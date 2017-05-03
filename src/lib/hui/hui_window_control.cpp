@@ -65,8 +65,12 @@ void GetPartStrings(const string &title)
 				PartString.erase(0);
 
 				int a = OptionString.find("format=");
-				if (a >= 0)
-					HuiFormatString = OptionString.substr(a + 7, OptionString.find(","));
+				if (a >= 0){
+					HuiFormatString = OptionString.substr(a + 7, -1);
+					int b = HuiFormatString.find(",");
+					if (b >= 0)
+						HuiFormatString = HuiFormatString.substr(0, b);
+				}
 			}
 	if (PartString.num == 0)
 		PartString.add("");

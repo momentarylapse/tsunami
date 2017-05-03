@@ -56,43 +56,67 @@ void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, c
 	gtk_tree_path_free(path);
 }
 
-GType HuiTypeList[64];
-void CreateTypeList()
+string make_format_string_useful(const string &_format, int size)
 {
-	for (int i=HuiFormatString.num;i<PartString.num;i++)
-		HuiFormatString.add('t');
-	for (int i=0;i<PartString.num;i++)
-		if ((HuiFormatString[i] == 'c') || (HuiFormatString[i] == 'C'))
-			HuiTypeList[i] = G_TYPE_BOOLEAN;
-		else if (HuiFormatString[i] == 'i')
-			HuiTypeList[i] = GDK_TYPE_PIXBUF;
-		else
-			HuiTypeList[i] = G_TYPE_STRING;
+	string format_string = _format;
+	for (int i=format_string.num; i<size; i++)
+		format_string.add('t');
+	format_string.resize(size);
+	return format_string;
 }
 
-void configure_tree_view_columns(HuiControl *c, GtkWidget *view)
+Array<GType> CreateTypeList(const string &_format, int size)
 {
-	for (int i=0;i<PartString.num;i++){
+	Array<GType> types;
+	string format_string = make_format_string_useful(_format, size);
+
+	for (char f: format_string){
+		if ((f == 'c') or (f == 'C'))
+			types.add(G_TYPE_BOOLEAN);
+		else if (f == 'i')
+			types.add(GDK_TYPE_PIXBUF);
+		else if (f == 'L')
+			types.add(G_TYPE_INT);
+		else
+			types.add(G_TYPE_STRING);
+	}
+	return types;
+}
+
+void configure_tree_view_columns(HuiControl *c, GtkWidget *view, const string &_format, Array<string> &parts)
+{
+	string format_string = make_format_string_useful(_format, parts.num);
+
+	foreachi (char f, format_string, i){
 		GtkCellRenderer *renderer;
 		GtkTreeViewColumn *column;
-		if (HuiFormatString[i] == 'C'){
+		if (f == 'C'){
+			// editable checkbox
    			renderer = gtk_cell_renderer_toggle_new();
 			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "active", i, NULL);
 			g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
 			g_signal_connect (G_OBJECT(renderer), "toggled", G_CALLBACK(list_toggle_callback), c);
-		}else if (HuiFormatString[i] == 'c'){
+		}else if (f == 'c'){
+			// constant checkbox
    			renderer = gtk_cell_renderer_toggle_new();
 			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "active", i, NULL);
-		}else if (HuiFormatString[i] == 'i'){
+		}else if (f == 'i'){
+			// image
    			renderer = gtk_cell_renderer_pixbuf_new();
 			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "pixbuf", i, NULL);
-		}else if (HuiFormatString[i] == 'T'){
+		}else if (f == 'L'){
+			// list
+			renderer = gtk_cell_renderer_combo_new();
+			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "active", i, NULL);
+		}else if (f == 'T'){
+			// editable text
 			renderer = gtk_cell_renderer_text_new();
 			g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
 			g_object_set(renderer, "editable", TRUE, NULL);
 			g_signal_connect(renderer, "edited", G_CALLBACK(list_edited_callback), c);
 			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "text", i, NULL);
 		}else{
+			// constant text
 			renderer = gtk_cell_renderer_text_new();
 			column = gtk_tree_view_column_new_with_attributes(sys_str(PartString[i]), renderer, "text", i, NULL);
 		}
@@ -146,8 +170,8 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	// "model"
-	CreateTypeList();
-	GtkListStore *store = gtk_list_store_newv(PartString.num, HuiTypeList);
+	Array<GType> types = CreateTypeList(HuiFormatString, PartString.num);
+	GtkListStore *store = gtk_list_store_newv(types.num, &types[0]);
 
 	// "view"
 	GtkWidget *view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -162,6 +186,8 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 	g_signal_connect(G_OBJECT(store), "row-deleted", G_CALLBACK(&OnGtkListRowDeleted), this);
 	allow_change_messages = true;
 
+	row_target = -1;
+
 	// frame
 	frame = sw;
 	if (panel->border_width > 0){
@@ -173,7 +199,7 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 
 	widget = view;
 
-	configure_tree_view_columns(this, view);
+	configure_tree_view_columns(this, view, HuiFormatString, PartString);
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	setOptions(OptionString);

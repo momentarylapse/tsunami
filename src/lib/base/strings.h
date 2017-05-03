@@ -9,7 +9,7 @@
 //--------------------------------------------------------------
 // cool string class
 
-class string : public DynamicArray
+class string : public Array<char>
 {
 	public:
 
@@ -72,7 +72,7 @@ class string : public DynamicArray
 	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
 	{	assign(&s);	}
 	void _cdecl operator += (const string &s)
-	{	append(&s);	}
+	{	DynamicArray::append(&s);	}
 	string _cdecl operator + (const string &s) const
 	{	string r = *this;	r += s;	return r;	}
 	friend string _cdecl operator + (const char *s1, const string &s2)

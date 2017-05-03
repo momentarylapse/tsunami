@@ -13,7 +13,7 @@ ActionGroup::ActionGroup()
 
 ActionGroup::~ActionGroup()
 {
-	for (Action *a : action)
+	for (Action *a: action)
 		delete(a);
 	action.clear();
 }
@@ -49,13 +49,13 @@ void ActionGroup::undo(Data *d)
 
 void ActionGroup::redo(Data *d)
 {
-	for (Action *a : action)
+	for (Action *a: action)
 		a->redo(d);
 }
 
 bool ActionGroup::is_trivial()
 {
-	for (Action *a : action)
+	for (Action *a: action)
 		if (!a->is_trivial())
 			return false;
 	return true;

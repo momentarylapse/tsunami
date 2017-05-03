@@ -12,9 +12,8 @@
 
 void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpointer data);
 void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, const gchar *new_text, gpointer data);
-extern GType HuiTypeList[64];
-void CreateTypeList();
-void configure_tree_view_columns(HuiControl *c, GtkWidget *view);
+Array<GType> CreateTypeList(const string &_format, int size);
+void configure_tree_view_columns(HuiControl *c, GtkWidget *view, const string &_format, Array<string> &parts);
 void OnGtkListActivate(GtkWidget *widget, void* a, void* b, gpointer data);
 void OnGtkListSelect(GtkTreeSelection *selection, gpointer data);
 
@@ -29,8 +28,8 @@ HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, Hu
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	// "model"
-	CreateTypeList();
-	GtkTreeStore *store = gtk_tree_store_newv(PartString.num, HuiTypeList);
+	Array<GType> types = CreateTypeList(HuiFormatString, PartString.num);
+	GtkTreeStore *store = gtk_tree_store_newv(types.num, &types[0]);
 
 	// "view"
 	GtkWidget *view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -51,7 +50,7 @@ HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, Hu
 
 	widget = view;
 
-	configure_tree_view_columns(this, view);
+	configure_tree_view_columns(this, view, HuiFormatString, PartString);
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	setOptions(OptionString);

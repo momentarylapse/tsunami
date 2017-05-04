@@ -55,7 +55,7 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("mode:midi", this, &MidiEditorConsole::onViewModeMidi);
+	event("mode:linear", this, &MidiEditorConsole::onViewModeLinear);
 	event("mode:tab", this, &MidiEditorConsole::onViewModeTab);
 	event("mode:classical", this, &MidiEditorConsole::onViewModeClassical);
 	event("beat_partition", this, &MidiEditorConsole::onBeatPartition);
@@ -150,7 +150,7 @@ void MidiEditorConsole::onCreationMode()
 	}
 }
 
-void MidiEditorConsole::onViewModeMidi()
+void MidiEditorConsole::onViewModeLinear()
 {
 	view->mode_midi->setMode(AudioView::MIDI_MODE_LINEAR);
 }
@@ -257,7 +257,8 @@ void MidiEditorConsole::setTrack(Track *t)
 				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
 
 		int mode = view->mode->which_midi_mode(track);
-		check("mode:midi", mode == view->MIDI_MODE_LINEAR);
+		view->mode_midi->setMode(mode);
+		check("mode:linear", mode == view->MIDI_MODE_LINEAR);
 		check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
 		check("mode:tab", mode == view->MIDI_MODE_TAB);
 	}

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-404
+405
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -647,6 +647,9 @@ Midi
 
 midi_editor/mode:classical
 Klassisch
+
+midi_editor/mode:linear
+Linear
 
 midi_editor/mode:midi
 Midi

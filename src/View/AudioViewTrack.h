@@ -40,21 +40,23 @@ public:
 		STATE_REFERENCE
 	};
 
+	void drawBackground(Painter *c);
+	void drawGridBars(Painter *c, const color &bg, bool show_time);
 
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
-	void drawMidiDefault(Painter *c, const MidiData &midi, bool as_reference, int shift);
+	void drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift);
-	void drawMidiScore(Painter *c, const MidiData &midi, bool as_reference, int shift);
-	void drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteScore(Painter *c, MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
+	void drawMidiClassical(Painter *c, const MidiData &midi, bool as_reference, int shift);
+	void drawMidiClassicalClef(Painter *c, const Clef &clef, const Scale &scale);
+	void drawMidiNoteClassical(Painter *c, MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
-	static void draw_score_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
+	static void draw_classical_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
 	Track *track;
 	rect area;

@@ -29,7 +29,7 @@ public:
 	virtual void onKeyUp(int k);
 	virtual void updateTrackHeights();
 
-	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time);
+
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift);

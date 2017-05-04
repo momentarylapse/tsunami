@@ -10,7 +10,7 @@ menu_fake
 0
 48
 0
-21385920
+47008032
 0
 2
 Item
@@ -2650,7 +2650,7 @@ rand_id_347115
 -1
 3
 RadioButton
-mode:midi
+mode:linear
 expandx
 
 1
@@ -7190,8 +7190,8 @@ Midi
 midi_editor/mode:classical
 Classical
 
-midi_editor/mode:midi
-Midi
+midi_editor/mode:linear
+Linear
 
 midi_editor/mode:tab
 Tab
@@ -7679,7 +7679,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-403
+404
 // Text
 /cancel
 Abbrechen
@@ -8325,6 +8325,9 @@ Midi
 
 midi_editor/mode:classical
 Klassisch
+
+midi_editor/mode:linear
+Linear
 
 midi_editor/mode:midi
 Midi

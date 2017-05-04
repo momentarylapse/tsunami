@@ -30,7 +30,7 @@ public:
 
 	void onScale();
 	void onBeatPartition();
-	void onViewModeMidi();
+	void onViewModeLinear();
 	void onViewModeClassical();
 	void onViewModeTab();
 	void onCreationMode();

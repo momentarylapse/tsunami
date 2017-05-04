@@ -37,10 +37,9 @@ public:
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 
 	void drawMidiNote(Painter *c, const MidiNote &n, int state);
-	void drawMidiEvent(Painter *c, const MidiEvent &e);
 	void drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableLinear(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableClassical(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
 
 	virtual Selection getHover();
 

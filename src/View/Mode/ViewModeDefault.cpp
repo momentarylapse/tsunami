@@ -15,8 +15,6 @@
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "math.h"
 
-string i2s_small(int i);
-
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
@@ -242,94 +240,20 @@ void ViewModeDefault::updateTrackHeights()
 
 
 
-void ViewModeDefault::drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time)
-{
-	if (song->bars.num == 0)
-		return;
-	int prev_num_beats = 0;
-	float prev_bpm = 0;
-	int s0 = cam->screen2sample(r.x1 - 1);
-	int s1 = cam->screen2sample(r.x2);
-	//c->SetLineWidth(2.0f);
-	Array<float> dash, no_dash;
-	dash.add(6);
-	dash.add(4);
-	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = song->bars.getBars(Range(s0, s1 - s0));
-	for (Bar &b: bars){
-		int xx = cam->sample2screen(b.range.offset);
-
-		float dx_bar = cam->dsample2screen(b.range.length);
-		float dx_beat = dx_bar / b.num_beats;
-		float f1 = min(1.0f, dx_bar / 40.0f);
-		if ((b.index % 5) == 0)
-			f1 = 1;
-		float f2 = min(1.0f, dx_beat / 25.0f);
-
-		if (f1 >= 0.1f){
-			c->setColor(ColorInterpolate(bg, view->colors.text_soft1, f1));
-			c->setLineDash(no_dash, r.y1);
-			c->drawLine(xx, r.y1, xx, r.y2);
-		}
-
-		if (f2 >= 0.1f){
-			color c1 = ColorInterpolate(bg, view->colors.text_soft1, f2);
-			float beat_length = (float)b.range.length / (float)b.num_beats;
-			c->setLineDash(dash, r.y1);
-			for (int i=0; i<b.num_beats; i++){
-				float beat_offset = b.range.offset + (float)i * beat_length;
-				if (i == 0)
-					continue;
-				c->setColor(c1);
-				int x = cam->sample2screen(beat_offset);
-				c->drawLine(x, r.y1, x, r.y2);
-			}
-		}
-
-		if (show_time){
-			if (f1 > 0.9f){
-				c->setColor(view->colors.text_soft1);
-				c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
-			}
-			float bpm = b.bpm(song->sample_rate);
-			string s;
-			if (prev_num_beats != b.num_beats)
-				s = i2s(b.num_beats) + "/" + i2s_small(4);
-			if (fabs(prev_bpm - bpm) > 0.5f)
-				s += format(" \u2669=%.0f", bpm);
-			if (s.num > 0){
-				c->setColor(view->colors.text_soft1);
-				c->setFont("", view->FONT_SIZE, true, false);
-				c->drawStr(max(xx + 4, 20), r.y2 - 16, s);
-				c->setFont("", view->FONT_SIZE, false, false);
-			}
-			prev_num_beats = b.num_beats;
-			prev_bpm = bpm;
-		}
-	}
-	c->setLineDash(no_dash, 0);
-	c->setLineWidth(view->LINE_WIDTH);
-}
-
-void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
-{
-	color cc = (view->sel.has(t->track)) ? view->colors.background_track_selected : view->colors.background_track;
-	c->setColor(cc);
-	c->drawRect(t->area);
-
-	view->drawGridTime(c, t->area, cc, false);
-	drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
-}
-
 void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift)
 {
 	int mode = which_midi_mode(t->track);
 	if (mode == view->MIDI_MODE_LINEAR)
-		t->drawMidiDefault(c, midi, as_reference, shift);
+		t->drawMidiLinear(c, midi, as_reference, shift);
 	else if (mode == view->MIDI_MODE_TAB)
 		t->drawMidiTab(c, midi, as_reference, shift);
-	else // if (mode == view->VIEW_MIDI_SCORE)
-		t->drawMidiScore(c, midi, as_reference, shift);
+	else // if (mode == view->VIEW_MIDI_CLASSICAL)
+		t->drawMidiClassical(c, midi, as_reference, shift);
+}
+
+void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
+{
+	t->drawBackground(c);
 }
 
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)

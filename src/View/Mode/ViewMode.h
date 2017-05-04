@@ -40,7 +40,6 @@ public:
 
 	virtual Selection getHover();
 
-	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time = false){}
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
 	virtual void drawPost(Painter *c){}

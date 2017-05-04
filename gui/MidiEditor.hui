@@ -7,7 +7,7 @@ Dialog midi_editor "Midi" 380 516
 				Grid ? "" 2 4
 					Text me_t_mode "Mode:"
 					Grid ? "" 3 1
-						RadioButton mode:midi "Midi" expandx
+						RadioButton mode:linear "Linear" expandx
 						RadioButton mode:classical "Classical" expandx
 						RadioButton mode:tab "Tab" expandx
 					Text me_t_partition "Sub beats"

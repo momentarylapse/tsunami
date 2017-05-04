@@ -569,35 +569,24 @@ void ViewModeMidi::drawMidiNote(Painter *c, const MidiNote &n, int state)
 	}
 	if (view->sel.has(&n)){
 		color col1 = view->colors.selection;
-		AudioViewTrack::draw_score_note(c, x1, x2, y, r, 2, col1, col1, false);
+		AudioViewTrack::draw_classical_note(c, x1, x2, y, r, 2, col1, col1, false);
 	}
 
-	AudioViewTrack::draw_score_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
-}
-
-void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
-{
-	float x = cam->sample2screen(e.pos);
-	float y1 = pitch2y(e.pitch + 1);
-	float y2 = pitch2y(e.pitch);
-	color col = AudioViewTrack::getPitchColor(e.pitch);
-	col = ColorInterpolate(col, view->colors.text, 0.5f);
-	c->setColor(col);
-	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
+	AudioViewTrack::draw_classical_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
 }
 
 void ViewModeMidi::drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	int mode = which_midi_mode(t->track);
 	if (mode == view->MIDI_MODE_CLASSICAL)
-		t->drawMidiScore(c, midi, as_reference, 0);
+		t->drawMidiClassical(c, midi, as_reference, 0);
 	else if (mode == view->MIDI_MODE_TAB)
 		t->drawMidiTab(c, midi, as_reference, 0);
 	else // midi
-		drawMidiEditableDefault(c, t, midi, as_reference, track, area);
+		drawMidiEditableLinear(c, t, midi, as_reference, track, area);
 }
 
-void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableLinear(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	track_rect = area;
 
@@ -614,11 +603,11 @@ void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const 
 	}
 }
 
-void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableClassical(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	const Clef& clef = track->instrument.get_clef();
 
-	t->drawMidiScoreClef(c, clef, view->midi_scale);
+	t->drawMidiClassicalClef(c, clef, view->midi_scale);
 	//const int *mod = view->midi_scale.get_modifiers_clef();
 
 	c->setAntialiasing(true);
@@ -631,9 +620,9 @@ void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const Mi
 	foreachi(MidiNote *n, midi, i){
 		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
 		if (as_reference){
-			t->drawMidiNoteScore(c, n, 0, AudioViewTrack::STATE_REFERENCE, clef);
+			t->drawMidiNoteClassical(c, n, 0, AudioViewTrack::STATE_REFERENCE, clef);
 		}else{
-			t->drawMidiNoteScore(c, n, 0, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT, clef);
+			t->drawMidiNoteClassical(c, n, 0, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT, clef);
 		}
 	}
 
@@ -660,7 +649,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 			Array<MidiNote> notes = getCreationNotes();
 			for (MidiNote &n: notes){
 				if (mode == view->MIDI_MODE_CLASSICAL)
-					t->drawMidiNoteScore(c, &n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
+					t->drawMidiNoteClassical(c, &n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
 				else if (mode == view->MIDI_MODE_TAB)
 					{}
 				else
@@ -678,7 +667,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 				MidiNote n = MidiNote(r, hover->pitch, 1);
 				n.clef_position = hover->clef_position;
 				n.modifier = hover->modifier;
-				t->drawMidiNoteScore(c, &n, 0, t->STATE_HOVER, clef);
+				t->drawMidiNoteClassical(c, &n, 0, t->STATE_HOVER, clef);
 
 				float x = view->cam.sample2screen(r.offset);
 				int mod;

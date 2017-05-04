@@ -201,7 +201,7 @@ public:
 		cc->song->action_manager->beginActionGroup();
 		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
-		tbuf.set(input->buffer, 0, 1.0f);
+		tbuf.add(input->buffer, 0, 1.0f, 0);
 		song->execute(a);
 		song->action_manager->endActionGroup();
 

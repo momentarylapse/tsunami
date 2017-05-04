@@ -357,9 +357,16 @@ void ViewModeMidi::drawTrackPitchGrid(Painter *c, AudioViewTrack *t)
 	}
 }
 
-inline bool hover_note_classical_or_tab(const MidiNote &n, Selection &s, ViewModeMidi *vmm)
+inline bool hover_note_classical(const MidiNote &n, Selection &s, ViewModeMidi *vmm)
 {
 	if (n.clef_position != s.clef_position)
+		return false;
+	return n.range.is_inside(s.pos);
+}
+
+inline bool hover_note_tab(const MidiNote &n, Selection &s, ViewModeMidi *vmm)
+{
+	if (n.stringno != s.clef_position)
 		return false;
 	return n.range.is_inside(s.pos);
 }
@@ -454,7 +461,7 @@ Selection ViewModeMidi::getHover()
 
 		if (creation_mode != CREATION_MODE_SELECT){
 			int mode = which_midi_mode(s.track);
-			if ((mode == AudioView::MIDI_MODE_CLASSICAL)){// or (mode == AudioView::MIDI_MODE_TAB)){
+			if ((mode == AudioView::MIDI_MODE_CLASSICAL)){
 				s.pitch = cur_track->y2pitch_classical(my, modifier);
 				s.clef_position = cur_track->screen_to_clef_pos(my);
 				s.modifier = modifier;
@@ -462,7 +469,21 @@ Selection ViewModeMidi::getHover()
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
 				foreachi(MidiNote *n, s.track->midi, i)
-					if (hover_note_classical_or_tab(*n, s, this)){
+					if (hover_note_classical(*n, s, this)){
+						s.note = n;
+						s.index = i;
+						s.type = Selection::TYPE_MIDI_NOTE;
+						return s;
+					}
+			}else if ((mode == AudioView::MIDI_MODE_TAB)){
+				//s.pitch = cur_track->y2pitch_classical(my, modifier);
+				s.clef_position = cur_track->screen_to_string(my);
+				s.modifier = modifier;
+				//s.type = Selection::TYPE_MIDI_PITCH;
+				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
+
+				foreachi(MidiNote *n, s.track->midi, i)
+					if (hover_note_tab(*n, s, this)){
 						s.note = n;
 						s.index = i;
 						s.type = Selection::TYPE_MIDI_NOTE;

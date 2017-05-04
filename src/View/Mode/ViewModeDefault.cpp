@@ -253,7 +253,11 @@ void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiData &mi
 
 void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
-	t->drawBackground(c);
+	t->drawBlankBackground(c);
+
+	color cc = t->getBackgroundColor();
+	view->drawGridTime(c, t->area, cc, false);
+	t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), 0);
 }
 
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
@@ -459,6 +463,8 @@ void ViewModeDefault::selectUnderMouse()
 
 int ViewModeDefault::which_midi_mode(Track *t)
 {
+	if (view->midi_view_mode == view->MIDI_MODE_LINEAR)
+			return view->MIDI_MODE_LINEAR;
 	if ((view->midi_view_mode == view->MIDI_MODE_TAB) and (t->instrument.string_pitch.num > 0))
 		return view->MIDI_MODE_TAB;
 	return view->MIDI_MODE_CLASSICAL;

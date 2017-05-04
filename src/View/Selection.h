@@ -13,6 +13,7 @@
 class AudioViewTrack;
 class Track;
 class SampleRef;
+class MidiNote;
 
 class Selection
 {
@@ -21,6 +22,7 @@ public:
 	AudioViewTrack *vtrack;
 	Track *track;
 	SampleRef *sample;
+	MidiNote *note;
 	int pos;
 	int sample_offset;
 	Array<int> barrier;

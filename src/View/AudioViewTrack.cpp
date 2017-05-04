@@ -16,12 +16,17 @@
 #include "../Audio/Synth/Synthesizer.h"
 
 
+const int PITCH_SHOW_COUNT = 30;
+
 string i2s_small(int i); // -> MidiData.cpp
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
 	track = _track;
+
+	pitch_min = 55;
+	pitch_max = pitch_min + PITCH_SHOW_COUNT;
 
 	area = rect(0, 0, 0, 0);
 	height_min = height_wish = 0;
@@ -263,12 +268,76 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	c->setFont("", -1, false, false);
 }
 
+
+
+void AudioViewTrack::setPitchMinMax(int _min, int _max)
+{
+	int diff = _max - _min;
+	pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
+	pitch_max = pitch_min + diff;
+	view->forceRedraw();
+}
+
+float AudioViewTrack::linear_pitch2y(int pitch)
+{
+	return area.y2 - area.height() * ((float)pitch - pitch_min) / (pitch_max - pitch_min);
+}
+
+float AudioViewTrack::classical_pitch2y(int pitch)
+{
+	int mod;
+	const Clef& clef = track->instrument.get_clef();
+	int p = clef.pitch_to_position(pitch, view->midi_scale, mod);
+	return clef_pos_to_screen(p);
+}
+
+void AudioViewTrack::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
+{
+	float x1 = view->cam.sample2screen(n.range.offset);
+	float x2 = view->cam.sample2screen(n.range.end());
+	float y1 = linear_pitch2y(n.pitch + 1);
+	float y2 = linear_pitch2y(n.pitch);
+
+	float y = (y1 + y2) / 2;
+	float r = max((y2 - y1) / 2.3f, 2.0f);
+
+	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
+	if (state == AudioViewTrack::STATE_HOVER){
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	}else if (state == AudioViewTrack::STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
+	}
+	if (view->sel.has(&n)){
+		color col1 = view->colors.selection;
+		AudioViewTrack::draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	AudioViewTrack::draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
+}
+
 void AudioViewTrack::drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
-	c->setLineWidth(3.0f);
+	//c->setLineWidth(3.0f);
+
+
+	// draw notes
+	for (MidiNote *n: midi){
+		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
+			continue;
+		bool _hover = ((view->hover.type == Selection::TYPE_MIDI_NOTE) and (n == view->hover.note));
+		if (as_reference){
+			drawMidiNoteLinear(c, *n, 0, AudioViewTrack::STATE_REFERENCE);
+		}else{
+			drawMidiNoteLinear(c, *n, 0, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT);
+		}
+	}
+
+	/*
+
 	for (MidiNote *n: notes){
+		//drawMidiNoteLinear(c,  *n, 0, );
 		float x1 = view->cam.sample2screen(n->range.offset + shift);
 		float x2 = view->cam.sample2screen(n->range.end() + shift);
 		x2 = max(x2, x1 + 4);
@@ -286,10 +355,10 @@ void AudioViewTrack::drawMidiLinear(Painter *c, const MidiData &midi, bool as_re
 		//c->drawRect(rect(x1, x2, r.y1, r.y2));
 		c->drawLine(x1, h, x2, h);
 	}
-	c->setLineWidth(view->LINE_WIDTH);
+	c->setLineWidth(view->LINE_WIDTH);*/
 }
 
-void AudioViewTrack::draw_classical_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
+void AudioViewTrack::draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
 {
 	float x = x1 + r;
 
@@ -343,13 +412,13 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_refer
 
 		if (view->sel.has(n)){
 			color col2 = view->colors.selection;
-			draw_classical_note(c, x1, x2, y, r, 2, col2, col2, false);
+			draw_simple_note(c, x1, x2, y, r, 2, col2, col2, false);
 		}
 
 		color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
 		col = ColorInterpolate(col, view->colors.background_track, 0.3f);
 
-		draw_classical_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
+		draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
 
 		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
@@ -402,7 +471,7 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, MidiNote *n, int shift, M
 	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
 	if (view->sel.has(n)){
 		color col1 = view->colors.selection;
-		draw_classical_note(c, x1, x2, y, r, 2, col1, col1, false);
+		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
 	}
 	if (state == STATE_HOVER)
 		col = ColorInterpolate(col, view->colors.hover, 0.333f);
@@ -416,7 +485,7 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, MidiNote *n, int shift, M
 		c->drawStr(x1 - size*0.7f, y - size*0.8f , modifier_symbol(n->modifier));
 	}
 
-	draw_classical_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
+	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
 }
 
 void AudioViewTrack::drawMidiClassicalClef(Painter *c, const Clef &clef, const Scale &scale)
@@ -460,7 +529,7 @@ void AudioViewTrack::drawMidiClassical(Painter *c, const MidiData &midi, bool as
 	c->setAntialiasing(false);
 }
 
-void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time)
+void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition)
 {
 	if (view->song->bars.num == 0)
 		return;
@@ -496,6 +565,12 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time)
 			c->setLineDash(dash, area.y1);
 			for (int i=0; i<b.num_beats; i++){
 				float beat_offset = b.range.offset + (float)i * beat_length;
+				color c2 = ColorInterpolate(bg, c1, 0.6f);
+				c->setColor(c2);
+				for (int j=1; j<beat_partition; j++){
+					int x = view->cam.sample2screen(beat_offset + beat_length * j / beat_partition);
+					c->drawLine(x, area.y1, x, area.y2);
+				}
 				if (i == 0)
 					continue;
 				c->setColor(c1);
@@ -529,14 +604,16 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time)
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void AudioViewTrack::drawBackground(Painter *c)
+color AudioViewTrack::getBackgroundColor()
 {
-	color cc = (view->sel.has(track)) ? view->colors.background_track_selected : view->colors.background_track;
+	return (view->sel.has(track)) ? view->colors.background_track_selected : view->colors.background_track;
+}
+
+void AudioViewTrack::drawBlankBackground(Painter *c)
+{
+	color cc = getBackgroundColor();
 	c->setColor(cc);
 	c->drawRect(area);
-
-	view->drawGridTime(c, area, cc, false);
-	drawGridBars(c, cc, (track->type == Track::TYPE_TIME));
 }
 
 void AudioViewTrack::draw(Painter *c)

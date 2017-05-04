@@ -25,6 +25,7 @@ void Selection::clear()
 	track = NULL;
 	vtrack = NULL;
 	sample = NULL;
+	note = NULL;
 	index = 0;
 	pos = 0;
 	sample_offset = 0;
@@ -38,6 +39,7 @@ bool hover_changed(Selection &hover, Selection &hover_old)
 {
 	return (hover.type != hover_old.type)
 			or (hover.sample != hover_old.sample)
+			or (hover.note != hover_old.note)
 			or (hover.show_track_controls != hover_old.show_track_controls)
 			or (hover.index != hover_old.index)
 			or (hover.pitch != hover_old.pitch)

@@ -32,6 +32,11 @@ public:
 
 	float clef_pos_to_screen(int pos);
 	int screen_to_clef_pos(float y);
+	float classical_pitch2y(int pitch);
+	float linear_pitch2y(int pitch);
+
+	void setPitchMinMax(int pitch_min, int pitch_max);
+	int pitch_min, pitch_max;
 
 	enum MidiNoteState
 	{
@@ -40,8 +45,9 @@ public:
 		STATE_REFERENCE
 	};
 
-	void drawBackground(Painter *c);
-	void drawGridBars(Painter *c, const color &bg, bool show_time);
+	color getBackgroundColor();
+	void drawBlankBackground(Painter *c);
+	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
 
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
@@ -49,6 +55,7 @@ public:
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
 	void drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift);
+	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
 	void drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiClassical(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiClassicalClef(Painter *c, const Clef &clef, const Scale &scale);
@@ -56,7 +63,7 @@ public:
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
-	static void draw_classical_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
+	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
 	Track *track;
 	rect area;

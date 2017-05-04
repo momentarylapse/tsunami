@@ -21,31 +21,499 @@
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 
+
+class CaptureConsoleMode
+{
+public:
+	CaptureConsoleMode(CaptureConsole *_cc)
+{
+		cc = _cc;
+		song = cc->song;
+		view = cc->view;
+	}
+	virtual ~CaptureConsoleMode(){};
+	virtual void start() = 0;
+	virtual void stop() = 0;
+	virtual void enter() = 0;
+	virtual void leave() = 0;
+	virtual void enterParent(){};
+	virtual void leaveParent(){};
+	virtual bool insert() = 0;
+	virtual void pause() = 0;
+	virtual void dump() = 0;
+	virtual int getSampleCount() = 0;
+	virtual bool isCapturing() = 0;
+
+	CaptureConsole *cc;
+	Song *song;
+	AudioView *view;
+};
+
+class CaptureConsoleModeAudio : public CaptureConsoleMode
+{
+	InputStreamAudio *input;
+	Array<Device*> sources;
+	Device *chosen_device;
+	int target;
+
+public:
+	CaptureConsoleModeAudio(CaptureConsole *_cc) :
+		CaptureConsoleMode(_cc)
+	{
+		msg_write("audio.new");
+		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+		input = NULL;
+		target = -1;
+
+		cc->event("capture_audio_source", this, &CaptureConsoleModeAudio::onSource);
+		cc->event("capture_audio_target", this, &CaptureConsoleModeAudio::onTarget);
+	}
+
+	void onSource()
+	{
+		int n = cc->getInt("");
+		if ((n >= 0) and (n < sources.num)){
+			chosen_device = sources[n];
+			input->setDevice(chosen_device);
+		}
+	}
+
+	void onTarget()
+	{
+		target = cc->getInt("capture_audio_target");
+		view->capturing_track = target;
+	}
+
+	virtual void enterParent()
+	{
+		target = view->cur_track->get_index();
+	}
+
+	virtual void enter()
+	{
+		sources = cc->device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+
+		// add all
+		cc->reset("capture_audio_source");
+		for (Device *d: sources)
+			cc->setString("capture_audio_source", d->get_name());
+
+		// select current
+		foreachi(Device *d, sources, i)
+			if (d == chosen_device)
+				cc->setInt("capture_audio_source", i);
+
+
+		// target list
+		cc->reset("capture_audio_target");
+		for (Track *t: song->tracks)
+			cc->addString("capture_audio_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
+		cc->addString("capture_audio_target", _("  - create new track -"));
+
+		view->capturing_track = target;
+		cc->setInt("capture_audio_target", target);
+
+
+		input = new InputStreamAudio(song->sample_rate);
+		input->setBackupMode(BACKUP_MODE_TEMP);
+		input->setChunkSize(4096);
+		input->setUpdateDt(0.03f);
+		cc->subscribe(input);
+		view->setInput(input);
+		cc->peak_meter->setSource(input);
+
+		input->setDevice(chosen_device);
+
+		//enable("capture_audio_source", false);
+
+		if (!input->start()){
+			/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
+			CapturingByDialog = false;
+			msg_db_l(1);
+			return;*/
+		}
+	}
+
+	virtual void leave()
+	{
+		cc->peak_meter->setSource(NULL);
+		view->setInput(NULL);
+		cc->unsubscribe(input);
+		delete(input);
+		input = NULL;
+	}
+
+	virtual void pause()
+	{
+		input->accumulate(false);
+	}
+
+	virtual void start()
+	{
+		input->resetSync();
+		input->accumulate(true);
+		cc->enable("capture_audio_source", false);
+		cc->enable("capture_audio_target", false);
+	}
+
+	virtual void stop()
+	{
+		input->stop();
+	}
+
+	virtual void dump()
+	{
+		input->resetAccumulation();
+		input->accumulate(false);
+		cc->enable("capture_audio_source", true);
+		cc->enable("capture_audio_target", true);
+	}
+
+	virtual bool insert()
+	{
+
+		Track *t;
+		int i0;
+		int s_start = view->sel.range.start();
+
+		// insert recorded data with some delay
+		int dpos = input->getDelay();
+
+		if (target >= song->tracks.num){
+			// new track
+			t = song->addTrack(Track::TYPE_AUDIO, song->tracks.num);
+		}else{
+			// overwrite
+			t = song->tracks[target];
+		}
+		i0 = s_start + dpos;
+
+		if (t->type != Track::TYPE_AUDIO){
+			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(t->type).c_str()));
+			return false;
+		}
+
+		// insert data
+		Range r = Range(i0, input->getSampleCount());
+		cc->song->action_manager->beginActionGroup();
+		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
+		tbuf.set(input->buffer, 0, 1.0f);
+		song->execute(a);
+		song->action_manager->endActionGroup();
+
+		input->resetAccumulation();
+		return true;
+	}
+
+	virtual int getSampleCount()
+	{
+		return input->getSampleCount();
+	}
+
+	virtual bool isCapturing()
+	{
+		return input->isCapturing();
+	}
+};
+
+
+class CaptureConsoleModeMidi : public CaptureConsoleMode
+{
+	InputStreamMidi *input;
+	Array<Device*> sources;
+	Device *chosen_device;
+	int target;
+	Synthesizer *temp_synth;
+
+
+
+public:
+	CaptureConsoleModeMidi(CaptureConsole *_cc) :
+		CaptureConsoleMode(_cc)
+	{
+		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_MIDI_INPUT);
+		input = NULL;
+		target = -1;
+
+		temp_synth = CreateSynthesizer("", song);
+
+		cc->event("capture_midi_source", this, &CaptureConsoleModeAudio::onSource);
+		cc->event("capture_midi_target", this, &CaptureConsoleModeAudio::onTarget);
+	}
+
+	void onSource()
+	{
+		int n = cc->getInt("");
+		if ((n >= 0) and (n < sources.num)){
+			chosen_device = sources[n];
+			input->setDevice(chosen_device);
+		}
+	}
+
+	void onTarget()
+	{
+		setTarget(cc->getInt("capture_midi_target"));
+	}
+
+
+	void setTarget(int index)
+	{
+		target = index;
+		if (index < song->tracks.num){
+			Track *t = song->tracks[index];
+			if (t->type == t->TYPE_TIME){
+				index = song->tracks.num;
+				input->setPreviewSynthesizer(temp_synth);
+			}else{
+				input->setPreviewSynthesizer(t->synth);
+			}
+		}else{
+			input->setPreviewSynthesizer(temp_synth);
+		}
+		view->capturing_track = index;
+		cc->setInt("capture_midi_target", index);
+	}
+
+	virtual void enterParent()
+	{
+		target = view->cur_track->get_index();
+	}
+
+	virtual void enter()
+	{
+		sources = cc->device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
+
+		// add all
+		cc->reset("capture_midi_source");
+		for (Device *d: sources)
+			cc->setString("capture_midi_source", d->get_name());
+
+		// select current
+		foreachi(Device *d, sources, i)
+			if (d == chosen_device)
+				cc->setInt("capture_midi_source", i);
+
+
+		// target list
+		cc->reset("capture_midi_target");
+		for (Track *t: song->tracks)
+			cc->addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
+		cc->addString("capture_midi_target", _("  - create new track -"));
+
+		input = new InputStreamMidi(song->sample_rate);
+		input->setBackupMode(BACKUP_MODE_TEMP);
+		input->setChunkSize(4096);
+		input->setUpdateDt(0.03f);
+		cc->subscribe(input);
+		view->setInput(input);
+		cc->peak_meter->setSource(input);
+
+		input->setDevice(chosen_device);
+
+		setTarget(target);
+
+		if (!input->start()){
+			/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
+			CapturingByDialog = false;
+			msg_db_l(1);
+			return;*/
+		}
+	}
+
+	virtual void leave()
+	{
+		msg_write("midi.leave");
+		cc->peak_meter->setSource(NULL);
+		view->setInput(NULL);
+		cc->unsubscribe(input);
+		delete(input);
+		input = NULL;
+	}
+
+	virtual void pause()
+	{
+		input->accumulate(false);
+	}
+
+	virtual void start()
+	{
+		input->resetSync();
+		input->accumulate(true);
+		cc->enable("capture_midi_source", false);
+		cc->enable("capture_midi_target", false);
+	}
+
+	virtual void stop()
+	{
+		input->stop();
+	}
+
+	virtual void dump()
+	{
+		input->resetAccumulation();
+		input->accumulate(false);
+		cc->enable("capture_midi_source", true);
+		cc->enable("capture_midi_target", true);
+	}
+
+	virtual bool insert()
+	{
+		Track *t;
+		int target = cc->getInt("capture_midi_target");
+		int i0;
+		int s_start = view->sel.range.start();
+
+		// insert recorded data with some delay
+		int dpos = input->getDelay();
+
+		if (target >= song->tracks.num){
+			// new track
+			t = song->addTrack(Track::TYPE_MIDI, song->tracks.num);
+		}else{
+			// overwrite
+			t = song->tracks[target];
+		}
+		i0 = s_start + dpos;
+
+		if (t->type != Track::TYPE_MIDI){
+			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(t->type).c_str()));
+			return false;
+		}
+
+		// insert data
+		t->insertMidiData(i0, midi_events_to_notes(input->midi));
+
+		input->resetAccumulation();
+		return true;
+	}
+
+	virtual int getSampleCount()
+	{
+		return input->getSampleCount();
+	}
+
+	virtual bool isCapturing()
+	{
+		return input->isCapturing();
+	}
+};
+
+
+
+
+class CaptureConsoleModeMulti: public CaptureConsoleMode
+{
+	Array<Device*> sources_audio;
+	Array<Device*> sources_midi;
+
+	int size;
+
+
+public:
+	CaptureConsoleModeMulti(CaptureConsole *_cc) :
+		CaptureConsoleMode(_cc)
+	{
+		size = 0;
+	}
+
+	virtual ~CaptureConsoleModeMulti()
+	{
+	}
+
+	virtual void enterParent()
+	{
+		sources_audio = cc->device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+		sources_midi = cc->device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
+
+		// target list multi
+		//reset("capture_multi_list");
+		//for (Track *t: song->tracks)
+		//	addString("capture_multi_list", t->getNiceName() + "\\" + track_type(t->type) + "\\ - none -");
+		foreachi (Track *t, song->tracks, i){
+			cc->setTarget("capture_multi_grid", -1);
+			cc->addLabel(t->getNiceName(), 0, i+1, 0, 0, "capture-multi-target-" + i2s(i));
+			cc->addLabel(track_type(t->type), 1, i+1, 0, 0, "capture-multi-type-" + i2s(i));
+			cc->addComboBox(_("- none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
+			if (t->type == Track::TYPE_AUDIO){
+				for (Device *d: sources_audio)
+					cc->addString("capture-multi-source-" + i2s(i), d->get_name());
+			}else if (t->type == Track::TYPE_MIDI){
+				for (Device *d: sources_midi)
+					cc->addString("capture-multi-source-" + i2s(i), d->get_name());
+			}
+		}
+		size = song->tracks.num;
+	}
+
+	virtual void leaveParent()
+	{
+		for (int i=0; i<size; i++){
+			cc->removeControl("capture-multi-target-" + i2s(i));
+			cc->removeControl("capture-multi-type-" + i2s(i));
+			cc->removeControl("capture-multi-source-" + i2s(i));
+		}
+		size = 0;
+	}
+
+	virtual void enter()
+	{
+	}
+
+	virtual void leave()
+	{
+	}
+
+	virtual void pause()
+	{
+	}
+
+	virtual void start()
+	{
+	}
+
+	virtual void stop()
+	{
+	}
+
+	virtual void dump()
+	{
+	}
+
+	virtual bool insert()
+	{
+		return false;
+	}
+
+	virtual int getSampleCount()
+	{
+		return 0;
+	}
+
+	virtual bool isCapturing()
+	{
+		return false;
+	}
+};
+
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	SideBarConsole(_("Recording")),
 	Observer("CaptureDialog")
 {
 	song = s;
 	view = v;
-	type = -1;
-	input = NULL;
+	mode = NULL;
 
 
 	// dialog
 	setBorderWidth(5);
 	embedDialog("record_dialog", 0, 0);
 
-	temp_synth = CreateSynthesizer("", s);
-
 	device_manager = tsunami->device_manager;
-	chosen_device_audio = NULL;
-	chosen_device_midi = NULL;
-
-	multi_size = 0;
 
 
 	// dialog
-	peak_meter = new PeakMeter(this, "capture_level", input, view);
+	peak_meter = new PeakMeter(this, "capture_level", NULL, view);
 
 
 
@@ -53,19 +521,21 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	//event("hui:close", this, &CaptureConsole::onClose);
 	event("ok", this, &CaptureConsole::onOk);
 	event("capture_type", this, &CaptureConsole::onType);
-	event("capture_audio_source", this, &CaptureConsole::onSourceAudio);
-	event("capture_audio_target", this, &CaptureConsole::onTargetAudio);
-	event("capture_midi_source", this, &CaptureConsole::onSourceMidi);
-	event("capture_midi_target", this, &CaptureConsole::onTargetMidi);
 	event("capture_start", this, &CaptureConsole::onStart);
 	event("capture_delete", this, &CaptureConsole::onDelete);
 	event("capture_pause", this, &CaptureConsole::onPause);
+
+	mode_audio = new CaptureConsoleModeAudio(this);
+	mode_midi = new CaptureConsoleModeMidi(this);
+	mode_multi = new CaptureConsoleModeMulti(this);
 }
 
 CaptureConsole::~CaptureConsole()
 {
+	delete(mode_audio);
+	delete(mode_midi);
+	delete(mode_multi);
 	delete(peak_meter);
-	delete(temp_synth);
 }
 
 inline int dev_type(int type)
@@ -77,69 +547,21 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
-	type = -1;
-	input = NULL;
-
-	chosen_device_audio = NULL;
-	chosen_device_midi = NULL;
-
-	chosen_device_audio = device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
-	chosen_device_midi = device_manager->chooseDevice(Device::TYPE_MIDI_INPUT);
-
-	updateSourceList();
-
-
-	// dialog
-	setString("capture_time", song->get_time_str_long(0));
-	enable("capture_delete", false);
-	enable("capture_pause", false);
-	enable("ok", false);
-
-	// target list
-	reset("capture_audio_target");
-	for (Track *t: song->tracks)
-		addString("capture_audio_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	addString("capture_audio_target", _("  - create new track -"));
-
-	// target list midi
-	reset("capture_midi_target");
-	for (Track *t: song->tracks)
-		addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	addString("capture_midi_target", _("  - create new track -"));
-
-	// target list multi
-	//reset("capture_multi_list");
-	//for (Track *t: song->tracks)
-	//	addString("capture_multi_list", t->getNiceName() + "\\" + track_type(t->type) + "\\ - none -");
-	foreachi (Track *t, song->tracks, i){
-		setTarget("capture_multi_grid", -1);
-		addLabel(t->getNiceName(), 0, i+1, 0, 0, "capture-multi-target-" + i2s(i));
-		addLabel(track_type(t->type), 1, i+1, 0, 0, "capture-multi-type-" + i2s(i));
-		addComboBox(_("- none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
-		for (Device *d: sources_audio)
-			addString("capture-multi-source-" + i2s(i), d->get_name());
-	}
-	multi_size = song->tracks.num;
-
-
-	if (view->cur_track){
-		if (view->cur_track->type == Track::TYPE_AUDIO)
-			beginAudio();
-		else if (view->cur_track->type == Track::TYPE_MIDI)
-			beginMidi();
-
-		setTargetAudio(view->cur_track->get_index());
-		setTargetMidi(view->cur_track->get_index());
+	if (view->cur_track->type == Track::TYPE_MIDI){
+		mode = mode_midi;
+		setInt("capture_type", 1);
 	}else{
-		beginAudio();
-		setTargetAudio(song->tracks.num);
-		setTargetMidi(song->tracks.num);
+		mode = mode_audio;
+		setInt("capture_type", 0);
 	}
 
-
-	//chosen_device = input->getDevice();//device_manager->chooseDevice(dev_type(type));
+	mode_audio->enterParent();
+	mode_midi->enterParent();
+	mode_multi->enterParent();
 
 	view->setMode(view->mode_capture);
+
+	mode->enter();
 
 	// automatically start
 	onStart();
@@ -147,204 +569,33 @@ void CaptureConsole::onEnter()
 
 void CaptureConsole::onLeave()
 {
-	if (input->isCapturing())
-		insert();
+	if (mode->isCapturing())
+		mode->insert();
 
 	view->stream->stop();
 
-	endCapture();
+	mode->leave();
 
-	for (int i=0; i<multi_size; i++){
-		removeControl("capture-multi-target-" + i2s(i));
-		removeControl("capture-multi-type-" + i2s(i));
-		removeControl("capture-multi-source-" + i2s(i));
-	}
+	mode_audio->leaveParent();
+	mode_midi->leaveParent();
+	mode_multi->leaveParent();
 
 	view->setMode(view->mode_default);
-}
-
-void CaptureConsole::onTargetAudio()
-{
-	int target = getInt("capture_audio_target");
-	setTargetAudio(target);
-}
-
-void CaptureConsole::onTargetMidi()
-{
-	int target = getInt("capture_midi_target");
-	setTargetMidi(target);
 }
 
 
 void CaptureConsole::onType()
 {
+	mode->leave();
+
 	int n = getInt("capture_type");
 	if (n == 0)
-		beginAudio();
+		mode = mode_audio;
 	if (n == 1)
-		beginMidi();
+		mode = mode_midi;
 	if (n == 2)
-		beginMulti();
-}
-
-
-void CaptureConsole::beginMode(int mode)
-{
-	if (mode == Track::TYPE_AUDIO)
-		beginAudio();
-	if (mode == Track::TYPE_MIDI)
-		beginMidi();
-}
-
-void CaptureConsole::beginAudio()
-{
-	endCapture();
-
-	type = Track::TYPE_AUDIO;
-	setInt("capture_type", 0);
-
-	input = new InputStreamAudio(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
-	input->setChunkSize(4096);
-	input->setUpdateDt(0.03f);
-	subscribe(input);
-	view->setInput(input);
-	peak_meter->setSource(input);
-
-	input->setDevice(chosen_device_audio);
-
-	enable("capture_audio_source", false);
-
-	if (!input->start()){
-		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
-		CapturingByDialog = false;
-		msg_db_l(1);
-		return;*/
-	}
-}
-
-void CaptureConsole::beginMidi()
-{
-	endCapture();
-
-	type = Track::TYPE_MIDI;
-	setInt("capture_type", 1);
-
-	input = new InputStreamMidi(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
-	input->setChunkSize(4096);
-	input->setUpdateDt(0.03f);
-	subscribe(input);
-	view->setInput(input);
-	peak_meter->setSource(input);
-
-	input->setDevice(chosen_device_midi);
-
-	enable("capture_midi_source", false);
-
-	if (!input->start()){
-		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
-		CapturingByDialog = false;
-		msg_db_l(1);
-		return;*/
-	}
-}
-
-void CaptureConsole::beginMulti()
-{
-	type = -1;
-	setInt("capture_type", 2);
-}
-
-void CaptureConsole::endCapture()
-{
-	if (input){
-		peak_meter->setSource(NULL);
-		view->setInput(NULL);
-		unsubscribe(input);
-		delete(input);
-		input = NULL;
-	}
-}
-
-void CaptureConsole::setTargetAudio(int index)
-{
-	if (type != Track::TYPE_AUDIO)
-		return;
-
-	if (index < song->tracks.num){
-		Track *t = song->tracks[index];
-		if (t->type == t->TYPE_TIME){
-			index = song->tracks.num;
-		}
-	}
-	view->capturing_track = index;
-	setInt("capture_audio_target", index);
-}
-
-void CaptureConsole::setTargetMidi(int index)
-{
-	if (type != Track::TYPE_MIDI)
-		return;
-	if (index < song->tracks.num){
-		Track *t = song->tracks[index];
-		if (t->type == t->TYPE_TIME){
-			index = song->tracks.num;
-			((InputStreamMidi*)input)->setPreviewSynthesizer(temp_synth);
-		}else{
-			((InputStreamMidi*)input)->setPreviewSynthesizer(t->synth);
-		}
-	}else{
-		((InputStreamMidi*)input)->setPreviewSynthesizer(temp_synth);
-	}
-	view->capturing_track = index;
-	setInt("capture_midi_target", index);
-}
-
-void CaptureConsole::onSourceAudio()
-{
-	if (type != Track::TYPE_AUDIO)
-		return;
-	int n = getInt("");
-	if ((n >= 0) and (n < sources_audio.num)){
-		chosen_device_audio = sources_audio[n];
-		input->setDevice(chosen_device_audio);
-	}
-}
-
-void CaptureConsole::onSourceMidi()
-{
-	if (type != Track::TYPE_MIDI)
-		return;
-	int n = getInt("");
-	if ((n >= 0) and (n < sources_midi.num)){
-		chosen_device_midi = sources_midi[n];
-		input->setDevice(chosen_device_midi);
-	}
-}
-
-void CaptureConsole::updateSourceList()
-{
-	sources_audio = device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
-	sources_midi = device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
-
-	// add all
-	reset("capture_audio_source");
-	for (Device *d: sources_audio)
-		setString("capture_audio_source", d->get_name());
-
-	// add all
-	reset("capture_midi_source");
-	for (Device *d: sources_midi)
-		setString("capture_midi_source", d->get_name());
-
-	// select current
-	foreachi(Device *d, sources_audio, i)
-		if (d == chosen_device_audio)
-			setInt("capture_audio_source", i);
-	foreachi(Device *d, sources_midi, i)
-		if (d == chosen_device_midi)
-			setInt("capture_midi_source", i);
+		mode = mode_multi;
+	mode->enter();
 }
 
 
@@ -353,33 +604,23 @@ void CaptureConsole::onStart()
 	view->renderer->prepare(view->getPlaybackSelection(), false);
 	view->stream->play();
 
-	input->resetSync();
-	input->accumulate(true);
+	mode->start();
 	enable("capture_start", false);
 	enable("capture_pause", true);
 	enable("capture_delete", true);
 	enable("ok", true);
 	enable("capture_type", false);
-	enable("capture_audio_source", false);
-	enable("capture_audio_target", false);
-	enable("capture_midi_source", false);
-	enable("capture_midi_target", false);
 }
 
 void CaptureConsole::onDelete()
 {
 	if (view->stream->isPlaying())
 		view->stream->stop();
-	input->resetAccumulation();
-	input->accumulate(false);
+	mode->dump();
 	enable("capture_start", true);
 	enable("capture_pause", false);
 	enable("capture_delete", false);
 	enable("capture_type", true);
-	enable("capture_audio_source", true);
-	enable("capture_audio_target", true);
-	enable("capture_midi_source", true);
-	enable("capture_midi_target", true);
 	enable("ok", false);
 	updateTime();
 }
@@ -389,7 +630,7 @@ void CaptureConsole::onPause()
 	// TODO...
 	if (view->stream->isPlaying())
 		view->stream->stop();
-	input->accumulate(false);
+	mode->pause();
 	enable("capture_start", true);
 	enable("capture_pause", false);
 }
@@ -397,14 +638,14 @@ void CaptureConsole::onPause()
 
 void CaptureConsole::onOk()
 {
-	input->stop();
-	if (insert())
+	mode->stop();
+	if (mode->insert())
 		((SideBar*)parent)->_hide();
 }
 
 void CaptureConsole::onCancel()
 {
-	input->stop();
+	mode->stop();
 	((SideBar*)parent)->_hide();
 }
 
@@ -415,7 +656,7 @@ void CaptureConsole::onClose()
 
 void CaptureConsole::updateTime()
 {
-	setString("capture_time", song->get_time_str_long(input->getSampleCount()));
+	setString("capture_time", song->get_time_str_long(mode->getSampleCount()));
 }
 
 void CaptureConsole::onUpdate(Observable *o, const string &message)
@@ -425,86 +666,7 @@ void CaptureConsole::onUpdate(Observable *o, const string &message)
 	updateTime();
 }
 
-bool CaptureConsole::insert()
+bool CaptureConsole::isCapturing()
 {
-	if (type == -1)
-		return insertMulti();
-	if (type == Track::TYPE_MIDI)
-		return insertMidi();
-	//if (type == Track::TYPE_AUDIO)
-	return insertAudio();
+	return mode->isCapturing();
 }
-
-bool CaptureConsole::insertAudio()
-{
-	Track *t;
-	int target = getInt("capture_audio_target");
-	int i0;
-	int s_start = view->sel.range.start();
-
-	// insert recorded data with some delay
-	int dpos = input->getDelay();
-
-	if (target >= song->tracks.num){
-		// new track
-		t = song->addTrack(type, song->tracks.num);
-	}else{
-		// overwrite
-		t = song->tracks[target];
-	}
-	i0 = s_start + dpos;
-
-	if (t->type != type){
-		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(type).c_str(), track_type(t->type).c_str()));
-		return false;
-	}
-
-	// insert data
-	Range r = Range(i0, input->getSampleCount());
-	song->action_manager->beginActionGroup();
-	BufferBox tbuf = t->getBuffers(view->cur_layer, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
-	tbuf.set(((InputStreamAudio*)input)->buffer, 0, 1.0f);
-	song->execute(a);
-	song->action_manager->endActionGroup();
-
-	input->resetAccumulation();
-	return true;
-}
-
-bool CaptureConsole::insertMidi()
-{
-	Track *t;
-	int target = getInt("capture_midi_target");
-	int i0;
-	int s_start = view->sel.range.start();
-
-	// insert recorded data with some delay
-	int dpos = input->getDelay();
-
-	if (target >= song->tracks.num){
-		// new track
-		t = song->addTrack(type, song->tracks.num);
-	}else{
-		// overwrite
-		t = song->tracks[target];
-	}
-	i0 = s_start + dpos;
-
-	if (t->type != type){
-		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(type).c_str(), track_type(t->type).c_str()));
-		return false;
-	}
-
-	// insert data
-	t->insertMidiData(i0, midi_events_to_notes(((InputStreamMidi*)input)->midi));
-
-	input->resetAccumulation();
-	return true;
-}
-
-bool CaptureConsole::insertMulti()
-{
-	return false;
-}
-

@@ -396,7 +396,7 @@ string title_filename(const string &filename)
 bool TsunamiWindow::allowTermination()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
-		if (side_bar->capture_console->input->isCapturing()){
+		if (side_bar->capture_console->isCapturing()){
 			string answer = HuiQuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
 				return false;

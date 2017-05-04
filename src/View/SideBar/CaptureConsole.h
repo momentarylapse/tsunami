@@ -15,9 +15,9 @@
 #include "../../Data/Song.h"
 
 class AudioView;
-class InputStreamAny;
 class DeviceManager;
 class Device;
+class CaptureConsoleMode;
 
 class CaptureConsole : public SideBarConsole, public Observer
 {
@@ -30,18 +30,7 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	void beginAudio();
-	void beginMidi();
-	void beginMulti();
-	void beginMode(int type);
-	void endCapture();
-
 	void onType();
-
-	void onSourceAudio();
-	void onTargetAudio();
-	void onSourceMidi();
-	void onTargetMidi();
 
 	void onStart();
 	void onDelete();
@@ -49,37 +38,23 @@ public:
 	void onOk();
 	void onCancel();
 	void onClose();
-	bool insert();
-	bool insertAudio();
-	bool insertMidi();
-	bool insertMulti();
-
-	void fillTrackList();
 
 	DeviceManager *device_manager;
 
-	void updateSourceList();
-	Array<Device*> sources_audio;
-	Device *chosen_device_audio;
-	Array<Device*> sources_midi;
-	Device *chosen_device_midi;
 	void updateTime();
 
 	void onUpdate(Observable *o, const string &message);
 
-	void setTargetAudio(int index);
-	void setTargetMidi(int index);
-	//void setType(int type);
+	bool isCapturing();
 
 	Song *song;
 	AudioView *view;
-	InputStreamAny *input;
-	//InputStreamAny *input_midi;
 	PeakMeter *peak_meter;
-	Synthesizer *temp_synth;
-	int type;
+	CaptureConsoleMode *mode;
 
-	int multi_size;
+	CaptureConsoleMode *mode_audio;
+	CaptureConsoleMode *mode_midi;
+	CaptureConsoleMode *mode_multi;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

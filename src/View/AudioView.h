@@ -64,7 +64,6 @@ public:
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
 
-	void setMidiViewMode(int mode);
 	void updatePeaks();
 	void zoomIn();
 	void zoomOut();
@@ -128,11 +127,14 @@ public:
 	int preview_sleep_time;
 	bool antialiasing;
 
+
+	void setMidiViewMode(int mode);
 	int midi_view_mode;
 	enum{
-		MIDI_MODE_MIDI,
+		MIDI_MODE_LINEAR,
 		MIDI_MODE_TAB,
-		MIDI_MODE_SCORE,
+		MIDI_MODE_CLASSICAL,
+		MIDI_MODE_DRUM
 	};
 
 	bool edit_multi;

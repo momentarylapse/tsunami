@@ -132,7 +132,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	input = NULL;
 
 	edit_multi = false;
-	midi_view_mode = HuiConfig.getInt("View.MidiMode", MIDI_MODE_SCORE);
+	midi_view_mode = HuiConfig.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
 
 	// modes
 	mode = NULL;
@@ -722,7 +722,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 			if (type == Track::TYPE_AUDIO)
 				vtrack[capturing_track]->drawBuffer(c, ((InputStreamAudio*)input)->buffer, cam.pos - sel.range.offset, colors.capture_marker);
 			if (type == Track::TYPE_MIDI)
-				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
+				mode->drawMidi(c, vtrack[capturing_track], midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
 		}
 	}
 
@@ -782,9 +782,9 @@ void AudioView::updateMenu()
 	// edit
 	win->check("edit_multi", edit_multi);
 	// view
-	win->check("view_midi_default", midi_view_mode == MIDI_MODE_MIDI);
+	win->check("view_midi_default", midi_view_mode == MIDI_MODE_LINEAR);
 	win->check("view_midi_tab", midi_view_mode == MIDI_MODE_TAB);
-	win->check("view_midi_score", midi_view_mode == MIDI_MODE_SCORE);
+	win->check("view_midi_score", midi_view_mode == MIDI_MODE_CLASSICAL);
 	win->enable("view_samples", false);
 }
 

@@ -51,7 +51,7 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (selection->type == Selection::TYPE_MUTE){
 		selection->track->setMuted(!selection->track->muted);
 	}else if (selection->type == Selection::TYPE_SOLO){
-		for (Track *t : song->tracks)
+		for (Track *t: song->tracks)
 			view->sel.set(t, (t == selection->track));
 		if (selection->track->muted)
 			selection->track->setMuted(false);
@@ -229,7 +229,7 @@ void ViewModeDefault::onKeyUp(int k)
 void ViewModeDefault::updateTrackHeights()
 {
 	int n_ch = 1;
-	for (AudioViewTrack *t : view->vtrack){
+	for (AudioViewTrack *t: view->vtrack){
 		t->height_min = view->TIME_SCALE_HEIGHT * 2;
 		if (t->track->type == Track::TYPE_AUDIO)
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
@@ -256,7 +256,7 @@ void ViewModeDefault::drawGridBars(Painter *c, const rect &r, const color &bg, b
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	Array<Bar> bars = song->bars.getBars(Range(s0, s1 - s0));
-	for (Bar &b : bars){
+	for (Bar &b: bars){
 		int xx = cam->sample2screen(b.range.offset);
 
 		float dx_bar = cam->dsample2screen(b.range.length);
@@ -321,17 +321,28 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
 }
 
+void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift)
+{
+	int mode = which_midi_mode(t->track);
+	if (mode == view->MIDI_MODE_LINEAR)
+		t->drawMidiDefault(c, midi, as_reference, shift);
+	else if (mode == view->MIDI_MODE_TAB)
+		t->drawMidiTab(c, midi, as_reference, shift);
+	else // if (mode == view->VIEW_MIDI_SCORE)
+		t->drawMidiScore(c, midi, as_reference, shift);
+}
+
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
-	if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))
-		t->drawMidi(c, t->track->midi, false, 0);
+	if (t->track->type == Track::TYPE_MIDI)
+		drawMidi(c, t, t->track->midi, false, 0);
 
 	// audio buffer
 	t->drawTrackBuffers(c, view->cam.pos);
 
 	// samples
-	for (SampleRef *s : t->track->samples)
+	for (SampleRef *s: t->track->samples)
 		t->drawSample(c, s);
 
 	// marker
@@ -350,15 +361,15 @@ void ViewModeDefault::setBarriers(Selection *s)
 	if (s->type == s->TYPE_SAMPLE)
 		dpos = s->sample_offset;
 
-	for (Track *t : song->tracks){
+	for (Track *t: song->tracks){
 		// add subs
-		for (SampleRef *sam : t->samples){
+		for (SampleRef *sam: t->samples){
 			s->barrier.add(sam->pos + dpos);
 		}
 
 		// time bar...
 		Array<Beat> beats = song->bars.getBeats(cam->range(), true);
-		for (Beat &b : beats)
+		for (Beat &b: beats)
 			s->barrier.add(b.range.offset);
 	}
 
@@ -375,7 +386,7 @@ void ViewModeDefault::applyBarriers(int &pos)
 	int dmin = view->BARRIER_DIST;
 	bool found = false;
 	int new_pos;
-	for (int b : selection->barrier){
+	for (int b: selection->barrier){
 		int dist = fabs(cam->sample2screen(b) - cam->sample2screen(pos));
 		if (dist < dmin){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
@@ -451,7 +462,7 @@ Selection ViewModeDefault::getHover()
 		}
 
 		// TODO: prefer selected subs
-		for (SampleRef *ss : s.track->samples){
+		for (SampleRef *ss: s.track->samples){
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;
@@ -520,4 +531,11 @@ void ViewModeDefault::selectUnderMouse()
 	if (selection->type == Selection::TYPE_SAMPLE){
 		view->selectSample(s, control);
 	}
+}
+
+int ViewModeDefault::which_midi_mode(Track *t)
+{
+	if ((view->midi_view_mode == view->MIDI_MODE_TAB) and (t->instrument.string_pitch.num > 0))
+		return view->MIDI_MODE_TAB;
+	return view->MIDI_MODE_CLASSICAL;
 }

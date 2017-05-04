@@ -30,7 +30,10 @@ public:
 
 	void onScale();
 	void onBeatPartition();
-	void onMidiEditMode();
+	void onViewModeMidi();
+	void onViewModeClassical();
+	void onViewModeTab();
+	void onCreationMode();
 	void onInterval();
 	void onChordType();
 	void onChordInversion();

@@ -33,7 +33,7 @@ public:
 
 	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
-	void drawTrackBackgroundDefault(Painter *c, AudioViewTrack *t);
+	void drawTrackPitchGrid(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 
 	void drawMidiNote(Painter *c, const MidiNote &n, int state);
@@ -43,6 +43,8 @@ public:
 	void drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
 
 	virtual Selection getHover();
+
+	virtual int which_midi_mode(Track *t);
 
 	Array<MidiNote> getCreationNotes();
 	int y2clef(int y, int &mod);
@@ -55,19 +57,22 @@ public:
 
 	int pitch_min, pitch_max;
 	int beat_partition;
-	int midi_mode;
 	int chord_type;
 	int chord_inversion;
 	int midi_interval;
 
 	int modifier;
 
+	void setMode(int mode);
+	int mode_wanted;
+	void setCreationMode(int mode);
+	int creation_mode;
 	enum
 	{
-		MIDI_MODE_SELECT,
-		MIDI_MODE_NOTE,
-		MIDI_MODE_INTERVAL,
-		MIDI_MODE_CHORD
+		CREATION_MODE_SELECT,
+		CREATION_MODE_NOTE,
+		CREATION_MODE_INTERVAL,
+		CREATION_MODE_CHORD
 	};
 
 	Synthesizer *preview_synth;

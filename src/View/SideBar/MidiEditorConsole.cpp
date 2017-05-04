@@ -55,10 +55,13 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	//Enable("add", false);
 	enable("track_name", false);
 
+	event("mode:midi", this, &MidiEditorConsole::onViewModeMidi);
+	event("mode:tab", this, &MidiEditorConsole::onViewModeTab);
+	event("mode:classical", this, &MidiEditorConsole::onViewModeClassical);
 	event("beat_partition", this, &MidiEditorConsole::onBeatPartition);
 	event("scale_root", this, &MidiEditorConsole::onScale);
 	event("scale_type", this, &MidiEditorConsole::onScale);
-	event("midi_edit_mode", this, &MidiEditorConsole::onMidiEditMode);
+	event("midi_edit_mode", this, &MidiEditorConsole::onCreationMode);
 	event("interval", this, &MidiEditorConsole::onInterval);
 	event("chord_type", this, &MidiEditorConsole::onChordType);
 	event("chord_inversion", this, &MidiEditorConsole::onChordInversion);
@@ -135,16 +138,31 @@ void MidiEditorConsole::onBeatPartition()
 	view->mode_midi->setBeatPartition(getInt(""));
 }
 
-void MidiEditorConsole::onMidiEditMode()
+void MidiEditorConsole::onCreationMode()
 {
 	int n = getInt("midi_edit_mode");
 	if (n == 0){
-		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_NOTE;
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_NOTE);
 	}else if (n == 1){
-		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_INTERVAL;
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_INTERVAL);
 	}else if (n == 2){
-		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_CHORD;
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_CHORD);
 	}
+}
+
+void MidiEditorConsole::onViewModeMidi()
+{
+	view->mode_midi->setMode(AudioView::MIDI_MODE_LINEAR);
+}
+
+void MidiEditorConsole::onViewModeClassical()
+{
+	view->mode_midi->setMode(AudioView::MIDI_MODE_CLASSICAL);
+}
+
+void MidiEditorConsole::onViewModeTab()
+{
+	view->mode_midi->setMode(AudioView::MIDI_MODE_TAB);
 }
 
 void MidiEditorConsole::onInterval()
@@ -237,6 +255,11 @@ void MidiEditorConsole::setTrack(Track *t)
 		if ((tn >= 0) and (tn < view->vtrack.num))
 			if (view->vtrack[tn])
 				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
+
+		int mode = view->mode->which_midi_mode(track);
+		check("mode:midi", mode == view->MIDI_MODE_LINEAR);
+		check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
+		check("mode:tab", mode == view->MIDI_MODE_TAB);
 	}
 
 }

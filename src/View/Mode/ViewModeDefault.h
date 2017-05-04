@@ -32,6 +32,9 @@ public:
 	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
+	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift);
+
+	virtual int which_midi_mode(Track *t);
 
 	void selectUnderMouse();
 	void setCursorPos(int pos);

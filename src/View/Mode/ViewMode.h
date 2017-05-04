@@ -15,6 +15,7 @@ class Track;
 class ViewPort;
 class TsunamiWindow;
 class Song;
+class MidiData;
 class Painter;
 class rect;
 class color;
@@ -43,6 +44,9 @@ public:
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
 	virtual void drawPost(Painter *c){}
+	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift){}
+
+	virtual int which_midi_mode(Track *t) = 0;
 
 	AudioView *view;
 	ViewPort *cam;

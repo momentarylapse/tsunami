@@ -46,7 +46,6 @@ public:
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
-	void drawMidi(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiDefault(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiScore(Painter *c, const MidiData &midi, bool as_reference, int shift);
@@ -54,8 +53,6 @@ public:
 	void drawMidiNoteScore(Painter *c, MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
-
-	int which_midi_mode(bool editing);
 
 	static void draw_score_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 

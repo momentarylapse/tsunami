@@ -662,7 +662,7 @@ void TsunamiWindow::onSelectExpand()
 
 void TsunamiWindow::onViewMidiDefault()
 {
-	view->setMidiViewMode(view->MIDI_MODE_MIDI);
+	view->setMidiViewMode(view->MIDI_MODE_LINEAR);
 }
 
 void TsunamiWindow::onViewMidiTab()
@@ -672,7 +672,7 @@ void TsunamiWindow::onViewMidiTab()
 
 void TsunamiWindow::onViewMidiScore()
 {
-	view->setMidiViewMode(view->MIDI_MODE_SCORE);
+	view->setMidiViewMode(view->MIDI_MODE_CLASSICAL);
 }
 
 void TsunamiWindow::onZoomIn()

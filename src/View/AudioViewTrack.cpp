@@ -8,6 +8,7 @@
 #include "AudioViewTrack.h"
 #include "AudioView.h"
 #include "Mode/ViewMode.h"
+#include "Mode/ViewModeMidi.h"
 #include "../Tsunami.h"
 #include "../Data/Song.h"
 #include "../Midi/MidiData.h"
@@ -212,7 +213,7 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	if (s->type() == Track::TYPE_AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
 	else if (s->type() == Track::TYPE_MIDI)
-		drawMidi(c, *s->midi, true, s->pos);
+		view->mode->drawMidi(c, this, *s->midi, true, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 	if (view->sel.has(s))//((is_cur) or (a->sub_mouse_over == s))
@@ -257,18 +258,6 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	c->drawStr(x, y, text);
 
 	c->setFont("", -1, false, false);
-}
-
-
-void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, bool as_reference, int shift)
-{
-	int mode = which_midi_mode(false);
-	if (mode == view->MIDI_MODE_MIDI)
-		drawMidiDefault(c, midi, as_reference, shift);
-	else if (mode == view->MIDI_MODE_TAB)
-		drawMidiTab(c, midi, as_reference, shift);
-	else // if (mode == view->VIEW_MIDI_SCORE)
-		drawMidiScore(c, midi, as_reference, shift);
 }
 
 void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, bool as_reference, int shift)
@@ -533,17 +522,5 @@ void AudioViewTrack::drawHeader(Painter *c)
 			c->setColor(view->colors.text_soft2);
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}
-}
-
-
-int AudioViewTrack::which_midi_mode(bool editing)
-{
-	if (view->midi_view_mode == view->MIDI_MODE_SCORE)
-		return view->MIDI_MODE_SCORE;
-	if (view->midi_view_mode == view->MIDI_MODE_MIDI)
-		return editing ? view->MIDI_MODE_MIDI : view->MIDI_MODE_SCORE;
-	if ((view->midi_view_mode == view->MIDI_MODE_TAB) and (track->instrument.string_pitch.num > 0))
-		return view->MIDI_MODE_TAB;
-	return view->MIDI_MODE_SCORE;
 }
 

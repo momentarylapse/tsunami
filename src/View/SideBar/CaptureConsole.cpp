@@ -60,7 +60,6 @@ public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc)
 	{
-		msg_write("audio.new");
 		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 		input = NULL;
 		target = -1;
@@ -80,8 +79,21 @@ public:
 
 	void onTarget()
 	{
-		target = cc->getInt("capture_audio_target");
+		setTarget(cc->getInt("capture_audio_target"));
+	}
+
+	void setTarget(int index)
+	{
+		target = index;
+		view->setCurTrack(song->tracks[target]);
 		view->capturing_track = target;
+		cc->setInt("capture_audio_target", target);
+
+		bool ok = (song->tracks[target]->type == Track::TYPE_AUDIO);
+		cc->setString("capture_audio_message", "");
+		if (!ok)
+			cc->setString("capture_audio_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_AUDIO).c_str()));
+		cc->enable("capture_start", ok);
 	}
 
 	virtual void enterParent()
@@ -108,10 +120,9 @@ public:
 		cc->reset("capture_audio_target");
 		for (Track *t: song->tracks)
 			cc->addString("capture_audio_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-		cc->addString("capture_audio_target", _("  - create new track -"));
+		//cc->addString("capture_audio_target", _("  - create new track -"));
 
-		view->capturing_track = target;
-		cc->setInt("capture_audio_target", target);
+		setTarget(target);
 
 
 		input = new InputStreamAudio(song->sample_rate);
@@ -171,22 +182,14 @@ public:
 
 	virtual bool insert()
 	{
-
-		Track *t;
-		int i0;
 		int s_start = view->sel.range.start();
 
 		// insert recorded data with some delay
 		int dpos = input->getDelay();
 
-		if (target >= song->tracks.num){
-			// new track
-			t = song->addTrack(Track::TYPE_AUDIO, song->tracks.num);
-		}else{
-			// overwrite
-			t = song->tracks[target];
-		}
-		i0 = s_start + dpos;
+		// overwrite
+		Track *t = song->tracks[target];
+		int i0 = s_start + dpos;
 
 		if (t->type != Track::TYPE_AUDIO){
 			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(t->type).c_str()));
@@ -238,8 +241,8 @@ public:
 
 		temp_synth = CreateSynthesizer("", song);
 
-		cc->event("capture_midi_source", this, &CaptureConsoleModeAudio::onSource);
-		cc->event("capture_midi_target", this, &CaptureConsoleModeAudio::onTarget);
+		cc->event("capture_midi_source", this, &CaptureConsoleModeMidi::onSource);
+		cc->event("capture_midi_target", this, &CaptureConsoleModeMidi::onTarget);
 	}
 
 	void onSource()
@@ -260,19 +263,18 @@ public:
 	void setTarget(int index)
 	{
 		target = index;
-		if (index < song->tracks.num){
-			Track *t = song->tracks[index];
-			if (t->type == t->TYPE_TIME){
-				index = song->tracks.num;
-				input->setPreviewSynthesizer(temp_synth);
-			}else{
-				input->setPreviewSynthesizer(t->synth);
-			}
-		}else{
-			input->setPreviewSynthesizer(temp_synth);
-		}
-		view->capturing_track = index;
-		cc->setInt("capture_midi_target", index);
+		Track *t = song->tracks[index];
+		input->setPreviewSynthesizer(t->synth);
+		view->setCurTrack(song->tracks[target]);
+		view->capturing_track = target;
+		cc->setInt("capture_midi_target", target);
+
+
+		bool ok = (song->tracks[target]->type == Track::TYPE_MIDI);
+		cc->setString("capture_midi_message", "");
+		if (!ok)
+			cc->setString("capture_midi_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_MIDI).c_str()));
+		cc->enable("capture_start", ok);
 	}
 
 	virtual void enterParent()
@@ -299,7 +301,7 @@ public:
 		cc->reset("capture_midi_target");
 		for (Track *t: song->tracks)
 			cc->addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-		cc->addString("capture_midi_target", _("  - create new track -"));
+		//cc->addString("capture_midi_target", _("  - create new track -"));
 
 		input = new InputStreamMidi(song->sample_rate);
 		input->setBackupMode(BACKUP_MODE_TEMP);
@@ -323,7 +325,6 @@ public:
 
 	virtual void leave()
 	{
-		msg_write("midi.leave");
 		cc->peak_meter->setSource(NULL);
 		view->setInput(NULL);
 		cc->unsubscribe(input);
@@ -359,22 +360,14 @@ public:
 
 	virtual bool insert()
 	{
-		Track *t;
 		int target = cc->getInt("capture_midi_target");
-		int i0;
 		int s_start = view->sel.range.start();
 
 		// insert recorded data with some delay
 		int dpos = input->getDelay();
 
-		if (target >= song->tracks.num){
-			// new track
-			t = song->addTrack(Track::TYPE_MIDI, song->tracks.num);
-		}else{
-			// overwrite
-			t = song->tracks[target];
-		}
-		i0 = s_start + dpos;
+		Track *t = song->tracks[target];
+		int i0 = s_start + dpos;
 
 		if (t->type != Track::TYPE_MIDI){
 			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(t->type).c_str()));
@@ -434,13 +427,16 @@ public:
 			cc->setTarget("capture_multi_grid", -1);
 			cc->addLabel(t->getNiceName(), 0, i+1, 0, 0, "capture-multi-target-" + i2s(i));
 			cc->addLabel(track_type(t->type), 1, i+1, 0, 0, "capture-multi-type-" + i2s(i));
-			cc->addComboBox(_("- none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
 			if (t->type == Track::TYPE_AUDIO){
+				cc->addComboBox(_("        - none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
 				for (Device *d: sources_audio)
 					cc->addString("capture-multi-source-" + i2s(i), d->get_name());
 			}else if (t->type == Track::TYPE_MIDI){
+				cc->addComboBox(_("        - none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
 				for (Device *d: sources_midi)
 					cc->addString("capture-multi-source-" + i2s(i), d->get_name());
+			}else{
+				cc->addLabel(_("        - none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
 			}
 		}
 		size = song->tracks.num;
@@ -547,12 +543,15 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
-	if (view->cur_track->type == Track::TYPE_MIDI){
-		mode = mode_midi;
-		setInt("capture_type", 1);
-	}else{
+	if (view->cur_track->type == Track::TYPE_AUDIO){
 		mode = mode_audio;
 		setInt("capture_type", 0);
+	}else if (view->cur_track->type == Track::TYPE_MIDI){
+		mode = mode_midi;
+		setInt("capture_type", 1);
+	}else{ // TYPE_TIME
+		mode = mode_multi;
+		setInt("capture_type", 2);
 	}
 
 	mode_audio->enterParent();

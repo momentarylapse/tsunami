@@ -10,7 +10,7 @@ menu_fake
 0
 48
 0
-47429440
+41245216
 0
 2
 Item
@@ -4312,7 +4312,7 @@ rand_id_775767
 1
 4
 0
-2
+3
 Group
 rdt_audio_source
 
@@ -4357,6 +4357,17 @@ expandx
 1
 -1
 0
+Text
+capture_audio_message
+italic
+
+1
+0
+2
+1
+1
+-1
+0
 ControlTable
 rand_id_288379
 
@@ -4367,7 +4378,7 @@ rand_id_288379
 1
 4
 1
-2
+3
 Group
 rdt_midi_source
 
@@ -4408,6 +4419,17 @@ expandx
 1
 0
 0
+1
+1
+-1
+0
+Text
+capture_midi_message
+italic
+
+1
+0
+2
 1
 1
 -1
@@ -8770,7 +8792,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-147
+151
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8780,6 +8802,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
         - Standard -
         - don't connect -
         - nicht verbinden -
+        - none -
+        - keine -
   - create new track -
   - neue Spur anlegen -
   - none -
@@ -8802,6 +8826,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 (Pause)\\-\\-\\%.3f
 (anonymous)
 (anonym)
+- none -
+- none -
 -Default  Parameters-
 -Standard Parameter-
 ...done
@@ -8830,6 +8856,8 @@ Call: tsunami --info <File>
 Aufruf: tsunami --info <Datei>
 Can not load MidiEffect: \"%s\"
 MidiEffekt nicht ladbar: \"%s\"
+Can not record into this track! Please select a track of type %s.
+Kann nicht in diese Spur aufnehmen! Bitte wählen Sie eine Spur vom Typ %s.
 Can only delete samples which are unused.
 Kann nur Samples löschen, die nicht benutzt werden!
 Can only edit bars or a single pause at a time.
@@ -8960,6 +8988,8 @@ Phrygian
 Phrygisch
 Piano
 Piano
+Please select a track of type %s.
+Bitte wählen Sie eine Spur vom Typ %s.
 Plugin does not contain a function 'void main()'
 Plugin enthält keine Funktion 'void main()'
 Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'

@@ -6,11 +6,13 @@ Dialog record_dialog "Aufnahme" 300 200
 					ComboBox capture_audio_source "" expandx
 				Group rdt_audio_target "Target"
 					ComboBox capture_audio_target "" expandx
+				Text capture_audio_message "" italic
 			Grid ? "" 1 4
 				Group rdt_midi_source "Source"
 					ComboBox capture_midi_source "" expandx
 				Group rdt_midi_target "Target"
 					ComboBox capture_midi_target "" expandx
+				Text capture_midi_message "" italic
 			Grid capture_multi_grid "" 3 128
 				Text rdt_multi_target "Target" bold
 				Text rdt_multi_type "Type" bold

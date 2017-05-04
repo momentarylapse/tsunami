@@ -73,9 +73,7 @@ void ConfigurableSelectorDialog::onListSelect()
 
 void ConfigurableSelectorDialog::onSelect()
 {
-	msg_write("onsel");
 	int n = getInt("list") - ugroups.num;
-	msg_write(n);
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
@@ -84,25 +82,21 @@ void ConfigurableSelectorDialog::onSelect()
 		_return = CreateMidiEffect(names[n], song);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
 		_return = CreateSynthesizer(names[n], song);
-	msg_write(p2s(_return));
 	destroy();
 }
 
 void ConfigurableSelectorDialog::onClose()
 {
-	msg_write("onclose");
 	destroy();
 }
 
 void ConfigurableSelectorDialog::onCancel()
 {
-	msg_write("oncan");
 	destroy();
 }
 
 void ConfigurableSelectorDialog::onOk()
 {
-	msg_write("onok");
 	onSelect();
 }
 
@@ -111,7 +105,6 @@ Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
 	dlg->run();
 	Synthesizer *s = (Synthesizer*)dlg->_return;
-	msg_write(p2s(s));
 	delete(dlg);
 	return s;
 }

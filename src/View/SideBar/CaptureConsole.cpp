@@ -201,7 +201,11 @@ public:
 		cc->song->action_manager->beginActionGroup();
 		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
-		tbuf.add(input->buffer, 0, 1.0f, 0);
+
+		if (HuiConfig.getInt("Input.Mode", 0) == 1)
+			tbuf.add(input->buffer, 0, 1.0f, 0);
+		else
+			tbuf.set(input->buffer, 0, 1.0f);
 		song->execute(a);
 		song->action_manager->endActionGroup();
 

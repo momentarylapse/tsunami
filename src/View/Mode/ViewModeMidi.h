@@ -39,12 +39,10 @@ public:
 
 	virtual int which_midi_mode(Track *t);
 
-	MidiData getCreationNotes();
-	int y2clef(int y, int &mod);
-	int y2pitch(int y);
+	MidiData getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
 
-	Array<int> getCreationPitch();
+	Array<int> getCreationPitch(int base_pitch);
 
 	int beat_partition;
 	int chord_type;

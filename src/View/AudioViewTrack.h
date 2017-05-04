@@ -32,8 +32,15 @@ public:
 
 	float clef_pos_to_screen(int pos);
 	int screen_to_clef_pos(float y);
-	float classical_pitch2y(int pitch);
-	float linear_pitch2y(int pitch);
+	float string_to_screen(int string);
+	int screen_to_string(float y);
+
+	float pitch2y_classical(int pitch);
+	float pitch2y_linear(int pitch);
+	int y2pitch_classical(float y, int modifier);
+	int y2pitch_linear(float y);
+	int y2clef_classical(float y, int &mod);
+	int y2clef_linear(float y, int &mod);
 
 	void setPitchMinMax(int pitch_min, int pitch_max);
 	int pitch_min, pitch_max;
@@ -42,6 +49,7 @@ public:
 	{
 		STATE_DEFAULT,
 		STATE_HOVER,
+		STATE_SELECTED,
 		STATE_REFERENCE
 	};
 
@@ -57,9 +65,11 @@ public:
 	void drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
 	void drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift);
+	void drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state);
+	void drawMidiClefTab(Painter *c);
 	void drawMidiClassical(Painter *c, const MidiData &midi, bool as_reference, int shift);
-	void drawMidiClassicalClef(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteClassical(Painter *c, MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
+	void drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale);
+	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
@@ -76,6 +86,7 @@ public:
 	int height_wish, height_min;
 
 	float clef_dy;
+	float clef_y0;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

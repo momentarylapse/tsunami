@@ -258,6 +258,17 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	color cc = t->getBackgroundColor();
 	view->drawGridTime(c, t->area, cc, false);
 	t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), 0);
+
+
+	if (t->track->type == Track::TYPE_MIDI){
+		int mode = which_midi_mode(t->track);
+		if (mode == AudioView::MIDI_MODE_CLASSICAL){
+			const Clef& clef = t->track->instrument.get_clef();
+			t->drawMidiClefClassical(c, clef, view->midi_scale);
+		}else if (mode == AudioView::MIDI_MODE_TAB){
+			t->drawMidiClefTab(c);
+		}
+	}
 }
 
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)

@@ -39,7 +39,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("select_synth", this, &TrackConsole::onSelectSynth);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
-	event("_edit_fx", this, &TrackConsole::onEditFx);
+	event("edit_fx", this, &TrackConsole::onEditFx);
 	event("edit_curves", this, &TrackConsole::onEditCurves);
 	event("_edit_midi", this, &TrackConsole::onEditMidi);
 	event("_edit_midi_fx", this, &TrackConsole::onEditMidiFx);

@@ -68,6 +68,9 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 	event("target", this, &CurveConsole::onTarget);
 	eventX(id_list, "hui:select", this, &CurveConsole::onListSelect);
 	eventX(id_list, "hui:change", this, &CurveConsole::onListEdit);
+	event("edit_song", this, &CurveConsole::onEditSong);
+	event("edit_track", this, &CurveConsole::onEditTrack);
+	event("edit_fx", this, &CurveConsole::onEditFx);
 
 	curve = NULL;
 
@@ -166,5 +169,20 @@ void CurveConsole::onListEdit()
 			song->curves[n]->max = getCell(id_list, n, col)._float();
 	}
 	redraw("area");
+}
+
+void CurveConsole::onEditSong()
+{
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+}
+
+void CurveConsole::onEditTrack()
+{
+	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+}
+
+void CurveConsole::onEditFx()
+{
+	((SideBar*)parent)->open(SideBar::FX_CONSOLE);
 }
 

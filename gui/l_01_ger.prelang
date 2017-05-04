@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-396
+404
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -612,6 +612,9 @@ Unterteilung
 midi_editor/ld_t_scale
 Tonleiter
 
+midi_editor/me_group_creation
+Erstellen
+
 midi_editor/me_group_edit
 Bearbeiten
 
@@ -624,11 +627,32 @@ Referenz-Spuren
 midi_editor/me_group_view
 Ansicht
 
+midi_editor/me_t_mode
+Modus:
+
+midi_editor/me_t_modifier
+Veränderung:
+
+midi_editor/me_t_partition
+Teilschläge
+
+midi_editor/me_t_scale
+Tonart
+
 midi_editor/midi_edit_mode
 Einzelton\\Intervall\\Akkord
 
 midi_editor/midi_editor
 Midi
+
+midi_editor/mode:classical
+Klassisch
+
+midi_editor/mode:midi
+Midi
+
+midi_editor/mode:tab
+Tab
 
 midi_editor/modifier:flat
 ♭

@@ -30,6 +30,9 @@ public:
 	void onTarget();
 	void onListEdit();
 	void onListSelect();
+	void onEditSong();
+	void onEditTrack();
+	void onEditFx();
 
 	virtual void onEnter();
 	virtual void onLeave();

@@ -1,9 +1,9 @@
 Dialog midi_fx_editor "Midi Fx" 380 516
 	Grid ? "" 1 4 expandy
 		Grid me_grid_no "" 1 1
-			Text mfx_t_no_midi "no midi track selected" expandx center
+			Text mfx_t_no_midi "no midi track selected" expandx center italic
 		Grid midi_fx_inner_table "" 1 32
-			Text comment_no_fx "- no effects active here (yet) -" center
+			Text comment_no_fx "- no effects active here (yet) -" center italic
 			.
 			.
 			.

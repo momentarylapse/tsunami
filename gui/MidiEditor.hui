@@ -1,35 +1,42 @@
 Dialog midi_editor "Midi" 380 516
 	Grid ? "" 1 4
 		Grid me_grid_no "" 1 1
-			Text ld_t_no_midi "No midi track selected" expandx center
+			Text ld_t_no_midi "No midi track selected" expandx center italic
 		Grid me_grid_yes "" 1 4
 			Group me_group_view "View"
-				Grid ? "" 2 2
-					Text ld_t_partition "Partitioning"
+				Grid ? "" 2 4
+					Text me_t_mode "Mode:"
+					Grid ? "" 3 1
+						RadioButton mode:midi "Midi" expandx
+						RadioButton mode:classical "Classical" expandx
+						RadioButton mode:tab "Tab" expandx
+					Text me_t_partition "Sub beats"
 					SpinButton beat_partition "4\\1\\256" expandx
-					Text ld_t_scale "Scale"
+					Text me_t_scale "Scale"
 					Grid ? "" 2 1
 						ComboBox scale_root "" expandx
 						ComboBox scale_type "" expandx
-			TabControl midi_edit_mode "Single tone\\Interval\\Chord"
-				Grid ? "" 1 1
-					.
-				Grid me_group_interval "" 2 1
-					Text ld_t_interval "Interval"
-					SpinButton interval "0\\-99\\99"
-				Grid ? "" 3 2
-					Text ld_t_space "" width=12
-					Text ld_t_chord "Type"
-					ComboBox chord_type "" expandx
-					.
-					Text ld_t_inversion "Inversion"
-					ComboBox chord_inversion ""
-			Group me_group_modifier "Modifier"
-				Grid ? "" 4 1
-					RadioButton modifier:none "none" expandx
-					RadioButton modifier:sharp "♯" expandx
-					RadioButton modifier:flat "♭" expandx
-					RadioButton modifier:natural "♮" expandx
+			Group me_group_creation "Creation"
+				Grid ? "" 1 2
+					TabControl midi_edit_mode "Single tone\\Interval\\Chord"
+						Grid ? "" 1 1
+							.
+						Grid me_group_interval "" 2 1
+							Text ld_t_interval "Interval"
+							SpinButton interval "0\\-99\\99"
+						Grid ? "" 3 2
+							Text ld_t_space "" width=12
+							Text ld_t_chord "Type"
+							ComboBox chord_type "" expandx
+							.
+							Text ld_t_inversion "Inversion"
+							ComboBox chord_inversion ""
+					Grid ? "" 5 1
+						Text me_t_modifier "Modifier:"
+						RadioButton modifier:none "none" expandx
+						RadioButton modifier:sharp "♯" expandx
+						RadioButton modifier:flat "♭" expandx
+						RadioButton modifier:natural "♮" expandx
 			Expander me_group_reference "Reference tracks"
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
 		Text ? "" expandy

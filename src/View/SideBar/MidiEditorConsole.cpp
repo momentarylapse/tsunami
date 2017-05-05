@@ -152,17 +152,17 @@ void MidiEditorConsole::onCreationMode()
 
 void MidiEditorConsole::onViewModeLinear()
 {
-	view->mode_midi->setMode(AudioView::MIDI_MODE_LINEAR);
+	setMode(AudioView::MIDI_MODE_LINEAR);
 }
 
 void MidiEditorConsole::onViewModeClassical()
 {
-	view->mode_midi->setMode(AudioView::MIDI_MODE_CLASSICAL);
+	setMode(AudioView::MIDI_MODE_CLASSICAL);
 }
 
 void MidiEditorConsole::onViewModeTab()
 {
-	view->mode_midi->setMode(AudioView::MIDI_MODE_TAB);
+	setMode(AudioView::MIDI_MODE_TAB);
 }
 
 void MidiEditorConsole::onInterval()
@@ -257,11 +257,26 @@ void MidiEditorConsole::setTrack(Track *t)
 				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
 
 		int mode = view->mode->which_midi_mode(track);
-		view->mode_midi->setMode(mode);
-		check("mode:linear", mode == view->MIDI_MODE_LINEAR);
-		check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
-		check("mode:tab", mode == view->MIDI_MODE_TAB);
+		setMode(mode);
+
+		if (t->instrument.type == Instrument::TYPE_DRUMS){
+			// select a nicer pitch range in linear mode for drums
+			view->vtrack[track->get_index()]->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
+		}
 	}
 
+}
+
+void MidiEditorConsole::setMode(int mode)
+{
+	view->mode_midi->setMode(mode);
+	check("mode:linear", mode == view->MIDI_MODE_LINEAR);
+	check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
+	check("mode:tab", mode == view->MIDI_MODE_TAB);
+
+	enable("modifier:none", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:sharp", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:flat", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:natural", mode == view->MIDI_MODE_CLASSICAL);
 }
 

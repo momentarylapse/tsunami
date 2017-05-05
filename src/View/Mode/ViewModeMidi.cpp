@@ -452,15 +452,15 @@ Selection ViewModeMidi::getHover()
 
 	// midi
 	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track)){
+		int mode = which_midi_mode(s.track);
 
 		// scroll bar
-		if (scroll_bar.inside(view->mx, view->my)){
+		if ((mode == AudioView::MIDI_MODE_LINEAR) and (scroll_bar.inside(view->mx, view->my))){
 			s.type = Selection::TYPE_SCROLL;
 			return s;
 		}
 
 		if (creation_mode != CREATION_MODE_SELECT){
-			int mode = which_midi_mode(s.track);
 			if ((mode == AudioView::MIDI_MODE_CLASSICAL)){
 				s.pitch = cur_track->y2pitch_classical(my, modifier);
 				s.clef_position = cur_track->screen_to_clef_pos(my);

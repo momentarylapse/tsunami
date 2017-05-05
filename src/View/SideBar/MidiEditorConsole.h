@@ -49,6 +49,7 @@ public:
 
 	void clear();
 	void setTrack(Track *t);
+	void setMode(int mode);
 
 
 	string id_inner;

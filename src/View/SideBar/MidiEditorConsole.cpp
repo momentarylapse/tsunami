@@ -96,10 +96,30 @@ void MidiEditorConsole::update()
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
+
+	if (!track)
+		return;
+
 	check("modifier:none", view->mode_midi->modifier == MODIFIER_NONE);
 	check("modifier:sharp", view->mode_midi->modifier == MODIFIER_SHARP);
 	check("modifier:flat", view->mode_midi->modifier == MODIFIER_FLAT);
 	check("modifier:natural", view->mode_midi->modifier == MODIFIER_NATURAL);
+
+	int mode = view->mode->which_midi_mode(track);
+	check("mode:linear", mode == view->MIDI_MODE_LINEAR);
+	check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
+	check("mode:tab", mode == view->MIDI_MODE_TAB);
+
+	enable("modifier:none", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:sharp", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:flat", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:natural", mode == view->MIDI_MODE_CLASSICAL);
+
+
+	if (track->instrument.type == Instrument::TYPE_DRUMS){
+		// select a nicer pitch range in linear mode for drums
+		view->vtrack[track->get_index()]->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
+	}
 }
 
 void MidiEditorConsole::onUpdate(Observable* o, const string &message)
@@ -256,13 +276,7 @@ void MidiEditorConsole::setTrack(Track *t)
 			if (view->vtrack[tn])
 				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
 
-		int mode = view->mode->which_midi_mode(track);
-		setMode(mode);
-
-		if (t->instrument.type == Instrument::TYPE_DRUMS){
-			// select a nicer pitch range in linear mode for drums
-			view->vtrack[track->get_index()]->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
-		}
+		update();
 	}
 
 }
@@ -270,13 +284,6 @@ void MidiEditorConsole::setTrack(Track *t)
 void MidiEditorConsole::setMode(int mode)
 {
 	view->mode_midi->setMode(mode);
-	check("mode:linear", mode == view->MIDI_MODE_LINEAR);
-	check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
-	check("mode:tab", mode == view->MIDI_MODE_TAB);
-
-	enable("modifier:none", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:sharp", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:flat", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:natural", mode == view->MIDI_MODE_CLASSICAL);
+	update();
 }
 

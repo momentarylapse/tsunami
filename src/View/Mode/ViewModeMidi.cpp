@@ -126,6 +126,7 @@ void ViewModeMidi::onLeftButtonDown()
 		if (preview_synth)
 			delete preview_synth;
 		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
+		preview_synth->setInstrument(view->cur_track->instrument);
 		preview_renderer->setSynthesizer(preview_synth);
 
 		preview_source->start(getCreationPitch(selection->pitch));

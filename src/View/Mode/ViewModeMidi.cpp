@@ -83,6 +83,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	deleting = false;
 	string_no = 0;
+	octave = 3;
 
 	scroll_offset = 0;
 	scroll_bar = rect(0, 0, 0, 0);
@@ -207,6 +208,27 @@ void ViewModeMidi::onKeyDown(int k)
 		}else if (k == KEY_4){
 			modifier = MODIFIER_NATURAL;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
+		}
+
+
+		if ((k >= KEY_A) and (k <= KEY_G)){
+			Range r = getMidiEditRange();
+			int number = (k - KEY_A);
+			int rel[7] = {9,11,0,2,4,5,7};
+			int pitch = pitch_from_octave_and_rel(rel[number], octave);
+			MidiNote n = MidiNote(r, pitch, 1.0f);
+			cur_track->track->addMidiNote(n);
+			setCursorPos(r.end() + 1);
+			//view->updateSelection();
+
+		}
+		if (k == KEY_UP){
+			octave = min(octave + 1, 7);
+			view->forceRedraw();
+		}
+		if (k == KEY_DOWN){
+			octave = max(octave - 1, 0);
+			view->forceRedraw();
 		}
 	}else if (mode == AudioView::MIDI_MODE_TAB){
 
@@ -651,15 +673,19 @@ void ViewModeMidi::drawPost(Painter *c)
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
 
-	int y = cur_track->string_to_screen(string_no);
-	int y1 = y - cur_track->clef_dy/2;
-	int y2 = y + cur_track->clef_dy/2;
-
-
-	c->setColor(color(0.5f, 1, 0, 0));
-	c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
-	//view->drawTimeLine(c, r.start(), 0, Red, false);
-	//view->drawTimeLine(c, r.end(), 0, Red, false);
+	c->setColor(view->colors.selection_internal);
+	if (mode == AudioView::MIDI_MODE_TAB){
+		int y = cur_track->string_to_screen(string_no);
+		int y1 = y - cur_track->clef_dy/2;
+		int y2 = y + cur_track->clef_dy/2;
+		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+	}else if (mode == AudioView::MIDI_MODE_CLASSICAL){
+		int p1 = pitch_from_octave_and_rel(0, octave);
+		int p2 = pitch_from_octave_and_rel(0, octave+1);
+		int y1 = cur_track->pitch2y_classical(p2);
+		int y2 = cur_track->pitch2y_classical(p1);
+		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+	}
 }
 
 Range ViewModeMidi::getMidiEditRange()

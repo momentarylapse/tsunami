@@ -111,53 +111,23 @@ Array<Bar> BarCollection::getBars(const Range &r)
 
 int BarCollection::getNextBeat(int pos)
 {
-	int p0 = 0;
-	if (p0 > pos)
-		return p0;
-	for (BarPattern &b: *this){
-		if (b.type == b.TYPE_BAR){
-			int pp = p0;
-			for (int j=0; j<b.num_beats; j++){
-				pp += b.length / b.num_beats;
-				if (j == b.num_beats-1)
-					pp = p0 + b.length;
-				if (pp > pos)
-					return pp;
-			}
-			p0 += b.length;
-		}else if (b.type == b.TYPE_PAUSE){
-			p0 += b.length;
-			if (p0 > pos)
-				return p0;
-		}
-	}
-	return pos;
+	Array<Beat> beats = get_beats(*this, Range::ALL, true, false);
+	for (Beat &b: beats)
+		if (b.range.offset > pos)
+			return b.range.offset;
+	return 0;
 }
 
 int BarCollection::getPrevBeat(int pos)
 {
-	int p0 = 0;
-	if (p0 > pos)
-		return p0;
-	int prev = p0;
-	for (BarPattern &b: *this){
-		if (b.type == b.TYPE_BAR){
-			int pp = p0;
-			for (int j=0; j<b.num_beats; j++){
-				prev = pp;
-				pp += b.length / b.num_beats;
-				if (pp >= pos)
-					return prev;
-			}
-			p0 += b.length;
-		}else if (b.type == b.TYPE_PAUSE){
-			prev = p0;
-			p0 += b.length;
-			if (p0 >= pos)
-				return prev;
-		}
+	Array<Beat> beats = get_beats(*this, Range::ALL, true, false);
+	int prev = 0;
+	for (Beat &b: beats){
+		if (b.range.offset >= pos)
+			return prev;
+		prev = b.range.offset;
 	}
-	return pos;
+	return 0;
 }
 
 int BarCollection::getNextSubBeat(int pos, int beat_partition)

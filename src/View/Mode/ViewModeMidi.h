@@ -76,6 +76,7 @@ public:
 
 	bool deleting;
 	int string_no;
+	int octave;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

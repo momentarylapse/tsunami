@@ -54,6 +54,9 @@ public:
 	Array<Beat> getBeats(const Range &r, bool include_hidden = false, bool include_sub_beats = false);
 	Array<Bar> getBars(const Range &r);
 	int getNextBeat(int pos);
+	int getPrevBeat(int pos);
+	int getNextSubBeat(int pos, int beat_partition);
+	int getPrevSubBeat(int pos, int beat_partition);
 	Range getRange();
 };
 

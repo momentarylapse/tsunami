@@ -34,6 +34,7 @@ public:
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
 	void drawTrackPitchGrid(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
+	virtual void drawPost(Painter *c);
 
 	virtual Selection getHover();
 
@@ -43,6 +44,7 @@ public:
 	void setBeatPartition(int partition);
 
 	Array<int> getCreationPitch(int base_pitch);
+	Range getMidiEditRange();
 
 	int beat_partition;
 	int chord_type;
@@ -73,6 +75,7 @@ public:
 	float scroll_offset;
 
 	bool deleting;
+	int string_no;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

@@ -11,6 +11,7 @@
 #include "ViewMode.h"
 
 class ActionTrackMoveSample;
+class Range;
 
 class ViewModeDefault : public ViewMode
 {

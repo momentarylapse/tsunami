@@ -677,7 +677,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 
 	// track title
-	c->setFont("", -1, (track == view->cur_track), false);
+	c->setFont("", view->FONT_SIZE, (track == view->cur_track), false);
 	c->setFill(false);
 	c->setLineWidth(3);
 	c->setColor(view->colors.background_track);

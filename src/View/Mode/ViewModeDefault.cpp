@@ -39,7 +39,7 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TIME)){
+	if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TIME) or (selection->type == Selection::TYPE_CLEF_POSITION)){
 		setCursorPos(selection->pos);
 	}else if (selection->type == Selection::TYPE_SELECTION_START){
 		// swap end / start
@@ -204,6 +204,7 @@ void ViewModeDefault::onKeyDown(int k)
 		cam->move(view->ScrollSpeedFast * dt / cam->scale);
 	if (k == KEY_PRIOR)
 		cam->move(- view->ScrollSpeedFast * dt / cam->scale);
+
 	// zoom
 	if (k == KEY_ADD)
 		cam->zoom(exp(  view->ZoomSpeed));
@@ -480,3 +481,4 @@ int ViewModeDefault::which_midi_mode(Track *t)
 		return view->MIDI_MODE_TAB;
 	return view->MIDI_MODE_CLASSICAL;
 }
+

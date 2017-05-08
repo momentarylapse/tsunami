@@ -624,7 +624,7 @@ void AudioView::updateTracks()
 		notify(MESSAGE_VTRACK_CHANGE);
 }
 
-void AudioView::drawTimeLine(Painter *c, int pos, int type, color &col, bool show_time)
+void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time)
 {
 	int p = cam.sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){

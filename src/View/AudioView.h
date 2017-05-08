@@ -69,7 +69,7 @@ public:
 	void zoomOut();
 
 	void drawGridTime(Painter *c, const rect &r, const color &bg, bool show_time = false);
-	void drawTimeLine(Painter *c, int pos, int type, color &col, bool show_time = false);
+	void drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time = false);
 	void drawSelection(Painter *c, const rect &r);
 	void drawBackground(Painter *c, const rect &r);
 	void drawAudioFile(Painter *c, const rect &r);

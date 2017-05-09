@@ -26,42 +26,58 @@ class MidiPreviewSource : public MidiSource
 public:
 	MidiPreviewSource()
 	{
-		started = ended = false;
-		end_of_stream = false;
+		mode = MODE_WAITING;
+		ttl = -1;
 	}
 	virtual int _cdecl read(MidiRawData &midi)
 	{
-		if (end_of_stream)
+		if (mode == MODE_END_OF_STREAM)
 			return 0;
-		if (started){
+
+		if (mode == MODE_START_NOTES){
 			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 1));
-			started = false;
-		}
-		if (ended){
+			mode = MODE_ACTIVE_NOTES;
+		}else if (mode == MODE_END_NOTES){
 			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 0));
-			ended = false;
-			end_of_stream = true;
+			mode = MODE_END_OF_STREAM;
+		}
+		if (mode == MODE_ACTIVE_NOTES){
+			ttl -= midi.samples;
+			if (ttl < 0)
+				end();
 		}
 		return midi.samples;
 	}
 
-	void start(const Array<int> &_pitch)
+	void start(const Array<int> &_pitch, int _ttl)
 	{
-		if (ended)
+		if ((mode != MODE_WAITING) and (mode != MODE_END_OF_STREAM))
 			return;
 		pitch = _pitch;
-		started = true;
-		end_of_stream = false;
+		ttl = _ttl;
+		mode = MODE_START_NOTES;
 	}
 	void end()
 	{
-		ended = true;
+		if (mode == MODE_START_NOTES){
+			mode = MODE_WAITING;
+		}else if (mode == MODE_ACTIVE_NOTES){
+			mode = MODE_END_NOTES;
+		}
 	}
 
-	bool started, ended;
-	bool end_of_stream;
+private:
+	int mode;
+	enum{
+		MODE_WAITING,
+		MODE_START_NOTES,
+		MODE_ACTIVE_NOTES,
+		MODE_END_NOTES,
+		MODE_END_OF_STREAM
+	};
+	int ttl;
 
 	Array<int> pitch;
 };
@@ -116,6 +132,23 @@ void ViewModeMidi::setCreationMode(int _mode)
 	//view->forceRedraw();
 }
 
+
+void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
+{
+
+	if (!preview_stream->isPlaying()){
+		if (preview_synth)
+			delete preview_synth;
+		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
+		preview_synth->setInstrument(view->cur_track->instrument);
+		preview_renderer->setSynthesizer(preview_synth);
+	}
+
+	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
+	if (!preview_stream->isPlaying())
+		preview_stream->play();
+}
+
 void ViewModeMidi::onLeftButtonDown()
 {
 	ViewModeDefault::onLeftButtonDown();
@@ -135,17 +168,7 @@ void ViewModeMidi::onLeftButtonDown()
 		if (mode == AudioView::MIDI_MODE_TAB){
 		}else{ // CLASSICAL/LINEAR
 			// create new note
-			if (!preview_stream->isPlaying()){
-				if (preview_synth)
-					delete preview_synth;
-				preview_synth = (Synthesizer*)view->cur_track->synth->copy();
-				preview_synth->setInstrument(view->cur_track->instrument);
-				preview_renderer->setSynthesizer(preview_synth);
-			}
-
-			preview_source->start(getCreationPitch(selection->pitch));
-			if (!preview_stream->isPlaying())
-				preview_stream->play();
+			startMidiPreview(getCreationPitch(selection->pitch), 1.0f);
 		}
 	}else if (selection->type == Selection::TYPE_SCROLL){
 		scroll_offset = view->my - scroll_bar.y1;
@@ -159,11 +182,8 @@ void ViewModeMidi::onLeftButtonUp()
 	int mode = which_midi_mode(cur_track->track);
 	if ((mode == AudioView::MIDI_MODE_CLASSICAL) or (mode == AudioView::MIDI_MODE_LINEAR)){
 		if (selection->type == Selection::TYPE_MIDI_PITCH){
-			view->song->action_manager->beginActionGroup();
 			MidiData notes = getCreationNotes(selection, mouse_possibly_selecting_start);
-			for (MidiNote *n: notes)
-				view->cur_track->addMidiNote(*n);
-			view->song->action_manager->endActionGroup();
+			view->cur_track->addMidiNotes(notes);
 
 			preview_source->end();
 		}
@@ -220,6 +240,7 @@ void ViewModeMidi::onKeyDown(int k)
 			cur_track->track->addMidiNote(n);
 			setCursorPos(r.end() + 1);
 			//view->updateSelection();
+			startMidiPreview(pitch, 0.1f);
 
 		}
 		if (k == KEY_UP){
@@ -241,6 +262,7 @@ void ViewModeMidi::onKeyDown(int k)
 			cur_track->track->addMidiNote(n);
 			setCursorPos(r.end() + 1);
 			//view->updateSelection();
+			startMidiPreview(pitch, 0.1f);
 
 		}
 		if (k == KEY_UP){

@@ -106,6 +106,7 @@ void MidiEditorConsole::update()
 	check("modifier:natural", view->mode_midi->modifier == MODIFIER_NATURAL);
 
 	int mode = view->mode->which_midi_mode(track);
+	view->mode_midi->setMode(mode);
 	check("mode:linear", mode == view->MIDI_MODE_LINEAR);
 	check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
 	check("mode:tab", mode == view->MIDI_MODE_TAB);
@@ -247,8 +248,7 @@ void MidiEditorConsole::clear()
 	if (track)
 		unsubscribe(track);
 	track = NULL;
-	setInt("reference_tracks", -1);
-	//Enable("add", false);
+	setSelection("reference_tracks", Array<int>());
 }
 
 void MidiEditorConsole::onEnter()

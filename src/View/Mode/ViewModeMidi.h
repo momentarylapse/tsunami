@@ -45,6 +45,7 @@ public:
 
 	Array<int> getCreationPitch(int base_pitch);
 	Range getMidiEditRange();
+	void startMidiPreview(const Array<int> &pitch, float ttl);
 
 	int beat_partition;
 	int chord_type;

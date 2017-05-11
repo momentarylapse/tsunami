@@ -29,13 +29,13 @@ LayerConsole::LayerConsole(Song *s, AudioView *v) :
 
 	loadData();
 
-	eventX("layers", "hui:select", this, &LayerConsole::onSelect);
-	eventX("layers", "hui:change", this, &LayerConsole::onEdit);
-	event("add_layer", this, &LayerConsole::onAdd);
-	event("delete_layer", this, &LayerConsole::onDelete);
-	event("merge_layer", this, &LayerConsole::onMerge);
+	eventX("layers", "hui:select", std::bind(&LayerConsole::onSelect, this));
+	eventX("layers", "hui:change", std::bind(&LayerConsole::onEdit, this));
+	event("add_layer", std::bind(&LayerConsole::onAdd, this));
+	event("delete_layer", std::bind(&LayerConsole::onDelete, this));
+	event("merge_layer", std::bind(&LayerConsole::onMerge, this));
 
-	event("edit_song", this, &LayerConsole::onEditSong);
+	event("edit_song", std::bind(&LayerConsole::onEditSong, this));
 
 	subscribe(song);
 	subscribe(view, view->MESSAGE_CUR_LAYER_CHANGE);

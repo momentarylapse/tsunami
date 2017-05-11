@@ -39,8 +39,8 @@ public:
 			hideControl("save_favorite", true);
 		}
 
-		event("load_favorite", this, &SynthPanel::onLoad);
-		event("save_favorite", this, &SynthPanel::onSave);
+		event("load_favorite", std::bind(&SynthPanel::onLoad, this));
+		event("save_favorite", std::bind(&SynthPanel::onSave, this));
 
 		old_param = synth->configToString();
 		subscribe(synth, synth->MESSAGE_CHANGE);
@@ -90,11 +90,11 @@ SynthConsole::SynthConsole(AudioView *_view) :
 
 	fromResource("synth_console");
 
-	event("select", this, &SynthConsole::onSelect);
-	event("detune", this, &SynthConsole::onDetune);
+	event("select", std::bind(&SynthConsole::onSelect, this));
+	event("detune", std::bind(&SynthConsole::onDetune, this));
 
-	event("edit_song", this, &SynthConsole::onEditSong);
-	event("edit_track", this, &SynthConsole::onEditTrack);
+	event("edit_song", std::bind(&SynthConsole::onEditSong, this));
+	event("edit_track", std::bind(&SynthConsole::onEditTrack, this));
 
 	track = NULL;
 	panel = NULL;

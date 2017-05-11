@@ -21,13 +21,13 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	track = NULL;
 	sample = NULL;
 
-	event("volume", this, &SampleRefConsole::onVolume);
-	event("mute", this, &SampleRefConsole::onMute);
-	event("track", this, &SampleRefConsole::onTrack);
+	event("volume", std::bind(&SampleRefConsole::onVolume, this));
+	event("mute", std::bind(&SampleRefConsole::onMute, this));
+	event("track", std::bind(&SampleRefConsole::onTrack, this));
 
-	event("edit_song", this, &SampleRefConsole::onEditSong);
-	event("edit_track", this, &SampleRefConsole::onEditTrack);
-	event("edit_sample", this, &SampleRefConsole::onEditSample);
+	event("edit_song", std::bind(&SampleRefConsole::onEditSong, this));
+	event("edit_track", std::bind(&SampleRefConsole::onEditTrack, this));
+	event("edit_sample", std::bind(&SampleRefConsole::onEditSample, this));
 
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }

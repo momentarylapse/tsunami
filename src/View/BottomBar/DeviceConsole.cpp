@@ -18,14 +18,14 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 
 	fromResource("device-manager");
 
-	eventX("output-list", "hui:change", this, &DeviceConsole::onOutputEdit);
-	eventX("input-list", "hui:change", this, &DeviceConsole::onInputEdit);
-	eventX("midi-input-list", "hui:change", this, &DeviceConsole::onMidiInputEdit);
-	eventX("output-list", "hui:move", this, &DeviceConsole::onOutputMove);
-	eventX("input-list", "hui:move", this, &DeviceConsole::onInputMove);
-	eventX("midi-input-list", "hui:move", this, &DeviceConsole::onMidiInputMove);
-	event("top-priority", this, &DeviceConsole::onTopPriority);
-	event("erase", this, &DeviceConsole::onErase);
+	eventX("output-list", "hui:change", std::bind(&DeviceConsole::onOutputEdit, this));
+	eventX("input-list", "hui:change", std::bind(&DeviceConsole::onInputEdit, this));
+	eventX("midi-input-list", "hui:change", std::bind(&DeviceConsole::onMidiInputEdit, this));
+	eventX("output-list", "hui:move", std::bind(&DeviceConsole::onOutputMove, this));
+	eventX("input-list", "hui:move", std::bind(&DeviceConsole::onInputMove, this));
+	eventX("midi-input-list", "hui:move", std::bind(&DeviceConsole::onMidiInputMove, this));
+	event("top-priority", std::bind(&DeviceConsole::onTopPriority, this));
+	event("erase", std::bind(&DeviceConsole::onErase, this));
 
 	subscribe(device_manager);
 

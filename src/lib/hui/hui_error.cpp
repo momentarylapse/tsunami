@@ -20,14 +20,14 @@ extern Array<HuiWindow*> HuiWindows;
 
 void _HuiSignalHandler(int)
 {
-	HuiErrorFunction.call();
+	HuiErrorFunction();
 }
 
 // apply a function to be executed when a critical error occures
-void HuiSetErrorFunction(hui_callback *error_function)
+void HuiSetErrorFunction(const HuiCallback &function)
 {
-	HuiErrorFunction = error_function;
-	if (error_function){
+	HuiErrorFunction = function;
+	if (function){
 		signal(SIGSEGV, &_HuiSignalHandler);
 		/*signal(SIGINT, &_HuiSignalHandler);
 		signal(SIGILL, &_HuiSignalHandler);
@@ -39,7 +39,7 @@ void HuiSetErrorFunction(hui_callback *error_function)
 	}
 }
 
-static hui_callback *_eh_cleanup_function_;
+static HuiCallback _eh_cleanup_function_;
 
 
 #ifdef _X_USE_NET_
@@ -63,9 +63,9 @@ public:
 		setString("report_sender",_("(anonymous)"));
 		setString("comment",_("Just happened somehow..."));
 
-		event("ok", this, &ReportDialog::onOk);
-		event("cancel", this, &ReportDialog::destroy);
-		event("hui:close", this, &ReportDialog::destroy);
+		event("ok", std::bind(&ReportDialog::onOk, this));
+		event("cancel", std::bind(&ReportDialog::destroy, this));
+		event("hui:close", std::bind(&ReportDialog::destroy, this));
 	}
 
 	void onOk()
@@ -104,7 +104,7 @@ public:
 		addButton(_("open message.txt"),115,460,200,25,"show_log");
 		addButton(_("Send bug report to Michi"),325,460,265,25,"send_report");
 	#ifdef _X_USE_NET_
-		event("send_report", this, &ErrorDialog::onSendBugReport);
+		event("send_report", std::bind(&ErrorDialog::onSendBugReport, this));
 	#else
 		enable("send_report", false);
 		setTooltip("send_report", _("Program was compiled without network support..."));
@@ -114,10 +114,10 @@ public:
 			if (temp.num > 0)
 				addString("message_list", temp);
 		}
-		event("show_log", this, &ErrorDialog::onShowLog);
-		event("cancel", this, &ErrorDialog::onClose);
-		event("hui:win_close", this, &ErrorDialog::onClose);
-		event("ok", this, &ErrorDialog::onClose);
+		event("show_log", std::bind(&ErrorDialog::onShowLog, this));
+		event("cancel", std::bind(&ErrorDialog::onClose, this));
+		event("hui:win_close", std::bind(&ErrorDialog::onClose, this));
+		event("ok", std::bind(&ErrorDialog::onClose, this));
 	}
 
 	void onShowLog()
@@ -172,7 +172,7 @@ void hui_default_error_handler()
 	exit(0);
 }
 
-void HuiSetDefaultErrorHandler(hui_callback *error_cleanup_function)
+void HuiSetDefaultErrorHandler(const HuiCallback &error_cleanup_function)
 {
 	_eh_cleanup_function_ = error_cleanup_function;
 	HuiSetErrorFunction(&hui_default_error_handler);

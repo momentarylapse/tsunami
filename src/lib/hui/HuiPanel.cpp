@@ -98,57 +98,57 @@ void HuiPanel::_set_cur_id_(const string &id)
 	cur_id = id;
 }
 
-void HuiPanel::eventS(const string &id, hui_callback *function)
+/*void HuiPanel::eventS(const string &id, hui_callback *function)
 {
-	events.add(HuiEventListener(id, ":def:", function));
+	events.add(HuiEventListener(id, ":def:", HuiCallback(function)));
 
 }
 
 void HuiPanel::eventSX(const string &id, const string &msg, hui_callback *function)
 {
+	events.add(HuiEventListener(id, msg, HuiCallback(function)));
+}*/
+
+void HuiPanel::event(const string &id, const HuiCallback &function)
+{
+	events.add(HuiEventListener(id, ":def:", function));
+}
+
+void HuiPanel::eventX(const string &id, const string &msg, const HuiCallback &function)
+{
 	events.add(HuiEventListener(id, msg, function));
 }
 
-void HuiPanel::_event(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void HuiPanel::eventXP(const string &id, const string &msg, const HuiCallbackP &function)
 {
-	events.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, msg, -1, function));
 }
 
-void HuiPanel::_eventX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+/*void HuiPanel::_eventK(const string &id, hui_kaba_callback *function)
 {
-	events.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
-}
-
-void HuiPanel::_eventXP(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)(Painter*))
-{
-	events.add(HuiEventListener(id, msg, HuiCallback(handler, (void(HuiEventHandler::*)())function)));
-}
-
-void HuiPanel::_eventK(const string &id, hui_kaba_callback *function)
-{
-	events.add(HuiEventListener(id, ":def:", HuiCallback(this, function)));
+	events.add(HuiEventListener(id, ":def:", std::bind(function, this)));
 }
 
 void HuiPanel::_eventKO(const string &id, HuiEventHandler* handler, hui_kaba_callback *function)
 {
-	events.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, ":def:", std::bind(function, handler)));
 }
 
 void HuiPanel::_eventKX(const string &id, const string &msg, hui_kaba_callback *function)
 {
-	events.add(HuiEventListener(id, msg, HuiCallback(this, function)));
+	events.add(HuiEventListener(id, msg, std::bind(function, this)));
 }
 
 void HuiPanel::_eventKOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function)
 {
-	events.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
-}
+	events.add(HuiEventListener(id, msg, std::bind(function, handler)));
+}*/
 
 void HuiPanel::removeEventHandlers(HuiEventHandler *handler)
 {
-	for (int i=events.num-1;i>=0;i--)
+	/*for (int i=events.num-1;i>=0;i--)
 		if (events[i].function.has_handler(handler))
-			events.erase(i);
+			events.erase(i);*/
 }
 
 bool HuiPanel::_send_event_(HuiEvent *e)
@@ -190,15 +190,18 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 			continue;
 
 		// send the event
-		if (ee.function.is_set()){
 
-			if (e->message == "hui:draw"){
+		if (e->message == "hui:draw"){
+			if (ee.function_p){
 				HuiPainter p(this, e->id);
-				ee.function.call_p(&p);
-			}else{
-				ee.function.call();
+				ee.function_p(&p);
+				sent = true;
 			}
-			sent = true;
+		}else{
+			if (ee.function){
+				ee.function();
+				sent = true;
+			}
 		}
 
 		// window closed by callback?

@@ -39,10 +39,10 @@ public:
 			hideControl("save_favorite", true);
 		}
 
-		event("enabled", this, &SingleFxPanel::onEnabled);
-		event("delete", this, &SingleFxPanel::onDelete);
-		event("load_favorite", this, &SingleFxPanel::onLoad);
-		event("save_favorite", this, &SingleFxPanel::onSave);
+		event("enabled", std::bind(&SingleFxPanel::onEnabled, this));
+		event("delete", std::bind(&SingleFxPanel::onDelete, this));
+		event("load_favorite", std::bind(&SingleFxPanel::onLoad, this));
+		event("save_favorite", std::bind(&SingleFxPanel::onSave, this));
 
 		check("enabled", fx->enabled);
 
@@ -123,10 +123,10 @@ FxConsole::FxConsole(AudioView *_view, Song *_song) :
 	if (!view)
 		hideControl("edit_track", true);
 
-	event("add", this, &FxConsole::onAdd);
+	event("add", std::bind(&FxConsole::onAdd, this));
 
-	event("edit_song", this, &FxConsole::onEditSong);
-	event("edit_track", this, &FxConsole::onEditTrack);
+	event("edit_song", std::bind(&FxConsole::onEditSong, this));
+	event("edit_track", std::bind(&FxConsole::onEditTrack, this));
 
 	if (view)
 		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);

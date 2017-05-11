@@ -31,19 +31,19 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
-	event("name", this, &TrackConsole::onName);
-	event("volume", this, &TrackConsole::onVolume);
-	event("panning", this, &TrackConsole::onPanning);
-	event("instrument", this, &TrackConsole::onInstrument);
-	event("edit_tuning", this, &TrackConsole::onEditTuning);
-	event("select_synth", this, &TrackConsole::onSelectSynth);
+	event("name", std::bind(&TrackConsole::onName, this));
+	event("volume", std::bind(&TrackConsole::onVolume, this));
+	event("panning", std::bind(&TrackConsole::onPanning, this));
+	event("instrument", std::bind(&TrackConsole::onInstrument, this));
+	event("edit_tuning", std::bind(&TrackConsole::onEditTuning, this));
+	event("select_synth", std::bind(&TrackConsole::onSelectSynth, this));
 
-	event("edit_song", this, &TrackConsole::onEditSong);
-	event("edit_fx", this, &TrackConsole::onEditFx);
-	event("edit_curves", this, &TrackConsole::onEditCurves);
-	event("_edit_midi", this, &TrackConsole::onEditMidi);
-	event("_edit_midi_fx", this, &TrackConsole::onEditMidiFx);
-	event("_edit_synth", this, &TrackConsole::onEditSynth);
+	event("edit_song", std::bind(&TrackConsole::onEditSong, this));
+	event("edit_fx", std::bind(&TrackConsole::onEditFx, this));
+	event("edit_curves", std::bind(&TrackConsole::onEditCurves, this));
+	event("_edit_midi", std::bind(&TrackConsole::onEditMidi, this));
+	event("_edit_midi_fx", std::bind(&TrackConsole::onEditMidiFx, this));
+	event("_edit_synth", std::bind(&TrackConsole::onEditSynth, this));
 }
 
 TrackConsole::~TrackConsole()

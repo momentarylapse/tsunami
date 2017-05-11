@@ -34,9 +34,9 @@ public:
 		}
 		setSelection("list", sel);
 
-		event("hui:close", this, &CurveTargetDialog::destroy);
-		event("cancel", this, &CurveTargetDialog::destroy);
-		event("ok", this, &CurveTargetDialog::onOk);
+		event("hui:close", std::bind(&CurveTargetDialog::destroy, this));
+		event("cancel", std::bind(&CurveTargetDialog::destroy, this));
+		event("ok", std::bind(&CurveTargetDialog::onOk, this));
 	}
 
 	Array<Curve::Target> all_targets;
@@ -63,14 +63,14 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 
 	id_list = "curves";
 
-	event("add", this, &CurveConsole::onAdd);
-	event("delete", this, &CurveConsole::onDelete);
-	event("target", this, &CurveConsole::onTarget);
-	eventX(id_list, "hui:select", this, &CurveConsole::onListSelect);
-	eventX(id_list, "hui:change", this, &CurveConsole::onListEdit);
-	event("edit_song", this, &CurveConsole::onEditSong);
-	event("edit_track", this, &CurveConsole::onEditTrack);
-	event("edit_fx", this, &CurveConsole::onEditFx);
+	event("add", std::bind(&CurveConsole::onAdd, this));
+	event("delete", std::bind(&CurveConsole::onDelete, this));
+	event("target", std::bind(&CurveConsole::onTarget, this));
+	eventX(id_list, "hui:select", std::bind(&CurveConsole::onListSelect, this));
+	eventX(id_list, "hui:change", std::bind(&CurveConsole::onListEdit, this));
+	event("edit_song", std::bind(&CurveConsole::onEditSong, this));
+	event("edit_track", std::bind(&CurveConsole::onEditTrack, this));
+	event("edit_fx", std::bind(&CurveConsole::onEditFx, this));
 
 	curve = NULL;
 

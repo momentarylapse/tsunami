@@ -326,7 +326,7 @@ public:
 			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
 			addLabel(a.unit, 3, i, 0, 0, "");
-			a.slider = new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this);
+			a.slider = new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, std::bind(&AutoConfigPanel::onChange, this), *a.value);
 		}
 	}
 	~AutoConfigPanel()
@@ -385,12 +385,12 @@ public:
 		if (c->configurable_type != c->TYPE_EFFECT)
 			hideControl("preview", true);
 
-		event("load_favorite", this, &ConfigurationDialog::onLoad);
-		event("save_favorite", this, &ConfigurationDialog::onSave);
-		event("ok", this, &ConfigurationDialog::onOk);
-		event("preview", this, &ConfigurationDialog::onPreview);
-		event("cancel", this, &ConfigurationDialog::onClose);
-		event("hui:close", this, &ConfigurationDialog::onClose);
+		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
+		event("save_favorite", std::bind(&ConfigurationDialog::onSave, this));
+		event("ok", std::bind(&ConfigurationDialog::onOk, this));
+		event("preview", std::bind(&ConfigurationDialog::onPreview, this));
+		event("cancel", std::bind(&ConfigurationDialog::onClose, this));
+		event("hui:close", std::bind(&ConfigurationDialog::onClose, this));
 	}
 	~ConfigurationDialog()
 	{

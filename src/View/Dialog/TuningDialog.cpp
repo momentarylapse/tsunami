@@ -18,10 +18,10 @@ TuningDialog::TuningDialog(HuiWindow *_parent, Track *t) :
 
 	update();
 
-	event("ok", this, &TuningDialog::onOk);
-	event("cancel", this, &TuningDialog::destroy);
-	event("hui:close", this, &TuningDialog::destroy);
-	event("add_first", this, &TuningDialog::onAddFirst);
+	event("ok", std::bind(&TuningDialog::onOk, this));
+	event("cancel", std::bind(&TuningDialog::destroy, this));
+	event("hui:close", std::bind(&TuningDialog::destroy, this));
+	event("add_first", std::bind(&TuningDialog::onAddFirst, this));
 }
 
 void TuningDialog::update()
@@ -45,9 +45,9 @@ void TuningDialog::update()
 			setImage("delete_" + id, "hui:delete");
 			addButton("", 3, 100 - i, 0, 0, "add_" + id);
 			setImage("add_" + id, "hui:add");
-			event(id, this, &TuningDialog::onEdit);
-			event("delete_" + id, this, &TuningDialog::onDelete);
-			event("add_" + id, this, &TuningDialog::onAdd);
+			event(id, std::bind(&TuningDialog::onEdit, this));
+			event("delete_" + id, std::bind(&TuningDialog::onDelete, this));
+			event("add_" + id, std::bind(&TuningDialog::onAdd, this));
 
 			// reverse order list... nicer gui
 			for (int p=MAX_PITCH-1; p>=0; p--)

@@ -19,9 +19,9 @@ PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *s, AudioView *v):
 
 	setFloat("duration", 1.0f);
 
-	event("ok", this, &PauseAddDialog::onOk);
-	event("cancel", this, &PauseAddDialog::onClose);
-	event("hui:close", this, &PauseAddDialog::onClose);
+	event("ok", std::bind(&PauseAddDialog::onOk, this));
+	event("cancel", std::bind(&PauseAddDialog::onClose, this));
+	event("hui:close", std::bind(&PauseAddDialog::onClose, this));
 }
 
 void PauseAddDialog::onOk()

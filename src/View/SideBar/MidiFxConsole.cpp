@@ -41,10 +41,10 @@ public:
 			hideControl("save_favorite", true);
 		}
 
-		event("enabled", this, &SingleMidiFxPanel::onEnabled);
-		event("delete", this, &SingleMidiFxPanel::onDelete);
-		event("load_favorite", this, &SingleMidiFxPanel::onLoad);
-		event("save_favorite", this, &SingleMidiFxPanel::onSave);
+		event("enabled", std::bind(&SingleMidiFxPanel::onEnabled, this));
+		event("delete", std::bind(&SingleMidiFxPanel::onDelete, this));
+		event("load_favorite", std::bind(&SingleMidiFxPanel::onLoad, this));
+		event("save_favorite", std::bind(&SingleMidiFxPanel::onSave, this));
 
 		check("enabled", fx->enabled);
 
@@ -116,11 +116,11 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("add", this, &MidiFxConsole::onAdd);
+	event("add", std::bind(&MidiFxConsole::onAdd, this));
 
-	event("edit_song", this, &MidiFxConsole::onEditSong);
-	event("edit_track", this, &MidiFxConsole::onEditTrack);
-	event("edit_midi", this, &MidiFxConsole::onEditMidi);
+	event("edit_song", std::bind(&MidiFxConsole::onEditSong, this));
+	event("edit_track", std::bind(&MidiFxConsole::onEditTrack, this));
+	event("edit_midi", std::bind(&MidiFxConsole::onEditMidi, this));
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();

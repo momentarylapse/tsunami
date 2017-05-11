@@ -38,8 +38,8 @@ BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager,
 	addConsole(mixing_console, "");
 	addConsole(device_console, "");
 
-	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
-	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
+	eventX("choose", "hui:select", std::bind(&BottomBar::onChoose, this));
+	event("close", std::bind(&BottomBar::onClose, this));
 
 	reveal("revealer", false);
 	visible = false;

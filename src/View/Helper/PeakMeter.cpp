@@ -57,8 +57,8 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	r.reset();
 	l.reset();
 
-	panel->eventXP(id, "hui:draw", this, &PeakMeter::onDraw);
-	panel->eventX(id, "hui:left-button-down", this, &PeakMeter::onLeftButtonDown);
+	panel->eventXP(id, "hui:draw", std::bind(&PeakMeter::onDraw, this, std::placeholders::_1));
+	panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeter::onLeftButtonDown, this));
 
 	setSource(_source);
 	enable(true);

@@ -109,7 +109,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 	if (available <= frames and stream->end_of_data){
 		//printf("end\n");
-		HuiRunLaterM(0.001f, stream, &OutputStream::stop); // TODO prevent abort before playback really finished
+		HuiRunLater(0.001f, std::bind(&OutputStream::stop, stream)); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -521,7 +521,7 @@ void OutputStream::play()
 	Pa_StartStream(_stream);
 #endif
 
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &OutputStream::update);
+	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&OutputStream::update, this));
 
 	notify(MESSAGE_STATE_CHANGE);
 }

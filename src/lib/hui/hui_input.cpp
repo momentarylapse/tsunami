@@ -11,84 +11,20 @@ Array<HuiCommand> _HuiCommand_;
 	int HuiKeyID[256], HuiKeyID2[256];
 #endif
 
-HuiCallback::HuiCallback()
-{
-	func = NULL;
-	object = NULL;
-	member_function = NULL;
-	kaba_func = NULL;
-}
-
-HuiCallback::HuiCallback(hui_callback *_func)
-{
-	func = _func;
-	object = NULL;
-	member_function = NULL;
-	kaba_func = NULL;
-}
-
-HuiCallback::HuiCallback(HuiEventHandler *_object, MemberFuncP _member_function)
-{
-	func = NULL;
-	object = _object;
-	member_function = _member_function;
-	kaba_func = NULL;
-}
-
-HuiCallback::HuiCallback(HuiEventHandler *_object, hui_kaba_callback *_func)
-{
-	func = NULL;
-	object = _object;
-	member_function = NULL;
-	kaba_func = _func;
-}
-
-void HuiCallback::call()
-{
-	if (func){
-		func();
-	}else if (object){
-		if (member_function)
-			(object->*member_function)();
-		else if (kaba_func)
-			kaba_func(object);
-	}
-}
-
-void HuiCallback::call_p(void *p)
-{
-	if (func){
-		((hui_callback_p*)func)(p);
-	}else if (object){
-		if (member_function){
-			MemberFuncPP f = (MemberFuncPP)member_function;
-			(object->*f)(p);
-		}else if (kaba_func){
-			((hui_kaba_callback_p*)kaba_func)(object, p);
-		}
-	}
-}
-
-bool HuiCallback::is_set()
-{
-	if (func)
-		return true;
-	else if (object)
-		return true;
-	return false;
-}
-
-bool HuiCallback::has_handler(HuiEventHandler *_object)
-{
-	return (object == _object);
-}
 
 
-HuiEventListener::HuiEventListener(const string &_id, const string &_message, HuiCallback _function)
+HuiEventListener::HuiEventListener(const string &_id, const string &_message, const HuiCallback &_function)
 {
 	id = _id;
 	message = _message;
 	function = _function;
+}
+
+HuiEventListener::HuiEventListener(const string &_id, const string &_message, int __, const HuiCallbackP &_function)
+{
+	id = _id;
+	message = _message;
+	function_p = _function;
 }
 
 HuiEvent _HuiEvent_;
@@ -567,12 +503,13 @@ bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message)
 
 void _HuiSendGlobalCommand_(HuiEvent *e)
 {
-	for (HuiCommand &c : _HuiCommand_)
+	for (HuiCommand &c: _HuiCommand_)
 		if (_HuiEventMatch_(e, c.id, ":def:"))
-			c.func.call();
+			if (c.func)
+				c.func();
 }
 
-void HuiAddCommand(const string &id, const string &image, int default_key_code, hui_callback *func)
+void HuiAddCommand(const string &id, const string &image, int default_key_code, const HuiCallback &func)
 {
 	HuiCommand c;
 	c.type = 0;
@@ -583,7 +520,7 @@ void HuiAddCommand(const string &id, const string &image, int default_key_code, 
 	_HuiCommand_.add(c);
 }
 
-void HuiAddCommandToggle(const string &id, const string &image, int default_key_code, hui_callback *func)
+void HuiAddCommandToggle(const string &id, const string &image, int default_key_code, const HuiCallback &func)
 {
 	HuiCommand c;
 	c.type = 1;
@@ -591,28 +528,6 @@ void HuiAddCommandToggle(const string &id, const string &image, int default_key_
 	c.image = image;
 	c.key_code = default_key_code;
 	c.func = func;
-	_HuiCommand_.add(c);
-}
-
-void _HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
-{
-	HuiCommand c;
-	c.type = 0;
-	c.id = id;
-	c.image = image;
-	c.key_code = default_key_code;
-	c.func = HuiCallback(handler, function);
-	_HuiCommand_.add(c);
-}
-
-void _HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
-{
-	HuiCommand c;
-	c.type = 1;
-	c.id = id;
-	c.image = image;
-	c.key_code = default_key_code;
-	c.func = HuiCallback(handler, function);
 	_HuiCommand_.add(c);
 }
 

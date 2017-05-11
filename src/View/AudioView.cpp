@@ -188,18 +188,18 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 
 
 	// events
-	parent->eventXP("area", "hui:draw", this, &AudioView::onDraw);
-	parent->eventX("area", "hui:mouse-move", this, &AudioView::onMouseMove);
-	parent->eventX("area", "hui:left-button-down", this, &AudioView::onLeftButtonDown);
-	parent->eventX("area", "hui:left-double-click", this, &AudioView::onLeftDoubleClick);
-	parent->eventX("area", "hui:left-button-up", this, &AudioView::onLeftButtonUp);
-	parent->eventX("area", "hui:middle-button-down", this, &AudioView::onMiddleButtonDown);
-	parent->eventX("area", "hui:middle-button-up", this, &AudioView::onMiddleButtonUp);
-	parent->eventX("area", "hui:right-button-down", this, &AudioView::onRightButtonDown);
-	parent->eventX("area", "hui:right-button-up", this, &AudioView::onRightButtonUp);
-	parent->eventX("area", "hui:key-down", this, &AudioView::onKeyDown);
-	parent->eventX("area", "hui:key-up", this, &AudioView::onKeyUp);
-	parent->eventX("area", "hui:mouse-wheel", this, &AudioView::onMouseWheel);
+	parent->eventXP("area", "hui:draw", std::bind(&AudioView::onDraw, this, std::placeholders::_1));
+	parent->eventX("area", "hui:mouse-move", std::bind(&AudioView::onMouseMove, this));
+	parent->eventX("area", "hui:left-button-down", std::bind(&AudioView::onLeftButtonDown, this));
+	parent->eventX("area", "hui:left-double-click", std::bind(&AudioView::onLeftDoubleClick, this));
+	parent->eventX("area", "hui:left-button-up", std::bind(&AudioView::onLeftButtonUp, this));
+	parent->eventX("area", "hui:middle-button-down", std::bind(&AudioView::onMiddleButtonDown, this));
+	parent->eventX("area", "hui:middle-button-up", std::bind(&AudioView::onMiddleButtonUp, this));
+	parent->eventX("area", "hui:right-button-down", std::bind(&AudioView::onRightButtonDown, this));
+	parent->eventX("area", "hui:right-button-up", std::bind(&AudioView::onRightButtonUp, this));
+	parent->eventX("area", "hui:key-down", std::bind(&AudioView::onKeyDown, this));
+	parent->eventX("area", "hui:key-up", std::bind(&AudioView::onKeyUp, this));
+	parent->eventX("area", "hui:mouse-wheel", std::bind(&AudioView::onMouseWheel, this));
 
 	parent->activate("area");
 
@@ -742,7 +742,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	repeat |= is_updating_peaks;
 
 	if (repeat)
-		HuiRunLaterM(repeat_fast ? 0.03f : 0.2f, this, &AudioView::forceRedraw);
+		HuiRunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
 }
 
 int frame=0;

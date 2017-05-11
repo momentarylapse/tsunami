@@ -45,17 +45,17 @@ SongConsole::SongConsole(Song *a) :
 
 	loadData();
 
-	event("samplerate", this, &SongConsole::onSamplerate);
-	event("format", this, &SongConsole::onFormat);
-	event("compress", this, &SongConsole::onCompression);
-	eventX("tags", "hui:select", this, &SongConsole::onTagsSelect);
-	eventX("tags", "hui:change", this, &SongConsole::onTagsEdit);
-	event("add_tag", this, &SongConsole::onAddTag);
-	event("delete_tag", this, &SongConsole::onDeleteTag);
+	event("samplerate", std::bind(&SongConsole::onSamplerate, this));
+	event("format", std::bind(&SongConsole::onFormat, this));
+	event("compress", std::bind(&SongConsole::onCompression, this));
+	eventX("tags", "hui:select", std::bind(&SongConsole::onTagsSelect, this));
+	eventX("tags", "hui:change", std::bind(&SongConsole::onTagsEdit, this));
+	event("add_tag", std::bind(&SongConsole::onAddTag, this));
+	event("delete_tag", std::bind(&SongConsole::onDeleteTag, this));
 
-	event("edit_layers", this, &SongConsole::onEditLayers);
-	event("edit_samples", this, &SongConsole::onEditSamples);
-	event("edit_fx", this, &SongConsole::onEditFx);
+	event("edit_layers", std::bind(&SongConsole::onEditLayers, this));
+	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
+	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
 
 	subscribe(song);
 }
@@ -69,7 +69,7 @@ void SongConsole::loadData()
 {
 	// tags
 	reset("tags");
-	for (Tag &t : song->tags)
+	for (Tag &t: song->tags)
 		addString("tags", t.key + "\\" + t.value);
 	enable("delete_tag", false);
 

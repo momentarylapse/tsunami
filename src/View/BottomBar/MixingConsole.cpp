@@ -37,9 +37,9 @@ TrackMixer::TrackMixer()
 	addString(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 	addString(vol_slider_id, format("%f\\-inf", db2slider(DB_MIN))); // \u221e
 
-	event(vol_slider_id, this, &TrackMixer::onVolume);
-	event(pan_slider_id, this, &TrackMixer::onPanning);
-	event(mute_id, this, &TrackMixer::onMute);
+	event(vol_slider_id, std::bind(&TrackMixer::onVolume, this));
+	event(pan_slider_id, std::bind(&TrackMixer::onPanning, this));
+	event(mute_id, std::bind(&TrackMixer::onMute, this));
 }
 
 TrackMixer::~TrackMixer()
@@ -112,7 +112,7 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 	peak_meter = new PeakMeter(this, "output-peaks", stream, view);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
-	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
+	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
 	subscribe(song);
 	subscribe(device_manager);

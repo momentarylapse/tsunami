@@ -40,9 +40,9 @@ BarAddDialog::BarAddDialog(HuiWindow *root, Song *s, AudioView *v):
 	setInt("sub_beats", sub_beats);
 	setFloat("bpm", bpm);
 
-	event("ok", this, &BarAddDialog::onOk);
-	event("cancel", this, &BarAddDialog::onClose);
-	event("hui:close", this, &BarAddDialog::onClose);
+	event("ok", std::bind(&BarAddDialog::onOk, this));
+	event("cancel", std::bind(&BarAddDialog::onClose, this));
+	event("hui:close", std::bind(&BarAddDialog::onClose, this));
 }
 
 void BarAddDialog::onOk()

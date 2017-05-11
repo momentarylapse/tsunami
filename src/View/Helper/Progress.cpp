@@ -18,7 +18,7 @@ Progress::Progress(const string &str, HuiWindow *parent) :
 		dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", 0);
 		dlg->show();
-		dlg->eventS("hui:close", &HuiFuncIgnore);
+		dlg->event("hui:close", &HuiFuncIgnore);
 		HuiDoSingleMainLoop();
 	}
 	cancelled = false;
@@ -76,8 +76,8 @@ ProgressCancelable::ProgressCancelable(const string &str, HuiWindow *parent) :
 		dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", 0);
 		dlg->show();
-		dlg->event("hui:close", this, &Progress::cancel);
-		dlg->event("cancel", this, &Progress::cancel);
+		dlg->event("hui:close", std::bind(&Progress::cancel, this));
+		dlg->event("cancel", std::bind(&Progress::cancel, this));
 		HuiDoSingleMainLoop();
 	}
 }

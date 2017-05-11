@@ -176,10 +176,32 @@ int main(int NumArgs, char *Args[])
 
 #ifdef HUI_API_GTK
 	int idle_id = -1;
+
+	class HuiGtkRunner
+	{
+	public:
+		HuiGtkRunner(const HuiCallback &_func)
+		{
+			func = _func;
+			id = -1;
+		}
+		HuiCallback func;
+		int id;
+	};
+	Array<HuiGtkRunner*> _hui_runners_;
+	void _hui_runner_delete_(int id)
+	{
+		for (int i=_hui_runners_.num-1; i>=0; i--)
+			if (_hui_runners_[i]->id == id){
+				delete _hui_runners_[i];
+				_hui_runners_.erase(i);
+			}
+	}
+
 	gboolean GtkIdleFunction(void*)
 	{
-		if (HuiIdleFunction.is_set())
-			HuiIdleFunction.call();
+		if (HuiIdleFunction)
+			HuiIdleFunction();
 		else
 			HuiSleep(0.010f);
 		return TRUE;
@@ -187,25 +209,27 @@ int main(int NumArgs, char *Args[])
 
 	gboolean GtkRunLaterFunction(gpointer data)
 	{
-		HuiCallback *c = (HuiCallback*)data;
-		c->call();
-		delete(c);
+		HuiGtkRunner *c = (HuiGtkRunner*)data;
+		if (c->func)
+			c->func();
+		_hui_runner_delete_(c->id);
 		return FALSE;
 	}
 
 	gboolean GtkRunRepeatedFunction(gpointer data)
 	{
-		HuiCallback *c = (HuiCallback*)data;
-		c->call();
+		HuiGtkRunner *c = (HuiGtkRunner*)data;
+		if (c->func)
+			c->func();
 		return TRUE;
 	}
 #endif
 
-void _HuiSetIdleFunction(HuiCallback c)
+void HuiSetIdleFunction(const HuiCallback &c)
 {
 #ifdef HUI_API_GTK
-	bool old_idle = HuiIdleFunction.is_set();
-	bool new_idle = c.is_set();
+	bool old_idle = (bool)HuiIdleFunction;
+	bool new_idle = (bool)c;
 	if (new_idle and !old_idle)
 		idle_id = g_idle_add_full(300, GtkIdleFunction, NULL, NULL);
 	if (!new_idle and old_idle and (idle_id >= 0)){
@@ -216,7 +240,7 @@ void _HuiSetIdleFunction(HuiCallback c)
 	HuiIdleFunction = c;
 }
 
-void HuiSetIdleFunction(hui_callback *idle_function)
+/*void HuiSetIdleFunction(hui_callback *idle_function)
 {
 	_HuiSetIdleFunction(idle_function);
 }
@@ -224,20 +248,23 @@ void HuiSetIdleFunction(hui_callback *idle_function)
 void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 	_HuiSetIdleFunction(HuiCallback(object, function));
-}
+}*/
 
-int _HuiRunLater(float time, HuiCallback *c)
+int HuiRunLater(float time, const HuiCallback &c)
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");
 		return 0;
 	#endif
 	#ifdef HUI_API_GTK
-		return g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunLaterFunction, (void*)c, NULL);
+		HuiGtkRunner *r = new HuiGtkRunner(c);
+		r->id = g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunLaterFunction, (void*)r, NULL);
+		_hui_runners_.add(r);
+		return r->id;
 	#endif
 }
 
-int HuiRunLater(float time, hui_callback *function)
+/*int HuiRunLater(float time, hui_callback *function)
 {
 	return _HuiRunLater(time, new HuiCallback(function));
 }
@@ -245,20 +272,23 @@ int HuiRunLater(float time, hui_callback *function)
 int _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 	return _HuiRunLater(time, new HuiCallback(object, function));
-}
+}*/
 
-int _HuiRunRepeated(float time, HuiCallback *c)
+int HuiRunRepeated(float time, const HuiCallback &c)
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunRepeated");
 		return 0;
 	#endif
 	#ifdef HUI_API_GTK
-		return g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunRepeatedFunction, (void*)c, NULL);
+		HuiGtkRunner *r = new HuiGtkRunner(c);
+		r->id = g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunRepeatedFunction, (void*)r, NULL);
+		_hui_runners_.add(r);
+		return r->id;
 	#endif
 }
 
-int HuiRunRepeated(float time, hui_callback *function)
+/*int HuiRunRepeated(float time, hui_callback *function)
 {
 	return _HuiRunRepeated(time, new HuiCallback(function));
 }
@@ -266,12 +296,13 @@ int HuiRunRepeated(float time, hui_callback *function)
 int _HuiRunRepeatedM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 	return _HuiRunRepeated(time, new HuiCallback(object, function));
-}
+}*/
 
 void HuiCancelRunner(int id)
 {
 #ifdef HUI_API_GTK
 	g_source_remove(id);
+	_hui_runner_delete_(id);
 #endif
 }
 
@@ -467,7 +498,7 @@ void HuiDoSingleMainLoop()
 		gtk_main_iteration();
 
 	// pop idle function
-	_HuiSetIdleFunction(_if_);
+	HuiSetIdleFunction(_if_);
 #endif
 }
 

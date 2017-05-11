@@ -380,7 +380,7 @@ void InputStreamAudio::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &InputStreamAudio::update);
+	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&InputStreamAudio::update, this));
 	running = true;
 }
 

@@ -57,7 +57,7 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)){
 		//printf("----change   %d\n", idx);
 
-		HuiRunLaterM(0.1f, out, &DeviceManager::update_devices);
+		HuiRunLater(0.1f, std::bind(&DeviceManager::update_devices, out));
 	}
 }
 
@@ -163,7 +163,7 @@ DeviceManager::DeviceManager() :
 
 	init();
 
-	hui_rep_id = HuiRunRepeatedM(2.0f, this, &DeviceManager::update_midi_devices);
+	hui_rep_id = HuiRunRepeated(2.0f, std::bind(&DeviceManager::update_midi_devices, this));
 }
 
 DeviceManager::~DeviceManager()

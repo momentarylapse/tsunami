@@ -23,8 +23,8 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_
 	peak_meter = new PeakMeter(this, "peaks", stream, view);
 	setFloat("volume", output->getOutputVolume());
 
-	event("show_bottom_bar", this, &MiniBar::onShowBottomBar);
-	event("volume", this, &MiniBar::onVolume);
+	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
+	event("volume", std::bind(&MiniBar::onVolume, this));
 
 	subscribe(bottom_bar);
 	subscribe(output);

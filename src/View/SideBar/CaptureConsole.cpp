@@ -64,8 +64,8 @@ public:
 		input = NULL;
 		target = -1;
 
-		cc->event("capture_audio_source", this, &CaptureConsoleModeAudio::onSource);
-		cc->event("capture_audio_target", this, &CaptureConsoleModeAudio::onTarget);
+		cc->event("capture_audio_source", std::bind(&CaptureConsoleModeAudio::onSource, this));
+		cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
 	}
 
 	void onSource()
@@ -245,8 +245,8 @@ public:
 
 		temp_synth = CreateSynthesizer("", song);
 
-		cc->event("capture_midi_source", this, &CaptureConsoleModeMidi::onSource);
-		cc->event("capture_midi_target", this, &CaptureConsoleModeMidi::onTarget);
+		cc->event("capture_midi_source", std::bind(&CaptureConsoleModeMidi::onSource, this));
+		cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));
 	}
 
 	void onSource()
@@ -517,13 +517,13 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 
 
 
-	event("cancel", this, &CaptureConsole::onCancel);
-	//event("hui:close", this, &CaptureConsole::onClose);
-	event("ok", this, &CaptureConsole::onOk);
-	event("capture_type", this, &CaptureConsole::onType);
-	event("capture_start", this, &CaptureConsole::onStart);
-	event("capture_delete", this, &CaptureConsole::onDelete);
-	event("capture_pause", this, &CaptureConsole::onPause);
+	event("cancel", std::bind(&CaptureConsole::onCancel, this));
+	//event("hui:close", std::bind(&CaptureConsole::onClose, this));
+	event("ok", std::bind(&CaptureConsole::onOk, this));
+	event("capture_type", std::bind(&CaptureConsole::onType, this));
+	event("capture_start", std::bind(&CaptureConsole::onStart, this));
+	event("capture_delete", std::bind(&CaptureConsole::onDelete, this));
+	event("capture_pause", std::bind(&CaptureConsole::onPause, this));
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);

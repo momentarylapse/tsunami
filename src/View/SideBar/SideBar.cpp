@@ -63,7 +63,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addConsole(sample_ref_console);
 	addConsole(capture_console);
 
-	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
+	event("close", std::bind(&SideBar::onClose, this));
 
 	reveal("revealer", false);
 	visible = false;

@@ -17,14 +17,14 @@ SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 	HuiWindow("settings_dialog", _parent)
 {
 	view = _view;
-	event("language", this, &SettingsDialog::onLanguage);
-	event("color_scheme", this, &SettingsDialog::onColorScheme);
-	event("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
-	event("default_artist", this, &SettingsDialog::onDefaultArtist);
-	event("capture_filename", this, &SettingsDialog::onCaptureFilename);
-	event("capture_find", this, &SettingsDialog::onCaptureFind);
-	event("hui:close", this, &SettingsDialog::destroy);
-	event("close", this, &SettingsDialog::destroy);
+	event("language", std::bind(&SettingsDialog::onLanguage, this));
+	event("color_scheme", std::bind(&SettingsDialog::onColorScheme, this));
+	event("ogg_bitrate", std::bind(&SettingsDialog::onOggBitrate, this));
+	event("default_artist", std::bind(&SettingsDialog::onDefaultArtist, this));
+	event("capture_filename", std::bind(&SettingsDialog::onCaptureFilename, this));
+	event("capture_find", std::bind(&SettingsDialog::onCaptureFind, this));
+	event("hui:close", std::bind(&SettingsDialog::destroy, this));
+	event("close", std::bind(&SettingsDialog::destroy, this));
 
 	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	setOptions("default_artist", "placeholder=" + AppName);

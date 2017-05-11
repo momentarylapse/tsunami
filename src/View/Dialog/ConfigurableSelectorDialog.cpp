@@ -51,11 +51,11 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 			setInt("list", n);
 	}
 
-	event("hui:close", this, &ConfigurableSelectorDialog::onClose);
-	eventX("list", "hui:select", this, &ConfigurableSelectorDialog::onListSelect);
-	event("list", this, &ConfigurableSelectorDialog::onSelect);
-	event("cancel", this, &ConfigurableSelectorDialog::onCancel);
-	event("ok", this, &ConfigurableSelectorDialog::onOk);
+	event("hui:close", std::bind(&ConfigurableSelectorDialog::onClose, this));
+	eventX("list", "hui:select", std::bind(&ConfigurableSelectorDialog::onListSelect, this));
+	event("list", std::bind(&ConfigurableSelectorDialog::onSelect, this));
+	event("cancel", std::bind(&ConfigurableSelectorDialog::onCancel, this));
+	event("ok", std::bind(&ConfigurableSelectorDialog::onOk, this));
 	enable("ok", false);
 
 	_return = NULL;

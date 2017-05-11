@@ -26,8 +26,8 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 
 	check("all_octaves", true);
 
-	event("close", this, &DetuneSynthesizerDialog::onClose);
-	event("hui:close", this, &DetuneSynthesizerDialog::onClose);
+	event("close", std::bind(&DetuneSynthesizerDialog::onClose, this));
+	event("hui:close", std::bind(&DetuneSynthesizerDialog::onClose, this));
 }
 
 DetuneSynthesizerDialog::~DetuneSynthesizerDialog()

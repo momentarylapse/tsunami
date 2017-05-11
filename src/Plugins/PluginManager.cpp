@@ -520,7 +520,7 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const 
 		if (f.filename.find(dir) >= 0){
 			string id = "execute-" + name_space + "--" + f.name;
             m->addItemImage(f.name, f.image, id);
-            win->event(id, win, function);
+            win->event(id, std::bind(function, win));
 		}
 	}
 }

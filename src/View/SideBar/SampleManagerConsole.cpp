@@ -115,18 +115,18 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 {
 	fromResource("sample_manager_dialog");
 
-	event("import_from_file", this, &SampleManagerConsole::onImport);
-	event("export_sample", this, &SampleManagerConsole::onExport);
-	event("preview_sample", this, &SampleManagerConsole::onPreview);
-	event("paste_sample", this, &SampleManagerConsole::onInsert);
-	event("create_from_selection", this, &SampleManagerConsole::onCreateFromSelection);
-	event("delete_sample", this, &SampleManagerConsole::onDelete);
-	event("scale_sample", this, &SampleManagerConsole::onScale);
-	eventX("sample_list", "hui:change", this, &SampleManagerConsole::onListEdit);
-	eventX("sample_list", "hui:select", this, &SampleManagerConsole::onListSelect);
-	event("sample_list", this, &SampleManagerConsole::onPreview);
+	event("import_from_file", std::bind(&SampleManagerConsole::onImport, this));
+	event("export_sample", std::bind(&SampleManagerConsole::onExport, this));
+	event("preview_sample", std::bind(&SampleManagerConsole::onPreview, this));
+	event("paste_sample", std::bind(&SampleManagerConsole::onInsert, this));
+	event("create_from_selection", std::bind(&SampleManagerConsole::onCreateFromSelection, this));
+	event("delete_sample", std::bind(&SampleManagerConsole::onDelete, this));
+	event("scale_sample", std::bind(&SampleManagerConsole::onScale, this));
+	eventX("sample_list", "hui:change", std::bind(&SampleManagerConsole::onListEdit, this));
+	eventX("sample_list", "hui:select", std::bind(&SampleManagerConsole::onListSelect, this));
+	event("sample_list", std::bind(&SampleManagerConsole::onPreview, this));
 
-	event("edit_song", this, &SampleManagerConsole::onEditSong);
+	event("edit_song", std::bind(&SampleManagerConsole::onEditSong, this));
 
 	preview_renderer = NULL;
 	preview_stream = NULL;
@@ -365,11 +365,11 @@ public:
 				setInt(list_id, i + 1);
 		}
 
-		event("ok", this, &SampleSelector::onOk);
-		event("cancel", this, &SampleSelector::onCancel);
-		event("hui:close", this, &SampleSelector::onCancel);
-		eventX(list_id, "hui:select", this, &SampleSelector::onSelect);
-		event(list_id, this, &SampleSelector::onList);
+		event("ok", std::bind(&SampleSelector::onOk, this));
+		event("cancel", std::bind(&SampleSelector::onCancel, this));
+		event("hui:close", std::bind(&SampleSelector::onCancel, this));
+		eventX(list_id, "hui:select", std::bind(&SampleSelector::onSelect, this));
+		event(list_id, std::bind(&SampleSelector::onList, this));
 	}
 	virtual ~SampleSelector()
 	{

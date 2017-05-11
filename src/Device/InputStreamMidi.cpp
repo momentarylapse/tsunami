@@ -287,7 +287,7 @@ void InputStreamMidi::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &InputStreamMidi::update);
+	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&InputStreamMidi::update, this));
 	running = true;
 }
 

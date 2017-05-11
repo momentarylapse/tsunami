@@ -35,15 +35,15 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	enable(id_add_pause, true);
 
 	fillList();
-	event(id, this, &BarsConsole::onList);
-	eventX(id, "hui:select", this, &BarsConsole::onListSelect);
-	eventX(id, "hui:change", this, &BarsConsole::onListEdit);
-	event(id_add, this, &BarsConsole::onAdd);
-	event(id_add_pause, this, &BarsConsole::onAddPause);
-	event(id_delete, this, &BarsConsole::onDelete);
-	event(id_edit, this, &BarsConsole::onEdit);
-	event(id_scale, this, &BarsConsole::onScale);
-	event(id_link, this, &BarsConsole::onModifyMidi);
+	event(id, std::bind(&BarsConsole::onList, this));
+	eventX(id, "hui:select", std::bind(&BarsConsole::onListSelect, this));
+	eventX(id, "hui:change", std::bind(&BarsConsole::onListEdit, this));
+	event(id_add, std::bind(&BarsConsole::onAdd, this));
+	event(id_add_pause, std::bind(&BarsConsole::onAddPause, this));
+	event(id_delete, std::bind(&BarsConsole::onDelete, this));
+	event(id_edit, std::bind(&BarsConsole::onEdit, this));
+	event(id_scale, std::bind(&BarsConsole::onScale, this));
+	event(id_link, std::bind(&BarsConsole::onModifyMidi, this));
 
 	subscribe(view, view->MESSAGE_SELECTION_CHANGE);
 	subscribe(song, song->MESSAGE_EDIT_BARS);
@@ -53,9 +53,9 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 
 	updateMessage();
 
-	event("create_time_track", this, &BarsConsole::onCreateTimeTrack);
+	event("create_time_track", std::bind(&BarsConsole::onCreateTimeTrack, this));
 
-	event("edit_song", this, &BarsConsole::onEditSong);
+	event("edit_song", std::bind(&BarsConsole::onEditSong, this));
 }
 
 BarsConsole::~BarsConsole()
@@ -85,7 +85,7 @@ void BarsConsole::fillList()
 	reset(id);
 	int sample_rate = song->sample_rate;
 	int n = 1;
-	for (BarPattern &b : song->bars){
+	for (BarPattern &b: song->bars){
 		float duration = (float)b.length / (float)sample_rate;
 		if (b.type == b.TYPE_BAR){
 			addString(id, format("%d\\%d\\%.1f\\%.3f", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), duration));

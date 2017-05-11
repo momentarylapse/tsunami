@@ -17,9 +17,9 @@ LogConsole::LogConsole(Log *_log) :
 
 	fromResource("log_console");
 
-	event("clear", this, &LogConsole::onClear);
+	event("clear", std::bind(&LogConsole::onClear, this));
 
-	HuiRunLaterM(0.5f, this, &LogConsole::reload);
+	HuiRunLater(0.5f, std::bind(&LogConsole::reload, this));
 
 	subscribe(log);
 }

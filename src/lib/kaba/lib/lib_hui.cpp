@@ -318,7 +318,7 @@ void SIAddPackageHui()
 				func_add_param("id",		TypeString);
 			class_add_func("redraw",								TypeVoid,		mf(&HuiPanel::redraw));
 				func_add_param("id",		TypeString);
-			class_add_func("eventS",						TypeVoid,		mf(&HuiPanel::eventS));
+		/*	class_add_func("eventS",						TypeVoid,		mf(&HuiPanel::eventS));
 				func_add_param("id",			TypeString);
 				func_add_param("func",			TypePointer);
 			class_add_func("eventSX",						TypeVoid,		mf(&HuiPanel::eventSX));
@@ -340,7 +340,7 @@ void SIAddPackageHui()
 				func_add_param("id",			TypeString);
 				func_add_param("msg",			TypeString);
 				func_add_param("handler",		TypePointer);
-				func_add_param("func",			TypePointer);
+				func_add_param("func",			TypePointer);*/
 			//class_add_func("beginDraw",								TypeHuiPainterP,		mf(&HuiPanel::beginDraw));
 			//	func_add_param("id",		TypeString);
 			class_set_vtable(HuiPanel);

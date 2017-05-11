@@ -19,9 +19,9 @@ PauseEditDialog::PauseEditDialog(HuiWindow *root, Song *_song, int _index, bool 
 	BarPattern &b = song->bars[index];
 	setFloat("duration", (float)b.length / (float)song->sample_rate);
 
-	event("ok", this, &PauseEditDialog::onOk);
-	event("cancel", this, &PauseEditDialog::destroy);
-	event("hui:close", this, &PauseEditDialog::destroy);
+	event("ok", std::bind(&PauseEditDialog::onOk, this));
+	event("cancel", std::bind(&PauseEditDialog::destroy, this));
+	event("hui:close", std::bind(&PauseEditDialog::destroy, this));
 }
 
 void PauseEditDialog::onOk()

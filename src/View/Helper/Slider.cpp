@@ -12,7 +12,7 @@ Slider::Slider()
 }
 
 
-Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
+Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, const HuiCallback &_func, float _value)
 {
 	panel = _panel;
 	id_slider = _id_slider;
@@ -20,31 +20,15 @@ Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_e
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = HuiCallback(_func);
+	func = _func;
 
-	panel->event(id_slider, this, &Slider::onSlide);
-	panel->event(id_edit, this, &Slider::onEdit);
-
-	set(_value);
-}
-
-
-
-Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
-{
-	panel = _panel;
-	id_slider = _id_slider;
-	id_edit = _id_edit;
-	value_min = _v_min;
-	value_max = _v_max;
-	factor = _factor;
-	func = HuiCallback(_handler ? _handler : panel, _func);
-
-	panel->event(id_slider, this, &Slider::onSlide);
-	panel->event(id_edit, this, &Slider::onEdit);
+	panel->event(id_slider, std::bind(&Slider::onSlide, this));
+	panel->event(id_edit, std::bind(&Slider::onEdit, this));
 
 	set(_value);
 }
+
+
 
 Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value)
 {
@@ -54,10 +38,10 @@ Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_e
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = HuiCallback(panel, _func);
+	func = std::bind(_func, panel);
 
-	panel->event(id_slider, this, &Slider::onSlide);
-	panel->event(id_edit, this, &Slider::onEdit);
+	panel->event(id_slider, std::bind(&Slider::onSlide, this));
+	panel->event(id_edit, std::bind(&Slider::onEdit, this));
 
 	set(_value);
 }
@@ -102,13 +86,13 @@ void Slider::onSlide()
 {
 	float value = value_min + panel->getFloat("") * (value_max - value_min);
 	panel->setFloat(id_edit, value * factor);
-	func.call();
+	func();
 }
 
 void Slider::onEdit()
 {
 	float value = panel->getFloat("") / factor;
 	panel->setFloat(id_slider, (value - value_min) / (value_max - value_min));
-	func.call();
+	func();
 }
 

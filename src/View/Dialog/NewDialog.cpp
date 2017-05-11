@@ -23,11 +23,11 @@ NewDialog::NewDialog(HuiWindow *_parent, Song *s):
 	setInt("beats_per_bar", 4);
 	setInt("sub_beats", 1);
 
-	event("cancel", this, &NewDialog::destroy);
-	event("hui:close", this, &NewDialog::destroy);
-	event("ok", this, &NewDialog::onOk);
-	event("metronome", this, &NewDialog::onMetronome);
-	event("new_track_type:midi", this, &NewDialog::onTypeMidi);
+	event("cancel", std::bind(&NewDialog::destroy, this));
+	event("hui:close", std::bind(&NewDialog::destroy, this));
+	event("ok", std::bind(&NewDialog::onOk, this));
+	event("metronome", std::bind(&NewDialog::onMetronome, this));
+	event("new_track_type:midi", std::bind(&NewDialog::onTypeMidi, this));
 }
 
 void NewDialog::onOk()

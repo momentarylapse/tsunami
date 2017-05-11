@@ -158,10 +158,10 @@ public:
 		if (!save)
 			names.insert(":def:", 0);
 		hideControl("grid2", !save);
-		event("list", this, &FavoriteSelectionDialog::onList);
-		eventX("list", "hui:select", this, &FavoriteSelectionDialog::onListSelect);
-		event("name", this, &FavoriteSelectionDialog::onName);
-		event("ok", this, &FavoriteSelectionDialog::onOk);
+		event("list", std::bind(&FavoriteSelectionDialog::onList, this));
+		eventX("list", "hui:select", std::bind(&FavoriteSelectionDialog::onListSelect, this));
+		event("name", std::bind(&FavoriteSelectionDialog::onName, this));
+		event("ok", std::bind(&FavoriteSelectionDialog::onOk, this));
 		setInt("list", -1);
 	}
 	void onList()

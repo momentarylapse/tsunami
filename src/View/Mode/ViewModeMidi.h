@@ -56,6 +56,7 @@ public:
 
 	void setMode(int mode);
 	int mode_wanted;
+
 	void setCreationMode(int mode);
 	int creation_mode;
 	enum

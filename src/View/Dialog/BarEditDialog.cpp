@@ -22,12 +22,12 @@ BarEditDialog::BarEditDialog(HuiWindow *root, Song *_song, const Range &_bars, b
 	setInt("sub_beats", b.sub_beats);
 	setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
 
-	event("ok", this, &BarEditDialog::onOk);
-	event("cancel", this, &BarEditDialog::onClose);
-	event("hui:close", this, &BarEditDialog::onClose);
-	event("beats", this, &BarEditDialog::onBeats);
-	event("sub_beats", this, &BarEditDialog::onSubBeats);
-	event("bpm", this, &BarEditDialog::onBpm);
+	event("ok", std::bind(&BarEditDialog::onOk, this));
+	event("cancel", std::bind(&BarEditDialog::onClose, this));
+	event("hui:close", std::bind(&BarEditDialog::onClose, this));
+	event("beats", std::bind(&BarEditDialog::onBeats, this));
+	event("sub_beats", std::bind(&BarEditDialog::onSubBeats, this));
+	event("bpm", std::bind(&BarEditDialog::onBpm, this));
 }
 
 void BarEditDialog::onOk()

@@ -100,7 +100,7 @@ void HuiPanel::_set_cur_id_(const string &id)
 
 void HuiPanel::event(const string &id, const HuiCallback &function)
 {
-	events.add(HuiEventListener(id, ":def:", function));
+	eventX(id, ":def:", function);
 }
 
 void HuiPanel::eventX(const string &id, const string &msg, const HuiCallback &function)
@@ -108,50 +108,30 @@ void HuiPanel::eventX(const string &id, const string &msg, const HuiCallback &fu
 	events.add(HuiEventListener(id, msg, function));
 }
 
+// hopefully deprecated soon?
 void HuiPanel::eventXP(const string &id, const string &msg, const HuiCallbackP &function)
 {
 	events.add(HuiEventListener(id, msg, -1, function));
 }
 
-void HuiPanel::_kaba_eventS(const string &id, hui_kaba_callback *function)
-{
-	events.add(HuiEventListener(id, ":def:", HuiCallback(function)));
-}
-
-void HuiPanel::_kaba_eventSX(const string &id, const string &msg, hui_kaba_callback *function)
-{
-	events.add(HuiEventListener(id, msg, HuiCallback(function)));
-}
-
 void HuiPanel::_kaba_event(const string &id, hui_kaba_member_callback *function)
 {
-	events.add(HuiEventListener(id, ":def:", std::bind(function, this)));
-	events.back().handler = this;
+	event(id, std::bind(function, this));
 }
 
 void HuiPanel::_kaba_eventO(const string &id, HuiEventHandler* handler, hui_kaba_member_callback *function)
 {
-	events.add(HuiEventListener(id, ":def:", std::bind(function, handler)));
-	events.back().handler = handler;
+	event(id, std::bind(function, handler));
 }
 
 void HuiPanel::_kaba_eventX(const string &id, const string &msg, hui_kaba_member_callback *function)
 {
-	events.add(HuiEventListener(id, msg, std::bind(function, this)));
-	events.back().handler = this;
+	eventX(id, msg, std::bind(function, this));
 }
 
 void HuiPanel::_kaba_eventOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_member_callback *function)
 {
-	events.add(HuiEventListener(id, msg, std::bind(function, handler)));
-	events.back().handler = handler;
-}
-
-void HuiPanel::removeEventHandlers(HuiEventHandler *handler)
-{
-	for (int i=events.num-1;i>=0;i--)
-		if (events[i].handler == handler)
-			events.erase(i);
+	eventX(id, msg, std::bind(function, handler));
 }
 
 bool HuiPanel::_send_event_(HuiEvent *e)

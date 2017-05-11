@@ -318,13 +318,6 @@ void SIAddPackageHui()
 				func_add_param("id",		TypeString);
 			class_add_func("redraw",								TypeVoid,		mf(&HuiPanel::redraw));
 				func_add_param("id",		TypeString);
-			class_add_func("eventS",						TypeVoid,		mf(&HuiPanel::_kaba_eventS));
-				func_add_param("id",			TypeString);
-				func_add_param("func",			TypePointer);
-			class_add_func("eventSX",						TypeVoid,		mf(&HuiPanel::_kaba_eventSX));
-				func_add_param("id",			TypeString);
-				func_add_param("msg",			TypeString);
-				func_add_param("func",			TypePointer);
 			class_add_func("event",						TypeVoid,		mf(&HuiPanel::_kaba_event));
 				func_add_param("id",			TypeString);
 				func_add_param("func",			TypePointer);

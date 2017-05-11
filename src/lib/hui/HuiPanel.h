@@ -51,13 +51,10 @@ public:
 	bool _send_event_(HuiEvent *e);
 
 	// kaba wrappers
-	void _cdecl _kaba_eventS(const string &id, hui_kaba_callback *function);
-	void _cdecl _kaba_eventSX(const string &id, const string &msg, hui_kaba_callback *function);
 	void _cdecl _kaba_event(const string &id, hui_kaba_member_callback *function);
 	void _cdecl _kaba_eventO(const string &id, HuiEventHandler* handler, hui_kaba_member_callback *function);
 	void _cdecl _kaba_eventX(const string &id, const string &msg, hui_kaba_member_callback *function);
 	void _cdecl _kaba_eventOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_member_callback *function);
-	void removeEventHandlers(HuiEventHandler *handler);
 
 	// creating controls
 

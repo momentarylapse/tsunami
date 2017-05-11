@@ -18,6 +18,7 @@ HuiEventListener::HuiEventListener(const string &_id, const string &_message, co
 	id = _id;
 	message = _message;
 	function = _function;
+	handler = NULL;
 }
 
 HuiEventListener::HuiEventListener(const string &_id, const string &_message, int __, const HuiCallbackP &_function)
@@ -25,6 +26,7 @@ HuiEventListener::HuiEventListener(const string &_id, const string &_message, in
 	id = _id;
 	message = _message;
 	function_p = _function;
+	handler = NULL;
 }
 
 HuiEvent _HuiEvent_;

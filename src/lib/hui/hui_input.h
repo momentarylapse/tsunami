@@ -51,6 +51,7 @@ public:
 	string id, message;
 	HuiCallback function;
 	HuiCallbackP function_p;
+	void *handler; // for matching
 	HuiEventListener(){}
 	HuiEventListener(const string &id, const string &message, const HuiCallback &function);
 	HuiEventListener(const string &id, const string &message, int __, const HuiCallbackP &function);

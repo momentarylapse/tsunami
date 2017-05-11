@@ -45,28 +45,19 @@ public:
 	void set_win(HuiWindow *win);
 
 	// events
-//	void _cdecl eventS(const string &id, hui_callback *function);
-//	void _cdecl eventSX(const string &id, const string &msg, hui_callback *function);
 	void _cdecl event(const string &id, const HuiCallback &function);
 	void _cdecl eventX(const string &id, const string &msg, const HuiCallback &function);
 	void _cdecl eventXP(const string &id, const string &msg, const HuiCallbackP &function);
-/*	template<typename T>
-	void _cdecl event(const string &id, void* handler, T fun)
-	{	_event(id, (HuiEventHandler*)handler, (void (HuiEventHandler::*)())fun);	}
-	template<typename T>
-	void _cdecl eventX(const string &id, const string &msg, void* handler, T fun)
-	{	_eventX(id, msg, (HuiEventHandler*)handler, (void(HuiEventHandler::*)())fun);	}
-	template<typename T>
-	void _cdecl eventXP(const string &id, const string &msg, void* handler, T fun)
-	{
-		_eventXP(id, msg, (HuiEventHandler*)handler, (void(HuiEventHandler::*)(Painter*))fun);
-	}
-	void _cdecl _eventK(const string &id, hui_kaba_callback *function);
-	void _cdecl _eventKO(const string &id, HuiEventHandler* handler, hui_kaba_callback *function);
-	void _cdecl _eventKX(const string &id, const string &msg, hui_kaba_callback *function);
-	void _cdecl _eventKOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function);*/
-	void removeEventHandlers(HuiEventHandler *handler);
 	bool _send_event_(HuiEvent *e);
+
+	// kaba wrappers
+	void _cdecl _kaba_eventS(const string &id, hui_kaba_callback *function);
+	void _cdecl _kaba_eventSX(const string &id, const string &msg, hui_kaba_callback *function);
+	void _cdecl _kaba_event(const string &id, hui_kaba_member_callback *function);
+	void _cdecl _kaba_eventO(const string &id, HuiEventHandler* handler, hui_kaba_member_callback *function);
+	void _cdecl _kaba_eventX(const string &id, const string &msg, hui_kaba_member_callback *function);
+	void _cdecl _kaba_eventOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_member_callback *function);
+	void removeEventHandlers(HuiEventHandler *handler);
 
 	// creating controls
 

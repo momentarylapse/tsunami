@@ -98,17 +98,6 @@ void HuiPanel::_set_cur_id_(const string &id)
 	cur_id = id;
 }
 
-/*void HuiPanel::eventS(const string &id, hui_callback *function)
-{
-	events.add(HuiEventListener(id, ":def:", HuiCallback(function)));
-
-}
-
-void HuiPanel::eventSX(const string &id, const string &msg, hui_callback *function)
-{
-	events.add(HuiEventListener(id, msg, HuiCallback(function)));
-}*/
-
 void HuiPanel::event(const string &id, const HuiCallback &function)
 {
 	events.add(HuiEventListener(id, ":def:", function));
@@ -124,31 +113,45 @@ void HuiPanel::eventXP(const string &id, const string &msg, const HuiCallbackP &
 	events.add(HuiEventListener(id, msg, -1, function));
 }
 
-/*void HuiPanel::_eventK(const string &id, hui_kaba_callback *function)
+void HuiPanel::_kaba_eventS(const string &id, hui_kaba_callback *function)
+{
+	events.add(HuiEventListener(id, ":def:", HuiCallback(function)));
+}
+
+void HuiPanel::_kaba_eventSX(const string &id, const string &msg, hui_kaba_callback *function)
+{
+	events.add(HuiEventListener(id, msg, HuiCallback(function)));
+}
+
+void HuiPanel::_kaba_event(const string &id, hui_kaba_member_callback *function)
 {
 	events.add(HuiEventListener(id, ":def:", std::bind(function, this)));
+	events.back().handler = this;
 }
 
-void HuiPanel::_eventKO(const string &id, HuiEventHandler* handler, hui_kaba_callback *function)
+void HuiPanel::_kaba_eventO(const string &id, HuiEventHandler* handler, hui_kaba_member_callback *function)
 {
 	events.add(HuiEventListener(id, ":def:", std::bind(function, handler)));
+	events.back().handler = handler;
 }
 
-void HuiPanel::_eventKX(const string &id, const string &msg, hui_kaba_callback *function)
+void HuiPanel::_kaba_eventX(const string &id, const string &msg, hui_kaba_member_callback *function)
 {
 	events.add(HuiEventListener(id, msg, std::bind(function, this)));
+	events.back().handler = this;
 }
 
-void HuiPanel::_eventKOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function)
+void HuiPanel::_kaba_eventOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_member_callback *function)
 {
 	events.add(HuiEventListener(id, msg, std::bind(function, handler)));
-}*/
+	events.back().handler = handler;
+}
 
 void HuiPanel::removeEventHandlers(HuiEventHandler *handler)
 {
-	/*for (int i=events.num-1;i>=0;i--)
-		if (events[i].function.has_handler(handler))
-			events.erase(i);*/
+	for (int i=events.num-1;i>=0;i--)
+		if (events[i].handler == handler)
+			events.erase(i);
 }
 
 bool HuiPanel::_send_event_(HuiEvent *e)

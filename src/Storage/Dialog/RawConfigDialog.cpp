@@ -8,8 +8,8 @@
 #include "RawConfigDialog.h"
 #include "../../Data/Track.h"
 
-RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
-	HuiWindow("raw_config_dialog", parent)
+RawConfigDialog::RawConfigDialog(RawConfigData *_data, hui::Window *parent) :
+	hui::Window("raw_config_dialog", parent)
 {
 	data = _data;
 	data->channels = 1;

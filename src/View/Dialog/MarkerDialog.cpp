@@ -7,8 +7,8 @@
 
 #include "MarkerDialog.h"
 
-MarkerDialog::MarkerDialog(HuiWindow* _parent, Track* _t, int _pos, int _index):
-	HuiWindow("marker_dialog", _parent)
+MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, int _pos, int _index):
+	hui::Window("marker_dialog", _parent)
 {
 	track = _t;
 	pos = _pos;

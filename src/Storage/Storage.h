@@ -32,12 +32,12 @@ public:
 	bool saveViaRenderer(AudioRenderer *r, const string &filename);
 	bool save(Song *a, const string &filename);
 
-	bool askByFlags(HuiWindow *win, const string &title, int flags);
+	bool askByFlags(hui::Window *win, const string &title, int flags);
 
-	bool askOpen(HuiWindow *win);
-	bool askSave(HuiWindow *win);
-	bool askOpenImport(HuiWindow *win);
-	bool askSaveExport(HuiWindow *win);
+	bool askOpen(hui::Window *win);
+	bool askSave(hui::Window *win);
+	bool askOpenImport(hui::Window *win);
+	bool askSaveExport(hui::Window *win);
 
 	FormatDescriptor *getFormat(const string &ext, int flags);
 

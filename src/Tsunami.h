@@ -10,8 +10,8 @@
 
 #include "lib/hui/hui.h"
 
-extern string AppName;
-extern string AppVersion;
+extern const string AppName;
+extern const string AppVersion;
 
 
 class Song;
@@ -25,7 +25,7 @@ class Storage;
 class Clipboard;
 class TsunamiWindow;
 
-class Tsunami : public HuiApplication
+class Tsunami : public hui::Application
 {
 public:
 	Tsunami();
@@ -40,7 +40,7 @@ public:
 	bool allowTermination();
 
 	TsunamiWindow *win;
-	HuiWindow *_win;
+	hui::Window *_win;
 	AudioView *_view;
 
 

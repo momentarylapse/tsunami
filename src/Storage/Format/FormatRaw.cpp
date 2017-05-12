@@ -16,7 +16,7 @@ FormatDescriptorRaw::FormatDescriptorRaw() :
 {
 }
 
-RawConfigData GetRawConfigData(HuiWindow *win)
+RawConfigData GetRawConfigData(hui::Window *win)
 {
 	RawConfigData data;
 	RawConfigDialog *dlg = new RawConfigDialog(&data, win);

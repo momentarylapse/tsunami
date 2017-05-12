@@ -17,7 +17,9 @@ class Script;
 class Class;
 };
 
-class HuiPanel;
+namespace hui{
+	class Panel;
+}
 
 
 class PluginData : public VirtualBase

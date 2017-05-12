@@ -19,7 +19,7 @@ LogConsole::LogConsole(Log *_log) :
 
 	event("clear", std::bind(&LogConsole::onClear, this));
 
-	HuiRunLater(0.5f, std::bind(&LogConsole::reload, this));
+	hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
 
 	subscribe(log);
 }

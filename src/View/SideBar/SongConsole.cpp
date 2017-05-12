@@ -114,11 +114,11 @@ void SongConsole::onTagsSelect()
 
 void SongConsole::onTagsEdit()
 {
-	int r = HuiGetEvent()->row;
+	int r = hui::GetEvent()->row;
 	if (r < 0)
 		return;
 	Tag t = song->tags[r];
-	if (HuiGetEvent()->column == 0)
+	if (hui::GetEvent()->column == 0)
 		t.key = getCell("tags", r, 0);
 	else
 		t.value = getCell("tags", r, 1);

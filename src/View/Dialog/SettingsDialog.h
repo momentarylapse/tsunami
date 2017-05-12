@@ -12,10 +12,10 @@
 
 class AudioView;
 
-class SettingsDialog: public HuiWindow
+class SettingsDialog: public hui::Window
 {
 public:
-	SettingsDialog(AudioView *view, HuiWindow *parent);
+	SettingsDialog(AudioView *view, hui::Window *parent);
 
 	void loadData();
 	void applyData();

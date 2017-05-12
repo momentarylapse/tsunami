@@ -12,10 +12,10 @@
 #include "../../Data/Song.h"
 #include "../../lib/hui/hui.h"
 
-class NewDialog: public HuiWindow
+class NewDialog: public hui::Window
 {
 public:
-	NewDialog(HuiWindow *_parent, Song *a);
+	NewDialog(hui::Window *_parent, Song *a);
 
 	void loadData();
 	void applyData();

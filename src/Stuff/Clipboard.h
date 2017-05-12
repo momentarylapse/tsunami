@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef CLIPBOARD_H_
-#define CLIPBOARD_H_
+#ifndef SRC_STUFF_CLIPBOARD_H_
+#define SRC_STUFF_CLIPBOARD_H_
 
 #include "Observable.h"
 class Song;
@@ -37,4 +37,4 @@ private:
 	Array<int> ref_uid;
 };
 
-#endif /* CLIPBOARD_H_ */
+#endif /* SRC_STUFF_CLIPBOARD_H_ */

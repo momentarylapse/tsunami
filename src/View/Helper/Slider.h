@@ -10,15 +10,15 @@
 
 #include "../../lib/hui/hui.h"
 
-class Slider : public HuiEventHandler
+class Slider : public hui::EventHandler
 {
 public:
 	Slider();
-	Slider(HuiPanel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, const HuiCallback &func, float _value);
-	Slider(HuiPanel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui_kaba_member_callback *_func, float _value);
+	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, const hui::Callback &func, float _value);
+	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui::kaba_member_callback *_func, float _value);
 	virtual ~Slider();
 
-	void _cdecl __init_ext__(HuiPanel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui_kaba_member_callback *_func, float _value);
+	void _cdecl __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui::kaba_member_callback *_func, float _value);
 	virtual void _cdecl __delete__();
 
 	void _cdecl set(float value);
@@ -32,8 +32,8 @@ private:
 	string id_slider, id_edit;
 	float value_min, value_max;
 	float factor;
-	HuiPanel *panel;
-	HuiCallback func;
+	hui::Panel *panel;
+	hui::Callback func;
 };
 
 #endif /* SLIDER_H_ */

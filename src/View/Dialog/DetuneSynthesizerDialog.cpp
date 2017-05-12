@@ -11,8 +11,8 @@
 #include "../AudioView.h"
 #include <math.h>
 
-DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, HuiWindow *parent) :
-	HuiDialog("", 500, 550, parent, false)
+DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, hui::Window *parent) :
+	hui::Dialog("", 500, 550, parent, false)
 {
 	fromResource("detune_synthesizer_dialog");
 
@@ -108,8 +108,9 @@ void DetuneSynthesizerDialog::onLeftButtonUp()
 void DetuneSynthesizerDialog::onMouseMove()
 {
 	hover = -1;
-	if ((HuiGetEvent()->mx >= 0) and (HuiGetEvent()->mx < width))
-		hover = (HuiGetEvent()->mx / width * MAX_PITCH);
+	auto e = hui::GetEvent();
+	if ((e->mx >= 0) and (e->mx < width))
+		hover = (e->mx / width * MAX_PITCH);
 
 	redraw("detune_area");
 }
@@ -117,8 +118,9 @@ void DetuneSynthesizerDialog::onMouseMove()
 void DetuneSynthesizerDialog::onMouseWheel()
 {
 	if (hover >= 0){
-		if (HuiGetEvent()->scroll_y != 0)
-			track->detuneSynthesizer(hover, 0.1f * HuiGetEvent()->scroll_y, isChecked("all_octaves"));
+		auto e = hui::GetEvent();
+		if (e->scroll_y != 0)
+			track->detuneSynthesizer(hover, 0.1f * e->scroll_y, isChecked("all_octaves"));
 		redraw("detune_area");
 	}
 }

@@ -11,7 +11,9 @@
 #include "../Stuff/Observable.h"
 
 class TsunamiWindow;
-class HuiWindow;
+namespace hui{
+	class Window;
+}
 class AudioView;
 class Song;
 
@@ -36,7 +38,7 @@ public:
 
 	void _cdecl stop_request();
 
-	HuiWindow *win;
+	hui::Window *win;
 	AudioView *view;
 	Song *song;
 

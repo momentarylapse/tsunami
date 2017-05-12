@@ -9,7 +9,6 @@
 #include "MixingConsole.h"
 #include "LogConsole.h"
 #include "DeviceConsole.h"
-#include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
 

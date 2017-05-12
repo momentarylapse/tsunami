@@ -61,7 +61,7 @@ string render_sample(Sample *s, AudioView *view)
 		render_bufbox(im, s->buf, view);
 	else if (s->type == Track::TYPE_MIDI)
 		render_midi(im, s->midi);
-	return HuiSetImage(im);
+	return hui::SetImage(im);
 }
 
 class SampleManagerItem : public Observer
@@ -96,7 +96,7 @@ public:
 		if (s){
 			unsubscribe(s);
 			s = NULL;
-			HuiDeleteImage(icon);
+			hui::DeleteImage(icon);
 		}
 	}
 
@@ -183,8 +183,8 @@ void SampleManagerConsole::onListSelect()
 
 void SampleManagerConsole::onListEdit()
 {
-	int sel = HuiGetEvent()->row;
-	int col = HuiGetEvent()->column;
+	int sel = hui::GetEvent()->row;
+	int col = hui::GetEvent()->column;
 	if (col == 1)
 		song->editSampleName(items[sel]->s, getCell("sample_list", sel, 1));
 	else if (col == 4)
@@ -195,8 +195,8 @@ void SampleManagerConsole::onImport()
 {
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
-		tsunami->storage->loadBufferBox(song, &buf, HuiFilename);
-		song->addSample(HuiFilename.basename(), buf);
+		tsunami->storage->loadBufferBox(song, &buf, hui::Filename);
+		song->addSample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		onListSelect();
 	}
@@ -211,7 +211,7 @@ void SampleManagerConsole::onExport()
 	if (tsunami->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::TYPE_AUDIO){
 			BufferRenderer rr(&sel[0]->buf);
-			tsunami->storage->saveViaRenderer(&rr, HuiFilename);
+			tsunami->storage->saveViaRenderer(&rr, hui::Filename);
 		}
 	}
 }
@@ -287,7 +287,7 @@ void SampleManagerConsole::setSelection(const Array<Sample*> &samples)
 	Array<int> indices;
 	for (Sample *s: samples)
 		indices.add(getIndex(s));
-	HuiPanel::setSelection("sample_list", indices);
+	hui::Panel::setSelection("sample_list", indices);
 }
 
 void SampleManagerConsole::onEditSong()
@@ -342,11 +342,11 @@ void SampleManagerConsole::endPreview()
 }
 
 
-class SampleSelector : public HuiDialog
+class SampleSelector : public hui::Dialog
 {
 public:
-	SampleSelector(HuiPanel *root, Song *a, Sample *old, AudioView *view) :
-		HuiDialog("", 300, 400, root->win, false)
+	SampleSelector(hui::Panel *root, Song *a, Sample *old, AudioView *view) :
+		hui::Dialog("", 300, 400, root->win, false)
 	{
 		song = a;
 		ret = NULL;;
@@ -374,7 +374,7 @@ public:
 	virtual ~SampleSelector()
 	{
 		for (string &name: icon_names)
-			HuiDeleteImage(name);
+			hui::DeleteImage(name);
 	}
 
 	void onSelect()
@@ -416,7 +416,7 @@ public:
 	string list_id;
 };
 
-Sample *SampleManagerConsole::select(HuiPanel *root, Song *a, Sample *old)
+Sample *SampleManagerConsole::select(hui::Panel *root, Song *a, Sample *old)
 {
 	SampleSelector *s = new SampleSelector(root, a, old, tsunami->_view);
 	s->run();

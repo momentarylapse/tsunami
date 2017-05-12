@@ -12,10 +12,10 @@
 
 class Sample;
 
-class SampleScaleDialog : public HuiDialog
+class SampleScaleDialog : public hui::Dialog
 {
 public:
-	SampleScaleDialog(HuiWindow *root, Sample *s);
+	SampleScaleDialog(hui::Window *root, Sample *s);
 	virtual ~SampleScaleDialog();
 
 	Sample *sample;

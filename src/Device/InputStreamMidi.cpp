@@ -62,6 +62,8 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 
 	device_manager = tsunami->device_manager;
 
+	timer = new hui::Timer;
+
 	init();
 
 
@@ -75,9 +77,10 @@ InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	unconnect();
-	delete(preview_stream);
-	delete(preview_renderer);
-	delete(preview_source);
+	delete preview_stream;
+	delete preview_renderer;
+	delete preview_source;
+	delete timer;
 }
 
 void InputStreamMidi::init()
@@ -197,7 +200,7 @@ bool InputStreamMidi::start()
 	if (preview_renderer->getSynthesizer())
 		preview_stream->play();*/
 
-	timer.reset();
+	timer->reset();
 
 	_startUpdate();
 	capturing = true;
@@ -217,7 +220,7 @@ void InputStreamMidi::stop()
 
 int InputStreamMidi::doCapturing()
 {
-	double dt = timer.get();
+	double dt = timer->get();
 	double offset_new = offset + dt;
 	int pos = offset * (double)sample_rate;
 	int pos_new = offset_new * (double)sample_rate;
@@ -287,7 +290,7 @@ void InputStreamMidi::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&InputStreamMidi::update, this));
+	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&InputStreamMidi::update, this));
 	running = true;
 }
 
@@ -295,7 +298,7 @@ void InputStreamMidi::_stopUpdate()
 {
 	if (!running)
 		return;
-	HuiCancelRunner(hui_runner_id);
+	hui::CancelRunner(hui_runner_id);
 	hui_runner_id = -1;
 	running = false;
 }

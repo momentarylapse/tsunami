@@ -12,7 +12,7 @@
 
 class Configurable;
 
-class ConfigPanel : public HuiPanel
+class ConfigPanel : public hui::Panel
 {
 public:
 	ConfigPanel();

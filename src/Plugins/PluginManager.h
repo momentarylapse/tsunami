@@ -9,7 +9,6 @@
 #define PLUGINMANAGER_H_
 
 #include "../Data/Song.h"
-#include "../lib/hui/hui.h"
 #include "../lib/kaba/kaba.h"
 
 class Plugin;
@@ -21,8 +20,12 @@ class FavoriteManager;
 class TsunamiWindow;
 class SongPlugin;
 class TsunamiPlugin;
+namespace hui{
+	class Window;
+	class Panel;
+}
 
-class PluginManager : public HuiEventHandler
+class PluginManager
 {
 public:
 	PluginManager();
@@ -39,14 +42,14 @@ public:
 
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
-	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
+	string SelectFavoriteName(hui::Window *win, Configurable *c, bool save);
 
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name, Song *song);
 
-	Effect *ChooseEffect(HuiPanel *parent, Song *song);
-	MidiEffect *ChooseMidiEffect(HuiPanel *parent, Song *song);
-	//Synthesizer *ChooseSynthesizer(HuiPanel *parent);
+	Effect *ChooseEffect(hui::Panel *parent, Song *song);
+	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Song *song);
+	//Synthesizer *ChooseSynthesizer(hui::Panel *parent);
 
 
 	// not compiled yet

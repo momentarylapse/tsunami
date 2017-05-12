@@ -19,6 +19,10 @@ class Device;
 class DeviceManager;
 class MidiPreviewFeedSource;
 
+namespace hui{
+	class Timer;
+}
+
 #ifdef DEVICE_MIDI_ALSA
 struct _snd_seq_port_subscribe;
 #endif
@@ -76,7 +80,7 @@ private:
 	Device *device;
 	int npfd;
 	struct pollfd *pfd;
-	HuiTimer timer;
+	hui::Timer *timer;
 	double offset;
 	bool capturing;
 	bool accumulating;

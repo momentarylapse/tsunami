@@ -14,10 +14,10 @@ class Configurable;
 class Synthesizer;
 class Song;
 
-class ConfigurableSelectorDialog: public HuiWindow
+class ConfigurableSelectorDialog: public hui::Window
 {
 public:
-	ConfigurableSelectorDialog(HuiWindow *_parent, int type, Song *song, const string &old_name = "");
+	ConfigurableSelectorDialog(hui::Window *_parent, int type, Song *song, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
 	void onListSelect();
@@ -35,6 +35,6 @@ public:
 	Configurable *_return;
 };
 
-Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_name = "");
+Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name = "");
 
 #endif /* CONFIGURABLESELECTORDIALOG_H_ */

@@ -11,7 +11,9 @@
 #include "../lib/base/base.h"
 
 class Configurable;
-class HuiWindow;
+namespace hui{
+	class Window;
+}
 
 class FavoriteManager
 {
@@ -41,7 +43,7 @@ public:
 	void Apply(Configurable *c, const string &name);
 	void Save(Configurable *c, const string &name);
 
-	string SelectName(HuiWindow *win, Configurable *c, bool save);
+	string SelectName(hui::Window *win, Configurable *c, bool save);
 
 	string type2str(int type);
 	int str2type(const string &str);

@@ -33,7 +33,7 @@ public:
 
 	string id_inner;
 
-	HuiPanel *panel;
+	hui::Panel *panel;
 
 	AudioView *view;
 	Track *track;

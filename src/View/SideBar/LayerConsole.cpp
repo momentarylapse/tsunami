@@ -68,7 +68,7 @@ void LayerConsole::onSelect()
 
 void LayerConsole::onEdit()
 {
-	int r = HuiGetEvent()->row;
+	int r = hui::GetEvent()->row;
 	if (r < 0)
 		return;
 	song->renameLayer(r, getCell("layers", r, 1));

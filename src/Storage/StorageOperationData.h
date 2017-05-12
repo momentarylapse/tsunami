@@ -12,7 +12,9 @@
 
 class Song;
 class Progress;
-class HuiWindow;
+namespace hui{
+	class Window;
+}
 class BufferBox;
 class Track;
 class Storage;
@@ -22,7 +24,7 @@ class AudioRenderer;
 class StorageOperationData
 {
 public:
-	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, BufferBox *b, const string &filename, const string &message, HuiWindow *win);
+	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, BufferBox *b, const string &filename, const string &message, hui::Window *win);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -37,7 +39,7 @@ public:
 	Storage *storage;
 	Format *format;
 
-	HuiWindow *win;
+	hui::Window *win;
 
 	Song *song;
 	Progress *progress;

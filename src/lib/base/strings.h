@@ -141,6 +141,14 @@ string _cdecl h2d(const string &hex_str, int bytes);
 string _cdecl implode(const Array<string> &a, const string &glue);
 string _cdecl utf32_to_utf8(const Array<int> &s);
 
+
+
+string _cdecl str_unescape(const string &str);
+string _cdecl str_escape(const string &str);
+
+string _cdecl str_m_to_utf8(const string &str);
+string _cdecl str_utf8_to_m(const string &str);
+
 bool _cdecl sa_contains(Array<string> &a, const string &s);
 
 //--------------------------------------------------------------

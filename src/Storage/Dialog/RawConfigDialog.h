@@ -19,10 +19,10 @@ struct RawConfigData
 	int offset;
 };
 
-class RawConfigDialog : public HuiWindow
+class RawConfigDialog : public hui::Window
 {
 public:
-	RawConfigDialog(RawConfigData *data, HuiWindow *parent);
+	RawConfigDialog(RawConfigData *data, hui::Window *parent);
 	virtual ~RawConfigDialog();
 
 	void onClose();

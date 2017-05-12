@@ -43,9 +43,9 @@
 
 #include "Plugins/FastFourierTransform.h"
 
-extern string AppName;
+extern const string AppName;
 
-HuiTimer debug_timer;
+hui::Timer debug_timer;
 
 static Array<TsunamiWindow*> TsunamiWindows;
 
@@ -65,82 +65,82 @@ public:
 };
 
 TsunamiWindow::TsunamiWindow() :
-	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HUI_WIN_MODE_RESIZABLE | HUI_WIN_MODE_CONTROLS)
+	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_RESIZABLE | hui::WIN_MODE_CONTROLS)
 {
 
 	tsunami->win = this;
 
-	int width = HuiConfig.getInt("Window.Width", 800);
-	int height = HuiConfig.getInt("Window.Height", 600);
-	bool maximized = HuiConfig.getBool("Window.Maximized", true);
+	int width = hui::Config.getInt("Window.Width", 800);
+	int height = hui::Config.getInt("Window.Height", 600);
+	bool maximized = hui::Config.getBool("Window.Maximized", true);
 
-	//HuiAddKeyCode("insert_added", KEY_RETURN);
-	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
+	//hui::AddKeyCode("insert_added", hui::KEY_RETURN);
+	//hui::AddKeyCode("remove_added", hui::KEY_BACKSPACE);
 
-	HuiAddCommand("new", "hui:new", KEY_N + KEY_CONTROL, std::bind(&TsunamiWindow::onNew, this));
-	HuiAddCommand("open", "hui:open", KEY_O + KEY_CONTROL, std::bind(&TsunamiWindow::onOpen, this));
-	HuiAddCommand("save", "hui:save", KEY_S + KEY_CONTROL, std::bind(&TsunamiWindow::onSave, this));
-	HuiAddCommand("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, std::bind(&TsunamiWindow::onSaveAs, this));
-	HuiAddCommand("copy", "hui:copy", KEY_C + KEY_CONTROL, std::bind(&TsunamiWindow::onCopy, this));
-	HuiAddCommand("paste", "hui:paste", KEY_V + KEY_CONTROL, std::bind(&TsunamiWindow::onPaste, this));
-	HuiAddCommand("paste_as_samples", "hui:paste", KEY_V + KEY_CONTROL + KEY_SHIFT, std::bind(&TsunamiWindow::onPasteAsSamples, this));
-	HuiAddCommand("delete", "hui:delete", -1, std::bind(&TsunamiWindow::onDelete, this));
-	HuiAddCommand("edit_multi", "", -1, std::bind(&TsunamiWindow::onEditMulti, this));
-	HuiAddCommand("export_selection", "", KEY_X + KEY_CONTROL, std::bind(&TsunamiWindow::onExport, this));
-	HuiAddCommand("undo", "hui:undo", KEY_Z + KEY_CONTROL, std::bind(&TsunamiWindow::onUndo, this));
-	HuiAddCommand("redo", "hui:redo", KEY_Y + KEY_CONTROL, std::bind(&TsunamiWindow::onRedo, this));
-	HuiAddCommand("add_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddTrack, this));
-	HuiAddCommand("add_time_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddTimeTrack, this));
-	HuiAddCommand("add_midi_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddMidiTrack, this));
-	HuiAddCommand("delete_track", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteTrack, this));
-	HuiAddCommand("track_edit_midi", "hui:edit", -1, std::bind(&TsunamiWindow::onTrackEditMidi, this));
-	HuiAddCommand("track_edit_fx", "hui:edit", -1, std::bind(&TsunamiWindow::onTrackEditFX, this));
-	HuiAddCommand("track_add_marker", "hui:add", -1, std::bind(&TsunamiWindow::onTrackAddMarker, this));
-	HuiAddCommand("layer_manager", "hui:settings", -1, std::bind(&TsunamiWindow::onLayerManager, this));
-	HuiAddCommand("layer_add", "hui:add", -1, std::bind(&TsunamiWindow::onAddLayer, this));
-	HuiAddCommand("layer_delete", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteLayer, this));
-	HuiAddCommand("layer_up", "hui:up", -1, std::bind(&TsunamiWindow::onCurLayerUp, this));
-	HuiAddCommand("layer_down", "hui:down", -1, std::bind(&TsunamiWindow::onCurLayerDown, this));
-	HuiAddCommand("add_bars", "hui:add", -1, std::bind(&TsunamiWindow::onAddBars, this));
-	HuiAddCommand("add_pause", "hui:add", -1, std::bind(&TsunamiWindow::onAddPause, this));
-	HuiAddCommand("delete_bars", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteBars, this));
-	HuiAddCommand("edit_bars", "hui:edit", -1, std::bind(&TsunamiWindow::onEditBars, this));
-	HuiAddCommand("scale_bars", "hui:scale", -1, std::bind(&TsunamiWindow::onScaleBars, this));
-	HuiAddCommand("bar_link_to_data", "", -1, std::bind(&TsunamiWindow::onBarsModifyMidi, this));
-	HuiAddCommand("sample_manager", "", -1, std::bind(&TsunamiWindow::onSampleManager, this));
-	HuiAddCommand("song_edit_samples", "", -1, std::bind(&TsunamiWindow::onSampleManager, this));
-	HuiAddCommand("show_mixing_console", "", -1, std::bind(&TsunamiWindow::onMixingConsole, this));
-	HuiAddCommand("show_fx_console", "", -1, std::bind(&TsunamiWindow::onFxConsole, this));
-	HuiAddCommand("sample_from_selection", "hui:cut", -1, std::bind(&TsunamiWindow::onSampleFromSelection, this));
-	HuiAddCommand("insert_sample", "", KEY_I + KEY_CONTROL, std::bind(&TsunamiWindow::onInsertSample, this));
-	HuiAddCommand("remove_sample", "", -1, std::bind(&TsunamiWindow::onRemoveSample, this));
-	HuiAddCommand("delete_marker", "", -1, std::bind(&TsunamiWindow::onDeleteMarker, this));
-	HuiAddCommand("edit_marker", "", -1, std::bind(&TsunamiWindow::onEditMarker, this));
-	HuiAddCommand("track_import", "", -1, std::bind(&TsunamiWindow::onTrackImport, this));
-	HuiAddCommand("sub_import", "", -1, std::bind(&TsunamiWindow::onSampleImport, this));
-	HuiAddCommand("song_properties", "", KEY_F4, std::bind(&TsunamiWindow::onSongProperties, this));
-	HuiAddCommand("track_properties", "", -1, std::bind(&TsunamiWindow::onTrackProperties, this));
-	HuiAddCommand("sample_properties", "", -1, std::bind(&TsunamiWindow::onSampleProperties, this));
-	HuiAddCommand("settings", "", -1, std::bind(&TsunamiWindow::onSettings, this));
-	HuiAddCommand("play", "hui:media-play", -1, std::bind(&TsunamiWindow::onPlay, this));
-	HuiAddCommand("play_loop", "", -1, std::bind(&TsunamiWindow::onPlayLoop, this));
-	HuiAddCommand("pause", "hui:media-pause", -1, std::bind(&TsunamiWindow::onPause, this));
-	HuiAddCommand("stop", "hui:media-stop", -1, std::bind(&TsunamiWindow::onStop, this));
-	HuiAddCommand("record", "hui:media-record", -1, std::bind(&TsunamiWindow::onRecord, this));
-	HuiAddCommand("show_log", "", -1, std::bind(&TsunamiWindow::onShowLog, this));
-	HuiAddCommand("about", "", -1, std::bind(&TsunamiWindow::onAbout, this));
-	HuiAddCommand("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, std::bind(&TsunamiWindow::onFindAndExecutePlugin, this));
-	HuiAddCommand("exit", "hui:quit", KEY_Q + KEY_CONTROL, std::bind(&TsunamiWindow::onExit, this));
+	hui::AddCommand("new", "hui:new", hui::KEY_N + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onNew, this));
+	hui::AddCommand("open", "hui:open", hui::KEY_O + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onOpen, this));
+	hui::AddCommand("save", "hui:save", hui::KEY_S + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onSave, this));
+	hui::AddCommand("save_as", "hui:save-as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT, std::bind(&TsunamiWindow::onSaveAs, this));
+	hui::AddCommand("copy", "hui:copy", hui::KEY_C + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onCopy, this));
+	hui::AddCommand("paste", "hui:paste", hui::KEY_V + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onPaste, this));
+	hui::AddCommand("paste_as_samples", "hui:paste", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT, std::bind(&TsunamiWindow::onPasteAsSamples, this));
+	hui::AddCommand("delete", "hui:delete", -1, std::bind(&TsunamiWindow::onDelete, this));
+	hui::AddCommand("edit_multi", "", -1, std::bind(&TsunamiWindow::onEditMulti, this));
+	hui::AddCommand("export_selection", "", hui::KEY_X + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onExport, this));
+	hui::AddCommand("undo", "hui:undo", hui::KEY_Z + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onUndo, this));
+	hui::AddCommand("redo", "hui:redo", hui::KEY_Y + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onRedo, this));
+	hui::AddCommand("add_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddTrack, this));
+	hui::AddCommand("add_time_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddTimeTrack, this));
+	hui::AddCommand("add_midi_track", "hui:add", -1, std::bind(&TsunamiWindow::onAddMidiTrack, this));
+	hui::AddCommand("delete_track", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteTrack, this));
+	hui::AddCommand("track_edit_midi", "hui:edit", -1, std::bind(&TsunamiWindow::onTrackEditMidi, this));
+	hui::AddCommand("track_edit_fx", "hui:edit", -1, std::bind(&TsunamiWindow::onTrackEditFX, this));
+	hui::AddCommand("track_add_marker", "hui:add", -1, std::bind(&TsunamiWindow::onTrackAddMarker, this));
+	hui::AddCommand("layer_manager", "hui:settings", -1, std::bind(&TsunamiWindow::onLayerManager, this));
+	hui::AddCommand("layer_add", "hui:add", -1, std::bind(&TsunamiWindow::onAddLayer, this));
+	hui::AddCommand("layer_delete", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteLayer, this));
+	hui::AddCommand("layer_up", "hui:up", -1, std::bind(&TsunamiWindow::onCurLayerUp, this));
+	hui::AddCommand("layer_down", "hui:down", -1, std::bind(&TsunamiWindow::onCurLayerDown, this));
+	hui::AddCommand("add_bars", "hui:add", -1, std::bind(&TsunamiWindow::onAddBars, this));
+	hui::AddCommand("add_pause", "hui:add", -1, std::bind(&TsunamiWindow::onAddPause, this));
+	hui::AddCommand("delete_bars", "hui:delete", -1, std::bind(&TsunamiWindow::onDeleteBars, this));
+	hui::AddCommand("edit_bars", "hui:edit", -1, std::bind(&TsunamiWindow::onEditBars, this));
+	hui::AddCommand("scale_bars", "hui:scale", -1, std::bind(&TsunamiWindow::onScaleBars, this));
+	hui::AddCommand("bar_link_to_data", "", -1, std::bind(&TsunamiWindow::onBarsModifyMidi, this));
+	hui::AddCommand("sample_manager", "", -1, std::bind(&TsunamiWindow::onSampleManager, this));
+	hui::AddCommand("song_edit_samples", "", -1, std::bind(&TsunamiWindow::onSampleManager, this));
+	hui::AddCommand("show_mixing_console", "", -1, std::bind(&TsunamiWindow::onMixingConsole, this));
+	hui::AddCommand("show_fx_console", "", -1, std::bind(&TsunamiWindow::onFxConsole, this));
+	hui::AddCommand("sample_from_selection", "hui:cut", -1, std::bind(&TsunamiWindow::onSampleFromSelection, this));
+	hui::AddCommand("insert_sample", "", hui::KEY_I + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onInsertSample, this));
+	hui::AddCommand("remove_sample", "", -1, std::bind(&TsunamiWindow::onRemoveSample, this));
+	hui::AddCommand("delete_marker", "", -1, std::bind(&TsunamiWindow::onDeleteMarker, this));
+	hui::AddCommand("edit_marker", "", -1, std::bind(&TsunamiWindow::onEditMarker, this));
+	hui::AddCommand("track_import", "", -1, std::bind(&TsunamiWindow::onTrackImport, this));
+	hui::AddCommand("sub_import", "", -1, std::bind(&TsunamiWindow::onSampleImport, this));
+	hui::AddCommand("song_properties", "", hui::KEY_F4, std::bind(&TsunamiWindow::onSongProperties, this));
+	hui::AddCommand("track_properties", "", -1, std::bind(&TsunamiWindow::onTrackProperties, this));
+	hui::AddCommand("sample_properties", "", -1, std::bind(&TsunamiWindow::onSampleProperties, this));
+	hui::AddCommand("settings", "", -1, std::bind(&TsunamiWindow::onSettings, this));
+	hui::AddCommand("play", "hui:media-play", -1, std::bind(&TsunamiWindow::onPlay, this));
+	hui::AddCommand("play_loop", "", -1, std::bind(&TsunamiWindow::onPlayLoop, this));
+	hui::AddCommand("pause", "hui:media-pause", -1, std::bind(&TsunamiWindow::onPause, this));
+	hui::AddCommand("stop", "hui:media-stop", -1, std::bind(&TsunamiWindow::onStop, this));
+	hui::AddCommand("record", "hui:media-record", -1, std::bind(&TsunamiWindow::onRecord, this));
+	hui::AddCommand("show_log", "", -1, std::bind(&TsunamiWindow::onShowLog, this));
+	hui::AddCommand("about", "", -1, std::bind(&TsunamiWindow::onAbout, this));
+	hui::AddCommand("run_plugin", "hui:execute", hui::KEY_RETURN + hui::KEY_SHIFT, std::bind(&TsunamiWindow::onFindAndExecutePlugin, this));
+	hui::AddCommand("exit", "hui:quit", hui::KEY_Q + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onExit, this));
 
-	HuiAddCommand("select_all", "", KEY_A + KEY_CONTROL, std::bind(&TsunamiWindow::onSelectAll, this));
-	HuiAddCommand("select_nothing", "", -1, std::bind(&TsunamiWindow::onSelectNone, this));
-	HuiAddCommand("select_expand", "", -1, std::bind(&TsunamiWindow::onSelectExpand, this));
-	HuiAddCommand("view_midi_default", "", -1, std::bind(&TsunamiWindow::onViewMidiDefault, this));
-	HuiAddCommand("view_midi_tab", "", -1, std::bind(&TsunamiWindow::onViewMidiTab, this));
-	HuiAddCommand("view_midi_score", "", -1, std::bind(&TsunamiWindow::onViewMidiScore, this));
-	HuiAddCommand("view_optimal", "", -1, std::bind(&TsunamiWindow::onViewOptimal, this));
-	HuiAddCommand("zoom_in", "", -1, std::bind(&TsunamiWindow::onZoomIn, this));
-	HuiAddCommand("zoom_out", "", -1, std::bind(&TsunamiWindow::onZoomOut, this));
+	hui::AddCommand("select_all", "", hui::KEY_A + hui::KEY_CONTROL, std::bind(&TsunamiWindow::onSelectAll, this));
+	hui::AddCommand("select_nothing", "", -1, std::bind(&TsunamiWindow::onSelectNone, this));
+	hui::AddCommand("select_expand", "", -1, std::bind(&TsunamiWindow::onSelectExpand, this));
+	hui::AddCommand("view_midi_default", "", -1, std::bind(&TsunamiWindow::onViewMidiDefault, this));
+	hui::AddCommand("view_midi_tab", "", -1, std::bind(&TsunamiWindow::onViewMidiTab, this));
+	hui::AddCommand("view_midi_score", "", -1, std::bind(&TsunamiWindow::onViewMidiScore, this));
+	hui::AddCommand("view_optimal", "", -1, std::bind(&TsunamiWindow::onViewOptimal, this));
+	hui::AddCommand("zoom_in", "", -1, std::bind(&TsunamiWindow::onZoomIn, this));
+	hui::AddCommand("zoom_out", "", -1, std::bind(&TsunamiWindow::onZoomOut, this));
 
 	// table structure
 	setSize(width, height);
@@ -157,7 +157,7 @@ TsunamiWindow::TsunamiWindow() :
 	toolbar[0]->setByID("toolbar");
 	//ToolbarConfigure(false, true);
 
-	setMenu(HuiCreateResourceMenu("menu"));
+	setMenu(hui::CreateResourceMenu("menu"));
 	//ToolBarConfigure(true, true);
 	setMaximized(maximized);
 
@@ -203,7 +203,7 @@ TsunamiWindow::TsunamiWindow() :
 	if (song->tracks.num > 0)
 		view->setCurTrack(song->tracks[0]);
 	view->optimizeView();
-	HuiRunLater(0.5f, std::bind(&AudioView::optimizeView, view));
+	hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, view));
 
 	updateMenu();
 	TsunamiWindows.add(this);
@@ -228,16 +228,16 @@ void TsunamiCleanUp()
 	}while(again);
 
 	if (TsunamiWindows.num == 0)
-		HuiEnd();
+		hui::End();
 }
 
 void TsunamiWindow::onDestroy()
 {
 	int w, h;
 	getSizeDesired(w, h);
-	HuiConfig.setInt("Window.Width", w);
-	HuiConfig.setInt("Window.Height", h);
-	HuiConfig.setBool("Window.Maximized", isMaximized());
+	hui::Config.setInt("Window.Width", w);
+	hui::Config.setInt("Window.Height", h);
+	hui::Config.setBool("Window.Maximized", isMaximized());
 
 	observer->unsubscribe(view);
 	observer->unsubscribe(song);
@@ -253,13 +253,13 @@ void TsunamiWindow::onDestroy()
 	delete(view);
 	delete(song);
 
-	HuiRunLater(0.010f, &TsunamiCleanUp);
+	hui::RunLater(0.010f, &TsunamiCleanUp);
 }
 
 
 void TsunamiWindow::onAbout()
 {
-	HuiAboutBox(this);
+	hui::AboutBox(this);
 }
 
 
@@ -397,7 +397,7 @@ bool TsunamiWindow::allowTermination()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
 		if (side_bar->capture_console->isCapturing()){
-			string answer = HuiQuestionBox(this, _("Question"), _("Cancel recording?"), true);
+			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
 				return false;
 			side_bar->capture_console->onDelete();
@@ -407,7 +407,7 @@ bool TsunamiWindow::allowTermination()
 
 	if (song->action_manager->isSave())
 		return true;
-	string answer = HuiQuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
+	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
 	if (answer == "hui:yes"){
 		/*if (!OnSave())
 			return false;*/
@@ -442,13 +442,13 @@ void TsunamiWindow::onEditMulti()
 
 void TsunamiWindow::onFindAndExecutePlugin()
 {
-	if (HuiFileDialogOpen(win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
-		tsunami->plugin_manager->_ExecutePlugin(this, HuiFilename);
+	if (hui::FileDialogOpen(win, _("Select plugin script"), hui::AppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
+		tsunami->plugin_manager->_ExecutePlugin(this, hui::Filename);
 }
 
 void TsunamiWindow::onMenuExecuteEffect()
 {
-	string name = HuiGetEvent()->id.explode("--")[1];
+	string name = hui::GetEvent()->id.explode("--")[1];
 
 	Effect *fx = CreateEffect(name, song);
 
@@ -469,7 +469,7 @@ void TsunamiWindow::onMenuExecuteEffect()
 
 void TsunamiWindow::onMenuExecuteMidiEffect()
 {
-	string name = HuiGetEvent()->id.explode("--")[1];
+	string name = hui::GetEvent()->id.explode("--")[1];
 
 	MidiEffect *fx = CreateMidiEffect(name, song);
 
@@ -490,7 +490,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 
 void TsunamiWindow::onMenuExecuteSongPlugin()
 {
-	string name = HuiGetEvent()->id.explode("--")[1];
+	string name = hui::GetEvent()->id.explode("--")[1];
 
 	SongPlugin *p = CreateSongPlugin(name, this);
 
@@ -500,7 +500,7 @@ void TsunamiWindow::onMenuExecuteSongPlugin()
 
 void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 {
-	string name = HuiGetEvent()->id.explode("--")[1];
+	string name = hui::GetEvent()->id.explode("--")[1];
 
 	for (TsunamiPlugin *p: plugins)
 		if (p->name == name){
@@ -557,7 +557,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (tsunami->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		tsunami->storage->loadTrack(t, HuiFilename, view->sel.range.start(), view->cur_layer);
+		tsunami->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
 	}
 }
 
@@ -617,7 +617,7 @@ void TsunamiWindow::onDeleteLayer()
 
 void TsunamiWindow::onCurLayer()
 {
-	view->setCurLayer(HuiGetEvent()->id.substr(14, -1)._int());
+	view->setCurLayer(hui::GetEvent()->id.substr(14, -1)._int());
 }
 
 void TsunamiWindow::onCurLayerUp()
@@ -726,7 +726,7 @@ void TsunamiWindow::updateMenu()
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
 	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
 
-	HuiMenu *m = getMenu()->getSubMenuByID("menu_layer_target");
+	hui::Menu *m = getMenu()->getSubMenuByID("menu_layer_target");
 	if (m){
 		m->clear();
 		for (int i=0; i<song->layer_names.num; i++)
@@ -748,7 +748,7 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 		tpl->stop();
 
 		if (die_on_plugin_stop)
-			HuiEnd();//HuiRunLaterM(0.01f, this, &TsunamiWindow::destroy);
+			hui::End();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
 	}else{
 		// "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();
@@ -778,7 +778,7 @@ void TsunamiWindow::onOpen()
 	if (!allowTermination())
 		return;
 	if (tsunami->storage->askOpen(this))
-		tsunami->storage->load(song, HuiFilename);
+		tsunami->storage->load(song, hui::Filename);
 }
 
 
@@ -794,7 +794,7 @@ void TsunamiWindow::onSave()
 void TsunamiWindow::onSaveAs()
 {
 	if (tsunami->storage->askSave(this))
-		tsunami->storage->save(song, HuiFilename);
+		tsunami->storage->save(song, hui::Filename);
 }
 
 void TsunamiWindow::onExport()
@@ -802,20 +802,20 @@ void TsunamiWindow::onExport()
 	if (tsunami->storage->askSaveExport(this)){
 		SongRenderer rr(song, &view->sel);
 		rr.prepare(view->getPlaybackSelection(), false);
-		tsunami->storage->saveViaRenderer(&rr, HuiFilename);
+		tsunami->storage->saveViaRenderer(&rr, hui::Filename);
 	}
 }
 
 void TsunamiWindow::onAddBars()
 {
-	HuiDialog *dlg = new BarAddDialog(win, song, view);
+	auto dlg = new BarAddDialog(win, song, view);
 	dlg->run();
 	delete(dlg);
 }
 
 void TsunamiWindow::onAddPause()
 {
-	HuiDialog *dlg = new PauseAddDialog(win, song, view);
+	auto dlg = new PauseAddDialog(win, song, view);
 	dlg->run();
 	delete(dlg);
 }
@@ -843,15 +843,15 @@ void TsunamiWindow::onEditBars()
 		else if (song->bars[i].type == BarPattern::TYPE_PAUSE)
 			num_pauses ++;
 	if (num_bars > 0 and num_pauses == 0){
-		HuiDialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
+		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
 		dlg->run();
 		delete(dlg);
 	}else if (num_bars == 0 and num_pauses == 1){
-		HuiDialog *dlg = new PauseEditDialog(win, song, view->sel.bars.start(), view->bars_edit_data);
+		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bars.start(), view->bars_edit_data);
 		dlg->run();
 		delete(dlg);
 	}else{
-		HuiErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
+		hui::ErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
 	}
 }
 

@@ -13,8 +13,8 @@
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
 
-SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
-	HuiWindow("settings_dialog", _parent)
+SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
+	hui::Window("settings_dialog", _parent)
 {
 	view = _view;
 	event("language", std::bind(&SettingsDialog::onLanguage, this));
@@ -48,10 +48,10 @@ SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 void SettingsDialog::loadData()
 {
 	// language
-	Array<string> lang = HuiGetLanguages();
+	Array<string> lang = hui::GetLanguages();
 	foreachi(string &l, lang, i){
 		addString("language", l);
-		if (l == HuiGetCurLanguage())
+		if (l == hui::GetCurLanguage())
 			setInt("language", i);
 	}
 
@@ -63,13 +63,13 @@ void SettingsDialog::loadData()
 	}
 
 	// ogg quality
-	float CurOggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
+	float CurOggQuality = hui::Config.getFloat("OggQuality", 0.5f);
 	foreachi(OggQuality &q, ogg_quality, i)
 		if (CurOggQuality > q.quality - 0.05f)
 			setInt("ogg_bitrate", i);
 	setDecimals(1);
 
-	setString("default_artist", HuiConfig.getStr("DefaultArtist", ""));
+	setString("default_artist", hui::Config.getStr("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
@@ -82,10 +82,10 @@ void SettingsDialog::applyData()
 
 void SettingsDialog::onLanguage()
 {
-	Array<string> lang = HuiGetLanguages();
+	Array<string> lang = hui::GetLanguages();
 	int l = getInt("");
-	HuiSetLanguage(lang[l]);
-	HuiConfig.setStr("Language", lang[l]);
+	hui::SetLanguage(lang[l]);
+	hui::Config.setStr("Language", lang[l]);
 }
 
 void SettingsDialog::onColorScheme()
@@ -97,12 +97,12 @@ void SettingsDialog::onColorScheme()
 
 void SettingsDialog::onOggBitrate()
 {
-	HuiConfig.setFloat("OggQuality", ogg_quality[getInt("")].quality);
+	hui::Config.setFloat("OggQuality", ogg_quality[getInt("")].quality);
 }
 
 void SettingsDialog::onDefaultArtist()
 {
-	HuiConfig.setStr("DefaultArtist", getString(""));
+	hui::Config.setStr("DefaultArtist", getString(""));
 }
 
 void SettingsDialog::onCaptureFilename()
@@ -112,8 +112,8 @@ void SettingsDialog::onCaptureFilename()
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::backup_filename.basename(), "*.raw", "*.raw"))
-		setString("capture_filename", HuiFilename);
-	InputStreamAudio::setBackupFilename(HuiFilename);
+	if (hui::FileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::backup_filename.basename(), "*.raw", "*.raw"))
+		setString("capture_filename", hui::Filename);
+	InputStreamAudio::setBackupFilename(hui::Filename);
 }
 

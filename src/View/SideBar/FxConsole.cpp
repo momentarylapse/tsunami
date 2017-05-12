@@ -13,7 +13,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
 
-class SingleFxPanel : public HuiPanel, public Observer
+class SingleFxPanel : public hui::Panel, public Observer
 {
 public:
 	SingleFxPanel(Song *a, Track *t, Effect *_fx, int _index) :
@@ -56,7 +56,7 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, (Configurable*)fx, false);
+		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, false);
 		if (name.num == 0)
 			return;
 		tsunami->plugin_manager->ApplyFavorite(fx, name);
@@ -156,19 +156,19 @@ void FxConsole::onAdd()
 
 void FxConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	dynamic_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void FxConsole::onEditTrack()
 {
-	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+	dynamic_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
 }
 
 void FxConsole::clear()
 {
 	if (track)
 		unsubscribe(track);
-	foreachi(HuiPanel *p, panels, i){
+	foreachi(hui::Panel *p, panels, i){
 		delete(p);
 		removeControl("separator_" + i2s(i));
 	}

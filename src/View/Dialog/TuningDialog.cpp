@@ -8,8 +8,8 @@
 #include "TuningDialog.h"
 #include "../../Data/Track.h"
 
-TuningDialog::TuningDialog(HuiWindow *_parent, Track *t) :
-	HuiWindow("tuning_dialog", _parent)
+TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
+	hui::Window("tuning_dialog", _parent)
 {
 	track = t;
 	tuning = track->instrument.string_pitch;
@@ -73,7 +73,7 @@ void TuningDialog::onOk()
 
 void TuningDialog::onEdit()
 {
-	string id = HuiGetEvent()->id;
+	string id = hui::GetEvent()->id;
 	int n = id.substr(6, -1)._int();
 	int p = MAX_PITCH - 1 - getInt(id);
 	tuning[n] = p;
@@ -81,7 +81,7 @@ void TuningDialog::onEdit()
 
 void TuningDialog::onDelete()
 {
-	string id = HuiGetEvent()->id;
+	string id = hui::GetEvent()->id;
 	int n = id.substr(7+6, -1)._int();
 	tuning.erase(n);
 	update();
@@ -89,7 +89,7 @@ void TuningDialog::onDelete()
 
 void TuningDialog::onAdd()
 {
-	string id = HuiGetEvent()->id;
+	string id = hui::GetEvent()->id;
 	int n = id.substr(4+6, -1)._int();
 	tuning.insert(tuning[n], n);
 	update();

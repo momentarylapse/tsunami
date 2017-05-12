@@ -199,10 +199,10 @@ public:
 	};
 	ImageData images;
 
-	HuiMenu *menu_track;
-	HuiMenu *menu_sample;
-	HuiMenu *menu_marker;
-	HuiMenu *menu_song;
+	hui::Menu *menu_track;
+	hui::Menu *menu_sample;
+	hui::Menu *menu_marker;
+	hui::Menu *menu_song;
 };
 
 #endif /* AUDIOVIEW_H_ */

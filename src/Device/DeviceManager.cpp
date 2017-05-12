@@ -57,7 +57,7 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)){
 		//printf("----change   %d\n", idx);
 
-		HuiRunLater(0.1f, std::bind(&DeviceManager::update_devices, out));
+		hui::RunLater(0.1f, std::bind(&DeviceManager::update_devices, out));
 	}
 }
 
@@ -68,7 +68,7 @@ bool pa_wait_context_ready(pa_context *c)
 	int n = 0;
 	while (pa_context_get_state(c) != PA_CONTEXT_READY){
 		//pa_mainloop_iterate(m, 1, NULL);
-		HuiSleep(0.01f);
+		hui::Sleep(0.01f);
 		n ++;
 		if (n >= 500)
 			return false;
@@ -139,11 +139,11 @@ DeviceManager::DeviceManager() :
 {
 	initialized = false;
 
-	output_devices = str2devs(HuiConfig.getStr("Output.Devices", ""), Device::TYPE_AUDIO_OUTPUT);
-	input_devices = str2devs(HuiConfig.getStr("Input.Devices", ""), Device::TYPE_AUDIO_INPUT);
-	midi_input_devices = str2devs(HuiConfig.getStr("MidiInput.Devices", ""), Device::TYPE_MIDI_INPUT);
+	output_devices = str2devs(hui::Config.getStr("Output.Devices", ""), Device::TYPE_AUDIO_OUTPUT);
+	input_devices = str2devs(hui::Config.getStr("Input.Devices", ""), Device::TYPE_AUDIO_INPUT);
+	midi_input_devices = str2devs(hui::Config.getStr("MidiInput.Devices", ""), Device::TYPE_MIDI_INPUT);
 
-	output_volume = HuiConfig.getFloat("Output.Volume", 1.0f);
+	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
 
 
 #ifdef DEVICE_PULSEAUDIO
@@ -163,12 +163,12 @@ DeviceManager::DeviceManager() :
 
 	init();
 
-	hui_rep_id = HuiRunRepeated(2.0f, std::bind(&DeviceManager::update_midi_devices, this));
+	hui_rep_id = hui::RunRepeated(2.0f, std::bind(&DeviceManager::update_midi_devices, this));
 }
 
 DeviceManager::~DeviceManager()
 {
-	HuiCancelRunner(hui_rep_id);
+	hui::CancelRunner(hui_rep_id);
 
 	write_config();
 	kill();
@@ -199,11 +199,11 @@ void DeviceManager::remove_device(int type, int index)
 
 void DeviceManager::write_config()
 {
-	//HuiConfig.setStr("Output.ChosenDevice", chosen_device);
-	HuiConfig.setFloat("Output.Volume", output_volume);
-	HuiConfig.setStr("Output.Devices", devs2str(output_devices));
-	HuiConfig.setStr("Input.Devices", devs2str(input_devices));
-	HuiConfig.setStr("MidiInput.Devices", devs2str(midi_input_devices));
+	//hui::Config.setStr("Output.ChosenDevice", chosen_device);
+	hui::Config.setFloat("Output.Volume", output_volume);
+	hui::Config.setStr("Output.Devices", devs2str(output_devices));
+	hui::Config.setStr("Input.Devices", devs2str(input_devices));
+	hui::Config.setStr("MidiInput.Devices", devs2str(midi_input_devices));
 }
 
 

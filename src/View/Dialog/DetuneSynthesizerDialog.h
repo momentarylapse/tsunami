@@ -14,10 +14,10 @@ class Synthesizer;
 class Track;
 class AudioView;
 
-class DetuneSynthesizerDialog : public HuiDialog
+class DetuneSynthesizerDialog : public hui::Dialog
 {
 public:
-	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, HuiWindow *parent);
+	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, hui::Window *parent);
 	virtual ~DetuneSynthesizerDialog();
 
 	virtual void _cdecl onDraw(Painter *p);

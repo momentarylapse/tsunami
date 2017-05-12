@@ -657,7 +657,7 @@ void BufferBox::update_peaks()
 		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
 			while (!tsunami->song->try_lock()){
 				Thread::cancelationPoint();
-				HuiSleep(0.01f);
+				hui::Sleep(0.01f);
 			}
 			update_peaks_chunk(*this, i);
 			tsunami->song->unlock();

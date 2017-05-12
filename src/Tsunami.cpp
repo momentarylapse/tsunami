@@ -16,13 +16,13 @@
 #include "Plugins/TsunamiPlugin.h"
 
 
-string AppName = "Tsunami";
-string AppVersion = "0.6.97.1";
+const string AppName = "Tsunami";
+const string AppVersion = "0.6.97.2";
 
 Tsunami *tsunami = NULL;
 
 Tsunami::Tsunami() :
-	HuiApplication("tsunami", "English", HUI_FLAG_LOAD_RESOURCE)
+	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
 {
 	song = NULL;
 	_view = NULL;
@@ -34,12 +34,12 @@ Tsunami::Tsunami() :
 	plugin_manager = NULL;
 	storage = NULL;
 
-	HuiSetProperty("name", AppName);
-	HuiSetProperty("version", AppVersion);
-	HuiSetProperty("comment", _("Editor for audio files"));
-	HuiSetProperty("website", "http://michi.is-a-geek.org/software");
-	HuiSetProperty("copyright", "© 2007-2017 by Michael Ankele");
-	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
+	hui::SetProperty("name", AppName);
+	hui::SetProperty("version", AppVersion);
+	hui::SetProperty("comment", _("Editor for audio files"));
+	hui::SetProperty("website", "http://michi.is-a-geek.org/software");
+	hui::SetProperty("copyright", "© 2007-2017 by Michael Ankele");
+	hui::SetProperty("author", "Michael Ankele <michi@lupina.de>");
 }
 
 Tsunami::~Tsunami()
@@ -153,7 +153,7 @@ void Tsunami::createWindow()
 {
 	win = new TsunamiWindow;
 	win->auto_delete = true;
-	_win = dynamic_cast<HuiWindow*>(win);
+	_win = dynamic_cast<hui::Window*>(win);
 	_view = win->view;
 	song = win->song;
 }
@@ -169,4 +169,4 @@ bool Tsunami::allowTermination()
 	return true;
 }
 
-HuiExecute(Tsunami);
+HUI_EXECUTE(Tsunami);

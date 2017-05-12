@@ -42,7 +42,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 	int n = 0;
 	while (pa_stream_get_state(s) != PA_STREAM_READY){
 		//pa_mainloop_iterate(m, 1, NULL);
-		HuiSleep(0.01f);
+		hui::Sleep(0.01f);
 		n ++;
 		if (n >= 200)
 			return false;
@@ -109,7 +109,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 	if (available <= frames and stream->end_of_data){
 		//printf("end\n");
-		HuiRunLater(0.001f, std::bind(&OutputStream::stop, stream)); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, std::bind(&OutputStream::stop, stream)); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -190,7 +190,7 @@ class StreamThread : public Thread
 {
 public:
 	OutputStream *stream;
-	HuiTimer timer;
+	hui::Timer timer;
 	float t_idle;
 
 	StreamThread(OutputStream *s)
@@ -211,7 +211,7 @@ public:
 				//printf("%.1f %%\n", stream->cpu_usage * 100);
 				t_idle = 0;
 			}else{
-				HuiSleep(0.005f);
+				hui::Sleep(0.005f);
 				t_idle += timer.get();
 			}
 		}
@@ -324,7 +324,7 @@ void OutputStream::kill_dev()
 void OutputStream::kill()
 {
 	if (hui_runner_id >= 0){
-		HuiCancelRunner(hui_runner_id);
+		hui::CancelRunner(hui_runner_id);
 		hui_runner_id = -1;
 	}
 
@@ -347,7 +347,7 @@ void OutputStream::stop()
 
 	playing = false;
 	read_more = false;
-	HuiCancelRunner(hui_runner_id);
+	hui::CancelRunner(hui_runner_id);
 	hui_runner_id = -1;
 
 #ifdef DEVICE_PULSEAUDIO
@@ -521,7 +521,7 @@ void OutputStream::play()
 	Pa_StartStream(_stream);
 #endif
 
-	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&OutputStream::update, this));
+	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
 
 	notify(MESSAGE_STATE_CHANGE);
 }

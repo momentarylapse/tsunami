@@ -12,7 +12,7 @@
 #include "../Data/BufferBox.h"
 #include "../Audio/Renderer/AudioRenderer.h"
 
-StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, BufferBox *b, const string &_filename, const string &message, HuiWindow *_win)
+StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, BufferBox *b, const string &_filename, const string &message, hui::Window *_win)
 {
 	win = _win;
 	storage = _storage;

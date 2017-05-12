@@ -133,8 +133,9 @@ void DeviceConsole::add_device()
 
 void DeviceConsole::onOutputEdit()
 {
-	int index = HuiGetEvent()->row;
-	int col = HuiGetEvent()->column;
+	auto e = hui::GetEvent();
+	int index = e->row;
+	int col = e->column;
 	if (col == 4){
 		output_devices[index]->visible = getCell("", index, col)._bool();
 	}
@@ -143,8 +144,9 @@ void DeviceConsole::onOutputEdit()
 
 void DeviceConsole::onInputEdit()
 {
-	int index = HuiGetEvent()->row;
-	int col = HuiGetEvent()->column;
+	auto e = hui::GetEvent();
+	int index = e->row;
+	int col = e->column;
 	if (col == 4){
 		input_devices[index]->visible = getCell("", index, col)._bool();
 	}else if (col == 6){
@@ -155,8 +157,9 @@ void DeviceConsole::onInputEdit()
 
 void DeviceConsole::onMidiInputEdit()
 {
-	int index = HuiGetEvent()->row;
-	int col = HuiGetEvent()->column;
+	auto e = hui::GetEvent();
+	int index = e->row;
+	int col = e->column;
 	if (col == 3){
 		midi_input_devices[index]->visible = getCell("", index, col)._bool();
 	}
@@ -184,8 +187,9 @@ void DeviceConsole::onTopPriority()
 
 void DeviceConsole::onOutputMove()
 {
-	int source = HuiGetEvent()->row;
-	int target = HuiGetEvent()->row_target;
+	auto e = hui::GetEvent();
+	int source = e->row;
+	int target = e->row_target;
 	//msg_write(format("  move  %d  ->  %d", source, target));
 	device_manager->moveDevicePriority(output_devices[source], target);
 	setInt("output-list", target);
@@ -193,16 +197,18 @@ void DeviceConsole::onOutputMove()
 
 void DeviceConsole::onInputMove()
 {
-	int source = HuiGetEvent()->row;
-	int target = HuiGetEvent()->row_target;
+	auto e = hui::GetEvent();
+	int source = e->row;
+	int target = e->row_target;
 	device_manager->moveDevicePriority(input_devices[source], target);
 	setInt("input-list", target);
 }
 
 void DeviceConsole::onMidiInputMove()
 {
-	int source = HuiGetEvent()->row;
-	int target = HuiGetEvent()->row_target;
+	auto e = hui::GetEvent();
+	int source = e->row;
+	int target = e->row_target;
 	device_manager->moveDevicePriority(midi_input_devices[source], target);
 	setInt("midi-input-list", target);
 }

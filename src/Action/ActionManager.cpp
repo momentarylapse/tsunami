@@ -19,6 +19,7 @@ ActionManager::ActionManager(Data *_data)
 	cur_group = NULL;
 	lock_level = 0;
 	mutex = new Mutex;
+	timer = new hui::Timer;
 	reset();
 }
 
@@ -26,6 +27,7 @@ ActionManager::~ActionManager()
 {
 	reset();
 	delete(mutex);
+	delete(timer);
 }
 
 void ActionManager::reset()
@@ -56,7 +58,7 @@ void ActionManager::add(Action *a)
 {
 	truncate();
 
-	if (timer.get() < 2.0f)
+	if (timer->get() < 2.0f)
 		if (merge(a))
 			return;
 

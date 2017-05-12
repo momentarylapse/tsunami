@@ -9,8 +9,8 @@
 #include "../../Data/Song.h"
 #include "../AudioView.h"
 
-BarAddDialog::BarAddDialog(HuiWindow *root, Song *s, AudioView *v):
-	HuiDialog("", 100, 100, root, false)
+BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
+	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("bar_add_dialog");
 	song = s;

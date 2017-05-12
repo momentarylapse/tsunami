@@ -9,8 +9,8 @@
 #include "../../Data/Song.h"
 #include "../../Data/BufferInterpolator.h"
 
-SampleScaleDialog::SampleScaleDialog(HuiWindow *root, Sample *s):
-	HuiDialog("", 100, 100, root, false)
+SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
+	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("sample_scale_dialog");
 	sample = s;

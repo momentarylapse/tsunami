@@ -64,14 +64,14 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 
 void FavoriteManager::Load()
 {
-	LoadFromFile(HuiAppDirectoryStatic + "Data/favorites_demo.txt", true);
-	LoadFromFile(HuiAppDirectory + "Data/favorites.txt", false);
+	LoadFromFile(hui::AppDirectoryStatic + "Data/favorites_demo.txt", true);
+	LoadFromFile(hui::AppDirectory + "Data/favorites.txt", false);
 	loaded = true;
 }
 
 void FavoriteManager::Save()
 {
-	File *f = FileCreate(HuiAppDirectory + "Data/favorites.txt");
+	File *f = FileCreate(hui::AppDirectory + "Data/favorites.txt");
 	if (!f)
 		return;
 	f->WriteInt(favorites.num);
@@ -136,11 +136,11 @@ void FavoriteManager::set(const Favorite &ff)
 }
 
 
-class FavoriteSelectionDialog : public HuiDialog
+class FavoriteSelectionDialog : public hui::Dialog
 {
 public:
-	FavoriteSelectionDialog(HuiWindow *win, const Array<string> &_names, bool _save) :
-		HuiDialog(_(""), 300, 200, win, false)
+	FavoriteSelectionDialog(hui::Window *win, const Array<string> &_names, bool _save) :
+		hui::Dialog(_(""), 300, 200, win, false)
 	{
 		save = _save;
 		names = _names;
@@ -195,7 +195,7 @@ public:
 	string selection;
 };
 
-string FavoriteManager::SelectName(HuiWindow *win, Configurable *c, bool save)
+string FavoriteManager::SelectName(hui::Window *win, Configurable *c, bool save)
 {
 	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, GetList(c), save);
 	dlg->run();

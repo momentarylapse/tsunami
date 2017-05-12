@@ -12,7 +12,7 @@
 #ifndef _HUI_EXISTS_
 #define _HUI_EXISTS_
 
-#include "hui_common.h"
+#include "common.h"
 #ifdef _X_USE_IMAGE_
 	#include "../image/image.h"
 #else
@@ -20,14 +20,17 @@
 	typedef int color;
 #endif
 
-extern string HuiVersion;
+namespace hui
+{
+
+extern string Version;
 
 
 
 
-class HuiWindow;
-class HuiMenu;
-class HuiEventHandler;
+class Window;
+class Menu;
+class EventHandler;
 
 
 
@@ -39,39 +42,40 @@ class HuiEventHandler;
 // hui itself
 
 
-extern bool HuiEndKeepMsgAlive;
+extern bool EndKeepMsgAlive;
 
 // images
-//int HuiLoadImage(const string &filename);
-string HuiSetImage(const Image &image);
-void HuiDeleteImage(const string &name);
+//int LoadImage(const string &filename);
+string SetImage(const Image &image);
+void DeleteImage(const string &name);
 
 // HUI configuration
-extern string HuiComboBoxSeparator;
+extern string ComboBoxSeparator;
 
 // data from hui (...don't change...)
-extern string HuiAppFilename, HuiAppDirectory, HuiAppDirectoryStatic;
-extern string HuiInitialWorkingDirectory;
-extern bool HuiRunning;
+extern string AppFilename, AppDirectory, AppDirectoryStatic;
+extern string InitialWorkingDirectory;
+extern bool Running;
+
+};
 
 
-
-#include "HuiApplication.h"
-#include "hui_main.h"
-#include "hui_input.h"
-#include "HuiMenu.h"
-#include "HuiPanel.h"
-#include "HuiWindow.h"
-#include "hui_common_dlg.h"
-#include "hui_language.h"
-#include "HuiConfig.h"
-#include "hui_resource.h"
-#include "hui_utility.h"
-#include "HuiPainter.h"
-#include "HuiTimer.h"
-#include "HuiToolbar.h"
-#include "hui_error.h"
-#include "hui_clipboard.h"
+#include "Application.h"
+#include "main.h"
+#include "input.h"
+#include "Menu.h"
+#include "Panel.h"
+#include "Window.h"
+#include "common_dlg.h"
+#include "language.h"
+#include "Config.h"
+#include "resource.h"
+#include "utility.h"
+#include "Painter.h"
+#include "Timer.h"
+#include "Toolbar.h"
+#include "error.h"
+#include "clipboard.h"
 
 
 #endif

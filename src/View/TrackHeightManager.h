@@ -24,7 +24,7 @@ public:
 	bool dirty;
 	bool animating;
 	rect render_area;
-	HuiTimer timer;
+	hui::Timer timer;
 
 	bool check(Song *s);
 	bool update(AudioView *v, Song *s, const rect &r);

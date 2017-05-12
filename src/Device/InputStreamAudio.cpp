@@ -126,7 +126,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	playback_delay_const = 0;
 	if (device)
 		playback_delay_const = device->latency;
-	backup_filename = HuiConfig.getStr("Input.TempFilename", "");
+	backup_filename = hui::Config.getStr("Input.TempFilename", "");
 	backup_file = NULL;
 	backup_mode = BACKUP_MODE_NONE;
 
@@ -182,7 +182,7 @@ void InputStreamAudio::stop()
 	for (int i=0; i<1000; i++){
 		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED)
 			break;
-		HuiSleep(0.001f);
+		hui::Sleep(0.001f);
 	}
 
 	pa_stream_unref(_stream);
@@ -291,7 +291,7 @@ int InputStreamAudio::getSampleCount()
 void InputStreamAudio::setPlaybackDelayConst(float f)
 {
 	playback_delay_const = f;
-	HuiConfig.setFloat("Input.PlaybackDelay", playback_delay_const);
+	hui::Config.setFloat("Input.PlaybackDelay", playback_delay_const);
 }
 
 int InputStreamAudio::doCapturing()
@@ -368,7 +368,7 @@ string InputStreamAudio::getBackupFilename()
 void InputStreamAudio::setBackupFilename(const string &filename)
 {
 	backup_filename = filename;
-	HuiConfig.setStr("Input.TempFilename", backup_filename);
+	hui::Config.setStr("Input.TempFilename", backup_filename);
 }
 
 void InputStreamAudio::setTempBackupFilename(const string &filename)
@@ -380,7 +380,7 @@ void InputStreamAudio::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeated(update_dt, std::bind(&InputStreamAudio::update, this));
+	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&InputStreamAudio::update, this));
 	running = true;
 }
 
@@ -388,7 +388,7 @@ void InputStreamAudio::_stopUpdate()
 {
 	if (!running)
 		return;
-	HuiCancelRunner(hui_runner_id);
+	hui::CancelRunner(hui_runner_id);
 	hui_runner_id = -1;
 	running = false;
 }

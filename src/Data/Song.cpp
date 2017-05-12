@@ -185,7 +185,7 @@ void Song::newEmpty(int _sample_rate)
 	// default tags
 	addTag("title", "New Audio File");//_("New Audio File"));
 	addTag("album", AppName);
-	addTag("artist", HuiConfig.getStr("DefaultArtist", AppName));
+	addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
 
 	action_manager->enable(true);
 	notify();
@@ -363,7 +363,7 @@ Track *Song::addTrack(int type, int index)
 	return (Track*)execute(new ActionTrackAdd(index, type));
 }
 
-extern HuiTimer debug_timer;
+extern hui::Timer debug_timer;
 
 void Song::updatePeaks()
 {

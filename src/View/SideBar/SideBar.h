@@ -25,7 +25,7 @@ class MidiFxConsole;
 class CaptureConsole;
 class AudioView;
 
-class SideBarConsole : public HuiPanel
+class SideBarConsole : public hui::Panel
 {
 public:
 	SideBarConsole(const string &_title)
@@ -36,7 +36,7 @@ public:
 	virtual void onLeave(){}
 };
 
-class SideBar : public HuiPanel, public Observable
+class SideBar : public hui::Panel, public Observable
 {
 public:
 	SideBar(AudioView *view, Song *song);

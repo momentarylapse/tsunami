@@ -9,6 +9,7 @@
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Tsunami.h"
 #include "../AudioView.h"
+#include "../../lib/hui/hui.h"
 
 const int PeakMeter::NUM_SAMPLES = 1024;
 const int PeakMeter::SPECTRUM_SIZE = 30;
@@ -44,7 +45,7 @@ void PeakMeter::Data::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source, AudioView *_view) :
+PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_source, AudioView *_view) :
 	Observer("PeakMeter")
 {
 	panel = _panel;
@@ -56,6 +57,7 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	enabled = false;
 	r.reset();
 	l.reset();
+	timer = new hui::Timer;
 
 	panel->eventXP(id, "hui:draw", std::bind(&PeakMeter::onDraw, this, std::placeholders::_1));
 	panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeter::onLeftButtonDown, this));
@@ -67,6 +69,7 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 PeakMeter::~PeakMeter()
 {
 	setSource(NULL);
+	delete timer;
 }
 
 void PeakMeter::setSource(PeakMeterSource *_source)
@@ -155,7 +158,7 @@ void PeakMeter::onDraw(Painter *c)
 
 void PeakMeter::findPeaks()
 {
-	float dt = timer.peek();
+	float dt = timer->peek();
 	r.update(buf.c[0], dt);
 	l.update(buf.c[1], dt);
 }
@@ -218,7 +221,7 @@ void PeakMeter::onUpdate(Observable *o, const string &message)
 	int state = source->getState();
 
 	if (state == source->STATE_PLAYING){
-		if (timer.peek() < UPDATE_DT)
+		if (timer->peek() < UPDATE_DT)
 			return;
 		sample_rate = source->getSampleRate();
 		source->getSomeSamples(buf, NUM_SAMPLES);
@@ -226,7 +229,7 @@ void PeakMeter::onUpdate(Observable *o, const string &message)
 			findPeaks();
 		else if (mode == ModeSpectrum)
 			findSpectrum();
-		timer.get();
+		timer->get();
 	}else if (state == source->STATE_STOPPED){
 		clearData();
 	}

@@ -367,11 +367,11 @@ ConfigPanel *Configurable::createPanel()
 	}
 }*/
 
-class ConfigurationDialog : public HuiWindow, public Observer
+class ConfigurationDialog : public hui::Window, public Observer
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		HuiWindow("configurable_dialog", tsunami->win),
+		hui::Window("configurable_dialog", tsunami->win),
 		Observer("")
 	{
 		config = c;

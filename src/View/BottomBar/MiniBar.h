@@ -17,7 +17,7 @@ class DeviceManager;
 class BottomBar;
 class AudioView;
 
-class MiniBar : public HuiPanel, public Observer
+class MiniBar : public hui::Panel, public Observer
 {
 public:
 	MiniBar(BottomBar *bottom_bar, OutputStream *stream, DeviceManager *output, AudioView *view);

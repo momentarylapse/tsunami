@@ -8,8 +8,8 @@
 #include "PauseEditDialog.h"
 #include "../../Data/Song.h"
 
-PauseEditDialog::PauseEditDialog(HuiWindow *root, Song *_song, int _index, bool _apply_to_midi):
-	HuiDialog("", 100, 100, root, false)
+PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index, bool _apply_to_midi):
+	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("pause_edit_dialog");
 	song = _song;

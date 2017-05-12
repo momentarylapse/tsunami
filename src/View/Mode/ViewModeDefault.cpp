@@ -109,7 +109,9 @@ void ViewModeDefault::onMouseMove()
 {
 	bool _force_redraw_ = false;
 
-	if (HuiGetEvent()->lbut){
+	auto e = hui::GetEvent();
+
+	if (e->lbut){
 
 		// cheap auto scrolling
 		if (hover->allow_auto_scroll()){
@@ -141,12 +143,12 @@ void ViewModeDefault::onMouseMove()
 		_force_redraw_ = false;
 		int x, w;
 		int r = 4;
-		if (HuiGetEvent()->dx < 0){
+		if (e->dx < 0){
 			x = view->mx - r;
-			w = - HuiGetEvent()->dx + 2*r;
+			w = - e->dx + 2*r;
 		}else{
 			x = view->mx + r;
-			w = - HuiGetEvent()->dx - 2*r;
+			w = - e->dx - 2*r;
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());
 	}else if (selection->type == Selection::TYPE_PLAYBACK){
@@ -161,11 +163,11 @@ void ViewModeDefault::onMouseMove()
 	}
 
 	// selection:
-	if (!HuiGetEvent()->lbut){
+	if (!e->lbut){
 		mouse_possibly_selecting = -1;
 	}
 	if (mouse_possibly_selecting >= 0)
-		mouse_possibly_selecting += fabs(HuiGetEvent()->dx);
+		mouse_possibly_selecting += fabs(e->dx);
 	if (mouse_possibly_selecting > view->mouse_min_move_to_select){
 		view->sel_raw.offset = mouse_possibly_selecting_start;
 		view->sel_raw.length = selection->pos - mouse_possibly_selecting_start;
@@ -183,7 +185,7 @@ void ViewModeDefault::onMouseMove()
 
 void ViewModeDefault::onMouseWheel()
 {
-	HuiEvent *e = HuiGetEvent();
+	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f)
 		cam->zoom(exp(e->scroll_y * view->ZoomSpeed * 0.3f));
 	if (fabs(e->scroll_x) > 0.1f)
@@ -196,22 +198,22 @@ void ViewModeDefault::onKeyDown(int k)
 // view
 	// moving
 	float dt = 0.05f;
-	if (k == KEY_RIGHT)
+	if (k == hui::KEY_RIGHT)
 		cam->move(view->ScrollSpeed * dt / cam->scale);
-	if (k == KEY_LEFT)
+	if (k == hui::KEY_LEFT)
 		cam->move(- view->ScrollSpeed * dt / cam->scale);
-	if (k == KEY_NEXT)
+	if (k == hui::KEY_NEXT)
 		cam->move(view->ScrollSpeedFast * dt / cam->scale);
-	if (k == KEY_PRIOR)
+	if (k == hui::KEY_PRIOR)
 		cam->move(- view->ScrollSpeedFast * dt / cam->scale);
 
 	// zoom
-	if (k == KEY_ADD)
+	if (k == hui::KEY_ADD)
 		cam->zoom(exp(  view->ZoomSpeed));
-	if (k == KEY_SUBTRACT)
+	if (k == hui::KEY_SUBTRACT)
 		cam->zoom(exp(- view->ZoomSpeed));
 
-	if (k == KEY_SPACE){
+	if (k == hui::KEY_SPACE){
 		if (view->stream->isPlaying()){
 			view->stream->pause();
 		}else{
@@ -359,7 +361,7 @@ Selection ViewModeDefault::getHover()
 
 	// selection boundaries?
 	view->selectionUpdatePos(s);
-	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(KEY_SHIFT))){
+	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(hui::KEY_SHIFT))){
 		if (view->mouse_over_time(view->sel_raw.end())){
 			s.type = Selection::TYPE_SELECTION_END;
 			return s;
@@ -455,7 +457,7 @@ void ViewModeDefault::selectUnderMouse()
 	*selection = *hover;
 	Track *t = selection->track;
 	SampleRef *s = selection->sample;
-	bool control = win->getKey(KEY_CONTROL);
+	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
 	if (selection->track)

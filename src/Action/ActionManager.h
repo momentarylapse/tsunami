@@ -9,7 +9,6 @@
 #define ACTIONMANAGER_H_
 
 #include "../lib/base/base.h"
-#include "../lib/hui/HuiTimer.h"
 #include "Action.h"
 #include "../Data/Data.h"
 
@@ -17,6 +16,9 @@ class Data;
 class Action;
 class ActionGroup;
 class Mutex;
+namespace hui{
+	class Timer;
+}
 
 class ActionManager
 {
@@ -62,7 +64,7 @@ private:
 	ActionGroup *cur_group;
 
 	// for merging
-	HuiTimer timer;
+	hui::Timer *timer;
 
 	Mutex *mutex;
 };

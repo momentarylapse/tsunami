@@ -16,7 +16,7 @@
 #include "../../Tsunami.h"
 
 
-class SingleMidiFxPanel : public HuiPanel, public Observer
+class SingleMidiFxPanel : public hui::Panel, public Observer
 {
 public:
 	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index) :
@@ -167,7 +167,7 @@ void MidiFxConsole::clear()
 {
 	if (track)
 		unsubscribe(track);
-	foreachi(HuiPanel *p, panels, i){
+	foreachi(hui::Panel *p, panels, i){
 		delete(p);
 		removeControl("separator_" + i2s(i));
 	}
@@ -178,17 +178,17 @@ void MidiFxConsole::clear()
 
 void MidiFxConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	reinterpret_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void MidiFxConsole::onEditTrack()
 {
-	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+	reinterpret_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
 }
 
 void MidiFxConsole::onEditMidi()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
+	reinterpret_cast<SideBar*>(parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
 void MidiFxConsole::setTrack(Track *t)

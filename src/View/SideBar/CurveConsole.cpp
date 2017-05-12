@@ -12,11 +12,11 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-class CurveTargetDialog : public HuiWindow
+class CurveTargetDialog : public hui::Window
 {
 public:
-	CurveTargetDialog(HuiPanel *parent, Song *song, Array<Curve::Target> &t) :
-		HuiWindow(("curve-target-dialog"), parent->win),
+	CurveTargetDialog(hui::Panel *parent, Song *song, Array<Curve::Target> &t) :
+		hui::Window(("curve-target-dialog"), parent->win),
 		targets(t)
 	{
 		all_targets = Curve::Target::enumerate(song);
@@ -158,8 +158,8 @@ void CurveConsole::onListSelect()
 
 void CurveConsole::onListEdit()
 {
-	int n = HuiGetEvent()->row;
-	int col = HuiGetEvent()->column;
+	int n = hui::GetEvent()->row;
+	int col = hui::GetEvent()->column;
 	if (n >= 0){
 		if (col == 0)
 			song->curves[n]->name = getCell(id_list, n, col);
@@ -173,16 +173,16 @@ void CurveConsole::onListEdit()
 
 void CurveConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	dynamic_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void CurveConsole::onEditTrack()
 {
-	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+	dynamic_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
 }
 
 void CurveConsole::onEditFx()
 {
-	((SideBar*)parent)->open(SideBar::FX_CONSOLE);
+	dynamic_cast<SideBar*>(parent)->open(SideBar::FX_CONSOLE);
 }
 

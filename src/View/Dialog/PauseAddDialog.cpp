@@ -9,8 +9,8 @@
 #include "../../Data/Song.h"
 #include "../AudioView.h"
 
-PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *s, AudioView *v):
-	HuiDialog("", 100, 100, root, false)
+PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v):
+	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("pause_add_dialog");
 	song = s;

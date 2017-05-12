@@ -12,10 +12,10 @@
 #include "../../lib/hui/hui.h"
 #include "../../Data/Track.h"
 
-class MarkerDialog: public HuiWindow
+class MarkerDialog: public hui::Window
 {
 public:
-	MarkerDialog(HuiWindow *_parent, Track *t, int pos, int index);
+	MarkerDialog(hui::Window *_parent, Track *t, int pos, int index);
 	virtual ~MarkerDialog();
 
 	void onEdit();

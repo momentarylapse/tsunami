@@ -10,7 +10,9 @@
 
 #include "../lib/base/base.h"
 
-class HuiWindow;
+namespace hui{
+	class Window;
+}
 class TsunamiWindow;
 class AudioView;
 class Song;
@@ -26,7 +28,7 @@ public:
 
 	virtual void _cdecl apply(Song *song){}
 
-	HuiWindow *win;
+	hui::Window *win;
 	AudioView *view;
 };
 

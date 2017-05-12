@@ -146,21 +146,22 @@ void BarsConsole::selectToView()
 void BarsConsole::onListEdit()
 {
 	int sample_rate = song->sample_rate;
-	int index = HuiGetEvent()->row;
+	hui::Event* e = hui::GetEvent();
+	int index = e->row;
 	BarPattern b = song->bars[index];
-	string text = getCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
+	string text = getCell(id, e->row, e->column);
 	if (b.num_beats > 0){
-		if (HuiGetEvent()->column == 1){
+		if (e->column == 1){
 			float l = (float)b.length / (float)b.num_beats;
 			b.num_beats = text._int();
 			b.length = l * b.num_beats;
-		}else if (HuiGetEvent()->column == 2){
+		}else if (e->column == 2){
 			b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / text._float());
-		}else if (HuiGetEvent()->column == 3){
+		}else if (e->column == 3){
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}else{
-		if (HuiGetEvent()->column == 3){
+		if (e->column == 3){
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}

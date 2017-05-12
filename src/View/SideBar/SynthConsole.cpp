@@ -18,7 +18,7 @@
 
 
 
-class SynthPanel : public HuiPanel, public Observer
+class SynthPanel : public hui::Panel, public Observer
 {
 public:
 	SynthPanel(Track *t) :
@@ -52,7 +52,7 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, (Configurable*)synth, false);
+		string name = tsunami->plugin_manager->SelectFavoriteName(win, synth, false);
 		if (name.num == 0)
 			return;
 		tsunami->plugin_manager->ApplyFavorite(synth, name);
@@ -123,7 +123,7 @@ void SynthConsole::onSelect()
 
 void SynthConsole::onDetune()
 {
-	HuiDialog *dlg = new DetuneSynthesizerDialog(track->synth, track, view, win);
+	hui::Dialog *dlg = new DetuneSynthesizerDialog(track->synth, track, view, win);
 	dlg->show();
 }
 

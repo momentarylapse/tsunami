@@ -66,7 +66,7 @@ void ViewModeScaleBars::onMouseMove()
 
 void ViewModeScaleBars::onKeyDown(int k)
 {
-	if (k == KEY_ESCAPE)
+	if (k == hui::KEY_ESCAPE)
 		view->setMode(view->mode_default);
 }
 

@@ -20,7 +20,7 @@ class LogConsole;
 class DeviceConsole;
 class Log;
 
-class BottomBarConsole : public HuiPanel
+class BottomBarConsole : public hui::Panel
 {
 public:
 	BottomBarConsole(const string &_title)
@@ -28,7 +28,7 @@ public:
 	string title;
 };
 
-class BottomBar : public HuiPanel, public Observable
+class BottomBar : public hui::Panel, public Observable
 {
 public:
 	BottomBar(AudioView *view, Song *audio, DeviceManager *device_manager, Log *log);

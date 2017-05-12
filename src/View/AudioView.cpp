@@ -126,13 +126,13 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	dark.name = "dark";
 	basic_schemes.add(dark);
 
-	setColorScheme(HuiConfig.getStr("View.ColorScheme", "bright"));
+	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
 	song = _song;
 	input = NULL;
 
 	edit_multi = false;
-	midi_view_mode = HuiConfig.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
+	midi_view_mode = hui::Config.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
 
 	// modes
 	mode = NULL;
@@ -146,25 +146,25 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
 
-	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
-	mouse_min_move_to_select = HuiConfig.getInt("View.MouseMinMoveToSelect", 5);
-	preview_sleep_time = HuiConfig.getInt("PreviewSleepTime", 10);
-	ScrollSpeed = HuiConfig.getInt("View.ScrollSpeed", 300);
-	ScrollSpeedFast = HuiConfig.getInt("View.ScrollSpeedFast", 3000);
-	ZoomSpeed = HuiConfig.getFloat("View.ZoomSpeed", 0.1f);
-	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
+	detail_steps = hui::Config.getInt("View.DetailSteps", 1);
+	mouse_min_move_to_select = hui::Config.getInt("View.MouseMinMoveToSelect", 5);
+	preview_sleep_time = hui::Config.getInt("PreviewSleepTime", 10);
+	ScrollSpeed = hui::Config.getInt("View.ScrollSpeed", 300);
+	ScrollSpeedFast = hui::Config.getInt("View.ScrollSpeedFast", 3000);
+	ZoomSpeed = hui::Config.getFloat("View.ZoomSpeed", 0.1f);
+	antialiasing = hui::Config.getBool("View.Antialiasing", false);
 
-	images.speaker = LoadImage(HuiAppDirectoryStatic + "Data/volume.tga");
+	images.speaker = LoadImage(hui::AppDirectoryStatic + "Data/volume.tga");
 	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
-	images.x = LoadImage(HuiAppDirectoryStatic + "Data/x.tga");
+	images.x = LoadImage(hui::AppDirectoryStatic + "Data/x.tga");
 	images.x_bg = ExpandImageMask(images.x, 1.5f);
-	images.solo = LoadImage(HuiAppDirectoryStatic + "Data/solo.tga");
+	images.solo = LoadImage(hui::AppDirectoryStatic + "Data/solo.tga");
 	images.solo_bg = ExpandImageMask(images.solo, 1.5f);
-	images.track_audio = LoadImage(HuiAppDirectoryStatic + "Data/track-audio.tga");
+	images.track_audio = LoadImage(hui::AppDirectoryStatic + "Data/track-audio.tga");
 	images.track_audio_bg = ExpandImageMask(images.track_audio, 1.5f);
-	images.track_time = LoadImage(HuiAppDirectoryStatic + "Data/track-time.tga");
+	images.track_time = LoadImage(hui::AppDirectoryStatic + "Data/track-time.tga");
 	images.track_time_bg = ExpandImageMask(images.track_time, 1.5f);
-	images.track_midi = LoadImage(HuiAppDirectoryStatic + "Data/track-midi.tga");
+	images.track_midi = LoadImage(hui::AppDirectoryStatic + "Data/track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
 	cur_track = NULL;
@@ -204,10 +204,10 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	parent->activate("area");
 
 
-	menu_song = HuiCreateResourceMenu("popup_song_menu");
-	menu_track = HuiCreateResourceMenu("popup_track_menu");
-	menu_sample = HuiCreateResourceMenu("popup_sample_menu");
-	menu_marker = HuiCreateResourceMenu("popup_marker_menu");
+	menu_song = hui::CreateResourceMenu("popup_song_menu");
+	menu_track = hui::CreateResourceMenu("popup_track_menu");
+	menu_sample = hui::CreateResourceMenu("popup_sample_menu");
+	menu_marker = hui::CreateResourceMenu("popup_marker_menu");
 
 	//ForceRedraw();
 	updateMenu();
@@ -242,18 +242,18 @@ AudioView::~AudioView()
 	delete(images.track_time);
 	delete(images.track_time_bg);
 
-	HuiConfig.setInt("View.DetailSteps", detail_steps);
-	HuiConfig.setInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
-	HuiConfig.setInt("View.ScrollSpeed", ScrollSpeed);
-	HuiConfig.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
-	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
-	HuiConfig.setBool("View.Antialiasing", antialiasing);
-	HuiConfig.setInt("View.MidiMode", midi_view_mode);
+	hui::Config.setInt("View.DetailSteps", detail_steps);
+	hui::Config.setInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
+	hui::Config.setInt("View.ScrollSpeed", ScrollSpeed);
+	hui::Config.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
+	hui::Config.setFloat("View.ZoomSpeed", ZoomSpeed);
+	hui::Config.setBool("View.Antialiasing", antialiasing);
+	hui::Config.setInt("View.MidiMode", midi_view_mode);
 }
 
 void AudioView::setColorScheme(const string &name)
 {
-	HuiConfig.setStr("View.ColorScheme", name);
+	hui::Config.setStr("View.ColorScheme", name);
 	colors.create(basic_schemes[0]);
 	for (ColorSchemeBasic &b : basic_schemes)
 		if (b.name == name)
@@ -277,8 +277,8 @@ void AudioView::setScale(const Scale &s)
 
 void AudioView::setMouse()
 {
-	mx = HuiGetEvent()->mx;
-	my = HuiGetEvent()->my;
+	mx = hui::GetEvent()->mx;
+	my = hui::GetEvent()->my;
 }
 
 bool AudioView::mouseOverTrack(AudioViewTrack *t)
@@ -430,13 +430,13 @@ void AudioView::onCommand(const string & id)
 
 void AudioView::onKeyDown()
 {
-	int k = HuiGetEvent()->key_code;
+	int k = hui::GetEvent()->key_code;
 	mode->onKeyDown(k);
 }
 
 void AudioView::onKeyUp()
 {
-	int k = HuiGetEvent()->key_code;
+	int k = hui::GetEvent()->key_code;
 	mode->onKeyUp(k);
 }
 
@@ -742,7 +742,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	repeat |= is_updating_peaks;
 
 	if (repeat)
-		HuiRunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
+		hui::RunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
 }
 
 int frame=0;
@@ -803,7 +803,7 @@ void AudioView::updatePeaks()
 			forceRedraw();
 			break;
 		}else
-			HuiSleep(0.001f);
+			hui::Sleep(0.001f);
 	}
 }
 

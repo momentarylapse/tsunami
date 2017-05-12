@@ -20,7 +20,7 @@ class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
 
-class TsunamiWindow : public HuiWindow
+class TsunamiWindow : public hui::Window
 {
 public:
 	TsunamiWindow();

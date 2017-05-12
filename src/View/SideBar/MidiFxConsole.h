@@ -39,7 +39,7 @@ public:
 	AudioView *view;
 	Track *track;
 	Song *song;
-	Array<HuiPanel*> panels;
+	Array<hui::Panel*> panels;
 };
 
 #endif /* MIDIFXCONSOLE_H_ */

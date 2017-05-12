@@ -42,12 +42,12 @@ Storage::Storage()
 #endif
 	formats.add(new FormatDescriptorMidi());
 
-	current_directory = HuiConfig.getStr("CurrentDirectory", "");
+	current_directory = hui::Config.getStr("CurrentDirectory", "");
 }
 
 Storage::~Storage()
 {
-	HuiConfig.setStr("CurrentDirectory", current_directory);
+	hui::Config.setStr("CurrentDirectory", current_directory);
 
 	for (FormatDescriptor *d : formats)
 		delete(d);
@@ -175,7 +175,7 @@ bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 	return true;
 }
 
-bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
+bool Storage::askByFlags(hui::Window *win, const string &title, int flags)
 {
 	string filter, filter_show;
 	filter_show = _("all known files");
@@ -209,27 +209,27 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 			filter_show += ")";
 		}
 	if (flags & FormatDescriptor::FLAG_WRITE)
-		return HuiFileDialogSave(win, title, current_directory, filter_show, filter);
+		return hui::FileDialogSave(win, title, current_directory, filter_show, filter);
 	else
-		return HuiFileDialogOpen(win, title, current_directory, filter_show, filter);
+		return hui::FileDialogOpen(win, title, current_directory, filter_show, filter);
 }
 
-bool Storage::askOpen(HuiWindow *win)
+bool Storage::askOpen(hui::Window *win)
 {
 	return askByFlags(win, _("Open file"), FormatDescriptor::FLAG_READ);
 }
 
-bool Storage::askSave(HuiWindow *win)
+bool Storage::askSave(hui::Window *win)
 {
 	return askByFlags(win, _("Save file"), FormatDescriptor::FLAG_WRITE);
 }
 
-bool Storage::askOpenImport(HuiWindow *win)
+bool Storage::askOpenImport(hui::Window *win)
 {
 	return askByFlags(win, _("Import file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_READ);
 }
 
-bool Storage::askSaveExport(HuiWindow *win)
+bool Storage::askSaveExport(hui::Window *win)
 {
 	return askByFlags(win, _("Export file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_WRITE);
 }

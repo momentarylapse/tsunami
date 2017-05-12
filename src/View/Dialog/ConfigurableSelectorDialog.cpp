@@ -13,13 +13,13 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Plugin.h"
 
-ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, Song *_song, const string &old_name) :
-	HuiWindow("configurable-selection-dialog", _parent)
+ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Song *_song, const string &old_name) :
+	hui::Window("configurable-selection-dialog", _parent)
 {
 	type = _type;
 	song = _song;
 	if (type == Configurable::TYPE_EFFECT){
-		string prefix = HuiAppDirectoryStatic + "Plugins/Buffer/";
+		string prefix = hui::AppDirectoryStatic + "Plugins/Buffer/";
 		for (auto &pf : tsunami->plugin_manager->plugin_files){
 			if (pf.filename.match(prefix + "*")){
 				names.add(pf.name);
@@ -100,7 +100,7 @@ void ConfigurableSelectorDialog::onOk()
 	onSelect();
 }
 
-Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_name)
+Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
 	dlg->run();

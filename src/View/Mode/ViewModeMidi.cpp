@@ -216,24 +216,24 @@ void ViewModeMidi::onKeyDown(int k)
 {
 	int mode = which_midi_mode(cur_track->track);
 	if (mode == AudioView::MIDI_MODE_CLASSICAL){
-		if (k == KEY_1){
+		if (k == hui::KEY_1){
 			modifier = MODIFIER_NONE;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
-		}else if (k == KEY_2){
+		}else if (k == hui::KEY_2){
 			modifier = MODIFIER_SHARP;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
-		}else if (k == KEY_3){
+		}else if (k == hui::KEY_3){
 			modifier = MODIFIER_FLAT;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
-		}else if (k == KEY_4){
+		}else if (k == hui::KEY_4){
 			modifier = MODIFIER_NATURAL;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}
 
 
-		if ((k >= KEY_A) and (k <= KEY_G)){
+		if ((k >= hui::KEY_A) and (k <= hui::KEY_G)){
 			Range r = getMidiEditRange();
-			int number = (k - KEY_A);
+			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
 			MidiNote n = MidiNote(r, pitch, 1.0f);
@@ -243,19 +243,19 @@ void ViewModeMidi::onKeyDown(int k)
 			startMidiPreview(pitch, 0.1f);
 
 		}
-		if (k == KEY_UP){
+		if (k == hui::KEY_UP){
 			octave = min(octave + 1, 7);
 			view->forceRedraw();
 		}
-		if (k == KEY_DOWN){
+		if (k == hui::KEY_DOWN){
 			octave = max(octave - 1, 0);
 			view->forceRedraw();
 		}
 	}else if (mode == AudioView::MIDI_MODE_TAB){
 
-		if ((k >= KEY_0) and (k <= KEY_9)){
+		if ((k >= hui::KEY_0) and (k <= hui::KEY_9)){
 			Range r = getMidiEditRange();
-			int number = (k - KEY_0);
+			int number = (k - hui::KEY_0);
 			int pitch = cur_track->track->instrument.string_pitch[string_no] + number;
 			MidiNote n = MidiNote(r, pitch, 1.0f);
 			n.stringno = string_no;
@@ -265,11 +265,11 @@ void ViewModeMidi::onKeyDown(int k)
 			startMidiPreview(pitch, 0.1f);
 
 		}
-		if (k == KEY_UP){
+		if (k == hui::KEY_UP){
 			string_no = min(string_no + 1, cur_track->track->instrument.string_pitch.num - 1);
 			view->forceRedraw();
 		}
-		if (k == KEY_DOWN){
+		if (k == hui::KEY_DOWN){
 			string_no = max(string_no - 1, 0);
 			view->forceRedraw();
 		}
@@ -626,7 +626,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 		if ((mode == view->MIDI_MODE_CLASSICAL) or (mode == view->MIDI_MODE_LINEAR)){
 
 			// current creation
-			if ((HuiGetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH)){
+			if ((hui::GetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH)){
 				MidiData notes = getCreationNotes(selection, mouse_possibly_selecting_start);
 				drawMidi(c, t, notes, false, 0);
 				//c->setFontSize(view->FONT_SIZE);
@@ -634,7 +634,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 
 			// creation preview
-			if ((!HuiGetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
+			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
 				MidiData notes = getCreationNotes(hover, hover->pos);
 				drawMidi(c, t, notes, false, 0);
 			}

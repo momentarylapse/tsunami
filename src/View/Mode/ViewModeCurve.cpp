@@ -43,7 +43,7 @@ void ViewModeCurve::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
 
-	if (HuiGetEvent()->lbut){
+	if (hui::GetEvent()->lbut){
 		if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT)){
 			curve->points[selection->index].pos = cam->screen2sample(view->mx);
 			curve->points[selection->index].value = clampf(screen2value(view->my), curve->min, curve->max);
@@ -57,7 +57,7 @@ void ViewModeCurve::onKeyDown(int k)
 	ViewModeDefault::onKeyDown(k);
 
 	if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT))
-		if (k == KEY_DELETE){
+		if (k == hui::KEY_DELETE){
 			curve->points.erase(selection->index);
 			selection->clear();
 			hover->clear();

@@ -105,67 +105,67 @@ OBJ = \
  lib/file/file.o\
  lib/file/file_op.o\
  lib/file/msg.o\
- lib/hui/Controls/HuiControl.o\
- lib/hui/Controls/HuiControlButtonGtk.o\
- lib/hui/Controls/HuiControlCheckBoxGtk.o\
- lib/hui/Controls/HuiControlColorButtonGtk.o\
- lib/hui/Controls/HuiControlComboBoxGtk.o\
- lib/hui/Controls/HuiControlDrawingAreaGtk.o\
- lib/hui/Controls/HuiControlEditGtk.o\
- lib/hui/Controls/HuiControlExpanderGtk.o\
- lib/hui/Controls/HuiControlGridGtk.o\
- lib/hui/Controls/HuiControlGroupGtk.o\
- lib/hui/Controls/HuiControlLabelGtk.o\
- lib/hui/Controls/HuiControlListViewGtk.o\
- lib/hui/Controls/HuiControlMultilineEditGtk.o\
- lib/hui/Controls/HuiControlPanedGtk.o\
- lib/hui/Controls/HuiControlProgressBarGtk.o\
- lib/hui/Controls/HuiControlRadioButtonGtk.o\
- lib/hui/Controls/HuiControlRevealerGtk.o\
- lib/hui/Controls/HuiControlScrollerGtk.o\
- lib/hui/Controls/HuiControlSeparatorGtk.o\
- lib/hui/Controls/HuiControlSliderGtk.o\
- lib/hui/Controls/HuiControlSpinButtonGtk.o\
- lib/hui/Controls/HuiControlTabControlGtk.o\
- lib/hui/Controls/HuiControlToggleButtonGtk.o\
- lib/hui/Controls/HuiControlTreeViewGtk.o\
- lib/hui/Controls/HuiMenuItemGtk.o\
- lib/hui/Controls/HuiMenuItemSeparatorGtk.o\
- lib/hui/Controls/HuiMenuItemSubmenuGtk.o\
- lib/hui/Controls/HuiMenuItemToggleGtk.o\
- lib/hui/Controls/HuiToolItemButtonGtk.o\
- lib/hui/Controls/HuiToolItemMenuButtonGtk.o\
- lib/hui/Controls/HuiToolItemSeparatorGtk.o\
- lib/hui/Controls/HuiToolItemToggleButtonGtk.o\
+ lib/hui/Controls/Control.o\
+ lib/hui/Controls/ControlButtonGtk.o\
+ lib/hui/Controls/ControlCheckBoxGtk.o\
+ lib/hui/Controls/ControlColorButtonGtk.o\
+ lib/hui/Controls/ControlComboBoxGtk.o\
+ lib/hui/Controls/ControlDrawingAreaGtk.o\
+ lib/hui/Controls/ControlEditGtk.o\
+ lib/hui/Controls/ControlExpanderGtk.o\
+ lib/hui/Controls/ControlGridGtk.o\
+ lib/hui/Controls/ControlGroupGtk.o\
+ lib/hui/Controls/ControlLabelGtk.o\
+ lib/hui/Controls/ControlListViewGtk.o\
+ lib/hui/Controls/ControlMultilineEditGtk.o\
+ lib/hui/Controls/ControlPanedGtk.o\
+ lib/hui/Controls/ControlProgressBarGtk.o\
+ lib/hui/Controls/ControlRadioButtonGtk.o\
+ lib/hui/Controls/ControlRevealerGtk.o\
+ lib/hui/Controls/ControlScrollerGtk.o\
+ lib/hui/Controls/ControlSeparatorGtk.o\
+ lib/hui/Controls/ControlSliderGtk.o\
+ lib/hui/Controls/ControlSpinButtonGtk.o\
+ lib/hui/Controls/ControlTabControlGtk.o\
+ lib/hui/Controls/ControlToggleButtonGtk.o\
+ lib/hui/Controls/ControlTreeViewGtk.o\
+ lib/hui/Controls/MenuItemGtk.o\
+ lib/hui/Controls/MenuItemSeparatorGtk.o\
+ lib/hui/Controls/MenuItemSubmenuGtk.o\
+ lib/hui/Controls/MenuItemToggleGtk.o\
+ lib/hui/Controls/ToolItemButtonGtk.o\
+ lib/hui/Controls/ToolItemMenuButtonGtk.o\
+ lib/hui/Controls/ToolItemSeparatorGtk.o\
+ lib/hui/Controls/ToolItemToggleButtonGtk.o\
  lib/hui/hui.o\
- lib/hui/hui_clipboard.o\
- lib/hui/hui_common_dlg.o\
- lib/hui/hui_common_dlg_gtk.o\
- lib/hui/hui_common_dlg_win.o\
- lib/hui/hui_error.o\
- lib/hui/hui_input.o\
- lib/hui/hui_language.o\
- lib/hui/hui_main_gtk.o\
- lib/hui/hui_main_win.o\
- lib/hui/hui_resource.o\
- lib/hui/hui_utility.o\
- lib/hui/hui_window_control.o\
- lib/hui/hui_window_control_gtk.o\
- lib/hui/hui_window_control_win.o\
- lib/hui/HuiApplication.o\
- lib/hui/HuiConfig.o\
- lib/hui/HuiMenu.o\
- lib/hui/HuiMenuGtk.o\
- lib/hui/HuiMenuWin.o\
- lib/hui/HuiPainterGtk.o\
- lib/hui/HuiPanel.o\
- lib/hui/HuiTimer.o\
- lib/hui/HuiToolbar.o\
- lib/hui/HuiToolbarGtk.o\
- lib/hui/HuiToolbarWin.o\
- lib/hui/HuiWindow.o\
- lib/hui/HuiWindowGtk.o\
- lib/hui/HuiWindowWin.o\
+ lib/hui/clipboard.o\
+ lib/hui/common_dlg.o\
+ lib/hui/common_dlg_gtk.o\
+ lib/hui/common_dlg_win.o\
+ lib/hui/error.o\
+ lib/hui/input.o\
+ lib/hui/language.o\
+ lib/hui/main_gtk.o\
+ lib/hui/main_win.o\
+ lib/hui/resource.o\
+ lib/hui/utility.o\
+ lib/hui/window_control.o\
+ lib/hui/window_control_gtk.o\
+ lib/hui/window_control_win.o\
+ lib/hui/Application.o\
+ lib/hui/Config.o\
+ lib/hui/Menu.o\
+ lib/hui/MenuGtk.o\
+ lib/hui/MenuWin.o\
+ lib/hui/PainterGtk.o\
+ lib/hui/Panel.o\
+ lib/hui/Timer.o\
+ lib/hui/Toolbar.o\
+ lib/hui/ToolbarGtk.o\
+ lib/hui/ToolbarWin.o\
+ lib/hui/Window.o\
+ lib/hui/WindowGtk.o\
+ lib/hui/WindowWin.o\
  lib/image/color.o\
  lib/image/image.o\
  lib/image/image_bmp.o\
@@ -612,185 +612,185 @@ lib/file/file_op.o : lib/file/file_op.cpp
 lib/file/msg.o : lib/file/msg.cpp
 	$(CPP) -c lib/file/msg.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControl.o : lib/hui/Controls/HuiControl.cpp
-	$(CPP) -c lib/hui/Controls/HuiControl.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/Control.o : lib/hui/Controls/Control.cpp
+	$(CPP) -c lib/hui/Controls/Control.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlButtonGtk.o : lib/hui/Controls/HuiControlButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlButtonGtk.o : lib/hui/Controls/ControlButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlCheckBoxGtk.o : lib/hui/Controls/HuiControlCheckBoxGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlCheckBoxGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlCheckBoxGtk.o : lib/hui/Controls/ControlCheckBoxGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlCheckBoxGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlColorButtonGtk.o : lib/hui/Controls/HuiControlColorButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlColorButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlColorButtonGtk.o : lib/hui/Controls/ControlColorButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlColorButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlComboBoxGtk.o : lib/hui/Controls/HuiControlComboBoxGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlComboBoxGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlComboBoxGtk.o : lib/hui/Controls/ControlComboBoxGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlComboBoxGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlDrawingAreaGtk.o : lib/hui/Controls/HuiControlDrawingAreaGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlDrawingAreaGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlDrawingAreaGtk.o : lib/hui/Controls/ControlDrawingAreaGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlDrawingAreaGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlEditGtk.o : lib/hui/Controls/HuiControlEditGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlEditGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlEditGtk.o : lib/hui/Controls/ControlEditGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlEditGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlExpanderGtk.o : lib/hui/Controls/HuiControlExpanderGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlExpanderGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlExpanderGtk.o : lib/hui/Controls/ControlExpanderGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlExpanderGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlGridGtk.o : lib/hui/Controls/HuiControlGridGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlGridGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlGridGtk.o : lib/hui/Controls/ControlGridGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlGridGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlGroupGtk.o : lib/hui/Controls/HuiControlGroupGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlGroupGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlGroupGtk.o : lib/hui/Controls/ControlGroupGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlGroupGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlLabelGtk.o : lib/hui/Controls/HuiControlLabelGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlLabelGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlLabelGtk.o : lib/hui/Controls/ControlLabelGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlLabelGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlListViewGtk.o : lib/hui/Controls/HuiControlListViewGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlListViewGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlListViewGtk.o : lib/hui/Controls/ControlListViewGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlListViewGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlMultilineEditGtk.o : lib/hui/Controls/HuiControlMultilineEditGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlMultilineEditGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlMultilineEditGtk.o : lib/hui/Controls/ControlMultilineEditGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlMultilineEditGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlPanedGtk.o : lib/hui/Controls/HuiControlPanedGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlPanedGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlPanedGtk.o : lib/hui/Controls/ControlPanedGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlPanedGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlProgressBarGtk.o : lib/hui/Controls/HuiControlProgressBarGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlProgressBarGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlProgressBarGtk.o : lib/hui/Controls/ControlProgressBarGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlProgressBarGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlRadioButtonGtk.o : lib/hui/Controls/HuiControlRadioButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlRadioButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlRadioButtonGtk.o : lib/hui/Controls/ControlRadioButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlRadioButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlRevealerGtk.o : lib/hui/Controls/HuiControlRevealerGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlRevealerGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlRevealerGtk.o : lib/hui/Controls/ControlRevealerGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlRevealerGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlScrollerGtk.o : lib/hui/Controls/HuiControlScrollerGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlScrollerGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlScrollerGtk.o : lib/hui/Controls/ControlScrollerGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlScrollerGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlSeparatorGtk.o : lib/hui/Controls/HuiControlSeparatorGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlSeparatorGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlSeparatorGtk.o : lib/hui/Controls/ControlSeparatorGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlSeparatorGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlSliderGtk.o : lib/hui/Controls/HuiControlSliderGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlSliderGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlSliderGtk.o : lib/hui/Controls/ControlSliderGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlSliderGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlSpinButtonGtk.o : lib/hui/Controls/HuiControlSpinButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlSpinButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlSpinButtonGtk.o : lib/hui/Controls/ControlSpinButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlSpinButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlTabControlGtk.o : lib/hui/Controls/HuiControlTabControlGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlTabControlGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlTabControlGtk.o : lib/hui/Controls/ControlTabControlGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlTabControlGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlToggleButtonGtk.o : lib/hui/Controls/HuiControlToggleButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlToggleButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlToggleButtonGtk.o : lib/hui/Controls/ControlToggleButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlToggleButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiControlTreeViewGtk.o : lib/hui/Controls/HuiControlTreeViewGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiControlTreeViewGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ControlTreeViewGtk.o : lib/hui/Controls/ControlTreeViewGtk.cpp
+	$(CPP) -c lib/hui/Controls/ControlTreeViewGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiMenuItemGtk.o : lib/hui/Controls/HuiMenuItemGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiMenuItemGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/MenuItemGtk.o : lib/hui/Controls/MenuItemGtk.cpp
+	$(CPP) -c lib/hui/Controls/MenuItemGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiMenuItemSeparatorGtk.o : lib/hui/Controls/HuiMenuItemSeparatorGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiMenuItemSeparatorGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/MenuItemSeparatorGtk.o : lib/hui/Controls/MenuItemSeparatorGtk.cpp
+	$(CPP) -c lib/hui/Controls/MenuItemSeparatorGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiMenuItemSubmenuGtk.o : lib/hui/Controls/HuiMenuItemSubmenuGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiMenuItemSubmenuGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/MenuItemSubmenuGtk.o : lib/hui/Controls/MenuItemSubmenuGtk.cpp
+	$(CPP) -c lib/hui/Controls/MenuItemSubmenuGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiMenuItemToggleGtk.o : lib/hui/Controls/HuiMenuItemToggleGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiMenuItemToggleGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/MenuItemToggleGtk.o : lib/hui/Controls/MenuItemToggleGtk.cpp
+	$(CPP) -c lib/hui/Controls/MenuItemToggleGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiToolItemButtonGtk.o : lib/hui/Controls/HuiToolItemButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiToolItemButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ToolItemButtonGtk.o : lib/hui/Controls/ToolItemButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ToolItemButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiToolItemMenuButtonGtk.o : lib/hui/Controls/HuiToolItemMenuButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiToolItemMenuButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ToolItemMenuButtonGtk.o : lib/hui/Controls/ToolItemMenuButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ToolItemMenuButtonGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiToolItemSeparatorGtk.o : lib/hui/Controls/HuiToolItemSeparatorGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiToolItemSeparatorGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ToolItemSeparatorGtk.o : lib/hui/Controls/ToolItemSeparatorGtk.cpp
+	$(CPP) -c lib/hui/Controls/ToolItemSeparatorGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/Controls/HuiToolItemToggleButtonGtk.o : lib/hui/Controls/HuiToolItemToggleButtonGtk.cpp
-	$(CPP) -c lib/hui/Controls/HuiToolItemToggleButtonGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/Controls/ToolItemToggleButtonGtk.o : lib/hui/Controls/ToolItemToggleButtonGtk.cpp
+	$(CPP) -c lib/hui/Controls/ToolItemToggleButtonGtk.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/hui.o : lib/hui/hui.cpp
 	$(CPP) -c lib/hui/hui.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_clipboard.o : lib/hui/hui_clipboard.cpp
-	$(CPP) -c lib/hui/hui_clipboard.cpp -o $@ $(CXXFLAGS)
+lib/hui/clipboard.o : lib/hui/clipboard.cpp
+	$(CPP) -c lib/hui/clipboard.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_common_dlg.o : lib/hui/hui_common_dlg.cpp
-	$(CPP) -c lib/hui/hui_common_dlg.cpp -o $@ $(CXXFLAGS)
+lib/hui/common_dlg.o : lib/hui/common_dlg.cpp
+	$(CPP) -c lib/hui/common_dlg.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_common_dlg_gtk.o : lib/hui/hui_common_dlg_gtk.cpp
-	$(CPP) -c lib/hui/hui_common_dlg_gtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/common_dlg_gtk.o : lib/hui/common_dlg_gtk.cpp
+	$(CPP) -c lib/hui/common_dlg_gtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_common_dlg_win.o : lib/hui/hui_common_dlg_win.cpp
-	$(CPP) -c lib/hui/hui_common_dlg_win.cpp -o $@ $(CXXFLAGS)
+lib/hui/common_dlg_win.o : lib/hui/common_dlg_win.cpp
+	$(CPP) -c lib/hui/common_dlg_win.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_error.o : lib/hui/hui_error.cpp
-	$(CPP) -c lib/hui/hui_error.cpp -o $@ $(CXXFLAGS)
+lib/hui/error.o : lib/hui/error.cpp
+	$(CPP) -c lib/hui/error.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_input.o : lib/hui/hui_input.cpp
-	$(CPP) -c lib/hui/hui_input.cpp -o $@ $(CXXFLAGS)
+lib/hui/input.o : lib/hui/input.cpp
+	$(CPP) -c lib/hui/input.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_language.o : lib/hui/hui_language.cpp
-	$(CPP) -c lib/hui/hui_language.cpp -o $@ $(CXXFLAGS)
+lib/hui/language.o : lib/hui/language.cpp
+	$(CPP) -c lib/hui/language.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_main_gtk.o : lib/hui/hui_main_gtk.cpp
-	$(CPP) -c lib/hui/hui_main_gtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/main_gtk.o : lib/hui/main_gtk.cpp
+	$(CPP) -c lib/hui/main_gtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_main_win.o : lib/hui/hui_main_win.cpp
-	$(CPP) -c lib/hui/hui_main_win.cpp -o $@ $(CXXFLAGS)
+lib/hui/main_win.o : lib/hui/main_win.cpp
+	$(CPP) -c lib/hui/main_win.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_resource.o : lib/hui/hui_resource.cpp
-	$(CPP) -c lib/hui/hui_resource.cpp -o $@ $(CXXFLAGS)
+lib/hui/resource.o : lib/hui/resource.cpp
+	$(CPP) -c lib/hui/resource.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_utility.o : lib/hui/hui_utility.cpp
-	$(CPP) -c lib/hui/hui_utility.cpp -o $@ $(CXXFLAGS)
+lib/hui/utility.o : lib/hui/utility.cpp
+	$(CPP) -c lib/hui/utility.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_window_control.o : lib/hui/hui_window_control.cpp
-	$(CPP) -c lib/hui/hui_window_control.cpp -o $@ $(CXXFLAGS)
+lib/hui/window_control.o : lib/hui/window_control.cpp
+	$(CPP) -c lib/hui/window_control.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_window_control_gtk.o : lib/hui/hui_window_control_gtk.cpp
-	$(CPP) -c lib/hui/hui_window_control_gtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/window_control_gtk.o : lib/hui/window_control_gtk.cpp
+	$(CPP) -c lib/hui/window_control_gtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/hui_window_control_win.o : lib/hui/hui_window_control_win.cpp
-	$(CPP) -c lib/hui/hui_window_control_win.cpp -o $@ $(CXXFLAGS)
+lib/hui/window_control_win.o : lib/hui/window_control_win.cpp
+	$(CPP) -c lib/hui/window_control_win.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiConfig.o : lib/hui/HuiConfig.cpp
-	$(CPP) -c lib/hui/HuiConfig.cpp -o $@ $(CXXFLAGS)
+lib/hui/Config.o : lib/hui/Config.cpp
+	$(CPP) -c lib/hui/Config.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiMenu.o : lib/hui/HuiMenu.cpp
-	$(CPP) -c lib/hui/HuiMenu.cpp -o $@ $(CXXFLAGS)
+lib/hui/Menu.o : lib/hui/Menu.cpp
+	$(CPP) -c lib/hui/Menu.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiMenuGtk.o : lib/hui/HuiMenuGtk.cpp
-	$(CPP) -c lib/hui/HuiMenuGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/MenuGtk.o : lib/hui/MenuGtk.cpp
+	$(CPP) -c lib/hui/MenuGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiMenuWin.o : lib/hui/HuiMenuWin.cpp
-	$(CPP) -c lib/hui/HuiMenuWin.cpp -o $@ $(CXXFLAGS)
+lib/hui/MenuWin.o : lib/hui/MenuWin.cpp
+	$(CPP) -c lib/hui/MenuWin.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiPainterGtk.o : lib/hui/HuiPainterGtk.cpp
-	$(CPP) -c lib/hui/HuiPainterGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/PainterGtk.o : lib/hui/PainterGtk.cpp
+	$(CPP) -c lib/hui/PainterGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiPanel.o : lib/hui/HuiPanel.cpp
-	$(CPP) -c lib/hui/HuiPanel.cpp -o $@ $(CXXFLAGS)
+lib/hui/Panel.o : lib/hui/Panel.cpp
+	$(CPP) -c lib/hui/Panel.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiTimer.o : lib/hui/HuiTimer.cpp
-	$(CPP) -c lib/hui/HuiTimer.cpp -o $@ $(CXXFLAGS)
+lib/hui/Timer.o : lib/hui/Timer.cpp
+	$(CPP) -c lib/hui/Timer.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiToolbar.o : lib/hui/HuiToolbar.cpp
-	$(CPP) -c lib/hui/HuiToolbar.cpp -o $@ $(CXXFLAGS)
+lib/hui/Toolbar.o : lib/hui/Toolbar.cpp
+	$(CPP) -c lib/hui/Toolbar.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiToolbarGtk.o : lib/hui/HuiToolbarGtk.cpp
-	$(CPP) -c lib/hui/HuiToolbarGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/ToolbarGtk.o : lib/hui/ToolbarGtk.cpp
+	$(CPP) -c lib/hui/ToolbarGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiToolbarWin.o : lib/hui/HuiToolbarWin.cpp
-	$(CPP) -c lib/hui/HuiToolbarWin.cpp -o $@ $(CXXFLAGS)
+lib/hui/ToolbarWin.o : lib/hui/ToolbarWin.cpp
+	$(CPP) -c lib/hui/ToolbarWin.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiWindow.o : lib/hui/HuiWindow.cpp
-	$(CPP) -c lib/hui/HuiWindow.cpp -o $@ $(CXXFLAGS)
+lib/hui/Window.o : lib/hui/Window.cpp
+	$(CPP) -c lib/hui/Window.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiWindowGtk.o : lib/hui/HuiWindowGtk.cpp
-	$(CPP) -c lib/hui/HuiWindowGtk.cpp -o $@ $(CXXFLAGS)
+lib/hui/WindowGtk.o : lib/hui/WindowGtk.cpp
+	$(CPP) -c lib/hui/WindowGtk.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/HuiWindowWin.o : lib/hui/HuiWindowWin.cpp
-	$(CPP) -c lib/hui/HuiWindowWin.cpp -o $@ $(CXXFLAGS)
+lib/hui/WindowWin.o : lib/hui/WindowWin.cpp
+	$(CPP) -c lib/hui/WindowWin.cpp -o $@ $(CXXFLAGS)
 
 lib/image/color.o : lib/image/color.cpp
 	$(CPP) -c lib/image/color.cpp -o $@ $(CXXFLAGS)
@@ -1190,7 +1190,7 @@ clean :
 install : all
 	mkdir -p /usr/share/tsunami
 	mkdir -p /usr/share/tsunami/Data
-	cp -f ../Data/hui_resources.txt    /usr/share/tsunami/Data
+	cp -f ../Data/resources.txt    /usr/share/tsunami/Data
 	cp -f ../Data/icon.*               /usr/share/tsunami/Data
 	cp -f ../Data/*.tga                /usr/share/tsunami/Data
 	cp -f ../Data/license.txt          /usr/share/tsunami/Data

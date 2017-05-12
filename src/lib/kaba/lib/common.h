@@ -27,9 +27,9 @@ void add_const(const string &name, Class *type, void *value);
 void add_ext_var(const string &name, Class *type, void *var);
 void add_type_cast(int penalty, Class *source, Class *dest, const string &cmd, void *func);
 
-#define class_set_vtable(type) \
-	{type type##Instance; \
-	class_link_vtable(*(void***)&type##Instance);}
+#define class_set_vtable(TYPE) \
+	{TYPE my_instance; \
+	class_link_vtable(*(void***)&my_instance);}
 
 
 };

@@ -20,7 +20,7 @@ class DeviceManager;
 class OutputStream;
 class AudioView;
 
-class TrackMixer: public HuiPanel
+class TrackMixer: public hui::Panel
 {
 public:
 	TrackMixer();

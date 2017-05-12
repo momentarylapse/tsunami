@@ -655,8 +655,8 @@ void add_type_cast(int penalty, Class *source, Class *dest, const string &cmd, v
 		}
 	if (c.func_no < 0){
 #ifdef _X_USE_HUI_
-		HuiErrorBox(NULL, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
-		HuiRaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");
+		hui::ErrorBox(NULL, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
+		hui::RaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");
 #else
 		msg_error("add_type_cast (ScriptInit): " + string(cmd) + " not found"));
 		exit(1);

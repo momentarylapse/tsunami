@@ -14,7 +14,7 @@
 class Observer;
 struct ObserverRequest;
 
-class Observable : public HuiEventHandler
+class Observable : public hui::EventHandler
 {
 public:
 	Observable(const string &name);

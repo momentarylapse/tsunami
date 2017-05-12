@@ -36,7 +36,7 @@ public:
 	AudioView *view;
 	Track *track;
 	Song *song;
-	Array<HuiPanel*> panels;
+	Array<hui::Panel*> panels;
 };
 
 #endif /* FXCONSOLE_H_ */

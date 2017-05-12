@@ -8,12 +8,15 @@
 #ifndef PEAKMETER_H_
 #define PEAKMETER_H_
 
-#include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
 #include "../../Stuff/Observable.h"
 #include "../../Data/BufferBox.h"
 
 class AudioView;
+namespace hui{
+	class Timer;
+	class Panel;
+}
 
 class PeakMeterSource : public Observable
 {
@@ -29,10 +32,10 @@ public:
 	};
 };
 
-class PeakMeter : public HuiEventHandler, public Observer
+class PeakMeter : public Observer
 {
 public:
-	PeakMeter(HuiPanel *panel, const string &id, PeakMeterSource *source, AudioView *view);
+	PeakMeter(hui::Panel *panel, const string &id, PeakMeterSource *source, AudioView *view);
 	virtual ~PeakMeter();
 
 	void onDraw(Painter *p);
@@ -53,7 +56,7 @@ private:
 
 	float i_to_freq(int i);
 
-	HuiPanel *panel;
+	hui::Panel *panel;
 	AudioView *view;
 	string id;
 	PeakMeterSource *source;
@@ -80,7 +83,7 @@ private:
 	float sample_rate;
 	BufferBox buf;
 
-	HuiTimer timer;
+	hui::Timer* timer;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

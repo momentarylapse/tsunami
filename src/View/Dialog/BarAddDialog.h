@@ -14,14 +14,14 @@
 class Song;
 class AudioView;
 
-class BarAddDialog : public HuiDialog
+class BarAddDialog : public hui::Dialog
 {
 public:
 	Song *song;
 	AudioView *view;
 	Range bars;
 
-	BarAddDialog(HuiWindow *root, Song *s, AudioView *v);
+	BarAddDialog(hui::Window *root, Song *s, AudioView *v);
 	void onOk();
 	void onClose();
 };

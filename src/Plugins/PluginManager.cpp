@@ -503,18 +503,18 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 
 void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
-	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
+	Array<DirEntry> list = dir_search(hui::AppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
-		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
+		pf.filename = hui::AppDirectoryStatic + "Plugins/" + dir + e.name;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);
 	}
 }
 
-void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
+void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
 {
 	for (PluginManager::PluginFile &f: pm->plugin_files){
 		if (f.filename.find(dir) >= 0){
@@ -553,7 +553,7 @@ void PluginManager::FindPlugins()
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 {
-	HuiMenu *m = win->getMenu();
+	hui::Menu *m = win->getMenu();
 
 	// "Buffer"
 	add_plugins_in_dir("Buffer/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
@@ -585,7 +585,7 @@ void PluginManager::SaveFavorite(Configurable *c, const string &name)
 }
 
 
-string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool save)
+string PluginManager::SelectFavoriteName(hui::Window *win, Configurable *c, bool save)
 {
 	return favorites->SelectName(win, c, save);
 }
@@ -647,7 +647,7 @@ Plugin *PluginManager::GetPlugin(int type, const string &name)
 Array<string> PluginManager::FindSynthesizers()
 {
 	Array<string> names;
-	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/Synthesizer/", "*.kaba", false);
+	Array<DirEntry> list = dir_search(hui::AppDirectoryStatic + "Plugins/Synthesizer/", "*.kaba", false);
 	for (DirEntry &e : list)
 		names.add(e.name.replace(".kaba", ""));
 	return names;
@@ -655,7 +655,7 @@ Array<string> PluginManager::FindSynthesizers()
 
 Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 {
-	string filename = HuiAppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
+	string filename = hui::AppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
 		return NULL;
 	Kaba::Script *s;
@@ -676,7 +676,7 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 	return NULL;
 }
 
-Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)
+Effect* PluginManager::ChooseEffect(hui::Panel *parent, Song *song)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, song);
 	dlg->run();
@@ -685,7 +685,7 @@ Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)
 	return e;
 }
 
-MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent, Song *song)
+MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Song *song)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, song);
 	dlg->run();

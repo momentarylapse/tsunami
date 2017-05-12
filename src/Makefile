@@ -1190,7 +1190,7 @@ clean :
 install : all
 	mkdir -p /usr/share/tsunami
 	mkdir -p /usr/share/tsunami/Data
-	cp -f ../Data/resources.txt    /usr/share/tsunami/Data
+	cp -f ../Data/hui_resources.txt    /usr/share/tsunami/Data
 	cp -f ../Data/icon.*               /usr/share/tsunami/Data
 	cp -f ../Data/*.tga                /usr/share/tsunami/Data
 	cp -f ../Data/license.txt          /usr/share/tsunami/Data

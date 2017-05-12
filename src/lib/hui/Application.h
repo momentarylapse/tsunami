@@ -30,6 +30,8 @@ public:
 	virtual bool onStartup(const Array<string> &arg) = 0;
 
 	int run();
+
+	void end();
 };
 
 }

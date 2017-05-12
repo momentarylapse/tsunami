@@ -64,11 +64,12 @@ public:
 	}
 };
 
-TsunamiWindow::TsunamiWindow() :
+TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_RESIZABLE | hui::WIN_MODE_CONTROLS)
 {
+	app = _tsunami;
 
-	tsunami->win = this;
+	app->win = this;
 
 	int width = hui::Config.getInt("Window.Width", 800);
 	int height = hui::Config.getInt("Window.Height", 600);
@@ -162,7 +163,7 @@ TsunamiWindow::TsunamiWindow() :
 	setMaximized(maximized);
 
 
-	tsunami->plugin_manager->AddPluginsToMenu(this);
+	app->plugin_manager->AddPluginsToMenu(this);
 
 	// events
 	event("hui:close", std::bind(&TsunamiWindow::onExit, this));
@@ -176,23 +177,23 @@ TsunamiWindow::TsunamiWindow() :
 	song = new Song;
 
 
-	view = new AudioView(this, song, tsunami->device_manager);
+	view = new AudioView(this, song, app->device_manager);
 
 	// side bar
 	side_bar = new SideBar(view, song);
 	embed(side_bar, "root_table", 1, 0);
 
 	// bottom bar
-	bottom_bar = new BottomBar(view, song, tsunami->device_manager, tsunami->log);
+	bottom_bar = new BottomBar(view, song, app->device_manager, app->log);
 	embed(bottom_bar, "main_table", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->device_manager, view);
+	mini_bar = new MiniBar(bottom_bar, view->stream, app->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
 	observer = new TsunamiWindowObserver(this);
 	observer->subscribe(view);
 	observer->subscribe(song);
 	observer->subscribe(view->stream, OutputStream::MESSAGE_STATE_CHANGE);
-	observer->subscribe(tsunami->clipboard);
+	observer->subscribe(app->clipboard);
 	observer->subscribe(bottom_bar);
 	observer->subscribe(side_bar);
 
@@ -242,7 +243,7 @@ void TsunamiWindow::onDestroy()
 	observer->unsubscribe(view);
 	observer->unsubscribe(song);
 	observer->unsubscribe(view->stream);
-	observer->unsubscribe(tsunami->clipboard);
+	observer->unsubscribe(app->clipboard);
 	observer->unsubscribe(bottom_bar);
 	observer->unsubscribe(side_bar);
 	delete(observer);
@@ -278,7 +279,7 @@ void TsunamiWindow::onAddTimeTrack()
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
 	}catch(SongException &e){
-		tsunami->log->error(e.message);
+		app->log->error(e.message);
 	}
 	song->action_manager->endActionGroup();
 }
@@ -294,10 +295,11 @@ void TsunamiWindow::onDeleteTrack()
 		try{
 			song->deleteTrack(get_track_index(view->cur_track));
 		}catch(SongException &e){
-			tsunami->log->error(e.message);
+			app->log->error(e.message);
 		}
-	}else
-		tsunami->log->error(_("No track selected"));
+	}else{
+		app->log->error(_("No track selected"));
+	}
 }
 
 void TsunamiWindow::onTrackEditMidi()
@@ -305,7 +307,7 @@ void TsunamiWindow::onTrackEditMidi()
 	if (view->cur_track)
 		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	else
-		tsunami->log->error(_("No track selected"));
+		app->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackEditFX()
@@ -313,7 +315,7 @@ void TsunamiWindow::onTrackEditFX()
 	if (view->cur_track)
 		side_bar->open(SideBar::FX_CONSOLE);
 	else
-		tsunami->log->error(_("No track selected"));
+		app->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackAddMarker()
@@ -323,7 +325,7 @@ void TsunamiWindow::onTrackAddMarker()
 		dlg->run();
 		delete(dlg);
 	}else{
-		tsunami->log->error(_("No track selected"));
+		app->log->error(_("No track selected"));
 	}
 }
 
@@ -337,7 +339,7 @@ void TsunamiWindow::onTrackProperties()
 	if (view->cur_track)
 		side_bar->open(SideBar::TRACK_CONSOLE);
 	else
-		tsunami->log->error(_("No track selected"));
+		app->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onSampleProperties()
@@ -345,7 +347,7 @@ void TsunamiWindow::onSampleProperties()
 	if (view->cur_sample)
 		side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	else
-		tsunami->log->error(_("No sample selected"));
+		app->log->error(_("No sample selected"));
 }
 
 void TsunamiWindow::onDeleteMarker()
@@ -353,7 +355,7 @@ void TsunamiWindow::onDeleteMarker()
 	if (view->selection.type == Selection::TYPE_MARKER)
 		view->cur_track->deleteMarker(view->selection.index);
 	else
-		tsunami->log->error(_("No marker selected"));
+		app->log->error(_("No marker selected"));
 }
 
 void TsunamiWindow::onEditMarker()
@@ -363,7 +365,7 @@ void TsunamiWindow::onEditMarker()
 		dlg->run();
 		delete(dlg);
 	}else
-		tsunami->log->error(_("No marker selected"));
+		app->log->error(_("No marker selected"));
 }
 
 void TsunamiWindow::onShowLog()
@@ -422,17 +424,17 @@ bool TsunamiWindow::allowTermination()
 
 void TsunamiWindow::onCopy()
 {
-	tsunami->clipboard->copy(view);
+	app->clipboard->copy(view);
 }
 
 void TsunamiWindow::onPaste()
 {
-	tsunami->clipboard->paste(view);
+	app->clipboard->paste(view);
 }
 
 void TsunamiWindow::onPasteAsSamples()
 {
-	tsunami->clipboard->pasteAsSamples(view);
+	app->clipboard->pasteAsSamples(view);
 }
 
 void TsunamiWindow::onEditMulti()
@@ -443,7 +445,7 @@ void TsunamiWindow::onEditMulti()
 void TsunamiWindow::onFindAndExecutePlugin()
 {
 	if (hui::FileDialogOpen(win, _("Select plugin script"), hui::AppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
-		tsunami->plugin_manager->_ExecutePlugin(this, hui::Filename);
+		app->plugin_manager->_ExecutePlugin(this, hui::Filename);
 }
 
 void TsunamiWindow::onMenuExecuteEffect()
@@ -555,9 +557,9 @@ void TsunamiWindow::onSettings()
 
 void TsunamiWindow::onTrackImport()
 {
-	if (tsunami->storage->askOpenImport(this)){
+	if (app->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		tsunami->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
+		app->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
 	}
 }
 
@@ -692,8 +694,8 @@ void TsunamiWindow::updateMenu()
 	// edit
 	enable("undo", song->action_manager->undoable());
 	enable("redo", song->action_manager->redoable());
-	enable("copy", tsunami->clipboard->canCopy(view));
-	enable("paste", tsunami->clipboard->hasData());
+	enable("copy", app->clipboard->canCopy(view));
+	enable("paste", app->clipboard->hasData());
 	enable("delete", selected or (view->sel.getNumSamples() > 0));
 	// file
 	//Enable("export_selection", true);
@@ -777,8 +779,8 @@ void TsunamiWindow::onOpen()
 {
 	if (!allowTermination())
 		return;
-	if (tsunami->storage->askOpen(this))
-		tsunami->storage->load(song, hui::Filename);
+	if (app->storage->askOpen(this))
+		app->storage->load(song, hui::Filename);
 }
 
 
@@ -787,22 +789,22 @@ void TsunamiWindow::onSave()
 	if (song->filename == "")
 		onSaveAs();
 	else
-		tsunami->storage->save(song, song->filename);
+		app->storage->save(song, song->filename);
 }
 
 
 void TsunamiWindow::onSaveAs()
 {
-	if (tsunami->storage->askSave(this))
-		tsunami->storage->save(song, hui::Filename);
+	if (app->storage->askSave(this))
+		app->storage->save(song, hui::Filename);
 }
 
 void TsunamiWindow::onExport()
 {
-	if (tsunami->storage->askSaveExport(this)){
+	if (app->storage->askSaveExport(this)){
 		SongRenderer rr(song, &view->sel);
 		rr.prepare(view->getPlaybackSelection(), false);
-		tsunami->storage->saveViaRenderer(&rr, hui::Filename);
+		app->storage->saveViaRenderer(&rr, hui::Filename);
 	}
 }
 

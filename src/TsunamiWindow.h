@@ -19,11 +19,12 @@ class SideBar;
 class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
+class Tsunami;
 
 class TsunamiWindow : public hui::Window
 {
 public:
-	TsunamiWindow();
+	TsunamiWindow(Tsunami *tsunami);
 	virtual ~TsunamiWindow();
 	virtual void onDestroy();
 
@@ -123,6 +124,8 @@ public:
 	Array<TsunamiPlugin*> plugins;
 	bool die_on_plugin_stop;
 	bool auto_delete;
+
+	Tsunami *app;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

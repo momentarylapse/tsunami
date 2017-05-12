@@ -85,7 +85,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 		win->show();
 
 		if (arg.num >= 2)
-			tsunami->storage->load(win->song, arg[1]);
+			storage->load(win->song, arg[1]);
 	}
 	return true;
 }
@@ -151,7 +151,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 
 void Tsunami::createWindow()
 {
-	win = new TsunamiWindow;
+	win = new TsunamiWindow(this);
 	win->auto_delete = true;
 	_win = dynamic_cast<hui::Window*>(win);
 	_view = win->view;

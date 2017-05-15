@@ -59,11 +59,14 @@ void Menu::addSubMenu(const string &name, const string &id, Menu *menu)
 		add(new MenuItemSubmenu(name, menu, id));
 }
 
+void try_add_accel(GtkWidget *item, const string &id, Panel *p);
+
 void Menu::set_panel(Panel *_panel)
 {
 	panel = _panel;
 	for (Control *c: items){
 		c->panel = panel;
+		try_add_accel(c->widget, c->id, panel);
 		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
 		if (s)
 			s->sub_menu->set_panel(panel);

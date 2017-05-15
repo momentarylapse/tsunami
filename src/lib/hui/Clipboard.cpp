@@ -1,5 +1,5 @@
 /*
- * clipboard.cpp
+ * Clipboard.cpp
  *
  *  Created on: 26.06.2013
  *      Author: michi
@@ -11,7 +11,10 @@
 namespace hui
 {
 
-void CopyToClipBoard(const string &buffer)
+namespace Clipboard
+{
+
+void Copy(const string &buffer)
 {
 #ifdef HUI_API_WIN
 	if (buffer.num < 1)
@@ -61,7 +64,7 @@ void CopyToClipBoard(const string &buffer)
 #endif
 }
 
-string PasteFromClipBoard()
+string Paste()
 {
 	string r;
 #ifdef HUI_API_WIN
@@ -99,4 +102,6 @@ string PasteFromClipBoard()
 	return r;
 }
 
-};
+}
+
+}

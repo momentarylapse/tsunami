@@ -14,8 +14,6 @@
 namespace hui
 {
 
-typedef MapEntry<string, string> ConfigEntry;
-
 class Configuration
 {
 public:

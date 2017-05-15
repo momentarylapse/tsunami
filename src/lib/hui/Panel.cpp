@@ -71,7 +71,7 @@ void Panel::_ClearPanel_()
 	}
 	id.clear();
 	cur_id.clear();
-	events.clear();
+	event_listeners.clear();
 }
 
 void Panel::setBorderWidth(int width)
@@ -108,13 +108,22 @@ void Panel::event(const string &id, const Callback &function)
 
 void Panel::eventX(const string &id, const string &msg, const Callback &function)
 {
-	events.add(EventListener(id, msg, function));
+	event_listeners.add(EventListener(id, msg, function));
 }
 
 // hopefully deprecated soon?
 void Panel::eventXP(const string &id, const string &msg, const CallbackP &function)
 {
-	events.add(EventListener(id, msg, -1, function));
+	event_listeners.add(EventListener(id, msg, -1, function));
+}
+
+void Panel::setKeyCode(const string &id, int key_code, const string &image)
+{
+	for (EventListener &e: event_listeners)
+		if (e.id == id){
+			e.key_code = key_code;
+			e.image = image;
+		}
 }
 
 void Panel::_kaba_event(const string &id, kaba_member_callback *function)
@@ -170,9 +179,9 @@ bool Panel::_send_event_(Event *e)
 		_set_cur_id_(e->message);
 
 	bool sent = false;
-	for (int i=0; i<events.num; i++){
-		EventListener &ee = events[i];
-		if (!_EventMatch_(e, ee.id, ee.message))
+	for (int i=0; i<event_listeners.num; i++){
+		EventListener &ee = event_listeners[i];
+		if (!e->match(ee.id, ee.message))
 			continue;
 
 		// send the event

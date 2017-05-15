@@ -1,9 +1,9 @@
 #include "hui.h"
+#include "common.h"
 
 namespace hui
 {
 
-Array<Command> _hui_commands_;
 
 #ifdef HUI_API_WIN
 	unsigned char HuiKeyID[256];
@@ -19,6 +19,9 @@ EventListener::EventListener(const string &_id, const string &_message, const Ca
 	id = _id;
 	message = _message;
 	function = _function;
+	key_code = -1;
+	enabled = true;
+	type = 0;
 }
 
 EventListener::EventListener(const string &_id, const string &_message, int __, const CallbackP &_function)
@@ -26,6 +29,9 @@ EventListener::EventListener(const string &_id, const string &_message, int __, 
 	id = _id;
 	message = _message;
 	function_p = _function;
+	key_code = -1;
+	enabled = true;
+	type = 0;
 }
 
 Event _hui_event_;
@@ -43,6 +49,40 @@ Event::Event(const string &_id, const string &_message)
 	id = _id;
 	message = _message;
 	is_default = true;
+	height = width = 0;
+	key = -1;
+	key_code = -1;
+	mx = my = 0;
+	win = NULL;
+	row = row_target = 0;
+	rbut = mbut = lbut = false;
+	column = 0;
+}
+
+bool Event::match(const string &_id, const string &_message) const
+{
+	// all events
+	if (_id == "*")
+		return true;
+
+	// direct match ("extended")
+	if ((_id == id) and (_message == message))
+		return true;
+
+	// default match
+	if ((_id == id) and (_message == ":def:") and is_default)
+		return true;
+	if ((_id == message) and (id == "") and (_message == ":def:") and is_default)
+		return true;
+
+	// simple match
+	if (_message == "*"){
+		if (_id == id)
+			return true;
+		if ((_id == message) and (id == ""))
+			return true;
+	}
+	return false;
 }
 
 void _InitInput_()
@@ -255,17 +295,6 @@ void _InitInput_()
 	#endif
 }
 
-
-void AddKeyCode(const string &id, int key_code)
-{
-	Command c;
-	c.key_code = key_code;
-	c.id = id;
-	c.enabled = true;
-	c.type = 0;
-	_hui_commands_.add(c);
-}
-
 string GetKeyName(int k)
 {
 	if (k==KEY_LCONTROL)	return "ControlL";
@@ -476,61 +505,6 @@ string GetKeyChar(int key_code)
 
 extern Array<Window*> _hui_windows_;
 
-bool _EventMatch_(Event *e, const string &id, const string &message)
-{
-	// all events
-	if (id == "*")
-		return true;
-
-	// direct match ("extended")
-	if ((id == e->id) && (message == e->message))
-		return true;
-
-	// default match
-	if ((id == e->id) && (message == ":def:") && (e->is_default))
-		return true;
-	if ((id == e->message) && (e->id == "") && (message == ":def:") && (e->is_default))
-		return true;
-
-	// simple match
-	if (message == "*"){
-		if (id == e->id)
-			return true;
-		if ((id == e->message) && (e->id == ""))
-			return true;
-	}
-	return false;
-}
-
-void _SendGlobalCommand_(Event *e)
-{
-	for (Command &c: _hui_commands_)
-		if (_EventMatch_(e, c.id, ":def:"))
-			if (c.func)
-				c.func();
-}
-
-void AddCommand(const string &id, const string &image, int default_key_code, const Callback &func)
-{
-	Command c;
-	c.type = 0;
-	c.id = id;
-	c.image = image;
-	c.key_code = default_key_code;
-	c.func = func;
-	_hui_commands_.add(c);
-}
-
-void AddCommandToggle(const string &id, const string &image, int default_key_code, const Callback &func)
-{
-	Command c;
-	c.type = 1;
-	c.id = id;
-	c.image = image;
-	c.key_code = default_key_code;
-	c.func = func;
-	_hui_commands_.add(c);
-}
 
 void LoadKeyCodes(const string &filename)
 {

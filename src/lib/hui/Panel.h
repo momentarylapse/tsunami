@@ -53,6 +53,7 @@ public:
 	void _cdecl event(const string &id, const Callback &function);
 	void _cdecl eventX(const string &id, const string &msg, const Callback &function);
 	void _cdecl eventXP(const string &id, const string &msg, const CallbackP &function);
+	void _cdecl setKeyCode(const string &id, int key_code, const string &image = "");
 	bool _send_event_(Event *e);
 
 	// kaba wrappers
@@ -174,7 +175,9 @@ protected:
 	Array<Control*> controls;
 	Control *cur_control;
 	Control *root_control;
-	Array<EventListener> events;
+public:
+	Array<EventListener> event_listeners;
+protected:
 
 	string id;
 	int unique_id;

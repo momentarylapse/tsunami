@@ -125,7 +125,7 @@ void Configuration::save()
 	File *f = FileCreateSilent(filename);
 	f->WriteStr("// NumConfigs");
 	f->WriteInt(map.num);
-	for (ConfigEntry &e : map){
+	for (auto &e: map){
 		f->WriteStr("// " + e.key);
 		f->WriteStr(e.value);
 	}

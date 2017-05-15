@@ -16,8 +16,6 @@ namespace hui
 
 void *get_gtk_image(const string &image, bool large);
 
-void try_add_accel(GtkWidget *item, const string &id);
-
 gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 {
 	reinterpret_cast<Control*>(data)->notify("hui:click");
@@ -32,8 +30,6 @@ MenuItem::MenuItem(const string &title, const string &id) :
 	if (im)
 		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(i->widget), im);*/
 	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
-
-	try_add_accel(widget, id);
 }
 
 void MenuItem::setImage(const string &image)

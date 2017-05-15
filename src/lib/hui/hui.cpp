@@ -262,16 +262,6 @@ int RunLater(float time, const Callback &c)
 	#endif
 }
 
-/*int HuiRunLater(float time, hui_callback *function)
-{
-	return _HuiRunLater(time, new HuiCallback(function));
-}
-
-int _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
-{
-	return _HuiRunLater(time, new HuiCallback(object, function));
-}*/
-
 int RunRepeated(float time, const Callback &c)
 {
 	#ifdef HUI_API_WIN
@@ -285,16 +275,6 @@ int RunRepeated(float time, const Callback &c)
 		return r->id;
 	#endif
 }
-
-/*int HuiRunRepeated(float time, hui_callback *function)
-{
-	return _HuiRunRepeated(time, new HuiCallback(function));
-}
-
-int _HuiRunRepeatedM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
-{
-	return _HuiRunRepeated(time, new HuiCallback(object, function));
-}*/
 
 void CancelRunner(int id)
 {

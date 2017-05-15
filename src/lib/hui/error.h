@@ -11,6 +11,9 @@
 namespace hui
 {
 
+typedef Callback Callback;
+class Window;
+
 // error handling
 void SetErrorFunction(const Callback &function);
 void SetDefaultErrorHandler(const Callback &error_cleanup_function);

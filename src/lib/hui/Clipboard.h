@@ -1,5 +1,5 @@
 /*
- * clipboard.h
+ * Clipboard.h
  *
  *  Created on: 26.06.2013
  *      Author: michi
@@ -11,9 +11,13 @@
 namespace hui
 {
 
-// clipboard
-void _cdecl CopyToClipBoard(const string &buffer);
-string _cdecl PasteFromClipBoard();
+namespace Clipboard
+{
+
+void _cdecl Copy(const string &buffer);
+string _cdecl Paste();
+
+}
 
 }
 

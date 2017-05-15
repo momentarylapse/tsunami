@@ -9,7 +9,7 @@
 #ifndef _HUI_WINDOW_EXISTS_
 #define _HUI_WINDOW_EXISTS_
 
-#include "input.h"
+#include "Event.h"
 #include "Panel.h"
 
 

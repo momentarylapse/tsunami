@@ -138,27 +138,27 @@ OBJ = \
  lib/hui/Controls/ToolItemSeparatorGtk.o\
  lib/hui/Controls/ToolItemToggleButtonGtk.o\
  lib/hui/hui.o\
- lib/hui/clipboard.o\
  lib/hui/common_dlg.o\
  lib/hui/common_dlg_gtk.o\
  lib/hui/common_dlg_win.o\
  lib/hui/error.o\
- lib/hui/input.o\
  lib/hui/language.o\
  lib/hui/main_gtk.o\
  lib/hui/main_win.o\
- lib/hui/resource.o\
  lib/hui/utility.o\
  lib/hui/window_control.o\
  lib/hui/window_control_gtk.o\
  lib/hui/window_control_win.o\
  lib/hui/Application.o\
+ lib/hui/Clipboard.o\
  lib/hui/Config.o\
+ lib/hui/Event.o\
  lib/hui/Menu.o\
  lib/hui/MenuGtk.o\
  lib/hui/MenuWin.o\
  lib/hui/PainterGtk.o\
  lib/hui/Panel.o\
+ lib/hui/Resource.o\
  lib/hui/Timer.o\
  lib/hui/Toolbar.o\
  lib/hui/ToolbarGtk.o\
@@ -711,9 +711,6 @@ lib/hui/Controls/ToolItemToggleButtonGtk.o : lib/hui/Controls/ToolItemToggleButt
 lib/hui/hui.o : lib/hui/hui.cpp
 	$(CPP) -c lib/hui/hui.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/clipboard.o : lib/hui/clipboard.cpp
-	$(CPP) -c lib/hui/clipboard.cpp -o $@ $(CXXFLAGS)
-
 lib/hui/common_dlg.o : lib/hui/common_dlg.cpp
 	$(CPP) -c lib/hui/common_dlg.cpp -o $@ $(CXXFLAGS)
 
@@ -726,9 +723,6 @@ lib/hui/common_dlg_win.o : lib/hui/common_dlg_win.cpp
 lib/hui/error.o : lib/hui/error.cpp
 	$(CPP) -c lib/hui/error.cpp -o $@ $(CXXFLAGS)
 
-lib/hui/input.o : lib/hui/input.cpp
-	$(CPP) -c lib/hui/input.cpp -o $@ $(CXXFLAGS)
-
 lib/hui/language.o : lib/hui/language.cpp
 	$(CPP) -c lib/hui/language.cpp -o $@ $(CXXFLAGS)
 
@@ -737,9 +731,6 @@ lib/hui/main_gtk.o : lib/hui/main_gtk.cpp
 
 lib/hui/main_win.o : lib/hui/main_win.cpp
 	$(CPP) -c lib/hui/main_win.cpp -o $@ $(CXXFLAGS)
-
-lib/hui/resource.o : lib/hui/resource.cpp
-	$(CPP) -c lib/hui/resource.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/utility.o : lib/hui/utility.cpp
 	$(CPP) -c lib/hui/utility.cpp -o $@ $(CXXFLAGS)
@@ -753,8 +744,14 @@ lib/hui/window_control_gtk.o : lib/hui/window_control_gtk.cpp
 lib/hui/window_control_win.o : lib/hui/window_control_win.cpp
 	$(CPP) -c lib/hui/window_control_win.cpp -o $@ $(CXXFLAGS)
 
+lib/hui/Clipboard.o : lib/hui/Clipboard.cpp
+	$(CPP) -c lib/hui/Clipboard.cpp -o $@ $(CXXFLAGS)
+
 lib/hui/Config.o : lib/hui/Config.cpp
 	$(CPP) -c lib/hui/Config.cpp -o $@ $(CXXFLAGS)
+
+lib/hui/Event.o : lib/hui/Event.cpp
+	$(CPP) -c lib/hui/Event.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/Menu.o : lib/hui/Menu.cpp
 	$(CPP) -c lib/hui/Menu.cpp -o $@ $(CXXFLAGS)
@@ -770,6 +767,9 @@ lib/hui/PainterGtk.o : lib/hui/PainterGtk.cpp
 
 lib/hui/Panel.o : lib/hui/Panel.cpp
 	$(CPP) -c lib/hui/Panel.cpp -o $@ $(CXXFLAGS)
+
+lib/hui/Resource.o : lib/hui/Resource.cpp
+	$(CPP) -c lib/hui/Resource.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/Timer.o : lib/hui/Timer.cpp
 	$(CPP) -c lib/hui/Timer.cpp -o $@ $(CXXFLAGS)

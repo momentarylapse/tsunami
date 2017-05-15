@@ -12,6 +12,8 @@
 namespace hui
 {
 
+class Window;
+
 // file dialogs
 bool _cdecl FileDialogOpen(Window *win, const string &title, const string &dir, const string &show_filter, const string &filter);
 bool _cdecl FileDialogSave(Window *win, const string &title, const string &dir, const string &show_filter, const string &filter);

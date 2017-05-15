@@ -518,7 +518,7 @@ void SIAddPackageHui()
 			func_add_param("default",	TypeString);
 	
 	// user interface
-	add_func("HuiSetIdleFunction",	TypeVoid,		(void*)&hui::SetIdleFunction);
+	/*add_func("HuiSetIdleFunction",	TypeVoid,		(void*)&hui::SetIdleFunction);
 		func_add_param("idle_func",	TypePointer);
 	add_func("HuiAddKeyCode",	TypeVoid,		(void*)&hui::AddKeyCode);
 		func_add_param("id",	TypeString);
@@ -527,7 +527,7 @@ void SIAddPackageHui()
 		func_add_param("id",	TypeString);
 		func_add_param("image",	TypeString);
 		func_add_param("key_code",	TypeInt);
-		func_add_param("func",	TypePointer);
+		func_add_param("func",	TypePointer);*/
 	add_func("HuiGetEvent",	TypeHuiEventP,		(void*)&hui::GetEvent);
 	add_func("HuiRun",				TypeVoid,		(void*)&hui::Run);
 	add_func("HuiEnd",				TypeVoid,		(void*)&hui::End);
@@ -565,9 +565,9 @@ void SIAddPackageHui()
 		func_add_param("text",		TypeString);
 
 	// clipboard
-	add_func("HuiCopyToClipboard",	TypeVoid,			(void*)&hui::CopyToClipBoard);
+	add_func("HuiCopyToClipboard",	TypeVoid,			(void*)&hui::Clipboard::Copy);
 		func_add_param("buffer",	TypeString);
-	add_func("HuiPasteFromClipboard",	TypeString,		(void*)&hui::PasteFromClipBoard);
+	add_func("HuiPasteFromClipboard",	TypeString,		(void*)&hui::Clipboard::Paste);
 	add_func("HuiOpenDocument",		TypeVoid,			(void*)&hui::OpenDocument);
 		func_add_param("filename",	TypeString);
 	add_func("HuiSetImage",			TypeString,			(void*)&hui::SetImage);

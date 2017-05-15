@@ -191,7 +191,6 @@ void NotifyWindowByWidget(Panel *panel, GtkWidget *widget, const string &message
 	panel->_set_cur_id_(id);
 	if (id.num > 0){
 		Event e = Event(id, message);
-		_SendGlobalCommand_(&e);
 		e.is_default = is_default;
 		panel->_send_event_(&e);
 	}
@@ -202,7 +201,7 @@ void SetImageById(Panel *panel, const string &id)
 	if ((id == "ok") or (id == "cancel") or (id == "apply"))
 		panel->setImage(id, "hui:" + id);
 	else if (id != ""){
-		for (Command &c: _hui_commands_)
+		for (auto &c: panel->event_listeners)
 			if ((c.id == id) and (c.image != ""))
 				panel->setImage(id, c.image);
 	}
@@ -441,7 +440,7 @@ void Panel::removeControl(const string &id)
 {
 	Control *c = _get_control_(id);
 	if (c){
-		hui_rm_event(events, c);
+		hui_rm_event(event_listeners, c);
 		delete(c);
 	}
 }

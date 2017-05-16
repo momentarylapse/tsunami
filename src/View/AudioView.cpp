@@ -154,17 +154,17 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	ZoomSpeed = hui::Config.getFloat("View.ZoomSpeed", 0.1f);
 	antialiasing = hui::Config.getBool("View.Antialiasing", false);
 
-	images.speaker = LoadImage(hui::AppDirectoryStatic + "Data/volume.tga");
+	images.speaker = LoadImage(tsunami->directory_static + "Data/volume.tga");
 	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
-	images.x = LoadImage(hui::AppDirectoryStatic + "Data/x.tga");
+	images.x = LoadImage(tsunami->directory_static + "Data/x.tga");
 	images.x_bg = ExpandImageMask(images.x, 1.5f);
-	images.solo = LoadImage(hui::AppDirectoryStatic + "Data/solo.tga");
+	images.solo = LoadImage(tsunami->directory_static + "Data/solo.tga");
 	images.solo_bg = ExpandImageMask(images.solo, 1.5f);
-	images.track_audio = LoadImage(hui::AppDirectoryStatic + "Data/track-audio.tga");
+	images.track_audio = LoadImage(tsunami->directory_static + "Data/track-audio.tga");
 	images.track_audio_bg = ExpandImageMask(images.track_audio, 1.5f);
-	images.track_time = LoadImage(hui::AppDirectoryStatic + "Data/track-time.tga");
+	images.track_time = LoadImage(tsunami->directory_static + "Data/track-time.tga");
 	images.track_time_bg = ExpandImageMask(images.track_time, 1.5f);
-	images.track_midi = LoadImage(hui::AppDirectoryStatic + "Data/track-midi.tga");
+	images.track_midi = LoadImage(tsunami->directory_static + "Data/track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
 	cur_track = NULL;

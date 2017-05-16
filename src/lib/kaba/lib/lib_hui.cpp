@@ -529,9 +529,9 @@ void SIAddPackageHui()
 		func_add_param("key_code",	TypeInt);
 		func_add_param("func",	TypePointer);*/
 	add_func("HuiGetEvent",	TypeHuiEventP,		(void*)&hui::GetEvent);
-	add_func("HuiRun",				TypeVoid,		(void*)&hui::Run);
+	/*add_func("HuiRun",				TypeVoid,		(void*)&hui::Run);
 	add_func("HuiEnd",				TypeVoid,		(void*)&hui::End);
-	add_func("HuiDoSingleMainLoop",	TypeVoid,	(void*)&hui::DoSingleMainLoop);
+	add_func("HuiDoSingleMainLoop",	TypeVoid,	(void*)&hui::doSingleMainLoop);*/
 	add_func("HuiSleep",			TypeVoid,	(void*)&hui::Sleep);
 		func_add_param("duration",		TypeFloat32);
 	add_func("HuiFileDialogOpen",	TypeBool,	(void*)&hui::FileDialogOpen);
@@ -693,9 +693,9 @@ void SIAddPackageHui()
 	add_const("NumKeys",TypeInt,(void*)hui::NUM_KEYS);
 	add_const("KeyAny",TypeInt,(void*)hui::KEY_ANY);
 
-	add_ext_var("AppFilename",		TypeString,		hui_p(&hui::AppFilename));
-	add_ext_var("AppDirectory",		TypeString,		hui_p(&hui::AppDirectory));
-	add_ext_var("AppDirectoryStatic",TypeString,		hui_p(&hui::AppDirectoryStatic));
+	add_ext_var("AppFilename",		TypeString,		hui_p(&hui::Application::filename));
+	add_ext_var("AppDirectory",		TypeString,		hui_p(&hui::Application::directory));
+	add_ext_var("AppDirectoryStatic",TypeString,		hui_p(&hui::Application::directory_static));
 	add_ext_var("HuiFilename",		TypeString,		hui_p(&hui::Filename));
 	//add_ext_var("HuiRunning",		TypeBool,		hui_p(&hui::HuiRunning));
 	add_ext_var("HuiConfig",		TypeHuiConfiguration,	hui_p(&hui::Config));

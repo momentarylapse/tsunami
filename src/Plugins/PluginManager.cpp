@@ -503,12 +503,12 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 
 void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
-	Array<DirEntry> list = dir_search(hui::AppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
+	Array<DirEntry> list = dir_search(tsunami->directory_static + "Plugins/" + dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
-		pf.filename = hui::AppDirectoryStatic + "Plugins/" + dir + e.name;
+		pf.filename = tsunami->directory_static + "Plugins/" + dir + e.name;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);
 	}
@@ -647,7 +647,7 @@ Plugin *PluginManager::GetPlugin(int type, const string &name)
 Array<string> PluginManager::FindSynthesizers()
 {
 	Array<string> names;
-	Array<DirEntry> list = dir_search(hui::AppDirectoryStatic + "Plugins/Synthesizer/", "*.kaba", false);
+	Array<DirEntry> list = dir_search(tsunami->directory_static + "Plugins/Synthesizer/", "*.kaba", false);
 	for (DirEntry &e : list)
 		names.add(e.name.replace(".kaba", ""));
 	return names;
@@ -655,7 +655,7 @@ Array<string> PluginManager::FindSynthesizers()
 
 Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 {
-	string filename = hui::AppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
+	string filename = tsunami->directory_static + "Plugins/Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
 		return NULL;
 	Kaba::Script *s;

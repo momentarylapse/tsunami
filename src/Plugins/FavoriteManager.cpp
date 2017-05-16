@@ -9,6 +9,7 @@
 #include "Configurable.h"
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
+#include "../Tsunami.h"
 
 FavoriteManager::FavoriteManager()
 {
@@ -64,14 +65,14 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 
 void FavoriteManager::Load()
 {
-	LoadFromFile(hui::AppDirectoryStatic + "Data/favorites_demo.txt", true);
-	LoadFromFile(hui::AppDirectory + "Data/favorites.txt", false);
+	LoadFromFile(tsunami->directory_static + "Data/favorites_demo.txt", true);
+	LoadFromFile(tsunami->directory + "Data/favorites.txt", false);
 	loaded = true;
 }
 
 void FavoriteManager::Save()
 {
-	File *f = FileCreate(hui::AppDirectory + "Data/favorites.txt");
+	File *f = FileCreate(tsunami->directory + "Data/favorites.txt");
 	if (!f)
 		return;
 	f->WriteInt(favorites.num);

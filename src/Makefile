@@ -150,6 +150,7 @@ OBJ = \
  lib/hui/window_control_gtk.o\
  lib/hui/window_control_win.o\
  lib/hui/Application.o\
+ lib/hui/Callback.o\
  lib/hui/Clipboard.o\
  lib/hui/Config.o\
  lib/hui/Event.o\
@@ -743,6 +744,9 @@ lib/hui/window_control_gtk.o : lib/hui/window_control_gtk.cpp
 
 lib/hui/window_control_win.o : lib/hui/window_control_win.cpp
 	$(CPP) -c lib/hui/window_control_win.cpp -o $@ $(CXXFLAGS)
+
+lib/hui/Callback.o : lib/hui/Callback.cpp
+	$(CPP) -c lib/hui/Callback.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/Clipboard.o : lib/hui/Clipboard.cpp
 	$(CPP) -c lib/hui/Clipboard.cpp -o $@ $(CXXFLAGS)

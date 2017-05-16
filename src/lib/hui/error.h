@@ -8,10 +8,11 @@
 #ifndef HUI_ERROR_H_
 #define HUI_ERROR_H_
 
+#include "Callback.h"
+
 namespace hui
 {
 
-typedef Callback Callback;
 class Window;
 
 // error handling

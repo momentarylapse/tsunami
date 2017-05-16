@@ -19,7 +19,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int
 	type = _type;
 	song = _song;
 	if (type == Configurable::TYPE_EFFECT){
-		string prefix = hui::AppDirectoryStatic + "Plugins/Buffer/";
+		string prefix = tsunami->directory_static + "Plugins/Buffer/";
 		for (auto &pf : tsunami->plugin_manager->plugin_files){
 			if (pf.filename.match(prefix + "*")){
 				names.add(pf.name);

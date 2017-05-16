@@ -28,11 +28,11 @@ struct HuiImage
 	string filename;
 	Image image;
 };
-extern Array<HuiImage> _hui_images_;
+extern Array<HuiImage> _all_images_;
 
 
 // window lists...
-extern Array<Window*> _hui_windows_;
+extern Array<Window*> _all_windows_;
 
 };
 

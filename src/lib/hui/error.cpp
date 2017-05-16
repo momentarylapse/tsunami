@@ -6,6 +6,7 @@
  */
 
 #include "hui.h"
+#include "internal.h"
 
 
 
@@ -19,7 +20,6 @@ namespace hui
 {
 
 extern Callback _idle_function_, _error_function_;
-extern Array<Window*> _hui_windows_;
 
 void _HuiSignalHandler(int)
 {
@@ -76,7 +76,7 @@ public:
 		string sender = getString("report_sender");
 		string comment = getString("comment");
 		string return_msg;
-		if (NetSendBugReport(sender, GetProperty("name"), GetProperty("version"), comment, return_msg))
+		if (NetSendBugReport(sender, Application::getProperty("name"), Application::getProperty("version"), comment, return_msg))
 			InfoBox(NULL, "ok", return_msg);
 		else
 			ErrorBox(NULL, "error", return_msg);
@@ -99,7 +99,7 @@ public:
 	ErrorDialog() :
 		FixedDialog(_("Error"), 600, 500, NULL, false)
 	{
-		addLabel(GetProperty("name") + " " + GetProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
+		addLabel(Application::getProperty("name") + " " + Application::getProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
 		addListView(_("Messages"),5,30,590,420,"message_list");
 		//addEdit("",5,30,590,420,"message_list";
 		addButton(_("Ok"),5,460,100,25,"ok");
@@ -158,7 +158,7 @@ void hui_default_error_handler()
 		msg_write(_("...done"));
 	}
 
-	foreachb(Window *w, _hui_windows_)
+	foreachb(Window *w, _all_windows_)
 		delete(w);
 	msg_write(_("                  Close dialog box to exit program."));
 

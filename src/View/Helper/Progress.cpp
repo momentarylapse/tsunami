@@ -19,7 +19,7 @@ Progress::Progress(const string &str, hui::Window *parent) :
 		dlg->setFloat("progress_bar", 0);
 		dlg->show();
 		dlg->event("hui:close", &hui::FuncIgnore);
-		hui::DoSingleMainLoop();
+		hui::Application::doSingleMainLoop();
 	}
 	cancelled = false;
 }
@@ -42,7 +42,7 @@ void Progress::set(const string &str, float progress)
 	if (dlg){
 		dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", progress);
-		hui::DoSingleMainLoop();
+		hui::Application::doSingleMainLoop();
 	}
 }
 
@@ -51,7 +51,7 @@ void Progress::set(float progress)
 {
 	if (dlg){
 		dlg->setFloat("progress_bar", progress);
-		hui::DoSingleMainLoop();
+		hui::Application::doSingleMainLoop();
 	}
 }
 
@@ -78,7 +78,7 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 		dlg->show();
 		dlg->event("hui:close", std::bind(&Progress::cancel, this));
 		dlg->event("cancel", std::bind(&Progress::cancel, this));
-		hui::DoSingleMainLoop();
+		hui::Application::doSingleMainLoop();
 	}
 }
 

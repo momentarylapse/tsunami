@@ -266,7 +266,7 @@ void TsunamiCleanUp()
 	}while(again);
 
 	if (TsunamiWindows.num == 0)
-		hui::End();
+		tsunami->end();
 }
 
 void TsunamiWindow::onDestroy()
@@ -481,7 +481,7 @@ void TsunamiWindow::onEditMulti()
 
 void TsunamiWindow::onFindAndExecutePlugin()
 {
-	if (hui::FileDialogOpen(win, _("Select plugin script"), hui::AppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
+	if (hui::FileDialogOpen(win, _("Select plugin script"), tsunami->directory_static + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
 		app->plugin_manager->_ExecutePlugin(this, hui::Filename);
 }
 
@@ -787,7 +787,7 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 		tpl->stop();
 
 		if (die_on_plugin_stop)
-			hui::End();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
+			tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
 	}else{
 		// "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();

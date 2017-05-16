@@ -43,14 +43,12 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *panel)
 
 Menu::Menu()
 {
-	msg_db_r("HuiMenu()", 1);
 	_MakeUsable_();
 	panel = NULL;
 	
 	widget = gtk_menu_new();
 	if (accel_group == NULL)
 		accel_group = gtk_accel_group_new();
-	msg_db_l(1);
 }
 
 Menu::~Menu()
@@ -173,12 +171,12 @@ const char *get_gtk_icon_name(const string image)
 
 HuiImage *get_image(const string &image)
 {
-	for (HuiImage &m: _hui_images_)
+	for (HuiImage &m: _all_images_)
 		if (m.filename == image)
 			return &m;
 	HuiImage img = {0, image};
-	_hui_images_.add(img);
-	return &_hui_images_.back();
+	_all_images_.add(img);
+	return &_all_images_.back();
 }
 
 void *get_gtk_image(const string &image, bool large)
@@ -197,7 +195,7 @@ void *get_gtk_image(const string &image, bool large)
 		if ((img->filename[0] == '/') or (img->filename[1] == ':'))
 			return gtk_image_new_from_file(sys_str_f(img->filename));
 		// relative
-		return gtk_image_new_from_file(sys_str_f(AppDirectory + img->filename));
+		return gtk_image_new_from_file(sys_str_f(Application::directory + img->filename));
 	}
 }
 

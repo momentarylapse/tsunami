@@ -15,7 +15,8 @@
 namespace hui
 {
 
-extern int _main_level_;
+
+Array<Window*> _all_windows_;
 
 Window *CurWindow = NULL;
 
@@ -101,7 +102,7 @@ Window::Window(const string &id, Window *parent)
 void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 {
 	_MakeUsable_();
-	_hui_windows_.add(this);
+	_all_windows_.add(this);
 
 	is_resizable = ((_mode & WIN_MODE_RESIZABLE) > 0);
 	allowed = true;
@@ -120,7 +121,6 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 	input.reset();
 
 	allow_input = false; // allow only if ->Show() was called
-	main_level = _main_level_;
 }
 
 void Window::_clean_up_()
@@ -132,9 +132,9 @@ void Window::_clean_up_()
 	input.reset();
 	
 	// unregister window
-	for (int i=0;i<_hui_windows_.num;i++)
-		if (_hui_windows_[i] == this){
-			_hui_windows_.erase(i);
+	for (int i=0;i<_all_windows_.num;i++)
+		if (_all_windows_[i] == this){
+			_all_windows_.erase(i);
 			break;
 		}
 }
@@ -142,15 +142,12 @@ void Window::_clean_up_()
 // default handler when trying to close the windows
 void Window::onCloseRequest()
 {
-	int level = _get_main_level_();
 	destroy();
 	
-	// no message function (and last window in this main level): end program
-	// ...or at least end nested main level
-	for (Window *w: _hui_windows_)
-		if (w->_get_main_level_() >= level)
-			return;
-	End();
+	// no message function (and last window): end program
+	if (_all_windows_.num > 0)
+		return;
+	Application::end();
 }
 
 
@@ -179,11 +176,6 @@ void Window::setPositionSpecial(Window *win,int mode)
 	if ((mode & HUI_BOTTOM) > 0)
 		cy = py + ph - ch - 2;
 	setPosition(cx, cy);
-}
-
-int Window::_get_main_level_()
-{
-	return main_level;
 }
 
 Menu *Window::getMenu()

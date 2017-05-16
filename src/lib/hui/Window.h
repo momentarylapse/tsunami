@@ -142,7 +142,6 @@ public:
 
 
 	// hui internal
-	int _get_main_level_();
 	bool allow_input;
 	InputData input;
 	int mouse_offset_x, mouse_offset_y;
@@ -180,8 +179,6 @@ private:
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
 	Window *parent;
-
-	int main_level;
 };
 
 

@@ -12,6 +12,7 @@
 
 class complex;
 class rect;
+class color;
 
 namespace hui
 {

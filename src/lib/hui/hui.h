@@ -42,8 +42,6 @@ class EventHandler;
 // hui itself
 
 
-extern bool EndKeepMsgAlive;
-
 // images
 //int LoadImage(const string &filename);
 string SetImage(const Image &image);
@@ -52,14 +50,10 @@ void DeleteImage(const string &name);
 // HUI configuration
 extern string ComboBoxSeparator;
 
-// data from hui (...don't change...)
-extern string AppFilename, AppDirectory, AppDirectoryStatic;
-extern string InitialWorkingDirectory;
-extern bool Running;
-
 };
 
 
+#include "Callback.h"
 #include "Application.h"
 #include "main.h"
 #include "Event.h"

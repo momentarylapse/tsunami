@@ -34,12 +34,12 @@ Tsunami::Tsunami() :
 	plugin_manager = NULL;
 	storage = NULL;
 
-	hui::SetProperty("name", AppName);
-	hui::SetProperty("version", AppVersion);
-	hui::SetProperty("comment", _("Editor for audio files"));
-	hui::SetProperty("website", "http://michi.is-a-geek.org/software");
-	hui::SetProperty("copyright", "© 2007-2017 by Michael Ankele");
-	hui::SetProperty("author", "Michael Ankele <michi@lupina.de>");
+	setProperty("name", AppName);
+	setProperty("version", AppVersion);
+	setProperty("comment", _("Editor for audio files"));
+	setProperty("website", "http://michi.is-a-geek.org/software");
+	setProperty("copyright", "© 2007-2017 by Michael Ankele");
+	setProperty("author", "Michael Ankele <michi@lupina.de>");
 }
 
 Tsunami::~Tsunami()

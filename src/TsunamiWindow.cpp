@@ -83,8 +83,8 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	setKeyCode("save", hui::KEY_S + hui::KEY_CONTROL, "hui:save");
 	event("save_as", std::bind(&TsunamiWindow::onSaveAs, this));
 	setKeyCode("save_as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT, "hui:save-as");
-	event("save_as", std::bind(&TsunamiWindow::onSaveAs, this));
-	setKeyCode("save_as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT, "hui:save-as");
+	event("copy", std::bind(&TsunamiWindow::onCopy, this));
+	setKeyCode("copy", hui::KEY_C + hui::KEY_CONTROL, "hui:copy");
 	event("paste", std::bind(&TsunamiWindow::onPaste, this));
 	setKeyCode("paste", hui::KEY_V + hui::KEY_CONTROL, "hui:paste");
 	event("paste_as_samples", std::bind(&TsunamiWindow::onPasteAsSamples, this));
@@ -105,8 +105,6 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	setKeyCode("add_time_track", -1, "hui:add");
 	event("add_midi_track", std::bind(&TsunamiWindow::onAddMidiTrack, this));
 	setKeyCode("add_midi_track", -1, "hui:add");
-	event("delete_track", std::bind(&TsunamiWindow::onDeleteTrack, this));
-	setKeyCode("delete_track", -1, "hui:delete");
 	event("delete_track", std::bind(&TsunamiWindow::onDeleteTrack, this));
 	setKeyCode("delete_track", -1, "hui:delete");
 	event("track_edit_midi", std::bind(&TsunamiWindow::onTrackEditMidi, this));
@@ -131,8 +129,8 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	setKeyCode("add_pause", -1, "hui:add");
 	event("delete_bars", std::bind(&TsunamiWindow::onDeleteBars, this));
 	setKeyCode("delete_bars", -1, "hui:delete");
-	event("scale_bars", std::bind(&TsunamiWindow::onScaleBars, this));
-	setKeyCode("scale_bars", -1, "hui:scale");
+	event("edit_bars", std::bind(&TsunamiWindow::onEditBars, this));
+	setKeyCode("edit_bars", -1, "hui:edit");
 	event("scale_bars", std::bind(&TsunamiWindow::onScaleBars, this));
 	setKeyCode("scale_bars", -1, "hui:scale");
 	event("bar_link_to_data", std::bind(&TsunamiWindow::onBarsModifyMidi, this));

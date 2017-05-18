@@ -159,8 +159,8 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	event("play_loop", std::bind(&TsunamiWindow::onPlayLoop, this));
 	event("pause", std::bind(&TsunamiWindow::onPause, this));
 	setKeyCode("pause", -1, "hui:media-pause");
-	event("pause", std::bind(&TsunamiWindow::onPause, this));
-	setKeyCode("pause", -1, "hui:media-pause");
+	event("stop", std::bind(&TsunamiWindow::onStop, this));
+	setKeyCode("stop", -1, "hui:media-stop");
 	event("record", std::bind(&TsunamiWindow::onRecord, this));
 	setKeyCode("record", -1, "hui:media-record");
 	event("show_log", std::bind(&TsunamiWindow::onShowLog, this));

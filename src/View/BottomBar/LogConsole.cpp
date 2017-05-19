@@ -19,7 +19,8 @@ LogConsole::LogConsole(Log *_log) :
 
 	event("clear", std::bind(&LogConsole::onClear, this));
 
-	hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
+	//hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
+	reload();
 
 	subscribe(log);
 }
@@ -37,13 +38,13 @@ void LogConsole::onClear()
 void LogConsole::reload()
 {
 	reset("log_list");
-	for (auto &m : log->messages){
+	for (auto &m: log->messages){
 		if (m.type == Log::TYPE_ERROR){
 			addString("log_list", "hui:error\\" + m.text);
-			((BottomBar*)parent)->open(BottomBar::LOG_CONSOLE);
+			bar()->open(BottomBar::LOG_CONSOLE);
 		}else if (m.type == Log::TYPE_WARNING){
 			addString("log_list", "hui:warning\\" + m.text);
-			((BottomBar*)parent)->open(BottomBar::LOG_CONSOLE);
+			bar()->open(BottomBar::LOG_CONSOLE);
 		}else{
 			addString("log_list", "hui:info\\" + m.text);
 		}

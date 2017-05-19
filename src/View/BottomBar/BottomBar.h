@@ -19,14 +19,7 @@ class MixingConsole;
 class LogConsole;
 class DeviceConsole;
 class Log;
-
-class BottomBarConsole : public hui::Panel
-{
-public:
-	BottomBarConsole(const string &_title)
-	{ title = _title; }
-	string title;
-};
+class BottomBarConsole;
 
 class BottomBar : public hui::Panel, public Observable
 {
@@ -60,6 +53,16 @@ public:
 
 	Array<BottomBarConsole*> consoles;
 	void addConsole(BottomBarConsole *c, const string &list_name);
+};
+
+
+class BottomBarConsole : public hui::Panel
+{
+public:
+	BottomBarConsole(const string &_title)
+	{ title = _title; }
+	string title;
+	BottomBar *bar(){ return dynamic_cast<BottomBar*>(parent); }
 };
 
 #endif /* BOTTOMBAR_H_ */

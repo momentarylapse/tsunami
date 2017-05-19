@@ -643,18 +643,18 @@ void CaptureConsole::onOk()
 {
 	mode->stop();
 	if (mode->insert())
-		((SideBar*)parent)->_hide();
+		bar()->_hide();
 }
 
 void CaptureConsole::onCancel()
 {
 	mode->stop();
-	((SideBar*)parent)->_hide();
+	bar()->_hide();
 }
 
 void CaptureConsole::onClose()
 {
-	((SideBar*)parent)->_hide();
+	bar()->_hide();
 }
 
 void CaptureConsole::updateTime()

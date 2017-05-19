@@ -139,17 +139,17 @@ void SongConsole::onDeleteTag()
 
 void SongConsole::onEditLayers()
 {
-	((SideBar*)parent)->open(SideBar::LAYER_CONSOLE);
+	bar()->open(SideBar::LAYER_CONSOLE);
 }
 
 void SongConsole::onEditSamples()
 {
-	((SideBar*)parent)->open(SideBar::SAMPLE_CONSOLE);
+	bar()->open(SideBar::SAMPLE_CONSOLE);
 }
 
 void SongConsole::onEditFx()
 {
-	((SideBar*)parent)->open(SideBar::GLOBAL_FX_CONSOLE);
+	bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
 void SongConsole::onUpdate(Observable *o, const string &message)

@@ -212,7 +212,7 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	song = new Song;
 
 
-	view = new AudioView(this, song, app->device_manager);
+	view = new AudioView(this, "area", song);
 
 	// side bar
 	side_bar = new SideBar(view, song);
@@ -235,11 +235,7 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 
 
 	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
-
-	if (song->tracks.num > 0)
-		view->setCurTrack(song->tracks[0]);
-	view->optimizeView();
-	hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, view));
+	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	updateMenu();
 	TsunamiWindows.add(this);

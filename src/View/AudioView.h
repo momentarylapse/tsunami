@@ -35,7 +35,7 @@ class ViewModeCapture;
 class AudioView : public Observable, public Observer
 {
 public:
-	AudioView(TsunamiWindow *parent, Song *audio, DeviceManager *output);
+	AudioView(TsunamiWindow *parent, const string &id, Song *audio);
 	virtual ~AudioView();
 
 	void checkConsistency();
@@ -77,8 +77,11 @@ public:
 	void optimizeView();
 	void updateMenu();
 
+	string id;
+
 	Array<ColorSchemeBasic> basic_schemes;
-	static ColorScheme colors;
+	static ColorSchemeBasic basic_colors;
+	ColorScheme colors;
 	void setColorScheme(const string &name);
 
 	static const int SAMPLE_FRAME_HEIGHT;

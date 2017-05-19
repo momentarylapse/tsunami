@@ -210,17 +210,17 @@ void MidiEditorConsole::onReferenceTracks()
 
 void MidiEditorConsole::onEditTrack()
 {
-	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void MidiEditorConsole::onEditMidiFx()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_FX_CONCOLE);
+	bar()->open(SideBar::MIDI_FX_CONCOLE);
 }
 
 void MidiEditorConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void MidiEditorConsole::onModifierNone()

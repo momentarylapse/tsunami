@@ -77,7 +77,7 @@ void BarsConsole::onCreateTimeTrack()
 
 void BarsConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void BarsConsole::fillList()

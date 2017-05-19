@@ -78,7 +78,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("storage", &tsunami->storage);
 	Kaba::LinkExternal("logging", &tsunami->log);
-	Kaba::LinkExternal("colors", &AudioView::colors);
+	Kaba::LinkExternal("colors", &tsunami->_view->colors);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);

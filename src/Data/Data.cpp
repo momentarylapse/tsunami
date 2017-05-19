@@ -8,6 +8,9 @@
 #include "Data.h"
 #include "../lib/threads/Mutex.h"
 
+
+const string Data::MESSAGE_FINISHED_LOADING = "FinishedLoading";
+
 Data::Data(const string &name) :
 	Observable(name)
 {

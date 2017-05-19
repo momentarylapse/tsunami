@@ -34,7 +34,7 @@ const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
-ColorScheme AudioView::colors;
+ColorSchemeBasic AudioView::basic_colors;
 
 int get_track_index_save(Song *song, Track *t)
 {
@@ -100,12 +100,13 @@ Image *ExpandImageMask(Image *im, float d)
 	return r;
 }
 
-AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output) :
+AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	Observable("AudioView"),
 	Observer("AudioView"),
 	midi_scale(Scale::TYPE_MAJOR, 0),
 	cam(this)
 {
+	id = _id;
 	win = parent;
 
 	ColorSchemeBasic bright;
@@ -188,20 +189,20 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 
 
 	// events
-	parent->eventXP("area", "hui:draw", std::bind(&AudioView::onDraw, this, std::placeholders::_1));
-	parent->eventX("area", "hui:mouse-move", std::bind(&AudioView::onMouseMove, this));
-	parent->eventX("area", "hui:left-button-down", std::bind(&AudioView::onLeftButtonDown, this));
-	parent->eventX("area", "hui:left-double-click", std::bind(&AudioView::onLeftDoubleClick, this));
-	parent->eventX("area", "hui:left-button-up", std::bind(&AudioView::onLeftButtonUp, this));
-	parent->eventX("area", "hui:middle-button-down", std::bind(&AudioView::onMiddleButtonDown, this));
-	parent->eventX("area", "hui:middle-button-up", std::bind(&AudioView::onMiddleButtonUp, this));
-	parent->eventX("area", "hui:right-button-down", std::bind(&AudioView::onRightButtonDown, this));
-	parent->eventX("area", "hui:right-button-up", std::bind(&AudioView::onRightButtonUp, this));
-	parent->eventX("area", "hui:key-down", std::bind(&AudioView::onKeyDown, this));
-	parent->eventX("area", "hui:key-up", std::bind(&AudioView::onKeyUp, this));
-	parent->eventX("area", "hui:mouse-wheel", std::bind(&AudioView::onMouseWheel, this));
+	parent->eventXP(id, "hui:draw", std::bind(&AudioView::onDraw, this, std::placeholders::_1));
+	parent->eventX(id, "hui:mouse-move", std::bind(&AudioView::onMouseMove, this));
+	parent->eventX(id, "hui:left-button-down", std::bind(&AudioView::onLeftButtonDown, this));
+	parent->eventX(id, "hui:left-double-click", std::bind(&AudioView::onLeftDoubleClick, this));
+	parent->eventX(id, "hui:left-button-up", std::bind(&AudioView::onLeftButtonUp, this));
+	parent->eventX(id, "hui:middle-button-down", std::bind(&AudioView::onMiddleButtonDown, this));
+	parent->eventX(id, "hui:middle-button-up", std::bind(&AudioView::onMiddleButtonUp, this));
+	parent->eventX(id, "hui:right-button-down", std::bind(&AudioView::onRightButtonDown, this));
+	parent->eventX(id, "hui:right-button-up", std::bind(&AudioView::onRightButtonUp, this));
+	parent->eventX(id, "hui:key-down", std::bind(&AudioView::onKeyDown, this));
+	parent->eventX(id, "hui:key-up", std::bind(&AudioView::onKeyUp, this));
+	parent->eventX(id, "hui:mouse-wheel", std::bind(&AudioView::onMouseWheel, this));
 
-	parent->activate("area");
+	parent->activate(id);
 
 
 	menu_song = hui::CreateResourceMenu("popup_song_menu");
@@ -254,10 +255,12 @@ AudioView::~AudioView()
 void AudioView::setColorScheme(const string &name)
 {
 	hui::Config.setStr("View.ColorScheme", name);
-	colors.create(basic_schemes[0]);
-	for (ColorSchemeBasic &b : basic_schemes)
+	basic_colors = basic_schemes[0];
+	for (ColorSchemeBasic &b: basic_schemes)
 		if (b.name == name)
-			colors.create(b);
+			basic_colors = b;
+
+	colors = basic_colors.create(true);
 	forceRedraw();
 }
 
@@ -450,7 +453,7 @@ void AudioView::forceRedraw()
 {
 	//msg_write("force redraw");
 	force_redraw = true;
-	win->redraw("area");
+	win->redraw(id);
 }
 
 void AudioView::unselectAllSamples()
@@ -554,6 +557,9 @@ void AudioView::onUpdate(Observable *o, const string &message)
 					setCurTrack(song->tracks[0]);
 			}
 			optimizeView();
+		}else if (message == song->MESSAGE_FINISHED_LOADING){
+			optimizeView();
+			hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, this));
 		}else{
 			if ((message == song->MESSAGE_ADD_TRACK) or (message == song->MESSAGE_DELETE_TRACK))
 				updateTracks();
@@ -749,6 +755,7 @@ int frame=0;
 
 void AudioView::onDraw(Painter *c)
 {
+	colors = basic_colors.create(win->isActive(id));
 	force_redraw = false;
 
 	drawing_rect = rect(0, c->width, 0, c->height);
@@ -762,6 +769,8 @@ void AudioView::onDraw(Painter *c)
 		drawAudioFile(c, drawing_rect);
 
 	//c->DrawStr(100, 100, i2s(frame++));
+
+	colors = basic_colors.create(true);
 }
 
 void AudioView::optimizeView()
@@ -962,6 +971,7 @@ void AudioView::setInput(InputStreamAny *_input)
 		subscribe(input);
 }
 
+// unused?!?
 void AudioView::enable(bool _enabled)
 {
 	if (enabled and !_enabled)

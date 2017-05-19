@@ -99,7 +99,7 @@ void LayerConsole::onMerge()
 
 void LayerConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void LayerConsole::onUpdate(Observable *o, const string &message)

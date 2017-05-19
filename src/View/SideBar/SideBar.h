@@ -24,17 +24,7 @@ class SynthConsole;
 class MidiFxConsole;
 class CaptureConsole;
 class AudioView;
-
-class SideBarConsole : public hui::Panel
-{
-public:
-	SideBarConsole(const string &_title)
-	{ title = _title; }
-	string title;
-
-	virtual void onEnter(){}
-	virtual void onLeave(){}
-};
+class SideBarConsole;
 
 class SideBar : public hui::Panel, public Observable
 {
@@ -86,6 +76,19 @@ public:
 
 	Array<SideBarConsole*> consoles;
 	void addConsole(SideBarConsole *c);
+};
+
+
+class SideBarConsole : public hui::Panel
+{
+public:
+	SideBarConsole(const string &_title)
+	{ title = _title; }
+	string title;
+	SideBar *bar(){ return dynamic_cast<SideBar*>(parent); }
+
+	virtual void onEnter(){}
+	virtual void onLeave(){}
 };
 
 #endif /* BOTTOMBAR_H_ */

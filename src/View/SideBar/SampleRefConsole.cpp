@@ -59,7 +59,7 @@ void SampleRefConsole::onMute()
 
 void SampleRefConsole::onTrack()
 {
-	int n = getInt("");
+	//int n = getInt("");
 }
 
 void SampleRefConsole::onVolume()
@@ -74,18 +74,18 @@ void SampleRefConsole::onVolume()
 
 void SampleRefConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void SampleRefConsole::onEditTrack()
 {
-	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void SampleRefConsole::onEditSample()
 {
-	((SideBar*)parent)->sample_manager->setSelection(sample->origin);
-	((SideBar*)parent)->open(SideBar::SAMPLE_CONSOLE);
+	bar()->sample_manager->setSelection(sample->origin);
+	bar()->open(SideBar::SAMPLE_CONSOLE);
 }
 
 void SampleRefConsole::loadData()

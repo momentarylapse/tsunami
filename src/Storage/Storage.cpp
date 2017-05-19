@@ -78,6 +78,7 @@ bool Storage::load(Song *a, const string &filename)
 	a->action_manager->reset();
 	a->notify(a->MESSAGE_NEW);
 	a->notify(a->MESSAGE_CHANGE);
+	a->notify(a->MESSAGE_FINISHED_LOADING);
 
 	delete(f);
 	return true;

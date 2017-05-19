@@ -44,6 +44,7 @@ void NewDialog::onOk()
 	}
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);
+	song->notify(song->MESSAGE_FINISHED_LOADING);
 	destroy();
 }
 

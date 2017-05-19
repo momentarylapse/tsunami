@@ -148,32 +148,32 @@ void TrackConsole::applyData()
 
 void TrackConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void TrackConsole::onEditFx()
 {
-	((SideBar*)parent)->open(SideBar::FX_CONSOLE);
+	bar()->open(SideBar::FX_CONSOLE);
 }
 
 void TrackConsole::onEditCurves()
 {
-	((SideBar*)parent)->open(SideBar::CURVE_CONSOLE);
+	bar()->open(SideBar::CURVE_CONSOLE);
 }
 
 void TrackConsole::onEditMidi()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
+	bar()->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
 void TrackConsole::onEditMidiFx()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_FX_CONCOLE);
+	bar()->open(SideBar::MIDI_FX_CONCOLE);
 }
 
 void TrackConsole::onEditSynth()
 {
-	((SideBar*)parent)->open(SideBar::SYNTH_CONSOLE);
+	bar()->open(SideBar::SYNTH_CONSOLE);
 }
 
 void TrackConsole::onUpdate(Observable *o, const string &message)

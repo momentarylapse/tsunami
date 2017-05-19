@@ -11,6 +11,8 @@
 #include "../lib/base/base.h"
 #include "../lib/image/color.h"
 
+class ColorScheme;
+
 class ColorSchemeBasic
 {
 public:
@@ -20,6 +22,8 @@ public:
 	color hover;
 	float gamma;
 	string name;
+
+	ColorScheme create(bool active) const;
 };
 
 class ColorScheme : public ColorSchemeBasic
@@ -39,7 +43,6 @@ public:
 	color sample;
 	color sample_selected;
 	color sample_hover;
-	void create(ColorSchemeBasic &basic);
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

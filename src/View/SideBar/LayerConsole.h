@@ -23,6 +23,7 @@ public:
 
 	void onSelect();
 	void onEdit();
+	void onMove();
 	void onAdd();
 	void onDelete();
 	void onMerge();

@@ -507,13 +507,7 @@ void DeviceManager::moveDevicePriority(Device *d, int new_prio)
 	Array<Device*> &devices = getDeviceList(d->type);
 	for (int i=0; i<devices.num; i++)
 		if (devices[i] == d){
-			if (i > new_prio){
-				devices.insert(d, new_prio);
-				devices.erase(i + 1);
-			}else{
-				devices.insert(d, new_prio + 1);
-				devices.erase(i);
-			}
+			devices.move(i, new_prio);
 			break;
 		}
 	write_config();

@@ -18,6 +18,7 @@ OBJ = \
  Action/Layer/ActionLayer__Delete.o\
  Action/Layer/ActionLayerAdd.o\
  Action/Layer/ActionLayerDelete.o\
+ Action/Layer/ActionLayerMove.o\
  Action/Layer/ActionLayerMerge.o\
  Action/Layer/ActionLayerRename.o\
  Action/Sample/ActionSampleAdd.o\
@@ -351,6 +352,9 @@ Action/Layer/ActionLayerAdd.o : Action/Layer/ActionLayerAdd.cpp
 
 Action/Layer/ActionLayerDelete.o : Action/Layer/ActionLayerDelete.cpp
 	$(CPP) -c Action/Layer/ActionLayerDelete.cpp -o $@ $(CXXFLAGS)
+
+Action/Layer/ActionLayerMove.o : Action/Layer/ActionLayerMove.cpp
+	$(CPP) -c Action/Layer/ActionLayerMove.cpp -o $@ $(CXXFLAGS)
 
 Action/Layer/ActionLayerMerge.o : Action/Layer/ActionLayerMerge.cpp
 	$(CPP) -c Action/Layer/ActionLayerMerge.cpp -o $@ $(CXXFLAGS)

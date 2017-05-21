@@ -168,9 +168,9 @@ void DynamicArray::insert_single(const void *d, int index)
 
 void DynamicArray::swap(int i1, int i2)
 {
-	if ((i1 < 0) || (i1 >= num))
+	if ((i1 < 0) or (i1 >= num))
 		return;
-	if ((i2 < 0) || (i2 >= num))
+	if ((i2 < 0) or (i2 >= num))
 		return;
 	if (i1 == i2)
 		return;
@@ -195,6 +195,17 @@ void DynamicArray::swap(int i1, int i2)
 		memcpy(p1, p2, element_size);
 		memcpy(p2, t, element_size);
 		delete[](t);
+	}
+}
+
+void DynamicArray::move(int source, int target)
+{
+	if (source > target){
+		for (int i=source; i>target; i--)
+			swap(i, i-1);
+	}else{
+		for (int i=source; i<target; i++)
+			swap(i, i+1);
 	}
 }
 

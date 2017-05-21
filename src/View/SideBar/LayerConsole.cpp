@@ -31,6 +31,7 @@ LayerConsole::LayerConsole(Song *s, AudioView *v) :
 
 	eventX("layers", "hui:select", std::bind(&LayerConsole::onSelect, this));
 	eventX("layers", "hui:change", std::bind(&LayerConsole::onEdit, this));
+	eventX("layers", "hui:move", std::bind(&LayerConsole::onMove, this));
 	event("add_layer", std::bind(&LayerConsole::onAdd, this));
 	event("delete_layer", std::bind(&LayerConsole::onDelete, this));
 	event("merge_layer", std::bind(&LayerConsole::onMerge, this));
@@ -72,6 +73,16 @@ void LayerConsole::onEdit()
 	if (r < 0)
 		return;
 	song->renameLayer(r, getCell("layers", r, 1));
+}
+
+void LayerConsole::onMove()
+{
+	int source = hui::GetEvent()->row;
+	int target = hui::GetEvent()->row_target;
+	if ((source < 0) or (target < 0))
+		return;
+	song->moveLayer(source, target);
+	view->setCurLayer(target);
 }
 
 void LayerConsole::onAdd()

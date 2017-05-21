@@ -32,6 +32,7 @@
 #include "../Action/Layer/ActionLayerAdd.h"
 #include "../Action/Layer/ActionLayerDelete.h"
 #include "../Action/Layer/ActionLayerMerge.h"
+#include "../Action/Layer/ActionLayerMove.h"
 #include "../Action/Layer/ActionLayerRename.h"
 #include "../Action/Sample/ActionSampleAdd.h"
 #include "../Action/Sample/ActionSampleDelete.h"
@@ -411,6 +412,11 @@ void Song::mergeLayers(int source, int target)
 	if (source == target)
 		throw SongException(_("Can't merge a layer with itself."));
 	execute(new ActionLayerMerge(source, target));
+}
+
+void Song::moveLayer(int source, int target)
+{
+	execute(new ActionLayerMove(source, target));
 }
 
 void Song::renameLayer(int index, const string &name)

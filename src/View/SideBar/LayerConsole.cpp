@@ -51,12 +51,12 @@ LayerConsole::~LayerConsole()
 void LayerConsole::loadData()
 {
 	reset("layers");
-	foreachi(string &n, song->layer_names, i)
-		addString("layers", i2s(i + 1) + "\\" + n);
-	if (song->layer_names.num > 0)
+	foreachi(Song::Layer *l, song->layers, i)
+		addString("layers", i2s(i + 1) + "\\" + l->name + "\\" + b2s(l->active));
+	if (song->layers.num > 0)
 		setInt("layers", view->cur_layer);
 
-	enable("delete_layer", song->layer_names.num > 1);
+	enable("delete_layer", song->layers.num > 1);
 	enable("merge_layer", view->cur_layer > 0);
 }
 
@@ -69,10 +69,16 @@ void LayerConsole::onSelect()
 
 void LayerConsole::onEdit()
 {
-	int r = hui::GetEvent()->row;
-	if (r < 0)
+	int row = hui::GetEvent()->row;
+	int col = hui::GetEvent()->column;
+	if (row < 0)
 		return;
-	song->renameLayer(r, getCell("layers", r, 1));
+	if (col == 1){
+		song->renameLayer(row, getCell("layers", row, 1));
+	}else if (col == 2){
+		song->layers[row]->active = getCell("layers", row, 2)._bool();
+		loadData();
+	}
 }
 
 void LayerConsole::onMove()
@@ -96,7 +102,7 @@ void LayerConsole::onDelete()
 {
 	try{
 		song->deleteLayer(view->cur_layer);
-	}catch(SongException &e){
+	}catch(Song::Exception &e){
 		tsunami->log->error(e.message);
 	}
 }

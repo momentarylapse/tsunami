@@ -303,6 +303,10 @@ class Track
 class Tag
 	string key, value
 
+class SongLayer
+	string name
+	bool active
+
 class Song
 	string filename
 	Tag[] tags
@@ -316,7 +320,7 @@ class Song
 	
 	BarPattern[] bars
 	
-	string[] layer_names
+	SongLayer*[] layers
 	
 	extern void __init__()
 	extern virtual void __delete__()

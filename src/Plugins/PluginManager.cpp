@@ -78,7 +78,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("storage", &tsunami->storage);
 	Kaba::LinkExternal("logging", &tsunami->log);
-	Kaba::LinkExternal("colors", &tsunami->_view->colors);
+	Kaba::LinkExternal("colors", &tsunami->_view->_export_colors);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -331,7 +331,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
 	Kaba::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
 	Kaba::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
-	Kaba::DeclareClassOffset("Song", "layer_names", _offsetof(Song, layer_names));
+	Kaba::DeclareClassOffset("Song", "layers", _offsetof(Song, layers));
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);

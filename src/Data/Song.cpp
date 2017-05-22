@@ -72,9 +72,15 @@ int get_sample_ref_index(SampleRef *s)
 	return -1;
 }
 
-SongException::SongException(const string &_message)
+Song::Exception::Exception(const string &_message)
 {
 	message = _message;
+}
+
+Song::Layer::Layer(const string &_name)
+{
+	name = _name;
+	active = true;
 }
 
 Song::Song() :
@@ -84,7 +90,7 @@ Song::Song() :
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
 	volume = 1;
-	layer_names.add("");
+	layers.add(new Layer(""));
 }
 
 void Song::__init__()
@@ -231,8 +237,10 @@ void Song::reset()
 		delete(c);
 	curves.clear();
 
-	layer_names.clear();
-	layer_names.add("");
+	for (Layer *l: layers)
+		delete(l);
+	layers.clear();
+	layers.add(new Layer(""));
 
 	action_manager->reset();
 
@@ -357,7 +365,7 @@ Track *Song::addTrack(int type, int index)
 	if (type == Track::TYPE_TIME){
 		// force single time track
 		if (getTimeTrack())
-			throw SongException(_("There already is one rhythm track."));
+			throw Exception(_("There already is one rhythm track."));
 	}
 	if (index < 0)
 		index = tracks.num;
@@ -400,17 +408,17 @@ void Song::addLayer(const string &name, int index)
 
 void Song::deleteLayer(int index)
 {
-	if (layer_names.num < 2)
-		throw SongException(_("At least one layer has to exist."));
+	if (layers.num < 2)
+		throw Exception(_("At least one layer has to exist."));
 	execute(new ActionLayerDelete(index));
 }
 
 void Song::mergeLayers(int source, int target)
 {
-	if (layer_names.num < 2)
-		throw SongException(_("At least one layer has to exist."));
+	if (layers.num < 2)
+		throw Exception(_("At least one layer has to exist."));
 	if (source == target)
-		throw SongException(_("Can't merge a layer with itself."));
+		throw Exception(_("Can't merge a layer with itself."));
 	execute(new ActionLayerMerge(source, target));
 }
 
@@ -427,7 +435,7 @@ void Song::renameLayer(int index, const string &name)
 void Song::deleteTrack(int index)
 {
 	if (tracks.num < 2)
-		throw SongException(_("At least one layer has to exist."));
+		throw Exception(_("At least one layer has to exist."));
 	execute(new ActionTrackDelete(index));
 }
 
@@ -439,7 +447,7 @@ Sample *Song::addSample(const string &name, BufferBox &buf)
 void Song::deleteSample(Sample *s)
 {
 	if (s->ref_count > 0)
-		throw SongException(_("Can only delete samples which are unused."));
+		throw Exception(_("Can only delete samples which are unused."));
 	execute(new ActionSampleDelete(s));
 }
 
@@ -574,8 +582,8 @@ int Song::getNextBeat(int pos)
 
 string Song::getNiceLayerName(int index)
 {
-	if (layer_names[index].num > 0)
-		return layer_names[index];
+	if (layers[index]->name.num > 0)
+		return layers[index]->name;
 	return format(_("Layer %d"), index + 1);
 }
 

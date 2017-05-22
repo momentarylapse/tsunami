@@ -81,6 +81,7 @@ public:
 
 	Array<ColorSchemeBasic> basic_schemes;
 	static ColorSchemeBasic basic_colors;
+	static ColorScheme _export_colors;
 	ColorScheme colors;
 	void setColorScheme(const string &name);
 

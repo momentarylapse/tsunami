@@ -14,7 +14,6 @@ class ActionLayerRename : public Action
 {
 public:
 	ActionLayerRename(int index, const string &name);
-	virtual ~ActionLayerRename();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

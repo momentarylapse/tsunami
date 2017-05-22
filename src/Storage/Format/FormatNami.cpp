@@ -52,15 +52,15 @@ public:
 	virtual void read(File *f)
 	{
 		int num = f->ReadInt();
-		me->layer_names.clear();
+		me->layers.clear();
 		for (int i=0;i<num;i++)
-			me->layer_names.add(f->ReadStr());
+			me->layers.add(new Song::Layer(f->ReadStr()));
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->layer_names.num);
-		for (int i=0; i<me->layer_names.num; i++)
-			f->WriteStr(me->layer_names[i]);
+		f->WriteInt(me->layers.num);
+		for (auto l: me->layers)
+			f->WriteStr(l->name);
 	}
 };
 

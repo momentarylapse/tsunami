@@ -14,12 +14,13 @@ class ActionLayer__Delete : public Action
 {
 public:
 	ActionLayer__Delete(int index);
+	virtual ~ActionLayer__Delete();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 private:
 	int index;
-	string name;
+	void *layer;
 };
 
 #endif /* SRC_ACTION_LAYER_ACTIONLAYER__DELETE_H_ */

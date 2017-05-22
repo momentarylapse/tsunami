@@ -9,16 +9,23 @@
 
 #include "../../Data/Song.h"
 
-ActionLayerAdd::ActionLayerAdd(const string &_name, int _index)
+ActionLayerAdd::ActionLayerAdd(const string &name, int _index)
 {
-	name = _name;
+	layer = new Song::Layer(name);
 	index = _index;
+}
+
+ActionLayerAdd::~ActionLayerAdd()
+{
+	if (layer)
+		delete((Song::Layer*)layer);
 }
 
 void* ActionLayerAdd::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	a->layer_names.insert(name, index);
+	a->layers.insert((Song::Layer*)layer, index);
+	layer = NULL;
 
 	TrackLayer new_layer;
 	for (Track *t: a->tracks)
@@ -32,7 +39,7 @@ void ActionLayerAdd::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	a->layer_names.erase(index);
+	a->layers.erase(index);
 
 	for (Track *t: a->tracks)
 		t->layers.erase(index);

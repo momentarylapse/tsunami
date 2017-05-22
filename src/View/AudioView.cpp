@@ -35,6 +35,7 @@ const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
 ColorSchemeBasic AudioView::basic_colors;
+ColorScheme AudioView::_export_colors;
 
 int get_track_index_save(Song *song, Track *t)
 {
@@ -261,6 +262,7 @@ void AudioView::setColorScheme(const string &name)
 			basic_colors = b;
 
 	colors = basic_colors.create(true);
+	_export_colors = colors;
 	forceRedraw();
 }
 
@@ -533,7 +535,7 @@ void AudioView::checkConsistency()
 			setCurTrack(song->tracks[0]);
 
 	// check cur_layer consistency
-	if ((cur_layer < 0) or (cur_layer >= song->layer_names.num)){
+	if ((cur_layer < 0) or (cur_layer >= song->layers.num)){
 		cur_layer = 0;
 		forceRedraw();
 	}
@@ -952,7 +954,7 @@ void AudioView::setCurLayer(int l)
 {
 	if (cur_layer == l)
 		return;
-	if ((l < 0) or (l >= song->layer_names.num))
+	if ((l < 0) or (l >= song->layers.num))
 		return;
 	cur_layer = l;
 	forceRedraw();

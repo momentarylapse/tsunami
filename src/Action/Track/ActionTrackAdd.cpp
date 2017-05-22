@@ -37,7 +37,7 @@ void *ActionTrackAdd::execute(Data *d)
 
 	t->song = a;
 	t->type = type;
-	t->layers.resize(a->layer_names.num);
+	t->layers.resize(a->layers.num);
 
 	a->tracks.insert(t, index);
 

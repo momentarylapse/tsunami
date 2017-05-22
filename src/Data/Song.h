@@ -35,13 +35,6 @@ struct Tag
 	}
 };
 
-class SongException
-{
-public:
-	SongException(const string &message);
-	string message;
-};
-
 class Song : public Data
 {
 public:
@@ -67,6 +60,15 @@ public:
 	static const string MESSAGE_EDIT_LAYER;
 	static const string MESSAGE_DELETE_LAYER;
 	static const string MESSAGE_EDIT_BARS;
+
+
+
+	class Exception
+	{
+	public:
+		Exception(const string &message);
+		string message;
+	};
 
 	string _cdecl get_time_str(int t);
 	string _cdecl get_time_str_fuzzy(int t, float dt);
@@ -143,7 +145,14 @@ public:
 	Array<Curve*> curves;
 	BarCollection bars;
 
-	Array<string> layer_names;
+	struct Layer
+	{
+		string name;
+		bool active;
+		Layer(const string &name);
+	};
+
+	Array<Layer*> layers;
 };
 
 

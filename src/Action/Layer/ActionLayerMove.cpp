@@ -19,7 +19,7 @@ void* ActionLayerMove::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	a->layer_names.move(source, target);
+	a->layers.move(source, target);
 	for (Track *t: a->tracks)
 		t->layers.move(source, target);
 
@@ -30,7 +30,7 @@ void ActionLayerMove::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	a->layer_names.move(target, source);
+	a->layers.move(target, source);
 	for (Track *t: a->tracks)
 		t->layers.move(target, source);
 }

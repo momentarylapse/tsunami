@@ -12,18 +12,25 @@
 ActionLayer__Delete::ActionLayer__Delete(int _index)
 {
 	index = _index;
+	layer = NULL;
+}
+
+ActionLayer__Delete::~ActionLayer__Delete()
+{
+	if (layer)
+		delete((Song::Layer*)layer);
 }
 
 void* ActionLayer__Delete::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
-	assert(index < a->layer_names.num);
+	assert(index < a->layers.num);
 
-	name = a->layer_names[index];
-	a->layer_names.erase(index);
+	layer = a->layers[index];
+	a->layers.erase(index);
 
-	for (Track *t : a->tracks){
+	for (Track *t: a->tracks){
 		assert(t->layers[index].buffers.num == 0);
 		t->layers.erase(index);
 	}
@@ -37,10 +44,11 @@ void ActionLayer__Delete::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	a->layer_names.insert(name, index);
+	a->layers.insert((Song::Layer*)layer, index);
+	layer = NULL;
 
 	TrackLayer new_layer;
-	for (Track *t : a->tracks)
+	for (Track *t: a->tracks)
 		t->layers.insert(new_layer, index);
 
 	a->notify(a->MESSAGE_ADD_LAYER);

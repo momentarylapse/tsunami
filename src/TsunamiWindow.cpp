@@ -309,7 +309,7 @@ void TsunamiWindow::onAddTimeTrack()
 		// some default data
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
-	}catch(SongException &e){
+	}catch(Song::Exception &e){
 		app->log->error(e.message);
 	}
 	song->action_manager->endActionGroup();
@@ -325,7 +325,7 @@ void TsunamiWindow::onDeleteTrack()
 	if (view->cur_track){
 		try{
 			song->deleteTrack(get_track_index(view->cur_track));
-		}catch(SongException &e){
+		}catch(Song::Exception &e){
 			app->log->error(e.message);
 		}
 	}else{
@@ -735,8 +735,8 @@ void TsunamiWindow::updateMenu()
 	enable("delete_track", view->cur_track);
 	enable("track_properties", view->cur_track);
 	// layer
-	enable("layer_delete", song->layer_names.num > 1);
-	enable("layer_up", view->cur_layer < song->layer_names.num -1);
+	enable("layer_delete", song->layers.num > 1);
+	enable("layer_up", view->cur_layer < song->layers.num -1);
 	enable("layer_down", view->cur_layer > 0);
 	// bars
 	enable("delete_bars", !view->sel.bars.empty());
@@ -762,7 +762,7 @@ void TsunamiWindow::updateMenu()
 	hui::Menu *m = getMenu()->getSubMenuByID("menu_layer_target");
 	if (m){
 		m->clear();
-		for (int i=0; i<song->layer_names.num; i++)
+		for (int i=0; i<song->layers.num; i++)
 			m->addItemCheckable(song->getNiceLayerName(i), format("jump_to_layer_%d", i));
 		check(format("jump_to_layer_%d", view->cur_layer), true);
 	}

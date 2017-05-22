@@ -16,19 +16,15 @@ ActionLayerRename::ActionLayerRename(int _index, const string &_name)
 	name = _name;
 }
 
-ActionLayerRename::~ActionLayerRename()
-{
-}
-
 void* ActionLayerRename::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
-	assert(index < a->layer_names.num);
+	assert(index < a->layers.num);
 
 	string temp = name;
-	name = a->layer_names[index];
-	a->layer_names[index] = temp;
+	name = a->layers[index]->name;
+	a->layers[index]->name = temp;
 
 	a->notify(a->MESSAGE_EDIT_LAYER);
 

@@ -45,11 +45,15 @@ public:
 	string SelectFavoriteName(hui::Window *win, Configurable *c, bool save);
 
 	Array<string> FindSynthesizers();
-	Synthesizer *LoadSynthesizer(const string &name, Song *song);
+	Array<string> FindEffects();
+	Array<string> FindMidiEffects();
+	Array<string> FindConfigurable(int type);
+	Synthesizer *__LoadSynthesizer(const string &name, Song *song);
+	Synthesizer *CreateSynthesizer(const string &name, Song *song);
 
 	Effect *ChooseEffect(hui::Panel *parent, Song *song);
 	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Song *song);
-	//Synthesizer *ChooseSynthesizer(hui::Panel *parent);
+	Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name = "");
 
 
 	// not compiled yet

@@ -11,9 +11,6 @@
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
 #include "../../Midi/MidiSource.h"
-#include "../../Tsunami.h"
-#include "../../Stuff/Log.h"
-#include "../../Plugins/PluginManager.h"
 #include "../../lib/math/math.h"
 
 
@@ -144,32 +141,3 @@ bool Synthesizer::isDefault()
 	return (name == "Dummy") and (tuning.is_default());
 }
 
-
-
-// factory
-Synthesizer *CreateSynthesizer(const string &name, Song *song)
-{
-	if ((name == "Dummy") or (name == ""))
-		return new DummySynthesizer;
-	/*if (name == "Sample")
-		return new SampleSynthesizer;*/
-	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name, song);
-	if (s){
-		s->resetConfig();
-		s->name = name;
-		return s;
-	}
-	tsunami->log->error(_("unknown synthesizer: ") + name);
-	s = new DummySynthesizer;
-	s->song = song;
-	s->name = name;
-	return s;
-}
-
-Array<string> FindSynthesizers()
-{
-	Array<string> names = tsunami->plugin_manager->FindSynthesizers();
-	names.add("Dummy");
-	//names.add("Sample");
-	return names;
-}

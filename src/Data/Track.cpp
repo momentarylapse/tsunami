@@ -36,6 +36,8 @@
 #include "../Action/Track/Marker/ActionTrackMoveMarker.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
+#include "../Tsunami.h"
+#include "../Plugins/PluginManager.h"
 
 
 string track_type(int type)
@@ -66,7 +68,7 @@ Track::Track() :
 	volume = 1;
 	muted = false;
 
-	synth = CreateSynthesizer("Dummy", song);
+	synth = tsunami->plugin_manager->CreateSynthesizer("Dummy", song);
 }
 
 
@@ -93,7 +95,7 @@ void Track::reset()
 
 	if (synth)
 		delete(synth);
-	synth = CreateSynthesizer("Dummy", song);
+	synth = tsunami->plugin_manager->CreateSynthesizer("Dummy", song);
 }
 
 Track::~Track()

@@ -18,26 +18,19 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int
 {
 	type = _type;
 	song = _song;
-	if (type == Configurable::TYPE_EFFECT){
-		string prefix = tsunami->directory_static + "Plugins/Buffer/";
-		for (auto &pf : tsunami->plugin_manager->plugin_files){
-			if (pf.filename.match(prefix + "*")){
-				names.add(pf.name);
-				string g = pf.filename.substr(prefix.num, -1).explode("/")[0];
-				groups.add(g);
-				ugroups.add(g);
-			}
-		}
-	}else if (type == Configurable::TYPE_MIDI_EFFECT){
-		for (auto &pf : tsunami->plugin_manager->plugin_files){
-			if (pf.type == Plugin::TYPE_MIDI_EFFECT)
-				names.add(pf.name);
-		}
-	}else if (type == Configurable::TYPE_SYNTHESIZER){
-		names = FindSynthesizers();
+	Array<string> tnames = tsunami->plugin_manager->FindConfigurable(type);
+
+	for (string &s: tnames){
+		auto ss = s.explode("/");
+		names.add(ss.back());
+		groups.add(ss[0]);
+		ugroups.add(ss[0]);
 	}
 
-	for (string &g : ugroups)
+	if (ugroups.num < 2)
+		ugroups.clear();
+
+	for (string &g: ugroups)
 		setString("list", g);
 
 	foreachi(string &name, names, i){
@@ -81,7 +74,7 @@ void ConfigurableSelectorDialog::onSelect()
 	else if (type == Configurable::TYPE_MIDI_EFFECT)
 		_return = CreateMidiEffect(names[n], song);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
-		_return = CreateSynthesizer(names[n], song);
+		_return = tsunami->plugin_manager->CreateSynthesizer(names[n], song);
 	destroy();
 }
 
@@ -98,13 +91,4 @@ void ConfigurableSelectorDialog::onCancel()
 void ConfigurableSelectorDialog::onOk()
 {
 	onSelect();
-}
-
-Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name)
-{
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
-	dlg->run();
-	Synthesizer *s = (Synthesizer*)dlg->_return;
-	delete(dlg);
-	return s;
 }

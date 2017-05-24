@@ -9,6 +9,7 @@
 #include "../../Tsunami.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
+#include "../../Plugins/PluginManager.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
@@ -832,7 +833,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateSynthesizer(f->ReadStr(), parent->song);
+		me = tsunami->plugin_manager->CreateSynthesizer(f->ReadStr(), parent->song);
 		me->configFromString(f->ReadStr());
 		f->ReadStr();
 		f->ReadInt();

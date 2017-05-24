@@ -70,6 +70,11 @@ void GlobalSetTempBackupFilename(const string &filename)
 	InputStreamAudio::setTempBackupFilename(filename);
 }
 
+Synthesizer* GlobalCreateSynthesizer(const string &name, Song *song)
+{
+	return tsunami->plugin_manager->CreateSynthesizer(name, song);
+}
+
 void PluginManager::LinkAppScriptData()
 {
 	Kaba::config.directory = "";
@@ -83,7 +88,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
 	Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
-	Kaba::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
+	Kaba::LinkExternal("CreateSynthesizer", (void*)&GlobalCreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
@@ -648,12 +653,14 @@ Array<string> PluginManager::FindSynthesizers()
 {
 	Array<string> names;
 	Array<DirEntry> list = dir_search(tsunami->directory_static + "Plugins/Synthesizer/", "*.kaba", false);
-	for (DirEntry &e : list)
+	for (DirEntry &e: list)
 		names.add(e.name.replace(".kaba", ""));
+	names.add("Dummy");
+	//names.add("Sample");
 	return names;
 }
 
-Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
+Synthesizer *PluginManager::__LoadSynthesizer(const string &name, Song *song)
 {
 	string filename = tsunami->directory_static + "Plugins/Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
@@ -675,6 +682,61 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 	}
 	return NULL;
 }
+// factory
+Synthesizer *PluginManager::CreateSynthesizer(const string &name, Song *song)
+{
+	if ((name == "Dummy") or (name == ""))
+		return new DummySynthesizer;
+	/*if (name == "Sample")
+		return new SampleSynthesizer;*/
+	Synthesizer *s = __LoadSynthesizer(name, song);
+	if (s){
+		s->resetConfig();
+		s->name = name;
+		return s;
+	}
+	tsunami->log->error(_("unknown synthesizer: ") + name);
+	s = new DummySynthesizer;
+	s->song = song;
+	s->name = name;
+	return s;
+}
+
+
+
+Array<string> PluginManager::FindEffects()
+{
+	Array<string> names;
+	string prefix = tsunami->directory_static + "Plugins/Buffer/";
+	for (auto &pf: plugin_files){
+		if (pf.filename.match(prefix + "*")){
+			string g = pf.filename.substr(prefix.num, -1).explode("/")[0];
+			names.add(g + "/" + pf.name);
+		}
+	}
+	return names;
+}
+
+Array<string> PluginManager::FindMidiEffects()
+{
+	Array<string> names;
+	for (auto &pf: plugin_files)
+		if (pf.type == Plugin::TYPE_MIDI_EFFECT)
+			names.add(pf.name);
+	return names;
+}
+
+Array<string> PluginManager::FindConfigurable(int type)
+{
+	if (type == Configurable::TYPE_EFFECT)
+		return FindEffects();
+	if (type == Configurable::TYPE_MIDI_EFFECT)
+		return FindMidiEffects();
+	if (type == Configurable::TYPE_SYNTHESIZER)
+		return FindSynthesizers();
+	return Array<string>();
+}
+
 
 Effect* PluginManager::ChooseEffect(hui::Panel *parent, Song *song)
 {
@@ -692,6 +754,16 @@ MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Song *song)
 	MidiEffect *e = (MidiEffect*)dlg->_return;
 	delete(dlg);
 	return e;
+}
+
+
+Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name)
+{
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
+	dlg->run();
+	Synthesizer *s = (Synthesizer*)dlg->_return;
+	delete(dlg);
+	return s;
 }
 
 /*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)

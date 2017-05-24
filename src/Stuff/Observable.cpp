@@ -14,17 +14,11 @@ const string Observable::MESSAGE_DELETE = "Delete";
 const bool Observable::DEBUG_MESSAGES = false;
 
 
-struct ObserverRequest
+ObserverRequest::ObserverRequest(Observer *o, const string &_message)
 {
-	ObserverRequest(){}
-	ObserverRequest(Observer *o, const string &_message)
-	{
-		observer = o;
-		message = &_message;
-	}
-	Observer* observer;
-	const string *message;
-};
+	observer = o;
+	message = &_message;
+}
 
 typedef ObserverRequest Notification;
 

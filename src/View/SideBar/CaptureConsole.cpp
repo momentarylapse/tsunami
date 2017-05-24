@@ -15,6 +15,7 @@
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
 #include "../../Stuff/Log.h"
+#include "../../Plugins/PluginManager.h"
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "CaptureConsole.h"
@@ -243,7 +244,7 @@ public:
 		input = NULL;
 		target = -1;
 
-		temp_synth = CreateSynthesizer("", song);
+		temp_synth = tsunami->plugin_manager->CreateSynthesizer("", song);
 
 		cc->event("capture_midi_source", std::bind(&CaptureConsoleModeMidi::onSource, this));
 		cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));

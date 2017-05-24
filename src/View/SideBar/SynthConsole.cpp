@@ -116,7 +116,7 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	Synthesizer *s = ChooseSynthesizer(win, track->song, track->synth->name);
+	Synthesizer *s = tsunami->plugin_manager->ChooseSynthesizer(win, track->song, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }

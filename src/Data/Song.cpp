@@ -17,7 +17,6 @@
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
-#include "../TsunamiWindow.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"

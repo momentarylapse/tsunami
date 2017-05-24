@@ -12,7 +12,14 @@
 #include "../lib/hui/hui.h"
 
 class Observer;
-struct ObserverRequest;
+
+struct ObserverRequest
+{
+	ObserverRequest(){}
+	ObserverRequest(Observer *o, const string &_message);
+	Observer* observer;
+	const string *message;
+};
 
 class Observable : public hui::EventHandler
 {

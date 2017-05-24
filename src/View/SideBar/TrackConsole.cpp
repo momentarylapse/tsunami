@@ -11,6 +11,7 @@
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../Dialog/TuningDialog.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Tsunami.h"
 #include "../AudioView.h"
 #include "TrackConsole.h"
 
@@ -25,7 +26,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	setDecimals(1);
 
 	Array<Instrument> instruments = Instrument::enumerate();
-	for (Instrument &i : instruments)
+	for (Instrument &i: instruments)
 		setString("instrument", i.name());
 
 	loadData();
@@ -137,7 +138,7 @@ void TrackConsole::onSelectSynth()
 {
 	if (!track)
 		return;
-	Synthesizer *s = ChooseSynthesizer(win, track->song, track->synth->name);
+	Synthesizer *s = tsunami->plugin_manager->ChooseSynthesizer(win, track->song, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }

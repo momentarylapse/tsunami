@@ -35,6 +35,4 @@ public:
 	Configurable *_return;
 };
 
-Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name = "");
-
 #endif /* CONFIGURABLESELECTORDIALOG_H_ */

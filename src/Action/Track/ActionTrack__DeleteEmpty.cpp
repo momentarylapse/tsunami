@@ -8,14 +8,16 @@
 #include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 
-ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(int _index)
+ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track)
 {
-	index = _index;
+	index = _track->get_index();
 	track = NULL;
 }
 
 ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
 {
+	if (track)
+		delete track;
 }
 
 void *ActionTrack__DeleteEmpty::execute(Data *d)
@@ -46,6 +48,7 @@ void ActionTrack__DeleteEmpty::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
+	track = NULL;
 }
 
 

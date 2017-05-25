@@ -10,10 +10,12 @@
 
 #include "../Action.h"
 
+class Track;
+
 class ActionTrackAdd : public Action
 {
 public:
-	ActionTrackAdd(int _index, int _type);
+	ActionTrackAdd(int _type, int index);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

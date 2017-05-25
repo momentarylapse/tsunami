@@ -124,6 +124,13 @@ class Array : public DynamicArray
 			}
 			num = size;
 		}
+		int find(const T item) const
+		{
+			for (int i=0; i<num; i++)
+				if ((*this)[i] == item)
+					return i;
+			return -1;
+		}
 		Array<T> _cdecl sub(int start, int num_elements) const
 		{
 			Array<T> s;

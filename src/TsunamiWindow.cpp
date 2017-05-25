@@ -298,7 +298,7 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	song->addTrack(Track::TYPE_AUDIO, view->cur_track->get_index() + 1);
+	song->addTrackAfter(Track::TYPE_AUDIO, view->cur_track);
 }
 
 void TsunamiWindow::onAddTimeTrack()
@@ -317,14 +317,14 @@ void TsunamiWindow::onAddTimeTrack()
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	song->addTrack(Track::TYPE_MIDI, view->cur_track->get_index() + 1);
+	song->addTrackAfter(Track::TYPE_MIDI, view->cur_track);
 }
 
 void TsunamiWindow::onDeleteTrack()
 {
 	if (view->cur_track){
 		try{
-			song->deleteTrack(get_track_index(view->cur_track));
+			song->deleteTrack(view->cur_track);
 		}catch(Song::Exception &e){
 			app->log->error(e.message);
 		}

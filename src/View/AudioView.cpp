@@ -130,6 +130,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 
 	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
+	dummy_vtrack = new AudioViewTrack(this, NULL);
+
 	song = _song;
 	input = NULL;
 
@@ -172,7 +174,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	cur_track = NULL;
 	cur_sample = NULL;
 	cur_layer = 0;
-	capturing_track = 0;
+	capturing_track = NULL;
 
 	bars_edit_data = true;
 
@@ -230,6 +232,8 @@ AudioView::~AudioView()
 	delete(peak_thread);
 	delete(stream);
 	delete(renderer);
+
+	delete(dummy_vtrack);
 
 	delete(images.speaker);
 	delete(images.speaker_bg);
@@ -585,6 +589,15 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	}
 }
 
+AudioViewTrack *AudioView::get_track(Track *track)
+{
+	for (auto t: vtrack){
+		if (t->track == track)
+			return t;
+	}
+	return dummy_vtrack;
+}
+
 void AudioView::updateTracks()
 {
 	bool changed = false;
@@ -726,11 +739,11 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 		int type = input->getType();
 		if (type == Track::TYPE_AUDIO)
 			((InputStreamAudio*)input)->buffer.update_peaks();
-		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
+		if (capturing_track){
 			if (type == Track::TYPE_AUDIO)
-				vtrack[capturing_track]->drawBuffer(c, ((InputStreamAudio*)input)->buffer, cam.pos - sel.range.offset, colors.capture_marker);
+				get_track(capturing_track)->drawBuffer(c, dynamic_cast<InputStreamAudio*>(input)->buffer, cam.pos - sel.range.offset, colors.capture_marker);
 			if (type == Track::TYPE_MIDI)
-				mode->drawMidi(c, vtrack[capturing_track], midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
+				mode->drawMidi(c, get_track(capturing_track), midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
 		}
 	}
 

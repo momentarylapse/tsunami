@@ -119,7 +119,7 @@ void MidiEditorConsole::update()
 
 	if (track->instrument.type == Instrument::TYPE_DRUMS){
 		// select a nicer pitch range in linear mode for drums
-		view->vtrack[track->get_index()]->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
+		view->get_track(track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
 	}
 }
 
@@ -134,15 +134,12 @@ void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 
 		reset("reference_tracks");
 		if (song){
-			for (Track *t : song->tracks)
+			for (Track *t: song->tracks)
 				addString("reference_tracks", t->getNiceName());
 		}
 
 		if (track){
-			int tn = track->get_index();
-			if ((tn >= 0) and (tn < view->vtrack.num))
-				if (view->vtrack[tn])
-					setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
+			setSelection("reference_tracks", view->get_track(track)->reference_tracks);
 		}
 	}else{
 		setTrack(track);

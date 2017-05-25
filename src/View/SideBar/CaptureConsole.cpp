@@ -55,7 +55,7 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 	InputStreamAudio *input;
 	Array<Device*> sources;
 	Device *chosen_device;
-	int target;
+	Track *target;
 
 public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc) :
@@ -63,7 +63,7 @@ public:
 	{
 		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 		input = NULL;
-		target = -1;
+		target = NULL;
 
 		cc->event("capture_audio_source", std::bind(&CaptureConsoleModeAudio::onSource, this));
 		cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
@@ -80,17 +80,19 @@ public:
 
 	void onTarget()
 	{
-		setTarget(cc->getInt("capture_audio_target"));
+		int index = cc->getInt("capture_audio_target");
+		if (index >= 0)
+			setTarget(cc->song->tracks[index]);
 	}
 
-	void setTarget(int index)
+	void setTarget(Track *t)
 	{
-		target = index;
-		view->setCurTrack(song->tracks[target]);
+		target = t;
+		view->setCurTrack(target);
 		view->capturing_track = target;
-		cc->setInt("capture_audio_target", target);
+		cc->setInt("capture_audio_target", target->get_index());
 
-		bool ok = (song->tracks[target]->type == Track::TYPE_AUDIO);
+		bool ok = (target->type == Track::TYPE_AUDIO);
 		cc->setString("capture_audio_message", "");
 		if (!ok)
 			cc->setString("capture_audio_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_AUDIO).c_str()));
@@ -99,7 +101,7 @@ public:
 
 	virtual void enterParent()
 	{
-		target = view->cur_track->get_index();
+		target = view->cur_track;
 	}
 
 	virtual void enter()
@@ -189,19 +191,18 @@ public:
 		int dpos = input->getDelay();
 
 		// overwrite
-		Track *t = song->tracks[target];
 		int i0 = s_start + dpos;
 
-		if (t->type != Track::TYPE_AUDIO){
-			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(t->type).c_str()));
+		if (target->type != Track::TYPE_AUDIO){
+			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(target->type).c_str()));
 			return false;
 		}
 
 		// insert data
 		Range r = Range(i0, input->getSampleCount());
 		cc->song->action_manager->beginActionGroup();
-		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
+		BufferBox tbuf = target->getBuffers(view->cur_layer, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(target, view->cur_layer, r);
 
 		if (hui::Config.getInt("Input.Mode", 0) == 1)
 			tbuf.add(input->buffer, 0, 1.0f, 0);
@@ -231,7 +232,7 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode
 	InputStreamMidi *input;
 	Array<Device*> sources;
 	Device *chosen_device;
-	int target;
+	Track *target;
 	Synthesizer *temp_synth;
 
 
@@ -242,7 +243,7 @@ public:
 	{
 		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_MIDI_INPUT);
 		input = NULL;
-		target = -1;
+		target = NULL;
 
 		temp_synth = tsunami->plugin_manager->CreateSynthesizer("", song);
 
@@ -261,21 +262,20 @@ public:
 
 	void onTarget()
 	{
-		setTarget(cc->getInt("capture_midi_target"));
+		setTarget(cc->song->tracks[cc->getInt("capture_midi_target")]);
 	}
 
 
-	void setTarget(int index)
+	void setTarget(Track *t)
 	{
-		target = index;
-		Track *t = song->tracks[index];
+		target = t;
 		input->setPreviewSynthesizer(t->synth);
-		view->setCurTrack(song->tracks[target]);
+		view->setCurTrack(target);
 		view->capturing_track = target;
-		cc->setInt("capture_midi_target", target);
+		cc->setInt("capture_midi_target", target->get_index());
 
 
-		bool ok = (song->tracks[target]->type == Track::TYPE_MIDI);
+		bool ok = (target->type == Track::TYPE_MIDI);
 		cc->setString("capture_midi_message", "");
 		if (!ok)
 			cc->setString("capture_midi_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_MIDI).c_str()));
@@ -284,7 +284,7 @@ public:
 
 	virtual void enterParent()
 	{
-		target = view->cur_track->get_index();
+		target = view->cur_track;
 	}
 
 	virtual void enter()
@@ -365,22 +365,20 @@ public:
 
 	virtual bool insert()
 	{
-		int target = cc->getInt("capture_midi_target");
 		int s_start = view->sel.range.start();
 
 		// insert recorded data with some delay
 		int dpos = input->getDelay();
 
-		Track *t = song->tracks[target];
 		int i0 = s_start + dpos;
 
-		if (t->type != Track::TYPE_MIDI){
-			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(t->type).c_str()));
+		if (target->type != Track::TYPE_MIDI){
+			tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(target->type).c_str()));
 			return false;
 		}
 
 		// insert data
-		t->insertMidiData(i0, midi_events_to_notes(input->midi));
+		target->insertMidiData(i0, midi_events_to_notes(input->midi));
 
 		input->resetAccumulation();
 		return true;

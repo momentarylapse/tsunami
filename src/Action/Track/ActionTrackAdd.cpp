@@ -13,7 +13,7 @@
 #include "../../Tsunami.h"
 #include "../../Plugins/PluginManager.h"
 
-ActionTrackAdd::ActionTrackAdd(int _index, int _type)
+ActionTrackAdd::ActionTrackAdd(int _type, int _index)
 {
 	index = _index;
 	type = _type;

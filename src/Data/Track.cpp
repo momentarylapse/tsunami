@@ -121,12 +121,8 @@ string Track::getNiceName()
 
 int Track::get_index()
 {
-	if (song){
-		foreachi(Track *t, song->tracks, i)
-			if (this == t)
-				return i;
-	}
-	return -1;
+	//assert(song);
+	return song->tracks.find(this);
 }
 
 BufferBox Track::readBuffers(int layer_no, const Range &r)

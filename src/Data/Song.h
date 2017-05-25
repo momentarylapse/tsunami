@@ -70,6 +70,14 @@ public:
 		string message;
 	};
 
+
+	struct Layer
+	{
+		string name;
+		bool active;
+		Layer(const string &name);
+	};
+
 	string _cdecl get_time_str(int t);
 	string _cdecl get_time_str_fuzzy(int t, float dt);
 	string _cdecl get_time_str_long(int t);
@@ -104,12 +112,13 @@ public:
 	void _cdecl setDefaultFormat(SampleFormat format);
 	void _cdecl setCompression(int compression);
 	Track *_cdecl addTrack(int type, int index = -1);
-	void _cdecl deleteTrack(int index);
+	Track *_cdecl addTrackAfter(int type, Track *insert_after = NULL);
+	void _cdecl deleteTrack(Track *track);
 	Sample *_cdecl addSample(const string &name, BufferBox &buf);
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);
-	void _cdecl addLayer(const string &name, int index);
+	Layer *_cdecl addLayer(const string &name, int index);
 	void _cdecl deleteLayer(int index);
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);
@@ -144,14 +153,6 @@ public:
 	Array<Sample*> samples;
 	Array<Curve*> curves;
 	BarCollection bars;
-
-	struct Layer
-	{
-		string name;
-		bool active;
-		Layer(const string &name);
-	};
-
 	Array<Layer*> layers;
 };
 

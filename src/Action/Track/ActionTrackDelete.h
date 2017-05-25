@@ -11,14 +11,16 @@
 #include "../../Data/Song.h"
 #include "../ActionGroup.h"
 
+class Track;
+
 class ActionTrackDelete : public ActionGroup
 {
 public:
-	ActionTrackDelete(int index);
+	ActionTrackDelete(Track *track);
 
 	virtual void build(Data *d);
 
-	int index;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKDELETET_H_ */

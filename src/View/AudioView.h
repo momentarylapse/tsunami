@@ -171,7 +171,7 @@ public:
 	Track *cur_track;
 	SampleRef *cur_sample;
 	int cur_layer;
-	int capturing_track;
+	Track *capturing_track;
 
 
 	void setScale(const Scale &s);
@@ -185,6 +185,8 @@ public:
 	ViewPort cam;
 
 	Array<AudioViewTrack*> vtrack;
+	AudioViewTrack *dummy_vtrack;
+	AudioViewTrack *get_track(Track *track);
 	void updateTracks();
 
 	int prefered_buffer_layer;

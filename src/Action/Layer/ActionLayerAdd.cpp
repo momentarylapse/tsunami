@@ -25,6 +25,7 @@ void* ActionLayerAdd::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	a->layers.insert((Song::Layer*)layer, index);
+	void *r = layer;
 	layer = NULL;
 
 	TrackLayer new_layer;
@@ -32,7 +33,7 @@ void* ActionLayerAdd::execute(Data* d)
 		t->layers.insert(new_layer, index);
 	a->notify(a->MESSAGE_ADD_LAYER);
 
-	return NULL;
+	return r;
 }
 
 void ActionLayerAdd::undo(Data* d)

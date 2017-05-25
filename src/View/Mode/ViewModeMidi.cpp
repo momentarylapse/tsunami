@@ -616,7 +616,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 		cur_track = t;
 
 		for (int n: t->reference_tracks)
-			if ((n >= 0) and (n < song->tracks.num) and (n != t->track->get_index()))
+			if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))
 				drawMidi(c, t, song->tracks[n]->midi, true, 0);
 
 		drawMidi(c, t, t->track->midi, false, 0);

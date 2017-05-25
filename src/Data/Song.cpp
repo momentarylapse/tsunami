@@ -64,13 +64,6 @@ int get_track_index(Track *t)
 	return -1;
 }
 
-int get_sample_ref_index(SampleRef *s)
-{
-	if (s)
-		return s->get_index();
-	return -1;
-}
-
 Song::Exception::Exception(const string &_message)
 {
 	message = _message;
@@ -357,7 +350,13 @@ Track *Song::addTrack(int type, int index)
 	}
 	if (index < 0)
 		index = tracks.num;
-	return (Track*)execute(new ActionTrackAdd(index, type));
+	return (Track*)execute(new ActionTrackAdd(type, index));
+}
+
+Track *Song::addTrackAfter(int type, Track *ref)
+{
+	int index = ref->get_index();
+	return addTrack(type, index + 1);
 }
 
 extern hui::Timer debug_timer;
@@ -389,9 +388,9 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	action_manager->endActionGroup();
 }
 
-void Song::addLayer(const string &name, int index)
+Song::Layer *Song::addLayer(const string &name, int index)
 {
-	execute(new ActionLayerAdd(name, index));
+	return (Song::Layer*)execute(new ActionLayerAdd(name, index));
 }
 
 void Song::deleteLayer(int index)
@@ -420,11 +419,11 @@ void Song::renameLayer(int index, const string &name)
 	execute(new ActionLayerRename(index, name));
 }
 
-void Song::deleteTrack(int index)
+void Song::deleteTrack(Track *track)
 {
 	if (tracks.num < 2)
 		throw Exception(_("At least one layer has to exist."));
-	execute(new ActionTrackDelete(index));
+	execute(new ActionTrackDelete(track));
 }
 
 Sample *Song::addSample(const string &name, BufferBox &buf)

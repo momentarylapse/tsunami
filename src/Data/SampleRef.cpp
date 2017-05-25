@@ -48,9 +48,7 @@ int SampleRef::get_index() const
 {
 	Track *t = track();
 	if (t){
-		foreachi(SampleRef *s, t->samples, i)
-			if (this == s)
-				return i;
+		return t->samples.find((SampleRef*)this);
 	}
 	return -1;
 }

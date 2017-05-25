@@ -14,7 +14,7 @@
 class ActionTrack__DeleteEmpty: public Action
 {
 public:
-	ActionTrack__DeleteEmpty(int _index);
+	ActionTrack__DeleteEmpty(Track *track);
 	virtual ~ActionTrack__DeleteEmpty();
 
 	virtual void *execute(Data *d);

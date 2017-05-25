@@ -56,10 +56,10 @@ const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 
-Track::Track() :
+Track::Track(int _type, Synthesizer *_synth) :
 	Observable("Track")
 {
-	type = TYPE_AUDIO;
+	type = _type;
 	muted = false;
 	volume = 1;
 	panning = 0;
@@ -68,21 +68,16 @@ Track::Track() :
 	volume = 1;
 	muted = false;
 
-	synth = tsunami->plugin_manager->CreateSynthesizer("Dummy", song);
+	synth = _synth;
+	if (synth)
+		synth->song = song;
 }
 
+//tsunami->plugin_manager->CreateSynthesizer("Dummy", song)
 
 
-// destructor...
-void Track::reset()
+Track::~Track()
 {
-	layers.clear();
-	name.clear();
-	instrument = Instrument(Instrument::TYPE_NONE);
-	volume = 1;
-	muted = false;
-	panning = 0;
-
 	midi.deep_clear();
 
 	for (Effect *f: fx)
@@ -95,45 +90,22 @@ void Track::reset()
 
 	if (synth)
 		delete(synth);
-	synth = tsunami->plugin_manager->CreateSynthesizer("Dummy", song);
-}
-
-Track::~Track()
-{
-	reset();
-	if (synth)
-		delete(synth);
-}
-
-Range Track::getRangeUnsafe()
-{
-	int _min =  1073741824;
-	int _max = -1073741824;
-	for (TrackLayer &l: layers)
-		if (l.buffers.num > 0){
-			_min = min(l.buffers[0].offset, _min);
-			_max = max(l.buffers.back().range().end(), _max);
-		}
-	for (SampleRef *s: samples){
-		if (s->pos < _min)
-			_min = s->pos;
-		int smax = s->pos + s->buf->length;
-		if (smax > _max)
-			_max = smax;
-	}
-	Range r = Range(_min, _max - _min);
-
-	if ((type == TYPE_MIDI) and (midi.num > 0))
-		r = r or midi.getRange(synth->keep_notes);
-
-	return r;
 }
 
 Range Track::getRange()
 {
-	Range r = getRangeUnsafe();
-	if (r.length < 0)
-		return Range::EMPTY;
+	Range r = Range::EMPTY;
+
+	for (TrackLayer &l: layers)
+		for (BufferBox &b: l.buffers)
+			r = r or b.range();
+
+	for (SampleRef *s: samples)
+		r = r or s->range();
+
+	if ((type == TYPE_MIDI) and (midi.num > 0))
+		r = r or midi.getRange(synth->keep_notes);
+
 	return r;
 }
 

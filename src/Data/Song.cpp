@@ -265,32 +265,21 @@ bool Song::save(const string & filename)
 
 Range Song::getRange()
 {
-	int min =  1073741824;
-	int max = -1073741824;
-	Range r = Range(min, max - min);
+	Range r = Range::EMPTY;
 
 	for (Track *t: tracks)
-		r = r or t->getRangeUnsafe();
+		r = r or t->getRange();
 
-	if (r.length < 0)
-		return Range::EMPTY;
 	return r;
 }
 
 Range Song::getRangeWithTime()
 {
-	int min =  1073741824;
-	int max = -1073741824;
-	Range r = Range(min, max - min);
+	Range r = getRange();
 
 	if (bars.num > 0)
 		r = r or bars.getRange();
 
-	for (Track *t: tracks)
-		r = r or t->getRangeUnsafe();
-
-	if (r.length < 0)
-		return Range::EMPTY;
 	return r;
 }
 

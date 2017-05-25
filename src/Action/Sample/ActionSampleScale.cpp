@@ -26,7 +26,7 @@ ActionSampleScale::~ActionSampleScale()
 
 void *ActionSampleScale::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
+	//Song *a = dynamic_cast<Song*>(d);
 
 	if (!buf){
 		buf = new BufferBox;
@@ -41,7 +41,7 @@ void *ActionSampleScale::execute(Data *d)
 
 void ActionSampleScale::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
+	//Song *a = dynamic_cast<Song*>(d);
 
 	sample->buf.swap_ref(*buf);
 

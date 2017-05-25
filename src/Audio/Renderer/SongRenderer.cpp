@@ -159,11 +159,11 @@ void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list
 {
 	buf.make_own();
 
-	Track fake_track;
+	Track fake_track = Track(Track::TYPE_AUDIO, NULL);
 	make_fake_track(&fake_track, buf);
 
 	// apply preview plugin?
-	if ((t) and (effect))
+	if (t and effect)
 		effect->apply(buf, &fake_track, false);
 
 	// apply fx
@@ -176,7 +176,7 @@ void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 {
 	bb_render_track_no_fx(buf, t, ti);
 
-	if ((t->fx.num > 0) or (effect))
+	if ((t->fx.num > 0) or effect)
 		bb_apply_fx(buf, t, t->fx);
 }
 

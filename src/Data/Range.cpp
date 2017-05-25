@@ -113,6 +113,8 @@ bool Range::is_more_inside(int pos) const
 
 Range Range::intersect(const Range &r) const
 {
+	if (empty() or r.empty())
+		return EMPTY;
 	int i0 = max(start(), r.start());
 	int i1 = min(end(), r.end());
 	return Range(i0, i1 - i0);
@@ -120,6 +122,10 @@ Range Range::intersect(const Range &r) const
 
 Range Range::operator||(const Range &r) const
 {
+	if (empty())
+		return r;
+	if (r.empty())
+		return *this;
 	int i0 = min(start(), r.start());
 	int i1 = max(end(), r.end());
 	return Range(i0, i1 - i0);

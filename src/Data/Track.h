@@ -48,17 +48,15 @@ string track_type(int type);
 class Track : public Observable
 {
 public:
-	Track();
+	Track(int type, Synthesizer *synth);
 	virtual ~Track();
 	Range _cdecl getRange();
-	Range _cdecl getRangeUnsafe();
 
 	static const string MESSAGE_ADD_EFFECT;
 	static const string MESSAGE_DELETE_EFFECT;
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
-	void _cdecl reset();
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 	BufferBox _cdecl readBuffers(int layer_no, const Range &r);

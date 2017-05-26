@@ -212,14 +212,14 @@ SampleRef *Track::addSampleRef(int pos, Sample* sample)
 	return (SampleRef*)song->execute(new ActionTrackAddSample(this, pos, sample));
 }
 
-void Track::deleteSampleRef(int index)
+void Track::deleteSampleRef(SampleRef *ref)
 {
-	song->execute(new ActionTrackDeleteSample(this, index));
+	song->execute(new ActionTrackDeleteSample(ref));
 }
 
-void Track::editSampleRef(int index, float volume, bool mute)
+void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
 {
-	song->execute(new ActionTrackEditSample(this, index, volume, mute));
+	song->execute(new ActionTrackEditSample(ref, volume, mute));
 }
 
 void Track::addMidiNote(const MidiNote &n)

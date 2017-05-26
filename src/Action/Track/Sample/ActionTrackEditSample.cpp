@@ -9,43 +9,33 @@
 
 #include "../../../Data/Song.h"
 
-ActionTrackEditSample::ActionTrackEditSample(Track *t, int _index, float volume, bool mute)
+ActionTrackEditSample::ActionTrackEditSample(SampleRef *_ref, float volume, bool mute)
 {
-	track_no = get_track_index(t);
-	index = _index;
-	SampleRef *s = t->samples[index];
-	old_value.volume = s->volume;
-	old_value.mute = s->muted;
+	ref = _ref;
+	old_value.volume = ref->volume;
+	old_value.mute = ref->muted;
 	new_value.volume = volume;
 	new_value.mute = mute;
 }
 
-ActionTrackEditSample::~ActionTrackEditSample()
-{
-}
-
 void *ActionTrackEditSample::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-	SampleRef *s = t->samples[index];
+	//Song *a = dynamic_cast<Song*>(d);
 
-	s->volume = new_value.volume;
-	s->muted = new_value.mute;
-	s->notify(s->MESSAGE_CHANGE_BY_ACTION);
+	ref->volume = new_value.volume;
+	ref->muted = new_value.mute;
+	ref->notify(ref->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
 
 void ActionTrackEditSample::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-	SampleRef *s = t->samples[index];
+	//Song *a = dynamic_cast<Song*>(d);
 
-	s->volume = old_value.volume;
-	s->muted = old_value.mute;
-	s->notify(s->MESSAGE_CHANGE_BY_ACTION);
+	ref->volume = old_value.volume;
+	ref->muted = old_value.mute;
+	ref->notify(ref->MESSAGE_CHANGE_BY_ACTION);
 }
 
 
@@ -54,6 +44,6 @@ bool ActionTrackEditSample::mergable(Action *a)
 	ActionTrackEditSample *aa = dynamic_cast<ActionTrackEditSample*>(a);
 	if (!aa)
 		return false;
-	return (aa->track_no == track_no) and (aa->index == index);
+	return (aa->ref == ref);
 }
 

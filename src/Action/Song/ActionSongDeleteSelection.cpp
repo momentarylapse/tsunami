@@ -42,7 +42,7 @@ void ActionSongDeleteSelection::build(Data *d)
 		// subs
 		for (int i=t->samples.num-1; i>=0; i--)
 			if (sel.has(t->samples[i]))
-				addSubAction(new ActionTrackDeleteSample(t, i), d);
+				addSubAction(new ActionTrackDeleteSample(t->samples[i]), d);
 
 		// midi
 		for (int i=t->midi.num-1; i>=0; i--)
@@ -69,11 +69,11 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, T
 			// b completely inside?
 			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, n), a);
 
-		}else if (sel.range.is_inside(bi1-1)){//((i0 > bi0) and (i1 > bi1) and (i0 < bi1)){
+		}else if (sel.range.is_inside(bi1-1)){
 			// overlapping end of b?
 			addSubAction(new ActionTrack__ShrinkBufferBox(t, layer_no, n, i0 - bi0), a);
 
-		}else if (sel.range.is_inside(bi0)){//((i0 <= bi0) and (i1 < bi1) and (i1 > bi0)){
+		}else if (sel.range.is_inside(bi0)){
 			// overlapping beginning of b?
 			addSubAction(new ActionTrack__SplitBufferBox(t, layer_no, n, i1 - bi0), a);
 			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, n), a);

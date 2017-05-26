@@ -15,7 +15,7 @@ class Track;
 class ActionTrackDeleteSample : public Action
 {
 public:
-	ActionTrackDeleteSample(Track *t, int _index);
+	ActionTrackDeleteSample(SampleRef *ref);
 	virtual ~ActionTrackDeleteSample();
 
 	virtual void *execute(Data *d);

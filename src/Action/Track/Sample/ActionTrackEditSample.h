@@ -9,7 +9,10 @@
 #define ACTIONTRACKEDITSAMPLE_H_
 
 #include "../../ActionMergable.h"
+
+
 class Track;
+class SampleRef;
 
 struct EditSampleRefData
 {
@@ -20,8 +23,7 @@ struct EditSampleRefData
 class ActionTrackEditSample : public ActionMergable<EditSampleRefData>
 {
 public:
-	ActionTrackEditSample(Track *t, int index, float volume, bool mute);
-	virtual ~ActionTrackEditSample();
+	ActionTrackEditSample(SampleRef *ref, float volume, bool mute);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
@@ -29,7 +31,7 @@ public:
 	virtual bool mergable(Action *a);
 
 private:
-	int track_no, index;
+	SampleRef *ref;
 };
 
 #endif /* ACTIONTRACKEDITSAMPLE_H_ */

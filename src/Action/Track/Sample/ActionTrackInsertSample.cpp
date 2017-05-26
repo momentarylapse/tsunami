@@ -47,7 +47,7 @@ void ActionTrackInsertSample::build(Data *d)
 	}
 
 	// delete sub
-	addSubAction(new ActionTrackDeleteSample(t, index), s);
+	addSubAction(new ActionTrackDeleteSample(ref), s);
 
 	if (sample->auto_delete and (sample->ref_count == 0))
 		addSubAction(new ActionSampleDelete(sample), d);

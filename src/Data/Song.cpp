@@ -383,7 +383,7 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	for (Track *t: tracks){
 		for (int j=t->samples.num-1; j>=0; j--)
 			if (sel.has(t->samples[j]))
-				t->deleteSampleRef(j);
+				t->deleteSampleRef(t->samples[j]);
 	}
 	action_manager->endActionGroup();
 }

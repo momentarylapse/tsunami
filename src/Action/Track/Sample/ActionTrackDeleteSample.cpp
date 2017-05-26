@@ -9,10 +9,10 @@
 
 #include "../../../Data/Song.h"
 
-ActionTrackDeleteSample::ActionTrackDeleteSample(Track *t, int _index)
+ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref)
 {
-	track_no = get_track_index(t);
-	index = _index;
+	track_no = _ref->track_no;
+	index = _ref->get_index();
 	ref = NULL;
 }
 

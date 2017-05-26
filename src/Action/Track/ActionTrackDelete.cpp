@@ -18,7 +18,7 @@ ActionTrackDelete::ActionTrackDelete(Track *_track)
 
 void ActionTrackDelete::build(Data *d)
 {
-	Song *s = dynamic_cast<Song*>(d);
+	//Song *s = dynamic_cast<Song*>(d);
 
 	// delete buffers
 	foreachi(TrackLayer &l, track->layers, li)
@@ -27,7 +27,7 @@ void ActionTrackDelete::build(Data *d)
 
 	// delete samples
 	for (int i=track->samples.num-1; i>=0; i--)
-		addSubAction(new ActionTrackDeleteSample(track, i), d);
+		addSubAction(new ActionTrackDeleteSample(track->samples[i]), d);
 
 	// delete the track itself
 	addSubAction(new ActionTrack__DeleteEmpty(track), d);

@@ -50,8 +50,7 @@ void SampleRefConsole::onMute()
 	if (!sample)
 		return;
 	unsubscribe(sample);
-	int index = sample->get_index();
-	track->editSampleRef(index, sample->volume, isChecked(""));
+	track->editSampleRef(sample, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
 	subscribe(sample);
@@ -67,8 +66,7 @@ void SampleRefConsole::onVolume()
 	if (!sample)
 		return;
 	unsubscribe(sample);
-	int index = sample->get_index();
-	track->editSampleRef(index, db2amplitude(getFloat("")), sample->muted);
+	track->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
 	subscribe(sample);
 }
 

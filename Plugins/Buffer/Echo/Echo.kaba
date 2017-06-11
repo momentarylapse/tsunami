@@ -3,20 +3,20 @@
 
 use "../../api.kaba"
 
-const string AutoConfigDelay = "0:1:1:1000:ms"
-const string AutoConfigVolume = "0:2:0.1:100:%"
-const string AutoConfigFeedback = "0:1:0.1:100:%"
+const string AUTO_CONFIG_DELAY = "0:1:1:1000:ms"
+const string AUTO_CONFIG_VOLUME = "0:2:0.1:100:%"
+const string AUTO_CONFIG_FEEDBACK = "0:1:0.1:100:%"
 
 
 class Config extends PluginData
-	float Delay
-	float Volume
-	float Feedback
+	float delay
+	float volume
+	float feedback
 
 	override void reset()
-		self.Volume = 0.2
-		Feedback = 0.5
-		Delay = 0.15
+		volume = 0.2
+		feedback = 0.5
+		delay = 0.15
 
 
 class PluginState extends PluginData
@@ -41,11 +41,11 @@ class Echo extends AudioEffect
 			float b0 = bb
 		
 			// add echo
-			bb = bb + d[p] * config.Volume
+			bb = bb + d[p] * config.volume
 			//clampf(b[i], -1, 1)
 		
 			// add to echo
-			d[p] = b0 + d[p] * config.Feedback
+			d[p] = b0 + d[p] * config.feedback
 		
 			p ++
 			if p >= d.num
@@ -55,7 +55,7 @@ class Echo extends AudioEffect
 	override void process(BufferBox buf)
 
 		Song *a = song
-		int delay_samples = a.sample_rate * config.Delay
+		int delay_samples = a.sample_rate * config.delay
 		state.buf_r.resize(delay_samples)
 		state.buf_l.resize(delay_samples)
 	

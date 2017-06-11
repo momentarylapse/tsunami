@@ -6,10 +6,10 @@ use "../../api.kaba"
 const string AutoConfigPitch = "0:2:0.1:100:%"
 
 class Config extends PluginData
-	float Pitch
+	float pitch
 
 	override void reset()
-		Pitch = 1
+		pitch = 1
 
 
 class PitchShift extends AudioEffect
@@ -24,7 +24,7 @@ class PitchShift extends AudioEffect
 		int ll = b.num / 2
 		buf2.resize(ll)
 		for i in 0:ll
-			float i_s = i2f(i) / config.Pitch
+			float i_s = i2f(i) / config.pitch
 			int ii_s = f2i(i_s)
 			float di_s = i_s - i2f(ii_s)
 			if i < ll and ii_s < ll

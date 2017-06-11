@@ -3,19 +3,19 @@
 
 use "../../api.kaba"
 
-const string AutoConfigDelay = "0:0.02:0.1:1000:ms"
-const string AutoConfigSpeed = "0:2:0.01:1:Hz"
-const string AutoConfigDepth = "0:1:0.1:100:%"
+const string AUTO_CONFIG_DELAY = "0:0.02:0.1:1000:ms"
+const string AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"
+const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
 
 
 class PluginConfig extends PluginData
-	float Delay
-	float Speed
-	float Depth
+	float delay
+	float speed
+	float depth
 	override void reset()
-		Depth = 0.5
-		Speed = 0.3
-		Delay = 0.01
+		depth = 0.5
+		speed = 0.3
+		delay = 0.01
 
 class PluginState extends PluginData
 	float[] temp_r
@@ -33,9 +33,9 @@ class Flanger extends AudioEffect
 	void doFlanger(float[] b, float[] temp, int sample_rate)
 		int p = state.offset % temp.num
 	
-		float f_a = (1 - 0.5 * config.Depth) * config.Delay
-		float f_b = 0.5 * config.Depth * config.Delay
-		float f_c = 1.0 / sample_rate * 2 * pi * config.Speed
+		float f_a = (1 - 0.5 * config.depth) * config.delay
+		float f_b = 0.5 * config.depth * config.delay
+		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
 		for bb,i in b
 	
@@ -59,7 +59,7 @@ class Flanger extends AudioEffect
 	
 	override void process(BufferBox buf)
 		Song *a = song
-		int delay_samples = a.sample_rate * config.Delay + 1
+		int delay_samples = a.sample_rate * config.delay + 1
 		state.temp_r.resize(delay_samples)
 		state.temp_l.resize(delay_samples)
 	

@@ -5,11 +5,11 @@ use "../../api.kaba"
 
 
 class Config extends PluginData
-	float Volume
-	bool Maximize
+	float volume
+	bool maximize
 	
 	override void reset()
-		self.Volume = 1
+		self.volume = 1
 
 class Volume extends AudioEffect
 	Config config
@@ -18,8 +18,8 @@ class Volume extends AudioEffect
 		return new VolumePanel(self)
 
 	override void process(BufferBox buf)
-		float factor = config.Volume
-		if config.Maximize
+		float factor = config.volume
+		if config.maximize
 			float max = 0
 			for i in 0:buf.length
 				if abs(buf.r[i]) > max
@@ -45,7 +45,7 @@ class VolumePanel extends ConfigPanel
 		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
 		addLabel("%", 2, 0, 0, 0, "")
 		
-		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
+		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.volume)
 	
 		event("max", &onMax)
 	
@@ -53,18 +53,18 @@ class VolumePanel extends ConfigPanel
 		delete(slider)
 
 	override void update()
-		slider.set(c.config.Volume)
-		check("max", c.config.Maximize)
-		enable("volume", !c.config.Maximize)
-		enable("volume_slider", !c.config.Maximize)
+		slider.set(c.config.volume)
+		check("max", c.config.maximize)
+		enable("volume", !c.config.maximize)
+		enable("volume_slider", !c.config.maximize)
 
 	void onMax()
-		c.config.Maximize = isChecked("max")
-		enable("volume", !c.config.Maximize)
-		enable("volume_slider", !c.config.Maximize)
+		c.config.maximize = isChecked("max")
+		enable("volume", !c.config.maximize)
+		enable("volume_slider", !c.config.maximize)
 		notify()
 
 	void onVolume()
-		c.config.Volume = slider.get()
+		c.config.volume = slider.get()
 		notify()
 

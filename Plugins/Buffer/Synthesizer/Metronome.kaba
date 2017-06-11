@@ -5,13 +5,13 @@ use "../../api.kaba"
 use "../../Midi/Source/Metronome.kaba"
 
 class Config extends PluginData
-	float BeatsPerMinute
-	float Volume
-	int BeatsPerMeasure
+	float beats_per_minute
+	float volume
+	int beats_per_measure
 	override void reset()
-		Volume = 0.3
-		BeatsPerMinute = 90
-		BeatsPerMeasure = 4
+		volume = 0.3
+		beats_per_minute = 90
+		beats_per_measure = 4
 
 
 
@@ -34,9 +34,9 @@ class Metronome extends AudioEffect
 	override void process(BufferBox buf)
 		synth.setSampleRate(song.sample_rate)
 		source.sample_rate = song.sample_rate
-		source.volume = config.Volume
-		source.num_beats = config.BeatsPerMeasure
-		source.setBpm(config.BeatsPerMinute)
+		source.volume = config.volume
+		source.num_beats = config.beats_per_measure
+		source.setBpm(config.beats_per_minute)
 		renderer.read(buf)
 		
 	override ConfigPanel *createPanel()
@@ -65,21 +65,21 @@ class MetronomePanel extends ConfigPanel
 		update()
 
 	override void update()
-		setFloat("beats_per_minute", c.config.BeatsPerMinute)
-		setInt("beats_per_measure", c.config.BeatsPerMeasure)
-		setFloat("volume", c.config.Volume * 100)
-		//SliderSet(self, "volume", c.config.Volume)
+		setFloat("beats_per_minute", c.config.beats_per_minute)
+		setInt("beats_per_measure", c.config.beats_per_measure)
+		setFloat("volume", c.config.volume * 100)
+		//SliderSet(self, "volume", c.config.volume)
 
 	void onMetroBeats()
-		c.config.BeatsPerMinute = getFloat("")
+		c.config.beats_per_minute = getFloat("")
 		notify()
 
 	void onMetroMeasure()
-		c.config.BeatsPerMeasure = getInt("")
+		c.config.beats_per_measure = getInt("")
 		notify()
 
 	void onMetroVolume()
-		c.config.Volume = getFloat("") / 100
-		//m.config.Volume = SliderGet(self, "volume")
+		c.config.volume = getFloat("") / 100
+		//m.config.volume = SliderGet(self, "volume")
 		notify()
 

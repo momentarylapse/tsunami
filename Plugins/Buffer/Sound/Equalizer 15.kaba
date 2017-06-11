@@ -11,10 +11,10 @@ const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
 
 class Config extends PluginData
-	float[NUM_BANDS] Factor
+	float[NUM_BANDS] factor
 
 	override void reset()
-		for f in Factor
+		for f in factor
 			f = 1
 
 class Equalizer15 extends AudioEffect
@@ -46,7 +46,7 @@ class Equalizer15 extends AudioEffect
 		for i in 0:NUM_BANDS
 			int j0 = clamp(FreqMin[i] * w, 0, len2)
 			int j1 = clamp(FreqMax[i] * w, 0, len2)
-			float ff = config.Factor[i] / b.num
+			float ff = config.factor[i] / b.num
 			for j in j0:j1
 				f[j] = f[j] * ff
 		
@@ -88,10 +88,10 @@ class Equalizer15Panel extends ConfigPanel
 		Event *e = HuiGetEvent()
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_" + i)
-				c.config.Factor[i] = getFloat("") * 2
+				c.config.factor[i] = getFloat("") * 2
 				notify()
 		
 	override void update()
 		for i in 0:NUM_BANDS
-			setFloat("slider_" + i, c.config.Factor[i] / 2)
+			setFloat("slider_" + i, c.config.factor[i] / 2)
 	

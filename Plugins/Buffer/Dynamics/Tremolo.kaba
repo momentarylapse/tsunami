@@ -2,16 +2,16 @@
 
 use "../../api.kaba"
 
-const string AutoConfigSpeed = "0:20:0.1:1:Hz"
-const string AutoConfigDepth = "0:1:0.1:100:%"
+const string AUTO_CONFIG_SPEED = "0:20:0.1:1:Hz"
+const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
 
 class Config extends PluginData
-	float Speed
-	float Depth
+	float speed
+	float depth
 
 	override void reset()
-		Depth = 0.5
-		Speed = 6
+		depth = 0.5
+		speed = 6
 
 class Tremolo extends AudioEffect
 
@@ -19,10 +19,10 @@ class Tremolo extends AudioEffect
 
 	void doTremolo(float[] b)
 	
-		float f_c = 1.0 / song.sample_rate * 2 * pi * config.Speed
+		float f_c = 1.0 / song.sample_rate * 2 * pi * config.speed
 	
 		for bb,i in b
-			float f = 1 - (1 + cos(i * f_c)) * config.Depth * 0.5
+			float f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5
 	
 			// old value
 			bb *= f

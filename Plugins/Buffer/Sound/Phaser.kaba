@@ -4,19 +4,19 @@
 use "../../api.kaba"
 
 
-const string AutoConfigAngle = "-3.1415:3.1415:1:57.2958:°" // -pi : pi : 180/pi
-const string AutoConfigSpeed = "0:2:0.01:1:Hz"
-const string AutoConfigDepth = "0:1:0.1:100:%"
+const string AUTO_CONFIG_ANGLE = "-3.1415:3.1415:1:57.2958:°" // -pi : pi : 180/pi
+const string AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"
+const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
 
 
 class PluginConfig extends PluginData
-	float Angle
-	float Speed
-	float Depth
+	float angle
+	float speed
+	float depth
 	override void reset()
-		Depth = 0.5
-		Speed = 0.3
-		Angle = pi / 2
+		depth = 0.5
+		speed = 0.3
+		angle = pi / 2
 
 class PhaserChannelParams
 	float x1, x2, y1, y2

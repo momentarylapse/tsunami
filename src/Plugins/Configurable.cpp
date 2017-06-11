@@ -266,9 +266,28 @@ void Configurable::resetState()
 	onConfig();
 }
 
+string to_camel_case(const string &s)
+{
+	string r;
+	bool next_upper = true;
+	for (int i=0; i<s.num; i++){
+		if (s[i] == '_'){
+			next_upper = true;
+			continue;
+		}else{
+			if (next_upper)
+				r += s.substr(i, 1).upper();
+			else
+				r += s.substr(i, 1);
+			next_upper = false;
+		}
+	}
+	return r;
+}
+
 struct AutoConfigData
 {
-	string name, unit;
+	string name, label, unit;
 	float min, max, step, factor;
 	float *value;
 	Slider *slider;
@@ -281,6 +300,31 @@ struct AutoConfigData
 		value = NULL;
 		slider = NULL;
 	}
+	AutoConfigData(const string &_name) :
+		AutoConfigData()
+	{
+		name = _name;
+		label = to_camel_case(_name);
+	}
+	void parse(const string &s)
+	{
+		Array<string> p = s.explode(":");
+		if (p.num == 5){
+			min = p[0]._float();
+			max = p[1]._float();
+			step = p[2]._float();
+			factor = p[3]._float();
+			unit = p[4];
+		}else{
+			msg_write("required format: min:max:step:factor:unit");
+		}
+
+	}
+
+	bool name_match(const string &const_name)
+	{
+		return (("AUTO_CONFIG_" + name).upper().replace("_", "") == const_name.upper().replace("_", ""));
+	}
 };
 
 Array<AutoConfigData> get_auto_conf(PluginData *config)
@@ -289,20 +333,12 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 	Array<AutoConfigData> r;
 	for (auto &e: config->_class->elements)
 		if (e.type == Kaba::TypeFloat32){
-			AutoConfigData a;
-			a.name = e.name;
+			AutoConfigData a = AutoConfigData(e.name);
 			a.value = (float*)((char*)config + e.offset);
 			for (auto c: ps->constants){
-				if (c->name == "AutoConfig" + e.name){
-					Array<string> p = c->value.explode(":");
-					if (p.num == 5){
-						a.min = p[0]._float();
-						a.max = p[1]._float();
-						a.step = p[2]._float();
-						a.factor = p[3]._float();
-						a.unit = p[4];
-					}
-				}
+				if (c->type == Kaba::TypeString)
+					if (a.name_match(c->name))
+						a.parse(c->as_string());
 			}
 			r.add(a);
 		}
@@ -322,7 +358,7 @@ public:
 		addGrid("", 0, 1, 4, aa.num, "main-table");
 		setTarget("main-table", 0);
 		foreachi(AutoConfigData &a, aa, i){
-			addLabel(a.name, 0, i, 0, 0, "");
+			addLabel(a.label, 0, i, 0, 0, "");
 			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
 			addLabel(a.unit, 3, i, 0, 0, "");

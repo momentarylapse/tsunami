@@ -2,19 +2,19 @@
 // Title[Deutsch] = Verzerrer
 use "../../api.kaba"
 
-const string AutoConfigGain = "0:1:0.1:100:%"
+const string AUTO_CONFIG_GAIN = "0:1:0.1:100:%"
 
 class Config extends PluginData
-	float Gain
+	float gain
 	override void reset()
-		Gain = 0.1
+		gain = 0.1
 
 class Distortion extends AudioEffect
 	Config config
 
 
 	override void process(BufferBox buf)
-		float a = max(10000 * pow(config.Gain, 2), 0.01)
+		float a = max(10000 * pow(config.gain, 2), 0.01)
 		float b = 1 / atan(a)
 	
 		for i in 0:buf.length

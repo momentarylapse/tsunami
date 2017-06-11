@@ -146,7 +146,7 @@ int string::compare(const string &s) const
 
 inline int ichar(unsigned char a)
 {
-	if ((a >= 'A') && (a <= 'Z'))
+	if ((a >= 'A') and (a <= 'Z'))
 		return (int)a - (int)'A' + (int)'a';
 	return (int)a;
 }
@@ -189,7 +189,7 @@ Array<string> string::explode(const string &s) const
 
 		pos = s.num + pos2;
 	}
-	if ((r.num > 0) || (pos < num))
+	if ((r.num > 0) or (pos < num))
 		r.add(substr(pos, num - pos));
 	return r;
 }
@@ -230,7 +230,7 @@ string string::lower() const
 {
 	string r = *this;
 	for (int i=0;i<r.num;i++)
-		if ((r[i] >= 'A') && (r[i] <= 'Z'))
+		if ((r[i] >= 'A') and (r[i] <= 'Z'))
 			r[i] += 'a' - 'A';
 	return r;
 }
@@ -239,7 +239,7 @@ string string::upper() const
 {
 	string r = *this;
 	for (int i=0;i<r.num;i++)
-		if ((r[i] >= 'a') && (r[i] <= 'z'))
+		if ((r[i] >= 'a') and (r[i] <= 'z'))
 			r[i] += 'A' - 'a';
 	return r;
 }
@@ -313,7 +313,7 @@ void string::dir_ensure_ending()
 {
 	if (num > 0){
 		char lc = (*this)[num - 1];
-		if ((lc != '/') && (lc != '\\'))
+		if ((lc != '/') and (lc != '\\'))
 			add('/');
 	}
 }
@@ -380,15 +380,15 @@ string format(const string str,...)
 
 	int l=0,s=strlen(str);
 	for (int i=0;i<s;i++){
-		if ((str[i]=='%')&&(str[i+1]=='s')){
+		if ((str[i]=='%')and(str[i+1]=='s')){
 			strcat(tmp,va_arg(marker,char*));
 			i++;
 			l=strlen(tmp);
-		}else if ((str[i]=='%')&&(str[i+1]=='d')){
+		}else if ((str[i]=='%')and(str[i+1]=='d')){
 			strcat(tmp,i2s(va_arg(marker,int)));
 			i++;
 			l=strlen(tmp);
-		}else if ((str[i]=='%')&&(str[i+1]=='f')){
+		}else if ((str[i]=='%')and(str[i+1]=='f')){
 			int fl=3;
 			if (str[i+2]==':'){
 				fl=str[i+3]-'0';
@@ -397,7 +397,7 @@ string format(const string str,...)
 				i++;
 			strcat(tmp,f2s((float)va_arg(marker,double),fl));
 			l=strlen(tmp);
-		}else if ((str[i]=='%')&&(str[i+1]=='v')){
+		}else if ((str[i]=='%')and(str[i+1]=='v')){
 			int fl=3;
 			if (str[i+2]==':'){
 				fl=str[i+3]-'0';
@@ -625,7 +625,7 @@ string string::hex(bool inverted) const
 			str.add('0' + c1);
 		else
 			str.add('a' + c1 - 10);
-		if ((!inverted)&&(i < num - 1))
+		if ((!inverted)and(i < num - 1))
 			str.add('.');
 	}
 	return str;
@@ -633,11 +633,11 @@ string string::hex(bool inverted) const
 
 inline int hex_nibble_to_value(char c)
 {
-	if ((c >= '0') && (c <= '9'))
+	if ((c >= '0') and (c <= '9'))
 		return c - '0';
-	if ((c >= 'a') && (c <= 'f'))
+	if ((c >= 'a') and (c <= 'f'))
 		return c - 'a' + 10;
-	if ((c >= 'A') && (c <= 'F'))
+	if ((c >= 'A') and (c <= 'F'))
 		return c - 'A' + 10;
 	return 0;
 }
@@ -791,7 +791,7 @@ double s2f64(const string &s)
 
 bool string::_bool() const
 {
-	return (*this == "true") || (*this == "yes");
+	return (*this == "true") or (*this == "yes");
 }
 
 bool s2b(const string &s)
@@ -906,10 +906,10 @@ string string::trim() const
 {
 	int i0 = 0, i1 = num-1;
 	for (i0=0;i0<num;i0++)
-		if (((*this)[i0] != ' ') && ((*this)[i0] != '\t') && ((*this)[i0] != '\n') && ((*this)[i0] != '\r'))
+		if (((*this)[i0] != ' ') and ((*this)[i0] != '\t') and ((*this)[i0] != '\n') and ((*this)[i0] != '\r'))
 			break;
 	for (i1=num-1;i1>=0;i1--)
-		if (((*this)[i1] != ' ') && ((*this)[i1] != '\t') && ((*this)[i1] != '\n') && ((*this)[i1] != '\r'))
+		if (((*this)[i1] != ' ') and ((*this)[i1] != '\t') and ((*this)[i1] != '\n') and ((*this)[i1] != '\r'))
 			break;
 	return substr(i0, i1 - i0 + 1);
 }
@@ -1003,10 +1003,10 @@ Array<int> string::utf16_to_utf32() const
 	bool big_endian = false;
 	unsigned int last = 0;
 	for (int i=0; i<num-1; i+=2){
-		if (((*this)[i] == 0xff) && ((*this)[i+1] == 0xfe)){
+		if (((*this)[i] == 0xff) and ((*this)[i+1] == 0xfe)){
 			big_endian = false;
 			continue;
-		}else if (((*this)[i] == 0xfe) && ((*this)[i+1] == 0xff)){
+		}else if (((*this)[i] == 0xfe) and ((*this)[i+1] == 0xff)){
 			big_endian = true;
 			continue;
 		}
@@ -1015,9 +1015,9 @@ Array<int> string::utf16_to_utf32() const
 			code = (*this)[i+1] | ((*this)[i] << 8);
 		//msg_write(string((char*)&code, 2).hex());
 
-		if ((code < 0xd800) || (code > 0xdbff))
+		if ((code < 0xd800) or (code > 0xdbff))
 			r.add(code);
-		else if ((last >= 0xdc00) && (last <= 0xdfff))
+		else if ((last >= 0xdc00) and (last <= 0xdfff))
 			r.add(0x010000 | ((code - 0xd800) << 12) | (last - 0xdc00));
 		last = code;
 	}
@@ -1168,7 +1168,7 @@ string str_utf8_to_m(const string &str)
 
 bool sa_contains(Array<string> &a, const string &s)
 {
-	for (string &aa : a)
+	for (string &aa: a)
 		if (aa == s)
 			return true;
 	return false;
@@ -1183,7 +1183,7 @@ int regex_match(char *rex,char *str,int max_matches)
 	int ss=strlen(str);
 	int rs=strlen(rex);
 
-	if ((max_matches<=0)||(max_matches>REGEX_MAX_MATCHES))
+	if ((max_matches<=0)or(max_matches>REGEX_MAX_MATCHES))
 		max_matches=REGEX_MAX_MATCHES;
 
 	int n_matches=0;

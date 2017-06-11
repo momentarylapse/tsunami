@@ -28,9 +28,15 @@ public:
 
 	int type;
 	Song *song;
-	Array<string> names;
+	struct Label
+	{
+		string full;
+		string name, group;
+	};
+	Array<Label> labels;
 	Set<string> ugroups;
-	Array<string> groups;
+
+	static Label split_label(const string &s);
 
 	Configurable *_return;
 };

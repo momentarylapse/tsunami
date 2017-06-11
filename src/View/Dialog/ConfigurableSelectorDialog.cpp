@@ -13,6 +13,16 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Plugin.h"
 
+ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const string &s)
+{
+	Label l;
+	l.full = s;
+	auto ss = s.explode("/");
+	l.name = ss.back();
+	l.group = implode(ss.sub(0, ss.num-1), "/");
+	return l;
+}
+
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Song *_song, const string &old_name) :
 	hui::Window("configurable-selection-dialog", _parent)
 {
@@ -21,26 +31,23 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int
 	Array<string> tnames = tsunami->plugin_manager->FindConfigurable(type);
 
 	for (string &s: tnames){
-		auto ss = s.explode("/");
-		names.add(ss.back());
-		groups.add(ss[0]);
-		ugroups.add(ss[0]);
+		Label l = split_label(s);
+		labels.add(l);
+		if (l.group.num > 0)
+			ugroups.add(l.group);
 	}
-
-	if (ugroups.num < 2)
-		ugroups.clear();
 
 	for (string &g: ugroups)
 		setString("list", g);
 
-	foreachi(string &name, names, i){
+	foreachi (Label &l, labels, i){
 		int n = i;
-		if (groups.num > 0){
-			int r = ugroups.find(groups[i]);
-			addChildString("list", r, name);
+		if (ugroups.num > 0){
+			int r = ugroups.find(l.group);
+			addChildString("list", r, l.name);
 		}else
-			setString("list", name);
-		if (name == old_name)
+			setString("list", l.name);
+		if (l.name == old_name)
 			setInt("list", n);
 	}
 
@@ -70,11 +77,11 @@ void ConfigurableSelectorDialog::onSelect()
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
-		_return = CreateEffect(names[n], song);
+		_return = CreateEffect(labels[n].name, song);
 	else if (type == Configurable::TYPE_MIDI_EFFECT)
-		_return = CreateMidiEffect(names[n], song);
+		_return = CreateMidiEffect(labels[n].name, song);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
-		_return = tsunami->plugin_manager->CreateSynthesizer(names[n], song);
+		_return = tsunami->plugin_manager->CreateSynthesizer(labels[n].name, song);
 	destroy();
 }
 

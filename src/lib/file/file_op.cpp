@@ -24,7 +24,7 @@
 	#define _unlink	unlink
 	inline unsigned char to_low(unsigned char c)
 	{
-		if ((c>='A')&&(c<='Z'))
+		if ((c>='A')and(c<='Z'))
 			return c-'A'+'a';
 		return c;
 	}
@@ -32,7 +32,7 @@
 	{
 		unsigned char a_low=to_low(*a);
 		unsigned char b_low=to_low(*b);
-		while((*a!=0)&&(*b!=0)){
+		while((*a!=0)and(*b!=0)){
 			if (a_low!=b_low)	break;
 			a++,++b;
 			a_low=to_low(*a);
@@ -101,7 +101,7 @@ bool file_rename(const string &source,const string &target)
 		dir[i]=target[i];
 		dir[i+1]=0;
 		if (i>3)
-			if ((target[i]=='/')||(target[i]=='\\'))
+			if ((target[i]=='/')or(target[i]=='\\'))
 				dir_create(string(dir));
 	}
 	return (rename(source.sys_filename().c_str(), target.sys_filename().c_str())==0);
@@ -114,7 +114,7 @@ bool file_copy(const string &source,const string &target)
 		dir[i]=target[i];
 		dir[i+1]=0;
 		if (i>3)
-			if ((target[i]=='/')||(target[i]=='\\'))
+			if ((target[i]=='/')or(target[i]=='\\'))
 				dir_create(string(dir));
 	}
 	int hs=_open(source.sys_filename().c_str(),O_RDONLY);
@@ -151,7 +151,11 @@ bool file_delete(const string &filename)
 string file_hash(const string &filename, const string &type)
 {
 	if (type == "md5"){
-		return FileReadBinary(filename).md5();
+		try{
+			return FileReadBinary(filename).md5();
+		}catch(...){
+			return "";
+		}
 	}
 	return "";
 }
@@ -183,9 +187,9 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	int e=handle;
 	while(e>=0){
 		string name = t.name;
-		//if ((strcmp(t.name,".")!=0)&&(strcmp(t.name,"..")!=0)&&(strstr(t.name,"~")==NULL)){
-		if ((name != ".") && (name != "..") && (name.back() != '~')){
-			if ((name.match(filter))|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
+		//if ((strcmp(t.name,".")!=0)and(strcmp(t.name,"..")!=0)and(strstr(t.name,"~")==NULL)){
+		if ((name != ".") and (name != "..") and (name.back() != '~')){
+			if ((name.match(filter))or ((show_directories)and(t.attrib==_A_SUBDIR)) ){
 				entry.name = name;
 				entry.is_dir = (t.attrib == _A_SUBDIR);
 				entry.size = t.size;
@@ -206,16 +210,16 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	dn=readdir(_dir);
 	struct stat s;
 	while(dn){
-		//if ((strcmp(dn->d_name,".")!=0)&&(strcmp(dn->d_name,"..")!=0)&&(!strstr(dn->d_name,"~"))){
+		//if ((strcmp(dn->d_name,".")!=0)and(strcmp(dn->d_name,"..")!=0)and(!strstr(dn->d_name,"~"))){
 		string name = dn->d_name;
-		if ((name != ".") && (name != "..") && (name.back() != '~')){
+		if ((name != ".") and (name != "..") and (name.back() != '~')){
 			string ffn = dir2 + name;
 			stat(ffn.c_str(), &s);
 			bool is_reg=(s.st_mode & S_IFREG)>0;
 			bool is_dir=(s.st_mode & S_IFDIR)>0;
 			int sss=strlen(dn->d_name) - filter2.num;
 			if (sss<0)	sss=0;
-			if ( ((is_reg)&&(name.match(filter))) || ((show_directories)&&(is_dir)) ){
+			if (((is_reg) and (name.match(filter))) or ((show_directories) and (is_dir))){
 				entry.name = name;
 				entry.is_dir = is_dir;
 				entry.size = s.st_size;
@@ -236,7 +240,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 				if (entry_list[i].name.icompare(entry_list[j].name) > 0)
 					ok = false;
 			}else
-				if ((!entry_list[i].is_dir) && (entry_list[j].is_dir))
+				if ((!entry_list[i].is_dir) and (entry_list[j].is_dir))
 					ok = false;
 			if (!ok)
 				entry_list.swap(i, j);

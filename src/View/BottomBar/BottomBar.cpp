@@ -42,9 +42,14 @@ BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager,
 
 	reveal("revealer", false);
 	visible = false;
-	active_console = -1;
+	active_console = NULL;
 
-	choose(MIXING_CONSOLE);
+	choose(mixing_console);
+
+
+	for (auto c: consoles)
+		if (c->notify)
+			open(c);
 }
 
 BottomBar::~BottomBar()
@@ -70,7 +75,7 @@ void BottomBar::_hide()
 	notify();
 }
 
-void BottomBar::addConsole(BottomBarConsole *c, const string &list_name)
+void BottomBar::addConsole(BottomBar::Console *c, const string &list_name)
 {
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
@@ -78,27 +83,35 @@ void BottomBar::addConsole(BottomBarConsole *c, const string &list_name)
 	c->hide();
 }
 
+int BottomBar::index(BottomBar::Console *console)
+{
+	foreachi (auto c, consoles, i)
+		if (console == c)
+			return i;
+	return -1;
+}
+
 void BottomBar::onChoose()
 {
 	int n = getInt("");
 	if (n >= 0)
-		open(n);
+		open(consoles[n]);
 }
 
-void BottomBar::choose(int console)
+void BottomBar::choose(BottomBar::Console *console)
 {
-	if (active_console >= 0)
-		consoles[active_console]->hide();
+	if (active_console)
+		active_console->hide();
 
 	active_console = console;
 
-	consoles[active_console]->show();
-	setInt("choose", console);
+	active_console->show();
+	setInt("choose", index(active_console));
 
 	notify();
 }
 
-void BottomBar::open(int console)
+void BottomBar::open(BottomBar::Console *console)
 {
 	choose(console);
 
@@ -107,8 +120,17 @@ void BottomBar::open(int console)
 	notify();
 }
 
-bool BottomBar::isActive(int console)
+bool BottomBar::isActive(BottomBar::Console *console)
 {
 	return (active_console == console) and visible;
+}
+
+void BottomBar::Console::blink()
+{
+	if (bar()){
+		bar()->choose(this);
+	}else{
+		notify = true;
+	}
 }
 

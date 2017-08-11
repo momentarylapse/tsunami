@@ -17,6 +17,9 @@
 #include "View/Dialog/PauseEditDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
+#include "View/BottomBar/DeviceConsole.h"
+#include "View/BottomBar/LogConsole.h"
+#include "View/BottomBar/MixingConsole.h"
 #include "View/SideBar/SideBar.h"
 #include "View/SideBar/CaptureConsole.h"
 #include "View/SideBar/LayerConsole.h"
@@ -401,7 +404,7 @@ void TsunamiWindow::onEditMarker()
 
 void TsunamiWindow::onShowLog()
 {
-	bottom_bar->open(BottomBar::LOG_CONSOLE);
+	bottom_bar->open(bottom_bar->log_console);
 }
 
 void TsunamiWindow::onUndo()
@@ -563,7 +566,7 @@ void TsunamiWindow::onSampleManager()
 
 void TsunamiWindow::onMixingConsole()
 {
-	bottom_bar->open(BottomBar::MIXING_CONSOLE);
+	bottom_bar->open(bottom_bar->mixing_console);
 }
 
 void TsunamiWindow::onFxConsole()
@@ -755,7 +758,7 @@ void TsunamiWindow::updateMenu()
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
 	// view
-	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
+	check("show_mixing_console", bottom_bar->isActive(bottom_bar->mixing_console));
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
 	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
 

@@ -13,7 +13,7 @@
 class DeviceManager;
 class Device;
 
-class DeviceConsole: public BottomBarConsole, public Observer
+class DeviceConsole: public BottomBar::Console, public Observer
 {
 public:
 	DeviceConsole(DeviceManager *device_manager);

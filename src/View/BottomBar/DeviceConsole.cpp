@@ -10,7 +10,7 @@
 #include "../../Device/Device.h"
 
 DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
-	BottomBarConsole(_("Devices")),
+	BottomBar::Console(_("Devices")),
 	Observer("DeviceConsole")
 {
 	device_manager = _device_manager;

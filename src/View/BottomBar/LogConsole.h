@@ -12,7 +12,7 @@
 
 class Log;
 
-class LogConsole: public BottomBarConsole, public Observer
+class LogConsole: public BottomBar::Console, public Observer
 {
 public:
 	LogConsole(Log *log);

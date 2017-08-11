@@ -27,42 +27,42 @@ public:
 	BottomBar(AudioView *view, Song *audio, DeviceManager *device_manager, Log *log);
 	virtual ~BottomBar();
 
+
+
+
+	class Console : public hui::Panel
+	{
+	public:
+		Console(const string &_title)
+		{ title = _title; notify = false; }
+		string title;
+		BottomBar *bar(){ return dynamic_cast<BottomBar*>(parent); }
+
+
+		void blink();
+		bool notify;
+	};
+
 	void onClose();
 	void onChoose();
 
 	void _show();
 	void _hide();
 
-	enum
-	{
-		LOG_CONSOLE,
-		MIXING_CONSOLE,
-		CURVE_CONSOLE,
-		NUM_CONSOLES
-	};
-
-	void choose(int console);
-	void open(int console);
-	bool isActive(int console);
-	int active_console;
+	void choose(Console *console);
+	void open(Console *console);
+	bool isActive(Console *console);
+	Console *active_console;
 	bool visible;
 
 	MixingConsole *mixing_console;
 	LogConsole *log_console;
 	DeviceConsole *device_console;
 
-	Array<BottomBarConsole*> consoles;
-	void addConsole(BottomBarConsole *c, const string &list_name);
-};
+	int index(Console *console);
 
-
-class BottomBarConsole : public hui::Panel
-{
-public:
-	BottomBarConsole(const string &_title)
-	{ title = _title; }
-	string title;
-	BottomBar *bar(){ return dynamic_cast<BottomBar*>(parent); }
+	Array<Console*> consoles;
+	void addConsole(Console *c, const string &list_name);
 };
 
 #endif /* BOTTOMBAR_H_ */

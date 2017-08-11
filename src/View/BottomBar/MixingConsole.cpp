@@ -100,7 +100,7 @@ void TrackMixer::update()
 
 
 MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream, AudioView *view) :
-	BottomBarConsole(_("Mixing console")),
+	BottomBar::Console(_("Mixing console")),
 	Observer("MixingConsole")
 {
 	song = _song;
@@ -123,7 +123,7 @@ MixingConsole::~MixingConsole()
 {
 	unsubscribe(song);
 	unsubscribe(device_manager);
-	for (TrackMixer *m : mixer)
+	for (TrackMixer *m: mixer)
 		delete(m);
 	delete(peak_meter);
 }

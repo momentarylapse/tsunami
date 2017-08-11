@@ -423,11 +423,17 @@ string FileRead(const string &filename)
 	return r;
 }
 
+class FileError //: public Exception
+{
+public:
+	FileError(){}
+};
+
 string FileReadBinary(const string &filename)
 {
 	File *f = FileOpen(filename);
 	if (!f)
-		return "";
+		throw FileError();
 	f->SetBinaryMode(true);
 	string r = f->ReadComplete();
 	FileClose(f);

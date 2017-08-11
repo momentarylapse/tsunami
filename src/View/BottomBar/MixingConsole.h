@@ -49,7 +49,7 @@ public:
 	string id_separator;
 };
 
-class MixingConsole: public BottomBarConsole, public Observer
+class MixingConsole: public BottomBar::Console, public Observer
 {
 public:
 	MixingConsole(Song *audio, DeviceManager *device_manager, OutputStream *stream, AudioView *view);

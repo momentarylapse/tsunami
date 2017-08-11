@@ -10,7 +10,7 @@
 #include "LogConsole.h"
 
 LogConsole::LogConsole(Log *_log) :
-	BottomBarConsole(_("Messages")),
+	BottomBar::Console(_("Messages")),
 	Observer("LogConsole")
 {
 	log = _log;
@@ -41,10 +41,10 @@ void LogConsole::reload()
 	for (auto &m: log->messages){
 		if (m.type == Log::TYPE_ERROR){
 			addString("log_list", "hui:error\\" + m.text);
-			bar()->open(BottomBar::LOG_CONSOLE);
+			blink();
 		}else if (m.type == Log::TYPE_WARNING){
 			addString("log_list", "hui:warning\\" + m.text);
-			bar()->open(BottomBar::LOG_CONSOLE);
+			blink();
 		}else{
 			addString("log_list", "hui:info\\" + m.text);
 		}

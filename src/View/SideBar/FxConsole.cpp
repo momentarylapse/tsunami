@@ -156,12 +156,12 @@ void FxConsole::onAdd()
 
 void FxConsole::onEditSong()
 {
-	dynamic_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void FxConsole::onEditTrack()
 {
-	dynamic_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void FxConsole::clear()

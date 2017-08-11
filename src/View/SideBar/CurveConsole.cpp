@@ -173,16 +173,16 @@ void CurveConsole::onListEdit()
 
 void CurveConsole::onEditSong()
 {
-	dynamic_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void CurveConsole::onEditTrack()
 {
-	dynamic_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void CurveConsole::onEditFx()
 {
-	dynamic_cast<SideBar*>(parent)->open(SideBar::FX_CONSOLE);
+	bar()->open(SideBar::FX_CONSOLE);
 }
 

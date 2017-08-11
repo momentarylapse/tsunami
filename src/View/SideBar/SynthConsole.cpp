@@ -129,12 +129,12 @@ void SynthConsole::onDetune()
 
 void SynthConsole::onEditSong()
 {
-	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void SynthConsole::onEditTrack()
 {
-	tsunami->win->side_bar->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void SynthConsole::clear()

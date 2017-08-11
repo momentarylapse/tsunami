@@ -292,7 +292,7 @@ void SampleManagerConsole::setSelection(const Array<Sample*> &samples)
 
 void SampleManagerConsole::onEditSong()
 {
-	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void SampleManagerConsole::onUpdate(Observable *o, const string &message)

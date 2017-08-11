@@ -178,17 +178,17 @@ void MidiFxConsole::clear()
 
 void MidiFxConsole::onEditSong()
 {
-	reinterpret_cast<SideBar*>(parent)->open(SideBar::SONG_CONSOLE);
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void MidiFxConsole::onEditTrack()
 {
-	reinterpret_cast<SideBar*>(parent)->open(SideBar::TRACK_CONSOLE);
+	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
 void MidiFxConsole::onEditMidi()
 {
-	reinterpret_cast<SideBar*>(parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
+	bar()->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
 void MidiFxConsole::setTrack(Track *t)

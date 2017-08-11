@@ -120,9 +120,14 @@ void BottomBar::open(BottomBar::Console *console)
 	notify();
 }
 
-bool BottomBar::isActive(BottomBar::Console *console)
+void BottomBar::open(int console_index)
 {
-	return (active_console == console) and visible;
+	open(consoles[console_index]);
+}
+
+bool BottomBar::isActive(int console_index)
+{
+	return (active_console == consoles[console_index]) and visible;
 }
 
 void BottomBar::Console::blink()

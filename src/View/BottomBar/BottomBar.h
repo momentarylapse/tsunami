@@ -28,6 +28,11 @@ public:
 	virtual ~BottomBar();
 
 
+	enum{
+		LOG_CONSOLE,
+		MIXING_CONSOLE,
+		DEVICE_CONSOLE
+	};
 
 
 	class Console : public hui::Panel
@@ -51,7 +56,8 @@ public:
 
 	void choose(Console *console);
 	void open(Console *console);
-	bool isActive(Console *console);
+	void open(int console_index);
+	bool isActive(int console_index);
 	Console *active_console;
 	bool visible;
 

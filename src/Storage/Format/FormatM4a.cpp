@@ -22,7 +22,13 @@ void FormatM4a::loadTrack(StorageOperationData *od)
 		od->storage->loadTrack(od->track, tmp, od->offset, od->layer);
 		od->storage->current_directory = od->filename.dirname();
 		file_delete(tmp);
+	}else if (system("which ffmpeg") == 0){
+		string tmp = "/tmp/tsunami_m4a_out.wav";
+		system(("yes | ffmpeg -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
+		od->storage->loadTrack(od->track, tmp, od->offset, od->layer);
+		od->storage->current_directory = od->filename.dirname();
+		file_delete(tmp);
 	}else
-		od->error("need external program 'avconv' to decode");
+		od->error("need external program 'avconv' or 'ffmpeg' to decode");
 }
 

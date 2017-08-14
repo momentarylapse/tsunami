@@ -9,4 +9,4 @@ Comment[de]=Editor für Audio-Dateien
 Categories=AudioVideo;Audio
 Exec=/usr/bin/tsunami
 Icon=/usr/share/tsunami/Data/icon.svg
-MimeType=application/michisoft-nami;application/ogg;audio/ogg;audio/x-vorbis+ogg;application/x-ogg;audio/x-wav;application/flac;application/x-flac;audio/x-flac;audio/flac;audo/midi;audio/x-mpeg;audio/x-gtp
+MimeType=application/michisoft-nami;application/ogg;audio/ogg;audio/x-vorbis+ogg;application/x-ogg;audio/x-wav;application/flac;application/x-flac;audio/x-flac;audio/flac;audio/midi;audio/mpeg3;audio/x-mpeg;audio/x-mpeg-3;audio/x-gtp;audio/mp4a-latm

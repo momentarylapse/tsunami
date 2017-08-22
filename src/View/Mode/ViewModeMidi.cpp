@@ -253,9 +253,11 @@ void ViewModeMidi::onKeyDown(int k)
 		}
 	}else if (mode == AudioView::MIDI_MODE_TAB){
 
-		if ((k >= hui::KEY_0) and (k <= hui::KEY_9)){
+		if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
 			Range r = getMidiEditRange();
 			int number = (k - hui::KEY_0);
+			if (k >= hui::KEY_A)
+				number = 10 + (k - hui::KEY_A);
 			int pitch = cur_track->track->instrument.string_pitch[string_no] + number;
 			MidiNote n = MidiNote(r, pitch, 1.0f);
 			n.stringno = string_no;

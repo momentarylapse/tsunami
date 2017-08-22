@@ -143,7 +143,12 @@ void Panel::_kaba_eventX(const string &id, const string &msg, kaba_member_callba
 
 void Panel::_kaba_eventOX(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function)
 {
-	eventX(id, msg, std::bind(function, handler));
+	if (msg == "hui:draw"){
+		kaba_member_callback_p *f = (kaba_member_callback_p*)function;
+		eventXP(id, msg, std::bind(f, handler, std::placeholders::_1));
+	}else{
+		eventX(id, msg, std::bind(function, handler));
+	}
 }
 
 bool Panel::_send_event_(Event *e)

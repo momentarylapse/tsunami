@@ -6,11 +6,11 @@ use "../grid.kaba"
 //#show
 //#disasm
 
-const int N = 4096
-const int NT = 512
-const int NF = 512
-const float MIN_FREQ = 80.0
-const float MAX_FREQ = 10000.0
+const int N = 4096*2 // fft size
+const int NT = 512 // time bins
+const int NF = 512*2 // freq bins
+const float MIN_FREQ = 60.0
+const float MAX_FREQ = 3000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
@@ -93,6 +93,7 @@ class ShowSpectrogram extends SongPlugin
 		float log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
 		for t in 0:NT
+			// time slice
 			int offset = (buf.length - N) * t / NT
 		
 			for j in 0:N
@@ -100,12 +101,15 @@ class ShowSpectrogram extends SongPlugin
 			fft_r2c(sub, f)
 			float ww = i2f(N) / song.sample_rate
 			for i in 0:NF
+				// frequency slice
 				float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
 				float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
 				int j0 = fmin * ww
 				int j1 = fmax * ww + 1
 				j0 = clamp(j0, 0, f.num)
 				j1 = clamp(j1, 0, f.num)
+				
+				// find maximum amplitude in that frequency interval
 				float bmaxr = 0
 				for j in j0:j1
 					float amp = f[j].x * f[j].x + f[j].y * f[j].y

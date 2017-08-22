@@ -411,7 +411,7 @@ void AudioViewTrack::drawMidiClefTab(Painter *c)
 
 void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
 {
-	float r = clef_dy/2;
+	float r = min(clef_dy/2, 15.0f);
 
 	float x1 = view->cam.sample2screen(n->range.offset + shift);
 	float x2 = view->cam.sample2screen(n->range.end() + shift);
@@ -446,7 +446,7 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 
 	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
 
-	if (x2 - x1 > r/2){
+	if (x2 - x1 > r/4){
 		float font_size = r * 1.4f;
 		c->setFontSize(font_size);
 		c->setColor(view->colors.text);

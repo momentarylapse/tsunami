@@ -783,6 +783,14 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 
 		if (die_on_plugin_stop)
 			tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
+	}else if (o == side_bar){
+		if (!side_bar->visible)
+			activate(view->id);
+		updateMenu();
+	}else if (o == bottom_bar){
+		if (!bottom_bar->visible)
+			activate(view->id);
+		updateMenu();
 	}else{
 		// "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();

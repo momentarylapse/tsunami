@@ -74,7 +74,7 @@ SerialNodeParam Serializer::add_temp(Class *t, bool add_constructor)
 	param.type = t;
 	param.shift = 0;
 
-	if (param.type->GetDestructor())
+	if (param.type->get_destructor())
 		inserted_temp.add(param);
 
 	if (add_constructor)
@@ -507,7 +507,7 @@ SerialNodeParam Serializer::AddReference(const SerialNodeParam &param, Class *ty
 {
 	SerialNodeParam ret;
 	if (!type)
-		type = param.type->GetPointer();
+		type = param.type->get_pointer();
 	ret.type = type;
 	ret.shift = 0;
 	if (param.kind == KIND_REF_TO_CONST){
@@ -654,15 +654,15 @@ SerialNodeParam Serializer::SerializeNode(Node *com, Block *block, int index)
 
 	}else if (com->kind == KIND_VIRTUAL_FUNCTION){
 
-		AddClassFunctionCall(instance.type->parent->GetVirtualFunction(com->link_no), instance, params, ret);
+		AddClassFunctionCall(instance.type->parent->get_virtual_function(com->link_no), instance, params, ret);
 
 	}else if (com->kind == KIND_STATEMENT){
 		SerializeStatement(com, params, ret, block, index, marker_before_params);
 	}else if (com->kind == KIND_ARRAY_BUILDER){
-		ClassFunction *cf = com->type->GetFunc("add", TypeVoid, 1);
+		ClassFunction *cf = com->type->get_func("add", TypeVoid, 1);
 		if (!cf)
 			DoError(format("[..]: can not find %s.add() function???", com->type->name.c_str()));
-		instance = AddReference(ret, com->type->GetPointer());
+		instance = AddReference(ret, com->type->get_pointer());
 		for (int i=0; i<com->params.num; i++){
 			AddFunctionCall(cf->script, cf->nr, instance, params[i], p_none);
 		}
@@ -727,7 +727,7 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, int modus)
 	Class *class_type = param.type;
 	if (modus == -1)
 		class_type = class_type->parent;
-	ClassFunction *f = class_type->GetDefaultConstructor();
+	ClassFunction *f = class_type->get_default_constructor();
 	if (!f)
 		return;
 
@@ -746,13 +746,13 @@ void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref
 	Array<SerialNodeParam> params;
 
 	if (needs_ref){
-		ClassFunction *f = param.type->GetDestructor();
+		ClassFunction *f = param.type->get_destructor();
 		if (!f)
 			return;
 		SerialNodeParam inst = AddReference(param);
 		AddClassFunctionCall(f, inst, params, p_none);
 	}else{
-		ClassFunction *f = param.type->parent->GetDestructor();
+		ClassFunction *f = param.type->parent->get_destructor();
 		if (!f)
 			return;
 		AddClassFunctionCall(f, param, params, p_none);

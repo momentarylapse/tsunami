@@ -23,7 +23,7 @@ void SyntaxTree::AutoImplementAddChildConstructors(Node *self, Function *f, Clas
 	foreachi(ClassElement &e, t->elements, i){
 		if (i < i0)
 			continue;
-		ClassFunction *ff = e.type->GetDefaultConstructor();
+		ClassFunction *ff = e.type->get_default_constructor();
 		if (!ff)
 			continue;
 		Node *p = shift_node(self, true, e.offset, e.type);
@@ -36,19 +36,19 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool all
 {
 	if (!f)
 		return;
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	if (t->is_super_array){
 		int nc = AddConstant(TypeInt);
 		constants[nc]->as_int() = t->parent->size;
-		Node *c = add_node_classfunc(t->GetFunc("__mem_init__", TypeVoid, 1, TypeInt), self);
+		Node *c = add_node_classfunc(t->get_func("__mem_init__", TypeVoid, 1, TypeInt), self);
 		c->set_param(0, add_node_const(nc));
 		f->block->nodes.add(c);
 	}else{
 
 		// parent constructor
 		if (t->parent and allow_parent_constructor){
-			ClassFunction *ff = t->parent->GetDefaultConstructor();
+			ClassFunction *ff = t->parent->get_default_constructor();
 			if (ff){
 				Node *c = add_node_classfunc(ff, cp_node(self));
 				f->block->nodes.add(c);
@@ -70,9 +70,9 @@ void SyntaxTree::AutoImplementComplexConstructor(Function *f, Class *t)
 		return;
 	if (!f->auto_implement)
 		return;
-	ClassFunction *pcc = t->parent->GetComplexConstructor();
+	ClassFunction *pcc = t->parent->get_complex_constructor();
 
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	// parent constructor
 	Node *c = add_node_classfunc(pcc, cp_node(self));
@@ -93,10 +93,10 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Class *t)
 {
 	if (!f)
 		return;
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	if (t->is_super_array){
-		ClassFunction *f_clear = t->GetFunc("clear", TypeVoid, 0);
+		ClassFunction *f_clear = t->get_func("clear", TypeVoid, 0);
 		if (f_clear){
 			Node *c = add_node_classfunc(f_clear, self);
 			f->block->nodes.add(c);
@@ -108,7 +108,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Class *t)
 		foreachi(ClassElement &e, t->elements, i){
 			if (i < i0)
 				continue;
-			ClassFunction *ff = e.type->GetDestructor();
+			ClassFunction *ff = e.type->get_destructor();
 			if (!ff)
 				continue;
 			Node *p = shift_node(self, true, e.offset, e.type);
@@ -118,7 +118,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Class *t)
 
 		// parent destructor
 		if (t->parent){
-			ClassFunction *ff = t->parent->GetDestructor();
+			ClassFunction *ff = t->parent->get_destructor();
 			if (ff){
 				Node *c = add_node_classfunc(ff, cp_node(self), true);
 				f->block->nodes.add(c);
@@ -132,11 +132,11 @@ void SyntaxTree::AutoImplementAssign(Function *f, Class *t)
 	if (!f)
 		return;
 	Node *other = add_node_local_var(f->__get_var("other"), t);
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	if (t->is_super_array){
 
-		ClassFunction *f_resize = t->GetFunc("resize", TypeVoid, 1, TypeInt);
+		ClassFunction *f_resize = t->get_func("resize", TypeVoid, 1, TypeInt);
 		if (!f_resize)
 			DoError(format("%s.__assign__(): no %s.resize(int) found", t->name.c_str(), t->name.c_str()));
 
@@ -175,11 +175,11 @@ void SyntaxTree::AutoImplementAssign(Function *f, Class *t)
 
 		// el := self.data[for_var]
 		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 		Node *cmd_el = add_node_parray(self_data, for_var, t->parent);
 
 		// el2 := other.data[for_var]
-		Node *other_data = shift_node(other, false, 0, t->parent->GetPointer());
+		Node *other_data = shift_node(other, false, 0, t->parent->get_pointer());
 		Node *cmd_el2 = add_node_parray(other_data, for_var, t->parent);
 
 
@@ -275,14 +275,14 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Class *t)
 		return;
 	f->block->add_var("for_var", TypeInt);
 
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	Node *self_num = shift_node(cp_node(self), true, config.pointer_size, TypeInt);
 
 	Node *for_var = add_node_local_var(f->__get_var("for_var"), TypeInt);
 
 // delete...
-	ClassFunction *f_del = t->parent->GetDestructor();
+	ClassFunction *f_del = t->parent->get_destructor();
 	if (f_del){
 		// for_var = 0
 		int nc = AddConstant(TypeInt);
@@ -303,7 +303,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Class *t)
 
 		// el := self.data[for_var]
 		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 		Node *cmd_el = add_node_parray(self_data, for_var, t->parent);
 
 		// __delete__
@@ -317,7 +317,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Class *t)
 	}
 
 	// clear
-	Node *cmd_clear = add_node_classfunc(t->GetFunc("__mem_clear__", TypeVoid, 0), self);
+	Node *cmd_clear = add_node_classfunc(t->get_func("__mem_clear__", TypeVoid, 0), self);
 	f->block->nodes.add(cmd_clear);
 }
 
@@ -331,7 +331,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Class *t)
 
 	Node *num = add_node_local_var(f->__get_var("num"), TypeInt);
 
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	Node *self_num = shift_node(cp_node(self), true, config.pointer_size, TypeInt);
 
@@ -344,7 +344,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Class *t)
 	f->block->nodes.add(cmd_copy_num);
 
 // delete...
-	ClassFunction *f_del = t->parent->GetDestructor();
+	ClassFunction *f_del = t->parent->get_destructor();
 	if (f_del){
 		// for_var = num
 		Node *cmd_assign = add_node_operator_by_inline(for_var, num, INLINE_INT_ASSIGN);
@@ -362,7 +362,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Class *t)
 
 		// el := self.data[for_var]
 		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 		Node *cmd_el = add_node_parray(self_data, for_var, t->parent);
 
 		// __delete__
@@ -376,12 +376,12 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Class *t)
 	}
 
 	// resize
-	Node *c_resize = add_node_classfunc(t->GetFunc("__mem_resize__", TypeVoid, 1, TypeInt), self);
+	Node *c_resize = add_node_classfunc(t->get_func("__mem_resize__", TypeVoid, 1, TypeInt), self);
 	c_resize->set_param(0, num);
 	f->block->nodes.add(c_resize);
 
 	// new...
-	ClassFunction *f_init = t->parent->GetDefaultConstructor();
+	ClassFunction *f_init = t->parent->get_default_constructor();
 	if (f_init){
 		// for_var = num_old
 		Node *cmd_assign = add_node_operator_by_inline(for_var, num_old, INLINE_INT_ASSIGN);
@@ -399,7 +399,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Class *t)
 
 		// el := self.data[for_var]
 		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 		Node *cmd_el = add_node_parray(self_data, for_var, t->parent);
 
 		// __init__
@@ -420,15 +420,15 @@ void SyntaxTree::AutoImplementArrayRemove(Function *f, Class *t)
 		return;
 
 	Node *index = add_node_local_var(f->__get_var("index"), TypeInt);
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	// delete...
-	ClassFunction *f_del = t->parent->GetDestructor();
+	ClassFunction *f_del = t->parent->get_destructor();
 	if (f_del){
 
 		// el := self.data[index]
 		Node *deref_self = deref_node(cp_node(self));
-		Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+		Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 		Node *cmd_el = add_node_parray(self_data, index, t->parent);
 
 		// __delete__
@@ -437,7 +437,7 @@ void SyntaxTree::AutoImplementArrayRemove(Function *f, Class *t)
 	}
 
 	// resize
-	Node *c_remove = add_node_classfunc(t->GetFunc("__mem_remove__", TypeVoid, 1, TypeInt), self);
+	Node *c_remove = add_node_classfunc(t->get_func("__mem_remove__", TypeVoid, 1, TypeInt), self);
 	c_remove->set_param(0, index);
 	f->block->nodes.add(c_remove);
 }
@@ -449,7 +449,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	Block *b = f->block;
 	Node *item = add_node_local_var(b->get_var("x"), t->parent);
 
-	Node *self = add_node_local_var(b->get_var(IDENTIFIER_SELF), t->GetPointer());
+	Node *self = add_node_local_var(b->get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	Node *self_num = shift_node(cp_node(self), true, config.pointer_size, TypeInt);
 
@@ -459,7 +459,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	constants[nc]->as_int() = 1;
 	Node *cmd_1 = add_node_const(nc);
 	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, INLINE_INT_ADD);
-	Node *cmd_resize = add_node_classfunc(t->GetFunc("resize", TypeVoid, 1, TypeInt), self);
+	Node *cmd_resize = add_node_classfunc(t->get_func("resize", TypeVoid, 1, TypeInt), self);
 	cmd_resize->set_param(0, cmd_add);
 	b->nodes.add(cmd_resize);
 
@@ -468,7 +468,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	// el := self.data[self.num - 1]
 	Node *cmd_sub = add_node_operator_by_inline(cp_node(self_num), cmd_1, INLINE_INT_SUBTRACT);
 	Node *deref_self = deref_node(cp_node(self));
-	Node *self_data = shift_node(deref_self, false, 0, t->parent->GetPointer());
+	Node *self_data = shift_node(deref_self, false, 0, t->parent->get_pointer());
 	Node *cmd_el = add_node_parray(self_data, cmd_sub, t->parent);
 
 	Node *cmd_assign = LinkOperator(OPERATOR_ASSIGN, cmd_el, item);
@@ -486,7 +486,7 @@ void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_
 		f->num_params ++;
 	}
 	f->Update(t);
-	t->AddFunction(s, s->functions.num - 1, false, cf);
+	t->add_function(s, s->functions.num - 1, false, cf);
 }
 
 bool needs_new(ClassFunction *f)
@@ -514,31 +514,31 @@ void SyntaxTree::AddFunctionHeadersForClass(Class *t)
 	}else if (t->is_array){
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other");
 	}else if (!t->is_simple_class()){//needs_init){
-		if (needs_new(t->GetDefaultConstructor()))
-			add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, TypeVoid, "", t->GetDefaultConstructor());
-		if (needs_new(t->GetDestructor()))
-			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, TypeVoid, "", t->GetDestructor());
-		if (needs_new(t->GetAssign())){
+		if (needs_new(t->get_default_constructor()))
+			add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, TypeVoid, "", t->get_default_constructor());
+		if (needs_new(t->get_destructor()))
+			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, TypeVoid, "", t->get_destructor());
+		if (needs_new(t->get_assign())){
 			//add_func_header(this, t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
 			// implement only if parent has also done so
 			if (t->parent){
-				if (t->parent->GetAssign())
-					add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->GetAssign());
+				if (t->parent->get_assign())
+					add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->get_assign());
 			}else{
-				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->GetAssign());
+				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->get_assign());
 			}
 		}
-		if (needs_new(t->GetComplexConstructor()))
+		if (needs_new(t->get_complex_constructor()))
 			if (t->parent)
-				if (t->parent->GetComplexConstructor()){
+				if (t->parent->get_complex_constructor()){
 					Function *f = AddFunction(IDENTIFIER_FUNC_INIT, TypeVoid);
 					f->auto_implement = true;
 
-					Function *b = t->parent->GetComplexConstructor()->GetFunc();
+					Function *b = t->parent->get_complex_constructor()->GetFunc();
 					f->num_params = b->num_params;
 					f->var = b->var;
 					f->Update(t);
-					t->AddFunction(this, functions.num - 1, false, t->GetComplexConstructor());
+					t->add_function(this, functions.num - 1, false, t->get_complex_constructor());
 
 				}
 	}
@@ -546,7 +546,7 @@ void SyntaxTree::AddFunctionHeadersForClass(Class *t)
 
 Function* class_get_func(Class *t, const string &name, Class *return_type, int num_params)
 {
-	ClassFunction *cf = t->GetFunc(name, return_type, num_params);
+	ClassFunction *cf = t->get_func(name, return_type, num_params);
 	if (cf){
 		Function *f = cf->GetFunc();
 		if (f->auto_implement){
@@ -582,7 +582,7 @@ void SyntaxTree::AutoImplementFunctions(Class *t)
 		if (t->needs_destructor())
 			AutoImplementDestructor(class_get_func(t, IDENTIFIER_FUNC_DELETE, TypeVoid, 0), t);
 		AutoImplementAssign(class_get_func(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1), t);
-		ClassFunction *cf = t->GetComplexConstructor();
+		ClassFunction *cf = t->get_complex_constructor();
 		if (cf)
 			AutoImplementComplexConstructor(cf->GetFunc(), t);
 	}

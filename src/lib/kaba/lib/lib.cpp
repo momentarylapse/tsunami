@@ -380,7 +380,7 @@ void class_add_func_virtual(const string &name, Class *return_type, void *func, 
 
 void class_link_vtable(void *p)
 {
-	cur_class->LinkExternalVirtualTable(p);
+	cur_class->link_external_virtual_table(p);
 }
 
 
@@ -500,7 +500,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	t->parent = parent;
 	add_class(t);
 
-	ClassFunction *sub = t->GetFunc("subarray", TypeDynamicArray, 2);
+	ClassFunction *sub = t->get_func("subarray", TypeDynamicArray, 2);
 	sub->return_type = t;
 
 		// FIXME  wrong for complicated classes

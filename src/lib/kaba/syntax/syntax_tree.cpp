@@ -159,7 +159,7 @@ Node *SyntaxTree::cp_node(Node *c)
 
 Node *SyntaxTree::ref_node(Node *sub, Class *override_type)
 {
-	Class *t = override_type ? override_type : sub->type->GetPointer();
+	Class *t = override_type ? override_type : sub->type->get_pointer();
 	Node *c = AddNode(KIND_REFERENCE, 0, t);
 	c->set_num_params(1);
 	c->set_param(0, sub);
@@ -651,7 +651,7 @@ Node exlink_make_var_local(SyntaxTree *ps, Class *t, int var_no)
 Node exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
 	Node link;
-	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->GetPointer());
+	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->get_pointer());
 	link.type = e.type;
 	link.link_no = e.offset;
 	link.kind = KIND_DEREF_ADDRESS_SHIFT;
@@ -665,7 +665,7 @@ Node exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 Node exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
 	Node link;
-	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->GetPointer());
+	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->get_pointer());
 	if (cf.virtual_index >= 0){
 		link.kind = KIND_VIRTUAL_FUNCTION;
 		link.link_no = cf.virtual_index;
@@ -744,7 +744,7 @@ Array<Node> SyntaxTree::GetExistence(const string &name, Block *block)
 		}
 		if (f->_class){
 			if ((name == IDENTIFIER_SUPER) and (f->_class->parent)){
-				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var(IDENTIFIER_SELF)));
+				links.add(exlink_make_var_local(this, f->_class->parent->get_pointer(), f->__get_var(IDENTIFIER_SELF)));
 				return links;
 			}
 			// class elements (within a class function)
@@ -891,7 +891,7 @@ Node *conv_cbr(SyntaxTree *ps, Node *c, int var)
 
 	// convert
 	if ((c->kind == KIND_VAR_LOCAL) and (c->link_no == var)){
-		c->type = c->type->GetPointer();
+		c->type = c->type->get_pointer();
 		return ps->deref_node(c);
 	}
 	return c;
@@ -935,7 +935,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 
 		// return: array reference (-> dereference)
 		if ((c->type->is_array) /*or (c->Type->IsSuperArray)*/){
-			c->type = c->type->GetPointer();
+			c->type = c->type->get_pointer();
 			return ps->deref_node(c);
 			//deref_command_old(this, c);
 		}
@@ -1046,7 +1046,7 @@ void SyntaxTree::ConvertCallByReference()
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
 			if (f->var[j].type->uses_call_by_reference()){
-				f->var[j].type = f->var[j].type->GetPointer();
+				f->var[j].type = f->var[j].type->get_pointer();
 
 				// internal usage...
 				foreachi(Node *c, f->block->nodes, i)
@@ -1134,7 +1134,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		c_offset->type = TypeInt;//TypePointer;
 		// address = &array + offset
 		Node *c_address = add_node_operator_by_inline(c_ref_array, c_offset, __get_pointer_add_int());
-		c_address->type = el_type->GetPointer();//TypePointer;
+		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
 	}else if (c->kind == KIND_POINTER_AS_ARRAY){
@@ -1159,7 +1159,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		c_offset->type = TypeInt;
 		// address = &array + offset
 		Node *c_address = add_node_operator_by_inline(c_ref_array, c_offset, __get_pointer_add_int());
-		c_address->type = el_type->GetPointer();//TypePointer;
+		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
 	}else if (c->kind == KIND_ADDRESS_SHIFT){
@@ -1180,7 +1180,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		Node *c_shift = add_node_const(nc);
 		// address = &struct + shift
 		Node *c_address = add_node_operator_by_inline(c_ref_struct, c_shift, __get_pointer_add_int());
-		c_address->type = el_type->GetPointer();//TypePointer;
+		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
 	}else if (c->kind == KIND_DEREF_ADDRESS_SHIFT){
@@ -1200,7 +1200,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		Node *c_shift = add_node_const(nc);
 		// address = &struct + shift
 		Node *c_address = add_node_operator_by_inline(c_ref_struct, c_shift, __get_pointer_add_int());
-		c_address->type = el_type->GetPointer();//TypePointer;
+		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
 	}

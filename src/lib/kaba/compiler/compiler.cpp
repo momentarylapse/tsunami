@@ -59,7 +59,7 @@ void try_init_global_var(Class *type, char* g_var)
 			try_init_global_var(type->parent, g_var + i * type->parent->size);
 		return;
 	}
-	ClassFunction *cf = type->GetDefaultConstructor();
+	ClassFunction *cf = type->get_default_constructor();
 	if (!cf)
 		return;
 	typedef void init_func(void *);
@@ -482,7 +482,7 @@ void Script::LinkFunctions()
 
 	// link virtual functions into vtables
 	for (Class *t: syntax->classes){
-		t->LinkVirtualTable();
+		t->link_virtual_table();
 
 		if (config.compile_os){
 			for (int i=0; i<t->vtable.num; i++)

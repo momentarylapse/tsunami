@@ -500,7 +500,7 @@ void SerializerARM::ProcessDereferences()
 					rp.kind = KIND_VAR_LOCAL;
 				else
 					rp.kind = KIND_VAR_TEMP;
-				rp.type = p.type->GetPointer();
+				rp.type = p.type->get_pointer();
 				int r = find_unused_reg(i, i, 4);
 				next_cmd_target(i);
 				add_cmd(Asm::INST_MOV, param_vreg(TypePointer, r), rp);

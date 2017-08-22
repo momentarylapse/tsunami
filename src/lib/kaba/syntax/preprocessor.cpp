@@ -198,7 +198,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 		Function *f = c->script->syntax->functions[c->link_no];
 		if (!f->is_pure)
 			return c;
-		if (f->return_type->GetDefaultConstructor()) // TODO
+		if (f->return_type->get_default_constructor()) // TODO
 			return c;
 		void *ff = (void*)c->script->func[c->link_no];
 		if (!ff)

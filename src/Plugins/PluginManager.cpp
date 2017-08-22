@@ -673,9 +673,9 @@ Synthesizer *PluginManager::__LoadSynthesizer(const string &name, Song *song)
 		return NULL;
 	}
 	for (auto *t : s->syntax->classes){
-		if (t->GetRoot()->name != "Synthesizer")
+		if (t->get_root()->name != "Synthesizer")
 			continue;
-		Synthesizer *synth = (Synthesizer*)t->CreateInstance();
+		Synthesizer *synth = (Synthesizer*)t->create_instance();
 		synth->song = song;
 		synth->setSampleRate(song->sample_rate);
 		return synth;

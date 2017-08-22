@@ -114,13 +114,13 @@ bool Class::is_simple_class() const
 	if (parent)
 		if (!parent->is_simple_class())
 			return false;
-	if (GetDefaultConstructor())
+	if (get_default_constructor())
 		return false;
-	if (GetComplexConstructor())
+	if (get_complex_constructor())
 		return false;
-	if (GetDestructor())
+	if (get_destructor())
 		return false;
-	if (GetAssign())
+	if (get_assign())
 		return false;
 	for (ClassElement &e: elements)
 		if (!e.type->is_simple_class())
@@ -188,13 +188,13 @@ bool Class::needs_destructor() const
 	if (is_super_array)
 		return true;
 	if (parent){
-		if (parent->GetDestructor())
+		if (parent->get_destructor())
 			return true;
 		if (parent->needs_destructor())
 			return true;
 	}
 	for (ClassElement &e: elements){
-		if (e.type->GetDestructor())
+		if (e.type->get_destructor())
 			return true;
 		if (e.type->needs_destructor())
 			return true;
@@ -224,7 +224,7 @@ bool Class::is_derived_from(const string &root) const
 	return parent->is_derived_from(root);
 }
 
-ClassFunction *Class::GetFunc(const string &_name, const Class *return_type, int num_params, const Class *param0) const
+ClassFunction *Class::get_func(const string &_name, const Class *return_type, int num_params, const Class *param0) const
 {
 	foreachi(ClassFunction &f, functions, i)
 		if ((f.name == _name) and (f.return_type == return_type) and (f.param_types.num == num_params)){
@@ -237,12 +237,12 @@ ClassFunction *Class::GetFunc(const string &_name, const Class *return_type, int
 	return NULL;
 }
 
-ClassFunction *Class::GetDefaultConstructor() const
+ClassFunction *Class::get_default_constructor() const
 {
-	return GetFunc(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
+	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
 }
 
-ClassFunction *Class::GetComplexConstructor() const
+ClassFunction *Class::get_complex_constructor() const
 {
 	for (ClassFunction &f: functions)
 		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_types.num > 0))
@@ -250,17 +250,17 @@ ClassFunction *Class::GetComplexConstructor() const
 	return NULL;
 }
 
-ClassFunction *Class::GetDestructor() const
+ClassFunction *Class::get_destructor() const
 {
-	return GetFunc(IDENTIFIER_FUNC_DELETE, TypeVoid, 0);
+	return get_func(IDENTIFIER_FUNC_DELETE, TypeVoid, 0);
 }
 
-ClassFunction *Class::GetAssign() const
+ClassFunction *Class::get_assign() const
 {
-	return GetFunc(IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1, this);
+	return get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1, this);
 }
 
-ClassFunction *Class::GetGet(const Class *index) const
+ClassFunction *Class::get_get(const Class *index) const
 {
 	for (ClassFunction &cf: functions){
 		if (cf.name != "__get__")
@@ -274,7 +274,7 @@ ClassFunction *Class::GetGet(const Class *index) const
 	return NULL;
 }
 
-ClassFunction *Class::GetVirtualFunction(int virtual_index) const
+ClassFunction *Class::get_virtual_function(int virtual_index) const
 {
 	for (ClassFunction &f: functions)
 		if (f.virtual_index == virtual_index)
@@ -282,7 +282,7 @@ ClassFunction *Class::GetVirtualFunction(int virtual_index) const
 	return NULL;
 }
 
-void Class::LinkVirtualTable()
+void Class::link_virtual_table()
 {
 	if (vtable.num == 0)
 		return;
@@ -314,7 +314,7 @@ void Class::LinkVirtualTable()
 	}
 }
 
-void Class::LinkExternalVirtualTable(void *p)
+void Class::link_external_virtual_table(void *p)
 {
 	// link script functions according to external vtable
 	VirtualTable *t = (VirtualTable*)p;
@@ -367,12 +367,12 @@ string func_signature(Function *f)
 }
 
 
-Class *Class::GetPointer() const
+Class *Class::get_pointer() const
 {
 	return owner->CreateNewClass(name + "*", config.pointer_size, true, false, false, 0, const_cast<Class*>(this));
 }
 
-Class *Class::GetRoot() const
+Class *Class::get_root() const
 {
 	Class *r = const_cast<Class*>(this);
 	while (r->parent)
@@ -388,7 +388,7 @@ void class_func_out(Class *c, ClassFunction *f)
 	msg_write(c->name + "." + f->name + ps);
 }
 
-void Class::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool override)
+void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool override)
 {
 	Function *f = s->functions[func_no];
 	ClassFunction cf;
@@ -452,10 +452,10 @@ bool Class::derive_from(const Class* root, bool increase_size)
 	return found;
 }
 
-void *Class::CreateInstance() const
+void *Class::create_instance() const
 {
 	void *p = malloc(size);
-	ClassFunction *c = GetDefaultConstructor();
+	ClassFunction *c = get_default_constructor();
 	if (c){
 		typedef void con_func(void *);
 		con_func * f = (con_func*)c->script->func[c->nr];

@@ -197,7 +197,7 @@ PluginData *Configurable::get_config() const
 	if (!c)
 		return NULL;
 	for (auto &e: c->elements)
-		if ((e.name == "config") and (e.type->GetRoot()->name == "PluginData")){
+		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
 			PluginData *config = (PluginData*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
@@ -215,7 +215,7 @@ PluginData *Configurable::get_state() const
 		return NULL;
 	}
 	for (auto &e: c->elements)
-		if ((e.name == "state") and (e.type->GetRoot()->name == "PluginData")){
+		if ((e.name == "state") and (e.type->get_root()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
 			state->_class = e.type;
 			return state;
@@ -541,7 +541,7 @@ Configurable *Configurable::copy() const
 		return NULL;
 	}
 
-	Configurable *clone = (Configurable*)c->CreateInstance();
+	Configurable *clone = (Configurable*)c->create_instance();
 
 	clone->configurable_type = configurable_type;
 	clone->configFromString(configToString());

@@ -260,9 +260,9 @@ public:
 	Class *GetConstantType(const string &str);
 	void GetConstantValue(const string &str, Value &value);
 	Class *FindType(const string &name);
-	Class *AddType(Class *type);
-	Class *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub);
-	Class *CreateArrayType(Class *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
+	Class *AddClass(Class *type);
+	Class *CreateNewClass(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub);
+	Class *CreateArrayClass(Class *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
 	Array<Node> GetExistence(const string &name, Block *block);
 	Array<Node> GetExistenceShared(const string &name);
 	void LinkMostImportantOperator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);

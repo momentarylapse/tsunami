@@ -18,7 +18,7 @@ int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 	// return data too big... push address
 	SerialNodeParam ret_ref;
-	if (type->UsesReturnByMemory()){
+	if (type->uses_return_by_memory()){
 		//add_temp(type, ret_temp);
 		ret_ref = AddReference(/*ret_temp*/ ret);
 		//add_ref();
@@ -41,7 +41,7 @@ int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 	if (config.abi == ABI_WINDOWS_32){
 		// more than 4 byte have to be returned -> give return address as very last parameter!
-		if (type->UsesReturnByMemory())
+		if (type->uses_return_by_memory())
 			add_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 	}
 
@@ -53,7 +53,7 @@ int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 	
 	if (config.abi == ABI_GNU_32){
 		// more than 4 byte have to be returned -> give return address as very first parameter!
-		if (type->UsesReturnByMemory())
+		if (type->uses_return_by_memory())
 			add_cmd(Asm::INST_PUSH, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 	}
 	return push_size;
@@ -69,7 +69,7 @@ void SerializerX86::fc_end(int push_size, const SerialNodeParam &ret)
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_ESP), param_const(TypeChar, push_size));
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->UsesReturnByMemory())){
+	if ((type != TypeVoid) and (!type->uses_return_by_memory())){
 		if (type == TypeFloat32)
 			if (config.compile_os)
 				add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
@@ -231,7 +231,7 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			break;
 		case STATEMENT_RETURN:
 			if (com->params.num > 0){
-				if (cur_func->return_type->UsesReturnByMemory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
+				if (cur_func->return_type->uses_return_by_memory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
 					FillInDestructorsBlock(block, true);
 					// internally handled...
 #if 0
@@ -1104,7 +1104,7 @@ void SerializerX86::AddFunctionIntro(Function *f)
 void SerializerX86::AddFunctionOutro(Function *f)
 {
 	add_cmd(Asm::INST_LEAVE);
-	if (f->return_type->UsesReturnByMemory())
+	if (f->return_type->uses_return_by_memory())
 		add_cmd(Asm::INST_RET, param_const(TypeReg16, 4));
 	else
 		add_cmd(Asm::INST_RET);

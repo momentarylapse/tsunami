@@ -13,7 +13,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 
 	// return data too big... push address
 	SerialNodeParam ret_ref;
-	if (type->UsesReturnByMemory()){
+	if (type->uses_return_by_memory()){
 		//add_temp(type, ret_temp);
 		ret_ref = AddReference(/*ret_temp*/ ret);
 		//add_ref();
@@ -31,7 +31,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 		params.insert(instance, 0);
 
 	// return as _very_ first parameter
-	if (type->UsesReturnByMemory()){
+	if (type->uses_return_by_memory()){
 		//add_temp(type, ret_temp);
 //		ret_ref = AddReference(/*ret_temp*/ ret);
 		params.insert(ret_ref, 0);
@@ -112,7 +112,7 @@ void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, con
 	Class *type = ret.get_type_save();
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->UsesReturnByMemory())){
+	if ((type != TypeVoid) and (!type->uses_return_by_memory())){
 		if (type == TypeFloat32)
 			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
 		else if (type == TypeFloat64)
@@ -180,7 +180,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 {
 	// return, instance, params
 	Array<Variable> param;
-	if (f->return_type->UsesReturnByMemory()){
+	if (f->return_type->uses_return_by_memory()){
 		for (Variable &v: f->var)
 			if (v.name == IDENTIFIER_RETURN_VAR){
 				param.add(v);

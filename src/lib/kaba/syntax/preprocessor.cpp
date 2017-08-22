@@ -17,7 +17,7 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 		}else if (f->return_type == TypeFloat32){
 			*(float*)ret = ((float(*)())ff)();
 			return true;
-		}else if (f->return_type->UsesReturnByMemory()){
+		}else if (f->return_type->uses_return_by_memory()){
 			((void(*)(void*))ff)(ret);
 			return true;
 		}
@@ -32,14 +32,14 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 				*(float*)ret = ((float(*)(float))ff)(*(float*)param[0]);
 				return true;
 			}
-		}else if (f->return_type->UsesReturnByMemory()){
+		}else if (f->return_type->uses_return_by_memory()){
 			if (f->literal_param_type[0] == TypeInt){
 				((void(*)(void*, int))ff)(ret, *(int*)param[0]);
 				return true;
 			}else if (f->literal_param_type[0] == TypeFloat32){
 				((void(*)(void*, float))ff)(ret, *(float*)param[0]);
 				return true;
-			}else if (f->literal_param_type[0]->UsesCallByReference()){
+			}else if (f->literal_param_type[0]->uses_call_by_reference()){
 				((void(*)(void*, void*))ff)(ret, param[0]);
 				return true;
 			}
@@ -55,27 +55,27 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 				*(float*)ret = ((float(*)(float, float))ff)(*(float*)param[0], *(float*)param[1]);
 				return true;
 			}
-		}else if (f->return_type->UsesReturnByMemory()){
+		}else if (f->return_type->uses_return_by_memory()){
 			if ((f->literal_param_type[0] == TypeInt) and(f->literal_param_type[1] == TypeInt)){
 				((void(*)(void*, int, int))ff)(ret, *(int*)param[0], *(int*)param[1]);
 				return true;
 			}else if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32)){
 				((void(*)(void*, float, float))ff)(ret, *(float*)param[0], *(float*)param[1]);
 				return true;
-			}else if ((f->literal_param_type[0]->UsesCallByReference()) and(f->literal_param_type[1]->UsesCallByReference())){
+			}else if ((f->literal_param_type[0]->uses_call_by_reference()) and(f->literal_param_type[1]->uses_call_by_reference())){
 				((void(*)(void*, void*, void*))ff)(ret, param[0], param[1]);
 				return true;
 			}
 		}
 	}else if (f->num_params == 3){
-		if (f->return_type->UsesReturnByMemory()){
+		if (f->return_type->uses_return_by_memory()){
 			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32) and(f->literal_param_type[2] == TypeFloat32)){
 				((void(*)(void*, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2]);
 				return true;
 			}
 		}
 	}else if (f->num_params == 4){
-		if (f->return_type->UsesReturnByMemory()){
+		if (f->return_type->uses_return_by_memory()){
 			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32) and(f->literal_param_type[2] == TypeFloat32) and(f->literal_param_type[3] == TypeFloat32)){
 				((void(*)(void*, float, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;

@@ -374,7 +374,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 	foreachi(Function *f, syntax->functions, i){
 		if (!f->_class)
 			continue;
-		if (!f->_class->IsDerivedFrom(root_type))
+		if (!f->_class->is_derived_from(root_type))
 			continue;
 		if ((f->name.match("*." + name)) and (f->literal_return_type->name == return_type) and (num_params == f->num_params)){
 

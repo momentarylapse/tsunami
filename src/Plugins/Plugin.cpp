@@ -42,7 +42,7 @@ void *Plugin::createInstance(const string &root_type)
 		return NULL;
 
 	for (auto *t : s->syntax->classes){
-		if (t->IsDerivedFrom(root_type))
+		if (t->is_derived_from(root_type))
 			return t->CreateInstance();
 	}
 	tsunami->log->error(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));

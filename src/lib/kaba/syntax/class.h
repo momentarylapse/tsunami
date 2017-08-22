@@ -38,8 +38,8 @@ typedef void *VirtualTable;
 
 class Class{
 public:
-	Class();
-	//Class(const string &name, int size, SyntaxTree *owner);
+	//Class();
+	Class(const string &name, int size, SyntaxTree *owner, Class *parent = NULL);
 	~Class();
 	string name;
 	long long size; // complete size of type
@@ -56,17 +56,17 @@ public:
 	void *_vtable_location_target_; // (opcode offset adjusted)
 
 	bool force_call_by_value;
-	bool UsesCallByReference() const;
-	bool UsesReturnByMemory() const;
+	bool uses_call_by_reference() const;
+	bool uses_return_by_memory() const;
 	bool is_simple_class() const;
 	bool is_size_known() const;
-	Class *GetArrayElement() const;
+	Class *get_array_element() const;
 	bool usable_as_super_array() const;
 	bool needs_constructor() const;
 	bool needs_destructor() const;
-	bool IsDerivedFrom(const Class *root) const;
-	bool IsDerivedFrom(const string &root) const;
-	bool DeriveFrom(const Class *root, bool increase_size);
+	bool is_derived_from(const Class *root) const;
+	bool is_derived_from(const string &root) const;
+	bool derive_from(const Class *root, bool increase_size);
 	Class *GetPointer() const;
 	Class *GetRoot() const;
 	void AddFunction(SyntaxTree *s, int func_no, bool as_virtual = false, bool override = false);

@@ -87,13 +87,13 @@ void SIAddPackageNix()
 		class_add_func("startRender", TypeBool, nix_p(mf(&NixTexture::start_render)));
 
 	add_class(TypeDynamicTexture);
-		TypeDynamicTexture->DeriveFrom(TypeTexture, false);
+		TypeDynamicTexture->derive_from(TypeTexture, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixDynamicTexture::__init__)));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
 	add_class(TypeCubeMap);
-		TypeCubeMap->DeriveFrom(TypeTexture, false);
+		TypeCubeMap->derive_from(TypeTexture, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixCubeMap::__init__)));
 			func_add_param("size", TypeInt);
 

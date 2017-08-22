@@ -322,7 +322,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Layer);
 
 	add_class(TypePicture);
-		TypePicture->DeriveFrom(TypeLayer, false);
+		TypePicture->derive_from(TypeLayer, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAPicture(enabled));
 	//	class_add_element("pos",			TypeVector,		GetDAPicture(pos));
 	//	class_add_element("color",			TypeColor,		GetDAPicture(_color));
@@ -350,7 +350,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Picture);
 	
 	add_class(TypePicture3D);
-		TypePicture3D->DeriveFrom(TypeLayer, false);
+		TypePicture3D->derive_from(TypeLayer, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAPicture3D(enabled));
 		class_add_element("lighting",		TypeBool,		GetDAPicture3D(lighting));
 		class_add_element("world_3d",		TypeBool,		GetDAPicture3D(world_3d));
@@ -374,7 +374,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Picture3d);
 	
 	add_class(TypeText);
-		TypeText->DeriveFrom(TypeLayer, false);
+		TypeText->derive_from(TypeLayer, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAText(enabled));
 	//	class_add_element("pos",			TypeVector,		GetDAText(pos));
 	//	class_add_element("color",			TypeColor,		GetDAText(_color));
@@ -424,7 +424,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Particle);
 
 	add_class(TypeParticleRot);
-		TypeParticleRot->DeriveFrom(TypeParticle, false);
+		TypeParticleRot->derive_from(TypeParticle, false);
 		class_add_element("ang", TypeVector, GetDAParticle(parameter));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&ParticleRot::__init_ext__)));
 			func_add_param("pos", TypeVector);
@@ -438,7 +438,7 @@ void SIAddPackageX()
 		class_set_vtable_x(ParticleRot);
 
 	add_class(TypeBeam);
-		TypeBeam->DeriveFrom(TypeParticle, false);
+		TypeBeam->derive_from(TypeParticle, false);
 		class_add_element("length",			TypeVector,		GetDAParticle(parameter));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Beam::__init_ext__)));
 			func_add_param("pos", TypeVector);
@@ -730,7 +730,7 @@ void SIAddPackageX()
 			func_add_param("axis", TypeInt);
 
 	add_class(TypeLinkSpring);
-		TypeLinkSpring->DeriveFrom(TypeLink, false);
+		TypeLinkSpring->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_spring__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -740,14 +740,14 @@ void SIAddPackageX()
 			func_add_param("k",			TypeFloat32);
 
 	add_class(TypeLinkBall);
-		TypeLinkBall->DeriveFrom(TypeLink, false);
+		TypeLinkBall->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_ball__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
 			func_add_param("p",			TypeVector);
 
 	add_class(TypeLinkHinge);
-		TypeLinkHinge->DeriveFrom(TypeLink, false);
+		TypeLinkHinge->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_hinge__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -755,7 +755,7 @@ void SIAddPackageX()
 			func_add_param("ax",		TypeVector);
 
 	add_class(TypeLinkHinge2);
-		TypeLinkHinge2->DeriveFrom(TypeLink, false);
+		TypeLinkHinge2->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_hinge2__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -764,7 +764,7 @@ void SIAddPackageX()
 			func_add_param("ax2",		TypeVector);
 
 	add_class(TypeLinkSlider);
-		TypeLinkSlider->DeriveFrom(TypeLink, false);
+		TypeLinkSlider->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_slider__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -772,7 +772,7 @@ void SIAddPackageX()
 
 
 	add_class(TypeLinkUniversal);
-		TypeLinkUniversal->DeriveFrom(TypeLink, false);
+		TypeLinkUniversal->derive_from(TypeLink, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_universal__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);

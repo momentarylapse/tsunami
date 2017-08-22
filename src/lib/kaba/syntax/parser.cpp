@@ -243,7 +243,7 @@ Node *SyntaxTree::GetOperandExtensionArray(Node *Operand, Block *block)
 		array = Operand->param[0];*/
 	}else if (Operand->type->usable_as_super_array()){
 		array = add_node_parray(shift_node(Operand, false, 0, Operand->type->GetPointer()),
-		                           index, Operand->type->GetArrayElement());
+		                           index, Operand->type->get_array_element());
 	}else if (Operand->type->is_pointer){
 		array = add_node_parray(Operand, index, Operand->type->parent->parent);
 	}else{
@@ -557,7 +557,7 @@ Node *build_list(SyntaxTree *ps, Array<Node*> &el)
 		ps->DoError("empty arrays not supported yet");
 //	if (el.num > SCRIPT_MAX_PARAMS)
 //		ps->DoError(format("only %d elements in auto arrays supported yet", SCRIPT_MAX_PARAMS));
-	Class *t = ps->CreateArrayType(el[0]->type, -1);
+	Class *t = ps->CreateArrayClass(el[0]->type, -1);
 	Node *c = ps->AddNode(KIND_ARRAY_BUILDER, 0, t);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++){
@@ -641,7 +641,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 				int _ie=Exp.cur_exp-1;
 				int po = links[0].link_no, o=-1;
 				Node *sub_command = GetOperand(block);
-				Class *r = TypeVoid;
+				//Class *r = TypeVoid;
 				Class *p2 = sub_command->type;
 
 				// exact match?
@@ -650,7 +650,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 					if (po == operators[i].primitive_id)
 						if ((operators[i].param_type_1 == TypeVoid) and (type_match(p2, operators[i].param_type_2))){
 							o = i;
-							r = operators[i].return_type;
+							//r = operators[i].return_type;
 							ok = true;
 							break;
 						}
@@ -666,7 +666,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 							if ((operators[i].param_type_1 == TypeVoid) and (type_match_with_cast(p2, false, false, operators[i].param_type_2, pen2, c2))){
 								ok = true;
 								if (pen2 < pen_min){
-									r = operators[i].return_type;
+									//r = operators[i].return_type;
 									o = i;
 									pen_min = pen2;
 									c2_best = c2;
@@ -1060,7 +1060,7 @@ void SyntaxTree::ParseStatementForall(Block *block)
 	//Exp.next();
 
 	// variable...
-	Class *var_type = for_array->type->GetArrayElement();
+	Class *var_type = for_array->type->get_array_element();
 	int var_no = block->add_var(var_name, var_type);
 	Node *for_var = add_node_local_var(var_no, var_type);
 
@@ -1462,13 +1462,13 @@ void SyntaxTree::ParseClass()
 	Exp.next();
 
 	// create class and type
-	Class *_class = CreateNewType(name, 0, false, false, false, 0, NULL);
+	Class *_class = CreateNewClass(name, 0, false, false, false, 0, NULL);
 
 	// parent class
 	if (Exp.cur == IDENTIFIER_EXTENDS){
 		Exp.next();
 		Class *parent = ParseType(); // force
-		if (!_class->DeriveFrom(parent, true))
+		if (!_class->derive_from(parent, true))
 			DoError(format("parental type in class definition after \"%s\" has to be a class, but (%s) is not", IDENTIFIER_EXTENDS.c_str(), parent->name.c_str()));
 		_offset = parent->size;
 	}
@@ -1693,7 +1693,7 @@ void Function::Update(Class *class_type)
 		literal_param_type[i] = var[i].type;
 
 	// return by memory
-	if (return_type->UsesReturnByMemory())
+	if (return_type->uses_return_by_memory())
 		block->add_var(IDENTIFIER_RETURN_VAR, return_type->GetPointer());
 
 	// class function
@@ -1712,7 +1712,7 @@ Class *_make_array_(SyntaxTree *s, Class *t, Array<int> dim)
 	string orig_name = t->name;
 	foreachb(int d, dim){
 		// create array       (complicated name necessary to get correct ordering   int a[2][4] = (int[4])[2])
-		t = s->CreateArrayType(t, d, orig_name, t->name.substr(orig_name.num, -1));
+		t = s->CreateArrayClass(t, d, orig_name, t->name.substr(orig_name.num, -1));
 	}
 	return t;
 }
@@ -1865,7 +1865,7 @@ void SyntaxTree::ParseAllClassNames()
 			if (Exp.cur == IDENTIFIER_CLASS){
 				Exp.next();
 				int nt0 = classes.num;
-				Class *t = CreateNewType(Exp.cur, 0, false, false, false, 0, NULL);
+				Class *t = CreateNewClass(Exp.cur, 0, false, false, false, 0, NULL);
 				if (nt0 == classes.num)
 					DoError("class already exists");
 				t->fully_parsed = false;

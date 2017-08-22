@@ -104,7 +104,6 @@ struct PrimitiveOperator
 	unsigned char level; // order of operators ("Punkt vor Strich")
 	string function_name;
 };
-extern int NumPrimitiveOperators;
 extern PrimitiveOperator PrimitiveOperators[];
 
 

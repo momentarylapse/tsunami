@@ -53,9 +53,9 @@ bool type_match(Class *given, Class *wanted)
 
 	// compatible pointers (of same or derived class)
 	if (given->is_pointer and wanted->is_pointer)
-		return given->parent->IsDerivedFrom(wanted->parent);
+		return given->parent->is_derived_from(wanted->parent);
 
-	return given->IsDerivedFrom(wanted);
+	return given->is_derived_from(wanted);
 }
 
 
@@ -68,31 +68,33 @@ bool _type_match(Class *given, bool same_chunk, Class *wanted)
 	return type_match(given, wanted);
 }
 
-Class::Class()//const string &_name, int _size, SyntaxTree *_owner)
+Class::Class(const string &_name, int _size, SyntaxTree *_owner, Class *_parent)
 {
-	//name = _name;
-	owner = NULL;//_owner;
-	size = 0;//_size;
+	name = _name;
+	owner = _owner;
+	size = _size;
 	is_array = false;
 	is_super_array = false;
 	array_length = 0;
 	is_pointer = false;
 	is_silent = false;
-	parent = NULL;
+	parent = _parent;
 	force_call_by_value = false;
 	fully_parsed = true;
+	_vtable_location_target_ = NULL;
+	_vtable_location_compiler_ = NULL;
 };
 
 Class::~Class()
 {
 }
 
-bool Class::UsesCallByReference() const
+bool Class::uses_call_by_reference() const
 {
 	return (!force_call_by_value and !is_pointer) or is_array;
 }
 
-bool Class::UsesReturnByMemory() const
+bool Class::uses_return_by_memory() const
 {
 	return (!force_call_by_value and !is_pointer) or is_array;
 }
@@ -101,7 +103,7 @@ bool Class::UsesReturnByMemory() const
 
 bool Class::is_simple_class() const
 {
-	if (!UsesCallByReference())
+	if (!uses_call_by_reference())
 		return true;
 	/*if (is_array)
 		return false;*/
@@ -139,20 +141,20 @@ bool Class::usable_as_super_array() const
 	return false;
 }
 
-Class *Class::GetArrayElement() const
+Class *Class::get_array_element() const
 {
 	if (is_array or is_super_array)
 		return parent;
 	if (is_pointer)
 		return NULL;
 	if (parent)
-		return parent->GetArrayElement();
+		return parent->get_array_element();
 	return NULL;
 }
 
 bool Class::needs_constructor() const
 {
-	if (!UsesCallByReference())
+	if (!uses_call_by_reference())
 		return false;
 	if (is_super_array)
 		return true;
@@ -181,7 +183,7 @@ bool Class::is_size_known() const
 
 bool Class::needs_destructor() const
 {
-	if (!UsesCallByReference())
+	if (!uses_call_by_reference())
 		return false;
 	if (is_super_array)
 		return true;
@@ -200,7 +202,7 @@ bool Class::needs_destructor() const
 	return false;
 }
 
-bool Class::IsDerivedFrom(const Class *root) const
+bool Class::is_derived_from(const Class *root) const
 {
 	if (this == root)
 		return true;
@@ -208,10 +210,10 @@ bool Class::IsDerivedFrom(const Class *root) const
 		return false;
 	if (!parent)
 		return false;
-	return parent->IsDerivedFrom(root);
+	return parent->is_derived_from(root);
 }
 
-bool Class::IsDerivedFrom(const string &root) const
+bool Class::is_derived_from(const string &root) const
 {
 	if (name == root)
 		return true;
@@ -219,7 +221,7 @@ bool Class::IsDerivedFrom(const string &root) const
 		return false;
 	if (!parent)
 		return false;
-	return parent->IsDerivedFrom(root);
+	return parent->is_derived_from(root);
 }
 
 ClassFunction *Class::GetFunc(const string &_name, const Class *return_type, int num_params, const Class *param0) const
@@ -367,7 +369,7 @@ string func_signature(Function *f)
 
 Class *Class::GetPointer() const
 {
-	return owner->CreateNewType(name + "*", config.pointer_size, true, false, false, 0, const_cast<Class*>(this));
+	return owner->CreateNewClass(name + "*", config.pointer_size, true, false, false, 0, const_cast<Class*>(this));
 }
 
 Class *Class::GetRoot() const
@@ -422,7 +424,7 @@ void Class::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overri
 		functions.add(cf);
 }
 
-bool Class::DeriveFrom(const Class* root, bool increase_size)
+bool Class::derive_from(const Class* root, bool increase_size)
 {
 	parent = const_cast<Class*>(root);
 	bool found = false;

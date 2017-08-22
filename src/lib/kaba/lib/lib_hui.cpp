@@ -339,7 +339,7 @@ void SIAddPackageHui()
 
 
 	add_class(TypeHuiWindow);
-		TypeHuiWindow->DeriveFrom(TypeHuiPanel, false);
+		TypeHuiWindow->derive_from(TypeHuiPanel, false);
 		TypeHuiWindow->vtable = TypeHuiPanel->vtable;
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::Window::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
@@ -401,7 +401,7 @@ void SIAddPackageHui()
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiNixWindow);
-		TypeHuiNixWindow->DeriveFrom(TypeHuiWindow, false);
+		TypeHuiNixWindow->derive_from(TypeHuiWindow, false);
 		TypeHuiNixWindow->vtable = TypeHuiWindow->vtable;
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::NixWindow::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
@@ -413,7 +413,7 @@ void SIAddPackageHui()
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiDialog);
-		TypeHuiDialog->DeriveFrom(TypeHuiWindow, false);
+		TypeHuiDialog->derive_from(TypeHuiWindow, false);
 		TypeHuiDialog->vtable = TypeHuiWindow->vtable;
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::Dialog::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
@@ -425,7 +425,7 @@ void SIAddPackageHui()
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiFixedDialog);
-		TypeHuiFixedDialog->DeriveFrom(TypeHuiWindow, false);
+		TypeHuiFixedDialog->derive_from(TypeHuiWindow, false);
 		TypeHuiFixedDialog->vtable = TypeHuiWindow->vtable;
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::FixedDialog::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);

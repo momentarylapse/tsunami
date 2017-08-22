@@ -607,7 +607,7 @@ Node *SyntaxTree::add_node_const(int nc)
 
 int SyntaxTree::WhichPrimitiveOperator(const string &name)
 {
-	for (int i=0;i<NumPrimitiveOperators;i++)
+	for (int i=0;i<NUM_PRIMITIVE_OPERATORS;i++)
 		if (name == PrimitiveOperators[i].name)
 			return i;
 	return -1;
@@ -806,26 +806,31 @@ Class *SyntaxTree::FindType(const string &name)
 	return NULL;
 }
 
-// create a new type?
-Class *SyntaxTree::AddType(Class *type)
+Class *SyntaxTree::CreateNewClass(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub)
 {
+	// check if it already exists
 	for (Class *t: classes)
-		if (type->name == t->name)
+		if (name == t->name)
 			return t;
 	for (Script *inc: includes)
 		for (Class *t: inc->syntax->classes)
-			if (type->name == t->name)
+			if (name == t->name)
 				return t;
-	Class *t = new Class;
-	*t = *type;
-	t->owner = this;
-	t->name = type->name;
+
+	// add new class
+	Class *t = new Class(name, size, this);
+	t->is_array = is_array and (array_size >= 0);
+	t->is_super_array = is_array and (array_size < 0);
+	t->array_length = max(array_size, 0);
+	t->is_pointer = is_pointer;
+	t->is_silent = is_silent;
+	t->name = name;
+	t->size = size;
+	t->parent = sub;
 	classes.add(t);
-
-
 	if (t->is_super_array){
 		Class *parent = t->parent;
-		t->DeriveFrom(TypeDynamicArray, false);
+		t->derive_from(TypeDynamicArray, false);
 		t->parent = parent;
 		AddFunctionHeadersForClass(t);
 	}else if (t->is_array){
@@ -834,30 +839,16 @@ Class *SyntaxTree::AddType(Class *type)
 	return t;
 }
 
-Class *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub)
-{
-	Class nt;
-	nt.is_array = is_array and (array_size >= 0);
-	nt.is_super_array = is_array and (array_size < 0);
-	nt.array_length = max(array_size, 0);
-	nt.is_pointer = is_pointer;
-	nt.is_silent = is_silent;
-	nt.name = name;
-	nt.size = size;
-	nt.parent = sub;
-	return AddType(&nt);
-}
-
-Class *SyntaxTree::CreateArrayType(Class *element_type, int num_elements, const string &_name_pre, const string &suffix)
+Class *SyntaxTree::CreateArrayClass(Class *element_type, int num_elements, const string &_name_pre, const string &suffix)
 {
 	string name_pre = _name_pre;
 	if (name_pre.num == 0)
 		name_pre = element_type->name;
 	if (num_elements < 0){
-		return CreateNewType(name_pre + "[]" +  suffix,
+		return CreateNewClass(name_pre + "[]" +  suffix,
 			config.super_array_size, false, false, true, num_elements, element_type);
 	}else{
-		return CreateNewType(name_pre + format("[%d]", num_elements) + suffix,
+		return CreateNewClass(name_pre + format("[%d]", num_elements) + suffix,
 			element_type->size * num_elements, false, false, true, num_elements, element_type);
 	}
 }
@@ -938,7 +929,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 
 		// parameters: array/class as reference
 		for (int j=0;j<c->params.num;j++)
-			if (c->params[j]->type->UsesCallByReference()){
+			if (c->params[j]->type->uses_call_by_reference()){
 				c->set_param(j, ps->ref_node(c->params[j]));
 			}
 
@@ -1054,7 +1045,7 @@ void SyntaxTree::ConvertCallByReference()
 		
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
-			if (f->var[j].type->UsesCallByReference()){
+			if (f->var[j].type->uses_call_by_reference()){
 				f->var[j].type = f->var[j].type->GetPointer();
 
 				// internal usage...
@@ -1075,7 +1066,7 @@ void SyntaxTree::ConvertCallByReference()
 
 	// convert return...
 	for (Function *f: functions)
-		if (f->return_type->UsesReturnByMemory())
+		if (f->return_type->uses_return_by_memory())
 			convert_return_by_memory(this, f->block, f);
 
 	// convert function calls
@@ -1227,7 +1218,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 
 void MapLVSX86Return(Function *f)
 {
-	if (f->return_type->UsesReturnByMemory()){
+	if (f->return_type->uses_return_by_memory()){
 		foreachi(Variable &v, f->var, i)
 			if (v.name == IDENTIFIER_RETURN_VAR){
 				v._offset = f->_param_size;

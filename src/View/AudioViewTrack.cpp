@@ -328,6 +328,7 @@ void AudioViewTrack::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift
 	float y2 = pitch2y_linear(n.pitch);
 
 	float y = (y1 + y2) / 2;
+	n.y = y;
 	float r = max((y2 - y1) / 2.3f, 2.0f);
 
 	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
@@ -420,6 +421,7 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 
 	int p = n->stringno;
 	float y = string_to_screen(p);
+	n->y = y;
 
 	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
 	if (state == STATE_HOVER){
@@ -501,6 +503,7 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 
 	int p = n->clef_position;
 	float y = clef_pos_to_screen(p);
+	n->y = y;
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2){

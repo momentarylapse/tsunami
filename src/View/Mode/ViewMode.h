@@ -49,7 +49,6 @@ public:
 
 	AudioView *view;
 	ViewPort *cam;
-	Selection *selection;
 	Selection *hover;
 	TsunamiWindow *win;
 	Song *song;

@@ -93,9 +93,9 @@ public:
 	static const int TRACK_HANDLE_WIDTH;
 	static const int BARRIER_DIST;
 
-	Selection hover, selection;
+	Selection hover;
 	SongSelection sel;
-	Range sel_raw;
+	//Range sel_raw;
 
 	void _cdecl unselectAllSamples();
 

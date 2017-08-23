@@ -28,6 +28,8 @@ void Selection::clear()
 	note = NULL;
 	index = 0;
 	pos = 0;
+	range = Range::EMPTY;
+	y0 = y1 = 0;
 	sample_offset = 0;
 	show_track_controls = NULL;
 	pitch = -1;

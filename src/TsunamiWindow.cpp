@@ -384,16 +384,16 @@ void TsunamiWindow::onSampleProperties()
 
 void TsunamiWindow::onDeleteMarker()
 {
-	if (view->selection.type == Selection::TYPE_MARKER)
-		view->cur_track->deleteMarker(view->selection.index);
+	if (view->hover.type == Selection::TYPE_MARKER)
+		view->cur_track->deleteMarker(view->hover.index);
 	else
 		app->log->error(_("No marker selected"));
 }
 
 void TsunamiWindow::onEditMarker()
 {
-	if (view->selection.type == Selection::TYPE_MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, -1, view->selection.index);
+	if (view->hover.type == Selection::TYPE_MARKER){
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, -1, view->hover.index);
 		dlg->run();
 		delete(dlg);
 	}else

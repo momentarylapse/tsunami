@@ -9,6 +9,7 @@
 #define SRC_VIEW_SELECTION_H_
 
 #include "../lib/base/base.h"
+#include "../Data/Range.h"
 
 class AudioViewTrack;
 class Track;
@@ -24,6 +25,9 @@ public:
 	SampleRef *sample;
 	MidiNote *note;
 	int pos;
+	Range range;
+	int y0;
+	int y1;
 	int sample_offset;
 	Array<int> barrier;
 	Track *show_track_controls;
@@ -34,8 +38,10 @@ public:
 	enum
 	{
 		TYPE_NONE,
+		TYPE_BACKGROUND,
 		TYPE_SELECTION_START,
 		TYPE_SELECTION_END,
+		TYPE_SELECTION_RECT,
 		TYPE_PLAYBACK,
 		TYPE_TIME,
 		TYPE_TRACK,

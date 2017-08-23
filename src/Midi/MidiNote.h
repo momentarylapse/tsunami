@@ -24,6 +24,7 @@ public:
 	float pitch;
 	float volume;
 	mutable int stringno, clef_position, modifier;
+	mutable int y;
 
 	void reset_meta();
 	void update_meta(const Instrument &i, const Scale &s, int hand_position) const;

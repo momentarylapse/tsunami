@@ -438,7 +438,6 @@ void PluginManager::LinkAppScriptData()
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
-	Kaba::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Kaba::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
 	Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));

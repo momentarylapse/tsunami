@@ -314,7 +314,13 @@ void AudioView::selectionUpdatePos(Selection &s)
 
 void AudioView::updateSelection()
 {
-	sel.fromRange(song, sel_raw);
+	if (hover.type == hover.TYPE_SELECTION_RECT)
+		sel.fromRect(song, hover.range, hover.y0, hover.y1);
+	else if (hover.type == hover.TYPE_SELECTION_END)
+		sel.fromRange(song, hover.range);
+
+	if (sel.range.length < 0)
+		sel.range.invert();
 
 	sel.update_bars(song);
 
@@ -390,7 +396,7 @@ void AudioView::onLeftButtonUp()
 	mode->onLeftButtonUp();
 
 	// TODO !!!!!!!!
-	selection.clear();
+	//selection.clear();
 
 	forceRedraw();
 	updateMenu();
@@ -554,7 +560,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 
 		if (message == song->MESSAGE_NEW){
 			updateTracks();
-			sel.range = sel_raw = Range(0, 0);
+			sel.range = Range(0, 0);
 			setCurTrack(NULL);
 			if (song->tracks.num > 0){
 				if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)
@@ -701,8 +707,22 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 		if (sel.has(t->track))
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));*/
 	c->drawRect(rect(sxx1, sxx2, r.y1, r.y1 + TIME_SCALE_HEIGHT));
-	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
+	drawTimeLine(c, sel.range.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
+
+	if (hover.type == Selection::TYPE_SELECTION_RECT){
+		int sx1 = cam.sample2screen(hover.range.start());
+		int sx2 = cam.sample2screen(hover.range.end());
+		int sxx1 = clampi(sx1, r.x1, r.x2);
+		int sxx2 = clampi(sx2, r.x1, r.x2);
+		c->setColor(colors.selection_internal);
+		c->setFill(false);
+		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+		c->setFill(true);
+		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+
+
+	}
 
 	// bar selection
 	sx1 = cam.sample2screen(sel.bar_range.start());
@@ -854,14 +874,14 @@ void AudioView::zoomOut()
 
 void AudioView::selectAll()
 {
-	sel_raw = song->getRange();
+	sel.range = song->getRange();
 	updateSelection();
 }
 
 void AudioView::selectNone()
 {
 	// select all/none
-	sel_raw.clear();
+	sel.range.clear();
 	updateSelection();
 	unselectAllSamples();
 	setCurSample(NULL);
@@ -890,16 +910,16 @@ void AudioView::selectExpand()
 
 			// midi
 			for (MidiNote *n: t->midi)
-				test_range(n->range, sel_raw, update);
+				test_range(n->range, sel.range, update);
 
 			// buffers
 			for (TrackLayer &l: t->layers)
 				for (BufferBox &b: l.buffers)
-					test_range(b.range(), sel_raw, update);
+					test_range(b.range(), sel.range, update);
 
 			// samples
 			for (SampleRef *s: t->samples)
-				test_range(s->range(), sel_raw, update);
+				test_range(s->range(), sel.range, update);
 		}
 	}
 

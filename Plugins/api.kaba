@@ -355,7 +355,6 @@ class ColorScheme
 	color hover
 
 class AudioView
-	//Range sel_raw
 	SongSelection sel
 	OutputStream* stream
 	AudioRenderer* renderer

@@ -12,7 +12,6 @@ ViewMode::ViewMode(AudioView *_view)
 {
 	view = _view;
 	cam = &view->cam;
-	selection = &view->selection;
 	hover = &view->hover;
 	win = view->win;
 	song = view->song;

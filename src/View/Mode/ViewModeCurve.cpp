@@ -28,7 +28,7 @@ void ViewModeCurve::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 
 
-	if ((curve) and (selection->type == Selection::TYPE_TRACK)){
+	if ((curve) and (hover->type == Selection::TYPE_TRACK)){
 		curve->add(cam->screen2sample(view->mx), screen2value(view->my));
 		view->forceRedraw();
 	}
@@ -44,9 +44,9 @@ void ViewModeCurve::onMouseMove()
 	ViewModeDefault::onMouseMove();
 
 	if (hui::GetEvent()->lbut){
-		if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT)){
-			curve->points[selection->index].pos = cam->screen2sample(view->mx);
-			curve->points[selection->index].value = clampf(screen2value(view->my), curve->min, curve->max);
+		if ((curve) and (hover->type == Selection::TYPE_CURVE_POINT)){
+			curve->points[hover->index].pos = cam->screen2sample(view->mx);
+			curve->points[hover->index].value = clampf(screen2value(view->my), curve->min, curve->max);
 			view->forceRedraw();
 		}
 	}
@@ -56,10 +56,10 @@ void ViewModeCurve::onKeyDown(int k)
 {
 	ViewModeDefault::onKeyDown(k);
 
-	if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT))
+	if ((curve) and (hover->type == Selection::TYPE_CURVE_POINT))
 		if (k == hui::KEY_DELETE){
-			curve->points.erase(selection->index);
-			selection->clear();
+			curve->points.erase(hover->index);
+			hover->clear();
 			hover->clear();
 			view->forceRedraw();
 		}
@@ -90,7 +90,8 @@ void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 		foreachi(Curve::Point &p, curve->points, i){
 			if ((hover->type == Selection::TYPE_CURVE_POINT) and (i == hover->index))
 				c->setColor(view->colors.selection_boundary_hover);
-			else if ((selection->type == Selection::TYPE_CURVE_POINT) and (i == selection->index))
+			else if ((hover->type == Selection::TYPE_CURVE_POINT) and (i == hover->index))
+				// TODO.... selected...
 				c->setColor(view->colors.selection_boundary);
 			else
 				c->setColor(view->colors.text);
@@ -119,11 +120,11 @@ Selection ViewModeCurve::getHover()
 
 	// selection boundaries?
 	view->selectionUpdatePos(s);
-	if (view->mouse_over_time(view->sel_raw.end())){
+	if (view->mouse_over_time(view->sel.range.end())){
 		s.type = Selection::TYPE_SELECTION_END;
 		return s;
 	}
-	if (view->mouse_over_time(view->sel_raw.start())){
+	if (view->mouse_over_time(view->sel.range.start())){
 		s.type = Selection::TYPE_SELECTION_START;
 		return s;
 	}

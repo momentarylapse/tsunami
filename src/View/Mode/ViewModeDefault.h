@@ -45,7 +45,8 @@ public:
 	void applyBarriers(int &pos);
 
 	float mouse_possibly_selecting;
-	int mouse_possibly_selecting_start;
+	int mouse_possibly_selecting_start_pos;
+	int mouse_possibly_selecting_start_y;
 
 	ActionTrackMoveSample *cur_action;
 };

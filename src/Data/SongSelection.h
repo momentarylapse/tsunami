@@ -26,8 +26,6 @@ public:
 	void clear();
 	void all(Song *s);
 	void all_tracks(Song *s);
-	void fromRange(Song *s, const Range &r);
-	void fromRect(Song *s, const Range &r, int y0, int y1);
 	void update_bars(Song *s);
 
 	Range range;

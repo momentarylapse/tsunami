@@ -364,7 +364,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("AudioRenderer", "seek", Kaba::mf(&AudioRenderer::seek), &ar);
 	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Kaba::mf(&AudioRenderer::getSampleRate), &ar);
 
-	SongRenderer sr(&af, NULL);
+	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Kaba::LinkExternal("SongRenderer.prepare", Kaba::mf(&SongRenderer::prepare));
 	Kaba::LinkExternal("SongRenderer.render", Kaba::mf(&SongRenderer::render));

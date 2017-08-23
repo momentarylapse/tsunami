@@ -70,7 +70,7 @@ void ViewModeDefault::onLeftButtonUp()
 	}else if (hover->type == Selection::TYPE_SELECTION_RECT){
 		hover->type = Selection::TYPE_NONE;
 	}else if (hover->type == Selection::TYPE_SELECTION_END){
-		view->updateSelection();
+		//view->updateSelection();
 	}
 	cur_action = NULL;
 	view->forceRedraw();
@@ -149,6 +149,7 @@ void ViewModeDefault::onMouseMove()
 
 		applyBarriers(hover->pos);
 		hover->range.set_end(hover->pos);
+		view->sel = view->getSelectionForRange(hover->range);
 		view->updateSelection();
 		_force_redraw_ = true;
 		/*_force_redraw_ = false;
@@ -167,6 +168,7 @@ void ViewModeDefault::onMouseMove()
 			applyBarriers(hover->pos);
 			hover->range.set_end(hover->pos);
 			hover->y1 = view->my;
+			view->sel = view->getSelectionForRect(hover->range, hover->y0, hover->y1);
 			view->updateSelection();
 			_force_redraw_ = true;
 	}else if (hover->type == Selection::TYPE_PLAYBACK){
@@ -190,15 +192,20 @@ void ViewModeDefault::onMouseMove()
 		//view->sel_raw.offset = mouse_possibly_selecting_start_pos;
 		//view->sel_raw.length = hover->pos - mouse_possibly_selecting_start_pos;
 		setBarriers(hover);
-		view->updateSelection();
-		hover->type = Selection::TYPE_SELECTION_RECT;
 		hover->range.set_start(mouse_possibly_selecting_start_pos);
 		hover->range.set_end(hover->pos);
-		hover->y0 = mouse_possibly_selecting_start_y;
-		hover->y1 = view->my;
-		hover->type = Selection::TYPE_SELECTION_RECT;
-		_force_redraw_ = true;
+		if (hover->type == Selection::TYPE_TIME){
+			hover->type = Selection::TYPE_SELECTION_END;
+			view->sel = view->getSelectionForRange(hover->range);
+		}else{
+			hover->type = Selection::TYPE_SELECTION_RECT;
+			hover->y0 = mouse_possibly_selecting_start_y;
+			hover->y1 = view->my;
+			view->sel = view->getSelectionForRect(hover->range, hover->y0, hover->y1);
+		}
+		view->updateSelection();
 		mouse_possibly_selecting = -1;
+		_force_redraw_ = true;
 	}
 
 	if (_force_redraw_)
@@ -471,6 +478,7 @@ void ViewModeDefault::setCursorPos(int pos)
 		}
 	}
 	mouse_possibly_selecting = 0;
+	//view->sel.clear();
 	view->sel.range = Range(pos, 0);
 	view->updateSelection();
 }

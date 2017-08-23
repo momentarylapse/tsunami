@@ -363,7 +363,7 @@ class AudioView
 	extern void removeObserver(void* handler)
 
 class SongRenderer
-	extern void __init__(Song* s, SongSelection* sel)
+	extern void __init__(Song* s)
 	extern virtual void __delete__()
 	extern void render(Range r, BufferBox buf)
 	extern void prepare(Range r, bool allow_loop)

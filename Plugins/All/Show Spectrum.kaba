@@ -92,7 +92,7 @@ class ShowSpectrum extends SongPlugin
 		dlg = new SpectrumDialog(self)
 	
 		BufferBox buf
-		SongRenderer* renderer = new SongRenderer(song, &view.sel)
+		SongRenderer* renderer = new SongRenderer(song)
 		renderer.render(view.sel.range, buf)
 		delete renderer
 	

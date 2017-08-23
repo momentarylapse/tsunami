@@ -17,19 +17,12 @@
 
 #include "../../lib/math/math.h"
 
-SongRenderer::SongRenderer(Song *s, SongSelection *_sel)
+SongRenderer::SongRenderer(Song *s)
 {
 	MidiRawData no_midi;
 	midi_streamer = new MidiDataSource(no_midi);
 	song = s;
-	sel = _sel;
-	sel_own = false;
 
-	if (!sel){
-		sel = new SongSelection;
-		sel->all(song);
-		sel_own = true;
-	}
 	effect = NULL;
 	allow_loop = false;
 	loop_if_allowed = false;
@@ -39,14 +32,12 @@ SongRenderer::SongRenderer(Song *s, SongSelection *_sel)
 
 SongRenderer::~SongRenderer()
 {
-	if (sel_own)
-		delete sel;
 	delete(midi_streamer);
 }
 
-void SongRenderer::__init__(Song *s, SongSelection *sel)
+void SongRenderer::__init__(Song *s)
 {
-	new(this) SongRenderer(s, sel);
+	new(this) SongRenderer(s);
 }
 
 void SongRenderer::__delete__()
@@ -180,10 +171,10 @@ void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 		bb_apply_fx(buf, t, t->fx);
 }
 
-int get_first_usable_track(Song *a, SongSelection *sel)
+int get_first_usable_track(Song *s)
 {
-	foreachi(Track *t, a->tracks, i)
-		if (!t->muted and sel->has(t))
+	foreachi(Track *t, s->tracks, i)
+		if (!t->muted)
 			return i;
 	return -1;
 }
@@ -191,7 +182,7 @@ int get_first_usable_track(Song *a, SongSelection *sel)
 void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 {
 	// any un-muted track?
-	int i0 = get_first_usable_track(song, sel);
+	int i0 = get_first_usable_track(song);
 	if (i0 < 0){
 		// no -> return silence
 		buf.resize(range_cur.length);
@@ -204,7 +195,7 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 
 		// other tracks
 		for (int i=i0+1;i<song->tracks.num;i++){
-			if (song->tracks[i]->muted or !sel->has(song->tracks[i]))
+			if (song->tracks[i]->muted)
 				continue;
 			BufferBox tbuf;
 			bb_render_track_fx(tbuf, song->tracks[i], i);

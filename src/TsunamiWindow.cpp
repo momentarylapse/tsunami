@@ -842,7 +842,7 @@ void TsunamiWindow::onSaveAs()
 void TsunamiWindow::onExport()
 {
 	if (app->storage->askSaveExport(this)){
-		SongRenderer rr(song, &view->sel);
+		SongRenderer rr(song);
 		rr.prepare(view->getPlaybackSelection(), false);
 		app->storage->saveViaRenderer(&rr, hui::Filename);
 	}

@@ -115,7 +115,7 @@ void Format::loadSong(StorageOperationData *od)
 
 void Format::saveSong(StorageOperationData* od)
 {
-	SongRenderer renderer(od->song, NULL);
+	SongRenderer renderer(od->song);
 	od->renderer = &renderer;
 	saveViaRenderer(od);
 }

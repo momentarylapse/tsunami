@@ -33,65 +33,6 @@ void SongSelection::all_tracks(Song* s)
 		add(t);
 }
 
-
-void SongSelection::fromRange(Song* s, const Range &r)
-{
-	range = r;
-	if (range.length < 0)
-		range.invert();
-	markers.clear();
-	notes.clear();
-	samples.clear();
-
-	for (Track *t: s->tracks){
-		if (!has(t))
-			continue;
-
-		// subs
-		for (SampleRef *s: t->samples)
-			set(s, range.overlaps(s->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			set(m, range.is_inside(m->pos));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			set(n, range.is_inside(n->range.center()));
-	}
-}
-
-void SongSelection::fromRect(Song* s, const Range &r, int y0, int y1)
-{
-	range = r;
-	if (range.length < 0)
-		range.invert();
-	if (y0 > y1){
-		int t = y0;
-		y0 = y1;
-		y1 = t;
-	}
-	markers.clear();
-	notes.clear();
-	samples.clear();
-
-	for (Track *t: s->tracks){
-
-		// subs
-		for (SampleRef *s: t->samples)
-			set(s, range.overlaps(s->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			set(m, range.is_inside(m->pos));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			if ((n->y >= y0) and (n->y <= y1))
-				set(n, range.is_inside(n->range.center()));
-	}
-}
-
 void SongSelection::update_bars(Song* s)
 {
 	bars.clear();

@@ -10,16 +10,15 @@
 
 #include "AudioRenderer.h"
 
-class SongSelection;
 class MidiDataSource;
 
 class SongRenderer : public AudioRenderer
 {
 public:
-	SongRenderer(Song *a, SongSelection *sel);
+	SongRenderer(Song *s);
 	virtual ~SongRenderer();
 
-	void _cdecl __init__(Song *s, SongSelection *sel);
+	void _cdecl __init__(Song *s);
 	virtual void _cdecl __delete__();
 
 	void _cdecl render(const Range &range, BufferBox &buf);
@@ -56,9 +55,6 @@ private:
 	Array<MidiData> midi;
 
 	MidiDataSource *midi_streamer;
-
-	SongSelection *sel;
-	bool sel_own;
 
 public:
 	Effect *effect;

@@ -181,7 +181,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
-	renderer = new SongRenderer(song, &sel);
+	renderer = new SongRenderer(song);
 	stream = new OutputStream(renderer);
 
 	area = rect(0, 0, 0, 0);
@@ -314,11 +314,6 @@ void AudioView::selectionUpdatePos(Selection &s)
 
 void AudioView::updateSelection()
 {
-	if (hover.type == hover.TYPE_SELECTION_RECT)
-		sel.fromRect(song, hover.range, hover.y0, hover.y1);
-	else if (hover.type == hover.TYPE_SELECTION_END)
-		sel.fromRange(song, hover.range);
-
 	if (sel.range.length < 0)
 		sel.range.invert();
 
@@ -335,6 +330,66 @@ void AudioView::updateSelection()
 	forceRedraw();
 
 	notify(MESSAGE_SELECTION_CHANGE);
+}
+
+
+SongSelection AudioView::getSelectionForRange(const Range &r)
+{
+	SongSelection s;
+	s.range = r;
+	if (s.range.length < 0)
+		s.range.invert();
+	s.tracks = sel.tracks;
+
+	for (Track *t: song->tracks){
+		if (!s.has(t))
+			continue;
+
+		// subs
+		for (SampleRef *sr: t->samples)
+			s.set(sr, s.range.overlaps(sr->range()));
+
+		// markers
+		for (TrackMarker *m: t->markers)
+			s.set(m, s.range.is_inside(m->pos));
+
+		// midi
+		for (MidiNote *n: t->midi)
+			s.set(n, s.range.is_inside(n->range.center()));
+	}
+	return s;
+}
+
+SongSelection AudioView::getSelectionForRect(const Range &r, int y0, int y1)
+{
+	SongSelection s;
+	s.range = r;
+	if (s.range.length < 0)
+		s.range.invert();
+	if (y0 > y1){
+		int t = y0;
+		y0 = y1;
+		y1 = t;
+	}
+	s.tracks = sel.tracks;
+
+	for (auto vt: vtrack){
+		Track *t = vt->track;
+
+		// subs
+		for (SampleRef *sr: t->samples)
+			s.set(sr, s.range.overlaps(sr->range()));
+
+		// markers
+		for (TrackMarker *m: t->markers)
+			s.set(m, s.range.is_inside(m->pos));
+
+		// midi
+		for (MidiNote *n: t->midi)
+			if ((n->y >= y0) and (n->y <= y1))
+				s.set(n, s.range.is_inside(n->range.center()));
+	}
+	return s;
 }
 
 bool AudioView::mouse_over_time(int pos)
@@ -874,7 +929,7 @@ void AudioView::zoomOut()
 
 void AudioView::selectAll()
 {
-	sel.range = song->getRange();
+	sel = getSelectionForRange(song->getRange());
 	updateSelection();
 }
 
@@ -882,6 +937,7 @@ void AudioView::selectNone()
 {
 	// select all/none
 	sel.range.clear();
+	sel.clear();
 	updateSelection();
 	unselectAllSamples();
 	setCurSample(NULL);
@@ -901,6 +957,7 @@ inline void test_range(const Range &r, Range &sel, bool &update)
 
 void AudioView::selectExpand()
 {
+	Range r = sel.range;
 	bool update = true;
 	while(update){
 		update = false;
@@ -910,19 +967,20 @@ void AudioView::selectExpand()
 
 			// midi
 			for (MidiNote *n: t->midi)
-				test_range(n->range, sel.range, update);
+				test_range(n->range, r, update);
 
 			// buffers
 			for (TrackLayer &l: t->layers)
 				for (BufferBox &b: l.buffers)
-					test_range(b.range(), sel.range, update);
+					test_range(b.range(), r, update);
 
 			// samples
 			for (SampleRef *s: t->samples)
-				test_range(s->range(), sel.range, update);
+				test_range(s->range(), r, update);
 		}
 	}
 
+	sel = getSelectionForRange(r);
 	updateSelection();
 }
 
@@ -963,6 +1021,7 @@ void AudioView::selectTrack(Track *t, bool diff)
 		// select this track
 		sel.add(t);
 	}
+	// TODO: what to do???
 	updateSelection();
 }
 

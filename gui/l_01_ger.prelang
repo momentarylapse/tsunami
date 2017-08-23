@@ -640,7 +640,7 @@ midi_editor/me_t_scale
 Tonart
 
 midi_editor/midi_edit_mode
-Einzelton\\Intervall\\Akkord
+Markieren\\Einzelton\\Intervall\\Akkord
 
 midi_editor/midi_editor
 Midi

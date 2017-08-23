@@ -691,24 +691,27 @@ void AudioView::drawBackground(Painter *c, const rect &r)
 
 void AudioView::drawSelection(Painter *c, const rect &r)
 {
+	// time selection
 	int sx1 = cam.sample2screen(sel.range.start());
 	int sx2 = cam.sample2screen(sel.range.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
-	for (AudioViewTrack *t: vtrack)
+	/*for (AudioViewTrack *t: vtrack)
 		if (sel.has(t->track))
-			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));*/
+	c->drawRect(rect(sxx1, sxx2, r.y1, r.y1 + TIME_SCALE_HEIGHT));
 	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 
-
-
+	// bar selection
 	sx1 = cam.sample2screen(sel.bar_range.start());
 	sx2 = cam.sample2screen(sel.bar_range.end());
 	sxx1 = clampi(sx1, r.x1, r.x2);
 	sxx2 = clampi(sx2, r.x1, r.x2);
-	c->setColor(colors.selection_internal);
+	color col = colors.selection_internal;
+	col.a *= 0.5f;
+	c->setColor(col);
 	for (AudioViewTrack *t: vtrack)
 		if (t->track->type == Track::TYPE_TIME){
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));

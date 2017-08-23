@@ -97,7 +97,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	chord_inversion = 0;
 	modifier = MODIFIER_NONE;
 
-	deleting = false;
+	moving = false;
 	string_no = 0;
 	octave = 3;
 
@@ -155,10 +155,16 @@ void ViewModeMidi::onLeftButtonDown()
 	int mode = which_midi_mode(cur_track->track);
 
 	if (selection->type == Selection::TYPE_MIDI_NOTE){
-		// start delete
-		selection->track->deleteMidiNote(selection->index);
-		hover->clear();
-		deleting = true;
+		if (win->getKey(hui::KEY_CONTROL)){
+			view->sel.set(selection->note, !view->sel.has(selection->note));
+		}else{
+			if (!view->sel.has(selection->note)){
+				view->sel.clear();
+				view->sel.add(selection->note);
+			}
+		}
+		// start moving
+		moving = true;
 	}else if (selection->type == Selection::TYPE_CLEF_POSITION){
 		if (mode == AudioView::MIDI_MODE_TAB){
 			string_no = clampi(selection->clef_position, 0, cur_track->track->instrument.string_pitch.num - 1);
@@ -188,23 +194,24 @@ void ViewModeMidi::onLeftButtonUp()
 			preview_source->end();
 		}
 	}
-	deleting = false;
+	moving = false;
 }
 
 void ViewModeMidi::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
 
-	if (deleting){
-		*hover = getHover();
+	// drag & drop
+	if (moving){
+		/**hover = getHover();
 		if ((hover->type == Selection::TYPE_MIDI_NOTE) and (hover->track == view->cur_track)){
 			selection->track->deleteMidiNote(hover->index);
 			hover->clear();
-		}
+		}*/
 	}
 
-	// drag & drop
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
+		// creating notes
 		view->forceRedraw();
 	}else if (selection->type == Selection::TYPE_SCROLL){
 		int _pitch_max = (cur_track->area.y2 + scroll_offset - view->my) / cur_track->area.height() * (MAX_PITCH - 1.0f);
@@ -366,8 +373,10 @@ MidiData ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 		return notes;
 	for (int p: pitch)
 		notes.add(new MidiNote(r and allowed, p, 1));
-	notes[0]->clef_position = sel->clef_position;
-	notes[0]->modifier = sel->modifier;
+	if (notes.num > 0){
+		notes[0]->clef_position = sel->clef_position;
+		notes[0]->modifier = sel->modifier;
+	}
 	return notes;
 }
 
@@ -548,7 +557,7 @@ Selection ViewModeMidi::getHover()
 			return s;
 		}
 
-		if (creation_mode != CREATION_MODE_SELECT){
+		/*if (creation_mode != CREATION_MODE_SELECT)*/{
 			if ((mode == AudioView::MIDI_MODE_CLASSICAL)){
 				s.pitch = cur_track->y2pitch_classical(my, modifier);
 				s.clef_position = cur_track->screen_to_clef_pos(my);
@@ -591,6 +600,11 @@ Selection ViewModeMidi::getHover()
 						s.type = Selection::TYPE_MIDI_NOTE;
 						return s;
 					}
+			}
+		}
+		if (creation_mode == CREATION_MODE_SELECT){
+			if ((s.type == Selection::TYPE_MIDI_PITCH) or (s.type == Selection::TYPE_CLEF_POSITION)){
+				s.type = Selection::TYPE_TRACK;
 			}
 		}
 	}

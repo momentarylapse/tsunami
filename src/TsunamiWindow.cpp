@@ -91,7 +91,7 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	event("paste_as_samples", std::bind(&TsunamiWindow::onPasteAsSamples, this));
 	setKeyCode("paste_as_samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT, "hui:paste");
 	event("delete", std::bind(&TsunamiWindow::onDelete, this));
-	setKeyCode("delete", -1, "hui:delete");
+	setKeyCode("delete", hui::KEY_DELETE, "hui:delete");
 	event("edit_multi", std::bind(&TsunamiWindow::onEditMulti, this));
 	setKeyCode("edit_multi", -1, "");
 	event("export_selection", std::bind(&TsunamiWindow::onExport, this));

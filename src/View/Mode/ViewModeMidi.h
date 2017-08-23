@@ -76,7 +76,7 @@ public:
 	rect scroll_bar;
 	float scroll_offset;
 
-	bool deleting;
+	bool moving;
 	int string_no;
 	int octave;
 };

@@ -116,6 +116,8 @@ void MidiEditorConsole::update()
 	enable("modifier:flat", mode == view->MIDI_MODE_CLASSICAL);
 	enable("modifier:natural", mode == view->MIDI_MODE_CLASSICAL);
 
+	setInt("midi_edit_mode", view->mode_midi->creation_mode);
+
 
 	if (track->instrument.type == Instrument::TYPE_DRUMS){
 		// select a nicer pitch range in linear mode for drums
@@ -160,10 +162,12 @@ void MidiEditorConsole::onCreationMode()
 {
 	int n = getInt("midi_edit_mode");
 	if (n == 0){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_NOTE);
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_SELECT);
 	}else if (n == 1){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_INTERVAL);
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_NOTE);
 	}else if (n == 2){
+		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_INTERVAL);
+	}else if (n == 3){
 		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_CHORD);
 	}
 }

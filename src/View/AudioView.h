@@ -118,9 +118,17 @@ public:
 
 	int mx, my;
 
-	float mouse_possibly_selecting;
-	int mouse_possibly_selecting_start_pos;
-	int mouse_possibly_selecting_start_y;
+	struct MouseSelectionPlanner
+	{
+		float dist;
+		int start_pos;
+		int start_y;
+		int min_move_to_select;
+		void start(int pos, int y);
+		bool step();
+		bool selecting();
+		void stop();
+	}msp;
 
 	void selectNone();
 	void selectAll();
@@ -143,7 +151,6 @@ public:
 	bool force_redraw;
 
 	int detail_steps;
-	int mouse_min_move_to_select;
 	int preview_sleep_time;
 	bool antialiasing;
 

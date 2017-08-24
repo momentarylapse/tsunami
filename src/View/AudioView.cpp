@@ -101,6 +101,34 @@ Image *ExpandImageMask(Image *im, float d)
 	return r;
 }
 
+
+
+void AudioView::MouseSelectionPlanner::start(int pos, int y)
+{
+	dist = 0;
+	start_pos = pos;
+	start_y = y;
+}
+
+bool AudioView::MouseSelectionPlanner::step()
+{
+	if (dist < 0)
+		return false;
+	auto e = hui::GetEvent();
+	dist += fabs(e->dx) + fabs(e->dy);
+	return selecting();
+}
+
+bool AudioView::MouseSelectionPlanner::selecting()
+{
+	return dist > min_move_to_select;
+}
+
+void AudioView::MouseSelectionPlanner::stop()
+{
+	dist = -1;
+}
+
 AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	Observable("AudioView"),
 	Observer("AudioView"),
@@ -150,7 +178,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	enabled = true;
 
 	detail_steps = hui::Config.getInt("View.DetailSteps", 1);
-	mouse_min_move_to_select = hui::Config.getInt("View.MouseMinMoveToSelect", 5);
+	msp.min_move_to_select = hui::Config.getInt("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = hui::Config.getInt("PreviewSleepTime", 10);
 	ScrollSpeed = hui::Config.getInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = hui::Config.getInt("View.ScrollSpeedFast", 3000);
@@ -184,9 +212,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	stream = new OutputStream(renderer);
 
 	mx = my = 0;
-	mouse_possibly_selecting_start_pos = -1;
-	mouse_possibly_selecting_start_y = -1;
-	mouse_possibly_selecting = -1;
+	msp.stop();
 	selection_mode = SELECTION_MODE_NONE;
 	subscribe(song);
 	subscribe(stream);
@@ -251,7 +277,7 @@ AudioView::~AudioView()
 	delete(images.track_time_bg);
 
 	hui::Config.setInt("View.DetailSteps", detail_steps);
-	hui::Config.setInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
+	hui::Config.setInt("View.MouseMinMoveToSelect", msp.min_move_to_select);
 	hui::Config.setInt("View.ScrollSpeed", ScrollSpeed);
 	hui::Config.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.setFloat("View.ZoomSpeed", ZoomSpeed);
@@ -377,9 +403,6 @@ void AudioView::onMouseMove()
 	mode->onMouseMove();
 
 
-	auto e = hui::GetEvent();
-
-
 	if (selection_mode == SELECTION_MODE_TIME){
 
 		applyBarriers(hover.pos);
@@ -403,26 +426,9 @@ void AudioView::onMouseMove()
 	}else{
 
 		// selection:
-		if (mouse_possibly_selecting >= 0)
-			mouse_possibly_selecting += fabs(e->dx) + fabs(e->dy);
-		if (mouse_possibly_selecting > mouse_min_move_to_select){
-			//view->sel_raw.offset = mouse_possibly_selecting_start_pos;
-			//view->sel_raw.length = hover.pos - mouse_possibly_selecting_start_pos;
-			mode->setBarriers(hover);
-			hover.range.set_start(mouse_possibly_selecting_start_pos);
-			hover.range.set_end(hover.pos);
-			if (hover.type == Selection::TYPE_TIME){
-				hover.type = Selection::TYPE_SELECTION_END;
-				selection_mode = SELECTION_MODE_TIME;
-			}else{
-				hover.y0 = mouse_possibly_selecting_start_y;
-				hover.y1 = my;
-				selection_mode = SELECTION_MODE_RECT;
-			}
-			sel = mode->getSelection();
-			updateSelection();
-			mouse_possibly_selecting = -1;
-			//_force_redraw_ = true;
+		if (msp.step()){
+			mode->startSelection();
+			msp.stop();
 		}
 	}
 	forceRedraw();
@@ -432,8 +438,6 @@ void AudioView::onLeftButtonDown()
 {
 	setMouse();
 	mode->onLeftButtonDown();
-	mouse_possibly_selecting_start_pos = hover.pos;
-	mouse_possibly_selecting_start_y = my;
 
 	forceRedraw();
 	updateMenu();
@@ -464,8 +468,6 @@ void align_to_beats(Song *s, Range &r, int beat_partition)
 void AudioView::onLeftButtonUp()
 {
 	mode->onLeftButtonUp();
-
-	selection_mode = SELECTION_MODE_NONE;
 
 	forceRedraw();
 	updateMenu();

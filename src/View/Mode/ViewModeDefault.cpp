@@ -38,13 +38,16 @@ void ViewModeDefault::onLeftButtonDown()
 	//   start after lb down and moving
 	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_CLEF_POSITION)){
 		setCursorPos(hover->pos);
+		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_SELECTION_END){
 		hover->range = view->sel.range;
+		view->selection_mode = view->SELECTION_MODE_TIME;
 	}else if (hover->type == Selection::TYPE_SELECTION_START){
 		// swap end / start
 		hover->type = Selection::TYPE_SELECTION_END;
 		hover->range = view->sel.range;
 		hover->range.invert();
+		view->selection_mode = view->SELECTION_MODE_TIME;
 	}else if (hover->type == Selection::TYPE_MUTE){
 		hover->track->setMuted(!hover->track->muted);
 	}else if (hover->type == Selection::TYPE_SOLO){
@@ -62,22 +65,26 @@ void ViewModeDefault::onLeftButtonUp()
 	if (cur_action)
 		song->execute(cur_action);
 	cur_action = NULL;
+
+	view->selection_mode = view->SELECTION_MODE_NONE;
+	view->msp.stop();
 }
 
 void ViewModeDefault::onLeftDoubleClick()
 {
+	if (view->selection_mode != view->SELECTION_MODE_NONE)
+		return;
+
 	selectUnderMouse();
 
-	if (view->mouse_possibly_selecting < view->mouse_min_move_to_select){
-		if (hover->type == Selection::TYPE_SAMPLE){
-			win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
-		}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HANDLE) or ((hover->track) and ((hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)))){
-			win->side_bar->open(SideBar::TRACK_CONSOLE);
-		}else if (!hover->track){
-			win->side_bar->open(SideBar::SONG_CONSOLE);
-		}
-		hover->type = Selection::TYPE_NONE;
+	if (hover->type == Selection::TYPE_SAMPLE){
+		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
+	}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HANDLE) or ((hover->track) and ((hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)))){
+		win->side_bar->open(SideBar::TRACK_CONSOLE);
+	}else if (!hover->track){
+		win->side_bar->open(SideBar::SONG_CONSOLE);
 	}
+	//hover->type = Selection::TYPE_NONE;
 }
 
 void ViewModeDefault::onRightButtonDown()
@@ -269,7 +276,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
-		t->drawMarker(c, m, i, (view->hover.type == Selection::TYPE_MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
+		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
 }
 
 void ViewModeDefault::setBarriers(Selection &s)
@@ -297,7 +304,7 @@ void ViewModeDefault::setBarriers(Selection &s)
 	// selection marker
 	if (!view->sel.range.empty()){
 		s.barrier.add(view->sel.range.start());
-		if (view->mouse_possibly_selecting < 0)
+		if (view->msp.dist < 0)
 			s.barrier.add(view->sel.range.end());
 	}
 }
@@ -409,7 +416,7 @@ void ViewModeDefault::setCursorPos(int pos)
 			return;*/
 		}
 	}
-	view->mouse_possibly_selecting = 0;
+	//view->msp.start(hover->pos, hover->y0);
 	//view->sel.clear();
 	view->sel.range = Range(pos, 0);
 	view->updateSelection();
@@ -498,6 +505,23 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 				s.set(n, s.range.is_inside(n->range.center()));
 	}
 	return s;
+}
+
+void ViewModeDefault::startSelection()
+{
+	setBarriers(*hover);
+	hover->range.set_start(view->msp.start_pos);
+	hover->range.set_end(hover->pos);
+	if (hover->type == Selection::TYPE_TIME){
+		hover->type = Selection::TYPE_SELECTION_END;
+		view->selection_mode = view->SELECTION_MODE_TIME;
+	}else{
+		hover->y0 = view->msp.start_y;
+		hover->y1 = view->my;
+		view->selection_mode = view->SELECTION_MODE_RECT;
+	}
+	view->sel = getSelection();
+	view->updateSelection();
 }
 
 int ViewModeDefault::which_midi_mode(Track *t)

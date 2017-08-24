@@ -157,13 +157,6 @@ public:
 		MIDI_MODE_DRUM
 	};
 
-	bool edit_multi;
-	void setEditMulti(bool enabled);
-
-	SongSelection getEditSeletion();
-
-	rect drawing_rect;
-
 	ViewMode *mode;
 	void setMode(ViewMode *m);
 	ViewModeDefault *mode_default;

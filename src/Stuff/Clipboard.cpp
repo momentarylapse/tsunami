@@ -67,9 +67,8 @@ void Clipboard::copy(AudioView *view)
 
 	temp->sample_rate = s->sample_rate;
 
-	SongSelection sel = view->getEditSeletion();
 	for (Track *t: s->tracks)
-		if (sel.has(t))
+		if (view->sel.has(t))
 			append_track(t, view);
 
 	notify();

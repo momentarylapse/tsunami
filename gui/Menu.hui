@@ -18,8 +18,6 @@ Menu menu "" disabled
 		Item select_nothing "Clear selection" image=hui:delete
 		Item select_expand "Expand selection"
 		Separator
-		Item edit_multi "Apply to all selected tracks" checkable
-		Separator
 		Item /copy "Copy" image=hui:copy
 		Item /paste "Paste" image=hui:paste
 		Item /paste_as_samples "Paste as samples" image=hui:paste

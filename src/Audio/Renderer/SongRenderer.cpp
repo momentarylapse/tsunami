@@ -287,7 +287,7 @@ void SongRenderer::reset()
 		for (Effect *fx: t->fx)
 			fx->prepare();
 		for (MidiEffect *fx: t->midi.fx){
-			fx->Prepare();
+			fx->prepare();
 			fx->process(&midi[i]);
 		}
 	}

@@ -92,8 +92,6 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	setKeyCode("paste_as_samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT, "hui:paste");
 	event("delete", std::bind(&TsunamiWindow::onDelete, this));
 	setKeyCode("delete", hui::KEY_DELETE, "hui:delete");
-	event("edit_multi", std::bind(&TsunamiWindow::onEditMulti, this));
-	setKeyCode("edit_multi", -1, "");
 	event("export_selection", std::bind(&TsunamiWindow::onExport, this));
 	setKeyCode("export_selection", hui::KEY_X + hui::KEY_CONTROL, "");
 	event("undo", std::bind(&TsunamiWindow::onUndo, this));
@@ -469,11 +467,6 @@ void TsunamiWindow::onPasteAsSamples()
 	app->clipboard->pasteAsSamples(view);
 }
 
-void TsunamiWindow::onEditMulti()
-{
-	view->setEditMulti(isChecked(""));
-}
-
 void TsunamiWindow::onFindAndExecutePlugin()
 {
 	if (hui::FileDialogOpen(win, _("Select plugin script"), tsunami->directory_static + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
@@ -488,13 +481,11 @@ void TsunamiWindow::onMenuExecuteEffect()
 
 	fx->resetConfig();
 	if (fx->configure()){
-		Range range = view->getPlaybackSelection();
-		SongSelection sel = view->getEditSeletion();
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
-			if (sel.has(t) and (t->type == t->TYPE_AUDIO)){
+			if (view->sel.has(t) and (t->type == t->TYPE_AUDIO)){
 				fx->resetState();
-				fx->doProcessTrack(t, view->cur_layer, range);
+				fx->doProcessTrack(t, view->cur_layer, view->sel.range);
 			}
 		song->action_manager->endActionGroup();
 	}
@@ -509,13 +500,11 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 
 	fx->resetConfig();
 	if (fx->configure()){
-		Range range = view->getPlaybackSelection();
-		SongSelection sel = view->getEditSeletion();
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
-			if (sel.has(t) and (t->type == t->TYPE_MIDI)){
+			if (view->sel.has(t) and (t->type == t->TYPE_MIDI)){
 				fx->resetState();
-				fx->DoProcessTrack(t, range);
+				fx->process_track(t, view->sel);
 			}
 		song->action_manager->endActionGroup();
 	}
@@ -554,7 +543,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 
 void TsunamiWindow::onDelete()
 {
-	song->deleteSelection(view->getEditSeletion(), view->cur_layer, false);
+	song->deleteSelection(view->sel, view->cur_layer, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -597,7 +586,7 @@ void TsunamiWindow::onTrackImport()
 
 void TsunamiWindow::onRemoveSample()
 {
-	song->deleteSelectedSamples(view->getEditSeletion());
+	song->deleteSelectedSamples(view->sel);
 }
 
 void TsunamiWindow::onPlayLoop()
@@ -631,7 +620,7 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertSample()
 {
-	song->insertSelectedSamples(view->getEditSeletion(), view->cur_layer);
+	song->insertSelectedSamples(view->sel, view->cur_layer);
 }
 
 void TsunamiWindow::onRecord()
@@ -671,7 +660,7 @@ void TsunamiWindow::onLayerManager()
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	song->createSamplesFromSelection(view->getEditSeletion(), view->cur_layer);
+	song->createSamplesFromSelection(view->sel, view->cur_layer);
 }
 
 void TsunamiWindow::onViewOptimal()

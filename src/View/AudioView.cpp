@@ -135,7 +135,6 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	song = _song;
 	input = NULL;
 
-	edit_multi = false;
 	midi_view_mode = hui::Config.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
 
 	// modes
@@ -147,7 +146,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	mode_capture = new ViewModeCapture(this);
 	setMode(mode_default);
 
-	drawing_rect = rect(0, 1024, 0, 768);
+	area = rect(0, 1024, 0, 768);
 	enabled = true;
 
 	detail_steps = hui::Config.getInt("View.DetailSteps", 1);
@@ -184,7 +183,6 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	renderer = new SongRenderer(song);
 	stream = new OutputStream(renderer);
 
-	area = rect(0, 0, 0, 0);
 	mx = my = 0;
 	mouse_possibly_selecting_start_pos = -1;
 	mouse_possibly_selecting_start_y = -1;
@@ -793,8 +791,11 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
 		c->setFill(true);
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
-
-
+	}else{
+		c->setColor(colors.selection_internal);
+		for (AudioViewTrack *t: vtrack)
+			if (sel.has(t->track) and (t->track->type == Track::TYPE_AUDIO))
+				c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	}
 
 	// bar selection
@@ -869,7 +870,7 @@ void AudioView::onDraw(Painter *c)
 	colors = basic_colors.create(win->isActive(id));
 	force_redraw = false;
 
-	drawing_rect = rect(0, c->width, 0, c->height);
+	area = rect(0, c->width, 0, c->height);
 
 	c->setFontSize(FONT_SIZE);
 	c->setLineWidth(LINE_WIDTH);
@@ -877,7 +878,7 @@ void AudioView::onDraw(Painter *c)
 	//c->setColor(ColorWaveCur);
 
 	if (enabled)
-		drawAudioFile(c, drawing_rect);
+		drawAudioFile(c, area);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
@@ -887,7 +888,7 @@ void AudioView::onDraw(Painter *c)
 void AudioView::optimizeView()
 {
 	if (area.x2 <= 0)
-		area.x2 = drawing_rect.x2;
+		area.x2 = 1024;
 
 	Range r = song->getRangeWithTime();
 
@@ -899,8 +900,6 @@ void AudioView::optimizeView()
 
 void AudioView::updateMenu()
 {
-	// edit
-	win->check("edit_multi", edit_multi);
 	// view
 	win->check("view_midi_default", midi_view_mode == MIDI_MODE_LINEAR);
 	win->check("view_midi_tab", midi_view_mode == MIDI_MODE_TAB);
@@ -1094,18 +1093,4 @@ void AudioView::enable(bool _enabled)
 	else if (!enabled and _enabled)
 		subscribe(song);
 	enabled = _enabled;
-}
-
-void AudioView::setEditMulti(bool enabled)
-{
-	edit_multi = enabled;
-	updateMenu();
-}
-
-SongSelection AudioView::getEditSeletion()
-{
-	if (edit_multi)
-		return sel;
-
-	return sel.restrict_to_track(cur_track);
 }

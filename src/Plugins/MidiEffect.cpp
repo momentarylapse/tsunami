@@ -12,6 +12,7 @@
 #include "../lib/math/math.h"
 #include "../Stuff/Log.h"
 #include "PluginManager.h"
+#include "../Data/SongSelection.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::MidiEffect() :
@@ -46,7 +47,7 @@ void MidiEffect::__delete__()
 	this->MidiEffect::~MidiEffect();
 }
 
-void MidiEffect::Prepare()
+void MidiEffect::prepare()
 {
 	resetState();
 	if (!usable)
@@ -60,7 +61,7 @@ string MidiEffect::GetError()
 	return format(_("Can not load MidiEffect: \"%s\""), name.c_str());
 }
 
-void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
+void MidiEffect::apply(MidiData &midi, Track *t, bool log_error)
 {
 	// run
 	process(&midi);
@@ -74,15 +75,14 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 
 
 
-void MidiEffect::DoProcessTrack(Track *t, const Range &r)
+void MidiEffect::process_track(Track *t, const SongSelection &sel)
 {
-	MidiDataRef midi_ref = t->midi.getNotes(r);
-	MidiData midi = t->midi.getNotes(r);
+	MidiData midi = t->midi.getNotesBySelection(sel);
 
 	t->song->action_manager->beginActionGroup();
 
 	for (int i=t->midi.num-1; i>=0; i--)
-		if (r.is_inside(t->midi[i]->range.center()))
+		if (sel.has(t->midi[i]))
 			t->deleteMidiNote(i);
 
 	process(&midi);

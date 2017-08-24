@@ -186,6 +186,10 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 
 	area = rect(0, 0, 0, 0);
 	mx = my = 0;
+	mouse_possibly_selecting_start_pos = -1;
+	mouse_possibly_selecting_start_y = -1;
+	mouse_possibly_selecting = -1;
+	selection_mode = SELECTION_MODE_NONE;
 	subscribe(song);
 	subscribe(stream);
 
@@ -333,65 +337,6 @@ void AudioView::updateSelection()
 }
 
 
-SongSelection AudioView::getSelectionForRange(const Range &r)
-{
-	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
-	s.tracks = sel.tracks;
-
-	for (Track *t: song->tracks){
-		if (!s.has(t))
-			continue;
-
-		// subs
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.is_inside(m->pos));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			s.set(n, s.range.is_inside(n->range.center()));
-	}
-	return s;
-}
-
-SongSelection AudioView::getSelectionForRect(const Range &r, int y0, int y1)
-{
-	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
-	if (y0 > y1){
-		int t = y0;
-		y0 = y1;
-		y1 = t;
-	}
-	s.tracks = sel.tracks;
-
-	for (auto vt: vtrack){
-		Track *t = vt->track;
-
-		// subs
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.is_inside(m->pos));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			if ((n->y >= y0) and (n->y <= y1))
-				s.set(n, s.range.is_inside(n->range.center()));
-	}
-	return s;
-}
-
 bool AudioView::mouse_over_time(int pos)
 {
 	int ssx = cam.sample2screen(pos);
@@ -410,16 +355,88 @@ Range AudioView::getPlaybackSelection()
 	return sel.range;
 }
 
+void AudioView::applyBarriers(int &pos)
+{
+	int dmin = BARRIER_DIST;
+	bool found = false;
+	int new_pos;
+	for (int b: hover.barrier){
+		int dist = fabs(cam.sample2screen(b) - cam.sample2screen(pos));
+		if (dist < dmin){
+			//msg_write(format("barrier:  %d  ->  %d", pos, b));
+			new_pos = b;
+			found = true;
+			dmin = dist;
+		}
+	}
+	if (found)
+		pos = new_pos;
+}
+
 void AudioView::onMouseMove()
 {
 	setMouse();
 	mode->onMouseMove();
+
+
+	auto e = hui::GetEvent();
+
+
+	if (selection_mode == SELECTION_MODE_TIME){
+
+		applyBarriers(hover.pos);
+		hover.range.set_end(hover.pos);
+		if (win->getKey(hui::KEY_CONTROL))
+			sel = sel_temp or mode->getSelection();
+		else
+			sel = mode->getSelection();
+		updateSelection();
+	}else if (selection_mode == SELECTION_MODE_RECT){
+
+		applyBarriers(hover.pos);
+		hover.range.set_end(hover.pos);
+		hover.y1 = my;
+		if (win->getKey(hui::KEY_CONTROL))
+			sel = sel_temp or mode->getSelection();
+		else
+			sel = mode->getSelection();
+		updateSelection();
+
+	}else{
+
+		// selection:
+		if (mouse_possibly_selecting >= 0)
+			mouse_possibly_selecting += fabs(e->dx) + fabs(e->dy);
+		if (mouse_possibly_selecting > mouse_min_move_to_select){
+			//view->sel_raw.offset = mouse_possibly_selecting_start_pos;
+			//view->sel_raw.length = hover.pos - mouse_possibly_selecting_start_pos;
+			mode->setBarriers(hover);
+			hover.range.set_start(mouse_possibly_selecting_start_pos);
+			hover.range.set_end(hover.pos);
+			if (hover.type == Selection::TYPE_TIME){
+				hover.type = Selection::TYPE_SELECTION_END;
+				selection_mode = SELECTION_MODE_TIME;
+			}else{
+				hover.y0 = mouse_possibly_selecting_start_y;
+				hover.y1 = my;
+				selection_mode = SELECTION_MODE_RECT;
+			}
+			sel = mode->getSelection();
+			updateSelection();
+			mouse_possibly_selecting = -1;
+			//_force_redraw_ = true;
+		}
+	}
+	forceRedraw();
 }
 
 void AudioView::onLeftButtonDown()
 {
 	setMouse();
 	mode->onLeftButtonDown();
+	mouse_possibly_selecting_start_pos = hover.pos;
+	mouse_possibly_selecting_start_y = my;
+
 	forceRedraw();
 	updateMenu();
 }
@@ -450,8 +467,7 @@ void AudioView::onLeftButtonUp()
 {
 	mode->onLeftButtonUp();
 
-	// TODO !!!!!!!!
-	//selection.clear();
+	selection_mode = SELECTION_MODE_NONE;
 
 	forceRedraw();
 	updateMenu();
@@ -758,14 +774,16 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
-	/*for (AudioViewTrack *t: vtrack)
-		if (sel.has(t->track))
-			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));*/
 	c->drawRect(rect(sxx1, sxx2, r.y1, r.y1 + TIME_SCALE_HEIGHT));
 	drawTimeLine(c, sel.range.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 
-	if (hover.type == Selection::TYPE_SELECTION_RECT){
+	if (selection_mode == SELECTION_MODE_TIME){
+		c->setColor(colors.selection_internal);
+		for (AudioViewTrack *t: vtrack)
+			if (sel.has(t->track))
+				c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+	}else if (selection_mode == SELECTION_MODE_RECT){
 		int sx1 = cam.sample2screen(hover.range.start());
 		int sx2 = cam.sample2screen(hover.range.end());
 		int sxx1 = clampi(sx1, r.x1, r.x2);
@@ -929,7 +947,7 @@ void AudioView::zoomOut()
 
 void AudioView::selectAll()
 {
-	sel = getSelectionForRange(song->getRange());
+	sel = mode->getSelectionForRange(song->getRange());
 	updateSelection();
 }
 
@@ -980,7 +998,7 @@ void AudioView::selectExpand()
 		}
 	}
 
-	sel = getSelectionForRange(r);
+	sel = mode->getSelectionForRange(r);
 	updateSelection();
 }
 

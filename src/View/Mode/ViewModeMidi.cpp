@@ -188,7 +188,7 @@ void ViewModeMidi::onLeftButtonUp()
 	int mode = which_midi_mode(cur_track->track);
 	if ((mode == AudioView::MIDI_MODE_CLASSICAL) or (mode == AudioView::MIDI_MODE_LINEAR)){
 		if (hover->type == Selection::TYPE_MIDI_PITCH){
-			MidiData notes = getCreationNotes(hover, mouse_possibly_selecting_start_pos);
+			MidiData notes = getCreationNotes(hover, view->mouse_possibly_selecting_start_pos);
 			view->cur_track->addMidiNotes(notes);
 
 			preview_source->end();
@@ -643,7 +643,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 			// current creation
 			if ((hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
-				MidiData notes = getCreationNotes(hover, mouse_possibly_selecting_start_pos);
+				MidiData notes = getCreationNotes(hover, view->mouse_possibly_selecting_start_pos);
 				drawMidi(c, t, notes, false, 0);
 				//c->setFontSize(view->FONT_SIZE);
 			}

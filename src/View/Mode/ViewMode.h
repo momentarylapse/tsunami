@@ -11,6 +11,7 @@
 class AudioView;
 class AudioViewTrack;
 class Selection;
+class SongSelection;
 class Track;
 class ViewPort;
 class TsunamiWindow;
@@ -19,6 +20,7 @@ class MidiData;
 class Painter;
 class rect;
 class color;
+class Range;
 
 class ViewMode
 {
@@ -39,6 +41,7 @@ public:
 	virtual void onCurTrackChange(){}
 
 	virtual Selection getHover();
+	virtual void setBarriers(Selection &s){}
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
@@ -46,6 +49,10 @@ public:
 	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift){}
 
 	virtual int which_midi_mode(Track *t) = 0;
+
+	SongSelection getSelection();
+	virtual SongSelection getSelectionForRange(const Range &r);
+	virtual SongSelection getSelectionForRect(const Range &r, int y0, int y1);
 
 	AudioView *view;
 	ViewPort *cam;

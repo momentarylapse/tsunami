@@ -37,16 +37,14 @@ public:
 
 	virtual int which_midi_mode(Track *t);
 
+	virtual SongSelection getSelectionForRange(const Range &r);
+	virtual SongSelection getSelectionForRect(const Range &r, int y0, int y1);
+
 	void selectUnderMouse();
 	void setCursorPos(int pos);
 	virtual Selection getHover();
 
-	void setBarriers(Selection *s);
-	void applyBarriers(int &pos);
-
-	float mouse_possibly_selecting;
-	int mouse_possibly_selecting_start_pos;
-	int mouse_possibly_selecting_start_y;
+	virtual void setBarriers(Selection &s);
 
 	ActionTrackMoveSample *cur_action;
 };

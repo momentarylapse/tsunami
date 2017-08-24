@@ -57,6 +57,8 @@ public:
 	int getNumSamples() const;
 
 	SongSelection restrict_to_track(Track *t) const;
+	SongSelection operator||(const SongSelection &s) const;
+	SongSelection minus(const SongSelection &s) const;
 };
 
 #endif /* SRC_DATA_SONGSELECTION_H_ */

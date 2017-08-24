@@ -146,11 +146,31 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 	sel.bars = bars;
 	sel.bar_range = bar_range;
 	sel.set(t, true);
-	for (MidiNote *n: t->midi)
+	for (auto n: t->midi)
 		sel.set(n, has(n));
-	for (TrackMarker *m: t->markers)
+	for (auto m: t->markers)
 		sel.set(m, has(m));
-	for (SampleRef *r: t->samples)
+	for (auto r: t->samples)
 		sel.set(r, has(r));
 	return sel;
+}
+
+SongSelection SongSelection::operator||(const SongSelection &s) const
+{
+	SongSelection r = *this;
+	for (auto t: s.tracks)
+		r.add(t);
+	for (auto n: s.notes)
+		r.add(n);
+	for (auto m: s.markers)
+		r.add(m);
+	for (auto sr: s.samples)
+		r.add(sr);
+	return r;
+}
+
+SongSelection SongSelection::minus(const SongSelection &s) const
+{
+	SongSelection r = *this;
+	return r;
 }

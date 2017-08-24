@@ -95,7 +95,17 @@ public:
 
 	Selection hover;
 	SongSelection sel;
-	//Range sel_raw;
+	SongSelection sel_temp;
+
+	enum SelectionMode{
+		SELECTION_MODE_NONE,
+		SELECTION_MODE_TIME,
+		SELECTION_MODE_RECT,
+	};
+	SelectionMode selection_mode;
+
+
+	void applyBarriers(int &pos);
 
 	void _cdecl unselectAllSamples();
 
@@ -108,12 +118,16 @@ public:
 
 	int mx, my;
 
+	float mouse_possibly_selecting;
+	int mouse_possibly_selecting_start_pos;
+	int mouse_possibly_selecting_start_y;
+
 	void selectNone();
 	void selectAll();
 	void selectExpand();
 	void updateSelection();
-	SongSelection getSelectionForRange(const Range &r);
-	SongSelection getSelectionForRect(const Range &r, int y0, int y1);
+	//SongSelection getSelectionForRange(const Range &r);
+	//SongSelection getSelectionForRect(const Range &r, int y0, int y1);
 	Range getPlaybackSelection();
 
 	void setMouse();

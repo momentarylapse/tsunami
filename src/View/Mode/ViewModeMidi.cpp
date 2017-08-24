@@ -166,10 +166,12 @@ void ViewModeMidi::onLeftButtonDown()
 		// start moving
 		moving = true;
 	}else if (hover->type == Selection::TYPE_CLEF_POSITION){
+		view->msp.start_pos = hover->pos; // TODO ...bad
 		if (mode == AudioView::MIDI_MODE_TAB){
 			string_no = clampi(hover->clef_position, 0, cur_track->track->instrument.string_pitch.num - 1);
 		}
 	}else if (hover->type == Selection::TYPE_MIDI_PITCH){
+		view->msp.start_pos = hover->pos; // TODO ...bad
 		if (mode == AudioView::MIDI_MODE_TAB){
 		}else{ // CLASSICAL/LINEAR
 			// create new note

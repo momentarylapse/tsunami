@@ -127,20 +127,20 @@ void ViewModeDefault::onMouseMove()
 
 		view->selectionUpdatePos(view->hover);
 	}else{
-		Selection hover_old = *hover;
+		//Selection hover_old = *hover;
 		*hover = getHover();
-		if (hover_changed(*hover, hover_old))
+		/*if (hover_changed(*hover, hover_old))
 			view->forceRedraw();
-		return;
+		return;*/
 	}
 
 
 	// drag & drop
 	if (view->selection_mode == view->SELECTION_MODE_TIME){
 
-		Selection mo = getHover();
+		/*Selection mo = getHover();
 		if (mo.track)
-			view->sel.add(mo.track);
+			view->sel.add(mo.track);*/
 
 		//_force_redraw_ = true;
 		/*_force_redraw_ = false;
@@ -502,7 +502,8 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 		// midi
 		for (MidiNote *n: t->midi)
 			if ((n->y >= y0) and (n->y <= y1))
-				s.set(n, s.range.is_inside(n->range.center()));
+				//s.set(n, s.range.is_inside(n->range.center()));
+				s.set(n, s.range.overlaps(n->range));
 	}
 	return s;
 }

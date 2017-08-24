@@ -71,6 +71,33 @@ inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom
 	c->drawLines(tt);
 }
 
+inline void draw_line_buffer_sel(Painter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset, const Range &r)
+{
+	int nl = 0;
+	int i0 = max((double) x          / zoom + view_pos - offset    , 0.0);
+	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, (double)buf.num);
+	if (i1 < i0)
+		return;
+
+	tt.resize(i1 - i0);
+	c->setLineWidth(3.0f);
+
+	for (int i=i0; i<i1; i++){
+		if (!r.is_inside(i + offset))
+			continue;
+
+		double p = x + ((double)(i + offset) + 0.5 - view_pos) * zoom;
+		tt[nl].x = (float)p;
+		tt[nl].y = y0 + buf[i] * hf;
+		if (zoom > 5)
+			c->drawCircle(p, tt[nl].y, 4);
+		nl ++;
+	}
+	tt.resize(nl);
+	c->drawLines(tt);
+	c->setLineWidth(1.0f);
+}
+
 inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
 {
 	int nl = 0;
@@ -89,6 +116,38 @@ inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel,
 			float dy = ((float)(buf[ip])/255.0f) * hf;
 			tt[nl].y  = y0 - dy;
 			nl ++;
+		}
+	}
+	if (nl == 0)
+		return;
+	tt.resize(nl * 2);
+	for (int i=0; i<nl; i++){
+		tt[nl + i].x = tt[nl - i - 1].x;
+		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y + 1;
+	}
+	c->drawPolygon(tt);
+}
+
+inline void draw_peak_buffer_sel(Painter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset, int xmin, int xmax)
+{
+	int nl = 0;
+	double dpos = 1.0 / zoom;
+	// pixel position
+	// -> buffer position
+	double p0 = view_pos_rel;
+	tt.resize(width/di + 10);
+	for (int i=0; i<width+di; i+=di){
+
+		double p = p0 + dpos * (double)i + 0.5;
+		int ip = (int)(p - offset)/f;
+		if ((ip >= 0) and (ip < buf.num))
+		if (((int)(p) < offset + buf.num*f) and (p >= offset)){
+			if ((((float)x+i) >= xmin) and (((float)x+i)<= xmax)){
+				tt[nl].x = (float)x+i;
+				float dy = ((float)(buf[ip])/255.0f) * hf;
+				tt[nl].y  = y0 - dy - 2;
+				nl ++;
+			}
 		}
 	}
 	if (nl == 0)
@@ -167,6 +226,57 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	}
 }
 
+void AudioViewTrack::drawBufferSelection(Painter *c, BufferBox &b, double view_pos_rel, const color &col, const Range &r)
+{
+	float w = area.width();
+	float h = area.height();
+	float hf = h / 4;
+	float x1 = area.x1;
+	float y1 = area.y1;
+
+	// zero heights of both channels
+	float y0r = y1 + hf;
+	float y0l = y1 + hf * 3;
+
+
+	int di = view->detail_steps;
+	c->setColor(col);
+
+	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
+	int l = view->prefered_buffer_layer * 4;
+	if (l >= 0){
+		double bzf = view->buffer_zoom_factor;
+
+
+		// no peaks yet? -> show dummy
+		if (b.peaks.num < l){
+			c->setColor(ColorInterpolate(col, Red, 0.3f));
+			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.length * view->cam.scale, h);
+			return;
+		}
+
+		// maximum
+		double _bzf = bzf;
+		int ll = l;
+		color cc = col;
+		cc.a *= 0.3f;
+		c->setColor(cc);
+		if (ll + 4 < b.peaks.num){
+			ll += 4;
+			_bzf *= 2;
+		}
+		int xmin = view->cam.sample2screen(r.start());
+		int xmax = view->cam.sample2screen(r.end());
+		draw_peak_buffer_sel(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll], b.offset, xmin, xmax);
+		draw_peak_buffer_sel(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll+1], b.offset, xmin, xmax);
+	}else{
+
+		// directly show every sample
+		draw_line_buffer_sel(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.c[0], b.offset, r);
+		draw_line_buffer_sel(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.c[1], b.offset, r);
+	}
+}
+
 void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
 	// non-current layers
@@ -180,6 +290,13 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 	// current
 	for (BufferBox &b: track->layers[view->cur_layer].buffers)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
+
+	if (view->sel.has(track)){
+		// selection
+		for (BufferBox &b: track->layers[view->cur_layer].buffers){
+			drawBufferSelection(c, b, view_pos_rel, view->colors.selection, view->sel.range);
+		}
+	}
 }
 
 void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
@@ -331,14 +448,16 @@ void AudioViewTrack::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift
 	n.y = y;
 	float r = max((y2 - y1) / 2.3f, 2.0f);
 
-	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
-	if (state == AudioViewTrack::STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state == AudioViewTrack::STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}else if (state == AudioViewTrack::STATE_SELECTED){
+	if (state & AudioViewTrack::STATE_SELECTED){
 		color col1 = view->colors.selection;
 		AudioViewTrack::draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
+	if (state & AudioViewTrack::STATE_HOVER){
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	}else if (state & AudioViewTrack::STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
 	AudioViewTrack::draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
@@ -346,13 +465,14 @@ void AudioViewTrack::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift
 
 inline AudioViewTrack::MidiNoteState note_state(MidiNote *n, bool as_reference, AudioView *view)
 {
-	if (as_reference)
-		return AudioViewTrack::STATE_REFERENCE;
-	if ((view->hover.type == Selection::TYPE_MIDI_NOTE) and (n == view->hover.note))
-		return AudioViewTrack::STATE_HOVER;
+	AudioViewTrack::MidiNoteState s = AudioViewTrack::STATE_DEFAULT;
 	if (view->sel.has(n))
-		return AudioViewTrack::STATE_SELECTED;
-	return AudioViewTrack::STATE_DEFAULT;
+		s = AudioViewTrack::STATE_SELECTED;
+	if (as_reference)
+		return (AudioViewTrack::MidiNoteState)(AudioViewTrack::STATE_REFERENCE | s);
+	if ((view->hover.type == Selection::TYPE_MIDI_NOTE) and (n == view->hover.note))
+		return (AudioViewTrack::MidiNoteState)(AudioViewTrack::STATE_HOVER | s);
+	return s;
 }
 
 void AudioViewTrack::drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift)
@@ -423,14 +543,16 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 	float y = string_to_screen(p);
 	n->y = y;
 
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
-	if (state == STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state == STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}else if (state == STATE_SELECTED){
+	if (state & STATE_SELECTED){
 		color col1 = view->colors.selection;
 		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
+	if (state & STATE_HOVER){
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	}else if (state & STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
 	/*if (n->modifier != MODIFIER_NONE){
@@ -517,15 +639,16 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 		c->drawLine(x - clef_dy, y, x + clef_dy, y);
 	}
 
-
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
-	if (state == STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state == STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}else if (state == STATE_SELECTED){
+	if (state & STATE_SELECTED){
 		color col1 = view->colors.selection;
 		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
+	if (state & STATE_HOVER){
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	}else if (state & STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
 	if (n->modifier != MODIFIER_NONE){

@@ -793,11 +793,6 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
 		c->setFill(true);
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
-	}else{
-		c->setColor(colors.selection_internal);
-		for (AudioViewTrack *t: vtrack)
-			if (sel.has(t->track) and (t->track->type == Track::TYPE_AUDIO))
-				c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	}
 
 	// bar selection

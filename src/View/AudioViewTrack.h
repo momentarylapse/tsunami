@@ -21,6 +21,7 @@ class MidiEvent;
 class TrackMarker;
 class Clef;
 class Scale;
+class Range;
 
 class AudioViewTrack
 {
@@ -47,10 +48,10 @@ public:
 
 	enum MidiNoteState
 	{
-		STATE_DEFAULT,
-		STATE_HOVER,
-		STATE_SELECTED,
-		STATE_REFERENCE
+		STATE_DEFAULT = 0,
+		STATE_HOVER = 1,
+		STATE_REFERENCE = 2,
+		STATE_SELECTED = 4,
 	};
 
 	color getBackgroundColor();
@@ -59,6 +60,7 @@ public:
 
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
+	void drawBufferSelection(Painter *c, BufferBox &b, double view_pos_rel, const color &col, const Range &r);
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);

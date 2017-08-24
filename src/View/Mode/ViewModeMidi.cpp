@@ -168,7 +168,6 @@ void ViewModeMidi::onLeftButtonDown()
 	}else if (hover->type == Selection::TYPE_CLEF_POSITION){
 		if (mode == AudioView::MIDI_MODE_TAB){
 			string_no = clampi(hover->clef_position, 0, cur_track->track->instrument.string_pitch.num - 1);
-			view->forceRedraw();
 		}
 	}else if (hover->type == Selection::TYPE_MIDI_PITCH){
 		if (mode == AudioView::MIDI_MODE_TAB){
@@ -212,7 +211,7 @@ void ViewModeMidi::onMouseMove()
 
 	if (hover->type == Selection::TYPE_MIDI_PITCH){
 		// creating notes
-		view->forceRedraw();
+		//view->forceRedraw();
 	}else if (hover->type == Selection::TYPE_SCROLL){
 		int _pitch_max = (cur_track->area.y2 + scroll_offset - view->my) / cur_track->area.height() * (MAX_PITCH - 1.0f);
 		cur_track->setPitchMinMax(_pitch_max - PITCH_SHOW_COUNT, _pitch_max);

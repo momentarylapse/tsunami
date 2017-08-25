@@ -314,6 +314,8 @@ Selection ViewModeDefault::getHover()
 	Selection s;
 	int mx = view->mx;
 	int my = view->my;
+	s.pos = view->cam.screen2sample(mx);
+	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = my;
 	s.type = s.TYPE_BACKGROUND;
 
@@ -330,7 +332,6 @@ Selection ViewModeDefault::getHover()
 	}
 
 	// selection boundaries?
-	view->selectionUpdatePos(s);
 	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(hui::KEY_SHIFT))){
 		if (view->mouse_over_time(view->sel.range.end())){
 			s.type = Selection::TYPE_SELECTION_END;

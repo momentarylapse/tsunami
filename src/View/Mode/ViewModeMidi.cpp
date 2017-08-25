@@ -154,6 +154,14 @@ void ViewModeMidi::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 	int mode = which_midi_mode(cur_track->track);
 
+	if (creation_mode == CREATION_MODE_SELECT){
+		view->msp.start(hover->pos, hover->y0);
+
+	}else{
+		//view->msp.start(hover->pos, hover->y0);
+		view->hide_selection = true;
+	}
+
 	if (hover->type == Selection::TYPE_MIDI_NOTE){
 		if (win->getKey(hui::KEY_CONTROL)){
 			view->sel.set(hover->note, !view->sel.has(hover->note));
@@ -166,6 +174,9 @@ void ViewModeMidi::onLeftButtonDown()
 		// start moving
 		moving = true;
 	}else if (hover->type == Selection::TYPE_CLEF_POSITION){
+		/*if (creation_mode != CREATION_MODE_SELECT){
+			view->msp.stop();
+		}*/
 		view->msp.start_pos = hover->pos; // TODO ...bad
 		if (mode == AudioView::MIDI_MODE_TAB){
 			string_no = clampi(hover->clef_position, 0, cur_track->track->instrument.string_pitch.num - 1);
@@ -185,6 +196,7 @@ void ViewModeMidi::onLeftButtonDown()
 void ViewModeMidi::onLeftButtonUp()
 {
 	ViewModeDefault::onLeftButtonUp();
+	view->hide_selection = false;
 
 	int mode = which_midi_mode(cur_track->track);
 	if ((mode == AudioView::MIDI_MODE_CLASSICAL) or (mode == AudioView::MIDI_MODE_LINEAR)){
@@ -201,6 +213,7 @@ void ViewModeMidi::onLeftButtonUp()
 void ViewModeMidi::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
+	auto e = hui::GetEvent();
 
 	// drag & drop
 	if (moving){
@@ -215,8 +228,10 @@ void ViewModeMidi::onMouseMove()
 		// creating notes
 		//view->forceRedraw();
 	}else if (hover->type == Selection::TYPE_SCROLL){
-		int _pitch_max = (cur_track->area.y2 + scroll_offset - view->my) / cur_track->area.height() * (MAX_PITCH - 1.0f);
-		cur_track->setPitchMinMax(_pitch_max - PITCH_SHOW_COUNT, _pitch_max);
+		if (e->lbut){
+			int _pitch_max = (cur_track->area.y2 + scroll_offset - view->my) / cur_track->area.height() * (MAX_PITCH - 1.0f);
+			cur_track->setPitchMinMax(_pitch_max - PITCH_SHOW_COUNT, _pitch_max);
+		}
 	}
 }
 
@@ -478,75 +493,12 @@ inline bool hover_note_linear(const MidiNote &n, Selection &s, ViewModeMidi *vmm
 
 Selection ViewModeMidi::getHover()
 {
-	Selection s;
+	Selection s = ViewModeDefault::getHover();
+	if (s.type != s.TYPE_TRACK)
+		return s;
+
 	int mx = view->mx;
 	int my = view->my;
-
-	// track?
-	foreachi(AudioViewTrack *t, view->vtrack, i){
-		if (view->mouseOverTrack(t)){
-			s.vtrack = t;
-			s.index = i;
-			s.track = t->track;
-			s.type = Selection::TYPE_TRACK;
-			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.show_track_controls = t->track;
-		}
-	}
-
-	// selection boundaries?
-	view->selectionUpdatePos(s);
-	if (view->mouse_over_time(view->sel.range.end())){
-		s.type = Selection::TYPE_SELECTION_END;
-		return s;
-	}
-	if (view->mouse_over_time(view->sel.range.start())){
-		s.type = Selection::TYPE_SELECTION_START;
-		return s;
-	}
-	if (view->stream->isPlaying()){
-		if (view->mouse_over_time(view->stream->getPos())){
-			s.type = Selection::TYPE_PLAYBACK;
-			return s;
-		}
-	}
-
-	// mute button?
-	if (s.track){
-		AudioViewTrack *t = s.vtrack;
-		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_MUTE;
-			return s;
-		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_SOLO;
-			return s;
-		}
-	}
-
-	// sub?
-	if (s.track){
-
-		// markers
-		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
-			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my)){
-				s.type = Selection::TYPE_MARKER;
-				s.index = i;
-				return s;
-			}
-		}
-
-		// TODO: prefer selected subs
-		for (SampleRef *ss: s.track->samples){
-			int offset = view->mouseOverSample(ss);
-			if (offset >= 0){
-				s.sample = ss;
-				s.type = Selection::TYPE_SAMPLE;
-				s.sample_offset = offset;
-				return s;
-			}
-		}
-	}
 
 	// midi
 	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track)){
@@ -603,23 +555,11 @@ Selection ViewModeMidi::getHover()
 					}
 			}
 		}
-		if (creation_mode == CREATION_MODE_SELECT){
+		/*if (creation_mode == CREATION_MODE_SELECT){
 			if ((s.type == Selection::TYPE_MIDI_PITCH) or (s.type == Selection::TYPE_CLEF_POSITION)){
 				s.type = Selection::TYPE_TRACK;
 			}
-		}
-	}
-
-	// time scale
-	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::TYPE_TIME;
-		return s;
-	}
-
-	// track handle
-	if ((s.track) and (mx < view->area.x1 + view->TRACK_HANDLE_WIDTH)){
-		s.type = Selection::TYPE_TRACK_HANDLE;
-		return s;
+		}*/
 	}
 
 	return s;

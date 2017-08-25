@@ -103,6 +103,7 @@ public:
 		SELECTION_MODE_RECT,
 	};
 	SelectionMode selection_mode;
+	bool hide_selection;
 
 
 	void applyBarriers(int &pos);

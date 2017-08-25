@@ -105,6 +105,7 @@ Selection ViewModeCurve::getHover()
 	Selection s;
 	int mx = view->mx;
 	int my = view->my;
+	s.pos = view->cam.screen2sample(mx);
 
 	// track?
 	foreachi(AudioViewTrack *t, view->vtrack, i){
@@ -119,7 +120,6 @@ Selection ViewModeCurve::getHover()
 	}
 
 	// selection boundaries?
-	view->selectionUpdatePos(s);
 	if (view->mouse_over_time(view->sel.range.end())){
 		s.type = Selection::TYPE_SELECTION_END;
 		return s;

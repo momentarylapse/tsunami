@@ -214,6 +214,7 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	mx = my = 0;
 	msp.stop();
 	selection_mode = SELECTION_MODE_NONE;
+	hide_selection = false;
 	subscribe(song);
 	subscribe(stream);
 
@@ -778,6 +779,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	drawTimeLine(c, sel.range.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 
+	if (!hide_selection){
 	if (selection_mode == SELECTION_MODE_TIME){
 		c->setColor(colors.selection_internal);
 		for (AudioViewTrack *t: vtrack)
@@ -793,6 +795,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
 		c->setFill(true);
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+	}
 	}
 
 	// bar selection

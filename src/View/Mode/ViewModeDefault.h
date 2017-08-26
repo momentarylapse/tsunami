@@ -43,7 +43,7 @@ public:
 	virtual void startSelection();
 
 	void selectUnderMouse();
-	void setCursorPos(int pos);
+	void setCursorPos(int pos, bool keep_track_selection);
 	virtual Selection getHover();
 
 	virtual void setBarriers(Selection &s);

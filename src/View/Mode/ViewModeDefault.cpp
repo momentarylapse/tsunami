@@ -36,8 +36,11 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_CLEF_POSITION)){
-		setCursorPos(hover->pos);
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_CLEF_POSITION)){
+		setCursorPos(hover->pos, false);
+		view->msp.start(hover->pos, hover->y0);
+	}else if (hover->type == Selection::TYPE_TIME){
+		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_SELECTION_END){
 		hover->range = view->sel.range;
@@ -401,7 +404,7 @@ Selection ViewModeDefault::getHover()
 	return s;
 }
 
-void ViewModeDefault::setCursorPos(int pos)
+void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 {
 	if (view->stream->isPlaying()){
 		if (view->renderer->range().is_inside(pos)){
@@ -418,7 +421,14 @@ void ViewModeDefault::setCursorPos(int pos)
 		}
 	}
 	//view->msp.start(hover->pos, hover->y0);
-	//view->sel.clear();
+	Set<const Track*> tracks = view->sel.tracks;
+	view->sel.clear();
+	if (keep_track_selection){
+		view->sel.tracks = tracks;
+	}else{
+		for (Track *t: view->song->tracks)
+			view->sel.add(t);
+	}
 	view->sel.range = Range(pos, 0);
 	view->updateSelection();
 }
@@ -438,6 +448,12 @@ void ViewModeDefault::selectUnderMouse()
 		view->selectTrack(t, control);
 		if (!control)
 			view->unselectAllSamples();
+	}
+	if (hover->type == Selection::TYPE_MARKER){
+		if (control)
+			view->sel.set(t->markers[hover->index], !view->sel.has(t->markers[hover->index]));
+		else
+			view->sel.add(t->markers[hover->index]);
 	}
 
 	// sub

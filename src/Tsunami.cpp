@@ -17,7 +17,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.6.99.1 alpha!";
+const string AppVersion = "0.6.99.2 alpha!";
 
 Tsunami *tsunami = NULL;
 

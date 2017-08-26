@@ -190,6 +190,7 @@ void ViewModeMidi::onLeftButtonDown()
 		}
 	}else if (hover->type == Selection::TYPE_SCROLL){
 		scroll_offset = view->my - scroll_bar.y1;
+		view->msp.stop();
 	}
 }
 
@@ -261,7 +262,7 @@ void ViewModeMidi::onKeyDown(int k)
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
 			MidiNote n = MidiNote(r, pitch, 1.0f);
 			cur_track->track->addMidiNote(n);
-			setCursorPos(r.end() + 1);
+			setCursorPos(r.end() + 1, true);
 			//view->updateSelection();
 			startMidiPreview(pitch, 0.1f);
 
@@ -285,7 +286,7 @@ void ViewModeMidi::onKeyDown(int k)
 			MidiNote n = MidiNote(r, pitch, 1.0f);
 			n.stringno = string_no;
 			cur_track->track->addMidiNote(n);
-			setCursorPos(r.end() + 1);
+			setCursorPos(r.end() + 1, true);
 			//view->updateSelection();
 			startMidiPreview(pitch, 0.1f);
 
@@ -299,6 +300,10 @@ void ViewModeMidi::onKeyDown(int k)
 			view->forceRedraw();
 		}
 	}
+
+	//if (k == hui::KEY_ESCAPE)
+		//tsunami->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
+		//view->setMode(view->mode_default);
 
 	ViewModeDefault::onKeyDown(k);
 }

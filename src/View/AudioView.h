@@ -101,6 +101,8 @@ public:
 		SELECTION_MODE_NONE,
 		SELECTION_MODE_TIME,
 		SELECTION_MODE_RECT,
+		SELECTION_MODE_TRACK_RECT,
+		SELECTION_MODE_FAKE,
 	};
 	SelectionMode selection_mode;
 	bool hide_selection;

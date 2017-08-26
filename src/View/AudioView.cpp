@@ -404,16 +404,7 @@ void AudioView::onMouseMove()
 	mode->onMouseMove();
 
 
-	if (selection_mode == SELECTION_MODE_TIME){
-
-		applyBarriers(hover.pos);
-		hover.range.set_end(hover.pos);
-		if (win->getKey(hui::KEY_CONTROL))
-			sel = sel_temp or mode->getSelection();
-		else
-			sel = mode->getSelection();
-		updateSelection();
-	}else if (selection_mode == SELECTION_MODE_RECT){
+	if (selection_mode != SELECTION_MODE_NONE){
 
 		applyBarriers(hover.pos);
 		hover.range.set_end(hover.pos);
@@ -423,7 +414,6 @@ void AudioView::onMouseMove()
 		else
 			sel = mode->getSelection();
 		updateSelection();
-
 	}else{
 
 		// selection:
@@ -780,7 +770,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 
 	if (!hide_selection){
-	if (selection_mode == SELECTION_MODE_TIME){
+	if ((selection_mode == SELECTION_MODE_TIME) or (selection_mode == SELECTION_MODE_TRACK_RECT)){
 		c->setColor(colors.selection_internal);
 		for (AudioViewTrack *t: vtrack)
 			if (sel.has(t->track))

@@ -509,6 +509,40 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 	return s;
 }
 
+SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, int y1)
+{
+	SongSelection s;
+	s.range = r;
+	if (s.range.length < 0)
+		s.range.invert();
+	if (y0 > y1){
+		int t = y0;
+		y0 = y1;
+		y1 = t;
+	}
+
+	for (auto vt: view->vtrack){
+		Track *t = vt->track;
+		if ((y1 < vt->area.y1) or (y0 > vt->area.y2))
+			continue;
+		s.add(t);
+
+		// subs
+		for (SampleRef *sr: t->samples)
+			s.set(sr, s.range.overlaps(sr->range()));
+
+		// markers
+		for (TrackMarker *m: t->markers)
+			s.set(m, s.range.is_inside(m->pos));
+
+		// midi
+		for (MidiNote *n: t->midi)
+			//s.set(n, s.range.is_inside(n->range.center()));
+			s.set(n, s.range.overlaps(n->range));
+	}
+	return s;
+}
+
 void ViewModeDefault::startSelection()
 {
 	setBarriers(*hover);
@@ -520,7 +554,7 @@ void ViewModeDefault::startSelection()
 	}else{
 		hover->y0 = view->msp.start_y;
 		hover->y1 = view->my;
-		view->selection_mode = view->SELECTION_MODE_RECT;
+		view->selection_mode = view->SELECTION_MODE_TRACK_RECT;
 	}
 	view->sel = getSelection();
 	view->updateSelection();

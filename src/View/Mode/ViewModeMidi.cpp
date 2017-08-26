@@ -675,3 +675,20 @@ Range ViewModeMidi::getMidiEditRange()
 		b = song->bars.getNextSubBeat(b, beat_partition);
 	return Range(a, b - a);
 }
+
+void ViewModeMidi::startSelection()
+{
+	setBarriers(*hover);
+	hover->range.set_start(view->msp.start_pos);
+	hover->range.set_end(hover->pos);
+	if (hover->type == Selection::TYPE_TIME){
+		hover->type = Selection::TYPE_SELECTION_END;
+		view->selection_mode = view->SELECTION_MODE_TIME;
+	}else{
+		hover->y0 = view->msp.start_y;
+		hover->y1 = view->my;
+		view->selection_mode = view->SELECTION_MODE_RECT;
+	}
+	view->sel = getSelection();
+	view->updateSelection();
+}

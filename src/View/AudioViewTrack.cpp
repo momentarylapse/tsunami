@@ -145,7 +145,7 @@ inline void draw_peak_buffer_sel(Painter *c, int width, int di, double view_pos_
 			if ((((float)x+i) >= xmin) and (((float)x+i)<= xmax)){
 				tt[nl].x = (float)x+i;
 				float dy = ((float)(buf[ip])/255.0f) * hf;
-				tt[nl].y  = y0 - dy - 2;
+				tt[nl].y  = y0 - dy - 1;
 				nl ++;
 			}
 		}
@@ -240,7 +240,9 @@ void AudioViewTrack::drawBufferSelection(Painter *c, BufferBox &b, double view_p
 
 
 	int di = view->detail_steps;
-	c->setColor(col);
+	color cc = col;
+	cc.a = 0.7f;
+	c->setColor(cc);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
 	int l = view->prefered_buffer_layer * 4;
@@ -258,9 +260,6 @@ void AudioViewTrack::drawBufferSelection(Painter *c, BufferBox &b, double view_p
 		// maximum
 		double _bzf = bzf;
 		int ll = l;
-		color cc = col;
-		cc.a *= 0.3f;
-		c->setColor(cc);
 		if (ll + 4 < b.peaks.num){
 			ll += 4;
 			_bzf *= 2;
@@ -294,7 +293,7 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 	if (view->sel.has(track)){
 		// selection
 		for (BufferBox &b: track->layers[view->cur_layer].buffers){
-			drawBufferSelection(c, b, view_pos_rel, view->colors.selection, view->sel.range);
+			drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}
 }

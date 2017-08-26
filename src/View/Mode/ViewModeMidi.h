@@ -37,6 +37,7 @@ public:
 	virtual void drawPost(Painter *c);
 
 	virtual Selection getHover();
+	virtual void startSelection();
 
 	virtual int which_midi_mode(Track *t);
 

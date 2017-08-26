@@ -39,6 +39,7 @@ public:
 
 	virtual SongSelection getSelectionForRange(const Range &r);
 	virtual SongSelection getSelectionForRect(const Range &r, int y0, int y1);
+	virtual SongSelection getSelectionForTrackRect(const Range &r, int y0, int y1);
 	virtual void startSelection();
 
 	void selectUnderMouse();

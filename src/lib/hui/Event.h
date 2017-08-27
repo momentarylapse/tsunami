@@ -52,6 +52,7 @@ Event *GetEvent();
 class EventListener
 {
 public:
+	int uid;
 	int type, key_code;
 	bool enabled;
 	string id, message;
@@ -59,8 +60,8 @@ public:
 	Callback function;
 	CallbackP function_p;
 	EventListener(){}
-	EventListener(const string &id, const string &message, const Callback &function);
-	EventListener(const string &id, const string &message, int __, const CallbackP &function);
+	EventListener(int uid, const string &id, const string &message, const Callback &function);
+	EventListener(int uid, const string &id, const string &message, int __, const CallbackP &function);
 };
 
 

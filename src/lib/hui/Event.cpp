@@ -14,8 +14,9 @@ namespace hui
 
 
 
-EventListener::EventListener(const string &_id, const string &_message, const Callback &_function)
+EventListener::EventListener(int _uid, const string &_id, const string &_message, const Callback &_function)
 {
+	uid = _uid;
 	id = _id;
 	message = _message;
 	function = _function;
@@ -24,8 +25,9 @@ EventListener::EventListener(const string &_id, const string &_message, const Ca
 	type = 0;
 }
 
-EventListener::EventListener(const string &_id, const string &_message, int __, const CallbackP &_function)
+EventListener::EventListener(int _uid, const string &_id, const string &_message, int __, const CallbackP &_function)
 {
+	uid = _uid;
 	id = _id;
 	message = _message;
 	function_p = _function;

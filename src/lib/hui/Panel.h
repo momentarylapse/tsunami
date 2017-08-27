@@ -50,17 +50,18 @@ public:
 	void set_win(Window *win);
 
 	// events
-	void _cdecl event(const string &id, const Callback &function);
-	void _cdecl eventX(const string &id, const string &msg, const Callback &function);
-	void _cdecl eventXP(const string &id, const string &msg, const CallbackP &function);
+	int _cdecl event(const string &id, const Callback &function);
+	int _cdecl eventX(const string &id, const string &msg, const Callback &function);
+	int _cdecl eventXP(const string &id, const string &msg, const CallbackP &function);
+	void _cdecl removeEventHandler(int event_handler_id);
 	void _cdecl setKeyCode(const string &id, int key_code, const string &image = "");
 	bool _send_event_(Event *e);
 
 	// kaba wrappers
-	void _cdecl _kaba_event(const string &id, kaba_member_callback *function);
-	void _cdecl _kaba_eventO(const string &id, EventHandler* handler, kaba_member_callback *function);
-	void _cdecl _kaba_eventX(const string &id, const string &msg, kaba_member_callback *function);
-	void _cdecl _kaba_eventOX(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function);
+	int _cdecl _kaba_event(const string &id, kaba_member_callback *function);
+	int _cdecl _kaba_eventO(const string &id, EventHandler* handler, kaba_member_callback *function);
+	int _cdecl _kaba_eventX(const string &id, const string &msg, kaba_member_callback *function);
+	int _cdecl _kaba_eventOX(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function);
 
 	// creating controls
 
@@ -177,6 +178,7 @@ protected:
 	Control *root_control;
 public:
 	Array<EventListener> event_listeners;
+	int current_event_listener_uid;
 protected:
 
 	string id;

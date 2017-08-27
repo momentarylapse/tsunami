@@ -30,6 +30,7 @@ public:
 
 private:
 	string id_slider, id_edit;
+	int event_handler_id[2];
 	float value_min, value_max;
 	float factor;
 	hui::Panel *panel;

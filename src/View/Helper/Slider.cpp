@@ -9,6 +9,12 @@
 
 Slider::Slider()
 {
+	value_min = 0;
+	value_max = 0;
+	factor = 1;
+	panel = NULL;
+	event_handler_id[0] = -1;
+	event_handler_id[1] = -1;
 }
 
 
@@ -22,8 +28,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	factor = _factor;
 	func = _func;
 
-	panel->event(id_slider, std::bind(&Slider::onSlide, this));
-	panel->event(id_edit, std::bind(&Slider::onEdit, this));
+	event_handler_id[0] = panel->event(id_slider, std::bind(&Slider::onSlide, this));
+	event_handler_id[1] = panel->event(id_edit, std::bind(&Slider::onEdit, this));
 
 	set(_value);
 }
@@ -40,8 +46,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	factor = _factor;
 	func = std::bind(_func, panel);
 
-	panel->event(id_slider, std::bind(&Slider::onSlide, this));
-	panel->event(id_edit, std::bind(&Slider::onEdit, this));
+	event_handler_id[0] = panel->event(id_slider, std::bind(&Slider::onSlide, this));
+	event_handler_id[1] = panel->event(id_edit, std::bind(&Slider::onEdit, this));
 
 	set(_value);
 }
@@ -49,6 +55,10 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 
 Slider::~Slider()
 {
+	if (panel){
+		panel->removeEventHandler(event_handler_id[0]);
+		panel->removeEventHandler(event_handler_id[1]);
+	}
 }
 
 void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui::kaba_member_callback *_func, float _value)
@@ -84,14 +94,14 @@ void Slider::enable(bool enabled)
 
 void Slider::onSlide()
 {
-	float value = value_min + panel->getFloat("") * (value_max - value_min);
+	float value = value_min + panel->getFloat(id_slider) * (value_max - value_min);
 	panel->setFloat(id_edit, value * factor);
 	func();
 }
 
 void Slider::onEdit()
 {
-	float value = panel->getFloat("") / factor;
+	float value = panel->getFloat(id_edit) / factor;
 	panel->setFloat(id_slider, (value - value_min) / (value_max - value_min));
 	func();
 }

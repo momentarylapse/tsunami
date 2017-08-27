@@ -791,18 +791,21 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	// bar selection
 	sx1 = cam.sample2screen(sel.bar_range.start());
 	sx2 = cam.sample2screen(sel.bar_range.end());
-	sxx1 = clampi(sx1, r.x1, r.x2);
-	sxx2 = clampi(sx2, r.x1, r.x2);
-	color col = colors.selection_internal;
-	col.a *= 0.5f;
-	c->setColor(col);
+	c->setAntialiasing(true);
+	c->setColor(colors.text_soft1);
+	c->setLineWidth(2.5f);
 	for (AudioViewTrack *t: vtrack)
 		if (t->track->type == Track::TYPE_TIME){
-			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
-			c->drawRect(rect(sxx2 - 5, sxx2 + 5, t->area.y1, t->area.y2));
+			float dy = t->area.height();
+			c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
+			c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
+			c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
+			c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
+			c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
+			c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
 		}
-	/*drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);*/
+	c->setLineWidth(1.0f);
+	c->setAntialiasing(false);
 }
 
 void AudioView::drawAudioFile(Painter *c, const rect &r)

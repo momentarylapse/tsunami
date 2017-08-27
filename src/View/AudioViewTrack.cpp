@@ -809,15 +809,10 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 
 	// track title
-	c->setFont("", view->FONT_SIZE, (track == view->cur_track), false);
-	c->setFill(false);
-	c->setLineWidth(3);
-	c->setColor(view->colors.background_track);
+	c->setFont("", view->FONT_SIZE, view->sel.has(track), false);
+	drawStrWithShadow(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
 	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
-	c->setFill(true);
-	c->setLineWidth(1);
-	c->setColor(view->colors.text);
-	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
+
 	c->setFont("", -1, false, false);
 
 	// icons

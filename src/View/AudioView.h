@@ -137,8 +137,7 @@ public:
 	void selectAll();
 	void selectExpand();
 	void updateSelection();
-	//SongSelection getSelectionForRange(const Range &r);
-	//SongSelection getSelectionForRect(const Range &r, int y0, int y1);
+	void setSelection(const SongSelection &s);
 	Range getPlaybackSelection();
 
 	void setMouse();

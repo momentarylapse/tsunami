@@ -362,6 +362,13 @@ void AudioView::updateSelection()
 }
 
 
+void AudioView::setSelection(const SongSelection &s)
+{
+	sel = s;
+	updateSelection();
+}
+
+
 bool AudioView::mouse_over_time(int pos)
 {
 	int ssx = cam.sample2screen(pos);
@@ -410,10 +417,9 @@ void AudioView::onMouseMove()
 		hover.range.set_end(hover.pos);
 		hover.y1 = my;
 		if (win->getKey(hui::KEY_CONTROL))
-			sel = sel_temp or mode->getSelection();
+			setSelection(sel_temp or mode->getSelection(hover.range));
 		else
-			sel = mode->getSelection();
-		updateSelection();
+			setSelection(mode->getSelection(hover.range));
 	}else{
 
 		// selection:
@@ -718,9 +724,11 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 	int p = cam.sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){
 		c->setColor((type == hover.type) ? colors.selection_boundary_hover : col);
+		c->setLineWidth(2.0f);
 		c->drawLine(p, area.y1, p, area.y2);
 		if (show_time)
 			c->drawStr(p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos));
+		c->setLineWidth(1.0f);
 	}
 }
 
@@ -939,17 +947,13 @@ void AudioView::zoomOut()
 
 void AudioView::selectAll()
 {
-	sel = mode->getSelectionForRange(song->getRange());
-	updateSelection();
+	setSelection(mode->getSelectionForRange(song->getRange()));
 }
 
 void AudioView::selectNone()
 {
 	// select all/none
-	sel.range.clear();
-	sel.clear();
-	updateSelection();
-	unselectAllSamples();
+	setSelection(SongSelection());
 	setCurSample(NULL);
 }
 
@@ -990,8 +994,7 @@ void AudioView::selectExpand()
 		}
 	}
 
-	sel = mode->getSelectionForRange(r);
-	updateSelection();
+	setSelection(mode->getSelectionForRange(r));
 }
 
 
@@ -1032,7 +1035,8 @@ void AudioView::selectTrack(Track *t, bool diff)
 		sel.add(t);
 	}
 	// TODO: what to do???
-	updateSelection();
+	SongSelection ss = mode->getSelectionForRange(sel.range);
+	setSelection(ss);
 }
 
 void AudioView::setCurSample(SampleRef *s)

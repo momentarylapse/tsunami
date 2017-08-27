@@ -429,8 +429,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 		for (Track *t: view->song->tracks)
 			view->sel.add(t);
 	}
-	view->sel.range = Range(pos, 0);
-	view->updateSelection();
+	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
 
 void ViewModeDefault::selectUnderMouse()
@@ -446,8 +445,8 @@ void ViewModeDefault::selectUnderMouse()
 		view->setCurTrack(hover->track);
 	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HANDLE)){
 		view->selectTrack(t, control);
-		if (!control)
-			view->unselectAllSamples();
+		/*if (!control)
+			view->unselectAllSamples();*/
 	}
 	if (hover->type == Selection::TYPE_MARKER){
 		if (control)
@@ -572,8 +571,7 @@ void ViewModeDefault::startSelection()
 		hover->y1 = view->my;
 		view->selection_mode = view->SELECTION_MODE_TRACK_RECT;
 	}
-	view->sel = getSelection();
-	view->updateSelection();
+	view->setSelection(getSelection(hover->range));
 }
 
 int ViewModeDefault::which_midi_mode(Track *t)

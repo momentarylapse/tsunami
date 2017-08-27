@@ -155,6 +155,7 @@ void ViewModeMidi::onLeftButtonDown()
 	int mode = which_midi_mode(cur_track->track);
 
 	if (creation_mode == CREATION_MODE_SELECT){
+		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 
 	}else{
@@ -694,6 +695,5 @@ void ViewModeMidi::startSelection()
 		hover->y1 = view->my;
 		view->selection_mode = view->SELECTION_MODE_RECT;
 	}
-	view->sel = getSelection();
-	view->updateSelection();
+	view->setSelection(getSelection(hover->range));
 }

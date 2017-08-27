@@ -42,7 +42,6 @@ public:
 	color grid;
 	color sample;
 	color sample_selected;
-	color sample_hover;
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

@@ -322,15 +322,26 @@ void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col,
 	c->drawLine(asx, area.y2, aex, area.y2);
 }
 
+void drawStrWithShadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow)
+{
+	c->setFill(false);
+	c->setLineWidth(3);
+	c->setColor(col_shadow);
+	c->drawStr(x, y, str);
+
+	c->setFill(true);
+	c->setLineWidth(1);
+	c->setColor(col_text);
+	c->drawStr(x, y, str);
+}
+
 void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 {
 	color col = view->colors.sample;
-	//bool is_cur = ((s == cur_sub) and (t->IsSelected));
-	if (!view->sel.has(s))
+	if (view->sel.has(s))
 		col = view->colors.sample_selected;
 	if (view->hover.sample == s)
-		col = view->colors.sample_hover;
-	//col.a = 0.2f;
+		col = ColorInterpolate(col,  view->colors.hover, 0.2f);
 
 	drawSampleFrame(c, s, col, 0);
 
@@ -340,9 +351,10 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	else if (s->type() == Track::TYPE_MIDI)
 		view->mode->drawMidi(c, this, *s->midi, true, s->pos);
 
-	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
-	if (view->sel.has(s))//((is_cur) or (a->sub_mouse_over == s))
-		c->drawStr(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name);
+	if (view->sel.has(s)){
+		int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
+		drawStrWithShadow(c, asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name, view->colors.text, view->colors.background_track_selected);
+	}
 }
 
 void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover)
@@ -360,24 +372,19 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	float x = view->cam.sample2screen(marker->pos);
 	float y = area.y1;
 
-	c->setFill(false);
-	c->setLineWidth(3);
-	if (sel)
-		c->setColor(ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f));
-	else
-		c->setColor(view->colors.background_track);
+	color col = view->colors.text;
+	color col_bg = view->colors.background_track;
+	if (sel){
+		col = view->colors.selection;
+		col_bg = ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);
+	}
+	if (hover)
+		col = ColorInterpolate(col, view->colors.hover, 0.3f);
 
-	c->drawStr(x, area.y1, text);
-	c->setFill(true);
-	c->setLineWidth(1);
+	drawStrWithShadow(c, x, area.y1, text, col, col_bg);
 
 	marker_areas[index] = rect(x, x + w, y, y + 16);
 
-	color col = view->colors.text;
-	if (sel)
-		col = view->colors.selection;
-	if (hover)
-		col = ColorInterpolate(col, view->colors.hover, 0.3f);
 
 	c->setColor(col);
 	c->drawStr(x, y, text);

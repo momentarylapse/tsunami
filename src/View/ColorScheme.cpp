@@ -38,9 +38,8 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.text_soft3 = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.7f), pow(0.3f, gamma));
 	c.text_soft2 = ColorInterpolate(c.text_soft3, c.text_soft1, 0.4f);
 	c.grid = c.text_soft3;
-	c.sample = color(1, 0.6f, 0.6f, 0);
-	c.sample_hover = color(1, 0.6f, 0, 0);
-	c.sample_selected = color(1, 0.4f, 0.4f, 0.4f);
+	c.sample = c.text_soft2;
+	c.sample_selected = c.selection;
 	return c;
 }
 

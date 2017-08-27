@@ -21,7 +21,8 @@ public:
 	virtual void build(Data *d);
 
 private:
-	void CreateSubsFromTrack(Track *t, const SongSelection &sel, int layer_no);
+	void CreateSamplesFromTrackAudio(Track *t, const SongSelection &sel, int layer_no);
+	void CreateSamplesFromTrackMidi(Track *t, const SongSelection &sel);
 
 	const SongSelection &sel;
 	int layer_no;

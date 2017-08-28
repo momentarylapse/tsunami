@@ -890,7 +890,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 		c->setColor(view->colors.text);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_EDIT))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 39, area.y1 + 22, "ed");
+		c->drawStr(area.x1 + 39, area.y1 + 22-2, "🔧"); // "\u1F527");
 	}
 }
 

@@ -70,6 +70,7 @@ OBJ = \
  Action/Track/ActionTrack__DeleteEmpty.o\
  Action/Track/ActionTrackAdd.o\
  Action/Track/ActionTrackDelete.o\
+ Action/Track/ActionTrackMove.o\
  Action/Action.o\
  Action/ActionGroup.o\
  Action/ActionManager.o\
@@ -508,6 +509,9 @@ Action/Track/ActionTrackAdd.o : Action/Track/ActionTrackAdd.cpp
 
 Action/Track/ActionTrackDelete.o : Action/Track/ActionTrackDelete.cpp
 	$(CPP) -c Action/Track/ActionTrackDelete.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/ActionTrackMove.o : Action/Track/ActionTrackMove.cpp
+	$(CPP) -c Action/Track/ActionTrackMove.cpp -o $@ $(CXXFLAGS)
 
 Action/Action.o : Action/Action.cpp
 	$(CPP) -c Action/Action.cpp -o $@ $(CXXFLAGS)

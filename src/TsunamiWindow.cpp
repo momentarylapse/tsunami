@@ -297,7 +297,7 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	song->addTrackAfter(Track::TYPE_AUDIO, view->cur_track);
+	song->addTrack(Track::TYPE_AUDIO);
 }
 
 void TsunamiWindow::onAddTimeTrack()
@@ -316,7 +316,7 @@ void TsunamiWindow::onAddTimeTrack()
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	song->addTrackAfter(Track::TYPE_MIDI, view->cur_track);
+	song->addTrack(Track::TYPE_MIDI);
 }
 
 void TsunamiWindow::onDeleteTrack()

@@ -19,6 +19,7 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
 	cur_action = NULL;
+	moving_track = NULL;
 }
 
 ViewModeDefault::~ViewModeDefault()
@@ -60,14 +61,24 @@ void ViewModeDefault::onLeftButtonDown()
 			hover->track->setMuted(false);
 	}else if (hover->type == Selection::TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(view->song, view->sel);
+	}else if (hover->type == Selection::TYPE_TRACK_HANDLE){
+		view->msp.start(hover->pos, hover->y0);
 	}
 }
 
 void ViewModeDefault::onLeftButtonUp()
 {
-	if (cur_action)
+	if (cur_action){
 		song->execute(cur_action);
-	cur_action = NULL;
+		cur_action = NULL;
+	}
+
+	if (moving_track){
+		int target = getTrackMoveTarget(false);
+		int orig = get_track_index(moving_track);
+		moving_track->move(target);
+		moving_track = NULL;
+	}
 
 	view->selection_mode = view->SELECTION_MODE_NONE;
 	view->msp.stop();
@@ -280,6 +291,45 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	t->marker_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
+}
+
+int ViewModeDefault::getTrackMoveTarget(bool visual)
+{
+	int orig = get_track_index(moving_track);
+	foreachi(auto vt, view->vtrack, i){
+		int y = (vt->area.y1 + vt->area.y2) / 2;
+		if (y > view->my){
+			if (visual or (i < orig))
+				return i;
+			else
+				return i - 1;
+		}
+	}
+	return visual ? song->tracks.num : (song->tracks.num-1);
+}
+
+void ViewModeDefault::drawPost(Painter *c)
+{
+	if (moving_track){
+		int orig = get_track_index(moving_track);
+		int t = getTrackMoveTarget(true);
+		int y = view->vtrack.back()->area.y2;
+		if (t < view->vtrack.num)
+			y = view->vtrack[t]->area.y1;
+
+		c->setColor(view->colors.selection_boundary);
+		c->setLineWidth(2.0f);
+		c->drawLine(view->area.x1,  y,  view->area.x2,  y);
+		c->setLineWidth(1.0f);
+
+		c->setColor(view->colors.selection_internal);
+		rect r = view->vtrack[orig]->area;
+		r.x2 = view->TRACK_HANDLE_WIDTH;
+		c->drawRect(r);
+
+		c->setColor(view->colors.selection_boundary);
+		c->drawStr(view->mx,  view->my, "moving "+moving_track->getNiceName());
+	}
 }
 
 void ViewModeDefault::setBarriers(Selection &s)
@@ -563,7 +613,9 @@ void ViewModeDefault::startSelection()
 	setBarriers(*hover);
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
-	if (hover->type == Selection::TYPE_TIME){
+	if (hover->type == Selection::TYPE_TRACK_HANDLE){
+		moving_track = hover->track;
+	}else if (hover->type == Selection::TYPE_TIME){
 		hover->type = Selection::TYPE_SELECTION_END;
 		view->selection_mode = view->SELECTION_MODE_TIME;
 	}else{

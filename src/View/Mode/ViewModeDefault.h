@@ -12,6 +12,7 @@
 
 class ActionTrackMoveSample;
 class Range;
+class Track;
 
 class ViewModeDefault : public ViewMode
 {
@@ -34,6 +35,7 @@ public:
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift);
+	virtual void drawPost(Painter *c);
 
 	virtual int which_midi_mode(Track *t);
 
@@ -48,7 +50,11 @@ public:
 
 	virtual void setBarriers(Selection &s);
 
+	int getTrackMoveTarget(bool visual);
+
 	ActionTrackMoveSample *cur_action;
+
+	Track* moving_track;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

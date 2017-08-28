@@ -71,6 +71,7 @@ public:
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
+	void _cdecl move(int target);
 	BufferBox _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiData &midi);
 	void _cdecl addEffect(Effect *effect);

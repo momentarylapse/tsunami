@@ -21,6 +21,7 @@
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackEditMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.h"
+#include "../Action/Track/ActionTrackMove.h"
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
 #include "../Action/Track/Sample/ActionTrackEditSample.h"
@@ -263,6 +264,11 @@ void Track::setVolume(float volume)
 void Track::setPanning(float panning)
 {
 	song->execute(new ActionTrackEditPanning(this, panning));
+}
+
+void Track::move(int target)
+{
+	song->execute(new ActionTrackMove(this, target));
 }
 
 void Track::insertMidiData(int offset, const MidiData& midi)

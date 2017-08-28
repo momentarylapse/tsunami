@@ -30,6 +30,7 @@
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
 const float AudioView::LINE_WIDTH = 1.0f;
+const float AudioView::CORNER_RADIUS = 8.0f;
 const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 120;
@@ -730,15 +731,27 @@ void AudioView::updateTracks()
 		notify(MESSAGE_VTRACK_CHANGE);
 }
 
+void AudioView::drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
+{
+	float w = c->getStrWidth(str);
+	c->setColor(col_bg);
+	c->setRoundness(CORNER_RADIUS);
+	c->drawRect(x-CORNER_RADIUS, y-CORNER_RADIUS, w + 2*CORNER_RADIUS, FONT_SIZE + 2*CORNER_RADIUS);
+	c->setRoundness(0);
+	c->setColor(col_text);
+	c->drawStr(x, y - FONT_SIZE/3, str);
+}
+
 void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time)
 {
 	int p = cam.sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){
-		c->setColor((type == hover.type) ? colors.selection_boundary_hover : col);
+		color cc = (type == hover.type) ? colors.selection_boundary_hover : col;
+		c->setColor(cc);
 		c->setLineWidth(2.0f);
 		c->drawLine(p, area.y1, p, area.y2);
 		if (show_time)
-			c->drawStr(p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos));
+			drawBoxedStr(c,  p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
 		c->setLineWidth(1.0f);
 	}
 }

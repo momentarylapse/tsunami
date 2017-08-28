@@ -26,6 +26,7 @@ public:
 	virtual void _cdecl setFontSize(float size) = 0;
 	virtual void _cdecl setAntialiasing(bool enabled) = 0;
 	virtual void _cdecl setLineWidth(float w) = 0;
+	virtual void _cdecl setRoundness(float radius){}
 	virtual void _cdecl setLineDash(const Array<float> &dash, float offset) = 0;
 	virtual void _cdecl setFill(bool fill) = 0;
 	virtual void _cdecl clip(const rect &r) = 0;

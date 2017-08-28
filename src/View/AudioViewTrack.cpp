@@ -803,20 +803,6 @@ void AudioViewTrack::draw(Painter *c)
 	drawHeader(c);
 }
 
-void drawRectRound(Painter *c, float x1, float y1, float w, float h, float r)
-{
-	float x2 = x1 + w;
-	float y2 = y1 + h;
-	c->drawCircle(x1+r, y1+r, r);
-	c->drawCircle(x2-r, y1+r, r);
-	c->drawCircle(x1+r, y2-r, r);
-	c->drawCircle(x2-r, y2-r, r);
-	c->drawRect(x1, y1+r, w, h-r*2);
-	c->drawRect(x1+r, y1, w-r*2, r);
-	c->drawRect(x1+r, y2-r, w-r*2, r);
-}
-
-
 bool AudioView::editingTrack(Track *t)
 {
 	if (cur_track != t)
@@ -846,7 +832,9 @@ void AudioViewTrack::drawHeader(Painter *c)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
 	c->setColor(col);
 	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	drawRectRound(c, area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h, 8);
+	c->setRoundness(view->CORNER_RADIUS);
+	c->drawRect(area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h);
+	c->setRoundness(0);
 
 	// track title
 	c->setFont("", view->FONT_SIZE, view->sel.has(track), false);

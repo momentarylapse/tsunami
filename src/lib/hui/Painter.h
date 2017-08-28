@@ -31,6 +31,7 @@ class Painter : public ::Painter
 	string cur_font;
 	bool cur_font_bold, cur_font_italic;
 	bool mode_fill;
+	float corner_radius;
 
 	Painter();
 	Painter(Panel *panel, const string &id);
@@ -44,6 +45,7 @@ class Painter : public ::Painter
 	virtual void _cdecl setAntialiasing(bool enabled);
 	virtual void _cdecl setLineWidth(float w);
 	virtual void _cdecl setLineDash(const Array<float> &dash, float offset);
+	virtual void _cdecl setRoundness(float radius);
 	virtual void _cdecl setFill(bool fill);
 	virtual void _cdecl clip(const rect &r);
 	virtual void _cdecl drawPoint(float x, float y);

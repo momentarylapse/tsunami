@@ -74,6 +74,8 @@ public:
 	void drawBackground(Painter *c, const rect &r);
 	void drawAudioFile(Painter *c, const rect &r);
 
+	void drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
+
 	void optimizeView();
 	void updateMenu();
 
@@ -88,6 +90,7 @@ public:
 	static const int SAMPLE_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;
 	static const float LINE_WIDTH;
+	static const float CORNER_RADIUS;
 	static const int FONT_SIZE;
 	static const int MAX_TRACK_CHANNEL_HEIGHT;
 	static const int TRACK_HANDLE_WIDTH;

@@ -301,13 +301,22 @@ int ViewModeDefault::getTrackMoveTarget(bool visual)
 	foreachi(auto vt, view->vtrack, i){
 		int y = (vt->area.y1 + vt->area.y2) / 2;
 		if (y > view->my){
-			if (visual or (i < orig))
+			if (visual or (i <= orig))
 				return i;
 			else
 				return i - 1;
 		}
 	}
 	return visual ? song->tracks.num : (song->tracks.num-1);
+}
+
+void drawCursorHover(ViewMode *m, Painter *c, const string &msg)
+{
+	float x = max(m->view->mx - 20.0f, 2.0f);
+	float y = m->view->my + 20;
+	c->setFont("", -1, true, false);
+	m->view->drawBoxedStr(c, x, y, msg, m->view->colors.background, m->view->colors.text_soft1);
+	c->setFont("", -1, false, false);
 }
 
 void ViewModeDefault::drawPost(Painter *c)
@@ -324,14 +333,22 @@ void ViewModeDefault::drawPost(Painter *c)
 		c->drawLine(view->area.x1,  y,  view->area.x2,  y);
 		c->setLineWidth(1.0f);
 
-		c->setColor(view->colors.selection_internal);
+		/*c->setColor(view->colors.selection_internal);
 		rect r = view->vtrack[orig]->area;
 		r.x2 = view->TRACK_HANDLE_WIDTH;
-		c->drawRect(r);
+		c->drawRect(r);*/
 
-		c->setColor(view->colors.selection_boundary);
-		c->drawStr(view->mx,  view->my, "moving "+moving_track->getNiceName());
+		drawCursorHover(this, c, moving_track->getNiceName());
 	}
+
+	if (hover->type == Selection::TYPE_SAMPLE)
+		drawCursorHover(this, c, _("sample ") + hover->sample->origin->name);
+	if (hover->type == Selection::TYPE_TRACK_EDIT)
+		drawCursorHover(this, c, _("edit track properties"));
+	if (hover->type == Selection::TYPE_TRACK_MUTE)
+		drawCursorHover(this, c, _("toggle mute"));
+	if (hover->type == Selection::TYPE_TRACK_SOLO)
+		drawCursorHover(this, c, _("toggle solo"));
 }
 
 void ViewModeDefault::setBarriers(Selection &s)

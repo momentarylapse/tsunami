@@ -651,6 +651,8 @@ int ViewModeMidi::which_midi_mode(Track *t)
 
 void ViewModeMidi::drawPost(Painter *c)
 {
+	ViewModeDefault::drawPost(c);
+
 	int mode = which_midi_mode(cur_track->track);
 	if ((mode != AudioView::MIDI_MODE_CLASSICAL) and (mode != AudioView::MIDI_MODE_TAB))
 		return;

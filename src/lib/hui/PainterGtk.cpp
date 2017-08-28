@@ -27,6 +27,7 @@ Painter::Painter()
 	cur_font_italic = false;
 	cur_font_size = -1;
 	cur_font = "";
+	corner_radius = 0;
 }
 
 Painter::Painter(Panel *panel, const string &_id)
@@ -38,6 +39,7 @@ Painter::Painter(Panel *panel, const string &_id)
 	height = 0;
 	mode_fill = true;
 	Control *c = panel->_get_control_(id);
+	corner_radius = 0;
 	if (c){
 		cr = (cairo_t*)((ControlDrawingArea*)c)->cur_cairo;
 //		cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
@@ -81,6 +83,11 @@ void Painter::setLineDash(const Array<float> &dash, float offset)
 	for (int i=0; i<dash.num; i++)
 		d.add(dash[i]);
 	cairo_set_dash(cr, (double*)d.data, d.num, offset);
+}
+
+void Painter::setRoundness(float radius)
+{
+	corner_radius = radius;
 }
 
 color gdk2color(GdkColor c)
@@ -217,7 +224,16 @@ void Painter::drawRect(float x, float y, float w, float h)
 {
 	if (!cr)
 		return;
-	cairo_rectangle(cr, x, y, w, h);
+	if (corner_radius > 0){
+		float r = corner_radius;
+		cairo_new_sub_path(cr);
+		cairo_arc(cr, x + w - r, y + r, r, -pi/2, 0);
+		cairo_arc(cr, x + w - r, y + h - r, r, 0, pi/2);
+		cairo_arc(cr, x + r, y + h - r, r, pi/2, pi);
+		cairo_arc(cr, x + r, y + r, r, pi, pi*3/2);
+		cairo_close_path(cr);
+	}else
+		cairo_rectangle(cr, x, y, w, h);
 
 	if (mode_fill)
 		cairo_fill(cr);
@@ -227,14 +243,7 @@ void Painter::drawRect(float x, float y, float w, float h)
 
 void Painter::drawRect(const rect &r)
 {
-	if (!cr)
-		return;
-	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
-
-	if (mode_fill)
-		cairo_fill(cr);
-	else
-		cairo_stroke(cr);
+	drawRect(r.x1, r.y1, r.width(), r.height());
 }
 
 void Painter::drawCircle(float x, float y, float radius)

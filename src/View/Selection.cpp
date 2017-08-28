@@ -19,6 +19,17 @@ bool Selection::allow_auto_scroll() const
 	return (type == TYPE_SELECTION_END) or (type == TYPE_SAMPLE) or (type == TYPE_PLAYBACK);
 }
 
+bool Selection::is_in(int _type) const
+{
+	if (type == _type)
+		return true;
+	if (_type == TYPE_TRACK_HANDLE)
+		return (type == TYPE_MUTE) or (type == TYPE_SOLO);
+	if (_type == TYPE_TRACK)
+		return (track != NULL);
+	return false;
+}
+
 void Selection::clear()
 {
 	type = TYPE_NONE;
@@ -31,7 +42,6 @@ void Selection::clear()
 	range = Range::EMPTY;
 	y0 = y1 = 0;
 	sample_offset = 0;
-	show_track_controls = NULL;
 	pitch = -1;
 	clef_position = -1;
 	modifier = MODIFIER_UNKNOWN;
@@ -42,7 +52,6 @@ bool hover_changed(Selection &hover, Selection &hover_old)
 	return (hover.type != hover_old.type)
 			or (hover.sample != hover_old.sample)
 			or (hover.note != hover_old.note)
-			or (hover.show_track_controls != hover_old.show_track_controls)
 			or (hover.index != hover_old.index)
 			or (hover.pitch != hover_old.pitch)
 			or (hover.clef_position != hover_old.clef_position);

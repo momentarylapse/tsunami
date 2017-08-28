@@ -30,7 +30,6 @@ public:
 	int y1;
 	int sample_offset;
 	Array<int> barrier;
-	Track *show_track_controls;
 	int pitch;
 	int clef_position, modifier;
 	int index;
@@ -58,6 +57,7 @@ public:
 
 	Selection();
 	bool allow_auto_scroll() const;
+	bool is_in(int type) const;
 	void clear();
 };
 

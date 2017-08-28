@@ -91,6 +91,8 @@ public:
 	static const int FONT_SIZE;
 	static const int MAX_TRACK_CHANNEL_HEIGHT;
 	static const int TRACK_HANDLE_WIDTH;
+	static const int TRACK_HANDLE_HEIGHT;
+	static const int TRACK_HANDLE_HEIGHT_SMALL;
 	static const int BARRIER_DIST;
 
 	Selection hover;

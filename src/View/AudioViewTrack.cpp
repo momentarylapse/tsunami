@@ -801,44 +801,75 @@ void AudioViewTrack::draw(Painter *c)
 	drawHeader(c);
 }
 
+void drawRectRound(Painter *c, float x1, float y1, float w, float h, float r)
+{
+	float x2 = x1 + w;
+	float y2 = y1 + h;
+	c->drawCircle(x1+r, y1+r, r);
+	c->drawCircle(x2-r, y1+r, r);
+	c->drawCircle(x1+r, y2-r, r);
+	c->drawCircle(x2-r, y2-r, r);
+	c->drawRect(x1, y1+r, w, h-r*2);
+	c->drawRect(x1+r, y1, w-r*2, r);
+	c->drawRect(x1+r, y2-r, w-r*2, r);
+}
+
 void AudioViewTrack::drawHeader(Painter *c)
 {
-	if (view->hover.show_track_controls == track){
-		c->setColor(color(0.4f, 1, 1, 1));
+	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::TYPE_TRACK_HANDLE);
+	/*if (visible){
+		color col = view->colors.background_track;
+		if (view->sel.has(track))
+			col = view->colors.background_track_selected;
+		col = ColorInterpolate(col, view->colors.hover, 0.5f);
+		col.a = 0.5f;
+		c->setColor(col);
+		//c->setColor(color(0.4f, 1, 1, 1));
 		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
-	}
+	}*/
+	color col = view->colors.background_track_selected;
+	if (view->sel.has(track))
+		col = ColorInterpolate(col, view->colors.selection, 0.4f);
+	if (hover)
+		col = ColorInterpolate(col, view->colors.hover, 0.2f);
+	c->setColor(col);
+	float h = hover ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	drawRectRound(c, area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h, 8);
 
 	// track title
 	c->setFont("", view->FONT_SIZE, view->sel.has(track), false);
-	drawStrWithShadow(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
+	//drawStrWithShadow(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
+	c->setColor(view->colors.text);
 	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
 
 	c->setFont("", -1, false, false);
 
 	// icons
 	if (track->type == track->TYPE_TIME){
-		c->setColor(view->colors.background_track);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time_bg);
+		//c->setColor(view->colors.background_track);
+		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time);
 	}else if (track->type == track->TYPE_MIDI){
-		c->setColor(view->colors.background_track);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi_bg);
+		//c->setColor(view->colors.background_track);
+		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi);
 	}else{
-		c->setColor(view->colors.background_track);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio_bg);
+		//c->setColor(view->colors.background_track);
+		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio);
 	}
+	if (track->muted and !hover)
+		c->drawImage(area.x1 + 5, area.y1 + 5, *view->images.x);
 
-	c->setColor(view->colors.text);
-	if ((track->muted) or (view->hover.show_track_controls == track)){
-		c->setColor(view->colors.background_track);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker_bg);
-		if (track->muted)
-			c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
+
+	if (hover){
+		//c->setColor(view->colors.background_track);
+		//c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker_bg);
+		//if (track->muted)
+		//	c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
 		c->setColor(view->colors.text);
 		if (view->hover.type == Selection::TYPE_MUTE)
 			c->setColor(view->colors.text_soft2);
@@ -846,9 +877,9 @@ void AudioViewTrack::drawHeader(Painter *c)
 		if (track->muted)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
-	if ((view->song->tracks.num > 1) and (view->hover.show_track_controls == track)){
-		c->setColor(view->colors.background_track);
-		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
+	if ((view->song->tracks.num > 1) and hover){
+		//c->setColor(view->colors.background_track);
+		//c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
 		c->setColor(view->colors.text);
 		if (view->hover.type == Selection::TYPE_SOLO)
 			c->setColor(view->colors.text_soft2);

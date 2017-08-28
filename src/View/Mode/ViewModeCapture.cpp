@@ -32,26 +32,9 @@ Selection ViewModeCapture::getHover()
 			s.track = t->track;
 			s.type = Selection::TYPE_TRACK;
 			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.show_track_controls = t->track;
+				s.type = Selection::TYPE_TRACK_HANDLE;
 		}
 	}
-
-	// selection boundaries?
-	/*view->selectionUpdatePos(s);
-	if (view->mouse_over_time(view->sel_raw.end())){
-		s.type = Selection::TYPE_SELECTION_END;
-		return s;
-	}
-	if (view->mouse_over_time(view->sel_raw.start())){
-		s.type = Selection::TYPE_SELECTION_START;
-		return s;
-	}
-	if (view->stream->isPlaying()){
-		if (view->mouse_over_time(view->stream->getPos())){
-			s.type = Selection::TYPE_PLAYBACK;
-			return s;
-		}
-	}*/
 
 	// mute button?
 	if (s.track){
@@ -69,12 +52,6 @@ Selection ViewModeCapture::getHover()
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
 		s.type = Selection::TYPE_TIME;
-		return s;
-	}
-
-	// track handle
-	if ((s.track) and (mx < view->area.x1 + view->TRACK_HANDLE_WIDTH)){
-		s.type = Selection::TYPE_TRACK_HANDLE;
 		return s;
 	}
 

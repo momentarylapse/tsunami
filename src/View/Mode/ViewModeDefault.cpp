@@ -379,8 +379,8 @@ Selection ViewModeDefault::getHover()
 			s.index = i;
 			s.track = t->track;
 			s.type = Selection::TYPE_TRACK;
-			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.show_track_controls = t->track;
+			if ((view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < t->area.y1 + view->TRACK_HANDLE_HEIGHT))
+				s.type = Selection::TYPE_TRACK_HANDLE;
 		}
 	}
 
@@ -442,12 +442,6 @@ Selection ViewModeDefault::getHover()
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
 		s.type = Selection::TYPE_TIME;
-		return s;
-	}
-
-	// track handle
-	if ((s.track) and (mx < view->area.x1 + view->TRACK_HANDLE_WIDTH)){
-		s.type = Selection::TYPE_TRACK_HANDLE;
 		return s;
 	}
 

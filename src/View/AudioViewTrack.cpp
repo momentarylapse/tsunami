@@ -447,8 +447,8 @@ int AudioViewTrack::y2clef_linear(float y, int &mod)
 
 void AudioViewTrack::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
 {
-	float x1 = view->cam.sample2screen(n.range.offset);
-	float x2 = view->cam.sample2screen(n.range.end());
+	float x1 = view->cam.sample2screen(n.range.offset + shift);
+	float x2 = view->cam.sample2screen(n.range.end() + shift);
 	float y1 = pitch2y_linear(n.pitch + 1);
 	float y2 = pitch2y_linear(n.pitch);
 
@@ -494,7 +494,7 @@ void AudioViewTrack::drawMidiLinear(Painter *c, const MidiData &midi, bool as_re
 	for (MidiNote *n: midi){
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
-		drawMidiNoteLinear(c, *n, 0, note_state(n, as_reference, view));
+		drawMidiNoteLinear(c, *n, shift, note_state(n, as_reference, view));
 	}
 }
 
@@ -593,7 +593,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_refer
 	MidiDataRef notes = midi.getNotes(range);
 
 	for (MidiNote *n: notes)
-		drawMidiNoteTab(c,  n,  0,  note_state(n, as_reference, view));
+		drawMidiNoteTab(c,  n,  shift,  note_state(n, as_reference, view));
 
 	c->setAntialiasing(false);
 	c->setFontSize(view->FONT_SIZE);

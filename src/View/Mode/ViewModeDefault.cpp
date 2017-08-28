@@ -29,6 +29,7 @@ ViewModeDefault::~ViewModeDefault()
 
 void ViewModeDefault::onLeftButtonDown()
 {
+	bool track_hover_sel = view->sel.has(hover->track);
 	selectUnderMouse();
 
 	setBarriers(*hover);
@@ -37,11 +38,14 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_CLEF_POSITION)){
-		setCursorPos(hover->pos, false);
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION)){
+		setCursorPos(hover->pos, track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_TIME){
 		setCursorPos(hover->pos, true);
+		view->msp.start(hover->pos, hover->y0);
+	}else if (hover->type == Selection::TYPE_BACKGROUND){
+		setCursorPos(hover->pos, false);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_SELECTION_END){
 		hover->range = view->sel.range;
@@ -77,7 +81,7 @@ void ViewModeDefault::onLeftButtonUp()
 
 	if (moving_track){
 		int target = getTrackMoveTarget(false);
-		int orig = get_track_index(moving_track);
+		//int orig = get_track_index(moving_track);
 		moving_track->move(target);
 		moving_track = NULL;
 	}
@@ -261,8 +265,10 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	t->drawBlankBackground(c);
 
 	color cc = t->getBackgroundColor();
-	view->drawGridTime(c, t->area, cc, false);
-	t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), 0);
+	if (song->bars.num > 0)
+		t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), 0);
+	else
+		view->drawGridTime(c, t->area, cc, false);
 
 
 	if (t->track->type == Track::TYPE_MIDI){
@@ -490,12 +496,10 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	//view->msp.start(hover->pos, hover->y0);
 	Set<const Track*> tracks = view->sel.tracks;
 	view->sel.clear();
-	if (keep_track_selection){
+	if (keep_track_selection)
 		view->sel.tracks = tracks;
-	}else{
-		for (Track *t: view->song->tracks)
-			view->sel.add(t);
-	}
+	else
+		view->sel.all_tracks(view->song);
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
 

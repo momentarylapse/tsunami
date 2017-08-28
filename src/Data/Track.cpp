@@ -268,7 +268,8 @@ void Track::setPanning(float panning)
 
 void Track::move(int target)
 {
-	song->execute(new ActionTrackMove(this, target));
+	if (target != get_index())
+		song->execute(new ActionTrackMove(this, target));
 }
 
 void Track::insertMidiData(int offset, const MidiData& midi)

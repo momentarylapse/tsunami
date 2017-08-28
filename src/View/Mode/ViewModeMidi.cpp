@@ -413,8 +413,10 @@ void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	t->drawBlankBackground(c);
 
 	color cc = t->getBackgroundColor();
-	view->drawGridTime(c, t->area, cc, false);
-	t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), beat_partition);
+	if (song->bars.num > 0)
+		t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), beat_partition);
+	else
+		view->drawGridTime(c, t->area, cc, false);
 
 	if (t->track->type == Track::TYPE_MIDI){
 		int mode = which_midi_mode(t->track);

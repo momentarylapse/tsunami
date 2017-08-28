@@ -680,6 +680,8 @@ void AudioView::updateTracks()
 	vtrack2.resize(song->tracks.num);
 	foreachi(Track *t, song->tracks, ti){
 		bool found = false;
+
+		// find existing
 		foreachi(AudioViewTrack *v, vtrack, vi)
 			if (v){
 				if (v->track == t){
@@ -697,18 +699,25 @@ void AudioView::updateTracks()
 			sel.add(t);
 		}
 	}
-	for (AudioViewTrack *v : vtrack)
+
+	// delete deleted
+	for (AudioViewTrack *v: vtrack)
 		if (v){
 			delete(v);
 			changed = true;
 		}
 	vtrack = vtrack2;
 	thm.dirty = true;
+
+	// guess where to create new tracks
 	foreachi(AudioViewTrack *v, vtrack, i){
-		if (i > 0){
-			if (v->area.y1 < vtrack[i-1]->area.y2){
-				v->area.y1 = vtrack[i-1]->area.y2;
-				v->area.y2 = vtrack[i-1]->area.y2;
+		if (v->area.height() == 0){
+			if (i > 0){
+				v->area = vtrack[i-1]->area;
+				v->area.y1 = v->area.y2;
+			}else if (vtrack.num > 1){
+				v->area = vtrack[i+1]->area;
+				v->area.y2 = v->area.y1;
 			}
 		}
 	}

@@ -23,8 +23,8 @@ bool Selection::is_in(int _type) const
 {
 	if (type == _type)
 		return true;
-	if (_type == TYPE_TRACK_HANDLE)
-		return (type == TYPE_MUTE) or (type == TYPE_SOLO);
+	if (_type == TYPE_TRACK_HEADER)
+		return (type == TYPE_TRACK_MUTE) or (type == TYPE_TRACK_SOLO) or (type == TYPE_TRACK_EDIT);
 	if (_type == TYPE_TRACK)
 		return (track != NULL);
 	return false;

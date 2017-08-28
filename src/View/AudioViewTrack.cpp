@@ -10,6 +10,8 @@
 #include "Mode/ViewMode.h"
 #include "Mode/ViewModeMidi.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
+#include "SideBar/SideBar.h"
 #include "../Data/Song.h"
 #include "../Midi/MidiData.h"
 #include "../Midi/Clef.h"
@@ -814,26 +816,36 @@ void drawRectRound(Painter *c, float x1, float y1, float w, float h, float r)
 	c->drawRect(x1+r, y2-r, w-r*2, r);
 }
 
+
+bool AudioView::editingTrack(Track *t)
+{
+	if (cur_track != t)
+		return false;
+	if (win->side_bar->isActive(SideBar::TRACK_CONSOLE))
+		return true;
+	if (win->side_bar->isActive(SideBar::FX_CONSOLE))
+		return true;
+	if (win->side_bar->isActive(SideBar::MIDI_FX_CONCOLE))
+		return true;
+	if (win->side_bar->isActive(SideBar::SYNTH_CONSOLE))
+		return true;
+	if (win->side_bar->isActive(SideBar::MIDI_EDITOR_CONSOLE))
+		return true;
+	return false;
+}
+
 void AudioViewTrack::drawHeader(Painter *c)
 {
-	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::TYPE_TRACK_HANDLE);
-	/*if (visible){
-		color col = view->colors.background_track;
-		if (view->sel.has(track))
-			col = view->colors.background_track_selected;
-		col = ColorInterpolate(col, view->colors.hover, 0.5f);
-		col.a = 0.5f;
-		c->setColor(col);
-		//c->setColor(color(0.4f, 1, 1, 1));
-		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
-	}*/
+	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::TYPE_TRACK_HEADER);
+	bool visible = hover or view->editingTrack(track);
+
 	color col = view->colors.background_track_selected;
 	if (view->sel.has(track))
 		col = ColorInterpolate(col, view->colors.selection, 0.4f);
 	if (hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
 	c->setColor(col);
-	float h = hover ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
 	drawRectRound(c, area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h, 8);
 
 	// track title
@@ -861,29 +873,36 @@ void AudioViewTrack::drawHeader(Painter *c)
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio);
 	}
-	if (track->muted and !hover)
+	if (track->muted and !visible)
 		c->drawImage(area.x1 + 5, area.y1 + 5, *view->images.x);
 
+	color col_but_hover = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 
-	if (hover){
+	if (visible){
 		//c->setColor(view->colors.background_track);
 		//c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker_bg);
 		//if (track->muted)
 		//	c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
 		c->setColor(view->colors.text);
-		if (view->hover.type == Selection::TYPE_MUTE)
-			c->setColor(view->colors.text_soft2);
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_MUTE))
+			c->setColor(col_but_hover);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
 		if (track->muted)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
-	if ((view->song->tracks.num > 1) and hover){
+	if ((view->song->tracks.num > 1) and visible){
 		//c->setColor(view->colors.background_track);
 		//c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
 		c->setColor(view->colors.text);
-		if (view->hover.type == Selection::TYPE_SOLO)
-			c->setColor(view->colors.text_soft2);
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_SOLO))
+			c->setColor(col_but_hover);
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
+	}
+	if (visible){
+		c->setColor(view->colors.text);
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_EDIT))
+			c->setColor(col_but_hover);
+		c->drawStr(area.x1 + 39, area.y1 + 22, "ed");
 	}
 }
 

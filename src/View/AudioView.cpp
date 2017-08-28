@@ -1081,6 +1081,7 @@ void AudioView::setCurLayer(int l)
 	notify(MESSAGE_CUR_LAYER_CHANGE);
 }
 
+
 void AudioView::setInput(InputStreamAny *_input)
 {
 	if (input)

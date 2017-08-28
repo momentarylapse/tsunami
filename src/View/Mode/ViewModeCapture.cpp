@@ -32,7 +32,7 @@ Selection ViewModeCapture::getHover()
 			s.track = t->track;
 			s.type = Selection::TYPE_TRACK;
 			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.type = Selection::TYPE_TRACK_HANDLE;
+				s.type = Selection::TYPE_TRACK_HEADER;
 		}
 	}
 
@@ -40,11 +40,11 @@ Selection ViewModeCapture::getHover()
 	if (s.track){
 		AudioViewTrack *t = s.vtrack;
 		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_MUTE;
+			s.type = Selection::TYPE_TRACK_MUTE;
 			return s;
 		}
 		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_SOLO;
+			s.type = Selection::TYPE_TRACK_SOLO;
 			return s;
 		}
 	}

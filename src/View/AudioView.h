@@ -193,6 +193,8 @@ public:
 	int cur_layer;
 	Track *capturing_track;
 
+	bool editingTrack(Track *t);
+
 
 	void setScale(const Scale &s);
 	Scale midi_scale;

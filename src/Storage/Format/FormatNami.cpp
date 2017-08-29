@@ -1010,7 +1010,7 @@ public:
 		write_sub_array("level", me->layers);
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);
-		write_sub_array("marker", me->markers);
+		write_sub_parray("marker", me->markers);
 		if ((me->type == me->TYPE_TIME) or (me->type == me->TYPE_MIDI))
 			if (!me->synth->isDefault())
 				write_sub("synth", me->synth);

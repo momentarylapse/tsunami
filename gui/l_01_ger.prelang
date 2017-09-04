@@ -1219,7 +1219,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-151
+155
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1491,6 +1491,8 @@ call: tsunami --export <File> <Exportfile>
 call: tsunami --export <File> <Exportfile>
 call: tsunami --info <File>
 call: tsunami --info <File>
+edit track properties
+Eigenschaften der Spur bearbeiten
 enter new name
 neuen Namen eingeben
 exporting
@@ -1515,8 +1517,14 @@ open message.txt
 message.txt öffnen
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+sample 
+sample 
 saving 
 speichere 
+toggle mute
+stumm an/aus
+toggle solo
+solo an/aus
 unknown command: 
 unbekannter Befehl: 
 unknown file extension: 

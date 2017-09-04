@@ -7,11 +7,11 @@ menu_fake
 
 
 0
--966118593
+797837814
 112
 0
-373546496
--966118593
+1432128256
+797837814
 2
 Item
 play
@@ -41,11 +41,11 @@ dummy_favorite_dialog
 
 
 0
--966118593
+797837814
 112
 400
 355
--966118593
+797837814
 8
 ComboBox
 favorite_list
@@ -141,11 +141,11 @@ bar_add_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_629479
@@ -296,11 +296,11 @@ bar_edit_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_316867
@@ -429,11 +429,11 @@ configurable_dialog
 
 
 0
--966118593
+797837814
 112
 200
 100
--966118593
+797837814
 1
 ControlTable
 grid
@@ -540,11 +540,11 @@ configurable-selection-dialog
 
 
 0
--966118593
+797837814
 112
 400
 500
--966118593
+797837814
 1
 ControlTable
 rand_id_651132
@@ -607,11 +607,11 @@ curve_console
 
 
 0
--966118593
+797837814
 112
 380
 516
--966118593
+797837814
 1
 ControlTable
 rand_id_971465
@@ -740,11 +740,11 @@ curve-target-dialog
 
 
 0
--966118593
+797837814
 112
 300
 400
--966118593
+797837814
 1
 ControlTable
 rand_id_546106
@@ -807,11 +807,11 @@ trackdest_dialog
 
 
 0
--966118593
+797837814
 112
 400
 300
--966118593
+797837814
 1
 ListView
 track_list
@@ -830,11 +830,11 @@ detune_synthesizer_dialog
 
 
 0
--966118593
+797837814
 112
 400
 400
--966118593
+797837814
 1
 ControlTable
 rand_id_113280
@@ -897,11 +897,11 @@ device-manager
 
 
 0
--966118593
+797837814
 112
 400
 200
--966118593
+797837814
 1
 ControlTable
 rand_id_592539
@@ -986,11 +986,11 @@ fx_editor
 
 
 0
--966118593
+797837814
 112
 380
 516
--966118593
+797837814
 1
 ControlTable
 rand_id_450917
@@ -1097,11 +1097,11 @@ fx_panel
 
 
 0
--966118593
+797837814
 112
 200
 200
--966118593
+797837814
 1
 ControlTable
 grid
@@ -1186,11 +1186,11 @@ layer_dialog
 
 
 0
--966118593
+797837814
 112
 430
 375
--966118593
+797837814
 1
 ControlTable
 lvld_grid_1
@@ -1297,11 +1297,11 @@ log_console
 
 
 0
--966118593
+797837814
 112
 200
 100
--966118593
+797837814
 1
 ControlTable
 rand_id_598481
@@ -1342,11 +1342,11 @@ log_toolbar
 
 
 0
--966118593
+797837814
 112
 200
 100
--966118593
+797837814
 2
 Item
 log_clear
@@ -1376,11 +1376,11 @@ marker_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_833243
@@ -1443,11 +1443,11 @@ menu
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 10
 ItemPopup
 menu_file
@@ -2500,11 +2500,11 @@ midi_editor
 
 
 0
--966118593
+797837814
 112
 380
 516
--966118593
+797837814
 1
 ControlTable
 rand_id_675475
@@ -2996,11 +2996,11 @@ midi_fx_editor
 
 
 0
--966118593
+797837814
 112
 380
 516
--966118593
+797837814
 1
 ControlTable
 rand_id_673936
@@ -3140,11 +3140,11 @@ mini_bar
 
 
 0
--966118593
+797837814
 112
 400
 40
--966118593
+797837814
 1
 ControlTable
 rand_id_184622
@@ -3218,11 +3218,11 @@ mixing-console
 
 
 0
--966118593
+797837814
 112
 300
 200
--966118593
+797837814
 1
 ControlTable
 rand_id_730729
@@ -3318,11 +3318,11 @@ new_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_202212
@@ -3605,11 +3605,11 @@ pause_add_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_532440
@@ -3705,11 +3705,11 @@ pause_edit_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_877383
@@ -3805,11 +3805,11 @@ popup_marker_menu
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 4
 Item
 marker_menu_header
@@ -3861,11 +3861,11 @@ popup_song_menu
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 6
 Item
 song_menu_header
@@ -3939,11 +3939,11 @@ popup_track_menu
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 7
 Item
 track_menu_header
@@ -4028,11 +4028,11 @@ popup_sample_menu
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 5
 Item
 sample_menu_header
@@ -4095,11 +4095,11 @@ progress_dialog
 
 
 0
--966118593
+797837814
 112
 210
 30
--966118593
+797837814
 1
 ProgressBar
 progress_bar
@@ -4118,11 +4118,11 @@ progress_cancelable_dialog
 
 
 0
--966118593
+797837814
 112
 210
 30
--966118593
+797837814
 1
 ControlTable
 progress_cancelable_grid
@@ -4163,11 +4163,11 @@ raw_config_dialog
 
 
 0
--966118593
+797837814
 112
 300
 100
--966118593
+797837814
 1
 ControlTable
 rand_id_111275
@@ -4296,11 +4296,11 @@ record_dialog
 
 
 0
--966118593
+797837814
 112
 300
 200
--966118593
+797837814
 1
 ControlTable
 rand_id_593211
@@ -4649,11 +4649,11 @@ sample_manager_dialog
 allow-parent
 
 0
--966118593
+797837814
 112
 400
 400
--966118593
+797837814
 1
 ControlTable
 rand_id_3578
@@ -4804,11 +4804,11 @@ sample_ref_dialog
 
 
 0
--966118593
+797837814
 112
 375
 230
--966118593
+797837814
 1
 ControlTable
 rand_id_188201
@@ -4992,11 +4992,11 @@ sample_scale_dialog
 
 
 0
--966118593
+797837814
 112
 250
 80
--966118593
+797837814
 1
 ControlTable
 rand_id_764871
@@ -5235,11 +5235,11 @@ sample_selection_dialog
 
 
 0
--966118593
+797837814
 112
 300
 400
--966118593
+797837814
 1
 ControlTable
 rand_id_383831
@@ -5302,11 +5302,11 @@ settings_dialog
 
 
 0
--966118593
+797837814
 112
 300
 200
--966118593
+797837814
 1
 ControlTable
 rand_id_943051
@@ -5512,11 +5512,11 @@ song_dialog
 
 
 0
--966118593
+797837814
 112
 430
 375
--966118593
+797837814
 1
 ControlTable
 rand_id_793656
@@ -5755,11 +5755,11 @@ synth_console
 
 
 0
--966118593
+797837814
 112
 300
 200
--966118593
+797837814
 1
 ControlTable
 outer
@@ -5866,11 +5866,11 @@ synth_panel
 
 
 0
--966118593
+797837814
 112
 200
 200
--966118593
+797837814
 1
 ControlTable
 grid
@@ -5933,11 +5933,11 @@ toolbar
 
 
 0
--966118593
+797837814
 112
 200
 200
--966118593
+797837814
 15
 Item
 new
@@ -6110,11 +6110,11 @@ track_dialog
 
 
 0
--966118593
+797837814
 112
 380
 516
--966118593
+797837814
 1
 ControlTable
 rand_id_273911
@@ -6463,11 +6463,11 @@ track-mixer
 
 
 0
--966118593
+797837814
 112
 80
 200
--966118593
+797837814
 1
 ControlTable
 rand_id_684178
@@ -6530,11 +6530,11 @@ tuning_dialog
 
 
 0
--966118593
+797837814
 112
 120
 50
--966118593
+797837814
 1
 ControlTable
 rand_id_727550
@@ -8830,7 +8830,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-151
+155
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -9102,6 +9102,8 @@ call: tsunami --export <File> <Exportfile>
 call: tsunami --export <File> <Exportfile>
 call: tsunami --info <File>
 call: tsunami --info <File>
+edit track properties
+Eigenschaften der Spur bearbeiten
 enter new name
 neuen Namen eingeben
 exporting
@@ -9126,8 +9128,14 @@ open message.txt
 message.txt öffnen
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+sample 
+sample 
 saving 
 speichere 
+toggle mute
+stumm an/aus
+toggle solo
+solo an/aus
 unknown command: 
 unbekannter Befehl: 
 unknown file extension: 

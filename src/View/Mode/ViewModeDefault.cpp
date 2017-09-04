@@ -438,7 +438,7 @@ Selection ViewModeDefault::getHover()
 			s.type = Selection::TYPE_TRACK_SOLO;
 			return s;
 		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 39) and (mx < t->area.x1 + 51) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+		if ((mx >= t->area.x1 + 39) and (mx < t->area.x1 + 51) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::TYPE_TRACK_EDIT;
 			return s;
 		}

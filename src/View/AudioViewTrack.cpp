@@ -817,6 +817,8 @@ bool AudioView::editingTrack(Track *t)
 		return true;
 	if (win->side_bar->isActive(SideBar::MIDI_EDITOR_CONSOLE))
 		return true;
+	if (win->side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+		return true;
 	return false;
 }
 

@@ -30,7 +30,7 @@ class AutoRecord extends TsunamiPlugin
 	
 	void onUpdate(string message)
 		//print("------------- " + message)
-		if message == "SetInput"
+		if message == "InputChange"
 			if view.input
 				string fn = get_fn()
 				SetTempBackupFilename(fn)

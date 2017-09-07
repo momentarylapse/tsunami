@@ -58,6 +58,7 @@ const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
+const string AudioView::MESSAGE_INPUT_CHANGE = "InputChange";
 
 
 class PeakThread : public Thread
@@ -1101,7 +1102,7 @@ void AudioView::setInput(InputStreamAny *_input)
 		unsubscribe(input);
 
 	input = _input;
-	notify("SetInput");
+	notify(MESSAGE_INPUT_CHANGE);
 
 	if (input)
 		subscribe(input);

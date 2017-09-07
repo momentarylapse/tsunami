@@ -63,6 +63,7 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
+	static const string MESSAGE_INPUT_CHANGE;
 
 	void updatePeaks();
 	void zoomIn();

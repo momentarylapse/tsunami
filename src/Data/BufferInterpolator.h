@@ -8,7 +8,7 @@
 #ifndef SRC_DATA_BUFFERINTERPOLATOR_H_
 #define SRC_DATA_BUFFERINTERPOLATOR_H_
 
-class BufferBox;
+class AudioBuffer;
 
 class BufferInterpolator
 {
@@ -23,7 +23,7 @@ public:
 		METHOD_FOURIER,
 	};
 
-	static void interpolate(BufferBox &in, BufferBox &out, int new_size, Method method);
+	static void interpolate(AudioBuffer &in, AudioBuffer &out, int new_size, Method method);
 };
 
 #endif /* SRC_DATA_BUFFERINTERPOLATOR_H_ */

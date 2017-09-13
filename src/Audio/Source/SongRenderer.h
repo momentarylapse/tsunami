@@ -21,8 +21,8 @@ public:
 	void _cdecl __init__(Song *s);
 	virtual void _cdecl __delete__();
 
-	void _cdecl render(const Range &range, BufferBox &buf);
-	virtual int _cdecl read(BufferBox &buf);
+	void _cdecl render(const Range &range, AudioBuffer &buf);
+	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
 	void _cdecl prepare(const Range &range, bool alllow_loop);
 	void _cdecl applySelection(SongSelection &sel);
@@ -38,15 +38,15 @@ public:
 	virtual Array<Tag> _cdecl getTags();
 
 private:
-	void read_basic(BufferBox &buf, int pos, int size);
-	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);
-	void bb_render_time_track_no_fx(BufferBox &buf, Track *t);
-	void bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti);
-	void bb_render_track_no_fx(BufferBox &buf, Track *t, int ti);
-	void make_fake_track(Track *t, BufferBox &buf);
-	void bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list);
-	void bb_render_track_fx(BufferBox &buf, Track *t, int ti);
-	void bb_render_song_no_fx(BufferBox &buf);
+	void read_basic(AudioBuffer &buf, int pos, int size);
+	void bb_render_audio_track_no_fx(AudioBuffer &buf, Track *t);
+	void bb_render_time_track_no_fx(AudioBuffer &buf, Track *t);
+	void bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
+	void bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
+	void make_fake_track(Track *t, AudioBuffer &buf);
+	void bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
+	void bb_render_track_fx(AudioBuffer &buf, Track *t, int ti);
+	void bb_render_song_no_fx(AudioBuffer &buf);
 
 	Song *song;
 	Range _range;

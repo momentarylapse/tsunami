@@ -21,7 +21,7 @@ void AudioSource::__delete__()
 	this->~AudioSource();
 }
 
-int AudioSource::readResize(BufferBox &buf)
+int AudioSource::readResize(AudioBuffer &buf)
 {
 	int n = read(buf);
 	buf.resize(n);

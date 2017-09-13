@@ -51,7 +51,7 @@ void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void 
 		float *in = (float*)data;
 
 		RingBuffer &buf = input->current_buffer;
-		BufferBox b;
+		AudioBuffer b;
 		buf.writeRef(b, frames);
 		b.deinterleave(in, input->num_channels);
 
@@ -305,7 +305,7 @@ int InputStreamAudio::doCapturing()
 	if (!accumulating)
 		return avail;
 
-	BufferBox b;
+	AudioBuffer b;
 	current_buffer.readRef(b, avail);
 	buffer.append(b);
 
@@ -325,7 +325,7 @@ void InputStreamAudio::resetSync()
 	sync.reset();
 }
 
-void InputStreamAudio::getSomeSamples(BufferBox &buf, int num_samples)
+void InputStreamAudio::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
 	current_buffer.peekRef(buf, -num_samples);
 }

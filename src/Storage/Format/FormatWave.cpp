@@ -53,7 +53,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	f->WriteBuffer("data", 4);
 	f->WriteInt(samples * bytes_per_sample);
 
-	BufferBox buf;
+	AudioBuffer buf;
 	buf.resize(CHUNK_SIZE);
 	int done = 0;
 	while (r->readResize(buf) > 0){

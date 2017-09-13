@@ -30,7 +30,7 @@ void SampleSynthesizer::__delete__()
 	this->SampleSynthesizer::~SampleSynthesizer();
 }
 
-void SampleSynthesizer::renderNote(BufferBox& buf, const Range& range, float pitch, float volume)
+void SampleSynthesizer::renderNote(AudioBuffer& buf, const Range& range, float pitch, float volume)
 {
 	if ((pitch < 0) or (pitch >= samples.num))
 		return;

@@ -162,7 +162,7 @@ inline void draw_peak_buffer_sel(Painter *c, int width, int di, double view_pos_
 	c->drawPolygon(tt);
 }
 
-void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col)
+void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col)
 {
 	float w = area.width();
 	float h = area.height();
@@ -228,7 +228,7 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	}
 }
 
-void AudioViewTrack::drawBufferSelection(Painter *c, BufferBox &b, double view_pos_rel, const color &col, const Range &r)
+void AudioViewTrack::drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
 {
 	float w = area.width();
 	float h = area.height();
@@ -284,17 +284,17 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 	foreachi(TrackLayer &lev, track->layers, layer_no){
 		if (layer_no == view->cur_layer)
 			continue;
-		for (BufferBox &b: lev.buffers)
+		for (AudioBuffer &b: lev.buffers)
 			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
-	for (BufferBox &b: track->layers[view->cur_layer].buffers)
+	for (AudioBuffer &b: track->layers[view->cur_layer].buffers)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
 
 	if (view->sel.has(track)){
 		// selection
-		for (BufferBox &b: track->layers[view->cur_layer].buffers){
+		for (AudioBuffer &b: track->layers[view->cur_layer].buffers){
 			drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}

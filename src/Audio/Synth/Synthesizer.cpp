@@ -103,7 +103,7 @@ void Synthesizer::enablePitch(int pitch, bool enable)
 		//delete_me.add(pitch);
 }
 
-int Synthesizer::read(BufferBox &buf, MidiSource *source)
+int Synthesizer::read(AudioBuffer &buf, MidiSource *source)
 {
 	// get from source...
 	events.samples = buf.length;

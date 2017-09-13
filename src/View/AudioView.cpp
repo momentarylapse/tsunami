@@ -554,7 +554,7 @@ void AudioView::updateBufferZoom()
 	// which level of detail?
 	if (cam.scale < 0.2f)
 		for (int i=24-1;i>=0;i--){
-			double _f = (double)(1 << (i + BufferBox::PEAK_OFFSET_EXP));
+			double _f = (double)(1 << (i + AudioBuffer::PEAK_OFFSET_EXP));
 			if (_f > 1.0 / cam.scale){
 				prefered_buffer_layer = i;
 				buffer_zoom_factor = _f;
@@ -1011,7 +1011,7 @@ void AudioView::selectExpand()
 
 			// buffers
 			for (TrackLayer &l: t->layers)
-				for (BufferBox &b: l.buffers)
+				for (AudioBuffer &b: l.buffers)
 					test_range(b.range(), r, update);
 
 			// samples

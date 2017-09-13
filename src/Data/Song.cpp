@@ -426,7 +426,7 @@ void Song::deleteTrack(Track *track)
 	execute(new ActionTrackDelete(track));
 }
 
-Sample *Song::addSample(const string &name, BufferBox &buf)
+Sample *Song::addSample(const string &name, AudioBuffer &buf)
 {
 	return (Sample*)execute(new ActionSampleAdd(name, buf, false));
 }

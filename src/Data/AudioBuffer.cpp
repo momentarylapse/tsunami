@@ -5,7 +5,8 @@
  *      Author: michi
  */
 
-#include "BufferBox.h"
+#include "AudioBuffer.h"
+
 #include "../lib/math/math.h"
 //#include <math.h>
 #include <assert.h>
@@ -20,11 +21,11 @@
 // ...
 
 
-const int BufferBox::PEAK_CHUNK_EXP = 15;
-const int BufferBox::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
-const int BufferBox::PEAK_OFFSET_EXP = 3;
-const int BufferBox::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
-const int BufferBox::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
+const int AudioBuffer::PEAK_CHUNK_EXP = 15;
+const int AudioBuffer::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
+const int AudioBuffer::PEAK_OFFSET_EXP = 3;
+const int AudioBuffer::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
+const int AudioBuffer::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 
 SampleFormat format_for_bits(int bits)
 {
@@ -74,14 +75,14 @@ string format_name(SampleFormat format)
 }
 
 
-BufferBox::BufferBox()
+AudioBuffer::AudioBuffer()
 {
 	offset = 0;
 	length = 0;
 	channels = 2;
 }
 
-BufferBox::BufferBox(const BufferBox &b)
+AudioBuffer::AudioBuffer(const AudioBuffer &b)
 {
 	offset = b.offset;
 	length = b.length;
@@ -90,17 +91,17 @@ BufferBox::BufferBox(const BufferBox &b)
 		c[i] = b.c[i];
 }
 
-void BufferBox::__init__()
+void AudioBuffer::__init__()
 {
-	new(this) BufferBox;
+	new(this) AudioBuffer;
 }
 
-void BufferBox::__delete__()
+void AudioBuffer::__delete__()
 {
-	this->BufferBox::~BufferBox();
+	this->AudioBuffer::~AudioBuffer();
 }
 
-void BufferBox::operator=(const BufferBox &b)
+void AudioBuffer::operator=(const AudioBuffer &b)
 {
 	offset = b.offset;
 	length = b.length;
@@ -110,11 +111,11 @@ void BufferBox::operator=(const BufferBox &b)
 	peaks = b.peaks;
 }
 
-BufferBox::~BufferBox()
+AudioBuffer::~AudioBuffer()
 {
 }
 
-void BufferBox::clear()
+void AudioBuffer::clear()
 {
 	for (int i=0; i<channels; i++)
 		c[i].clear();
@@ -122,7 +123,7 @@ void BufferBox::clear()
 	peaks.clear();
 }
 
-void truncate_peaks(BufferBox &buf, int length)
+void truncate_peaks(AudioBuffer &buf, int length)
 {
 	int level4 = 0;
 	length /= buf.PEAK_FINEST_SIZE;
@@ -135,7 +136,7 @@ void truncate_peaks(BufferBox &buf, int length)
 
 }
 
-void BufferBox::resize(int _length)
+void AudioBuffer::resize(int _length)
 {
 	if (_length < length)
 		truncate_peaks(*this, _length);
@@ -144,7 +145,7 @@ void BufferBox::resize(int _length)
 	length = _length;
 }
 
-bool BufferBox::is_ref() const
+bool AudioBuffer::is_ref() const
 {	return ((length > 0) and (c[0].allocated == 0));	}
 
 void fa_make_own(Array<float> &a)
@@ -156,7 +157,7 @@ void fa_make_own(Array<float> &a)
 	memcpy(a.data, data, a.element_size * num);
 }
 
-void BufferBox::make_own()
+void AudioBuffer::make_own()
 {
 	if (is_ref()){
 		//msg_write("bb::make_own!");
@@ -165,7 +166,7 @@ void BufferBox::make_own()
 	}
 }
 
-void BufferBox::swap_ref(BufferBox &b)
+void AudioBuffer::swap_ref(AudioBuffer &b)
 {
 	// buffer
 	for (int i=0; i<channels; i++)
@@ -190,7 +191,7 @@ void BufferBox::swap_ref(BufferBox &b)
 	b.channels = t;
 }
 
-void BufferBox::append(BufferBox &b)
+void AudioBuffer::append(AudioBuffer &b)
 {
 	int num0 = length;
 	resize(length + b.length);
@@ -206,7 +207,7 @@ void float_array_swap_values(Array<float> &a, Array<float> &b)
 	}
 }
 
-void BufferBox::swap_value(BufferBox &b)
+void AudioBuffer::swap_value(AudioBuffer &b)
 {
 	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
@@ -216,7 +217,7 @@ void BufferBox::swap_value(BufferBox &b)
 	b.peaks.clear();
 }
 
-void BufferBox::scale(float volume, float panning)
+void AudioBuffer::scale(float volume, float panning)
 {
 	if ((volume == 1.0f) and (panning == 0))
 		return;
@@ -237,7 +238,7 @@ void BufferBox::scale(float volume, float panning)
 	peaks.clear();
 }
 
-void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning)
+void AudioBuffer::add(const AudioBuffer &b, int _offset, float volume, float panning)
 {
 	// relative to b
 	int i0 = max(0, -_offset);
@@ -263,7 +264,7 @@ void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
-void BufferBox::set(const BufferBox &b, int _offset, float volume)
+void AudioBuffer::set(const AudioBuffer &b, int _offset, float volume)
 {
 	// relative to b
 	int i0 = max(0, -_offset);
@@ -283,7 +284,7 @@ void BufferBox::set(const BufferBox &b, int _offset, float volume)
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
-void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)
+void AudioBuffer::set_as_ref(const AudioBuffer &b, int _offset, int _length)
 {
 	clear();
 	length = _length;
@@ -294,7 +295,7 @@ void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)
 }
 
 #if 0
-void BufferBox::set_16bit(const void *b, int offset, int length)
+void AudioBuffer::set_16bit(const void *b, int offset, int length)
 {
 	// relative to b
 	int i0 = max(0, - offset);
@@ -335,7 +336,7 @@ inline float import_24(int i)
 	return (float)(i & 0x00ffffff) / 8388608.0f;
 }
 
-void BufferBox::import(void *data, int _channels, SampleFormat format, int samples)
+void AudioBuffer::import(void *data, int _channels, SampleFormat format, int samples)
 {
 	char *cb = (char*)data;
 	short *sb = (short*)data;
@@ -423,7 +424,7 @@ inline void set_data_24(int *data, float value)
 	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
-bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool align32) const
+bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool align32) const
 {
 	wtb_overflow = false;
 
@@ -459,7 +460,7 @@ bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool ali
 	return !wtb_overflow;
 }
 
-bool BufferBox::exports(string &data, int _channels, SampleFormat format) const
+bool AudioBuffer::exports(string &data, int _channels, SampleFormat format) const
 {
 	data.resize(length * _channels * (format_get_bits(format) / 8));
 	return _export(data.data, _channels, format, false);
@@ -474,7 +475,7 @@ inline float _clamp_(float f)
 	return f;
 }
 
-void BufferBox::interleave(float *p, float volume) const
+void AudioBuffer::interleave(float *p, float volume) const
 {
 	float *pr = &c[0][0];
 	float *pl = &c[1][0];
@@ -491,7 +492,7 @@ void BufferBox::interleave(float *p, float volume) const
 	}
 }
 
-void BufferBox::deinterleave(float *p, int num_channels)
+void AudioBuffer::deinterleave(float *p, int num_channels)
 {
 	float *pr = &c[0][0];
 	float *pl = &c[1][0];
@@ -508,12 +509,12 @@ void BufferBox::deinterleave(float *p, int num_channels)
 	}
 }
 
-Range BufferBox::range() const
+Range AudioBuffer::range() const
 {
 	return Range(offset, length);
 }
 
-Range BufferBox::range0() const
+Range AudioBuffer::range0() const
 {
 	return Range(0, length);
 }
@@ -538,7 +539,7 @@ static void update_shrink_table()
 unsigned char inline shrink_mean(unsigned char a, unsigned char b)
 {	return _shrink_mean_table[a][b];	}
 
-void BufferBox::invalidate_peaks(const Range &_range)
+void AudioBuffer::invalidate_peaks(const Range &_range)
 {
 	assert(range().covers(_range));
 
@@ -565,7 +566,7 @@ inline float fabsmax(float *p)
 	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
-void ensure_peak_size(BufferBox &buf, int level4, int n, bool set_invalid = false)
+void ensure_peak_size(AudioBuffer &buf, int level4, int n, bool set_invalid = false)
 {
 	if (buf.peaks.num < level4 + 4)
 		buf.peaks.resize(level4 + 4);
@@ -581,7 +582,7 @@ void ensure_peak_size(BufferBox &buf, int level4, int n, bool set_invalid = fals
 	}
 }
 
-void update_peaks_chunk(BufferBox &buf, int index)
+void update_peaks_chunk(AudioBuffer &buf, int index)
 {
 	// first level
 	int i0 = index * buf.PEAK_CHUNK_SIZE / buf.PEAK_FINEST_SIZE;
@@ -638,7 +639,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 	}
 }
 
-void BufferBox::update_peaks()
+void AudioBuffer::update_peaks()
 {
 	if (!_shrink_table_created)
 		update_shrink_table();

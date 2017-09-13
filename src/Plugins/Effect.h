@@ -14,7 +14,7 @@
 
 class Plugin;
 class Track;
-class BufferBox;
+class AudioBuffer;
 class Song;
 
 namespace Script{
@@ -43,12 +43,12 @@ public:
 	Track *track;
 	int layer;
 
-	virtual void _cdecl processTrack(BufferBox *buf){};
+	virtual void _cdecl processTrack(AudioBuffer *buf){};
 
 	void doProcessTrack(Track *t, int layer, const Range &r);
 
 	void prepare();
-	void apply(BufferBox &buf, Track *t, bool log_error);
+	void apply(AudioBuffer &buf, Track *t, bool log_error);
 
 	string getError();
 };

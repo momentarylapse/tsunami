@@ -127,7 +127,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 #define READSIZE		1<<12
 	int nn = 0;
 
-	BufferBox buf;
+	AudioBuffer buf;
 	buf.resize(READSIZE);
 
 	int eos = 0;

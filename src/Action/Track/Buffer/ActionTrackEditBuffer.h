@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITBUFFER_H_
-#define ACTIONTRACKEDITBUFFER_H_
+#ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_
+#define SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_
 
 #include "../../Action.h"
 #include "../../../Data/Track.h"
@@ -24,8 +24,8 @@ private:
 	int track_no;
 	Range range;
 	int level_no;
-	BufferBox box;
+	AudioBuffer box;
 	int index;
 };
 
-#endif /* ACTIONTRACKEDITBUFFER_H_ */
+#endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_ */

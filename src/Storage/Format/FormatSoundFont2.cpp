@@ -134,7 +134,7 @@ void FormatSoundFont2::read_samples(File *f)
 			throw format("invalid sample end: %d   [0, %d)", s.end, sample_count);
 
 		f->SetPos(sample_offset + s.start*2, true);
-		BufferBox buf;
+		AudioBuffer buf;
 		int num_samples = s.end - s.start;
 		if (num_samples < 0)
 			throw format("negative sample size: %d - %d", s.start, s.end);

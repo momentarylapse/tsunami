@@ -14,7 +14,7 @@
 #include "../../Midi/Instrument.h"
 
 class Range;
-class BufferBox;
+class AudioBuffer;
 class MidiSource;
 class PluginManager;
 class DetuneSynthesizerDialog;
@@ -35,7 +35,7 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	virtual void _cdecl render(BufferBox &buf){}
+	virtual void _cdecl render(AudioBuffer &buf){}
 
 	int sample_rate;
 	void _cdecl setSampleRate(int sample_rate);
@@ -46,7 +46,7 @@ public:
 
 	int keep_notes;
 
-	int _cdecl read(BufferBox &buf, MidiSource *source);
+	int _cdecl read(AudioBuffer &buf, MidiSource *source);
 
 	void _cdecl reset();
 

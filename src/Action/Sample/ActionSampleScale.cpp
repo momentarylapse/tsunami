@@ -29,7 +29,7 @@ void *ActionSampleScale::execute(Data *d)
 	//Song *a = dynamic_cast<Song*>(d);
 
 	if (!buf){
-		buf = new BufferBox;
+		buf = new AudioBuffer;
 		BufferInterpolator::interpolate(sample->buf, *buf, new_size, (BufferInterpolator::Method)method);
 	}
 

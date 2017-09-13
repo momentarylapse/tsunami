@@ -15,7 +15,7 @@ class Song;
 class Track;
 class Sample;
 class MidiData;
-class BufferBox;
+class AudioBuffer;
 class Range;
 
 class SampleRef : public Observable
@@ -36,7 +36,7 @@ public:
 
 	int pos;
 	Sample *origin;
-	BufferBox *buf;
+	AudioBuffer *buf;
 	MidiData *midi;
 	bool muted;
 	float volume;

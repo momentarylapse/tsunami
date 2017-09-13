@@ -15,7 +15,7 @@
 
 class Plugin;
 class Track;
-class BufferBox;
+class AudioBuffer;
 class MidiData;
 class SongSelection;
 

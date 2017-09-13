@@ -32,7 +32,7 @@ void ActionTrackInsertSample::build(Data *d)
 		// get target buffer
 		Range r = ref->range();
 		addSubAction(new ActionTrackCreateBuffers(t, layer_no, r), s);
-		BufferBox buf = t->readBuffers(layer_no, r);
+		AudioBuffer buf = t->readBuffers(layer_no, r);
 
 		// insert sub (ignore muted)
 		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(t, layer_no, r);

@@ -8,10 +8,10 @@
 #ifndef SAMPLE_H_
 #define SAMPLE_H_
 
-#include "BufferBox.h"
 #include "../Midi/MidiData.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
+#include "AudioBuffer.h"
 
 class Song;
 class Track;
@@ -37,7 +37,7 @@ public:
 
 	string name;
 	int type;
-	BufferBox buf;
+	AudioBuffer buf;
 	MidiData midi;
 	float volume;
 	int offset;

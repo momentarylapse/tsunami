@@ -154,12 +154,12 @@ public:
 
 #ifdef OS_WINDOWS
 
-string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
+string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 {
 	return "";
 }
 
-void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
+void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p)
 {
 }
 
@@ -175,7 +175,7 @@ FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncod
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 
-string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
+string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 {
 	string data;
 
@@ -244,7 +244,7 @@ string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
 
 struct UncompressData
 {
-	BufferBox *buf;
+	AudioBuffer *buf;
 	string *data;
 	int sample_offset;
 	int byte_offset;
@@ -266,7 +266,7 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 	UncompressData *d = (UncompressData*)client_data;
 
 	// read decoded PCM samples
-	BufferBox *buf = d->buf;
+	AudioBuffer *buf = d->buf;
 	float scale = pow(2.0f, d->bits-1);
 	int offset = d->sample_offset;
 	int n = min((int)frame->header.blocksize, buf->length - offset);
@@ -298,7 +298,7 @@ static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__Stream
 	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
+void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p)
 {
 	bool ok = true;
 
@@ -339,13 +339,13 @@ void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
 }
 #endif
 
-class FileChunkBufferBox : public FileChunk<TrackLayer,BufferBox>
+class FileChunkBufferBox : public FileChunk<TrackLayer,AudioBuffer>
 {
 public:
-	FileChunkBufferBox() : FileChunk<TrackLayer,BufferBox>("bufbox"){}
+	FileChunkBufferBox() : FileChunk<TrackLayer,AudioBuffer>("bufbox"){}
 	virtual void create()
 	{
-		BufferBox dummy;
+		AudioBuffer dummy;
 		parent->buffers.add(dummy);
 		me = &parent->buffers.back();
 	}
@@ -406,10 +406,10 @@ public:
 	}
 };
 
-class FileChunkSampleBufferBox : public FileChunk<Sample,BufferBox>
+class FileChunkSampleBufferBox : public FileChunk<Sample,AudioBuffer>
 {
 public:
-	FileChunkSampleBufferBox() : FileChunk<Sample,BufferBox>("bufbox"){}
+	FileChunkSampleBufferBox() : FileChunk<Sample,AudioBuffer>("bufbox"){}
 	virtual void create()
 	{
 		me = &parent->buf;

@@ -87,7 +87,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 		}
 	}else{
 		for (int n=0; (n<2) and (done < frames); n++){
-			BufferBox b;
+			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
 			out += b.length * 2;
@@ -160,7 +160,7 @@ int OutputStream::stream_request_callback(const void *inputBuffer, void *outputB
 		}
 	}else{
 		for (int n=0; (n<2) and (done < frames); n++){
-			BufferBox b;
+			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
 			out += b.length * 2;
@@ -400,7 +400,7 @@ void OutputStream::stream()
 	read_more = false;
 
 	int size = 0;
-	BufferBox b;
+	AudioBuffer b;
 	b.resize(buffer_size);
 
 	// read data
@@ -586,7 +586,7 @@ float OutputStream::getSampleRate()
 	return renderer->getSampleRate();
 }
 
-void OutputStream::getSomeSamples(BufferBox &buf, int num_samples)
+void OutputStream::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
 	if (!playing)
 		return;

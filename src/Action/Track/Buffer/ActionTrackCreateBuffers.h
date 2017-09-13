@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKCREATEBUFFERS_H_
-#define ACTIONTRACKCREATEBUFFERS_H_
+#ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACKCREATEBUFFERS_H_
+#define SRC_ACTION_TRACK_BUFFER_ACTIONTRACKCREATEBUFFERS_H_
 
 #include "../../ActionGroup.h"
 #include "../../../Data/Range.h"
@@ -25,4 +25,4 @@ public:
 	Range r;
 };
 
-#endif /* ACTIONTRACKCREATEBUFFERS_H_ */
+#endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKCREATEBUFFERS_H_ */

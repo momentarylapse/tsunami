@@ -1,14 +1,14 @@
 /*
- * ActionTrack__DeleteBufferBox.cpp
+ * ActionTrack__DeleteBuffer.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
-#include "ActionTrack__DeleteBufferBox.h"
 #include <assert.h>
+#include "ActionTrack__DeleteBuffer.h"
 
-ActionTrack__DeleteBufferBox::ActionTrack__DeleteBufferBox(Track *t, int _level_no, int _index)
+ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(Track *t, int _level_no, int _index)
 {
 	track_no = get_track_index(t);
 	index = _index;
@@ -17,7 +17,7 @@ ActionTrack__DeleteBufferBox::ActionTrack__DeleteBufferBox(Track *t, int _level_
 
 
 
-void ActionTrack__DeleteBufferBox::undo(Data *d)
+void ActionTrack__DeleteBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
@@ -31,14 +31,14 @@ void ActionTrack__DeleteBufferBox::undo(Data *d)
 
 
 
-void *ActionTrack__DeleteBufferBox::execute(Data *d)
+void *ActionTrack__DeleteBuffer::execute(Data *d)
 {
 	//msg_write("delete " + i2s(index));
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(level_no >= 0);
 	assert(level_no < t->layers.num);
-	BufferBox &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
 
 	assert(index >= 0 and index < t->layers[level_no].buffers.num);
 

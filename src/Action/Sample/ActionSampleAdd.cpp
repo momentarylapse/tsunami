@@ -10,7 +10,7 @@
 #include <assert.h>
 #include "../../Data/Song.h"
 
-ActionSampleAdd::ActionSampleAdd(const string &name, const BufferBox &buf, bool auto_delete)
+ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete)
 {
 	sample = new Sample(Track::TYPE_AUDIO);
 	sample->buf = buf;

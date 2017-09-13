@@ -1,14 +1,14 @@
 /*
- * ActionTrack__AbsorbBufferBox.cpp
+ * ActionTrack__AbsorbBuffer.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "ActionTrack__AbsorbBufferBox.h"
 #include "../../../Data/Song.h"
+#include "ActionTrack__AbsorbBuffer.h"
 
-ActionTrack__AbsorbBufferBox::ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src)
+ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(Track *t, int _level_no, int _dest, int _src)
 {
 	track_no = get_track_index(t);
 	dest = _dest;
@@ -16,19 +16,19 @@ ActionTrack__AbsorbBufferBox::ActionTrack__AbsorbBufferBox(Track *t, int _level_
 	level_no = _level_no;
 }
 
-ActionTrack__AbsorbBufferBox::~ActionTrack__AbsorbBufferBox()
+ActionTrack__AbsorbBuffer::~ActionTrack__AbsorbBuffer()
 {
 }
 
-void *ActionTrack__AbsorbBufferBox::execute(Data *d)
+void *ActionTrack__AbsorbBuffer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	TrackLayer &l = t->layers[level_no];
 
 
-	BufferBox &b_src  = l.buffers[src];
-	BufferBox &b_dest = l.buffers[dest];
+	AudioBuffer &b_src  = l.buffers[src];
+	AudioBuffer &b_dest = l.buffers[dest];
 	dest_old_length = b_dest.length;
 	int new_size = b_src.offset + b_src.length - b_dest.offset;
 	if (new_size > b_dest.length)
@@ -45,17 +45,17 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 
 
 
-void ActionTrack__AbsorbBufferBox::undo(Data *d)
+void ActionTrack__AbsorbBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	TrackLayer &l = t->layers[level_no];
 
 	//msg_todo("absorb undo...");
-	BufferBox dummy;
+	AudioBuffer dummy;
 	l.buffers.insert(dummy, src);
-	BufferBox &b_src  = l.buffers[src];
-	BufferBox &b_dest = l.buffers[dest];
+	AudioBuffer &b_src  = l.buffers[src];
+	AudioBuffer &b_dest = l.buffers[dest];
 	b_src.offset = src_offset;
 	b_src.resize(src_length);
 

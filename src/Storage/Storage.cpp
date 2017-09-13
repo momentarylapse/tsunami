@@ -107,7 +107,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 	return true;
 }
 
-bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
+bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
 	Song *aa = new Song;
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
@@ -122,7 +122,7 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 }
 
 #if 0
-bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
+bool Storage::saveBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
 	current_directory = filename.dirname();
 	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);

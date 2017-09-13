@@ -81,7 +81,7 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 
 	if (target->type == Track::TYPE_AUDIO){
 		Range r = Range(view->sel.range.start(), source->layers[0].buffers[0].length);
-		BufferBox buf = target->getBuffers(view->cur_layer, r);
+		AudioBuffer buf = target->getBuffers(view->cur_layer, r);
 		Action *a = new ActionTrackEditBuffer(target, view->cur_layer, r);
 		buf.set(source->layers[0].buffers[0], 0, 1.0f);
 		s->execute(a);

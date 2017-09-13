@@ -40,7 +40,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
-	BufferBox buf = od->track->getBuffers(flac_layer, range);
+	AudioBuffer buf = od->track->getBuffers(flac_layer, range);
 
 	Action *a;
 	if (od->song->action_manager->isEnabled())
@@ -220,7 +220,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 
 		// read blocks of samples from WAVE file and feed to encoder
 		float scale = (float)(1 << (bits-1));
-		BufferBox buf;
+		AudioBuffer buf;
 		buf.resize(FLAC_READSIZE);
 		while (r->readResize(buf)){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */

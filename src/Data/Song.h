@@ -114,7 +114,7 @@ public:
 	Track *_cdecl addTrack(int type, int index = -1);
 	Track *_cdecl addTrackAfter(int type, Track *insert_after = NULL);
 	void _cdecl deleteTrack(Track *track);
-	Sample *_cdecl addSample(const string &name, BufferBox &buf);
+	Sample *_cdecl addSample(const string &name, AudioBuffer &buf);
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);

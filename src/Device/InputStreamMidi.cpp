@@ -272,7 +272,7 @@ int InputStreamMidi::getState()
 	return STATE_STOPPED;
 }
 
-void InputStreamMidi::getSomeSamples(BufferBox &buf, int num_samples)
+void InputStreamMidi::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
 	preview_stream->getSomeSamples(buf, num_samples);
 }

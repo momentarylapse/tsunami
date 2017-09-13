@@ -8,9 +8,9 @@
 #include "ActionTrackSampleFromSelection.h"
 #include "ActionTrackPasteAsSample.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
-#include "../Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../Midi/ActionTrackDeleteMidiNote.h"
 #include "../../../Data/SongSelection.h"
+#include "../Buffer/ActionTrack__DeleteBuffer.h"
 
 ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel, int _layer_no) :
 	sel(_sel)
@@ -33,10 +33,10 @@ void ActionTrackSampleFromSelection::build(Data *d)
 void ActionTrackSampleFromSelection::CreateSamplesFromTrackAudio(Track *t, const SongSelection &sel, int layer_no)
 {
 	TrackLayer &l = t->layers[layer_no];
-	foreachib(BufferBox &b, l.buffers, bi)
+	foreachib(AudioBuffer &b, l.buffers, bi)
 		if (sel.range.covers(b.range())){
 			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b, false), t->song);
-			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, bi), t->song);
+			addSubAction(new ActionTrack__DeleteBuffer(t, layer_no, bi), t->song);
 		}
 }
 

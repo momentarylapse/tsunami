@@ -1,14 +1,14 @@
 /*
- * ActionTrack__ShrinkBufferBox.cpp
+ * ActionTrack__ShrinkBuffer.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
-#include "ActionTrack__ShrinkBufferBox.h"
 #include <assert.h>
+#include "ActionTrack__ShrinkBuffer.h"
 
-ActionTrack__ShrinkBufferBox::ActionTrack__ShrinkBufferBox(Track *t, int _level_no, int _index, int _length)
+ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(Track *t, int _level_no, int _index, int _length)
 {
 	track_no = get_track_index(t);
 	level_no = _level_no;
@@ -17,11 +17,11 @@ ActionTrack__ShrinkBufferBox::ActionTrack__ShrinkBufferBox(Track *t, int _level_
 	old_length = 0;
 }
 
-void ActionTrack__ShrinkBufferBox::undo(Data *d)
+void ActionTrack__ShrinkBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
 
 	// restore
 	b.resize(old_length);
@@ -33,11 +33,11 @@ void ActionTrack__ShrinkBufferBox::undo(Data *d)
 
 
 
-void *ActionTrack__ShrinkBufferBox::execute(Data *d)
+void *ActionTrack__ShrinkBuffer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));
 

@@ -16,13 +16,13 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 	track_no = get_track_index(t);
 
 	index = -1;
-	foreachi(BufferBox &buf, t->layers[level_no].buffers, i)
+	foreachi(AudioBuffer &buf, t->layers[level_no].buffers, i)
 		if (buf.range().covers(range))
 			index = i;
 	assert(index >= 0);
 
 	// save old data
-	BufferBox b = t->readBuffers(level_no, range);
+	AudioBuffer b = t->readBuffers(level_no, range);
 	box.resize(b.length);
 	box.set(b, 0, 1.0f);
 }
@@ -36,7 +36,7 @@ void ActionTrackEditBuffer::undo(Data *d)
 
 	t->layers[level_no].buffers[index].invalidate_peaks(range);
 
-	BufferBox b = t->readBuffers(level_no, range);
+	AudioBuffer b = t->readBuffers(level_no, range);
 	box.swap_value(b);
 }
 

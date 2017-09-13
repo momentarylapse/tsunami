@@ -55,7 +55,7 @@ public:
 	virtual void _cdecl resetAccumulation();
 	virtual int _cdecl getSampleCount();
 
-	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
+	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 	virtual int _cdecl getState();
 
 	// delay/sync
@@ -75,7 +75,7 @@ public:
 
 
 	RingBuffer current_buffer;
-	BufferBox buffer;
+	AudioBuffer buffer;
 
 private:
 

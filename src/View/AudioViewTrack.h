@@ -13,7 +13,7 @@
 class Track;
 class Painter;
 class AudioView;
-class BufferBox;
+class AudioBuffer;
 class SampleRef;
 class MidiData;
 class MidiNote;
@@ -59,8 +59,8 @@ public:
 	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
 
 	void drawTrackBuffers(Painter *c, double pos);
-	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
-	void drawBufferSelection(Painter *c, BufferBox &b, double view_pos_rel, const color &col, const Range &r);
+	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
+	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);

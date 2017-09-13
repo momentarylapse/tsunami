@@ -13,13 +13,13 @@
 class BufferStreamer : public AudioSource
 {
 public:
-	BufferStreamer(BufferBox *buf);
+	BufferStreamer(AudioBuffer *buf);
 	virtual ~BufferStreamer(){}
 
-	void _cdecl __init__(BufferBox *buf);
+	void _cdecl __init__(AudioBuffer *buf);
 	virtual void _cdecl __delete__();
 
-	virtual int _cdecl read(BufferBox &buf);
+	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
 	virtual Range _cdecl range();
 	virtual int _cdecl getPos(){ return offset; }
@@ -27,7 +27,7 @@ public:
 	//virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 	virtual int _cdecl getNumSamples();
 
-	BufferBox *buf;
+	AudioBuffer *buf;
 	int offset;
 };
 

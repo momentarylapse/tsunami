@@ -12,7 +12,6 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "FastFourierTransform.h"
-#include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
 #include "../Device/InputStreamAudio.h"
 #include "../Device/InputStreamMidi.h"
@@ -31,6 +30,7 @@
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"
+#include "ExtendedAudioBuffer.h"
 #include "MidiEffect.h"
 #include "SongPlugin.h"
 #include "TsunamiPlugin.h"
@@ -154,21 +154,21 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiEffect.notify", Kaba::mf(&MidiEffect::notify));
 	Kaba::DeclareClassVirtualIndex("MidiEffect", "onConfig", Kaba::mf(&MidiEffect::onConfig), &midieffect);
 
-	Kaba::DeclareClassSize("BufferBox", sizeof(BufferBox));
-	Kaba::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
-	Kaba::DeclareClassOffset("BufferBox", "length", _offsetof(BufferBox, length));
-	Kaba::DeclareClassOffset("BufferBox", "channels", _offsetof(BufferBox, channels));
-	Kaba::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
-	Kaba::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
-	Kaba::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BufferBox::__init__));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BufferBox::__delete__));
-	Kaba::LinkExternal("BufferBox.clear", Kaba::mf(&BufferBox::clear));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&BufferBox::__assign__));
-	Kaba::LinkExternal("BufferBox.range", Kaba::mf(&BufferBox::range));
-	Kaba::LinkExternal("BufferBox.add", Kaba::mf(&BufferBox::add));
-	Kaba::LinkExternal("BufferBox.set", Kaba::mf(&BufferBox::set));
-	Kaba::LinkExternal("BufferBox.get_spectrum", Kaba::mf(&ExtendedBufferBox::get_spectrum));
+	Kaba::DeclareClassSize("BufferBox", sizeof(AudioBuffer));
+	Kaba::DeclareClassOffset("BufferBox", "offset", _offsetof(AudioBuffer, offset));
+	Kaba::DeclareClassOffset("BufferBox", "length", _offsetof(AudioBuffer, length));
+	Kaba::DeclareClassOffset("BufferBox", "channels", _offsetof(AudioBuffer, channels));
+	Kaba::DeclareClassOffset("BufferBox", "r", _offsetof(AudioBuffer, c[0]));
+	Kaba::DeclareClassOffset("BufferBox", "l", _offsetof(AudioBuffer, c[1]));
+	Kaba::DeclareClassOffset("BufferBox", "peaks", _offsetof(AudioBuffer, peaks));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioBuffer::__init__));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioBuffer::__delete__));
+	Kaba::LinkExternal("BufferBox.clear", Kaba::mf(&AudioBuffer::clear));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&AudioBuffer::__assign__));
+	Kaba::LinkExternal("BufferBox.range", Kaba::mf(&AudioBuffer::range));
+	Kaba::LinkExternal("BufferBox.add", Kaba::mf(&AudioBuffer::add));
+	Kaba::LinkExternal("BufferBox.set", Kaba::mf(&AudioBuffer::set));
+	Kaba::LinkExternal("BufferBox.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
 
 
 	Kaba::DeclareClassSize("RingBuffer", sizeof(RingBuffer));

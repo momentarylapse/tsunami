@@ -7,8 +7,8 @@
 
 #include "ActionLayerDelete.h"
 
-#include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../../Data/Song.h"
+#include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
 #include "ActionLayer__Delete.h"
 
 ActionLayerDelete::ActionLayerDelete(int _index)
@@ -22,7 +22,7 @@ void ActionLayerDelete::build(Data *d)
 	for (Track* t : s->tracks){
 		TrackLayer &l = t->layers[index];
 		for (int i=l.buffers.num-1; i>=0; i--)
-			addSubAction(new ActionTrack__DeleteBufferBox(t, index, i), s);
+			addSubAction(new ActionTrack__DeleteBuffer(t, index, i), s);
 	}
 
 	addSubAction(new ActionLayer__Delete(index), s);

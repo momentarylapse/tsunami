@@ -8,8 +8,8 @@
 #ifndef RAWCONFIGDIALOG_H_
 #define RAWCONFIGDIALOG_H_
 
+#include "../../Data/AudioBuffer.h"
 #include "../../lib/hui/hui.h"
-#include "../../Data/BufferBox.h"
 
 struct RawConfigData
 {

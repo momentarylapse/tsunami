@@ -29,12 +29,12 @@ OBJ = \
  Action/Tag/ActionTagDelete.o\
  Action/Tag/ActionTagEdit.o\
  Action/Song/ActionSongDeleteSelection.o\
- Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o\
- Action/Track/Buffer/ActionTrack__AddBufferBox.o\
- Action/Track/Buffer/ActionTrack__SplitBufferBox.o\
- Action/Track/Buffer/ActionTrack__DeleteBufferBox.o\
- Action/Track/Buffer/ActionTrack__GrowBufferBox.o\
- Action/Track/Buffer/ActionTrack__ShrinkBufferBox.o\
+ Action/Track/Buffer/ActionTrack__AbsorbBuffer.o\
+ Action/Track/Buffer/ActionTrack__AddBuffer.o\
+ Action/Track/Buffer/ActionTrack__SplitBuffer.o\
+ Action/Track/Buffer/ActionTrack__DeleteBuffer.o\
+ Action/Track/Buffer/ActionTrack__GrowBuffer.o\
+ Action/Track/Buffer/ActionTrack__ShrinkBuffer.o\
  Action/Track/Buffer/ActionTrackCreateBuffers.o\
  Action/Track/Buffer/ActionTrackEditBuffer.o\
  Action/Track/Data/ActionTrackEditMuted.o\
@@ -84,7 +84,7 @@ OBJ = \
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
- Data/BufferBox.o\
+ Data/AudioBuffer.o\
  Data/BufferInterpolator.o\
  Data/Curve.o\
  Data/Data.o\
@@ -227,7 +227,7 @@ OBJ = \
  Plugins/Configurable.o\
  Plugins/Effect.o\
  Plugins/EffectManager.o\
- Plugins/ExtendedBufferBox.o\
+ Plugins/ExtendedAudioBuffer.o\
  Plugins/FastFourierTransform.o\
  Plugins/FavoriteManager.o\
  Plugins/MidiEffect.o\
@@ -387,23 +387,23 @@ Action/Tag/ActionTagEdit.o : Action/Tag/ActionTagEdit.cpp
 Action/Song/ActionSongDeleteSelection.o : Action/Song/ActionSongDeleteSelection.cpp
 	$(CPP) -c Action/Song/ActionSongDeleteSelection.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o : Action/Track/Buffer/ActionTrack__AbsorbBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__AbsorbBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__AbsorbBuffer.o : Action/Track/Buffer/ActionTrack__AbsorbBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__AbsorbBuffer.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__AddBufferBox.o : Action/Track/Buffer/ActionTrack__AddBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__AddBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__AddBuffer.o : Action/Track/Buffer/ActionTrack__AddBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__AddBuffer.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__SplitBufferBox.o : Action/Track/Buffer/ActionTrack__SplitBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__SplitBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__SplitBuffer.o : Action/Track/Buffer/ActionTrack__SplitBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__SplitBuffer.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__DeleteBufferBox.o : Action/Track/Buffer/ActionTrack__DeleteBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__DeleteBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__DeleteBuffer.o : Action/Track/Buffer/ActionTrack__DeleteBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__DeleteBuffer.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__GrowBufferBox.o : Action/Track/Buffer/ActionTrack__GrowBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__GrowBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__GrowBuffer.o : Action/Track/Buffer/ActionTrack__GrowBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__GrowBuffer.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__ShrinkBufferBox.o : Action/Track/Buffer/ActionTrack__ShrinkBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__ShrinkBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__ShrinkBuffer.o : Action/Track/Buffer/ActionTrack__ShrinkBuffer.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__ShrinkBuffer.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Buffer/ActionTrackCreateBuffers.o : Action/Track/Buffer/ActionTrackCreateBuffers.cpp
 	$(CPP) -c Action/Track/Buffer/ActionTrackCreateBuffers.cpp -o $@ $(CXXFLAGS)
@@ -552,8 +552,8 @@ Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 	$(CPP) -c Audio/Synth/Synthesizer.cpp -o $@ $(CXXFLAGS)
 
-Data/BufferBox.o : Data/BufferBox.cpp
-	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
+Data/AudioBuffer.o : Data/AudioBuffer.cpp
+	$(CPP) -c Data/AudioBuffer.cpp -o $@ $(CXXFLAGS)
 
 Data/BufferInterpolator.o : Data/BufferInterpolator.cpp
 	$(CPP) -c Data/BufferInterpolator.cpp -o $@ $(CXXFLAGS)
@@ -978,8 +978,8 @@ Plugins/Effect.o : Plugins/Effect.cpp
 Plugins/EffectManager.o : Plugins/EffectManager.cpp
 	$(CPP) -c Plugins/EffectManager.cpp -o $@ $(CXXFLAGS)
 
-Plugins/ExtendedBufferBox.o : Plugins/ExtendedBufferBox.cpp
-	$(CPP) -c Plugins/ExtendedBufferBox.cpp -o $@ $(CXXFLAGS)
+Plugins/ExtendedAudioBuffer.o : Plugins/ExtendedAudioBuffer.cpp
+	$(CPP) -c Plugins/ExtendedAudioBuffer.cpp -o $@ $(CXXFLAGS)
 
 Plugins/FastFourierTransform.o : Plugins/FastFourierTransform.cpp
 	$(CPP) -c Plugins/FastFourierTransform.cpp -o $@ $(CXXFLAGS)

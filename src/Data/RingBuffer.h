@@ -8,7 +8,7 @@
 #ifndef SRC_DATA_RINGBUFFER_H_
 #define SRC_DATA_RINGBUFFER_H_
 
-#include "BufferBox.h"
+#include "AudioBuffer.h"
 
 class RingBuffer {
 public:
@@ -16,19 +16,19 @@ public:
 	virtual ~RingBuffer();
 
 	int available();
-	void read(BufferBox &b);
-	void write(BufferBox &b);
+	void read(AudioBuffer &b);
+	void write(AudioBuffer &b);
 
-	void readRef(BufferBox &b, int size);
-	void peekRef(BufferBox &b, int size);
-	void writeRef(BufferBox &b, int size);
+	void readRef(AudioBuffer &b, int size);
+	void peekRef(AudioBuffer &b, int size);
+	void writeRef(AudioBuffer &b, int size);
 
 	void moveReadPos(int delta);
 	void moveWritePos(int delta);
 
 	void clear();
 
-	BufferBox buf;
+	AudioBuffer buf;
 	int read_pos;
 	int write_pos;
 };

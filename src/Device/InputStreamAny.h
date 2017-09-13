@@ -34,7 +34,7 @@ public:
 
 	// PeakMeterSource
 	virtual float _cdecl getSampleRate(){ return sample_rate; }
-	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples) = 0;
 	virtual int _cdecl getState() = 0;
 
 	virtual void _cdecl setDevice(Device *d) = 0;

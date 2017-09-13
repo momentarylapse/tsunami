@@ -6,8 +6,8 @@
  */
 
 #include "BufferInterpolator.h"
-#include "BufferBox.h"
 #include "../Plugins/FastFourierTransform.h"
+#include "AudioBuffer.h"
 
 BufferInterpolator::BufferInterpolator()
 {
@@ -48,7 +48,7 @@ static void interpolate_channel(Array<float> &in, Array<float> &out, BufferInter
 	}
 }
 
-void BufferInterpolator::interpolate(BufferBox &in, BufferBox &out, int new_size, Method method)
+void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, int new_size, Method method)
 {
 	out.resize(new_size);
 	for (int i=0; i<in.channels; i++)

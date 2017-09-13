@@ -202,7 +202,7 @@ public:
 		// insert data
 		Range r = Range(i0, input->getSampleCount());
 		cc->song->action_manager->beginActionGroup();
-		BufferBox tbuf = target->getBuffers(view->cur_layer, r);
+		AudioBuffer tbuf = target->getBuffers(view->cur_layer, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(target, view->cur_layer, r);
 
 		if (hui::Config.getInt("Input.Mode", 0) == 1)

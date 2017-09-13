@@ -7,11 +7,10 @@
 
 #include "ActionBarAdd.h"
 
-#include "../Track/Buffer/ActionTrack__SplitBufferBox.h"
-
 #include "../../Data/Track.h"
 #include <assert.h>
 
+#include "../Track/Buffer/ActionTrack__SplitBuffer.h"
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
@@ -34,7 +33,7 @@ void ActionBarAdd::build(Data *d)
 			for (int l=0; l<t->layers.num; l++)
 				for (int i=t->layers[l].buffers.num-1; i>=0; i--)
 					if (t->layers[l].buffers[i].range().is_more_inside(pos0))
-						addSubAction(new ActionTrack__SplitBufferBox(t, l, i, pos0 - t->layers[l].buffers[i].offset), d);
+						addSubAction(new ActionTrack__SplitBuffer(t, l, i, pos0 - t->layers[l].buffers[i].offset), d);
 
 		addSubAction(new Action__ShiftData(pos0, bar.length), d);
 

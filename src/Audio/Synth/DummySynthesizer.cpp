@@ -100,7 +100,7 @@ void DummySynthesizer::onConfig()
 	}
 }
 
-void DummySynthesizer::render(BufferBox& buf)
+void DummySynthesizer::render(AudioBuffer& buf)
 {
 	for (int i=0; i<buf.length; i++){
 

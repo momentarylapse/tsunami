@@ -61,10 +61,10 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 	return !ir.empty();
 }
 
-void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
+void SongRenderer::bb_render_audio_track_no_fx(AudioBuffer &buf, Track *t)
 {
 	// track buffer
-	BufferBox buf0 = t->readBuffersCol(range_cur);
+	AudioBuffer buf0 = t->readBuffersCol(range_cur);
 	buf.swap_ref(buf0);
 
 	// subs
@@ -83,7 +83,7 @@ void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	}
 }
 
-void make_silence(BufferBox &buf, int size)
+void make_silence(AudioBuffer &buf, int size)
 {
 	if (buf.length == 0){
 		buf.resize(size);
@@ -94,7 +94,7 @@ void make_silence(BufferBox &buf, int size)
 	}
 }
 
-void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
+void SongRenderer::bb_render_time_track_no_fx(AudioBuffer &buf, Track *t)
 {
 	make_silence(buf, range_cur.length);
 
@@ -110,7 +110,7 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	t->synth->read(buf, midi_streamer);
 }
 
-void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	make_silence(buf, range_cur.length);
 
@@ -128,7 +128,7 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	t->synth->read(buf, midi_streamer);
 }
 
-void SongRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	if (t->type == Track::TYPE_AUDIO)
 		bb_render_audio_track_no_fx(buf, t);
@@ -138,7 +138,7 @@ void SongRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
 		bb_render_midi_track_no_fx(buf, t, ti);
 }
 
-void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
+void SongRenderer::make_fake_track(Track *t, AudioBuffer &buf)
 {
 	//msg_write("fake track");
 	t->song = song;
@@ -147,7 +147,7 @@ void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
 	t->layers[0].buffers[0].set_as_ref(buf, 0, range_cur.length);
 }
 
-void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
+void SongRenderer::bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list)
 {
 	buf.make_own();
 
@@ -164,7 +164,7 @@ void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list
 			fx->apply(buf, &fake_track, false);
 }
 
-void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_track_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	bb_render_track_no_fx(buf, t, ti);
 
@@ -180,7 +180,7 @@ int get_first_usable_track(Song *s)
 	return -1;
 }
 
-void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
+void SongRenderer::bb_render_song_no_fx(AudioBuffer &buf)
 {
 	// any un-muted track?
 	int i0 = get_first_usable_track(song);
@@ -198,7 +198,7 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 		for (int i=i0+1;i<song->tracks.num;i++){
 			if (song->tracks[i]->muted)
 				continue;
-			BufferBox tbuf;
+			AudioBuffer tbuf;
 			bb_render_track_fx(tbuf, song->tracks[i], i);
 			buf.make_own();
 			buf.add(tbuf, 0, song->tracks[i]->volume, song->tracks[i]->panning);
@@ -220,7 +220,7 @@ void unapply_curves(Song *audio)
 		c->unapply();
 }
 
-void SongRenderer::read_basic(BufferBox &buf, int pos, int size)
+void SongRenderer::read_basic(AudioBuffer &buf, int pos, int size)
 {
 	range_cur = Range(pos, size);
 
@@ -236,7 +236,7 @@ void SongRenderer::read_basic(BufferBox &buf, int pos, int size)
 	unapply_curves(song);
 }
 
-int SongRenderer::read(BufferBox &buf)
+int SongRenderer::read(AudioBuffer &buf)
 {
 	int size = max(min(buf.length, _range.end() - pos), 0);
 
@@ -244,7 +244,7 @@ int SongRenderer::read(BufferBox &buf)
 		buf.resize(size);
 		int chunk = 128;
 		for (int d=0; d<size; d+=chunk){
-			BufferBox tbuf;
+			AudioBuffer tbuf;
 			read_basic(tbuf, pos + d, min(size - d, chunk));
 			buf.set(tbuf, d, 1.0f);
 		}
@@ -258,7 +258,7 @@ int SongRenderer::read(BufferBox &buf)
 	return size;
 }
 
-void SongRenderer::render(const Range &range, BufferBox &buf)
+void SongRenderer::render(const Range &range, AudioBuffer &buf)
 {
 	prepare(range, false);
 	buf.resize(range.length);

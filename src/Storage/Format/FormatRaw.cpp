@@ -41,7 +41,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 	for (int i=0; i<config.offset; i++)
 		f->WriteByte(0);
 
-	BufferBox buf;
+	AudioBuffer buf;
 	buf.resize(CHUNK_SIZE);
 	int samples = r->getNumSamples();
 	int done = 0;

@@ -1,14 +1,14 @@
 /*
- * ActionTrackGrowBufferBox.cpp
+ * ActionTrackGrowBuffer.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "ActionTrack__GrowBufferBox.h"
 #include "../../../Data/Track.h"
+#include "ActionTrack__GrowBuffer.h"
 
-ActionTrack__GrowBufferBox::ActionTrack__GrowBufferBox(Track *t, int _level_no, int _index, int _new_length)
+ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(Track *t, int _level_no, int _index, int _new_length)
 {
 	track_no = get_track_index(t);
 	level_no = _level_no;
@@ -17,12 +17,12 @@ ActionTrack__GrowBufferBox::ActionTrack__GrowBufferBox(Track *t, int _level_no, 
 	old_length = 0;
 }
 
-void *ActionTrack__GrowBufferBox::execute(Data *d)
+void *ActionTrack__GrowBuffer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
 	old_length = b.length;
 	b.resize(new_length);
 
@@ -31,12 +31,12 @@ void *ActionTrack__GrowBufferBox::execute(Data *d)
 
 
 
-void ActionTrack__GrowBufferBox::undo(Data *d)
+void ActionTrack__GrowBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
 	b.resize(old_length);
 }
 

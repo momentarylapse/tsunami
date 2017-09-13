@@ -44,13 +44,13 @@ void RingBuffer::moveWritePos(int delta)
 		write_pos -= buf.length;
 }
 
-void RingBuffer::read(BufferBox& b)
+void RingBuffer::read(AudioBuffer& b)
 {
 	b.set(buf, read_pos, 1.0f);
 	moveReadPos(b.length);
 }
 
-void RingBuffer::write(BufferBox& b)
+void RingBuffer::write(AudioBuffer& b)
 {
 	int size_a = min(b.length, buf.length - write_pos);
 	buf.set(b, write_pos, 1.0f);
@@ -63,7 +63,7 @@ void RingBuffer::write(BufferBox& b)
 	moveWritePos(b.length);
 }
 
-void RingBuffer::peekRef(BufferBox &b, int size)
+void RingBuffer::peekRef(AudioBuffer &b, int size)
 {
 	if (size >= 0){
 		size = min(size, available());
@@ -75,13 +75,13 @@ void RingBuffer::peekRef(BufferBox &b, int size)
 	}
 }
 
-void RingBuffer::readRef(BufferBox &b, int size)
+void RingBuffer::readRef(AudioBuffer &b, int size)
 {
 	peekRef(b, size);
 	moveReadPos(b.length);
 }
 
-void RingBuffer::writeRef(BufferBox &b, int size)
+void RingBuffer::writeRef(AudioBuffer &b, int size)
 {
 	size = min(size, buf.length - write_pos);
 	b.set_as_ref(buf, write_pos, size);

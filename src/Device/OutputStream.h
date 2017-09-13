@@ -70,7 +70,7 @@ public:
 	void _cdecl seek(int pos);
 
 	virtual float _cdecl getSampleRate();
-	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
+	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 
 	float _cdecl getVolume();
 	void _cdecl setVolume(float _volume);

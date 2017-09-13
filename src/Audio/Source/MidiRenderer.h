@@ -27,7 +27,7 @@ public:
 	Synthesizer *_cdecl getSynthesizer(){ return s; }
 	void _cdecl setSynthesizer(Synthesizer *s);
 
-	virtual int _cdecl read(BufferBox &buf);
+	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
 
 	virtual int _cdecl getSampleRate();

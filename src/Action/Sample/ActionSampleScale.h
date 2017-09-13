@@ -11,7 +11,7 @@
 
 #include "../Action.h"
 
-class BufferBox;
+class AudioBuffer;
 class Sample;
 
 class ActionSampleScale : public Action
@@ -25,7 +25,7 @@ public:
 
 private:
 	Sample *sample;
-	BufferBox *buf;
+	AudioBuffer *buf;
 	int new_size;
 	int method;
 };

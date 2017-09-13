@@ -7,13 +7,13 @@
 
 #include "../Source/BufferStreamer.h"
 
-BufferStreamer::BufferStreamer(BufferBox *b)
+BufferStreamer::BufferStreamer(AudioBuffer *b)
 {
 	buf = b;
 	offset = 0;
 }
 
-void BufferStreamer::__init__(BufferBox* buf)
+void BufferStreamer::__init__(AudioBuffer* buf)
 {
 	new(this) BufferStreamer(buf);
 }
@@ -22,7 +22,7 @@ void BufferStreamer::__delete__()
 {
 }
 
-int BufferStreamer::read(BufferBox& _buf)
+int BufferStreamer::read(AudioBuffer& _buf)
 {
 	int n = min(_buf.length, buf->length - offset);
 	_buf.set(*buf, -offset, 1);

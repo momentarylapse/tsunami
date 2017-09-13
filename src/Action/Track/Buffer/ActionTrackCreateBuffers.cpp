@@ -6,11 +6,11 @@
  */
 
 #include "ActionTrackCreateBuffers.h"
-#include "ActionTrack__AddBufferBox.h"
-#include "ActionTrack__GrowBufferBox.h"
-#include "ActionTrack__AbsorbBufferBox.h"
 #include "../../../Data/Track.h"
 #include <assert.h>
+#include "ActionTrack__AbsorbBuffer.h"
+#include "ActionTrack__AddBuffer.h"
+#include "ActionTrack__GrowBuffer.h"
 
 ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int _level_no, const Range &_r)
 {
@@ -30,7 +30,7 @@ void ActionTrackCreateBuffers::build(Data *d)
 	// last buffer before <pos>?
 	int n_pos = -1;
 	int n_before = -1;
-	foreachi(BufferBox &b, l.buffers, i){
+	foreachi(AudioBuffer &b, l.buffers, i){
 		if ((r.offset >= b.offset) and (r.offset <= b.offset + b.length))
 			n_pos = i;
 		if (r.offset >= b.offset)
@@ -44,22 +44,22 @@ void ActionTrackCreateBuffers::build(Data *d)
 		//msg_write("inside");
 
 		// use base buffers
-		BufferBox &b = l.buffers[n_pos];
+		AudioBuffer &b = l.buffers[n_pos];
 
 		// too small?
 		if (r.end() > b.offset + b.length)
-			addSubAction(new ActionTrack__GrowBufferBox(t, level_no, n_pos, r.end() - b.offset), d);
+			addSubAction(new ActionTrack__GrowBuffer(t, level_no, n_pos, r.end() - b.offset), d);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		addSubAction(new ActionTrack__AddBufferBox(t, level_no, n_pos, r), d);
+		addSubAction(new ActionTrack__AddBuffer(t, level_no, n_pos, r), d);
 	}
 
 	// collision???  -> absorb
 	for (int i=l.buffers.num-1;i>n_pos;i--)
 		if (l.buffers[i].offset <= r.end())
-			addSubAction(new ActionTrack__AbsorbBufferBox(t, level_no, n_pos, i), d);
+			addSubAction(new ActionTrack__AbsorbBuffer(t, level_no, n_pos, i), d);
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

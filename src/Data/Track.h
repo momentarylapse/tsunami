@@ -9,12 +9,12 @@
 #define TRACK_H_
 
 #include "Range.h"
-#include "BufferBox.h"
 #include "../Midi/MidiData.h"
 #include "Sample.h"
 #include "../Midi/Instrument.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
+#include "AudioBuffer.h"
 #include "Song.h"
 
 
@@ -24,7 +24,7 @@
 
 #define DEFAULT_SAMPLE_RATE		44100
 
-class BufferBox;
+class AudioBuffer;
 class Song;
 class Synthesizer;
 class Effect;
@@ -33,7 +33,7 @@ class Effect;
 class TrackLayer
 {
 public:
-	Array<BufferBox> buffers;
+	Array<AudioBuffer> buffers;
 };
 
 class TrackMarker
@@ -59,8 +59,8 @@ public:
 
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
-	BufferBox _cdecl readBuffers(int layer_no, const Range &r);
-	BufferBox _cdecl readBuffersCol(const Range &r);
+	AudioBuffer _cdecl readBuffers(int layer_no, const Range &r);
+	AudioBuffer _cdecl readBuffersCol(const Range &r);
 
 	string _cdecl getNiceName();
 	int _cdecl get_index();
@@ -72,7 +72,7 @@ public:
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
 	void _cdecl move(int target);
-	BufferBox _cdecl getBuffers(int layer_no, const Range &r);
+	AudioBuffer _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiData &midi);
 	void _cdecl addEffect(Effect *effect);
 	void _cdecl deleteEffect(int index);

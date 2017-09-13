@@ -18,7 +18,7 @@ public:
 	virtual ~DummySynthesizer();
 	void __init__();
 
-	virtual void _cdecl render(BufferBox &buf);
+	virtual void _cdecl render(AudioBuffer &buf);
 
 	virtual void _cdecl onConfig();
 

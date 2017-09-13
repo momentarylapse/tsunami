@@ -30,7 +30,7 @@ void EffectRenderer::__delete__()
 	this->EffectRenderer::~EffectRenderer();
 }
 
-int EffectRenderer::read(BufferBox& buf)
+int EffectRenderer::read(AudioBuffer& buf)
 {
 	int r = child->read(buf);
 	for (Effect *f : fx){

@@ -44,7 +44,7 @@ int MidiRenderer::getSampleRate()
 	return DEFAULT_SAMPLE_RATE;
 }
 
-int MidiRenderer::read(BufferBox &buf)
+int MidiRenderer::read(AudioBuffer &buf)
 {
 	if (!s or !source)
 		return 0;

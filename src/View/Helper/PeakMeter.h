@@ -10,9 +10,9 @@
 
 #include "../../Stuff/Observer.h"
 #include "../../Stuff/Observable.h"
-#include "../../Data/BufferBox.h"
 
 class AudioView;
+class AudioBuffer;
 namespace hui{
 	class Timer;
 	class Panel;
@@ -23,7 +23,7 @@ class PeakMeterSource : public Observable
 public:
 	PeakMeterSource(const string &name) : Observable(name){}
 	virtual float _cdecl getSampleRate() = 0;
-	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples) = 0;
 	virtual int _cdecl getState() = 0;
 	enum{
 		STATE_PLAYING,
@@ -81,7 +81,7 @@ private:
 	void drawPeak(Painter *c, const rect &r, Data &d);
 
 	float sample_rate;
-	BufferBox buf;
+	AudioBuffer *buf;
 
 	hui::Timer* timer;
 

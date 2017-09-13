@@ -11,7 +11,7 @@
 #include "../../Sample/ActionSampleAdd.h"
 #include "ActionTrackAddSample.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const BufferBox &_buf, bool _auto_delete)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const AudioBuffer &_buf, bool _auto_delete)
 {
 	t = _t;
 	pos = _pos;

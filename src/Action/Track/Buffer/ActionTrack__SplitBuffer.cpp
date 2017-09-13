@@ -1,14 +1,15 @@
 /*
- * ActionTrack__SplitBufferBox.cpp
+ * ActionTrack__SplitBuffer.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
 #include <assert.h>
-#include "ActionTrack__SplitBufferBox.h"
 
-ActionTrack__SplitBufferBox::ActionTrack__SplitBufferBox(Track *t, int _level_no, int _index, int _offset)
+#include "ActionTrack__SplitBuffer.h"
+
+ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(Track *t, int _level_no, int _index, int _offset)
 {
 	track_no = get_track_index(t);
 	index = _index;
@@ -18,12 +19,12 @@ ActionTrack__SplitBufferBox::ActionTrack__SplitBufferBox(Track *t, int _level_no
 
 
 
-void ActionTrack__SplitBufferBox::undo(Data *d)
+void ActionTrack__SplitBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->layers[level_no].buffers[index];
-	BufferBox &b2 = t->layers[level_no].buffers[index + 1];
+	AudioBuffer &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b2 = t->layers[level_no].buffers[index + 1];
 
 	// transfer data
 	b.resize(b.length + b2.length);
@@ -35,7 +36,7 @@ void ActionTrack__SplitBufferBox::undo(Data *d)
 
 
 
-void *ActionTrack__SplitBufferBox::execute(Data *d)
+void *ActionTrack__SplitBuffer::execute(Data *d)
 {
 	//msg_write(format("cut %d   at %d", index, offset));
 	Song *a = dynamic_cast<Song*>(d);
@@ -46,11 +47,11 @@ void *ActionTrack__SplitBufferBox::execute(Data *d)
 	assert(offset < (l.buffers[index].length - 1));
 
 	// create new
-	BufferBox dummy;
+	AudioBuffer dummy;
 	l.buffers.insert(dummy, index + 1);
 
-	BufferBox &b = l.buffers[index];
-	BufferBox &b2 = l.buffers[index + 1];
+	AudioBuffer &b = l.buffers[index];
+	AudioBuffer &b2 = l.buffers[index + 1];
 
 	// new position
 	b2.offset = b.offset + offset;

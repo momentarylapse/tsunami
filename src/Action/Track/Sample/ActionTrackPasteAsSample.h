@@ -12,14 +12,14 @@
 
 class Track;
 class Song;
-class BufferBox;
+class AudioBuffer;
 class MidiData;
 class Sample;
 
 class ActionTrackPasteAsSample : public ActionGroup
 {
 public:
-	ActionTrackPasteAsSample(Track *t, int pos, const BufferBox &buf, bool auto_delete);
+	ActionTrackPasteAsSample(Track *t, int pos, const AudioBuffer &buf, bool auto_delete);
 	ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi, bool auto_delete);
 
 	virtual void build(Data *d);
@@ -27,7 +27,7 @@ public:
 
 	Track *t;
 	int pos;
-	const BufferBox *buf;
+	const AudioBuffer *buf;
 	const MidiData *midi;
 	Sample *sample;
 	bool auto_delete;

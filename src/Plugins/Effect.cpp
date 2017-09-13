@@ -64,7 +64,7 @@ string Effect::getError()
 	return format(_("Can't load effect: \"%s\""), name.c_str());
 }
 
-void Effect::apply(BufferBox &buf, Track *t, bool log_error)
+void Effect::apply(AudioBuffer &buf, Track *t, bool log_error)
 {
 	track = t;
 	song = t->song;
@@ -84,7 +84,7 @@ void Effect::doProcessTrack(Track *t, int _layer, const Range &r)
 	layer = _layer;
 	range = r;
 
-	BufferBox buf = t->getBuffers(layer, r);
+	AudioBuffer buf = t->getBuffers(layer, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(track, layer, r);
 	processTrack(&buf);
 	song->execute(a);

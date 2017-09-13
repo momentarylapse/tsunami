@@ -98,7 +98,7 @@ Range Track::getRange()
 	Range r = Range::EMPTY;
 
 	for (TrackLayer &l: layers)
-		for (BufferBox &b: l.buffers)
+		for (AudioBuffer &b: l.buffers)
 			r = r or b.range();
 
 	for (SampleRef *s: samples)
@@ -126,12 +126,12 @@ int Track::get_index()
 	return song->tracks.find(this);
 }
 
-BufferBox Track::readBuffers(int layer_no, const Range &r)
+AudioBuffer Track::readBuffers(int layer_no, const Range &r)
 {
-	BufferBox buf;
+	AudioBuffer buf;
 
 	// is <r> inside a buffer?
-	for (BufferBox &b: layers[layer_no].buffers){
+	for (AudioBuffer &b: layers[layer_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) and (p1 <= b.length)){
@@ -145,15 +145,15 @@ BufferBox Track::readBuffers(int layer_no, const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (BufferBox &b: layers[layer_no].buffers)
+	for (AudioBuffer &b: layers[layer_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
 }
 
-BufferBox Track::readBuffersCol(const Range &r)
+AudioBuffer Track::readBuffersCol(const Range &r)
 {
-	BufferBox buf;
+	AudioBuffer buf;
 
 	// is <r> inside a single buffer?
 	int num_inside = 0;
@@ -161,7 +161,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 	int inside_p0, inside_p1;
 	bool intersected = false;
 	foreachi(TrackLayer &l, layers, li)
-		foreachi(BufferBox &b, l.buffers, bi){
+		foreachi(AudioBuffer &b, l.buffers, bi){
 			if (b.range().covers(r)){
 				num_inside ++;
 				inside_layer = li;
@@ -182,13 +182,13 @@ BufferBox Track::readBuffersCol(const Range &r)
 
 	// fill with overlap
 	for (TrackLayer &l: layers)
-		for (BufferBox &b: l.buffers)
+		for (AudioBuffer &b: l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	return buf;
 }
 
-BufferBox Track::getBuffers(int layer_no, const Range &r)
+AudioBuffer Track::getBuffers(int layer_no, const Range &r)
 {
 	song->execute(new ActionTrackCreateBuffers(this, layer_no, r));
 	return readBuffers(layer_no, r);
@@ -197,14 +197,14 @@ BufferBox Track::getBuffers(int layer_no, const Range &r)
 void Track::updatePeaks()
 {
 	for (TrackLayer &l: layers)
-		for (BufferBox &b: l.buffers)
+		for (AudioBuffer &b: l.buffers)
 			b.update_peaks();
 }
 
 void Track::invalidateAllPeaks()
 {
 	for (TrackLayer &l: layers)
-		for (BufferBox &b: l.buffers)
+		for (AudioBuffer &b: l.buffers)
 			b.peaks.clear();
 }
 

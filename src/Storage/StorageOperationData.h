@@ -15,7 +15,7 @@ class Progress;
 namespace hui{
 	class Window;
 }
-class BufferBox;
+class AudioBuffer;
 class Track;
 class Storage;
 class Format;
@@ -24,7 +24,7 @@ class AudioSource;
 class StorageOperationData
 {
 public:
-	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, BufferBox *b, const string &filename, const string &message, hui::Window *win);
+	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, AudioBuffer *b, const string &filename, const string &message, hui::Window *win);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -44,7 +44,7 @@ public:
 	Song *song;
 	Progress *progress;
 	string filename;
-	BufferBox *buf;
+	AudioBuffer *buf;
 	Track *track;
 	AudioSource *renderer;
 	int offset;

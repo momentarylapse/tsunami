@@ -23,7 +23,7 @@
 #include "../../Audio/Source/SongRenderer.h"
 
 
-void render_bufbox(Image &im, BufferBox &b, AudioView *view)
+void render_bufbox(Image &im, AudioBuffer &b, AudioView *view)
 {
 	int w = im.width;
 	int h = im.height;
@@ -195,7 +195,7 @@ void SampleManagerConsole::onListEdit()
 void SampleManagerConsole::onImport()
 {
 	if (tsunami->storage->askOpenImport(win)){
-		BufferBox buf;
+		AudioBuffer buf;
 		tsunami->storage->loadBufferBox(song, &buf, hui::Filename);
 		song->addSample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);

@@ -1,12 +1,12 @@
 /*
- * BufferBox.h
+ * AudioBuffer.h
  *
  *  Created on: 21.03.2012
  *      Author: michi
  */
 
-#ifndef BUFFERBOX_H_
-#define BUFFERBOX_H_
+#ifndef SRC_DATA_AUDIOBUFFER_H_
+#define SRC_DATA_AUDIOBUFFER_H_
 
 #include "../lib/file/file.h"
 #include "Range.h"
@@ -27,18 +27,18 @@ enum SampleFormat
 	NUM_SAMPLE_FORMATS
 };
 
-class BufferBox
+class AudioBuffer
 {
 public:
-	BufferBox();
-	BufferBox(const BufferBox &b);
-	~BufferBox();
+	AudioBuffer();
+	AudioBuffer(const AudioBuffer &b);
+	~AudioBuffer();
 
 	void _cdecl __init__();
 	void _cdecl __delete__();
 
-	void operator=(const BufferBox &b);
-	void __assign__(const BufferBox &other){ *this = other; }
+	void operator=(const AudioBuffer &b);
+	void __assign__(const AudioBuffer &other){ *this = other; }
 
 	int offset, length;
 	int channels;
@@ -54,12 +54,12 @@ public:
 	bool _cdecl is_ref() const;
 	void _cdecl make_own();
 	void _cdecl scale(float volume, float panning = 0);
-	void _cdecl swap_ref(BufferBox &b);
-	void _cdecl swap_value(BufferBox &b);
-	void _cdecl append(BufferBox &b);
-	void _cdecl set(const BufferBox &b, int offset, float volume);
-	void _cdecl add(const BufferBox &b, int offset, float volume, float panning);
-	void _cdecl set_as_ref(const BufferBox &b, int offset, int length);
+	void _cdecl swap_ref(AudioBuffer &b);
+	void _cdecl swap_value(AudioBuffer &b);
+	void _cdecl append(AudioBuffer &b);
+	void _cdecl set(const AudioBuffer &b, int offset, float volume);
+	void _cdecl add(const AudioBuffer &b, int offset, float volume, float panning);
+	void _cdecl set_as_ref(const AudioBuffer &b, int offset, int length);
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
 	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;
@@ -82,4 +82,4 @@ SampleFormat format_for_bits(int bits);
 int format_get_bits(SampleFormat);
 string format_name(SampleFormat format);
 
-#endif /* BUFFERBOX_H_ */
+#endif /* SRC_DATA_AUDIOBUFFER_H_ */

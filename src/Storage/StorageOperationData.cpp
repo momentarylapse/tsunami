@@ -11,9 +11,9 @@
 #include "../View/Helper/Progress.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
-#include "../Data/BufferBox.h"
+#include "../Data/AudioBuffer.h"
 
-StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, BufferBox *b, const string &_filename, const string &message, hui::Window *_win)
+StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
 {
 	win = _win;
 	storage = _storage;

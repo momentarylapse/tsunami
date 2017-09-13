@@ -6,6 +6,7 @@
  */
 
 #include "PeakMeter.h"
+#include "../../Data/AudioBuffer.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Tsunami.h"
 #include "../AudioView.h"
@@ -54,6 +55,7 @@ PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_so
 	view = _view;
 	mode = ModePeaks;
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	buf = new AudioBuffer;
 	enabled = false;
 	r.reset();
 	l.reset();
@@ -69,6 +71,7 @@ PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_so
 PeakMeter::~PeakMeter()
 {
 	setSource(NULL);
+	delete buf;
 	delete timer;
 }
 
@@ -159,8 +162,8 @@ void PeakMeter::onDraw(Painter *c)
 void PeakMeter::findPeaks()
 {
 	float dt = timer->peek();
-	r.update(buf.c[0], dt);
-	l.update(buf.c[1], dt);
+	r.update(buf->c[0], dt);
+	l.update(buf->c[1], dt);
 }
 
 void PeakMeter::clearData()
@@ -190,17 +193,17 @@ void PeakMeter::setMode(int _mode)
 void PeakMeter::findSpectrum()
 {
 	Array<complex> cr, cl;
-	cr.resize(buf.length / 2 + 1);
-	cl.resize(buf.length / 2 + 1);
-	FastFourierTransform::fft_r2c(buf.c[0], cr);
-	FastFourierTransform::fft_r2c(buf.c[1], cl);
+	cr.resize(buf->length / 2 + 1);
+	cl.resize(buf->length / 2 + 1);
+	FastFourierTransform::fft_r2c(buf->c[0], cr);
+	FastFourierTransform::fft_r2c(buf->c[1], cl);
 	r.spec.resize(SPECTRUM_SIZE);
 	l.spec.resize(SPECTRUM_SIZE);
 	for (int i=0;i<SPECTRUM_SIZE;i++){
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
-		int n0 = f0 * buf.length / sample_rate;
-		int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
+		int n0 = f0 * buf->length / sample_rate;
+		int n1 = max((int)(f1 * buf->length / sample_rate), n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){
@@ -224,7 +227,7 @@ void PeakMeter::onUpdate(Observable *o, const string &message)
 		if (timer->peek() < UPDATE_DT)
 			return;
 		sample_rate = source->getSampleRate();
-		source->getSomeSamples(buf, NUM_SAMPLES);
+		source->getSomeSamples(*buf, NUM_SAMPLES);
 		if (mode == ModePeaks)
 			findPeaks();
 		else if (mode == ModeSpectrum)

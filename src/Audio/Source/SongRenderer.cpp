@@ -5,7 +5,8 @@
  *      Author: michi
  */
 
-#include "SongRenderer.h"
+#include "../Source/SongRenderer.h"
+
 #include "../Synth/Synthesizer.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"

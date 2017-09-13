@@ -6,8 +6,9 @@
  */
 
 #include "FormatWave.h"
+
+#include "../../Audio/Source/AudioSource.h"
 #include "../../lib/math/math.h"
-#include "../../Audio/Renderer/AudioRenderer.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 16;
@@ -22,7 +23,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
 	const int CHUNK_SIZE = 1 << 15;
 
-	AudioRenderer *r = od->renderer;
+	AudioSource *r = od->renderer;
 
 	SampleFormat format = SAMPLE_FORMAT_16;
 	if (od->song)

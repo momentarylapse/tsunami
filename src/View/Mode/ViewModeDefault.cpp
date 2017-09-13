@@ -12,8 +12,8 @@
 #include "../../TsunamiWindow.h"
 #include "../../Device/OutputStream.h"
 #include "../../Action/Track/Sample/ActionTrackMoveSample.h"
-#include "../../Audio/Renderer/SongRenderer.h"
 #include "math.h"
+#include "../../Audio/Source/SongRenderer.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)

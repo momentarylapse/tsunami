@@ -6,12 +6,13 @@
  */
 
 #include "ViewModeMidi.h"
+
+#include "../../Audio/Source/MidiRenderer.h"
+#include "../../Audio/Source/SongRenderer.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Device/OutputStream.h"
-#include "../../Audio/Renderer/MidiRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
-#include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Midi/Clef.h"
 #include "../../Midi/MidiSource.h"
 #include "../../Data/SongSelection.h"

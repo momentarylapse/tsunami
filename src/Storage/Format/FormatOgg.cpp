@@ -8,7 +8,8 @@
 
 
 #include "FormatOgg.h"
-#include "../../Audio/Renderer/AudioRenderer.h"
+
+#include "../../Audio/Source/AudioSource.h"
 
 #ifndef OS_WINDOWS
 #include <vorbis/codec.h>
@@ -56,7 +57,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 
 void FormatOgg::saveViaRenderer(StorageOperationData *od)
 {
-	AudioRenderer *r = od->renderer;
+	AudioSource *r = od->renderer;
 
 	float OggQuality = hui::Config.getFloat("OggQuality", 0.5f);
 

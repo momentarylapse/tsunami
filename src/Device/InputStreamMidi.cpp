@@ -10,8 +10,9 @@
 #include "Device.h"
 #include "DeviceManager.h"
 #include "InputStreamMidi.h"
+
+#include "../Audio/Source/MidiRenderer.h"
 #include "OutputStream.h"
-#include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Midi/MidiSource.h"
 

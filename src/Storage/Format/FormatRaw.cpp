@@ -6,8 +6,9 @@
  */
 
 #include "FormatRaw.h"
+
+#include "../../Audio/Source/SongRenderer.h"
 #include "../../lib/math/math.h"
-#include "../../Audio/Renderer/SongRenderer.h"
 #include "../Dialog/RawConfigDialog.h"
 
 
@@ -28,7 +29,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
 	const int CHUNK_SIZE = 1<<15;
-	AudioRenderer *r = od->renderer;
+	AudioSource *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
 	if (!f){

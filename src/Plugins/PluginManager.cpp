@@ -6,6 +6,9 @@
  */
 
 #include "PluginManager.h"
+
+#include "../Audio/Source/MidiRenderer.h"
+#include "../Audio/Source/SongRenderer.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "FastFourierTransform.h"
@@ -16,10 +19,8 @@
 #include "../Device/InputStreamAny.h"
 #include "../Device/OutputStream.h"
 #include "../Device/DeviceManager.h"
-#include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
-#include "../Audio/Renderer/SongRenderer.h"
 #include "../Midi/MidiSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
@@ -352,17 +353,17 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.addSample", Kaba::mf(&Song::addSample));
 	Kaba::LinkExternal("Song.deleteSample", Kaba::mf(&Song::deleteSample));
 
-	AudioRenderer ar;
-	Kaba::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
+	AudioSource ar;
+	Kaba::DeclareClassSize("AudioRenderer", sizeof(AudioSource));
 	//Kaba::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
-	Kaba::LinkExternal("AudioRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioRenderer::__init__));
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioRenderer::__delete__), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "read", Kaba::mf(&AudioRenderer::read), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "reset", Kaba::mf(&AudioRenderer::reset), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "range", Kaba::mf(&AudioRenderer::range), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getPos", Kaba::mf(&AudioRenderer::getPos), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "seek", Kaba::mf(&AudioRenderer::seek), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Kaba::mf(&AudioRenderer::getSampleRate), &ar);
+	Kaba::LinkExternal("AudioRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "read", Kaba::mf(&AudioSource::read), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "reset", Kaba::mf(&AudioSource::reset), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "range", Kaba::mf(&AudioSource::range), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getPos", Kaba::mf(&AudioSource::getPos), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "seek", Kaba::mf(&AudioSource::seek), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Kaba::mf(&AudioSource::getSampleRate), &ar);
 
 	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));

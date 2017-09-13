@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_SONGRENDERER_H_
-#define SRC_AUDIO_SONGRENDERER_H_
+#ifndef SRC_AUDIO_SOURCE_SONGRENDERER_H_
+#define SRC_AUDIO_SOURCE_SONGRENDERER_H_
 
-#include "AudioRenderer.h"
+#include "../Source/AudioSource.h"
 
 class MidiDataSource;
 
-class SongRenderer : public AudioRenderer
+class SongRenderer : public AudioSource
 {
 public:
 	SongRenderer(Song *s);
@@ -62,4 +62,4 @@ public:
 	bool loop_if_allowed;
 };
 
-#endif /* SRC_AUDIO_SONGRENDERER_H_ */
+#endif /* SRC_AUDIO_SOURCE_SONGRENDERER_H_ */

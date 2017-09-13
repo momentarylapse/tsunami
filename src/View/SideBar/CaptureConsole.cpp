@@ -10,7 +10,6 @@
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
 #include "../../Device/OutputStream.h"
-#include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
@@ -19,6 +18,8 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "CaptureConsole.h"
+
+#include "../../Audio/Source/SongRenderer.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 

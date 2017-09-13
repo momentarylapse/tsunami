@@ -7,6 +7,8 @@
 
 
 #include "Configurable.h"
+
+#include "../Audio/Source/SongRenderer.h"
 #include "ConfigPanel.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -17,7 +19,6 @@
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
-#include "../Audio/Renderer/SongRenderer.h"
 #include "../Device/OutputStream.h"
 
 const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";

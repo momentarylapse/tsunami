@@ -1,20 +1,20 @@
 /*
- * AudioRenderer.h
+ * AudioSource.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef AUDIORENDERER_H_
-#define AUDIORENDERER_H_
+#ifndef SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
+#define SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
 
 #include "../../Data/Song.h"
 
-class AudioRenderer : public VirtualBase
+class AudioSource : public VirtualBase
 {
 public:
-	AudioRenderer();
-	virtual ~AudioRenderer(){}
+	AudioSource();
+	virtual ~AudioSource(){}
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -31,4 +31,4 @@ public:
 	virtual bool _cdecl needsReset(){ return false; }
 };
 
-#endif /* AUDIORENDERER_H_ */
+#endif /* SRC_AUDIO_SOURCE_AUDIOSOURCE_H_ */

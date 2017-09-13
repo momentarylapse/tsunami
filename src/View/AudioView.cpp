@@ -6,6 +6,9 @@
  */
 
 #include "AudioView.h"
+
+#include "../Audio/Source/MidiRenderer.h"
+#include "../Audio/Source/SongRenderer.h"
 #include "AudioViewTrack.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
@@ -17,9 +20,7 @@
 #include "../Device/InputStreamAudio.h"
 #include "../Device/InputStreamMidi.h"
 #include "../Device/OutputStream.h"
-#include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
-#include "../Audio/Renderer/SongRenderer.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"

@@ -7,6 +7,8 @@
 
 #include "lib/hui/hui.h"
 #include "TsunamiWindow.h"
+
+#include "Audio/Source/SongRenderer.h"
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/SettingsDialog.h"
@@ -38,7 +40,6 @@
 #include "Device/OutputStream.h"
 #include "Device/DeviceManager.h"
 #include "Device/InputStreamAny.h"
-#include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
 

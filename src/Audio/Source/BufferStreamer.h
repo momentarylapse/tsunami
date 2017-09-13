@@ -1,20 +1,20 @@
 /*
- * BufferRenderer.h
+ * BufferStreamer.h
  *
  *  Created on: 25.11.2015
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_RENDERER_BUFFERRENDERER_H_
-#define SRC_AUDIO_RENDERER_BUFFERRENDERER_H_
+#ifndef SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
+#define SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
 
-#include "AudioRenderer.h"
+#include "../Source/AudioSource.h"
 
-class BufferRenderer : public AudioRenderer
+class BufferStreamer : public AudioSource
 {
 public:
-	BufferRenderer(BufferBox *buf);
-	virtual ~BufferRenderer(){}
+	BufferStreamer(BufferBox *buf);
+	virtual ~BufferStreamer(){}
 
 	void _cdecl __init__(BufferBox *buf);
 	virtual void _cdecl __delete__();
@@ -31,4 +31,4 @@ public:
 	int offset;
 };
 
-#endif /* SRC_AUDIO_RENDERER_BUFFERRENDERER_H_ */
+#endif /* SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_ */

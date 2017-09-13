@@ -7,7 +7,8 @@
 
 #include "FormatFlac.h"
 #include <math.h>
-#include "../../Audio/Renderer/AudioRenderer.h"
+
+#include "../../Audio/Source/AudioSource.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 
@@ -164,7 +165,7 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
-	AudioRenderer *r = od->renderer;
+	AudioSource *r = od->renderer;
 
 	FLAC__StreamEncoder *encoder = NULL;
 	FLAC__StreamMetadata *metadata = NULL;

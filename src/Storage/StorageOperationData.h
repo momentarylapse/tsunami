@@ -19,7 +19,7 @@ class BufferBox;
 class Track;
 class Storage;
 class Format;
-class AudioRenderer;
+class AudioSource;
 
 class StorageOperationData
 {
@@ -46,7 +46,7 @@ public:
 	string filename;
 	BufferBox *buf;
 	Track *track;
-	AudioRenderer *renderer;
+	AudioSource *renderer;
 	int offset;
 	int layer;
 };

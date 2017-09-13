@@ -13,7 +13,7 @@
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
-class AudioRenderer;
+class AudioSource;
 class Format;
 
 class FormatDescriptor

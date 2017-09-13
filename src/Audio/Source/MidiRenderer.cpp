@@ -5,8 +5,9 @@
  *      Author: michi
  */
 
+#include "../Source/MidiRenderer.h"
+
 #include "../Synth/Synthesizer.h"
-#include "MidiRenderer.h"
 
 
 

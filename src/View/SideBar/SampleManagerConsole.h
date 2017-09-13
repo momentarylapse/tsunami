@@ -13,7 +13,7 @@
 class Song;
 class Sample;
 class OutputStream;
-class BufferRenderer;
+class BufferStreamer;
 class SampleManagerItem;
 class Progress;
 class AudioView;
@@ -54,7 +54,7 @@ public:
 	void setSelection(const Array<Sample*> &samples);
 
 	OutputStream *preview_stream;
-	BufferRenderer *preview_renderer;
+	BufferStreamer *preview_renderer;
 	Sample *preview_sample;
 
 	Progress *progress;

@@ -5,10 +5,11 @@
  *      Author: michi
  */
 
-#include "EffectRenderer.h"
+#include "../Source/EffectRenderer.h"
+
 #include "../../Plugins/Effect.h"
 
-EffectRenderer::EffectRenderer(AudioRenderer* _child, const Array<Effect*> _fx)
+EffectRenderer::EffectRenderer(AudioSource* _child, const Array<Effect*> _fx)
 {
 	child = _child;
 	fx = _fx;
@@ -19,7 +20,7 @@ EffectRenderer::~EffectRenderer()
 {
 }
 
-void EffectRenderer::__init__(AudioRenderer *_child, const Array<Effect*> _fx)
+void EffectRenderer::__init__(AudioSource *_child, const Array<Effect*> _fx)
 {
 	new(this) EffectRenderer(_child, _fx);
 }

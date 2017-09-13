@@ -5,17 +5,17 @@
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_RENDERER_MIDIRENDERER_H_
-#define SRC_AUDIO_RENDERER_MIDIRENDERER_H_
+#ifndef SRC_AUDIO_SOURCE_MIDIRENDERER_H_
+#define SRC_AUDIO_SOURCE_MIDIRENDERER_H_
 
 
-#include "AudioRenderer.h"
+#include "../Source/AudioSource.h"
 
 class Synthesizer;
 class MidiEvent;
 class MidiSource;
 
-class MidiRenderer : public AudioRenderer
+class MidiRenderer : public AudioSource
 {
 public:
 	MidiRenderer(Synthesizer *s, MidiSource *source);
@@ -38,4 +38,4 @@ private:
 	bool samples_remaining;
 };
 
-#endif /* SRC_AUDIO_RENDERER_MIDIRENDERER_H_ */
+#endif /* SRC_AUDIO_SOURCE_MIDIRENDERER_H_ */

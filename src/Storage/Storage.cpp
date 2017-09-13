@@ -6,6 +6,8 @@
  */
 
 #include "Storage.h"
+
+#include "../Audio/Source/SongRenderer.h"
 #include "Format/Format.h"
 #include "Format/FormatWave.h"
 #include "Format/FormatRaw.h"
@@ -22,7 +24,6 @@
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
-#include "../Audio/Renderer/SongRenderer.h"
 #include "../Data/Song.h"
 
 Storage::Storage()
@@ -161,7 +162,7 @@ bool Storage::save(Song *a, const string &filename)
 	return true;
 }
 
-bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
+bool Storage::saveViaRenderer(AudioSource *r, const string &filename)
 {
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
 	if (!d)

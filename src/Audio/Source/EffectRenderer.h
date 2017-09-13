@@ -5,21 +5,21 @@
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_RENDERER_EFFECTRENDERER_H_
-#define SRC_AUDIO_RENDERER_EFFECTRENDERER_H_
+#ifndef SRC_AUDIO_SOURCE_EFFECTRENDERER_H_
+#define SRC_AUDIO_SOURCE_EFFECTRENDERER_H_
 
-#include "AudioRenderer.h"
+#include "../Source/AudioSource.h"
 
 class Effect;
 class Track;
 
-class EffectRenderer : public AudioRenderer
+class EffectRenderer : public AudioSource
 {
 public:
-	EffectRenderer(AudioRenderer *child, const Array<Effect*> fx);
+	EffectRenderer(AudioSource *child, const Array<Effect*> fx);
 	virtual ~EffectRenderer();
 
-	void _cdecl __init__(AudioRenderer *child, const Array<Effect*> fx);
+	void _cdecl __init__(AudioSource *child, const Array<Effect*> fx);
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(BufferBox &buf);
@@ -33,9 +33,9 @@ public:
 
 	void setTrack(Track *t);
 
-	AudioRenderer *child;
+	AudioSource *child;
 	Array<Effect*> fx;
 	Track *track;
 };
 
-#endif /* SRC_AUDIO_RENDERER_EFFECTRENDERER_H_ */
+#endif /* SRC_AUDIO_SOURCE_EFFECTRENDERER_H_ */

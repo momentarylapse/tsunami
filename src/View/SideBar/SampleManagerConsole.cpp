@@ -9,8 +9,6 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Device/OutputStream.h"
-#include "../../Audio/Renderer/BufferRenderer.h"
-#include "../../Audio/Renderer/SongRenderer.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
 #include "../../Tsunami.h"
@@ -20,6 +18,9 @@
 #include "../../Data/Song.h"
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
+
+#include "../../Audio/Source/BufferStreamer.h"
+#include "../../Audio/Source/SongRenderer.h"
 
 
 void render_bufbox(Image &im, BufferBox &b, AudioView *view)
@@ -210,7 +211,7 @@ void SampleManagerConsole::onExport()
 
 	if (tsunami->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::TYPE_AUDIO){
-			BufferRenderer rr(&sel[0]->buf);
+			BufferStreamer rr(&sel[0]->buf);
 			tsunami->storage->saveViaRenderer(&rr, hui::Filename);
 		}
 	}
@@ -318,7 +319,7 @@ void SampleManagerConsole::onPreview()
 		endPreview();
 	int sel = getInt("sample_list");
 	preview_sample = items[sel]->s;
-	preview_renderer = new BufferRenderer(&preview_sample->buf);
+	preview_renderer = new BufferStreamer(&preview_sample->buf);
 	preview_stream = new OutputStream(preview_renderer);
 
 	progress = new ProgressCancelable(_("Preview"), win);

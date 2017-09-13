@@ -17,7 +17,7 @@
 #include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
-class AudioRenderer;
+class AudioSource;
 class DeviceManager;
 class Device;
 class Thread;
@@ -39,10 +39,10 @@ class OutputStream : public PeakMeterSource
 	friend StreamThread;
 public:
 	//AudioStream();
-	OutputStream(AudioRenderer *r);
+	OutputStream(AudioSource *r);
 	virtual ~OutputStream();
 
-	void _cdecl __init__(AudioRenderer *r);
+	void _cdecl __init__(AudioSource *r);
 	virtual void _cdecl __delete__();
 
 	void create_dev();
@@ -62,8 +62,8 @@ public:
 	bool _cdecl isPlaying();
 	bool _cdecl isPaused();
 	int _cdecl getState();
-	void _cdecl setSource(AudioRenderer *r);
-	AudioRenderer *_cdecl getSource(){ return renderer; }
+	void _cdecl setSource(AudioSource *r);
+	AudioSource *_cdecl getSource(){ return renderer; }
 	void _cdecl setDevice(Device *d);
 	int _cdecl getPos();
 	bool _cdecl getPosSafe(int &pos);
@@ -89,7 +89,7 @@ private:
 	float update_dt;
 	int hui_runner_id;
 
-	AudioRenderer *renderer;
+	AudioSource *renderer;
 	RingBuffer ring_buf;
 
 	bool reading;

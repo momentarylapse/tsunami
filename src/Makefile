@@ -75,11 +75,11 @@ OBJ = \
  Action/ActionGroup.o\
  Action/ActionManager.o\
  Action/ActionMergable.o\
- Audio/Renderer/AudioRenderer.o\
- Audio/Renderer/BufferRenderer.o\
- Audio/Renderer/EffectRenderer.o\
- Audio/Renderer/MidiRenderer.o\
- Audio/Renderer/SongRenderer.o\
+ Audio/Source/AudioSource.o\
+ Audio/Source/BufferStreamer.o\
+ Audio/Source/EffectRenderer.o\
+ Audio/Source/MidiRenderer.o\
+ Audio/Source/SongRenderer.o\
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
@@ -525,20 +525,20 @@ Action/ActionManager.o : Action/ActionManager.cpp
 Action/ActionMergable.o : Action/ActionMergable.cpp
 	$(CPP) -c Action/ActionMergable.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/AudioRenderer.o : Audio/Renderer/AudioRenderer.cpp
-	$(CPP) -c Audio/Renderer/AudioRenderer.cpp -o $@ $(CXXFLAGS)
+Audio/Source/AudioSource.o : Audio/Source/AudioSource.cpp
+	$(CPP) -c Audio/Source/AudioSource.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/BufferRenderer.o : Audio/Renderer/BufferRenderer.cpp
-	$(CPP) -c Audio/Renderer/BufferRenderer.cpp -o $@ $(CXXFLAGS)
+Audio/Source/BufferStreamer.o : Audio/Source/BufferStreamer.cpp
+	$(CPP) -c Audio/Source/BufferStreamer.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/EffectRenderer.o : Audio/Renderer/EffectRenderer.cpp
-	$(CPP) -c Audio/Renderer/EffectRenderer.cpp -o $@ $(CXXFLAGS)
+Audio/Source/EffectRenderer.o : Audio/Source/EffectRenderer.cpp
+	$(CPP) -c Audio/Source/EffectRenderer.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/MidiRenderer.o : Audio/Renderer/MidiRenderer.cpp
-	$(CPP) -c Audio/Renderer/MidiRenderer.cpp -o $@ $(CXXFLAGS)
+Audio/Source/MidiRenderer.o : Audio/Source/MidiRenderer.cpp
+	$(CPP) -c Audio/Source/MidiRenderer.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/SongRenderer.o : Audio/Renderer/SongRenderer.cpp
-	$(CPP) -c Audio/Renderer/SongRenderer.cpp -o $@ $(CXXFLAGS)
+Audio/Source/SongRenderer.o : Audio/Source/SongRenderer.cpp
+	$(CPP) -c Audio/Source/SongRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/Synth/DummySynthesizer.o : Audio/Synth/DummySynthesizer.cpp
 	$(CPP) -c Audio/Synth/DummySynthesizer.cpp -o $@ $(CXXFLAGS)

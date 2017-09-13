@@ -6,12 +6,13 @@
  */
 
 #include "../Tsunami.h"
-#include "../Audio/Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
 #include "Device.h"
 #include "OutputStream.h"
+
+#include "../Audio/Source/AudioSource.h"
 
 #ifdef DEVICE_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -219,7 +220,7 @@ public:
 	}
 };
 
-OutputStream::OutputStream(AudioRenderer *r) :
+OutputStream::OutputStream(AudioSource *r) :
 	PeakMeterSource("OutputStream"),
 	ring_buf(1048576)
 {
@@ -260,7 +261,7 @@ OutputStream::~OutputStream()
 	kill();
 }
 
-void OutputStream::__init__(AudioRenderer *r)
+void OutputStream::__init__(AudioSource *r)
 {
 	new(this) OutputStream(r);
 }
@@ -424,7 +425,7 @@ void OutputStream::stream()
 	reading = false;
 }
 
-void OutputStream::setSource(AudioRenderer *r)
+void OutputStream::setSource(AudioSource *r)
 {
 	if (playing)
 		stop();

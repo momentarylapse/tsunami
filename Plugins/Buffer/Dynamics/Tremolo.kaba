@@ -27,6 +27,6 @@ class Tremolo extends AudioEffect
 			// old value
 			bb *= f
 	
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		doTremolo(buf.r)
 		doTremolo(buf.l)

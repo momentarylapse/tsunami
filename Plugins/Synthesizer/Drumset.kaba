@@ -81,7 +81,7 @@ class DrumsetSynthesizer extends Synthesizer
 		if state.s
 			state.s.setSampleRate(sample_rate)
 			state.s.onConfig()
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		Synthesizer *s = state.s
 		if !s
 			return

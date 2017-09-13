@@ -11,7 +11,7 @@ class Config extends PluginData
 class SinusSmoothSynthesizer extends Synthesizer
 	Config config
 
-	override void renderNote(BufferBox buf, Range r, float pitch, float volume)
+	override void renderNote(AudioBuffer buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)
 		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
 		float sm_d = config.release * sample_rate

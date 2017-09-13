@@ -9,7 +9,7 @@ int offset
 
 DummySynthesizer synth
 
-void fill(BufferBox buf)
+void fill(AudioBuffer buf)
 	buf.r = 0
 	buf.l = 0
 	

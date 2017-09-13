@@ -11,7 +11,7 @@ const float threshold = 5.0
 
 
 const int BUFFER_SIZE = 4096
-BufferBox buf
+AudioBuffer buf
 
 SuperNovaWindow *win
 

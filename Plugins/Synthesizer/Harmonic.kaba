@@ -104,7 +104,7 @@ class HarmonicSynthesizer extends Synthesizer
 		for p in state.pitch
 			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
 		
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		for i in 0:buf.length
 
 			// current events?

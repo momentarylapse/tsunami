@@ -17,6 +17,6 @@ class Octaver extends AudioEffect
 		for bb in b
 			bb = (bb * bb) * config.level + bb * (1 - config.level)
 
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		doOctaver(buf.r)
 		doOctaver(buf.l)

@@ -29,7 +29,7 @@ class PitchRecognizer
 			input.current_buffer.moveReadPos(available - BUFFER_SIZE)
 		int num = clampi(available, 0, BUFFER_SIZE)
 	
-		BufferBox buf
+		AudioBuffer buf
 		input.current_buffer.peekRef(buf, num)
 	
 		float[] temp

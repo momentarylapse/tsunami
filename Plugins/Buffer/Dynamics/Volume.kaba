@@ -17,7 +17,7 @@ class Volume extends AudioEffect
 	override ConfigPanel *createPanel()
 		return new VolumePanel(self)
 
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		float factor = config.volume
 		if config.maximize
 			float max = 0

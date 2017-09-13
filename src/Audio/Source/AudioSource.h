@@ -10,6 +10,8 @@
 
 #include "../../Data/Song.h"
 
+class AudioBuffer;
+
 class AudioSource : public VirtualBase
 {
 public:

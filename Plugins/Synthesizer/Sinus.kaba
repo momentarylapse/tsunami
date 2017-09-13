@@ -13,7 +13,7 @@ class SinusState extends PluginData
 class SinusSynthesizer extends Synthesizer
 	SinusState state
 
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i

@@ -100,7 +100,7 @@ class Circuit : AudioEffect
 	Config config
 	State state
 
-	overwrite void process(BufferBox buf)*/
+	overwrite void process(AudioBuffer buf)*/
 
 
 void main()

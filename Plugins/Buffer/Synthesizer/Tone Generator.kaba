@@ -18,7 +18,7 @@ class ToneGenerator extends AudioEffect
 	Config config
 	DummySynthesizer synth
 
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		Song *a = song
 		synth.setSampleRate(a.sample_rate)
 		

@@ -3,7 +3,7 @@ use "../api.kaba"
 
 class HeavySynthesizer extends Synthesizer
 	DummySynthesizer sub
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		sub.setSampleRate(sample_rate)
 		for e in events
 			MidiEvent ee = e

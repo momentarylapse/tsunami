@@ -3,5 +3,5 @@
 use "../../api.kaba"
 
 class Identity extends AudioEffect
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		nil

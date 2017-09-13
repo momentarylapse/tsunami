@@ -211,7 +211,7 @@ class FMSynthesizer extends Synthesizer
 				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
 				o.env.set2(c.initial, c.peak)
 
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 
 		for i in 0:buf.length
 

@@ -19,7 +19,7 @@ class SampleState extends PluginData
 class SampleSynthesizer extends Synthesizer
 	SampleConfig config
 	SampleState state
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		for e in events
 			if e.volume > 0
 				state.events.add(e)

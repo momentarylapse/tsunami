@@ -94,7 +94,7 @@ Chord[]  ParseChords(string str)
 		chords.add(c)
 	return chords
 
-/*void AddSimpleTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+/*void AddSimpleTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
 	float f_w = 1.0 / sample_rate * f * 2.0 * pi
 	int i0 = max(pos0, 0)
 	int i1 = min(pos1, buf.num)
@@ -108,14 +108,14 @@ Chord[]  ParseChords(string str)
 		buf.r[i] += d
 		buf.l[i] += d
 
-void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+void AddRichTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f,     vol * 0.6)
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 2, vol * 0.5)
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 4, vol * 0.3)
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 8, vol * 0.1)*/
 
-/*class RichtSynthesizer : DummySynthesizer
-	virtual void AddToneFreq(BufferBox buf, Range r, float freq, float volume)*/
+/*class RichSynthesizer : DummySynthesizer
+	virtual void AddToneFreq(AudioBuffer buf, Range r, float freq, float volume)*/
 
 /*void AddChord(Synthesizer s, Range r, Chord c, float volume)
 	

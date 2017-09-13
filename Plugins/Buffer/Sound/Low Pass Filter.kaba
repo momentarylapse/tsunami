@@ -20,7 +20,7 @@ class LowPassFilter extends AudioEffect
 	State state
 
 	// y[i] := α * x[i] + (1-α) * y[i-1]
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		float RC = 1 / (2 * pi * config.frequency)
 		float dt = 1.0 / song.sample_rate
 		float a = dt / (RC + dt)

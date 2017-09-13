@@ -3,7 +3,7 @@ use "../api.kaba"
 
 class InverseSynthesizer extends Synthesizer
 	DummySynthesizer sub
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		sub.setSampleRate(sample_rate)
 		sub.events = events
 		for e in sub.events

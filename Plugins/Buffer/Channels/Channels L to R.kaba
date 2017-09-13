@@ -3,6 +3,6 @@
 use "../../api.kaba"
 
 class LToR extends AudioEffect
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		buf.r = buf.l
 

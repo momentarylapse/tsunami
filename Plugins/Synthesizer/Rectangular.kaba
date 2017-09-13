@@ -16,7 +16,7 @@ class RectangularState extends PluginData
 class RectangularSynthesizer extends Synthesizer
 	RectangularState state
 
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i

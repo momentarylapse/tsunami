@@ -154,21 +154,21 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiEffect.notify", Kaba::mf(&MidiEffect::notify));
 	Kaba::DeclareClassVirtualIndex("MidiEffect", "onConfig", Kaba::mf(&MidiEffect::onConfig), &midieffect);
 
-	Kaba::DeclareClassSize("BufferBox", sizeof(AudioBuffer));
-	Kaba::DeclareClassOffset("BufferBox", "offset", _offsetof(AudioBuffer, offset));
-	Kaba::DeclareClassOffset("BufferBox", "length", _offsetof(AudioBuffer, length));
-	Kaba::DeclareClassOffset("BufferBox", "channels", _offsetof(AudioBuffer, channels));
-	Kaba::DeclareClassOffset("BufferBox", "r", _offsetof(AudioBuffer, c[0]));
-	Kaba::DeclareClassOffset("BufferBox", "l", _offsetof(AudioBuffer, c[1]));
-	Kaba::DeclareClassOffset("BufferBox", "peaks", _offsetof(AudioBuffer, peaks));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioBuffer::__init__));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioBuffer::__delete__));
-	Kaba::LinkExternal("BufferBox.clear", Kaba::mf(&AudioBuffer::clear));
-	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&AudioBuffer::__assign__));
-	Kaba::LinkExternal("BufferBox.range", Kaba::mf(&AudioBuffer::range));
-	Kaba::LinkExternal("BufferBox.add", Kaba::mf(&AudioBuffer::add));
-	Kaba::LinkExternal("BufferBox.set", Kaba::mf(&AudioBuffer::set));
-	Kaba::LinkExternal("BufferBox.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
+	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
+	Kaba::DeclareClassOffset("AudioBuffer", "offset", _offsetof(AudioBuffer, offset));
+	Kaba::DeclareClassOffset("AudioBuffer", "length", _offsetof(AudioBuffer, length));
+	Kaba::DeclareClassOffset("AudioBuffer", "channels", _offsetof(AudioBuffer, channels));
+	Kaba::DeclareClassOffset("AudioBuffer", "r", _offsetof(AudioBuffer, c[0]));
+	Kaba::DeclareClassOffset("AudioBuffer", "l", _offsetof(AudioBuffer, c[1]));
+	Kaba::DeclareClassOffset("AudioBuffer", "peaks", _offsetof(AudioBuffer, peaks));
+	Kaba::LinkExternal("AudioBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioBuffer::__init__));
+	Kaba::LinkExternal("AudioBuffer." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioBuffer::__delete__));
+	Kaba::LinkExternal("AudioBuffer.clear", Kaba::mf(&AudioBuffer::clear));
+	Kaba::LinkExternal("AudioBuffer." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&AudioBuffer::__assign__));
+	Kaba::LinkExternal("AudioBuffer.range", Kaba::mf(&AudioBuffer::range));
+	Kaba::LinkExternal("AudioBuffer.add", Kaba::mf(&AudioBuffer::add));
+	Kaba::LinkExternal("AudioBuffer.set", Kaba::mf(&AudioBuffer::set));
+	Kaba::LinkExternal("AudioBuffer.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
 
 
 	Kaba::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
@@ -354,16 +354,16 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.deleteSample", Kaba::mf(&Song::deleteSample));
 
 	AudioSource ar;
-	Kaba::DeclareClassSize("AudioRenderer", sizeof(AudioSource));
-	//Kaba::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
-	Kaba::LinkExternal("AudioRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "read", Kaba::mf(&AudioSource::read), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "reset", Kaba::mf(&AudioSource::reset), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "range", Kaba::mf(&AudioSource::range), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getPos", Kaba::mf(&AudioSource::getPos), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "seek", Kaba::mf(&AudioSource::seek), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Kaba::mf(&AudioSource::getSampleRate), &ar);
+	Kaba::DeclareClassSize("AudioSource", sizeof(AudioSource));
+	//Kaba::DeclareClassOffset("AudioSource", "sample_rate", _offsetof(AudioSource, sample_rate));
+	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "range", Kaba::mf(&AudioSource::range), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "getPos", Kaba::mf(&AudioSource::getPos), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "seek", Kaba::mf(&AudioSource::seek), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "getSampleRate", Kaba::mf(&AudioSource::getSampleRate), &ar);
 
 	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));

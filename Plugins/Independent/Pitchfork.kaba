@@ -3,7 +3,7 @@
 use "../api.kaba"
 
 
-class ForkRenderer extends AudioRenderer
+class ForkRenderer extends AudioSource
 	int offset
 	float freq
 	float volume
@@ -11,7 +11,7 @@ class ForkRenderer extends AudioRenderer
 		offset = 0
 		freq = 880
 		volume = 0.8
-	override int read(BufferBox buf)
+	override int read(AudioBuffer buf)
 		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * freq * 2.0 * pi
 		for i in 0:buf.length
 			buf.r[i] = sin((i + offset) * w_f) * volume

@@ -53,7 +53,7 @@ class Equalizer15 extends AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()

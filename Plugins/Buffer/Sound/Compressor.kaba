@@ -84,7 +84,7 @@ class Compressor extends AudioEffect
 	override ConfigPanel *createPanel()
 		return new CompressorPanel(self)
 
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		Song *a = song
 		
 		dgain_attack = 10 / (config.attack * a.sample_rate)

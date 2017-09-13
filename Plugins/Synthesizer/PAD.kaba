@@ -83,7 +83,7 @@ class PADSynthesizer extends Synthesizer
 			m = max(b, m)
 		p.buf /= (m * 1.2)
 
-	override void render(BufferBox buf)
+	override void render(AudioBuffer buf)
 			
 		for i in 0:buf.length
 			for e in events

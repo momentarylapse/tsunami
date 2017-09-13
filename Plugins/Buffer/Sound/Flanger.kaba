@@ -57,7 +57,7 @@ class Flanger extends AudioEffect
 				p = 0
 
 	
-	override void process(BufferBox buf)
+	override void process(AudioBuffer buf)
 		Song *a = song
 		int delay_samples = a.sample_rate * config.delay + 1
 		state.temp_r.resize(delay_samples)

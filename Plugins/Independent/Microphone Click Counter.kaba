@@ -110,7 +110,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	void onInput()
 		int available = input.current_buffer.available()
 	
-		BufferBox buf
+		AudioBuffer buf
 		input.current_buffer.readRef(buf, available)
 	
 		float[] temp

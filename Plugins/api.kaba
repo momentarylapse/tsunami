@@ -100,7 +100,7 @@ class AudioEffect
 	int layer_no
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void process(BufferBox buf)
+	extern virtual void process(AudioBuffer buf)
 	extern void resetConfig()
 	extern void resetState()
 	extern virtual ConfigPanel *createPanel()
@@ -124,37 +124,37 @@ class MidiEffect
 	//extern void notify()
 	extern virtual void onConfig()
 
-class BufferBox
+class AudioBuffer
 	int offset, length
 	int channels
 	float[] r, l
 	string[] peaks
 	extern void __init__()
 	extern void __delete__()
-	extern void __assign__(BufferBox other)
+	extern void __assign__(AudioBuffer other)
 	extern void clear()
 	extern Range range()
-	extern void set(BufferBox b, int offset, float volume)
-	extern void add(BufferBox b, int offset, float volume, float panning)
+	extern void set(AudioBuffer b, int offset, float volume)
+	extern void add(AudioBuffer b, int offset, float volume, float panning)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 
 class RingBuffer
 	extern int available()
-	extern void read(BufferBox b)
-	extern void write(BufferBox b)
-	extern void readRef(BufferBox b, int size)
-	extern void peekRef(BufferBox b, int size)
-	extern void writeRef(BufferBox b, int size)
+	extern void read(AudioBuffer b)
+	extern void write(AudioBuffer b)
+	extern void readRef(AudioBuffer b, int size)
+	extern void peekRef(AudioBuffer b, int size)
+	extern void writeRef(AudioBuffer b, int size)
 	extern void moveReadPos(int delta)
 	extern void moveWritePos(int delta)
 	extern void clear()
 	void __assign__(RingBuffer o)
 
 // general "interface"
-class AudioRenderer
+class AudioSource
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual int read(BufferBox buf)
+	extern virtual int read(AudioBuffer buf)
 	extern virtual void reset()
 	extern virtual Range range()
 	extern virtual int getPos()
@@ -176,7 +176,7 @@ class Synthesizer
 	MidiRawData events
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void render(BufferBox buf)
+	extern virtual void render(AudioBuffer buf)
 	extern virtual ConfigPanel *createPanel()
 	extern void resetState()
 	extern void resetConfig()
@@ -191,13 +191,13 @@ class Synthesizer
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	//extern overwrite void __delete__()
-	extern override void render(BufferBox buf)
+	extern override void render(AudioBuffer buf)
 
-class MidiRenderer extends AudioRenderer
+class MidiRenderer extends AudioSource
 	extern void __init__(Synthesizer *s, MidiSource *source)
 	extern override void __delete__()
 	extern void setSynthesizer(Synthesizer *s)
-	extern override int read(BufferBox buf)
+	extern override int read(AudioBuffer buf)
 	extern override void reset()
 	extern override int getSampleRate()
 
@@ -228,12 +228,12 @@ enum
 	TRACK_TYPE_MIDI
 
 class TrackLayer
-	BufferBox[] buffers
+	AudioBuffer[] buffers
 
 class Sample // TODO
 	string name
 	int type
-	BufferBox buf
+	AudioBuffer buf
 	MidiData midi
 	float volume
 	int uid
@@ -243,7 +243,7 @@ class Sample // TODO
 
 class SampleRef // TODO
 	Sample *origin
-	BufferBox *buf
+	AudioBuffer *buf
 	extern void __init__(Sample *sam)
 	extern virtual void __delete__()
 
@@ -277,8 +277,8 @@ class Track
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern BufferBox getBuffers(int layer_no, Range r)
-	extern BufferBox readBuffers(Range r)
+	extern AudioBuffer getBuffers(int layer_no, Range r)
+	extern AudioBuffer readBuffers(Range r)
 	
 	extern void setName(string name)
 	extern void setMuted(bool muted)
@@ -335,7 +335,7 @@ class Song
 	extern void addPause(int index, float time, bool affect_midi)
 	extern void editBar(int index, BarPattern p, bool affect_midi)
 	extern void deleteBar(int index, bool affect_midi)
-	extern Sample* addSample(string name, BufferBox buf)
+	extern Sample* addSample(string name, AudioBuffer buf)
 	extern void deleteSample(Sample* sample)
 
 class SongSelection
@@ -357,7 +357,7 @@ class ColorScheme
 class AudioView
 	SongSelection sel
 	OutputStream* stream
-	AudioRenderer* renderer
+	AudioSource* renderer
 	InputStreamAny* input
 	extern void addObserver(void* handler, void* func)
 	extern void removeObserver(void* handler)
@@ -365,9 +365,9 @@ class AudioView
 class SongRenderer
 	extern void __init__(Song* s)
 	extern virtual void __delete__()
-	extern void render(Range r, BufferBox buf)
+	extern void render(Range r, AudioBuffer buf)
 	extern void prepare(Range r, bool allow_loop)
-	extern virtual int read(BufferBox b)
+	extern virtual int read(AudioBuffer b)
 	extern virtual void reset()
 	extern virtual Range range()
 	extern virtual int getPos()
@@ -376,12 +376,12 @@ class SongRenderer
 
 
 class OutputStream
-	extern void __init__(AudioRenderer* r)
+	extern void __init__(AudioSource* r)
 	extern void __delete__()
 	extern void stop()
 	extern void play()
 	extern void pause()
-	//extern void setSource(AudioRenderer *r)
+	//extern void setSource(AudioSource *r)
 	extern bool isPlaying()
 	extern int getPos()
 	extern float getSampleRate()
@@ -391,7 +391,7 @@ class OutputStream
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer
-	BufferBox buffer
+	AudioBuffer buffer
 	MidiData midi
 	extern void start(int type, int sample_rate)
 	extern void stop()
@@ -419,14 +419,14 @@ class InputStreamAny
 	extern virtual void accumulate(bool enable)
 	extern virtual void resetAccumulation()
 	extern virtual float getSampleRate()
-	extern virtual void getSomeSamples(BufferBox buf, int num)
+	extern virtual void getSomeSamples(AudioBuffer buf, int num)
 	extern virtual int getState()
 	extern void addObserver(void* handler, void* func)
 	extern void removeObserver(void* handler)
 
 class InputStreamAudio extends InputStreamAny
 	RingBuffer current_buffer
-	BufferBox buffer
+	AudioBuffer buffer
 	extern void __init__(int sample_rate)
 	extern override void __delete__()
 	extern override bool start()
@@ -436,7 +436,7 @@ class InputStreamAudio extends InputStreamAny
 	extern override void accumulate(bool enable)
 	extern override void resetAccumulation()
 	extern override float getSampleRate()
-	extern override void getSomeSamples(BufferBox buf, int num)
+	extern override void getSomeSamples(AudioBuffer buf, int num)
 	extern override int getState()
 	
 /*class InputStream
@@ -455,7 +455,7 @@ class InputStreamAudio extends InputStreamAny
 	extern virtual int getSampleCount()
 
 	extern virtual float getSampleRate()
-	extern virtual void getSomeSamples(BufferBox buf, int num_samples)
+	extern virtual void getSomeSamples(AudioBuffer buf, int num_samples)
 	extern virtual int getState()
 
 	extern virtual void setDevice(string dev)
@@ -474,7 +474,7 @@ class InputStreamAudio extends InputStreamAny
 	bool capturing
 
 	RingBuffer current_buffer
-	BufferBox buffer
+	AudioBuffer buffer
 	MidiData midi
 	MidiData current_midi
 

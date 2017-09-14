@@ -78,21 +78,21 @@ PeakMeter::~PeakMeter()
 void PeakMeter::setSource(PeakMeterSource *_source)
 {
 	if (source and enabled)
-		unsubscribe(source);
+		source->unsubscribe(this);
 
 	source = _source;
 
 	if (source and enabled)
-		subscribe(source);
+		source->subscribe(this);
 }
 
 void PeakMeter::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			subscribe(source);
+			source->subscribe(this);
 		if (enabled and !_enabled)
-			unsubscribe(source);
+			source->unsubscribe(this);
 	}
 
 	enabled = _enabled;

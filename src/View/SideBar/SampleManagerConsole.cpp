@@ -74,7 +74,7 @@ public:
 		manager = _manager;
 		s = _s;
 		icon = render_sample(s, view);
-		subscribe(s);
+		s->subscribe(this);
 	}
 	virtual ~SampleManagerItem()
 	{
@@ -95,7 +95,7 @@ public:
 	void zombify()
 	{
 		if (s){
-			unsubscribe(s);
+			s->unsubscribe(this);
 			s = NULL;
 			hui::DeleteImage(icon);
 		}
@@ -139,9 +139,9 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	view = _view;
 	updateList();
 
-	subscribe(song, song->MESSAGE_ADD_SAMPLE);
-	subscribe(song, song->MESSAGE_DELETE_SAMPLE);
-	subscribe(song, song->MESSAGE_NEW);
+	song->subscribe(this, song->MESSAGE_ADD_SAMPLE);
+	song->subscribe(this, song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe(this, song->MESSAGE_NEW);
 }
 
 SampleManagerConsole::~SampleManagerConsole()
@@ -150,7 +150,7 @@ SampleManagerConsole::~SampleManagerConsole()
 		delete(si);
 	items.clear();
 
-	unsubscribe(song);
+	song->unsubscribe(this);
 }
 
 int SampleManagerConsole::getIndex(Sample *s)
@@ -323,8 +323,8 @@ void SampleManagerConsole::onPreview()
 	preview_stream = new OutputStream(preview_renderer);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	subscribe(progress);
-	subscribe(preview_stream);
+	progress->subscribe(this);
+	preview_stream->subscribe(this);
 	preview_stream->play();
 }
 
@@ -332,8 +332,8 @@ void SampleManagerConsole::endPreview()
 {
 	if (!progress)
 		return;
-	unsubscribe(preview_stream);
-	unsubscribe(progress);
+	preview_stream->unsubscribe(this);
+	progress->unsubscribe(this);
 	preview_stream->stop();
 	delete(progress);
 	progress = NULL;

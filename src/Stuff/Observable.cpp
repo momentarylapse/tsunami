@@ -7,6 +7,7 @@
 
 #include "Observable.h"
 #include "Observer.h"
+#include <functional>
 
 const string Observable::MESSAGE_ALL = "";
 const string Observable::MESSAGE_CHANGE = "Change";
@@ -41,12 +42,12 @@ void Observable::_observable_destruct_()
 	message_queue.clear();
 }
 
-void Observable::addObserver(Observer *o, const string &message)
+void Observable::subscribe(Observer *o, const string &message)
 {
 	requests.add(ObserverRequest(o, message));
 }
 
-void Observable::removeObserver(Observer *o)
+void Observable::unsubscribe(Observer *o)
 {
 	for (int i=requests.num-1; i>=0; i--)
 		if (requests[i].observer == o){
@@ -57,7 +58,7 @@ void Observable::removeObserver(Observer *o)
 void Observable::addWrappedObserver(void* handler, void* func)
 {
 	Observer *o = new ObserverWrapper(handler, func);
-	addObserver(o, MESSAGE_ALL);
+	subscribe(o, MESSAGE_ALL);
 }
 
 void Observable::removeWrappedObserver(void* handler)
@@ -97,6 +98,7 @@ void Observable::notifySend()
 	for (Notification &n: notifications){
 		if (DEBUG_MESSAGES)
 			msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
+		//n.callback();
 		n.observer->onUpdate(this, *n.message);
 	}
 }

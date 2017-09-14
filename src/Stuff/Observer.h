@@ -20,9 +20,6 @@ public:
 	Observer(const string &name);
 	virtual ~Observer();
 
-	void subscribe(Observable *o, const string &message = Observable::MESSAGE_ALL);
-	void unsubscribe(Observable *o);
-
 	string getName();
 
 	virtual void onUpdate(Observable *o, const string &message) = 0;

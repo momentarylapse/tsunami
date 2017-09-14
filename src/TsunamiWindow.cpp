@@ -225,12 +225,12 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	embed(mini_bar, "main_table", 0, 2);
 
 	observer = new TsunamiWindowObserver(this);
-	observer->subscribe(view);
-	observer->subscribe(song);
-	observer->subscribe(view->stream, OutputStream::MESSAGE_STATE_CHANGE);
-	observer->subscribe(app->clipboard);
-	observer->subscribe(bottom_bar);
-	observer->subscribe(side_bar);
+	view->subscribe(observer);
+	song->subscribe(observer);
+	view->stream->subscribe(observer, OutputStream::MESSAGE_STATE_CHANGE);
+	app->clipboard->subscribe(observer);
+	bottom_bar->subscribe(observer);
+	side_bar->subscribe(observer);
 
 
 
@@ -271,12 +271,12 @@ void TsunamiWindow::onDestroy()
 	hui::Config.setInt("Window.Height", h);
 	hui::Config.setBool("Window.Maximized", isMaximized());
 
-	observer->unsubscribe(view);
-	observer->unsubscribe(song);
-	observer->unsubscribe(view->stream);
-	observer->unsubscribe(app->clipboard);
-	observer->unsubscribe(bottom_bar);
-	observer->unsubscribe(side_bar);
+	view->unsubscribe(observer);
+	song->unsubscribe(observer);
+	view->stream->unsubscribe(observer);
+	app->clipboard->unsubscribe(observer);
+	bottom_bar->unsubscribe(observer);
+	side_bar->unsubscribe(observer);
 	delete(observer);
 
 	delete(side_bar);
@@ -538,7 +538,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 	TsunamiPlugin *p = CreateTsunamiPlugin(name, this);
 
 	plugins.add(p);
-	observer->subscribe(p, p->MESSAGE_STOP_REQUEST);
+	p->subscribe(observer, p->MESSAGE_STOP_REQUEST);
 	p->start();
 }
 

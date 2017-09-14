@@ -220,8 +220,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	msp.stop();
 	selection_mode = SELECTION_MODE_NONE;
 	hide_selection = false;
-	subscribe(song);
-	subscribe(stream);
+	song->subscribe(this);
+	stream->subscribe(this);
 
 
 
@@ -253,8 +253,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 
 AudioView::~AudioView()
 {
-	unsubscribe(song);
-	unsubscribe(stream);
+	song->unsubscribe(this);
+	stream->unsubscribe(this);
 	setInput(NULL);
 
 	delete(mode_curve);
@@ -1100,21 +1100,21 @@ void AudioView::setCurLayer(int l)
 void AudioView::setInput(InputStreamAny *_input)
 {
 	if (input)
-		unsubscribe(input);
+		input->unsubscribe(this);
 
 	input = _input;
 	notify(MESSAGE_INPUT_CHANGE);
 
 	if (input)
-		subscribe(input);
+		input->subscribe(this);
 }
 
 // unused?!?
 void AudioView::enable(bool _enabled)
 {
 	if (enabled and !_enabled)
-		unsubscribe(song);
+		song->unsubscribe(this);
 	else if (!enabled and _enabled)
-		subscribe(song);
+		song->subscribe(this);
 	enabled = _enabled;
 }

@@ -69,7 +69,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	visible = false;
 	active_console = -1;
 
-	view->subscribe(this);
+	subscribe(view); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()

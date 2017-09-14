@@ -38,14 +38,14 @@ LayerConsole::LayerConsole(Song *s, AudioView *v) :
 
 	event("edit_song", std::bind(&LayerConsole::onEditSong, this));
 
-	subscribe(song);
-	subscribe(view, view->MESSAGE_CUR_LAYER_CHANGE);
+	song->subscribe(this);
+	view->subscribe(this, view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
 LayerConsole::~LayerConsole()
 {
-	unsubscribe(song);
-	unsubscribe(view);
+	song->unsubscribe(this);
+	view->unsubscribe(this);
 }
 
 void LayerConsole::loadData()

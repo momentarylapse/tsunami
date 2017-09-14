@@ -47,12 +47,12 @@ public:
 		check("enabled", fx->enabled);
 
 		old_param = fx->configToString();
-		subscribe(fx, fx->MESSAGE_CHANGE);
-		subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{
-		unsubscribe(fx);
+		fx->unsubscribe(this);
 	}
 	void onLoad()
 	{
@@ -129,18 +129,18 @@ FxConsole::FxConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&FxConsole::onEditTrack, this));
 
 	if (view)
-		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
-	subscribe(song, song->MESSAGE_NEW);
-	subscribe(song, song->MESSAGE_ADD_EFFECT);
-	subscribe(song, song->MESSAGE_DELETE_EFFECT);
+		view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
+	song->subscribe(this, song->MESSAGE_NEW);
+	song->subscribe(this, song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, song->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
 {
 	clear();
 	if (view)
-		unsubscribe(view);
-	unsubscribe(song);
+		view->unsubscribe(this);
+	song->unsubscribe(this);
 }
 
 void FxConsole::onAdd()
@@ -167,7 +167,7 @@ void FxConsole::onEditTrack()
 void FxConsole::clear()
 {
 	if (track)
-		unsubscribe(track);
+		track->unsubscribe(this);
 	foreachi(hui::Panel *p, panels, i){
 		delete(p);
 		removeControl("separator_" + i2s(i));
@@ -182,9 +182,9 @@ void FxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		subscribe(track, track->MESSAGE_DELETE);
-		subscribe(track, track->MESSAGE_ADD_EFFECT);
-		subscribe(track, track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, track->MESSAGE_DELETE);
+		track->subscribe(this, track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, track->MESSAGE_DELETE_EFFECT);
 	}
 
 

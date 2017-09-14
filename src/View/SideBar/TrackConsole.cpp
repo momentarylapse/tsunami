@@ -30,7 +30,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 		setString("instrument", i.name());
 
 	loadData();
-	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
 
 	event("name", std::bind(&TrackConsole::onName, this));
 	event("volume", std::bind(&TrackConsole::onVolume, this));
@@ -49,9 +49,9 @@ TrackConsole::TrackConsole(AudioView *_view) :
 
 TrackConsole::~TrackConsole()
 {
-	unsubscribe(view);
+	view->unsubscribe(this);
 	if (track)
-		unsubscribe(track);
+		track->unsubscribe(this);
 }
 
 void TrackConsole::loadData()
@@ -97,11 +97,11 @@ void TrackConsole::loadData()
 void TrackConsole::setTrack(Track *t)
 {
 	if (track)
-		unsubscribe(track);
+		track->unsubscribe(this);
 	track = t;
 	loadData();
 	if (track)
-		subscribe(track);
+		track->subscribe(this);
 }
 
 void TrackConsole::onName()

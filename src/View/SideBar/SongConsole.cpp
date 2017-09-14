@@ -57,12 +57,12 @@ SongConsole::SongConsole(Song *a) :
 	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
 	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
 
-	subscribe(song);
+	song->subscribe(this);
 }
 
 SongConsole::~SongConsole()
 {
-	unsubscribe(song);
+	song->unsubscribe(this);
 }
 
 void SongConsole::loadData()

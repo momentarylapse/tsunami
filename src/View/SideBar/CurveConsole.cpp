@@ -74,16 +74,16 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 
 	curve = NULL;
 
-	subscribe(song, song->MESSAGE_NEW);
-	subscribe(song, song->MESSAGE_ADD_CURVE);
-	subscribe(song, song->MESSAGE_DELETE_CURVE);
-	subscribe(view, view->MESSAGE_VIEW_CHANGE);
+	song->subscribe(this, song->MESSAGE_NEW);
+	song->subscribe(this, song->MESSAGE_ADD_CURVE);
+	song->subscribe(this, song->MESSAGE_DELETE_CURVE);
+	view->subscribe(this, view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
 {
-	unsubscribe(song);
-	unsubscribe(view);
+	song->unsubscribe(this);
+	view->unsubscribe(this);
 }
 
 void CurveConsole::onUpdate(Observable* o, const string &message)

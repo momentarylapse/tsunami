@@ -22,12 +22,12 @@ LogConsole::LogConsole(Log *_log) :
 	//hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
 	reload();
 
-	subscribe(log);
+	log->subscribe(this);
 }
 
 LogConsole::~LogConsole()
 {
-	unsubscribe(log);
+	log->unsubscribe(this);
 }
 
 void LogConsole::onClear()

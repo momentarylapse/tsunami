@@ -18,17 +18,6 @@ Observer::~Observer()
 }
 
 
-
-void Observer::subscribe(Observable *o, const string &message)
-{
-	o->addObserver(this, message);
-}
-
-void Observer::unsubscribe(Observable *o)
-{
-	o->removeObserver(this);
-}
-
 string Observer::getName()
 {
 	return observer_name;

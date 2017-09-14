@@ -27,14 +27,14 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	event("top-priority", std::bind(&DeviceConsole::onTopPriority, this));
 	event("erase", std::bind(&DeviceConsole::onErase, this));
 
-	subscribe(device_manager);
+	device_manager->subscribe(this);
 
 	update_full();
 }
 
 DeviceConsole::~DeviceConsole()
 {
-	unsubscribe(device_manager);
+	device_manager->unsubscribe(this);
 }
 
 void DeviceConsole::onUpdate(Observable *o, const string &message)

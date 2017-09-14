@@ -16,9 +16,10 @@ class Observer;
 struct ObserverRequest
 {
 	ObserverRequest(){}
-	ObserverRequest(Observer *o, const string &_message);
+	ObserverRequest(Observer *o, const string &message);//, hui::Callback callback);
 	Observer* observer;
 	const string *message;
+	//hui::Callback callback;
 };
 
 class Observable : public hui::EventHandler
@@ -31,7 +32,9 @@ public:
 	static const string MESSAGE_DELETE;
 	static const string MESSAGE_ALL;
 
-	void addObserver(Observer *o, const string &message = MESSAGE_ALL);
+	void subscribe(Observer *observer, const string &message = MESSAGE_ALL);
+	void unsubscribe(Observer *observer);
+	//void addObserver(Observer *o, const string &message = MESSAGE_ALL);
 	void addWrappedObserver(void *handler, void *func);
 	void removeObserver(Observer *o);
 	void removeWrappedObserver(void *handler);

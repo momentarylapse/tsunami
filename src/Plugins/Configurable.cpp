@@ -470,8 +470,8 @@ public:
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		subscribe(progress);
-		subscribe(tsunami->win->view->stream);
+		progress->subscribe(this);
+		tsunami->win->view->stream->subscribe(this);
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();
 	}
@@ -494,8 +494,8 @@ public:
 	{
 		if (!progress)
 			return;
-		unsubscribe(tsunami->win->view->stream);
-		unsubscribe(progress);
+		tsunami->win->view->stream->unsubscribe(this);
+		progress->unsubscribe(this);
 		tsunami->win->view->stream->stop();
 		delete(progress);
 		progress = NULL;

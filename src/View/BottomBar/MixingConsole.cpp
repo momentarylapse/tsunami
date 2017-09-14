@@ -114,15 +114,15 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
-	subscribe(song);
-	subscribe(device_manager);
+	song->subscribe(this);
+	device_manager->subscribe(this);
 	loadData();
 }
 
 MixingConsole::~MixingConsole()
 {
-	unsubscribe(song);
-	unsubscribe(device_manager);
+	song->unsubscribe(this);
+	device_manager->unsubscribe(this);
 	for (TrackMixer *m: mixer)
 		delete(m);
 	delete(peak_meter);

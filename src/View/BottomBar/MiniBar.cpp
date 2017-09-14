@@ -26,14 +26,14 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_
 	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
 	event("volume", std::bind(&MiniBar::onVolume, this));
 
-	subscribe(bottom_bar);
-	subscribe(output);
+	bottom_bar->subscribe(this);
+	output->subscribe(this);
 }
 
 MiniBar::~MiniBar()
 {
-	unsubscribe(output);
-	unsubscribe(bottom_bar);
+	output->unsubscribe(this);
+	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
 }
 

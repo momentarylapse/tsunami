@@ -133,7 +133,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		cc->subscribe(input);
+		input->subscribe(cc);
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -153,7 +153,7 @@ public:
 	{
 		cc->peak_meter->setSource(NULL);
 		view->setInput(NULL);
-		cc->unsubscribe(input);
+		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
 	}
@@ -313,7 +313,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		cc->subscribe(input);
+		input->subscribe(cc);
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -333,7 +333,7 @@ public:
 	{
 		cc->peak_meter->setSource(NULL);
 		view->setInput(NULL);
-		cc->unsubscribe(input);
+		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
 	}

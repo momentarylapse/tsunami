@@ -49,12 +49,12 @@ public:
 		check("enabled", fx->enabled);
 
 		old_param = fx->configToString();
-		subscribe(fx, fx->MESSAGE_CHANGE);
-		subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
-		unsubscribe(fx);
+		fx->unsubscribe(this);
 	}
 	void onLoad()
 	{
@@ -122,15 +122,15 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&MidiFxConsole::onEditTrack, this));
 	event("edit_midi", std::bind(&MidiFxConsole::onEditMidi, this));
 
-	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
 }
 
 MidiFxConsole::~MidiFxConsole()
 {
 	clear();
-	unsubscribe(view);
-	unsubscribe(song);
+	view->unsubscribe(this);
+	song->unsubscribe(this);
 }
 
 void MidiFxConsole::update()
@@ -166,7 +166,7 @@ void MidiFxConsole::onAdd()
 void MidiFxConsole::clear()
 {
 	if (track)
-		unsubscribe(track);
+		track->unsubscribe(this);
 	foreachi(hui::Panel *p, panels, i){
 		delete(p);
 		removeControl("separator_" + i2s(i));
@@ -196,9 +196,9 @@ void MidiFxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		subscribe(track, track->MESSAGE_DELETE);
-		subscribe(track, track->MESSAGE_ADD_MIDI_EFFECT);
-		subscribe(track, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, track->MESSAGE_DELETE);
+		track->subscribe(this, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

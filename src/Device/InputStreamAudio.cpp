@@ -112,6 +112,22 @@ int InputStreamAudio::SyncData::getDelay()
 	return 0;
 }
 
+int InputStreamAudio::Source::read(AudioBuffer &buf)
+{
+	stream->current_buffer.read(buf);
+	return min(buf.length, stream->getSampleCount());
+}
+
+int InputStreamAudio::Source::getSampleRate()
+{
+	return stream->getSampleRate();
+}
+
+int InputStreamAudio::Source::getNumSamples()
+{
+	return stream->getSampleCount();
+}
+
 
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	InputStreamAny("InputStreamAudio", _sample_rate),
@@ -121,6 +137,8 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 #ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
 #endif
+
+	source.stream = this;
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;

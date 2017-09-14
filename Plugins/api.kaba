@@ -427,6 +427,7 @@ class InputStreamAny
 class InputStreamAudio extends InputStreamAny
 	RingBuffer current_buffer
 	AudioBuffer buffer
+	AudioSource source
 	extern void __init__(int sample_rate)
 	extern override void __delete__()
 	extern override bool start()

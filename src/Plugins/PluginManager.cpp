@@ -402,6 +402,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, current_buffer));
 	Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
+	Kaba::DeclareClassOffset("InputStreamAudio", "source", _offsetof(InputStreamAudio, source));
 	Kaba::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
 	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
 	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));

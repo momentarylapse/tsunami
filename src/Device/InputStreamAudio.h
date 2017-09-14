@@ -12,6 +12,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
+#include "../Audio/Source/AudioSource.h"
 #include "InputStreamAny.h"
 #include "config.h"
 
@@ -76,6 +77,17 @@ public:
 
 	RingBuffer current_buffer;
 	AudioBuffer buffer;
+
+	class Source : public AudioSource
+	{
+	public:
+		virtual int _cdecl read(AudioBuffer &buf);
+		virtual int _cdecl getSampleRate();
+		virtual int _cdecl getNumSamples();
+
+		InputStreamAudio *stream;
+	};
+	Source source;
 
 private:
 

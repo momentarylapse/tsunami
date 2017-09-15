@@ -48,8 +48,8 @@ public:
 		check("enabled", fx->enabled);
 
 		old_param = fx->configToString();
-		fx->subscribe_old2(this, SingleMidiFxPanel, fx->MESSAGE_CHANGE);
-		fx->subscribe_old2(this, SingleMidiFxPanel, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChange, this), fx->MESSAGE_CHANGE);
+		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
@@ -82,12 +82,16 @@ public:
 		if (track)
 			track->deleteMidiEffect(index);
 	}
-	virtual void onUpdate(Observable *o)
+	void onFxChange()
 	{
-		if (o->cur_message() == o->MESSAGE_CHANGE){
-			if (track)
-				track->editMidiEffect(index, old_param);
-		}
+		if (track)
+			track->editMidiEffect(index, old_param);
+		check("enabled", fx->enabled);
+		p->update();
+		old_param = fx->configToString();
+	}
+	void onFxChangeByAction()
+	{
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->configToString();
@@ -120,7 +124,7 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&MidiFxConsole::onEditTrack, this));
 	event("edit_midi", std::bind(&MidiFxConsole::onEditMidi, this));
 
-	view->subscribe_old2(this, MidiFxConsole, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&MidiFxConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
 }
 
@@ -141,15 +145,23 @@ void MidiFxConsole::update()
 	hideControl(id_inner, !allow);
 }
 
-void MidiFxConsole::onUpdate(Observable* o)
+void MidiFxConsole::onViewCurTrackChange()
 {
 	update();
-	if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
-		setTrack(NULL);
-	}else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE))
-		setTrack(view->cur_track);
-	else
-		setTrack(track);
+	setTrack(view->cur_track);
+}
+
+void MidiFxConsole::onTrackDelete()
+{
+	msg_write("MFX.onTrackDelete");
+	update();
+	setTrack(NULL);
+}
+
+void MidiFxConsole::onUpdate()
+{
+	update();
+	setTrack(track);
 }
 
 void MidiFxConsole::onAdd()
@@ -194,9 +206,9 @@ void MidiFxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_DELETE);
-		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiFxConsole::onViewCurTrackChange, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

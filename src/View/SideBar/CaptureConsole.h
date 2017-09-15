@@ -42,7 +42,7 @@ public:
 
 	void updateTime();
 
-	void onUpdate(Observable *o);
+	void onUpdate();
 
 	bool isCapturing();
 

@@ -21,7 +21,7 @@ class DeviceConsole;
 class Log;
 class BottomBarConsole;
 
-class BottomBar : public hui::Panel, public Observable
+class BottomBar : public Observable<hui::Panel>
 {
 public:
 	BottomBar(AudioView *view, Song *audio, DeviceManager *device_manager, Log *log);

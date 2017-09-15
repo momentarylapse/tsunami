@@ -58,7 +58,8 @@ public:
 
 	void onOutputVolume();
 
-	void onUpdate(Observable *o);
+	void onUpdateSong();
+	void onUpdateDeviceManager();
 
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();

@@ -13,7 +13,7 @@
 
 class LogConsole;
 
-class Log : public Observable
+class Log : public Observable<VirtualBase>
 {
 	friend class LogConsole;
 public:

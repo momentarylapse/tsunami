@@ -25,8 +25,8 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_
 	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
 	event("volume", std::bind(&MiniBar::onVolume, this));
 
-	bottom_bar->subscribe_old(this, MiniBar);
-	output->subscribe_old(this, MiniBar);
+	bottom_bar->subscribe(this, std::bind(&MiniBar::onBottomBarUpdate, this));
+	output->subscribe(this, std::bind(&MiniBar::onVolumeChange, this));
 }
 
 MiniBar::~MiniBar()
@@ -57,15 +57,16 @@ void MiniBar::onHide()
 	peak_meter->enable(false);
 }
 
-void MiniBar::onUpdate(Observable *o)
+void MiniBar::onBottomBarUpdate()
 {
-	if (o == bottom_bar){
-		if (bottom_bar->visible)
-			hide();
-		else
-			show();
-	}else if (o == output){
-		setFloat("volume", output->getOutputVolume());
-	}
+	if (bottom_bar->visible)
+		hide();
+	else
+		show();
+}
+
+void MiniBar::onVolumeChange()
+{
+	setFloat("volume", output->getOutputVolume());
 }
 

@@ -73,10 +73,10 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 
 	curve = NULL;
 
-	song->subscribe_old2(this, CurveConsole, song->MESSAGE_NEW);
-	song->subscribe_old2(this, CurveConsole, song->MESSAGE_ADD_CURVE);
-	song->subscribe_old2(this, CurveConsole, song->MESSAGE_DELETE_CURVE);
-	view->subscribe_old2(this, CurveConsole, view->MESSAGE_VIEW_CHANGE);
+	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_ADD_CURVE);
+	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_DELETE_CURVE);
+	view->subscribe(this, std::bind(&CurveConsole::onViewChange, this), view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
@@ -85,13 +85,15 @@ CurveConsole::~CurveConsole()
 	view->unsubscribe(this);
 }
 
-void CurveConsole::onUpdate(Observable* o)
+
+void CurveConsole::onViewChange()
 {
-	if (o == song){
-		updateList();
-	}else if (o == view){
-		redraw("area");
-	}
+	redraw("area");
+}
+
+void CurveConsole::onUpdate()
+{
+	updateList();
 }
 
 void CurveConsole::onEnter()

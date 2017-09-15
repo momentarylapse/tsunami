@@ -73,9 +73,9 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::onEditMidiFx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::onEditSong, this));
 
-	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_CUR_TRACK_CHANGE);
-	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_SETTINGS_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::onViewVTrackChange, this), view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), view->MESSAGE_SETTINGS_CHANGE);
 	update();
 }
 
@@ -124,27 +124,37 @@ void MidiEditorConsole::update()
 	}
 }
 
-void MidiEditorConsole::onUpdate(Observable* o)
+void MidiEditorConsole::onTrackDelete()
 {
 	update();
-	if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
-		setTrack(NULL);
-	}else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE)){
-		setTrack(view->cur_track);
-	}else if ((o == view) and (o->cur_message() == view->MESSAGE_VTRACK_CHANGE)){
+	setTrack(NULL);
+}
 
-		reset("reference_tracks");
-		if (song){
-			for (Track *t: song->tracks)
-				addString("reference_tracks", t->getNiceName());
-		}
+void MidiEditorConsole::onViewCurTrackChange()
+{
+	update();
+	setTrack(view->cur_track);
+}
 
-		if (track){
-			setSelection("reference_tracks", view->get_track(track)->reference_tracks);
-		}
-	}else{
-		setTrack(track);
+void MidiEditorConsole::onViewVTrackChange()
+{
+	update();
+
+	reset("reference_tracks");
+	if (song){
+		for (Track *t: song->tracks)
+			addString("reference_tracks", t->getNiceName());
 	}
+
+	if (track){
+		setSelection("reference_tracks", view->get_track(track)->reference_tracks);
+	}
+}
+
+void MidiEditorConsole::onUpdate()
+{
+	update();
+	setTrack(track);
 }
 
 void MidiEditorConsole::onScale()
@@ -267,9 +277,9 @@ void MidiEditorConsole::setTrack(Track *t)
 
 	track = t;
 	if (track){
-		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_DELETE);
-		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiEditorConsole::onTrackDelete, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), track->MESSAGE_DELETE_MIDI_EFFECT);
 
 		int tn = track->get_index();
 		if ((tn >= 0) and (tn < view->vtrack.num))

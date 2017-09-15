@@ -28,7 +28,6 @@ public:
 	void onEditSong();
 	void onEditTrack();
 
-	void onUpdate(Observable *o);
 	void onSynthDelete();
 	void onTrackDelete();
 	void onTrackChange();

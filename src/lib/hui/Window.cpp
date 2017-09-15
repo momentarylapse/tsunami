@@ -44,6 +44,7 @@ void InputData::reset()
 	lb = mb = rb = false;
 	memset(key, 0, sizeof(key));
 	key_buffer.clear();
+	key_code = 0;
 }
 
 

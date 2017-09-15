@@ -33,7 +33,7 @@ public:
 	void onEditSamples();
 	void onEditFx();
 
-	void onUpdate(Observable *o);
+	void onUpdate();
 
 	Song *song;
 };

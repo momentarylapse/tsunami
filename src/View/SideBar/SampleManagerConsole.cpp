@@ -73,16 +73,16 @@ public:
 		manager = _manager;
 		s = _s;
 		icon = render_sample(s, view);
-		s->subscribe_old(this, SampleManagerItem);
+		s->subscribe(this, std::bind(&SampleManagerItem::onUpdate, this));
 	}
 	virtual ~SampleManagerItem()
 	{
 		zombify();
 	}
-	virtual void onUpdate(Observable *o)
+	virtual void onUpdate()
 	{
 		//msg_write("item:  " + message);
-		if (o->cur_message() == s->MESSAGE_DELETE){
+		if (s->cur_message() == s->MESSAGE_DELETE){
 			manager->remove(this);
 		}else{
 			int n = manager->getIndex(s);
@@ -137,9 +137,9 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	view = _view;
 	updateList();
 
-	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_ADD_SAMPLE);
-	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_ADD_SAMPLE);
+	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_NEW);
 }
 
 SampleManagerConsole::~SampleManagerConsole()
@@ -294,21 +294,24 @@ void SampleManagerConsole::onEditSong()
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleManagerConsole::onUpdate(Observable *o)
+void SampleManagerConsole::onProgressCancel()
 {
-	if (progress and (o == progress)){
-		if (o->cur_message() == progress->MESSAGE_CANCEL)
-			endPreview();
-	}else if (o == preview_stream){
-		int pos = preview_stream->getPos();
-		Range r = preview_sample->range();
-		progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
-		if (!preview_stream->isPlaying())
-			endPreview();
-	}else if (o == song){
-		//msg_write(o->getName() + " / " + message);
-		updateList();
-	}
+	if (progress)
+		endPreview();
+}
+
+void SampleManagerConsole::onSongUpdate()
+{
+	updateList();
+}
+
+void SampleManagerConsole::onPreviewStreamUpdate()
+{
+	int pos = preview_stream->getPos();
+	Range r = preview_sample->range();
+	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
+	if (!preview_stream->isPlaying())
+		endPreview();
 }
 
 void SampleManagerConsole::onPreview()
@@ -321,8 +324,8 @@ void SampleManagerConsole::onPreview()
 	preview_stream = new OutputStream(preview_renderer);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe_old(this, SampleManagerConsole);
-	preview_stream->subscribe_old(this, SampleManagerConsole);
+	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));
+	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamUpdate, this));
 	preview_stream->play();
 }
 

@@ -12,36 +12,25 @@
 #include "../lib/hui/hui.h"
 #include <functional>
 
-class Observable : public VirtualBase
+
+//extern const string MESSAGE_CHANGE;
+//extern const string MESSAGE_DELETE;
+//extern const string MESSAGE_ANY;
+
+class ObservableData
 {
 public:
-	Observable();
-	virtual ~Observable();
-
-	typedef std::function<void()> Callback;
-	typedef std::function<void(Observable*)> CallbackP;
-
-	static const string MESSAGE_CHANGE;
-	static const string MESSAGE_DELETE;
-	static const string MESSAGE_ANY;
-
-	//void subscribe(Observer *observer, const string &message = MESSAGE_ANY);
-	void unsubscribe(VirtualBase *observer);
-	void subscribe2(VirtualBase *observer, const Callback &callback, const string &message = MESSAGE_ANY);
-	void subscribe3(VirtualBase *observer, const CallbackP &callback, const string &message = MESSAGE_ANY);
-	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function);
+	ObservableData();
+	~ObservableData();
 
 	void notifyBegin();
-	void notify(const string &message = MESSAGE_CHANGE);
+	void notify(const string &message);
 	void notifyEnd();
-private:
 	void notifyEnqueue(const string &message);
 	void notifySend();
 
-protected:
-	void _observable_destruct_();
-
-private:
+	typedef std::function<void()> Callback;
+	typedef std::function<void(VirtualBase*)> CallbackP;
 
 	// observers
 	struct Subscription
@@ -53,7 +42,8 @@ private:
 		Callback callback;
 		CallbackP callback_p;
 	};
-	Array<Subscription> observable_subscriptions;
+	Array<Subscription> subscriptions;
+	void unsubscribe(VirtualBase *observer);
 
 	struct Notification : Subscription
 	{
@@ -62,19 +52,75 @@ private:
 	};
 
 	// current notifies
-	Array<const string*> observable_message_queue;
-	int observable_notify_level;
+	Array<const string*> message_queue;
+	int notify_level;
 
-	const string* observable_cur_message;
-
-public:
-	const string& cur_message() const;
-
-private:
-	static const bool DEBUG_MESSAGES;
+	const string* cur_message;
+	VirtualBase *me;
 };
 
-#define subscribe_old(OBJECT, CLASS) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1))
-#define subscribe_old2(OBJECT, CLASS, MESSAGE) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1), MESSAGE)
+template<class T>
+class Observable : public T
+{
+public:
+	static const string MESSAGE_CHANGE;
+	static const string MESSAGE_DELETE;
+	static const string MESSAGE_ANY;
+
+	//static constexpr string &MESSAGE_CHANGE = ObservableData::MESSAGE_CHANGE;
+	//static const string &MESSAGE_DELETE = ObservableData::MESSAGE_DELETE;
+	//static const string &MESSAGE_ANY = ObservableData::MESSAGE_ANY;
+
+	//void subscribe(Observer *observer, const string &message = MESSAGE_ANY);
+	void unsubscribe(VirtualBase *observer)
+	{
+		observable_data.unsubscribe(observer);
+	}
+	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message = MESSAGE_ANY)
+	{
+		observable_data.subscriptions.add(ObservableData::Subscription(observer, &message, callback, NULL));
+		observable_data.me = this;
+	}
+	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback, const string &message = MESSAGE_ANY)
+	{
+		observable_data.subscriptions.add(ObservableData::Subscription(observer, &message, NULL, callback));
+		observable_data.me = this;
+	}
+	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function)
+	{
+		subscribe(handler, std::bind(function, handler));
+	}
+
+	void notifyBegin()
+	{
+		observable_data.notifyBegin();
+	}
+	void notify(const string &message = MESSAGE_CHANGE)
+	{
+		observable_data.notify(message);
+	}
+	void notifyEnd()
+	{
+		observable_data.notifyEnd();
+	}
+	const string& cur_message() const
+	{
+		return *observable_data.cur_message;
+	}
+private:
+
+	ObservableData observable_data;
+};
+
+
+template<class T>
+const string Observable<T>::MESSAGE_CHANGE = "Change";
+template<class T>
+const string Observable<T>::MESSAGE_DELETE = "Delete";
+template<class T>
+const string Observable<T>::MESSAGE_ANY = "";
+
+//#define subscribe_old(OBJECT, CLASS) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1))
+//#define subscribe_old2(OBJECT, CLASS, MESSAGE) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1), MESSAGE)
 
 #endif /* OBSERVABLE_H_ */

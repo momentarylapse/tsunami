@@ -133,7 +133,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		input->subscribe_old(cc, CaptureConsole);
+		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -313,7 +313,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		input->subscribe_old(cc, CaptureConsole);
+		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -661,10 +661,11 @@ void CaptureConsole::updateTime()
 	setString("capture_time", song->get_time_str_long(mode->getSampleCount()));
 }
 
-void CaptureConsole::onUpdate(Observable *o)
+void CaptureConsole::onUpdate()
 {
-	if (&o->cur_message() == &Observable::MESSAGE_DELETE)
-		return;
+	//if (mode->input->cur_message() == MESSAGE_DELETE)
+	//	return;
+	// FIXME
 	updateTime();
 }
 

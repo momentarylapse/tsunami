@@ -113,8 +113,8 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
-	song->subscribe_old(this, MixingConsole);
-	device_manager->subscribe_old(this, MixingConsole);
+	song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
+	device_manager->subscribe(this, std::bind(&MixingConsole::onUpdateDeviceManager, this));
 	loadData();
 }
 
@@ -152,12 +152,14 @@ void MixingConsole::loadData()
 	hideControl("link-volumes", song->tracks.num <= 1);
 }
 
-void MixingConsole::onUpdate(Observable* o)
+void MixingConsole::onUpdateDeviceManager()
 {
-	if (o == device_manager)
-		setFloat("output-volume", device_manager->getOutputVolume());
-	else
-		loadData();
+	setFloat("output-volume", device_manager->getOutputVolume());
+}
+
+void MixingConsole::onUpdateSong()
+{
+	loadData();
 }
 
 void MixingConsole::onShow()

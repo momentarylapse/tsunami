@@ -46,8 +46,8 @@ public:
 		check("enabled", fx->enabled);
 
 		old_param = fx->configToString();
-		fx->subscribe_old2(this, SingleFxPanel, fx->MESSAGE_CHANGE);
-		fx->subscribe_old2(this, SingleFxPanel, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChange, this), fx->MESSAGE_CHANGE);
+		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{
@@ -86,14 +86,19 @@ public:
 		else
 			song->deleteEffect(index);
 	}
-	virtual void onUpdate(Observable *o)
+	void onfxChange()
 	{
-		if (o->cur_message() == o->MESSAGE_CHANGE){
-			if (track)
-				track->editEffect(index, old_param);
-			else
-				song->editEffect(index, old_param);
-		}
+		if (track)
+			track->editEffect(index, old_param);
+		else
+			song->editEffect(index, old_param);
+		check("enabled", fx->enabled);
+		p->update();
+		old_param = fx->configToString();
+
+	}
+	void onfxChangeByAction()
+	{
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->configToString();
@@ -127,10 +132,10 @@ FxConsole::FxConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&FxConsole::onEditTrack, this));
 
 	if (view)
-		view->subscribe_old2(this, FxConsole, view->MESSAGE_CUR_TRACK_CHANGE);
-	song->subscribe_old2(this, FxConsole, song->MESSAGE_NEW);
-	song->subscribe_old2(this, FxConsole, song->MESSAGE_ADD_EFFECT);
-	song->subscribe_old2(this, FxConsole, song->MESSAGE_DELETE_EFFECT);
+		view->subscribe(this, std::bind(&FxConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
@@ -180,9 +185,9 @@ void FxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe_old2(this, FxConsole, track->MESSAGE_DELETE);
-		track->subscribe_old2(this, FxConsole, track->MESSAGE_ADD_EFFECT);
-		track->subscribe_old2(this, FxConsole, track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, std::bind(&FxConsole::onTrackDelete, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&FxConsole::onUpdate, this), track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, std::bind(&FxConsole::onUpdate, this), track->MESSAGE_DELETE_EFFECT);
 	}
 
 
@@ -200,13 +205,17 @@ void FxConsole::setTrack(Track *t)
 	//Enable("add", track);
 }
 
-void FxConsole::onUpdate(Observable* o)
+void FxConsole::onTrackDelete()
 {
-	if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE))
-		setTrack(NULL);
-	else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE))
-		setTrack(view->cur_track);
-	else
-		setTrack(track);
+	setTrack(NULL);
+}
+void FxConsole::onViewCurTrackChange()
+{
+	setTrack(view->cur_track);
+}
+
+void FxConsole::onUpdate()
+{
+	setTrack(track);
 }
 

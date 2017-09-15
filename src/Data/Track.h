@@ -45,7 +45,7 @@ public:
 
 string track_type(int type);
 
-class Track : public Observable
+class Track : public Observable<VirtualBase>
 {
 public:
 	Track(int type, Synthesizer *synth);

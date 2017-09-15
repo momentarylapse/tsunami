@@ -42,8 +42,8 @@ public:
 		event("save_favorite", std::bind(&SynthPanel::onSave, this));
 
 		old_param = synth->configToString();
-		synth->subscribe2(this, std::bind(&SynthPanel::onSynthChange, this), synth->MESSAGE_CHANGE);
-		synth->subscribe2(this, std::bind(&SynthPanel::onSynthChangeByAction, this), synth->MESSAGE_CHANGE_BY_ACTION);
+		synth->subscribe(this, std::bind(&SynthPanel::onSynthChange, this), synth->MESSAGE_CHANGE);
+		synth->subscribe(this, std::bind(&SynthPanel::onSynthChangeByAction, this), synth->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SynthPanel()
 	{
@@ -101,7 +101,7 @@ SynthConsole::SynthConsole(AudioView *_view) :
 	track = NULL;
 	panel = NULL;
 
-	view->subscribe2(this, std::bind(&SynthConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&SynthConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 SynthConsole::~SynthConsole()
@@ -160,11 +160,11 @@ void SynthConsole::setTrack(Track *t)
 	if (!track)
 		return;
 
-	track->subscribe2(this, std::bind(&SynthConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-	track->subscribe2(this, std::bind(&SynthConsole::onTrackChange, this), track->MESSAGE_CHANGE);
+	track->subscribe(this, std::bind(&SynthConsole::onTrackDelete, this), track->MESSAGE_DELETE);
+	track->subscribe(this, std::bind(&SynthConsole::onTrackChange, this), track->MESSAGE_CHANGE);
 
 	if (track->synth){
-		track->synth->subscribe2(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);
+		track->synth->subscribe(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);
 		panel = new SynthPanel(track);
 		embed(panel, id_inner, 0, 0);
 		addSeparator("!horizontal", 0, 1, 0, 0, "separator_0");

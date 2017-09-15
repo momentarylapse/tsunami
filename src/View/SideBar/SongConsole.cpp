@@ -55,7 +55,7 @@ SongConsole::SongConsole(Song *a) :
 	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
 	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
 
-	song->subscribe_old(this, SongConsole);
+	song->subscribe(this, std::bind(&SongConsole::onUpdate, this));
 }
 
 SongConsole::~SongConsole()
@@ -150,7 +150,7 @@ void SongConsole::onEditFx()
 	bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
-void SongConsole::onUpdate(Observable *o)
+void SongConsole::onUpdate()
 {
 	loadData();
 }

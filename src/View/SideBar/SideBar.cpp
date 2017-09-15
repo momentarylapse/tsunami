@@ -68,7 +68,7 @@ SideBar::SideBar(AudioView *view, Song *song)
 	visible = false;
 	active_console = -1;
 
-	subscribe_old(view, AudioView); // EVIL HACK?!?
+	subscribe(view, std::bind(&AudioView::onUpdate, view)); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()

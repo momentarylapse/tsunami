@@ -188,7 +188,7 @@ void Configurable::__init__()
 
 void Configurable::__delete__()
 {
-	this->Observable::~Observable();
+	this->Configurable::~Configurable();
 }
 
 PluginData *Configurable::get_config() const
@@ -468,8 +468,8 @@ public:
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->subscribe2(this, std::bind(&ConfigurationDialog::onProgressCancel, this), progress->MESSAGE_CANCEL);
-		tsunami->win->view->stream->subscribe2(this, std::bind(&ConfigurationDialog::onUpdateStream, this));
+		progress->subscribe(this, std::bind(&ConfigurationDialog::onProgressCancel, this), progress->MESSAGE_CANCEL);
+		tsunami->win->view->stream->subscribe(this, std::bind(&ConfigurationDialog::onUpdateStream, this));
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();
 	}

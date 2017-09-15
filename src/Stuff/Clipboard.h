@@ -13,7 +13,7 @@ class Song;
 class Track;
 class AudioView;
 
-class Clipboard : public Observable
+class Clipboard : public Observable<VirtualBase>
 {
 public:
 	Clipboard();

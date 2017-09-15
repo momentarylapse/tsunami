@@ -21,7 +21,9 @@ public:
 	MidiFxConsole(AudioView *view, Song *audio);
 	virtual ~MidiFxConsole();
 
-	void onUpdate(Observable *o);
+	void onViewCurTrackChange();
+	void onTrackDelete();
+	void onUpdate();
 	void update();
 
 	void clear();

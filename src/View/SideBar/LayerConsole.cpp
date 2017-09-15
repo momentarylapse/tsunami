@@ -36,8 +36,8 @@ LayerConsole::LayerConsole(Song *s, AudioView *v) :
 
 	event("edit_song", std::bind(&LayerConsole::onEditSong, this));
 
-	song->subscribe_old(this, LayerConsole);
-	view->subscribe_old2(this, LayerConsole, view->MESSAGE_CUR_LAYER_CHANGE);
+	song->subscribe(this, std::bind(&LayerConsole::onUpdate, this));
+	view->subscribe(this, std::bind(&LayerConsole::onUpdate, this), view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
 LayerConsole::~LayerConsole()
@@ -117,7 +117,7 @@ void LayerConsole::onEditSong()
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void LayerConsole::onUpdate(Observable *o)
+void LayerConsole::onUpdate()
 {
 	loadData();
 }

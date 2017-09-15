@@ -28,7 +28,9 @@ public:
 	void onEditSong();
 	void onEditTrack();
 
-	void onUpdate(Observable *o);
+	void onTrackDelete();
+	void onViewCurTrackChange();
+	void onUpdate();
 
 	string id_inner;
 

@@ -32,7 +32,7 @@ class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
 
-class AudioView : public Observable
+class AudioView : public Observable<VirtualBase>
 {
 public:
 	AudioView(TsunamiWindow *parent, const string &id, Song *audio);
@@ -55,7 +55,10 @@ public:
 	void onKeyUp();
 	void onCommand(const string &id);
 
-	void onUpdate(Observable *o);
+	void onSongUpdate();
+	void onStreamUpdate();
+	void onInputUpdate();
+	void onUpdate();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
 	static const string MESSAGE_CUR_LAYER_CHANGE;

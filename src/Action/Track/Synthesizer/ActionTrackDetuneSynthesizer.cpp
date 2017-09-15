@@ -35,7 +35,7 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d)
 	t->synth->tuning = temp;
 	t->synth->update_delta_phi();
 
-	((Observable*)t->synth)->notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+	t->synth->Observable::notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 
 	return t;
 }

@@ -36,7 +36,7 @@ public:
 class ConfigPanel;
 class Song;
 
-class Configurable : public Observable
+class Configurable : public Observable<VirtualBase>
 {
 public:
 	Configurable(int type);

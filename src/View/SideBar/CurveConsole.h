@@ -21,7 +21,8 @@ public:
 	CurveConsole(AudioView *view, Song *song);
 	virtual ~CurveConsole();
 
-	virtual void onUpdate(Observable *o);
+	void onViewChange();
+	void onUpdate();
 
 	void updateList();
 	void onAdd();

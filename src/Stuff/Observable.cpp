@@ -7,27 +7,52 @@
 
 #include "Observable.h"
 #include <functional>
+//#include <typeinfo>
+#include "../lib/kaba/kaba.h"
 
-const string Observable::MESSAGE_ANY = "";
-const string Observable::MESSAGE_CHANGE = "Change";
-const string Observable::MESSAGE_DELETE = "Delete";
-const bool Observable::DEBUG_MESSAGES = true;
+
+/*const string MESSAGE_CHANGE = "Change";
+const string MESSAGE_DELETE = "Delete";
+const string MESSAGE_ANY = "";*/
+static const bool DEBUG_MESSAGES = true;
 
 static string dummy_string;
 
+namespace Kaba{
+extern Array<Kaba::Script*> PublicScript;
+};
 
 static string get_obs_name(VirtualBase *o)
 {
+	for (auto s: Kaba::PublicScript)
+		for (auto c: s->syntax->classes){
+			void *vtable = *(void**)o;
+			if (vtable == c->_vtable_location_compiler_)
+				return "<kaba:" + c->name + ">";
+		}
 	return typeid(*o).name();
+
+	//return p2s(o); // sigh... m(-_-)m
+
+	/*try{
+		o = dynamic_cast<VirtualBase*>(o);
+	}catch(...){
+		return "???";
+	}
+
+	msg_write("a");
+	const std::type_info &a = typeid(*o);
+	msg_write("b");
+	return a.name();*/
 }
 
-Observable::Subscription::Subscription()
+ObservableData::Subscription::Subscription()
 {
 	observer = NULL;
 	message = NULL;
 }
 
-Observable::Subscription::Subscription(VirtualBase *o, const string *_message, const Observable::Callback &_callback, const Observable::CallbackP &_callback_p)
+ObservableData::Subscription::Subscription(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback, const ObservableData::CallbackP &_callback_p)
 {
 	observer = o;
 	message = _message;
@@ -35,13 +60,13 @@ Observable::Subscription::Subscription(VirtualBase *o, const string *_message, c
 	callback_p = _callback_p;
 }
 
-Observable::Notification::Notification()
+ObservableData::Notification::Notification()
 {
 	observer = NULL;
 	message = NULL;
 }
 
-Observable::Notification::Notification(VirtualBase *o, const string *_message, const Observable::Callback &_callback, const Observable::CallbackP &_callback_p)
+ObservableData::Notification::Notification(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback, const ObservableData::CallbackP &_callback_p)
 {
 	observer = o;
 	message = _message;
@@ -50,111 +75,95 @@ Observable::Notification::Notification(VirtualBase *o, const string *_message, c
 }
 
 
-Observable::Observable()
+ObservableData::ObservableData()
 {
-	observable_notify_level = 0;
-	observable_cur_message = NULL;
+	me = NULL; // it is only useful, when set by subscribe anyways...
+	notify_level = 0;
+	cur_message = NULL;
 }
 
-Observable::~Observable()
+ObservableData::~ObservableData()
 {
-	notify(MESSAGE_DELETE);
+	msg_write("~ObservableData");
+	if (me){
+		//notify(me->MESSAGE_DELETE);
+		msg_write("notify... " + get_obs_name(me));
+		notify(Observable<VirtualBase>::MESSAGE_DELETE);
+	}
 }
 
-void Observable::_observable_destruct_()
+void ObservableData::unsubscribe(VirtualBase *o)
 {
-	observable_subscriptions.clear();
-	observable_message_queue.clear();
-}
-
-void Observable::subscribe2(VirtualBase *o, const Callback &callback, const string &message)
-{
-	observable_subscriptions.add(Subscription(o, &message, callback, NULL));
-}
-
-void Observable::subscribe3(VirtualBase *o, const CallbackP &callback, const string &message)
-{
-	observable_subscriptions.add(Subscription(o, &message, NULL, callback));
-}
-
-void Observable::unsubscribe(VirtualBase *o)
-{
-	for (int i=observable_subscriptions.num-1; i>=0; i--)
-		if (observable_subscriptions[i].observer == o){
-			observable_subscriptions.erase(i);
+	for (int i=subscriptions.num-1; i>=0; i--)
+		if (subscriptions[i].observer == o){
+			subscriptions.erase(i);
 		}
 }
 
-void Observable::subscribe_kaba(hui::EventHandler *handler, hui::kaba_member_callback *function)
+void ObservableData::notifySend()
 {
-	subscribe2(handler, std::bind(function, handler));
-}
+	if (!me){
+		message_queue.clear();
+		return;
+	}
 
-
-void Observable::notifySend()
-{
 	Array<Notification> notifications;
 
 	// decide whom to send what
-	for (const string *m: observable_message_queue){
+	for (const string *m: message_queue){
 		//msg_write("send " + observable_name + ": " + queue[i]);
-		for (Subscription &r: observable_subscriptions){
-			if ((r.message == m) or (r.message == &MESSAGE_ANY))
+		for (Subscription &r: subscriptions){
+			if ((r.message == m) or (*r.message == Observable<VirtualBase>::MESSAGE_ANY))
 				notifications.add(Notification(r.observer, m, r.callback, r.callback_p));
 		}
 	}
 
-	observable_message_queue.clear();
+	message_queue.clear();
 
 	// send
 	for (Notification &n: notifications){
 		if (DEBUG_MESSAGES)
-			msg_write("send " + get_obs_name(this) + "/" + *n.message + "  >>  " + get_obs_name(n.observer));
+			msg_write("send " + get_obs_name(me) + "  >>  " + *n.message + "  >>  " + get_obs_name(n.observer));
 		//n.callback();
-		observable_cur_message = n.message;
+		cur_message = n.message;
 		if (n.callback)
 			n.callback();
 		else if (n.callback_p)
-			n.callback_p(this);
+			n.callback_p(me);
 	}
 }
 
 
-void Observable::notifyEnqueue(const string &message)
+void ObservableData::notifyEnqueue(const string &message)
 {
 	// already enqueued?
-	for (const string *m: observable_message_queue)
+	for (const string *m: message_queue)
 		if (&message == m)
 			return;
 
 	// add
-	observable_message_queue.add(&message);
+	message_queue.add(&message);
 }
 
-void Observable::notifyBegin()
+void ObservableData::notifyBegin()
 {
-	observable_notify_level ++;
+	notify_level ++;
 	//msg_write("notify ++");
 }
 
-void Observable::notifyEnd()
+void ObservableData::notifyEnd()
 {
-	observable_notify_level --;
+	notify_level --;
 	//msg_write("notify --");
-	if (observable_notify_level == 0)
+	if (notify_level == 0)
 		notifySend();
 }
 
 
-void Observable::notify(const string &message)
+void ObservableData::notify(const string &message)
 {
 	notifyEnqueue(message);
-	if (observable_notify_level == 0)
+	if (notify_level == 0)
 		notifySend();
-}
-
-const string& Observable::cur_message() const
-{
-	return *observable_cur_message;
 }
 

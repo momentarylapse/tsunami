@@ -18,7 +18,6 @@ class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
 class Tsunami;
-class Observable;
 
 class TsunamiWindow : public hui::Window
 {
@@ -108,7 +107,10 @@ public:
 
 	void updateMenu();
 
-	void onUpdate(Observable *o);
+	void onPluginStopRequest(VirtualBase *o);
+	void onSideBarUpdate();
+	void onBottomBarUpdate();
+	void onUpdate();
 
 	AudioView *view;
 

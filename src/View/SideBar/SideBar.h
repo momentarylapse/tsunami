@@ -26,7 +26,7 @@ class CaptureConsole;
 class AudioView;
 class SideBarConsole;
 
-class SideBar : public hui::Panel, public Observable
+class SideBar : public Observable<hui::Panel>
 {
 public:
 	SideBar(AudioView *view, Song *song);

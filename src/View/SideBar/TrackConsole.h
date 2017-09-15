@@ -39,7 +39,8 @@ public:
 
 	void setTrack(Track *t);
 
-	void onUpdate(Observable *o);
+	void onViewCurTrackChange();
+	void onUpdate();
 
 	AudioView *view;
 	Track *track;

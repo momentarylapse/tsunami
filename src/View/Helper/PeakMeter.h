@@ -17,7 +17,7 @@ namespace hui{
 	class Panel;
 }
 
-class PeakMeterSource : public Observable
+class PeakMeterSource : public Observable<VirtualBase>
 {
 public:
 	PeakMeterSource(){}
@@ -41,7 +41,7 @@ public:
 	void onLeftButtonDown();
 	void onRightButtonDown();
 	void setMode(int mode);
-	void onUpdate(Observable *o);
+	void onUpdate();
 	void enable(bool enabled);
 
 	static const int NUM_SAMPLES;

@@ -20,7 +20,7 @@ public:
 
 	void onClear();
 	void reload();
-	void onUpdate(Observable *o);
+	void onUpdate();
 
 	Log *log;
 };

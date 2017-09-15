@@ -28,7 +28,8 @@ public:
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();
 
-	void onUpdate(Observable *o);
+	void onBottomBarUpdate();
+	void onVolumeChange();
 
 	OutputStream *stream;
 	DeviceManager *output;

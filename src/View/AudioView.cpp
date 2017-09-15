@@ -218,8 +218,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	msp.stop();
 	selection_mode = SELECTION_MODE_NONE;
 	hide_selection = false;
-	song->subscribe_old(this, AudioView);
-	stream->subscribe_old(this, AudioView);
+	song->subscribe(this, std::bind(&AudioView::onSongUpdate, this));
+	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this));
 
 
 
@@ -622,48 +622,57 @@ void AudioView::checkConsistency()
 	}
 }
 
-void AudioView::onUpdate(Observable *o)
+void AudioView::onSongUpdate()
 {
-	//msg_write("AudioView: " + o->getName() + " / " + message);
+
 	checkConsistency();
-
-	if (o == song){
-
-		if (o->cur_message() == song->MESSAGE_NEW){
-			updateTracks();
-			sel.range = Range(0, 0);
-			setCurTrack(NULL);
-			if (song->tracks.num > 0){
-				if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)
-					setCurTrack(song->tracks[1]);
-				else
-					setCurTrack(song->tracks[0]);
-			}
-			optimizeView();
-		}else if (o->cur_message() == song->MESSAGE_FINISHED_LOADING){
-			optimizeView();
-			hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, this));
-		}else{
-			if ((o->cur_message() == song->MESSAGE_ADD_TRACK) or (o->cur_message() == song->MESSAGE_DELETE_TRACK))
-				updateTracks();
-			forceRedraw();
-			updateMenu();
+	if (song->cur_message() == song->MESSAGE_NEW){
+		updateTracks();
+		sel.range = Range(0, 0);
+		setCurTrack(NULL);
+		if (song->tracks.num > 0){
+			if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)
+				setCurTrack(song->tracks[1]);
+			else
+				setCurTrack(song->tracks[0]);
 		}
-
-		if (o->cur_message() == song->MESSAGE_CHANGE)
-			if (song->action_manager->isEnabled())
-				updatePeaks();
-	}else if (o == stream){
-		if (stream->isPlaying())
-			cam.makeSampleVisible(stream->getPos());
+		optimizeView();
+	}else if (song->cur_message() == song->MESSAGE_FINISHED_LOADING){
+		optimizeView();
+		hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, this));
+	}else{
+		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
+			updateTracks();
 		forceRedraw();
-	}else if (input and o == input){
+		updateMenu();
+	}
+
+	if (song->cur_message() == MESSAGE_CHANGE)
+		if (song->action_manager->isEnabled())
+			updatePeaks();
+}
+
+void AudioView::onStreamUpdate()
+{
+	if (stream->isPlaying())
+		cam.makeSampleVisible(stream->getPos());
+	forceRedraw();
+}
+
+void AudioView::onInputUpdate()
+{
+	if (input){
 		if (input->isCapturing())
 			cam.makeSampleVisible(sel.range.start() + input->getSampleCount());
 		forceRedraw();
-	}else{
-		forceRedraw();
 	}
+}
+
+void AudioView::onUpdate()
+{
+	checkConsistency();
+
+	forceRedraw();
 }
 
 AudioViewTrack *AudioView::get_track(Track *track)
@@ -1104,7 +1113,7 @@ void AudioView::setInput(InputStreamAny *_input)
 	notify(MESSAGE_INPUT_CHANGE);
 
 	if (input)
-		input->subscribe_old(this, AudioView);
+		input->subscribe(this, std::bind(&AudioView::onInputUpdate, this));
 }
 
 // unused?!?
@@ -1113,6 +1122,6 @@ void AudioView::enable(bool _enabled)
 	if (enabled and !_enabled)
 		song->unsubscribe(this);
 	else if (!enabled and _enabled)
-		song->subscribe_old(this, AudioView);
+		song->subscribe(this, std::bind(&AudioView::onSongUpdate, this));
 	enabled = _enabled;
 }

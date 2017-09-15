@@ -28,7 +28,7 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	event("edit_track", std::bind(&SampleRefConsole::onEditTrack, this));
 	event("edit_sample", std::bind(&SampleRefConsole::onEditSample, this));
 
-	view->subscribe_old2(this, SampleRefConsole, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->subscribe(this, std::bind(&SampleRefConsole::onViewCurSampleChange, this), view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SampleRefConsole::~SampleRefConsole()
@@ -52,7 +52,7 @@ void SampleRefConsole::onMute()
 	track->editSampleRef(sample, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
-	sample->subscribe_old(this, SampleRefConsole);
+	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
 }
 
 void SampleRefConsole::onTrack()
@@ -66,7 +66,7 @@ void SampleRefConsole::onVolume()
 		return;
 	sample->unsubscribe(this);
 	track->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
-	sample->subscribe_old(this, SampleRefConsole);
+	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
 }
 
 void SampleRefConsole::onEditSong()
@@ -108,21 +108,22 @@ void SampleRefConsole::loadData()
 	setInt("track", sample->track_no);
 }
 
-void SampleRefConsole::onUpdate(Observable *o)
+void SampleRefConsole::onViewCurSampleChange()
 {
-	if (o == view){
-		if (sample)
-			sample->unsubscribe(this);
-		track = view->cur_track;
-		sample = view->cur_sample;
-		if (sample)
-			sample->subscribe_old(this, SampleRefConsole);
-		loadData();
-	}else if ((o == sample) and (o->cur_message() == o->MESSAGE_DELETE)){
+	if (sample)
+		sample->unsubscribe(this);
+	track = view->cur_track;
+	sample = view->cur_sample;
+	if (sample)
+		sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
+	loadData();
+}
+
+void SampleRefConsole::onUpdate()
+{
+	if (sample->cur_message() == sample->MESSAGE_DELETE){
 		sample->unsubscribe(this);
 		sample = NULL;
-		loadData();
-	}else{
-		loadData();
 	}
+	loadData();
 }

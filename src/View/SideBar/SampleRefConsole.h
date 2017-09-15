@@ -32,7 +32,8 @@ public:
 	void onEditTrack();
 	void onEditSample();
 
-	void onUpdate(Observable *o);
+	void onViewCurSampleChange();
+	void onUpdate();
 
 	AudioView *view;
 	Song *song;

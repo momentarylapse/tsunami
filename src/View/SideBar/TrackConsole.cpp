@@ -29,7 +29,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 		setString("instrument", i.name());
 
 	loadData();
-	view->subscribe_old2(this, TrackConsole, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&TrackConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
 
 	event("name", std::bind(&TrackConsole::onName, this));
 	event("volume", std::bind(&TrackConsole::onVolume, this));
@@ -100,7 +100,7 @@ void TrackConsole::setTrack(Track *t)
 	track = t;
 	loadData();
 	if (track)
-		track->subscribe_old(this, TrackConsole);
+		track->subscribe(this, std::bind(&TrackConsole::onUpdate, this));
 }
 
 void TrackConsole::onName()
@@ -176,11 +176,14 @@ void TrackConsole::onEditSynth()
 	bar()->open(SideBar::SYNTH_CONSOLE);
 }
 
-void TrackConsole::onUpdate(Observable *o)
+void TrackConsole::onViewCurTrackChange()
 {
-	if (o == view){
-		setTrack(view->cur_track);
-	}else if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
+	setTrack(view->cur_track);
+}
+
+void TrackConsole::onUpdate()
+{
+	if (track->cur_message() == track->MESSAGE_DELETE){
 		setTrack(NULL);
 	}else{
 		loadData();

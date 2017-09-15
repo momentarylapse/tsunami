@@ -29,7 +29,7 @@ public:
 
 	void onEditSong();
 
-	void onUpdate(Observable *o);
+	void onUpdate();
 
 	Song *song;
 	AudioView *view;

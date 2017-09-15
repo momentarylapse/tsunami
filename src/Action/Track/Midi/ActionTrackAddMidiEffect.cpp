@@ -30,7 +30,7 @@ void *ActionTrackAddMidiEffect::execute(Data *d)
 void ActionTrackAddMidiEffect::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	((Observable*)effect)->notify(effect->MESSAGE_DELETE);
+	effect->Observable::notify(effect->MESSAGE_DELETE);
 	Track *t = a->get_track(track_no);
 	t->midi.fx.pop();
 	t->notify(t->MESSAGE_DELETE_MIDI_EFFECT);

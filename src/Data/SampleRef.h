@@ -18,7 +18,7 @@ class MidiData;
 class AudioBuffer;
 class Range;
 
-class SampleRef : public Observable
+class SampleRef : public Observable<VirtualBase>
 {
 public:
 	SampleRef(Sample *sample);

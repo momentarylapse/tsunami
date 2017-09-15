@@ -18,7 +18,7 @@ class Track;
 class SampleRef;
 struct Tag;
 
-class Sample : public Observable
+class Sample : public Observable<VirtualBase>
 {
 public:
 	Sample(int type);

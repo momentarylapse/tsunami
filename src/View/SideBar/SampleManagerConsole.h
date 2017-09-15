@@ -38,7 +38,9 @@ public:
 
 	void onEditSong();
 
-	void onUpdate(Observable *o);
+	void onProgressCancel();
+	void onSongUpdate();
+	void onPreviewStreamUpdate();
 
 	void endPreview();
 

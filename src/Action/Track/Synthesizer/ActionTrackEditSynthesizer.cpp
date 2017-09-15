@@ -26,7 +26,7 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 	assert(t->synth);
 
 	t->synth->configFromString(new_value);
-	((Observable*)t->synth)->notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+	t->synth->Observable::notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
@@ -40,7 +40,7 @@ void ActionTrackEditSynthesizer::undo(Data *d)
 	assert(t->synth);
 
 	t->synth->configFromString(old_value);
-	((Observable*)t->synth)->notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+	t->synth->Observable::notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 }
 
 bool ActionTrackEditSynthesizer::mergable(Action *a)

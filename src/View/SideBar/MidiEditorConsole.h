@@ -24,7 +24,10 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	void onUpdate(Observable *o);
+	void onTrackDelete();
+	void onViewCurTrackChange();
+	void onViewVTrackChange();
+	void onUpdate();
 	void update();
 
 	void onScale();

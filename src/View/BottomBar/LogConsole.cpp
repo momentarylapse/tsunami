@@ -21,7 +21,7 @@ LogConsole::LogConsole(Log *_log) :
 	//hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
 	reload();
 
-	log->subscribe_old(this, LogConsole);
+	log->subscribe(this, std::bind(&LogConsole::onUpdate, this));
 }
 
 LogConsole::~LogConsole()
@@ -50,7 +50,7 @@ void LogConsole::reload()
 	}
 }
 
-void LogConsole::onUpdate(Observable *o)
+void LogConsole::onUpdate()
 {
 	reload();
 }

@@ -33,7 +33,7 @@ enum
 	BACKUP_MODE_KEEP
 };
 
-class DeviceManager : public Observable
+class DeviceManager : public Observable<VirtualBase>
 {
 public:
 	friend class OutputStream;

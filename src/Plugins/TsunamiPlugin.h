@@ -17,7 +17,7 @@ namespace hui{
 class AudioView;
 class Song;
 
-class TsunamiPlugin : public Observable
+class TsunamiPlugin : public Observable<VirtualBase>
 {
 public:
 	TsunamiPlugin();

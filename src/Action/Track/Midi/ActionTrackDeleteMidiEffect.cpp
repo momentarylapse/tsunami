@@ -25,7 +25,7 @@ void *ActionTrackDeleteMidiEffect::execute(Data *d)
 	assert(index < t->midi.fx.num);
 
 	effect = t->midi.fx[index];
-	((Observable*)effect)->notify(effect->MESSAGE_DELETE);
+	effect->Observable::notify(effect->MESSAGE_DELETE);
 	t->midi.fx.erase(index);
 	t->notify(t->MESSAGE_DELETE_MIDI_EFFECT);
 

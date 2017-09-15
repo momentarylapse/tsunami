@@ -209,12 +209,12 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	mini_bar = new MiniBar(bottom_bar, view->stream, app->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
-	view->subscribe_old(this, TsunamiWindow);
-	song->subscribe_old(this, TsunamiWindow);
-	view->stream->subscribe_old2(this, TsunamiWindow, OutputStream::MESSAGE_STATE_CHANGE);
-	app->clipboard->subscribe_old(this, TsunamiWindow);
-	bottom_bar->subscribe_old(this, TsunamiWindow);
-	side_bar->subscribe_old(this, TsunamiWindow);
+	view->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
+	song->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
+	view->stream->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this), OutputStream::MESSAGE_STATE_CHANGE);
+	app->clipboard->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
+	bottom_bar->subscribe(this, std::bind(&TsunamiWindow::onBottomBarUpdate, this));
+	side_bar->subscribe(this, std::bind(&TsunamiWindow::onSideBarUpdate, this));
 
 
 
@@ -521,7 +521,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 	TsunamiPlugin *p = CreateTsunamiPlugin(name, this);
 
 	plugins.add(p);
-	p->subscribe_old2(this, TsunamiWindow, p->MESSAGE_STOP_REQUEST);
+	p->subscribe3(this, std::bind(&TsunamiWindow::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
 	p->start();
 }
 
@@ -747,27 +747,33 @@ void TsunamiWindow::updateMenu()
 	setTitle(title);
 }
 
-
-void TsunamiWindow::onUpdate(Observable *o)
+void TsunamiWindow::onPluginStopRequest(VirtualBase *o)
 {
-	if (o->cur_message() == TsunamiPlugin::MESSAGE_STOP_REQUEST){
-		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
-		tpl->stop();
+	TsunamiPlugin *tpl = (TsunamiPlugin*)o;
+	tpl->stop();
 
-		if (die_on_plugin_stop)
-			tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
-	}else if (o == side_bar){
-		if (!side_bar->visible)
-			activate(view->id);
-		updateMenu();
-	}else if (o == bottom_bar){
-		if (!bottom_bar->visible)
-			activate(view->id);
-		updateMenu();
-	}else{
-		// "Clipboard", "AudioFile" or "AudioView"
-		updateMenu();
-	}
+	if (die_on_plugin_stop)
+		tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
+}
+
+void TsunamiWindow::onSideBarUpdate()
+{
+	if (!side_bar->visible)
+		activate(view->id);
+	updateMenu();
+}
+
+void TsunamiWindow::onBottomBarUpdate()
+{
+	if (!bottom_bar->visible)
+		activate(view->id);
+	updateMenu();
+}
+
+void TsunamiWindow::onUpdate()
+{
+	// "Clipboard", "AudioFile" or "AudioView"
+	updateMenu();
 }
 
 

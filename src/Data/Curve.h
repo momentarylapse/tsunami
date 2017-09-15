@@ -19,7 +19,7 @@ namespace Kaba
 	class Class;
 };
 
-class Curve : public Observable
+class Curve : public Observable<VirtualBase>
 {
 public:
 	Curve();

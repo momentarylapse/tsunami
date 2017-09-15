@@ -15,9 +15,8 @@
 
 class ActionManager;
 class Action;
-class Observable;
 
-class Data : public Observable
+class Data : public Observable<VirtualBase>
 {
 public:
 	Data();

@@ -82,14 +82,14 @@ void PeakMeter::setSource(PeakMeterSource *_source)
 	source = _source;
 
 	if (source and enabled)
-		source->subscribe_old(this, PeakMeter);
+		source->subscribe(this, std::bind(&PeakMeter::onUpdate, this));
 }
 
 void PeakMeter::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			source->subscribe_old(this, PeakMeter);
+			source->subscribe(this, std::bind(&PeakMeter::onUpdate, this));
 		if (enabled and !_enabled)
 			source->unsubscribe(this);
 	}
@@ -213,9 +213,9 @@ void PeakMeter::findSpectrum()
 	}
 }
 
-void PeakMeter::onUpdate(Observable *o)
+void PeakMeter::onUpdate()
 {
-	if (&o->cur_message() == &Observable::MESSAGE_DELETE){
+	if (source and (&source->cur_message() == &source->MESSAGE_DELETE)){
 		setSource(NULL);
 		return;
 	}

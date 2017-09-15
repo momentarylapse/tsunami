@@ -252,7 +252,6 @@ OBJ = \
  Stuff/Clipboard.o\
  Stuff/Log.o\
  Stuff/Observable.o\
- Stuff/Observer.o\
  View/BottomBar/BottomBar.o\
  View/BottomBar/DeviceConsole.o\
  View/BottomBar/LogConsole.o\
@@ -1052,9 +1051,6 @@ Stuff/Log.o : Stuff/Log.cpp
 
 Stuff/Observable.o : Stuff/Observable.cpp
 	$(CPP) -c Stuff/Observable.cpp -o $@ $(CXXFLAGS)
-
-Stuff/Observer.o : Stuff/Observer.cpp
-	$(CPP) -c Stuff/Observer.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp
 	$(CPP) -c View/BottomBar/BottomBar.cpp -o $@ $(CXXFLAGS)

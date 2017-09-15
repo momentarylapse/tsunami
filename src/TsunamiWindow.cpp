@@ -51,21 +51,6 @@ hui::Timer debug_timer;
 
 static Array<TsunamiWindow*> TsunamiWindows;
 
-class TsunamiWindowObserver : public Observer
-{
-public:
-	TsunamiWindow *win;
-	TsunamiWindowObserver(TsunamiWindow *_win) : Observer("TsunamiWindow")
-	{
-		win = _win;
-	}
-
-	void onUpdate(Observable *o, const string &message)
-	{
-		win->onUpdate(o, message);
-	}
-};
-
 TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_RESIZABLE | hui::WIN_MODE_CONTROLS)
 {
@@ -224,13 +209,12 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	mini_bar = new MiniBar(bottom_bar, view->stream, app->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
-	observer = new TsunamiWindowObserver(this);
-	view->subscribe(observer);
-	song->subscribe(observer);
-	view->stream->subscribe(observer, OutputStream::MESSAGE_STATE_CHANGE);
-	app->clipboard->subscribe(observer);
-	bottom_bar->subscribe(observer);
-	side_bar->subscribe(observer);
+	view->subscribe_old(this, TsunamiWindow);
+	song->subscribe_old(this, TsunamiWindow);
+	view->stream->subscribe_old2(this, TsunamiWindow, OutputStream::MESSAGE_STATE_CHANGE);
+	app->clipboard->subscribe_old(this, TsunamiWindow);
+	bottom_bar->subscribe_old(this, TsunamiWindow);
+	side_bar->subscribe_old(this, TsunamiWindow);
 
 
 
@@ -271,13 +255,12 @@ void TsunamiWindow::onDestroy()
 	hui::Config.setInt("Window.Height", h);
 	hui::Config.setBool("Window.Maximized", isMaximized());
 
-	view->unsubscribe(observer);
-	song->unsubscribe(observer);
-	view->stream->unsubscribe(observer);
-	app->clipboard->unsubscribe(observer);
-	bottom_bar->unsubscribe(observer);
-	side_bar->unsubscribe(observer);
-	delete(observer);
+	view->unsubscribe(this);
+	song->unsubscribe(this);
+	view->stream->unsubscribe(this);
+	app->clipboard->unsubscribe(this);
+	bottom_bar->unsubscribe(this);
+	side_bar->unsubscribe(this);
 
 	delete(side_bar);
 	delete(mini_bar);
@@ -538,7 +521,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 	TsunamiPlugin *p = CreateTsunamiPlugin(name, this);
 
 	plugins.add(p);
-	p->subscribe(observer, p->MESSAGE_STOP_REQUEST);
+	p->subscribe_old2(this, TsunamiWindow, p->MESSAGE_STOP_REQUEST);
 	p->start();
 }
 
@@ -765,9 +748,9 @@ void TsunamiWindow::updateMenu()
 }
 
 
-void TsunamiWindow::onUpdate(Observable *o, const string &message)
+void TsunamiWindow::onUpdate(Observable *o)
 {
-	if (message == TsunamiPlugin::MESSAGE_STOP_REQUEST){
+	if (o->cur_message() == TsunamiPlugin::MESSAGE_STOP_REQUEST){
 		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
 		tpl->stop();
 

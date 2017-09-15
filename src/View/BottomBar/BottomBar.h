@@ -9,7 +9,7 @@
 #define BOTTOMBAR_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../Stuff/Observer.h"
+#include "../../Stuff/Observable.h"
 
 class AudioView;
 class Song;

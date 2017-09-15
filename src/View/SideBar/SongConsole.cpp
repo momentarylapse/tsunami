@@ -7,7 +7,6 @@
 
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
-#include "../../Stuff/Observer.h"
 #include "../../Stuff/Log.h"
 #include "../../View/AudioView.h"
 #include "../BottomBar/BottomBar.h"
@@ -23,8 +22,7 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 };
 
 SongConsole::SongConsole(Song *a) :
-	SideBarConsole(_("File properties")),
-	Observer("AudioFileConsole")
+	SideBarConsole(_("File properties"))
 {
 	song = a;
 
@@ -57,7 +55,7 @@ SongConsole::SongConsole(Song *a) :
 	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
 	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
 
-	song->subscribe(this);
+	song->subscribe_old(this, SongConsole);
 }
 
 SongConsole::~SongConsole()
@@ -152,7 +150,7 @@ void SongConsole::onEditFx()
 	bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
-void SongConsole::onUpdate(Observable *o, const string &message)
+void SongConsole::onUpdate(Observable *o)
 {
 	loadData();
 }

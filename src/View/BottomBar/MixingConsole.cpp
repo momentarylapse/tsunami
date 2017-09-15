@@ -100,8 +100,7 @@ void TrackMixer::update()
 
 
 MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream, AudioView *view) :
-	BottomBar::Console(_("Mixing console")),
-	Observer("MixingConsole")
+	BottomBar::Console(_("Mixing console"))
 {
 	song = _song;
 	device_manager = _device_manager;
@@ -114,8 +113,8 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
-	song->subscribe(this);
-	device_manager->subscribe(this);
+	song->subscribe_old(this, MixingConsole);
+	device_manager->subscribe_old(this, MixingConsole);
 	loadData();
 }
 
@@ -153,7 +152,7 @@ void MixingConsole::loadData()
 	hideControl("link-volumes", song->tracks.num <= 1);
 }
 
-void MixingConsole::onUpdate(Observable* o, const string &message)
+void MixingConsole::onUpdate(Observable* o)
 {
 	if (o == device_manager)
 		setFloat("output-volume", device_manager->getOutputVolume());

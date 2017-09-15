@@ -9,20 +9,19 @@
 #define CURVECONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
 class Song;
 class AudioView;
 class Curve;
 
-class CurveConsole : public SideBarConsole, public Observer
+class CurveConsole : public SideBarConsole
 {
 public:
 	CurveConsole(AudioView *view, Song *song);
 	virtual ~CurveConsole();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o);
 
 	void updateList();
 	void onAdd();

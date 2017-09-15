@@ -9,7 +9,6 @@
 #define MINIBAR_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../Stuff/Observer.h"
 
 class PeakMeter;
 class OutputStream;
@@ -17,7 +16,7 @@ class DeviceManager;
 class BottomBar;
 class AudioView;
 
-class MiniBar : public hui::Panel, public Observer
+class MiniBar : public hui::Panel
 {
 public:
 	MiniBar(BottomBar *bottom_bar, OutputStream *stream, DeviceManager *output, AudioView *view);
@@ -29,7 +28,7 @@ public:
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	OutputStream *stream;
 	DeviceManager *output;

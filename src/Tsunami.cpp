@@ -139,7 +139,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		TsunamiPlugin *p = CreateTsunamiPlugin(args[2], win);
 		p->args = args.sub(3, -1);
 		win->plugins.add(p);
-		p->subscribe(win->observer, p->MESSAGE_STOP_REQUEST);
+		p->subscribe_old2(win, TsunamiWindow, p->MESSAGE_STOP_REQUEST);
 		p->start();
 		return false;
 	}else if (args[1].head(2) == "--"){

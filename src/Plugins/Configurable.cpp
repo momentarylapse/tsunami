@@ -404,12 +404,11 @@ ConfigPanel *Configurable::createPanel()
 	}
 }*/
 
-class ConfigurationDialog : public hui::Window, public Observer
+class ConfigurationDialog : public hui::Window
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		hui::Window("configurable_dialog", tsunami->win),
-		Observer("")
+		hui::Window("configurable_dialog", tsunami->win)
 	{
 		config = c;
 		panel = p;
@@ -470,18 +469,20 @@ public:
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->subscribe(this);
-		tsunami->win->view->stream->subscribe(this);
+		progress->subscribe2(this, std::bind(&ConfigurationDialog::onProgressCancel, this), progress->MESSAGE_CANCEL);
+		tsunami->win->view->stream->subscribe2(this, std::bind(&ConfigurationDialog::onUpdateStream, this));
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();
 	}
 
-	virtual void onUpdate(Observable *o, const string &message)
+	void onProgressCancel()
 	{
-		if (progress and (o == progress)){
-			if (message == progress->MESSAGE_CANCEL)
-				previewEnd();
-		}else if (progress and (o == tsunami->win->view->stream)){
+		previewEnd();
+	}
+
+	void onUpdateStream()
+	{
+		if (progress){
 			int pos = tsunami->win->view->stream->getPos();
 			Range r = tsunami->win->view->sel.range;
 			progress->set(_("Preview"), (float)(pos - r.offset) / r.length);

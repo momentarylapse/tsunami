@@ -65,25 +65,24 @@ string render_sample(Sample *s, AudioView *view)
 	return hui::SetImage(im);
 }
 
-class SampleManagerItem : public Observer
+class SampleManagerItem : public VirtualBase
 {
 public:
-	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *view) :
-		Observer("SampleManagerItem")
+	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *view)
 	{
 		manager = _manager;
 		s = _s;
 		icon = render_sample(s, view);
-		s->subscribe(this);
+		s->subscribe_old(this, SampleManagerItem);
 	}
 	virtual ~SampleManagerItem()
 	{
 		zombify();
 	}
-	virtual void onUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o)
 	{
 		//msg_write("item:  " + message);
-		if (message == s->MESSAGE_DELETE){
+		if (o->cur_message() == s->MESSAGE_DELETE){
 			manager->remove(this);
 		}else{
 			int n = manager->getIndex(s);
@@ -111,8 +110,7 @@ public:
 };
 
 SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
-	SideBarConsole(_("Samples")),
-	Observer("SampleManagerConsole")
+	SideBarConsole(_("Samples"))
 {
 	fromResource("sample_manager_dialog");
 
@@ -139,9 +137,9 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	view = _view;
 	updateList();
 
-	song->subscribe(this, song->MESSAGE_ADD_SAMPLE);
-	song->subscribe(this, song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe(this, song->MESSAGE_NEW);
+	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_ADD_SAMPLE);
+	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe_old2(this, SampleManagerConsole, song->MESSAGE_NEW);
 }
 
 SampleManagerConsole::~SampleManagerConsole()
@@ -296,10 +294,10 @@ void SampleManagerConsole::onEditSong()
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleManagerConsole::onUpdate(Observable *o, const string &message)
+void SampleManagerConsole::onUpdate(Observable *o)
 {
 	if (progress and (o == progress)){
-		if (message == progress->MESSAGE_CANCEL)
+		if (o->cur_message() == progress->MESSAGE_CANCEL)
 			endPreview();
 	}else if (o == preview_stream){
 		int pos = preview_stream->getPos();
@@ -323,8 +321,8 @@ void SampleManagerConsole::onPreview()
 	preview_stream = new OutputStream(preview_renderer);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this);
-	preview_stream->subscribe(this);
+	progress->subscribe_old(this, SampleManagerConsole);
+	preview_stream->subscribe_old(this, SampleManagerConsole);
 	preview_stream->play();
 }
 

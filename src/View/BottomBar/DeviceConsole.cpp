@@ -10,8 +10,7 @@
 #include "../../Device/Device.h"
 
 DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
-	BottomBar::Console(_("Devices")),
-	Observer("DeviceConsole")
+	BottomBar::Console(_("Devices"))
 {
 	device_manager = _device_manager;
 
@@ -27,7 +26,9 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	event("top-priority", std::bind(&DeviceConsole::onTopPriority, this));
 	event("erase", std::bind(&DeviceConsole::onErase, this));
 
-	device_manager->subscribe(this);
+	device_manager->subscribe2(this, std::bind(&DeviceConsole::add_device, this), device_manager->MESSAGE_ADD_DEVICE);
+	device_manager->subscribe2(this, std::bind(&DeviceConsole::update_full, this), device_manager->MESSAGE_REMOVE_DEVICE);
+	device_manager->subscribe2(this, std::bind(&DeviceConsole::change_data, this), device_manager->MESSAGE_CHANGE);
 
 	update_full();
 }
@@ -35,18 +36,6 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 DeviceConsole::~DeviceConsole()
 {
 	device_manager->unsubscribe(this);
-}
-
-void DeviceConsole::onUpdate(Observable *o, const string &message)
-{
-	if (message == device_manager->MESSAGE_CHANGE){
-		change_data();
-	}else if (message == device_manager->MESSAGE_ADD_DEVICE){
-		add_device();
-	}else if (message == device_manager->MESSAGE_REMOVE_DEVICE){
-		update_full();
-	}else{
-	}
 }
 
 string DeviceConsole::to_format(int i, const Device *d)

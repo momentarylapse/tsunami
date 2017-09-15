@@ -9,14 +9,13 @@
 #define MIDIEDITORCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
 class Song;
 class AudioView;
 class Track;
 
-class MidiEditorConsole : public SideBarConsole, public Observer
+class MidiEditorConsole : public SideBarConsole
 {
 public:
 	MidiEditorConsole(AudioView *view, Song *audio);
@@ -25,7 +24,7 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 	void update();
 
 	void onScale();

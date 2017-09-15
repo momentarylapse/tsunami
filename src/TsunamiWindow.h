@@ -8,10 +8,8 @@
 #ifndef TSUNAMIWINDOW_H_
 #define TSUNAMIWINDOW_H_
 
-#include "Stuff/Observer.h"
 #include "lib/hui/hui.h"
 
-class Observer;
 class HuiWindow;
 class Song;
 class AudioView;
@@ -20,6 +18,7 @@ class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
 class Tsunami;
+class Observable;
 
 class TsunamiWindow : public hui::Window
 {
@@ -109,8 +108,7 @@ public:
 
 	void updateMenu();
 
-	Observer *observer;
-	void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	AudioView *view;
 

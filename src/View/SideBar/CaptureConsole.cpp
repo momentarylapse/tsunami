@@ -133,7 +133,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		input->subscribe(cc);
+		input->subscribe_old(cc, CaptureConsole);
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -313,7 +313,7 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		input->subscribe(cc);
+		input->subscribe_old(cc, CaptureConsole);
 		view->setInput(input);
 		cc->peak_meter->setSource(input);
 
@@ -497,8 +497,7 @@ public:
 };
 
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
-	SideBarConsole(_("Recording")),
-	Observer("CaptureDialog")
+	SideBarConsole(_("Recording"))
 {
 	song = s;
 	view = v;
@@ -662,9 +661,9 @@ void CaptureConsole::updateTime()
 	setString("capture_time", song->get_time_str_long(mode->getSampleCount()));
 }
 
-void CaptureConsole::onUpdate(Observable *o, const string &message)
+void CaptureConsole::onUpdate(Observable *o)
 {
-	if (&message == &Observable::MESSAGE_DELETE)
+	if (&o->cur_message() == &Observable::MESSAGE_DELETE)
 		return;
 	updateTime();
 }

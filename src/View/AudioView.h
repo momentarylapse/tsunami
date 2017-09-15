@@ -12,7 +12,7 @@
 #include "../Data/SongSelection.h"
 #include "../Midi/Scale.h"
 #include "../lib/hui/hui.h"
-#include "../Stuff/Observer.h"
+#include "../Stuff/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
 #include "Selection.h"
@@ -32,7 +32,7 @@ class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
 
-class AudioView : public Observable, public Observer
+class AudioView : public Observable
 {
 public:
 	AudioView(TsunamiWindow *parent, const string &id, Song *audio);
@@ -55,7 +55,7 @@ public:
 	void onKeyUp();
 	void onCommand(const string &id);
 
-	void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
 	static const string MESSAGE_CUR_LAYER_CHANGE;

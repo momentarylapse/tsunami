@@ -8,7 +8,6 @@
 #ifndef PEAKMETER_H_
 #define PEAKMETER_H_
 
-#include "../../Stuff/Observer.h"
 #include "../../Stuff/Observable.h"
 
 class AudioView;
@@ -32,7 +31,7 @@ public:
 	};
 };
 
-class PeakMeter : public Observer
+class PeakMeter : public VirtualBase
 {
 public:
 	PeakMeter(hui::Panel *panel, const string &id, PeakMeterSource *source, AudioView *view);
@@ -42,7 +41,7 @@ public:
 	void onLeftButtonDown();
 	void onRightButtonDown();
 	void setMode(int mode);
-	void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 	void enable(bool enabled);
 
 	static const int NUM_SAMPLES;

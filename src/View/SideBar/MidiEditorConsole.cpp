@@ -23,8 +23,7 @@ int get_track_index_save(Song *song, Track *t);
 
 
 MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Midi")),
-	Observer("MidiEditorConsole")
+	SideBarConsole(_("Midi"))
 {
 	view = _view;
 	song = _song;
@@ -74,9 +73,9 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::onEditMidiFx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::onEditSong, this));
 
-	view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
-	view->subscribe(this, view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, view->MESSAGE_SETTINGS_CHANGE);
+	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe_old2(this, MidiEditorConsole, view->MESSAGE_SETTINGS_CHANGE);
 	update();
 }
 
@@ -125,14 +124,14 @@ void MidiEditorConsole::update()
 	}
 }
 
-void MidiEditorConsole::onUpdate(Observable* o, const string &message)
+void MidiEditorConsole::onUpdate(Observable* o)
 {
 	update();
-	if ((o == track) and (message == track->MESSAGE_DELETE)){
+	if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) and (message == view->MESSAGE_CUR_TRACK_CHANGE)){
+	}else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE)){
 		setTrack(view->cur_track);
-	}else if ((o == view) and (message == view->MESSAGE_VTRACK_CHANGE)){
+	}else if ((o == view) and (o->cur_message() == view->MESSAGE_VTRACK_CHANGE)){
 
 		reset("reference_tracks");
 		if (song){
@@ -268,9 +267,9 @@ void MidiEditorConsole::setTrack(Track *t)
 
 	track = t;
 	if (track){
-		track->subscribe(this, track->MESSAGE_DELETE);
-		track->subscribe(this, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_DELETE);
+		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe_old2(this, MidiEditorConsole, track->MESSAGE_DELETE_MIDI_EFFECT);
 
 		int tn = track->get_index();
 		if ((tn >= 0) and (tn < view->vtrack.num))

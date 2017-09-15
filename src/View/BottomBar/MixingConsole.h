@@ -10,7 +10,6 @@
 
 
 #include "BottomBar.h"
-#include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class Song;
@@ -49,7 +48,7 @@ public:
 	string id_separator;
 };
 
-class MixingConsole: public BottomBar::Console, public Observer
+class MixingConsole: public BottomBar::Console
 {
 public:
 	MixingConsole(Song *audio, DeviceManager *device_manager, OutputStream *stream, AudioView *view);
@@ -59,7 +58,7 @@ public:
 
 	void onOutputVolume();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();

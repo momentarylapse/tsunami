@@ -13,7 +13,7 @@
 class DeviceManager;
 class Device;
 
-class DeviceConsole: public BottomBar::Console, public Observer
+class DeviceConsole: public BottomBar::Console
 {
 public:
 	DeviceConsole(DeviceManager *device_manager);
@@ -31,8 +31,6 @@ public:
 	void onMidiInputMove();
 	void onTopPriority();
 	void onErase();
-
-	virtual void onUpdate(Observable *o, const string &message);
 
 	string to_format(int i, const Device *d);
 

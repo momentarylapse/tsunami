@@ -9,12 +9,11 @@
 #define SYNTHCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 
 class Track;
 class AudioView;
 
-class SynthConsole : public SideBarConsole, public Observer
+class SynthConsole : public SideBarConsole
 {
 public:
 	SynthConsole(AudioView *view);
@@ -29,7 +28,7 @@ public:
 	void onEditSong();
 	void onEditTrack();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	string id_inner;
 

@@ -9,15 +9,13 @@
 #include "LayerConsole.h"
 
 #include "../../Tsunami.h"
-#include "../../Stuff/Observer.h"
 #include "../../View/AudioView.h"
 #include "../../Data/Song.h"
 #include "../../Stuff/Log.h"
 
 
 LayerConsole::LayerConsole(Song *s, AudioView *v) :
-	SideBarConsole(_("Layers")),
-	Observer("LayerConsole")
+	SideBarConsole(_("Layers"))
 {
 	song = s;
 	view = v;
@@ -38,8 +36,8 @@ LayerConsole::LayerConsole(Song *s, AudioView *v) :
 
 	event("edit_song", std::bind(&LayerConsole::onEditSong, this));
 
-	song->subscribe(this);
-	view->subscribe(this, view->MESSAGE_CUR_LAYER_CHANGE);
+	song->subscribe_old(this, LayerConsole);
+	view->subscribe_old2(this, LayerConsole, view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
 LayerConsole::~LayerConsole()
@@ -119,7 +117,7 @@ void LayerConsole::onEditSong()
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void LayerConsole::onUpdate(Observable *o, const string &message)
+void LayerConsole::onUpdate(Observable *o)
 {
 	loadData();
 }

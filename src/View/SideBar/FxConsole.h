@@ -9,13 +9,12 @@
 #define FXCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 
 class Track;
 class Song;
 class AudioView;
 
-class FxConsole : public SideBarConsole, public Observer
+class FxConsole : public SideBarConsole
 {
 public:
 	FxConsole(AudioView *view, Song *audio);
@@ -29,7 +28,7 @@ public:
 	void onEditSong();
 	void onEditTrack();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	string id_inner;
 

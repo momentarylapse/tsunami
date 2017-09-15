@@ -12,7 +12,7 @@
 
 class Log;
 
-class LogConsole: public BottomBar::Console, public Observer
+class LogConsole: public BottomBar::Console
 {
 public:
 	LogConsole(Log *log);
@@ -20,7 +20,7 @@ public:
 
 	void onClear();
 	void reload();
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	Log *log;
 };

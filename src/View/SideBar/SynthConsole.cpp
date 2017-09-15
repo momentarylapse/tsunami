@@ -18,11 +18,10 @@
 
 
 
-class SynthPanel : public hui::Panel, public Observer
+class SynthPanel : public hui::Panel
 {
 public:
-	SynthPanel(Track *t) :
-		Observer("SynthPanel")
+	SynthPanel(Track *t)
 	{
 		track = t;
 		synth = t->synth;
@@ -43,8 +42,8 @@ public:
 		event("save_favorite", std::bind(&SynthPanel::onSave, this));
 
 		old_param = synth->configToString();
-		synth->subscribe(this, synth->MESSAGE_CHANGE);
-		synth->subscribe(this, synth->MESSAGE_CHANGE_BY_ACTION);
+		synth->subscribe_old2(this, SynthPanel, synth->MESSAGE_CHANGE);
+		synth->subscribe_old2(this, SynthPanel, synth->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SynthPanel()
 	{
@@ -66,9 +65,9 @@ public:
 			return;
 		tsunami->plugin_manager->SaveFavorite(synth, name);
 	}
-	virtual void onUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o)
 	{
-		if (message == o->MESSAGE_CHANGE){
+		if (o->cur_message() == o->MESSAGE_CHANGE){
 			track->editSynthesizer(old_param);
 		}
 		if (p)
@@ -82,8 +81,7 @@ public:
 };
 
 SynthConsole::SynthConsole(AudioView *_view) :
-	SideBarConsole(_("Synthesizer")),
-	Observer("SynthConsole")
+	SideBarConsole(_("Synthesizer"))
 {
 	view = _view;
 	id_inner = "grid";
@@ -99,7 +97,7 @@ SynthConsole::SynthConsole(AudioView *_view) :
 	track = NULL;
 	panel = NULL;
 
-	view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe_old2(this, SynthConsole, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 SynthConsole::~SynthConsole()
@@ -158,24 +156,24 @@ void SynthConsole::setTrack(Track *t)
 	if (!track)
 		return;
 
-	track->subscribe(this, track->MESSAGE_DELETE);
-	track->subscribe(this, track->MESSAGE_CHANGE);
+	track->subscribe_old2(this, SynthConsole, track->MESSAGE_DELETE);
+	track->subscribe_old2(this, SynthConsole, track->MESSAGE_CHANGE);
 
 	if (track->synth){
-		track->synth->subscribe(this, track->synth->MESSAGE_DELETE);
+		track->synth->subscribe_old2(this, SynthConsole, track->synth->MESSAGE_DELETE);
 		panel = new SynthPanel(track);
 		embed(panel, id_inner, 0, 0);
 		addSeparator("!horizontal", 0, 1, 0, 0, "separator_0");
 	}
 }
 
-void SynthConsole::onUpdate(Observable* o, const string &message)
+void SynthConsole::onUpdate(Observable* o)
 {
-	if ((o->getName() == "Synthesizer") and (message == o->MESSAGE_DELETE)){
+	if ((o->getName() == "Synthesizer") and (o->cur_message() == o->MESSAGE_DELETE)){
 		clear();
-	}else if ((o == track) and (message == track->MESSAGE_DELETE)){
+	}else if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) and (message == view->MESSAGE_CUR_TRACK_CHANGE))
+	}else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE))
 		setTrack(view->cur_track);
 	else
 		setTrack(track);

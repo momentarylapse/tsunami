@@ -12,8 +12,7 @@
 #include "SampleManagerConsole.h"
 
 SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
-	SideBarConsole("Sample-Eigenschaften"),
-	Observer("SampleRefConsole")
+	SideBarConsole("Sample-Eigenschaften")
 {
 	fromResource("sample_ref_dialog");
 	view = v;
@@ -29,7 +28,7 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	event("edit_track", std::bind(&SampleRefConsole::onEditTrack, this));
 	event("edit_sample", std::bind(&SampleRefConsole::onEditSample, this));
 
-	view->subscribe(this, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->subscribe_old2(this, SampleRefConsole, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SampleRefConsole::~SampleRefConsole()
@@ -53,7 +52,7 @@ void SampleRefConsole::onMute()
 	track->editSampleRef(sample, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
-	sample->subscribe(this);
+	sample->subscribe_old(this, SampleRefConsole);
 }
 
 void SampleRefConsole::onTrack()
@@ -67,7 +66,7 @@ void SampleRefConsole::onVolume()
 		return;
 	sample->unsubscribe(this);
 	track->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
-	sample->subscribe(this);
+	sample->subscribe_old(this, SampleRefConsole);
 }
 
 void SampleRefConsole::onEditSong()
@@ -109,7 +108,7 @@ void SampleRefConsole::loadData()
 	setInt("track", sample->track_no);
 }
 
-void SampleRefConsole::onUpdate(Observable *o, const string &message)
+void SampleRefConsole::onUpdate(Observable *o)
 {
 	if (o == view){
 		if (sample)
@@ -117,9 +116,9 @@ void SampleRefConsole::onUpdate(Observable *o, const string &message)
 		track = view->cur_track;
 		sample = view->cur_sample;
 		if (sample)
-			sample->subscribe(this);
+			sample->subscribe_old(this, SampleRefConsole);
 		loadData();
-	}else if ((o == sample) and (message == o->MESSAGE_DELETE)){
+	}else if ((o == sample) and (o->cur_message() == o->MESSAGE_DELETE)){
 		sample->unsubscribe(this);
 		sample = NULL;
 		loadData();

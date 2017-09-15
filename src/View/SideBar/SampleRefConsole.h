@@ -14,7 +14,7 @@ class Track;
 class SampleRef;
 class AudioView;
 
-class SampleRefConsole: public SideBarConsole, public Observer
+class SampleRefConsole: public SideBarConsole
 {
 public:
 	SampleRefConsole(AudioView *view, Song *song);
@@ -32,7 +32,7 @@ public:
 	void onEditTrack();
 	void onEditSample();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	AudioView *view;
 	Song *song;

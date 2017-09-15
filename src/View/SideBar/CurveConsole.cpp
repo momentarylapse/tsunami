@@ -53,8 +53,7 @@ public:
 };
 
 CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Curves")),
-	Observer("CurveConsole")
+	SideBarConsole(_("Curves"))
 {
 	view = _view;
 	song = _song;
@@ -74,10 +73,10 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 
 	curve = NULL;
 
-	song->subscribe(this, song->MESSAGE_NEW);
-	song->subscribe(this, song->MESSAGE_ADD_CURVE);
-	song->subscribe(this, song->MESSAGE_DELETE_CURVE);
-	view->subscribe(this, view->MESSAGE_VIEW_CHANGE);
+	song->subscribe_old2(this, CurveConsole, song->MESSAGE_NEW);
+	song->subscribe_old2(this, CurveConsole, song->MESSAGE_ADD_CURVE);
+	song->subscribe_old2(this, CurveConsole, song->MESSAGE_DELETE_CURVE);
+	view->subscribe_old2(this, CurveConsole, view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
@@ -86,7 +85,7 @@ CurveConsole::~CurveConsole()
 	view->unsubscribe(this);
 }
 
-void CurveConsole::onUpdate(Observable* o, const string &message)
+void CurveConsole::onUpdate(Observable* o)
 {
 	if (o == song){
 		updateList();

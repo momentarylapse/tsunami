@@ -389,8 +389,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleCount", Kaba::mf(&InputStreamAny::getSampleCount), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "accumulate", Kaba::mf(&InputStreamAny::accumulate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "resetAccumulation", Kaba::mf(&InputStreamAny::resetAccumulation), &input);
-	Kaba::LinkExternal("InputStreamAny.addObserver", Kaba::mf(&InputStreamAny::addWrappedObserver));
-	Kaba::LinkExternal("InputStreamAny.removeObserver", Kaba::mf(&InputStreamAny::removeWrappedObserver));
+	Kaba::LinkExternal("InputStreamAny.addObserver", Kaba::mf(&InputStreamAny::subscribe_kaba));
+	Kaba::LinkExternal("InputStreamAny.removeObserver", Kaba::mf(&InputStreamAny::unsubscribe));
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleRate", Kaba::mf(&InputStreamAny::getSampleRate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSomeSamples", Kaba::mf(&InputStreamAny::getSomeSamples), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getState", Kaba::mf(&InputStreamAny::getState), &input);
@@ -413,8 +413,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleCount", Kaba::mf(&InputStreamAudio::getSampleCount), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "accumulate", Kaba::mf(&InputStreamAudio::accumulate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "resetAccumulation", Kaba::mf(&InputStreamAudio::resetAccumulation), &input);
-	Kaba::LinkExternal("InputStreamAudio.addObserver", Kaba::mf(&InputStreamAudio::addWrappedObserver));
-	Kaba::LinkExternal("InputStreamAudio.removeObserver", Kaba::mf(&InputStreamAudio::removeWrappedObserver));
+	Kaba::LinkExternal("InputStreamAudio.addObserver", Kaba::mf(&InputStreamAudio::subscribe_kaba));
+	Kaba::LinkExternal("InputStreamAudio.removeObserver", Kaba::mf(&InputStreamAudio::unsubscribe));
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Kaba::mf(&InputStreamAudio::getSampleRate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Kaba::mf(&InputStreamAudio::getSomeSamples), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getState", Kaba::mf(&InputStreamAudio::getState), &input);
@@ -443,8 +443,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
 	Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
-	Kaba::LinkExternal("AudioView.addObserver", Kaba::mf(&AudioView::addWrappedObserver));
-	Kaba::LinkExternal("AudioView.removeObserver", Kaba::mf(&AudioView::removeWrappedObserver));
+	Kaba::LinkExternal("AudioView.addObserver", Kaba::mf(&AudioView::subscribe_kaba));
+	Kaba::LinkExternal("AudioView.removeObserver", Kaba::mf(&AudioView::unsubscribe));
 
 	Kaba::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
 	Kaba::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));

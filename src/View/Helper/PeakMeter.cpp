@@ -46,8 +46,7 @@ void PeakMeter::Data::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_source, AudioView *_view) :
-	Observer("PeakMeter")
+PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_source, AudioView *_view)
 {
 	panel = _panel;
 	id = _id;
@@ -83,14 +82,14 @@ void PeakMeter::setSource(PeakMeterSource *_source)
 	source = _source;
 
 	if (source and enabled)
-		source->subscribe(this);
+		source->subscribe_old(this, PeakMeter);
 }
 
 void PeakMeter::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			source->subscribe(this);
+			source->subscribe_old(this, PeakMeter);
 		if (enabled and !_enabled)
 			source->unsubscribe(this);
 	}
@@ -214,9 +213,9 @@ void PeakMeter::findSpectrum()
 	}
 }
 
-void PeakMeter::onUpdate(Observable *o, const string &message)
+void PeakMeter::onUpdate(Observable *o)
 {
-	if (&message == &Observable::MESSAGE_DELETE){
+	if (&o->cur_message() == &Observable::MESSAGE_DELETE){
 		setSource(NULL);
 		return;
 	}

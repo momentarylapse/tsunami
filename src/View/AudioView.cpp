@@ -136,7 +136,6 @@ void AudioView::MouseSelectionPlanner::stop()
 
 AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	Observable("AudioView"),
-	Observer("AudioView"),
 	midi_scale(Scale::TYPE_MAJOR, 0),
 	cam(this)
 {
@@ -220,8 +219,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	msp.stop();
 	selection_mode = SELECTION_MODE_NONE;
 	hide_selection = false;
-	song->subscribe(this);
-	stream->subscribe(this);
+	song->subscribe_old(this, AudioView);
+	stream->subscribe_old(this, AudioView);
 
 
 
@@ -624,14 +623,14 @@ void AudioView::checkConsistency()
 	}
 }
 
-void AudioView::onUpdate(Observable *o, const string &message)
+void AudioView::onUpdate(Observable *o)
 {
 	//msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
 
-		if (message == song->MESSAGE_NEW){
+		if (o->cur_message() == song->MESSAGE_NEW){
 			updateTracks();
 			sel.range = Range(0, 0);
 			setCurTrack(NULL);
@@ -642,17 +641,17 @@ void AudioView::onUpdate(Observable *o, const string &message)
 					setCurTrack(song->tracks[0]);
 			}
 			optimizeView();
-		}else if (message == song->MESSAGE_FINISHED_LOADING){
+		}else if (o->cur_message() == song->MESSAGE_FINISHED_LOADING){
 			optimizeView();
 			hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, this));
 		}else{
-			if ((message == song->MESSAGE_ADD_TRACK) or (message == song->MESSAGE_DELETE_TRACK))
+			if ((o->cur_message() == song->MESSAGE_ADD_TRACK) or (o->cur_message() == song->MESSAGE_DELETE_TRACK))
 				updateTracks();
 			forceRedraw();
 			updateMenu();
 		}
 
-		if (message == song->MESSAGE_CHANGE)
+		if (o->cur_message() == song->MESSAGE_CHANGE)
 			if (song->action_manager->isEnabled())
 				updatePeaks();
 	}else if (o == stream){
@@ -1106,7 +1105,7 @@ void AudioView::setInput(InputStreamAny *_input)
 	notify(MESSAGE_INPUT_CHANGE);
 
 	if (input)
-		input->subscribe(this);
+		input->subscribe_old(this, AudioView);
 }
 
 // unused?!?
@@ -1115,6 +1114,6 @@ void AudioView::enable(bool _enabled)
 	if (enabled and !_enabled)
 		song->unsubscribe(this);
 	else if (!enabled and _enabled)
-		song->subscribe(this);
+		song->subscribe_old(this, AudioView);
 	enabled = _enabled;
 }

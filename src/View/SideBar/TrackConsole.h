@@ -10,12 +10,11 @@
 
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class AudioView;
 
-class TrackConsole: public SideBarConsole, public Observer
+class TrackConsole: public SideBarConsole
 {
 public:
 	TrackConsole(AudioView *view);
@@ -40,7 +39,7 @@ public:
 
 	void setTrack(Track *t);
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	AudioView *view;
 	Track *track;

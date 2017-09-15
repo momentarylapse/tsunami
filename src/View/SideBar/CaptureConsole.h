@@ -11,7 +11,6 @@
 
 #include "SideBar.h"
 #include "../Helper/PeakMeter.h"
-#include "../../Stuff/Observer.h"
 #include "../../Data/Song.h"
 
 class AudioView;
@@ -19,7 +18,7 @@ class DeviceManager;
 class Device;
 class CaptureConsoleMode;
 
-class CaptureConsole : public SideBarConsole, public Observer
+class CaptureConsole : public SideBarConsole
 {
 public:
 	CaptureConsole(Song *s, AudioView *view);
@@ -43,7 +42,7 @@ public:
 
 	void updateTime();
 
-	void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	bool isCapturing();
 

@@ -11,8 +11,7 @@
 #include "MiniBar.h"
 #include "../../Device/DeviceManager.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output, AudioView *view) :
-	Observer("MiniBar")
+MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output, AudioView *view)
 {
 	stream = _stream;
 	output = _output;
@@ -26,8 +25,8 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_
 	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
 	event("volume", std::bind(&MiniBar::onVolume, this));
 
-	bottom_bar->subscribe(this);
-	output->subscribe(this);
+	bottom_bar->subscribe_old(this, MiniBar);
+	output->subscribe_old(this, MiniBar);
 }
 
 MiniBar::~MiniBar()
@@ -58,7 +57,7 @@ void MiniBar::onHide()
 	peak_meter->enable(false);
 }
 
-void MiniBar::onUpdate(Observable *o, const string &message)
+void MiniBar::onUpdate(Observable *o)
 {
 	if (o == bottom_bar){
 		if (bottom_bar->visible)

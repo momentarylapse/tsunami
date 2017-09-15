@@ -9,10 +9,9 @@
 #define SRC_VIEW_SIDEBAR_LAYERCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 class Song;
 
-class LayerConsole: public SideBarConsole, public Observer
+class LayerConsole: public SideBarConsole
 {
 public:
 	LayerConsole(Song *s, AudioView *view);
@@ -30,7 +29,7 @@ public:
 
 	void onEditSong();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	Song *song;
 	AudioView *view;

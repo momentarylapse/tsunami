@@ -16,11 +16,10 @@
 #include "../../Tsunami.h"
 
 
-class SingleMidiFxPanel : public hui::Panel, public Observer
+class SingleMidiFxPanel : public hui::Panel
 {
 public:
-	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index) :
-		Observer("SingleMidiFxPanel")
+	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index)
 	{
 		song = a;
 		track = t;
@@ -49,8 +48,8 @@ public:
 		check("enabled", fx->enabled);
 
 		old_param = fx->configToString();
-		fx->subscribe(this, fx->MESSAGE_CHANGE);
-		fx->subscribe(this, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe_old2(this, SingleMidiFxPanel, fx->MESSAGE_CHANGE);
+		fx->subscribe_old2(this, SingleMidiFxPanel, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
@@ -83,9 +82,9 @@ public:
 		if (track)
 			track->deleteMidiEffect(index);
 	}
-	virtual void onUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o)
 	{
-		if (message == o->MESSAGE_CHANGE){
+		if (o->cur_message() == o->MESSAGE_CHANGE){
 			if (track)
 				track->editMidiEffect(index, old_param);
 		}
@@ -102,8 +101,7 @@ public:
 };
 
 MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Midi Fx")),
-	Observer("MidiFxConsole")
+	SideBarConsole(_("Midi Fx"))
 {
 	view = _view;
 	song = _song;
@@ -122,7 +120,7 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&MidiFxConsole::onEditTrack, this));
 	event("edit_midi", std::bind(&MidiFxConsole::onEditMidi, this));
 
-	view->subscribe(this, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe_old2(this, MidiFxConsole, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
 }
 
@@ -143,12 +141,12 @@ void MidiFxConsole::update()
 	hideControl(id_inner, !allow);
 }
 
-void MidiFxConsole::onUpdate(Observable* o, const string &message)
+void MidiFxConsole::onUpdate(Observable* o)
 {
 	update();
-	if ((o == track) and (message == track->MESSAGE_DELETE)){
+	if ((o == track) and (o->cur_message() == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) and (message == view->MESSAGE_CUR_TRACK_CHANGE))
+	}else if ((o == view) and (o->cur_message() == view->MESSAGE_CUR_TRACK_CHANGE))
 		setTrack(view->cur_track);
 	else
 		setTrack(track);
@@ -196,9 +194,9 @@ void MidiFxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe(this, track->MESSAGE_DELETE);
-		track->subscribe(this, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_DELETE);
+		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe_old2(this, MidiFxConsole, track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

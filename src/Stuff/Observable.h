@@ -10,34 +10,26 @@
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
+#include <functional>
 
-class Observer;
-
-struct ObserverRequest
-{
-	ObserverRequest(){}
-	ObserverRequest(Observer *o, const string &message);//, hui::Callback callback);
-	Observer* observer;
-	const string *message;
-	//hui::Callback callback;
-};
-
-class Observable : public hui::EventHandler
+class Observable : public VirtualBase
 {
 public:
 	Observable(const string &name);
 	virtual ~Observable();
 
+	typedef std::function<void()> Callback;
+	typedef std::function<void(Observable*)> CallbackP;
+
 	static const string MESSAGE_CHANGE;
 	static const string MESSAGE_DELETE;
-	static const string MESSAGE_ALL;
+	static const string MESSAGE_ANY;
 
-	void subscribe(Observer *observer, const string &message = MESSAGE_ALL);
-	void unsubscribe(Observer *observer);
-	//void addObserver(Observer *o, const string &message = MESSAGE_ALL);
-	void addWrappedObserver(void *handler, void *func);
-	void removeObserver(Observer *o);
-	void removeWrappedObserver(void *handler);
+	//void subscribe(Observer *observer, const string &message = MESSAGE_ANY);
+	void unsubscribe(VirtualBase *observer);
+	void subscribe2(VirtualBase *observer, const Callback &callback, const string &message = MESSAGE_ANY);
+	void subscribe3(VirtualBase *observer, const CallbackP &callback, const string &message = MESSAGE_ANY);
+	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function);
 	string getName();
 
 	void notifyBegin();
@@ -54,13 +46,37 @@ private:
 	string observable_name;
 
 	// observers
-	Array<ObserverRequest> requests;
+	struct Subscription
+	{
+		Subscription();
+		Subscription(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
+		VirtualBase* observer;
+		const string *message;
+		Callback callback;
+		CallbackP callback_p;
+	};
+	Array<Subscription> observable_subscriptions;
+
+	struct Notification : Subscription
+	{
+		Notification();
+		Notification(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
+	};
 
 	// current notifies
-	Array<const string*> message_queue;
-	int notify_level;
+	Array<const string*> observable_message_queue;
+	int observable_notify_level;
 
+	const string* observable_cur_message;
+
+public:
+	const string& cur_message() const;
+
+private:
 	static const bool DEBUG_MESSAGES;
 };
+
+#define subscribe_old(OBJECT, CLASS) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1))
+#define subscribe_old2(OBJECT, CLASS, MESSAGE) subscribe3(OBJECT, std::bind(&CLASS::onUpdate, OBJECT, std::placeholders::_1), MESSAGE)
 
 #endif /* OBSERVABLE_H_ */

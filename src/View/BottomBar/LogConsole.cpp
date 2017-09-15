@@ -10,8 +10,7 @@
 #include "LogConsole.h"
 
 LogConsole::LogConsole(Log *_log) :
-	BottomBar::Console(_("Messages")),
-	Observer("LogConsole")
+	BottomBar::Console(_("Messages"))
 {
 	log = _log;
 
@@ -22,7 +21,7 @@ LogConsole::LogConsole(Log *_log) :
 	//hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
 	reload();
 
-	log->subscribe(this);
+	log->subscribe_old(this, LogConsole);
 }
 
 LogConsole::~LogConsole()
@@ -51,7 +50,7 @@ void LogConsole::reload()
 	}
 }
 
-void LogConsole::onUpdate(Observable *o, const string &message)
+void LogConsole::onUpdate(Observable *o)
 {
 	reload();
 }

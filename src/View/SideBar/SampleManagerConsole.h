@@ -18,7 +18,7 @@ class SampleManagerItem;
 class Progress;
 class AudioView;
 
-class SampleManagerConsole : public SideBarConsole, public Observer
+class SampleManagerConsole : public SideBarConsole
 {
 public:
 	SampleManagerConsole(Song *a, AudioView *v);
@@ -38,7 +38,7 @@ public:
 
 	void onEditSong();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	void endPreview();
 

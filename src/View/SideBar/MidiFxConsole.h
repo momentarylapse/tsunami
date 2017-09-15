@@ -9,20 +9,19 @@
 #define MIDIFXCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
 class Song;
 class Track;
 class AudioView;
 
-class MidiFxConsole : public SideBarConsole, public Observer
+class MidiFxConsole : public SideBarConsole
 {
 public:
 	MidiFxConsole(AudioView *view, Song *audio);
 	virtual ~MidiFxConsole();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 	void update();
 
 	void clear();

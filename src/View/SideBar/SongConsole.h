@@ -9,10 +9,9 @@
 #define SONGCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../Stuff/Observer.h"
 class Song;
 
-class SongConsole: public SideBarConsole, public Observer
+class SongConsole: public SideBarConsole
 {
 public:
 	SongConsole(Song *s);
@@ -34,7 +33,7 @@ public:
 	void onEditSamples();
 	void onEditFx();
 
-	virtual void onUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o);
 
 	Song *song;
 };

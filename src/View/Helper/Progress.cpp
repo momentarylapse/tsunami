@@ -9,8 +9,7 @@
 
 const string Progress::MESSAGE_CANCEL = "Cancel";
 
-Progress::Progress(const string &str, hui::Window *parent) :
-	Observable("Progress")
+Progress::Progress(const string &str, hui::Window *parent)
 {
 	dlg = NULL;
 	if (parent){
@@ -24,9 +23,9 @@ Progress::Progress(const string &str, hui::Window *parent) :
 	cancelled = false;
 }
 
-Progress::Progress() :
-	Observable("Progress"), dlg(NULL)
+Progress::Progress()
 {
+	dlg = NULL;
 	cancelled = false;
 }
 

@@ -89,8 +89,7 @@ void Curve::Target::enumerateType(char *pp, Kaba::Class *t, Array<Target> &list,
 }
 
 
-Curve::Curve() :
-	Observable("Curve")
+Curve::Curve()
 {
 	min = 0;
 	max = 1;

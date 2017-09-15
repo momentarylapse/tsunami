@@ -20,7 +20,7 @@ class Observable;
 class Data : public Observable
 {
 public:
-	Data(const string &name);
+	Data();
 	virtual ~Data();
 
 	static const string MESSAGE_FINISHED_LOADING;

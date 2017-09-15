@@ -13,8 +13,7 @@ const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Sample::MESSAGE_REFERENCE = "Reference";
 const string Sample::MESSAGE_UNREFERENCE= "Unreference";
 
-Sample::Sample(int _type) :
-	Observable("Sample")
+Sample::Sample(int _type)
 {
 	owner = NULL;
 	type = _type;

@@ -17,8 +17,8 @@ class Log : public Observable
 {
 	friend class LogConsole;
 public:
-	Log();
-	virtual ~Log();
+	Log(){}
+	virtual ~Log(){}
 
 	static const string MESSAGE_ADD;
 	static const string MESSAGE_CLEAR;

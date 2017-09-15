@@ -50,10 +50,9 @@ Observable::Notification::Notification(VirtualBase *o, const string *_message, c
 }
 
 
-Observable::Observable(const string &name)
+Observable::Observable()
 {
 	observable_notify_level = 0;
-	observable_name = name;
 	observable_cur_message = NULL;
 }
 
@@ -64,7 +63,6 @@ Observable::~Observable()
 
 void Observable::_observable_destruct_()
 {
-	observable_name.clear();
 	observable_subscriptions.clear();
 	observable_message_queue.clear();
 }
@@ -93,10 +91,6 @@ void Observable::subscribe_kaba(hui::EventHandler *handler, hui::kaba_member_cal
 }
 
 
-
-string Observable::getName()
-{	return observable_name;	}
-
 void Observable::notifySend()
 {
 	Array<Notification> notifications;
@@ -115,7 +109,7 @@ void Observable::notifySend()
 	// send
 	for (Notification &n: notifications){
 		if (DEBUG_MESSAGES)
-			msg_write("send " + getName() + "/" + *n.message + "  >>  " + get_obs_name(n.observer));
+			msg_write("send " + get_obs_name(this) + "/" + *n.message + "  >>  " + get_obs_name(n.observer));
 		//n.callback();
 		observable_cur_message = n.message;
 		if (n.callback)

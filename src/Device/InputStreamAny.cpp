@@ -16,8 +16,7 @@ const string InputStreamAny::MESSAGE_CAPTURE = "Capture";
 static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
-InputStreamAny::InputStreamAny(const string &name, int _sample_rate) :
-	PeakMeterSource(name)
+InputStreamAny::InputStreamAny(int _sample_rate)
 {
 	sample_rate = _sample_rate;
 	chunk_size = -1;

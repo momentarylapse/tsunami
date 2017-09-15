@@ -15,8 +15,7 @@
 #include "../Data/SongSelection.h"
 #include <assert.h>
 
-Clipboard::Clipboard() :
-	Observable("Clipboard")
+Clipboard::Clipboard()
 {
 	temp = new Song;
 	temp->reset();

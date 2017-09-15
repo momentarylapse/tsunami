@@ -15,7 +15,7 @@
 
 
 Synthesizer::Synthesizer() :
-	Configurable("Synthesizer", TYPE_SYNTHESIZER)
+	Configurable(TYPE_SYNTHESIZER)
 {
 	sample_rate = 0;
 	keep_notes = 0;

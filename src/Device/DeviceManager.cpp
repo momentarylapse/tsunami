@@ -134,8 +134,7 @@ string devs2str(Array<Device*> devices)
 }
 
 
-DeviceManager::DeviceManager() :
-	Observable("AudioOutput")
+DeviceManager::DeviceManager()
 {
 	initialized = false;
 

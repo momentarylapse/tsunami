@@ -135,7 +135,6 @@ void AudioView::MouseSelectionPlanner::stop()
 }
 
 AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
-	Observable("AudioView"),
 	midi_scale(Scale::TYPE_MAJOR, 0),
 	cam(this)
 {

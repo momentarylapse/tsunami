@@ -19,8 +19,7 @@
 #include "CaptureConsole.h"
 #include "LayerConsole.h"
 
-SideBar::SideBar(AudioView *view, Song *song) :
-	Observable("SideBar")
+SideBar::SideBar(AudioView *view, Song *song)
 {
 	addRevealer("!slide-left", 0, 0, 0, 0, "revealer");
 	setTarget("revealer", 0);

@@ -13,8 +13,7 @@
 
 const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
-TsunamiPlugin::TsunamiPlugin() :
-	Observable("TsunamiPlugin")
+TsunamiPlugin::TsunamiPlugin()
 {
 	win = NULL;
 	view = NULL;

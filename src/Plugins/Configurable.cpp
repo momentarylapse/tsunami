@@ -171,8 +171,7 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 	}
 }
 
-Configurable::Configurable(const string &observable_name, int type) :
-	Observable(observable_name)
+Configurable::Configurable(int type)
 {
 	configurable_type = type;
 	song = NULL;
@@ -184,7 +183,7 @@ Configurable::~Configurable()
 
 void Configurable::__init__()
 {
-	new(this) Configurable("", -1);
+	new(this) Configurable(-1);
 }
 
 void Configurable::__delete__()

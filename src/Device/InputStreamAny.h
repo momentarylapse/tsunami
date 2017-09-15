@@ -16,7 +16,7 @@ class InputStreamAny : public PeakMeterSource
 {
 public:
 
-	InputStreamAny(const string &name, int sample_rate);
+	InputStreamAny(int sample_rate);
 	virtual ~InputStreamAny();
 
 	static const string MESSAGE_CAPTURE;

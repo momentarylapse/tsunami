@@ -57,8 +57,7 @@ const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 
-Track::Track(int _type, Synthesizer *_synth) :
-	Observable("Track")
+Track::Track(int _type, Synthesizer *_synth)
 {
 	type = _type;
 	muted = false;

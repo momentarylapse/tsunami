@@ -39,7 +39,7 @@ class Song;
 class Configurable : public Observable
 {
 public:
-	Configurable(const string &observable_name, int type);
+	Configurable(int type);
 	virtual ~Configurable();
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();

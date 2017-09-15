@@ -130,7 +130,7 @@ int InputStreamAudio::Source::getNumSamples()
 
 
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
-	InputStreamAny("InputStreamAudio", _sample_rate),
+	InputStreamAny(_sample_rate),
 	current_buffer(1048576)
 {
 	capturing = false;

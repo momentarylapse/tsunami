@@ -20,7 +20,7 @@ namespace hui{
 class PeakMeterSource : public Observable
 {
 public:
-	PeakMeterSource(const string &name) : Observable(name){}
+	PeakMeterSource(){}
 	virtual float _cdecl getSampleRate() = 0;
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples) = 0;
 	virtual int _cdecl getState() = 0;

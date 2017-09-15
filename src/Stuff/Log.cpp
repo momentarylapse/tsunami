@@ -12,15 +12,6 @@
 const string Log::MESSAGE_ADD = "Add";
 const string Log::MESSAGE_CLEAR = "Clear";
 
-Log::Log() :
-	Observable("Log")
-{
-}
-
-Log::~Log()
-{
-}
-
 
 void Log::error(const string &message)
 {

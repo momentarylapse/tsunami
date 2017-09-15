@@ -14,8 +14,7 @@ const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
 
-SampleRef::SampleRef(Sample *sample) :
-	Observable("SampleRef")
+SampleRef::SampleRef(Sample *sample)
 {
 	buf = &sample->buf;
 	midi = &sample->midi;

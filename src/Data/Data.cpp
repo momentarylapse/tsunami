@@ -11,8 +11,7 @@
 
 const string Data::MESSAGE_FINISHED_LOADING = "FinishedLoading";
 
-Data::Data(const string &name) :
-	Observable(name)
+Data::Data()
 {
 	action_manager = new ActionManager(this);
 	binary_file_format = true;

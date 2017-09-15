@@ -15,7 +15,7 @@
 class Observable : public VirtualBase
 {
 public:
-	Observable(const string &name);
+	Observable();
 	virtual ~Observable();
 
 	typedef std::function<void()> Callback;
@@ -30,7 +30,6 @@ public:
 	void subscribe2(VirtualBase *observer, const Callback &callback, const string &message = MESSAGE_ANY);
 	void subscribe3(VirtualBase *observer, const CallbackP &callback, const string &message = MESSAGE_ANY);
 	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function);
-	string getName();
 
 	void notifyBegin();
 	void notify(const string &message = MESSAGE_CHANGE);
@@ -43,7 +42,6 @@ protected:
 	void _observable_destruct_();
 
 private:
-	string observable_name;
 
 	// observers
 	struct Subscription

@@ -51,7 +51,7 @@ public:
 
 
 InputStreamMidi::InputStreamMidi(int _sample_rate) :
-	InputStreamAny("InputStreamMidi", _sample_rate)
+	InputStreamAny(sample_rate)
 {
 #ifdef DEVICE_MIDI_ALSA
 	subs = NULL;

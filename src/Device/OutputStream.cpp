@@ -221,7 +221,6 @@ public:
 };
 
 OutputStream::OutputStream(AudioSource *r) :
-	PeakMeterSource("OutputStream"),
 	ring_buf(1048576)
 {
 	renderer = r;

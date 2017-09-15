@@ -75,8 +75,7 @@ Song::Layer::Layer(const string &_name)
 	active = true;
 }
 
-Song::Song() :
-	Data("AudioFile")
+Song::Song()
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	default_format = SAMPLE_FORMAT_16;

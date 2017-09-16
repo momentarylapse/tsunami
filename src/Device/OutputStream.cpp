@@ -95,7 +95,6 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 			break;
 		}
 		done = frames;
-		stream->cur_pos += done;
 	}
 
 	pa_stream_write(p, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
@@ -250,7 +249,6 @@ OutputStream::OutputStream(AudioSource *r) :
 	dev_sample_rate = -1;
 	cpu_usage = 0;
 	end_of_data = false;
-	cur_pos = 0;
 
 	device_manager->addStream(this);
 }
@@ -416,10 +414,10 @@ void OutputStream::stream()
 	ring_buf.write(b);
 
 	// update pos
-	Range rr = renderer->range();
+	/*Range rr = renderer->range();
 	cur_pos = renderer->getPos() - rr.offset - ring_buf.available();
 	if (rr.length > 0)
-		cur_pos = rr.offset + (cur_pos + rr.length) % rr.length;
+		cur_pos = rr.offset + (cur_pos + rr.length) % rr.length;*/
 
 	reading = false;
 }
@@ -463,7 +461,7 @@ void OutputStream::play()
 
 	playing = true;
 	paused = false;
-	cur_pos = renderer->range().offset;
+	//cur_pos = renderer->range().offset;
 
 	renderer->reset();
 	stream();
@@ -540,33 +538,26 @@ int OutputStream::getState()
 	return STATE_STOPPED;
 }
 
-int OutputStream::getPos()
+int OutputStream::getPos(int read_pos)
 {
 	int pos;
-	if (getPosSafe(pos))
+	if (getPosSafe(pos, read_pos))
 		return pos;
 	return 0;
 }
 
-bool OutputStream::getPosSafe(int &pos)
+bool OutputStream::getPosSafe(int &pos, int read_pos)
 {
 	if (!playing)
 		return false;
 
-	pos = cur_pos;
+	pos = read_pos - ring_buf.available();
 
 	// translation
-	Range r = renderer->range();
+	/*Range r = renderer->range();
 	if (r.length > 0)
-		pos = cur_pos; //r.offset + ((cur_pos + renderer->offset()) %r.num);
+		pos = cur_pos; //r.offset + ((cur_pos + renderer->offset()) %r.num);*/
 	return true;
-}
-
-void OutputStream::seek(int pos)
-{
-	renderer->seek(pos);
-	play();
-	cur_pos = pos;
 }
 
 float OutputStream::getVolume()

@@ -175,7 +175,7 @@ void ViewModeDefault::onMouseMove()
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
 	}else if (hover->type == Selection::TYPE_PLAYBACK){
-		view->stream->seek(hover->pos);
+		view->renderer->seek(hover->pos);
 		_force_redraw_ = true;
 	}else if (hover->type == Selection::TYPE_SAMPLE){
 		view->applyBarriers(hover->pos);
@@ -420,7 +420,7 @@ Selection ViewModeDefault::getHover()
 			return s;
 		}
 		if (view->stream->isPlaying()){
-			if (view->mouse_over_time(view->stream->getPos())){
+			if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
 				s.type = Selection::TYPE_PLAYBACK;
 				return s;
 			}
@@ -481,7 +481,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 {
 	if (view->stream->isPlaying()){
 		if (view->renderer->range().is_inside(pos)){
-			view->stream->seek(pos);
+			view->renderer->seek(pos);
 			hover->type = Selection::TYPE_PLAYBACK;
 			view->forceRedraw();
 			return;

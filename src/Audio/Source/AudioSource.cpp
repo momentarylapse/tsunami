@@ -20,16 +20,3 @@ void AudioSource::__delete__()
 {
 	this->~AudioSource();
 }
-
-int AudioSource::readResize(AudioBuffer &buf)
-{
-	int n = read(buf);
-	buf.resize(n);
-	return n;
-}
-
-Array<Tag> AudioSource::getTags()
-{
-	Array<Tag> tags;
-	return tags;
-}

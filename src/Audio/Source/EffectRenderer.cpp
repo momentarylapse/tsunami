@@ -46,34 +46,9 @@ void EffectRenderer::reset()
 	child->reset();
 }
 
-Range EffectRenderer::range()
-{
-	return child->range();
-}
-
-int EffectRenderer::getPos()
-{
-	return child->getPos();
-}
-
-void EffectRenderer::seek(int pos)
-{
-	child->seek(pos);
-}
-
 int EffectRenderer::getSampleRate()
 {
 	return child->getSampleRate();
-}
-
-int EffectRenderer::getNumSamples()
-{
-	return child->getNumSamples();
-}
-
-Array<Tag> EffectRenderer::getTags()
-{
-	return child->getTags();
 }
 
 void EffectRenderer::setTrack(Track *t)

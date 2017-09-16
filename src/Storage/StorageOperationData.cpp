@@ -26,6 +26,7 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	offset = 0;
 	layer = 0;
 	renderer = NULL;
+	num_samples = 0;
 }
 
 StorageOperationData::~StorageOperationData()
@@ -63,6 +64,6 @@ int StorageOperationData::get_num_samples()
 	if (buf)
 		return buf->length;
 	if (renderer)
-		return renderer->getNumSamples();
+		return num_samples;
 	return 0;
 }

@@ -92,12 +92,9 @@ class ConfigPanel extends Panel
 
 class AudioEffect
 	string name
-	bool only_on_selection
-	Range range
 	bool usable
 	Song *song
 	Track *track
-	int layer_no
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(AudioBuffer buf)
@@ -110,8 +107,6 @@ class AudioEffect
 
 class MidiEffect
 	string name
-	bool only_on_selection
-	Range range
 	bool usable
 	Song *song
 	extern void __init__()
@@ -156,9 +151,6 @@ class AudioSource
 	extern virtual void __delete__()
 	extern virtual int read(AudioBuffer buf)
 	extern virtual void reset()
-	extern virtual Range range()
-	extern virtual int getPos()
-	extern virtual int seek()
 	extern virtual int getSampleRate()
 
 class MidiSource
@@ -369,9 +361,9 @@ class SongRenderer
 	extern void prepare(Range r, bool allow_loop)
 	extern virtual int read(AudioBuffer b)
 	extern virtual void reset()
-	extern virtual Range range()
-	extern virtual int getPos()
-	extern virtual int seek()
+	extern Range range()
+	extern int getPos()
+	extern int seek()
 	extern virtual int getSampleRate()
 
 

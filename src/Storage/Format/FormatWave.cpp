@@ -33,7 +33,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	int bit_depth = format_get_bits(format);
 	int channels = 2;
 	int bytes_per_sample = bit_depth / 8 * channels;
-	int samples = r->getNumSamples();
+	int samples = od->num_samples;
 
 	File *f = FileCreate(od->filename);
 	if (!f)
@@ -56,7 +56,9 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	AudioBuffer buf;
 	buf.resize(CHUNK_SIZE);
 	int done = 0;
-	while (r->readResize(buf) > 0){
+	int samples_read;
+	while ((samples_read = r->read(buf)) > 0){
+		buf.resize(samples_read);
 		string data;
 		if (!buf.exports(data, 2, SAMPLE_FORMAT_16))
 			od->warn(_("Amplitude too large, signal distorted."));

@@ -197,15 +197,14 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			throw string("could not set bits per sample");
 		if (!FLAC__stream_encoder_set_sample_rate(encoder, r->getSampleRate()))
 			throw string("could not set sample rate");
-		if (!FLAC__stream_encoder_set_total_samples_estimate(encoder, r->getNumSamples()))
+		if (!FLAC__stream_encoder_set_total_samples_estimate(encoder, od->get_num_samples()))
 			throw string("could not set total samples estimate");
 
 		// metadata
 		metadata = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 		if (!metadata)
 			throw string("could not add meta data");
-		Array<Tag> tags = r->getTags();
-		for (Tag &t : tags){
+		for (Tag &t : od->tags){
 			FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, tag_to_vorbis(t.key).c_str(), t.value.c_str());
 			FLAC__metadata_object_vorbiscomment_append_comment(metadata, entry, true);
 		}
@@ -222,14 +221,15 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		float scale = (float)(1 << (bits-1));
 		AudioBuffer buf;
 		buf.resize(FLAC_READSIZE);
-		while (r->readResize(buf)){
+		int samples_read;
+		while ((samples_read = r->read(buf)) > 0){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-			for (int i=0;i<buf.length;i++){
+			for (int i=0;i<samples_read;i++){
 				flac_pcm[i * 2 + 0] = (int)(buf.c[0][i] * scale);
 				flac_pcm[i * 2 + 1] = (int)(buf.c[1][i] * scale);
 			}
 			/* feed samples to encoder */
-			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.length))
+			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, samples_read))
 				throw string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)];
 		}
 

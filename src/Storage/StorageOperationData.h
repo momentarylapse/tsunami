@@ -20,6 +20,7 @@ class Track;
 class Storage;
 class Format;
 class AudioSource;
+class Tag;
 
 class StorageOperationData
 {
@@ -47,6 +48,8 @@ public:
 	AudioBuffer *buf;
 	Track *track;
 	AudioSource *renderer;
+	Array<Tag> tags;
+	int num_samples;
 	int offset;
 	int layer;
 };

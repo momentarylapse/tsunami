@@ -354,7 +354,7 @@ void AudioView::updateSelection()
 
 	renderer->setRange(getPlaybackSelection());
 	if (stream->isPlaying()){
-		if (renderer->range().is_inside(stream->getPos()))
+		if (renderer->range().is_inside(stream->getPos(renderer->getPos())))
 			renderer->setRange(getPlaybackSelection());
 		else
 			stream->stop();
@@ -655,7 +655,7 @@ void AudioView::onSongUpdate()
 void AudioView::onStreamUpdate()
 {
 	if (stream->isPlaying())
-		cam.makeSampleVisible(stream->getPos());
+		cam.makeSampleVisible(stream->getPos(renderer->getPos()));
 	forceRedraw();
 }
 
@@ -887,7 +887,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	if (input and input->isCapturing())
 		drawTimeLine(c, sel.range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
 	else if (stream->isPlaying())
-		drawTimeLine(c, stream->getPos(), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
+		drawTimeLine(c, stream->getPos(renderer->getPos()), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
 

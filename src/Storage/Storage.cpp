@@ -162,7 +162,7 @@ bool Storage::save(Song *a, const string &filename)
 	return true;
 }
 
-bool Storage::saveViaRenderer(AudioSource *r, const string &filename)
+bool Storage::saveViaRenderer(AudioSource *r, const string &filename, int num_samples, const Array<Tag> &tags)
 {
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
 	if (!d)
@@ -172,6 +172,8 @@ bool Storage::saveViaRenderer(AudioSource *r, const string &filename)
 	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), tsunami->win);
 
 	od.renderer = r;
+	od.tags = tags;
+	od.num_samples = num_samples;
 	f->saveViaRenderer(&od);
 	delete(f);
 	return true;

@@ -43,10 +43,12 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 
 	AudioBuffer buf;
 	buf.resize(CHUNK_SIZE);
-	int samples = r->getNumSamples();
+	int samples = od->num_samples;
 	int done = 0;
-	while (r->readResize(buf) > 0){
+	int samples_read;
+	while ((samples_read = r->read(buf)) > 0){
 		string data;
+		buf.resize(samples_read);
 		if (!buf.exports(data, config.channels, config.format))
 			od->warn(_("Amplitude too large, signal distorted."));
 		od->set(float(done) / (float)samples);

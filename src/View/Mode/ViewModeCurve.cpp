@@ -11,6 +11,7 @@
 #include "../../Data/Curve.h"
 #include "../../Device/OutputStream.h"
 #include "../../TsunamiWindow.h"
+#include "../../Audio/Source/SongRenderer.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
@@ -129,7 +130,7 @@ Selection ViewModeCurve::getHover()
 		return s;
 	}
 	if (view->stream->isPlaying()){
-		if (view->mouse_over_time(view->stream->getPos())){
+		if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
 			s.type = Selection::TYPE_PLAYBACK;
 			return s;
 		}

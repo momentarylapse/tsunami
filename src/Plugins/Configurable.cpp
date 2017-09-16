@@ -482,7 +482,7 @@ public:
 	void onUpdateStream()
 	{
 		if (progress){
-			int pos = tsunami->win->view->stream->getPos();
+			int pos = tsunami->win->view->stream->getPos(0); // TODO
 			Range r = tsunami->win->view->sel.range;
 			progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 			if (!tsunami->win->view->stream->isPlaying())

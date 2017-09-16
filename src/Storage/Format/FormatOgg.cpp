@@ -93,8 +93,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
-	Array<Tag> tags = r->getTags();
-	for (Tag &tag : tags)
+	for (Tag &tag : od->tags)
 		vorbis_comment_add_tag(&vc, tag.key.c_str(), tag.value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;
@@ -123,7 +122,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 //#if 1
 	//int eos = 0;
 	int written = 0;
-	int samples = r->getNumSamples();
+	int samples = od->num_samples;
 #define READSIZE		1<<12
 	int nn = 0;
 
@@ -134,16 +133,17 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 	while(!eos){
 		//msg_write(written);
 
-		if (r->readResize(buf) <= 0)
+		int samples_read = r->read(buf);
+		if (samples_read <= 0)
 			break;
 
-		float **buffer = vorbis_analysis_buffer(&vd, buf.length);
-		for (int i=0;i<buf.length;i++){
+		float **buffer = vorbis_analysis_buffer(&vd, samples_read);
+		for (int i=0;i<samples_read;i++){
 			buffer[0][i] = buf.c[0][i];
 			buffer[1][i] = buf.c[1][i];
 		}
-		written += buf.length;
-		vorbis_analysis_wrote(&vd, buf.length);
+		written += samples_read;
+		vorbis_analysis_wrote(&vd, samples_read);
 
 
 		nn ++;

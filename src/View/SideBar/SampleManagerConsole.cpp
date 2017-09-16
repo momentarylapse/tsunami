@@ -210,7 +210,7 @@ void SampleManagerConsole::onExport()
 	if (tsunami->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::TYPE_AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			tsunami->storage->saveViaRenderer(&rr, hui::Filename);
+			tsunami->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
 	}
 }
@@ -307,7 +307,7 @@ void SampleManagerConsole::onSongUpdate()
 
 void SampleManagerConsole::onPreviewStreamUpdate()
 {
-	int pos = preview_stream->getPos();
+	int pos = preview_stream->getPos(0); // TODO
 	Range r = preview_sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 	if (!preview_stream->isPlaying())

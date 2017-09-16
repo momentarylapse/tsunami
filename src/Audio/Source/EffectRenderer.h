@@ -24,12 +24,7 @@ public:
 
 	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
-	virtual Range _cdecl range();
-	virtual int _cdecl getPos();
-	virtual void _cdecl seek(int pos);
 	virtual int _cdecl getSampleRate();
-	virtual int _cdecl getNumSamples();
-	virtual Array<Tag> _cdecl getTags();
 
 	void setTrack(Track *t);
 

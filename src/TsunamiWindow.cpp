@@ -823,7 +823,7 @@ void TsunamiWindow::onExport()
 	if (app->storage->askSaveExport(this)){
 		SongRenderer rr(song);
 		rr.prepare(view->getPlaybackSelection(), false);
-		app->storage->saveViaRenderer(&rr, hui::Filename);
+		app->storage->saveViaRenderer(&rr, hui::Filename, rr.getNumSamples(), song->tags);
 	}
 }
 

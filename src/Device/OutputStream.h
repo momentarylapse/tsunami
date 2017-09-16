@@ -65,9 +65,8 @@ public:
 	void _cdecl setSource(AudioSource *r);
 	AudioSource *_cdecl getSource(){ return renderer; }
 	void _cdecl setDevice(Device *d);
-	int _cdecl getPos();
-	bool _cdecl getPosSafe(int &pos);
-	void _cdecl seek(int pos);
+	int _cdecl getPos(int read_pos);
+	bool _cdecl getPosSafe(int &pos, int read_pos);
 
 	virtual float _cdecl getSampleRate();
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
@@ -108,7 +107,6 @@ private:
 #endif
 
 	int dev_sample_rate;
-	long long cur_pos;
 
 	DeviceManager *device_manager;
 	Device *device;

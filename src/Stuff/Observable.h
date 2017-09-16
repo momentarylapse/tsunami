@@ -43,6 +43,7 @@ public:
 		CallbackP callback_p;
 	};
 	Array<Subscription> subscriptions;
+	void subscribe(VirtualBase *me, VirtualBase *observer, const Callback &callback, const CallbackP &callback_p, const string &message);
 	void unsubscribe(VirtualBase *observer);
 
 	struct Notification : Subscription
@@ -78,13 +79,11 @@ public:
 	}
 	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message = MESSAGE_ANY)
 	{
-		observable_data.subscriptions.add(ObservableData::Subscription(observer, &message, callback, NULL));
-		observable_data.me = this;
+		observable_data.subscribe(this, observer, callback, NULL, message);
 	}
-	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback, const string &message = MESSAGE_ANY)
+	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback_p, const string &message = MESSAGE_ANY)
 	{
-		observable_data.subscriptions.add(ObservableData::Subscription(observer, &message, NULL, callback));
-		observable_data.me = this;
+		observable_data.subscribe(this, observer, NULL, callback_p, message);
 	}
 	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function)
 	{

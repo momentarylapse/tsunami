@@ -78,7 +78,6 @@ Track::Track(int _type, Synthesizer *_synth)
 
 Track::~Track()
 {
-	msg_write("-------------------------   ~Track");
 	midi.deep_clear();
 
 	for (Effect *f: fx)

@@ -11,10 +11,7 @@
 #include "../lib/kaba/kaba.h"
 
 
-/*const string MESSAGE_CHANGE = "Change";
-const string MESSAGE_DELETE = "Delete";
-const string MESSAGE_ANY = "";*/
-static const bool DEBUG_MESSAGES = true;
+static const int MESSAGE_DEBUG_LEVEL = 0;
 
 static string dummy_string;
 
@@ -22,28 +19,56 @@ namespace Kaba{
 extern Array<Kaba::Script*> PublicScript;
 };
 
+bool split_num_string(const string &n, string &out, int &after)
+{
+	out = n;
+	if (n[0] < '0' or n[0] > '9')
+		return false;
+	if (n[1] >= '0' and n[1] <= '9'){
+		int num = n.head(2)._int();
+		out = n.substr(2, num);
+		after = num + 2;
+		return true;
+	}
+	int num = n.head(1)._int();
+	out = n.substr(1, num);
+	after = num + 1;
+	return true;
+}
+
+string printify(const string &n)
+{
+	string out;
+	int after;
+	if (!split_num_string(n,  out, after))
+		return n;
+	if (after < n.num){
+		if (n[after] == 'I'){
+			int after2;
+			string out2;
+			if (!split_num_string(n.substr(after+1, -1),  out2, after2))
+				return n + format("----a %d", after);
+			return out + "<" + out2 + ">";
+		}else
+			return n + format("----b %d", after);
+	}
+	return out;
+}
+
 static string get_obs_name(VirtualBase *o)
 {
+	if (!o)
+		return "<null>";
+	string pp;
+	if (MESSAGE_DEBUG_LEVEL >= 4)
+		pp = "(" + p2s(o) + ")";
 	for (auto s: Kaba::PublicScript)
 		for (auto c: s->syntax->classes){
 			void *vtable = *(void**)o;
 			if (vtable == c->_vtable_location_compiler_)
-				return "<kaba:" + c->name + ">";
+				return "<kaba:" + c->name + ">" + pp;
 		}
-	return typeid(*o).name();
-
-	//return p2s(o); // sigh... m(-_-)m
-
-	/*try{
-		o = dynamic_cast<VirtualBase*>(o);
-	}catch(...){
-		return "???";
-	}
-
-	msg_write("a");
-	const std::type_info &a = typeid(*o);
-	msg_write("b");
-	return a.name();*/
+	return printify(typeid(*o).name()) + pp;
 }
 
 ObservableData::Subscription::Subscription()
@@ -84,18 +109,31 @@ ObservableData::ObservableData()
 
 ObservableData::~ObservableData()
 {
-	msg_write("~ObservableData");
+	if (MESSAGE_DEBUG_LEVEL >= 2)
+		msg_write("~ObservableData");
 	if (me){
+		if (MESSAGE_DEBUG_LEVEL >= 2)
+			msg_write("notify... " + get_obs_name(me));
 		//notify(me->MESSAGE_DELETE);
-		msg_write("notify... " + get_obs_name(me));
 		notify(Observable<VirtualBase>::MESSAGE_DELETE);
 	}
 }
 
-void ObservableData::unsubscribe(VirtualBase *o)
+
+void ObservableData::subscribe(VirtualBase *_me, VirtualBase *observer, const ObservableData::Callback &callback, const ObservableData::CallbackP &callback_p, const string &message)
 {
+	subscriptions.add(ObservableData::Subscription(observer, &message, callback, callback_p));
+	me = _me;
+	if (MESSAGE_DEBUG_LEVEL >= 2)
+		msg_write("subscribe:  " + get_obs_name(me) + "  <<  (" + message + ")  <<  " + get_obs_name(observer));
+}
+
+void ObservableData::unsubscribe(VirtualBase *observer)
+{
+	if (MESSAGE_DEBUG_LEVEL >= 2)
+		msg_write("unsubscribe:  " + get_obs_name(me) + "  <<  " + get_obs_name(observer));
 	for (int i=subscriptions.num-1; i>=0; i--)
-		if (subscriptions[i].observer == o){
+		if (subscriptions[i].observer == observer){
 			subscriptions.erase(i);
 		}
 }
@@ -122,8 +160,8 @@ void ObservableData::notifySend()
 
 	// send
 	for (Notification &n: notifications){
-		if (DEBUG_MESSAGES)
-			msg_write("send " + get_obs_name(me) + "  >>  " + *n.message + "  >>  " + get_obs_name(n.observer));
+		if (MESSAGE_DEBUG_LEVEL >= 1)
+			msg_write("send " + get_obs_name(me) + "  ---" + *n.message + "--->>  " + get_obs_name(n.observer));
 		//n.callback();
 		cur_message = n.message;
 		if (n.callback)
@@ -148,13 +186,11 @@ void ObservableData::notifyEnqueue(const string &message)
 void ObservableData::notifyBegin()
 {
 	notify_level ++;
-	//msg_write("notify ++");
 }
 
 void ObservableData::notifyEnd()
 {
 	notify_level --;
-	//msg_write("notify --");
 	if (notify_level == 0)
 		notifySend();
 }

@@ -153,7 +153,6 @@ void MidiFxConsole::onViewCurTrackChange()
 
 void MidiFxConsole::onTrackDelete()
 {
-	msg_write("MFX.onTrackDelete");
 	update();
 	setTrack(NULL);
 }
@@ -206,7 +205,7 @@ void MidiFxConsole::setTrack(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe(this, std::bind(&MidiFxConsole::onViewCurTrackChange, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&MidiFxConsole::onTrackDelete, this), track->MESSAGE_DELETE);
 		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_ADD_MIDI_EFFECT);
 		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_DELETE_MIDI_EFFECT);
 	}

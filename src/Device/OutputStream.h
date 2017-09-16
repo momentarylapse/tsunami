@@ -63,7 +63,6 @@ public:
 	bool _cdecl isPaused();
 	int _cdecl getState();
 	void _cdecl setSource(AudioSource *r);
-	AudioSource *_cdecl getSource(){ return renderer; }
 	void _cdecl setDevice(Device *d);
 	int _cdecl getPos(int read_pos);
 	bool _cdecl getPosSafe(int &pos, int read_pos);

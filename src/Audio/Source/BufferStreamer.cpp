@@ -20,6 +20,7 @@ void BufferStreamer::__init__(AudioBuffer* buf)
 
 void BufferStreamer::__delete__()
 {
+	this->~BufferStreamer();
 }
 
 int BufferStreamer::read(AudioBuffer& _buf)
@@ -35,17 +36,7 @@ void BufferStreamer::reset()
 	offset = 0;
 }
 
-Range BufferStreamer::range()
-{
-	return Range(0, buf->length);
-}
-
 void BufferStreamer::seek(int pos)
 {
 	offset = pos;
-}
-
-int BufferStreamer::getNumSamples()
-{
-	return buf->length;
 }

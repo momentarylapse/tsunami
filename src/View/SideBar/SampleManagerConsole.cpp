@@ -307,7 +307,7 @@ void SampleManagerConsole::onSongUpdate()
 
 void SampleManagerConsole::onPreviewStreamUpdate()
 {
-	int pos = preview_stream->getPos(0); // TODO
+	int pos = preview_stream->getPos(preview_renderer->getPos());
 	Range r = preview_sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 	if (!preview_stream->isPlaying())

@@ -21,11 +21,9 @@ public:
 
 	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
-	virtual Range _cdecl range();
-	virtual int _cdecl getPos(){ return offset; }
-	virtual void _cdecl seek(int pos);
+	int _cdecl getPos(){ return offset; }
+	void _cdecl seek(int pos);
 	//virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
-	virtual int _cdecl getNumSamples();
 
 	AudioBuffer *buf;
 	int offset;

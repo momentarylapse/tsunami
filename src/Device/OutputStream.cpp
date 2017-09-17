@@ -222,7 +222,7 @@ public:
 OutputStream::OutputStream(AudioSource *r) :
 	ring_buf(1048576)
 {
-	renderer = r;
+	source = r;
 
 	playing = false;
 	paused = false;
@@ -270,7 +270,7 @@ void OutputStream::__delete__()
 
 void OutputStream::create_dev()
 {
-	dev_sample_rate = renderer->getSampleRate();
+	dev_sample_rate = source->getSampleRate();
 
 #ifdef DEVICE_PULSEAUDIO
 	if (_stream)
@@ -401,10 +401,10 @@ void OutputStream::stream()
 	b.resize(buffer_size);
 
 	// read data
-	size = renderer->read(b);
+	size = source->read(b);
 
 	// out of data?
-	if (size == 0){
+	if (size == source->END_OF_STREAM){
 		end_of_data = true;
 		reading = false;
 		return;
@@ -421,7 +421,7 @@ void OutputStream::setSource(AudioSource *r)
 	if (playing)
 		stop();
 
-	renderer = r;
+	source = r;
 }
 
 void OutputStream::setDevice(Device *d)
@@ -457,7 +457,7 @@ void OutputStream::play()
 	paused = false;
 	//cur_pos = renderer->range().offset;
 
-	renderer->reset();
+	source->reset();
 	stream();
 
 
@@ -567,7 +567,7 @@ void OutputStream::setVolume(float _volume)
 
 float OutputStream::getSampleRate()
 {
-	return renderer->getSampleRate();
+	return source->getSampleRate();
 }
 
 void OutputStream::getSomeSamples(AudioBuffer &buf, int num_samples)

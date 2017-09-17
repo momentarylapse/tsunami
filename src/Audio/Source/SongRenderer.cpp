@@ -21,7 +21,7 @@
 SongRenderer::SongRenderer(Song *s)
 {
 	MidiRawData no_midi;
-	midi_streamer = new MidiDataSource(no_midi);
+	midi_streamer = new MidiDataStreamer(no_midi);
 	song = s;
 
 	preview_effect = NULL;
@@ -227,7 +227,9 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos, int size)
 
 int SongRenderer::read(AudioBuffer &buf)
 {
-	int size = max(min(buf.length, _range.end() - pos), 0);
+	int size = min(buf.length, _range.end() - pos);
+	if (size <= 0)
+		return END_OF_STREAM;
 
 	if (song->curves.num >= 0){
 		buf.resize(size);

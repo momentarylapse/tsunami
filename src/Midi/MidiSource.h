@@ -20,13 +20,15 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(MidiRawData &midi){ return 0; };
+
+	static const int END_OF_STREAM;
 };
 
-class MidiDataSource : public MidiSource
+class MidiDataStreamer : public MidiSource
 {
 public:
-	MidiDataSource(const MidiRawData &midi);
-	virtual ~MidiDataSource();
+	MidiDataStreamer(const MidiRawData &midi);
+	virtual ~MidiDataStreamer();
 
 	virtual int _cdecl read(MidiRawData &midi);
 

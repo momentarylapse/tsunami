@@ -26,6 +26,8 @@ void BufferStreamer::__delete__()
 int BufferStreamer::read(AudioBuffer& _buf)
 {
 	int n = min(_buf.length, buf->length - offset);
+	if (n <= 0)
+		return END_OF_STREAM;
 	_buf.set(*buf, -offset, 1);
 	offset += n;
 	return n;

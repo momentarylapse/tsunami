@@ -87,7 +87,7 @@ private:
 	float update_dt;
 	int hui_runner_id;
 
-	AudioSource *renderer;
+	AudioSource *source;
 	RingBuffer ring_buf;
 
 	bool reading;

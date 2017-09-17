@@ -9,6 +9,8 @@
 #include "../lib/file/msg.h"
 
 
+const int MidiSource::END_OF_STREAM = -2;
+
 MidiSource::MidiSource()
 {
 }
@@ -23,19 +25,21 @@ void MidiSource::__delete__()
 	this->MidiSource::~MidiSource();
 }
 
-MidiDataSource::MidiDataSource(const MidiRawData& _midi)
+MidiDataStreamer::MidiDataStreamer(const MidiRawData& _midi)
 {
 	midi = _midi;
 	offset = 0;
 }
 
-MidiDataSource::~MidiDataSource()
+MidiDataStreamer::~MidiDataStreamer()
 {
 }
 
-int MidiDataSource::read(MidiRawData& _midi)
+int MidiDataStreamer::read(MidiRawData& _midi)
 {
 	int n = min(midi.samples - offset, _midi.samples);
+	if (n <= 0)
+		return END_OF_STREAM;
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
 	for (MidiEvent &e : midi)
@@ -45,7 +49,7 @@ int MidiDataSource::read(MidiRawData& _midi)
 	return n;
 }
 
-void MidiDataSource::setData(const MidiRawData &_midi)
+void MidiDataStreamer::setData(const MidiRawData &_midi)
 {
 	midi = _midi;
 	offset = 0;
@@ -61,7 +65,7 @@ int MidiDataSource::getPos()
 	return offset;
 }*/
 
-void MidiDataSource::seek(int pos)
+void MidiDataStreamer::seek(int pos)
 {
 	offset = pos;
 }

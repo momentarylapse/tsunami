@@ -10,7 +10,7 @@
 
 #include "../Source/AudioSource.h"
 
-class MidiDataSource;
+class MidiDataStreamer;
 
 class SongRenderer : public AudioSource
 {
@@ -53,7 +53,7 @@ private:
 	int pos;
 	Array<MidiData> midi;
 
-	MidiDataSource *midi_streamer;
+	MidiDataStreamer *midi_streamer;
 
 public:
 	Effect *preview_effect;

@@ -14,16 +14,47 @@
 #include "PluginManager.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
+
+Effect::Output::Output(Effect *_fx)
+{
+	fx = _fx;
+	source = NULL;
+}
+
+int Effect::Output::read(AudioBuffer &buf)
+{
+	if (!source)
+		return 0;
+	int samples = source->read(buf);
+	fx->process(buf);
+	return samples;
+}
+
+void Effect::Output::reset()
+{
+	fx->resetState();
+}
+
+int Effect::Output::getSampleRate()
+{
+	return fx->sample_rate;
+}
+
+void Effect::Output::setSource(AudioSource *_source)
+{
+	source = _source;
+	fx->sample_rate = source->getSampleRate();
+}
+
 Effect::Effect() :
 	Configurable(TYPE_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
-	only_on_selection = false;
 	enabled = true;
 	song = NULL;
-	track = NULL;
-	layer = 0;
+	sample_rate = DEFAULT_SAMPLE_RATE;
+	out = new Output(this);
 }
 
 Effect::Effect(Plugin *p) :
@@ -31,15 +62,15 @@ Effect::Effect(Plugin *p) :
 {
 	usable = true;
 	plugin = p;
-	only_on_selection = false;
 	enabled = true;
 	song = NULL;
-	track = NULL;
-	layer = 0;
+	sample_rate = DEFAULT_SAMPLE_RATE;
+	out = new Output(this);
 }
 
 Effect::~Effect()
 {
+	delete out;
 }
 
 void Effect::__init__()
@@ -52,10 +83,10 @@ void Effect::__delete__()
 	this->Effect::~Effect();
 }
 
-void Effect::prepare()
+/*void Effect::prepare()
 {
 	resetState();
-}
+}*/
 
 string Effect::getError()
 {
@@ -64,29 +95,15 @@ string Effect::getError()
 	return format(_("Can't load effect: \"%s\""), name.c_str());
 }
 
-void Effect::apply(AudioBuffer &buf, Track *t, bool log_error)
+
+
+void Effect::doProcessTrack(Track *t, int layer, const Range &r)
 {
-	track = t;
-	song = t->song;
-	layer = 0;
-	range = buf.range();
-
-	// run
-	processTrack(&buf);
-}
-
-
-
-void Effect::doProcessTrack(Track *t, int _layer, const Range &r)
-{
-	track = t;
-	song = t->song;
-	layer = _layer;
-	range = r;
+	sample_rate = t->song->sample_rate;
 
 	AudioBuffer buf = t->getBuffers(layer, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(track, layer, r);
-	processTrack(&buf);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, layer, r);
+	process(buf);
 	song->execute(a);
 }
 

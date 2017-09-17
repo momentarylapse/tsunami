@@ -54,8 +54,7 @@ class Echo extends AudioEffect
 
 	override void process(AudioBuffer buf)
 
-		Song *a = song
-		int delay_samples = a.sample_rate * config.delay
+		int delay_samples = sample_rate * config.delay
 		state.buf_r.resize(delay_samples)
 		state.buf_l.resize(delay_samples)
 	

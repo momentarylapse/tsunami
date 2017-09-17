@@ -87,8 +87,8 @@ class Compressor extends AudioEffect
 	override void process(AudioBuffer buf)
 		Song *a = song
 		
-		dgain_attack = 10 / (config.attack * a.sample_rate)
-		dgain_release = 10 / (config.release * a.sample_rate)
+		dgain_attack = 10 / (config.attack * sample_rate)
+		dgain_release = 10 / (config.release * sample_rate)
 		
 		compress(buf.r, state.squares_r, &state.gain_r)
 		compress(buf.l, state.squares_l, &state.gain_l)

@@ -19,25 +19,23 @@ class Metronome extends AudioEffect
 	Config config
 	Synthesizer *synth
 	MetronomeSource *source
-	MidiRenderer *renderer
 	
 	override void __init__()
 		synth = new DummySynthesizer
-		source = new MetronomeSource(90, 4, DEFAULT_SAMPLE_RATE)
-		renderer = new MidiRenderer(synth, source)
+		source = new MetronomeSource(90, 4, sample_rate)
+		synth.out.setSource(source)
 	
 	override void __delete__()
-		delete renderer
 		delete source
 		delete synth
 
 	override void process(AudioBuffer buf)
-		synth.setSampleRate(song.sample_rate)
-		source.sample_rate = song.sample_rate
+		synth.setSampleRate(sample_rate)
+		source.sample_rate = sample_rate
 		source.volume = config.volume
 		source.num_beats = config.beats_per_measure
 		source.setBpm(config.beats_per_minute)
-		renderer.read(buf)
+		synth.out.read(buf)
 		
 	override ConfigPanel *createPanel()
 		return new MetronomePanel(self)

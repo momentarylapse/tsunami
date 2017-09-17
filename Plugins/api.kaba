@@ -94,7 +94,7 @@ class AudioEffect
 	string name
 	bool usable
 	Song *song
-	Track *track
+	int sample_rate
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(AudioBuffer buf)

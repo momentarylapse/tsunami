@@ -158,12 +158,12 @@ void SongRenderer::bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_li
 
 	// apply preview plugin?
 	if (t and effect)
-		effect->apply(buf, &fake_track, false);
+		effect->process(buf);
 
 	// apply fx
 	for (Effect *fx: fx_list)
 		if (fx->enabled)
-			fx->apply(buf, &fake_track, false);
+			fx->process(buf);
 }
 
 void SongRenderer::bb_render_track_fx(AudioBuffer &buf, Track *t, int ti)
@@ -280,7 +280,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 void SongRenderer::reset()
 {
 	for (Effect *fx: song->fx)
-		fx->prepare();
+		fx->resetState();
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
@@ -288,14 +288,14 @@ void SongRenderer::reset()
 		t->synth->setInstrument(t->instrument);
 		t->synth->reset();
 		for (Effect *fx: t->fx)
-			fx->prepare();
+			fx->resetState();
 		for (MidiEffect *fx: t->midi.fx){
 			fx->prepare();
 			fx->process(&midi[i]);
 		}
 	}
 	if (effect)
-		effect->prepare();
+		effect->resetState();
 }
 
 int SongRenderer::getSampleRate()

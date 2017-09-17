@@ -102,9 +102,9 @@ public:
 	virtual void read(File *f)
 	{
 		me = CreateEffect(f->ReadStr(), parent->song);
-		me->only_on_selection = f->ReadBool();
-		me->range.offset = f->ReadInt();
-		me->range.length = f->ReadInt();
+		f->ReadBool();
+		f->ReadInt();
+		f->ReadInt();
 		string params = f->ReadStr();
 		me->configFromString(params);
 		string temp = f->ReadStr();
@@ -115,9 +115,9 @@ public:
 	virtual void write(File *f)
 	{
 		f->WriteStr(me->name);
-		f->WriteBool(me->only_on_selection);
-		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.length);
+		f->WriteBool(false);
+		f->WriteInt(0);
+		f->WriteInt(0);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
 	}
@@ -131,9 +131,9 @@ public:
 	virtual void read(File *f)
 	{
 		me = CreateEffect(f->ReadStr(), parent);
-		me->only_on_selection = f->ReadBool();
-		me->range.offset = f->ReadInt();
-		me->range.length = f->ReadInt();
+		f->ReadBool();
+		f->ReadInt();
+		f->ReadInt();
 		string params = f->ReadStr();
 		me->configFromString(params);
 		string temp = f->ReadStr();
@@ -144,9 +144,9 @@ public:
 	virtual void write(File *f)
 	{
 		f->WriteStr(me->name);
-		f->WriteBool(me->only_on_selection);
-		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.length);
+		f->WriteBool(false);
+		f->WriteInt(0);
+		f->WriteInt(0);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
 	}

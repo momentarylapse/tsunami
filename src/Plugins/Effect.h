@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 #include "Configurable.h"
+#include "../Audio/Source/AudioSource.h"
 
 class Plugin;
 class Track;
@@ -32,23 +33,29 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	bool only_on_selection;
-	Range range;
 	Plugin *plugin;
 	bool usable;
 	bool enabled;
 
 	// context
-	Song *song;
-	Track *track;
-	int layer;
+	int sample_rate;
 
-	virtual void _cdecl processTrack(AudioBuffer *buf){};
+	class Output : public AudioSource
+	{
+	public:
+		Output(Effect *fx);
+		virtual int _cdecl read(AudioBuffer &buf);
+		virtual void _cdecl reset();
+		virtual int _cdecl getSampleRate();
+		void setSource(AudioSource *source);
+		Effect *fx;
+		AudioSource *source;
+	};
+	Output *out;
+
+	virtual void _cdecl process(AudioBuffer &buf){};
 
 	void doProcessTrack(Track *t, int layer, const Range &r);
-
-	void prepare();
-	void apply(AudioBuffer &buf, Track *t, bool log_error);
 
 	string getError();
 };

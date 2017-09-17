@@ -119,16 +119,12 @@ void PluginManager::LinkAppScriptData()
 	Effect effect;
 	Kaba::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Kaba::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
-	Kaba::DeclareClassOffset("AudioEffect", "only_on_selection", _offsetof(Effect, only_on_selection));
-	Kaba::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
 	Kaba::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
 	Kaba::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
-	Kaba::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
-	Kaba::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
-	Kaba::DeclareClassOffset("AudioEffect", "layer", _offsetof(Effect, layer));
+	Kaba::DeclareClassOffset("AudioEffect", "sample_rate", _offsetof(Effect, sample_rate));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Effect::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Effect::__delete__), &effect);
-	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&Effect::processTrack), &effect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&Effect::process), &effect);
 	Kaba::DeclareClassVirtualIndex("AudioEffect", "createPanel", Kaba::mf(&Effect::createPanel), &effect);
 	Kaba::LinkExternal("AudioEffect.resetConfig", Kaba::mf(&Effect::resetConfig));
 	Kaba::LinkExternal("AudioEffect.resetState", Kaba::mf(&Effect::resetState));

@@ -53,8 +53,6 @@ class Phaser extends AudioEffect
 			b[i] = y
 	
 	override void process(AudioBuffer buf)
-		Song *a = song
-	
-		doPhaser(buf.r, state.r, a.sample_rate)
-		doPhaser(buf.l, state.l, a.sample_rate)
+		doPhaser(buf.r, state.r, sample_rate)
+		doPhaser(buf.l, state.l, sample_rate)
 	

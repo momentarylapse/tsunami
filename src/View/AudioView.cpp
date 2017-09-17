@@ -7,7 +7,6 @@
 
 #include "AudioView.h"
 
-#include "../Audio/Source/MidiRenderer.h"
 #include "../Audio/Source/SongRenderer.h"
 #include "AudioViewTrack.h"
 #include "Mode/ViewModeDefault.h"

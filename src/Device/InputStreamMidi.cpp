@@ -11,7 +11,6 @@
 #include "DeviceManager.h"
 #include "InputStreamMidi.h"
 
-#include "../Audio/Source/MidiRenderer.h"
 #include "OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Midi/MidiSource.h"
@@ -69,17 +68,15 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 
 
 	preview_source = new MidiPreviewFeedSource;
-	preview_renderer = new MidiRenderer(NULL, preview_source);
-	preview_stream = new OutputStream(preview_renderer);
-	preview_stream->setBufferSize(2048);
+	preview_stream = NULL;
 }
 
 InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	unconnect();
-	delete preview_stream;
-	delete preview_renderer;
+	if (preview_stream)
+		delete preview_stream;
 	delete preview_source;
 	delete timer;
 }
@@ -91,7 +88,11 @@ void InputStreamMidi::init()
 
 void InputStreamMidi::setPreviewSynthesizer(Synthesizer *s)
 {
-	preview_renderer->setSynthesizer(s);
+	if (!preview_stream){
+		preview_stream = new OutputStream(s->out);
+		preview_stream->setBufferSize(2048);
+	}else
+		preview_stream->setSource(s->out);
 	/*preview_renderer->setAutoStop(false);
 	if (s and capturing)
 		preview_stream->play();*/

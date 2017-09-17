@@ -13,10 +13,55 @@
 #include "../../Midi/MidiSource.h"
 #include "../../lib/math/math.h"
 
+Synthesizer::Output::Output(Synthesizer *s)
+{
+	synth = s;
+	source = NULL;
+}
+
+void Synthesizer::Output::reset()
+{
+	synth->reset();
+	//source->reset();
+}
+
+void Synthesizer::Output::setSource(MidiSource *_source)
+{
+	source = _source;
+}
+
+int Synthesizer::Output::getSampleRate()
+{
+	return synth->sample_rate;
+}
+
+int Synthesizer::Output::read(AudioBuffer &buf)
+{
+	if (!source)
+		return 0;
+	// get from source...
+	synth->events.samples = buf.length;
+	int n = source->read(synth->events);
+	if (n < buf.length)
+		synth->source_run_out = true;
+
+	buf.scale(0);
+
+	if (synth->hasRunOutOfData())
+		return 0;
+
+	synth->render(buf);
+
+	synth->events.clear();
+
+	return n;
+}
+
 
 Synthesizer::Synthesizer() :
 	Configurable(TYPE_SYNTHESIZER)
 {
+	out = new Output(this);
 	sample_rate = 0;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::TYPE_PIANO);
@@ -29,6 +74,7 @@ Synthesizer::Synthesizer() :
 
 Synthesizer::~Synthesizer()
 {
+	delete out;
 }
 
 void Synthesizer::__init__()
@@ -85,26 +131,6 @@ void Synthesizer::enablePitch(int pitch, bool enable)
 		active_pitch.erase(pitch);
 		// delayed deletion (makes things easier in the render() function)
 		//delete_me.add(pitch);
-}
-
-int Synthesizer::read(AudioBuffer &buf, MidiSource *source)
-{
-	// get from source...
-	events.samples = buf.length;
-	int n = source->read(events);
-	if (n < buf.length)
-		source_run_out = true;
-
-	buf.scale(0);
-
-	if (hasRunOutOfData())
-		return 0;
-
-	render(buf);
-
-	events.clear();
-
-	return n;
 }
 
 bool Synthesizer::hasRunOutOfData()

@@ -158,6 +158,12 @@ class MidiSource
 	extern virtual void __delete__()
 	extern virtual int read(MidiRawData midi)
 
+class SynthOutput extends AudioSource
+	extern override int read(AudioBuffer buf)
+	extern override void reset()
+	extern override int getSampleRate()
+	extern void setSource(MidiSource* source)
+
 class Synthesizer
 	string name
 	int sample_rate
@@ -166,6 +172,7 @@ class Synthesizer
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	MidiRawData events
+	SynthOutput* out
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(AudioBuffer buf)
@@ -184,14 +191,6 @@ class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	//extern overwrite void __delete__()
 	extern override void render(AudioBuffer buf)
-
-class MidiRenderer extends AudioSource
-	extern void __init__(Synthesizer *s, MidiSource *source)
-	extern override void __delete__()
-	extern void setSynthesizer(Synthesizer *s)
-	extern override int read(AudioBuffer buf)
-	extern override void reset()
-	extern override int getSampleRate()
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)

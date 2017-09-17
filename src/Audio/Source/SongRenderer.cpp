@@ -107,7 +107,8 @@ void SongRenderer::bb_render_time_track_no_fx(AudioBuffer &buf, Track *t)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, b.level, 0.8f);
 
 	midi_streamer->setData(raw);
-	t->synth->read(buf, midi_streamer);
+	t->synth->out->setSource(midi_streamer);
+	t->synth->out->read(buf);
 }
 
 void SongRenderer::bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
@@ -125,7 +126,8 @@ void SongRenderer::bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti
 	raw.read(events, range_cur);
 
 	midi_streamer->setData(events);
-	t->synth->read(buf, midi_streamer);
+	t->synth->out->setSource(midi_streamer);
+	t->synth->out->read(buf);
 }
 
 void SongRenderer::bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti)

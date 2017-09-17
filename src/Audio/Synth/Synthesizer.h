@@ -12,6 +12,7 @@
 #include "../../Plugins/Configurable.h"
 #include "../../Midi/MidiData.h"
 #include "../../Midi/Instrument.h"
+#include "../Source/AudioSource.h"
 
 class Range;
 class AudioBuffer;
@@ -46,8 +47,6 @@ public:
 
 	int keep_notes;
 
-	int _cdecl read(AudioBuffer &buf, MidiSource *source);
-
 	void _cdecl reset();
 
 	bool hasRunOutOfData();
@@ -55,6 +54,22 @@ public:
 	bool source_run_out;
 
 	bool isDefault();
+
+	class Output : public AudioSource
+	{
+	public:
+		Output(Synthesizer *synth);
+		Synthesizer *synth;
+		virtual int _cdecl read(AudioBuffer &buf);
+		virtual void _cdecl reset();
+
+		virtual int _cdecl getSampleRate();
+
+		void setSource(MidiSource *source);
+		MidiSource *source;
+
+	};
+	Output *out;
 
 protected:
 

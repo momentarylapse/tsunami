@@ -78,7 +78,6 @@ OBJ = \
  Audio/Source/AudioSource.o\
  Audio/Source/BufferStreamer.o\
  Audio/Source/EffectRenderer.o\
- Audio/Source/MidiRenderer.o\
  Audio/Source/SongRenderer.o\
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/EnvelopeADSR.o\
@@ -532,9 +531,6 @@ Audio/Source/BufferStreamer.o : Audio/Source/BufferStreamer.cpp
 
 Audio/Source/EffectRenderer.o : Audio/Source/EffectRenderer.cpp
 	$(CPP) -c Audio/Source/EffectRenderer.cpp -o $@ $(CXXFLAGS)
-
-Audio/Source/MidiRenderer.o : Audio/Source/MidiRenderer.cpp
-	$(CPP) -c Audio/Source/MidiRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/Source/SongRenderer.o : Audio/Source/SongRenderer.cpp
 	$(CPP) -c Audio/Source/SongRenderer.cpp -o $@ $(CXXFLAGS)

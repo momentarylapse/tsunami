@@ -7,7 +7,6 @@
 
 #include "PluginManager.h"
 
-#include "../Audio/Source/MidiRenderer.h"
 #include "../Audio/Source/SongRenderer.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -219,6 +218,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
 	Kaba::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
 	Kaba::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
+	Kaba::DeclareClassOffset("Synthesizer", "out", _offsetof(Synthesizer, out));
 	Kaba::LinkExternal("Synthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Synthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Synthesizer::__delete__), &synth);
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "createPanel", Kaba::mf(&Synthesizer::createPanel), &synth);
@@ -230,14 +230,12 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Synthesizer.setSampleRate", Kaba::mf(&Synthesizer::setSampleRate));
 	Kaba::LinkExternal("Synthesizer.notify", Kaba::mf(&Synthesizer::notify));
 
-	MidiRenderer midiren(NULL, NULL);
-	Kaba::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
-	Kaba::LinkExternal("MidiRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiRenderer::__init__));
-	Kaba::DeclareClassVirtualIndex("MidiRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiRenderer::__delete__), &midiren);
-	Kaba::DeclareClassVirtualIndex("MidiRenderer", "read", Kaba::mf(&MidiRenderer::read), &midiren);
-	Kaba::DeclareClassVirtualIndex("MidiRenderer", "reset", Kaba::mf(&MidiRenderer::reset), &midiren);
-	Kaba::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Kaba::mf(&MidiRenderer::getSampleRate), &midiren);
-	Kaba::LinkExternal("MidiRenderer.setSynthesizer", Kaba::mf(&MidiRenderer::setSynthesizer));
+	Synthesizer::Output synth_out(NULL);
+	Kaba::DeclareClassSize("SynthOutput", sizeof(Synthesizer::Output));
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "read", Kaba::mf(&Synthesizer::Output::read), &synth_out);
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "getSampleRate", Kaba::mf(&Synthesizer::Output::getSampleRate), &synth_out);
+	Kaba::LinkExternal("SynthOutput.setSource", Kaba::mf(&Synthesizer::Output::setSource));
 
 
 	DummySynthesizer dsynth;

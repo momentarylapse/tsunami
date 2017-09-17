@@ -7,7 +7,6 @@
 
 #include "ViewModeMidi.h"
 
-#include "../../Audio/Source/MidiRenderer.h"
 #include "../../Audio/Source/SongRenderer.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
@@ -108,15 +107,13 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	preview_source = new MidiPreviewSource;
 
 	preview_synth = NULL;
-	preview_renderer = new MidiRenderer(preview_synth, preview_source);
-	preview_stream = new OutputStream(preview_renderer);
-	preview_stream->setBufferSize(2048);
+	preview_stream = NULL;
 }
 
 ViewModeMidi::~ViewModeMidi()
 {
-	delete preview_stream;
-	delete preview_renderer;
+	if (preview_stream)
+		delete preview_stream;
 	if (preview_synth)
 		delete preview_synth;
 }
@@ -138,11 +135,15 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
 
 	if (!preview_stream->isPlaying()){
+		if (preview_stream)
+			delete preview_stream;
 		if (preview_synth)
 			delete preview_synth;
 		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
 		preview_synth->setInstrument(view->cur_track->instrument);
-		preview_renderer->setSynthesizer(preview_synth);
+		preview_synth->out->setSource(preview_source);
+		preview_stream = new OutputStream(preview_synth->out);
+		preview_stream->setBufferSize(2048);
 	}
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);

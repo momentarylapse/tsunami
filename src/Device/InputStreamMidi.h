@@ -13,7 +13,6 @@
 #include "config.h"
 
 class OutputStream;
-class MidiRenderer;
 class Synthesizer;
 class Device;
 class DeviceManager;
@@ -90,7 +89,6 @@ private:
 
 	MidiPreviewFeedSource *preview_source;
 	OutputStream *preview_stream;
-	MidiRenderer *preview_renderer;
 };
 
 #endif /* INPUTSTREAMMIDI_H_ */

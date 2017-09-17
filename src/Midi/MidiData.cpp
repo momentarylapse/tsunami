@@ -376,7 +376,7 @@ void MidiData::operator=(const MidiDataRef &midi)
 	fx = midi.fx;
 }
 
-Range MidiData::getRange(int elongation) const
+Range MidiData::range(int elongation) const
 {
 	if (num == 0)
 		return Range::EMPTY;

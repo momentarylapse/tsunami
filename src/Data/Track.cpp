@@ -104,7 +104,7 @@ Range Track::getRange()
 		r = r or s->range();
 
 	if ((type == TYPE_MIDI) and (midi.num > 0))
-		r = r or midi.getRange(synth->keep_notes);
+		r = r or midi.range(synth->keep_notes);
 
 	return r;
 }

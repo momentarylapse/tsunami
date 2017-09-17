@@ -35,7 +35,6 @@ public:
 private:
 	Synthesizer *s;
 	MidiSource *source;
-	bool samples_remaining;
 };
 
 #endif /* SRC_AUDIO_SOURCE_MIDIRENDERER_H_ */

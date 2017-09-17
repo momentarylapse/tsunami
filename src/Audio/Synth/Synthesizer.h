@@ -76,10 +76,6 @@ public:
 protected:
 	Tuning tuning;
 	float delta_phi[MAX_PITCH];
-
-	void lock();
-	void unlock();
-	bool locked;
 };
 
 #endif /* SYNTHESIZER_H_ */

@@ -283,7 +283,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiData::__init__));
 	Kaba::LinkExternal("MidiData.getEvents", Kaba::mf(&MidiData::getEvents));
 	Kaba::LinkExternal("MidiData.getNotes", Kaba::mf(&MidiData::getNotes));
-	Kaba::LinkExternal("MidiData.getRange", Kaba::mf(&MidiData::getRange));
+	Kaba::LinkExternal("MidiData.getRange", Kaba::mf(&MidiData::range));
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));

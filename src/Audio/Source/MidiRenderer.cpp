@@ -13,7 +13,6 @@
 
 MidiRenderer::MidiRenderer(Synthesizer *_s, MidiSource *_source)
 {
-	samples_remaining = -1;
 	source = _source;
 	setSynthesizer(_s);
 }

@@ -15,10 +15,6 @@ static const int MESSAGE_DEBUG_LEVEL = 0;
 
 static string dummy_string;
 
-namespace Kaba{
-extern Array<Kaba::Script*> PublicScript;
-};
-
 bool split_num_string(const string &n, string &out, int &after)
 {
 	out = n;
@@ -62,12 +58,9 @@ static string get_obs_name(VirtualBase *o)
 	string pp;
 	if (MESSAGE_DEBUG_LEVEL >= 4)
 		pp = "(" + p2s(o) + ")";
-	for (auto s: Kaba::PublicScript)
-		for (auto c: s->syntax->classes){
-			void *vtable = *(void**)o;
-			if (vtable == c->_vtable_location_compiler_)
-				return "<kaba:" + c->name + ">" + pp;
-		}
+	Kaba::Class *c = Kaba::GetDynamicType(o);
+	if (c)
+		return "<kaba:" + c->name + ">" + pp;
 	return printify(typeid(*o).name()) + pp;
 }
 

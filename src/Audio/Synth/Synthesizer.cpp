@@ -19,7 +19,6 @@ Synthesizer::Synthesizer() :
 {
 	sample_rate = 0;
 	keep_notes = 0;
-	locked = false;
 	instrument = Instrument(Instrument::TYPE_PIANO);
 	source_run_out = false;
 
@@ -78,21 +77,6 @@ void Synthesizer::setInstrument(Instrument &i)
 	onConfig();
 }
 
-void Synthesizer::lock()
-{
-	// really unsafe locking mechanism
-	printf("syn.lock\n");
-	while (locked){}
-	printf("...\n");
-	locked = true;
-}
-
-void Synthesizer::unlock()
-{
-	printf("syn.unlock\n");
-	locked = false;
-}
-
 void Synthesizer::enablePitch(int pitch, bool enable)
 {
 	if (enable)
@@ -120,12 +104,12 @@ int Synthesizer::read(AudioBuffer &buf, MidiSource *source)
 
 	events.clear();
 
-	return buf.length;
+	return n;
 }
 
 bool Synthesizer::hasRunOutOfData()
 {
-	return (events.num == 0) and (active_pitch.num == 0) and source_run_out;
+	return (active_pitch.num == 0) and source_run_out;
 }
 
 void Synthesizer::reset()

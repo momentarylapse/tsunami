@@ -25,6 +25,8 @@ public:
 	virtual void _cdecl reset(){}
 
 	virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
+
+	static const int END_OF_STREAM;
 };
 
 #endif /* SRC_AUDIO_SOURCE_AUDIOSOURCE_H_ */

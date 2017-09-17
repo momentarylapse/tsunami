@@ -75,6 +75,7 @@ OBJ = \
  Action/ActionGroup.o\
  Action/ActionManager.o\
  Action/ActionMergable.o\
+ Audio/AudioSucker.o\
  Audio/Source/AudioSource.o\
  Audio/Source/BufferStreamer.o\
  Audio/Source/SongRenderer.o\
@@ -521,6 +522,9 @@ Action/ActionManager.o : Action/ActionManager.cpp
 
 Action/ActionMergable.o : Action/ActionMergable.cpp
 	$(CPP) -c Action/ActionMergable.cpp -o $@ $(CXXFLAGS)
+
+Audio/AudioSucker.o : Audio/AudioSucker.cpp
+	$(CPP) -c Audio/AudioSucker.cpp -o $@ $(CXXFLAGS)
 
 Audio/Source/AudioSource.o : Audio/Source/AudioSource.cpp
 	$(CPP) -c Audio/Source/AudioSource.cpp -o $@ $(CXXFLAGS)

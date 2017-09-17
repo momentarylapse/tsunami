@@ -7,6 +7,8 @@
 
 #include "../Source/AudioSource.h"
 
+const int AudioSource::END_OF_STREAM = -1;
+
 AudioSource::AudioSource()
 {
 }

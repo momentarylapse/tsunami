@@ -413,12 +413,6 @@ void OutputStream::stream()
 	// add to queue
 	ring_buf.write(b);
 
-	// update pos
-	/*Range rr = renderer->range();
-	cur_pos = renderer->getPos() - rr.offset - ring_buf.available();
-	if (rr.length > 0)
-		cur_pos = rr.offset + (cur_pos + rr.length) % rr.length;*/
-
 	reading = false;
 }
 

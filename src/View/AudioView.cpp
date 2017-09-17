@@ -1052,14 +1052,14 @@ void AudioView::selectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		for (Track *tt : t->song->tracks)
+		for (Track *tt: t->song->tracks)
 			if (sel.has(tt) and (tt != t))
 				is_only_selected = false;
 		sel.set(t, !sel.has(t) or is_only_selected);
 	}else{
 		if (!sel.has(t)){
 			// unselect all tracks
-			for (Track *tt : t->song->tracks)
+			for (Track *tt: t->song->tracks)
 				sel.set(tt, false);
 		}
 

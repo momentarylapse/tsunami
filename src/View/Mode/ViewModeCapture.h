@@ -12,6 +12,8 @@
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
+class InputStreamAny;
+
 class ViewModeCapture : public ViewModeDefault
 {
 public:
@@ -21,6 +23,14 @@ public:
 	virtual Selection getHover();
 	virtual void onLeftButtonDown(){}
 	virtual void onLeftDoubleClick(){}
+
+	virtual void drawPost(Painter *c);
+
+	InputStreamAny *input;
+	void setInput(InputStreamAny *input);
+	Track *capturing_track;
+
+	void onInputUpdate();
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

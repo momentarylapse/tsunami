@@ -20,7 +20,6 @@
 
 class DeviceManager;
 class OutputStream;
-class InputStreamAny;
 class SongRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
@@ -57,7 +56,6 @@ public:
 
 	void onSongUpdate();
 	void onStreamUpdate();
-	void onInputUpdate();
 	void onUpdate();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
@@ -189,8 +187,6 @@ public:
 
 	OutputStream *stream;
 	SongRenderer *renderer;
-	InputStreamAny *input;
-	void setInput(InputStreamAny *input);
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);
@@ -198,7 +194,6 @@ public:
 	Track *cur_track;
 	SampleRef *cur_sample;
 	int cur_layer;
-	Track *capturing_track;
 
 	bool editingTrack(Track *t);
 

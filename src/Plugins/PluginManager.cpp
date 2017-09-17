@@ -26,6 +26,7 @@
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
+#include "../View/Mode/ViewModeCapture.h"
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"
@@ -37,6 +38,7 @@
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
+extern InputStreamAny *export_view_input;
 
 
 PluginManager::PluginManager()
@@ -84,6 +86,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("storage", &tsunami->storage);
 	Kaba::LinkExternal("logging", &tsunami->log);
 	Kaba::LinkExternal("colors", &tsunami->_view->_export_colors);
+	Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -380,8 +383,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleCount", Kaba::mf(&InputStreamAny::getSampleCount), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "accumulate", Kaba::mf(&InputStreamAny::accumulate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "resetAccumulation", Kaba::mf(&InputStreamAny::resetAccumulation), &input);
-	Kaba::LinkExternal("InputStreamAny.addObserver", Kaba::mf(&InputStreamAny::subscribe_kaba));
-	Kaba::LinkExternal("InputStreamAny.removeObserver", Kaba::mf(&InputStreamAny::unsubscribe));
+	Kaba::LinkExternal("InputStreamAny.subscribe", Kaba::mf(&InputStreamAny::subscribe_kaba));
+	Kaba::LinkExternal("InputStreamAny.unsubscribe", Kaba::mf(&InputStreamAny::unsubscribe));
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleRate", Kaba::mf(&InputStreamAny::getSampleRate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSomeSamples", Kaba::mf(&InputStreamAny::getSomeSamples), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getState", Kaba::mf(&InputStreamAny::getState), &input);
@@ -404,8 +407,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleCount", Kaba::mf(&InputStreamAudio::getSampleCount), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "accumulate", Kaba::mf(&InputStreamAudio::accumulate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "resetAccumulation", Kaba::mf(&InputStreamAudio::resetAccumulation), &input);
-	Kaba::LinkExternal("InputStreamAudio.addObserver", Kaba::mf(&InputStreamAudio::subscribe_kaba));
-	Kaba::LinkExternal("InputStreamAudio.removeObserver", Kaba::mf(&InputStreamAudio::unsubscribe));
+	Kaba::LinkExternal("InputStreamAudio.subscribe", Kaba::mf(&InputStreamAudio::subscribe_kaba));
+	Kaba::LinkExternal("InputStreamAudio.unsubscribe", Kaba::mf(&InputStreamAudio::unsubscribe));
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Kaba::mf(&InputStreamAudio::getSampleRate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Kaba::mf(&InputStreamAudio::getSomeSamples), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getState", Kaba::mf(&InputStreamAudio::getState), &input);
@@ -433,9 +436,11 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
 	Kaba::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
-	Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
-	Kaba::LinkExternal("AudioView.addObserver", Kaba::mf(&AudioView::subscribe_kaba));
-	Kaba::LinkExternal("AudioView.removeObserver", Kaba::mf(&AudioView::unsubscribe));
+	//Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
+	Kaba::LinkExternal("AudioView.subscribe", Kaba::mf(&AudioView::subscribe_kaba));
+	Kaba::LinkExternal("AudioView.unsubscribe", Kaba::mf(&AudioView::unsubscribe));
+
+	msg_write(p2s(Kaba::mf(&AudioView::subscribe_kaba)));
 
 	Kaba::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
 	Kaba::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));

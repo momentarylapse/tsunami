@@ -73,10 +73,10 @@ class PitchRecognizer
 	void __init__()
 		input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
 		input.start()
-		input.addObserver(self, &updateInput)
+		input.subscribe(self, &updateInput, "")
 		
 	virtual void __delete__()
-		input.removeObserver(self)
+		input.unsubscribe(self)
 		input.stop()
 		delete input
 	

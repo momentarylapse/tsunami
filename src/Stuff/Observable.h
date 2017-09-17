@@ -85,9 +85,9 @@ public:
 	{
 		observable_data.subscribe(this, observer, NULL, callback_p, message);
 	}
-	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function)
+	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function, const string &message)
 	{
-		subscribe(handler, std::bind(function, handler));
+		subscribe(handler, std::bind(function, handler), message);
 	}
 
 	void notifyBegin()

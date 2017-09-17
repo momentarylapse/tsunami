@@ -5,10 +5,10 @@ class AutoRecord extends TsunamiPlugin
 	
 	override void onStart()
 		win.show()
-		view.addObserver(self, &onUpdate)
+		view.subscribe(self, &onUpdate, "InputChange")
 		
 	override void onStop()
-		view.removeObserver(self)
+		view.unsubscribe(self)
 		
 	string get_fn()
 		string base = "/home/michi/backup-"
@@ -28,11 +28,9 @@ class AutoRecord extends TsunamiPlugin
 			if !FileExists(fn)
 				return fn
 	
-	void onUpdate(string message)
-		//print("------------- " + message)
-		if message == "InputChange"
-			if view.input
-				string fn = get_fn()
-				SetTempBackupFilename(fn)
-				view.input.setBackupMode(2)
-				song.filename = fn.replace(".raw", ".ogg")
+	void onUpdate()
+		if view_input
+			string fn = get_fn()
+			SetTempBackupFilename(fn)
+			view_input.setBackupMode(2)
+			song.filename = fn.replace(".raw", ".ogg")

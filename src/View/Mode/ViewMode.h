@@ -8,6 +8,8 @@
 #ifndef SRC_VIEW_MODE_VIEWMODE_H_
 #define SRC_VIEW_MODE_VIEWMODE_H_
 
+#include "../../Stuff/Observable.h"
+
 class AudioView;
 class AudioViewTrack;
 class Selection;
@@ -22,7 +24,7 @@ class rect;
 class color;
 class Range;
 
-class ViewMode
+class ViewMode : public Observable<VirtualBase>
 {
 public:
 	ViewMode(AudioView *view);

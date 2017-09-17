@@ -90,7 +90,7 @@ public:
 	{
 		target = t;
 		view->setCurTrack(target);
-		view->capturing_track = target;
+		view->mode_capture->capturing_track = target;
 		cc->setInt("capture_audio_target", target->get_index());
 
 		bool ok = (target->type == Track::TYPE_AUDIO);
@@ -134,7 +134,7 @@ public:
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
 		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
-		view->setInput(input);
+		view->mode_capture->setInput(input);
 		cc->peak_meter->setSource(input);
 
 		input->setDevice(chosen_device);
@@ -152,7 +152,7 @@ public:
 	virtual void leave()
 	{
 		cc->peak_meter->setSource(NULL);
-		view->setInput(NULL);
+		view->mode_capture->setInput(NULL);
 		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
@@ -272,7 +272,7 @@ public:
 		target = t;
 		input->setPreviewSynthesizer(t->synth);
 		view->setCurTrack(target);
-		view->capturing_track = target;
+		view->mode_capture->capturing_track = target;
 		cc->setInt("capture_midi_target", target->get_index());
 
 
@@ -314,7 +314,7 @@ public:
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
 		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
-		view->setInput(input);
+		view->mode_capture->setInput(input);
 		cc->peak_meter->setSource(input);
 
 		input->setDevice(chosen_device);
@@ -332,7 +332,7 @@ public:
 	virtual void leave()
 	{
 		cc->peak_meter->setSource(NULL);
-		view->setInput(NULL);
+		view->mode_capture->setInput(NULL);
 		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;

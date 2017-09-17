@@ -15,9 +15,6 @@
 #include "Mode/ViewModeCapture.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
-#include "../Device/InputStreamAny.h"
-#include "../Device/InputStreamAudio.h"
-#include "../Device/InputStreamMidi.h"
 #include "../Device/OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/Log.h"
@@ -163,7 +160,6 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	dummy_vtrack = new AudioViewTrack(this, NULL);
 
 	song = _song;
-	input = NULL;
 
 	midi_view_mode = hui::Config.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
 
@@ -203,7 +199,6 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	cur_track = NULL;
 	cur_sample = NULL;
 	cur_layer = 0;
-	capturing_track = NULL;
 
 	bars_edit_data = true;
 
@@ -252,7 +247,6 @@ AudioView::~AudioView()
 {
 	song->unsubscribe(this);
 	stream->unsubscribe(this);
-	setInput(NULL);
 
 	delete(mode_curve);
 	delete(mode_scale_bars);
@@ -658,15 +652,6 @@ void AudioView::onStreamUpdate()
 	forceRedraw();
 }
 
-void AudioView::onInputUpdate()
-{
-	if (input){
-		if (input->isCapturing())
-			cam.makeSampleVisible(sel.range.start() + input->getSampleCount());
-		forceRedraw();
-	}
-}
-
 void AudioView::onUpdate()
 {
 	checkConsistency();
@@ -864,28 +849,13 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	for (AudioViewTrack *t: vtrack)
 		t->draw(c);
 
-	// capturing preview
-	if (input and input->isCapturing()){
-		int type = input->getType();
-		if (type == Track::TYPE_AUDIO)
-			((InputStreamAudio*)input)->buffer.update_peaks();
-		if (capturing_track){
-			if (type == Track::TYPE_AUDIO)
-				get_track(capturing_track)->drawBuffer(c, dynamic_cast<InputStreamAudio*>(input)->buffer, cam.pos - sel.range.offset, colors.capture_marker);
-			if (type == Track::TYPE_MIDI)
-				mode->drawMidi(c, get_track(capturing_track), midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
-		}
-	}
-
 
 	// selection
 	drawSelection(c, r);
 
 
 	// playing/capturing position
-	if (input and input->isCapturing())
-		drawTimeLine(c, sel.range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
-	else if (stream->isPlaying())
+	if (stream->isPlaying())
 		drawTimeLine(c, stream->getPos(renderer->getPos()), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
@@ -1102,18 +1072,6 @@ void AudioView::setCurLayer(int l)
 	notify(MESSAGE_CUR_LAYER_CHANGE);
 }
 
-
-void AudioView::setInput(InputStreamAny *_input)
-{
-	if (input)
-		input->unsubscribe(this);
-
-	input = _input;
-	notify(MESSAGE_INPUT_CHANGE);
-
-	if (input)
-		input->subscribe(this, std::bind(&AudioView::onInputUpdate, this));
-}
 
 // unused?!?
 void AudioView::enable(bool _enabled)

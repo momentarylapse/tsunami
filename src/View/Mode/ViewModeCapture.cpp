@@ -8,14 +8,23 @@
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../../Device/InputStreamAny.h"
+#include "../../Device/InputStreamAudio.h"
+#include "../../Device/InputStreamMidi.h"
+
+InputStreamAny *export_view_input = NULL;
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
+	input = NULL;
+	export_view_input = NULL;
+	capturing_track = NULL;
 }
 
 ViewModeCapture::~ViewModeCapture()
 {
+	setInput(NULL);
 }
 
 Selection ViewModeCapture::getHover()
@@ -58,3 +67,43 @@ Selection ViewModeCapture::getHover()
 	return s;
 }
 
+void ViewModeCapture::drawPost(Painter *c)
+{
+	// capturing preview
+	if (input and input->isCapturing()){
+		int type = input->getType();
+		if (type == Track::TYPE_AUDIO)
+			((InputStreamAudio*)input)->buffer.update_peaks();
+		if (capturing_track){
+			if (type == Track::TYPE_AUDIO)
+				view->get_track(capturing_track)->drawBuffer(c, dynamic_cast<InputStreamAudio*>(input)->buffer, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
+			if (type == Track::TYPE_MIDI)
+				drawMidi(c, view->get_track(capturing_track), midi_events_to_notes(((InputStreamMidi*)input)->midi), true, view->sel.range.start());
+		}
+	}
+
+	if (input and input->isCapturing())
+		view->drawTimeLine(c, view->sel.range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+}
+
+void ViewModeCapture::setInput(InputStreamAny *_input)
+{
+	if (input)
+		input->unsubscribe(this);
+
+	input = _input;
+	export_view_input = input;
+	view->notify(view->MESSAGE_INPUT_CHANGE);
+
+	if (input)
+		input->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
+}
+
+void ViewModeCapture::onInputUpdate()
+{
+	if (input){
+		if (input->isCapturing())
+			view->cam.makeSampleVisible(view->sel.range.start() + input->getSampleCount());
+		view->forceRedraw();
+	}
+}

@@ -144,7 +144,7 @@ void ObservableData::notifySend()
 	for (const string *m: message_queue){
 		//msg_write("send " + observable_name + ": " + queue[i]);
 		for (Subscription &r: subscriptions){
-			if ((r.message == m) or (*r.message == Observable<VirtualBase>::MESSAGE_ANY))
+			if ((*r.message == *m) or (*r.message == Observable<VirtualBase>::MESSAGE_ANY))
 				notifications.add(Notification(r.observer, m, r.callback, r.callback_p));
 		}
 	}

@@ -24,7 +24,7 @@ SongRenderer::SongRenderer(Song *s)
 	midi_streamer = new MidiDataSource(no_midi);
 	song = s;
 
-	effect = NULL;
+	preview_effect = NULL;
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
@@ -140,25 +140,9 @@ void SongRenderer::bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 		bb_render_midi_track_no_fx(buf, t, ti);
 }
 
-void SongRenderer::make_fake_track(Track *t, AudioBuffer &buf)
-{
-	//msg_write("fake track");
-	t->song = song;
-	t->layers.resize(1);
-	t->layers[0].buffers.resize(1);
-	t->layers[0].buffers[0].set_as_ref(buf, 0, range_cur.length);
-}
-
 void SongRenderer::bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list)
 {
 	buf.make_own();
-
-	Track fake_track = Track(Track::TYPE_AUDIO, NULL);
-	make_fake_track(&fake_track, buf);
-
-	// apply preview plugin?
-	if (t and effect)
-		effect->process(buf);
 
 	// apply fx
 	for (Effect *fx: fx_list)
@@ -170,8 +154,11 @@ void SongRenderer::bb_render_track_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	bb_render_track_no_fx(buf, t, ti);
 
-	if ((t->fx.num > 0) or effect)
-		bb_apply_fx(buf, t, t->fx);
+	Array<Effect*> fx = t->fx;
+	if (preview_effect)
+		fx.add(preview_effect);
+	if (fx.num > 0)
+		bb_apply_fx(buf, t, fx);
 }
 
 int get_first_usable_track(Song *s)
@@ -294,8 +281,8 @@ void SongRenderer::reset()
 			fx->process(&midi[i]);
 		}
 	}
-	if (effect)
-		effect->resetState();
+	if (preview_effect)
+		preview_effect->resetState();
 }
 
 int SongRenderer::getSampleRate()

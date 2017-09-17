@@ -43,7 +43,6 @@ private:
 	void bb_render_time_track_no_fx(AudioBuffer &buf, Track *t);
 	void bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void make_fake_track(Track *t, AudioBuffer &buf);
 	void bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
 	void bb_render_track_fx(AudioBuffer &buf, Track *t, int ti);
 	void bb_render_song_no_fx(AudioBuffer &buf);
@@ -57,7 +56,7 @@ private:
 	MidiDataSource *midi_streamer;
 
 public:
-	Effect *effect;
+	Effect *preview_effect;
 	bool allow_loop;
 	bool loop_if_allowed;
 };

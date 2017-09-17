@@ -77,7 +77,6 @@ OBJ = \
  Action/ActionMergable.o\
  Audio/Source/AudioSource.o\
  Audio/Source/BufferStreamer.o\
- Audio/Source/EffectRenderer.o\
  Audio/Source/SongRenderer.o\
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/EnvelopeADSR.o\
@@ -528,9 +527,6 @@ Audio/Source/AudioSource.o : Audio/Source/AudioSource.cpp
 
 Audio/Source/BufferStreamer.o : Audio/Source/BufferStreamer.cpp
 	$(CPP) -c Audio/Source/BufferStreamer.cpp -o $@ $(CXXFLAGS)
-
-Audio/Source/EffectRenderer.o : Audio/Source/EffectRenderer.cpp
-	$(CPP) -c Audio/Source/EffectRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/Source/SongRenderer.o : Audio/Source/SongRenderer.cpp
 	$(CPP) -c Audio/Source/SongRenderer.cpp -o $@ $(CXXFLAGS)

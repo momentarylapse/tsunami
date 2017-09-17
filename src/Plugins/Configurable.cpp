@@ -464,7 +464,7 @@ public:
 		if (progress)
 			previewEnd();
 		config->configToString();
-		tsunami->win->view->renderer->effect = (Effect*)config;
+		tsunami->win->view->renderer->preview_effect = (Effect*)config;
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
@@ -501,7 +501,7 @@ public:
 		progress = NULL;
 
 
-		tsunami->win->view->renderer->effect = NULL;
+		tsunami->win->view->renderer->preview_effect = NULL;
 	}
 
 	Configurable *config;

@@ -499,7 +499,8 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	if (keep_track_selection)
 		view->sel.tracks = tracks;
 	else
-		view->sel.all_tracks(view->song);
+		view->sel.tracks = view->cur_track;
+		//view->sel.all_tracks(view->song);
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
 

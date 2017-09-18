@@ -134,7 +134,7 @@ public:
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
 		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
-		view->mode_capture->setInput(input);
+		view->mode_capture->setInputAudio(input);
 		cc->peak_meter->setSource(input);
 
 		input->setDevice(chosen_device);
@@ -152,7 +152,7 @@ public:
 	virtual void leave()
 	{
 		cc->peak_meter->setSource(NULL);
-		view->mode_capture->setInput(NULL);
+		view->mode_capture->setInputAudio(NULL);
 		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
@@ -314,7 +314,7 @@ public:
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
 		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
-		view->mode_capture->setInput(input);
+		view->mode_capture->setInputMidi(input);
 		cc->peak_meter->setSource(input);
 
 		input->setDevice(chosen_device);
@@ -332,7 +332,7 @@ public:
 	virtual void leave()
 	{
 		cc->peak_meter->setSource(NULL);
-		view->mode_capture->setInput(NULL);
+		view->mode_capture->setInputMidi(NULL);
 		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;

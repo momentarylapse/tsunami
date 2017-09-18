@@ -38,7 +38,7 @@
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
-extern InputStreamAny *export_view_input;
+extern InputStreamAudio *export_view_input;
 
 
 PluginManager::PluginManager()

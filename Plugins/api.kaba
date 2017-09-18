@@ -523,7 +523,7 @@ extern Log* logging
 //extern PluginContext plugin_context
 extern Storage* storage
 extern ColorScheme colors
-extern InputStreamAny* view_input
+extern InputStreamAudio* view_input
 
 
 extern void fft_c2c(complex[] in, complex[] out, bool inverse)

@@ -12,19 +12,21 @@
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
 
-InputStreamAny *export_view_input = NULL;
+InputStreamAudio *export_view_input = NULL;
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
-	input = NULL;
+	input_audio = NULL;
+	input_midi = NULL;
 	export_view_input = NULL;
 	capturing_track = NULL;
 }
 
 ViewModeCapture::~ViewModeCapture()
 {
-	setInput(NULL);
+	setInputAudio(NULL);
+	setInputMidi(NULL);
 }
 
 Selection ViewModeCapture::getHover()
@@ -70,40 +72,56 @@ Selection ViewModeCapture::getHover()
 void ViewModeCapture::drawPost(Painter *c)
 {
 	// capturing preview
-	if (input and input->isCapturing()){
-		int type = input->getType();
-		if (type == Track::TYPE_AUDIO)
-			((InputStreamAudio*)input)->buffer.update_peaks();
-		if (capturing_track){
-			if (type == Track::TYPE_AUDIO)
-				view->get_track(capturing_track)->drawBuffer(c, dynamic_cast<InputStreamAudio*>(input)->buffer, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
-			if (type == Track::TYPE_MIDI)
-				drawMidi(c, view->get_track(capturing_track), midi_events_to_notes(((InputStreamMidi*)input)->midi), true, view->sel.range.start());
-		}
+	if (input_audio and input_audio->isCapturing()){
+		input_audio->buffer.update_peaks();
+		if (capturing_track)
+			view->get_track(capturing_track)->drawBuffer(c, input_audio->buffer, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
+		view->drawTimeLine(c, view->sel.range.start() + input_audio->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
 	}
 
-	if (input and input->isCapturing())
-		view->drawTimeLine(c, view->sel.range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+
+	if (input_midi and input_midi->isCapturing()){
+		if (capturing_track)
+			drawMidi(c, view->get_track(capturing_track), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
+		view->drawTimeLine(c, view->sel.range.start() + input_midi->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+	}
 }
 
-void ViewModeCapture::setInput(InputStreamAny *_input)
+void ViewModeCapture::setInputAudio(InputStreamAudio *_input)
 {
-	if (input)
-		input->unsubscribe(this);
+	if (input_audio)
+		input_audio->unsubscribe(this);
 
-	input = _input;
-	export_view_input = input;
+	input_audio = _input;
+	export_view_input = input_audio;
 	view->notify(view->MESSAGE_INPUT_CHANGE);
 
-	if (input)
-		input->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
+	if (input_audio)
+		input_audio->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
+}
+
+void ViewModeCapture::setInputMidi(InputStreamMidi *_input)
+{
+	if (input_midi)
+		input_midi->unsubscribe(this);
+
+	input_midi = _input;
+	view->notify(view->MESSAGE_INPUT_CHANGE);
+
+	if (input_midi)
+		input_midi->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
 }
 
 void ViewModeCapture::onInputUpdate()
 {
-	if (input){
-		if (input->isCapturing())
-			view->cam.makeSampleVisible(view->sel.range.start() + input->getSampleCount());
+	if (input_audio){
+		if (input_audio->isCapturing())
+			view->cam.makeSampleVisible(view->sel.range.start() + input_audio->getSampleCount());
+		view->forceRedraw();
+	}
+	if (input_midi){
+		if (input_midi->isCapturing())
+			view->cam.makeSampleVisible(view->sel.range.start() + input_midi->getSampleCount());
 		view->forceRedraw();
 	}
 }

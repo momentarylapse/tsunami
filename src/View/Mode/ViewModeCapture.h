@@ -12,7 +12,8 @@
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
-class InputStreamAny;
+class InputStreamAudio;
+class InputStreamMidi;
 
 class ViewModeCapture : public ViewModeDefault
 {
@@ -26,8 +27,10 @@ public:
 
 	virtual void drawPost(Painter *c);
 
-	InputStreamAny *input;
-	void setInput(InputStreamAny *input);
+	InputStreamAudio *input_audio;
+	InputStreamMidi *input_midi;
+	void setInputAudio(InputStreamAudio *input);
+	void setInputMidi(InputStreamMidi *input);
 	Track *capturing_track;
 
 	void onInputUpdate();

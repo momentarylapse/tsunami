@@ -663,6 +663,9 @@ void CaptureConsole::updateTime()
 
 void CaptureConsole::onUpdate()
 {
+	if (view->sel.range.length > 0)
+		if (mode->getSampleCount() >= view->getPlaybackSelection().length)
+			onPause();
 	//if (mode->input->cur_message() == MESSAGE_DELETE)
 	//	return;
 	// FIXME

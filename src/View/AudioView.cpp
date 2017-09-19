@@ -18,8 +18,10 @@
 #include "../Device/OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/Log.h"
+#include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
+#include "../lib/hui/hui.h"
 #include "Mode/ViewModeScaleBars.h"
 
 #include "../lib/threads/Mutex.h"
@@ -136,6 +138,8 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 {
 	id = _id;
 	win = parent;
+
+	perf_channel = PerformanceMonitor::create_channel("view");
 
 	ColorSchemeBasic bright;
 	bright.background = White;
@@ -280,6 +284,8 @@ AudioView::~AudioView()
 	hui::Config.setFloat("View.ZoomSpeed", ZoomSpeed);
 	hui::Config.setBool("View.Antialiasing", antialiasing);
 	hui::Config.setInt("View.MidiMode", midi_view_mode);
+
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioView::setColorScheme(const string &name)
@@ -870,6 +876,8 @@ int frame=0;
 
 void AudioView::onDraw(Painter *c)
 {
+	PerformanceMonitor::start_busy(perf_channel);
+
 	colors = basic_colors.create(win->isActive(id));
 	force_redraw = false;
 
@@ -886,6 +894,9 @@ void AudioView::onDraw(Painter *c)
 	//c->DrawStr(100, 100, i2s(frame++));
 
 	colors = basic_colors.create(true);
+
+
+	PerformanceMonitor::end_busy(perf_channel);
 }
 
 void AudioView::optimizeView()

@@ -52,9 +52,9 @@ public:
 	virtual bool _cdecl isCapturing();
 
 
-	virtual void _cdecl accumulate(bool enable);
+	/*virtual void _cdecl accumulate(bool enable);
 	virtual void _cdecl resetAccumulation();
-	virtual int _cdecl getSampleCount();
+	virtual int _cdecl getSampleCount();*/
 
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 	virtual int _cdecl getState();
@@ -76,22 +76,21 @@ public:
 
 
 	RingBuffer current_buffer;
-	AudioBuffer buffer;
+	//AudioBuffer buffer;
 
 	class Source : public AudioSource
 	{
 	public:
 		virtual int _cdecl read(AudioBuffer &buf);
 		virtual int _cdecl getSampleRate();
-		virtual int _cdecl getNumSamples();
 
 		InputStreamAudio *stream;
 	};
-	Source source;
+	Source *source;
 
 private:
 
-	bool accumulating;
+	//bool accumulating;
 	bool capturing;
 
 	bool running;

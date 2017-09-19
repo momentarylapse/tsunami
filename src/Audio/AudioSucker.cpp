@@ -9,8 +9,9 @@
 #include "Source/AudioSource.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
+#include "../Stuff/PerformanceMonitor.h"
 
-const int AudioSucker::DEFAULT_BUFFER_SIZE = 4096;
+const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 const string AudioSucker::MESSAGE_UPDATE = "Update";
 
 
@@ -18,37 +19,31 @@ class AudioSuckerThread : public Thread
 {
 public:
 	AudioSucker *sucker;
-	hui::Timer timer;
-	float t_idle;
+	int perf_channel;
 
 	AudioSuckerThread(AudioSucker *s)
 	{
 		sucker = s;
-		t_idle = 0;
+		perf_channel = sucker->perf_channel;
 	}
 
 	virtual void _cdecl onRun()
 	{
-		timer.reset();
 		//msg_write("thread run");
 		while(true){
+			//msg_write(".");
 			if (sucker->running){
+				PerformanceMonitor::start_busy(perf_channel);
 				int r = sucker->update();
+				PerformanceMonitor::end_busy(perf_channel);
 				if (r == AudioSource::END_OF_STREAM)
 					break;
 				if (r == 0){
 					hui::Sleep(sucker->no_data_wait);
-					t_idle += timer.get();
 					continue;
 				}
-
-				float t_busy = timer.get();
-				sucker->cpu_usage = t_busy / (t_busy + t_idle);
-				printf("%.1f %%\n", sucker->cpu_usage * 100);
-				t_idle = 0;
 			}else{
 				hui::Sleep(0.200f);
-				t_idle += timer.get();
 			}
 		}
 		//msg_write("thread done...");
@@ -57,13 +52,14 @@ public:
 
 AudioSucker::AudioSucker(AudioSource *_source)
 {
+	perf_channel = PerformanceMonitor::create_channel("suck");
 	source = _source;
-	accumulate = false;
+	accumulating = false;
 	running = false;
 	thread = new AudioSuckerThread(this);
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	cpu_usage = 0;
 	no_data_wait = 0.005f;
+
 }
 
 AudioSucker::~AudioSucker()
@@ -73,6 +69,7 @@ AudioSucker::~AudioSucker()
 		delete(thread);
 		thread = NULL;
 	}
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioSucker::setSource(AudioSource* s)
@@ -80,18 +77,27 @@ void AudioSucker::setSource(AudioSource* s)
 	source = s;
 }
 
-void AudioSucker::setAccumulate(bool enable)
+void AudioSucker::accumulate(bool enable)
 {
-	accumulate = enable;
+	accumulating = enable;
+}
+
+void AudioSucker::resetAccumulation()
+{
+	buf.clear();
 }
 
 void AudioSucker::start()
 {
+	if (running)
+		return;
+	thread->run();
 	running = true;
 }
 
 void AudioSucker::stop()
 {
+	thread->kill();
 	running = false;
 }
 
@@ -103,8 +109,10 @@ int AudioSucker::update()
 	if (r == source->END_OF_STREAM)
 		return r;
 	if (r > 0){
-		if (accumulate)
+		if (accumulating){
+			temp.resize(r);
 			buf.append(temp);
+		}
 		notify(MESSAGE_UPDATE);
 	}
 	return r;

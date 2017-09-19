@@ -114,18 +114,12 @@ int InputStreamAudio::SyncData::getDelay()
 
 int InputStreamAudio::Source::read(AudioBuffer &buf)
 {
-	stream->current_buffer.read(buf);
-	return min(buf.length, stream->getSampleCount());
+	return stream->current_buffer.read(buf);
 }
 
 int InputStreamAudio::Source::getSampleRate()
 {
 	return stream->getSampleRate();
-}
-
-int InputStreamAudio::Source::getNumSamples()
-{
-	return stream->getSampleCount();
 }
 
 
@@ -138,7 +132,8 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	_stream = NULL;
 #endif
 
-	source.stream = this;
+	source = new Source;
+	source->stream = this;
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;
@@ -208,7 +203,6 @@ void InputStreamAudio::stop()
 #endif
 
 	capturing = false;
-	accumulating = false;
 	current_buffer.clear();
 	if (backup_file){
 		delete(backup_file);
@@ -223,7 +217,6 @@ bool InputStreamAudio::start()
 	if (capturing)
 		stop();
 
-	accumulating = false;
 	num_channels = 2;
 
 #ifdef DEVICE_PULSEAUDIO
@@ -289,23 +282,6 @@ float InputStreamAudio::getPlaybackDelayConst()
 	return playback_delay_const;
 }
 
-void InputStreamAudio::accumulate(bool enable)
-{
-	//resetAccumulation();
-	current_buffer.clear();
-	accumulating = enable;
-}
-
-void InputStreamAudio::resetAccumulation()
-{
-	buffer.clear();
-}
-
-int InputStreamAudio::getSampleCount()
-{
-	return buffer.length;
-}
-
 void InputStreamAudio::setPlaybackDelayConst(float f)
 {
 	playback_delay_const = f;
@@ -320,14 +296,11 @@ int InputStreamAudio::doCapturing()
 	int avail = current_buffer.available();
 	sync.add(avail);
 
-	if (!accumulating)
-		return avail;
-
-	AudioBuffer b;
-	current_buffer.readRef(b, avail);
-	buffer.append(b);
+	return avail;
 
 	if (backup_file){
+		AudioBuffer b;
+		current_buffer.readRef(b, avail);
 		// write to file
 		string data;
 		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);

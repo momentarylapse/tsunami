@@ -12,12 +12,13 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
+#include "Stuff/PerformanceMonitor.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.6.99.3 alpha!";
+const string AppVersion = "0.6.100.0 alpha!";
 
 Tsunami *tsunami = NULL;
 
@@ -58,6 +59,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	_win = NULL;
 	_view = NULL;
 	song = NULL;
+
+	PerformanceMonitor::init();
 
 	log = new Log;
 

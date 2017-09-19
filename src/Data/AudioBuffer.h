@@ -58,6 +58,7 @@ public:
 	void _cdecl swap_value(AudioBuffer &b);
 	void _cdecl append(AudioBuffer &b);
 	void _cdecl set(const AudioBuffer &b, int offset, float volume);
+	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume);
 	void _cdecl add(const AudioBuffer &b, int offset, float volume, float panning);
 	void _cdecl set_as_ref(const AudioBuffer &b, int offset, int length);
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);

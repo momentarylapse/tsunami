@@ -233,6 +233,8 @@ public:
 	hui::Menu *menu_sample;
 	hui::Menu *menu_marker;
 	hui::Menu *menu_song;
+
+	int perf_channel;
 };
 
 #endif /* AUDIOVIEW_H_ */

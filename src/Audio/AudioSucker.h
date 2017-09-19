@@ -22,7 +22,8 @@ public:
 	virtual ~AudioSucker();
 
 	void setSource(AudioSource *s);
-	void setAccumulate(bool enable);
+	void accumulate(bool enable);
+	void resetAccumulation();
 	void setBufferSize(int size);
 
 	void start();
@@ -36,12 +37,12 @@ public:
 
 	AudioSource *source;
 	AudioBuffer buf;
-	bool accumulate;
+	bool accumulating;
 	bool running;
 	int buffer_size;
 	float no_data_wait;
 
-	float cpu_usage;
+	int perf_channel;
 
 	AudioSuckerThread *thread;
 };

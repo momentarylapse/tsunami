@@ -16,7 +16,7 @@ public:
 	virtual ~RingBuffer();
 
 	int available();
-	void read(AudioBuffer &b);
+	int read(AudioBuffer &b);
 	void write(AudioBuffer &b);
 
 	void readRef(AudioBuffer &b, int size);

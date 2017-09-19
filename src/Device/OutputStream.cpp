@@ -7,6 +7,7 @@
 
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
+#include "../Stuff/PerformanceMonitor.h"
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
 #include "Device.h"
@@ -190,29 +191,24 @@ class StreamThread : public Thread
 {
 public:
 	OutputStream *stream;
-	hui::Timer timer;
-	float t_idle;
+	int perf_channel;
 
 	StreamThread(OutputStream *s)
 	{
 		stream = s;
-		t_idle = 0;
+		perf_channel = stream->perf_channel;
 	}
 
 	virtual void _cdecl onRun()
 	{
-		timer.reset();
 		//msg_write("thread run");
 		while(stream->playing){
 			if (stream->read_more){
+				PerformanceMonitor::start_busy(perf_channel);
 				stream->stream();
-				float t_busy = timer.get();
-				stream->cpu_usage = t_busy / (t_busy + t_idle);
-				//printf("%.1f %%\n", stream->cpu_usage * 100);
-				t_idle = 0;
+				PerformanceMonitor::end_busy(perf_channel);
 			}else{
 				hui::Sleep(0.005f);
-				t_idle += timer.get();
 			}
 		}
 		//msg_write("thread done...");
@@ -222,6 +218,7 @@ public:
 OutputStream::OutputStream(AudioSource *r) :
 	ring_buf(1048576)
 {
+	perf_channel = PerformanceMonitor::create_channel("out");
 	source = r;
 
 	playing = false;
@@ -247,7 +244,7 @@ OutputStream::OutputStream(AudioSource *r) :
 	err = paNoError;
 #endif
 	dev_sample_rate = -1;
-	cpu_usage = 0;
+
 	end_of_data = false;
 
 	device_manager->addStream(this);
@@ -256,6 +253,7 @@ OutputStream::OutputStream(AudioSource *r) :
 OutputStream::~OutputStream()
 {
 	kill();
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void OutputStream::__init__(AudioSource *r)

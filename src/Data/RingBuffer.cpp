@@ -44,10 +44,23 @@ void RingBuffer::moveWritePos(int delta)
 		write_pos -= buf.length;
 }
 
-void RingBuffer::read(AudioBuffer& b)
+int RingBuffer::read(AudioBuffer& b)
 {
-	b.set(buf, read_pos, 1.0f);
-	moveReadPos(b.length);
+	int samples = min(b.length, available());
+
+	int samples_a = min(samples, buf.length - read_pos);
+	b.set_x(buf, -read_pos, read_pos + samples_a, 1.0f);
+	moveReadPos(samples_a);
+	return samples_a;
+
+	int samples_b = samples - samples_a;
+	if (samples_b > 0){
+		AudioBuffer bb;
+		bb.set_as_ref(b, samples_a,  samples_b);
+		bb.set_x(buf, 0, samples_b, 1.0f);
+	}
+	moveReadPos(samples);
+	return samples;
 }
 
 void RingBuffer::write(AudioBuffer& b)

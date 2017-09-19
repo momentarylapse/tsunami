@@ -11,8 +11,10 @@
 #include "../../Device/InputStreamAny.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
+#include "../../Audio/AudioSucker.h"
 
 InputStreamAudio *export_view_input = NULL;
+AudioSucker *export_view_sucker = NULL;
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
@@ -21,6 +23,7 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 	input_midi = NULL;
 	export_view_input = NULL;
 	capturing_track = NULL;
+	//console_mode = NULL;
 }
 
 ViewModeCapture::~ViewModeCapture()
@@ -73,10 +76,11 @@ void ViewModeCapture::drawPost(Painter *c)
 {
 	// capturing preview
 	if (input_audio and input_audio->isCapturing()){
-		input_audio->buffer.update_peaks();
+		AudioBuffer &buf = export_view_sucker->buf;
+		buf.update_peaks();
 		if (capturing_track)
-			view->get_track(capturing_track)->drawBuffer(c, input_audio->buffer, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
-		view->drawTimeLine(c, view->sel.range.start() + input_audio->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+			view->get_track(capturing_track)->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
+		view->drawTimeLine(c, view->sel.range.start() + buf.length, Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
 	}
 
 
@@ -115,8 +119,9 @@ void ViewModeCapture::setInputMidi(InputStreamMidi *_input)
 void ViewModeCapture::onInputUpdate()
 {
 	if (input_audio){
+		AudioBuffer &buf = export_view_sucker->buf;
 		if (input_audio->isCapturing())
-			view->cam.makeSampleVisible(view->sel.range.start() + input_audio->getSampleCount());
+			view->cam.makeSampleVisible(view->sel.range.start() + buf.length);
 		view->forceRedraw();
 	}
 	if (input_midi){

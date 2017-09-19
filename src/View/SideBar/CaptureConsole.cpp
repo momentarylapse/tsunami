@@ -11,6 +11,7 @@
 #include "../../Device/InputStreamMidi.h"
 #include "../../Device/OutputStream.h"
 #include "../../Audio/Synth/Synthesizer.h"
+#include "../../Audio/AudioSucker.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
 #include "../../Stuff/Log.h"
@@ -23,6 +24,8 @@
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 
+
+extern AudioSucker *export_view_sucker;
 
 class CaptureConsoleMode
 {
@@ -54,6 +57,7 @@ public:
 class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
 	InputStreamAudio *input;
+	AudioSucker *sucker;
 	Array<Device*> sources;
 	Device *chosen_device;
 	Track *target;
@@ -65,6 +69,7 @@ public:
 		chosen_device = cc->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 		input = NULL;
 		target = NULL;
+		sucker = NULL;
 
 		cc->event("capture_audio_source", std::bind(&CaptureConsoleModeAudio::onSource, this));
 		cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
@@ -147,10 +152,15 @@ public:
 			msg_db_l(1);
 			return;*/
 		}
+
+		sucker = new AudioSucker(input->source);
+		sucker->start();
+		export_view_sucker = sucker;
 	}
 
 	virtual void leave()
 	{
+		delete sucker;
 		cc->peak_meter->setSource(NULL);
 		view->mode_capture->setInputAudio(NULL);
 		input->unsubscribe(cc);
@@ -160,13 +170,13 @@ public:
 
 	virtual void pause()
 	{
-		input->accumulate(false);
+		sucker->accumulate(false);
 	}
 
 	virtual void start()
 	{
 		input->resetSync();
-		input->accumulate(true);
+		sucker->accumulate(true);
 		cc->enable("capture_audio_source", false);
 		cc->enable("capture_audio_target", false);
 	}
@@ -178,8 +188,8 @@ public:
 
 	virtual void dump()
 	{
-		input->resetAccumulation();
-		input->accumulate(false);
+		sucker->resetAccumulation();
+		sucker->accumulate(false);
 		cc->enable("capture_audio_source", true);
 		cc->enable("capture_audio_target", true);
 	}
@@ -200,25 +210,25 @@ public:
 		}
 
 		// insert data
-		Range r = Range(i0, input->getSampleCount());
+		Range r = Range(i0, sucker->buf.length);
 		cc->song->action_manager->beginActionGroup();
 		AudioBuffer tbuf = target->getBuffers(view->cur_layer, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(target, view->cur_layer, r);
 
 		if (hui::Config.getInt("Input.Mode", 0) == 1)
-			tbuf.add(input->buffer, 0, 1.0f, 0);
+			tbuf.add(sucker->buf, 0, 1.0f, 0);
 		else
-			tbuf.set(input->buffer, 0, 1.0f);
+			tbuf.set(sucker->buf, 0, 1.0f);
 		song->execute(a);
 		song->action_manager->endActionGroup();
 
-		input->resetAccumulation();
+		sucker->resetAccumulation();
 		return true;
 	}
 
 	virtual int getSampleCount()
 	{
-		return input->getSampleCount();
+		return sucker->buf.length;
 	}
 
 	virtual bool isCapturing()
@@ -631,7 +641,7 @@ void CaptureConsole::onPause()
 {
 	// TODO...
 	if (view->stream->isPlaying())
-		view->stream->stop();
+		view->stream->pause();
 	mode->pause();
 	enable("capture_start", true);
 	enable("capture_pause", false);

@@ -264,34 +264,60 @@ void AudioBuffer::add(const AudioBuffer &b, int _offset, float volume, float pan
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
-void AudioBuffer::set(const AudioBuffer &b, int _offset, float volume)
+inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length)
 {
-	// relative to b
-	int i0 = max(0, -_offset);
-	int i1 = min(b.length, length - _offset);
+	for (int j=0; j<source.channels; j++)
+		memcpy(&target.c[j][target_offset], &source.c[j][source_offset], sizeof(float) * length);
+}
+
+inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length, float volume)
+{
+	for (int j=0; j<source.channels; j++){
+		float *pt = &target.c[j][target_offset];
+		float *ps = &source.c[j][source_offset];
+		float *ps_end = ps + length;
+		while(ps < ps_end){
+			*pt = *ps;
+			ps ++;
+			pt ++;
+		}
+	}
+}
+
+// this[offset:] = source[:length]
+void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume)
+{
+	_length = min(_length, source.length);
+
+	// relative to self
+	int i0 = max(0, _offset);
+	int i1 = min(_length + _offset, length);
 	if (i1 <= i0)
 		return;
 
 	// set buffers
 	if (volume == 1.0f){
-		for (int j=0; j<channels; j++)
-			memcpy(&c[j][i0 + _offset], (float*)b.c[j].data + i0, sizeof(float) * (i1 - i0));
+		_buf_copy_samples_(*this, i0, source, i0 - _offset, i1 - i0);
 	}else{
-		for (int j=0; j<channels; j++)
-			for (int i=i0;i<i1;i++)
-				c[j][i + _offset] = b.c[j][i] * volume;
+		_buf_copy_samples_scale_(*this, i0, source, i0 - _offset, i1 - i0, volume);
 	}
-	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
+	invalidate_peaks(Range(i0 + offset, i1 - i0));
 }
 
-void AudioBuffer::set_as_ref(const AudioBuffer &b, int _offset, int _length)
+// this[offset:] = source[:]
+void AudioBuffer::set(const AudioBuffer &source, int _offset, float volume)
+{
+	set_x(source, _offset, source.length, volume);
+}
+
+void AudioBuffer::set_as_ref(const AudioBuffer &target, int _offset, int _length)
 {
 	clear();
 	length = _length;
-	offset = _offset + b.offset;
-	channels = b.channels;
+	offset = _offset + target.offset;
+	channels = target.channels;
 	for (int i=0; i<channels; i++)
-		c[i].set_ref(b.c[i].sub(_offset, _length));
+		c[i].set_ref(target.c[i].sub(_offset, _length));
 }
 
 #if 0

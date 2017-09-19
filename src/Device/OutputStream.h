@@ -112,7 +112,7 @@ private:
 	bool killed;
 
 	Thread *thread;
-	float cpu_usage;
+	int perf_channel;
 
 #ifdef DEVICE_PULSEAUDIO
 	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);

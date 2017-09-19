@@ -28,9 +28,9 @@ public:
 	virtual int _cdecl getDelay() = 0;
 	virtual void _cdecl resetSync() = 0;
 
-	virtual void _cdecl accumulate(bool enable) = 0;
+	/*virtual void _cdecl accumulate(bool enable) = 0;
 	virtual void _cdecl resetAccumulation() = 0;
-	virtual int _cdecl getSampleCount() = 0;
+	virtual int _cdecl getSampleCount() = 0;*/
 
 	// PeakMeterSource
 	virtual float _cdecl getSampleRate(){ return sample_rate; }

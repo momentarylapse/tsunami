@@ -15,6 +15,8 @@
 class InputStreamAudio;
 class InputStreamMidi;
 
+//class CaptureConsoleMode;
+
 class ViewModeCapture : public ViewModeDefault
 {
 public:
@@ -26,6 +28,8 @@ public:
 	virtual void onLeftDoubleClick(){}
 
 	virtual void drawPost(Painter *c);
+
+	//CaptureConsoleMode *console_mode;
 
 	InputStreamAudio *input_audio;
 	InputStreamMidi *input_midi;

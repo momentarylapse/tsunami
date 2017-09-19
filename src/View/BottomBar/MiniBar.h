@@ -19,7 +19,7 @@ class AudioView;
 class MiniBar : public hui::Panel
 {
 public:
-	MiniBar(BottomBar *bottom_bar, OutputStream *stream, DeviceManager *output, AudioView *view);
+	MiniBar(BottomBar *bottom_bar, DeviceManager *dev_manager, AudioView *view);
 	virtual ~MiniBar();
 
 	void onShowBottomBar();
@@ -31,10 +31,13 @@ public:
 	void onBottomBarUpdate();
 	void onVolumeChange();
 
-	OutputStream *stream;
-	DeviceManager *output;
+	void onViewOutputChange();
+
+	//OutputStream *stream;
+	DeviceManager *dev_manager;
 	PeakMeter *peak_meter;
 	BottomBar *bottom_bar;
+	AudioView *view;
 };
 
 #endif /* MINIBAR_H_ */

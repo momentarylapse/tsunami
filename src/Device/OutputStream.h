@@ -51,12 +51,13 @@ public:
 
 
 	static const string MESSAGE_STATE_CHANGE;
+	static const string MESSAGE_END_OF_STREAM;
 	static const string MESSAGE_UPDATE;
 
 
 	void _cdecl stop();
 	void _cdecl play();
-	void _cdecl pause();
+	void _cdecl pause(bool pause);
 	void _cdecl update();
 
 	bool _cdecl isPlaying();

@@ -32,6 +32,7 @@ const float DEFAULT_UPDATE_DT = 0.050f;
 
 const string OutputStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string OutputStream::MESSAGE_UPDATE = "Update";
+const string OutputStream::MESSAGE_END_OF_STREAM = "EndOfStream";
 
 
 #ifdef DEVICE_PULSEAUDIO
@@ -380,12 +381,12 @@ void OutputStream::stop()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void OutputStream::pause()
+void OutputStream::pause(bool _pause)
 {
 	if (!playing)
 		return;
 
-	paused = !paused;
+	paused = _pause;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -453,9 +454,7 @@ void OutputStream::play()
 
 	playing = true;
 	paused = false;
-	//cur_pos = renderer->range().offset;
 
-	source->reset();
 	stream();
 
 
@@ -519,6 +518,11 @@ void OutputStream::play()
 bool OutputStream::isPlaying()
 {
 	return playing;
+}
+
+bool OutputStream::isPaused()
+{
+	return playing and paused;
 }
 
 int OutputStream::getState()

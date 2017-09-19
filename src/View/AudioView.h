@@ -56,6 +56,8 @@ public:
 
 	void onSongUpdate();
 	void onStreamUpdate();
+	void onStreamStateChange();
+	void onStreamEndOfStream();
 	void onUpdate();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
@@ -65,6 +67,8 @@ public:
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
 	static const string MESSAGE_INPUT_CHANGE;
+	static const string MESSAGE_OUTPUT_CHANGE;
+	static const string MESSAGE_OUTPUT_STATE_CHANGE;
 
 	void updatePeaks();
 	void zoomIn();
@@ -187,6 +191,12 @@ public:
 
 	OutputStream *stream;
 	SongRenderer *renderer;
+	void play();
+	void stop();
+	void pause(bool pause);
+	bool isPlaying();
+	bool isPaused();
+	int playbackPos();
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);

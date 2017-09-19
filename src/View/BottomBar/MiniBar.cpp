@@ -8,30 +8,33 @@
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Device/OutputStream.h"
-#include "MiniBar.h"
 #include "../../Device/DeviceManager.h"
+#include "../AudioView.h"
+#include "MiniBar.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output, AudioView *view)
+MiniBar::MiniBar(BottomBar *_bottom_bar, DeviceManager *_output, AudioView *_view)
 {
-	stream = _stream;
-	output = _output;
+	view = _view;
+	dev_manager = _output;
 	bottom_bar = _bottom_bar;
 
 	fromResource("mini_bar");
 
-	peak_meter = new PeakMeter(this, "peaks", stream, view);
-	setFloat("volume", output->getOutputVolume());
+	peak_meter = new PeakMeter(this, "peaks", view->stream, view);
+	setFloat("volume", dev_manager->getOutputVolume());
 
 	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
 	event("volume", std::bind(&MiniBar::onVolume, this));
 
 	bottom_bar->subscribe(this, std::bind(&MiniBar::onBottomBarUpdate, this));
-	output->subscribe(this, std::bind(&MiniBar::onVolumeChange, this));
+	dev_manager->subscribe(this, std::bind(&MiniBar::onVolumeChange, this));
+	view->subscribe(this, std::bind(&MiniBar::onViewOutputChange, this), view->MESSAGE_OUTPUT_CHANGE);
 }
 
 MiniBar::~MiniBar()
 {
-	output->unsubscribe(this);
+	if (view->stream)
+		view->stream->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
 }
@@ -44,7 +47,7 @@ void MiniBar::onShowBottomBar()
 
 void MiniBar::onVolume()
 {
-	output->setOutputVolume(getFloat(""));
+	dev_manager->setOutputVolume(getFloat(""));
 }
 
 void MiniBar::onShow()
@@ -67,6 +70,11 @@ void MiniBar::onBottomBarUpdate()
 
 void MiniBar::onVolumeChange()
 {
-	setFloat("volume", output->getOutputVolume());
+	setFloat("volume", dev_manager->getOutputVolume());
+}
+
+void MiniBar::onViewOutputChange()
+{
+	peak_meter->setSource(view->stream);
 }
 

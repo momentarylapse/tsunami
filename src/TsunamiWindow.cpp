@@ -37,7 +37,6 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
-#include "Device/OutputStream.h"
 #include "Device/DeviceManager.h"
 #include "Device/InputStreamAny.h"
 #include "Data/Song.h"
@@ -206,12 +205,11 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	// bottom bar
 	bottom_bar = new BottomBar(view, song, app->device_manager, app->log);
 	embed(bottom_bar, "main_table", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, view->stream, app->device_manager, view);
+	mini_bar = new MiniBar(bottom_bar, app->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
 	view->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
 	song->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
-	view->stream->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this), OutputStream::MESSAGE_STATE_CHANGE);
 	app->clipboard->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
 	bottom_bar->subscribe(this, std::bind(&TsunamiWindow::onBottomBarUpdate, this));
 	side_bar->subscribe(this, std::bind(&TsunamiWindow::onSideBarUpdate, this));
@@ -257,7 +255,6 @@ void TsunamiWindow::onDestroy()
 
 	view->unsubscribe(this);
 	song->unsubscribe(this);
-	view->stream->unsubscribe(this);
 	app->clipboard->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	side_bar->unsubscribe(this);
@@ -583,15 +580,14 @@ void TsunamiWindow::onPlay()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
 		return;
-	view->renderer->prepare(view->getPlaybackSelection(), true);
-	view->stream->play();
+	view->play();
 }
 
 void TsunamiWindow::onPause()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
 		return;
-	view->stream->pause();
+	view->pause(true);
 }
 
 void TsunamiWindow::onStop()
@@ -599,7 +595,7 @@ void TsunamiWindow::onStop()
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
 		side_bar->_hide();
 	else
-		view->stream->stop();
+		view->stop();
 }
 
 void TsunamiWindow::onInsertSample()
@@ -724,8 +720,8 @@ void TsunamiWindow::updateMenu()
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
-	enable("stop", view->stream->isPlaying() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
-	enable("pause", view->stream->isPlaying());
+	enable("stop", view->isPlaying() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
+	enable("pause", view->isPlaying() and !view->isPaused());
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
 	// view

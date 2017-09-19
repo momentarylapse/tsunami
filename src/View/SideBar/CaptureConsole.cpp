@@ -556,6 +556,9 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
+	view->renderer->prepare(view->getPlaybackSelection(), false);
+
+
 	if (view->cur_track->type == Track::TYPE_AUDIO){
 		mode = mode_audio;
 		setInt("capture_type", 0);
@@ -584,7 +587,7 @@ void CaptureConsole::onLeave()
 	if (mode->isCapturing())
 		mode->insert();
 
-	view->stream->stop();
+	view->stop();
 
 	mode->leave();
 
@@ -613,8 +616,10 @@ void CaptureConsole::onType()
 
 void CaptureConsole::onStart()
 {
-	view->renderer->prepare(view->getPlaybackSelection(), false);
-	view->stream->play();
+	if (view->isPlaying())
+		view->pause(false);
+	else
+		view->play();
 
 	mode->start();
 	enable("capture_start", false);
@@ -626,8 +631,9 @@ void CaptureConsole::onStart()
 
 void CaptureConsole::onDelete()
 {
-	if (view->stream->isPlaying())
-		view->stream->stop();
+	if (view->isPlaying())
+		view->stop();
+	view->renderer->prepare(view->getPlaybackSelection(), false);
 	mode->dump();
 	enable("capture_start", true);
 	enable("capture_pause", false);
@@ -640,8 +646,7 @@ void CaptureConsole::onDelete()
 void CaptureConsole::onPause()
 {
 	// TODO...
-	if (view->stream->isPlaying())
-		view->stream->pause();
+	view->pause(true);
 	mode->pause();
 	enable("capture_start", true);
 	enable("capture_pause", false);

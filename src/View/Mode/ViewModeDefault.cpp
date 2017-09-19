@@ -220,10 +220,11 @@ void ViewModeDefault::onKeyDown(int k)
 		cam->zoom(exp(- view->ZoomSpeed));
 
 	if (k == hui::KEY_SPACE){
-		if (view->stream->isPlaying()){
-			view->stream->pause();
+		if (view->isPlaying()){
+			view->pause(!view->isPaused());
 		}else{
 			win->onPlay();
+			//view->play(); unsafe for recording...
 		}
 	}
 	view->updateMenu();
@@ -419,7 +420,7 @@ Selection ViewModeDefault::getHover()
 			s.type = Selection::TYPE_SELECTION_START;
 			return s;
 		}
-		if (view->stream->isPlaying()){
+		if (view->isPlaying()){
 			if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
 				s.type = Selection::TYPE_PLAYBACK;
 				return s;
@@ -479,18 +480,14 @@ Selection ViewModeDefault::getHover()
 
 void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 {
-	if (view->stream->isPlaying()){
+	if (view->isPlaying()){
 		if (view->renderer->range().is_inside(pos)){
 			view->renderer->seek(pos);
 			hover->type = Selection::TYPE_PLAYBACK;
 			view->forceRedraw();
 			return;
 		}else{
-			view->stream->stop();
-			/*view->stream->seek(pos);
-			hover->type = Selection::TYPE_PLAYBACK;
-			view->forceRedraw();
-			return;*/
+			view->stop();
 		}
 	}
 	//view->msp.start(hover->pos, hover->y0);

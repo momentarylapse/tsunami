@@ -93,7 +93,8 @@ private:
 
 	bool reading;
 	bool read_more;
-	bool end_of_data;
+	bool read_end_of_data;
+	bool played_end_of_data;
 
 	int data_samples;
 
@@ -128,6 +129,8 @@ private:
 	                                   PaStreamCallbackFlags statusFlags,
 	                                   void *userData);
 #endif
+
+	void onPlayedEndOfStream();
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

@@ -104,14 +104,14 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 
 	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->end_of_data)){
+	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_data)){
 		//printf("+\n");
 		stream->read_more = true;
 	}
 
-	if (available <= frames and stream->end_of_data){
-		//printf("end\n");
-		hui::RunLater(0.001f, std::bind(&OutputStream::stop, stream)); // TODO prevent abort before playback really finished
+	if (available <= frames and stream->read_end_of_data){
+		printf("end of data...\n");
+		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -246,7 +246,8 @@ OutputStream::OutputStream(AudioSource *r) :
 #endif
 	dev_sample_rate = -1;
 
-	end_of_data = false;
+	read_end_of_data = false;
+	played_end_of_data = false;
 
 	device_manager->addStream(this);
 }
@@ -375,7 +376,8 @@ void OutputStream::stop()
 	// clean up
 	playing = false;
 	paused = false;
-	end_of_data = false;
+	read_end_of_data = false;
+	played_end_of_data = false;
 	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
@@ -404,7 +406,7 @@ void OutputStream::stream()
 
 	// out of data?
 	if (size == source->END_OF_STREAM){
-		end_of_data = true;
+		read_end_of_data = true;
 		reading = false;
 		return;
 	}
@@ -448,7 +450,8 @@ void OutputStream::play()
 
 
 
-	end_of_data = false;
+	read_end_of_data = false;
+	played_end_of_data = false;
 	reading = false;
 
 
@@ -606,4 +609,11 @@ void OutputStream::update()
 
 	if (!paused)
 		notify(MESSAGE_UPDATE);
+}
+
+void OutputStream::onPlayedEndOfStream()
+{
+	msg_write("stream eos");
+	notify(MESSAGE_END_OF_STREAM);
+	stop();
 }

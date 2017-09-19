@@ -665,7 +665,11 @@ void AudioView::onStreamStateChange()
 
 void AudioView::onStreamEndOfStream()
 {
-	stop();
+	msg_write("view: eos");
+
+	// stop... but wait for other handlers of this message before deleting stream
+	hui::RunLater(0.01f,  std::bind(&AudioView::stop, this));
+	//stop();
 }
 
 void AudioView::onUpdate()

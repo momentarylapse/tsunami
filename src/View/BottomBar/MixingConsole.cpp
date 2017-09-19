@@ -12,6 +12,7 @@
 
 #include "../../Device/DeviceManager.h"
 #include "../../Data/Song.h"
+#include "../AudioView.h"
 
 const float TrackMixer::DB_MIN = -1000000;
 const float TrackMixer::DB_MAX = 10;
@@ -99,22 +100,24 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream, AudioView *view) :
+MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, AudioView *_view) :
 	BottomBar::Console(_("Mixing console"))
 {
+	view = _view;
 	song = _song;
 	device_manager = _device_manager;
 	id_inner = "inner-grid";
 
 	fromResource("mixing-console");
 
-	peak_meter = new PeakMeter(this, "output-peaks", stream, view);
+	peak_meter = new PeakMeter(this, "output-peaks", view->stream, view);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
 	song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
 	device_manager->subscribe(this, std::bind(&MixingConsole::onUpdateDeviceManager, this));
+	view->subscribe(this, std::bind(&MixingConsole::onViewOutputChange, this), view->MESSAGE_OUTPUT_CHANGE);
 	loadData();
 }
 
@@ -122,6 +125,7 @@ MixingConsole::~MixingConsole()
 {
 	song->unsubscribe(this);
 	device_manager->unsubscribe(this);
+	view->unsubscribe(this);
 	for (TrackMixer *m: mixer)
 		delete(m);
 	delete(peak_meter);
@@ -170,4 +174,9 @@ void MixingConsole::onShow()
 void MixingConsole::onHide()
 {
 	peak_meter->enable(false);
+}
+
+void MixingConsole::onViewOutputChange()
+{
+	peak_meter->setSource(view->stream);
 }

@@ -95,8 +95,8 @@ private:
 	bool keep_thread_running;
 	bool reading;
 	bool read_more;
-	bool read_end_of_data;
-	bool played_end_of_data;
+	bool read_end_of_stream;
+	bool played_end_of_stream;
 
 	int data_samples;
 

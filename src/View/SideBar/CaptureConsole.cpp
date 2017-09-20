@@ -188,8 +188,8 @@ public:
 
 	virtual void dump()
 	{
-		sucker->resetAccumulation();
 		sucker->accumulate(false);
+		sucker->resetAccumulation();
 		cc->enable("capture_audio_source", true);
 		cc->enable("capture_audio_target", true);
 	}

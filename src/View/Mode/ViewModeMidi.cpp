@@ -32,7 +32,7 @@ public:
 	virtual int _cdecl read(MidiRawData &midi)
 	{
 		if (mode == MODE_END_OF_STREAM)
-			return 0;
+			return END_OF_STREAM;
 
 		if (mode == MODE_START_NOTES){
 			for (int p: pitch)
@@ -112,10 +112,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 ViewModeMidi::~ViewModeMidi()
 {
-	if (preview_stream)
-		delete preview_stream;
-	if (preview_synth)
-		delete preview_synth;
+	kill_preview();
+	delete preview_source;
 }
 
 void ViewModeMidi::setMode(int _mode)
@@ -133,20 +131,33 @@ void ViewModeMidi::setCreationMode(int _mode)
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
-	if (preview_stream){
-		if (preview_stream)
-			delete preview_stream;
-		if (preview_synth)
-			delete preview_synth;
-		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
-		preview_synth->setInstrument(view->cur_track->instrument);
-		preview_synth->out->setSource(preview_source);
-		preview_stream = new OutputStream(preview_synth->out);
-		preview_stream->setBufferSize(2048);
-	}
+	kill_preview();
+	preview_synth = (Synthesizer*)view->cur_track->synth->copy();
+	preview_synth->setInstrument(view->cur_track->instrument);
+	preview_synth->out->setSource(preview_source);
+	preview_stream = new OutputStream(preview_synth->out);
+	preview_stream->setBufferSize(2048);
+	preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_END_OF_STREAM);
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
 	preview_stream->_play();
+}
+
+void ViewModeMidi::onEndOfStream()
+{
+	//msg_write("end of stream...");
+	hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
+}
+
+void ViewModeMidi::kill_preview()
+{
+	//msg_write("kill");
+	if (preview_stream)
+		delete preview_stream;
+	preview_stream = NULL;
+	if (preview_synth)
+		delete preview_synth;
+	preview_synth = NULL;
 }
 
 void ViewModeMidi::onLeftButtonDown()

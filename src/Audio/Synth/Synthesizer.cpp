@@ -42,14 +42,20 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 	// get from source...
 	synth->events.samples = buf.length;
 	int n = source->read(synth->events);
-	if (n < buf.length)
-		synth->source_run_out = true;
+	synth->source_run_out = (n == source->END_OF_STREAM);
 
+	//printf("  %d  %d\n", synth->active_pitch.num, n);
+	if (synth->hasRunOutOfData()){
+		//printf("synth read eos\n");
+		return END_OF_STREAM;
+	}
+
+	// if source end_of_stream but still active rendering
+	//  => render full requested buf size
+
+	if (n >= 0)
+		buf.length = n; // (-_-)'
 	buf.scale(0);
-
-	if (synth->hasRunOutOfData())
-		return 0;
-
 	synth->render(buf);
 
 	synth->events.clear();

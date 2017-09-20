@@ -74,7 +74,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 	int available = stream->ring_buf.available();
 	//printf("%d\n", available);
 	if (stream->paused or (available < frames)){
-		if (!stream->paused)
+		if (!stream->paused and !stream->read_end_of_stream)
 			printf("< underflow\n");
 		// output silence...
 		for (int i=0; i<frames; i++){
@@ -99,13 +99,14 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 
 	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_data)){
+	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
 		//printf("+\n");
 		stream->read_more = true;
 	}
 
-	if (available <= frames and stream->read_end_of_data){
+	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("end of data...\n");
+		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
 }
@@ -241,8 +242,8 @@ OutputStream::OutputStream(AudioSource *r) :
 #endif
 	dev_sample_rate = -1;
 
-	read_end_of_data = false;
-	played_end_of_data = false;
+	read_end_of_stream = false;
+	played_end_of_stream = false;
 
 	device_manager->addStream(this);
 }
@@ -368,8 +369,8 @@ void OutputStream::_stop()
 
 	// clean up
 	paused = false;
-	read_end_of_data = false;
-	played_end_of_data = false;
+	read_end_of_stream = false;
+	played_end_of_stream = false;
 	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
@@ -405,12 +406,13 @@ void OutputStream::readStream()
 
 	// out of data?
 	if (size == source->END_OF_STREAM){
-		read_end_of_data = true;
+		read_end_of_stream = true;
 		reading = false;
 		return;
 	}
 
 	// add to queue
+	b.length = size;
 	ring_buf.write(b);
 
 	reading = false;
@@ -434,8 +436,8 @@ void OutputStream::_play()
 void OutputStream::start_first_time()
 {
 	//printf("stream start first\n");
-	read_end_of_data = false;
-	played_end_of_data = false;
+	read_end_of_stream = false;
+	played_end_of_stream = false;
 	reading = false;
 
 	// we need some data in the buffer...
@@ -566,6 +568,6 @@ void OutputStream::update()
 void OutputStream::onPlayedEndOfStream()
 {
 	//printf("stream end\n");
-	notify(MESSAGE_END_OF_STREAM);
 	pause(true);
+	notify(MESSAGE_END_OF_STREAM);
 }

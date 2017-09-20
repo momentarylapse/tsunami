@@ -1,0 +1,95 @@
+use "../api.kaba"
+
+void append(int[] a, int[] b)
+	for x in b
+		a.add(x)
+
+int[] morse(string str)
+	int[] l
+	for c in str
+		if c == 'a'
+			append(l, [1, 2])
+		if c == 'b'
+			append(l, [2, 1, 1, 1])
+		if c == 'c'
+			append(l, [2,1,2,1])
+		if c == 'd'
+			append(l, [2,1,1])
+		if c == 'e'
+			append(l, [1])
+		if c == 'f'
+			append(l, [1,1,2,1])
+		if c == 'g'
+			append(l, [2,2,1])
+		if c == 'h'
+			append(l, [1,1,1,1])
+		if c == 'i'
+			append(l, [1,1])
+		if c == 'j'
+			append(l, [1,2,2,2])
+		if c == 'k'
+			append(l, [2,1,2])
+		if c == 'l'
+			append(l, [1,2,1,1])
+		if c == 'm'
+			append(l, [2,2])
+		if c == 'n'
+			append(l, [2,1])
+		if c == 'o'
+			append(l, [2,2,2])
+		if c == 'p'
+			append(l, [1,2,2,1])
+		if c == 'q'
+			append(l, [2,2,1,2])
+		if c == 'r'
+			append(l, [1,2,1])
+		if c == 's'
+			append(l, [1,1,1])
+		if c == 't'
+			append(l, [2])
+		if c == 'u'
+			append(l, [1,1,2])
+		if c == 'v'
+			append(l, [1,1,1,2])
+		if c == 'w'
+			append(l, [1,2,2])
+		if c == 'x'
+			append(l, [2,1,1,2])
+		if c == 'y'
+			append(l, [2,1,2,2])
+		if c == 'z'
+			append(l, [2,2,1,1])
+	return l
+
+void make_midi(MidiData midi, int[] l, int d, int pitch)
+	int offset = 0
+	for ll in l
+		int samples = ll * d
+		MidiNote *n = new MidiNote
+		*n = _MidiNote(_Range(offset, samples-d/2), pitch, 1)
+		midi.add(n)
+		offset += samples
+	
+
+class XXX extends SongPlugin
+	override void apply(Song* song)
+		/*for t in song.tracks
+			if t.type == TYPE_MIDI
+				MidiData midi
+				int[] l = morse("lump homology")
+				make_midi(midi, l, 7000)
+				t.insertMidiData(0, midi)*/
+		
+		MidiData midi
+		int[] l = morse("lump homology")
+		make_midi(midi, l, 7000, 60)
+		song.tracks[0].insertMidiData(0, midi)
+		midi.clear()
+		l = morse("banana")
+		make_midi(midi, l, 7000, 67)
+		song.tracks[1].insertMidiData(0, midi)
+		midi.clear()
+		l = morse("math")
+		make_midi(midi, l, 7000, 72)
+		song.tracks[2].insertMidiData(0, midi)
+		

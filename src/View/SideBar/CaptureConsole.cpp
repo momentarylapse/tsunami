@@ -374,6 +374,7 @@ public:
 
 	virtual void stop()
 	{
+		preview_stream->_stop();
 		input->stop();
 	}
 

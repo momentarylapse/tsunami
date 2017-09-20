@@ -133,8 +133,7 @@ void ViewModeMidi::setCreationMode(int _mode)
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
-
-	if (!preview_stream->isPlaying()){
+	if (preview_stream){
 		if (preview_stream)
 			delete preview_stream;
 		if (preview_synth)
@@ -147,8 +146,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 	}
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
-	if (!preview_stream->isPlaying())
-		preview_stream->play();
+	preview_stream->_play();
 }
 
 void ViewModeMidi::onLeftButtonDown()

@@ -461,7 +461,7 @@ public:
 
 	void previewStart()
 	{
-		if (progress)
+		/*if (progress)
 			previewEnd();
 		config->configToString();
 		tsunami->win->view->renderer->preview_effect = (Effect*)config;
@@ -469,9 +469,10 @@ public:
 
 		progress = new ProgressCancelable(_("Preview"), win);
 		progress->subscribe(this, std::bind(&ConfigurationDialog::onProgressCancel, this), progress->MESSAGE_CANCEL);
+
 		tsunami->win->view->stream->subscribe(this, std::bind(&ConfigurationDialog::onUpdateStream, this));
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
-		tsunami->win->view->stream->play();
+		tsunami->win->view->stream->play();*/
 	}
 
 	void onProgressCancel()
@@ -481,18 +482,18 @@ public:
 
 	void onUpdateStream()
 	{
-		if (progress){
+		/*if (progress){
 			int pos = tsunami->win->view->stream->getPos(0); // TODO
 			Range r = tsunami->win->view->sel.range;
 			progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 			if (!tsunami->win->view->stream->isPlaying())
 				previewEnd();
-		}
+		}*/
 	}
 
 	void previewEnd()
 	{
-		if (!progress)
+		/*if (!progress)
 			return;
 		tsunami->win->view->stream->unsubscribe(this);
 		progress->unsubscribe(this);
@@ -501,7 +502,7 @@ public:
 		progress = NULL;
 
 
-		tsunami->win->view->renderer->preview_effect = NULL;
+		tsunami->win->view->renderer->preview_effect = NULL;*/
 	}
 
 	Configurable *config;

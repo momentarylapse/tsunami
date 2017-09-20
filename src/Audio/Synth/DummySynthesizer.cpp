@@ -24,6 +24,7 @@ DummySynthesizer::DummySynthesizer()
 {
 	name = "Dummy";
 	state.reset();
+	onConfig();
 }
 
 DummySynthesizer::~DummySynthesizer()

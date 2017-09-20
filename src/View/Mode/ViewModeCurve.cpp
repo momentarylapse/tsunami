@@ -129,8 +129,8 @@ Selection ViewModeCurve::getHover()
 		s.type = Selection::TYPE_SELECTION_START;
 		return s;
 	}
-	if (view->stream->isPlaying()){
-		if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
+	if (view->isPlaying()){
+		if (view->mouse_over_time(view->playbackPos())){
 			s.type = Selection::TYPE_PLAYBACK;
 			return s;
 		}

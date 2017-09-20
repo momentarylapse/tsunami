@@ -47,7 +47,6 @@ public:
 
 	void create_dev();
 	void kill_dev();
-	void kill();
 
 
 	static const string MESSAGE_STATE_CHANGE;
@@ -55,19 +54,22 @@ public:
 	static const string MESSAGE_UPDATE;
 
 
-	void _cdecl stop();
-	void _cdecl play();
+	void _cdecl _stop();
+	void _cdecl _play();
 	void _cdecl pause(bool pause);
 	void _cdecl update();
 
-	bool _cdecl isPlaying();
+	bool fully_initialized;
+	void start_first_time();
+
 	bool _cdecl isPaused();
 	int _cdecl getState();
 	void _cdecl setSource(AudioSource *r);
 	void _cdecl setDevice(Device *d);
 	int _cdecl getPos(int read_pos);
-	bool _cdecl getPosSafe(int &pos, int read_pos);
 
+
+	// PeakMeterSource
 	virtual float _cdecl getSampleRate();
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 
@@ -78,11 +80,10 @@ public:
 
 private:
 	bool testError(const string &msg);
-	void stream();
+	void readStream();
 
 
 	float volume;
-	bool playing;
 	bool paused;
 	int buffer_size;
 	float update_dt;
@@ -91,6 +92,7 @@ private:
 	AudioSource *source;
 	RingBuffer ring_buf;
 
+	bool keep_thread_running;
 	bool reading;
 	bool read_more;
 	bool read_end_of_data;

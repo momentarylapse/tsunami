@@ -653,8 +653,7 @@ void AudioView::onSongUpdate()
 
 void AudioView::onStreamUpdate()
 {
-	if (stream->isPlaying())
-		cam.makeSampleVisible(playbackPos());
+	cam.makeSampleVisible(playbackPos());
 	forceRedraw();
 }
 
@@ -665,8 +664,6 @@ void AudioView::onStreamStateChange()
 
 void AudioView::onStreamEndOfStream()
 {
-	msg_write("view: eos");
-
 	// stop... but wait for other handlers of this message before deleting stream
 	hui::RunLater(0.01f,  std::bind(&AudioView::stop, this));
 	//stop();
@@ -1112,8 +1109,7 @@ void AudioView::enable(bool _enabled)
 void AudioView::play()
 {
 	if (isPaused()){
-		// un-pause
-		stream->play();
+		stream->pause(false);
 		return;
 	}
 	if (stream)
@@ -1125,19 +1121,20 @@ void AudioView::play()
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_END_OF_STREAM);
 	notify(MESSAGE_OUTPUT_CHANGE);
-	stream->play();
+	stream->_play();
+	forceRedraw();
 }
 
 void AudioView::stop()
 {
 	if (!stream)
 		return;
-	stream->stop();
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	stream->unsubscribe(this);
 	delete(stream);
 	stream = NULL;
 	notify(MESSAGE_OUTPUT_CHANGE);
+	forceRedraw();
 }
 
 void AudioView::pause(bool _pause)

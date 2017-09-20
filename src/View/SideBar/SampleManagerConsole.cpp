@@ -310,8 +310,11 @@ void SampleManagerConsole::onPreviewStreamUpdate()
 	int pos = preview_stream->getPos(preview_renderer->getPos());
 	Range r = preview_sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
-	if (!preview_stream->isPlaying())
-		endPreview();
+}
+
+void SampleManagerConsole::onPreviewStreamEnd()
+{
+	endPreview();
 }
 
 void SampleManagerConsole::onPreview()
@@ -326,7 +329,8 @@ void SampleManagerConsole::onPreview()
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));
 	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamUpdate, this));
-	preview_stream->play();
+	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamEnd, this), preview_stream->MESSAGE_END_OF_STREAM);
+	preview_stream->_play();
 }
 
 void SampleManagerConsole::endPreview()
@@ -335,7 +339,6 @@ void SampleManagerConsole::endPreview()
 		return;
 	preview_stream->unsubscribe(this);
 	progress->unsubscribe(this);
-	preview_stream->stop();
 	delete(progress);
 	progress = NULL;
 	delete(preview_stream);

@@ -98,11 +98,13 @@ void InputStreamAudio::SyncData::reset()
 
 void InputStreamAudio::SyncData::add(int samples)
 {
-	if (tsunami->win->view->stream->isPlaying()){
+#if 0
+	if (tsunami->win->view->isPlaying()){
 		samples_in += samples;
 		/*delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);*/ // TODO
 		num_points ++;
 	}
+#endif
 }
 
 int InputStreamAudio::SyncData::getDelay()

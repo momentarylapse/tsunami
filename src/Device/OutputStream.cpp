@@ -67,20 +67,14 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 	stream->testError("pa_stream_begin_write");
 	//printf("%d  %p  %d\n", r, data, (int)nbytes);
 
-	if (!stream->playing){
-		//msg_error("not playing");
-		pa_stream_cancel_write(p);
-		stream->testError("pa_stream_cancel_write");
-		return;
-	}
-
 	int done = 0;
 	int frames = nbytes / 8;
 	float *out = (float*)data;
 
 	int available = stream->ring_buf.available();
-	if ((stream->paused) or (available < frames)){
-		if ((stream->playing) and (!stream->paused))
+	//printf("%d\n", available);
+	if (stream->paused or (available < frames)){
+		if (!stream->paused)
 			printf("< underflow\n");
 		// output silence...
 		for (int i=0; i<frames; i++){
@@ -91,6 +85,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 		for (int n=0; (n<2) and (done < frames); n++){
 			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
+
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
 			out += b.length * 2;
 			done += b.length;
@@ -110,7 +105,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 	}
 
 	if (available <= frames and stream->read_end_of_data){
-		printf("end of data...\n");
+		//printf("end of data...\n");
 		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
 }
@@ -123,8 +118,7 @@ void OutputStream::stream_success_callback(pa_stream *s, int success, void *user
 void OutputStream::stream_underflow_callback(pa_stream *s, void *userdata)
 {
 	OutputStream *stream = (OutputStream*)userdata;
-	if (stream->playing)
-		printf("pulse: underflow\n");
+	printf("pulse: underflow\n");
 }
 
 #endif
@@ -202,17 +196,17 @@ public:
 
 	virtual void _cdecl onRun()
 	{
-		//msg_write("thread run");
-		while(stream->playing){
+		//printf("thread start\n");
+		while(stream->keep_thread_running){
 			if (stream->read_more){
 				PerformanceMonitor::start_busy(perf_channel);
-				stream->stream();
+				stream->readStream();
 				PerformanceMonitor::end_busy(perf_channel);
 			}else{
 				hui::Sleep(0.005f);
 			}
 		}
-		//msg_write("thread done...");
+		//printf("thread end\n");
 	}
 };
 
@@ -222,12 +216,13 @@ OutputStream::OutputStream(AudioSource *r) :
 	perf_channel = PerformanceMonitor::create_channel("out");
 	source = r;
 
-	playing = false;
+	fully_initialized = false;
 	paused = false;
 	volume = 1;
 	read_more = false;
 	reading = false;
 	hui_runner_id = -1;
+	keep_thread_running = true;
 
 	device_manager = tsunami->device_manager;
 	device = device_manager->chooseDevice(Device::TYPE_AUDIO_OUTPUT);
@@ -254,7 +249,24 @@ OutputStream::OutputStream(AudioSource *r) :
 
 OutputStream::~OutputStream()
 {
-	kill();
+	//printf("del stream\n");
+	if (hui_runner_id >= 0){
+		hui::CancelRunner(hui_runner_id);
+		hui_runner_id = -1;
+	}
+
+	kill_dev();
+
+	device_manager->removeStream(this);
+	killed = true;
+
+	if (thread){
+		keep_thread_running = false;
+		thread->join();
+		//thread->kill();
+		delete(thread);
+		thread = NULL;
+	}
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
@@ -318,32 +330,13 @@ void OutputStream::kill_dev()
 #endif
 }
 
-// only used for clean up
-void OutputStream::kill()
+void OutputStream::_stop()
 {
-	if (hui_runner_id >= 0){
-		hui::CancelRunner(hui_runner_id);
-		hui_runner_id = -1;
-	}
+	pause(true);
 
-	kill_dev();
+#if 0
+	return;
 
-	device_manager->removeStream(this);
-	killed = true;
-
-	if (thread){
-		thread->kill();
-		delete(thread);
-		thread = NULL;
-	}
-}
-
-void OutputStream::stop()
-{
-	if (!playing)
-		return;
-
-	playing = false;
 	read_more = false;
 	hui::CancelRunner(hui_runner_id);
 	hui_runner_id = -1;
@@ -374,25 +367,31 @@ void OutputStream::stop()
 	thread = NULL;
 
 	// clean up
-	playing = false;
 	paused = false;
 	read_end_of_data = false;
 	played_end_of_data = false;
 	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
+#endif
 }
 
 void OutputStream::pause(bool _pause)
 {
-	if (!playing)
-		return;
+	//printf("stream pause %d\n", (int)_pause);
+	if (!fully_initialized)
+		start_first_time();
 
 	paused = _pause;
+
+	pa_operation *op = pa_stream_cork(_stream, paused, NULL, NULL);
+	testError("pa_stream_cork");
+	pa_wait_op(op);
+
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void OutputStream::stream()
+void OutputStream::readStream()
 {
 	reading = true;
 	read_more = false;
@@ -419,9 +418,6 @@ void OutputStream::stream()
 
 void OutputStream::setSource(AudioSource *r)
 {
-	if (playing)
-		stop();
-
 	source = r;
 }
 
@@ -430,41 +426,24 @@ void OutputStream::setDevice(Device *d)
 	device = d;
 }
 
-void OutputStream::play()
+void OutputStream::_play()
 {
-	/*if (dev_sample_rate != renderer->getSampleRate())
-		kill_dev();
-	if (!_stream)
-		create_dev();
-	if (!_stream)
-		return;*/
+	pause(false);
+}
 
-
-	if (playing){
-		/*if (paused){
-			pause();
-			return;
-		}*/
-		stop();
-	}
-
-
-
+void OutputStream::start_first_time()
+{
+	//printf("stream start first\n");
 	read_end_of_data = false;
 	played_end_of_data = false;
 	reading = false;
 
-
-	playing = true;
-	paused = false;
-
-	stream();
+	// we need some data in the buffer...
+	readStream();
 
 
-	//if (!thread){
-		thread = new StreamThread(this);
-		thread->run();
-	//}
+	thread = new StreamThread(this);
+	thread->run();
 
 
 #ifdef DEVICE_PULSEAUDIO
@@ -497,7 +476,7 @@ void OutputStream::play()
 			// still no luck... give up
 			msg_write("aaaaa");
 			tsunami->log->error("pa_wait_for_stream_ready");
-			stop();
+			_stop();
 			return;
 		}
 	}
@@ -513,50 +492,28 @@ void OutputStream::play()
 	Pa_StartStream(_stream);
 #endif
 
+	fully_initialized = true;
 	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
 
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-bool OutputStream::isPlaying()
-{
-	return playing;
-}
-
 bool OutputStream::isPaused()
 {
-	return playing and paused;
+	return paused;
 }
 
 int OutputStream::getState()
 {
-	if (playing and paused)
+	if (paused)
 		return STATE_PAUSED;
-	if (playing)
-		return STATE_PLAYING;
-	return STATE_STOPPED;
+	return STATE_PLAYING;
+	//return STATE_STOPPED;
 }
 
 int OutputStream::getPos(int read_pos)
 {
-	int pos;
-	if (getPosSafe(pos, read_pos))
-		return pos;
-	return 0;
-}
-
-bool OutputStream::getPosSafe(int &pos, int read_pos)
-{
-	if (!playing)
-		return false;
-
-	pos = read_pos - ring_buf.available();
-
-	// translation
-	/*Range r = renderer->range();
-	if (r.length > 0)
-		pos = cur_pos; //r.offset + ((cur_pos + renderer->offset()) %r.num);*/
-	return true;
+	return read_pos - ring_buf.available();
 }
 
 float OutputStream::getVolume()
@@ -577,9 +534,6 @@ float OutputStream::getSampleRate()
 
 void OutputStream::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
-	if (!playing)
-		return;
-
 	ring_buf.peekRef(buf, num_samples);
 }
 
@@ -604,8 +558,6 @@ bool OutputStream::testError(const string &msg)
 void OutputStream::update()
 {
 	testError("idle");
-	if (!playing)
-		return;
 
 	if (!paused)
 		notify(MESSAGE_UPDATE);
@@ -613,7 +565,7 @@ void OutputStream::update()
 
 void OutputStream::onPlayedEndOfStream()
 {
-	msg_write("stream eos");
+	//printf("stream end\n");
 	notify(MESSAGE_END_OF_STREAM);
-	stop();
+	pause(true);
 }

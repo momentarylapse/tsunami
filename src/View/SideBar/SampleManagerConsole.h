@@ -41,6 +41,7 @@ public:
 	void onProgressCancel();
 	void onSongUpdate();
 	void onPreviewStreamUpdate();
+	void onPreviewStreamEnd();
 
 	void endPreview();
 

@@ -360,7 +360,7 @@ void DeviceManager::kill()
 
 	Array<OutputStream*> to_del = streams;
 	for (OutputStream *s: to_del)
-		s->kill();
+		delete s;
 
 	// audio
 #ifdef DEVICE_PULSEAUDIO

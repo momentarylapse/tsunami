@@ -250,10 +250,11 @@ int InputStreamMidi::doCapturing()
 	}
 #endif
 
-	if (current_midi.num > 0)
+	/*if (current_midi.num > 0)
 		preview_source->feed(current_midi);
 	if ((current_midi.num > 0) and (!preview_stream->isPlaying()))
-		preview_stream->play();
+		preview_stream->_play();*/
+	// FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	if (accumulating)
 		midi.append(current_midi);

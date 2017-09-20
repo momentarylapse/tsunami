@@ -11,12 +11,10 @@
 #include "../Data/Song.h"
 #include "InputStreamAny.h"
 #include "config.h"
+#include "../Midi/MidiSource.h"
 
-class OutputStream;
-class Synthesizer;
 class Device;
 class DeviceManager;
-class MidiPreviewFeedSource;
 
 namespace hui{
 	class Timer;
@@ -59,13 +57,26 @@ public:
 	virtual void _cdecl setDevice(Device *d);
 	virtual Device *_cdecl getDevice();
 
-	void _cdecl setPreviewSynthesizer(Synthesizer *s);
-
 
 	virtual int _cdecl getType(){ return Track::TYPE_MIDI; }
 
 	MidiRawData midi;
 	MidiRawData current_midi;
+
+	class Output : public MidiSource
+	{
+	public:
+		Output(InputStreamMidi *input);
+		virtual ~Output();
+
+		virtual int _cdecl read(MidiRawData &midi);
+		void _cdecl feed(const MidiRawData &midi);
+
+		MidiRawData events;
+		InputStreamMidi *input;
+		bool real_time_mode;
+	};
+	Output *out;
 
 private:
 
@@ -86,9 +97,6 @@ private:
 
 	bool running;
 	int hui_runner_id;
-
-	MidiPreviewFeedSource *preview_source;
-	OutputStream *preview_stream;
 };
 
 #endif /* INPUTSTREAMMIDI_H_ */

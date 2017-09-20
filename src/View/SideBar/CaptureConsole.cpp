@@ -244,7 +244,8 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode
 	Array<Device*> sources;
 	Device *chosen_device;
 	Track *target;
-	Synthesizer *temp_synth;
+	Synthesizer *preview_synth;
+	OutputStream *preview_stream;
 
 
 
@@ -256,7 +257,8 @@ public:
 		input = NULL;
 		target = NULL;
 
-		temp_synth = tsunami->plugin_manager->CreateSynthesizer("", song);
+		preview_synth = NULL;
+		preview_stream = NULL;
 
 		cc->event("capture_midi_source", std::bind(&CaptureConsoleModeMidi::onSource, this));
 		cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));
@@ -279,8 +281,17 @@ public:
 
 	void setTarget(Track *t)
 	{
+		if (preview_stream)
+			delete preview_stream;
+		if (preview_synth)
+			delete preview_synth;
+
 		target = t;
-		input->setPreviewSynthesizer(t->synth);
+		preview_synth = (Synthesizer*)t->synth->copy();
+		preview_synth->out->setSource(input->out);
+		preview_stream = new OutputStream(preview_synth->out);
+		preview_stream->setBufferSize(512);
+		preview_stream->_play();
 		view->setCurTrack(target);
 		view->mode_capture->capturing_track = target;
 		cc->setInt("capture_midi_target", target->get_index());
@@ -321,8 +332,8 @@ public:
 
 		input = new InputStreamMidi(song->sample_rate);
 		input->setBackupMode(BACKUP_MODE_TEMP);
-		input->setChunkSize(4096);
-		input->setUpdateDt(0.03f);
+		input->setChunkSize(512);
+		input->setUpdateDt(0.005f);
 		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
 		view->mode_capture->setInputMidi(input);
 		cc->peak_meter->setSource(input);
@@ -368,8 +379,8 @@ public:
 
 	virtual void dump()
 	{
-		input->resetAccumulation();
 		input->accumulate(false);
+		input->resetAccumulation();
 		cc->enable("capture_midi_source", true);
 		cc->enable("capture_midi_target", true);
 	}

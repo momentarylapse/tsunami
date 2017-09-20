@@ -19,38 +19,47 @@
 #include <alsa/asoundlib.h>
 #endif
 
-
-class MidiPreviewFeedSource : public MidiSource
+InputStreamMidi::Output::Output(InputStreamMidi *_input)
 {
-public:
-	virtual int _cdecl read(MidiRawData &midi)
-	{
-		//msg_write("mpfs.read");
+	input = _input;
+	real_time_mode = true;
+}
+
+InputStreamMidi::Output::~Output(){}
+
+int InputStreamMidi::Output::read(MidiRawData &midi)
+{
+	if (real_time_mode){
+		for (auto &e: events){
+			e.pos = 0;
+			midi.add(e);
+		}
+
+		events.clear();
+		return midi.samples;
+	}else{
+		int samples = min(midi.samples, events.samples);
 		for (int i=events.num-1; i>=0; i--){
-			if (events[i].pos < midi.samples){
+			if (events[i].pos < samples){
 				//msg_write("add " + format("%.0f  %f", events[i].pitch, events[i].volume));
 				midi.add(events[i]);
 				events.erase(i);
 			}else
-				events[i].pos -= midi.samples;
+				events[i].pos -= samples;
 		}
 
-		events.samples = 0;
-		return midi.samples;
+		events.samples -= samples;
+		return samples;
 	}
+}
 
-	void _cdecl feed(const MidiRawData &midi)
-	{
-		events.append(midi);
-		//msg_write("feed " + i2s(midi.num));
-	}
-
-	MidiRawData events;
-};
-
+void InputStreamMidi::Output::feed(const MidiRawData &midi)
+{
+	events.append(midi);
+}
 
 InputStreamMidi::InputStreamMidi(int _sample_rate) :
-	InputStreamAny(sample_rate)
+	InputStreamAny(_sample_rate)
 {
 #ifdef DEVICE_MIDI_ALSA
 	subs = NULL;
@@ -62,40 +71,24 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 
 	device_manager = tsunami->device_manager;
 
+	out = new Output(this);
+
 	timer = new hui::Timer;
 
 	init();
-
-
-	preview_source = new MidiPreviewFeedSource;
-	preview_stream = NULL;
 }
 
 InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	unconnect();
-	if (preview_stream)
-		delete preview_stream;
-	delete preview_source;
+	delete out;
 	delete timer;
 }
 
 void InputStreamMidi::init()
 {
 	setDevice(device_manager->chooseDevice(Device::TYPE_MIDI_INPUT));
-}
-
-void InputStreamMidi::setPreviewSynthesizer(Synthesizer *s)
-{
-	if (!preview_stream){
-		preview_stream = new OutputStream(s->out);
-		preview_stream->setBufferSize(2048);
-	}else
-		preview_stream->setSource(s->out);
-	/*preview_renderer->setAutoStop(false);
-	if (s and capturing)
-		preview_stream->play();*/
 }
 
 bool InputStreamMidi::unconnect()
@@ -198,9 +191,6 @@ bool InputStreamMidi::start()
 	resetAccumulation();
 
 	clearInputQueue();
-	/*preview_renderer->setAutoStop(false);
-	if (preview_renderer->getSynthesizer())
-		preview_stream->play();*/
 
 	timer->reset();
 
@@ -213,9 +203,6 @@ void InputStreamMidi::stop()
 {
 	_stopUpdate();
 	capturing = false;
-	//preview_renderer->setAutoStop(true);
-//	preview_renderer->endAllNotes();
-	//preview_stream->stop();
 
 	midi.sanify(Range(0, midi.samples));
 }
@@ -228,7 +215,7 @@ int InputStreamMidi::doCapturing()
 	int pos_new = offset_new * (double)sample_rate;
 	current_midi.clear();
 	current_midi.samples = pos_new - pos;
-	if (accumulating)
+	//if (accumulating)
 		offset = offset_new;
 
 #ifdef DEVICE_MIDI_ALSA
@@ -250,11 +237,8 @@ int InputStreamMidi::doCapturing()
 	}
 #endif
 
-	/*if (current_midi.num > 0)
-		preview_source->feed(current_midi);
-	if ((current_midi.num > 0) and (!preview_stream->isPlaying()))
-		preview_stream->_play();*/
-	// FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if (current_midi.samples > 0)
+		out->feed(current_midi);
 
 	if (accumulating)
 		midi.append(current_midi);
@@ -276,7 +260,6 @@ int InputStreamMidi::getState()
 
 void InputStreamMidi::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
-	preview_stream->getSomeSamples(buf, num_samples);
 }
 
 
@@ -309,7 +292,7 @@ void InputStreamMidi::_stopUpdate()
 void InputStreamMidi::update()
 {
 	if (doCapturing() > 0)
-		notify(MESSAGE_CAPTURE);
+	{}//	notify(MESSAGE_CAPTURE);
 
 	running = isCapturing();
 }

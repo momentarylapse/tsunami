@@ -138,7 +138,6 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(4096);
 		input->setUpdateDt(0.03f);
-		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
 		view->mode_capture->setInputAudio(input);
 		cc->peak_meter->setSource(input);
 
@@ -163,7 +162,6 @@ public:
 		delete sucker;
 		cc->peak_meter->setSource(NULL);
 		view->mode_capture->setInputAudio(NULL);
-		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
 	}
@@ -334,7 +332,6 @@ public:
 		input->setBackupMode(BACKUP_MODE_TEMP);
 		input->setChunkSize(512);
 		input->setUpdateDt(0.005f);
-		input->subscribe(cc, std::bind(&CaptureConsole::onUpdate, cc));
 		view->mode_capture->setInputMidi(input);
 		cc->peak_meter->setSource(input);
 
@@ -354,7 +351,6 @@ public:
 	{
 		cc->peak_meter->setSource(NULL);
 		view->mode_capture->setInputMidi(NULL);
-		input->unsubscribe(cc);
 		delete(input);
 		input = NULL;
 	}
@@ -632,6 +628,7 @@ void CaptureConsole::onStart()
 		view->pause(false);
 	else
 		view->play();
+	view->stream->subscribe(this, std::bind(&CaptureConsole::onUpdate, this));
 
 	mode->start();
 	enable("capture_start", false);
@@ -643,6 +640,7 @@ void CaptureConsole::onStart()
 
 void CaptureConsole::onDelete()
 {
+	view->stream->unsubscribe(this);
 	if (view->isPlaying())
 		view->stop();
 	view->renderer->prepare(view->getPlaybackSelection(), false);
@@ -658,6 +656,7 @@ void CaptureConsole::onDelete()
 void CaptureConsole::onPause()
 {
 	// TODO...
+	view->stream->unsubscribe(this);
 	view->pause(true);
 	mode->pause();
 	enable("capture_start", true);

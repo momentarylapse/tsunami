@@ -163,7 +163,7 @@ void InputStreamMidi::resetAccumulation()
 
 int InputStreamMidi::getSampleCount()
 {
-	return offset * (double)sample_rate;
+	return midi.samples;
 }
 
 void InputStreamMidi::clearInputQueue()

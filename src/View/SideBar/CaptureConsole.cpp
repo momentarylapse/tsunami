@@ -564,7 +564,7 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
-	view->renderer->prepare(view->getPlaybackSelection(), false);
+	view->renderer->prepare(view->getPlaybackSelection(false), false);
 
 
 	if (view->cur_track->type == Track::TYPE_AUDIO){
@@ -624,11 +624,14 @@ void CaptureConsole::onType()
 
 void CaptureConsole::onStart()
 {
-	if (view->isPlaying())
+	if (view->isPlaying()){
 		view->pause(false);
-	else
-		view->play();
-	view->stream->subscribe(this, std::bind(&CaptureConsole::onUpdate, this));
+	}else{
+		mode->dump();
+		view->play(view->getPlaybackSelection(true), false);
+	}
+	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputUpdate, this), view->stream->MESSAGE_UPDATE);
+	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_END_OF_STREAM);
 
 	mode->start();
 	enable("capture_start", false);
@@ -640,10 +643,10 @@ void CaptureConsole::onStart()
 
 void CaptureConsole::onDelete()
 {
-	view->stream->unsubscribe(this);
-	if (view->isPlaying())
+	if (view->isPlaying()){
+		view->stream->unsubscribe(this);
 		view->stop();
-	view->renderer->prepare(view->getPlaybackSelection(), false);
+	}
 	mode->dump();
 	enable("capture_start", true);
 	enable("capture_pause", false);
@@ -656,7 +659,7 @@ void CaptureConsole::onDelete()
 void CaptureConsole::onPause()
 {
 	// TODO...
-	view->stream->unsubscribe(this);
+	//view->stream->unsubscribe(this);
 	view->pause(true);
 	mode->pause();
 	enable("capture_start", true);
@@ -687,14 +690,18 @@ void CaptureConsole::updateTime()
 	setString("capture_time", song->get_time_str_long(mode->getSampleCount()));
 }
 
-void CaptureConsole::onUpdate()
+void CaptureConsole::onOutputEndOfStream()
 {
-	if (view->sel.range.length > 0)
-		if (mode->getSampleCount() >= view->getPlaybackSelection().length)
-			onPause();
-	//if (mode->input->cur_message() == MESSAGE_DELETE)
-	//	return;
-	// FIXME
+	view->stream->unsubscribe(this);
+	view->stop();
+	mode->pause();
+	enable("capture_start", true);
+	enable("capture_pause", false);
+	enable("capture_delete", true);
+}
+
+void CaptureConsole::onOutputUpdate()
+{
 	updateTime();
 }
 

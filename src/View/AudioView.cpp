@@ -351,10 +351,10 @@ void AudioView::updateSelection()
 	sel.update_bars(song);
 
 
-	renderer->setRange(getPlaybackSelection());
+	renderer->setRange(getPlaybackSelection(false));
 	if (isPlaying()){
 		if (renderer->range().is_inside(playbackPos()))
-			renderer->setRange(getPlaybackSelection());
+			renderer->setRange(getPlaybackSelection(false));
 		else{
 			stop();
 		}
@@ -379,9 +379,11 @@ bool AudioView::mouse_over_time(int pos)
 }
 
 
-Range AudioView::getPlaybackSelection()
+Range AudioView::getPlaybackSelection(bool for_recording)
 {
 	if (sel.range.empty()){
+		if (for_recording)
+			return Range(sel.range.start(), 0x70000000);
 		int num = song->getRangeWithTime().end() - sel.range.start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
@@ -1106,16 +1108,12 @@ void AudioView::enable(bool _enabled)
 }
 
 
-void AudioView::play()
+void AudioView::play(const Range &range, bool allow_loop)
 {
-	if (isPaused()){
-		stream->pause(false);
-		return;
-	}
 	if (stream)
 		stop();
 
-	renderer->prepare(getPlaybackSelection(), true);
+	renderer->prepare(range, allow_loop);
 	stream = new OutputStream(renderer);
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);

@@ -149,7 +149,7 @@ public:
 	void selectExpand();
 	void updateSelection();
 	void setSelection(const SongSelection &s);
-	Range getPlaybackSelection();
+	Range getPlaybackSelection(bool for_recording);
 
 	void setMouse();
 	bool mouseOverTrack(AudioViewTrack *t);
@@ -191,7 +191,7 @@ public:
 
 	OutputStream *stream;
 	SongRenderer *renderer;
-	void play();
+	void play(const Range &range, bool allow_loop);
 	void stop();
 	void pause(bool pause);
 	bool isPlaying();

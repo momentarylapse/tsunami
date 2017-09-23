@@ -580,7 +580,10 @@ void TsunamiWindow::onPlay()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
 		return;
-	view->play();
+	if (view->isPaused())
+		view->pause(false);
+	else
+		view->play(view->getPlaybackSelection(false), true);
 }
 
 void TsunamiWindow::onPause()
@@ -818,7 +821,7 @@ void TsunamiWindow::onExport()
 {
 	if (app->storage->askSaveExport(this)){
 		SongRenderer rr(song);
-		rr.prepare(view->getPlaybackSelection(), false);
+		rr.prepare(view->getPlaybackSelection(false), false);
 		app->storage->saveViaRenderer(&rr, hui::Filename, rr.getNumSamples(), song->tags);
 	}
 }

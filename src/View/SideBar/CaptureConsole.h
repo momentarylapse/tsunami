@@ -42,7 +42,8 @@ public:
 
 	void updateTime();
 
-	void onUpdate();
+	void onOutputUpdate();
+	void onOutputEndOfStream();
 
 	bool isCapturing();
 

@@ -59,10 +59,8 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::TYPE_TRACK_MUTE){
 		hover->track->setMuted(!hover->track->muted);
 	}else if (hover->type == Selection::TYPE_TRACK_SOLO){
-		for (Track *t: song->tracks)
-			view->sel.set(t, (t == hover->track));
-		if (hover->track->muted)
-			hover->track->setMuted(false);
+		auto vt = view->get_track(hover->track);
+		vt->setSolo(!vt->solo);
 	}else if (hover->type == Selection::TYPE_TRACK_EDIT){
 		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
 	}else if (hover->type == Selection::TYPE_SAMPLE){

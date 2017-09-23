@@ -28,6 +28,7 @@ public:
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
+	void _cdecl allowTracks(const Set<Track*> &allowed_tracks);
 
 	void _cdecl seek(int pos);
 
@@ -52,6 +53,7 @@ private:
 	Range range_cur;
 	int pos;
 	Array<MidiData> midi;
+	Set<Track*> allowed_tracks;
 
 	MidiDataStreamer *midi_streamer;
 

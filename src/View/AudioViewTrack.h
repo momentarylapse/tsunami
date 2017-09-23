@@ -77,11 +77,14 @@ public:
 
 	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
+	void setSolo(bool solo);
+
 	Track *track;
 	rect area;
 	rect area_last, area_target;
 	Array<rect> marker_areas;
 	Array<int> reference_tracks;
+	bool solo;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
 

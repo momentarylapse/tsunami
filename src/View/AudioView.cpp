@@ -1114,6 +1114,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 		stop();
 
 	renderer->prepare(range, allow_loop);
+	renderer->allowTracks(get_playable_tracks());
 	stream = new OutputStream(renderer);
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
@@ -1160,4 +1161,22 @@ int AudioView::playbackPos()
 	if (stream)
 		return stream->getPos(renderer->getPos());
 	return 0;
+}
+
+bool AudioView::hasAnySolo()
+{
+	for (auto *t: vtrack)
+		if (t->solo)
+			return true;
+	return false;
+}
+
+Set<Track*> AudioView::get_playable_tracks()
+{
+	Set<Track*> allowed;
+	bool any_solo = hasAnySolo();
+	for (Track* t: song->tracks)
+		if (get_track(t)->solo or !any_solo)
+			allowed.add(t);
+	return allowed;
 }

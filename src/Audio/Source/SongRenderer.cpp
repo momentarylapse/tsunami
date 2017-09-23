@@ -161,10 +161,10 @@ void SongRenderer::bb_render_track_fx(AudioBuffer &buf, Track *t, int ti)
 		bb_apply_fx(buf, t, fx);
 }
 
-int get_first_usable_track(Song *s)
+int get_first_usable_track(Song *s, Set<Track*> &allowed)
 {
 	foreachi(Track *t, s->tracks, i)
-		if (!t->muted)
+		if ((!t->muted) and (allowed.find(t) >= 0))
 			return i;
 	return -1;
 }
@@ -172,7 +172,7 @@ int get_first_usable_track(Song *s)
 void SongRenderer::bb_render_song_no_fx(AudioBuffer &buf)
 {
 	// any un-muted track?
-	int i0 = get_first_usable_track(song);
+	int i0 = get_first_usable_track(song, allowed_tracks);
 	if (i0 < 0){
 		// no -> return silence
 		buf.resize(range_cur.length);
@@ -185,6 +185,8 @@ void SongRenderer::bb_render_song_no_fx(AudioBuffer &buf)
 
 		// other tracks
 		for (int i=i0+1;i<song->tracks.num;i++){
+			if (allowed_tracks.find(song->tracks[i]) < 0)
+				continue;
 			if (song->tracks[i]->muted)
 				continue;
 			AudioBuffer tbuf;
@@ -256,12 +258,20 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 	read(buf);
 }
 
+void SongRenderer::allowTracks(const Set<Track*> &_allowed_tracks)
+{
+	allowed_tracks = _allowed_tracks;
+}
+
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
 	midi.clear();
+	allowed_tracks.clear();
+	for (Track* t: song->tracks)
+		allowed_tracks.add(t);
 
 	reset();
 }

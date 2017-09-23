@@ -16,6 +16,7 @@
 #include "../Midi/MidiData.h"
 #include "../Midi/Clef.h"
 #include "../Audio/Synth/Synthesizer.h"
+#include "../Audio/Source/SongRenderer.h"
 
 
 const int PITCH_SHOW_COUNT = 30;
@@ -26,6 +27,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
 	track = _track;
+	solo = false;
 
 	pitch_min = 55;
 	pitch_max = pitch_min + PITCH_SHOW_COUNT;
@@ -826,6 +828,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 {
 	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::TYPE_TRACK_HEADER);
 	bool visible = hover or view->editingTrack(track);
+	bool playable = (view->get_playable_tracks().find(track) >= 0);
 
 	color col = view->colors.background_track_selected;
 	if (view->sel.has(track))
@@ -839,27 +842,23 @@ void AudioViewTrack::drawHeader(Painter *c)
 	c->setRoundness(0);
 
 	// track title
-	c->setFont("", view->FONT_SIZE, view->sel.has(track), false);
-	//drawStrWithShadow(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
-	c->setColor(view->colors.text);
-	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
+	c->setFont("", view->FONT_SIZE, view->sel.has(track) and playable, false);
+	if (playable)
+		c->setColor(view->colors.text);
+	else
+		c->setColor(view->colors.text_soft2);
+	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName() + (solo ? " (solo)" : ""));
 
 	c->setFont("", -1, false, false);
 
 	// icons
 	if (track->type == track->TYPE_TIME){
-		//c->setColor(view->colors.background_track);
-		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time);
 	}else if (track->type == track->TYPE_MIDI){
-		//c->setColor(view->colors.background_track);
-		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi);
 	}else{
-		//c->setColor(view->colors.background_track);
-		//c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio_bg);
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio);
 	}
@@ -869,10 +868,6 @@ void AudioViewTrack::drawHeader(Painter *c)
 	color col_but_hover = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 
 	if (visible){
-		//c->setColor(view->colors.background_track);
-		//c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker_bg);
-		//if (track->muted)
-		//	c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
 		c->setColor(view->colors.text);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_MUTE))
 			c->setColor(col_but_hover);
@@ -881,8 +876,6 @@ void AudioViewTrack::drawHeader(Painter *c)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
 	if ((view->song->tracks.num > 1) and visible){
-		//c->setColor(view->colors.background_track);
-		//c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
 		c->setColor(view->colors.text);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_SOLO))
 			c->setColor(col_but_hover);
@@ -894,5 +887,11 @@ void AudioViewTrack::drawHeader(Painter *c)
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 39, area.y1 + 22-2, "🔧"); // "\u1F527");
 	}
+}
+
+void AudioViewTrack::setSolo(bool _solo)
+{
+	solo = _solo;
+	view->renderer->allowTracks(view->get_playable_tracks());
 }
 

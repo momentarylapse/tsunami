@@ -278,6 +278,10 @@ OBJ = \
  View/Mode/ViewModeDefault.o\
  View/Mode/ViewModeMidi.o\
  View/Mode/ViewModeScaleBars.o\
+ View/SideBar/CaptureConsoleModes/CaptureConsoleMode.o\
+ View/SideBar/CaptureConsoleModes/CaptureConsoleModeAudio.o\
+ View/SideBar/CaptureConsoleModes/CaptureConsoleModeMidi.o\
+ View/SideBar/CaptureConsoleModes/CaptureConsoleModeMulti.o\
  View/SideBar/CaptureConsole.o\
  View/SideBar/CurveConsole.o\
  View/SideBar/FxConsole.o\
@@ -1132,6 +1136,18 @@ View/Mode/ViewModeScaleBars.o : View/Mode/ViewModeScaleBars.cpp
 
 View/SideBar/CaptureConsole.o : View/SideBar/CaptureConsole.cpp
 	$(CPP) -c View/SideBar/CaptureConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CaptureConsoleModes/CaptureConsoleMode.o : View/SideBar/CaptureConsoleModes/CaptureConsoleMode.cpp
+	$(CPP) -c View/SideBar/CaptureConsoleModes/CaptureConsoleMode.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CaptureConsoleModes/CaptureConsoleModeAudio.o : View/SideBar/CaptureConsoleModes/CaptureConsoleModeAudio.cpp
+	$(CPP) -c View/SideBar/CaptureConsoleModes/CaptureConsoleModeAudio.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CaptureConsoleModes/CaptureConsoleModeMidi.o : View/SideBar/CaptureConsoleModes/CaptureConsoleModeMidi.cpp
+	$(CPP) -c View/SideBar/CaptureConsoleModes/CaptureConsoleModeMidi.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CaptureConsoleModes/CaptureConsoleModeMulti.o : View/SideBar/CaptureConsoleModes/CaptureConsoleModeMulti.cpp
+	$(CPP) -c View/SideBar/CaptureConsoleModes/CaptureConsoleModeMulti.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/CurveConsole.o : View/SideBar/CurveConsole.cpp
 	$(CPP) -c View/SideBar/CurveConsole.cpp -o $@ $(CXXFLAGS)

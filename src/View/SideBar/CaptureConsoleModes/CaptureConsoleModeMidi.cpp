@@ -13,6 +13,7 @@
 #include "../../../Device/Device.h"
 #include "../../../Audio/Synth/Synthesizer.h"
 #include "../../../Data/Song.h"
+#include "../../../Data/SongSelection.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Stuff/Log.h"
@@ -28,8 +29,10 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	preview_synth = NULL;
 	preview_stream = NULL;
 
+	cc->enable("capture_midi_target", false);
+
 	cc->event("capture_midi_source", std::bind(&CaptureConsoleModeMidi::onSource, this));
-	cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));
+	//cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));
 }
 
 void CaptureConsoleModeMidi::onSource()
@@ -43,7 +46,7 @@ void CaptureConsoleModeMidi::onSource()
 
 void CaptureConsoleModeMidi::onTarget()
 {
-	setTarget(cc->song->tracks[cc->getInt("capture_midi_target")]);
+	//setTarget(cc->song->tracks[cc->getInt("capture_midi_target")]);
 }
 
 
@@ -55,6 +58,7 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 		delete preview_synth;
 
 	target = t;
+	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->out->setSource(input->out);
 	preview_stream = new OutputStream(preview_synth->out);
@@ -74,7 +78,6 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 
 void CaptureConsoleModeMidi::enterParent()
 {
-	target = view->cur_track;
 }
 
 void CaptureConsoleModeMidi::enter()
@@ -107,7 +110,9 @@ void CaptureConsoleModeMidi::enter()
 
 	input->setDevice(chosen_device);
 
-	setTarget(target);
+	for (const Track *t: view->sel.tracks)
+		if (t->type == t->TYPE_MIDI)
+			setTarget((Track*)t);
 
 	if (!input->start()){
 		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
@@ -135,7 +140,7 @@ void CaptureConsoleModeMidi::start()
 	input->resetSync();
 	input->accumulate(true);
 	cc->enable("capture_midi_source", false);
-	cc->enable("capture_midi_target", false);
+	//cc->enable("capture_midi_target", false);
 }
 
 void CaptureConsoleModeMidi::stop()
@@ -149,7 +154,7 @@ void CaptureConsoleModeMidi::dump()
 	input->accumulate(false);
 	input->resetAccumulation();
 	cc->enable("capture_midi_source", true);
-	cc->enable("capture_midi_target", true);
+	//cc->enable("capture_midi_target", true);
 }
 
 bool CaptureConsoleModeMidi::insert()

@@ -39,12 +39,13 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	// dialog
 	peak_meter = new PeakMeter(this, "capture_level", NULL, view);
 
+	//enable("capture_type", false);
 
 
 	event("cancel", std::bind(&CaptureConsole::onCancel, this));
 	//event("hui:close", std::bind(&CaptureConsole::onClose, this));
 	event("ok", std::bind(&CaptureConsole::onOk, this));
-	event("capture_type", std::bind(&CaptureConsole::onType, this));
+	//event("capture_type", std::bind(&CaptureConsole::onType, this));
 	event("capture_start", std::bind(&CaptureConsole::onStart, this));
 	event("capture_delete", std::bind(&CaptureConsole::onDelete, this));
 	event("capture_pause", std::bind(&CaptureConsole::onPause, this));
@@ -71,10 +72,18 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
-	if (view->cur_track->type == Track::TYPE_AUDIO){
+	int num_audio = 0, num_midi = 0;
+	for (const Track *t: view->sel.tracks){
+		if (t->type == t->TYPE_AUDIO)
+			num_audio ++;
+		if (t->type == t->TYPE_MIDI)
+			num_midi ++;
+	}
+
+	if ((num_audio == 1) and (num_midi == 0)){
 		mode = mode_audio;
 		setInt("capture_type", 0);
-	}else if (view->cur_track->type == Track::TYPE_MIDI){
+	}else if ((num_audio == 0) and (num_midi == 1)){
 		mode = mode_midi;
 		setInt("capture_type", 1);
 	}else{ // TYPE_TIME
@@ -113,7 +122,7 @@ void CaptureConsole::onLeave()
 
 void CaptureConsole::onType()
 {
-	mode->leave();
+	/*mode->leave();
 
 	int n = getInt("capture_type");
 	if (n == 0)
@@ -122,7 +131,7 @@ void CaptureConsole::onType()
 		mode = mode_midi;
 	if (n == 2)
 		mode = mode_multi;
-	mode->enter();
+	mode->enter();*/
 }
 
 
@@ -142,7 +151,7 @@ void CaptureConsole::onStart()
 	enable("capture_pause", true);
 	enable("capture_delete", true);
 	enable("ok", true);
-	enable("capture_type", false);
+	//enable("capture_type", false);
 }
 
 void CaptureConsole::onDelete()
@@ -155,7 +164,7 @@ void CaptureConsole::onDelete()
 	enable("capture_start", true);
 	enable("capture_pause", false);
 	enable("capture_delete", false);
-	enable("capture_type", true);
+	//enable("capture_type", true);
 	enable("ok", false);
 	updateTime();
 }

@@ -31,8 +31,10 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	target = NULL;
 	sucker = NULL;
 
+	cc->enable("capture_audio_target", false);
+
 	cc->event("capture_audio_source", std::bind(&CaptureConsoleModeAudio::onSource, this));
-	cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
+	//cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
 }
 
 void CaptureConsoleModeAudio::onSource()
@@ -46,9 +48,9 @@ void CaptureConsoleModeAudio::onSource()
 
 void CaptureConsoleModeAudio::onTarget()
 {
-	int index = cc->getInt("capture_audio_target");
+	/*int index = cc->getInt("capture_audio_target");
 	if (index >= 0)
-		setTarget(cc->song->tracks[index]);
+		setTarget(cc->song->tracks[index]);*/
 }
 
 void CaptureConsoleModeAudio::setTarget(Track *t)
@@ -67,7 +69,6 @@ void CaptureConsoleModeAudio::setTarget(Track *t)
 
 void CaptureConsoleModeAudio::enterParent()
 {
-	target = view->cur_track;
 }
 
 void CaptureConsoleModeAudio::enter()
@@ -91,7 +92,9 @@ void CaptureConsoleModeAudio::enter()
 		cc->addString("capture_audio_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	//cc->addString("capture_audio_target", _("  - create new track -"));
 
-	setTarget(target);
+	for (const Track *t: view->sel.tracks)
+		if (t->type == t->TYPE_AUDIO)
+			setTarget((Track*)t);
 
 
 	input = new InputStreamAudio(song->sample_rate);
@@ -136,7 +139,7 @@ void CaptureConsoleModeAudio::start()
 	input->resetSync();
 	sucker->accumulate(true);
 	cc->enable("capture_audio_source", false);
-	cc->enable("capture_audio_target", false);
+	//cc->enable("capture_audio_target", false);
 }
 
 void CaptureConsoleModeAudio::stop()
@@ -149,7 +152,7 @@ void CaptureConsoleModeAudio::dump()
 	sucker->accumulate(false);
 	sucker->resetAccumulation();
 	cc->enable("capture_audio_source", true);
-	cc->enable("capture_audio_target", true);
+	//cc->enable("capture_audio_target", true);
 }
 
 bool CaptureConsoleModeAudio::insert()

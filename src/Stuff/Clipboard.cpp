@@ -112,7 +112,7 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 	}
 }
 
-bool Clipboard::test_compatibility(AudioView *view, bool *paste_single)
+bool Clipboard::test_compatibility(AudioView *view)
 {
 	Array<string> temp_type, dest_type;
 	for (Track *t: view->song->tracks){
@@ -125,13 +125,6 @@ bool Clipboard::test_compatibility(AudioView *view, bool *paste_single)
 
 	for (Track *t: temp->tracks)
 		temp_type.add(track_type(t->type));
-
-	// only 1 track in clipboard => paste into current
-	*paste_single = (temp->tracks.num == 1);
-	if (*paste_single){
-		dest_type.clear();
-		dest_type.add(track_type(view->cur_track->type));
-	}
 
 	if (dest_type.num != temp->tracks.num){
 		tsunami->log->error(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
@@ -152,26 +145,21 @@ void Clipboard::paste(AudioView *view)
 		return;
 	Song *s = view->song;
 
-	bool paste_single;
-	if (!test_compatibility(view, &paste_single))
+	if (!test_compatibility(view))
 		return;
 
 
 	s->action_manager->beginActionGroup();
 
-	if (paste_single){
-		paste_track(0, view->cur_track, view);
-	}else{
-		int ti = 0;
-		for (Track *t: s->tracks){
-			if (!view->sel.has(t))
-				continue;
-			if (t->type == Track::TYPE_TIME)
-				continue;
+	int ti = 0;
+	for (Track *t: s->tracks){
+		if (!view->sel.has(t))
+			continue;
+		if (t->type == Track::TYPE_TIME)
+			continue;
 
-			paste_track(ti, t, view);
-			ti ++;
-		}
+		paste_track(ti, t, view);
+		ti ++;
 	}
 	s->action_manager->endActionGroup();
 }
@@ -182,26 +170,21 @@ void Clipboard::pasteAsSamples(AudioView *view)
 		return;
 	Song *s = view->song;
 
-	bool paste_single;
-	if (!test_compatibility(view, &paste_single))
+	if (!test_compatibility(view))
 		return;
 
 
 	s->action_manager->beginActionGroup();
 
-	if (paste_single){
-		paste_track_as_samples(0, view->cur_track, view);
-	}else{
-		int ti = 0;
-		for (Track *t: s->tracks){
-			if (!view->sel.has(t))
-				continue;
-			if (t->type == Track::TYPE_TIME)
-				continue;
+	int ti = 0;
+	for (Track *t: s->tracks){
+		if (!view->sel.has(t))
+			continue;
+		if (t->type == Track::TYPE_TIME)
+			continue;
 
-			paste_track_as_samples(ti, t, view);
-			ti ++;
-		}
+		paste_track_as_samples(ti, t, view);
+		ti ++;
 	}
 	s->action_manager->endActionGroup();
 }

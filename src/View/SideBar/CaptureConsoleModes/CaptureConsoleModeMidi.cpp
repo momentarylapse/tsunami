@@ -83,6 +83,7 @@ void CaptureConsoleModeMidi::enterParent()
 void CaptureConsoleModeMidi::enter()
 {
 	sources = cc->device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
+	cc->hideControl("capture_midi_grid", false);
 
 	// add all
 	cc->reset("capture_midi_source");

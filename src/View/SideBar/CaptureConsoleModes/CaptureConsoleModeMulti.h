@@ -12,22 +12,29 @@
 #include "../../../lib/base/base.h"
 
 class Device;
+class Track;
 
 class CaptureConsoleModeMulti: public CaptureConsoleMode
 {
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
 
-	int size;
+	struct CaptureItem
+	{
+		Track *track;
+		Device *device;
+		string id_source, id_target, id_type;
+	};
+	Array<CaptureItem> items;
 
 
 public:
 	CaptureConsoleModeMulti(CaptureConsole *cc);
 	virtual ~CaptureConsoleModeMulti();
-	virtual void enterParent();
-	virtual void leaveParent();
-	virtual void enter(){}
-	virtual void leave(){}
+	//virtual void enterParent();
+	//virtual void leaveParent();
+	virtual void enter();
+	virtual void leave();
 	virtual void pause(){}
 	virtual void start(){}
 	virtual void stop(){}

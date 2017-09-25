@@ -132,7 +132,7 @@ bool BottomBar::isActive(int console_index)
 void BottomBar::Console::blink()
 {
 	if (bar()){
-		bar()->choose(this);
+		bar()->open(this);
 	}else{
 		notify = true;
 	}

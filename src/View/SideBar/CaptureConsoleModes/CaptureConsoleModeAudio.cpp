@@ -74,6 +74,7 @@ void CaptureConsoleModeAudio::enterParent()
 void CaptureConsoleModeAudio::enter()
 {
 	sources = cc->device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+	cc->hideControl("capture_audio_grid", false);
 
 	// add all
 	cc->reset("capture_audio_source");

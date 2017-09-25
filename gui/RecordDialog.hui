@@ -1,22 +1,17 @@
 Dialog record_dialog "Aufnahme" 300 200
-	Grid ? "" 1 4
-		TabControl capture_type "Audio\\Midi\\Multi Track" noexpandy
-			Grid ? "" 1 4
-				Group rdt_audio_source "Source"
-					ComboBox capture_audio_source "" expandx
-				Group rdt_audio_target "Target"
-					ComboBox capture_audio_target "" expandx
-				Text capture_audio_message "" italic
-			Grid ? "" 1 4
-				Group rdt_midi_source "Source"
-					ComboBox capture_midi_source "" expandx
-				Group rdt_midi_target "Target"
-					ComboBox capture_midi_target "" expandx
-				Text capture_midi_message "" italic
-			Grid capture_multi_grid "" 3 128
-				Text rdt_multi_target "Target" bold
-				Text rdt_multi_type "Type" bold
-				Text rdt_multi_source "Source" bold
+	Grid ? "" 1 6
+		Grid capture_audio_grid "" 1 4
+			Group rdt_audio_source "Source"
+				ComboBox capture_audio_source "" expandx
+			Text capture_audio_message "" italic
+		Grid capture_midi_grid "" 1 4
+			Group rdt_midi_source "Source"
+				ComboBox capture_midi_source "" expandx
+			Text capture_midi_message "" italic
+		Grid capture_multi_grid "" 3 128
+			Text rdt_multi_target "Target" bold
+			Text rdt_multi_type "Type" bold
+			Text rdt_multi_source "Source" bold
 		Group rdt_capture "Recording"
 			Grid ? "" 1 2
 				Grid ? "" 2 1 noexpandy

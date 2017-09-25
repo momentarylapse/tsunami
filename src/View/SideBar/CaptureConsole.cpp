@@ -72,6 +72,10 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
+	hideControl("capture_audio_grid", true);
+	hideControl("capture_midi_grid", true);
+	hideControl("capture_multi_grid", true);
+
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
 		if (t->type == t->TYPE_AUDIO)

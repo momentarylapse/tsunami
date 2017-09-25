@@ -23,7 +23,7 @@ public:
 	void paste(AudioView *view);
 	void pasteAsSamples(AudioView *view);
 
-	bool test_compatibility(AudioView *view, bool *paste_single);
+	bool test_compatibility(AudioView *view);
 
 	void clear();
 	void append_track(Track *t, AudioView *view);

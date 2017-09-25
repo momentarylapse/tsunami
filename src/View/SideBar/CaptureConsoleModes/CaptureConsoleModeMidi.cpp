@@ -63,7 +63,7 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	preview_synth->out->setSource(input->out);
 	preview_stream = new OutputStream(preview_synth->out);
 	preview_stream->setBufferSize(512);
-	preview_stream->_play();
+	preview_stream->play();
 	view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
 	cc->setInt("capture_midi_target", target->get_index());
@@ -146,7 +146,7 @@ void CaptureConsoleModeMidi::start()
 
 void CaptureConsoleModeMidi::stop()
 {
-	preview_stream->_stop();
+	preview_stream->stop();
 	input->stop();
 }
 

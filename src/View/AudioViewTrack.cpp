@@ -374,7 +374,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 
 	float w = c->getStrWidth(text);
 	float x = view->cam.sample2screen(marker->pos);
-	float y = area.y1;
+	float y = area.y1 + 10;
 
 	color col = view->colors.text;
 	color col_bg = view->colors.background_track;
@@ -385,13 +385,9 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	if (hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.3f);
 
-	drawStrWithShadow(c, x, area.y1, text, col, col_bg);
+	view->drawBoxedStr(c,  x, y, text, col, col_bg);
 
 	marker_areas[index] = rect(x, x + w, y, y + 16);
-
-
-	c->setColor(col);
-	c->drawStr(x, y, text);
 
 	c->setFont("", -1, false, false);
 }

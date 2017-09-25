@@ -421,8 +421,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
 	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);
 	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
-	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::_play));
-	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::_stop));
+	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::play));
+	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
 	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
 	//Kaba::LinkExternal("OutputStream.isPlaying", Kaba::mf(&OutputStream::isPlaying));
 	Kaba::LinkExternal("OutputStream.getPos", Kaba::mf(&OutputStream::getPos));

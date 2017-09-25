@@ -331,7 +331,7 @@ void OutputStream::kill_dev()
 #endif
 }
 
-void OutputStream::_stop()
+void OutputStream::stop()
 {
 	pause(true);
 
@@ -379,6 +379,8 @@ void OutputStream::_stop()
 
 void OutputStream::pause(bool _pause)
 {
+	if (!fully_initialized and _pause)
+		return;
 	//printf("stream pause %d\n", (int)_pause);
 	if (!fully_initialized)
 		start_first_time();
@@ -428,7 +430,7 @@ void OutputStream::setDevice(Device *d)
 	device = d;
 }
 
-void OutputStream::_play()
+void OutputStream::play()
 {
 	pause(false);
 }
@@ -478,7 +480,7 @@ void OutputStream::start_first_time()
 			// still no luck... give up
 			msg_write("aaaaa");
 			tsunami->log->error("pa_wait_for_stream_ready");
-			_stop();
+			stop();
 			return;
 		}
 	}

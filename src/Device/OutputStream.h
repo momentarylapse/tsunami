@@ -54,8 +54,8 @@ public:
 	static const string MESSAGE_UPDATE;
 
 
-	void _cdecl _stop();
-	void _cdecl _play();
+	void _cdecl stop();
+	void _cdecl play();
 	void _cdecl pause(bool pause);
 	void _cdecl update();
 

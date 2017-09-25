@@ -140,7 +140,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 	preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_END_OF_STREAM);
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
-	preview_stream->_play();
+	preview_stream->play();
 }
 
 void ViewModeMidi::onEndOfStream()
@@ -152,8 +152,10 @@ void ViewModeMidi::onEndOfStream()
 void ViewModeMidi::kill_preview()
 {
 	//msg_write("kill");
-	if (preview_stream)
+	if (preview_stream){
+		preview_stream->stop();
 		delete preview_stream;
+	}
 	preview_stream = NULL;
 	if (preview_synth)
 		delete preview_synth;

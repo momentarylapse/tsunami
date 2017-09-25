@@ -330,7 +330,7 @@ void SampleManagerConsole::onPreview()
 	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));
 	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamUpdate, this));
 	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamEnd, this), preview_stream->MESSAGE_END_OF_STREAM);
-	preview_stream->_play();
+	preview_stream->play();
 }
 
 void SampleManagerConsole::endPreview()

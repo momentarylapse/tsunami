@@ -1051,11 +1051,9 @@ void AudioView::selectTrack(Track *t, bool diff)
 				is_only_selected = false;
 		sel.set(t, !sel.has(t) or is_only_selected);
 	}else{
-		if (!sel.has(t)){
-			// unselect all tracks
-			for (Track *tt: t->song->tracks)
-				sel.set(tt, false);
-		}
+		//if (!sel.has(t)){
+		sel.tracks.clear();
+		//}
 
 		// select this track
 		sel.add(t);

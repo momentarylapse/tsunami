@@ -45,8 +45,8 @@ public:
 	void _cdecl __init__(AudioSource *r);
 	virtual void _cdecl __delete__();
 
-	void create_dev();
-	void kill_dev();
+	void _create_dev();
+	void _kill_dev();
 
 
 	static const string MESSAGE_STATE_CHANGE;
@@ -60,7 +60,9 @@ public:
 	void _cdecl update();
 
 	bool fully_initialized;
-	void start_first_time();
+	void _start_first_time();
+	void _unpause();
+	void _pause();
 
 	bool _cdecl isPaused();
 	int _cdecl getState();

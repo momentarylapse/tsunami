@@ -59,7 +59,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 
 void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	//printf("request %d\n", (int)nbytes);
+	printf("request %d\n", (int)nbytes);
 	OutputStream *stream = (OutputStream*)userdata;
 
 	void *data;
@@ -100,12 +100,12 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 	// read more?
 	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
-		//printf("+\n");
+		printf("+\n");
 		stream->read_more = true;
 	}
 
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
-		//printf("end of data...\n");
+		printf("end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
@@ -211,11 +211,11 @@ public:
 	}
 };
 
-OutputStream::OutputStream(AudioSource *r) :
+OutputStream::OutputStream(AudioSource *s) :
 	ring_buf(1048576)
 {
 	perf_channel = PerformanceMonitor::create_channel("out");
-	source = r;
+	source = s;
 
 	fully_initialized = false;
 	paused = false;
@@ -250,13 +250,13 @@ OutputStream::OutputStream(AudioSource *r) :
 
 OutputStream::~OutputStream()
 {
-	//printf("del stream\n");
+	printf("del stream\n");
 	if (hui_runner_id >= 0){
 		hui::CancelRunner(hui_runner_id);
 		hui_runner_id = -1;
 	}
 
-	kill_dev();
+	_kill_dev();
 
 	device_manager->removeStream(this);
 	killed = true;
@@ -281,14 +281,11 @@ void OutputStream::__delete__()
 	this->OutputStream::~OutputStream();
 }
 
-void OutputStream::create_dev()
+void OutputStream::_create_dev()
 {
 	dev_sample_rate = source->getSampleRate();
 
 #ifdef DEVICE_PULSEAUDIO
-	if (_stream)
-		return;
-
 	pa_sample_spec ss;
 	ss.rate = dev_sample_rate;
 	ss.channels = 2;
@@ -301,18 +298,19 @@ void OutputStream::create_dev()
 	pa_stream_set_underflow_callback(_stream, &stream_underflow_callback, this);
 #endif
 #ifdef DEVICE_PORTAUDIO
-	if (_stream)
-		return;
 	err = Pa_OpenDefaultStream(&_stream, 0, 2, paFloat32, dev_sample_rate, 256,
 	                           &stream_request_callback, this);
 	testError("Pa_OpenDefaultStream");
 #endif
 }
 
-void OutputStream::kill_dev()
+void OutputStream::_kill_dev()
 {
-#ifdef DEVICE_PULSEAUDIO
+	printf("kill dev\n");
+	if (!paused)
+		_pause();
 
+#ifdef DEVICE_PULSEAUDIO
 	if (_stream){
 		pa_stream_disconnect(_stream);
 		testError("pa_stream_disconnect");
@@ -333,69 +331,63 @@ void OutputStream::kill_dev()
 
 void OutputStream::stop()
 {
-	pause(true);
-
-#if 0
-	return;
-
-	read_more = false;
-	hui::CancelRunner(hui_runner_id);
-	hui_runner_id = -1;
-
-#ifdef DEVICE_PULSEAUDIO
-	if (_stream){
-
-		pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
-		testError("pa_stream_drain");
-		pa_wait_op(op);
-
-		kill_dev();
-	}
-#endif
-
-#ifdef DEVICE_PORTAUDIO
-	if (_stream){
-		err = Pa_AbortStream(_stream);
-		testError("Pa_AbortStream");
-
-		kill_dev();
-	}
-#endif
-
-	// stop thread
-	thread->join();
-	delete thread;
-	thread = NULL;
-
-	// clean up
-	paused = false;
-	read_end_of_stream = false;
-	played_end_of_stream = false;
-	ring_buf.clear();
-
-	notify(MESSAGE_STATE_CHANGE);
-#endif
+	_pause();
 }
 
-void OutputStream::pause(bool _pause)
+void OutputStream::_pause()
 {
-	if (!fully_initialized and _pause)
-		return;
-	//printf("stream pause %d\n", (int)_pause);
 	if (!fully_initialized)
-		start_first_time();
+		return;
+	if (isPaused())
+		return;
+	printf("pause...");
 
-	paused = _pause;
+	paused = true;
 
-	pa_operation *op = pa_stream_cork(_stream, paused, NULL, NULL);
+#ifdef DEVICE_PULSEAUDIO
+	pa_operation *op = pa_stream_cork(_stream, true, NULL, NULL);
 	testError("pa_stream_cork");
 	pa_wait_op(op);
+#endif
+	printf("ok\n");
 
 	notify(MESSAGE_STATE_CHANGE);
+}
+
+void OutputStream::_unpause()
+{
+	if (!fully_initialized)
+		return;
+	if (!isPaused())
+		return;
+	printf("unpause...");
+
+	paused = false;
+
+#ifdef DEVICE_PULSEAUDIO
+	pa_operation *op = pa_stream_cork(_stream, false, NULL, NULL);
+	testError("pa_stream_cork");
+	pa_wait_op(op);
+#endif
+	printf("ok\n");
+
+	notify(MESSAGE_STATE_CHANGE);
+}
+
+void OutputStream::pause(bool __pause)
+{
+	if (paused == __pause)
+		return;
+
+	if (__pause)
+		_pause();
+	else
+		_unpause();
 }
 
 void OutputStream::readStream()
 {
+	printf("read stream\n");
 	reading = true;
 	read_more = false;
 
@@ -420,9 +412,9 @@ void OutputStream::readStream()
 	reading = false;
 }
 
-void OutputStream::setSource(AudioSource *r)
+void OutputStream::setSource(AudioSource *s)
 {
-	source = r;
+	source = s;
 }
 
 void OutputStream::setDevice(Device *d)
@@ -432,12 +424,15 @@ void OutputStream::setDevice(Device *d)
 
 void OutputStream::play()
 {
-	pause(false);
+	if (fully_initialized)
+		_unpause();
+	else
+		_start_first_time();
 }
 
-void OutputStream::start_first_time()
+void OutputStream::_start_first_time()
 {
-	//printf("stream start first\n");
+	printf("stream start first\n");
 	read_end_of_stream = false;
 	played_end_of_stream = false;
 	reading = false;
@@ -451,7 +446,7 @@ void OutputStream::start_first_time()
 
 
 #ifdef DEVICE_PULSEAUDIO
-	create_dev();
+	_create_dev();
 	if (!_stream)
 		return;
 

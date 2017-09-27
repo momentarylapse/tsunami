@@ -6,6 +6,7 @@
  */
 
 #include "../lib/hui/hui.h"
+#include "../lib/threads/Mutex.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Stuff/Log.h"
@@ -137,6 +138,8 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	source = new Source;
 	source->stream = this;
 
+	control_mutex = new Mutex;
+
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;
 	if (device)
@@ -154,6 +157,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 InputStreamAudio::~InputStreamAudio()
 {
 	stop();
+	delete control_mutex;
 }
 
 void InputStreamAudio::__init__(int _sample_rate)
@@ -186,19 +190,30 @@ void InputStreamAudio::setDevice(Device *_device)
 
 void InputStreamAudio::stop()
 {
+	_stop(true);
+}
+
+void InputStreamAudio::_stop(bool use_mutex)
+{
 	if (!capturing)
 		return;
+	if (use_mutex)
+		control_mutex->lock();
 	_stopUpdate();
 
 #ifdef DEVICE_PULSEAUDIO
+	printf("disconnect\n");
 	pa_stream_disconnect(_stream);
 	testError("disconnect");
 
 	for (int i=0; i<1000; i++){
-		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED)
+		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED){
+			printf("terminated\n");
 			break;
+		}
 		hui::Sleep(0.001f);
 	}
+	printf("unref\n");
 
 	pa_stream_unref(_stream);
 	testError("unref");
@@ -212,12 +227,15 @@ void InputStreamAudio::stop()
 		if (backup_mode != BACKUP_MODE_KEEP)
 			file_delete(cur_backup_filename);
 	}
+	if (use_mutex)
+		control_mutex->unlock();
 }
 
 bool InputStreamAudio::start()
 {
+	control_mutex->lock();
 	if (capturing)
-		stop();
+		_stop(false);
 
 	num_channels = 2;
 
@@ -265,6 +283,7 @@ bool InputStreamAudio::start()
 	_startUpdate();
 
 	resetSync();
+	control_mutex->unlock();
 	return capturing;
 }
 

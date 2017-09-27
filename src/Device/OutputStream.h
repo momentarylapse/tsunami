@@ -22,6 +22,7 @@ class DeviceManager;
 class Device;
 class Thread;
 class StreamThread;
+class Mutex;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -90,6 +91,7 @@ private:
 	int buffer_size;
 	float update_dt;
 	int hui_runner_id;
+	Mutex *control_mutex;
 
 	AudioSource *source;
 	RingBuffer ring_buf;

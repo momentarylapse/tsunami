@@ -18,6 +18,7 @@
 
 class PluginManager;
 class Device;
+class Mutex;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -42,6 +43,7 @@ public:
 
 	virtual bool _cdecl start();
 	virtual void _cdecl stop();
+	void _stop(bool bool_mutex);
 
 	int _cdecl getDelay();
 	void _cdecl resetSync();
@@ -95,6 +97,8 @@ private:
 
 	bool running;
 	int hui_runner_id;
+
+	Mutex *control_mutex;
 
 	int num_channels;
 

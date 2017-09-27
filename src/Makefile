@@ -300,8 +300,8 @@ OBJ = \
  View/Selection.o\
  View/TrackHeightManager.o\
  View/ViewPort.o\
- TsunamiWindow.o\
- Tsunami.o
+ TsunamiWindow.o#\
+# Tsunami.o
 CPP = g++
 GLOBALFLAGS = -O2 -g
 #GLOBALFLAGS = -O1 -g
@@ -309,8 +309,8 @@ LIB_DIR = lib
 CXXFLAGS = -std=c++11 `pkg-config --cflags gtk+-3.0` -DUSE_UNWIND=1 $(GLOBALFLAGS)
 CXXFLAGSLINKING = -std=c++11 `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lunwind -lpulse -lasound -lfftw3f -lFLAC -logg -lvorbis -lvorbisfile -lvorbisenc $(GLOBALFLAGS)
 
-$(BIN) : $(OBJ)
-	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
+$(BIN) : $(OBJ) Tsunami.o
+	$(CPP) $(OBJ) Tsunami.o -o $(BIN) $(CXXFLAGSLINKING)
 
 Action/Bar/ActionBar__Add.o : Action/Bar/ActionBar__Add.cpp
 	$(CPP) -c Action/Bar/ActionBar__Add.cpp -o $@ $(CXXFLAGS)
@@ -1200,11 +1200,16 @@ View/TrackHeightManager.o : View/TrackHeightManager.cpp
 View/ViewPort.o : View/ViewPort.cpp
 	$(CPP) -c View/ViewPort.cpp -o $@ $(CXXFLAGS)
 
-main.o : main.cpp
-	$(CPP) -c main.cpp -o $@ $(CXXFLAGS)
-
 Tsunami.o : Tsunami.cpp
 	$(CPP) -c Tsunami.cpp -o $@ $(CXXFLAGS)
+
+test : ../Test/ringbuffer
+
+../Test/ringbuffer : all ../Test/src/ringbuffer.cpp
+	g++ ../Test/src/ringbuffer.cpp $(OBJ) -o ../Test/ringbuffer $(CXXFLAGSLINKING)
+
+run-test : test
+	../Test/ringbuffer
 
 clean :
 	rm -f $(BIN)
@@ -1237,3 +1242,4 @@ install : all
 	xdg-icon-resource install --context mimetypes --size 128 ../Data/Icons/128.png application-michisoft-nami
 	#xdg-icon-resource install --context mimetypes ../Data/Icons/tsunami.svg application-michisoft-nami
 	cp $(BIN) /usr/bin
+

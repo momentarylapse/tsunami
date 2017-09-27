@@ -36,6 +36,7 @@ void pa_wait_op(pa_operation *op)
 		return;
 	}
 	printf("-w-");
+	int n = 0;
 	//msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) != PA_OPERATION_DONE){
 		printf(".");
@@ -43,6 +44,10 @@ void pa_wait_op(pa_operation *op)
 		//pa_mainloop_iterate(m, 1, NULL);
 		if (pa_operation_get_state(op) == PA_OPERATION_CANCELLED)
 			break;
+		n ++;
+		if (n > 200)
+			break;
+		hui::Sleep(0.005f);
 	}
 	if (pa_operation_get_state(op) != PA_OPERATION_DONE)
 		tsunami->log->error("pa_wait_op: failed");

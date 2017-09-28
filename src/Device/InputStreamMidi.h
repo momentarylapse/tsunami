@@ -9,7 +9,7 @@
 #define INPUTSTREAMMIDI_H_
 
 #include "../Data/Song.h"
-#include "InputStreamAny.h"
+#include "../View/Helper/PeakMeter.h"
 #include "config.h"
 #include "../Midi/MidiSource.h"
 
@@ -24,7 +24,7 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class InputStreamMidi : public InputStreamAny
+class InputStreamMidi : public PeakMeterSource
 {
 public:
 
@@ -33,32 +33,32 @@ public:
 
 	void _cdecl init();
 
-	virtual bool _cdecl start();
-	virtual void _cdecl stop();
+	static const string MESSAGE_CAPTURE;
+
+	bool _cdecl start();
+	void _cdecl stop();
 
 	void _startUpdate();
 	void _stopUpdate();
 	void update();
 	int doCapturing();
 
-	virtual bool _cdecl isCapturing();
+	bool _cdecl isCapturing();
 
-	virtual int _cdecl getDelay();
-	virtual void _cdecl resetSync();
+	int _cdecl getDelay();
+	void _cdecl resetSync();
 
-	virtual void _cdecl accumulate(bool enable);
-	virtual void _cdecl resetAccumulation();
-	virtual int _cdecl getSampleCount();
+	void _cdecl accumulate(bool enable);
+	void _cdecl resetAccumulation();
+	int _cdecl getSampleCount();
 
+	virtual float _cdecl getSampleRate(){ return sample_rate; }
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 	virtual int _cdecl getState();
 
-	virtual bool _cdecl unconnect();
-	virtual void _cdecl setDevice(Device *d);
-	virtual Device *_cdecl getDevice();
-
-
-	virtual int _cdecl getType(){ return Track::TYPE_MIDI; }
+	bool _cdecl unconnect();
+	void _cdecl setDevice(Device *d);
+	Device *_cdecl getDevice();
 
 	MidiRawData midi;
 	MidiRawData current_midi;
@@ -77,6 +77,16 @@ public:
 		bool real_time_mode;
 	};
 	Output *out;
+
+	void _cdecl setBackupMode(int mode);
+	int backup_mode;
+
+	void _cdecl setChunkSize(int size);
+	void _cdecl setUpdateDt(float dt);
+	int chunk_size;
+	float update_dt;
+
+	int sample_rate;
 
 private:
 

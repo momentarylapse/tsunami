@@ -8,7 +8,6 @@
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
-#include "../../Device/InputStreamAny.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
 #include "../../Audio/AudioSucker.h"

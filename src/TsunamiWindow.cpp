@@ -38,7 +38,6 @@
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
 #include "Device/DeviceManager.h"
-#include "Device/InputStreamAny.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
 

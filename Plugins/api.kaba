@@ -398,84 +398,35 @@ class MidiPort
 	int client, port
 	string client_name, port_name
 
-class InputStreamAny
+/*class InputStreamAny
 	int sample_rate
 	extern virtual void __delete__()
 	extern virtual void setBackupMode(int mode)
 	extern virtual bool start()
 	extern virtual void stop()
 	extern virtual bool isCapturing()
-	/*extern virtual int getSampleCount()
-	extern virtual void accumulate(bool enable)
-	extern virtual void resetAccumulation()*/
 	extern virtual float getSampleRate()
 	extern virtual void getSomeSamples(AudioBuffer buf, int num)
 	extern virtual int getState()
 	extern void subscribe(void* handler, void* func, string message)
-	extern void unsubscribe(void* handler)
+	extern void unsubscribe(void* handler)*/
 
-class InputStreamAudio extends InputStreamAny
+class InputStreamAudio
 	RingBuffer current_buffer
 	AudioBuffer buffer
 	AudioSource source
 	extern void __init__(int sample_rate)
-	extern override void __delete__()
-	extern override bool start()
-	extern override void stop()
-	extern override bool isCapturing()
-	//extern override int getSampleCount()
-	//extern override void accumulate(bool enable)
-	//extern override void resetAccumulation()
-	extern override float getSampleRate()
-	extern override void getSomeSamples(AudioBuffer buf, int num)
-	extern override int getState()
-	
-/*class InputStream
 	extern virtual void __delete__()
-
-	extern virtual bool start()
-	extern virtual void stop()
-	extern virtual int doCapturing()
-
-	extern virtual bool isCapturing()
-	extern virtual int getDelay()
-	extern virtual void resetSync()
-
-	extern virtual void accumulate(bool enable)
-	extern virtual void resetAccumulation()
-	extern virtual int getSampleCount()
-
+	extern bool start()
+	extern void stop()
+	extern bool isCapturing()
 	extern virtual float getSampleRate()
-	extern virtual void getSomeSamples(AudioBuffer buf, int num_samples)
+	extern virtual void getSomeSamples(AudioBuffer buf, int num)
 	extern virtual int getState()
-
-	extern virtual void setDevice(string dev)
-	extern virtual string getChosenDevice()
-
-	extern virtual MidiPort getCurMidiPort()
-	extern virtual MidiPort[] findMidiPorts()
-	extern virtual bool connectMidiPort(MidiPort p)
-	extern virtual void setPreviewSynthesizer(Synthesizer *s)
-	
-	extern void addObserver(void *handler, void *func)
-	extern void removeObserver(void *handler)
-
-	int sample_rate
-	bool accumulating
-	bool capturing
-
-	RingBuffer current_buffer
-	AudioBuffer buffer
-	MidiData midi
-	MidiData current_midi
-
-class InputStreamAudio : InputStream
-	extern void __init__(int sample_rate)
-	extern virtual void __delete__()
-
-class InputStreamMidi : InputStream
-	extern void __init__(int sample_rate)
-	extern virtual void __delete__()*/
+	extern void setBackupMode(int mode)
+	extern bool isCapturing()
+	extern void subscribe(void* handler, void* func, string message)
+	extern void unsubscribe(void* handler)
 
 class Storage
 	extern bool load(Song *s, string filename)

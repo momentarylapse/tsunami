@@ -19,6 +19,10 @@
 #include <alsa/asoundlib.h>
 #endif
 
+const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
+static const int DEFAULT_CHUNK_SIZE = 512;
+static const float DEFAULT_UPDATE_TIME = 0.005f;
+
 InputStreamMidi::Output::Output(InputStreamMidi *_input)
 {
 	input = _input;
@@ -58,9 +62,15 @@ void InputStreamMidi::Output::feed(const MidiRawData &midi)
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(int _sample_rate) :
-	InputStreamAny(_sample_rate)
+InputStreamMidi::InputStreamMidi(int _sample_rate)
 {
+	sample_rate = _sample_rate;
+	chunk_size = -1;
+	update_dt = -1;
+	backup_mode = BACKUP_MODE_NONE;
+	update_dt = DEFAULT_UPDATE_TIME;
+	chunk_size = DEFAULT_CHUNK_SIZE;
+
 #ifdef DEVICE_MIDI_ALSA
 	subs = NULL;
 #endif
@@ -295,5 +305,26 @@ void InputStreamMidi::update()
 	{}//	notify(MESSAGE_CAPTURE);
 
 	running = isCapturing();
+}
+
+void InputStreamMidi::setBackupMode(int mode)
+{
+	backup_mode = mode;
+}
+
+void InputStreamMidi::setChunkSize(int size)
+{
+	if (size > 0)
+		chunk_size = size;
+	else
+		chunk_size = DEFAULT_CHUNK_SIZE;
+}
+
+void InputStreamMidi::setUpdateDt(float dt)
+{
+	if (dt > 0)
+		update_dt = dt;
+	else
+		update_dt = DEFAULT_UPDATE_TIME;
 }
 

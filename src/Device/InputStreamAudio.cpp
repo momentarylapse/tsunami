@@ -28,6 +28,10 @@ string InputStreamAudio::cur_backup_filename;
 float InputStreamAudio::playback_delay_const;
 
 
+const string InputStreamAudio::MESSAGE_CAPTURE = "Capture";
+static const int DEFAULT_CHUNK_SIZE = 512;
+static const float DEFAULT_UPDATE_TIME = 0.005f;
+
 
 #ifdef DEVICE_PULSEAUDIO
 extern void pa_wait_op(pa_operation *op); // -> DeviceManager.cpp
@@ -127,9 +131,15 @@ int InputStreamAudio::Source::getSampleRate()
 
 
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
-	InputStreamAny(_sample_rate),
 	current_buffer(1048576)
 {
+	sample_rate = _sample_rate;
+	chunk_size = -1;
+	update_dt = -1;
+	backup_mode = BACKUP_MODE_NONE;
+	update_dt = DEFAULT_UPDATE_TIME;
+	chunk_size = DEFAULT_CHUNK_SIZE;
+
 	capturing = false;
 #ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
@@ -168,6 +178,27 @@ void InputStreamAudio::__init__(int _sample_rate)
 void InputStreamAudio::__delete__()
 {
 	this->InputStreamAudio::~InputStreamAudio();
+}
+
+void InputStreamAudio::setBackupMode(int mode)
+{
+	backup_mode = mode;
+}
+
+void InputStreamAudio::setChunkSize(int size)
+{
+	if (size > 0)
+		chunk_size = size;
+	else
+		chunk_size = DEFAULT_CHUNK_SIZE;
+}
+
+void InputStreamAudio::setUpdateDt(float dt)
+{
+	if (dt > 0)
+		update_dt = dt;
+	else
+		update_dt = DEFAULT_UPDATE_TIME;
 }
 
 Device *InputStreamAudio::getDevice()

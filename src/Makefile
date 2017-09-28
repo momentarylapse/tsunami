@@ -97,7 +97,6 @@ OBJ = \
  Data/Track.o\
  Device/Device.o\
  Device/DeviceManager.o\
- Device/InputStreamAny.o\
  Device/InputStreamAudio.o\
  Device/InputStreamMidi.o\
  Device/OutputStream.o\
@@ -593,9 +592,6 @@ Device/DeviceManager.o : Device/DeviceManager.cpp
 
 Device/Device.o : Device/Device.cpp
 	$(CPP) -c Device/Device.cpp -o $@ $(CXXFLAGS)
-
-Device/InputStreamAny.o : Device/InputStreamAny.cpp
-	$(CPP) -c Device/InputStreamAny.cpp -o $@ $(CXXFLAGS)
 
 Device/InputStreamAudio.o : Device/InputStreamAudio.cpp
 	$(CPP) -c Device/InputStreamAudio.cpp -o $@ $(CXXFLAGS)

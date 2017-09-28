@@ -13,7 +13,7 @@
 #include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
 #include "../Audio/Source/AudioSource.h"
-#include "InputStreamAny.h"
+#include "../View/Helper/PeakMeter.h"
 #include "config.h"
 
 class PluginManager;
@@ -24,7 +24,7 @@ class Mutex;
 struct pa_stream;
 #endif
 
-class InputStreamAudio : public InputStreamAny
+class InputStreamAudio : public PeakMeterSource
 {
 	friend class PluginManager;
 public:
@@ -34,15 +34,17 @@ public:
 	void _cdecl __init__(int sample_rate);
 	virtual void _cdecl __delete__();
 
+	static const string MESSAGE_CAPTURE;
+
 	void _startUpdate();
 	void _stopUpdate();
 	void update();
 
-	virtual void _cdecl setDevice(Device *device);
-	virtual Device* _cdecl getDevice();
+	void _cdecl setDevice(Device *device);
+	Device* _cdecl getDevice();
 
-	virtual bool _cdecl start();
-	virtual void _cdecl stop();
+	bool _cdecl start();
+	void _cdecl stop();
 	void _stop(bool bool_mutex);
 
 	int _cdecl getDelay();
@@ -51,13 +53,14 @@ public:
 	int doCapturing();
 
 
-	virtual bool _cdecl isCapturing();
+	bool _cdecl isCapturing();
 
 
 	/*virtual void _cdecl accumulate(bool enable);
 	virtual void _cdecl resetAccumulation();
 	virtual int _cdecl getSampleCount();*/
 
+	virtual float _cdecl getSampleRate(){ return sample_rate; }
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
 	virtual int _cdecl getState();
 
@@ -74,9 +77,6 @@ public:
 	static string backup_filename;
 
 
-	virtual int _cdecl getType(){ return Track::TYPE_AUDIO; }
-
-
 	RingBuffer current_buffer;
 	//AudioBuffer buffer;
 
@@ -89,6 +89,16 @@ public:
 		InputStreamAudio *stream;
 	};
 	Source *source;
+
+	void _cdecl setBackupMode(int mode);
+	int backup_mode;
+
+	void _cdecl setChunkSize(int size);
+	void _cdecl setUpdateDt(float dt);
+	int chunk_size;
+	float update_dt;
+
+	int sample_rate;
 
 private:
 

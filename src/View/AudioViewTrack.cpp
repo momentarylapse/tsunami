@@ -213,7 +213,7 @@ void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 
 
 		// invalid peaks...
-		int nn = b.length / b.PEAK_CHUNK_SIZE;
+		int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
 		for (int i=0; i<nn; i++){
 			if (b.peaks[b.PEAK_MAGIC_LEVEL4][i] == 255){
 				c->setColor(ColorInterpolate(col, Red, 0.3f));

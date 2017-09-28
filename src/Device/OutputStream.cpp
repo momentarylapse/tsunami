@@ -60,7 +60,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 
 void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	printf("request %d\n", (int)nbytes);
+	printf("output request %d\n", (int)nbytes);
 	OutputStream *stream = (OutputStream*)userdata;
 
 	void *data;
@@ -215,6 +215,7 @@ public:
 OutputStream::OutputStream(AudioSource *s) :
 	ring_buf(1048576)
 {
+	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
 	source = s;
 
@@ -253,7 +254,7 @@ OutputStream::OutputStream(AudioSource *s) :
 
 OutputStream::~OutputStream()
 {
-	printf("del stream\n");
+	printf("output del\n");
 	if (hui_runner_id >= 0){
 		hui::CancelRunner(hui_runner_id);
 		hui_runner_id = -1;
@@ -310,7 +311,7 @@ void OutputStream::_create_dev()
 
 void OutputStream::_kill_dev()
 {
-	printf("kill dev\n");
+	printf("output kill dev\n");
 	if (!paused)
 		_pause();
 

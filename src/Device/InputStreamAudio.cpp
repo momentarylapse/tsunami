@@ -42,28 +42,28 @@ extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 
 void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	//printf("read %d\n", (int)nbytes);
+	printf("input request %d\n", (int)nbytes);
 	InputStreamAudio *input = (InputStreamAudio*)userdata;
-	if (!input->isCapturing())
-		return;
 
 	const void *data;
 	pa_stream_peek(p, &data, &nbytes);
 	input->testError("pa_stream_peek");
-	int frames = nbytes / 4 / input->num_channels;
+	int frames = nbytes / sizeof(float) / input->num_channels;
 
 	if (data){
-		float *in = (float*)data;
+		if (input->isCapturing()){
+			float *in = (float*)data;
 
-		RingBuffer &buf = input->current_buffer;
-		AudioBuffer b;
-		buf.writeRef(b, frames);
-		b.deinterleave(in, input->num_channels);
+			RingBuffer &buf = input->current_buffer;
+			AudioBuffer b;
+			buf.writeRef(b, frames);
+			b.deinterleave(in, input->num_channels);
 
-		int done = b.length;
-		if (done < frames){
-			buf.writeRef(b, frames - done);
-			b.deinterleave(&in[2 * done], input->num_channels);
+			int done = b.length;
+			if (done < frames){
+				buf.writeRef(b, frames - done);
+				b.deinterleave(&in[input->num_channels * done], input->num_channels);
+			}
 		}
 
 		pa_stream_drop(p);
@@ -133,6 +133,7 @@ int InputStreamAudio::Source::getSampleRate()
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	current_buffer(1048576)
 {
+	printf("input new\n");
 	sample_rate = _sample_rate;
 	chunk_size = -1;
 	update_dt = -1;
@@ -166,6 +167,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 
 InputStreamAudio::~InputStreamAudio()
 {
+	printf("input del\n");
 	stop();
 	delete control_mutex;
 }
@@ -221,6 +223,7 @@ void InputStreamAudio::setDevice(Device *_device)
 
 void InputStreamAudio::stop()
 {
+	printf("input stop\n");
 	_stop(true);
 }
 
@@ -264,6 +267,7 @@ void InputStreamAudio::_stop(bool use_mutex)
 
 bool InputStreamAudio::start()
 {
+	printf("input start\n");
 	control_mutex->lock();
 	if (capturing)
 		_stop(false);
@@ -323,7 +327,9 @@ bool InputStreamAudio::testError(const string &msg)
 #ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(tsunami->device_manager->context);
 	if (e != 0)
-		tsunami->log->error(msg + " (input): " + pa_strerror(e));
+		hui::RunLater(0.001f, std::bind(&Log::error, tsunami->log, msg + " (input): " + pa_strerror(e)));
+	// make sure errors are handled in the gui thread...
+		//tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);
 #endif
 	return false;

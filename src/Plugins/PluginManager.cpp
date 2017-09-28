@@ -401,7 +401,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::play));
 	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
 	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
-	//Kaba::LinkExternal("OutputStream.isPlaying", Kaba::mf(&OutputStream::isPlaying));
+	Kaba::LinkExternal("OutputStream.isPaused", Kaba::mf(&OutputStream::isPaused));
 	Kaba::LinkExternal("OutputStream.getPos", Kaba::mf(&OutputStream::getPos));
 	Kaba::LinkExternal("OutputStream.getSampleRate", Kaba::mf(&OutputStream::getSampleRate));
 	Kaba::LinkExternal("OutputStream.getVolume", Kaba::mf(&OutputStream::getVolume));

@@ -378,6 +378,7 @@ class OutputStream
 	extern float getVolume()
 	extern void setVolume(float volume)
 	extern void setBufferSize(int size)
+	extern bool isPaused()
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer
@@ -398,19 +399,6 @@ class MidiPort
 	int client, port
 	string client_name, port_name
 
-/*class InputStreamAny
-	int sample_rate
-	extern virtual void __delete__()
-	extern virtual void setBackupMode(int mode)
-	extern virtual bool start()
-	extern virtual void stop()
-	extern virtual bool isCapturing()
-	extern virtual float getSampleRate()
-	extern virtual void getSomeSamples(AudioBuffer buf, int num)
-	extern virtual int getState()
-	extern void subscribe(void* handler, void* func, string message)
-	extern void unsubscribe(void* handler)*/
-
 class InputStreamAudio
 	RingBuffer current_buffer
 	AudioBuffer buffer
@@ -424,7 +412,6 @@ class InputStreamAudio
 	extern virtual void getSomeSamples(AudioBuffer buf, int num)
 	extern virtual int getState()
 	extern void setBackupMode(int mode)
-	extern bool isCapturing()
 	extern void subscribe(void* handler, void* func, string message)
 	extern void unsubscribe(void* handler)
 

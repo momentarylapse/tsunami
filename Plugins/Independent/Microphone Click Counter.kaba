@@ -125,8 +125,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 					print("start")
 					active = true
 					source.click()
-					if !stream.isPlaying()
-						stream.play()
+					stream.play()
 					counter ++
 					print(counter)
 					active_ttl = recover_samples

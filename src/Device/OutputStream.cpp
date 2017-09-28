@@ -9,7 +9,6 @@
 #include "../Stuff/Log.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/threads/Thread.h"
-#include "../lib/threads/Mutex.h"
 #include "DeviceManager.h"
 #include "Device.h"
 #include "OutputStream.h"
@@ -230,8 +229,6 @@ OutputStream::OutputStream(AudioSource *s) :
 	device_manager = tsunami->device_manager;
 	device = device_manager->chooseDevice(Device::TYPE_AUDIO_OUTPUT);
 
-	control_mutex = new Mutex;
-
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	update_dt = DEFAULT_UPDATE_DT;
@@ -272,7 +269,6 @@ OutputStream::~OutputStream()
 		delete(thread);
 		thread = NULL;
 	}
-	delete control_mutex;
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
@@ -336,9 +332,7 @@ void OutputStream::_kill_dev()
 
 void OutputStream::stop()
 {
-	control_mutex->lock();
 	_pause();
-	control_mutex->unlock();
 }
 
 void OutputStream::_pause()
@@ -386,12 +380,10 @@ void OutputStream::pause(bool __pause)
 	if (paused == __pause)
 		return;
 
-	control_mutex->lock();
 	if (__pause)
 		_pause();
 	else
 		_unpause();
-	control_mutex->unlock();
 }
 
 void OutputStream::readStream()
@@ -433,12 +425,10 @@ void OutputStream::setDevice(Device *d)
 
 void OutputStream::play()
 {
-	control_mutex->lock();
 	if (fully_initialized)
 		_unpause();
 	else
 		_start_first_time();
-	control_mutex->unlock();
 }
 
 void OutputStream::_start_first_time()

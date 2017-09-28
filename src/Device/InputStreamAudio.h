@@ -18,7 +18,6 @@
 
 class PluginManager;
 class Device;
-class Mutex;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -45,7 +44,7 @@ public:
 
 	bool _cdecl start();
 	void _cdecl stop();
-	void _stop(bool bool_mutex);
+	void _stop();
 
 	int _cdecl getDelay();
 	void _cdecl resetSync();
@@ -54,11 +53,6 @@ public:
 
 
 	bool _cdecl isCapturing();
-
-
-	/*virtual void _cdecl accumulate(bool enable);
-	virtual void _cdecl resetAccumulation();
-	virtual int _cdecl getSampleCount();*/
 
 	virtual float _cdecl getSampleRate(){ return sample_rate; }
 	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
@@ -77,8 +71,7 @@ public:
 	static string backup_filename;
 
 
-	RingBuffer current_buffer;
-	//AudioBuffer buffer;
+	RingBuffer buffer;
 
 	class Source : public AudioSource
 	{
@@ -107,8 +100,6 @@ private:
 
 	bool running;
 	int hui_runner_id;
-
-	Mutex *control_mutex;
 
 	int num_channels;
 

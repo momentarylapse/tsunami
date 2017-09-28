@@ -6,7 +6,6 @@
  */
 
 #include "../lib/hui/hui.h"
-#include "../lib/threads/Mutex.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Stuff/Log.h"
@@ -54,7 +53,7 @@ void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void 
 		if (input->isCapturing()){
 			float *in = (float*)data;
 
-			RingBuffer &buf = input->current_buffer;
+			RingBuffer &buf = input->buffer;
 			AudioBuffer b;
 			buf.writeRef(b, frames);
 			b.deinterleave(in, input->num_channels);
@@ -121,7 +120,7 @@ int InputStreamAudio::SyncData::getDelay()
 
 int InputStreamAudio::Source::read(AudioBuffer &buf)
 {
-	return stream->current_buffer.read(buf);
+	return stream->buffer.read(buf);
 }
 
 int InputStreamAudio::Source::getSampleRate()
@@ -131,7 +130,7 @@ int InputStreamAudio::Source::getSampleRate()
 
 
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
-	current_buffer(1048576)
+	buffer(1048576)
 {
 	printf("input new\n");
 	sample_rate = _sample_rate;
@@ -148,8 +147,6 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 
 	source = new Source;
 	source->stream = this;
-
-	control_mutex = new Mutex;
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;
@@ -169,7 +166,6 @@ InputStreamAudio::~InputStreamAudio()
 {
 	printf("input del\n");
 	stop();
-	delete control_mutex;
 }
 
 void InputStreamAudio::__init__(int _sample_rate)
@@ -224,15 +220,13 @@ void InputStreamAudio::setDevice(Device *_device)
 void InputStreamAudio::stop()
 {
 	printf("input stop\n");
-	_stop(true);
+	_stop();
 }
 
-void InputStreamAudio::_stop(bool use_mutex)
+void InputStreamAudio::_stop()
 {
 	if (!capturing)
 		return;
-	if (use_mutex)
-		control_mutex->lock();
 	_stopUpdate();
 
 #ifdef DEVICE_PULSEAUDIO
@@ -254,23 +248,20 @@ void InputStreamAudio::_stop(bool use_mutex)
 #endif
 
 	capturing = false;
-	current_buffer.clear();
+	buffer.clear();
 	if (backup_file){
 		delete(backup_file);
 		backup_file = NULL;
 		if (backup_mode != BACKUP_MODE_KEEP)
 			file_delete(cur_backup_filename);
 	}
-	if (use_mutex)
-		control_mutex->unlock();
 }
 
 bool InputStreamAudio::start()
 {
 	printf("input start\n");
-	control_mutex->lock();
 	if (capturing)
-		_stop(false);
+		_stop();
 
 	num_channels = 2;
 
@@ -318,7 +309,6 @@ bool InputStreamAudio::start()
 	_startUpdate();
 
 	resetSync();
-	control_mutex->unlock();
 	return capturing;
 }
 
@@ -351,14 +341,14 @@ int InputStreamAudio::doCapturing()
 	if (!capturing)
 		return 0;
 
-	int avail = current_buffer.available();
+	int avail = buffer.available();
 	sync.add(avail);
 
 	return avail;
 
 	if (backup_file){
 		AudioBuffer b;
-		current_buffer.readRef(b, avail);
+		buffer.readRef(b, avail);
 		// write to file
 		string data;
 		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
@@ -376,7 +366,7 @@ void InputStreamAudio::resetSync()
 
 void InputStreamAudio::getSomeSamples(AudioBuffer &buf, int num_samples)
 {
-	current_buffer.peekRef(buf, -num_samples);
+	buffer.peekRef(buf, -num_samples);
 }
 
 bool InputStreamAudio::isCapturing()

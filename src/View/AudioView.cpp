@@ -666,6 +666,7 @@ void AudioView::onStreamStateChange()
 
 void AudioView::onStreamEndOfStream()
 {
+	stream->stop();
 	// stop... but wait for other handlers of this message before deleting stream
 	hui::RunLater(0.01f,  std::bind(&AudioView::stop, this));
 	//stop();

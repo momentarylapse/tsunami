@@ -7,6 +7,8 @@
 
 #include "../Source/BufferStreamer.h"
 
+static bool CHEAT = true;
+
 BufferStreamer::BufferStreamer(AudioBuffer *b)
 {
 	buf = b;
@@ -25,12 +27,17 @@ void BufferStreamer::__delete__()
 
 int BufferStreamer::read(AudioBuffer& _buf)
 {
-	int n = min(_buf.length, buf->length - offset);
+	int available = buf->length - offset;
+	int n = min(_buf.length, available);
 	if (n <= 0)
 		return END_OF_STREAM;
+	if (!CHEAT){
+		if (n < _buf.length)
+			return NOT_ENOUGH_DATA;
+	}
 	_buf.set(*buf, -offset, 1);
 	offset += n;
-	return n;
+	return _buf.length;
 }
 
 void BufferStreamer::reset()

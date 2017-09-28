@@ -43,6 +43,8 @@ int InputStreamMidi::Output::read(MidiRawData &midi)
 		return midi.samples;
 	}else{
 		int samples = min(midi.samples, events.samples);
+		if (samples < midi.samples)
+			return NOT_ENOUGH_DATA;
 		for (int i=events.num-1; i>=0; i--){
 			if (events[i].pos < samples){
 				//msg_write("add " + format("%.0f  %f", events[i].pitch, events[i].volume));

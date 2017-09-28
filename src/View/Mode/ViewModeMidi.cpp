@@ -31,8 +31,11 @@ public:
 	}
 	virtual int _cdecl read(MidiRawData &midi)
 	{
-		if (mode == MODE_END_OF_STREAM)
+		printf("mps.read\n");
+		if (mode == MODE_END_OF_STREAM){
+			printf("  - end\n");
 			return END_OF_STREAM;
+		}
 
 		if (mode == MODE_START_NOTES){
 			for (int p: pitch)
@@ -131,13 +134,17 @@ void ViewModeMidi::setCreationMode(int _mode)
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
-	kill_preview();
-	preview_synth = (Synthesizer*)view->cur_track->synth->copy();
-	preview_synth->setInstrument(view->cur_track->instrument);
-	preview_synth->out->setSource(preview_source);
-	preview_stream = new OutputStream(preview_synth->out);
-	preview_stream->setBufferSize(2048);
-	preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_END_OF_STREAM);
+	//kill_preview();
+	if (!preview_synth){
+		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
+		preview_synth->setInstrument(view->cur_track->instrument);
+		preview_synth->out->setSource(preview_source);
+	}
+	if (!preview_stream){
+		preview_stream = new OutputStream(preview_synth->out);
+		preview_stream->setBufferSize(2048);
+		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_END_OF_STREAM);
+	}
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
 	preview_stream->play();
@@ -145,8 +152,9 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 
 void ViewModeMidi::onEndOfStream()
 {
-	//msg_write("end of stream...");
-	hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
+	msg_write("view: end of stream");
+	preview_stream->stop();
+	//hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
 }
 
 void ViewModeMidi::kill_preview()

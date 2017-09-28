@@ -335,12 +335,13 @@ void SampleManagerConsole::onPreview()
 
 void SampleManagerConsole::endPreview()
 {
-	if (!progress)
-		return;
+	if (progress){
+		progress->unsubscribe(this);
+		delete(progress);
+		progress = NULL;
+	}
 	preview_stream->unsubscribe(this);
-	progress->unsubscribe(this);
-	delete(progress);
-	progress = NULL;
+	preview_stream->stop();
 	delete(preview_stream);
 	delete(preview_renderer);
 	preview_sample = NULL;

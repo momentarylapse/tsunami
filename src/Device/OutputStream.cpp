@@ -74,6 +74,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 	int available = stream->ring_buf.available();
 	//printf("%d\n", available);
 	if (stream->paused or (available < frames)){
+		printf("  x\n");
 		if (!stream->paused and !stream->read_end_of_stream)
 			printf("< underflow\n");
 		// output silence...
@@ -82,6 +83,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 			*out ++ = 0;
 		}
 	}else{
+		printf("  j\n");
 		for (int n=0; (n<2) and (done < frames); n++){
 			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
@@ -363,6 +365,9 @@ void OutputStream::_unpause()
 		return;
 	printf("unpause...");
 
+	read_end_of_stream = false;
+	played_end_of_stream = false;
+	reading = false;
 	paused = false;
 
 #ifdef DEVICE_PULSEAUDIO
@@ -399,8 +404,14 @@ void OutputStream::readStream()
 	// read data
 	size = source->read(b);
 
+	if (size == source->NOT_ENOUGH_DATA){
+		printf(" -> no data\n");
+		return;
+	}
+
 	// out of data?
 	if (size == source->END_OF_STREAM){
+		printf(" -> end\n");
 		read_end_of_stream = true;
 		reading = false;
 		return;
@@ -409,6 +420,7 @@ void OutputStream::readStream()
 	// add to queue
 	b.length = size;
 	ring_buf.write(b);
+	printf(" -> %d of %d\n", size, buffer_size);
 
 	reading = false;
 }
@@ -566,6 +578,6 @@ void OutputStream::update()
 void OutputStream::onPlayedEndOfStream()
 {
 	//printf("stream end\n");
-	pause(true);
+	//pause(true);
 	notify(MESSAGE_END_OF_STREAM);
 }

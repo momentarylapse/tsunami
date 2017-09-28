@@ -38,7 +38,7 @@ public:
 				PerformanceMonitor::end_busy(perf_channel);
 				if (r == AudioSource::END_OF_STREAM)
 					break;
-				if (r == 0){
+				if (r == AudioSource::NOT_ENOUGH_DATA){
 					hui::Sleep(sucker->no_data_wait);
 					continue;
 				}
@@ -106,14 +106,14 @@ int AudioSucker::update()
 	AudioBuffer temp;
 	temp.resize(buffer_size);
 	int r = source->read(temp);
+	if (r == source->NOT_ENOUGH_DATA)
+		return r;
 	if (r == source->END_OF_STREAM)
 		return r;
-	if (r > 0){
-		if (accumulating){
-			temp.resize(r);
-			buf.append(temp);
-		}
-		notify(MESSAGE_UPDATE);
+	if (accumulating){
+		temp.resize(r);
+		buf.append(temp);
 	}
+	notify(MESSAGE_UPDATE);
 	return r;
 }

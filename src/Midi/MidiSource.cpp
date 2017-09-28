@@ -9,6 +9,7 @@
 #include "../lib/file/msg.h"
 
 
+const int MidiSource::NOT_ENOUGH_DATA = 0;
 const int MidiSource::END_OF_STREAM = -2;
 
 MidiSource::MidiSource()
@@ -40,6 +41,8 @@ int MidiDataStreamer::read(MidiRawData& _midi)
 	int n = min(midi.samples - offset, _midi.samples);
 	if (n <= 0)
 		return END_OF_STREAM;
+	if (n < _midi.samples)
+		return NOT_ENOUGH_DATA;
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
 	for (MidiEvent &e : midi)

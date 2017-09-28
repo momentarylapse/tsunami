@@ -120,6 +120,8 @@ int InputStreamAudio::SyncData::getDelay()
 
 int InputStreamAudio::Source::read(AudioBuffer &buf)
 {
+	if (stream->buffer.available() < buf.length)
+		return NOT_ENOUGH_DATA;
 	return stream->buffer.read(buf);
 }
 

@@ -7,6 +7,7 @@
 
 #include "../Source/AudioSource.h"
 
+const int AudioSource::NOT_ENOUGH_DATA = 0;
 const int AudioSource::END_OF_STREAM = -1;
 
 AudioSource::AudioSource()

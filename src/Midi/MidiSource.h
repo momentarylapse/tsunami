@@ -22,6 +22,7 @@ public:
 	virtual int _cdecl read(MidiRawData &midi){ return 0; };
 
 	static const int END_OF_STREAM;
+	static const int NOT_ENOUGH_DATA;
 };
 
 class MidiDataStreamer : public MidiSource

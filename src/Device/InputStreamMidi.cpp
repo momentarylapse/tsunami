@@ -67,8 +67,6 @@ void InputStreamMidi::Output::feed(const MidiRawData &midi)
 InputStreamMidi::InputStreamMidi(int _sample_rate)
 {
 	sample_rate = _sample_rate;
-	chunk_size = -1;
-	update_dt = -1;
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
@@ -120,9 +118,9 @@ bool InputStreamMidi::unconnect()
 
 void InputStreamMidi::setDevice(Device *d)
 {
-	device = d;
-
 	unconnect();
+
+	device = d;
 
 	if ((device->client < 0) or (device->port < 0))
 		return;// true;

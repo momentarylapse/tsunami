@@ -35,11 +35,11 @@ void pa_wait_op(pa_operation *op)
 		tsunami->log->error("pa_wait_op:  op=nil");
 		return;
 	}
-	printf("-w-");
+//	printf("-w-");
 	int n = 0;
 	//msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) != PA_OPERATION_DONE){
-		printf(".");
+//		printf(".");
 		// PA_OPERATION_RUNNING
 		//pa_mainloop_iterate(m, 1, NULL);
 		if (pa_operation_get_state(op) == PA_OPERATION_CANCELLED)
@@ -53,7 +53,7 @@ void pa_wait_op(pa_operation *op)
 		tsunami->log->error("pa_wait_op: failed");
 	pa_operation_unref(op);
 	//msg_write(" ok");
-	printf("-o-");
+//	printf("-o-");
 }
 
 void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)

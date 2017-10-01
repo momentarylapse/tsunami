@@ -41,7 +41,7 @@ extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 
 void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	printf("input request %d\n", (int)nbytes);
+//	printf("input request %d\n", (int)nbytes);
 	InputStreamAudio *input = (InputStreamAudio*)userdata;
 
 	const void *data;
@@ -134,7 +134,7 @@ int InputStreamAudio::Source::getSampleRate()
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	buffer(1048576)
 {
-	printf("input new\n");
+//	printf("input new\n");
 	sample_rate = _sample_rate;
 	chunk_size = -1;
 	update_dt = -1;
@@ -166,7 +166,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 
 InputStreamAudio::~InputStreamAudio()
 {
-	printf("input del\n");
+//	printf("input del\n");
 	stop();
 }
 
@@ -221,7 +221,7 @@ void InputStreamAudio::setDevice(Device *_device)
 
 void InputStreamAudio::stop()
 {
-	printf("input stop\n");
+//	printf("input stop\n");
 	_stop();
 }
 
@@ -232,18 +232,18 @@ void InputStreamAudio::_stop()
 	_stopUpdate();
 
 #ifdef DEVICE_PULSEAUDIO
-	printf("disconnect\n");
+//	printf("disconnect\n");
 	pa_stream_disconnect(_stream);
 	testError("disconnect");
 
 	for (int i=0; i<1000; i++){
 		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED){
-			printf("terminated\n");
+//			printf("terminated\n");
 			break;
 		}
 		hui::Sleep(0.001f);
 	}
-	printf("unref\n");
+//	printf("unref\n");
 
 	pa_stream_unref(_stream);
 	testError("unref");
@@ -261,7 +261,7 @@ void InputStreamAudio::_stop()
 
 bool InputStreamAudio::start()
 {
-	printf("input start\n");
+//	printf("input start\n");
 	if (capturing)
 		_stop();
 

@@ -31,9 +31,9 @@ public:
 	}
 	virtual int _cdecl read(MidiRawData &midi)
 	{
-		printf("mps.read\n");
+		//printf("mps.read\n");
 		if (mode == MODE_END_OF_STREAM){
-			printf("  - end\n");
+			//printf("  - end\n");
 			return END_OF_STREAM;
 		}
 
@@ -152,7 +152,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 
 void ViewModeMidi::onEndOfStream()
 {
-	msg_write("view: end of stream");
+	//msg_write("view: end of stream");
 	preview_stream->stop();
 	//hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
 }

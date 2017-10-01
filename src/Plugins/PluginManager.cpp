@@ -418,8 +418,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AudioView.subscribe", Kaba::mf(&AudioView::subscribe_kaba));
 	Kaba::LinkExternal("AudioView.unsubscribe", Kaba::mf(&AudioView::unsubscribe));
 
-	msg_write(p2s(Kaba::mf(&AudioView::subscribe_kaba)));
-
 	Kaba::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
 	Kaba::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));
 	Kaba::DeclareClassOffset("ColorScheme", "background_track", _offsetof(ColorScheme, background_track));

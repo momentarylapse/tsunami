@@ -39,14 +39,14 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 {
 	if (!source)
 		return 0;
-	printf("synth read %d\n", buf.length);
+//	printf("synth read %d\n", buf.length);
 	synth->source_run_out = false;
 	// get from source...
 	synth->events.samples = buf.length;
 	int n = source->read(synth->events);
-	printf("sr  %d", n);
+//	printf("sr  %d", n);
 	if (n == source->NOT_ENOUGH_DATA){
-		printf(" no data\n");
+//		printf(" no data\n");
 		return NOT_ENOUGH_DATA;
 	}
 	if (n == source->END_OF_STREAM){
@@ -59,11 +59,11 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 
 	//printf("  %d  %d\n", synth->active_pitch.num, n);
 	if (synth->hasRunOutOfData()){
-		printf(" eos\n");
+//		printf(" eos\n");
 		return END_OF_STREAM;
 	}
 
-	printf("...%d  %d  ok\n", n, buf.length);
+//	printf("...%d  %d  ok\n", n, buf.length);
 	buf.scale(0);
 	synth->render(buf);
 

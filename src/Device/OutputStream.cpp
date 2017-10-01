@@ -59,7 +59,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 
 void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	printf("output request %d\n", (int)nbytes);
+//	printf("output request %d\n", (int)nbytes);
 	OutputStream *stream = (OutputStream*)userdata;
 
 	void *data;
@@ -74,7 +74,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 	int available = stream->ring_buf.available();
 	//printf("%d\n", available);
 	if (stream->paused or (available < frames)){
-		printf("  x\n");
+//		printf("  x\n");
 		if (!stream->paused and !stream->read_end_of_stream)
 			printf("< underflow\n");
 		// output silence...
@@ -83,7 +83,7 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 			*out ++ = 0;
 		}
 	}else{
-		printf("  j\n");
+//		printf("  j\n");
 		for (int n=0; (n<2) and (done < frames); n++){
 			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
@@ -102,12 +102,12 @@ void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *us
 
 	// read more?
 	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
-		printf("+\n");
+//		printf("+\n");
 		stream->read_more = true;
 	}
 
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
-		printf("end of data...\n");
+//		printf("end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
@@ -216,7 +216,7 @@ public:
 OutputStream::OutputStream(AudioSource *s) :
 	ring_buf(1048576)
 {
-	printf("output new\n");
+//	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
 	source = s;
 
@@ -253,7 +253,7 @@ OutputStream::OutputStream(AudioSource *s) :
 
 OutputStream::~OutputStream()
 {
-	printf("output del\n");
+//	printf("output del\n");
 	if (hui_runner_id >= 0){
 		hui::CancelRunner(hui_runner_id);
 		hui_runner_id = -1;
@@ -309,7 +309,7 @@ void OutputStream::_create_dev()
 
 void OutputStream::_kill_dev()
 {
-	printf("output kill dev\n");
+//	printf("output kill dev\n");
 	if (!paused)
 		_pause();
 
@@ -343,7 +343,7 @@ void OutputStream::_pause()
 		return;
 	if (isPaused())
 		return;
-	printf("pause...");
+//	printf("pause...");
 
 	paused = true;
 
@@ -352,7 +352,7 @@ void OutputStream::_pause()
 	testError("pa_stream_cork");
 	pa_wait_op(op);
 #endif
-	printf("ok\n");
+//	printf("ok\n");
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -363,7 +363,7 @@ void OutputStream::_unpause()
 		return;
 	if (!isPaused())
 		return;
-	printf("unpause...");
+//	printf("unpause...");
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
@@ -375,7 +375,7 @@ void OutputStream::_unpause()
 	testError("pa_stream_cork");
 	pa_wait_op(op);
 #endif
-	printf("ok\n");
+//	printf("ok\n");
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -393,7 +393,7 @@ void OutputStream::pause(bool __pause)
 
 void OutputStream::readStream()
 {
-	printf("read stream\n");
+//	printf("read stream\n");
 	reading = true;
 	read_more = false;
 
@@ -405,13 +405,13 @@ void OutputStream::readStream()
 	size = source->read(b);
 
 	if (size == source->NOT_ENOUGH_DATA){
-		printf(" -> no data\n");
+//		printf(" -> no data\n");
 		return;
 	}
 
 	// out of data?
 	if (size == source->END_OF_STREAM){
-		printf(" -> end\n");
+//		printf(" -> end\n");
 		read_end_of_stream = true;
 		reading = false;
 		return;
@@ -420,7 +420,7 @@ void OutputStream::readStream()
 	// add to queue
 	b.length = size;
 	ring_buf.write(b);
-	printf(" -> %d of %d\n", size, buffer_size);
+//	printf(" -> %d of %d\n", size, buffer_size);
 
 	reading = false;
 }
@@ -445,7 +445,7 @@ void OutputStream::play()
 
 void OutputStream::_start_first_time()
 {
-	printf("stream start first\n");
+//	printf("stream start first\n");
 	read_end_of_stream = false;
 	played_end_of_stream = false;
 	reading = false;

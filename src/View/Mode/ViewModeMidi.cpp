@@ -143,7 +143,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 	if (!preview_stream){
 		preview_stream = new OutputStream(preview_synth->out);
 		preview_stream->setBufferSize(2048);
-		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_END_OF_STREAM);
+		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
 
 	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);

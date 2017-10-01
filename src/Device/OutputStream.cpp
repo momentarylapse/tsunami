@@ -32,7 +32,8 @@ const float DEFAULT_UPDATE_DT = 0.050f;
 
 const string OutputStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string OutputStream::MESSAGE_UPDATE = "Update";
-const string OutputStream::MESSAGE_END_OF_STREAM = "EndOfStream";
+const string OutputStream::MESSAGE_READ_END_OF_STREAM = "ReadEndOfStream";
+const string OutputStream::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
 
 
 #ifdef DEVICE_PULSEAUDIO
@@ -414,6 +415,7 @@ void OutputStream::readStream()
 //		printf(" -> end\n");
 		read_end_of_stream = true;
 		reading = false;
+		hui::RunLater(0.001f,  std::bind(&OutputStream::onReadEndOfStream, this));
 		return;
 	}
 
@@ -554,7 +556,7 @@ bool OutputStream::testError(const string &msg)
 #ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(device_manager->context);
 	if (e != 0){
-		msg_error(msg + ": " + pa_strerror(e));
+		msg_error("OutputStream: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
 #endif
@@ -579,5 +581,19 @@ void OutputStream::onPlayedEndOfStream()
 {
 	//printf("stream end\n");
 	//pause(true);
-	notify(MESSAGE_END_OF_STREAM);
+	notify(MESSAGE_PLAY_END_OF_STREAM);
+}
+
+void OutputStream::onReadEndOfStream()
+{
+	read_end_of_stream = true;
+	reading = false;
+/*#ifdef DEVICE_PULSEAUDIO
+	pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
+	testError("pa_stream_drain");
+	pa_wait_op(op);
+#endif*/
+	// should drain...and use pa_stream_set_state_callback for notification
+
+	notify(MESSAGE_READ_END_OF_STREAM);
 }

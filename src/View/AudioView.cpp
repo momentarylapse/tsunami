@@ -1117,7 +1117,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 	stream = new OutputStream(renderer);
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
-	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_END_OF_STREAM);
+	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
 	notify(MESSAGE_OUTPUT_CHANGE);
 	stream->play();
 	forceRedraw();

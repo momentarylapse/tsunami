@@ -150,7 +150,7 @@ class AudioSource
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(AudioBuffer buf)
-	extern virtual void reset()
+	//extern virtual void reset()
 	extern virtual int getSampleRate()
 
 class MidiSource
@@ -160,7 +160,7 @@ class MidiSource
 
 class SynthOutput extends AudioSource
 	extern override int read(AudioBuffer buf)
-	extern override void reset()
+	//extern override void reset()
 	extern override int getSampleRate()
 	extern void setSource(MidiSource* source)
 
@@ -359,7 +359,6 @@ class SongRenderer
 	extern void render(Range r, AudioBuffer buf)
 	extern void prepare(Range r, bool allow_loop)
 	extern virtual int read(AudioBuffer b)
-	extern virtual void reset()
 	extern Range range()
 	extern int getPos()
 	extern int seek()

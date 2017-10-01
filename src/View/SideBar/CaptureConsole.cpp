@@ -148,7 +148,7 @@ void CaptureConsole::onStart()
 		view->play(view->getPlaybackSelection(true), false);
 	}
 	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputUpdate, this), view->stream->MESSAGE_UPDATE);
-	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_END_OF_STREAM);
+	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mode->start();
 	enable("capture_start", false);

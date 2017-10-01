@@ -327,7 +327,7 @@ void drawCursorHover(ViewMode *m, Painter *c, const string &msg)
 void ViewModeDefault::drawPost(Painter *c)
 {
 	if (moving_track){
-		int orig = get_track_index(moving_track);
+		//int orig = get_track_index(moving_track);
 		int t = getTrackMoveTarget(true);
 		int y = view->vtrack.back()->area.y2;
 		if (t < view->vtrack.num)

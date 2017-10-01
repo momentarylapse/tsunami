@@ -19,11 +19,11 @@ Synthesizer::Output::Output(Synthesizer *s)
 	source = NULL;
 }
 
-void Synthesizer::Output::reset()
+/*void Synthesizer::Output::reset()
 {
 	synth->reset();
 	//source->reset();
-}
+}*/
 
 void Synthesizer::Output::setSource(MidiSource *_source)
 {

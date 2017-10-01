@@ -50,7 +50,8 @@ public:
 
 
 	static const string MESSAGE_STATE_CHANGE;
-	static const string MESSAGE_END_OF_STREAM;
+	static const string MESSAGE_READ_END_OF_STREAM;
+	static const string MESSAGE_PLAY_END_OF_STREAM;
 	static const string MESSAGE_UPDATE;
 
 
@@ -135,6 +136,7 @@ private:
 #endif
 
 	void onPlayedEndOfStream();
+	void onReadEndOfStream();
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

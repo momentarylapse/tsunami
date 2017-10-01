@@ -57,6 +57,7 @@ public:
 	MidiDataRef getNotes(const Range &r) const;
 	MidiDataRef getNotesBySelection(const SongSelection &s) const;
 	MidiData duplicate() const;
+	void append(const MidiData &midi, int offset);
 
 	Range range(int elongation) const;
 	int samples;

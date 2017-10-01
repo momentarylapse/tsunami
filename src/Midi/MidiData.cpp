@@ -354,6 +354,17 @@ MidiData MidiData::duplicate() const
 	return b;
 }
 
+void MidiData::append(const MidiData &midi, int offset)
+{
+	for (MidiNote *n: midi){
+		MidiNote *nn = n->copy();
+		nn->range.offset += offset;
+		add(nn);
+	}
+	samples = max(samples, midi.samples + offset);
+	sort();
+}
+
 void MidiData::operator=(const MidiData &midi)
 {
 	deep_clear();

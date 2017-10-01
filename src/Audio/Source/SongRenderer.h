@@ -23,7 +23,6 @@ public:
 
 	// from AudioSource
 	virtual int _cdecl read(AudioBuffer &buf);
-	virtual void _cdecl reset();
 	virtual int _cdecl getSampleRate();
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
@@ -39,6 +38,7 @@ public:
 	int _cdecl getNumSamples();
 
 private:
+	void _cdecl reset();
 	void read_basic(AudioBuffer &buf, int pos, int size);
 	void bb_render_audio_track_no_fx(AudioBuffer &buf, Track *t);
 	void bb_render_time_track_no_fx(AudioBuffer &buf, Track *t);

@@ -134,7 +134,7 @@ public:
 	virtual void _cdecl onCloseRequest();
 	virtual void _cdecl onKeyDown(){}
 	virtual void _cdecl onKeyUp(){}
-	virtual void _cdecl onDraw(Painter *p){}
+	virtual void _cdecl onDraw(::Painter *p){}
 
 	// input
 	bool _cdecl getKey(int key);

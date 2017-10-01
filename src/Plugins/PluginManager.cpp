@@ -231,7 +231,7 @@ void PluginManager::LinkAppScriptData()
 	Synthesizer::Output synth_out(NULL);
 	Kaba::DeclareClassSize("SynthOutput", sizeof(Synthesizer::Output));
 	Kaba::DeclareClassVirtualIndex("SynthOutput", "read", Kaba::mf(&Synthesizer::Output::read), &synth_out);
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
+	//Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
 	Kaba::DeclareClassVirtualIndex("SynthOutput", "getSampleRate", Kaba::mf(&Synthesizer::Output::getSampleRate), &synth_out);
 	Kaba::LinkExternal("SynthOutput.setSource", Kaba::mf(&Synthesizer::Output::setSource));
 
@@ -355,7 +355,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &ar);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &ar);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "getSampleRate", Kaba::mf(&AudioSource::getSampleRate), &ar);
 
 	SongRenderer sr(&af);
@@ -365,7 +364,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("SongRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongRenderer::__init__));
 	Kaba::DeclareClassVirtualIndex("SongRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongRenderer::__delete__), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "read", Kaba::mf(&SongRenderer::read), &sr);
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
 	Kaba::LinkExternal("SongRenderer.getPos", Kaba::mf(&SongRenderer::getPos));
 	Kaba::LinkExternal("SongRenderer.seek", Kaba::mf(&SongRenderer::seek));

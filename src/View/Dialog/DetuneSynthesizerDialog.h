@@ -26,16 +26,20 @@ public:
 	virtual void _cdecl onMouseMove();
 	virtual void _cdecl onMouseWheel();
 
-	void onClose();
-	float pitch2x(float p);
 
-	float freq2y(float f);
-	float y2freq(float y);
+	void onClose();
+	void onRelative();
+
+	float pitch2x(float p);
+	float pitch2y(float p);
+	float relpitch2y(float p, float p0);
 
 	Synthesizer *synth;
 	Track *track;
 	AudioView *view;
 	float width, height;
+
+	bool mode_relative;
 
 	int hover;
 };

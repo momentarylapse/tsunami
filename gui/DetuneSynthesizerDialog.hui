@@ -1,6 +1,7 @@
 Dialog detune_synthesizer_dialog "Verstimmung" 400 400
 	Grid ? "" 1 2
 		DrawingArea detune_area "" expandx expandy
-		Grid ? "" 2 1 buttonbar
+		Grid ? "" 3 1 buttonbar
+			CheckBox relative "relative"
 			CheckBox all_octaves "all octaves"
 			Button /close "Close" image=hui:close

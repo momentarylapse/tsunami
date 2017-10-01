@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-405
+406
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -233,6 +233,9 @@ alle Oktaven
 
 detune_synthesizer_dialog/detune_synthesizer_dialog
 Verstimmung
+
+detune_synthesizer_dialog/relative
+relativ
 
 device-manager/dev-tab
 Output\\Input\\Midi Input

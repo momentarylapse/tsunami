@@ -867,7 +867,8 @@ void AudioViewTrack::drawHeader(Painter *c)
 		c->setColor(view->colors.text);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_MUTE))
 			c->setColor(col_but_hover);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
+		c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
+		//c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
 		if (track->muted)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
@@ -881,7 +882,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 		c->setColor(view->colors.text);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_EDIT))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 39, area.y1 + 22-2, "🔧"); // "\u1F527");
+		c->drawStr(area.x1 + 39, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
 	}
 }
 

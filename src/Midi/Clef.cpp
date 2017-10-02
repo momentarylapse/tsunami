@@ -9,11 +9,11 @@
 #include "Scale.h"
 #include "MidiData.h"
 
-const Clef Clef::TREBLE(Clef::TYPE_TREBLE, "𝄞", 5*7-5); // \uD834\uDD1E   "\u1d11e";
-const Clef Clef::TREBLE_8(Clef::TYPE_TREBLE_8, "𝄠", 4*7-5); // \uD834\uDD20   "\u1d120";
-const Clef Clef::BASS(Clef::TYPE_BASS, "𝄢", 3*7-3); // \uD834\uDD22    "\u1d122";
-const Clef Clef::BASS_8(Clef::TYPE_BASS_8, "𝄤", 2*7-3); // \uD834\uDD24   "\u1d124";
-const Clef Clef::DRUMS(Clef::TYPE_DRUMS, "𝄥", 0);
+const Clef Clef::TREBLE(Clef::TYPE_TREBLE, "\U0001d11e", 5*7-5); // U+1d11e "𝄞"
+const Clef Clef::TREBLE_8(Clef::TYPE_TREBLE_8, "\U0001d120", 4*7-5); // U+1d120 "𝄠"
+const Clef Clef::BASS(Clef::TYPE_BASS, "\U0001d122", 3*7-3); // U+1d122 "𝄢"
+const Clef Clef::BASS_8(Clef::TYPE_BASS_8, "\U0001d124", 2*7-3); // U+1d124 "𝄤"
+const Clef Clef::DRUMS(Clef::TYPE_DRUMS, "\U0001d125", 0); // U+1d125 "𝄥"
 
 struct DrumClefPosition
 {

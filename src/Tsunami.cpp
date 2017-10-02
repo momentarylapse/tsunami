@@ -18,7 +18,8 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.6.102.0 alpha!";
+const string AppVersion = "0.7.0.0";
+const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
 
@@ -36,7 +37,7 @@ Tsunami::Tsunami() :
 	storage = NULL;
 
 	setProperty("name", AppName);
-	setProperty("version", AppVersion);
+	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
 	setProperty("comment", _("Editor for audio files"));
 	setProperty("website", "http://michi.is-a-geek.org/software");
 	setProperty("copyright", "© 2007-2017 by Michael Ankele");
@@ -78,7 +79,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	// ok, full window mode
 
-	log->info(AppName + " " + AppVersion);
+	log->info(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 	log->info(_("  ...don't worry. Everything will be fine!"));
 
 

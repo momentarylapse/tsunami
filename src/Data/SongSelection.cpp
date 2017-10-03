@@ -17,6 +17,11 @@ void SongSelection::clear()
 	bars.clear();
 	bar_range.clear();
 	tracks.clear();
+	clear_data();
+}
+
+void SongSelection::clear_data()
+{
 	samples.clear();
 	markers.clear();
 	notes.clear();

@@ -516,16 +516,32 @@ void ViewModeDefault::selectUnderMouse()
 			view->unselectAllSamples();*/
 	}
 	if (hover->type == Selection::TYPE_MARKER){
-		if (control)
-			view->sel.set(t->markers[hover->index], !view->sel.has(t->markers[hover->index]));
-		else
-			view->sel.add(t->markers[hover->index]);
+		auto m = t->markers[hover->index];
+		if (control){
+			view->sel.set(m, !view->sel.has(m));
+		}else{
+			if (view->sel.has(m)){
+			}else{
+				view->selectTrack(t, false);
+				view->sel.clear_data();
+				view->sel.add(m);
+			}
+		}
 	}
 
-	// sub
+	// sample
 	view->setCurSample(s);
 	if (hover->type == Selection::TYPE_SAMPLE){
-		view->selectSample(s, control);
+		if (control){
+			view->sel.set(s, !view->sel.has(s));
+		}else{
+			if (view->sel.has(s)){
+			}else{
+				view->selectTrack(t, false);
+				view->sel.clear_data();
+				view->sel.add(s);
+			}
+		}
 	}
 }
 

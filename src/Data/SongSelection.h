@@ -24,6 +24,7 @@ public:
 	SongSelection();
 
 	void clear();
+	void clear_data();
 	void all(Song *s);
 	void all_tracks(Song *s);
 	void update_bars(Song *s);

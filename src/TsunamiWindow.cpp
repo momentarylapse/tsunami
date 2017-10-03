@@ -331,7 +331,10 @@ void TsunamiWindow::onTrackEditFX()
 void TsunamiWindow::onTrackAddMarker()
 {
 	if (view->hover.track){
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, view->sel.range, -1);
+		Range range = view->sel.range;
+		if (!range.is_inside(view->hover.pos))
+			range = Range(view->hover.pos, 0);
+		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, -1);
 		dlg->run();
 		delete(dlg);
 	}else{

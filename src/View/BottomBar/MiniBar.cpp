@@ -35,6 +35,7 @@ MiniBar::~MiniBar()
 {
 	if (view->stream)
 		view->stream->unsubscribe(this);
+	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
 }

@@ -384,7 +384,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 
 	color col = view->colors.text;
 	color col_bg = view->colors.background_track;
-	color col2 = getPitchColor(((long)marker / 64) % MAX_PITCH);
+	color col2 = getPitchColor(marker->text.hash() % MAX_PITCH);
 	if (sel){
 		col = view->colors.selection;
 		col_bg = ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);

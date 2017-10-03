@@ -26,20 +26,8 @@ void ActionSongDeleteSelection::build(Data *d)
 	msg_write("del sel.build");
 	Song *s = dynamic_cast<Song*>(d);
 	for (Track *t: s->tracks){
-		if (!sel.has(t))
-			continue;
 
-		// buffer boxes
-		if (all_layers){
-			foreachi(TrackLayer &l, t->layers, li)
-				DeleteBuffersFromTrackLayer(s, t, l, sel, li);
-		}else{
-			DeleteBuffersFromTrackLayer(s, t, t->layers[layer_no], sel, layer_no);
-		}
-
-
-
-		// subs
+		// samples
 		for (int i=t->samples.num-1; i>=0; i--)
 			if (sel.has(t->samples[i]))
 				addSubAction(new ActionTrackDeleteSample(t->samples[i]), d);
@@ -53,6 +41,18 @@ void ActionSongDeleteSelection::build(Data *d)
 		for (int i=t->markers.num-1; i>=0; i--)
 			if (sel.has(t->markers[i]))
 				addSubAction(new ActionTrackDeleteMarker(t, i), d);
+
+
+		if (!sel.has(t))
+			continue;
+
+		// buffer boxes
+		if (all_layers){
+			foreachi(TrackLayer &l, t->layers, li)
+				DeleteBuffersFromTrackLayer(s, t, l, sel, li);
+		}else{
+			DeleteBuffersFromTrackLayer(s, t, t->layers[layer_no], sel, layer_no);
+		}
 	}
 }
 

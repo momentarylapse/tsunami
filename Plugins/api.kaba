@@ -205,8 +205,9 @@ class TrackRenderBuffer
 	int dummy
 
 class TrackMarker
-	int pos
+	Range range
 	string text
+	AudioEffect*[] fx
 	
 class BarPattern
 	int num_beats
@@ -253,8 +254,8 @@ class Track
 	float volume, panning
 	bool muted
 	
-	AudioEffect[] *fx
-	SampleRef[] *samples
+	AudioEffect*[] fx
+	SampleRef*[] samples
 	
 	// midi track
 	MidiData midi
@@ -287,7 +288,7 @@ class Track
 	//extern void addMidiNotes(MidiData midi)
 	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
-	extern void addMarker(int pos, string text)
+	extern TrackMarker* addMarker(Range range, string text)
 	extern void deleteMarker(int index)
 	extern void moveMarker(int index, int pos)
 

@@ -44,8 +44,8 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 
 		// marker
 		for (TrackMarker *m: t->markers)
-			if (m->pos >= offset)
-				m->pos += delta;
+			if (m->range.offset >= offset)
+				m->range.offset += delta;
 
 		// buffer
 		for (TrackLayer &l: t->layers)

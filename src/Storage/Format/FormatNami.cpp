@@ -926,15 +926,21 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->pos = f->ReadInt();
+		me->range.offset = f->ReadInt();
 		me->text = f->ReadStr();
-		f->ReadInt(); // reserved
+		int version = f->ReadInt();
+		if (version > 0){
+			me->range.length = f->ReadInt();
+			int nfx = f->ReadInt();
+		}
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->pos);
+		f->WriteInt(me->range.offset);
 		f->WriteStr(me->text);
-		f->WriteInt(0);
+		f->WriteInt(1);
+		f->WriteInt(me->range.length);
+		f->WriteInt(0);//me->fx.num);
 	}
 };
 

@@ -34,6 +34,7 @@
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Action/Track/Marker/ActionTrackAddMarker.h"
 #include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
+#include "../Action/Track/Marker/ActionTrackEditMarker.h"
 #include "../Action/Track/Marker/ActionTrackMoveMarker.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
@@ -336,9 +337,9 @@ void Track::detuneSynthesizer(int pitch, float dpitch, bool all_octaves)
 	song->execute(new ActionTrackDetuneSynthesizer(this, pitch, dpitch, all_octaves));
 }
 
-void Track::addMarker(int pos, const string &text)
+TrackMarker *Track::addMarker(const Range &range, const string &text)
 {
-	song->execute(new ActionTrackAddMarker(this, pos, text));
+	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, range, text));
 }
 
 void Track::deleteMarker(int index)
@@ -349,6 +350,11 @@ void Track::deleteMarker(int index)
 void Track::moveMarker(int index, int pos)
 {
 	song->execute(new ActionTrackMoveMarker(this, index, pos));
+}
+
+void Track::editMarker(int index, const string &text)
+{
+	song->execute(new ActionTrackEditMarker(this, index, text));
 }
 
 

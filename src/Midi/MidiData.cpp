@@ -522,7 +522,7 @@ void MidiData::update_meta(Track *t, const Scale& scale) const
 	Set<HandPosition> hands;
 	for (TrackMarker *m: t->markers)
 		if (m->text.match(":pos *:"))
-			hands.add(HandPosition(m->pos, m->text.substr(4, -2)._int()));
+			hands.add(HandPosition(m->range.offset, m->text.substr(4, -2)._int()));
 
 
 	int hand_position = 0;

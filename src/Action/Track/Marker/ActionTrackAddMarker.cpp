@@ -8,11 +8,11 @@
 #include "ActionTrackAddMarker.h"
 #include "../../../Data/Track.h"
 
-ActionTrackAddMarker::ActionTrackAddMarker(Track *t, int pos, const string &text)
+ActionTrackAddMarker::ActionTrackAddMarker(Track *t, const Range &range, const string &text)
 {
 	track_no = get_track_index(t);
 	marker = new TrackMarker;
-	marker->pos = pos;
+	marker->range = range;
 	marker->text = text;
 }
 
@@ -23,7 +23,7 @@ void *ActionTrackAddMarker::execute(Data *d)
 	Track *t = a->get_track(track_no);
 	t->markers.add(marker);
 
-	return NULL;
+	return marker;
 }
 
 void ActionTrackAddMarker::undo(Data *d)

@@ -48,6 +48,7 @@ OBJ = \
  Action/Track/Effect/ActionTrackToggleEffectEnabled.o\
  Action/Track/Marker/ActionTrackAddMarker.o\
  Action/Track/Marker/ActionTrackDeleteMarker.o\
+ Action/Track/Marker/ActionTrackEditMarker.o\
  Action/Track/Marker/ActionTrackMoveMarker.o\
  Action/Track/Midi/ActionTrackAddMidiEffect.o\
  Action/Track/Midi/ActionTrackDeleteMidiEffect.o\
@@ -448,6 +449,9 @@ Action/Track/Marker/ActionTrackDeleteMarker.o : Action/Track/Marker/ActionTrackD
 
 Action/Track/Marker/ActionTrackMoveMarker.o : Action/Track/Marker/ActionTrackMoveMarker.cpp
 	$(CPP) -c Action/Track/Marker/ActionTrackMoveMarker.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Marker/ActionTrackEditMarker.o : Action/Track/Marker/ActionTrackEditMarker.cpp
+	$(CPP) -c Action/Track/Marker/ActionTrackEditMarker.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Midi/ActionTrackAddMidiEffect.o : Action/Track/Midi/ActionTrackAddMidiEffect.cpp
 	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiEffect.cpp -o $@ $(CXXFLAGS)

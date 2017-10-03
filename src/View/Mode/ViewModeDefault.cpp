@@ -547,7 +547,7 @@ SongSelection ViewModeDefault::getSelectionForRange(const Range &r)
 
 		// markers
 		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.is_inside(m->pos));
+			s.set(m, s.range.overlaps(m->range));
 
 		// midi
 		for (MidiNote *n: t->midi)
@@ -580,7 +580,7 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 
 		// markers
 		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.is_inside(m->pos));
+			s.set(m, s.range.overlaps(m->range));
 
 		// midi
 		for (MidiNote *n: t->midi)
@@ -615,7 +615,7 @@ SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, 
 
 		// markers
 		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.is_inside(m->pos));
+			s.set(m, s.range.overlaps(m->range));
 
 		// midi
 		for (MidiNote *n: t->midi)

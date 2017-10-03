@@ -11,11 +11,12 @@
 #include "../../Action.h"
 class Track;
 class TrackMarker;
+class Range;
 
 class ActionTrackAddMarker: public Action
 {
 public:
-	ActionTrackAddMarker(Track *t, int pos, const string &text);
+	ActionTrackAddMarker(Track *t, const Range &range, const string &text);
 	virtual ~ActionTrackAddMarker(){}
 
 	virtual void *execute(Data *d);

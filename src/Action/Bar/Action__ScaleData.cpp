@@ -62,9 +62,12 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 		}
 
 		// marker
-		for (TrackMarker *m : t->markers)
-			if (m->pos >= pos0)
-				m->pos = __shift_data_shift(r, new_length, m->pos);
+		for (TrackMarker *m : t->markers){
+			if (m->range.start() >= pos0)
+				m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
+			if (m->range.end() >= pos0)
+				m->range.set_end(__shift_data_shift(r, new_length, m->range.end()));
+		}
 
 		// buffer
 		for (TrackLayer &l : t->layers)

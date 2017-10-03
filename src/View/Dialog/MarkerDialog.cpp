@@ -7,16 +7,16 @@
 
 #include "MarkerDialog.h"
 
-MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, int _pos, int _index):
+MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, int _index):
 	hui::Window("marker_dialog", _parent)
 {
 	track = _t;
-	pos = _pos;
+	range = _range;
 	index = _index;
 
 	if (index >= 0){
 		setString("text", track->markers[index]->text);
-		pos = track->markers[index]->pos;
+		range = track->markers[index]->range;
 
 		enable("ok", true);
 	}else{
@@ -41,13 +41,9 @@ void MarkerDialog::onEdit()
 void MarkerDialog::onOk()
 {
 	if (index >= 0){
-		// cheap solution...
-		track->song->action_manager->beginActionGroup();
-		track->deleteMarker(index);
-		track->addMarker(pos, getString("text"));
-		track->song->action_manager->endActionGroup();
+		track->editMarker(index, getString("text"));
 	}else{
-		track->addMarker(pos, getString("text"));
+		track->addMarker(range, getString("text"));
 	}
 	destroy();
 }

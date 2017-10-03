@@ -366,28 +366,47 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	string text = marker->text;
 	if (text.match(":pos *:"))
 		text = "🖐 " + text.substr(5, -2);
+	if (marker->fx.num > 0)
+		text += format(" (%d fx)", marker->fx.num);
 
 	bool sel = view->sel.has(marker);
 
 	if (sel)
 		c->setFont("", -1, true, false);
 
-	float w = c->getStrWidth(text);
-	float x = view->cam.sample2screen(marker->pos);
-	float y = area.y1 + 10;
+	float w = c->getStrWidth(text) + view->CORNER_RADIUS * 2;
+	float x0 = view->cam.sample2screen(marker->range.start());
+	float x1 = view->cam.sample2screen(marker->range.end());
+	float y0 = area.y1;
+	float y1 = area.y1 + 30;
+
+	w = max(w, x1 - x0);
 
 	color col = view->colors.text;
 	color col_bg = view->colors.background_track;
+	color col2 = getPitchColor(((long)marker / 64) % MAX_PITCH);
 	if (sel){
 		col = view->colors.selection;
 		col_bg = ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);
+		col2 = ColorInterpolate(col2, view->colors.selection, 0.5f);
 	}
-	if (hover)
+	if (hover){
 		col = ColorInterpolate(col, view->colors.hover, 0.3f);
+		col2 = ColorInterpolate(col2, view->colors.hover, 0.3f);
+	}
 
-	view->drawBoxedStr(c,  x, y, text, col, col_bg);
+	color col_bg2 = col2;
+	col_bg2.a = 0.25f;
+	c->setColor(col_bg2);
+	c->drawRect(x0, y0, x1-x0, y1-y0);
+	c->setColor(col2);
+	c->setLineWidth(2.0f);
+	c->drawLine(x0, area.y1, x0, area.y2);
+	c->drawLine(x1, area.y1, x1, area.y2);
+	c->setLineWidth(1.0f);
+	view->drawBoxedStr(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 
-	marker_areas[index] = rect(x, x + w, y, y + 16);
+	marker_areas[index] = rect(x0, x0 + w, y0, y1);
 
 	c->setFont("", -1, false, false);
 }
@@ -861,28 +880,30 @@ void AudioViewTrack::drawHeader(Painter *c)
 	if (track->muted and !visible)
 		c->drawImage(area.x1 + 5, area.y1 + 5, *view->images.x);
 
-	color col_but_hover = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
+	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
+	color col_but_hover = view->colors.text;
 
 	if (visible){
-		c->setColor(view->colors.text);
+		c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_MUTE))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
-		//c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
+		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
+		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
 		if (track->muted)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
 	if ((view->song->tracks.num > 1) and visible){
-		c->setColor(view->colors.text);
+		c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_SOLO))
 			c->setColor(col_but_hover);
+		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}
 	if (visible){
-		c->setColor(view->colors.text);
+		c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_EDIT))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 39, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
+		c->drawStr(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
 	}
 }
 

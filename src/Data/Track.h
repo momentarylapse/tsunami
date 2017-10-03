@@ -30,6 +30,8 @@ class Synthesizer;
 class Effect;
 
 
+
+
 class TrackLayer
 {
 public:
@@ -39,8 +41,9 @@ public:
 class TrackMarker
 {
 public:
-	int pos;
+	Range range;
 	string text;
+	Array<Effect*> fx;
 };
 
 string track_type(int type);
@@ -56,6 +59,7 @@ public:
 	static const string MESSAGE_DELETE_EFFECT;
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
+
 
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
@@ -91,9 +95,10 @@ public:
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
 	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
-	void _cdecl addMarker(int pos, const string &text);
-	void _cdecl deleteMarker(int id);
-	void _cdecl moveMarker(int id, int pos);
+	TrackMarker* _cdecl addMarker(const Range &range, const string &text);
+	void _cdecl deleteMarker(int index);
+	void _cdecl moveMarker(int index, int pos);
+	void _cdecl editMarker(int index, const string &text);
 
 
 	enum
@@ -120,6 +125,8 @@ public:
 	// midi track
 	MidiData midi;
 	Synthesizer *synth;
+
+
 
 	Array<TrackMarker*> markers;
 

@@ -15,7 +15,7 @@
 class MarkerDialog: public hui::Window
 {
 public:
-	MarkerDialog(hui::Window *_parent, Track *t, int pos, int index);
+	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, int index);
 	virtual ~MarkerDialog();
 
 	void onEdit();
@@ -23,7 +23,7 @@ public:
 	void onClose();
 
 	Track *track;
-	int pos;
+	Range range;
 	int index;
 };
 

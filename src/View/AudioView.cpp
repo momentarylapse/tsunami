@@ -536,9 +536,12 @@ void AudioView::onMouseWheel()
 
 void AudioView::forceRedraw()
 {
-	//msg_write("force redraw");
-	force_redraw = true;
 	win->redraw(id);
+}
+
+void AudioView::forceRedrawPart(const rect &r)
+{
+	win->redrawRect(id, r);
 }
 
 void AudioView::unselectAllSamples()
@@ -769,7 +772,7 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 	}
 }
 
-void AudioView::drawBackground(Painter *c, const rect &r)
+void AudioView::drawBackground(Painter *c)
 {
 	int yy = 0;
 	if (vtrack.num > 0)
@@ -777,17 +780,17 @@ void AudioView::drawBackground(Painter *c, const rect &r)
 
 	// time scale
 	c->setColor(colors.background_track);
-	c->drawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
+	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
+	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
 
 	// tracks
 	for (AudioViewTrack *t: vtrack)
 		mode->drawTrackBackground(c, t);
 
 	// free space below tracks
-	if (yy < r.y2){
+	if (yy < clip.y2){
 		c->setColor(colors.background);
-		rect rr = rect(r.x1, r.x2, yy, r.y2);
+		rect rr = rect(clip.x1, clip.x2, yy, clip.y2);
 		c->drawRect(rr);
 		drawGridTime(c, rr, colors.background, false);
 	}
@@ -795,22 +798,22 @@ void AudioView::drawBackground(Painter *c, const rect &r)
 	// lines between tracks
 	c->setColor(colors.grid);
 	for (AudioViewTrack *t: vtrack)
-		c->drawLine(0, t->area.y1, r.width(), t->area.y1);
-	if (yy < r.y2)
-		c->drawLine(0, yy, r.width(), yy);
+		c->drawLine(clip.x1, t->area.y1, clip.width(), t->area.y1);
+	if (yy < clip.y2)
+		c->drawLine(clip.x1, yy, clip.width(), yy);
 
 	//DrawGrid(c, r, ColorBackgroundCurWave, true);
 }
 
-void AudioView::drawSelection(Painter *c, const rect &r)
+void AudioView::drawSelection(Painter *c)
 {
 	// time selection
 	int sx1 = cam.sample2screen(sel.range.start());
 	int sx2 = cam.sample2screen(sel.range.end());
-	int sxx1 = clampi(sx1, r.x1, r.x2);
-	int sxx2 = clampi(sx2, r.x1, r.x2);
+	int sxx1 = clampi(sx1, clip.x1, clip.x2);
+	int sxx2 = clampi(sx2, clip.x1, clip.x2);
 	c->setColor(colors.selection_internal);
-	c->drawRect(rect(sxx1, sxx2, r.y1, r.y1 + TIME_SCALE_HEIGHT));
+	c->drawRect(rect(sxx1, sxx2, clip.y1, clip.y1 + TIME_SCALE_HEIGHT));
 	drawTimeLine(c, sel.range.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 
@@ -823,8 +826,8 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	}else if (selection_mode == SELECTION_MODE_RECT){
 		int sx1 = cam.sample2screen(hover.range.start());
 		int sx2 = cam.sample2screen(hover.range.end());
-		int sxx1 = clampi(sx1, r.x1, r.x2);
-		int sxx2 = clampi(sx2, r.x1, r.x2);
+		int sxx1 = clampi(sx1, clip.x1, clip.x2);
+		int sxx2 = clampi(sx2, clip.x1, clip.x2);
 		c->setColor(colors.selection_internal);
 		c->setFill(false);
 		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
@@ -853,17 +856,16 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	c->setAntialiasing(false);
 }
 
-void AudioView::drawAudioFile(Painter *c, const rect &r)
+void AudioView::drawAudioFile(Painter *c)
 {
-	area = r;
 	//msg_write("draw");
 
-	bool repeat = thm.update(this, song, r);
+	bool repeat = thm.update(this, song, area);
 	bool repeat_fast = repeat;
 	updateBufferZoom();
 
 	// background
-	drawBackground(c, r);
+	drawBackground(c);
 
 	// tracks
 	for (AudioViewTrack *t: vtrack)
@@ -871,7 +873,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 
 
 	// selection
-	drawSelection(c, r);
+	drawSelection(c);
 
 
 	// playing/capturing position
@@ -893,9 +895,9 @@ void AudioView::onDraw(Painter *c)
 	PerformanceMonitor::start_busy(perf_channel);
 
 	colors = basic_colors.create(win->isActive(id));
-	force_redraw = false;
 
-	area = rect(0, c->width, 0, c->height);
+	area = c->getArea();
+	clip = c->getClip();
 
 	c->setFontSize(FONT_SIZE);
 	c->setLineWidth(LINE_WIDTH);
@@ -903,7 +905,7 @@ void AudioView::onDraw(Painter *c)
 	//c->setColor(ColorWaveCur);
 
 	if (enabled)
-		drawAudioFile(c, area);
+		drawAudioFile(c);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 

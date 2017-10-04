@@ -24,6 +24,8 @@ class Painter : public ::Painter
 	public:
 #ifdef HUI_API_GTK
 	cairo_t *cr;
+	PangoLayout *layout;
+	PangoFontDescription *font_desc;
 #endif
 	Window *win;
 	string id;
@@ -59,6 +61,8 @@ class Painter : public ::Painter
 	virtual float _cdecl getStrWidth(const string &str);
 	virtual void _cdecl drawImage(float x, float y, const Image &image);
 	virtual void _cdecl drawMaskImage(float x, float y, const Image &image);
+	virtual rect _cdecl getArea();
+	virtual rect _cdecl getClip();
 };
 
 };

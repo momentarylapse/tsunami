@@ -20,6 +20,8 @@ Painter::Painter()
 {
 	win = NULL;
 	cr = NULL;
+	layout = NULL;
+	font_desc = NULL;
 	width = 0;
 	height = 0;
 	mode_fill = true;
@@ -35,19 +37,21 @@ Painter::Painter(Panel *panel, const string &_id)
 	win = panel->win;
 	id = _id;
 	cr = NULL;
+	layout = NULL;
+	font_desc = NULL;
 	width = 0;
 	height = 0;
 	mode_fill = true;
-	Control *c = panel->_get_control_(id);
+	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(panel->_get_control_(id));
 	corner_radius = 0;
 	if (c){
-		cr = (cairo_t*)((ControlDrawingArea*)c)->cur_cairo;
+		cr = (cairo_t*)c->cur_cairo;
 //		cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
+		layout = pango_cairo_create_layout(cr);
 
 		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
 		width = gdk_window_get_width(gtk_widget_get_window(c->widget));
 		height = gdk_window_get_height(gtk_widget_get_window(c->widget));
-		//hui_drawing_context.setFontSize(16);
 		setFont("Sans", 16, false, false);
 	}
 }
@@ -57,6 +61,10 @@ Painter::~Painter()
 	if (!cr)
 		return;
 
+	if (layout)
+		g_object_unref(layout);
+	if (font_desc)
+		pango_font_description_free(font_desc);
 //	cairo_destroy(cr);
 	cr = NULL;
 }
@@ -118,6 +126,17 @@ void Painter::clip(const rect &r)
 	cairo_clip(cr);
 }
 
+rect Painter::getClip()
+{
+	double x1, x2, y1, y2;
+	cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
+	return rect(x1, x2, y1, y2);
+}
+
+rect Painter::getArea()
+{
+	return rect(0, width, 0, height);
+}
 
 void Painter::drawPoint(float x, float y)
 {
@@ -170,27 +189,15 @@ void Painter::drawStr(float x, float y, const string &str)
 	if (!cr)
 		return;
 	cairo_move_to(cr, x, y);// + cur_font_size);
-	PangoLayout *layout = pango_cairo_create_layout(cr);
-	pango_layout_set_text(layout, (char*)str.data, str.num);//.c_str(), -1);
-	string f = cur_font;
-	if (cur_font_bold)
-		f += " Bold";
-	if (cur_font_italic)
-		f += " Italic";
-	f += " " + i2s(cur_font_size);
-	PangoFontDescription *desc = pango_font_description_from_string(f.c_str());
-	//PangoFontDescription *desc = pango_font_description_new();
-	//pango_font_description_set_family(desc, "Sans");//cur_font);
-	//pango_font_description_set_size(desc, 10);//cur_font_size);
-	pango_layout_set_font_description(layout, desc);
-	pango_font_description_free(desc);
+	pango_cairo_update_layout(cr, layout);
+	pango_layout_set_text(layout, (char*)str.data, str.num);
+
 	if (mode_fill){
 		pango_cairo_show_layout(cr, layout);
 	}else{
 		pango_cairo_layout_path(cr, layout);
 		cairo_stroke(cr);
 	}
-	g_object_unref(layout);
 
 	//cairo_show_text(cr, str);
 }
@@ -199,23 +206,10 @@ float Painter::getStrWidth(const string &str)
 {
 	if (!cr)
 		return 0;
-	PangoLayout *layout = pango_cairo_create_layout(cr);
+	pango_cairo_update_layout(cr, layout);
 	pango_layout_set_text(layout, (char*)str.data, str.num);//.c_str(), -1);
-	string f = cur_font;
-	if (cur_font_bold)
-		f += " Bold";
-	if (cur_font_italic)
-		f += " Italic";
-	f += " " + i2s(cur_font_size);
-	PangoFontDescription *desc = pango_font_description_from_string(f.c_str());
-	//PangoFontDescription *desc = pango_font_description_new();
-	//pango_font_description_set_family(desc, "Sans");//cur_font);
-	//pango_font_description_set_size(desc, 10);//cur_font_size);
-	pango_layout_set_font_description(layout, desc);
-	pango_font_description_free(desc);
 	int w, h;
 	pango_layout_get_size(layout, &w, &h);
-	g_object_unref(layout);
 
 	return (float)w / 1000.0f;
 }
@@ -309,14 +303,30 @@ void Painter::setFont(const string &font, float size, bool bold, bool italic)
 		cur_font_size = (int)size;
 	cur_font_bold = bold;
 	cur_font_italic = italic;
+
+
+
+	string f = cur_font;
+	if (cur_font_bold)
+		f += " Bold";
+	if (cur_font_italic)
+		f += " Italic";
+	f += " " + i2s(cur_font_size);
+	if (font_desc)
+		pango_font_description_free(font_desc);
+	font_desc = pango_font_description_from_string(f.c_str());
+	//PangoFontDescription *desc = pango_font_description_new();
+	//pango_font_description_set_family(desc, "Sans");//cur_font);
+	//pango_font_description_set_size(desc, 10);//cur_font_size);
+	pango_layout_set_font_description(layout, font_desc);
+
 }
 
 void Painter::setFontSize(float size)
 {
 	if (!cr)
 		return;
-	//cairo_set_font_size(cr, size);
-	cur_font_size = (int)size;
+	setFont(cur_font, size, cur_font_bold, cur_font_italic);
 }
 
 void Painter::setAntialiasing(bool enabled)

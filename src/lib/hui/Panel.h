@@ -12,6 +12,7 @@
 
 
 class Painter;
+class rect;
 
 namespace hui
 {
@@ -146,7 +147,7 @@ public:
 
 	// drawing
 	void _cdecl redraw(const string &id);
-	void _cdecl redrawRect(const string &_id, int x, int y, int w, int h);
+	void _cdecl redrawRect(const string &_id, const rect &r);
 	Control *_get_control_(const string &id);
 #ifdef HUI_API_GTK
 	Control *_get_control_by_widget_(GtkWidget *widget);

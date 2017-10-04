@@ -39,6 +39,7 @@ public:
 
 	void checkConsistency();
 	void forceRedraw();
+	void forceRedrawPart(const rect &r);
 
 	void onDraw(Painter *p);
 	void onMouseMove();
@@ -76,9 +77,9 @@ public:
 
 	void drawGridTime(Painter *c, const rect &r, const color &bg, bool show_time = false);
 	void drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time = false);
-	void drawSelection(Painter *c, const rect &r);
-	void drawBackground(Painter *c, const rect &r);
-	void drawAudioFile(Painter *c, const rect &r);
+	void drawSelection(Painter *c);
+	void drawBackground(Painter *c);
+	void drawAudioFile(Painter *c);
 
 	void drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
 
@@ -160,9 +161,6 @@ public:
 	void selectSample(SampleRef *s, bool diff);
 	void selectTrack(Track *t, bool diff);
 
-
-	bool force_redraw;
-
 	int detail_steps;
 	int preview_sleep_time;
 	bool antialiasing;
@@ -216,6 +214,7 @@ public:
 	bool bars_edit_data;
 
 	rect area;
+	rect clip;
 	TrackHeightManager thm;
 
 	ViewPort cam;

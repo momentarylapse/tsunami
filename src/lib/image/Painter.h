@@ -42,6 +42,8 @@ public:
 	virtual void _cdecl drawImage(float x, float y, const Image &image) = 0;
 	virtual void _cdecl drawMaskImage(float x, float y, const Image &image) = 0;
 	int width, height;
+	virtual rect getArea() = 0;
+	virtual rect getClip() = 0;
 };
 
 

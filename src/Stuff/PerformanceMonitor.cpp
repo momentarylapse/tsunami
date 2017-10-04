@@ -8,7 +8,7 @@
 #include "PerformanceMonitor.h"
 #include "../lib/hui/hui.h"
 
-#define ALLOW_PERF_MON	0
+#define ALLOW_PERF_MON	1
 
 #if ALLOW_PERF_MON
 struct Channel
@@ -16,13 +16,15 @@ struct Channel
 	string name;
 	float cpu_usage;
 	float t_busy, t_idle, t_last;
+	int n;
 	bool used;
 	hui::Timer timer;
 	int state;
 	void reset()
 	{
-		t_busy = t_idle = 0;
+		t_busy = t_idle = t_last = 0;
 		state = -1;
+		n = 0;
 	}
 	void update()
 	{
@@ -31,31 +33,37 @@ struct Channel
 };
 static Array<Channel> channels;
 
-static void reset()
+static void pm_reset()
 {
 	//timer.get();
-	for (auto c: channels){
+	for (auto &c: channels){
 		c.t_busy = c.t_idle = c.t_last = 0;
+		c.n = 0;
 		c.state = -1;
 	}
 }
 
-static void show()
+static void pm_show()
 {
 	printf("----- cpu usage -----\n");
 	for (auto c: channels)
 		if (c.used){
-			float cpu_usage = c.t_busy / (c.t_busy + c.t_idle);
-			printf("[%s]: %.1f%%\n", c.name.c_str(), c.cpu_usage * 100.0f);
+			float avg = 0;
+			c.cpu_usage = 0;
+			if ((c.t_busy > 0) and (c.n > 0)){
+				c.cpu_usage = c.t_busy / (c.t_busy + c.t_idle);
+				avg = c.t_busy / c.n;
+			}
+			printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage * 100.0f, avg * 1000.0f);
 		}
-	reset();
+	pm_reset();
 }
 #endif
 
 void PerformanceMonitor::init()
 {
 #if ALLOW_PERF_MON
-	reset();
+	pm_reset();
 #endif
 }
 
@@ -112,9 +120,10 @@ void PerformanceMonitor::end_busy(int channel)
 	//printf("- %d %f\n", channel, t);
 	float dt = c.timer.get();
 	c.t_busy += dt;// t - c.t_last;
+	c.n ++;
 	//c.t_last = t;
 	c.state = 0;
-	//if (t > 5)
-	//	show();
+	if (c.t_busy + c.t_idle > 5)
+		pm_show();
 #endif
 }

@@ -460,24 +460,25 @@ void Panel::redraw(const string &_id)
 	}
 }
 
-void Panel::redrawRect(const string &_id, int x, int y, int w, int h)
+void Panel::redrawRect(const string &_id, const rect &r)
 {
 	Control *c = _get_control_(_id);
 	if (c){
-		if (w < 0){
+
+		/*if (w < 0){
 			x += w;
 			w = - w;
 		}
 		if (h < 0){
 			y += h;
 			h = - h;
-		}
-		GdkRectangle r;
-		r.x = x;
-		r.y = y;
-		r.width = w;
-		r.height = h;
-		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), &r, false);
+		}*/
+		GdkRectangle rr;
+		rr.x = r.x1;
+		rr.y = r.y1;
+		rr.width = r.width();
+		rr.height = r.height();
+		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), &rr, false);
 	}
 }
 

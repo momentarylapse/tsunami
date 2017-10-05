@@ -11,6 +11,7 @@
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Audio/Synth/Synthesizer.h"
+#include "../../Data/Curve.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 #endif
@@ -149,6 +150,52 @@ public:
 		f->WriteInt(0);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
+	}
+};
+
+class FileChunkCurve : public FileChunk<Song,Curve>
+{
+public:
+	FileChunkCurve() : FileChunk<Song,Curve>("curve"){}
+	virtual void create(){
+		me = new Curve;
+		parent->curves.add(me);
+	}
+	virtual void read(File *f)
+	{
+		f->ReadInt();
+		me->name = f->ReadStr();
+		int n = f->ReadInt();
+		for (int i=0; i<n; i++){
+			Curve::Target t;
+			t.fromString(f->ReadStr(), parent);
+			me->targets.add(t);
+		}
+		me->min = f->ReadFloat();
+		me->max = f->ReadFloat();
+		n = f->ReadInt();
+		for (int i=0; i<n; i++){
+			Curve::Point p;
+			p.pos = f->ReadInt();
+			p.value = f->ReadFloat();
+			me->points.add(p);
+		}
+		parent->notify(parent->MESSAGE_ADD_CURVE);
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(0); // version
+		f->WriteStr(me->name);
+		f->WriteInt(me->targets.num);
+		for (auto t: me->targets)
+			f->WriteStr(t.str(parent));
+		f->WriteFloat(me->min);
+		f->WriteFloat(me->max);
+		f->WriteInt(me->points.num);
+		for (auto p: me->points){
+			f->WriteInt(p.pos);
+			f->WriteFloat(p.value);
+		}
 	}
 };
 
@@ -1038,6 +1085,7 @@ public:
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);
 		add_child(new FileChunkGlobalEffect);
+		add_child(new FileChunkCurve);
 	}
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
@@ -1057,6 +1105,7 @@ public:
 		write_sub_parray("sample", me->samples);
 		write_sub_parray("track", me->tracks);
 		write_sub_parray("effect", me->fx);
+		write_sub_parray("curve", me->curves);
 	}
 };
 

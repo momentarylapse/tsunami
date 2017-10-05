@@ -46,10 +46,21 @@ string Curve::Target::niceStr(Song *a)
 	return "";
 }
 
-Array<Curve::Target> Curve::Target::enumerate(Song *a)
+void Curve::Target::fromString(const string &str, Song *s)
+{
+	auto targets = enumerate(s);
+	p = NULL;
+	for (auto t: targets)
+		if (t.str(s) == str)
+			*this = t;
+	if (!p)
+		msg_error("can't find curve target " + str);
+}
+
+Array<Curve::Target> Curve::Target::enumerate(Song *s)
 {
 	Array<Target> list;
-	foreachi(Track *t, a->tracks, i)
+	foreachi(Track *t, s->tracks, i)
 		enumerateTrack(t, list, format("t:%d", i), format("track[%d]", i));
 	return list;
 }

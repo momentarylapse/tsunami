@@ -103,78 +103,12 @@ void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 
 Selection ViewModeCurve::getHover()
 {
-	Selection s;
+	Selection s = ViewModeDefault::getHover();
 	int mx = view->mx;
 	int my = view->my;
-	s.pos = view->cam.screen2sample(mx);
-
-	// track?
-	foreachi(AudioViewTrack *t, view->vtrack, i){
-		if (view->mouseOverTrack(t)){
-			s.vtrack = t;
-			s.index = i;
-			s.track = t->track;
-			s.type = Selection::TYPE_TRACK;
-			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.type = Selection::TYPE_TRACK_HEADER;
-		}
-	}
-
-	// selection boundaries?
-	if (view->mouse_over_time(view->sel.range.end())){
-		s.type = Selection::TYPE_SELECTION_END;
-		return s;
-	}
-	if (view->mouse_over_time(view->sel.range.start())){
-		s.type = Selection::TYPE_SELECTION_START;
-		return s;
-	}
-	if (view->isPlaying()){
-		if (view->mouse_over_time(view->playbackPos())){
-			s.type = Selection::TYPE_PLAYBACK;
-			return s;
-		}
-	}
-
-	// mute button?
-	if (s.track){
-		AudioViewTrack *t = s.vtrack;
-		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_MUTE;
-			return s;
-		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_SOLO;
-			return s;
-		}
-	}
-
-	// sub?
-	if (s.track){
-
-		// markers
-		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
-			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my)){
-				s.type = Selection::TYPE_MARKER;
-				s.index = i;
-				return s;
-			}
-		}
-
-		// TODO: prefer selected subs
-		for (SampleRef *ss : s.track->samples){
-			int offset = view->mouseOverSample(ss);
-			if (offset >= 0){
-				s.sample = ss;
-				s.type = Selection::TYPE_SAMPLE;
-				s.sample_offset = offset;
-				return s;
-			}
-		}
-	}
 
 	// curve points
-	if ((s.track) and (curve)){
+	if (s.track and curve){
 		foreachi(Curve::Point &p, curve->points, i){
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
@@ -184,12 +118,6 @@ Selection ViewModeCurve::getHover()
 				return s;
 			}
 		}
-	}
-
-	// time scale
-	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::TYPE_TIME;
-		return s;
 	}
 
 	return s;

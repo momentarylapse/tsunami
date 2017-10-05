@@ -102,3 +102,19 @@ J Spur-Icons hover
 
 * Aufnahme-Metronom (grafisch + Vorlauf)
 
+
+
+
+
+== short term ==
+
+J save progress bar fix
+* nicer sample drawing
+* beat relative midi creation
+* beat source?
+* always auto record
+* repair curve editor
+* curve actions
+* read-only mode (while saving etc)
+* abort saving?
+

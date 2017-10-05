@@ -84,28 +84,6 @@ void Format::importData(Track *t, void *data, int channels, SampleFormat format,
 	}
 }
 
-/*void Format::exportAsTrack(StorageOperationData *od)
-{
-	SongRenderer renderer;
-
-	const int CHUNK_SIZE = 1<<16;
-
-	Range r = od->song->getRange();
-	od->samples = r.num;
-	saveBufferBegin(od);
-	int written = 0;
-	while(written < r.num){
-
-		BufferBox buf;
-		renderer.render(od->song, Range(r.offset + written, CHUNK_SIZE), buf);
-		od->buf = &buf;
-		saveBufferPart(od);
-		written += CHUNK_SIZE;
-	}
-	saveBufferEnd(od);
-}*/
-
-
 
 void Format::loadSong(StorageOperationData *od)
 {
@@ -116,6 +94,7 @@ void Format::loadSong(StorageOperationData *od)
 void Format::saveSong(StorageOperationData* od)
 {
 	SongRenderer renderer(od->song);
+	od->num_samples = renderer.getNumSamples();
 	od->renderer = &renderer;
 	saveViaRenderer(od);
 }

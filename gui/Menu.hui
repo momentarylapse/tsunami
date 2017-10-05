@@ -30,8 +30,6 @@ Menu menu "" disabled
 		Item add_track "Add empty audio track" image=hui:add
 		Item add_midi_track "Add midi track" image=hui:add
 		Item add_time_track "Add rhythm track" image=hui:add
-		Separator
-		Item delete_track "Delete" image=hui:delete
 	Menu menu_layer "Layers"
 		Item layer_manager "Manage..." image=hui:properties
 		Separator
@@ -53,7 +51,6 @@ Menu menu "" disabled
 		Separator
 		Item sample_from_selection "Cut out from selection" image=hui:cut
 		Item insert_sample "Insert statically" image=hui:add
-		Item remove_sample "Delete" image=hui:delete
 	Menu menu_view "View"
 		Menu menu_view_midi "Midi"
 			Item view_midi_default "Default" checkable

@@ -71,8 +71,6 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 	event("edit_track", std::bind(&CurveConsole::onEditTrack, this));
 	event("edit_fx", std::bind(&CurveConsole::onEditFx, this));
 
-	curve = NULL;
-
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_NEW);
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_ADD_CURVE);
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_DELETE_CURVE);
@@ -111,7 +109,7 @@ void CurveConsole::updateList()
 	reset(id_list);
 	foreachi(Curve *c, song->curves, i){
 		addString(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
-		if (c == curve)
+		if (c == curve())
 			setInt(id_list, i);
 	}
 }
@@ -120,8 +118,15 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
-	song->curves.add(c);
-	song->notify(song->MESSAGE_ADD_CURVE);
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, c->targets);
+	dlg->run();
+	delete(dlg);
+	if (c->targets.num > 0){
+		song->curves.add(c);
+		song->notify(song->MESSAGE_ADD_CURVE);
+		view->mode_curve->setCurve(c);
+		updateList();
+	}
 }
 
 void CurveConsole::onDelete()
@@ -130,16 +135,16 @@ void CurveConsole::onDelete()
 	if (n >= 0){
 		delete(song->curves[n]);
 		song->curves.erase(n);
-		curve = NULL;
+		view->mode_curve->setCurve(NULL);
 	}
 	song->notify(song->MESSAGE_DELETE_CURVE);
 }
 
 void CurveConsole::onTarget()
 {
-	if (!curve)
+	if (!curve())
 		return;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, curve->targets);
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, curve()->targets);
 	dlg->run();
 	delete(dlg);
 	updateList();
@@ -147,12 +152,12 @@ void CurveConsole::onTarget()
 
 void CurveConsole::onListSelect()
 {
-	curve = NULL;
 	view->mode_curve->setCurve(NULL);
 	int n = getInt(id_list);
 	if (n >= 0){
-		curve = song->curves[n];
-		view->mode_curve->setCurve(curve);
+		view->mode_curve->setCurve(song->curves[n]);
+	}else{
+		view->mode_curve->setCurve(NULL);
 	}
 	redraw("area");
 }
@@ -185,5 +190,10 @@ void CurveConsole::onEditTrack()
 void CurveConsole::onEditFx()
 {
 	bar()->open(SideBar::FX_CONSOLE);
+}
+
+Curve* CurveConsole::curve()
+{
+	return view->mode_curve->curve;
 }
 

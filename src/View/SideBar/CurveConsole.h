@@ -39,7 +39,7 @@ public:
 
 	Song *song;
 	AudioView *view;
-	Curve *curve;
+	Curve* curve();
 
 	string id_list;
 };

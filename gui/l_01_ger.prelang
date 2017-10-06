@@ -1222,7 +1222,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-155
+157
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1494,6 +1494,10 @@ call: tsunami --export <File> <Exportfile>
 call: tsunami --export <File> <Exportfile>
 call: tsunami --info <File>
 call: tsunami --info <File>
+edit curves
+Kurven bearbeiten
+edit effects
+Effekte bearbeiten
 edit track properties
 Eigenschaften der Spur bearbeiten
 enter new name

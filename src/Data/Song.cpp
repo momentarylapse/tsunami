@@ -7,27 +7,15 @@
 
 #include "Curve.h"
 #include "../Plugins/Effect.h"
-#include "../Action/Track/ActionTrackAdd.h"
-#include "../Action/Track/ActionTrackDelete.h"
-#include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
-#include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
-#include "../Action/Track/Effect/ActionTrackAddEffect.h"
-#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
-#include "../Action/Track/Effect/ActionTrackEditEffect.h"
-#include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
-#include "../Audio/Synth/DummySynthesizer.h"
-#include "../Tsunami.h"
-#include "../Storage/Storage.h"
-#include "../Stuff/Log.h"
-#include "../View/AudioView.h"
-#include "../lib/threads/Mutex.h"
-#include <assert.h>
-#include <math.h>
-#include "Song.h"
-
 #include "../Action/Bar/ActionBarAdd.h"
 #include "../Action/Bar/ActionBarDelete.h"
 #include "../Action/Bar/ActionBarEdit.h"
+#include "../Action/Curve/ActionCurveAdd.h"
+#include "../Action/Curve/ActionCurveAddPoint.h"
+#include "../Action/Curve/ActionCurveDelete.h"
+#include "../Action/Curve/ActionCurveDeletePoint.h"
+#include "../Action/Curve/ActionCurveEdit.h"
+#include "../Action/Curve/ActionCurveEditPoint.h"
 #include "../Action/Layer/ActionLayerAdd.h"
 #include "../Action/Layer/ActionLayerDelete.h"
 #include "../Action/Layer/ActionLayerMerge.h"
@@ -45,6 +33,23 @@
 #include "../Action/Tag/ActionTagAdd.h"
 #include "../Action/Tag/ActionTagDelete.h"
 #include "../Action/Tag/ActionTagEdit.h"
+#include "../Action/Track/ActionTrackAdd.h"
+#include "../Action/Track/ActionTrackDelete.h"
+#include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
+#include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
+#include "../Action/Track/Effect/ActionTrackAddEffect.h"
+#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
+#include "../Action/Track/Effect/ActionTrackEditEffect.h"
+#include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
+#include "../Audio/Synth/DummySynthesizer.h"
+#include "../Tsunami.h"
+#include "../Storage/Storage.h"
+#include "../Stuff/Log.h"
+#include "../View/AudioView.h"
+#include "../lib/threads/Mutex.h"
+#include <assert.h>
+#include <math.h>
+#include "Song.h"
 
 float amplitude2db(float amp)
 {
@@ -102,6 +107,7 @@ const string Song::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Song::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Song::MESSAGE_ADD_CURVE = "AddCurve";
 const string Song::MESSAGE_DELETE_CURVE = "DeleteCurve";
+const string Song::MESSAGE_EDIT_CURVE = "EditCurve";
 const string Song::MESSAGE_ADD_SAMPLE = "AddSample";
 const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
 const string Song::MESSAGE_ADD_LAYER = "AddLayer";
@@ -493,6 +499,46 @@ void Song::editBar(int index, BarPattern &p, bool affect_midi)
 void Song::deleteBar(int index, bool affect_midi)
 {
 	execute(new ActionBarDelete(index, affect_midi));
+}
+
+Curve *Song::addCurve(const string &name, Array<Curve::Target> &targets)
+{
+	Curve *c = new Curve;
+	c->name = name;
+	c->targets = targets;
+	execute(new ActionCurveAdd(c, curves.num));
+	return c;
+}
+void Song::deleteCurve(Curve *curve)
+{
+	foreachi(auto c, curves, i)
+		if (c == curve)
+			execute(new ActionCurveDelete(i));
+}
+
+void Song::editCurve(Curve *curve, const string &name, float min, float max)
+{
+	execute(new ActionCurveEdit(curve, name, min, max, curve->targets));
+}
+
+void Song::curveSetTargets(Curve *curve, Array<Curve::Target> &targets)
+{
+	execute(new ActionCurveEdit(curve, curve->name, curve->min, curve->max, targets));
+}
+
+void Song::curveAddPoint(Curve *curve, int pos, float value)
+{
+	execute(new ActionCurveAddPoint(curve, pos, value));
+}
+
+void Song::curveDeletePoint(Curve *curve, int index)
+{
+	execute(new ActionCurveDeletePoint(curve, index));
+}
+
+void Song::curveEditPoint(Curve *curve, int index, int pos, float value)
+{
+	execute(new ActionCurveEditPoint(curve, index, pos, value));
 }
 
 void Song::invalidateAllPeaks()

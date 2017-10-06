@@ -13,6 +13,7 @@
 #include "Sample.h"
 #include "SampleRef.h"
 #include "Rhythm.h"
+#include "Curve.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
 
@@ -54,6 +55,7 @@ public:
 	static const string MESSAGE_DELETE_EFFECT;
 	static const string MESSAGE_ADD_CURVE;
 	static const string MESSAGE_DELETE_CURVE;
+	static const string MESSAGE_EDIT_CURVE;
 	static const string MESSAGE_ADD_SAMPLE;
 	static const string MESSAGE_DELETE_SAMPLE;
 	static const string MESSAGE_ADD_LAYER;
@@ -131,6 +133,13 @@ public:
 	void _cdecl deleteSelectedSamples(const SongSelection &sel);
 	void _cdecl deleteSelection(const SongSelection &sel, int layer_no, bool all_layers);
 	void _cdecl createSamplesFromSelection(const SongSelection &sel, int layer_no);
+	Curve *_cdecl addCurve(const string &name, Array<Curve::Target> &targets);
+	void _cdecl deleteCurve(Curve *curve);
+	void _cdecl editCurve(Curve *curve, const string &name, float min, float max);
+	void _cdecl curveSetTargets(Curve *curve, Array<Curve::Target> &targets);
+	void _cdecl curveAddPoint(Curve *curve, int pos, float value);
+	void _cdecl curveDeletePoint(Curve *curve, int index);
+	void _cdecl curveEditPoint(Curve *curve, int index, int pos, float value);
 
 	// helper
 	Track *_cdecl get_track(int track_no);

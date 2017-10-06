@@ -11,6 +11,12 @@ OBJ = \
  Action/Bar/ActionBarAdd.o\
  Action/Bar/ActionBarDelete.o\
  Action/Bar/ActionBarEdit.o\
+ Action/Curve/ActionCurveAdd.o\
+ Action/Curve/ActionCurveAddPoint.o\
+ Action/Curve/ActionCurveDelete.o\
+ Action/Curve/ActionCurveDeletePoint.o\
+ Action/Curve/ActionCurveEdit.o\
+ Action/Curve/ActionCurveEditPoint.o\
  Action/Song/Data/ActionSongChangeAllTrackVolumes.o\
  Action/Song/Data/ActionSongSetDefaultFormat.o\
  Action/Song/Data/ActionSongSetSampleRate.o\
@@ -335,6 +341,24 @@ Action/Bar/ActionBarDelete.o : Action/Bar/ActionBarDelete.cpp
 
 Action/Bar/ActionBarEdit.o : Action/Bar/ActionBarEdit.cpp
 	$(CPP) -c Action/Bar/ActionBarEdit.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveAdd.o : Action/Curve/ActionCurveAdd.cpp
+	$(CPP) -c Action/Curve/ActionCurveAdd.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveAddPoint.o : Action/Curve/ActionCurveAddPoint.cpp
+	$(CPP) -c Action/Curve/ActionCurveAddPoint.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveDelete.o : Action/Curve/ActionCurveDelete.cpp
+	$(CPP) -c Action/Curve/ActionCurveDelete.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveDeletePoint.o : Action/Curve/ActionCurveDeletePoint.cpp
+	$(CPP) -c Action/Curve/ActionCurveDeletePoint.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveEdit.o : Action/Curve/ActionCurveEdit.cpp
+	$(CPP) -c Action/Curve/ActionCurveEdit.cpp -o $@ $(CXXFLAGS)
+
+Action/Curve/ActionCurveEditPoint.o : Action/Curve/ActionCurveEditPoint.cpp
+	$(CPP) -c Action/Curve/ActionCurveEditPoint.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/Data/ActionSongChangeAllTrackVolumes.o : Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp
 	$(CPP) -c Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)

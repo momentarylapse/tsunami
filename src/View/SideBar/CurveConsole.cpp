@@ -74,6 +74,7 @@ CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_NEW);
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_ADD_CURVE);
 	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_DELETE_CURVE);
+	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_EDIT_CURVE);
 	view->subscribe(this, std::bind(&CurveConsole::onViewChange, this), view->MESSAGE_VIEW_CHANGE);
 }
 
@@ -116,14 +117,12 @@ void CurveConsole::updateList()
 
 void CurveConsole::onAdd()
 {
-	Curve *c = new Curve;
-	c->name = "new";
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, c->targets);
+	Array<Curve::Target> targets;
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
 	dlg->run();
 	delete(dlg);
-	if (c->targets.num > 0){
-		song->curves.add(c);
-		song->notify(song->MESSAGE_ADD_CURVE);
+	if (targets.num > 0){
+		Curve *c = song->addCurve("new", targets);
 		view->mode_curve->setCurve(c);
 		updateList();
 	}
@@ -133,19 +132,21 @@ void CurveConsole::onDelete()
 {
 	int n = getInt(id_list);
 	if (n >= 0){
-		delete(song->curves[n]);
-		song->curves.erase(n);
+		song->deleteCurve(song->curves[n]);
 		view->mode_curve->setCurve(NULL);
 	}
-	song->notify(song->MESSAGE_DELETE_CURVE);
 }
 
 void CurveConsole::onTarget()
 {
 	if (!curve())
 		return;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, curve()->targets);
+	Array<Curve::Target> targets = curve()->targets;
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
 	dlg->run();
+	//if (dlg->id == "ok")
+		song->curveSetTargets(curve(), targets);
+
 	delete(dlg);
 	updateList();
 }
@@ -167,12 +168,16 @@ void CurveConsole::onListEdit()
 	int n = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
 	if (n >= 0){
+		string name = song->curves[n]->name;
+		float min = song->curves[n]->min;
+		float max = song->curves[n]->max;
 		if (col == 0)
-			song->curves[n]->name = getCell(id_list, n, col);
+			name = getCell(id_list, n, col);
 		else if (col == 1)
-			song->curves[n]->min = getCell(id_list, n, col)._float();
+			min = getCell(id_list, n, col)._float();
 		else if (col == 2)
-			song->curves[n]->max = getCell(id_list, n, col)._float();
+			max = getCell(id_list, n, col)._float();
+		song->editCurve(song->curves[n], name, min, max);
 	}
 	redraw("area");
 }

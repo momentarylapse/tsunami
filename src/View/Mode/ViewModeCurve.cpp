@@ -30,8 +30,10 @@ void ViewModeCurve::onLeftButtonDown()
 
 
 	if (curve and (hover->type == Selection::TYPE_CURVE_POINT_NONE)){
-		curve->add(cam->screen2sample(view->mx), screen2value(view->my));
-		view->forceRedraw();
+		int pos = cam->screen2sample(view->mx);
+		float value = screen2value(view->my);
+		song->curveAddPoint(curve, pos, value);
+		//view->forceRedraw();
 	}
 }
 
@@ -46,9 +48,10 @@ void ViewModeCurve::onMouseMove()
 
 	if (hui::GetEvent()->lbut){
 		if (curve and (hover->type == Selection::TYPE_CURVE_POINT)){
-			curve->points[hover->index].pos = cam->screen2sample(view->mx);
-			curve->points[hover->index].value = clampf(screen2value(view->my), curve->min, curve->max);
-			view->forceRedraw();
+			int pos = cam->screen2sample(view->mx);
+			float value = clampf(screen2value(view->my), curve->min, curve->max);
+			song->curveEditPoint(curve, hover->index, pos, value);
+			//view->forceRedraw();
 		}
 	}
 }
@@ -59,10 +62,9 @@ void ViewModeCurve::onKeyDown(int k)
 
 	if (curve and (hover->type == Selection::TYPE_CURVE_POINT))
 		if (k == hui::KEY_DELETE){
-			curve->points.erase(hover->index);
+			song->curveDeletePoint(curve, hover->index);
 			hover->clear();
-			hover->clear();
-			view->forceRedraw();
+			//view->forceRedraw();
 		}
 }
 

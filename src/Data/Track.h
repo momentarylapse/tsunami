@@ -64,7 +64,7 @@ public:
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 	AudioBuffer _cdecl readBuffers(int layer_no, const Range &r);
-	AudioBuffer _cdecl readBuffersCol(const Range &r);
+	void _cdecl readBuffersCol(AudioBuffer &buf, int offset);
 
 	string _cdecl getNiceName();
 	int _cdecl get_index();

@@ -222,6 +222,13 @@ void AudioBuffer::scale(float volume, float panning)
 	if ((volume == 1.0f) and (panning == 0))
 		return;
 
+	if (volume == 0.0f){
+		for (int i=0; i<channels; i++)
+			memset(&c[i][0], 0, sizeof(float)*length);
+		peaks.clear();
+		return;
+	}
+
 	float f[2];
 	if (channels == 2){
 		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);

@@ -151,12 +151,10 @@ AudioBuffer Track::readBuffers(int layer_no, const Range &r)
 	return buf;
 }
 
-AudioBuffer Track::readBuffersCol(const Range &r)
+void Track::readBuffersCol(AudioBuffer &buf, int offset)
 {
-	AudioBuffer buf;
-
 	// is <r> inside a single buffer?
-	int num_inside = 0;
+	/*int num_inside = 0;
 	int inside_layer, inside_no;
 	int inside_p0, inside_p1;
 	bool intersected = false;
@@ -174,18 +172,15 @@ AudioBuffer Track::readBuffersCol(const Range &r)
 	if ((num_inside == 1) and (!intersected)){
 		// set as reference to subarrays
 		buf.set_as_ref(layers[inside_layer].buffers[inside_no], inside_p0, inside_p1 - inside_p0);
-		return buf;
-	}
+		return;
+	}*/
 
-	// create own...
-	buf.resize(r.length);
+	buf.scale(0);
 
 	// fill with overlap
 	for (TrackLayer &l: layers)
 		for (AudioBuffer &b: l.buffers)
-			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
-
-	return buf;
+			buf.add(b, b.offset - offset, 1.0f, 0.0f);
 }
 
 AudioBuffer Track::getBuffers(int layer_no, const Range &r)

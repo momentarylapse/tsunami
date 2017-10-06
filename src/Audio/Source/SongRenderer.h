@@ -39,14 +39,14 @@ public:
 
 private:
 	void _cdecl reset();
-	void read_basic(AudioBuffer &buf, int pos, int size);
-	void bb_render_audio_track_no_fx(AudioBuffer &buf, Track *t);
-	void bb_render_time_track_no_fx(AudioBuffer &buf, Track *t);
-	void bb_render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void bb_render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void bb_apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
-	void bb_render_track_fx(AudioBuffer &buf, Track *t, int ti);
-	void bb_render_song_no_fx(AudioBuffer &buf);
+	void read_basic(AudioBuffer &buf, int pos);
+	void render_audio_track_no_fx(AudioBuffer &buf, Track *t);
+	void render_time_track_no_fx(AudioBuffer &buf, Track *t);
+	void render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
+	void render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
+	void apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
+	void render_track_fx(AudioBuffer &buf, Track *t, int ti);
+	void render_song_no_fx(AudioBuffer &buf);
 
 	Song *song;
 	Range _range;

@@ -12,10 +12,10 @@
 #include "../AudioView.h"
 #include "MiniBar.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, DeviceManager *_output, AudioView *_view)
+MiniBar::MiniBar(BottomBar *_bottom_bar, DeviceManager *_dev_manager, AudioView *_view)
 {
 	view = _view;
-	dev_manager = _output;
+	dev_manager = _dev_manager;
 	bottom_bar = _bottom_bar;
 
 	fromResource("mini_bar");
@@ -33,8 +33,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, DeviceManager *_output, AudioView *_vie
 
 MiniBar::~MiniBar()
 {
-	if (view->stream)
-		view->stream->unsubscribe(this);
+	view->unsubscribe(this);
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);

@@ -53,11 +53,11 @@ Selection ViewModeCapture::getHover()
 	if (s.track){
 		AudioViewTrack *t = s.vtrack;
 		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_MUTE;
+			s.type = Selection::TYPE_TRACK_BUTTON_MUTE;
 			return s;
 		}
 		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_SOLO;
+			s.type = Selection::TYPE_TRACK_BUTTON_SOLO;
 			return s;
 		}
 	}

@@ -29,7 +29,7 @@ void ViewModeCurve::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 
 
-	if ((curve) and (hover->type == Selection::TYPE_TRACK)){
+	if (curve and (hover->type == Selection::TYPE_CURVE_POINT_NONE)){
 		curve->add(cam->screen2sample(view->mx), screen2value(view->my));
 		view->forceRedraw();
 	}
@@ -45,7 +45,7 @@ void ViewModeCurve::onMouseMove()
 	ViewModeDefault::onMouseMove();
 
 	if (hui::GetEvent()->lbut){
-		if ((curve) and (hover->type == Selection::TYPE_CURVE_POINT)){
+		if (curve and (hover->type == Selection::TYPE_CURVE_POINT)){
 			curve->points[hover->index].pos = cam->screen2sample(view->mx);
 			curve->points[hover->index].value = clampf(screen2value(view->my), curve->min, curve->max);
 			view->forceRedraw();
@@ -57,7 +57,7 @@ void ViewModeCurve::onKeyDown(int k)
 {
 	ViewModeDefault::onKeyDown(k);
 
-	if ((curve) and (hover->type == Selection::TYPE_CURVE_POINT))
+	if (curve and (hover->type == Selection::TYPE_CURVE_POINT))
 		if (k == hui::KEY_DELETE){
 			curve->points.erase(hover->index);
 			hover->clear();
@@ -108,7 +108,7 @@ Selection ViewModeCurve::getHover()
 	int my = view->my;
 
 	// curve points
-	if (s.track and curve){
+	if ((s.type == s.TYPE_TRACK) and curve){
 		foreachi(Curve::Point &p, curve->points, i){
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
@@ -119,6 +119,8 @@ Selection ViewModeCurve::getHover()
 			}
 		}
 	}
+	if (s.type == s.TYPE_TRACK)
+		s.type = Selection::TYPE_CURVE_POINT_NONE;
 
 	return s;
 }

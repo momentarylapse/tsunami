@@ -24,7 +24,7 @@ bool Selection::is_in(int _type) const
 	if (type == _type)
 		return true;
 	if (_type == TYPE_TRACK_HEADER)
-		return (type == TYPE_TRACK_MUTE) or (type == TYPE_TRACK_SOLO) or (type == TYPE_TRACK_EDIT);
+		return (type == TYPE_TRACK_BUTTON_MUTE) or (type == TYPE_TRACK_BUTTON_SOLO) or (type == TYPE_TRACK_BUTTON_EDIT) or (type == TYPE_TRACK_BUTTON_CURVE) or (type == TYPE_TRACK_BUTTON_FX);
 	if (_type == TYPE_TRACK)
 		return (track != NULL);
 	return false;

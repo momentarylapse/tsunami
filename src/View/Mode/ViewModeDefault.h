@@ -47,6 +47,7 @@ public:
 	void selectUnderMouse();
 	void setCursorPos(int pos, bool keep_track_selection);
 	virtual Selection getHover();
+	Selection getHoverBasic();
 
 	virtual void setBarriers(Selection &s);
 

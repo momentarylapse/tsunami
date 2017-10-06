@@ -869,13 +869,13 @@ void AudioViewTrack::drawHeader(Painter *c)
 	// icons
 	if (track->type == track->TYPE_TIME){
 		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time); // "⏱"
 	}else if (track->type == track->TYPE_MIDI){
 		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{
 		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio); // "∿"
 	}
 	if (track->muted and !visible)
 		c->drawImage(area.x1 + 5, area.y1 + 5, *view->images.x);
@@ -885,7 +885,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_MUTE))
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_MUTE))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
@@ -894,16 +894,26 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 	if ((view->song->tracks.num > 1) and visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_SOLO))
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_SOLO))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_EDIT))
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_EDIT))
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
+
+		c->setColor(col_but);
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_FX))
+			c->setColor(col_but_hover);
+		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...
+
+		c->setColor(col_but);
+		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_CURVE))
+			c->setColor(col_but_hover);
+		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ...
 	}
 }
 

@@ -56,13 +56,17 @@ void ViewModeDefault::onLeftButtonDown()
 		hover->range = view->sel.range;
 		hover->range.invert();
 		view->selection_mode = view->SELECTION_MODE_TIME;
-	}else if (hover->type == Selection::TYPE_TRACK_MUTE){
+	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_MUTE){
 		hover->track->setMuted(!hover->track->muted);
-	}else if (hover->type == Selection::TYPE_TRACK_SOLO){
+	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_SOLO){
 		auto vt = view->get_track(hover->track);
 		vt->setSolo(!vt->solo);
-	}else if (hover->type == Selection::TYPE_TRACK_EDIT){
+	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_EDIT){
 		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
+	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_FX){
+		view->win->side_bar->open(SideBar::FX_CONSOLE);
+	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_CURVE){
+		view->win->side_bar->open(SideBar::CURVE_CONSOLE);
 	}else if (hover->type == Selection::TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(view->song, view->sel);
 	}else if (hover->type == Selection::TYPE_TRACK_HEADER){
@@ -348,12 +352,16 @@ void ViewModeDefault::drawPost(Painter *c)
 
 	if (hover->type == Selection::TYPE_SAMPLE)
 		drawCursorHover(this, c, _("sample ") + hover->sample->origin->name);
-	if (hover->type == Selection::TYPE_TRACK_EDIT)
+	if (hover->type == Selection::TYPE_TRACK_BUTTON_EDIT)
 		drawCursorHover(this, c, _("edit track properties"));
-	if (hover->type == Selection::TYPE_TRACK_MUTE)
+	if (hover->type == Selection::TYPE_TRACK_BUTTON_MUTE)
 		drawCursorHover(this, c, _("toggle mute"));
-	if (hover->type == Selection::TYPE_TRACK_SOLO)
+	if (hover->type == Selection::TYPE_TRACK_BUTTON_SOLO)
 		drawCursorHover(this, c, _("toggle solo"));
+	if (hover->type == Selection::TYPE_TRACK_BUTTON_CURVE)
+		drawCursorHover(this, c, _("edit curves"));
+	if (hover->type == Selection::TYPE_TRACK_BUTTON_FX)
+		drawCursorHover(this, c, _("edit effects"));
 }
 
 void ViewModeDefault::setBarriers(Selection &s)
@@ -386,7 +394,7 @@ void ViewModeDefault::setBarriers(Selection &s)
 	}
 }
 
-Selection ViewModeDefault::getHover()
+Selection ViewModeDefault::getHoverBasic()
 {
 	Selection s;
 	int mx = view->mx;
@@ -426,24 +434,51 @@ Selection ViewModeDefault::getHover()
 		}
 	}
 
-	// mute button?
+	// time scale
+	if (my < view->TIME_SCALE_HEIGHT){
+		s.type = Selection::TYPE_TIME;
+		return s;
+	}
+
+	// track header buttons?
 	if (s.track){
 		AudioViewTrack *t = s.vtrack;
-		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_MUTE;
+		int x = 5;
+		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+			s.type = Selection::TYPE_TRACK_BUTTON_MUTE;
 			return s;
 		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_SOLO;
+		x += 17;
+		if ((song->tracks.num > 1) and (mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+			s.type = Selection::TYPE_TRACK_BUTTON_SOLO;
 			return s;
 		}
-		if ((mx >= t->area.x1 + 39) and (mx < t->area.x1 + 51) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_EDIT;
+		x += 17;
+		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+			s.type = Selection::TYPE_TRACK_BUTTON_EDIT;
+			return s;
+		}
+		x += 17;
+		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+			s.type = Selection::TYPE_TRACK_BUTTON_FX;
+			return s;
+		}
+		x += 17;
+		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+			s.type = Selection::TYPE_TRACK_BUTTON_CURVE;
 			return s;
 		}
 	}
 
-	// sub?
+	return s;
+}
+
+Selection ViewModeDefault::getHover()
+{
+	Selection s = getHoverBasic();
+	int mx = view->mx;
+	int my = view->my;
+
 	if (s.track){
 
 		// markers
@@ -455,7 +490,7 @@ Selection ViewModeDefault::getHover()
 			}
 		}
 
-		// TODO: prefer selected subs
+		// TODO: prefer selected samples
 		for (SampleRef *ss: s.track->samples){
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
@@ -465,12 +500,6 @@ Selection ViewModeDefault::getHover()
 				return s;
 			}
 		}
-	}
-
-	// time scale
-	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::TYPE_TIME;
-		return s;
 	}
 
 	return s;

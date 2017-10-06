@@ -64,7 +64,6 @@ public:
 
 	Array<Point> points;
 
-	void add(int pos, float value);
 	float get(int pos);
 
 	void apply(int pos);

@@ -25,6 +25,7 @@ void* ActionCurveEditPoint::execute(Data* d)
 {
 	//Song *a = dynamic_cast<Song*>(d);
 
+	old_value = curve->points[index];
 	curve->points[index] = new_value;
 
 	return NULL;

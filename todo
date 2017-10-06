@@ -113,8 +113,8 @@ J save progress bar fix
 * beat relative midi creation
 * beat source?
 * always auto record
-* repair curve editor
-* curve actions
+~ repair curve editor
+J curve actions
 * read-only mode (while saving etc)
 * abort saving?
 

@@ -94,7 +94,6 @@ public:
 	void _cdecl invalidateAllPeaks();
 
 	Track *_cdecl getTimeTrack();
-	int _cdecl getNextBeat(int pos);
 	int _cdecl barOffset(int index);
 	string _cdecl getNiceLayerName(int index);
 

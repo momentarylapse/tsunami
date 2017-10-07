@@ -10,6 +10,8 @@
 
 #include "MidiData.h"
 
+class BeatSource;
+
 class MidiSource : public VirtualBase
 {
 public:
@@ -20,6 +22,9 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(MidiRawData &midi){ return 0; };
+
+	BeatSource *beat_source;
+	void setBeatSource(BeatSource *beat_source);
 
 	static const int END_OF_STREAM;
 	static const int NOT_ENOUGH_DATA;
@@ -39,6 +44,13 @@ public:
 
 	MidiRawData midi;
 	int offset;
+	bool ignore_end;
+};
+
+class BeatMidifier : public MidiSource
+{
+public:
+	virtual int _cdecl read(MidiRawData &midi);
 };
 
 #endif /* SRC_MIDI_MIDISOURCE_H_ */

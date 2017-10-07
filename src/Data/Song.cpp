@@ -607,11 +607,6 @@ Track *Song::getTimeTrack()
 	return NULL;
 }
 
-int Song::getNextBeat(int pos)
-{
-	return bars.getNextBeat(pos);
-}
-
 string Song::getNiceLayerName(int index)
 {
 	if (layers[index]->name.num > 0)

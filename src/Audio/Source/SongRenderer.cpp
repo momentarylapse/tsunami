@@ -21,7 +21,6 @@
 SongRenderer::SongRenderer(Song *s)
 {
 	MidiRawData no_midi;
-	midi_streamer = new MidiDataStreamer(no_midi);
 	song = s;
 
 	preview_effect = NULL;
@@ -33,7 +32,8 @@ SongRenderer::SongRenderer(Song *s)
 
 SongRenderer::~SongRenderer()
 {
-	delete(midi_streamer);
+	for (auto m: midi_sources)
+		delete m;
 }
 
 void SongRenderer::__init__(Song *s)
@@ -61,7 +61,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 	return !ir.empty();
 }
 
-void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t)
+void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	// track buffer
 	t->readBuffersCol(buf, range_cur.offset);
@@ -81,7 +81,7 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t)
 	}
 }
 
-void SongRenderer::render_time_track_no_fx(AudioBuffer &buf, Track *t)
+void SongRenderer::render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	Array<Beat> beats = song->bars.getBeats(range_cur, false, true);
 
@@ -91,34 +91,21 @@ void SongRenderer::render_time_track_no_fx(AudioBuffer &buf, Track *t)
 	for (Beat &b: beats)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, b.level, 0.8f);
 
-	midi_streamer->setData(raw);
-	t->synth->out->setSource(midi_streamer);
+	((MidiDataStreamer*)midi_sources[ti])->setData(raw);
 	t->synth->out->read(buf);
 }
 
 void SongRenderer::render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
-	MidiData *m = &t->midi;
-	if (ti < midi.num)
-		m = &midi[ti];
-	// TODO
-
-	MidiRawData raw = midi_notes_to_events(*m);
-
-	MidiRawData events;
-	raw.read(events, range_cur);
-
-	midi_streamer->setData(events);
-	t->synth->out->setSource(midi_streamer);
 	t->synth->out->read(buf);
 }
 
 void SongRenderer::render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	if (t->type == Track::TYPE_AUDIO)
-		render_audio_track_no_fx(buf, t);
+		render_audio_track_no_fx(buf, t, ti);
 	else if (t->type == Track::TYPE_TIME)
-		render_time_track_no_fx(buf, t);
+		render_time_track_no_fx(buf, t, ti);
 	else if (t->type == Track::TYPE_MIDI)
 		render_midi_track_no_fx(buf, t, ti);
 }
@@ -248,7 +235,9 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
-	midi.clear();
+	for (auto m: midi_sources)
+		delete m;
+	midi_sources.clear();
 	allowed_tracks.clear();
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);
@@ -266,16 +255,23 @@ void SongRenderer::reset()
 		for (auto c: t->samples)
 			if (c->type() == t->TYPE_MIDI)
 				_midi.append(*c->midi, c->pos);
-		midi.add(_midi);
+		for (MidiEffect *fx: t->midi.fx){
+			fx->prepare();
+			fx->process(&_midi);
+		}
+
+		MidiRawData raw = midi_notes_to_events(_midi);
+		MidiDataStreamer *m = new MidiDataStreamer(raw);
+		m->ignore_end = true;
+		m->seek(pos);
+		midi_sources.add(m);
+
 		t->synth->setSampleRate(song->sample_rate);
 		t->synth->setInstrument(t->instrument);
 		t->synth->reset();
+		t->synth->out->setSource(m);
 		for (Effect *fx: t->fx)
 			fx->resetState();
-		for (MidiEffect *fx: t->midi.fx){
-			fx->prepare();
-			fx->process(&midi[i]);
-		}
 	}
 	if (preview_effect)
 		preview_effect->resetState();
@@ -296,6 +292,8 @@ int SongRenderer::getNumSamples()
 void SongRenderer::seek(int _pos)
 {
 	pos = _pos;
+	for (auto m: midi_sources)
+		((MidiDataStreamer*)m)->seek(pos);
 	for (Track *t: song->tracks)
 		t->synth->reset();//endAllNotes();
 }

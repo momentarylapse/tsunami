@@ -60,5 +60,50 @@ public:
 	Range getRange();
 };
 
+class DummyBeatSource;
+
+class BeatSource : public VirtualBase
+{
+public:
+	virtual ~BeatSource(){}
+	virtual int _cdecl read(Array<Beat> &beats, int samples) = 0;
+
+	static DummyBeatSource *dummy;
+};
+
+class DummyBeatSource : public BeatSource
+{
+public:
+	virtual int _cdecl read(Array<Beat> &beats, int samples){ return samples; }
+};
+
+class BarStreamer : public BeatSource
+{
+	BarStreamer(BarCollection &bars);
+	virtual int _cdecl read(Array<Beat> &beats, int samples);
+	void seek(int pos);
+
+	BarCollection bars;
+	int offset;
+};
+
+// TODO: find better name!
+class RhythmHelper
+{
+public:
+	RhythmHelper(BarCollection *bars);
+	Array<Beat> getBeats(const Range &r, bool include_hidden = false, bool include_sub_beats = false);
+	int getNextBeat();
+	int getPrevBeat();
+	int getNextSubBeat(int beat_partition);
+	int getPrevSubBeat(int beat_partition);
+	Range expand(const Range &r, int beat_partition);
+	void set_pos(int pos);
+	void consume(int samples);
+	void reset();
+	BarCollection *bars;
+	int offset;
+};
+
 
 #endif /* RHYTHM_H_ */

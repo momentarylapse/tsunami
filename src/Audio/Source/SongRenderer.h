@@ -10,7 +10,7 @@
 
 #include "../Source/AudioSource.h"
 
-class MidiDataStreamer;
+class MidiSource;
 
 class SongRenderer : public AudioSource
 {
@@ -40,8 +40,8 @@ public:
 private:
 	void _cdecl reset();
 	void read_basic(AudioBuffer &buf, int pos);
-	void render_audio_track_no_fx(AudioBuffer &buf, Track *t);
-	void render_time_track_no_fx(AudioBuffer &buf, Track *t);
+	void render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti);
+	void render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
@@ -52,10 +52,9 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
-	Array<MidiData> midi;
 	Set<Track*> allowed_tracks;
 
-	MidiDataStreamer *midi_streamer;
+	Array<MidiSource*> midi_sources;
 
 public:
 	Effect *preview_effect;

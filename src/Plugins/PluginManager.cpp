@@ -342,7 +342,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.addTrack", Kaba::mf(&Song::addTrack));
 	Kaba::LinkExternal("Song.deleteTrack", Kaba::mf(&Song::deleteTrack));
 	Kaba::LinkExternal("Song.getRange", Kaba::mf(&Song::getRange));
-	Kaba::LinkExternal("Song.getNextBeat", Kaba::mf(&Song::getNextBeat));
 	Kaba::LinkExternal("Song.addBar", Kaba::mf(&Song::addBar));
 	Kaba::LinkExternal("Song.addPause", Kaba::mf(&Song::addPause));
 	Kaba::LinkExternal("Song.editBar", Kaba::mf(&Song::editBar));

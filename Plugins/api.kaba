@@ -318,7 +318,6 @@ class Song
 	extern virtual void __delete__()
 	
 	extern Range getRange()
-	extern int getNextBeat(int pos)
 	
 	extern void newEmpty(int sample_rate)
 	extern Track* addTrack(int type, int index)

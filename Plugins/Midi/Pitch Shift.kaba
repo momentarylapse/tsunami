@@ -11,6 +11,6 @@ class Config extends PluginData
 class PitchShift extends MidiEffect
 	Config config
 	
-	override void process(MidiData midi)
+	override void process(MidiNoteBuffer midi)
 		for n in midi
 			n.pitch += config.Pitch

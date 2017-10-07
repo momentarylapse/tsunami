@@ -31,7 +31,7 @@ InputStreamMidi::Output::Output(InputStreamMidi *_input)
 
 InputStreamMidi::Output::~Output(){}
 
-int InputStreamMidi::Output::read(MidiRawData &midi)
+int InputStreamMidi::Output::read(MidiEventBuffer &midi)
 {
 	if (real_time_mode){
 		for (auto &e: events){
@@ -59,7 +59,7 @@ int InputStreamMidi::Output::read(MidiRawData &midi)
 	}
 }
 
-void InputStreamMidi::Output::feed(const MidiRawData &midi)
+void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 {
 	events.append(midi);
 }

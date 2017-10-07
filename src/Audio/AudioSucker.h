@@ -8,7 +8,7 @@
 #ifndef SRC_AUDIO_AUDIOSUCKER_H_
 #define SRC_AUDIO_AUDIOSUCKER_H_
 
-#include "../Data/AudioBuffer.h"
+#include "AudioBuffer.h"
 #include "../Stuff/Observable.h"
 
 class AudioSource;

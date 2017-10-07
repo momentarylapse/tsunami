@@ -38,12 +38,12 @@ void render_bufbox(Image &im, AudioBuffer &b, AudioView *view)
 	}
 }
 
-void render_midi(Image &im, MidiData &m)
+void render_midi(Image &im, MidiNoteBuffer &m)
 {
 	int w = im.width;
 	int h = im.height;
 	Range r = Range(0, m.samples);
-	MidiDataRef notes = m.getNotes(r);
+	MidiNoteBufferRef notes = m.getNotes(r);
 	for (MidiNote *n: notes){
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);

@@ -15,7 +15,7 @@
 
 #define MAX_PITCH		128
 
-class MidiDataRef;
+class MidiNoteBufferRef;
 class MidiEffect;
 class Instrument;
 class Clef;
@@ -24,13 +24,13 @@ class Track;
 class SongSelection;
 
 
-class MidiRawData : public Array<MidiEvent>
+class MidiEventBuffer : public Array<MidiEvent>
 {
 public:
-	MidiRawData();
+	MidiEventBuffer();
 	void _cdecl __init__();
-	MidiRawData getEvents(const Range &r) const;
-	int read(MidiRawData &data, const Range &r) const;
+	MidiEventBuffer getEvents(const Range &r) const;
+	int read(MidiEventBuffer &data, const Range &r) const;
 	Array<MidiNote> getNotes(const Range &r) const;
 	int getNextEvent(int pos) const;
 
@@ -41,23 +41,23 @@ public:
 	void sanify(const Range &r);
 
 	void addMetronomeClick(int pos, int level, float volume);
-	void append(const MidiRawData &data);
+	void append(const MidiEventBuffer &data);
 };
 
-class MidiData : public Array<MidiNote*>
+class MidiNoteBuffer : public Array<MidiNote*>
 {
 public:
-	MidiData();
-	MidiData(const MidiData &midi);
-	~MidiData();
+	MidiNoteBuffer();
+	MidiNoteBuffer(const MidiNoteBuffer &midi);
+	~MidiNoteBuffer();
 	void _cdecl __init__();
 	void _cdecl __delete__();
 	void deep_clear();
-	MidiRawData getEvents(const Range &r) const;
-	MidiDataRef getNotes(const Range &r) const;
-	MidiDataRef getNotesBySelection(const SongSelection &s) const;
-	MidiData duplicate() const;
-	void append(const MidiData &midi, int offset);
+	MidiEventBuffer getEvents(const Range &r) const;
+	MidiNoteBufferRef getNotes(const Range &r) const;
+	MidiNoteBufferRef getNotesBySelection(const SongSelection &s) const;
+	MidiNoteBuffer duplicate() const;
+	void append(const MidiNoteBuffer &midi, int offset);
 
 	Range range(int elongation) const;
 	int samples;
@@ -65,8 +65,8 @@ public:
 	void sort();
 	void sanify(const Range &r);
 
-	void operator=(const MidiData &midi);
-	void operator=(const MidiDataRef &midi);
+	void operator=(const MidiNoteBuffer &midi);
+	void operator=(const MidiNoteBufferRef &midi);
 
 	//void update_meta(const Instrument &i, const Scale &s) const;
 	void update_meta(Track *t, const Scale &s) const;
@@ -75,15 +75,15 @@ public:
 	Array<MidiEffect*> fx;
 };
 
-class MidiDataRef : public MidiData
+class MidiNoteBufferRef : public MidiNoteBuffer
 {
 public:
-	MidiDataRef();
-	~MidiDataRef();
+	MidiNoteBufferRef();
+	~MidiNoteBufferRef();
 };
 
-MidiRawData midi_notes_to_events(const MidiData &notes);
-MidiData midi_events_to_notes(const MidiRawData &events);
+MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes);
+MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events);
 
 
 

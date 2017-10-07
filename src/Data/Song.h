@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SONG_H_
-#define SONG_H_
+#ifndef SRC_DATA_SONG_H_
+#define SRC_DATA_SONG_H_
 
 #include "Data.h"
 #include "Track.h"
 #include "Sample.h"
 #include "SampleRef.h"
-#include "Rhythm.h"
+#include "../Rhythm/BarCollection.h"
 #include "Curve.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
@@ -171,4 +171,4 @@ int get_sample_index(Sample *s);
 float amplitude2db(float amp);
 float db2amplitude(float db);
 
-#endif /* SONG_H_ */
+#endif /* SRC_DATA_SONG_H_ */

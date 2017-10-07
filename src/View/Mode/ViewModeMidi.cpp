@@ -29,7 +29,7 @@ public:
 		mode = MODE_WAITING;
 		ttl = -1;
 	}
-	virtual int _cdecl read(MidiRawData &midi)
+	virtual int _cdecl read(MidiEventBuffer &midi)
 	{
 		//printf("mps.read\n");
 		if (mode == MODE_END_OF_STREAM){
@@ -224,7 +224,7 @@ void ViewModeMidi::onLeftButtonUp()
 	int mode = which_midi_mode(cur_track->track);
 	if ((mode == AudioView::MIDI_MODE_CLASSICAL) or (mode == AudioView::MIDI_MODE_LINEAR)){
 		if (hover->type == Selection::TYPE_MIDI_PITCH){
-			MidiData notes = getCreationNotes(hover, view->msp.start_pos);
+			auto notes = getCreationNotes(hover, view->msp.start_pos);
 			view->cur_track->addMidiNotes(notes);
 
 			preview_source->end();
@@ -368,7 +368,7 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 			}
 	}
 
-	MidiRawData midi = midi_notes_to_events(t->midi);
+	MidiEventBuffer midi = midi_notes_to_events(t->midi);
 	for (MidiEvent &e: midi)
 		for (int p: pitch)
 			if (e.pitch == p){
@@ -395,7 +395,7 @@ Array<int> ViewModeMidi::getCreationPitch(int base_pitch)
 	return pitch;
 }
 
-MidiData ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
+MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 {
 	int start = min(pos0, sel->pos);
 	int end = max(pos0, sel->pos);
@@ -411,7 +411,7 @@ MidiData ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 	Range allowed = get_allowed_midi_range(view->cur_track, pitch, pos0);
 
 	// create notes
-	MidiData notes;
+	MidiNoteBuffer notes;
 	if (allowed.empty())
 		return notes;
 	for (int p: pitch)
@@ -613,7 +613,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 			// current creation
 			if ((hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
-				MidiData notes = getCreationNotes(hover, view->msp.start_pos);
+				auto notes = getCreationNotes(hover, view->msp.start_pos);
 				drawMidi(c, t, notes, false, 0);
 				//c->setFontSize(view->FONT_SIZE);
 			}
@@ -621,7 +621,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 			// creation preview
 			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
-				MidiData notes = getCreationNotes(hover, hover->pos);
+				auto notes = getCreationNotes(hover, hover->pos);
 				drawMidi(c, t, notes, false, 0);
 			}
 		}

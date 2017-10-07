@@ -61,7 +61,7 @@ int[] morse(string str)
 			append(l, [2,2,1,1])
 	return l
 
-void make_midi(MidiData midi, int[] l, int d, int pitch)
+void make_midi(MidiNoteBuffer midi, int[] l, int d, int pitch)
 	int offset = 0
 	for ll in l
 		int samples = ll * d
@@ -75,12 +75,12 @@ class XXX extends SongPlugin
 	override void apply(Song* song)
 		/*for t in song.tracks
 			if t.type == TYPE_MIDI
-				MidiData midi
+				MidiNoteBuffer midi
 				int[] l = morse("lump homology")
 				make_midi(midi, l, 7000)
 				t.insertMidiData(0, midi)*/
 		
-		MidiData midi
+		MidiNoteBuffer midi
 		int[] l = morse("lump homology")
 		make_midi(midi, l, 7000, 60)
 		song.tracks[0].insertMidiData(0, midi)

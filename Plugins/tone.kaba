@@ -128,7 +128,7 @@ void AddRichTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f
 	pitch.add(c.base_tone + 7)
 	pitch.add(c.base_tone + 12)
 	
-	MidiRawData midi
+	MidiEventBuffer midi
 	for p in pitch
 		midi.addNote(_MidiNote(r, p, volume))
 	s.feed(midi)*/

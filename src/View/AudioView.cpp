@@ -22,6 +22,7 @@
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
+#include "../Rhythm/Beat.h"
 #include "Mode/ViewModeScaleBars.h"
 
 #include "../lib/threads/Mutex.h"

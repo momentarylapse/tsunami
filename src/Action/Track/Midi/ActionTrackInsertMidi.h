@@ -14,7 +14,7 @@
 class ActionTrackInsertMidi : public Action
 {
 public:
-	ActionTrackInsertMidi(Track *t, int offset, const MidiData &midi);
+	ActionTrackInsertMidi(Track *t, int offset, const MidiNoteBuffer &midi);
 	virtual ~ActionTrackInsertMidi();
 
 	virtual void *execute(Data *d);
@@ -22,7 +22,7 @@ public:
 
 private:
 	int track_no;
-	MidiData midi;
+	MidiNoteBuffer midi;
 	int offset;
 	Array<int> inserted_at;
 	bool applied;

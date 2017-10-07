@@ -11,7 +11,7 @@
 #include "ViewModeDefault.h"
 #include "../../lib/math/math.h"
 
-class MidiData;
+class MidiNoteBuffer;
 class MidiNote;
 class MidiEvent;
 class OutputStream;
@@ -40,7 +40,7 @@ public:
 
 	virtual int which_midi_mode(Track *t);
 
-	MidiData getCreationNotes(Selection *sel, int pos0);
+	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
 
 	Array<int> getCreationPitch(int base_pitch);

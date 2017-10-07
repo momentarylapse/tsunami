@@ -16,7 +16,7 @@
 class Plugin;
 class Track;
 class AudioBuffer;
-class MidiData;
+class MidiNoteBuffer;
 class SongSelection;
 
 namespace Script{
@@ -40,12 +40,12 @@ public:
 	bool usable;
 	bool enabled;
 
-	virtual void _cdecl process(MidiData *midi){};
+	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
 	void process_track(Track *t, const SongSelection &sel);
 
 	void prepare();
-	void apply(MidiData &midi, Track *t, bool log_error);
+	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);
 
 	string GetError();
 };

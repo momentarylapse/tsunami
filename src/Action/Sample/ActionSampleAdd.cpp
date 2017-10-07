@@ -20,7 +20,7 @@ ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, boo
 	sample->_pointer_ref();
 }
 
-ActionSampleAdd::ActionSampleAdd(const string &name, const MidiData &midi, bool auto_delete)
+ActionSampleAdd::ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete)
 {
 	sample = new Sample(Track::TYPE_MIDI);
 	sample->midi = midi;

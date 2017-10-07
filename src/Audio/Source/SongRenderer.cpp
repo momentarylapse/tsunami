@@ -14,14 +14,18 @@
 #include "../../Data/Curve.h"
 #include "../../Data/SongSelection.h"
 #include "../../Midi/MidiSource.h"
+#include "../../Midi/MidiEventStreamer.h"
+#include "../../Rhythm/BarStreamer.h"
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
 
 SongRenderer::SongRenderer(Song *s)
 {
-	MidiRawData no_midi;
+	MidiEventBuffer no_midi;
 	song = s;
+	beat_midifier = NULL;
+	bar_streamer = NULL;
 
 	preview_effect = NULL;
 	allow_loop = false;
@@ -32,8 +36,7 @@ SongRenderer::SongRenderer(Song *s)
 
 SongRenderer::~SongRenderer()
 {
-	for (auto m: midi_sources)
-		delete m;
+	clear_data();
 }
 
 void SongRenderer::__init__(Song *s)
@@ -83,15 +86,6 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 
 void SongRenderer::render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
-	Array<Beat> beats = song->bars.getBeats(range_cur, false, true);
-
-	MidiRawData raw;
-	raw.samples = buf.length;
-
-	for (Beat &b: beats)
-		raw.addMetronomeClick(b.range.offset - range_cur.offset, b.level, 0.8f);
-
-	((MidiDataStreamer*)midi_sources[ti])->setData(raw);
 	t->synth->out->read(buf);
 }
 
@@ -230,51 +224,86 @@ void SongRenderer::allowTracks(const Set<Track*> &_allowed_tracks)
 	allowed_tracks = _allowed_tracks;
 }
 
+void SongRenderer::clear_data()
+{
+	for (auto m: midi_streamer)
+		delete m;
+	midi_streamer.clear();
+
+	if (beat_midifier){
+		delete beat_midifier;
+		beat_midifier = NULL;
+	}
+
+	if (bar_streamer){
+		delete bar_streamer;
+		bar_streamer = NULL;
+	}
+
+	allowed_tracks.clear();
+}
+
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
+	clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
-	for (auto m: midi_sources)
-		delete m;
-	midi_sources.clear();
-	allowed_tracks.clear();
+
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);
 
-	reset();
+	reset_state();
+	build_data();
 }
 
-void SongRenderer::reset()
+void SongRenderer::reset_state()
 {
 	for (Effect *fx: song->fx)
 		fx->resetState();
 	foreachi(Track *t, song->tracks, i){
-		//midi.add(t, t->midi);
-		MidiData _midi = t->midi;
-		for (auto c: t->samples)
-			if (c->type() == t->TYPE_MIDI)
-				_midi.append(*c->midi, c->pos);
-		for (MidiEffect *fx: t->midi.fx){
-			fx->prepare();
-			fx->process(&_midi);
-		}
-
-		MidiRawData raw = midi_notes_to_events(_midi);
-		MidiDataStreamer *m = new MidiDataStreamer(raw);
-		m->ignore_end = true;
-		m->seek(pos);
-		midi_sources.add(m);
-
-		t->synth->setSampleRate(song->sample_rate);
-		t->synth->setInstrument(t->instrument);
-		t->synth->reset();
-		t->synth->out->setSource(m);
 		for (Effect *fx: t->fx)
 			fx->resetState();
+		t->synth->reset();
 	}
 	if (preview_effect)
 		preview_effect->resetState();
+}
+
+void SongRenderer::build_data()
+{
+	bar_streamer = new BarStreamer(song->bars);
+	beat_midifier = new BeatMidifier;
+	beat_midifier->setBeatSource(bar_streamer);
+
+	foreachi(Track *t, song->tracks, i){
+		//midi.add(t, t->midi);
+		if (t->type == t->TYPE_MIDI){
+			MidiNoteBuffer _midi = t->midi;
+			for (auto c: t->samples)
+				if (c->type() == t->TYPE_MIDI)
+					_midi.append(*c->midi, c->pos);
+			for (MidiEffect *fx: t->midi.fx){
+				fx->prepare();
+				fx->process(&_midi);
+			}
+
+			MidiEventBuffer raw = midi_notes_to_events(_midi);
+			MidiEventStreamer *m = new MidiEventStreamer(raw);
+			m->ignore_end = true;
+			m->seek(pos);
+			midi_streamer.add(m);
+
+			t->synth->setSampleRate(song->sample_rate);
+			t->synth->setInstrument(t->instrument);
+			t->synth->out->setSource(m);
+		}else if (t->type == t->TYPE_TIME){
+
+			t->synth->setSampleRate(song->sample_rate);
+			t->synth->setInstrument(t->instrument);
+			t->synth->out->setSource(beat_midifier);
+		}
+	}
 }
 
 int SongRenderer::getSampleRate()
@@ -292,8 +321,11 @@ int SongRenderer::getNumSamples()
 void SongRenderer::seek(int _pos)
 {
 	pos = _pos;
-	for (auto m: midi_sources)
-		((MidiDataStreamer*)m)->seek(pos);
+	reset_state();
+	for (auto m: midi_streamer)
+		m->seek(pos);
+	if (bar_streamer)
+		bar_streamer->seek(pos);
 	for (Track *t: song->tracks)
 		t->synth->reset();//endAllNotes();
 }

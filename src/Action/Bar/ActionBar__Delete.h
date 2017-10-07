@@ -9,7 +9,7 @@
 #define SRC_ACTION_BAR_ACTIONBAR__DELETE_H_
 
 #include "../Action.h"
-#include "../../Data/Song.h"
+#include "../../Rhythm/BarCollection.h"
 
 class ActionBar__Delete: public Action
 {

@@ -1,40 +1,16 @@
 /*
- * Rhythm.cpp
+ * BarCollection.cpp
  *
- *  Created on: 23.02.2013
+ *  Created on: 07.10.2017
  *      Author: michi
  */
 
-#include "Rhythm.h"
 
-Beat::Beat(const Range &r, int _bar_no, int _beat_no, int _level)
-{
-	range = r;
-	bar_no = _bar_no;
-	beat_no = _beat_no;
-	level = _level;
-};
+#include "BarCollection.h"
+#include "Beat.h"
+#include "Bar.h"
+#include "../Data/Range.h"
 
-Range Beat::sub(int index, int parts)
-{
-	int length = range.length / parts;
-	int start = range.offset + index * length;
-	if (index == parts - 1)
-		return Range(start, range.length - start);
-	return Range(start, length);
-}
-
-Bar::Bar(const Range &r, int _num_beats, int _index)
-{
-	range = r;
-	num_beats = _num_beats;
-	index = _index;
-}
-
-float Bar::bpm(float sample_rate)
-{
-	return 60.0f / (float)range.length * (float)num_beats * sample_rate;
-}
 
 // pos is precise... beat length not...
 Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hidden, bool include_sub_beats, int overwrite_sub_beats = -1)
@@ -151,6 +127,16 @@ int BarCollection::getPrevSubBeat(int pos, int beat_partition)
 	return 0;
 }
 
+
+
+Range BarCollection::expand(const Range &r, int beat_partition)
+{
+	Range o = r;
+	o.set_start(getPrevSubBeat(r.start(), beat_partition));
+	o.set_end(getNextSubBeat(r.end(), beat_partition));
+	return r;
+}
+
 Range BarCollection::getRange()
 {
 	int pos0 = 0;
@@ -158,85 +144,4 @@ Range BarCollection::getRange()
 		pos0 += b.length;
 	return Range(0, pos0);
 }
-
-
-
-RhythmHelper::RhythmHelper(BarCollection *_bars)
-{
-	bars = _bars;
-	offset = 0;
-}
-
-Array<Beat> RhythmHelper::getBeats(const Range &r, bool include_hidden, bool include_sub_beats)
-{
-	return bars->getBeats(r, include_hidden, include_sub_beats);
-}
-
-int RhythmHelper::getNextBeat()
-{
-	return bars->getNextBeat(offset);
-}
-
-int RhythmHelper::getPrevBeat()
-{
-	return bars->getPrevBeat(offset);
-}
-
-int RhythmHelper::getNextSubBeat(int beat_partition)
-{
-	return bars->getNextSubBeat(offset, beat_partition);
-}
-
-int RhythmHelper::getPrevSubBeat(int beat_partition)
-{
-	return bars->getPrevSubBeat(offset, beat_partition);
-}
-
-Range RhythmHelper::expand(const Range &r, int beat_partition)
-{
-	Range o = r;
-	offset = r.start();
-	o.set_start(getPrevSubBeat(beat_partition));
-	offset = r.end();
-	o.set_end(getNextSubBeat(beat_partition));
-	return r;
-}
-
-void RhythmHelper::set_pos(int pos)
-{
-	offset = pos;
-}
-
-void RhythmHelper::consume(int samples)
-{
-	offset += samples;
-}
-
-void RhythmHelper::reset()
-{
-	offset = 0;
-}
-
-
-
-
-DummyBeatSource* BeatSource::dummy = new DummyBeatSource;
-
-BarStreamer::BarStreamer(BarCollection &_bars)
-{
-	bars = _bars;
-	offset = 0;
-}
-
-int BarStreamer::read(Array<Beat> &beats, int samples)
-{
-	beats = bars.getBeats(Range(offset, samples), false, false);
-	return samples;
-}
-
-void BarStreamer::seek(int pos)
-{
-	offset = pos;
-}
-
 

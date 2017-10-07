@@ -99,7 +99,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				throw string("midi track header is not \"MTrk\": " + tn);
 			//msg_write("----------------------- track");
 
-			Map<int, MidiRawData> events;
+			Map<int, MidiEventBuffer> events;
 			string track_name;
 			int last_status = 0;
 

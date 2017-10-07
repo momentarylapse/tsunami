@@ -9,7 +9,7 @@
 #define SRC_ACTION_BAR_ACTIONBAR__ADD_H_
 
 #include "../Action.h"
-#include "../../Data/Song.h"
+#include "../../Rhythm/BarCollection.h"
 
 class ActionBar__Add: public Action
 {

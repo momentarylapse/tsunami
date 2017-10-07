@@ -10,7 +10,7 @@
 
 #include "../ActionGroup.h"
 
-#include "../../Data/Rhythm.h"
+#include "../../Rhythm/BarCollection.h"
 
 class Song;
 

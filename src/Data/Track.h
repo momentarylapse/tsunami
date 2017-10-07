@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef TRACK_H_
-#define TRACK_H_
+#ifndef SRC_DATA_TRACK_H_
+#define SRC_DATA_TRACK_H_
 
 #include "Range.h"
 #include "../Midi/MidiData.h"
@@ -14,7 +14,7 @@
 #include "../Midi/Instrument.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
-#include "AudioBuffer.h"
+#include "../Audio/AudioBuffer.h"
 #include "Song.h"
 
 
@@ -77,7 +77,7 @@ public:
 	void _cdecl setPanning(float panning);
 	void _cdecl move(int target);
 	AudioBuffer _cdecl getBuffers(int layer_no, const Range &r);
-	void _cdecl insertMidiData(int offset, const MidiData &midi);
+	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
 	void _cdecl addEffect(Effect *effect);
 	void _cdecl deleteEffect(int index);
 	void _cdecl editEffect(int index, const string &param_old);
@@ -90,7 +90,7 @@ public:
 	void _cdecl deleteSampleRef(SampleRef *ref);
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 	void _cdecl addMidiNote(const MidiNote &n);
-	void _cdecl addMidiNotes(const MidiData &notes);
+	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
@@ -123,7 +123,7 @@ public:
 	Array<SampleRef*> samples;
 
 	// midi track
-	MidiData midi;
+	MidiNoteBuffer midi;
 	Synthesizer *synth;
 
 
@@ -133,4 +133,4 @@ public:
 	Song *song;
 };
 
-#endif /* TRACK_H_ */
+#endif /* SRC_DATA_TRACK_H_ */

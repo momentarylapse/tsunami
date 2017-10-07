@@ -8,7 +8,7 @@
 #include "ActionSampleScale.h"
 
 #include "../../Data/Song.h"
-#include "../../Data/BufferInterpolator.h"
+#include "../../Audio/BufferInterpolator.h"
 
 ActionSampleScale::ActionSampleScale(Sample *s, int _new_size, int _method)
 {

@@ -7,7 +7,7 @@
 
 #include "ActionTrackInsertMidi.h"
 
-ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiData &_midi)
+ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiNoteBuffer &_midi)
 {
 	track_no = get_track_index(t);
 	offset = _offset;

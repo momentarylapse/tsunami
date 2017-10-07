@@ -5,13 +5,13 @@
  *      Author: michi
  */
 
-#ifndef SAMPLE_H_
-#define SAMPLE_H_
+#ifndef SRC_DATA_SAMPLE_H_
+#define SRC_DATA_SAMPLE_H_
 
 #include "../Midi/MidiData.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
-#include "AudioBuffer.h"
+#include "../Audio/AudioBuffer.h"
 
 class Song;
 class Track;
@@ -38,7 +38,7 @@ public:
 	string name;
 	int type;
 	AudioBuffer buf;
-	MidiData midi;
+	MidiNoteBuffer midi;
 	float volume;
 	int offset;
 
@@ -61,4 +61,4 @@ public:
 
 
 
-#endif /* SAMPLE_H_ */
+#endif /* SRC_DATA_SAMPLE_H_ */

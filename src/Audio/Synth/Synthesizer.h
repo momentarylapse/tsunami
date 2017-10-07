@@ -75,7 +75,7 @@ protected:
 
 	Instrument instrument;
 
-	MidiRawData events;
+	MidiEventBuffer events;
 
 	Set<int> active_pitch;
 	Array<int> delete_me;

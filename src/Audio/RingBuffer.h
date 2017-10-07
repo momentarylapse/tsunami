@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_DATA_RINGBUFFER_H_
-#define SRC_DATA_RINGBUFFER_H_
+#ifndef SRC_AUDIO_RINGBUFFER_H_
+#define SRC_AUDIO_RINGBUFFER_H_
 
 #include "AudioBuffer.h"
 
@@ -33,4 +33,4 @@ public:
 	int write_pos;
 };
 
-#endif /* SRC_DATA_RINGBUFFER_H_ */
+#endif /* SRC_AUDIO_RINGBUFFER_H_ */

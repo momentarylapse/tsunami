@@ -13,6 +13,9 @@
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
 #include "../Data/Song.h"
+#include "../Rhythm/BarCollection.h"
+#include "../Rhythm/Bar.h"
+#include "../Rhythm/Beat.h"
 #include "../Midi/MidiData.h"
 #include "../Midi/Clef.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -500,10 +503,10 @@ inline AudioViewTrack::MidiNoteState note_state(MidiNote *n, bool as_reference, 
 	return s;
 }
 
-void AudioViewTrack::drawMidiLinear(Painter *c, const MidiData &midi, bool as_reference, int shift)
+void AudioViewTrack::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
-	MidiDataRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.getNotes(range);
 	//c->setLineWidth(3.0f);
 
 
@@ -603,11 +606,11 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 	}
 }
 
-void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift)
+void AudioViewTrack::drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(track, view->midi_scale);
-	MidiDataRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.getNotes(range);
 
 	for (MidiNote *n: notes)
 		drawMidiNoteTab(c,  n,  shift,  note_state(n, as_reference, view));
@@ -709,11 +712,11 @@ void AudioViewTrack::drawMidiClefClassical(Painter *c, const Clef &clef, const S
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewTrack::drawMidiClassical(Painter *c, const MidiData &midi, bool as_reference, int shift)
+void AudioViewTrack::drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(track, view->midi_scale);
-	MidiDataRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.getNotes(range);
 
 	const Clef& clef = track->instrument.get_clef();
 

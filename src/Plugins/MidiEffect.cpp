@@ -61,7 +61,7 @@ string MidiEffect::GetError()
 	return format(_("Can not load MidiEffect: \"%s\""), name.c_str());
 }
 
-void MidiEffect::apply(MidiData &midi, Track *t, bool log_error)
+void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 {
 	// run
 	process(&midi);
@@ -77,7 +77,7 @@ void MidiEffect::apply(MidiData &midi, Track *t, bool log_error)
 
 void MidiEffect::process_track(Track *t, const SongSelection &sel)
 {
-	MidiData midi = t->midi.getNotesBySelection(sel);
+	MidiNoteBuffer midi = t->midi.getNotesBySelection(sel);
 
 	t->song->action_manager->beginActionGroup();
 

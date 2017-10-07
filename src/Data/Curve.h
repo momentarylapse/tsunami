@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef CURVE_H_
-#define CURVE_H_
+#ifndef SRC_DATA_CURVE_H_
+#define SRC_DATA_CURVE_H_
 
 #include "../Stuff/Observable.h"
 
@@ -72,4 +72,4 @@ public:
 	string getTargets(Song *a);
 };
 
-#endif /* CURVE_H_ */
+#endif /* SRC_DATA_CURVE_H_ */

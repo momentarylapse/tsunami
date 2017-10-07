@@ -60,7 +60,7 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 	e.volume = volume
 	return e
 
-class MidiRawData extends MidiEvent[]
+class MidiEventBuffer extends MidiEvent[]
 	int samples
 	extern override void __init__()
 	extern MidiNote[] getNotes(Range r)
@@ -71,7 +71,7 @@ class MidiRawData extends MidiEvent[]
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
 	extern void addMetronomeClick(int pos, int level, float volume)
 
-class MidiData extends MidiNote*[]
+class MidiNoteBuffer extends MidiNote*[]
 	int samples
 	extern override void __init__()
 	extern MidiNote*[] getNotes(Range r)
@@ -111,7 +111,7 @@ class MidiEffect
 	Song *song
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void process(MidiData midi)
+	extern virtual void process(MidiNoteBuffer midi)
 	extern void resetConfig()
 	extern void resetState()
 	extern virtual ConfigPanel *createPanel()
@@ -156,7 +156,7 @@ class AudioSource
 class MidiSource
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual int read(MidiRawData midi)
+	extern virtual int read(MidiEventBuffer midi)
 
 class SynthOutput extends AudioSource
 	extern override int read(AudioBuffer buf)
@@ -171,7 +171,7 @@ class Synthesizer
 	float[MAX_PITCH] freq
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
-	MidiRawData events
+	MidiEventBuffer events
 	SynthOutput* out
 	extern void __init__()
 	extern virtual void __delete__()
@@ -181,7 +181,7 @@ class Synthesizer
 	extern void resetConfig()
 	extern void setSampleRate(int sample_rate)
 	
-//	extern void feed(MidiRawData midi)
+//	extern void feed(MidiEventBuffer midi)
 	
 	extern void enablePitch(int pitch, bool enable)
 	//extern void notify()
@@ -226,7 +226,7 @@ class Sample // TODO
 	string name
 	int type
 	AudioBuffer buf
-	MidiData midi
+	MidiNoteBuffer midi
 	float volume
 	int uid
 	Tag[] tags
@@ -258,7 +258,7 @@ class Track
 	SampleRef*[] samples
 	
 	// midi track
-	MidiData midi
+	MidiNoteBuffer midi
 	Synthesizer *synth
 	
 	TrackMarker[] markers
@@ -276,7 +276,7 @@ class Track
 	extern void setMuted(bool muted)
 	extern void setVolume(float volume)
 	extern void setPanning(float panning)
-	extern void insertMidiData(int offset, MidiData midi)
+	extern void insertMidiData(int offset, MidiNoteBuffer midi)
 	extern void addEffect(AudioEffect *effect)
 	extern void deleteEffect(int index)
 	extern void editEffect(int index, string param_old)
@@ -285,7 +285,7 @@ class Track
 	extern void deleteSampleRef(int index)
 	extern void editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay)
 	extern void addMidiNote(MidiNote n)
-	//extern void addMidiNotes(MidiData midi)
+	//extern void addMidiNotes(MidiNoteBuffer midi)
 	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
 	extern TrackMarker* addMarker(Range range, string text)
@@ -382,7 +382,7 @@ class OutputStream
 /*class AudioInput //: Observable
 	RingBuffer current_buffer
 	AudioBuffer buffer
-	MidiData midi
+	MidiNoteBuffer midi
 	extern void start(int type, int sample_rate)
 	extern void stop()
 	extern bool isCapturing()

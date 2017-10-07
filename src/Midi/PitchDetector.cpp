@@ -6,8 +6,8 @@
  */
 
 #include "PitchDetector.h"
-#include "Source/AudioSource.h"
-#include "../Data/AudioBuffer.h"
+#include "../Audio/Source/AudioSource.h"
+#include "../Audio/AudioBuffer.h"
 #include "../Plugins/FastFourierTransform.h"
 
 
@@ -49,7 +49,7 @@ void PitchDetector::__delete__()
 	this->~PitchDetector();
 }
 
-void PitchDetector::process(MidiRawData &midi, AudioBuffer &buf)
+void PitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf)
 {
 	Array<float> temp;
 	temp = buf.c[0] + buf.c[1];
@@ -90,7 +90,7 @@ void PitchDetector::process(MidiRawData &midi, AudioBuffer &buf)
 	}
 }
 
-int PitchDetector::read(MidiRawData& midi)
+int PitchDetector::read(MidiEventBuffer& midi)
 {
 	AudioBuffer buf;
 	buf.resize(midi.samples);

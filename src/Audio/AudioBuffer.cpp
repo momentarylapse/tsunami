@@ -1,5 +1,5 @@
 /*
- * BufferBox.cpp
+ * AudioBuffer.cpp
  *
  *  Created on: 21.03.2012
  *      Author: michi
@@ -14,7 +14,7 @@
 
 
 #include "../Tsunami.h"
-#include "Song.h"
+#include "../Data/Song.h"
 #include "../lib/threads/Thread.h"
 
 // peaks:

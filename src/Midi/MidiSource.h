@@ -21,7 +21,7 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	virtual int _cdecl read(MidiRawData &midi){ return 0; };
+	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 
 	BeatSource *beat_source;
 	void setBeatSource(BeatSource *beat_source);
@@ -30,27 +30,10 @@ public:
 	static const int NOT_ENOUGH_DATA;
 };
 
-class MidiDataStreamer : public MidiSource
-{
-public:
-	MidiDataStreamer(const MidiRawData &midi);
-	virtual ~MidiDataStreamer();
-
-	virtual int _cdecl read(MidiRawData &midi);
-
-	void _cdecl setData(const MidiRawData &midi);
-
-	void _cdecl seek(int pos);
-
-	MidiRawData midi;
-	int offset;
-	bool ignore_end;
-};
-
 class BeatMidifier : public MidiSource
 {
 public:
-	virtual int _cdecl read(MidiRawData &midi);
+	virtual int _cdecl read(MidiEventBuffer &midi);
 };
 
 #endif /* SRC_MIDI_MIDISOURCE_H_ */

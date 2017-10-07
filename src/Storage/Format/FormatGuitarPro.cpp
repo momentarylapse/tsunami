@@ -6,6 +6,7 @@
  */
 
 #include "FormatGuitarPro.h"
+#include "../../Rhythm/Bar.h"
 
 const int BEAT_PARTITION = 12;
 
@@ -649,7 +650,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 	// samples per 16th / 3
 	float spu = (float)b.range.length / (float)b.num_beats / (float)BEAT_PARTITION;
 
-	MidiDataRef notes = t->t->midi.getNotes(b.range);
+	MidiNoteBufferRef notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
 
 	for (MidiNote *n : notes){

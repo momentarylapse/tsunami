@@ -42,7 +42,7 @@ void ActionTrackSampleFromSelection::CreateSamplesFromTrackAudio(Track *t, const
 
 void ActionTrackSampleFromSelection::CreateSamplesFromTrackMidi(Track *t, const SongSelection &selo)
 {
-	MidiData midi = t->midi.getNotesBySelection(sel);
+	MidiNoteBuffer midi = t->midi.getNotesBySelection(sel);
 	midi.samples = sel.range.length;
 	if (midi.num == 0)
 		return;

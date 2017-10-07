@@ -11,7 +11,7 @@ class Config extends PluginData
 class Delay extends MidiEffect
 	Config config
 	
-	override void process(MidiData midi)
+	override void process(MidiNoteBuffer midi)
 		int dt = song.sample_rate * config.delay
 		for n in midi
 			n.range.offset += dt

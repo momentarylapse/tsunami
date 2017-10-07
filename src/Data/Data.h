@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef DATA_H_
-#define DATA_H_
+#ifndef SRC_DATA_DATA_H_
+#define SRC_DATA_DATA_H_
 
 #include "../lib/base/base.h"
 #include "../Action/Action.h"
@@ -44,4 +44,4 @@ public:
 	void unlock();
 };
 
-#endif /* DATA_H_ */
+#endif /* SRC_DATA_DATA_H_ */

@@ -49,7 +49,7 @@ class MetronomeSource extends MidiSource
 		
 		update()
 		
-	override int read(MidiRawData midi)
+	override int read(MidiEventBuffer midi)
 		if pause
 			return midi.samples
 	

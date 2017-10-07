@@ -22,9 +22,9 @@ public:
 	void _cdecl __init__(AudioSource *source);
 	virtual void _cdecl __delete__();
 
-	virtual int _cdecl read(MidiRawData &midi);
+	virtual int _cdecl read(MidiEventBuffer &midi);
 
-	void process(MidiRawData &midi, AudioBuffer &buf);
+	void process(MidiEventBuffer &midi, AudioBuffer &buf);
 
 	AudioSource *source;
 

@@ -266,20 +266,20 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("MidiNote", "clef_position", _offsetof(MidiNote, clef_position));
 	Kaba::DeclareClassOffset("MidiNote", "modifier", _offsetof(MidiNote, modifier));
 
-	Kaba::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
-	Kaba::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));
-	Kaba::LinkExternal("MidiRawData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiRawData::__init__));
-	Kaba::LinkExternal("MidiRawData.getEvents", Kaba::mf(&MidiRawData::getEvents));
-	Kaba::LinkExternal("MidiRawData.getNotes", Kaba::mf(&MidiRawData::getNotes));
-	Kaba::LinkExternal("MidiRawData.getRange", Kaba::mf(&MidiRawData::getRange));
-	Kaba::LinkExternal("MidiRawData.addMetronomeClick", Kaba::mf(&MidiRawData::addMetronomeClick));
+	Kaba::DeclareClassSize("MidiEventBuffer", sizeof(MidiEventBuffer));
+	Kaba::DeclareClassOffset("MidiEventBuffer", "samples", _offsetof(MidiEventBuffer, samples));
+	Kaba::LinkExternal("MidiEventBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEventBuffer::__init__));
+	Kaba::LinkExternal("MidiEventBuffer.getEvents", Kaba::mf(&MidiEventBuffer::getEvents));
+	Kaba::LinkExternal("MidiEventBuffer.getNotes", Kaba::mf(&MidiEventBuffer::getNotes));
+	Kaba::LinkExternal("MidiEventBuffer.getRange", Kaba::mf(&MidiEventBuffer::getRange));
+	Kaba::LinkExternal("MidiEventBuffer.addMetronomeClick", Kaba::mf(&MidiEventBuffer::addMetronomeClick));
 
-	Kaba::DeclareClassSize("MidiData", sizeof(MidiData));
-	Kaba::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
-	Kaba::LinkExternal("MidiData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiData::__init__));
-	Kaba::LinkExternal("MidiData.getEvents", Kaba::mf(&MidiData::getEvents));
-	Kaba::LinkExternal("MidiData.getNotes", Kaba::mf(&MidiData::getNotes));
-	Kaba::LinkExternal("MidiData.getRange", Kaba::mf(&MidiData::range));
+	Kaba::DeclareClassSize("MidiNoteBuffer", sizeof(MidiNoteBuffer));
+	Kaba::DeclareClassOffset("MidiNoteBuffer", "samples", _offsetof(MidiNoteBuffer, samples));
+	Kaba::LinkExternal("MidiNoteBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiNoteBuffer::__init__));
+	Kaba::LinkExternal("MidiNoteBuffer.getEvents", Kaba::mf(&MidiNoteBuffer::getEvents));
+	Kaba::LinkExternal("MidiNoteBuffer.getNotes", Kaba::mf(&MidiNoteBuffer::getNotes));
+	Kaba::LinkExternal("MidiNoteBuffer.getRange", Kaba::mf(&MidiNoteBuffer::range));
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, text));

@@ -6,7 +6,7 @@
  */
 
 #include "PeakMeter.h"
-#include "../../Data/AudioBuffer.h"
+#include "../../Audio/AudioBuffer.h"
 #include "../../Plugins/FastFourierTransform.h"
 #include "../../Tsunami.h"
 #include "../AudioView.h"

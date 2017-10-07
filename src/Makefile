@@ -82,7 +82,10 @@ OBJ = \
  Action/ActionGroup.o\
  Action/ActionManager.o\
  Action/ActionMergable.o\
+ Audio/AudioBuffer.o\
  Audio/AudioSucker.o\
+ Audio/BufferInterpolator.o\
+ Audio/RingBuffer.o\
  Audio/Source/AudioSource.o\
  Audio/Source/BufferStreamer.o\
  Audio/Source/SongRenderer.o\
@@ -90,13 +93,9 @@ OBJ = \
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
- Data/AudioBuffer.o\
- Data/BufferInterpolator.o\
  Data/Curve.o\
  Data/Data.o\
  Data/Range.o\
- Data/RingBuffer.o\
- Data/Rhythm.o\
  Data/Sample.o\
  Data/SampleRef.o\
  Data/Song.o\
@@ -225,6 +224,7 @@ OBJ = \
  Midi/Instrument.o\
  Midi/MidiData.o\
  Midi/MidiEvent.o\
+ Midi/MidiEventStreamer.o\
  Midi/MidiNote.o\
  Midi/MidiSource.o\
  Midi/Scale.o\
@@ -240,6 +240,11 @@ OBJ = \
  Plugins/PluginManager.o\
  Plugins/SongPlugin.o\
  Plugins/TsunamiPlugin.o\
+ Rhythm/Bar.o\
+ Rhythm/BarCollection.o\
+ Rhythm/BarStreamer.o\
+ Rhythm/Beat.o\
+ Rhythm/BeatSource.o\
  Storage/Dialog/RawConfigDialog.o\
  Storage/Format/Format.o\
  Storage/Format/FormatFlac.o\
@@ -555,8 +560,17 @@ Action/ActionManager.o : Action/ActionManager.cpp
 Action/ActionMergable.o : Action/ActionMergable.cpp
 	$(CPP) -c Action/ActionMergable.cpp -o $@ $(CXXFLAGS)
 
+Audio/AudioBuffer.o : Audio/AudioBuffer.cpp
+	$(CPP) -c Audio/AudioBuffer.cpp -o $@ $(CXXFLAGS)
+
 Audio/AudioSucker.o : Audio/AudioSucker.cpp
 	$(CPP) -c Audio/AudioSucker.cpp -o $@ $(CXXFLAGS)
+
+Audio/BufferInterpolator.o : Audio/BufferInterpolator.cpp
+	$(CPP) -c Audio/BufferInterpolator.cpp -o $@ $(CXXFLAGS)
+
+Audio/RingBuffer.o : Audio/RingBuffer.cpp
+	$(CPP) -c Audio/RingBuffer.cpp -o $@ $(CXXFLAGS)
 
 Audio/Source/AudioSource.o : Audio/Source/AudioSource.cpp
 	$(CPP) -c Audio/Source/AudioSource.cpp -o $@ $(CXXFLAGS)
@@ -579,12 +593,6 @@ Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 	$(CPP) -c Audio/Synth/Synthesizer.cpp -o $@ $(CXXFLAGS)
 
-Data/AudioBuffer.o : Data/AudioBuffer.cpp
-	$(CPP) -c Data/AudioBuffer.cpp -o $@ $(CXXFLAGS)
-
-Data/BufferInterpolator.o : Data/BufferInterpolator.cpp
-	$(CPP) -c Data/BufferInterpolator.cpp -o $@ $(CXXFLAGS)
-
 Data/Curve.o : Data/Curve.cpp
 	$(CPP) -c Data/Curve.cpp -o $@ $(CXXFLAGS)
 
@@ -593,12 +601,6 @@ Data/Data.o : Data/Data.cpp
 
 Data/Range.o : Data/Range.cpp
 	$(CPP) -c Data/Range.cpp -o $@ $(CXXFLAGS)
-
-Data/RingBuffer.o : Data/RingBuffer.cpp
-	$(CPP) -c Data/RingBuffer.cpp -o $@ $(CXXFLAGS)
-
-Data/Rhythm.o : Data/Rhythm.cpp
-	$(CPP) -c Data/Rhythm.cpp -o $@ $(CXXFLAGS)
 
 Data/Sample.o : Data/Sample.cpp
 	$(CPP) -c Data/Sample.cpp -o $@ $(CXXFLAGS)
@@ -981,6 +983,9 @@ Midi/MidiData.o : Midi/MidiData.cpp
 Midi/MidiEvent.o : Midi/MidiEvent.cpp
 	$(CPP) -c Midi/MidiEvent.cpp -o $@ $(CXXFLAGS)
 
+Midi/MidiEventStreamer.o : Midi/MidiEventStreamer.cpp
+	$(CPP) -c Midi/MidiEventStreamer.cpp -o $@ $(CXXFLAGS)
+
 Midi/MidiNote.o : Midi/MidiNote.cpp
 	$(CPP) -c Midi/MidiNote.cpp -o $@ $(CXXFLAGS)
 
@@ -1025,6 +1030,21 @@ Plugins/TsunamiPlugin.o : Plugins/TsunamiPlugin.cpp
 
 Plugins/PluginManager.o : Plugins/PluginManager.cpp
 	$(CPP) -c Plugins/PluginManager.cpp -o $@ $(CXXFLAGS)
+
+Rhythm/Bar.o : Rhythm/Bar.cpp
+	$(CPP) -c Rhythm/Bar.cpp -o $@ $(CXXFLAGS)
+
+Rhythm/BarCollection.o : Rhythm/BarCollection.cpp
+	$(CPP) -c Rhythm/BarCollection.cpp -o $@ $(CXXFLAGS)
+
+Rhythm/BarStreamer.o : Rhythm/BarStreamer.cpp
+	$(CPP) -c Rhythm/BarStreamer.cpp -o $@ $(CXXFLAGS)
+
+Rhythm/Beat.o : Rhythm/Beat.cpp
+	$(CPP) -c Rhythm/Beat.cpp -o $@ $(CXXFLAGS)
+
+Rhythm/BeatSource.o : Rhythm/BeatSource.cpp
+	$(CPP) -c Rhythm/BeatSource.cpp -o $@ $(CXXFLAGS)
 
 Storage/Dialog/RawConfigDialog.o : Storage/Dialog/RawConfigDialog.cpp
 	$(CPP) -c Storage/Dialog/RawConfigDialog.cpp -o $@ $(CXXFLAGS)

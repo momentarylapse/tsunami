@@ -14,6 +14,7 @@
 #include "../../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "math.h"
 #include "../../Audio/Source/SongRenderer.h"
+#include "../../Rhythm/Beat.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
@@ -252,7 +253,7 @@ void ViewModeDefault::updateTrackHeights()
 
 
 
-void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, int shift)
+void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	int mode = which_midi_mode(t->track);
 	if (mode == view->MIDI_MODE_LINEAR)

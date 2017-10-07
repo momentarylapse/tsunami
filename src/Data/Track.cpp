@@ -223,7 +223,7 @@ void Track::addMidiNote(const MidiNote &n)
 	song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
-void Track::addMidiNotes(const MidiData &notes)
+void Track::addMidiNotes(const MidiNoteBuffer &notes)
 {
 	song->action_manager->beginActionGroup();
 	for (MidiNote *n: notes)
@@ -267,7 +267,7 @@ void Track::move(int target)
 		song->execute(new ActionTrackMove(this, target));
 }
 
-void Track::insertMidiData(int offset, const MidiData& midi)
+void Track::insertMidiData(int offset, const MidiNoteBuffer& midi)
 {
 	song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }

@@ -8,7 +8,7 @@
 #ifndef RAWCONFIGDIALOG_H_
 #define RAWCONFIGDIALOG_H_
 
-#include "../../Data/AudioBuffer.h"
+#include "../../Audio/AudioBuffer.h"
 #include "../../lib/hui/hui.h"
 
 struct RawConfigData

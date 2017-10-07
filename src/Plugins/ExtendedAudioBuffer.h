@@ -8,7 +8,7 @@
 #ifndef SRC_PLUGINS_EXTENDEDAUDIOBUFFER_H_
 #define SRC_PLUGINS_EXTENDEDAUDIOBUFFER_H_
 
-#include "../Data/AudioBuffer.h"
+#include "../Audio/AudioBuffer.h"
 class complex;
 
 class ExtendedAudioBuffer : public AudioBuffer

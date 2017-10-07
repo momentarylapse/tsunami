@@ -5,11 +5,11 @@
  *      Author: michi
  */
 
-#ifndef SRC_DATA_AUDIOBUFFER_H_
-#define SRC_DATA_AUDIOBUFFER_H_
+#ifndef SRC_AUDIO_AUDIOBUFFER_H_
+#define SRC_AUDIO_AUDIOBUFFER_H_
 
 #include "../lib/file/file.h"
-#include "Range.h"
+#include "../Data/Range.h"
 
 
 
@@ -83,4 +83,4 @@ SampleFormat format_for_bits(int bits);
 int format_get_bits(SampleFormat);
 string format_name(SampleFormat format);
 
-#endif /* SRC_DATA_AUDIOBUFFER_H_ */
+#endif /* SRC_AUDIO_AUDIOBUFFER_H_ */

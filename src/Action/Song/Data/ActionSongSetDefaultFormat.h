@@ -8,7 +8,7 @@
 #ifndef SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
 #define SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
 
-#include "../../../Data/AudioBuffer.h"
+#include "../../../Audio/AudioBuffer.h"
 #include "../../Action.h"
 
 

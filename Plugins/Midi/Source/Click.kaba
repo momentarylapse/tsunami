@@ -4,7 +4,7 @@ class ClickSource extends MidiSource
 	bool emit_click
 	override void __init__()
 		emit_click = false
-	override int read(MidiRawData midi)
+	override int read(MidiEventBuffer midi)
 		if emit_click
 			midi.add(_MidiEvent(0, 80, 1))
 			midi.add(_MidiEvent(1, 80, 0))

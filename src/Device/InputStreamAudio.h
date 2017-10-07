@@ -5,13 +5,13 @@
  *      Author: michi
  */
 
-#ifndef INPUTSTREAMAUDIO_H_
-#define INPUTSTREAMAUDIO_H_
+#ifndef SRC_DEVICE_INPUTSTREAMAUDIO_H_
+#define SRC_DEVICE_INPUTSTREAMAUDIO_H_
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
-#include "../Data/RingBuffer.h"
+#include "../Audio/RingBuffer.h"
 #include "../Audio/Source/AudioSource.h"
 #include "../View/Helper/PeakMeter.h"
 #include "config.h"
@@ -133,4 +133,4 @@ private:
 #endif
 };
 
-#endif /* INPUTSTREAMAUDIO_H_ */
+#endif /* SRC_DEVICE_INPUTSTREAMAUDIO_H_ */

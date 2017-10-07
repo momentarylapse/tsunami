@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SAMPLEREF_H_
-#define SAMPLEREF_H_
+#ifndef SRC_DATA_SAMPLEREF_H_
+#define SRC_DATA_SAMPLEREF_H_
 
 #include "../Stuff/Observable.h"
 #include "../lib/math/rect.h"
@@ -14,7 +14,7 @@
 class Song;
 class Track;
 class Sample;
-class MidiData;
+class MidiNoteBuffer;
 class AudioBuffer;
 class Range;
 
@@ -37,7 +37,7 @@ public:
 	int pos;
 	Sample *origin;
 	AudioBuffer *buf;
-	MidiData *midi;
+	MidiNoteBuffer *midi;
 	bool muted;
 	float volume;
 
@@ -47,4 +47,4 @@ public:
 	Song *owner;
 };
 
-#endif /* SAMPLEREF_H_ */
+#endif /* SRC_DATA_SAMPLEREF_H_ */

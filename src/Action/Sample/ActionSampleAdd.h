@@ -11,14 +11,14 @@
 #include "../Action.h"
 
 class AudioBuffer;
-class MidiData;
+class MidiNoteBuffer;
 class Sample;
 
 class ActionSampleAdd : public Action
 {
 public:
 	ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete);
-	ActionSampleAdd(const string &name, const MidiData &midi, bool auto_delete);
+	ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete);
 	virtual ~ActionSampleAdd();
 
 	virtual void *execute(Data *d);

@@ -17,7 +17,7 @@ class Config extends PluginData
 class Randomize extends MidiEffect
 	Config config
 	
-	override void process(MidiData midi)
+	override void process(MidiNoteBuffer midi)
 		float delay = song.sample_rate * config.TimeDelay
 		float var = song.sample_rate * config.TimeVariation
 		for n in midi

@@ -11,6 +11,9 @@
 #include "../Source/AudioSource.h"
 
 class MidiSource;
+class MidiEventStreamer;
+class BarStreamer;
+class BeatMidifier;
 
 class SongRenderer : public AudioSource
 {
@@ -38,7 +41,6 @@ public:
 	int _cdecl getNumSamples();
 
 private:
-	void _cdecl reset();
 	void read_basic(AudioBuffer &buf, int pos);
 	void render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti);
@@ -54,7 +56,13 @@ private:
 	int pos;
 	Set<Track*> allowed_tracks;
 
-	Array<MidiSource*> midi_sources;
+	Array<MidiEventStreamer*> midi_streamer;
+	BarStreamer *bar_streamer;
+	BeatMidifier *beat_midifier;
+
+	void clear_data();
+	void reset_state();
+	void build_data();
 
 public:
 	Effect *preview_effect;

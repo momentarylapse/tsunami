@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_DATA_BUFFERINTERPOLATOR_H_
-#define SRC_DATA_BUFFERINTERPOLATOR_H_
+#ifndef SRC_AUDIO_BUFFERINTERPOLATOR_H_
+#define SRC_AUDIO_BUFFERINTERPOLATOR_H_
 
 class AudioBuffer;
 
@@ -26,4 +26,4 @@ public:
 	static void interpolate(AudioBuffer &in, AudioBuffer &out, int new_size, Method method);
 };
 
-#endif /* SRC_DATA_BUFFERINTERPOLATOR_H_ */
+#endif /* SRC_AUDIO_BUFFERINTERPOLATOR_H_ */

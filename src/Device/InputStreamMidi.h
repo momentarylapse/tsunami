@@ -60,8 +60,8 @@ public:
 	void _cdecl setDevice(Device *d);
 	Device *_cdecl getDevice();
 
-	MidiRawData midi;
-	MidiRawData current_midi;
+	MidiEventBuffer midi;
+	MidiEventBuffer current_midi;
 
 	class Output : public MidiSource
 	{
@@ -69,10 +69,10 @@ public:
 		Output(InputStreamMidi *input);
 		virtual ~Output();
 
-		virtual int _cdecl read(MidiRawData &midi);
-		void _cdecl feed(const MidiRawData &midi);
+		virtual int _cdecl read(MidiEventBuffer &midi);
+		void _cdecl feed(const MidiEventBuffer &midi);
 
-		MidiRawData events;
+		MidiEventBuffer events;
 		InputStreamMidi *input;
 		bool real_time_mode;
 	};

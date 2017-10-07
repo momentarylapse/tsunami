@@ -21,7 +21,7 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const Au
 	auto_delete = _auto_delete;
 }
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const MidiData &_midi, bool _auto_delete)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const MidiNoteBuffer &_midi, bool _auto_delete)
 {
 	t = _t;
 	pos = _pos;

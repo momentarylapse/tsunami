@@ -32,10 +32,12 @@ SongRenderer::SongRenderer(Song *s)
 	loop_if_allowed = false;
 	pos = 0;
 	prepare(s->getRange(), false);
+	song->subscribe(this, std::bind(&SongRenderer::on_song_change, this));
 }
 
 SongRenderer::~SongRenderer()
 {
+	song->unsubscribe(this);
 	clear_data();
 }
 
@@ -222,6 +224,7 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 void SongRenderer::allowTracks(const Set<Track*> &_allowed_tracks)
 {
 	allowed_tracks = _allowed_tracks;
+	_seek(pos);
 }
 
 void SongRenderer::clear_data()
@@ -261,7 +264,7 @@ void SongRenderer::reset_state()
 {
 	for (Effect *fx: song->fx)
 		fx->resetState();
-	foreachi(Track *t, song->tracks, i){
+	for (Track *t: song->tracks){
 		for (Effect *fx: t->fx)
 			fx->resetState();
 		t->synth->reset();
@@ -320,13 +323,21 @@ int SongRenderer::getNumSamples()
 
 void SongRenderer::seek(int _pos)
 {
-	pos = _pos;
 	reset_state();
+	_seek(_pos);
+}
+
+void SongRenderer::_seek(int _pos)
+{
+	pos = _pos;
 	for (auto m: midi_streamer)
 		m->seek(pos);
 	if (bar_streamer)
 		bar_streamer->seek(pos);
-	for (Track *t: song->tracks)
-		t->synth->reset();//endAllNotes();
+}
+
+void SongRenderer::on_song_change()
+{
+	_seek(pos);
 }
 

@@ -50,6 +50,8 @@ private:
 	void render_track_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_song_no_fx(AudioBuffer &buf);
 
+	void on_song_change();
+
 	Song *song;
 	Range _range;
 	Range range_cur;
@@ -63,6 +65,7 @@ private:
 	void clear_data();
 	void reset_state();
 	void build_data();
+	void _seek(int pos);
 
 public:
 	Effect *preview_effect;

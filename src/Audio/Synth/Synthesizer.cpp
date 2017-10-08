@@ -158,7 +158,6 @@ void Synthesizer::reset()
 	resetState();
 	active_pitch.clear();
 	source_run_out = false;
-	//resetMidiData();
 }
 
 bool Synthesizer::isDefault()

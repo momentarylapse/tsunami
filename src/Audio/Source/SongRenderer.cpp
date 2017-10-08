@@ -223,7 +223,11 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 
 void SongRenderer::allowTracks(const Set<Track*> &_allowed_tracks)
 {
+	for (Track *t: _allowed_tracks)
+		if (!allowed_tracks.contains(t))
+			reset_track_state(t);
 	allowed_tracks = _allowed_tracks;
+	//reset_state();
 	_seek(pos);
 }
 
@@ -264,13 +268,18 @@ void SongRenderer::reset_state()
 {
 	for (Effect *fx: song->fx)
 		fx->resetState();
-	for (Track *t: song->tracks){
-		for (Effect *fx: t->fx)
-			fx->resetState();
-		t->synth->reset();
-	}
 	if (preview_effect)
 		preview_effect->resetState();
+
+	for (Track *t: song->tracks)
+		reset_track_state(t);
+}
+
+void SongRenderer::reset_track_state(Track *t)
+{
+	for (Effect *fx: t->fx)
+		fx->resetState();
+	t->synth->reset();
 }
 
 void SongRenderer::build_data()
@@ -338,6 +347,7 @@ void SongRenderer::_seek(int _pos)
 
 void SongRenderer::on_song_change()
 {
+	//reset_state();
 	_seek(pos);
 }
 

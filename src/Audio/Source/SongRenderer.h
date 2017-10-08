@@ -64,6 +64,7 @@ private:
 
 	void clear_data();
 	void reset_state();
+	void reset_track_state(Track *t);
 	void build_data();
 	void _seek(int pos);
 

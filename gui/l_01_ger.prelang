@@ -1225,7 +1225,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-157
+158
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1453,6 +1453,8 @@ Select backup file for recordings
 Sicherungsdatei für Aufnahmen wählen
 Select plugin script
 Plugin-Script wählen
+Selection range is empty
+Auswahl überdeckt keinen Zeitbereich
 Send bug report to Michi
 Fehlermeldung an Michi senden
 Start

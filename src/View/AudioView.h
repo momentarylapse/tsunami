@@ -196,6 +196,7 @@ public:
 	bool isPaused();
 	int playbackPos();
 	Set<Track*> get_playable_tracks();
+	Set<Track*> get_selected_tracks();
 	bool hasAnySolo();
 
 	void setCurSample(SampleRef *s);

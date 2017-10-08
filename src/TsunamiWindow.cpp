@@ -311,17 +311,13 @@ void TsunamiWindow::onTrackRender()
 	song->action_manager->beginActionGroup();
 	Track *t = song->addTrack(Track::TYPE_AUDIO);
 
-	SongRenderer rr(song);
-	rr.prepare(range, false);
-	Set<Track*> tracks;
-	for (auto t: song->tracks)
-		if (view->sel.has(t))
-			tracks.add(t);
-	rr.allowTracks(tracks);
+	SongRenderer renderer(song);
+	renderer.prepare(range, false);
+	renderer.allowTracks(view->get_selected_tracks());
 	AudioBuffer buf = t->getBuffers(view->cur_layer, range);
 
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, range);
-	rr.read(buf);
+	renderer.read(buf);
 	song->execute(a);
 	song->action_manager->endActionGroup();
 
@@ -850,10 +846,10 @@ void TsunamiWindow::onSaveAs()
 void TsunamiWindow::onExport()
 {
 	if (app->storage->askSaveExport(this)){
-		SongRenderer rr(song);
-		rr.prepare(view->getPlaybackSelection(false), false);
-		rr.allowTracks(view->get_playable_tracks());
-		app->storage->saveViaRenderer(&rr, hui::Filename, rr.getNumSamples(), song->tags);
+		SongRenderer renderer(song);
+		renderer.prepare(view->getPlaybackSelection(false), false);
+		renderer.allowTracks(view->get_selected_tracks());
+		app->storage->saveViaRenderer(&renderer, hui::Filename, renderer.getNumSamples(), song->tags);
 	}
 }
 

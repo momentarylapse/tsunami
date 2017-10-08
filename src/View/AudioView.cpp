@@ -1175,10 +1175,19 @@ bool AudioView::hasAnySolo()
 
 Set<Track*> AudioView::get_playable_tracks()
 {
-	Set<Track*> allowed;
+	Set<Track*> tracks;
 	bool any_solo = hasAnySolo();
 	for (Track* t: song->tracks)
 		if (get_track(t)->solo or !any_solo)
-			allowed.add(t);
-	return allowed;
+			tracks.add(t);
+	return tracks;
+}
+
+Set<Track*> AudioView::get_selected_tracks()
+{
+	Set<Track*> tracks;
+	for (Track* t: song->tracks)
+		if (sel.has(t))
+			tracks.add(t);
+	return tracks;
 }

@@ -287,11 +287,40 @@ string to_camel_case(const string &s)
 
 struct AutoConfigData
 {
-	string name, label, unit;
+	enum{
+		TYPE_FLOAT,
+		TYPE_INT,
+		TYPE_STRING,
+		TYPE_PITCH,
+	};
+	string name, label;
+	int type;
+	AutoConfigData(int _type, const string &_name)
+	{
+		type = _type;
+		name = _name;
+		label = to_camel_case(_name);
+	}
+	virtual ~AutoConfigData(){}
+
+	bool name_match(const string &const_name)
+	{
+		return (("AUTO_CONFIG_" + name).upper().replace("_", "") == const_name.upper().replace("_", ""));
+	}
+	virtual void parse(const string &s) = 0;
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) = 0;
+	virtual void get_value() = 0;
+	virtual void set_value() = 0;
+};
+
+struct AutoConfigDataFloat : public AutoConfigData
+{
+	string unit;
 	float min, max, step, factor;
 	float *value;
 	Slider *slider;
-	AutoConfigData()
+	AutoConfigDataFloat(const string &_name) :
+		AutoConfigData(TYPE_FLOAT, _name)
 	{
 		min = -100000000;
 		max = 100000000;
@@ -300,13 +329,11 @@ struct AutoConfigData
 		value = NULL;
 		slider = NULL;
 	}
-	AutoConfigData(const string &_name) :
-		AutoConfigData()
+	virtual ~AutoConfigDataFloat()
 	{
-		name = _name;
-		label = to_camel_case(_name);
+		delete(slider);
 	}
-	void parse(const string &s)
+	virtual void parse(const string &s)
 	{
 		Array<string> p = s.explode(":");
 		if (p.num == 5){
@@ -320,36 +347,180 @@ struct AutoConfigData
 		}
 
 	}
-
-	bool name_match(const string &const_name)
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
 	{
-		return (("AUTO_CONFIG_" + name).upper().replace("_", "") == const_name.upper().replace("_", ""));
+		p->addGrid("", 1, i, 3, 1, "grid-" + i);
+		p->setTarget("grid-" + i, 0);
+		p->addSlider("!width=150,expandx", 0, 0, 0, 0, "slider-" + i);
+		p->addSpinButton(format("%f\\%f\\%f\\%f", *value, min*factor, max*factor, step), 1, 0, 0, 0, "spin-" + i);
+		p->addLabel(unit, 2, 0, 0, 0, "");
+		slider = new Slider(p, "slider-" + i, "spin-" + i, min, max, factor, callback, *value);
+	}
+	virtual void get_value()
+	{
+		*value = slider->get();
+	}
+	virtual void set_value()
+	{
+		slider->set(*value);
 	}
 };
 
-Array<AutoConfigData> get_auto_conf(PluginData *config)
+struct AutoConfigDataInt : public AutoConfigData
+{
+	int min, max;
+	int *value;
+	ConfigPanel *panel;
+	string id;
+	AutoConfigDataInt(const string &_name) :
+		AutoConfigData(TYPE_INT, _name)
+	{
+		min = 0;
+		max = 1000;
+		value = NULL;
+		panel = NULL;
+	}
+	virtual ~AutoConfigDataInt()
+	{}
+	virtual void parse(const string &s)
+	{
+		Array<string> p = s.explode(":");
+		if (p.num == 2){
+			min = p[0]._int();
+			max = p[1]._int();
+		}else{
+			msg_write("required format: min:max");
+		}
+
+	}
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	{
+		id = "spin-" + i;
+		panel = p;
+		p->addSpinButton(format("!width=150,expandx\\%d\\%d\\%d", *value, min, max), 1, i, 0, 0, id);
+		p->event(id, callback);
+	}
+	virtual void get_value()
+	{
+		*value = panel->getInt(id);
+	}
+	virtual void set_value()
+	{
+		panel->setInt(id, *value);
+	}
+};
+
+struct AutoConfigDataPitch : public AutoConfigData
+{
+	float *value;
+	string id;
+	ConfigPanel *panel;
+	AutoConfigDataPitch(const string &_name) :
+		AutoConfigData(TYPE_PITCH, _name)
+	{
+		value = NULL;
+		panel = NULL;
+	}
+	virtual ~AutoConfigDataPitch()
+	{}
+	virtual void parse(const string &s)
+	{}
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	{
+		id = "pitch-" + i;
+		panel = p;
+		p->addComboBox("!width=150,expandx", 1, i, 0, 0, id);
+		for (int j=0; j<MAX_PITCH; j++)
+			p->addString(id, pitch_name(j));
+		p->setInt(id, *value);
+		p->event(id, callback);
+	}
+	virtual void get_value()
+	{
+		*value = panel->getInt(id);
+	}
+	virtual void set_value()
+	{
+		panel->setInt(id, *value);
+	}
+};
+
+struct AutoConfigDataString : public AutoConfigData
+{
+	string *value;
+	string id;
+	ConfigPanel *panel;
+	AutoConfigDataString(const string &_name) :
+		AutoConfigData(TYPE_STRING, _name)
+	{
+		value = NULL;
+		panel = NULL;
+	}
+	virtual ~AutoConfigDataString()
+	{
+	}
+	virtual void parse(const string &s)
+	{
+	}
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	{
+		id = "edit-" + i;
+		panel = p;
+		p->addEdit("!width=150,expandx\\" + *value, 1, i, 0, 0, id);
+		p->event(id, callback);
+	}
+	virtual void get_value()
+	{
+		*value = panel->getString(id);
+	}
+	virtual void set_value()
+	{
+		panel->setString(id, *value);
+	}
+};
+
+Array<AutoConfigData*> get_auto_conf(PluginData *config)
 {
 	Kaba::SyntaxTree *ps = config->_class->owner;
-	Array<AutoConfigData> r;
-	for (auto &e: config->_class->elements)
+	Array<AutoConfigData*> r;
+	for (auto &e: config->_class->elements){
 		if (e.type == Kaba::TypeFloat32){
-			AutoConfigData a = AutoConfigData(e.name);
-			a.value = (float*)((char*)config + e.offset);
-			for (auto c: ps->constants){
-				if (c->type == Kaba::TypeString)
-					if (a.name_match(c->name))
-						a.parse(c->as_string());
+			if (e.name == "pitch"){
+				AutoConfigDataPitch *a = new AutoConfigDataPitch(e.name);
+				a->value = (float*)((char*)config + e.offset);
+				r.add(a);
+			}else{
+				AutoConfigDataFloat *a = new AutoConfigDataFloat(e.name);
+				a->value = (float*)((char*)config + e.offset);
+				r.add(a);
 			}
+		}else if (e.type == Kaba::TypeInt){
+			AutoConfigDataInt *a = new AutoConfigDataInt(e.name);
+			a->value = (int*)((char*)config + e.offset);
+			r.add(a);
+		}else if (e.type == Kaba::TypeString){
+			AutoConfigDataString *a = new AutoConfigDataString(e.name);
+			a->value = (string*)((char*)config + e.offset);
 			r.add(a);
 		}
+	}
+
+	for (auto a: r){
+		for (auto c: ps->constants){
+			if (c->type == Kaba::TypeString)
+				if (a->name_match(c->name))
+					a->parse(c->as_string());
+		}
+	}
+
 	return r;
 }
 
 class AutoConfigPanel : public ConfigPanel
 {
 public:
-	Array<AutoConfigData> aa;
-	AutoConfigPanel(Array<AutoConfigData> &_aa, Configurable *_c) :
+	Array<AutoConfigData*> aa;
+	AutoConfigPanel(Array<AutoConfigData*> &_aa, Configurable *_c) :
 		ConfigPanel(_c)
 	{
 		aa = _aa;
@@ -357,30 +528,28 @@ public:
 		setTarget("root-table", 0);
 		addGrid("", 0, 1, 4, aa.num, "main-table");
 		setTarget("main-table", 0);
-		foreachi(AutoConfigData &a, aa, i){
-			addLabel(a.label, 0, i, 0, 0, "");
-			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
-			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
-			addLabel(a.unit, 3, i, 0, 0, "");
-			a.slider = new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, std::bind(&AutoConfigPanel::onChange, this), *a.value);
+		foreachi(AutoConfigData *a, aa, i){
+			setTarget("main-table", 0);
+			addLabel(a->label, 0, i, 0, 0, "");
+			a->add_gui(this, i, std::bind(&AutoConfigPanel::onChange, this));
 		}
 	}
 	~AutoConfigPanel()
 	{
-		for (auto &a: aa)
-			delete(a.slider);
+		for (auto a: aa)
+			delete a;
 	}
 	void _cdecl onChange()
 	{
-		for (auto &a: aa)
-			*a.value = a.slider->get();
+		for (auto a: aa)
+			a->get_value();
 		notify();
 
 	}
 	virtual void _cdecl update()
 	{
-		for (auto &a: aa)
-			a.slider->set(*a.value);
+		for (auto a: aa)
+			a->set_value();
 	}
 };
 
@@ -390,7 +559,7 @@ ConfigPanel *Configurable::createPanel()
 	PluginData *config = get_config();
 	if (!config)
 		return NULL;
-	Array<AutoConfigData> aa = get_auto_conf(config);
+	auto aa = get_auto_conf(config);
 	if (aa.num == 0)
 		return NULL;
 	return new AutoConfigPanel(aa, this);
@@ -520,7 +689,7 @@ bool Configurable::configure()
 	//_auto_panel_ = NULL;
 	ConfigPanel *panel = createPanel();
 	if (!panel)
-		return false;
+		return true;
 	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel);
 	dlg->run();
 	bool ok = dlg->ok;

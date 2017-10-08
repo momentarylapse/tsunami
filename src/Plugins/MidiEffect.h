@@ -48,6 +48,14 @@ public:
 	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);
 
 	string GetError();
+
+	int bh_offset;
+	void note(float pitch, float volume, int beats);
+	void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition);
+	void skip(int beats);
+	void skip_x(int beats, int sub_beats, int beat_partition);
+	Song *bh_song;
+	MidiNoteBuffer *bh_midi;
 };
 
 MidiEffect *_cdecl CreateMidiEffect(const string &name, Song *song);

@@ -150,6 +150,10 @@ void PluginManager::LinkAppScriptData()
 	//Kaba::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Kaba::mf(&MidiEffect::UpdateDialog), &midieffect);
 	Kaba::LinkExternal("MidiEffect.notify", Kaba::mf(&MidiEffect::notify));
 	Kaba::DeclareClassVirtualIndex("MidiEffect", "onConfig", Kaba::mf(&MidiEffect::onConfig), &midieffect);
+	Kaba::LinkExternal("MidiEffect.note", Kaba::mf(&MidiEffect::note));
+	Kaba::LinkExternal("MidiEffect.skip", Kaba::mf(&MidiEffect::skip));
+	Kaba::LinkExternal("MidiEffect.note_x", Kaba::mf(&MidiEffect::note_x));
+	Kaba::LinkExternal("MidiEffect.skip_x", Kaba::mf(&MidiEffect::skip_x));
 
 	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
 	Kaba::DeclareClassOffset("AudioBuffer", "offset", _offsetof(AudioBuffer, offset));

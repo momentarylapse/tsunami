@@ -1,5 +1,9 @@
 use "../api.kaba"
 
+const string AUTO_CONFIG_PITCH = "0:127:1:1:"
+const string AUTO_CONFIG_TEXT = ""
+const string AUTO_CONFIG_BEAT_PARTITION = "1:8"
+
 void append(int[] a, int[] b)
 	for x in b
 		a.add(x)
@@ -61,35 +65,22 @@ int[] morse(string str)
 			append(l, [2,2,1,1])
 	return l
 
-void make_midi(MidiNoteBuffer midi, int[] l, int d, int pitch)
-	int offset = 0
-	for ll in l
-		int samples = ll * d
-		MidiNote *n = new MidiNote
-		*n = _MidiNote(_Range(offset, samples-d/2), pitch, 1)
-		midi.add(n)
-		offset += samples
-	
 
-class XXX extends SongPlugin
-	override void apply(Song* song)
-		/*for t in song.tracks
-			if t.type == TYPE_MIDI
-				MidiNoteBuffer midi
-				int[] l = morse("lump homology")
-				make_midi(midi, l, 7000)
-				t.insertMidiData(0, midi)*/
-		
-		MidiNoteBuffer midi
-		int[] l = morse("lump homology")
-		make_midi(midi, l, 7000, 60)
-		song.tracks[0].insertMidiData(0, midi)
-		midi.clear()
-		l = morse("banana")
-		make_midi(midi, l, 7000, 67)
-		song.tracks[1].insertMidiData(0, midi)
-		midi.clear()
-		l = morse("math")
-		make_midi(midi, l, 7000, 72)
-		song.tracks[2].insertMidiData(0, midi)
-		
+class Config extends PluginData
+	float pitch
+	string text
+	int beat_partition
+	
+	override void reset()
+		pitch = 60
+		text = "test"
+		beat_partition = 2
+
+class Morse extends MidiEffect
+	Config config
+	
+	override void process(MidiNoteBuffer midi)
+		int[] l = morse(config.text)
+		for ll in l
+			note_x(config.pitch, 1, 0, ll, config.beat_partition)
+			skip_x(0, 1, config.beat_partition)

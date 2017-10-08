@@ -22,6 +22,9 @@ MidiEffect::MidiEffect() :
 	plugin = NULL;
 	only_on_selection = false;
 	enabled = true;
+	bh_offset = 0;
+	bh_song = NULL;
+	bh_midi = NULL;
 }
 
 MidiEffect::MidiEffect(Plugin *p) :
@@ -31,6 +34,9 @@ MidiEffect::MidiEffect(Plugin *p) :
 	plugin = p;
 	only_on_selection = false;
 	enabled = true;
+	bh_offset = 0;
+	bh_song = NULL;
+	bh_midi = NULL;
 }
 
 MidiEffect::~MidiEffect()
@@ -79,6 +85,14 @@ void MidiEffect::process_track(Track *t, const SongSelection &sel)
 {
 	MidiNoteBuffer midi = t->midi.getNotesBySelection(sel);
 
+	bh_song = t->song;
+	bh_offset = sel.range.offset;
+	int b2 = bh_song->bars.getNextBeat(bh_offset);
+	int b1 = bh_song->bars.getPrevBeat(b2);
+	if (b1 < bh_offset)
+		bh_offset = b2;
+	bh_midi = &midi;
+
 	t->song->action_manager->beginActionGroup();
 
 	for (int i=t->midi.num-1; i>=0; i--)
@@ -91,6 +105,54 @@ void MidiEffect::process_track(Track *t, const SongSelection &sel)
 
 	t->insertMidiData(0, midi);
 	t->song->action_manager->endActionGroup();
+}
+
+void MidiEffect::note(float pitch, float volume, int beats)
+{
+	if (!bh_song)
+		return;
+	int pos = bh_offset;
+	for (int i=0; i<beats; i++)
+		pos = bh_song->bars.getNextBeat(pos);
+
+	bh_midi->add(new MidiNote(Range(bh_offset, pos - bh_offset), pitch, volume));
+	bh_offset = pos;
+
+}
+
+void MidiEffect::skip(int beats)
+{
+	if (!bh_song)
+		return;
+
+	for (int i=0; i<beats; i++)
+		bh_offset = bh_song->bars.getNextBeat(bh_offset);
+}
+
+void MidiEffect::note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
+{
+	if (!bh_song)
+		return;
+	int pos = bh_offset;
+	for (int i=0; i<beats; i++)
+		pos = bh_song->bars.getNextBeat(pos);
+	for (int i=0; i<sub_beats; i++)
+		pos = bh_song->bars.getNextSubBeat(pos, beat_partition);
+
+	bh_midi->add(new MidiNote(Range(bh_offset, pos - bh_offset), pitch, volume));
+	bh_offset = pos;
+
+}
+
+void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
+{
+	if (!bh_song)
+		return;
+
+	for (int i=0; i<beats; i++)
+		bh_offset = bh_song->bars.getNextBeat(bh_offset);
+	for (int i=0; i<sub_beats; i++)
+		bh_offset = bh_song->bars.getNextSubBeat(bh_offset, beat_partition);
 }
 
 

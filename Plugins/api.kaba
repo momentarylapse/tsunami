@@ -118,6 +118,10 @@ class MidiEffect
 	//extern virtual void updateDialog()
 	//extern void notify()
 	extern virtual void onConfig()
+	extern void note(float pitch, float volume, int beats)
+	extern void skip(int beats)
+	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
+	extern void skip_x(int beats, int sub_beats, int beat_partition)
 
 class AudioBuffer
 	int offset, length

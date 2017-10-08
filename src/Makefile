@@ -228,6 +228,7 @@ OBJ = \
  Midi/MidiNote.o\
  Midi/MidiSource.o\
  Midi/Scale.o\
+ Plugins/AutoConfigPanel.o\
  Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
  Plugins/Effect.o\
@@ -997,6 +998,9 @@ Midi/Scale.o : Midi/Scale.cpp
 
 Plugins/Configurable.o : Plugins/Configurable.cpp
 	$(CPP) -c Plugins/Configurable.cpp -o $@ $(CXXFLAGS)
+
+Plugins/AutoConfigPanel.o : Plugins/AutoConfigPanel.cpp
+	$(CPP) -c Plugins/AutoConfigPanel.cpp -o $@ $(CXXFLAGS)
 
 Plugins/ConfigPanel.o : Plugins/ConfigPanel.cpp
 	$(CPP) -c Plugins/ConfigPanel.cpp -o $@ $(CXXFLAGS)

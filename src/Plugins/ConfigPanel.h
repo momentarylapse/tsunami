@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef CONFIGPANEL_H_
-#define CONFIGPANEL_H_
+#ifndef SRC_PLUGINS_CONFIGPANEL_H_
+#define SRC_PLUGINS_CONFIGPANEL_H_
 
 #include "../lib/hui/hui.h"
 
@@ -27,4 +27,4 @@ public:
 	Configurable *c;
 };
 
-#endif /* CONFIGPANEL_H_ */
+#endif /* SRC_PLUGINS_CONFIGPANEL_H_ */

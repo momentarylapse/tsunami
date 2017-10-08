@@ -26,6 +26,7 @@ Menu menu "" disabled
 		Item /settings "Settings" image=hui:preferences
 	Menu menu_track "Track"
 		Item track_import "Import from file..." image=hui:open
+		Item track_render "Render from selection"
 		Separator
 		Item add_track "Add empty audio track" image=hui:add
 		Item add_midi_track "Add midi track" image=hui:add

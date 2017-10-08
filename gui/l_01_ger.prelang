@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-406
+407
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -548,6 +548,9 @@ Aus Datei importieren...
 
 menu/track_properties
 Eigenschaften
+
+menu/track_render
+Aus Auswahl rendern
 
 menu/view_midi_default
 Standard

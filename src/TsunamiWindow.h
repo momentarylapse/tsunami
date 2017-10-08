@@ -50,6 +50,7 @@ public:
 	void onAddTimeTrack();
 	void onAddMidiTrack();
 	void onDeleteTrack();
+	void onTrackRender();
 	void onTrackEditMidi();
 	void onTrackEditFX();
 	void onTrackAddMarker();

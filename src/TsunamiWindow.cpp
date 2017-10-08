@@ -40,6 +40,7 @@
 #include "Device/DeviceManager.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
+#include "Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -82,6 +83,7 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	setKeyCode("undo", hui::KEY_Z + hui::KEY_CONTROL, "hui:undo");
 	event("redo", std::bind(&TsunamiWindow::onRedo, this));
 	setKeyCode("redo", hui::KEY_Y + hui::KEY_CONTROL, "hui:redo");
+	event("track_render", std::bind(&TsunamiWindow::onTrackRender, this));
 	event("add_track", std::bind(&TsunamiWindow::onAddTrack, this));
 	setKeyCode("add_track", -1, "hui:add");
 	event("add_time_track", std::bind(&TsunamiWindow::onAddTimeTrack, this));
@@ -297,6 +299,32 @@ void TsunamiWindow::onAddTimeTrack()
 void TsunamiWindow::onAddMidiTrack()
 {
 	song->addTrack(Track::TYPE_MIDI);
+}
+
+void TsunamiWindow::onTrackRender()
+{
+	Range range = view->sel.range;
+	if (range.empty()){
+		app->log->error(_("Selection range is empty"));
+		return;
+	}
+	song->action_manager->beginActionGroup();
+	Track *t = song->addTrack(Track::TYPE_AUDIO);
+
+	SongRenderer rr(song);
+	rr.prepare(range, false);
+	Set<Track*> tracks;
+	for (auto t: song->tracks)
+		if (view->sel.has(t))
+			tracks.add(t);
+	rr.allowTracks(tracks);
+	AudioBuffer buf = t->getBuffers(view->cur_layer, range);
+
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, range);
+	rr.read(buf);
+	song->execute(a);
+	song->action_manager->endActionGroup();
+
 }
 
 void TsunamiWindow::onDeleteTrack()

@@ -8,7 +8,7 @@
 #include "FormatMidi.h"
 
 FormatDescriptorMidi::FormatDescriptorMidi() :
-	FormatDescriptor("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ)
+	FormatDescriptor("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ | FLAG_WRITE)
 {
 }
 
@@ -20,10 +20,32 @@ static string read_chunk_name(File *f)
 	return s;
 }
 
+static void write_chunk_name(File *f, const string &name)
+{
+	string s = name;
+	s.resize(4);
+	f->WriteBuffer(s.data, 4);
+}
+
+static int int_reverse(int i)
+{
+	return ((i & 255) << 24) + (((i >> 8) & 255) << 16) + (((i >> 16) & 255) << 8) + ((i >> 24) & 255);
+}
+
+static int int16_reverse(int i)
+{
+	return ((i & 255) << 8) + ((i >> 8) & 255);
+}
+
 static int read_int(File *f)
 {
 	int i = f->ReadInt();
-	return ((i & 255) << 24) + (((i >> 8) & 255) << 16) + (((i >> 16) & 255) << 8) + ((i >> 24) & 255);
+	return int_reverse(i);
+}
+
+static int write_int(File *f, int i)
+{
+	f->WriteInt(int_reverse(i));
 }
 
 static int read_var(File *f)
@@ -35,6 +57,19 @@ static int read_var(File *f)
 		i = (c0 & 127) + (i << 7);
 	}while ((c0 & 128) > 0);
 	return i;
+}
+
+static void write_var(File *f, int i)
+{
+	for (int offset = 0; offset < 32; offset += 7){
+		unsigned char c = (i >> offset) & 0x7f;
+		bool more_data = ((i >> (offset + 7)) != 0);
+		if (more_data)
+			c |= 0x80;
+		f->WriteByte(c);
+		if (!more_data)
+			break;
+	}
 }
 
 static string ascii2utf8(const string &s)
@@ -63,9 +98,9 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		int hsize = read_int(f);
 		if (hn != "MThd")
 			throw string("midi header is not \"MTHd\": " + hn);
-		int format_type = f->ReadReversedWord();
-		int num_tracks = f->ReadReversedWord();
-		int time_division = f->ReadReversedWord();
+		int format_type = int16_reverse(f->ReadWord());
+		int num_tracks = int16_reverse(f->ReadWord());
+		int time_division = int16_reverse(f->ReadWord());
 		if (format_type > 2)
 			throw format("only format type 1 allowed: %d", format_type);
 		msg_write(format("tracks: %d", num_tracks));
@@ -198,8 +233,86 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		od->error(s);
 	}
 }
-
-void FormatMidi::saveSong(StorageOperationData *od)
+void FormatMidi::saveSong(StorageOperationData* od)
 {
-}
+	File *f = NULL;
+	try {
+		f = FileCreate(od->filename);
+		if (!f)
+			throw string("can not create file");
 
+		f->SetBinaryMode(true);
+		int num_tracks = od->song->tracks.num;
+		int ticks_per_beat = 16;
+		// heaer
+		write_chunk_name(f, "MThd");
+		write_int(f, 6); // size
+		f->WriteWord(int16_reverse(1)); // format
+		f->WriteWord(int16_reverse(num_tracks));
+		f->WriteWord(int16_reverse(ticks_per_beat));
+		// beat = quarter note
+		int mpqn = 500000; // micro s/beat = 120 beats/min;
+		int numerator = 4;
+		int denominator = 4;
+		int last_bar = 0;
+		for (Track* t : od->song->tracks) {
+			write_chunk_name(f, "MTrk");
+			int pos0 = f->GetPos();
+			write_int(f, 0); // size
+			// track name
+			if (t->name.num > 0) {
+				f->WriteByte(0xff);
+				f->WriteByte(0x03);
+				write_var(f, t->name.num);
+				f->WriteBuffer(t->name.data, t->name.num);
+			}
+			if (od->song->bars.num > 0) {
+				auto b = od->song->bars[0];
+				float bpm = 60.0f / ((float) b.length / (float) od->song->sample_rate / b.num_beats);
+				mpqn = 60000000.0f / bpm;
+				f->WriteByte(0xff);
+				f->WriteByte(0x81);
+				f->WriteByte(mpqn >> 16);
+				f->WriteByte(mpqn >> 8);
+				f->WriteByte(mpqn >> 0);
+				f->WriteByte(0xff);
+				f->WriteByte(0x88);
+				f->WriteByte(b.num_beats);
+				f->WriteByte(2); // 1/4
+			}
+			MidiEventBuffer events = t->midi.getEvents(Range::ALL);
+			int offset = 0;
+			for (MidiEvent& e: events) {
+				int dt = e.pos - offset;
+				int v = (int) (((double) (dt) / (double) (mpqn) * 1000000.0
+						/ (double) (od->song->sample_rate)
+						* (double) (ticks_per_beat)));
+				write_var(f, v);
+				offset = e.pos;
+				if (e.volume > 0) {
+					// on
+					f->WriteByte(0x90);
+					f->WriteByte((int) (e.pitch));
+					f->WriteByte((int) (e.volume) * 127.0f);
+				} else {
+					// off
+					f->WriteByte(0x80);
+					f->WriteByte((int) (e.pitch));
+					f->WriteByte(0);
+				}
+			}
+			int pos = f->GetPos();
+			f->SetPos(pos0, true);
+			write_int(f, pos - pos0 - 4);
+			f->SetPos(pos, true);
+		}
+		FileClose(f);
+	} catch (const string& s) {
+		if (f)
+			FileClose(f);
+
+		od->error(s);
+	}
+
+
+}

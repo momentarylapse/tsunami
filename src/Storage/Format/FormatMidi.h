@@ -17,7 +17,7 @@ public:
 	virtual void saveViaRenderer(StorageOperationData *od){}
 
 	virtual void loadSong(StorageOperationData *od);
-	virtual void saveSong(StorageOperationData *od);
+	virtual void saveSong(StorageOperationData* od);
 };
 
 class FormatDescriptorMidi : public FormatDescriptor

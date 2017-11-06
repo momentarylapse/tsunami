@@ -427,7 +427,7 @@ void Script::__Execute()
 		//msg_left();
 	}else{
 #ifdef _X_ALLOW_X_
-		if (__waiting_mode==WaitingModeRT)
+		if (__waiting_mode == WAITING_MODE_RT)
 			__time_to_wait -= Engine.ElapsedRT;
 		else
 			__time_to_wait -= Engine.Elapsed;
@@ -435,7 +435,7 @@ void Script::__Execute()
 			return;
 		}
 #endif
-		GlobalWaitingMode=WAITING_MODE_NONE;
+		GlobalWaitingMode = WAITING_MODE_NONE;
 		//msg_write(ThisObject);
 
 		//msg_write(">---");
@@ -445,8 +445,8 @@ void Script::__Execute()
 		//msg_write("ok");
 		//msg_left();
 	}
-	__waiting_mode=GlobalWaitingMode;
-	__time_to_wait=GlobalTimeToWait;
+	__waiting_mode = GlobalWaitingMode;
+	__time_to_wait = GlobalTimeToWait;
 }
 
 };

@@ -313,7 +313,8 @@ void Control::notify(const string &message, bool is_default)
 	Event e = Event(id, message);
 	//_SendGlobalCommand_(&e);
 	e.is_default = is_default;
-	panel->_send_event_(&e);
+	bool force = (message == "hui:realize-gl");
+	panel->_send_event_(&e, force);
 
 	if (notify_is_deleted(this)){
 		notify_pop();

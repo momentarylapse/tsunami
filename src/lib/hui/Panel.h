@@ -22,6 +22,7 @@ class Resource;
 class Painter;
 class Event;
 class EventListener;
+class EventKeyCode;
 class Control;
 class ControlRadioButton;
 
@@ -56,7 +57,7 @@ public:
 	int _cdecl eventXP(const string &id, const string &msg, const CallbackP &function);
 	void _cdecl removeEventHandler(int event_handler_id);
 	void _cdecl setKeyCode(const string &id, int key_code, const string &image = "");
-	bool _send_event_(Event *e);
+	bool _send_event_(Event *e, bool force_if_not_allowed = false);
 
 	// kaba wrappers
 	int _cdecl _kaba_event(const string &id, kaba_member_callback *function);
@@ -179,6 +180,7 @@ protected:
 	Control *root_control;
 public:
 	Array<EventListener> event_listeners;
+	Array<EventKeyCode> event_key_codes;
 	int current_event_listener_uid;
 protected:
 

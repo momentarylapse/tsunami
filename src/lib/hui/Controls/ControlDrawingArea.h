@@ -18,10 +18,10 @@ class ControlDrawingArea : public Control
 {
 public:
 	ControlDrawingArea(const string &text, const string &id);
-
-	void hardReset();
+	void make_current();
 
 	void *cur_cairo;
+	bool is_opengl;
 };
 
 };

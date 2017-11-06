@@ -95,9 +95,15 @@ vector matrix::project(const vector &v) const
 	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);
 }
 
+vector matrix::unproject(const vector &v) const
+{
+	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);
+}
+
 string matrix::str() const
 {
-	return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
+	//return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
+	return format("(%f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f\n %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
 }
 
 // kaba
@@ -110,17 +116,20 @@ vector matrix::mul_v(const vector &v) const
 {	return *this * v;	}
 
 
-#define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
+//#define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
 
 // combining two transformation matrices (first do m1, then m2:   m = m2 * m1 )
 void MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1)
 {
 	// m_ij = (sum k) m2_ik * m1_kj
 	matrix _m;
-	_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
+	for (int i=0; i<4; i++)
+		for (int j=0; j<4; j++)
+			_m.__e[i][j] = m2.__e[i][0]*m1.__e[0][j] + m2.__e[i][1]*m1.__e[1][j] + m2.__e[i][2]*m1.__e[2][j] + m2.__e[i][3]*m1.__e[3][j];
+	/*_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
 	_m._10=_ps(m2,m1,1,0);	_m._11=_ps(m2,m1,1,1);	_m._12=_ps(m2,m1,1,2);	_m._13=_ps(m2,m1,1,3);
 	_m._20=_ps(m2,m1,2,0);	_m._21=_ps(m2,m1,2,1);	_m._22=_ps(m2,m1,2,2);	_m._23=_ps(m2,m1,2,3);
-	_m._30=_ps(m2,m1,3,0);	_m._31=_ps(m2,m1,3,1);	_m._32=_ps(m2,m1,3,2);	_m._33=_ps(m2,m1,3,3);
+	_m._30=_ps(m2,m1,3,0);	_m._31=_ps(m2,m1,3,1);	_m._32=_ps(m2,m1,3,2);	_m._33=_ps(m2,m1,3,3);*/
 	m=_m;
 }
 
@@ -128,12 +137,15 @@ void MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1)
 matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 {
 	// m_ij = (sum k) m2_ik * m1_kj
-	matrix _m;
-	_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
+	matrix m;
+	for (int i=0; i<4; i++)
+		for (int j=0; j<4; j++)
+			m.__e[i][j] = m2.__e[i][0]*m1.__e[0][j] + m2.__e[i][1]*m1.__e[1][j] + m2.__e[i][2]*m1.__e[2][j] + m2.__e[i][3]*m1.__e[3][j];
+	/*_m._00=_ps(m2,m1,0,0);	_m._01=_ps(m2,m1,0,1);	_m._02=_ps(m2,m1,0,2);	_m._03=_ps(m2,m1,0,3);
 	_m._10=_ps(m2,m1,1,0);	_m._11=_ps(m2,m1,1,1);	_m._12=_ps(m2,m1,1,2);	_m._13=_ps(m2,m1,1,3);
 	_m._20=_ps(m2,m1,2,0);	_m._21=_ps(m2,m1,2,1);	_m._22=_ps(m2,m1,2,2);	_m._23=_ps(m2,m1,2,3);
-	_m._30=_ps(m2,m1,3,0);	_m._31=_ps(m2,m1,3,1);	_m._32=_ps(m2,m1,3,2);	_m._33=_ps(m2,m1,3,3);
-	return _m;
+	_m._30=_ps(m2,m1,3,0);	_m._31=_ps(m2,m1,3,1);	_m._32=_ps(m2,m1,3,2);	_m._33=_ps(m2,m1,3,3);*/
+	return m;
 }
 
 // identity (no transformation: m*v=v)

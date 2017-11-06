@@ -15,14 +15,13 @@ class matrix
 public:
 	union{
 		struct{
-			// the squared form of this block is "transposed"!
-			float _00,_10,_20,_30;
-			float _01,_11,_21,_31;
-			float _02,_12,_22,_32;
-			float _03,_13,_23,_33;
+			// "c" row major order
+			float _00,_01,_02,_03;
+			float _10,_11,_12,_13;
+			float _20,_21,_22,_23;
+			float _30,_31,_32,_33;
 		};
 		float __e[4][4];
-//#define _e(i,j)		__e[j][i]
 		float e[16];
 	};
 

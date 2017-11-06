@@ -3,8 +3,8 @@
 HUI_DIR = $(LIB_DIR)/hui
 HUI_BIN  = $(HUI_DIR)/hui.a
 HUI_OBJ  = $(HUI_DIR)/hui.o \
- $(HUI_DIR)/language.o $(HUI_DIR)/Config.o $(HUI_DIR)/resource.o $(HUI_DIR)/utility.o \
- $(HUI_DIR)/input.o $(HUI_DIR)/error.o $(HUI_DIR)/clipboard.o $(HUI_DIR)/Timer.o \
+ $(HUI_DIR)/language.o $(HUI_DIR)/Config.o $(HUI_DIR)/Resource.o $(HUI_DIR)/utility.o \
+ $(HUI_DIR)/Event.o $(HUI_DIR)/error.o $(HUI_DIR)/Clipboard.o $(HUI_DIR)/Timer.o \
  $(HUI_DIR)/common_dlg.o $(HUI_DIR)/common_dlg_gtk.o $(HUI_DIR)/common_dlg_win.o \
  $(HUI_DIR)/Menu.o $(HUI_DIR)/MenuGtk.o $(HUI_DIR)/MenuWin.o \
  $(HUI_DIR)/Window.o $(HUI_DIR)/WindowGtk.o $(HUI_DIR)/WindowWin.o \
@@ -27,7 +27,7 @@ HUI_OBJ  = $(HUI_DIR)/hui.o \
  $(HUI_DIR)/Controls/ToolItemSeparatorGtk.o $(HUI_DIR)/Controls/ToolItemToggleButtonGtk.o \
  $(HUI_DIR)/Controls/MenuItemGtk.o $(HUI_DIR)/Controls/MenuItemSubmenuGtk.o \
  $(HUI_DIR)/Controls/MenuItemSeparatorGtk.o $(HUI_DIR)/Controls/MenuItemToggleGtk.o \
- $(HUI_DIR)/Application.o
+ $(HUI_DIR)/Application.o $(HUI_DIR)/Callback.o
 HUI_CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
 
 
@@ -47,6 +47,9 @@ $(HUI_DIR)/main_win.o : $(HUI_DIR)/main_win.cpp
 $(HUI_DIR)/Application.o : $(HUI_DIR)/Application.cpp
 	$(CPP) -c $(HUI_DIR)/Application.cpp -o $@ $(HUI_CXXFLAGS)
 
+$(HUI_DIR)/Callback.o : $(HUI_DIR)/Callback.cpp
+	$(CPP) -c $(HUI_DIR)/Callback.cpp -o $@ $(HUI_CXXFLAGS)
+
 $(HUI_DIR)/common_dlg.o : $(HUI_DIR)/common_dlg.cpp
 	$(CPP) -c $(HUI_DIR)/common_dlg.cpp -o $@ $(HUI_CXXFLAGS)
 
@@ -59,17 +62,17 @@ $(HUI_DIR)/common_dlg_win.o : $(HUI_DIR)/common_dlg_win.cpp
 $(HUI_DIR)/error.o : $(HUI_DIR)/error.cpp
 	$(CPP) -c $(HUI_DIR)/error.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/clipboard.o : $(HUI_DIR)/clipboard.cpp
-	$(CPP) -c $(HUI_DIR)/clipboard.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Clipboard.o : $(HUI_DIR)/Clipboard.cpp
+	$(CPP) -c $(HUI_DIR)/Clipboard.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/language.o : $(HUI_DIR)/language.cpp
 	$(CPP) -c $(HUI_DIR)/language.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/input.o : $(HUI_DIR)/input.cpp
-	$(CPP) -c $(HUI_DIR)/input.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Event.o : $(HUI_DIR)/Event.cpp
+	$(CPP) -c $(HUI_DIR)/Event.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/resource.o : $(HUI_DIR)/resource.cpp
-	$(CPP) -c $(HUI_DIR)/resource.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Resource.o : $(HUI_DIR)/Resource.cpp
+	$(CPP) -c $(HUI_DIR)/Resource.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/utility.o : $(HUI_DIR)/utility.cpp
 	$(CPP) -c $(HUI_DIR)/utility.cpp -o $@ $(HUI_CXXFLAGS)
@@ -194,25 +197,25 @@ $(HUI_DIR)/Controls/ControlSeparatorGtk.o : $(HUI_DIR)/Controls/ControlSeparator
 $(HUI_DIR)/Controls/ControlRevealerGtk.o : $(HUI_DIR)/Controls/ControlRevealerGtk.cpp
 	$(CPP) -c $(HUI_DIR)/Controls/ControlRevealerGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlToolItemButtonGtk.o : $(HUI_DIR)/Controls/ControlToolItemButtonGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlToolItemButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/ToolItemButtonGtk.o : $(HUI_DIR)/Controls/ToolItemButtonGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/ToolItemButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlToolItemMenuButtonGtk.o : $(HUI_DIR)/Controls/ControlToolItemMenuButtonGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlToolItemMenuButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/ToolItemMenuButtonGtk.o : $(HUI_DIR)/Controls/ToolItemMenuButtonGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/ToolItemMenuButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlToolItemSeparatorGtk.o : $(HUI_DIR)/Controls/ControlToolItemSeparatorGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlToolItemSeparatorGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/ToolItemSeparatorGtk.o : $(HUI_DIR)/Controls/ToolItemSeparatorGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/ToolItemSeparatorGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlToolItemToggleButtonGtk.o : $(HUI_DIR)/Controls/ControlToolItemToggleButtonGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlToolItemToggleButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/ToolItemToggleButtonGtk.o : $(HUI_DIR)/Controls/ToolItemToggleButtonGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/ToolItemToggleButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlMenuItemGtk.o : $(HUI_DIR)/Controls/ControlMenuItemGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlMenuItemGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/MenuItemGtk.o : $(HUI_DIR)/Controls/MenuItemGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/MenuItemGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlMenuItemSubmenuGtk.o : $(HUI_DIR)/Controls/ControlMenuItemSubmenuGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlMenuItemSubmenuGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/MenuItemSubmenuGtk.o : $(HUI_DIR)/Controls/MenuItemSubmenuGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/MenuItemSubmenuGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/Controls/ControlMenuItemToggleGtk.o : $(HUI_DIR)/Controls/ControlMenuItemToggleGtk.cpp
-	$(CPP) -c $(HUI_DIR)/Controls/ControlMenuItemToggleGtk.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/Controls/MenuItemToggleGtk.o : $(HUI_DIR)/Controls/MenuItemToggleGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/MenuItemToggleGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
 

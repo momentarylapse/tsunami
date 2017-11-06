@@ -131,11 +131,7 @@ void Panel::removeEventHandler(int event_handler_id)
 
 void Panel::setKeyCode(const string &id, int key_code, const string &image)
 {
-	for (EventListener &e: event_listeners)
-		if (e.id == id){
-			e.key_code = key_code;
-			e.image = image;
-		}
+	event_key_codes.add(EventKeyCode(id, "", key_code));
 }
 
 int Panel::_kaba_event(const string &id, kaba_member_callback *function)
@@ -163,15 +159,13 @@ int Panel::_kaba_eventOX(const string &id, const string &msg, EventHandler* hand
 	}
 }
 
-bool Panel::_send_event_(Event *e)
+bool Panel::_send_event_(Event *e, bool force_if_not_allowed)
 {
 	if (!win)
 		return false;
-	if (!win->allow_input)
+	if (!win->allow_input and !force_if_not_allowed)
 		return false;
 
-	//msg_write(e->id);
-	//msg_write(e->message);
 	CurWindow = win;
 	e->win = win;
 	e->mx = win->input.x;
@@ -196,8 +190,8 @@ bool Panel::_send_event_(Event *e)
 		_set_cur_id_(e->message);
 
 	bool sent = false;
-	for (int i=0; i<event_listeners.num; i++){
-		EventListener &ee = event_listeners[i];
+
+	for (auto &ee: event_listeners){
 		if (!e->match(ee.id, ee.message))
 			continue;
 

@@ -10,6 +10,8 @@
 #include <math.h>
 #include "../internal.h"
 
+#include <GL/gl.h>
+
 #ifdef HUI_API_GTK
 
 namespace hui
@@ -18,11 +20,45 @@ namespace hui
 int GtkAreaMouseSet = -1;
 int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
+static ControlDrawingArea *NixGlArea = NULL;
+GdkGLContext *gtk_gl_context = NULL;
+
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	reinterpret_cast<ControlDrawingArea*>(user_data)->cur_cairo = cr;
 	reinterpret_cast<Control*>(user_data)->notify("hui:draw");
 	return false;
+}
+
+gboolean OnGtkGLAreaRender(GtkGLArea *area, GdkGLContext *context)
+{
+	//glClearColor(0, 0, 1, 0);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//printf("render...\n");
+
+	GtkAllocation a;
+	gtk_widget_get_allocation(GTK_WIDGET(area), &a);
+	NixGlArea->panel->win->input.row = a.height;
+	NixGlArea->panel->win->input.column = a.width;
+
+
+	gtk_gl_context = context;
+	NixGlArea->notify("hui:draw-gl");
+	return false;
+}
+
+void OnGtkGLAreaRealize(GtkGLArea *area)
+{
+	//printf("realize...\n");
+	gtk_gl_area_make_current(area);
+	if (gtk_gl_area_get_error(area) != NULL){
+		printf("realize: gl area make current error...\n");
+		return;
+	}
+	//glClearColor(0, 0, 1, 0);
+	//glClear(GL_COLOR_BUFFER_BIT);
+
+	NixGlArea->notify("hui:realize-gl");
 }
 
 /*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
@@ -218,8 +254,20 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
 	GetPartStrings(title);
-	GtkWidget *da = gtk_drawing_area_new();
-	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
+	is_opengl = (OptionString.find("opengl") >= 0);
+	GtkWidget *da;
+	if (is_opengl){
+		NixGlArea = this;
+		da = gtk_gl_area_new();
+		gtk_gl_area_set_has_stencil_buffer(GTK_GL_AREA(da), true);
+		gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(da), true);
+		gtk_gl_area_attach_buffers(GTK_GL_AREA(da));
+		g_signal_connect(G_OBJECT(da), "realize", G_CALLBACK(OnGtkGLAreaRealize), this);
+		g_signal_connect(G_OBJECT(da), "render", G_CALLBACK(OnGtkGLAreaRender), this);
+	}else{
+		da = gtk_drawing_area_new();
+		g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
+	}
 	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
 	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
 	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
@@ -230,16 +278,16 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButton), this);
 	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&OnGtkAreaMouseWheel), this);
 	//g_signal_connect(G_OBJECT(w), "focus-in-event", G_CALLBACK(&focus_in_event), this);
-	int mask;
-	g_object_get(G_OBJECT(da), "events", &mask, NULL);
-	mask |= GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
-	mask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK;
-	mask |= GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
-	mask |= GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK;
-	mask |= GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK;
-	mask |= GDK_SMOOTH_SCROLL_MASK;// | GDK_TOUCHPAD_GESTURE_MASK;
+	//int mask;
+	//g_object_get(G_OBJECT(da), "events", &mask, NULL);
+	gtk_widget_add_events(da, GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
+	gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+	gtk_widget_add_events(da, GDK_POINTER_MOTION_MASK);// | GDK_POINTER_MOTION_HINT_MASK); // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
+	gtk_widget_add_events(da, GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
+	gtk_widget_add_events(da, GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK);
+	gtk_widget_add_events(da, GDK_SMOOTH_SCROLL_MASK);// | GDK_TOUCHPAD_GESTURE_MASK;
 	//mask = GDK_ALL_EVENTS_MASK;
-	g_object_set(G_OBJECT(da), "events", mask, NULL);
+//	g_object_set(G_OBJECT(da), "events", mask, NULL);
 
 	grab_focus = (OptionString.find("grabfocus") >= 0);
 	if (grab_focus){
@@ -254,43 +302,10 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	cur_cairo = NULL;
 }
 
-void ControlDrawingArea::hardReset()
+void ControlDrawingArea::make_current()
 {
-	msg_db_f("hard reset", 0);
-	GtkWidget *parent = gtk_widget_get_parent(widget);
-
-	gtk_container_remove(GTK_CONTAINER(parent), widget);
-
-
-	GtkWidget *da = gtk_drawing_area_new();
-	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
-	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
-	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
-	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
-	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&OnGtkAreaMouseMove), this);
-	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButton), this);
-	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButton), this);
-	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&OnGtkAreaMouseWheel), this);
-	//g_signal_connect(G_OBJECT(w), "focus-in-event", G_CALLBACK(&focus_in_event), this);
-	int mask;
-	g_object_get(G_OBJECT(da), "events", &mask, NULL);
-	mask |= GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
-	mask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK;
-	mask |= GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
-	mask |= GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK;
-	//mask = GDK_ALL_EVENTS_MASK;
-	g_object_set(G_OBJECT(da), "events", mask, NULL);
-
-	widget = da;
-	gtk_widget_set_hexpand(widget, true);
-	gtk_widget_set_vexpand(widget, true);
-
-	gtk_container_add(GTK_CONTAINER(parent), widget);
-
-	if (grab_focus){
-		gtk_widget_set_can_focus(da, true);
-		gtk_widget_grab_focus(da);
-	}
+	if (is_opengl)
+		gtk_gl_area_make_current(GTK_GL_AREA(widget));
 }
 
 };

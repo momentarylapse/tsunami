@@ -98,6 +98,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		int hsize = read_int(f);
 		if (hn != "MThd")
 			throw string("midi header is not \"MTHd\": " + hn);
+		//msg_write(hn + " " + i2s(hsize));
 		int format_type = int16_reverse(f->ReadWord());
 		int num_tracks = int16_reverse(f->ReadWord());
 		int time_division = int16_reverse(f->ReadWord());
@@ -163,7 +164,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 						int a1 = f->ReadByte();
 						int a2 = f->ReadByte();
 						mpqn = (a0 << 16) + (a1 << 8) + a2;
-						msg_write(format("%.1f bpm", 60000000.0f / (float)mpqn));
+						//msg_write(format("%.1f bpm", 60000000.0f / (float)mpqn));
 					}else if (type == 88){
 						int a0 = f->ReadByte();
 						int a1 = f->ReadByte();
@@ -171,7 +172,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 						int a3 = f->ReadByte();
 						numerator = a0;
 						denominator = 1<<a1;
-						msg_write(format("time %d %d %d %d", a0, 1<<a1, a2, a3));
+						//msg_write(format("time %d %d %d %d", a0, 1<<a1, a2, a3));
 					}else{
 						string t;
 						t.resize(l);
@@ -242,7 +243,10 @@ void FormatMidi::saveSong(StorageOperationData* od)
 			throw string("can not create file");
 
 		f->SetBinaryMode(true);
-		int num_tracks = od->song->tracks.num;
+		int num_tracks = 0;
+		for (Track *t: od->song->tracks)
+			if (t->type == t->TYPE_MIDI)
+				num_tracks ++;
 		int ticks_per_beat = 16;
 		// heaer
 		write_chunk_name(f, "MThd");
@@ -256,11 +260,14 @@ void FormatMidi::saveSong(StorageOperationData* od)
 		int denominator = 4;
 		int last_bar = 0;
 		for (Track* t : od->song->tracks) {
+			if (t->type != t->TYPE_MIDI)
+				continue;
 			write_chunk_name(f, "MTrk");
 			int pos0 = f->GetPos();
 			write_int(f, 0); // size
 			// track name
 			if (t->name.num > 0) {
+				write_var(f, 0);
 				f->WriteByte(0xff);
 				f->WriteByte(0x03);
 				write_var(f, t->name.num);
@@ -270,17 +277,25 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				auto b = od->song->bars[0];
 				float bpm = 60.0f / ((float) b.length / (float) od->song->sample_rate / b.num_beats);
 				mpqn = 60000000.0f / bpm;
+				write_var(f, 0);
 				f->WriteByte(0xff);
-				f->WriteByte(0x81);
+				f->WriteByte(81);
+				write_var(f, 0);
 				f->WriteByte(mpqn >> 16);
 				f->WriteByte(mpqn >> 8);
 				f->WriteByte(mpqn >> 0);
+
+				write_var(f, 0);
 				f->WriteByte(0xff);
-				f->WriteByte(0x88);
+				f->WriteByte(88);
+				write_var(f, 0);
 				f->WriteByte(b.num_beats);
 				f->WriteByte(2); // 1/4
+				f->WriteByte(0);
+				f->WriteByte(0);
 			}
 			MidiEventBuffer events = t->midi.getEvents(Range::ALL);
+			events.sort();
 			int offset = 0;
 			for (MidiEvent& e: events) {
 				int dt = e.pos - offset;

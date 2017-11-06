@@ -20,7 +20,6 @@ EventListener::EventListener(int _uid, const string &_id, const string &_message
 	id = _id;
 	message = _message;
 	function = _function;
-	key_code = -1;
 	enabled = true;
 	type = 0;
 }
@@ -31,9 +30,16 @@ EventListener::EventListener(int _uid, const string &_id, const string &_message
 	id = _id;
 	message = _message;
 	function_p = _function;
-	key_code = -1;
 	enabled = true;
 	type = 0;
+}
+
+EventKeyCode::EventKeyCode(const string &_id, const string &_message, int _key_code)
+{
+	id = _id;
+	message = _message;
+	key_code = _key_code;
+
 }
 
 Event _hui_event_;

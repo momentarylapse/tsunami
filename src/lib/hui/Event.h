@@ -48,12 +48,20 @@ class Event
 extern Event _hui_event_;
 Event *GetEvent();
 
+class EventKeyCode
+{
+public:
+	string id, message;
+	int key_code;
+	EventKeyCode(){}
+	EventKeyCode(const string &id, const string &messgae, int key_code);
+};
 
 class EventListener
 {
 public:
 	int uid;
-	int type, key_code;
+	int type;
 	bool enabled;
 	string id, message;
 	string image;

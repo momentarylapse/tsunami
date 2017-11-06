@@ -18,6 +18,7 @@
 	#include "../../../fx/light.h"
 	#include "../../../meta.h"
 	#include "../../../networking.h"
+	#include "../../../input.h"
 	#define x_p(p)		(void*)p
 	void _cdecl ExitProgram();
 	void _cdecl ScreenShot();
@@ -90,7 +91,6 @@ extern Class *TypeFloatList;
 extern Class *TypeIntList;
 extern Class *TypeVectorList;
 extern Class *TypeVectorArray;
-extern Class *TypeIntArray;
 extern Class *TypeFloatArray;
 extern Class *TypeFloatPs;
 extern Class *TypePlaneList;
@@ -98,7 +98,7 @@ extern Class *TypeSocketP;
 extern Class *TypeSocketPList;
 //extern Type *TypeVertexBufferP; // -> script_data_nix.cpp
 extern Class *TypeTextureP; // -> script_data_nix.cpp
-extern Class *TypeTexturePArray;
+extern Class *TypeTexturePList;
 extern Class *TypeShaderP;
 
 
@@ -214,7 +214,7 @@ void amd64_camera_unproject(vector &r, Camera *c, vector &v)
 {	r = c->Unproject(v);	}
 void amd64_getg(vector &r, vector &v)
 {	r = GetG(v);	}
-#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::InstructionSetAMD64) ? ((void*)(wrap)) : ((void*)(orig)))
+#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 #else
 #define amd64_wrap(a, b)	NULL
 #endif
@@ -499,8 +499,7 @@ void SIAddPackageX()
 		class_add_element("normal",			TypeVectorList,	GetDASubSkin(normal));
 
 	add_class(TypeMaterial);
-		class_add_element("num_textures",	TypeInt,		GetDAMaterial(num_textures));
-		class_add_element("texture",		TypeTexturePArray,	GetDAMaterial(texture));
+		class_add_element("textures",		TypeTexturePList,	GetDAMaterial(textures));
 		class_add_element("shader",			TypeShaderP,	GetDAMaterial(shader));
 		class_add_element("alpha_factor",	TypeFloat32,		GetDAMaterial(alpha_factor));
 		class_add_element("ambient",		TypeColor,		GetDAMaterial(ambient));
@@ -839,7 +838,7 @@ void SIAddPackageX()
 		class_add_element("session", TypeString, GetDAHostData(session));
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&HostData::__init__)));
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, x_p(mf(&HostData::__delete__)));
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, x_p(mf(&HostData::operator=)));
+		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, x_p(mf(&HostData::__assign__)));
 			func_add_param("other", TypeHostData);
 	
 	add_class(TypeHostDataList);
@@ -895,13 +894,36 @@ void SIAddPackageX()
 		func_add_param("o_ignore",		TypeModelP);
 	
 
+		// user input
+	add_func("UpdateInput",			TypeVoid,	x_p(&update_input));
+	add_func("GetKey",								TypeBool,	x_p(&get_key));
+		func_add_param("id",		TypeInt);
+	add_func("GetKeyDown",								TypeBool,	x_p(&get_key_down));
+		func_add_param("id",		TypeInt);
+	add_func("GetKeyDownRep",							TypeInt,	x_p(&get_key_down_rep));
+	add_func("GetKeyUp",								TypeBool,	x_p(&get_key_up));
+		func_add_param("id",		TypeInt);
+	add_func("GetKeyChar",							TypeString,	x_p(&get_key_char));
+		func_add_param("id",		TypeInt);
+	add_func("GetButton",										TypeBool,	x_p(&get_button));
+		func_add_param("button",	TypeInt);
+	add_func("GetButtonDown",										TypeBool,	x_p(&get_button_down));
+		func_add_param("button",	TypeInt);
+	add_func("GetButtonUp",										TypeBool,	x_p(&get_button_up));
+		func_add_param("button",	TypeInt);
+
 	// game variables
 	add_ext_var("World", 			TypeWorldData,	x_p(&World));
 	add_ext_var("Ego", 				TypeModelP,		x_p(&World.ego));
 	add_ext_var("Engine", 			TypeEngineData,	x_p(&Engine));
 	add_ext_var("Net", 				TypeNetworkData,x_p(&Net));
-	add_ext_var("Cam",				TypeCameraP,		x_p(&Cam));
+	add_ext_var("Cam",				TypeCameraP,		x_p(&cam));
 	add_ext_var("CurrentLayer",		TypeLayerP,	x_p(&CurrentGrouping));
+
+	add_ext_var("Mouse",			TypeVector,		x_p(&mouse));
+	add_ext_var("MouseRel",			TypeVector,		x_p(&mouse_rel));
+	add_ext_var("MouseD",			TypeVector,		x_p(&mouse_d));
+	add_ext_var("MouseDRel",		TypeVector,		x_p(&mouse_d_rel));
 
 	// trace
 	add_const("TraceTypeNone",    TypeInt, x_p(TRACE_TYPE_NONE));

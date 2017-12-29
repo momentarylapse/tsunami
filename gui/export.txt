@@ -1,5 +1,5 @@
 // Target Directory
-../Data/
+../static/
 // Source Code Directory
 ../src/
 // Own Language

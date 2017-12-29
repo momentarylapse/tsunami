@@ -65,14 +65,14 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 
 void FavoriteManager::Load()
 {
-	LoadFromFile(tsunami->directory_static + "Data/favorites_demo.txt", true);
-	LoadFromFile(tsunami->directory + "Data/favorites.txt", false);
+	LoadFromFile(tsunami->directory_static + "favorites_demo.txt", true);
+	LoadFromFile(tsunami->directory + "favorites.txt", false);
 	loaded = true;
 }
 
 void FavoriteManager::Save()
 {
-	File *f = FileCreate(tsunami->directory + "Data/favorites.txt");
+	File *f = FileCreate(tsunami->directory + "favorites.txt");
 	if (!f)
 		return;
 	f->WriteInt(favorites.num);

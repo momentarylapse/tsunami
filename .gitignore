@@ -1,6 +1,6 @@
 message.txt
-Data/config.txt
-Data/favorites.txt
+config.txt
+favorites.txt
 *.o
 *.a
 *~

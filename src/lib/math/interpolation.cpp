@@ -146,7 +146,6 @@ template<class T>
 void Interpolator<T>::update()
 {
 	if (type == TYPE_CUBIC_SPLINE_NOTANG){
-		type = TYPE_CUBIC_SPLINE;
 		if (closed){
 			T v = (part[0].pos1 - part.back().pos0) / (part.back().dt + part[0].dt);
 			part.back().vel1 = v;
@@ -259,7 +258,7 @@ T Interpolator<T>::get(float t)
 		int index = canonize(t);
 		if (type == TYPE_LERP)
 			return _inter_lerp_<T>(part[index], t);
-		if (type == TYPE_CUBIC_SPLINE)
+		if ((type == TYPE_CUBIC_SPLINE) or (type == TYPE_CUBIC_SPLINE_NOTANG))
 			return _inter_cubic_spline_<T>(part[index], t);
 		if (type == TYPE_ANGULAR_LERP)
 			return _inter_angular_lerp_<T>(part[index], t);
@@ -278,7 +277,7 @@ T Interpolator<T>::getTang(float t)
 		int index = canonize(t);
 		if (type == TYPE_LERP)
 			return _inter_lerp_tang_<T>(part[index], t);
-		if (type == TYPE_CUBIC_SPLINE)
+		if ((type == TYPE_CUBIC_SPLINE) or (type == TYPE_CUBIC_SPLINE_NOTANG))
 			return _inter_cubic_spline_tang_<T>(part[index], t);
 	}
 	return _inter_zero_<T>();

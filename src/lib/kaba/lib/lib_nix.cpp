@@ -84,7 +84,6 @@ void SIAddPackageNix()
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::Texture::__delete__)));
 		class_add_func("overwrite",	TypeVoid,	nix_p(mf(&nix::Texture::overwrite)));
 			func_add_param("image", TypeImage);
-		class_add_func("startRender", TypeBool, nix_p(mf(&nix::Texture::start_render)));
 
 	add_class(TypeDynamicTexture);
 		TypeDynamicTexture->derive_from(TypeTexture, false);
@@ -207,22 +206,20 @@ void SIAddPackageNix()
 		func_add_param("light",			TypeInt);
 		func_add_param("pos",			TypeVector);
 		func_add_param("radius",			TypeFloat32);
-		func_add_param("ambient",		TypeColor);
 		func_add_param("diffuse",		TypeColor);
-		func_add_param("specular",		TypeColor);
+		func_add_param("ambient",		TypeFloat32);
+		func_add_param("specular",		TypeFloat32);
 	add_func("NixSetLightDirectional",									TypeVoid,	nix_p(&nix::SetLightDirectional));
 		func_add_param("light",			TypeInt);
 		func_add_param("dir",			TypeVector);
-		func_add_param("ambient",		TypeColor);
 		func_add_param("diffuse",		TypeColor);
-		func_add_param("specular",		TypeColor);
+		func_add_param("ambient",		TypeFloat32);
+		func_add_param("specular",		TypeFloat32);
 	add_func("NixEnableLight",											TypeVoid,	nix_p(&nix::EnableLight));
 		func_add_param("light",			TypeInt);
 		func_add_param("enabled",		TypeBool);
 	add_func("NixSetAmbientLight",										TypeVoid,	nix_p(&nix::SetAmbientLight));
 		func_add_param("ambient",		TypeColor);
-	add_func("NixSpecularEnable",										TypeVoid,	nix_p(&nix::SpecularEnable));
-		func_add_param("enabled",		TypeBool);
 	add_func("NixSetCull",											TypeVoid,	nix_p(&nix::SetCull));
 		func_add_param("mode",		TypeInt);
 	add_func("NixSetWire",											TypeVoid,	nix_p(&nix::SetWire));
@@ -260,49 +257,49 @@ void SIAddPackageNix()
 	add_func("NixScreenShotToImage",								TypeVoid,	nix_p(&nix::ScreenShotToImage));
 		func_add_param("im",	TypeImage);
 
-	add_ext_var("TargetWidth",		TypeInt,		nix_p(&nix::target_height));
-	add_ext_var("TargetHeight",		TypeInt,		nix_p(&nix::target_height));
-	add_ext_var("Target",			TypeRect,		nix_p(&nix::target_rect));
-	add_ext_var("Fullscreen",		TypeBool,		nix_p(&nix::Fullscreen));
+	add_ext_var("target_width",		TypeInt,		nix_p(&nix::target_height));
+	add_ext_var("target_height",		TypeInt,		nix_p(&nix::target_height));
+	add_ext_var("target",			TypeRect,		nix_p(&nix::target_rect));
+	add_ext_var("fullscreen",		TypeBool,		nix_p(&nix::Fullscreen));
 	add_ext_var("Api",				TypeString,		nix_p(&nix::ApiName));
 	//add_ext_var("TextureLifeTime",	TypeInt,		nix_p(&nix::TextureMaxFramesToLive));
-	add_ext_var("LineWidth",		TypeFloat32,		nix_p(&nix::line_width));
-	add_ext_var("SmoothLines",		TypeBool,		nix_p(&nix::smooth_lines));
+	//add_ext_var("LineWidth",		TypeFloat32,		nix_p(&nix::line_width));
+	//add_ext_var("SmoothLines",		TypeBool,		nix_p(&nix::smooth_lines));
 
 	// alpha operations
-	add_const("AlphaNone",           TypeInt, nix_p(AlphaNone));
-	add_const("AlphaZero",           TypeInt, nix_p(AlphaZero));
-	add_const("AlphaOne",            TypeInt, nix_p(AlphaOne));
-	add_const("AlphaColorKey",       TypeInt, nix_p(AlphaColorKey));
-	add_const("AlphaColorKeyHard",   TypeInt, nix_p(AlphaColorKeyHard));
-	add_const("AlphaAdd",            TypeInt, nix_p(AlphaAdd));
-	add_const("AlphaMaterial",       TypeInt, nix_p(AlphaMaterial));
-	add_const("AlphaSourceColor",    TypeInt, nix_p(AlphaSourceColor));
-	add_const("AlphaSourceInvColor", TypeInt, nix_p(AlphaSourceInvColor));
-	add_const("AlphaSourceAlpha",    TypeInt, nix_p(AlphaSourceAlpha));
-	add_const("AlphaSourceInvAlpha", TypeInt, nix_p(AlphaSourceInvAlpha));
-	add_const("AlphaDestColor",      TypeInt, nix_p(AlphaDestColor));
-	add_const("AlphaDestInvColor",   TypeInt, nix_p(AlphaDestInvColor));
-	add_const("AlphaDestAlpha",      TypeInt, nix_p(AlphaDestAlpha));
-	add_const("AlphaDestInvAlpha",   TypeInt, nix_p(AlphaDestInvAlpha));
+	add_const("ALPHA_NONE",             TypeInt, nix_p(ALPHA_NONE));
+	add_const("ALPHA_ZERO",             TypeInt, nix_p(ALPHA_ZERO));
+	add_const("ALPHA_ONE",              TypeInt, nix_p(ALPHA_ONE));
+	add_const("ALPHA_COLOR_KEY",        TypeInt, nix_p(ALPHA_COLOR_KEY_SMOOTH));
+	add_const("ALPHA_COLOR_KEY_HARD",   TypeInt, nix_p(ALPHA_COLOR_KEY_HARD));
+	add_const("ALPHA_ADD",              TypeInt, nix_p(ALPHA_ADD));
+	add_const("ALPHA_MATERIAL",         TypeInt, nix_p(ALPHA_MATERIAL));
+	add_const("ALPHA_SOURCE_COLOR",     TypeInt, nix_p(ALPHA_SOURCE_COLOR));
+	add_const("ALPHA_SOURCE_INV_COLOR", TypeInt, nix_p(ALPHA_SOURCE_INV_COLOR));
+	add_const("ALPHA_SOURCE_ALPHA",     TypeInt, nix_p(ALPHA_SOURCE_ALPHA));
+	add_const("ALPHA_SOURCE_INV_ALPHA", TypeInt, nix_p(ALPHA_SOURCE_INV_ALPHA));
+	add_const("ALPHA_DEST_COLOR",       TypeInt, nix_p(ALPHA_DEST_COLOR));
+	add_const("ALPHA_DEST_INV_COLOR",   TypeInt, nix_p(ALPHA_DEST_INV_COLOR));
+	add_const("ALPHA_DEST_ALPHA",       TypeInt, nix_p(ALPHA_DEST_ALPHA));
+	add_const("ALPHA_DEST_INV_ALPHA",   TypeInt, nix_p(ALPHA_DEST_INV_ALPHA));
 	// stencil operations
-	add_const("StencilNone",             TypeInt, nix_p(StencilNone));
-	add_const("StencilIncrease",         TypeInt, nix_p(StencilIncrease));
-	add_const("StencilDecrease",         TypeInt, nix_p(StencilDecrease));
-	add_const("StencilSet",              TypeInt, nix_p(StencilSet));
-	add_const("StencilMaskEqual",        TypeInt, nix_p(StencilMaskEqual));
-	add_const("StencilMaskNotEqual",     TypeInt, nix_p(StencilMaskNotEqual));
-	add_const("StencilMaskLess",         TypeInt, nix_p(StencilMaskLess));
-	add_const("StencilMaskLessEqual",    TypeInt, nix_p(StencilMaskLessEqual));
-	add_const("StencilMaskGreater",      TypeInt, nix_p(StencilMaskGreater));
-	add_const("StencilMaskGreaterEqual", TypeInt, nix_p(StencilMaskGreaterEqual));
-	add_const("StencilReset",            TypeInt, nix_p(StencilReset));
+	add_const("STENCIL_NONE",               TypeInt, nix_p(STENCIL_NONE));
+	add_const("STENCIL_INCREASE",           TypeInt, nix_p(STENCIL_INCREASE));
+	add_const("STENCIL_DECREASE",           TypeInt, nix_p(STENCIL_DECREASE));
+	add_const("STENCIL_SET",                TypeInt, nix_p(STENCIL_SET));
+	add_const("STENCIL_MASK_EQUAL",         TypeInt, nix_p(STENCIL_MASK_EQUAL));
+	add_const("STENCIL_MASK_NOT_EQUAL",     TypeInt, nix_p(STENCIL_MASK_NOT_EQUAL));
+	add_const("STENCIL_MASK_LESS",          TypeInt, nix_p(STENCIL_MASK_LESS));
+	add_const("STENCIL_MASK_LESS_EQUAL",    TypeInt, nix_p(STENCIL_MASK_LESS_EQUAL));
+	add_const("STENCIL_MASK_GREATER",       TypeInt, nix_p(STENCIL_MASK_GREATER));
+	add_const("STENCIL_MASK_GREATER_EQUAL", TypeInt, nix_p(STENCIL_MASK_GREATER_EQUAL));
+	add_const("STENCIL_RESET",              TypeInt, nix_p(STENCIL_RESET));
 	// fog
-	add_const("FogLinear", TypeInt, nix_p(FogLinear));
-	add_const("FogExp",    TypeInt, nix_p(FogExp));
-	add_const("FogExp2",   TypeInt, nix_p(FogExp2));
+	add_const("FOG_LINEAR", TypeInt, nix_p(FOG_LINEAR));
+	add_const("FOG_EXP",    TypeInt, nix_p(FOG_EXP));
+	add_const("FOG_EXP2",   TypeInt, nix_p(FOG_EXP2));
 
-	add_ext_var("VBTemp",     TypeVertexBufferP, nix_p(nix::vb_temp));
+	add_ext_var("vb_temp",     TypeVertexBufferP, nix_p(nix::vb_temp));
 }
 
 };

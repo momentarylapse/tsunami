@@ -190,8 +190,8 @@ void AboutBox(Window *win)
 {
 	// load license
 	if (Application::getProperty("license") == "")
-		if (file_test_existence(Application::directory_static + "Data/license_small.txt"))
-			Application::setProperty("license", FileRead(Application::directory_static + "Data/license_small.txt"));
+		if (file_test_existence(Application::directory_static + "license_small.txt"))
+			Application::setProperty("license", FileRead(Application::directory_static + "license_small.txt"));
 
 	// author list
 	Array<char*> _a_;

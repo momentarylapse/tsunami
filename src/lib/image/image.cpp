@@ -135,6 +135,8 @@ void Image::save(const string &filename) const
 
 void Image::clear()
 {
+	width = 0;
+	height = 0;
 	data.clear();
 }
 

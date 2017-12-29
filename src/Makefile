@@ -1266,13 +1266,12 @@ clean :
 
 install : all
 	mkdir -p /usr/share/tsunami
-	mkdir -p /usr/share/tsunami/Data
-	cp -f ../Data/hui_resources.txt    /usr/share/tsunami/Data
-	cp -f ../Data/icon.*               /usr/share/tsunami/Data
-	cp -f ../Data/*.tga                /usr/share/tsunami/Data
-	cp -f ../Data/license.txt          /usr/share/tsunami/Data
-	cp -f ../Data/license_small.txt    /usr/share/tsunami/Data
-	cp -f ../Data/favorites_demo.txt   /usr/share/tsunami/Data
+	cp -f ../static/hui_resources.txt    /usr/share/tsunami
+	cp -f ../static/icon.*               /usr/share/tsunami
+	cp -f ../static/*.tga                /usr/share/tsunami
+	cp -f ../static/license.txt          /usr/share/tsunami
+	cp -f ../static/license_small.txt    /usr/share/tsunami
+	cp -f ../static/favorites_demo.txt   /usr/share/tsunami
 	mkdir -p /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/*.kaba           /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Buffer           /usr/share/tsunami/Plugins
@@ -1281,13 +1280,13 @@ install : all
 	cp -rf ../Plugins/Independent      /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Synthesizer      /usr/share/tsunami/Plugins
 	cp -rf ../Lessons/                 /usr/share/tsunami/
-	cp -rf ../Data/Drumsets            /usr/share/tsunami/Data
-	xdg-desktop-menu install ../Data/michisoft-tsunami.desktop
-	xdg-mime install ../Data/michisoft-nami.xml
-	xdg-icon-resource install --context mimetypes --size  32 ../Data/Icons/32.png  application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size  48 ../Data/Icons/48.png  application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size  64 ../Data/Icons/64.png  application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size 128 ../Data/Icons/128.png application-michisoft-nami
-	#xdg-icon-resource install --context mimetypes ../Data/Icons/tsunami.svg application-michisoft-nami
+	cp -rf ../static/Drumsets            /usr/share/tsunami/
+	xdg-desktop-menu install ../static/michisoft-tsunami.desktop
+	xdg-mime install ../static/michisoft-nami.xml
+	xdg-icon-resource install --context mimetypes --size  32 ../static/Icons/32.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size  48 ../static/Icons/48.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size  64 ../static/Icons/64.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 128 ../static/Icons/128.png application-michisoft-nami
+	#xdg-icon-resource install --context mimetypes ../static/Icons/tsunami.svg application-michisoft-nami
 	cp $(BIN) /usr/bin
 

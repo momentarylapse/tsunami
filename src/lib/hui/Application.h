@@ -51,6 +51,7 @@ public:
 	static string directory;			// dir of changeable files (ie. ~/.app/)
 	static string directory_static;	// dir of static files (ie. /usr/shar/app)
 	static string initial_working_directory;
+	static bool installed; // installed into system folders?
 	static bool running;
 
 	static Array<string> _args;

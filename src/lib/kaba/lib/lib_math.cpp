@@ -560,7 +560,7 @@ void SIAddPackageMath()
 		class_add_func("invert",	TypeVoid,	mf(&quaternion::invert));
 		class_add_func("bar",		TypeQuaternion,	amd64_wrap(mf(&quaternion::bar), &amd64_quat_bar), FLAG_PURE);
 		class_add_func("normalize",	TypeVoid,	mf(&quaternion::normalize));
-		class_add_func("getAngles",	TypeVector,	amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles), FLAG_PURE);
+		class_add_func("angles",	TypeVector,	amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles), FLAG_PURE);
 		class_add_func("str",		TypeString,			mf(&quaternion::str), FLAG_PURE);
 	
 	add_class(TypeRect);
@@ -760,10 +760,10 @@ void SIAddPackageMath()
 		class_add_element("n",	TypeRandom, 0);
 		class_add_func("seed",		TypeVoid, mf(&Random::seed));
 			func_add_param("str",		TypeString);
-		class_add_func("geti",		TypeInt, mf(&Random::geti));
+		class_add_func("int",		TypeInt, mf(&Random::geti));
 			func_add_param("max",		TypeInt);
 		class_add_func("getu",		TypeFloat32, mf(&Random::getu));
-		class_add_func("getf",		TypeFloat32, mf(&Random::getf));
+		class_add_func("float",		TypeFloat32, mf(&Random::getf));
 			func_add_param("min",		TypeFloat32);
 			func_add_param("max",		TypeFloat32);
 		class_add_func("inBall",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));

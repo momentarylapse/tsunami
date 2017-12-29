@@ -169,12 +169,12 @@ const char *get_gtk_icon_name(const string image)
 	return "";
 }
 
-HuiImage *get_image(const string &image)
+HuiImage *get_image(const string &filename)
 {
 	for (HuiImage &m: _all_images_)
-		if (m.filename == image)
+		if (m.filename == filename)
 			return &m;
-	HuiImage img = {0, image};
+	HuiImage img = {0, filename};
 	_all_images_.add(img);
 	return &_all_images_.back();
 }

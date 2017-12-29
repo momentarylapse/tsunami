@@ -913,29 +913,29 @@ void SIAddPackageX()
 		func_add_param("button",	TypeInt);
 
 	// game variables
-	add_ext_var("World", 			TypeWorldData,	x_p(&World));
-	add_ext_var("Ego", 				TypeModelP,		x_p(&World.ego));
-	add_ext_var("Engine", 			TypeEngineData,	x_p(&Engine));
-	add_ext_var("Net", 				TypeNetworkData,x_p(&Net));
-	add_ext_var("Cam",				TypeCameraP,		x_p(&cam));
-	add_ext_var("CurrentLayer",		TypeLayerP,	x_p(&CurrentGrouping));
+	add_ext_var("world", 			TypeWorldData,	x_p(&World));
+	add_ext_var("ego", 				TypeModelP,		x_p(&World.ego));
+	add_ext_var("engine", 			TypeEngineData,	x_p(&Engine));
+	add_ext_var("net", 				TypeNetworkData,x_p(&Net));
+	add_ext_var("cam",				TypeCameraP,		x_p(&cam));
+	add_ext_var("current_layer",		TypeLayerP,	x_p(&CurrentGrouping));
 
-	add_ext_var("Mouse",			TypeVector,		x_p(&mouse));
-	add_ext_var("MouseRel",			TypeVector,		x_p(&mouse_rel));
-	add_ext_var("MouseD",			TypeVector,		x_p(&mouse_d));
-	add_ext_var("MouseDRel",		TypeVector,		x_p(&mouse_d_rel));
+	add_ext_var("mouse_pixel",			TypeVector,		x_p(&mouse));
+	add_ext_var("mouse",			TypeVector,		x_p(&mouse_rel));
+	add_ext_var("dmouse_pixel",			TypeVector,		x_p(&mouse_d));
+	add_ext_var("dmouse",		TypeVector,		x_p(&mouse_d_rel));
 
 	// trace
-	add_const("TraceTypeNone",    TypeInt, x_p(TRACE_TYPE_NONE));
-	add_const("TraceTypeTerrain", TypeInt, x_p(TRACE_TYPE_TERRAIN));
-	add_const("TraceTypeModel",   TypeInt, x_p(TRACE_TYPE_MODEL));
+	add_const("TRACE_NONE",    TypeInt, x_p(TRACE_TYPE_NONE));
+	add_const("TRACE_TERRAIN", TypeInt, x_p(TRACE_TYPE_TERRAIN));
+	add_const("TRACE_MODEL",   TypeInt, x_p(TRACE_TYPE_MODEL));
 	// animation operations
-	add_const("MoveOpSet",         TypeInt, x_p(MOVE_OP_SET));
-	add_const("MoveOpSetNewKeyed", TypeInt, x_p(MOVE_OP_SET_NEW_KEYED));
-	add_const("MoveOpSetOldKeyed", TypeInt, x_p(MOVE_OP_SET_OLD_KEYED));
-	add_const("MoveOpAdd1Factor",  TypeInt, x_p(MOVE_OP_ADD_1_FACTOR));
-	add_const("MoveOpMix1Factor",  TypeInt, x_p(MOVE_OP_MIX_1_FACTOR));
-	add_const("MoveOpMix2Factor",  TypeInt, x_p(MOVE_OP_MIX_2_FACTOR));
+	add_const("MOVE_OP_SET",         TypeInt, x_p(MOVE_OP_SET));
+	add_const("MOVE_OP_SET_NEW_KEYED", TypeInt, x_p(MOVE_OP_SET_NEW_KEYED));
+	add_const("MOVE_OP_SET_OLD_KEYED", TypeInt, x_p(MOVE_OP_SET_OLD_KEYED));
+	add_const("MOVE_OP_ADD_1_FACTOR",  TypeInt, x_p(MOVE_OP_ADD_1_FACTOR));
+	add_const("MOVE_OP_MIX_1_FACTOR",  TypeInt, x_p(MOVE_OP_MIX_1_FACTOR));
+	add_const("MOVE_OP_MIX_2_FACTOR",  TypeInt, x_p(MOVE_OP_MIX_2_FACTOR));
 	
 
 #if _X_ALLOW_X_

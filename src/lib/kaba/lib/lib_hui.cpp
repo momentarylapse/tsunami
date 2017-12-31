@@ -385,7 +385,7 @@ void SIAddPackageHui()
 			func_add_param("button",	TypeInt);
 			func_add_param("change",	TypeInt);
 		class_add_func("getKey",							TypeBool,		mf(&hui::Window::getKey));
-			func_add_param("KEY_",			TypeInt);
+			func_add_param("key",			TypeInt);
 		class_add_func_virtual("onMouseMove", TypeVoid, mf(&hui::Window::onMouseMove));
 		class_add_func_virtual("onMouseWheel", TypeVoid, mf(&hui::Window::onMouseWheel));
 		class_add_func_virtual("onLeftButtonDown", TypeVoid, mf(&hui::Window::onLeftButtonDown));
@@ -524,11 +524,11 @@ void SIAddPackageHui()
 		func_add_param("idle_func",	TypePointer);
 	add_func("HuiAddKeyCode",	TypeVoid,		(void*)&hui::AddKeyCode);
 		func_add_param("id",	TypeString);
-		func_add_param("KEY__code",	TypeInt);
+		func_add_param("ley_code",	TypeInt);
 	add_func("HuiAddCommand",	TypeVoid,		(void*)&hui::AddCommand);
 		func_add_param("id",	TypeString);
 		func_add_param("image",	TypeString);
-		func_add_param("KEY__code",	TypeInt);
+		func_add_param("key_code",	TypeInt);
 		func_add_param("func",	TypePointer);*/
 	add_func("HuiGetEvent",	TypeHuiEventP,		(void*)&hui::GetEvent);
 	/*add_func("HuiRun",				TypeVoid,		(void*)&hui::Run);
@@ -582,8 +582,8 @@ void SIAddPackageHui()
 		class_add_element("mouse_y",	TypeFloat32,	GetDAEvent(my));
 		class_add_element("scroll_x",		TypeFloat32,	GetDAEvent(scroll_x));
 		class_add_element("scroll_y",		TypeFloat32,	GetDAEvent(scroll_y));
-		class_add_element("KEY_",		TypeInt,	GetDAEvent(key));
-		class_add_element("KEY__code",	TypeInt,	GetDAEvent(key_code));
+		class_add_element("key",		TypeInt,	GetDAEvent(key));
+		class_add_element("key_code",	TypeInt,	GetDAEvent(key_code));
 		class_add_element("width",		TypeInt,	GetDAEvent(width));
 		class_add_element("height",		TypeInt,	GetDAEvent(height));
 		class_add_element("button_l",	TypeBool,	GetDAEvent(lbut));

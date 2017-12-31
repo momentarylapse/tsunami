@@ -132,7 +132,7 @@ class EqualizerGrid extends Grid
 
 	// [Delete] -> remove point
 	override void onKeyDown()
-		if HuiGetEvent().key_code == KeyDelete
+		if HuiGetEvent().key_code == KEY_DELETE
 			if Selected > 0 and Selected < c.curve.num-1
 				c.curve.remove(Selected)
 				cp.notify()

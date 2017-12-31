@@ -149,7 +149,7 @@ class CompressorGrid extends Grid
 		int k = HuiGetEvent().key
 
 		// [Delete] -> remove point
-		if (k == KeyDelete) and (Selected > 0) and (Selected < config.curve.num - 1)
+		if (k == KEY_DELETE) and (Selected > 0) and (Selected < config.curve.num - 1)
 			config.curve.remove(Selected)
 			cp.notify()
 			Selected = -1

@@ -17,6 +17,10 @@ namespace Kaba{
 	#define GetDAWindow(x)			long(&_win->x)-long(_win)
 	#define GetDAEvent(x)	long(&_event->x)-long(_event)
 	#define GetDAPainter(x)	long(&_painter->x)-long(_painter)
+	void HuiSetIdleFunctionKaba(hui::kaba_callback *f)
+	{
+		hui::SetIdleFunction(f);
+	}
 #else
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
@@ -520,11 +524,11 @@ void SIAddPackageHui()
 			func_add_param("default",	TypeString);
 	
 	// user interface
-	/*add_func("HuiSetIdleFunction",	TypeVoid,		(void*)&hui::SetIdleFunction);
+	add_func("HuiSetIdleFunction",	TypeVoid,		(void*)&HuiSetIdleFunctionKaba);
 		func_add_param("idle_func",	TypePointer);
-	add_func("HuiAddKeyCode",	TypeVoid,		(void*)&hui::AddKeyCode);
+	/*add_func("HuiAddKeyCode",	TypeVoid,		(void*)&hui::AddKeyCode);
 		func_add_param("id",	TypeString);
-		func_add_param("ley_code",	TypeInt);
+		func_add_param("key_code",	TypeInt);
 	add_func("HuiAddCommand",	TypeVoid,		(void*)&hui::AddCommand);
 		func_add_param("id",	TypeString);
 		func_add_param("image",	TypeString);

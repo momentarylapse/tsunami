@@ -160,6 +160,8 @@ void SIAddPackageFile()
 		func_add_param("filename",		TypeString);
 	add_func("FileExists",			TypeBool,		(void*)&file_test_existence);
 		func_add_param("filename",		TypeString);
+	add_func("FileIsDirectory",			TypeBool,		(void*)&file_is_directory);
+		func_add_param("filename",		TypeString);
 	add_func("FileHash",			TypeString,		(void*)&file_hash);
 		func_add_param("filename",		TypeString);
 		func_add_param("type",		TypeString);

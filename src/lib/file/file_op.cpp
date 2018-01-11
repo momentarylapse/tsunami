@@ -43,21 +43,25 @@
 #endif
 
 
-
-static File *test_file=NULL;
-
 // just test the existence of a file
 bool file_test_existence(const string &filename)
 {
-	if (!test_file)
-		test_file=new File();
-	test_file->SilentFileAccess=test_file->DontReportErrors=true;
-	if (!test_file->Open(filename)){
-		//delete(test_file);
-		return false;
+	struct stat s;
+	if (stat(filename.c_str(), &s) == 0){
+		//if (s.st_mode & S_IFREG)
+			return true;
 	}
-	test_file->Close();
-	return true;
+	return false;
+}
+
+bool file_is_directory(const string &path)
+{
+	struct stat s;
+	if (stat(path.c_str(), &s) == 0){
+		if (s.st_mode & S_IFDIR)
+			return true;
+	}
+	return false;
 }
 
 
@@ -171,7 +175,6 @@ string shell_execute(const string &cmd)
 // seach an directory for files matching a filter
 Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_directories)
 {
-	msg_db_r("dir_search", 1);
 	Array<DirEntry> entry_list;
 	DirEntry entry;
 
@@ -246,7 +249,6 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 				entry_list.swap(i, j);
 		}
 
-	msg_db_l(1);
 	return entry_list;
 }
 

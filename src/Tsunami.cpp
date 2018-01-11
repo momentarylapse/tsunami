@@ -18,7 +18,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.1.1";
+const string AppVersion = "0.7.1.2";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -40,7 +40,7 @@ Tsunami::Tsunami() :
 	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
 	setProperty("comment", _("Editor for audio files"));
 	setProperty("website", "http://michi.is-a-geek.org/software");
-	setProperty("copyright", "© 2007-2017 by Michael Ankele");
+	setProperty("copyright", "© 2007-2018 by Michael Ankele");
 	setProperty("author", "Michael Ankele <michi@lupina.de>");
 }
 

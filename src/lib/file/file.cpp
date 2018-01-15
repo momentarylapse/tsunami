@@ -352,6 +352,10 @@ File::File()
 	SilentFileAccess = SilentFiles;
 	DontReportErrors = false;
 	handle = -1;
+	Binary = false;
+	FloatDecimals = 6;
+	Reading = false;
+	Eof = false;
 }
 
 File::~File()

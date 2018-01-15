@@ -220,6 +220,7 @@ OBJ = \
  lib/threads/Thread.o\
  lib/threads/ThreadedWork.o\
  lib/xfile/chunked.o\
+ lib/xfile/xml.o\
  Midi/Clef.o\
  Midi/Instrument.o\
  Midi/MidiData.o\
@@ -971,6 +972,9 @@ lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp
 
 lib/xfile/chunked.o : lib/xfile/chunked.cpp
 	$(CPP) -c lib/xfile/chunked.cpp -o $@ $(CXXFLAGS)
+
+lib/xfile/xml.o : lib/xfile/xml.cpp
+	$(CPP) -c lib/xfile/xml.cpp -o $@ $(CXXFLAGS)
 
 Midi/Clef.o : Midi/Clef.cpp
 	$(CPP) -c Midi/Clef.cpp -o $@ $(CXXFLAGS)

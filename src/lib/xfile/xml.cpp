@@ -18,8 +18,8 @@ class EndOfFile{};
 
 void skip_until_char(File *f, char c)
 {
-	while(!f->Eof){
-		char cc = f->ReadChar();
+	while(!f->eof()){
+		char cc = f->read_char();
 		if (cc == c)
 			return;
 	}
@@ -33,12 +33,12 @@ bool is_whitespace(char c)
 
 char skip_whitespace(File *f, bool back = true)
 {
-	while (!f->Eof){
-		char c = f->ReadChar();
+	while (!f->eof()){
+		char c = f->read_char();
 		if (is_whitespace(c))
 			continue;
 		if (back)
-			f->SetPos(-1, false);
+			f->seek(-1);
 		return c;
 	}
 	throw EndOfFile();
@@ -66,8 +66,8 @@ string read_next_exp(File *f)
 		return "?";
 	bool in_string = (c0 == '\"') or (c0 == '\'');
 	if (in_string){
-		while (!f->Eof){
-			char c = f->ReadChar();
+		while (!f->eof()){
+			char c = f->read_char();
 			if (c == c0)
 				return e;
 			e.add(c);
@@ -77,10 +77,10 @@ string read_next_exp(File *f)
 	}
 
 	e.add(c0);
-	while (!f->Eof){
-		char c = f->ReadChar();
+	while (!f->eof()){
+		char c = f->read_char();
 		if (is_whitespace(c) or (c == '=') or (c == '>') or (c == '<')){
-			f->SetPos(-1, false);
+			f->seek(-1);
 			return e;
 		}
 		e.add(c);
@@ -106,7 +106,6 @@ void Parser::load(const string &filename)
 		return;
 	}
 
-	f->SetBinaryMode(true);
 	while(true){
 		try{
 			Element e = read_element(f);
@@ -141,8 +140,8 @@ void Parser::show_element(Element &e, const string &pre)
 void skip_recursive(File *f)
 {
 	int level = 0;
-	while(!f->Eof){
-		char c = f->ReadChar();
+	while(!f->eof()){
+		char c = f->read_char();
 		if (c == '<'){
 			level += 1;
 			//msg_write("<<");
@@ -170,16 +169,16 @@ Element Parser::read_element(File *f)
 	if (nn > NMAX)
 		return e;
 	//msg_write("content....");
-	while(!f->Eof){
-		char c = f->ReadChar();
+	while(!f->eof()){
+		char c = f->read_char();
 		if (c == '<'){
-			f->SetPos(-1, false);
+			f->seek(-1);
 			break;
 		}
 		e.text.add(c);
 	}
 	e.text = e.text.trim();
-	while(!f->Eof){
+	while(!f->eof()){
 		Element ee = read_element(f);
 		if (ee.closing and (ee.tag == e.tag)){
 			//msg_write(">> element (with closing)");
@@ -228,7 +227,7 @@ Element Parser::read_tag(File *f)
 	//msg_write("aaa");
 
 	// attributes
-	while(!f->Eof){
+	while(!f->eof()){
 		string s = read_next_exp(f);
 		//msg_write(s);
 		if (s == "?")

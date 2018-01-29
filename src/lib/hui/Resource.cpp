@@ -35,17 +35,17 @@ Resource *Resource::get_node(const string &id) const
 
 void LoadResourceCommand5(File *f, Resource *c)
 {
-	c->type = f->ReadStr();
-	c->id = f->ReadStr();
-	c->options = f->ReadStr().explode(",");
-	c->image = f->ReadStr();
-	c->enabled = f->ReadBool();
-	c->x = f->ReadInt();
-	c->y = f->ReadInt();
-	c->w = f->ReadInt();
-	c->h = f->ReadInt();
-	c->page = f->ReadInt();
-	int n = f->ReadInt();
+	c->type = f->read_str();
+	c->id = f->read_str();
+	c->options = f->read_str().explode(",");
+	c->image = f->read_str();
+	c->enabled = f->read_bool();
+	c->x = f->read_int();
+	c->y = f->read_int();
+	c->w = f->read_int();
+	c->h = f->read_int();
+	c->page = f->read_int();
+	int n = f->read_int();
 	for (int i=0; i<n; i++){
 		Resource child;
 		LoadResourceCommand5(f, &child);
@@ -59,8 +59,8 @@ void LoadResource(const string &filename)
 	_resources_.clear();
 	_languages_.clear();
 
-	File *f = FileOpen(filename);
-	if (f){
+	try{
+		File *f = FileOpenText(filename);
 		int ffv = f->ReadFileFormatVersion();
 		if (ffv != 5){
 			FileClose(f);
@@ -68,56 +68,56 @@ void LoadResource(const string &filename)
 			return;
 		}
 
-		f->ReadComment();
-		int nres = f->ReadInt();
+		f->read_comment();
+		int nres = f->read_int();
 		for (int i=0;i<nres;i++){
 			Resource res;
 			res.children.clear();
-			f->ReadComment();
+			f->read_comment();
 			LoadResourceCommand5(f, &res);
 			_resources_.add(res);
 		}
 
 		// languages
-		f->ReadComment();
-		int nl = f->ReadInt();
+		f->read_comment();
+		int nl = f->read_int();
 		for (int l=0;l<nl;l++){
 			Language hl;
 
 			// Language
-			f->ReadComment();
-			hl.name = f->ReadStr();
+			f->read_comment();
+			hl.name = f->read_str();
 
 			//  NumIDs
-			f->ReadComment();
-			int n = f->ReadInt();
-			f->ReadComment(); // Text
+			f->read_comment();
+			int n = f->read_int();
+			f->read_comment(); // Text
 			for (int i=0;i<n;i++){
 				Language::Command c;
-				Array<string> ids = f->ReadStr().explode("/");
+				Array<string> ids = f->read_str().explode("/");
 				if (ids.num >= 2)
 					c._namespace = ids[0];
 				if (ids.num >= 1)
 					c.id = ids.back();
-				c.text = str_unescape(f->ReadStr());
-				c.tooltip = str_unescape(f->ReadStr());
+				c.text = str_unescape(f->read_str());
+				c.tooltip = str_unescape(f->read_str());
 				hl.cmd.add(c);
 			}
 			// Num Language Strings
-			f->ReadComment();
-			n = f->ReadInt();
+			f->read_comment();
+			n = f->read_int();
 			// Text
-			f->ReadComment();
+			f->read_comment();
 			for (int i=0;i<n;i++){
 				Language::Translation s;
-				s.orig = str_unescape(f->ReadStr());
-				s.trans = str_unescape(f->ReadStr());
+				s.orig = str_unescape(f->read_str());
+				s.trans = str_unescape(f->read_str());
 				hl.trans.add(s);
 			}
 			_languages_.add(hl);
 		}
 		FileClose(f);
-	}
+	}catch(...){}
 }
 
 Resource *GetResource(const string &id)

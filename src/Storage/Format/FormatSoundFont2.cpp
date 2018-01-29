@@ -23,19 +23,17 @@ void FormatSoundFont2::loadSong(StorageOperationData *_od)
 	od = _od;
 	song = od->song;
 
-	File *f = FileOpen(od->filename);
-	if (!f)
-		throw string("can not open file");
-	f->SetBinaryMode(true);
+	File *f = NULL;
 
 	sample_offset = -1;
 
 	try{
+		f = FileOpen(od->filename);
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);
-	}catch(string &s){
-		od->error(s);
+	}catch(Exception &e){
+		od->error(e.message());
 	}
 
 
@@ -57,36 +55,36 @@ void FormatSoundFont2::sfSample::print()
 void FormatSoundFont2::read_chunk(File *f)
 {
 	char temp[4];
-	f->ReadBuffer(temp, 4);
+	f->read_buffer(temp, 4);
 	string name = string(temp, 4);
-	int l = f->ReadInt();
-	int after_pos = f->GetPos() + l;
+	int l = f->read_int();
+	int after_pos = f->get_pos() + l;
 
 	msg_write("chunk: " + name + " (" + i2s(l) + ")");
 	msg_right();
 
 
 	if (name == "RIFF"){
-		f->ReadBuffer(temp, 4);
+		f->read_buffer(temp, 4);
 		string aaa = string(temp, 4);
 		if (aaa != "sfbk")
-			throw string("'sfbk' expected in RIFF chunk");
+			throw Exception("'sfbk' expected in RIFF chunk");
 
 		read_chunk(f);
 		read_chunk(f);
 		read_chunk(f);
 	}else if (name == "LIST"){
-		f->ReadBuffer(temp, 4);
+		f->read_buffer(temp, 4);
 		string aaa = string(temp, 4);
 		msg_write("LIST: " + aaa);
-		while (f->GetPos() < after_pos - 3){
+		while (f->get_pos() < after_pos - 3){
 			read_chunk(f);
 		}
 	}else if (name == "smpl"){
-		sample_offset = f->GetPos();
+		sample_offset = f->get_pos();
 		sample_count = l / 2;
 	}else if (name == "shdr"){
-		while (f->GetPos() < after_pos - 3){
+		while (f->get_pos() < after_pos - 3){
 			sfSample s;
 			read_sample_header(f, s);
 			if (s.name != "EOS")
@@ -94,7 +92,7 @@ void FormatSoundFont2::read_chunk(File *f)
 		}
 	}
 
-	f->SetPos(after_pos, true);
+	f->set_pos(after_pos);
 
 
 	msg_left();
@@ -103,17 +101,17 @@ void FormatSoundFont2::read_chunk(File *f)
 void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s)
 {
 	char temp[21];
-	f->ReadBuffer(temp, 20);
+	f->read_buffer(temp, 20);
 	s.name = temp;
-	s.start = f->ReadInt();
-	s.end = f->ReadInt();
-	s.start_loop = f->ReadInt();
-	s.end_loop = f->ReadInt();
-	s.sample_rate = f->ReadInt();
-	s.original_key = f->ReadByte();
-	s.correction = f->ReadChar();
-	s.sample_link = f->ReadWord();
-	s.sample_type = f->ReadWord();
+	s.start = f->read_int();
+	s.end = f->read_int();
+	s.start_loop = f->read_int();
+	s.end_loop = f->read_int();
+	s.sample_rate = f->read_int();
+	s.original_key = f->read_byte();
+	s.correction = f->read_char();
+	s.sample_link = f->read_word();
+	s.sample_type = f->read_word();
 }
 
 void FormatSoundFont2::read_samples(File *f)
@@ -129,17 +127,17 @@ void FormatSoundFont2::read_samples(File *f)
 			continue;
 		}
 		if ((s.start < 0) or (s.start >= sample_count))
-			throw format("invalid sample start: %d   [0, %d)", s.start, sample_count);
+			throw Exception(format("invalid sample start: %d   [0, %d)", s.start, sample_count));
 		if ((s.end < 0) or (s.end >= sample_count))
-			throw format("invalid sample end: %d   [0, %d)", s.end, sample_count);
+			throw Exception(format("invalid sample end: %d   [0, %d)", s.end, sample_count));
 
-		f->SetPos(sample_offset + s.start*2, true);
+		f->set_pos(sample_offset + s.start*2);
 		AudioBuffer buf;
 		int num_samples = s.end - s.start;
 		if (num_samples < 0)
-			throw format("negative sample size: %d - %d", s.start, s.end);
+			throw Exception(format("negative sample size: %d - %d", s.start, s.end));
 		char *data = new char[num_samples*2];
-		f->ReadBuffer(data, num_samples*2);
+		f->read_buffer(data, num_samples*2);
 		buf.resize(num_samples);
 		buf.import(data, 1, SAMPLE_FORMAT_16, num_samples);// / 2);
 		Sample *sample = song->addSample(s.name, buf);

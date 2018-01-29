@@ -14,6 +14,7 @@
 #endif
 #include "../kaba.h"
 #include "common.h"
+#include "exception.h"
 #include "../../config.h"
 
 
@@ -26,7 +27,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.14.8.0";
+string LibVersion = "0.15.-1.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -48,6 +49,9 @@ const string IDENTIFIER_VIRTUAL = "virtual";
 const string IDENTIFIER_EXTERN = "extern";
 const string IDENTIFIER_USE = "use";
 const string IDENTIFIER_RETURN = "return";
+const string IDENTIFIER_RAISE = "raise";
+const string IDENTIFIER_TRY = "try";
+const string IDENTIFIER_EXCEPT = "except";
 const string IDENTIFIER_IF = "if";
 const string IDENTIFIER_ELSE = "else";
 const string IDENTIFIER_WHILE = "while";
@@ -139,6 +143,9 @@ Class *TypePlaneList;
 Class *TypeMatrix3;
 Class *TypeDate;
 Class *TypeImage;
+
+Class *TypeException;
+Class *TypeExceptionP;
 
 
 Array<Package> Packages;
@@ -455,6 +462,7 @@ int add_func(const string &name, Class *return_type, void *func, ScriptFlag flag
 {
 	Function *f = new Function(cur_package_script->syntax, name, return_type);
 	f->is_pure = ((flag & FLAG_PURE) > 0);
+	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
 	cur_package_script->syntax->functions.add(f);
 	cur_package_script->func.add(config.allow_std_lib ? (void (*)())func : NULL);
 	cur_func = f;
@@ -748,6 +756,8 @@ void SIAddPackageBase()
 	TypeChar			= add_type  ("char",		sizeof(char), FLAG_CALL_BY_VALUE);
 	TypeDynamicArray	= add_type  ("@DynamicArray", config.super_array_size);
 
+	TypeException		= add_type  ("Exception",	sizeof(KabaException));
+	TypeExceptionP		= add_type_p("Exception*", TypeException);
 
 
 	// select default float type
@@ -945,6 +955,17 @@ void SIAddPackageBase()
 		func_set_inline(INLINE_INT_ADD);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
+
+	add_class(TypeException);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&KabaException::__init__));
+			func_add_param("message", TypeString);
+			class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&KabaException::__delete__));
+			class_add_func_virtual("message", TypeString, mf(&KabaException::message));
+		class_add_element("text", TypeString, config.pointer_size);
+		class_set_vtable(KabaException);
+
+	add_func(IDENTIFIER_RAISE, TypeVoid, (void*)&kaba_raise_exception);
+		func_add_param("e", TypeExceptionP);
 }
 
 
@@ -962,6 +983,8 @@ void SIAddBasicCommands()
 	add_statement(IDENTIFIER_DELETE, STATEMENT_DELETE, 1);
 	add_statement("sizeof", STATEMENT_SIZEOF, 1);
 	add_statement(IDENTIFIER_ASM, STATEMENT_ASM);
+	add_statement(IDENTIFIER_TRY, STATEMENT_TRY); // return: ParamType will be defined by the parser!
+	add_statement(IDENTIFIER_EXCEPT, STATEMENT_EXCEPT); // return: ParamType will be defined by the parser!
 }
 
 

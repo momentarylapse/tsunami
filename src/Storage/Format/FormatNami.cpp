@@ -36,13 +36,13 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->key = f->ReadStr();
-		me->value = f->ReadStr();
+		me->key = f->read_str();
+		me->value = f->read_str();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->key);
-		f->WriteStr(me->value);
+		f->write_str(me->key);
+		f->write_str(me->value);
 	}
 };
 
@@ -53,16 +53,16 @@ public:
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
 	{
-		int num = f->ReadInt();
+		int num = f->read_int();
 		me->layers.clear();
 		for (int i=0;i<num;i++)
-			me->layers.add(new Song::Layer(f->ReadStr()));
+			me->layers.add(new Song::Layer(f->read_str()));
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->layers.num);
+		f->write_int(me->layers.num);
 		for (auto l: me->layers)
-			f->WriteStr(l->name);
+			f->write_str(l->name);
 	}
 };
 
@@ -73,25 +73,25 @@ public:
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
 	{
-		me->sample_rate = f->ReadInt();
-		me->default_format = (SampleFormat)f->ReadInt();
-		f->ReadInt(); // channels
-		me->compression = f->ReadInt();
-		f->ReadInt();
-		f->ReadInt();
-		f->ReadInt();
-		f->ReadInt();
+		me->sample_rate = f->read_int();
+		me->default_format = (SampleFormat)f->read_int();
+		f->read_int(); // channels
+		me->compression = f->read_int();
+		f->read_int();
+		f->read_int();
+		f->read_int();
+		f->read_int();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->sample_rate);
-		f->WriteInt(me->default_format);
-		f->WriteInt(2); // channels
-		f->WriteInt(me->compression);
-		f->WriteInt(0); // reserved
-		f->WriteInt(0);
-		f->WriteInt(0);
-		f->WriteInt(0);
+		f->write_int(me->sample_rate);
+		f->write_int(me->default_format);
+		f->write_int(2); // channels
+		f->write_int(me->compression);
+		f->write_int(0); // reserved
+		f->write_int(0);
+		f->write_int(0);
+		f->write_int(0);
 	}
 };
 
@@ -102,25 +102,25 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->ReadStr(), parent->song);
-		f->ReadBool();
-		f->ReadInt();
-		f->ReadInt();
-		string params = f->ReadStr();
+		me = CreateEffect(f->read_str(), parent->song);
+		f->read_bool();
+		f->read_int();
+		f->read_int();
+		string params = f->read_str();
 		me->configFromString(params);
-		string temp = f->ReadStr();
+		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
 		parent->fx.add(me);
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteBool(false);
-		f->WriteInt(0);
-		f->WriteInt(0);
-		f->WriteStr(me->configToString());
-		f->WriteStr(me->enabled ? "" : "disabled");
+		f->write_str(me->name);
+		f->write_bool(false);
+		f->write_int(0);
+		f->write_int(0);
+		f->write_str(me->configToString());
+		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
 
@@ -131,25 +131,25 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->ReadStr(), parent);
-		f->ReadBool();
-		f->ReadInt();
-		f->ReadInt();
-		string params = f->ReadStr();
+		me = CreateEffect(f->read_str(), parent);
+		f->read_bool();
+		f->read_int();
+		f->read_int();
+		string params = f->read_str();
 		me->configFromString(params);
-		string temp = f->ReadStr();
+		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
 		parent->fx.add(me);
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteBool(false);
-		f->WriteInt(0);
-		f->WriteInt(0);
-		f->WriteStr(me->configToString());
-		f->WriteStr(me->enabled ? "" : "disabled");
+		f->write_str(me->name);
+		f->write_bool(false);
+		f->write_int(0);
+		f->write_int(0);
+		f->write_str(me->configToString());
+		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
 
@@ -163,38 +163,38 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		f->ReadInt();
-		me->name = f->ReadStr();
-		int n = f->ReadInt();
+		f->read_int();
+		me->name = f->read_str();
+		int n = f->read_int();
 		for (int i=0; i<n; i++){
 			Curve::Target t;
-			t.fromString(f->ReadStr(), parent);
+			t.fromString(f->read_str(), parent);
 			me->targets.add(t);
 		}
-		me->min = f->ReadFloat();
-		me->max = f->ReadFloat();
-		n = f->ReadInt();
+		me->min = f->read_float();
+		me->max = f->read_float();
+		n = f->read_int();
 		for (int i=0; i<n; i++){
 			Curve::Point p;
-			p.pos = f->ReadInt();
-			p.value = f->ReadFloat();
+			p.pos = f->read_int();
+			p.value = f->read_float();
 			me->points.add(p);
 		}
 		parent->notify(parent->MESSAGE_ADD_CURVE);
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(0); // version
-		f->WriteStr(me->name);
-		f->WriteInt(me->targets.num);
+		f->write_int(0); // version
+		f->write_str(me->name);
+		f->write_int(me->targets.num);
 		for (auto t: me->targets)
-			f->WriteStr(t.str(parent));
-		f->WriteFloat(me->min);
-		f->WriteFloat(me->max);
-		f->WriteInt(me->points.num);
+			f->write_str(t.str(parent));
+		f->write_float(me->min);
+		f->write_float(me->max);
+		f->write_int(me->points.num);
 		for (auto p: me->points){
-			f->WriteInt(p.pos);
-			f->WriteFloat(p.value);
+			f->write_int(p.pos);
+			f->write_float(p.value);
 		}
 	}
 };
@@ -351,7 +351,7 @@ void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p)
 
 	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
 	if (!decoder)
-		throw string("flac: decoder_new()");
+		throw Exception("flac: decoder_new()");
 
 	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO));
 
@@ -398,11 +398,11 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->offset = f->ReadInt();
-		int num = f->ReadInt();
+		me->offset = f->read_int();
+		int num = f->read_int();
 		me->resize(num);
-		int channels = f->ReadInt(); // channels (2)
-		int bits = f->ReadInt(); // bit (16)
+		int channels = f->read_int(); // channels (2)
+		int bits = f->read_int(); // bit (16)
 
 		string data;
 
@@ -412,17 +412,17 @@ public:
 		// read chunk'ed
 		int offset = 0;
 		for (int n=0; n<data.num / CHUNK_SIZE; n++){
-			f->ReadBuffer(&data[offset], CHUNK_SIZE);
+			f->read_buffer(&data[offset], CHUNK_SIZE);
 			notify();
 			offset += CHUNK_SIZE;
 		}
-		f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
+		f->read_buffer(&data[offset], data.num % CHUNK_SIZE);
 
 		// insert
 
 		Song *song = (Song*)root->base->get();
 		if (song->compression > 0){
-			//throw string("can't read compressed nami files yet");
+			//throw Exception("can't read compressed nami files yet");
 			uncompress_buffer(*me, data, this);
 
 		}else{
@@ -434,10 +434,10 @@ public:
 		Song *song = (Song*)root->base->get();
 
 		int channels = 2;
-		f->WriteInt(me->offset);
-		f->WriteInt(me->length);
-		f->WriteInt(channels);
-		f->WriteInt(format_get_bits(song->default_format));
+		f->write_int(me->offset);
+		f->write_int(me->length);
+		f->write_int(channels);
+		f->write_int(format_get_bits(song->default_format));
 
 		string data;
 		if (song->compression == 0){
@@ -449,7 +449,7 @@ public:
 			data = compress_buffer(*me, song, this);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
-		f->WriteBuffer(data.data, data.num);
+		f->write_buffer(data.data, data.num);
 	}
 };
 
@@ -463,11 +463,11 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->offset = f->ReadInt();
-		int num = f->ReadInt();
+		me->offset = f->read_int();
+		int num = f->read_int();
 		me->resize(num);
-		int channels = f->ReadInt(); // channels (2)
-		int bits = f->ReadInt(); // bit (16)
+		int channels = f->read_int(); // channels (2)
+		int bits = f->read_int(); // bit (16)
 
 		string data;
 
@@ -477,17 +477,17 @@ public:
 		// read chunk'ed
 		int offset = 0;
 		for (int n=0; n<data.num / CHUNK_SIZE; n++){
-			f->ReadBuffer(&data[offset], CHUNK_SIZE);
+			f->read_buffer(&data[offset], CHUNK_SIZE);
 			notify();
 			offset += CHUNK_SIZE;
 		}
-		f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
+		f->read_buffer(&data[offset], data.num % CHUNK_SIZE);
 
 		// insert
 
 		Song *song = (Song*)root->base->get();
 		if (song->compression > 0){
-			//throw string("can't read compressed nami files yet");
+			//throw Exception("can't read compressed nami files yet");
 			uncompress_buffer(*me, data, this);
 
 		}else{
@@ -499,10 +499,10 @@ public:
 		Song *song = (Song*)root->base->get();
 
 		int channels = 2;
-		f->WriteInt(me->offset);
-		f->WriteInt(me->length);
-		f->WriteInt(channels);
-		f->WriteInt(format_get_bits(song->default_format));
+		f->write_int(me->offset);
+		f->write_int(me->length);
+		f->write_int(channels);
+		f->write_int(format_get_bits(song->default_format));
 
 		string data;
 		if (song->compression == 0){
@@ -514,7 +514,7 @@ public:
 			data = compress_buffer(*me, song, this);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
-		f->WriteBuffer(data.data, data.num);
+		f->write_buffer(data.data, data.num);
 	}
 };
 
@@ -526,44 +526,44 @@ public:
 	{}
 	virtual void read(File *f)
 	{
-		string name = f->ReadStr();
-		int pos = f->ReadInt();
-		int index = f->ReadInt();
+		string name = f->read_str();
+		int pos = f->read_int();
+		int index = f->read_int();
 		me = parent->addSampleRef(pos, parent->song->samples[index]);
-		me->volume = f->ReadFloat();
-		me->muted = f->ReadBool();
-		f->ReadInt();
-		f->ReadInt();
-		f->ReadInt(); // reserved
-		f->ReadInt();
+		me->volume = f->read_float();
+		me->muted = f->read_bool();
+		f->read_int();
+		f->read_int();
+		f->read_int(); // reserved
+		f->read_int();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->origin->name);
-		f->WriteInt(me->pos);
-		f->WriteInt(me->origin->get_index());
-		f->WriteFloat(me->volume);
-		f->WriteBool(me->muted);
-		f->WriteInt(0);
-		f->WriteInt(0);
-		f->WriteInt(0); // reserved
-		f->WriteInt(0);
+		f->write_str(me->origin->name);
+		f->write_int(me->pos);
+		f->write_int(me->origin->get_index());
+		f->write_float(me->volume);
+		f->write_bool(me->muted);
+		f->write_int(0);
+		f->write_int(0);
+		f->write_int(0); // reserved
+		f->write_int(0);
 	}
 };
 
 #if 0
 void ReadChunkSub(ChunkStack *s, Track *t)
 {
-	string name = s->f->ReadStr();
-	int pos = s->f->ReadInt();
-	int length = s->f->ReadInt();
+	string name = s->f->read_str();
+	int pos = s->f->read_int();
+	int length = s->f->read_int();
 	SampleRef *r = __AddEmptySubTrack(t, Range(pos, length), name);
-	r->volume = s->f->ReadFloat();
-	r->muted = s->f->ReadBool();
-	r->rep_num = s->f->ReadInt();
-	r->rep_delay = s->f->ReadInt();
-	s->f->ReadInt(); // reserved
-	s->f->ReadInt();
+	r->volume = s->f->read_float();
+	r->muted = s->f->read_bool();
+	r->rep_num = s->f->read_int();
+	r->rep_delay = s->f->read_int();
+	s->f->read_int(); // reserved
+	s->f->read_int();
 
 	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &r->buf);
 	tsunami->log->error("\"sub\" chunk is deprecated!");
@@ -583,10 +583,10 @@ public:
 	virtual void read(File *f)
 	{
 		MidiEvent e;
-		e.pos = f->ReadInt();
-		e.pitch = f->ReadInt();
-		e.volume = f->ReadFloat();
-		f->ReadInt(); // reserved
+		e.pos = f->read_int();
+		e.pitch = f->read_int();
+		e.volume = f->read_float();
+		f->read_int(); // reserved
 
 		int unended = -1;
 		foreachi(MidiNote *n, *parent, i)
@@ -605,10 +605,10 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->pos);
-		f->WriteInt(me->pitch);
-		f->WriteFloat(me->volume);
-		f->WriteInt(0); // reserved
+		f->write_int(me->pos);
+		f->write_int(me->pitch);
+		f->write_float(me->volume);
+		f->write_int(0); // reserved
 	}
 };
 
@@ -620,25 +620,25 @@ public:
 	{}
 	virtual void read(File *f)
 	{
-		me = CreateMidiEffect(f->ReadStr(), NULL);
-		me->only_on_selection = f->ReadBool();
-		me->range.offset = f->ReadInt();
-		me->range.length = f->ReadInt();
-		string params = f->ReadStr();
+		me = CreateMidiEffect(f->read_str(), NULL);
+		me->only_on_selection = f->read_bool();
+		me->range.offset = f->read_int();
+		me->range.length = f->read_int();
+		string params = f->read_str();
 		me->configFromString(params);
-		string temp = f->ReadStr();
+		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
 		parent->fx.add(me);
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteBool(me->only_on_selection);
-		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.length);
-		f->WriteStr(me->configToString());
-		f->WriteStr(me->enabled ? "" : "disabled");
+		f->write_str(me->name);
+		f->write_bool(me->only_on_selection);
+		f->write_int(me->range.offset);
+		f->write_int(me->range.length);
+		f->write_str(me->configToString());
+		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
 
@@ -651,20 +651,20 @@ public:
 	virtual void read(File *f)
 	{
 		MidiNote *n = new MidiNote;
-		n->range.offset = f->ReadInt();
-		n->range.length = f->ReadInt();
-		n->pitch = f->ReadInt();
-		n->volume = f->ReadFloat();
-		f->ReadInt(); // reserved
+		n->range.offset = f->read_int();
+		n->range.length = f->read_int();
+		n->pitch = f->read_int();
+		n->volume = f->read_float();
+		f->read_int(); // reserved
 		parent->add(n);
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.length);
-		f->WriteInt(me->pitch);
-		f->WriteFloat(me->volume);
-		f->WriteInt(0); // reserved
+		f->write_int(me->range.offset);
+		f->write_int(me->range.length);
+		f->write_int(me->pitch);
+		f->write_float(me->volume);
+		f->write_int(0); // reserved
 	}
 };
 
@@ -680,45 +680,45 @@ public:
 	virtual void create(){ me = &parent->midi; }
 	virtual void read(File *f)
 	{
-		f->ReadStr();
-		f->ReadStr();
-		f->ReadStr();
-		int version = f->ReadInt();
+		f->read_str();
+		f->read_str();
+		f->read_str();
+		int version = f->read_int();
 		if (version < 1)
 			return;
-		int num = f->ReadInt();
-		int meta = f->ReadInt();
+		int num = f->read_int();
+		int meta = f->read_int();
 		for (int i=0; i<num; i++){
 			MidiNote *n = new MidiNote;
-			n->range.offset = f->ReadInt();
-			n->range.length = f->ReadInt();
-			n->pitch = f->ReadInt();
-			n->volume = f->ReadFloat();
+			n->range.offset = f->read_int();
+			n->range.length = f->read_int();
+			n->pitch = f->read_int();
+			n->volume = f->read_float();
 			if (meta & 1)
-				n->stringno = f->ReadInt();
+				n->stringno = f->read_int();
 			if (meta & 2)
-				n->clef_position = f->ReadInt();
+				n->clef_position = f->read_int();
 			me->add(n);
 		}
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr("");
-		f->WriteStr("");
-		f->WriteStr("");
-		f->WriteInt(1); // version
+		f->write_str("");
+		f->write_str("");
+		f->write_str("");
+		f->write_int(1); // version
 
-		f->WriteInt(me->num);
-		f->WriteInt(3); // stringno + clef_position
+		f->write_int(me->num);
+		f->write_int(3); // stringno + clef_position
 		for (MidiNote *n : *me){
-			f->WriteInt(n->range.offset);
-			f->WriteInt(n->range.length);
-			f->WriteInt(n->pitch);
-			f->WriteFloat(n->volume);
-			f->WriteInt(n->stringno);
-			f->WriteInt(n->clef_position);
+			f->write_int(n->range.offset);
+			f->write_int(n->range.length);
+			f->write_int(n->pitch);
+			f->write_float(n->volume);
+			f->write_int(n->stringno);
+			f->write_int(n->clef_position);
 		}
-		f->WriteInt(0); // reserved
+		f->write_int(0); // reserved
 	}
 	virtual void write_subs()
 	{
@@ -738,46 +738,46 @@ public:
 	virtual void create(){ me = &parent->midi; }
 	virtual void read(File *f)
 	{
-		f->ReadStr();
-		f->ReadStr();
-		f->ReadStr();
-		int version = f->ReadInt();
+		f->read_str();
+		f->read_str();
+		f->read_str();
+		int version = f->read_int();
 		if (version < 1)
 			return;
-		int num = f->ReadInt();
-		int meta = f->ReadInt();
+		int num = f->read_int();
+		int meta = f->read_int();
 		for (int i=0; i<num; i++){
 			MidiNote *n = new MidiNote;
-			n->range.offset = f->ReadInt();
-			n->range.length = f->ReadInt();
-			n->pitch = f->ReadInt();
-			n->volume = f->ReadFloat();
+			n->range.offset = f->read_int();
+			n->range.length = f->read_int();
+			n->pitch = f->read_int();
+			n->volume = f->read_float();
 			if (meta & 1)
-				n->stringno = f->ReadInt();
+				n->stringno = f->read_int();
 			if (meta & 2)
-				n->clef_position = f->ReadInt();
+				n->clef_position = f->read_int();
 			me->add(n);
 		}
-		f->ReadInt(); // reserved
+		f->read_int(); // reserved
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr("");
-		f->WriteStr("");
-		f->WriteStr("");
-		f->WriteInt(1); // version
+		f->write_str("");
+		f->write_str("");
+		f->write_str("");
+		f->write_int(1); // version
 
-		f->WriteInt(me->num);
-		f->WriteInt(3); // stringno + clef_position
+		f->write_int(me->num);
+		f->write_int(3); // stringno + clef_position
 		for (MidiNote *n : *me){
-			f->WriteInt(n->range.offset);
-			f->WriteInt(n->range.length);
-			f->WriteInt(n->pitch);
-			f->WriteFloat(n->volume);
-			f->WriteInt(n->stringno);
-			f->WriteInt(n->clef_position);
+			f->write_int(n->range.offset);
+			f->write_int(n->range.length);
+			f->write_int(n->pitch);
+			f->write_float(n->volume);
+			f->write_int(n->stringno);
+			f->write_int(n->clef_position);
 		}
-		f->WriteInt(0); // reserved
+		f->write_int(0); // reserved
 	}
 	virtual void write_subs()
 	{
@@ -801,19 +801,19 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->name = f->ReadStr();
-		me->volume = f->ReadFloat();
-		me->offset = f->ReadInt();
-		me->type = f->ReadInt();
-		f->ReadInt(); // reserved
+		me->name = f->read_str();
+		me->volume = f->read_float();
+		me->offset = f->read_int();
+		me->type = f->read_int();
+		f->read_int(); // reserved
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteFloat(me->volume);
-		f->WriteInt(me->offset);
-		f->WriteInt(me->type);
-		f->WriteInt(0); // reserved
+		f->write_str(me->name);
+		f->write_float(me->volume);
+		f->write_int(me->offset);
+		f->write_int(me->type);
+		f->write_int(0); // reserved
 	}
 	virtual void write_subs()
 	{
@@ -839,12 +839,12 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		n = f->ReadInt();
+		n = f->read_int();
 		me = &parent->layers[n];
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(parent->layers.index(me));
+		f->write_int(parent->layers.index(me));
 	}
 	virtual void write_subs()
 	{
@@ -860,13 +860,13 @@ public:
 	virtual void read(File *f)
 	{
 		for (int i=0; i<MAX_PITCH; i++)
-			me->freq[i] = f->ReadFloat();
+			me->freq[i] = f->read_float();
 		parent->update_delta_phi();
 	}
 	virtual void write(File *f)
 	{
 		for (int i=0; i<MAX_PITCH; i++)
-			f->WriteFloat(me->freq[i]);
+			f->write_float(me->freq[i]);
 	}
 };
 
@@ -880,20 +880,20 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = tsunami->plugin_manager->CreateSynthesizer(f->ReadStr(), parent->song);
-		me->configFromString(f->ReadStr());
-		f->ReadStr();
-		f->ReadInt();
+		me = tsunami->plugin_manager->CreateSynthesizer(f->read_str(), parent->song);
+		me->configFromString(f->read_str());
+		f->read_str();
+		f->read_int();
 
 		delete(parent->synth);
 		parent->synth = me;
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteStr(me->configToString());
-		f->WriteStr("");
-		f->WriteInt(0); // reserved
+		f->write_str(me->name);
+		f->write_str(me->configToString());
+		f->write_str("");
+		f->write_int(0); // reserved
 	}
 	virtual void write_subs()
 	{
@@ -910,13 +910,13 @@ public:
 	virtual void read(File *f)
 	{
 		BarPattern b;
-		b.type = f->ReadInt();
-		b.length = f->ReadInt();
-		b.num_beats = f->ReadInt();
+		b.type = f->read_int();
+		b.length = f->read_int();
+		b.num_beats = f->read_int();
 		if (b.type == BarPattern::TYPE_PAUSE)
 			b.num_beats = 0;
-		int count = f->ReadInt();
-		b.sub_beats = f->ReadInt();
+		int count = f->read_int();
+		b.sub_beats = f->read_int();
 		if (b.sub_beats <= 0)
 			b.sub_beats = 1;
 		for (int i=0; i<count; i++)
@@ -924,11 +924,11 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->type);
-		f->WriteInt(me->length);
-		f->WriteInt(me->num_beats);
-		f->WriteInt(1);
-		f->WriteInt(me->sub_beats);
+		f->write_int(me->type);
+		f->write_int(me->length);
+		f->write_int(me->num_beats);
+		f->write_int(1);
+		f->write_int(me->sub_beats);
 	}
 };
 
@@ -940,13 +940,13 @@ public:
 	virtual void read(File *f)
 	{
 		BarPattern b;
-		b.type = f->ReadInt();
-		b.length = f->ReadInt();
-		b.num_beats = f->ReadInt();
+		b.type = f->read_int();
+		b.length = f->read_int();
+		b.num_beats = f->read_int();
 		if (b.type == BarPattern::TYPE_PAUSE)
 			b.num_beats = 0;
-		int count = f->ReadInt();
-		b.sub_beats = f->ReadInt();
+		int count = f->read_int();
+		b.sub_beats = f->read_int();
 		if (b.sub_beats <= 0)
 			b.sub_beats = 1;
 		for (int i=0; i<count; i++)
@@ -954,11 +954,11 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->type);
-		f->WriteInt(me->length);
-		f->WriteInt(me->num_beats);
-		f->WriteInt(1);
-		f->WriteInt(0); // reserved
+		f->write_int(me->type);
+		f->write_int(me->length);
+		f->write_int(me->num_beats);
+		f->write_int(1);
+		f->write_int(0); // reserved
 	}
 };
 
@@ -973,21 +973,21 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->range.offset = f->ReadInt();
-		me->text = f->ReadStr();
-		int version = f->ReadInt();
+		me->range.offset = f->read_int();
+		me->text = f->read_str();
+		int version = f->read_int();
 		if (version > 0){
-			me->range.length = f->ReadInt();
-			int nfx = f->ReadInt();
+			me->range.length = f->read_int();
+			int nfx = f->read_int();
 		}
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->range.offset);
-		f->WriteStr(me->text);
-		f->WriteInt(1);
-		f->WriteInt(me->range.length);
-		f->WriteInt(0);//me->fx.num);
+		f->write_int(me->range.offset);
+		f->write_str(me->text);
+		f->write_int(1);
+		f->write_int(me->range.length);
+		f->write_int(0);//me->fx.num);
 	}
 };
 
@@ -1001,15 +1001,15 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->string_pitch.resize(f->ReadInt());
+		me->string_pitch.resize(f->read_int());
 		for (int i=0; i<me->string_pitch.num; i++)
-			me->string_pitch[i] = f->ReadInt();
+			me->string_pitch[i] = f->read_int();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->string_pitch.num);
+		f->write_int(me->string_pitch.num);
 		for (int i=0; i<me->string_pitch.num; i++)
-			f->WriteInt(me->string_pitch[i]);
+			f->write_int(me->string_pitch[i]);
 	}
 };
 
@@ -1034,25 +1034,25 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->name = f->ReadStr();
-		me->volume = f->ReadFloat();
-		me->muted = f->ReadBool();
-		me->type = f->ReadInt();
-		me->panning = f->ReadFloat();
-		me->instrument = Instrument(f->ReadInt());
-		f->ReadInt(); // reserved
+		me->name = f->read_str();
+		me->volume = f->read_float();
+		me->muted = f->read_bool();
+		me->type = f->read_int();
+		me->panning = f->read_float();
+		me->instrument = Instrument(f->read_int());
+		f->read_int(); // reserved
 
 		notify();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteStr(me->name);
-		f->WriteFloat(me->volume);
-		f->WriteBool(me->muted);
-		f->WriteInt(me->type);
-		f->WriteFloat(me->panning);
-		f->WriteInt(me->instrument.type);
-		f->WriteInt(0); // reserved
+		f->write_str(me->name);
+		f->write_float(me->volume);
+		f->write_bool(me->muted);
+		f->write_int(me->type);
+		f->write_float(me->panning);
+		f->write_int(me->instrument.type);
+		f->write_int(0); // reserved
 
 		notify();
 	}
@@ -1090,11 +1090,11 @@ public:
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
 	{
-		me->sample_rate = f->ReadInt();
+		me->sample_rate = f->read_int();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->sample_rate);
+		f->write_int(me->sample_rate);
 	}
 	virtual void write_subs()
 	{
@@ -1132,7 +1132,7 @@ public:
 	}
 	virtual void on_notify()
 	{
-		od->set((float)context.f->GetPos() / (float)context.f->GetSize());
+		od->set((float)context.f->get_pos() / (float)context.f->get_size());
 	}
 	virtual void on_unhandled()
 	{
@@ -1157,8 +1157,8 @@ void FormatNami::saveSong(StorageOperationData *_od)
 	try{
 		ChunkedFileFormatNami n;
 		n.write_file(od);
-	}catch(string &s){
-		od->error("saving nami: " + s);
+	}catch(Exception &s){
+		od->error("saving nami: " + s.message());
 	}
 }
 
@@ -1194,8 +1194,8 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	try{
 		ChunkedFileFormatNami n;
 		n.read_file(od);
-	}catch(string &s){
-		od->error("loading nami: " + s);
+	}catch(Exception &e){
+		od->error("loading nami: " + e.message());
 	}
 
 	// some post processing

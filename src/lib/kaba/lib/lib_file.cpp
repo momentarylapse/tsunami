@@ -2,6 +2,7 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "common.h"
+#include "exception.h"
 
 namespace Kaba{
 
@@ -10,8 +11,6 @@ class vector;
 extern Class *TypeIntPs;
 extern Class *TypeFloatPs;
 extern Class *TypeBoolPs;
-extern Class *TypeStringList;
-extern Class *TypeBoolList;
 
 static Date *_date;
 #define	GetDADate(x)			long(&_date->x)-long(_date)
@@ -42,28 +41,136 @@ public:
 	void _cdecl __delete__()
 	{ this->~KabaFile(); }
 	int _cdecl _WriteBuffer(const string &s)
-	{ return WriteBuffer(s.data, s.num); }
+	{ return write_buffer(s.data, s.num); }
 	string _cdecl _ReadBuffer(int size)
 	{
 		string s;
 		s.resize(size);
-		int r = ReadBuffer(s.data, size);
+		int r = read_buffer(s.data, size);
 		s.resize(r);
 		return s;
 	}
 	void _cdecl _ReadInt(int &i)
-	{ i = ReadInt(); }
+	{ i = read_int(); }
 	void _cdecl _ReadFloat(float &f)
-	{ f = ReadFloat(); }
+	{ f = read_float(); }
 	void _cdecl _ReadBool(bool &b)
-	{ b = ReadBool(); }
+	{ b = read_bool(); }
 	void _cdecl _ReadVector(vector &v)
-	{ ReadVector(&v); }
+	{ read_vector(&v); }
 	void _cdecl _ReadStr(string &s)
-	{ s = ReadStr(); }
+	{ s = read_str(); }
 	void _cdecl _WriteVector(const vector &v)
-	{ WriteVector(&v); }
+	{ write_vector(&v); }
+
+	void _write_int(int i){ write_int(i); }
+	void _write_float(float f){ write_float(f); }
+	void _write_bool(bool b){ write_bool(b); }
+	void _write_str(const string &s){ write_str(s); }
+	void _write_vector(vector &v){ write_vector(&v); }
 };
+
+class KabaFileError : public KabaException
+{
+public: KabaFileError() : KabaException(){}
+public: KabaFileError(const string &t) : KabaException(t){}
+};
+
+/*class KabaFileNotFoundError : public KabaFileError
+{ public: KabaFileNotFoundError(const string &t) : KabaFileError(t){} };
+
+class KabaFileNotWritableError : public KabaFileError
+{ public: KabaFileNotWritableError(const string &t) : KabaFileError(t){} };*/
+
+File* kaba_file_open(const string &filename)
+{
+	try{
+		return FileOpen(filename);
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return NULL;
+}
+
+File* kaba_file_open_text(const string &filename)
+{
+	try{
+		return FileOpenText(filename);
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return NULL;
+}
+
+File* kaba_file_create(const string &filename)
+{
+	try{
+		return FileCreate(filename);
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return NULL;
+}
+
+File* kaba_file_create_text(const string &filename)
+{
+	try{
+		return FileCreateText(filename);
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return NULL;
+}
+
+string kaba_file_read(const string &filename)
+{
+	try{
+		return FileRead(filename).replace("\\r", "");
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return "";
+}
+
+string kaba_file_hash(const string &filename, const string &type)
+{
+	try{
+		return file_hash(filename, type);
+	}catch(::FileError &e){
+		kaba_raise_exception(new KabaFileError(e.message()));
+	}
+	return "";
+}
+
+void kaba_file_rename(const string &a, const string &b)
+{
+	if (!file_rename(a, b))
+		kaba_raise_exception(new KabaFileError("can not rename file '" + a + "' -> '" + b + "'"));
+}
+
+void kaba_file_copy(const string &a, const string &b)
+{
+	if (!file_copy(a, b))
+		kaba_raise_exception(new KabaFileError("can not copy file '" + a + "' -> '" + b + "'"));
+}
+
+void kaba_file_delete(const string &f)
+{
+	if (!file_delete(f))
+		kaba_raise_exception(new KabaFileError("can not delete file '" + f + "'"));
+}
+
+void kaba_dir_create(const string &f)
+{
+	if (!dir_create(f))
+		kaba_raise_exception(new KabaFileError("can not create directory '" + f + "'"));
+}
+
+void kaba_dir_delete(const string &f)
+{
+	if (!dir_delete(f))
+		kaba_raise_exception(new KabaFileError("can not delete directory '" + f + "'"));
+}
 
 void SIAddPackageFile()
 {
@@ -79,6 +186,12 @@ void SIAddPackageFile()
 	TypeDirEntry		= add_type  ("DirEntry", sizeof(DirEntry));
 	Class*
 	TypeDirEntryList	= add_type_a("DirEntry[]", TypeDirEntry, -1);
+	Class*
+	TypeFileError		= add_type  ("FileError", sizeof(KabaFileError));
+	//Class*
+	//TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
+	//Class*
+	//TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
 
 
 	add_class(TypeDate);
@@ -101,26 +214,25 @@ void SIAddPackageFile()
 		class_add_func("getCDate",		TypeDate,		mf(&File::GetDateCreation));
 		class_add_func("getMDate",		TypeDate,		mf(&File::GetDateModification));
 		class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
-		class_add_func("getSize",		TypeInt,		mf(&File::GetSize));
-		class_add_func("getPos",		TypeInt,		mf(&File::GetPos));
-		class_add_func("seek",		TypeVoid,		mf(&File::SetPos));
+		class_add_func("getSize",		TypeInt,		mf(&File::get_size));
+		class_add_func("getPos",		TypeInt,		mf(&File::get_pos));
+		class_add_func("set_pos",		TypeVoid,		mf(&File::set_pos));
 			func_add_param("pos",		TypeInt);
-			func_add_param("absolute",	TypeBool);
-		class_add_func("setBinaryMode",	TypeVoid,		mf(&File::SetBinaryMode));
-			func_add_param("binary",	TypeBool);
+		class_add_func("seek",		TypeVoid,		mf(&File::seek));
+			func_add_param("delta",		TypeInt);
 		class_add_func("read",		TypeString,			mf(&KabaFile::_ReadBuffer));
 			func_add_param("size",			TypeInt);
 		class_add_func("write",		TypeInt,			mf(&KabaFile::_WriteBuffer));
 			func_add_param("s",			TypeString);
-		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteBool));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_bool));
 			func_add_param("b",			TypeBool);
-		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteInt));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_int));
 			func_add_param("i",			TypeInt);
-		class_add_func("__lshift__",	TypeVoid,			mf(&File::WriteFloat));
+		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_float));
 			func_add_param("x",			TypeFloat32);
-		class_add_func("__lshift__",	TypeVoid,			mf(&File::WriteVector));
+		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_vector));
 			func_add_param("v",			TypeVector);
-		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteStr));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_str));
 			func_add_param("s",			TypeString);
 		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadBool));
 			func_add_param("b",			TypeBoolPs);
@@ -132,7 +244,6 @@ void SIAddPackageFile()
 			func_add_param("v",			TypeVector);
 		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadStr));
 			func_add_param("s",			TypeString);
-		class_add_func("readComplete",	TypeString,			mf(&File::ReadComplete));
 
 	
 	add_class(TypeDirEntry);
@@ -150,36 +261,43 @@ void SIAddPackageFile()
 			func_add_param("other",		TypeDirEntryList);
 		class_add_func("str",		TypeString,			mf(&DirEntryList::str));
 
+	add_class(TypeFileError);
+		TypeFileError->derive_from(TypeException, false);
+		class_set_vtable(KabaFileError);
 
 	// file access
-	add_func("FileOpen",			TypeFileP,				(void*)&FileOpen);
+	add_func("FileOpen",			TypeFileP,				(void*)&kaba_file_open, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename",		TypeString);
-	add_func("FileCreate",			TypeFileP,				(void*)&FileCreate);
+	add_func("FileOpenText",			TypeFileP,				(void*)&kaba_file_open_text, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename",		TypeString);
-	add_func("FileRead",			TypeString,				(void*)&FileRead);
+	add_func("FileCreate",			TypeFileP,				(void*)&kaba_file_create, FLAG_RAISES_EXCEPTIONS);
+		func_add_param("filename",		TypeString);
+	add_func("FileCreateText",			TypeFileP,				(void*)&kaba_file_create_text, FLAG_RAISES_EXCEPTIONS);
+		func_add_param("filename",		TypeString);
+	add_func("FileRead",			TypeString,				(void*)&kaba_file_read, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename",		TypeString);
 	add_func("FileExists",			TypeBool,		(void*)&file_test_existence);
 		func_add_param("filename",		TypeString);
 	add_func("FileIsDirectory",			TypeBool,		(void*)&file_is_directory);
 		func_add_param("filename",		TypeString);
-	add_func("FileHash",			TypeString,		(void*)&file_hash);
+	add_func("FileHash",			TypeString,		(void*)&kaba_file_hash, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename",		TypeString);
 		func_add_param("type",		TypeString);
-	add_func("FileRename",			TypeBool,			(void*)&file_rename);
+	add_func("FileRename",			TypeVoid,			(void*)&kaba_file_rename, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("source",		TypeString);
 		func_add_param("dest",		TypeString);
-	add_func("FileCopy",			TypeBool,			(void*)&file_copy);
+	add_func("FileCopy",			TypeVoid,			(void*)&kaba_file_copy, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("source",		TypeString);
 		func_add_param("dest",		TypeString);
-	add_func("FileDelete",			TypeBool,			(void*)&file_delete);
+	add_func("FileDelete",			TypeVoid,			(void*)&kaba_file_delete, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename",		TypeString);
 	add_func("DirSearch",			TypeDirEntryList,			(void*)&dir_search);
 		func_add_param("dir",		TypeString);
 		func_add_param("filter",		TypeString);
 		func_add_param("show_dirs",		TypeBool);
-	add_func("DirCreate",			TypeBool,			(void*)&dir_create);
+	add_func("DirCreate",			TypeVoid,			(void*)&kaba_dir_create, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("dir",		TypeString);
-	add_func("DirDelete",			TypeBool,			(void*)&dir_delete);
+	add_func("DirDelete",			TypeVoid,			(void*)&kaba_dir_delete, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("dir",		TypeString);
 	add_func("GetCurDir",			TypeString,			(void*)&get_current_dir);
 	add_func("GetCurDate",			TypeDate,			(void*)&get_current_date);

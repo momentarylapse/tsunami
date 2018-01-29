@@ -69,7 +69,6 @@ static int CurrentTraceLevel=0;
 void msg_init(const string &force_filename, bool verbose)
 {
 	Verbose = false;
-	file = new File();
 	Shift = 0;
 	ErrorOccured = false;
 	msg_inited = true;
@@ -77,10 +76,10 @@ void msg_init(const string &force_filename, bool verbose)
 		msg_file_name = force_filename;
 	if (!verbose)
 		return;
-	file->Create(msg_file_name);
+	file = FileCreateText(msg_file_name);
 	Verbose = verbose;
 #ifdef MSG_LOG_TIMIGS
-	file->WriteStr("[hh:mm:ss, ms]");
+	file->write_str("[hh:mm:ss, ms]");
 #endif
 }
 
@@ -94,7 +93,7 @@ void msg_set_verbose(bool verbose)
 	if (Verbose == verbose)
 		return;
 	if (verbose){
-		file->Create(msg_file_name);
+		file = FileCreateText(msg_file_name);
 		Shift = 0;
 	}else{
 		msg_end(false);
@@ -126,6 +125,24 @@ void msg_add_str(const string &str)
 	printf("%s\n", str.c_str());
 }
 
+// insert some white spaces
+void ShiftRight(File *f, int s)
+{
+	if (!file)
+		return;
+	int r;
+#ifdef StructuredShifts
+	for (int i=0;i<s-1;i++)
+		r=_write(handle," |\t",3);
+	if (s>0)
+		r=_write(handle," >-\t",4);
+#else
+	for (int i=0;i<s;i++)
+		f->write_buffer("\t",1);
+#endif
+}
+
+
 void write_date()
 {
 #ifdef MSG_LOG_TIMIGS
@@ -144,8 +161,9 @@ void msg_write(int i)
 {
 	if (!Verbose)	return;
 	write_date();
-	file->ShiftRight(Shift);
-	file->WriteInt(i);
+	ShiftRight(file, Shift);
+	if (file)
+		file->write_int(i);
 
 	string s = i2s(i);
 	msg_add_str(s);
@@ -155,8 +173,9 @@ void msg_write(const string &str)
 {
 	if (!Verbose)	return;
 	write_date();
-	file->ShiftRight(Shift);
-	file->WriteStr(str);
+	ShiftRight(file, Shift);
+	if (file)
+		file->write_str(str);
 
 	msg_add_str(str);
 }
@@ -165,9 +184,10 @@ void msg_write(const char *str)
 {
 	if (!Verbose)	return;
 	write_date();
-	file->ShiftRight(Shift);
+	ShiftRight(file, Shift);
 	string s = string(str);
-	file->WriteStr(s);
+	if (file)
+		file->write_str(s);
 
 	msg_add_str(s);
 }
@@ -399,7 +419,7 @@ void msg_end(bool del_file)
 	//if (!msg_inited)	return;
 	if (!file)		return;
 	if (!Verbose)	return;
-	file->WriteStr("\n\n\n\n"\
+	file->write_str("\n\n\n\n"\
 " #                       # \n"\
 "###                     ###\n"\
 " #     natural death     # \n"\
@@ -409,11 +429,9 @@ void msg_end(bool del_file)
 "______ |/ ______ |/ * _____\n");
 	Verbose=false;
 	msg_inited=false;
-	file->Close();
-	if (del_file){
-		delete(file);
-		file=NULL;
-	}
+	file->close();
+	delete(file);
+	file = NULL;
 }
 
 void msg_db_out(int dl,const char *str)

@@ -19,10 +19,10 @@ int endian_big_to_little(int i)
 
 int read_int_big_endian(File *f)
 {
-	int a = f->ReadByte();
-	int b = f->ReadByte();
-	int c = f->ReadByte();
-	int d = f->ReadByte();
+	int a = f->read_byte();
+	int b = f->read_byte();
+	int c = f->read_byte();
+	int d = f->read_byte();
 	return d + (c << 8) + (b << 16) + (a << 24);
 }
 
@@ -66,22 +66,21 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 void image_load_png(const string &filename, Image &image)
 {
 	char buf[8];
-	File *f = FileOpen(filename);
-	f->SetBinaryMode(true);
-
+	File *f;
 	try{
+	f = FileOpen(filename);
 
 	// intro
-	f->ReadBuffer(buf, 8);
+	f->read_buffer(buf, 8);
 
 	string data;
 
 	int bytes_per_pixel;
 
-	while (!f->Eof){
+	while (!f->eof()){
 		// read chunk
 		int size = read_int_big_endian(f);//endian_big_to_little(f->ReadInt());
-		f->ReadBuffer(buf, 4);
+		f->read_buffer(buf, 4);
 		string name = string(buf, 4);
 		//msg_write(size);
 		//msg_write("chunk: " + name);
@@ -89,8 +88,8 @@ void image_load_png(const string &filename, Image &image)
 			int w = read_int_big_endian(f);
 			int h = read_int_big_endian(f);
 			image.create(w, h, Black);
-			int bits_per_channel = f->ReadByte();
-			int type = f->ReadByte();
+			int bits_per_channel = f->read_byte();
+			int type = f->read_byte();
 			// 0 = gray, 2 = rgb, 6 = rgba
 			if (bits_per_channel != 8)
 				throw string("unhandled bits per channel: " + i2s(bits_per_channel));
@@ -102,16 +101,16 @@ void image_load_png(const string &filename, Image &image)
 			}else
 				throw string("unhandled color type: " + i2s(type));
 
-			f->SetPos(size - 10, false);
+			f->seek(size - 10);
 		}else if (name == "IDAT"){
 			int size0 = data.num;
 			data.resize(size0 + size);
-			f->ReadBuffer(&data[size0], size);
+			f->read_buffer(&data[size0], size);
 		}else if (name == "IEND"){
 			break;
 		}else
-			f->SetPos(size, false);
-		f->ReadInt(); // crc
+			f->seek(size);
+		f->read_int(); // crc
 	}
 
 	string dest;
@@ -145,12 +144,13 @@ void image_load_png(const string &filename, Image &image)
 			image.setPixel(x, image.height - y - 1, color(a, r, g, b));
 		}
 	}
+	FileClose(f);
 
+	}catch(FileError &e){
 	}catch(string &s){
 		msg_error("png: " + s);
+		FileClose(f);
 	}
-
-	delete(f);
 }
 
 #else

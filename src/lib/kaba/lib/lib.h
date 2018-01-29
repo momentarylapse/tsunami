@@ -50,6 +50,9 @@ extern const string IDENTIFIER_VIRTUAL;
 extern const string IDENTIFIER_EXTERN;
 extern const string IDENTIFIER_USE;
 extern const string IDENTIFIER_RETURN;
+extern const string IDENTIFIER_RAISE;
+extern const string IDENTIFIER_TRY;
+extern const string IDENTIFIER_EXCEPT;
 extern const string IDENTIFIER_IF;
 extern const string IDENTIFIER_ELSE;
 extern const string IDENTIFIER_WHILE;
@@ -135,6 +138,9 @@ enum
 	STATEMENT_DELETE,
 	STATEMENT_SIZEOF,
 	STATEMENT_ASM,
+	STATEMENT_RAISE,
+	STATEMENT_TRY,
+	STATEMENT_EXCEPT,
 	NUM_STATEMENTS
 };
 

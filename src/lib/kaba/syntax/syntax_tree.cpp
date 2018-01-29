@@ -276,6 +276,7 @@ SyntaxTree::SyntaxTree(Script *_script) :
 	asm_meta_info = new Asm::MetaInfo;
 	for_index_count = 0;
 	Exp.cur_line = NULL;
+	parser_loop_depth = 0;
 
 	// "include" default stuff
 	for (Package &p: Packages)
@@ -522,6 +523,7 @@ Function::Function(SyntaxTree *_tree, const string &_name, Class *_return_type)
 	_logical_line_no = -1;
 	_exp_no = -1;
 	inline_no = -1;
+	throws_exceptions = false;
 }
 
 int Function::__get_var(const string &name)

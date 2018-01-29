@@ -83,6 +83,7 @@ Class::Class(const string &_name, int _size, SyntaxTree *_owner, Class *_parent)
 	fully_parsed = true;
 	_vtable_location_target_ = NULL;
 	_vtable_location_compiler_ = NULL;
+	_vtable_location_external_ = NULL;
 };
 
 Class::~Class()
@@ -330,6 +331,7 @@ void Class::link_external_virtual_table(void *p)
 	vtable.resize(max_vindex + 1);
 	_vtable_location_compiler_ = vtable.data;
 	_vtable_location_target_ = vtable.data;
+	_vtable_location_external_ = (void*)t;
 
 	for (int i=0; i<vtable.num; i++)
 		vtable[i] = t[i];

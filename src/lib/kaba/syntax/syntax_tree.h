@@ -112,6 +112,7 @@ struct Block
 	Array<int> vars;
 	Function *function;
 	Block *parent;
+	void *_start, *_end; // opcode range
 	int level;
 	void add(Node *c);
 	void set(int index, Node *c);
@@ -146,6 +147,7 @@ struct Function
 	Class *literal_return_type;
 	bool is_extern, auto_implement;
 	bool is_pure;
+	bool throws_exceptions; // for external
 	int inline_no;
 	// for compilation...
 	long long _var_size, _param_size;
@@ -288,6 +290,8 @@ public:
 	void ParseStatementBreak(Block *block);
 	void ParseStatementContinue(Block *block);
 	void ParseStatementReturn(Block *block);
+	void ParseStatementRaise(Block *block);
+	void ParseStatementTry(Block *block);
 	void ParseStatementIf(Block *block);
 
 	void CreateAsmMetaInfo();
@@ -359,6 +363,8 @@ public:
 	Script *script;
 	Function *cur_func;
 	int for_index_count;
+
+	int parser_loop_depth;
 };
 
 string Kind2Str(int kind);

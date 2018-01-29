@@ -160,10 +160,8 @@ void image_load_bmp(const string &filename, Image &image)
 
 void image_save_bmp(const string &filename, const Image &image)
 {
+	try{
 	File *f = FileCreate(filename);
-	if (!f)
-		return;
-	f->SetBinaryMode(true);
 	image.setMode(image.ModeRGBA);
 
 	int row_size = 4 * (int)((image.width * 3 + 3) / 4);
@@ -182,7 +180,7 @@ void image_save_bmp(const string &filename, const Image &image)
 	*(short*)(&Header[28]) = 24; // bits
 	*(int*)(&Header[30]) = 0; // compression
 	*(int*)(&Header[34]) = data_size;
-	f->WriteBuffer(Header, 56);
+	f->write_buffer(Header, 56);
 	unsigned char *row = new unsigned char[row_size + 16];
 	for (int y=image.height-1;y>=0;y--){
 		unsigned int *d = ((unsigned int*)image.data.data) + (y * image.width);
@@ -193,9 +191,11 @@ void image_save_bmp(const string &filename, const Image &image)
 			*(p ++) = (*d);
 			d ++;
 		}
-		f->WriteBuffer(row, row_size);
+		f->write_buffer(row, row_size);
 	}
 	delete[](row);
 
 	FileClose(f);
+	}catch(...){
+	}
 }

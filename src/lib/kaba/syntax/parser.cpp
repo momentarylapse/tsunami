@@ -342,7 +342,7 @@ Array<Class*> SyntaxTree::GetFunctionWantedParams(Node &link)
 			DoError("FindFunctionSingleParameter: can't find virtual function...?!?");
 		return cf->param_types;
 	}else
-		DoError("evil function...");
+		DoError("evil function...kind="+i2s(link.kind));
 
 	Array<Class*> dummy_types;
 	return dummy_types;
@@ -1005,8 +1005,10 @@ void SyntaxTree::ParseStatementFor(Block *block)
 	// ...block
 	Exp.next_line();
 	ExpectIndent();
+	parser_loop_depth ++;
 	int loop_block_no = blocks.num; // should get created...soon
 	ParseCompleteCommand(block);
+	parser_loop_depth --;
 
 	// ...for_var += 1
 	Node *cmd_inc;
@@ -1097,8 +1099,10 @@ void SyntaxTree::ParseStatementForall(Block *block)
 	// ...block
 	Exp.next_line();
 	ExpectIndent();
+	parser_loop_depth ++;
 	int loop_block_no = blocks.num; // should get created...soon
 	ParseCompleteCommand(block);
+	parser_loop_depth --;
 
 	// ...for_index += 1
 	Node *cmd_inc = add_node_operator_by_inline(for_index, val1 /*dummy*/, INLINE_INT_INCREASE);
@@ -1146,11 +1150,15 @@ void SyntaxTree::ParseStatementWhile(Block *block)
 	// ...block
 	Exp.next_line();
 	ExpectIndent();
+	parser_loop_depth ++;
 	ParseCompleteCommand(block);
+	parser_loop_depth --;
 }
 
 void SyntaxTree::ParseStatementBreak(Block *block)
 {
+	if (parser_loop_depth == 0)
+		DoError("'break' only allowed inside a loop");
 	Exp.next();
 	Node *cmd = add_node_statement(STATEMENT_BREAK);
 	block->nodes.add(cmd);
@@ -1158,6 +1166,8 @@ void SyntaxTree::ParseStatementBreak(Block *block)
 
 void SyntaxTree::ParseStatementContinue(Block *block)
 {
+	if (parser_loop_depth == 0)
+		DoError("'continue' only allowed inside a loop");
 	Exp.next();
 	Node *cmd = add_node_statement(STATEMENT_CONTINUE);
 	block->nodes.add(cmd);
@@ -1176,6 +1186,101 @@ void SyntaxTree::ParseStatementReturn(Block *block)
 		cmd->set_param(0, cmd_value);
 	}
 	ExpectNewline();
+}
+
+// IGNORE!!! raise() is a function :P
+void SyntaxTree::ParseStatementRaise(Block *block)
+{
+	throw "jhhhh";
+	Exp.next();
+	Node *cmd = add_node_statement(STATEMENT_RAISE);
+	block->nodes.add(cmd);
+
+	Node *cmd_ex = CheckParamLink(GetCommand(block), TypeExceptionP, IDENTIFIER_RAISE, 0);
+	cmd->set_num_params(1);
+	cmd->set_param(0, cmd_ex);
+
+	/*if (block->function->return_type == TypeVoid){
+		cmd->set_num_params(0);
+	}else{
+		Node *cmd_value = CheckParamLink(GetCommand(block), block->function->return_type, IDENTIFIER_RETURN, 0);
+		cmd->set_num_params(1);
+		cmd->set_param(0, cmd_value);
+	}*/
+	ExpectNewline();
+}
+
+void SyntaxTree::ParseStatementTry(Block *block)
+{
+	int ind = Exp.cur_line->indent;
+	Exp.next();
+	Node *cmd = add_node_statement(STATEMENT_TRY);
+	block->nodes.add(cmd);
+	ExpectNewline();
+	// ...block
+	Exp.next_line();
+	ExpectIndent();
+	ParseCompleteCommand(block);
+	Exp.next_line();
+
+	if (Exp.cur != IDENTIFIER_EXCEPT)
+		DoError("except after try expected");
+	if (Exp.cur_line->indent != ind)
+		DoError("wrong indentation for except");
+	Exp.next();
+
+	Node *cmd_ex = add_node_statement(STATEMENT_EXCEPT);
+	block->nodes.add(cmd_ex);
+
+	Block *new_block = AddBlock(block->function, block);
+
+	if (!Exp.end_of_line()){
+		Class *ex_type = FindType(Exp.cur);
+		if (!ex_type)
+			DoError("Exception class expected");
+		if (!ex_type->is_derived_from(TypeException))
+			DoError("Exception class expected");
+		cmd_ex->type = ex_type;
+		ex_type = ex_type->get_pointer();
+		Exp.next();
+		if (!Exp.end_of_line()){
+			if (Exp.cur != "as")
+				DoError("'as' expected");
+			Exp.next();
+			string ex_name = Exp.cur;
+			int v = new_block->add_var(ex_name, ex_type);
+			cmd_ex->params.add(AddNode(KIND_VAR_LOCAL, v, ex_type));
+		}
+	}
+
+	int last_indent = Exp.indent_0;
+
+	Exp.next();
+	ExpectNewline();
+	// ...block
+	Exp.next_line();
+	ExpectIndent();
+	//ParseCompleteCommand(block);
+	//Exp.next_line();
+
+	//auto n = block->nodes.back();
+	//n->as_block()->
+
+	Node *cmd_ex_block = add_node_block(new_block);
+	block->nodes.add(cmd_ex_block);
+
+	for (int i=0;true;i++){
+		if (((i > 0) and (Exp.cur_line->indent < last_indent)) or (Exp.end_of_file()))
+			break;
+
+		ParseCompleteCommand(new_block);
+		Exp.next_line();
+	}
+	Exp.cur_line --;
+	Exp.indent_0 = Exp.cur_line->indent;
+	Exp.indented = false;
+	Exp.cur_exp = Exp.cur_line->exp.num - 1;
+	Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
 }
 
 void SyntaxTree::ParseStatementIf(Block *block)
@@ -1242,6 +1347,10 @@ void SyntaxTree::ParseStatement(Block *block)
 		ParseStatementContinue(block);
 	}else if (Exp.cur == IDENTIFIER_RETURN){
 		ParseStatementReturn(block);
+	//}else if (Exp.cur == IDENTIFIER_RAISE){
+	//	ParseStatementRaise(block);
+	}else if (Exp.cur == IDENTIFIER_TRY){
+		ParseStatementTry(block);
 	}else if (Exp.cur == IDENTIFIER_IF){
 		ParseStatementIf(block);
 	}
@@ -1315,7 +1424,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block)
 
 
 	// commands (the actual code!)
-		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or (Exp.cur == IDENTIFIER_IF)){
+		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or /*(Exp.cur == IDENTIFIER_RAISE) or*/ (Exp.cur == IDENTIFIER_TRY) or (Exp.cur == IDENTIFIER_IF)){
 			ParseStatement(block);
 
 		}else{
@@ -1355,7 +1464,20 @@ void SyntaxTree::ParseImport()
 			include = Load(filename, script->just_analyse or config.compile_os);
 			// os-includes will be appended to syntax_tree... so don't compile yet
 		}catch(Exception &e){
-			string msg = "in imported file:\n\"" + e.message + "\"";
+
+			int logical_line = Exp.get_line_no();
+			int exp_no = Exp.cur_exp;
+			int physical_line = Exp.line[logical_line].physical_line;
+			int pos = Exp.line[logical_line].exp[exp_no].pos;
+			string expr = Exp.line[logical_line].exp[exp_no].name;
+			e.line = physical_line;
+			e.column = pos;
+			e.message += "\n...imported from:\nline " + i2s(physical_line) + ", " + script->filename;
+			throw e;
+			//msg_write(e.message);
+			//msg_write("...");
+			string msg = e.message + "\nimported file:";
+			//string msg = "in imported file:\n\"" + e.message + "\"";
 			DoError(msg);
 		}
 
@@ -1843,6 +1965,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 			AutoImplementDefaultConstructor(f, f->_class, true);
 	}
 
+	parser_loop_depth = 0;
 
 // instructions
 	while(more_to_parse){

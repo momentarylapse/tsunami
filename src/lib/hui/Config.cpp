@@ -102,37 +102,40 @@ string Configuration::getStr(const string& name, const string& default_str)
 
 void Configuration::load()
 {
-	File *f = FileOpenSilent(filename);
-	map.clear();
-	if (f){
-		f->ReadComment();
-		int num = f->ReadInt();
+	try{
+		File *f = FileOpenText(filename);
+		map.clear();
+		f->read_comment();
+		int num = f->read_int();
 		for (int i=0;i<num;i++){
-			string temp = f->ReadStr();
+			string temp = f->read_str();
 			string key = temp.substr(3, temp.num - 3);
-			string value = f->ReadStr();
+			string value = f->read_str();
 			map[key] = value;
 		}
 		FileClose(f);
+		loaded = true;
+		changed = false;
+	}catch(...){
 	}
-	loaded = true;
-	changed = false;
 }
 
 void Configuration::save()
 {
 	dir_create(filename.dirname());
-	File *f = FileCreateSilent(filename);
-	f->WriteStr("// NumConfigs");
-	f->WriteInt(map.num);
-	for (auto &e: map){
-		f->WriteStr("// " + e.key);
-		f->WriteStr(e.value);
-	}
-	f->WriteStr("#");
-	FileClose(f);
-	loaded = true;
-	changed = false;
+	try{
+		File *f = FileCreateText(filename);
+		f->write_str("// NumConfigs");
+		f->write_int(map.num);
+		for (auto &e: map){
+			f->write_str("// " + e.key);
+			f->write_str(e.value);
+		}
+		f->write_str("#");
+		FileClose(f);
+		loaded = true;
+		changed = false;
+	}catch(...){}
 }
 
 

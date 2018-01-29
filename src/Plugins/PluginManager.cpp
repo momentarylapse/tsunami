@@ -473,22 +473,22 @@ void PluginManager::LinkAppScriptData()
 void get_plugin_file_data(PluginManager::PluginFile &pf)
 {
 	pf.image = "";
-	SilentFiles = true;
-	string content = FileRead(pf.filename);
-	int p = content.find("// Image = hui:");
-	if (p >= 0)
-		pf.image = content.substr(p + 11, content.find("\n") - p - 11);
-	SilentFiles = false;
+	try{
+		string content = FileRead(pf.filename);
+		int p = content.find("// Image = hui:");
+		if (p >= 0)
+			pf.image = content.substr(p + 11, content.find("\n") - p - 11);
+	}catch(...){}
 }
 
 void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
-	Array<DirEntry> list = dir_search(tsunami->directory_static + "Plugins/" + dir, "*.kaba", false);
+	Array<DirEntry> list = dir_search(pm->plugin_dir() + dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
-		pf.filename = tsunami->directory_static + "Plugins/" + dir + e.name;
+		pf.filename = pm->plugin_dir() + dir + e.name;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);
 	}
@@ -627,7 +627,7 @@ Plugin *PluginManager::GetPlugin(int type, const string &name)
 Array<string> PluginManager::FindSynthesizers()
 {
 	Array<string> names;
-	Array<DirEntry> list = dir_search(tsunami->directory_static + "Plugins/Synthesizer/", "*.kaba", false);
+	Array<DirEntry> list = dir_search(plugin_dir() + "Synthesizer/", "*.kaba", false);
 	for (DirEntry &e: list)
 		names.add(e.name.replace(".kaba", ""));
 	names.add("Dummy");
@@ -637,7 +637,7 @@ Array<string> PluginManager::FindSynthesizers()
 
 Synthesizer *PluginManager::__LoadSynthesizer(const string &name, Song *song)
 {
-	string filename = tsunami->directory_static + "Plugins/Synthesizer/" + name + ".kaba";
+	string filename = plugin_dir() + "Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
 		return NULL;
 	Kaba::Script *s;
@@ -678,11 +678,17 @@ Synthesizer *PluginManager::CreateSynthesizer(const string &name, Song *song)
 }
 
 
+string PluginManager::plugin_dir()
+{
+	if (tsunami->directory_static.find("/home/") == 0)
+		return "Plugins/";
+	return tsunami->directory_static + "Plugins/";
+}
 
 Array<string> PluginManager::FindEffects()
 {
 	Array<string> names;
-	string prefix = tsunami->directory_static + "Plugins/Buffer/";
+	string prefix = plugin_dir() + "Buffer/";
 	for (auto &pf: plugin_files){
 		if (pf.filename.match(prefix + "*")){
 			string g = pf.filename.substr(prefix.num, -1).explode("/")[0];

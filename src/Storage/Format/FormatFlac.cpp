@@ -103,9 +103,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 	try{
 
 		File *f = FileOpen(od->filename);
-		if (!f)
-			throw string("can not open file");
-		flac_file_size = f->GetSize();
+		flac_file_size = f->get_size();
 		FileClose(f);
 
 		flac_layer = od->layer;
@@ -115,7 +113,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 
 		decoder = FLAC__stream_decoder_new();
 		if (!decoder)
-			throw string("could not create decoder");
+			throw Exception("could not create decoder");
 
 		FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
 
@@ -126,10 +124,10 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 								flac_metadata_callback,
 								flac_error_callback, od);
 		if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-			throw string("initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status];
+			throw Exception(string("initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
 
 		if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
-			throw string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)];
+			throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
 
 
 		if (t->get_index() == 0){
@@ -137,8 +135,8 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 			t->song->setDefaultFormat(format_for_bits(flac_bits));
 		}
 
-	}catch(string &s){
-		od->error(s);
+	}catch(Exception &e){
+		od->error(e.message());
 	}
 
 	if (decoder)
@@ -185,37 +183,37 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		// allocate the encoder
 		encoder = FLAC__stream_encoder_new();
 		if (!encoder)
-			throw string("allocating encoder");
+			throw Exception("allocating encoder");
 
 //		if (!FLAC__stream_encoder_set_verify(encoder, true))
 //			throw string("FLAC__stream_encoder_set_verify");
 		if (!FLAC__stream_encoder_set_compression_level(encoder, 5))
-			throw string("could not set compression level");
+			throw Exception("could not set compression level");
 		if (!FLAC__stream_encoder_set_channels(encoder, channels))
-			throw string("could not set channels");
+			throw Exception("could not set channels");
 		if (!FLAC__stream_encoder_set_bits_per_sample(encoder, bits))
-			throw string("could not set bits per sample");
+			throw Exception("could not set bits per sample");
 		if (!FLAC__stream_encoder_set_sample_rate(encoder, r->getSampleRate()))
-			throw string("could not set sample rate");
+			throw Exception("could not set sample rate");
 		if (!FLAC__stream_encoder_set_total_samples_estimate(encoder, od->get_num_samples()))
-			throw string("could not set total samples estimate");
+			throw Exception("could not set total samples estimate");
 
 		// metadata
 		metadata = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 		if (!metadata)
-			throw string("could not add meta data");
+			throw Exception("could not add meta data");
 		for (Tag &t : od->tags){
 			FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, tag_to_vorbis(t.key).c_str(), t.value.c_str());
 			FLAC__metadata_object_vorbiscomment_append_comment(metadata, entry, true);
 		}
 
 		if (!FLAC__stream_encoder_set_metadata(encoder, &metadata, 1))
-			throw string("could not set meta data");
+			throw Exception("could not set meta data");
 
 		// initialize encoder
 		init_status = FLAC__stream_encoder_init_file(encoder, od->filename.c_str(), flac_progress_callback, od);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
-			throw string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status];
+			throw Exception(string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 
 		// read blocks of samples from WAVE file and feed to encoder
 		float scale = (float)(1 << (bits-1));
@@ -230,14 +228,14 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			}
 			/* feed samples to encoder */
 			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, samples_read))
-				throw string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)];
+				throw Exception(string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 		}
 
 		if (!FLAC__stream_encoder_finish(encoder))
-			throw string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)];
+			throw Exception(string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 
-	}catch(string &s){
-		od->error(s);
+	}catch(Exception &e){
+		od->error(e.message());
 	}
 
 	// now that encoding is finished, the metadata can be freed

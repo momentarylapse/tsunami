@@ -54,6 +54,7 @@ public:
 	Array<void*> vtable;
 	void *_vtable_location_compiler_; // may point to const/opcode
 	void *_vtable_location_target_; // (opcode offset adjusted)
+	void *_vtable_location_external_; // from linked classes (just for reference)
 
 	bool force_call_by_value;
 	bool uses_call_by_reference() const;
@@ -105,6 +106,9 @@ extern Class *TypeVector;
 extern Class *TypeRect;
 extern Class *TypeColor;
 extern Class *TypeQuaternion;
+
+extern Class *TypeException;
+extern Class *TypeExceptionP;
 
 };
 

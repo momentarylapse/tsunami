@@ -412,13 +412,8 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 
 void image_load_jpg(const string &filename, Image &image)
 {
-	File *f = FileOpenSilent(filename);
-	if (!f)
-		return;
-	f->SetBinaryMode(true);
-	string tt = f->ReadComplete();
+	string tt = FileRead(filename);
 	unsigned char *buf = (unsigned char*)tt.data;
-	FileClose(f);
 
 	unsigned char *b=buf;
 

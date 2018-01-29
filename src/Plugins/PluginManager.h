@@ -31,6 +31,8 @@ public:
 	PluginManager();
 	virtual ~PluginManager();
 
+	string plugin_dir();
+
 	void LinkAppScriptData();
 	void FindPlugins();
 	void AddPluginsToMenu(TsunamiWindow *win);

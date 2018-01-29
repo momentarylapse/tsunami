@@ -32,14 +32,9 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 	AudioSource *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
-	if (!f){
-		od->error("can not create file");
-		return;
-	}
-	f->SetBinaryMode(true);
 
 	for (int i=0; i<config.offset; i++)
-		f->WriteByte(0);
+		f->write_byte(0);
 
 	AudioBuffer buf;
 	buf.resize(CHUNK_SIZE);
@@ -52,7 +47,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 		if (!buf.exports(data, config.channels, config.format))
 			od->warn(_("Amplitude too large, signal distorted."));
 		od->set(float(done) / (float)samples);
-		f->WriteBuffer(data.data, data.num);
+		f->write_buffer(data.data, data.num);
 		done += buf.length;
 	}
 
@@ -66,26 +61,24 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 	const int WAVE_BUFFER_SIZE = 1 << 16;
 
 	char *data = new char[WAVE_BUFFER_SIZE];
-	File *f = FileOpen(od->filename);
+	File *f = NULL;
 
 	try{
+		f = FileOpen(od->filename);
 
-		if (!f)
-			throw string("can not open file");
-		f->SetBinaryMode(true);
 		int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
-		long long size = f->GetSize64() - config.offset;
+		long long size = f->get_size64() - config.offset;
 		//int samples = size / byte_per_sample;
 
 		if (config.offset > 0)
-			f->ReadBuffer(data, config.offset);
+			f->read_buffer(data, config.offset);
 
 		long long read = 0;
 		int nn = 0;
 		int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
 		while (read < size){
 			int toread = (int)min((long long)nice_buffer_size, size - read);
-			int r = f->ReadBuffer(data, toread);
+			int r = f->read_buffer(data, toread);
 			nn ++;
 			if (nn > 16){
 				od->set((float)read / (float)size);
@@ -97,12 +90,12 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 				importData(od->track, data, config.channels, config.format, dsamples, _offset, od->layer);
 				read += r;
 			}else{
-				throw string("could not read in raw file...");
+				throw Exception("could not read in raw file...");
 			}
 		}
 
-	}catch(const string &s){
-		od->error(s);
+	}catch(Exception &e){
+		od->error(e.message());
 	}
 
 	delete[](data);

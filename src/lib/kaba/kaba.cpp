@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.14.7.1";
+string Version = "0.15.-1.0";
 
 //#define ScriptDebug
 
@@ -166,23 +166,21 @@ void Script::Load(const string &_filename, bool _just_analyse)
 	try{
 
 	// read file
-	File *f = FileOpen(config.directory + filename);
-	if (!f)
+		string buffer = FileReadText(config.directory + filename);
+		syntax->ParseBuffer(buffer, just_analyse);
+
+
+		if (!just_analyse)
+			Compiler();
+		/*if (pre_script->FlagShow)
+			pre_script->Show();*/
+		if ((!just_analyse) and (config.verbose)){
+			msg_write(format("Opcode: %d bytes", opcode_size));
+			msg_write(Asm::Disassemble(opcode, opcode_size));
+		}
+
+	}catch(FileError &e){
 		DoError("script file not loadable");
-	string buffer = f->ReadComplete();
-	delete(f);
-	syntax->ParseBuffer(buffer, just_analyse);
-
-
-	if (!just_analyse)
-		Compiler();
-	/*if (pre_script->FlagShow)
-		pre_script->Show();*/
-	if ((!just_analyse) and (config.verbose)){
-		msg_write(format("Opcode: %d bytes", opcode_size));
-		msg_write(Asm::Disassemble(opcode, opcode_size));
-	}
-
 	}catch(Exception &e){
 		loading_script_stack.pop();
 		throw e;

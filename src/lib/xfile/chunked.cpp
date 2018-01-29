@@ -67,7 +67,7 @@ FileChunkBasic::~FileChunkBasic()
 }
 void FileChunkBasic::create()
 {
-	throw string("no data creation... " + name);
+	throw Exception("no data creation... " + name);
 }
 void FileChunkBasic::notify()
 {
@@ -110,7 +110,7 @@ FileChunkBasic *FileChunkBasic::get_sub(const string &name)
 			c->set_parent(get());
 			return c;
 		}
-	throw string("no sub... " + name + " in " + context->str());
+	throw Exception("no sub... " + name + " in " + context->str());
 }
 
 void FileChunkBasic::write_sub(const string &name, void *p)
@@ -141,18 +141,18 @@ void FileChunkBasic::write_sub_array(const string &name, DynamicArray &a)
 void FileChunkBasic::write_begin_chunk(File *f)
 {
 	string s = name + "        ";
-	f->WriteBuffer(s.data, root->header_name_size);
-	f->WriteInt(0); // temporary
-	context->push(name, context->f->GetPos(), 0);
+	f->write_buffer(s.data, root->header_name_size);
+	f->write_int(0); // temporary
+	context->push(name, context->f->get_pos(), 0);
 }
 
 void FileChunkBasic::write_end_chunk(File *f)
 {
-	int pos = f->GetPos();
+	int pos = f->get_pos();
 	int chunk_pos = context->layers.back().pos0;
-	f->SetPos(chunk_pos - 4, true);
-	f->WriteInt(pos - chunk_pos);
-	f->SetPos(pos, true);
+	f->set_pos(chunk_pos - 4);
+	f->write_int(pos - chunk_pos);
+	f->set_pos(pos);
 	context->pop();
 }
 void FileChunkBasic::write_complete()
@@ -173,15 +173,15 @@ string FileChunkBasic::read_header()
 {
 	string cname;
 	cname.resize(root->header_name_size);
-	context->f->ReadBuffer(cname.data, cname.num);
+	context->f->read_buffer(cname.data, cname.num);
 	strip(cname);
-	int size = context->f->ReadInt();
-	int pos0 = context->f->GetPos();
+	int size = context->f->read_int();
+	int pos0 = context->f->get_pos();
 
 	if (size < 0)
-		throw string("chunk with negative size found");
+		throw Exception("chunk with negative size found");
 	if (pos0 + size > context->end())
-		throw string("inner chunk is larger than its parent");
+		throw Exception("inner chunk is larger than its parent");
 
 	context->push(cname, pos0, size);
 	return cname;
@@ -195,7 +195,7 @@ void FileChunkBasic::read_contents()
 	read(f);
 
 	// read nested chunks
-	while (f->GetPos() < context->end() - 8){
+	while (f->get_pos() < context->end() - 8){
 
 		string cname = read_header();
 
@@ -212,10 +212,10 @@ void FileChunkBasic::read_contents()
 		if (!ok){
 			if (root)
 				root->on_unhandled();
-			//throw string("no sub handler: " + context->str());
+			//throw Exception("no sub handler: " + context->str());
 		}
 
-		f->SetPos(context->end(), true);
+		f->set_pos(context->end());
 		context->pop();
 	}
 }
@@ -229,9 +229,6 @@ ChunkedFileParser::~ChunkedFileParser()
 bool ChunkedFileParser::read(const string &filename, void *p)
 {
 	File *f = FileOpen(filename);
-	if (!f)
-		throw string("can not open file");
-	f->SetBinaryMode(true);
 	context.f = f;
 	//context.push(Context::Layer(name, 0, f->GetSize()));
 
@@ -239,7 +236,7 @@ bool ChunkedFileParser::read(const string &filename, void *p)
 	base->set(p);
 	string cname = base->read_header();
 	if (cname != base->name)
-		throw string("wrong base chunk: ") + cname + " (" + base->name + " expected)";
+		throw Exception("wrong base chunk: " + cname + " (" + base->name + " expected)");
 	base->read_contents();
 
 	delete(f);
@@ -250,9 +247,6 @@ bool ChunkedFileParser::read(const string &filename, void *p)
 bool ChunkedFileParser::write(const string &filename, void *p)
 {
 	File *f = FileCreate(filename);
-	if (!f)
-		throw string("can not create file");
-	f->SetBinaryMode(true);
 	context.f = f;
 	//context->push(Context::Layer(name, 0, 0));
 

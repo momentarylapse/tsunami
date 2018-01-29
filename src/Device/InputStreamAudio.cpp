@@ -304,8 +304,11 @@ bool InputStreamAudio::start()
 
 	if (backup_mode != BACKUP_MODE_NONE){
 		cur_backup_filename = getBackupFilename();
-		backup_file = FileCreate(getBackupFilename());
-		backup_file->SetBinaryMode(true);
+		try{
+			backup_file = FileCreate(getBackupFilename());
+		}catch(FileError &e){
+			tsunami->log->error(e.message());
+		}
 	}
 
 	_startUpdate();
@@ -355,7 +358,7 @@ int InputStreamAudio::doCapturing()
 		string data;
 		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
 
-		backup_file->WriteBuffer(&data[0], data.num);
+		backup_file->write_buffer(&data[0], data.num);
 	}
 
 	return avail;

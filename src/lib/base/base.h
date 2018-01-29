@@ -54,4 +54,17 @@ public:
 //    they also override ~() with __delete_external__()
 
 
+
+
+// strings.cpp
+class Exception
+{
+public:
+	Exception(){}
+	Exception(const string &msg){ text = msg; }
+	virtual ~Exception(){}
+	virtual string message(){ return text; }
+	string text;
+};
+
 #endif

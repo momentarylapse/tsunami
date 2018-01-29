@@ -10,6 +10,7 @@ KABA_OBJ  = $(KABA_DIR)/kaba.o \
  $(KABA_DIR)/syntax/preprocessor.o \
  $(KABA_DIR)/syntax/parser.o \
  $(KABA_DIR)/syntax/implicit.o \
+ $(KABA_DIR)/lib/exception.o \
  $(KABA_DIR)/lib/lib.o \
  $(KABA_DIR)/lib/lib_file.o \
  $(KABA_DIR)/lib/lib_math.o \
@@ -61,6 +62,9 @@ $(KABA_DIR)/syntax/precompiler.o : $(KABA_DIR)/syntax/precompiler.cpp $(KABA_DEP
 
 $(KABA_DIR)/syntax/preprocessor.o : $(KABA_DIR)/syntax/preprocessor.cpp $(KABA_DEP)
 	$(CPP) -c $(KABA_DIR)/syntax/preprocessor.cpp -o $@ $(KABA_CXXFLAGS)
+
+$(KABA_DIR)/lib/exception.o : $(KABA_DIR)/lib/exception.cpp $(KABA_DEP)
+	$(CPP) -c $(KABA_DIR)/lib/exception.cpp -o $@ $(KABA_CXXFLAGS)
 
 $(KABA_DIR)/lib/lib.o : $(KABA_DIR)/lib/lib.cpp $(KABA_DEP)
 	$(CPP) -c $(KABA_DIR)/lib/lib.cpp -o $@ $(KABA_CXXFLAGS)

@@ -10,6 +10,7 @@
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
+#include "../Stuff/Log.h"
 
 FavoriteManager::FavoriteManager()
 {
@@ -46,21 +47,23 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 {
 	if (!file_test_existence(filename))
 		return;
-	File *f = FileOpen(filename);
-	if (!f)
-		return;
-	int n = f->ReadInt();
-	for (int i=0; i<n; i++){
-		Favorite ff;
-		string type = f->ReadStr();
-		ff.type = str2type(type);
-		ff.config_name = f->ReadStr();
-		ff.name = f->ReadStr();
-		ff.options = f->ReadStr();
-		ff.read_only = read_only;
-		set(ff);
+	try{
+		File *f = FileOpenText(filename);
+		int n = f->read_int();
+		for (int i=0; i<n; i++){
+			Favorite ff;
+			string type = f->read_str();
+			ff.type = str2type(type);
+			ff.config_name = f->read_str();
+			ff.name = f->read_str();
+			ff.options = f->read_str();
+			ff.read_only = read_only;
+			set(ff);
+		}
+		delete(f);
+	}catch(Exception &e){
+		tsunami->log->error(e.message());
 	}
-	delete(f);
 }
 
 void FavoriteManager::Load()
@@ -72,17 +75,19 @@ void FavoriteManager::Load()
 
 void FavoriteManager::Save()
 {
-	File *f = FileCreate(tsunami->directory + "favorites.txt");
-	if (!f)
-		return;
-	f->WriteInt(favorites.num);
-	for (Favorite &ff: favorites){
-		f->WriteStr(type2str(ff.type));
-		f->WriteStr(ff.config_name);
-		f->WriteStr(ff.name);
-		f->WriteStr(ff.options);
+	try{
+		File *f = FileCreateText(tsunami->directory + "favorites.txt");
+		f->write_int(favorites.num);
+		for (Favorite &ff: favorites){
+			f->write_str(type2str(ff.type));
+			f->write_str(ff.config_name);
+			f->write_str(ff.name);
+			f->write_str(ff.options);
+		}
+		delete(f);
+	}catch(Exception &e){
+		tsunami->log->error(e.message());
 	}
-	delete(f);
 }
 
 Array<string> FavoriteManager::GetList(Configurable *c)

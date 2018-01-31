@@ -35,10 +35,11 @@ public:
 	Array<Resource> children;
 	void reset();
 	Resource* get_node(const string &id) const;
-	void load(const string &buffer);
 	void show(int indent = 0);
+	string to_string(int indent = 0);
 };
 
+Resource ParseResource(const string &buffer, bool literal = false);
 
 
 // resources

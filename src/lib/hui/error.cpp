@@ -99,7 +99,7 @@ public:
 	ErrorDialog() :
 		FixedDialog(_("Error"), 600, 500, NULL, false)
 	{
-		addLabel(Application::getProperty("name") + " " + Application::getProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
+		addLabel(Application::getProperty("name") + " " + Application::getProperty("version") + _(" has crashed.		The last lines of the file message.txt:"),5,5,590,20,"error_header");
 		addListView(_("Messages"),5,30,590,420,"message_list");
 		//addEdit("",5,30,590,420,"message_list";
 		addButton(_("Ok"),5,460,100,25,"ok");

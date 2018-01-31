@@ -4,8 +4,8 @@ Dialog synth_console "" 300 200
 			.
 			.
 			Grid ? "" 2 1
-				Button select "" expandx flat image=hui:open tooltip="Select synthesizer"
-				Button detune "" noexpandx flat image=hui:properties tooltip="detune"
+				Button select "" expandx flat image=hui:open "tooltip=Select synthesizer"
+				Button detune "" noexpandx flat image=hui:properties "tooltip=detune"
 		Group sc_group_edit "Edit"
 			Grid ? "" 2 1
 				Button /edit_song "File"

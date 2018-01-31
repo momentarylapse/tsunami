@@ -153,48 +153,57 @@ void Control::setOptions(const string &options)
 	int height = -1;
 	for (string &aa : a){
 		int eq = aa.find("=");
-		if (aa == "expandx")
+		string op;
+		if (eq < 0)
+			op = aa.replace("-", "");
+		else
+			op = aa.head(eq).replace("-", "");
+
+		if (op == "expandx")
 			gtk_widget_set_hexpand(widget, true);
-		else if (aa == "noexpandx")
+		else if (op == "noexpandx")
 			gtk_widget_set_hexpand(widget, false);
-		else if (aa == "expandy")
+		else if (op == "expandy")
 			gtk_widget_set_vexpand(widget, true);
-		else if (aa == "noexpandy")
+		else if (op == "noexpandy")
 			gtk_widget_set_vexpand(widget, false);
-		else if (aa == "indent")
+		else if (op == "indent")
 #if GTK_CHECK_VERSION(3,12,0)
 			gtk_widget_set_margin_start(get_frame(), 20);
 #else
 			gtk_widget_set_margin_left(get_frame(), 20);
 #endif
-		else if (eq >= 0){
-			string a0 = aa.head(eq);
+		else if (op == "grabfocus"){
+			grab_focus = true;
+			gtk_widget_set_can_focus(widget, true);
+			gtk_widget_grab_focus(widget);
+		}else if (eq >= 0){
 			string a1 = aa.tail(aa.num-eq-1);
-			if (a0 == "width")
+			if (op == "width")
 				width = a1._int();
-			else if (a0 == "height")
+			else if (op == "height")
 				height = a1._int();
-			else if (a0 == "margin-left"){
+			else if (op == "marginleft"){
 #if GTK_CHECK_VERSION(3,12,0)
 				gtk_widget_set_margin_start(get_frame(), 20);
 #else
 				gtk_widget_set_margin_left(get_frame(), a1._int());
 #endif
-			}else if (a0 == "margin-right"){
+			}else if (op == "marginright"){
 #if GTK_CHECK_VERSION(3,12,0)
 				gtk_widget_set_margin_end(get_frame(), a1._int());
 #else
 				gtk_widget_set_margin_right(get_frame(), a1._int());
 #endif
-			}else if (a0 == "margin-top"){
+			}else if (op == "margintop"){
 				gtk_widget_set_margin_top(get_frame(), a1._int());
-			}else if (a0 == "margin-bottom"){
+			}else if (op == "marginbottom"){
 				gtk_widget_set_margin_bottom(get_frame(), a1._int());
 			}else{
-				__setOption(a0, a1);
+				__setOption(op, a1);
 			}
 		}else
-			__setOption(aa, "");
+			__setOption(op, "");
 	}
 	if ((width >= 0) or (height >= 0))
 		gtk_widget_set_size_request(get_frame(), width, height);

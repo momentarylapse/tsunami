@@ -20,13 +20,8 @@ ControlGrid::ControlGrid(const string &title, const string &id, int num_x, int n
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
+	button_bar = false;
 	setOptions(OptionString);
-	button_bar = (OptionString.find("buttonbar") >= 0);
-	if (button_bar){
-		gtk_widget_set_margin_top(widget, 7);
-		gtk_widget_set_margin_bottom(widget, 4);
-		gtk_widget_set_halign(widget, GTK_ALIGN_END);
-	}
 }
 
 void ControlGrid::add(Control *child, int x, int y)
@@ -42,6 +37,16 @@ void ControlGrid::add(Control *child, int x, int y)
 		if (width < 0)
 			gtk_widget_set_size_request(child_widget, 100, height);
 		//gtk_widget_set_halign(child_widget, GTK_ALIGN_END);
+	}
+}
+
+void ControlGrid::__setOption(const string &op, const string &value)
+{
+	if (op == "buttonbar"){
+		button_bar = true;
+		gtk_widget_set_margin_top(widget, 7);
+		gtk_widget_set_margin_bottom(widget, 4);
+		gtk_widget_set_halign(widget, GTK_ALIGN_END);
 	}
 }
 

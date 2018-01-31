@@ -21,6 +21,7 @@ public:
 	virtual void __setString(const string &str);
 	virtual void __addString(const string &str);
 	virtual void setTabSize(int tab_size);
+	virtual void __setOption(const string &op, const string &value);
 
 	bool handle_keys;
 };

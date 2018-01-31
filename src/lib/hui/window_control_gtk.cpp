@@ -410,7 +410,7 @@ void Panel::embedDialog(const string &id, int x, int y)
 	Resource *res = GetResource(id);
 	if (!res)
 		return;
-	if (res->type != "SizableDialog")
+	if (res->type != "Dialog")
 		return;
 	if (res->children.num == 0)
 		return;

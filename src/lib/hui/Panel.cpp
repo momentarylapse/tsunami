@@ -253,7 +253,7 @@ void Panel::hide()
 
 void Panel::addControl(const string &type, const string &title, int x, int y, int width, int height, const string &id)
 {
-	//msg_db_m(format("HuiPanelAddControl %s  %s  %d  %d  %d  %d  %d", type.c_str(), title.c_str(), x, y, width, height, id.c_str()).c_str(),2);
+	//printf("HuiPanelAddControl %s  %s  %d  %d  %d  %d  %s\n", type.c_str(), title.c_str(), x, y, width, height, id.c_str());
 	if (type == "Button")
 		addButton(title, x, y, width, height, id);
 	else if (type == "ColorButton")
@@ -349,14 +349,6 @@ void Panel::fromResource(const string &id)
 	this->id = id;
 
 
-	// dialog
-	/*CHuiPanel *dlg
-	if (res->type == "SizableDialog")
-		dlg = HuiCreateSizableDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
-	else
-		dlg = HuiCreateDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);*/
-
-
 	// menu/toolbar?
 	if (win){
 		for (string &o: res->options){
@@ -376,11 +368,12 @@ void Panel::fromResource(const string &id)
 
 void Panel::fromSource(const string &buffer)
 {
-	Resource res;
-	res.load(buffer);
+	Resource res = ParseResource(buffer);
 	if (res.type == "Dialog"){
-		if (win)
+		if (win){
 			win->setSize(res.w, res.h);
+			win->setTitle(res.title);
+		}
 
 		if (res.children.num > 0)
 			embedResource(res.children[0], "", 0, 0);
@@ -402,9 +395,11 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 
 	setTarget(parent_id, x);
 	string title = GetLanguageR(ns, c);
-	/*if (c.options.num > 0)
-		title = "!" + implode(c.options, ",") + "\\" + title;*/
+	//if (c.options.num > 0)
+	//	title = "!" + implode(c.options, ",") + "\\" + title;
 	addControl(c.type, title, x, y, c.w, c.h, c.id);
+	for (string &o: c.options)
+		setOptions(c.id, o);
 
 	enable(c.id, c.enabled);
 	if (c.image.num > 0)
@@ -420,8 +415,7 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 
 void Panel::embedSource(const string &buffer, const string &parent_id, int x, int y)
 {
-	Resource res;
-	res.load(buffer);
+	Resource res = ParseResource(buffer);
 	embedResource(res, parent_id, x, y);
 }
 

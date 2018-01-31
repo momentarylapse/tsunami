@@ -127,6 +127,8 @@ public:
 	virtual void read_comment();
 	virtual void write_comment(const string &str);
 
+	int float_decimals;
+
 //private:
 	string filename;
 	int handle;

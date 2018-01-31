@@ -1,8 +1,8 @@
 Dialog configurable_dialog "" 200 100
 	Grid grid "" 1 3
 		Grid ? "" 5 1
-			Button load_favorite "" flat image=hui:open tooltip="load parameter"
-			Button save_favorite "" flat image=hui:save tooltip="save parameter"
+			Button load_favorite "" flat image=hui:open "tooltip=load parameter"
+			Button save_favorite "" flat image=hui:save "tooltip=save parameter"
 			.
 			.
 			.

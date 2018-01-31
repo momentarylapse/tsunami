@@ -1,4 +1,4 @@
 Dialog log_console "Nachrichten" 200 100
 	Grid ? "" 2 1
 		ListView log_list "type\\msg" format=it nobar
-		Button clear "" image=hui:clear tooltip="delete all messages"
+		Button clear "" image=hui:clear "tooltip=delete all messages"

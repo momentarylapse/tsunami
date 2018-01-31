@@ -27,7 +27,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.15.-1.0";
+string LibVersion = "0.15.-1.1";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -454,6 +454,15 @@ int _cdecl _Char2Int(char c)
 {	return (int)c;	}
 bool _cdecl _Pointer2Bool(void *p)
 {	return (p != NULL);	}
+string _cdecl kaba_shell_execute(const string &cmd)
+{
+	try{
+		return shell_execute(cmd);
+	}catch(::Exception &e){
+		kaba_raise_exception(new KabaException(e.message()));
+	}
+	return "";
+}
 
 
 Array<Statement> Statements;
@@ -1218,7 +1227,7 @@ void SIAddCommands()
 	add_func("@free",			TypeVoid,		(void*)&free);
 		func_add_param("p",	TypePointer);
 	// system
-	add_func("_exec_",			TypeString,		(void*)&shell_execute);
+	add_func("shell_execute",	TypeString,	(void*)&kaba_shell_execute, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("cmd",	TypeString);
 
 

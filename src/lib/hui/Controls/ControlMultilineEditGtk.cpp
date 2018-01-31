@@ -28,15 +28,6 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_show(scroll);
 	gtk_container_add(GTK_CONTAINER(scroll), widget);
-	if (OptionString.find("monospace") >= 0){
-#if GTK_CHECK_VERSION(3,16,0)
-		gtk_text_view_set_monospace(GTK_TEXT_VIEW(widget), true);
-#else
-		PangoFontDescription *font_desc = pango_font_description_from_string("Monospace 12");
-		gtk_widget_override_font(widget, font_desc);
-		pango_font_description_free(font_desc);
-#endif
-	}
 
 	// frame
 	frame = scroll;
@@ -47,15 +38,7 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&OnGtkMultilineEditChange), this);
-	handle_keys = (OptionString.find("handlekeys") >= 0);
-	if (handle_keys){
-		int mask;
-		g_object_get(G_OBJECT(widget), "events", &mask, NULL);
-		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
-		g_object_set(G_OBJECT(widget), "events", mask, NULL);
-		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
-		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
-	}
+	handle_keys = false;
 	setOptions(OptionString);
 }
 
@@ -87,6 +70,29 @@ void ControlMultilineEdit::setTabSize(int tab_size)
 	PangoTabArray *ta = pango_tab_array_new(1, true);
 	pango_tab_array_set_tab(ta, 0, PANGO_TAB_LEFT, width * tab_size);
 	gtk_text_view_set_tabs(GTK_TEXT_VIEW(widget), ta);
+}
+
+
+void ControlMultilineEdit::__setOption(const string &op, const string &value)
+{
+	if (op == "handlekeys"){
+		handle_keys = true;
+		int mask;
+		g_object_get(G_OBJECT(widget), "events", &mask, NULL);
+		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
+		g_object_set(G_OBJECT(widget), "events", mask, NULL);
+		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
+		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
+	}
+	if (op == "monospace"){
+#if GTK_CHECK_VERSION(3,16,0)
+		gtk_text_view_set_monospace(GTK_TEXT_VIEW(widget), true);
+#else
+		PangoFontDescription *font_desc = pango_font_description_from_string("Monospace 12");
+		gtk_widget_override_font(widget, font_desc);
+		pango_font_description_free(font_desc);
+#endif
+	}
 }
 
 };

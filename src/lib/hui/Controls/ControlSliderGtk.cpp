@@ -83,11 +83,11 @@ void ControlSlider::__setOption(const string &op, const string &value)
 		gtk_range_set_range(GTK_RANGE(widget), vmin, vmax);
 	}else if (op == "origin")
 		gtk_scale_set_has_origin(GTK_SCALE(widget), value._bool());
-	else if (op == "show-value")
+	else if (op == "showvalue")
 		gtk_scale_set_draw_value(GTK_SCALE(widget), value._bool());
 	else if (op == "mark")
 		__addString(value);
-	else if (op == "clear-marks")
+	else if (op == "clearmarks")
 		gtk_scale_clear_marks(GTK_SCALE(widget));
 }
 

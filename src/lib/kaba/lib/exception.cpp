@@ -102,6 +102,15 @@ struct ExceptionBlockData
 	Node *except;
 };
 
+inline bool ex_type_match(Class *ex_type, Class *catch_type)
+{
+	if (ex_type == TypeUnknown)
+		return true;
+	if (catch_type == TypeVoid)
+		return true;
+	return ex_type->is_derived_from(catch_type);
+}
+
 ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 {
 	ExceptionBlockData ebd;
@@ -132,7 +141,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 		if (index > 0)
 			if ((b->nodes[index - 1]->kind == KIND_STATEMENT) and (b->nodes[index - 1]->link_no == STATEMENT_TRY)){
 				auto ee = b->nodes[index + 1];
-				if (!ex_type->is_derived_from(ee->type))
+				if (!ex_type_match(ex_type, ee->type))
 					continue;
 				//msg_write("try...");
 				ebd.needs_killing = blocks.sub(0, bi);
@@ -169,6 +178,8 @@ void relink_return(void *rip, void *rbp, void *rsp)
 
 Class* get_type(void *p)
 {
+	if (!p)
+		return TypeUnknown;
 	void *vtable = *(void**)p;
 	Array<Script*> scripts = PublicScript;
 	for (auto p: Packages)
@@ -272,7 +283,9 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 
 
 	// uncaught...
-	if (ex_type == TypeUnknown)
+	if (!kaba_exception)
+		msg_error("uncaught exception  (nil)");
+	else if (ex_type == TypeUnknown)
 		msg_error("uncaught exception:  " + kaba_exception->message());
 	else
 		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());

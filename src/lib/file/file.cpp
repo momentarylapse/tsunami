@@ -134,6 +134,7 @@ t_file_try_again_func *FileTryAgainFunc;
 File::File()
 {
 	handle = -1;
+	float_decimals = 6;
 }
 
 File::~File()
@@ -160,8 +161,6 @@ class TextFile : public File
 public:
 	TextFile();
 	virtual ~TextFile();
-
-	int float_decimals;
 
 	virtual char read_char();
 	virtual unsigned char read_byte();
@@ -254,8 +253,10 @@ File *FileAppend(const string &filename)
 
 void FileClose(File *f)
 {
-	f->close();
-	delete(f);
+	if (f){
+		f->close();
+		delete(f);
+	}
 }
 
 string FileRead(const string &filename)

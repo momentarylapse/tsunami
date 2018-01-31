@@ -162,15 +162,26 @@ string file_hash(const string &filename, const string &type)
 
 string shell_execute(const string &cmd)
 {
-	int r = system(cmd.c_str());
-	if (r < 0)
-		throw Exception("does not compute");
-	return "";
+	FILE *f = popen(cmd.c_str(), "r");
+	string buffer;
+
+	while(true){
+		int c = fgetc(f);
+		if (c == EOF)
+			break;
+		buffer.add(c);
+	}
+
+	int r = pclose(f);
+//	int r = system(cmd.c_str());
+	if (r != 0)
+		throw Exception("failed to run shell command");
+	return buffer;
 }
 
 
 
-// seach an directory for files matching a filter
+// search a directory for files matching a filter
 Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_directories)
 {
 	Array<DirEntry> entry_list;

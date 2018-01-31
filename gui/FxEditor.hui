@@ -28,7 +28,7 @@ Dialog fx_editor "Effects" 380 516
 			.
 			.
 			.
-			Button add "" expandx flat image=hui:add tooltip="add new effect"
+			Button add "" expandx flat image=hui:add "tooltip=add new effect"
 			.
 			.
 			.

@@ -30,7 +30,7 @@ Dialog midi_fx_editor "Midi Fx" 380 516
 			.
 			.
 			.
-			Button add "" expandx flat image=hui:add tooltip="add new effect"
+			Button add "" expandx flat image=hui:add "tooltip=add new effect"
 			.
 			.
 			.

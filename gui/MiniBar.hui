@@ -2,8 +2,8 @@ Dialog mini_bar "" 400 40
 	Grid ? "" 1 2 expandx border=0
 		Separator ? "" horizontal
 		Grid ? "" 5 1 expandx border=8
-			Button show_bottom_bar "" flat image=hui:up tooltip="Expand"
-			DrawingArea peaks "" width=100 noexpandx noexpandy tooltip="Output level"
-			Slider volume "0\\-10000\\10\\0.1" width=100 noexpandx noexpandy tooltip="Output volume"
+			Button show_bottom_bar "" flat image=hui:up "tooltip=Expand"
+			DrawingArea peaks "" width=100 noexpandx noexpandy "tooltip=Output level"
+			Slider volume "0\\-10000\\10\\0.1" width=100 noexpandx noexpandy "tooltip=Output volume"
 			.
 			.

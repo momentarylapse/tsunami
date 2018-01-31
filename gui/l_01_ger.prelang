@@ -512,7 +512,7 @@ Eigenschaften
 
 menu/scale_bars
 Skalieren
-
+markierte Takte skalieren (durch Verschieben der Markierung links)
 menu/scale_sample
 Skalieren
 
@@ -1245,7 +1245,7 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
   ...keine Sorge, das wird schon!
  - no strings -
  - keine Saiten -
- has crashed.\t\tThe last lines of the file message.txt::
+ has crashed.\t\tThe last lines of the file message.txt:
  ist abgestürtzt.\t\tDie letzten Zeilen der Datei message.txt:
 %d strings: 
 %d Saiten: 
@@ -1355,8 +1355,6 @@ Error in script file: \"%s\"\n%s
 Fehler in Script-Datei: \"%s\"\n%s
 Export file
 Datei exportieren
-Failed writing header to output stream\n
-Failed writing header to output stream\n
 File properties
 Datei Eigenschaften
 Flute
@@ -1543,4 +1541,5 @@ unknown file extension:
 unbekannte Dateiendung: 
 unknown synthesizer: 
 unbekannter Synthesizer: 
-#
+Failed writing header to output stream\n
+Konnte Header nicht in Ausgabe Stream schreiben\n

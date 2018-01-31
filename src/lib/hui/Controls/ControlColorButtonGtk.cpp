@@ -23,8 +23,6 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 {
 	GetPartStrings(title);
 	widget = gtk_color_button_new();
-	if (OptionString.find("alpha") >= 0)
-		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
 	setOptions(OptionString);
@@ -56,6 +54,12 @@ color ControlColorButton::getColor()
 	col.b = gcol.blue;
 	col.a = gcol.alpha;
 	return col;
+}
+
+void ControlColorButton::__setOption(const string &op, const string &value)
+{
+	if (op == "alpha")
+		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);
 }
 
 };

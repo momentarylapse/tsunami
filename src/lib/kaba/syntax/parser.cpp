@@ -1250,12 +1250,12 @@ void SyntaxTree::ParseStatementTry(Block *block)
 			string ex_name = Exp.cur;
 			int v = new_block->add_var(ex_name, ex_type);
 			cmd_ex->params.add(AddNode(KIND_VAR_LOCAL, v, ex_type));
+			Exp.next();
 		}
 	}
 
 	int last_indent = Exp.indent_0;
 
-	Exp.next();
 	ExpectNewline();
 	// ...block
 	Exp.next_line();

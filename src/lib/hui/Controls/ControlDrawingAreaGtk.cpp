@@ -254,6 +254,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
 	GetPartStrings(title);
+	// FIXME: this needs to be supplied as title... fromSource() won't work...
 	is_opengl = (OptionString.find("opengl") >= 0);
 	GtkWidget *da;
 	if (is_opengl){
@@ -289,11 +290,6 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	//mask = GDK_ALL_EVENTS_MASK;
 //	g_object_set(G_OBJECT(da), "events", mask, NULL);
 
-	grab_focus = (OptionString.find("grabfocus") >= 0);
-	if (grab_focus){
-		gtk_widget_set_can_focus(da, true);
-		gtk_widget_grab_focus(da);
-	}
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);

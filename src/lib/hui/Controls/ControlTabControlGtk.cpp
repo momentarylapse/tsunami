@@ -34,8 +34,6 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 	cur_page = 0;
 	g_signal_connect(G_OBJECT(widget), "switch-page", G_CALLBACK(&OnGtkTabControlSwitch), this);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
-	if (OptionString.find("nobar") >= 0)
-		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
 	setOptions(OptionString);
 }
 

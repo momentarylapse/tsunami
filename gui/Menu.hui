@@ -45,7 +45,7 @@ Menu menu "" disabled
 		Item add_pause "Add pause" image=hui:add
 		Item delete_bars "Delete" image=hui:delete
 		Item edit_bars "Edit" image=hui:edit
-		Item scale_bars "Scale" image=hui:zoom-in tooltip="scale selected bars (by moving the selection on the left)"
+		Item scale_bars "Scale" image=hui:zoom-in "tooltip=scale selected bars (by moving the selection on the left)"
 		Item bar_link_to_data "Edit data" checkable
 	Menu menu_sub "Samples"
 		Item sample_manager "Manage..." image=hui:properties

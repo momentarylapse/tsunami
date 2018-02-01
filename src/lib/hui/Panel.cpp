@@ -316,7 +316,7 @@ void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id
 	setTarget(parent_id, cmd.x);
 	addControl(cmd.type, GetLanguageR(ns, cmd),
 				cmd.x, cmd.y,
-				cmd.w, cmd.h,
+				1, 1,
 				cmd.id);
 
 	enable(cmd.id, cmd.enabled());
@@ -343,8 +343,12 @@ void Panel::fromResource(const string &id)
 		win->setTitle(GetLanguage(id, res->id));
 
 	// size
-	if (win)
-		win->setSize(res->w, res->h);
+	if (win){
+		int width = res->value("width", "0")._int();
+		int height = res->value("height", "0")._int();
+		if (width + height > 0)
+			win->setSize(width, height);
+	}
 
 	this->id = id;
 
@@ -371,7 +375,10 @@ void Panel::fromSource(const string &buffer)
 	Resource res = ParseResource(buffer);
 	if (res.type == "Dialog"){
 		if (win){
-			win->setSize(res.w, res.h);
+			int width = res.value("width", "0")._int();
+			int height = res.value("height", "0")._int();
+			if (width + height > 0)
+				win->setSize(width, height);
 			win->setTitle(res.title);
 		}
 
@@ -397,7 +404,7 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 	string title = GetLanguageR(ns, c);
 	//if (c.options.num > 0)
 	//	title = "!" + implode(c.options, ",") + "\\" + title;
-	addControl(c.type, title, x, y, c.w, c.h, c.id);
+	addControl(c.type, title, x, y, 1, 1, c.id);
 	for (string &o: c.options)
 		setOptions(c.id, o);
 

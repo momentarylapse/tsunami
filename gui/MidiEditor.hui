@@ -1,48 +1,55 @@
-Dialog midi_editor "Midi" 380 516
-	Grid ? "" 1 4
-		Grid me_grid_no "" 1 1
+Dialog midi_editor "Midi" width=380 height=516
+	Grid ? ""
+		Grid me_grid_no ""
 			Text ld_t_no_midi "No midi track selected" expandx center italic
-		Grid me_grid_yes "" 1 4
+		---|
+		Grid me_grid_yes ""
 			Group me_group_view "View"
-				Grid ? "" 2 4
+				Grid ? ""
 					Text me_t_mode "Mode:"
-					Grid ? "" 3 1
+					Grid ? ""
 						RadioButton mode:linear "Linear" expandx
 						RadioButton mode:classical "Classical" expandx
 						RadioButton mode:tab "Tab" expandx
+					---|
 					Text me_t_partition "Sub beats"
-					SpinButton beat_partition "4\\1\\256" expandx
+					SpinButton beat_partition "4" range=1:256 expandx
+					---|
 					Text me_t_scale "Scale"
-					Grid ? "" 2 1
+					Grid ? ""
 						ComboBox scale_root "" expandx
 						ComboBox scale_type "" expandx
+			---|
 			Group me_group_creation "Creation"
-				Grid ? "" 1 2
+				Grid ? ""
 					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord"
 						.
-						Grid ? "" 1 1
-							.
-						Grid me_group_interval "" 2 1
+						Grid ? ""
+							---|
+						Grid me_group_interval ""
 							Text ld_t_interval "Interval"
-							SpinButton interval "0\\-99\\99"
-						Grid ? "" 3 2
-							Text ld_t_space "" width=12
+							SpinButton interval "0" range=-99:99
+						Grid ? ""
 							Text ld_t_chord "Type"
 							ComboBox chord_type "" expandx
-							.
+							---|
 							Text ld_t_inversion "Inversion"
 							ComboBox chord_inversion ""
-					Grid ? "" 5 1
+					---|
+					Grid ? ""
 						Text me_t_modifier "Modifier:"
 						RadioButton modifier:none "none" expandx
 						RadioButton modifier:sharp "♯" expandx
 						RadioButton modifier:flat "♭" expandx
 						RadioButton modifier:natural "♮" expandx
+			---|
 			Expander me_group_reference "Reference tracks"
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
+		---|
 		Text ? "" expandy
+		---|
 		Group me_group_edit "Edit"
-			Grid ? "" 3 1
+			Grid ? ""
 				Button /edit_song "File"
 				Button /edit_track "Track"
 				Button /edit_midi_fx "Midi-Fx"

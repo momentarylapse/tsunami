@@ -165,14 +165,17 @@ class PADPanel extends ConfigPanel
 		super.__init__(_s)
 		pc = &c.config
 		fromSource("
-Grid ? '' 1 2
-	Grid ? '' 2 3
+Grid ? ''
+	Grid ? ''
 		Text ? 'bw'
-		SpinButton bw '0\\0\\10\\0.01'
+		SpinButton bw '0' range=0:10:0.01
+		---|
 		Text ? 'bwscale'
-		SpinButton bwscale '0\\0\\10\\0.01'
+		SpinButton bwscale '0' range=0:10:0.01
+		---|
 		Text ? 'detune'
-		SpinButton detune '0\\-10\\10\\0.01'
+		SpinButton detune '0' range=-10:10:0.01
+	---|
 	DrawingArea drawing '' grabfocus height=300 noexpandy")
 		event("bw", &onChange)
 		event("bwscale", &onChange)

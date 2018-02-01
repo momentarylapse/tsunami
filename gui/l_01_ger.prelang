@@ -118,13 +118,13 @@ bar_add_dialog/bar_add_dialog
 neue Takte
 
 bar_add_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_add_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_add_dialog/count
-1\\1\\10000\\1
+1
 
 bar_add_dialog/insert:after
 danach
@@ -133,7 +133,7 @@ bar_add_dialog/insert:before
 davor
 
 bar_add_dialog/sub_beats
-1\\1\\24\\1
+1
 
 bar_add_dialog/t_sub_beats
 Teil-Schläge
@@ -142,10 +142,10 @@ bar_edit_dialog/bar_edit_dialog
 Takte bearbeiten
 
 bar_edit_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_edit_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_edit_dialog/edit_beats
 Schläge
@@ -157,7 +157,7 @@ bar_edit_dialog/edit_sub_beats
 Teil-Schläge
 
 bar_edit_dialog/sub_beats
-1\\1\\24\\1
+1
 
 bars_dialog/add_bar
 Takt
@@ -595,10 +595,10 @@ menu_fake/stop
 Stopp
 
 midi_editor/beat_partition
-4\\1\\256
+4
 
 midi_editor/interval
-0\\-99\\99
+0
 
 midi_editor/ld_t_chord
 Typ
@@ -697,7 +697,7 @@ mini_bar/show_bottom_bar
 
 Leiste aufklappen
 mini_bar/volume
-0\\-10000\\10\\0.1
+0
 Ausgabelautstärke
 mixing-console/link-volumes
 koppeln
@@ -712,10 +712,10 @@ mixing-console/t_output
 Ausgabe
 
 new_dialog/beats_per_bar
-4\\1\\99
+4
 
 new_dialog/beats_per_minute
-90\\0\\999\\0.1
+90
 
 new_dialog/metronome
 einfügen
@@ -748,10 +748,10 @@ new_dialog/new_track_type:midi
 Midi
 
 new_dialog/num_bars
-10\\0\\999
+10
 
 new_dialog/sub_beats
-4\\1\\24
+4
 
 new_dialog/t_sub_beats
 Teil-Schläge pro Schlag
@@ -760,7 +760,7 @@ pause_add_dialog/count
 
 
 pause_add_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_add_dialog/insert:after
 danach
@@ -778,7 +778,7 @@ pause_add_dialog/t_s
 s
 
 pause_edit_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_edit_dialog/pause_edit_dialog
 Pause bearbeiten
@@ -862,7 +862,7 @@ raw_config_dialog/raw_config_dialog
 Raw Datei
 
 raw_config_dialog/sample_rate
-44100\\1
+44100
 
 raw_config_dialog/t_channels
 Kanäle
@@ -1003,43 +1003,43 @@ sample_ref_dialog/mute
 Stumm
 
 sample_ref_dialog/repdelay
-0\\0\\\\0.1
+0
 
 sample_ref_dialog/repnum
-1\\1
+1
 
 sample_ref_dialog/sample_ref_dialog
 Sub Track
 
 sample_ref_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 sample_scale_dialog/factor
-0\\0\\1000\\0.01
+0
 
 sample_scale_dialog/method
 Linear\\Kubisch\\Sinc\\Fourier
 
 sample_scale_dialog/rate_inv_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_inv_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/sample_scale_dialog
 Sample skalieren
 
 sample_scale_dialog/samples_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/samples_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/ssd_t_factor
 Faktor %
@@ -1147,10 +1147,10 @@ track-mixer/mute
 Stumm
 
 track-mixer/panning
-0\\-100\\100\\1
+0
 Balance
 track-mixer/volume
-0\\-10000\\10\\0.1
+0
 Lautstärke in dB
 track_dialog/_edit_fx
 Bearbeiten
@@ -1195,7 +1195,7 @@ track_dialog/g_volume
 Lautstärke
 
 track_dialog/panning
-0\\-100\\100\\1
+0
 
 track_dialog/select_synth
 
@@ -1213,7 +1213,7 @@ track_dialog/track_dialog
 Spur
 
 track_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 trackdest_dialog/track_list
 Spur

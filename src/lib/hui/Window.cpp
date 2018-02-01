@@ -84,7 +84,9 @@ Window::Window(const string &id, Window *parent)
 	for (string &o: res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
-	_init_(GetLanguage(id, id), -1, -1, res->w, res->h, parent, allow_parent, mode);
+	int width = res->value("width", "300")._int();
+	int height = res->value("height", "200")._int();
+	_init_(GetLanguage(id, id), -1, -1, width, height, parent, allow_parent, mode);
 
 	// menu/toolbar?
 	for (string &o: res->options){

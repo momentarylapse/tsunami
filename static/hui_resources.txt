@@ -1,4 +1,4 @@
-t6
+t7
 // Number Of Resources
 44
 // Resource
@@ -7,79 +7,59 @@ menu_fake
 disabled
 0
 0
-1
-1
 2
 Item
 play
 
 0
 0
-1
-1
 0
 Item
 stop
 
-0
-0
 1
-1
+0
 0
 // Resource
 Dialog
 bar_add_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
 
 0
 0
-2
-4
 8
 Text
 bad_t_count
 
 0
 0
-1
-1
 0
 SpinButton
 count
-expandx
+range=1:10000:1,expandx
 1
 0
-1
-1
 0
 Text
 bad_t_beats
 
 0
 1
-1
-1
 0
 SpinButton
 beats
-expandx
-1
-1
+range=1:1000:1,expandx
 1
 1
 0
@@ -88,32 +68,24 @@ t_sub_beats
 
 0
 2
-1
-1
 0
 SpinButton
 sub_beats
-expandx
+range=1:24:1,expandx
 1
 2
-1
-1
 0
 Text
 bad_t_bpm
 
 0
 3
-1
-1
 0
 SpinButton
 bpm
-expandx
+range=0:1000:0.1,expandx
 1
 3
-1
-1
 0
 Grid
 ?
@@ -121,78 +93,58 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Dialog
 bar_edit_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
 
 0
 0
-2
-3
 6
 CheckBox
 edit_beats
 
 0
 0
-1
-1
 0
 SpinButton
 beats
-expandx
+range=1:1000:1,expandx
 1
 0
-1
-1
 0
 CheckBox
 edit_sub_beats
 
 0
 1
-1
-1
 0
 SpinButton
 sub_beats
-expandx
-1
-1
+range=1:24:1,expandx
 1
 1
 0
@@ -201,16 +153,12 @@ edit_bpm
 
 0
 2
-1
-1
 0
 SpinButton
 bpm
-expandx
+range=0:1000:0.1,expandx
 1
 2
-1
-1
 0
 Grid
 ?
@@ -218,129 +166,97 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Dialog
 configurable_dialog
-
+width=200,height=100
 0
 0
-200
-100
 1
 Grid
 grid
 
 0
 0
-1
-3
 2
 Grid
 ?
 
 0
 0
-5
-1
 2
 Button
 load_favorite
 flat,image=hui:open
 0
 0
-1
-1
 0
 Button
 save_favorite
 flat,image=hui:save
 1
 0
-1
-1
 0
 Grid
 ?
 buttonbar
 0
 2
-4
-1
 4
 Button
 preview
 image=hui:media-play
 0
 0
-1
-1
 0
 Text
 ?
 width=30
 1
 0
-1
-1
 0
 Button
 cancel
 image=hui:cancel
 2
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 3
 0
-1
-1
 0
 // Resource
 Dialog
 configurable-selection-dialog
-
+width=400,height=500
 0
 0
-400
-500
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 TreeView
 list
 
 0
 0
-1
-1
 0
 Grid
 ?
@@ -348,55 +264,41 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 
 0
 0
-1
-1
 0
 Button
 ok
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 curve_console
-
+width=380,height=516
 0
 0
-380
-516
 1
 Grid
 ?
 
 0
 0
-1
-3
 3
 ListView
 curves
 expandx,format=TTTt
 0
 0
-1
-1
 0
 Grid
 controller_buttons
 
 0
-1
-4
 1
 3
 Button
@@ -404,24 +306,18 @@ add
 image=hui:add
 0
 0
-1
-1
 0
 Button
 delete
 image=hui:delete
 1
 0
-1
-1
 0
 Button
 target
 
 2
 0
-1
-1
 0
 Group
 cc_group_edit
@@ -429,71 +325,53 @@ cc_group_edit
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
-3
-1
 3
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 Button
 edit_fx
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 curve-target-dialog
-
+width=300,height=400
 0
 0
-300
-400
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 ListView
 list
 multiselection,nobar
 0
 0
-1
-1
 0
 Grid
 ?
 buttonbar
 0
-1
-2
 1
 2
 Button
@@ -501,58 +379,44 @@ cancel
 
 0
 0
-1
-1
 0
 Button
 ok
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 trackdest_dialog
-
+width=400,height=300
 0
 0
-400
-300
 1
 ListView
 track_list
 
 0
 0
-1
-1
 0
 // Resource
 Dialog
 detune_synthesizer_dialog
-
+width=400,height=400
 0
 0
-400
-400
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 DrawingArea
 detune_area
 expandx,expandy
 0
 0
-1
-1
 0
 Grid
 ?
@@ -560,144 +424,108 @@ buttonbar
 0
 1
 3
-1
-3
 CheckBox
 relative
 
 0
 0
-1
-1
 0
 CheckBox
 all_octaves
 
 1
 0
-1
-1
 0
 Button
 close
 image=hui:close
 2
 0
-1
-1
 0
 // Resource
 Dialog
 device-manager
-
+width=400,height=200
 0
 0
-400
-200
 1
 Grid
 ?
 
 0
 0
-2
-1
 2
 TabControl
 dev-tab
 
 0
 0
-1
-1
 3
 ListView
 output-list
 format=ttttCc,reorderable
 0
 0
-1
-1
 0
 ListView
 input-list
 format=ttttCcT,reorderable
 1
 0
-1
-1
 0
 ListView
 midi-input-list
 format=tttCc,reorderable
 2
 0
-1
-1
 0
 Grid
 ?
 
 1
 0
-1
-2
 1
 Button
 erase
 flat,image=hui:delete
 0
 0
-1
-1
 0
 // Resource
 Dialog
 fx_editor
-
+width=380,height=516
 0
 0
-380
-516
 1
 Grid
 ?
 
 0
 0
-1
-3
 3
 Grid
 fx_inner_table
 
 0
 0
-1
-32
 2
 Text
 comment_no_fx
 center,italic
 0
 0
-1
-1
 0
 Button
 add
 expandx,flat,image=hui:add
 0
-27
-1
-1
+26
 0
 Text
 ?
 expandy
 0
-1
-1
 1
 0
 Group
@@ -706,40 +534,30 @@ fe_g_edit
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 fx_panel
-
+width=200,height=200
 0
 0
-200
-200
 1
 Grid
 grid
@@ -747,87 +565,65 @@ expandx,noexpandy
 0
 0
 1
-2
-1
 Grid
 ?
 
 0
 0
-5
-1
 5
 Button
 load_favorite
 flat,image=hui:open
 0
 0
-1
-1
 0
 Button
 save_favorite
 flat,image=hui:save
 1
 0
-1
-1
 0
 Text
 name
 bold,center,expandx
 2
 0
-1
-1
 0
 CheckBox
 enabled
 
 3
 0
-1
-1
 0
 Button
 delete
 flat,image=hui:delete
 4
 0
-1
-1
 0
 // Resource
 Dialog
 layer_dialog
-
+width=430,height=375
 0
 0
-430
-375
 1
 Grid
 lvld_grid_1
 expandy
 0
 0
-1
-3
 3
 ListView
 layers
 format=tTC,select-single,reorderable
 0
 0
-1
-1
 0
 Grid
 ?
 
 0
-1
-3
 1
 3
 Button
@@ -835,24 +631,18 @@ add_layer
 flat,image=hui:add
 0
 0
-1
-1
 0
 Button
 delete_layer
 flat,image=hui:delete
 1
 0
-1
-1
 0
 Button
 merge_layer
 flat,image=hui:paste
 2
 0
-1
-1
 0
 Group
 lvld_t_edit
@@ -860,32 +650,24 @@ lvld_t_edit
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
-2
-1
 1
 Button
 edit_song
 
 0
 0
-1
-1
 0
 // Resource
 Dialog
 log_console
-
+width=200,height=100
 0
 0
-200
-100
 1
 Grid
 ?
@@ -893,23 +675,17 @@ Grid
 0
 0
 2
-1
-2
 ListView
 log_list
 format=it,nobar
 0
 0
-1
-1
 0
 Button
 clear
 image=hui:clear
 1
 0
-1
-1
 0
 // Resource
 Toolbar
@@ -917,49 +693,37 @@ log_toolbar
 
 0
 0
-1
-1
 2
 Item
 log_clear
 
 0
 0
-1
-1
 0
 Item
 log_close
 
-0
-0
 1
-1
+0
 0
 // Resource
 Dialog
 marker_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Edit
 text
 expandx
 0
 0
-1
-1
 0
 Grid
 ?
@@ -967,23 +731,17 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Menu
@@ -991,769 +749,577 @@ menu
 disabled
 0
 0
-1
-1
 10
 Menu
 menu_file
 
 0
 0
-1
-1
 10
 Item
 new
 image=hui:new
 0
 0
-1
-1
 0
 Item
 open
 image=hui:open
-0
-0
 1
-1
+0
 0
 Separator
 
 
+2
 0
-0
-1
-1
 0
 Item
 save
 image=hui:save
+3
 0
-0
-1
-1
 0
 Item
 save_as
 image=hui:save-as
+4
 0
-0
-1
-1
 0
 Item
 export_selection
 image=hui:save-as
+5
 0
-0
-1
-1
 0
 Separator
 
 
+6
 0
-0
-1
-1
 0
 Item
 song_properties
 image=hui:properties
+7
 0
-0
-1
-1
 0
 Separator
 
 
+8
 0
-0
-1
-1
 0
 Item
 exit
 image=hui:quit
+9
 0
-0
-1
-1
 0
 Menu
 menu_edit
 
-0
-0
 1
-1
+0
 13
 Item
 undo
 image=hui:undo
 0
 0
-1
-1
 0
 Item
 redo
 image=hui:redo
-0
-0
 1
-1
+0
 0
 Separator
 
 
+2
 0
-0
-1
-1
 0
 Item
 select_all
 image=hui:select-all
+3
 0
-0
-1
-1
 0
 Item
 select_nothing
 image=hui:delete
+4
 0
-0
-1
-1
 0
 Item
 select_expand
 
+5
 0
-0
-1
-1
 0
 Separator
 
 
+6
 0
-0
-1
-1
 0
 Item
 copy
 image=hui:copy
+7
 0
-0
-1
-1
 0
 Item
 paste
 image=hui:paste
+8
 0
-0
-1
-1
 0
 Item
 paste_as_samples
 image=hui:paste
+9
 0
-0
-1
-1
 0
 Item
 delete
 image=hui:delete
+10
 0
-0
-1
-1
 0
 Separator
 
 
+11
 0
-0
-1
-1
 0
 Item
 settings
 image=hui:preferences
+12
 0
-0
-1
-1
 0
 Menu
 menu_track
 
+2
 0
-0
-1
-1
 6
 Item
 track_import
 image=hui:open
 0
 0
-1
-1
 0
 Item
 track_render
 
-0
-0
 1
-1
+0
 0
 Separator
 
 
+2
 0
-0
-1
-1
 0
 Item
 add_track
 image=hui:add
+3
 0
-0
-1
-1
 0
 Item
 add_midi_track
 image=hui:add
+4
 0
-0
-1
-1
 0
 Item
 add_time_track
 image=hui:add
+5
 0
-0
-1
-1
 0
 Menu
 menu_layer
 
+3
 0
-0
-1
-1
 8
 Item
 layer_manager
 image=hui:properties
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 layer_add
 image=hui:add
+2
 0
-0
-1
-1
 0
 Item
 layer_delete
 image=hui:delete
+3
 0
-0
-1
-1
 0
 Separator
 
 
+4
 0
-0
-1
-1
 0
 Menu
 menu_layer_target
 
+5
 0
-0
-1
-1
 0
 Item
 layer_up
 image=hui:up
+6
 0
-0
-1
-1
 0
 Item
 layer_down
 image=hui:down
+7
 0
-0
-1
-1
 0
 Menu
 menu_bars
 
+4
 0
-0
-1
-1
 6
 Item
 add_bars
 flat,image=hui:add
 0
 0
-1
-1
 0
 Item
 add_pause
 image=hui:add
-0
-0
 1
-1
+0
 0
 Item
 delete_bars
 image=hui:delete
+2
 0
-0
-1
-1
 0
 Item
 edit_bars
 image=hui:edit
+3
 0
-0
-1
-1
 0
 Item
 scale_bars
 image=hui:zoom-in
+4
 0
-0
-1
-1
 0
 Item
 bar_link_to_data
 checkable
+5
 0
-0
-1
-1
 0
 Menu
 menu_sub
 
+5
 0
-0
-1
-1
 4
 Item
 sample_manager
 image=hui:properties
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 sample_from_selection
 image=hui:cut
+2
 0
-0
-1
-1
 0
 Item
 insert_sample
 image=hui:add
+3
 0
-0
-1
-1
 0
 Menu
 menu_view
 
+6
 0
-0
-1
-1
 8
 Menu
 menu_view_midi
 
 0
 0
-1
-1
 3
 Item
 view_midi_default
 checkable
 0
 0
-1
-1
 0
 Item
 view_midi_tab
 checkable
-0
-0
 1
-1
+0
 0
 Item
 view_midi_score
 checkable
+2
 0
-0
-1
-1
 0
 Item
 show_mixing_console
 checkable
-0
-0
 1
-1
+0
 0
 Item
 show_fx_console
 checkable
+2
 0
-0
-1
-1
 0
 Separator
 
 
+3
 0
-0
-1
-1
 0
 Item
 zoom_in
 image=hui:zoom-in
+4
 0
-0
-1
-1
 0
 Item
 zoom_out
 image=hui:zoom-out
+5
 0
-0
-1
-1
 0
 Item
 view_optimal
 image=hui:zoom-fit
+6
 0
-0
-1
-1
 0
 Item
 view_samples
 image=hui:zoom-one
+7
 0
-0
-1
-1
 0
 Menu
 menu_sound
 
+7
 0
-0
-1
-1
 6
 Item
 play
 image=hui:media-play
 0
 0
-1
-1
 0
 Item
 pause
 image=hui:media-pause
-0
-0
 1
-1
+0
 0
 Item
 stop
 image=hui:media-stop
+2
 0
-0
-1
-1
 0
 Item
 play_loop
 checkable
+3
 0
-0
-1
-1
 0
 Separator
 
 
+4
 0
-0
-1
-1
 0
 Item
 record
 image=hui:media-record
+5
 0
-0
-1
-1
 0
 Menu
 menu_plugins
 
+8
 0
-0
-1
-1
 15
 Item
 run_plugin
 image=hui:execute
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 plugin_on_file
 disabled
+2
 0
-0
-1
-1
 0
 Menu
 menu_plugins_channels
 
+3
 0
-0
-1
-1
 0
 Menu
 menu_plugins_dynamics
 
+4
 0
-0
-1
-1
 0
 Menu
 menu_plugins_echo
 
+5
 0
-0
-1
-1
 0
 Menu
 menu_plugins_pitch
 
+6
 0
-0
-1
-1
 0
 Menu
 menu_plugins_repair
 
+7
 0
-0
-1
-1
 0
 Menu
 menu_plugins_sound
 
+8
 0
-0
-1
-1
 0
 Menu
 menu_plugins_synthesizer
 
+9
 0
-0
-1
-1
 0
 Separator
 
 
+10
 0
-0
-1
-1
 0
 Menu
 menu_plugins_on_midi
 
+11
 0
-0
-1
-1
 0
 Separator
 
 
+12
 0
-0
-1
-1
 0
 Menu
 menu_plugins_on_all
 
+13
 0
-0
-1
-1
 0
 Menu
 menu_plugins_other
 
+14
 0
-0
-1
-1
 0
 Menu
 menu_help
 
+9
 0
-0
-1
-1
 4
 Item
 help
 image=hui:help
 0
 0
-1
-1
 0
 Item
 show_log
 image=hui:info
-0
-0
 1
-1
+0
 0
 Separator
 
 
+2
 0
-0
-1
-1
 0
 Item
 about
 image=hui:about
+3
 0
-0
-1
-1
 0
 // Resource
 Dialog
 midi_editor
-
+width=380,height=516
 0
 0
-380
-516
 1
 Grid
 ?
 
 0
 0
-1
-4
 4
 Grid
 me_grid_no
@@ -1761,23 +1327,17 @@ me_grid_no
 0
 0
 1
-1
-1
 Text
 ld_t_no_midi
 expandx,center,italic
 0
 0
-1
-1
 0
 Grid
 me_grid_yes
 
 0
 1
-1
-4
 3
 Group
 me_group_view
@@ -1785,23 +1345,17 @@ me_group_view
 0
 0
 1
-1
-1
 Grid
 ?
 
 0
 0
-2
-4
 6
 Text
 me_t_mode
 
 0
 0
-1
-1
 0
 Grid
 ?
@@ -1809,45 +1363,33 @@ Grid
 1
 0
 3
-1
-3
 RadioButton
 mode:linear
 expandx
 0
 0
-1
-1
 0
 RadioButton
 mode:classical
 expandx
 1
 0
-1
-1
 0
 RadioButton
 mode:tab
 expandx
 2
 0
-1
-1
 0
 Text
 me_t_partition
 
 0
 1
-1
-1
 0
 SpinButton
 beat_partition
-expandx
-1
-1
+range=1:256,expandx
 1
 1
 0
@@ -1856,8 +1398,6 @@ me_t_scale
 
 0
 2
-1
-1
 0
 Grid
 ?
@@ -1865,23 +1405,17 @@ Grid
 1
 2
 2
-1
-2
 ComboBox
 scale_root
 expandx
 0
 0
-1
-1
 0
 ComboBox
 scale_type
 expandx
 1
 0
-1
-1
 0
 Group
 me_group_creation
@@ -1889,31 +1423,23 @@ me_group_creation
 0
 1
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 TabControl
 midi_edit_mode
 
 0
 0
-1
-1
 3
 Grid
 ?
 
 1
 0
-1
-1
 0
 Grid
 me_group_interval
@@ -1921,69 +1447,45 @@ me_group_interval
 2
 0
 2
-1
-2
 Text
 ld_t_interval
 
 0
 0
-1
-1
 0
 SpinButton
 interval
-
+range=-99:99
 1
 0
-1
-1
 0
 Grid
 ?
 
 3
 0
-3
-2
-5
-Text
-ld_t_space
-width=12
-0
-0
-1
-1
-0
+4
 Text
 ld_t_chord
 
-1
 0
-1
-1
+0
 0
 ComboBox
 chord_type
 expandx
-2
+1
 0
-1
-1
 0
 Text
 ld_t_inversion
 
-1
-1
-1
+0
 1
 0
 ComboBox
 chord_inversion
 
-2
-1
 1
 1
 0
@@ -1991,8 +1493,6 @@ Grid
 ?
 
 0
-1
-5
 1
 5
 Text
@@ -2000,40 +1500,30 @@ me_t_modifier
 
 0
 0
-1
-1
 0
 RadioButton
 modifier:none
 expandx
 1
 0
-1
-1
 0
 RadioButton
 modifier:sharp
 expandx
 2
 0
-1
-1
 0
 RadioButton
 modifier:flat
 expandx
 3
 0
-1
-1
 0
 RadioButton
 modifier:natural
 expandx
 4
 0
-1
-1
 0
 Expander
 me_group_reference
@@ -2041,23 +1531,17 @@ me_group_reference
 0
 2
 1
-1
-1
 ListView
 reference_tracks
 height=200,noexpandy,nobar,select-multi
 0
 0
-1
-1
 0
 Text
 ?
 expandy
 0
 2
-1
-1
 0
 Group
 me_group_edit
@@ -2065,56 +1549,42 @@ me_group_edit
 0
 3
 1
-1
-1
 Grid
 ?
 
 0
 0
-3
-1
 3
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 Button
 edit_midi_fx
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 midi_fx_editor
-
+width=380,height=516
 0
 0
-380
-516
 1
 Grid
 ?
 expandy
 0
 0
-1
-4
 4
 Grid
 me_grid_no
@@ -2122,47 +1592,35 @@ me_grid_no
 0
 0
 1
-1
-1
 Text
 mfx_t_no_midi
 expandx,center,italic
 0
 0
-1
-1
 0
 Grid
 midi_fx_inner_table
 
 0
 1
-1
-32
 2
 Text
 comment_no_fx
 center,italic
 0
 0
-1
-1
 0
 Button
 add
 expandx,flat,image=hui:add
 0
-27
-1
-1
+26
 0
 Text
 ?
 expandy
 0
 2
-1
-1
 0
 Group
 mfe_g_edit
@@ -2170,71 +1628,53 @@ mfe_g_edit
 0
 3
 1
-1
-1
 Grid
 ?
 
 0
 0
-3
-1
 3
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 Button
 edit_midi
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 mini_bar
-
+width=400,height=40
 0
 0
-400
-40
 1
 Grid
 ?
 expandx,border=0
 0
 0
-1
-2
 2
 Separator
 
 
 0
 0
-1
-1
 0
 Grid
 ?
 expandx,border=8
 0
-1
-5
 1
 3
 Button
@@ -2242,33 +1682,25 @@ show_bottom_bar
 flat,image=hui:up
 0
 0
-1
-1
 0
 DrawingArea
 peaks
 width=100,noexpandx,noexpandy
 1
 0
-1
-1
 0
 Slider
 volume
 width=100,noexpandx,noexpandy
 2
 0
-1
-1
 0
 // Resource
 Dialog
 mixing-console
-
+width=300,height=200
 0
 0
-300
-200
 1
 Grid
 ?
@@ -2276,30 +1708,22 @@ Grid
 0
 0
 4
-1
-4
 Grid
 ?
 
 0
 0
-1
-3
 3
 Text
 t_output
 bold,center
 0
 0
-1
-1
 0
 DrawingArea
 output-peaks
 width=100,height=30,noexpandx,noexpandy
 0
-1
-1
 1
 0
 Slider
@@ -2307,49 +1731,37 @@ output-volume
 vertical,expandy
 0
 2
-1
-1
 0
 Separator
 
 
 1
 0
-1
-1
 0
 Grid
 inner-grid
 
 2
 0
-1
-20
 0
 CheckBox
 link-volumes
 
 3
 0
-1
-1
 0
 // Resource
 Dialog
 new_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-4
 4
 Group
 nd_g_frequency
@@ -2357,31 +1769,23 @@ nd_g_frequency
 0
 0
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 ComboBox
 sample_rate
 expandx,editable
 0
 0
-1
-1
 0
 Text
 per_second
 
 1
 0
-1
-1
 0
 Group
 nd_g_track
@@ -2389,31 +1793,23 @@ nd_g_track
 0
 1
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 RadioButton
 new_track_type:audio
 
 0
 0
-1
-1
 0
 RadioButton
 new_track_type:midi
 
 1
 0
-1
-1
 0
 Group
 nd_g_metronome
@@ -2421,69 +1817,51 @@ nd_g_metronome
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 CheckBox
 metronome
 
 0
 0
-1
-1
 0
 Grid
 nd_g_metronome_params
 
 0
 1
-3
-3
 9
 Text
 nd_t_bpm
 
 0
 0
-1
-1
 0
 SpinButton
 beats_per_minute
-
+range=0:999:0.1
 1
 0
-1
-1
 0
 Text
 per_minute
 
 2
 0
-1
-1
 0
 Text
 nd_t_bars
 
 0
 1
-1
-1
 0
 SpinButton
 num_bars
-
-1
-1
+range=0:999
 1
 1
 0
@@ -2492,32 +1870,24 @@ nd_t_beats
 
 0
 2
-1
-1
 0
 SpinButton
 beats_per_bar
-
+range=1:99
 1
 2
-1
-1
 0
 Text
 t_sub_beats
 
 0
 3
-1
-1
 0
 SpinButton
 sub_beats
-
+range=1:24
 1
 3
-1
-1
 0
 Grid
 ?
@@ -2525,72 +1895,54 @@ buttonbar
 0
 3
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Dialog
 pause_add_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
 
 0
 0
-3
-1
 3
 Text
 t_duration
 
 0
 0
-1
-1
 0
 SpinButton
 duration
-expandx
+range=0:10000:0.001,expandx
 1
 0
-1
-1
 0
 Text
 t_s
 
 2
 0
-1
-1
 0
 Grid
 ?
@@ -2598,72 +1950,54 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Dialog
 pause_edit_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
 
 0
 0
-3
-1
 3
 Text
 t_duration
 
 0
 0
-1
-1
 0
 SpinButton
 duration
-expandx
+range=0:10000:0.001,expandx
 1
 0
-1
-1
 0
 Text
 t_s
 
 2
 0
-1
-1
 0
 Grid
 ?
@@ -2671,23 +2005,17 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Menu
@@ -2695,40 +2023,30 @@ popup_marker_menu
 
 0
 0
-1
-1
 4
 Item
 marker_menu_header
 disabled
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 edit_marker
 
+2
 0
-0
-1
-1
 0
 Item
 delete_marker
 
+3
 0
-0
-1
-1
 0
 // Resource
 Menu
@@ -2736,56 +2054,42 @@ popup_song_menu
 
 0
 0
-1
-1
 6
 Item
 song_menu_header
 disabled
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 add_track
 
+2
 0
-0
-1
-1
 0
 Item
 add_midi_track
 
+3
 0
-0
-1
-1
 0
 Item
 song_edit_samples
 
+4
 0
-0
-1
-1
 0
 Item
 song_properties
 
+5
 0
-0
-1
-1
 0
 // Resource
 Menu
@@ -2793,64 +2097,48 @@ popup_track_menu
 
 0
 0
-1
-1
 7
 Item
 track_menu_header
 disabled
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 delete_track
 
+2
 0
-0
-1
-1
 0
 Item
 track_add_marker
 
+3
 0
-0
-1
-1
 0
 Item
 track_edit_fx
 
+4
 0
-0
-1
-1
 0
 Item
 track_edit_midi
 
+5
 0
-0
-1
-1
 0
 Item
 track_properties
 
+6
 0
-0
-1
-1
 0
 // Resource
 Menu
@@ -2858,153 +2146,115 @@ popup_sample_menu
 
 0
 0
-1
-1
 5
 Item
 sample_menu_header
 disabled
 0
 0
-1
-1
 0
 Separator
 
 
-0
-0
 1
-1
+0
 0
 Item
 insert_sample
 
+2
 0
-0
-1
-1
 0
 Item
 remove_sample
 
+3
 0
-0
-1
-1
 0
 Item
 sample_properties
 
+4
 0
-0
-1
-1
 0
 // Resource
 Dialog
 progress_dialog
-
+width=210,height=30
 0
 0
-210
-30
 1
 ProgressBar
 progress_bar
 
 0
 0
-1
-1
 0
 // Resource
 Dialog
 progress_cancelable_dialog
-
+width=210,height=30
 0
 0
-210
-30
 1
 Grid
 progress_cancelable_grid
 expandx
 0
 0
-1
-2
 2
 ProgressBar
 progress_bar
 expandx
 0
 0
-1
-1
 0
 Button
 cancel
 image=hui:cancel
 0
 1
-1
-1
 0
 // Resource
 Dialog
 raw_config_dialog
-
+width=300,height=100
 0
 0
-300
-100
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
 
 0
 0
-2
-4
 6
 Text
 t_format
 
 0
 0
-1
-1
 0
 ComboBox
 format
 expandx
 1
 0
-1
-1
 0
 Text
 t_channels
 
 0
 1
-1
-1
 0
 ComboBox
 channels
 
-1
-1
 1
 1
 0
@@ -3013,16 +2263,12 @@ t_samplerate
 
 0
 2
-1
-1
 0
 SpinButton
 sample_rate
-
+range=1
 1
 2
-1
-1
 0
 Grid
 ?
@@ -3030,48 +2276,36 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 
 0
 0
-1
-1
 0
 Button
 ok
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 record_dialog
-
+width=300,height=200
 0
 0
-300
-200
 1
 Grid
 ?
 
 0
 0
-1
-6
 6
 Grid
 capture_audio_grid
 
 0
 0
-1
-4
 2
 Group
 rdt_audio_source
@@ -3079,22 +2313,16 @@ rdt_audio_source
 0
 0
 1
-1
-1
 ComboBox
 capture_audio_source
 expandx
 0
 0
-1
-1
 0
 Text
 capture_audio_message
 italic
 0
-1
-1
 1
 0
 Grid
@@ -3102,8 +2330,6 @@ capture_midi_grid
 
 0
 1
-1
-4
 2
 Group
 rdt_midi_source
@@ -3111,22 +2337,16 @@ rdt_midi_source
 0
 0
 1
-1
-1
 ComboBox
 capture_midi_source
 expandx
 0
 0
-1
-1
 0
 Text
 capture_midi_message
 italic
 0
-1
-1
 1
 0
 Grid
@@ -3135,31 +2355,23 @@ capture_multi_grid
 0
 2
 3
-128
-3
 Text
 rdt_multi_target
 bold
 0
 0
-1
-1
 0
 Text
 rdt_multi_type
 bold
 1
 0
-1
-1
 0
 Text
 rdt_multi_source
 bold
 2
 0
-1
-1
 0
 Group
 rdt_capture
@@ -3167,15 +2379,11 @@ rdt_capture
 0
 3
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 ?
@@ -3183,30 +2391,22 @@ noexpandy
 0
 0
 2
-1
-2
 Text
 capture_time
 width=120
 0
 0
-1
-1
 0
 DrawingArea
 capture_level
 height=25
 1
 0
-1
-1
 0
 Grid
 ?
 
 0
-1
-3
 1
 3
 Button
@@ -3214,24 +2414,18 @@ capture_start
 flat,image=hui:media-record
 0
 0
-1
-1
 0
 Button
 capture_pause
 flat,image=hui:media-pause
 1
 0
-1
-1
 0
 Button
 capture_delete
 flat,image=hui:delete
 2
 0
-1
-1
 0
 Grid
 ?
@@ -3239,63 +2433,47 @@ buttonbar
 0
 4
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
-image=hui:ok		
+image=hui:ok
 1
 0
-1
-1
 0
 Text
 ?
 expandy
 0
 5
-1
-1
 0
 // Resource
 Dialog
 sample_manager_dialog
-allow-parent
+width=400,height=400,allow-parent
 0
 0
-400
-400
 1
 Grid
 ?
 
 0
 0
-1
-3
 3
 ListView
 sample_list
 format=iTttC,select-multi
 0
 0
-1
-1
 0
 Grid
 ?
 
 0
-1
-7
 1
 7
 Button
@@ -3303,56 +2481,42 @@ import_from_file
 flat,image=hui:open
 0
 0
-1
-1
 0
 Button
 export_sample
 flat,image=hui:save
 1
 0
-1
-1
 0
 Button
 delete_sample
 flat,image=hui:delete
 2
 0
-1
-1
 0
 Button
 preview_sample
 flat,image=hui:media-play
 3
 0
-1
-1
 0
 Button
 paste_sample
 flat,image=hui:paste
 4
 0
-1
-1
 0
 Button
 create_from_selection
 flat,image=hui:copy
 5
 0
-1
-1
 0
 Button
 scale_sample
 flat,image=hui:zoom-in
 6
 0
-1
-1
 0
 Group
 smd_group_edit
@@ -3360,40 +2524,30 @@ smd_group_edit
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-1
 1
 Button
 edit_song
 
 0
 0
-1
-1
 0
 // Resource
 Dialog
 sample_ref_dialog
-
+width=375,height=230
 0
 0
-375
-230
 1
 Grid
 ?
 
 0
 0
-1
-5
 5
 Group
 ld_t_name
@@ -3401,15 +2555,11 @@ ld_t_name
 0
 0
 1
-1
-1
 Edit
 name
 expandx
 0
 0
-1
-1
 0
 Group
 ld_t_track
@@ -3417,15 +2567,11 @@ ld_t_track
 0
 1
 1
-1
-1
 ComboBox
 track
 
 0
 0
-1
-1
 0
 Group
 ld_t_volume
@@ -3433,175 +2579,131 @@ ld_t_volume
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
 3
-1
-3
 SpinButton
 volume
-expandx
+range=-10000:10:0.1,expandx
 0
 0
-1
-1
 0
 Text
 db
 
 1
 0
-1
-1
 0
 CheckBox
 mute
 
 2
 0
-1
-1
 0
 Text
 ?
 expandy
 0
 3
-1
-1
 0
 Group
 ld_t_edit
 
-0
-4
 1
-1
+3
 1
 Grid
 ?
 
 0
 0
-3
-1
 3
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 Button
 edit_sample
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 sample_scale_dialog
-
+width=250,height=80
 0
 0
-250
-80
 1
 Grid
 ?
 
 0
 0
-1
-3
 3
 Grid
 ?
-
+5,3
 0
 0
-5
-3
 13
 Text
 ssd_t_samples
 
 1
 0
-1
-1
 0
 Text
 ssd_t_rate
 
 2
 0
-1
-1
 0
 Text
 ssd_t_rate_inv
 
 3
 0
-1
-1
 0
 Text
 ssd_t_factor
 
 4
 0
-1
-1
 0
 Text
 ssd_t_orig
 
 0
 1
-1
-1
 0
 SpinButton
 samples_orig
-expandx,disabled
-1
-1
+range=1:,expandx,disabled
 1
 1
 0
 SpinButton
 rate_orig
-expandx,disabled
+range=1:,expandx,disabled
 2
-1
-1
 1
 0
 SpinButton
 rate_inv_orig
-expandx
+range=1:,expandx
 3
-1
-1
 1
 0
 Text
@@ -3609,47 +2711,35 @@ ssd_t_new
 
 0
 2
-1
-1
 0
 SpinButton
 samples_new
-expandx
+range=1:,expandx
 1
 2
-1
-1
 0
 SpinButton
 rate_new
-expandx
+range=1:,expandx
 2
 2
-1
-1
 0
 SpinButton
 rate_inv_new
-expandx,disabled
+range=1:,expandx,disabled
 3
 2
-1
-1
 0
 SpinButton
 factor
-expandx
+range=0:1000:0.01",expandx
 4
 2
-1
-1
 0
 Grid
 ?
 
 0
-1
-2
 1
 2
 Text
@@ -3657,65 +2747,49 @@ ssd_t_method
 
 0
 0
-1
-1
 0
 ComboBox
 method
 expandx
 1
 0
-1
-1
 0
 Grid
 ?
 buttonbar
 0
 2
-2
-1
 2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Resource
 Dialog
 sample_selection_dialog
-
+width=300,height=400
 0
 0
-300
-400
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 ListView
 sample_selection_list
 format=itt
 0
 0
-1
-1
 0
 Grid
 ?
@@ -3723,40 +2797,30 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 
 0
 0
-1
-1
 0
 Button
 ok
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 settings_dialog
-
+width=300,height=200
 0
 0
-300
-200
 1
 Grid
 ?
 
 0
 0
-1
-3
 3
 Group
 pdp_general
@@ -3764,45 +2828,33 @@ pdp_general
 0
 0
 1
-1
-1
 Grid
 ?
 
 0
 0
-2
-4
 8
 Text
 pdp_language
 
 0
 0
-1
-1
 0
 ComboBox
 language
 expandx
 1
 0
-1
-1
 0
 Text
 pdp_colorscheme
 
 0
 1
-1
-1
 0
 ComboBox
 color_scheme
 
-1
-1
 1
 1
 0
@@ -3811,32 +2863,24 @@ pdt_oggrate
 
 0
 2
-1
-1
 0
 ComboBox
 ogg_bitrate
 
 1
 2
-1
-1
 0
 Text
 pdt_defaultartist
 
 0
 3
-1
-1
 0
 Edit
 default_artist
 
 1
 3
-1
-1
 0
 Group
 pdp_capture
@@ -3844,39 +2888,29 @@ pdp_capture
 0
 1
 1
-1
-1
 Grid
 ?
 
 0
 0
 3
-1
-3
 Text
 pdt_capturetempfile
 
 0
 0
-1
-1
 0
 Edit
 capture_filename
 expandx
 1
 0
-1
-1
 0
 Button
 capture_find
 image=hui:open
 2
 0
-1
-1
 0
 Grid
 ?
@@ -3884,32 +2918,24 @@ buttonbar
 0
 2
 1
-1
-1
 DefButton
 close
 image=hui:close
 0
 0
-1
-1
 0
 // Resource
 Dialog
 song_dialog
-
+width=430,height=375
 0
 0
-430
-375
 1
 Grid
 ?
 expandy
 0
 0
-1
-3
 3
 Group
 ad_t_data
@@ -3917,61 +2943,45 @@ ad_t_data
 0
 0
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 ListView
 data_list
 nobar,height=110,noexpandy
 0
 0
-1
-1
 0
 Grid
 ?
 
 0
 1
-2
-3
 5
 Text
 ad_t_samplerate
 
 0
 0
-1
-1
 0
 ComboBox
 samplerate
 expandx,editable
 1
 0
-1
-1
 0
 Text
 ad_t_format
 
 0
 1
-1
-1
 0
 ComboBox
 format
 expandx
-1
-1
 1
 1
 0
@@ -3980,8 +2990,6 @@ compress
 
 1
 2
-1
-1
 0
 Group
 ad_t_tags
@@ -3989,30 +2997,22 @@ ad_t_tags
 0
 1
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 ListView
 tags
 format=TT
 0
 0
-1
-1
 0
 Grid
 ?
 
 0
-1
-2
 1
 2
 Button
@@ -4020,16 +3020,12 @@ add_tag
 flat,image=hui:add
 0
 0
-1
-1
 0
 Button
 delete_tag
 flat,image=hui:delete
 1
 0
-1
-1
 0
 Group
 ad_t_edit
@@ -4037,56 +3033,42 @@ ad_t_edit
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
 3
-1
-3
 Button
 edit_layers
 
 0
 0
-1
-1
 0
 Button
 edit_samples
 
 1
 0
-1
-1
 0
 Button
 edit_fx
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 synth_console
-
+width=300,height=200
 0
 0
-300
-200
 1
 Grid
 outer
 expandy
 0
 0
-1
-2
 2
 Grid
 grid
@@ -4094,31 +3076,23 @@ expandy
 0
 0
 1
-3
-1
 Grid
 ?
 
 0
 2
 2
-1
-2
 Button
 select
 expandx,flat,image=hui:open
 0
 0
-1
-1
 0
 Button
 detune
 noexpandx,flat,image=hui:properties
 1
 0
-1
-1
 0
 Group
 sc_group_edit
@@ -4126,40 +3100,30 @@ sc_group_edit
 0
 1
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_track
 
 1
 0
-1
-1
 0
 // Resource
 Dialog
 synth_panel
-
+width=200,height=200
 0
 0
-200
-200
 1
 Grid
 grid
@@ -4167,39 +3131,29 @@ noexpandx,expandy
 0
 0
 1
-2
-1
 Grid
 ?
 
 0
 0
 3
-1
-3
 Button
 load_favorite
 flat,image=hui:open
 0
 0
-1
-1
 0
 Button
 save_favorite
 flat,image=hui:save
 1
 0
-1
-1
 0
 Text
 name
 bold,center,expandx
 2
 0
-1
-1
 0
 // Resource
 Toolbar
@@ -4207,145 +3161,109 @@ toolbar
 
 0
 0
-1
-1
 15
 Item
 new
 image=hui:new
 0
 0
-1
-1
 0
 Item
 open
 image=hui:open
-0
-0
 1
-1
+0
 0
 Item
 save
 image=hui:save
+2
 0
-0
-1
-1
 0
 Separator
 
 
+3
 0
-0
-1
-1
 0
 Item
 undo
 image=hui:undo
+4
 0
-0
-1
-1
 0
 Item
 redo
 image=hui:redo
+5
 0
-0
-1
-1
 0
 Separator
 
 
+6
 0
-0
-1
-1
 0
 Item
 copy
 image=hui:copy
+7
 0
-0
-1
-1
 0
 Item
 paste
 image=hui:paste
+8
 0
-0
-1
-1
 0
 Item
 delete
 image=hui:delete
+9
 0
-0
-1
-1
 0
 Separator
 
 
+10
 0
-0
-1
-1
 0
 Item
 play
 image=hui:media-play
+11
 0
-0
-1
-1
 0
 Item
 pause
 image=hui:media-pause
+12
 0
-0
-1
-1
 0
 Item
 stop
 image=hui:media-stop
+13
 0
-0
-1
-1
 0
 Item
 record
 image=hui:media-record
+14
 0
-0
-1
-1
 0
 // Resource
 Dialog
 track_dialog
-
+width=380,height=516
 0
 0
-380
-516
 1
 Grid
 ?
 
 0
 0
-1
-8
 7
 Group
 g_name
@@ -4353,15 +3271,11 @@ g_name
 0
 0
 1
-1
-1
 Edit
 name
 expandx
 0
 0
-1
-1
 0
 Group
 g_volume
@@ -4369,53 +3283,39 @@ g_volume
 0
 1
 1
-1
-1
 Grid
 ?
 noexpandx
 0
 0
-3
-2
 6
 Text
 t_volume
 
 0
 0
-1
-1
 0
 SpinButton
 volume
-expandx
+range=-10000:10:0.1",expandx
 1
 0
-1
-1
 0
 Text
 db
 
 2
 0
-1
-1
 0
 Text
 t_panning
 
 0
 1
-1
-1
 0
 SpinButton
 panning
-
-1
-1
+range=-100:100:1
 1
 1
 0
@@ -4424,8 +3324,6 @@ percent
 
 2
 1
-1
-1
 0
 Group
 g_instrument
@@ -4433,30 +3331,22 @@ g_instrument
 0
 2
 1
-1
-1
 Grid
 ?
 
 0
 0
-1
-2
 2
 ComboBox
 instrument
 expandx
 0
 0
-1
-1
 0
 Grid
 ?
 
 0
-1
-2
 1
 2
 Text
@@ -4464,16 +3354,12 @@ tuning
 expandx
 0
 0
-1
-1
 0
 Button
 edit_tuning
 image=hui:properties,flat
 1
 0
-1
-1
 0
 Group
 g_midi
@@ -4481,31 +3367,23 @@ g_midi
 0
 3
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 Button
 _edit_midi
 flat,expandx
 0
 0
-1
-1
 0
 Button
 _edit_midi_fx
 flat
 1
 0
-1
-1
 0
 Group
 g_synth
@@ -4513,39 +3391,29 @@ g_synth
 0
 4
 1
-1
-1
 Grid
 ?
 
 0
 0
 2
-1
-2
 Button
 select_synth
 expandx,flat,flat
 0
 0
-1
-1
 0
 Button
 _edit_synth
 noexpandx,flat,image=hui:properties,flat
 1
 0
-1
-1
 0
 Text
 ?
 expandy
 0
 5
-1
-1
 0
 Group
 td_t_edit
@@ -4553,71 +3421,53 @@ td_t_edit
 0
 6
 1
-1
-1
 Grid
 ?
 
 0
 0
-4
-1
 3
 Button
 edit_song
 
 0
 0
-1
-1
 0
 Button
 edit_fx
 
 1
 0
-1
-1
 0
 Button
 edit_curves
 
 2
 0
-1
-1
 0
 // Resource
 Dialog
 track-mixer
-
+width=80,height=200
 0
 0
-80
-200
 1
 Grid
 ?
 
 0
 0
-1
-4
 4
 Text
 name
 center
 0
 0
-1
-1
 0
 Slider
 panning
 width=80,origin=no
 0
-1
-1
 1
 0
 Slider
@@ -4625,41 +3475,31 @@ volume
 vertical,expandy
 0
 2
-1
-1
 0
 CheckBox
 mute
 
 0
 3
-1
-1
 0
 // Resource
 Dialog
 tuning_dialog
-
+width=120,height=50
 0
 0
-120
-50
 1
 Grid
 ?
 
 0
 0
-1
-2
 2
 Grid
 td_g_tuning
 
 0
 0
-3
-32
 0
 Grid
 ?
@@ -4667,23 +3507,17 @@ buttonbar
 0
 1
 2
-1
-2
 Button
 cancel
 image=hui:cancel
 0
 0
-1
-1
 0
 DefButton
 ok
 image=hui:ok
 1
 0
-1
-1
 0
 // Number Of Languages
 2
@@ -4798,16 +3632,16 @@ bar_add_dialog/bar_add_dialog
 New bars
 
 bar_add_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_add_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_add_dialog/count
-1\\1\\10000\\1
+1
 
 bar_add_dialog/sub_beats
-1\\1\\24\\1
+1
 
 bar_add_dialog/t_sub_beats
 Sub beats
@@ -4816,10 +3650,10 @@ bar_edit_dialog/bar_edit_dialog
 Edit bars
 
 bar_edit_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_edit_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_edit_dialog/edit_beats
 Beats
@@ -4831,7 +3665,7 @@ bar_edit_dialog/edit_sub_beats
 Sub beats
 
 bar_edit_dialog/sub_beats
-1\\1\\24\\1
+1
 
 configurable-selection-dialog/configurable-selection-dialog
 Auswahl
@@ -5152,10 +3986,10 @@ menu_fake/stop
 Stop
 
 midi_editor/beat_partition
-4\\1\\256
+4
 
 midi_editor/interval
-0\\-99\\99
+0
 
 midi_editor/ld_t_chord
 Type
@@ -5257,10 +4091,10 @@ mixing-console/t_output
 Output
 
 new_dialog/beats_per_bar
-4\\1\\99
+4
 
 new_dialog/beats_per_minute
-90\\0\\999\\0.1
+90
 
 new_dialog/metronome
 add
@@ -5293,16 +4127,16 @@ new_dialog/new_track_type:midi
 Midi
 
 new_dialog/num_bars
-10\\0\\999
+10
 
 new_dialog/sub_beats
-4\\1\\24
+4
 
 new_dialog/t_sub_beats
 Sub beats per beat
 
 pause_add_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_add_dialog/pause_add_dialog
 New pause
@@ -5314,7 +4148,7 @@ pause_add_dialog/t_s
 s
 
 pause_edit_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_edit_dialog/pause_edit_dialog
 Edit pause
@@ -5392,7 +4226,7 @@ raw_config_dialog/raw_config_dialog
 Raw Datei
 
 raw_config_dialog/sample_rate
-44100\\1
+44100
 
 raw_config_dialog/t_channels
 Channels
@@ -5482,34 +4316,34 @@ sample_ref_dialog/sample_ref_dialog
 Sample
 
 sample_ref_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 sample_scale_dialog/factor
-0\\0\\1000\\0.01
+0
 
 sample_scale_dialog/method
 Linear\\Cubic\\Sinc\\Fourier
 
 sample_scale_dialog/rate_inv_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_inv_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/sample_scale_dialog
 Scale sample
 
 sample_scale_dialog/samples_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/samples_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/ssd_t_factor
 Factor %
@@ -5647,7 +4481,7 @@ track_dialog/g_volume
 Volume
 
 track_dialog/panning
-0\\-100\\100\\1
+0
 
 track_dialog/select_synth
 
@@ -5665,7 +4499,7 @@ track_dialog/track_dialog
 Spur
 
 track_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 trackdest_dialog/track_list
 Track
@@ -5799,13 +4633,13 @@ bar_add_dialog/bar_add_dialog
 neue Takte
 
 bar_add_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_add_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_add_dialog/count
-1\\1\\10000\\1
+1
 
 bar_add_dialog/insert:after
 danach
@@ -5814,7 +4648,7 @@ bar_add_dialog/insert:before
 davor
 
 bar_add_dialog/sub_beats
-1\\1\\24\\1
+1
 
 bar_add_dialog/t_sub_beats
 Teil-Schläge
@@ -5823,10 +4657,10 @@ bar_edit_dialog/bar_edit_dialog
 Takte bearbeiten
 
 bar_edit_dialog/beats
-1\\1\\1000\\1
+1
 
 bar_edit_dialog/bpm
-0\\0\\1000\\0.1
+0
 
 bar_edit_dialog/edit_beats
 Schläge
@@ -5838,7 +4672,7 @@ bar_edit_dialog/edit_sub_beats
 Teil-Schläge
 
 bar_edit_dialog/sub_beats
-1\\1\\24\\1
+1
 
 bars_dialog/add_bar
 Takt
@@ -6276,10 +5110,10 @@ menu_fake/stop
 Stopp
 
 midi_editor/beat_partition
-4\\1\\256
+4
 
 midi_editor/interval
-0\\-99\\99
+0
 
 midi_editor/ld_t_chord
 Typ
@@ -6378,7 +5212,7 @@ mini_bar/show_bottom_bar
 
 Leiste aufklappen
 mini_bar/volume
-0\\-10000\\10\\0.1
+0
 Ausgabelautstärke
 mixing-console/link-volumes
 koppeln
@@ -6393,10 +5227,10 @@ mixing-console/t_output
 Ausgabe
 
 new_dialog/beats_per_bar
-4\\1\\99
+4
 
 new_dialog/beats_per_minute
-90\\0\\999\\0.1
+90
 
 new_dialog/metronome
 einfügen
@@ -6429,16 +5263,16 @@ new_dialog/new_track_type:midi
 Midi
 
 new_dialog/num_bars
-10\\0\\999
+10
 
 new_dialog/sub_beats
-4\\1\\24
+4
 
 new_dialog/t_sub_beats
 Teil-Schläge pro Schlag
 
 pause_add_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_add_dialog/insert:after
 danach
@@ -6456,7 +5290,7 @@ pause_add_dialog/t_s
 s
 
 pause_edit_dialog/duration
-1.0\\0\\10000\\0.001
+1.0
 
 pause_edit_dialog/pause_edit_dialog
 Pause bearbeiten
@@ -6540,7 +5374,7 @@ raw_config_dialog/raw_config_dialog
 Raw Datei
 
 raw_config_dialog/sample_rate
-44100\\1
+44100
 
 raw_config_dialog/t_channels
 Kanäle
@@ -6681,43 +5515,43 @@ sample_ref_dialog/mute
 Stumm
 
 sample_ref_dialog/repdelay
-0\\0\\\\0.1
+0
 
 sample_ref_dialog/repnum
-1\\1
+1
 
 sample_ref_dialog/sample_ref_dialog
 Sub Track
 
 sample_ref_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 sample_scale_dialog/factor
-0\\0\\1000\\0.01
+0
 
 sample_scale_dialog/method
 Linear\\Kubisch\\Sinc\\Fourier
 
 sample_scale_dialog/rate_inv_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_inv_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/rate_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/sample_scale_dialog
 Sample skalieren
 
 sample_scale_dialog/samples_new
-1\\1\\\\1
+1
 
 sample_scale_dialog/samples_orig
-1\\1\\\\1
+1
 
 sample_scale_dialog/ssd_t_factor
 Faktor %
@@ -6825,10 +5659,10 @@ track-mixer/mute
 Stumm
 
 track-mixer/panning
-0\\-100\\100\\1
+0
 Balance
 track-mixer/volume
-0\\-10000\\10\\0.1
+0
 Lautstärke in dB
 track_dialog/_edit_fx
 Bearbeiten
@@ -6873,7 +5707,7 @@ track_dialog/g_volume
 Lautstärke
 
 track_dialog/panning
-0\\-100\\100\\1
+0
 
 track_dialog/select_synth
 
@@ -6891,7 +5725,7 @@ track_dialog/track_dialog
 Spur
 
 track_dialog/volume
-0\\-10000\\10\\0.1
+0
 
 trackdest_dialog/track_list
 Spur

@@ -1,6 +1,7 @@
-Dialog sample_selection_dialog "Sample wählen" 300 400
-	Grid ? "" 1 2
+Dialog sample_selection_dialog "Sample wählen" width=300 height=400
+	Grid ? ""
 		ListView sample_selection_list "Preview\\Name\\Duration" format=itt
-		Grid ? "" 2 1 buttonbar
+		---|
+		Grid ? "" buttonbar
 			Button /cancel "Cancel"
 			Button /ok "OK"

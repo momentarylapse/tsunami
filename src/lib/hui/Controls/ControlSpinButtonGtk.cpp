@@ -21,21 +21,12 @@ ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	float vmin = -100000000000.0f;
 	float vmax = 100000000000.0f;
 	float step = 1;
-	if (PartString.num >= 2){
-		if (PartString[1].num > 0)
-			vmin = s2f(PartString[1]);
-	}if (PartString.num >= 3){
-		if (PartString[2].num > 0)
-			vmax = s2f(PartString[2]);
-	}if (PartString.num >= 4){
-		if (PartString[3].num > 0)
-			step = s2f(PartString[3]);
-	}
 	widget = gtk_spin_button_new_with_range(vmin, vmax, step);
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
-	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkEditChange), this);
 	setOptions(OptionString);
+
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(PartString[0]));
+	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkEditChange), this);
 }
 
 string ControlSpinButton::getString()
@@ -75,7 +66,7 @@ void ControlSpinButton::__setOption(const string &op, const string &value)
 		float vmin = -100000000000.0f;
 		float vmax = 100000000000.0f;
 		float step = 1;
-		Array<string> v = value.explode("\\");
+		Array<string> v = value.replace("\\", ":").explode(":");
 		if (v.num >= 1){
 			if (v[0].num > 0)
 				vmin = v[0]._float();

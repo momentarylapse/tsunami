@@ -1,17 +1,20 @@
-Dialog sample_ref_dialog "Sample" 375 230
-	Grid ? "" 1 5
+Dialog sample_ref_dialog "Sample" width=375 height=230
+	Grid ? ""
 		Group ld_t_name "Name"
 			Edit name "" expandx
+		---|
 		Group ld_t_track "Track"
 			ComboBox track ""
+		---|
 		Group ld_t_volume "Volume"
-			Grid ? "" 3 1
-				SpinButton volume "0\\-10000\\10\\0.1" expandx
+			Grid ? ""
+				SpinButton volume "0" range=-10000:10:0.1 expandx
 				Text /db "dB"
 				CheckBox mute "Muted"
+		---|
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
-			Grid ? "" 3 1
+			Grid ? ""
 				Button /edit_song "File"
 				Button /edit_track "Track"
 				Button edit_sample "Sample"

@@ -28,12 +28,14 @@ public:
 	string title;
 	string tooltip;
 	Array<string> options;
-	int x, y, w, h;
+	int x, y;
 	Array<Resource> children;
 	Resource();
 	Resource* get_node(const string &id) const;
 	bool enabled();
 	string image();
+	bool has(const string &key);
+	string value(const string &key, const string &fallback = "");
 	void show(int indent = 0);
 	string to_string(int indent = 0);
 };

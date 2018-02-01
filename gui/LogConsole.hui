@@ -1,4 +1,4 @@
-Dialog log_console "Nachrichten" 200 100
-	Grid ? "" 2 1
+Dialog log_console "Nachrichten" width=200 height=100
+	Grid ? ""
 		ListView log_list "type\\msg" format=it nobar
 		Button clear "" image=hui:clear "tooltip=delete all messages"

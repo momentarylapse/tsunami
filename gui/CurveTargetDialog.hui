@@ -1,6 +1,7 @@
-Dialog curve-target-dialog "Ziel" 300 400
-	Grid ? "" 1 2
+Dialog curve-target-dialog "Ziel" width=300 height=400
+	Grid ? ""
 		ListView list "Name" multiselection nobar
-		Grid ? "" 2 1 buttonbar
+		---|
+		Grid ? "" buttonbar
 			Button /cancel "Cancel"
 			Button /ok "OK"

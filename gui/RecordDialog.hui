@@ -1,28 +1,36 @@
-Dialog record_dialog "Aufnahme" 300 200
-	Grid ? "" 1 6
-		Grid capture_audio_grid "" 1 4
+Dialog record_dialog "Aufnahme" width=300 height=200
+	Grid ? ""
+		Grid capture_audio_grid ""
 			Group rdt_audio_source "Source"
 				ComboBox capture_audio_source "" expandx
+			---|
 			Text capture_audio_message "" italic
-		Grid capture_midi_grid "" 1 4
+		---|
+		Grid capture_midi_grid ""
 			Group rdt_midi_source "Source"
 				ComboBox capture_midi_source "" expandx
+			---|
 			Text capture_midi_message "" italic
-		Grid capture_multi_grid "" 3 128
+		---|
+		Grid capture_multi_grid ""
 			Text rdt_multi_target "Target" bold
 			Text rdt_multi_type "Type" bold
 			Text rdt_multi_source "Source" bold
+		---|
 		Group rdt_capture "Recording"
-			Grid ? "" 1 2
-				Grid ? "" 2 1 noexpandy
+			Grid ? ""
+				Grid ? "" noexpandy
 					Text capture_time "0:00" width=120
 					DrawingArea capture_level "" height=25
-				Grid ? "" 3 1
+				---|
+				Grid ? ""
 					Button capture_start "" flat image=hui:media-record
 					Button capture_pause "" flat image=hui:media-pause
 					Button capture_delete "Dump" flat image=hui:delete
-		Grid ? "" 2 1 buttonbar
+		---|
+		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok		
+			DefButton /ok "OK" image=hui:ok
+		---|
 		Text ? "" expandy
 

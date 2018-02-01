@@ -1,2 +1,2 @@
-Dialog progress_dialog "in Arbeit" 210 30
+Dialog progress_dialog "in Arbeit" width=210 height=30
 	ProgressBar progress_bar ""

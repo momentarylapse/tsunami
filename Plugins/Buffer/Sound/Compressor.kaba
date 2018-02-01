@@ -161,14 +161,14 @@ class CompressorPanel extends ConfigPanel
 		super.__init__(_fx)
 		addGrid("", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
-		addDrawingArea("!grabfocus,height=250", 0, 0, 0, 0, "drawing_area")
+		addDrawingArea("!grabfocus,height=250\\", 0, 0, 0, 0, "drawing_area")
 		addGrid("!noexpandy", 0, 1, 6, 1, "table2")
 		setTarget("table2", 0)
 		addLabel("Attack", 0, 0, 0, 0, "")
-		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "attack")
+		addSpinButton("!range=0:100:0.1\\", 1, 0, 0, 0, "attack")
 		addLabel("ms", 2, 0, 0, 0, "")
 		addLabel("Release", 3, 0, 0, 0, "")
-		addSpinButton("\\0\\1000\\0.1", 4, 0, 0, 0, "release")
+		addSpinButton("!range=0:1000:0.1\\", 4, 0, 0, 0, "release")
 		addLabel("ms", 5, 0, 0, 0, "")
 		
 		grid.config = &_fx.config

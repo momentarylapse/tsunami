@@ -1,13 +1,14 @@
-Dialog configurable_dialog "" 200 100
-	Grid grid "" 1 3
-		Grid ? "" 5 1
+Dialog configurable_dialog "" width=200 height=100
+	Grid grid ""
+		Grid ? ""
 			Button load_favorite "" flat image=hui:open "tooltip=load parameter"
 			Button save_favorite "" flat image=hui:save "tooltip=save parameter"
 			.
 			.
 			.
-		.
-		Grid ? "" 4 1 buttonbar
+		---|
+		---|
+		Grid ? "" buttonbar
 			Button preview "Preview" image=hui:media-play
 			Text ? "" width=30
 			Button /cancel "Cancel" image=hui:cancel

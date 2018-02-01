@@ -1,29 +1,33 @@
-Dialog new_dialog "New file" 250 80
-	Grid ? "" 1 4
+Dialog new_dialog "New file" width=250 height=80
+	Grid ? ""
 		Group nd_g_frequency "Samplerate"
-			Grid ? "" 2 1
+			Grid ? ""
 				ComboBox sample_rate "" expandx editable
 				Text /per_second "/s"
+		---|
 		Group nd_g_track "First track"
-			Grid ? "" 2 1
+			Grid ? ""
 				RadioButton new_track_type:audio "Audio"
 				RadioButton new_track_type:midi "Midi"
+		---|
 		Group nd_g_metronome "Metronome"
-			Grid ? "" 1 2
+			Grid ? ""
 				CheckBox metronome "add"
-				Grid nd_g_metronome_params "" 3 3
+				---|
+				Grid nd_g_metronome_params ""
 					Text nd_t_bpm "Speed"
-					SpinButton beats_per_minute "90\\0\\999\\0.1"
+					SpinButton beats_per_minute "90" range=0:999:0.1
 					Text /per_minute "/min"
+					---|
 					Text nd_t_bars "Bars"
-					SpinButton num_bars "10\\0\\999"
-					.
+					SpinButton num_bars "10" range=0:999
+					---|
 					Text nd_t_beats "Beats per bar"
-					SpinButton beats_per_bar "4\\1\\99"
-					.
+					SpinButton beats_per_bar "4" range=1:99
+					---|
 					Text t_sub_beats "Sub beats per beat"
-					SpinButton sub_beats "4\\1\\24"
-					.
-		Grid ? "" 2 1 buttonbar
+					SpinButton sub_beats "4" range=1:24
+		---|
+		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

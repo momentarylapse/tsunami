@@ -65,9 +65,10 @@ class SpectrumDialog extends Dialog
 	void __init__(SongPlugin *plugin)
 		super.__init__("Spectrum", 600, 460, plugin.win, true)
 		fromSource("
-Grid ? '' 1 2
+Grid ? ''
 	DrawingArea drawing_area ''
-	Grid ? 2 1 !noexpandy
+	---|
+	Grid ? '' noexpandy
 		ComboBox type 'Linear\\Logarithm'
 		Button close 'Close' width=120 image=hui:close")
 		

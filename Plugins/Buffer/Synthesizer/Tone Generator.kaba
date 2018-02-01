@@ -41,7 +41,7 @@ class TonePanel extends ConfigPanel
 		setTarget("table2", 0)
 		addRadioButton("Ton", 0, 0, 0, 0, "type:pitch")
 		addRadioButton("Frequenz", 0, 1, 0, 0, "type:freq")
-		addSpinButton("\\0\\100000\\0.1", 1, 1, 0, 0, "frequency")
+		addSpinButton("!range=0:100000:0.1\\", 1, 1, 0, 0, "frequency")
 		addLabel("Hz", 2, 1, 0, 0, "")
 		addLabel("Lautstärke:", 0, 2, 0, 0, "")
 		addLabel("%", 2, 2, 0, 0, "")
@@ -49,10 +49,10 @@ class TonePanel extends ConfigPanel
 		addGrid("", 1, 2, 2, 1, "table4")
 		setTarget("table3", 0)
 		addComboBox("", 0, 0, 0, 0, "pitch_rel")
-		addSpinButton("\\0\\8", 1, 0, 0, 0, "octave")
+		addSpinButton("!range=0:8", 1, 0, 0, 0, "octave")
 		setTarget("table4", 0)
 		addSlider("", 0, 0, 0, 0, "volume_slider")
-		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
+		addSpinButton("!range=0:100:0.1\\", 1, 0, 0, 0, "volume")
 	
 		reset("pitch_rel")
 		for i in 0:12

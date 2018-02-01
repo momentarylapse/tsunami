@@ -65,7 +65,7 @@ void ControlSlider::__setOption(const string &op, const string &value)
 		float vmin = -100000000000.0f;
 		float vmax = 100000000000.0f;
 		float step = 1;
-		Array<string> v = value.explode("\\");
+		Array<string> v = value.replace("\\", ":").explode(":");
 		if (v.num >= 1){
 			if (v[0].num > 0)
 				vmin = v[0]._float();

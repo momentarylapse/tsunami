@@ -9,16 +9,25 @@ namespace hui
 extern Array<Language> _languages_;
 Array<Resource> _resources_;
 
-void Resource::reset()
+Resource::Resource()
 {
-	type = "";
-	id = "";
-	options.clear();
-	image = "";
-	enabled = true;
-	page = 0;
-	children.clear();
 	x = y = w = h = 0;
+}
+
+bool Resource::enabled()
+{
+	for (string &o: options)
+		if (o == "disabled")
+			return false;
+	return true;
+}
+
+string Resource::image()
+{
+	for (string &o: options)
+		if (o.head(6) == "image=")
+			return o.substr(6, -1);
+	return "";
 }
 
 Resource *Resource::get_node(const string &id) const
@@ -33,24 +42,21 @@ Resource *Resource::get_node(const string &id) const
 	return NULL;
 }
 
-void LoadResourceCommand5(File *f, Resource *c)
+void LoadResourceCommand6(File *f, Resource *c)
 {
 	c->type = f->read_str();
 	c->id = f->read_str();
 	if (c->id == "?")
 		c->id = "rand_id:" + i2s(randi(1000000));
 	c->options = f->read_str().explode(",");
-	c->image = f->read_str();
-	c->enabled = f->read_bool();
 	c->x = f->read_int();
 	c->y = f->read_int();
 	c->w = f->read_int();
 	c->h = f->read_int();
-	c->page = f->read_int();
 	int n = f->read_int();
 	for (int i=0; i<n; i++){
 		Resource child;
-		LoadResourceCommand5(f, &child);
+		LoadResourceCommand6(f, &child);
 		c->children.add(child);
 	}
 }
@@ -64,9 +70,9 @@ void LoadResource(const string &filename)
 	try{
 		File *f = FileOpenText(filename);
 		int ffv = f->ReadFileFormatVersion();
-		if (ffv != 5){
+		if (ffv != 6){
 			FileClose(f);
-			msg_error("hui resource version is " + i2s(ffv) + " (5 expected)");
+			msg_error("hui resource version is " + i2s(ffv) + " (6 expected)");
 			return;
 		}
 
@@ -76,7 +82,7 @@ void LoadResource(const string &filename)
 			Resource res;
 			res.children.clear();
 			f->read_comment();
-			LoadResourceCommand5(f, &res);
+			LoadResourceCommand6(f, &res);
 			_resources_.add(res);
 		}
 
@@ -190,12 +196,12 @@ Menu *_create_res_menu_(const string &ns, Resource *res)
 		if (c.type == "Item"){
 			if (sa_contains(c.options, "checkable"))
 				menu->addItemCheckable(get_lang(ns, c.id, "", true), c.id);
-			else if (c.image.num > 0)
-				menu->addItemImage(get_lang(ns, c.id, "", true), c.image, c.id);
+			else if (c.image().num > 0)
+				menu->addItemImage(get_lang(ns, c.id, "", true), c.image(), c.id);
 			else
 				menu->addItem(get_lang(ns, c.id, "", true), c.id);
 		}else if (c.type == "ItemImage"){
-			menu->addItemImage(get_lang(ns, c.id, "", true), c.image, c.id);
+			menu->addItemImage(get_lang(ns, c.id, "", true), c.image(), c.id);
 		}else if (c.type == "ItemCheckable"){
 			menu->addItemCheckable(get_lang(ns, c.id, "", true), c.id);
 		}else if ((c.type == "ItemSeparator") or (c.type == "Separator")){
@@ -205,7 +211,7 @@ Menu *_create_res_menu_(const string &ns, Resource *res)
 			menu->addSubMenu(get_lang(ns, c.id, "", true), c.id, sub);
 		}
 		if (menu->items.num > 0)
-			menu->items.back()->enable(c.enabled);
+			menu->items.back()->enable(c.enabled());
 	}
 	return menu;
 }
@@ -336,16 +342,8 @@ void res_parse_new(const string &line, Array<string> &tokens)
 
 void res_add_option(Resource &c, const string &option)
 {
-	if (option.head(6) == "image="){
-		c.image = option.substr(6, -1);
-		return;
-	}
 	if (option.head(8) == "tooltip="){
 		c.tooltip = option.substr(8, -1);
-		return;
-	}
-	if (option == "disabled"){
-		c.enabled = false;
 		return;
 	}
 	c.options.add(option);
@@ -363,8 +361,6 @@ bool res_load_line(string &l, Resource &c, bool literally)
 	c.y = 0;
 	c.w = 1;
 	c.h = 1;
-	c.page = -1;
-	c.enabled = true;
 
 	// id
 	string id;
@@ -459,8 +455,6 @@ string Resource::to_string(int indent)
 		nn += format(" %d %d", w, h);
 	for (string &o: options)
 		nn += " " + o;
-	if (image.num > 0)
-		nn += " image=" + image;
 	if (tooltip.num > 0)
 		nn += " \"tooltip=" + str_escape(tooltip) + "\"";
 	if (type == "Grid"){

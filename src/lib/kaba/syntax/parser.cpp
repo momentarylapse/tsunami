@@ -1269,8 +1269,10 @@ void SyntaxTree::ParseStatementTry(Block *block)
 	Node *cmd_ex_block = add_node_block(new_block);
 	block->nodes.add(cmd_ex_block);
 
+	Exp.indented = false;
+
 	for (int i=0;true;i++){
-		if (((i > 0) and (Exp.cur_line->indent < last_indent)) or (Exp.end_of_file()))
+		if (((i > 0) and (Exp.cur_line->indent <= last_indent)) or (Exp.end_of_file()))
 			break;
 
 		ParseCompleteCommand(new_block);
@@ -1327,6 +1329,15 @@ void SyntaxTree::ParseStatementIf(Block *block)
 	}
 }
 
+void SyntaxTree::ParseStatementPass(Block *block)
+{
+	Exp.next(); // pass
+	ExpectNewline();
+
+	//Node *cmd_pass = add_node_statement(STATEMENT_PASS);
+	//block->nodes.add(cmd_pass);
+}
+
 void SyntaxTree::ParseStatement(Block *block)
 {
 	bool has_colon = false;
@@ -1353,6 +1364,8 @@ void SyntaxTree::ParseStatement(Block *block)
 		ParseStatementTry(block);
 	}else if (Exp.cur == IDENTIFIER_IF){
 		ParseStatementIf(block);
+	}else if (Exp.cur == IDENTIFIER_PASS){
+		ParseStatementPass(block);
 	}
 }
 
@@ -1424,7 +1437,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block)
 
 
 	// commands (the actual code!)
-		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or /*(Exp.cur == IDENTIFIER_RAISE) or*/ (Exp.cur == IDENTIFIER_TRY) or (Exp.cur == IDENTIFIER_IF)){
+		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or /*(Exp.cur == IDENTIFIER_RAISE) or*/ (Exp.cur == IDENTIFIER_TRY) or (Exp.cur == IDENTIFIER_IF) or (Exp.cur == IDENTIFIER_PASS)){
 			ParseStatement(block);
 
 		}else{

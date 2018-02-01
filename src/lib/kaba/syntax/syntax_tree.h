@@ -293,6 +293,7 @@ public:
 	void ParseStatementRaise(Block *block);
 	void ParseStatementTry(Block *block);
 	void ParseStatementIf(Block *block);
+	void ParseStatementPass(Block *block);
 
 	void CreateAsmMetaInfo();
 

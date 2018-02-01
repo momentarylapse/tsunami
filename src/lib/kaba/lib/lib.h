@@ -60,6 +60,7 @@ extern const string IDENTIFIER_FOR;
 extern const string IDENTIFIER_IN;
 extern const string IDENTIFIER_BREAK;
 extern const string IDENTIFIER_CONTINUE;
+extern const string IDENTIFIER_PASS;
 extern const string IDENTIFIER_AND;
 extern const string IDENTIFIER_OR;
 extern const string IDENTIFIER_XOR;
@@ -141,6 +142,7 @@ enum
 	STATEMENT_RAISE,
 	STATEMENT_TRY,
 	STATEMENT_EXCEPT,
+	STATEMENT_PASS,
 	NUM_STATEMENTS
 };
 

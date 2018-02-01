@@ -324,6 +324,8 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 		case STATEMENT_ASM:
 			add_cmd(INST_ASM);
 			break;
+		case STATEMENT_PASS:
+			break;
 		default:
 			DoError("statement unimplemented: " + Statements[com->link_no].name);
 	}

@@ -71,12 +71,12 @@ void Toolbar::setByID(const string &id)
 	for (Resource &cmd: res->children){
 		if (cmd.type == "Item"){
 			if (sa_contains(cmd.options, "checkable"))
-				addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+				addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
 			else
-				addItem(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+				addItem(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
 			item.back()->setTooltip(GetLanguageT(id, cmd.id));
 		}else if (cmd.type == "ItemCheckable"){
-			addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+			addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
 			item.back()->setTooltip(GetLanguageT(id, cmd.id));
 		}else if ((cmd.type == "ItemSeparator") or (cmd.type == "Separator")){
 			addSeparator();
@@ -85,12 +85,12 @@ void Toolbar::setByID(const string &id)
 			bool ok = false;
 			for (string &o: cmd.options)
 				if (o.find("menu=") == 0){
-					addItemMenuByID(title, cmd.image, o.substr(5, -1), cmd.id);
+					addItemMenuByID(title, cmd.image(), o.substr(5, -1), cmd.id);
 					item.back()->setTooltip(GetLanguageT(id, cmd.id));
 					ok = true;
 				}
 			if ((!ok) and (cmd.children.num > 0)){
-				addItemMenu(title, cmd.image, _create_res_menu_(id, &cmd), cmd.id);
+				addItemMenu(title, cmd.image(), _create_res_menu_(id, &cmd), cmd.id);
 				item.back()->setTooltip(GetLanguageT(id, cmd.id));
 			}
 		}

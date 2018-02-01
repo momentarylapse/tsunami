@@ -313,16 +313,16 @@ void Panel::addControl(const string &type, const string &title, int x, int y, in
 void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id)
 {
 	//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-	setTarget(parent_id, cmd.page);
+	setTarget(parent_id, cmd.x);
 	addControl(cmd.type, GetLanguageR(ns, cmd),
 				cmd.x, cmd.y,
 				cmd.w, cmd.h,
 				cmd.id);
 
-	enable(cmd.id, cmd.enabled);
+	enable(cmd.id, cmd.enabled());
 
-	if (cmd.image.num > 0)
-		setImage(cmd.id, cmd.image);
+	if (cmd.image().num > 0)
+		setImage(cmd.id, cmd.image());
 
 	string tooltip = GetLanguageT(ns, cmd.id);
 	if (tooltip.num > 0)
@@ -401,9 +401,9 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 	for (string &o: c.options)
 		setOptions(c.id, o);
 
-	enable(c.id, c.enabled);
-	if (c.image.num > 0)
-		setImage(c.id, c.image);
+	enable(c.id, c.enabled());
+	if (c.image().num > 0)
+		setImage(c.id, c.image());
 
 	string tooltip = GetLanguageT(ns, c.id);
 	if (tooltip.num > 0)

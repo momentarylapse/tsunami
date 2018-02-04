@@ -431,7 +431,6 @@ bool res_load_rec(Array<string> &lines, int &cur_line, Resource &c, bool literal
 			}
 
 			x ++;
-
 		}
 
 		return r;

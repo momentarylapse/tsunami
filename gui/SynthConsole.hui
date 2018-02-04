@@ -1,5 +1,5 @@
 Dialog synth_console "" width=300 height=200
-	Grid outer "" expandy
+	Grid ? "" expandy
 		Grid grid "" expandy
 			---|
 			---|

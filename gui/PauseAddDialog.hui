@@ -1,10 +1,9 @@
 Dialog pause_add_dialog "New pause" width=250 height=80
-	Grid ? ""
+	Grid ? "" vertical
 		Grid ? ""
 			Text t_duration "Duration"
 			SpinButton duration "1.0" range=0:10000:0.001 expandx
 			Text t_s "s"
-		---|
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

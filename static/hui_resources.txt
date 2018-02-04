@@ -285,7 +285,7 @@ width=380,height=516
 1
 Grid
 ?
-
+vertical
 0
 0
 3
@@ -298,8 +298,8 @@ expandx,format=TTTt
 Grid
 controller_buttons
 
-0
 1
+0
 3
 Button
 add
@@ -322,8 +322,8 @@ target
 Group
 cc_group_edit
 
-0
 2
+0
 1
 Grid
 ?
@@ -358,7 +358,7 @@ width=300,height=400
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -371,8 +371,8 @@ multiselection,nobar
 Grid
 ?
 buttonbar
-0
 1
+0
 2
 Button
 cancel
@@ -408,7 +408,7 @@ width=400,height=400
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -421,8 +421,8 @@ expandx,expandy
 Grid
 ?
 buttonbar
-0
 1
+0
 3
 CheckBox
 relative
@@ -609,8 +609,8 @@ width=430,height=375
 0
 1
 Grid
-lvld_grid_1
-expandy
+?
+vertical,expandy
 0
 0
 3
@@ -623,8 +623,8 @@ format=tTC,select-single,reorderable
 Grid
 ?
 
-0
 1
+0
 3
 Button
 add_layer
@@ -647,8 +647,8 @@ flat,image=hui:paste
 Group
 lvld_t_edit
 
-0
 2
+0
 1
 Grid
 ?
@@ -1317,7 +1317,7 @@ width=380,height=516
 1
 Grid
 ?
-
+vertical
 0
 0
 4
@@ -1335,9 +1335,9 @@ expandx,center,italic
 0
 Grid
 me_grid_yes
-
-0
+vertical
 1
+0
 3
 Group
 me_group_view
@@ -1420,8 +1420,8 @@ expandx
 Group
 me_group_creation
 
-0
 1
+0
 1
 Grid
 ?
@@ -1434,13 +1434,7 @@ midi_edit_mode
 
 0
 0
-3
-Grid
-?
-
-1
-0
-0
+2
 Grid
 me_group_interval
 
@@ -1528,8 +1522,8 @@ expandx
 Expander
 me_group_reference
 
-0
 2
+0
 1
 ListView
 reference_tracks
@@ -1540,14 +1534,14 @@ height=200,noexpandy,nobar,select-multi
 Text
 ?
 expandy
-0
 2
+0
 0
 Group
 me_group_edit
 
-0
 3
+0
 1
 Grid
 ?
@@ -1710,7 +1704,7 @@ Grid
 4
 Grid
 ?
-
+vertical
 0
 0
 3
@@ -1723,14 +1717,14 @@ bold,center
 DrawingArea
 output-peaks
 width=100,height=30,noexpandx,noexpandy
-0
 1
+0
 0
 Slider
 output-volume
 vertical,expandy
-0
 2
+0
 0
 Separator
 
@@ -1759,7 +1753,7 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
 4
@@ -1790,8 +1784,8 @@ per_second
 Group
 nd_g_track
 
-0
 1
+0
 1
 Grid
 ?
@@ -1814,12 +1808,12 @@ new_track_type:midi
 Group
 nd_g_metronome
 
-0
 2
+0
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -1832,8 +1826,8 @@ metronome
 Grid
 nd_g_metronome_params
 
-0
 1
+0
 9
 Text
 nd_t_bpm
@@ -1892,8 +1886,8 @@ range=1:24
 Grid
 ?
 buttonbar
-0
 3
+0
 2
 Button
 cancel
@@ -1916,7 +1910,7 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -1947,8 +1941,8 @@ t_s
 Grid
 ?
 buttonbar
-0
 1
+0
 2
 Button
 cancel
@@ -1971,7 +1965,7 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -1994,7 +1988,7 @@ range=0:10000:0.001,expandx
 0
 0
 Text
-t_s
+s
 
 2
 0
@@ -2002,8 +1996,8 @@ t_s
 Grid
 ?
 buttonbar
-0
 1
+0
 2
 Button
 cancel
@@ -2199,7 +2193,7 @@ width=210,height=30
 1
 Grid
 progress_cancelable_grid
-expandx
+vertical,expandx
 0
 0
 2
@@ -2212,8 +2206,8 @@ expandx
 Button
 cancel
 image=hui:cancel
-0
 1
+0
 0
 // Resource
 Dialog
@@ -2224,7 +2218,7 @@ width=300,height=100
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -2266,15 +2260,15 @@ t_samplerate
 0
 SpinButton
 sample_rate
-range=1
+range=1:
 1
 2
 0
 Grid
 ?
 buttonbar
-0
 1
+0
 2
 Button
 cancel
@@ -2297,10 +2291,10 @@ width=300,height=200
 1
 Grid
 ?
-
+vertical
 0
 0
-6
+5
 Grid
 capture_audio_grid
 
@@ -2328,8 +2322,8 @@ italic
 Grid
 capture_midi_grid
 
-0
 1
+0
 2
 Group
 rdt_midi_source
@@ -2352,8 +2346,8 @@ italic
 Grid
 capture_multi_grid
 
-0
 2
+0
 3
 Text
 rdt_multi_target
@@ -2376,8 +2370,8 @@ bold
 Group
 rdt_capture
 
-0
 3
+0
 1
 Grid
 ?
@@ -2430,8 +2424,8 @@ flat,image=hui:delete
 Grid
 ?
 buttonbar
-0
 4
+0
 2
 Button
 cancel
@@ -2445,12 +2439,6 @@ image=hui:ok
 1
 0
 0
-Text
-?
-expandy
-0
-5
-0
 // Resource
 Dialog
 sample_manager_dialog
@@ -2460,7 +2448,7 @@ width=400,height=400,allow-parent
 1
 Grid
 ?
-
+vertical
 0
 0
 3
@@ -2473,8 +2461,8 @@ format=iTttC,select-multi
 Grid
 ?
 
-0
 1
+0
 7
 Button
 import_from_file
@@ -2521,8 +2509,8 @@ flat,image=hui:zoom-in
 Group
 smd_group_edit
 
-0
 2
+0
 1
 Grid
 ?
@@ -2545,7 +2533,7 @@ width=375,height=230
 1
 Grid
 ?
-
+vertical
 0
 0
 5
@@ -2564,8 +2552,8 @@ expandx
 Group
 ld_t_track
 
-0
 1
+0
 1
 ComboBox
 track
@@ -2576,8 +2564,8 @@ track
 Group
 ld_t_volume
 
-0
 2
+0
 1
 Grid
 ?
@@ -2606,14 +2594,14 @@ mute
 Text
 ?
 expandy
-0
 3
+0
 0
 Group
 ld_t_edit
 
-1
-3
+4
+0
 1
 Grid
 ?
@@ -2648,7 +2636,7 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
 3
@@ -2739,8 +2727,8 @@ range=0:1000:0.01",expandx
 Grid
 ?
 
-0
 1
+0
 2
 Text
 ssd_t_method
@@ -2757,8 +2745,8 @@ expandx
 Grid
 ?
 buttonbar
-0
 2
+0
 2
 Button
 cancel
@@ -2781,7 +2769,7 @@ width=300,height=400
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -2794,8 +2782,8 @@ format=itt
 Grid
 ?
 buttonbar
-0
 1
+0
 2
 Button
 cancel
@@ -2818,7 +2806,7 @@ width=300,height=200
 1
 Grid
 ?
-
+vertical
 0
 0
 3
@@ -2885,8 +2873,8 @@ default_artist
 Group
 pdp_capture
 
-0
 1
+0
 1
 Grid
 ?
@@ -2915,8 +2903,8 @@ image=hui:open
 Grid
 ?
 buttonbar
-0
 2
+0
 1
 DefButton
 close
@@ -2933,7 +2921,7 @@ width=430,height=375
 1
 Grid
 ?
-expandy
+expandy,vertical
 0
 0
 3
@@ -2994,8 +2982,8 @@ compress
 Group
 ad_t_tags
 
-0
 1
+0
 1
 Grid
 ?
@@ -3030,8 +3018,8 @@ flat,image=hui:delete
 Group
 ad_t_edit
 
-0
 2
+0
 1
 Grid
 ?
@@ -3065,7 +3053,7 @@ width=300,height=200
 0
 1
 Grid
-outer
+?
 expandy
 0
 0
@@ -3126,7 +3114,7 @@ width=200,height=200
 0
 1
 Grid
-grid
+?
 noexpandx,expandy
 0
 0
@@ -3261,7 +3249,7 @@ width=380,height=516
 1
 Grid
 ?
-
+vertical
 0
 0
 7
@@ -3280,8 +3268,8 @@ expandx
 Group
 g_volume
 
-0
 1
+0
 1
 Grid
 ?
@@ -3328,8 +3316,8 @@ percent
 Group
 g_instrument
 
-0
 2
+0
 1
 Grid
 ?
@@ -3364,8 +3352,8 @@ image=hui:properties,flat
 Group
 g_midi
 
-0
 3
+0
 1
 Grid
 ?
@@ -3388,8 +3376,8 @@ flat
 Group
 g_synth
 
-0
 4
+0
 1
 Grid
 ?
@@ -3412,14 +3400,14 @@ noexpandx,flat,image=hui:properties,flat
 Text
 ?
 expandy
-0
 5
+0
 0
 Group
 td_t_edit
 
-0
 6
+0
 1
 Grid
 ?
@@ -3454,7 +3442,7 @@ width=80,height=200
 1
 Grid
 ?
-
+vertical
 0
 0
 4
@@ -3466,21 +3454,21 @@ center
 0
 Slider
 panning
-width=80,origin=no
-0
+range=-100:100:1,width=80,origin=no
 1
+0
 0
 Slider
 volume
-vertical,expandy
-0
+range=-10000:10:0.1,vertical,expandy
 2
+0
 0
 CheckBox
 mute
 
-0
 3
+0
 0
 // Resource
 Dialog
@@ -3603,6 +3591,9 @@ Record
 
 /redo
 Redo
+
+/s
+s
 
 /save
 Save
@@ -4156,9 +4147,6 @@ Edit pause
 pause_edit_dialog/t_duration
 Duration
 
-pause_edit_dialog/t_s
-s
-
 popup_marker_menu/delete_marker
 Delete
 
@@ -4451,10 +4439,10 @@ track-mixer/mute
 Muted
 
 track-mixer/panning
-0\\-100\\100\\1
+0
 Balance
 track-mixer/volume
-0\\-10000\\10\\0.1
+0
 Volume in dB
 track_dialog/_edit_midi
 Edit

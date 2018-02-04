@@ -1,31 +1,9 @@
 Dialog mixing-console "" width=300 height=200
 	Grid ? ""
-		Grid ? ""
+		Grid ? "" vertical
 			Text t_output "Output" bold center
-			---|
 			DrawingArea output-peaks "" width=100 height=30 noexpandx noexpandy "tooltip=Output level"
-			---|
 			Slider output-volume "" vertical expandy "tooltip=Output volume"
 		Separator ? "" vertical
 		Grid inner-grid ""
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
 		CheckBox link-volumes "couple" "tooltip=change the sliders of all tracks simultaniously"

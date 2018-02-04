@@ -16,16 +16,22 @@ namespace hui
 ControlGrid::ControlGrid(const string &title, const string &id, int num_x, int num_y, Panel *panel) :
 	Control(CONTROL_GRID, id)
 {
+	vertical = false;
+	button_bar = false;
 	GetPartStrings(title);
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
-	button_bar = false;
 	setOptions(OptionString);
 }
 
 void ControlGrid::add(Control *child, int x, int y)
 {
+	if (vertical){
+		int t = x;
+		x = y;
+		y = t;
+	}
 	GtkWidget *child_widget = child->get_frame();
 	gtk_grid_attach(GTK_GRID(widget), child_widget, x, y, 1, 1);
 	child->parent = this;
@@ -47,6 +53,8 @@ void ControlGrid::__setOption(const string &op, const string &value)
 		gtk_widget_set_margin_top(widget, 7);
 		gtk_widget_set_margin_bottom(widget, 4);
 		gtk_widget_set_halign(widget, GTK_ALIGN_END);
+	}else if (op == "vertical"){
+		vertical = true;
 	}
 }
 

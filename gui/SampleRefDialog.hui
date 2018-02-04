@@ -1,17 +1,14 @@
 Dialog sample_ref_dialog "Sample" width=375 height=230
-	Grid ? ""
+	Grid ? "" vertical
 		Group ld_t_name "Name"
 			Edit name "" expandx
-		---|
 		Group ld_t_track "Track"
 			ComboBox track ""
-		---|
 		Group ld_t_volume "Volume"
 			Grid ? ""
 				SpinButton volume "0" range=-10000:10:0.1 expandx
 				Text /db "dB"
 				CheckBox mute "Muted"
-		---|
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
 			Grid ? ""

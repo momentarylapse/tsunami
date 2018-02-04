@@ -1,8 +1,7 @@
 Dialog track_dialog "Spur" width=380 height=516
-	Grid ? ""
+	Grid ? "" vertical
 		Group g_name "Name"
 			Edit name "" expandx
-		---|
 		Group g_volume "Volume"
 			Grid ? "" noexpandx
 				Text t_volume "Volume"
@@ -12,7 +11,6 @@ Dialog track_dialog "Spur" width=380 height=516
 				Text t_panning "Balance"
 				SpinButton panning "0" range=-100:100:1
 				Text /percent "%"
-		---|
 		Group g_instrument "Instrument"
 			Grid ? ""
 				ComboBox instrument "" expandx
@@ -20,19 +18,15 @@ Dialog track_dialog "Spur" width=380 height=516
 				Grid ? ""
 					Text tuning "" expandx
 					Button edit_tuning "" image=hui:properties flat
-		---|
 		Group g_midi "Midi"
 			Grid ? ""
 				Button _edit_midi "Edit" flat expandx
 				Button _edit_midi_fx "Fx" flat
-		---|
 		Group g_synth "Synthesizer"
 			Grid ? ""
 				Button select_synth "" expandx flat "tooltip=Select synthesizer" flat
 				Button _edit_synth "" noexpandx flat image=hui:properties "tooltip=Configure synthesizer" flat
-		---|
 		Text ? "" expandy
-		---|
 		Group td_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File"

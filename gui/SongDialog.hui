@@ -1,5 +1,5 @@
 Dialog song_dialog "Sound-Datei" width=430 height=375
-	Grid ? "" expandy
+	Grid ? "" expandy vertical
 		Group ad_t_data "Data"
 			Grid ? ""
 				ListView data_list "key\\value" nobar height=110 noexpandy
@@ -13,7 +13,6 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 					---|
 					.
 					CheckBox compress "Compression" "tooltip=when saving"
-		---|
 		Group ad_t_tags "Tags"
 			Grid ? ""
 				ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
@@ -21,7 +20,6 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 				Grid ? ""
 					Button add_tag "" flat image=hui:add
 					Button delete_tag "" flat image=hui:delete
-		---|
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_layers "Layers"

@@ -1,5 +1,5 @@
 Dialog raw_config_dialog "Raw Datei" width=300 height=100
-	Grid ? ""
+	Grid ? "" vertical
 		Grid ? ""
 			Text t_format "Format"
 			ComboBox format "" expandx
@@ -8,8 +8,7 @@ Dialog raw_config_dialog "Raw Datei" width=300 height=100
 			ComboBox channels "Mono\\Stereo"
 			---|
 			Text t_samplerate "Samplerate"
-			SpinButton sample_rate "44100" range=1
-		---|
+			SpinButton sample_rate "44100" range=1:
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
 			Button /ok "OK"

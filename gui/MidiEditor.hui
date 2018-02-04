@@ -1,9 +1,8 @@
 Dialog midi_editor "Midi" width=380 height=516
-	Grid ? ""
+	Grid ? "" vertical
 		Grid me_grid_no ""
 			Text ld_t_no_midi "No midi track selected" expandx center italic
-		---|
-		Grid me_grid_yes ""
+		Grid me_grid_yes "" vertical
 			Group me_group_view "View"
 				Grid ? ""
 					Text me_t_mode "Mode:"
@@ -19,13 +18,11 @@ Dialog midi_editor "Midi" width=380 height=516
 					Grid ? ""
 						ComboBox scale_root "" expandx
 						ComboBox scale_type "" expandx
-			---|
 			Group me_group_creation "Creation"
 				Grid ? ""
 					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord"
 						.
-						Grid ? ""
-							---|
+						.
 						Grid me_group_interval ""
 							Text ld_t_interval "Interval"
 							SpinButton interval "0" range=-99:99
@@ -42,12 +39,9 @@ Dialog midi_editor "Midi" width=380 height=516
 						RadioButton modifier:sharp "♯" expandx
 						RadioButton modifier:flat "♭" expandx
 						RadioButton modifier:natural "♮" expandx
-			---|
 			Expander me_group_reference "Reference tracks"
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
-		---|
 		Text ? "" expandy
-		---|
 		Group me_group_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File"

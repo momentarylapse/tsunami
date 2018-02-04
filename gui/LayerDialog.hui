@@ -1,13 +1,10 @@
 Dialog layer_dialog "Layers" width=430 height=375
-	Grid lvld_grid_1 "" expandy
+	Grid ? "" vertical expandy
 		ListView layers "#\\Name\\Active" format=tTC select-single reorderable "tooltip=Each layer can contain its own audio buffers"
-		---|
 		Grid ? ""
 			Button add_layer "" flat image=hui:add "tooltip=Add a new empty layer at the top"
 			Button delete_layer "" flat image=hui:delete "tooltip=Delete the selected layer and all its audio buffers"
 			Button merge_layer "" flat image=hui:paste "tooltip=Merge the selected layer with the one below it"
-		---|
 		Group lvld_t_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File"
-				.

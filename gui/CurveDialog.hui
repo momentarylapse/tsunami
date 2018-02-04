@@ -1,12 +1,10 @@
 Dialog curve_console "Kurven" width=380 height=516
-	Grid ? ""
+	Grid ? "" vertical
 		ListView curves "Name\\min\\max\\Parameter" expandx format=TTTt
-		---|
 		Grid controller_buttons ""
 			Button add "" image=hui:add
 			Button delete "" image=hui:delete
 			Button target "Parameter"
-		---|
 		Group cc_group_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File"

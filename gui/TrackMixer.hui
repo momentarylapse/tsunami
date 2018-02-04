@@ -1,9 +1,6 @@
 Dialog track-mixer "" width=80 height=200
-	Grid ? ""
+	Grid ? "" vertical
 		Text name "" center
-		---|
-		Slider panning "0\\-100\\100\\1" width=80 origin=no "tooltip=Balance"
-		---|
-		Slider volume "0\\-10000\\10\\0.1" vertical expandy "tooltip=Volume in dB"
-		---|
+		Slider panning "0" range=-100:100:1 width=80 origin=no "tooltip=Balance"
+		Slider volume "0" range=-10000:10:0.1 vertical expandy "tooltip=Volume in dB"
 		CheckBox mute "Muted"

@@ -27,8 +27,8 @@ TrackMixer::TrackMixer()
 	vol_slider_id = "volume";
 	pan_slider_id = "panning";
 	mute_id = "mute";
-	addString(pan_slider_id, "0\\L");
-	addString(pan_slider_id, "0.5\\");
+	addString(pan_slider_id, "-1\\L");
+	addString(pan_slider_id, "0\\");
 	addString(pan_slider_id, "1\\R");
 	addString(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
 	addString(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
@@ -82,7 +82,7 @@ void TrackMixer::onMute()
 
 void TrackMixer::onPanning()
 {
-	track->setPanning(getFloat("")*2 - 1);
+	track->setPanning(getFloat(""));
 }
 
 void TrackMixer::setTrack(Track* t)
@@ -94,9 +94,9 @@ void TrackMixer::setTrack(Track* t)
 void TrackMixer::update()
 {
 	setFloat(vol_slider_id, vol2slider(track->volume));
-	setFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
+	setFloat(pan_slider_id, track->panning);
 	check(mute_id, track->muted);
-	setString(id_name, "!bold\\" + track->getNiceName());
+	setString(id_name, track->getNiceName());
 }
 
 

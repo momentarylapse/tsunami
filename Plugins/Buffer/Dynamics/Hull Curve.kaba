@@ -72,7 +72,7 @@ class HullGrid extends Grid
 
 	// [Delete] -> remove point
 	override void onKeyDown()
-		if HuiGetEvent().key_code == KeyDelete
+		if HuiGetEvent().key_code == KEY_DELETE
 			if Selected > 0 and Selected < config.curve.num-1
 				config.curve.remove(Selected)
 				cp.notify()
@@ -123,9 +123,8 @@ class HullCurvePanel extends ConfigPanel
 	override void __init__(HullCurve *_h)
 		super.__init__(_h)
 		fromSource("
-Grid ? ''
+Grid ? '' vertical
 	DrawingArea drawing '' grabfocus height=250
-	---|
 	Grid ? '' noexpandy
 		ComboBox type 'linear\\log'
 		CheckBox preview 'show buffer'")

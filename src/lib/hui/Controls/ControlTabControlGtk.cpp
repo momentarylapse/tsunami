@@ -70,19 +70,12 @@ void ControlTabControl::__removeString(int row)
 void ControlTabControl::addPage(const string &str)
 {
 	GtkWidget *inside;
-	bool resizable = true;
-	if (panel->win)
-		if (!panel->win->is_resizable)
-			resizable = false;
-	if (resizable){
 #if GTK_CHECK_VERSION(3,0,0)
-		inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 #else
-		inside = gtk_hbox_new(true, 0);
+	inside = gtk_hbox_new(true, 0);
 #endif
-		gtk_box_set_homogeneous(GTK_BOX(inside), true);
-	}else
-		inside = gtk_fixed_new();
+	gtk_box_set_homogeneous(GTK_BOX(inside), true);
 	gtk_widget_show(inside);
 	GtkWidget *label = gtk_label_new(sys_str(str));
 	gtk_notebook_append_page(GTK_NOTEBOOK(widget), inside, label);

@@ -67,36 +67,36 @@ public:
 
 	// creating controls
 
-	void _cdecl addControl(const string &type, const string &title, int x, int y, int width, int height, const string &id);
+	void _cdecl addControl(const string &type, const string &title, int x, int y, const string &id);
 	void _cdecl _addControl(const string &ns, Resource &cmd, const string &parent_id);
-	void _cdecl addButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addDefButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addColorButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addToggleButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addCheckBox(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addRadioButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addLabel(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addEdit(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addMultilineEdit(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addGroup(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addComboBox(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addTabControl(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl setTarget(const string &id, int tab_page);
-	void _cdecl addListView(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addTreeView(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addIconView(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addListView_Test(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addProgressBar(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addSlider(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addImage(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addDrawingArea(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addGrid(const string &title, int x, int y, int width, int height, const string &id);
-	void _cdecl addSpinButton(const string &title, int x, int y, int width, int height, const string &id);
-	void _cdecl addScroller(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addExpander(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addSeparator(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addPaned(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addRevealer(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl addButton(const string &title, int x, int y,const string &id);
+	void _cdecl addDefButton(const string &title, int x, int y, const string &id);
+	void _cdecl addColorButton(const string &title, int x, int y, const string &id);
+	void _cdecl addToggleButton(const string &title, int x, int y, const string &id);
+	void _cdecl addCheckBox(const string &title, int x, int y, const string &id);
+	void _cdecl addRadioButton(const string &title, int x, int y, const string &id);
+	void _cdecl addLabel(const string &title, int x, int y, const string &id);
+	void _cdecl addEdit(const string &title, int x, int y, const string &id);
+	void _cdecl addMultilineEdit(const string &title, int x, int y, const string &id);
+	void _cdecl addGroup(const string &title, int x, int y, const string &id);
+	void _cdecl addComboBox(const string &title, int x, int y, const string &id);
+	void _cdecl addTabControl(const string &title, int x, int y, const string &id);
+	void _cdecl setTarget(const string &id);
+	void _cdecl addListView(const string &title, int x, int y, const string &id);
+	void _cdecl addTreeView(const string &title, int x, int y, const string &id);
+	void _cdecl addIconView(const string &title, int x, int y, const string &id);
+	void _cdecl addListView_Test(const string &title, int x, int y, const string &id);
+	void _cdecl addProgressBar(const string &title, int x, int y, const string &id);
+	void _cdecl addSlider(const string &title, int x, int y, const string &id);
+	void _cdecl addImage(const string &title, int x, int y, const string &id);
+	void _cdecl addDrawingArea(const string &title, int x, int y, const string &id);
+	void _cdecl addGrid(const string &title, int x, int y, const string &id);
+	void _cdecl addSpinButton(const string &title, int x, int y, const string &id);
+	void _cdecl addScroller(const string &title, int x, int y, const string &id);
+	void _cdecl addExpander(const string &title, int x, int y, const string &id);
+	void _cdecl addSeparator(const string &title, int x, int y, const string &id);
+	void _cdecl addPaned(const string &title, int x, int y, const string &id);
+	void _cdecl addRevealer(const string &title, int x, int y, const string &id);
 
 	void _cdecl embedDialog(const string &id, int x, int y);
 	void _cdecl embedSource(const string &source, const string &parent_id, int x, int y);
@@ -161,8 +161,6 @@ public:
 
 
 protected:
-	int tab_creation_page;
-	bool is_resizable;
 
 
 #ifdef HUI_API_WIN
@@ -171,7 +169,7 @@ protected:
 public:
 	GtkWidget *plugable;
 protected:
-	void _insert_control_(Control *c, int x, int y, int width, int height);
+	void _insert_control_(Control *c, int x, int y);
 	int desired_width, desired_height;
 #endif
 

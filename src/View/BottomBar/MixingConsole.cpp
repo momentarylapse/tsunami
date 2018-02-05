@@ -142,7 +142,7 @@ void MixingConsole::loadData()
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
 		embed(m, id_inner, i*2, 0);
-		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator-" + i2s(i));
+		addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
 	}
 	for (int i=song->tracks.num; i<mixer.num; i++){
 		delete(mixer[i]);

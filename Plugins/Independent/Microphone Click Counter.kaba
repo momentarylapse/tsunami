@@ -12,14 +12,14 @@ class ClickCounterDialog extends Dialog
 	MicrophoneClickCounter *counter
 	void __init__(MicrophoneClickCounter *_counter)
 		super.__init__("Click Counter", 300, 175, _counter.win, false)
-		addGrid("", 0, 0, 1, 2, "grid")
-		setTarget("grid", 0)
-		addDrawingArea("", 0, 0, 0, 0, "drawing")
-		addGrid("", 0, 1, 3, 1, "grid2")
-		setTarget("grid2", 0)
-		addButton("+", 0, 0, 0, 0, "inc")
-		addButton("-", 1, 0, 0, 0, "dec")
-		addButton("Close", 2, 0, 0, 0, "close")
+		addGrid("", 0, 0, "grid")
+		setTarget("grid")
+		addDrawingArea("", 0, 0, "drawing")
+		addGrid("", 0, 1, "grid2")
+		setTarget("grid2")
+		addButton("+", 0, 0, "inc")
+		addButton("-", 1, 0, "dec")
+		addButton("Close", 2, 0, "close")
 		setImage("close", "hui:close")
 		
 		counter = _counter

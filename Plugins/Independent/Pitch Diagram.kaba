@@ -127,7 +127,7 @@ complex[] bufc
 
 void main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
-	win.addDrawingArea("", 0, 0, 0, 0, "drawing")
+	win.addDrawingArea("", 0, 0, "drawing")
 	
 	win.eventSX("drawing", "hui:draw", &Draw)
 	win.eventS("hui:close", &OnClose)

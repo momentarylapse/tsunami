@@ -32,8 +32,8 @@ public:
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
-			setTarget("grid", 0);
-			addLabel(_("not configurable"), 0, 1, 0, 0, "");
+			setTarget("grid");
+			addLabel(_("not configurable"), 0, 1, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}
@@ -167,7 +167,7 @@ void SynthConsole::setTrack(Track *t)
 		track->synth->subscribe(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);
 		panel = new SynthPanel(track);
 		embed(panel, id_inner, 0, 0);
-		addSeparator("!horizontal", 0, 1, 0, 0, "separator_0");
+		addSeparator("!horizontal", 0, 1, "separator_0");
 	}
 }
 

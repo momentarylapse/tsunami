@@ -59,26 +59,26 @@ class Equalizer15 extends AudioEffect
 		f.clear()
 	
 	override ConfigPanel *createPanel()
-		return new ConfigPanel(self)
+		return new Equalizer15Panel(self)
 
 class Equalizer15Panel extends ConfigPanel
 	override Equalizer15 *c
 
 	override void __init__(Equalizer15 *_eq)
 		super.__init__(_eq)
-		addGrid("", 0, 1, NUM_BANDS, 2, "grid")
-		setTarget("grid", 0)
+		addGrid("", 0, 1, "grid")
+		setTarget("grid")
 		for i in 0:NUM_BANDS
-			addSlider("!expandy,vertical", i, 0, 0, 0, "slider_" + i)
+			addSlider("!expandy,vertical,height=200", i, 0, "slider_" + i)
 			//addString("slider_" + i, "0.5:0")
-		addLabel("20", 0, 1, 0, 0, "")
-		addLabel("54", 2, 1, 0, 0, "")
-		addLabel("140", 4, 1, 0, 0, "")
-		addLabel("390", 6, 1, 0, 0, "")
-		addLabel("1k", 8, 1, 0, 0, "")
-		addLabel("2k8", 10, 1, 0, 0, "")
-		addLabel("7k5", 12, 1, 0, 0, "")
-		addLabel("20k", 14, 1, 0, 0, "")
+		addLabel("20", 0, 1, "")
+		addLabel("54", 2, 1, "")
+		addLabel("140", 4, 1, "")
+		addLabel("390", 6, 1, "")
+		addLabel("1k", 8, 1, "")
+		addLabel("2k8", 10, 1, "")
+		addLabel("7k5", 12, 1, "")
+		addLabel("20k", 14, 1, "")
 	
 		event("*", &onEvent)
 	

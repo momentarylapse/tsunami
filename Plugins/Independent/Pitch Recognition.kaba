@@ -25,10 +25,10 @@ class PitchRecognitionDialog extends Dialog
 	
 	void __init__(PitchRecognition* _plugin)
 		super.__init__("Tonerkennung", 300, 175, _plugin.win, false)
-		addGrid("", 0, 0, 1, 2, "grid")
-		setTarget("grid", 0)
-		addDrawingArea("", 5, 5, 290, 135, "drawing")
-		addButton("Schließen", 5, 145, 290, 25, "close")
+		addGrid("", 0, 0, "grid")
+		setTarget("grid")
+		addDrawingArea("", 5, 5, "drawing")
+		addButton("Schließen", 5, 145, "close")
 		setImage("close", "hui:close")
 		
 		plugin = _plugin

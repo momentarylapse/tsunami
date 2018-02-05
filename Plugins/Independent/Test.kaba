@@ -5,7 +5,7 @@ class MyDialog extends Dialog
 	void __init__(TsunamiPlugin* _plugin)
 		super.__init__("", 300, 200, _plugin.win, false)
 		plugin = _plugin
-		addEdit("", 0, 0, 0, 0, "edit")
+		addEdit("", 0, 0, "edit")
 		event("edit", &onChange)
 		event("hui:close", &onClose)
 	void onChange()

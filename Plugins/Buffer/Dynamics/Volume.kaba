@@ -36,14 +36,14 @@ class VolumePanel extends ConfigPanel
 	Slider *slider
 	override void __init__(Volume *_v)
 		super.__init__(_v)
-		addGrid("!width=400", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
-		addCheckBox("Maximieren", 0, 1, 0, 0, "max")
-		addGrid("", 0, 0, 3, 1, "table2")
-		setTarget("table2", 0)
-		addSlider("!expandx", 0, 0, 0, 0, "volume_slider")
-		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
-		addLabel("%", 2, 0, 0, 0, "")
+		addGrid("!width=400", 0, 0, "table1")
+		setTarget("table1")
+		addCheckBox("Maximieren", 0, 1, "max")
+		addGrid("", 0, 0, "table2")
+		setTarget("table2")
+		addSlider("!expandx", 0, 0, "volume_slider")
+		addSpinButton("\\0\\1000\\0.1", 1, 0, "volume")
+		addLabel("%", 2, 0, "")
 		
 		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.volume)
 	

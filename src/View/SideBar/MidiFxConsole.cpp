@@ -34,8 +34,8 @@ public:
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
-			setTarget("grid", 0);
-			addLabel(_("not configurable"), 0, 1, 0, 0, "");
+			setTarget("grid");
+			addLabel(_("not configurable"), 0, 1, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}
@@ -215,7 +215,7 @@ void MidiFxConsole::setTrack(Track *t)
 		foreachi(MidiEffect *e, track->midi.fx, i){
 			panels.add(new SingleMidiFxPanel(song, track, e, i));
 			embed(panels.back(), id_inner, 0, i*2 + 3);
-			addSeparator("!horizontal", 0, i*2 + 4, 0, 0, "separator_" + i2s(i));
+			addSeparator("!horizontal", 0, i*2 + 4, "separator_" + i2s(i));
 		}
 		hideControl("comment_no_fx", track->midi.fx.num > 0);
 	}else{

@@ -24,10 +24,10 @@ class PitchForkDialog extends Dialog
 	
 	void __init__(PitchFork *pf)
 		super.__init__("Pitchfork", 200, 80, pf.win, false)
-		addGrid("", 0, 0, 1, 2, "table")
-		setTarget("table", 0)
-		addSpinButton("", 0, 0, 0, 0, "frequency")
-		addButton("Close", 0, 1, 0, 0, "close")
+		addGrid("", 0, 0, "table")
+		setTarget("table")
+		addSpinButton("", 0, 0, "frequency")
+		addButton("Close", 0, 1, "close")
 		setImage("close", "hui:close")
 		
 		fork = pf

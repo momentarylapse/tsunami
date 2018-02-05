@@ -14,20 +14,20 @@
 
 BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager, Log *log)
 {
-	addRevealer("!slide-up", 0, 0, 0, 0, "revealer");
-	setTarget("revealer", 0);
-	addGrid("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
-	setTarget("root_grid0", 0);
-	addSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
-	addGrid("!expandx", 0, 1, 3, 1, "root_grid");
-	setTarget("root_grid", 0);
-	addGrid("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
-	addSeparator("!vertical", 1, 0, 0, 0, "");
-	addGrid("", 2, 0, 1, 20, "console_grid");
-	setTarget("button_grid", 0);
-	addButton("!noexpandy,flat", 0, 0, 0, 0, "close");
+	addRevealer("!slide-up", 0, 0, "revealer");
+	setTarget("revealer");
+	addGrid("!noexpandy,height=300,expandx", 0, 0, "root_grid0");
+	setTarget("root_grid0");
+	addSeparator("!horizontal,expandx", 0, 0, "");
+	addGrid("!expandx", 0, 1, "root_grid");
+	setTarget("root_grid");
+	addGrid("!noexpandx,width=130", 0, 0, "button_grid");
+	addSeparator("!vertical", 1, 0, "");
+	addGrid("", 2, 0, "console_grid");
+	setTarget("button_grid");
+	addButton("!noexpandy,flat", 0, 0, "close");
 	setImage("close", "hui:close");
-	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
+	addListView("!nobar\\name", 0, 1, "choose");
 
 	log_console = new LogConsole(log);
 	mixing_console = new MixingConsole(song, device_manager, view);

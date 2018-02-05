@@ -32,8 +32,8 @@ public:
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
-			setTarget("grid", 0);
-			addLabel(_("not configurable"), 0, 1, 0, 0, "");
+			setTarget("grid");
+			addLabel(_("not configurable"), 0, 1, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}
@@ -199,7 +199,7 @@ void FxConsole::setTrack(Track *t)
 	foreachi(Effect *e, fx, i){
 		panels.add(new SingleFxPanel(song, track, e, i));
 		embed(panels.back(), id_inner, 0, i*2);
-		addSeparator("!horizontal", 0, i*2 + 1, 0, 0, "separator_" + i2s(i));
+		addSeparator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
 	}
 	hideControl("comment_no_fx", fx.num > 0);
 	//Enable("add", track);

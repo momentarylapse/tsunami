@@ -16,7 +16,7 @@ namespace hui
 class ControlGrid : public Control
 {
 public:
-	ControlGrid(const string &text, const string &id, int num_x, int num_y, Panel *panel);
+	ControlGrid(const string &text, const string &id, Panel *panel);
 	virtual void add(Control *child, int x, int y);
 
 	virtual void __setOption(const string &op, const string &value);

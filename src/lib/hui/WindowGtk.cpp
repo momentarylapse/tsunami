@@ -159,7 +159,7 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	gtk_window_set_title(GTK_WINDOW(window), sys_str(title));
-	gtk_window_set_resizable(GTK_WINDOW(window), is_resizable);
+	gtk_window_set_resizable(GTK_WINDOW(window), true);
 	if (parent){
 		// dialog -> center on screen or root (if given)    ->  done by gtk....later
 		/*if (parent){
@@ -179,10 +179,7 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 	}
 
 	// size
-	if (is_resizable)
-		gtk_window_resize(GTK_WINDOW(window), width, height);
-	else
-		gtk_widget_set_size_request(window, width, height);
+	gtk_window_resize(GTK_WINDOW(window), width, height);
 	desired_width = width;
 	desired_height = height;
 
@@ -228,20 +225,12 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 	plugable = NULL;
 	cur_control = NULL;
 	if (ControlMode){
-		if (is_resizable){
-			// free to use...
-			//cur_control = hbox;
-			plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-			gtk_widget_show(plugable);
-			//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
-			gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
-		}else{
-			// "fixed" (for buttons etc)
-			plugable = gtk_fixed_new();
-			gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
-			gtk_widget_show(plugable);
-			//gl_widget = plugable;
-		}
+		// free to use...
+		//cur_control = hbox;
+		plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+		gtk_widget_show(plugable);
+		//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
+		gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
 	}
 
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);

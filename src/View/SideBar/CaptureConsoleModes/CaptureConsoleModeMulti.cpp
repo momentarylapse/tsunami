@@ -41,19 +41,19 @@ void CaptureConsoleModeMulti::enter()
 		c.id_target = "capture-multi-target-" + i2s(i);
 		c.id_type = "capture-multi-type-" + i2s(i);
 		c.id_source = "capture-multi-source-" + i2s(i);
-		cc->setTarget("capture_multi_grid", -1);
-		cc->addLabel(t->getNiceName(), 0, i+1, 0, 0, c.id_target);
-		cc->addLabel(track_type(t->type), 1, i+1, 0, 0, c.id_type);
+		cc->setTarget("capture_multi_grid");
+		cc->addLabel(t->getNiceName(), 0, i+1, c.id_target);
+		cc->addLabel(track_type(t->type), 1, i+1, c.id_type);
 		if (t->type == Track::TYPE_AUDIO){
-			cc->addComboBox(_("        - none -"), 2, i+1, 0, 0, c.id_source);
+			cc->addComboBox(_("        - none -"), 2, i+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->addString(c.id_source, d->get_name());
 		}else if (t->type == Track::TYPE_MIDI){
-			cc->addComboBox(_("        - none -"), 2, i+1, 0, 0, c.id_source);
+			cc->addComboBox(_("        - none -"), 2, i+1, c.id_source);
 			for (Device *d: sources_midi)
 				cc->addString(c.id_source, d->get_name());
 		}else{
-			cc->addLabel(_("        - none -"), 2, i+1, 0, 0, c.id_source);
+			cc->addLabel(_("        - none -"), 2, i+1, c.id_source);
 		}
 		items.add(c);
 	}

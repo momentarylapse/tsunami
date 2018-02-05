@@ -16,7 +16,7 @@ namespace hui
 class ControlSlider : public Control
 {
 public:
-	ControlSlider(const string &text, const string &id, bool vertical);
+	ControlSlider(const string &text, const string &id);
 	virtual float getFloat();
 	virtual void __setFloat(float f);
 	virtual void __addString(const string &s);

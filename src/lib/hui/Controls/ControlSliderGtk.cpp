@@ -15,10 +15,10 @@ namespace hui
 void OnGtkSliderChange(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:change");	}
 
-ControlSlider::ControlSlider(const string &title, const string &id, bool _vertical) :
+ControlSlider::ControlSlider(const string &title, const string &id) :
 	Control(CONTROL_SLIDER, id)
 {
-	vertical = _vertical;
+	vertical = false;
 	GetPartStrings(title);
 	if (OptionString.find("vertical") >= 0)
 		vertical = true;

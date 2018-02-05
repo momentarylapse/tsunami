@@ -67,14 +67,14 @@ class HarmonicPanel extends ConfigPanel
 	HarmonicGrid grid
 	override void __init__(HarmonicSynthesizer *_s)
 		super.__init__(_s)
-		addGrid("", 0, 0, 1, 2, "main_table")
-		setTarget("main_table", 0)
-		addGrid("", 0, 0, 4, 1, "table1")
-		addDrawingArea("!grabfocus,width=400", 0, 1, 0, 0, "drawing")
-		setTarget("table1", 0)
-		addLabel("Release", 0, 0, 0, 0, "")
-		addSpinButton("!range=0:500:0.1\\0", 1, 0, 0, 0, "release")
-		addLabel("ms", 2, 0, 0, 0, "")
+		addGrid("", 0, 0, "main_table")
+		setTarget("main_table")
+		addGrid("", 0, 0, "table1")
+		addDrawingArea("!grabfocus,width=400", 0, 1, "drawing")
+		setTarget("table1")
+		addLabel("Release", 0, 0, "")
+		addSpinButton("!range=0:500:0.1\\0", 1, 0, "release")
+		addLabel("ms", 2, 0, "")
 		event("release", &onChange)
 		hc = &c.config
 		

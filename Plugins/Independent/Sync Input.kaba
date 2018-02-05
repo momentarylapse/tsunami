@@ -34,7 +34,7 @@ void main()
 	synth.sample_rate = SAMPLE_RATE
 	
 	dlg = new Dialog("Sync", 200, 80, MainWin, false)
-	dlg.addLabel("Sync...", 0, 0, 0, 0, "")
+	dlg.addLabel("Sync...", 0, 0, "")
 	offset_in = 0
 	
 	input.addObserver(nil, &sync)

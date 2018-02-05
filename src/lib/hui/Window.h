@@ -196,13 +196,6 @@ public:
 	void _cdecl __init_ext__(const string &title, int width, int height, Window *root, bool allow_root);
 };
 
-class FixedDialog : public Window
-{
-public:
-	FixedDialog(const string &title, int width, int height, Window *root, bool allow_root);
-	void _cdecl __init_ext__(const string &title, int width, int height, Window *root, bool allow_root);
-};
-
 extern Window *CurWindow;
 
 
@@ -218,7 +211,6 @@ void FuncIgnore();
 void FuncClose();
 
 enum{
-	WIN_MODE_RESIZABLE = 1,
 	WIN_MODE_NO_FRAME = 2,
 	WIN_MODE_NO_TITLE = 4,
 	WIN_MODE_CONTROLS = 8,

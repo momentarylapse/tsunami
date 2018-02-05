@@ -96,11 +96,11 @@ struct AutoConfigDataFloat : public AutoConfigData
 	}
 	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
 	{
-		p->addGrid("", 1, i, 3, 1, "grid-" + i);
-		p->setTarget("grid-" + i, 0);
-		p->addSlider("!width=150,expandx", 0, 0, 0, 0, "slider-" + i);
-		p->addSpinButton(format("%f\\%f\\%f\\%f", *value, min*factor, max*factor, step), 1, 0, 0, 0, "spin-" + i);
-		p->addLabel(unit, 2, 0, 0, 0, "");
+		p->addGrid("", 1, i, "grid-" + i);
+		p->setTarget("grid-" + i);
+		p->addSlider("!width=150,expandx", 0, 0, "slider-" + i);
+		p->addSpinButton(format("%f\\%f\\%f\\%f", *value, min*factor, max*factor, step), 1, 0, "spin-" + i);
+		p->addLabel(unit, 2, 0, "");
 		slider = new Slider(p, "slider-" + i, "spin-" + i, min, max, factor, callback, *value);
 	}
 	virtual void get_value()
@@ -144,7 +144,7 @@ struct AutoConfigDataInt : public AutoConfigData
 	{
 		id = "spin-" + i;
 		panel = p;
-		p->addSpinButton(format("!width=150,expandx\\%d\\%d\\%d", *value, min, max), 1, i, 0, 0, id);
+		p->addSpinButton(format("!width=150,expandx\\%d\\%d\\%d", *value, min, max), 1, i, id);
 		p->event(id, callback);
 	}
 	virtual void get_value()
@@ -176,7 +176,7 @@ struct AutoConfigDataPitch : public AutoConfigData
 	{
 		id = "pitch-" + i;
 		panel = p;
-		p->addComboBox("!width=150,expandx", 1, i, 0, 0, id);
+		p->addComboBox("!width=150,expandx", 1, i, id);
 		for (int j=0; j<MAX_PITCH; j++)
 			p->addString(id, pitch_name(j));
 		p->setInt(id, *value);
@@ -213,7 +213,7 @@ struct AutoConfigDataString : public AutoConfigData
 	{
 		id = "edit-" + i;
 		panel = p;
-		p->addEdit("!width=150,expandx\\" + *value, 1, i, 0, 0, id);
+		p->addEdit("!width=150,expandx\\" + *value, 1, i, id);
 		p->event(id, callback);
 	}
 	virtual void get_value()
@@ -267,13 +267,13 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Configurable *_c) 
 	ConfigPanel(_c)
 {
 	aa = _aa;
-	addGrid("", 0, 0, 1, 3, "root-table");
-	setTarget("root-table", 0);
-	addGrid("", 0, 1, 4, aa.num, "main-table");
-	setTarget("main-table", 0);
+	addGrid("", 0, 0, "root-table");
+	setTarget("root-table");
+	addGrid("", 0, 1, "main-table");
+	setTarget("main-table");
 	foreachi(AutoConfigData *a, aa, i){
-		setTarget("main-table", 0);
-		addLabel(a->label, 0, i, 0, 0, "");
+		setTarget("main-table");
+		addLabel(a->label, 0, i, "");
 		a->add_gui(this, i, std::bind(&AutoConfigPanel::onChange, this));
 	}
 }

@@ -9,9 +9,8 @@ class MetronomeDialog extends Dialog
 	void __init__(Metronome *_metro)
 		super.__init__("Metronome", 300, 250, _metro.win, true)
 		fromSource("
-Grid ? ''
+Grid ? '' vertical
 	DrawingArea area ''
-	---|
 	Grid ? ''
 		Text ? 'Speed'
 		SpinButton bpm '0' range=1: expandx
@@ -22,7 +21,6 @@ Grid ? ''
 		---|
 		Text ? 'Sub Beats'
 		SpinButton num_sub_beats '1' range=1:99
-	---|
 	Grid ? '' buttonbar
 		Button close 'Close' image=hui:close")
 		

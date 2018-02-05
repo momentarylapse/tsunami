@@ -143,7 +143,7 @@ class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	override void __init__(Equalizer *e)
 		super.__init__(e)
-		addDrawingArea("!grabfocus,height=250", 0, 0, 0, 0, "drawing")
+		addDrawingArea("!grabfocus,height=250", 0, 0, "drawing")
 	
 		grid.init(self, "drawing")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")

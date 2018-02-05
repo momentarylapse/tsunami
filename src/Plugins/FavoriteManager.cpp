@@ -150,13 +150,13 @@ public:
 	{
 		save = _save;
 		names = _names;
-		addGrid("", 0, 0, 1, 2, "grid");
-		setTarget("grid", 0);
-		addListView("Name", 0, 0, 0, 0, "list");
-		addGrid("", 0, 1, 2, 1, "grid2");
-		setTarget("grid2", 0);
-		addEdit("!expandx,placeholder=" + _("enter new name"), 0, 0, 0, 0, "name");
-		addDefButton("Ok", 1, 0, 0, 0, "ok");
+		addGrid("", 0, 0, "grid");
+		setTarget("grid");
+		addListView("Name", 0, 0, "list");
+		addGrid("", 0, 1, "grid2");
+		setTarget("grid2");
+		addEdit("!expandx,placeholder=" + _("enter new name"), 0, 0, "name");
+		addDefButton("Ok", 1, 0, "ok");
 		if (!save)
 			addString("list", _("-Default  Parameters-"));
 		for (string &n: names)

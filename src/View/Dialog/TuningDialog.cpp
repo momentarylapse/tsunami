@@ -35,15 +35,15 @@ void TuningDialog::update()
 	}
 	removeControl("add_first");
 
-	setTarget("td_g_tuning", 0);
+	setTarget("td_g_tuning");
 	foreachi(int t, tuning, i){
 		string id = format("string%d", i);
 		if (i >= gui_num_strings){
-			addLabel(i2s(i+1), 0, 100 - i, 0, 0, id + "_label");
-			addComboBox("", 1, 100 - i, 0, 0, id);
-			addButton("", 2, 100 - i, 0, 0, "delete_" + id);
+			addLabel(i2s(i+1), 0, 100 - i, id + "_label");
+			addComboBox("", 1, 100 - i, id);
+			addButton("", 2, 100 - i, "delete_" + id);
 			setImage("delete_" + id, "hui:delete");
-			addButton("", 3, 100 - i, 0, 0, "add_" + id);
+			addButton("", 3, 100 - i, "add_" + id);
 			setImage("add_" + id, "hui:add");
 			event(id, std::bind(&TuningDialog::onEdit, this));
 			event("delete_" + id, std::bind(&TuningDialog::onDelete, this));
@@ -56,7 +56,7 @@ void TuningDialog::update()
 		setInt(id, MAX_PITCH - 1 - t);
 	}
 	if (tuning.num == 0){
-		addButton("", 0, 0, 0, 0, "add_first");
+		addButton("", 0, 0, "add_first");
 		setImage("add_first", "hui:add");
 	}
 

@@ -84,65 +84,27 @@ extern string OptionString, HuiFormatString;
 	}
 #endif
 
-void Panel::_insert_control_(Control *c, int x, int y, int width, int height)
+void Panel::_insert_control_(Control *c, int x, int y)
 {
 	GtkWidget *frame = c->get_frame();
 	c->panel = this;
 	c->is_button_bar = false;
-	if (is_resizable){
-		if (cur_control){
-			if (cur_control->type == CONTROL_GRID){
-				cur_control->add(c, x, y);
-			}else if (cur_control->type == CONTROL_TABCONTROL){
-				cur_control->add(c, tab_creation_page, 0);
-			}else if (cur_control->type == CONTROL_GROUP){
-				cur_control->add(c, 0, 0);
-			}else if (cur_control->type == CONTROL_EXPANDER){
-				cur_control->add(c, 0, 0);
-			}else if (cur_control->type == CONTROL_SCROLLER){
-				cur_control->add(c, 0, 0);
-			}else if (cur_control->type == CONTROL_REVEALER){
-				cur_control->add(c, 0, 0);
-			}
-		}else{
-			root_control = c;
-			// directly into the window...
-			//gtk_container_add(GTK_CONTAINER(plugable), frame);
-			if (plugable){
-				// this = HuiWindow...
-				gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
-				gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
-			}
-		}
+	if (cur_control){
+		cur_control->add(c, x, y);
 	}else{
-		if ((c->type == CONTROL_BUTTON) or (c->type == CONTROL_COLORBUTTON) or (c->type == CONTROL_COMBOBOX)){
-			x -= 1;
-			y -= 1;
-			width += 2;
-			height += 2;
-		}else if (c->type == CONTROL_LABEL){
-			y -= 4;
-			height += 8;
-		}else if (c->type == CONTROL_DRAWINGAREA){
-			/*x -= 2;
-			y -= 2;*/
+		root_control = c;
+		// directly into the window...
+		//gtk_container_add(GTK_CONTAINER(plugable), frame);
+		if (plugable){
+			// this = HuiWindow...
+			gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
+			gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
 		}
-		// fixed
-		GtkWidget *target_widget = plugable;
-		if (cur_control)
-			target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(cur_control->widget), tab_creation_page); // selected by SetTabCreationPage()...
-			
-		gtk_widget_set_size_request(frame, width, height);
-		gtk_fixed_put(GTK_FIXED(target_widget), frame, x, y);
 	}
 	if (frame != c->widget)
 		gtk_widget_show(frame);
 	gtk_widget_show(c->widget);
 	c->enabled = true;
-	//c->TabID = TabCreationID;
-	//c->TabPage = TabCreationPage;
-	/*c->x = 0;
-	c->y = 0;*/
 	controls.add(c);
 }
 
@@ -209,21 +171,21 @@ void SetImageById(Panel *panel, const string &id)
 
 
 
-void Panel::addButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addButton(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlButton(title, id), x, y, width, height);
+	_insert_control_(new ControlButton(title, id), x, y);
 
 	SetImageById(this, id);
 }
 
-void Panel::addColorButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addColorButton(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlColorButton(title, id), x, y, width, height);
+	_insert_control_(new ControlColorButton(title, id), x, y);
 }
 
-void Panel::addDefButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addDefButton(const string &title, int x, int y, const string &id)
 {
-	addButton(title, x, y, width, height, id);
+	addButton(title, x, y, id);
 	GtkWidget *b = controls.back()->widget;
 	gtk_widget_set_can_default(b, true);
 	gtk_widget_grab_default(b);
@@ -232,82 +194,79 @@ void Panel::addDefButton(const string &title,int x,int y,int width,int height,co
 
 
 
-void Panel::addCheckBox(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addCheckBox(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlCheckBox(title, id), x, y, width, height);
+	_insert_control_(new ControlCheckBox(title, id), x, y);
 }
 
-void Panel::addLabel(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addLabel(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlLabel(title, id), x, y, width, height);
+	_insert_control_(new ControlLabel(title, id), x, y);
 }
 
 
 
-void Panel::addEdit(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addEdit(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlEdit(title, id), x, y, width, height);
+	_insert_control_(new ControlEdit(title, id), x, y);
 }
 
-void Panel::addMultilineEdit(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addMultilineEdit(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlMultilineEdit(title, id), x, y, width, height);
+	_insert_control_(new ControlMultilineEdit(title, id), x, y);
 	if (win)
 		if ((!win->main_input_control) and ((ControlMultilineEdit*)controls.back())->handle_keys)
 			win->main_input_control = controls.back();
 }
 
-void Panel::addSpinButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addSpinButton(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlSpinButton(title, id), x, y, width, height);
+	_insert_control_(new ControlSpinButton(title, id), x, y);
 }
 
-void Panel::addGroup(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addGroup(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlGroup(title, id), x, y, width, height);
+	_insert_control_(new ControlGroup(title, id), x, y);
 }
 
-void Panel::addComboBox(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addComboBox(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlComboBox(title, id), x, y, width, height);
+	_insert_control_(new ControlComboBox(title, id), x, y);
 }
 
-void Panel::addToggleButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addToggleButton(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlToggleButton(title, id), x, y, width, height);
+	_insert_control_(new ControlToggleButton(title, id), x, y);
 }
 
-void Panel::addRadioButton(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addRadioButton(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlRadioButton(title, id, this), x, y, width, height);
+	_insert_control_(new ControlRadioButton(title, id, this), x, y);
 }
 
-void Panel::addTabControl(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addTabControl(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlTabControl(title, id, this), x, y, width, height);
+	_insert_control_(new ControlTabControl(title, id, this), x, y);
 }
 
-void Panel::setTarget(const string &id,int page)
+void Panel::setTarget(const string &id)
 {
-	tab_creation_page = page;
 	cur_control = NULL;
 	if (id.num > 0)
-		for (int i=0;i<controls.num;i++)
-			if (id == controls[i]->id)
-				cur_control = controls[i];
+		cur_control = _get_control_(id);
 }
 
-void Panel::addListView(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addListView(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlListView(title, id, this), x, y, width, height);
+	_insert_control_(new ControlListView(title, id, this), x, y);
 }
 
-void Panel::addTreeView(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addTreeView(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlTreeView(title, id, this), x, y, width, height);
+	_insert_control_(new ControlTreeView(title, id, this), x, y);
 }
 
-void Panel::addIconView(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addIconView(const string &title, int x, int y, const string &id)
 {
 	msg_todo("AddIconView: deprecated");
 	/*
@@ -336,20 +295,20 @@ void Panel::addIconView(const string &title,int x,int y,int width,int height,con
 	gtk_container_add(GTK_CONTAINER(frame),sw);
 	gtk_container_add(GTK_CONTAINER(sw), view);
 	gtk_widget_show(sw);
-	_InsertControl_(view, x, y, width, height, id, HuiKindIconView, frame);*/
+	_InsertControl_(view, x, y, id, HuiKindIconView, frame);*/
 }
 
-void Panel::addProgressBar(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addProgressBar(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlProgressBar(title, id), x, y, width, height);
+	_insert_control_(new ControlProgressBar(title, id), x, y);
 }
 
-void Panel::addSlider(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addSlider(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlSlider(title, id, height > width), x, y, width, height);
+	_insert_control_(new ControlSlider(title, id), x, y);
 }
 
-void Panel::addImage(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addImage(const string &title, int x, int y, const string &id)
 {
 	msg_todo("AddImage: deprecated");
 	/*GetPartStrings(id, title);
@@ -361,46 +320,46 @@ void Panel::addImage(const string &title,int x,int y,int width,int height,const 
 			im = gtk_image_new_from_file(sys_str_f(HuiAppDirectoryStatic + PartString[0]));
 	}else
 		im = gtk_image_new();
-	_InsertControl_(im, x, y, width, height, id, HuiKindImage);*/
+	_InsertControl_(im, x, y, id, HuiKindImage);*/
 }
 
 
-void Panel::addDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addDrawingArea(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlDrawingArea(title, id), x, y, width, height);
+	_insert_control_(new ControlDrawingArea(title, id), x, y);
 	if (win and (!win->main_input_control))
 		win->main_input_control = controls.back();
 }
 
 
-void Panel::addGrid(const string &title, int x, int y, int width, int height, const string &id)
+void Panel::addGrid(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlGrid(title, id, width, height, this), x, y, width, height);
+	_insert_control_(new ControlGrid(title, id, this), x, y);
 }
 
-void Panel::addExpander(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addExpander(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlExpander(title, id), x, y, width, height);
+	_insert_control_(new ControlExpander(title, id), x, y);
 }
 
-void Panel::addPaned(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addPaned(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlPaned(title, id), x, y, width, height);
+	_insert_control_(new ControlPaned(title, id), x, y);
 }
 
-void Panel::addScroller(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addScroller(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlScroller(title, id), x, y, width, height);
+	_insert_control_(new ControlScroller(title, id), x, y);
 }
 
-void Panel::addSeparator(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addSeparator(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlSeparator(title, id), x, y, width, height);
+	_insert_control_(new ControlSeparator(title, id), x, y);
 }
 
-void Panel::addRevealer(const string &title,int x,int y,int width,int height,const string &id)
+void Panel::addRevealer(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlRevealer(title, id), x, y, width, height);
+	_insert_control_(new ControlRevealer(title, id), x, y);
 }
 
 void Panel::embedDialog(const string &id, int x, int y)

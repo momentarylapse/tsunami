@@ -51,7 +51,7 @@ hui::Timer debug_timer;
 static Array<TsunamiWindow*> TsunamiWindows;
 
 TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
-	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_RESIZABLE | hui::WIN_MODE_CONTROLS)
+	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_CONTROLS)
 {
 	app = _tsunami;
 
@@ -166,13 +166,13 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	// table structure
 	setSize(width, height);
 	setBorderWidth(0);
-	addGrid("", 0, 0, 2, 1, "root_table");
-	setTarget("root_table", 0);
-	addGrid("", 0, 0, 1, 3, "main_table");
+	addGrid("", 0, 0, "root_table");
+	setTarget("root_table");
+	addGrid("", 0, 0, "main_table");
 
 	// main table
-	setTarget("main_table", 0);
-	addDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
+	setTarget("main_table");
+	addDrawingArea("!grabfocus", 0, 0, "area");
 
 
 	toolbar[0]->setByID("toolbar");

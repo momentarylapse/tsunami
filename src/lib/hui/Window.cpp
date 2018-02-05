@@ -60,7 +60,7 @@ Window::Window()
 
 Window::Window(const string &title, int x, int y, int width, int height)
 {
-	_init_(title, x, y, width, height, NULL, true, WIN_MODE_RESIZABLE | WIN_MODE_CONTROLS);
+	_init_(title, x, y, width, height, NULL, true, WIN_MODE_CONTROLS);
 }
 
 void Window::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -79,7 +79,7 @@ Window::Window(const string &id, Window *parent)
 	if (res->type != "Dialog")
 		msg_error("resource type should be Dialog, but is " + res->type);
 
-	int mode = WIN_MODE_CONTROLS | WIN_MODE_RESIZABLE;
+	int mode = WIN_MODE_CONTROLS;
 	bool allow_parent = false;
 	for (string &o: res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
@@ -108,7 +108,6 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 	_MakeUsable_();
 	_all_windows_.add(this);
 
-	is_resizable = ((_mode & WIN_MODE_RESIZABLE) > 0);
 	allowed = true;
 	allow_keys = true;
 	parent = _root;
@@ -227,9 +226,9 @@ void FuncClose()
 }
 
 NixWindow::NixWindow(const string& title, int x, int y, int width, int height) :
-	Window(title, x, y, width, height, NULL, true, WIN_MODE_RESIZABLE)
+	Window(title, x, y, width, height, NULL, true, 0)
 {
-	addDrawingArea("", 0, 0, 0, 0, "nix-area");
+	addDrawingArea("", 0, 0, "nix-area");
 }
 
 void NixWindow::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -238,7 +237,7 @@ void NixWindow::__init_ext__(const string& title, int x, int y, int width, int h
 }
 
 Dialog::Dialog(const string& title, int width, int height, Window* root, bool allow_root) :
-	Window(title, -1, -1, width, height, root, allow_root, WIN_MODE_CONTROLS | WIN_MODE_RESIZABLE)
+	Window(title, -1, -1, width, height, root, allow_root, WIN_MODE_CONTROLS)
 {
 }
 
@@ -247,20 +246,10 @@ void Dialog::__init_ext__(const string& title, int width, int height, Window* ro
 	new(this) Dialog(title, width, height, root, allow_root);
 }
 
-FixedDialog::FixedDialog(const string& title, int width, int height, Window* root, bool allow_root) :
-	Window(title, -1, -1, width, height, root, allow_root, WIN_MODE_CONTROLS)
-{
-}
-
-void FixedDialog::__init_ext__(const string& title, int width, int height, Window* root, bool allow_root)
-{
-	new(this) FixedDialog(title, width, height, root, allow_root);
-}
-
 
 
 SourceDialog::SourceDialog(const string &buffer, Window *root) :
-	Window("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, WIN_MODE_CONTROLS | WIN_MODE_RESIZABLE)
+	Window("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, WIN_MODE_CONTROLS)
 {
 	fromSource(buffer);
 }

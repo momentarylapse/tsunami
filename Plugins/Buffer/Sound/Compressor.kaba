@@ -159,17 +159,17 @@ class CompressorPanel extends ConfigPanel
 	CompressorGrid grid
 	override void __init__(Compressor *_fx)
 		super.__init__(_fx)
-		addGrid("", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
-		addDrawingArea("!grabfocus,height=250\\", 0, 0, 0, 0, "drawing_area")
-		addGrid("!noexpandy", 0, 1, 6, 1, "table2")
-		setTarget("table2", 0)
-		addLabel("Attack", 0, 0, 0, 0, "")
-		addSpinButton("!range=0:100:0.1\\", 1, 0, 0, 0, "attack")
-		addLabel("ms", 2, 0, 0, 0, "")
-		addLabel("Release", 3, 0, 0, 0, "")
-		addSpinButton("!range=0:1000:0.1\\", 4, 0, 0, 0, "release")
-		addLabel("ms", 5, 0, 0, 0, "")
+		addGrid("", 0, 0, "table1")
+		setTarget("table1")
+		addDrawingArea("!grabfocus,height=250\\", 0, 0, "drawing_area")
+		addGrid("!noexpandy", 0, 1, "table2")
+		setTarget("table2")
+		addLabel("Attack", 0, 0, "")
+		addSpinButton("!range=0:100:0.1\\", 1, 0, "attack")
+		addLabel("ms", 2, 0, "")
+		addLabel("Release", 3, 0, "")
+		addSpinButton("!range=0:1000:0.1\\", 4, 0, "release")
+		addLabel("ms", 5, 0, "")
 		
 		grid.config = &_fx.config
 		grid.cp = self

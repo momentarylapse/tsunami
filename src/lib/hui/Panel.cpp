@@ -23,15 +23,13 @@ Panel::Panel()
 	expander_indent = 20;
 	id = "";
 	num_float_decimals = 3;
-	tab_creation_page = -1;
 	root_control = NULL;
-	is_resizable = true;
 	plugable = NULL;
 	current_event_listener_uid = 0;
 
 	unique_id = current_uid ++;
 
-	setTarget("", 0);
+	setTarget("");
 }
 
 Panel::~Panel()
@@ -251,61 +249,61 @@ void Panel::hide()
 // easy window creation functions
 
 
-void Panel::addControl(const string &type, const string &title, int x, int y, int width, int height, const string &id)
+void Panel::addControl(const string &type, const string &title, int x, int y, const string &id)
 {
-	//printf("HuiPanelAddControl %s  %s  %d  %d  %d  %d  %s\n", type.c_str(), title.c_str(), x, y, width, height, id.c_str());
+	//printf("HuiPanelAddControl %s  %s  %d  %d  %s\n", type.c_str(), title.c_str(), x, y, id.c_str());
 	if (type == "Button")
-		addButton(title, x, y, width, height, id);
+		addButton(title, x, y, id);
 	else if (type == "ColorButton")
-		addColorButton(title, x, y, width, height, id);
+		addColorButton(title, x, y, id);
 	else if (type == "DefButton")
-		addDefButton(title, x, y, width, height, id);
+		addDefButton(title, x, y, id);
 	else if ((type == "Label") or (type == "Text"))
-		addLabel(title, x, y, width, height, id);
+		addLabel(title, x, y, id);
 	else if (type == "Edit")
-		addEdit(title, x, y, width, height, id);
+		addEdit(title, x, y, id);
 	else if (type == "MultilineEdit")
-		addMultilineEdit(title, x, y, width, height, id);
+		addMultilineEdit(title, x, y, id);
 	else if (type == "Group")
-		addGroup(title, x, y, width, height, id);
+		addGroup(title, x, y, id);
 	else if (type == "CheckBox")
-		addCheckBox(title, x, y, width, height, id);
+		addCheckBox(title, x, y, id);
 	else if (type == "ComboBox")
-		addComboBox(title, x, y, width, height, id);
+		addComboBox(title, x, y, id);
 	else if (type == "TabControl")
-		addTabControl(title, x, y, width, height, id);
+		addTabControl(title, x, y, id);
 	else if (type == "ListView")
-		addListView(title, x, y, width, height, id);
+		addListView(title, x, y, id);
 	else if (type == "TreeView")
-		addTreeView(title, x, y, width, height, id);
+		addTreeView(title, x, y, id);
 	else if (type == "IconView")
-		addIconView(title, x, y, width, height, id);
+		addIconView(title, x, y, id);
 	else if (type == "ProgressBar")
-		addProgressBar(title, x, y, width, height, id);
+		addProgressBar(title, x, y, id);
 	else if (type == "Slider")
-		addSlider(title, x, y, width, height, id);
+		addSlider(title, x, y, id);
 	else if (type == "Image")
-		addImage(title, x, y, width, height, id);
+		addImage(title, x, y, id);
 	else if (type == "DrawingArea")
-		addDrawingArea(title, x, y, width, height, id);
+		addDrawingArea(title, x, y, id);
 	else if ((type == "ControlTable") or (type == "Grid"))
-		addGrid(title, x, y, width, height, id);
+		addGrid(title, x, y, id);
 	else if (type == "SpinButton")
-		addSpinButton(title, x, y, width, height, id);
+		addSpinButton(title, x, y, id);
 	else if (type == "RadioButton")
-		addRadioButton(title, x, y, width, height, id);
+		addRadioButton(title, x, y, id);
 	else if (type == "ToggleButton")
-		addToggleButton(title, x, y, width, height, id);
+		addToggleButton(title, x, y, id);
 	else if (type == "Expander")
-		addExpander(title, x, y, width, height, id);
+		addExpander(title, x, y, id);
 	else if (type == "Scroller")
-		addScroller(title, x, y, width, height, id);
+		addScroller(title, x, y, id);
 	else if (type == "Paned")
-		addPaned(title, x, y, width, height, id);
+		addPaned(title, x, y, id);
 	else if (type == "Separator")
-		addSeparator(title, x, y, width, height, id);
+		addSeparator(title, x, y, id);
 	else if (type == "Revealer")
-		addRevealer(title, x, y, width, height, id);
+		addRevealer(title, x, y, id);
 	else
 		msg_error("unknown hui control: " + type);
 }
@@ -313,10 +311,9 @@ void Panel::addControl(const string &type, const string &title, int x, int y, in
 void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id)
 {
 	//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-	setTarget(parent_id, cmd.x);
+	setTarget(parent_id);
 	addControl(cmd.type, GetLanguageR(ns, cmd),
 				cmd.x, cmd.y,
-				1, 1,
 				cmd.id);
 
 	enable(cmd.id, cmd.enabled());
@@ -400,11 +397,11 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 {
 	//_addControl(main_id, c, parent_id);
 
-	setTarget(parent_id, x);
+	setTarget(parent_id);
 	string title = GetLanguageR(ns, c);
 	//if (c.options.num > 0)
 	//	title = "!" + implode(c.options, ",") + "\\" + title;
-	addControl(c.type, title, x, y, 1, 1, c.id);
+	addControl(c.type, title, x, y, c.id);
 	for (string &o: c.options)
 		setOptions(c.id, o);
 
@@ -436,8 +433,8 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 	panel->set_win(win);
 	children.add(panel);
 
-	setTarget(parent_id, x);
-	_insert_control_(panel->root_control, x, y, 0, 0);
+	setTarget(parent_id);
+	_insert_control_(panel->root_control, x, y);
 	controls.pop(); // dont' really add to us
 	panel->root_control->panel = panel;
 }

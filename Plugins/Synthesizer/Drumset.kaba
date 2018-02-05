@@ -98,10 +98,10 @@ class DrumsetPanel extends ConfigPanel
 	override void __init__(DrumsetSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addGrid("", 0, 0, 2, 1, "grid")
-		setTarget("grid", 0)
-		addLabel("Set", 0 ,0, 0, 0, "")
-		addComboBox("", 1, 0, 0, 0, "sets")
+		addGrid("", 0, 0, "grid")
+		setTarget("grid")
+		addLabel("Set", 0 ,0, "")
+		addComboBox("", 1, 0, "sets")
 		event("sets", &onSelect)
 
 	override void update()

@@ -13,7 +13,7 @@
 namespace hui
 {
 
-ControlGrid::ControlGrid(const string &title, const string &id, int num_x, int num_y, Panel *panel) :
+ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 	Control(CONTROL_GRID, id)
 {
 	vertical = false;

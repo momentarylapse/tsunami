@@ -88,7 +88,6 @@ void Panel::_insert_control_(Control *c, int x, int y)
 {
 	GtkWidget *frame = c->get_frame();
 	c->panel = this;
-	c->is_button_bar = false;
 	if (cur_control){
 		cur_control->add(c, x, y);
 	}else{

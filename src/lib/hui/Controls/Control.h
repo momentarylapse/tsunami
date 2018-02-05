@@ -33,7 +33,7 @@ public:
 	virtual ~Control();
 	int type;
 	string id;
-	int x, y;
+
 #ifdef HUI_API_WIN
 	HWND hWnd, hWnd2;//,hWnd3;
 	//Array<HWND> _item_;
@@ -45,7 +45,6 @@ public:
     GtkWidget *get_frame();
 #endif
 	bool enabled;
-	bool is_button_bar;
 	bool grab_focus;
 	Panel *panel;
 	Control *parent;

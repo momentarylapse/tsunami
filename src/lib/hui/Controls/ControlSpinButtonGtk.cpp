@@ -6,13 +6,15 @@
  */
 
 #include "ControlSpinButton.h"
+#include <math.h>
 
 #ifdef HUI_API_GTK
 
 namespace hui
 {
 
-void OnGtkEditChange(GtkWidget *widget, gpointer data);
+void OnGtkSpinButtonChange(GtkWidget *widget, gpointer data)
+{	reinterpret_cast<Control*>(data)->notify("hui:change");	}
 
 ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	Control(CONTROL_SPINBUTTON, id)
@@ -26,7 +28,7 @@ ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	setOptions(OptionString);
 
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(PartString[0]));
-	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkEditChange), this);
+	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkSpinButtonChange), this);
 }
 
 string ControlSpinButton::getString()
@@ -60,6 +62,13 @@ void ControlSpinButton::__setFloat(float f)
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), f);
 }
 
+int count_digits(float f)
+{
+	if (f <= 0)
+		return 0;
+	return max(0, (int)(0.5-log10(f)));
+}
+
 void ControlSpinButton::__setOption(const string &op, const string &value)
 {
 	if (op == "range"){
@@ -79,6 +88,7 @@ void ControlSpinButton::__setOption(const string &op, const string &value)
 			if (v[2].num > 0){
 				step = v[2]._float();
 				gtk_spin_button_set_increments(GTK_SPIN_BUTTON(widget), step, step * 10);
+				gtk_spin_button_set_digits(GTK_SPIN_BUTTON(widget), count_digits(step));
 			}
 		}
 		gtk_spin_button_set_range(GTK_SPIN_BUTTON(widget), vmin, vmax);

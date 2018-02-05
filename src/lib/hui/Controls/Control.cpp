@@ -148,6 +148,7 @@ bool Control::hasFocus()
 
 void Control::setOptions(const string &options)
 {
+	allow_signal_level ++;
 	Array<string> a = options.explode(",");
 	int width = -1;
 	int height = -1;
@@ -207,6 +208,7 @@ void Control::setOptions(const string &options)
 	}
 	if ((width >= 0) or (height >= 0))
 		gtk_widget_set_size_request(get_frame(), width, height);
+	allow_signal_level --;
 }
 
 void Control::getSize(int &w, int &h)

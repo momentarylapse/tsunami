@@ -8,7 +8,7 @@
 #include "RecordDialog.h"
 
 RecordDialog::RecordDialog(hui::Window *_parent, bool _allow_parent):
-	hui::Window("dummy", -1, -1, 800, 600, _parent, _allow_parent, hui::WIN_MODE_CONTROLS)
+	hui::Window("dummy", -1, -1, 800, 600, _parent, _allow_parent, 0)
 {
 }
 

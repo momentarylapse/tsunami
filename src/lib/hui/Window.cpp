@@ -60,7 +60,7 @@ Window::Window()
 
 Window::Window(const string &title, int x, int y, int width, int height)
 {
-	_init_(title, x, y, width, height, NULL, true, WIN_MODE_CONTROLS);
+	_init_(title, x, y, width, height, NULL, true, 0);
 }
 
 void Window::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -79,14 +79,13 @@ Window::Window(const string &id, Window *parent)
 	if (res->type != "Dialog")
 		msg_error("resource type should be Dialog, but is " + res->type);
 
-	int mode = WIN_MODE_CONTROLS;
 	bool allow_parent = false;
 	for (string &o: res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
 	int width = res->value("width", "300")._int();
 	int height = res->value("height", "200")._int();
-	_init_(GetLanguage(id, id), -1, -1, width, height, parent, allow_parent, mode);
+	_init_(GetLanguage(id, id), -1, -1, width, height, parent, allow_parent, 0);
 
 	// menu/toolbar?
 	for (string &o: res->options){
@@ -228,7 +227,7 @@ void FuncClose()
 NixWindow::NixWindow(const string& title, int x, int y, int width, int height) :
 	Window(title, x, y, width, height, NULL, true, 0)
 {
-	addDrawingArea("", 0, 0, "nix-area");
+	addDrawingArea("!opengl", 0, 0, "nix-area");
 }
 
 void NixWindow::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -237,7 +236,7 @@ void NixWindow::__init_ext__(const string& title, int x, int y, int width, int h
 }
 
 Dialog::Dialog(const string& title, int width, int height, Window* root, bool allow_root) :
-	Window(title, -1, -1, width, height, root, allow_root, WIN_MODE_CONTROLS)
+	Window(title, -1, -1, width, height, root, allow_root, 0)
 {
 }
 
@@ -249,7 +248,7 @@ void Dialog::__init_ext__(const string& title, int width, int height, Window* ro
 
 
 SourceDialog::SourceDialog(const string &buffer, Window *root) :
-	Window("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, WIN_MODE_CONTROLS)
+	Window("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, 0)
 {
 	fromSource(buffer);
 }

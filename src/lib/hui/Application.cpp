@@ -175,7 +175,8 @@ void Application::end()
 	PostQuitMessage(0);
 #endif
 #ifdef HUI_API_GTK
-	gtk_main_quit();
+	if (gtk_main_level() > 0)
+		gtk_main_quit();
 #endif
 
 	// really end hui?
@@ -224,14 +225,15 @@ void Application::doSingleMainLoop()
 #ifdef HUI_API_GTK
 
 	// push idle function
-	Callback _if_ = _idle_function_;
+	//Callback _if_ = _idle_function_;
 
-	SetIdleFunction(NULL);
-	while(gtk_events_pending())
+	//SetIdleFunction(NULL);
+	do{
 		gtk_main_iteration();
+	}while (gtk_events_pending());
 
 	// pop idle function
-	SetIdleFunction(_if_);
+	//SetIdleFunction(_if_);
 #endif
 }
 

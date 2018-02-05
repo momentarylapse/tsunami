@@ -51,7 +51,7 @@ hui::Timer debug_timer;
 static Array<TsunamiWindow*> TsunamiWindows;
 
 TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
-	hui::Window(AppName, -1, -1, 800, 600, NULL, false, hui::WIN_MODE_CONTROLS)
+	hui::Window(AppName, -1, -1, 800, 600)
 {
 	app = _tsunami;
 

@@ -35,47 +35,6 @@ inline Window *win_from_widget(void *widget)
 	return NULL;
 }
 
-#if 0
-bool win_send_message(GtkWidget *widget, const string &message, gpointer user_data)
-{
-	Window *window = (Window*)user_data;
-	if (!window)
-		return false;
-	HuiCurWindow = window;
-	if (widget == window->window){
-		//if (gtk_window_has_toplevel_focus(GTK_WINDOW(window->window))){
-		//_so("top_level");
-		if (window->AllowInput){
-			window->_send_event_(message, "", NULL);
-			return true;
-		}
-	}else{
-/*		//if (gtk_window_has_toplevel_focus(GTK_WINDOW(window->window))){
-		//_so("top_level");
-		if (HuiRunning)
-		for (int i=0;i<window->Control.num;i++)
-			if (window->Control[i]->win == widget){
-				if (window->Control[i]->input_handler){
-					sHuiInputMessage m;
-					m.message = message;
-					m.id = window->Control[i]->ID;
-					int mod;
-					gdk_window_get_pointer(widget->window, &m.mx, &m.my, (GdkModifierType*)&mod);
-					gdk_drawable_get_size(window->Control[i]->win->window, &m.width, &m.height);
-
-					m.lbut = ((mod & GDK_BUTTON1_MASK) > 0);
-					m.mbut = ((mod & GDK_BUTTON2_MASK) > 0);
-					m.rbut = ((mod & GDK_BUTTON3_MASK) > 0);
-					window->Control[i]->input_handler(&m);
-					return true;
-				}
-			}*/
-	}
-	return false;
-}
-#endif
-
-
 void WinTrySendByKeyCode(Window *win, int key_code)
 {
 	if (key_code <= 0)
@@ -134,8 +93,6 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 		return;
 
 	_init_generic_(root, allow_root, mode);
-	
-	bool ControlMode = ((mode & WIN_MODE_CONTROLS) > 0);
 
 	// creation
 	if (parent){
@@ -224,14 +181,12 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 
 	plugable = NULL;
 	cur_control = NULL;
-	if (ControlMode){
-		// free to use...
-		//cur_control = hbox;
-		plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-		gtk_widget_show(plugable);
-		//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
-		gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
-	}
+	// free to use...
+	//cur_control = hbox;
+	plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	gtk_widget_show(plugable);
+	//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
+	gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
 
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_BOTTOM]->widget, FALSE, FALSE, 0);
@@ -505,8 +460,7 @@ void Window::setMaximized(bool maximized)
 
 bool Window::isMaximized()
 {
-	int state = gdk_window_get_state(gtk_widget_get_window(window));
-	return ((state & GDK_WINDOW_STATE_MAXIMIZED) > 0);
+	return gtk_window_is_maximized(GTK_WINDOW(window));
 }
 
 bool Window::isMinimized()

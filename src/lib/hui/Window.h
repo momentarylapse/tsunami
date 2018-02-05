@@ -211,9 +211,6 @@ void FuncIgnore();
 void FuncClose();
 
 enum{
-	WIN_MODE_NO_FRAME = 2,
-	WIN_MODE_NO_TITLE = 4,
-	WIN_MODE_CONTROLS = 8,
 	WIN_MODE_DUMMY = 16,
 };
 

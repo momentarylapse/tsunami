@@ -1,4 +1,4 @@
-Menu menu "" disabled
+Menu menu ""
 	Menu menu_file "File"
 		Item /new "New..." image=hui:new
 		Item /open "Open..." image=hui:open

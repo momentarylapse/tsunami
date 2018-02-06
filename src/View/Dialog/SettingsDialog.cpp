@@ -14,7 +14,7 @@
 #include "../AudioView.h"
 
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
-	hui::Window("settings_dialog", _parent)
+	hui::ResourceWindow("settings_dialog", _parent)
 {
 	view = _view;
 	event("language", std::bind(&SettingsDialog::onLanguage, this));

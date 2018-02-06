@@ -19,7 +19,7 @@ struct RawConfigData
 	int offset;
 };
 
-class RawConfigDialog : public hui::Window
+class RawConfigDialog : public hui::ResourceWindow
 {
 public:
 	RawConfigDialog(RawConfigData *data, hui::Window *parent);

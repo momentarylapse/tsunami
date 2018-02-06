@@ -85,7 +85,7 @@ static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data)
 
 // general window
 
-void Window::_init_(const string &title, int x, int y, int width, int height, Window *root, bool allow_root, int mode)
+void Window::_init_(const string &title, int width, int height, Window *root, bool allow_root, int mode)
 {
 	window = NULL;
 	win = this;
@@ -131,8 +131,8 @@ void Window::_init_(const string &title, int x, int y, int width, int height, Wi
 		//gtk_window_move(GTK_WINDOW(window),x,y);*/
 		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent->window));
 	}else{
-		if ((x >= 0) && (y >= 0))
-			gtk_window_move(GTK_WINDOW(window), x, y);
+		/*if ((x >= 0) && (y >= 0))
+			gtk_window_move(GTK_WINDOW(window), x, y);*/
 	}
 
 	// size

@@ -41,6 +41,7 @@ public:
 	void _cdecl activate(const string &control_id);
 	bool _cdecl isActive(const string &control_id);
 	void _cdecl fromResource(const string &id);
+	void setFromResource(Resource *res);
 	void _cdecl fromSource(const string &source);
 
 	void _cdecl show();

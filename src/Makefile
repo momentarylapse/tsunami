@@ -279,7 +279,6 @@ OBJ = \
  View/Dialog/NewDialog.o\
  View/Dialog/PauseAddDialog.o\
  View/Dialog/PauseEditDialog.o\
- View/Dialog/RecordDialog.o\
  View/Dialog/SampleScaleDialog.o\
  View/Dialog/SettingsDialog.o\
  View/Dialog/TuningDialog.o\
@@ -1150,9 +1149,6 @@ View/Dialog/PauseAddDialog.o : View/Dialog/PauseAddDialog.cpp
 
 View/Dialog/PauseEditDialog.o : View/Dialog/PauseEditDialog.cpp
 	$(CPP) -c View/Dialog/PauseEditDialog.cpp -o $@ $(CXXFLAGS)
-
-View/Dialog/RecordDialog.o : View/Dialog/RecordDialog.cpp
-	$(CPP) -c View/Dialog/RecordDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/SampleScaleDialog.o : View/Dialog/SampleScaleDialog.cpp
 	$(CPP) -c View/Dialog/SampleScaleDialog.cpp -o $@ $(CXXFLAGS)

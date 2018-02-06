@@ -24,7 +24,7 @@ ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const 
 }
 
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Song *_song, const string &old_name) :
-	hui::Window("configurable-selection-dialog", _parent)
+	hui::ResourceWindow("configurable-selection-dialog", _parent)
 {
 	type = _type;
 	song = _song;

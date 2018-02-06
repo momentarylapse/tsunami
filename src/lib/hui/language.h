@@ -63,7 +63,7 @@ extern bool _using_language_;
 
 string _cdecl GetLanguage(const string &ns, const string &id);
 string _cdecl GetLanguageR(const string &ns, Resource &cmd);
-string _cdecl GetLanguageT(const string &ns, const string &id);
+string _cdecl GetLanguageT(const string &ns, const string &id, const string &tooltip);
 string _cdecl GetLanguageS(const string &str);
 #define L(ns, id)	hui::GetLanguage(ns, id)
 #define _(str)	hui::GetLanguageS(str_m_to_utf8(str))

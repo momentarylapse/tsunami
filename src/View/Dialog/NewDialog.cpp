@@ -8,7 +8,7 @@
 #include "NewDialog.h"
 
 NewDialog::NewDialog(hui::Window *_parent, Song *s):
-	hui::Window("new_dialog", _parent)
+	hui::ResourceWindow("new_dialog", _parent)
 {
 	song = s;
 

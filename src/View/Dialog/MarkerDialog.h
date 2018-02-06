@@ -12,7 +12,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../Data/Track.h"
 
-class MarkerDialog: public hui::Window
+class MarkerDialog: public hui::ResourceWindow
 {
 public:
 	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, int index);

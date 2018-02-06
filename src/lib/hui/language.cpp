@@ -184,8 +184,11 @@ string GetLanguageR(const string &ns, Resource &cmd)
 	return cmd.title;
 }
 
-string GetLanguageT(const string &ns, const string &id)
+// tooltip
+string GetLanguageT(const string &ns, const string &id, const string &tooltip)
 {
+	if (tooltip.num > 0)
+		return tooltip;
 	if ((!_using_language_) or (id.num == 0))
 		return "";
 	for (Language::Command &c: cur_lang->cmd)

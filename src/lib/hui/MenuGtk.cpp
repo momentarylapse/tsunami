@@ -183,25 +183,25 @@ void *get_gtk_image(const string &image, bool large)
 {
 	if (image == "")
 		return NULL;
-	if (image.find("hui:") == 0){
+	if (image.head(4) == "hui:"){
 		// internal
 		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), large ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_MENU);
 	}else{
 		// file
-		HuiImage *img = get_image(image);
-		if (!img)
-			return NULL;
+		//HuiImage *img = get_image(image);
+		//if (!img)
+		//	return NULL;
 		// absolute path?
-		if ((img->filename[0] == '/') or (img->filename[1] == ':'))
-			return gtk_image_new_from_file(sys_str_f(img->filename));
+	//	if ((img->filename[0] == '/') or (img->filename[1] == ':'))
+	//		return gtk_image_new_from_file(sys_str_f(img->filename));
 		// relative
-		return gtk_image_new_from_file(sys_str_f(Application::directory + img->filename));
+		return gtk_image_new_from_file(sys_str_f(Application::directory_static + image));
 	}
 }
 
 void *get_gtk_image_pixbuf(const string &image)
 {
-	if (image.find("hui:") == 0){
+	if (image.head(4) == "hui:"){
 		// internal
 		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image), 24, (GtkIconLookupFlags)0, NULL);
 		if (pb){

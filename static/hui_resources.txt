@@ -746,7 +746,7 @@ image=hui:ok
 // Resource
 Menu
 menu
-disabled
+
 0
 0
 10
@@ -3436,7 +3436,7 @@ edit_curves
 // Resource
 Dialog
 track-mixer
-width=80,height=200
+
 0
 0
 1
@@ -3454,7 +3454,7 @@ center,bold
 0
 Slider
 panning
-range=-1:1:0.01,width=80,origin=no
+range=-1:1:0.01,width=100,origin=no
 1
 0
 0
@@ -4436,7 +4436,7 @@ synth_panel/save_favorite
 
 load parameter
 track-mixer/mute
-Muted
+Mute
 
 track-mixer/panning
 0

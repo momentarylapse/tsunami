@@ -321,7 +321,7 @@ void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id
 	if (cmd.image().num > 0)
 		setImage(cmd.id, cmd.image());
 
-	string tooltip = GetLanguageT(ns, cmd.id);
+	string tooltip = GetLanguageT(ns, cmd.id, cmd.tooltip);
 	if (tooltip.num > 0)
 		setTooltip(cmd.id, tooltip);
 
@@ -332,59 +332,53 @@ void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id
 void Panel::fromResource(const string &id)
 {
 	Resource *res = GetResource(id);
+	if (res)
+		setFromResource(res);
+}
+
+void Panel::setFromResource(Resource *res)
+{
 	if (!res)
 		return;
 
-	// title
-	if (win)
+	bool res_is_window = ((res->type == "Dialog") or (res->type == "Window"));
+
+	// directly change window?
+	if (win and !parent and res_is_window){
+		// title
 		win->setTitle(GetLanguage(id, res->id));
 
-	// size
-	if (win){
+		// size
 		int width = res->value("width", "0")._int();
 		int height = res->value("height", "0")._int();
 		if (width + height > 0)
 			win->setSize(width, height);
+
+		// menu/toolbar?
+		string toolbar = res->value("toolbar");
+		string menu = res->value("menu");
+		if (menu != "")
+			win->setMenu(CreateResourceMenu(menu));
+		if (toolbar != "")
+			win->toolbar[TOOLBAR_TOP]->setByID(toolbar);
 	}
 
-	this->id = id;
+	id = res->id;
 
-
-	// menu/toolbar?
-	if (win){
-		for (string &o: res->options){
-			if (o.find("menu=") == 0)
-				win->setMenu(CreateResourceMenu(o.substr(5, -1)));
-			if (o.find("toolbar=") == 0)
-				win->toolbar[TOOLBAR_TOP]->setByID(o.substr(8, -1));
-		}
-	}
 
 	// controls
-	for (Resource &cmd: res->children)
-		_addControl(id, cmd, "");
-
-	msg_db_m("  \\(^_^)/",1);
+	if (res_is_window){
+		for (Resource &cmd: res->children)
+			_addControl(id, cmd, "");
+	}else{
+		embedResource(*res, "", 0, 0);
+	}
 }
 
 void Panel::fromSource(const string &buffer)
 {
 	Resource res = ParseResource(buffer);
-	if (res.type == "Dialog"){
-		if (win){
-			int width = res.value("width", "0")._int();
-			int height = res.value("height", "0")._int();
-			if (width + height > 0)
-				win->setSize(width, height);
-			win->setTitle(res.title);
-		}
-
-		if (res.children.num > 0)
-			embedResource(res.children[0], "", 0, 0);
-	}else{
-		embedResource(res, "", 0, 0);
-	}
-
+	setFromResource(&res);
 }
 
 
@@ -409,7 +403,7 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 	if (c.image().num > 0)
 		setImage(c.id, c.image());
 
-	string tooltip = GetLanguageT(ns, c.id);
+	string tooltip = GetLanguageT(ns, c.id, c.tooltip);
 	if (tooltip.num > 0)
 		setTooltip(c.id, tooltip);
 
@@ -419,6 +413,7 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 
 void Panel::embedSource(const string &buffer, const string &parent_id, int x, int y)
 {
+	msg_write("embed source ");
 	Resource res = ParseResource(buffer);
 	embedResource(res, parent_id, x, y);
 }

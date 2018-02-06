@@ -60,43 +60,54 @@ void Toolbar::reset()
 // create and apply a toolbar bar resource id
 void Toolbar::setByID(const string &id)
 {
-	msg_db_m(id.c_str(),1);
 	Resource *res = GetResource(id);
 	if (!res){
 		msg_error("Toolbar.SetByID  :~~(");
 		return;
 	}
+	fromResource(res);
+}
+
+void Toolbar::fromResource(Resource *res)
+{
 	reset();
+	id = res->id;
 	//Configure(res->b_param[0], res->b_param[1]);
 	for (Resource &cmd: res->children){
+		string title = get_lang(id, cmd.id, cmd.title, false);
+		string tooltip = GetLanguageT(id, cmd.id, cmd.tooltip);
+		if (tooltip.num == 0)
+			tooltip = title;
+
 		if (cmd.type == "Item"){
 			if (sa_contains(cmd.options, "checkable"))
-				addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
+				addItemCheckable(title, cmd.image(), cmd.id);
 			else
-				addItem(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
-			item.back()->setTooltip(GetLanguageT(id, cmd.id));
-		}else if (cmd.type == "ItemCheckable"){
-			addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image(), cmd.id);
-			item.back()->setTooltip(GetLanguageT(id, cmd.id));
-		}else if ((cmd.type == "ItemSeparator") or (cmd.type == "Separator")){
+				addItem(title, cmd.image(), cmd.id);
+			item.back()->setTooltip(tooltip);
+		}else if (cmd.type == "Separator"){
 			addSeparator();
-		}else if (cmd.type == "ItemPopup"){
-			string title = get_lang(id, cmd.id, "", false);
+		}else if (cmd.type == "Menu"){
 			bool ok = false;
 			for (string &o: cmd.options)
 				if (o.find("menu=") == 0){
 					addItemMenuByID(title, cmd.image(), o.substr(5, -1), cmd.id);
-					item.back()->setTooltip(GetLanguageT(id, cmd.id));
+					item.back()->setTooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 					ok = true;
 				}
 			if ((!ok) and (cmd.children.num > 0)){
 				addItemMenu(title, cmd.image(), _create_res_menu_(id, &cmd), cmd.id);
-				item.back()->setTooltip(GetLanguageT(id, cmd.id));
+				item.back()->setTooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 			}
 		}
 	}
 	enable(true);
-	msg_db_m(":)",1);
+}
+
+void Toolbar::fromSource(const string &source)
+{
+	Resource res = ParseResource(source);
+	fromResource(&res);
 }
 
 };

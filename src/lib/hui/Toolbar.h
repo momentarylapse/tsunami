@@ -22,6 +22,7 @@ public:
 	virtual ~Toolbar();
 	Window *win;
 	Array<Control*> item;
+	string id;
 	bool enabled;
 	bool text_enabled;
 	bool large_icons;
@@ -41,6 +42,8 @@ public:
 	void _cdecl addSeparator();
 	void _cdecl reset();
 	void _cdecl setByID(const string &id);
+	void _cdecl fromSource(const string &source);
+	void _cdecl fromResource(Resource *r);
 
 	void add(Control *c);
 };

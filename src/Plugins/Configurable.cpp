@@ -286,11 +286,11 @@ ConfigPanel *Configurable::createPanel()
 	}
 }*/
 
-class ConfigurationDialog : public hui::Window
+class ConfigurationDialog : public hui::ResourceWindow
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		hui::Window("configurable_dialog", tsunami->win)
+		hui::ResourceWindow("configurable_dialog", tsunami->win)
 	{
 		config = c;
 		panel = p;

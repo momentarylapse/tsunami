@@ -12,11 +12,11 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-class CurveTargetDialog : public hui::ResourceWindow
+class CurveTargetDialog : public hui::Window
 {
 public:
 	CurveTargetDialog(hui::Panel *parent, Song *song, Array<Curve::Target> &t) :
-		hui::ResourceWindow(("curve-target-dialog"), parent->win),
+		hui::Window(("curve-target-dialog"), parent->win),
 		targets(t)
 	{
 		all_targets = Curve::Target::enumerate(song);

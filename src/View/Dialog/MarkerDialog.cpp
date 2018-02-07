@@ -8,7 +8,7 @@
 #include "MarkerDialog.h"
 
 MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, int _index):
-	hui::ResourceWindow("marker_dialog", _parent)
+	hui::Window("marker_dialog", _parent)
 {
 	track = _t;
 	range = _range;

@@ -12,7 +12,7 @@
 #include "../../Data/Song.h"
 #include "../../lib/hui/hui.h"
 
-class NewDialog: public hui::ResourceWindow
+class NewDialog: public hui::Window
 {
 public:
 	NewDialog(hui::Window *_parent, Song *a);

@@ -14,7 +14,7 @@ class Configurable;
 class Synthesizer;
 class Song;
 
-class ConfigurableSelectorDialog: public hui::ResourceWindow
+class ConfigurableSelectorDialog: public hui::Window
 {
 public:
 	ConfigurableSelectorDialog(hui::Window *_parent, int type, Song *song, const string &old_name = "");

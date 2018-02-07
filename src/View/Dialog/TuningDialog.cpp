@@ -9,7 +9,7 @@
 #include "../../Data/Track.h"
 
 TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
-	hui::ResourceWindow("tuning_dialog", _parent)
+	hui::Window("tuning_dialog", _parent)
 {
 	track = t;
 	tuning = track->instrument.string_pitch;

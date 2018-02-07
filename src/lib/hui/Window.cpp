@@ -63,9 +63,19 @@ void Window::__init_ext__(const string& title, int width, int height)
 }
 
 
-ResourceWindow::ResourceWindow(const string &id, Window *parent)
+// resource constructor
+Window::Window(const string &id, Window *parent)
 {
 	Resource *res = GetResource(id);
+	if (!res){
+		msg_error("Window: undefined resource id: " + id);
+		return;
+	}
+	_init_("", 300, 200, parent, res->has("allowparent"), 0);
+
+	setFromResource(res);
+
+	/*
 	if (!res){
 		msg_error("Window: undefined resource id: " + id);
 		return;
@@ -93,7 +103,7 @@ ResourceWindow::ResourceWindow(const string &id, Window *parent)
 	for (Resource &cmd: res->children)
 		_addControl(id, cmd, "");
 
-	msg_db_m("  \\(^_^)/",1);
+	msg_db_m("  \\(^_^)/",1);*/
 }
 
 void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)

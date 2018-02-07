@@ -342,9 +342,10 @@ void Panel::setFromResource(Resource *res)
 		return;
 
 	bool res_is_window = ((res->type == "Dialog") or (res->type == "Window"));
+	bool panel_is_window = win and !parent;
 
 	// directly change window?
-	if (win and !parent and res_is_window){
+	if (panel_is_window and res_is_window){
 		// title
 		win->setTitle(GetLanguage(id, res->id));
 

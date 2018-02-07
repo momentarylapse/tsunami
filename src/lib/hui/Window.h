@@ -75,6 +75,7 @@ class Window : public Panel
 public:
 	Window();
 	Window(const string &title, int width, int height);
+	Window(const string &id, Window *parent);
 	void _cdecl __init_ext__(const string &title, int width, int height);
 	virtual ~Window();
 	virtual void _cdecl __delete__();
@@ -168,7 +169,7 @@ private:
 public:
 	GtkWidget *window;
 private:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar, *__ttt__;
+	GtkWidget *vbox, *hbox, *menubar, *statusbar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	int desired_width, desired_height;
@@ -197,12 +198,6 @@ public:
 
 extern Window *CurWindow;
 
-
-class ResourceWindow : public Window
-{
-public:
-	ResourceWindow(const string &id, Window *parent);
-};
 
 class SourceWindow : public Window
 {

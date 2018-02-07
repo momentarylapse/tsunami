@@ -74,36 +74,6 @@ Window::Window(const string &id, Window *parent)
 	_init_("", 300, 200, parent, res->has("allowparent"), 0);
 
 	setFromResource(res);
-
-	/*
-	if (!res){
-		msg_error("Window: undefined resource id: " + id);
-		return;
-	}
-	if ((res->type != "Dialog") and (res->type != "Window"))
-		msg_error("resource type should be Dialog or Window, but is " + res->type);
-
-	bool allow_parent = false;
-	for (string &o: res->options)
-		if ((o == "allow-root") or (o == "allow-parent"))
-			allow_parent = true;
-	int width = res->value("width", "300")._int();
-	int height = res->value("height", "200")._int();
-	_init_(GetLanguage(id, id), width, height, parent, allow_parent, 0);
-
-	// menu/toolbar?
-	for (string &o: res->options){
-		if (o.head(5) == "menu=")
-			setMenu(CreateResourceMenu(o.substr(5, -1)));
-		if (o.head(8) == "toolbar=")
-			toolbar[TOOLBAR_TOP]->setByID(o.substr(8, -1));
-	}
-
-	// controls
-	for (Resource &cmd: res->children)
-		_addControl(id, cmd, "");
-
-	msg_db_m("  \\(^_^)/",1);*/
 }
 
 void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)

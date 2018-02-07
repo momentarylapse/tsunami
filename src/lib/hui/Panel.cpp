@@ -414,7 +414,6 @@ void Panel::_embedResource(const string &ns, Resource &c, const string &parent_i
 
 void Panel::embedSource(const string &buffer, const string &parent_id, int x, int y)
 {
-	msg_write("embed source ");
 	Resource res = ParseResource(buffer);
 	embedResource(res, parent_id, x, y);
 }

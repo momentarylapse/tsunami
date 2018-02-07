@@ -363,9 +363,9 @@ void Window::setSize(int width, int height)
 {
 	desired_width = width;
 	desired_height = height;
-	if (parent)
+	/*if (parent)
 		gtk_widget_set_size_request(window, width, height);
-	else
+	else*/
 		gtk_window_resize(GTK_WINDOW(window), width, height);
 }
 

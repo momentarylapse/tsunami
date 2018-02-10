@@ -48,7 +48,7 @@ namespace hui
 {
 
 
-string Version = "0.6.6.0";
+string Version = "0.6.7.0";
 
 
 #ifdef OS_WINDOWS

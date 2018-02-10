@@ -24,14 +24,16 @@ ControlGroup::ControlGroup(const string &title, const string &id) :
 	setOptions(OptionString);
 }
 
-
 void ControlGroup::add(Control *child, int x, int y)
 {
 	GtkWidget *child_widget = child->get_frame();
+	int ind = child->indent;
+	if (ind < 0)
+		ind = 20;
 #if GTK_CHECK_VERSION(3,12,0)
-	gtk_widget_set_margin_start(child_widget, panel->expander_indent);
+	gtk_widget_set_margin_start(child_widget, ind);
 #else
-	gtk_widget_set_margin_left(child_widget, panel->expander_indent);
+	gtk_widget_set_margin_left(child_widget, ind);
 #endif
 	gtk_widget_set_margin_top(child_widget, 2);
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);

@@ -46,6 +46,7 @@ public:
 #endif
 	bool enabled;
 	bool grab_focus;
+	int indent;
 	Panel *panel;
 	Control *parent;
 	Array<Control*> children;

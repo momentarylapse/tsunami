@@ -31,7 +31,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), NULL);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
-	//SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
 void ControlExpander::expand(int row, bool expand)
@@ -54,10 +54,13 @@ void ControlExpander::add(Control *child, int x, int y)
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_widget_set_vexpand(child_widget, true);
 	//gtk_widget_set_hexpand(child_widget, true);
+	int ind = child->indent;
+	if (ind < 0)
+		ind = 20;
 #if GTK_CHECK_VERSION(3,12,0)
-	gtk_widget_set_margin_start(child_widget, panel->expander_indent);
+	gtk_widget_set_margin_start(child_widget, ind);
 #else
-	gtk_widget_set_margin_left(child_widget, panel->expander_indent);
+	gtk_widget_set_margin_left(child_widget, ind);
 #endif
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 	children.add(child);

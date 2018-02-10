@@ -62,6 +62,7 @@ Control::Control(int _type, const string &_id)
 	frame = NULL;
 #endif
 	grab_focus = false;
+	indent = -1;
 }
 
 Control::~Control()
@@ -168,13 +169,21 @@ void Control::setOptions(const string &options)
 			gtk_widget_set_vexpand(widget, true);
 		else if (op == "noexpandy")
 			gtk_widget_set_vexpand(widget, false);
-		else if (op == "indent")
+		else if (op == "indent"){
+			indent = 25;
 #if GTK_CHECK_VERSION(3,12,0)
-			gtk_widget_set_margin_start(get_frame(), 20);
+			gtk_widget_set_margin_start(get_frame(), indent);
 #else
-			gtk_widget_set_margin_left(get_frame(), 20);
+			gtk_widget_set_margin_left(get_frame(), indent);
 #endif
-		else if (op == "grabfocus"){
+		}else if (op == "noindent"){
+			indent = 0;
+#if GTK_CHECK_VERSION(3,12,0)
+			gtk_widget_set_margin_start(get_frame(), 0);
+#else
+			gtk_widget_set_margin_left(get_frame(), 0);
+#endif
+		}else if (op == "grabfocus"){
 			grab_focus = true;
 			gtk_widget_set_can_focus(widget, true);
 			gtk_widget_grab_focus(widget);
@@ -184,9 +193,11 @@ void Control::setOptions(const string &options)
 				width = a1._int();
 			else if (op == "height")
 				height = a1._int();
-			else if (op == "marginleft"){
+			else if ((op == "marginleft") or (op == "indent")){
+				indent = a1._int();
+				printf("indent %d\n", indent);
 #if GTK_CHECK_VERSION(3,12,0)
-				gtk_widget_set_margin_start(get_frame(), 20);
+				gtk_widget_set_margin_start(get_frame(), a1._int());
 #else
 				gtk_widget_set_margin_left(get_frame(), a1._int());
 #endif

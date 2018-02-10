@@ -157,7 +157,7 @@ Window *CreateResourceDialog(const string &id, Window *root)
 	}
 	
 
-	if ((res->type != "Dialog") or (res->type != "Window")){
+	if ((res->type != "Dialog") and (res->type != "Window")){
 		msg_error("resource type should be Dialog or Window, but is " + res->type);
 		return NULL;
 	}

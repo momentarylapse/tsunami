@@ -158,7 +158,6 @@ public:
 	string _get_cur_id_();
 	void _set_cur_id_(const string &id);
 	void _cdecl setBorderWidth(int width);
-	void _cdecl setIndent(int indent);
 
 
 protected:
@@ -190,7 +189,6 @@ public:
 	int _get_unique_id_();
 	int num_float_decimals;
 	int border_width;
-	int expander_indent;
 	Window *win;
 	Panel *parent;
 	Array<Panel*> children;

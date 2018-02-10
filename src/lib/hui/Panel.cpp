@@ -20,7 +20,6 @@ Panel::Panel()
 	win = NULL;
 	parent = NULL;
 	border_width = 5;
-	expander_indent = 20;
 	id = "";
 	num_float_decimals = 3;
 	root_control = NULL;
@@ -76,11 +75,6 @@ void Panel::_ClearPanel_()
 void Panel::setBorderWidth(int width)
 {
 	border_width = width;
-}
-
-void Panel::setIndent(int indent)
-{
-	expander_indent = indent;
 }
 
 void Panel::setDecimals(int decimals)
@@ -316,10 +310,16 @@ void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id
 				cmd.x, cmd.y,
 				cmd.id);
 
+	for (string &o: cmd.options)
+		setOptions(cmd.id, o);
+
 	enable(cmd.id, cmd.enabled());
+	if (cmd.has("hidden"))
+		hideControl(cmd.id, true);
 
 	if (cmd.image().num > 0)
 		setImage(cmd.id, cmd.image());
+
 
 	string tooltip = GetLanguageT(ns, cmd.id, cmd.tooltip);
 	if (tooltip.num > 0)
@@ -365,6 +365,10 @@ void Panel::setFromResource(Resource *res)
 	}
 
 	id = res->id;
+
+	int bw = res->value("borderwidth", "-1")._int();
+	if (bw >= 0)
+		setBorderWidth(bw);
 
 
 	// controls

@@ -29,13 +29,37 @@ void SongSelection::clear_data()
 
 void SongSelection::all(Song* s)
 {
-	all_tracks(s);
+	from_range(s, s->getRangeWithTime());
 }
 
-void SongSelection::all_tracks(Song* s)
+void SongSelection::from_range(Song *s, const Range &r)
 {
+	Set<const Track*> _tracks;
 	for (Track *t: s->tracks)
+		_tracks.add(t);
+	from_range(s, r, _tracks);
+}
+
+void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _tracks)
+{
+	clear();
+	range = r;
+
+	for (const Track *t: _tracks){
 		add(t);
+
+		// subs
+		for (SampleRef *sr: t->samples)
+			set(sr, range.overlaps(sr->range()));
+
+		// markers
+		for (TrackMarker *m: t->markers)
+			set(m, range.overlaps(m->range));
+
+		// midi
+		for (MidiNote *n: t->midi)
+			set(n, range.is_inside(n->range.center()));
+	}
 }
 
 void SongSelection::update_bars(Song* s)

@@ -581,24 +581,7 @@ SongSelection ViewModeDefault::getSelectionForRange(const Range &r)
 	s.range = r;
 	if (s.range.length < 0)
 		s.range.invert();
-	s.tracks = view->sel.tracks;
-
-	for (Track *t: song->tracks){
-		if (!s.has(t))
-			continue;
-
-		// subs
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.overlaps(m->range));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			s.set(n, s.range.is_inside(n->range.center()));
-	}
+	s.from_range(song, r, view->sel.tracks);
 	return s;
 }
 

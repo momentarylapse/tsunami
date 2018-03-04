@@ -29,7 +29,9 @@ void Action__ShiftData::undo(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
 
+	offset += shift;
 	do_shift(s, -shift);
+	offset -= shift;
 }
 
 void Action__ShiftData::do_shift(Song *s, int delta)

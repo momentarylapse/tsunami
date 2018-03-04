@@ -30,14 +30,11 @@ void ActionBarDelete::build(Data *d)
 	Range r = Range(s->barOffset(index), s->bars[index].length);
 	addSubAction(new ActionBar__Delete(index), d);
 
-	/*if (affect_data){
+	if (affect_data){
 		SongSelection sel;
-		sel.all_tracks(s);
-		sel.fromRange(s, r);
+		sel.from_range(s, r);
 		addSubAction(new ActionSongDeleteSelection(-1, sel, true), d);
 
 		addSubAction(new Action__ShiftData(r.end(), - r.length), d);
-
-	}*/
-	printf("TODO: ActionBarDelete with affect_data\n");
+	}
 }

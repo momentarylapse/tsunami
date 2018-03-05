@@ -12,6 +12,11 @@
 #include "../Data/Range.h"
 
 
+#define NUM_PEAK_LEVELS		24
+#define PEAK_FACTOR			2
+
+#define DEFAULT_SAMPLE_RATE		44100
+
 
 enum SampleFormat
 {
@@ -76,7 +81,11 @@ public:
 	static const int PEAK_MAGIC_LEVEL4;
 
 	void _cdecl invalidate_peaks(const Range &r);
-	void _cdecl update_peaks();
+
+	void _ensure_peak_size(int level4, int n, bool set_invalid = false);
+	int _update_peaks_prepare();
+	void _update_peaks_chunk(int index);
+	void _truncate_peaks(int length);
 };
 
 SampleFormat format_for_bits(int bits);

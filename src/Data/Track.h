@@ -18,11 +18,6 @@
 #include "Song.h"
 
 
-#define NUM_PEAK_LEVELS		24
-#define PEAK_FACTOR			2
-#define MIN_MAX_FACTOR		10
-
-#define DEFAULT_SAMPLE_RATE		44100
 
 class AudioBuffer;
 class Song;
@@ -60,8 +55,6 @@ public:
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
-
-	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 	AudioBuffer _cdecl readBuffers(int layer_no, const Range &r);
 	void _cdecl readBuffersCol(AudioBuffer &buf, int offset);

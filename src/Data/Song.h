@@ -90,7 +90,6 @@ public:
 	virtual bool _cdecl load(const string &filename, bool deep);
 	virtual bool _cdecl save(const string &filename);
 
-	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 
 	Track *_cdecl getTimeTrack();

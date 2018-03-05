@@ -364,18 +364,6 @@ Track *Song::addTrackAfter(int type, Track *ref)
 	return addTrack(type, index + 1);
 }
 
-extern hui::Timer debug_timer;
-
-void Song::updatePeaks()
-{
-	debug_timer.reset();
-	for (Track *t: tracks)
-		t->updatePeaks();
-	for (Sample *s: samples)
-		s->buf.update_peaks();
-	//msg_write(format("up %f", debug_timer.get()));
-}
-
 void Song::insertSelectedSamples(const SongSelection &sel, int layer_no)
 {
 	if (sel.getNumSamples() > 0)

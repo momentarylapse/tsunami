@@ -225,6 +225,10 @@ public:
 	AudioViewTrack *get_track(Track *track);
 	void updateTracks();
 
+	void update_peaks(AudioBuffer &buf);
+	void update_peaks(Track *t);
+	void update_peaks(Song *s);
+
 	int prefered_buffer_layer;
 	double buffer_zoom_factor;
 	void updateBufferZoom();

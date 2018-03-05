@@ -189,13 +189,6 @@ AudioBuffer Track::getBuffers(int layer_no, const Range &r)
 	return readBuffers(layer_no, r);
 }
 
-void Track::updatePeaks()
-{
-	for (TrackLayer &l: layers)
-		for (AudioBuffer &b: l.buffers)
-			b.update_peaks();
-}
-
 void Track::invalidateAllPeaks()
 {
 	for (TrackLayer &l: layers)

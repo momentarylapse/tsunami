@@ -40,6 +40,8 @@ const int AudioView::BARRIER_DIST = 8;
 ColorSchemeBasic AudioView::basic_colors;
 ColorScheme AudioView::_export_colors;
 
+extern hui::Timer debug_timer;
+
 int get_track_index_save(Song *song, Track *t)
 {
 	if (t){
@@ -75,7 +77,7 @@ public:
 	{
 		//msg_write("  run");
 		//HuiSleep(0.1f);
-		view->song->updatePeaks();
+		view->update_peaks(view->song);
 		view->is_updating_peaks = false;
 	}
 	/*virtual void _cdecl onCancel()
@@ -681,6 +683,43 @@ void AudioView::onUpdate()
 	checkConsistency();
 
 	forceRedraw();
+}
+
+void AudioView::update_peaks(AudioBuffer &buf)
+{
+	song->lock();
+	int n = buf._update_peaks_prepare();
+	song->unlock();
+
+	Thread::cancelationPoint();
+
+	for (int i=0; i<n; i++)
+		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
+			while (!song->try_lock()){
+				Thread::cancelationPoint();
+				hui::Sleep(0.01f);
+			}
+			buf._update_peaks_chunk(i);
+			song->unlock();
+			Thread::cancelationPoint();
+		}
+}
+
+void AudioView::update_peaks(Track *t)
+{
+	for (TrackLayer &l: t->layers)
+		for (AudioBuffer &b: l.buffers)
+			update_peaks(b);
+}
+
+void AudioView::update_peaks(Song *song)
+{
+	debug_timer.reset();
+	for (Track *t: song->tracks)
+		update_peaks(t);
+	for (Sample *s: song->samples)
+		update_peaks(s->buf);
+	//msg_write(format("up %f", debug_timer.get()));
 }
 
 AudioViewTrack *AudioView::get_track(Track *track)

@@ -13,9 +13,7 @@
 
 
 
-#include "../Tsunami.h"
-#include "../Data/Song.h"
-#include "../lib/threads/Thread.h"
+//#include "../Data/Song.h"
 
 // peaks:
 // ...
@@ -123,15 +121,15 @@ void AudioBuffer::clear()
 	peaks.clear();
 }
 
-void truncate_peaks(AudioBuffer &buf, int length)
+void AudioBuffer::_truncate_peaks(int _length)
 {
 	int level4 = 0;
-	length /= buf.PEAK_FINEST_SIZE;
-	while(level4 < buf.peaks.num){
+	_length /= PEAK_FINEST_SIZE;
+	while(level4 < peaks.num){
 		for (int k=0; k<4; k++)
-			buf.peaks[level4 + k].resize(length);
+			peaks[level4 + k].resize(_length);
 		level4 += 4;
-		length /= 2;
+		_length /= 2;
 	}
 
 }
@@ -139,7 +137,7 @@ void truncate_peaks(AudioBuffer &buf, int length)
 void AudioBuffer::resize(int _length)
 {
 	if (_length < length)
-		truncate_peaks(*this, _length);
+		_truncate_peaks(_length);
 	for (int i=0; i<channels; i++)
 		c[i].resize(_length);
 	length = _length;
@@ -486,8 +484,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 			*(fc ++) = c[1][i];
 		}
 	}else{
-		//tsunami->log->error("invalid export format");
-		msg_error("invalid export format");
+		throw Exception("invalid export format");
 	}
 
 	return !wtb_overflow;
@@ -599,39 +596,39 @@ inline float fabsmax(float *p)
 	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
-void ensure_peak_size(AudioBuffer &buf, int level4, int n, bool set_invalid = false)
+void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid)
 {
-	if (buf.peaks.num < level4 + 4)
-		buf.peaks.resize(level4 + 4);
-	if (buf.peaks[level4].num < n){
-		int n0 = buf.peaks[level4].num;
-		buf.peaks[level4    ].resize(n);
-		buf.peaks[level4 + 1].resize(n);
-		buf.peaks[level4 + 2].resize(n);
-		buf.peaks[level4 + 3].resize(n);
+	if (peaks.num < level4 + 4)
+		peaks.resize(level4 + 4);
+	if (peaks[level4].num < n){
+		int n0 = peaks[level4].num;
+		peaks[level4    ].resize(n);
+		peaks[level4 + 1].resize(n);
+		peaks[level4 + 2].resize(n);
+		peaks[level4 + 3].resize(n);
 		if (set_invalid)
 			for (int i=n0; i<n; i++)
-				buf.peaks[level4][i] = buf.peaks[level4 + 1][i] = 255;
+				peaks[level4][i] = peaks[level4 + 1][i] = 255;
 	}
 }
 
-void update_peaks_chunk(AudioBuffer &buf, int index)
+void AudioBuffer::_update_peaks_chunk(int index)
 {
 	// first level
-	int i0 = index * buf.PEAK_CHUNK_SIZE / buf.PEAK_FINEST_SIZE;
-	int i1 = min(i0 + buf.PEAK_CHUNK_SIZE / buf.PEAK_FINEST_SIZE, buf.length / buf.PEAK_FINEST_SIZE);
+	int i0 = index * PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE;
+	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, length / PEAK_FINEST_SIZE);
 	int n = i1 - i0;
 
-	ensure_peak_size(buf, 0, i1);
+	_ensure_peak_size(0, i1);
 
-	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
+	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, peaks[0].num, index));
 
-	for (int j=0; j<buf.channels; j++){
+	for (int j=0; j<channels; j++){
 		for (int i=i0; i<i1; i++)
-			buf.peaks[j][i] = fabsmax(&buf.c[j][i * buf.PEAK_FINEST_SIZE]) * 254;
+			peaks[j][i] = fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254;
 	}
-	memcpy(&buf.peaks[2][i0], &buf.peaks[0][i0], n);
-	memcpy(&buf.peaks[3][i0], &buf.peaks[1][i0], n);
+	memcpy(&peaks[2][i0], &peaks[0][i0], n);
+	memcpy(&peaks[3][i0], &peaks[1][i0], n);
 
 	// medium levels
 	int level4 = 0;
@@ -640,19 +637,19 @@ void update_peaks_chunk(AudioBuffer &buf, int index)
 		n = n / 2;
 		i0 = i0 / 2;
 		i1 = i0 + n;
-		ensure_peak_size(buf, level4, i1);
+		_ensure_peak_size(level4, i1);
 
 		for (int i=i0; i<i1; i++)
-			buf.peaks[level4    ][i] = shrink_max(buf.peaks[level4 - 4][i * 2], buf.peaks[level4 - 4][i * 2 + 1]);
+			peaks[level4    ][i] = shrink_max(peaks[level4 - 4][i * 2], peaks[level4 - 4][i * 2 + 1]);
 		for (int i=i0; i<i1; i++)
-			buf.peaks[level4 + 1][i] = shrink_max(buf.peaks[level4 - 3][i * 2], buf.peaks[level4 - 3][i * 2 + 1]);
+			peaks[level4 + 1][i] = shrink_max(peaks[level4 - 3][i * 2], peaks[level4 - 3][i * 2 + 1]);
 		for (int i=i0; i<i1; i++)
-			buf.peaks[level4 + 2][i] = shrink_mean(buf.peaks[level4 - 2][i * 2], buf.peaks[level4 - 2][i * 2 + 1]);
+			peaks[level4 + 2][i] = shrink_mean(peaks[level4 - 2][i * 2], peaks[level4 - 2][i * 2 + 1]);
 		for (int i=i0; i<i1; i++)
-			buf.peaks[level4 + 3][i] = shrink_mean(buf.peaks[level4 - 1][i * 2], buf.peaks[level4 - 1][i * 2 + 1]);
+			peaks[level4 + 3][i] = shrink_mean(peaks[level4 - 1][i * 2], peaks[level4 - 1][i * 2 + 1]);
 	}
 
-	//	msg_write(format("%d  %d  %d", level4 / 4, buf.peaks.num / 4 - 1, n));
+	//	msg_write(format("%d  %d  %d", level4 / 4, peaks.num / 4 - 1, n));
 	if (n == 0)
 		return;
 
@@ -663,39 +660,25 @@ void update_peaks_chunk(AudioBuffer &buf, int index)
 
 		level4 += 4;
 		i0 = i0 / 2;
-		ensure_peak_size(buf, level4, i0 + 1);
+		_ensure_peak_size(level4, i0 + 1);
 
-		buf.peaks[level4    ][i0] = shrink_max(buf.peaks[level4 - 4][i0 * 2], buf.peaks[level4 - 4][i0 * 2 + 1]);
-		buf.peaks[level4 + 1][i0] = shrink_max(buf.peaks[level4 - 3][i0 * 2], buf.peaks[level4 - 3][i0 * 2 + 1]);
-		buf.peaks[level4 + 2][i0] = shrink_mean(buf.peaks[level4 - 2][i0 * 2], buf.peaks[level4 - 2][i0 * 2 + 1]);
-		buf.peaks[level4 + 3][i0] = shrink_mean(buf.peaks[level4 - 1][i0 * 2], buf.peaks[level4 - 1][i0 * 2 + 1]);
+		peaks[level4    ][i0] = shrink_max(peaks[level4 - 4][i0 * 2], peaks[level4 - 4][i0 * 2 + 1]);
+		peaks[level4 + 1][i0] = shrink_max(peaks[level4 - 3][i0 * 2], peaks[level4 - 3][i0 * 2 + 1]);
+		peaks[level4 + 2][i0] = shrink_mean(peaks[level4 - 2][i0 * 2], peaks[level4 - 2][i0 * 2 + 1]);
+		peaks[level4 + 3][i0] = shrink_mean(peaks[level4 - 1][i0 * 2], peaks[level4 - 1][i0 * 2 + 1]);
 	}
 }
 
-void AudioBuffer::update_peaks()
+int AudioBuffer::_update_peaks_prepare()
 {
 	if (!_shrink_table_created)
 		update_shrink_table();
 
 	int n = length / PEAK_CHUNK_SIZE;
 
-	tsunami->song->lock();
 	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
-		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
-	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
-	tsunami->song->unlock();
+		_ensure_peak_size((i - PEAK_OFFSET_EXP) * 4, length >> i, false);
+	_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
 
-	Thread::cancelationPoint();
-
-	for (int i=0; i<n; i++)
-		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
-			while (!tsunami->song->try_lock()){
-				Thread::cancelationPoint();
-				hui::Sleep(0.01f);
-			}
-			update_peaks_chunk(*this, i);
-			tsunami->song->unlock();
-
-			Thread::cancelationPoint();
-		}
+	return n;
 }

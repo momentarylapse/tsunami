@@ -43,7 +43,6 @@
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
-#include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../lib/threads/Mutex.h"
@@ -250,16 +249,6 @@ Song::~Song()
 	reset();
 }
 
-
-bool Song::load(const string & filename, bool deep)
-{
-	return tsunami->storage->load(this, filename);
-}
-
-bool Song::save(const string & filename)
-{
-	return tsunami->storage->save(this, filename);
-}
 
 Range Song::getRange()
 {

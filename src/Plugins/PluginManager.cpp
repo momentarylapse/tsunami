@@ -77,7 +77,7 @@ void PluginManager::LinkAppScriptData()
 
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
-	Kaba::LinkExternal("storage", &tsunami->storage);
+	//Kaba::LinkExternal("storage", &tsunami->storage);
 	Kaba::LinkExternal("logging", &tsunami->log);
 	Kaba::LinkExternal("colors", &AudioView::_export_colors);
 	Kaba::LinkExternal("view_input", &export_view_input);

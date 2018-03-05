@@ -29,11 +29,9 @@ Tsunami::Tsunami() :
 {
 	device_manager = NULL;
 	log = NULL;
-	_win = NULL;
 	clipboard = NULL;
 	win = NULL;
 	plugin_manager = NULL;
-	storage = NULL;
 
 	setProperty("name", AppName);
 	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
@@ -45,7 +43,6 @@ Tsunami::Tsunami() :
 
 Tsunami::~Tsunami()
 {
-	delete(storage);
 	delete(device_manager);
 	delete(plugin_manager);
 	delete(clipboard);
@@ -56,7 +53,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 {
 	tsunami = this;
 	win = NULL;
-	_win = NULL;
 
 	PerformanceMonitor::init();
 
@@ -65,8 +61,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	clipboard = new Clipboard;
 
 	device_manager = new DeviceManager;
-
-	storage = new Storage;
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
@@ -88,7 +82,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 		win->show();
 
 		if (arg.num >= 2)
-			storage->load(win->song, arg[1]);
+			win->storage->load(win->song, arg[1]);
 	}
 	return true;
 }
@@ -97,6 +91,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 {
 	if (args.num < 2)
 		return false;
+	Storage *storage = new Storage;
 	if (args[1] == "--help"){
 		log->info(AppName + " " + AppVersion);
 		log->info("--help");
@@ -152,11 +147,12 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 	return false;
 }
 
-void Tsunami::createWindow()
+TsunamiWindow* Tsunami::createWindow()
 {
 	win = new TsunamiWindow(this);
 	win->auto_delete = true;
-	_win = dynamic_cast<hui::Window*>(win);
+	windows.add(win);
+	return win;
 }
 
 void Tsunami::loadKeyCodes()

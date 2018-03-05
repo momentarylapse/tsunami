@@ -18,6 +18,7 @@ class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
 class Tsunami;
+class Storage;
 
 class TsunamiWindow : public hui::Window
 {
@@ -116,6 +117,8 @@ public:
 	AudioView *view;
 
 	Song *song;
+
+	Storage *storage;
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;

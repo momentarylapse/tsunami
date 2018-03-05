@@ -54,8 +54,6 @@ namespace hui{
 
 hui::Timer debug_timer;
 
-static Array<TsunamiWindow*> TsunamiWindows;
-
 TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	hui::Window(AppName, 800, 600)
 {
@@ -188,6 +186,8 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	//ToolBarConfigure(true, true);
 	setMaximized(maximized);
 
+	storage = new Storage;
+
 
 	app->plugin_manager->AddPluginsToMenu(this);
 
@@ -227,7 +227,6 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	updateMenu();
-	TsunamiWindows.add(this);
 }
 
 TsunamiWindow::~TsunamiWindow()
@@ -239,16 +238,16 @@ void TsunamiCleanUp()
 	bool again = false;
 	do{
 		again = false;
-		foreachi(TsunamiWindow *w, TsunamiWindows, i)
+		foreachi(TsunamiWindow *w, tsunami->windows, i)
 			if (w->gotDestroyed() and w->auto_delete){
 				delete(w);
-				TsunamiWindows.erase(i);
+				tsunami->windows.erase(i);
 				again = true;
 				break;
 			}
 	}while(again);
 
-	if (TsunamiWindows.num == 0)
+	if (tsunami->windows.num == 0)
 		tsunami->end();
 }
 
@@ -591,9 +590,9 @@ void TsunamiWindow::onSettings()
 
 void TsunamiWindow::onTrackImport()
 {
-	if (app->storage->askOpenImport(this)){
+	if (storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		app->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
+		storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
 	}
 }
 
@@ -832,8 +831,8 @@ void TsunamiWindow::onOpen()
 {
 	if (!allowTermination())
 		return;
-	if (app->storage->askOpen(this)){
-		app->storage->load(song, hui::Filename);
+	if (storage->askOpen(this)){
+		storage->load(song, hui::Filename);
 		BackupManager::set_save_state();
 	}
 }
@@ -844,12 +843,12 @@ void TsunamiWindow::onSave()
 	if (song->filename == "")
 		onSaveAs();
 	else{
-		app->storage->save(song, song->filename);
+		storage->save(song, song->filename);
 		BackupManager::set_save_state();
 	}
 }
 
-string _suggest_filename(Song *s)
+string _suggest_filename(Song *s, const string &dir)
 {
 	if (s->filename != "")
 		return s->filename.basename();
@@ -868,8 +867,8 @@ string _suggest_filename(Song *s)
 	for (int i=0; i<26; i++){
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
-		msg_write(tsunami->storage->current_directory + name);
-		if (!file_test_existence(tsunami->storage->current_directory + name))
+		msg_write(dir + name);
+		if (!file_test_existence(dir + name))
 			return name;
 	}
 	return "";
@@ -878,21 +877,21 @@ string _suggest_filename(Song *s)
 void TsunamiWindow::onSaveAs()
 {
 	if (song->filename == "")
-		hui::file_dialog_default = _suggest_filename(song);
+		hui::file_dialog_default = _suggest_filename(song, storage->current_directory);
 
-	if (app->storage->askSave(this))
-		app->storage->save(song, hui::Filename);
+	if (storage->askSave(this))
+		storage->save(song, hui::Filename);
 
 	hui::file_dialog_default = "";
 }
 
 void TsunamiWindow::onExport()
 {
-	if (app->storage->askSaveExport(this)){
+	if (storage->askSaveExport(this)){
 		SongRenderer renderer(song);
 		renderer.prepare(view->getPlaybackSelection(false), false);
 		renderer.allowTracks(view->get_selected_tracks());
-		app->storage->saveViaRenderer(&renderer, hui::Filename, renderer.getNumSamples(), song->tags);
+		storage->saveViaRenderer(&renderer, hui::Filename, renderer.getNumSamples(), song->tags);
 	}
 }
 

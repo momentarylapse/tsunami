@@ -87,8 +87,6 @@ public:
 	virtual void _cdecl reset();
 	void _cdecl newEmpty(int _sample_rate);
 	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
-	virtual bool _cdecl load(const string &filename, bool deep);
-	virtual bool _cdecl save(const string &filename);
 
 	void _cdecl invalidateAllPeaks();
 

@@ -36,14 +36,11 @@ public:
 	bool handleCLIArguments(const Array<string> &arg);
 	void loadKeyCodes();
 
-	void createWindow();
+	TsunamiWindow* createWindow();
 	bool allowTermination();
 
 	TsunamiWindow *win;
-	hui::Window *_win;
-
-
-	Storage *storage;
+	Array<TsunamiWindow*> windows;
 
 	Log *log;
 

@@ -192,9 +192,9 @@ void SampleManagerConsole::onListEdit()
 
 void SampleManagerConsole::onImport()
 {
-	if (tsunami->storage->askOpenImport(win)){
+	if (view->win->storage->askOpenImport(win)){
 		AudioBuffer buf;
-		tsunami->storage->loadBufferBox(song, &buf, hui::Filename);
+		view->win->storage->loadBufferBox(song, &buf, hui::Filename);
 		song->addSample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		onListSelect();
@@ -207,10 +207,10 @@ void SampleManagerConsole::onExport()
 	if (sel.num != 1)
 		return;
 
-	if (tsunami->storage->askSaveExport(win)){
+	if (view->win->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::TYPE_AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			tsunami->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
+			view->win->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
 	}
 }

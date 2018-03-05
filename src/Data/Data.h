@@ -25,8 +25,6 @@ public:
 	static const string MESSAGE_FINISHED_LOADING;
 
 	virtual void _cdecl reset() = 0;
-	virtual bool _cdecl load(const string &_filename, bool deep = true) = 0;
-	virtual bool _cdecl save(const string &_filename) = 0;
 
 	void resetHistory();
 	void *execute(Action *a);

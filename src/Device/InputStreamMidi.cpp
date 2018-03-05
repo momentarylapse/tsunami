@@ -14,6 +14,7 @@
 #include "OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Midi/MidiSource.h"
+#include "../Stuff/BackupManager.h"
 
 #ifdef DEVICE_MIDI_ALSA
 #include <alsa/asoundlib.h>

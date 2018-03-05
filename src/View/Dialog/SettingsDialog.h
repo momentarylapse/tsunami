@@ -24,8 +24,6 @@ public:
 	void onColorScheme();
 	void onOggBitrate();
 	void onDefaultArtist();
-	void onCaptureFilename();
-	void onCaptureFind();
 
 
 private:

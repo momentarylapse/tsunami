@@ -15,15 +15,13 @@
 #include "Device.h"
 #include "InputStreamAudio.h"
 #include "OutputStream.h"
+#include "../Stuff/BackupManager.h"
 
 #ifdef DEVICE_PULSEAUDIO
 #include <pulse/pulseaudio.h>
 #endif
 
 
-string InputStreamAudio::backup_filename;
-string InputStreamAudio::temp_backup_filename;
-string InputStreamAudio::cur_backup_filename;
 float InputStreamAudio::playback_delay_const;
 
 
@@ -122,7 +120,17 @@ int InputStreamAudio::Source::read(AudioBuffer &buf)
 {
 	if (stream->buffer.available() < buf.length)
 		return NOT_ENOUGH_DATA;
-	return stream->buffer.read(buf);
+
+	int r = stream->buffer.read(buf);
+
+	if (stream->backup_file){
+		// write to file
+		string data;
+		buf.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
+		stream->backup_file->write_buffer(&data[0], data.num);
+	}
+
+	return r;
 }
 
 int InputStreamAudio::Source::getSampleRate()
@@ -138,9 +146,9 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	sample_rate = _sample_rate;
 	chunk_size = -1;
 	update_dt = -1;
-	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
+	num_channels = 0;
 
 	capturing = false;
 #ifdef DEVICE_PULSEAUDIO
@@ -152,16 +160,15 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;
-	if (device)
+	if (device){
 		playback_delay_const = device->latency;
-	backup_filename = hui::Config.getStr("Input.TempFilename", "");
+		num_channels = device->channels;
+	}
 	backup_file = NULL;
-	backup_mode = BACKUP_MODE_NONE;
+	backup_mode = BACKUP_MODE_TEMP;
 
 	running = false;
-
-	if (file_test_existence(getBackupFilename()))
-		tsunami->log->warn(_("found old recording: ") + getBackupFilename());
+	hui_runner_id = -1;
 }
 
 InputStreamAudio::~InputStreamAudio()
@@ -229,6 +236,7 @@ void InputStreamAudio::_stop()
 {
 	if (!capturing)
 		return;
+	tsunami->log->info(_("capture audio stop"));
 	_stopUpdate();
 
 #ifdef DEVICE_PULSEAUDIO
@@ -252,10 +260,10 @@ void InputStreamAudio::_stop()
 	capturing = false;
 	buffer.clear();
 	if (backup_file){
-		delete(backup_file);
+		BackupManager::done(backup_file);
 		backup_file = NULL;
-		if (backup_mode != BACKUP_MODE_KEEP)
-			file_delete(cur_backup_filename);
+		//if (backup_mode != BACKUP_MODE_KEEP)
+		//	file_delete(cur_backup_filename);
 	}
 }
 
@@ -264,6 +272,8 @@ bool InputStreamAudio::start()
 //	printf("input start\n");
 	if (capturing)
 		_stop();
+
+	tsunami->log->info(_("capture audio start"));
 
 	num_channels = 2;
 
@@ -302,14 +312,8 @@ bool InputStreamAudio::start()
 
 	capturing = true;
 
-	if (backup_mode != BACKUP_MODE_NONE){
-		cur_backup_filename = getBackupFilename();
-		try{
-			backup_file = FileCreate(getBackupFilename());
-		}catch(FileError &e){
-			tsunami->log->error(e.message());
-		}
-	}
+	if (backup_mode != BACKUP_MODE_NONE)
+		backup_file = BackupManager::get_file("raw");
 
 	_startUpdate();
 
@@ -350,18 +354,6 @@ int InputStreamAudio::doCapturing()
 	sync.add(avail);
 
 	return avail;
-
-	if (backup_file){
-		AudioBuffer b;
-		buffer.readRef(b, avail);
-		// write to file
-		string data;
-		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
-
-		backup_file->write_buffer(&data[0], data.num);
-	}
-
-	return avail;
 }
 
 void InputStreamAudio::resetSync()
@@ -389,35 +381,6 @@ int InputStreamAudio::getState()
 int InputStreamAudio::getDelay()
 {
 	return sync.getDelay() - playback_delay_const * (float)sample_rate / 1000.0f;
-}
-
-string InputStreamAudio::getDefaultBackupFilename()
-{
-#ifdef OS_WINDOWS
-	return "c:\\tsunami-input.raw";
-#else
-	return "/tmp/tsunami-input.raw";
-#endif
-}
-
-string InputStreamAudio::getBackupFilename()
-{
-	if (temp_backup_filename.num > 0)
-		return temp_backup_filename;
-	if (backup_filename.num > 0)
-		return backup_filename;
-	return getDefaultBackupFilename();
-}
-
-void InputStreamAudio::setBackupFilename(const string &filename)
-{
-	backup_filename = filename;
-	hui::Config.setStr("Input.TempFilename", backup_filename);
-}
-
-void InputStreamAudio::setTempBackupFilename(const string &filename)
-{
-	temp_backup_filename = filename;
 }
 
 void InputStreamAudio::_startUpdate()

@@ -26,13 +26,6 @@ struct pa_context;
 struct _snd_seq;
 #endif
 
-enum
-{
-	BACKUP_MODE_NONE,
-	BACKUP_MODE_TEMP,
-	BACKUP_MODE_KEEP
-};
-
 class DeviceManager : public Observable<VirtualBase>
 {
 public:

@@ -13,12 +13,13 @@
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
 #include "Stuff/PerformanceMonitor.h"
+#include "Stuff/BackupManager.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.1.4";
+const string AppVersion = "0.7.1.5";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -81,6 +82,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	log->info(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 	log->info(_("  ...don't worry. Everything will be fine!"));
+
+	BackupManager::check_old_files();
 
 
 	// create a window and load file

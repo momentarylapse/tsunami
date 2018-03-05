@@ -99,7 +99,6 @@ void CaptureConsoleModeAudio::enter()
 
 
 	input = new InputStreamAudio(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);
 	view->mode_capture->setInputAudio(input);

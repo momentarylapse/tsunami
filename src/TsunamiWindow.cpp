@@ -37,6 +37,7 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
+#include "Stuff/BackupManager.h"
 #include "Device/DeviceManager.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
@@ -804,8 +805,10 @@ void TsunamiWindow::onUpdate()
 
 void TsunamiWindow::onExit()
 {
-	if (allowTermination())
+	if (allowTermination()){
+		BackupManager::set_save_state();
 		destroy();
+	}
 }
 
 
@@ -816,6 +819,7 @@ void TsunamiWindow::onNew()
 	NewDialog *dlg = new NewDialog(this, song);
 	dlg->run();
 	delete(dlg);
+	BackupManager::set_save_state();
 }
 
 
@@ -823,8 +827,10 @@ void TsunamiWindow::onOpen()
 {
 	if (!allowTermination())
 		return;
-	if (app->storage->askOpen(this))
+	if (app->storage->askOpen(this)){
 		app->storage->load(song, hui::Filename);
+		BackupManager::set_save_state();
+	}
 }
 
 
@@ -832,8 +838,10 @@ void TsunamiWindow::onSave()
 {
 	if (song->filename == "")
 		onSaveAs();
-	else
+	else{
 		app->storage->save(song, song->filename);
+		BackupManager::set_save_state();
+	}
 }
 
 

@@ -62,14 +62,6 @@ public:
 	static float getPlaybackDelayConst();
 	static void setPlaybackDelayConst(float f);
 
-	// backup
-	static string getDefaultBackupFilename();
-	static string getBackupFilename();
-	static void setBackupFilename(const string &filename);
-	static void setTempBackupFilename(const string &filename);
-	static string temp_backup_filename;
-	static string backup_filename;
-
 
 	RingBuffer buffer;
 
@@ -112,7 +104,6 @@ private:
 	static bool testError(const string &msg);
 
 	File *backup_file;
-	static string cur_backup_filename;
 
 	struct SyncData
 	{

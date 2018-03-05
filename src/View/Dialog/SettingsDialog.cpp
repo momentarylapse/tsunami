@@ -21,12 +21,10 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	event("color_scheme", std::bind(&SettingsDialog::onColorScheme, this));
 	event("ogg_bitrate", std::bind(&SettingsDialog::onOggBitrate, this));
 	event("default_artist", std::bind(&SettingsDialog::onDefaultArtist, this));
-	event("capture_filename", std::bind(&SettingsDialog::onCaptureFilename, this));
-	event("capture_find", std::bind(&SettingsDialog::onCaptureFind, this));
 	event("hui:close", std::bind(&SettingsDialog::destroy, this));
 	event("close", std::bind(&SettingsDialog::destroy, this));
 
-	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
+	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
@@ -72,8 +70,6 @@ void SettingsDialog::loadData()
 	setString("default_artist", hui::Config.getStr("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
-
-	setString("capture_filename", InputStreamAudio::backup_filename);
 }
 
 void SettingsDialog::applyData()
@@ -103,17 +99,5 @@ void SettingsDialog::onOggBitrate()
 void SettingsDialog::onDefaultArtist()
 {
 	hui::Config.setStr("DefaultArtist", getString(""));
-}
-
-void SettingsDialog::onCaptureFilename()
-{
-	InputStreamAudio::setBackupFilename(getString(""));
-}
-
-void SettingsDialog::onCaptureFind()
-{
-	if (hui::FileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::backup_filename.basename(), "*.raw", "*.raw"))
-		setString("capture_filename", hui::Filename);
-	InputStreamAudio::setBackupFilename(hui::Filename);
 }
 

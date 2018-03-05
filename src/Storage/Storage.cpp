@@ -62,6 +62,8 @@ bool Storage::load(Song *a, const string &filename)
 	if (!d)
 		return false;
 
+	tsunami->log->info(_("loading ") + filename);
+
 	Format *f = d->create();
 	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, tsunami->win);
 
@@ -92,6 +94,8 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 	if (!d)
 		return false;
 
+	tsunami->log->info(_("loading track ") + filename);
+
 	Format *f = d->create();
 	Song *a = t->song;
 	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, tsunami->win);
@@ -109,6 +113,8 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 
 bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
+	tsunami->log->info(_("loading buffer ") + filename);
+
 	Song *aa = new Song;
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
@@ -144,8 +150,10 @@ bool Storage::save(Song *a, const string &filename)
 	if (!d)
 		return false;
 
+	tsunami->log->info(_("saving ") + filename);
+
 	if (!d->testFormatCompatibility(a))
-		tsunami->log->warn(_("Data loss!"));
+		tsunami->log->warn(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
 	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, tsunami->win);
@@ -167,6 +175,8 @@ bool Storage::saveViaRenderer(AudioSource *r, const string &filename, int num_sa
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
 	if (!d)
 		return false;
+
+	tsunami->log->info(_("exporting ") + filename);
 
 	Format *f = d->create();
 	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), tsunami->win);

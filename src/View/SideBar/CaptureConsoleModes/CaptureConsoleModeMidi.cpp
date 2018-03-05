@@ -103,7 +103,6 @@ void CaptureConsoleModeMidi::enter()
 	//cc->addString("capture_midi_target", _("  - create new track -"));
 
 	input = new InputStreamMidi(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
 	input->setChunkSize(512);
 	input->setUpdateDt(0.005f);
 	view->mode_capture->setInputMidi(input);

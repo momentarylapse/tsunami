@@ -273,6 +273,7 @@ OBJ = Action/Bar/Action__ScaleData.o \
  Storage/Format/FormatWave.o \
  Storage/Storage.o \
  Storage/StorageOperationData.o \
+ Stuff/BackupManager.o \
  Stuff/Clipboard.o \
  Stuff/Log.o \
  Stuff/Observable.o \
@@ -1138,6 +1139,9 @@ Storage/Storage.o : Storage/Storage.cpp Storage/Storage.h lib/file/file.h lib/ba
 Storage/StorageOperationData.o : Storage/StorageOperationData.cpp Storage/StorageOperationData.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Audio/Source/AudioSource.h Data/Song.h Data/Data.h Action/Action.h Action/ActionManager.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Data/Track.h Data/Range.h Midi/MidiData.h Midi/MidiNote.h Midi/MidiEvent.h Data/Sample.h lib/math/rect.h Audio/AudioBuffer.h Midi/Instrument.h Data/SampleRef.h Rhythm/BarCollection.h Data/Curve.h View/Helper/Progress.h Tsunami.h Stuff/Log.h
 	$(CPP) -c Storage/StorageOperationData.cpp -o $@ $(CXXFLAGS)
 
+Stuff/BackupManager.o : Stuff/BackupManager.cpp Stuff/BackupManager.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/Track.h Data/Range.h Midi/MidiData.h Midi/MidiNote.h Midi/MidiEvent.h Data/Sample.h lib/math/rect.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Audio/AudioBuffer.h Midi/Instrument.h Data/Song.h Data/Data.h Action/Action.h Action/ActionManager.h Data/SampleRef.h Rhythm/BarCollection.h Data/Curve.h Tsunami.h
+	$(CPP) -c Stuff/BackupManager.cpp -o $@ $(CXXFLAGS)
+
 Stuff/Clipboard.o : Stuff/Clipboard.cpp Stuff/Clipboard.h Stuff/Observable.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h View/AudioView.h Data/Song.h Data/Data.h Action/Action.h Action/ActionManager.h Data/Track.h Data/Range.h Midi/MidiData.h Midi/MidiNote.h Midi/MidiEvent.h Data/Sample.h lib/math/rect.h Audio/AudioBuffer.h Midi/Instrument.h Data/SampleRef.h Rhythm/BarCollection.h Data/Curve.h Data/SongSelection.h Midi/Scale.h View/TrackHeightManager.h View/ViewPort.h View/Selection.h View/ColorScheme.h Action/Track/Sample/ActionTrackPasteAsSample.h Action/ActionGroup.h Action/Track/Buffer/ActionTrackEditBuffer.h Tsunami.h Stuff/Log.h
 	$(CPP) -c Stuff/Clipboard.cpp -o $@ $(CXXFLAGS)
 
@@ -1313,7 +1317,7 @@ install :
 	cp -rf ../Plugins/Independent      /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Synthesizer      /usr/share/tsunami/Plugins
 	cp -rf ../Lessons/                 /usr/share/tsunami/
-	cp -rf ../static/Drumsets            /usr/share/tsunami/
+	cp -rf ../static/Drumsets          /usr/share/tsunami/
 	xdg-desktop-menu install ../static/michisoft-tsunami.desktop
 	xdg-mime install ../static/michisoft-nami.xml
 	xdg-icon-resource install --context mimetypes --size  32 ../static/Icons/32.png  application-michisoft-nami --noupdate

@@ -68,7 +68,7 @@ Song* getCurSong()
 
 void GlobalSetTempBackupFilename(const string &filename)
 {
-	InputStreamAudio::setTempBackupFilename(filename);
+	//InputStreamAudio::setTempBackupFilename(filename);
 }
 
 Synthesizer* GlobalCreateSynthesizer(const string &name, Song *song)

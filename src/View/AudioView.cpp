@@ -932,6 +932,7 @@ int frame=0;
 
 void AudioView::onDraw(Painter *c)
 {
+	printf("draw %p\n", this);
 	PerformanceMonitor::start_busy(perf_channel);
 
 	colors = basic_colors.create(win->isActive(id));

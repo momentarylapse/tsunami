@@ -6,12 +6,13 @@
  */
 
 #include "NewDialog.h"
+#include "../../Data/Song.h"
+#include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 
-NewDialog::NewDialog(hui::Window *_parent, Song *s):
+NewDialog::NewDialog(hui::Window *_parent):
 	hui::Window("new_dialog", _parent)
 {
-	song = s;
-
 	addString("sample_rate", "22050");
 	addString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
 	addString("sample_rate", "48000");
@@ -34,6 +35,9 @@ void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
 	bool midi = isChecked("new_track_type:midi");
+	TsunamiWindow *win = tsunami->createWindow();
+	win->show();
+	Song *song = win->song;
 	song->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){

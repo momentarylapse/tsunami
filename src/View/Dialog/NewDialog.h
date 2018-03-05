@@ -9,13 +9,14 @@
 #define NEWDIALOG_H_
 
 
-#include "../../Data/Song.h"
 #include "../../lib/hui/hui.h"
+
+class Song;
 
 class NewDialog: public hui::Window
 {
 public:
-	NewDialog(hui::Window *_parent, Song *a);
+	NewDialog(hui::Window *_parent);
 
 	void loadData();
 	void applyData();
@@ -23,8 +24,6 @@ public:
 	void onOk();
 	void onMetronome();
 	void onTypeMidi();
-
-	Song *song;
 };
 
 #endif /* NEWDIALOG_H_ */

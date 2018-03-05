@@ -816,12 +816,10 @@ void TsunamiWindow::onExit()
 
 void TsunamiWindow::onNew()
 {
-	if (!allowTermination())
-		return;
-	NewDialog *dlg = new NewDialog(this, song);
+	NewDialog *dlg = new NewDialog(this);
 	dlg->run();
 	delete(dlg);
-	BackupManager::set_save_state();
+	//BackupManager::set_save_state();
 }
 
 

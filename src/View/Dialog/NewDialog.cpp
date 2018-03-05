@@ -36,7 +36,6 @@ void NewDialog::onOk()
 	int sample_rate = getString("sample_rate")._int();
 	bool midi = isChecked("new_track_type:midi");
 	TsunamiWindow *win = tsunami->createWindow();
-	win->show();
 	Song *song = win->song;
 	song->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
 	song->action_manager->enable(false);
@@ -50,6 +49,8 @@ void NewDialog::onOk()
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 	destroy();
+	win->show();
+	win->activate("");
 }
 
 void NewDialog::onMetronome()

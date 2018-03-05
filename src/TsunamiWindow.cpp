@@ -47,6 +47,11 @@
 
 extern const string AppName;
 
+namespace hui{
+	extern string file_dialog_default;
+}
+
+
 hui::Timer debug_timer;
 
 static Array<TsunamiWindow*> TsunamiWindows;
@@ -844,11 +849,41 @@ void TsunamiWindow::onSave()
 	}
 }
 
+string _suggest_filename(Song *s)
+{
+	if (s->filename != "")
+		return s->filename.basename();
+	string base = get_current_date().format("%Y-%m-%d");
+
+	string ext = "nami";
+	if ((s->tracks.num == 1) and (s->tracks[0]->type == Track::TYPE_AUDIO))
+		ext = "ogg";
+	bool allow_midi = true;
+	for (Track* t: s->tracks)
+		if ((t->type != Track::TYPE_MIDI) and (t->type != Track::TYPE_TIME))
+			allow_midi = false;
+	if (allow_midi)
+		ext = "midi";
+
+	for (int i=0; i<26; i++){
+		string name = base + "a." + ext;
+		name[name.num - ext.num - 2] += i;
+		msg_write(tsunami->storage->current_directory + name);
+		if (!file_test_existence(tsunami->storage->current_directory + name))
+			return name;
+	}
+	return "";
+}
 
 void TsunamiWindow::onSaveAs()
 {
+	if (song->filename == "")
+		hui::file_dialog_default = _suggest_filename(song);
+
 	if (app->storage->askSave(this))
 		app->storage->save(song, hui::Filename);
+
+	hui::file_dialog_default = "";
 }
 
 void TsunamiWindow::onExport()

@@ -5,6 +5,9 @@ namespace hui
 {
 
 
+string file_dialog_default;
+
+
 static GtkWindow *get_window_save(Window *win)
 {
 	_MakeUsable_();
@@ -87,6 +90,7 @@ static void try_to_ensure_extension(string &filename, const string &filter)
 		filename += "." + filter_ext;
 }
 
+
 // file selection for saving
 bool FileDialogSave(Window *win,const string &title,const string &dir,const string &show_filter,const string &filter)
 {
@@ -99,6 +103,8 @@ bool FileDialogSave(Window *win,const string &title,const string &dir,const stri
 												NULL);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
+	if (file_dialog_default.num > 0)
+		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(file_dialog_default));
 	add_filters(dlg, show_filter, filter);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT){

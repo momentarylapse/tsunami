@@ -18,6 +18,7 @@
 
 class PluginManager;
 class Device;
+class TsunamiWindow;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -75,8 +76,10 @@ public:
 	};
 	Source *source;
 
-	void _cdecl setBackupMode(int mode);
+	void _cdecl setBackupMode(int mode, TsunamiWindow *win);
 	int backup_mode;
+	File *backup_file;
+	TsunamiWindow *win;
 
 	void _cdecl setChunkSize(int size);
 	void _cdecl setUpdateDt(float dt);
@@ -102,8 +105,6 @@ private:
 #endif
 
 	static bool testError(const string &msg);
-
-	File *backup_file;
 
 	struct SyncData
 	{

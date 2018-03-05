@@ -808,7 +808,7 @@ void TsunamiWindow::onUpdate()
 void TsunamiWindow::onExit()
 {
 	if (allowTermination()){
-		BackupManager::set_save_state();
+		BackupManager::set_save_state(this);
 		destroy();
 	}
 }
@@ -828,7 +828,7 @@ void TsunamiWindow::onOpen()
 	if (storage->askOpen(this)){
 		if (song->is_empty()){
 			storage->load(song, hui::Filename);
-			BackupManager::set_save_state();
+			BackupManager::set_save_state(this);
 		}else{
 			TsunamiWindow *w = tsunami->createWindow();
 			w->show();
@@ -844,7 +844,7 @@ void TsunamiWindow::onSave()
 		onSaveAs();
 	else{
 		storage->save(song, song->filename);
-		BackupManager::set_save_state();
+		BackupManager::set_save_state(this);
 	}
 }
 

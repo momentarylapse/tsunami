@@ -27,13 +27,13 @@ string BackupManager::get_filename(const string &extension)
 }
 
 
-void BackupManager::set_save_state()
+void BackupManager::set_save_state(TsunamiWindow *win)
 {
 	for (auto &bf: files){
-		if (bf.from_this_session){
+		if (bf.win == win){
 			tsunami->log->info(_("deleting backup: ") + bf.filename);
 			file_delete(bf.filename);
-			bf.from_this_session = false; // auto remove
+			bf.win = NULL; // auto remove
 		}
 	}
 	_clear_old();
@@ -47,7 +47,7 @@ void BackupManager::check_old_files()
 	auto _files = dir_search(tsunami->directory, "backup-*", false);
 	for (auto &f: _files){
 		BackupFile bf;
-		bf.from_this_session = false;
+		bf.win = NULL;
 		bf.f = NULL;
 		bf.filename = tsunami->directory + f.name;
 		files.add(bf);
@@ -55,15 +55,15 @@ void BackupManager::check_old_files()
 
 	// check
 	for (auto &bf: files){
-		if (!bf.from_this_session)
+		if (!bf.win)
 			tsunami->log->warn(_("recording backup found: ") + bf.filename);
 	}
 }
 
-File *BackupManager::get_file(const string &extension)
+File *BackupManager::create_file(const string &extension, TsunamiWindow *win)
 {
 	BackupFile bf;
-	bf.from_this_session = true;
+	bf.win = win;
 	bf.filename = get_filename(extension);
 	tsunami->log->info(_("creating backup: ") + bf.filename);
 	try{
@@ -105,7 +105,7 @@ BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
 void BackupManager::_clear_old()
 {
 	for (int i=0; i<files.num; i++)
-		if (!files[i].from_this_session){
+		if (!files[i].win){
 			files.erase(i);
 			i --;
 		}

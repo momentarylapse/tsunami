@@ -166,6 +166,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	}
 	backup_file = NULL;
 	backup_mode = BACKUP_MODE_NONE;
+	win = NULL;
 
 	running = false;
 	hui_runner_id = -1;
@@ -187,9 +188,10 @@ void InputStreamAudio::__delete__()
 	this->InputStreamAudio::~InputStreamAudio();
 }
 
-void InputStreamAudio::setBackupMode(int mode)
+void InputStreamAudio::setBackupMode(int mode, TsunamiWindow *_win)
 {
 	backup_mode = mode;
+	win = _win;
 }
 
 void InputStreamAudio::setChunkSize(int size)
@@ -313,7 +315,7 @@ bool InputStreamAudio::start()
 	capturing = true;
 
 	if (backup_mode != BACKUP_MODE_NONE)
-		backup_file = BackupManager::get_file("raw");
+		backup_file = BackupManager::create_file("raw", win);
 
 	_startUpdate();
 

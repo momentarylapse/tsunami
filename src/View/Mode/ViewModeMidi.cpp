@@ -85,8 +85,6 @@ private:
 	Array<int> pitch;
 };
 
-static MidiPreviewSource *preview_source;
-
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {

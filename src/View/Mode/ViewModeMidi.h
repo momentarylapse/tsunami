@@ -16,6 +16,7 @@ class MidiNote;
 class MidiEvent;
 class OutputStream;
 class Synthesizer;
+class MidiPreviewSource;
 
 class ViewModeMidi : public ViewModeDefault
 {
@@ -71,6 +72,7 @@ public:
 
 	Synthesizer *preview_synth;
 	OutputStream *preview_stream;
+	MidiPreviewSource *preview_source;
 
 	AudioViewTrack *cur_track;
 

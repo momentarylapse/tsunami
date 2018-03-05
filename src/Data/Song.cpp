@@ -249,6 +249,12 @@ Song::~Song()
 	reset();
 }
 
+bool Song::is_empty()
+{
+	if (filename.num > 0)
+		return false;
+	return action_manager->isSave();
+}
 
 Range Song::getRange()
 {

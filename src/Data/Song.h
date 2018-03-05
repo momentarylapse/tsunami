@@ -85,6 +85,7 @@ public:
 	string _cdecl get_time_str_long(int t);
 
 	virtual void _cdecl reset();
+	bool is_empty();
 	void _cdecl newEmpty(int _sample_rate);
 	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
 

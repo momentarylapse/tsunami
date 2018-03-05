@@ -825,11 +825,15 @@ void TsunamiWindow::onNew()
 
 void TsunamiWindow::onOpen()
 {
-	if (!allowTermination())
-		return;
 	if (storage->askOpen(this)){
-		storage->load(song, hui::Filename);
-		BackupManager::set_save_state();
+		if (song->is_empty()){
+			storage->load(song, hui::Filename);
+			BackupManager::set_save_state();
+		}else{
+			TsunamiWindow *w = tsunami->createWindow();
+			w->show();
+			w->storage->load(w->song, hui::Filename);
+		}
 	}
 }
 

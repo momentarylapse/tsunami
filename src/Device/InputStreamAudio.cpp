@@ -165,7 +165,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 		num_channels = device->channels;
 	}
 	backup_file = NULL;
-	backup_mode = BACKUP_MODE_TEMP;
+	backup_mode = BACKUP_MODE_NONE;
 
 	running = false;
 	hui_runner_id = -1;

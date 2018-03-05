@@ -16,6 +16,7 @@
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Stuff/Log.h"
+#include "../../../Stuff/BackupManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../../Tsunami.h"
 
@@ -99,6 +100,7 @@ void CaptureConsoleModeAudio::enter()
 
 
 	input = new InputStreamAudio(song->sample_rate);
+	input->setBackupMode(BACKUP_MODE_TEMP);
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);
 	view->mode_capture->setInputAudio(input);

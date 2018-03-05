@@ -60,11 +60,6 @@ bool GlobalAllowTermination()
 	return tsunami->allowTermination();
 }
 
-Song* getCurSong()
-{
-	return tsunami->song;
-}
-
 
 void GlobalSetTempBackupFilename(const string &filename)
 {
@@ -84,18 +79,18 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("storage", &tsunami->storage);
 	Kaba::LinkExternal("logging", &tsunami->log);
-	Kaba::LinkExternal("colors", &tsunami->_view->_export_colors);
+	Kaba::LinkExternal("colors", &AudioView::_export_colors);
 	Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
+	//Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
 	Kaba::LinkExternal("CreateSynthesizer", (void*)&GlobalCreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
-	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
+	//Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
 	Kaba::DeclareClassSize("Range", sizeof(Range));
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
@@ -196,7 +191,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Sample.getValue", Kaba::mf(&Sample::getValue));
 
 	Sample sample(0);
-	sample.owner = tsunami->song;
+	//sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
 	Kaba::DeclareClassSize("SampleRef", sizeof(SampleRef));
 	Kaba::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));

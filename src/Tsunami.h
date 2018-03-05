@@ -41,10 +41,7 @@ public:
 
 	TsunamiWindow *win;
 	hui::Window *_win;
-	AudioView *_view;
 
-
-	Song *song;
 
 	Storage *storage;
 

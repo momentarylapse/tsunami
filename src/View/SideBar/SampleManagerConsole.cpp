@@ -422,11 +422,12 @@ public:
 	string list_id;
 };
 
-Sample *SampleManagerConsole::select(hui::Panel *root, Song *a, Sample *old)
+Sample *SampleManagerConsole::select(hui::Panel *root, Sample *old)
 {
-	SampleSelector *s = new SampleSelector(root, a, old, tsunami->_view);
+	/*SampleSelector *s = new SampleSelector(root, song, old, view);
 	s->run();
 	Sample *r = s->ret;
 	delete(s);
-	return r;
+	return r;*/
+	return NULL;
 }

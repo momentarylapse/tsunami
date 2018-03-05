@@ -27,8 +27,6 @@ Tsunami *tsunami = NULL;
 Tsunami::Tsunami() :
 	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
 {
-	song = NULL;
-	_view = NULL;
 	device_manager = NULL;
 	log = NULL;
 	_win = NULL;
@@ -59,8 +57,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	tsunami = this;
 	win = NULL;
 	_win = NULL;
-	_view = NULL;
-	song = NULL;
 
 	PerformanceMonitor::init();
 
@@ -109,7 +105,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		log->info("--execute <PLUGIN_NAME> [ARGUMENTS]");
 		return true;
 	}else if (args[1] == "--info"){
-		song = new Song;
+		Song* song = new Song;
 		if (args.num < 3){
 			log->error(_("call: tsunami --info <File>"));
 		}else if (storage->load(song, args[2])){
@@ -127,7 +123,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		delete(song);
 		return true;
 	}else if (args[1] == "--export"){
-		song = new Song;
+		Song* song = new Song;
 		if (args.num < 4){
 			log->error(_("call: tsunami --export <File> <Exportfile>"));
 		}else if (storage->load(song, args[2])){
@@ -161,8 +157,6 @@ void Tsunami::createWindow()
 	win = new TsunamiWindow(this);
 	win->auto_delete = true;
 	_win = dynamic_cast<hui::Window*>(win);
-	_view = win->view;
-	song = win->song;
 }
 
 void Tsunami::loadKeyCodes()

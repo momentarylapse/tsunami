@@ -62,7 +62,7 @@ public:
 
 	Progress *progress;
 
-	static Sample *_cdecl select(hui::Panel *root, Song *a, Sample *old);
+	static Sample *_cdecl select(hui::Panel *root, Sample *old);
 };
 
 #endif /* SAMPLEMANAGERCONSOLE_H_ */

@@ -59,8 +59,6 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 {
 	app = _tsunami;
 
-	app->win = this;
-
 	int width = hui::Config.getInt("Window.Width", 800);
 	int height = hui::Config.getInt("Window.Height", 600);
 	bool maximized = hui::Config.getBool("Window.Maximized", true);
@@ -186,7 +184,7 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	//ToolBarConfigure(true, true);
 	setMaximized(maximized);
 
-	storage = new Storage;
+	storage = new Storage(this);
 
 
 	app->plugin_manager->AddPluginsToMenu(this);

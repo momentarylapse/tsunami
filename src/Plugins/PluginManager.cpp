@@ -71,20 +71,34 @@ Synthesizer* GlobalCreateSynthesizer(const string &name, Song *song)
 	return tsunami->plugin_manager->CreateSynthesizer(name, song);
 }
 
+Storage *GlobalStorage()
+{
+	for (auto *w: tsunami->windows)
+		return w->storage;
+	return NULL;
+}
+
+Song *getCurSong()
+{
+	for (auto *w: tsunami->windows)
+		return w->song;
+	return NULL;
+}
+
 void PluginManager::LinkAppScriptData()
 {
 	Kaba::config.directory = "";
 
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
-	//Kaba::LinkExternal("storage", &tsunami->storage);
+	Kaba::LinkExternal("storage", (void*)&GlobalStorage);
 	Kaba::LinkExternal("logging", &tsunami->log);
 	Kaba::LinkExternal("colors", &AudioView::_export_colors);
 	Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	//Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
+	Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
 	Kaba::LinkExternal("CreateSynthesizer", (void*)&GlobalCreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);

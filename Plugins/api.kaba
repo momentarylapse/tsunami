@@ -461,7 +461,7 @@ class SongPlugin
 
 extern Log* logging
 //extern PluginContext plugin_context
-extern Storage* storage
+extern Storage* storage()
 extern ColorScheme colors
 extern InputStreamAudio* view_input
 
@@ -475,5 +475,5 @@ extern bool AllowTermination()
 extern Synthesizer* CreateSynthesizer(string name)
 extern AudioEffect* CreateAudioEffect(string name, Song* s)
 extern MidiEffect* CreateMidiEffect(string name, Song* s)
-extern Sample* SelectSample(Panel* panel, Song* s, Sample* old)
-extern void SetTempBackupFilename(string filename)
+//extern Sample* SelectSample(Panel* panel, Song* s, Sample* old)
+//extern void SetTempBackupFilename(string filename)

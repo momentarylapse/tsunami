@@ -30,7 +30,6 @@ Tsunami::Tsunami() :
 	device_manager = NULL;
 	log = NULL;
 	clipboard = NULL;
-	win = NULL;
 	plugin_manager = NULL;
 
 	setProperty("name", AppName);
@@ -52,7 +51,6 @@ Tsunami::~Tsunami()
 bool Tsunami::onStartup(const Array<string> &arg)
 {
 	tsunami = this;
-	win = NULL;
 
 	PerformanceMonitor::init();
 
@@ -77,13 +75,13 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 
 	// create a window and load file
-	if (!win){
-		createWindow();
+	//if (!win){
+		TsunamiWindow* win = createWindow();
 		win->show();
 
 		if (arg.num >= 2)
 			win->storage->load(win->song, arg[1]);
-	}
+	//}
 	return true;
 }
 
@@ -91,7 +89,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 {
 	if (args.num < 2)
 		return false;
-	Storage *storage = new Storage;
+	Storage *storage = new Storage(NULL);
 	if (args[1] == "--help"){
 		log->info(AppName + " " + AppVersion);
 		log->info("--help");
@@ -126,7 +124,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		}
 		delete(song);
 		return true;
-	}else if (args[1] == "--execute"){
+	/*}else if (args[1] == "--execute"){
 		if (args.num < 3){
 			log->error(_("call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]"));
 			return true;
@@ -139,7 +137,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		win->plugins.add(p);
 		p->subscribe3(win, std::bind(&TsunamiWindow::onPluginStopRequest, win, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
 		p->start();
-		return false;
+		return false;*/
 	}else if (args[1].head(2) == "--"){
 		log->error(_("unknown command: ") + args[1]);
 		return true;
@@ -149,7 +147,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 
 TsunamiWindow* Tsunami::createWindow()
 {
-	win = new TsunamiWindow(this);
+	TsunamiWindow* win = new TsunamiWindow(this);
 	win->auto_delete = true;
 	windows.add(win);
 	return win;
@@ -161,8 +159,9 @@ void Tsunami::loadKeyCodes()
 
 bool Tsunami::allowTermination()
 {
-	if (win)
-		return win->allowTermination();
+	for (auto *w: windows)
+		if (!w->allowTermination())
+			return false;
 	return true;
 }
 

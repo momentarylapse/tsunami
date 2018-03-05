@@ -26,7 +26,7 @@
 #include "../Stuff/Log.h"
 #include "../Data/Song.h"
 
-Storage::Storage()
+Storage::Storage(TsunamiWindow *_win)
 {
 	formats.add(new FormatDescriptorNami());
 	formats.add(new FormatDescriptorWave());
@@ -43,6 +43,7 @@ Storage::Storage()
 #endif
 	formats.add(new FormatDescriptorMidi());
 
+	win = _win;
 	current_directory = hui::Config.getStr("CurrentDirectory", "");
 }
 
@@ -65,7 +66,7 @@ bool Storage::load(Song *a, const string &filename)
 	tsunami->log->info(_("loading ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -98,7 +99,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 
 	Format *f = d->create();
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, win);
 	od.offset = offset;
 	od.layer = layer;
 
@@ -156,15 +157,15 @@ bool Storage::save(Song *a, const string &filename)
 		tsunami->log->warn(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, win);
 
 	a->filename = filename;
 
 	f->saveSong(&od);
 
 	a->action_manager->markCurrentAsSave();
-	if (tsunami->win)
-		tsunami->win->updateMenu();
+	if (win)
+		win->updateMenu();
 
 	delete(f);
 	return true;
@@ -179,7 +180,7 @@ bool Storage::saveViaRenderer(AudioSource *r, const string &filename, int num_sa
 	tsunami->log->info(_("exporting ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), win);
 
 	od.renderer = r;
 	od.tags = tags;

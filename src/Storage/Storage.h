@@ -20,11 +20,12 @@ class AudioBuffer;
 class AudioSource;
 class StorageOperationData;
 class Tag;
+class TsunamiWindow;
 
 class Storage
 {
 public:
-	Storage();
+	Storage(TsunamiWindow *win);
 	virtual ~Storage();
 
 	bool load(Song *a, const string &filename);
@@ -45,6 +46,8 @@ public:
 //private:
 	Array<FormatDescriptor*> formats;
 	string current_directory;
+
+	TsunamiWindow *win;
 };
 
 #endif /* STORAGE_H_ */

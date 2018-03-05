@@ -39,7 +39,6 @@ public:
 	TsunamiWindow* createWindow();
 	bool allowTermination();
 
-	TsunamiWindow *win;
 	Array<TsunamiWindow*> windows;
 
 	Log *log;

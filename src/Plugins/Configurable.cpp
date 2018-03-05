@@ -289,8 +289,8 @@ ConfigPanel *Configurable::createPanel()
 class ConfigurationDialog : public hui::Window
 {
 public:
-	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		hui::Window("configurable_dialog", tsunami->win)
+	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p, hui::Window *parent) :
+		hui::Window("configurable_dialog", parent)
 	{
 		config = c;
 		panel = p;
@@ -394,7 +394,7 @@ public:
 	bool ok;
 };
 
-bool Configurable::configure()
+bool Configurable::configure(hui::Window *win)
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -404,7 +404,7 @@ bool Configurable::configure()
 	ConfigPanel *panel = createPanel();
 	if (!panel)
 		return true;
-	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel);
+	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel, win);
 	dlg->run();
 	bool ok = dlg->ok;
 	delete(dlg);

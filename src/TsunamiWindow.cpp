@@ -493,7 +493,7 @@ void TsunamiWindow::onMenuExecuteEffect()
 	Effect *fx = CreateEffect(name, song);
 
 	fx->resetConfig();
-	if (fx->configure()){
+	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
 			if (view->sel.has(t) and (t->type == t->TYPE_AUDIO)){
@@ -512,7 +512,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 	MidiEffect *fx = CreateMidiEffect(name, song);
 
 	fx->resetConfig();
-	if (fx->configure()){
+	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
 			if (view->sel.has(t) and (t->type == t->TYPE_MIDI)){

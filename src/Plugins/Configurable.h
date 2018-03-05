@@ -48,7 +48,7 @@ public:
 
 	void _cdecl resetConfig();
 	void _cdecl resetState();
-	bool configure();
+	bool configure(hui::Window *win);
 	virtual ConfigPanel *_cdecl createPanel();
 	void _cdecl notify();
 	virtual void _cdecl onConfig(){}

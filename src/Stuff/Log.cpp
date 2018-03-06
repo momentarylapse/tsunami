@@ -37,6 +37,16 @@ void Log::clear()
 	notify(MESSAGE_CLEAR);
 }
 
+Log::Message Log::last()
+{
+	return messages.back();
+}
+
+Array<Log::Message> Log::all()
+{
+	return messages;
+}
+
 
 void Log::addMessage(int type, const string &_message)
 {

@@ -187,7 +187,8 @@ void Panel::addDefButton(const string &title, int x, int y, const string &id)
 	addButton(title, x, y, id);
 	GtkWidget *b = controls.back()->widget;
 	gtk_widget_set_can_default(b, true);
-	gtk_widget_grab_default(b);
+	if (win) // otherwise gtk will complain
+		gtk_widget_grab_default(b);
 }
 
 

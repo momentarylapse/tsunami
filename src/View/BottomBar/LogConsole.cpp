@@ -21,7 +21,8 @@ LogConsole::LogConsole(Log *_log) :
 	//hui::RunLater(0.5f, std::bind(&LogConsole::reload, this));
 	reload();
 
-	log->subscribe(this, std::bind(&LogConsole::onUpdate, this));
+	log->subscribe3(this, std::bind(&LogConsole::onLogAdd, this), Log::MESSAGE_ADD);
+	log->subscribe3(this, std::bind(&LogConsole::onLogClear, this), Log::MESSAGE_CLEAR);
 }
 
 LogConsole::~LogConsole()
@@ -34,23 +35,34 @@ void LogConsole::onClear()
 	log->clear();
 }
 
-void LogConsole::reload()
+void console_add_message(LogConsole *lc, Log::Message &m)
 {
-	reset("log_list");
-	for (auto &m: log->messages){
-		if (m.type == Log::TYPE_ERROR){
-			addString("log_list", "hui:error\\" + m.text);
-			blink();
-		}else if (m.type == Log::TYPE_WARNING){
-			addString("log_list", "hui:warning\\" + m.text);
-			blink();
-		}else{
-			addString("log_list", "hui:info\\" + m.text);
-		}
+	if (m.type == Log::TYPE_ERROR){
+		lc->addString("log_list", "hui:error\\" + m.text);
+		lc->blink();
+	}else if (m.type == Log::TYPE_WARNING){
+		lc->addString("log_list", "hui:warning\\" + m.text);
+		lc->blink();
+	}else{
+		lc->addString("log_list", "hui:info\\" + m.text);
 	}
 }
 
-void LogConsole::onUpdate()
+void LogConsole::reload()
 {
-	reload();
+	reset("log_list");
+	auto messages = log->all();
+	for (auto &m: messages)
+		console_add_message(this, m);
+}
+
+void LogConsole::onLogAdd()
+{
+	auto m = log->last();
+	console_add_message(this, m);
+}
+
+void LogConsole::onLogClear()
+{
+	reset("log_list");
 }

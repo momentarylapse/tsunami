@@ -11,11 +11,8 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
-class LogConsole;
-
 class Log : public Observable<VirtualBase>
 {
-	friend class LogConsole;
 public:
 	Log(){}
 	virtual ~Log(){}
@@ -40,6 +37,10 @@ public:
 		int type;
 		string text;
 	};
+
+	Message last();
+	Array<Message> all();
+
 private:
 	void addMessage(int type, const string &message);
 	Array<Message> messages;

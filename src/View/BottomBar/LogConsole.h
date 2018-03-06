@@ -20,7 +20,9 @@ public:
 
 	void onClear();
 	void reload();
-	void onUpdate();
+
+	void onLogAdd();
+	void onLogClear();
 
 	Log *log;
 };

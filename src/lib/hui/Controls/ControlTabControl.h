@@ -17,6 +17,7 @@ class ControlTabControl : public Control
 {
 public:
 	ControlTabControl(const string &text, const string &id, Panel *panel);
+	~ControlTabControl();
 	virtual string getString();
 	virtual void __setString(const string &str);
 	virtual void __setInt(int i);

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-407
+408
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1224,8 +1224,11 @@ Ziel-Spur für die Ebenen
 tuning_dialog/tuning_dialog
 Stimmung
 
+/s
+s
+
 // Num Language Strings
-158
+167
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1543,3 +1546,21 @@ unknown synthesizer:
 unbekannter Synthesizer: 
 Failed writing header to output stream\n
 Konnte Header nicht in Ausgabe Stream schreiben\n
+backup done: 
+Backup abgeschlossen: 
+capture audio start
+Audioaufnahme start
+capture audio stop
+Audioaufnahme stopp
+creating backup: 
+Erstelle Backup: 
+data loss when saving in this format!
+Datenverlust beim Speichern in diesem Format!
+deleting backup: 
+Lösche Backup: 
+loading buffer 
+lade Audiopuffer 
+loading track 
+Lade Spur 
+recording backup found: 
+Aufnahme Backup gefunden: 

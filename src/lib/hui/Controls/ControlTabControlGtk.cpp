@@ -37,6 +37,12 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 	setOptions(OptionString);
 }
 
+ControlTabControl::~ControlTabControl()
+{
+	gtk_widget_hide(widget);
+	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
+}
+
 string ControlTabControl::getString()
 {
 	return "";
@@ -83,9 +89,7 @@ void ControlTabControl::addPage(const string &str)
 
 void ControlTabControl::add(Control *child, int x, int y)
 {
-	GtkWidget *child_widget = child->widget;
-	if (child->frame)
-		child_widget = child->frame;
+	GtkWidget *child_widget = child->get_frame();
 	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
 	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
 	if (panel)

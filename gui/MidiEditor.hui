@@ -19,7 +19,7 @@ Dialog midi_editor "Midi" width=380 height=516
 						ComboBox scale_root "" expandx
 						ComboBox scale_type "" expandx
 			Group me_group_creation "Creation"
-				Grid ? ""
+				Grid ? "" vertical
 					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord"
 						.
 						.
@@ -32,7 +32,6 @@ Dialog midi_editor "Midi" width=380 height=516
 							---|
 							Text ld_t_inversion "Inversion"
 							ComboBox chord_inversion ""
-					---|
 					Grid ? ""
 						Text me_t_modifier "Modifier:"
 						RadioButton modifier:none "none" expandx

@@ -1425,7 +1425,7 @@ me_group_creation
 1
 Grid
 ?
-
+vertical
 0
 0
 2
@@ -1486,8 +1486,8 @@ chord_inversion
 Grid
 ?
 
-0
 1
+0
 5
 Text
 me_t_modifier
@@ -4504,7 +4504,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-406
+407
 // Text
 /cancel
 Abbrechen
@@ -4592,6 +4592,9 @@ Aufnehmen
 
 /redo
 Wiederherstellen
+
+/s
+s
 
 /save
 Speichern
@@ -5725,7 +5728,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-158
+167
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -5993,12 +5996,24 @@ all files
 alle Dateien
 all known files
 alles mögliche
+backup done: 
+Backup abgeschlossen: 
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
 call: tsunami --export <File> <Exportfile>
 call: tsunami --export <File> <Exportfile>
 call: tsunami --info <File>
 call: tsunami --info <File>
+capture audio start
+Audioaufnahme start
+capture audio stop
+Audioaufnahme stopp
+creating backup: 
+Erstelle Backup: 
+data loss when saving in this format!
+Datenverlust beim Speichern in diesem Format!
+deleting backup: 
+Lösche Backup: 
 edit curves
 Kurven bearbeiten
 edit effects
@@ -6019,6 +6034,10 @@ i'm now going to clean up...
 i'm now going to clean up...
 loading 
 lade 
+loading buffer 
+lade Audiopuffer 
+loading track 
+Lade Spur 
 move selection to scale
 Selektierung ziehen zum Skalieren
 no sample selected
@@ -6029,6 +6048,8 @@ open message.txt
 message.txt öffnen
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+recording backup found: 
+Aufnahme Backup gefunden: 
 sample 
 sample 
 saving 

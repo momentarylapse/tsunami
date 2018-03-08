@@ -5,9 +5,11 @@ use "../Midi/Source/Metronome.kaba"
 
 class MetronomeDialog extends Dialog
 	Metronome *metro
+	float fraction_prev
+	float t_blink
 	
 	void __init__(Metronome *_metro)
-		super.__init__("Metronome", 300, 250, _metro.win, true)
+		super.__init__("Metronome", 300, 320, _metro.win, true)
 		fromSource("
 Grid ? '' vertical
 	DrawingArea area ''
@@ -25,6 +27,8 @@ Grid ? '' vertical
 		Button close 'Close' image=hui:close")
 		
 		metro = _metro
+		fraction_prev = 0
+		t_blink = 0
 	
 		setFloat("bpm", metro.source.bpm)
 		setInt("num_beats", metro.source.num_beats)
@@ -43,8 +47,14 @@ Grid ? '' vertical
 		float y0 = h / 2
 		float r = min(x0, y0) * 0.9
 		
+		bool crossed_beat = fraction_prev > metro.source.fraction_beat
+		if crossed_beat
+			t_blink = 1
+		
 		// background
 		p.setColor(colors.background)
+		if crossed_beat
+			p.setColor(ColorInterpolate(Red, colors.background, 0.5*sqrt(t_blink)))
 		p.drawRect(0, 0, w, h)
 		
 		
@@ -52,7 +62,7 @@ Grid ? '' vertical
 			p.setFontSize(r * 1.8)
 			p.setColor(ColorInterpolate(colors.grid, colors.background, 0.2))
 			p.drawStr(x0-r*1.0, y0-r*1.2, "⏸")
-			p.setFontSize(16)
+			//p.setFontSize(16)
 		
 		// circle
 		p.setColor(ColorInterpolate(colors.grid, colors.background, 0.5))
@@ -71,8 +81,13 @@ Grid ? '' vertical
 		p.drawCircle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
 		
 		// beat number
+		float fs = r * (1 + t_blink * 0.5) * 0.5
+		p.setFontSize(fs)
 		int n = metro.source.cur_beat + 1
-		p.drawStr(x0-7, y0-11, n)
+		p.drawStr(x0-fs*0.4, y0-fs*0.75, n)
+		
+		fraction_prev = metro.source.fraction_beat
+		t_blink *= 0.9
 	
 	void onAreaLeftButtonDown()
 		metro.source.setPause(!metro.source.pause)

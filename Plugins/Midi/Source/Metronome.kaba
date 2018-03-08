@@ -98,5 +98,10 @@ class MetronomeSource extends MidiSource
 		samples_beat = dt_b * sample_rate
 		samples_sub_beat = dt_s * sample_rate
 		
-		//offset = (1 - fraction) * sm_m
+		//if cur_beat >
+		
+		cur_sub_beat = num_sub_beats * fraction_beat
+		offset_sub_beat = (1 + cur_sub_beat - fraction_beat * num_sub_beats) * samples_sub_beat
+
+
 

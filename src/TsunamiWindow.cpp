@@ -7,6 +7,7 @@
 
 #include "lib/hui/hui.h"
 #include "TsunamiWindow.h"
+#include "Session.h"
 
 #include "Audio/Source/SongRenderer.h"
 #include "Tsunami.h"
@@ -54,10 +55,13 @@ namespace hui{
 
 hui::Timer debug_timer;
 
-TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
+TsunamiWindow::TsunamiWindow(Session *_session) :
 	hui::Window(AppName, 800, 600)
 {
-	app = _tsunami;
+	session = _session;
+	session->setWin(this);
+	song = session->song;
+	app = tsunami;
 
 	int width = hui::Config.getInt("Window.Width", 800);
 	int height = hui::Config.getInt("Window.Height", 600);
@@ -184,8 +188,6 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 	//ToolBarConfigure(true, true);
 	setMaximized(maximized);
 
-	storage = new Storage(this);
-
 
 	app->plugin_manager->AddPluginsToMenu(this);
 
@@ -195,20 +197,19 @@ TsunamiWindow::TsunamiWindow(Tsunami *_tsunami) :
 		event(format("jump_to_layer_%d", i), std::bind(&TsunamiWindow::onCurLayer, this));
 
 
-	die_on_plugin_stop = false;
+	session->die_on_plugin_stop = false;
 	auto_delete = false;
 
-	song = new Song;
 
-
-	view = new AudioView(this, "area", song);
+	view = new AudioView(session, "area");
+	session->view = view;
 
 	// side bar
-	side_bar = new SideBar(view, song);
+	side_bar = new SideBar(session);
 	embed(side_bar, "root_table", 1, 0);
 
 	// bottom bar
-	bottom_bar = new BottomBar(view, song, app->device_manager, app->log);
+	bottom_bar = new BottomBar(session);
 	embed(bottom_bar, "main_table", 0, 1);
 	mini_bar = new MiniBar(bottom_bar, app->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
@@ -236,16 +237,17 @@ void TsunamiCleanUp()
 	bool again = false;
 	do{
 		again = false;
-		foreachi(TsunamiWindow *w, tsunami->windows, i)
-			if (w->gotDestroyed() and w->auto_delete){
-				delete(w);
-				tsunami->windows.erase(i);
+		foreachi(Session *s, tsunami->sessions, i)
+			if (s->win->gotDestroyed() and s->win->auto_delete){
+				delete(s->win);
+				delete(s);
+				tsunami->sessions.erase(i);
 				again = true;
 				break;
 			}
 	}while(again);
 
-	if (tsunami->windows.num == 0)
+	if (tsunami->sessions.num == 0)
 		tsunami->end();
 }
 
@@ -294,7 +296,7 @@ void TsunamiWindow::onAddTimeTrack()
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
 	}catch(Song::Exception &e){
-		app->log->error(e.message);
+		session->e(e.message);
 	}
 	song->action_manager->endActionGroup();
 }
@@ -308,7 +310,7 @@ void TsunamiWindow::onTrackRender()
 {
 	Range range = view->sel.range;
 	if (range.empty()){
-		app->log->error(_("Selection range is empty"));
+		session->e(_("Selection range is empty"));
 		return;
 	}
 	song->action_manager->beginActionGroup();
@@ -332,10 +334,10 @@ void TsunamiWindow::onDeleteTrack()
 		try{
 			song->deleteTrack(view->cur_track);
 		}catch(Song::Exception &e){
-			app->log->error(e.message);
+			session->e(e.message);
 		}
 	}else{
-		app->log->error(_("No track selected"));
+		session->e(_("No track selected"));
 	}
 }
 
@@ -344,7 +346,7 @@ void TsunamiWindow::onTrackEditMidi()
 	if (view->cur_track)
 		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	else
-		app->log->error(_("No track selected"));
+		session->e(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackEditFX()
@@ -352,7 +354,7 @@ void TsunamiWindow::onTrackEditFX()
 	if (view->cur_track)
 		side_bar->open(SideBar::FX_CONSOLE);
 	else
-		app->log->error(_("No track selected"));
+		session->e(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackAddMarker()
@@ -365,7 +367,7 @@ void TsunamiWindow::onTrackAddMarker()
 		dlg->run();
 		delete(dlg);
 	}else{
-		app->log->error(_("No track selected"));
+		session->e(_("No track selected"));
 	}
 }
 
@@ -379,7 +381,7 @@ void TsunamiWindow::onTrackProperties()
 	if (view->cur_track)
 		side_bar->open(SideBar::TRACK_CONSOLE);
 	else
-		app->log->error(_("No track selected"));
+		session->e(_("No track selected"));
 }
 
 void TsunamiWindow::onSampleProperties()
@@ -387,7 +389,7 @@ void TsunamiWindow::onSampleProperties()
 	if (view->cur_sample)
 		side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	else
-		app->log->error(_("No sample selected"));
+		session->e(_("No sample selected"));
 }
 
 void TsunamiWindow::onDeleteMarker()
@@ -395,7 +397,7 @@ void TsunamiWindow::onDeleteMarker()
 	if (view->hover.type == Selection::TYPE_MARKER)
 		view->cur_track->deleteMarker(view->hover.index);
 	else
-		app->log->error(_("No marker selected"));
+		session->e(_("No marker selected"));
 }
 
 void TsunamiWindow::onEditMarker()
@@ -405,7 +407,7 @@ void TsunamiWindow::onEditMarker()
 		dlg->run();
 		delete(dlg);
 	}else
-		app->log->error(_("No marker selected"));
+		session->e(_("No marker selected"));
 }
 
 void TsunamiWindow::onShowLog()
@@ -480,14 +482,14 @@ void TsunamiWindow::onPasteAsSamples()
 void TsunamiWindow::onFindAndExecutePlugin()
 {
 	if (hui::FileDialogOpen(win, _("Select plugin script"), tsunami->directory_static + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
-		app->plugin_manager->_ExecutePlugin(this, hui::Filename);
+		app->plugin_manager->_ExecutePlugin(session, hui::Filename);
 }
 
 void TsunamiWindow::onMenuExecuteEffect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	Effect *fx = CreateEffect(name, song);
+	Effect *fx = CreateEffect(session, name);
 
 	fx->resetConfig();
 	if (fx->configure(this)){
@@ -506,7 +508,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	MidiEffect *fx = CreateMidiEffect(name, song);
+	MidiEffect *fx = CreateMidiEffect(session, name);
 
 	fx->resetConfig();
 	if (fx->configure(this)){
@@ -525,9 +527,9 @@ void TsunamiWindow::onMenuExecuteSongPlugin()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	SongPlugin *p = CreateSongPlugin(name, this);
+	SongPlugin *p = CreateSongPlugin(session, name);
 
-	p->apply(song);
+	p->apply();
 	delete(p);
 }
 
@@ -535,7 +537,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	for (TsunamiPlugin *p: plugins)
+	for (TsunamiPlugin *p: session->plugins)
 		if (p->name == name){
 			if (p->active)
 				p->stop();
@@ -544,9 +546,9 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 			return;
 		}
 
-	TsunamiPlugin *p = CreateTsunamiPlugin(name, this);
+	TsunamiPlugin *p = CreateTsunamiPlugin(session, name);
 
-	plugins.add(p);
+	session->plugins.add(p);
 	p->subscribe3(this, std::bind(&TsunamiWindow::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
 	p->start();
 }
@@ -588,9 +590,9 @@ void TsunamiWindow::onSettings()
 
 void TsunamiWindow::onTrackImport()
 {
-	if (storage->askOpenImport(this)){
+	if (session->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
+		session->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
 	}
 }
 
@@ -780,7 +782,7 @@ void TsunamiWindow::onPluginStopRequest(VirtualBase *o)
 	TsunamiPlugin *tpl = (TsunamiPlugin*)o;
 	tpl->stop();
 
-	if (die_on_plugin_stop)
+	if (session->die_on_plugin_stop)
 		tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
 }
 
@@ -808,7 +810,7 @@ void TsunamiWindow::onUpdate()
 void TsunamiWindow::onExit()
 {
 	if (allowTermination()){
-		BackupManager::set_save_state(this);
+		BackupManager::set_save_state(session);
 		destroy();
 	}
 }
@@ -825,14 +827,14 @@ void TsunamiWindow::onNew()
 
 void TsunamiWindow::onOpen()
 {
-	if (storage->askOpen(this)){
+	if (session->storage->askOpen(this)){
 		if (song->is_empty()){
-			storage->load(song, hui::Filename);
-			BackupManager::set_save_state(this);
+			session->storage->load(song, hui::Filename);
+			BackupManager::set_save_state(session);
 		}else{
-			TsunamiWindow *w = tsunami->createWindow();
-			w->show();
-			w->storage->load(w->song, hui::Filename);
+			Session *s = tsunami->createSession();
+			s->win->show();
+			s->storage->load(s->song, hui::Filename);
 		}
 	}
 }
@@ -843,8 +845,8 @@ void TsunamiWindow::onSave()
 	if (song->filename == "")
 		onSaveAs();
 	else{
-		storage->save(song, song->filename);
-		BackupManager::set_save_state(this);
+		session->storage->save(song, song->filename);
+		BackupManager::set_save_state(session);
 	}
 }
 
@@ -877,21 +879,21 @@ string _suggest_filename(Song *s, const string &dir)
 void TsunamiWindow::onSaveAs()
 {
 	if (song->filename == "")
-		hui::file_dialog_default = _suggest_filename(song, storage->current_directory);
+		hui::file_dialog_default = _suggest_filename(song, session->storage->current_directory);
 
-	if (storage->askSave(this))
-		storage->save(song, hui::Filename);
+	if (session->storage->askSave(this))
+		session->storage->save(song, hui::Filename);
 
 	hui::file_dialog_default = "";
 }
 
 void TsunamiWindow::onExport()
 {
-	if (storage->askSaveExport(this)){
+	if (session->storage->askSaveExport(this)){
 		SongRenderer renderer(song);
 		renderer.prepare(view->getPlaybackSelection(false), false);
 		renderer.allowTracks(view->get_selected_tracks());
-		storage->saveViaRenderer(&renderer, hui::Filename, renderer.getNumSamples(), song->tags);
+		session->storage->saveViaRenderer(&renderer, hui::Filename, renderer.getNumSamples(), song->tags);
 	}
 }
 

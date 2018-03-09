@@ -13,15 +13,16 @@
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
+#include "../../Session.h"
 
 
 class SingleMidiFxPanel : public hui::Panel
 {
 public:
-	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index)
+	SingleMidiFxPanel(Session *_session, Track *t, MidiEffect *_fx, int _index)
 	{
-		song = a;
+		session = _session;
+		song = session->song;
 		track = t;
 		fx = _fx;
 		index = _index;
@@ -57,20 +58,20 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, false);
+		string name = session->plugin_manager->SelectFavoriteName(win, fx, false);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->ApplyFavorite(fx, name);
+		session->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
 			track->editMidiEffect(index, old_param);
 		old_param = fx->configToString();
 	}
 	void onSave()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, true);
+		string name = session->plugin_manager->SelectFavoriteName(win, fx, true);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->SaveFavorite(fx, name);
+		session->plugin_manager->SaveFavorite(fx, name);
 	}
 	void onEnabled()
 	{
@@ -96,6 +97,7 @@ public:
 		p->update();
 		old_param = fx->configToString();
 	}
+	Session *session;
 	Song *song;
 	Track *track;
 	MidiEffect *fx;
@@ -104,12 +106,9 @@ public:
 	int index;
 };
 
-MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Midi Fx"))
+MidiFxConsole::MidiFxConsole(Session *session) :
+	SideBarConsole(_("Midi Fx"), session)
 {
-	view = _view;
-	song = _song;
-
 	fromResource("midi_fx_editor");
 
 	id_inner = "midi_fx_inner_table";
@@ -165,7 +164,7 @@ void MidiFxConsole::onUpdate()
 
 void MidiFxConsole::onAdd()
 {
-	MidiEffect *effect = tsunami->plugin_manager->ChooseMidiEffect(this, track->song);
+	MidiEffect *effect = session->plugin_manager->ChooseMidiEffect(this, session);
 	if (!effect)
 		return;
 	if (track)
@@ -213,7 +212,7 @@ void MidiFxConsole::setTrack(Track *t)
 
 	if (track){
 		foreachi(MidiEffect *e, track->midi.fx, i){
-			panels.add(new SingleMidiFxPanel(song, track, e, i));
+			panels.add(new SingleMidiFxPanel(session, track, e, i));
 			embed(panels.back(), id_inner, 0, i*2 + 3);
 			addSeparator("!horizontal", 0, i*2 + 4, "separator_" + i2s(i));
 		}

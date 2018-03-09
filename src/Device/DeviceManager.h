@@ -9,7 +9,8 @@
 #define DEVICEMANAGER_H_
 
 #include "config.h"
-#include "../Data/Song.h"
+//#include "../Data/Song.h"
+#include "../Stuff/Observable.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 
@@ -17,6 +18,7 @@
 class OutputStream;
 class InputStreamAudio;
 class Device;
+class Session;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_context;
@@ -64,7 +66,7 @@ public:
 	Device *chooseDevice(int type);
 
 //private:
-	bool testError(const string &msg);
+	bool testError(Session *session, const string &msg);
 
 	bool initialized;
 	int hui_rep_id;

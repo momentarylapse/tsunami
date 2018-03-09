@@ -10,6 +10,7 @@
 #include "../Audio/Source/SongRenderer.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
+#include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
 #include "../Device/InputStreamAudio.h"
@@ -21,7 +22,6 @@
 #include "../Midi/MidiSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
-#include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
@@ -45,7 +45,6 @@ PluginManager::PluginManager()
 	favorites = new FavoriteManager;
 
 	FindPlugins();
-	LinkAppScriptData();
 }
 
 PluginManager::~PluginManager()
@@ -66,23 +65,9 @@ void GlobalSetTempBackupFilename(const string &filename)
 	//InputStreamAudio::setTempBackupFilename(filename);
 }
 
-Synthesizer* GlobalCreateSynthesizer(const string &name, Song *song)
+Synthesizer* GlobalCreateSynthesizer(Session *session, const string &name)
 {
-	return tsunami->plugin_manager->CreateSynthesizer(name, song);
-}
-
-Storage *GlobalStorage()
-{
-	for (auto *w: tsunami->windows)
-		return w->storage;
-	return NULL;
-}
-
-Song *getCurSong()
-{
-	for (auto *w: tsunami->windows)
-		return w->song;
-	return NULL;
+	return session->plugin_manager->CreateSynthesizer(session, name);
 }
 
 void PluginManager::LinkAppScriptData()
@@ -91,24 +76,31 @@ void PluginManager::LinkAppScriptData()
 
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
-	Kaba::LinkExternal("storage", (void*)&GlobalStorage);
-	Kaba::LinkExternal("logging", &tsunami->log);
 	Kaba::LinkExternal("colors", &AudioView::_export_colors);
 	Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
 	Kaba::LinkExternal("CreateSynthesizer", (void*)&GlobalCreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
-	//Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
+	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
 	Kaba::DeclareClassSize("Range", sizeof(Range));
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
 	Kaba::DeclareClassOffset("Range", "length", _offsetof(Range, length));
+
+
+	Kaba::DeclareClassSize("Session", sizeof(Session));
+	Kaba::DeclareClassOffset("Session", "id", _offsetof(Session, id));
+	Kaba::DeclareClassOffset("Session", "storage", _offsetof(Session, storage));
+	Kaba::DeclareClassOffset("Session", "win", _offsetof(Session, _kaba_win));
+	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
+	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
+	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
+	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 
 
 	PluginData plugin_data;
@@ -131,7 +123,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Kaba::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
 	Kaba::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
-	Kaba::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
+	Kaba::DeclareClassOffset("AudioEffect", "session", _offsetof(Effect, session));
 	Kaba::DeclareClassOffset("AudioEffect", "sample_rate", _offsetof(Effect, sample_rate));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Effect::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Effect::__delete__), &effect);
@@ -149,7 +141,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
 	Kaba::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
 	Kaba::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
-	Kaba::DeclareClassOffset("MidiEffect", "song", _offsetof(MidiEffect, song));
+	Kaba::DeclareClassOffset("MidiEffect", "session", _offsetof(MidiEffect, session));
 	Kaba::LinkExternal("MidiEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEffect::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiEffect::__delete__), &midieffect);
 	Kaba::DeclareClassVirtualIndex("MidiEffect", "process", Kaba::mf(&MidiEffect::process), &midieffect);
@@ -223,6 +215,7 @@ void PluginManager::LinkAppScriptData()
 	Synthesizer synth;
 	Kaba::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Kaba::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
+	Kaba::DeclareClassOffset("Synthesizer", "session", _offsetof(Synthesizer, session));
 	Kaba::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
 	Kaba::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
 	Kaba::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
@@ -338,7 +331,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Track.deleteMarker", Kaba::mf(&Track::deleteMarker));
 	Kaba::LinkExternal("Track.moveMarker", Kaba::mf(&Track::moveMarker));
 
-	Song af;
+	Song af = Song(Session::GLOBAL);
 	Kaba::DeclareClassSize("Song", sizeof(Song));
 	Kaba::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
 	Kaba::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
@@ -383,8 +376,9 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "getSampleRate", Kaba::mf(&SongRenderer::getSampleRate), &sr);
 
 	{
-	InputStreamAudio input(0);
+	InputStreamAudio input(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
+	Kaba::DeclareClassOffset("InputStreamAudio", "session", _offsetof(InputStreamAudio, session));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
 	//Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
 	Kaba::DeclareClassOffset("InputStreamAudio", "source", _offsetof(InputStreamAudio, source));
@@ -404,7 +398,7 @@ void PluginManager::LinkAppScriptData()
 	}
 
 	{
-	OutputStream stream(NULL);
+	OutputStream stream(Session::GLOBAL, NULL);
 	Kaba::DeclareClassSize("OutputStream", sizeof(OutputStream));
 	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
 	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);
@@ -441,10 +435,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("ColorScheme", "selection", _offsetof(ColorScheme, selection));
 	Kaba::DeclareClassOffset("ColorScheme", "hover", _offsetof(ColorScheme, hover));
 
-	Kaba::LinkExternal("Log.error", Kaba::mf(&Log::error));
-	Kaba::LinkExternal("Log.warn", Kaba::mf(&Log::warn));
-	Kaba::LinkExternal("Log.info", Kaba::mf(&Log::info));
-
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
@@ -459,16 +449,15 @@ void PluginManager::LinkAppScriptData()
 
 	SongPlugin song_plugin;
 	Kaba::DeclareClassSize("SongPlugin", sizeof(SongPlugin));
-	Kaba::DeclareClassOffset("SongPlugin", "win", _offsetof(SongPlugin, win));
-	Kaba::DeclareClassOffset("SongPlugin", "view", _offsetof(SongPlugin, view));
+	Kaba::DeclareClassOffset("SongPlugin", "session", _offsetof(SongPlugin, session));
+	Kaba::DeclareClassOffset("SongPlugin", "song", _offsetof(SongPlugin, song));
 	Kaba::LinkExternal("SongPlugin." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongPlugin::__init__));
 	Kaba::DeclareClassVirtualIndex("SongPlugin", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongPlugin::__delete__), &song_plugin);
 	Kaba::DeclareClassVirtualIndex("SongPlugin", "apply", Kaba::mf(&SongPlugin::apply), &song_plugin);
 
 	TsunamiPlugin tsunami_plugin;
 	Kaba::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
-	Kaba::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
-	Kaba::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
+	Kaba::DeclareClassOffset("TsunamiPlugin", "session", _offsetof(TsunamiPlugin, session));
 	Kaba::DeclareClassOffset("TsunamiPlugin", "song", _offsetof(TsunamiPlugin, song));
 	Kaba::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
 	Kaba::LinkExternal("TsunamiPlugin." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&TsunamiPlugin::__init__));
@@ -599,11 +588,11 @@ Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
 
 typedef void main_void_func();
 
-void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
+void PluginManager::_ExecutePlugin(Session *session, const string &filename)
 {
 	Plugin *p = LoadAndCompilePlugin(Plugin::TYPE_OTHER, filename);
 	if (!p->usable){
-		tsunami->log->error(p->getError());
+		session->e(p->getError());
 		return;
 	}
 
@@ -613,22 +602,22 @@ void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 	if (f_main){
 		f_main();
 	}else{
-		tsunami->log->error(_("Plugin does not contain a function 'void main()'"));
+		session->e(_("Plugin does not contain a function 'void main()'"));
 	}
 }
 
 
-Plugin *PluginManager::GetPlugin(int type, const string &name)
+Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
 {
 	for (PluginFile &pf: plugin_files){
 		if ((pf.name == name) and (pf.type == type)){
 			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
 			if (!p->usable)
-				tsunami->log->error(p->getError());
+				session->e(p->getError());
 			return p;
 		}
 	}
-	tsunami->log->error(format(_("Can't find plugin: %s ..."), name.c_str()));
+	session->e(format(_("Can't find plugin: %s ..."), name.c_str()));
 	return NULL;
 }
 
@@ -644,7 +633,7 @@ Array<string> PluginManager::FindSynthesizers()
 	return names;
 }
 
-Synthesizer *PluginManager::__LoadSynthesizer(const string &name, Song *song)
+Synthesizer *PluginManager::__LoadSynthesizer(Session *session, const string &name)
 {
 	string filename = plugin_dir() + "Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
@@ -653,35 +642,37 @@ Synthesizer *PluginManager::__LoadSynthesizer(const string &name, Song *song)
 	try{
 		s = Kaba::Load(filename);
 	}catch(Kaba::Exception &e){
-		tsunami->log->error(e.message);
+		session->e(e.message);
 		return NULL;
 	}
 	for (auto *t : s->syntax->classes){
 		if (t->get_root()->name != "Synthesizer")
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->create_instance();
-		synth->song = song;
-		synth->setSampleRate(song->sample_rate);
+		synth->session = session;
+		synth->song = session->song;
+		synth->setSampleRate(session->song->sample_rate);
 		return synth;
 	}
 	return NULL;
 }
 // factory
-Synthesizer *PluginManager::CreateSynthesizer(const string &name, Song *song)
+Synthesizer *PluginManager::CreateSynthesizer(Session *session, const string &name)
 {
 	if ((name == "Dummy") or (name == ""))
 		return new DummySynthesizer;
 	/*if (name == "Sample")
 		return new SampleSynthesizer;*/
-	Synthesizer *s = __LoadSynthesizer(name, song);
+	Synthesizer *s = __LoadSynthesizer(session, name);
 	if (s){
 		s->resetConfig();
 		s->name = name;
 		return s;
 	}
-	tsunami->log->error(_("unknown synthesizer: ") + name);
+	session->e(_("unknown synthesizer: ") + name);
 	s = new DummySynthesizer;
-	s->song = song;
+	s->session = session;
+	s->song = session->song;
 	s->name = name;
 	return s;
 }
@@ -728,18 +719,18 @@ Array<string> PluginManager::FindConfigurable(int type)
 }
 
 
-Effect* PluginManager::ChooseEffect(hui::Panel *parent, Song *song)
+Effect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, song);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, session);
 	dlg->run();
 	Effect *e = (Effect*)dlg->_return;
 	delete(dlg);
 	return e;
 }
 
-MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Song *song)
+MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, song);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, session);
 	dlg->run();
 	MidiEffect *e = (MidiEffect*)dlg->_return;
 	delete(dlg);
@@ -747,9 +738,9 @@ MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Song *song)
 }
 
 
-Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name)
+Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, session, old_name);
 	dlg->run();
 	Synthesizer *s = (Synthesizer*)dlg->_return;
 	delete(dlg);

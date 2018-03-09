@@ -3,7 +3,7 @@ use "../api.kaba"
 class MyDialog extends Dialog
 	TsunamiPlugin* plugin
 	void __init__(TsunamiPlugin* _plugin)
-		super.__init__("", 300, 200, _plugin.win, false)
+		super.__init__("", 300, 200, _plugin.session.win, false)
 		plugin = _plugin
 		addEdit("", 0, 0, "edit")
 		event("edit", &onChange)

@@ -9,16 +9,13 @@
 #define MIDIEDITORCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../lib/math/math.h"
 
-class Song;
-class AudioView;
 class Track;
 
 class MidiEditorConsole : public SideBarConsole
 {
 public:
-	MidiEditorConsole(AudioView *view, Song *audio);
+	MidiEditorConsole(Session *session);
 	virtual ~MidiEditorConsole();
 
 	virtual void onEnter();
@@ -56,9 +53,7 @@ public:
 
 	string id_inner;
 
-	AudioView *view;
 	Track *track;
-	Song *song;
 };
 
 #endif /* MIDIEDITORCONSOLE_H_ */

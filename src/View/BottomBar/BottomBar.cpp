@@ -11,8 +11,9 @@
 #include "DeviceConsole.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
+#include "../../Session.h"
 
-BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager, Log *log)
+BottomBar::BottomBar(Session *session)
 {
 	addRevealer("!slide-up", 0, 0, "revealer");
 	setTarget("revealer");
@@ -29,9 +30,9 @@ BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager,
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, "choose");
 
-	log_console = new LogConsole(log);
-	mixing_console = new MixingConsole(song, device_manager, view);
-	device_console = new DeviceConsole(device_manager);
+	log_console = new LogConsole(session);
+	mixing_console = new MixingConsole(session);
+	device_console = new DeviceConsole(session);
 	addConsole(log_console, "");
 	addConsole(mixing_console, "");
 	addConsole(device_console, "");
@@ -127,6 +128,16 @@ void BottomBar::open(int console_index)
 bool BottomBar::isActive(int console_index)
 {
 	return (active_console == consoles[console_index]) and visible;
+}
+
+
+BottomBar::Console::Console(const string &_title, Session *_session)
+{
+	title = _title;
+	notify = false;
+	session = _session;
+	song = session->song;
+	view = session->view;
 }
 
 void BottomBar::Console::blink()

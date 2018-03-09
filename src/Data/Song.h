@@ -39,10 +39,10 @@ struct Tag
 class Song : public Data
 {
 public:
-	Song();
+	Song(Session *session);
 	virtual ~Song();
 
-	void _cdecl __init__();
+	void _cdecl __init__(Session *session);
 	void _cdecl __delete__();
 
 	Range _cdecl getRange();

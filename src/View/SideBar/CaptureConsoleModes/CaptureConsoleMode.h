@@ -11,6 +11,7 @@
 class CaptureConsole;
 class Song;
 class AudioView;
+class Session;
 
 class CaptureConsoleMode
 {
@@ -30,6 +31,7 @@ public:
 	virtual bool isCapturing() = 0;
 
 	CaptureConsole *cc;
+	Session *session;
 	Song *song;
 	AudioView *view;
 };

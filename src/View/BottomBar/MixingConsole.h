@@ -51,7 +51,7 @@ public:
 class MixingConsole: public BottomBar::Console
 {
 public:
-	MixingConsole(Song *audio, DeviceManager *device_manager, AudioView *view);
+	MixingConsole(Session *session);
 	virtual ~MixingConsole();
 
 	void loadData();
@@ -65,10 +65,8 @@ public:
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();
 
-	Song *song;
 	DeviceManager *device_manager;
 	PeakMeter *peak_meter;
-	AudioView *view;
 
 	string id_inner;
 	Array<TrackMixer*> mixer;

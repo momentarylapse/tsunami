@@ -9,16 +9,13 @@
 #define MIDIFXCONSOLE_H_
 
 #include "SideBar.h"
-#include "../../lib/math/math.h"
 
-class Song;
 class Track;
-class AudioView;
 
 class MidiFxConsole : public SideBarConsole
 {
 public:
-	MidiFxConsole(AudioView *view, Song *audio);
+	MidiFxConsole(Session *session);
 	virtual ~MidiFxConsole();
 
 	void onViewCurTrackChange();
@@ -37,9 +34,7 @@ public:
 
 	string id_inner;
 
-	AudioView *view;
 	Track *track;
-	Song *song;
 	Array<hui::Panel*> panels;
 };
 

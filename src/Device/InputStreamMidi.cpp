@@ -5,11 +5,10 @@
  *      Author: michi
  */
 
-#include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "InputStreamMidi.h"
+#include "../Session.h"
 #include "Device.h"
 #include "DeviceManager.h"
-#include "InputStreamMidi.h"
 
 #include "OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -65,8 +64,9 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(int _sample_rate)
+InputStreamMidi::InputStreamMidi(Session *_session, int _sample_rate)
 {
+	session = _session;
 	sample_rate = _sample_rate;
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
@@ -80,7 +80,7 @@ InputStreamMidi::InputStreamMidi(int _sample_rate)
 
 	running = false;
 
-	device_manager = tsunami->device_manager;
+	device_manager = session->device_manager;
 
 	out = new Output(this);
 
@@ -109,7 +109,7 @@ bool InputStreamMidi::unconnect()
 		return true;
 	int r = snd_seq_unsubscribe_port(device_manager->handle, subs);
 	if (r != 0)
-		tsunami->log->error(string("Error unconnecting from midi port: ") + snd_strerror(r));
+		session->e(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
 	return r == 0;
@@ -141,7 +141,7 @@ void InputStreamMidi::setDevice(Device *d)
 	snd_seq_port_subscribe_set_dest(subs, &dest);
 	int r = snd_seq_subscribe_port(device_manager->handle, subs);
 	if (r != 0){
-		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
+		session->e(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
 		subs = NULL;
 	}

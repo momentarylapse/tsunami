@@ -6,7 +6,7 @@
  */
 
 #include "FormatNami.h"
-#include "../../Tsunami.h"
+#include "../../Session.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
@@ -19,6 +19,10 @@
 #include "../../lib/xfile/chunked.h"
 
 const int CHUNK_SIZE = 1 << 16;
+
+
+static Session *_cur_session = NULL; // argh
+
 
 FormatDescriptorNami::FormatDescriptorNami() :
 	FormatDescriptor("Tsunami", "nami", FLAG_AUDIO | FLAG_MIDI | FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS | FLAG_READ | FLAG_WRITE)
@@ -102,7 +106,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->read_str(), parent->song);
+		me = CreateEffect(_cur_session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
@@ -131,7 +135,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->read_str(), parent);
+		me = CreateEffect(_cur_session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
@@ -620,7 +624,7 @@ public:
 	{}
 	virtual void read(File *f)
 	{
-		me = CreateMidiEffect(f->read_str(), NULL);
+		me = CreateMidiEffect(_cur_session, f->read_str());
 		me->only_on_selection = f->read_bool();
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
@@ -880,7 +884,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = tsunami->plugin_manager->CreateSynthesizer(f->read_str(), parent->song);
+		me = _cur_session->plugin_manager->CreateSynthesizer(_cur_session, f->read_str());
 		me->configFromString(f->read_str());
 		f->read_str();
 		f->read_int();
@@ -1187,6 +1191,7 @@ void FormatNami::make_consistent(Song *a)
 void FormatNami::loadSong(StorageOperationData *_od)
 {
 	od = _od;
+	_cur_session = od->session;
 
 	// TODO?
 	od->song->tags.clear();

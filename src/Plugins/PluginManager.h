@@ -20,6 +20,7 @@ class FavoriteManager;
 class TsunamiWindow;
 class SongPlugin;
 class TsunamiPlugin;
+class Session;
 namespace hui{
 	class Window;
 	class Panel;
@@ -37,10 +38,10 @@ public:
 	void FindPlugins();
 	void AddPluginsToMenu(TsunamiWindow *win);
 
-	void _ExecutePlugin(TsunamiWindow *win, const string &filename);
+	void _ExecutePlugin(Session *session, const string &filename);
 
 	Plugin *LoadAndCompilePlugin(int type, const string &filename);
-	Plugin *GetPlugin(int type, const string &name);
+	Plugin *GetPlugin(Session *session, int type, const string &name);
 
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
@@ -50,12 +51,12 @@ public:
 	Array<string> FindEffects();
 	Array<string> FindMidiEffects();
 	Array<string> FindConfigurable(int type);
-	Synthesizer *__LoadSynthesizer(const string &name, Song *song);
-	Synthesizer *CreateSynthesizer(const string &name, Song *song);
+	Synthesizer *__LoadSynthesizer(Session *session, const string &name);
+	Synthesizer *CreateSynthesizer(Session *session, const string &name);
 
-	Effect *ChooseEffect(hui::Panel *parent, Song *song);
-	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Song *song);
-	Synthesizer *ChooseSynthesizer(hui::Window *parent, Song *song, const string &old_name = "");
+	Effect *ChooseEffect(hui::Panel *parent, Session *session);
+	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Session *session);
+	Synthesizer *ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name = "");
 
 
 	// not compiled yet

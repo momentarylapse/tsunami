@@ -15,6 +15,7 @@
 
 class Device;
 class DeviceManager;
+class Session;
 
 namespace hui{
 	class Timer;
@@ -28,7 +29,7 @@ class InputStreamMidi : public PeakMeterSource
 {
 public:
 
-	InputStreamMidi(int sample_rate);
+	InputStreamMidi(Session *session, int sample_rate);
 	virtual ~InputStreamMidi();
 
 	void _cdecl init();
@@ -59,6 +60,8 @@ public:
 	bool _cdecl unconnect();
 	void _cdecl setDevice(Device *d);
 	Device *_cdecl getDevice();
+
+	Session *session;
 
 	MidiEventBuffer midi;
 	MidiEventBuffer current_midi;

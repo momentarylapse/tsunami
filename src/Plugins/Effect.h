@@ -16,7 +16,7 @@
 class Plugin;
 class Track;
 class AudioBuffer;
-class Song;
+class Session;
 
 namespace Script{
 class Script;
@@ -27,7 +27,6 @@ class Effect : public Configurable
 {
 public:
 	Effect();
-	Effect(Plugin *p);
 	virtual ~Effect();
 
 	void _cdecl __init__();
@@ -60,6 +59,6 @@ public:
 	string getError();
 };
 
-Effect *_cdecl CreateEffect(const string &name, Song *song);
+Effect *_cdecl CreateEffect(Session *session, const string &name);
 
 #endif /* EFFECT_H_ */

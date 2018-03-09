@@ -18,7 +18,7 @@ enum
 };
 
 class File;
-class TsunamiWindow;
+class Session;
 
 class BackupManager
 {
@@ -28,7 +28,7 @@ public:
 
 	struct BackupFile
 	{
-		TsunamiWindow *win;
+		Session *session;
 		string filename;
 		File *f;
 	};
@@ -36,11 +36,11 @@ public:
 	static BackupFile* _find_by_file(File *f);
 	static void _clear_old();
 
-	static void set_save_state(TsunamiWindow *win);
-	static void check_old_files();
+	static void set_save_state(Session *sessoin);
+	static void check_old_files(Session *session);
 
 	static string get_filename(const string &extension);
-	static File *create_file(const string &extension, TsunamiWindow *win);
+	static File *create_file(const string &extension, Session *session);
 	static void abort(File *f);
 	static void done(File *f);
 };

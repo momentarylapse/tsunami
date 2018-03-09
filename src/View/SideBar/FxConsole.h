@@ -13,11 +13,12 @@
 class Track;
 class Song;
 class AudioView;
+class Session;
 
 class FxConsole : public SideBarConsole
 {
 public:
-	FxConsole(AudioView *view, Song *audio);
+	FxConsole(Session *session);
 	virtual ~FxConsole();
 
 	void clear();
@@ -34,9 +35,7 @@ public:
 
 	string id_inner;
 
-	AudioView *view;
 	Track *track;
-	Song *song;
 	Array<hui::Panel*> panels;
 };
 

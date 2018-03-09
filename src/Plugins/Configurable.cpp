@@ -11,11 +11,9 @@
 #include "../Audio/Source/SongRenderer.h"
 #include "ConfigPanel.h"
 #include "AutoConfigPanel.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
+#include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "PluginManager.h"
-#include "../Stuff/Log.h"
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
@@ -171,10 +169,10 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 	}
 }
 
-Configurable::Configurable(int type)
+Configurable::Configurable(Session *_session, int type)
 {
 	configurable_type = type;
-	song = NULL;
+	session = _session;
 }
 
 Configurable::~Configurable()
@@ -183,7 +181,7 @@ Configurable::~Configurable()
 
 void Configurable::__init__()
 {
-	new(this) Configurable(-1);
+	new(this) Configurable(NULL, -1);
 }
 
 void Configurable::__delete__()
@@ -241,7 +239,7 @@ void Configurable::configFromString(const string &param)
 
 	config->reset();
 	int pos = 0;
-	var_from_string(config->_class, (char*)config, param, pos, song);
+	var_from_string(config->_class, (char*)config, param, pos, session->song);
 	onConfig();
 }
 
@@ -328,18 +326,18 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(this, config, false);
+		string name = config->session->plugin_manager->SelectFavoriteName(this, config, false);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->ApplyFavorite(config, name);
+		config->session->plugin_manager->ApplyFavorite(config, name);
 		panel->update();
 	}
 	void onSave()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(this, config, true);
+		string name = config->session->plugin_manager->SelectFavoriteName(this, config, true);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->SaveFavorite(config, name);
+		config->session->plugin_manager->SaveFavorite(config, name);
 	}
 
 	void previewStart()

@@ -11,12 +11,11 @@
 #include "SideBar.h"
 
 class Track;
-class AudioView;
 
 class SynthConsole : public SideBarConsole
 {
 public:
-	SynthConsole(AudioView *view);
+	SynthConsole(Session *session);
 	virtual ~SynthConsole();
 
 	void clear();
@@ -37,7 +36,6 @@ public:
 
 	hui::Panel *panel;
 
-	AudioView *view;
 	Track *track;
 };
 

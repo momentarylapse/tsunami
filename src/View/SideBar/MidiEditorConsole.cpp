@@ -22,12 +22,9 @@
 int get_track_index_save(Song *song, Track *t);
 
 
-MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Midi"))
+MidiEditorConsole::MidiEditorConsole(Session *session) :
+	SideBarConsole(_("Midi"), session)
 {
-	view = _view;
-	song = _song;
-
 	fromResource("midi_editor");
 
 	id_inner = "midi_fx_inner_table";

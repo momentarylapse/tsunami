@@ -74,7 +74,7 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 
 
 Synthesizer::Synthesizer() :
-	Configurable(TYPE_SYNTHESIZER)
+	Configurable(NULL, TYPE_SYNTHESIZER)
 {
 	out = new Output(this);
 	sample_rate = 0;

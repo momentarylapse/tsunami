@@ -34,12 +34,13 @@ public:
 
 //class AutoConfigPanel;
 class ConfigPanel;
+class Session;
 class Song;
 
 class Configurable : public Observable<VirtualBase>
 {
 public:
-	Configurable(int type);
+	Configurable(Session *session, int type);
 	virtual ~Configurable();
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -63,6 +64,7 @@ public:
 
 	int configurable_type;
 	string name;
+	Session *session;
 	Song *song;
 
 
@@ -78,7 +80,7 @@ template<class T>
 class ConfigurableMixin
 {
 public:
-	ConfigurableMixin(int type);
+	ConfigurableMixin(Session *session, int type);
 	virtual ~ConfigurableMixin();
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -102,6 +104,7 @@ public:
 
 	int configurable_type;
 	string name;
+	Session *session;
 	Song *song;
 
 

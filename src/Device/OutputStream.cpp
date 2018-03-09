@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-#include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "../Session.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
@@ -38,7 +37,7 @@ const string OutputStream::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
 
 #ifdef DEVICE_PULSEAUDIO
 
-extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
+extern void pa_wait_op(Session*, pa_operation*); // -> AudioOutput.cpp
 
 bool pa_wait_stream_ready(pa_stream *s)
 {
@@ -122,6 +121,7 @@ void OutputStream::stream_success_callback(pa_stream *s, int success, void *user
 void OutputStream::stream_underflow_callback(pa_stream *s, void *userdata)
 {
 	OutputStream *stream = (OutputStream*)userdata;
+	//stream->session->w("pulse: underflow\n");
 	printf("pulse: underflow\n");
 }
 
@@ -214,11 +214,12 @@ public:
 	}
 };
 
-OutputStream::OutputStream(AudioSource *s) :
+OutputStream::OutputStream(Session *_session, AudioSource *s) :
 	ring_buf(1048576)
 {
 //	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
+	session = _session;
 	source = s;
 
 	fully_initialized = false;
@@ -229,7 +230,7 @@ OutputStream::OutputStream(AudioSource *s) :
 	hui_runner_id = -1;
 	keep_thread_running = true;
 
-	device_manager = tsunami->device_manager;
+	device_manager = session->device_manager;
 	device = device_manager->chooseDevice(Device::TYPE_AUDIO_OUTPUT);
 
 	data_samples = 0;
@@ -275,9 +276,9 @@ OutputStream::~OutputStream()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void OutputStream::__init__(AudioSource *r)
+void OutputStream::__init__(Session *s, AudioSource *r)
 {
-	new(this) OutputStream(r);
+	new(this) OutputStream(s, r);
 }
 
 void OutputStream::__delete__()
@@ -351,7 +352,7 @@ void OutputStream::_pause()
 #ifdef DEVICE_PULSEAUDIO
 	pa_operation *op = pa_stream_cork(_stream, true, NULL, NULL);
 	testError("pa_stream_cork");
-	pa_wait_op(op);
+	pa_wait_op(session, op);
 #endif
 //	printf("ok\n");
 
@@ -374,7 +375,7 @@ void OutputStream::_unpause()
 #ifdef DEVICE_PULSEAUDIO
 	pa_operation *op = pa_stream_cork(_stream, false, NULL, NULL);
 	testError("pa_stream_cork");
-	pa_wait_op(op);
+	pa_wait_op(session, op);
 #endif
 //	printf("ok\n");
 
@@ -489,7 +490,7 @@ void OutputStream::_start_first_time()
 		if (!pa_wait_stream_ready(_stream)){
 			// still no luck... give up
 			msg_write("aaaaa");
-			tsunami->log->error("pa_wait_for_stream_ready");
+			session->e("pa_wait_for_stream_ready");
 			stop();
 			return;
 		}
@@ -499,7 +500,7 @@ void OutputStream::_start_first_time()
 
 	pa_operation *op = pa_stream_trigger(_stream, &stream_success_callback, NULL);
 	testError("pa_stream_trigger");
-	pa_wait_op(op);
+	pa_wait_op(session, op);
 #endif
 
 #ifdef DEVICE_PORTAUDIO
@@ -556,7 +557,7 @@ bool OutputStream::testError(const string &msg)
 #ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(device_manager->context);
 	if (e != 0){
-		msg_error("OutputStream: " + msg + ": " + pa_strerror(e));
+		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
 #endif

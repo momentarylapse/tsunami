@@ -74,7 +74,7 @@ class SamplePanel extends ConfigPanel
 		Sample *old = nil
 		if sc.samples[n]
 			old = sc.samples[n].origin
-		Sample *s = SelectSample(self, getCurSong(), old)
+		Sample *s = SelectSample(c.session, self, old)
 		if s != old
 			if sc.samples[n]
 				delete sc.samples[n]

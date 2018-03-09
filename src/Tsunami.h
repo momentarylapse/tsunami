@@ -24,6 +24,7 @@ class AudioView;
 class Storage;
 class Clipboard;
 class TsunamiWindow;
+class Session;
 
 class Tsunami : public hui::Application
 {
@@ -36,10 +37,10 @@ public:
 	bool handleCLIArguments(const Array<string> &arg);
 	void loadKeyCodes();
 
-	TsunamiWindow* createWindow();
+	Session* createSession();
 	bool allowTermination();
 
-	Array<TsunamiWindow*> windows;
+	Array<Session*> sessions;
 
 	Log *log;
 

@@ -6,9 +6,7 @@
  */
 
 #include "../lib/hui/hui.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
-#include "../Stuff/Log.h"
+#include "../Session.h"
 #include "../View/AudioView.h"
 
 #include "DeviceManager.h"
@@ -31,7 +29,7 @@ static const float DEFAULT_UPDATE_TIME = 0.005f;
 
 
 #ifdef DEVICE_PULSEAUDIO
-extern void pa_wait_op(pa_operation *op); // -> DeviceManager.cpp
+extern void pa_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 #endif
 
@@ -139,10 +137,11 @@ int InputStreamAudio::Source::getSampleRate()
 }
 
 
-InputStreamAudio::InputStreamAudio(int _sample_rate) :
+InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
 	buffer(1048576)
 {
 //	printf("input new\n");
+	session = _session;
 	sample_rate = _sample_rate;
 	chunk_size = -1;
 	update_dt = -1;
@@ -158,7 +157,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	source = new Source;
 	source->stream = this;
 
-	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	device = session->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = 0;
 	if (device){
 		playback_delay_const = device->latency;
@@ -166,7 +165,6 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	}
 	backup_file = NULL;
 	backup_mode = BACKUP_MODE_NONE;
-	win = NULL;
 
 	running = false;
 	hui_runner_id = -1;
@@ -178,9 +176,9 @@ InputStreamAudio::~InputStreamAudio()
 	stop();
 }
 
-void InputStreamAudio::__init__(int _sample_rate)
+void InputStreamAudio::__init__(Session *session, int _sample_rate)
 {
-	new(this) InputStreamAudio(_sample_rate);
+	new(this) InputStreamAudio(session, _sample_rate);
 }
 
 void InputStreamAudio::__delete__()
@@ -188,10 +186,9 @@ void InputStreamAudio::__delete__()
 	this->InputStreamAudio::~InputStreamAudio();
 }
 
-void InputStreamAudio::setBackupMode(int mode, TsunamiWindow *_win)
+void InputStreamAudio::setBackupMode(int mode)
 {
 	backup_mode = mode;
-	win = _win;
 }
 
 void InputStreamAudio::setChunkSize(int size)
@@ -238,7 +235,7 @@ void InputStreamAudio::_stop()
 {
 	if (!capturing)
 		return;
-	tsunami->log->info(_("capture audio stop"));
+	session->i(_("capture audio stop"));
 	_stopUpdate();
 
 #ifdef DEVICE_PULSEAUDIO
@@ -275,7 +272,7 @@ bool InputStreamAudio::start()
 	if (capturing)
 		_stop();
 
-	tsunami->log->info(_("capture audio start"));
+	session->i(_("capture audio start"));
 
 	num_channels = 2;
 
@@ -284,7 +281,7 @@ bool InputStreamAudio::start()
 	ss.rate = sample_rate;
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
-	_stream = pa_stream_new(tsunami->device_manager->context, "stream-in", &ss, NULL);
+	_stream = pa_stream_new(session->device_manager->context, "stream-in", &ss, NULL);
 	testError("pa_stream_new");
 
 
@@ -307,7 +304,7 @@ bool InputStreamAudio::start()
 
 	if (!pa_wait_stream_ready(_stream)){
 
-		tsunami->log->error("pa_wait_for_stream_ready");
+		session->e("pa_wait_for_stream_ready");
 		return false;
 	}
 #endif
@@ -315,7 +312,7 @@ bool InputStreamAudio::start()
 	capturing = true;
 
 	if (backup_mode != BACKUP_MODE_NONE)
-		backup_file = BackupManager::create_file("raw", win);
+		backup_file = BackupManager::create_file("raw", session);
 
 	_startUpdate();
 
@@ -326,9 +323,9 @@ bool InputStreamAudio::start()
 bool InputStreamAudio::testError(const string &msg)
 {
 #ifdef DEVICE_PULSEAUDIO
-	int e = pa_context_errno(tsunami->device_manager->context);
+	int e = pa_context_errno(session->device_manager->context);
 	if (e != 0)
-		hui::RunLater(0.001f, std::bind(&Log::error, tsunami->log, msg + " (input): " + pa_strerror(e)));
+		hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
 	// make sure errors are handled in the gui thread...
 		//tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);

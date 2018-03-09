@@ -6,17 +6,18 @@
  */
 
 #include "StorageOperationData.h"
+#include "Storage.h"
 
 #include "../Audio/Source/AudioSource.h"
 #include "../View/Helper/Progress.h"
-#include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "../Session.h"
 #include "../Audio/AudioBuffer.h"
 
 StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
 {
 	win = _win;
 	storage = _storage;
+	session = storage->session;
 	format = _format;
 	song = s;
 	filename = _filename;
@@ -36,17 +37,17 @@ StorageOperationData::~StorageOperationData()
 
 void StorageOperationData::info(const string& message)
 {
-	tsunami->log->info(filename + ": " + message);
+	session->i(filename + ": " + message);
 }
 
 void StorageOperationData::warn(const string& message)
 {
-	tsunami->log->warn(filename + ": " + message);
+	session->w(filename + ": " + message);
 }
 
 void StorageOperationData::error(const string& message)
 {
-	tsunami->log->error(filename + ": " + message);
+	session->e(filename + ": " + message);
 }
 
 void StorageOperationData::set(float t)

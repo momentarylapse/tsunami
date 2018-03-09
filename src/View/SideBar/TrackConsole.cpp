@@ -11,14 +11,13 @@
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../Dialog/TuningDialog.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
+#include "../../Session.h"
 #include "../AudioView.h"
 #include "TrackConsole.h"
 
-TrackConsole::TrackConsole(AudioView *_view) :
-	SideBarConsole(_("Track properties"))
+TrackConsole::TrackConsole(Session *session) :
+	SideBarConsole(_("Track properties"), session)
 {
-	view = _view;
 	track = NULL;
 	setBorderWidth(5);
 	fromResource("track_dialog");
@@ -137,7 +136,7 @@ void TrackConsole::onSelectSynth()
 {
 	if (!track)
 		return;
-	Synthesizer *s = tsunami->plugin_manager->ChooseSynthesizer(win, track->song, track->synth->name);
+	Synthesizer *s = session->plugin_manager->ChooseSynthesizer(win, session, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }

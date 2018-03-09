@@ -9,6 +9,7 @@
 #include "../../Data/Song.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
+#include "../../Session.h"
 
 NewDialog::NewDialog(hui::Window *_parent):
 	hui::Window("new_dialog", _parent)
@@ -35,8 +36,8 @@ void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
 	bool midi = isChecked("new_track_type:midi");
-	TsunamiWindow *win = tsunami->createWindow();
-	Song *song = win->song;
+	Session *session = tsunami->createSession();
+	Song *song = session->song;
 	song->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
@@ -49,8 +50,8 @@ void NewDialog::onOk()
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 	destroy();
-	win->show();
-	win->activate("");
+	session->win->show();
+	session->win->activate("");
 }
 
 void NewDialog::onMetronome()

@@ -11,12 +11,10 @@
 #include "SampleRefConsole.h"
 #include "SampleManagerConsole.h"
 
-SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
-	SideBarConsole("Sample-Eigenschaften")
+SampleRefConsole::SampleRefConsole(Session *session):
+	SideBarConsole(_("Sample properties"), session)
 {
 	fromResource("sample_ref_dialog");
-	view = v;
-	song = s;
 	track = NULL;
 	sample = NULL;
 

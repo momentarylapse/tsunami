@@ -6,8 +6,7 @@
  */
 
 #include "TsunamiPlugin.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
+#include "../Session.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 
@@ -15,8 +14,7 @@ const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
 TsunamiPlugin::TsunamiPlugin()
 {
-	win = NULL;
-	view = NULL;
+	session = NULL;
 	song = NULL;
 	active = false;
 }
@@ -58,26 +56,21 @@ void TsunamiPlugin::stop()
 
 
 
-TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win)
+TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
-	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_TSUNAMI_PLUGIN, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_TSUNAMI_PLUGIN, name);
 	TsunamiPlugin *t = NULL;
 
 	if (p->usable)
-		t = (TsunamiPlugin*)p->createInstance("TsunamiPlugin");
+		t = (TsunamiPlugin*)p->createInstance(session, "TsunamiPlugin");
 
 	// dummy?
 	if (!t)
 		t = new TsunamiPlugin;
 
 	t->name = name;
-	t->win = win;
-	t->song = NULL;
-	t->view = NULL;
-	if (win){
-		t->song = win->song;
-		t->view = win->view;
-	}
+	t->session = session;
+	t->song = session->song;
 	/*t->plugin = p;
 	t->usable = p->usable;
 	t->resetConfig();*/

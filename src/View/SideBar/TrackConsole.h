@@ -12,12 +12,11 @@
 #include "SideBar.h"
 class Track;
 class Slider;
-class AudioView;
 
 class TrackConsole: public SideBarConsole
 {
 public:
-	TrackConsole(AudioView *view);
+	TrackConsole(Session *session);
 	virtual ~TrackConsole();
 
 	void loadData();
@@ -42,7 +41,6 @@ public:
 	void onViewCurTrackChange();
 	void onUpdate();
 
-	AudioView *view;
 	Track *track;
 };
 

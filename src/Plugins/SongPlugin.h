@@ -13,8 +13,7 @@
 namespace hui{
 	class Window;
 }
-class TsunamiWindow;
-class AudioView;
+class Session;
 class Song;
 
 class SongPlugin : public VirtualBase
@@ -26,12 +25,12 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	virtual void _cdecl apply(Song *song){}
+	virtual void _cdecl apply(){}
 
-	hui::Window *win;
-	AudioView *view;
+	Session *session;
+	Song *song;
 };
 
-SongPlugin *CreateSongPlugin(const string &name, TsunamiWindow *win);
+SongPlugin *CreateSongPlugin(Session *session, const string &name);
 
 #endif /* SRC_PLUGINS_SONGPLUGIN_H_ */

@@ -9,15 +9,14 @@
 #include "../View/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "../Session.h"
 #include "../Data/Song.h"
 #include "../Data/SongSelection.h"
 #include <assert.h>
 
 Clipboard::Clipboard()
 {
-	temp = new Song;
+	temp = new Song(Session::GLOBAL);
 	temp->reset();
 }
 
@@ -127,13 +126,13 @@ bool Clipboard::test_compatibility(AudioView *view)
 		temp_type.add(track_type(t->type));
 
 	if (dest_type.num != temp->tracks.num){
-		tsunami->log->error(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
+		view->session->e(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
 		return false;
 	}
 	string t1 = "[" + implode(temp_type, ", ") + "]";
 	string t2 = "[" + implode(dest_type, ", ") + "]";
 	if (t1 != t2){
-		tsunami->log->error(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1.c_str(), t2.c_str()));
+		view->session->e(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1.c_str(), t2.c_str()));
 		return false;
 	}
 	return true;

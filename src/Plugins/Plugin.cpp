@@ -6,11 +6,11 @@
  */
 
 #include "Plugin.h"
-#include "../Tsunami.h"
+#include "../Session.h"
 #include "../lib/kaba/kaba.h"
-#include "PluginManager.h"
-#include "Effect.h"
-#include "../Stuff/Log.h"
+#include "../lib/hui/hui.h"
+//#include "PluginManager.h"
+//#include "Effect.h"
 
 
 Plugin::Plugin(const string &_filename, int _type)
@@ -36,7 +36,7 @@ string Plugin::getError()
 	return format(_("Error in script file: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
 }
 
-void *Plugin::createInstance(const string &root_type)
+void *Plugin::createInstance(Session *session, const string &root_type)
 {
 	if (!usable)
 		return NULL;
@@ -45,6 +45,6 @@ void *Plugin::createInstance(const string &root_type)
 		if (t->is_derived_from(root_type))
 			return t->create_instance();
 	}
-	tsunami->log->error(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));
+	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));
 	return NULL;
 }

@@ -14,12 +14,15 @@ class Configurable;
 namespace hui{
 	class Window;
 }
+class Session;
 
 class FavoriteManager
 {
 public:
 	FavoriteManager();
 	virtual ~FavoriteManager();
+
+	static const string DEFAULT_NAME;
 
 	struct Favorite
 	{
@@ -33,9 +36,9 @@ public:
 	bool loaded;
 	Array<Favorite> favorites;
 
-	void Load();
-	void LoadFromFile(const string &filename, bool read_only);
-	void Save();
+	void Load(Session *session);
+	void LoadFromFile(const string &filename, bool read_only, Session *session);
+	void Save(Session *session);
 
 	void set(const Favorite &f);
 

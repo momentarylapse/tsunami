@@ -52,11 +52,9 @@ public:
 	}
 };
 
-CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Curves"))
+CurveConsole::CurveConsole(Session *session) :
+	SideBarConsole(_("Curves"), session)
 {
-	view = _view;
-	song = _song;
 
 	fromResource("curve_console");
 

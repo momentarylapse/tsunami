@@ -79,7 +79,8 @@ Song::Layer::Layer(const string &_name)
 	active = true;
 }
 
-Song::Song()
+Song::Song(Session *session) :
+	Data(session)
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	default_format = SAMPLE_FORMAT_16;
@@ -88,9 +89,9 @@ Song::Song()
 	layers.add(new Layer(""));
 }
 
-void Song::__init__()
+void Song::__init__(Session *session)
 {
-	new(this) Song;
+	new(this) Song(session);
 }
 
 void Song::__delete__()

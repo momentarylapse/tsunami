@@ -8,7 +8,7 @@
 #include "BackupManager.h"
 #include "../Data/Track.h"
 #include "../Tsunami.h"
-#include "Log.h"
+#include "../Session.h"
 
 Array<BackupManager::BackupFile> BackupManager::files;
 
@@ -27,19 +27,19 @@ string BackupManager::get_filename(const string &extension)
 }
 
 
-void BackupManager::set_save_state(TsunamiWindow *win)
+void BackupManager::set_save_state(Session *session)
 {
 	for (auto &bf: files){
-		if (bf.win == win){
-			tsunami->log->info(_("deleting backup: ") + bf.filename);
+		if (bf.session == session){
+			session->i(_("deleting backup: ") + bf.filename);
 			file_delete(bf.filename);
-			bf.win = NULL; // auto remove
+			bf.session = NULL; // auto remove
 		}
 	}
 	_clear_old();
 }
 
-void BackupManager::check_old_files()
+void BackupManager::check_old_files(Session *session)
 {
 	_clear_old();
 
@@ -47,7 +47,7 @@ void BackupManager::check_old_files()
 	auto _files = dir_search(tsunami->directory, "backup-*", false);
 	for (auto &f: _files){
 		BackupFile bf;
-		bf.win = NULL;
+		bf.session = NULL;
 		bf.f = NULL;
 		bf.filename = tsunami->directory + f.name;
 		files.add(bf);
@@ -55,23 +55,23 @@ void BackupManager::check_old_files()
 
 	// check
 	for (auto &bf: files){
-		if (!bf.win)
-			tsunami->log->warn(_("recording backup found: ") + bf.filename);
+		if (!bf.session)
+			session->w(_("recording backup found: ") + bf.filename);
 	}
 }
 
-File *BackupManager::create_file(const string &extension, TsunamiWindow *win)
+File *BackupManager::create_file(const string &extension, Session *session)
 {
 	BackupFile bf;
-	bf.win = win;
+	bf.session = session;
 	bf.filename = get_filename(extension);
-	tsunami->log->info(_("creating backup: ") + bf.filename);
+	session->i(_("creating backup: ") + bf.filename);
 	try{
 		bf.f = FileCreate(bf.filename);
 		files.add(bf);
 		return bf.f;
 	}catch(FileError &e){
-		tsunami->log->error(e.message());
+		session->e(e.message());
 	}
 	return NULL;
 }
@@ -87,7 +87,7 @@ void BackupManager::done(File *f)
 	delete f;
 	auto bf = _find_by_file(f);
 	if (bf){
-		tsunami->log->info(_("backup done: ") + bf->filename);
+		bf->session->i(_("backup done: ") + bf->filename);
 		bf->f = NULL;
 	}
 }
@@ -105,7 +105,7 @@ BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
 void BackupManager::_clear_old()
 {
 	for (int i=0; i<files.num; i++)
-		if (!files[i].win){
+		if (!files[i].session){
 			files.erase(i);
 			i --;
 		}

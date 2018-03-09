@@ -8,30 +8,17 @@
 #include "MidiEffect.h"
 
 #include "Plugin.h"
-#include "../Tsunami.h"
+#include "../Session.h"
 #include "../lib/math/math.h"
-#include "../Stuff/Log.h"
 #include "PluginManager.h"
 #include "../Data/SongSelection.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::MidiEffect() :
-	Configurable(TYPE_MIDI_EFFECT)
+	Configurable(Session::GLOBAL, TYPE_MIDI_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
-	only_on_selection = false;
-	enabled = true;
-	bh_offset = 0;
-	bh_song = NULL;
-	bh_midi = NULL;
-}
-
-MidiEffect::MidiEffect(Plugin *p) :
-	Configurable(TYPE_MIDI_EFFECT)
-{
-	usable = true;
-	plugin = p;
 	only_on_selection = false;
 	enabled = true;
 	bh_offset = 0;
@@ -57,7 +44,7 @@ void MidiEffect::prepare()
 {
 	resetState();
 	if (!usable)
-		tsunami->log->error(GetError());
+		session->e(GetError());
 }
 
 string MidiEffect::GetError()
@@ -75,7 +62,7 @@ void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			tsunami->log->error(_("While applying a midi effect: ") + GetError());
+			session->e(_("While applying a midi effect: ") + GetError());
 	}
 }
 
@@ -156,12 +143,12 @@ void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
 }
 
 
-MidiEffect *CreateMidiEffect(const string &name, Song *song)
+MidiEffect *CreateMidiEffect(Session *session, const string &name)
 {
-	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_MIDI_EFFECT, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_MIDI_EFFECT, name);
 	MidiEffect *fx = NULL;
 	if (p->usable)
-		fx = (MidiEffect*)p->createInstance("MidiEffect");
+		fx = (MidiEffect*)p->createInstance(session, "MidiEffect");
 
 	// dummy?
 	if (!fx)
@@ -170,7 +157,8 @@ MidiEffect *CreateMidiEffect(const string &name, Song *song)
 	fx->name = name;
 	fx->plugin = p;
 	fx->usable = p->usable;
-	fx->song = song;
+	fx->session = session;
+	fx->song = session->song;
 	fx->resetConfig();
 	return fx;
 }

@@ -18,8 +18,9 @@
 #include "SongConsole.h"
 #include "CaptureConsole.h"
 #include "LayerConsole.h"
+#include "../../Session.h"
 
-SideBar::SideBar(AudioView *view, Song *song)
+SideBar::SideBar(Session *session)
 {
 	addRevealer("!slide-left", 0, 0, "revealer");
 	setTarget("revealer");
@@ -36,18 +37,18 @@ SideBar::SideBar(AudioView *view, Song *song)
 	setImage("close", "hui:close");
 	addLabel("!big,expandx,center\\...", 1, 0, "title");
 
-	song_console = new SongConsole(song);
-	layer_console = new LayerConsole(song, view);
-	sample_manager = new SampleManagerConsole(song, view);
-	global_fx_console = new FxConsole(NULL, song);
-	track_console = new TrackConsole(view);
-	midi_editor_console = new MidiEditorConsole(view, song);
-	fx_console = new FxConsole(view, song);
-	curve_console = new CurveConsole(view, song);
-	synth_console = new SynthConsole(view);
-	midi_fx_console = new MidiFxConsole(view, song);
-	sample_ref_console = new SampleRefConsole(view, song);
-	capture_console = new CaptureConsole(song, view);
+	song_console = new SongConsole(session);
+	layer_console = new LayerConsole(session);
+	sample_manager = new SampleManagerConsole(session);
+	global_fx_console = new FxConsole(session);
+	track_console = new TrackConsole(session);
+	midi_editor_console = new MidiEditorConsole(session);
+	fx_console = new FxConsole(session);
+	curve_console = new CurveConsole(session);
+	synth_console = new SynthConsole(session);
+	midi_fx_console = new MidiFxConsole(session);
+	sample_ref_console = new SampleRefConsole(session);
+	capture_console = new CaptureConsole(session);
 
 	addConsole(song_console);
 	addConsole(layer_console);
@@ -68,7 +69,7 @@ SideBar::SideBar(AudioView *view, Song *song)
 	visible = false;
 	active_console = -1;
 
-	subscribe(view, std::bind(&AudioView::onUpdate, view)); // EVIL HACK?!?
+	subscribe(session->view, std::bind(&AudioView::onUpdate, session->view)); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()
@@ -137,5 +138,15 @@ void SideBar::open(int console)
 bool SideBar::isActive(int console)
 {
 	return (active_console == console) and visible;
+}
+
+
+
+SideBarConsole::SideBarConsole(const string &_title, Session *_session)
+{
+	title = _title;
+	session = _session;
+	song = session->song;
+	view = session->view;
 }
 

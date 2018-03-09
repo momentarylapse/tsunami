@@ -21,13 +21,15 @@
 #include "Format/FormatNami.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
+#include "../Session.h"
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 #include "../Data/Song.h"
 
-Storage::Storage(TsunamiWindow *_win)
+Storage::Storage(Session *_session)
 {
+	session = _session;
 	formats.add(new FormatDescriptorNami());
 	formats.add(new FormatDescriptorWave());
 	formats.add(new FormatDescriptorRaw());
@@ -43,7 +45,6 @@ Storage::Storage(TsunamiWindow *_win)
 #endif
 	formats.add(new FormatDescriptorMidi());
 
-	win = _win;
 	current_directory = hui::Config.getStr("CurrentDirectory", "");
 }
 
@@ -63,10 +64,10 @@ bool Storage::load(Song *a, const string &filename)
 	if (!d)
 		return false;
 
-	tsunami->log->info(_("loading ") + filename);
+	session->i(_("loading ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, session->win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -95,11 +96,11 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 	if (!d)
 		return false;
 
-	tsunami->log->info(_("loading track ") + filename);
+	session->i(_("loading track ") + filename);
 
 	Format *f = d->create();
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, session->win);
 	od.offset = offset;
 	od.layer = layer;
 
@@ -114,9 +115,9 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 
 bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
-	tsunami->log->info(_("loading buffer ") + filename);
+	session->i(_("loading buffer ") + filename);
 
-	Song *aa = new Song;
+	Song *aa = new Song(session);
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
@@ -151,21 +152,21 @@ bool Storage::save(Song *a, const string &filename)
 	if (!d)
 		return false;
 
-	tsunami->log->info(_("saving ") + filename);
+	session->i(_("saving ") + filename);
 
 	if (!d->testFormatCompatibility(a))
-		tsunami->log->warn(_("data loss when saving in this format!"));
+		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, session->win);
 
 	a->filename = filename;
 
 	f->saveSong(&od);
 
 	a->action_manager->markCurrentAsSave();
-	if (win)
-		win->updateMenu();
+	if (session->win)
+		session->win->updateMenu();
 
 	delete(f);
 	return true;
@@ -177,10 +178,10 @@ bool Storage::saveViaRenderer(AudioSource *r, const string &filename, int num_sa
 	if (!d)
 		return false;
 
-	tsunami->log->info(_("exporting ") + filename);
+	session->i(_("exporting ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), session->win);
 
 	od.renderer = r;
 	od.tags = tags;
@@ -252,18 +253,18 @@ bool Storage::askSaveExport(hui::Window *win)
 
 FormatDescriptor *Storage::getFormat(const string &ext, int flags)
 {
-	bool found = false;
 	for (FormatDescriptor *d : formats){
 		if (d->canHandle(ext)){
-			found = true;
-			if ((d->flags & flags) == flags)
+			if ((d->flags & flags) == flags){
 				return d;
+			}else{
+				session->e(_("file format is incompatible for this action: ") + ext);
+				return NULL;
+
+			}
 		}
 	}
 
-	if (found)
-		tsunami->log->error(_("file format is incompatible for this action: ") + ext);
-	else
-		tsunami->log->error(_("unknown file extension: ") + ext);
+	session->e(_("unknown file extension: ") + ext);
 	return NULL;
 }

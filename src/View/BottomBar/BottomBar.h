@@ -19,12 +19,13 @@ class MixingConsole;
 class LogConsole;
 class DeviceConsole;
 class Log;
+class Session;
 class BottomBarConsole;
 
 class BottomBar : public Observable<hui::Panel>
 {
 public:
-	BottomBar(AudioView *view, Song *audio, DeviceManager *device_manager, Log *log);
+	BottomBar(Session *session);
 	virtual ~BottomBar();
 
 
@@ -38,9 +39,11 @@ public:
 	class Console : public hui::Panel
 	{
 	public:
-		Console(const string &_title)
-		{ title = _title; notify = false; }
+		Console(const string &_title, Session *_session);
 		string title;
+		Session *session;
+		Song *song;
+		AudioView *view;
 		BottomBar *bar(){ return dynamic_cast<BottomBar*>(parent); }
 
 

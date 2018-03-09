@@ -8,7 +8,7 @@
 #include "Effect.h"
 
 #include "Plugin.h"
-#include "../Tsunami.h"
+#include "../Session.h"
 #include "../lib/math/math.h"
 #include "../Stuff/Log.h"
 #include "PluginManager.h"
@@ -47,23 +47,11 @@ void Effect::Output::setSource(AudioSource *_source)
 }
 
 Effect::Effect() :
-	Configurable(TYPE_EFFECT)
+	Configurable(Session::GLOBAL, TYPE_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
 	enabled = true;
-	song = NULL;
-	sample_rate = DEFAULT_SAMPLE_RATE;
-	out = new Output(this);
-}
-
-Effect::Effect(Plugin *p) :
-	Configurable(TYPE_EFFECT)
-{
-	usable = true;
-	plugin = p;
-	enabled = true;
-	song = NULL;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	out = new Output(this);
 }
@@ -104,16 +92,17 @@ void Effect::doProcessTrack(Track *t, int layer, const Range &r)
 	AudioBuffer buf = t->getBuffers(layer, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, layer, r);
 	process(buf);
-	song->execute(a);
+	session->song->execute(a);
 }
 
 
-Effect *CreateEffect(const string &name, Song *song)
+// TODO: move to PluginManager?
+Effect *CreateEffect(Session *session, const string &name)
 {
-	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_EFFECT, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_EFFECT, name);
 	Effect *fx = NULL;
 	if (p->usable)
-		fx = (Effect*)p->createInstance("AudioEffect");
+		fx = (Effect*)p->createInstance(session, "AudioEffect");
 
 	// dummy?
 	if (!fx)
@@ -122,7 +111,8 @@ Effect *CreateEffect(const string &name, Song *song)
 	fx->name = name;
 	fx->plugin = p;
 	fx->usable = p->usable;
-	fx->song = song;
+	fx->song = session->song;
+	fx->session = session;
 	fx->resetConfig();
 	return fx;
 }

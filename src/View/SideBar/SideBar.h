@@ -25,11 +25,12 @@ class MidiFxConsole;
 class CaptureConsole;
 class AudioView;
 class SideBarConsole;
+class Session;
 
 class SideBar : public Observable<hui::Panel>
 {
 public:
-	SideBar(AudioView *view, Song *song);
+	SideBar(Session *session);
 	virtual ~SideBar();
 
 	void onClose();
@@ -82,9 +83,11 @@ public:
 class SideBarConsole : public hui::Panel
 {
 public:
-	SideBarConsole(const string &_title)
-	{ title = _title; }
+	SideBarConsole(const string &_title, Session *_session);
 	string title;
+	Session *session;
+	Song *song;
+	AudioView *view;
 	SideBar *bar(){ return dynamic_cast<SideBar*>(parent); }
 
 	virtual void onEnter(){}

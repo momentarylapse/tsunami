@@ -16,7 +16,7 @@ class Device;
 class DeviceConsole: public BottomBar::Console
 {
 public:
-	DeviceConsole(DeviceManager *device_manager);
+	DeviceConsole(Session *session);
 	virtual ~DeviceConsole();
 
 	void update_full();

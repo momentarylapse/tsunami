@@ -15,14 +15,13 @@ class Log;
 class LogConsole: public BottomBar::Console
 {
 public:
-	LogConsole(Log *log);
+	LogConsole(Session *session);
 	virtual ~LogConsole();
 
 	void onClear();
 	void reload();
 
 	void onLogAdd();
-	void onLogClear();
 
 	Log *log;
 };

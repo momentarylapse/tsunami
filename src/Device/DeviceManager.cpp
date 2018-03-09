@@ -5,6 +5,7 @@
  *      Author: michi
  */
 
+#include "../Session.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include "Device.h"
@@ -29,10 +30,10 @@ const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
 #ifdef DEVICE_PULSEAUDIO
 
-void pa_wait_op(pa_operation *op)
+void pa_wait_op(Session *session, pa_operation *op)
 {
 	if (!op){
-		tsunami->log->error("pa_wait_op:  op=nil");
+		session->e("pa_wait_op:  op=nil");
 		return;
 	}
 //	printf("-w-");
@@ -50,7 +51,7 @@ void pa_wait_op(pa_operation *op)
 		hui::Sleep(0.005f);
 	}
 	if (pa_operation_get_state(op) != PA_OPERATION_DONE)
-		tsunami->log->error("pa_wait_op: failed");
+		session->e("pa_wait_op: failed");
 	pa_operation_unref(op);
 	//msg_write(" ok");
 //	printf("-o-");
@@ -216,13 +217,15 @@ void DeviceManager::write_config()
 
 void DeviceManager::update_devices()
 {
+	Session *session = Session::GLOBAL;
+
 #ifdef DEVICE_PULSEAUDIO
 	for (Device *d: output_devices)
 		d->present = false;
 
 	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, this);
-	if (!testError("pa_context_get_sink_info_list"))
-		pa_wait_op(op);
+	if (!testError(session, "pa_context_get_sink_info_list"))
+		pa_wait_op(session, op);
 
 	default_devices[Device::TYPE_AUDIO_OUTPUT]->present = true;
 
@@ -231,8 +234,8 @@ void DeviceManager::update_devices()
 		d->present = false;
 
 	op = pa_context_get_source_info_list(context, pa_source_info_callback, this);
-	if (!testError("pa_context_get_source_info_list"))
-		pa_wait_op(op);
+	if (!testError(session, "pa_context_get_source_info_list"))
+		pa_wait_op(session, op);
 
 
 	default_devices[Device::TYPE_AUDIO_INPUT]->present = true;
@@ -296,41 +299,43 @@ void DeviceManager::init()
 	if (initialized)
 		return;
 
+	Session *session = Session::GLOBAL;
+
 	// audio
 #ifdef DEVICE_PULSEAUDIO
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	if (!m){
-		tsunami->log->error("pa_threaded_mainloop_new failed");
+		session->e("pa_threaded_mainloop_new failed");
 		return;
 	}
 
 	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(m);
 	if (!m){
-		tsunami->log->error("pa_threaded_mainloop_get_api failed");
+		session->e("pa_threaded_mainloop_get_api failed");
 		return;
 	}
 
 	context = pa_context_new(mainloop_api, "tsunami");
-	if (testError("pa_context_new"))
+	if (testError(session, "pa_context_new"))
 		return;
 
 	pa_context_connect(context, NULL, (pa_context_flags_t)0, NULL);
-	if (testError("pa_context_connect"))
+	if (testError(session, "pa_context_connect"))
 		return;
 
 	pa_threaded_mainloop_start(m);
-	if (testError("pa_threaded_mainloop_start"))
+	if (testError(session, "pa_threaded_mainloop_start"))
 		return;
 
 	if (!pa_wait_context_ready(context)){
-		tsunami->log->error("pulse audio context does not turn 'ready'");
+		session->e("pulse audio context does not turn 'ready'");
 		return;
 	}
 
 	pa_context_set_subscribe_callback(context, &pa_subscription_callback, this);
-	testError("pa_context_set_subscribe_callback");
+	testError(session, "pa_context_set_subscribe_callback");
 	pa_context_subscribe(context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
-	testError("pa_context_subscribe");
+	testError(session, "pa_context_subscribe");
 #endif
 
 #ifdef DEVICE_PORTAUDIO
@@ -342,7 +347,7 @@ void DeviceManager::init()
 #ifdef DEVICE_MIDI_ALSA
 	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
-		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
+		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
 		//return;
 	}else{
 	snd_seq_set_client_name(handle, "Tsunami");
@@ -350,7 +355,7 @@ void DeviceManager::init()
 				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 				SND_SEQ_PORT_TYPE_APPLICATION);
 	if (portid < 0){
-		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
+		session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
 		//return;
 	}
 	}
@@ -374,7 +379,7 @@ void DeviceManager::kill()
 #ifdef DEVICE_PULSEAUDIO
 	if (context){
 		pa_context_disconnect(context);
-		testError("pa_context_disconnect");
+		testError(Session::GLOBAL, "pa_context_disconnect");
 	}
 #endif
 
@@ -521,12 +526,12 @@ void DeviceManager::moveDevicePriority(Device *d, int new_prio)
 	notify(MESSAGE_CHANGE);
 }
 
-bool DeviceManager::testError(const string &msg)
+bool DeviceManager::testError(Session *session, const string &msg)
 {
 #ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(context);
 	if (e != 0)
-		tsunami->log->error(msg + ": " + pa_strerror(e));
+		session->e(msg + ": " + pa_strerror(e));
 	return (e != 0);
 #endif
 	return false;

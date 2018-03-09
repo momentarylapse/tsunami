@@ -5,9 +5,7 @@
  *      Author: michi
  */
 
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
-#include "../../Stuff/Log.h"
+#include "../../Session.h"
 #include "../../View/AudioView.h"
 #include "../BottomBar/BottomBar.h"
 #include "../../Data/Song.h"
@@ -21,11 +19,9 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 	SAMPLE_FORMAT_32_FLOAT
 };
 
-SongConsole::SongConsole(Song *a) :
-	SideBarConsole(_("File properties"))
+SongConsole::SongConsole(Session *session) :
+	SideBarConsole(_("File properties"), session)
 {
-	song = a;
-
 	// dialog
 	setBorderWidth(5);
 	embedDialog("song_dialog", 0, 0);

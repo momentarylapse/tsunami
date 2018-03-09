@@ -23,7 +23,7 @@ class PitchForkDialog extends Dialog
 	PitchFork *fork
 	
 	void __init__(PitchFork *pf)
-		super.__init__("Pitchfork", 200, 80, pf.win, false)
+		super.__init__("Pitchfork", 200, 80, pf.session.win, false)
 		addGrid("", 0, 0, "table")
 		setTarget("table")
 		addSpinButton("", 0, 0, "frequency")
@@ -51,7 +51,7 @@ class PitchFork extends TsunamiPlugin
 	override void onStart()
 	
 		renderer = new ForkRenderer
-		stream = new OutputStream(renderer)
+		stream = new OutputStream(session, renderer)
 		
 		dlg = new PitchForkDialog(self)
 		dlg.show()

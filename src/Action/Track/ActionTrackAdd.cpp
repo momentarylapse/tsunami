@@ -35,7 +35,7 @@ void *ActionTrackAdd::execute(Data *d)
 
 	assert((index >= 0) and (index <= a->tracks.num));
 
-	Track *t = new Track(type, tsunami->plugin_manager->CreateSynthesizer("Dummy", a));
+	Track *t = new Track(type, tsunami->plugin_manager->CreateSynthesizer(a->session, "Dummy"));
 
 	t->song = a;
 	t->layers.resize(a->layers.num);

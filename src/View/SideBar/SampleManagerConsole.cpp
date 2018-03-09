@@ -11,8 +11,7 @@
 #include "../../Device/OutputStream.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
+#include "../../Session.h"
 #include <math.h>
 
 #include "../../Data/Song.h"
@@ -109,8 +108,8 @@ public:
 	SampleManagerConsole *manager;
 };
 
-SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
-	SideBarConsole(_("Samples"))
+SampleManagerConsole::SampleManagerConsole(Session *session) :
+	SideBarConsole(_("Samples"), session)
 {
 	fromResource("sample_manager_dialog");
 
@@ -133,8 +132,6 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 
 	progress = NULL;
 
-	song = s;
-	view = _view;
 	updateList();
 
 	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_ADD_SAMPLE);
@@ -192,9 +189,9 @@ void SampleManagerConsole::onListEdit()
 
 void SampleManagerConsole::onImport()
 {
-	if (view->win->storage->askOpenImport(win)){
+	if (session->storage->askOpenImport(win)){
 		AudioBuffer buf;
-		view->win->storage->loadBufferBox(song, &buf, hui::Filename);
+		session->storage->loadBufferBox(song, &buf, hui::Filename);
 		song->addSample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		onListSelect();
@@ -207,10 +204,10 @@ void SampleManagerConsole::onExport()
 	if (sel.num != 1)
 		return;
 
-	if (view->win->storage->askSaveExport(win)){
+	if (session->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::TYPE_AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			view->win->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
+			session->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
 	}
 }
@@ -324,7 +321,7 @@ void SampleManagerConsole::onPreview()
 	int sel = getInt("sample_list");
 	preview_sample = items[sel]->s;
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
-	preview_stream = new OutputStream(preview_renderer);
+	preview_stream = new OutputStream(session, preview_renderer);
 
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));
@@ -351,10 +348,10 @@ void SampleManagerConsole::endPreview()
 class SampleSelector : public hui::Dialog
 {
 public:
-	SampleSelector(hui::Panel *root, Song *a, Sample *old, AudioView *view) :
-		hui::Dialog("", 300, 400, root->win, false)
+	SampleSelector(Session *session, hui::Panel *parent, Sample *old) :
+		hui::Dialog("", 300, 400, parent->win, false)
 	{
-		song = a;
+		song = session->song;
 		ret = NULL;;
 		_old = old;
 
@@ -365,7 +362,7 @@ public:
 		setString(list_id, _("\\- none -\\"));
 		setInt(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
-			icon_names.add(render_sample(s, view));
+			icon_names.add(render_sample(s, session->view));
 			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.length));
 			if (s == old)
 				setInt(list_id, i + 1);
@@ -422,12 +419,11 @@ public:
 	string list_id;
 };
 
-Sample *SampleManagerConsole::select(hui::Panel *root, Sample *old)
+Sample *SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old)
 {
-	/*SampleSelector *s = new SampleSelector(root, song, old, view);
+	SampleSelector *s = new SampleSelector(session, parent, old);
 	s->run();
 	Sample *r = s->ret;
 	delete(s);
-	return r;*/
-	return NULL;
+	return r;
 }

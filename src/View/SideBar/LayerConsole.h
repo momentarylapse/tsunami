@@ -9,12 +9,11 @@
 #define SRC_VIEW_SIDEBAR_LAYERCONSOLE_H_
 
 #include "SideBar.h"
-class Song;
 
 class LayerConsole: public SideBarConsole
 {
 public:
-	LayerConsole(Song *s, AudioView *view);
+	LayerConsole(Session *session);
 	virtual ~LayerConsole();
 
 	void loadData();
@@ -30,9 +29,6 @@ public:
 	void onEditSong();
 
 	void onUpdate();
-
-	Song *song;
-	AudioView *view;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_LAYERCONSOLE_H_ */

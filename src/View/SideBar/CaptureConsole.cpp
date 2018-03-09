@@ -5,7 +5,6 @@
  *      Author: michi
  */
 
-#include "../../Tsunami.h"
 #include "../../Device/OutputStream.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
@@ -15,17 +14,16 @@
 #include "CaptureConsoleModes/CaptureConsoleModeMulti.h"
 
 #include "CaptureConsole.h"
+#include "../../Session.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 
 
 
 
-CaptureConsole::CaptureConsole(Song *s, AudioView *v):
-	SideBarConsole(_("Recording"))
+CaptureConsole::CaptureConsole(Session *session):
+	SideBarConsole(_("Recording"), session)
 {
-	song = s;
-	view = v;
 	mode = NULL;
 
 
@@ -33,7 +31,7 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	setBorderWidth(5);
 	embedDialog("record_dialog", 0, 0);
 
-	device_manager = tsunami->device_manager;
+	device_manager = session->device_manager;
 
 
 	// dialog

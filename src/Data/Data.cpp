@@ -11,9 +11,10 @@
 
 const string Data::MESSAGE_FINISHED_LOADING = "FinishedLoading";
 
-Data::Data()
+Data::Data(Session *_session)
 {
 	action_manager = new ActionManager(this);
+	session = _session;
 	binary_file_format = true;
 	file_time = 0;
 }

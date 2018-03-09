@@ -6,13 +6,14 @@
  */
 
 #include "BottomBar.h"
+#include "../../Session.h"
 #include "../../Stuff/Log.h"
 #include "LogConsole.h"
 
-LogConsole::LogConsole(Log *_log) :
-	BottomBar::Console(_("Messages"))
+LogConsole::LogConsole(Session *session) :
+	BottomBar::Console(_("Messages"), session)
 {
-	log = _log;
+	log = session->log;
 
 	fromResource("log_console");
 
@@ -22,7 +23,6 @@ LogConsole::LogConsole(Log *_log) :
 	reload();
 
 	log->subscribe3(this, std::bind(&LogConsole::onLogAdd, this), Log::MESSAGE_ADD);
-	log->subscribe3(this, std::bind(&LogConsole::onLogClear, this), Log::MESSAGE_CLEAR);
 }
 
 LogConsole::~LogConsole()
@@ -32,26 +32,29 @@ LogConsole::~LogConsole()
 
 void LogConsole::onClear()
 {
-	log->clear();
+	reset("log_list");
 }
 
 void console_add_message(LogConsole *lc, Log::Message &m)
 {
+	string text = m.text;
+	if (m.session == Session::GLOBAL)
+		text = "[global] " + m.text;
 	if (m.type == Log::TYPE_ERROR){
-		lc->addString("log_list", "hui:error\\" + m.text);
+		lc->addString("log_list", "hui:error\\" + text);
 		lc->blink();
 	}else if (m.type == Log::TYPE_WARNING){
-		lc->addString("log_list", "hui:warning\\" + m.text);
+		lc->addString("log_list", "hui:warning\\" + text);
 		lc->blink();
 	}else{
-		lc->addString("log_list", "hui:info\\" + m.text);
+		lc->addString("log_list", "hui:info\\" + text);
 	}
 }
 
 void LogConsole::reload()
 {
 	reset("log_list");
-	auto messages = log->all();
+	auto messages = log->all(session);
 	for (auto &m: messages)
 		console_add_message(this, m);
 }
@@ -59,10 +62,6 @@ void LogConsole::reload()
 void LogConsole::onLogAdd()
 {
 	auto m = log->last();
-	console_add_message(this, m);
-}
-
-void LogConsole::onLogClear()
-{
-	reset("log_list");
+	if ((m.session == session) or (m.session == Session::GLOBAL))
+		console_add_message(this, m);
 }

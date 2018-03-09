@@ -9,15 +9,13 @@
 #define SAMPLEREFCONSOLE_H_
 
 #include "SideBar.h"
-class Song;
 class Track;
 class SampleRef;
-class AudioView;
 
 class SampleRefConsole: public SideBarConsole
 {
 public:
-	SampleRefConsole(AudioView *view, Song *song);
+	SampleRefConsole(Session *session);
 	virtual ~SampleRefConsole();
 
 	void loadData();
@@ -35,8 +33,6 @@ public:
 	void onViewCurSampleChange();
 	void onUpdate();
 
-	AudioView *view;
-	Song *song;
 	Track *track;
 	SampleRef *sample;
 };

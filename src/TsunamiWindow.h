@@ -10,20 +10,18 @@
 
 #include "lib/hui/hui.h"
 
-class HuiWindow;
 class Song;
 class AudioView;
 class SideBar;
 class BottomBar;
 class MiniBar;
-class TsunamiPlugin;
+class Session;
 class Tsunami;
-class Storage;
 
 class TsunamiWindow : public hui::Window
 {
 public:
-	TsunamiWindow(Tsunami *tsunami);
+	TsunamiWindow(Session *session);
 	virtual ~TsunamiWindow();
 	virtual void onDestroy();
 
@@ -118,14 +116,12 @@ public:
 
 	Song *song;
 
-	Storage *storage;
+	Session *session;
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
 	MiniBar *mini_bar;
 
-	Array<TsunamiPlugin*> plugins;
-	bool die_on_plugin_stop;
 	bool auto_delete;
 
 	Tsunami *app;

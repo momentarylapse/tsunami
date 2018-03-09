@@ -13,11 +13,11 @@
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
+#include "../Session.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Device/OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
-#include "../Stuff/Log.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
@@ -137,12 +137,14 @@ void AudioView::MouseSelectionPlanner::stop()
 	dist = -1;
 }
 
-AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
+AudioView::AudioView(Session *_session, const string &_id) :
 	midi_scale(Scale::TYPE_MAJOR, 0),
 	cam(this)
 {
 	id = _id;
-	win = parent;
+	session = _session;
+	win = session->win;
+	song = session->song;
 
 	perf_channel = PerformanceMonitor::create_channel("view");
 
@@ -167,8 +169,6 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
 	dummy_vtrack = new AudioViewTrack(this, NULL);
-
-	song = _song;
 
 	midi_view_mode = hui::Config.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
 
@@ -226,20 +226,20 @@ AudioView::AudioView(TsunamiWindow *parent, const string &_id, Song *_song) :
 
 
 	// events
-	parent->eventXP(id, "hui:draw", std::bind(&AudioView::onDraw, this, std::placeholders::_1));
-	parent->eventX(id, "hui:mouse-move", std::bind(&AudioView::onMouseMove, this));
-	parent->eventX(id, "hui:left-button-down", std::bind(&AudioView::onLeftButtonDown, this));
-	parent->eventX(id, "hui:left-double-click", std::bind(&AudioView::onLeftDoubleClick, this));
-	parent->eventX(id, "hui:left-button-up", std::bind(&AudioView::onLeftButtonUp, this));
-	parent->eventX(id, "hui:middle-button-down", std::bind(&AudioView::onMiddleButtonDown, this));
-	parent->eventX(id, "hui:middle-button-up", std::bind(&AudioView::onMiddleButtonUp, this));
-	parent->eventX(id, "hui:right-button-down", std::bind(&AudioView::onRightButtonDown, this));
-	parent->eventX(id, "hui:right-button-up", std::bind(&AudioView::onRightButtonUp, this));
-	parent->eventX(id, "hui:key-down", std::bind(&AudioView::onKeyDown, this));
-	parent->eventX(id, "hui:key-up", std::bind(&AudioView::onKeyUp, this));
-	parent->eventX(id, "hui:mouse-wheel", std::bind(&AudioView::onMouseWheel, this));
+	win->eventXP(id, "hui:draw", std::bind(&AudioView::onDraw, this, std::placeholders::_1));
+	win->eventX(id, "hui:mouse-move", std::bind(&AudioView::onMouseMove, this));
+	win->eventX(id, "hui:left-button-down", std::bind(&AudioView::onLeftButtonDown, this));
+	win->eventX(id, "hui:left-double-click", std::bind(&AudioView::onLeftDoubleClick, this));
+	win->eventX(id, "hui:left-button-up", std::bind(&AudioView::onLeftButtonUp, this));
+	win->eventX(id, "hui:middle-button-down", std::bind(&AudioView::onMiddleButtonDown, this));
+	win->eventX(id, "hui:middle-button-up", std::bind(&AudioView::onMiddleButtonUp, this));
+	win->eventX(id, "hui:right-button-down", std::bind(&AudioView::onRightButtonDown, this));
+	win->eventX(id, "hui:right-button-up", std::bind(&AudioView::onRightButtonUp, this));
+	win->eventX(id, "hui:key-down", std::bind(&AudioView::onKeyDown, this));
+	win->eventX(id, "hui:key-up", std::bind(&AudioView::onKeyUp, this));
+	win->eventX(id, "hui:mouse-wheel", std::bind(&AudioView::onMouseWheel, this));
 
-	parent->activate(id);
+	win->activate(id);
 
 
 	menu_song = hui::CreateResourceMenu("popup_song_menu");
@@ -1156,7 +1156,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 
 	renderer->prepare(range, allow_loop);
 	renderer->allowTracks(get_playable_tracks());
-	stream = new OutputStream(renderer);
+	stream = new OutputStream(session, renderer);
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);

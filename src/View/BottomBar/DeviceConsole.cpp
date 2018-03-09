@@ -6,13 +6,14 @@
  */
 
 #include "DeviceConsole.h"
+#include "../../Session.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
 
-DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
-	BottomBar::Console(_("Devices"))
+DeviceConsole::DeviceConsole(Session *session) :
+	BottomBar::Console(_("Devices"), session)
 {
-	device_manager = _device_manager;
+	device_manager = session->device_manager;
 
 
 	fromResource("device-manager");

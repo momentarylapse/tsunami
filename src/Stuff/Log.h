@@ -11,6 +11,8 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
+class Session;
+
 class Log : public Observable<VirtualBase>
 {
 public:
@@ -18,13 +20,10 @@ public:
 	virtual ~Log(){}
 
 	static const string MESSAGE_ADD;
-	static const string MESSAGE_CLEAR;
 
-	void error(const string &message);
-	void warn(const string &message);
-	void info(const string &message);
-
-	void clear();
+	void error(Session *session, const string &message);
+	void warn(Session *session, const string &message);
+	void info(Session *session, const string &message);
 
 	enum{
 		TYPE_ERROR,
@@ -34,15 +33,16 @@ public:
 
 	struct Message
 	{
+		Session *session;
 		int type;
 		string text;
 	};
 
 	Message last();
-	Array<Message> all();
+	Array<Message> all(Session *session);
 
 private:
-	void addMessage(int type, const string &message);
+	void addMessage(Session *session, int type, const string &message);
 	Array<Message> messages;
 };
 

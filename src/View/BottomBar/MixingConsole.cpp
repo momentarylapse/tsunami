@@ -12,6 +12,7 @@
 
 #include "../../Device/DeviceManager.h"
 #include "../../Data/Song.h"
+#include "../../Session.h"
 #include "../AudioView.h"
 
 const float TrackMixer::DB_MIN = -1000000;
@@ -100,12 +101,10 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, AudioView *_view) :
-	BottomBar::Console(_("Mixing console"))
+MixingConsole::MixingConsole(Session *session) :
+	BottomBar::Console(_("Mixing console"), session)
 {
-	view = _view;
-	song = _song;
-	device_manager = _device_manager;
+	device_manager = session->device_manager;
 	id_inner = "inner-grid";
 
 	fromResource("mixing-console");

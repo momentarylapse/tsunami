@@ -12,12 +12,12 @@
 
 class Configurable;
 class Synthesizer;
-class Song;
+class Session;
 
 class ConfigurableSelectorDialog: public hui::Window
 {
 public:
-	ConfigurableSelectorDialog(hui::Window *_parent, int type, Song *song, const string &old_name = "");
+	ConfigurableSelectorDialog(hui::Window *_parent, int type, Session *session, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
 	void onListSelect();
@@ -27,7 +27,7 @@ public:
 	void onOk();
 
 	int type;
-	Song *song;
+	Session *session;
 	struct Label
 	{
 		string full;

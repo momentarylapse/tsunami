@@ -16,8 +16,7 @@
 #include "../../../Data/SongSelection.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
-#include "../../../Stuff/Log.h"
-#include "../../../Tsunami.h"
+#include "../../../Session.h"
 
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -61,7 +60,7 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->out->setSource(input->out);
-	preview_stream = new OutputStream(preview_synth->out);
+	preview_stream = new OutputStream(session, preview_synth->out);
 	preview_stream->setBufferSize(512);
 	preview_stream->play();
 	view->setCurTrack(target);
@@ -102,7 +101,7 @@ void CaptureConsoleModeMidi::enter()
 		cc->addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	//cc->addString("capture_midi_target", _("  - create new track -"));
 
-	input = new InputStreamMidi(song->sample_rate);
+	input = new InputStreamMidi(session, song->sample_rate);
 	input->setChunkSize(512);
 	input->setUpdateDt(0.005f);
 	view->mode_capture->setInputMidi(input);
@@ -167,7 +166,7 @@ bool CaptureConsoleModeMidi::insert()
 	int i0 = s_start + dpos;
 
 	if (target->type != Track::TYPE_MIDI){
-		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(target->type).c_str()));
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(target->type).c_str()));
 		return false;
 	}
 

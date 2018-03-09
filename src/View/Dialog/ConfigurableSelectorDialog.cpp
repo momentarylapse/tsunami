@@ -6,7 +6,7 @@
  */
 
 #include "ConfigurableSelectorDialog.h"
-#include "../../Tsunami.h"
+#include "../../Session.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
@@ -23,12 +23,12 @@ ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const 
 	return l;
 }
 
-ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Song *_song, const string &old_name) :
+ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Session *_session, const string &old_name) :
 	hui::Window("configurable-selection-dialog", _parent)
 {
 	type = _type;
-	song = _song;
-	Array<string> tnames = tsunami->plugin_manager->FindConfigurable(type);
+	session = _session;
+	Array<string> tnames = session->plugin_manager->FindConfigurable(type);
 
 	for (string &s: tnames){
 		Label l = split_label(s);
@@ -77,11 +77,11 @@ void ConfigurableSelectorDialog::onSelect()
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
-		_return = CreateEffect(labels[n].name, song);
+		_return = CreateEffect(session, labels[n].name);
 	else if (type == Configurable::TYPE_MIDI_EFFECT)
-		_return = CreateMidiEffect(labels[n].name, song);
+		_return = CreateMidiEffect(session, labels[n].name);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
-		_return = tsunami->plugin_manager->CreateSynthesizer(labels[n].name, song);
+		_return = session->plugin_manager->CreateSynthesizer(session, labels[n].name);
 	destroy();
 }
 

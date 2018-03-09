@@ -11,14 +11,15 @@
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
+#include "../../Session.h"
 
 class SingleFxPanel : public hui::Panel
 {
 public:
-	SingleFxPanel(Song *a, Track *t, Effect *_fx, int _index)
+	SingleFxPanel(Session *_session, Track *t, Effect *_fx, int _index)
 	{
-		song = a;
+		session = _session;
+		song = session->song;
 		track = t;
 		fx = _fx;
 		index = _index;
@@ -55,10 +56,10 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, false);
+		string name = session->plugin_manager->SelectFavoriteName(win, fx, false);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->ApplyFavorite(fx, name);
+		session->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
 			track->editEffect(index, old_param);
 		else
@@ -67,10 +68,10 @@ public:
 	}
 	void onSave()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, true);
+		string name = session->plugin_manager->SelectFavoriteName(win, fx, true);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->SaveFavorite(fx, name);
+		session->plugin_manager->SaveFavorite(fx, name);
 	}
 	void onEnabled()
 	{
@@ -103,6 +104,7 @@ public:
 		p->update();
 		old_param = fx->configToString();
 	}
+	Session *session;
 	Song *song;
 	Track *track;
 	Effect *fx;
@@ -111,11 +113,9 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Effects"))
+FxConsole::FxConsole(Session *session) :
+	SideBarConsole(_("Effects"), session)
 {
-	view = _view;
-	song = _song;
 	id_inner = "fx_inner_table";
 
 	fromResource("fx_editor");
@@ -148,7 +148,7 @@ FxConsole::~FxConsole()
 
 void FxConsole::onAdd()
 {
-	Effect *effect = tsunami->plugin_manager->ChooseEffect(this, track->song);
+	Effect *effect = session->plugin_manager->ChooseEffect(this, session);
 	if (!effect)
 		return;
 	if (track)
@@ -197,7 +197,7 @@ void FxConsole::setTrack(Track *t)
 	else
 		fx = song->fx;
 	foreachi(Effect *e, fx, i){
-		panels.add(new SingleFxPanel(song, track, e, i));
+		panels.add(new SingleFxPanel(session, track, e, i));
 		embed(panels.back(), id_inner, 0, i*2);
 		addSeparator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
 	}

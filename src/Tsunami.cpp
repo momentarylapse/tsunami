@@ -9,6 +9,7 @@
 
 #include "Device/DeviceManager.h"
 #include "TsunamiWindow.h"
+#include "Session.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
@@ -63,24 +64,25 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 
+	Session::GLOBAL = new Session();
+
+	plugin_manager->LinkAppScriptData();
+
 	if (handleCLIArguments(arg))
 		return false;
 
 	// ok, full window mode
 
-	log->info(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
-	log->info(_("  ...don't worry. Everything will be fine!"));
-
-	BackupManager::check_old_files();
+	BackupManager::check_old_files(Session::GLOBAL);
 
 
 	// create a window and load file
 	//if (!win){
-		TsunamiWindow* win = createWindow();
-		win->show();
+		Session *session = createSession();
+		session->win->show();
 
 		if (arg.num >= 2)
-			win->storage->load(win->song, arg[1]);
+			session->storage->load(session->song, arg[1]);
 	//}
 	return true;
 }
@@ -89,19 +91,20 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 {
 	if (args.num < 2)
 		return false;
-	Storage *storage = new Storage(NULL);
+	Session *session = Session::GLOBAL;
+
 	if (args[1] == "--help"){
-		log->info(AppName + " " + AppVersion);
-		log->info("--help");
-		log->info("--info <FILE>");
-		log->info("--export <FILE_IN> <FILE_OUT>");
-		log->info("--execute <PLUGIN_NAME> [ARGUMENTS]");
+		session->i(AppName + " " + AppVersion);
+		session->i("--help");
+		session->i("--info <FILE>");
+		session->i("--export <FILE_IN> <FILE_OUT>");
+		session->i("--execute <PLUGIN_NAME> [ARGUMENTS]");
 		return true;
 	}else if (args[1] == "--info"){
-		Song* song = new Song;
+		Song* song = session->song;//new Song(session);
 		if (args.num < 3){
-			log->error(_("call: tsunami --info <File>"));
-		}else if (storage->load(song, args[2])){
+			session->e(_("call: tsunami --info <File>"));
+		}else if (session->storage->load(song, args[2])){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));
@@ -113,16 +116,16 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 			for (Tag &t: song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
-		delete(song);
+		//delete(song);
 		return true;
 	}else if (args[1] == "--export"){
-		Song* song = new Song;
+		Song* song = session->song;//new Song;
 		if (args.num < 4){
-			log->error(_("call: tsunami --export <File> <Exportfile>"));
-		}else if (storage->load(song, args[2])){
-			storage->save(song, args[3]);
+			session->e(_("call: tsunami --export <File> <Exportfile>"));
+		}else if (session->storage->load(song, args[2])){
+			session->storage->save(song, args[3]);
 		}
-		delete(song);
+		//delete(song);
 		return true;
 	/*}else if (args[1] == "--execute"){
 		if (args.num < 3){
@@ -139,18 +142,27 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		p->start();
 		return false;*/
 	}else if (args[1].head(2) == "--"){
-		log->error(_("unknown command: ") + args[1]);
+		session->e(_("unknown command: ") + args[1]);
 		return true;
 	}
 	return false;
 }
 
-TsunamiWindow* Tsunami::createWindow()
+Session* Tsunami::createSession()
 {
-	TsunamiWindow* win = new TsunamiWindow(this);
-	win->auto_delete = true;
-	windows.add(win);
-	return win;
+	Session *session = new Session();
+
+	session->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
+	session->i(_("  ...don't worry. Everything will be fine!"));
+
+	session->song = new Song(session);
+
+	session->setWin(new TsunamiWindow(session));
+	session->win->auto_delete = true;
+	session->win->show();
+
+	sessions.add(session);
+	return session;
 }
 
 void Tsunami::loadKeyCodes()
@@ -159,8 +171,8 @@ void Tsunami::loadKeyCodes()
 
 bool Tsunami::allowTermination()
 {
-	for (auto *w: windows)
-		if (!w->allowTermination())
+	for (auto *s: sessions)
+		if (!s->win->allowTermination())
 			return false;
 	return true;
 }

@@ -11,7 +11,7 @@ const float RECOVER_TIME = 0.40
 class ClickCounterDialog extends Dialog
 	MicrophoneClickCounter *counter
 	void __init__(MicrophoneClickCounter *_counter)
-		super.__init__("Click Counter", 300, 175, _counter.win, false)
+		super.__init__("Click Counter", 300, 175, _counter.session.win, false)
 		addGrid("", 0, 0, "grid")
 		setTarget("grid")
 		addDrawingArea("", 0, 0, "drawing")
@@ -82,9 +82,9 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		active_ttl = -1
 	
 		source = new ClickSource
-		synth = CreateSynthesizer("")
+		synth = CreateSynthesizer(session, "")
 		synth.out.setSource(source)
-		stream = new OutputStream(synth.out)
+		stream = new OutputStream(session, synth.out)
 		stream.setBufferSize(2048)
 		stream.play()
 		

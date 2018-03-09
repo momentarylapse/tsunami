@@ -10,11 +10,10 @@
 
 #include "../Stuff/Observable.h"
 
-class TsunamiWindow;
 namespace hui{
 	class Window;
 }
-class AudioView;
+class Session;
 class Song;
 
 class TsunamiPlugin : public Observable<VirtualBase>
@@ -38,8 +37,7 @@ public:
 
 	void _cdecl stop_request();
 
-	hui::Window *win;
-	AudioView *view;
+	Session *session;
 	Song *song;
 
 	string name;
@@ -47,6 +45,6 @@ public:
 	Array<string> args;
 };
 
-TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win);
+TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name);
 
 #endif /* SRC_PLUGINS_TSUNAMIPLUGIN_H_ */

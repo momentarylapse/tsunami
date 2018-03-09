@@ -8,13 +8,14 @@
 #ifndef PLUGIN_H_
 #define PLUGIN_H_
 
-#include "../Data/Song.h"
 #include "../lib/base/base.h"
 
 namespace Kaba{
 class Script;
 class Class;
 };
+
+class Session;
 
 // represents a compiled script
 class Plugin
@@ -40,7 +41,7 @@ public:
 
 	string getError();
 
-	void *createInstance(const string &root_type);
+	void *createInstance(Session *session, const string &root_type);
 };
 
 #endif /* PLUGIN_H_ */

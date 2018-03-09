@@ -14,11 +14,12 @@
 class Song;
 class AudioView;
 class Curve;
+class Session;
 
 class CurveConsole : public SideBarConsole
 {
 public:
-	CurveConsole(AudioView *view, Song *song);
+	CurveConsole(Session *session);
 	virtual ~CurveConsole();
 
 	void onViewChange();
@@ -37,8 +38,6 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	Song *song;
-	AudioView *view;
 	Curve* curve();
 
 	string id_list;

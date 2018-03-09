@@ -8,18 +8,15 @@
 
 #include "LayerConsole.h"
 
-#include "../../Tsunami.h"
+#include "../../Session.h"
 #include "../../View/AudioView.h"
 #include "../../Data/Song.h"
 #include "../../Stuff/Log.h"
 
 
-LayerConsole::LayerConsole(Song *s, AudioView *v) :
-	SideBarConsole(_("Layers"))
+LayerConsole::LayerConsole(Session *session) :
+	SideBarConsole(_("Layers"), session)
 {
-	song = s;
-	view = v;
-
 	// dialog
 	setBorderWidth(5);
 	embedDialog("layer_dialog", 0, 0);
@@ -101,7 +98,7 @@ void LayerConsole::onDelete()
 	try{
 		song->deleteLayer(view->cur_layer);
 	}catch(Song::Exception &e){
-		tsunami->log->error(e.message);
+		session->e(e.message);
 	}
 }
 

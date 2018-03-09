@@ -21,6 +21,8 @@ class Storage;
 class Format;
 class AudioSource;
 class Tag;
+class Storage;
+class Session;
 
 class StorageOperationData
 {
@@ -42,6 +44,7 @@ public:
 
 	hui::Window *win;
 
+	Session *session;
 	Song *song;
 	Progress *progress;
 	string filename;

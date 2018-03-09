@@ -14,7 +14,7 @@ class Song;
 class SongConsole: public SideBarConsole
 {
 public:
-	SongConsole(Song *s);
+	SongConsole(Session *session);
 	virtual ~SongConsole();
 
 	void loadData();
@@ -34,8 +34,6 @@ public:
 	void onEditFx();
 
 	void onUpdate();
-
-	Song *song;
 };
 
 #endif /* SONGCONSOLE_H_ */

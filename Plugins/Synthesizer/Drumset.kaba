@@ -5,13 +5,13 @@ class Drumset
 	string name
 	Song *a
 	
-	void load()
+	void load(Session* session)
 		if a
 			return
-		a = new Song
-		string temp = storage.current_directory
-		storage.load(a, AppDirectoryStatic + "Data/Drumsets/" + name + ".nami")
-		storage.current_directory = temp
+		a = new Song(session)
+		string temp = session.storage.current_directory
+		session.storage.load(a, AppDirectoryStatic + "Drumsets/" + name + ".nami")
+		session.storage.current_directory = temp
 
 class DrumList
 	Drumset[] sets
@@ -32,7 +32,7 @@ class DrumList
 
 	//string[] find_drumsets()
 	void update()
-		DirEntry[] list = DirSearch(AppDirectoryStatic + "Data/Drumsets", "*.nami", false)
+		DirEntry[] list = DirSearch(AppDirectoryStatic + "Drumsets", "*.nami", false)
 		for e in list
 			string name = e.name.substr(0, -6)
 			if find(name) >= 0
@@ -42,18 +42,18 @@ class DrumList
 			s.a = nil
 			sets.add(s)
 	
-	Song *get(string name)
+	Song *get(Session* session, string name)
 		update()
 		int n = find(name)
 		if n < 0
 			if sets.num > 0
 				n = 0
-				logging.warn("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
+				session.w("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
 			else
-				logging.error("Drumset not found: '" + name + "' (none found)")
+				session.e("Drumset not found: '" + name + "' (none found)")
 				return nil
 		Drumset *s = &sets[n]
-		s.load()
+		s.load(session)
 		return s.a
 
 DrumList drumlist
@@ -74,7 +74,7 @@ class DrumsetSynthesizer extends Synthesizer
 	override void __init__()
 		state.a = nil
 	override void onConfig()
-		state.a = drumlist.get(config.name)
+		state.a = drumlist.get(session, config.name)
 		state.s = nil
 		if state.a
 			state.s = state.a.tracks[0].synth

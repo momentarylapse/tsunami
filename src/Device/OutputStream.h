@@ -22,6 +22,7 @@ class DeviceManager;
 class Device;
 class Thread;
 class StreamThread;
+class Session;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -39,10 +40,10 @@ class OutputStream : public PeakMeterSource
 	friend StreamThread;
 public:
 	//AudioStream();
-	OutputStream(AudioSource *r);
+	OutputStream(Session *session, AudioSource *r);
 	virtual ~OutputStream();
 
-	void _cdecl __init__(AudioSource *r);
+	void _cdecl __init__(Session *session, AudioSource *r);
 	virtual void _cdecl __delete__();
 
 	void _create_dev();
@@ -85,6 +86,7 @@ private:
 	bool testError(const string &msg);
 	void readStream();
 
+	Session *session;
 
 	float volume;
 	bool paused;

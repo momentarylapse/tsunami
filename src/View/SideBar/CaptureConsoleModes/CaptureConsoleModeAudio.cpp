@@ -15,10 +15,9 @@
 #include "../../../Data/Song.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
-#include "../../../Stuff/Log.h"
+#include "../../../Session.h"
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../../Tsunami.h"
 
 
 
@@ -99,8 +98,8 @@ void CaptureConsoleModeAudio::enter()
 			setTarget((Track*)t);
 
 
-	input = new InputStreamAudio(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP, view->win);
+	input = new InputStreamAudio(session, song->sample_rate);
+	input->setBackupMode(BACKUP_MODE_TEMP);
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);
 	view->mode_capture->setInputAudio(input);
@@ -168,7 +167,7 @@ bool CaptureConsoleModeAudio::insert()
 	int i0 = s_start + dpos;
 
 	if (target->type != Track::TYPE_AUDIO){
-		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(target->type).c_str()));
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(target->type).c_str()));
 		return false;
 	}
 

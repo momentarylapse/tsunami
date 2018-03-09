@@ -17,11 +17,12 @@ class AudioView;
 class DeviceManager;
 class Device;
 class CaptureConsoleMode;
+class Session;
 
 class CaptureConsole : public SideBarConsole
 {
 public:
-	CaptureConsole(Song *s, AudioView *view);
+	CaptureConsole(Session *session);
 	virtual ~CaptureConsole();
 
 
@@ -47,8 +48,6 @@ public:
 
 	bool isCapturing();
 
-	Song *song;
-	AudioView *view;
 	PeakMeter *peak_meter;
 	CaptureConsoleMode *mode;
 

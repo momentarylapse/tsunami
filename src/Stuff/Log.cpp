@@ -7,50 +7,48 @@
 
 #include "Log.h"
 #include "../lib/hui/hui.h"
-#include "../Tsunami.h"
+#include "../Session.h"
 
 const string Log::MESSAGE_ADD = "Add";
-const string Log::MESSAGE_CLEAR = "Clear";
 
 
-void Log::error(const string &message)
+void Log::error(Session *session, const string &message)
 {
-	addMessage(TYPE_ERROR, message);
+	addMessage(session, TYPE_ERROR, message);
 }
 
 
-void Log::warn(const string &message)
+void Log::warn(Session *session, const string &message)
 {
-	addMessage(TYPE_WARNING, message);
+	addMessage(session, TYPE_WARNING, message);
 }
 
 
-void Log::info(const string &message)
+void Log::info(Session *session, const string &message)
 {
-	addMessage(TYPE_INFO, message);
+	addMessage(session, TYPE_INFO, message);
 }
 
-
-void Log::clear()
-{
-	messages.clear();
-	notify(MESSAGE_CLEAR);
-}
 
 Log::Message Log::last()
 {
 	return messages.back();
 }
 
-Array<Log::Message> Log::all()
+Array<Log::Message> Log::all(Session *session)
 {
-	return messages;
+	Array<Log::Message> r;
+	for (auto &m: messages)
+		if ((m.session == session) or (m.session == Session::GLOBAL))
+			r.add(m);
+	return r;
 }
 
 
-void Log::addMessage(int type, const string &_message)
+void Log::addMessage(Session *session, int type, const string &_message)
 {
 	Message m;
+	m.session = session;
 	m.type = type;
 	m.text = _message;
 	messages.add(m);

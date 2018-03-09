@@ -30,11 +30,12 @@ class ViewModeMidi;
 class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
+class Session;
 
 class AudioView : public Observable<VirtualBase>
 {
 public:
-	AudioView(TsunamiWindow *parent, const string &id, Song *audio);
+	AudioView(Session *session, const string &id);
 	virtual ~AudioView();
 
 	void checkConsistency();
@@ -183,6 +184,7 @@ public:
 	ViewModeCurve *mode_curve;
 	ViewModeCapture *mode_capture;
 
+	Session *session;
 	TsunamiWindow *win;
 
 	Song *song;

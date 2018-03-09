@@ -10,7 +10,9 @@
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "../Session.h"
+
+const string FavoriteManager::DEFAULT_NAME = ":def:";
 
 FavoriteManager::FavoriteManager()
 {
@@ -43,7 +45,7 @@ int FavoriteManager::str2type(const string &str)
 	return -1;
 }
 
-void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
+void FavoriteManager::LoadFromFile(const string &filename, bool read_only, Session *session)
 {
 	if (!file_test_existence(filename))
 		return;
@@ -62,18 +64,18 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 		}
 		delete(f);
 	}catch(Exception &e){
-		tsunami->log->error(e.message());
+		session->e(e.message());
 	}
 }
 
-void FavoriteManager::Load()
+void FavoriteManager::Load(Session *session)
 {
-	LoadFromFile(tsunami->directory_static + "favorites_demo.txt", true);
-	LoadFromFile(tsunami->directory + "favorites.txt", false);
+	LoadFromFile(tsunami->directory_static + "favorites_demo.txt", true, session);
+	LoadFromFile(tsunami->directory + "favorites.txt", false, session);
 	loaded = true;
 }
 
-void FavoriteManager::Save()
+void FavoriteManager::Save(Session *session)
 {
 	try{
 		File *f = FileCreateText(tsunami->directory + "favorites.txt");
@@ -86,14 +88,14 @@ void FavoriteManager::Save()
 		}
 		delete(f);
 	}catch(Exception &e){
-		tsunami->log->error(e.message());
+		session->e(e.message());
 	}
 }
 
 Array<string> FavoriteManager::GetList(Configurable *c)
 {
 	if (!loaded)
-		Load();
+		Load(c->session);
 	Array<string> r;
 	for (Favorite &f: favorites){
 		if ((f.type == c->configurable_type) and (f.config_name == c->name))
@@ -105,10 +107,10 @@ Array<string> FavoriteManager::GetList(Configurable *c)
 void FavoriteManager::Apply(Configurable *c, const string &name)
 {
 	c->resetConfig();
-	if (name == ":def:")
+	if (name == DEFAULT_NAME)
 		return;
 	if (!loaded)
-		Load();
+		Load(c->session);
 	for (Favorite &f: favorites){
 		if ((f.type == c->configurable_type) and (f.config_name == c->name) and (f.name == name))
 			c->configFromString(f.options);
@@ -118,7 +120,7 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 void FavoriteManager::Save(Configurable *c, const string &name)
 {
 	if (!loaded)
-		Load();
+		Load(c->session);
 	Favorite f;
 	f.type = c->configurable_type;
 	f.config_name = c->name;
@@ -126,7 +128,7 @@ void FavoriteManager::Save(Configurable *c, const string &name)
 	f.read_only = false;
 	f.options = c->configToString();
 	set(f);
-	Save();
+	Save(c->session);
 }
 
 void FavoriteManager::set(const Favorite &ff)

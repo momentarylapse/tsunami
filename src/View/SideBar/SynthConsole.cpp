@@ -13,16 +13,16 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
+#include "../../Session.h"
 
 
 
 class SynthPanel : public hui::Panel
 {
 public:
-	SynthPanel(Track *t)
+	SynthPanel(Session *_session, Track *t)
 	{
+		session = _session;
 		track = t;
 		synth = t->synth;
 		fromResource("synth_panel");
@@ -51,19 +51,19 @@ public:
 	}
 	void onLoad()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, synth, false);
+		string name = session->plugin_manager->SelectFavoriteName(win, synth, false);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->ApplyFavorite(synth, name);
+		session->plugin_manager->ApplyFavorite(synth, name);
 		track->editSynthesizer(old_param);
 		old_param = synth->configToString();
 	}
 	void onSave()
 	{
-		string name = tsunami->plugin_manager->SelectFavoriteName(win, synth, true);
+		string name = session->plugin_manager->SelectFavoriteName(win, synth, true);
 		if (name.num == 0)
 			return;
-		tsunami->plugin_manager->SaveFavorite(synth, name);
+		session->plugin_manager->SaveFavorite(synth, name);
 	}
 	void onSynthChange()
 	{
@@ -78,16 +78,16 @@ public:
 			p->update();
 		old_param = synth->configToString();
 	}
+	Session *session;
 	Track *track;
 	Synthesizer *synth;
 	ConfigPanel *p;
 	string old_param;
 };
 
-SynthConsole::SynthConsole(AudioView *_view) :
-	SideBarConsole(_("Synthesizer"))
+SynthConsole::SynthConsole(Session *session) :
+	SideBarConsole(_("Synthesizer"), session)
 {
-	view = _view;
 	id_inner = "grid";
 
 	fromResource("synth_console");
@@ -118,7 +118,7 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	Synthesizer *s = tsunami->plugin_manager->ChooseSynthesizer(win, track->song, track->synth->name);
+	Synthesizer *s = session->plugin_manager->ChooseSynthesizer(win, session, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }
@@ -165,7 +165,7 @@ void SynthConsole::setTrack(Track *t)
 
 	if (track->synth){
 		track->synth->subscribe(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);
-		panel = new SynthPanel(track);
+		panel = new SynthPanel(session, track);
 		embed(panel, id_inner, 0, 0);
 		addSeparator("!horizontal", 0, 1, "separator_0");
 	}

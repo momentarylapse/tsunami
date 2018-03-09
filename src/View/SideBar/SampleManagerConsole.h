@@ -16,12 +16,12 @@ class OutputStream;
 class BufferStreamer;
 class SampleManagerItem;
 class Progress;
-class AudioView;
+class Session;
 
 class SampleManagerConsole : public SideBarConsole
 {
 public:
-	SampleManagerConsole(Song *a, AudioView *v);
+	SampleManagerConsole(Session *session);
 	virtual ~SampleManagerConsole();
 
 	void updateList();
@@ -45,8 +45,6 @@ public:
 
 	void endPreview();
 
-	Song *song;
-	AudioView *view;
 	Array<SampleManagerItem*> items;
 	Array<SampleManagerItem*> old_items;
 	void add(SampleManagerItem *item);
@@ -62,7 +60,7 @@ public:
 
 	Progress *progress;
 
-	static Sample *_cdecl select(hui::Panel *root, Sample *old);
+	static Sample *_cdecl select(Session *session, hui::Panel *parent, Sample *old);
 };
 
 #endif /* SAMPLEMANAGERCONSOLE_H_ */

@@ -6,15 +6,14 @@
  */
 
 #include "SongPlugin.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
+#include "../Session.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 
 SongPlugin::SongPlugin()
 {
-	win = NULL;
-	view = NULL;
+	session = NULL;
+	song = NULL;
 }
 
 SongPlugin::~SongPlugin()
@@ -33,19 +32,19 @@ void SongPlugin::__delete__()
 
 
 
-SongPlugin *CreateSongPlugin(const string &name, TsunamiWindow *win)
+SongPlugin *CreateSongPlugin(Session *session, const string &name)
 {
-	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_SONG_PLUGIN, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_SONG_PLUGIN, name);
 	SongPlugin *sp = NULL;
 	if (p->usable)
-		sp = (SongPlugin*)p->createInstance("SongPlugin");
+		sp = (SongPlugin*)p->createInstance(session, "SongPlugin");
 
 	// dummy?
 	if (!sp)
 		sp = new SongPlugin;
 
-	sp->win = dynamic_cast<hui::Window*>(win);
-	sp->view = win->view;
+	sp->session = session;
+	sp->song = session->song;
 	/*sp->name = name;
 	sp->plugin = p;
 	sp->usable = p->usable;

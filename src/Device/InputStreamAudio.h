@@ -18,7 +18,7 @@
 
 class PluginManager;
 class Device;
-class TsunamiWindow;
+class Session;
 
 #ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
@@ -28,10 +28,10 @@ class InputStreamAudio : public PeakMeterSource
 {
 	friend class PluginManager;
 public:
-	InputStreamAudio(int sample_rate);
+	InputStreamAudio(Session *session, int sample_rate);
 	virtual ~InputStreamAudio();
 
-	void _cdecl __init__(int sample_rate);
+	void _cdecl __init__(Session *session, int sample_rate);
 	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CAPTURE;
@@ -76,10 +76,10 @@ public:
 	};
 	Source *source;
 
-	void _cdecl setBackupMode(int mode, TsunamiWindow *win);
+	void _cdecl setBackupMode(int mode);
 	int backup_mode;
 	File *backup_file;
-	TsunamiWindow *win;
+	Session *session;
 
 	void _cdecl setChunkSize(int size);
 	void _cdecl setUpdateDt(float dt);
@@ -104,7 +104,7 @@ private:
 	pa_stream *_stream;
 #endif
 
-	static bool testError(const string &msg);
+	bool testError(const string &msg);
 
 	struct SyncData
 	{

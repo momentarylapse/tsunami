@@ -15,11 +15,12 @@
 
 class ActionManager;
 class Action;
+class Session;
 
 class Data : public Observable<VirtualBase>
 {
 public:
-	Data();
+	Data(Session *session);
 	virtual ~Data();
 
 	static const string MESSAGE_FINISHED_LOADING;
@@ -31,6 +32,7 @@ public:
 	void _cdecl undo();
 	void _cdecl redo();
 
+	Session *session;
 	string filename;
 	int file_time;
 	bool binary_file_format;

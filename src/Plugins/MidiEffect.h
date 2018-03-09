@@ -18,6 +18,7 @@ class Track;
 class AudioBuffer;
 class MidiNoteBuffer;
 class SongSelection;
+class Song;
 
 namespace Script{
 class Script;
@@ -28,7 +29,6 @@ class MidiEffect : public Configurable
 {
 public:
 	MidiEffect();
-	MidiEffect(Plugin *p);
 	virtual ~MidiEffect();
 
 	void _cdecl __init__();
@@ -58,6 +58,6 @@ public:
 	MidiNoteBuffer *bh_midi;
 };
 
-MidiEffect *_cdecl CreateMidiEffect(const string &name, Song *song);
+MidiEffect *_cdecl CreateMidiEffect(Session *session, const string &name);
 
 #endif /* MIDIEFFECT_H_ */

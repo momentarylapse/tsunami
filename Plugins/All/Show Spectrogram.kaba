@@ -44,7 +44,7 @@ class SpecGrid extends Grid
 class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(ShowSpectrogram* plugin, Song* song)
-		super.__init__("Spectrum", 600, 460, plugin.win, true)
+		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		fromSource("
 Grid ? ''
 	DrawingArea drawing_area ''
@@ -53,7 +53,7 @@ Grid ? ''
 		Text ? ''
 		Button close 'Close' width=120 image=hui:close")
 		
-		AudioView* view = plugin.view
+		AudioView* view = plugin.session.view
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range.offset / i2f(song.sample_rate), view.sel.range.end() / i2f(song.sample_rate), false, "s")
@@ -82,7 +82,7 @@ class ShowSpectrogram extends SongPlugin
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)
-		renderer.render(view.sel.range, buf)
+		renderer.render(session.view.sel.range, buf)
 		delete renderer
 	
 		complex[] f
@@ -131,9 +131,9 @@ class ShowSpectrogram extends SongPlugin
 		dlg.run()
 		delete dlg
 
-	override void apply(Song *song)
+	override void apply()
 	
-		if view.sel.range.length > 0
+		if session.view.sel.range.length > 0
 			show_spec(song)
 		else
-			logging.error("'Show Spectrogram.kaba': Needs some selection!")
+			session.e("'Show Spectrogram.kaba': Needs some selection!")

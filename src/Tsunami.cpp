@@ -101,7 +101,8 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		session->i("--execute <PLUGIN_NAME> [ARGUMENTS]");
 		return true;
 	}else if (args[1] == "--info"){
-		Song* song = session->song;//new Song(session);
+		Song* song = new Song(session);
+		session->song = song;
 		if (args.num < 3){
 			session->e(_("call: tsunami --info <File>"));
 		}else if (session->storage->load(song, args[2])){
@@ -116,16 +117,17 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 			for (Tag &t: song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
-		//delete(song);
+		delete(song);
 		return true;
 	}else if (args[1] == "--export"){
-		Song* song = session->song;//new Song;
+		Song* song = new Song(session);
+		session->song = song;
 		if (args.num < 4){
 			session->e(_("call: tsunami --export <File> <Exportfile>"));
 		}else if (session->storage->load(song, args[2])){
 			session->storage->save(song, args[3]);
 		}
-		//delete(song);
+		delete(song);
 		return true;
 	/*}else if (args[1] == "--execute"){
 		if (args.num < 3){

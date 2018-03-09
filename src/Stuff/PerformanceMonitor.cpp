@@ -75,12 +75,15 @@ int PerformanceMonitor::create_channel(const string &name)
 			c.used = true;
 			c.name = name;
 			c.t_busy = c.t_idle = c.t_last = 0;
+			c.cpu_usage = 0;
 			c.state = -1;
 			return i;
 		}
 	Channel c;
+	c.n = 0;
 	c.name = name;
 	c.t_busy = c.t_idle = c.t_last = 0;
+	c.cpu_usage = 0;
 	c.state = -1;
 	c.used = true;
 	channels.add(c);

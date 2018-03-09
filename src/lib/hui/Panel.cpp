@@ -432,10 +432,12 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 	panel->set_win(win);
 	children.add(panel);
 
+	Panel* orig = panel->root_control->panel;
+
 	setTarget(parent_id);
 	_insert_control_(panel->root_control, x, y);
 	controls.pop(); // dont' really add to us
-	panel->root_control->panel = panel;
+	panel->root_control->panel = orig;//panel;
 }
 
 void Panel::set_win(Window *_win)

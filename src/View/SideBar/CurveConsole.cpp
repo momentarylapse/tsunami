@@ -37,6 +37,7 @@ public:
 		event("hui:close", std::bind(&CurveTargetDialog::destroy, this));
 		event("cancel", std::bind(&CurveTargetDialog::destroy, this));
 		event("ok", std::bind(&CurveTargetDialog::onOk, this));
+		event("list", std::bind(&CurveTargetDialog::onOk, this));
 	}
 
 	Array<Curve::Target> all_targets;

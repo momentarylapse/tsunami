@@ -464,11 +464,11 @@ Selection ViewModeDefault::getHoverBasic()
 			s.type = Selection::TYPE_TRACK_BUTTON_FX;
 			return s;
 		}
-		x += 17;
+		/*x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::TYPE_TRACK_BUTTON_CURVE;
 			return s;
-		}
+		}*/
 	}
 
 	return s;

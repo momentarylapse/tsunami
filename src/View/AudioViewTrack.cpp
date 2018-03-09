@@ -913,10 +913,10 @@ void AudioViewTrack::drawHeader(Painter *c)
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...
 
-		c->setColor(col_but);
+		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_CURVE))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ...
+		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
 }
 

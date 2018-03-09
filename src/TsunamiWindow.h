@@ -107,7 +107,6 @@ public:
 
 	void updateMenu();
 
-	void onPluginStopRequest(VirtualBase *o);
 	void onSideBarUpdate();
 	void onBottomBarUpdate();
 	void onUpdate();

@@ -10,6 +10,7 @@
 #include "Tsunami.h"
 #include "Stuff/Log.h"
 #include "Storage/Storage.h"
+#include "Plugins/TsunamiPlugin.h"
 #include "lib/hui/hui.h"
 
 int Session::next_id = 0;
@@ -57,3 +58,32 @@ void Session::e(const string &message)
 	log->error(this, message);
 }
 
+
+void Session::executeTsunamiPlugin(const string& name)
+{
+	for (TsunamiPlugin *p: plugins)
+		if (p->name == name){
+			if (p->active)
+				p->stop();
+			else
+				p->start();
+			return;
+		}
+
+	TsunamiPlugin *p = CreateTsunamiPlugin(this, name);
+
+	plugins.add(p);
+	p->subscribe3(this, std::bind(&Session::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
+	p->start();
+}
+
+
+void Session::onPluginStopRequest(VirtualBase *o)
+{
+	TsunamiPlugin *tpl = (TsunamiPlugin*)o;
+	tpl->stop();
+
+	if (die_on_plugin_stop)
+		//tsunami->end();//
+		hui::RunLater(0.01f, std::bind(&TsunamiWindow::destroy, win));
+}

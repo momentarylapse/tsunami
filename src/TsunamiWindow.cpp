@@ -197,7 +197,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		event(format("jump_to_layer_%d", i), std::bind(&TsunamiWindow::onCurLayer, this));
 
 
-	session->die_on_plugin_stop = false;
 	auto_delete = false;
 
 
@@ -230,6 +229,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 TsunamiWindow::~TsunamiWindow()
 {
+	// all done by onDestroy()
 }
 
 void TsunamiCleanUp()
@@ -537,20 +537,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	for (TsunamiPlugin *p: session->plugins)
-		if (p->name == name){
-			if (p->active)
-				p->stop();
-			else
-				p->start();
-			return;
-		}
-
-	TsunamiPlugin *p = CreateTsunamiPlugin(session, name);
-
-	session->plugins.add(p);
-	p->subscribe3(this, std::bind(&TsunamiWindow::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
-	p->start();
+	session->executeTsunamiPlugin(name);
 }
 
 void TsunamiWindow::onDelete()
@@ -775,15 +762,6 @@ void TsunamiWindow::updateMenu()
 	if (!song->action_manager->isSave())
 		title = "*" + title;
 	setTitle(title);
-}
-
-void TsunamiWindow::onPluginStopRequest(VirtualBase *o)
-{
-	TsunamiPlugin *tpl = (TsunamiPlugin*)o;
-	tpl->stop();
-
-	if (session->die_on_plugin_stop)
-		tsunami->end();//hui::RunLater(0.01f, this, &TsunamiWindow::destroy);
 }
 
 void TsunamiWindow::onSideBarUpdate()

@@ -33,9 +33,12 @@ public:
 	static void _init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang);
 
 	virtual bool onStartup(const Array<string> &arg) = 0;
+	virtual void onEnd(){}
+
+	void end();
 
 	static int run();
-	static void end();
+	static void hard_end();
 	static void doSingleMainLoop();
 
 

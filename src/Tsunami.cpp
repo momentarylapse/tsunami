@@ -20,7 +20,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.3.0";
+const string AppVersion = "0.7.3.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -47,6 +47,14 @@ Tsunami::~Tsunami()
 	delete(plugin_manager);
 	delete(clipboard);
 	delete(log);
+}
+
+void Tsunami::onEnd()
+{
+	while (sessions.num > 0){
+		Session *s = sessions.pop();
+		delete s;
+	}
 }
 
 bool Tsunami::onStartup(const Array<string> &arg)
@@ -77,13 +85,13 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 
 	// create a window and load file
-	//if (!win){
+	if (sessions.num == 0){
 		Session *session = createSession();
 		session->win->show();
 
 		if (arg.num >= 2)
 			session->storage->load(session->song, arg[1]);
-	//}
+	}
 	return true;
 }
 
@@ -129,20 +137,16 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		}
 		delete(song);
 		return true;
-	/*}else if (args[1] == "--execute"){
+	}else if (args[1] == "--execute"){
 		if (args.num < 3){
-			log->error(_("call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]"));
+			session->e(_("call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]"));
 			return true;
 		}
-		createWindow();
-		win->hide();
-		win->die_on_plugin_stop = true;
-		TsunamiPlugin *p = CreateTsunamiPlugin(args[2], win);
-		p->args = args.sub(3, -1);
-		win->plugins.add(p);
-		p->subscribe3(win, std::bind(&TsunamiWindow::onPluginStopRequest, win, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
-		p->start();
-		return false;*/
+		session = createSession();
+		session->win->hide();
+		session->die_on_plugin_stop = true;
+		session->executeTsunamiPlugin(args[2]);
+		return false;
 	}else if (args[1].head(2) == "--"){
 		session->e(_("unknown command: ") + args[1]);
 		return true;

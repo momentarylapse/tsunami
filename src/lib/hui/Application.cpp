@@ -162,8 +162,18 @@ int Application::run()
 	return 0;
 }
 
-// ends the system loop of the run() command
+// FIXME: when closing the last window, hard_end() gets called... ignoring onEnd()!!!
 void Application::end()
+{
+	SetIdleFunction(NULL);
+
+	onEnd();
+
+	hard_end();
+}
+
+// ends the system loop of the run() command
+void Application::hard_end()
 {
 	SetIdleFunction(NULL);
 

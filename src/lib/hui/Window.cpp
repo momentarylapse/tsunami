@@ -123,7 +123,7 @@ void Window::onCloseRequest()
 	// no message function (and last window): end program
 	if (_all_windows_.num > 0)
 		return;
-	Application::end();
+	Application::hard_end();
 }
 
 

@@ -23,11 +23,11 @@ namespace hui{
 }
 
 // representing one instance/window
-class Session
+class Session : public VirtualBase
 {
 public:
 	Session();
-	~Session();
+	virtual ~Session();
 
 	static int next_id;
 
@@ -42,6 +42,10 @@ public:
 
 	Array<TsunamiPlugin*> plugins;
 	bool die_on_plugin_stop;
+
+
+	void executeTsunamiPlugin(const string &name);
+	void onPluginStopRequest(VirtualBase *o);
 
 
 	// global

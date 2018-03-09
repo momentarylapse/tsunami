@@ -33,6 +33,7 @@ public:
 	virtual ~Tsunami();
 
 	virtual bool onStartup(const Array<string> &arg);
+	virtual void onEnd();
 
 	bool handleCLIArguments(const Array<string> &arg);
 	void loadKeyCodes();

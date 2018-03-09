@@ -526,7 +526,7 @@ void TextFile::read_comment()
 // read a word (2 bytes in binary mode)
 unsigned int File::read_word()
 {
-	unsigned int i;
+	unsigned int i = 0;
 	read_buffer(&i, 2);
 	return i;
 }

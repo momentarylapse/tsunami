@@ -10,11 +10,14 @@
 
 #define ALLOW_PERF_MON	1
 
+static const float UPDATE_DT = 5.0f;
+static PerformanceMonitor *perf_mon = NULL;
+
 #if ALLOW_PERF_MON
 struct Channel
 {
 	string name;
-	float cpu_usage;
+	Array<float> cpu_usage;
 	float t_busy, t_idle, t_last;
 	int n;
 	bool used;
@@ -28,7 +31,7 @@ struct Channel
 	}
 	void update()
 	{
-		cpu_usage = t_busy / (t_busy + t_idle);
+		cpu_usage.add(t_busy / (t_busy + t_idle));
 	}
 };
 static Array<Channel> channels;
@@ -49,22 +52,28 @@ static void pm_show()
 	for (auto c: channels)
 		if (c.used){
 			float avg = 0;
-			c.cpu_usage = 0;
 			if ((c.t_busy > 0) and (c.n > 0)){
-				c.cpu_usage = c.t_busy / (c.t_busy + c.t_idle);
+				c.cpu_usage.add(c.t_busy / (c.t_busy + c.t_idle));
 				avg = c.t_busy / c.n;
+			}else{
+				c.cpu_usage.add(0);
 			}
-			printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage * 100.0f, avg * 1000.0f);
+			printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage.back() * 100.0f, avg * 1000.0f);
 		}
 	pm_reset();
 }
 #endif
 
-void PerformanceMonitor::init()
+PerformanceMonitor::PerformanceMonitor()
 {
+	perf_mon = this;
 #if ALLOW_PERF_MON
 	pm_reset();
 #endif
+}
+
+PerformanceMonitor::~PerformanceMonitor()
+{
 }
 
 int PerformanceMonitor::create_channel(const string &name)
@@ -75,7 +84,7 @@ int PerformanceMonitor::create_channel(const string &name)
 			c.used = true;
 			c.name = name;
 			c.t_busy = c.t_idle = c.t_last = 0;
-			c.cpu_usage = 0;
+			c.cpu_usage.clear();
 			c.state = -1;
 			return i;
 		}
@@ -83,7 +92,7 @@ int PerformanceMonitor::create_channel(const string &name)
 	c.n = 0;
 	c.name = name;
 	c.t_busy = c.t_idle = c.t_last = 0;
-	c.cpu_usage = 0;
+	c.cpu_usage.clear();
 	c.state = -1;
 	c.used = true;
 	channels.add(c);
@@ -115,6 +124,11 @@ void PerformanceMonitor::start_busy(int channel)
 #endif
 }
 
+void pm_notify()
+{
+	perf_mon->notify();
+}
+
 void PerformanceMonitor::end_busy(int channel)
 {
 #if ALLOW_PERF_MON
@@ -126,7 +140,22 @@ void PerformanceMonitor::end_busy(int channel)
 	c.n ++;
 	//c.t_last = t;
 	c.state = 0;
-	if (c.t_busy + c.t_idle > 5)
+	if (c.t_busy + c.t_idle > UPDATE_DT){
 		pm_show();
+		//hui::RunLater(0.01f, std::bind(&PerformanceMonitor::notify, perf_mon, &PerformanceMonitor::MESSAGE_CHANGE));
+		hui::RunLater(0.01f, &pm_notify);
+	}
 #endif
+}
+
+Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
+{
+	Array<PerformanceMonitor::ChannelInfo> infos;
+	for (auto &c: channels)
+		if (c.used){
+			ChannelInfo i;
+			i.name = c.name;
+			i.cpu = c.cpu_usage;
+		}
+	return infos;
 }

@@ -25,6 +25,7 @@ class Storage;
 class Clipboard;
 class TsunamiWindow;
 class Session;
+class PerformanceMonitor;
 
 class Tsunami : public hui::Application
 {
@@ -46,9 +47,9 @@ public:
 	Log *log;
 
 	DeviceManager *device_manager;
-
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;
+	PerformanceMonitor *perf_mon;
 };
 
 

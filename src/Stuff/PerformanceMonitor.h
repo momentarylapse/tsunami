@@ -9,11 +9,20 @@
 #define SRC_STUFF_PERFORMANCEMONITOR_H_
 
 #include "../lib/base/base.h"
+#include "Observable.h"
 
-class PerformanceMonitor
+class PerformanceMonitor : public Observable<VirtualBase>
 {
 public:
-	static void init();
+	PerformanceMonitor();
+	virtual ~PerformanceMonitor();
+
+	struct ChannelInfo{
+		string name;
+		Array<float> cpu;
+	};
+	Array<ChannelInfo> get_info();
+
 	static int create_channel(const string &name);
 	static void delete_channel(int channel);
 	static void start_busy(int channel);

@@ -20,7 +20,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.3.2";
+const string AppVersion = "0.7.3.3";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -32,6 +32,7 @@ Tsunami::Tsunami() :
 	log = NULL;
 	clipboard = NULL;
 	plugin_manager = NULL;
+	perf_mon = NULL;
 
 	setProperty("name", AppName);
 	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
@@ -47,6 +48,7 @@ Tsunami::~Tsunami()
 	delete(plugin_manager);
 	delete(clipboard);
 	delete(log);
+	delete(perf_mon);
 }
 
 void Tsunami::onEnd()
@@ -61,7 +63,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 {
 	tsunami = this;
 
-	PerformanceMonitor::init();
+	perf_mon = new PerformanceMonitor;
 
 	log = new Log;
 

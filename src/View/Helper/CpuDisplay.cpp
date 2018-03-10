@@ -43,6 +43,17 @@ color type_color(int t)
 	return Black;
 }
 
+string type_name(int t)
+{
+	if (t == CpuDisplay::TYPE_VIEW)
+		return "view";
+	if (t == CpuDisplay::TYPE_OUT)
+		return "out";
+	if (t == CpuDisplay::TYPE_SUCK)
+		return "suck";
+	return "?";
+}
+
 void CpuDisplay::onDraw(Painter* p)
 {
 	int w = p->width;
@@ -63,28 +74,30 @@ void CpuDisplay::onDraw(Painter* p)
 		}
 		if (cpu[t].num > 0){
 			p->setFontSize(8);
-			p->drawStr(20 + t * 30, h / 2-5, format("%.0f%%", cpu[t].back() * 100));
+			p->drawStr(20 + t * 30, h / 2-10, format("%.0f%%", cpu[t].back() * 100));
+			p->drawStr(20 + t * 30, h / 2, format("%.0fms", avg[t].back() * 1000));
 		}
 	}
 }
 
 void CpuDisplay::onUpdate()
 {
-	float c[NUM_TYPES];
+	float c[NUM_TYPES], a[NUM_TYPES];
 	for (int t=0; t<NUM_TYPES; t++)
-		c[t] = 0;
+		c[t] = a[t] = 0;
 
 	auto infos = perf_mon->get_info();
-	for (auto &i: infos){
-		if (i.name == "view")
-			c[TYPE_VIEW] += i.cpu.back();
-		else if (i.name == "out")
-			c[TYPE_OUT] += i.cpu.back();
-		else if (i.name == "suck")
-			c[TYPE_SUCK] += i.cpu.back();
-	}
-	for (int t=0; t<NUM_TYPES; t++)
+	for (auto &i: infos)
+		for (int t=0; t<NUM_TYPES; t++)
+			if (i.name == type_name(t)){
+				c[t] += i.cpu;
+				a[t] += i.avg;
+			}
+
+	for (int t=0; t<NUM_TYPES; t++){
 		cpu[t].add(c[t]);
+		avg[t].add(a[t]);
+	}
 
 	panel->redraw(id);
 }

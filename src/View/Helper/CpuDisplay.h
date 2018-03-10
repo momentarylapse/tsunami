@@ -41,6 +41,7 @@ public:
 	};
 
 	Array<float> cpu[NUM_TYPES];
+	Array<float> avg[NUM_TYPES];
 };
 
 #endif /* SRC_VIEW_HELPER_CPUDISPLAY_H_ */

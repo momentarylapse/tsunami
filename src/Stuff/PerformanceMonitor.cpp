@@ -17,13 +17,21 @@ static PerformanceMonitor *perf_mon = NULL;
 struct Channel
 {
 	string name;
-	Array<float> cpu_usage;
 	float t_busy, t_idle, t_last;
 	int n;
 	bool used;
 	hui::Timer timer;
 	int state;
-	void reset()
+	float _cpu, _avg;
+	void init(const string &_name)
+	{
+		name = _name;
+		used = true;
+		reset_state();
+		_cpu = 0;
+		_avg = 0;
+	}
+	void reset_state()
 	{
 		t_busy = t_idle = t_last = 0;
 		state = -1;
@@ -31,36 +39,28 @@ struct Channel
 	}
 	void update()
 	{
-		cpu_usage.add(t_busy / (t_busy + t_idle));
+		_cpu = t_busy / (t_busy + t_idle);
+		_avg = 0;
+		if ((t_busy > 0) and (n > 0))
+			_avg = t_busy / n;
+		reset_state();
 	}
 };
 static Array<Channel> channels;
 
-static void pm_reset()
-{
-	//timer.get();
-	for (auto &c: channels){
-		c.t_busy = c.t_idle = c.t_last = 0;
-		c.n = 0;
-		c.state = -1;
-	}
-}
-
 static void pm_update()
 {
-	//printf("----- cpu usage -----\n");
 	for (auto &c: channels)
-		if (c.used){
-			float avg = 0;
-			if ((c.t_busy > 0) and (c.n > 0)){
-				c.cpu_usage.add(c.t_busy / (c.t_busy + c.t_idle));
-				avg = c.t_busy / c.n;
-			}else{
-				c.cpu_usage.add(0);
-			}
-	//		printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage.back() * 100.0f, avg * 1000.0f);
-		}
-	pm_reset();
+		if (c.used)
+			c.update();
+}
+
+static void pm_show()
+{
+	printf("----- cpu usage -----\n");
+	for (auto &c: channels)
+		if (c.used)
+			printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c._cpu * 100.0f, c._avg * 1000.0f);
 }
 #endif
 
@@ -68,7 +68,6 @@ PerformanceMonitor::PerformanceMonitor()
 {
 	perf_mon = this;
 #if ALLOW_PERF_MON
-	pm_reset();
 #endif
 }
 
@@ -81,18 +80,11 @@ int PerformanceMonitor::create_channel(const string &name)
 #if ALLOW_PERF_MON
 	foreachi(Channel &c, channels, i)
 		if (!c.used){
-			c.used = true;
-			c.name = name;
-			c.t_busy = c.t_idle = c.t_last = 0;
-			c.state = -1;
+			c.init(name);
 			return i;
 		}
 	Channel c;
-	c.n = 0;
-	c.name = name;
-	c.t_busy = c.t_idle = c.t_last = 0;
-	c.state = -1;
-	c.used = true;
+	c.init(name);
 	channels.add(c);
 	return channels.num - 1;
 #else
@@ -104,7 +96,6 @@ void PerformanceMonitor::delete_channel(int channel)
 {
 #if ALLOW_PERF_MON
 	channels[channel].used = false;
-	channels[channel].cpu_usage.clear();
 #endif
 }
 
@@ -141,6 +132,7 @@ void PerformanceMonitor::end_busy(int channel)
 	c.state = 0;
 	if (c.t_busy + c.t_idle > UPDATE_DT){
 		pm_update();
+		//pm_show();
 		//hui::RunLater(0.01f, std::bind(&PerformanceMonitor::notify, perf_mon, &PerformanceMonitor::MESSAGE_CHANGE));
 		hui::RunLater(0.01f, &pm_notify);
 	}
@@ -154,7 +146,8 @@ Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
 		if (c.used){
 			ChannelInfo i;
 			i.name = c.name;
-			i.cpu = c.cpu_usage;
+			i.cpu = c._cpu;
+			i.avg = c._avg;
 			infos.add(i);
 		}
 	return infos;

@@ -52,7 +52,7 @@ PeakMeter::PeakMeter(hui::Panel *_panel, const string &_id, PeakMeterSource *_so
 	id = _id;
 	source = NULL;
 	view = _view;
-	mode = ModePeaks;
+	mode = MODE_PEAKS;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	buf = new AudioBuffer;
 	enabled = false;
@@ -141,7 +141,7 @@ void PeakMeter::onDraw(Painter *c)
 {
 	int w = c->width;
 	int h = c->height;
-	if (mode == ModePeaks){
+	if (mode == MODE_PEAKS){
 
 		drawPeak(c, rect(2, w-2, 2, h/2-1), r);
 		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), l);
@@ -176,7 +176,7 @@ inline float PeakMeter::i_to_freq(int i)
 
 void PeakMeter::onLeftButtonDown()
 {
-	setMode((mode == ModePeaks) ? ModeSpectrum : ModePeaks);
+	setMode((mode == MODE_PEAKS) ? MODE_SPECTRUM : MODE_PEAKS);
 }
 
 void PeakMeter::onRightButtonDown()
@@ -227,9 +227,9 @@ void PeakMeter::onUpdate()
 			return;
 		sample_rate = source->getSampleRate();
 		source->getSomeSamples(*buf, NUM_SAMPLES);
-		if (mode == ModePeaks)
+		if (mode == MODE_PEAKS)
 			findPeaks();
-		else if (mode == ModeSpectrum)
+		else if (mode == MODE_SPECTRUM)
 			findSpectrum();
 		timer->get();
 	}else if (state == source->STATE_STOPPED){

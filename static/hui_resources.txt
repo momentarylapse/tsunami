@@ -1670,7 +1670,7 @@ Grid
 expandx,border=8
 0
 1
-3
+4
 Button
 show_bottom_bar
 flat,image=hui:up
@@ -1687,6 +1687,12 @@ Slider
 volume
 width=100,noexpandx,noexpandy
 2
+0
+0
+DrawingArea
+cpu
+width=100,noexpandx,noexpandy
+3
 0
 0
 // Resource

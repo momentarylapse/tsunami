@@ -27,6 +27,7 @@ Session::Session()
 	log = tsunami->log;
 	device_manager = tsunami->device_manager;
 	plugin_manager = tsunami->plugin_manager;
+	perf_mon = tsunami->perf_mon;
 
 	id = next_id ++;
 	die_on_plugin_stop = false;

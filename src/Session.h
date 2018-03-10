@@ -18,6 +18,7 @@ class AudioView;
 class TsunamiPlugin;
 class DeviceManager;
 class PluginManager;
+class PerformanceMonitor;
 namespace hui{
 	class Window;
 }
@@ -52,6 +53,7 @@ public:
 	Log *log;
 	DeviceManager *device_manager;
 	PluginManager *plugin_manager;
+	PerformanceMonitor *perf_mon;
 
 
 	// logging

@@ -10,7 +10,7 @@
 
 #define ALLOW_PERF_MON	1
 
-static const float UPDATE_DT = 5.0f;
+static const float UPDATE_DT = 1.0f;
 static PerformanceMonitor *perf_mon = NULL;
 
 #if ALLOW_PERF_MON
@@ -46,10 +46,10 @@ static void pm_reset()
 	}
 }
 
-static void pm_show()
+static void pm_update()
 {
-	printf("----- cpu usage -----\n");
-	for (auto c: channels)
+	//printf("----- cpu usage -----\n");
+	for (auto &c: channels)
 		if (c.used){
 			float avg = 0;
 			if ((c.t_busy > 0) and (c.n > 0)){
@@ -58,7 +58,7 @@ static void pm_show()
 			}else{
 				c.cpu_usage.add(0);
 			}
-			printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage.back() * 100.0f, avg * 1000.0f);
+	//		printf("[%s]: %.1f%%  %.1fms\n", c.name.c_str(), c.cpu_usage.back() * 100.0f, avg * 1000.0f);
 		}
 	pm_reset();
 }
@@ -84,7 +84,6 @@ int PerformanceMonitor::create_channel(const string &name)
 			c.used = true;
 			c.name = name;
 			c.t_busy = c.t_idle = c.t_last = 0;
-			c.cpu_usage.clear();
 			c.state = -1;
 			return i;
 		}
@@ -92,7 +91,6 @@ int PerformanceMonitor::create_channel(const string &name)
 	c.n = 0;
 	c.name = name;
 	c.t_busy = c.t_idle = c.t_last = 0;
-	c.cpu_usage.clear();
 	c.state = -1;
 	c.used = true;
 	channels.add(c);
@@ -106,6 +104,7 @@ void PerformanceMonitor::delete_channel(int channel)
 {
 #if ALLOW_PERF_MON
 	channels[channel].used = false;
+	channels[channel].cpu_usage.clear();
 #endif
 }
 
@@ -141,7 +140,7 @@ void PerformanceMonitor::end_busy(int channel)
 	//c.t_last = t;
 	c.state = 0;
 	if (c.t_busy + c.t_idle > UPDATE_DT){
-		pm_show();
+		pm_update();
 		//hui::RunLater(0.01f, std::bind(&PerformanceMonitor::notify, perf_mon, &PerformanceMonitor::MESSAGE_CHANGE));
 		hui::RunLater(0.01f, &pm_notify);
 	}
@@ -156,6 +155,7 @@ Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
 			ChannelInfo i;
 			i.name = c.name;
 			i.cpu = c.cpu_usage;
+			infos.add(i);
 		}
 	return infos;
 }

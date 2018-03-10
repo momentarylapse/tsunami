@@ -11,15 +11,17 @@
 #include "../../lib/hui/hui.h"
 
 class PeakMeter;
+class CpuDisplay;
 class OutputStream;
 class DeviceManager;
 class BottomBar;
 class AudioView;
+class Session;
 
 class MiniBar : public hui::Panel
 {
 public:
-	MiniBar(BottomBar *bottom_bar, DeviceManager *dev_manager, AudioView *view);
+	MiniBar(BottomBar *bottom_bar, Session *session);
 	virtual ~MiniBar();
 
 	void onShowBottomBar();
@@ -34,8 +36,10 @@ public:
 	void onViewOutputChange();
 
 	//OutputStream *stream;
+	Session *session;
 	DeviceManager *dev_manager;
 	PeakMeter *peak_meter;
+	CpuDisplay *cpu_display;
 	BottomBar *bottom_bar;
 	AudioView *view;
 };

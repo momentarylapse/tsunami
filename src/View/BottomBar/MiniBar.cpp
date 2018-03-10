@@ -7,21 +7,26 @@
 
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
+#include "../Helper/CpuDisplay.h"
 #include "../../Device/OutputStream.h"
 #include "../../Device/DeviceManager.h"
+#include "../../Session.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, DeviceManager *_dev_manager, AudioView *_view)
+MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 {
-	view = _view;
-	dev_manager = _dev_manager;
+	session = _session;
+	view = session->view;
+	dev_manager = session->device_manager;
 	bottom_bar = _bottom_bar;
 
 	fromResource("mini_bar");
 
 	peak_meter = new PeakMeter(this, "peaks", view->stream, view);
 	setFloat("volume", dev_manager->getOutputVolume());
+
+	cpu_display = new CpuDisplay(this, "cpu", session);
 
 	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
 	event("volume", std::bind(&MiniBar::onVolume, this));
@@ -37,6 +42,7 @@ MiniBar::~MiniBar()
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
+	delete(cpu_display);
 }
 
 void MiniBar::onShowBottomBar()

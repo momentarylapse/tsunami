@@ -210,7 +210,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// bottom bar
 	bottom_bar = new BottomBar(session);
 	embed(bottom_bar, "main_table", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, app->device_manager, view);
+	mini_bar = new MiniBar(bottom_bar, session);
 	embed(mini_bar, "main_table", 0, 2);
 
 	view->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));

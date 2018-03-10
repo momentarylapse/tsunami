@@ -62,8 +62,8 @@ private:
 	int mode;
 
 	enum{
-		ModePeaks,
-		ModeSpectrum
+		MODE_PEAKS,
+		MODE_SPECTRUM
 	};
 
 	struct Data{

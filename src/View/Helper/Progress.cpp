@@ -9,6 +9,8 @@
 
 const string Progress::MESSAGE_CANCEL = "Cancel";
 
+const float PROGRESS_DT = 0.05f;
+
 Progress::Progress(const string &str, hui::Window *parent)
 {
 	dlg = NULL;
@@ -39,8 +41,11 @@ Progress::~Progress()
 void Progress::set(const string &str, float progress)
 {
 	if (dlg){
+		if (timer.peek() < PROGRESS_DT)
+			return;
 		dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", progress);
+		timer.reset();
 		hui::Application::doSingleMainLoop();
 	}
 }
@@ -49,7 +54,10 @@ void Progress::set(const string &str, float progress)
 void Progress::set(float progress)
 {
 	if (dlg){
+		if (timer.peek() < PROGRESS_DT)
+			return;
 		dlg->setFloat("progress_bar", progress);
+		timer.reset();
 		hui::Application::doSingleMainLoop();
 	}
 }

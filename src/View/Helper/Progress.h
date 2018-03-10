@@ -27,6 +27,7 @@ public:
 protected:
 	Progress();
 	hui::Window *dlg;
+	hui::Timer timer;
 	bool cancelled;
 };
 

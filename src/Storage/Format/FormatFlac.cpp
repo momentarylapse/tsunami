@@ -31,12 +31,10 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 		flac_read_samples = 0;
 	StorageOperationData *od = (StorageOperationData*)client_data;
 
-	if (frame->header.number.sample_number % (1<<14) == 0){
-		if (flac_tells_samples)
-			od->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
-		else // estimate... via increasingly compressed size
-			od->set(( 1 - exp(- (float)(flac_read_samples * flac_channels * (flac_bits / 8)) / (float)flac_file_size ) ));
-	}
+	if (flac_tells_samples)
+		od->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
+	else // estimate... via increasingly compressed size
+		od->set(( 1 - exp(- (float)(flac_read_samples * flac_channels * (flac_bits / 8)) / (float)flac_file_size ) ));
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
@@ -146,17 +144,11 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 }
 
 
-
-#define FLAC_READSIZE 2048
-
 void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
 {
 	StorageOperationData *od = (StorageOperationData*)client_data;
-	if (samples_written % (FLAC_READSIZE * 64) == 0)
-		od->set((float)samples_written / (float)od->get_num_samples());
+	od->set((float)samples_written / (float)od->get_num_samples());
 }
-
-static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
@@ -215,10 +207,13 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 			throw Exception(string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 
+
+		FLAC__int32 *flac_pcm = new FLAC__int32[CHUNK_SAMPLES/*samples*/ * 2/*channels*/];
+
 		// read blocks of samples from WAVE file and feed to encoder
 		float scale = (float)(1 << (bits-1));
 		AudioBuffer buf;
-		buf.resize(FLAC_READSIZE);
+		buf.resize(CHUNK_SAMPLES);
 		int samples_read;
 		while ((samples_read = r->read(buf)) > 0){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
@@ -230,6 +225,8 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, samples_read))
 				throw Exception(string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 		}
+
+		delete[] flac_pcm;
 
 		if (!FLAC__stream_encoder_finish(encoder))
 			throw Exception(string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);

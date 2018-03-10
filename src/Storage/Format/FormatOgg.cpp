@@ -17,9 +17,6 @@
 #include <vorbis/vorbisenc.h>
 
 
-const int CHUNK_SIZE = 1 << 16;
-
-
 
 string tag_from_vorbis(const string &key)
 {

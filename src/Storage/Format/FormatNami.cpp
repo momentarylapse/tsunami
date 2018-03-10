@@ -18,7 +18,6 @@
 #include <math.h>
 #include "../../lib/xfile/chunked.h"
 
-const int CHUNK_SIZE = 1 << 16;
 
 
 static Session *_cur_session = NULL; // argh
@@ -215,7 +214,6 @@ void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p)
 }
 
 #else
-static FLAC__int32 flac_pcm[CHUNK_SIZE/*samples*/ * 2/*channels*/];
 
 FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
 {
@@ -263,10 +261,12 @@ string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 
 	// read blocks of samples from WAVE file and feed to encoder
 	if (ok){
+		FLAC__int32 *flac_pcm = new FLAC__int32 [CHUNK_SAMPLES/*samples*/ * 2/*channels*/];
+
 		int p0 = 0;
 		size_t left = (size_t)b.length;
 		while (ok and left){
-			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
+			size_t need = (left > CHUNK_SAMPLES ? (size_t)CHUNK_SAMPLES : (size_t)left);
 			{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 				for (unsigned int i=0;i<need;i++){
@@ -277,8 +277,10 @@ string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
 			}
 			left -= need;
-			p0 += CHUNK_SIZE;
+			p0 += CHUNK_SAMPLES;
 		}
+
+		delete[] flac_pcm;
 	}
 
 	ok &= FLAC__stream_encoder_finish(encoder);

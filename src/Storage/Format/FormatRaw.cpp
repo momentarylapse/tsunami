@@ -28,7 +28,6 @@ RawConfigData GetRawConfigData(hui::Window *win)
 void FormatRaw::saveViaRenderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
-	const int CHUNK_SIZE = 1<<15;
 	AudioSource *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
@@ -58,9 +57,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
 
-	const int WAVE_BUFFER_SIZE = 1 << 16;
-
-	char *data = new char[WAVE_BUFFER_SIZE];
+	char *data = new char[CHUNK_SIZE];
 	File *f = NULL;
 
 	try{
@@ -75,7 +72,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 
 		long long read = 0;
 		int nn = 0;
-		int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
+		int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 		while (read < size){
 			int toread = (int)min((long long)nice_buffer_size, size - read);
 			int r = f->read_buffer(data, toread);

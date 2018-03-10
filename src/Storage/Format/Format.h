@@ -16,6 +16,9 @@ class StorageOperationData;
 class AudioSource;
 class Format;
 
+const int CHUNK_SIZE = 1 << 18;
+const int CHUNK_SAMPLES = 1 << 16;
+
 class FormatDescriptor
 {
 public:

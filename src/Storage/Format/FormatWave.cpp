@@ -11,8 +11,6 @@
 #include "../../lib/math/math.h"
 
 
-const int WAVE_BUFFER_SIZE = 1 << 16;
-
 FormatDescriptorWave::FormatDescriptorWave() :
 	FormatDescriptor("Wave", "wav,wave", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
 {
@@ -21,8 +19,6 @@ FormatDescriptorWave::FormatDescriptorWave() :
 
 void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
-	const int CHUNK_SIZE = 1 << 15;
-
 	AudioSource *r = od->renderer;
 
 	SampleFormat format = SAMPLE_FORMAT_16;
@@ -104,7 +100,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 {
 	Track *t = od->track;
 
-	char *data = new char[WAVE_BUFFER_SIZE];
+	char *data = new char[CHUNK_SIZE];
 	File *f = NULL;
 
 	try{
@@ -168,7 +164,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 
 			int read = 0;
 			int nn = 0;
-			int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
+			int nice_buffer_size = CHUNK_SIZE - (CHUNK_SIZE % byte_per_sample);
 			while (read < chunk_size){
 				int toread = clampi(nice_buffer_size, 0, chunk_size - read);
 				int r = f->read_buffer(data, toread);

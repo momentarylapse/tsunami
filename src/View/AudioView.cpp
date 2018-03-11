@@ -636,6 +636,9 @@ void AudioView::onSongUpdate()
 	if (song->cur_message() == song->MESSAGE_NEW){
 		updateTracks();
 		sel.range = Range(0, 0);
+		sel.clear();
+		for (Track *t: song->tracks)
+			sel.add(t);
 		setCurTrack(NULL);
 		if (song->tracks.num > 0){
 			if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)

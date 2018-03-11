@@ -115,7 +115,9 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 	}else
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-	gtk_window_set_title(GTK_WINDOW(window), sys_str(title));
+	GetPartStrings(title);
+
+	gtk_window_set_title(GTK_WINDOW(window), sys_str(PartString[0]));
 	gtk_window_set_resizable(GTK_WINDOW(window), true);
 	if (parent){
 		// dialog -> center on screen or root (if given)    ->  done by gtk....later

@@ -28,6 +28,7 @@ protected:
 	Progress();
 	hui::Window *dlg;
 	hui::Timer timer;
+	float allow_next;
 	bool cancelled;
 };
 

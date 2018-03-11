@@ -45,7 +45,9 @@ void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _track
 	clear();
 	range = r;
 
-	for (const Track *t: _tracks){
+	for (const Track *t: s->tracks){
+		if (_tracks.find(t) < 0)
+			continue;
 		add(t);
 
 		// subs

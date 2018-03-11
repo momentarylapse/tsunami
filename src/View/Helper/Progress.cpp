@@ -14,13 +14,12 @@ const float PROGRESS_DT = 0.05f;
 Progress::Progress(const string &str, hui::Window *parent)
 {
 	dlg = NULL;
+	allow_next = 0;
 	if (parent){
 		dlg = hui::CreateResourceDialog("progress_dialog", parent);
-		dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", 0);
-		dlg->show();
 		dlg->event("hui:close", &hui::FuncIgnore);
-		hui::Application::doSingleMainLoop();
+		set(str, 0);
+		dlg->show();
 	}
 	cancelled = false;
 }
@@ -29,6 +28,7 @@ Progress::Progress()
 {
 	dlg = NULL;
 	cancelled = false;
+	allow_next = 0;
 }
 
 Progress::~Progress()
@@ -41,25 +41,31 @@ Progress::~Progress()
 void Progress::set(const string &str, float progress)
 {
 	if (dlg){
-		if (timer.peek() < PROGRESS_DT)
+		float t = timer.peek();
+		if (t < allow_next)
 			return;
-		dlg->setString("progress_bar", str);
+		if (str.num > 0)
+			dlg->setTitle(str);
+		if (t > 2){
+			int eta = (int)(t / progress * (1-progress) + 0.7f);
+			if (eta >= 60)
+				dlg->setString("progress_bar", format("%.1f%% (%dmin %ds)", progress * 100, eta/60, eta %60));
+			else
+				dlg->setString("progress_bar", format("%.1f%% (%ds)", progress * 100, eta));
+		}else{
+			dlg->setString("progress_bar", format("%.1f%%", progress * 100));
+		}
+		//dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", progress);
-		timer.reset();
 		hui::Application::doSingleMainLoop();
+		allow_next = t + PROGRESS_DT;
 	}
 }
 
 
 void Progress::set(float progress)
 {
-	if (dlg){
-		if (timer.peek() < PROGRESS_DT)
-			return;
-		dlg->setFloat("progress_bar", progress);
-		timer.reset();
-		hui::Application::doSingleMainLoop();
-	}
+	set("", progress);
 }
 
 void Progress::cancel()

@@ -71,17 +71,20 @@ Array<Bar> BarCollection::getBars(const Range &r)
 	Array<Bar> bars;
 
 	int pos0 = 0;
-	int bar_no = 0;
-	for (BarPattern &b: *this)
+	int index = 0;
+	int bar_no_text = 0;
+	for (BarPattern &b: *this){
 		if (b.type == b.TYPE_BAR){
 			Range rr = Range(pos0, b.length);
 			if (rr.overlaps(r))
-				bars.add(Bar(rr, b.num_beats, bar_no));
+				bars.add(Bar(rr, b.num_beats, index, bar_no_text));
 			pos0 += b.length;
-			bar_no ++;
+			bar_no_text ++;
 		}else if (b.type == b.TYPE_PAUSE){
 			pos0 += b.length;
 		}
+		index ++;
+	}
 	return bars;
 }
 

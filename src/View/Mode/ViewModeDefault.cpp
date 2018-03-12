@@ -15,6 +15,7 @@
 #include "math.h"
 #include "../../Audio/Source/SongRenderer.h"
 #include "../../Rhythm/Beat.h"
+#include "../../Rhythm/Bar.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
@@ -112,7 +113,18 @@ void ViewModeDefault::onLeftDoubleClick()
 
 void ViewModeDefault::onRightButtonDown()
 {
+	bool track_hover_sel = view->sel.has(hover->track);
+
 	selectUnderMouse();
+
+	// click outside sel.range -> select new position
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND)){
+		if (!view->sel.range.is_inside(hover->pos)){
+			setBarriers(*hover);
+			view->applyBarriers(hover->pos);
+			setCursorPos(hover->pos, track_hover_sel);
+		}
+	}
 
 	// pop up menu...
 	view->updateMenu();
@@ -286,6 +298,30 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	}
 }
 
+void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
+{
+	float y1 = t->area.y1;
+	float y2 = t->area.y2;
+
+	float lw = 3;
+
+	c->setLineWidth(lw*2);
+	c->setColor(view->colors.selection_internal);
+	c->setFill(false);
+
+	auto bars = view->song->bars.getBars(Range::ALL);
+	for (auto &b: bars){
+		if (view->sel.bars.is_inside(b.index)){
+			float x1 = view->cam.sample2screen(b.range.offset);
+			float x2 = view->cam.sample2screen(b.range.end());
+			c->drawRect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
+		}
+	}
+	c->setFill(true);
+	c->setLineWidth(1);
+
+}
+
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
@@ -303,6 +339,9 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	t->marker_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
+
+	if (t->track->type == Track::TYPE_TIME)
+		draw_bar_selection(c, t, view);
 }
 
 int ViewModeDefault::getTrackMoveTarget(bool visual)

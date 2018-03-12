@@ -15,10 +15,11 @@ class Bar
 {
 public:
 	Bar(){}
-	Bar(const Range &r, int num_beats, int index);
+	Bar(const Range &r, int num_beats, int index, int index_text);
 	Range range;
 	int num_beats;
-	int index;
+	int index; // index in the Bar[] array
+	int index_text; // index without pause "bars" (well, text = n+1...)
 	float bpm(float sample_rate);
 };
 

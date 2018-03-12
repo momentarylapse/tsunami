@@ -118,8 +118,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("add_bars", -1, "hui:add");
 	event("add_pause", std::bind(&TsunamiWindow::onAddPause, this));
 	setKeyCode("add_pause", -1, "hui:add");
-	event("delete_bars", std::bind(&TsunamiWindow::onDeleteBars, this));
-	setKeyCode("delete_bars", -1, "hui:delete");
+	event("delete_time", std::bind(&TsunamiWindow::onDeleteBars, this));
+	setKeyCode("delete_time", -1, "hui:delete");
 	event("edit_bars", std::bind(&TsunamiWindow::onEditBars, this));
 	setKeyCode("edit_bars", -1, "hui:edit");
 	event("scale_bars", std::bind(&TsunamiWindow::onScaleBars, this));

@@ -12,6 +12,7 @@ Tsunami.suo
 Tsunami.sdf
 Tsunami.opensdf
 Test/ringbuffer
+gui/TRANS
 *.nami
 *.wav
 *.ogg

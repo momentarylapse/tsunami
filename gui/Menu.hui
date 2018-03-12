@@ -23,7 +23,7 @@ Menu menu ""
 		Item /paste_as_samples "Paste as samples" image=hui:paste
 		Item /delete "Delete" image=hui:delete
 		Separator
-		Item /settings "Settings" image=hui:preferences
+		Item /settings "Settings..." image=hui:preferences
 	Menu menu_track "Track"
 		Item track_import "Import from file..." image=hui:open
 		Item track_render "Render from selection"
@@ -40,13 +40,16 @@ Menu menu ""
 		Menu menu_layer_target "Go to"
 		Item layer_up "Up" image=hui:up
 		Item layer_down "Down" image=hui:down
-	Menu menu_bars "Bars"
-		Item add_bars "Add bars" flat image=hui:add
-		Item add_pause "Add pause" image=hui:add
-		Item delete_bars "Delete" image=hui:delete
-		Item edit_bars "Edit" image=hui:edit
+	Menu menu_time "Time"
+		Item delete_time "Delete selected interval" image=hui:delete
+		Item insert_time "Insert silence..." image=hui:add
+		Separator
+		Item bars_label "Bars" disabled
+		Item add_bars "Add bars..." flat image=hui:add
+		Item add_pause "Add pause..." image=hui:add
+		Item edit_bars "Edit..." image=hui:edit
 		Item scale_bars "Scale" image=hui:zoom-in "tooltip=scale selected bars (by moving the selection on the left)"
-		Item bar_link_to_data "Edit data" checkable
+		Item bar_link_to_data "Apply changes to data" checkable
 	Menu menu_sub "Samples"
 		Item sample_manager "Manage..." image=hui:properties
 		Separator

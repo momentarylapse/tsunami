@@ -749,7 +749,7 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 		float dx_bar = view->cam.dsample2screen(b.range.length);
 		float dx_beat = dx_bar / b.num_beats;
 		float f1 = min(1.0f, dx_bar / 40.0f);
-		if ((b.index % 5) == 0)
+		if ((b.index_text % 5) == 0)
 			f1 = 1;
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
@@ -782,7 +782,7 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 		if (show_time){
 			if (f1 > 0.9f){
 				c->setColor(view->colors.text_soft1);
-				c->drawStr(xx + 2, area.y1, i2s(b.index + 1));
+				c->drawStr(xx + 2, area.y1, i2s(b.index_text + 1));
 			}
 			float bpm = b.bpm(view->song->sample_rate);
 			string s;

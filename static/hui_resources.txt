@@ -997,45 +997,63 @@ image=hui:down
 0
 0
 Menu
-menu_bars
+menu_time
 
 4
 0
-6
+9
+Item
+delete_time
+image=hui:delete
+0
+0
+0
+Item
+insert_time
+image=hui:add
+1
+0
+0
+Separator
+
+
+2
+0
+0
+Item
+bars_label
+disabled
+3
+0
+0
 Item
 add_bars
 flat,image=hui:add
-0
+4
 0
 0
 Item
 add_pause
 image=hui:add
-1
-0
-0
-Item
-delete_bars
-image=hui:delete
-2
+5
 0
 0
 Item
 edit_bars
 image=hui:edit
-3
+6
 0
 0
 Item
 scale_bars
 image=hui:zoom-in
-4
+7
 0
 0
 Item
 bar_link_to_data
 checkable
-5
+8
 0
 0
 Menu
@@ -3518,7 +3536,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-328
+330
 // Text
 /cancel
 Cancel
@@ -3608,7 +3626,7 @@ Save
 Save as...
 
 /settings
-Settings
+Settings...
 
 /stop
 Stop
@@ -3785,13 +3803,13 @@ menu/about
 About
 
 menu/add_bars
-Add bars
+Add bars...
 
 menu/add_midi_track
 Add midi track
 
 menu/add_pause
-Add pause
+Add pause...
 
 menu/add_time_track
 Add rhythm track
@@ -3800,13 +3818,16 @@ menu/add_track
 Add empty audio track
 
 menu/bar_link_to_data
-Edit data
+Apply changes to data
 
-menu/delete_bars
-Delete
+menu/bars_label
+Bars
+
+menu/delete_time
+Delete selected interval
 
 menu/edit_bars
-Edit
+Edit...
 
 menu/export_selection
 Export selection...
@@ -3816,6 +3837,9 @@ Help
 
 menu/insert_sample
 Insert statically
+
+menu/insert_time
+Insert silence...
 
 menu/layer_add
 Add
@@ -3831,9 +3855,6 @@ Manage...
 
 menu/layer_up
 Up
-
-menu/menu_bars
-Bars
 
 menu/menu_edit
 Edit
@@ -3888,6 +3909,9 @@ Sound
 
 menu/menu_sub
 Samples
+
+menu/menu_time
+Time
 
 menu/menu_track
 Track
@@ -4510,7 +4534,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-407
+411
 // Text
 /cancel
 Abbrechen
@@ -4872,6 +4896,9 @@ Leere Audiospur hinzufügen
 menu/bar_link_to_data
 Daten mitbearbeiten
 
+menu/bars_label
+Takte
+
 menu/bars_manager
 Verwalten...
 
@@ -4880,6 +4907,9 @@ Takte löschen
 
 menu/delete_bars
 Löschen
+
+menu/delete_time
+Ausgewähltes Interval löschen
 
 menu/delete_track
 Löschen
@@ -4901,6 +4931,9 @@ Hilfe
 
 menu/insert_sample
 Fest einfügen
+
+menu/insert_time
+Stille einfügen...
 
 menu/layer_add
 Hinzufügen
@@ -4973,6 +5006,9 @@ Sound
 
 menu/menu_sub
 Samples
+
+menu/menu_time
+Zeit
 
 menu/menu_track
 Spur
@@ -5734,7 +5770,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-167
+168
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -5946,6 +5982,8 @@ Recording
 Aufnahme
 Recording Midi
 Recording Midi
+Sample properties
+Sample Eigenschaften
 Samplerate
 Samplerate
 Samples

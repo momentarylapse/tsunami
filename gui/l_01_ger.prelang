@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-408
+412
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1227,8 +1227,20 @@ Stimmung
 /s
 s
 
+menu/bars_label
+Takte
+
+menu/delete_time
+Ausgewähltes Interval löschen
+
+menu/insert_time
+Stille einfügen...
+
+menu/menu_time
+Zeit
+
 // Num Language Strings
-167
+168
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1564,3 +1576,5 @@ loading track
 Lade Spur 
 recording backup found: 
 Aufnahme Backup gefunden: 
+Sample properties
+Sample Eigenschaften

@@ -15,6 +15,7 @@ class AudioViewTrack;
 class Track;
 class SampleRef;
 class MidiNote;
+class TrackMarker;
 class Bar;
 
 class Selection
@@ -25,6 +26,7 @@ public:
 	Track *track;
 	SampleRef *sample;
 	MidiNote *note;
+	TrackMarker *marker;
 	Bar *bar;
 	int pos;
 	Range range;

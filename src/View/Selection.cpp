@@ -37,6 +37,7 @@ void Selection::clear()
 	vtrack = NULL;
 	sample = NULL;
 	note = NULL;
+	marker = NULL;
 	bar = NULL;
 	index = 0;
 	pos = 0;

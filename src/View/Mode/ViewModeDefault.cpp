@@ -40,8 +40,13 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION) or (hover->type == Selection::TYPE_BAR)){
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION)){
 		setCursorPos(hover->pos, track_hover_sel);
+		view->msp.start(hover->pos, hover->y0);
+	}else if (hover->type == Selection::TYPE_BAR){
+		setCursorPos(hover->pos, track_hover_sel);
+		view->sel.range = hover->bar->range();
+		view->updateSelection();
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_TIME){
 		setCursorPos(hover->pos, true);
@@ -73,6 +78,9 @@ void ViewModeDefault::onLeftButtonDown()
 		cur_action = new ActionTrackMoveSample(view->song, view->sel);
 	}else if (hover->type == Selection::TYPE_TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
+	}else if (hover->type == Selection::TYPE_MARKER){
+		view->sel.range = hover->marker->range;
+		view->updateSelection();
 	}
 }
 
@@ -533,6 +541,7 @@ Selection ViewModeDefault::getHover()
 		// markers
 		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
 			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my)){
+				s.marker = s.track->markers[i];
 				s.type = Selection::TYPE_MARKER;
 				s.index = i;
 				return s;

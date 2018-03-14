@@ -10,18 +10,17 @@
 
 #include "../ActionGroup.h"
 
-class BarPattern;
 class Song;
 
 class ActionBarEdit: public ActionGroup
 {
 public:
-	ActionBarEdit(int index, BarPattern &bar, bool affect_data);
+	ActionBarEdit(int index, int length, int num_beats, int num_sub_beats, bool affect_data);
 
 	virtual void build(Data *d);
 
 	int index;
-	BarPattern &bar;
+	int length, num_beats, num_sub_beats;
 	bool affect_data;
 };
 

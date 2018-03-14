@@ -124,7 +124,7 @@ public:
 	void _cdecl renameLayer(int index, const string &name);
 	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi);
 	void _cdecl addPause(int index, float time, bool affect_midi);
-	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
+	void _cdecl editBar(int index, int length, int num_beats, int num_sub_beats, bool affect_midi);
 	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl deleteTimeInterval(int index, const Range &range);
 	void _cdecl insertSelectedSamples(const SongSelection &sel, int layer_no);

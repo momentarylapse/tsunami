@@ -8,17 +8,23 @@
 #include "ActionBarAdd.h"
 
 #include "../../Data/Track.h"
+#include "../../Rhythm/Bar.h"
 #include <assert.h>
 
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, BarPattern &_bar, bool _affect_data)
+ActionBarAdd::ActionBarAdd(int _index, int length, int num_beats, int num_sub_beats, bool _affect_data)
 {
 	index = _index;
-	bar = _bar;
+	bar = new Bar(length, num_beats, num_sub_beats);
 	affect_data = _affect_data;
+}
+
+ActionBarAdd::~ActionBarAdd()
+{
+	delete bar;
 }
 
 void ActionBarAdd::build(Data *d)
@@ -35,7 +41,7 @@ void ActionBarAdd::build(Data *d)
 					if (t->layers[l].buffers[i].range().is_more_inside(pos0))
 						addSubAction(new ActionTrack__SplitBuffer(t, l, i, pos0 - t->layers[l].buffers[i].offset), d);
 
-		addSubAction(new Action__ShiftData(pos0, bar.length), d);
+		addSubAction(new Action__ShiftData(pos0, bar->length), d);
 
 	}
 }

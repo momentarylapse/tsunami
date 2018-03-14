@@ -8,13 +8,17 @@
 #include "ActionBar__Edit.h"
 
 #include "../../Data/Track.h"
+#include "../../Rhythm/Bar.h"
 #include <assert.h>
+#include <algorithm>
 
 
-ActionBar__Edit::ActionBar__Edit(int _index, BarPattern &_bar)
+ActionBar__Edit::ActionBar__Edit(int _index, int _length, int _num_beats, int _num_sub_beats)
 {
 	index = _index;
-	bar = _bar;
+	length = _length;
+	num_beats = _num_beats;
+	num_sub_beats = _num_sub_beats;
 }
 
 void *ActionBar__Edit::execute(Data *d)
@@ -23,9 +27,12 @@ void *ActionBar__Edit::execute(Data *d)
 	assert(index >= 0);
 	assert(index < s->bars.num);
 
-	BarPattern temp = bar;
-	bar = s->bars[index];
-	s->bars[index] = temp;
+	Bar *bar = s->bars[index];
+
+	std::swap(length, bar->length);
+	std::swap(num_beats, bar->num_beats);
+	std::swap(num_sub_beats, bar->num_sub_beats);
+
 	s->notify(s->MESSAGE_EDIT_BARS);
 
 	return NULL;

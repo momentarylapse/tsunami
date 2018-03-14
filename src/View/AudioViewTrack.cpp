@@ -742,16 +742,16 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 	dash.add(6);
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = view->song->bars.getBars(Range(s0, s1 - s0));
-	for (Bar &b: bars){
-		if (b.num_beats == 0)
+	Array<Bar*> bars = view->song->bars.getBars(Range(s0, s1 - s0));
+	for (Bar *b: bars){
+		if (b->is_pause())
 			continue;
-		int xx = view->cam.sample2screen(b.range.offset);
+		int xx = view->cam.sample2screen(b->range().offset);
 
-		float dx_bar = view->cam.dsample2screen(b.range.length);
-		float dx_beat = dx_bar / b.num_beats;
+		float dx_bar = view->cam.dsample2screen(b->range().length);
+		float dx_beat = dx_bar / b->num_beats;
 		float f1 = min(1.0f, dx_bar / 40.0f);
-		if ((b.index_text % 5) == 0)
+		if ((b->index_text % 5) == 0)
 			f1 = 1;
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
@@ -763,10 +763,10 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 
 		if (f2 >= 0.1f){
 			color c1 = ColorInterpolate(bg, view->colors.text_soft1, f2);
-			float beat_length = (float)b.range.length / (float)b.num_beats;
+			float beat_length = (float)b->range().length / (float)b->num_beats;
 			c->setLineDash(dash, area.y1);
-			for (int i=0; i<b.num_beats; i++){
-				float beat_offset = b.range.offset + (float)i * beat_length;
+			for (int i=0; i<b->num_beats; i++){
+				float beat_offset = b->range().offset + (float)i * beat_length;
 				color c2 = ColorInterpolate(bg, c1, 0.6f);
 				c->setColor(c2);
 				for (int j=1; j<beat_partition; j++){
@@ -784,12 +784,12 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 		if (show_time){
 			if (f1 > 0.9f){
 				c->setColor(view->colors.text_soft1);
-				c->drawStr(xx + 2, area.y1, i2s(b.index_text + 1));
+				c->drawStr(xx + 2, area.y1, i2s(b->index_text + 1));
 			}
-			float bpm = b.bpm(view->song->sample_rate);
+			float bpm = b->bpm(view->song->sample_rate);
 			string s;
-			if (prev_num_beats != b.num_beats)
-				s = i2s(b.num_beats) + "/" + i2s_small(4);
+			if (prev_num_beats != b->num_beats)
+				s = i2s(b->num_beats) + "/" + i2s_small(4);
 			if (fabs(prev_bpm - bpm) > 0.5f)
 				s += format(" \u2669=%.0f", bpm);
 			if (s.num > 0){
@@ -798,7 +798,7 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 				c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
 				c->setFont("", view->FONT_SIZE, false, false);
 			}
-			prev_num_beats = b.num_beats;
+			prev_num_beats = b->num_beats;
 			prev_bpm = bpm;
 		}
 	}

@@ -116,10 +116,10 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 			tt.t = t;
 			tracks.add(tt);
 		}
-	Array<Bar> bars = a->bars.getBars(Range::ALL);
+	Array<Bar*> bars = a->bars.getBars(Range::ALL);
 	tempo = 90;
 	if (bars.num > 0)
-		tempo = (bars[0].bpm(a->sample_rate) + 0.5f);
+		tempo = (bars[0]->bpm(a->sample_rate) + 0.5f);
 
 
 	write_info();
@@ -156,7 +156,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 
 	f->write_int(bars.num);
 	f->write_int(tracks.num);
-	for (Bar &b : bars)
+	for (Bar *b : bars)
 		write_measure_header(b);
 	foreachi(GpTrack &t, tracks, i)
 		write_track(&t, i);
@@ -164,7 +164,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	if (version >= 500)
 		f->write_byte(0);
 
-	for (Bar &b : bars){
+	for (Bar *b : bars){
 		for (GpTrack &t : tracks)
 			write_measure(&t, b);
 	}
@@ -451,10 +451,10 @@ void FormatGuitarPro::read_measure_header()
 	measures.add(m);
 }
 
-void FormatGuitarPro::write_measure_header(Bar &b)
+void FormatGuitarPro::write_measure_header(Bar *b)
 {
 	f->write_byte(0x03);
-	f->write_byte(b.num_beats);
+	f->write_byte(b->num_beats);
 	f->write_byte(4);
 	if (version >= 500){
 		//if ((flags & 0x03) != 0)
@@ -637,23 +637,23 @@ Array<int> decompose_time(int length)
 	return t;
 }
 
-Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
+Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 {
 	// samples per 16th / 3
-	float spu = (float)b.range.length / (float)b.num_beats / (float)BEAT_PARTITION;
+	float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
-	MidiNoteBufferRef notes = t->t->midi.getNotes(b.range);
+	MidiNoteBufferRef notes = t->t->midi.getNotes(b->range());
 	Array<GuitarNote> gnotes;
 
 	for (MidiNote *n : notes){
-		Range r = n->range and b.range;
+		Range r = n->range and b->range();
 		GuitarNote gn;
-		gn.offset = int((float)(r.offset - b.range.offset) / spu + 0.5f);
-		gn.length = int((float)(r.end() - b.range.offset) / spu + 0.5f) - gn.offset;
+		gn.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);
+		gn.length = int((float)(r.end() - b->range().offset) / spu + 0.5f) - gn.offset;
 		gn.pitch.add(n->pitch);
 		if (gn.length == 0)
 			continue;
-		if (gn.offset < b.num_beats * BEAT_PARTITION)
+		if (gn.offset < b->num_beats * BEAT_PARTITION)
 			gnotes.add(gn);
 	}
 
@@ -702,11 +702,11 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 	return gnotes;
 }
 
-void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
+void FormatGuitarPro::write_measure(GpTrack *t, Bar *b)
 {
 	//msg_write(format("m %x", f->GetPos()));
 
-	int bpm = (b.bpm(t->t->song->sample_rate) + 0.5f);
+	int bpm = (b->bpm(t->t->song->sample_rate) + 0.5f);
 	bool update_tempo = (bpm != tempo);
 	tempo = bpm;
 
@@ -718,7 +718,7 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 		GuitarNote g;
 		g.length = BEAT_PARTITION;
 		while (true){
-			if (g.length * 2 > BEAT_PARTITION * b.num_beats)
+			if (g.length * 2 > BEAT_PARTITION * b->num_beats)
 				break;
 			g.length *= 2;
 		}

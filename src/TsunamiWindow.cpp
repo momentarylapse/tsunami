@@ -42,6 +42,7 @@
 #include "Device/DeviceManager.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
+#include "Rhythm/Bar.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 #include "Plugins/FastFourierTransform.h"
@@ -921,10 +922,10 @@ void TsunamiWindow::onEditBars()
 	int num_bars = 0;
 	int num_pauses = 0;
 	for (int i=view->sel.bars.offset; i<view->sel.bars.end(); i++)
-		if (song->bars[i].type == BarPattern::TYPE_BAR)
-			num_bars ++;
-		else if (song->bars[i].type == BarPattern::TYPE_PAUSE)
+		if (song->bars[i]->is_pause())
 			num_pauses ++;
+		else
+			num_bars ++;
 	if (num_bars > 0 and num_pauses == 0){
 		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
 		dlg->run();

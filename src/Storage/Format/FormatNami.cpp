@@ -12,6 +12,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Data/Curve.h"
+#include "../../Rhythm/Bar.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 #endif
@@ -908,59 +909,63 @@ public:
 	}
 };
 
-class FileChunkBar : public FileChunk<Song,BarPattern>
+class FileChunkBar : public FileChunk<Song,Bar>
 {
 public:
-	FileChunkBar() : FileChunk<Song,BarPattern>("bar"){}
+	FileChunkBar() : FileChunk<Song,Bar>("bar"){}
 	virtual void create(){ me = NULL; }
 	virtual void read(File *f)
 	{
-		BarPattern b;
-		b.type = f->read_int();
-		b.length = f->read_int();
-		b.num_beats = f->read_int();
-		if (b.type == BarPattern::TYPE_PAUSE)
-			b.num_beats = 0;
+		int type = f->read_int();
+		int length = f->read_int();
+		int num_beats = f->read_int();
+		if (type == BarPattern::TYPE_PAUSE)
+			num_beats = 0;
 		int count = f->read_int();
-		b.sub_beats = f->read_int();
-		if (b.sub_beats <= 0)
-			b.sub_beats = 1;
+		int sub_beats = f->read_int();
+		if (sub_beats <= 0)
+			sub_beats = 1;
 		for (int i=0; i<count; i++)
-			parent->bars.add(b);
+			parent->bars.add(new Bar(length, num_beats, sub_beats));
 	}
 	virtual void write(File *f)
 	{
-		f->write_int(me->type);
+		if (me->is_pause())
+			f->write_int(BarPattern::TYPE_PAUSE);
+		else
+			f->write_int(BarPattern::TYPE_BAR);
 		f->write_int(me->length);
 		f->write_int(me->num_beats);
 		f->write_int(1);
-		f->write_int(me->sub_beats);
+		f->write_int(me->num_sub_beats);
 	}
 };
 
-class FileChunkTrackBar : public FileChunk<Track,BarPattern>
+class FileChunkTrackBar : public FileChunk<Track,Bar>
 {
 public:
-	FileChunkTrackBar() : FileChunk<Track,BarPattern>("bar"){}
+	FileChunkTrackBar() : FileChunk<Track,Bar>("bar"){}
 	virtual void create(){ me = NULL; }
 	virtual void read(File *f)
 	{
-		BarPattern b;
-		b.type = f->read_int();
-		b.length = f->read_int();
-		b.num_beats = f->read_int();
-		if (b.type == BarPattern::TYPE_PAUSE)
-			b.num_beats = 0;
+		int type = f->read_int();
+		int length = f->read_int();
+		int num_beats = f->read_int();
+		if (type == BarPattern::TYPE_PAUSE)
+			num_beats = 0;
 		int count = f->read_int();
-		b.sub_beats = f->read_int();
-		if (b.sub_beats <= 0)
-			b.sub_beats = 1;
+		int sub_beats = f->read_int();
+		if (sub_beats <= 0)
+			sub_beats = 1;
 		for (int i=0; i<count; i++)
-			parent->song->bars.add(b);
+			parent->song->bars.add(new Bar(length, num_beats, sub_beats));
 	}
 	virtual void write(File *f)
 	{
-		f->write_int(me->type);
+		if (me->is_pause())
+			f->write_int(BarPattern::TYPE_PAUSE);
+		else
+			f->write_int(BarPattern::TYPE_BAR);
 		f->write_int(me->length);
 		f->write_int(me->num_beats);
 		f->write_int(1);

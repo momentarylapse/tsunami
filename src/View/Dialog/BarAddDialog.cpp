@@ -7,6 +7,7 @@
 
 #include "BarAddDialog.h"
 #include "../../Data/Song.h"
+#include "../../Rhythm/Bar.h"
 #include "../AudioView.h"
 
 BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
@@ -29,11 +30,11 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
 
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
-		foreachi(BarPattern &b, song->bars, i)
-			if ((i <= ref) and (b.num_beats > 0)){
-				beats = b.num_beats;
-				sub_beats = b.sub_beats;
-				bpm = song->sample_rate * 60.0f / (b.length / b.num_beats);
+		foreachi(Bar *b, song->bars, i)
+			if ((i <= ref) and (b->num_beats > 0)){
+				beats = b->num_beats;
+				sub_beats = b->num_sub_beats;
+				bpm = song->sample_rate * 60.0f / (b->length / b->num_beats);
 			}
 	}
 	setInt("beats", beats);

@@ -7,6 +7,7 @@
 
 #include "SongSelection.h"
 #include "Song.h"
+#include "../Rhythm/Bar.h"
 
 SongSelection::SongSelection()
 {
@@ -32,15 +33,15 @@ void SongSelection::all(Song* s)
 	from_range(s, s->getRangeWithTime());
 }
 
-void SongSelection::from_range(Song *s, const Range &r)
+void SongSelection::from_range(Song *s, const Range &r, int mask)
 {
 	Set<const Track*> _tracks;
 	for (Track *t: s->tracks)
 		_tracks.add(t);
-	from_range(s, r, _tracks);
+	from_range(s, r, _tracks, mask);
 }
 
-void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _tracks)
+void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _tracks, int mask)
 {
 	clear();
 	range = r;
@@ -50,17 +51,20 @@ void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _track
 			continue;
 		add(t);
 
-		// subs
-		for (SampleRef *sr: t->samples)
-			set(sr, range.overlaps(sr->range()));
+		// samples
+		if ((mask & MASK_SAMPLES) > 0)
+			for (SampleRef *sr: t->samples)
+				set(sr, range.overlaps(sr->range()));
 
 		// markers
-		for (TrackMarker *m: t->markers)
-			set(m, range.overlaps(m->range));
+		if ((mask & MASK_MARKERS) > 0)
+			for (TrackMarker *m: t->markers)
+				set(m, range.overlaps(m->range));
 
 		// midi
-		for (MidiNote *n: t->midi)
-			set(n, range.is_inside(n->range.center()));
+		if ((mask & MASK_MIDI_NOTES) > 0)
+			for (MidiNote *n: t->midi)
+				set(n, range.is_inside(n->range.center()));
 	}
 }
 
@@ -71,12 +75,13 @@ void SongSelection::update_bars(Song* s)
 
 	int pos = 0;
 	bool first = true;
-	foreachi(BarPattern &b, s->bars, i){
-		Range r = Range(pos + 1, b.length - 2);
+	foreachi(Bar *b, s->bars, i){
+		Range r = Range(pos + 1, b->length - 2);
+		b->offset = pos;
 		if (r.overlaps(range)){
 			if (first){
 				bars = Range(i, 1);
-				bar_range = Range(pos, b.length);
+				bar_range = Range(pos, b->length);
 			}
 			bars.set_end(i+1);
 			bar_range.set_end(r.end() + 1);
@@ -85,7 +90,7 @@ void SongSelection::update_bars(Song* s)
 			bars = Range(i, 0);
 			bar_range = Range(pos, 0);
 		}
-		pos += b.length;
+		pos += b->length;
 	}
 	if (range.start() >= pos){
 		bars = Range(s->bars.num, 0);

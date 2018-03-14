@@ -318,10 +318,10 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 	c->setFill(false);
 
 	auto bars = view->song->bars.getBars(Range::ALL);
-	for (auto &b: bars){
-		if (view->sel.bars.is_inside(b.index)){
-			float x1 = view->cam.sample2screen(b.range.offset);
-			float x2 = view->cam.sample2screen(b.range.end());
+	for (auto b: bars){
+		if (view->sel.bars.is_inside(b->index)){
+			float x1 = view->cam.sample2screen(b->range().offset);
+			float x2 = view->cam.sample2screen(b->range().end());
 			c->drawRect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
 		}
 	}
@@ -552,9 +552,10 @@ Selection ViewModeDefault::getHover()
 		// bars
 		if (s.track->type == Track::TYPE_TIME){
 			auto bars = view->song->bars.getBars(Range(s.pos, 0));
-			for (auto &b: bars){
+			for (auto *b: bars){
 				//b.range.
-				s.index = b.index;
+				s.bar = b;
+				s.index = b->index;
 				s.type = Selection::TYPE_BAR;
 				return s;
 			}

@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <math.h>
 #include "Song.h"
+#include "../Rhythm/Bar.h"
 
 float amplitude2db(float amp)
 {
@@ -336,7 +337,7 @@ int Song::barOffset(int index)
 {
 	int pos = 0;
 	for (int i=0; i<min(index, bars.num); i++)
-		pos += bars[i].length;
+		pos += bars[i]->length;
 	return pos;
 }
 
@@ -451,33 +452,25 @@ void Song::createSamplesFromSelection(const SongSelection &sel, int layer_no)
 
 void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi)
 {
-	BarPattern b;
-	b.num_beats = beats;
-	b.sub_beats = sub_beats;
-	b.type = b.TYPE_BAR;
-	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
+	int length = (int)((float)beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionBarAdd(index, b, affect_midi));
+		execute(new ActionBarAdd(index, length, beats, sub_beats, affect_midi));
 	else
-		execute(new ActionBarAdd(bars.num, b, affect_midi));
+		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, affect_midi));
 }
 
 void Song::addPause(int index, float time, bool affect_midi)
 {
-	BarPattern b;
-	b.num_beats = 0;
-	b.sub_beats = 1;
-	b.type = b.TYPE_PAUSE;
-	b.length = (int)((float)sample_rate * time);
+	int length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionBarAdd(index, b, affect_midi));
+		execute(new ActionBarAdd(index, length, 0, 0, affect_midi));
 	else
-		execute(new ActionBarAdd(bars.num, b, affect_midi));
+		execute(new ActionBarAdd(bars.num, length, 0, 0, affect_midi));
 }
 
-void Song::editBar(int index, BarPattern &p, bool affect_midi)
+void Song::editBar(int index, int length, int beats, int sub_beats, bool affect_midi)
 {
-	execute(new ActionBarEdit(index, p, affect_midi));
+	execute(new ActionBarEdit(index, length, beats, sub_beats, affect_midi));
 }
 
 void Song::deleteBar(int index, bool affect_midi)

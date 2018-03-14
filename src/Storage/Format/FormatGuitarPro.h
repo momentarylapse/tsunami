@@ -72,9 +72,9 @@ public:
 	void write_channels();
 	void write_eq();
 	void write_page_setup();
-	void write_measure_header(Bar &b);
+	void write_measure_header(Bar *b);
 	void write_track(GpTrack *t, int index);
-	void write_measure(GpTrack *t, Bar &b);
+	void write_measure(GpTrack *t, Bar *b);
 	void write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length, bool update_tempo);
 	void write_beat_fx();
 	void write_note(GpTrack &t, int string_base, int start, int length);

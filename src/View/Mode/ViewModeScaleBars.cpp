@@ -8,6 +8,7 @@
 #include "../AudioView.h"
 #include "../../lib/hui/hui.h"
 #include "../../lib/math/math.h"
+#include "../../Rhythm/Bar.h"
 #include "ViewModeScaleBars.h"
 
 ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
@@ -76,9 +77,9 @@ void ViewModeScaleBars::performScale()
 
 	song->action_manager->beginActionGroup();
 	foreachb(int i, scaling_sel){
-		BarPattern b = song->bars[i];
-		b.length = (int)((float)b.length * factor);
-		song->editBar(i, b, view->bars_edit_data);
+		Bar *b = song->bars[i];
+		int length = (int)((float)b->length * factor);
+		song->editBar(i, length, b->num_beats, b->num_sub_beats, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();
 

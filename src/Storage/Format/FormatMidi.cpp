@@ -6,6 +6,7 @@
  */
 
 #include "FormatMidi.h"
+#include "../../Rhythm/Bar.h"
 
 FormatDescriptorMidi::FormatDescriptorMidi() :
 	FormatDescriptor("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ | FLAG_WRITE)
@@ -268,8 +269,8 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				f->write_buffer(t->name.data, t->name.num);
 			}
 			if (od->song->bars.num > 0) {
-				auto b = od->song->bars[0];
-				float bpm = 60.0f / ((float) b.length / (float) od->song->sample_rate / b.num_beats);
+				auto *b = od->song->bars[0];
+				float bpm = b->bpm(od->song->sample_rate);
 				mpqn = 60000000.0f / bpm;
 				write_var(f, 0);
 				f->write_byte(0xff);
@@ -283,7 +284,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				f->write_byte(0xff);
 				f->write_byte(88);
 				write_var(f, 0);
-				f->write_byte(b.num_beats);
+				f->write_byte(b->num_beats);
 				f->write_byte(2); // 1/4
 				f->write_byte(0);
 				f->write_byte(0);

@@ -20,18 +20,18 @@ Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hi
 	int pos_bar = 0;
 	int bar_no = 0;
 
-	for (BarPattern &b: collection)
-		if (b.type == b.TYPE_BAR){
+	for (Bar *b: collection)
+		if (!b->is_pause()){
 			// bar
-			int beat_length = b.length / b.num_beats;
+			int beat_length = b->length / b->num_beats;
 			int level = 0;
-			for (int i=0; i<b.num_beats; i++){
+			for (int i=0; i<b->num_beats; i++){
 				// beat
 				int pos_beat = pos_bar + i * beat_length;
 
 				if (include_sub_beats){
 
-					int sub_beats = (overwrite_sub_beats > 0) ? overwrite_sub_beats : b.sub_beats;
+					int sub_beats = (overwrite_sub_beats > 0) ? overwrite_sub_beats : b->num_sub_beats;
 					int sub_beat_length = beat_length / sub_beats;
 
 					for (int k=0; k<sub_beats; k++){
@@ -49,12 +49,12 @@ Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hi
 				}
 				level = 1;
 			}
-			pos_bar += b.length;
+			pos_bar += b->length;
 			bar_no ++;
-		}else if (b.type == b.TYPE_PAUSE){
+		}else{
 			if (include_hidden)
-				beats.add(Beat(Range(pos_bar, b.length), -1, 0, -1));
-			pos_bar += b.length;
+				beats.add(Beat(Range(pos_bar, b->length), -1, 0, -1));
+			pos_bar += b->length;
 		}
 	if (include_hidden and (collection.num > 0))
 		beats.add(Beat(Range(pos_bar, 0), -1, 0, -1));
@@ -66,19 +66,22 @@ Array<Beat> BarCollection::getBeats(const Range &r, bool include_hidden, bool in
 	return get_beats(*this, r, include_hidden, include_sub_beats, -1);
 }
 
-Array<Bar> BarCollection::getBars(const Range &r)
+Array<Bar*> BarCollection::getBars(const Range &r)
 {
-	Array<Bar> bars;
+	Array<Bar*> bars;
 
 	int pos0 = 0;
 	int index = 0;
 	int bar_no_text = 0;
-	for (BarPattern &b: *this){
-		Range rr = Range(pos0, b.length);
+	for (Bar *b: *this){
+		Range rr = Range(pos0, b->length);
+		b->index = index;
+		b->index_text = bar_no_text;
+		b->offset = pos0;
 		if (rr.overlaps(r))
-			bars.add(Bar(rr, b.num_beats, index, bar_no_text));
-		pos0 += b.length;
-		if (b.type == b.TYPE_BAR)
+			bars.add(b);
+		pos0 += b->length;
+		if (!b->is_pause())
 			bar_no_text ++;
 		index ++;
 	}
@@ -140,8 +143,8 @@ Range BarCollection::expand(const Range &r, int beat_partition)
 Range BarCollection::getRange()
 {
 	int pos0 = 0;
-	for (BarPattern &b: *this)
-		pos0 += b.length;
+	for (Bar *b: *this)
+		pos0 += b->length;
 	return Range(0, pos0);
 }
 

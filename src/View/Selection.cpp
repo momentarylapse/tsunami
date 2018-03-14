@@ -37,6 +37,7 @@ void Selection::clear()
 	vtrack = NULL;
 	sample = NULL;
 	note = NULL;
+	bar = NULL;
 	index = 0;
 	pos = 0;
 	range = Range::EMPTY;
@@ -52,6 +53,7 @@ bool hover_changed(Selection &hover, Selection &hover_old)
 	return (hover.type != hover_old.type)
 			or (hover.sample != hover_old.sample)
 			or (hover.note != hover_old.note)
+			or (hover.bar != hover_old.bar)
 			or (hover.index != hover_old.index)
 			or (hover.pitch != hover_old.pitch)
 			or (hover.clef_position != hover_old.clef_position);

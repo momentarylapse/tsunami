@@ -11,7 +11,7 @@
 #include <assert.h>
 
 
-ActionBar__Add::ActionBar__Add(int _index, BarPattern &_bar)
+ActionBar__Add::ActionBar__Add(int _index, Bar *_bar)
 {
 	index = _index;
 	bar = _bar;

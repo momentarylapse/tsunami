@@ -9,9 +9,11 @@
 
 #include "../Song/ActionSongDeleteSelection.h"
 #include "../Track/Marker/ActionTrackEditMarker.h"
+#include "../Track/Marker/ActionTrackDeleteMarker.h"
 
 #include "../../Data/Song.h"
 #include "../../Data/SongSelection.h"
+#include "../../Rhythm/Bar.h"
 #include <assert.h>
 
 #include "Action__ShiftData.h"
@@ -28,20 +30,19 @@ void ActionBarDelete::build(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < s->bars.num);
 
-	Range r = Range(s->barOffset(index), s->bars[index].length);
+	Range r = Range(s->barOffset(index), s->bars[index]->length);
 	addSubAction(new ActionBar__Delete(index), d);
 
 	if (affect_data){
 		SongSelection sel;
-		sel.from_range(s, r);
+		sel.from_range(s, r, SongSelection::MASK_MIDI_NOTES | SongSelection::MASK_SAMPLES);
 
 		for (Track *t: s->tracks){
 			foreachi (TrackMarker *m, t->markers, i){
-				// cover -> allow delete
-				if (r.covers(m->range))
-					continue;
-
-				if (r.is_inside(m->range.start())){
+				if (r.covers(m->range)){
+					// cover
+					addSubAction(new ActionTrackDeleteMarker(t, i), d);
+				}else if (r.is_inside(m->range.start())){
 					// cover start
 					sel.set(m, false);
 					addSubAction(new ActionTrackEditMarker(t, i, Range(r.offset, m->range.end() - r.end()), m->text), d);

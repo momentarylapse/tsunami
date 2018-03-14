@@ -27,8 +27,15 @@ public:
 	void clear_data();
 	void all(Song *s);
 	void update_bars(Song *s);
-	void from_range(Song *s, const Range &r);
-	void from_range(Song *s, const Range &r, Set<const Track*> tracks);
+	void from_range(Song *s, const Range &r, int mask = MASK_ALL);
+	void from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = MASK_ALL);
+
+	enum{
+		MASK_SAMPLES = 1,
+		MASK_MARKERS = 2,
+		MASK_MIDI_NOTES = 4,
+		MASK_ALL = -1
+	};
 
 	Range range;
 

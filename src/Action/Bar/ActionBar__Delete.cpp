@@ -13,6 +13,7 @@
 ActionBar__Delete::ActionBar__Delete(int _index)
 {
 	index = _index;
+	bar = NULL;
 }
 
 void *ActionBar__Delete::execute(Data *d)

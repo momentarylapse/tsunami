@@ -9,19 +9,20 @@
 #define SRC_ACTION_BAR_ACTIONBAR__ADD_H_
 
 #include "../Action.h"
-#include "../../Rhythm/BarCollection.h"
+
+class Bar;
 
 class ActionBar__Add: public Action
 {
 public:
-	ActionBar__Add(int index, BarPattern &Bar);
+	ActionBar__Add(int index, Bar *bar);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
 	int index;
-	BarPattern bar;
+	Bar *bar;
 };
 
 #endif /* SRC_ACTION_BAR_ACTIONBAR__ADD_H_ */

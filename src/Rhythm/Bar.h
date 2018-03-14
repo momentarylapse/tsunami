@@ -10,17 +10,37 @@
 
 #include "../Data/Range.h"
 
+class BarCollection;
 
-class Bar
+class BarPattern
+{
+public:
+	BarPattern();
+	BarPattern(int length, int num_beats, int num_sub_beats);
+	int length;
+	int num_beats;
+	int num_sub_beats;
+
+	enum{
+		TYPE_BAR,
+		TYPE_PAUSE
+	};
+};
+
+class Bar : public BarPattern
 {
 public:
 	Bar(){}
-	Bar(const Range &r, int num_beats, int index, int index_text);
-	Range range;
-	int num_beats;
+	Bar(int length, int num_beats, int num_sub_beats);
+	bool is_pause();
+	float bpm(float sample_rate);
+
+
+	// filled by BarCollection.getBars()
 	int index; // index in the Bar[] array
 	int index_text; // index without pause "bars" (well, text = n+1...)
-	float bpm(float sample_rate);
+	int offset;
+	Range range();
 };
 
 

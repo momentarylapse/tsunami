@@ -9,7 +9,8 @@
 #define SRC_ACTION_BAR_ACTIONBAR__DELETE_H_
 
 #include "../Action.h"
-#include "../../Rhythm/BarCollection.h"
+
+class Bar;
 
 class ActionBar__Delete: public Action
 {
@@ -20,7 +21,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	BarPattern bar;
+	Bar *bar;
 	int index;
 };
 

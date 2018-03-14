@@ -20,6 +20,7 @@
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Midi/MidiSource.h"
+#include "../Rhythm/Bar.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../View/AudioView.h"
@@ -261,7 +262,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("BarPattern", sizeof(BarPattern));
 	Kaba::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
 	Kaba::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
-	Kaba::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
+	//Kaba::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
 	//Kaba::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
 
 	Kaba::DeclareClassSize("MidiNote", sizeof(MidiNote));

@@ -118,7 +118,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("add_bars", -1, "hui:add");
 	event("add_pause", std::bind(&TsunamiWindow::onAddPause, this));
 	setKeyCode("add_pause", -1, "hui:add");
-	event("delete_time", std::bind(&TsunamiWindow::onDeleteBars, this));
+	event("delete_bars", std::bind(&TsunamiWindow::onDeleteBars, this));
+	setKeyCode("delete_bars", -1, "hui:delete");
+	event("delete_time", std::bind(&TsunamiWindow::onDeleteTimeInterval, this));
 	setKeyCode("delete_time", -1, "hui:delete");
 	event("edit_bars", std::bind(&TsunamiWindow::onEditBars, this));
 	setKeyCode("edit_bars", -1, "hui:edit");
@@ -730,6 +732,7 @@ void TsunamiWindow::updateMenu()
 	enable("layer_up", view->cur_layer < song->layers.num -1);
 	enable("layer_down", view->cur_layer > 0);
 	// bars
+	enable("delete_time", !view->sel.range.empty());
 	enable("delete_bars", !view->sel.bars.empty());
 	enable("edit_bars", !view->sel.bars.empty());
 	enable("scale_bars", !view->sel.bars.empty());
@@ -897,6 +900,17 @@ void TsunamiWindow::onDeleteBars()
 		song->deleteBar(i, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();
+}
+
+void TsunamiWindow::onDeleteTimeInterval()
+{
+	hui::ErrorBox(this, "todo", "todo");
+	/*song->action_manager->beginActionGroup();
+
+	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
+		song->deleteBar(i, view->bars_edit_data);
+	}
+	song->action_manager->endActionGroup();*/
 }
 
 void TsunamiWindow::onEditBars()

@@ -104,6 +104,9 @@ Range Track::getRange()
 	for (SampleRef *s: samples)
 		r = r or s->range();
 
+	for (TrackMarker *m: markers)
+		r = r or m->range;
+
 	if ((type == TYPE_MIDI) and (midi.num > 0))
 		r = r or midi.range(synth->keep_notes);
 

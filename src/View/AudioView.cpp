@@ -244,8 +244,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	menu_song = hui::CreateResourceMenu("popup_song_menu");
 	menu_track = hui::CreateResourceMenu("popup_track_menu");
+	menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
 	menu_sample = hui::CreateResourceMenu("popup_sample_menu");
 	menu_marker = hui::CreateResourceMenu("popup_marker_menu");
+	menu_bar = hui::CreateResourceMenu("popup_bar_menu");
 
 	//ForceRedraw();
 	updateMenu();
@@ -880,23 +882,25 @@ void AudioView::drawSelection(Painter *c)
 	}
 
 	// bar selection
-	sx1 = cam.sample2screen(sel.bar_range.start());
-	sx2 = cam.sample2screen(sel.bar_range.end());
-	c->setAntialiasing(true);
-	c->setColor(colors.text_soft1);
-	c->setLineWidth(2.5f);
-	for (AudioViewTrack *t: vtrack)
-		if (t->track->type == Track::TYPE_TIME){
-			float dy = t->area.height();
-			c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
-			c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
-			c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
-			c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
-			c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
-			c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
+	if (sel.bars.length == 0){
+		sx1 = cam.sample2screen(sel.bar_range.start());
+		sx2 = cam.sample2screen(sel.bar_range.end());
+		c->setAntialiasing(true);
+		c->setColor(colors.text_soft1);
+		c->setLineWidth(2.5f);
+		for (AudioViewTrack *t: vtrack)
+			if (t->track->type == Track::TYPE_TIME){
+				float dy = t->area.height();
+				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
+				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
+				c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
+				c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
+				c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
+				c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
 		}
-	c->setLineWidth(1.0f);
-	c->setAntialiasing(false);
+		c->setLineWidth(1.0f);
+		c->setAntialiasing(false);
+	}
 }
 
 void AudioView::drawAudioFile(Painter *c)

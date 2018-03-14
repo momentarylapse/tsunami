@@ -248,8 +248,10 @@ public:
 	ImageData images;
 
 	hui::Menu *menu_track;
+	hui::Menu *menu_time_track;
 	hui::Menu *menu_sample;
 	hui::Menu *menu_marker;
+	hui::Menu *menu_bar;
 	hui::Menu *menu_song;
 
 	int perf_channel;

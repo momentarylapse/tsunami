@@ -744,6 +744,8 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	Array<Bar> bars = view->song->bars.getBars(Range(s0, s1 - s0));
 	for (Bar &b: bars){
+		if (b.num_beats == 0)
+			continue;
 		int xx = view->cam.sample2screen(b.range.offset);
 
 		float dx_bar = view->cam.dsample2screen(b.range.length);

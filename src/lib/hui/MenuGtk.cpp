@@ -65,7 +65,11 @@ void Menu::gtk_realize()
 void Menu::openPopup(Panel *panel, int x, int y)
 {
 	gtk_widget_show(widget);
+#if GTK_CHECK_VERSION(3,22,0)
+	gtk_menu_popup_at_pointer(GTK_MENU(widget), NULL);
+#else
 	gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+#endif
 	set_panel(panel);
 }
 

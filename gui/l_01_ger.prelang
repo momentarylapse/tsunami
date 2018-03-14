@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-412
+427
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1239,8 +1239,53 @@ Stille einfügen...
 menu/menu_time
 Zeit
 
+popup_bar_menu/bar_menu_header
+Takt
+
+popup_bar_menu/delete_bars
+Löschen
+
+popup_bar_menu/edit_bars
+Bearbeiten...
+
+popup_bar_menu/scale_bars
+Skalieren
+
+popup_bar_menu/track_add_marker
+Marker hinzufügen
+
+popup_time_track_menu/delete_track
+Löschen
+
+popup_time_track_menu/time_track_menu_header
+Metronom Spur
+
+popup_time_track_menu/track_add_marker
+Marker hinzufügen
+
+popup_time_track_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_time_track_menu/track_properties
+Eigenschaften
+
+popup_pause_menu/delete_bars
+Löschen
+
+popup_pause_menu/edit_bars
+Bearbeiten...
+
+popup_pause_menu/pause_menu_header
+Pause
+
+popup_pause_menu/scale_bars
+Skalieren
+
+popup_pause_menu/track_add_marker
+Marker hinzufügen
+
 // Num Language Strings
-168
+169
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1578,3 +1623,5 @@ recording backup found:
 Aufnahme Backup gefunden: 
 Sample properties
 Sample Eigenschaften
+Pause
+Pause

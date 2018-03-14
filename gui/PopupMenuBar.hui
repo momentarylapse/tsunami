@@ -1,0 +1,7 @@
+Menu popup_bar_menu ""
+	Item bar_menu_header "Bar" disabled
+	Separator
+	Item delete_bars "Delete"
+	Item track_add_marker "Add marker"
+	Item edit_bars "Edit..."
+	Item scale_bars "Scale" image=hui:zoom-in

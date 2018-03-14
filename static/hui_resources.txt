@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-44
+46
 // Resource
 Menu
 menu_fake
@@ -1001,7 +1001,7 @@ menu_time
 
 4
 0
-9
+10
 Item
 delete_time
 image=hui:delete
@@ -1051,9 +1051,15 @@ image=hui:zoom-in
 0
 0
 Item
+delete_bars
+flat,image=hui:delete
+8
+0
+0
+Item
 bar_link_to_data
 checkable
-8
+9
 0
 0
 Menu
@@ -2068,6 +2074,49 @@ delete_marker
 0
 // Resource
 Menu
+popup_bar_menu
+
+0
+0
+6
+Item
+bar_menu_header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+delete_bars
+
+2
+0
+0
+Item
+track_add_marker
+
+3
+0
+0
+Item
+edit_bars
+
+4
+0
+0
+Item
+scale_bars
+image=hui:zoom-in
+5
+0
+0
+// Resource
+Menu
 popup_song_menu
 
 0
@@ -2105,6 +2154,49 @@ song_edit_samples
 0
 Item
 song_properties
+
+5
+0
+0
+// Resource
+Menu
+popup_time_track_menu
+
+0
+0
+6
+Item
+time_track_menu_header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+delete_track
+
+2
+0
+0
+Item
+track_add_marker
+
+3
+0
+0
+Item
+track_edit_fx
+
+4
+0
+0
+Item
+track_properties
 
 5
 0
@@ -3536,7 +3628,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-330
+341
 // Text
 /cancel
 Cancel
@@ -3822,6 +3914,9 @@ Apply changes to data
 
 menu/bars_label
 Bars
+
+menu/delete_bars
+Löschen
 
 menu/delete_time
 Delete selected interval
@@ -4177,6 +4272,21 @@ Edit pause
 pause_edit_dialog/t_duration
 Duration
 
+popup_bar_menu/bar_menu_header
+Bar
+
+popup_bar_menu/delete_bars
+Delete
+
+popup_bar_menu/edit_bars
+Edit...
+
+popup_bar_menu/scale_bars
+Scale
+
+popup_bar_menu/track_add_marker
+Add marker
+
 popup_marker_menu/delete_marker
 Delete
 
@@ -4211,6 +4321,21 @@ popup_song_menu/song_menu_header
 File
 
 popup_song_menu/song_properties
+Properties
+
+popup_time_track_menu/delete_track
+Delete
+
+popup_time_track_menu/time_track_menu_header
+Time track
+
+popup_time_track_menu/track_add_marker
+Add marker
+
+popup_time_track_menu/track_edit_fx
+Edit effects
+
+popup_time_track_menu/track_properties
 Properties
 
 popup_track_menu/delete_track
@@ -4534,7 +4659,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-411
+426
 // Text
 /cancel
 Abbrechen
@@ -5334,6 +5459,21 @@ Dauer
 pause_edit_dialog/t_s
 s
 
+popup_bar_menu/bar_menu_header
+Takt
+
+popup_bar_menu/delete_bars
+Löschen
+
+popup_bar_menu/edit_bars
+Bearbeiten...
+
+popup_bar_menu/scale_bars
+Skalieren
+
+popup_bar_menu/track_add_marker
+Marker hinzufügen
+
 popup_marker_menu/delete_marker
 Löschen
 
@@ -5342,6 +5482,21 @@ Bearbeiten
 
 popup_marker_menu/marker_menu_header
 Marker
+
+popup_pause_menu/delete_bars
+Löschen
+
+popup_pause_menu/edit_bars
+Bearbeiten...
+
+popup_pause_menu/pause_menu_header
+Pause
+
+popup_pause_menu/scale_bars
+Skalieren
+
+popup_pause_menu/track_add_marker
+Marker hinzufügen
 
 popup_sample_menu/insert_sample
 Fest einfügen
@@ -5371,6 +5526,21 @@ popup_song_menu/song_menu_header
 Datei
 
 popup_song_menu/song_properties
+Eigenschaften
+
+popup_time_track_menu/delete_track
+Löschen
+
+popup_time_track_menu/time_track_menu_header
+Metronom Spur
+
+popup_time_track_menu/track_add_marker
+Marker hinzufügen
+
+popup_time_track_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_time_track_menu/track_properties
 Eigenschaften
 
 popup_track_menu/delete_track
@@ -5770,7 +5940,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-168
+169
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -5962,6 +6132,8 @@ Open file
 Datei öffnen
 Organ
 Orgel
+Pause
+Pause
 Phrygian
 Phrygisch
 Piano

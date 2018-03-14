@@ -40,7 +40,7 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION)){
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION) or (hover->type == Selection::TYPE_BAR)){
 		setCursorPos(hover->pos, track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_TIME){
@@ -118,7 +118,7 @@ void ViewModeDefault::onRightButtonDown()
 	selectUnderMouse();
 
 	// click outside sel.range -> select new position
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND)){
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_BAR)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			setBarriers(*hover);
 			view->applyBarriers(hover->pos);
@@ -129,15 +129,23 @@ void ViewModeDefault::onRightButtonDown()
 	// pop up menu...
 	view->updateMenu();
 
-	if (hover->type == Selection::TYPE_SAMPLE)
+	if (hover->type == Selection::TYPE_SAMPLE){
 		view->menu_sample->openPopup(view->win, 0, 0);
-	else if (hover->type == Selection::TYPE_MARKER)
+	}else if (hover->type == Selection::TYPE_BAR){
+		//if (song->bars[hover->index].type == BarPattern::TYPE_PAUSE)
+		//	view->menu_bar->items[0]->setString(_("Pause"));
+		view->menu_bar->openPopup(view->win, 0, 0);
+	}else if (hover->type == Selection::TYPE_MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
-	else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER) or (hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)){
+	}else if ((hover->type == Selection::TYPE_TRACK) and (hover->track->type == Track::TYPE_TIME)){
+		view->menu_time_track->openPopup(view->win, 0, 0);
+	}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER) or (hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::TYPE_MIDI);
+		view->menu_track->enable("track_add_marker", hover->type == Selection::TYPE_TRACK);
 		view->menu_track->openPopup(view->win, 0, 0);
-	}else if (!hover->track)
+	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);
+	}
 }
 
 void ViewModeDefault::onRightButtonUp()
@@ -340,7 +348,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
 
-	if (t->track->type == Track::TYPE_TIME)
+	if ((t->track->type == Track::TYPE_TIME) and (view->sel.has(t->track)))
 		draw_bar_selection(c, t, view);
 }
 
@@ -537,6 +545,17 @@ Selection ViewModeDefault::getHover()
 				s.sample = ss;
 				s.type = Selection::TYPE_SAMPLE;
 				s.sample_offset = offset;
+				return s;
+			}
+		}
+
+		// bars
+		if (s.track->type == Track::TYPE_TIME){
+			auto bars = view->song->bars.getBars(Range(s.pos, 0));
+			for (auto &b: bars){
+				//b.range.
+				s.index = b.index;
+				s.type = Selection::TYPE_BAR;
 				return s;
 			}
 		}

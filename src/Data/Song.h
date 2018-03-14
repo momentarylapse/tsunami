@@ -126,6 +126,7 @@ public:
 	void _cdecl addPause(int index, float time, bool affect_midi);
 	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
 	void _cdecl deleteBar(int index, bool affect_midi);
+	void _cdecl deleteTimeInterval(int index, const Range &range);
 	void _cdecl insertSelectedSamples(const SongSelection &sel, int layer_no);
 	void _cdecl deleteSelectedSamples(const SongSelection &sel);
 	void _cdecl deleteSelection(const SongSelection &sel, int layer_no, bool all_layers);

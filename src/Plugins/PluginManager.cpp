@@ -329,7 +329,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Track.setSynthesizer", Kaba::mf(&Track::setSynthesizer));
 	Kaba::LinkExternal("Track.addMarker", Kaba::mf(&Track::addMarker));
 	Kaba::LinkExternal("Track.deleteMarker", Kaba::mf(&Track::deleteMarker));
-	Kaba::LinkExternal("Track.moveMarker", Kaba::mf(&Track::moveMarker));
+	Kaba::LinkExternal("Track.editMarker", Kaba::mf(&Track::editMarker));
 
 	Song af = Song(Session::GLOBAL);
 	Kaba::DeclareClassSize("Song", sizeof(Song));

@@ -23,7 +23,6 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(int _layer_no, const SongSe
 
 void ActionSongDeleteSelection::build(Data *d)
 {
-	msg_write("del sel.build");
 	Song *s = dynamic_cast<Song*>(d);
 	for (Track *t: s->tracks){
 

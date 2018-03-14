@@ -297,7 +297,7 @@ class Track
 	extern void setSynthesizer(Synthesizer *synth)
 	extern TrackMarker* addMarker(Range range, string text)
 	extern void deleteMarker(int index)
-	extern void moveMarker(int index, int pos)
+	extern void editMarker(int index, Range range, string text)
 
 class Tag
 	string key, value

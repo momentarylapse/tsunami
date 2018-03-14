@@ -35,7 +35,6 @@
 #include "../Action/Track/Marker/ActionTrackAddMarker.h"
 #include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
 #include "../Action/Track/Marker/ActionTrackEditMarker.h"
-#include "../Action/Track/Marker/ActionTrackMoveMarker.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../Tsunami.h"
@@ -338,14 +337,9 @@ void Track::deleteMarker(int index)
 	song->execute(new ActionTrackDeleteMarker(this, index));
 }
 
-void Track::moveMarker(int index, int pos)
+void Track::editMarker(int index, const Range &range, const string &text)
 {
-	song->execute(new ActionTrackMoveMarker(this, index, pos));
-}
-
-void Track::editMarker(int index, const string &text)
-{
-	song->execute(new ActionTrackEditMarker(this, index, text));
+	song->execute(new ActionTrackEditMarker(this, index, range, text));
 }
 
 

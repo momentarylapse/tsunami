@@ -90,8 +90,7 @@ public:
 	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
 	TrackMarker* _cdecl addMarker(const Range &range, const string &text);
 	void _cdecl deleteMarker(int index);
-	void _cdecl moveMarker(int index, int pos);
-	void _cdecl editMarker(int index, const string &text);
+	void _cdecl editMarker(int index, const Range &range, const string &text);
 
 
 	enum

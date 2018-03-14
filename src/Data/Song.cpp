@@ -485,6 +485,11 @@ void Song::deleteBar(int index, bool affect_midi)
 	execute(new ActionBarDelete(index, affect_midi));
 }
 
+void Song::deleteTimeInterval(int index, const Range &range)
+{
+	//execute(new ActionBarDelete(index, affect_midi));
+}
+
 Curve *Song::addCurve(const string &name, Array<Curve::Target> &targets)
 {
 	Curve *c = new Curve;

@@ -9,10 +9,11 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackEditMarker::ActionTrackEditMarker(Track *t, int _index, const string &_text)
+ActionTrackEditMarker::ActionTrackEditMarker(Track *t, int _index, const Range &_range, const string &_text)
 {
 	track_no = get_track_index(t);
 	index = _index;
+	range = _range;
 	text = _text;
 }
 
@@ -28,6 +29,11 @@ void *ActionTrackEditMarker::execute(Data *d)
 	string temp = text;
 	text = t->markers[index]->text;
 	t->markers[index]->text = temp;
+
+	Range r = range;
+	range = t->markers[index]->range;
+	msg_write(r.str());
+	t->markers[index]->range = r;
 
 	return NULL;
 }

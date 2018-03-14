@@ -348,7 +348,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
 
-	if ((t->track->type == Track::TYPE_TIME) and (view->sel.has(t->track)))
+	if (t->track->type == Track::TYPE_TIME)
 		draw_bar_selection(c, t, view);
 }
 
@@ -521,6 +521,7 @@ Selection ViewModeDefault::getHoverBasic()
 	return s;
 }
 
+// FIXME: header > marker etc
 Selection ViewModeDefault::getHover()
 {
 	Selection s = getHoverBasic();
@@ -636,12 +637,7 @@ void ViewModeDefault::selectUnderMouse()
 
 SongSelection ViewModeDefault::getSelectionForRange(const Range &r)
 {
-	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
-	s.from_range(song, r, view->sel.tracks);
-	return s;
+	return SongSelection::from_range(song, r, view->sel.tracks);
 }
 
 SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y1)
@@ -681,39 +677,17 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 
 SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, int y1)
 {
-	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
 	if (y0 > y1){
 		int t = y0;
 		y0 = y1;
 		y1 = t;
 	}
-
+	Set<const Track*> _tracks;
 	for (auto vt: view->vtrack){
-		Track *t = vt->track;
-		if ((y1 < vt->area.y1) or (y0 > vt->area.y2))
-			continue;
-		s.add(t);
-
-		// subs
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.overlaps(m->range));
-
-		// midi
-		for (MidiNote *n: t->midi)
-			//s.set(n, s.range.is_inside(n->range.center()));
-			s.set(n, s.range.overlaps(n->range));
-
-		if (t->type == Track::TYPE_TIME)
-			s._update_bars(song);
+		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
+			_tracks.add(vt->track);
 	}
-	return s;
+	return SongSelection::from_range(song, r, _tracks);
 }
 
 void ViewModeDefault::startSelection()

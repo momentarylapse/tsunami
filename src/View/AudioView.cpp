@@ -881,8 +881,8 @@ void AudioView::drawSelection(Painter *c)
 
 	// bar selection
 	if (sel.bars.num == 0){
-		sx1 = cam.sample2screen(sel.bar_range.start());
-		sx2 = cam.sample2screen(sel.bar_range.end());
+		sx1 = cam.sample2screen(song->barOffset(sel.bar_indices.offset));
+		sx2 = sx1;
 		c->setAntialiasing(true);
 		c->setColor(colors.text_soft1);
 		c->setLineWidth(2.5f);

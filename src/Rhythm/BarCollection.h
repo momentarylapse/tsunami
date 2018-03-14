@@ -26,7 +26,8 @@ public:
 	int getNextSubBeat(int pos, int beat_partition);
 	int getPrevSubBeat(int pos, int beat_partition);
 	Range expand(const Range &r, int beat_partition);
-	Range getRange();
+	Range range();
+	Range sub_range(const Range &indices);
 };
 
 

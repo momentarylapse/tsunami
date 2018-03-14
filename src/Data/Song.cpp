@@ -273,7 +273,7 @@ Range Song::getRangeWithTime()
 	Range r = getRange();
 
 	if (bars.num > 0)
-		r = r or bars.getRange();
+		r = r or bars.range();
 
 	return r;
 }

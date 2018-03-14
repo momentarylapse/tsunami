@@ -144,7 +144,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				offset += dt;
 				while (offset > last_bar){
 					od->song->addBar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
-					last_bar = od->song->bars.getRange().end();
+					last_bar = od->song->bars.range().end();
 				}
 				int c0 = f->read_byte();
 				if ((c0 & 128) == 0){ // "running status"

@@ -140,11 +140,22 @@ Range BarCollection::expand(const Range &r, int beat_partition)
 	return r;
 }
 
-Range BarCollection::getRange()
+Range BarCollection::range()
 {
 	int pos0 = 0;
 	for (Bar *b: *this)
 		pos0 += b->length;
 	return Range(0, pos0);
+}
+
+Range BarCollection::sub_range(const Range &indices)
+{
+	int offset = 0;
+	for (int i=0; i<indices.offset; i++)
+		offset += (*this)[i]->length;
+	int pos0 = offset;
+	for (int i=indices.offset; i<indices.end(); i++)
+		pos0 += (*this)[i]->length;
+	return Range(offset, pos0 - offset);
 }
 

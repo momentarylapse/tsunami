@@ -41,8 +41,8 @@ void ViewModeScaleBars::startScaling(const Array<int> &sel)
 {
 	scaling_change = false;
 	scaling_sel = sel;
-	scaling_range_orig = view->sel.bar_range;
-	view->sel.range = view->sel.bar_range;
+	scaling_range_orig = song->bars.sub_range(view->sel.bar_indices);
+	view->sel.range = song->bars.sub_range(view->sel.bar_indices);
 	view->updateSelection();
 }
 

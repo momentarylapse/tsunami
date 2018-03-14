@@ -28,8 +28,8 @@ public:
 	void clear_data();
 	void all(Song *s);
 	void _update_bars(Song *s);
-	void from_range(Song *s, const Range &r, int mask = MASK_ALL);
-	void from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = MASK_ALL);
+	static SongSelection from_range(Song *s, const Range &r, int mask = MASK_ALL);
+	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = MASK_ALL);
 
 	enum{
 		MASK_SAMPLES = 1,
@@ -40,8 +40,6 @@ public:
 	};
 
 	Range range;
-
-	Range bar_range;
 
 	Set<const Track*> tracks;
 	Set<const SampleRef*> samples;

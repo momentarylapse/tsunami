@@ -15,7 +15,7 @@ SongSelection::SongSelection()
 
 void SongSelection::clear()
 {
-	bars.clear();
+	bar_indices.clear();
 	bar_range.clear();
 	tracks.clear();
 	clear_data();
@@ -26,6 +26,7 @@ void SongSelection::clear_data()
 	samples.clear();
 	markers.clear();
 	notes.clear();
+	bars.clear();
 }
 
 void SongSelection::all(Song* s)
@@ -66,11 +67,16 @@ void SongSelection::from_range(Song *s, const Range &r, Set<const Track*> _track
 			for (MidiNote *n: t->midi)
 				set(n, range.is_inside(n->range.center()));
 	}
+
+	// bars
+	if ((mask & MASK_BARS) > 0)
+		_update_bars(s);
 }
 
-void SongSelection::update_bars(Song* s)
+void SongSelection::_update_bars(Song* s)
 {
 	bars.clear();
+	bar_indices.clear();
 	bar_range.clear();
 
 	int pos = 0;
@@ -80,20 +86,22 @@ void SongSelection::update_bars(Song* s)
 		b->offset = pos;
 		if (r.overlaps(range)){
 			if (first){
-				bars = Range(i, 1);
+				bar_indices = Range(i, 1);
 				bar_range = Range(pos, b->length);
 			}
-			bars.set_end(i+1);
+			bar_indices.set_end(i + 1);
+			bars.add(b);
 			bar_range.set_end(r.end() + 1);
 			first = false;
 		}else if (range.length == 0 and (range.offset == pos)){
-			bars = Range(i, 0);
+			bar_indices = Range(i, 0);
+			bars.add(b);
 			bar_range = Range(pos, 0);
 		}
 		pos += b->length;
 	}
 	if (range.start() >= pos){
-		bars = Range(s->bars.num, 0);
+		bar_indices = Range(s->bars.num, 0);
 		bar_range = Range(pos, 0);
 	}
 }
@@ -170,6 +178,24 @@ bool SongSelection::has(const MidiNote* n) const
 	return notes.contains(n);
 }
 
+void SongSelection::add(const Bar *b)
+{
+	bars.add(b);
+}
+
+void SongSelection::set(const Bar *b, bool selected)
+{
+	if (selected)
+		bars.add(b);
+	else
+		bars.erase(b);
+}
+
+bool SongSelection::has(const Bar *b) const
+{
+	return bars.contains(b);
+}
+
 int SongSelection::getNumSamples() const
 {
 	return samples.num;
@@ -202,6 +228,8 @@ SongSelection SongSelection::operator||(const SongSelection &s) const
 		r.add(m);
 	for (auto sr: s.samples)
 		r.add(sr);
+	for (auto b: s.bars)
+		r.add(b);
 	return r;
 }
 

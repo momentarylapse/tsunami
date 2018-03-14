@@ -32,7 +32,6 @@ void *ActionTrackEditMarker::execute(Data *d)
 
 	Range r = range;
 	range = t->markers[index]->range;
-	msg_write(r.str());
 	t->markers[index]->range = r;
 
 	return NULL;

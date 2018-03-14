@@ -734,9 +734,9 @@ void TsunamiWindow::updateMenu()
 	enable("layer_down", view->cur_layer > 0);
 	// bars
 	enable("delete_time", !view->sel.range.empty());
-	enable("delete_bars", !view->sel.bars.empty());
-	enable("edit_bars", !view->sel.bars.empty());
-	enable("scale_bars", !view->sel.bars.empty());
+	enable("delete_bars", view->sel.bars.num > 0);
+	enable("edit_bars", view->sel.bars.num > 0);
+	enable("scale_bars", view->sel.bars.num > 0);
 	check("bar_link_to_data", view->bars_edit_data);
 	// sample
 	enable("sample_from_selection", selected);
@@ -897,7 +897,7 @@ void TsunamiWindow::onDeleteBars()
 {
 	song->action_manager->beginActionGroup();
 
-	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
+	for (int i=view->sel.bar_indices.end()-1; i>=view->sel.bar_indices.start(); i--){
 		song->deleteBar(i, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();
@@ -916,22 +916,22 @@ void TsunamiWindow::onDeleteTimeInterval()
 
 void TsunamiWindow::onEditBars()
 {
-	if (view->sel.bars.length == 0){
+	if (view->sel.bars.num == 0){
 		return;
 	}
 	int num_bars = 0;
 	int num_pauses = 0;
-	for (int i=view->sel.bars.offset; i<view->sel.bars.end(); i++)
+	for (int i=view->sel.bar_indices.offset; i<view->sel.bar_indices.end(); i++)
 		if (song->bars[i]->is_pause())
 			num_pauses ++;
 		else
 			num_bars ++;
 	if (num_bars > 0 and num_pauses == 0){
-		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
+		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bar_indices, view->bars_edit_data);
 		dlg->run();
 		delete(dlg);
 	}else if (num_bars == 0 and num_pauses == 1){
-		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bars.start(), view->bars_edit_data);
+		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start(), view->bars_edit_data);
 		dlg->run();
 		delete(dlg);
 	}else{
@@ -943,7 +943,7 @@ void TsunamiWindow::onScaleBars()
 {
 	view->setMode(view->mode_scale_bars);
 	Set<int> s;
-	for (int i=view->sel.bars.start(); i<view->sel.bars.end(); i++)
+	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
 		s.add(i);
 	view->mode_scale_bars->startScaling(s);
 }

@@ -16,7 +16,7 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
 	fromResource("bar_add_dialog");
 	song = s;
 	view = v;
-	bars = view->sel.bars;
+	bars = view->sel.bar_indices;
 
 	// no reference bar selected -> use last bar
 	int ref = bars.end() - 1;

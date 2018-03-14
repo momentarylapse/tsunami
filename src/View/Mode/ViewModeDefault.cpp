@@ -319,7 +319,7 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 	auto bars = view->song->bars.getBars(Range::ALL);
 	for (auto b: bars){
-		if (view->sel.bars.is_inside(b->index)){
+		if (view->sel.has(b)){
 			float x1 = view->cam.sample2screen(b->range().offset);
 			float x2 = view->cam.sample2screen(b->range().end());
 			c->drawRect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
@@ -709,6 +709,9 @@ SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, 
 		for (MidiNote *n: t->midi)
 			//s.set(n, s.range.is_inside(n->range.center()));
 			s.set(n, s.range.overlaps(n->range));
+
+		if (t->type == Track::TYPE_TIME)
+			s._update_bars(song);
 	}
 	return s;
 }

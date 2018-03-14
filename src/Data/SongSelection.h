@@ -17,6 +17,7 @@ class Track;
 class SampleRef;
 class TrackMarker;
 class MidiNote;
+class Bar;
 
 class SongSelection
 {
@@ -26,7 +27,7 @@ public:
 	void clear();
 	void clear_data();
 	void all(Song *s);
-	void update_bars(Song *s);
+	void _update_bars(Song *s);
 	void from_range(Song *s, const Range &r, int mask = MASK_ALL);
 	void from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = MASK_ALL);
 
@@ -34,18 +35,20 @@ public:
 		MASK_SAMPLES = 1,
 		MASK_MARKERS = 2,
 		MASK_MIDI_NOTES = 4,
+		MASK_BARS = 8,
 		MASK_ALL = -1
 	};
 
 	Range range;
 
-	Range bars;
 	Range bar_range;
 
 	Set<const Track*> tracks;
 	Set<const SampleRef*> samples;
 	Set<const TrackMarker*> markers;
 	Set<const MidiNote*> notes;
+	Set<const Bar*> bars;
+	Range bar_indices;
 
 	void add(const Track *t);
 	void set(const Track *t, bool selected);
@@ -62,6 +65,10 @@ public:
 	void add(const MidiNote *n);
 	void set(const MidiNote *n, bool selected);
 	bool has(const MidiNote *n) const;
+
+	void add(const Bar *b);
+	void set(const Bar *b, bool selected);
+	bool has(const Bar *b) const;
 
 	int getNumSamples() const;
 

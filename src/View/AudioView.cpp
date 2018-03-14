@@ -353,8 +353,6 @@ void AudioView::updateSelection()
 	if (sel.range.length < 0)
 		sel.range.invert();
 
-	sel.update_bars(song);
-
 
 	renderer->setRange(getPlaybackSelection(false));
 	if (isPlaying()){
@@ -882,7 +880,7 @@ void AudioView::drawSelection(Painter *c)
 	}
 
 	// bar selection
-	if (sel.bars.length == 0){
+	if (sel.bars.num == 0){
 		sx1 = cam.sample2screen(sel.bar_range.start());
 		sx2 = cam.sample2screen(sel.bar_range.end());
 		c->setAntialiasing(true);

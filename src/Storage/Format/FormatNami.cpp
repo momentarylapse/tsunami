@@ -21,7 +21,8 @@
 
 
 
-static Session *_cur_session = NULL; // argh
+StorageOperationData *cur_op(FileChunkBasic *c);
+
 
 
 FormatDescriptorNami::FormatDescriptorNami() :
@@ -106,7 +107,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(_cur_session, f->read_str());
+		me = CreateEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
@@ -135,7 +136,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(_cur_session, f->read_str());
+		me = CreateEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
@@ -627,7 +628,7 @@ public:
 	{}
 	virtual void read(File *f)
 	{
-		me = CreateMidiEffect(_cur_session, f->read_str());
+		me = CreateMidiEffect(cur_op(this)->session, f->read_str());
 		me->only_on_selection = f->read_bool();
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
@@ -887,7 +888,8 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = _cur_session->plugin_manager->CreateSynthesizer(_cur_session, f->read_str());
+		Session *session = cur_op(this)->session;
+		me = session->plugin_manager->CreateSynthesizer(session, f->read_str());
 		me->configFromString(f->read_str());
 		f->read_str();
 		f->read_int();
@@ -941,7 +943,7 @@ public:
 	}
 };
 
-class FileChunkTrackBar : public FileChunk<Track,Bar>
+/*class FileChunkTrackBar : public FileChunk<Track,Bar>
 {
 public:
 	FileChunkTrackBar() : FileChunk<Track,Bar>("bar"){}
@@ -962,6 +964,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
+		root->on_error("deprecated... TrackBar.write");
 		if (me->is_pause())
 			f->write_int(BarPattern::TYPE_PAUSE);
 		else
@@ -971,7 +974,7 @@ public:
 		f->write_int(1);
 		f->write_int(0); // reserved
 	}
-};
+};*/
 
 class FileChunkMarker : public FileChunk<Track,TrackMarker>
 {
@@ -1034,7 +1037,7 @@ public:
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
-		add_child(new FileChunkTrackBar);
+		//add_child(new FileChunkTrackBar);
 		add_child(new FileChunkMarker);
 		add_child(new FileChunkSampleRef);
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
@@ -1112,7 +1115,7 @@ public:
 		write_sub("format", me);
 		write_sub_array("tag", me->tags);
 		write_sub("lvlname", me);
-		write_sub_array("bar", me->bars);
+		write_sub_parray("bar", me->bars);
 		write_sub_parray("sample", me->samples);
 		write_sub_parray("track", me->tracks);
 		write_sub_parray("effect", me->fx);
@@ -1159,6 +1162,11 @@ public:
 	}
 };
 
+StorageOperationData *cur_op(FileChunkBasic *c)
+{
+	return ((ChunkedFileFormatNami*)c->root)->od;
+}
+
 
 void FormatNami::saveSong(StorageOperationData *_od)
 {
@@ -1198,7 +1206,6 @@ void FormatNami::make_consistent(Song *a)
 void FormatNami::loadSong(StorageOperationData *_od)
 {
 	od = _od;
-	_cur_session = od->session;
 
 	// TODO?
 	od->song->tags.clear();

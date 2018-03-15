@@ -45,8 +45,8 @@ void ViewModeDefault::onLeftButtonDown()
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_BAR){
 		setCursorPos(hover->pos, track_hover_sel);
-		view->sel.range = hover->bar->range();
-		view->updateSelection();
+		//view->sel.range = hover->bar->range();
+		//view->updateSelection();
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_TIME){
 		setCursorPos(hover->pos, true);
@@ -79,8 +79,8 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::TYPE_TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_MARKER){
-		view->sel.range = hover->marker->range;
-		view->updateSelection();
+		//view->sel.range = hover->marker->range;
+		//view->updateSelection();
 	}
 }
 
@@ -110,13 +110,15 @@ void ViewModeDefault::onLeftDoubleClick()
 	selectUnderMouse();
 
 	if (hover->type == Selection::TYPE_SAMPLE){
-		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
-	}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER) or ((hover->track) and ((hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)))){
-		win->side_bar->open(SideBar::TRACK_CONSOLE);
-	}else if (!hover->track){
-		win->side_bar->open(SideBar::SONG_CONSOLE);
+		view->sel.range = view->cur_sample->range();
+		view->updateSelection();
+	}else if (hover->type == Selection::TYPE_MARKER){
+		view->sel.range = hover->marker->range;
+		view->updateSelection();
+	}else if (hover->type == Selection::TYPE_BAR){
+		view->sel.range = hover->bar->range();
+		view->updateSelection();
 	}
-	//hover->type = Selection::TYPE_NONE;
 }
 
 void ViewModeDefault::onRightButtonDown()

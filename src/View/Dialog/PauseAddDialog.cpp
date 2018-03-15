@@ -15,7 +15,7 @@ PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int _in
 	fromResource("pause_add_dialog");
 	song = s;
 	view = v;
-	index = -index;
+	index = _index;
 
 	setFloat("duration", 1.0f);
 

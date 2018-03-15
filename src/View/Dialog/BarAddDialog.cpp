@@ -27,7 +27,7 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index)
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(Bar *b, song->bars, i)
-			if ((i <= index) and (b->num_beats > 0)){
+			if ((i <= index) and (!b->is_pause())){
 				beats = b->num_beats;
 				sub_beats = b->num_sub_beats;
 				bpm = song->sample_rate * 60.0f / (b->length / b->num_beats);

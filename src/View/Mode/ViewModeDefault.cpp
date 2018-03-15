@@ -632,6 +632,7 @@ void ViewModeDefault::selectUnderMouse()
 	*hover = getHover();
 	Track *t = hover->track;
 	SampleRef *s = hover->sample;
+	Bar *b = hover->bar;
 	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
@@ -640,11 +641,27 @@ void ViewModeDefault::selectUnderMouse()
 	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER)){
 		view->selectTrack(t, control, false);
 	}
+
+	view->setCurSample(s);
+
+
 	if (hover->type == Selection::TYPE_BAR_GAP){
+		view->sel.clear_data();
 		view->sel.bar_gap = hover->index;
-	}
-	if (hover->type == Selection::TYPE_MARKER){
-		auto m = t->markers[hover->index];
+	}else if (hover->type == Selection::TYPE_BAR){
+		auto b = hover->bar;
+		if (control){
+			view->sel.set(b, !view->sel.has(b));
+		}else{
+			if (view->sel.has(b)){
+			}else{
+				view->selectTrack(t, control, true);
+				view->sel.clear_data();
+				view->sel.add(b);
+			}
+		}
+	}else if (hover->type == Selection::TYPE_MARKER){
+		auto m = hover->marker;
 		if (control){
 			view->sel.set(m, !view->sel.has(m));
 		}else{
@@ -655,11 +672,7 @@ void ViewModeDefault::selectUnderMouse()
 				view->sel.add(m);
 			}
 		}
-	}
-
-	// sample
-	view->setCurSample(s);
-	if (hover->type == Selection::TYPE_SAMPLE){
+	}else if (hover->type == Selection::TYPE_SAMPLE){
 		if (control){
 			view->sel.set(s, !view->sel.has(s));
 		}else{

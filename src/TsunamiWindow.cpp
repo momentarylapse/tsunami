@@ -892,7 +892,6 @@ int pref_bar_index(AudioView *view)
 
 void TsunamiWindow::onAddBars()
 {
-	msg_write(pref_bar_index(view));
 	auto dlg = new BarAddDialog(win, song, view, pref_bar_index(view));
 	dlg->run();
 	delete(dlg);

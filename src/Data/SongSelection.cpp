@@ -85,6 +85,11 @@ void SongSelection::_update_bars(Song* s)
 	bar_indices.clear();
 	bar_gap = -1;
 
+	if (range.end() <= 0){
+		bar_gap = 0;
+		return;
+	}
+
 	int pos = 0;
 	bool first = true;
 	foreachi(Bar *b, s->bars, i){
@@ -98,13 +103,12 @@ void SongSelection::_update_bars(Song* s)
 			bars.add(b);
 			first = false;
 		}else if (range.length == 0 and (range.offset == pos)){
-			bar_indices = Range(i, 0);
 			bar_gap = i;
 		}
 		pos += b->length;
 	}
 	if (range.start() >= pos){
-		bar_indices = Range(s->bars.num, 0);
+		bar_gap = s->bars.num;
 	}
 }
 

@@ -109,13 +109,13 @@ void ViewModeDefault::onLeftDoubleClick()
 	selectUnderMouse();
 
 	if (hover->type == Selection::TYPE_SAMPLE){
-		view->sel.range = view->cur_sample->range();
+		view->sel = getSelectionForRange(view->cur_sample->range());
 		view->updateSelection();
 	}else if (hover->type == Selection::TYPE_MARKER){
-		view->sel.range = hover->marker->range;
+		view->sel = getSelectionForRange(hover->marker->range);
 		view->updateSelection();
 	}else if (hover->type == Selection::TYPE_BAR){
-		view->sel.range = hover->bar->range();
+		view->sel = getSelectionForRange(hover->bar->range());
 		view->updateSelection();
 	}
 }

@@ -160,9 +160,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	ColorSchemeBasic dark;
 	dark.background = color(1, 0.15f, 0.15f, 0.15f);
 	dark.text = color(1, 0.95f, 0.95f, 0.95f);
-	dark.selection = color(1, 0.3f, 0.3f, 0.8f);
+	dark.selection = color(1, 0.3f, 0.3f, 0.9f);
 	dark.hover = White;
-	dark.gamma = 0.3f;
+	dark.gamma = 0.4f;
 	dark.name = "dark";
 	basic_schemes.add(dark);
 

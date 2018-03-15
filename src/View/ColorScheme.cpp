@@ -22,7 +22,7 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 		c.hover = hover;
 	}else{
 		c.text = ColorInterpolate(text, background, 0.3f);
-		c.selection = ColorInterpolate(selection, background, 0.3f);
+		c.selection = ColorInterpolate(selection, background, pow(0.3f, gamma));
 		c.hover = ColorInterpolate(hover, background, 0.3f);
 	}
 
@@ -31,7 +31,7 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.background_track_selected = ColorInterpolate(background, c.selection*1.2f, 0.15f);
 	c.background_track = c.background;
 	c.selection_internal = c.selection;
-	c.selection_internal.a = 0.2f;
+	c.selection_internal.a = pow(0.2f, gamma);
 	c.selection_boundary = c.selection;
 	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
 	c.preview_marker = color(1, 0, 0.7f, 0);

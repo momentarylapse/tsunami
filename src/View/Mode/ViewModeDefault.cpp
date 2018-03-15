@@ -128,7 +128,7 @@ void ViewModeDefault::onRightButtonDown()
 	selectUnderMouse();
 
 	// click outside sel.range -> select new position
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND) or (hover->type == Selection::TYPE_BAR)){
+	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			setBarriers(*hover);
 			view->applyBarriers(hover->pos);
@@ -329,7 +329,15 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 	auto bars = view->song->bars.getBars(Range::ALL);
 	for (auto b: bars){
-		if (view->sel.has(b)){
+		if ((view->sel.has(b)) or (b == view->hover.bar)){
+			color col = view->colors.hover;
+			col.a = 0.3f;
+			if (view->sel.has(b)){
+				col = view->colors.selection_internal;
+				if (b == view->hover.bar)
+					col = ColorInterpolate(col, view->colors.hover, 0.5f);
+			}
+			c->setColor(col);
 			float x1 = view->cam.sample2screen(b->range().offset);
 			float x2 = view->cam.sample2screen(b->range().end());
 			c->drawRect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
@@ -531,10 +539,14 @@ Selection ViewModeDefault::getHoverBasic()
 	return s;
 }
 
-// FIXME: header > marker etc
 Selection ViewModeDefault::getHover()
 {
 	Selection s = getHoverBasic();
+
+	// already found important stuff?
+	if ((s.type != Selection::TYPE_BACKGROUND) and (s.type != Selection::TYPE_TRACK) and (s.type != Selection::TYPE_TIME))
+		return s;
+
 	int mx = view->mx;
 	int my = view->my;
 
@@ -600,6 +612,14 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
 
+void sel_track_soft(Track *t, SongSelection *sel)
+{
+	if (sel->has(t))
+		return;
+	sel->tracks.clear();
+	sel->add(t);
+}
+
 void ViewModeDefault::selectUnderMouse()
 {
 	view->sel_temp = view->sel;
@@ -623,7 +643,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(m)){
 			}else{
-				view->selectTrack(t, false);
+				sel_track_soft(t, &view->sel);
 				view->sel.clear_data();
 				view->sel.add(m);
 			}
@@ -638,7 +658,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(s)){
 			}else{
-				view->selectTrack(t, false);
+				sel_track_soft(t, &view->sel);
 				view->sel.clear_data();
 				view->sel.add(s);
 			}

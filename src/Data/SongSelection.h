@@ -47,6 +47,7 @@ public:
 	Set<const MidiNote*> notes;
 	Set<const Bar*> bars;
 	Range bar_indices;
+	int bar_gap;
 
 	void add(const Track *t);
 	void set(const Track *t, bool selected);

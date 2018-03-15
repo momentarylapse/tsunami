@@ -11,6 +11,7 @@
 
 SongSelection::SongSelection()
 {
+	bar_gap = -1;
 }
 
 void SongSelection::clear()
@@ -26,6 +27,7 @@ void SongSelection::clear_data()
 	markers.clear();
 	notes.clear();
 	bars.clear();
+	bar_gap = -1;
 }
 
 void SongSelection::all(Song* s)
@@ -69,12 +71,11 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			for (MidiNote *n: t->midi)
 				//set(n, range.is_inside(n->range.center()));
 				s.set(n, s.range.overlaps(n->range));
-
-		// bars
-		if ((mask & MASK_BARS) > 0)
-			if (t->type == Track::TYPE_TIME)
-				s._update_bars(song);
 	}
+
+	// bars
+	if ((mask & MASK_BARS) > 0)
+		s._update_bars(song);
 	return s;
 }
 
@@ -82,6 +83,7 @@ void SongSelection::_update_bars(Song* s)
 {
 	bars.clear();
 	bar_indices.clear();
+	bar_gap = -1;
 
 	int pos = 0;
 	bool first = true;
@@ -97,6 +99,7 @@ void SongSelection::_update_bars(Song* s)
 			first = false;
 		}else if (range.length == 0 and (range.offset == pos)){
 			bar_indices = Range(i, 0);
+			bar_gap = i;
 		}
 		pos += b->length;
 	}

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-427
+429
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1283,6 +1283,12 @@ Skalieren
 
 popup_pause_menu/track_add_marker
 Marker hinzufügen
+
+popup_time_track_menu/add_bars
+Takte hinzufügen...
+
+popup_time_track_menu/add_pause
+Pause hinzufügen...
 
 // Num Language Strings
 169

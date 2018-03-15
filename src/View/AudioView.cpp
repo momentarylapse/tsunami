@@ -880,11 +880,30 @@ void AudioView::drawSelection(Painter *c)
 	}
 
 	// bar selection
-	if (sel.bars.num == 0){
-		sx1 = cam.sample2screen(song->barOffset(sel.bar_indices.offset));
+	if (sel.bar_gap >= 0){
+		sx1 = cam.sample2screen(song->barOffset(sel.bar_gap));
 		sx2 = sx1;
 		c->setAntialiasing(true);
 		c->setColor(colors.text_soft1);
+		c->setLineWidth(2.5f);
+		for (AudioViewTrack *t: vtrack)
+			if (t->track->type == Track::TYPE_TIME){
+				float dy = t->area.height();
+				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
+				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
+				c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
+				c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
+				c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
+				c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
+		}
+		c->setLineWidth(1.0f);
+		c->setAntialiasing(false);
+	}
+	if (hover.type == Selection::TYPE_BAR_GAP){
+		sx1 = cam.sample2screen(song->barOffset(hover.index));
+		sx2 = sx1;
+		c->setAntialiasing(true);
+		c->setColor(colors.hover);
 		c->setLineWidth(2.5f);
 		for (AudioViewTrack *t: vtrack)
 			if (t->track->type == Track::TYPE_TIME){

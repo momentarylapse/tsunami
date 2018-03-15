@@ -2,6 +2,8 @@ Menu popup_time_track_menu ""
 	Item time_track_menu_header "Time track" disabled
 	Separator
 	Item delete_track "Delete"
+	Item add_bars "Add bars..." flat image=hui:add
+	Item add_pause "Add pause..." image=hui:add
 	Item track_add_marker "Add marker"
 	Item track_edit_fx "Edit effects"
 	Item track_properties "Properties"

@@ -2164,7 +2164,7 @@ popup_time_track_menu
 
 0
 0
-6
+8
 Item
 time_track_menu_header
 disabled
@@ -2184,21 +2184,33 @@ delete_track
 0
 0
 Item
+add_bars
+flat,image=hui:add
+3
+0
+0
+Item
+add_pause
+image=hui:add
+4
+0
+0
+Item
 track_add_marker
 
-3
+5
 0
 0
 Item
 track_edit_fx
 
-4
+6
 0
 0
 Item
 track_properties
 
-5
+7
 0
 0
 // Resource
@@ -3628,7 +3640,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-341
+343
 // Text
 /cancel
 Cancel
@@ -4323,6 +4335,12 @@ File
 popup_song_menu/song_properties
 Properties
 
+popup_time_track_menu/add_bars
+Add bars...
+
+popup_time_track_menu/add_pause
+Add pause...
+
 popup_time_track_menu/delete_track
 Delete
 
@@ -4659,7 +4677,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-426
+428
 // Text
 /cancel
 Abbrechen
@@ -5527,6 +5545,12 @@ Datei
 
 popup_song_menu/song_properties
 Eigenschaften
+
+popup_time_track_menu/add_bars
+Takte hinzufügen...
+
+popup_time_track_menu/add_pause
+Pause hinzufügen...
 
 popup_time_track_menu/delete_track
 Löschen

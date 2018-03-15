@@ -57,7 +57,9 @@ void BarAddDialog::onOk()
 	if (!song->getTimeTrack())
 		song->addTrack(Track::TYPE_TIME, 0);
 
-	int index = max(0, bars.end());
+	int index = view->sel.bar_gap;
+	if (index < 0)
+		index = song->bars.num;
 
 	for (int i=0; i<count; i++)
 		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data);

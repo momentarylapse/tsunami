@@ -44,11 +44,12 @@ void ViewModeDefault::onLeftButtonDown()
 		setCursorPos(hover->pos, track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_BAR){
-		setCursorPos(hover->pos, track_hover_sel);
-		//view->sel.range = hover->bar->range();
-		//view->updateSelection();
+		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_TIME){
+		setCursorPos(hover->pos, true);
+		view->msp.start(hover->pos, hover->y0);
+	}else if (hover->type == Selection::TYPE_BAR_GAP){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_BACKGROUND){
@@ -79,8 +80,6 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::TYPE_TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::TYPE_MARKER){
-		//view->sel.range = hover->marker->range;
-		//view->updateSelection();
 	}
 }
 
@@ -147,6 +146,8 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_bar->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::TYPE_MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
+	}else if (hover->type == Selection::TYPE_BAR_GAP){
+		view->menu_time_track->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::TYPE_TRACK) and (hover->track->type == Track::TYPE_TIME)){
 		view->menu_time_track->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER) or (hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)){
@@ -575,6 +576,18 @@ Selection ViewModeDefault::getHover()
 
 		// bars
 		if (s.track->type == Track::TYPE_TIME){
+			int offset = 0;
+			for (int i=0; i<view->song->bars.num+1; i++){
+				float x = view->cam.sample2screen(offset);
+				if (fabs(x - mx) < view->BARRIER_DIST){
+					s.index = i;
+					s.type = Selection::TYPE_BAR_GAP;
+					s.pos = offset;
+					return s;
+				}
+				if (i < view->song->bars.num)
+					offset += view->song->bars[i]->length;
+			}
 			auto bars = view->song->bars.getBars(Range(s.pos, 0));
 			for (auto *b: bars){
 				//b.range.
@@ -627,6 +640,9 @@ void ViewModeDefault::selectUnderMouse()
 	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER)){
 		view->selectTrack(t, control, false);
 	}
+	if (hover->type == Selection::TYPE_BAR_GAP){
+		view->sel.bar_gap = hover->index;
+	}
 	if (hover->type == Selection::TYPE_MARKER){
 		auto m = t->markers[hover->index];
 		if (control){
@@ -649,7 +665,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(s)){
 			}else{
-				view->selectTrack(t, control, false);
+				view->selectTrack(t, control, true);
 				view->sel.clear_data();
 				view->sel.add(s);
 			}

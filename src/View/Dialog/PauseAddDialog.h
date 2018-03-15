@@ -19,9 +19,9 @@ class PauseAddDialog : public hui::Dialog
 public:
 	Song *song;
 	AudioView *view;
-	Range bars;
+	int index;
 
-	PauseAddDialog(hui::Window *root, Song *s, AudioView *v);
+	PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int index);
 	void onOk();
 	void onClose();
 };

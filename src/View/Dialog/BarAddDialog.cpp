@@ -10,18 +10,14 @@
 #include "../../Rhythm/Bar.h"
 #include "../AudioView.h"
 
-BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
+BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("bar_add_dialog");
 	song = s;
 	view = v;
-	bars = view->sel.bar_indices;
+	index = max(_index, 0);
 
-	// no reference bar selected -> use last bar
-	int ref = bars.end() - 1;
-	if (ref < 0)
-		ref = song->bars.num;
 
 	setInt("count", 1);
 	int beats = 4;
@@ -31,7 +27,7 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v):
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(Bar *b, song->bars, i)
-			if ((i <= ref) and (b->num_beats > 0)){
+			if ((i <= index) and (b->num_beats > 0)){
 				beats = b->num_beats;
 				sub_beats = b->num_sub_beats;
 				bpm = song->sample_rate * 60.0f / (b->length / b->num_beats);
@@ -56,10 +52,6 @@ void BarAddDialog::onOk()
 
 	if (!song->getTimeTrack())
 		song->addTrack(Track::TYPE_TIME, 0);
-
-	int index = view->sel.bar_gap;
-	if (index < 0)
-		index = song->bars.num;
 
 	for (int i=0; i<count; i++)
 		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data);

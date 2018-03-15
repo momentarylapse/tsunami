@@ -9,13 +9,13 @@
 #include "../../Data/Song.h"
 #include "../AudioView.h"
 
-PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v):
+PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("pause_add_dialog");
 	song = s;
 	view = v;
-	bars = view->sel.bar_indices;
+	index = -index;
 
 	setFloat("duration", 1.0f);
 
@@ -31,8 +31,6 @@ void PauseAddDialog::onOk()
 
 	if (!song->getTimeTrack())
 		song->addTrack(Track::TYPE_TIME, 0);
-
-	int index = max(0, bars.end());
 
 	song->addPause(index, duration, view->bars_edit_data);
 	song->action_manager->endActionGroup();

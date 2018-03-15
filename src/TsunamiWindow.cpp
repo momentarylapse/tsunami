@@ -879,16 +879,28 @@ void TsunamiWindow::onExport()
 	}
 }
 
+int pref_bar_index(AudioView *view)
+{
+	if (view->sel.bar_gap >= 0)
+		return view->sel.bar_gap;
+	if (!view->sel.bar_indices.empty())
+		return view->sel.bar_indices.end();
+	if (view->hover.pos > 0)
+		return view->song->bars.num;
+	return 0;
+}
+
 void TsunamiWindow::onAddBars()
 {
-	auto dlg = new BarAddDialog(win, song, view);
+	msg_write(pref_bar_index(view));
+	auto dlg = new BarAddDialog(win, song, view, pref_bar_index(view));
 	dlg->run();
 	delete(dlg);
 }
 
 void TsunamiWindow::onAddPause()
 {
-	auto dlg = new PauseAddDialog(win, song, view);
+	auto dlg = new PauseAddDialog(win, song, view, pref_bar_index(view));
 	dlg->run();
 	delete(dlg);
 }

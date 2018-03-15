@@ -19,9 +19,9 @@ class BarAddDialog : public hui::Dialog
 public:
 	Song *song;
 	AudioView *view;
-	Range bars;
+	int index;
 
-	BarAddDialog(hui::Window *root, Song *s, AudioView *v);
+	BarAddDialog(hui::Window *root, Song *s, AudioView *v, int index);
 	void onOk();
 	void onClose();
 };

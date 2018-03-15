@@ -160,7 +160,7 @@ public:
 	bool mouse_over_time(int pos);
 
 	void selectSample(SampleRef *s, bool diff);
-	void selectTrack(Track *t, bool diff);
+	void selectTrack(Track *t, bool diff, bool soft);
 
 	int detail_steps;
 	int preview_sleep_time;

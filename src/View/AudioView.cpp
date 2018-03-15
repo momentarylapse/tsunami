@@ -1088,7 +1088,7 @@ void AudioView::selectSample(SampleRef *s, bool diff)
 	}
 }
 
-void AudioView::selectTrack(Track *t, bool diff)
+void AudioView::selectTrack(Track *t, bool diff, bool soft)
 {
 	if (!t)
 		return;
@@ -1098,17 +1098,17 @@ void AudioView::selectTrack(Track *t, bool diff)
 			if (sel.has(tt) and (tt != t))
 				is_only_selected = false;
 		sel.set(t, !sel.has(t) or is_only_selected);
-	}else{
-		//if (!sel.has(t)){
+	}else if (soft){
+		if (sel.has(t))
+			return;
 		sel.tracks.clear();
-		//}
-
-		// select this track
+		sel.add(t);
+	}else{
+		sel.tracks.clear();
 		sel.add(t);
 	}
 	// TODO: what to do???
-	SongSelection ss = mode->getSelectionForRange(sel.range);
-	setSelection(ss);
+	setSelection(mode->getSelectionForRange(sel.range));
 }
 
 void AudioView::setCurSample(SampleRef *s)

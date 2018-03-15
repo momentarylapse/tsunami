@@ -612,13 +612,6 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
 
-void sel_track_soft(Track *t, SongSelection *sel)
-{
-	if (sel->has(t))
-		return;
-	sel->tracks.clear();
-	sel->add(t);
-}
 
 void ViewModeDefault::selectUnderMouse()
 {
@@ -632,9 +625,7 @@ void ViewModeDefault::selectUnderMouse()
 	if (hover->track)
 		view->setCurTrack(hover->track);
 	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER)){
-		view->selectTrack(t, control);
-		/*if (!control)
-			view->unselectAllSamples();*/
+		view->selectTrack(t, control, false);
 	}
 	if (hover->type == Selection::TYPE_MARKER){
 		auto m = t->markers[hover->index];
@@ -643,7 +634,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(m)){
 			}else{
-				sel_track_soft(t, &view->sel);
+				view->selectTrack(t, control, true);
 				view->sel.clear_data();
 				view->sel.add(m);
 			}
@@ -658,7 +649,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(s)){
 			}else{
-				sel_track_soft(t, &view->sel);
+				view->selectTrack(t, control, false);
 				view->sel.clear_data();
 				view->sel.add(s);
 			}

@@ -21,9 +21,9 @@ public:
 	int num_beats;
 	int num_sub_beats;
 
-	enum{
-		TYPE_BAR,
-		TYPE_PAUSE
+	enum Type{
+		BAR,
+		PAUSE
 	};
 };
 
@@ -41,6 +41,13 @@ public:
 	int index_text; // index without pause "bars" (well, text = n+1...)
 	int offset;
 	Range range();
+
+	// when inserting new bars
+	enum EditMode{
+		IGNORE,
+		INSERT_SILENCE,
+		STRETCH
+	};
 };
 
 

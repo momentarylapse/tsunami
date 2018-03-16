@@ -509,25 +509,25 @@ void PluginManager::FindPlugins()
 	Kaba::Init();
 
 	// "Buffer"
-	find_plugins_in_dir("Buffer/Channels/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Dynamics/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Echo/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Pitch/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Repair/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Sound/", Plugin::TYPE_EFFECT, this);
-	find_plugins_in_dir("Buffer/Synthesizer/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Channels/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Dynamics/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Echo/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Pitch/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Repair/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Sound/", Plugin::Type::EFFECT, this);
+	find_plugins_in_dir("Buffer/Synthesizer/", Plugin::Type::EFFECT, this);
 
 	// "Midi"
-	find_plugins_in_dir("Midi/", Plugin::TYPE_MIDI_EFFECT, this);
+	find_plugins_in_dir("Midi/", Plugin::Type::MIDI_EFFECT, this);
 
 	// "All"
-	find_plugins_in_dir("All/", Plugin::TYPE_SONG_PLUGIN, this);
+	find_plugins_in_dir("All/", Plugin::Type::SONG_PLUGIN, this);
 
 	// rest
-	find_plugins_in_dir("Independent/", Plugin::TYPE_TSUNAMI_PLUGIN, this);
+	find_plugins_in_dir("Independent/", Plugin::Type::TSUNAMI_PLUGIN, this);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer/", Plugin::TYPE_SYNTHESIZER, this);
+	find_plugins_in_dir("Synthesizer/", Plugin::Type::SYNTHESIZER, this);
 }
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
@@ -591,7 +591,7 @@ typedef void main_void_func();
 
 void PluginManager::_ExecutePlugin(Session *session, const string &filename)
 {
-	Plugin *p = LoadAndCompilePlugin(Plugin::TYPE_OTHER, filename);
+	Plugin *p = LoadAndCompilePlugin(Plugin::Type::OTHER, filename);
 	if (!p->usable){
 		session->e(p->getError());
 		return;
@@ -703,18 +703,18 @@ Array<string> PluginManager::FindMidiEffects()
 {
 	Array<string> names;
 	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::TYPE_MIDI_EFFECT)
+		if (pf.type == Plugin::Type::MIDI_EFFECT)
 			names.add(pf.name);
 	return names;
 }
 
 Array<string> PluginManager::FindConfigurable(int type)
 {
-	if (type == Configurable::TYPE_EFFECT)
+	if (type == Configurable::Type::EFFECT)
 		return FindEffects();
-	if (type == Configurable::TYPE_MIDI_EFFECT)
+	if (type == Configurable::Type::MIDI_EFFECT)
 		return FindMidiEffects();
-	if (type == Configurable::TYPE_SYNTHESIZER)
+	if (type == Configurable::Type::SYNTHESIZER)
 		return FindSynthesizers();
 	return Array<string>();
 }
@@ -722,7 +722,7 @@ Array<string> PluginManager::FindConfigurable(int type)
 
 Effect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, session);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::EFFECT, session);
 	dlg->run();
 	Effect *e = (Effect*)dlg->_return;
 	delete(dlg);
@@ -731,7 +731,7 @@ Effect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 
 MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, session);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::MIDI_EFFECT, session);
 	dlg->run();
 	MidiEffect *e = (MidiEffect*)dlg->_return;
 	delete(dlg);
@@ -741,7 +741,7 @@ MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session
 
 Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, session, old_name);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::Type::SYNTHESIZER, session, old_name);
 	dlg->run();
 	Synthesizer *s = (Synthesizer*)dlg->_return;
 	delete(dlg);
@@ -750,7 +750,7 @@ Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *sess
 
 /*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)
 {
-	string name = ChooseConfigurable(parent, Configurable::TYPE_SYNTHESIZER);
+	string name = ChooseConfigurable(parent, Configurable::Type::SYNTHESIZER);
 	if (name == "")
 		return NULL;
 	return CreateSynthesizer(name);

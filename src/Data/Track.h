@@ -93,11 +93,10 @@ public:
 	void _cdecl editMarker(int index, const Range &range, const string &text);
 
 
-	enum
-	{
-		TYPE_AUDIO,
-		TYPE_TIME,
-		TYPE_MIDI
+	enum Type{
+		AUDIO,
+		TIME,
+		MIDI
 	};
 
 // data

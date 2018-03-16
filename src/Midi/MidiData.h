@@ -97,44 +97,44 @@ string pitch_name(int pitch);
 string drum_pitch_name(int pitch);
 
 
-enum
+enum DrumPitch
 {
-	DRUM_PITCH_BASS_ACCOUSTIC = 35,
-	DRUM_PITCH_BASS = 36,
-	DRUM_PITCH_SIDE_STICK = 37,
-	DRUM_PITCH_SNARE = 38,
-	DRUM_PITCH_CLAP = 39,
-	DRUM_PITCH_SNARE_ELECTRONIC = 40,
-	DRUM_PITCH_TOM_FLOOR_LOW = 41,
-	DRUM_PITCH_HIHAT_CLOSED = 42,
-	DRUM_PITCH_TOM_FLOOR_HI = 43,
-	DRUM_PITCH_HIHAT_PEDAL = 44,
-	DRUM_PITCH_TOM_LOW = 45,
-	DRUM_PITCH_HIHAT_OPEN = 46,
-	DRUM_PITCH_TOM_LOW_MID = 47,
-	DRUM_PITCH_TOM_HI_MID = 48,
-	DRUM_PITCH_CRASH_1 = 49,
-	DRUM_PITCH_TOM_HI = 50,
-	DRUM_PITCH_RIDE_1 = 51,
-	DRUM_PITCH_CHINESE = 52,
-	DRUM_PITCH_BELL_RIDE = 53,
-	DRUM_PITCH_TAMBOURINE = 54,
-	DRUM_PITCH_SPLASH = 55,
-	DRUM_PITCH_COWBELL = 56,
-	DRUM_PITCH_CRASH_2 = 57,
-	DRUM_PITCH_VIBRASLASH = 58,
-	DRUM_PITCH_RIDE_2 = 59,
-	DRUM_PITCH_BONGO_HI = 60,
-	DRUM_PITCH_BONGO_LOW = 61,
+	BASS_ACCOUSTIC = 35,
+	BASS = 36,
+	SIDE_STICK = 37,
+	SNARE = 38,
+	CLAP = 39,
+	SNARE_ELECTRONIC = 40,
+	TOM_FLOOR_LOW = 41,
+	HIHAT_CLOSED = 42,
+	TOM_FLOOR_HI = 43,
+	HIHAT_PEDAL = 44,
+	TOM_LOW = 45,
+	HIHAT_OPEN = 46,
+	TOM_LOW_MID = 47,
+	TOM_HI_MID = 48,
+	CRASH_1 = 49,
+	TOM_HI = 50,
+	RIDE_1 = 51,
+	CHINESE = 52,
+	BELL_RIDE = 53,
+	TAMBOURINE = 54,
+	SPLASH = 55,
+	COWBELL = 56,
+	CRASH_2 = 57,
+	VIBRASLASH = 58,
+	RIDE_2 = 59,
+	BONGO_HI = 60,
+	BONGO_LOW = 61,
 };
 
-enum
+enum ChordType
 {
-	CHORD_TYPE_MINOR,
-	CHORD_TYPE_MAJOR,
-	CHORD_TYPE_DIMINISHED,
-	CHORD_TYPE_AUGMENTED,
-	NUM_CHORD_TYPES
+	MINOR,
+	MAJOR,
+	DIMINISHED,
+	AUGMENTED,
+	NUM
 };
 
 string chord_type_name(int type);
@@ -142,23 +142,24 @@ Array<int> chord_notes(int type, int inversion, int pitch);
 
 
 
-enum{
-	MODIFIER_NONE,
-	MODIFIER_SHARP,
-	MODIFIER_FLAT,
-	MODIFIER_NATURAL,
-	MODIFIER_UNKNOWN = -1,
+enum Modifier
+{
+	NONE,
+	SHARP,
+	FLAT,
+	NATURAL,
+	UNKNOWN = -1,
 };
 
 inline string modifier_symbol(int mod)
 {
-	if (mod == MODIFIER_NONE)
+	if (mod == Modifier::NONE)
 		return "";
-	if (mod == MODIFIER_SHARP)
+	if (mod == Modifier::SHARP)
 		return "\u266f";
-	if (mod == MODIFIER_FLAT)
+	if (mod == Modifier::FLAT)
 		return "\u266d";
-	if (mod == MODIFIER_NATURAL)
+	if (mod == Modifier::NATURAL)
 		return "\u266e";
 	return "?";
 }

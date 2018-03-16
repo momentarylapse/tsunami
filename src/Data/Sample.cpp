@@ -48,7 +48,7 @@ int Sample::get_index() const
 
 Range Sample::range() const
 {
-	if (type == Track::TYPE_MIDI)
+	if (type == Track::Type::MIDI)
 		return Range(0, midi.samples);
 	return buf.range0();
 }

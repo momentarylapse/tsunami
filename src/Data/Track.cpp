@@ -43,11 +43,11 @@
 
 string track_type(int type)
 {
-	if (type == Track::TYPE_AUDIO)
+	if (type == Track::Type::AUDIO)
 		return _("Audio");
-	if (type == Track::TYPE_MIDI)
+	if (type == Track::Type::MIDI)
 		return _("Midi");
-	if (type == Track::TYPE_TIME)
+	if (type == Track::Type::TIME)
 		return _("Metronome");
 	return "???";
 }
@@ -106,7 +106,7 @@ Range Track::getRange()
 	for (TrackMarker *m: markers)
 		r = r or m->range;
 
-	if ((type == TYPE_MIDI) and (midi.num > 0))
+	if ((type == Type::MIDI) and (midi.num > 0))
 		r = r or midi.range(synth->keep_notes);
 
 	return r;
@@ -116,7 +116,7 @@ string Track::getNiceName()
 {
 	if (name.num > 0)
 		return name;
-	if (type == TYPE_TIME)
+	if (type == Type::TIME)
 		return _("Metronome");
 	int n = get_track_index(this);
 	return format(_("Track %d"), n+1);

@@ -25,11 +25,11 @@ public:
 	string name;
 	string internal_name;
 
-	enum{
-		TYPE_AUDIO_OUTPUT,
-		TYPE_AUDIO_INPUT,
-		TYPE_MIDI_OUTPUT,
-		TYPE_MIDI_INPUT
+	enum Type{
+		AUDIO_OUTPUT,
+		AUDIO_INPUT,
+		MIDI_OUTPUT,
+		MIDI_INPUT
 	};
 
 	int type;

@@ -138,7 +138,7 @@ void AudioView::MouseSelectionPlanner::stop()
 }
 
 AudioView::AudioView(Session *_session, const string &_id) :
-	midi_scale(Scale::TYPE_MAJOR, 0),
+	midi_scale(Scale::Type::MAJOR, 0),
 	cam(this)
 {
 	id = _id;
@@ -170,7 +170,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	dummy_vtrack = new AudioViewTrack(this, NULL);
 
-	midi_view_mode = hui::Config.getInt("View.MidiMode", MIDI_MODE_CLASSICAL);
+	midi_view_mode = hui::Config.getInt("View.MidiMode", MidiMode::CLASSICAL);
 
 	// modes
 	mode = NULL;
@@ -219,7 +219,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	mx = my = 0;
 	msp.stop();
-	selection_mode = SELECTION_MODE_NONE;
+	selection_mode = SelectionMode::NONE;
 	hide_selection = false;
 	song->subscribe(this, std::bind(&AudioView::onSongUpdate, this));
 
@@ -419,7 +419,7 @@ void AudioView::onMouseMove()
 	mode->onMouseMove();
 
 
-	if (selection_mode != SELECTION_MODE_NONE){
+	if (selection_mode != SelectionMode::NONE){
 
 		applyBarriers(hover.pos);
 		hover.range.set_end(hover.pos);
@@ -641,7 +641,7 @@ void AudioView::onSongUpdate()
 			sel.add(t);
 		setCurTrack(NULL);
 		if (song->tracks.num > 0){
-			if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)
+			if ((song->tracks[0]->type == Track::Type::TIME) and song->tracks.num > 1)
 				setCurTrack(song->tracks[1]);
 			else
 				setCurTrack(song->tracks[0]);
@@ -857,16 +857,16 @@ void AudioView::drawSelection(Painter *c)
 	int sxx2 = clampi(sx2, clip.x1, clip.x2);
 	c->setColor(colors.selection_internal);
 	c->drawRect(rect(sxx1, sxx2, clip.y1, clip.y1 + TIME_SCALE_HEIGHT));
-	drawTimeLine(c, sel.range.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel.range.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
+	drawTimeLine(c, sel.range.start(), Selection::Type::SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel.range.end(), Selection::Type::SELECTION_END, colors.selection_boundary);
 
 	if (!hide_selection){
-	if ((selection_mode == SELECTION_MODE_TIME) or (selection_mode == SELECTION_MODE_TRACK_RECT)){
+	if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
 		c->setColor(colors.selection_internal);
 		for (AudioViewTrack *t: vtrack)
 			if (sel.has(t->track))
 				c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
-	}else if (selection_mode == SELECTION_MODE_RECT){
+	}else if (selection_mode == SelectionMode::RECT){
 		int sx1 = cam.sample2screen(hover.range.start());
 		int sx2 = cam.sample2screen(hover.range.end());
 		int sxx1 = clampi(sx1, clip.x1, clip.x2);
@@ -887,7 +887,7 @@ void AudioView::drawSelection(Painter *c)
 		c->setColor(colors.text_soft1);
 		c->setLineWidth(2.5f);
 		for (AudioViewTrack *t: vtrack)
-			if (t->track->type == Track::TYPE_TIME){
+			if (t->track->type == Track::Type::TIME){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
@@ -899,14 +899,14 @@ void AudioView::drawSelection(Painter *c)
 		c->setLineWidth(1.0f);
 		c->setAntialiasing(false);
 	}
-	if (hover.type == Selection::TYPE_BAR_GAP){
+	if (hover.type == Selection::Type::BAR_GAP){
 		sx1 = cam.sample2screen(song->barOffset(hover.index));
 		sx2 = sx1;
 		c->setAntialiasing(true);
 		c->setColor(colors.hover);
 		c->setLineWidth(2.5f);
 		for (AudioViewTrack *t: vtrack)
-			if (t->track->type == Track::TYPE_TIME){
+			if (t->track->type == Track::Type::TIME){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
@@ -942,7 +942,7 @@ void AudioView::drawAudioFile(Painter *c)
 
 	// playing/capturing position
 	if (stream)
-		drawTimeLine(c, playbackPos(), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
+		drawTimeLine(c, playbackPos(), Selection::Type::PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
 
@@ -995,9 +995,9 @@ void AudioView::optimizeView()
 void AudioView::updateMenu()
 {
 	// view
-	win->check("view_midi_default", midi_view_mode == MIDI_MODE_LINEAR);
-	win->check("view_midi_tab", midi_view_mode == MIDI_MODE_TAB);
-	win->check("view_midi_score", midi_view_mode == MIDI_MODE_CLASSICAL);
+	win->check("view_midi_default", midi_view_mode == MidiMode::LINEAR);
+	win->check("view_midi_tab", midi_view_mode == MidiMode::TAB);
+	win->check("view_midi_score", midi_view_mode == MidiMode::CLASSICAL);
 	win->enable("view_samples", false);
 }
 

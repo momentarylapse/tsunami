@@ -74,12 +74,12 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 
 
 Synthesizer::Synthesizer() :
-	Configurable(NULL, TYPE_SYNTHESIZER)
+	Configurable(NULL, Type::SYNTHESIZER)
 {
 	out = new Output(this);
 	sample_rate = 0;
 	keep_notes = 0;
-	instrument = Instrument(Instrument::TYPE_PIANO);
+	instrument = Instrument(Instrument::Type::PIANO);
 	source_run_out = false;
 
 	tuning.set_default();

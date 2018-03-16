@@ -231,7 +231,7 @@ OutputStream::OutputStream(Session *_session, AudioSource *s) :
 	keep_thread_running = true;
 
 	device_manager = session->device_manager;
-	device = device_manager->chooseDevice(Device::TYPE_AUDIO_OUTPUT);
+	device = device_manager->chooseDevice(Device::Type::AUDIO_OUTPUT);
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;

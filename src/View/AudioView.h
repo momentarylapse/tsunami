@@ -111,11 +111,11 @@ public:
 	SongSelection sel_temp;
 
 	enum SelectionMode{
-		SELECTION_MODE_NONE,
-		SELECTION_MODE_TIME,
-		SELECTION_MODE_RECT,
-		SELECTION_MODE_TRACK_RECT,
-		SELECTION_MODE_FAKE,
+		NONE,
+		TIME,
+		RECT,
+		TRACK_RECT,
+		FAKE,
 	};
 	SelectionMode selection_mode;
 	bool hide_selection;
@@ -169,11 +169,11 @@ public:
 
 	void setMidiViewMode(int mode);
 	int midi_view_mode;
-	enum{
-		MIDI_MODE_LINEAR,
-		MIDI_MODE_TAB,
-		MIDI_MODE_CLASSICAL,
-		MIDI_MODE_DRUM
+	enum MidiMode{
+		LINEAR,
+		TAB,
+		CLASSICAL,
+		DRUM
 	};
 
 	ViewMode *mode;

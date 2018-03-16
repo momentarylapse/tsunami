@@ -55,11 +55,11 @@ Device::Device(int _type, const string &s)
 string Device::get_name() const
 {
 	if (is_default()){
-		if (type == TYPE_AUDIO_OUTPUT)
+		if (type == Type::AUDIO_OUTPUT)
 			return _("        - Default -");
-		if (type == TYPE_AUDIO_INPUT)
+		if (type == Type::AUDIO_INPUT)
 			return _("        - Default -");
-		if (type == TYPE_MIDI_INPUT)
+		if (type == Type::MIDI_INPUT)
 			return _("        - don't connect -");
 	}
 	return name;

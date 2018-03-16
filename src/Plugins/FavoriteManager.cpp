@@ -25,11 +25,11 @@ FavoriteManager::~FavoriteManager()
 
 string FavoriteManager::type2str(int type)
 {
-	if (type == Configurable::TYPE_EFFECT)
+	if (type == Configurable::Type::EFFECT)
 		return "Effect";
-	if (type == Configurable::TYPE_SYNTHESIZER)
+	if (type == Configurable::Type::SYNTHESIZER)
 		return "Synth";
-	if (type == Configurable::TYPE_MIDI_EFFECT)
+	if (type == Configurable::Type::MIDI_EFFECT)
 		return "MidiEffect";
 	return "???";
 }
@@ -37,11 +37,11 @@ string FavoriteManager::type2str(int type)
 int FavoriteManager::str2type(const string &str)
 {
 	if (str == "Effect")
-		return Configurable::TYPE_EFFECT;
+		return Configurable::Type::EFFECT;
 	if (str == "Synth")
-		return Configurable::TYPE_SYNTHESIZER;
+		return Configurable::Type::SYNTHESIZER;
 	if (str == "MidiEffect")
-		return Configurable::TYPE_MIDI_EFFECT;
+		return Configurable::Type::MIDI_EFFECT;
 	return -1;
 }
 

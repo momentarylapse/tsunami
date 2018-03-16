@@ -345,7 +345,7 @@ int Song::barOffset(int index)
 
 Track *Song::addTrack(int type, int index)
 {
-	if (type == Track::TYPE_TIME){
+	if (type == Track::Type::TIME){
 		// force single time track
 		if (getTimeTrack())
 			throw Exception(_("There already is one rhythm track."));
@@ -450,27 +450,27 @@ void Song::createSamplesFromSelection(const SongSelection &sel, int layer_no)
 		execute(new ActionTrackSampleFromSelection(sel, layer_no));
 }
 
-void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi)
+void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)
 {
 	int length = (int)((float)beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionBarAdd(index, length, beats, sub_beats, affect_midi));
+		execute(new ActionBarAdd(index, length, beats, sub_beats, mode));
 	else
-		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, affect_midi));
+		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, mode));
 }
 
-void Song::addPause(int index, float time, bool affect_midi)
+void Song::addPause(int index, float time, int mode)
 {
 	int length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionBarAdd(index, length, 0, 0, affect_midi));
+		execute(new ActionBarAdd(index, length, 0, 0, mode));
 	else
-		execute(new ActionBarAdd(bars.num, length, 0, 0, affect_midi));
+		execute(new ActionBarAdd(bars.num, length, 0, 0, mode));
 }
 
-void Song::editBar(int index, int length, int beats, int sub_beats, bool affect_midi)
+void Song::editBar(int index, int length, int beats, int sub_beats, int mode)
 {
-	execute(new ActionBarEdit(index, length, beats, sub_beats, affect_midi));
+	execute(new ActionBarEdit(index, length, beats, sub_beats, mode));
 }
 
 void Song::deleteBar(int index, bool affect_midi)
@@ -584,7 +584,7 @@ MidiEffect *Song::get_midi_fx(int track_no, int index)
 Track *Song::getTimeTrack()
 {
 	for (Track *t: tracks)
-		if (t->type == t->TYPE_TIME)
+		if (t->type == t->Type::TIME)
 			return t;
 	return NULL;
 }

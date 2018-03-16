@@ -29,13 +29,13 @@ public:
 
 	bool usable;
 	int type;
-	enum{
-		TYPE_EFFECT,
-		TYPE_MIDI_EFFECT,
-		TYPE_SONG_PLUGIN,
-		TYPE_TSUNAMI_PLUGIN,
-		TYPE_SYNTHESIZER,
-		TYPE_OTHER
+	enum Type{
+		EFFECT,
+		MIDI_EFFECT,
+		SONG_PLUGIN,
+		TSUNAMI_PLUGIN,
+		SYNTHESIZER,
+		OTHER
 	};
 	string error_message;
 

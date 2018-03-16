@@ -64,10 +64,10 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		enable("_edit_midi", track->type == Track::TYPE_MIDI);
-		enable("_edit_midi_fx", track->type == Track::TYPE_MIDI);
-		enable("_edit_synth", track->type != Track::TYPE_AUDIO);
-		enable("select_synth", track->type != Track::TYPE_AUDIO);
+		enable("_edit_midi", track->type == Track::Type::MIDI);
+		enable("_edit_midi_fx", track->type == Track::Type::MIDI);
+		enable("_edit_synth", track->type != Track::Type::AUDIO);
+		enable("select_synth", track->type != Track::Type::AUDIO);
 
 		Array<Instrument> instruments = Instrument::enumerate();
 		foreachi(Instrument &ii, instruments, i){

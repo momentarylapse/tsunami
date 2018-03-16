@@ -157,7 +157,7 @@ InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
 	source = new Source;
 	source->stream = this;
 
-	device = session->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	playback_delay_const = 0;
 	if (device){
 		playback_delay_const = device->latency;

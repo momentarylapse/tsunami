@@ -26,7 +26,7 @@ extern AudioSucker *export_view_sucker;
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = cc->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	chosen_device = cc->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	input = NULL;
 	target = NULL;
 	sucker = NULL;
@@ -60,10 +60,10 @@ void CaptureConsoleModeAudio::setTarget(Track *t)
 	view->mode_capture->capturing_track = target;
 	cc->setInt("capture_audio_target", target->get_index());
 
-	bool ok = (target->type == Track::TYPE_AUDIO);
+	bool ok = (target->type == Track::Type::AUDIO);
 	cc->setString("capture_audio_message", "");
 	if (!ok)
-		cc->setString("capture_audio_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_AUDIO).c_str()));
+		cc->setString("capture_audio_message", format(_("Please select a track of type %s."), track_type(Track::Type::AUDIO).c_str()));
 	cc->enable("capture_start", ok);
 }
 
@@ -73,7 +73,7 @@ void CaptureConsoleModeAudio::enterParent()
 
 void CaptureConsoleModeAudio::enter()
 {
-	sources = cc->device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+	sources = cc->device_manager->getGoodDeviceList(Device::Type::AUDIO_INPUT);
 	cc->hideControl("capture_audio_grid", false);
 
 	// add all
@@ -94,7 +94,7 @@ void CaptureConsoleModeAudio::enter()
 	//cc->addString("capture_audio_target", _("  - create new track -"));
 
 	for (const Track *t: view->sel.tracks)
-		if (t->type == t->TYPE_AUDIO)
+		if (t->type == t->Type::AUDIO)
 			setTarget((Track*)t);
 
 
@@ -166,8 +166,8 @@ bool CaptureConsoleModeAudio::insert()
 	// overwrite
 	int i0 = s_start + dpos;
 
-	if (target->type != Track::TYPE_AUDIO){
-		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_AUDIO).c_str(), track_type(target->type).c_str()));
+	if (target->type != Track::Type::AUDIO){
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::Type::AUDIO).c_str(), track_type(target->type).c_str()));
 		return false;
 	}
 

@@ -17,6 +17,7 @@ class SampleRef;
 class MidiNote;
 class TrackMarker;
 class Bar;
+class SongSelection;
 
 class Selection
 {
@@ -38,37 +39,39 @@ public:
 	int clef_position, modifier;
 	int index;
 
-	enum
+	enum Type
 	{
-		TYPE_NONE,
-		TYPE_BACKGROUND,
-		TYPE_SELECTION_START,
-		TYPE_SELECTION_END,
-		TYPE_PLAYBACK,
-		TYPE_TIME,
-		TYPE_TRACK,
-		TYPE_TRACK_HEADER,
-		TYPE_TRACK_BUTTON_MUTE,
-		TYPE_TRACK_BUTTON_SOLO,
-		TYPE_TRACK_BUTTON_EDIT,
-		TYPE_TRACK_BUTTON_CURVE,
-		TYPE_TRACK_BUTTON_FX,
-		TYPE_SAMPLE,
-		TYPE_MIDI_NOTE,
-		TYPE_MIDI_PITCH,
-		TYPE_CLEF_POSITION,
-		TYPE_MARKER,
-		TYPE_BAR,
-		TYPE_BAR_GAP,
-		TYPE_SCROLL,
-		TYPE_CURVE_POINT,
-		TYPE_CURVE_POINT_NONE,
+		NONE,
+		BACKGROUND,
+		SELECTION_START,
+		SELECTION_END,
+		PLAYBACK,
+		TIME,
+		TRACK,
+		TRACK_HEADER,
+		TRACK_BUTTON_MUTE,
+		TRACK_BUTTON_SOLO,
+		TRACK_BUTTON_EDIT,
+		TRACK_BUTTON_CURVE,
+		TRACK_BUTTON_FX,
+		SAMPLE,
+		MIDI_NOTE,
+		MIDI_PITCH,
+		CLEF_POSITION,
+		MARKER,
+		BAR,
+		BAR_GAP,
+		SCROLL,
+		CURVE_POINT,
+		CURVE_POINT_NONE,
 	};
 
 	Selection();
 	bool allow_auto_scroll() const;
 	bool is_in(int type) const;
 	void clear();
+
+	SongSelection to_song_sel() const;
 };
 
 bool hover_changed(Selection &hover, Selection &hover_old);

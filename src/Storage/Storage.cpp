@@ -92,7 +92,7 @@ bool Storage::load(Song *a, const string &filename)
 bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 {
 	current_directory = filename.dirname();
-	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
+	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::Flag::AUDIO);
 	if (!d)
 		return false;
 
@@ -118,7 +118,7 @@ bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 	session->i(_("loading buffer ") + filename);
 
 	Song *aa = new Song(session);
-	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
+	aa->newWithOneTrack(Track::Type::AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
 	if (t->layers[0].buffers.num > 0){
@@ -133,7 +133,7 @@ bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 bool Storage::saveBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
 	current_directory = filename.dirname();
-	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
+	Format *f = getFormat(filename.extension(), Format::Flag::AUDIO);
 	if (!f)
 		return false;
 
@@ -174,7 +174,7 @@ bool Storage::save(Song *a, const string &filename)
 
 bool Storage::saveViaRenderer(AudioSource *r, const string &filename, int num_samples, const Array<Tag> &tags)
 {
-	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
+	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::Flag::AUDIO);
 	if (!d)
 		return false;
 
@@ -224,7 +224,7 @@ bool Storage::askByFlags(hui::Window *win, const string &title, int flags)
 			}
 			filter_show += ")";
 		}
-	if (flags & FormatDescriptor::FLAG_WRITE)
+	if (flags & FormatDescriptor::Flag::WRITE)
 		return hui::FileDialogSave(win, title, current_directory, filter_show, filter);
 	else
 		return hui::FileDialogOpen(win, title, current_directory, filter_show, filter);
@@ -232,22 +232,22 @@ bool Storage::askByFlags(hui::Window *win, const string &title, int flags)
 
 bool Storage::askOpen(hui::Window *win)
 {
-	return askByFlags(win, _("Open file"), FormatDescriptor::FLAG_READ);
+	return askByFlags(win, _("Open file"), FormatDescriptor::Flag::READ);
 }
 
 bool Storage::askSave(hui::Window *win)
 {
-	return askByFlags(win, _("Save file"), FormatDescriptor::FLAG_WRITE);
+	return askByFlags(win, _("Save file"), FormatDescriptor::Flag::WRITE);
 }
 
 bool Storage::askOpenImport(hui::Window *win)
 {
-	return askByFlags(win, _("Import file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_READ);
+	return askByFlags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ);
 }
 
 bool Storage::askSaveExport(hui::Window *win)
 {
-	return askByFlags(win, _("Export file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_WRITE);
+	return askByFlags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::WRITE);
 }
 
 

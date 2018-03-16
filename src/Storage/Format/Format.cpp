@@ -33,23 +33,23 @@ bool FormatDescriptor::testFormatCompatibility(Song *a)
 	int num_midi = 0;
 	for (Track *t : a->tracks){
 		num_fx += t->fx.num;
-		if (t->type == t->TYPE_AUDIO)
+		if (t->type == t->Type::AUDIO)
 			num_audio ++;
-		if (t->type == t->TYPE_MIDI)
+		if (t->type == t->Type::MIDI)
 			num_midi ++;
 	}
 
-	if ((a->tracks.num > 1) and ((flags & FLAG_MULTITRACK) == 0))
+	if ((a->tracks.num > 1) and ((flags & Flag::MULTITRACK) == 0))
 		return false;
-	/*if ((a->tag.num > 0) and ((flags & FLAG_TAGS) == 0))
+	/*if ((a->tag.num > 0) and ((flags & Flag::TAGS) == 0))
 		return false;*/
-	if ((num_fx > 0) and ((flags & FLAG_FX) == 0))
+	if ((num_fx > 0) and ((flags & Flag::FX) == 0))
 		return false;
-	if ((num_subs > 0) and ((flags & FLAG_SUBS) == 0))
+	if ((num_subs > 0) and ((flags & Flag::SAMPLES) == 0))
 		return false;
-	if ((num_audio > 0) and ((flags & FLAG_AUDIO) == 0))
+	if ((num_audio > 0) and ((flags & Flag::AUDIO) == 0))
 		return false;
-	if ((num_midi > 0) and ((flags & FLAG_MIDI) == 0))
+	if ((num_midi > 0) and ((flags & Flag::MIDI) == 0))
 		return false;
 	return true;
 }
@@ -87,7 +87,7 @@ void Format::importData(Track *t, void *data, int channels, SampleFormat format,
 
 void Format::loadSong(StorageOperationData *od)
 {
-	od->track = od->song->addTrack(Track::TYPE_AUDIO, 0);
+	od->track = od->song->addTrack(Track::Type::AUDIO, 0);
 	loadTrack(od);
 }
 

@@ -97,7 +97,7 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	DeviceManager *dm = (DeviceManager*)userdata;
-	Device *d = dm->get_device_create(Device::TYPE_AUDIO_OUTPUT, i->name);
+	Device *d = dm->get_device_create(Device::Type::AUDIO_OUTPUT, i->name);
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
 	d->present = true;
@@ -112,7 +112,7 @@ void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, vo
 	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	DeviceManager *dm = (DeviceManager*)userdata;
-	Device *d = dm->get_device_create(Device::TYPE_AUDIO_INPUT, i->name);
+	Device *d = dm->get_device_create(Device::Type::AUDIO_INPUT, i->name);
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
 	d->present = true;
@@ -147,9 +147,9 @@ DeviceManager::DeviceManager()
 {
 	initialized = false;
 
-	output_devices = str2devs(hui::Config.getStr("Output.Devices", ""), Device::TYPE_AUDIO_OUTPUT);
-	input_devices = str2devs(hui::Config.getStr("Input.Devices", ""), Device::TYPE_AUDIO_INPUT);
-	midi_input_devices = str2devs(hui::Config.getStr("MidiInput.Devices", ""), Device::TYPE_MIDI_INPUT);
+	output_devices = str2devs(hui::Config.getStr("Output.Devices", ""), Device::Type::AUDIO_OUTPUT);
+	input_devices = str2devs(hui::Config.getStr("Input.Devices", ""), Device::Type::AUDIO_INPUT);
+	midi_input_devices = str2devs(hui::Config.getStr("MidiInput.Devices", ""), Device::Type::MIDI_INPUT);
 
 	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
 
@@ -163,11 +163,11 @@ DeviceManager::DeviceManager()
 #endif
 
 	// system defaults
-	default_devices[Device::TYPE_AUDIO_OUTPUT] = get_device_create(Device::TYPE_AUDIO_OUTPUT, ":default:");
-	default_devices[Device::TYPE_AUDIO_OUTPUT]->channels = 2;
-	default_devices[Device::TYPE_AUDIO_INPUT] = get_device_create(Device::TYPE_AUDIO_INPUT, ":default:");
-	default_devices[Device::TYPE_AUDIO_INPUT]->channels = 2;
-	default_devices[Device::TYPE_MIDI_INPUT] = get_device_create(Device::TYPE_MIDI_INPUT, ":default:");
+	default_devices[Device::Type::AUDIO_OUTPUT] = get_device_create(Device::Type::AUDIO_OUTPUT, ":default:");
+	default_devices[Device::Type::AUDIO_OUTPUT]->channels = 2;
+	default_devices[Device::Type::AUDIO_INPUT] = get_device_create(Device::Type::AUDIO_INPUT, ":default:");
+	default_devices[Device::Type::AUDIO_INPUT]->channels = 2;
+	default_devices[Device::Type::MIDI_INPUT] = get_device_create(Device::Type::MIDI_INPUT, ":default:");
 
 	init();
 
@@ -227,7 +227,7 @@ void DeviceManager::update_devices()
 	if (!testError(session, "pa_context_get_sink_info_list"))
 		pa_wait_op(session, op);
 
-	default_devices[Device::TYPE_AUDIO_OUTPUT]->present = true;
+	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
 
 
 	for (Device *d: input_devices)
@@ -238,7 +238,7 @@ void DeviceManager::update_devices()
 		pa_wait_op(session, op);
 
 
-	default_devices[Device::TYPE_AUDIO_INPUT]->present = true;
+	default_devices[Device::Type::AUDIO_INPUT]->present = true;
 
 
 	update_midi_devices();
@@ -274,7 +274,7 @@ void DeviceManager::update_midi_devices()
 				continue;
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
 				continue;
-			Device *d = get_device_create(Device::TYPE_MIDI_INPUT, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
+			Device *d = get_device_create(Device::Type::MIDI_INPUT, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
 			d->name = d->internal_name;
 			d->client = snd_seq_client_info_get_client(cinfo);
 			d->port = snd_seq_port_info_get_port(pinfo);
@@ -282,7 +282,7 @@ void DeviceManager::update_midi_devices()
 		}
 	}
 
-	default_devices[Device::TYPE_MIDI_INPUT]->present = true;
+	default_devices[Device::Type::MIDI_INPUT]->present = true;
 
 
 	bool changed = false;
@@ -453,11 +453,11 @@ Device* DeviceManager::get_device_create(int type, const string &internal_name)
 
 Array<Device*> &DeviceManager::getDeviceList(int type)
 {
-	if (type == Device::TYPE_AUDIO_OUTPUT)
+	if (type == Device::Type::AUDIO_OUTPUT)
 		return output_devices;
-	if (type == Device::TYPE_AUDIO_INPUT)
+	if (type == Device::Type::AUDIO_INPUT)
 		return input_devices;
-	if (type == Device::TYPE_MIDI_INPUT)
+	if (type == Device::Type::MIDI_INPUT)
 		return midi_input_devices;
 	return empty_device_list;
 }

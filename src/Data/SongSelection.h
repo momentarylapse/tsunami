@@ -28,15 +28,15 @@ public:
 	void clear_data();
 	void all(Song *s);
 	void _update_bars(Song *s);
-	static SongSelection from_range(Song *s, const Range &r, int mask = MASK_ALL);
-	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = MASK_ALL);
+	static SongSelection from_range(Song *s, const Range &r, int mask = Mask::ALL);
+	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = Mask::ALL);
 
-	enum{
-		MASK_SAMPLES = 1,
-		MASK_MARKERS = 2,
-		MASK_MIDI_NOTES = 4,
-		MASK_BARS = 8,
-		MASK_ALL = -1
+	enum Mask{
+		SAMPLES = 1,
+		MARKERS = 2,
+		MIDI_NOTES = 4,
+		BARS = 8,
+		ALL = -1
 	};
 
 	Range range;

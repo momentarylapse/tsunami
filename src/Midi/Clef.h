@@ -16,20 +16,20 @@ class Clef
 {
 public:
 	Clef(int type, const string &symbol, int offset);
-	enum{
-		TYPE_TREBLE,
-		TYPE_TREBLE_8,
-		TYPE_BASS,
-		TYPE_BASS_8,
-		TYPE_DRUMS,
-		NUM_CLEF_TYPES
+	enum Type{
+		TREBLE,
+		TREBLE_8,
+		BASS,
+		BASS_8,
+		DRUMS,
+		NUM
 	};
 
-	static const Clef TREBLE;
-	static const Clef TREBLE_8;
-	static const Clef BASS;
-	static const Clef BASS_8;
-	static const Clef DRUMS;
+	static const Clef _TREBLE;
+	static const Clef _TREBLE_8;
+	static const Clef _BASS;
+	static const Clef _BASS_8;
+	static const Clef _DRUMS;
 
 	int type;
 	int offset;

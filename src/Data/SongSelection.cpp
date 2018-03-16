@@ -57,24 +57,24 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 		s.add(t);
 
 		// samples
-		if ((mask & MASK_SAMPLES) > 0)
+		if ((mask & Mask::SAMPLES) > 0)
 			for (SampleRef *sr: t->samples)
 				s.set(sr, s.range.overlaps(sr->range()));
 
 		// markers
-		if ((mask & MASK_MARKERS) > 0)
+		if ((mask & Mask::MARKERS) > 0)
 			for (TrackMarker *m: t->markers)
 				s.set(m, s.range.overlaps(m->range));
 
 		// midi
-		if ((mask & MASK_MIDI_NOTES) > 0)
+		if ((mask & Mask::MIDI_NOTES) > 0)
 			for (MidiNote *n: t->midi)
 				//set(n, range.is_inside(n->range.center()));
 				s.set(n, s.range.overlaps(n->range));
 	}
 
 	// bars
-	if ((mask & MASK_BARS) > 0)
+	if ((mask & Mask::BARS) > 0)
 		s._update_bars(song);
 	return s;
 }

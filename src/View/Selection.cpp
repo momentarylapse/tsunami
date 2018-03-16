@@ -16,23 +16,23 @@ Selection::Selection()
 
 bool Selection::allow_auto_scroll() const
 {
-	return (type == TYPE_SELECTION_END) or (type == TYPE_SAMPLE) or (type == TYPE_PLAYBACK);
+	return (type == Type::SELECTION_END) or (type == Type::SAMPLE) or (type == Type::PLAYBACK);
 }
 
 bool Selection::is_in(int _type) const
 {
 	if (type == _type)
 		return true;
-	if (_type == TYPE_TRACK_HEADER)
-		return (type == TYPE_TRACK_BUTTON_MUTE) or (type == TYPE_TRACK_BUTTON_SOLO) or (type == TYPE_TRACK_BUTTON_EDIT) or (type == TYPE_TRACK_BUTTON_CURVE) or (type == TYPE_TRACK_BUTTON_FX);
-	if (_type == TYPE_TRACK)
+	if (_type == Type::TRACK_HEADER)
+		return (type == Type::TRACK_BUTTON_MUTE) or (type == Type::TRACK_BUTTON_SOLO) or (type == Type::TRACK_BUTTON_EDIT) or (type == Type::TRACK_BUTTON_CURVE) or (type == Type::TRACK_BUTTON_FX);
+	if (_type == Type::TRACK)
 		return (track != NULL);
 	return false;
 }
 
 void Selection::clear()
 {
-	type = TYPE_NONE;
+	type = Type::NONE;
 	track = NULL;
 	vtrack = NULL;
 	sample = NULL;
@@ -46,7 +46,7 @@ void Selection::clear()
 	sample_offset = 0;
 	pitch = -1;
 	clef_position = -1;
-	modifier = MODIFIER_UNKNOWN;
+	modifier = Modifier::UNKNOWN;
 }
 
 bool hover_changed(Selection &hover, Selection &hover_old)

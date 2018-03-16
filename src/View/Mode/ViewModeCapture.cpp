@@ -43,9 +43,9 @@ Selection ViewModeCapture::getHover()
 			s.vtrack = t;
 			s.index = i;
 			s.track = t->track;
-			s.type = Selection::TYPE_TRACK;
+			s.type = Selection::Type::TRACK;
 			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.type = Selection::TYPE_TRACK_HEADER;
+				s.type = Selection::Type::TRACK_HEADER;
 		}
 	}
 
@@ -53,18 +53,18 @@ Selection ViewModeCapture::getHover()
 	if (s.track){
 		AudioViewTrack *t = s.vtrack;
 		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_MUTE;
+			s.type = Selection::Type::TRACK_BUTTON_MUTE;
 			return s;
 		}
 		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_SOLO;
+			s.type = Selection::Type::TRACK_BUTTON_SOLO;
 			return s;
 		}
 	}
 
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::TYPE_TIME;
+		s.type = Selection::Type::TIME;
 		return s;
 	}
 
@@ -79,14 +79,14 @@ void ViewModeCapture::drawPost(Painter *c)
 		view->update_peaks(buf);
 		if (capturing_track)
 			view->get_track(capturing_track)->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
-		view->drawTimeLine(c, view->sel.range.start() + buf.length, Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+		view->drawTimeLine(c, view->sel.range.start() + buf.length, Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 
 
 	if (input_midi and input_midi->isCapturing()){
 		if (capturing_track)
 			drawMidi(c, view->get_track(capturing_track), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
-		view->drawTimeLine(c, view->sel.range.start() + input_midi->getSampleCount(), Selection::TYPE_PLAYBACK, view->colors.capture_marker, true);
+		view->drawTimeLine(c, view->sel.range.start() + input_midi->getSampleCount(), Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 }
 

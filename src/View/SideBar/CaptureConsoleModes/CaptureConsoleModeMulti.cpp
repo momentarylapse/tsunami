@@ -25,12 +25,12 @@ CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
 void CaptureConsoleModeMulti::enter()
 {
 	cc->hideControl("capture_multi_grid", false);
-	sources_audio = cc->device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
-	sources_midi = cc->device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
+	sources_audio = cc->device_manager->getGoodDeviceList(Device::Type::AUDIO_INPUT);
+	sources_midi = cc->device_manager->getGoodDeviceList(Device::Type::MIDI_INPUT);
 
 	// target list multi
 	for (Track *t: song->tracks){
-		if ((t->type != t->TYPE_AUDIO) and (t->type != t->TYPE_MIDI))
+		if ((t->type != t->Type::AUDIO) and (t->type != t->Type::MIDI))
 			continue;
 		if (!view->sel.has(t))
 			continue;
@@ -44,11 +44,11 @@ void CaptureConsoleModeMulti::enter()
 		cc->setTarget("capture_multi_grid");
 		cc->addLabel(t->getNiceName(), 0, i+1, c.id_target);
 		cc->addLabel(track_type(t->type), 1, i+1, c.id_type);
-		if (t->type == Track::TYPE_AUDIO){
+		if (t->type == Track::Type::AUDIO){
 			cc->addComboBox(_("        - none -"), 2, i+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->addString(c.id_source, d->get_name());
-		}else if (t->type == Track::TYPE_MIDI){
+		}else if (t->type == Track::Type::MIDI){
 			cc->addComboBox(_("        - none -"), 2, i+1, c.id_source);
 			for (Device *d: sources_midi)
 				cc->addString(c.id_source, d->get_name());

@@ -29,7 +29,7 @@ void ViewModeCurve::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 
 
-	if (curve and (hover->type == Selection::TYPE_CURVE_POINT_NONE)){
+	if (curve and (hover->type == Selection::Type::CURVE_POINT_NONE)){
 		int pos = cam->screen2sample(view->mx);
 		float value = screen2value(view->my);
 		song->curveAddPoint(curve, pos, value);
@@ -47,7 +47,7 @@ void ViewModeCurve::onMouseMove()
 	ViewModeDefault::onMouseMove();
 
 	if (hui::GetEvent()->lbut){
-		if (curve and (hover->type == Selection::TYPE_CURVE_POINT)){
+		if (curve and (hover->type == Selection::Type::CURVE_POINT)){
 			int pos = cam->screen2sample(view->mx);
 			float value = clampf(screen2value(view->my), curve->min, curve->max);
 			song->curveEditPoint(curve, hover->index, pos, value);
@@ -60,7 +60,7 @@ void ViewModeCurve::onKeyDown(int k)
 {
 	ViewModeDefault::onKeyDown(k);
 
-	if (curve and (hover->type == Selection::TYPE_CURVE_POINT))
+	if (curve and (hover->type == Selection::Type::CURVE_POINT))
 		if (k == hui::KEY_DELETE){
 			song->curveDeletePoint(curve, hover->index);
 			hover->clear();
@@ -91,9 +91,9 @@ void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 
 		// points
 		foreachi(Curve::Point &p, curve->points, i){
-			if ((hover->type == Selection::TYPE_CURVE_POINT) and (i == hover->index))
+			if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
 				c->setColor(view->colors.selection_boundary_hover);
-			else if ((hover->type == Selection::TYPE_CURVE_POINT) and (i == hover->index))
+			else if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
 				// TODO.... selected...
 				c->setColor(view->colors.selection_boundary);
 			else
@@ -110,19 +110,19 @@ Selection ViewModeCurve::getHover()
 	int my = view->my;
 
 	// curve points
-	if ((s.type == s.TYPE_TRACK) and curve){
+	if ((s.type == s.Type::TRACK) and curve){
 		foreachi(Curve::Point &p, curve->points, i){
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
 			if ((fabs(mx - x) < 10) and (fabs(my - y) < 10)){
-				s.type = Selection::TYPE_CURVE_POINT;
+				s.type = Selection::Type::CURVE_POINT;
 				s.index = i;
 				return s;
 			}
 		}
 	}
-	if (s.type == s.TYPE_TRACK)
-		s.type = Selection::TYPE_CURVE_POINT_NONE;
+	if (s.type == s.Type::TRACK)
+		s.type = Selection::Type::CURVE_POINT_NONE;
 
 	return s;
 }

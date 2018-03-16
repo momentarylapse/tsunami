@@ -36,7 +36,7 @@ string tag_to_vorbis(const string &key)
 OggVorbis_File vf;
 
 FormatDescriptorOgg::FormatDescriptorOgg() :
-	FormatDescriptor("Ogg vorbis", "ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
+	FormatDescriptor("Ogg vorbis", "ogg", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ | Flag::WRITE)
 {
 }
 

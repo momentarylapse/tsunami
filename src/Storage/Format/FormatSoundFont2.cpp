@@ -8,7 +8,7 @@
 #include "FormatSoundFont2.h"
 
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
-	FormatDescriptor("SoundFont2", "sf2", FLAG_AUDIO | FLAG_TAGS | FLAG_SUBS | FLAG_READ)
+	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
 {
 }
 

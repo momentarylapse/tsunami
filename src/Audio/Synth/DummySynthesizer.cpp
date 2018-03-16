@@ -47,7 +47,7 @@ void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack,
 
 void DummySynthesizer::onConfig()
 {
-	if (instrument.type == Instrument::TYPE_DRUMS){
+	if (instrument.type == Instrument::Type::DRUMS){
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 			state.pitch[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
@@ -56,42 +56,42 @@ void DummySynthesizer::onConfig()
 		}
 
 		// bass drum
-		_set_drum(DRUM_PITCH_BASS, 130, 1.5f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_BASS_ACCOUSTIC, 130, 1.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::BASS, 130, 1.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::BASS_ACCOUSTIC, 130, 1.5f, 0.005f, 0.1f);
 
 		// snare
-		_set_drum(DRUM_PITCH_SNARE, 200, 1.2f, 0.005f, 0.2f);
-		_set_drum(DRUM_PITCH_SNARE_ELECTRONIC, 200, 1.2f, 0.005f, 0.2f);
+		_set_drum(DrumPitch::SNARE, 200, 1.2f, 0.005f, 0.2f);
+		_set_drum(DrumPitch::SNARE_ELECTRONIC, 200, 1.2f, 0.005f, 0.2f);
 
 		// toms
-		_set_drum(DRUM_PITCH_TOM_FLOOR_LOW, 60, 0.8f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_TOM_FLOOR_HI, 100, 0.8f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_TOM_LOW, 200, 0.8f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_TOM_LOW_MID, 300, 0.6f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_TOM_HI_MID, 400, 0.5f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_TOM_HI, 600, 0.3f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_FLOOR_LOW, 60, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_FLOOR_HI, 100, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_LOW, 200, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_LOW_MID, 300, 0.6f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_HI_MID, 400, 0.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TOM_HI, 600, 0.3f, 0.005f, 0.1f);
 
 		// hihat
-		_set_drum(DRUM_PITCH_HIHAT_CLOSED, 1000, 0.2f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_HIHAT_PEDAL, 1000, 0.2f, 0.005f, 0.1f);
-		_set_drum(DRUM_PITCH_HIHAT_OPEN, 600, 0.15f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::HIHAT_CLOSED, 1000, 0.2f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::HIHAT_PEDAL, 1000, 0.2f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::HIHAT_OPEN, 600, 0.15f, 0.005f, 0.4f);
 
 		// cymbals
-		_set_drum(DRUM_PITCH_CRASH_1, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_CRASH_2, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_RIDE_1, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_RIDE_2, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_CHINESE, 600, 0.23f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_BELL_RIDE, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DRUM_PITCH_SPLASH, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::CRASH_1, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::CRASH_2, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::RIDE_1, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::RIDE_2, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::CHINESE, 600, 0.23f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::BELL_RIDE, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::SPLASH, 600, 0.2f, 0.005f, 0.4f);
 
-		/*DRUM_PITCH_SIDE_STICK = 37,
-		DRUM_PITCH_CLAP = 39,
-		DRUM_PITCH_TAMBOURINE = 54,
-		DRUM_PITCH_COWBELL = 56,
-		DRUM_PITCH_VIBRASLASH = 58,
-		DRUM_PITCH_BONGO_HI = 60,
-		DRUM_PITCH_BONGO_LOW = 61,*/
+		/*DrumPitch::SIDE_STICK = 37,
+		DrumPitch::CLAP = 39,
+		DrumPitch::TAMBOURINE = 54,
+		DrumPitch::COWBELL = 56,
+		DrumPitch::VIBRASLASH = 58,
+		DrumPitch::BONGO_HI = 60,
+		DrumPitch::BONGO_LOW = 61,*/
 	}else{
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);

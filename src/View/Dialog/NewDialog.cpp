@@ -38,10 +38,10 @@ void NewDialog::onOk()
 	bool midi = isChecked("new_track_type:midi");
 	Session *session = tsunami->createSession();
 	Song *song = session->song;
-	song->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
+	song->newWithOneTrack(midi ? Track::Type::MIDI : Track::Type::AUDIO, sample_rate);
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
-		Track *t = song->addTrack(Track::TYPE_TIME, 0);
+		Track *t = song->addTrack(Track::Type::TIME, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
 			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);

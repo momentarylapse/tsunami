@@ -353,9 +353,9 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	drawSampleFrame(c, s, col, 0);
 
 	// buffer
-	if (s->type() == Track::TYPE_AUDIO)
+	if (s->type() == Track::Type::AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
-	else if (s->type() == Track::TYPE_MIDI)
+	else if (s->type() == Track::Type::MIDI)
 		view->mode->drawMidi(c, this, *s->midi, true, s->pos);
 
 	if (view->sel.has(s)){
@@ -451,13 +451,13 @@ int AudioViewTrack::y2pitch_classical(float y, int modifier)
 
 int AudioViewTrack::y2clef_classical(float y, int &mod)
 {
-	mod = MODIFIER_UNKNOWN;//modifier;
+	mod = Modifier::UNKNOWN;//modifier;
 	return screen_to_clef_pos(y);
 }
 
 int AudioViewTrack::y2clef_linear(float y, int &mod)
 {
-	mod = MODIFIER_UNKNOWN;//modifier;
+	mod = Modifier::UNKNOWN;//modifier;
 
 	int pitch = y2pitch_linear(y);
 	const Clef& clef = track->instrument.get_clef();
@@ -498,7 +498,7 @@ inline AudioViewTrack::MidiNoteState note_state(MidiNote *n, bool as_reference, 
 		s = AudioViewTrack::STATE_SELECTED;
 	if (as_reference)
 		return (AudioViewTrack::MidiNoteState)(AudioViewTrack::STATE_REFERENCE | s);
-	if ((view->hover.type == Selection::TYPE_MIDI_NOTE) and (n == view->hover.note))
+	if ((view->hover.type == Selection::Type::MIDI_NOTE) and (n == view->hover.note))
 		return (AudioViewTrack::MidiNoteState)(AudioViewTrack::STATE_HOVER | s);
 	return s;
 }
@@ -583,7 +583,7 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
-	/*if (n->modifier != MODIFIER_NONE){
+	/*if (n->modifier != Modifier::NONE){
 		c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
 		c->setFontSize(size);
@@ -679,7 +679,7 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
-	if (n->modifier != MODIFIER_NONE){
+	if (n->modifier != Modifier::NONE){
 		c->setColor(view->colors.text);
 		//c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
@@ -707,7 +707,7 @@ void AudioViewTrack::drawMidiClefClassical(Painter *c, const Clef &clef, const S
 	c->setFontSize(dy);
 
 	for (int i=0; i<7; i++)
-		if (scale.modifiers[i] != MODIFIER_NONE)
+		if (scale.modifiers[i] != Modifier::NONE)
 			c->drawStr(18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
 	c->setFontSize(view->FONT_SIZE);
 }
@@ -846,7 +846,7 @@ bool AudioView::editingTrack(Track *t)
 
 void AudioViewTrack::drawHeader(Painter *c)
 {
-	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::TYPE_TRACK_HEADER);
+	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
 	bool visible = hover or view->editingTrack(track);
 	bool playable = (view->get_playable_tracks().find(track) >= 0);
 
@@ -872,10 +872,10 @@ void AudioViewTrack::drawHeader(Painter *c)
 	c->setFont("", -1, false, false);
 
 	// icons
-	if (track->type == track->TYPE_TIME){
+	if (track->type == track->Type::TIME){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	}else if (track->type == track->TYPE_MIDI){
+	}else if (track->type == track->Type::MIDI){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{
@@ -890,7 +890,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_MUTE))
+		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_MUTE))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
@@ -899,24 +899,24 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 	if ((view->song->tracks.num > 1) and visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_SOLO))
+		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_SOLO))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_EDIT))
+		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_EDIT))
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
 
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_FX))
+		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...
 
 		/*c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::TYPE_TRACK_BUTTON_CURVE))
+		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_CURVE))
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}

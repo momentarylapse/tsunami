@@ -40,46 +40,46 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_CLEF_POSITION)){
+	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::CLEF_POSITION)){
 		setCursorPos(hover->pos, track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_BAR){
+	}else if (hover->type == Selection::Type::BAR){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_TIME){
+	}else if (hover->type == Selection::Type::TIME){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_BAR_GAP){
+	}else if (hover->type == Selection::Type::BAR_GAP){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_BACKGROUND){
+	}else if (hover->type == Selection::Type::BACKGROUND){
 		setCursorPos(hover->pos, false);
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_SELECTION_END){
+	}else if (hover->type == Selection::Type::SELECTION_END){
 		hover->range = view->sel.range;
-		view->selection_mode = view->SELECTION_MODE_TIME;
-	}else if (hover->type == Selection::TYPE_SELECTION_START){
+		view->selection_mode = view->SelectionMode::TIME;
+	}else if (hover->type == Selection::Type::SELECTION_START){
 		// swap end / start
-		hover->type = Selection::TYPE_SELECTION_END;
+		hover->type = Selection::Type::SELECTION_END;
 		hover->range = view->sel.range;
 		hover->range.invert();
-		view->selection_mode = view->SELECTION_MODE_TIME;
-	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_MUTE){
+		view->selection_mode = view->SelectionMode::TIME;
+	}else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE){
 		hover->track->setMuted(!hover->track->muted);
-	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_SOLO){
+	}else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO){
 		auto vt = view->get_track(hover->track);
 		vt->setSolo(!vt->solo);
-	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_EDIT){
+	}else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT){
 		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
-	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_FX){
+	}else if (hover->type == Selection::Type::TRACK_BUTTON_FX){
 		view->win->side_bar->open(SideBar::FX_CONSOLE);
-	}else if (hover->type == Selection::TYPE_TRACK_BUTTON_CURVE){
+	}else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE){
 		view->win->side_bar->open(SideBar::CURVE_CONSOLE);
-	}else if (hover->type == Selection::TYPE_SAMPLE){
+	}else if (hover->type == Selection::Type::SAMPLE){
 		cur_action = new ActionTrackMoveSample(view->song, view->sel);
-	}else if (hover->type == Selection::TYPE_TRACK_HEADER){
+	}else if (hover->type == Selection::Type::TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::TYPE_MARKER){
+	}else if (hover->type == Selection::Type::MARKER){
 	}
 }
 
@@ -97,24 +97,24 @@ void ViewModeDefault::onLeftButtonUp()
 		moving_track = NULL;
 	}
 
-	view->selection_mode = view->SELECTION_MODE_NONE;
+	view->selection_mode = view->SelectionMode::NONE;
 	view->msp.stop();
 }
 
 void ViewModeDefault::onLeftDoubleClick()
 {
-	if (view->selection_mode != view->SELECTION_MODE_NONE)
+	if (view->selection_mode != view->SelectionMode::NONE)
 		return;
 
 	selectUnderMouse();
 
-	if (hover->type == Selection::TYPE_SAMPLE){
+	if (hover->type == Selection::Type::SAMPLE){
 		view->sel = getSelectionForRange(view->cur_sample->range());
 		view->updateSelection();
-	}else if (hover->type == Selection::TYPE_MARKER){
+	}else if (hover->type == Selection::Type::MARKER){
 		view->sel = getSelectionForRange(hover->marker->range);
 		view->updateSelection();
-	}else if (hover->type == Selection::TYPE_BAR){
+	}else if (hover->type == Selection::Type::BAR){
 		view->sel = getSelectionForRange(hover->bar->range());
 		view->updateSelection();
 	}
@@ -127,7 +127,7 @@ void ViewModeDefault::onRightButtonDown()
 	selectUnderMouse();
 
 	// click outside sel.range -> select new position
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TIME) or (hover->type == Selection::TYPE_BACKGROUND)){
+	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			setBarriers(*hover);
 			view->applyBarriers(hover->pos);
@@ -138,21 +138,21 @@ void ViewModeDefault::onRightButtonDown()
 	// pop up menu...
 	view->updateMenu();
 
-	if (hover->type == Selection::TYPE_SAMPLE){
+	if (hover->type == Selection::Type::SAMPLE){
 		view->menu_sample->openPopup(view->win, 0, 0);
-	}else if (hover->type == Selection::TYPE_BAR){
-		//if (song->bars[hover->index].type == BarPattern::TYPE_PAUSE)
+	}else if (hover->type == Selection::Type::BAR){
+		//if (song->bars[hover->index].type == BarPattern::Type::PAUSE)
 		//	view->menu_bar->items[0]->setString(_("Pause"));
 		view->menu_bar->openPopup(view->win, 0, 0);
-	}else if (hover->type == Selection::TYPE_MARKER){
+	}else if (hover->type == Selection::Type::MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
-	}else if (hover->type == Selection::TYPE_BAR_GAP){
+	}else if (hover->type == Selection::Type::BAR_GAP){
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::TYPE_TRACK) and (hover->track->type == Track::TYPE_TIME)){
+	}else if ((hover->type == Selection::Type::TRACK) and (hover->track->type == Track::Type::TIME)){
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER) or (hover->type == Selection::TYPE_SELECTION_START) or (hover->type == Selection::TYPE_SELECTION_END)){
-		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::TYPE_MIDI);
-		view->menu_track->enable("track_add_marker", hover->type == Selection::TYPE_TRACK);
+	}else if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
+		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
+		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::TRACK);
 		view->menu_track->openPopup(view->win, 0, 0);
 	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);
@@ -190,7 +190,7 @@ void ViewModeDefault::onMouseMove()
 
 
 	// drag & drop
-	if (view->selection_mode == view->SELECTION_MODE_TIME){
+	if (view->selection_mode == view->SelectionMode::TIME){
 
 		/*Selection mo = getHover();
 		if (mo.track)
@@ -208,10 +208,10 @@ void ViewModeDefault::onMouseMove()
 			w = - e->dx - 2*r;
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
-	}else if (hover->type == Selection::TYPE_PLAYBACK){
+	}else if (hover->type == Selection::Type::PLAYBACK){
 		view->renderer->seek(hover->pos);
 		_force_redraw_ = true;
-	}else if (hover->type == Selection::TYPE_SAMPLE){
+	}else if (hover->type == Selection::Type::SAMPLE){
 		view->applyBarriers(hover->pos);
 		int dpos = (float)hover->pos - hover->sample_offset - hover->sample->pos;
 		if (cur_action)
@@ -273,9 +273,9 @@ void ViewModeDefault::updateTrackHeights()
 	int n_ch = 1;
 	for (AudioViewTrack *t: view->vtrack){
 		t->height_min = view->TIME_SCALE_HEIGHT * 2;
-		if (t->track->type == Track::TYPE_AUDIO)
+		if (t->track->type == Track::Type::AUDIO)
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-		else if (t->track->type == Track::TYPE_MIDI)
+		else if (t->track->type == Track::Type::MIDI)
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
 		else
 			t->height_wish =view->TIME_SCALE_HEIGHT * 2;
@@ -287,9 +287,9 @@ void ViewModeDefault::updateTrackHeights()
 void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	int mode = which_midi_mode(t->track);
-	if (mode == view->MIDI_MODE_LINEAR)
+	if (mode == view->MidiMode::LINEAR)
 		t->drawMidiLinear(c, midi, as_reference, shift);
-	else if (mode == view->MIDI_MODE_TAB)
+	else if (mode == view->MidiMode::TAB)
 		t->drawMidiTab(c, midi, as_reference, shift);
 	else // if (mode == view->VIEW_MIDI_CLASSICAL)
 		t->drawMidiClassical(c, midi, as_reference, shift);
@@ -301,17 +301,17 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 
 	color cc = t->getBackgroundColor();
 	if (song->bars.num > 0)
-		t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), 0);
+		t->drawGridBars(c, cc, (t->track->type == Track::Type::TIME), 0);
 	else
 		view->drawGridTime(c, t->area, cc, false);
 
 
-	if (t->track->type == Track::TYPE_MIDI){
+	if (t->track->type == Track::Type::MIDI){
 		int mode = which_midi_mode(t->track);
-		if (mode == AudioView::MIDI_MODE_CLASSICAL){
+		if (mode == AudioView::MidiMode::CLASSICAL){
 			const Clef& clef = t->track->instrument.get_clef();
 			t->drawMidiClefClassical(c, clef, view->midi_scale);
-		}else if (mode == AudioView::MIDI_MODE_TAB){
+		}else if (mode == AudioView::MidiMode::TAB){
 			t->drawMidiClefTab(c);
 		}
 	}
@@ -352,7 +352,7 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
-	if (t->track->type == Track::TYPE_MIDI)
+	if (t->track->type == Track::Type::MIDI)
 		drawMidi(c, t, t->track->midi, false, 0);
 
 	// audio buffer
@@ -365,9 +365,9 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
-		t->drawMarker(c, m, i, (hover->type == Selection::TYPE_MARKER) and (hover->track == t->track) and (hover->index == i));
+		t->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t->track) and (hover->index == i));
 
-	if (t->track->type == Track::TYPE_TIME)
+	if (t->track->type == Track::Type::TIME)
 		draw_bar_selection(c, t, view);
 }
 
@@ -417,28 +417,28 @@ void ViewModeDefault::drawPost(Painter *c)
 		drawCursorHover(this, c, moving_track->getNiceName());
 	}
 
-	if (hover->type == Selection::TYPE_SAMPLE)
+	if (hover->type == Selection::Type::SAMPLE)
 		drawCursorHover(this, c, _("sample ") + hover->sample->origin->name);
-	if (hover->type == Selection::TYPE_TRACK_BUTTON_EDIT)
+	if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
 		drawCursorHover(this, c, _("edit track properties"));
-	if (hover->type == Selection::TYPE_TRACK_BUTTON_MUTE)
+	if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)
 		drawCursorHover(this, c, _("toggle mute"));
-	if (hover->type == Selection::TYPE_TRACK_BUTTON_SOLO)
+	if (hover->type == Selection::Type::TRACK_BUTTON_SOLO)
 		drawCursorHover(this, c, _("toggle solo"));
-	if (hover->type == Selection::TYPE_TRACK_BUTTON_CURVE)
+	if (hover->type == Selection::Type::TRACK_BUTTON_CURVE)
 		drawCursorHover(this, c, _("edit curves"));
-	if (hover->type == Selection::TYPE_TRACK_BUTTON_FX)
+	if (hover->type == Selection::Type::TRACK_BUTTON_FX)
 		drawCursorHover(this, c, _("edit effects"));
 }
 
 void ViewModeDefault::setBarriers(Selection &s)
 {
 	s.barrier.clear();
-	if (s.type == s.TYPE_NONE)
+	if (s.type == s.Type::NONE)
 		return;
 
 	int dpos = 0;
-	if (s.type == s.TYPE_SAMPLE)
+	if (s.type == s.Type::SAMPLE)
 		dpos = s.sample_offset;
 
 	for (Track *t: song->tracks){
@@ -469,7 +469,7 @@ Selection ViewModeDefault::getHoverBasic()
 	s.pos = view->cam.screen2sample(mx);
 	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = my;
-	s.type = s.TYPE_BACKGROUND;
+	s.type = s.Type::BACKGROUND;
 
 	// track?
 	foreachi(AudioViewTrack *t, view->vtrack, i){
@@ -477,25 +477,25 @@ Selection ViewModeDefault::getHoverBasic()
 			s.vtrack = t;
 			s.index = i;
 			s.track = t->track;
-			s.type = Selection::TYPE_TRACK;
+			s.type = Selection::Type::TRACK;
 			if ((view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < t->area.y1 + view->TRACK_HANDLE_HEIGHT))
-				s.type = Selection::TYPE_TRACK_HEADER;
+				s.type = Selection::Type::TRACK_HEADER;
 		}
 	}
 
 	// selection boundaries?
 	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(hui::KEY_SHIFT))){
 		if (view->mouse_over_time(view->sel.range.end())){
-			s.type = Selection::TYPE_SELECTION_END;
+			s.type = Selection::Type::SELECTION_END;
 			return s;
 		}
 		if (view->mouse_over_time(view->sel.range.start())){
-			s.type = Selection::TYPE_SELECTION_START;
+			s.type = Selection::Type::SELECTION_START;
 			return s;
 		}
 		if (view->isPlaying()){
 			if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
-				s.type = Selection::TYPE_PLAYBACK;
+				s.type = Selection::Type::PLAYBACK;
 				return s;
 			}
 		}
@@ -503,7 +503,7 @@ Selection ViewModeDefault::getHoverBasic()
 
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::TYPE_TIME;
+		s.type = Selection::Type::TIME;
 		return s;
 	}
 
@@ -512,27 +512,27 @@ Selection ViewModeDefault::getHoverBasic()
 		AudioViewTrack *t = s.vtrack;
 		int x = 5;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_MUTE;
+			s.type = Selection::Type::TRACK_BUTTON_MUTE;
 			return s;
 		}
 		x += 17;
 		if ((song->tracks.num > 1) and (mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_SOLO;
+			s.type = Selection::Type::TRACK_BUTTON_SOLO;
 			return s;
 		}
 		x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_EDIT;
+			s.type = Selection::Type::TRACK_BUTTON_EDIT;
 			return s;
 		}
 		x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_FX;
+			s.type = Selection::Type::TRACK_BUTTON_FX;
 			return s;
 		}
 		/*x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::TYPE_TRACK_BUTTON_CURVE;
+			s.type = Selection::Type::TRACK_BUTTON_CURVE;
 			return s;
 		}*/
 	}
@@ -545,7 +545,7 @@ Selection ViewModeDefault::getHover()
 	Selection s = getHoverBasic();
 
 	// already found important stuff?
-	if ((s.type != Selection::TYPE_BACKGROUND) and (s.type != Selection::TYPE_TRACK) and (s.type != Selection::TYPE_TIME))
+	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::TRACK) and (s.type != Selection::Type::TIME))
 		return s;
 
 	int mx = view->mx;
@@ -557,7 +557,7 @@ Selection ViewModeDefault::getHover()
 		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
 			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my)){
 				s.marker = s.track->markers[i];
-				s.type = Selection::TYPE_MARKER;
+				s.type = Selection::Type::MARKER;
 				s.index = i;
 				return s;
 			}
@@ -568,20 +568,20 @@ Selection ViewModeDefault::getHover()
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;
-				s.type = Selection::TYPE_SAMPLE;
+				s.type = Selection::Type::SAMPLE;
 				s.sample_offset = offset;
 				return s;
 			}
 		}
 
 		// bars
-		if (s.track->type == Track::TYPE_TIME){
+		if (s.track->type == Track::Type::TIME){
 			int offset = 0;
 			for (int i=0; i<view->song->bars.num+1; i++){
 				float x = view->cam.sample2screen(offset);
 				if (fabs(x - mx) < view->BARRIER_DIST){
 					s.index = i;
-					s.type = Selection::TYPE_BAR_GAP;
+					s.type = Selection::Type::BAR_GAP;
 					s.pos = offset;
 					return s;
 				}
@@ -593,7 +593,7 @@ Selection ViewModeDefault::getHover()
 				//b.range.
 				s.bar = b;
 				s.index = b->index;
-				s.type = Selection::TYPE_BAR;
+				s.type = Selection::Type::BAR;
 				return s;
 			}
 		}
@@ -607,7 +607,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	if (view->isPlaying()){
 		if (view->renderer->range().is_inside(pos)){
 			view->renderer->seek(pos);
-			hover->type = Selection::TYPE_PLAYBACK;
+			hover->type = Selection::Type::PLAYBACK;
 			view->forceRedraw();
 			return;
 		}else{
@@ -632,23 +632,22 @@ void ViewModeDefault::selectUnderMouse()
 	*hover = getHover();
 	Track *t = hover->track;
 	SampleRef *s = hover->sample;
-	Bar *b = hover->bar;
 	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
 	if (hover->track)
 		view->setCurTrack(hover->track);
-	if ((hover->type == Selection::TYPE_TRACK) or (hover->type == Selection::TYPE_TRACK_HEADER)){
+	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER)){
 		view->selectTrack(t, control, false);
 	}
 
 	view->setCurSample(s);
 
 
-	if (hover->type == Selection::TYPE_BAR_GAP){
+	if (hover->type == Selection::Type::BAR_GAP){
 		view->sel.clear_data();
 		view->sel.bar_gap = hover->index;
-	}else if (hover->type == Selection::TYPE_BAR){
+	}else if (hover->type == Selection::Type::BAR){
 		auto b = hover->bar;
 		if (control){
 			view->sel.set(b, !view->sel.has(b));
@@ -660,7 +659,7 @@ void ViewModeDefault::selectUnderMouse()
 				view->sel.add(b);
 			}
 		}
-	}else if (hover->type == Selection::TYPE_MARKER){
+	}else if (hover->type == Selection::Type::MARKER){
 		auto m = hover->marker;
 		if (control){
 			view->sel.set(m, !view->sel.has(m));
@@ -672,7 +671,7 @@ void ViewModeDefault::selectUnderMouse()
 				view->sel.add(m);
 			}
 		}
-	}else if (hover->type == Selection::TYPE_SAMPLE){
+	}else if (hover->type == Selection::Type::SAMPLE){
 		if (control){
 			view->sel.set(s, !view->sel.has(s));
 		}else{
@@ -746,25 +745,25 @@ void ViewModeDefault::startSelection()
 	setBarriers(*hover);
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
-	if (hover->type == Selection::TYPE_TRACK_HEADER){
+	if (hover->type == Selection::Type::TRACK_HEADER){
 		moving_track = hover->track;
-	}else if (hover->type == Selection::TYPE_TIME){
-		hover->type = Selection::TYPE_SELECTION_END;
-		view->selection_mode = view->SELECTION_MODE_TIME;
+	}else if (hover->type == Selection::Type::TIME){
+		hover->type = Selection::Type::SELECTION_END;
+		view->selection_mode = view->SelectionMode::TIME;
 	}else{
 		hover->y0 = view->msp.start_y;
 		hover->y1 = view->my;
-		view->selection_mode = view->SELECTION_MODE_TRACK_RECT;
+		view->selection_mode = view->SelectionMode::TRACK_RECT;
 	}
 	view->setSelection(getSelection(hover->range));
 }
 
 int ViewModeDefault::which_midi_mode(Track *t)
 {
-	if (view->midi_view_mode == view->MIDI_MODE_LINEAR)
-			return view->MIDI_MODE_LINEAR;
-	if ((view->midi_view_mode == view->MIDI_MODE_TAB) and (t->instrument.string_pitch.num > 0))
-		return view->MIDI_MODE_TAB;
-	return view->MIDI_MODE_CLASSICAL;
+	if (view->midi_view_mode == view->MidiMode::LINEAR)
+			return view->MidiMode::LINEAR;
+	if ((view->midi_view_mode == view->MidiMode::TAB) and (t->instrument.string_pitch.num > 0))
+		return view->MidiMode::TAB;
+	return view->MidiMode::CLASSICAL;
 }
 

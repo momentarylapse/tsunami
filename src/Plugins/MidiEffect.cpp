@@ -15,7 +15,7 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::MidiEffect() :
-	Configurable(Session::GLOBAL, TYPE_MIDI_EFFECT)
+	Configurable(Session::GLOBAL, Type::MIDI_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
@@ -145,7 +145,7 @@ void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_MIDI_EFFECT, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::MIDI_EFFECT, name);
 	MidiEffect *fx = NULL;
 	if (p->usable)
 		fx = (MidiEffect*)p->createInstance(session, "MidiEffect");

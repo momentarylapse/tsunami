@@ -47,7 +47,7 @@ void Effect::Output::setSource(AudioSource *_source)
 }
 
 Effect::Effect() :
-	Configurable(Session::GLOBAL, TYPE_EFFECT)
+	Configurable(Session::GLOBAL, Type::EFFECT)
 {
 	usable = true;
 	plugin = NULL;
@@ -99,7 +99,7 @@ void Effect::doProcessTrack(Track *t, int layer, const Range &r)
 // TODO: move to PluginManager?
 Effect *CreateEffect(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::TYPE_EFFECT, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::EFFECT, name);
 	Effect *fx = NULL;
 	if (p->usable)
 		fx = (Effect*)p->createInstance(session, "AudioEffect");

@@ -109,59 +109,59 @@ string pitch_name(int pitch)
 
 string drum_pitch_name(int pitch)
 {
-	if (pitch == DRUM_PITCH_BASS_ACCOUSTIC)
+	if (pitch == DrumPitch::BASS_ACCOUSTIC)
 		return "bass      (akk)";
-	if (pitch == DRUM_PITCH_BASS)
+	if (pitch == DrumPitch::BASS)
 		return "bass";
-	if (pitch == DRUM_PITCH_SIDE_STICK)
+	if (pitch == DrumPitch::SIDE_STICK)
 		return "side stick";
-	if (pitch == DRUM_PITCH_SNARE)
+	if (pitch == DrumPitch::SNARE)
 		return "snare";
-	if (pitch == DRUM_PITCH_CLAP)
+	if (pitch == DrumPitch::CLAP)
 		return "clap";
-	if (pitch == DRUM_PITCH_SNARE_ELECTRONIC)
+	if (pitch == DrumPitch::SNARE_ELECTRONIC)
 		return "snare     (electronic)";
-	if (pitch == DRUM_PITCH_TOM_FLOOR_LOW)
+	if (pitch == DrumPitch::TOM_FLOOR_LOW)
 		return "tom - floor low";
-	if (pitch == DRUM_PITCH_HIHAT_CLOSED)
+	if (pitch == DrumPitch::HIHAT_CLOSED)
 		return "hihat - closed";
-	if (pitch == DRUM_PITCH_TOM_FLOOR_HI)
+	if (pitch == DrumPitch::TOM_FLOOR_HI)
 		return "tom - floor hi";
-	if (pitch == DRUM_PITCH_HIHAT_PEDAL)
+	if (pitch == DrumPitch::HIHAT_PEDAL)
 		return "hihat - pedal";
-	if (pitch == DRUM_PITCH_TOM_LOW)
+	if (pitch == DrumPitch::TOM_LOW)
 		return "tom - low";
-	if (pitch == DRUM_PITCH_HIHAT_OPEN)
+	if (pitch == DrumPitch::HIHAT_OPEN)
 		return "hihat - open";
-	if (pitch == DRUM_PITCH_TOM_LOW_MID)
+	if (pitch == DrumPitch::TOM_LOW_MID)
 		return "tom - low mid";
-	if (pitch == DRUM_PITCH_TOM_HI_MID)
+	if (pitch == DrumPitch::TOM_HI_MID)
 		return "tom - hi mid";
-	if (pitch == DRUM_PITCH_CRASH_1)
+	if (pitch == DrumPitch::CRASH_1)
 		return "crash 1";
-	if (pitch == DRUM_PITCH_TOM_HI)
+	if (pitch == DrumPitch::TOM_HI)
 		return "tom - hi";
-	if (pitch == DRUM_PITCH_RIDE_1)
+	if (pitch == DrumPitch::RIDE_1)
 		return "ride 1";
-	if (pitch == DRUM_PITCH_CHINESE)
+	if (pitch == DrumPitch::CHINESE)
 		return "chinese";
-	if (pitch == DRUM_PITCH_BELL_RIDE)
+	if (pitch == DrumPitch::BELL_RIDE)
 		return "bell ride";
-	if (pitch == DRUM_PITCH_TAMBOURINE)
+	if (pitch == DrumPitch::TAMBOURINE)
 		return "tambourine";
-	if (pitch == DRUM_PITCH_SPLASH)
+	if (pitch == DrumPitch::SPLASH)
 		return "splash";
-	if (pitch == DRUM_PITCH_COWBELL)
+	if (pitch == DrumPitch::COWBELL)
 		return "cowbell";
-	if (pitch == DRUM_PITCH_CRASH_2)
+	if (pitch == DrumPitch::CRASH_2)
 		return "crash 2";
-	if (pitch == DRUM_PITCH_VIBRASLASH)
+	if (pitch == DrumPitch::VIBRASLASH)
 		return "vibraslash?";
-	if (pitch == DRUM_PITCH_RIDE_2)
+	if (pitch == DrumPitch::RIDE_2)
 		return "ride 2";
-	if (pitch == DRUM_PITCH_BONGO_HI)
+	if (pitch == DrumPitch::BONGO_HI)
 		return "bongo - hi";
-	if (pitch == DRUM_PITCH_BONGO_LOW)
+	if (pitch == DrumPitch::BONGO_LOW)
 		return "bongo - low";
 	return pitch_name(pitch);
 }
@@ -460,13 +460,13 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events)
 
 string chord_type_name(int type)
 {
-	if (type == CHORD_TYPE_MINOR)
+	if (type == ChordType::MINOR)
 		return _("Minor");
-	if (type == CHORD_TYPE_MAJOR)
+	if (type == ChordType::MAJOR)
 		return _("Major");
-	if (type == CHORD_TYPE_DIMINISHED)
+	if (type == ChordType::DIMINISHED)
 		return _("Diminished");
-	if (type == CHORD_TYPE_AUGMENTED)
+	if (type == ChordType::AUGMENTED)
 		return _("Augmented");
 	return "???";
 }
@@ -475,16 +475,16 @@ Array<int> chord_notes(int type, int inversion, int pitch)
 {
 	Array<int> r;
 	r.add(pitch);
-	if (type == CHORD_TYPE_MINOR){
+	if (type == ChordType::MINOR){
 		r.add(pitch + 3);
 		r.add(pitch + 7);
-	}else if (type == CHORD_TYPE_MAJOR){
+	}else if (type == ChordType::MAJOR){
 		r.add(pitch + 4);
 		r.add(pitch + 7);
-	}else if (type == CHORD_TYPE_DIMINISHED){
+	}else if (type == ChordType::DIMINISHED){
 		r.add(pitch + 3);
 		r.add(pitch + 6);
-	}else if (type == CHORD_TYPE_AUGMENTED){
+	}else if (type == ChordType::AUGMENTED){
 		r.add(pitch + 4);
 		r.add(pitch + 8);
 	}
@@ -546,6 +546,6 @@ void MidiNoteBuffer::clear_meta() const
 		n->stringno = -1;
 	for (MidiNote *n: *this){
 		n->clef_position = -1;
-		n->modifier = MODIFIER_UNKNOWN;
+		n->modifier = Modifier::UNKNOWN;
 	}
 }

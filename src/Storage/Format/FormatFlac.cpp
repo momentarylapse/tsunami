@@ -87,7 +87,7 @@ void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoder
 }
 
 FormatDescriptorFlac::FormatDescriptorFlac() :
-	FormatDescriptor("Flac", "flac", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
+	FormatDescriptor("Flac", "flac", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ | Flag::WRITE)
 {
 }
 

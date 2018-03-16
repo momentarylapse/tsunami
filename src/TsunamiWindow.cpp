@@ -224,7 +224,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 
 
-	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
+	song->newWithOneTrack(Track::Type::AUDIO, DEFAULT_SAMPLE_RATE);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	updateMenu();
@@ -287,14 +287,14 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	song->addTrack(Track::TYPE_AUDIO);
+	song->addTrack(Track::Type::AUDIO);
 }
 
 void TsunamiWindow::onAddTimeTrack()
 {
 	song->action_manager->beginActionGroup();
 	try{
-		song->addTrack(Track::TYPE_TIME, 0);
+		song->addTrack(Track::Type::TIME, 0);
 		// some default data
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
@@ -306,7 +306,7 @@ void TsunamiWindow::onAddTimeTrack()
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	song->addTrack(Track::TYPE_MIDI);
+	song->addTrack(Track::Type::MIDI);
 }
 
 void TsunamiWindow::onTrackRender()
@@ -317,7 +317,7 @@ void TsunamiWindow::onTrackRender()
 		return;
 	}
 	song->action_manager->beginActionGroup();
-	Track *t = song->addTrack(Track::TYPE_AUDIO);
+	Track *t = song->addTrack(Track::Type::AUDIO);
 
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
@@ -397,7 +397,7 @@ void TsunamiWindow::onSampleProperties()
 
 void TsunamiWindow::onDeleteMarker()
 {
-	if (view->hover.type == Selection::TYPE_MARKER)
+	if (view->hover.type == Selection::Type::MARKER)
 		view->cur_track->deleteMarker(view->hover.index);
 	else
 		session->e(_("No marker selected"));
@@ -405,7 +405,7 @@ void TsunamiWindow::onDeleteMarker()
 
 void TsunamiWindow::onEditMarker()
 {
-	if (view->hover.type == Selection::TYPE_MARKER){
+	if (view->hover.type == Selection::Type::MARKER){
 		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, Range::EMPTY, view->hover.index);
 		dlg->run();
 		delete(dlg);
@@ -498,7 +498,7 @@ void TsunamiWindow::onMenuExecuteEffect()
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
-			if (view->sel.has(t) and (t->type == t->TYPE_AUDIO)){
+			if (view->sel.has(t) and (t->type == t->Type::AUDIO)){
 				fx->resetState();
 				fx->doProcessTrack(t, view->cur_layer, view->sel.range);
 			}
@@ -517,7 +517,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
-			if (view->sel.has(t) and (t->type == t->TYPE_MIDI)){
+			if (view->sel.has(t) and (t->type == t->Type::MIDI)){
 				fx->resetState();
 				fx->process_track(t, view->sel);
 			}
@@ -581,7 +581,7 @@ void TsunamiWindow::onSettings()
 void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
-		Track *t = song->addTrack(Track::TYPE_AUDIO);
+		Track *t = song->addTrack(Track::Type::AUDIO);
 		session->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
 	}
 }
@@ -689,17 +689,17 @@ void TsunamiWindow::onSelectExpand()
 
 void TsunamiWindow::onViewMidiDefault()
 {
-	view->setMidiViewMode(view->MIDI_MODE_LINEAR);
+	view->setMidiViewMode(view->MidiMode::LINEAR);
 }
 
 void TsunamiWindow::onViewMidiTab()
 {
-	view->setMidiViewMode(view->MIDI_MODE_TAB);
+	view->setMidiViewMode(view->MidiMode::TAB);
 }
 
 void TsunamiWindow::onViewMidiScore()
 {
-	view->setMidiViewMode(view->MIDI_MODE_CLASSICAL);
+	view->setMidiViewMode(view->MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::onZoomIn()
@@ -839,11 +839,11 @@ string _suggest_filename(Song *s, const string &dir)
 	string base = get_current_date().format("%Y-%m-%d");
 
 	string ext = "nami";
-	if ((s->tracks.num == 1) and (s->tracks[0]->type == Track::TYPE_AUDIO))
+	if ((s->tracks.num == 1) and (s->tracks[0]->type == Track::Type::AUDIO))
 		ext = "ogg";
 	bool allow_midi = true;
 	for (Track* t: s->tracks)
-		if ((t->type != Track::TYPE_MIDI) and (t->type != Track::TYPE_TIME))
+		if ((t->type != Track::Type::MIDI) and (t->type != Track::Type::TIME))
 			allow_midi = false;
 	if (allow_midi)
 		ext = "midi";
@@ -884,7 +884,7 @@ int pref_bar_index(AudioView *view)
 	if (view->sel.bar_gap >= 0)
 		return view->sel.bar_gap;
 	if (!view->sel.bar_indices.empty())
-		return view->sel.bar_indices.end();
+		return view->sel.bar_indices.end() + 1;
 	if (view->hover.pos > 0)
 		return view->song->bars.num;
 	return 0;

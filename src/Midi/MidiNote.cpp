@@ -43,12 +43,12 @@ void MidiNote::reset_meta()
 {
 	stringno = -1;
 	clef_position = -1;
-	modifier = MODIFIER_UNKNOWN;
+	modifier = Modifier::UNKNOWN;
 }
 
 void MidiNote::update_meta(const Instrument &instrument, const Scale& scale, int hand_position) const
 {
-	if ((clef_position < 0) or (modifier == MODIFIER_UNKNOWN)){
+	if ((clef_position < 0) or (modifier == Modifier::UNKNOWN)){
 		const Clef& clef = instrument.get_clef();
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}

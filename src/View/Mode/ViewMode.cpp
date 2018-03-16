@@ -28,11 +28,11 @@ Selection ViewMode::getHover()
 
 SongSelection ViewMode::getSelection(const Range &r)
 {
-	if (view->selection_mode == view->SELECTION_MODE_TIME)
+	if (view->selection_mode == view->SelectionMode::TIME)
 		return getSelectionForRange(r);
-	if (view->selection_mode == view->SELECTION_MODE_RECT)
+	if (view->selection_mode == view->SelectionMode::RECT)
 		return getSelectionForRect(r, hover->y0, hover->y1);
-	if (view->selection_mode == view->SELECTION_MODE_TRACK_RECT)
+	if (view->selection_mode == view->SelectionMode::TRACK_RECT)
 		return getSelectionForTrackRect(r, hover->y0, hover->y1);
 	return SongSelection();
 }

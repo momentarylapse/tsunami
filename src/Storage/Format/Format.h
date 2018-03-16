@@ -33,16 +33,16 @@ public:
 	string description;
 	int flags;
 
-	enum{
-		FLAG_SINGLE_TRACK = 1<<0,
-		FLAG_TAGS = 1<<1,
-		FLAG_FX = 1<<2,
-		FLAG_MULTITRACK = 1<<3,
-		FLAG_SUBS = 1<<4,
-		FLAG_AUDIO = 1<<5,
-		FLAG_MIDI = 1<<6,
-		FLAG_READ = 1<<7,
-		FLAG_WRITE = 1<<8,
+	enum Flag{
+		SINGLE_TRACK = 1<<0,
+		TAGS = 1<<1,
+		FX = 1<<2,
+		MULTITRACK = 1<<3,
+		SAMPLES = 1<<4,
+		AUDIO = 1<<5,
+		MIDI = 1<<6,
+		READ = 1<<7,
+		WRITE = 1<<8,
 	};
 };
 

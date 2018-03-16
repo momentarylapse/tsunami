@@ -26,27 +26,27 @@ class MidiPreviewSource : public MidiSource
 public:
 	MidiPreviewSource()
 	{
-		mode = MODE_WAITING;
+		mode = Mode::WAITING;
 		ttl = -1;
 	}
 	virtual int _cdecl read(MidiEventBuffer &midi)
 	{
 		//printf("mps.read\n");
-		if (mode == MODE_END_OF_STREAM){
+		if (mode == Mode::END_OF_STREAM){
 			//printf("  - end\n");
 			return END_OF_STREAM;
 		}
 
-		if (mode == MODE_START_NOTES){
+		if (mode == Mode::START_NOTES){
 			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 1));
-			mode = MODE_ACTIVE_NOTES;
-		}else if (mode == MODE_END_NOTES){
+			mode = Mode::ACTIVE_NOTES;
+		}else if (mode == Mode::END_NOTES){
 			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 0));
-			mode = MODE_END_OF_STREAM;
+			mode = Mode::END_OF_STREAM;
 		}
-		if (mode == MODE_ACTIVE_NOTES){
+		if (mode == Mode::ACTIVE_NOTES){
 			ttl -= midi.samples;
 			if (ttl < 0)
 				end();
@@ -56,29 +56,29 @@ public:
 
 	void start(const Array<int> &_pitch, int _ttl)
 	{
-		if ((mode != MODE_WAITING) and (mode != MODE_END_OF_STREAM))
+		if ((mode != Mode::WAITING) and (mode != Mode::END_OF_STREAM))
 			return;
 		pitch = _pitch;
 		ttl = _ttl;
-		mode = MODE_START_NOTES;
+		mode = Mode::START_NOTES;
 	}
 	void end()
 	{
-		if (mode == MODE_START_NOTES){
-			mode = MODE_WAITING;
-		}else if (mode == MODE_ACTIVE_NOTES){
-			mode = MODE_END_NOTES;
+		if (mode == Mode::START_NOTES){
+			mode = Mode::WAITING;
+		}else if (mode == Mode::ACTIVE_NOTES){
+			mode = Mode::END_NOTES;
 		}
 	}
 
 private:
 	int mode;
-	enum{
-		MODE_WAITING,
-		MODE_START_NOTES,
-		MODE_ACTIVE_NOTES,
-		MODE_END_NOTES,
-		MODE_END_OF_STREAM
+	enum Mode{
+		WAITING,
+		START_NOTES,
+		ACTIVE_NOTES,
+		END_NOTES,
+		END_OF_STREAM
 	};
 	int ttl;
 
@@ -91,12 +91,12 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	cur_track = NULL;
 	beat_partition = 4;
 	win->setInt("beat_partition", beat_partition);
-	mode_wanted = AudioView::MIDI_MODE_CLASSICAL;
-	creation_mode = CREATION_MODE_NOTE;
+	mode_wanted = AudioView::MidiMode::CLASSICAL;
+	creation_mode = CreationMode::NOTE;
 	midi_interval = 3;
 	chord_type = 0;
 	chord_inversion = 0;
-	modifier = MODIFIER_NONE;
+	modifier = Modifier::NONE;
 
 	moving = false;
 	string_no = 0;
@@ -173,7 +173,7 @@ void ViewModeMidi::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 	int mode = which_midi_mode(cur_track->track);
 
-	if (creation_mode == CREATION_MODE_SELECT){
+	if (creation_mode == CreationMode::SELECT){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 
@@ -182,7 +182,7 @@ void ViewModeMidi::onLeftButtonDown()
 		view->hide_selection = true;
 	}
 
-	if (hover->type == Selection::TYPE_MIDI_NOTE){
+	if (hover->type == Selection::Type::MIDI_NOTE){
 		if (win->getKey(hui::KEY_CONTROL)){
 			view->sel.set(hover->note, !view->sel.has(hover->note));
 		}else{
@@ -193,22 +193,22 @@ void ViewModeMidi::onLeftButtonDown()
 		}
 		// start moving
 		moving = true;
-	}else if (hover->type == Selection::TYPE_CLEF_POSITION){
-		/*if (creation_mode != CREATION_MODE_SELECT){
+	}else if (hover->type == Selection::Type::CLEF_POSITION){
+		/*if (creation_mode != CreationMode::SELECT){
 			view->msp.stop();
 		}*/
 		view->msp.start_pos = hover->pos; // TODO ...bad
-		if (mode == AudioView::MIDI_MODE_TAB){
+		if (mode == AudioView::MidiMode::TAB){
 			string_no = clampi(hover->clef_position, 0, cur_track->track->instrument.string_pitch.num - 1);
 		}
-	}else if (hover->type == Selection::TYPE_MIDI_PITCH){
+	}else if (hover->type == Selection::Type::MIDI_PITCH){
 		view->msp.start_pos = hover->pos; // TODO ...bad
-		if (mode == AudioView::MIDI_MODE_TAB){
+		if (mode == AudioView::MidiMode::TAB){
 		}else{ // CLASSICAL/LINEAR
 			// create new note
 			startMidiPreview(getCreationPitch(hover->pitch), 1.0f);
 		}
-	}else if (hover->type == Selection::TYPE_SCROLL){
+	}else if (hover->type == Selection::Type::SCROLL){
 		scroll_offset = view->my - scroll_bar.y1;
 		view->msp.stop();
 	}
@@ -220,8 +220,8 @@ void ViewModeMidi::onLeftButtonUp()
 	view->hide_selection = false;
 
 	int mode = which_midi_mode(cur_track->track);
-	if ((mode == AudioView::MIDI_MODE_CLASSICAL) or (mode == AudioView::MIDI_MODE_LINEAR)){
-		if (hover->type == Selection::TYPE_MIDI_PITCH){
+	if ((mode == AudioView::MidiMode::CLASSICAL) or (mode == AudioView::MidiMode::LINEAR)){
+		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
 			view->cur_track->addMidiNotes(notes);
 
@@ -239,16 +239,16 @@ void ViewModeMidi::onMouseMove()
 	// drag & drop
 	if (moving){
 		/**hover = getHover();
-		if ((hover->type == Selection::TYPE_MIDI_NOTE) and (hover->track == view->cur_track)){
+		if ((hover->type == Selection::Type::MIDI_NOTE) and (hover->track == view->cur_track)){
 			hover->track->deleteMidiNote(hover->index);
 			hover->clear();
 		}*/
 	}
 
-	if (hover->type == Selection::TYPE_MIDI_PITCH){
+	if (hover->type == Selection::Type::MIDI_PITCH){
 		// creating notes
 		//view->forceRedraw();
-	}else if (hover->type == Selection::TYPE_SCROLL){
+	}else if (hover->type == Selection::Type::SCROLL){
 		if (e->lbut){
 			int _pitch_max = (cur_track->area.y2 + scroll_offset - view->my) / cur_track->area.height() * (MAX_PITCH - 1.0f);
 			cur_track->setPitchMinMax(_pitch_max - PITCH_SHOW_COUNT, _pitch_max);
@@ -259,18 +259,18 @@ void ViewModeMidi::onMouseMove()
 void ViewModeMidi::onKeyDown(int k)
 {
 	int mode = which_midi_mode(cur_track->track);
-	if (mode == AudioView::MIDI_MODE_CLASSICAL){
+	if (mode == AudioView::MidiMode::CLASSICAL){
 		if (k == hui::KEY_1){
-			modifier = MODIFIER_NONE;
+			modifier = Modifier::NONE;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_2){
-			modifier = MODIFIER_SHARP;
+			modifier = Modifier::SHARP;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_3){
-			modifier = MODIFIER_FLAT;
+			modifier = Modifier::FLAT;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_4){
-			modifier = MODIFIER_NATURAL;
+			modifier = Modifier::NATURAL;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}
 
@@ -295,7 +295,7 @@ void ViewModeMidi::onKeyDown(int k)
 			octave = max(octave - 1, 0);
 			view->forceRedraw();
 		}
-	}else if (mode == AudioView::MIDI_MODE_TAB){
+	}else if (mode == AudioView::MidiMode::TAB){
 
 		if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
 			Range r = getMidiEditRange();
@@ -332,11 +332,11 @@ void ViewModeMidi::updateTrackHeights()
 {
 	for (AudioViewTrack *t: view->vtrack){
 		t->height_min = view->TIME_SCALE_HEIGHT;
-		if (t->track->type == Track::TYPE_AUDIO){
+		if (t->track->type == Track::Type::AUDIO){
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
-		}else if (t->track->type == Track::TYPE_MIDI){
+		}else if (t->track->type == Track::Type::MIDI){
 			if (t->track == view->cur_track){
-				if (view->midi_view_mode == view->MIDI_MODE_CLASSICAL)
+				if (view->midi_view_mode == view->MidiMode::CLASSICAL)
 					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 				else
 					t->height_wish = 5000;
@@ -381,13 +381,13 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 Array<int> ViewModeMidi::getCreationPitch(int base_pitch)
 {
 	Array<int> pitch;
-	if (creation_mode == CREATION_MODE_NOTE){
+	if (creation_mode == CreationMode::NOTE){
 		pitch.add(base_pitch);
-	}else if (creation_mode == CREATION_MODE_INTERVAL){
+	}else if (creation_mode == CreationMode::INTERVAL){
 		pitch.add(base_pitch);
 		if (midi_interval != 0)
 			pitch.add(base_pitch + midi_interval);
-	}else if (creation_mode == CREATION_MODE_CHORD){
+	}else if (creation_mode == CreationMode::CHORD){
 		pitch = chord_notes(chord_type, chord_inversion, base_pitch);
 	}
 	return pitch;
@@ -433,21 +433,21 @@ void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 
 	color cc = t->getBackgroundColor();
 	if (song->bars.num > 0)
-		t->drawGridBars(c, cc, (t->track->type == Track::TYPE_TIME), beat_partition);
+		t->drawGridBars(c, cc, (t->track->type == Track::Type::TIME), beat_partition);
 	else
 		view->drawGridTime(c, t->area, cc, false);
 
-	if (t->track->type == Track::TYPE_MIDI){
+	if (t->track->type == Track::Type::MIDI){
 		int mode = which_midi_mode(t->track);
 		if (t->track == view->cur_track){
-			if (mode == AudioView::MIDI_MODE_LINEAR)
+			if (mode == AudioView::MidiMode::LINEAR)
 				drawTrackPitchGrid(c, t);
 		}
 
-		if (mode == AudioView::MIDI_MODE_CLASSICAL){
+		if (mode == AudioView::MidiMode::CLASSICAL){
 			const Clef& clef = t->track->instrument.get_clef();
 			t->drawMidiClefClassical(c, clef, view->midi_scale);
-		}else if (mode == AudioView::MIDI_MODE_TAB){
+		}else if (mode == AudioView::MidiMode::TAB){
 			t->drawMidiClefTab(c);
 		}
 	}
@@ -479,10 +479,10 @@ void ViewModeMidi::drawTrackPitchGrid(Painter *c, AudioViewTrack *t)
 		PluginData *c = t->track->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
-	bool is_drum = (t->track->instrument.type == Instrument::TYPE_DRUMS);
+	bool is_drum = (t->track->instrument.type == Instrument::Type::DRUMS);
 	for (int i=cur_track->pitch_min; i<cur_track->pitch_max; i++){
 		c->setColor(cc);
-		if (((hover->type == Selection::TYPE_MIDI_PITCH) or (hover->type == Selection::TYPE_MIDI_NOTE)) and (i == hover->pitch))
+		if (((hover->type == Selection::Type::MIDI_PITCH) or (hover->type == Selection::Type::MIDI_NOTE)) and (i == hover->pitch))
 			c->setColor(view->colors.text);
 
 		string name = pitch_name(i);
@@ -521,70 +521,70 @@ inline bool hover_note_linear(const MidiNote &n, Selection &s, ViewModeMidi *vmm
 Selection ViewModeMidi::getHover()
 {
 	Selection s = ViewModeDefault::getHover();
-	if (s.type != s.TYPE_TRACK)
+	if (s.type != s.Type::TRACK)
 		return s;
 
 	int mx = view->mx;
 	int my = view->my;
 
 	// midi
-	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track)){
+	if ((s.track) and (s.track->type == Track::Type::MIDI) and (s.track == view->cur_track)){
 		int mode = which_midi_mode(s.track);
 
 		// scroll bar
-		if ((mode == AudioView::MIDI_MODE_LINEAR) and (scroll_bar.inside(view->mx, view->my))){
-			s.type = Selection::TYPE_SCROLL;
+		if ((mode == AudioView::MidiMode::LINEAR) and (scroll_bar.inside(view->mx, view->my))){
+			s.type = Selection::Type::SCROLL;
 			return s;
 		}
 
-		/*if (creation_mode != CREATION_MODE_SELECT)*/{
-			if ((mode == AudioView::MIDI_MODE_CLASSICAL)){
+		/*if (creation_mode != CreationMode::SELECT)*/{
+			if ((mode == AudioView::MidiMode::CLASSICAL)){
 				s.pitch = cur_track->y2pitch_classical(my, modifier);
 				s.clef_position = cur_track->screen_to_clef_pos(my);
 				s.modifier = modifier;
-				s.type = Selection::TYPE_MIDI_PITCH;
+				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
 				foreachi(MidiNote *n, s.track->midi, i)
 					if (hover_note_classical(*n, s, this)){
 						s.note = n;
 						s.index = i;
-						s.type = Selection::TYPE_MIDI_NOTE;
+						s.type = Selection::Type::MIDI_NOTE;
 						return s;
 					}
-			}else if ((mode == AudioView::MIDI_MODE_TAB)){
+			}else if ((mode == AudioView::MidiMode::TAB)){
 				//s.pitch = cur_track->y2pitch_classical(my, modifier);
 				s.clef_position = cur_track->screen_to_string(my);
 				s.modifier = modifier;
-				s.type = Selection::TYPE_CLEF_POSITION;
+				s.type = Selection::Type::CLEF_POSITION;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
 				foreachi(MidiNote *n, s.track->midi, i)
 					if (hover_note_tab(*n, s, this)){
 						s.note = n;
 						s.index = i;
-						s.type = Selection::TYPE_MIDI_NOTE;
+						s.type = Selection::Type::MIDI_NOTE;
 						return s;
 					}
-			}else if (mode == AudioView::MIDI_MODE_LINEAR){
+			}else if (mode == AudioView::MidiMode::LINEAR){
 				s.pitch = cur_track->y2pitch_linear(my);
 				s.clef_position = cur_track->y2clef_linear(my, s.modifier);
 				//s.modifier = modifier;
-				s.type = Selection::TYPE_MIDI_PITCH;
+				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
 				foreachi(MidiNote *n, s.track->midi, i)
 					if (hover_note_linear(*n, s, this)){
 						s.note = n;
 						s.index = i;
-						s.type = Selection::TYPE_MIDI_NOTE;
+						s.type = Selection::Type::MIDI_NOTE;
 						return s;
 					}
 			}
 		}
-		/*if (creation_mode == CREATION_MODE_SELECT){
-			if ((s.type == Selection::TYPE_MIDI_PITCH) or (s.type == Selection::TYPE_CLEF_POSITION)){
-				s.type = Selection::TYPE_TRACK;
+		/*if (creation_mode == CreationMode::SELECT){
+			if ((s.type == Selection::Type::MIDI_PITCH) or (s.type == Selection::Type::CLEF_POSITION)){
+				s.type = Selection::Type::TRACK;
 			}
 		}*/
 	}
@@ -595,7 +595,7 @@ Selection ViewModeMidi::getHover()
 void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
-	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){
+	if ((view->cur_track == t->track) and (t->track->type == Track::Type::MIDI)){
 		// we're editing this track...
 		cur_track = t;
 
@@ -607,10 +607,10 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 		int mode = which_midi_mode(t->track);
 
-		if ((mode == view->MIDI_MODE_CLASSICAL) or (mode == view->MIDI_MODE_LINEAR)){
+		if ((mode == view->MidiMode::CLASSICAL) or (mode == view->MidiMode::LINEAR)){
 
 			// current creation
-			if ((hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
+			if ((hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
 				auto notes = getCreationNotes(hover, view->msp.start_pos);
 				drawMidi(c, t, notes, false, 0);
 				//c->setFontSize(view->FONT_SIZE);
@@ -618,19 +618,19 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 
 			// creation preview
-			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
+			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
 				auto notes = getCreationNotes(hover, hover->pos);
 				drawMidi(c, t, notes, false, 0);
 			}
 		}
 
 
-		if (mode == view->MIDI_MODE_CLASSICAL){
+		if (mode == view->MidiMode::CLASSICAL){
 
-		}else if (mode == view->MIDI_MODE_LINEAR){
+		}else if (mode == view->MidiMode::LINEAR){
 
 			// scrollbar
-			if (hover->type == Selection::TYPE_SCROLL)
+			if (hover->type == Selection::Type::SCROLL)
 				c->setColor(view->colors.text);
 			else
 				c->setColor(view->colors.text_soft1);
@@ -640,7 +640,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 	}else{
 
 		// not editing -> just draw
-		if (t->track->type == Track::TYPE_MIDI)
+		if (t->track->type == Track::Type::MIDI)
 			drawMidi(c, t, t->track->midi, false, 0);
 	}
 
@@ -654,16 +654,16 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
-		t->drawMarker(c, m, i, (view->hover.type == Selection::TYPE_MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
+		t->drawMarker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
 }
 
 int ViewModeMidi::which_midi_mode(Track *t)
 {
-	if ((view->cur_track == t) and (t->type == Track::TYPE_MIDI)){
-		if (mode_wanted == view->MIDI_MODE_TAB){
+	if ((view->cur_track == t) and (t->type == Track::Type::MIDI)){
+		if (mode_wanted == view->MidiMode::TAB){
 			if (t->instrument.string_pitch.num > 0)
-				return view->MIDI_MODE_TAB;
-			return view->MIDI_MODE_CLASSICAL;
+				return view->MidiMode::TAB;
+			return view->MidiMode::CLASSICAL;
 		}
 		return mode_wanted;
 	}
@@ -675,19 +675,19 @@ void ViewModeMidi::drawPost(Painter *c)
 	ViewModeDefault::drawPost(c);
 
 	int mode = which_midi_mode(cur_track->track);
-	if ((mode != AudioView::MIDI_MODE_CLASSICAL) and (mode != AudioView::MIDI_MODE_TAB))
+	if ((mode != AudioView::MidiMode::CLASSICAL) and (mode != AudioView::MidiMode::TAB))
 		return;
 	Range r = getMidiEditRange();
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
 
 	c->setColor(view->colors.selection_internal);
-	if (mode == AudioView::MIDI_MODE_TAB){
+	if (mode == AudioView::MidiMode::TAB){
 		int y = cur_track->string_to_screen(string_no);
 		int y1 = y - cur_track->clef_dy/2;
 		int y2 = y + cur_track->clef_dy/2;
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
-	}else if (mode == AudioView::MIDI_MODE_CLASSICAL){
+	}else if (mode == AudioView::MidiMode::CLASSICAL){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = cur_track->pitch2y_classical(p2);
@@ -710,13 +710,13 @@ void ViewModeMidi::startSelection()
 	setBarriers(*hover);
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
-	if (hover->type == Selection::TYPE_TIME){
-		hover->type = Selection::TYPE_SELECTION_END;
-		view->selection_mode = view->SELECTION_MODE_TIME;
+	if (hover->type == Selection::Type::TIME){
+		hover->type = Selection::Type::SELECTION_END;
+		view->selection_mode = view->SelectionMode::TIME;
 	}else{
 		hover->y0 = view->msp.start_y;
 		hover->y1 = view->my;
-		view->selection_mode = view->SELECTION_MODE_RECT;
+		view->selection_mode = view->SelectionMode::RECT;
 	}
 	view->setSelection(getSelection(hover->range));
 }

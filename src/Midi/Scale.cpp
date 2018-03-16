@@ -12,35 +12,35 @@
 
 
 static const int scale_major_modifiers[12][7] = {
-	{MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE}, // C
-	{MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_FLAT}, // Db
-	{MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE}, // D
-	{MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT}, // Eb
-	{MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE}, // E
-	{MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT}, // F
-	{MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE}, // F#
-	{MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE}, // G
-	{MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT}, // Ab
-	{MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE}, // A
-	{MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT}, // Bb
-	{MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE}, // B
+	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE}, // C
+	{Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::FLAT}, // Db
+	{Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::NONE}, // D
+	{Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::FLAT}, // Eb
+	{Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::NONE}, // E
+	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::FLAT}, // F
+	{Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::NONE}, // F#
+	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::NONE}, // G
+	{Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::FLAT}, // Ab
+	{Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::NONE}, // A
+	{Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::FLAT}, // Bb
+	{Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::NONE}, // B
 };
 
 inline int scale_to_major(const Scale &s)
 {
-	if (s.type == Scale::TYPE_MAJOR)
+	if (s.type == Scale::Type::MAJOR)
 		return s.root;
-	if (s.type == Scale::TYPE_LOCRIAN)
+	if (s.type == Scale::Type::LOCRIAN)
 		return (s.root + 1) % 12;
-	if (s.type == Scale::TYPE_MINOR)
+	if (s.type == Scale::Type::MINOR)
 		return (s.root + 3) % 12;
-	if (s.type == Scale::TYPE_MIXOLYDIAN)
+	if (s.type == Scale::Type::MIXOLYDIAN)
 		return (s.root + 5) % 12;
-	if (s.type == Scale::TYPE_LYDIAN)
+	if (s.type == Scale::Type::LYDIAN)
 		return (s.root + 7) % 12;
-	if (s.type == Scale::TYPE_PHRYGIAN)
+	if (s.type == Scale::Type::PHRYGIAN)
 		return (s.root + 8) % 12;
-	if (s.type == Scale::TYPE_DORIAN)
+	if (s.type == Scale::Type::DORIAN)
 		return (s.root + 10) % 12;
 	return s.root;
 }
@@ -63,19 +63,19 @@ Scale::Scale(int _type, int _root)
 
 string Scale::get_type_name(int type)
 {
-	if (type == TYPE_MAJOR)
+	if (type == Type::MAJOR)
 		return _("Major");
-	if (type == TYPE_DORIAN)
+	if (type == Type::DORIAN)
 		return _("Dorian");
-	if (type == TYPE_PHRYGIAN)
+	if (type == Type::PHRYGIAN)
 		return _("Phrygian");
-	if (type == TYPE_LYDIAN)
+	if (type == Type::LYDIAN)
 		return _("Lydian");
-	if (type == TYPE_MIXOLYDIAN)
+	if (type == Type::MIXOLYDIAN)
 		return _("Mixolydian");
-	if (type == TYPE_MINOR)
+	if (type == Type::MINOR)
 		return _("Minor");
-	if (type == TYPE_LOCRIAN)
+	if (type == Type::LOCRIAN)
 		return _("Locrian");
 	return "???";
 }
@@ -93,15 +93,15 @@ bool Scale::contains(int pitch) const
 inline int apply_modifier(int pitch, int scale_mod, int mod)
 {
 	int d = 0;
-	if (scale_mod == MODIFIER_SHARP)
+	if (scale_mod == Modifier::SHARP)
 		d = 1;
-	else if (scale_mod == MODIFIER_FLAT)
+	else if (scale_mod == Modifier::FLAT)
 		d = -1;
-	if (mod == MODIFIER_SHARP)
+	if (mod == Modifier::SHARP)
 		d += 1;
-	else if (mod == MODIFIER_FLAT)
+	else if (mod == Modifier::FLAT)
 		d -= 1;
-	else if (mod == MODIFIER_NATURAL)
+	else if (mod == Modifier::NATURAL)
 		d = 0;
 	return pitch + d;
 }

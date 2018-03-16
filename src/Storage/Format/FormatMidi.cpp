@@ -9,7 +9,7 @@
 #include "../../Rhythm/Bar.h"
 
 FormatDescriptorMidi::FormatDescriptorMidi() :
-	FormatDescriptor("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ | FLAG_WRITE)
+	FormatDescriptor("Midi", "mid,midi", Flag::MIDI | Flag::MULTITRACK | Flag::READ | Flag::WRITE)
 {
 }
 
@@ -123,7 +123,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		int denominator = 4;
 		int last_bar = 0;
 
-		od->song->addTrack(Track::TYPE_TIME);
+		od->song->addTrack(Track::Type::TIME);
 
 		for (int i=0; i<num_tracks; i++){
 			string tn = read_chunk_name(f);
@@ -218,7 +218,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 			if ((events.num > 0) or (i > 0)){
 				Array<int> keys = events.keys();
 				for (int k : keys){
-					Track *t = od->song->addTrack(Track::TYPE_MIDI);
+					Track *t = od->song->addTrack(Track::Type::MIDI);
 					t->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;
 				}
@@ -240,7 +240,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 
 		int num_tracks = 0;
 		for (Track *t: od->song->tracks)
-			if (t->type == t->TYPE_MIDI)
+			if (t->type == t->Type::MIDI)
 				num_tracks ++;
 		int ticks_per_beat = 16;
 		// heaer
@@ -255,7 +255,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 		int denominator = 4;
 		int last_bar = 0;
 		for (Track* t : od->song->tracks) {
-			if (t->type != t->TYPE_MIDI)
+			if (t->type != t->Type::MIDI)
 				continue;
 			write_chunk_name(f, "MTrk");
 			int pos0 = f->get_pos();

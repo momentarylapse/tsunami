@@ -12,7 +12,7 @@
 
 
 FormatDescriptorWave::FormatDescriptorWave() :
-	FormatDescriptor("Wave", "wav,wave", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
+	FormatDescriptor("Wave", "wav,wave", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::READ | Flag::WRITE)
 {
 }
 

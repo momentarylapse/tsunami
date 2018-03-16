@@ -15,14 +15,14 @@ class Bar;
 class ActionBarAdd : public ActionGroup
 {
 public:
-	ActionBarAdd(int index, int length, int num_beats, int num_sub_beats, bool affect_data);
+	ActionBarAdd(int index, int length, int num_beats, int num_sub_beats, int mode);
 	~ActionBarAdd();
 
 	virtual void build(Data *d);
 
 	int index;
 	Bar *bar;
-	bool affect_data;
+	int mode;
 };
 
 #endif /* ACTIONSONGBARADD_H_ */

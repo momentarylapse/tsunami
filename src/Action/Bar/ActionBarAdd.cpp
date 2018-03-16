@@ -15,11 +15,11 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, int length, int num_beats, int num_sub_beats, bool _affect_data)
+ActionBarAdd::ActionBarAdd(int _index, int length, int num_beats, int num_sub_beats, int _mode)
 {
 	index = _index;
 	bar = new Bar(length, num_beats, num_sub_beats);
-	affect_data = _affect_data;
+	mode = _mode;
 }
 
 ActionBarAdd::~ActionBarAdd()
@@ -32,7 +32,7 @@ void ActionBarAdd::build(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	addSubAction(new ActionBar__Add(index, bar), d);
 
-	if (affect_data){
+	if (mode != Bar::EditMode::IGNORE){
 		int pos0 = s->barOffset(index);
 
 		for (Track *t: s->tracks)

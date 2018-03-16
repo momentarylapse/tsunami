@@ -98,11 +98,11 @@ void SongRenderer::render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 
 void SongRenderer::render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
-	if (t->type == Track::TYPE_AUDIO)
+	if (t->type == Track::Type::AUDIO)
 		render_audio_track_no_fx(buf, t, ti);
-	else if (t->type == Track::TYPE_TIME)
+	else if (t->type == Track::Type::TIME)
 		render_time_track_no_fx(buf, t, ti);
-	else if (t->type == Track::TYPE_MIDI)
+	else if (t->type == Track::Type::MIDI)
 		render_midi_track_no_fx(buf, t, ti);
 }
 
@@ -290,10 +290,10 @@ void SongRenderer::build_data()
 
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
-		if (t->type == t->TYPE_MIDI){
+		if (t->type == t->Type::MIDI){
 			MidiNoteBuffer _midi = t->midi;
 			for (auto c: t->samples)
-				if (c->type() == t->TYPE_MIDI)
+				if (c->type() == t->Type::MIDI)
 					_midi.append(*c->midi, c->pos);
 			for (MidiEffect *fx: t->midi.fx){
 				fx->prepare();
@@ -309,7 +309,7 @@ void SongRenderer::build_data()
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
 			t->synth->out->setSource(m);
-		}else if (t->type == t->TYPE_TIME){
+		}else if (t->type == t->Type::TIME){
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);

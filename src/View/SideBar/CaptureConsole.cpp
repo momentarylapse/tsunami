@@ -63,9 +63,9 @@ CaptureConsole::~CaptureConsole()
 
 inline int dev_type(int type)
 {
-	if (type == Track::TYPE_AUDIO)
-		return Device::TYPE_AUDIO_INPUT;
-	return Device::TYPE_MIDI_INPUT;
+	if (type == Track::Type::AUDIO)
+		return Device::Type::AUDIO_INPUT;
+	return Device::Type::MIDI_INPUT;
 }
 
 void CaptureConsole::onEnter()
@@ -76,9 +76,9 @@ void CaptureConsole::onEnter()
 
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
-		if (t->type == t->TYPE_AUDIO)
+		if (t->type == t->Type::AUDIO)
 			num_audio ++;
-		if (t->type == t->TYPE_MIDI)
+		if (t->type == t->Type::MIDI)
 			num_midi ++;
 	}
 

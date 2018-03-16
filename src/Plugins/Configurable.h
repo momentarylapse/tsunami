@@ -68,11 +68,11 @@ public:
 	Song *song;
 
 
-	enum
+	enum Type
 	{
-		TYPE_EFFECT,
-		TYPE_SYNTHESIZER,
-		TYPE_MIDI_EFFECT,
+		EFFECT,
+		SYNTHESIZER,
+		MIDI_EFFECT,
 	};
 };
 
@@ -108,11 +108,11 @@ public:
 	Song *song;
 
 
-	enum
+	enum Type
 	{
-		TYPE_EFFECT,
-		TYPE_SYNTHESIZER,
-		TYPE_MIDI_EFFECT,
+		EFFECT,
+		SYNTHESIZER,
+		MIDI_EFFECT,
 	};
 };
 

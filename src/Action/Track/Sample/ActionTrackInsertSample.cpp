@@ -27,7 +27,7 @@ void ActionTrackInsertSample::build(Data *d)
 	Track *t = s->tracks[track_no];
 	SampleRef *ref = t->samples[index];
 	Sample *sample = ref->origin;
-	if (t->type == t->TYPE_AUDIO){
+	if (t->type == t->Type::AUDIO){
 
 		// get target buffer
 		Range r = ref->range();
@@ -38,7 +38,7 @@ void ActionTrackInsertSample::build(Data *d)
 		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(t, layer_no, r);
 		buf.set(*ref->buf, 0, ref->volume);
 		addSubAction(action, s);
-	}else if (t->type == t->TYPE_MIDI){
+	}else if (t->type == t->Type::MIDI){
 		for (MidiNote *n : *ref->midi){
 			MidiNote nn = *n;
 			nn.range.offset += ref->pos;

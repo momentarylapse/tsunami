@@ -12,17 +12,16 @@ class Scale
 {
 public:
 
-	enum
-	{
-		TYPE_MAJOR,
-		TYPE_DORIAN,
-		TYPE_PHRYGIAN,
-		TYPE_LYDIAN,
-		TYPE_MIXOLYDIAN,
-		TYPE_MINOR,
-		TYPE_LOCRIAN,
+	enum Type{
+		MAJOR,
+		DORIAN,
+		PHRYGIAN,
+		LYDIAN,
+		MIXOLYDIAN,
+		MINOR,
+		LOCRIAN,
 		NUM_TYPES,
-		TYPE_CUSTOM = -1
+		CUSTOM = -1
 	};
 	int type, root;
 	int modifiers[7];

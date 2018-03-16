@@ -62,12 +62,12 @@ public:
 
 	void setCreationMode(int mode);
 	int creation_mode;
-	enum
+	enum CreationMode
 	{
-		CREATION_MODE_SELECT,
-		CREATION_MODE_NOTE,
-		CREATION_MODE_INTERVAL,
-		CREATION_MODE_CHORD
+		SELECT,
+		NOTE,
+		INTERVAL,
+		CHORD
 	};
 
 	Synthesizer *preview_synth;

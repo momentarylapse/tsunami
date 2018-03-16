@@ -26,7 +26,7 @@ StorageOperationData *cur_op(FileChunkBasic *c);
 
 
 FormatDescriptorNami::FormatDescriptorNami() :
-	FormatDescriptor("Tsunami", "nami", FLAG_AUDIO | FLAG_MIDI | FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS | FLAG_READ | FLAG_WRITE)
+	FormatDescriptor("Tsunami", "nami", Flag::AUDIO | Flag::MIDI | Flag::FX | Flag::MULTITRACK | Flag::TAGS | Flag::SAMPLES | Flag::READ | Flag::WRITE)
 {}
 
 
@@ -803,7 +803,7 @@ public:
 	}
 	virtual void create()
 	{
-		me = new Sample(Track::TYPE_AUDIO);
+		me = new Sample(Track::Type::AUDIO);
 		me->set_owner(parent);
 		parent->samples.add(me);
 	}
@@ -825,9 +825,9 @@ public:
 	}
 	virtual void write_subs()
 	{
-		if (me->type == Track::TYPE_AUDIO)
+		if (me->type == Track::Type::AUDIO)
 			write_sub("bufbox", &me->buf);
-		else if (me->type == Track::TYPE_MIDI)
+		else if (me->type == Track::Type::MIDI)
 			write_sub("midi", &me->midi);
 	}
 };
@@ -921,7 +921,7 @@ public:
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
-		if (type == BarPattern::TYPE_PAUSE)
+		if (type == BarPattern::Type::PAUSE)
 			num_beats = 0;
 		int count = f->read_int();
 		int sub_beats = f->read_int();
@@ -933,9 +933,9 @@ public:
 	virtual void write(File *f)
 	{
 		if (me->is_pause())
-			f->write_int(BarPattern::TYPE_PAUSE);
+			f->write_int(BarPattern::Type::PAUSE);
 		else
-			f->write_int(BarPattern::TYPE_BAR);
+			f->write_int(BarPattern::Type::BAR);
 		f->write_int(me->length);
 		f->write_int(me->num_beats);
 		f->write_int(1);
@@ -953,7 +953,7 @@ public:
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
-		if (type == BarPattern::TYPE_PAUSE)
+		if (type == BarPattern::Type::PAUSE)
 			num_beats = 0;
 		int count = f->read_int();
 		int sub_beats = f->read_int();
@@ -966,9 +966,9 @@ public:
 	{
 		root->on_error("deprecated... TrackBar.write");
 		if (me->is_pause())
-			f->write_int(BarPattern::TYPE_PAUSE);
+			f->write_int(BarPattern::Type::PAUSE);
 		else
-			f->write_int(BarPattern::TYPE_BAR);
+			f->write_int(BarPattern::Type::BAR);
 		f->write_int(me->length);
 		f->write_int(me->num_beats);
 		f->write_int(1);
@@ -1044,7 +1044,7 @@ public:
 	}
 	virtual void create()
 	{
-		me = parent->addTrack(Track::TYPE_AUDIO);
+		me = parent->addTrack(Track::Type::AUDIO);
 	}
 	virtual void read(File *f)
 	{
@@ -1078,7 +1078,7 @@ public:
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("marker", me->markers);
-		if ((me->type == me->TYPE_TIME) or (me->type == me->TYPE_MIDI))
+		if ((me->type == me->Type::TIME) or (me->type == me->Type::MIDI))
 			if (!me->synth->isDefault())
 				write_sub("synth", me->synth);
 		if (me->midi.num > 0)
@@ -1195,7 +1195,7 @@ void check_empty_subs(Song *a)
 void FormatNami::make_consistent(Song *a)
 {
 	for (Sample *s : a->samples){
-		if (s->type == Track::TYPE_MIDI){
+		if (s->type == Track::Type::MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
 				s->midi.samples = s->midi.back()->range.end();
 			}

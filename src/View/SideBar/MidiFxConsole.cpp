@@ -138,7 +138,7 @@ void MidiFxConsole::update()
 {
 	bool allow = false;
 	if (view->cur_track)
-		allow = (view->cur_track->type == Track::TYPE_MIDI);
+		allow = (view->cur_track->type == Track::Type::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);

@@ -10,7 +10,7 @@
 #include "../../lib/math/math.h"
 
 FormatDescriptorMp3::FormatDescriptorMp3() :
-	FormatDescriptor("Mp3", "mp3", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
+	FormatDescriptor("Mp3", "mp3", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
 {
 }
 

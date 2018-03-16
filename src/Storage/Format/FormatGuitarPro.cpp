@@ -11,7 +11,7 @@
 const int BEAT_PARTITION = 12;
 
 FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
-	FormatDescriptor("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
+	FormatDescriptor("GuitarPro", "gp3,gp4,gp5", Flag::MIDI | Flag::READ | Flag::WRITE | Flag::MULTITRACK)
 {
 }
 
@@ -106,13 +106,13 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 
 	//Array<Track*> tracks;
 	for (Track *t : a->tracks)
-		if (t->type == t->TYPE_MIDI){
+		if (t->type == t->Type::MIDI){
 			GpTrack tt;
-			tt.is_drum = (t->instrument.type == Instrument::TYPE_DRUMS);
+			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
 			tt.midi_instrument = t->instrument.midi_no();
 			tt.tuning = t->instrument.string_pitch;
 			if (tt.tuning.num == 0)
-				tt.tuning = Instrument(Instrument::TYPE_ELECTRIC_GUITAR).string_pitch;
+				tt.tuning = Instrument(Instrument::Type::ELECTRIC_GUITAR).string_pitch;
 			tt.t = t;
 			tracks.add(tt);
 		}
@@ -235,7 +235,7 @@ void FormatGuitarPro::loadSong(StorageOperationData *_od)
 		msg_write(format("measures: %d   tracks: %d", num_measures, num_tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header();
-		a->addTrack(Track::TYPE_TIME);
+		a->addTrack(Track::Type::TIME);
 		for (int i=0; i<num_tracks; i++)
 			read_track();
 
@@ -470,7 +470,7 @@ void FormatGuitarPro::read_track()
 {
 	f->read_byte();
 	GpTrack tt;
-	tt.t = a->addTrack(Track::TYPE_MIDI);
+	tt.t = a->addTrack(Track::Type::MIDI);
 	tt.t->setName(read_str1c(f, 40));
 	int stringCount = f->read_int();
 	for (int i=0; i<7; i++){
@@ -482,7 +482,7 @@ void FormatGuitarPro::read_track()
 	int port = f->read_int();
 	int channel = f->read_int();
 	int channel_fx = f->read_int();
-	Instrument instrument = Instrument(Instrument::TYPE_DRUMS);
+	Instrument instrument = Instrument(Instrument::Type::DRUMS);
 	if (channel != 10)
 		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
 

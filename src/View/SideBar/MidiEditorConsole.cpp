@@ -31,7 +31,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	setInt("interval", view->mode_midi->midi_interval);
 
-	for (int i=0; i<NUM_CHORD_TYPES; i++)
+	for (int i=0; i<ChordType::NUM; i++)
 		addString("chord_type", chord_type_name(i));
 	setInt("chord_type", 0);
 	addString("chord_inversion", _("Basic form"));
@@ -88,7 +88,7 @@ void MidiEditorConsole::update()
 	bool allow = false;
 	if (view->cur_track)
 		if (get_track_index_save(view->song, view->cur_track) >= 0)
-			allow = (view->cur_track->type == Track::TYPE_MIDI);
+			allow = (view->cur_track->type == Track::Type::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
@@ -96,26 +96,26 @@ void MidiEditorConsole::update()
 	if (!track)
 		return;
 
-	check("modifier:none", view->mode_midi->modifier == MODIFIER_NONE);
-	check("modifier:sharp", view->mode_midi->modifier == MODIFIER_SHARP);
-	check("modifier:flat", view->mode_midi->modifier == MODIFIER_FLAT);
-	check("modifier:natural", view->mode_midi->modifier == MODIFIER_NATURAL);
+	check("modifier:none", view->mode_midi->modifier == Modifier::NONE);
+	check("modifier:sharp", view->mode_midi->modifier == Modifier::SHARP);
+	check("modifier:flat", view->mode_midi->modifier == Modifier::FLAT);
+	check("modifier:natural", view->mode_midi->modifier == Modifier::NATURAL);
 
 	int mode = view->mode->which_midi_mode(track);
 	view->mode_midi->setMode(mode);
-	check("mode:linear", mode == view->MIDI_MODE_LINEAR);
-	check("mode:classical", mode == view->MIDI_MODE_CLASSICAL);
-	check("mode:tab", mode == view->MIDI_MODE_TAB);
+	check("mode:linear", mode == view->MidiMode::LINEAR);
+	check("mode:classical", mode == view->MidiMode::CLASSICAL);
+	check("mode:tab", mode == view->MidiMode::TAB);
 
-	enable("modifier:none", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:sharp", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:flat", mode == view->MIDI_MODE_CLASSICAL);
-	enable("modifier:natural", mode == view->MIDI_MODE_CLASSICAL);
+	enable("modifier:none", mode == view->MidiMode::CLASSICAL);
+	enable("modifier:sharp", mode == view->MidiMode::CLASSICAL);
+	enable("modifier:flat", mode == view->MidiMode::CLASSICAL);
+	enable("modifier:natural", mode == view->MidiMode::CLASSICAL);
 
 	setInt("midi_edit_mode", view->mode_midi->creation_mode);
 
 
-	if (track->instrument.type == Instrument::TYPE_DRUMS){
+	if (track->instrument.type == Instrument::Type::DRUMS){
 		// select a nicer pitch range in linear mode for drums
 		view->get_track(track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
 	}
@@ -168,29 +168,29 @@ void MidiEditorConsole::onCreationMode()
 {
 	int n = getInt("midi_edit_mode");
 	if (n == 0){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_SELECT);
+		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::SELECT);
 	}else if (n == 1){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_NOTE);
+		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::NOTE);
 	}else if (n == 2){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_INTERVAL);
+		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::INTERVAL);
 	}else if (n == 3){
-		view->mode_midi->setCreationMode(ViewModeMidi::CREATION_MODE_CHORD);
+		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::CHORD);
 	}
 }
 
 void MidiEditorConsole::onViewModeLinear()
 {
-	setMode(AudioView::MIDI_MODE_LINEAR);
+	setMode(AudioView::MidiMode::LINEAR);
 }
 
 void MidiEditorConsole::onViewModeClassical()
 {
-	setMode(AudioView::MIDI_MODE_CLASSICAL);
+	setMode(AudioView::MidiMode::CLASSICAL);
 }
 
 void MidiEditorConsole::onViewModeTab()
 {
-	setMode(AudioView::MIDI_MODE_TAB);
+	setMode(AudioView::MidiMode::TAB);
 }
 
 void MidiEditorConsole::onInterval()
@@ -232,22 +232,22 @@ void MidiEditorConsole::onEditSong()
 
 void MidiEditorConsole::onModifierNone()
 {
-	view->mode_midi->modifier = MODIFIER_NONE;
+	view->mode_midi->modifier = Modifier::NONE;
 }
 
 void MidiEditorConsole::onModifierSharp()
 {
-	view->mode_midi->modifier = MODIFIER_SHARP;
+	view->mode_midi->modifier = Modifier::SHARP;
 }
 
 void MidiEditorConsole::onModifierFlat()
 {
-	view->mode_midi->modifier = MODIFIER_FLAT;
+	view->mode_midi->modifier = Modifier::FLAT;
 }
 
 void MidiEditorConsole::onModifierNatural()
 {
-	view->mode_midi->modifier = MODIFIER_NATURAL;
+	view->mode_midi->modifier = Modifier::NATURAL;
 }
 
 void MidiEditorConsole::clear()

@@ -10,7 +10,7 @@
 #include "../../lib/math/math.h"
 
 FormatDescriptorM4a::FormatDescriptorM4a() :
-	FormatDescriptor("Apple lossless audio", "m4a", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
+	FormatDescriptor("Apple lossless audio", "m4a", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
 {
 }
 

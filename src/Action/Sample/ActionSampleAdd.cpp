@@ -12,7 +12,7 @@
 
 ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete)
 {
-	sample = new Sample(Track::TYPE_AUDIO);
+	sample = new Sample(Track::Type::AUDIO);
 	sample->buf = buf;
 	sample->buf.offset = 0;
 	sample->name = name;
@@ -22,7 +22,7 @@ ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, boo
 
 ActionSampleAdd::ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete)
 {
-	sample = new Sample(Track::TYPE_MIDI);
+	sample = new Sample(Track::Type::MIDI);
 	sample->midi = midi;
 	sample->midi.sort();
 	sample->name = name;

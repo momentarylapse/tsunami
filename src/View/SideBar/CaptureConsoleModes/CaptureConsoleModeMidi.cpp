@@ -21,7 +21,7 @@
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = cc->device_manager->chooseDevice(Device::TYPE_MIDI_INPUT);
+	chosen_device = cc->device_manager->chooseDevice(Device::Type::MIDI_INPUT);
 	input = NULL;
 	target = NULL;
 
@@ -68,10 +68,10 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	cc->setInt("capture_midi_target", target->get_index());
 
 
-	bool ok = (target->type == Track::TYPE_MIDI);
+	bool ok = (target->type == Track::Type::MIDI);
 	cc->setString("capture_midi_message", "");
 	if (!ok)
-		cc->setString("capture_midi_message", format(_("Please select a track of type %s."), track_type(Track::TYPE_MIDI).c_str()));
+		cc->setString("capture_midi_message", format(_("Please select a track of type %s."), track_type(Track::Type::MIDI).c_str()));
 	cc->enable("capture_start", ok);
 }
 
@@ -81,7 +81,7 @@ void CaptureConsoleModeMidi::enterParent()
 
 void CaptureConsoleModeMidi::enter()
 {
-	sources = cc->device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
+	sources = cc->device_manager->getGoodDeviceList(Device::Type::MIDI_INPUT);
 	cc->hideControl("capture_midi_grid", false);
 
 	// add all
@@ -110,7 +110,7 @@ void CaptureConsoleModeMidi::enter()
 	input->setDevice(chosen_device);
 
 	for (const Track *t: view->sel.tracks)
-		if (t->type == t->TYPE_MIDI)
+		if (t->type == t->Type::MIDI)
 			setTarget((Track*)t);
 
 	if (!input->start()){
@@ -165,8 +165,8 @@ bool CaptureConsoleModeMidi::insert()
 
 	int i0 = s_start + dpos;
 
-	if (target->type != Track::TYPE_MIDI){
-		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::TYPE_MIDI).c_str(), track_type(target->type).c_str()));
+	if (target->type != Track::Type::MIDI){
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::Type::MIDI).c_str(), track_type(target->type).c_str()));
 		return false;
 	}
 

@@ -173,6 +173,7 @@ Configurable::Configurable(Session *_session, int type)
 {
 	configurable_type = type;
 	session = _session;
+	song = NULL;
 }
 
 Configurable::~Configurable()
@@ -298,7 +299,7 @@ public:
 		setTitle(config->name);
 		embed(panel, "grid", 0, 1);
 
-		if (c->configurable_type != c->TYPE_EFFECT)
+		if (c->configurable_type != c->Type::EFFECT)
 			hideControl("preview", true);
 
 		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
@@ -419,7 +420,7 @@ Configurable *Configurable::copy() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c){
-		if (this->configurable_type == TYPE_SYNTHESIZER)
+		if (this->configurable_type == Type::SYNTHESIZER)
 			return new DummySynthesizer;
 		return NULL;
 	}

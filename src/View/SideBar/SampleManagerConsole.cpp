@@ -57,9 +57,9 @@ string render_sample(Sample *s, AudioView *view)
 {
 	Image im;
 	im.create(150, 32, color(0, 0, 0, 0));
-	if (s->type == Track::TYPE_AUDIO)
+	if (s->type == Track::Type::AUDIO)
 		render_bufbox(im, s->buf, view);
-	else if (s->type == Track::TYPE_MIDI)
+	else if (s->type == Track::Type::MIDI)
 		render_midi(im, s->midi);
 	return hui::SetImage(im);
 }
@@ -205,7 +205,7 @@ void SampleManagerConsole::onExport()
 		return;
 
 	if (session->storage->askSaveExport(win)){
-		if (sel[0]->type == Track::TYPE_AUDIO){
+		if (sel[0]->type == Track::Type::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
 			session->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
@@ -242,7 +242,7 @@ void SampleManagerConsole::onScale()
 {
 	Array<Sample*> sel = getSelected();
 	for (Sample* s: sel){
-		if (s->type != Track::TYPE_AUDIO)
+		if (s->type != Track::Type::AUDIO)
 			continue;
 		SampleScaleDialog *dlg = new SampleScaleDialog(parent->win, s);
 		dlg->run();

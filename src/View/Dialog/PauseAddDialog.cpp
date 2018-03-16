@@ -30,7 +30,7 @@ void PauseAddDialog::onOk()
 	song->action_manager->beginActionGroup();
 
 	if (!song->getTimeTrack())
-		song->addTrack(Track::TYPE_TIME, 0);
+		song->addTrack(Track::Type::TIME, 0);
 
 	song->addPause(index, duration, view->bars_edit_data);
 	song->action_manager->endActionGroup();

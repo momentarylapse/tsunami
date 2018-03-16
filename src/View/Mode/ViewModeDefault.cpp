@@ -41,7 +41,7 @@ void ViewModeDefault::onLeftButtonDown()
 	// selection:
 	//   start after lb down and moving
 	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::CLEF_POSITION)){
-		setCursorPos(hover->pos, track_hover_sel);
+		setCursorPos(hover->pos, true);//track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::BAR){
 		setCursorPos(hover->pos, true);
@@ -615,11 +615,8 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 		}
 	}
 	//view->msp.start(hover->pos, hover->y0);
-	Set<const Track*> tracks = view->sel.tracks;
-	view->sel.clear();
-	if (keep_track_selection)
-		view->sel.tracks = tracks;
-	else
+	view->sel.clear_data();
+	if (!keep_track_selection)
 		view->sel.tracks = view->cur_track;
 		//view->sel.all_tracks(view->song);
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
@@ -638,7 +635,7 @@ void ViewModeDefault::selectUnderMouse()
 	if (hover->track)
 		view->setCurTrack(hover->track);
 	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER)){
-		view->selectTrack(t, control, false);
+		view->selectTrack(t, control, true);
 	}
 
 	view->setCurSample(s);

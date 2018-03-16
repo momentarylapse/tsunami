@@ -123,6 +123,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("delete_bars", -1, "hui:delete");
 	event("delete_time", std::bind(&TsunamiWindow::onDeleteTimeInterval, this));
 	setKeyCode("delete_time", -1, "hui:delete");
+	event("insert_time", std::bind(&TsunamiWindow::onInsertTimeInterval, this));
+	setKeyCode("insert_time", -1, "hui:add");
 	event("edit_bars", std::bind(&TsunamiWindow::onEditBars, this));
 	setKeyCode("edit_bars", -1, "hui:edit");
 	event("scale_bars", std::bind(&TsunamiWindow::onScaleBars, this));
@@ -915,6 +917,17 @@ void TsunamiWindow::onDeleteBars()
 }
 
 void TsunamiWindow::onDeleteTimeInterval()
+{
+	hui::ErrorBox(this, "todo", "todo");
+	/*song->action_manager->beginActionGroup();
+
+	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
+		song->deleteBar(i, view->bars_edit_data);
+	}
+	song->action_manager->endActionGroup();*/
+}
+
+void TsunamiWindow::onInsertTimeInterval()
 {
 	hui::ErrorBox(this, "todo", "todo");
 	/*song->action_manager->beginActionGroup();

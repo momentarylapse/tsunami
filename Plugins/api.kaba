@@ -216,10 +216,10 @@ class TrackMarker
 	string text
 	AudioEffect*[] fx
 	
-class BarPattern
+class Bar
 	int num_beats
+	int num_sub_beats
 	int length
-	int type
 
 enum
 	TRACK_TYPE_AUDIO
@@ -317,7 +317,7 @@ class Song
 	Track*[] tracks
 	Sample*[] samples
 	
-	BarPattern[] bars
+	Bar*[] bars
 	
 	SongLayer*[] layers
 	
@@ -331,7 +331,7 @@ class Song
 	extern void deleteTrack(int index)
 	extern void addBar(int index, float bpm, int beats, bool affect_midi)
 	extern void addPause(int index, float time, bool affect_midi)
-	extern void editBar(int index, BarPattern p, bool affect_midi)
+	//extern void editBar(int index, BarPattern p, bool affect_midi)
 	extern void deleteBar(int index, bool affect_midi)
 	extern Sample* addSample(string name, AudioBuffer buf)
 	extern void deleteSample(Sample* sample)

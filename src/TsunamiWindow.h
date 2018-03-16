@@ -81,6 +81,7 @@ public:
 	void onAddBars();
 	void onAddPause();
 	void onDeleteBars();
+	void onInsertTimeInterval();
 	void onDeleteTimeInterval();
 	void onEditBars();
 	void onScaleBars();

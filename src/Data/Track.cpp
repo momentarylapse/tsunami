@@ -215,7 +215,7 @@ void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
 
 void Track::addMidiNote(MidiNote *n)
 {
-	song->execute(new ActionTrackAddMidiNote(this, n));
+	song->execute(new ActionTrackAddMidiNote(this, n->copy()));
 }
 
 void Track::addMidiNotes(const MidiNoteBuffer &notes)

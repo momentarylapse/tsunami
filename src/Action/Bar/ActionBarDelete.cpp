@@ -35,8 +35,6 @@ void ActionBarDelete::build(Data *d)
 	Range r = Range(s->barOffset(index), s->bars[index]->length);
 	addSubAction(new ActionBar__Delete(index), d);
 
-	msg_write(r.str());
-
 	if (affect_data){
 		SongSelection sel = SongSelection::from_range(s, r, SongSelection::Mask::SAMPLES);
 

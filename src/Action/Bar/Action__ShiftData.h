@@ -14,7 +14,7 @@
 class Action__ShiftData: public Action
 {
 public:
-	Action__ShiftData(int offset, int shift);
+	Action__ShiftData(int offset, int shift, int mode);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
@@ -23,6 +23,7 @@ public:
 
 private:
 	int offset, shift;
+	int mode;
 };
 
 #endif /* SRC_ACTION_BAR_ACTION__SHIFTDATA_H_ */

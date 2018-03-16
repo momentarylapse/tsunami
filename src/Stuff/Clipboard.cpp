@@ -85,8 +85,8 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 		s->execute(a);
 	}else if (target->type == Track::Type::MIDI){
 		for (MidiNote *n: source->midi){
-			MidiNote nn = *n;
-			nn.range.offset += view->sel.range.start();
+			MidiNote *nn = n->copy();
+			nn->range.offset += view->sel.range.start();
 			target->addMidiNote(nn);
 		}
 	}

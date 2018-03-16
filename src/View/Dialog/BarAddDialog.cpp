@@ -54,7 +54,7 @@ void BarAddDialog::onOk()
 		song->addTrack(Track::Type::TIME, 0);
 
 	for (int i=0; i<count; i++)
-		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data);
+		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->action_manager->endActionGroup();
 
 	destroy();

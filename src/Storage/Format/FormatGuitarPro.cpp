@@ -884,10 +884,7 @@ void FormatGuitarPro::read_chord()
 
 void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length)
 {
-	MidiNote n;
-	n.range = Range(start, length);
-	n.volume = 1;
-	n.pitch = -1;
+	MidiNote *n = new MidiNote(Range(start, length), -1, 1);
 	int flags = f->read_byte();
 	if ((flags & 0x20) != 0) {
 		int noteType = f->read_byte();
@@ -895,14 +892,14 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 	if (((flags & 0x01) != 0) and (version < 500))
 		f->seek(2);
 	if ((flags & 0x10) != 0)
-		n.volume = 0.1f + 0.9f * (float)f->read_byte() / 10.0f;
+		n->volume = 0.1f + 0.9f * (float)f->read_byte() / 10.0f;
 	if ((flags & 0x20) != 0) {
 		int fret = f->read_byte();
 		int value = fret;
 		if ((string_no >= 0) and (string_no < t.tuning.num))
 			value = fret + t.tuning[string_no];
 		//msg_write(format("%d/%d -> %d", string_no, fret, value));
-		n.pitch = value;
+		n->pitch = value;
 	}
 	if ((flags & 0x80) != 0)
 		f->seek(2);
@@ -914,9 +911,9 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 	if ((flags & 0x08) != 0) {
 		read_note_fx();
 	}
-	if (n.volume > 1)
-		n.volume = 1;
-	if (n.pitch >= 0)
+	if (n->volume > 1)
+		n->volume = 1;
+	if (n->pitch >= 0)
 		t.t->addMidiNote(n);
 }
 

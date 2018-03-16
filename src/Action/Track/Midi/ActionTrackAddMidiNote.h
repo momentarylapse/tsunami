@@ -16,7 +16,7 @@ class MidiNote;
 class ActionTrackAddMidiNote : public Action
 {
 public:
-	ActionTrackAddMidiNote(Track *t, const MidiNote &n);
+	ActionTrackAddMidiNote(Track *t, MidiNote *n);
 	~ActionTrackAddMidiNote();
 
 	virtual void *execute(Data *d);

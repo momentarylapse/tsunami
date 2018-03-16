@@ -40,8 +40,8 @@ void ActionTrackInsertSample::build(Data *d)
 		addSubAction(action, s);
 	}else if (t->type == t->Type::MIDI){
 		for (MidiNote *n : *ref->midi){
-			MidiNote nn = *n;
-			nn.range.offset += ref->pos;
+			MidiNote *nn = n->copy();
+			nn->range.offset += ref->pos;
 			addSubAction(new ActionTrackAddMidiNote(t, nn), s);
 		}
 	}

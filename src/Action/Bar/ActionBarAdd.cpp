@@ -41,7 +41,7 @@ void ActionBarAdd::build(Data *d)
 					if (t->layers[l].buffers[i].range().is_more_inside(pos0))
 						addSubAction(new ActionTrack__SplitBuffer(t, l, i, pos0 - t->layers[l].buffers[i].offset), d);
 
-		addSubAction(new Action__ShiftData(pos0, bar->length), d);
+		addSubAction(new Action__ShiftData(pos0, bar->length, mode), d);
 
 	}
 }

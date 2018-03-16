@@ -10,6 +10,8 @@
 #include "../Song/ActionSongDeleteSelection.h"
 #include "../Track/Marker/ActionTrackEditMarker.h"
 #include "../Track/Marker/ActionTrackDeleteMarker.h"
+#include "../Track/Midi/ActionTrackEditMidiNote.h"
+#include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 
 #include "../../Data/Song.h"
 #include "../../Data/SongSelection.h"
@@ -33,8 +35,10 @@ void ActionBarDelete::build(Data *d)
 	Range r = Range(s->barOffset(index), s->bars[index]->length);
 	addSubAction(new ActionBar__Delete(index), d);
 
+	msg_write(r.str());
+
 	if (affect_data){
-		SongSelection sel = SongSelection::from_range(s, r, SongSelection::Mask::MIDI_NOTES | SongSelection::Mask::SAMPLES);
+		SongSelection sel = SongSelection::from_range(s, r, SongSelection::Mask::SAMPLES);
 
 		for (Track *t: s->tracks){
 			foreachi (TrackMarker *m, t->markers, i){
@@ -43,18 +47,35 @@ void ActionBarDelete::build(Data *d)
 					addSubAction(new ActionTrackDeleteMarker(t, i), d);
 				}else if (r.is_inside(m->range.start())){
 					// cover start
-					sel.set(m, false);
 					addSubAction(new ActionTrackEditMarker(t, i, Range(r.offset, m->range.end() - r.end()), m->text), d);
 				}else if (r.is_inside(m->range.end())){
 					// cover end
-					sel.set(m, false);
 					addSubAction(new ActionTrackEditMarker(t, i, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
+				}else if (m->range.covers(r)){
+					// cut out part
+					addSubAction(new ActionTrackEditMarker(t, i, Range(m->range.offset, m->range.length - r.length), m->text), d);
+				}
+			}
+
+			foreachi (MidiNote *m, t->midi, i){
+				if (r.covers(m->range)){
+					// cover
+					addSubAction(new ActionTrackDeleteMidiNote(t, i), d);
+				}else if (r.is_inside(m->range.start())){
+					// cover start
+					addSubAction(new ActionTrackEditMidiNote(t, m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume), d);
+				}else if (r.is_inside(m->range.end())){
+					// cover end
+					addSubAction(new ActionTrackEditMidiNote(t, m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume), d);
+				}else if (m->range.covers(r)){
+					// cut out part
+					addSubAction(new ActionTrackEditMidiNote(t, m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume), d);
 				}
 			}
 		}
 
 		addSubAction(new ActionSongDeleteSelection(-1, sel, true), d);
 
-		addSubAction(new Action__ShiftData(r.end(), - r.length), d);
+		addSubAction(new Action__ShiftData(r.end(), - r.length, Bar::EditMode::STRETCH), d);
 	}
 }

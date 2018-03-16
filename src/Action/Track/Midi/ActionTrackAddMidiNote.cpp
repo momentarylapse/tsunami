@@ -8,10 +8,10 @@
 #include "ActionTrackAddMidiNote.h"
 #include "../../../Data/Track.h"
 
-ActionTrackAddMidiNote::ActionTrackAddMidiNote(Track* t, const MidiNote& n)
+ActionTrackAddMidiNote::ActionTrackAddMidiNote(Track* t, MidiNote* n)
 {
 	track_no = get_track_index(t);
-	note = n.copy();
+	note = n;
 
 	insert_index = 0;
 	foreachi(MidiNote *nn, t->midi, i)

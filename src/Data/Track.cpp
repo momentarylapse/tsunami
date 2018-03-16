@@ -213,7 +213,7 @@ void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
 	song->execute(new ActionTrackEditSample(ref, volume, mute));
 }
 
-void Track::addMidiNote(const MidiNote &n)
+void Track::addMidiNote(MidiNote *n)
 {
 	song->execute(new ActionTrackAddMidiNote(this, n));
 }
@@ -222,7 +222,7 @@ void Track::addMidiNotes(const MidiNoteBuffer &notes)
 {
 	song->action_manager->beginActionGroup();
 	for (MidiNote *n: notes)
-		addMidiNote(*n);
+		addMidiNote(n);
 	song->action_manager->endActionGroup();
 }
 

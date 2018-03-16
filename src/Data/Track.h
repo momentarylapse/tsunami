@@ -82,7 +82,7 @@ public:
 	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
 	void _cdecl deleteSampleRef(SampleRef *ref);
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
-	void _cdecl addMidiNote(const MidiNote &n);
+	void _cdecl addMidiNote(MidiNote *n);
 	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);

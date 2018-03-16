@@ -280,8 +280,7 @@ void ViewModeMidi::onKeyDown(int k)
 			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
-			MidiNote n = MidiNote(r, pitch, 1.0f);
-			cur_track->track->addMidiNote(n);
+			cur_track->track->addMidiNote(new MidiNote(r, pitch, 1.0f));
 			setCursorPos(r.end() + 1, true);
 			//view->updateSelection();
 			startMidiPreview(pitch, 0.1f);
@@ -303,8 +302,8 @@ void ViewModeMidi::onKeyDown(int k)
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
 			int pitch = cur_track->track->instrument.string_pitch[string_no] + number;
-			MidiNote n = MidiNote(r, pitch, 1.0f);
-			n.stringno = string_no;
+			MidiNote *n = new MidiNote(r, pitch, 1.0f);
+			n->stringno = string_no;
 			cur_track->track->addMidiNote(n);
 			setCursorPos(r.end() + 1, true);
 			//view->updateSelection();

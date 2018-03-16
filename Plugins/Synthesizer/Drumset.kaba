@@ -9,9 +9,12 @@ class Drumset
 		if a
 			return
 		a = new Song(session)
+		Song *owner = session.song
+		session.song = a
 		string temp = session.storage.current_directory
 		session.storage.load(a, AppDirectoryStatic + "Drumsets/" + name + ".nami")
 		session.storage.current_directory = temp
+		session.song = owner
 
 class DrumList
 	Drumset[] sets

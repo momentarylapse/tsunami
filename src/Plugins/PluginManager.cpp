@@ -666,8 +666,10 @@ Synthesizer *PluginManager::CreateSynthesizer(Session *session, const string &na
 		return new SampleSynthesizer;*/
 	Synthesizer *s = __LoadSynthesizer(session, name);
 	if (s){
-		s->resetConfig();
 		s->name = name;
+		s->session = session;
+		s->song = session->song;
+		s->resetConfig();
 		return s;
 	}
 	session->e(_("unknown synthesizer: ") + name);

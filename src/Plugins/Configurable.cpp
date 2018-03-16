@@ -424,10 +424,11 @@ Configurable *Configurable::copy() const
 			return new DummySynthesizer;
 		return NULL;
 	}
-
 	Configurable *clone = (Configurable*)c->create_instance();
 
 	clone->configurable_type = configurable_type;
+	clone->session = session;
+	clone->song = song;
 	clone->configFromString(configToString());
 
 	return clone;

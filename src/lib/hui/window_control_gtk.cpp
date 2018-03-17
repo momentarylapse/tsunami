@@ -412,33 +412,17 @@ void Panel::removeControl(const string &id)
 void Panel::redraw(const string &_id)
 {
 	Control *c = _get_control_(_id);
-	if (c){
-		GdkWindow *w = gtk_widget_get_window(c->widget);
-		if (w)
-			gdk_window_invalidate_rect(w, NULL, false);
-	}
+	if (c)
+		if (c->widget)
+			gtk_widget_queue_draw(c->widget);
 }
 
 void Panel::redrawRect(const string &_id, const rect &r)
 {
 	Control *c = _get_control_(_id);
-	if (c){
-
-		/*if (w < 0){
-			x += w;
-			w = - w;
-		}
-		if (h < 0){
-			y += h;
-			h = - h;
-		}*/
-		GdkRectangle rr;
-		rr.x = r.x1;
-		rr.y = r.y1;
-		rr.width = r.width();
-		rr.height = r.height();
-		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), &rr, false);
-	}
+	if (c)
+		if (c->widget)
+			gtk_widget_queue_draw_area(c->widget, r.x1, r.y1, r.width(), r.height());
 }
 
 }

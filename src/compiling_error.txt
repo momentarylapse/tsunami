@@ -1,0 +1,2 @@
+/home/michi/Projekte/Tsunami/src/Makefile: file not recognized: File format not recognized
+collect2: Fehler: ld gab 1 als Ende-Status zurück

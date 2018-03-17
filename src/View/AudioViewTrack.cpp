@@ -564,7 +564,6 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 
 	float x1 = view->cam.sample2screen(n->range.offset + shift);
 	float x2 = view->cam.sample2screen(n->range.end() + shift);
-	//float x = x1 + r;
 
 
 	int p = n->stringno;
@@ -583,22 +582,9 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
-	/*if (n->modifier != Modifier::NONE){
-		c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
-		float size = r*2.8f;
-		c->setFontSize(size);
-		c->drawStr(x1 - size*0.7f, y - size*0.8f , modifier_symbol(n->modifier));
-	}*/
-
-	//draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
-/*
-
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
-	col = ColorInterpolate(col, view->colors.background_track, 0.3f);*/
-
 	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
 
-	if (x2 - x1 > r/4){
+	if (x2 - x1 > r/4 and r > 5){
 		float font_size = r * 1.4f;
 		c->setFontSize(font_size);
 		c->setColor(view->colors.text);

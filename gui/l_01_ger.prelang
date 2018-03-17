@@ -1196,7 +1196,7 @@ Lautstärke
 
 track_dialog/panning
 0
-
++100% = rechts, -100% = links
 track_dialog/select_synth
 
 Synthesizer wählen

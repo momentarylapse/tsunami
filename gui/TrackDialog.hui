@@ -9,7 +9,7 @@ Dialog track_dialog "Spur" width=380 height=516
 				Text /db "dB"
 				---|
 				Text t_panning "Balance"
-				SpinButton panning "0" range=-100:100:1
+				SpinButton panning "0" range=-100:100:1 "tooltip=+100% = right, -100% = left"
 				Text /percent "%"
 		Group g_instrument "Instrument"
 			Grid ? ""

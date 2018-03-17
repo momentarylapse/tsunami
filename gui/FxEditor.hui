@@ -1,41 +1,9 @@
 Dialog fx_editor "Effects" width=380 height=516
-	Grid ? ""
+	Grid ? "" vertical
+		Text comment_no_fx "- no effects active here (yet) -" center italic
 		Grid fx_inner_table ""
-			Text comment_no_fx "- no effects active here (yet) -" center italic
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			---|
-			Button add "" expandx flat image=hui:add "tooltip=add new effect"
-			---|
-			---|
-			---|
-			---|
-		---|
+		Button add "" expandx flat image=hui:add "tooltip=add new effect"
 		Text ? "" expandy
-		---|
 		Group fe_g_edit "Edit"
 			Grid ? ""
 				Button /edit_song "File"

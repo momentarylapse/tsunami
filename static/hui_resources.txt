@@ -500,39 +500,39 @@ width=380,height=516
 1
 Grid
 ?
-
+vertical
 0
 0
-3
-Grid
-fx_inner_table
-
-0
-0
-2
+5
 Text
 comment_no_fx
 center,italic
 0
 0
 0
+Grid
+fx_inner_table
+
+1
+0
+0
 Button
 add
 expandx,flat,image=hui:add
+2
 0
-26
 0
 Text
 ?
 expandy
+3
 0
-1
 0
 Group
 fe_g_edit
 
+4
 0
-2
 1
 Grid
 ?
@@ -1762,10 +1762,16 @@ Separator
 1
 0
 0
+Scroller
+?
+expandx
+2
+0
+1
 Grid
 inner-grid
 
-2
+0
 0
 0
 CheckBox
@@ -3242,7 +3248,7 @@ width=200,height=200
 0
 1
 Grid
-?
+grid
 noexpandx,expandy
 0
 0
@@ -3582,7 +3588,7 @@ center,bold
 0
 Slider
 panning
-range=-1:1:0.01,width=100,origin=no
+range=-1:1:0.01,width=80,origin=no
 1
 0
 0
@@ -4643,7 +4649,7 @@ Volume
 
 track_dialog/panning
 0
-
++100% = right, -100% = left
 track_dialog/select_synth
 
 Select synthesizer
@@ -5935,7 +5941,7 @@ Lautstärke
 
 track_dialog/panning
 0
-
++100% = rechts, -100% = links
 track_dialog/select_synth
 
 Synthesizer wählen

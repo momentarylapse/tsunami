@@ -1,5 +1,5 @@
 Dialog synth_panel "" width=200 height=200
-	Grid ? "" noexpandx expandy
+	Grid grid "" noexpandx expandy
 		Grid ? ""
 			Button load_favorite "" flat image=hui:open "tooltip=load parameter"
 			Button save_favorite "" flat image=hui:save "tooltip=load parameter"

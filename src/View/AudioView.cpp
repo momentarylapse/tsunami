@@ -540,6 +540,7 @@ void AudioView::onMouseWheel()
 void AudioView::forceRedraw()
 {
 	win->redraw(id);
+	//win->redrawRect(id, rect(200, 300, 0, area.y2));
 }
 
 void AudioView::forceRedrawPart(const rect &r)
@@ -952,7 +953,7 @@ void AudioView::drawAudioFile(Painter *c)
 		hui::RunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
 }
 
-int frame=0;
+int frame = 0;
 
 void AudioView::onDraw(Painter *c)
 {

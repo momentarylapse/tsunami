@@ -73,9 +73,10 @@ void CpuDisplay::onDraw(Painter* p)
 				p->drawLine(x0, y0, x1, y1);
 		}
 		if (cpu[t].num > 0){
-			p->setFontSize(8);
-			p->drawStr(20 + t * 30, h / 2-10, format("%.0f%%", cpu[t].back() * 100));
-			p->drawStr(20 + t * 30, h / 2, format("%.0fms", avg[t].back() * 1000));
+			p->setColor(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
+			p->setFontSize(7);
+			p->drawStr(20 + t * 30, h / 2-14, format("%.0f%%", cpu[t].back() * 100));
+			p->drawStr(20 + t * 30, h / 2-6, format("%.0fms", avg[t].back() * 1000));
 		}
 	}
 }

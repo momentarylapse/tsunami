@@ -26,6 +26,7 @@ class Painter : public ::Painter
 	cairo_t *cr;
 	PangoLayout *layout;
 	PangoFontDescription *font_desc;
+	cairo_surface_t *target_surface;
 #endif
 	Window *win;
 	string id;
@@ -64,6 +65,9 @@ class Painter : public ::Painter
 	virtual rect _cdecl getArea();
 	virtual rect _cdecl getClip();
 };
+
+Painter *start_image_paint(Image &im);
+void end_image_paint(Image &im, ::Painter *p);
 
 };
 

@@ -26,6 +26,58 @@ const int PITCH_SHOW_COUNT = 30;
 
 string i2s_small(int i); // -> MidiData.cpp
 
+
+class SymbolRenderer
+{
+	struct Symbol
+	{
+		float size;
+		string text;
+		Image im;
+	};
+	static Array<Symbol*> symbols;
+
+	static Symbol *make_symbol(float size, const string &s)
+	{
+		msg_write("new symbol " + f2s(size, 1) + " " + s);
+		Symbol *sym = new Symbol;
+		sym->im.create(size * s.num, size * 1.5f, color(0,0,0,0));
+		sym->text = s;
+		sym->size = size;
+
+		Painter *p = hui::start_image_paint(sym->im);
+		p->setColor(White);
+		p->setFontSize(size);
+		p->drawStr(0, 0, s);
+		hui::end_image_paint(sym->im, p);
+
+		symbols.add(sym);
+		return sym;
+	}
+
+	static Symbol *get_symbol(float size, const string &s)
+	{
+		for (Symbol *sym: symbols)
+			if (sym->text == s and fabs(sym->size - size) <= 1)
+				return sym;
+		return make_symbol(size, s);
+	}
+public:
+
+	static void draw(Painter *p, float x, float y, float size, const string &s)
+	{
+#if 0
+		p->setFontSize(size);
+		p->drawStr(x, y, s);
+#else
+		Symbol *sym = get_symbol(size, s);
+		p->drawImage(x, y, sym->im);
+#endif
+	}
+};
+Array<SymbolRenderer::Symbol*> SymbolRenderer::symbols;
+
+
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
@@ -586,9 +638,8 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 
 	if (x2 - x1 > r/4 and r > 5){
 		float font_size = r * 1.4f;
-		c->setFontSize(font_size);
 		c->setColor(view->colors.text);
-		c->drawStr(x1 + font_size*0.2f, y - font_size*0.75f, i2s(n->pitch - track->instrument.string_pitch[n->stringno]));
+		SymbolRenderer::draw(c, x1 + font_size*0.2f, y - font_size*0.75f, font_size, i2s(n->pitch - track->instrument.string_pitch[n->stringno]));
 	}
 }
 
@@ -665,12 +716,11 @@ void AudioViewTrack::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
 
-	if (n->modifier != Modifier::NONE){
+	if ((n->modifier != Modifier::NONE) and (r >= 3)){
 		c->setColor(view->colors.text);
 		//c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
-		c->setFontSize(size);
-		c->drawStr(x1 - size*0.7f, y - size*0.8f , modifier_symbol(n->modifier));
+		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.8f , size, modifier_symbol(n->modifier));
 	}
 
 	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));

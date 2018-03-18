@@ -86,7 +86,7 @@ CurveConsole::~CurveConsole()
 
 void CurveConsole::onViewChange()
 {
-	redraw("area");
+	view->forceRedraw();
 }
 
 void CurveConsole::onUpdate()
@@ -159,7 +159,7 @@ void CurveConsole::onListSelect()
 	}else{
 		view->mode_curve->setCurve(NULL);
 	}
-	redraw("area");
+	view->forceRedraw();
 }
 
 void CurveConsole::onListEdit()
@@ -178,7 +178,7 @@ void CurveConsole::onListEdit()
 			max = getCell(id_list, n, col)._float();
 		song->editCurve(song->curves[n], name, min, max);
 	}
-	redraw("area");
+	view->forceRedraw();
 }
 
 void CurveConsole::onEditSong()

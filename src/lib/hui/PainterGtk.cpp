@@ -21,6 +21,7 @@ Painter::Painter()
 	win = NULL;
 	cr = NULL;
 	layout = NULL;
+	target_surface = NULL;
 	font_desc = NULL;
 	width = 0;
 	height = 0;
@@ -38,6 +39,7 @@ Painter::Painter(Panel *panel, const string &_id)
 	id = _id;
 	cr = NULL;
 	layout = NULL;
+	target_surface = NULL;
 	font_desc = NULL;
 	width = 0;
 	height = 0;
@@ -65,6 +67,8 @@ Painter::~Painter()
 		g_object_unref(layout);
 	if (font_desc)
 		pango_font_description_free(font_desc);
+	if (target_surface)
+		cairo_surface_destroy(target_surface);
 //	cairo_destroy(cr);
 	cr = NULL;
 }
@@ -105,6 +109,8 @@ color gdk2color(GdkColor c)
 
 color Painter::getThemeColor(int i)
 {
+	if (!win)
+		return Black;
 	GtkStyleContext *sc = gtk_widget_get_style_context(win->window);
 	int x = (i / 10);
 	int y = (i % 10);
@@ -342,6 +348,28 @@ void Painter::setAntialiasing(bool enabled)
 void Painter::setFill(bool fill)
 {
 	mode_fill = fill;
+}
+
+
+
+Painter *start_image_paint(Image &im)
+{
+	im.setMode(Image::ModeBGRA);
+
+	Painter *p = new Painter;
+	p->target_surface = cairo_image_surface_create_for_data((unsigned char*)im.data.data, CAIRO_FORMAT_ARGB32, im.width, im.height, im.width*4);
+	p->cr = cairo_create(p->target_surface);
+	p->layout = pango_cairo_create_layout(p->cr);
+
+	p->width = im.width;
+	p->height = im.height;
+	p->setFont("Sans", 16, false, false);
+	return p;
+}
+
+void end_image_paint(Image &im, ::Painter *p)
+{
+	delete p;
 }
 
 };

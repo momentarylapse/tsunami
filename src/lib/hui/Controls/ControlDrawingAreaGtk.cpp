@@ -9,6 +9,7 @@
 #include "../hui.h"
 #include <math.h>
 #include "../internal.h"
+#include "../../math/rect.h"
 
 #include <GL/gl.h>
 
@@ -26,6 +27,7 @@ GdkGLContext *gtk_gl_context = NULL;
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	reinterpret_cast<ControlDrawingArea*>(user_data)->cur_cairo = cr;
+	reinterpret_cast<ControlDrawingArea*>(user_data)->redraw_area.clear();
 	reinterpret_cast<Control*>(user_data)->notify("hui:draw");
 	return false;
 }
@@ -302,6 +304,29 @@ void ControlDrawingArea::make_current()
 {
 	if (is_opengl)
 		gtk_gl_area_make_current(GTK_GL_AREA(widget));
+}
+
+void ControlDrawingArea::redraw()
+{
+	rect r = rect(0,0,1000000,1000000);
+	for (rect &rr: redraw_area)
+		if (rr.covers(r))
+			return;
+	if (!widget)
+		return;
+	gtk_widget_queue_draw(widget);
+	redraw_area.add(r);
+}
+
+void ControlDrawingArea::redraw(const rect &r)
+{
+	for (rect &rr: redraw_area)
+		if (rr.covers(r))
+			return;
+	if (!widget)
+		return;
+	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
+	redraw_area.add(r);
 }
 
 };

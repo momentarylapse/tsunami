@@ -24,7 +24,6 @@
 #include "hui.h"
 #include "internal.h"
 #ifdef HUI_API_GTK
-#include "../math/math.h"
 
 #ifndef OS_WINDOWS
 #include <pango/pangocairo.h>
@@ -411,18 +410,16 @@ void Panel::removeControl(const string &id)
 
 void Panel::redraw(const string &_id)
 {
-	Control *c = _get_control_(_id);
+	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(_get_control_(_id));
 	if (c)
-		if (c->widget)
-			gtk_widget_queue_draw(c->widget);
+		c->redraw();
 }
 
 void Panel::redrawRect(const string &_id, const rect &r)
 {
-	Control *c = _get_control_(_id);
+	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(_get_control_(_id));
 	if (c)
-		if (c->widget)
-			gtk_widget_queue_draw_area(c->widget, r.x1, r.y1, r.width(), r.height());
+		c->redraw(r);
 }
 
 }

@@ -10,6 +10,8 @@
 
 #include "Control.h"
 
+class rect;
+
 namespace hui
 {
 
@@ -22,6 +24,11 @@ public:
 
 	void *cur_cairo;
 	bool is_opengl;
+
+	Array<rect> redraw_area;
+
+	void redraw();
+	void redraw(const rect &r);
 };
 
 };

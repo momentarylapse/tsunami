@@ -33,6 +33,27 @@ bool rect::inside(float x, float y) const
 	return (x >= x1) and (x <= x2) and (y >= y1) and (y <= y2);
 }
 
+// r in this?
+bool rect::covers(const rect &r) const
+{
+	return (r.x1 >= x1) and (r.x2 <= x2) and (r.y1 >= y1) and (r.y2 <= y2);
+}
+
+bool rect::overlaps(const rect &r) const
+{
+	if (covers(r) or r.covers(*this))
+		return true;
+	if (inside(r.x1, r.y1))
+		return true;
+	if (inside(r.x2, r.y1))
+		return true;
+	if (inside(r.x1, r.y2))
+		return true;
+	if (inside(r.x2, r.y2))
+		return true;
+	return false;
+}
+
 bool rect::operator ==(const rect &r) const
 {
 	return (x1 == r.x1) and (y1 == r.y1) and (x2 == r.x2) and (y2 == r.y2);

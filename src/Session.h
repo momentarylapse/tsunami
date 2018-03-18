@@ -27,7 +27,7 @@ namespace hui{
 class Session : public VirtualBase
 {
 public:
-	Session();
+	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
 	virtual ~Session();
 
 	static int next_id;

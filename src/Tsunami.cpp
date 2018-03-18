@@ -69,12 +69,14 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	clipboard = new Clipboard;
 
+	Session::GLOBAL = new Session(log, NULL, NULL, perf_mon);
+
 	device_manager = new DeviceManager;
+	Session::GLOBAL->device_manager = device_manager;
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
-
-	Session::GLOBAL = new Session();
+	Session::GLOBAL->plugin_manager = plugin_manager;
 
 	plugin_manager->LinkAppScriptData();
 
@@ -158,7 +160,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 
 Session* Tsunami::createSession()
 {
-	Session *session = new Session();
+	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
 	session->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 	session->i(_("  ...don't worry. Everything will be fine!"));

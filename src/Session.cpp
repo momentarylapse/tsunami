@@ -7,7 +7,6 @@
 
 #include "Session.h"
 #include "TsunamiWindow.h"
-#include "Tsunami.h"
 #include "Stuff/Log.h"
 #include "Storage/Storage.h"
 #include "Plugins/TsunamiPlugin.h"
@@ -16,7 +15,7 @@
 int Session::next_id = 0;
 Session *Session::GLOBAL = NULL;
 
-Session::Session()
+Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon)
 {
 	win = NULL;
 	view = NULL;
@@ -24,10 +23,10 @@ Session::Session()
 	song = NULL;
 	storage = new Storage(this);
 
-	log = tsunami->log;
-	device_manager = tsunami->device_manager;
-	plugin_manager = tsunami->plugin_manager;
-	perf_mon = tsunami->perf_mon;
+	log = _log;
+	device_manager = _device_manager;
+	plugin_manager = _plugin_manager;
+	perf_mon = _perf_mon;
 
 	id = next_id ++;
 	die_on_plugin_stop = false;

@@ -135,7 +135,7 @@ int OutputStream::stream_request_callback(const void *inputBuffer, void *outputB
                                           PaStreamCallbackFlags statusFlags,
                                           void *userData)
 {
-	printf("request %d\n", (int)frames);
+	//printf("request %d\n", (int)frames);
 	OutputStream *stream = (OutputStream*)userData;
 
 	float *out = (float*)outputBuffer;
@@ -303,6 +303,14 @@ void OutputStream::_create_dev()
 	pa_stream_set_underflow_callback(_stream, &stream_underflow_callback, this);
 #endif
 #ifdef DEVICE_PORTAUDIO
+	session->i("open def stream");
+
+	/*PaStreamParameters params;
+	params.channelCount = 2;
+	params.sampleFormat = paFloat32;
+	params.device = ...
+	Pa_OpenStream(&_stream, NULL, &params, dev_sample_rate, 256, paNoFlag, &stream_request_callback, this)*/
+
 	err = Pa_OpenDefaultStream(&_stream, 0, 2, paFloat32, dev_sample_rate, 256,
 	                           &stream_request_callback, this);
 	testError("Pa_OpenDefaultStream");
@@ -460,9 +468,9 @@ void OutputStream::_start_first_time()
 	thread = new StreamThread(this);
 	thread->run();
 
+	_create_dev();
 
 #ifdef DEVICE_PULSEAUDIO
-	_create_dev();
 	if (!_stream)
 		return;
 
@@ -504,6 +512,8 @@ void OutputStream::_start_first_time()
 #endif
 
 #ifdef DEVICE_PORTAUDIO
+	if (!_stream)
+		return;
 	Pa_StartStream(_stream);
 #endif
 

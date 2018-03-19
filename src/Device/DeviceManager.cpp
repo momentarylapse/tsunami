@@ -28,6 +28,7 @@
 const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
+
 #ifdef DEVICE_PULSEAUDIO
 
 void pa_wait_op(Session *session, pa_operation *op)
@@ -219,9 +220,12 @@ void DeviceManager::update_devices()
 {
 	Session *session = Session::GLOBAL;
 
-#ifdef DEVICE_PULSEAUDIO
 	for (Device *d: output_devices)
 		d->present = false;
+	for (Device *d: input_devices)
+		d->present = false;
+
+#ifdef DEVICE_PULSEAUDIO
 
 	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, this);
 	if (!testError(session, "pa_context_get_sink_info_list"))
@@ -229,9 +233,6 @@ void DeviceManager::update_devices()
 
 	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
 
-
-	for (Device *d: input_devices)
-		d->present = false;
 
 	op = pa_context_get_source_info_list(context, pa_source_info_callback, this);
 	if (!testError(session, "pa_context_get_source_info_list"))
@@ -245,6 +246,32 @@ void DeviceManager::update_devices()
 
 	notify(MESSAGE_CHANGE);
 	write_config();
+#endif
+#ifdef DEVICE_PORTAUDIO
+	/*int count = Pa_GetHostApiCount();
+	for (int i=0; i<count; i++){
+		const PaHostApiInfo* api_info = Pa_GetHostApiInfo(i);
+		msg_write(api_info->name);
+		msg_write(api_info->deviceCount);
+	}*/
+	int count = Pa_GetDeviceCount();
+	for (int i=0; i<count; i++){
+		const PaDeviceInfo* dev = Pa_GetDeviceInfo(i);
+		if (dev->maxOutputChannels > 0){
+			Device *d = get_device_create(Device::Type::AUDIO_OUTPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
+			d->name = dev->name;
+			d->channels = min(dev->maxOutputChannels, 2);
+			d->present = true;
+			setDeviceConfig(d);
+		}
+		if (dev->maxInputChannels > 0){
+			Device *d = get_device_create(Device::Type::AUDIO_INPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
+			d->name = dev->name;
+			d->channels = min(dev->maxInputChannels, 2);
+			d->present = true;
+			setDeviceConfig(d);
+		}
+	}
 #endif
 }
 

@@ -44,8 +44,8 @@ Device::Device(int _type, const string &s)
 	latency = 0;
 	client = port = -1;
 	if (c.num >= 5){
-		name = c[0];
-		internal_name = c[1];
+		name = c[0].replace("${COMMA}", ",").replace("${PIPE}", "|");
+		internal_name = c[1].replace("${COMMA}", ",").replace("${PIPE}", "|");
 		channels = c[2]._int();
 		visible = c[3]._bool();
 		latency = c[4]._float();
@@ -73,8 +73,8 @@ bool Device::is_default() const
 string Device::to_config()
 {
 	string r;
-	r += name + ",";
-	r += internal_name + ",";
+	r += name.replace(",", "${COMMA}").replace("|", "${PIPE}") + ",";
+	r += internal_name.replace(",", "${COMMA}").replace("|", "${PIPE}") + ",";
 	r += i2s(channels) + ",";
 	r += b2s(visible) + ",";
 	r += f2s(latency, 6);

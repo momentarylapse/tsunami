@@ -142,44 +142,44 @@ int OutputStream::stream_request_callback(const void *inputBuffer, void *outputB
 	(void) inputBuffer; /* Prevent unused variable warning. */
 
 
-	if (!stream->playing){
-		//msg_error("not playing");
-		return 1;
-	}
-
 	int done = 0;
+
 	int available = stream->ring_buf.available();
-	if ((stream->paused) or (available < frames)){
-		if ((stream->playing) and (!stream->paused))
+	//printf("%d\n", available);
+	if (stream->paused or (available < (int)frames)){
+//		printf("  x\n");
+		if (!stream->paused and !stream->read_end_of_stream)
 			printf("< underflow\n");
 		// output silence...
-		for (int i=0; i<frames; i++){
+		for (int i=0; i<(int)frames; i++){
 			*out ++ = 0;
 			*out ++ = 0;
 		}
 	}else{
-		for (int n=0; (n<2) and (done < frames); n++){
+//		printf("  j\n");
+		for (int n=0; (n<2) and (done < (int)frames); n++){
 			AudioBuffer b;
 			stream->ring_buf.readRef(b, frames - done);
+
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
 			out += b.length * 2;
 			done += b.length;
 			break;
 		}
 		done = frames;
-		stream->cur_pos += done;
 	}
 
 
 	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->end_of_data)){
-		//printf("+\n");
+	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
+//		printf("+\n");
 		stream->read_more = true;
 	}
 
-	if (available <= frames and stream->end_of_data){
-		//printf("end\n");
-		HuiRunLaterM(0.001f, stream, &OutputStream::stop); // TODO prevent abort before playback really finished
+	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
+//		printf("end of data...\n");
+		stream->played_end_of_stream = true;
+		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
 	}
 	return 0;
 }

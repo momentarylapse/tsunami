@@ -19,6 +19,10 @@
 #include <pulse/pulseaudio.h>
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+#include <portaudio.h>
+#endif
+
 
 float InputStreamAudio::playback_delay_const;
 
@@ -152,6 +156,10 @@ InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
 	capturing = false;
 #ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
+#endif
+#ifdef DEVICE_PORTAUDIO
+	_stream = NULL;
+	err = paNoError;
 #endif
 
 	source = new Source;

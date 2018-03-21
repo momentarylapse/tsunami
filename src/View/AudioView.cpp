@@ -1225,7 +1225,7 @@ bool AudioView::isPaused()
 int AudioView::playbackPos()
 {
 	if (stream)
-		return stream->getPos(renderer->getPos());
+		return stream->getPos();
 	return 0;
 }
 

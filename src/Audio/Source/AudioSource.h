@@ -22,7 +22,10 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
+
 	//virtual void _cdecl reset(){}
+
+	virtual int _cdecl getPos(int delta){ return -1; }
 
 	virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 

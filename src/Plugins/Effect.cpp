@@ -35,6 +35,13 @@ void Effect::Output::reset()
 	fx->resetState();
 }
 
+int Effect::Output::getPos(int delta)
+{
+	if (!source)
+		return -1;
+	return source->getPos(delta);
+}
+
 int Effect::Output::getSampleRate()
 {
 	return fx->sample_rate;

@@ -36,7 +36,7 @@ public:
 
 	void _cdecl setRange(const Range &r){ _range = r; }
 	Range _cdecl range(){ return _range; }
-	int _cdecl getPos(){ return pos; }
+	virtual int _cdecl getPos(int delta);
 
 	int _cdecl getNumSamples();
 

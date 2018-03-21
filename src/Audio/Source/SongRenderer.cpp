@@ -345,6 +345,12 @@ void SongRenderer::_seek(int _pos)
 		bar_streamer->seek(pos);
 }
 
+int SongRenderer::getPos(int delta)
+{
+	Range r = range();
+	return loopi(pos + delta, r.start(), r.end());
+}
+
 void SongRenderer::on_song_change()
 {
 	//reset_state();

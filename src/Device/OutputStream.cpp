@@ -550,9 +550,9 @@ int OutputStream::getState()
 	//return STATE_STOPPED;
 }
 
-int OutputStream::getPos(int read_pos)
+int OutputStream::getPos()
 {
-	return read_pos - ring_buf.available();
+	return source->getPos(- ring_buf.available());
 }
 
 float OutputStream::getVolume()

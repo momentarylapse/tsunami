@@ -494,7 +494,7 @@ Selection ViewModeDefault::getHoverBasic()
 			return s;
 		}
 		if (view->isPlaying()){
-			if (view->mouse_over_time(view->stream->getPos(view->stream->getPos(view->renderer->getPos())))){
+			if (view->mouse_over_time(view->playbackPos())){
 				s.type = Selection::Type::PLAYBACK;
 				return s;
 			}

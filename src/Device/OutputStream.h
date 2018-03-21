@@ -70,7 +70,7 @@ public:
 	int _cdecl getState();
 	void _cdecl setSource(AudioSource *r);
 	void _cdecl setDevice(Device *d);
-	int _cdecl getPos(int read_pos);
+	int _cdecl getPos();
 
 
 	// PeakMeterSource

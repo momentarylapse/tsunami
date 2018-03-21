@@ -10,7 +10,6 @@
 
 
 
-#include "config.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
@@ -24,11 +23,11 @@ class Thread;
 class StreamThread;
 class Session;
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 struct pa_stream;
 #endif
 
-#ifdef DEVICE_PORTAUDIO
+#if HAS_LIB_PORTAUDIO
 typedef void PaStream;
 struct PaStreamCallbackTimeInfo;
 typedef unsigned long PaStreamCallbackFlags;
@@ -105,13 +104,13 @@ private:
 
 	int data_samples;
 
-#ifdef DEVICE_PULSEAUDIO
-	pa_stream *_stream;
+#if HAS_LIB_PULSEAUDIO
+	pa_stream *pulse_stream;
 #endif
 
-#ifdef DEVICE_PORTAUDIO
-	PaStream *_stream;
-	PaError err;
+#if HAS_LIB_PORTAUDIO
+	PaStream *portaudio_stream;
+	PaError portaudio_err;
 #endif
 
 	int dev_sample_rate;
@@ -123,18 +122,18 @@ private:
 	Thread *thread;
 	int perf_channel;
 
-#ifdef DEVICE_PULSEAUDIO
-	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
-	static void stream_underflow_callback(pa_stream *s, void *userdata);
-	static void stream_success_callback(pa_stream *s, int success, void *userdata);
+#if HAS_LIB_PULSEAUDIO
+	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+	static void pulse_stream_underflow_callback(pa_stream *s, void *userdata);
+	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
 #endif
 
-#ifdef DEVICE_PORTAUDIO
-	static int stream_request_callback(const void *inputBuffer, void *outputBuffer,
-	                                   unsigned long frames,
-	                                   const PaStreamCallbackTimeInfo* timeInfo,
-	                                   PaStreamCallbackFlags statusFlags,
-	                                   void *userData);
+#if HAS_LIB_PORTAUDIO
+	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
+	                                             unsigned long frames,
+	                                             const PaStreamCallbackTimeInfo* timeInfo,
+	                                             PaStreamCallbackFlags statusFlags,
+	                                             void *userData);
 #endif
 
 	void onPlayedEndOfStream();

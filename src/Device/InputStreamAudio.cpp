@@ -15,11 +15,11 @@
 #include "OutputStream.h"
 #include "../Stuff/BackupManager.h"
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
 #endif
 
-#ifdef DEVICE_PORTAUDIO
+#if HAS_LIB_PORTAUDIO
 #include <portaudio.h>
 #endif
 
@@ -32,14 +32,12 @@ static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 extern void pa_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
-#endif
 
-#ifdef DEVICE_PULSEAUDIO
 
-void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 //	printf("input request %d\n", (int)nbytes);
 	InputStreamAudio *input = (InputStreamAudio*)userdata;
@@ -154,12 +152,12 @@ InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
 	num_channels = 0;
 
 	capturing = false;
-#ifdef DEVICE_PULSEAUDIO
-	_stream = NULL;
+#if HAS_LIB_PULSEAUDIO
+	pulse_stream = NULL;
 #endif
-#ifdef DEVICE_PORTAUDIO
-	_stream = NULL;
-	err = paNoError;
+#if HAS_LIB_PORTAUDIO
+	portaudio_stream = NULL;
+	portaudio_err = paNoError;
 #endif
 
 	source = new Source;
@@ -246,13 +244,14 @@ void InputStreamAudio::_stop()
 	session->i(_("capture audio stop"));
 	_stopUpdate();
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
+	if (session->device_manager->api == DeviceManager::API_PULSE){
 //	printf("disconnect\n");
-	pa_stream_disconnect(_stream);
+	pa_stream_disconnect(pulse_stream);
 	testError("disconnect");
 
 	for (int i=0; i<1000; i++){
-		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED){
+		if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED){
 //			printf("terminated\n");
 			break;
 		}
@@ -260,8 +259,9 @@ void InputStreamAudio::_stop()
 	}
 //	printf("unref\n");
 
-	pa_stream_unref(_stream);
+	pa_stream_unref(pulse_stream);
 	testError("unref");
+	}
 #endif
 
 	capturing = false;
@@ -284,17 +284,18 @@ bool InputStreamAudio::start()
 
 	num_channels = 2;
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
+	if (session->device_manager->api == DeviceManager::API_PULSE){
 	pa_sample_spec ss;
 	ss.rate = sample_rate;
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
-	_stream = pa_stream_new(session->device_manager->context, "stream-in", &ss, NULL);
+	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
 	testError("pa_stream_new");
 
 
-	pa_stream_set_read_callback(_stream, &input_request_callback, this);
-	//pa_stream_set_state_callback(_stream, &input_notify_callback, NULL);
+	pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
+	//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, NULL);
 
 	pa_buffer_attr attr_in;
 //	attr_in.fragsize = -1;
@@ -306,14 +307,15 @@ bool InputStreamAudio::start()
 	const char *dev = NULL;
 	if (!device->is_default())
 		dev = device->internal_name.c_str();
-	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+	pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
 	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 	testError("pa_stream_connect_record");
 
-	if (!pa_wait_stream_ready(_stream)){
+	if (!pa_wait_stream_ready(pulse_stream)){
 
 		session->e("pa_wait_for_stream_ready");
 		return false;
+	}
 	}
 #endif
 
@@ -330,13 +332,15 @@ bool InputStreamAudio::start()
 
 bool InputStreamAudio::testError(const string &msg)
 {
-#ifdef DEVICE_PULSEAUDIO
-	int e = pa_context_errno(session->device_manager->context);
-	if (e != 0)
-		hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
-	// make sure errors are handled in the gui thread...
+#if HAS_LIB_PULSEAUDIO
+	if (session->device_manager->api == DeviceManager::API_PULSE){
+		int e = pa_context_errno(session->device_manager->pulse_context);
+		if (e != 0)
+			hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
+		// make sure errors are handled in the gui thread...
 		//tsunami->log->error(msg + " (input): " + pa_strerror(e));
-	return (e != 0);
+		return (e != 0);
+	}
 #endif
 	return false;
 }

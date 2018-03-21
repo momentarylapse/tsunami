@@ -15,7 +15,7 @@
 #include "../Midi/MidiSource.h"
 #include "../Stuff/BackupManager.h"
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 #include <alsa/asoundlib.h>
 #endif
 
@@ -104,10 +104,10 @@ void InputStreamMidi::init()
 
 bool InputStreamMidi::unconnect()
 {
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 	if (!subs)
 		return true;
-	int r = snd_seq_unsubscribe_port(device_manager->handle, subs);
+	int r = snd_seq_unsubscribe_port(device_manager->alsa_midi_handle, subs);
 	if (r != 0)
 		session->e(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
@@ -126,20 +126,20 @@ void InputStreamMidi::setDevice(Device *d)
 	if ((device->client < 0) or (device->port < 0))
 		return;// true;
 
-#ifdef DEVICE_MIDI_ALSA
-	if (!device_manager->handle)
+#if HAS_LIB_ALSA
+	if (!device_manager->alsa_midi_handle)
 		return;
 
 	snd_seq_addr_t sender, dest;
 	sender.client = device->client;
 	sender.port = device->port;
-	dest.client = snd_seq_client_id(device_manager->handle);
+	dest.client = snd_seq_client_id(device_manager->alsa_midi_handle);
 	dest.port = device_manager->portid;
 
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
 	snd_seq_port_subscribe_set_dest(subs, &dest);
-	int r = snd_seq_subscribe_port(device_manager->handle, subs);
+	int r = snd_seq_subscribe_port(device_manager->alsa_midi_handle, subs);
 	if (r != 0){
 		session->e(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
@@ -179,10 +179,10 @@ int InputStreamMidi::getSampleCount()
 
 void InputStreamMidi::clearInputQueue()
 {
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 	while (true){
 		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(device_manager->handle, &ev);
+		int r = snd_seq_event_input(device_manager->alsa_midi_handle, &ev);
 		if (r < 0)
 			break;
 		snd_seq_free_event(ev);
@@ -192,8 +192,8 @@ void InputStreamMidi::clearInputQueue()
 
 bool InputStreamMidi::start()
 {
-#ifdef DEVICE_MIDI_ALSA
-	if (!device_manager->handle)
+#if HAS_LIB_ALSA
+	if (!device_manager->alsa_midi_handle)
 		return false;
 #endif
 
@@ -229,10 +229,10 @@ int InputStreamMidi::doCapturing()
 	//if (accumulating)
 		offset = offset_new;
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 	while (true){
 		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(device_manager->handle, &ev);
+		int r = snd_seq_event_input(device_manager->alsa_midi_handle, &ev);
 		if (r < 0)
 			break;
 		int pitch = ev->data.note.note;

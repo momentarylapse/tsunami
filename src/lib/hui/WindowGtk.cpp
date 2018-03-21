@@ -9,7 +9,9 @@
 	#include <gdk/gdkwin32.h>
 #endif
 #ifdef OS_LINUX
+#if HAS_LIB_XLIB
 	#include <gdk/gdkx.h>
+#endif
 #endif
 
 namespace hui
@@ -437,7 +439,7 @@ void Window::setCursorPos(int x, int y)
 		input.x = (float)x;
 		input.y = (float)y;
 		// TODO GTK3
-#ifdef OS_LINUX
+#if HAS_LIB_XLIB
 		XWarpPointer(x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(main_input_control->widget)), 0, 0, 0, 0, x, y);
 		XFlush(x_display);
 #endif

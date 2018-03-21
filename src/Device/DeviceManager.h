@@ -8,8 +8,6 @@
 #ifndef DEVICEMANAGER_H_
 #define DEVICEMANAGER_H_
 
-#include "config.h"
-//#include "../Data/Song.h"
 #include "../Stuff/Observable.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
@@ -20,11 +18,11 @@ class InputStreamAudio;
 class Device;
 class Session;
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 struct pa_context;
 #endif
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 struct _snd_seq;
 #endif
 
@@ -43,6 +41,13 @@ public:
 
 	void init();
 	void kill();
+
+	enum{
+		API_ALSA,
+		API_PULSE,
+		API_PORTAUDIO
+	};
+	int api;
 
 
 	float getOutputVolume();
@@ -71,12 +76,12 @@ public:
 	bool initialized;
 	int hui_rep_id;
 
-#ifdef DEVICE_PULSEAUDIO
-	pa_context *context;
+#if HAS_LIB_PULSEAUDIO
+	pa_context *pulse_context;
 #endif
 
-#ifdef DEVICE_MIDI_ALSA
-	_snd_seq *handle;
+#if HAS_LIB_ALSA
+	_snd_seq *alsa_midi_handle;
 #endif
 	int portid;
 

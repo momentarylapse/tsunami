@@ -10,7 +10,6 @@
 
 #include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
-#include "config.h"
 #include "../Midi/MidiSource.h"
 
 class Device;
@@ -21,7 +20,7 @@ namespace hui{
 	class Timer;
 }
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 struct _snd_seq_port_subscribe;
 #endif
 
@@ -95,7 +94,7 @@ private:
 
 	void clearInputQueue();
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 	_snd_seq_port_subscribe *subs;
 #endif
 

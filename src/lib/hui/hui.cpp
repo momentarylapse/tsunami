@@ -41,7 +41,9 @@
 	#pragma warning(disable : 4995)
 #endif
 #ifdef OS_LINUX
+#if HAS_LIB_XLIB
 	#include <gdk/gdkx.h>
+#endif
 #endif
 
 namespace hui
@@ -173,7 +175,9 @@ void _MakeUsable_()
 #ifdef HUI_API_GTK
 	gtk_init(NULL, NULL);
 	#ifdef OS_LINUX
+#if HAS_LIB_XLIB
 		x_display = XOpenDisplay(0);
+#endif
 	#endif
 
 #if GTK_CHECK_VERSION(3,16,0)

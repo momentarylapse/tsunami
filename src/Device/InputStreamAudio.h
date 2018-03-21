@@ -14,17 +14,16 @@
 #include "../Audio/RingBuffer.h"
 #include "../Audio/Source/AudioSource.h"
 #include "../View/Helper/PeakMeter.h"
-#include "config.h"
 
 class PluginManager;
 class Device;
 class Session;
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 struct pa_stream;
 #endif
 
-#ifdef DEVICE_PORTAUDIO
+#if HAS_LIB_PORTAUDIO
 typedef void PaStream;
 struct PaStreamCallbackTimeInfo;
 typedef unsigned long PaStreamCallbackFlags;
@@ -108,12 +107,12 @@ private:
 
 	Device *device;
 
-#ifdef DEVICE_PULSEAUDIO
-	pa_stream *_stream;
+#if HAS_LIB_PULSEAUDIO
+	pa_stream *pulse_stream;
 #endif
-#ifdef DEVICE_PORTAUDIO
-	PaStream *_stream;
-	PaError err;
+#if HAS_LIB_PORTAUDIO
+	PaStream *portaudio_stream;
+	PaError portaudio_err;
 #endif
 
 	bool testError(const string &msg);
@@ -132,15 +131,15 @@ private:
 
 	static float playback_delay_const;
 
-#ifdef DEVICE_PULSEAUDIO
-	static void input_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+#if HAS_LIB_PULSEAUDIO
+	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 #endif
-#ifdef DEVICE_PORTAUDIO
-	static int stream_request_callback(const void *inputBuffer, void *outputBuffer,
-	                                   unsigned long frames,
-	                                   const PaStreamCallbackTimeInfo* timeInfo,
-	                                   PaStreamCallbackFlags statusFlags,
-	                                   void *userData);
+#if HAS_LIB_PORTAUDIO
+	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
+	                                             unsigned long frames,
+	                                             const PaStreamCallbackTimeInfo* timeInfo,
+	                                             PaStreamCallbackFlags statusFlags,
+	                                             void *userData);
 #endif
 
 };

@@ -12,16 +12,16 @@
 #include "DeviceManager.h"
 #include "OutputStream.h"
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
 #endif
 
-#ifdef DEVICE_PORTAUDIO
+#if HAS_LIB_PORTAUDIO
 #include <portaudio.h>
 #pragma comment(lib,"portaudio_x86.lib")
 #endif
 
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 #include <alsa/asoundlib.h>
 #endif
 
@@ -29,7 +29,7 @@ const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
 
 void pa_wait_op(Session *session, pa_operation *op)
 {
@@ -154,13 +154,14 @@ DeviceManager::DeviceManager()
 
 	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
 
+	api = -1;
 
-#ifdef DEVICE_PULSEAUDIO
-	context = NULL;
+#if HAS_LIB_PULSEAUDIO
+	pulse_context = NULL;
 #endif
 
-#ifdef DEVICE_MIDI_ALSA
-	handle = NULL;
+#if HAS_LIB_ALSA
+	alsa_midi_handle = NULL;
 #endif
 
 	// system defaults
@@ -225,29 +226,26 @@ void DeviceManager::update_devices()
 	for (Device *d: input_devices)
 		d->present = false;
 
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
+	if (api == API_PULSE){
 
-	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, this);
-	if (!testError(session, "pa_context_get_sink_info_list"))
-		pa_wait_op(session, op);
+		pa_operation *op = pa_context_get_sink_info_list(pulse_context, pa_sink_info_callback, this);
+		if (!testError(session, "pa_context_get_sink_info_list"))
+			pa_wait_op(session, op);
 
-	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
-
-
-	op = pa_context_get_source_info_list(context, pa_source_info_callback, this);
-	if (!testError(session, "pa_context_get_source_info_list"))
-		pa_wait_op(session, op);
+		default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
 
 
-	default_devices[Device::Type::AUDIO_INPUT]->present = true;
+		op = pa_context_get_source_info_list(pulse_context, pa_source_info_callback, this);
+		if (!testError(session, "pa_context_get_source_info_list"))
+			pa_wait_op(session, op);
 
 
-	update_midi_devices();
-
-	notify(MESSAGE_CHANGE);
-	write_config();
+		default_devices[Device::Type::AUDIO_INPUT]->present = true;
+	}
 #endif
-#ifdef DEVICE_PORTAUDIO
+#if HAS_LIB_PORTAUDIO
+	if (api == API_PORTAUDIO){
 	/*int count = Pa_GetHostApiCount();
 	for (int i=0; i<count; i++){
 		const PaHostApiInfo* api_info = Pa_GetHostApiInfo(i);
@@ -272,14 +270,20 @@ void DeviceManager::update_devices()
 			setDeviceConfig(d);
 		}
 	}
+	}
 #endif
+
+	update_midi_devices();
+
+	notify(MESSAGE_CHANGE);
+	write_config();
 }
 
 void DeviceManager::update_midi_devices()
 {
-#ifdef DEVICE_MIDI_ALSA
+#if HAS_LIB_ALSA
 
-	if (!handle)
+	if (!alsa_midi_handle)
 		return;
 
 	for (Device *d: midi_input_devices){
@@ -293,10 +297,10 @@ void DeviceManager::update_midi_devices()
 	snd_seq_client_info_alloca(&cinfo);
 	snd_seq_port_info_alloca(&pinfo);
 	snd_seq_client_info_set_client(cinfo, -1);
-	while (snd_seq_query_next_client(handle, cinfo) >= 0){
+	while (snd_seq_query_next_client(alsa_midi_handle, cinfo) >= 0){
 		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
 		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(handle, pinfo) >= 0){
+		while (snd_seq_query_next_port(alsa_midi_handle, pinfo) >= 0){
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
 				continue;
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
@@ -328,8 +332,22 @@ void DeviceManager::init()
 
 	Session *session = Session::GLOBAL;
 
+#if HAS_LIB_PULSEAUDIO
+	if (api < 0){
+		api = API_PULSE;
+		session->i(_("audio api selected: ") + "pulseaudio");
+	}
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (api < 0){
+		api = API_PORTAUDIO;
+		session->i(_("audio api selected: ") + "portaudio");
+	}
+#endif
+
 	// audio
-#ifdef DEVICE_PULSEAUDIO
+#if HAS_LIB_PULSEAUDIO
+	if (api == API_PULSE){
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	if (!m){
 		session->e("pa_threaded_mainloop_new failed");
@@ -342,11 +360,11 @@ void DeviceManager::init()
 		return;
 	}
 
-	context = pa_context_new(mainloop_api, "tsunami");
+	pulse_context = pa_context_new(mainloop_api, "tsunami");
 	if (testError(session, "pa_context_new"))
 		return;
 
-	pa_context_connect(context, NULL, (pa_context_flags_t)0, NULL);
+	pa_context_connect(pulse_context, NULL, (pa_context_flags_t)0, NULL);
 	if (testError(session, "pa_context_connect"))
 		return;
 
@@ -354,37 +372,40 @@ void DeviceManager::init()
 	if (testError(session, "pa_threaded_mainloop_start"))
 		return;
 
-	if (!pa_wait_context_ready(context)){
+	if (!pa_wait_context_ready(pulse_context)){
 		session->e("pulse audio context does not turn 'ready'");
 		return;
 	}
 
-	pa_context_set_subscribe_callback(context, &pa_subscription_callback, this);
+	pa_context_set_subscribe_callback(pulse_context, &pa_subscription_callback, this);
 	testError(session, "pa_context_set_subscribe_callback");
-	pa_context_subscribe(context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
+	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
 	testError(session, "pa_context_subscribe");
+	}
 #endif
 
-#ifdef DEVICE_PORTAUDIO
-	Pa_Initialize();
+#if HAS_LIB_PORTAUDIO
+	if (api == API_PORTAUDIO){
+		Pa_Initialize();
+	}
 #endif
 
 
 	// midi
-#ifdef DEVICE_MIDI_ALSA
-	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
+#if HAS_LIB_ALSA
+	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
 		//return;
 	}else{
-	snd_seq_set_client_name(handle, "Tsunami");
-	portid = snd_seq_create_simple_port(handle, "Tsunami MIDI in",
-				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-				SND_SEQ_PORT_TYPE_APPLICATION);
-	if (portid < 0){
-		session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
-		//return;
-	}
+		snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
+		portid = snd_seq_create_simple_port(alsa_midi_handle, "Tsunami MIDI in",
+					SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
+					SND_SEQ_PORT_TYPE_APPLICATION);
+		if (portid < 0){
+			session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
+			//return;
+		}
 	}
 #endif
 
@@ -403,21 +424,23 @@ void DeviceManager::kill()
 		delete s;
 
 	// audio
-#ifdef DEVICE_PULSEAUDIO
-	if (context){
-		pa_context_disconnect(context);
+#if HAS_LIB_PULSEAUDIO
+	if (api == API_PULSE and pulse_context){
+		pa_context_disconnect(pulse_context);
 		testError(Session::GLOBAL, "pa_context_disconnect");
 	}
 #endif
 
-#ifdef DEVICE_PORTAUDIO
-	Pa_Terminate();
+#if HAS_LIB_PORTAUDIO
+	if (api == API_PORTAUDIO){
+		Pa_Terminate();
+	}
 #endif
 
 	// midi
-#ifdef DEVICE_MIDI_ALSA
-	if (handle)
-		snd_seq_close(handle);
+#if HAS_LIB_ALSA
+	if (alsa_midi_handle)
+		snd_seq_close(alsa_midi_handle);
 #endif
 
 	initialized = false;
@@ -555,11 +578,13 @@ void DeviceManager::moveDevicePriority(Device *d, int new_prio)
 
 bool DeviceManager::testError(Session *session, const string &msg)
 {
-#ifdef DEVICE_PULSEAUDIO
-	int e = pa_context_errno(context);
-	if (e != 0)
-		session->e(msg + ": " + pa_strerror(e));
-	return (e != 0);
+#if HAS_LIB_PULSEAUDIO
+	if (api == API_PULSE){
+		int e = pa_context_errno(pulse_context);
+		if (e != 0)
+			session->e(msg + ": " + pa_strerror(e));
+		return (e != 0);
+	}
 #endif
 	return false;
 }

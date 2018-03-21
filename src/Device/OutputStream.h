@@ -48,6 +48,7 @@ public:
 	void _create_dev();
 	void _kill_dev();
 
+	int api;
 
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_READ_END_OF_STREAM;
@@ -82,7 +83,6 @@ public:
 	void _cdecl setBufferSize(int _size){ buffer_size = _size; }
 
 private:
-	bool testError(const string &msg);
 	void readStream();
 
 	Session *session;
@@ -106,11 +106,12 @@ private:
 
 #if HAS_LIB_PULSEAUDIO
 	pa_stream *pulse_stream;
+	bool _pulse_test_error(const string &msg);
 #endif
 
 #if HAS_LIB_PORTAUDIO
 	PaStream *portaudio_stream;
-	PaError portaudio_err;
+	bool _portaudio_test_error(PaError err, const string &msg);
 #endif
 
 	int dev_sample_rate;

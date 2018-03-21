@@ -44,7 +44,7 @@ void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes
 
 	const void *data;
 	pa_stream_peek(p, &data, &nbytes);
-	input->testError("pa_stream_peek");
+	input->_pulse_test_error("pa_stream_peek");
 	int frames = nbytes / sizeof(float) / input->num_channels;
 
 	if (data){
@@ -64,7 +64,7 @@ void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes
 		}
 
 		pa_stream_drop(p);
-		input->testError("pa_stream_drop");
+		input->_pulse_test_error("pa_stream_drop");
 	}
 	//msg_write(">");
 }
@@ -157,13 +157,13 @@ InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
 #endif
 #if HAS_LIB_PORTAUDIO
 	portaudio_stream = NULL;
-	portaudio_err = paNoError;
 #endif
 
 	source = new Source;
 	source->stream = this;
 
 	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
+	api = session->device_manager->audio_api;
 	playback_delay_const = 0;
 	if (device){
 		playback_delay_const = device->latency;
@@ -245,10 +245,10 @@ void InputStreamAudio::_stop()
 	_stopUpdate();
 
 #if HAS_LIB_PULSEAUDIO
-	if (session->device_manager->api == DeviceManager::API_PULSE){
+	if (api == DeviceManager::API_PULSE){
 //	printf("disconnect\n");
 	pa_stream_disconnect(pulse_stream);
-	testError("disconnect");
+	_pulse_test_error("disconnect");
 
 	for (int i=0; i<1000; i++){
 		if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED){
@@ -260,7 +260,7 @@ void InputStreamAudio::_stop()
 //	printf("unref\n");
 
 	pa_stream_unref(pulse_stream);
-	testError("unref");
+	_pulse_test_error("unref");
 	}
 #endif
 
@@ -285,13 +285,13 @@ bool InputStreamAudio::start()
 	num_channels = 2;
 
 #if HAS_LIB_PULSEAUDIO
-	if (session->device_manager->api == DeviceManager::API_PULSE){
+	if (api == DeviceManager::API_PULSE){
 	pa_sample_spec ss;
 	ss.rate = sample_rate;
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
 	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
-	testError("pa_stream_new");
+	_pulse_test_error("pa_stream_new");
 
 
 	pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
@@ -309,7 +309,7 @@ bool InputStreamAudio::start()
 		dev = device->internal_name.c_str();
 	pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
 	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
-	testError("pa_stream_connect_record");
+	_pulse_test_error("pa_stream_connect_record");
 
 	if (!pa_wait_stream_ready(pulse_stream)){
 
@@ -330,17 +330,15 @@ bool InputStreamAudio::start()
 	return capturing;
 }
 
-bool InputStreamAudio::testError(const string &msg)
+bool InputStreamAudio::_pulse_test_error(const string &msg)
 {
 #if HAS_LIB_PULSEAUDIO
-	if (session->device_manager->api == DeviceManager::API_PULSE){
-		int e = pa_context_errno(session->device_manager->pulse_context);
-		if (e != 0)
-			hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
-		// make sure errors are handled in the gui thread...
-		//tsunami->log->error(msg + " (input): " + pa_strerror(e));
-		return (e != 0);
-	}
+	int e = pa_context_errno(session->device_manager->pulse_context);
+	if (e != 0)
+		hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
+	// make sure errors are handled in the gui thread...
+	//tsunami->log->error(msg + " (input): " + pa_strerror(e));
+	return (e != 0);
 #endif
 	return false;
 }

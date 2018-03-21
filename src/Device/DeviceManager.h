@@ -22,6 +22,11 @@ class Session;
 struct pa_context;
 #endif
 
+#if HAS_LIB_PORTAUDIO
+typedef int PaError;
+#endif
+
+
 #if HAS_LIB_ALSA
 struct _snd_seq;
 #endif
@@ -42,12 +47,19 @@ public:
 	void init();
 	void kill();
 
-	enum{
+	void _init_audio_pulse();
+	void _init_audio_portaudio();
+	void _init_midi_alsa();
+
+	enum ApiType{
 		API_ALSA,
 		API_PULSE,
-		API_PORTAUDIO
+		API_PORTAUDIO,
+		API_NONE,
+		NUM_APIS
 	};
-	int api;
+	int audio_api;
+	int midi_api;
 
 
 	float getOutputVolume();
@@ -71,13 +83,16 @@ public:
 	Device *chooseDevice(int type);
 
 //private:
-	bool testError(Session *session, const string &msg);
 
 	bool initialized;
 	int hui_rep_id;
 
 #if HAS_LIB_PULSEAUDIO
 	pa_context *pulse_context;
+	bool _pulse_test_error(Session *session, const string &msg);
+#endif
+#if HAS_LIB_PORTAUDIO
+	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);
 #endif
 
 #if HAS_LIB_ALSA
@@ -89,8 +104,10 @@ public:
 
 	Array<OutputStream*> streams;
 
-	void update_midi_devices();
 	void update_devices();
+	void _update_devices_midi_alsa();
+	void _update_devices_audio_pulse();
+	void _update_devices_audio_portaudio();
 	Array<Device*> empty_device_list;
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;

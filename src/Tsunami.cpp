@@ -20,7 +20,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.4.1";
+const string AppVersion = "0.7.5.0";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -70,6 +70,9 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	clipboard = new Clipboard;
 
 	Session::GLOBAL = new Session(log, NULL, NULL, perf_mon);
+
+	Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
+	Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 	device_manager = new DeviceManager;
 	Session::GLOBAL->device_manager = device_manager;
@@ -161,9 +164,6 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 Session* Tsunami::createSession()
 {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
-
-	session->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
-	session->i(_("  ...don't worry. Everything will be fine!"));
 
 	session->song = new Song(session);
 

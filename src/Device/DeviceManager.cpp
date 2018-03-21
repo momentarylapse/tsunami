@@ -29,6 +29,23 @@ const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
 
+struct ApiDescription
+{
+	string name;
+	int index;
+	int mode;
+	bool available;
+};
+static ApiDescription api_descriptions[DeviceManager::NUM_APIS] = {
+	{"alsa", DeviceManager::ApiType::API_ALSA, 2, HAS_LIB_ALSA},
+	{"pulseaudio", DeviceManager::ApiType::API_PULSE, 1, HAS_LIB_PULSEAUDIO},
+	{"portaudio", DeviceManager::ApiType::API_PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
+	{"-none-", DeviceManager::ApiType::API_NONE, 3, true}
+};
+
+
+
+
 #if HAS_LIB_PULSEAUDIO
 
 void pa_wait_op(Session *session, pa_operation *op)
@@ -154,7 +171,8 @@ DeviceManager::DeviceManager()
 
 	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
 
-	api = -1;
+	audio_api = -1;
+	midi_api = -1;
 
 #if HAS_LIB_PULSEAUDIO
 	pulse_context = NULL;
@@ -173,7 +191,8 @@ DeviceManager::DeviceManager()
 
 	init();
 
-	hui_rep_id = hui::RunRepeated(2.0f, std::bind(&DeviceManager::update_midi_devices, this));
+	if (midi_api == API_ALSA)
+		hui_rep_id = hui::RunRepeated(2.0f, std::bind(&DeviceManager::_update_devices_midi_alsa, this));
 }
 
 DeviceManager::~DeviceManager()
@@ -214,38 +233,55 @@ void DeviceManager::write_config()
 	hui::Config.setStr("Output.Devices", devs2str(output_devices));
 	hui::Config.setStr("Input.Devices", devs2str(input_devices));
 	hui::Config.setStr("MidiInput.Devices", devs2str(midi_input_devices));
+	hui::Config.setStr("AudioApi", api_descriptions[audio_api].name);
+	hui::Config.setStr("MidiApi", api_descriptions[midi_api].name);
 }
 
 
 void DeviceManager::update_devices()
 {
-	Session *session = Session::GLOBAL;
-
 	for (Device *d: output_devices)
 		d->present = false;
 	for (Device *d: input_devices)
 		d->present = false;
 
+	if (audio_api == API_PULSE)
+		_update_devices_audio_pulse();
+	else if (audio_api == API_PORTAUDIO)
+		_update_devices_audio_portaudio();
+
+	if (midi_api == API_ALSA)
+		_update_devices_midi_alsa();
+
+	notify(MESSAGE_CHANGE);
+	write_config();
+}
+
+void DeviceManager::_update_devices_audio_pulse()
+{
+	Session *session = Session::GLOBAL;
+
 #if HAS_LIB_PULSEAUDIO
-	if (api == API_PULSE){
 
-		pa_operation *op = pa_context_get_sink_info_list(pulse_context, pa_sink_info_callback, this);
-		if (!testError(session, "pa_context_get_sink_info_list"))
-			pa_wait_op(session, op);
+	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pa_sink_info_callback, this);
+	if (!_pulse_test_error(session, "pa_context_get_sink_info_list"))
+		pa_wait_op(session, op);
 
-		default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
-
-
-		op = pa_context_get_source_info_list(pulse_context, pa_source_info_callback, this);
-		if (!testError(session, "pa_context_get_source_info_list"))
-			pa_wait_op(session, op);
+	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
 
 
-		default_devices[Device::Type::AUDIO_INPUT]->present = true;
-	}
+	op = pa_context_get_source_info_list(pulse_context, pa_source_info_callback, this);
+	if (!_pulse_test_error(session, "pa_context_get_source_info_list"))
+		pa_wait_op(session, op);
+
+
+	default_devices[Device::Type::AUDIO_INPUT]->present = true;
 #endif
+}
+
+void DeviceManager::_update_devices_audio_portaudio()
+{
 #if HAS_LIB_PORTAUDIO
-	if (api == API_PORTAUDIO){
 	/*int count = Pa_GetHostApiCount();
 	for (int i=0; i<count; i++){
 		const PaHostApiInfo* api_info = Pa_GetHostApiInfo(i);
@@ -270,16 +306,10 @@ void DeviceManager::update_devices()
 			setDeviceConfig(d);
 		}
 	}
-	}
 #endif
-
-	update_midi_devices();
-
-	notify(MESSAGE_CHANGE);
-	write_config();
 }
 
-void DeviceManager::update_midi_devices()
+void DeviceManager::_update_devices_midi_alsa()
 {
 #if HAS_LIB_ALSA
 
@@ -325,6 +355,21 @@ void DeviceManager::update_midi_devices()
 #endif
 }
 
+
+static int select_api(const string &preferred_name, int mode)
+{
+	int best = -1;
+	for (int i=DeviceManager::NUM_APIS-1; i>=0; i--){
+		ApiDescription &a = api_descriptions[i];
+		if (!a.available or ((a.mode & mode) == 0))
+			continue;
+		if (a.name == preferred_name)
+			return i;
+		best = i;//a.index;
+	}
+	return best;
+}
+
 void DeviceManager::init()
 {
 	if (initialized)
@@ -332,22 +377,32 @@ void DeviceManager::init()
 
 	Session *session = Session::GLOBAL;
 
-#if HAS_LIB_PULSEAUDIO
-	if (api < 0){
-		api = API_PULSE;
-		session->i(_("audio api selected: ") + "pulseaudio");
-	}
-#endif
-#if HAS_LIB_PORTAUDIO
-	if (api < 0){
-		api = API_PORTAUDIO;
-		session->i(_("audio api selected: ") + "portaudio");
-	}
-#endif
+	audio_api = select_api(hui::Config.getStr("AudioApi", "pulseaudio"), 1);
+	session->i(_("audio library selected: ") + api_descriptions[audio_api].name);
+	midi_api = select_api(hui::Config.getStr("MidiApi", "alsa"), 2);
+	session->i(_("midi library selected: ") + api_descriptions[midi_api].name);
 
 	// audio
+	if (audio_api == API_PULSE)
+		_init_audio_pulse();
+	else if (audio_api == API_PORTAUDIO)
+		_init_audio_portaudio();
+
+
+	// midi
+	if (midi_api == API_ALSA)
+		_init_midi_alsa();
+
+	update_devices();
+
+	initialized = true;
+}
+
+void DeviceManager::_init_audio_pulse()
+{
+	Session *session = Session::GLOBAL;
+
 #if HAS_LIB_PULSEAUDIO
-	if (api == API_PULSE){
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	if (!m){
 		session->e("pa_threaded_mainloop_new failed");
@@ -361,15 +416,15 @@ void DeviceManager::init()
 	}
 
 	pulse_context = pa_context_new(mainloop_api, "tsunami");
-	if (testError(session, "pa_context_new"))
+	if (_pulse_test_error(session, "pa_context_new"))
 		return;
 
 	pa_context_connect(pulse_context, NULL, (pa_context_flags_t)0, NULL);
-	if (testError(session, "pa_context_connect"))
+	if (_pulse_test_error(session, "pa_context_connect"))
 		return;
 
 	pa_threaded_mainloop_start(m);
-	if (testError(session, "pa_threaded_mainloop_start"))
+	if (_pulse_test_error(session, "pa_threaded_mainloop_start"))
 		return;
 
 	if (!pa_wait_context_ready(pulse_context)){
@@ -378,20 +433,26 @@ void DeviceManager::init()
 	}
 
 	pa_context_set_subscribe_callback(pulse_context, &pa_subscription_callback, this);
-	testError(session, "pa_context_set_subscribe_callback");
+	_pulse_test_error(session, "pa_context_set_subscribe_callback");
 	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
-	testError(session, "pa_context_subscribe");
-	}
+	_pulse_test_error(session, "pa_context_subscribe");
 #endif
+}
+
+void DeviceManager::_init_audio_portaudio()
+{
+	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PORTAUDIO
-	if (api == API_PORTAUDIO){
-		Pa_Initialize();
-	}
+	PaError err = Pa_Initialize();
+	_portaudio_test_error(err, session, "Pa_Initialize");
 #endif
+}
 
+void DeviceManager::_init_midi_alsa()
+{
+	Session *session = Session::GLOBAL;
 
-	// midi
 #if HAS_LIB_ALSA
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
@@ -408,10 +469,6 @@ void DeviceManager::init()
 		}
 	}
 #endif
-
-	update_devices();
-
-	initialized = true;
 }
 
 void DeviceManager::kill()
@@ -425,15 +482,16 @@ void DeviceManager::kill()
 
 	// audio
 #if HAS_LIB_PULSEAUDIO
-	if (api == API_PULSE and pulse_context){
+	if (audio_api == API_PULSE and pulse_context){
 		pa_context_disconnect(pulse_context);
-		testError(Session::GLOBAL, "pa_context_disconnect");
+		_pulse_test_error(Session::GLOBAL, "pa_context_disconnect");
 	}
 #endif
 
 #if HAS_LIB_PORTAUDIO
-	if (api == API_PORTAUDIO){
-		Pa_Terminate();
+	if (audio_api == API_PORTAUDIO){
+		PaError err = Pa_Terminate();
+		_portaudio_test_error(err, Session::GLOBAL, "Pa_Terminate");
 	}
 #endif
 
@@ -576,14 +634,23 @@ void DeviceManager::moveDevicePriority(Device *d, int new_prio)
 	notify(MESSAGE_CHANGE);
 }
 
-bool DeviceManager::testError(Session *session, const string &msg)
+bool DeviceManager::_pulse_test_error(Session *session, const string &msg)
 {
 #if HAS_LIB_PULSEAUDIO
-	if (api == API_PULSE){
-		int e = pa_context_errno(pulse_context);
-		if (e != 0)
-			session->e(msg + ": " + pa_strerror(e));
-		return (e != 0);
+	int e = pa_context_errno(pulse_context);
+	if (e != 0)
+		session->e(msg + ": " + pa_strerror(e));
+	return (e != 0);
+#endif
+	return false;
+}
+
+bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const string &msg)
+{
+#if HAS_LIB_PORTAUDIO
+	if (err != paNoError){
+		session->e(Pa_GetErrorText(err));
+		return true;
 	}
 #endif
 	return false;

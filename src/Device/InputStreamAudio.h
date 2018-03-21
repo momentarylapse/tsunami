@@ -97,6 +97,8 @@ public:
 
 private:
 
+	int api;
+
 	//bool accumulating;
 	bool capturing;
 
@@ -112,10 +114,9 @@ private:
 #endif
 #if HAS_LIB_PORTAUDIO
 	PaStream *portaudio_stream;
-	PaError portaudio_err;
 #endif
 
-	bool testError(const string &msg);
+	bool _pulse_test_error(const string &msg);
 
 	struct SyncData
 	{

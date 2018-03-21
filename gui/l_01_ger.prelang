@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-429
+439
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1290,8 +1290,38 @@ Takte hinzufügen...
 popup_time_track_menu/add_pause
 Pause hinzufügen...
 
+settings_dialog/default_artist
+
+neue Dateien bekommen einen tag artist=...
+settings_dialog/grp_devices
+Geräte
+
+settings_dialog/grp_interface
+Graphische Oberfläche
+
+settings_dialog/show_cpu
+CPU-Meter
+
+settings_dialog/t_audio_api
+Audio Bibliothek
+
+settings_dialog/t_midi_api
+Midi Bibliothek
+
+settings_dialog/t_scroll_speed
+Scroll Geschwindigkeit
+
+settings_dialog/audio_api
+
+erfordert einen Neustart des Programms
+settings_dialog/cpu_meter
+CPU-Meter
+
+settings_dialog/midi_api
+
+erfordert einen Neustart des Programms
 // Num Language Strings
-169
+171
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1631,3 +1661,7 @@ Sample properties
 Sample Eigenschaften
 Pause
 Pause
+audio library selected: 
+Audiobibliothek gewählt: 
+midi library selected: 
+Midibibliothek gewählt: 

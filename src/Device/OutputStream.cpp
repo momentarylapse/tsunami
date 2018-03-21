@@ -480,7 +480,7 @@ void OutputStream::_start_first_time()
 	_create_dev();
 
 #if HAS_LIB_PULSEAUDIO
-	if (device_manager->audio_api == DeviceManager::API_PULSE){
+	if (api == DeviceManager::API_PULSE){
 	if (!pulse_stream)
 		return;
 
@@ -592,7 +592,7 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 {
 #if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
-		session->e(Pa_GetErrorText(err));
+		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 #endif

@@ -2,22 +2,31 @@ Dialog settings_dialog "Einstellungen" width=300 height=200
 	Grid ? "" vertical
 		Group pdp_general "General"
 			Grid ? ""
+				Text pdt_defaultartist "Default artist"
+				Edit default_artist "" "tooltip=will create an artist=... tag in new files" expandx
+				---|
+				Text pdt_oggrate "OGG bitrate"
+				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
+		Group grp_interface "User interface"
+			Grid ? ""
 				Text pdp_language "Language"
 				ComboBox language "" expandx
 				---|
 				Text pdp_colorscheme "Color scheme"
-				ComboBox color_scheme ""
+				ComboBox color_scheme "" expandx
 				---|
-				Text pdt_oggrate "OGG bitrate"
-				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
+				Text t_scroll_speed "Scroll speed"
+				SpinButton scroll_speed "" --range=0.1:10:0.1
 				---|
-				Text pdt_defaultartist "Default artist" "tooltip=will create an artist=... tag in new files"
-				Edit default_artist ""
-		Group pdp_capture "Recording"
+				.
+				CheckBox cpu_meter "CPU meter"
+		Group grp_devices "Devices"
 			Grid ? ""
-				Text pdt_capturetempfile "Backup file"
-				Edit capture_filename "" "tooltip=Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt" expandx
-				Button capture_find "" image=hui:open
+				Text t_audio_api "Audio library"
+				ComboBox audio_api "" expandx "tooltip=a program restart is required to apply"
+				---|
+				Text t_midi_api "Midi library"
+				ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
 		Grid ? "" buttonbar
 			DefButton /close "Close" image=hui:close
 

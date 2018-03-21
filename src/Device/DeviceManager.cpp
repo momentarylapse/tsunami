@@ -36,7 +36,7 @@ struct ApiDescription
 	int mode;
 	bool available;
 };
-static ApiDescription api_descriptions[DeviceManager::NUM_APIS] = {
+ApiDescription api_descriptions[DeviceManager::NUM_APIS] = {
 	{"alsa", DeviceManager::ApiType::API_ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::API_PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::API_PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
@@ -233,8 +233,6 @@ void DeviceManager::write_config()
 	hui::Config.setStr("Output.Devices", devs2str(output_devices));
 	hui::Config.setStr("Input.Devices", devs2str(input_devices));
 	hui::Config.setStr("MidiInput.Devices", devs2str(midi_input_devices));
-	hui::Config.setStr("AudioApi", api_descriptions[audio_api].name);
-	hui::Config.setStr("MidiApi", api_descriptions[midi_api].name);
 }
 
 
@@ -381,6 +379,9 @@ void DeviceManager::init()
 	session->i(_("audio library selected: ") + api_descriptions[audio_api].name);
 	midi_api = select_api(hui::Config.getStr("MidiApi", "alsa"), 2);
 	session->i(_("midi library selected: ") + api_descriptions[midi_api].name);
+
+	hui::Config.setStr("AudioApi", api_descriptions[audio_api].name);
+	hui::Config.setStr("MidiApi", api_descriptions[midi_api].name);
 
 	// audio
 	if (audio_api == API_PULSE)
@@ -649,7 +650,7 @@ bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const s
 {
 #if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
-		session->e(Pa_GetErrorText(err));
+		session->e(msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 #endif

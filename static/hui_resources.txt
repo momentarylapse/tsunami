@@ -2943,7 +2943,7 @@ Grid
 vertical
 0
 0
-3
+4
 Group
 pdp_general
 
@@ -2955,7 +2955,43 @@ Grid
 
 0
 0
-8
+4
+Text
+pdt_defaultartist
+
+0
+0
+0
+Edit
+default_artist
+expandx
+1
+0
+0
+Text
+pdt_oggrate
+
+0
+1
+0
+ComboBox
+ogg_bitrate
+
+1
+1
+0
+Group
+grp_interface
+
+1
+0
+1
+Grid
+?
+
+0
+0
+7
 Text
 pdp_language
 
@@ -2976,38 +3012,32 @@ pdp_colorscheme
 0
 ComboBox
 color_scheme
-
+expandx
 1
 1
 0
 Text
-pdt_oggrate
+t_scroll_speed
 
 0
 2
 0
-ComboBox
-ogg_bitrate
-
+SpinButton
+scroll_speed
+--range=0.1:10:0.1
 1
 2
 0
-Text
-pdt_defaultartist
-
-0
-3
-0
-Edit
-default_artist
+CheckBox
+cpu_meter
 
 1
 3
 0
 Group
-pdp_capture
+grp_devices
 
-1
+2
 0
 1
 Grid
@@ -3015,29 +3045,35 @@ Grid
 
 0
 0
-3
+4
 Text
-pdt_capturetempfile
+t_audio_api
 
 0
 0
 0
-Edit
-capture_filename
+ComboBox
+audio_api
 expandx
 1
 0
 0
-Button
-capture_find
-image=hui:open
-2
+Text
+t_midi_api
+
 0
+1
+0
+ComboBox
+midi_api
+expandx
+1
+1
 0
 Grid
 ?
 buttonbar
-2
+3
 0
 1
 DefButton
@@ -3646,7 +3682,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-343
+349
 // Text
 /cancel
 Cancel
@@ -4539,14 +4575,26 @@ Sample wählen
 sample_selection_dialog/sample_selection_list
 Preview\\Name\\Duration
 
-settings_dialog/capture_filename
+settings_dialog/audio_api
 
-Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+a program restart is required to apply
+settings_dialog/cpu_meter
+CPU meter
+
+settings_dialog/default_artist
+
+will create an artist=... tag in new files
+settings_dialog/grp_devices
+Devices
+
+settings_dialog/grp_interface
+User interface
+
+settings_dialog/midi_api
+
+a program restart is required to apply
 settings_dialog/ogg_bitrate
 64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
-
-settings_dialog/pdp_capture
-Recording
 
 settings_dialog/pdp_colorscheme
 Color scheme
@@ -4557,17 +4605,23 @@ General
 settings_dialog/pdp_language
 Language
 
-settings_dialog/pdt_capturetempfile
-Backup file
-
 settings_dialog/pdt_defaultartist
 Default artist
-will create an artist=... tag in new files
+
 settings_dialog/pdt_oggrate
 OGG bitrate
 
 settings_dialog/settings_dialog
 Einstellungen
+
+settings_dialog/t_audio_api
+Audio library
+
+settings_dialog/t_midi_api
+Midi library
+
+settings_dialog/t_scroll_speed
+Scroll speed
 
 song_dialog/ad_t_data
 Data
@@ -4683,7 +4737,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-428
+438
 // Text
 /cancel
 Abbrechen
@@ -5813,9 +5867,27 @@ Sample wählen
 sample_selection_dialog/sample_selection_list
 Vorschau\\Name\\Dauer
 
+settings_dialog/audio_api
+
+erfordert einen Neustart des Programms
 settings_dialog/capture_filename
 
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+settings_dialog/cpu_meter
+CPU-Meter
+
+settings_dialog/default_artist
+
+neue Dateien bekommen einen tag artist=...
+settings_dialog/grp_devices
+Geräte
+
+settings_dialog/grp_interface
+Graphische Oberfläche
+
+settings_dialog/midi_api
+
+erfordert einen Neustart des Programms
 settings_dialog/ogg_bitrate
 64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
 
@@ -5842,6 +5914,18 @@ OGG-Bitrate
 
 settings_dialog/settings_dialog
 Einstellungen
+
+settings_dialog/show_cpu
+CPU-Meter
+
+settings_dialog/t_audio_api
+Audio Bibliothek
+
+settings_dialog/t_midi_api
+Midi Bibliothek
+
+settings_dialog/t_scroll_speed
+Scroll Geschwindigkeit
 
 song_dialog/ad_t_data
 Daten
@@ -5970,7 +6054,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-169
+171
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6242,6 +6326,8 @@ all files
 alle Dateien
 all known files
 alles mögliche
+audio library selected: 
+Audiobibliothek gewählt: 
 backup done: 
 Backup abgeschlossen: 
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
@@ -6284,6 +6370,8 @@ loading buffer
 lade Audiopuffer 
 loading track 
 Lade Spur 
+midi library selected: 
+Midibibliothek gewählt: 
 move selection to scale
 Selektierung ziehen zum Skalieren
 no sample selected

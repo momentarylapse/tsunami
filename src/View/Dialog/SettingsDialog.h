@@ -24,6 +24,10 @@ public:
 	void onColorScheme();
 	void onOggBitrate();
 	void onDefaultArtist();
+	void onScrollSpeed();
+	void onAudioApi();
+	void onMidiApi();
+	void onCpuMeter();
 
 
 private:

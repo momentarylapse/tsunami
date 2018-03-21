@@ -7,11 +7,25 @@
 
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
+#include "../../Session.h"
+#include "../../TsunamiWindow.h"
+#include "../BottomBar/MiniBar.h"
+#include "../Helper/CpuDisplay.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
+
+
+struct ApiDescription
+{
+	string name;
+	int index;
+	int mode;
+	bool available;
+};
+extern ApiDescription api_descriptions[];
 
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	hui::Window("settings_dialog", _parent)
@@ -21,6 +35,10 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	event("color_scheme", std::bind(&SettingsDialog::onColorScheme, this));
 	event("ogg_bitrate", std::bind(&SettingsDialog::onOggBitrate, this));
 	event("default_artist", std::bind(&SettingsDialog::onDefaultArtist, this));
+	event("scroll_speed", std::bind(&SettingsDialog::onScrollSpeed, this));
+	event("cpu_meter", std::bind(&SettingsDialog::onCpuMeter, this));
+	event("audio_api", std::bind(&SettingsDialog::onAudioApi, this));
+	event("midi_api", std::bind(&SettingsDialog::onMidiApi, this));
 	event("hui:close", std::bind(&SettingsDialog::destroy, this));
 	event("close", std::bind(&SettingsDialog::destroy, this));
 
@@ -70,6 +88,30 @@ void SettingsDialog::loadData()
 	setString("default_artist", hui::Config.getStr("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
+
+	check("cpu_meter", hui::Config.getBool("CpuDisplay", false));
+
+	setFloat("scroll_speed", 1.0f);
+	enable("scroll_speed", false);
+
+	int n_audio = 0, n_midi = 0;
+	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+		auto &a = api_descriptions[i];
+		if (!a.available)
+			continue;
+		if (a.mode & 1){
+			addString("audio_api", a.name);
+			if (a.index == Session::GLOBAL->device_manager->audio_api)
+				setInt("audio_api", n_audio);
+			n_audio ++;
+		}
+		if (a.mode & 2){
+			addString("midi_api", a.name);
+			if (a.index == Session::GLOBAL->device_manager->midi_api)
+				setInt("midi_api", n_midi);
+			n_midi ++;
+		}
+	}
 }
 
 void SettingsDialog::applyData()
@@ -101,3 +143,45 @@ void SettingsDialog::onDefaultArtist()
 	hui::Config.setStr("DefaultArtist", getString(""));
 }
 
+void SettingsDialog::onScrollSpeed()
+{
+}
+
+void SettingsDialog::onAudioApi()
+{
+	int n = getInt("");
+	int n_audio = 0;
+	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+		auto &a = api_descriptions[i];
+		if (!a.available)
+			continue;
+		if (a.mode & 1){
+			if (n_audio == n)
+				hui::Config.setStr("AudioApi", a.name);
+			n_audio ++;
+		}
+	}
+}
+
+void SettingsDialog::onMidiApi()
+{
+	int n = getInt("");
+	int n_midi = 0;
+	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+		auto &a = api_descriptions[i];
+		if (!a.available)
+			continue;
+		if (a.mode & 2){
+			if (n_midi == n)
+				hui::Config.setStr("MidiApi", a.name);
+			n_midi ++;
+		}
+	}
+}
+
+void SettingsDialog::onCpuMeter()
+{
+	bool show = isChecked("");
+	hui::Config.setBool("CpuDisplay", show);
+	view->win->mini_bar->cpu_display->panel->hideControl(view->win->mini_bar->cpu_display->id, !show);
+}

@@ -3024,7 +3024,7 @@ t_scroll_speed
 0
 SpinButton
 scroll_speed
---range=0.1:10:0.1
+--range=0.1:20:0.1
 1
 2
 0

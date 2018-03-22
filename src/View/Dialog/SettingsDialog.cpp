@@ -90,9 +90,8 @@ void SettingsDialog::loadData()
 	//SetInt("preview_sleep", PreviewSleepTime);
 
 	check("cpu_meter", hui::Config.getBool("CpuDisplay", false));
-
-	setFloat("scroll_speed", 1.0f);
-	enable("scroll_speed", false);
+	setFloat("scroll_speed", hui::Config.getFloat("View.MouseWheelSpeed", 1.0f));
+	//enable("scroll_speed", false);
 
 	int n_audio = 0, n_midi = 0;
 	for (int i=0; i<DeviceManager::NUM_APIS; i++){
@@ -145,6 +144,8 @@ void SettingsDialog::onDefaultArtist()
 
 void SettingsDialog::onScrollSpeed()
 {
+	view->mouse_wheel_speed = getFloat("");
+	hui::Config.setFloat("View.MouseWheelSpeed", getFloat(""));
 }
 
 void SettingsDialog::onAudioApi()

@@ -16,7 +16,7 @@ Dialog settings_dialog "Einstellungen" width=300 height=200
 				ComboBox color_scheme "" expandx
 				---|
 				Text t_scroll_speed "Scroll speed"
-				SpinButton scroll_speed "" --range=0.1:10:0.1
+				SpinButton scroll_speed "" --range=0.1:20:0.1
 				---|
 				.
 				CheckBox cpu_meter "CPU meter"

@@ -190,6 +190,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	ScrollSpeed = hui::Config.getInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = hui::Config.getInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = hui::Config.getFloat("View.ZoomSpeed", 0.1f);
+	mouse_wheel_speed = hui::Config.getFloat("View.MouseWheelSpeed", 1.0f);
 	antialiasing = hui::Config.getBool("View.Antialiasing", false);
 
 	images.speaker = LoadImage(tsunami->directory_static + "volume.tga");

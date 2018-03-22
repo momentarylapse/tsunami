@@ -131,6 +131,7 @@ public:
 	float ScrollSpeed;
 	float ScrollSpeedFast;
 	float ZoomSpeed;
+	float mouse_wheel_speed;
 
 	int mx, my;
 

@@ -227,9 +227,9 @@ void ViewModeDefault::onMouseWheel()
 {
 	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f)
-		cam->zoom(exp(e->scroll_y * view->ZoomSpeed * 0.3f));
+		cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f));
 	if (fabs(e->scroll_x) > 0.1f)
-		cam->move(e->scroll_x / cam->scale * view->ScrollSpeed * 0.03f);
+		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
 }
 
 void ViewModeDefault::onKeyDown(int k)

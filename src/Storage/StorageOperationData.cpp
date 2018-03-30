@@ -28,6 +28,7 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	layer = 0;
 	renderer = NULL;
 	num_samples = 0;
+	only_load_metadata = false;
 }
 
 StorageOperationData::~StorageOperationData()

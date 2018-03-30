@@ -229,6 +229,12 @@ void FormatOgg::loadTrack(StorageOperationData *od)
     }
 
 	int samples = (int)ov_pcm_total(&vf, -1);
+	if (od->only_load_metadata){
+		ov_clear(&vf);
+		t->addMarker(Range(0, samples), "dummy");
+		return;
+	}
+
 	char *data = new char[CHUNK_SIZE];
 	int current_section;
 	int read = 0;

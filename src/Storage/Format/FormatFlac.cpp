@@ -113,7 +113,8 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		if (!decoder)
 			throw Exception("could not create decoder");
 
-		FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
+		//FLAC__stream_decoder_set_metadata_respond(decoder, FLAC__METADATA_TYPE_STREAMINFO);
+		FLAC__stream_decoder_set_metadata_respond(decoder, FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
 		FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_file(
 								decoder,
@@ -124,8 +125,14 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 			throw Exception(string("initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
 
-		if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
-			throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		if (od->only_load_metadata){
+			if (!FLAC__stream_decoder_process_until_end_of_metadata(decoder))
+				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+			t->addMarker(Range(0, flac_samples), "dummy");
+		}else{
+			if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
+				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		}
 
 
 		if (t->get_index() == 0){

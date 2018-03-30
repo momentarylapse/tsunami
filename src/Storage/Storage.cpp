@@ -57,7 +57,7 @@ Storage::~Storage()
 	formats.clear();
 }
 
-bool Storage::load(Song *a, const string &filename)
+bool Storage::load_ex(Song *a, const string &filename, bool only_metadata)
 {
 	current_directory = filename.dirname();
 	FormatDescriptor *d = getFormat(filename.extension(), 0);
@@ -68,6 +68,7 @@ bool Storage::load(Song *a, const string &filename)
 
 	Format *f = d->create();
 	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, session->win);
+	od.only_load_metadata = only_metadata;
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -87,6 +88,11 @@ bool Storage::load(Song *a, const string &filename)
 
 	delete(f);
 	return true;
+}
+
+bool Storage::load(Song *a, const string &filename)
+{
+	return load_ex(a, filename, false);
 }
 
 bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)

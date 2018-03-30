@@ -20,7 +20,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.5.0";
+const string AppVersion = "0.7.5.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -120,7 +120,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		session->song = song;
 		if (args.num < 3){
 			session->e(_("call: tsunami --info <File>"));
-		}else if (session->storage->load(song, args[2])){
+		}else if (session->storage->load_ex(song, args[2], true)){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));

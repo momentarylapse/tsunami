@@ -55,6 +55,8 @@ public:
 	int num_samples;
 	int offset;
 	int layer;
+
+	bool only_load_metadata;
 };
 
 #endif /* SRC_STORAGE_STORAGEOPERATIONDATA_H_ */

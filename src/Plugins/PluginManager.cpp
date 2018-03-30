@@ -414,6 +414,9 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream.setVolume", Kaba::mf(&OutputStream::setVolume));
 	Kaba::LinkExternal("OutputStream.setBufferSize", Kaba::mf(&OutputStream::setBufferSize));
 //	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
+	Kaba::LinkExternal("OutputStream.subscribe", Kaba::mf(&OutputStream::subscribe_kaba));
+	Kaba::LinkExternal("OutputStream.unsubscribe", Kaba::mf(&OutputStream::unsubscribe));
+	Kaba::DeclareClassVirtualIndex("OutputStream", "getSomeSamples", Kaba::mf(&OutputStream::getSomeSamples), &stream);
 	}
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));

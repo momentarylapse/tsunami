@@ -385,6 +385,9 @@ class OutputStream
 	extern void setVolume(float volume)
 	extern void setBufferSize(int size)
 	extern bool isPaused()
+	extern void getSomeSamples(AudioBuffer buf, int num_samples)
+	extern void subscribe(void* handler, void* func, string message)
+	extern void unsubscribe(void* handler)
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer

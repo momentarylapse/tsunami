@@ -69,7 +69,6 @@ public:
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
 	static const string MESSAGE_INPUT_CHANGE;
-	static const string MESSAGE_OUTPUT_CHANGE;
 	static const string MESSAGE_OUTPUT_STATE_CHANGE;
 
 	void updatePeaks();
@@ -191,11 +190,12 @@ public:
 	Song *song;
 
 	OutputStream *stream;
+	bool playback_active;
 	SongRenderer *renderer;
 	void play(const Range &range, bool allow_loop);
 	void stop();
 	void pause(bool pause);
-	bool isPlaying();
+	bool isPlaybackActive();
 	bool isPaused();
 	int playbackPos();
 	Set<Track*> get_playable_tracks();

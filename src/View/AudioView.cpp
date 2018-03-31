@@ -61,7 +61,6 @@ const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 const string AudioView::MESSAGE_INPUT_CHANGE = "InputChange";
-const string AudioView::MESSAGE_OUTPUT_CHANGE = "OutputChange";
 const string AudioView::MESSAGE_OUTPUT_STATE_CHANGE = "OutputStateChange";
 
 
@@ -216,7 +215,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	is_updating_peaks = false;
 
 	renderer = new SongRenderer(song);
-	stream = NULL;
+	playback_active = false;
+	stream = new OutputStream(session, renderer);
+	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
+	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
+	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mx = my = 0;
 	msp.stop();
@@ -256,7 +259,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 AudioView::~AudioView()
 {
-	stop();
+	stream->unsubscribe(this);
+	delete(stream);
+
 	song->unsubscribe(this);
 
 	delete(mode_curve);
@@ -356,7 +361,7 @@ void AudioView::updateSelection()
 
 
 	renderer->setRange(getPlaybackSelection(false));
-	if (isPlaying()){
+	if (isPlaybackActive()){
 		if (renderer->range().is_inside(playbackPos()))
 			renderer->setRange(getPlaybackSelection(false));
 		else{
@@ -596,7 +601,7 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 		c->drawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
-		if (stream){
+		if (isPlaybackActive()){
 			color cc = colors.preview_marker;
 			cc.a = 0.25f;
 			c->setColor(cc);
@@ -943,7 +948,7 @@ void AudioView::drawAudioFile(Painter *c)
 
 
 	// playing/capturing position
-	if (stream)
+	if (isPlaybackActive())
 		drawTimeLine(c, playbackPos(), Selection::Type::PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
@@ -1177,57 +1182,50 @@ void AudioView::enable(bool _enabled)
 
 void AudioView::play(const Range &range, bool allow_loop)
 {
-	if (stream)
+	if (playback_active)
 		stop();
 
 	renderer->prepare(range, allow_loop);
 	renderer->allowTracks(get_playable_tracks());
-	stream = new OutputStream(session, renderer);
-	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
-	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
-	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
-	notify(MESSAGE_OUTPUT_CHANGE);
+	playback_active = true;
+	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	stream->play();
 	forceRedraw();
 }
 
 void AudioView::stop()
 {
-	if (!stream)
+	if (!playback_active)
 		return;
+	stream->stop();
+	playback_active = false;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	stream->unsubscribe(this);
-	delete(stream);
-	stream = NULL;
-	notify(MESSAGE_OUTPUT_CHANGE);
 	forceRedraw();
 }
 
 void AudioView::pause(bool _pause)
 {
-	if (stream){
+	if (playback_active){
 		stream->pause(_pause);
 		notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	}
 
 }
-bool AudioView::isPlaying()
+bool AudioView::isPlaybackActive()
 {
-	return stream;
+	return playback_active;
 }
 
 bool AudioView::isPaused()
 {
-	if (stream)
+	if (playback_active)
 		return stream->isPaused();
 	return false;
 }
 
 int AudioView::playbackPos()
 {
-	if (stream)
-		return stream->getPos();
-	return 0;
+	return stream->getPos();
 }
 
 bool AudioView::hasAnySolo()

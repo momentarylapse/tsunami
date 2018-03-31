@@ -33,12 +33,10 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	bottom_bar->subscribe(this, std::bind(&MiniBar::onBottomBarUpdate, this));
 	dev_manager->subscribe(this, std::bind(&MiniBar::onVolumeChange, this));
-	view->subscribe(this, std::bind(&MiniBar::onViewOutputChange, this), view->MESSAGE_OUTPUT_CHANGE);
 }
 
 MiniBar::~MiniBar()
 {
-	view->unsubscribe(this);
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
@@ -79,8 +77,4 @@ void MiniBar::onVolumeChange()
 	setFloat("volume", dev_manager->getOutputVolume());
 }
 
-void MiniBar::onViewOutputChange()
-{
-	peak_meter->setSource(view->stream);
-}
 

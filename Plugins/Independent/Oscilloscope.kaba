@@ -23,7 +23,7 @@ DrawingArea area ''")
 		p.setColor(colors.background)
 		p.drawRect(0, 0, w, h)
 		
-		if osci.stream
+		if osci.stream //.isPlaying()
 			AudioBuffer buf
 			osci.stream.getSomeSamples(buf, NUM_SAMPLES)
 			p.setColor(color(0.2,0,1,0))
@@ -47,24 +47,17 @@ class Oscilloscope extends TsunamiPlugin
 	int n
 	
 	override void onStart()
-		stream = nil
+		stream = session.view.stream
 		
 		dlg = new OscilloscopeDialog(self)
 		dlg.show()
-		session.view.subscribe(self, &onViewOutputChange, "OutputChange")
 		n = 0
+		stream.subscribe(self, &onUpdate, "Update")
 		
 	override void onStop()
 		session.view.unsubscribe(self)
 		stream = nil
 		delete dlg
-	
-	void onViewOutputChange()
-		//print("view output...")
-		stream = session.view.stream
-		if stream
-			stream.subscribe(self, &onUpdate, "Update")
-		dlg.redraw("area")
 	
 	void onUpdate()
 		n ++

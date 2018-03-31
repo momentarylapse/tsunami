@@ -254,7 +254,7 @@ void ViewModeDefault::onKeyDown(int k)
 		cam->zoom(exp(- view->ZoomSpeed));
 
 	if (k == hui::KEY_SPACE){
-		if (view->isPlaying()){
+		if (view->isPlaybackActive()){
 			view->pause(!view->isPaused());
 		}else{
 			win->onPlay();
@@ -493,7 +493,7 @@ Selection ViewModeDefault::getHoverBasic()
 			s.type = Selection::Type::SELECTION_START;
 			return s;
 		}
-		if (view->isPlaying()){
+		if (view->isPlaybackActive()){
 			if (view->mouse_over_time(view->playbackPos())){
 				s.type = Selection::Type::PLAYBACK;
 				return s;
@@ -604,9 +604,10 @@ Selection ViewModeDefault::getHover()
 
 void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 {
-	if (view->isPlaying()){
+	if (view->isPlaybackActive()){
 		if (view->renderer->range().is_inside(pos)){
 			view->renderer->seek(pos);
+			view->stream->clearBuffer();
 			hover->type = Selection::Type::PLAYBACK;
 			view->forceRedraw();
 			return;

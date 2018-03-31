@@ -350,6 +350,7 @@ void OutputStream::_kill_dev()
 void OutputStream::stop()
 {
 	_pause();
+	clearBuffer();
 }
 
 void OutputStream::_pause()
@@ -626,4 +627,9 @@ void OutputStream::onReadEndOfStream()
 	// should drain...and use pa_stream_set_state_callback for notification
 
 	notify(MESSAGE_READ_END_OF_STREAM);
+}
+
+void OutputStream::clearBuffer()
+{
+	ring_buf.clear();
 }

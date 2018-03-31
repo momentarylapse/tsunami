@@ -747,8 +747,8 @@ void TsunamiWindow::updateMenu()
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
-	enable("stop", view->isPlaying() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
-	enable("pause", view->isPlaying() and !view->isPaused());
+	enable("stop", view->isPlaybackActive() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
+	enable("pause", view->isPlaybackActive() and !view->isPaused());
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
 	// view

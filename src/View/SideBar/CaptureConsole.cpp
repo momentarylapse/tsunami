@@ -139,7 +139,7 @@ void CaptureConsole::onType()
 
 void CaptureConsole::onStart()
 {
-	if (view->isPlaying()){
+	if (view->isPlaybackActive()){
 		view->pause(false);
 	}else{
 		mode->dump();
@@ -158,7 +158,7 @@ void CaptureConsole::onStart()
 
 void CaptureConsole::onDelete()
 {
-	if (view->isPlaying()){
+	if (view->isPlaybackActive()){
 		view->stream->unsubscribe(this);
 		view->stop();
 	}

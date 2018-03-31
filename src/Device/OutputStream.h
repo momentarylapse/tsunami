@@ -72,6 +72,8 @@ public:
 	void _cdecl setDevice(Device *d);
 	int _cdecl getPos();
 
+	void _cdecl clearBuffer();
+
 
 	// PeakMeterSource
 	virtual float _cdecl getSampleRate();

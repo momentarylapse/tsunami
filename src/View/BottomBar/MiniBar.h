@@ -33,8 +33,6 @@ public:
 	void onBottomBarUpdate();
 	void onVolumeChange();
 
-	void onViewOutputChange();
-
 	//OutputStream *stream;
 	Session *session;
 	DeviceManager *dev_manager;

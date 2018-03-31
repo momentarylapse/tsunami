@@ -60,7 +60,6 @@ public:
 
 	void onUpdateSong();
 	void onUpdateDeviceManager();
-	void onViewOutputChange();
 
 	virtual void _cdecl onShow();
 	virtual void _cdecl onHide();

@@ -116,7 +116,6 @@ MixingConsole::MixingConsole(Session *session) :
 
 	song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
 	device_manager->subscribe(this, std::bind(&MixingConsole::onUpdateDeviceManager, this));
-	view->subscribe(this, std::bind(&MixingConsole::onViewOutputChange, this), view->MESSAGE_OUTPUT_CHANGE);
 	loadData();
 }
 
@@ -124,7 +123,6 @@ MixingConsole::~MixingConsole()
 {
 	song->unsubscribe(this);
 	device_manager->unsubscribe(this);
-	view->unsubscribe(this);
 	for (TrackMixer *m: mixer)
 		delete(m);
 	delete(peak_meter);
@@ -173,9 +171,4 @@ void MixingConsole::onShow()
 void MixingConsole::onHide()
 {
 	peak_meter->enable(false);
-}
-
-void MixingConsole::onViewOutputChange()
-{
-	peak_meter->setSource(view->stream);
 }

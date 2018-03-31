@@ -18,7 +18,7 @@ class Track;
 class MixingConsole;
 class LogConsole;
 class DeviceConsole;
-class Log;
+class SignalEditor;
 class Session;
 class BottomBarConsole;
 
@@ -30,9 +30,10 @@ public:
 
 
 	enum{
-		LOG_CONSOLE,
 		MIXING_CONSOLE,
-		DEVICE_CONSOLE
+		SIGNAL_EDITOR,
+		DEVICE_CONSOLE,
+		LOG_CONSOLE
 	};
 
 
@@ -65,8 +66,9 @@ public:
 	bool visible;
 
 	MixingConsole *mixing_console;
-	LogConsole *log_console;
+	SignalEditor *signal_editor;
 	DeviceConsole *device_console;
+	LogConsole *log_console;
 
 	int index(Console *console);
 

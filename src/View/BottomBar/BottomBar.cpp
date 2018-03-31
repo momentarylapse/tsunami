@@ -9,6 +9,7 @@
 #include "MixingConsole.h"
 #include "LogConsole.h"
 #include "DeviceConsole.h"
+#include "SignalEditor.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
 #include "../../Session.h"
@@ -30,12 +31,14 @@ BottomBar::BottomBar(Session *session)
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, "choose");
 
-	log_console = new LogConsole(session);
 	mixing_console = new MixingConsole(session);
+	signal_editor = new SignalEditor(session);
 	device_console = new DeviceConsole(session);
-	addConsole(log_console, "");
+	log_console = new LogConsole(session);
 	addConsole(mixing_console, "");
+	addConsole(signal_editor, "");
 	addConsole(device_console, "");
+	addConsole(log_console, "");
 
 	eventX("choose", "hui:select", std::bind(&BottomBar::onChoose, this));
 	event("close", std::bind(&BottomBar::onClose, this));

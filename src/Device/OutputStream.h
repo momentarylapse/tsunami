@@ -14,7 +14,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
-#include "../View/Helper/PeakMeter.h"
+#include "../Stuff/Observable.h"
 
 class AudioSource;
 class DeviceManager;
@@ -34,7 +34,7 @@ typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 #endif
 
-class OutputStream : public PeakMeterSource
+class OutputStream : public Observable<VirtualBase>
 {
 	friend StreamThread;
 public:
@@ -67,7 +67,6 @@ public:
 	void _pause();
 
 	bool _cdecl isPaused();
-	int _cdecl getState();
 	void _cdecl setSource(AudioSource *r);
 	void _cdecl setDevice(Device *d);
 	int _cdecl getPos();
@@ -76,8 +75,7 @@ public:
 
 
 	// PeakMeterSource
-	virtual float _cdecl getSampleRate();
-	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
+	float _cdecl getSampleRate();
 
 	float _cdecl getVolume();
 	void _cdecl setVolume(float _volume);

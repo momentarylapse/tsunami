@@ -14,6 +14,7 @@
 #include "../../Plugins/Effect.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Source/SongRenderer.h"
+#include "../../Audio/PeakMeter.h"
 
 class ModuleSongRenderer : public SignalEditor::Module
 {
@@ -36,7 +37,7 @@ public:
 		peak_meter = p;
 	}
 	virtual string type(){ return "PeakMeter"; }
-	//virtual void set_audio_source(AudioSource *s){ if (stream) stream->setSource(s); }
+	virtual void set_audio_source(AudioSource *s){ if (peak_meter) peak_meter->setSource(s); }
 };
 
 class ModuleOutputStream : public SignalEditor::Module
@@ -59,7 +60,7 @@ SignalEditor::SignalEditor(Session *session) :
 	eventXP("area", "hui:draw", std::bind(&SignalEditor::onDraw, this, std::placeholders::_1));
 
 	modules.add(new ModuleSongRenderer(view->renderer));
-	modules.add(new ModulePeakMeter(NULL));//session->win->bottom_bar->pe));
+	modules.add(new ModulePeakMeter(view->peak_meter));
 	modules.add(new ModuleOutputStream(view->stream));
 
 	foreachi (Module *m, modules, i){

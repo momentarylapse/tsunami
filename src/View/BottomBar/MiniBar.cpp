@@ -6,13 +6,13 @@
  */
 
 #include "BottomBar.h"
-#include "../Helper/PeakMeter.h"
 #include "../Helper/CpuDisplay.h"
 #include "../../Device/OutputStream.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
+#include "../Helper/PeakMeterDisplay.h"
 
 MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 {
@@ -23,7 +23,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	fromResource("mini_bar");
 
-	peak_meter = new PeakMeter(this, "peaks", view->stream, view);
+	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter, view);
 	setFloat("volume", dev_manager->getOutputVolume());
 
 	cpu_display = new CpuDisplay(this, "cpu", session);

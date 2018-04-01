@@ -23,7 +23,7 @@
 #endif
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
-const int DEFAULT_BUFFER_SIZE = 32768;
+const int DEFAULT_BUFFER_SIZE = 1024*4;//32768;
 //const int DEFAULT_BUFFER_SIZE = 16384;
 
 const float DEFAULT_UPDATE_DT = 0.050f;
@@ -543,14 +543,6 @@ bool OutputStream::isPaused()
 	return paused;
 }
 
-int OutputStream::getState()
-{
-	if (paused)
-		return STATE_PAUSED;
-	return STATE_PLAYING;
-	//return STATE_STOPPED;
-}
-
 int OutputStream::getPos()
 {
 	return source->getPos(- ring_buf.available());
@@ -570,11 +562,6 @@ void OutputStream::setVolume(float _volume)
 float OutputStream::getSampleRate()
 {
 	return source->getSampleRate();
-}
-
-void OutputStream::getSomeSamples(AudioBuffer &buf, int num_samples)
-{
-	ring_buf.peekRef(buf, num_samples);
 }
 
 bool OutputStream::_pulse_test_error(const string &msg)

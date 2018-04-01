@@ -370,21 +370,9 @@ void InputStreamAudio::resetSync()
 	sync.reset();
 }
 
-void InputStreamAudio::getSomeSamples(AudioBuffer &buf, int num_samples)
-{
-	buffer.peekRef(buf, -num_samples);
-}
-
 bool InputStreamAudio::isCapturing()
 {
 	return capturing;
-}
-
-int InputStreamAudio::getState()
-{
-	if (isCapturing())
-		return STATE_PLAYING;
-	return STATE_STOPPED;
 }
 
 int InputStreamAudio::getDelay()

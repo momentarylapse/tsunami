@@ -13,7 +13,7 @@
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
 #include "../Audio/Source/AudioSource.h"
-#include "../View/Helper/PeakMeter.h"
+#include "../Stuff/Observable.h"
 
 class PluginManager;
 class Device;
@@ -31,7 +31,7 @@ typedef int PaError;
 #endif
 
 
-class InputStreamAudio : public PeakMeterSource
+class InputStreamAudio : public Observable<VirtualBase>
 {
 	friend class PluginManager;
 public:
@@ -62,9 +62,7 @@ public:
 
 	bool _cdecl isCapturing();
 
-	virtual float _cdecl getSampleRate(){ return sample_rate; }
-	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
-	virtual int _cdecl getState();
+	float _cdecl getSampleRate(){ return sample_rate; }
 
 	// delay/sync
 	static float getPlaybackDelayConst();

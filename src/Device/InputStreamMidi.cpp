@@ -262,17 +262,6 @@ bool InputStreamMidi::isCapturing()
 	return capturing;
 }
 
-int InputStreamMidi::getState()
-{
-	if (isCapturing())
-		return STATE_PLAYING;
-	return STATE_STOPPED;
-}
-
-void InputStreamMidi::getSomeSamples(AudioBuffer &buf, int num_samples)
-{
-}
-
 
 int InputStreamMidi::getDelay()
 {

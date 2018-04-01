@@ -16,6 +16,7 @@ class Device;
 class Track;
 class Synthesizer;
 class OutputStream;
+class PeakMeter;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode
 {
@@ -24,6 +25,7 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode
 	Device *chosen_device;
 	Track *target;
 	Synthesizer *preview_synth;
+	PeakMeter *peak_meter;
 	OutputStream *preview_stream;
 
 

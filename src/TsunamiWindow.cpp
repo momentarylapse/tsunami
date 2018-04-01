@@ -28,7 +28,6 @@
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
-#include "View/Helper/PeakMeter.h"
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
@@ -46,6 +45,7 @@
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 #include "Plugins/FastFourierTransform.h"
+#include "View/Helper/PeakMeterDisplay.h"
 
 extern const string AppName;
 

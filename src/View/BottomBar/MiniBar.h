@@ -10,7 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 
-class PeakMeter;
+class PeakMeterDisplay;
 class CpuDisplay;
 class OutputStream;
 class DeviceManager;
@@ -36,7 +36,7 @@ public:
 	//OutputStream *stream;
 	Session *session;
 	DeviceManager *dev_manager;
-	PeakMeter *peak_meter;
+	PeakMeterDisplay *peak_meter;
 	CpuDisplay *cpu_display;
 	BottomBar *bottom_bar;
 	AudioView *view;

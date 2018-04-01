@@ -14,7 +14,7 @@ class Track;
 class Slider;
 class Song;
 class MixingConsole;
-class PeakMeter;
+class PeakMeterDisplay;
 class DeviceManager;
 class OutputStream;
 class AudioView;
@@ -65,7 +65,7 @@ public:
 	virtual void _cdecl onHide();
 
 	DeviceManager *device_manager;
-	PeakMeter *peak_meter;
+	PeakMeterDisplay *peak_meter;
 
 	string id_inner;
 	Array<TrackMixer*> mixer;

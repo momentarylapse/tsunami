@@ -12,6 +12,7 @@
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Device.h"
 #include "../../../Audio/AudioSucker.h"
+#include "../../../Audio/PeakMeter.h"
 #include "../../../Data/Song.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
@@ -28,6 +29,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 {
 	chosen_device = cc->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	input = NULL;
+	peak_meter = NULL;
 	target = NULL;
 	sucker = NULL;
 
@@ -103,7 +105,8 @@ void CaptureConsoleModeAudio::enter()
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);
 	view->mode_capture->setInputAudio(input);
-	cc->peak_meter->setSource(input);
+	peak_meter = new PeakMeter(input->source);
+	cc->peak_meter->setSource(peak_meter);
 
 	input->setDevice(chosen_device);
 
@@ -116,7 +119,7 @@ void CaptureConsoleModeAudio::enter()
 		return;*/
 	}
 
-	sucker = new AudioSucker(input->source);
+	sucker = new AudioSucker(peak_meter);
 	sucker->start();
 	export_view_sucker = sucker;
 }
@@ -125,6 +128,7 @@ void CaptureConsoleModeAudio::leave()
 {
 	delete sucker;
 	cc->peak_meter->setSource(NULL);
+	delete peak_meter;
 	view->mode_capture->setInputAudio(NULL);
 	delete(input);
 	input = NULL;

@@ -7,7 +7,7 @@
 
 #include "MixingConsole.h"
 #include "../../Device/OutputStream.h"
-#include "../Helper/PeakMeter.h"
+#include "../Helper/PeakMeterDisplay.h"
 #include <math.h>
 
 #include "../../Device/DeviceManager.h"
@@ -109,7 +109,7 @@ MixingConsole::MixingConsole(Session *session) :
 
 	fromResource("mixing-console");
 
-	peak_meter = new PeakMeter(this, "output-peaks", view->stream, view);
+	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, view);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));

@@ -12,6 +12,7 @@
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Device.h"
 #include "../../../Audio/Synth/Synthesizer.h"
+#include "../../../Audio/PeakMeter.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/SongSelection.h"
 #include "../../AudioView.h"
@@ -25,6 +26,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	input = NULL;
 	target = NULL;
 
+	peak_meter = NULL;
 	preview_synth = NULL;
 	preview_stream = NULL;
 
@@ -53,6 +55,8 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 {
 	if (preview_stream)
 		delete preview_stream;
+	if (peak_meter)
+		delete peak_meter;
 	if (preview_synth)
 		delete preview_synth;
 
@@ -60,7 +64,8 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->out->setSource(input->out);
-	preview_stream = new OutputStream(session, preview_synth->out);
+	peak_meter = new PeakMeter(preview_synth->out);
+	preview_stream = new OutputStream(session, peak_meter);
 	preview_stream->setBufferSize(512);
 	preview_stream->play();
 	view->setCurTrack(target);
@@ -105,7 +110,7 @@ void CaptureConsoleModeMidi::enter()
 	input->setChunkSize(512);
 	input->setUpdateDt(0.005f);
 	view->mode_capture->setInputMidi(input);
-	cc->peak_meter->setSource(input);
+	cc->peak_meter->setSource(NULL);//input);
 
 	input->setDevice(chosen_device);
 

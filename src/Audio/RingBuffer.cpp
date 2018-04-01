@@ -46,9 +46,11 @@ void RingBuffer::moveWritePos(int delta)
 
 int RingBuffer::read(AudioBuffer& b)
 {
+	printf("read %d  len=%d avail=%d  rp=%d  wp=%d\n", b.length, buf.length, available(), read_pos, write_pos);
 	int samples = min(b.length, available());
 
 	int samples_a = min(samples, buf.length - read_pos);
+	printf("a read=%d pos=%d\n", samples_a, read_pos);
 	b.set_x(buf, -read_pos, read_pos + samples_a, 1.0f);
 	moveReadPos(samples_a);
 
@@ -58,6 +60,7 @@ int RingBuffer::read(AudioBuffer& b)
 
 	AudioBuffer bb;
 	bb.set_as_ref(b, samples_a,  samples_b);
+	printf("b read=%d pos=%d\n", samples_b, read_pos);
 	bb.set_x(buf, 0, samples_b, 1.0f);
 	moveReadPos(samples_b);
 	return samples;
@@ -65,6 +68,7 @@ int RingBuffer::read(AudioBuffer& b)
 
 void RingBuffer::write(AudioBuffer& b)
 {
+	printf("write %d\n", b.length);
 	int size_a = min(b.length, buf.length - write_pos);
 	buf.set(b, write_pos, 1.0f);
 

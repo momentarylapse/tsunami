@@ -10,8 +10,8 @@
 
 
 #include "SideBar.h"
-#include "../Helper/PeakMeter.h"
 #include "../../Data/Song.h"
+#include "../Helper/PeakMeterDisplay.h"
 
 class AudioView;
 class DeviceManager;
@@ -48,7 +48,7 @@ public:
 
 	bool isCapturing();
 
-	PeakMeter *peak_meter;
+	PeakMeterDisplay *peak_meter;
 	CaptureConsoleMode *mode;
 
 	CaptureConsoleMode *mode_audio;

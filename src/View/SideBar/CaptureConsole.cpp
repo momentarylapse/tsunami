@@ -35,7 +35,7 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	peak_meter = new PeakMeter(this, "capture_level", NULL, view);
+	peak_meter = new PeakMeterDisplay(this, "capture_level", NULL, view);
 
 	//enable("capture_type", false);
 

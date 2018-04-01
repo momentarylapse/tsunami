@@ -13,12 +13,14 @@
 
 class InputStreamAudio;
 class AudioSucker;
+class PeakMeter;
 class Device;
 class Track;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
 	InputStreamAudio *input;
+	PeakMeter *peak_meter;
 	AudioSucker *sucker;
 	Array<Device*> sources;
 	Device *chosen_device;

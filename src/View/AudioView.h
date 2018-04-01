@@ -21,6 +21,7 @@
 class DeviceManager;
 class OutputStream;
 class SongRenderer;
+class PeakMeter;
 class TsunamiWindow;
 class AudioViewTrack;
 class PeakThread;
@@ -192,6 +193,7 @@ public:
 	OutputStream *stream;
 	bool playback_active;
 	SongRenderer *renderer;
+	PeakMeter *peak_meter;
 	void play(const Range &range, bool allow_loop);
 	void stop();
 	void pause(bool pause);

@@ -17,6 +17,7 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Device/OutputStream.h"
+#include "../Audio/PeakMeter.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
@@ -215,8 +216,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	is_updating_peaks = false;
 
 	renderer = new SongRenderer(song);
+	peak_meter = new PeakMeter(renderer);
 	playback_active = false;
-	stream = new OutputStream(session, renderer);
+	stream = new OutputStream(session, peak_meter);
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
@@ -261,6 +263,7 @@ AudioView::~AudioView()
 {
 	stream->unsubscribe(this);
 	delete(stream);
+	delete(peak_meter);
 
 	song->unsubscribe(this);
 

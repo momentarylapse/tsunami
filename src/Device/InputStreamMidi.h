@@ -9,8 +9,8 @@
 #define INPUTSTREAMMIDI_H_
 
 #include "../Data/Song.h"
-#include "../View/Helper/PeakMeter.h"
 #include "../Midi/MidiSource.h"
+#include "../Stuff/Observable.h"
 
 class Device;
 class DeviceManager;
@@ -24,7 +24,7 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class InputStreamMidi : public PeakMeterSource
+class InputStreamMidi : public Observable<VirtualBase>
 {
 public:
 
@@ -52,9 +52,7 @@ public:
 	void _cdecl resetAccumulation();
 	int _cdecl getSampleCount();
 
-	virtual float _cdecl getSampleRate(){ return sample_rate; }
-	virtual void _cdecl getSomeSamples(AudioBuffer &buf, int num_samples);
-	virtual int _cdecl getState();
+	float _cdecl getSampleRate(){ return sample_rate; }
 
 	bool _cdecl unconnect();
 	void _cdecl setDevice(Device *d);

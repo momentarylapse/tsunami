@@ -23,8 +23,9 @@
 #endif
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
-const int DEFAULT_BUFFER_SIZE = 1024*4;//32768;
+//const int DEFAULT_BUFFER_SIZE = 32768;
 //const int DEFAULT_BUFFER_SIZE = 16384;
+const int DEFAULT_BUFFER_SIZE = 4096;
 
 const float DEFAULT_UPDATE_DT = 0.050f;
 

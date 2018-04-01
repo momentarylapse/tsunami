@@ -51,14 +51,12 @@ PeakMeter::PeakMeter(AudioSource *s)
 	source = s;
 	mode = MODE_PEAKS;
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	ring_buf = new RingBuffer(1<<20);
 	r.reset();
 	l.reset();
 }
 
 PeakMeter::~PeakMeter()
 {
-	delete ring_buf;
 }
 
 inline float nice_peak(float p)
@@ -66,12 +64,9 @@ inline float nice_peak(float p)
 	return min((float)pow(p, 0.8f), 1.0f);
 }
 
-void PeakMeter::findPeaks()
+void PeakMeter::findPeaks(AudioBuffer &buf)
 {
-	float dt = (float)ring_buf->available() / (float)sample_rate;
-	AudioBuffer buf;
-	buf.resize(ring_buf->available());
-	ring_buf->read(buf);
+	float dt = (float)buf.length / (float)sample_rate;
 	r.update(buf.c[0], dt);
 	l.update(buf.c[1], dt);
 }
@@ -90,12 +85,9 @@ void PeakMeter::setMode(int _mode)
 	mode = _mode;
 }
 
-void PeakMeter::findSpectrum()
+void PeakMeter::findSpectrum(AudioBuffer &buf)
 {
 	Array<complex> cr, cl;
-	AudioBuffer buf;
-	buf.resize(ring_buf->available());
-	ring_buf->read(buf);
 	cr.resize(buf.length / 2 + 1);
 	cl.resize(buf.length / 2 + 1);
 	FastFourierTransform::fft_r2c(buf.c[0], cr);
@@ -117,14 +109,14 @@ void PeakMeter::findSpectrum()
 	}
 }
 
-void PeakMeter::update()
+void PeakMeter::update(AudioBuffer &buf)
 {
 	sample_rate = source->getSampleRate();
+	//clearData();
 	if (mode == MODE_PEAKS)
-		findPeaks();
+		findPeaks(buf);
 	else if (mode == MODE_SPECTRUM)
-		findSpectrum();
-	clearData();
+		findSpectrum(buf);
 	notify();
 }
 
@@ -139,9 +131,7 @@ int PeakMeter::read(AudioBuffer& buf)
 	if (!source)
 		return 0;
 	int r = source->read(buf);
-	ring_buf->write(buf);
-	if (ring_buf->available() >= NUM_SAMPLES)
-		update();
+	update(buf);
 	return r;
 }
 

@@ -24,11 +24,20 @@ void RingBuffer::clear()
 	read_pos = 0;
 }
 
+// how many samples are readable?
 int RingBuffer::available()
 {
 	if (write_pos < read_pos)
 		return write_pos - read_pos + buf.length;
 	return write_pos - read_pos;
+}
+
+// how many samples are writable?
+int RingBuffer::writable_size()
+{
+	if (read_pos <= write_pos)
+		return read_pos - write_pos + buf.length;
+	return read_pos - write_pos;
 }
 
 void RingBuffer::moveReadPos(int delta)
@@ -46,11 +55,9 @@ void RingBuffer::moveWritePos(int delta)
 
 int RingBuffer::read(AudioBuffer& b)
 {
-	printf("read %d  len=%d avail=%d  rp=%d  wp=%d\n", b.length, buf.length, available(), read_pos, write_pos);
 	int samples = min(b.length, available());
 
 	int samples_a = min(samples, buf.length - read_pos);
-	printf("a read=%d pos=%d\n", samples_a, read_pos);
 	b.set_x(buf, -read_pos, read_pos + samples_a, 1.0f);
 	moveReadPos(samples_a);
 
@@ -60,7 +67,6 @@ int RingBuffer::read(AudioBuffer& b)
 
 	AudioBuffer bb;
 	bb.set_as_ref(b, samples_a,  samples_b);
-	printf("b read=%d pos=%d\n", samples_b, read_pos);
 	bb.set_x(buf, 0, samples_b, 1.0f);
 	moveReadPos(samples_b);
 	return samples;
@@ -68,16 +74,17 @@ int RingBuffer::read(AudioBuffer& b)
 
 void RingBuffer::write(AudioBuffer& b)
 {
-	printf("write %d\n", b.length);
-	int size_a = min(b.length, buf.length - write_pos);
+	int samples = min(b.length, writable_size());
+
+	int size_a = min(samples, buf.length - write_pos);
 	buf.set(b, write_pos, 1.0f);
 
-	int size_b = b.length - size_a;
+	int size_b = samples - size_a;
 	if (size_b > 0){
 		buf.set(b, -size_a, 1.0f);
 	}
 
-	moveWritePos(b.length);
+	moveWritePos(samples);
 }
 
 void RingBuffer::peekRef(AudioBuffer &b, int size)

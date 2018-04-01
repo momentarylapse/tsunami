@@ -11,8 +11,8 @@
 #include "Source/AudioSource.h"
 #include "../Stuff/Observable.h"
 
-class RingBuffer;
 class PeakMeterDisplay;
+class AudioBuffer;
 
 class PeakMeter : public Observable<AudioSource>
 {
@@ -34,9 +34,9 @@ public:
 
 //private:
 	void clearData();
-	void findPeaks();
-	void findSpectrum();
-	void update();
+	void findPeaks(AudioBuffer &buf);
+	void findSpectrum(AudioBuffer &buf);
+	void update(AudioBuffer &buf);
 
 	float i_to_freq(int i);
 
@@ -59,7 +59,6 @@ public:
 	Data r, l;
 
 	float sample_rate;
-	RingBuffer *ring_buf;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

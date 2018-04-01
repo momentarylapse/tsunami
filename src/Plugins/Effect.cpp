@@ -35,22 +35,22 @@ void Effect::Output::reset()
 	fx->resetState();
 }
 
-int Effect::Output::getPos(int delta)
+int Effect::Output::get_pos(int delta)
 {
 	if (!source)
 		return -1;
-	return source->getPos(delta);
+	return source->get_pos(delta);
 }
 
-int Effect::Output::getSampleRate()
+int Effect::Output::sample_rate()
 {
 	return fx->sample_rate;
 }
 
-void Effect::Output::setSource(AudioSource *_source)
+void Effect::Output::set_source(AudioSource *_source)
 {
 	source = _source;
-	fx->sample_rate = source->getSampleRate();
+	fx->sample_rate = source->sample_rate();
 }
 
 Effect::Effect() :

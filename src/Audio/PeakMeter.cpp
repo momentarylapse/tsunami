@@ -50,7 +50,7 @@ PeakMeter::PeakMeter(AudioSource *s)
 {
 	source = s;
 	mode = MODE_PEAKS;
-	sample_rate = DEFAULT_SAMPLE_RATE;
+	_sample_rate = DEFAULT_SAMPLE_RATE;
 	r.reset();
 	l.reset();
 }
@@ -64,14 +64,14 @@ inline float nice_peak(float p)
 	return min((float)pow(p, 0.8f), 1.0f);
 }
 
-void PeakMeter::findPeaks(AudioBuffer &buf)
+void PeakMeter::find_peaks(AudioBuffer &buf)
 {
-	float dt = (float)buf.length / (float)sample_rate;
+	float dt = (float)buf.length / (float)_sample_rate;
 	r.update(buf.c[0], dt);
 	l.update(buf.c[1], dt);
 }
 
-void PeakMeter::clearData()
+void PeakMeter::clear_data()
 {
 	r.reset();
 	l.reset();
@@ -80,12 +80,12 @@ void PeakMeter::clearData()
 inline float PeakMeter::i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
-void PeakMeter::setMode(int _mode)
+void PeakMeter::set_mode(int _mode)
 {
 	mode = _mode;
 }
 
-void PeakMeter::findSpectrum(AudioBuffer &buf)
+void PeakMeter::find_spectrum(AudioBuffer &buf)
 {
 	Array<complex> cr, cl;
 	cr.resize(buf.length / 2 + 1);
@@ -97,8 +97,8 @@ void PeakMeter::findSpectrum(AudioBuffer &buf)
 	for (int i=0;i<SPECTRUM_SIZE;i++){
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
-		int n0 = f0 * buf.length / sample_rate;
-		int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
+		int n0 = f0 * buf.length / (float)_sample_rate;
+		int n1 = max((int)(f1 * buf.length / (float)_sample_rate), n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){
@@ -111,17 +111,17 @@ void PeakMeter::findSpectrum(AudioBuffer &buf)
 
 void PeakMeter::update(AudioBuffer &buf)
 {
-	sample_rate = source->getSampleRate();
+	_sample_rate = source->sample_rate();
 	//clearData();
 	if (mode == MODE_PEAKS)
-		findPeaks(buf);
+		find_peaks(buf);
 	else if (mode == MODE_SPECTRUM)
-		findSpectrum(buf);
+		find_spectrum(buf);
 	notify();
 }
 
 
-void PeakMeter::setSource(AudioSource* s)
+void PeakMeter::set_source(AudioSource* s)
 {
 	source = s;
 }
@@ -135,16 +135,24 @@ int PeakMeter::read(AudioBuffer& buf)
 	return r;
 }
 
-int PeakMeter::getPos(int delta)
+int PeakMeter::get_pos(int delta)
 {
 	if (!source)
 		return 0;
-	return source->getPos(delta);
+	return source->get_pos(delta);
 }
 
-int PeakMeter::getSampleRate()
+int PeakMeter::sample_rate()
 {
 	if (!source)
 		return DEFAULT_SAMPLE_RATE;
-	return source->getSampleRate();
+	return source->sample_rate();
+}
+
+void PeakMeter::reset()
+{
+	if (source)
+		source->reset();
+	clear_data();
+	notify();
 }

@@ -123,7 +123,7 @@ void PeakMeterDisplay::onDraw(Painter *c)
 void PeakMeterDisplay::onLeftButtonDown()
 {
 	if (source)
-		source->setMode((source->mode == PeakMeter::MODE_PEAKS) ? PeakMeter::MODE_SPECTRUM : PeakMeter::MODE_PEAKS);
+		source->set_mode((source->mode == PeakMeter::MODE_PEAKS) ? PeakMeter::MODE_SPECTRUM : PeakMeter::MODE_PEAKS);
 }
 
 void PeakMeterDisplay::onRightButtonDown()

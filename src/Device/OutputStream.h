@@ -66,24 +66,24 @@ public:
 	void _unpause();
 	void _pause();
 
-	bool _cdecl isPaused();
-	void _cdecl setSource(AudioSource *r);
-	void _cdecl setDevice(Device *d);
-	int _cdecl getPos();
+	bool _cdecl is_paused();
+	void _cdecl set_source(AudioSource *r);
+	void _cdecl set_device(Device *d);
+	int _cdecl get_pos();
 
-	void _cdecl clearBuffer();
+	void _cdecl clear_buffer();
 
 
 	// PeakMeterSource
-	float _cdecl getSampleRate();
+	int _cdecl sample_rate();
 
-	float _cdecl getVolume();
-	void _cdecl setVolume(float _volume);
+	float _cdecl get_volume();
+	void _cdecl set_volume(float _volume);
 
-	void _cdecl setBufferSize(int _size){ buffer_size = _size; }
+	void _cdecl set_buffer_size(int _size){ buffer_size = _size; }
 
 private:
-	void readStream();
+	void _read_stream();
 
 	Session *session;
 
@@ -137,8 +137,8 @@ private:
 	                                             void *userData);
 #endif
 
-	void onPlayedEndOfStream();
-	void onReadEndOfStream();
+	void on_played_end_of_stream();
+	void on_read_end_of_stream();
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

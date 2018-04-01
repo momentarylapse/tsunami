@@ -238,9 +238,9 @@ void PluginManager::LinkAppScriptData()
 	Synthesizer::Output synth_out(NULL);
 	Kaba::DeclareClassSize("SynthOutput", sizeof(Synthesizer::Output));
 	Kaba::DeclareClassVirtualIndex("SynthOutput", "read", Kaba::mf(&Synthesizer::Output::read), &synth_out);
-	//Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "getSampleRate", Kaba::mf(&Synthesizer::Output::getSampleRate), &synth_out);
-	Kaba::LinkExternal("SynthOutput.setSource", Kaba::mf(&Synthesizer::Output::setSource));
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "sample_rate", Kaba::mf(&Synthesizer::Output::sample_rate), &synth_out);
+	Kaba::LinkExternal("SynthOutput.set_source", Kaba::mf(&Synthesizer::Output::set_source));
 
 
 	DummySynthesizer dsynth;
@@ -362,7 +362,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &ar);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "getSampleRate", Kaba::mf(&AudioSource::getSampleRate), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "sample_rate", Kaba::mf(&AudioSource::sample_rate), &ar);
 
 	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
@@ -371,10 +372,11 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("SongRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongRenderer::__init__));
 	Kaba::DeclareClassVirtualIndex("SongRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongRenderer::__delete__), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "read", Kaba::mf(&SongRenderer::read), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
-	Kaba::LinkExternal("SongRenderer.getPos", Kaba::mf(&SongRenderer::getPos));
 	Kaba::LinkExternal("SongRenderer.seek", Kaba::mf(&SongRenderer::seek));
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "getSampleRate", Kaba::mf(&SongRenderer::getSampleRate), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "sample_rate", Kaba::mf(&SongRenderer::sample_rate), &sr);
 
 	{
 	InputStreamAudio input(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
@@ -389,11 +391,11 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAudio::__delete__), &input);
 	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));
 	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&InputStreamAudio::stop));
-	Kaba::LinkExternal("InputStreamAudio.isCapturing", Kaba::mf(&InputStreamAudio::isCapturing));
+	Kaba::LinkExternal("InputStreamAudio.is_capturing", Kaba::mf(&InputStreamAudio::is_capturing));
 	Kaba::LinkExternal("InputStreamAudio.subscribe", Kaba::mf(&InputStreamAudio::subscribe_kaba));
 	Kaba::LinkExternal("InputStreamAudio.unsubscribe", Kaba::mf(&InputStreamAudio::unsubscribe));
-	Kaba::LinkExternal("InputStreamAudio.getSampleRate", Kaba::mf(&InputStreamAudio::getSampleRate));
-	Kaba::LinkExternal("InputStreamAudio.setBackupMode", Kaba::mf(&InputStreamAudio::setBackupMode));
+	Kaba::LinkExternal("InputStreamAudio.sample_rate", Kaba::mf(&InputStreamAudio::sample_rate));
+	Kaba::LinkExternal("InputStreamAudio.set_backup_mode", Kaba::mf(&InputStreamAudio::set_backup_mode));
 	}
 
 	{
@@ -405,12 +407,12 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::play));
 	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
 	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
-	Kaba::LinkExternal("OutputStream.isPaused", Kaba::mf(&OutputStream::isPaused));
-	Kaba::LinkExternal("OutputStream.getPos", Kaba::mf(&OutputStream::getPos));
-	Kaba::LinkExternal("OutputStream.getSampleRate", Kaba::mf(&OutputStream::getSampleRate));
-	Kaba::LinkExternal("OutputStream.getVolume", Kaba::mf(&OutputStream::getVolume));
-	Kaba::LinkExternal("OutputStream.setVolume", Kaba::mf(&OutputStream::setVolume));
-	Kaba::LinkExternal("OutputStream.setBufferSize", Kaba::mf(&OutputStream::setBufferSize));
+	Kaba::LinkExternal("OutputStream.is_paused", Kaba::mf(&OutputStream::is_paused));
+	Kaba::LinkExternal("OutputStream.get_pos", Kaba::mf(&OutputStream::get_pos));
+	Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
+	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
+	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
+	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
 //	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
 	Kaba::LinkExternal("OutputStream.subscribe", Kaba::mf(&OutputStream::subscribe_kaba));
 	Kaba::LinkExternal("OutputStream.unsubscribe", Kaba::mf(&OutputStream::unsubscribe));

@@ -48,7 +48,7 @@ void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes
 	int frames = nbytes / sizeof(float) / input->num_channels;
 
 	if (data){
-		if (input->isCapturing()){
+		if (input->is_capturing()){
 			float *in = (float*)data;
 
 			RingBuffer &buf = input->buffer;
@@ -109,7 +109,7 @@ void InputStreamAudio::SyncData::add(int samples)
 #endif
 }
 
-int InputStreamAudio::SyncData::getDelay()
+int InputStreamAudio::SyncData::get_delay()
 {
 	if (num_points > 0)
 		return (delay_sum / num_points);
@@ -133,18 +133,18 @@ int InputStreamAudio::Source::read(AudioBuffer &buf)
 	return r;
 }
 
-int InputStreamAudio::Source::getSampleRate()
+int InputStreamAudio::Source::sample_rate()
 {
-	return stream->getSampleRate();
+	return stream->sample_rate();
 }
 
 
-InputStreamAudio::InputStreamAudio(Session *_session, int _sample_rate) :
+InputStreamAudio::InputStreamAudio(Session *_session, int __sample_rate) :
 	buffer(1048576)
 {
 //	printf("input new\n");
 	session = _session;
-	sample_rate = _sample_rate;
+	_sample_rate = __sample_rate;
 	chunk_size = -1;
 	update_dt = -1;
 	update_dt = DEFAULT_UPDATE_TIME;
@@ -192,12 +192,12 @@ void InputStreamAudio::__delete__()
 	this->InputStreamAudio::~InputStreamAudio();
 }
 
-void InputStreamAudio::setBackupMode(int mode)
+void InputStreamAudio::set_backup_mode(int mode)
 {
 	backup_mode = mode;
 }
 
-void InputStreamAudio::setChunkSize(int size)
+void InputStreamAudio::set_chunk_size(int size)
 {
 	if (size > 0)
 		chunk_size = size;
@@ -205,7 +205,7 @@ void InputStreamAudio::setChunkSize(int size)
 		chunk_size = DEFAULT_CHUNK_SIZE;
 }
 
-void InputStreamAudio::setUpdateDt(float dt)
+void InputStreamAudio::set_update_dt(float dt)
 {
 	if (dt > 0)
 		update_dt = dt;
@@ -213,12 +213,12 @@ void InputStreamAudio::setUpdateDt(float dt)
 		update_dt = DEFAULT_UPDATE_TIME;
 }
 
-Device *InputStreamAudio::getDevice()
+Device *InputStreamAudio::get_device()
 {
 	return device;
 }
 
-void InputStreamAudio::setDevice(Device *_device)
+void InputStreamAudio::set_device(Device *_device)
 {
 	device = _device;
 	playback_delay_const = device->latency;
@@ -242,7 +242,7 @@ void InputStreamAudio::_stop()
 	if (!capturing)
 		return;
 	session->i(_("capture audio stop"));
-	_stopUpdate();
+	_stop_update();
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
@@ -287,7 +287,7 @@ bool InputStreamAudio::start()
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
 	pa_sample_spec ss;
-	ss.rate = sample_rate;
+	ss.rate = _sample_rate;
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
 	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
@@ -324,9 +324,9 @@ bool InputStreamAudio::start()
 	if (backup_mode != BACKUP_MODE_NONE)
 		backup_file = BackupManager::create_file("raw", session);
 
-	_startUpdate();
+	_start_update();
 
-	resetSync();
+	reset_sync();
 	return capturing;
 }
 
@@ -343,18 +343,18 @@ bool InputStreamAudio::_pulse_test_error(const string &msg)
 	return false;
 }
 
-float InputStreamAudio::getPlaybackDelayConst()
+float InputStreamAudio::get_playback_delay_const()
 {
 	return playback_delay_const;
 }
 
-void InputStreamAudio::setPlaybackDelayConst(float f)
+void InputStreamAudio::set_playback_delay_const(float f)
 {
 	playback_delay_const = f;
 	hui::Config.setFloat("Input.PlaybackDelay", playback_delay_const);
 }
 
-int InputStreamAudio::doCapturing()
+int InputStreamAudio::do_capturing()
 {
 	if (!capturing)
 		return 0;
@@ -365,22 +365,22 @@ int InputStreamAudio::doCapturing()
 	return avail;
 }
 
-void InputStreamAudio::resetSync()
+void InputStreamAudio::reset_sync()
 {
 	sync.reset();
 }
 
-bool InputStreamAudio::isCapturing()
+bool InputStreamAudio::is_capturing()
 {
 	return capturing;
 }
 
-int InputStreamAudio::getDelay()
+int InputStreamAudio::get_delay()
 {
-	return sync.getDelay() - playback_delay_const * (float)sample_rate / 1000.0f;
+	return sync.get_delay() - playback_delay_const * (float)_sample_rate / 1000.0f;
 }
 
-void InputStreamAudio::_startUpdate()
+void InputStreamAudio::_start_update()
 {
 	if (running)
 		return;
@@ -388,7 +388,7 @@ void InputStreamAudio::_startUpdate()
 	running = true;
 }
 
-void InputStreamAudio::_stopUpdate()
+void InputStreamAudio::_stop_update()
 {
 	if (!running)
 		return;
@@ -399,8 +399,8 @@ void InputStreamAudio::_stopUpdate()
 
 void InputStreamAudio::update()
 {
-	if (doCapturing() > 0)
+	if (do_capturing() > 0)
 		notify(MESSAGE_CAPTURE);
 
-	running = isCapturing();
+	running = is_capturing();
 }

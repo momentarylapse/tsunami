@@ -110,7 +110,7 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
 //		printf("end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -180,7 +180,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
 //		printf("end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, std::bind(&OutputStream::onPlayedEndOfStream, stream)); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
 	}
 	return 0;
 }
@@ -205,7 +205,7 @@ public:
 		while(stream->keep_thread_running){
 			if (stream->read_more){
 				PerformanceMonitor::start_busy(perf_channel);
-				stream->readStream();
+				stream->_read_stream();
 				PerformanceMonitor::end_busy(perf_channel);
 			}else{
 				hui::Sleep(0.005f);
@@ -289,7 +289,7 @@ void OutputStream::__delete__()
 
 void OutputStream::_create_dev()
 {
-	dev_sample_rate = source->getSampleRate();
+	dev_sample_rate = source->sample_rate();
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
@@ -351,14 +351,15 @@ void OutputStream::_kill_dev()
 void OutputStream::stop()
 {
 	_pause();
-	clearBuffer();
+	source->reset();
+	clear_buffer();
 }
 
 void OutputStream::_pause()
 {
 	if (!fully_initialized)
 		return;
-	if (isPaused())
+	if (is_paused())
 		return;
 //	printf("pause...");
 
@@ -380,7 +381,7 @@ void OutputStream::_unpause()
 {
 	if (!fully_initialized)
 		return;
-	if (!isPaused())
+	if (!is_paused())
 		return;
 //	printf("unpause...");
 
@@ -412,7 +413,7 @@ void OutputStream::pause(bool __pause)
 		_unpause();
 }
 
-void OutputStream::readStream()
+void OutputStream::_read_stream()
 {
 //	printf("read stream\n");
 	reading = true;
@@ -435,7 +436,7 @@ void OutputStream::readStream()
 //		printf(" -> end\n");
 		read_end_of_stream = true;
 		reading = false;
-		hui::RunLater(0.001f,  std::bind(&OutputStream::onReadEndOfStream, this));
+		hui::RunLater(0.001f,  std::bind(&OutputStream::on_read_end_of_stream, this));
 		return;
 	}
 
@@ -447,12 +448,12 @@ void OutputStream::readStream()
 	reading = false;
 }
 
-void OutputStream::setSource(AudioSource *s)
+void OutputStream::set_source(AudioSource *s)
 {
 	source = s;
 }
 
-void OutputStream::setDevice(Device *d)
+void OutputStream::set_device(Device *d)
 {
 	device = d;
 }
@@ -473,7 +474,7 @@ void OutputStream::_start_first_time()
 	reading = false;
 
 	// we need some data in the buffer...
-	readStream();
+	_read_stream();
 
 
 	thread = new StreamThread(this);
@@ -539,30 +540,30 @@ void OutputStream::_start_first_time()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-bool OutputStream::isPaused()
+bool OutputStream::is_paused()
 {
 	return paused;
 }
 
-int OutputStream::getPos()
+int OutputStream::get_pos()
 {
-	return source->getPos(- ring_buf.available());
+	return source->get_pos(- ring_buf.available());
 }
 
-float OutputStream::getVolume()
+float OutputStream::get_volume()
 {
 	return volume;
 }
 
-void OutputStream::setVolume(float _volume)
+void OutputStream::set_volume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-float OutputStream::getSampleRate()
+int OutputStream::sample_rate()
 {
-	return source->getSampleRate();
+	return source->sample_rate();
 }
 
 bool OutputStream::_pulse_test_error(const string &msg)
@@ -596,14 +597,14 @@ void OutputStream::update()
 		notify(MESSAGE_UPDATE);
 }
 
-void OutputStream::onPlayedEndOfStream()
+void OutputStream::on_played_end_of_stream()
 {
 	//printf("stream end\n");
 	//pause(true);
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
-void OutputStream::onReadEndOfStream()
+void OutputStream::on_read_end_of_stream()
 {
 	read_end_of_stream = true;
 	reading = false;
@@ -617,7 +618,7 @@ void OutputStream::onReadEndOfStream()
 	notify(MESSAGE_READ_END_OF_STREAM);
 }
 
-void OutputStream::clearBuffer()
+void OutputStream::clear_buffer()
 {
 	ring_buf.clear();
 }

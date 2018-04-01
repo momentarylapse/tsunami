@@ -61,11 +61,10 @@ public:
 		Output(Synthesizer *synth);
 		Synthesizer *synth;
 		virtual int _cdecl read(AudioBuffer &buf);
-		//virtual void _cdecl reset();
+		virtual void _cdecl reset();
+		virtual int _cdecl sample_rate();
 
-		virtual int _cdecl getSampleRate();
-
-		void setSource(MidiSource *source);
+		void set_source(MidiSource *source);
 		MidiSource *source;
 
 	};

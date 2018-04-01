@@ -83,9 +83,9 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	
 		source = new ClickSource
 		synth = CreateSynthesizer(session, "")
-		synth.out.setSource(source)
+		synth.out.set_source(source)
 		stream = new OutputStream(session, synth.out)
-		stream.setBufferSize(2048)
+		stream.set_buffer_size(2048)
 		stream.play()
 		
 		dlg = new ClickCounterDialog(self)

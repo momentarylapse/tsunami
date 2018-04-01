@@ -26,19 +26,20 @@ public:
 
 	// from AudioSource
 	virtual int _cdecl read(AudioBuffer &buf);
-	virtual int _cdecl getSampleRate();
+	virtual int _cdecl sample_rate();
+	virtual void _cdecl reset();
+	virtual int _cdecl get_pos(int delta);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
-	void _cdecl allowTracks(const Set<Track*> &allowed_tracks);
+	void _cdecl allow_tracks(const Set<Track*> &allowed_tracks);
 
 	void _cdecl seek(int pos);
 
-	void _cdecl setRange(const Range &r){ _range = r; }
+	void _cdecl set_range(const Range &r){ _range = r; }
 	Range _cdecl range(){ return _range; }
-	virtual int _cdecl getPos(int delta);
 
-	int _cdecl getNumSamples();
+	int _cdecl get_num_samples();
 
 private:
 	void read_basic(AudioBuffer &buf, int pos);

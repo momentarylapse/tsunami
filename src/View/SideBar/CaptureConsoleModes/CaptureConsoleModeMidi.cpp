@@ -41,7 +41,7 @@ void CaptureConsoleModeMidi::onSource()
 	int n = cc->getInt("");
 	if ((n >= 0) and (n < sources.num)){
 		chosen_device = sources[n];
-		input->setDevice(chosen_device);
+		input->set_device(chosen_device);
 	}
 }
 
@@ -63,10 +63,10 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	target = t;
 	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
-	preview_synth->out->setSource(input->out);
+	preview_synth->out->set_source(input->out);
 	peak_meter = new PeakMeter(preview_synth->out);
 	preview_stream = new OutputStream(session, peak_meter);
-	preview_stream->setBufferSize(512);
+	preview_stream->set_buffer_size(512);
 	preview_stream->play();
 	view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
@@ -107,12 +107,12 @@ void CaptureConsoleModeMidi::enter()
 	//cc->addString("capture_midi_target", _("  - create new track -"));
 
 	input = new InputStreamMidi(session, song->sample_rate);
-	input->setChunkSize(512);
-	input->setUpdateDt(0.005f);
+	input->set_chunk_size(512);
+	input->set_update_dt(0.005f);
 	view->mode_capture->setInputMidi(input);
 	cc->peak_meter->setSource(NULL);//input);
 
-	input->setDevice(chosen_device);
+	input->set_device(chosen_device);
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == t->Type::MIDI)
@@ -141,7 +141,7 @@ void CaptureConsoleModeMidi::pause()
 
 void CaptureConsoleModeMidi::start()
 {
-	input->resetSync();
+	input->reset_sync();
 	input->accumulate(true);
 	cc->enable("capture_midi_source", false);
 	//cc->enable("capture_midi_target", false);
@@ -156,7 +156,7 @@ void CaptureConsoleModeMidi::stop()
 void CaptureConsoleModeMidi::dump()
 {
 	input->accumulate(false);
-	input->resetAccumulation();
+	input->reset_accumulation();
 	cc->enable("capture_midi_source", true);
 	//cc->enable("capture_midi_target", true);
 }
@@ -166,7 +166,7 @@ bool CaptureConsoleModeMidi::insert()
 	int s_start = view->sel.range.start();
 
 	// insert recorded data with some delay
-	int dpos = input->getDelay();
+	int dpos = input->get_delay();
 
 	int i0 = s_start + dpos;
 
@@ -178,18 +178,18 @@ bool CaptureConsoleModeMidi::insert()
 	// insert data
 	target->insertMidiData(i0, midi_events_to_notes(input->midi));
 
-	input->resetAccumulation();
+	input->reset_accumulation();
 	return true;
 }
 
 int CaptureConsoleModeMidi::getSampleCount()
 {
-	return input->getSampleCount();
+	return input->get_sample_count();
 }
 
 bool CaptureConsoleModeMidi::isCapturing()
 {
-	return input->isCapturing();
+	return input->is_capturing();
 }
 
 

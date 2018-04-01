@@ -64,10 +64,10 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(Session *_session, int _sample_rate)
+InputStreamMidi::InputStreamMidi(Session *_session, int __sample_rate)
 {
 	session = _session;
-	sample_rate = _sample_rate;
+	_sample_rate = __sample_rate;
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
@@ -99,7 +99,7 @@ InputStreamMidi::~InputStreamMidi()
 
 void InputStreamMidi::init()
 {
-	setDevice(device_manager->chooseDevice(Device::Type::MIDI_INPUT));
+	set_device(device_manager->chooseDevice(Device::Type::MIDI_INPUT));
 }
 
 bool InputStreamMidi::unconnect()
@@ -117,7 +117,7 @@ bool InputStreamMidi::unconnect()
 	return true;
 }
 
-void InputStreamMidi::setDevice(Device *d)
+void InputStreamMidi::set_device(Device *d)
 {
 	unconnect();
 
@@ -155,7 +155,7 @@ void InputStreamMidi::setDevice(Device *d)
 #endif
 }
 
-Device *InputStreamMidi::getDevice()
+Device *InputStreamMidi::get_device()
 {
 	return device;
 }
@@ -165,19 +165,19 @@ void InputStreamMidi::accumulate(bool enable)
 	accumulating = enable;
 }
 
-void InputStreamMidi::resetAccumulation()
+void InputStreamMidi::reset_accumulation()
 {
 	midi.clear();
 	midi.samples = 0;
 	offset = 0;
 }
 
-int InputStreamMidi::getSampleCount()
+int InputStreamMidi::get_sample_count()
 {
 	return midi.samples;
 }
 
-void InputStreamMidi::clearInputQueue()
+void InputStreamMidi::clear_input_queue()
 {
 #if HAS_LIB_ALSA
 	while (true){
@@ -199,31 +199,31 @@ bool InputStreamMidi::start()
 
 	accumulating = false;
 	offset = 0;
-	resetAccumulation();
+	reset_accumulation();
 
-	clearInputQueue();
+	clear_input_queue();
 
 	timer->reset();
 
-	_startUpdate();
+	_start_update();
 	capturing = true;
 	return true;
 }
 
 void InputStreamMidi::stop()
 {
-	_stopUpdate();
+	_stop_update();
 	capturing = false;
 
 	midi.sanify(Range(0, midi.samples));
 }
 
-int InputStreamMidi::doCapturing()
+int InputStreamMidi::do_capturing()
 {
 	double dt = timer->get();
 	double offset_new = offset + dt;
-	int pos = offset * (double)sample_rate;
-	int pos_new = offset_new * (double)sample_rate;
+	int pos = offset * (double)_sample_rate;
+	int pos_new = offset_new * (double)_sample_rate;
 	current_midi.clear();
 	current_midi.samples = pos_new - pos;
 	//if (accumulating)
@@ -257,22 +257,22 @@ int InputStreamMidi::doCapturing()
 	return current_midi.samples;
 }
 
-bool InputStreamMidi::isCapturing()
+bool InputStreamMidi::is_capturing()
 {
 	return capturing;
 }
 
 
-int InputStreamMidi::getDelay()
+int InputStreamMidi::get_delay()
 {
 	return 0;
 }
 
-void InputStreamMidi::resetSync()
+void InputStreamMidi::reset_sync()
 {
 }
 
-void InputStreamMidi::_startUpdate()
+void InputStreamMidi::_start_update()
 {
 	if (running)
 		return;
@@ -280,7 +280,7 @@ void InputStreamMidi::_startUpdate()
 	running = true;
 }
 
-void InputStreamMidi::_stopUpdate()
+void InputStreamMidi::_stop_update()
 {
 	if (!running)
 		return;
@@ -291,18 +291,18 @@ void InputStreamMidi::_stopUpdate()
 
 void InputStreamMidi::update()
 {
-	if (doCapturing() > 0)
+	if (do_capturing() > 0)
 	{}//	notify(MESSAGE_CAPTURE);
 
-	running = isCapturing();
+	running = is_capturing();
 }
 
-void InputStreamMidi::setBackupMode(int mode)
+void InputStreamMidi::set_backup_mode(int mode)
 {
 	backup_mode = mode;
 }
 
-void InputStreamMidi::setChunkSize(int size)
+void InputStreamMidi::set_chunk_size(int size)
 {
 	if (size > 0)
 		chunk_size = size;
@@ -310,7 +310,7 @@ void InputStreamMidi::setChunkSize(int size)
 		chunk_size = DEFAULT_CHUNK_SIZE;
 }
 
-void InputStreamMidi::setUpdateDt(float dt)
+void InputStreamMidi::set_update_dt(float dt)
 {
 	if (dt > 0)
 		update_dt = dt;

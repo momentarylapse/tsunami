@@ -37,7 +37,7 @@ public:
 		peak_meter = p;
 	}
 	virtual string type(){ return "PeakMeter"; }
-	virtual void set_audio_source(AudioSource *s){ if (peak_meter) peak_meter->setSource(s); }
+	virtual void set_audio_source(AudioSource *s){ if (peak_meter) peak_meter->set_source(s); }
 };
 
 class ModuleOutputStream : public SignalEditor::Module
@@ -49,7 +49,7 @@ public:
 		stream = s;
 	}
 	virtual string type(){ return "OutputStream"; }
-	virtual void set_audio_source(AudioSource *s){ if (stream) stream->setSource(s); }
+	virtual void set_audio_source(AudioSource *s){ if (stream) stream->set_source(s); }
 };
 
 SignalEditor::SignalEditor(Session *session) :

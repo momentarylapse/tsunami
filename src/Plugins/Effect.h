@@ -45,9 +45,9 @@ public:
 		Output(Effect *fx);
 		virtual int _cdecl read(AudioBuffer &buf);
 		virtual void _cdecl reset();
-		virtual int _cdecl getPos(int delta);
-		virtual int _cdecl getSampleRate();
-		void setSource(AudioSource *source);
+		virtual int _cdecl get_pos(int delta);
+		virtual int _cdecl sample_rate();
+		void set_source(AudioSource *source);
 		Effect *fx;
 		AudioSource *source;
 	};

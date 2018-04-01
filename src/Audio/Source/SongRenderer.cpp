@@ -221,7 +221,7 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 	read(buf);
 }
 
-void SongRenderer::allowTracks(const Set<Track*> &_allowed_tracks)
+void SongRenderer::allow_tracks(const Set<Track*> &_allowed_tracks)
 {
 	for (Track *t: _allowed_tracks)
 		if (!allowed_tracks.contains(t))
@@ -308,22 +308,27 @@ void SongRenderer::build_data()
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->out->setSource(m);
+			t->synth->out->set_source(m);
 		}else if (t->type == t->Type::TIME){
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->out->setSource(beat_midifier);
+			t->synth->out->set_source(beat_midifier);
 		}
 	}
 }
 
-int SongRenderer::getSampleRate()
+int SongRenderer::sample_rate()
 {
 	return song->sample_rate;
 }
 
-int SongRenderer::getNumSamples()
+void SongRenderer::reset()
+{
+	reset_state();
+}
+
+int SongRenderer::get_num_samples()
 {
 	if (allow_loop and loop_if_allowed)
 		return -1;
@@ -345,7 +350,7 @@ void SongRenderer::_seek(int _pos)
 		bar_streamer->seek(pos);
 }
 
-int SongRenderer::getPos(int delta)
+int SongRenderer::get_pos(int delta)
 {
 	Range r = range();
 	return loopi(pos + delta, r.start(), r.end());

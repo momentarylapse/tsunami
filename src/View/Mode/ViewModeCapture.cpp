@@ -74,7 +74,7 @@ Selection ViewModeCapture::getHover()
 void ViewModeCapture::drawPost(Painter *c)
 {
 	// capturing preview
-	if (input_audio and input_audio->isCapturing()){
+	if (input_audio and input_audio->is_capturing()){
 		AudioBuffer &buf = export_view_sucker->buf;
 		view->update_peaks(buf);
 		if (capturing_track)
@@ -83,10 +83,10 @@ void ViewModeCapture::drawPost(Painter *c)
 	}
 
 
-	if (input_midi and input_midi->isCapturing()){
+	if (input_midi and input_midi->is_capturing()){
 		if (capturing_track)
 			drawMidi(c, view->get_track(capturing_track), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
-		view->drawTimeLine(c, view->sel.range.start() + input_midi->getSampleCount(), Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+		view->drawTimeLine(c, view->sel.range.start() + input_midi->get_sample_count(), Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 }
 
@@ -119,13 +119,13 @@ void ViewModeCapture::onInputUpdate()
 {
 	if (input_audio){
 		AudioBuffer &buf = export_view_sucker->buf;
-		if (input_audio->isCapturing())
+		if (input_audio->is_capturing())
 			view->cam.makeSampleVisible(view->sel.range.start() + buf.length);
 		view->forceRedraw();
 	}
 	if (input_midi){
-		if (input_midi->isCapturing())
-			view->cam.makeSampleVisible(view->sel.range.start() + input_midi->getSampleCount());
+		if (input_midi->is_capturing())
+			view->cam.makeSampleVisible(view->sel.range.start() + input_midi->get_sample_count());
 		view->forceRedraw();
 	}
 }

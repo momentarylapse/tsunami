@@ -22,20 +22,21 @@ public:
 	virtual ~PeakMeter();
 
 	AudioSource *source;
-	void setSource(AudioSource *s);
+	void set_source(AudioSource *s);
 
 	virtual int _cdecl read(AudioBuffer &buf);
-	virtual int _cdecl getPos(int delta);
-	virtual int _cdecl getSampleRate();
+	virtual int _cdecl get_pos(int delta);
+	virtual int _cdecl sample_rate();
+	virtual void _cdecl reset();
 
-	void setMode(int mode);
+	void set_mode(int mode);
 
 	static const int NUM_SAMPLES;
 
 //private:
-	void clearData();
-	void findPeaks(AudioBuffer &buf);
-	void findSpectrum(AudioBuffer &buf);
+	void clear_data();
+	void find_peaks(AudioBuffer &buf);
+	void find_spectrum(AudioBuffer &buf);
 	void update(AudioBuffer &buf);
 
 	float i_to_freq(int i);
@@ -58,7 +59,7 @@ public:
 	};
 	Data r, l;
 
-	float sample_rate;
+	int _sample_rate;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

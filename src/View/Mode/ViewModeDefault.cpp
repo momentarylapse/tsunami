@@ -607,7 +607,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	if (view->isPlaybackActive()){
 		if (view->renderer->range().is_inside(pos)){
 			view->renderer->seek(pos);
-			view->stream->clearBuffer();
+			view->stream->clear_buffer();
 			hover->type = Selection::Type::PLAYBACK;
 			view->forceRedraw();
 			return;

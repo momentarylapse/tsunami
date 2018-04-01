@@ -363,10 +363,10 @@ void AudioView::updateSelection()
 		sel.range.invert();
 
 
-	renderer->setRange(getPlaybackSelection(false));
+	renderer->set_range(getPlaybackSelection(false));
 	if (isPlaybackActive()){
 		if (renderer->range().is_inside(playbackPos()))
-			renderer->setRange(getPlaybackSelection(false));
+			renderer->set_range(getPlaybackSelection(false));
 		else{
 			stop();
 		}
@@ -1189,7 +1189,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 		stop();
 
 	renderer->prepare(range, allow_loop);
-	renderer->allowTracks(get_playable_tracks());
+	renderer->allow_tracks(get_playable_tracks());
 	playback_active = true;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	stream->play();
@@ -1222,13 +1222,13 @@ bool AudioView::isPlaybackActive()
 bool AudioView::isPaused()
 {
 	if (playback_active)
-		return stream->isPaused();
+		return stream->is_paused();
 	return false;
 }
 
 int AudioView::playbackPos()
 {
-	return stream->getPos();
+	return stream->get_pos();
 }
 
 bool AudioView::hasAnySolo()

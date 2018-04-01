@@ -23,7 +23,7 @@ public:
 	virtual void _cdecl reset();
 	virtual int _cdecl getPos(int delta){ return offset + delta; }
 	void _cdecl seek(int pos);
-	//virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
+	//virtual int _cdecl sample_rate(){ return DEFAULT_SAMPLE_RATE; }
 
 	AudioBuffer *buf;
 	int offset;

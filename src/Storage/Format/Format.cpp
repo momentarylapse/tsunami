@@ -94,7 +94,7 @@ void Format::loadSong(StorageOperationData *od)
 void Format::saveSong(StorageOperationData* od)
 {
 	SongRenderer renderer(od->song);
-	od->num_samples = renderer.getNumSamples();
+	od->num_samples = renderer.get_num_samples();
 	od->renderer = &renderer;
 	saveViaRenderer(od);
 }

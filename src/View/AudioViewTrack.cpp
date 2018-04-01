@@ -1000,6 +1000,6 @@ void AudioViewTrack::drawHeader(Painter *c)
 void AudioViewTrack::setSolo(bool _solo)
 {
 	solo = _solo;
-	view->renderer->allowTracks(view->get_playable_tracks());
+	view->renderer->allow_tracks(view->get_playable_tracks());
 }
 

@@ -136,15 +136,15 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 	if (!preview_synth){
 		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
 		preview_synth->setInstrument(view->cur_track->instrument);
-		preview_synth->out->setSource(preview_source);
+		preview_synth->out->set_source(preview_source);
 	}
 	if (!preview_stream){
 		preview_stream = new OutputStream(view->session, preview_synth->out);
-		preview_stream->setBufferSize(2048);
+		preview_stream->set_buffer_size(2048);
 		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
 
-	preview_source->start(pitch, preview_stream->getSampleRate() * ttl);
+	preview_source->start(pitch, preview_stream->sample_rate() * ttl);
 	preview_stream->play();
 }
 

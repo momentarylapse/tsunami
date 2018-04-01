@@ -156,8 +156,8 @@ class AudioSource
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(AudioBuffer buf)
-	//extern virtual void reset()
-	extern virtual int getSampleRate()
+	extern virtual void reset()
+	extern virtual int sample_rate()
 
 class MidiSource
 	extern void __init__()
@@ -166,9 +166,9 @@ class MidiSource
 
 class SynthOutput extends AudioSource
 	extern override int read(AudioBuffer buf)
-	//extern override void reset()
-	extern override int getSampleRate()
-	extern void setSource(MidiSource* source)
+	extern override void reset()
+	extern override int sample_rate()
+	extern void set_source(MidiSource* source)
 
 class Synthesizer
 	string name
@@ -367,9 +367,9 @@ class SongRenderer
 	extern void prepare(Range r, bool allow_loop)
 	extern virtual int read(AudioBuffer b)
 	extern Range range()
-	extern int getPos()
+	extern int get_pos(int delta)
 	extern int seek()
-	extern virtual int getSampleRate()
+	extern virtual int sample_rate()
 
 
 class OutputStream
@@ -379,12 +379,12 @@ class OutputStream
 	extern void play()
 	extern void pause(bool pause)
 	//extern void setSource(AudioSource *r)
-	extern int getPos()
-	extern float getSampleRate()
-	extern float getVolume()
-	extern void setVolume(float volume)
-	extern void setBufferSize(int size)
-	extern bool isPaused()
+	extern int get_pos()
+	extern int sample_rate()
+	extern float get_volume()
+	extern void set_volume(float volume)
+	extern void set_buffer_size(int size)
+	extern bool is_paused()
 	extern void subscribe(void* handler, void* func, string message)
 	extern void unsubscribe(void* handler)
 
@@ -416,9 +416,9 @@ class InputStreamAudio
 	extern virtual void __delete__()
 	extern bool start()
 	extern void stop()
-	extern bool isCapturing()
-	extern float getSampleRate()
-	extern void setBackupMode(int mode)
+	extern bool is_capturing()
+	extern int sample_rate()
+	extern void set_backup_mode(int mode)
 	extern void subscribe(void* handler, void* func, string message)
 	extern void unsubscribe(void* handler)
 

@@ -44,7 +44,7 @@ void CaptureConsoleModeAudio::onSource()
 	int n = cc->getInt("");
 	if ((n >= 0) and (n < sources.num)){
 		chosen_device = sources[n];
-		input->setDevice(chosen_device);
+		input->set_device(chosen_device);
 	}
 }
 
@@ -101,14 +101,14 @@ void CaptureConsoleModeAudio::enter()
 
 
 	input = new InputStreamAudio(session, song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
-	input->setChunkSize(4096);
-	input->setUpdateDt(0.03f);
+	input->set_backup_mode(BACKUP_MODE_TEMP);
+	input->set_chunk_size(4096);
+	input->set_update_dt(0.03f);
 	view->mode_capture->setInputAudio(input);
 	peak_meter = new PeakMeter(input->source);
 	cc->peak_meter->setSource(peak_meter);
 
-	input->setDevice(chosen_device);
+	input->set_device(chosen_device);
 
 	//enable("capture_audio_source", false);
 
@@ -141,7 +141,7 @@ void CaptureConsoleModeAudio::pause()
 
 void CaptureConsoleModeAudio::start()
 {
-	input->resetSync();
+	input->reset_sync();
 	sucker->accumulate(true);
 	cc->enable("capture_audio_source", false);
 	//cc->enable("capture_audio_target", false);
@@ -165,7 +165,7 @@ bool CaptureConsoleModeAudio::insert()
 	int s_start = view->sel.range.start();
 
 	// insert recorded data with some delay
-	int dpos = input->getDelay();
+	int dpos = input->get_delay();
 
 	// overwrite
 	int i0 = s_start + dpos;
@@ -199,5 +199,5 @@ int CaptureConsoleModeAudio::getSampleCount()
 
 bool CaptureConsoleModeAudio::isCapturing()
 {
-	return input->isCapturing();
+	return input->is_capturing();
 }

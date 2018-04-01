@@ -66,7 +66,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
-	if (vorbis_encode_setup_vbr(&vi, 2, r->getSampleRate(), OggQuality)){
+	if (vorbis_encode_setup_vbr(&vi, 2, r->sample_rate(), OggQuality)){
 		od->error("vorbis_encode_setup_vbr");
 		return;
 	}

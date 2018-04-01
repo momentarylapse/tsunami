@@ -215,10 +215,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
-	renderer = new SongRenderer(song);
-	peak_meter = new PeakMeter(renderer);
+	renderer = session->song_renderer;
+	peak_meter = session->peak_meter;
 	playback_active = false;
-	stream = new OutputStream(session, peak_meter);
+	stream = session->output_stream;
 	stream->subscribe(this, std::bind(&AudioView::onStreamUpdate, this), stream->MESSAGE_UPDATE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamStateChange, this), stream->MESSAGE_STATE_CHANGE);
 	stream->subscribe(this, std::bind(&AudioView::onStreamEndOfStream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
@@ -262,8 +262,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 AudioView::~AudioView()
 {
 	stream->unsubscribe(this);
-	delete(stream);
-	delete(peak_meter);
 
 	song->unsubscribe(this);
 
@@ -274,7 +272,6 @@ AudioView::~AudioView()
 	delete(mode_default);
 
 	delete(peak_thread);
-	delete(renderer);
 
 	delete(dummy_vtrack);
 

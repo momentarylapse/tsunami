@@ -19,6 +19,10 @@ class TsunamiPlugin;
 class DeviceManager;
 class PluginManager;
 class PerformanceMonitor;
+class SignalChain;
+class SongRenderer;
+class PeakMeter;
+class OutputStream;
 namespace hui{
 	class Window;
 }
@@ -40,6 +44,11 @@ public:
 	Song *song;
 	AudioView *view;
 	Storage *storage;
+
+	SignalChain *signal_chain;
+	SongRenderer *song_renderer;
+	PeakMeter *peak_meter;
+	OutputStream *output_stream;
 
 	Array<TsunamiPlugin*> plugins;
 	bool die_on_plugin_stop;

@@ -15,12 +15,13 @@
 #include "Stuff/Clipboard.h"
 #include "Stuff/PerformanceMonitor.h"
 #include "Stuff/BackupManager.h"
+#include "Stuff/SignalChain.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.5.1";
+const string AppVersion = "0.7.5.9 x";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -166,6 +167,8 @@ Session* Tsunami::createSession()
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
 	session->song = new Song(session);
+
+	session->signal_chain = SignalChain::create_default(session);
 
 	session->setWin(new TsunamiWindow(session));
 	session->win->auto_delete = true;

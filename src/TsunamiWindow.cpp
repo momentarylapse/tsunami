@@ -274,7 +274,6 @@ void TsunamiWindow::onDestroy()
 	delete(mini_bar);
 	delete(bottom_bar);
 	delete(view);
-	delete(song);
 
 	hui::RunLater(0.010f, &TsunamiCleanUp);
 }

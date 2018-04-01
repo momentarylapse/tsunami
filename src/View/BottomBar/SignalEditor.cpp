@@ -39,6 +39,23 @@ void SignalEditor::onMouseMove()
 {
 }
 
+const float MODULE_WIDTH = 160;
+const float MODULE_HEIGHT = 25;
+
+static rect module_rect(SignalChain::Module *m)
+{
+	return rect(m->x, m->x + MODULE_WIDTH, m->y, m->y + MODULE_HEIGHT);
+}
+
+static color signal_color(int type)
+{
+	if (type == Track::Type::AUDIO)
+		return Red;
+	if (type == Track::Type::MIDI)
+		return Green;
+	return White;
+}
+
 void SignalEditor::onDraw(Painter* p)
 {
 	int w = p->width;
@@ -48,12 +65,31 @@ void SignalEditor::onDraw(Painter* p)
 	p->setFontSize(12);
 
 	for (auto *m: chain->modules){
-		p->setColor(view->colors.text_soft1);
-		p->setFill(false);
-		p->drawRect(m->x, m->y, 160, 25);
-		p->setFill(true);
+		p->setColor(view->colors.background_track_selected);
+		p->setRoundness(view->CORNER_RADIUS);
+		p->drawRect(module_rect(m));
+		p->setRoundness(0);
 		float ww = p->getStrWidth(m->type());
-		p->drawStr(m->x + 80 - ww/2, m->y + 4, m->type());
+		p->setColor(view->colors.text_soft1);
+		p->drawStr(m->x + MODULE_WIDTH/2 - ww/2, m->y + 4, m->type());
+
+		foreachi(int t, m->port_in, i){
+			p->setColor(signal_color(t));
+			p->drawCircle(m->x - 5, m->y + MODULE_HEIGHT/2 + i*15, 4);
+		}
+		foreachi(int t, m->port_out, i){
+			p->setColor(signal_color(t));
+			p->drawCircle(m->x + MODULE_WIDTH + 5, m->y + MODULE_HEIGHT/2 + i*15, 4);
+		}
+	}
+
+	for (auto *c: chain->cables){
+		float x0 = c->source->x + MODULE_WIDTH + 5;
+		float y0 = c->source->y + MODULE_HEIGHT/2;
+		float x1 = c->target->x - 5;
+		float y1 = c->target->y + MODULE_HEIGHT/2;
+		p->setColor(signal_color(c->type));
+		p->drawLine(x0, y0, x1, y1);
 	}
 }
 

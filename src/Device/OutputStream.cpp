@@ -415,6 +415,8 @@ void OutputStream::pause(bool __pause)
 
 void OutputStream::_read_stream()
 {
+	if (!source)
+		return;
 //	printf("read stream\n");
 	reading = true;
 	read_more = false;

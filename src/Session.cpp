@@ -11,9 +11,7 @@
 #include "Stuff/SignalChain.h"
 #include "Storage/Storage.h"
 #include "Plugins/TsunamiPlugin.h"
-#include "Audio/Source/SongRenderer.h"
-#include "Audio/PeakMeter.h"
-#include "Device/OutputStream.h"
+#include "Data/Song.h"
 #include "lib/hui/hui.h"
 
 int Session::next_id = 0;
@@ -43,12 +41,6 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 
 Session::~Session()
 {
-	if (output_stream)
-		delete(output_stream);
-	if (peak_meter)
-		delete(peak_meter);
-	if (song_renderer)
-		delete(song_renderer);
 	if (signal_chain)
 		delete(signal_chain);
 	if (song)

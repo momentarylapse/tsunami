@@ -14,6 +14,7 @@
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "PluginManager.h"
+#include "Plugin.h"
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
@@ -174,6 +175,9 @@ Configurable::Configurable(Session *_session, int type)
 	configurable_type = type;
 	session = _session;
 	song = NULL;
+	usable = true;
+	plugin = NULL;
+	enabled = true;
 }
 
 Configurable::~Configurable()
@@ -277,6 +281,14 @@ ConfigPanel *Configurable::create_panel()
 		return NULL;
 	return new AutoConfigPanel(aa, this);
 }
+
+string Configurable::getError()
+{
+	if (plugin)
+		return plugin->get_error();
+	return format(_("Can't load %s: \"%s\""), type_to_name(configurable_type).c_str(), name.c_str());
+}
+
 
 /*void Configurable::updateDialog()
 {

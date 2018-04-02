@@ -190,7 +190,11 @@ void SignalEditor::onKeyDown()
 
 void SignalEditor::onAddAudioSource()
 {
-	//chain->addAudioSource(...);
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_SOURCE, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addAudioSource(dlg->_return);
+	delete(dlg);
 }
 
 void SignalEditor::onAddAudioEffect()
@@ -214,7 +218,11 @@ void SignalEditor::onAddAudioInputStream()
 
 void SignalEditor::onAddMidiSource()
 {
-	chain->addMidiSource("test");
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_SOURCE, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addMidiSource(dlg->_return);
+	delete(dlg);
 }
 
 void SignalEditor::onAddMidiEffect()
@@ -242,7 +250,11 @@ void SignalEditor::onAddMidiInputStream()
 
 void SignalEditor::onAddBeatSource()
 {
-	chain->addBeatSource("test");
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::BEAT_SOURCE, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addBeatSource(dlg->_return);
+	delete(dlg);
 }
 
 void SignalEditor::onAddBeatMidifier()

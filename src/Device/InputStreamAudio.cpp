@@ -133,18 +133,13 @@ int InputStreamAudio::Source::read(AudioBuffer &buf)
 	return r;
 }
 
-int InputStreamAudio::Source::sample_rate()
-{
-	return stream->sample_rate();
-}
 
-
-InputStreamAudio::InputStreamAudio(Session *_session, int __sample_rate) :
+InputStreamAudio::InputStreamAudio(Session *_session) :
 	buffer(1048576)
 {
 //	printf("input new\n");
 	session = _session;
-	_sample_rate = __sample_rate;
+	_sample_rate = session->sample_rate();
 	chunk_size = -1;
 	update_dt = -1;
 	update_dt = DEFAULT_UPDATE_TIME;
@@ -182,9 +177,9 @@ InputStreamAudio::~InputStreamAudio()
 	stop();
 }
 
-void InputStreamAudio::__init__(Session *session, int _sample_rate)
+void InputStreamAudio::__init__(Session *session)
 {
-	new(this) InputStreamAudio(session, _sample_rate);
+	new(this) InputStreamAudio(session);
 }
 
 void InputStreamAudio::__delete__()

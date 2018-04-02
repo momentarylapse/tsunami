@@ -24,7 +24,6 @@ public:
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
 	virtual void _cdecl reset(){}
 	virtual int _cdecl get_pos(int delta){ return -1; }
-	virtual int _cdecl sample_rate(){ return DEFAULT_SAMPLE_RATE; }
 
 	static const int END_OF_STREAM;
 	static const int NOT_ENOUGH_DATA;

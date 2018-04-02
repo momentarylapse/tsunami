@@ -47,6 +47,13 @@ Session::~Session()
 		delete(song);
 }
 
+int Session::sample_rate()
+{
+	if (song)
+		return song->sample_rate;
+	return DEFAULT_SAMPLE_RATE;
+}
+
 void Session::setWin(TsunamiWindow *_win)
 {
 	win = _win;

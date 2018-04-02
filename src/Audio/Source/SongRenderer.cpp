@@ -194,7 +194,7 @@ int SongRenderer::read(AudioBuffer &buf)
 {
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
-		return END_OF_STREAM;
+		return AudioPort::END_OF_STREAM;
 
 	if (song->curves.num >= 0){
 		int chunk = 128;
@@ -316,11 +316,6 @@ void SongRenderer::build_data()
 			t->synth->set_source(beat_midifier);
 		}
 	}
-}
-
-int SongRenderer::sample_rate()
-{
-	return song->sample_rate;
 }
 
 void SongRenderer::reset()

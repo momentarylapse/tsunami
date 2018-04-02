@@ -37,7 +37,7 @@ SongPlugin *CreateSongPlugin(Session *session, const string &name)
 	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::SONG_PLUGIN, name);
 	SongPlugin *sp = NULL;
 	if (p->usable)
-		sp = (SongPlugin*)p->createInstance(session, "SongPlugin");
+		sp = (SongPlugin*)p->create_instance(session, "SongPlugin");
 
 	// dummy?
 	if (!sp)

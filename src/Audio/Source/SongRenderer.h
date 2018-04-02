@@ -8,14 +8,14 @@
 #ifndef SRC_AUDIO_SOURCE_SONGRENDERER_H_
 #define SRC_AUDIO_SOURCE_SONGRENDERER_H_
 
-#include "AudioPort.h"
+#include "AudioSource.h"
 
 class MidiSource;
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
 
-class SongRenderer : public AudioPort
+class SongRenderer : public AudioSource
 {
 public:
 	SongRenderer(Song *s);
@@ -26,7 +26,6 @@ public:
 
 	// from AudioSource
 	virtual int _cdecl read(AudioBuffer &buf);
-	virtual int _cdecl sample_rate();
 	virtual void _cdecl reset();
 	virtual int _cdecl get_pos(int delta);
 

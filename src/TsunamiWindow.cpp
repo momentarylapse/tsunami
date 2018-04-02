@@ -876,7 +876,7 @@ void TsunamiWindow::onExport()
 		SongRenderer renderer(song);
 		renderer.prepare(view->getPlaybackSelection(false), false);
 		renderer.allow_tracks(view->get_selected_tracks());
-		session->storage->saveViaRenderer(&renderer, hui::Filename, renderer.get_num_samples(), song->tags);
+		session->storage->saveViaRenderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags);
 	}
 }
 

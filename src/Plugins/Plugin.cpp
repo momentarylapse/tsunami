@@ -31,12 +31,12 @@ Plugin::Plugin(const string &_filename, int _type)
 	}
 }
 
-string Plugin::getError()
+string Plugin::get_error()
 {
 	return format(_("Error in script file: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
 }
 
-void *Plugin::createInstance(Session *session, const string &root_type)
+void *Plugin::create_instance(Session *session, const string &root_type)
 {
 	if (!usable)
 		return NULL;

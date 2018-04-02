@@ -10,6 +10,7 @@
 #include "FormatOgg.h"
 
 #include "../../Audio/Source/AudioPort.h"
+#include "../../Session.h"
 
 #ifndef OS_WINDOWS
 #include <vorbis/codec.h>
@@ -66,7 +67,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
-	if (vorbis_encode_setup_vbr(&vi, 2, r->sample_rate(), OggQuality)){
+	if (vorbis_encode_setup_vbr(&vi, 2, od->session->sample_rate(), OggQuality)){
 		od->error("vorbis_encode_setup_vbr");
 		return;
 	}

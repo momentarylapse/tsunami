@@ -32,11 +32,6 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	Plugin *plugin;
-	bool usable;
-	bool enabled;
-
-	// context
 	int sample_rate;
 
 	class Output : public AudioPort
@@ -46,7 +41,6 @@ public:
 		virtual int _cdecl read(AudioBuffer &buf);
 		virtual void _cdecl reset();
 		virtual int _cdecl get_pos(int delta);
-		virtual int _cdecl sample_rate();
 		AudioEffect *fx;
 	};
 	Output *out;
@@ -57,8 +51,6 @@ public:
 	virtual void _cdecl process(AudioBuffer &buf){};
 
 	void do_process_track(Track *t, int layer, const Range &r);
-
-	string getError();
 };
 
 AudioEffect *_cdecl CreateAudioEffect(Session *session, const string &name);

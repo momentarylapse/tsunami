@@ -15,6 +15,7 @@
 #include "../Plugins/PluginManager.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Source/SongRenderer.h"
+#include "../Audio/Source/AudioSource.h"
 #include "../Audio/PeakMeter.h"
 #include "../Audio/AudioJoiner.h"
 #include "../Midi/MidiSource.h"
@@ -34,15 +35,15 @@ SignalChain::Module::Module()
 class ModuleAudioSource : public SignalChain::Module
 {
 public:
-	AudioPort *source;
-	ModuleAudioSource(AudioPort *s)
+	AudioSource *source;
+	ModuleAudioSource(AudioSource *s)
 	{
 		source = s;
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioSource(){ delete source; }
 	virtual string type(){ return "AudioSource"; }
-	virtual AudioPort *audio_socket(int port){ return source; }
+	virtual AudioPort *audio_socket(int port){ return source->out; }
 };
 
 class ModuleSongRenderer : public SignalChain::Module
@@ -56,7 +57,7 @@ public:
 	}
 	virtual ~ModuleSongRenderer(){ delete renderer; }
 	virtual string type(){ return "SongRenderer"; }
-	virtual AudioPort *audio_socket(int port){ return renderer; }
+	virtual AudioPort *audio_socket(int port){ return renderer->out; }
 };
 
 class ModulePeakMeter : public SignalChain::Module
@@ -72,7 +73,7 @@ public:
 	virtual ~ModulePeakMeter(){ delete peak_meter; }
 	virtual string type(){ return "PeakMeter"; }
 	virtual void set_audio_source(int port, AudioPort *s){ peak_meter->set_source(s); }
-	virtual AudioPort *audio_socket(int port){ return peak_meter; }
+	virtual AudioPort *audio_socket(int port){ return peak_meter->out; }
 };
 
 class ModuleAudioJoiner : public SignalChain::Module
@@ -95,7 +96,7 @@ public:
 		else if (port == 1)
 			joiner->set_source_b(s);
 	}
-	virtual AudioPort *audio_socket(int port){ return joiner; }
+	virtual AudioPort *audio_socket(int port){ return joiner->out; }
 };
 
 class ModuleOutputStream : public SignalChain::Module
@@ -487,8 +488,7 @@ SignalChain::Module* SignalChain::addSongRenderer()
 
 SignalChain::Module* SignalChain::addAudioSource(const string &name)
 {
-	return NULL;
-	//return add(new ModuleAudioSource(s));
+	return add(new ModuleAudioSource(CreateAudioSource(session, name)));
 }
 
 SignalChain::Module* SignalChain::addMidiSource(const string &name)
@@ -509,17 +509,17 @@ SignalChain::Module* SignalChain::addAudioEffect(const string &name)
 
 SignalChain::Module* SignalChain::addAudioJoiner()
 {
-	return add(new ModuleAudioJoiner(new AudioJoiner(NULL, NULL)));
+	return add(new ModuleAudioJoiner(new AudioJoiner));
 }
 
 SignalChain::Module* SignalChain::addPeakMeter()
 {
-	return add(new ModulePeakMeter(new PeakMeter(NULL)));
+	return add(new ModulePeakMeter(new PeakMeter(session)));
 }
 
 SignalChain::Module* SignalChain::addAudioInputStream()
 {
-	return add(new ModuleAudioInputStream(new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)));
+	return add(new ModuleAudioInputStream(new InputStreamAudio(session)));
 }
 
 SignalChain::Module* SignalChain::addAudioOutputStream()
@@ -539,7 +539,7 @@ SignalChain::Module* SignalChain::addSynthesizer(const string &name)
 
 SignalChain::Module* SignalChain::addMidiInputStream()
 {
-	return add(new ModuleMidiInputStream(new InputStreamMidi(session, DEFAULT_SAMPLE_RATE)));
+	return add(new ModuleMidiInputStream(new InputStreamMidi(session)));
 }
 
 SignalChain::Module* SignalChain::addBeatMidifier()

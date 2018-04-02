@@ -57,6 +57,7 @@ public:
 	void executeTsunamiPlugin(const string &name);
 	void onPluginStopRequest(VirtualBase *o);
 
+	int sample_rate();
 
 	// global
 	Log *log;

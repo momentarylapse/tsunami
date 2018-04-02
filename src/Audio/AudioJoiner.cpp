@@ -7,57 +7,54 @@
 
 #include "AudioJoiner.h"
 
-AudioJoiner::AudioJoiner(AudioPort* _a, AudioPort* _b)
+AudioJoiner::AudioJoiner()
 {
-	a = _a;
-	b = _b;
+	out = new Output(this);
+	a = NULL;
+	b = NULL;
 }
 
 AudioJoiner::~AudioJoiner()
 {
 }
 
-int AudioJoiner::read(AudioBuffer& buf)
+int AudioJoiner::Output::read(AudioBuffer& buf)
 {
-	if (a and b){
-		int ra = a->read(buf);
+	if (joiner->a and joiner->b){
+		int ra = joiner->a->read(buf);
 		AudioBuffer buf_b;
 		buf_b.resize(buf.length);
-		int rb = b->read(buf_b);
+		int rb = joiner->b->read(buf_b);
 		buf.add(buf_b, 0, 1, 0);
 		return max(ra, rb);
-	}else if (a){
-		return a->read(buf);
-	}else if (b){
-		return b->read(buf);
+	}else if (joiner->a){
+		return joiner->a->read(buf);
+	}else if (joiner->b){
+		return joiner->b->read(buf);
 	}
 	return buf.length;
 }
 
-void AudioJoiner::reset()
+AudioJoiner::Output::Output(AudioJoiner *j)
 {
-	if (a)
-		a->reset();
-	if (b)
-		b->reset();
+	joiner = j;
 }
 
-int AudioJoiner::get_pos(int delta)
+void AudioJoiner::Output::reset()
 {
-	if (a)
-		return a->get_pos(delta);
-	if (b)
-		return b->get_pos(delta);
+	if (joiner->a)
+		joiner->a->reset();
+	if (joiner->b)
+		joiner->b->reset();
+}
+
+int AudioJoiner::Output::get_pos(int delta)
+{
+	if (joiner->a)
+		return joiner->a->get_pos(delta);
+	if (joiner->b)
+		return joiner->b->get_pos(delta);
 	return 0;
-}
-
-int AudioJoiner::sample_rate()
-{
-	if (a)
-		return a->sample_rate();
-	if (b)
-		return b->sample_rate();
-	return DEFAULT_SAMPLE_RATE;
 }
 
 void AudioJoiner::set_source_a(AudioPort* _a)

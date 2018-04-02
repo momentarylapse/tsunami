@@ -13,8 +13,8 @@
 #include "../Stuff/Observable.h"
 
 namespace Kaba{
-class Script;
-class Class;
+	class Script;
+	class Class;
 };
 
 namespace hui{
@@ -36,6 +36,7 @@ public:
 class ConfigPanel;
 class Session;
 class Song;
+class Plugin;
 
 class Configurable : public Observable<VirtualBase>
 {
@@ -66,6 +67,12 @@ public:
 	string name;
 	Session *session;
 	Song *song;
+
+
+	Plugin *plugin;
+	bool usable;
+	bool enabled;
+	string getError();
 
 
 	enum Type

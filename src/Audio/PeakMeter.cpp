@@ -10,6 +10,7 @@
 #include "RingBuffer.h"
 #include "../Plugins/FastFourierTransform.h"
 #include "../lib/hui/hui.h"
+#include "../Session.h"
 
 
 const int PeakMeter::NUM_SAMPLES = 1024;
@@ -46,11 +47,17 @@ void PeakMeter::Data::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::PeakMeter(AudioPort *s)
+PeakMeter::Output::Output(PeakMeter *p)
 {
-	source = s;
+	peak_meter = p;
+}
+
+PeakMeter::PeakMeter(Session *s)
+{
+	session = s;
+	source = NULL;
 	mode = MODE_PEAKS;
-	_sample_rate = DEFAULT_SAMPLE_RATE;
+	out = new Output(this);
 	r.reset();
 	l.reset();
 }
@@ -66,7 +73,7 @@ inline float nice_peak(float p)
 
 void PeakMeter::find_peaks(AudioBuffer &buf)
 {
-	float dt = (float)buf.length / (float)_sample_rate;
+	float dt = (float)buf.length / (float)session->sample_rate();
 	r.update(buf.c[0], dt);
 	l.update(buf.c[1], dt);
 }
@@ -94,11 +101,12 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 	FastFourierTransform::fft_r2c(buf.c[1], cl);
 	r.spec.resize(SPECTRUM_SIZE);
 	l.spec.resize(SPECTRUM_SIZE);
+	float sample_rate = (float)session->sample_rate();
 	for (int i=0;i<SPECTRUM_SIZE;i++){
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
-		int n0 = f0 * buf.length / (float)_sample_rate;
-		int n1 = max((int)(f1 * buf.length / (float)_sample_rate), n0 + 1);
+		int n0 = f0 * buf.length / sample_rate;
+		int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){
@@ -111,7 +119,6 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 
 void PeakMeter::update(AudioBuffer &buf)
 {
-	_sample_rate = source->sample_rate();
 	//clearData();
 	if (mode == MODE_PEAKS)
 		find_peaks(buf);
@@ -126,33 +133,26 @@ void PeakMeter::set_source(AudioPort* s)
 	source = s;
 }
 
-int PeakMeter::read(AudioBuffer& buf)
+int PeakMeter::Output::read(AudioBuffer& buf)
 {
-	if (!source)
+	if (!peak_meter->source)
 		return 0;
-	int r = source->read(buf);
-	update(buf);
+	int r = peak_meter->source->read(buf);
+	peak_meter->update(buf);
 	return r;
 }
 
-int PeakMeter::get_pos(int delta)
+int PeakMeter::Output::get_pos(int delta)
 {
-	if (!source)
+	if (!peak_meter->source)
 		return 0;
-	return source->get_pos(delta);
+	return peak_meter->source->get_pos(delta);
 }
 
-int PeakMeter::sample_rate()
+void PeakMeter::Output::reset()
 {
-	if (!source)
-		return DEFAULT_SAMPLE_RATE;
-	return source->sample_rate();
-}
-
-void PeakMeter::reset()
-{
-	if (source)
-		source->reset();
-	clear_data();
-	notify();
+	if (peak_meter->source)
+		peak_meter->source->reset();
+	peak_meter->clear_data();
+	peak_meter->notify();
 }

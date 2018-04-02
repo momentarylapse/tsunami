@@ -10,16 +10,23 @@
 
 #include "Source/AudioPort.h"
 
-class AudioJoiner : public AudioPort
+class AudioJoiner : public VirtualBase
 {
 public:
-	AudioJoiner(AudioPort *a, AudioPort *b);
+	AudioJoiner();
 	virtual ~AudioJoiner();
 
-	virtual int _cdecl read(AudioBuffer &buf);
-	virtual void _cdecl reset();
-	virtual int _cdecl get_pos(int delta);
-	virtual int _cdecl sample_rate();
+	class Output : public AudioPort
+	{
+	public:
+		Output(AudioJoiner *j);
+		virtual ~Output(){}
+		virtual int _cdecl read(AudioBuffer &buf);
+		virtual void _cdecl reset();
+		virtual int _cdecl get_pos(int delta);
+		AudioJoiner *joiner;
+	};
+	Output *out;
 
 	AudioPort *a, *b;
 	void _cdecl set_source_a(AudioPort *a);

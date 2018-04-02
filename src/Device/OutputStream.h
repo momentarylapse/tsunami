@@ -73,10 +73,6 @@ public:
 
 	void _cdecl clear_buffer();
 
-
-	// PeakMeterSource
-	int _cdecl sample_rate();
-
 	float _cdecl get_volume();
 	void _cdecl set_volume(float _volume);
 

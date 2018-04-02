@@ -289,7 +289,7 @@ void OutputStream::__delete__()
 
 void OutputStream::_create_dev()
 {
-	dev_sample_rate = source->sample_rate();
+	dev_sample_rate = session->sample_rate();
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
@@ -561,11 +561,6 @@ void OutputStream::set_volume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
-}
-
-int OutputStream::sample_rate()
-{
-	return source->sample_rate();
 }
 
 bool OutputStream::_pulse_test_error(const string &msg)

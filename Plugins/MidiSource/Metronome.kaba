@@ -1,4 +1,4 @@
-use "../../api.kaba"
+use "../api.kaba"
 
 class MetronomeSource extends MidiSource
 

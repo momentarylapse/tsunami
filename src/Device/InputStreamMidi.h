@@ -28,7 +28,7 @@ class InputStreamMidi : public Observable<VirtualBase>
 {
 public:
 
-	InputStreamMidi(Session *session, int sample_rate);
+	InputStreamMidi(Session *session);
 	virtual ~InputStreamMidi();
 
 	void _cdecl init();

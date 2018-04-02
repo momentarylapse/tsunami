@@ -1,0 +1,73 @@
+/*
+ * AudioSource.cpp
+ *
+ *  Created on: 02.04.2018
+ *      Author: michi
+ */
+
+#include "AudioSource.h"
+#include "../../Session.h"
+#include "../../Plugins/Plugin.h"
+#include "../../Plugins/PluginManager.h"
+
+AudioSource::AudioSource() :
+	Configurable(Session::GLOBAL, Configurable::Type::AUDIO_SOURCE)
+{
+	out = new Output(this);
+}
+
+AudioSource::~AudioSource()
+{
+	delete out;
+}
+
+void AudioSource::__init__()
+{
+	new(this) AudioSource;
+}
+
+void AudioSource::__delete__()
+{
+	this->AudioSource::~AudioSource();
+}
+
+AudioSource::Output::Output(AudioSource *s)
+{
+	source = s;
+}
+
+int AudioSource::Output::read(AudioBuffer& buf)
+{
+	return source->read(buf);
+}
+
+void AudioSource::Output::reset()
+{
+	source->reset();
+}
+
+int AudioSource::Output::get_pos(int delta)
+{
+	return source->get_pos(delta);
+}
+
+// TODO: move to PluginManager?
+AudioSource *CreateAudioSource(Session *session, const string &name)
+{
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_SOURCE, name);
+	AudioSource *s = NULL;
+	if (p->usable)
+		s = (AudioSource*)p->create_instance(session, "AudioSource");
+
+	// dummy?
+	if (!s)
+		s = new AudioSource;
+
+	s->name = name;
+	s->plugin = p;
+	s->usable = p->usable;
+	s->song = session->song;
+	s->session = session;
+	s->reset_config();
+	return s;
+}

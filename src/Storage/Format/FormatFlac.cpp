@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "../../Audio/Source/AudioPort.h"
+#include "../../Session.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 
@@ -192,7 +193,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			throw Exception("could not set channels");
 		if (!FLAC__stream_encoder_set_bits_per_sample(encoder, bits))
 			throw Exception("could not set bits per sample");
-		if (!FLAC__stream_encoder_set_sample_rate(encoder, r->sample_rate()))
+		if (!FLAC__stream_encoder_set_sample_rate(encoder, od->session->sample_rate()))
 			throw Exception("could not set sample rate");
 		if (!FLAC__stream_encoder_set_total_samples_estimate(encoder, od->get_num_samples()))
 			throw Exception("could not set total samples estimate");

@@ -13,21 +13,31 @@
 
 class PeakMeterDisplay;
 class AudioBuffer;
+class Session;
 
-class PeakMeter : public Observable<AudioPort>
+class PeakMeter : public Observable<VirtualBase>
 {
 	friend class PeakMeterDisplay;
 public:
-	PeakMeter(AudioPort *s);
+	PeakMeter(Session *s);
 	virtual ~PeakMeter();
 
 	AudioPort *source;
 	void set_source(AudioPort *s);
 
-	virtual int _cdecl read(AudioBuffer &buf);
-	virtual int _cdecl get_pos(int delta);
-	virtual int _cdecl sample_rate();
-	virtual void _cdecl reset();
+	class Output : public AudioPort
+	{
+	public:
+		Output(PeakMeter *p);
+		virtual ~Output(){}
+		virtual int _cdecl read(AudioBuffer &buf);
+		virtual int _cdecl get_pos(int delta);
+		virtual void _cdecl reset();
+		PeakMeter *peak_meter;
+	};
+	Output *out;
+
+	Session *session;
 
 	void set_mode(int mode);
 
@@ -58,8 +68,6 @@ public:
 		float get_sp();
 	};
 	Data r, l;
-
-	int _sample_rate;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

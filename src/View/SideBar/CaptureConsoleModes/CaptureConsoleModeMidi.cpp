@@ -64,8 +64,9 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->set_source(input->out);
-	peak_meter = new PeakMeter(preview_synth->out);
-	preview_stream = new OutputStream(session, peak_meter);
+	peak_meter = new PeakMeter(session);
+	peak_meter->set_source(preview_synth->out);
+	preview_stream = new OutputStream(session, peak_meter->out);
 	preview_stream->set_buffer_size(512);
 	preview_stream->play();
 	view->setCurTrack(target);
@@ -106,7 +107,7 @@ void CaptureConsoleModeMidi::enter()
 		cc->addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	//cc->addString("capture_midi_target", _("  - create new track -"));
 
-	input = new InputStreamMidi(session, song->sample_rate);
+	input = new InputStreamMidi(session);
 	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
 	view->mode_capture->setInputMidi(input);

@@ -48,8 +48,11 @@ public:
 	string SelectFavoriteName(hui::Window *win, Configurable *c, bool save);
 
 	Array<string> FindSynthesizers();
-	Array<string> FindEffects();
+	Array<string> FindAudioSources();
+	Array<string> FindAudioEffects();
+	Array<string> FindMidiSources();
 	Array<string> FindMidiEffects();
+	Array<string> FindBeatSources();
 	Array<string> FindConfigurable(int type);
 	Synthesizer *__LoadSynthesizer(Session *session, const string &name);
 	Synthesizer *CreateSynthesizer(Session *session, const string &name);

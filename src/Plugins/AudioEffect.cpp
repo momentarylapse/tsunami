@@ -10,7 +10,6 @@
 #include "Plugin.h"
 #include "../Session.h"
 #include "../lib/math/math.h"
-#include "../Stuff/Log.h"
 #include "PluginManager.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
@@ -24,6 +23,7 @@ int AudioEffect::Output::read(AudioBuffer &buf)
 {
 	if (!fx->source)
 		return buf.length;
+	fx->sample_rate = fx->session->sample_rate();
 	int samples = fx->source->read(buf);
 	fx->process(buf);
 	return samples;
@@ -43,20 +43,12 @@ int AudioEffect::Output::get_pos(int delta)
 	return fx->source->get_pos(delta);
 }
 
-int AudioEffect::Output::sample_rate()
-{
-	return fx->sample_rate;
-}
-
 AudioEffect::AudioEffect() :
 	Configurable(Session::GLOBAL, Type::AUDIO_EFFECT)
 {
-	usable = true;
-	plugin = NULL;
-	enabled = true;
-	sample_rate = DEFAULT_SAMPLE_RATE;
 	source = NULL;
 	out = new Output(this);
+	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
 AudioEffect::~AudioEffect()
@@ -77,28 +69,11 @@ void AudioEffect::__delete__()
 void AudioEffect::set_source(AudioPort *_source)
 {
 	source = _source;
-	if (source)
-		sample_rate = source->sample_rate();
 }
-
-/*void Effect::prepare()
-{
-	resetState();
-}*/
-
-string AudioEffect::getError()
-{
-	if (plugin)
-		return plugin->getError();
-	return format(_("Can't load effect: \"%s\""), name.c_str());
-}
-
-
 
 void AudioEffect::do_process_track(Track *t, int layer, const Range &r)
 {
 	sample_rate = t->song->sample_rate;
-
 	AudioBuffer buf = t->getBuffers(layer, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, layer, r);
 	process(buf);
@@ -109,10 +84,10 @@ void AudioEffect::do_process_track(Track *t, int layer, const Range &r)
 // TODO: move to PluginManager?
 AudioEffect *CreateAudioEffect(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::EFFECT, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_EFFECT, name);
 	AudioEffect *fx = NULL;
 	if (p->usable)
-		fx = (AudioEffect*)p->createInstance(session, "AudioEffect");
+		fx = (AudioEffect*)p->create_instance(session, "AudioEffect");
 
 	// dummy?
 	if (!fx)

@@ -100,12 +100,13 @@ void CaptureConsoleModeAudio::enter()
 			setTarget((Track*)t);
 
 
-	input = new InputStreamAudio(session, song->sample_rate);
+	input = new InputStreamAudio(session);
 	input->set_backup_mode(BACKUP_MODE_TEMP);
 	input->set_chunk_size(4096);
 	input->set_update_dt(0.03f);
 	view->mode_capture->setInputAudio(input);
-	peak_meter = new PeakMeter(input->out);
+	peak_meter = new PeakMeter(session);
+	peak_meter->set_source(input->out);
 	cc->peak_meter->setSource(peak_meter);
 
 	input->set_device(chosen_device);
@@ -119,7 +120,7 @@ void CaptureConsoleModeAudio::enter()
 		return;*/
 	}
 
-	sucker = new AudioSucker(peak_meter);
+	sucker = new AudioSucker(peak_meter->out);
 	sucker->start();
 	export_view_sucker = sucker;
 }

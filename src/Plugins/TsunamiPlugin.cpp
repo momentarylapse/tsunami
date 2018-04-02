@@ -62,7 +62,7 @@ TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 	TsunamiPlugin *t = NULL;
 
 	if (p->usable)
-		t = (TsunamiPlugin*)p->createInstance(session, "TsunamiPlugin");
+		t = (TsunamiPlugin*)p->create_instance(session, "TsunamiPlugin");
 
 	// dummy?
 	if (!t)

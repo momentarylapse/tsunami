@@ -64,10 +64,10 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(Session *_session, int __sample_rate)
+InputStreamMidi::InputStreamMidi(Session *_session)
 {
 	session = _session;
-	_sample_rate = __sample_rate;
+	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;

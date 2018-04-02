@@ -36,9 +36,6 @@ public:
 
 	bool only_on_selection;
 	Range range;
-	Plugin *plugin;
-	bool usable;
-	bool enabled;
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
@@ -46,8 +43,6 @@ public:
 
 	void prepare();
 	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);
-
-	string GetError();
 
 	int bh_offset;
 	void note(float pitch, float volume, int beats);

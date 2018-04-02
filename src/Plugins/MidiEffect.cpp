@@ -44,14 +44,7 @@ void MidiEffect::prepare()
 {
 	reset_state();
 	if (!usable)
-		session->e(GetError());
-}
-
-string MidiEffect::GetError()
-{
-	if (plugin)
-		return plugin->getError();
-	return format(_("Can not load MidiEffect: \"%s\""), name.c_str());
+		session->e(getError());
 }
 
 void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
@@ -62,7 +55,7 @@ void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			session->e(_("While applying a midi effect: ") + GetError());
+			session->e(_("While applying a midi effect: ") + getError());
 	}
 }
 
@@ -148,7 +141,7 @@ MidiEffect *CreateMidiEffect(Session *session, const string &name)
 	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::MIDI_EFFECT, name);
 	MidiEffect *fx = NULL;
 	if (p->usable)
-		fx = (MidiEffect*)p->createInstance(session, "MidiEffect");
+		fx = (MidiEffect*)p->create_instance(session, "MidiEffect");
 
 	// dummy?
 	if (!fx)

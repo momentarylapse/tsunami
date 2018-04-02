@@ -8,6 +8,7 @@
 #include "FormatWave.h"
 
 #include "../../Audio/Source/AudioPort.h"
+#include "../../Session.h"
 #include "../../lib/math/math.h"
 
 
@@ -39,8 +40,8 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	f->write_int(16); // chunk size (fmt)
 	f->write_word(1); // version
 	f->write_word(channels); // channels
-	f->write_int(r->sample_rate());
-	f->write_int(r->sample_rate() * bytes_per_sample); // bytes per sec
+	f->write_int(od->session->sample_rate());
+	f->write_int(od->session->sample_rate() * bytes_per_sample); // bytes per sec
 	f->write_word(4); // block align
 	f->write_word(bit_depth);
 	f->write_buffer("data", 4);

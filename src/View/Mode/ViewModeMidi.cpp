@@ -16,6 +16,7 @@
 #include "../../Midi/MidiSource.h"
 #include "../../Data/SongSelection.h"
 #include "../../TsunamiWindow.h"
+#include "../../Session.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
@@ -144,7 +145,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
 
-	preview_source->start(pitch, preview_stream->sample_rate() * ttl);
+	preview_source->start(pitch, view->session->sample_rate() * ttl);
 	preview_stream->play();
 }
 

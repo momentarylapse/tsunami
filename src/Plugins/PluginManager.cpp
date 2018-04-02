@@ -19,6 +19,8 @@
 #include "../Device/DeviceManager.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
+#include "../Audio/Source/AudioPort.h"
+#include "../Audio/Source/AudioSource.h"
 #include "../Midi/MidiSource.h"
 #include "../Rhythm/Bar.h"
 #include "../View/Helper/Progress.h"
@@ -119,6 +121,21 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("ConfigPanel.notify", Kaba::mf(&ConfigPanel::notify));
 	Kaba::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
 
+	AudioSource asource;
+	Kaba::DeclareClassSize("AudioSource", sizeof(AudioSource));
+	Kaba::DeclareClassOffset("AudioSource", "name", _offsetof(AudioSource, name));
+	Kaba::DeclareClassOffset("AudioSource", "usable", _offsetof(AudioSource, usable));
+	Kaba::DeclareClassOffset("AudioSource", "session", _offsetof(AudioSource, session));
+	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &asource);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &asource);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &asource);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "get_pos", Kaba::mf(&AudioSource::get_pos), &asource);
+	Kaba::DeclareClassVirtualIndex("AudioSource", "create_panel", Kaba::mf(&AudioSource::create_panel), &asource);
+	Kaba::LinkExternal("AudioSource.resetConfig", Kaba::mf(&AudioSource::reset_config));
+	Kaba::LinkExternal("AudioSource.resetState", Kaba::mf(&AudioSource::reset_state));
+	Kaba::LinkExternal("AudioSource.notify", Kaba::mf(&AudioSource::notify));
+	Kaba::DeclareClassVirtualIndex("AudioSource", "on_config", Kaba::mf(&AudioSource::on_oonfig), &asource);
 
 	AudioEffect effect;
 	Kaba::DeclareClassSize("AudioEffect", sizeof(AudioEffect));
@@ -240,7 +257,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("SynthOutput", sizeof(Synthesizer::Output));
 	Kaba::DeclareClassVirtualIndex("SynthOutput", "read", Kaba::mf(&Synthesizer::Output::read), &synth_out);
 	Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "sample_rate", Kaba::mf(&Synthesizer::Output::sample_rate), &synth_out);
+	Kaba::DeclareClassVirtualIndex("SynthOutput", "get_pos", Kaba::mf(&Synthesizer::Output::get_pos), &synth_out);
 
 
 	DummySynthesizer dsynth;
@@ -356,14 +373,13 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.addSample", Kaba::mf(&Song::addSample));
 	Kaba::LinkExternal("Song.deleteSample", Kaba::mf(&Song::deleteSample));
 
-	AudioPort ar;
+	AudioPort aport;
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));
-	//Kaba::DeclareClassOffset("AudioPort", "sample_rate", _offsetof(AudioSource, sample_rate));
 	Kaba::LinkExternal("AudioPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioPort::__init__));
-	Kaba::DeclareClassVirtualIndex("AudioPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioPort::__delete__), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "read", Kaba::mf(&AudioPort::read), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "reset", Kaba::mf(&AudioPort::reset), &ar);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "sample_rate", Kaba::mf(&AudioPort::sample_rate), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioPort::__delete__), &aport);
+	Kaba::DeclareClassVirtualIndex("AudioPort", "read", Kaba::mf(&AudioPort::read), &aport);
+	Kaba::DeclareClassVirtualIndex("AudioPort", "reset", Kaba::mf(&AudioPort::reset), &aport);
+	Kaba::DeclareClassVirtualIndex("AudioPort", "get_pos", Kaba::mf(&AudioPort::get_pos), &aport);
 
 	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
@@ -376,16 +392,13 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
 	Kaba::LinkExternal("SongRenderer.seek", Kaba::mf(&SongRenderer::seek));
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "sample_rate", Kaba::mf(&SongRenderer::sample_rate), &sr);
 
 	{
-	InputStreamAudio input(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
+	InputStreamAudio input(Session::GLOBAL);
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
 	Kaba::DeclareClassOffset("InputStreamAudio", "session", _offsetof(InputStreamAudio, session));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
-	//Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
-	Kaba::DeclareClassOffset("InputStreamAudio", "source", _offsetof(InputStreamAudio, out));
-	//Kaba::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
+	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(InputStreamAudio, out));
 	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
 	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAudio::__delete__), &input);
@@ -409,7 +422,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
 	Kaba::LinkExternal("OutputStream.is_paused", Kaba::mf(&OutputStream::is_paused));
 	Kaba::LinkExternal("OutputStream.get_pos", Kaba::mf(&OutputStream::get_pos));
-	Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
+	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
 	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
@@ -510,17 +523,26 @@ void PluginManager::FindPlugins()
 {
 	Kaba::Init();
 
-	// "Buffer"
-	find_plugins_in_dir("Buffer/Channels/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Dynamics/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Echo/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Pitch/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Repair/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Sound/", Plugin::Type::EFFECT, this);
-	find_plugins_in_dir("Buffer/Synthesizer/", Plugin::Type::EFFECT, this);
+	// "AudioSource"
+	find_plugins_in_dir("AudioSource/", Plugin::Type::AUDIO_SOURCE, this);
 
-	// "Midi"
-	find_plugins_in_dir("Midi/", Plugin::Type::MIDI_EFFECT, this);
+	// "AudioEffect"
+	find_plugins_in_dir("AudioEffect/Channels/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Dynamics/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Echo/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Pitch/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Repair/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Sound/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Synthesizer/", Plugin::Type::AUDIO_EFFECT, this);
+
+	// "MidiSource"
+	find_plugins_in_dir("MidiSource/", Plugin::Type::MIDI_SOURCE, this);
+
+	// "MidiEffect"
+	find_plugins_in_dir("MidiEffect/", Plugin::Type::MIDI_EFFECT, this);
+
+	// "BeatSource"
+	find_plugins_in_dir("BeatSource/", Plugin::Type::BEAT_SOURCE, this);
 
 	// "All"
 	find_plugins_in_dir("All/", Plugin::Type::SONG_PLUGIN, this);
@@ -537,16 +559,16 @@ void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 	hui::Menu *m = win->getMenu();
 
 	// "Buffer"
-	add_plugins_in_dir("Buffer/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Echo/", this, m->getSubMenuByID("menu_plugins_echo"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Repair/", this, m->getSubMenuByID("menu_plugins_repair"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Sound/", this, m->getSubMenuByID("menu_plugins_sound"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("Buffer/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Echo/", this, m->getSubMenuByID("menu_plugins_echo"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Repair/", this, m->getSubMenuByID("menu_plugins_repair"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Sound/", this, m->getSubMenuByID("menu_plugins_sound"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
 
 	// "Midi"
-	add_plugins_in_dir("Midi/", this, m->getSubMenuByID("menu_plugins_on_midi"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
+	add_plugins_in_dir("MidiEffect/", this, m->getSubMenuByID("menu_plugins_on_midi"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
 
 	// "All"
 	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_all"), "song", win, &TsunamiWindow::onMenuExecuteSongPlugin);
@@ -595,7 +617,7 @@ void PluginManager::_ExecutePlugin(Session *session, const string &filename)
 {
 	Plugin *p = LoadAndCompilePlugin(Plugin::Type::OTHER, filename);
 	if (!p->usable){
-		session->e(p->getError());
+		session->e(p->get_error());
 		return;
 	}
 
@@ -616,7 +638,7 @@ Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
 		if ((pf.name == name) and (pf.type == type)){
 			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
 			if (!p->usable)
-				session->e(p->getError());
+				session->e(p->get_error());
 			return p;
 		}
 	}
@@ -690,10 +712,19 @@ string PluginManager::plugin_dir()
 	return tsunami->directory_static + "Plugins/";
 }
 
-Array<string> PluginManager::FindEffects()
+Array<string> PluginManager::FindAudioSources()
 {
 	Array<string> names;
-	string prefix = plugin_dir() + "Buffer/";
+	for (auto &pf: plugin_files)
+		if (pf.type == Plugin::Type::AUDIO_SOURCE)
+			names.add(pf.name);
+	return names;
+}
+
+Array<string> PluginManager::FindAudioEffects()
+{
+	Array<string> names;
+	string prefix = plugin_dir() + "AudioEffect/";
 	for (auto &pf: plugin_files){
 		if (pf.filename.match(prefix + "*")){
 			string g = pf.filename.substr(prefix.num, -1).explode("/")[0];
@@ -712,14 +743,38 @@ Array<string> PluginManager::FindMidiEffects()
 	return names;
 }
 
+Array<string> PluginManager::FindMidiSources()
+{
+	Array<string> names;
+	for (auto &pf: plugin_files)
+		if (pf.type == Plugin::Type::MIDI_SOURCE)
+			names.add(pf.name);
+	return names;
+}
+
+Array<string> PluginManager::FindBeatSources()
+{
+	Array<string> names;
+	for (auto &pf: plugin_files)
+		if (pf.type == Plugin::Type::BEAT_SOURCE)
+			names.add(pf.name);
+	return names;
+}
+
 Array<string> PluginManager::FindConfigurable(int type)
 {
+	if (type == Configurable::Type::AUDIO_SOURCE)
+		return FindAudioSources();
 	if (type == Configurable::Type::AUDIO_EFFECT)
-		return FindEffects();
+		return FindAudioEffects();
+	if (type == Configurable::Type::MIDI_SOURCE)
+		return FindMidiSources();
 	if (type == Configurable::Type::MIDI_EFFECT)
 		return FindMidiEffects();
 	if (type == Configurable::Type::SYNTHESIZER)
 		return FindSynthesizers();
+	if (type == Configurable::Type::BEAT_SOURCE)
+		return FindBeatSources();
 	return Array<string>();
 }
 

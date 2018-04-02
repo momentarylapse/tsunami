@@ -35,10 +35,10 @@ class InputStreamAudio : public Observable<VirtualBase>
 {
 	friend class PluginManager;
 public:
-	InputStreamAudio(Session *session, int sample_rate);
+	InputStreamAudio(Session *session);
 	virtual ~InputStreamAudio();
 
-	void _cdecl __init__(Session *session, int sample_rate);
+	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CAPTURE;
@@ -75,7 +75,6 @@ public:
 	{
 	public:
 		virtual int _cdecl read(AudioBuffer &buf);
-		virtual int _cdecl sample_rate();
 
 		InputStreamAudio *stream;
 	};

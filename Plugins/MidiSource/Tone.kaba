@@ -1,0 +1,23 @@
+use "../api.kaba"
+
+class ToneSource extends MidiSource
+
+	float pitch
+	float volume
+	bool started
+	
+	override void __init__()
+		
+		pitch = 64.0
+		volume = 0.5
+		started = false
+		
+	override int read(MidiEventBuffer midi)
+		if !started
+			midi.add(_MidiEvent(0, pitch, volume))
+			started = true
+		return midi.samples
+	
+	override void reset()
+		started = false
+	

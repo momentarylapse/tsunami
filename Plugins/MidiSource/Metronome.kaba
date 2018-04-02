@@ -3,8 +3,6 @@ use "../api.kaba"
 class MetronomeSource extends MidiSource
 
 	// sound
-	float length
-	float freq
 	float volume
 	
 	// rhythm
@@ -32,8 +30,6 @@ class MetronomeSource extends MidiSource
 		win = nil
 		sample_rate = session.sample_rate()
 		
-		freq = 880.0
-		length = 0.02
 		volume = 1
 		bpm = 90
 		num_beats = 4

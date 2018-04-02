@@ -18,8 +18,9 @@ class Tremolo extends AudioEffect
 	Config config
 
 	void doTremolo(float[] b)
+		float sample_rate = session.sample_rate()
 	
-		float f_c = 1.0 / song.sample_rate * 2 * pi * config.speed
+		float f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
 		for bb,i in b
 			float f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5

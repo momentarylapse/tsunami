@@ -22,7 +22,9 @@ public:
 
 	void onLeftButtonDown();
 	void onLeftButtonUp();
+	void onRightButtonDown();
 	void onMouseMove();
+	void onKeyDown();
 	void onDraw(Painter *p);
 
 	void onChainUpdate();

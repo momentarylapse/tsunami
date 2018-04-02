@@ -46,6 +46,8 @@ public:
 	};
 	Array<Module*> modules;
 	Module* add(Module *m);
+	void remove(Module *m);
+	int module_index(SignalChain::Module *m);
 
 	struct Cable
 	{

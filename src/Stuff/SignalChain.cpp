@@ -186,9 +186,9 @@ SignalChain *SignalChain::create_default(Session *session)
 	session->output_stream = new OutputStream(session, NULL);
 
 	auto *mod_renderer = chain->add(new ModuleSongRenderer(session->song_renderer));
-	chain->add(new ModuleAudioEffect(fx));
 	auto *mod_peak = chain->add(new ModulePeakMeter(session->peak_meter));
 	auto *mod_out = chain->add(new ModuleOutputStream(session->output_stream));
+	chain->add(new ModuleAudioEffect(fx));
 	chain->add(new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, "")));
 	BarCollection bars;
 	bars.add(new Bar(80000, 4, 1));
@@ -223,6 +223,41 @@ SignalChain::Module *SignalChain::add(SignalChain::Module *m)
 	return m;
 }
 
+int SignalChain::module_index(SignalChain::Module *m)
+{
+	foreachi(Module *mm, modules, i)
+		if (mm == m)
+			return i;
+	return -1;
+}
+
+void SignalChain::remove(SignalChain::Module *m)
+{
+	int index = module_index(m);
+	if (index < 0)
+		return;
+	if (index < 3){
+		session->e(_("not allowed to delete system modules"));
+		return;
+	}
+
+
+	bool more = true;
+	while (more){
+		more = false;
+		for (Cable *c: cables)
+			if (c->source == m or c->target == m){
+				disconnect(c);
+				more = true;
+				break;
+			}
+	}
+
+	modules.erase(index);
+	delete m;
+	notify();
+}
+
 void SignalChain::connect(SignalChain::Module *source, int source_port, SignalChain::Module *target, int target_port)
 {
 	if (source_port < 0 or source_port >= source->port_out.num)
@@ -246,6 +281,7 @@ void SignalChain::connect(SignalChain::Module *source, int source_port, SignalCh
 	}else if (c->type == Track::Type::TIME){
 		target->set_beat_source(source->beat_socket());
 	}
+	notify();
 }
 
 void SignalChain::disconnect(SignalChain::Cable *c)
@@ -262,6 +298,7 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 
 			delete(c);
 			cables.erase(i);
+			notify();
 			break;
 		}
 }

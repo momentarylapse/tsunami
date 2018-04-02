@@ -24,12 +24,14 @@ SignalEditor::Selection::Selection()
 SignalEditor::SignalEditor(Session *session) :
 	BottomBar::Console(_("Signal Chain"), session)
 {
-	addDrawingArea("!expandx,expandy", 0, 0, "area");
+	addDrawingArea("!expandx,expandy,grabfocus", 0, 0, "area");
 
 	eventXP("area", "hui:draw", std::bind(&SignalEditor::onDraw, this, std::placeholders::_1));
 	eventX("area", "hui:mouse-move", std::bind(&SignalEditor::onMouseMove, this));
 	eventX("area", "hui:left-button-down", std::bind(&SignalEditor::onLeftButtonDown, this));
 	eventX("area", "hui:left-button-up", std::bind(&SignalEditor::onLeftButtonUp, this));
+	eventX("area", "hui:right-button-down", std::bind(&SignalEditor::onRightButtonDown, this));
+	eventX("area", "hui:key-down", std::bind(&SignalEditor::onKeyDown, this));
 
 	chain = session->signal_chain;
 	chain->subscribe(this, std::bind(&SignalEditor::onChainUpdate, this));
@@ -137,6 +139,20 @@ static color signal_color(int type)
 	return White;
 }
 
+void SignalEditor::onRightButtonDown()
+{
+}
+
+void SignalEditor::onKeyDown()
+{
+	int key = hui::GetEvent()->key_code;
+	if (key == hui::KEY_DELETE){
+		if (sel.type == sel.TYPE_MODULE){
+			chain->remove((SignalChain::Module*)sel.module);
+			hover = sel = Selection();
+		}
+	}
+}
 
 SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 {
@@ -196,9 +212,15 @@ void SignalEditor::onDraw(Painter* p)
 		p->setRoundness(view->CORNER_RADIUS);
 		p->drawRect(module_rect(m));
 		p->setRoundness(0);
+		if (sel.type == sel.TYPE_MODULE and sel.module == m){
+			p->setColor(view->colors.text);
+			p->setFont("", 12, true, false);
+		}else{
+			p->setColor(view->colors.text_soft1);
+		}
 		float ww = p->getStrWidth(m->type());
-		p->setColor(view->colors.text_soft1);
 		p->drawStr(m->x + MODULE_WIDTH/2 - ww/2, m->y + 4, m->type());
+		p->setFont("", 12, false, false);
 
 		foreachi(int t, m->port_in, i){
 			p->setColor(signal_color(t));

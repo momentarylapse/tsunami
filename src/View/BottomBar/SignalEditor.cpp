@@ -193,8 +193,11 @@ void SignalEditor::onAddAudioSource()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_SOURCE, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addAudioSource(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addAudioSource(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
@@ -202,27 +205,37 @@ void SignalEditor::onAddAudioEffect()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_EFFECT, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addAudioEffect(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addAudioEffect(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
 void SignalEditor::onAddAudioJoiner()
 {
-	chain->addAudioJoiner();
+	auto *m = chain->addAudioJoiner();
+	m->x = sel.dx;
+	m->y = sel.dy;
 }
 
 void SignalEditor::onAddAudioInputStream()
 {
-	chain->addAudioInputStream();
+	auto *m = chain->addAudioInputStream();
+	m->x = sel.dx;
+	m->y = sel.dy;
 }
 
 void SignalEditor::onAddMidiSource()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_SOURCE, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addMidiSource(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addMidiSource(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
@@ -230,8 +243,11 @@ void SignalEditor::onAddMidiEffect()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_EFFECT, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addMidiEffect(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addMidiEffect(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
@@ -239,28 +255,38 @@ void SignalEditor::onAddSynthesizer()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::SYNTHESIZER, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addSynthesizer(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addSynthesizer(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
 void SignalEditor::onAddMidiInputStream()
 {
-	chain->addMidiInputStream();
+	auto *m = chain->addMidiInputStream();
+	m->x = sel.dx;
+	m->y = sel.dy;
 }
 
 void SignalEditor::onAddBeatSource()
 {
 	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::BEAT_SOURCE, session);
 	dlg->run();
-	if (dlg->_return.num > 0)
-		chain->addBeatSource(dlg->_return);
+	if (dlg->_return.num > 0){
+		auto *m = chain->addBeatSource(dlg->_return);
+		m->x = sel.dx;
+		m->y = sel.dy;
+	}
 	delete(dlg);
 }
 
 void SignalEditor::onAddBeatMidifier()
 {
-	chain->addBeatMidifier();
+	auto *m = chain->addBeatMidifier();
+	m->x = sel.dx;
+	m->y = sel.dy;
 }
 
 void SignalEditor::onModuleDelete()
@@ -295,6 +321,8 @@ void SignalEditor::onSave()
 SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 {
 	Selection s;
+	s.dx = mx;
+	s.dy = my;
 	for (auto *m: chain->modules){
 		rect r = module_rect(m);
 		if (r.inside(mx, my)){

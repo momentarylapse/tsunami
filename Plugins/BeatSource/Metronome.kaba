@@ -1,0 +1,99 @@
+use "../api.kaba"
+
+class MetronomeSource extends BeatSource
+	
+	// rhythm
+	float bpm
+	int num_beats
+	int num_sub_beats
+	
+	bool pause
+	
+	// state/output
+	int cur_beat
+	int cur_sub_beat
+
+	int offset_sub_beat
+	float fraction_beat
+	//float fraction_sub_beat
+	int samples_beat
+	int samples_sub_beat
+	
+	
+	float sample_rate
+	Window* win
+	
+	override void __init__()
+		win = nil
+		sample_rate = session.sample_rate()
+
+		bpm = 90
+		num_beats = 4
+		num_sub_beats = 1
+
+		offset_sub_beat = 0
+		cur_beat = 0
+		cur_sub_beat = -1
+		fraction_beat = 0
+//		fraction_sub_beat = 0
+		
+		pause = false
+		
+		update()
+		
+	override int read(Beat[] beats, int samples)
+		if pause
+			return samples
+	
+		// render clicks
+		while offset_sub_beat < samples
+			cur_sub_beat ++
+			if cur_sub_beat >= num_sub_beats
+				cur_sub_beat = 0
+				cur_beat ++
+			if cur_beat >= num_beats
+				cur_beat = 0
+			
+			// render
+			if cur_sub_beat == 0
+				if cur_beat == 0
+					beats.add(_Beat(offset_sub_beat, 0))
+				else
+					beats.add(_Beat(offset_sub_beat, 1))
+			else
+				beats.add(_Beat(offset_sub_beat, 2))
+
+			offset_sub_beat += samples_sub_beat
+		offset_sub_beat -= samples
+		float fraction_sub_beat = 1 - i2f(offset_sub_beat) / i2f(samples_sub_beat)
+		fraction_beat = (i2f(cur_sub_beat) + fraction_sub_beat) / i2f(num_sub_beats)
+		
+		if win
+			win.redraw("area")
+		return samples
+	
+	void setBpm(float _bpm)
+		bpm = _bpm
+		update()
+	
+	void setBeats(int _beats, int _sub_beats)
+		num_beats = _beats
+		num_sub_beats = _sub_beats
+		update()
+	
+	void setPause(bool _pause)
+		pause = _pause
+	
+	void update()
+		float dt_b = 60.0 / bpm
+		float dt_s = dt_b / num_sub_beats
+		samples_beat = dt_b * sample_rate
+		samples_sub_beat = dt_s * sample_rate
+		
+		//if cur_beat >
+		
+		cur_sub_beat = num_sub_beats * fraction_beat
+		offset_sub_beat = (1 + cur_sub_beat - fraction_beat * num_sub_beats) * samples_sub_beat
+
+
+

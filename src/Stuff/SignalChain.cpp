@@ -204,7 +204,7 @@ public:
 	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
 	virtual string type(){ return "BeatMidifier"; }
 	virtual MidiPort *midi_socket(int port){ return beat_midifier->out; }
-	virtual void set_beat_source(int port, BeatSource *s){ beat_midifier->set_beat_source(s); }
+	virtual void set_beat_source(int port, BeatPort *s){ beat_midifier->set_beat_source(s); }
 };
 
 class ModuleBeatSource : public SignalChain::Module
@@ -218,7 +218,12 @@ public:
 	}
 	virtual ~ModuleBeatSource(){ delete source; }
 	virtual string type(){ return "BeatSource"; }
-	virtual BeatSource *beat_socket(int port){ return source; }
+	virtual BeatPort *beat_socket(int port){ return source->out; }
+
+	virtual string sub_type(){ return source->name; }
+	virtual string config_to_string(){ return source->config_to_string(); }
+	virtual void config_from_string(const string &str){ source->config_from_string(str); }
+	virtual ConfigPanel *create_panel(){ return source->create_panel(); }
 };
 
 class ModuleMidiSource: public SignalChain::Module
@@ -233,6 +238,11 @@ public:
 	virtual ~ModuleMidiSource(){ delete source; }
 	virtual string type(){ return "MidiSource"; }
 	virtual MidiPort *midi_socket(int port){ return source->out; }
+
+	virtual string sub_type(){ return source->name; }
+	virtual string config_to_string(){ return source->config_to_string(); }
+	virtual void config_from_string(const string &str){ source->config_from_string(str); }
+	virtual ConfigPanel *create_panel(){ return source->create_panel(); }
 };
 
 class ModuleMidiInputStream : public SignalChain::Module
@@ -545,11 +555,6 @@ SignalChain::Module* SignalChain::addBeatMidifier()
 
 SignalChain::Module* SignalChain::addBeatSource(const string &name)
 {
-	BarCollection bars;
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	return add(new ModuleBeatSource(new BarStreamer(bars)));
+	return add(new ModuleBeatSource(CreateBeatSource(session, name)));
 }
 

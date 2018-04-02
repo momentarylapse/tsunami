@@ -24,6 +24,8 @@
 #include "../Midi/MidiPort.h"
 #include "../Midi/MidiSource.h"
 #include "../Rhythm/Bar.h"
+#include "../Rhythm/BeatPort.h"
+#include "../Rhythm/BeatSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../View/AudioView.h"
@@ -323,6 +325,27 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiNoteBuffer.getEvents", Kaba::mf(&MidiNoteBuffer::getEvents));
 	Kaba::LinkExternal("MidiNoteBuffer.getNotes", Kaba::mf(&MidiNoteBuffer::getNotes));
 	Kaba::LinkExternal("MidiNoteBuffer.getRange", Kaba::mf(&MidiNoteBuffer::range));
+
+	BeatPort bport;
+	Kaba::DeclareClassSize("BeatPort", sizeof(BeatPort));
+	Kaba::LinkExternal("BeatPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatPort::__init__));
+	Kaba::DeclareClassVirtualIndex("BeatPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatPort::__delete__), &bport);
+	Kaba::DeclareClassVirtualIndex("BeatPort", "read", Kaba::mf(&BeatPort::read), &bport);
+	Kaba::DeclareClassVirtualIndex("BeatPort", "reset", Kaba::mf(&BeatPort::reset), &bport);
+
+	BeatSource bsource;
+	Kaba::DeclareClassSize("BeatSource", sizeof(BeatSource));
+	Kaba::DeclareClassOffset("BeatSource", "out", _offsetof(BeatSource, out));
+	Kaba::DeclareClassOffset("BeatSource", "session", _offsetof(BeatSource, session));
+	Kaba::LinkExternal("BeatSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatSource::__init__));
+	Kaba::DeclareClassVirtualIndex("BeatSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatSource::__delete__), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "read", Kaba::mf(&BeatSource::read), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "reset", Kaba::mf(&BeatSource::reset), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "create_panel", Kaba::mf(&BeatSource::create_panel), &bsource);
+	Kaba::LinkExternal("BeatSource.reset_config", Kaba::mf(&BeatSource::reset_config));
+	Kaba::LinkExternal("BeatSource.reset_state", Kaba::mf(&BeatSource::reset_state));
+	Kaba::LinkExternal("BeatSource.notify", Kaba::mf(&BeatSource::notify));
+	Kaba::DeclareClassVirtualIndex("BeatSource", "on_config", Kaba::mf(&BeatSource::on_config), &bsource);
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, text));

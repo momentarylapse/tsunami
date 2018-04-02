@@ -232,6 +232,26 @@ class EnvelopeADSR
 	extern float get()
 	bool just_killed
 
+
+class BeatPort
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual int read(Beat[] beats, int samples)
+	extern virtual void reset()
+
+class BeatSource
+	Session* session
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual int read(Beat[] beats, int samples)
+	extern virtual void reset()
+	extern virtual ConfigPanel* create_panel()
+	extern virtual void on_config()
+	extern virtual void reset_config()
+	extern virtual void reset_state()
+	extern virtual void notify()
+	BeatPort *out
+
 class TrackRenderBuffer
 	int dummy
 
@@ -244,6 +264,20 @@ class Bar
 	int num_beats
 	int num_sub_beats
 	int length
+
+
+class Beat
+	Range range
+	int bar_no
+	int beat_no
+	int level
+
+Beat _Beat(int offset, int level)
+	Beat b
+	b.range = _Range(offset, 0)
+	b.level = level
+	b.bar_no = 0
+	b.beat_no = 0
 
 enum
 	TRACK_TYPE_AUDIO

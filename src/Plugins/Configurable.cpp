@@ -8,7 +8,6 @@
 
 #include "Configurable.h"
 
-#include "../Audio/Source/SongRenderer.h"
 #include "ConfigPanel.h"
 #include "AutoConfigPanel.h"
 #include "../Session.h"

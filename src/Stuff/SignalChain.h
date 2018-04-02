@@ -12,10 +12,7 @@
 
 class AudioPort;
 class MidiPort;
-class BeatSource;
-class AudioEffect;
-class MidiEffect;
-class Synthesizer;
+class BeatPort;
 class ConfigPanel;
 class Session;
 
@@ -47,10 +44,10 @@ public:
 		virtual ConfigPanel *create_panel(){ return NULL; }
 		virtual void set_audio_source(int port, AudioPort *s){};
 		virtual void set_midi_source(int port, MidiPort *s){};
-		virtual void set_beat_source(int port, BeatSource *s){};
+		virtual void set_beat_source(int port, BeatPort *s){};
 		virtual AudioPort *audio_socket(int port){ return NULL; }
 		virtual MidiPort *midi_socket(int port){ return NULL; }
-		virtual BeatSource *beat_socket(int port){ return NULL; }
+		virtual BeatPort *beat_socket(int port){ return NULL; }
 		Array<int> port_in, port_out;
 	};
 	Array<Module*> modules;

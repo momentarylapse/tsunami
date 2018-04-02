@@ -1,0 +1,14 @@
+use "../api.kaba"
+
+class ChaosSource extends BeatSource
+		
+	override int read(Beat[] beats, int samples)
+		int sample_rate = session.sample_rate()
+	
+		int offset = randi(sample_rate / 4)
+		while offset < samples
+			beats.add(_Beat(offset, randi(3)))
+			offset += randi(sample_rate / 4)
+			
+		return samples
+	

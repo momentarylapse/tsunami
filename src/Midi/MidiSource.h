@@ -11,7 +11,7 @@
 #include "../Plugins/Configurable.h"
 #include "MidiPort.h"
 
-class BeatSource;
+class BeatPort;
 
 class MidiSource : public Configurable
 {
@@ -36,8 +36,8 @@ public:
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
 
-	BeatSource *beat_source;
-	void _cdecl set_beat_source(BeatSource *s);
+	BeatPort *beat_source;
+	void _cdecl set_beat_source(BeatPort *s);
 };
 
 MidiSource *_cdecl CreateMidiSource(Session *session, const string &name);

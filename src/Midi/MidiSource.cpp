@@ -30,7 +30,7 @@ void  MidiSource::Output::reset()
 MidiSource::MidiSource() :
 	Configurable(Session::GLOBAL, Configurable::Type::MIDI_SOURCE)
 {
-	beat_source = BeatSource::dummy;
+	beat_source = BeatSource::dummy->out;
 	out = new Output(this);
 }
 
@@ -49,9 +49,9 @@ void MidiSource::__delete__()
 	this->MidiSource::~MidiSource();
 }
 
-void MidiSource::set_beat_source(BeatSource *_beat_source)
+void MidiSource::set_beat_source(BeatPort *s)
 {
-	beat_source = _beat_source;
+	beat_source = s;
 }
 
 

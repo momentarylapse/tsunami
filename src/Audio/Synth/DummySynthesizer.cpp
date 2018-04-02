@@ -24,7 +24,7 @@ DummySynthesizer::DummySynthesizer()
 {
 	name = "Dummy";
 	state.reset();
-	onConfig();
+	on_oonfig();
 }
 
 DummySynthesizer::~DummySynthesizer()
@@ -45,7 +45,7 @@ void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack,
 }
 
 
-void DummySynthesizer::onConfig()
+void DummySynthesizer::on_oonfig()
 {
 	if (instrument.type == Instrument::Type::DRUMS){
 		for (int i=0; i<MAX_PITCH; i++){

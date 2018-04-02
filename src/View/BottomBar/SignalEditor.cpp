@@ -195,7 +195,7 @@ void SignalEditor::onAddAudioSource()
 
 void SignalEditor::onAddAudioEffect()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::EFFECT, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_EFFECT, session);
 	dlg->run();
 	if (dlg->_return.num > 0)
 		chain->addAudioEffect(dlg->_return);

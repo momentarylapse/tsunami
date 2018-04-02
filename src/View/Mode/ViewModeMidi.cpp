@@ -136,7 +136,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 	if (!preview_synth){
 		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
 		preview_synth->setInstrument(view->cur_track->instrument);
-		preview_synth->out->set_source(preview_source);
+		preview_synth->set_source(preview_source);
 	}
 	if (!preview_stream){
 		preview_stream = new OutputStream(view->session, preview_synth->out);

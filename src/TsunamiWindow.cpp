@@ -31,7 +31,6 @@
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
-#include "Plugins/Effect.h"
 #include "Plugins/MidiEffect.h"
 #include "Plugins/SongPlugin.h"
 #include "Storage/Storage.h"
@@ -43,6 +42,7 @@
 #include "Data/SongSelection.h"
 #include "Rhythm/Bar.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "Plugins/AudioEffect.h"
 
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
@@ -493,15 +493,15 @@ void TsunamiWindow::onMenuExecuteEffect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	Effect *fx = CreateEffect(session, name);
+	AudioEffect *fx = CreateAudioEffect(session, name);
 
-	fx->resetConfig();
+	fx->reset_config();
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
 			if (view->sel.has(t) and (t->type == t->Type::AUDIO)){
-				fx->resetState();
-				fx->doProcessTrack(t, view->cur_layer, view->sel.range);
+				fx->reset_state();
+				fx->do_process_track(t, view->cur_layer, view->sel.range);
 			}
 		song->action_manager->endActionGroup();
 	}
@@ -514,12 +514,12 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 
 	MidiEffect *fx = CreateMidiEffect(session, name);
 
-	fx->resetConfig();
+	fx->reset_config();
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
 			if (view->sel.has(t) and (t->type == t->Type::MIDI)){
-				fx->resetState();
+				fx->reset_state();
 				fx->process_track(t, view->sel);
 			}
 		song->action_manager->endActionGroup();

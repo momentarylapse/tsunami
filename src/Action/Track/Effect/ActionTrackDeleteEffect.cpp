@@ -5,9 +5,9 @@
  *      Author: michi
  */
 
-#include "ActionTrackDeleteEffect.h"
 #include "../../../Data/Track.h"
 #include <assert.h>
+#include "ActionTrackDeleteAudioEffect.h"
 
 ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
 {

@@ -8,21 +8,21 @@
 #ifndef SRC_AUDIO_PEAKMETER_H_
 #define SRC_AUDIO_PEAKMETER_H_
 
-#include "Source/AudioSource.h"
 #include "../Stuff/Observable.h"
+#include "Source/AudioPort.h"
 
 class PeakMeterDisplay;
 class AudioBuffer;
 
-class PeakMeter : public Observable<AudioSource>
+class PeakMeter : public Observable<AudioPort>
 {
 	friend class PeakMeterDisplay;
 public:
-	PeakMeter(AudioSource *s);
+	PeakMeter(AudioPort *s);
 	virtual ~PeakMeter();
 
-	AudioSource *source;
-	void set_source(AudioSource *s);
+	AudioPort *source;
+	void set_source(AudioPort *s);
 
 	virtual int _cdecl read(AudioBuffer &buf);
 	virtual int _cdecl get_pos(int delta);

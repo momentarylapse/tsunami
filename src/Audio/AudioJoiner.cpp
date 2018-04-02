@@ -7,7 +7,7 @@
 
 #include "AudioJoiner.h"
 
-AudioJoiner::AudioJoiner(AudioSource* _a, AudioSource* _b)
+AudioJoiner::AudioJoiner(AudioPort* _a, AudioPort* _b)
 {
 	a = _a;
 	b = _b;
@@ -60,12 +60,12 @@ int AudioJoiner::sample_rate()
 	return DEFAULT_SAMPLE_RATE;
 }
 
-void AudioJoiner::set_source_a(AudioSource* _a)
+void AudioJoiner::set_source_a(AudioPort* _a)
 {
 	a = _a;
 }
 
-void AudioJoiner::set_source_b(AudioSource* _b)
+void AudioJoiner::set_source_b(AudioPort* _b)
 {
 	b = _b;
 }

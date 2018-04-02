@@ -8,14 +8,14 @@
 #ifndef SRC_AUDIO_SOURCE_SONGRENDERER_H_
 #define SRC_AUDIO_SOURCE_SONGRENDERER_H_
 
-#include "../Source/AudioSource.h"
+#include "AudioPort.h"
 
 class MidiSource;
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
 
-class SongRenderer : public AudioSource
+class SongRenderer : public AudioPort
 {
 public:
 	SongRenderer(Song *s);
@@ -47,7 +47,7 @@ private:
 	void render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list);
+	void apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_list);
 	void render_track_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_song_no_fx(AudioBuffer &buf);
 
@@ -70,7 +70,7 @@ private:
 	void _seek(int pos);
 
 public:
-	Effect *preview_effect;
+	AudioEffect *preview_effect;
 	bool allow_loop;
 	bool loop_if_allowed;
 };

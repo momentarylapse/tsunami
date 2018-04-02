@@ -7,11 +7,11 @@
 
 #include "FormatNami.h"
 #include "../../Session.h"
-#include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Data/Curve.h"
+#include "../../Plugins/AudioEffect.h"
 #include "../../Rhythm/Bar.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
@@ -100,19 +100,19 @@ public:
 	}
 };
 
-class FileChunkEffect : public FileChunk<Track,Effect>
+class FileChunkEffect : public FileChunk<Track,AudioEffect>
 {
 public:
-	FileChunkEffect() : FileChunk<Track,Effect>("effect"){}
+	FileChunkEffect() : FileChunk<Track,AudioEffect>("effect"){}
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(cur_op(this)->session, f->read_str());
+		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->configFromString(params);
+		me->config_from_string(params);
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -124,24 +124,24 @@ public:
 		f->write_bool(false);
 		f->write_int(0);
 		f->write_int(0);
-		f->write_str(me->configToString());
+		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
 
-class FileChunkGlobalEffect : public FileChunk<Song,Effect>
+class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect>
 {
 public:
-	FileChunkGlobalEffect() : FileChunk<Song,Effect>("effect"){}
+	FileChunkGlobalEffect() : FileChunk<Song,AudioEffect>("effect"){}
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(cur_op(this)->session, f->read_str());
+		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->configFromString(params);
+		me->config_from_string(params);
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -153,7 +153,7 @@ public:
 		f->write_bool(false);
 		f->write_int(0);
 		f->write_int(0);
-		f->write_str(me->configToString());
+		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
@@ -633,7 +633,7 @@ public:
 		me->range.offset = f->read_int();
 		me->range.length = f->read_int();
 		string params = f->read_str();
-		me->configFromString(params);
+		me->config_from_string(params);
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -645,7 +645,7 @@ public:
 		f->write_bool(me->only_on_selection);
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
-		f->write_str(me->configToString());
+		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
 	}
 };
@@ -890,7 +890,7 @@ public:
 	{
 		Session *session = cur_op(this)->session;
 		me = session->plugin_manager->CreateSynthesizer(session, f->read_str());
-		me->configFromString(f->read_str());
+		me->config_from_string(f->read_str());
 		f->read_str();
 		f->read_int();
 
@@ -900,7 +900,7 @@ public:
 	virtual void write(File *f)
 	{
 		f->write_str(me->name);
-		f->write_str(me->configToString());
+		f->write_str(me->config_to_string());
 		f->write_str("");
 		f->write_int(0); // reserved
 	}

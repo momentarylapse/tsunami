@@ -6,10 +6,10 @@
  */
 
 #include "AudioSucker.h"
-#include "Source/AudioSource.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../Stuff/PerformanceMonitor.h"
+#include "Source/AudioPort.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 const string AudioSucker::MESSAGE_UPDATE = "Update";
@@ -36,9 +36,9 @@ public:
 				PerformanceMonitor::start_busy(perf_channel);
 				int r = sucker->update();
 				PerformanceMonitor::end_busy(perf_channel);
-				if (r == AudioSource::END_OF_STREAM)
+				if (r == AudioPort::END_OF_STREAM)
 					break;
-				if (r == AudioSource::NOT_ENOUGH_DATA){
+				if (r == AudioPort::NOT_ENOUGH_DATA){
 					hui::Sleep(sucker->no_data_wait);
 					continue;
 				}
@@ -50,7 +50,7 @@ public:
 	}
 };
 
-AudioSucker::AudioSucker(AudioSource *_source)
+AudioSucker::AudioSucker(AudioPort *_source)
 {
 	perf_channel = PerformanceMonitor::create_channel("suck");
 	source = _source;
@@ -72,7 +72,7 @@ AudioSucker::~AudioSucker()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void AudioSucker::setSource(AudioSource* s)
+void AudioSucker::setSource(AudioPort* s)
 {
 	source = s;
 }

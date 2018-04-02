@@ -18,7 +18,7 @@
 #include "../lib/math/rect.h"
 
 class Data;
-class Effect;
+class AudioEffect;
 class Track;
 class Sample;
 class Synthesizer;
@@ -101,7 +101,7 @@ public:
 	void _cdecl addTag(const string &key, const string &value);
 	void _cdecl editTag(int index, const string &key, const string &value);
 	void _cdecl deleteTag(int index);
-	void _cdecl addEffect(Effect *effect);
+	void _cdecl addEffect(AudioEffect *effect);
 	void _cdecl deleteEffect(int index);
 	void _cdecl editEffect(int index, const string &param_old);
 	void _cdecl enableEffect(int index, bool enabled);
@@ -143,7 +143,7 @@ public:
 	Track *_cdecl get_track(int track_no);
 	SampleRef *_cdecl get_sample_ref(int track_no, int index);
 	Sample* _cdecl get_sample_by_uid(int uid);
-	Effect *_cdecl get_fx(int track_no, int index);
+	AudioEffect *_cdecl get_fx(int track_no, int index);
 	MidiEffect *_cdecl get_midi_fx(int track_no, int index);
 
 // data
@@ -155,7 +155,7 @@ public:
 
 	float volume;
 
-	Array<Effect*> fx;
+	Array<AudioEffect*> fx;
 	Array<Track*> tracks;
 	Array<Sample*> samples;
 	Array<Curve*> curves;

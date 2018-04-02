@@ -46,7 +46,7 @@ void PeakMeter::Data::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::PeakMeter(AudioSource *s)
+PeakMeter::PeakMeter(AudioPort *s)
 {
 	source = s;
 	mode = MODE_PEAKS;
@@ -121,7 +121,7 @@ void PeakMeter::update(AudioBuffer &buf)
 }
 
 
-void PeakMeter::set_source(AudioSource* s)
+void PeakMeter::set_source(AudioPort* s)
 {
 	source = s;
 }

@@ -10,13 +10,13 @@
 
 #include "../../ActionMergable.h"
 class Track;
-class Effect;
+class AudioEffect;
 class Song;
 
 class ActionTrackEditEffect: public ActionMergable<string>
 {
 public:
-	ActionTrackEditEffect(Track *t, int index, const string &old_params, Effect *fx);
+	ActionTrackEditEffect(Track *t, int index, const string &old_params, AudioEffect *fx);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

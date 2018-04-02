@@ -22,7 +22,7 @@
 class AudioBuffer;
 class Song;
 class Synthesizer;
-class Effect;
+class AudioEffect;
 
 
 
@@ -38,7 +38,7 @@ class TrackMarker
 public:
 	Range range;
 	string text;
-	Array<Effect*> fx;
+	Array<AudioEffect*> fx;
 };
 
 string track_type(int type);
@@ -71,7 +71,7 @@ public:
 	void _cdecl move(int target);
 	AudioBuffer _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
-	void _cdecl addEffect(Effect *effect);
+	void _cdecl addEffect(AudioEffect *effect);
 	void _cdecl deleteEffect(int index);
 	void _cdecl editEffect(int index, const string &param_old);
 	void _cdecl enableEffect(int index, bool enabled);
@@ -110,7 +110,7 @@ public:
 	float volume, panning;
 	bool muted;
 
-	Array<Effect*> fx;
+	Array<AudioEffect*> fx;
 	Array<SampleRef*> samples;
 
 	// midi track

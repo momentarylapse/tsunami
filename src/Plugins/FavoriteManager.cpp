@@ -23,28 +23,6 @@ FavoriteManager::~FavoriteManager()
 {
 }
 
-string FavoriteManager::type2str(int type)
-{
-	if (type == Configurable::Type::EFFECT)
-		return "Effect";
-	if (type == Configurable::Type::SYNTHESIZER)
-		return "Synth";
-	if (type == Configurable::Type::MIDI_EFFECT)
-		return "MidiEffect";
-	return "???";
-}
-
-int FavoriteManager::str2type(const string &str)
-{
-	if (str == "Effect")
-		return Configurable::Type::EFFECT;
-	if (str == "Synth")
-		return Configurable::Type::SYNTHESIZER;
-	if (str == "MidiEffect")
-		return Configurable::Type::MIDI_EFFECT;
-	return -1;
-}
-
 void FavoriteManager::LoadFromFile(const string &filename, bool read_only, Session *session)
 {
 	if (!file_test_existence(filename))
@@ -55,7 +33,7 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only, Sessi
 		for (int i=0; i<n; i++){
 			Favorite ff;
 			string type = f->read_str();
-			ff.type = str2type(type);
+			ff.type = Configurable::type_from_name(type);
 			ff.config_name = f->read_str();
 			ff.name = f->read_str();
 			ff.options = f->read_str();
@@ -81,7 +59,7 @@ void FavoriteManager::Save(Session *session)
 		File *f = FileCreateText(tsunami->directory + "favorites.txt");
 		f->write_int(favorites.num);
 		for (Favorite &ff: favorites){
-			f->write_str(type2str(ff.type));
+			f->write_str(Configurable::type_to_name(ff.type));
 			f->write_str(ff.config_name);
 			f->write_str(ff.name);
 			f->write_str(ff.options);
@@ -106,14 +84,14 @@ Array<string> FavoriteManager::GetList(Configurable *c)
 
 void FavoriteManager::Apply(Configurable *c, const string &name)
 {
-	c->resetConfig();
+	c->reset_config();
 	if (name == DEFAULT_NAME)
 		return;
 	if (!loaded)
 		Load(c->session);
 	for (Favorite &f: favorites){
 		if ((f.type == c->configurable_type) and (f.config_name == c->name) and (f.name == name))
-			c->configFromString(f.options);
+			c->config_from_string(f.options);
 	}
 }
 
@@ -126,7 +104,7 @@ void FavoriteManager::Save(Configurable *c, const string &name)
 	f.config_name = c->name;
 	f.name = name;
 	f.read_only = false;
-	f.options = c->configToString();
+	f.options = c->config_to_string();
 	set(f);
 	Save(c->session);
 }

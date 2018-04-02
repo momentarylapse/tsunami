@@ -10,7 +10,7 @@
 
 #include "../../Action.h"
 class Track;
-class Effect;
+class AudioEffect;
 
 class ActionTrackToggleEffectEnabled: public Action
 {

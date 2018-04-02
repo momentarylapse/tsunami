@@ -8,7 +8,7 @@
 #include "ConfigurableSelectorDialog.h"
 #include "../../Session.h"
 #include "../../Audio/Synth/Synthesizer.h"
-#include "../../Plugins/Effect.h"
+#include "../../Plugins/AudioEffect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Plugin.h"

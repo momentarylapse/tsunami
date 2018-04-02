@@ -16,12 +16,6 @@
 Synthesizer::Output::Output(Synthesizer *s)
 {
 	synth = s;
-	source = NULL;
-}
-
-void Synthesizer::Output::set_source(MidiSource *_source)
-{
-	source = _source;
 }
 
 int Synthesizer::Output::sample_rate()
@@ -32,25 +26,25 @@ int Synthesizer::Output::sample_rate()
 void Synthesizer::Output::reset()
 {
 	synth->reset();
-	if (source)
-		source->reset();
+	if (synth->source)
+		synth->source->reset();
 }
 
 int Synthesizer::Output::read(AudioBuffer &buf)
 {
-	if (!source)
+	if (!synth->source)
 		return 0;
 //	printf("synth read %d\n", buf.length);
 	synth->source_run_out = false;
 	// get from source...
 	synth->events.samples = buf.length;
-	int n = source->read(synth->events);
+	int n = synth->source->read(synth->events);
 //	printf("sr  %d", n);
-	if (n == source->NOT_ENOUGH_DATA){
+	if (n == synth->source->NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;
 	}
-	if (n == source->END_OF_STREAM){
+	if (n == synth->source->END_OF_STREAM){
 		synth->source_run_out = true;
 
 		// if source end_of_stream but still active rendering
@@ -103,6 +97,11 @@ void Synthesizer::__delete__()
 	this->Synthesizer::~Synthesizer();
 }
 
+void Synthesizer::set_source(MidiSource *_source)
+{
+	source = _source;
+}
+
 void Synthesizer::Tuning::set_default()
 {
 	for (int p=0; p<MAX_PITCH; p++)
@@ -124,7 +123,7 @@ void Synthesizer::setSampleRate(int _sample_rate)
 	sample_rate = _sample_rate;
 
 	update_delta_phi();
-	onConfig();
+	on_oonfig();
 }
 
 void Synthesizer::update_delta_phi()
@@ -136,7 +135,7 @@ void Synthesizer::update_delta_phi()
 void Synthesizer::setInstrument(Instrument &i)
 {
 	instrument = i;
-	onConfig();
+	on_oonfig();
 }
 
 void Synthesizer::enablePitch(int pitch, bool enable)
@@ -156,7 +155,7 @@ bool Synthesizer::hasRunOutOfData()
 
 void Synthesizer::reset()
 {
-	resetState();
+	reset_state();
 	active_pitch.clear();
 	source_run_out = false;
 }

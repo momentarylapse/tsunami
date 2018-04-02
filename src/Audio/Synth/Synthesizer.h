@@ -12,7 +12,7 @@
 #include "../../Plugins/Configurable.h"
 #include "../../Midi/MidiData.h"
 #include "../../Midi/Instrument.h"
-#include "../Source/AudioSource.h"
+#include "../Source/AudioPort.h"
 
 class Range;
 class AudioBuffer;
@@ -55,7 +55,7 @@ public:
 
 	bool isDefault();
 
-	class Output : public AudioSource
+	class Output : public AudioPort
 	{
 	public:
 		Output(Synthesizer *synth);
@@ -64,11 +64,11 @@ public:
 		virtual void _cdecl reset();
 		virtual int _cdecl sample_rate();
 
-		void set_source(MidiSource *source);
-		MidiSource *source;
-
 	};
 	Output *out;
+
+	void set_source(MidiSource *source);
+	MidiSource *source;
 
 protected:
 

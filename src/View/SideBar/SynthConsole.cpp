@@ -27,7 +27,7 @@ public:
 		synth = t->synth;
 		fromResource("synth_panel");
 		setString("name", synth->name);
-		p = synth->createPanel();
+		p = synth->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
@@ -41,7 +41,7 @@ public:
 		event("load_favorite", std::bind(&SynthPanel::onLoad, this));
 		event("save_favorite", std::bind(&SynthPanel::onSave, this));
 
-		old_param = synth->configToString();
+		old_param = synth->config_to_string();
 		synth->subscribe(this, std::bind(&SynthPanel::onSynthChange, this), synth->MESSAGE_CHANGE);
 		synth->subscribe(this, std::bind(&SynthPanel::onSynthChangeByAction, this), synth->MESSAGE_CHANGE_BY_ACTION);
 	}
@@ -56,7 +56,7 @@ public:
 			return;
 		session->plugin_manager->ApplyFavorite(synth, name);
 		track->editSynthesizer(old_param);
-		old_param = synth->configToString();
+		old_param = synth->config_to_string();
 	}
 	void onSave()
 	{
@@ -70,13 +70,13 @@ public:
 		track->editSynthesizer(old_param);
 		if (p)
 			p->update();
-		old_param = synth->configToString();
+		old_param = synth->config_to_string();
 	}
 	void onSynthChangeByAction()
 	{
 		if (p)
 			p->update();
-		old_param = synth->configToString();
+		old_param = synth->config_to_string();
 	}
 	Session *session;
 	Track *track;

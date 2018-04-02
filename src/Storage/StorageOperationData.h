@@ -19,7 +19,7 @@ class AudioBuffer;
 class Track;
 class Storage;
 class Format;
-class AudioSource;
+class AudioPort;
 class Tag;
 class Storage;
 class Session;
@@ -50,7 +50,7 @@ public:
 	string filename;
 	AudioBuffer *buf;
 	Track *track;
-	AudioSource *renderer;
+	AudioPort *renderer;
 	Array<Tag> tags;
 	int num_samples;
 	int offset;

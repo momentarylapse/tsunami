@@ -12,7 +12,7 @@
 
 class Song;
 class Track;
-class Effect;
+class AudioEffect;
 class Configurable;
 namespace Kaba
 {

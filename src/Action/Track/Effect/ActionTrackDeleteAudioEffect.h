@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACKDELETEEFFECT_H_
 #define ACTIONTRACKDELETEEFFECT_H_
 
+#include "../../../Plugins/AudioEffect.h"
 #include "../../Action.h"
-#include "../../../Plugins/Effect.h"
 class Track;
 
 class ActionTrackDeleteEffect: public Action
@@ -21,7 +21,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	Effect *effect;
+	AudioEffect *effect;
 	int track_no;
 	int index;
 };

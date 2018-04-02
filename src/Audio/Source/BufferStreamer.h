@@ -8,9 +8,9 @@
 #ifndef SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
 #define SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
 
-#include "../Source/AudioSource.h"
+#include "AudioPort.h"
 
-class BufferStreamer : public AudioSource
+class BufferStreamer : public AudioPort
 {
 public:
 	BufferStreamer(AudioBuffer *buf);

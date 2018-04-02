@@ -47,18 +47,18 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	void _cdecl resetConfig();
-	void _cdecl resetState();
+	void _cdecl reset_config();
+	void _cdecl reset_state();
 	bool configure(hui::Window *win);
-	virtual ConfigPanel *_cdecl createPanel();
+	virtual ConfigPanel *_cdecl create_panel();
 	void _cdecl notify();
-	virtual void _cdecl onConfig(){}
+	virtual void _cdecl on_oonfig(){}
 
 	PluginData *get_config() const;
 	PluginData *get_state() const;
 
-	string configToString() const;
-	void configFromString(const string &options);
+	string config_to_string() const;
+	void config_from_string(const string &options);
 
 	Configurable *copy() const;
 
@@ -70,10 +70,16 @@ public:
 
 	enum Type
 	{
-		EFFECT,
-		SYNTHESIZER,
+		AUDIO_SOURCE,
+		AUDIO_EFFECT,
+		MIDI_SOURCE,
 		MIDI_EFFECT,
+		SYNTHESIZER,
+		BEAT_SOURCE,
 	};
+
+	static string type_to_name(int type);
+	static Type type_from_name(const string &name);
 };
 
 template<class T>
@@ -87,18 +93,18 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	void _cdecl resetConfig();
-	void _cdecl resetState();
+	void _cdecl reset_config();
+	void _cdecl reset_state();
 	bool configure();
-	virtual ConfigPanel *_cdecl createPanel();
+	virtual ConfigPanel *_cdecl create_panel();
 	void _cdecl notify();
-	virtual void _cdecl onConfig(){}
+	virtual void _cdecl on_config(){}
 
 	PluginData *get_config() const;
 	PluginData *get_state() const;
 
-	string configToString() const;
-	void configFromString(const string &options);
+	string config_to_string() const;
+	void config_from_string(const string &options);
 
 	Configurable *copy() const;
 
@@ -110,9 +116,12 @@ public:
 
 	enum Type
 	{
-		EFFECT,
-		SYNTHESIZER,
+		AUDIO_SOURCE,
+		AUDIO_EFFECT,
+		MIDI_SOURCE,
 		MIDI_EFFECT,
+		SYNTHESIZER,
+		BEAT_SOURCE,
 	};
 };
 

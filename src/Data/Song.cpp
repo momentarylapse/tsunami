@@ -6,7 +6,6 @@
  */
 
 #include "Curve.h"
-#include "../Plugins/Effect.h"
 #include "../Action/Bar/ActionBarAdd.h"
 #include "../Action/Bar/ActionBarDelete.h"
 #include "../Action/Bar/ActionBarEdit.h"
@@ -38,7 +37,6 @@
 #include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
-#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Audio/Synth/DummySynthesizer.h"
@@ -49,6 +47,9 @@
 #include <assert.h>
 #include <math.h>
 #include "Song.h"
+
+#include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
+#include "../Plugins/AudioEffect.h"
 #include "../Rhythm/Bar.h"
 
 float amplitude2db(float amp)
@@ -133,7 +134,7 @@ void Song::deleteTag(int index)
 	execute(new ActionTagDelete(index));
 }
 
-void Song::addEffect(Effect *effect)
+void Song::addEffect(AudioEffect *effect)
 {
 	execute(new ActionTrackAddEffect(NULL, effect));
 }
@@ -219,7 +220,7 @@ void Song::reset()
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
-	for (Effect *f: fx)
+	for (AudioEffect *f: fx)
 		delete(f);
 	fx.clear();
 
@@ -555,7 +556,7 @@ Sample* Song::get_sample_by_uid(int uid)
 	return NULL;
 }
 
-Effect *Song::get_fx(int track_no, int index)
+AudioEffect *Song::get_fx(int track_no, int index)
 {
 	assert(index >= 0);
 	if (track_no >= 0){

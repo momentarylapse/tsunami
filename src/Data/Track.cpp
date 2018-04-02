@@ -6,7 +6,6 @@
  */
 
 #include "Track.h"
-#include "../Plugins/Effect.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../lib/hui/hui.h"
@@ -29,7 +28,7 @@
 #include "../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 #include "../Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.h"
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
-#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
+#include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Action/Track/Marker/ActionTrackAddMarker.h"
@@ -37,6 +36,7 @@
 #include "../Action/Track/Marker/ActionTrackEditMarker.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
+#include "../Plugins/AudioEffect.h"
 #include "../Tsunami.h"
 #include "../Plugins/PluginManager.h"
 
@@ -80,7 +80,7 @@ Track::~Track()
 {
 	midi.deep_clear();
 
-	for (Effect *f: fx)
+	for (AudioEffect *f: fx)
 		delete(f);
 	fx.clear();
 
@@ -267,7 +267,7 @@ void Track::insertMidiData(int offset, const MidiNoteBuffer& midi)
 	song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }
 
-void Track::addEffect(Effect *effect)
+void Track::addEffect(AudioEffect *effect)
 {
 	song->execute(new ActionTrackAddEffect(this, effect));
 }

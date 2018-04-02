@@ -152,7 +152,7 @@ class RingBuffer
 	void __assign__(RingBuffer o)
 
 // general "interface"
-class AudioSource
+class AudioPort
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(AudioBuffer buf)
@@ -164,11 +164,10 @@ class MidiSource
 	extern virtual void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 
-class SynthOutput extends AudioSource
+class SynthOutput extends AudioPort
 	extern override int read(AudioBuffer buf)
 	extern override void reset()
 	extern override int sample_rate()
-	extern void set_source(MidiSource* source)
 
 class Synthesizer
 	string name
@@ -187,6 +186,7 @@ class Synthesizer
 	extern void resetState()
 	extern void resetConfig()
 	extern void setSampleRate(int sample_rate)
+	extern void set_source(MidiSource* source)
 	
 //	extern void feed(MidiEventBuffer midi)
 	
@@ -355,7 +355,7 @@ class ColorScheme
 class AudioView
 	SongSelection sel
 	OutputStream* stream
-	AudioSource* renderer
+	SongRenderer* renderer
 	//InputStreamAny* input
 	extern void subscribe(void* handler, void* func, string message)
 	extern void unsubscribe(void* handler)
@@ -373,7 +373,7 @@ class SongRenderer
 
 
 class OutputStream
-	extern void __init__(Session *session, AudioSource* source)
+	extern void __init__(Session *session, AudioPort* source)
 	extern void __delete__()
 	extern void stop()
 	extern void play()
@@ -410,7 +410,7 @@ class MidiPort
 class InputStreamAudio
 	RingBuffer current_buffer
 	AudioBuffer buffer
-	AudioSource source
+	AudioPort* out
 	Session* session
 	extern void __init__(Session* session, int sample_rate)
 	extern virtual void __delete__()

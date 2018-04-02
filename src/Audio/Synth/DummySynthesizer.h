@@ -20,7 +20,7 @@ public:
 
 	virtual void _cdecl render(AudioBuffer &buf);
 
-	virtual void _cdecl onConfig();
+	virtual void _cdecl on_oonfig();
 
 	class State : public PluginData
 	{

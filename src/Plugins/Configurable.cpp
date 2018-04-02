@@ -222,7 +222,7 @@ PluginData *Configurable::get_state() const
 	return NULL;
 }
 
-string Configurable::configToString() const
+string Configurable::config_to_string() const
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -232,7 +232,7 @@ string Configurable::configToString() const
 	return s;
 }
 
-void Configurable::configFromString(const string &param)
+void Configurable::config_from_string(const string &param)
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -241,33 +241,33 @@ void Configurable::configFromString(const string &param)
 	config->reset();
 	int pos = 0;
 	var_from_string(config->_class, (char*)config, param, pos, session->song);
-	onConfig();
+	on_oonfig();
 }
 
 
 // default version of ResetConfig()
 //   try to execute   Configurable.config.reset()
-void Configurable::resetConfig()
+void Configurable::reset_config()
 {
 	PluginData *config = get_config();
 	if (config)
 		config->reset();
-	onConfig();
+	on_oonfig();
 }
 
 // default version of ResetState()
 //   try to execute   Configurable.state.reset()
-void Configurable::resetState()
+void Configurable::reset_state()
 {
 	PluginData *state = get_state();
 	if (state)
 		state->reset();
-	onConfig();
+	on_oonfig();
 }
 
 
 // default handler...
-ConfigPanel *Configurable::createPanel()
+ConfigPanel *Configurable::create_panel()
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -299,7 +299,7 @@ public:
 		setTitle(config->name);
 		embed(panel, "grid", 0, 1);
 
-		if (c->configurable_type != c->Type::EFFECT)
+		if (c->configurable_type != c->Type::AUDIO_EFFECT)
 			hideControl("preview", true);
 
 		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
@@ -400,7 +400,7 @@ bool Configurable::configure(hui::Window *win)
 		return true;
 
 	//_auto_panel_ = NULL;
-	ConfigPanel *panel = createPanel();
+	ConfigPanel *panel = create_panel();
 	if (!panel)
 		return true;
 	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel, win);
@@ -412,7 +412,7 @@ bool Configurable::configure(hui::Window *win)
 
 void Configurable::notify()
 {
-	onConfig();
+	on_oonfig();
 	Observable::notify();
 }
 
@@ -429,10 +429,44 @@ Configurable *Configurable::copy() const
 	clone->configurable_type = configurable_type;
 	clone->session = session;
 	clone->song = song;
-	clone->configFromString(configToString());
+	clone->config_from_string(config_to_string());
 
 	return clone;
 }
 
+
+string Configurable::type_to_name(int type)
+{
+	if (type == Configurable::Type::AUDIO_SOURCE)
+		return "AudioSource";
+	if (type == Configurable::Type::AUDIO_EFFECT)
+		return "AudioEffect";
+	if (type == Configurable::Type::SYNTHESIZER)
+		return "Synthesizer";
+	if (type == Configurable::Type::MIDI_SOURCE)
+		return "MidiSource";
+	if (type == Configurable::Type::MIDI_EFFECT)
+		return "MidiEffect";
+	if (type == Configurable::Type::BEAT_SOURCE)
+		return "BeatSource";
+	return "???";
+}
+
+Configurable::Type Configurable::type_from_name(const string &str)
+{
+	if (str == "AudioSource")
+		return Configurable::Type::AUDIO_SOURCE;
+	if (str == "AudioEffect" or str == "Effect")
+		return Configurable::Type::AUDIO_EFFECT;
+	if (str == "Synthesizer" or str == "Synth")
+		return Configurable::Type::SYNTHESIZER;
+	if (str == "MidiEffect")
+		return Configurable::Type::MIDI_EFFECT;
+	if (str == "MidiSource")
+		return Configurable::Type::MIDI_SOURCE;
+	if (str == "BeatSource")
+		return Configurable::Type::BEAT_SOURCE;
+	return (Type)-1;
+}
 
 

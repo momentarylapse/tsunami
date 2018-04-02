@@ -12,7 +12,7 @@
 #include "Device.h"
 #include "OutputStream.h"
 
-#include "../Audio/Source/AudioSource.h"
+#include "../Audio/Source/AudioPort.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -215,7 +215,7 @@ public:
 	}
 };
 
-OutputStream::OutputStream(Session *_session, AudioSource *s) :
+OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	ring_buf(1048576)
 {
 //	printf("output new\n");
@@ -277,7 +277,7 @@ OutputStream::~OutputStream()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void OutputStream::__init__(Session *s, AudioSource *r)
+void OutputStream::__init__(Session *s, AudioPort *r)
 {
 	new(this) OutputStream(s, r);
 }
@@ -450,7 +450,7 @@ void OutputStream::_read_stream()
 	reading = false;
 }
 
-void OutputStream::set_source(AudioSource *s)
+void OutputStream::set_source(AudioPort *s)
 {
 	source = s;
 }

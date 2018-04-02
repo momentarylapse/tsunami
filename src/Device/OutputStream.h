@@ -16,7 +16,7 @@
 #include "../Audio/RingBuffer.h"
 #include "../Stuff/Observable.h"
 
-class AudioSource;
+class AudioPort;
 class DeviceManager;
 class Device;
 class Thread;
@@ -39,10 +39,10 @@ class OutputStream : public Observable<VirtualBase>
 	friend StreamThread;
 public:
 	//AudioStream();
-	OutputStream(Session *session, AudioSource *r);
+	OutputStream(Session *session, AudioPort *r);
 	virtual ~OutputStream();
 
-	void _cdecl __init__(Session *session, AudioSource *r);
+	void _cdecl __init__(Session *session, AudioPort *r);
 	virtual void _cdecl __delete__();
 
 	void _create_dev();
@@ -67,7 +67,7 @@ public:
 	void _pause();
 
 	bool _cdecl is_paused();
-	void _cdecl set_source(AudioSource *r);
+	void _cdecl set_source(AudioPort *r);
 	void _cdecl set_device(Device *d);
 	int _cdecl get_pos();
 
@@ -93,7 +93,7 @@ private:
 	float update_dt;
 	int hui_runner_id;
 
-	AudioSource *source;
+	AudioPort *source;
 	RingBuffer ring_buf;
 
 	bool keep_thread_running;

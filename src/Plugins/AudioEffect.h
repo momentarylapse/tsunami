@@ -1,17 +1,17 @@
 /*
- * Effect.h
+ * AudioEffect.h
  *
  *  Created on: 10.12.2012
  *      Author: michi
  */
 
-#ifndef EFFECT_H_
-#define EFFECT_H_
+#ifndef AUDIOEFFECT_H_
+#define AUDIOEFFECT_H_
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 #include "Configurable.h"
-#include "../Audio/Source/AudioSource.h"
+#include "../Audio/Source/AudioPort.h"
 
 class Plugin;
 class Track;
@@ -23,11 +23,11 @@ class Script;
 class Type;
 };
 
-class Effect : public Configurable
+class AudioEffect : public Configurable
 {
 public:
-	Effect();
-	virtual ~Effect();
+	AudioEffect();
+	virtual ~AudioEffect();
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -39,27 +39,28 @@ public:
 	// context
 	int sample_rate;
 
-	class Output : public AudioSource
+	class Output : public AudioPort
 	{
 	public:
-		Output(Effect *fx);
+		Output(AudioEffect *fx);
 		virtual int _cdecl read(AudioBuffer &buf);
 		virtual void _cdecl reset();
 		virtual int _cdecl get_pos(int delta);
 		virtual int _cdecl sample_rate();
-		void set_source(AudioSource *source);
-		Effect *fx;
-		AudioSource *source;
+		AudioEffect *fx;
 	};
 	Output *out;
 
+	AudioPort *source;
+	void set_source(AudioPort *source);
+
 	virtual void _cdecl process(AudioBuffer &buf){};
 
-	void doProcessTrack(Track *t, int layer, const Range &r);
+	void do_process_track(Track *t, int layer, const Range &r);
 
 	string getError();
 };
 
-Effect *_cdecl CreateEffect(Session *session, const string &name);
+AudioEffect *_cdecl CreateAudioEffect(Session *session, const string &name);
 
-#endif /* EFFECT_H_ */
+#endif /* AUDIOEFFECT_H_ */

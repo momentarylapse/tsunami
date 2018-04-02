@@ -6,9 +6,9 @@
  */
 
 #include "Curve.h"
-#include "../Plugins/Effect.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
+#include "../Plugins/AudioEffect.h"
 #include "Song.h"
 
 Curve::Target::Target()
@@ -68,7 +68,7 @@ void Curve::Target::enumerateTrack(Track *t, Array<Target> &list, const string &
 {
 	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
 	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
-	foreachi(Effect *fx, t->fx, i)
+	foreachi(AudioEffect *fx, t->fx, i)
 		enumerateConfigurable(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
 	enumerateConfigurable(t->synth, list, prefix + ":s", prefix_nice + ".synth");
 }

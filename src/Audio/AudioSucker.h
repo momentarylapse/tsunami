@@ -11,17 +11,17 @@
 #include "AudioBuffer.h"
 #include "../Stuff/Observable.h"
 
-class AudioSource;
+class AudioPort;
 class AudioSuckerThread;
 
 class AudioSucker : public Observable<VirtualBase>
 {
 	friend class AudioSuckerThread;
 public:
-	AudioSucker(AudioSource *source);
+	AudioSucker(AudioPort *source);
 	virtual ~AudioSucker();
 
-	void setSource(AudioSource *s);
+	void setSource(AudioPort *s);
 	void accumulate(bool enable);
 	void resetAccumulation();
 	void setBufferSize(int size);
@@ -35,7 +35,7 @@ public:
 	static const int DEFAULT_BUFFER_SIZE;
 	static const string MESSAGE_UPDATE;
 
-	AudioSource *source;
+	AudioPort *source;
 	AudioBuffer buf;
 	bool accumulating;
 	bool running;

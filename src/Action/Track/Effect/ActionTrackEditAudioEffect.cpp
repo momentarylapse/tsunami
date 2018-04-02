@@ -7,24 +7,24 @@
 
 #include "ActionTrackEditEffect.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/Effect.h"
 #include <assert.h>
+#include "../../../Plugins/AudioEffect.h"
 
-ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string &_old_params, Effect *fx)
+ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string &_old_params, AudioEffect *fx)
 {
 	track_no = get_track_index(t);
 	index = _index;
 	old_value = _old_params;
-	new_value = fx->configToString();
+	new_value = fx->config_to_string();
 }
 
 void *ActionTrackEditEffect::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	Effect *fx = a->get_fx(track_no, index);
+	AudioEffect *fx = a->get_fx(track_no, index);
 
-	fx->configFromString(new_value);
+	fx->config_from_string(new_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
@@ -34,9 +34,9 @@ void ActionTrackEditEffect::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	Effect *fx = a->get_fx(track_no, index);
+	AudioEffect *fx = a->get_fx(track_no, index);
 
-	fx->configFromString(old_value);
+	fx->config_from_string(old_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 }
 

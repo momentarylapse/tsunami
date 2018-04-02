@@ -8,10 +8,10 @@
 #include "StorageOperationData.h"
 #include "Storage.h"
 
-#include "../Audio/Source/AudioSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Session.h"
 #include "../Audio/AudioBuffer.h"
+#include "../Audio/Source/AudioPort.h"
 
 StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
 {

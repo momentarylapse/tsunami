@@ -1,11 +1,11 @@
 /*
- * Effect.cpp
+ * AudioEffect.cpp
  *
  *  Created on: 10.12.2012
  *      Author: michi
  */
 
-#include "Effect.h"
+#include "AudioEffect.h"
 
 #include "Plugin.h"
 #include "../Session.h"
@@ -15,70 +15,70 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
-Effect::Output::Output(Effect *_fx)
+AudioEffect::Output::Output(AudioEffect *_fx)
 {
 	fx = _fx;
-	source = NULL;
 }
 
-int Effect::Output::read(AudioBuffer &buf)
+int AudioEffect::Output::read(AudioBuffer &buf)
 {
-	if (!source)
+	if (!fx->source)
 		return buf.length;
-	int samples = source->read(buf);
+	int samples = fx->source->read(buf);
 	fx->process(buf);
 	return samples;
 }
 
-void Effect::Output::reset()
+void AudioEffect::Output::reset()
 {
-	fx->resetState();
-	if (source)
-		source->reset();
+	fx->reset_state();
+	if (fx->source)
+		fx->source->reset();
 }
 
-int Effect::Output::get_pos(int delta)
+int AudioEffect::Output::get_pos(int delta)
 {
-	if (!source)
+	if (!fx->source)
 		return -1;
-	return source->get_pos(delta);
+	return fx->source->get_pos(delta);
 }
 
-int Effect::Output::sample_rate()
+int AudioEffect::Output::sample_rate()
 {
 	return fx->sample_rate;
 }
 
-void Effect::Output::set_source(AudioSource *_source)
-{
-	source = _source;
-	if (source)
-		fx->sample_rate = source->sample_rate();
-}
-
-Effect::Effect() :
-	Configurable(Session::GLOBAL, Type::EFFECT)
+AudioEffect::AudioEffect() :
+	Configurable(Session::GLOBAL, Type::AUDIO_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
 	enabled = true;
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	source = NULL;
 	out = new Output(this);
 }
 
-Effect::~Effect()
+AudioEffect::~AudioEffect()
 {
 	delete out;
 }
 
-void Effect::__init__()
+void AudioEffect::__init__()
 {
-	new(this) Effect;
+	new(this) AudioEffect;
 }
 
-void Effect::__delete__()
+void AudioEffect::__delete__()
 {
-	this->Effect::~Effect();
+	this->AudioEffect::~AudioEffect();
+}
+
+void AudioEffect::set_source(AudioPort *_source)
+{
+	source = _source;
+	if (source)
+		sample_rate = source->sample_rate();
 }
 
 /*void Effect::prepare()
@@ -86,7 +86,7 @@ void Effect::__delete__()
 	resetState();
 }*/
 
-string Effect::getError()
+string AudioEffect::getError()
 {
 	if (plugin)
 		return plugin->getError();
@@ -95,7 +95,7 @@ string Effect::getError()
 
 
 
-void Effect::doProcessTrack(Track *t, int layer, const Range &r)
+void AudioEffect::do_process_track(Track *t, int layer, const Range &r)
 {
 	sample_rate = t->song->sample_rate;
 
@@ -107,22 +107,22 @@ void Effect::doProcessTrack(Track *t, int layer, const Range &r)
 
 
 // TODO: move to PluginManager?
-Effect *CreateEffect(Session *session, const string &name)
+AudioEffect *CreateAudioEffect(Session *session, const string &name)
 {
 	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::EFFECT, name);
-	Effect *fx = NULL;
+	AudioEffect *fx = NULL;
 	if (p->usable)
-		fx = (Effect*)p->createInstance(session, "AudioEffect");
+		fx = (AudioEffect*)p->createInstance(session, "AudioEffect");
 
 	// dummy?
 	if (!fx)
-		fx = new Effect;
+		fx = new AudioEffect;
 
 	fx->name = name;
 	fx->plugin = p;
 	fx->usable = p->usable;
 	fx->song = session->song;
 	fx->session = session;
-	fx->resetConfig();
+	fx->reset_config();
 	return fx;
 }

@@ -12,7 +12,7 @@
 #include "../lib/kaba/kaba.h"
 
 class Plugin;
-class Effect;
+class AudioEffect;
 class MidiEffect;
 class Synthesizer;
 class Configurable;
@@ -54,7 +54,7 @@ public:
 	Synthesizer *__LoadSynthesizer(Session *session, const string &name);
 	Synthesizer *CreateSynthesizer(Session *session, const string &name);
 
-	Effect *ChooseEffect(hui::Panel *parent, Session *session);
+	AudioEffect *ChooseEffect(hui::Panel *parent, Session *session);
 	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Session *session);
 	Synthesizer *ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name = "");
 

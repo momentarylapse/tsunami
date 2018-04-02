@@ -1,22 +1,22 @@
 /*
- * AudioSource.h
+ * AudioPort.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
-#define SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
+#ifndef SRC_AUDIO_SOURCE_AUDIOPORT_H_
+#define SRC_AUDIO_SOURCE_AUDIOPORT_H_
 
 #include "../../Data/Song.h"
 
 class AudioBuffer;
 
-class AudioSource : public VirtualBase
+class AudioPort : public VirtualBase
 {
 public:
-	AudioSource();
-	virtual ~AudioSource(){}
+	AudioPort();
+	virtual ~AudioPort(){}
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -30,4 +30,4 @@ public:
 	static const int NOT_ENOUGH_DATA;
 };
 
-#endif /* SRC_AUDIO_SOURCE_AUDIOSOURCE_H_ */
+#endif /* SRC_AUDIO_SOURCE_AUDIOPORT_H_ */

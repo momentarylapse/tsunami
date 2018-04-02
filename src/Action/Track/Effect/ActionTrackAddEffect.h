@@ -10,18 +10,18 @@
 
 #include "../../Action.h"
 class Track;
-class Effect;
+class AudioEffect;
 
 class ActionTrackAddEffect: public Action
 {
 public:
-	ActionTrackAddEffect(Track *t, Effect *effect);
+	ActionTrackAddEffect(Track *t, AudioEffect *effect);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	Effect *effect;
+	AudioEffect *effect;
 	int track_no;
 };
 

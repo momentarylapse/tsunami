@@ -13,7 +13,7 @@
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
-class AudioSource;
+class AudioPort;
 class Format;
 
 const int CHUNK_SIZE = 1 << 18;

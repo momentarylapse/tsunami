@@ -10,10 +10,10 @@
 
 #include "Observable.h"
 
-class AudioSource;
+class AudioPort;
 class MidiSource;
 class BeatSource;
-class Effect;
+class AudioEffect;
 class MidiEffect;
 class Synthesizer;
 class ConfigPanel;
@@ -45,10 +45,10 @@ public:
 		virtual string config_to_string(){ return ""; }
 		virtual void config_from_string(const string &str){}
 		virtual ConfigPanel *create_panel(){ return NULL; }
-		virtual void set_audio_source(int port, AudioSource *s){};
+		virtual void set_audio_source(int port, AudioPort *s){};
 		virtual void set_midi_source(int port, MidiSource *s){};
 		virtual void set_beat_source(int port, BeatSource *s){};
-		virtual AudioSource *audio_socket(int port){ return NULL; }
+		virtual AudioPort *audio_socket(int port){ return NULL; }
 		virtual MidiSource *midi_socket(int port){ return NULL; }
 		virtual BeatSource *beat_socket(int port){ return NULL; }
 		Array<int> port_in, port_out;

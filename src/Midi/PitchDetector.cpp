@@ -6,8 +6,8 @@
  */
 
 #include "PitchDetector.h"
-#include "../Audio/Source/AudioSource.h"
 #include "../Audio/AudioBuffer.h"
+#include "../Audio/Source/AudioPort.h"
 #include "../Plugins/FastFourierTransform.h"
 
 
@@ -27,7 +27,7 @@ int freq_to_index(float f)
 	return f*BUFFER_SIZE / DEFAULT_SAMPLE_RATE;
 }
 
-PitchDetector::PitchDetector(AudioSource *_source)
+PitchDetector::PitchDetector(AudioPort *_source)
 {
 	source = _source;
 	loud_enough = false;
@@ -39,7 +39,7 @@ PitchDetector::~PitchDetector()
 {
 }
 
-void PitchDetector::__init__(AudioSource *source)
+void PitchDetector::__init__(AudioPort *source)
 {
 	new(this) PitchDetector(source);
 }

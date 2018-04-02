@@ -8,7 +8,6 @@
 #include "../Source/SongRenderer.h"
 
 #include "../Synth/Synthesizer.h"
-#include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Data/Curve.h"
@@ -19,6 +18,7 @@
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
+#include "../../Plugins/AudioEffect.h"
 
 SongRenderer::SongRenderer(Song *s)
 {
@@ -106,10 +106,10 @@ void SongRenderer::render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 		render_midi_track_no_fx(buf, t, ti);
 }
 
-void SongRenderer::apply_fx(AudioBuffer &buf, Track *t, Array<Effect*> &fx_list)
+void SongRenderer::apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_list)
 {
 	// apply fx
-	for (Effect *fx: fx_list)
+	for (AudioEffect *fx: fx_list)
 		if (fx->enabled)
 			fx->process(buf);
 }
@@ -118,7 +118,7 @@ void SongRenderer::render_track_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	render_track_no_fx(buf, t, ti);
 
-	Array<Effect*> fx = t->fx;
+	Array<AudioEffect*> fx = t->fx;
 	if (preview_effect)
 		fx.add(preview_effect);
 	if (fx.num > 0)
@@ -266,10 +266,10 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 
 void SongRenderer::reset_state()
 {
-	for (Effect *fx: song->fx)
-		fx->resetState();
+	for (AudioEffect *fx: song->fx)
+		fx->reset_state();
 	if (preview_effect)
-		preview_effect->resetState();
+		preview_effect->reset_state();
 
 	for (Track *t: song->tracks)
 		reset_track_state(t);
@@ -277,8 +277,8 @@ void SongRenderer::reset_state()
 
 void SongRenderer::reset_track_state(Track *t)
 {
-	for (Effect *fx: t->fx)
-		fx->resetState();
+	for (AudioEffect *fx: t->fx)
+		fx->reset_state();
 	t->synth->reset();
 }
 
@@ -308,12 +308,12 @@ void SongRenderer::build_data()
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->out->set_source(m);
+			t->synth->set_source(m);
 		}else if (t->type == t->Type::TIME){
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->out->set_source(beat_midifier);
+			t->synth->set_source(beat_midifier);
 		}
 	}
 }

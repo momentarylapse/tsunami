@@ -8,15 +8,15 @@
 #include "FxConsole.h"
 #include "../AudioView.h"
 #include "../../Data/Track.h"
+#include "../../Plugins/AudioEffect.h"
 #include "../../Plugins/ConfigPanel.h"
-#include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 
 class SingleFxPanel : public hui::Panel
 {
 public:
-	SingleFxPanel(Session *_session, Track *t, Effect *_fx, int _index)
+	SingleFxPanel(Session *_session, Track *t, AudioEffect *_fx, int _index)
 	{
 		session = _session;
 		song = session->song;
@@ -28,7 +28,7 @@ public:
 
 		setString("name", fx->name);
 
-		p = fx->createPanel();
+		p = fx->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
@@ -46,7 +46,7 @@ public:
 
 		check("enabled", fx->enabled);
 
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChange, this), fx->MESSAGE_CHANGE);
 		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
 	}
@@ -64,7 +64,7 @@ public:
 			track->editEffect(index, old_param);
 		else
 			song->editEffect(index, old_param);
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 	}
 	void onSave()
 	{
@@ -95,19 +95,19 @@ public:
 			song->editEffect(index, old_param);
 		check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 
 	}
 	void onfxChangeByAction()
 	{
 		check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 	}
 	Session *session;
 	Song *song;
 	Track *track;
-	Effect *fx;
+	AudioEffect *fx;
 	string old_param;
 	ConfigPanel *p;
 	int index;
@@ -148,7 +148,7 @@ FxConsole::~FxConsole()
 
 void FxConsole::onAdd()
 {
-	Effect *effect = session->plugin_manager->ChooseEffect(this, session);
+	AudioEffect *effect = session->plugin_manager->ChooseEffect(this, session);
 	if (!effect)
 		return;
 	if (track)
@@ -191,12 +191,12 @@ void FxConsole::setTrack(Track *t)
 	}
 
 
-	Array<Effect*> fx;
+	Array<AudioEffect*> fx;
 	if (track)
 		fx = track->fx;
 	else
 		fx = song->fx;
-	foreachi(Effect *e, fx, i){
+	foreachi(AudioEffect *e, fx, i){
 		panels.add(new SingleFxPanel(session, track, e, i));
 		embed(panels.back(), id_inner, 0, i*2);
 		addSeparator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));

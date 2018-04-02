@@ -12,7 +12,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
-#include "../Audio/Source/AudioSource.h"
+#include "../Audio/Source/AudioPort.h"
 #include "../Stuff/Observable.h"
 
 class PluginManager;
@@ -71,7 +71,7 @@ public:
 
 	RingBuffer buffer;
 
-	class Source : public AudioSource
+	class Source : public AudioPort
 	{
 	public:
 		virtual int _cdecl read(AudioBuffer &buf);

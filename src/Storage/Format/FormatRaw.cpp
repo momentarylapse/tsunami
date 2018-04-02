@@ -28,7 +28,7 @@ RawConfigData GetRawConfigData(hui::Window *win)
 void FormatRaw::saveViaRenderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
-	AudioSource *r = od->renderer;
+	AudioPort *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
 

@@ -30,7 +30,7 @@ public:
 		fromResource("fx_panel");
 
 		setString("name", fx->name);
-		p = fx->createPanel();
+		p = fx->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
@@ -48,7 +48,7 @@ public:
 
 		check("enabled", fx->enabled);
 
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChange, this), fx->MESSAGE_CHANGE);
 		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
 	}
@@ -64,7 +64,7 @@ public:
 		session->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
 			track->editMidiEffect(index, old_param);
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 	}
 	void onSave()
 	{
@@ -89,13 +89,13 @@ public:
 			track->editMidiEffect(index, old_param);
 		check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 	}
 	void onFxChangeByAction()
 	{
 		check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->configToString();
+		old_param = fx->config_to_string();
 	}
 	Session *session;
 	Song *song;

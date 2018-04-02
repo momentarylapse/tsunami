@@ -7,9 +7,9 @@
 
 #include "ActionTrackAddEffect.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/Effect.h"
+#include "../../../Plugins/AudioEffect.h"
 
-ActionTrackAddEffect::ActionTrackAddEffect(Track *t, Effect *_effect)
+ActionTrackAddEffect::ActionTrackAddEffect(Track *t, AudioEffect *_effect)
 {
 	track_no = get_track_index(t);
 	effect = _effect;

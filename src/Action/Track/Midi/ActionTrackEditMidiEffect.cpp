@@ -15,7 +15,7 @@ ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(Track *t, int _index, const
 	track_no = get_track_index(t);
 	index = _index;
 	old_value = _old_params;
-	new_value = fx->configToString();
+	new_value = fx->config_to_string();
 }
 
 void *ActionTrackEditMidiEffect::execute(Data *d)
@@ -24,7 +24,7 @@ void *ActionTrackEditMidiEffect::execute(Data *d)
 
 	MidiEffect *fx = a->get_midi_fx(track_no, index);
 
-	fx->configFromString(new_value);
+	fx->config_from_string(new_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
@@ -36,7 +36,7 @@ void ActionTrackEditMidiEffect::undo(Data *d)
 
 	MidiEffect *fx = a->get_midi_fx(track_no, index);
 
-	fx->configFromString(old_value);
+	fx->config_from_string(old_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 }
 

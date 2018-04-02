@@ -8,7 +8,7 @@
 #include "FormatFlac.h"
 #include <math.h>
 
-#include "../../Audio/Source/AudioSource.h"
+#include "../../Audio/Source/AudioPort.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 
@@ -162,7 +162,7 @@ void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 byt
 
 void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
-	AudioSource *r = od->renderer;
+	AudioPort *r = od->renderer;
 
 	FLAC__StreamEncoder *encoder = NULL;
 	FLAC__StreamMetadata *metadata = NULL;

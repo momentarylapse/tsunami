@@ -7,7 +7,7 @@
 
 #include "FormatWave.h"
 
-#include "../../Audio/Source/AudioSource.h"
+#include "../../Audio/Source/AudioPort.h"
 #include "../../lib/math/math.h"
 
 
@@ -19,7 +19,7 @@ FormatDescriptorWave::FormatDescriptorWave() :
 
 void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
-	AudioSource *r = od->renderer;
+	AudioPort *r = od->renderer;
 
 	SampleFormat format = SAMPLE_FORMAT_16;
 	if (od->song)

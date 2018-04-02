@@ -42,7 +42,7 @@ void MidiEffect::__delete__()
 
 void MidiEffect::prepare()
 {
-	resetState();
+	reset_state();
 	if (!usable)
 		session->e(GetError());
 }
@@ -159,7 +159,7 @@ MidiEffect *CreateMidiEffect(Session *session, const string &name)
 	fx->usable = p->usable;
 	fx->session = session;
 	fx->song = session->song;
-	fx->resetConfig();
+	fx->reset_config();
 	return fx;
 }
 

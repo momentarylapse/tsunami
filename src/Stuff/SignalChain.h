@@ -12,6 +12,7 @@
 
 class AudioSource;
 class MidiSource;
+class BeatSource;
 class Session;
 
 class SignalChain : public Observable<VirtualBase>
@@ -37,8 +38,10 @@ public:
 		virtual string type() = 0;
 		virtual void set_audio_source(AudioSource *s){};
 		virtual void set_midi_source(MidiSource *s){};
+		virtual void set_beat_source(BeatSource *s){};
 		virtual AudioSource *audio_socket(){ return NULL; }
 		virtual MidiSource *midi_socket(){ return NULL; }
+		virtual BeatSource *beat_socket(){ return NULL; }
 		Array<int> port_in, port_out;
 	};
 	Array<Module*> modules;
@@ -47,7 +50,7 @@ public:
 	{
 		int type;
 		Module *source, *target;
-		int source_port, taget_port;
+		int source_port, target_port;
 	};
 	Array<Cable*> cables;
 

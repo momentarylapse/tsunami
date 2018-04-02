@@ -13,9 +13,13 @@
 #include "../Device/InputStreamMidi.h"
 #include "../Plugins/Effect.h"
 #include "../Plugins/MidiEffect.h"
+#include "../Plugins/PluginManager.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Source/SongRenderer.h"
 #include "../Audio/PeakMeter.h"
+#include "../Midi/MidiSource.h"
+#include "../Midi/MidiEventStreamer.h"
+#include "../Rhythm/BarStreamer.h"
 
 SignalChain::Module::Module()
 {
@@ -114,6 +118,50 @@ public:
 	virtual void set_midi_source(MidiSource *s){ if (synth) synth->out->set_source(s); }
 };
 
+class ModuleBeatMidifier : public SignalChain::Module
+{
+public:
+	BeatMidifier *beat_midifier;
+	ModuleBeatMidifier(BeatMidifier *b)
+	{
+		beat_midifier = b;
+		port_in.add(Track::Type::TIME);
+		port_out.add(Track::Type::MIDI);
+	}
+	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
+	virtual string type(){ return "BeatMidifier"; }
+	virtual MidiSource *midi_socket(){ return beat_midifier; }
+	virtual void set_beat_source(BeatSource *s){ if (beat_midifier) beat_midifier->setBeatSource(s); }
+};
+
+class ModuleBarStreamer : public SignalChain::Module
+{
+public:
+	BarStreamer *bar_streamer;
+	ModuleBarStreamer(BarStreamer *b)
+	{
+		bar_streamer = b;
+		port_out.add(Track::Type::TIME);
+	}
+	virtual ~ModuleBarStreamer(){ delete bar_streamer; }
+	virtual string type(){ return "BarStreamer"; }
+	virtual BeatSource *beat_socket(){ return bar_streamer; }
+};
+
+class ModuleMidiStreamer : public SignalChain::Module
+{
+public:
+	MidiEventStreamer *midi_streamer;
+	ModuleMidiStreamer(MidiEventStreamer *s)
+	{
+		midi_streamer = s;
+		port_out.add(Track::Type::MIDI);
+	}
+	virtual ~ModuleMidiStreamer(){ delete midi_streamer; }
+	virtual string type(){ return "MidiStreamer"; }
+	virtual MidiSource *midi_socket(){ return midi_streamer; }
+};
+
 SignalChain::SignalChain(Session *s)
 {
 	session = s;
@@ -139,18 +187,32 @@ SignalChain *SignalChain::create_default(Session *session)
 	auto *mod_fx = new ModuleAudioEffect(fx);
 	auto *mod_peak = new ModulePeakMeter(session->peak_meter);
 	auto *mod_out = new ModuleOutputStream(session->output_stream);
+	auto *mod_synth = new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, ""));
+	auto *mod_bar = new ModuleBarStreamer(new BarStreamer(session->song->bars));
+	auto *mod_bm = new ModuleBeatMidifier(new BeatMidifier);
+	MidiEventBuffer midi;
+	midi.add(MidiEvent(100, 80, 1));
+	midi.add(MidiEvent(40000, 80, 0));
+	midi.add(MidiEvent(50000, 82, 1));
+	midi.add(MidiEvent(90000, 82, 0));
+	auto *mod_midi = new ModuleMidiStreamer(new MidiEventStreamer(midi));
 	chain->modules.add(mod_renderer);
 	chain->modules.add(mod_fx);
 	chain->modules.add(mod_peak);
 	chain->modules.add(mod_out);
+	chain->modules.add(mod_synth);
+	chain->modules.add(mod_bar);
+	chain->modules.add(mod_bm);
+	chain->modules.add(mod_midi);
 
-	chain->connect(mod_renderer, 0, mod_fx, 0);
-	chain->connect(mod_fx, 0, mod_peak, 0);
+	//chain->connect(mod_renderer, 0, mod_fx, 0);
+	//chain->connect(mod_fx, 0, mod_peak, 0);
+	chain->connect(mod_renderer, 0, mod_peak, 0);
 	chain->connect(mod_peak, 0, mod_out, 0);
 
 	foreachi (Module *m, chain->modules, i){
-		m->x = 50 + i * 230;
-		m->y = 50;
+		m->x = 50 + (i % 5) * 230;
+		m->y = 50 + (i % 2) * 30 + 150*(i / 5);
 	}
 
 	return chain;
@@ -170,12 +232,14 @@ void SignalChain::connect(SignalChain::Module *source, int source_port, SignalCh
 	c->source = source;
 	c->target = target;
 	c->source_port = source_port;
-	c->taget_port = target_port;
+	c->target_port = target_port;
 	cables.add(c);
 	if (c->type == Track::Type::AUDIO){
 		target->set_audio_source(source->audio_socket());
 	}else if (c->type == Track::Type::MIDI){
 		target->set_midi_source(source->midi_socket());
+	}else if (c->type == Track::Type::TIME){
+		target->set_beat_source(source->beat_socket());
 	}
 }
 

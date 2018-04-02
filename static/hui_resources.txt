@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-46
+48
 // Resource
 Menu
 menu_fake
@@ -2123,6 +2123,122 @@ image=hui:zoom-in
 0
 // Resource
 Menu
+popup_signal_chain_menu
+
+0
+0
+3
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Menu
+add
+
+2
+0
+10
+Item
+signal_chain_add_audio_source
+
+0
+0
+0
+Item
+signal_chain_add_audio_effect
+
+1
+0
+0
+Item
+signal_chain_add_audio_join
+
+2
+0
+0
+Item
+signal_chain_add_audio_input
+
+3
+0
+0
+Item
+signal_chain_add_midi_source
+
+4
+0
+0
+Item
+signal_chain_add_midi_effect
+
+5
+0
+0
+Item
+signal_chain_add_synthesizer
+
+6
+0
+0
+Item
+signal_chain_add_midi_input
+
+7
+0
+0
+Item
+signal_chain_add_beat_source
+
+8
+0
+0
+Item
+signal_chain_add_beat_midifier
+
+9
+0
+0
+// Resource
+Menu
+popup_signal_module_menu
+
+0
+0
+4
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+signal_module_configure
+
+2
+0
+0
+Item
+signal_module_delete
+
+3
+0
+0
+// Resource
+Menu
 popup_song_menu
 
 0
@@ -3682,7 +3798,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-349
+364
 // Text
 /cancel
 Cancel
@@ -4362,6 +4478,51 @@ Samples
 popup_sample_menu/sample_properties
 Properties
 
+popup_signal_chain_menu/add
+Add Module
+
+popup_signal_chain_menu/header
+Signal chain
+
+popup_signal_chain_menu/signal_chain_add_audio_effect
+Audio effect
+
+popup_signal_chain_menu/signal_chain_add_audio_input
+Audio input stream
+
+popup_signal_chain_menu/signal_chain_add_audio_join
+Audio join
+
+popup_signal_chain_menu/signal_chain_add_audio_source
+Audio source
+
+popup_signal_chain_menu/signal_chain_add_beat_midifier
+Beat midifier
+
+popup_signal_chain_menu/signal_chain_add_beat_source
+Beat source
+
+popup_signal_chain_menu/signal_chain_add_midi_effect
+Midi effect
+
+popup_signal_chain_menu/signal_chain_add_midi_input
+Midi input stream
+
+popup_signal_chain_menu/signal_chain_add_midi_source
+Midi source
+
+popup_signal_chain_menu/signal_chain_add_synthesizer
+Synthesizer
+
+popup_signal_module_menu/header
+Module
+
+popup_signal_module_menu/signal_module_configure
+Configure
+
+popup_signal_module_menu/signal_module_delete
+Delete
+
 popup_song_menu/add_midi_track
 Add midi track
 
@@ -4737,7 +4898,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-438
+453
 // Text
 /cancel
 Abbrechen
@@ -5588,6 +5749,51 @@ Sample
 popup_sample_menu/sample_properties
 Eigenschaften
 
+popup_signal_chain_menu/add
+Modul hinzufügen
+
+popup_signal_chain_menu/header
+Signal Kette
+
+popup_signal_chain_menu/signal_chain_add_audio_effect
+Audio effect
+
+popup_signal_chain_menu/signal_chain_add_audio_input
+Audio input stream
+
+popup_signal_chain_menu/signal_chain_add_audio_join
+Audio join
+
+popup_signal_chain_menu/signal_chain_add_audio_source
+Audio source
+
+popup_signal_chain_menu/signal_chain_add_beat_midifier
+Beat midifier
+
+popup_signal_chain_menu/signal_chain_add_beat_source
+Beat source
+
+popup_signal_chain_menu/signal_chain_add_midi_effect
+Midi effect
+
+popup_signal_chain_menu/signal_chain_add_midi_input
+Midi input stream
+
+popup_signal_chain_menu/signal_chain_add_midi_source
+Midi source
+
+popup_signal_chain_menu/signal_chain_add_synthesizer
+Synthesizer
+
+popup_signal_module_menu/header
+Modul
+
+popup_signal_module_menu/signal_module_configure
+Konfigurieren
+
+popup_signal_module_menu/signal_module_delete
+Löschen
+
 popup_song_menu/add_midi_track
 Midi Spur hinzufügen
 
@@ -6054,7 +6260,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-171
+173
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6290,6 +6496,8 @@ Selection range is empty
 Auswahl überdeckt keinen Zeitbereich
 Send bug report to Michi
 Fehlermeldung an Michi senden
+Signal Chain
+Signal Kette
 Start
 Anfang
 Synthesizer
@@ -6376,6 +6584,8 @@ move selection to scale
 Selektierung ziehen zum Skalieren
 no sample selected
 kein Sample gewählt
+not allowed to delete system modules
+System Module dürfen nicht gelöscht werden
 not configurable
 nicht konfigurierbar
 open message.txt

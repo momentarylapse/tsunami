@@ -17,16 +17,29 @@
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Source/SongRenderer.h"
 #include "../Audio/PeakMeter.h"
+#include "../Audio/AudioJoiner.h"
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
-#include "../Rhythm/BarStreamer.h"
-#include "../Rhythm/BarCollection.h"
-#include "../Rhythm/Bar.h"
+#include "../Rhythm/BeatSource.h"
 
 SignalChain::Module::Module()
 {
 	x = y = 0;
 }
+
+class ModuleAudioSource : public SignalChain::Module
+{
+public:
+	AudioSource *source;
+	ModuleAudioSource(AudioSource *s)
+	{
+		source = s;
+		port_out.add(Track::Type::AUDIO);
+	}
+	virtual ~ModuleAudioSource(){ delete source; }
+	virtual string type(){ return "AudioSource"; }
+	virtual AudioSource *audio_socket(){ return source; }
+};
 
 class ModuleSongRenderer : public SignalChain::Module
 {
@@ -56,6 +69,23 @@ public:
 	virtual string type(){ return "PeakMeter"; }
 	virtual void set_audio_source(AudioSource *s){ if (peak_meter) peak_meter->set_source(s); }
 	virtual AudioSource *audio_socket(){ return peak_meter; }
+};
+
+class ModuleAudioJoiner : public SignalChain::Module
+{
+public:
+	AudioJoiner *joiner;
+	ModuleAudioJoiner(AudioJoiner *j)
+	{
+		joiner = j;
+		port_in.add(Track::Type::AUDIO);
+		port_in.add(Track::Type::AUDIO);
+		port_out.add(Track::Type::AUDIO);
+	}
+	virtual ~ModuleAudioJoiner(){ delete joiner; }
+	virtual string type(){ return "AudioJoiner"; }
+	virtual void set_audio_source(AudioSource *s){ if (joiner) joiner->set_source_a(s); }
+	virtual AudioSource *audio_socket(){ return joiner; }
 };
 
 class ModuleOutputStream : public SignalChain::Module
@@ -136,32 +166,32 @@ public:
 	virtual void set_beat_source(BeatSource *s){ if (beat_midifier) beat_midifier->setBeatSource(s); }
 };
 
-class ModuleBarStreamer : public SignalChain::Module
+class ModuleBeatSource : public SignalChain::Module
 {
 public:
-	BarStreamer *bar_streamer;
-	ModuleBarStreamer(BarStreamer *b)
+	BeatSource *source;
+	ModuleBeatSource(BeatSource *s)
 	{
-		bar_streamer = b;
+		source = s;
 		port_out.add(Track::Type::TIME);
 	}
-	virtual ~ModuleBarStreamer(){ delete bar_streamer; }
-	virtual string type(){ return "BarStreamer"; }
-	virtual BeatSource *beat_socket(){ return bar_streamer; }
+	virtual ~ModuleBeatSource(){ delete source; }
+	virtual string type(){ return "BeatSource"; }
+	virtual BeatSource *beat_socket(){ return source; }
 };
 
-class ModuleMidiStreamer : public SignalChain::Module
+class ModuleMidiSource: public SignalChain::Module
 {
 public:
-	MidiEventStreamer *midi_streamer;
-	ModuleMidiStreamer(MidiEventStreamer *s)
+	MidiSource *source;
+	ModuleMidiSource(MidiSource *s)
 	{
-		midi_streamer = s;
+		source = s;
 		port_out.add(Track::Type::MIDI);
 	}
-	virtual ~ModuleMidiStreamer(){ delete midi_streamer; }
-	virtual string type(){ return "MidiStreamer"; }
-	virtual MidiSource *midi_socket(){ return midi_streamer; }
+	virtual ~ModuleMidiSource(){ delete source; }
+	virtual string type(){ return "MidiSource"; }
+	virtual MidiSource *midi_socket(){ return source; }
 };
 
 SignalChain::SignalChain(Session *s)
@@ -179,34 +209,14 @@ SignalChain *SignalChain::create_default(Session *session)
 {
 	SignalChain *chain = new SignalChain(session);
 
-	session->song_renderer = new SongRenderer(session->song);
-	Effect *fx = CreateEffect(session, "Echo");
-	fx->configFromString("(0.3 0.98 0.5)");
-	session->peak_meter = new PeakMeter(NULL);
-	session->output_stream = new OutputStream(session, NULL);
+	auto *mod_renderer = chain->addSongRenderer(session->song);
+	auto *mod_peak = chain->addPeakMeter();
+	auto *mod_out = chain->addAudioOutputStream();
 
-	auto *mod_renderer = chain->add(new ModuleSongRenderer(session->song_renderer));
-	auto *mod_peak = chain->add(new ModulePeakMeter(session->peak_meter));
-	auto *mod_out = chain->add(new ModuleOutputStream(session->output_stream));
-	chain->add(new ModuleAudioEffect(fx));
-	chain->add(new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, "")));
-	BarCollection bars;
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	chain->add(new ModuleBarStreamer(new BarStreamer(bars)));
-	chain->add(new ModuleBeatMidifier(new BeatMidifier));
-	MidiEventBuffer midi;
-	midi.add(MidiEvent(100, 80, 1));
-	midi.add(MidiEvent(40000, 80, 0));
-	midi.add(MidiEvent(50000, 82, 1));
-	midi.add(MidiEvent(90000, 82, 0));
-	midi.samples = 400000;
-	chain->add(new ModuleMidiStreamer(new MidiEventStreamer(midi)));
+	session->song_renderer = dynamic_cast<ModuleSongRenderer*>(mod_renderer)->renderer;
+	session->peak_meter = dynamic_cast<ModulePeakMeter*>(mod_peak)->peak_meter;
+	session->output_stream = dynamic_cast<ModuleOutputStream*>(mod_out)->stream;
 
-	//chain->connect(mod_renderer, 0, mod_fx, 0);
-	//chain->connect(mod_fx, 0, mod_peak, 0);
 	chain->connect(mod_renderer, 0, mod_peak, 0);
 	chain->connect(mod_peak, 0, mod_out, 0);
 
@@ -319,5 +329,80 @@ void SignalChain::disconnect_target(SignalChain::Module *target, int target_port
 			disconnect(c);
 			break;
 		}
+}
+
+void SignalChain::save(const string& filename)
+{
+}
+
+void SignalChain::load(const string& filename)
+{
+}
+
+SignalChain::Module* SignalChain::addSongRenderer(Song *s)
+{
+	return add(new ModuleSongRenderer(new SongRenderer(s)));
+}
+
+SignalChain::Module* SignalChain::addAudioSource(AudioSource* s)
+{
+	return add(new ModuleAudioSource(s));
+}
+
+SignalChain::Module* SignalChain::addMidiSource(MidiSource* s)
+{
+	return add(new ModuleMidiSource(s));
+}
+
+SignalChain::Module* SignalChain::addAudioEffect(Effect* fx)
+{
+	return add(new ModuleAudioEffect(fx));
+}
+
+SignalChain::Module* SignalChain::addAudioJoiner()
+{
+	return add(new ModuleAudioJoiner(new AudioJoiner(NULL, NULL)));
+}
+
+SignalChain::Module* SignalChain::addPeakMeter()
+{
+	return add(new ModulePeakMeter(new PeakMeter(NULL)));
+}
+
+SignalChain::Module* SignalChain::addAudioInputStream()
+{
+	//return add(new ModuleAudioInputStream(new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)));
+	return NULL;
+}
+
+SignalChain::Module* SignalChain::addAudioOutputStream()
+{
+	return add(new ModuleOutputStream(new OutputStream(session, NULL)));
+}
+
+SignalChain::Module* SignalChain::addMidiEffect(MidiEffect* fx)
+{
+	return add(new ModuleMidiEffect(fx));
+}
+
+SignalChain::Module* SignalChain::addSynthesizer(Synthesizer* s)
+{
+	return add(new ModuleSynthesizer(s));
+}
+
+SignalChain::Module* SignalChain::addMidiInputStream()
+{
+	//return add(new ModuleMidiInputStream(new InputStreamMidi(session, DEFAULT_SAMPLE_RATE)));
+	return NULL;
+}
+
+SignalChain::Module* SignalChain::addBeatMidifier()
+{
+	return add(new ModuleBeatMidifier(new BeatMidifier));
+}
+
+SignalChain::Module* SignalChain::addBeatSource(BeatSource* s)
+{
+	return add(new ModuleBeatSource(s));
 }
 

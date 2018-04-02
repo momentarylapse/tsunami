@@ -13,6 +13,10 @@
 class AudioSource;
 class MidiSource;
 class BeatSource;
+class Effect;
+class MidiEffect;
+class Synthesizer;
+class Song;
 class Session;
 
 class SignalChain : public Observable<VirtualBase>
@@ -46,6 +50,19 @@ public:
 	};
 	Array<Module*> modules;
 	Module* add(Module *m);
+	Module* addAudioSource(AudioSource *s);
+	Module* addSongRenderer(Song *s);
+	Module* addMidiSource(MidiSource *s);
+	Module* addAudioEffect(Effect *fx);
+	Module* addAudioJoiner();
+	Module* addPeakMeter();
+	Module* addAudioInputStream();
+	Module* addAudioOutputStream();
+	Module* addMidiEffect(MidiEffect *fx);
+	Module* addSynthesizer(Synthesizer *s);
+	Module* addMidiInputStream();
+	Module* addBeatMidifier();
+	Module* addBeatSource(BeatSource *s);
 	void remove(Module *m);
 	int module_index(SignalChain::Module *m);
 

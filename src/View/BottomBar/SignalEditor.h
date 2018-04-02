@@ -13,6 +13,9 @@
 
 class Painter;
 class SignalChain;
+namespace hui{
+	class Menu;
+}
 
 class SignalEditor: public BottomBar::Console
 {
@@ -26,6 +29,20 @@ public:
 	void onMouseMove();
 	void onKeyDown();
 	void onDraw(Painter *p);
+
+	void onAddAudioSource();
+	void onAddAudioEffect();
+	void onAddAudioJoin();
+	void onAddAudioInputStream();
+	void onAddMidiSource();
+	void onAddMidiEffect();
+	void onAddSynthesizer();
+	void onAddMidiInputStream();
+	void onAddBeatSource();
+	void onAddBeatMidifier();
+
+	void onModuleDelete();
+	void onModuleConfigure();
 
 	void onChainUpdate();
 
@@ -48,6 +65,8 @@ public:
 	};
 	Selection getHover(float mx, float my);
 	Selection hover, sel;
+
+	hui::Menu *menu_chain, *menu_module;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_SIGNALEDITOR_H_ */

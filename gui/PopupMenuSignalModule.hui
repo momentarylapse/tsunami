@@ -1,0 +1,5 @@
+Menu popup_signal_module_menu ""
+	Item header "Module" disabled
+	Separator
+	Item signal_module_configure "Configure"
+	Item signal_module_delete "Delete"

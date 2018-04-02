@@ -9,6 +9,15 @@
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Stuff/SignalChain.h"
+#include "../../Plugins/Effect.h"
+#include "../../Plugins/MidiEffect.h"
+#include "../../Plugins/PluginManager.h"
+#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Midi/MidiSource.h"
+#include "../../Midi/MidiEventStreamer.h"
+#include "../../Rhythm/BarStreamer.h"
+#include "../../Rhythm/BarCollection.h"
+#include "../../Rhythm/Bar.h"
 
 
 SignalEditor::Selection::Selection()
@@ -26,12 +35,27 @@ SignalEditor::SignalEditor(Session *session) :
 {
 	addDrawingArea("!expandx,expandy,grabfocus", 0, 0, "area");
 
+	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
+	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
+
 	eventXP("area", "hui:draw", std::bind(&SignalEditor::onDraw, this, std::placeholders::_1));
 	eventX("area", "hui:mouse-move", std::bind(&SignalEditor::onMouseMove, this));
 	eventX("area", "hui:left-button-down", std::bind(&SignalEditor::onLeftButtonDown, this));
 	eventX("area", "hui:left-button-up", std::bind(&SignalEditor::onLeftButtonUp, this));
 	eventX("area", "hui:right-button-down", std::bind(&SignalEditor::onRightButtonDown, this));
 	eventX("area", "hui:key-down", std::bind(&SignalEditor::onKeyDown, this));
+	event("signal_chain_add_audio_source", std::bind(&SignalEditor::onAddAudioSource, this));
+	event("signal_chain_add_audio_effect", std::bind(&SignalEditor::onAddAudioEffect, this));
+	event("signal_chain_add_audio_input", std::bind(&SignalEditor::onAddAudioInputStream, this));
+	event("signal_chain_add_audio_join", std::bind(&SignalEditor::onAddAudioJoin, this));
+	event("signal_chain_add_midi_source", std::bind(&SignalEditor::onAddMidiSource, this));
+	event("signal_chain_add_midi_effect", std::bind(&SignalEditor::onAddMidiEffect, this));
+	event("signal_chain_add_midi_input", std::bind(&SignalEditor::onAddMidiInputStream, this));
+	event("signal_chain_add_synthesizer", std::bind(&SignalEditor::onAddSynthesizer, this));
+	event("signal_chain_add_beat_source", std::bind(&SignalEditor::onAddBeatSource, this));
+	event("signal_chain_add_beat_midifier", std::bind(&SignalEditor::onAddBeatMidifier, this));
+	event("signal_module_delete", std::bind(&SignalEditor::onModuleDelete, this));
+	event("signal_module_configure", std::bind(&SignalEditor::onModuleConfigure, this));
 
 	chain = session->signal_chain;
 	chain->subscribe(this, std::bind(&SignalEditor::onChainUpdate, this));
@@ -40,6 +64,8 @@ SignalEditor::SignalEditor(Session *session) :
 SignalEditor::~SignalEditor()
 {
 	chain->unsubscribe(this);
+	delete menu_chain;
+	delete menu_module;
 }
 
 void SignalEditor::onLeftButtonDown()
@@ -141,6 +167,16 @@ static color signal_color(int type)
 
 void SignalEditor::onRightButtonDown()
 {
+	int mx = hui::GetEvent()->mx;
+	int my = hui::GetEvent()->my;
+	hover = getHover(mx, my);
+	sel = hover;
+
+	if (hover.type == hover.TYPE_MODULE){
+		menu_module->openPopup(this, mx, my);
+	}else if (hover.type < 0){
+		menu_chain->openPopup(this, mx, my);
+	}
 }
 
 void SignalEditor::onKeyDown()
@@ -152,6 +188,80 @@ void SignalEditor::onKeyDown()
 			hover = sel = Selection();
 		}
 	}
+}
+
+void SignalEditor::onAddAudioSource()
+{
+	//chain->addAudioSource(...);
+}
+
+void SignalEditor::onAddAudioEffect()
+{
+	Effect *fx = CreateEffect(session, "Echo");
+	fx->configFromString("(0.3 0.98 0.5)");
+	chain->addAudioEffect(fx);
+}
+
+void SignalEditor::onAddAudioJoin()
+{
+	chain->addAudioJoiner();
+}
+
+void SignalEditor::onAddAudioInputStream()
+{
+	chain->addAudioInputStream();
+}
+
+void SignalEditor::onAddMidiSource()
+{
+	MidiEventBuffer midi;
+	midi.add(MidiEvent(100, 80, 1));
+	midi.add(MidiEvent(40000, 80, 0));
+	midi.add(MidiEvent(50000, 82, 1));
+	midi.add(MidiEvent(90000, 82, 0));
+	midi.samples = 400000;
+	chain->addMidiSource(new MidiEventStreamer(midi));
+}
+
+void SignalEditor::onAddMidiEffect()
+{
+}
+
+void SignalEditor::onAddSynthesizer()
+{
+	chain->addSynthesizer(session->plugin_manager->CreateSynthesizer(session, ""));
+}
+
+void SignalEditor::onAddMidiInputStream()
+{
+	chain->addMidiInputStream();
+}
+
+void SignalEditor::onAddBeatSource()
+{
+	BarCollection bars;
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	chain->addBeatSource(new BarStreamer(bars));
+}
+
+void SignalEditor::onAddBeatMidifier()
+{
+	chain->addBeatMidifier();
+}
+
+void SignalEditor::onModuleDelete()
+{
+	if (sel.type == sel.TYPE_MODULE){
+		chain->remove((SignalChain::Module*)sel.module);
+		hover = sel = Selection();
+	}
+}
+
+void SignalEditor::onModuleConfigure()
+{
 }
 
 SignalEditor::Selection SignalEditor::getHover(float mx, float my)

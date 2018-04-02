@@ -22,6 +22,7 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
+	virtual void _cdecl reset(){}
 
 	BeatSource *beat_source;
 	void setBeatSource(BeatSource *beat_source);
@@ -34,6 +35,7 @@ class BeatMidifier : public MidiSource
 {
 public:
 	virtual int _cdecl read(MidiEventBuffer &midi);
+	virtual void _cdecl reset();
 };
 
 #endif /* SRC_MIDI_MIDISOURCE_H_ */

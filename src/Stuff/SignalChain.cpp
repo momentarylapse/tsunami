@@ -20,6 +20,8 @@
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../Rhythm/BarStreamer.h"
+#include "../Rhythm/BarCollection.h"
+#include "../Rhythm/Bar.h"
 
 SignalChain::Module::Module()
 {
@@ -183,39 +185,42 @@ SignalChain *SignalChain::create_default(Session *session)
 	session->peak_meter = new PeakMeter(NULL);
 	session->output_stream = new OutputStream(session, NULL);
 
-	auto *mod_renderer = new ModuleSongRenderer(session->song_renderer);
-	auto *mod_fx = new ModuleAudioEffect(fx);
-	auto *mod_peak = new ModulePeakMeter(session->peak_meter);
-	auto *mod_out = new ModuleOutputStream(session->output_stream);
-	auto *mod_synth = new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, ""));
-	auto *mod_bar = new ModuleBarStreamer(new BarStreamer(session->song->bars));
-	auto *mod_bm = new ModuleBeatMidifier(new BeatMidifier);
+	auto *mod_renderer = chain->add(new ModuleSongRenderer(session->song_renderer));
+	chain->add(new ModuleAudioEffect(fx));
+	auto *mod_peak = chain->add(new ModulePeakMeter(session->peak_meter));
+	auto *mod_out = chain->add(new ModuleOutputStream(session->output_stream));
+	chain->add(new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, "")));
+	BarCollection bars;
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	chain->add(new ModuleBarStreamer(new BarStreamer(bars)));
+	chain->add(new ModuleBeatMidifier(new BeatMidifier));
 	MidiEventBuffer midi;
 	midi.add(MidiEvent(100, 80, 1));
 	midi.add(MidiEvent(40000, 80, 0));
 	midi.add(MidiEvent(50000, 82, 1));
 	midi.add(MidiEvent(90000, 82, 0));
-	auto *mod_midi = new ModuleMidiStreamer(new MidiEventStreamer(midi));
-	chain->modules.add(mod_renderer);
-	chain->modules.add(mod_fx);
-	chain->modules.add(mod_peak);
-	chain->modules.add(mod_out);
-	chain->modules.add(mod_synth);
-	chain->modules.add(mod_bar);
-	chain->modules.add(mod_bm);
-	chain->modules.add(mod_midi);
+	midi.samples = 400000;
+	chain->add(new ModuleMidiStreamer(new MidiEventStreamer(midi)));
 
 	//chain->connect(mod_renderer, 0, mod_fx, 0);
 	//chain->connect(mod_fx, 0, mod_peak, 0);
 	chain->connect(mod_renderer, 0, mod_peak, 0);
 	chain->connect(mod_peak, 0, mod_out, 0);
 
-	foreachi (Module *m, chain->modules, i){
-		m->x = 50 + (i % 5) * 230;
-		m->y = 50 + (i % 2) * 30 + 150*(i / 5);
-	}
-
 	return chain;
+}
+
+SignalChain::Module *SignalChain::add(SignalChain::Module *m)
+{
+	int i = modules.num;
+	m->x = 50 + (i % 5) * 230;
+	m->y = 50 + (i % 2) * 30 + 150*(i / 5);
+
+	modules.add(m);
+	return m;
 }
 
 void SignalChain::connect(SignalChain::Module *source, int source_port, SignalChain::Module *target, int target_port)
@@ -243,4 +248,39 @@ void SignalChain::connect(SignalChain::Module *source, int source_port, SignalCh
 	}
 }
 
+void SignalChain::disconnect(SignalChain::Cable *c)
+{
+	foreachi(Cable *cc, cables, i)
+		if (cc == c){
+			if (c->type == Track::Type::AUDIO){
+				c->target->set_audio_source(NULL);
+			}else if (c->type == Track::Type::MIDI){
+				c->target->set_midi_source(NULL);
+			}else if (c->type == Track::Type::TIME){
+				c->target->set_beat_source(NULL);
+			}
+
+			delete(c);
+			cables.erase(i);
+			break;
+		}
+}
+
+void SignalChain::disconnect_source(SignalChain::Module *source, int source_port)
+{
+	for (Cable *c: cables)
+		if (c->source == source and c->source_port == source_port){
+			disconnect(c);
+			break;
+		}
+}
+
+void SignalChain::disconnect_target(SignalChain::Module *target, int target_port)
+{
+	for (Cable *c: cables)
+		if (c->target == target and c->target_port == target_port){
+			disconnect(c);
+			break;
+		}
+}
 

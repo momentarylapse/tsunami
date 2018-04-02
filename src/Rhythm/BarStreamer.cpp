@@ -29,6 +29,7 @@ void BarStreamer::seek(int pos)
 	offset = pos;
 }
 
-
-
-
+void BarStreamer::reset()
+{
+	offset = 0;
+}

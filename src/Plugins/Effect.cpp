@@ -24,7 +24,7 @@ Effect::Output::Output(Effect *_fx)
 int Effect::Output::read(AudioBuffer &buf)
 {
 	if (!source)
-		return 0;
+		return buf.length;
 	int samples = source->read(buf);
 	fx->process(buf);
 	return samples;
@@ -33,6 +33,8 @@ int Effect::Output::read(AudioBuffer &buf)
 void Effect::Output::reset()
 {
 	fx->resetState();
+	if (source)
+		source->reset();
 }
 
 int Effect::Output::get_pos(int delta)
@@ -50,7 +52,8 @@ int Effect::Output::sample_rate()
 void Effect::Output::set_source(AudioSource *_source)
 {
 	source = _source;
-	fx->sample_rate = source->sample_rate();
+	if (source)
+		fx->sample_rate = source->sample_rate();
 }
 
 Effect::Effect() :

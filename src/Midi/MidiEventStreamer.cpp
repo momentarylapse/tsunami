@@ -6,6 +6,7 @@
  */
 
 #include "MidiEventStreamer.h"
+#include "../Rhythm/BeatSource.h"
 
 
 MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi)
@@ -35,6 +36,13 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi)
 			_midi.add(MidiEvent(e.pos - offset, e.pitch, e.volume));
 	offset += n;
 	return n;
+}
+
+void MidiEventStreamer::reset()
+{
+	if (beat_source)
+		beat_source->reset();
+	offset = 0;
 }
 
 void MidiEventStreamer::setData(const MidiEventBuffer &_midi)

@@ -44,12 +44,26 @@ void SignalEditor::onLeftButtonDown()
 {
 	hover = getHover(hui::GetEvent()->mx, hui::GetEvent()->my);
 	sel = hover;
+	if (sel.type == sel.TYPE_PORT_IN){
+		chain->disconnect_target((SignalChain::Module*)sel.module, sel.port);
+	}else if (sel.type == sel.TYPE_PORT_OUT){
+		chain->disconnect_source((SignalChain::Module*)sel.module, sel.port);
+	}
 	redraw("area");
 }
 
 void SignalEditor::onLeftButtonUp()
 {
 	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
+		if (hover.target_module){
+			if (sel.type == sel.TYPE_PORT_IN){
+				chain->disconnect_source((SignalChain::Module*)hover.target_module, hover.target_port);
+				chain->connect((SignalChain::Module*)hover.target_module, hover.target_port, (SignalChain::Module*)sel.module, sel.port);
+			}else if (sel.type == sel.TYPE_PORT_OUT){
+				chain->disconnect_target((SignalChain::Module*)hover.target_module, hover.target_port);
+				chain->connect((SignalChain::Module*)sel.module, sel.port, (SignalChain::Module*)hover.target_module, hover.target_port);
+			}
+		}
 		sel = Selection();
 	}
 	redraw("area");

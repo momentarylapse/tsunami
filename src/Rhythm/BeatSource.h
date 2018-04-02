@@ -19,6 +19,7 @@ class BeatSource : public VirtualBase
 public:
 	virtual ~BeatSource(){}
 	virtual int _cdecl read(Array<Beat> &beats, int samples) = 0;
+	virtual void _cdecl reset(){}
 
 	static DummyBeatSource *dummy;
 };

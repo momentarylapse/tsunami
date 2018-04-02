@@ -39,12 +39,20 @@ void MidiSource::setBeatSource(BeatSource *_beat_source)
 
 int BeatMidifier::read(MidiEventBuffer &midi)
 {
+	if (!beat_source)
+		return midi.samples;
+
 	Array<Beat> beats;
 	beat_source->read(beats, midi.samples);
-
 
 	for (Beat &b: beats)
 		midi.addMetronomeClick(b.range.offset, b.level, 0.8f);
 
 	return midi.samples;
+}
+
+void BeatMidifier::reset()
+{
+	if (beat_source)
+		beat_source->reset();
 }

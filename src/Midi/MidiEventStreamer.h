@@ -18,6 +18,7 @@ public:
 	virtual ~MidiEventStreamer();
 
 	virtual int _cdecl read(MidiEventBuffer &midi);
+	virtual void _cdecl reset();
 
 	void _cdecl setData(const MidiEventBuffer &midi);
 

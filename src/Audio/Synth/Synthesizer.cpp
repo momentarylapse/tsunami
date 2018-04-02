@@ -19,12 +19,6 @@ Synthesizer::Output::Output(Synthesizer *s)
 	source = NULL;
 }
 
-/*void Synthesizer::Output::reset()
-{
-	synth->reset();
-	//source->reset();
-}*/
-
 void Synthesizer::Output::set_source(MidiSource *_source)
 {
 	source = _source;
@@ -38,6 +32,8 @@ int Synthesizer::Output::sample_rate()
 void Synthesizer::Output::reset()
 {
 	synth->reset();
+	if (source)
+		source->reset();
 }
 
 int Synthesizer::Output::read(AudioBuffer &buf)

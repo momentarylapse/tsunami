@@ -45,6 +45,7 @@ public:
 		Array<int> port_in, port_out;
 	};
 	Array<Module*> modules;
+	Module* add(Module *m);
 
 	struct Cable
 	{
@@ -55,6 +56,9 @@ public:
 	Array<Cable*> cables;
 
 	void connect(Module *source, int source_port, Module *target, int target_port);
+	void disconnect_source(Module *source, int source_port);
+	void disconnect_target(Module *target, int target_port);
+	void disconnect(Cable *c);
 };
 
 #endif /* SRC_STUFF_SIGNALCHAIN_H_ */

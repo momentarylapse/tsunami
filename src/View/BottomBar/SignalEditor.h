@@ -30,9 +30,12 @@ public:
 	void onKeyDown();
 	void onDraw(Painter *p);
 
+	void onReset();
+	void onLoad();
+	void onSave();
 	void onAddAudioSource();
 	void onAddAudioEffect();
-	void onAddAudioJoin();
+	void onAddAudioJoiner();
 	void onAddAudioInputStream();
 	void onAddMidiSource();
 	void onAddMidiEffect();

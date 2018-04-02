@@ -21,6 +21,10 @@
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../Rhythm/BeatSource.h"
+#include "../Rhythm/BarStreamer.h"
+#include "../Rhythm/BarCollection.h"
+#include "../Rhythm/Bar.h"
+#include "../lib/file/file.h"
 
 SignalChain::Module::Module()
 {
@@ -38,7 +42,7 @@ public:
 	}
 	virtual ~ModuleAudioSource(){ delete source; }
 	virtual string type(){ return "AudioSource"; }
-	virtual AudioSource *audio_socket(){ return source; }
+	virtual AudioSource *audio_socket(int port){ return source; }
 };
 
 class ModuleSongRenderer : public SignalChain::Module
@@ -52,7 +56,7 @@ public:
 	}
 	virtual ~ModuleSongRenderer(){ delete renderer; }
 	virtual string type(){ return "SongRenderer"; }
-	virtual AudioSource *audio_socket(){ return renderer; }
+	virtual AudioSource *audio_socket(int port){ return renderer; }
 };
 
 class ModulePeakMeter : public SignalChain::Module
@@ -67,8 +71,8 @@ public:
 	}
 	virtual ~ModulePeakMeter(){ delete peak_meter; }
 	virtual string type(){ return "PeakMeter"; }
-	virtual void set_audio_source(AudioSource *s){ if (peak_meter) peak_meter->set_source(s); }
-	virtual AudioSource *audio_socket(){ return peak_meter; }
+	virtual void set_audio_source(int port, AudioSource *s){ peak_meter->set_source(s); }
+	virtual AudioSource *audio_socket(int port){ return peak_meter; }
 };
 
 class ModuleAudioJoiner : public SignalChain::Module
@@ -84,8 +88,14 @@ public:
 	}
 	virtual ~ModuleAudioJoiner(){ delete joiner; }
 	virtual string type(){ return "AudioJoiner"; }
-	virtual void set_audio_source(AudioSource *s){ if (joiner) joiner->set_source_a(s); }
-	virtual AudioSource *audio_socket(){ return joiner; }
+	virtual void set_audio_source(int port, AudioSource *s)
+	{
+		if (port == 0)
+			joiner->set_source_a(s);
+		else if (port == 1)
+			joiner->set_source_b(s);
+	}
+	virtual AudioSource *audio_socket(int port){ return joiner; }
 };
 
 class ModuleOutputStream : public SignalChain::Module
@@ -99,7 +109,21 @@ public:
 	}
 	virtual ~ModuleOutputStream(){ delete stream; }
 	virtual string type(){ return "OutputStream"; }
-	virtual void set_audio_source(AudioSource *s){ if (stream) stream->set_source(s); }
+	virtual void set_audio_source(int port, AudioSource *s){ stream->set_source(s); }
+};
+
+class ModuleAudioInputStream : public SignalChain::Module
+{
+public:
+	InputStreamAudio *stream;
+	ModuleAudioInputStream(InputStreamAudio *s)
+	{
+		stream = s;
+		port_out.add(Track::Type::AUDIO);
+	}
+	virtual ~ModuleAudioInputStream(){ delete stream; }
+	virtual string type(){ return "AudioInputStream"; }
+	virtual AudioSource *audio_socket(int port){ return stream->out; }
 };
 
 class ModuleAudioEffect : public SignalChain::Module
@@ -114,8 +138,13 @@ public:
 	}
 	virtual ~ModuleAudioEffect(){ delete fx; }
 	virtual string type(){ return "AudioEffect"; }
-	virtual AudioSource *audio_socket(){ return fx->out; }
-	virtual void set_audio_source(AudioSource *s){ if (fx) fx->out->set_source(s); }
+	virtual AudioSource *audio_socket(int port){ return fx->out; }
+	virtual void set_audio_source(int port, AudioSource *s){ fx->out->set_source(s); }
+
+	virtual string sub_type(){ return fx->name; }
+	virtual string config_to_string(){ return fx->configToString(); }
+	virtual void config_from_string(const string &str){ fx->configFromString(str); }
+	virtual ConfigPanel *create_panel(){ return fx->createPanel(); }
 };
 
 class ModuleMidiEffect : public SignalChain::Module
@@ -130,8 +159,12 @@ public:
 	}
 	virtual ~ModuleMidiEffect(){ delete fx; }
 	virtual string type(){ return "MidiEffect"; }
-	//virtual void set_midi_source(MidiSource *s){ if (fx) fx->out->set_source(s); }
-	//virtual MidiSource *midi_socket(){ return fx->out; }
+	//virtual void set_midi_source(int port, MidiSource *s){ if (fx) fx->out->set_source(s); }
+	//virtual MidiSource *midi_socket(int port){ return fx->out; }
+	virtual string sub_type(){ return fx->name; }
+	virtual string config_to_string(){ return fx->configToString(); }
+	virtual void config_from_string(const string &str){ fx->configFromString(str); }
+	virtual ConfigPanel *create_panel(){ return fx->createPanel(); }
 };
 
 class ModuleSynthesizer : public SignalChain::Module
@@ -146,8 +179,13 @@ public:
 	}
 	virtual ~ModuleSynthesizer(){ delete synth; }
 	virtual string type(){ return "Synthesizer"; }
-	virtual AudioSource *audio_socket(){ return synth->out; }
-	virtual void set_midi_source(MidiSource *s){ if (synth) synth->out->set_source(s); }
+	virtual AudioSource *audio_socket(int port){ return synth->out; }
+	virtual void set_midi_source(int port, MidiSource *s){ synth->out->set_source(s); }
+
+	virtual string sub_type(){ return synth->name; }
+	virtual string config_to_string(){ return synth->configToString(); }
+	virtual void config_from_string(const string &str){ synth->configFromString(str); }
+	virtual ConfigPanel *create_panel(){ return synth->createPanel(); }
 };
 
 class ModuleBeatMidifier : public SignalChain::Module
@@ -162,8 +200,8 @@ public:
 	}
 	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
 	virtual string type(){ return "BeatMidifier"; }
-	virtual MidiSource *midi_socket(){ return beat_midifier; }
-	virtual void set_beat_source(BeatSource *s){ if (beat_midifier) beat_midifier->setBeatSource(s); }
+	virtual MidiSource *midi_socket(int port){ return beat_midifier; }
+	virtual void set_beat_source(int port, BeatSource *s){ beat_midifier->setBeatSource(s); }
 };
 
 class ModuleBeatSource : public SignalChain::Module
@@ -177,7 +215,7 @@ public:
 	}
 	virtual ~ModuleBeatSource(){ delete source; }
 	virtual string type(){ return "BeatSource"; }
-	virtual BeatSource *beat_socket(){ return source; }
+	virtual BeatSource *beat_socket(int port){ return source; }
 };
 
 class ModuleMidiSource: public SignalChain::Module
@@ -191,7 +229,21 @@ public:
 	}
 	virtual ~ModuleMidiSource(){ delete source; }
 	virtual string type(){ return "MidiSource"; }
-	virtual MidiSource *midi_socket(){ return source; }
+	virtual MidiSource *midi_socket(int port){ return source; }
+};
+
+class ModuleMidiInputStream : public SignalChain::Module
+{
+public:
+	InputStreamMidi *stream;
+	ModuleMidiInputStream(InputStreamMidi *s)
+	{
+		stream = s;
+		port_out.add(Track::Type::AUDIO);
+	}
+	virtual ~ModuleMidiInputStream(){ delete stream; }
+	virtual string type(){ return "MidiInputStream"; }
+	virtual MidiSource *midi_socket(int port){ return stream->out; }
 };
 
 SignalChain::SignalChain(Session *s)
@@ -209,7 +261,7 @@ SignalChain *SignalChain::create_default(Session *session)
 {
 	SignalChain *chain = new SignalChain(session);
 
-	auto *mod_renderer = chain->addSongRenderer(session->song);
+	auto *mod_renderer = chain->addSongRenderer();
 	auto *mod_peak = chain->addPeakMeter();
 	auto *mod_out = chain->addAudioOutputStream();
 
@@ -285,11 +337,11 @@ void SignalChain::connect(SignalChain::Module *source, int source_port, SignalCh
 	c->target_port = target_port;
 	cables.add(c);
 	if (c->type == Track::Type::AUDIO){
-		target->set_audio_source(source->audio_socket());
+		target->set_audio_source(target_port, source->audio_socket(source_port));
 	}else if (c->type == Track::Type::MIDI){
-		target->set_midi_source(source->midi_socket());
+		target->set_midi_source(target_port, source->midi_socket(source_port));
 	}else if (c->type == Track::Type::TIME){
-		target->set_beat_source(source->beat_socket());
+		target->set_beat_source(target_port, source->beat_socket(source_port));
 	}
 	notify();
 }
@@ -299,11 +351,11 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 	foreachi(Cable *cc, cables, i)
 		if (cc == c){
 			if (c->type == Track::Type::AUDIO){
-				c->target->set_audio_source(NULL);
+				c->target->set_audio_source(c->target_port, NULL);
 			}else if (c->type == Track::Type::MIDI){
-				c->target->set_midi_source(NULL);
+				c->target->set_midi_source(c->target_port, NULL);
 			}else if (c->type == Track::Type::TIME){
-				c->target->set_beat_source(NULL);
+				c->target->set_beat_source(c->target_port, NULL);
 			}
 
 			delete(c);
@@ -333,30 +385,126 @@ void SignalChain::disconnect_target(SignalChain::Module *target, int target_port
 
 void SignalChain::save(const string& filename)
 {
+	File* f = FileCreateText(filename);
+	f->write_str("1");
+	f->write_int(modules.num);
+	for (auto *m: modules){
+		f->write_str(m->type());
+		f->write_str(m->sub_type());
+		f->write_str("");
+		f->write_str(m->config_to_string());
+		f->write_int(m->x);
+		f->write_int(m->y);
+	}
+	f->write_int(cables.num);
+	for (auto *c: cables){
+		f->write_int(module_index(c->source));
+		f->write_int(c->source_port);
+		f->write_int(module_index(c->target));
+		f->write_int(c->target_port);
+	}
+	delete f;
 }
 
 void SignalChain::load(const string& filename)
 {
+	for (int i=modules.num-1; i>=3; i--)
+		remove(modules[i]);
+	Array<Cable*> _cables = cables;
+	for (auto *c: cables)
+		disconnect(c);
+
+	File *f = FileOpenText(filename);
+	f->read_str();
+	int n = f->read_int();
+	for (int i=0; i<n; i++){
+		string type = f->read_str();
+		string sub_type = f->read_str();
+		string name = f->read_str();
+		Module *m = NULL;
+		if (i < 3){
+			m = modules[i];
+		}else{
+			if (type == "AudioSource")
+				m = addAudioSource(sub_type);
+			else if (type == "AudioEffect")
+				m = addAudioEffect(sub_type);
+			else if (type == "AudioJoiner")
+				m = addAudioJoiner();
+			else if (type == "PeakMeter")
+				m = addPeakMeter();
+			else if (type == "AudioInputStream")
+				m = addAudioInputStream();
+			else if (type == "OutputStream")
+				m = addAudioOutputStream();
+			else if (type == "MidiSource")
+				m = addMidiSource(sub_type);
+			else if (type == "MidiEffect")
+				m = addMidiEffect(sub_type);
+			else if (type == "Synthesizer")
+				m = addSynthesizer(sub_type);
+			else if (type == "MidiInputStream")
+				m = addMidiInputStream();
+			else if (type == "BeatMidifier")
+				m = addBeatMidifier();
+			else if (type == "BeatSource")
+				m = addBeatSource(sub_type);
+			else
+				throw Exception("unhandled module type");
+		}
+		string config = f->read_str();
+		m->config_from_string(config);
+		m->x = f->read_int();
+		m->y = f->read_int();
+	}
+	n = f->read_int();
+	for (int i=0; i<n; i++){
+		int s = f->read_int();
+		int sp = f->read_int();
+		int t = f->read_int();
+		int tp = f->read_int();
+		connect(modules[s], sp, modules[t], tp);
+	}
+	delete f;
 }
 
-SignalChain::Module* SignalChain::addSongRenderer(Song *s)
+void SignalChain::reset()
 {
-	return add(new ModuleSongRenderer(new SongRenderer(s)));
+	for (int i=modules.num-1; i>=3; i--)
+		remove(modules[i]);
+	Array<Cable*> _cables = cables;
+	for (auto *c: cables)
+		disconnect(c);
+
+	connect(modules[0], 0, modules[1], 0);
+	connect(modules[1], 0, modules[2], 0);
 }
 
-SignalChain::Module* SignalChain::addAudioSource(AudioSource* s)
+SignalChain::Module* SignalChain::addSongRenderer()
 {
-	return add(new ModuleAudioSource(s));
+	return add(new ModuleSongRenderer(new SongRenderer(session->song)));
 }
 
-SignalChain::Module* SignalChain::addMidiSource(MidiSource* s)
+SignalChain::Module* SignalChain::addAudioSource(const string &name)
 {
-	return add(new ModuleMidiSource(s));
+	return NULL;
+	//return add(new ModuleAudioSource(s));
 }
 
-SignalChain::Module* SignalChain::addAudioEffect(Effect* fx)
+SignalChain::Module* SignalChain::addMidiSource(const string &name)
 {
-	return add(new ModuleAudioEffect(fx));
+	MidiEventBuffer midi;
+	midi.add(MidiEvent(100, 80, 1));
+	midi.add(MidiEvent(40000, 80, 0));
+	midi.add(MidiEvent(50000, 82, 1));
+	midi.add(MidiEvent(90000, 82, 0));
+	midi.samples = 400000;
+	return add(new ModuleMidiSource(new MidiEventStreamer(midi)));
+}
+
+SignalChain::Module* SignalChain::addAudioEffect(const string &name)
+{
+	return add(new ModuleAudioEffect(CreateEffect(session, name)));
 }
 
 SignalChain::Module* SignalChain::addAudioJoiner()
@@ -371,8 +519,7 @@ SignalChain::Module* SignalChain::addPeakMeter()
 
 SignalChain::Module* SignalChain::addAudioInputStream()
 {
-	//return add(new ModuleAudioInputStream(new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)));
-	return NULL;
+	return add(new ModuleAudioInputStream(new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)));
 }
 
 SignalChain::Module* SignalChain::addAudioOutputStream()
@@ -380,20 +527,19 @@ SignalChain::Module* SignalChain::addAudioOutputStream()
 	return add(new ModuleOutputStream(new OutputStream(session, NULL)));
 }
 
-SignalChain::Module* SignalChain::addMidiEffect(MidiEffect* fx)
+SignalChain::Module* SignalChain::addMidiEffect(const string &name)
 {
-	return add(new ModuleMidiEffect(fx));
+	return add(new ModuleMidiEffect(CreateMidiEffect(session, name)));
 }
 
-SignalChain::Module* SignalChain::addSynthesizer(Synthesizer* s)
+SignalChain::Module* SignalChain::addSynthesizer(const string &name)
 {
-	return add(new ModuleSynthesizer(s));
+	return add(new ModuleSynthesizer(session->plugin_manager->CreateSynthesizer(session, name)));
 }
 
 SignalChain::Module* SignalChain::addMidiInputStream()
 {
-	//return add(new ModuleMidiInputStream(new InputStreamMidi(session, DEFAULT_SAMPLE_RATE)));
-	return NULL;
+	return add(new ModuleMidiInputStream(new InputStreamMidi(session, DEFAULT_SAMPLE_RATE)));
 }
 
 SignalChain::Module* SignalChain::addBeatMidifier()
@@ -401,8 +547,13 @@ SignalChain::Module* SignalChain::addBeatMidifier()
 	return add(new ModuleBeatMidifier(new BeatMidifier));
 }
 
-SignalChain::Module* SignalChain::addBeatSource(BeatSource* s)
+SignalChain::Module* SignalChain::addBeatSource(const string &name)
 {
-	return add(new ModuleBeatSource(s));
+	BarCollection bars;
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	bars.add(new Bar(80000, 4, 1));
+	return add(new ModuleBeatSource(new BarStreamer(bars)));
 }
 

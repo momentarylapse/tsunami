@@ -79,7 +79,7 @@ public:
 
 		InputStreamAudio *stream;
 	};
-	Source *source;
+	Source *out;
 
 	void _cdecl set_backup_mode(int mode);
 	int backup_mode;

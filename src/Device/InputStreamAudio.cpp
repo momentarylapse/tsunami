@@ -159,8 +159,8 @@ InputStreamAudio::InputStreamAudio(Session *_session, int __sample_rate) :
 	portaudio_stream = NULL;
 #endif
 
-	source = new Source;
-	source->stream = this;
+	out = new Source;
+	out->stream = this;
 
 	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	api = session->device_manager->audio_api;

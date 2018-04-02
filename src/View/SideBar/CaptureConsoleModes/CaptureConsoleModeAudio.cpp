@@ -105,7 +105,7 @@ void CaptureConsoleModeAudio::enter()
 	input->set_chunk_size(4096);
 	input->set_update_dt(0.03f);
 	view->mode_capture->setInputAudio(input);
-	peak_meter = new PeakMeter(input->source);
+	peak_meter = new PeakMeter(input->out);
 	cc->peak_meter->setSource(peak_meter);
 
 	input->set_device(chosen_device);

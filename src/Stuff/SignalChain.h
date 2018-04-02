@@ -16,7 +16,7 @@ class BeatSource;
 class Effect;
 class MidiEffect;
 class Synthesizer;
-class Song;
+class ConfigPanel;
 class Session;
 
 class SignalChain : public Observable<VirtualBase>
@@ -27,6 +27,7 @@ public:
 
 	Session *session;
 
+	void reset();
 	void save(const string &filename);
 	void load(const string &filename);
 
@@ -40,29 +41,33 @@ public:
 		virtual ~Module(){}
 		float x, y;
 		virtual string type() = 0;
-		virtual void set_audio_source(AudioSource *s){};
-		virtual void set_midi_source(MidiSource *s){};
-		virtual void set_beat_source(BeatSource *s){};
-		virtual AudioSource *audio_socket(){ return NULL; }
-		virtual MidiSource *midi_socket(){ return NULL; }
-		virtual BeatSource *beat_socket(){ return NULL; }
+		virtual string sub_type(){ return ""; }
+		virtual string config_to_string(){ return ""; }
+		virtual void config_from_string(const string &str){}
+		virtual ConfigPanel *create_panel(){ return NULL; }
+		virtual void set_audio_source(int port, AudioSource *s){};
+		virtual void set_midi_source(int port, MidiSource *s){};
+		virtual void set_beat_source(int port, BeatSource *s){};
+		virtual AudioSource *audio_socket(int port){ return NULL; }
+		virtual MidiSource *midi_socket(int port){ return NULL; }
+		virtual BeatSource *beat_socket(int port){ return NULL; }
 		Array<int> port_in, port_out;
 	};
 	Array<Module*> modules;
 	Module* add(Module *m);
-	Module* addAudioSource(AudioSource *s);
-	Module* addSongRenderer(Song *s);
-	Module* addMidiSource(MidiSource *s);
-	Module* addAudioEffect(Effect *fx);
+	Module* addAudioSource(const string &name);
+	Module* addSongRenderer();
+	Module* addMidiSource(const string &name);
+	Module* addAudioEffect(const string &name);
 	Module* addAudioJoiner();
 	Module* addPeakMeter();
 	Module* addAudioInputStream();
 	Module* addAudioOutputStream();
-	Module* addMidiEffect(MidiEffect *fx);
-	Module* addSynthesizer(Synthesizer *s);
+	Module* addMidiEffect(const string &name);
+	Module* addSynthesizer(const string &name);
 	Module* addMidiInputStream();
 	Module* addBeatMidifier();
-	Module* addBeatSource(BeatSource *s);
+	Module* addBeatSource(const string &name);
 	void remove(Module *m);
 	int module_index(SignalChain::Module *m);
 

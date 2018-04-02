@@ -20,7 +20,12 @@ AudioJoiner::~AudioJoiner()
 int AudioJoiner::read(AudioBuffer& buf)
 {
 	if (a and b){
-		return a->read(buf);
+		int ra = a->read(buf);
+		AudioBuffer buf_b;
+		buf_b.resize(buf.length);
+		int rb = b->read(buf_b);
+		buf.add(buf_b, 0, 1, 0);
+		return max(ra, rb);
 	}else if (a){
 		return a->read(buf);
 	}else if (b){

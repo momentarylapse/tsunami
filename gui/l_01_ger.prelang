@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-454
+458
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1364,6 +1364,18 @@ Konfigurieren
 
 popup_signal_module_menu/signal_module_delete
 Löschen
+
+popup_signal_chain_menu/signal_chain_load
+Laden...
+
+popup_signal_chain_menu/signal_chain_save
+Speichern...
+
+popup_signal_chain_menu/signal_chain_add_audio_joiner
+Audio joiner
+
+popup_signal_chain_menu/signal_chain_reset
+Zurücksetzen
 
 // Num Language Strings
 173

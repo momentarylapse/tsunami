@@ -57,8 +57,6 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int
 	event("cancel", std::bind(&ConfigurableSelectorDialog::onCancel, this));
 	event("ok", std::bind(&ConfigurableSelectorDialog::onOk, this));
 	enable("ok", false);
-
-	_return = NULL;
 }
 
 ConfigurableSelectorDialog::~ConfigurableSelectorDialog()
@@ -76,12 +74,7 @@ void ConfigurableSelectorDialog::onSelect()
 	int n = getInt("list") - ugroups.num;
 	if (n < 0)
 		return;
-	if (type == Configurable::Type::EFFECT)
-		_return = CreateEffect(session, labels[n].name);
-	else if (type == Configurable::Type::MIDI_EFFECT)
-		_return = CreateMidiEffect(session, labels[n].name);
-	else if (type == Configurable::Type::SYNTHESIZER)
-		_return = session->plugin_manager->CreateSynthesizer(session, labels[n].name);
+	_return = labels[n].name;
 	destroy();
 }
 

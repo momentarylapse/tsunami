@@ -384,7 +384,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("InputStreamAudio", "session", _offsetof(InputStreamAudio, session));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
 	//Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
-	Kaba::DeclareClassOffset("InputStreamAudio", "source", _offsetof(InputStreamAudio, source));
+	Kaba::DeclareClassOffset("InputStreamAudio", "source", _offsetof(InputStreamAudio, out));
 	//Kaba::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
 	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
 	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));
@@ -728,7 +728,9 @@ Effect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::EFFECT, session);
 	dlg->run();
-	Effect *e = (Effect*)dlg->_return;
+	Effect *e = NULL;
+	if (dlg->_return.num > 0)
+		e = CreateEffect(session, dlg->_return);
 	delete(dlg);
 	return e;
 }
@@ -737,7 +739,9 @@ MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::MIDI_EFFECT, session);
 	dlg->run();
-	MidiEffect *e = (MidiEffect*)dlg->_return;
+	MidiEffect *e = NULL;
+	if (dlg->_return.num > 0)
+		e = CreateMidiEffect(session, dlg->_return);
 	delete(dlg);
 	return e;
 }
@@ -747,7 +751,9 @@ Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *sess
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::Type::SYNTHESIZER, session, old_name);
 	dlg->run();
-	Synthesizer *s = (Synthesizer*)dlg->_return;
+	Synthesizer *s = NULL;
+	if (dlg->_return.num > 0)
+		s = CreateSynthesizer(session, dlg->_return);
 	delete(dlg);
 	return s;
 }

@@ -10,8 +10,6 @@
 
 #include "../../lib/hui/hui.h"
 
-class Configurable;
-class Synthesizer;
 class Session;
 
 class ConfigurableSelectorDialog: public hui::Window
@@ -38,7 +36,7 @@ public:
 
 	static Label split_label(const string &s);
 
-	Configurable *_return;
+	string _return;
 };
 
 #endif /* CONFIGURABLESELECTORDIALOG_H_ */

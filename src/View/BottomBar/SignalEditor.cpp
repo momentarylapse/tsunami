@@ -9,15 +9,10 @@
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Stuff/SignalChain.h"
-#include "../../Plugins/Effect.h"
-#include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Plugins/Configurable.h"
+#include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../Midi/MidiSource.h"
-#include "../../Midi/MidiEventStreamer.h"
-#include "../../Rhythm/BarStreamer.h"
-#include "../../Rhythm/BarCollection.h"
-#include "../../Rhythm/Bar.h"
 
 
 SignalEditor::Selection::Selection()
@@ -47,13 +42,16 @@ SignalEditor::SignalEditor(Session *session) :
 	event("signal_chain_add_audio_source", std::bind(&SignalEditor::onAddAudioSource, this));
 	event("signal_chain_add_audio_effect", std::bind(&SignalEditor::onAddAudioEffect, this));
 	event("signal_chain_add_audio_input", std::bind(&SignalEditor::onAddAudioInputStream, this));
-	event("signal_chain_add_audio_join", std::bind(&SignalEditor::onAddAudioJoin, this));
+	event("signal_chain_add_audio_joiner", std::bind(&SignalEditor::onAddAudioJoiner, this));
 	event("signal_chain_add_midi_source", std::bind(&SignalEditor::onAddMidiSource, this));
 	event("signal_chain_add_midi_effect", std::bind(&SignalEditor::onAddMidiEffect, this));
 	event("signal_chain_add_midi_input", std::bind(&SignalEditor::onAddMidiInputStream, this));
 	event("signal_chain_add_synthesizer", std::bind(&SignalEditor::onAddSynthesizer, this));
 	event("signal_chain_add_beat_source", std::bind(&SignalEditor::onAddBeatSource, this));
 	event("signal_chain_add_beat_midifier", std::bind(&SignalEditor::onAddBeatMidifier, this));
+	event("signal_chain_reset", std::bind(&SignalEditor::onReset, this));
+	event("signal_chain_load", std::bind(&SignalEditor::onLoad, this));
+	event("signal_chain_save", std::bind(&SignalEditor::onSave, this));
 	event("signal_module_delete", std::bind(&SignalEditor::onModuleDelete, this));
 	event("signal_module_configure", std::bind(&SignalEditor::onModuleConfigure, this));
 
@@ -141,7 +139,7 @@ static float module_port_in_x(SignalChain::Module *m)
 
 static float module_port_in_y(SignalChain::Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + index*15;
+	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
 }
 
 static float module_port_out_x(SignalChain::Module *m)
@@ -151,7 +149,7 @@ static float module_port_out_x(SignalChain::Module *m)
 
 static float module_port_out_y(SignalChain::Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + index*15;
+	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
 static color signal_color(int type)
@@ -197,12 +195,14 @@ void SignalEditor::onAddAudioSource()
 
 void SignalEditor::onAddAudioEffect()
 {
-	Effect *fx = CreateEffect(session, "Echo");
-	fx->configFromString("(0.3 0.98 0.5)");
-	chain->addAudioEffect(fx);
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::EFFECT, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addAudioEffect(dlg->_return);
+	delete(dlg);
 }
 
-void SignalEditor::onAddAudioJoin()
+void SignalEditor::onAddAudioJoiner()
 {
 	chain->addAudioJoiner();
 }
@@ -214,22 +214,25 @@ void SignalEditor::onAddAudioInputStream()
 
 void SignalEditor::onAddMidiSource()
 {
-	MidiEventBuffer midi;
-	midi.add(MidiEvent(100, 80, 1));
-	midi.add(MidiEvent(40000, 80, 0));
-	midi.add(MidiEvent(50000, 82, 1));
-	midi.add(MidiEvent(90000, 82, 0));
-	midi.samples = 400000;
-	chain->addMidiSource(new MidiEventStreamer(midi));
+	chain->addMidiSource("test");
 }
 
 void SignalEditor::onAddMidiEffect()
 {
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_EFFECT, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addMidiEffect(dlg->_return);
+	delete(dlg);
 }
 
 void SignalEditor::onAddSynthesizer()
 {
-	chain->addSynthesizer(session->plugin_manager->CreateSynthesizer(session, ""));
+	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::SYNTHESIZER, session);
+	dlg->run();
+	if (dlg->_return.num > 0)
+		chain->addSynthesizer(dlg->_return);
+	delete(dlg);
 }
 
 void SignalEditor::onAddMidiInputStream()
@@ -239,12 +242,7 @@ void SignalEditor::onAddMidiInputStream()
 
 void SignalEditor::onAddBeatSource()
 {
-	BarCollection bars;
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	bars.add(new Bar(80000, 4, 1));
-	chain->addBeatSource(new BarStreamer(bars));
+	chain->addBeatSource("test");
 }
 
 void SignalEditor::onAddBeatMidifier()
@@ -264,6 +262,23 @@ void SignalEditor::onModuleConfigure()
 {
 }
 
+void SignalEditor::onReset()
+{
+	chain->reset();
+}
+
+void SignalEditor::onLoad()
+{
+	if (hui::FileDialogOpen(win, "", "", "*", "*"))
+		chain->load(hui::Filename);
+}
+
+void SignalEditor::onSave()
+{
+	if (hui::FileDialogSave(win, "", "", "*", "*"))
+		chain->save(hui::Filename);
+}
+
 SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 {
 	Selection s;
@@ -279,7 +294,7 @@ SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 		for (int i=0; i<m->port_in.num; i++){
 			float y = module_port_in_y(m, i);
 			float x = module_port_in_x(m);
-			if (abs(x - mx) < 7 and abs(y - my) < 7){
+			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_IN;
 				s.module = m;
 				s.port = i;
@@ -292,7 +307,7 @@ SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 		for (int i=0; i<m->port_out.num; i++){
 			float y = module_port_out_y(m, i);
 			float x = module_port_out_x(m);
-			if (abs(x - mx) < 7 and abs(y - my) < 7){
+			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_OUT;
 				s.module = m;
 				s.port = i;

@@ -186,7 +186,7 @@ Configurable::~Configurable()
 
 void Configurable::__init__()
 {
-	new(this) Configurable(NULL, -1);
+	new(this) Configurable(Session::GLOBAL, -1);
 }
 
 void Configurable::__delete__()
@@ -245,7 +245,7 @@ void Configurable::config_from_string(const string &param)
 	config->reset();
 	int pos = 0;
 	var_from_string(config->_class, (char*)config, param, pos, session->song);
-	on_oonfig();
+	on_config();
 }
 
 
@@ -256,7 +256,7 @@ void Configurable::reset_config()
 	PluginData *config = get_config();
 	if (config)
 		config->reset();
-	on_oonfig();
+	on_config();
 }
 
 // default version of ResetState()
@@ -266,7 +266,7 @@ void Configurable::reset_state()
 	PluginData *state = get_state();
 	if (state)
 		state->reset();
-	on_oonfig();
+	on_config();
 }
 
 
@@ -424,7 +424,7 @@ bool Configurable::configure(hui::Window *win)
 
 void Configurable::notify()
 {
-	on_oonfig();
+	on_config();
 	Observable::notify();
 }
 

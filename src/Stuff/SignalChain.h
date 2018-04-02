@@ -11,7 +11,7 @@
 #include "Observable.h"
 
 class AudioPort;
-class MidiSource;
+class MidiPort;
 class BeatSource;
 class AudioEffect;
 class MidiEffect;
@@ -46,10 +46,10 @@ public:
 		virtual void config_from_string(const string &str){}
 		virtual ConfigPanel *create_panel(){ return NULL; }
 		virtual void set_audio_source(int port, AudioPort *s){};
-		virtual void set_midi_source(int port, MidiSource *s){};
+		virtual void set_midi_source(int port, MidiPort *s){};
 		virtual void set_beat_source(int port, BeatSource *s){};
 		virtual AudioPort *audio_socket(int port){ return NULL; }
-		virtual MidiSource *midi_socket(int port){ return NULL; }
+		virtual MidiPort *midi_socket(int port){ return NULL; }
 		virtual BeatSource *beat_socket(int port){ return NULL; }
 		Array<int> port_in, port_out;
 	};

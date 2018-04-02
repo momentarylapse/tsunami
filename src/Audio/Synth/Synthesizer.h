@@ -16,7 +16,7 @@
 
 class Range;
 class AudioBuffer;
-class MidiSource;
+class MidiPort;
 class PluginManager;
 class DetuneSynthesizerDialog;
 class ActionTrackDetuneSynthesizer;
@@ -67,8 +67,8 @@ public:
 	};
 	Output *out;
 
-	void set_source(MidiSource *source);
-	MidiSource *source;
+	void set_source(MidiPort *source);
+	MidiPort *source;
 
 protected:
 

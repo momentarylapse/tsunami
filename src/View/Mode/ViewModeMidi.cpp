@@ -13,8 +13,8 @@
 #include "../../Device/OutputStream.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Midi/Clef.h"
-#include "../../Midi/MidiSource.h"
 #include "../../Data/SongSelection.h"
+#include "../../Midi/MidiPort.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 
@@ -22,7 +22,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition);
 
 const int PITCH_SHOW_COUNT = 30;
 
-class MidiPreviewSource : public MidiSource
+class MidiPreviewSource : public MidiPort
 {
 public:
 	MidiPreviewSource()

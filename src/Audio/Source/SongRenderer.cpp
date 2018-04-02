@@ -12,12 +12,13 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Data/Curve.h"
 #include "../../Data/SongSelection.h"
-#include "../../Midi/MidiSource.h"
 #include "../../Midi/MidiEventStreamer.h"
 #include "../../Rhythm/BarStreamer.h"
+#include "../../Rhythm/BarMidifier.h"
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
+#include "../../Midi/MidiPort.h"
 #include "../../Plugins/AudioEffect.h"
 
 SongRenderer::SongRenderer(Song *s)
@@ -286,7 +287,7 @@ void SongRenderer::build_data()
 {
 	bar_streamer = new BarStreamer(song->bars);
 	beat_midifier = new BeatMidifier;
-	beat_midifier->setBeatSource(bar_streamer);
+	beat_midifier->set_beat_source(bar_streamer);
 
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
@@ -308,12 +309,12 @@ void SongRenderer::build_data()
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->set_source(m);
+			t->synth->set_source(m->out);
 		}else if (t->type == t->Type::TIME){
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
-			t->synth->set_source(beat_midifier);
+			t->synth->set_source(beat_midifier->out);
 		}
 	}
 }

@@ -10,7 +10,7 @@
 
 #include "AudioSource.h"
 
-class MidiSource;
+class MidiPort;
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;

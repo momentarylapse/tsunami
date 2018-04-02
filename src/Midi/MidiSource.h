@@ -1,41 +1,45 @@
 /*
  * MidiSource.h
  *
- *  Created on: 29.04.2016
+ *  Created on: 02.04.2018
  *      Author: michi
  */
 
 #ifndef SRC_MIDI_MIDISOURCE_H_
 #define SRC_MIDI_MIDISOURCE_H_
 
-#include "MidiData.h"
+#include "../Plugins/Configurable.h"
+#include "MidiPort.h"
 
 class BeatSource;
 
-class MidiSource : public VirtualBase
+class MidiSource : public Configurable
 {
 public:
 	MidiSource();
-	virtual ~MidiSource(){}
+	virtual ~MidiSource();
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
+
+	class Output : public MidiPort
+	{
+	public:
+		Output(MidiSource *s);
+		virtual ~Output(){}
+		virtual int _cdecl read(MidiEventBuffer &midi);
+		virtual void _cdecl reset();
+		MidiSource *source;
+	};
+	Output *out;
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
 
 	BeatSource *beat_source;
-	void setBeatSource(BeatSource *beat_source);
-
-	static const int END_OF_STREAM;
-	static const int NOT_ENOUGH_DATA;
+	void _cdecl set_beat_source(BeatSource *s);
 };
 
-class BeatMidifier : public MidiSource
-{
-public:
-	virtual int _cdecl read(MidiEventBuffer &midi);
-	virtual void _cdecl reset();
-};
+MidiSource *_cdecl CreateMidiSource(Session *session, const string &name);
 
 #endif /* SRC_MIDI_MIDISOURCE_H_ */

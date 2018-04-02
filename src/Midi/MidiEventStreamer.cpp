@@ -26,9 +26,9 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi)
 	if (ignore_end)
 		n = _midi.samples;
 	if (n <= 0)
-		return END_OF_STREAM;
+		return MidiPort::END_OF_STREAM;
 	if ((n < _midi.samples) and !ignore_end)
-		return NOT_ENOUGH_DATA;
+		return MidiPort::NOT_ENOUGH_DATA;
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
 	for (MidiEvent &e : midi)
@@ -45,7 +45,7 @@ void MidiEventStreamer::reset()
 	offset = 0;
 }
 
-void MidiEventStreamer::setData(const MidiEventBuffer &_midi)
+void MidiEventStreamer::set_data(const MidiEventBuffer &_midi)
 {
 	midi = _midi;
 	offset = 0;

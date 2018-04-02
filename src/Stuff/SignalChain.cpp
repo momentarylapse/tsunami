@@ -18,12 +18,14 @@
 #include "../Audio/Source/AudioSource.h"
 #include "../Audio/PeakMeter.h"
 #include "../Audio/AudioJoiner.h"
+#include "../Midi/MidiPort.h"
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../Rhythm/BeatSource.h"
 #include "../Rhythm/BarStreamer.h"
 #include "../Rhythm/BarCollection.h"
 #include "../Rhythm/Bar.h"
+#include "../Rhythm/BarMidifier.h"
 #include "../lib/file/file.h"
 #include "../Plugins/AudioEffect.h"
 
@@ -181,7 +183,7 @@ public:
 	virtual ~ModuleSynthesizer(){ delete synth; }
 	virtual string type(){ return "Synthesizer"; }
 	virtual AudioPort *audio_socket(int port){ return synth->out; }
-	virtual void set_midi_source(int port, MidiSource *s){ synth->set_source(s); }
+	virtual void set_midi_source(int port, MidiPort *s){ synth->set_source(s); }
 
 	virtual string sub_type(){ return synth->name; }
 	virtual string config_to_string(){ return synth->config_to_string(); }
@@ -201,8 +203,8 @@ public:
 	}
 	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
 	virtual string type(){ return "BeatMidifier"; }
-	virtual MidiSource *midi_socket(int port){ return beat_midifier; }
-	virtual void set_beat_source(int port, BeatSource *s){ beat_midifier->setBeatSource(s); }
+	virtual MidiPort *midi_socket(int port){ return beat_midifier->out; }
+	virtual void set_beat_source(int port, BeatSource *s){ beat_midifier->set_beat_source(s); }
 };
 
 class ModuleBeatSource : public SignalChain::Module
@@ -230,7 +232,7 @@ public:
 	}
 	virtual ~ModuleMidiSource(){ delete source; }
 	virtual string type(){ return "MidiSource"; }
-	virtual MidiSource *midi_socket(int port){ return source; }
+	virtual MidiPort *midi_socket(int port){ return source->out; }
 };
 
 class ModuleMidiInputStream : public SignalChain::Module
@@ -244,7 +246,7 @@ public:
 	}
 	virtual ~ModuleMidiInputStream(){ delete stream; }
 	virtual string type(){ return "MidiInputStream"; }
-	virtual MidiSource *midi_socket(int port){ return stream->out; }
+	virtual MidiPort *midi_socket(int port){ return stream->out; }
 };
 
 SignalChain::SignalChain(Session *s)
@@ -493,13 +495,7 @@ SignalChain::Module* SignalChain::addAudioSource(const string &name)
 
 SignalChain::Module* SignalChain::addMidiSource(const string &name)
 {
-	MidiEventBuffer midi;
-	midi.add(MidiEvent(100, 80, 1));
-	midi.add(MidiEvent(40000, 80, 0));
-	midi.add(MidiEvent(50000, 82, 1));
-	midi.add(MidiEvent(90000, 82, 0));
-	midi.samples = 400000;
-	return add(new ModuleMidiSource(new MidiEventStreamer(midi)));
+	return add(new ModuleMidiSource(CreateMidiSource(session, name)));
 }
 
 SignalChain::Module* SignalChain::addAudioEffect(const string &name)

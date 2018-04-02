@@ -8,9 +8,9 @@
 #ifndef SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
 #define SRC_AUDIO_SOURCE_BUFFERSTREAMER_H_
 
-#include "AudioPort.h"
+#include "AudioSource.h"
 
-class BufferStreamer : public AudioPort
+class BufferStreamer : public AudioSource
 {
 public:
 	BufferStreamer(AudioBuffer *buf);
@@ -21,9 +21,8 @@ public:
 
 	virtual int _cdecl read(AudioBuffer &buf);
 	virtual void _cdecl reset();
-	virtual int _cdecl getPos(int delta){ return offset + delta; }
+	virtual int _cdecl get_pos(int delta){ return offset + delta; }
 	void _cdecl seek(int pos);
-	//virtual int _cdecl sample_rate(){ return DEFAULT_SAMPLE_RATE; }
 
 	AudioBuffer *buf;
 	int offset;

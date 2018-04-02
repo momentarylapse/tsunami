@@ -9,8 +9,6 @@
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/hui/hui.h"
-//#include "PluginManager.h"
-//#include "Effect.h"
 
 
 Plugin::Plugin(const string &_filename, int _type)

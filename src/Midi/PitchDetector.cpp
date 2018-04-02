@@ -27,9 +27,9 @@ int freq_to_index(float f)
 	return f*BUFFER_SIZE / DEFAULT_SAMPLE_RATE;
 }
 
-PitchDetector::PitchDetector(AudioPort *_source)
+PitchDetector::PitchDetector()
 {
-	source = _source;
+	source = NULL;
 	loud_enough = false;
 	volume = 0;
 	frequency = 0;
@@ -39,14 +39,19 @@ PitchDetector::~PitchDetector()
 {
 }
 
-void PitchDetector::__init__(AudioPort *source)
+void PitchDetector::__init__()
 {
-	new(this) PitchDetector(source);
+	new(this) PitchDetector;
 }
 
 void PitchDetector::__delete__()
 {
-	this->~PitchDetector();
+	this->PitchDetector::~PitchDetector();
+}
+
+void PitchDetector::set_source(AudioPort *s)
+{
+	source = s;
 }
 
 void PitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf)

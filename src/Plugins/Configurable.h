@@ -53,7 +53,7 @@ public:
 	bool configure(hui::Window *win);
 	virtual ConfigPanel *_cdecl create_panel();
 	void _cdecl notify();
-	virtual void _cdecl on_oonfig(){}
+	virtual void _cdecl on_config(){}
 
 	PluginData *get_config() const;
 	PluginData *get_state() const;

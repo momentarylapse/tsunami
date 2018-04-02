@@ -28,15 +28,15 @@ class MetronomeSource extends MidiSource
 	float sample_rate
 	Window* win
 	
-	void __init__(float _bpm, int _beats, int _sample_rate)
+	override void __init__()
 		win = nil
-		sample_rate = _sample_rate
+		sample_rate = session.sample_rate()
 		
 		freq = 880.0
 		length = 0.02
 		volume = 1
-		bpm = _bpm
-		num_beats = _beats
+		bpm = 90
+		num_beats = 4
 		num_sub_beats = 1
 
 		offset_sub_beat = 0

@@ -6,13 +6,14 @@
  */
 
 #include "SignalEditor.h"
+
+#include "../../Midi/MidiPort.h"
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Stuff/SignalChain.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Configurable.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
-#include "../../Midi/MidiSource.h"
 
 
 SignalEditor::Selection::Selection()

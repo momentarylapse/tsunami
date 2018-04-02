@@ -9,7 +9,7 @@
 #define INPUTSTREAMMIDI_H_
 
 #include "../Data/Song.h"
-#include "../Midi/MidiSource.h"
+#include "../Midi/MidiPort.h"
 #include "../Stuff/Observable.h"
 
 class Device;
@@ -63,7 +63,7 @@ public:
 	MidiEventBuffer midi;
 	MidiEventBuffer current_midi;
 
-	class Output : public MidiSource
+	class Output : public MidiPort
 	{
 	public:
 		Output(InputStreamMidi *input);

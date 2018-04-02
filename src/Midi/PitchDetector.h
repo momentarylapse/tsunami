@@ -8,7 +8,7 @@
 #ifndef SRC_AUDIO_PITCHDETECTOR_H_
 #define SRC_AUDIO_PITCHDETECTOR_H_
 
-#include "../Midi/MidiSource.h"
+#include "MidiSource.h"
 
 class AudioPort;
 class AudioBuffer;
@@ -16,11 +16,13 @@ class AudioBuffer;
 class PitchDetector : public MidiSource
 {
 public:
-	PitchDetector(AudioPort *source);
+	PitchDetector();
 	virtual ~PitchDetector();
 
-	void _cdecl __init__(AudioPort *source);
+	void _cdecl __init__();
 	virtual void _cdecl __delete__();
+
+	void set_source(AudioPort *source);
 
 	virtual int _cdecl read(MidiEventBuffer &midi);
 

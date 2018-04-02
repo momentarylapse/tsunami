@@ -1,22 +1,42 @@
 /*
  * MidiSource.cpp
  *
- *  Created on: 29.04.2016
+ *  Created on: 02.04.2018
  *      Author: michi
  */
 
 #include "MidiSource.h"
-#include "../lib/file/msg.h"
-#include "../Rhythm/Beat.h"
 #include "../Rhythm/BeatSource.h"
+#include "../Session.h"
+#include "../Plugins/PluginManager.h"
+#include "../Plugins/Plugin.h"
 
 
-const int MidiSource::NOT_ENOUGH_DATA = 0;
-const int MidiSource::END_OF_STREAM = -2;
+MidiSource::Output::Output(MidiSource *s)
+{
+	source = s;
+}
 
-MidiSource::MidiSource()
+int MidiSource::Output::read(MidiEventBuffer &midi)
+{
+	return source->read(midi);
+}
+
+void  MidiSource::Output::reset()
+{
+	source->reset();
+}
+
+MidiSource::MidiSource() :
+	Configurable(Session::GLOBAL, Configurable::Type::MIDI_SOURCE)
 {
 	beat_source = BeatSource::dummy;
+	out = new Output(this);
+}
+
+MidiSource::~MidiSource()
+{
+	delete out;
 }
 
 void MidiSource::__init__()
@@ -29,7 +49,7 @@ void MidiSource::__delete__()
 	this->MidiSource::~MidiSource();
 }
 
-void MidiSource::setBeatSource(BeatSource *_beat_source)
+void MidiSource::set_beat_source(BeatSource *_beat_source)
 {
 	beat_source = _beat_source;
 }
@@ -37,22 +57,24 @@ void MidiSource::setBeatSource(BeatSource *_beat_source)
 
 
 
-int BeatMidifier::read(MidiEventBuffer &midi)
+// TODO: move to PluginManager?
+MidiSource *CreateMidiSource(Session *session, const string &name)
 {
-	if (!beat_source)
-		return midi.samples;
+	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::MIDI_SOURCE, name);
+	MidiSource *s = NULL;
+	if (p->usable)
+		s = (MidiSource*)p->create_instance(session, "MidiSource");
 
-	Array<Beat> beats;
-	beat_source->read(beats, midi.samples);
+	// dummy?
+	if (!s)
+		s = new MidiSource;
 
-	for (Beat &b: beats)
-		midi.addMetronomeClick(b.range.offset, b.level, 0.8f);
-
-	return midi.samples;
+	s->name = name;
+	s->plugin = p;
+	s->usable = p->usable;
+	s->song = session->song;
+	s->session = session;
+	s->reset_config();
+	return s;
 }
 
-void BeatMidifier::reset()
-{
-	if (beat_source)
-		beat_source->reset();
-}

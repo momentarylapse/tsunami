@@ -10,8 +10,8 @@
 #include "../../Data/Song.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
-#include "../../Midi/MidiSource.h"
 #include "../../lib/math/math.h"
+#include "../../Midi/MidiPort.h"
 
 Synthesizer::Output::Output(Synthesizer *s)
 {
@@ -97,7 +97,7 @@ void Synthesizer::__delete__()
 	this->Synthesizer::~Synthesizer();
 }
 
-void Synthesizer::set_source(MidiSource *_source)
+void Synthesizer::set_source(MidiPort *_source)
 {
 	source = _source;
 }
@@ -123,7 +123,7 @@ void Synthesizer::setSampleRate(int _sample_rate)
 	sample_rate = _sample_rate;
 
 	update_delta_phi();
-	on_oonfig();
+	on_config();
 }
 
 void Synthesizer::update_delta_phi()
@@ -135,7 +135,7 @@ void Synthesizer::update_delta_phi()
 void Synthesizer::setInstrument(Instrument &i)
 {
 	instrument = i;
-	on_oonfig();
+	on_config();
 }
 
 void Synthesizer::enablePitch(int pitch, bool enable)

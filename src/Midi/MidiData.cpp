@@ -314,7 +314,7 @@ void MidiNoteBuffer::__init__()
 
 void MidiNoteBuffer::__delete__()
 {
-	this->~MidiNoteBuffer();
+	this->MidiNoteBuffer::~MidiNoteBuffer();
 }
 
 void MidiNoteBuffer::deep_clear()

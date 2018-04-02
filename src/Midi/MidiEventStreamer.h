@@ -20,7 +20,7 @@ public:
 	virtual int _cdecl read(MidiEventBuffer &midi);
 	virtual void _cdecl reset();
 
-	void _cdecl setData(const MidiEventBuffer &midi);
+	void _cdecl set_data(const MidiEventBuffer &midi);
 
 	void _cdecl seek(int pos);
 

@@ -96,6 +96,7 @@ class AudioEffect
 	bool usable
 	Song *song
 	int sample_rate
+	AudioPort *out
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(AudioBuffer buf)
@@ -160,6 +161,7 @@ class AudioPort
 	extern virtual int get_pos(int delta)
 
 class AudioSource
+	Session* session
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(AudioBuffer buf)
@@ -167,16 +169,29 @@ class AudioSource
 	extern virtual int get_pos(int delta)
 	extern virtual ConfigPanel* create_panel()
 	extern virtual void on_config()
+	extern virtual void reset_config()
+	extern virtual void reset_state()
+	extern virtual void notify()
+	AudioPort *out
 
-class MidiSource
+class MidiPort
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
+	extern virtual void reset()
 
-class SynthOutput extends AudioPort
-	extern override int read(AudioBuffer buf)
-	extern override void reset()
-	extern override int get_pos(int delta)
+class MidiSource
+	Session* session
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual int read(MidiEventBuffer midi)
+	extern virtual void reset()
+	extern virtual ConfigPanel* create_panel()
+	extern virtual void on_config()
+	extern virtual void reset_config()
+	extern virtual void reset_state()
+	extern virtual void notify()
+	MidiPort *out
 
 class Synthesizer
 	string name
@@ -187,7 +202,7 @@ class Synthesizer
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	MidiEventBuffer events
-	SynthOutput* out
+	AudioPort* out
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(AudioBuffer buf)
@@ -379,7 +394,6 @@ class SongRenderer extends AudioSource
 	extern override void reset()
 	extern Range range()
 	extern int seek()
-	AudioPort *out
 
 
 class OutputStream
@@ -412,7 +426,7 @@ class OutputStream
 	extern void addObserver(void *handler, void *func)
 	extern void removeObserver(void *handler)*/
 
-class MidiPort
+class _MidiPort
 	int client, port
 	string client_name, port_name
 
@@ -443,6 +457,8 @@ class Session
 	Song* song
 	AudioView* view
 	Storage* storage
+	
+	extern int sample_rate()
 	
 	//DeviceManager* device_manager
 	//PluginManager* plugin_manager
@@ -493,7 +509,9 @@ extern void fft_c2r_inv(complex[] in, float[] out)
 
 extern bool AllowTermination()
 extern Synthesizer* CreateSynthesizer(Session* session, string name)
+extern AudioSource* CreateAudioSource(Session* session, string name)
 extern AudioEffect* CreateAudioEffect(Session* session, string name)
+extern MidiSource* CreateMidiSource(Session* session, string name)
 extern MidiEffect* CreateMidiEffect(Session* session, string name)
 extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
 //extern void SetTempBackupFilename(string filename)

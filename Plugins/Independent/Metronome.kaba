@@ -112,7 +112,7 @@ class Metronome extends TsunamiPlugin
 	
 	override void onStart()
 		synth = CreateSynthesizer(session, "")
-		source = new MetronomeSource(90, 4, synth.sample_rate)
+		source = new MetronomeSource
 		synth.set_source(source)
 		
 		dlg = new MetronomeDialog(self)

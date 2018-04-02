@@ -22,7 +22,7 @@ void BufferStreamer::__init__(AudioBuffer* buf)
 
 void BufferStreamer::__delete__()
 {
-	this->~BufferStreamer();
+	this->BufferStreamer::~BufferStreamer();
 }
 
 int BufferStreamer::read(AudioBuffer& _buf)
@@ -30,10 +30,10 @@ int BufferStreamer::read(AudioBuffer& _buf)
 	int available = buf->length - offset;
 	int n = min(_buf.length, available);
 	if (n <= 0)
-		return END_OF_STREAM;
+		return AudioPort::END_OF_STREAM;
 	if (!CHEAT){
 		if (n < _buf.length)
-			return NOT_ENOUGH_DATA;
+			return AudioPort::NOT_ENOUGH_DATA;
 	}
 	_buf.set(*buf, -offset, 1);
 	offset += n;

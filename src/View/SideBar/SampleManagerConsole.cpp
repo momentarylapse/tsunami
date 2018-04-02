@@ -207,7 +207,7 @@ void SampleManagerConsole::onExport()
 	if (session->storage->askSaveExport(win)){
 		if (sel[0]->type == Track::Type::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			session->storage->saveViaRenderer(&rr, hui::Filename, sel[0]->buf.length, Array<Tag>());
+			session->storage->saveViaRenderer(rr.out, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
 	}
 }
@@ -321,7 +321,7 @@ void SampleManagerConsole::onPreview()
 	int sel = getInt("sample_list");
 	preview_sample = items[sel]->s;
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
-	preview_stream = new OutputStream(session, preview_renderer);
+	preview_stream = new OutputStream(session, preview_renderer->out);
 
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));

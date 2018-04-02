@@ -21,5 +21,5 @@ void AudioPort::__init__()
 
 void AudioPort::__delete__()
 {
-	this->~AudioPort();
+	this->AudioPort::~AudioPort();
 }

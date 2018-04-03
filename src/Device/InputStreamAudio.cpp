@@ -336,7 +336,7 @@ bool InputStreamAudio::_pulse_test_error(const string &msg)
 #if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(session->device_manager->pulse_context);
 	if (e != 0)
-		hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
+		{}//hui::RunLater(0.001f, std::bind(&Session::e, session, msg + " (input): " + pa_strerror(e)));
 	// make sure errors are handled in the gui thread...
 	//tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);

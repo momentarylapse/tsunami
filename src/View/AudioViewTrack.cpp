@@ -279,9 +279,8 @@ void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 	if (l >= 0){
 		double bzf = view->buffer_zoom_factor;
 
-
 		// no peaks yet? -> show dummy
-		if (b.peaks.num < l){
+		if (b.peaks.num <= l){
 			c->setColor(ColorInterpolate(col, Red, 0.3f));
 			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.length * view->cam.scale, h);
 			return;
@@ -293,10 +292,6 @@ void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 		color cc = col;
 		cc.a *= 0.3f;
 		c->setColor(cc);
-		if (ll + 4 < b.peaks.num){
-			ll += 4;
-			_bzf *= 2;
-		}
 		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll], b.offset);
 		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll+1], b.offset);
 

@@ -569,7 +569,7 @@ void AudioView::updateBufferZoom()
 	if (cam.scale < 0.2f)
 		for (int i=24-1;i>=0;i--){
 			double _f = (double)(1 << (i + AudioBuffer::PEAK_OFFSET_EXP));
-			if (_f > 1.0 / cam.scale){
+			if (_f > 2.0 / cam.scale){
 				prefered_buffer_layer = i;
 				buffer_zoom_factor = _f;
 			}

@@ -207,24 +207,6 @@ PluginData *Configurable::get_config() const
 	return NULL;
 }
 
-PluginData *Configurable::get_state() const
-{
-	Kaba::Class *c = Kaba::GetDynamicType(this);
-	if (!c){
-		const DummySynthesizer *ds = dynamic_cast<const DummySynthesizer*>(this);
-		if (ds)
-			return (PluginData*)&ds->state;
-		return NULL;
-	}
-	for (auto &e: c->elements)
-		if ((e.name == "state") and (e.type->get_root()->name == "PluginData")){
-			PluginData *state = (PluginData*)((char*)this + e.offset);
-			state->_class = e.type;
-			return state;
-		}
-	return NULL;
-}
-
 string Configurable::config_to_string() const
 {
 	PluginData *config = get_config();
@@ -258,17 +240,6 @@ void Configurable::reset_config()
 	on_config();
 }
 
-// default version of ResetState()
-//   try to execute   Configurable.state.reset()
-void Configurable::reset_state()
-{
-	PluginData *state = get_state();
-	if (state)
-		state->reset();
-	on_config();
-}
-
-
 // default handler...
 ConfigPanel *Configurable::create_panel()
 {
@@ -281,7 +252,7 @@ ConfigPanel *Configurable::create_panel()
 	return new AutoConfigPanel(aa, this);
 }
 
-string Configurable::getError()
+string Configurable::get_error()
 {
 	if (plugin)
 		return plugin->get_error();

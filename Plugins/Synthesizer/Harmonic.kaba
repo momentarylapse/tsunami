@@ -9,14 +9,6 @@ class PitchState
 	float phi
 	EnvelopeADSR env
 
-class HarminocState extends PluginData
-	PitchState[MAX_PITCH] pitch
-	override void reset()
-		for p in pitch
-			p.volume = 0
-			p.phi = 0
-			p.env.reset()
-
 class HarmonicConfig extends PluginData
 	float[NUM_HARMONICS] intensity
 	float release
@@ -95,13 +87,19 @@ class HarmonicPanel extends ConfigPanel
 
 class HarmonicSynthesizer extends Synthesizer
 	HarmonicConfig config
-	HarminocState state
+	
+	PitchState[MAX_PITCH] pitch
+	override void reset_state()
+		for p in pitch
+			p.volume = 0
+			p.phi = 0
+			p.env.reset()
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new HarmonicPanel(self)
 	
-	override void onConfig()
-		for p in state.pitch
+	override void on_config()
+		for p in pitch
 			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
 		
 	override void render(AudioBuffer buf)
@@ -111,20 +109,20 @@ class HarmonicSynthesizer extends Synthesizer
 			for e in events
 				if e.pos == i
 					int pp = e.pitch+0.4
-					PitchState *s = &state.pitch[pp]
+					PitchState *s = &pitch[pp]
 					if e.volume == 0
 						s.env.end()
 					else
 						s.env.start(e.volume)
-						enablePitch(pp, true)
+						enable_pitch(pp, true)
 
 			for p in active_pitch
-				PitchState *s = &state.pitch[p]
+				PitchState *s = &pitch[p]
 
 				s.volume = s.env.get()
 
 				if s.volume == 0
-					enablePitch(p, false)
+					enable_pitch(p, false)
 					continue
 
 				float d = 0

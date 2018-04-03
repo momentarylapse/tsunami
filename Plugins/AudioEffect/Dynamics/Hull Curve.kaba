@@ -46,7 +46,7 @@ class HullCurve extends AudioEffect
 		hull(buf.r)
 		hull(buf.l)
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new HullCurvePanel(self)
 
 class HullGrid extends Grid

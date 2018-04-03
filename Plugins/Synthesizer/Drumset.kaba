@@ -66,33 +66,28 @@ class DrumsetConfig extends PluginData
 	override void reset()
 		name = ""
 
-class DrumsetState extends PluginData
-	Song *a
-	Synthesizer *s
-	
-
 class DrumsetSynthesizer extends Synthesizer
 	DrumsetConfig config
-	DrumsetState state
+	Song *a
+	Synthesizer *s
 	override void __init__()
-		state.a = nil
-	override void onConfig()
-		state.a = drumlist.get(session, config.name)
-		state.s = nil
-		if state.a
-			state.s = state.a.tracks[0].synth
-		if state.s
-			state.s.setSampleRate(sample_rate)
-			state.s.onConfig()
+		a = nil
+	override void on_config()
+		a = drumlist.get(session, config.name)
+		s = nil
+		if a
+			s = a.tracks[0].synth
+		if s
+			s.set_sample_rate(sample_rate)
+			s.on_config()
 	override void render(AudioBuffer buf)
-		Synthesizer *s = state.s
 		if !s
 			return
 		s.events = events
 		s.render(buf)
 
 	
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new DrumsetPanel(self)
 
 class DrumsetPanel extends ConfigPanel

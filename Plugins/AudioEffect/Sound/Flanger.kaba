@@ -17,21 +17,20 @@ class PluginConfig extends PluginData
 		speed = 0.3
 		delay = 0.01
 
-class PluginState extends PluginData
+
+class Flanger extends AudioEffect
+	PluginConfig config
+	
 	float[] temp_r
 	float[] temp_l
 	int offset
-	override void reset()
+	override void reset_state()
 		temp_r.clear()
 		temp_l.clear()
 		offset = 0
 
-class Flanger extends AudioEffect
-	PluginConfig config
-	PluginState state
-
 	void doFlanger(float[] b, float[] temp)
-		int p = state.offset % temp.num
+		int p = offset % temp.num
 	
 		float f_a = (1 - 0.5 * config.depth) * config.delay
 		float f_b = 0.5 * config.depth * config.delay
@@ -43,7 +42,7 @@ class Flanger extends AudioEffect
 			temp[p] = bb
 		
 			// shift
-			float dt = f_a - cos((i + state.offset) * f_c) * f_b
+			float dt = f_a - cos((i + offset) * f_c) * f_b
 			int dp = dt * sample_rate
 			int p2 = p - dp
 			if p2 < 0
@@ -59,10 +58,10 @@ class Flanger extends AudioEffect
 	
 	override void process(AudioBuffer buf)
 		int delay_samples = sample_rate * config.delay + 1
-		state.temp_r.resize(delay_samples)
-		state.temp_l.resize(delay_samples)
+		temp_r.resize(delay_samples)
+		temp_l.resize(delay_samples)
 	
-		doFlanger(buf.r, state.temp_r)
-		doFlanger(buf.l, state.temp_l)
+		doFlanger(buf.r, temp_r)
+		doFlanger(buf.l, temp_l)
 	
-		state.offset += buf.length
+		offset += buf.length

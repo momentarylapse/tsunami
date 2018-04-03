@@ -201,10 +201,10 @@ class FMSynthesizer extends Synthesizer
 	FMConfig config
 	FMState state
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new FMPanel(self)
 	
-	override void onConfig()
+	override void on_config()
 		for p in state.pitch
 			for o,i in p.osc
 				OscillatorConfig *c = &config.osc[i]
@@ -228,7 +228,7 @@ class FMSynthesizer extends Synthesizer
 						for o,oi in s.osc
 							// TODO: e.volume should only effect "output" oscs
 							o.env.start(e.volume * config.osc[oi].amplitude)
-						enablePitch(pp, true)
+						enable_pitch(pp, true)
 
 			int[] del_me
 			del_me.clear()
@@ -276,6 +276,6 @@ class FMSynthesizer extends Synthesizer
 						buf.l[i] += d*/
 			
 			for p in del_me
-				enablePitch(p, false)
+				enable_pitch(p, false)
 			
 	

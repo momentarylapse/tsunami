@@ -9,15 +9,18 @@ class Config extends PluginData
 	override void reset()
 		frequency = 1000
 
-class State extends PluginData
-	float in_r, in_l, out_r, out_l
-	bool used
-	override void reset()
-		used = false
-
 class LowPassFilter extends AudioEffect
 	Config config
-	State state
+	
+	
+	float in_r, in_l, out_r, out_l
+	bool used
+	
+	override void __init__()
+		used = false
+	
+	override void reset_state()
+		used = false
 
 
 	// y[i] := α * (y[i-1] + x[i] - x[i-1])
@@ -30,11 +33,11 @@ class LowPassFilter extends AudioEffect
 		float bb = 1 - aa
 		float prev_in_r = 0
 		float prev_in_l = 0
-		if state.used
+		if used
 			float tr = buf.r[0]
 			float tl = buf.l[0]
-			buf.r[0] = bb * (buf.r[0] + state.out_r - state.in_r)
-			buf.l[0] = bb * (buf.l[0] + state.out_l - state.in_l)
+			buf.r[0] = bb * (buf.r[0] + out_r - in_r)
+			buf.l[0] = bb * (buf.l[0] + out_l - in_l)
 			prev_in_r = tr
 			prev_in_l = tl
 			//buf.r[0] = aa * buf.r[0] + bb * state.out_r
@@ -53,8 +56,8 @@ class LowPassFilter extends AudioEffect
 			//buf.r[i] = aa * buf.r[i] + bb * buf.r[i-1]
 			//buf.l[i] = aa * buf.l[i] + bb * buf.l[i-1]
 		
-		state.used = true
-		state.in_r = prev_in_r
-		state.in_l = prev_in_l
-		state.out_r = buf.r[buf.length - 1]
-		state.out_l = buf.l[buf.length - 1]
+		used = true
+		in_r = prev_in_r
+		in_l = prev_in_l
+		out_r = buf.r[buf.length - 1]
+		out_l = buf.l[buf.length - 1]

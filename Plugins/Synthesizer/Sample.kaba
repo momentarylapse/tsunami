@@ -12,19 +12,17 @@ class SampleConfig extends PluginData
 				delete s
 		samples.clear()
 
-class SampleState extends PluginData
-	MidiEvent[] events
-	
-
 class SampleSynthesizer extends Synthesizer
 	SampleConfig config
-	SampleState state
+	
+	MidiEvent[] _events
+	
 	override void render(AudioBuffer buf)
 		for e in events
 			if e.volume > 0
-				state.events.add(e)
+				_events.add(e)
 		
-		for e in state.events
+		for e in _events
 			int n = e.pitch + 0.4
 			if n < 0 or n >= config.samples.num
 				e.pitch = -1
@@ -38,13 +36,13 @@ class SampleSynthesizer extends Synthesizer
 			if e.pos < -s.buf.length
 				e.pitch = -1
 			
-		for e,i in state.events
+		for e,i in _events
 			if e.pitch < 0
-				state.events.remove(i)
+				_events.remove(i)
 				i --
 			
 	
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new SamplePanel(self)
 
 class SamplePanel extends ConfigPanel

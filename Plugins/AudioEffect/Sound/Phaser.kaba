@@ -27,14 +27,14 @@ class PhaserChannelParams
 		y2 = 0
 
 class PluginState extends PluginData
-	PhaserChannelParams r, l
-	override void reset()
-		r.reset()
-		l.reset()
 
 class Phaser extends AudioEffect
 	PluginConfig config
-	PluginState state
+	
+	PhaserChannelParams r, l
+	override void reset_state()
+		r.reset()
+		l.reset()
 
 	void doPhaser(float[] b, PhaserChannelParams p, int sample_rate)
 	
@@ -53,6 +53,6 @@ class Phaser extends AudioEffect
 			b[i] = y
 	
 	override void process(AudioBuffer buf)
-		doPhaser(buf.r, state.r, sample_rate)
-		doPhaser(buf.l, state.l, sample_rate)
+		doPhaser(buf.r, r, sample_rate)
+		doPhaser(buf.l, l, sample_rate)
 	

@@ -60,7 +60,7 @@ class Equalizer extends AudioEffect
 		equalize(buf.r)
 		equalize(buf.l)
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new EqualizerPanel(self)
 
 

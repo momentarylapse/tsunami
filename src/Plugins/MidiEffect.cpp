@@ -44,7 +44,7 @@ void MidiEffect::prepare()
 {
 	reset_state();
 	if (!usable)
-		session->e(getError());
+		session->e(get_error());
 }
 
 void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
@@ -55,7 +55,7 @@ void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			session->e(_("While applying a midi effect: ") + getError());
+			session->e(_("While applying a midi effect: ") + get_error());
 	}
 }
 

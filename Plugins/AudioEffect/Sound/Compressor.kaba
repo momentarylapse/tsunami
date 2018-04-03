@@ -26,22 +26,21 @@ class CompressorConfig extends PluginData
 		//MouseOver = -1
 		//Selected = -1
 
-class CompressorState extends PluginData
+
+class Compressor extends AudioEffect
+	CompressorConfig config
+	
+	
 	float gain_r, gain_l
 	float[] squares_r
 	float[] squares_l
-	override void reset()
+	override void reset_state()
 		gain_r = 1
 		gain_l = 1
 		squares_r.clear()
 		squares_r.resize(70)
 		squares_l.clear()
 		squares_l.resize(70)
-
-
-class Compressor extends AudioEffect
-	CompressorConfig config
-	CompressorState state
 
 	float dgain_attack, dgain_release
 
@@ -81,7 +80,7 @@ class Compressor extends AudioEffect
 			// apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new CompressorPanel(self)
 
 	override void process(AudioBuffer buf)
@@ -90,8 +89,8 @@ class Compressor extends AudioEffect
 		dgain_attack = 10 / (config.attack * sample_rate)
 		dgain_release = 10 / (config.release * sample_rate)
 		
-		compress(buf.r, state.squares_r, &state.gain_r)
-		compress(buf.l, state.squares_l, &state.gain_l)
+		compress(buf.r, squares_r, &gain_r)
+		compress(buf.l, squares_l, &gain_l)
 
 class CompressorGrid extends Grid
 	int MouseOver, Selected

@@ -2,7 +2,7 @@
 // Title[Deutsch] = Metronom
 
 use "../../api.kaba"
-use "../../Midi/Source/Metronome.kaba"
+use "../../MidiSource/Metronome.kaba"
 
 class Config extends PluginData
 	float beats_per_minute
@@ -22,22 +22,22 @@ class Metronome extends AudioEffect
 	
 	override void __init__()
 		synth = new DummySynthesizer
-		source = new MetronomeSource(90, 4, sample_rate)
-		synth.out.setSource(source)
+		source = new MetronomeSource
+		synth.set_source(source.out)
 	
 	override void __delete__()
 		delete source
 		delete synth
 
 	override void process(AudioBuffer buf)
-		synth.setSampleRate(sample_rate)
+		synth.set_sample_rate(sample_rate)
 		source.sample_rate = sample_rate
 		source.volume = config.volume
 		source.num_beats = config.beats_per_measure
 		source.setBpm(config.beats_per_minute)
 		synth.out.read(buf)
 		
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new MetronomePanel(self)
 
 	

@@ -2,29 +2,29 @@ use "../api.kaba"
 use "../tone.kaba"
 
 class SinusState extends PluginData
-	float[MAX_PITCH] volume
-	float[MAX_PITCH] phase
-	override void reset()
-		for p in 0:MAX_PITCH
-			volume[p] = 0
-			phase[p] = 0
 
 
 class SinusSynthesizer extends Synthesizer
-	SinusState state
+	float[MAX_PITCH] volume
+	float[MAX_PITCH] phase
+	
+	override void reset_state()
+		for p in 0:MAX_PITCH
+			volume[p] = 0
+			phase[p] = 0
 
 	override void render(AudioBuffer buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i
 					int pp = e.pitch
-					state.volume[pp] = e.volume
-					enablePitch(pp, e.volume > 0)
+					volume[pp] = e.volume
+					enable_pitch(pp, e.volume > 0)
 			
 			for p in active_pitch
-				float d = sin(state.phase[p]) * state.volume[p]
+				float d = sin(phase[p]) * volume[p]
 				buf.r[i] += d
 				buf.l[i] += d
-				state.phase[p] += delta_phi[p]
-				if state.phase[p] > 2*pi
-					state.phase[p] -= 2*pi
+				phase[p] += delta_phi[p]
+				if phase[p] > 2*pi
+					phase[p] -= 2*pi

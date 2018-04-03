@@ -4,7 +4,7 @@ use "../api.kaba"
 class HeavySynthesizer extends Synthesizer
 	DummySynthesizer sub
 	override void render(AudioBuffer buf)
-		sub.setSampleRate(sample_rate)
+		sub.set_sample_rate(sample_rate)
 		for e in events
 			MidiEvent ee = e
 			ee.volume = e.volume * 0.3

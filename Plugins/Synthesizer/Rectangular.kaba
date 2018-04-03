@@ -5,27 +5,25 @@ class PitchState
 	float volume
 	float phase
 
-class RectangularState extends PluginData
-	PitchState[MAX_PITCH] pitch
-	override void reset()
-		for p in pitch
-			p.volume = 0
-			p.phase = 0
-
 
 class RectangularSynthesizer extends Synthesizer
-	RectangularState state
+	
+	PitchState[MAX_PITCH] pitches
+	override void reset_state()
+		for p in pitches
+			p.volume = 0
+			p.phase = 0
 
 	override void render(AudioBuffer buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i
 					int pp = e.pitch
-					state.pitch[pp].volume = e.volume
-					enablePitch(pp, e.volume > 0)
+					pitches[pp].volume = e.volume
+					enable_pitch(pp, e.volume > 0)
 			
 			for ip in active_pitch
-				PitchState *p = &state.pitch[ip]
+				PitchState *p = &pitches[ip]
 				float d = sin(p.phase)
 				if d > 0
 					buf.r[i] += p.volume

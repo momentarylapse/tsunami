@@ -100,12 +100,10 @@ class AudioEffect
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(AudioBuffer buf)
-	extern void resetConfig()
-	extern void resetState()
-	extern virtual ConfigPanel *createPanel()
-	//extern virtual void updateDialog()
-	//extern void notify()
-	extern virtual void onConfig()
+	extern void reset_config()
+	extern virtual void reset_state()
+	extern virtual ConfigPanel *create_panel()
+	extern virtual void on_config()
 
 class MidiEffect
 	string name
@@ -115,12 +113,12 @@ class MidiEffect
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)
-	extern void resetConfig()
-	extern void resetState()
-	extern virtual ConfigPanel *createPanel()
+	extern void reset_config()
+	extern virtual void reset_state()
+	extern virtual ConfigPanel *create_panel()
 	//extern virtual void updateDialog()
 	//extern void notify()
-	extern virtual void onConfig()
+	extern virtual void on_config()
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
@@ -169,9 +167,8 @@ class AudioSource
 	extern virtual int get_pos(int delta)
 	extern virtual ConfigPanel* create_panel()
 	extern virtual void on_config()
-	extern virtual void reset_config()
+	extern void reset_config()
 	extern virtual void reset_state()
-	extern virtual void notify()
 	AudioPort *out
 
 class MidiPort
@@ -188,9 +185,8 @@ class MidiSource
 	extern virtual void reset()
 	extern virtual ConfigPanel* create_panel()
 	extern virtual void on_config()
-	extern virtual void reset_config()
+	extern void reset_config()
 	extern virtual void reset_state()
-	extern virtual void notify()
 	MidiPort *out
 
 class Synthesizer
@@ -206,17 +202,14 @@ class Synthesizer
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(AudioBuffer buf)
-	extern virtual ConfigPanel *createPanel()
-	extern void resetState()
-	extern void resetConfig()
-	extern void setSampleRate(int sample_rate)
-	extern void set_source(MidiSource* source)
-	
+	extern virtual ConfigPanel *create_panel()
+	extern void reset_config()
+	extern virtual void reset_state()
+	extern void set_sample_rate(int sample_rate)
+	extern void set_source(MidiPort* source)
 //	extern void feed(MidiEventBuffer midi)
-	
-	extern void enablePitch(int pitch, bool enable)
-	//extern void notify()
-	extern virtual void onConfig()
+	extern void enable_pitch(int pitch, bool enable)
+	extern virtual void on_config()
 
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()

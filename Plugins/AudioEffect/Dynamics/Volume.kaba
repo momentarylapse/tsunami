@@ -14,7 +14,7 @@ class Config extends PluginData
 class Volume extends AudioEffect
 	Config config
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new VolumePanel(self)
 
 	override void process(AudioBuffer buf)

@@ -49,14 +49,13 @@ public:
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
 	void _cdecl reset_config();
-	void _cdecl reset_state();
+	virtual void _cdecl reset_state(){}
 	bool configure(hui::Window *win);
 	virtual ConfigPanel *_cdecl create_panel();
 	void _cdecl notify();
 	virtual void _cdecl on_config(){}
 
 	PluginData *get_config() const;
-	PluginData *get_state() const;
 
 	string config_to_string() const;
 	void config_from_string(const string &options);
@@ -72,7 +71,7 @@ public:
 	Plugin *plugin;
 	bool usable;
 	bool enabled;
-	string getError();
+	string get_error();
 
 
 	enum Type

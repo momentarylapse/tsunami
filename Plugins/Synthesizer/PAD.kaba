@@ -9,15 +9,6 @@ class PitchState
 	float[] buf
 	EnvelopeADSR env
 
-class PADState extends PluginData
-	PitchState[MAX_PITCH] pitch
-	override void __init__()
-		for p in pitch
-			p.buf.__init__()
-	override void reset()
-		for p in pitch
-			p.buf.clear()
-			p.pos = 0
 
 class PADConfig extends PluginData
 	float[] A
@@ -45,17 +36,26 @@ float gauss(float f, float bw)
 	return exp(- x*x) / bw
 
 class PADSynthesizer extends Synthesizer
-	PADState state
 	PADConfig config
 	
-	override void onConfig()
-		state.reset()
-		for p in state.pitch
+	PitchState[MAX_PITCH] pitches
+	
+	override void __init__()
+		for p in pitches
+			p.buf.__init__()
+	override void reset_state()
+		for p in pitches
+			p.buf.clear()
+			p.pos = 0
+	
+	override void on_config()
+		reset_state()
+		for p in pitches
 			p.env.set(0.02, 0.02, 0.7, 0.5, sample_rate)
 		
 	void create(int pitch)
 		float freq = pitch_to_freq(pitch)
-		PitchState *p = &state.pitch[pitch]
+		PitchState *p = &pitches[pitch]
 	
 		complex[] c
 		float[] amp
@@ -89,15 +89,15 @@ class PADSynthesizer extends Synthesizer
 			for e in events
 				if e.pos == i
 					int pp = e.pitch + 0.4
-					PitchState *ps = &state.pitch[pp]
+					PitchState *ps = &pitches[pp]
 					if e.volume > 0
 						ps.env.start(e.volume)
-						enablePitch(pp, true)
+						enable_pitch(pp, true)
 					else
 						ps.env.end()
 			int[] to_del
 			for ip in active_pitch
-				PitchState *p = &state.pitch[ip]
+				PitchState *p = &pitches[ip]
 				
 				if p.buf.num == 0
 					create(ip)
@@ -111,9 +111,9 @@ class PADSynthesizer extends Synthesizer
 				if p.pos >= N
 					p.pos = 0
 			for ip in to_del
-				enablePitch(ip, false)
+				enable_pitch(ip, false)
 	
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new PADPanel(self)
 
 class PADGrid extends Grid

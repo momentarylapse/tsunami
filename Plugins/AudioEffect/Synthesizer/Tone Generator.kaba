@@ -19,7 +19,7 @@ class ToneGenerator extends AudioEffect
 	DummySynthesizer synth
 
 	override void process(AudioBuffer buf)
-		synth.setSampleRate(sample_rate)
+		synth.set_sample_rate(sample_rate)
 		
 		Range r = _Range(0, buf.length)
 		MidiEventBuffer midi
@@ -29,7 +29,7 @@ class ToneGenerator extends AudioEffect
 		synth.read(buf)
 	
 
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new TonePanel(self)
 
 class TonePanel extends ConfigPanel

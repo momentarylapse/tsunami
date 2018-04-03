@@ -58,7 +58,7 @@ class Equalizer15 extends AudioEffect
 		equalize(buf.l)
 		f.clear()
 	
-	override ConfigPanel *createPanel()
+	override ConfigPanel *create_panel()
 		return new Equalizer15Panel(self)
 
 class Equalizer15Panel extends ConfigPanel

@@ -19,22 +19,14 @@ class Config extends PluginData
 		delay = 0.15
 
 
-class PluginState extends PluginData
+class Echo extends AudioEffect
+	Config config
 	float[] buf_r, buf_l
 	int offset
 
-	override void reset()
-		buf_r.clear()
-		buf_l.clear()
-		offset = 0
-
-class Echo extends AudioEffect
-	Config config
-	PluginState state
-
 
 	void doDelay(float[] b, float[] d)
-		int p = state.offset % d.num
+		int p = offset % d.num
 		for bb in b
 	
 			// old value
@@ -55,10 +47,16 @@ class Echo extends AudioEffect
 	override void process(AudioBuffer buf)
 
 		int delay_samples = sample_rate * config.delay
-		state.buf_r.resize(delay_samples)
-		state.buf_l.resize(delay_samples)
+		buf_r.resize(delay_samples)
+		buf_l.resize(delay_samples)
 	
-		doDelay(buf.r, state.buf_r)
-		doDelay(buf.l, state.buf_l)
+		doDelay(buf.r, buf_r)
+		doDelay(buf.l, buf_l)
 	
-		state.offset += buf.length
+		offset += buf.length
+	
+	override void reset_state()
+		buf_r.clear()
+		buf_l.clear()
+		offset = 0
+		on_config()

@@ -14,6 +14,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Configurable.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
+#include "../../lib/math/complex.h"
 
 
 SignalEditor::Selection::Selection()
@@ -370,6 +371,23 @@ SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 	return s;
 }
 
+void draw_cable(Painter *p, SignalChain::Cable *c)
+{
+	complex p0 = complex(module_port_out_x(c->source), module_port_out_y(c->source, c->source_port));
+	complex p1 = complex(module_port_in_x(c->target), module_port_in_y(c->target, c->target_port));
+	p->setColor(signal_color(c->type));
+	p->drawLine(p0.x, p0.y, p1.x, p1.y);
+	complex m = (p0 + p1) / 2;
+	complex d = (p1 - p0) / (p1 - p0).abs();
+	complex e = d * c_i;
+	Array<complex> pp;
+	pp.add(m + d * 12);
+	pp.add(m - d * 12 + e * 5);
+	pp.add(m - d * 12 - e * 5);
+	p->drawPolygon(pp);
+	//p->dr
+}
+
 
 void SignalEditor::onDraw(Painter* p)
 {
@@ -412,14 +430,8 @@ void SignalEditor::onDraw(Painter* p)
 		}
 	}
 
-	for (auto *c: chain->cables){
-		float x0 = module_port_out_x(c->source);
-		float y0 = module_port_out_y(c->source, c->source_port);
-		float x1 = module_port_in_x(c->target);
-		float y1 = module_port_in_y(c->target, c->target_port);
-		p->setColor(signal_color(c->type));
-		p->drawLine(x0, y0, x1, y1);
-	}
+	for (auto *c: chain->cables)
+		draw_cable(p, c);
 
 	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 		p->setColor(White);

@@ -11,7 +11,7 @@
 
 #include "SideBar.h"
 
-class Track;
+class Configurable;
 
 class ModuleConsole : public SideBarConsole
 {
@@ -20,7 +20,7 @@ public:
 	virtual ~ModuleConsole();
 
 	void clear();
-	void setModule(void *m);
+	void setModule(Configurable *m);
 
 	void onEditSong();
 
@@ -31,7 +31,7 @@ public:
 
 	hui::Panel *panel;
 
-	void *module;
+	Configurable *module;
 	hui::Panel *module_panel;
 };
 

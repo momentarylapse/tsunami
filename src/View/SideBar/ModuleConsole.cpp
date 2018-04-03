@@ -33,27 +33,24 @@ void ModuleConsole::clear()
 	if (module_panel)
 		delete module_panel;
 	module_panel = NULL;
-	if (module){
-		SignalChain::Module *m = (SignalChain::Module*)module;
-		m->configurable()->unsubscribe(this);
-	}
+	if (module)
+		module->unsubscribe(this);
 	module = NULL;
 	reset("category");
 	reset("sub_category");
 }
 
-void ModuleConsole::setModule(void* _m)
+void ModuleConsole::setModule(Configurable* m)
 {
 	clear();
 
-	module = _m;
+	module = m;
 
 	if (module){
-		SignalChain::Module *m = (SignalChain::Module*)module;
-		m->configurable()->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Configurable::MESSAGE_DELETE);
-		setString("category", m->type());
-		setString("sub_category", m->sub_type());
-		module_panel = m->create_panel();
+		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Configurable::MESSAGE_DELETE);
+		setString("category", Configurable::type_to_name(module->configurable_type));
+		//setString("sub_category", m->sub_type());
+		module_panel = module->create_panel();
 		if (module_panel)
 			embed(module_panel, "grid", 0, 0);
 		hideControl("no_config", module_panel);

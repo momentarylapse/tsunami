@@ -20,6 +20,17 @@
 #include "../SideBar/ModuleConsole.h"
 
 
+
+void apply_sel(SignalEditor *e)
+{
+	SignalChain::Module *m = (SignalChain::Module*)e->sel.module;
+	Configurable *c = NULL;
+	if (m)
+		c = m->configurable();
+	e->session->win->side_bar->module_console->setModule(c);
+
+}
+
 SignalEditor::Selection::Selection()
 {
 	type = -1;
@@ -76,7 +87,7 @@ void SignalEditor::onLeftButtonDown()
 {
 	hover = getHover(hui::GetEvent()->mx, hui::GetEvent()->my);
 	sel = hover;
-	session->win->side_bar->module_console->setModule(sel.module);
+	apply_sel(this);
 	if (sel.type == sel.TYPE_PORT_IN){
 		chain->disconnect_target((SignalChain::Module*)sel.module, sel.port);
 	}else if (sel.type == sel.TYPE_PORT_OUT){
@@ -98,6 +109,7 @@ void SignalEditor::onLeftButtonUp()
 			}
 		}
 		sel = Selection();
+		apply_sel(this);
 	}
 	redraw("area");
 }
@@ -176,7 +188,7 @@ void SignalEditor::onRightButtonDown()
 	int my = hui::GetEvent()->my;
 	hover = getHover(mx, my);
 	sel = hover;
-	session->win->side_bar->module_console->setModule(sel.module);
+	apply_sel(this);
 
 	if (hover.type == hover.TYPE_MODULE){
 		menu_module->openPopup(this, mx, my);
@@ -308,13 +320,13 @@ void SignalEditor::onModuleDelete()
 	if (sel.type == sel.TYPE_MODULE){
 		chain->remove((SignalChain::Module*)sel.module);
 		hover = sel = Selection();
-		session->win->side_bar->module_console->setModule(sel.module);
+		apply_sel(this);
 	}
 }
 
 void SignalEditor::onModuleConfigure()
 {
-	session->win->side_bar->module_console->setModule(sel.module);
+	apply_sel(this);
 	session->win->side_bar->open(SideBar::MODULE_CONSOLE);
 }
 

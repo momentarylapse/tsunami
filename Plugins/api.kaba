@@ -278,6 +278,7 @@ Beat _Beat(int offset, int level)
 	b.level = level
 	b.bar_no = 0
 	b.beat_no = 0
+	return b
 
 enum
 	TRACK_TYPE_AUDIO

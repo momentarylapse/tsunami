@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-458
+459
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1377,8 +1377,11 @@ Audio joiner
 popup_signal_chain_menu/signal_chain_reset
 Zurücksetzen
 
+popup_signal_chain_menu/signal_chain_add_pitch_detector
+Pitch detector
+
 // Num Language Strings
-173
+175
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1726,3 +1729,7 @@ Signal Chain
 Signal Kette
 not allowed to delete system modules
 System Module dürfen nicht gelöscht werden
+Module
+Modul
+call: tsunami --chain <SIGNAL_CHAIN>
+Aufruf: tsunami --chain <SIGNAL_CHAIN>

@@ -21,6 +21,7 @@
 #include "../Midi/MidiPort.h"
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
+#include "../Midi/PitchDetector.h"
 #include "../Rhythm/BeatSource.h"
 #include "../Rhythm/BarStreamer.h"
 #include "../Rhythm/BarCollection.h"
@@ -99,6 +100,22 @@ public:
 			joiner->set_source_b(s);
 	}
 	virtual AudioPort *audio_socket(int port){ return joiner->out; }
+};
+
+class ModulePitchDetector : public SignalChain::Module
+{
+public:
+	PitchDetector *pitch_detector;
+	ModulePitchDetector(PitchDetector *p)
+	{
+		pitch_detector = p;
+		port_in.add(Track::Type::AUDIO);
+		port_out.add(Track::Type::MIDI);
+	}
+	virtual ~ModulePitchDetector(){ delete pitch_detector; }
+	virtual string type(){ return "PitchDetector"; }
+	virtual void set_audio_source(int port, AudioPort *s){ pitch_detector->set_source(s); }
+	virtual MidiPort *midi_socket(int port){ return pitch_detector->out; }
 };
 
 class ModuleOutputStream : public SignalChain::Module
@@ -457,6 +474,8 @@ void SignalChain::load(const string& filename)
 				m = addAudioJoiner();
 			else if (type == "PeakMeter")
 				m = addPeakMeter();
+			else if (type == "PitchDetector")
+				m = addPitchDetector();
 			else if (type == "AudioInputStream")
 				m = addAudioInputStream();
 			else if (type == "OutputStream")
@@ -530,6 +549,11 @@ SignalChain::Module* SignalChain::addAudioEffect(const string &name)
 SignalChain::Module* SignalChain::addAudioJoiner()
 {
 	return add(new ModuleAudioJoiner(new AudioJoiner));
+}
+
+SignalChain::Module* SignalChain::addPitchDetector()
+{
+	return add(new ModulePitchDetector(new PitchDetector));
 }
 
 SignalChain::Module* SignalChain::addPeakMeter()

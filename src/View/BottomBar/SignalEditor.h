@@ -40,6 +40,7 @@ public:
 	void onAddMidiSource();
 	void onAddMidiEffect();
 	void onAddSynthesizer();
+	void onAddPitchDetector();
 	void onAddMidiInputStream();
 	void onAddBeatSource();
 	void onAddBeatMidifier();

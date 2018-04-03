@@ -59,6 +59,7 @@ public:
 	Module* addSongRenderer();
 	Module* addMidiSource(const string &name);
 	Module* addAudioEffect(const string &name);
+	Module* addPitchDetector();
 	Module* addAudioJoiner();
 	Module* addPeakMeter();
 	Module* addAudioInputStream();

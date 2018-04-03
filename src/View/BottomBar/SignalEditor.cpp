@@ -48,6 +48,7 @@ SignalEditor::SignalEditor(Session *session) :
 	event("signal_chain_add_midi_effect", std::bind(&SignalEditor::onAddMidiEffect, this));
 	event("signal_chain_add_midi_input", std::bind(&SignalEditor::onAddMidiInputStream, this));
 	event("signal_chain_add_synthesizer", std::bind(&SignalEditor::onAddSynthesizer, this));
+	event("signal_chain_add_pitch_detector", std::bind(&SignalEditor::onAddPitchDetector, this));
 	event("signal_chain_add_beat_source", std::bind(&SignalEditor::onAddBeatSource, this));
 	event("signal_chain_add_beat_midifier", std::bind(&SignalEditor::onAddBeatMidifier, this));
 	event("signal_chain_reset", std::bind(&SignalEditor::onReset, this));
@@ -266,6 +267,13 @@ void SignalEditor::onAddSynthesizer()
 void SignalEditor::onAddMidiInputStream()
 {
 	auto *m = chain->addMidiInputStream();
+	m->x = sel.dx;
+	m->y = sel.dy;
+}
+
+void SignalEditor::onAddPitchDetector()
+{
+	auto *m = chain->addPitchDetector();
 	m->x = sel.dx;
 	m->y = sel.dy;
 }

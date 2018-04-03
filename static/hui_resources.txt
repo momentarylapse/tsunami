@@ -2145,7 +2145,7 @@ add
 
 2
 0
-10
+11
 Item
 signal_chain_add_audio_source
 
@@ -2189,21 +2189,27 @@ signal_chain_add_synthesizer
 0
 0
 Item
-signal_chain_add_midi_input
+signal_chain_add_pitch_detector
 
 7
 0
 0
 Item
-signal_chain_add_beat_source
+signal_chain_add_midi_input
 
 8
 0
 0
 Item
-signal_chain_add_beat_midifier
+signal_chain_add_beat_source
 
 9
+0
+0
+Item
+signal_chain_add_beat_midifier
+
+10
 0
 0
 Item
@@ -3816,7 +3822,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-367
+368
 // Text
 /cancel
 Cancel
@@ -4529,6 +4535,9 @@ Midi input stream
 popup_signal_chain_menu/signal_chain_add_midi_source
 Midi source
 
+popup_signal_chain_menu/signal_chain_add_pitch_detector
+Pitch detector
+
 popup_signal_chain_menu/signal_chain_add_synthesizer
 Synthesizer
 
@@ -4925,7 +4934,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-457
+458
 // Text
 /cancel
 Abbrechen
@@ -5812,6 +5821,9 @@ Midi input stream
 popup_signal_chain_menu/signal_chain_add_midi_source
 Midi source
 
+popup_signal_chain_menu/signal_chain_add_pitch_detector
+Pitch detector
+
 popup_signal_chain_menu/signal_chain_add_synthesizer
 Synthesizer
 
@@ -6299,7 +6311,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-173
+175
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6473,6 +6485,8 @@ Mixing console
 Mischpult
 Mixolydian
 Mixolydisch
+Module
+Modul
 Name:
 Name:
 New Audio File
@@ -6577,6 +6591,8 @@ audio library selected:
 Audiobibliothek gewählt: 
 backup done: 
 Backup abgeschlossen: 
+call: tsunami --chain <SIGNAL_CHAIN>
+Aufruf: tsunami --chain <SIGNAL_CHAIN>
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
 call: tsunami --export <File> <Exportfile>

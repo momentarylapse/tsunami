@@ -100,8 +100,15 @@ int PitchDetector::read(MidiEventBuffer& midi)
 	AudioBuffer buf;
 	buf.resize(midi.samples);
 	int l = source->read(buf);
+	if (l <= 0)
+		return l;
 
 	process(midi, buf);
+	if (loud_enough){
+		int pitch = freq_to_pitch(frequency);
+		midi.add(MidiEvent(0, pitch, 1));
+		midi.add(MidiEvent(midi.samples-1, pitch, 0));
+	}
 
 	return l;
 }

@@ -30,11 +30,6 @@ void Log::info(Session *session, const string &message)
 }
 
 
-Log::Message Log::last()
-{
-	return messages.back();
-}
-
 Array<Log::Message> Log::all(Session *session)
 {
 	Array<Log::Message> r;
@@ -60,5 +55,8 @@ void Log::addMessage(Session *session, int type, const string &_message)
 	}else{
 		msg_write(_message);
 	}
-	notify(MESSAGE_ADD);
+
+	// make sure messages are handled in the gui thread...
+	hui::RunLater(0.01f, std::bind(&Log::notify, this, MESSAGE_ADD));
+	//notify(MESSAGE_ADD);
 }

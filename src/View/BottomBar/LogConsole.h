@@ -24,6 +24,7 @@ public:
 	void onLogAdd();
 
 	Log *log;
+	int messages_loaded;
 };
 
 #endif /* LOGCONSOLE_H_ */

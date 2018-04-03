@@ -38,7 +38,6 @@ public:
 		string text;
 	};
 
-	Message last();
 	Array<Message> all(Session *session);
 
 private:

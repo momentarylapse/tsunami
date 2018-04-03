@@ -14,6 +14,7 @@ LogConsole::LogConsole(Session *session) :
 	BottomBar::Console(_("Messages"), session)
 {
 	log = session->log;
+	messages_loaded = 0;
 
 	fromResource("log_console");
 
@@ -57,11 +58,13 @@ void LogConsole::reload()
 	auto messages = log->all(session);
 	for (auto &m: messages)
 		console_add_message(this, m);
+	messages_loaded = messages.num;
 }
 
 void LogConsole::onLogAdd()
 {
-	auto m = log->last();
-	if ((m.session == session) or (m.session == Session::GLOBAL))
+	auto messages = log->all(session);
+	for (auto &m: messages.sub(messages_loaded, -1))
 		console_add_message(this, m);
+	messages_loaded = messages.num;
 }

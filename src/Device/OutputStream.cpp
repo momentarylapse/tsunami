@@ -570,8 +570,7 @@ bool OutputStream::_pulse_test_error(const string &msg)
 #if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0){
-		hui::RunLater(0.001f, std::bind(&Session::e, session, "OutputStream: " + msg + ": " + pa_strerror(e)));
-//		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
+		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
 #endif
@@ -582,8 +581,7 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 {
 #if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
-		hui::RunLater(0.001f, std::bind(&Session::e, session, "OutputStream: " + msg + ": " + Pa_GetErrorText(err)));
-//		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
+		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 #endif

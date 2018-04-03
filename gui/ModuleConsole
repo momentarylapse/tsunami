@@ -1,0 +1,6 @@
+Dialog module_console "" width=300 height=200
+	Grid ? "" expandy vertical
+		Grid grid "" expandy
+		Group sc_group_edit "Edit"
+			Grid ? ""
+				Button /edit_song "File"

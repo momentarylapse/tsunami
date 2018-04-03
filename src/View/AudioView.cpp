@@ -20,7 +20,6 @@
 #include "../Audio/PeakMeter.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/PerformanceMonitor.h"
-#include "../Stuff/SignalChain.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
@@ -28,6 +27,7 @@
 #include "Mode/ViewModeScaleBars.h"
 
 #include "../lib/threads/Mutex.h"
+#include "../Module/SignalChain.h"
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;

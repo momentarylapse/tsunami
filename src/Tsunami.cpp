@@ -8,6 +8,7 @@
 #include "Tsunami.h"
 
 #include "Device/DeviceManager.h"
+#include "Module/SignalChain.h"
 #include "TsunamiWindow.h"
 #include "Session.h"
 #include "Storage/Storage.h"
@@ -15,7 +16,6 @@
 #include "Stuff/Clipboard.h"
 #include "Stuff/PerformanceMonitor.h"
 #include "Stuff/BackupManager.h"
-#include "Stuff/SignalChain.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 

@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#include "SignalChain.h"
+#include "../Module/SignalChain.h"
 
 #include "../Session.h"
 #include "../Device/OutputStream.h"

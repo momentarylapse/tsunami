@@ -6,7 +6,8 @@
  */
 
 #include "ModuleConsole.h"
-#include "../../Stuff/SignalChain.h"
+
+#include "../../Module/SignalChain.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/Configurable.h"
 

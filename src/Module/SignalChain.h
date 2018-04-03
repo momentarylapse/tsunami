@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_STUFF_SIGNALCHAIN_H_
-#define SRC_STUFF_SIGNALCHAIN_H_
+#ifndef SRC_MODULE_SIGNALCHAIN_H_
+#define SRC_MODULE_SIGNALCHAIN_H_
 
-#include "Observable.h"
+#include "../Stuff/Observable.h"
 
 class AudioPort;
 class MidiPort;
@@ -92,4 +92,4 @@ public:
 	void stop();
 };
 
-#endif /* SRC_STUFF_SIGNALCHAIN_H_ */
+#endif /* SRC_MODULE_SIGNALCHAIN_H_ */

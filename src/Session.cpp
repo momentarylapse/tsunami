@@ -8,11 +8,11 @@
 #include "Session.h"
 #include "TsunamiWindow.h"
 #include "Stuff/Log.h"
-#include "Stuff/SignalChain.h"
 #include "Storage/Storage.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Data/Song.h"
 #include "lib/hui/hui.h"
+#include "Module/SignalChain.h"
 
 int Session::next_id = 0;
 Session *Session::GLOBAL = NULL;

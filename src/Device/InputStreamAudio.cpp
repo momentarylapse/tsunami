@@ -39,7 +39,7 @@ extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 
 void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-//	printf("input request %d\n", (int)nbytes);
+	//printf("input request %d\n", (int)nbytes);
 	InputStreamAudio *input = (InputStreamAudio*)userdata;
 
 	const void *data;
@@ -116,8 +116,14 @@ int InputStreamAudio::SyncData::get_delay()
 	return 0;
 }
 
-int InputStreamAudio::Source::read(AudioBuffer &buf)
+InputStreamAudio::Output::Output(InputStreamAudio *s)
 {
+	stream = s;
+}
+
+int InputStreamAudio::Output::read(AudioBuffer &buf)
+{
+	//printf("read %d %d\n", buf.length, stream->buffer.available());
 	if (stream->buffer.available() < buf.length)
 		return NOT_ENOUGH_DATA;
 
@@ -154,8 +160,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	portaudio_stream = NULL;
 #endif
 
-	out = new Source;
-	out->stream = this;
+	out = new Output(this);
 
 	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	api = session->device_manager->audio_api;
@@ -175,6 +180,7 @@ InputStreamAudio::~InputStreamAudio()
 {
 //	printf("input del\n");
 	stop();
+	delete out;
 }
 
 void InputStreamAudio::__init__(Session *session)

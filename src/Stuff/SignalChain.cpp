@@ -113,6 +113,10 @@ public:
 	virtual ~ModuleOutputStream(){ delete stream; }
 	virtual string type(){ return "OutputStream"; }
 	virtual void set_audio_source(int port, AudioPort *s){ stream->set_source(s); }
+
+	virtual void start(){ stream->play(); }
+	virtual void stop(){ stream->stop(); }
+	virtual void pause(bool paused){ stream->pause(paused); }
 };
 
 class ModuleAudioInputStream : public SignalChain::Module
@@ -127,6 +131,9 @@ public:
 	virtual ~ModuleAudioInputStream(){ delete stream; }
 	virtual string type(){ return "AudioInputStream"; }
 	virtual AudioPort *audio_socket(int port){ return stream->out; }
+
+	virtual void start(){ stream->start(); }
+	virtual void stop(){ stream->stop(); }
 };
 
 class ModuleAudioEffect : public SignalChain::Module
@@ -257,6 +264,9 @@ public:
 	virtual ~ModuleMidiInputStream(){ delete stream; }
 	virtual string type(){ return "MidiInputStream"; }
 	virtual MidiPort *midi_socket(int port){ return stream->out; }
+
+	virtual void start(){ stream->start(); }
+	virtual void stop(){ stream->stop(); }
 };
 
 SignalChain::SignalChain(Session *s)
@@ -427,6 +437,7 @@ void SignalChain::load(const string& filename)
 	for (auto *c: cables)
 		disconnect(c);
 
+	try{
 	File *f = FileOpenText(filename);
 	f->read_str();
 	int n = f->read_int();
@@ -479,6 +490,9 @@ void SignalChain::load(const string& filename)
 		connect(modules[s], sp, modules[t], tp);
 	}
 	delete f;
+	}catch(Exception &e){
+		session->e(e.message());
+	}
 }
 
 void SignalChain::reset()
@@ -556,5 +570,23 @@ SignalChain::Module* SignalChain::addBeatMidifier()
 SignalChain::Module* SignalChain::addBeatSource(const string &name)
 {
 	return add(new ModuleBeatSource(CreateBeatSource(session, name)));
+}
+
+void SignalChain::start()
+{
+	for (auto *m: modules)
+		m->start();
+}
+
+void SignalChain::stop()
+{
+	for (auto *m: modules)
+		m->stop();
+}
+
+void SignalChain::pause(bool paused)
+{
+	for (auto *m: modules)
+		m->pause(paused);
 }
 

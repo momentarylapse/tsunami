@@ -20,6 +20,7 @@
 #include "../Audio/PeakMeter.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/PerformanceMonitor.h"
+#include "../Stuff/SignalChain.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
@@ -695,6 +696,15 @@ void AudioView::onUpdate()
 	forceRedraw();
 }
 
+void AudioView::update_peaks_now(AudioBuffer &buf)
+{
+	int n = buf._update_peaks_prepare();
+
+	for (int i=0; i<n; i++)
+		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255)
+			buf._update_peaks_chunk(i);
+}
+
 void AudioView::update_peaks(AudioBuffer &buf)
 {
 	song->lock();
@@ -1189,7 +1199,8 @@ void AudioView::play(const Range &range, bool allow_loop)
 	renderer->allow_tracks(get_playable_tracks());
 	playback_active = true;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	stream->play();
+	//stream->play();
+	session->signal_chain->start();
 	forceRedraw();
 }
 
@@ -1197,7 +1208,8 @@ void AudioView::stop()
 {
 	if (!playback_active)
 		return;
-	stream->stop();
+	session->signal_chain->stop();
+	//stream->stop();
 	playback_active = false;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	forceRedraw();

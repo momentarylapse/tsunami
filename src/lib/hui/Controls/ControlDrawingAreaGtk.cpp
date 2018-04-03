@@ -27,6 +27,7 @@ GdkGLContext *gtk_gl_context = NULL;
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	reinterpret_cast<ControlDrawingArea*>(user_data)->cur_cairo = cr;
+	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
 	reinterpret_cast<ControlDrawingArea*>(user_data)->redraw_area.clear();
 	reinterpret_cast<Control*>(user_data)->notify("hui:draw");
 	return false;
@@ -255,6 +256,7 @@ gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
+	delay_timer = new Timer;
 	GetPartStrings(title);
 	// FIXME: this needs to be supplied as title... fromSource() won't work...
 	is_opengl = (OptionString.find("opengl") >= 0);
@@ -300,6 +302,11 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	cur_cairo = NULL;
 }
 
+ControlDrawingArea::~ControlDrawingArea()
+{
+	delete delay_timer;
+}
+
 void ControlDrawingArea::make_current()
 {
 	if (is_opengl)
@@ -308,10 +315,19 @@ void ControlDrawingArea::make_current()
 
 void ControlDrawingArea::redraw()
 {
+	//msg_write("redraw " + id);
 	rect r = rect(0,0,1000000,1000000);
 	for (rect &rr: redraw_area)
-		if (rr.covers(r))
-			return;
+		if (rr.covers(r)){
+			if (delay_timer->peek() < 0.2f){
+				//msg_write("            IGNORE " + f2s(delay_timer->peek(), 3));
+				return;
+			}else{
+				delay_timer->reset();
+				redraw_area.clear();
+				break;
+			}
+		}
 	if (!widget)
 		return;
 	gtk_widget_queue_draw(widget);
@@ -321,8 +337,16 @@ void ControlDrawingArea::redraw()
 void ControlDrawingArea::redraw(const rect &r)
 {
 	for (rect &rr: redraw_area)
-		if (rr.covers(r))
-			return;
+		if (rr.covers(r)){
+			if (delay_timer->peek() < 0.2f){
+				//msg_write("            IGNORE " + f2s(delay_timer->peek(), 3));
+				return;
+			}else{
+				delay_timer->reset();
+				redraw_area.clear();
+				break;
+			}
+		}
 	if (!widget)
 		return;
 	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());

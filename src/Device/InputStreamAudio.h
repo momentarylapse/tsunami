@@ -71,14 +71,16 @@ public:
 
 	RingBuffer buffer;
 
-	class Source : public AudioPort
+	class Output : public AudioPort
 	{
 	public:
+		Output(InputStreamAudio *s);
+		virtual ~Output(){}
 		virtual int _cdecl read(AudioBuffer &buf);
 
 		InputStreamAudio *stream;
 	};
-	Source *out;
+	Output *out;
 
 	void _cdecl set_backup_mode(int mode);
 	int backup_mode;

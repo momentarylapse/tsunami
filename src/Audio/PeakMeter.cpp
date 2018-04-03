@@ -60,10 +60,12 @@ PeakMeter::PeakMeter(Session *s)
 	out = new Output(this);
 	r.reset();
 	l.reset();
+	ring_buffer = new RingBuffer(1<<18);
 }
 
 PeakMeter::~PeakMeter()
 {
+	delete ring_buffer;
 }
 
 inline float nice_peak(float p)
@@ -119,12 +121,12 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 
 void PeakMeter::update(AudioBuffer &buf)
 {
-	//clearData();
 	if (mode == MODE_PEAKS)
 		find_peaks(buf);
 	else if (mode == MODE_SPECTRUM)
 		find_spectrum(buf);
 	notify();
+	clear_data();
 }
 
 
@@ -138,7 +140,19 @@ int PeakMeter::Output::read(AudioBuffer& buf)
 	if (!peak_meter->source)
 		return 0;
 	int r = peak_meter->source->read(buf);
-	peak_meter->update(buf);
+	if (r <= 0)
+		return r;
+
+	AudioBuffer b;
+	b.set_as_ref(buf, 0, r);
+	peak_meter->ring_buffer->write(b);
+
+	if (peak_meter->ring_buffer->available() > NUM_SAMPLES){
+		AudioBuffer b2;
+		b2.resize(peak_meter->ring_buffer->available());
+		peak_meter->ring_buffer->read(b2);
+		peak_meter->update(b2);
+	}
 	return r;
 }
 

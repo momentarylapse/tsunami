@@ -115,6 +115,8 @@ public:
 
 	AudioView *view;
 
+	Array<string> menu_layer_names;
+
 	Song *song;
 
 	Session *session;

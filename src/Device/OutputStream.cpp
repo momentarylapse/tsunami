@@ -417,7 +417,7 @@ void OutputStream::_read_stream()
 {
 	if (!source)
 		return;
-//	printf("read stream\n");
+	//printf("read stream\n");
 	reading = true;
 	read_more = false;
 
@@ -429,13 +429,15 @@ void OutputStream::_read_stream()
 	size = source->read(b);
 
 	if (size == source->NOT_ENOUGH_DATA){
-//		printf(" -> no data\n");
+		//printf(" -> no data\n");
+		read_more = true;
+		// keep trying...
 		return;
 	}
 
 	// out of data?
 	if (size == source->END_OF_STREAM){
-//		printf(" -> end\n");
+		//printf(" -> end\n");
 		read_end_of_stream = true;
 		reading = false;
 		hui::RunLater(0.001f,  std::bind(&OutputStream::on_read_end_of_stream, this));
@@ -568,7 +570,8 @@ bool OutputStream::_pulse_test_error(const string &msg)
 #if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0){
-		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
+		hui::RunLater(0.001f, std::bind(&Session::e, session, "OutputStream: " + msg + ": " + pa_strerror(e)));
+//		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
 #endif
@@ -579,7 +582,8 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 {
 #if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
-		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
+		hui::RunLater(0.001f, std::bind(&Session::e, session, "OutputStream: " + msg + ": " + Pa_GetErrorText(err)));
+//		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 #endif

@@ -713,6 +713,16 @@ void TsunamiWindow::onZoomOut()
 	view->zoomOut();
 }
 
+bool menu_layer_names_needs_update(TsunamiWindow *win)
+{
+	if (win->menu_layer_names.num != win->song->layers.num)
+		return true;
+	for (int i=0; i<win->menu_layer_names.num; i++)
+		if (win->menu_layer_names[i] != win->song->getNiceLayerName(i))
+			return true;
+	return false;
+}
+
 void TsunamiWindow::updateMenu()
 {
 	bool selected = !view->sel.range.empty();
@@ -755,12 +765,17 @@ void TsunamiWindow::updateMenu()
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
 	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
 
-	hui::Menu *m = getMenu()->getSubMenuByID("menu_layer_target");
-	if (m){
-		m->clear();
-		for (int i=0; i<song->layers.num; i++)
-			m->addItemCheckable(song->getNiceLayerName(i), format("jump_to_layer_%d", i));
-		check(format("jump_to_layer_%d", view->cur_layer), true);
+	if (menu_layer_names_needs_update(this)){
+		hui::Menu *m = getMenu()->getSubMenuByID("menu_layer_target");
+		if (m){
+			m->clear();
+			menu_layer_names.clear();
+			for (int i=0; i<song->layers.num; i++){
+				menu_layer_names.add(song->getNiceLayerName(i));
+				m->addItemCheckable(song->getNiceLayerName(i), format("jump_to_layer_%d", i));
+			}
+			check(format("jump_to_layer_%d", view->cur_layer), true);
+		}
 	}
 
 	string title = title_filename(song->filename) + " - " + AppName;

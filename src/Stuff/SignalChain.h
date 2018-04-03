@@ -49,6 +49,9 @@ public:
 		virtual MidiPort *midi_socket(int port){ return NULL; }
 		virtual BeatPort *beat_socket(int port){ return NULL; }
 		Array<int> port_in, port_out;
+		virtual void start(){}
+		virtual void pause(bool paused){}
+		virtual void stop(){}
 	};
 	Array<Module*> modules;
 	Module* add(Module *m);
@@ -80,6 +83,10 @@ public:
 	void disconnect_source(Module *source, int source_port);
 	void disconnect_target(Module *target, int target_port);
 	void disconnect(Cable *c);
+
+	void start();
+	void pause(bool paused);
+	void stop();
 };
 
 #endif /* SRC_STUFF_SIGNALCHAIN_H_ */

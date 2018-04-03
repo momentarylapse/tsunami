@@ -155,6 +155,14 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 		session->die_on_plugin_stop = true;
 		session->executeTsunamiPlugin(args[2]);
 		return false;
+	}else if (args[1] == "--chain"){
+		if (args.num < 3){
+			session->e(_("call: tsunami --chain <SIGNAL_CHAIN>"));
+			return true;
+		}
+		session = createSession();
+		session->signal_chain->load(args[2]);
+		return false;
 	}else if (args[1].head(2) == "--"){
 		session->e(_("unknown command: ") + args[1]);
 		return true;

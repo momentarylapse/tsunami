@@ -469,7 +469,7 @@ class InputStreamAudio
 	AudioBuffer buffer
 	AudioPort* out
 	Session* session
-	extern void __init__(Session* session, int sample_rate)
+	extern void __init__(Session* session)
 	extern virtual void __delete__()
 	extern bool start()
 	extern void stop()

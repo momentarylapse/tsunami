@@ -13,6 +13,7 @@
 
 class PeakMeterDisplay;
 class AudioBuffer;
+class RingBuffer;
 class Session;
 
 class PeakMeter : public Observable<VirtualBase>
@@ -68,6 +69,8 @@ public:
 		float get_sp();
 	};
 	Data r, l;
+
+	RingBuffer *ring_buffer;
 
 	static const int SPECTRUM_SIZE;
 	static const float FREQ_MIN;

@@ -25,7 +25,8 @@ int AudioEffect::Output::read(AudioBuffer &buf)
 		return buf.length;
 	fx->sample_rate = fx->session->sample_rate();
 	int samples = fx->source->read(buf);
-	fx->process(buf);
+	if (samples > 0)
+		fx->process(buf);
 	return samples;
 }
 

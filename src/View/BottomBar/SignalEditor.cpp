@@ -15,6 +15,9 @@
 #include "../../Plugins/Configurable.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../lib/math/complex.h"
+#include "../../TsunamiWindow.h"
+#include "../SideBar/SideBar.h"
+#include "../SideBar/ModuleConsole.h"
 
 
 SignalEditor::Selection::Selection()
@@ -73,6 +76,7 @@ void SignalEditor::onLeftButtonDown()
 {
 	hover = getHover(hui::GetEvent()->mx, hui::GetEvent()->my);
 	sel = hover;
+	session->win->side_bar->module_console->setModule(sel.module);
 	if (sel.type == sel.TYPE_PORT_IN){
 		chain->disconnect_target((SignalChain::Module*)sel.module, sel.port);
 	}else if (sel.type == sel.TYPE_PORT_OUT){
@@ -172,6 +176,7 @@ void SignalEditor::onRightButtonDown()
 	int my = hui::GetEvent()->my;
 	hover = getHover(mx, my);
 	sel = hover;
+	session->win->side_bar->module_console->setModule(sel.module);
 
 	if (hover.type == hover.TYPE_MODULE){
 		menu_module->openPopup(this, mx, my);
@@ -303,11 +308,14 @@ void SignalEditor::onModuleDelete()
 	if (sel.type == sel.TYPE_MODULE){
 		chain->remove((SignalChain::Module*)sel.module);
 		hover = sel = Selection();
+		session->win->side_bar->module_console->setModule(sel.module);
 	}
 }
 
 void SignalEditor::onModuleConfigure()
 {
+	session->win->side_bar->module_console->setModule(sel.module);
+	session->win->side_bar->open(SideBar::MODULE_CONSOLE);
 }
 
 void SignalEditor::onReset()

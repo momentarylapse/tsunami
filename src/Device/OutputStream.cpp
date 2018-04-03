@@ -216,6 +216,7 @@ public:
 };
 
 OutputStream::OutputStream(Session *_session, AudioPort *s) :
+	Configurable(_session, Type::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
 {
 //	printf("output new\n");
@@ -374,7 +375,7 @@ void OutputStream::_pause()
 #endif
 //	printf("ok\n");
 
-	notify(MESSAGE_STATE_CHANGE);
+	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 
 void OutputStream::_unpause()
@@ -399,7 +400,7 @@ void OutputStream::_unpause()
 #endif
 //	printf("ok\n");
 
-	notify(MESSAGE_STATE_CHANGE);
+	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 
 void OutputStream::pause(bool __pause)
@@ -541,7 +542,7 @@ void OutputStream::_start_first_time()
 	fully_initialized = true;
 	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
 
-	notify(MESSAGE_STATE_CHANGE);
+	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 
 bool OutputStream::is_paused()
@@ -562,7 +563,7 @@ float OutputStream::get_volume()
 void OutputStream::set_volume(float _volume)
 {
 	volume = _volume;
-	notify(MESSAGE_STATE_CHANGE);
+	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 
 bool OutputStream::_pulse_test_error(const string &msg)
@@ -593,14 +594,14 @@ void OutputStream::update()
 //	testError("idle");
 
 	if (!paused)
-		notify(MESSAGE_UPDATE);
+		Observable<VirtualBase>::notify(MESSAGE_UPDATE);
 }
 
 void OutputStream::on_played_end_of_stream()
 {
 	//printf("stream end\n");
 	//pause(true);
-	notify(MESSAGE_PLAY_END_OF_STREAM);
+	Observable<VirtualBase>::notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
 void OutputStream::on_read_end_of_stream()
@@ -614,7 +615,7 @@ void OutputStream::on_read_end_of_stream()
 #endif*/
 	// should drain...and use pa_stream_set_state_callback for notification
 
-	notify(MESSAGE_READ_END_OF_STREAM);
+	Observable<VirtualBase>::notify(MESSAGE_READ_END_OF_STREAM);
 }
 
 void OutputStream::clear_buffer()

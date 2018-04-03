@@ -18,6 +18,7 @@
 #include "SongConsole.h"
 #include "CaptureConsole.h"
 #include "LayerConsole.h"
+#include "ModuleConsole.h"
 #include "../../Session.h"
 
 SideBar::SideBar(Session *session)
@@ -49,6 +50,7 @@ SideBar::SideBar(Session *session)
 	midi_fx_console = new MidiFxConsole(session);
 	sample_ref_console = new SampleRefConsole(session);
 	capture_console = new CaptureConsole(session);
+	module_console = new ModuleConsole(session);
 
 	addConsole(song_console);
 	addConsole(layer_console);
@@ -62,6 +64,7 @@ SideBar::SideBar(Session *session)
 	addConsole(midi_fx_console);
 	addConsole(sample_ref_console);
 	addConsole(capture_console);
+	addConsole(module_console);
 
 	event("close", std::bind(&SideBar::onClose, this));
 

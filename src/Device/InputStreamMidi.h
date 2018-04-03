@@ -10,7 +10,7 @@
 
 #include "../Data/Song.h"
 #include "../Midi/MidiPort.h"
-#include "../Stuff/Observable.h"
+#include "../Plugins/Configurable.h"
 
 class Device;
 class DeviceManager;
@@ -24,7 +24,7 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class InputStreamMidi : public Observable<VirtualBase>
+class InputStreamMidi : public Configurable
 {
 public:
 
@@ -57,8 +57,6 @@ public:
 	bool _cdecl unconnect();
 	void _cdecl set_device(Device *d);
 	Device *_cdecl get_device();
-
-	Session *session;
 
 	MidiEventBuffer midi;
 	MidiEventBuffer current_midi;

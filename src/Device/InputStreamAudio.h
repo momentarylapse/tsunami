@@ -13,7 +13,7 @@
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
 #include "../Audio/Source/AudioPort.h"
-#include "../Stuff/Observable.h"
+#include "../Plugins/Configurable.h"
 
 class PluginManager;
 class Device;
@@ -31,7 +31,7 @@ typedef int PaError;
 #endif
 
 
-class InputStreamAudio : public Observable<VirtualBase>
+class InputStreamAudio : public Configurable
 {
 	friend class PluginManager;
 public:
@@ -85,7 +85,6 @@ public:
 	void _cdecl set_backup_mode(int mode);
 	int backup_mode;
 	File *backup_file;
-	Session *session;
 
 	void _cdecl set_chunk_size(int size);
 	void _cdecl set_update_dt(float dt);

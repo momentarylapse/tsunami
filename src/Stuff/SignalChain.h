@@ -14,6 +14,7 @@ class AudioPort;
 class MidiPort;
 class BeatPort;
 class ConfigPanel;
+class Configurable;
 class Session;
 
 class SignalChain : public Observable<VirtualBase>
@@ -37,6 +38,7 @@ public:
 		Module();
 		virtual ~Module(){}
 		float x, y;
+		virtual Configurable *configurable() = 0;
 		virtual string type() = 0;
 		virtual string sub_type(){ return ""; }
 		virtual string config_to_string(){ return ""; }

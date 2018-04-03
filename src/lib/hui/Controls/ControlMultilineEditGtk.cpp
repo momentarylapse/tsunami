@@ -62,6 +62,11 @@ void ControlMultilineEdit::__addString(const string& str)
 {
 }
 
+void ControlMultilineEdit::__reset()
+{
+	__setString("");
+}
+
 void ControlMultilineEdit::setTabSize(int tab_size)
 {
 	PangoLayout *layout = gtk_widget_create_pango_layout(widget, "W");

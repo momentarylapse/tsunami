@@ -39,6 +39,11 @@ string ControlEdit::getString()
 	return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
+void ControlEdit::__reset()
+{
+	__setString("");
+}
+
 void ControlEdit::completionAdd(const string &text)
 {
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));

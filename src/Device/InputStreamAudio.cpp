@@ -141,6 +141,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
+	Configurable(_session, Configurable::Type::INPUT_STREAM_AUDIO),
 	buffer(1048576)
 {
 //	printf("input new\n");
@@ -399,7 +400,7 @@ void InputStreamAudio::_stop_update()
 void InputStreamAudio::update()
 {
 	if (do_capturing() > 0)
-		notify(MESSAGE_CAPTURE);
+		Observable<VirtualBase>::notify(MESSAGE_CAPTURE);
 
 	running = is_capturing();
 }

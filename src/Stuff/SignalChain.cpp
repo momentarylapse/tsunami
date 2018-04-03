@@ -45,6 +45,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioSource(){ delete source; }
+	virtual Configurable *configurable(){ return source; }
 	virtual string type(){ return "AudioSource"; }
 	virtual AudioPort *audio_socket(int port){ return source->out; }
 };
@@ -59,6 +60,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleSongRenderer(){ delete renderer; }
+	virtual Configurable *configurable(){ return renderer; }
 	virtual string type(){ return "SongRenderer"; }
 	virtual AudioPort *audio_socket(int port){ return renderer->out; }
 };
@@ -74,6 +76,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModulePeakMeter(){ delete peak_meter; }
+	virtual Configurable *configurable(){ return peak_meter; }
 	virtual string type(){ return "PeakMeter"; }
 	virtual void set_audio_source(int port, AudioPort *s){ peak_meter->set_source(s); }
 	virtual AudioPort *audio_socket(int port){ return peak_meter->out; }
@@ -91,6 +94,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioJoiner(){ delete joiner; }
+	virtual Configurable *configurable(){ return joiner; }
 	virtual string type(){ return "AudioJoiner"; }
 	virtual void set_audio_source(int port, AudioPort *s)
 	{
@@ -113,6 +117,7 @@ public:
 		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModulePitchDetector(){ delete pitch_detector; }
+	virtual Configurable *configurable(){ return pitch_detector; }
 	virtual string type(){ return "PitchDetector"; }
 	virtual void set_audio_source(int port, AudioPort *s){ pitch_detector->set_source(s); }
 	virtual MidiPort *midi_socket(int port){ return pitch_detector->out; }
@@ -128,6 +133,7 @@ public:
 		port_in.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleOutputStream(){ delete stream; }
+	virtual Configurable *configurable(){ return stream; }
 	virtual string type(){ return "OutputStream"; }
 	virtual void set_audio_source(int port, AudioPort *s){ stream->set_source(s); }
 
@@ -146,6 +152,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioInputStream(){ delete stream; }
+	virtual Configurable *configurable(){ return stream; }
 	virtual string type(){ return "AudioInputStream"; }
 	virtual AudioPort *audio_socket(int port){ return stream->out; }
 
@@ -164,6 +171,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioEffect(){ delete fx; }
+	virtual Configurable *configurable(){ return fx; }
 	virtual string type(){ return "AudioEffect"; }
 	virtual AudioPort *audio_socket(int port){ return fx->out; }
 	virtual void set_audio_source(int port, AudioPort *s){ fx->set_source(s); }
@@ -185,6 +193,7 @@ public:
 		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleMidiEffect(){ delete fx; }
+	virtual Configurable *configurable(){ return fx; }
 	virtual string type(){ return "MidiEffect"; }
 	//virtual void set_midi_source(int port, MidiSource *s){ if (fx) fx->out->set_source(s); }
 	//virtual MidiSource *midi_socket(int port){ return fx->out; }
@@ -205,6 +214,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleSynthesizer(){ delete synth; }
+	virtual Configurable *configurable(){ return synth; }
 	virtual string type(){ return "Synthesizer"; }
 	virtual AudioPort *audio_socket(int port){ return synth->out; }
 	virtual void set_midi_source(int port, MidiPort *s){ synth->set_source(s); }
@@ -226,6 +236,7 @@ public:
 		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
+	virtual Configurable *configurable(){ return beat_midifier; }
 	virtual string type(){ return "BeatMidifier"; }
 	virtual MidiPort *midi_socket(int port){ return beat_midifier->out; }
 	virtual void set_beat_source(int port, BeatPort *s){ beat_midifier->set_beat_source(s); }
@@ -241,6 +252,7 @@ public:
 		port_out.add(Track::Type::TIME);
 	}
 	virtual ~ModuleBeatSource(){ delete source; }
+	virtual Configurable *configurable(){ return source; }
 	virtual string type(){ return "BeatSource"; }
 	virtual BeatPort *beat_socket(int port){ return source->out; }
 
@@ -260,6 +272,7 @@ public:
 		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleMidiSource(){ delete source; }
+	virtual Configurable *configurable(){ return source; }
 	virtual string type(){ return "MidiSource"; }
 	virtual MidiPort *midi_socket(int port){ return source->out; }
 
@@ -279,6 +292,7 @@ public:
 		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleMidiInputStream(){ delete stream; }
+	virtual Configurable *configurable(){ return stream; }
 	virtual string type(){ return "MidiInputStream"; }
 	virtual MidiPort *midi_socket(int port){ return stream->out; }
 
@@ -548,7 +562,7 @@ SignalChain::Module* SignalChain::addAudioEffect(const string &name)
 
 SignalChain::Module* SignalChain::addAudioJoiner()
 {
-	return add(new ModuleAudioJoiner(new AudioJoiner));
+	return add(new ModuleAudioJoiner(new AudioJoiner(session)));
 }
 
 SignalChain::Module* SignalChain::addPitchDetector()

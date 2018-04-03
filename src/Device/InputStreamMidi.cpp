@@ -64,9 +64,9 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(Session *_session)
+InputStreamMidi::InputStreamMidi(Session *_session) :
+	Configurable(_session, Configurable::Type::INPUT_STREAM_MIDI)
 {
-	session = _session;
 	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;

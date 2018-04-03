@@ -23,7 +23,6 @@ public:
 	void setModule(void *m);
 
 	void onEditSong();
-	void onEditTrack();
 
 	void onModuleDelete();
 	void onModuleSelectionChange();
@@ -31,6 +30,9 @@ public:
 	string id_inner;
 
 	hui::Panel *panel;
+
+	void *module;
+	hui::Panel *module_panel;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_MODULECONSOLE_H_ */

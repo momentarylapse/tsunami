@@ -14,7 +14,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
-#include "../Stuff/Observable.h"
+#include "../Plugins/Configurable.h"
 
 class AudioPort;
 class DeviceManager;
@@ -34,7 +34,7 @@ typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 #endif
 
-class OutputStream : public Observable<VirtualBase>
+class OutputStream : public Configurable
 {
 	friend StreamThread;
 public:
@@ -80,8 +80,6 @@ public:
 
 private:
 	void _read_stream();
-
-	Session *session;
 
 	float volume;
 	bool paused;

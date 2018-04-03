@@ -7,7 +7,8 @@
 
 #include "AudioJoiner.h"
 
-AudioJoiner::AudioJoiner()
+AudioJoiner::AudioJoiner(Session *session) :
+	Configurable(session, Configurable::Type::AUDIO_JOINER)
 {
 	out = new Output(this);
 	a = NULL;

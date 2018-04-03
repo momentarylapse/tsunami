@@ -6,6 +6,9 @@
  */
 
 #include "ModuleConsole.h"
+#include "../../Stuff/SignalChain.h"
+#include "../../Plugins/ConfigPanel.h"
+#include "../../Plugins/Configurable.h"
 
 ModuleConsole::ModuleConsole(Session* session) :
 	SideBarConsole(_("Module"), session)
@@ -14,31 +17,57 @@ ModuleConsole::ModuleConsole(Session* session) :
 
 	fromResource("module_console");
 
+	module = NULL;
+	module_panel = NULL;
+
 	event("edit_song", std::bind(&ModuleConsole::onEditSong, this));
 }
 
 ModuleConsole::~ModuleConsole()
 {
+	clear();
 }
 
 void ModuleConsole::clear()
 {
+	if (module_panel)
+		delete module_panel;
+	module_panel = NULL;
+	if (module){
+		SignalChain::Module *m = (SignalChain::Module*)module;
+		m->configurable()->unsubscribe(this);
+	}
+	module = NULL;
+	reset("category");
+	reset("sub_category");
 }
 
-void ModuleConsole::setModule(void* m)
+void ModuleConsole::setModule(void* _m)
 {
+	clear();
+
+	module = _m;
+
+	if (module){
+		SignalChain::Module *m = (SignalChain::Module*)module;
+		m->configurable()->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Configurable::MESSAGE_DELETE);
+		setString("category", m->type());
+		setString("sub_category", m->sub_type());
+		module_panel = m->create_panel();
+		if (module_panel)
+			embed(module_panel, "grid", 0, 0);
+		hideControl("no_config", module_panel);
+	}
 }
 
 void ModuleConsole::onEditSong()
 {
-}
-
-void ModuleConsole::onEditTrack()
-{
+	bar()->open(SideBar::SONG_CONSOLE);
 }
 
 void ModuleConsole::onModuleDelete()
 {
+	clear();
 }
 
 void ModuleConsole::onModuleSelectionChange()

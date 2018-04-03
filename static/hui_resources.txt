@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-48
+49
 // Resource
 Menu
 menu_fake
@@ -1778,6 +1778,85 @@ CheckBox
 link-volumes
 
 3
+0
+0
+// Resource
+Dialog
+module_console
+width=300,height=200
+0
+0
+1
+Grid
+?
+expandy,vertical
+0
+0
+5
+Grid
+?
+
+0
+0
+4
+Label
+t_category
+
+0
+0
+0
+Edit
+category
+expandx,disabled
+1
+0
+0
+Label
+t_sub_category
+
+0
+1
+0
+Edit
+sub_category
+disabled
+1
+1
+0
+Grid
+?
+height=20
+1
+0
+0
+Label
+no_config
+center,bold
+2
+0
+0
+Grid
+grid
+expandy
+3
+0
+0
+Group
+sc_group_edit
+
+4
+0
+1
+Grid
+?
+
+0
+0
+1
+Button
+edit_song
+
+0
 0
 0
 // Resource
@@ -3822,7 +3901,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-368
+372
 // Text
 /cancel
 Cancel
@@ -4400,6 +4479,18 @@ Output volume
 mixing-console/t_output
 Output
 
+module_console/no_config
+this module is not configurable
+
+module_console/sc_group_edit
+Edit
+
+module_console/t_category
+Category
+
+module_console/t_sub_category
+Sub type
+
 new_dialog/beats_per_bar
 4
 
@@ -4934,7 +5025,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-458
+462
 // Text
 /cancel
 Abbrechen
@@ -5659,6 +5750,18 @@ Ausgabelautstärke
 mixing-console/t_output
 Ausgabe
 
+module_console/no_config
+dieses Modul ist nicht konfigurierbar
+
+module_console/sc_group_edit
+Bearbeiten
+
+module_console/t_category
+Kategorie
+
+module_console/t_sub_category
+Untertyp
+
 new_dialog/beats_per_bar
 4
 
@@ -6311,7 +6414,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-175
+176
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6387,6 +6490,8 @@ Can't find plugin: %s ...
 Kann Pluin nicht finden: %s ...
 Can't insert recorded data (%s) into target (%s).
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
+Can't load %s: \"%s\"
+Kann %s nicht laden: \"%s\"
 Can't load effect: \"%s\"
 Effekt nicht ladbar: \"%s\"
 Can't load effect: %s

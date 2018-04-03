@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-459
+463
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1380,8 +1380,20 @@ Zurücksetzen
 popup_signal_chain_menu/signal_chain_add_pitch_detector
 Pitch detector
 
+module_console/sc_group_edit
+Bearbeiten
+
+module_console/t_category
+Kategorie
+
+module_console/t_sub_category
+Untertyp
+
+module_console/no_config
+dieses Modul ist nicht konfigurierbar
+
 // Num Language Strings
-175
+176
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1733,3 +1745,5 @@ Module
 Modul
 call: tsunami --chain <SIGNAL_CHAIN>
 Aufruf: tsunami --chain <SIGNAL_CHAIN>
+Can't load %s: \"%s\"
+Kann %s nicht laden: \"%s\"

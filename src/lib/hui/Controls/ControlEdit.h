@@ -19,6 +19,7 @@ public:
 	ControlEdit(const string &text, const string &id);
 	virtual string getString();
 	virtual void __setString(const string &str);
+	virtual void __reset();
 	virtual void completionAdd(const string &text);
 	virtual void completionClear();
 	virtual void __setOption(const string &op, const string &value);

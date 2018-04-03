@@ -8,7 +8,7 @@
 #ifndef SRC_AUDIO_PEAKMETER_H_
 #define SRC_AUDIO_PEAKMETER_H_
 
-#include "../Stuff/Observable.h"
+#include "../Plugins/Configurable.h"
 #include "Source/AudioPort.h"
 
 class PeakMeterDisplay;
@@ -16,7 +16,7 @@ class AudioBuffer;
 class RingBuffer;
 class Session;
 
-class PeakMeter : public Observable<VirtualBase>
+class PeakMeter : public Configurable
 {
 	friend class PeakMeterDisplay;
 public:
@@ -37,8 +37,6 @@ public:
 		PeakMeter *peak_meter;
 	};
 	Output *out;
-
-	Session *session;
 
 	void set_mode(int mode);
 

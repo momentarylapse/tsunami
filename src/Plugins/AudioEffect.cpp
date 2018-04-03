@@ -45,7 +45,7 @@ int AudioEffect::Output::get_pos(int delta)
 }
 
 AudioEffect::AudioEffect() :
-	Configurable(Session::GLOBAL, Type::AUDIO_EFFECT)
+	Module(Session::GLOBAL, Type::AUDIO_EFFECT)
 {
 	source = NULL;
 	out = new Output(this);

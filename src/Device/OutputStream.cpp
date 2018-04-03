@@ -216,7 +216,7 @@ public:
 };
 
 OutputStream::OutputStream(Session *_session, AudioPort *s) :
-	Configurable(_session, Type::OUTPUT_STREAM_AUDIO),
+	Module(_session, Type::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
 {
 //	printf("output new\n");

@@ -476,7 +476,7 @@ void ViewModeMidi::drawTrackPitchGrid(Painter *c, AudioViewTrack *t)
 	cc.a = 0.4f;
 	Array<SampleRef*> *p = NULL;
 	if ((t->track->synth) and (t->track->synth->name == "Sample")){
-		PluginData *c = t->track->synth->get_config();
+		auto *c = t->track->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
 	bool is_drum = (t->track->instrument.type == Instrument::Type::DRUMS);

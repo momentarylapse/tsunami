@@ -69,12 +69,12 @@ void Curve::Target::enumerateTrack(Track *t, Array<Target> &list, const string &
 	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
 	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
 	foreachi(AudioEffect *fx, t->fx, i)
-		enumerateConfigurable(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
-	enumerateConfigurable(t->synth, list, prefix + ":s", prefix_nice + ".synth");
+		enumerateModule(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
+	enumerateModule(t->synth, list, prefix + ":s", prefix_nice + ".synth");
 }
-void Curve::Target::enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerateModule(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
-	PluginData *pd = c->get_config();
+	ModuleConfiguration *pd = c->get_config();
 	if (pd)
 		enumerateType((char*)pd, pd->_class, list, prefix, prefix_nice);
 }

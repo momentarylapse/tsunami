@@ -13,7 +13,7 @@
 class Song;
 class Track;
 class AudioEffect;
-class Configurable;
+class Module;
 namespace Kaba
 {
 	class Class;
@@ -45,7 +45,7 @@ public:
 
 		static Array<Target> enumerate(Song *a);
 		static void enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
-		static void enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static void enumerateModule(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
 		static void enumerateType(char *p, Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 	};
 

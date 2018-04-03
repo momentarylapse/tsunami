@@ -22,18 +22,12 @@ public:
 
 	virtual void _cdecl on_config();
 
-	class State : public PluginData
-	{
-	public:
-		virtual void _cdecl reset();
-		struct PitchState{
-			float volume;
-			float phi;
-			EnvelopeADSR env;
-		}pitch[MAX_PITCH];
-	};
-
-	State state;
+	virtual void _cdecl reset_state();
+	struct PitchState{
+		float volume;
+		float phi;
+		EnvelopeADSR env;
+	}pitch[MAX_PITCH];
 
 	void _set_drum(int no, float freq, float volume, float attack, float release);
 };

@@ -11,7 +11,7 @@
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Plugins/Configurable.h"
+#include "../../Module/Module.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../lib/math/complex.h"
 #include "../../Module/SignalChain.h"
@@ -23,8 +23,8 @@
 
 void apply_sel(SignalEditor *e)
 {
-	SignalChain::Module *m = (SignalChain::Module*)e->sel.module;
-	Configurable *c = NULL;
+	SignalChain::_Module *m = (SignalChain::_Module*)e->sel.module;
+	Module *c = NULL;
 	if (m)
 		c = m->configurable();
 	e->session->win->side_bar->module_console->setModule(c);
@@ -89,9 +89,9 @@ void SignalEditor::onLeftButtonDown()
 	sel = hover;
 	apply_sel(this);
 	if (sel.type == sel.TYPE_PORT_IN){
-		chain->disconnect_target((SignalChain::Module*)sel.module, sel.port);
+		chain->disconnect_target((SignalChain::_Module*)sel.module, sel.port);
 	}else if (sel.type == sel.TYPE_PORT_OUT){
-		chain->disconnect_source((SignalChain::Module*)sel.module, sel.port);
+		chain->disconnect_source((SignalChain::_Module*)sel.module, sel.port);
 	}
 	redraw("area");
 }
@@ -101,11 +101,11 @@ void SignalEditor::onLeftButtonUp()
 	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 		if (hover.target_module){
 			if (sel.type == sel.TYPE_PORT_IN){
-				chain->disconnect_source((SignalChain::Module*)hover.target_module, hover.target_port);
-				chain->connect((SignalChain::Module*)hover.target_module, hover.target_port, (SignalChain::Module*)sel.module, sel.port);
+				chain->disconnect_source((SignalChain::_Module*)hover.target_module, hover.target_port);
+				chain->connect((SignalChain::_Module*)hover.target_module, hover.target_port, (SignalChain::_Module*)sel.module, sel.port);
 			}else if (sel.type == sel.TYPE_PORT_OUT){
-				chain->disconnect_target((SignalChain::Module*)hover.target_module, hover.target_port);
-				chain->connect((SignalChain::Module*)sel.module, sel.port, (SignalChain::Module*)hover.target_module, hover.target_port);
+				chain->disconnect_target((SignalChain::_Module*)hover.target_module, hover.target_port);
+				chain->connect((SignalChain::_Module*)sel.module, sel.port, (SignalChain::_Module*)hover.target_module, hover.target_port);
 			}
 		}
 		sel = Selection();
@@ -120,7 +120,7 @@ void SignalEditor::onMouseMove()
 	float my = hui::GetEvent()->my;
 	if (hui::GetEvent()->lbut){
 		if (sel.type == sel.TYPE_MODULE){
-			auto *m = (SignalChain::Module*)sel.module;
+			auto *m = (SignalChain::_Module*)sel.module;
 			m->x = mx + sel.dx;
 			m->y = my + sel.dy;
 		}else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
@@ -146,27 +146,27 @@ void SignalEditor::onMouseMove()
 const float MODULE_WIDTH = 160;
 const float MODULE_HEIGHT = 25;
 
-static rect module_rect(SignalChain::Module *m)
+static rect module_rect(SignalChain::_Module *m)
 {
 	return rect(m->x, m->x + MODULE_WIDTH, m->y, m->y + MODULE_HEIGHT);
 }
 
-static float module_port_in_x(SignalChain::Module *m)
+static float module_port_in_x(SignalChain::_Module *m)
 {
 	return m->x - 5;
 }
 
-static float module_port_in_y(SignalChain::Module *m, int index)
+static float module_port_in_y(SignalChain::_Module *m, int index)
 {
 	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
 }
 
-static float module_port_out_x(SignalChain::Module *m)
+static float module_port_out_x(SignalChain::_Module *m)
 {
 	return m->x + MODULE_WIDTH + 5;
 }
 
-static float module_port_out_y(SignalChain::Module *m, int index)
+static float module_port_out_y(SignalChain::_Module *m, int index)
 {
 	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
@@ -202,7 +202,7 @@ void SignalEditor::onKeyDown()
 	int key = hui::GetEvent()->key_code;
 	if (key == hui::KEY_DELETE){
 		if (sel.type == sel.TYPE_MODULE){
-			chain->remove((SignalChain::Module*)sel.module);
+			chain->remove((SignalChain::_Module*)sel.module);
 			hover = sel = Selection();
 		}
 	}
@@ -210,7 +210,7 @@ void SignalEditor::onKeyDown()
 
 void SignalEditor::onAddAudioSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_SOURCE, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_SOURCE, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addAudioSource(dlg->_return);
@@ -222,7 +222,7 @@ void SignalEditor::onAddAudioSource()
 
 void SignalEditor::onAddAudioEffect()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::AUDIO_EFFECT, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_EFFECT, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addAudioEffect(dlg->_return);
@@ -248,7 +248,7 @@ void SignalEditor::onAddAudioInputStream()
 
 void SignalEditor::onAddMidiSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_SOURCE, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::MIDI_SOURCE, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addMidiSource(dlg->_return);
@@ -260,7 +260,7 @@ void SignalEditor::onAddMidiSource()
 
 void SignalEditor::onAddMidiEffect()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::MIDI_EFFECT, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::MIDI_EFFECT, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addMidiEffect(dlg->_return);
@@ -272,7 +272,7 @@ void SignalEditor::onAddMidiEffect()
 
 void SignalEditor::onAddSynthesizer()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::SYNTHESIZER, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::SYNTHESIZER, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addSynthesizer(dlg->_return);
@@ -298,7 +298,7 @@ void SignalEditor::onAddPitchDetector()
 
 void SignalEditor::onAddBeatSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Configurable::Type::BEAT_SOURCE, session);
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::BEAT_SOURCE, session);
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addBeatSource(dlg->_return);
@@ -318,7 +318,7 @@ void SignalEditor::onAddBeatMidifier()
 void SignalEditor::onModuleDelete()
 {
 	if (sel.type == sel.TYPE_MODULE){
-		chain->remove((SignalChain::Module*)sel.module);
+		chain->remove((SignalChain::_Module*)sel.module);
 		hover = sel = Selection();
 		apply_sel(this);
 	}
@@ -457,7 +457,7 @@ void SignalEditor::onDraw(Painter* p)
 		p->setColor(White);
 		if (hover.target_module){
 			p->setLineWidth(5);
-			SignalChain::Module *t = (SignalChain::Module*)hover.target_module;
+			SignalChain::_Module *t = (SignalChain::_Module*)hover.target_module;
 			if (hover.type == hover.TYPE_PORT_IN)
 				p->drawLine(sel.dx, sel.dy, module_port_out_x(t), module_port_out_y(t, hover.target_port));
 			else

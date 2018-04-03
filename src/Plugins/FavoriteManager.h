@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 
-class Configurable;
+class Module;
 namespace hui{
 	class Window;
 }
@@ -42,11 +42,11 @@ public:
 
 	void set(const Favorite &f);
 
-	Array<string> GetList(Configurable *c);
-	void Apply(Configurable *c, const string &name);
-	void Save(Configurable *c, const string &name);
+	Array<string> GetList(Module *c);
+	void Apply(Module *c, const string &name);
+	void Save(Module *c, const string &name);
 
-	string SelectName(hui::Window *win, Configurable *c, bool save);
+	string SelectName(hui::Window *win, Module *c, bool save);
 };
 
 #endif /* FAVORITEMANAGER_H_ */

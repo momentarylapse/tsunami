@@ -141,7 +141,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
-	Configurable(_session, Configurable::Type::INPUT_STREAM_AUDIO),
+	Module(_session, Type::INPUT_STREAM_AUDIO),
 	buffer(1048576)
 {
 //	printf("input new\n");

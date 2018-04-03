@@ -69,7 +69,7 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 
 
 Synthesizer::Synthesizer() :
-	Configurable(NULL, Type::SYNTHESIZER)
+	Module(NULL, Type::SYNTHESIZER)
 {
 	out = new Output(this);
 	sample_rate = 0;

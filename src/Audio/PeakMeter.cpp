@@ -53,7 +53,7 @@ PeakMeter::Output::Output(PeakMeter *p)
 }
 
 PeakMeter::PeakMeter(Session *s) :
-	Configurable(s, Type::PEAK_METER)
+	Module(s, Type::PEAK_METER)
 {
 	source = NULL;
 	mode = MODE_PEAKS;

@@ -15,7 +15,7 @@ class Plugin;
 class AudioEffect;
 class MidiEffect;
 class Synthesizer;
-class Configurable;
+class Module;
 class FavoriteManager;
 class TsunamiWindow;
 class SongPlugin;
@@ -43,9 +43,9 @@ public:
 	Plugin *LoadAndCompilePlugin(int type, const string &filename);
 	Plugin *GetPlugin(Session *session, int type, const string &name);
 
-	void ApplyFavorite(Configurable *c, const string &name);
-	void SaveFavorite(Configurable *c, const string &name);
-	string SelectFavoriteName(hui::Window *win, Configurable *c, bool save);
+	void ApplyFavorite(Module *c, const string &name);
+	void SaveFavorite(Module *c, const string &name);
+	string SelectFavoriteName(hui::Window *win, Module *c, bool save);
 
 	Array<string> FindSynthesizers();
 	Array<string> FindAudioSources();

@@ -1,35 +1,34 @@
 /*
- * Configurable.cpp
+ * Module.cpp
  *
  *  Created on: 05.01.2014
  *      Author: michi
  */
 
 
-#include "Configurable.h"
-
-#include "ConfigPanel.h"
-#include "AutoConfigPanel.h"
+#include "../Plugins/ConfigPanel.h"
+#include "../Plugins/AutoConfigPanel.h"
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
-#include "PluginManager.h"
-#include "Plugin.h"
+#include "../Plugins/PluginManager.h"
+#include "../Plugins/Plugin.h"
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Device/OutputStream.h"
+#include "Module.h"
 
-const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
-void PluginData::__init__()
+void ModuleConfiguration::__init__()
 {
-	new(this) PluginData;
+	new(this) ModuleConfiguration;
 }
 
-void PluginData::__delete__()
+void ModuleConfiguration::__delete__()
 {
-	this->PluginData::~PluginData();
+	this->ModuleConfiguration::~ModuleConfiguration();
 }
 
 
@@ -169,9 +168,9 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 	}
 }
 
-Configurable::Configurable(Session *_session, int type)
+Module::Module(Session *_session, int type)
 {
-	configurable_type = type;
+	module_type = type;
 	session = _session;
 	song = NULL;
 	usable = true;
@@ -179,37 +178,37 @@ Configurable::Configurable(Session *_session, int type)
 	enabled = true;
 }
 
-Configurable::~Configurable()
+Module::~Module()
 {
 }
 
-void Configurable::__init__()
+void Module::__init__()
 {
-	new(this) Configurable(Session::GLOBAL, -1);
+	new(this) Module(Session::GLOBAL, -1);
 }
 
-void Configurable::__delete__()
+void Module::__delete__()
 {
-	this->Configurable::~Configurable();
+	this->Module::~Module();
 }
 
-PluginData *Configurable::get_config() const
+ModuleConfiguration *Module::get_config() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c)
 		return NULL;
 	for (auto &e: c->elements)
-		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
-			PluginData *config = (PluginData*)((char*)this + e.offset);
+		if ((e.name == "config") and (e.type->get_root()->name == "ModuleConfiguration")){
+			ModuleConfiguration *config = (ModuleConfiguration*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
 		}
 	return NULL;
 }
 
-string Configurable::config_to_string() const
+string Module::config_to_string() const
 {
-	PluginData *config = get_config();
+	ModuleConfiguration *config = get_config();
 	if (!config)
 		return "";
 
@@ -217,9 +216,9 @@ string Configurable::config_to_string() const
 	return s;
 }
 
-void Configurable::config_from_string(const string &param)
+void Module::config_from_string(const string &param)
 {
-	PluginData *config = get_config();
+	ModuleConfiguration *config = get_config();
 	if (!config)
 		return;
 
@@ -231,19 +230,19 @@ void Configurable::config_from_string(const string &param)
 
 
 // default version of ResetConfig()
-//   try to execute   Configurable.config.reset()
-void Configurable::reset_config()
+//   try to execute   Module.config.reset()
+void Module::reset_config()
 {
-	PluginData *config = get_config();
+	ModuleConfiguration *config = get_config();
 	if (config)
 		config->reset();
 	on_config();
 }
 
 // default handler...
-ConfigPanel *Configurable::create_panel()
+ConfigPanel *Module::create_panel()
 {
-	PluginData *config = get_config();
+	ModuleConfiguration *config = get_config();
 	if (!config)
 		return NULL;
 	auto aa = get_auto_conf(config);
@@ -252,15 +251,15 @@ ConfigPanel *Configurable::create_panel()
 	return new AutoConfigPanel(aa, this);
 }
 
-string Configurable::get_error()
+string Module::get_error()
 {
 	if (plugin)
 		return plugin->get_error();
-	return format(_("Can't load %s: \"%s\""), type_to_name(configurable_type).c_str(), name.c_str());
+	return format(_("Can't load %s: \"%s\""), type_to_name(module_type).c_str(), name.c_str());
 }
 
 
-/*void Configurable::updateDialog()
+/*void Module::updateDialog()
 {
 	if (_auto_panel_){
 		_auto_panel_->update();
@@ -270,7 +269,7 @@ string Configurable::get_error()
 class ConfigurationDialog : public hui::Window
 {
 public:
-	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p, hui::Window *parent) :
+	ConfigurationDialog(Module *c, ModuleConfiguration *pd, ConfigPanel *p, hui::Window *parent) :
 		hui::Window("configurable_dialog", parent)
 	{
 		config = c;
@@ -281,7 +280,7 @@ public:
 		setTitle(config->name);
 		embed(panel, "grid", 0, 1);
 
-		if (c->configurable_type != c->Type::AUDIO_EFFECT)
+		if (c->module_type != c->Type::AUDIO_EFFECT)
 			hideControl("preview", true);
 
 		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
@@ -369,15 +368,15 @@ public:
 		tsunami->win->view->renderer->preview_effect = NULL;*/
 	}
 
-	Configurable *config;
+	Module *config;
 	ConfigPanel *panel;
 	Progress *progress;
 	bool ok;
 };
 
-bool Configurable::configure(hui::Window *win)
+bool Module::configure(hui::Window *win)
 {
-	PluginData *config = get_config();
+	ModuleConfiguration *config = get_config();
 	if (!config)
 		return true;
 
@@ -392,23 +391,23 @@ bool Configurable::configure(hui::Window *win)
 	return ok;
 }
 
-void Configurable::notify()
+void Module::notify()
 {
 	on_config();
 	Observable::notify();
 }
 
-Configurable *Configurable::copy() const
+Module *Module::copy() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c){
-		if (this->configurable_type == Type::SYNTHESIZER)
+		if (this->module_type == Type::SYNTHESIZER)
 			return new DummySynthesizer;
 		return NULL;
 	}
-	Configurable *clone = (Configurable*)c->create_instance();
+	Module *clone = (Module*)c->create_instance();
 
-	clone->configurable_type = configurable_type;
+	clone->module_type = module_type;
 	clone->session = session;
 	clone->song = song;
 	clone->config_from_string(config_to_string());
@@ -417,37 +416,37 @@ Configurable *Configurable::copy() const
 }
 
 
-string Configurable::type_to_name(int type)
+string Module::type_to_name(int type)
 {
-	if (type == Configurable::Type::AUDIO_SOURCE)
+	if (type == Module::Type::AUDIO_SOURCE)
 		return "AudioSource";
-	if (type == Configurable::Type::AUDIO_EFFECT)
+	if (type == Module::Type::AUDIO_EFFECT)
 		return "AudioEffect";
-	if (type == Configurable::Type::SYNTHESIZER)
+	if (type == Module::Type::SYNTHESIZER)
 		return "Synthesizer";
-	if (type == Configurable::Type::MIDI_SOURCE)
+	if (type == Module::Type::MIDI_SOURCE)
 		return "MidiSource";
-	if (type == Configurable::Type::MIDI_EFFECT)
+	if (type == Module::Type::MIDI_EFFECT)
 		return "MidiEffect";
-	if (type == Configurable::Type::BEAT_SOURCE)
+	if (type == Module::Type::BEAT_SOURCE)
 		return "BeatSource";
 	return "???";
 }
 
-Configurable::Type Configurable::type_from_name(const string &str)
+Module::Type Module::type_from_name(const string &str)
 {
 	if (str == "AudioSource")
-		return Configurable::Type::AUDIO_SOURCE;
+		return Module::Type::AUDIO_SOURCE;
 	if (str == "AudioEffect" or str == "Effect")
-		return Configurable::Type::AUDIO_EFFECT;
+		return Module::Type::AUDIO_EFFECT;
 	if (str == "Synthesizer" or str == "Synth")
-		return Configurable::Type::SYNTHESIZER;
+		return Module::Type::SYNTHESIZER;
 	if (str == "MidiEffect")
-		return Configurable::Type::MIDI_EFFECT;
+		return Module::Type::MIDI_EFFECT;
 	if (str == "MidiSource")
-		return Configurable::Type::MIDI_SOURCE;
+		return Module::Type::MIDI_SOURCE;
 	if (str == "BeatSource")
-		return Configurable::Type::BEAT_SOURCE;
+		return Module::Type::BEAT_SOURCE;
 	return (Type)-1;
 }
 

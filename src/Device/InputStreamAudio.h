@@ -13,7 +13,7 @@
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
 #include "../Audio/Source/AudioPort.h"
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 
 class PluginManager;
 class Device;
@@ -31,7 +31,7 @@ typedef int PaError;
 #endif
 
 
-class InputStreamAudio : public Configurable
+class InputStreamAudio : public Module
 {
 	friend class PluginManager;
 public:

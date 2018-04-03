@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
-#include "Configurable.h"
+#include "../Module/Module.h"
 #include "../Audio/Source/AudioPort.h"
 
 class Plugin;
@@ -23,7 +23,7 @@ class Script;
 class Type;
 };
 
-class AudioEffect : public Configurable
+class AudioEffect : public Module
 {
 public:
 	AudioEffect();

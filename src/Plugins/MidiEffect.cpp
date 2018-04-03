@@ -15,7 +15,7 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::MidiEffect() :
-	Configurable(Session::GLOBAL, Type::MIDI_EFFECT)
+	Module(Session::GLOBAL, Type::MIDI_EFFECT)
 {
 	usable = true;
 	plugin = NULL;

@@ -1,12 +1,12 @@
 /*
- * Configurable.h
+ * Module.h
  *
  *  Created on: 05.01.2014
  *      Author: michi
  */
 
-#ifndef CONFIGURABLE_H_
-#define CONFIGURABLE_H_
+#ifndef SRC_MODULE_MODULE_H_
+#define SRC_MODULE_MODULE_H_
 
 
 #include "../lib/base/base.h"
@@ -22,10 +22,10 @@ namespace hui{
 }
 
 
-class PluginData : public VirtualBase
+class ModuleConfiguration : public VirtualBase
 {
 public:
-	virtual ~PluginData(){}
+	virtual ~ModuleConfiguration(){}
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 	virtual void _cdecl reset(){}
@@ -38,11 +38,11 @@ class Session;
 class Song;
 class Plugin;
 
-class Configurable : public Observable<VirtualBase>
+class Module : public Observable<VirtualBase>
 {
 public:
-	Configurable(Session *session, int type);
-	virtual ~Configurable();
+	Module(Session *session, int type);
+	virtual ~Module();
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
@@ -55,14 +55,14 @@ public:
 	void _cdecl notify();
 	virtual void _cdecl on_config(){}
 
-	PluginData *get_config() const;
+	ModuleConfiguration *get_config() const;
 
 	string config_to_string() const;
 	void config_from_string(const string &options);
 
-	Configurable *copy() const;
+	Module *copy() const;
 
-	int configurable_type;
+	int module_type;
 	string name;
 	Session *session;
 	Song *song;
@@ -95,48 +95,5 @@ public:
 	static Type type_from_name(const string &name);
 };
 
-template<class T>
-class ConfigurableMixin
-{
-public:
-	ConfigurableMixin(Session *session, int type);
-	virtual ~ConfigurableMixin();
-	void _cdecl __init__();
-	virtual void _cdecl __delete__();
 
-	static const string MESSAGE_CHANGE_BY_ACTION;
-
-	void _cdecl reset_config();
-	void _cdecl reset_state();
-	bool configure();
-	virtual ConfigPanel *_cdecl create_panel();
-	void _cdecl notify();
-	virtual void _cdecl on_config(){}
-
-	PluginData *get_config() const;
-	PluginData *get_state() const;
-
-	string config_to_string() const;
-	void config_from_string(const string &options);
-
-	Configurable *copy() const;
-
-	int configurable_type;
-	string name;
-	Session *session;
-	Song *song;
-
-
-	enum Type
-	{
-		AUDIO_SOURCE,
-		AUDIO_EFFECT,
-		MIDI_SOURCE,
-		MIDI_EFFECT,
-		SYNTHESIZER,
-		BEAT_SOURCE,
-	};
-};
-
-
-#endif /* CONFIGURABLE_H_ */
+#endif /* SRC_MODULE_MODULE_H_ */

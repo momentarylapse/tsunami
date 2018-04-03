@@ -6,9 +6,9 @@
  */
 
 #include "ConfigPanel.h"
-#include "Configurable.h"
+#include "../Module/Module.h"
 
-ConfigPanel::ConfigPanel(Configurable *_c)
+ConfigPanel::ConfigPanel(Module *_c)
 {
 	c = _c;
 }
@@ -23,7 +23,7 @@ ConfigPanel::~ConfigPanel()
 }
 
 
-void ConfigPanel::__init__(Configurable *_c)
+void ConfigPanel::__init__(Module *_c)
 {
 	new(this) ConfigPanel(_c);
 }

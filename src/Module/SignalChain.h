@@ -14,7 +14,7 @@ class AudioPort;
 class MidiPort;
 class BeatPort;
 class ConfigPanel;
-class Configurable;
+class Module;
 class Session;
 
 class SignalChain : public Observable<VirtualBase>
@@ -32,13 +32,13 @@ public:
 	static SignalChain *create_default(Session *session);
 
 
-	class Module
+	class _Module
 	{
 	public:
-		Module();
-		virtual ~Module(){}
+		_Module();
+		virtual ~_Module(){}
 		float x, y;
-		virtual Configurable *configurable() = 0;
+		virtual Module *configurable() = 0;
 		virtual string type() = 0;
 		virtual string sub_type(){ return ""; }
 		virtual string config_to_string(){ return ""; }
@@ -55,36 +55,36 @@ public:
 		virtual void pause(bool paused){}
 		virtual void stop(){}
 	};
-	Array<Module*> modules;
-	Module* add(Module *m);
-	Module* addAudioSource(const string &name);
-	Module* addSongRenderer();
-	Module* addMidiSource(const string &name);
-	Module* addAudioEffect(const string &name);
-	Module* addPitchDetector();
-	Module* addAudioJoiner();
-	Module* addPeakMeter();
-	Module* addAudioInputStream();
-	Module* addAudioOutputStream();
-	Module* addMidiEffect(const string &name);
-	Module* addSynthesizer(const string &name);
-	Module* addMidiInputStream();
-	Module* addBeatMidifier();
-	Module* addBeatSource(const string &name);
-	void remove(Module *m);
-	int module_index(SignalChain::Module *m);
+	Array<_Module*> modules;
+	_Module* add(_Module *m);
+	_Module* addAudioSource(const string &name);
+	_Module* addSongRenderer();
+	_Module* addMidiSource(const string &name);
+	_Module* addAudioEffect(const string &name);
+	_Module* addPitchDetector();
+	_Module* addAudioJoiner();
+	_Module* addPeakMeter();
+	_Module* addAudioInputStream();
+	_Module* addAudioOutputStream();
+	_Module* addMidiEffect(const string &name);
+	_Module* addSynthesizer(const string &name);
+	_Module* addMidiInputStream();
+	_Module* addBeatMidifier();
+	_Module* addBeatSource(const string &name);
+	void remove(_Module *m);
+	int module_index(SignalChain::_Module *m);
 
 	struct Cable
 	{
 		int type;
-		Module *source, *target;
+		_Module *source, *target;
 		int source_port, target_port;
 	};
 	Array<Cable*> cables;
 
-	void connect(Module *source, int source_port, Module *target, int target_port);
-	void disconnect_source(Module *source, int source_port);
-	void disconnect_target(Module *target, int target_port);
+	void connect(_Module *source, int source_port, _Module *target, int target_port);
+	void disconnect_source(_Module *source, int source_port);
+	void disconnect_target(_Module *target, int target_port);
 	void disconnect(Cable *c);
 
 	void start();

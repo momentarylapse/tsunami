@@ -8,7 +8,7 @@
 #ifndef SRC_AUDIO_PEAKMETER_H_
 #define SRC_AUDIO_PEAKMETER_H_
 
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 #include "Source/AudioPort.h"
 
 class PeakMeterDisplay;
@@ -16,7 +16,7 @@ class AudioBuffer;
 class RingBuffer;
 class Session;
 
-class PeakMeter : public Configurable
+class PeakMeter : public Module
 {
 	friend class PeakMeterDisplay;
 public:

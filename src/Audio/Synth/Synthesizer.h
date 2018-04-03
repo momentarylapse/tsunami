@@ -9,7 +9,7 @@
 #define SYNTHESIZER_H_
 
 #include "../../lib/base/base.h"
-#include "../../Plugins/Configurable.h"
+#include "../../Module/Module.h"
 #include "../../Midi/MidiData.h"
 #include "../../Midi/Instrument.h"
 #include "../Source/AudioPort.h"
@@ -23,7 +23,7 @@ class ActionTrackDetuneSynthesizer;
 class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
 
-class Synthesizer : public Configurable
+class Synthesizer : public Module
 {
 	friend class PluginManager;
 	friend class DetuneSynthesizerDialog;

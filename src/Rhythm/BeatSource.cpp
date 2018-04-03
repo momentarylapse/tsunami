@@ -13,7 +13,7 @@
 DummyBeatSource* BeatSource::dummy = new DummyBeatSource;
 
 BeatSource::BeatSource() :
-	Configurable(Session::GLOBAL, Configurable::Type::BEAT_SOURCE)
+	Module(Session::GLOBAL, Type::BEAT_SOURCE)
 {
 	out = new Output(this);
 }

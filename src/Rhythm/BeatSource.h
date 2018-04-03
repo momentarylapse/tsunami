@@ -9,11 +9,11 @@
 #define SRC_RHYTHM_BEATSOURCE_H_
 
 #include "BeatPort.h"
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 
 class DummyBeatSource;
 
-class BeatSource : public Configurable
+class BeatSource : public Module
 {
 public:
 	BeatSource();

@@ -11,9 +11,10 @@
 #include "../../Plugins/PluginManager.h"
 
 AudioSource::AudioSource() :
-	Configurable(Session::GLOBAL, Configurable::Type::AUDIO_SOURCE)
+	Module(Session::GLOBAL, Type::AUDIO_SOURCE)
 {
 	out = new Output(this);
+	beat_source = NULL;
 }
 
 AudioSource::~AudioSource()

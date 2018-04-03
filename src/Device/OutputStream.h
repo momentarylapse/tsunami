@@ -14,7 +14,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 
 class AudioPort;
 class DeviceManager;
@@ -34,7 +34,7 @@ typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 #endif
 
-class OutputStream : public Configurable
+class OutputStream : public Module
 {
 	friend StreamThread;
 public:

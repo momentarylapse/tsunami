@@ -28,7 +28,7 @@ void  MidiSource::Output::reset()
 }
 
 MidiSource::MidiSource() :
-	Configurable(Session::GLOBAL, Configurable::Type::MIDI_SOURCE)
+	Module(Session::GLOBAL, Type::MIDI_SOURCE)
 {
 	beat_source = BeatSource::dummy->out;
 	out = new Output(this);

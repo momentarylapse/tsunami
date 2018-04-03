@@ -65,7 +65,7 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 }
 
 InputStreamMidi::InputStreamMidi(Session *_session) :
-	Configurable(_session, Configurable::Type::INPUT_STREAM_MIDI)
+	Module(_session, Type::INPUT_STREAM_MIDI)
 {
 	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;

@@ -8,12 +8,12 @@
 #ifndef SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
 #define SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
 
-#include "../../Plugins/Configurable.h"
+#include "../../Module/Module.h"
 #include "AudioPort.h"
 
 class BeatSource;
 
-class AudioSource : public Configurable
+class AudioSource : public Module
 {
 public:
 	AudioSource();

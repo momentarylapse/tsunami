@@ -9,7 +9,7 @@
 
 #include "../../Module/SignalChain.h"
 #include "../../Plugins/ConfigPanel.h"
-#include "../../Plugins/Configurable.h"
+#include "../../Module/Module.h"
 
 ModuleConsole::ModuleConsole(Session* session) :
 	SideBarConsole(_("Module"), session)
@@ -41,15 +41,15 @@ void ModuleConsole::clear()
 	reset("sub_category");
 }
 
-void ModuleConsole::setModule(Configurable* m)
+void ModuleConsole::setModule(Module* m)
 {
 	clear();
 
 	module = m;
 
 	if (module){
-		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Configurable::MESSAGE_DELETE);
-		setString("category", Configurable::type_to_name(module->configurable_type));
+		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Module::MESSAGE_DELETE);
+		setString("category", Module::type_to_name(module->module_type));
 		//setString("sub_category", m->sub_type());
 		module_panel = module->create_panel();
 		if (module_panel)

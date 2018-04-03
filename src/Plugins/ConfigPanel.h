@@ -10,21 +10,21 @@
 
 #include "../lib/hui/hui.h"
 
-class Configurable;
+class Module;
 
 class ConfigPanel : public hui::Panel
 {
 public:
 	ConfigPanel();
-	ConfigPanel(Configurable *c);
+	ConfigPanel(Module *c);
 	virtual ~ConfigPanel();
-	void _cdecl __init__(Configurable *c);
+	void _cdecl __init__(Module *c);
 	virtual void _cdecl __delete__();
 
 	void _cdecl notify();
 	virtual void _cdecl update(){}
 
-	Configurable *c;
+	Module *c;
 };
 
 #endif /* SRC_PLUGINS_CONFIGPANEL_H_ */

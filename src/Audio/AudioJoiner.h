@@ -9,11 +9,11 @@
 #define SRC_AUDIO_AUDIOJOINER_H_
 
 #include "Source/AudioPort.h"
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 
 class Session;
 
-class AudioJoiner : public Configurable
+class AudioJoiner : public Module
 {
 public:
 	AudioJoiner(Session *session);

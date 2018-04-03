@@ -6,7 +6,7 @@
  */
 
 #include "FavoriteManager.h"
-#include "Configurable.h"
+#include "../Module/Module.h"
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
@@ -33,7 +33,7 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only, Sessi
 		for (int i=0; i<n; i++){
 			Favorite ff;
 			string type = f->read_str();
-			ff.type = Configurable::type_from_name(type);
+			ff.type = Module::type_from_name(type);
 			ff.config_name = f->read_str();
 			ff.name = f->read_str();
 			ff.options = f->read_str();
@@ -59,7 +59,7 @@ void FavoriteManager::Save(Session *session)
 		File *f = FileCreateText(tsunami->directory + "favorites.txt");
 		f->write_int(favorites.num);
 		for (Favorite &ff: favorites){
-			f->write_str(Configurable::type_to_name(ff.type));
+			f->write_str(Module::type_to_name(ff.type));
 			f->write_str(ff.config_name);
 			f->write_str(ff.name);
 			f->write_str(ff.options);
@@ -70,19 +70,19 @@ void FavoriteManager::Save(Session *session)
 	}
 }
 
-Array<string> FavoriteManager::GetList(Configurable *c)
+Array<string> FavoriteManager::GetList(Module *c)
 {
 	if (!loaded)
 		Load(c->session);
 	Array<string> r;
 	for (Favorite &f: favorites){
-		if ((f.type == c->configurable_type) and (f.config_name == c->name))
+		if ((f.type == c->module_type) and (f.config_name == c->name))
 			r.add(f.name);
 	}
 	return r;
 }
 
-void FavoriteManager::Apply(Configurable *c, const string &name)
+void FavoriteManager::Apply(Module *c, const string &name)
 {
 	c->reset_config();
 	if (name == DEFAULT_NAME)
@@ -90,17 +90,17 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 	if (!loaded)
 		Load(c->session);
 	for (Favorite &f: favorites){
-		if ((f.type == c->configurable_type) and (f.config_name == c->name) and (f.name == name))
+		if ((f.type == c->module_type) and (f.config_name == c->name) and (f.name == name))
 			c->config_from_string(f.options);
 	}
 }
 
-void FavoriteManager::Save(Configurable *c, const string &name)
+void FavoriteManager::Save(Module *c, const string &name)
 {
 	if (!loaded)
 		Load(c->session);
 	Favorite f;
-	f.type = c->configurable_type;
+	f.type = c->module_type;
 	f.config_name = c->name;
 	f.name = name;
 	f.read_only = false;
@@ -181,7 +181,7 @@ public:
 	string selection;
 };
 
-string FavoriteManager::SelectName(hui::Window *win, Configurable *c, bool save)
+string FavoriteManager::SelectName(hui::Window *win, Module *c, bool save)
 {
 	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, GetList(c), save);
 	dlg->run();

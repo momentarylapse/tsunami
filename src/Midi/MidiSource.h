@@ -8,12 +8,12 @@
 #ifndef SRC_MIDI_MIDISOURCE_H_
 #define SRC_MIDI_MIDISOURCE_H_
 
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 #include "MidiPort.h"
 
 class BeatPort;
 
-class MidiSource : public Configurable
+class MidiSource : public Module
 {
 public:
 	MidiSource();

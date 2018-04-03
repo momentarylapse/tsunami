@@ -10,7 +10,7 @@
 
 #include "../Data/Song.h"
 #include "../Midi/MidiPort.h"
-#include "../Plugins/Configurable.h"
+#include "../Module/Module.h"
 
 class Device;
 class DeviceManager;
@@ -24,7 +24,7 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class InputStreamMidi : public Configurable
+class InputStreamMidi : public Module
 {
 public:
 

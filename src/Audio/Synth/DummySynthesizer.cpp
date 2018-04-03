@@ -11,7 +11,7 @@
 #include "../../lib/math/math.h"
 
 
-void DummySynthesizer::State::reset()
+void DummySynthesizer::reset_state()
 {
 	for (int i=0; i<MAX_PITCH; i++){
 		pitch[i].phi = 0;
@@ -23,7 +23,7 @@ void DummySynthesizer::State::reset()
 DummySynthesizer::DummySynthesizer()
 {
 	name = "Dummy";
-	state.reset();
+	reset_state();
 	on_config();
 }
 
@@ -39,8 +39,8 @@ void DummySynthesizer::__init__()
 
 void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack, float release)
 {
-	state.pitch[no].env.set(attack, release, 0.00001f, 0.05f, sample_rate);
-	state.pitch[no].env.set2(0, volume);
+	pitch[no].env.set(attack, release, 0.00001f, 0.05f, sample_rate);
+	pitch[no].env.set2(0, volume);
 	delta_phi[no] = freq * 2.0f * pi / sample_rate;
 }
 
@@ -50,8 +50,8 @@ void DummySynthesizer::on_config()
 	if (instrument.type == Instrument::Type::DRUMS){
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			state.pitch[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
-			state.pitch[i].env.set2(0, 0.45f);
+			pitch[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
+			pitch[i].env.set2(0, 0.45f);
 			delta_phi[i] = 100.0f * 2.0f * pi / sample_rate;
 		}
 
@@ -95,8 +95,8 @@ void DummySynthesizer::on_config()
 	}else{
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			state.pitch[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
-			state.pitch[i].env.set2(0, 0.45f);
+			pitch[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
+			pitch[i].env.set2(0, 0.45f);
 		}
 	}
 }
@@ -109,7 +109,7 @@ void DummySynthesizer::render(AudioBuffer& buf)
 		for (MidiEvent &e : events)
 			if (e.pos == i){
 				int p = e.pitch;
-				State::PitchState &s = state.pitch[p];
+				PitchState &s = pitch[p];
 				if (e.volume == 0){
 					s.env.end();
 				}else{
@@ -120,7 +120,7 @@ void DummySynthesizer::render(AudioBuffer& buf)
 
 		for (int ip=0; ip<active_pitch.num; ip++){
 			int p = active_pitch[ip];
-			State::PitchState &s = state.pitch[p];
+			PitchState &s = pitch[p];
 
 			s.volume = s.env.get();
 

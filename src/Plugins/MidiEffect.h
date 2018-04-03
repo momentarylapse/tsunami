@@ -11,7 +11,7 @@
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
-#include "Configurable.h"
+#include "../Module/Module.h"
 
 class Plugin;
 class Track;
@@ -25,7 +25,7 @@ class Script;
 class Type;
 };
 
-class MidiEffect : public Configurable
+class MidiEffect : public Module
 {
 public:
 	MidiEffect();

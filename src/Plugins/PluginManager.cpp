@@ -112,11 +112,11 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 
 
-	PluginData plugin_data;
-	Kaba::DeclareClassSize("PluginData", sizeof(PluginData));
-	Kaba::LinkExternal("PluginData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&PluginData::__init__));
-	Kaba::DeclareClassVirtualIndex("PluginData", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&PluginData::__delete__), &plugin_data);
-	Kaba::DeclareClassVirtualIndex("PluginData", "reset", Kaba::mf(&PluginData::reset), &plugin_data);
+	ModuleConfiguration plugin_data;
+	Kaba::DeclareClassSize("PluginData", sizeof(ModuleConfiguration));
+	Kaba::LinkExternal("PluginData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ModuleConfiguration::__init__));
+	Kaba::DeclareClassVirtualIndex("PluginData", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ModuleConfiguration::__delete__), &plugin_data);
+	Kaba::DeclareClassVirtualIndex("PluginData", "reset", Kaba::mf(&ModuleConfiguration::reset), &plugin_data);
 
 
 	ConfigPanel config_panel;
@@ -617,18 +617,18 @@ void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"), "tsunami", win, &TsunamiWindow::onMenuExecuteTsunamiPlugin);
 }
 
-void PluginManager::ApplyFavorite(Configurable *c, const string &name)
+void PluginManager::ApplyFavorite(Module *c, const string &name)
 {
 	favorites->Apply(c, name);
 }
 
-void PluginManager::SaveFavorite(Configurable *c, const string &name)
+void PluginManager::SaveFavorite(Module *c, const string &name)
 {
 	favorites->Save(c, name);
 }
 
 
-string PluginManager::SelectFavoriteName(hui::Window *win, Configurable *c, bool save)
+string PluginManager::SelectFavoriteName(hui::Window *win, Module *c, bool save)
 {
 	return favorites->SelectName(win, c, save);
 }
@@ -803,17 +803,17 @@ Array<string> PluginManager::FindBeatSources()
 
 Array<string> PluginManager::FindConfigurable(int type)
 {
-	if (type == Configurable::Type::AUDIO_SOURCE)
+	if (type == Module::Type::AUDIO_SOURCE)
 		return FindAudioSources();
-	if (type == Configurable::Type::AUDIO_EFFECT)
+	if (type == Module::Type::AUDIO_EFFECT)
 		return FindAudioEffects();
-	if (type == Configurable::Type::MIDI_SOURCE)
+	if (type == Module::Type::MIDI_SOURCE)
 		return FindMidiSources();
-	if (type == Configurable::Type::MIDI_EFFECT)
+	if (type == Module::Type::MIDI_EFFECT)
 		return FindMidiEffects();
-	if (type == Configurable::Type::SYNTHESIZER)
+	if (type == Module::Type::SYNTHESIZER)
 		return FindSynthesizers();
-	if (type == Configurable::Type::BEAT_SOURCE)
+	if (type == Module::Type::BEAT_SOURCE)
 		return FindBeatSources();
 	return Array<string>();
 }
@@ -821,7 +821,7 @@ Array<string> PluginManager::FindConfigurable(int type)
 
 AudioEffect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::AUDIO_EFFECT, session);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Module::Type::AUDIO_EFFECT, session);
 	dlg->run();
 	AudioEffect *e = NULL;
 	if (dlg->_return.num > 0)
@@ -832,7 +832,7 @@ AudioEffect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
 
 MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::Type::MIDI_EFFECT, session);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Module::Type::MIDI_EFFECT, session);
 	dlg->run();
 	MidiEffect *e = NULL;
 	if (dlg->_return.num > 0)
@@ -844,7 +844,7 @@ MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session
 
 Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::Type::SYNTHESIZER, session, old_name);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Module::Type::SYNTHESIZER, session, old_name);
 	dlg->run();
 	Synthesizer *s = NULL;
 	if (dlg->_return.num > 0)
@@ -855,7 +855,7 @@ Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *sess
 
 /*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)
 {
-	string name = ChooseConfigurable(parent, Configurable::Type::SYNTHESIZER);
+	string name = ChooseConfigurable(parent, Module::Type::SYNTHESIZER);
 	if (name == "")
 		return NULL;
 	return CreateSynthesizer(name);

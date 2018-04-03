@@ -7,7 +7,7 @@
 
 
 #include "AutoConfigPanel.h"
-#include "Configurable.h"
+#include "../Module/Module.h"
 #include "../View/Helper/Slider.h"
 #include "../Midi/MidiData.h"
 #include "../lib/kaba/kaba.h"
@@ -228,7 +228,7 @@ struct AutoConfigDataString : public AutoConfigData
 	}
 };
 
-Array<AutoConfigData*> get_auto_conf(PluginData *config)
+Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config)
 {
 	Kaba::SyntaxTree *ps = config->_class->owner;
 	Array<AutoConfigData*> r;
@@ -265,7 +265,7 @@ Array<AutoConfigData*> get_auto_conf(PluginData *config)
 	return r;
 }
 
-AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Configurable *_c) :
+AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	ConfigPanel(_c)
 {
 	aa = _aa;

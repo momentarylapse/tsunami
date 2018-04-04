@@ -81,6 +81,7 @@ public:
 
 	enum Type
 	{
+		// plugins
 		AUDIO_SOURCE,
 		AUDIO_EFFECT,
 		MIDI_SOURCE,
@@ -90,11 +91,13 @@ public:
 		OUTPUT_STREAM_AUDIO,
 		INPUT_STREAM_AUDIO,
 		INPUT_STREAM_MIDI,
+		AUDIO_VISUALIZER,
+		// other
 		PITCH_DETECTOR,
 		AUDIO_JOINER,
 		BEAT_MIDIFIER,
-		PEAK_METER,
 		AUDIO_SUCKER,
+		// recursion!
 		SIGNAL_CHAIN
 	};
 

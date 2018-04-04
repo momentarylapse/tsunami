@@ -429,8 +429,8 @@ string Module::type_to_name(int type)
 		return "MidiEffect";
 	if (type == Module::Type::BEAT_SOURCE)
 		return "BeatSource";
-	if (type == Module::Type::PEAK_METER)
-		return "PeakMeter";
+	if (type == Module::Type::AUDIO_VISUALIZER)
+		return "AudioVisualizer";
 	if (type == Module::Type::PITCH_DETECTOR)
 		return "PitchDetector";
 	if (type == Module::Type::OUTPUT_STREAM_AUDIO)
@@ -462,6 +462,8 @@ Module::Type Module::type_from_name(const string &str)
 		return Module::Type::MIDI_SOURCE;
 	if (str == "BeatSource")
 		return Module::Type::BEAT_SOURCE;
+	if (str == "AudioVisualizer")
+		return Module::Type::AUDIO_VISUALIZER;
 	return (Type)-1;
 }
 

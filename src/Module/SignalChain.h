@@ -35,12 +35,12 @@ public:
 	Array<Module*> modules;
 	Module* add(Module *m);
 	Module* addAudioSource(const string &name);
-	Module* addSongRenderer();
 	Module* addMidiSource(const string &name);
 	Module* addAudioEffect(const string &name);
 	Module* addPitchDetector();
 	Module* addAudioJoiner();
-	Module* addPeakMeter();
+	Module* addAudioSucker();
+	Module* addAudioVisualizer(const string &name);
 	Module* addAudioInputStream();
 	Module* addAudioOutputStream();
 	Module* addMidiEffect(const string &name);

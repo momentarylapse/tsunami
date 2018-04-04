@@ -48,19 +48,11 @@ void PeakMeter::Data::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::Output::Output(PeakMeter *p)
+PeakMeter::PeakMeter(Session *s)
 {
-	peak_meter = p;
-}
-
-PeakMeter::PeakMeter(Session *s) :
-	Module(s, Type::PEAK_METER)
-{
-	source = NULL;
+	name = "PeakMeter";
+	session = s;
 	mode = MODE_PEAKS;
-	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	r.reset();
 	l.reset();
 	ring_buffer = new RingBuffer(1<<18);
@@ -132,44 +124,22 @@ void PeakMeter::update(AudioBuffer &buf)
 	clear_data();
 }
 
-
-void PeakMeter::set_source(AudioPort* s)
+void PeakMeter::process(AudioBuffer& buf)
 {
-	source = s;
-}
-
-int PeakMeter::Output::read(AudioBuffer& buf)
-{
-	if (!peak_meter->source)
-		return 0;
-	int r = peak_meter->source->read(buf);
-	if (r <= 0)
-		return r;
-
 	AudioBuffer b;
-	b.set_as_ref(buf, 0, r);
-	peak_meter->ring_buffer->write(b);
+	b.set_as_ref(buf, 0, buf.length);
+	ring_buffer->write(b);
 
-	if (peak_meter->ring_buffer->available() > NUM_SAMPLES){
+	if (ring_buffer->available() > NUM_SAMPLES){
 		AudioBuffer b2;
-		b2.resize(peak_meter->ring_buffer->available());
-		peak_meter->ring_buffer->read(b2);
-		peak_meter->update(b2);
+		b2.resize(ring_buffer->available());
+		ring_buffer->read(b2);
+		update(b2);
 	}
-	return r;
 }
 
-int PeakMeter::Output::get_pos(int delta)
+void PeakMeter::reset()
 {
-	if (!peak_meter->source)
-		return 0;
-	return peak_meter->source->get_pos(delta);
-}
-
-void PeakMeter::Output::reset()
-{
-	if (peak_meter->source)
-		peak_meter->source->reset();
-	peak_meter->clear_data();
-	peak_meter->notify();
+	clear_data();
+	notify();
 }

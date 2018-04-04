@@ -12,6 +12,7 @@
 #include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
+#include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Module/ConfigPanel.h"
 #include "../Device/InputStreamAudio.h"
@@ -23,6 +24,7 @@
 #include "../Module/Port/AudioPort.h"
 #include "../Module/Audio/AudioSource.h"
 #include "../Module/Audio/SongRenderer.h"
+#include "../Module/Audio/AudioVisualizer.h"
 #include "../Module/Port/MidiPort.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
@@ -172,6 +174,13 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiEffect.skip", Kaba::mf(&MidiEffect::skip));
 	Kaba::LinkExternal("MidiEffect.note_x", Kaba::mf(&MidiEffect::note_x));
 	Kaba::LinkExternal("MidiEffect.skip_x", Kaba::mf(&MidiEffect::skip_x));
+
+	AudioVisualizer avis;
+	Kaba::DeclareClassSize("AudioVisualizer", sizeof(AudioVisualizer));
+	Kaba::LinkExternal("AudioVisualizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioVisualizer::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioVisualizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioVisualizer::__delete__), &avis);
+	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "process", Kaba::mf(&AudioVisualizer::process), &avis);
+	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "reset", Kaba::mf(&AudioVisualizer::reset), &avis);
 
 	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
 	Kaba::DeclareClassOffset("AudioBuffer", "offset", _offsetof(AudioBuffer, offset));
@@ -539,6 +548,9 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("AudioEffect/Sound/", Plugin::Type::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/Synthesizer/", Plugin::Type::AUDIO_EFFECT, this);
 
+	// "AudioVisualizer"
+	find_plugins_in_dir("AudioVisualizer/", Plugin::Type::AUDIO_VISUALIZER, this);
+
 	// "MidiSource"
 	find_plugins_in_dir("MidiSource/", Plugin::Type::MIDI_SOURCE, this);
 
@@ -719,6 +731,7 @@ Array<string> PluginManager::FindAudioSources()
 	for (auto &pf: plugin_files)
 		if (pf.type == Plugin::Type::AUDIO_SOURCE)
 			names.add(pf.name);
+	names.add("SongRenderer");
 	return names;
 }
 
@@ -732,6 +745,16 @@ Array<string> PluginManager::FindAudioEffects()
 			names.add(g + "/" + pf.name);
 		}
 	}
+	return names;
+}
+
+Array<string> PluginManager::FindAudioVisualizers()
+{
+	Array<string> names;
+	for (auto &pf: plugin_files)
+		if (pf.type == Plugin::Type::AUDIO_VISUALIZER)
+			names.add(pf.name);
+	names.add("PeakMeter");
 	return names;
 }
 
@@ -768,6 +791,8 @@ Array<string> PluginManager::FindConfigurable(int type)
 		return FindAudioSources();
 	if (type == Module::Type::AUDIO_EFFECT)
 		return FindAudioEffects();
+	if (type == Module::Type::AUDIO_VISUALIZER)
+		return FindAudioVisualizers();
 	if (type == Module::Type::MIDI_SOURCE)
 		return FindMidiSources();
 	if (type == Module::Type::MIDI_EFFECT)

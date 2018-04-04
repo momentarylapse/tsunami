@@ -124,6 +124,13 @@ class MidiEffect extends Module
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
 	extern void skip_x(int beats, int sub_beats, int beat_partition)
 
+class AudioVisualizer extends Module
+	AudioPort *out
+	extern override void __init__()
+	extern override void __delete__()
+	extern virtual void process(AudioBuffer buf)
+	extern virtual void reset()
+
 class AudioBuffer
 	int offset, length
 	int channels

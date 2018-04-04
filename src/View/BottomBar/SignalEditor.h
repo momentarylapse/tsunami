@@ -37,6 +37,8 @@ public:
 	void onAddAudioSource();
 	void onAddAudioEffect();
 	void onAddAudioJoiner();
+	void onAddAudioSucker();
+	void onAddAudioVisualizer();
 	void onAddAudioInputStream();
 	void onAddMidiSource();
 	void onAddMidiEffect();

@@ -55,6 +55,8 @@ SignalEditor::SignalEditor(Session *session) :
 	event("signal_chain_add_audio_effect", std::bind(&SignalEditor::onAddAudioEffect, this));
 	event("signal_chain_add_audio_input", std::bind(&SignalEditor::onAddAudioInputStream, this));
 	event("signal_chain_add_audio_joiner", std::bind(&SignalEditor::onAddAudioJoiner, this));
+	event("signal_chain_add_audio_sucker", std::bind(&SignalEditor::onAddAudioSucker, this));
+	event("signal_chain_add_audio_visualizer", std::bind(&SignalEditor::onAddAudioVisualizer, this));
 	event("signal_chain_add_midi_source", std::bind(&SignalEditor::onAddMidiSource, this));
 	event("signal_chain_add_midi_effect", std::bind(&SignalEditor::onAddMidiEffect, this));
 	event("signal_chain_add_midi_input", std::bind(&SignalEditor::onAddMidiInputStream, this));
@@ -228,9 +230,28 @@ void SignalEditor::onAddAudioEffect()
 	delete(dlg);
 }
 
+void SignalEditor::onAddAudioVisualizer()
+{
+	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_VISUALIZER, session);
+	dlg->run();
+	if (dlg->_return.num > 0){
+		auto *m = chain->addAudioVisualizer(dlg->_return);
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
+	}
+	delete(dlg);
+}
+
 void SignalEditor::onAddAudioJoiner()
 {
 	auto *m = chain->addAudioJoiner();
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
+}
+
+void SignalEditor::onAddAudioSucker()
+{
+	auto *m = chain->addAudioSucker();
 	m->module_x = sel.dx;
 	m->module_y = sel.dy;
 }

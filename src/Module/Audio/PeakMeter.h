@@ -8,7 +8,7 @@
 #ifndef SRC_MODULE_AUDIO_PEAKMETER_H_
 #define SRC_MODULE_AUDIO_PEAKMETER_H_
 
-#include "../Module.h"
+#include "AudioVisualizer.h"
 #include "../Port/AudioPort.h"
 
 class PeakMeterDisplay;
@@ -16,27 +16,15 @@ class AudioBuffer;
 class RingBuffer;
 class Session;
 
-class PeakMeter : public Module
+class PeakMeter : public AudioVisualizer
 {
 	friend class PeakMeterDisplay;
 public:
 	PeakMeter(Session *s);
 	virtual ~PeakMeter();
 
-	AudioPort *source;
-	void set_source(AudioPort *s);
-
-	class Output : public AudioPort
-	{
-	public:
-		Output(PeakMeter *p);
-		virtual ~Output(){}
-		virtual int _cdecl read(AudioBuffer &buf);
-		virtual int _cdecl get_pos(int delta);
-		virtual void _cdecl reset();
-		PeakMeter *peak_meter;
-	};
-	Output *out;
+	virtual _cdecl void process(AudioBuffer &buf);
+	virtual _cdecl void reset();
 
 	void set_mode(int mode);
 

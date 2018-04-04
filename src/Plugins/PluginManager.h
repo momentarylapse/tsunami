@@ -50,6 +50,7 @@ public:
 	Array<string> FindSynthesizers();
 	Array<string> FindAudioSources();
 	Array<string> FindAudioEffects();
+	Array<string> FindAudioVisualizers();
 	Array<string> FindMidiSources();
 	Array<string> FindMidiEffects();
 	Array<string> FindBeatSources();

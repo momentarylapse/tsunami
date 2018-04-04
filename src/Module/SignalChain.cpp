@@ -15,7 +15,9 @@
 #include "Midi/MidiEventStreamer.h"
 #include "Audio/PitchDetector.h"
 #include "Audio/AudioEffect.h"
+#include "Audio/AudioVisualizer.h"
 #include "Audio/PeakMeter.h"
+#include "Audio/AudioSucker.h"
 #include "Beats/BarStreamer.h"
 #include "Beats/BeatMidifier.h"
 #include "Beats/BeatSource.h"
@@ -46,8 +48,8 @@ SignalChain *SignalChain::create_default(Session *session)
 {
 	SignalChain *chain = new SignalChain(session);
 
-	auto *mod_renderer = chain->addSongRenderer();
-	auto *mod_peak = chain->addPeakMeter();
+	auto *mod_renderer = chain->addAudioSource("SongRenderer");
+	auto *mod_peak = chain->addAudioVisualizer("PeakMeter");
 	auto *mod_out = chain->addAudioOutputStream();
 
 	session->song_renderer = dynamic_cast<SongRenderer*>(mod_renderer);
@@ -210,7 +212,9 @@ void SignalChain::load(const string& filename)
 			else if (type == "AudioJoiner")
 				m = addAudioJoiner();
 			else if (type == "PeakMeter")
-				m = addPeakMeter();
+				m = addAudioVisualizer("PeakMeter");
+			else if (type == "AudioVisualizer")
+				m = addAudioVisualizer(sub_type);
 			else if (type == "PitchDetector")
 				m = addPitchDetector();
 			else if (type == "AudioInputStream")
@@ -232,7 +236,7 @@ void SignalChain::load(const string& filename)
 			else if (type == "BeatSource")
 				m = addBeatSource(sub_type);
 			else
-				throw Exception("unhandled module type");
+				throw Exception("unhandled module type: " + type);
 		}
 		string config = f->read_str();
 		m->config_from_string(config);
@@ -265,11 +269,6 @@ void SignalChain::reset()
 	connect(modules[1], 0, modules[2], 0);
 }
 
-Module* SignalChain::addSongRenderer()
-{
-	return add(new SongRenderer(session->song));
-}
-
 Module* SignalChain::addAudioSource(const string &name)
 {
 	return add(CreateAudioSource(session, name));
@@ -290,14 +289,19 @@ Module* SignalChain::addAudioJoiner()
 	return add(new AudioJoiner(session));
 }
 
+Module* SignalChain::addAudioSucker()
+{
+	return add(new AudioSucker(session));
+}
+
 Module* SignalChain::addPitchDetector()
 {
 	return add(new PitchDetector);
 }
 
-Module* SignalChain::addPeakMeter()
+Module* SignalChain::addAudioVisualizer(const string &name)
 {
-	return add(new PeakMeter(session));
+	return add(CreateAudioVisualizer(session, name));
 }
 
 Module* SignalChain::addAudioInputStream()

@@ -95,7 +95,7 @@ public:
 	{
 		AUDIO,
 		MIDI,
-		TIME
+		BEATS
 	};
 
 	static string type_to_name(int type);

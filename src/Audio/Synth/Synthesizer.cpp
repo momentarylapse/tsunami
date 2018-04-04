@@ -72,8 +72,8 @@ Synthesizer::Synthesizer() :
 	Module(NULL, Type::SYNTHESIZER)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
-	port_in.add(PortDescription(SignalType::MIDI, NULL, "in"));
+	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
+	port_in.add(PortDescription(SignalType::MIDI, (Port**)&source, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);

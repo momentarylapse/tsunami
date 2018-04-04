@@ -14,7 +14,7 @@ AudioSource::AudioSource() :
 	Module(Session::GLOBAL, Type::AUDIO_SOURCE)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
+	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
 	beat_source = NULL;
 }
 

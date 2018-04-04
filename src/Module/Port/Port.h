@@ -24,9 +24,9 @@ class PortDescription
 {
 public:
 	PortDescription(){}
-	PortDescription(int type, Port *port, const string &name);
+	PortDescription(int type, Port **port, const string &name);
 	int type;
-	Port *port;
+	Port **port;
 	string name;
 };
 

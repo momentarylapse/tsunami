@@ -39,17 +39,17 @@ public:
 		virtual ~_Module(){}
 		float x, y;
 		virtual Module *configurable() = 0;
-		virtual string type() = 0;
-		virtual string sub_type(){ return ""; }
-		virtual string config_to_string(){ return ""; }
-		virtual void config_from_string(const string &str){}
-		virtual ConfigPanel *create_panel(){ return NULL; }
-		virtual void set_audio_source(int port, AudioPort *s){};
-		virtual void set_midi_source(int port, MidiPort *s){};
-		virtual void set_beat_source(int port, BeatPort *s){};
-		virtual AudioPort *audio_socket(int port){ return NULL; }
-		virtual MidiPort *midi_socket(int port){ return NULL; }
-		virtual BeatPort *beat_socket(int port){ return NULL; }
+		virtual string type();
+		virtual string sub_type();
+		virtual string config_to_string();
+		virtual void config_from_string(const string &str);
+		virtual ConfigPanel *create_panel();
+		virtual void set_audio_source(int port, AudioPort *s);
+		virtual void set_midi_source(int port, MidiPort *s);
+		virtual void set_beat_source(int port, BeatPort *s);
+		virtual AudioPort *audio_socket(int port);
+		virtual MidiPort *midi_socket(int port);
+		virtual BeatPort *beat_socket(int port);
 		Array<int> port_in, port_out;
 		virtual void start(){}
 		virtual void pause(bool paused){}

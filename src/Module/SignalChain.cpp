@@ -35,6 +35,104 @@ SignalChain::_Module::_Module()
 	x = y = 0;
 }
 
+
+string SignalChain::_Module::type()
+{
+	return Module::type_to_name(configurable()->module_type);
+}
+
+AudioPort *SignalChain::_Module::audio_socket(int port)
+{
+	msg_write(type() + " audio socket " + i2s(port));
+	if (port < 0 or port >= configurable()->port_out.num)
+		return NULL;
+	if (configurable()->port_out[port].type == Module::SignalType::AUDIO){
+		msg_write("ok");
+		return *(AudioPort**)configurable()->port_out[port].port;
+	}
+	return NULL;
+}
+
+MidiPort *SignalChain::_Module::midi_socket(int port)
+{
+	msg_write(type() + " midi socket " + i2s(port));
+	if (port < 0 or port >= configurable()->port_out.num)
+		return NULL;
+	if (configurable()->port_out[port].type == Module::SignalType::MIDI){
+		msg_write("ok");
+		return *(MidiPort**)configurable()->port_out[port].port;
+	}
+	return NULL;
+}
+
+BeatPort *SignalChain::_Module::beat_socket(int port)
+{
+	msg_write(type() + " beat socket " + i2s(port));
+	if (port < 0 or port >= configurable()->port_out.num)
+		return NULL;
+	if (configurable()->port_out[port].type == Module::SignalType::BEATS){
+		msg_write("ok");
+		return *(BeatPort**)configurable()->port_out[port].port;
+	}
+	return NULL;
+}
+
+void SignalChain::_Module::set_audio_source(int port, AudioPort *s)
+{
+	msg_write(type() + " set audio " + i2s(port));
+	if (port < 0 or port >= configurable()->port_in.num)
+		return;
+	if (configurable()->port_in[port].type == Module::SignalType::AUDIO){
+		*(AudioPort**)configurable()->port_in[port].port = s;
+		msg_write("ok");
+	}
+}
+
+void SignalChain::_Module::set_midi_source(int port, MidiPort *s)
+{
+	msg_write(type() + " set midi " + i2s(port));
+	if (port < 0 or port >= configurable()->port_in.num)
+		return;
+	if (configurable()->port_in[port].type == Module::SignalType::MIDI){
+		*(MidiPort**)configurable()->port_in[port].port = s;
+		msg_write("ok");
+	}
+}
+
+void SignalChain::_Module::set_beat_source(int port, BeatPort *s)
+{
+	msg_write(type() + " set beat " + i2s(port));
+	if (port < 0 or port >= configurable()->port_in.num)
+		return;
+	if (configurable()->port_in[port].type == Module::SignalType::BEATS){
+		*(BeatPort**)configurable()->port_in[port].port = s;
+		msg_write("ok");
+	}
+}
+
+string SignalChain::_Module::sub_type()
+{
+	return configurable()->name;
+}
+
+string SignalChain::_Module::config_to_string()
+{
+	return configurable()->config_to_string();
+}
+
+void SignalChain::_Module::config_from_string(const string &str)
+{
+	configurable()->config_from_string(str);
+}
+
+ConfigPanel *SignalChain::_Module::create_panel()
+{
+	return configurable()->create_panel();
+}
+
+
+
+
 class ModuleAudioSource : public SignalChain::_Module
 {
 public:
@@ -46,8 +144,6 @@ public:
 	}
 	virtual ~ModuleAudioSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
-	virtual string type(){ return "AudioSource"; }
-	virtual AudioPort *audio_socket(int port){ return source->out; }
 };
 
 class ModuleSongRenderer : public SignalChain::_Module
@@ -61,8 +157,6 @@ public:
 	}
 	virtual ~ModuleSongRenderer(){ delete renderer; }
 	virtual Module *configurable(){ return renderer; }
-	virtual string type(){ return "SongRenderer"; }
-	virtual AudioPort *audio_socket(int port){ return renderer->out; }
 };
 
 class ModulePeakMeter : public SignalChain::_Module
@@ -77,9 +171,6 @@ public:
 	}
 	virtual ~ModulePeakMeter(){ delete peak_meter; }
 	virtual Module *configurable(){ return peak_meter; }
-	virtual string type(){ return "PeakMeter"; }
-	virtual void set_audio_source(int port, AudioPort *s){ peak_meter->set_source(s); }
-	virtual AudioPort *audio_socket(int port){ return peak_meter->out; }
 };
 
 class ModuleAudioJoiner : public SignalChain::_Module
@@ -95,15 +186,6 @@ public:
 	}
 	virtual ~ModuleAudioJoiner(){ delete joiner; }
 	virtual Module *configurable(){ return joiner; }
-	virtual string type(){ return "AudioJoiner"; }
-	virtual void set_audio_source(int port, AudioPort *s)
-	{
-		if (port == 0)
-			joiner->set_source_a(s);
-		else if (port == 1)
-			joiner->set_source_b(s);
-	}
-	virtual AudioPort *audio_socket(int port){ return joiner->out; }
 };
 
 class ModulePitchDetector : public SignalChain::_Module
@@ -118,9 +200,6 @@ public:
 	}
 	virtual ~ModulePitchDetector(){ delete pitch_detector; }
 	virtual Module *configurable(){ return pitch_detector; }
-	virtual string type(){ return "PitchDetector"; }
-	virtual void set_audio_source(int port, AudioPort *s){ pitch_detector->set_source(s); }
-	virtual MidiPort *midi_socket(int port){ return pitch_detector->out; }
 };
 
 class ModuleOutputStream : public SignalChain::_Module
@@ -134,8 +213,6 @@ public:
 	}
 	virtual ~ModuleOutputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
-	virtual string type(){ return "OutputStream"; }
-	virtual void set_audio_source(int port, AudioPort *s){ stream->set_source(s); }
 
 	virtual void start(){ stream->play(); }
 	virtual void stop(){ stream->stop(); }
@@ -153,8 +230,6 @@ public:
 	}
 	virtual ~ModuleAudioInputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
-	virtual string type(){ return "AudioInputStream"; }
-	virtual AudioPort *audio_socket(int port){ return stream->out; }
 
 	virtual void start(){ stream->start(); }
 	virtual void stop(){ stream->stop(); }
@@ -172,14 +247,6 @@ public:
 	}
 	virtual ~ModuleAudioEffect(){ delete fx; }
 	virtual Module *configurable(){ return fx; }
-	virtual string type(){ return "AudioEffect"; }
-	virtual AudioPort *audio_socket(int port){ return fx->out; }
-	virtual void set_audio_source(int port, AudioPort *s){ fx->set_source(s); }
-
-	virtual string sub_type(){ return fx->name; }
-	virtual string config_to_string(){ return fx->config_to_string(); }
-	virtual void config_from_string(const string &str){ fx->config_from_string(str); }
-	virtual ConfigPanel *create_panel(){ return fx->create_panel(); }
 };
 
 class ModuleMidiEffect : public SignalChain::_Module
@@ -194,13 +261,6 @@ public:
 	}
 	virtual ~ModuleMidiEffect(){ delete fx; }
 	virtual Module *configurable(){ return fx; }
-	virtual string type(){ return "MidiEffect"; }
-	//virtual void set_midi_source(int port, MidiSource *s){ if (fx) fx->out->set_source(s); }
-	//virtual MidiSource *midi_socket(int port){ return fx->out; }
-	virtual string sub_type(){ return fx->name; }
-	virtual string config_to_string(){ return fx->config_to_string(); }
-	virtual void config_from_string(const string &str){ fx->config_from_string(str); }
-	virtual ConfigPanel *create_panel(){ return fx->create_panel(); }
 };
 
 class ModuleSynthesizer : public SignalChain::_Module
@@ -215,14 +275,6 @@ public:
 	}
 	virtual ~ModuleSynthesizer(){ delete synth; }
 	virtual Module *configurable(){ return synth; }
-	virtual string type(){ return "Synthesizer"; }
-	virtual AudioPort *audio_socket(int port){ return synth->out; }
-	virtual void set_midi_source(int port, MidiPort *s){ synth->set_source(s); }
-
-	virtual string sub_type(){ return synth->name; }
-	virtual string config_to_string(){ return synth->config_to_string(); }
-	virtual void config_from_string(const string &str){ synth->config_from_string(str); }
-	virtual ConfigPanel *create_panel(){ return synth->create_panel(); }
 };
 
 class ModuleBeatMidifier : public SignalChain::_Module
@@ -253,13 +305,6 @@ public:
 	}
 	virtual ~ModuleBeatSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
-	virtual string type(){ return "BeatSource"; }
-	virtual BeatPort *beat_socket(int port){ return source->out; }
-
-	virtual string sub_type(){ return source->name; }
-	virtual string config_to_string(){ return source->config_to_string(); }
-	virtual void config_from_string(const string &str){ source->config_from_string(str); }
-	virtual ConfigPanel *create_panel(){ return source->create_panel(); }
 };
 
 class ModuleMidiSource: public SignalChain::_Module
@@ -273,13 +318,6 @@ public:
 	}
 	virtual ~ModuleMidiSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
-	virtual string type(){ return "MidiSource"; }
-	virtual MidiPort *midi_socket(int port){ return source->out; }
-
-	virtual string sub_type(){ return source->name; }
-	virtual string config_to_string(){ return source->config_to_string(); }
-	virtual void config_from_string(const string &str){ source->config_from_string(str); }
-	virtual ConfigPanel *create_panel(){ return source->create_panel(); }
 };
 
 class ModuleMidiInputStream : public SignalChain::_Module
@@ -293,8 +331,6 @@ public:
 	}
 	virtual ~ModuleMidiInputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
-	virtual string type(){ return "MidiInputStream"; }
-	virtual MidiPort *midi_socket(int port){ return stream->out; }
 
 	virtual void start(){ stream->start(); }
 	virtual void stop(){ stream->stop(); }

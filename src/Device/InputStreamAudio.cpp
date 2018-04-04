@@ -162,7 +162,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 #endif
 
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
+	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
 
 	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
 	api = session->device_manager->audio_api;

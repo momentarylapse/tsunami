@@ -428,6 +428,22 @@ string Module::type_to_name(int type)
 		return "MidiEffect";
 	if (type == Module::Type::BEAT_SOURCE)
 		return "BeatSource";
+	if (type == Module::Type::PEAK_METER)
+		return "PeakMeter";
+	if (type == Module::Type::PITCH_DETECTOR)
+		return "PitchDetector";
+	if (type == Module::Type::OUTPUT_STREAM_AUDIO)
+		return "OutputStream";
+	if (type == Module::Type::INPUT_STREAM_AUDIO)
+		return "InputStreamAudio";
+	if (type == Module::Type::INPUT_STREAM_MIDI)
+		return "InputStreamMidi";
+	if (type == Module::Type::AUDIO_SUCKER)
+		return "AudioSucker";
+	if (type == Module::Type::AUDIO_JOINER)
+		return "AudioJoiner";
+	if (type == Module::Type::BEAT_MIDIFIER)
+		return "BeatMidifier";
 	return "???";
 }
 

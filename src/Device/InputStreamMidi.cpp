@@ -83,7 +83,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	device_manager = session->device_manager;
 
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::MIDI, out, "out"));
+	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
 
 	timer = new hui::Timer;
 

@@ -16,7 +16,7 @@ BeatSource::BeatSource() :
 	Module(Session::GLOBAL, Type::BEAT_SOURCE)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::TIME, out, "out"));
+	port_out.add(PortDescription(SignalType::BEATS, (Port**)&out, "out"));
 }
 
 BeatSource::~BeatSource()

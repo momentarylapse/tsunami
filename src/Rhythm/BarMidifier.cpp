@@ -13,7 +13,7 @@
 BeatMidifier::BeatMidifier()
 {
 	module_type = Type::BEAT_MIDIFIER;
-	port_in.add(PortDescription(SignalType::TIME, NULL, "in"));
+	port_in.add(PortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 }
 
 int BeatMidifier::read(MidiEventBuffer &midi)

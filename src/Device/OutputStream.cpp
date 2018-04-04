@@ -224,7 +224,7 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	session = _session;
 	source = s;
 
-	port_in.add(PortDescription(SignalType::AUDIO, NULL, "in"));
+	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 
 	fully_initialized = false;
 	paused = false;

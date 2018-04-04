@@ -12,9 +12,9 @@ AudioJoiner::AudioJoiner(Session *session) :
 	Module(session, Type::AUDIO_JOINER)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
-	port_in.add(PortDescription(SignalType::AUDIO, NULL, "a"));
-	port_in.add(PortDescription(SignalType::AUDIO, NULL, "b"));
+	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
+	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&a, "a"));
+	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&b, "b"));
 	a = NULL;
 	b = NULL;
 }

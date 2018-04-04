@@ -36,8 +36,8 @@ MidiEffect::MidiEffect() :
 	Module(Session::GLOBAL, Type::MIDI_EFFECT)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::MIDI, out, "out"));
-	port_in.add(PortDescription(SignalType::MIDI, NULL, "in"));
+	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
+	port_in.add(PortDescription(SignalType::MIDI, (Port**)&source, "in"));
 	source = NULL;
 	only_on_selection = false;
 	bh_offset = 0;

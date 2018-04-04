@@ -100,6 +100,7 @@ class Module
 	extern void reset_config()
 	extern virtual void reset_state()
 	extern virtual ConfigPanel *create_panel()
+	extern void changed()
 	extern virtual void on_config()
 	extern virtual void module_start()
 	extern virtual void module_stop()

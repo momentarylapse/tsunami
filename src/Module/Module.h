@@ -51,7 +51,7 @@ public:
 	virtual void _cdecl reset_state(){}
 	bool configure(hui::Window *win);
 	virtual ConfigPanel *_cdecl create_panel();
-	void _cdecl notify();
+	void _cdecl changed();
 	virtual void _cdecl on_config(){}
 
 	ModuleConfiguration *get_config() const;
@@ -94,6 +94,7 @@ public:
 		BEAT_MIDIFIER,
 		PEAK_METER,
 		AUDIO_SUCKER,
+		SIGNAL_CHAIN
 	};
 
 	enum SignalType

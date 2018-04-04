@@ -287,7 +287,7 @@ void AutoConfigPanel::onChange()
 {
 	for (auto a: aa)
 		a->get_value();
-	notify();
+	changed();
 }
 
 void AutoConfigPanel::update()

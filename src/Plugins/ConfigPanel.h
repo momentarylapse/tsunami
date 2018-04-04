@@ -21,7 +21,7 @@ public:
 	void _cdecl __init__(Module *c);
 	virtual void _cdecl __delete__();
 
-	void _cdecl notify();
+	void _cdecl changed();
 	virtual void _cdecl update(){}
 
 	Module *c;

@@ -1,23 +1,27 @@
 use "../api.kaba"
 
-class ToneSource extends MidiSource
+const string AUTO_CONFIG_PITCH = "0:127"
+const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
+
+class ToneConfig extends PluginData
 	float pitch
 	float volume
+	override void reset()
+		pitch = 64
+		volume = 0.5
+
+class ToneSource extends MidiSource
+	ToneConfig config
+
 	bool started
 	
-	override void __init__()
-		
-		pitch = 64.0
-		volume = 0.5
+	override void reset_state()
 		started = false
 		
 	override int read(MidiEventBuffer midi)
 		if !started
-			midi.add(_MidiEvent(0, pitch, volume))
+			midi.add(_MidiEvent(0, config.pitch, config.volume))
 			started = true
 		return midi.samples
-	
-	override void reset()
-		started = false
 	

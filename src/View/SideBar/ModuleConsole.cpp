@@ -50,7 +50,7 @@ void ModuleConsole::setModule(Module* m)
 	if (module){
 		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Module::MESSAGE_DELETE);
 		setString("category", Module::type_to_name(module->module_type));
-		//setString("sub_category", m->sub_type());
+		setString("sub_category", m->name);
 		module_panel = module->create_panel();
 		if (module_panel)
 			embed(module_panel, "grid", 0, 0);

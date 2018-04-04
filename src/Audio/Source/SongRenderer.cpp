@@ -23,6 +23,7 @@
 
 SongRenderer::SongRenderer(Song *s)
 {
+	name = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
 	beat_midifier = NULL;

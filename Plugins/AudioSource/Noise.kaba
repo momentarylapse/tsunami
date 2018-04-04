@@ -1,8 +1,17 @@
 use "../api.kaba"
 
+const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+
+class NoiseConfig extends PluginData
+	float volume
+	override void reset()
+		volume = 1
+
 class Noise extends AudioSource
+	NoiseConfig config
+	
 	override int read(AudioBuffer buf)
 		for i in 0:buf.length
-			buf.r[i] = rand(2.0) - 1.0
-			buf.l[i] = rand(2.0) - 1.0
+			buf.r[i] = (rand(2.0) - 1.0) * config.volume
+			buf.l[i] = (rand(2.0) - 1.0) * config.volume
 		return buf.length

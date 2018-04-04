@@ -122,7 +122,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("Module", "create_panel", Kaba::mf(&Module::create_panel), &module);
 	Kaba::LinkExternal("Module.reset_config", Kaba::mf(&Module::reset_config));
 	Kaba::DeclareClassVirtualIndex("Module", "reset_state", Kaba::mf(&Module::reset_state), &module);
-	Kaba::LinkExternal("Module.notify", Kaba::mf(&Module::notify));
+	Kaba::LinkExternal("Module.changed", Kaba::mf(&Module::changed));
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);
@@ -141,7 +141,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("ConfigPanel." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ConfigPanel::__init__));
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ConfigPanel::__delete__), &config_panel);
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", "update", Kaba::mf(&ConfigPanel::update), &config_panel);
-	Kaba::LinkExternal("ConfigPanel.notify", Kaba::mf(&ConfigPanel::notify));
+	Kaba::LinkExternal("ConfigPanel.notify", Kaba::mf(&ConfigPanel::changed));
 	Kaba::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
 
 	AudioSource asource;

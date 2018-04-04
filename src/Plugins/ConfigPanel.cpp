@@ -33,8 +33,8 @@ void ConfigPanel::__delete__()
 	this->ConfigPanel::~ConfigPanel();
 }
 
-void ConfigPanel::notify()
+void ConfigPanel::changed()
 {
-	c->notify();
+	c->changed();
 }
 

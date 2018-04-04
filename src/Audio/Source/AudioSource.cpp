@@ -9,6 +9,7 @@
 #include "../../Session.h"
 #include "../../Plugins/Plugin.h"
 #include "../../Plugins/PluginManager.h"
+#include "SongRenderer.h"
 
 AudioSource::AudioSource() :
 	Module(Session::GLOBAL, Type::AUDIO_SOURCE)
@@ -56,18 +57,23 @@ int AudioSource::Output::get_pos(int delta)
 // TODO: move to PluginManager?
 AudioSource *CreateAudioSource(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_SOURCE, name);
 	AudioSource *s = NULL;
-	if (p->usable)
-		s = (AudioSource*)p->create_instance(session, "AudioSource");
+
+	if (name == "SongRenderer"){
+		s = new SongRenderer(session->song);
+	}else{
+		Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_SOURCE, name);
+		if (p->usable)
+			s = (AudioSource*)p->create_instance(session, "AudioSource");
+		s->plugin = p;
+		s->usable = p->usable;
+	}
 
 	// dummy?
 	if (!s)
 		s = new AudioSource;
 
 	s->name = name;
-	s->plugin = p;
-	s->usable = p->usable;
 	s->session = session;
 	s->reset_config();
 	return s;

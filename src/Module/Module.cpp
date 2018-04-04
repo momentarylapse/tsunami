@@ -391,7 +391,7 @@ bool Module::configure(hui::Window *win)
 	return ok;
 }
 
-void Module::notify()
+void Module::changed()
 {
 	on_config();
 	Observable::notify();

@@ -40,8 +40,11 @@ SignalChain::SignalChain(Session *s)
 
 SignalChain::~SignalChain()
 {
+	stop();
 	for (Module *m: modules)
-		delete(m);
+		delete m;
+	for (Cable *c: cables)
+		delete c;
 }
 
 SignalChain *SignalChain::create_default(Session *session)

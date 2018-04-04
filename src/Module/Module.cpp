@@ -180,6 +180,9 @@ Module::Module(Session *_session, int type)
 
 Module::~Module()
 {
+	// unlink sources
+	for (auto &pd: port_in)
+		*pd.port = NULL;
 }
 
 void Module::__init__()

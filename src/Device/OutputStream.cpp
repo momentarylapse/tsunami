@@ -259,7 +259,6 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 
 OutputStream::~OutputStream()
 {
-//	printf("output del\n");
 	if (hui_runner_id >= 0){
 		hui::CancelRunner(hui_runner_id);
 		hui_runner_id = -1;
@@ -354,7 +353,13 @@ void OutputStream::_kill_dev()
 void OutputStream::stop()
 {
 	_pause();
-	source->reset();
+	if (source)
+		source->reset();
+
+	// wait till the thread finished reading
+	while(reading)
+		hui::Sleep(0.01f);
+
 	clear_buffer();
 }
 
@@ -554,6 +559,8 @@ bool OutputStream::is_paused()
 
 int OutputStream::get_pos()
 {
+	if (!source)
+		return 0;
 	return source->get_pos(- ring_buf.available());
 }
 

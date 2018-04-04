@@ -14,7 +14,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Midi/Clef.h"
 #include "../../Data/SongSelection.h"
-#include "../../Midi/MidiPort.h"
+#include "../../Module/Port/MidiPort.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 

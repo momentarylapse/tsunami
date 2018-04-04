@@ -7,7 +7,7 @@
 
 #include "FormatWave.h"
 
-#include "../../Audio/Source/AudioPort.h"
+#include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
 #include "../../lib/math/math.h"
 

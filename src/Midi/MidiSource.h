@@ -9,7 +9,7 @@
 #define SRC_MIDI_MIDISOURCE_H_
 
 #include "../Module/Module.h"
-#include "MidiPort.h"
+#include "../Module/Port/MidiPort.h"
 
 class BeatPort;
 

@@ -12,7 +12,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Audio/RingBuffer.h"
-#include "../Audio/Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 #include "../Module/Module.h"
 
 class PluginManager;

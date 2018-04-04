@@ -6,8 +6,9 @@
  */
 
 #include "BarMidifier.h"
-#include "../Rhythm/Beat.h"
-#include "../Rhythm/BeatPort.h"
+#include "Beat.h"
+#include "../Midi/MidiData.h"
+#include "../Module/Port/BeatPort.h"
 
 int BeatMidifier::read(MidiEventBuffer &midi)
 {

@@ -7,9 +7,6 @@
 
 #include "AudioPort.h"
 
-const int AudioPort::NOT_ENOUGH_DATA = 0;
-const int AudioPort::END_OF_STREAM = -1;
-
 AudioPort::AudioPort()
 {
 }

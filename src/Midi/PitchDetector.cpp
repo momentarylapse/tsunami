@@ -7,8 +7,9 @@
 
 #include "PitchDetector.h"
 #include "../Audio/AudioBuffer.h"
-#include "../Audio/Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 #include "../Plugins/FastFourierTransform.h"
+#include "MidiData.h"
 
 
 

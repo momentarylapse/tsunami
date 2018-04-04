@@ -8,9 +8,6 @@
 #include "MidiPort.h"
 
 
-const int MidiPort::NOT_ENOUGH_DATA = 0;
-const int MidiPort::END_OF_STREAM = -2;
-
 MidiPort::MidiPort()
 {
 }

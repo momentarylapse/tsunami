@@ -88,6 +88,7 @@ public:
 		AUDIO_JOINER,
 		BEAT_MIDIFIER,
 		PEAK_METER,
+		AUDIO_SUCKER,
 	};
 
 	static string type_to_name(int type);

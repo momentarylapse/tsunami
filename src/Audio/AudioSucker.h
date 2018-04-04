@@ -9,22 +9,22 @@
 #define SRC_AUDIO_AUDIOSUCKER_H_
 
 #include "AudioBuffer.h"
-#include "../Stuff/Observable.h"
+#include "../Module/Module.h"
 
 class AudioPort;
 class AudioSuckerThread;
 
-class AudioSucker : public Observable<VirtualBase>
+class AudioSucker : public Module
 {
 	friend class AudioSuckerThread;
 public:
-	AudioSucker(AudioPort *source);
+	AudioSucker(Session *s);
 	virtual ~AudioSucker();
 
-	void setSource(AudioPort *s);
+	void set_source(AudioPort *s);
 	void accumulate(bool enable);
-	void resetAccumulation();
-	void setBufferSize(int size);
+	void reset_accumulation();
+	void set_buffer_size(int size);
 
 	void start();
 	void stop();

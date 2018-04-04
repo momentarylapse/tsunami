@@ -9,7 +9,7 @@
 #define SRC_AUDIO_SOURCE_AUDIOSOURCE_H_
 
 #include "../../Module/Module.h"
-#include "AudioPort.h"
+#include "../../Module/Port/AudioPort.h"
 
 class BeatSource;
 

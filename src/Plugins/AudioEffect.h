@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 #include "../Module/Module.h"
-#include "../Audio/Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 
 class Plugin;
 class Track;

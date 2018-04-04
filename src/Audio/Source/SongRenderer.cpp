@@ -18,7 +18,7 @@
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
-#include "../../Midi/MidiPort.h"
+#include "../../Module/Port/MidiPort.h"
 #include "../../Plugins/AudioEffect.h"
 
 SongRenderer::SongRenderer(Song *s)

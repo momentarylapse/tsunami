@@ -5,7 +5,8 @@
  *      Author: michi
  */
 
-#include "../Source/BufferStreamer.h"
+#include "BufferStreamer.h"
+#include "../AudioBuffer.h"
 
 static bool CHEAT = true;
 

@@ -7,7 +7,7 @@
 
 #include "SignalEditor.h"
 
-#include "../../Midi/MidiPort.h"
+#include "../../Module/Port/MidiPort.h"
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"

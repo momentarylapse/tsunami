@@ -5,15 +5,15 @@
  *      Author: michi
  */
 
-#ifndef SRC_RHYTHM_BEATPORT_H_
-#define SRC_RHYTHM_BEATPORT_H_
+#ifndef SRC_MODULE_PORT_BEATPORT_H_
+#define SRC_MODULE_PORT_BEATPORT_H_
 
 
-#include "../lib/base/base.h"
+#include "Port.h"
 class Beat;
 
 
-class BeatPort : public VirtualBase
+class BeatPort : public Port
 {
 public:
 	virtual ~BeatPort(){}
@@ -24,4 +24,4 @@ public:
 	virtual void _cdecl reset(){}
 };
 
-#endif /* SRC_RHYTHM_BEATPORT_H_ */
+#endif /* SRC_MODULE_PORT_BEATPORT_H_ */

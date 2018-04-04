@@ -9,11 +9,17 @@
 #define SRC_AUDIO_SOURCE_SONGRENDERER_H_
 
 #include "AudioSource.h"
+#include "../../Data/Range.h"
 
 class MidiPort;
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
+class Song;
+class Track;
+class AudioEffect;
+class AudioBuffer;
+class Range;
 
 class SongRenderer : public AudioSource
 {

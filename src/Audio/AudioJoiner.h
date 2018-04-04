@@ -8,7 +8,7 @@
 #ifndef SRC_AUDIO_AUDIOJOINER_H_
 #define SRC_AUDIO_AUDIOJOINER_H_
 
-#include "Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 #include "../Module/Module.h"
 
 class Session;

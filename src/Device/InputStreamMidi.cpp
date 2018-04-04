@@ -12,7 +12,7 @@
 
 #include "OutputStream.h"
 #include "../Audio/Synth/Synthesizer.h"
-#include "../Midi/MidiPort.h"
+#include "../Module/Port/MidiPort.h"
 #include "../Stuff/BackupManager.h"
 
 #if HAS_LIB_ALSA

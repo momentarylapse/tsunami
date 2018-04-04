@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_SOURCE_AUDIOPORT_H_
-#define SRC_AUDIO_SOURCE_AUDIOPORT_H_
+#ifndef SRC_MODULE_PORT_AUDIOPORT_H_
+#define SRC_MODULE_PORT_AUDIOPORT_H_
 
-#include "../../Data/Song.h"
+#include "Port.h"
 
 class AudioBuffer;
 
-class AudioPort : public VirtualBase
+class AudioPort : public Port
 {
 public:
 	AudioPort();
@@ -24,9 +24,6 @@ public:
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
 	virtual void _cdecl reset(){}
 	virtual int _cdecl get_pos(int delta){ return -1; }
-
-	static const int END_OF_STREAM;
-	static const int NOT_ENOUGH_DATA;
 };
 
-#endif /* SRC_AUDIO_SOURCE_AUDIOPORT_H_ */
+#endif /* SRC_MODULE_PORT_AUDIOPORT_H_ */

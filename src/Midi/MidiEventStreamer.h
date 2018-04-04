@@ -9,6 +9,7 @@
 #define SRC_MIDI_MIDIEVENTSTREAMER_H_
 
 #include "MidiSource.h"
+#include "MidiData.h"
 
 
 class MidiEventStreamer : public MidiSource

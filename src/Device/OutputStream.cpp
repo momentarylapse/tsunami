@@ -12,7 +12,7 @@
 #include "Device.h"
 #include "OutputStream.h"
 
-#include "../Audio/Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>

@@ -18,7 +18,7 @@
 #include "../Audio/Source/AudioSource.h"
 #include "../Audio/PeakMeter.h"
 #include "../Audio/AudioJoiner.h"
-#include "../Midi/MidiPort.h"
+#include "Port/MidiPort.h"
 #include "../Midi/MidiSource.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../Midi/PitchDetector.h"

@@ -6,6 +6,7 @@
  */
 
 #include "AudioJoiner.h"
+#include "AudioBuffer.h"
 
 AudioJoiner::AudioJoiner(Session *session) :
 	Module(session, Type::AUDIO_JOINER)

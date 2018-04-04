@@ -12,7 +12,7 @@
 #include "../../Module/Module.h"
 #include "../../Midi/MidiData.h"
 #include "../../Midi/Instrument.h"
-#include "../Source/AudioPort.h"
+#include "../../Module/Port/AudioPort.h"
 
 class Range;
 class AudioBuffer;

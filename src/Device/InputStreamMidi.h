@@ -9,7 +9,7 @@
 #define INPUTSTREAMMIDI_H_
 
 #include "../Data/Song.h"
-#include "../Midi/MidiPort.h"
+#include "../Module/Port/MidiPort.h"
 #include "../Module/Module.h"
 
 class Device;

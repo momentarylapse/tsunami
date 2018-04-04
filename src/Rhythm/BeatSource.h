@@ -8,7 +8,7 @@
 #ifndef SRC_RHYTHM_BEATSOURCE_H_
 #define SRC_RHYTHM_BEATSOURCE_H_
 
-#include "BeatPort.h"
+#include "../Module/Port/BeatPort.h"
 #include "../Module/Module.h"
 
 class DummyBeatSource;

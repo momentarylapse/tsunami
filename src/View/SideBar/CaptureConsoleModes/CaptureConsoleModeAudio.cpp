@@ -120,7 +120,8 @@ void CaptureConsoleModeAudio::enter()
 		return;*/
 	}
 
-	sucker = new AudioSucker(peak_meter->out);
+	sucker = new AudioSucker(session);
+	sucker->set_source(peak_meter->out);
 	sucker->start();
 	export_view_sucker = sucker;
 }
@@ -156,7 +157,7 @@ void CaptureConsoleModeAudio::stop()
 void CaptureConsoleModeAudio::dump()
 {
 	sucker->accumulate(false);
-	sucker->resetAccumulation();
+	sucker->reset_accumulation();
 	cc->enable("capture_audio_source", true);
 	//cc->enable("capture_audio_target", true);
 }
@@ -189,7 +190,7 @@ bool CaptureConsoleModeAudio::insert()
 	song->execute(a);
 	song->action_manager->endActionGroup();
 
-	sucker->resetAccumulation();
+	sucker->reset_accumulation();
 	return true;
 }
 

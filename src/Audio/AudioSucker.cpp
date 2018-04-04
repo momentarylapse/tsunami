@@ -9,7 +9,7 @@
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../Stuff/PerformanceMonitor.h"
-#include "Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 const string AudioSucker::MESSAGE_UPDATE = "Update";
@@ -50,10 +50,11 @@ public:
 	}
 };
 
-AudioSucker::AudioSucker(AudioPort *_source)
+AudioSucker::AudioSucker(Session *s) :
+	Module(s, Type::AUDIO_SUCKER)
 {
 	perf_channel = PerformanceMonitor::create_channel("suck");
-	source = _source;
+	source = NULL;
 	accumulating = false;
 	running = false;
 	thread = new AudioSuckerThread(this);
@@ -72,7 +73,7 @@ AudioSucker::~AudioSucker()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void AudioSucker::setSource(AudioPort* s)
+void AudioSucker::set_source(AudioPort* s)
 {
 	source = s;
 }
@@ -82,7 +83,7 @@ void AudioSucker::accumulate(bool enable)
 	accumulating = enable;
 }
 
-void AudioSucker::resetAccumulation()
+void AudioSucker::reset_accumulation()
 {
 	buf.clear();
 }
@@ -114,6 +115,6 @@ int AudioSucker::update()
 		temp.resize(r);
 		buf.append(temp);
 	}
-	notify(MESSAGE_UPDATE);
+	Observable::notify(MESSAGE_UPDATE);
 	return r;
 }

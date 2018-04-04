@@ -11,7 +11,8 @@
 #include "../View/Helper/Progress.h"
 #include "../Session.h"
 #include "../Audio/AudioBuffer.h"
-#include "../Audio/Source/AudioPort.h"
+#include "../Module/Port/AudioPort.h"
+#include "../Data/Track.h"
 
 StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
 {

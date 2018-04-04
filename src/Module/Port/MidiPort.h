@@ -5,15 +5,15 @@
  *      Author: michi
  */
 
-#ifndef SRC_MIDI_MIDIPORT_H_
-#define SRC_MIDI_MIDIPORT_H_
+#ifndef SRC_MODULE_PORT_MIDIPORT_H_
+#define SRC_MODULE_PORT_MIDIPORT_H_
 
-#include "MidiData.h"
+#include "Port.h"
 
 class BeatSource;
 class MidiEventBuffer;
 
-class MidiPort : public VirtualBase
+class MidiPort : public Port
 {
 public:
 	MidiPort();
@@ -24,9 +24,6 @@ public:
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
-
-	static const int END_OF_STREAM;
-	static const int NOT_ENOUGH_DATA;
 };
 
-#endif /* SRC_MIDI_MIDIPORT_H_ */
+#endif /* SRC_MODULE_PORT_MIDIPORT_H_ */

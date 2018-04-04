@@ -11,7 +11,7 @@
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
 #include "../../lib/math/math.h"
-#include "../../Midi/MidiPort.h"
+#include "../../Module/Port/MidiPort.h"
 
 Synthesizer::Output::Output(Synthesizer *s)
 {

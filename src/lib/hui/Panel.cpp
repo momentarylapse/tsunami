@@ -138,7 +138,7 @@ int Panel::_kaba_eventO(const string &id, EventHandler* handler, kaba_member_cal
 
 int Panel::_kaba_eventX(const string &id, const string &msg, kaba_member_callback *function)
 {
-	return eventX(id, msg, std::bind(function, this));
+	return _kaba_eventOX(id, msg, this, function);
 }
 
 int Panel::_kaba_eventOX(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function)

@@ -43,71 +43,53 @@ string SignalChain::_Module::type()
 
 AudioPort *SignalChain::_Module::audio_socket(int port)
 {
-	msg_write(type() + " audio socket " + i2s(port));
 	if (port < 0 or port >= configurable()->port_out.num)
 		return NULL;
-	if (configurable()->port_out[port].type == Module::SignalType::AUDIO){
-		msg_write("ok");
+	if (configurable()->port_out[port].type == Module::SignalType::AUDIO)
 		return *(AudioPort**)configurable()->port_out[port].port;
-	}
 	return NULL;
 }
 
 MidiPort *SignalChain::_Module::midi_socket(int port)
 {
-	msg_write(type() + " midi socket " + i2s(port));
 	if (port < 0 or port >= configurable()->port_out.num)
 		return NULL;
-	if (configurable()->port_out[port].type == Module::SignalType::MIDI){
-		msg_write("ok");
+	if (configurable()->port_out[port].type == Module::SignalType::MIDI)
 		return *(MidiPort**)configurable()->port_out[port].port;
-	}
 	return NULL;
 }
 
 BeatPort *SignalChain::_Module::beat_socket(int port)
 {
-	msg_write(type() + " beat socket " + i2s(port));
 	if (port < 0 or port >= configurable()->port_out.num)
 		return NULL;
-	if (configurable()->port_out[port].type == Module::SignalType::BEATS){
-		msg_write("ok");
+	if (configurable()->port_out[port].type == Module::SignalType::BEATS)
 		return *(BeatPort**)configurable()->port_out[port].port;
-	}
 	return NULL;
 }
 
 void SignalChain::_Module::set_audio_source(int port, AudioPort *s)
 {
-	msg_write(type() + " set audio " + i2s(port));
 	if (port < 0 or port >= configurable()->port_in.num)
 		return;
-	if (configurable()->port_in[port].type == Module::SignalType::AUDIO){
+	if (configurable()->port_in[port].type == Module::SignalType::AUDIO)
 		*(AudioPort**)configurable()->port_in[port].port = s;
-		msg_write("ok");
-	}
 }
 
 void SignalChain::_Module::set_midi_source(int port, MidiPort *s)
 {
-	msg_write(type() + " set midi " + i2s(port));
 	if (port < 0 or port >= configurable()->port_in.num)
 		return;
-	if (configurable()->port_in[port].type == Module::SignalType::MIDI){
+	if (configurable()->port_in[port].type == Module::SignalType::MIDI)
 		*(MidiPort**)configurable()->port_in[port].port = s;
-		msg_write("ok");
-	}
 }
 
 void SignalChain::_Module::set_beat_source(int port, BeatPort *s)
 {
-	msg_write(type() + " set beat " + i2s(port));
 	if (port < 0 or port >= configurable()->port_in.num)
 		return;
-	if (configurable()->port_in[port].type == Module::SignalType::BEATS){
+	if (configurable()->port_in[port].type == Module::SignalType::BEATS)
 		*(BeatPort**)configurable()->port_in[port].port = s;
-		msg_write("ok");
-	}
 }
 
 string SignalChain::_Module::sub_type()
@@ -140,7 +122,6 @@ public:
 	ModuleAudioSource(AudioSource *s)
 	{
 		source = s;
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
@@ -153,7 +134,6 @@ public:
 	ModuleSongRenderer(SongRenderer *r)
 	{
 		renderer = r;
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleSongRenderer(){ delete renderer; }
 	virtual Module *configurable(){ return renderer; }
@@ -166,8 +146,6 @@ public:
 	ModulePeakMeter(PeakMeter *p)
 	{
 		peak_meter = p;
-		port_in.add(Track::Type::AUDIO);
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModulePeakMeter(){ delete peak_meter; }
 	virtual Module *configurable(){ return peak_meter; }
@@ -180,9 +158,6 @@ public:
 	ModuleAudioJoiner(AudioJoiner *j)
 	{
 		joiner = j;
-		port_in.add(Track::Type::AUDIO);
-		port_in.add(Track::Type::AUDIO);
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioJoiner(){ delete joiner; }
 	virtual Module *configurable(){ return joiner; }
@@ -195,8 +170,6 @@ public:
 	ModulePitchDetector(PitchDetector *p)
 	{
 		pitch_detector = p;
-		port_in.add(Track::Type::AUDIO);
-		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModulePitchDetector(){ delete pitch_detector; }
 	virtual Module *configurable(){ return pitch_detector; }
@@ -209,7 +182,6 @@ public:
 	ModuleOutputStream(OutputStream *s)
 	{
 		stream = s;
-		port_in.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleOutputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
@@ -226,7 +198,6 @@ public:
 	ModuleAudioInputStream(InputStreamAudio *s)
 	{
 		stream = s;
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioInputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
@@ -242,8 +213,6 @@ public:
 	ModuleAudioEffect(AudioEffect *_fx)
 	{
 		fx = _fx;
-		port_in.add(Track::Type::AUDIO);
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleAudioEffect(){ delete fx; }
 	virtual Module *configurable(){ return fx; }
@@ -256,8 +225,6 @@ public:
 	ModuleMidiEffect(MidiEffect *_fx)
 	{
 		fx = _fx;
-		port_in.add(Track::Type::MIDI);
-		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleMidiEffect(){ delete fx; }
 	virtual Module *configurable(){ return fx; }
@@ -270,8 +237,6 @@ public:
 	ModuleSynthesizer(Synthesizer *s)
 	{
 		synth = s;
-		port_in.add(Track::Type::MIDI);
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleSynthesizer(){ delete synth; }
 	virtual Module *configurable(){ return synth; }
@@ -284,14 +249,9 @@ public:
 	ModuleBeatMidifier(BeatMidifier *b)
 	{
 		beat_midifier = b;
-		port_in.add(Track::Type::TIME);
-		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleBeatMidifier(){ delete beat_midifier; }
 	virtual Module *configurable(){ return beat_midifier; }
-	virtual string type(){ return "BeatMidifier"; }
-	virtual MidiPort *midi_socket(int port){ return beat_midifier->out; }
-	virtual void set_beat_source(int port, BeatPort *s){ beat_midifier->set_beat_source(s); }
 };
 
 class ModuleBeatSource : public SignalChain::_Module
@@ -301,7 +261,6 @@ public:
 	ModuleBeatSource(BeatSource *s)
 	{
 		source = s;
-		port_out.add(Track::Type::TIME);
 	}
 	virtual ~ModuleBeatSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
@@ -314,7 +273,6 @@ public:
 	ModuleMidiSource(MidiSource *s)
 	{
 		source = s;
-		port_out.add(Track::Type::MIDI);
 	}
 	virtual ~ModuleMidiSource(){ delete source; }
 	virtual Module *configurable(){ return source; }
@@ -327,7 +285,6 @@ public:
 	ModuleMidiInputStream(InputStreamMidi *s)
 	{
 		stream = s;
-		port_out.add(Track::Type::AUDIO);
 	}
 	virtual ~ModuleMidiInputStream(){ delete stream; }
 	virtual Module *configurable(){ return stream; }
@@ -413,25 +370,26 @@ void SignalChain::remove(SignalChain::_Module *m)
 
 void SignalChain::connect(SignalChain::_Module *source, int source_port, SignalChain::_Module *target, int target_port)
 {
-	if (source_port < 0 or source_port >= source->port_out.num)
+	if (source_port < 0 or source_port >= source->configurable()->port_out.num)
 		throw Exception("bla");
-	if (target_port < 0 or target_port >= target->port_in.num)
+	if (target_port < 0 or target_port >= target->configurable()->port_in.num)
 		throw Exception("bla");
-	if (source->port_out[source_port] != target->port_in[target_port])
+	//msg_write("connect " + i2s(source->configurable()->port_out[source_port].type) + " -> " + i2s(target->configurable()->port_in[target_port].type));
+	if (source->configurable()->port_out[source_port].type != target->configurable()->port_in[target_port].type)
 		throw Exception("bla");
 	// TODO: check ports in use
 	Cable *c = new Cable;
-	c->type = source->port_out[source_port];
+	c->type = source->configurable()->port_out[source_port].type;
 	c->source = source;
 	c->target = target;
 	c->source_port = source_port;
 	c->target_port = target_port;
 	cables.add(c);
-	if (c->type == Track::Type::AUDIO){
+	if (c->type == Module::SignalType::AUDIO){
 		target->set_audio_source(target_port, source->audio_socket(source_port));
-	}else if (c->type == Track::Type::MIDI){
+	}else if (c->type == Module::SignalType::MIDI){
 		target->set_midi_source(target_port, source->midi_socket(source_port));
-	}else if (c->type == Track::Type::TIME){
+	}else if (c->type == Module::SignalType::BEATS){
 		target->set_beat_source(target_port, source->beat_socket(source_port));
 	}
 	notify();
@@ -441,11 +399,11 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 {
 	foreachi(Cable *cc, cables, i)
 		if (cc == c){
-			if (c->type == Track::Type::AUDIO){
+			if (c->type == Module::SignalType::AUDIO){
 				c->target->set_audio_source(c->target_port, NULL);
-			}else if (c->type == Track::Type::MIDI){
+			}else if (c->type == Module::SignalType::MIDI){
 				c->target->set_midi_source(c->target_port, NULL);
-			}else if (c->type == Track::Type::TIME){
+			}else if (c->type == Module::SignalType::BEATS){
 				c->target->set_beat_source(c->target_port, NULL);
 			}
 
@@ -539,6 +497,8 @@ void SignalChain::load(const string& filename)
 				m = addSynthesizer(sub_type);
 			else if (type == "MidiInputStream")
 				m = addMidiInputStream();
+			//else if (type == "AudioSucker")
+			//	m = addAudioSucker();
 			else if (type == "BeatMidifier")
 				m = addBeatMidifier();
 			else if (type == "BeatSource")

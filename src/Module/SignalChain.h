@@ -50,7 +50,6 @@ public:
 		virtual AudioPort *audio_socket(int port);
 		virtual MidiPort *midi_socket(int port);
 		virtual BeatPort *beat_socket(int port);
-		Array<int> port_in, port_out;
 		virtual void start(){}
 		virtual void pause(bool paused){}
 		virtual void stop(){}

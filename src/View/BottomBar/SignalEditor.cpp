@@ -158,7 +158,7 @@ static float module_port_in_x(SignalChain::_Module *m)
 
 static float module_port_in_y(SignalChain::_Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
+	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->configurable()->port_in.num-1)/2)*20;
 }
 
 static float module_port_out_x(SignalChain::_Module *m)
@@ -168,16 +168,16 @@ static float module_port_out_x(SignalChain::_Module *m)
 
 static float module_port_out_y(SignalChain::_Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
+	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->configurable()->port_out.num-1)/2)*20;
 }
 
 static color signal_color(int type)
 {
-	if (type == Track::Type::AUDIO)
+	if (type == Module::SignalType::AUDIO)
 		return Red;
-	if (type == Track::Type::MIDI)
+	if (type == Module::SignalType::MIDI)
 		return Green;
-	if (type == Track::Type::TIME)
+	if (type == Module::SignalType::BEATS)
 		return Blue;
 	return White;
 }
@@ -361,27 +361,27 @@ SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 			s.dy = m->y - my;
 			return s;
 		}
-		for (int i=0; i<m->port_in.num; i++){
+		for (int i=0; i<m->configurable()->port_in.num; i++){
 			float y = module_port_in_y(m, i);
 			float x = module_port_in_x(m);
 			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_IN;
 				s.module = m;
 				s.port = i;
-				s.port_type = m->port_in[i];
+				s.port_type = m->configurable()->port_in[i].type;
 				s.dx = x;
 				s.dy = y;
 				return s;
 			}
 		}
-		for (int i=0; i<m->port_out.num; i++){
+		for (int i=0; i<m->configurable()->port_out.num; i++){
 			float y = module_port_out_y(m, i);
 			float x = module_port_out_x(m);
 			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_OUT;
 				s.module = m;
 				s.port = i;
-				s.port_type = m->port_out[i];
+				s.port_type = m->configurable()->port_out[i].type;
 				s.dx = x;
 				s.dy = y;
 				return s;
@@ -434,15 +434,15 @@ void SignalEditor::onDraw(Painter* p)
 		p->drawStr(m->x + MODULE_WIDTH/2 - ww/2, m->y + 4, m->type());
 		p->setFont("", 12, false, false);
 
-		foreachi(int t, m->port_in, i){
-			p->setColor(signal_color(t));
+		foreachi(auto &pd, m->configurable()->port_in, i){
+			p->setColor(signal_color(pd.type));
 			float r = 4;
 			if (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i)
 				r = 8;
 			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
-		foreachi(int t, m->port_out, i){
-			p->setColor(signal_color(t));
+		foreachi(auto &pd, m->configurable()->port_out, i){
+			p->setColor(signal_color(pd.type));
 			float r = 4;
 			if (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i)
 				r = 8;

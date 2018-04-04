@@ -12,6 +12,7 @@
 #include "SideBar.h"
 
 class Module;
+class ConfigPanel;
 
 class ModuleConsole : public SideBarConsole
 {
@@ -32,7 +33,7 @@ public:
 	hui::Panel *panel;
 
 	Module *module;
-	hui::Panel *module_panel;
+	ConfigPanel *module_panel;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_MODULECONSOLE_H_ */

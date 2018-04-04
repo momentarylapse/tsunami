@@ -13,9 +13,9 @@
 #include "../../Device/OutputStream.h"
 #include "../../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "math.h"
-#include "../../Audio/Source/SongRenderer.h"
-#include "../../Rhythm/Beat.h"
-#include "../../Rhythm/Bar.h"
+#include "../../Module/Audio/SongRenderer.h"
+#include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Rhythm/Beat.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)

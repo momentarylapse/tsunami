@@ -79,4 +79,4 @@ class SamplePanel extends ConfigPanel
 				sc.samples[n] = nil
 			if s
 				sc.samples[n] = s.createRef()
-			notify()
+			changed()

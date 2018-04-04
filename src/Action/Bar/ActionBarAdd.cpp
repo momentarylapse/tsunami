@@ -8,9 +8,9 @@
 #include "ActionBarAdd.h"
 
 #include "../../Data/Track.h"
-#include "../../Rhythm/Bar.h"
 #include <assert.h>
 
+#include "../../Data/Rhythm/Bar.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"
 #include "../Track/Marker/ActionTrackEditMarker.h"
 #include "../Track/Midi/ActionTrackEditMidiNote.h"

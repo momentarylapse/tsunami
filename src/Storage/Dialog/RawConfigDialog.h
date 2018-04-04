@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef RAWCONFIGDIALOG_H_
-#define RAWCONFIGDIALOG_H_
+#ifndef SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
+#define SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
 
-#include "../../Audio/AudioBuffer.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/hui/hui.h"
 
 struct RawConfigData
@@ -32,4 +32,4 @@ public:
 	bool ok;
 };
 
-#endif /* RAWCONFIGDIALOG_H_ */
+#endif /* SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_ */

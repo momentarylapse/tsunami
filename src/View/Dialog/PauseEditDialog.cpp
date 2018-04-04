@@ -6,8 +6,9 @@
  */
 
 #include "PauseEditDialog.h"
+
+#include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
-#include "../../Rhythm/Bar.h"
 
 PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index, bool _apply_to_midi):
 	hui::Dialog("", 100, 100, root, false)

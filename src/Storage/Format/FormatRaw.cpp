@@ -7,7 +7,7 @@
 
 #include "FormatRaw.h"
 
-#include "../../Audio/Source/SongRenderer.h"
+#include "../../Module/Audio/SongRenderer.h"
 #include "../../lib/math/math.h"
 #include "../Dialog/RawConfigDialog.h"
 

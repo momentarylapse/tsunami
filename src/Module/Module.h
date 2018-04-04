@@ -25,6 +25,7 @@ namespace hui{
 class ModuleConfiguration : public VirtualBase
 {
 public:
+	ModuleConfiguration(){ _class = NULL; }
 	virtual ~ModuleConfiguration(){}
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();

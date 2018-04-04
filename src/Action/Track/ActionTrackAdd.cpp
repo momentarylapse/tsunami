@@ -6,12 +6,12 @@
  */
 
 #include "ActionTrackAdd.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Data/Song.h"
+#include "../../Plugins/PluginManager.h"
+#include "../../Tsunami.h"
 #include "../../lib/hui/hui.h"
 #include <assert.h>
-#include "../../Data/Song.h"
-#include "../../Tsunami.h"
-#include "../../Plugins/PluginManager.h"
 
 ActionTrackAdd::ActionTrackAdd(int _type, int _index)
 {

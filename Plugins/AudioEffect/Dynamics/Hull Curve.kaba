@@ -75,7 +75,7 @@ class HullGrid extends Grid
 		if HuiGetEvent().key_code == KEY_DELETE
 			if Selected > 0 and Selected < config.curve.num-1
 				config.curve.remove(Selected)
-				cp.notify()
+				cp.changed()
 				Selected = -1
 				redraw()
 
@@ -86,7 +86,7 @@ class HullGrid extends Grid
 			complex p = project2(config.curve[i])
 			if (mx > q.x) and (mx < p.x)
 				config.curve.insert(getMouse2(), i)
-				cp.notify()
+				cp.changed()
 				Selected = i
 				redraw()
 				i = config.curve.num
@@ -108,7 +108,7 @@ class HullGrid extends Grid
 				config.curve[Selected].x = 1
 			if Selected == 0
 				config.curve[Selected].x = 0
-			cp.notify()
+			cp.changed()
 		else
 		// mouse over?
 			MouseOver = -1

@@ -10,7 +10,7 @@
 #include "../AudioViewTrack.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
-#include "../../Audio/AudioSucker.h"
+#include "../../Module/Audio/AudioSucker.h"
 
 InputStreamAudio *export_view_input = NULL;
 AudioSucker *export_view_sucker = NULL;

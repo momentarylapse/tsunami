@@ -7,27 +7,26 @@
 
 #include "AudioView.h"
 
-#include "../Audio/Source/SongRenderer.h"
 #include "AudioViewTrack.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
+#include "Mode/ViewModeScaleBars.h"
 #include "../Session.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
+#include "../Data/Rhythm/Beat.h"
 #include "../Device/OutputStream.h"
-#include "../Audio/PeakMeter.h"
-#include "../Audio/Synth/Synthesizer.h"
+#include "../Module/Audio/SongRenderer.h"
+#include "../Module/Synth/Synthesizer.h"
+#include "../Module/Audio/PeakMeter.h"
+#include "../Module/SignalChain.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
-#include "../Rhythm/Beat.h"
-#include "Mode/ViewModeScaleBars.h"
-
 #include "../lib/threads/Mutex.h"
-#include "../Module/SignalChain.h"
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;

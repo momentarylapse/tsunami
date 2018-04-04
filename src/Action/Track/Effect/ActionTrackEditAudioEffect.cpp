@@ -8,7 +8,8 @@
 #include "ActionTrackEditEffect.h"
 #include "../../../Data/Track.h"
 #include <assert.h>
-#include "../../../Plugins/AudioEffect.h"
+
+#include "../../../Module/Audio/AudioEffect.h"
 
 ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string &_old_params, AudioEffect *fx)
 {

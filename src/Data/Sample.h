@@ -8,10 +8,10 @@
 #ifndef SRC_DATA_SAMPLE_H_
 #define SRC_DATA_SAMPLE_H_
 
-#include "../Midi/MidiData.h"
+#include "Midi/MidiData.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
-#include "../Audio/AudioBuffer.h"
+#include "Audio/AudioBuffer.h"
 
 class Song;
 class Track;

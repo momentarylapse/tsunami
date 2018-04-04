@@ -8,7 +8,7 @@
 #include "ActionTrackDetuneSynthesizer.h"
 #include <assert.h>
 #include "../../../Data/Song.h"
-#include "../../../Audio/Synth/Synthesizer.h"
+#include "../../../Module/Synth/Synthesizer.h"
 
 ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, int pitch, float dpitch, bool all_octaves)
 {

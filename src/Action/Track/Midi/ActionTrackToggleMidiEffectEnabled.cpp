@@ -7,7 +7,7 @@
 
 #include "ActionTrackToggleMidiEffectEnabled.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/MidiEffect.h"
+#include "../../../Module/Midi/MidiEffect.h"
 
 ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(Track *t, int _index)
 {

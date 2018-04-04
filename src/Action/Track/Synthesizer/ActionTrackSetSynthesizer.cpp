@@ -8,7 +8,7 @@
 #include "ActionTrackSetSynthesizer.h"
 #include <assert.h>
 #include "../../../Data/Song.h"
-#include "../../../Audio/Synth/Synthesizer.h"
+#include "../../../Module/Synth/Synthesizer.h"
 
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth)
 {

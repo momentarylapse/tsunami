@@ -6,8 +6,9 @@
  */
 
 #include "PauseAddDialog.h"
+
+#include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
-#include "../../Rhythm/Bar.h"
 #include "../AudioView.h"
 
 PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):

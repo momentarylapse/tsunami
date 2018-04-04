@@ -7,11 +7,11 @@
 
 #include "PeakMeterDisplay.h"
 
-#include "../../Audio/PeakMeter.h"
 #include "../../Tsunami.h"
 #include "../AudioView.h"
 #include "../../lib/hui/hui.h"
 #include <math.h>
+#include "../../Module/Audio/PeakMeter.h"
 
 
 PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMeter *_source, AudioView *_view)

@@ -117,4 +117,4 @@ class DrumsetPanel extends ConfigPanel
 		sc.name = ""
 		if n > 0
 			sc.name = drumlist.sets[n-1].name
-		notify()
+		changed()

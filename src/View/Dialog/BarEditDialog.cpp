@@ -6,8 +6,9 @@
  */
 
 #include "BarEditDialog.h"
+
+#include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
-#include "../../Rhythm/Bar.h"
 
 BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars, bool _apply_to_midi):
 	hui::Dialog("", 100, 100, root, false)

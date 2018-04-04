@@ -11,14 +11,14 @@
 #include "../../../Device/OutputStream.h"
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Device.h"
-#include "../../../Audio/AudioSucker.h"
-#include "../../../Audio/PeakMeter.h"
 #include "../../../Data/Song.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../../Module/Audio/AudioSucker.h"
+#include "../../../Module/Audio/PeakMeter.h"
 
 
 

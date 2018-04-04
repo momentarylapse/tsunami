@@ -8,8 +8,8 @@
 #ifndef SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
 #define SRC_ACTION_SONG_DATA_ACTIONSONGSETDEFAULTFORMAT_H_
 
-#include "../../../Audio/AudioBuffer.h"
 #include "../../Action.h"
+#include "../../../Data/Audio/AudioBuffer.h"
 
 
 class ActionSongSetDefaultFormat : public Action

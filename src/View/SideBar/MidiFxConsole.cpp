@@ -7,11 +7,11 @@
 
 #include "MidiFxConsole.h"
 #include "../../Data/Track.h"
-#include "../../Midi/MidiData.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Data/Midi/MidiData.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/Midi/MidiEffect.h"
+#include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
-#include "../../Plugins/ConfigPanel.h"
-#include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 

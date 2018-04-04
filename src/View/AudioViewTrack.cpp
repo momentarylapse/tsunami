@@ -13,13 +13,13 @@
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
 #include "../Data/Song.h"
-#include "../Rhythm/BarCollection.h"
-#include "../Rhythm/Bar.h"
-#include "../Rhythm/Beat.h"
-#include "../Midi/MidiData.h"
-#include "../Midi/Clef.h"
-#include "../Audio/Synth/Synthesizer.h"
-#include "../Audio/Source/SongRenderer.h"
+#include "../Data/Rhythm/Bar.h"
+#include "../Data/Rhythm/Beat.h"
+#include "../Data/Rhythm/BarCollection.h"
+#include "../Data/Midi/MidiData.h"
+#include "../Data/Midi/Clef.h"
+#include "../Module/Synth/Synthesizer.h"
+#include "../Module/Audio/SongRenderer.h"
 
 
 const int PITCH_SHOW_COUNT = 30;

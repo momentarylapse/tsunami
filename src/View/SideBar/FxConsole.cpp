@@ -8,8 +8,8 @@
 #include "FxConsole.h"
 #include "../AudioView.h"
 #include "../../Data/Track.h"
-#include "../../Plugins/AudioEffect.h"
-#include "../../Plugins/ConfigPanel.h"
+#include "../../Module/Audio/AudioEffect.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 

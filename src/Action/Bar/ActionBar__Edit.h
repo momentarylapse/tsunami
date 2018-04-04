@@ -9,7 +9,6 @@
 #define SRC_ACTION_BAR_ACTIONBAR__EDIT_H_
 
 #include "../Action.h"
-#include "../../Rhythm/BarCollection.h"
 
 class ActionBar__Edit : public Action
 {

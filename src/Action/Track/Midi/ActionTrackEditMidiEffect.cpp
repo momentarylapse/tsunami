@@ -7,8 +7,9 @@
 
 #include "ActionTrackEditMidiEffect.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/MidiEffect.h"
 #include <assert.h>
+
+#include "../../../Module/Midi/MidiEffect.h"
 
 ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(Track *t, int _index, const string &_old_params, MidiEffect *fx)
 {

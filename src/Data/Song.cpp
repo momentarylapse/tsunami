@@ -5,7 +5,10 @@
  *      Author: michi
  */
 
+#include "Song.h"
+#include "SongSelection.h"
 #include "Curve.h"
+#include "Rhythm/Bar.h"
 #include "../Action/Bar/ActionBarAdd.h"
 #include "../Action/Bar/ActionBarDelete.h"
 #include "../Action/Bar/ActionBarEdit.h"
@@ -39,18 +42,16 @@
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
-#include "../Audio/Synth/DummySynthesizer.h"
+#include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
+#include "../Module/Synth/DummySynthesizer.h"
+#include "../Module/Audio/AudioEffect.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../lib/threads/Mutex.h"
 #include <assert.h>
 #include <math.h>
-#include "Song.h"
 
-#include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
-#include "../Plugins/AudioEffect.h"
-#include "../Rhythm/Bar.h"
 
 float amplitude2db(float amp)
 {

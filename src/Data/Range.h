@@ -8,6 +8,8 @@
 #ifndef RANGE_H_
 #define RANGE_H_
 
+#include "../lib/base/base.h"
+
 class string;
 
 class Range

@@ -6,7 +6,8 @@
  */
 
 #include "FormatMidi.h"
-#include "../../Rhythm/Bar.h"
+
+#include "../../Data/Rhythm/Bar.h"
 
 FormatDescriptorMidi::FormatDescriptorMidi() :
 	FormatDescriptor("Midi", "mid,midi", Flag::MIDI | Flag::MULTITRACK | Flag::READ | Flag::WRITE)

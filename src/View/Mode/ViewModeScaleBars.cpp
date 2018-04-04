@@ -8,8 +8,8 @@
 #include "../AudioView.h"
 #include "../../lib/hui/hui.h"
 #include "../../lib/math/math.h"
-#include "../../Rhythm/Bar.h"
 #include "ViewModeScaleBars.h"
+#include "../../Data/Rhythm/Bar.h"
 
 ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 	ViewModeDefault(view)

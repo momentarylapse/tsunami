@@ -10,8 +10,8 @@
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../Dialog/DetuneSynthesizerDialog.h"
 #include "../../Data/Track.h"
-#include "../../Audio/Synth/Synthesizer.h"
-#include "../../Plugins/ConfigPanel.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Session.h"
 

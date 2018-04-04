@@ -147,7 +147,7 @@ class PADGrid extends Grid
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			pc.A[Selected] = clamp(getMouse2().y, 0, 1)
-			p.notify()
+			p.changed()
 		else
 		// hover?
 			Hover = -1
@@ -192,7 +192,7 @@ Grid ? ''
 		pc.bwscale = getFloat("bwscale")
 		pc.detune = getFloat("detune")
 		grid.redraw()
-		notify()
+		changed()
 	
 	override void update()
 		setFloat("bw", pc.bw)

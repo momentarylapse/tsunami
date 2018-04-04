@@ -62,9 +62,9 @@ class VolumePanel extends ConfigPanel
 		c.config.maximize = isChecked("max")
 		enable("volume", !c.config.maximize)
 		enable("volume_slider", !c.config.maximize)
-		notify()
+		changed()
 
 	void onVolume()
 		c.config.volume = slider.get()
-		notify()
+		changed()
 

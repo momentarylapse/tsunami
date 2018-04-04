@@ -90,7 +90,7 @@ class Equalizer15Panel extends ConfigPanel
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_" + i)
 				c.config.factor[i] = getFloat("") * 2
-				notify()
+				changed()
 		
 	override void update()
 		for i in 0:NUM_BANDS

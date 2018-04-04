@@ -12,10 +12,10 @@
 #include "Track.h"
 #include "Sample.h"
 #include "SampleRef.h"
-#include "../Rhythm/BarCollection.h"
 #include "Curve.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
+#include "Rhythm/BarCollection.h"
 
 class Data;
 class AudioEffect;

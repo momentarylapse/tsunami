@@ -6,17 +6,17 @@
  */
 
 
-#include "../Plugins/ConfigPanel.h"
-#include "../Plugins/AutoConfigPanel.h"
+#include "Module.h"
+#include "ConfigPanel.h"
+#include "AutoConfigPanel.h"
+#include "Synth/DummySynthesizer.h"
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "../Plugins/PluginManager.h"
 #include "../Plugins/Plugin.h"
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
-#include "../Audio/Synth/DummySynthesizer.h"
 #include "../Device/OutputStream.h"
-#include "Module.h"
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 

@@ -158,7 +158,7 @@ class FMPanel extends ConfigPanel
 				l.dest = j
 				fc.link.add(l)*/
 		
-		notify()
+		changed()
 	
 	override void update()
 		for o,j in fc.osc

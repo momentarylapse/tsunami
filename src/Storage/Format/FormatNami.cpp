@@ -7,12 +7,12 @@
 
 #include "FormatNami.h"
 #include "../../Session.h"
-#include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Audio/Synth/Synthesizer.h"
 #include "../../Data/Curve.h"
-#include "../../Plugins/AudioEffect.h"
-#include "../../Rhythm/Bar.h"
+#include "../../Data/Rhythm/Bar.h"
+#include "../../Module/Audio/AudioEffect.h"
+#include "../../Module/Midi/MidiEffect.h"
+#include "../../Module/Synth/Synthesizer.h"
 #ifndef OS_WINDOWS
 #include <FLAC/all.h>
 #endif

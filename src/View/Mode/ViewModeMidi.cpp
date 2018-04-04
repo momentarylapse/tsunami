@@ -7,16 +7,16 @@
 
 #include "ViewModeMidi.h"
 
-#include "../../Audio/Source/SongRenderer.h"
-#include "../AudioView.h"
-#include "../AudioViewTrack.h"
-#include "../../Device/OutputStream.h"
-#include "../../Audio/Synth/Synthesizer.h"
-#include "../../Midi/Clef.h"
-#include "../../Data/SongSelection.h"
+#include "../../Module/Audio/SongRenderer.h"
+#include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Port/MidiPort.h"
+#include "../../Device/OutputStream.h"
+#include "../../Data/Midi/Clef.h"
+#include "../../Data/SongSelection.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
+#include "../AudioView.h"
+#include "../AudioViewTrack.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 

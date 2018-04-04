@@ -7,7 +7,7 @@
 
 #include "ActionTrackAddMidiEffect.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/MidiEffect.h"
+#include "../../../Module/Midi/MidiEffect.h"
 
 ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, MidiEffect *_effect)
 {

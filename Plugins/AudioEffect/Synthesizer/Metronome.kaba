@@ -71,14 +71,14 @@ class MetronomePanel extends ConfigPanel
 
 	void onMetroBeats()
 		c.config.beats_per_minute = getFloat("")
-		notify()
+		changed()
 
 	void onMetroMeasure()
 		c.config.beats_per_measure = getInt("")
-		notify()
+		changed()
 
 	void onMetroVolume()
 		c.config.volume = getFloat("") / 100
 		//m.config.volume = SliderGet(self, "volume")
-		notify()
+		changed()
 

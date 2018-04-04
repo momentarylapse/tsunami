@@ -11,7 +11,7 @@
 #include "../../Data/Curve.h"
 #include "../../Device/OutputStream.h"
 #include "../../TsunamiWindow.h"
-#include "../../Audio/Source/SongRenderer.h"
+#include "../../Module/Audio/SongRenderer.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)

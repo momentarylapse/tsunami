@@ -6,7 +6,7 @@
  */
 
 #include "Selection.h"
-#include "../Midi/MidiData.h"
+#include "../Data/Midi/MidiData.h"
 
 
 Selection::Selection()

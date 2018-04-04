@@ -6,18 +6,19 @@
  */
 
 #include "../../Data/Track.h"
-#include "../../Midi/MidiData.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Data/Midi/MidiData.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../Mode/ViewModeMidi.h"
-#include "../../Plugins/ConfigPanel.h"
-#include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/BottomBar.h"
 #include "MidiEditorConsole.h"
+
+#include "../../Module/Midi/MidiEffect.h"
 
 int get_track_index_save(Song *song, Track *t);
 

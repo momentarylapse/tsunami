@@ -9,7 +9,7 @@
 #define SRC_ACTION_TRACK_SYNTHESIZER_ACTIONTRACKDETUNESYNTHESIZER_H_
 
 #include "../../Action.h"
-#include "../../../Audio/Synth/Synthesizer.h"
+#include "../../../Module/Synth/Synthesizer.h"
 class Track;
 
 class ActionTrackDetuneSynthesizer: public Action

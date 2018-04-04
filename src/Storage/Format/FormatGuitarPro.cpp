@@ -6,7 +6,8 @@
  */
 
 #include "FormatGuitarPro.h"
-#include "../../Rhythm/Bar.h"
+
+#include "../../Data/Rhythm/Bar.h"
 
 const int BEAT_PARTITION = 12;
 

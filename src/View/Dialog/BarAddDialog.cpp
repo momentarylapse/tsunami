@@ -6,8 +6,9 @@
  */
 
 #include "BarAddDialog.h"
+
+#include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
-#include "../../Rhythm/Bar.h"
 #include "../AudioView.h"
 
 BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):

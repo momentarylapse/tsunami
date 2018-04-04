@@ -8,9 +8,9 @@
 #include "ActionBar__Edit.h"
 
 #include "../../Data/Track.h"
-#include "../../Rhythm/Bar.h"
 #include <assert.h>
 #include <algorithm>
+#include "../../Data/Rhythm/Bar.h"
 
 
 ActionBar__Edit::ActionBar__Edit(int _index, int _length, int _num_beats, int _num_sub_beats)

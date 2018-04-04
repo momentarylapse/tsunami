@@ -6,8 +6,9 @@
  */
 
 #include "SongSelection.h"
+
+#include "Rhythm/Bar.h"
 #include "Song.h"
-#include "../Rhythm/Bar.h"
 
 SongSelection::SongSelection()
 {

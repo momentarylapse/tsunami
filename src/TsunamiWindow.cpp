@@ -5,11 +5,10 @@
  *      Author: michi
  */
 
-#include "lib/hui/hui.h"
 #include "TsunamiWindow.h"
 #include "Session.h"
 
-#include "Audio/Source/SongRenderer.h"
+#include "Module/Audio/SongRenderer.h"
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/SettingsDialog.h"
@@ -31,7 +30,6 @@
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
-#include "Plugins/MidiEffect.h"
 #include "Plugins/SongPlugin.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
@@ -40,12 +38,13 @@
 #include "Device/DeviceManager.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
-#include "Rhythm/Bar.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "Plugins/AudioEffect.h"
-
+#include "Data/Rhythm/Bar.h"
+#include "Module/Audio/AudioEffect.h"
+#include "Module/Midi/MidiEffect.h"
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
+#include "lib/hui/hui.h"
 
 extern const string AppName;
 

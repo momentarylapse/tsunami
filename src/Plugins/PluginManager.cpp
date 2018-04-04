@@ -7,36 +7,36 @@
 
 #include "PluginManager.h"
 
-#include "../Audio/Source/SongRenderer.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
+#include "../Data/Rhythm/Bar.h"
+#include "../Module/ConfigPanel.h"
 #include "../Device/InputStreamAudio.h"
 #include "../Device/InputStreamMidi.h"
 #include "../Device/OutputStream.h"
 #include "../Device/DeviceManager.h"
-#include "../Audio/Synth/Synthesizer.h"
-#include "../Audio/Synth/DummySynthesizer.h"
+#include "../Module/Synth/Synthesizer.h"
+#include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Port/AudioPort.h"
-#include "../Audio/Source/AudioSource.h"
+#include "../Module/Audio/AudioSource.h"
+#include "../Module/Audio/SongRenderer.h"
 #include "../Module/Port/MidiPort.h"
-#include "../Midi/MidiSource.h"
-#include "../Rhythm/Bar.h"
+#include "../Module/Midi/MidiSource.h"
+#include "../Module/Audio/AudioEffect.h"
+#include "../Module/Beats/BeatSource.h"
+#include "../Module/Midi/MidiEffect.h"
 #include "../Module/Port/BeatPort.h"
-#include "../Rhythm/BeatSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../View/Mode/ViewModeCapture.h"
-#include "AudioEffect.h"
 #include "Plugin.h"
-#include "ConfigPanel.h"
 #include "ExtendedAudioBuffer.h"
-#include "MidiEffect.h"
 #include "SongPlugin.h"
 #include "TsunamiPlugin.h"
 #include "FavoriteManager.h"
@@ -143,7 +143,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("ConfigPanel." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ConfigPanel::__init__));
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ConfigPanel::__delete__), &config_panel);
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", "update", Kaba::mf(&ConfigPanel::update), &config_panel);
-	Kaba::LinkExternal("ConfigPanel.notify", Kaba::mf(&ConfigPanel::changed));
+	Kaba::LinkExternal("ConfigPanel.changed", Kaba::mf(&ConfigPanel::changed));
 	Kaba::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
 
 	AudioSource asource;

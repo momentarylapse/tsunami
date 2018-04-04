@@ -9,12 +9,12 @@
 #define SRC_DATA_TRACK_H_
 
 #include "Range.h"
-#include "../Midi/MidiData.h"
+#include "Midi/MidiData.h"
 #include "Sample.h"
-#include "../Midi/Instrument.h"
+#include "Midi/Instrument.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
-#include "../Audio/AudioBuffer.h"
+#include "Audio/AudioBuffer.h"
 #include "Song.h"
 
 

@@ -7,7 +7,7 @@
 
 #include "ActionTrackToggleEffectEnabled.h"
 #include "../../../Data/Track.h"
-#include "../../../Plugins/AudioEffect.h"
+#include "../../../Module/Audio/AudioEffect.h"
 
 ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(Track *t, int _index)
 {

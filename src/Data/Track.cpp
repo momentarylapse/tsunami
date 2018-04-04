@@ -6,10 +6,8 @@
  */
 
 #include "Track.h"
-#include "../Audio/Synth/Synthesizer.h"
+#include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
-#include "../lib/hui/hui.h"
-#include "../lib/threads/Mutex.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
@@ -36,9 +34,12 @@
 #include "../Action/Track/Marker/ActionTrackEditMarker.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
-#include "../Plugins/AudioEffect.h"
-#include "../Tsunami.h"
+#include "../Module/Synth/Synthesizer.h"
+#include "../Module/Audio/AudioEffect.h"
 #include "../Plugins/PluginManager.h"
+#include "../Tsunami.h"
+#include "../lib/hui/hui.h"
+#include "../lib/threads/Mutex.h"
 
 
 string track_type(int type)

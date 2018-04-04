@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACKDELETEMIDIEFFECT_H_
 #define ACTIONTRACKDELETEMIDIEFFECT_H_
 
+#include "../../../Module/Midi/MidiEffect.h"
 #include "../../Action.h"
-#include "../../../Plugins/MidiEffect.h"
 class Track;
 
 class ActionTrackDeleteMidiEffect: public Action

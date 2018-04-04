@@ -91,7 +91,7 @@ class EqualizerGrid extends Grid
 				c.curve[MouseOver].z += 0.2
 			else
 				c.curve[MouseOver].z -= 0.2
-			cp.notify()
+			cp.changed()
 			redraw()
 
 	// right button down -> new point
@@ -100,7 +100,7 @@ class EqualizerGrid extends Grid
 		for i in 1:c.curve.num
 			if (m.x > c.curve[i - 1].x) and (m.x < c.curve[i].x)
 				c.curve.insert(m, i)
-				cp.notify()
+				cp.changed()
 				Selected = i
 				MouseOver = i
 				redraw()
@@ -122,7 +122,7 @@ class EqualizerGrid extends Grid
 				c.curve[Selected].x = MAX_FREQ
 			if Selected == 0
 				c.curve[Selected].x = MIN_FREQ
-			cp.notify()
+			cp.changed()
 		else
 		// mouse over?
 			MouseOver = -1
@@ -136,7 +136,7 @@ class EqualizerGrid extends Grid
 		if HuiGetEvent().key_code == KEY_DELETE
 			if Selected > 0 and Selected < c.curve.num-1
 				c.curve.remove(Selected)
-				cp.notify()
+				cp.changed()
 				Selected = -1
 				redraw()
 

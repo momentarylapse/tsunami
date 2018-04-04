@@ -7,7 +7,7 @@
 
 #include "SampleScaleDialog.h"
 #include "../../Data/Song.h"
-#include "../../Audio/BufferInterpolator.h"
+#include "../../Data/Audio/BufferInterpolator.h"
 
 SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
 	hui::Dialog("", 100, 100, root, false)

@@ -43,7 +43,7 @@ class HarmonicGrid extends Grid
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			hc.intensity[Selected] = clamp(getMouse2().y, 0, 1)
-			p.notify()
+			p.changed()
 		else
 		// hover?
 			Hover = -1
@@ -78,7 +78,7 @@ class HarmonicPanel extends ConfigPanel
 		
 	void onChange()
 		hc.release = getFloat("release") / 1000
-		notify()
+		changed()
 	
 	override void update()
 		redraw("drawing")

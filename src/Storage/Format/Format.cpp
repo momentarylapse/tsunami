@@ -8,7 +8,7 @@
 #include "Format.h"
 #include "../../Tsunami.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../Audio/Source/SongRenderer.h"
+#include "../../Module/Audio/SongRenderer.h"
 
 FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags)
 {

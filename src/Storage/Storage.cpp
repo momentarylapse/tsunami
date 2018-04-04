@@ -7,7 +7,7 @@
 
 #include "Storage.h"
 
-#include "../Audio/Source/SongRenderer.h"
+#include "../Module/Audio/SongRenderer.h"
 #include "Format/Format.h"
 #include "Format/FormatWave.h"
 #include "Format/FormatRaw.h"

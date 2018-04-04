@@ -19,7 +19,7 @@ class ToneGenerator extends AudioEffect
 	DummySynthesizer synth
 
 	override void process(AudioBuffer buf)
-		synth.set_sample_rate(sample_rate)
+		synth.set_sample_rate(session.sample_rate())
 		
 		Range r = _Range(0, buf.length)
 		MidiEventBuffer midi

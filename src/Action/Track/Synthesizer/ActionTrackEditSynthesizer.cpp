@@ -7,7 +7,7 @@
 
 #include "ActionTrackEditSynthesizer.h"
 #include "../../../Data/Track.h"
-#include "../../../Audio/Synth/Synthesizer.h"
+#include "../../../Module/Synth/Synthesizer.h"
 #include <assert.h>
 
 ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t, const string &params_old)

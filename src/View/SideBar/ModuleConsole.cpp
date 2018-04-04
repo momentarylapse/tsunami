@@ -8,7 +8,7 @@
 #include "ModuleConsole.h"
 
 #include "../../Module/SignalChain.h"
-#include "../../Plugins/ConfigPanel.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../Module/Module.h"
 
 ModuleConsole::ModuleConsole(Session* session) :
@@ -52,8 +52,10 @@ void ModuleConsole::setModule(Module* m)
 		setString("category", Module::type_to_name(module->module_type));
 		setString("sub_category", m->name);
 		module_panel = module->create_panel();
-		if (module_panel)
+		if (module_panel){
+			module_panel->update();
 			embed(module_panel, "grid", 0, 0);
+		}
 		hideControl("no_config", module_panel);
 	}
 }

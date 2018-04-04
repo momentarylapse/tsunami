@@ -7,7 +7,7 @@
 
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Module/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../Dialog/TuningDialog.h"
 #include "../../Plugins/PluginManager.h"

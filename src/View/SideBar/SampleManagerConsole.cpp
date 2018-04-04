@@ -18,8 +18,8 @@
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
-#include "../../Audio/Source/BufferStreamer.h"
-#include "../../Audio/Source/SongRenderer.h"
+#include "../../Module/Audio/BufferStreamer.h"
+#include "../../Module/Audio/SongRenderer.h"
 
 
 void render_bufbox(Image &im, AudioBuffer &b, AudioView *view)

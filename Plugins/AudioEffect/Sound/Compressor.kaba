@@ -117,7 +117,7 @@ class CompressorGrid extends Grid
 			complex p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
-				cp.notify()
+				cp.changed()
 				Selected = i
 				redraw()
 				break
@@ -133,7 +133,7 @@ class CompressorGrid extends Grid
 			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
 			if Selected == config.curve.num - 1
 				config.curve[Selected].x = 0
-			cp.notify()
+			cp.changed()
 		else
 		// mouse over?
 			MouseOver = -1
@@ -148,7 +148,7 @@ class CompressorGrid extends Grid
 		// [Delete] -> remove point
 		if (k == KEY_DELETE) and (Selected > 0) and (Selected < config.curve.num - 1)
 			config.curve.remove(Selected)
-			cp.notify()
+			cp.changed()
 			Selected = -1
 			redraw()
 
@@ -188,5 +188,5 @@ class CompressorPanel extends ConfigPanel
 	void onEdit()
 		grid.config.attack = getFloat("attack") / 1000.0
 		grid.config.release = getFloat("release") / 1000.0
-		notify()
+		changed()
 		

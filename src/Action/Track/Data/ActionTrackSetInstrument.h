@@ -9,8 +9,8 @@
 #define SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_
 
 #include "../../ActionMergable.h"
+#include "../../../Data/Midi/Instrument.h"
 class Track;
-#include "../../../Midi/Instrument.h"
 
 class ActionTrackSetInstrument: public ActionMergable<Instrument>
 {

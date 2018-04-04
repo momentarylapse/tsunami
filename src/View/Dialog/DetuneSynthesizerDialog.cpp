@@ -7,7 +7,7 @@
 
 #include "DetuneSynthesizerDialog.h"
 #include "../../Tsunami.h"
-#include "../../Audio/Synth/Synthesizer.h"
+#include "../../Module/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include <math.h>
 

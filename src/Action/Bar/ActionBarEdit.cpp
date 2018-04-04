@@ -8,9 +8,9 @@
 #include "ActionBarEdit.h"
 
 #include "../../Data/Track.h"
-#include "../../Rhythm/Bar.h"
 #include <assert.h>
 
+#include "../../Data/Rhythm/Bar.h"
 #include "Action__ScaleData.h"
 #include "ActionBar__Edit.h"
 

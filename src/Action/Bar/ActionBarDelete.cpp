@@ -15,9 +15,9 @@
 
 #include "../../Data/Song.h"
 #include "../../Data/SongSelection.h"
-#include "../../Rhythm/Bar.h"
 #include <assert.h>
 
+#include "../../Data/Rhythm/Bar.h"
 #include "Action__ShiftData.h"
 #include "ActionBar__Delete.h"
 

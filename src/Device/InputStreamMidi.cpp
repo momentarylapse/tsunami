@@ -11,7 +11,6 @@
 #include "DeviceManager.h"
 
 #include "OutputStream.h"
-#include "../Audio/Synth/Synthesizer.h"
 #include "../Module/Port/MidiPort.h"
 #include "../Stuff/BackupManager.h"
 

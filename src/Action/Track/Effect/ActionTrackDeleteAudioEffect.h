@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKDELETEEFFECT_H_
 #define ACTIONTRACKDELETEEFFECT_H_
 
-#include "../../../Plugins/AudioEffect.h"
+#include "../../../Module/Audio/AudioEffect.h"
 #include "../../Action.h"
 class Track;
 

@@ -30,6 +30,8 @@ int freq_to_index(float f)
 
 PitchDetector::PitchDetector()
 {
+	module_type = Type::PITCH_DETECTOR;
+	port_in.add(PortDescription(SignalType::AUDIO, NULL, "in"));
 	source = NULL;
 	loud_enough = false;
 	volume = 0;

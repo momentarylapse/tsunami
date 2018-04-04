@@ -14,13 +14,32 @@
 #include "../Data/SongSelection.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
+MidiEffect::Output::Output(MidiEffect *_fx)
+{
+	fx = _fx;
+}
+
+int MidiEffect::Output::read(MidiEventBuffer &buf)
+{
+	if (!fx->source)
+		return buf.samples;
+	return fx->source->read(buf);
+}
+
+void MidiEffect::Output::reset()
+{
+	if (fx->source)
+		fx->source->reset();
+}
+
 MidiEffect::MidiEffect() :
 	Module(Session::GLOBAL, Type::MIDI_EFFECT)
 {
-	usable = true;
-	plugin = NULL;
+	out = new Output(this);
+	port_out.add(PortDescription(SignalType::MIDI, out, "out"));
+	port_in.add(PortDescription(SignalType::MIDI, NULL, "in"));
+	source = NULL;
 	only_on_selection = false;
-	enabled = true;
 	bh_offset = 0;
 	bh_song = NULL;
 	bh_midi = NULL;
@@ -28,6 +47,7 @@ MidiEffect::MidiEffect() :
 
 MidiEffect::~MidiEffect()
 {
+	delete out;
 }
 
 void MidiEffect::__init__()
@@ -38,6 +58,11 @@ void MidiEffect::__init__()
 void MidiEffect::__delete__()
 {
 	this->MidiEffect::~MidiEffect();
+}
+
+void MidiEffect::set_source(MidiPort *s)
+{
+	source = s;
 }
 
 void MidiEffect::prepare()

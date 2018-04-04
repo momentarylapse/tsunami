@@ -20,4 +20,14 @@ public:
 	static const int NOT_ENOUGH_DATA;
 };
 
+class PortDescription
+{
+public:
+	PortDescription(){}
+	PortDescription(int type, Port *port, const string &name);
+	int type;
+	Port *port;
+	string name;
+};
+
 #endif /* SRC_MODULE_PORT_PORT_H_ */

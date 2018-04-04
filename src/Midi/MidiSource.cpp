@@ -32,6 +32,7 @@ MidiSource::MidiSource() :
 {
 	beat_source = BeatSource::dummy->out;
 	out = new Output(this);
+	port_out.add(PortDescription(SignalType::MIDI, out, "out"));
 }
 
 MidiSource::~MidiSource()

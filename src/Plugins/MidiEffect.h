@@ -12,6 +12,7 @@
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 #include "../Module/Module.h"
+#include "../Module/Port/MidiPort.h"
 
 class Plugin;
 class Track;
@@ -19,11 +20,6 @@ class AudioBuffer;
 class MidiNoteBuffer;
 class SongSelection;
 class Song;
-
-namespace Script{
-class Script;
-class Type;
-};
 
 class MidiEffect : public Module
 {
@@ -36,6 +32,9 @@ public:
 
 	bool only_on_selection;
 	Range range;
+
+	MidiPort *source;
+	void set_source(MidiPort *s);
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
@@ -51,6 +50,18 @@ public:
 	void skip_x(int beats, int sub_beats, int beat_partition);
 	Song *bh_song;
 	MidiNoteBuffer *bh_midi;
+
+	class Output : public MidiPort
+	{
+	public:
+		Output(MidiEffect *fx);
+		virtual ~Output(){}
+		virtual int _cdecl read(MidiEventBuffer &midi);
+		virtual void _cdecl reset();
+
+		MidiEffect *fx;
+	};
+	Output *out;
 };
 
 MidiEffect *_cdecl CreateMidiEffect(Session *session, const string &name);

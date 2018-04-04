@@ -13,6 +13,7 @@
 class BeatMidifier : public MidiSource
 {
 public:
+	BeatMidifier();
 	virtual int _cdecl read(MidiEventBuffer &midi);
 	virtual void _cdecl reset();
 };

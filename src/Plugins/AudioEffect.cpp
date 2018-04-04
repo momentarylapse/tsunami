@@ -49,6 +49,8 @@ AudioEffect::AudioEffect() :
 {
 	source = NULL;
 	out = new Output(this);
+	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
+	port_in.add(PortDescription(SignalType::AUDIO, NULL, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 

@@ -32,11 +32,10 @@ public:
 	Kaba::Class *_class;
 };
 
-//class AutoConfigPanel;
 class ConfigPanel;
 class Session;
-class Song;
 class Plugin;
+class PortDescription;
 
 class Module : public Observable<VirtualBase>
 {
@@ -72,6 +71,7 @@ public:
 	bool enabled;
 	string get_error();
 
+	Array<PortDescription> port_in, port_out;
 
 	enum Type
 	{
@@ -89,6 +89,13 @@ public:
 		BEAT_MIDIFIER,
 		PEAK_METER,
 		AUDIO_SUCKER,
+	};
+
+	enum SignalType
+	{
+		AUDIO,
+		MIDI,
+		TIME
 	};
 
 	static string type_to_name(int type);

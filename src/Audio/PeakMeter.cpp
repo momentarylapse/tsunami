@@ -58,6 +58,8 @@ PeakMeter::PeakMeter(Session *s) :
 	source = NULL;
 	mode = MODE_PEAKS;
 	out = new Output(this);
+	port_out.add(PortDescription(SignalType::AUDIO, out, "out"));
+	port_in.add(PortDescription(SignalType::AUDIO, NULL, "in"));
 	r.reset();
 	l.reset();
 	ring_buffer = new RingBuffer(1<<18);

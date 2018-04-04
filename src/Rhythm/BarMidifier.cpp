@@ -10,6 +10,12 @@
 #include "../Midi/MidiData.h"
 #include "../Module/Port/BeatPort.h"
 
+BeatMidifier::BeatMidifier()
+{
+	module_type = Type::BEAT_MIDIFIER;
+	port_in.add(PortDescription(SignalType::TIME, NULL, "in"));
+}
+
 int BeatMidifier::read(MidiEventBuffer &midi)
 {
 	if (!beat_source)

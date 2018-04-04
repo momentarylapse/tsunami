@@ -13,6 +13,7 @@
 
 class Painter;
 class SignalChain;
+class Module;
 namespace hui{
 	class Menu;
 }
@@ -56,7 +57,7 @@ public:
 	{
 		Selection();
 		int type;
-		void *module;
+		Module *module;
 		int port, port_type;
 		float dx, dy;
 		enum{
@@ -64,7 +65,7 @@ public:
 			TYPE_PORT_IN,
 			TYPE_PORT_OUT,
 		};
-		void *target_module;
+		Module *target_module;
 		int target_port;
 	};
 	Selection getHover(float mx, float my);

@@ -175,6 +175,7 @@ Module::Module(Session *_session, int type)
 	usable = true;
 	plugin = NULL;
 	enabled = true;
+	module_x = module_y = 0;
 }
 
 Module::~Module()

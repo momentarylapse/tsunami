@@ -23,11 +23,7 @@
 
 void apply_sel(SignalEditor *e)
 {
-	SignalChain::_Module *m = (SignalChain::_Module*)e->sel.module;
-	Module *c = NULL;
-	if (m)
-		c = m->configurable();
-	e->session->win->side_bar->module_console->setModule(c);
+	e->session->win->side_bar->module_console->setModule(e->sel.module);
 
 }
 
@@ -89,9 +85,9 @@ void SignalEditor::onLeftButtonDown()
 	sel = hover;
 	apply_sel(this);
 	if (sel.type == sel.TYPE_PORT_IN){
-		chain->disconnect_target((SignalChain::_Module*)sel.module, sel.port);
+		chain->disconnect_target(sel.module, sel.port);
 	}else if (sel.type == sel.TYPE_PORT_OUT){
-		chain->disconnect_source((SignalChain::_Module*)sel.module, sel.port);
+		chain->disconnect_source(sel.module, sel.port);
 	}
 	redraw("area");
 }
@@ -101,11 +97,11 @@ void SignalEditor::onLeftButtonUp()
 	if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 		if (hover.target_module){
 			if (sel.type == sel.TYPE_PORT_IN){
-				chain->disconnect_source((SignalChain::_Module*)hover.target_module, hover.target_port);
-				chain->connect((SignalChain::_Module*)hover.target_module, hover.target_port, (SignalChain::_Module*)sel.module, sel.port);
+				chain->disconnect_source(hover.target_module, hover.target_port);
+				chain->connect(hover.target_module, hover.target_port, sel.module, sel.port);
 			}else if (sel.type == sel.TYPE_PORT_OUT){
-				chain->disconnect_target((SignalChain::_Module*)hover.target_module, hover.target_port);
-				chain->connect((SignalChain::_Module*)sel.module, sel.port, (SignalChain::_Module*)hover.target_module, hover.target_port);
+				chain->disconnect_target(hover.target_module, hover.target_port);
+				chain->connect(sel.module, sel.port, hover.target_module, hover.target_port);
 			}
 		}
 		sel = Selection();
@@ -120,9 +116,9 @@ void SignalEditor::onMouseMove()
 	float my = hui::GetEvent()->my;
 	if (hui::GetEvent()->lbut){
 		if (sel.type == sel.TYPE_MODULE){
-			auto *m = (SignalChain::_Module*)sel.module;
-			m->x = mx + sel.dx;
-			m->y = my + sel.dy;
+			auto *m = sel.module;
+			m->module_x = mx + sel.dx;
+			m->module_y = my + sel.dy;
 		}else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 			hover.target_module = NULL;
 			auto h = getHover(mx, my);
@@ -146,29 +142,29 @@ void SignalEditor::onMouseMove()
 const float MODULE_WIDTH = 160;
 const float MODULE_HEIGHT = 25;
 
-static rect module_rect(SignalChain::_Module *m)
+static rect module_rect(Module *m)
 {
-	return rect(m->x, m->x + MODULE_WIDTH, m->y, m->y + MODULE_HEIGHT);
+	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
 }
 
-static float module_port_in_x(SignalChain::_Module *m)
+static float module_port_in_x(Module *m)
 {
-	return m->x - 5;
+	return m->module_x - 5;
 }
 
-static float module_port_in_y(SignalChain::_Module *m, int index)
+static float module_port_in_y(Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->configurable()->port_in.num-1)/2)*20;
+	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
 }
 
-static float module_port_out_x(SignalChain::_Module *m)
+static float module_port_out_x(Module *m)
 {
-	return m->x + MODULE_WIDTH + 5;
+	return m->module_x + MODULE_WIDTH + 5;
 }
 
-static float module_port_out_y(SignalChain::_Module *m, int index)
+static float module_port_out_y(Module *m, int index)
 {
-	return m->y + MODULE_HEIGHT/2 + (index - (float)(m->configurable()->port_out.num-1)/2)*20;
+	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
 static color signal_color(int type)
@@ -202,7 +198,7 @@ void SignalEditor::onKeyDown()
 	int key = hui::GetEvent()->key_code;
 	if (key == hui::KEY_DELETE){
 		if (sel.type == sel.TYPE_MODULE){
-			chain->remove((SignalChain::_Module*)sel.module);
+			chain->remove(sel.module);
 			hover = sel = Selection();
 		}
 	}
@@ -214,8 +210,8 @@ void SignalEditor::onAddAudioSource()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addAudioSource(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -226,8 +222,8 @@ void SignalEditor::onAddAudioEffect()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addAudioEffect(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -235,15 +231,15 @@ void SignalEditor::onAddAudioEffect()
 void SignalEditor::onAddAudioJoiner()
 {
 	auto *m = chain->addAudioJoiner();
-	m->x = sel.dx;
-	m->y = sel.dy;
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
 }
 
 void SignalEditor::onAddAudioInputStream()
 {
 	auto *m = chain->addAudioInputStream();
-	m->x = sel.dx;
-	m->y = sel.dy;
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
 }
 
 void SignalEditor::onAddMidiSource()
@@ -252,8 +248,8 @@ void SignalEditor::onAddMidiSource()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addMidiSource(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -264,8 +260,8 @@ void SignalEditor::onAddMidiEffect()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addMidiEffect(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -276,8 +272,8 @@ void SignalEditor::onAddSynthesizer()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addSynthesizer(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -285,15 +281,15 @@ void SignalEditor::onAddSynthesizer()
 void SignalEditor::onAddMidiInputStream()
 {
 	auto *m = chain->addMidiInputStream();
-	m->x = sel.dx;
-	m->y = sel.dy;
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
 }
 
 void SignalEditor::onAddPitchDetector()
 {
 	auto *m = chain->addPitchDetector();
-	m->x = sel.dx;
-	m->y = sel.dy;
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
 }
 
 void SignalEditor::onAddBeatSource()
@@ -302,8 +298,8 @@ void SignalEditor::onAddBeatSource()
 	dlg->run();
 	if (dlg->_return.num > 0){
 		auto *m = chain->addBeatSource(dlg->_return);
-		m->x = sel.dx;
-		m->y = sel.dy;
+		m->module_x = sel.dx;
+		m->module_y = sel.dy;
 	}
 	delete(dlg);
 }
@@ -311,14 +307,14 @@ void SignalEditor::onAddBeatSource()
 void SignalEditor::onAddBeatMidifier()
 {
 	auto *m = chain->addBeatMidifier();
-	m->x = sel.dx;
-	m->y = sel.dy;
+	m->module_x = sel.dx;
+	m->module_y = sel.dy;
 }
 
 void SignalEditor::onModuleDelete()
 {
 	if (sel.type == sel.TYPE_MODULE){
-		chain->remove((SignalChain::_Module*)sel.module);
+		chain->remove(sel.module);
 		hover = sel = Selection();
 		apply_sel(this);
 	}
@@ -357,31 +353,31 @@ SignalEditor::Selection SignalEditor::getHover(float mx, float my)
 		if (r.inside(mx, my)){
 			s.type = Selection::TYPE_MODULE;
 			s.module = m;
-			s.dx = m->x - mx;
-			s.dy = m->y - my;
+			s.dx = m->module_x - mx;
+			s.dy = m->module_y - my;
 			return s;
 		}
-		for (int i=0; i<m->configurable()->port_in.num; i++){
+		for (int i=0; i<m->port_in.num; i++){
 			float y = module_port_in_y(m, i);
 			float x = module_port_in_x(m);
 			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_IN;
 				s.module = m;
 				s.port = i;
-				s.port_type = m->configurable()->port_in[i].type;
+				s.port_type = m->port_in[i].type;
 				s.dx = x;
 				s.dy = y;
 				return s;
 			}
 		}
-		for (int i=0; i<m->configurable()->port_out.num; i++){
+		for (int i=0; i<m->port_out.num; i++){
 			float y = module_port_out_y(m, i);
 			float x = module_port_out_x(m);
 			if (abs(x - mx) < 10 and abs(y - my) < 10){
 				s.type = Selection::TYPE_PORT_OUT;
 				s.module = m;
 				s.port = i;
-				s.port_type = m->configurable()->port_out[i].type;
+				s.port_type = m->port_out[i].type;
 				s.dx = x;
 				s.dy = y;
 				return s;
@@ -430,18 +426,19 @@ void SignalEditor::onDraw(Painter* p)
 		}else{
 			p->setColor(view->colors.text_soft1);
 		}
-		float ww = p->getStrWidth(m->type());
-		p->drawStr(m->x + MODULE_WIDTH/2 - ww/2, m->y + 4, m->type());
+		string type = m->type_to_name(m->module_type);
+		float ww = p->getStrWidth(type);
+		p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
 		p->setFont("", 12, false, false);
 
-		foreachi(auto &pd, m->configurable()->port_in, i){
+		foreachi(auto &pd, m->port_in, i){
 			p->setColor(signal_color(pd.type));
 			float r = 4;
 			if (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i)
 				r = 8;
 			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
-		foreachi(auto &pd, m->configurable()->port_out, i){
+		foreachi(auto &pd, m->port_out, i){
 			p->setColor(signal_color(pd.type));
 			float r = 4;
 			if (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i)
@@ -457,7 +454,7 @@ void SignalEditor::onDraw(Painter* p)
 		p->setColor(White);
 		if (hover.target_module){
 			p->setLineWidth(5);
-			SignalChain::_Module *t = (SignalChain::_Module*)hover.target_module;
+			Module *t = hover.target_module;
 			if (hover.type == hover.TYPE_PORT_IN)
 				p->drawLine(sel.dx, sel.dy, module_port_out_x(t), module_port_out_y(t, hover.target_port));
 			else

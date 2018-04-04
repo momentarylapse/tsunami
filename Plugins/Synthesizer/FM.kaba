@@ -82,20 +82,6 @@ class FMConfig extends PluginData
 		reset()
 	void __assign__(FMConfig o)
 
-class FMState extends PluginData
-	PitchState[MAX_PITCH] pitch
-	override void reset()
-		for p in pitch
-			p.num_osc_active = 0
-			for o in p.osc
-				o.volume = 0
-				o.input = 0
-				o.output = 0
-				o.phi = 0
-				o.env.reset()
-	override void __init__()
-		reset()
-
 class FMPanel extends ConfigPanel
 	FMConfig *fc
 	int chosen
@@ -199,13 +185,26 @@ class FMPanel extends ConfigPanel
 
 class FMSynthesizer extends Synthesizer
 	FMConfig config
-	FMState state
+	
+	
+	PitchState[MAX_PITCH] spitch
+	override void reset_state()
+		for p in spitch
+			p.num_osc_active = 0
+			for o in p.osc
+				o.volume = 0
+				o.input = 0
+				o.output = 0
+				o.phi = 0
+				o.env.reset()
+	override void __init__()
+		reset_state()
 
 	override ConfigPanel *create_panel()
 		return new FMPanel(self)
 	
 	override void on_config()
-		for p in state.pitch
+		for p in spitch
 			for o,i in p.osc
 				OscillatorConfig *c = &config.osc[i]
 				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
@@ -219,7 +218,7 @@ class FMSynthesizer extends Synthesizer
 			for e in events
 				if e.pos == i
 					int pp = e.pitch + 0.4
-					PitchState *s = &state.pitch[pp]
+					PitchState *s = &spitch[pp]
 					if e.volume == 0
 						for o,oi in s.osc
 							o.env.end()
@@ -233,7 +232,7 @@ class FMSynthesizer extends Synthesizer
 			int[] del_me
 			del_me.clear()
 			for p in active_pitch
-				PitchState *s = &state.pitch[p]
+				PitchState *s = &spitch[p]
 				for o,oi in s.osc
 					o.volume = o.env.get()
 					if o.env.just_killed

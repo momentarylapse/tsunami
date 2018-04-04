@@ -133,6 +133,12 @@ private:
 
 	void on_played_end_of_stream();
 	void on_read_end_of_stream();
+
+
+public:
+	virtual void module_start(){ play(); }
+	virtual void module_stop(){ stop(); }
+	virtual void module_pause(bool paused){ pause(paused); }
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

@@ -141,6 +141,10 @@ private:
 	                                             void *userData);
 #endif
 
+public:
+	virtual void module_start(){ start(); }
+	virtual void module_stop(){ stop(); }
+
 };
 
 #endif /* SRC_DEVICE_INPUTSTREAMAUDIO_H_ */

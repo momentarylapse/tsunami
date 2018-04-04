@@ -90,32 +90,32 @@ class ConfigPanel extends Panel
 	extern void notify()
 	void *c
 
-class AudioEffect
-	string name
-	Session* session
-	bool usable
-	AudioPort *out
-	extern void __init__()
-	extern virtual void __delete__()
-	extern virtual void process(AudioBuffer buf)
-	extern void reset_config()
-	extern virtual void reset_state()
-	extern virtual ConfigPanel *create_panel()
-	extern virtual void on_config()
 
-class MidiEffect
+class Module
 	string name
 	Session* session
 	bool usable
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void process(MidiNoteBuffer midi)
 	extern void reset_config()
 	extern virtual void reset_state()
 	extern virtual ConfigPanel *create_panel()
-	//extern virtual void updateDialog()
-	//extern void notify()
 	extern virtual void on_config()
+	extern virtual void module_start()
+	extern virtual void module_stop()
+	extern virtual void module_pause(bool paused)
+
+class AudioEffect extends Module
+	AudioPort *out
+	extern override void __init__()
+	extern override void __delete__()
+	extern virtual void process(AudioBuffer buf)
+
+class MidiEffect extends Module
+	MidiPort *out
+	extern override void __init__()
+	extern override void __delete__()
+	extern virtual void process(MidiNoteBuffer midi)
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
@@ -155,17 +155,12 @@ class AudioPort
 	extern virtual void reset()
 	extern virtual int get_pos(int delta)
 
-class AudioSource
-	Session* session
-	extern void __init__()
-	extern virtual void __delete__()
+class AudioSource extends Module
+	extern override void __init__()
+	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
 	extern virtual void reset()
 	extern virtual int get_pos(int delta)
-	extern virtual ConfigPanel* create_panel()
-	extern virtual void on_config()
-	extern void reset_config()
-	extern virtual void reset_state()
 	AudioPort *out
 
 class MidiPort
@@ -174,21 +169,14 @@ class MidiPort
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
 
-class MidiSource
-	Session* session
-	extern void __init__()
-	extern virtual void __delete__()
+class MidiSource extends Module
+	extern override void __init__()
+	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
-	extern virtual ConfigPanel* create_panel()
-	extern virtual void on_config()
-	extern void reset_config()
-	extern virtual void reset_state()
 	MidiPort *out
 
-class Synthesizer
-	string name
-	Session* session
+class Synthesizer extends Module
 	int sample_rate
 	int keep_notes
 	float[MAX_PITCH] freq
@@ -196,17 +184,13 @@ class Synthesizer
 	int[] active_pitch
 	MidiEventBuffer events
 	AudioPort* out
-	extern void __init__()
-	extern virtual void __delete__()
+	extern override void __init__()
+	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
-	extern virtual ConfigPanel *create_panel()
-	extern void reset_config()
-	extern virtual void reset_state()
 	extern void set_sample_rate(int sample_rate)
 	extern void set_source(MidiPort* source)
 //	extern void feed(MidiEventBuffer midi)
 	extern void enable_pitch(int pitch, bool enable)
-	extern virtual void on_config()
 
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
@@ -229,17 +213,11 @@ class BeatPort
 	extern virtual int read(Beat[] beats, int samples)
 	extern virtual void reset()
 
-class BeatSource
-	Session* session
-	extern void __init__()
-	extern virtual void __delete__()
+class BeatSource extends Module
+	extern override void __init__()
+	extern override void __delete__()
 	extern virtual int read(Beat[] beats, int samples)
 	extern virtual void reset()
-	extern virtual ConfigPanel* create_panel()
-	extern virtual void on_config()
-	extern virtual void reset_config()
-	extern virtual void reset_state()
-	extern virtual void notify()
 	BeatPort *out
 
 class TrackRenderBuffer

@@ -112,6 +112,23 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 
 
+	Module module(Session::GLOBAL, -1);
+	Kaba::DeclareClassSize("Module", sizeof(Module));
+	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, name));
+	Kaba::DeclareClassOffset("Module", "usable", _offsetof(Module, usable));
+	Kaba::DeclareClassOffset("Module", "session", _offsetof(Module, session));
+	Kaba::LinkExternal("Module." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Module::__init__));
+	Kaba::DeclareClassVirtualIndex("Module", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Module::__delete__), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "create_panel", Kaba::mf(&Module::create_panel), &module);
+	Kaba::LinkExternal("Module.reset_config", Kaba::mf(&Module::reset_config));
+	Kaba::DeclareClassVirtualIndex("Module", "reset_state", Kaba::mf(&Module::reset_state), &module);
+	Kaba::LinkExternal("Module.notify", Kaba::mf(&Module::notify));
+	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "module_pause", Kaba::mf(&Module::module_pause), &module);
+
+
 	ModuleConfiguration plugin_data;
 	Kaba::DeclareClassSize("PluginData", sizeof(ModuleConfiguration));
 	Kaba::LinkExternal("PluginData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ModuleConfiguration::__init__));
@@ -129,50 +146,26 @@ void PluginManager::LinkAppScriptData()
 
 	AudioSource asource;
 	Kaba::DeclareClassSize("AudioSource", sizeof(AudioSource));
-	Kaba::DeclareClassOffset("AudioSource", "name", _offsetof(AudioSource, name));
-	Kaba::DeclareClassOffset("AudioSource", "usable", _offsetof(AudioSource, usable));
-	Kaba::DeclareClassOffset("AudioSource", "session", _offsetof(AudioSource, session));
 	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "get_pos", Kaba::mf(&AudioSource::get_pos), &asource);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "create_panel", Kaba::mf(&AudioSource::create_panel), &asource);
-	Kaba::LinkExternal("AudioSource.reset_config", Kaba::mf(&AudioSource::reset_config));
-	Kaba::DeclareClassVirtualIndex("AudioSource", "reset_state", Kaba::mf(&AudioSource::reset_state), &asource);
-	Kaba::LinkExternal("AudioSource.notify", Kaba::mf(&AudioSource::notify));
-	Kaba::DeclareClassVirtualIndex("AudioSource", "on_config", Kaba::mf(&AudioSource::on_config), &asource);
 
-	AudioEffect effect;
+	AudioEffect aeffect;
 	Kaba::DeclareClassSize("AudioEffect", sizeof(AudioEffect));
-	Kaba::DeclareClassOffset("AudioEffect", "name", _offsetof(AudioEffect, name));
-	Kaba::DeclareClassOffset("AudioEffect", "usable", _offsetof(AudioEffect, usable));
-	Kaba::DeclareClassOffset("AudioEffect", "session", _offsetof(AudioEffect, session));
 	Kaba::DeclareClassOffset("AudioEffect", "sample_rate", _offsetof(AudioEffect, sample_rate));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioEffect::__init__));
-	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioEffect::__delete__), &effect);
-	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&AudioEffect::process), &effect);
-	Kaba::DeclareClassVirtualIndex("AudioEffect", "create_panel", Kaba::mf(&AudioEffect::create_panel), &effect);
-	Kaba::LinkExternal("AudioEffect.reset_config", Kaba::mf(&AudioEffect::reset_config));
-	Kaba::DeclareClassVirtualIndex("AudioEffect", "reset_state", Kaba::mf(&AudioEffect::reset_state), &effect);
-	Kaba::LinkExternal("AudioEffect.notify", Kaba::mf(&AudioEffect::notify));
-	Kaba::DeclareClassVirtualIndex("AudioEffect", "on_config", Kaba::mf(&AudioEffect::on_config), &effect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioEffect::__delete__), &aeffect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&AudioEffect::process), &aeffect);
 
-	MidiEffect midieffect;
+	MidiEffect meffect;
 	Kaba::DeclareClassSize("MidiEffect", sizeof(MidiEffect));
-	Kaba::DeclareClassOffset("MidiEffect", "name", _offsetof(MidiEffect, name));
 	Kaba::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
 	Kaba::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
-	Kaba::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
-	Kaba::DeclareClassOffset("MidiEffect", "session", _offsetof(MidiEffect, session));
 	Kaba::LinkExternal("MidiEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEffect::__init__));
-	Kaba::DeclareClassVirtualIndex("MidiEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiEffect::__delete__), &midieffect);
-	Kaba::DeclareClassVirtualIndex("MidiEffect", "process", Kaba::mf(&MidiEffect::process), &midieffect);
-	Kaba::DeclareClassVirtualIndex("MidiEffect", "create_panel", Kaba::mf(&MidiEffect::create_panel), &midieffect);
-	Kaba::LinkExternal("MidiEffect.reset_config", Kaba::mf(&MidiEffect::reset_config));
-	Kaba::DeclareClassVirtualIndex("MidiEffect", "reset_state", Kaba::mf(&MidiEffect::reset_state), &midieffect);
-	Kaba::LinkExternal("MidiEffect.notify", Kaba::mf(&MidiEffect::notify));
-	Kaba::DeclareClassVirtualIndex("MidiEffect", "on_config", Kaba::mf(&MidiEffect::on_config), &midieffect);
+	Kaba::DeclareClassVirtualIndex("MidiEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiEffect::__delete__), &meffect);
+	Kaba::DeclareClassVirtualIndex("MidiEffect", "process", Kaba::mf(&MidiEffect::process), &meffect);
 	Kaba::LinkExternal("MidiEffect.note", Kaba::mf(&MidiEffect::note));
 	Kaba::LinkExternal("MidiEffect.skip", Kaba::mf(&MidiEffect::skip));
 	Kaba::LinkExternal("MidiEffect.note_x", Kaba::mf(&MidiEffect::note_x));
@@ -238,22 +231,13 @@ void PluginManager::LinkAppScriptData()
 	MidiSource msource;
 	Kaba::DeclareClassSize("MidiSource", sizeof(MidiSource));
 	Kaba::DeclareClassOffset("MidiSource", "out", _offsetof(MidiSource, out));
-	Kaba::DeclareClassOffset("MidiSource", "session", _offsetof(MidiSource, session));
 	Kaba::LinkExternal("MidiSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiSource::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "reset", Kaba::mf(&MidiSource::reset), &msource);
-	Kaba::DeclareClassVirtualIndex("MidiSource", "create_panel", Kaba::mf(&MidiSource::create_panel), &msource);
-	Kaba::LinkExternal("MidiSource.reset_config", Kaba::mf(&MidiSource::reset_config));
-	Kaba::LinkExternal("MidiSource.reset_state", Kaba::mf(&MidiSource::reset_state));
-	Kaba::DeclareClassVirtualIndex("MidiSource", "reset_state", Kaba::mf(&MidiSource::reset_state), &msource);
-	Kaba::LinkExternal("MidiSource.notify", Kaba::mf(&MidiSource::notify));
-	Kaba::DeclareClassVirtualIndex("MidiSource", "on_config", Kaba::mf(&MidiSource::on_config), &msource);
 
 	Synthesizer synth;
 	Kaba::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
-	Kaba::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
-	Kaba::DeclareClassOffset("Synthesizer", "session", _offsetof(Synthesizer, session));
 	Kaba::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
 	Kaba::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
 	Kaba::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
@@ -263,21 +247,10 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Synthesizer", "out", _offsetof(Synthesizer, out));
 	Kaba::LinkExternal("Synthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Synthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Synthesizer::__delete__), &synth);
-	Kaba::DeclareClassVirtualIndex("Synthesizer", "create_panel", Kaba::mf(&Synthesizer::create_panel), &synth);
-	Kaba::LinkExternal("Synthesizer.reset_config", Kaba::mf(&Synthesizer::reset_config));
-	Kaba::DeclareClassVirtualIndex("Synthesizer", "reset_state", Kaba::mf(&Synthesizer::reset_state), &synth);
 	Kaba::LinkExternal("Synthesizer.enable_pitch", Kaba::mf(&Synthesizer::enablePitch));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
-	Kaba::DeclareClassVirtualIndex("Synthesizer", "on_config", Kaba::mf(&Synthesizer::on_config), &synth);
 	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::setSampleRate));
-	Kaba::LinkExternal("Synthesizer.notify", Kaba::mf(&Synthesizer::notify));
 	Kaba::LinkExternal("Synthesizer.set_source", Kaba::mf(&Synthesizer::set_source));
-
-	Synthesizer::Output synth_out(NULL);
-	Kaba::DeclareClassSize("SynthOutput", sizeof(Synthesizer::Output));
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "read", Kaba::mf(&Synthesizer::Output::read), &synth_out);
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "reset", Kaba::mf(&Synthesizer::Output::reset), &synth_out);
-	Kaba::DeclareClassVirtualIndex("SynthOutput", "get_pos", Kaba::mf(&Synthesizer::Output::get_pos), &synth_out);
 
 
 	DummySynthesizer dsynth;
@@ -335,16 +308,10 @@ void PluginManager::LinkAppScriptData()
 	BeatSource bsource;
 	Kaba::DeclareClassSize("BeatSource", sizeof(BeatSource));
 	Kaba::DeclareClassOffset("BeatSource", "out", _offsetof(BeatSource, out));
-	Kaba::DeclareClassOffset("BeatSource", "session", _offsetof(BeatSource, session));
 	Kaba::LinkExternal("BeatSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatSource::__init__));
 	Kaba::DeclareClassVirtualIndex("BeatSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatSource::__delete__), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "read", Kaba::mf(&BeatSource::read), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "reset", Kaba::mf(&BeatSource::reset), &bsource);
-	Kaba::DeclareClassVirtualIndex("BeatSource", "create_panel", Kaba::mf(&BeatSource::create_panel), &bsource);
-	Kaba::LinkExternal("BeatSource.reset_config", Kaba::mf(&BeatSource::reset_config));
-	Kaba::DeclareClassVirtualIndex("BeatSource", "reset_state", Kaba::mf(&BeatSource::reset_state), &bsource);
-	Kaba::LinkExternal("BeatSource.notify", Kaba::mf(&BeatSource::notify));
-	Kaba::DeclareClassVirtualIndex("BeatSource", "on_config", Kaba::mf(&BeatSource::on_config), &bsource);
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, text));
@@ -711,7 +678,7 @@ Synthesizer *PluginManager::__LoadSynthesizer(Session *session, const string &na
 		return NULL;
 	}
 	for (auto *t : s->syntax->classes){
-		if (t->get_root()->name != "Synthesizer")
+		if (!t->is_derived_from("Synthesizer"))
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->create_instance();
 		synth->session = session;

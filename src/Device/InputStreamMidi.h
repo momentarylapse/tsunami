@@ -105,6 +105,10 @@ private:
 
 	bool running;
 	int hui_runner_id;
+
+public:
+	virtual void module_start(){ start(); }
+	virtual void module_stop(){ stop(); }
 };
 
 #endif /* INPUTSTREAMMIDI_H_ */

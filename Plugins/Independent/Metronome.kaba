@@ -30,8 +30,8 @@ Grid ? '' vertical
 		fraction_prev = 0
 		t_blink = 0
 	
-		setFloat("bpm", metro.source.bpm)
-		setInt("num_beats", metro.source.num_beats)
+		setFloat("bpm", metro.source.config.bpm)
+		setInt("num_beats", metro.source.config.beats)
 	
 		event("hui:close", &onClose)
 		event("close", &onClose)
@@ -113,18 +113,24 @@ class Metronome extends TsunamiPlugin
 	override void onStart()
 		synth = CreateSynthesizer(session, "")
 		source = new MetronomeSource
-		synth.set_source(source)
+		source.session = session
+		source.reset_config()
+		synth.set_source(source.out)
 		
 		dlg = new MetronomeDialog(self)
 		dlg.show()
-		source.win = dlg
 	
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(1024)
 		stream.play()
 		
+		stream.subscribe(self, &onUpdate, "Update")
+	
+	void onUpdate()
+		dlg.redraw("area")
+		
 	override void onStop()
-		source.win = nil
+		stream.unsubscribe(self)
 		delete dlg
 		delete stream
 		delete synth

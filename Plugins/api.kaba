@@ -105,6 +105,8 @@ class Module
 	extern virtual void module_start()
 	extern virtual void module_stop()
 	extern virtual void module_pause(bool paused)
+	extern void subscribe(void* handler, void* func, string message)
+	extern void unsubscribe(void* handler)
 
 class AudioEffect extends Module
 	AudioPort *out
@@ -400,9 +402,9 @@ class SongRenderer extends AudioSource
 	extern int seek()
 
 
-class OutputStream
+class OutputStream extends Module
 	extern void __init__(Session *session, AudioPort* source)
-	extern void __delete__()
+	extern override void __delete__()
 	extern void stop()
 	extern void play()
 	extern void pause(bool pause)
@@ -412,8 +414,6 @@ class OutputStream
 	extern void set_volume(float volume)
 	extern void set_buffer_size(int size)
 	extern bool is_paused()
-	extern void subscribe(void* handler, void* func, string message)
-	extern void unsubscribe(void* handler)
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer
@@ -434,20 +434,17 @@ class _MidiPort
 	int client, port
 	string client_name, port_name
 
-class InputStreamAudio
+class InputStreamAudio extends Module
 	RingBuffer current_buffer
 	AudioBuffer buffer
 	AudioPort* out
-	Session* session
 	extern void __init__(Session* session)
-	extern virtual void __delete__()
+	extern override void __delete__()
 	extern bool start()
 	extern void stop()
 	extern bool is_capturing()
 	extern int sample_rate()
 	extern void set_backup_mode(int mode)
-	extern void subscribe(void* handler, void* func, string message)
-	extern void unsubscribe(void* handler)
 
 class Storage
 	extern bool load(Song *s, string filename)

@@ -51,7 +51,7 @@ class PitchFork extends TsunamiPlugin
 	override void onStart()
 	
 		renderer = new ForkRenderer
-		stream = new OutputStream(session, renderer)
+		stream = new OutputStream(session, renderer.out)
 		
 		dlg = new PitchForkDialog(self)
 		dlg.show()

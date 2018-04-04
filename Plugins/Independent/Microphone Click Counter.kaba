@@ -2,7 +2,7 @@
 // Title[Deutsch] = Tonerkennung
 use "../api.kaba"
 use "../tone.kaba"
-use "../Midi/Source/Click.kaba"
+use "../MidiSource/Click.kaba"
 
 const float THRESHOLD1 = 0.20
 const float THRESHOLD2 = 0.15
@@ -83,7 +83,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	
 		source = new ClickSource
 		synth = CreateSynthesizer(session, "")
-		synth.out.set_source(source)
+		synth.set_source(source.out)
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(2048)
 		stream.play()
@@ -91,7 +91,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		dlg = new ClickCounterDialog(self)
 		dlg.show()
 		
-		input = new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)
+		input = new InputStreamAudio(session)
 		input.start()
 		input.subscribe(self, &onInput, "")
 		

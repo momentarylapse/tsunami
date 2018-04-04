@@ -127,6 +127,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_pause", Kaba::mf(&Module::module_pause), &module);
+	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
+	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 
 
 	ModuleConfiguration plugin_data;
@@ -404,7 +406,6 @@ void PluginManager::LinkAppScriptData()
 	{
 	InputStreamAudio input(Session::GLOBAL);
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
-	Kaba::DeclareClassOffset("InputStreamAudio", "session", _offsetof(InputStreamAudio, session));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
 	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(InputStreamAudio, out));
 	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
@@ -413,8 +414,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));
 	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&InputStreamAudio::stop));
 	Kaba::LinkExternal("InputStreamAudio.is_capturing", Kaba::mf(&InputStreamAudio::is_capturing));
-	Kaba::LinkExternal("InputStreamAudio.subscribe", Kaba::mf(&InputStreamAudio::subscribe_kaba));
-	Kaba::LinkExternal("InputStreamAudio.unsubscribe", Kaba::mf(&InputStreamAudio::unsubscribe));
 	Kaba::LinkExternal("InputStreamAudio.sample_rate", Kaba::mf(&InputStreamAudio::sample_rate));
 	Kaba::LinkExternal("InputStreamAudio.set_backup_mode", Kaba::mf(&InputStreamAudio::set_backup_mode));
 	}
@@ -435,8 +434,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
 	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
 //	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
-	Kaba::LinkExternal("OutputStream.subscribe", Kaba::mf(&OutputStream::subscribe_kaba));
-	Kaba::LinkExternal("OutputStream.unsubscribe", Kaba::mf(&OutputStream::unsubscribe));
 	}
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));

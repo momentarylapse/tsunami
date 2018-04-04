@@ -151,7 +151,6 @@ MidiEffect *CreateMidiEffect(Session *session, const string &name)
 	fx->plugin = p;
 	fx->usable = p->usable;
 	fx->session = session;
-	fx->song = session->song;
 	fx->reset_config();
 	return fx;
 }

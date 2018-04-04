@@ -72,7 +72,6 @@ MidiSource *CreateMidiSource(Session *session, const string &name)
 	s->name = name;
 	s->plugin = p;
 	s->usable = p->usable;
-	s->song = session->song;
 	s->session = session;
 	s->reset_config();
 	return s;

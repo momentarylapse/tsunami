@@ -30,6 +30,7 @@ class Metronome extends AudioEffect
 		delete synth
 
 	override void process(AudioBuffer buf)
+		float sample_rate = session.sample_rate()
 		synth.set_sample_rate(sample_rate)
 		source.sample_rate = sample_rate
 		source.volume = config.volume

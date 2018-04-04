@@ -335,6 +335,7 @@ SignalChain::_Module *SignalChain::add(SignalChain::_Module *m)
 	m->x = 50 + (i % 5) * 230;
 	m->y = 50 + (i % 2) * 30 + 150*(i / 5);
 
+	m->configurable()->reset_state();
 	modules.add(m);
 	return m;
 }
@@ -557,7 +558,9 @@ SignalChain::_Module* SignalChain::addMidiSource(const string &name)
 
 SignalChain::_Module* SignalChain::addAudioEffect(const string &name)
 {
-	return add(new ModuleAudioEffect(CreateAudioEffect(session, name)));
+	auto *mm = new ModuleAudioEffect(CreateAudioEffect(session, name));
+	mm->configurable()->reset_state();
+	return add(mm);
 }
 
 SignalChain::_Module* SignalChain::addAudioJoiner()
@@ -610,8 +613,15 @@ SignalChain::_Module* SignalChain::addBeatSource(const string &name)
 	return add(new ModuleBeatSource(CreateBeatSource(session, name)));
 }
 
+void SignalChain::reset_state()
+{
+	for (auto *m: modules)
+		m->configurable()->reset_state();
+}
+
 void SignalChain::start()
 {
+	reset_state();
 	for (auto *m: modules)
 		m->start();
 }

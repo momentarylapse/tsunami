@@ -87,6 +87,8 @@ public:
 	void disconnect_target(_Module *target, int target_port);
 	void disconnect(Cable *c);
 
+	void reset_state();
+
 	void start();
 	void pause(bool paused);
 	void stop();

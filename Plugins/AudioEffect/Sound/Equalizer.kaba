@@ -33,6 +33,7 @@ class Equalizer extends AudioEffect
 	Config config
 
 	void equalize(float[] b)
+		float sample_rate = session.sample_rate()
 		complex[] f
 	
 	

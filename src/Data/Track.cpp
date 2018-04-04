@@ -69,8 +69,6 @@ Track::Track(int _type, Synthesizer *_synth)
 	muted = false;
 
 	synth = _synth;
-	if (synth)
-		synth->song = song;
 }
 
 //tsunami->plugin_manager->CreateSynthesizer("Dummy", song)

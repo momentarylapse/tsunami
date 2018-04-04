@@ -65,7 +65,6 @@ public:
 	int module_type;
 	string name;
 	Session *session;
-	Song *song;
 
 
 	Plugin *plugin;

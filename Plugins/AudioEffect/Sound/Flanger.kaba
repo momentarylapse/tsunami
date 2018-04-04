@@ -31,6 +31,7 @@ class Flanger extends AudioEffect
 
 	void doFlanger(float[] b, float[] temp)
 		int p = offset % temp.num
+		float sample_rate = session.sample_rate()
 	
 		float f_a = (1 - 0.5 * config.depth) * config.delay
 		float f_b = 0.5 * config.depth * config.delay
@@ -57,7 +58,7 @@ class Flanger extends AudioEffect
 
 	
 	override void process(AudioBuffer buf)
-		int delay_samples = sample_rate * config.delay + 1
+		int delay_samples = session.sample_rate() * config.delay + 1
 		temp_r.resize(delay_samples)
 		temp_l.resize(delay_samples)
 	

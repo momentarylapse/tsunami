@@ -71,7 +71,7 @@ class PitchRecognizer
 	
 	
 	void __init__(Session* session)
-		input = new InputStreamAudio(session, DEFAULT_SAMPLE_RATE)
+		input = new InputStreamAudio(session)
 		input.start()
 		input.subscribe(self, &updateInput, "")
 		

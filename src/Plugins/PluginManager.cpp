@@ -715,7 +715,6 @@ Synthesizer *PluginManager::__LoadSynthesizer(Session *session, const string &na
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->create_instance();
 		synth->session = session;
-		synth->song = session->song;
 		synth->setSampleRate(session->song->sample_rate);
 		return synth;
 	}
@@ -732,14 +731,12 @@ Synthesizer *PluginManager::CreateSynthesizer(Session *session, const string &na
 	if (s){
 		s->name = name;
 		s->session = session;
-		s->song = session->song;
 		s->reset_config();
 		return s;
 	}
 	session->e(_("unknown synthesizer: ") + name);
 	s = new DummySynthesizer;
 	s->session = session;
-	s->song = session->song;
 	s->name = name;
 	return s;
 }

@@ -172,7 +172,6 @@ Module::Module(Session *_session, int type)
 {
 	module_type = type;
 	session = _session;
-	song = NULL;
 	usable = true;
 	plugin = NULL;
 	enabled = true;
@@ -198,7 +197,7 @@ ModuleConfiguration *Module::get_config() const
 	if (!c)
 		return NULL;
 	for (auto &e: c->elements)
-		if ((e.name == "config") and (e.type->get_root()->name == "ModuleConfiguration")){
+		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
 			ModuleConfiguration *config = (ModuleConfiguration*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
@@ -409,7 +408,6 @@ Module *Module::copy() const
 
 	clone->module_type = module_type;
 	clone->session = session;
-	clone->song = song;
 	clone->config_from_string(config_to_string());
 
 	return clone;

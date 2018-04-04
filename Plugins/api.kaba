@@ -94,8 +94,6 @@ class AudioEffect
 	string name
 	Session* session
 	bool usable
-	Song *song
-	int sample_rate
 	AudioPort *out
 	extern void __init__()
 	extern virtual void __delete__()
@@ -109,7 +107,6 @@ class MidiEffect
 	string name
 	Session* session
 	bool usable
-	Song *song
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)

@@ -97,8 +97,8 @@ AudioEffect *CreateAudioEffect(Session *session, const string &name)
 	fx->name = name;
 	fx->plugin = p;
 	fx->usable = p->usable;
-	fx->song = session->song;
 	fx->session = session;
 	fx->reset_config();
+	fx->reset_state();
 	return fx;
 }

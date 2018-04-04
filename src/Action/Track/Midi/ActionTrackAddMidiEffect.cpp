@@ -13,7 +13,6 @@ ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, MidiEffect *_effect
 {
 	track_no = get_track_index(t);
 	effect = _effect;
-	effect->song = t->song;
 }
 
 void *ActionTrackAddMidiEffect::execute(Data *d)

@@ -14,7 +14,6 @@ ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_syn
 {
 	track_no = get_track_index(t);
 	synth = _synth;
-	synth->song = t->song;
 }
 
 void ActionTrackSetSynthesizer::undo(Data *d)

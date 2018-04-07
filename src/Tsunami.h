@@ -36,7 +36,7 @@ public:
 	virtual bool onStartup(const Array<string> &arg);
 	virtual void onEnd();
 
-	bool handleCLIArguments(const Array<string> &arg);
+	bool handleArguments(Array<string> &arg);
 	void loadKeyCodes();
 
 	Session* createSession();

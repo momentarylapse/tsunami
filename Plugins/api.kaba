@@ -126,10 +126,12 @@ class MidiEffect extends Module
 
 class AudioVisualizer extends Module
 	AudioPort *out
+	int chunk_size
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
 	extern virtual void reset()
+	extern void set_chunk_size(int chunk_size)
 
 class AudioBuffer
 	int offset, length

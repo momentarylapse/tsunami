@@ -177,10 +177,12 @@ void PluginManager::LinkAppScriptData()
 
 	AudioVisualizer avis;
 	Kaba::DeclareClassSize("AudioVisualizer", sizeof(AudioVisualizer));
+	Kaba::DeclareClassOffset("AudioVisualizer", "chunk_size", _offsetof(AudioVisualizer, chunk_size));
 	Kaba::LinkExternal("AudioVisualizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioVisualizer::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioVisualizer::__delete__), &avis);
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "process", Kaba::mf(&AudioVisualizer::process), &avis);
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "reset", Kaba::mf(&AudioVisualizer::reset), &avis);
+	Kaba::LinkExternal("AudioVisualizer.set_chunk_size", Kaba::mf(&AudioVisualizer::set_chunk_size));
 
 	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
 	Kaba::DeclareClassOffset("AudioBuffer", "offset", _offsetof(AudioBuffer, offset));

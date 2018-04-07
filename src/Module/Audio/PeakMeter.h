@@ -16,6 +16,17 @@ class AudioBuffer;
 class RingBuffer;
 class Session;
 
+
+struct PeakMeterData{
+	float peak;
+	float super_peak, super_peak_t;
+	Array<float> spec;
+
+	void reset();
+	void update(Array<float> &buf, float dt);
+	float get_sp();
+};
+
 class PeakMeter : public AudioVisualizer
 {
 	friend class PeakMeterDisplay;
@@ -45,16 +56,7 @@ public:
 		MODE_SPECTRUM
 	};
 
-	struct Data{
-		float peak;
-		float super_peak, super_peak_t;
-		Array<float> spec;
-
-		void reset();
-		void update(Array<float> &buf, float dt);
-		float get_sp();
-	};
-	Data r, l;
+	PeakMeterData r, l;
 
 	RingBuffer *ring_buffer;
 

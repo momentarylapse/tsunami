@@ -12,6 +12,7 @@
 
 class AudioView;
 class PeakMeter;
+class PeakMeterData;
 namespace hui{
 	class Panel;
 }
@@ -31,6 +32,8 @@ public:
 	void enable(bool enabled);
 
 private:
+
+	PeakMeterData *r, *l;
 
 	hui::Panel *panel;
 	AudioView *view;

@@ -20,20 +20,20 @@ const float PeakMeter::FREQ_MIN = 40.0f;
 const float PeakMeter::FREQ_MAX = 4000.0f;
 const float PeakMeter::UPDATE_DT = 0.05f;
 
-void PeakMeter::Data::reset()
+void PeakMeterData::reset()
 {
 	peak = 0;
 	super_peak = super_peak_t = 0;
 	spec.clear();
-	spec.resize(SPECTRUM_SIZE);
+	spec.resize(PeakMeter::SPECTRUM_SIZE);
 }
 
-float PeakMeter::Data::get_sp()
+float PeakMeterData::get_sp()
 {
 	return max(super_peak * (1 - (float)pow(super_peak_t, 3)*0.2f), 0.0001f);
 }
 
-void PeakMeter::Data::update(Array<float> &buf, float dt)
+void PeakMeterData::update(Array<float> &buf, float dt)
 {
 	peak = 0;
 	for (int i=0; i<buf.num; i++){

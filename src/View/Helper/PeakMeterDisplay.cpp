@@ -21,6 +21,8 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	source = NULL;
 	view = _view;
 	enabled = false;
+	r = new PeakMeterData;
+	l = new PeakMeterData;
 
 	panel->eventXP(id, "hui:draw", std::bind(&PeakMeterDisplay::onDraw, this, std::placeholders::_1));
 	panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeterDisplay::onLeftButtonDown, this));
@@ -32,6 +34,8 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 PeakMeterDisplay::~PeakMeterDisplay()
 {
 	setSource(NULL);
+	delete r;
+	delete l;
 }
 
 void PeakMeterDisplay::setSource(PeakMeter *_source)
@@ -75,7 +79,7 @@ inline float nice_peak(float p)
 	return min((float)pow(p, 0.8f), 1.0f);
 }
 
-void drawPeak(Painter *c, const rect &r, PeakMeter::Data &d, AudioView *view)
+void drawPeak(Painter *c, const rect &r, PeakMeterData &d, AudioView *view)
 {
 	int w = r.width();
 	int h = r.height();
@@ -105,8 +109,8 @@ void PeakMeterDisplay::onDraw(Painter *c)
 	int h = c->height;
 	if (source->mode == PeakMeter::MODE_PEAKS){
 
-		drawPeak(c, rect(2, w-2, 2, h/2-1), source->r, view);
-		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), source->l, view);
+		drawPeak(c, rect(2, w-2, 2, h/2-1), *r, view);
+		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l, view);
 	}else{
 		c->setColor(view->colors.background);
 		c->drawRect(2, 2, w - 4, h - 4);
@@ -114,7 +118,7 @@ void PeakMeterDisplay::onDraw(Painter *c)
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
 		for (int i=0;i<100;i++){
 			float x0 = 2 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
-			float hh = (h - 4) * source->r.spec[i];
+			float hh = (h - 4) * r->spec[i];
 			c->drawRect(x0, h - 2 - hh, dx, hh);
 		}
 	}
@@ -132,5 +136,9 @@ void PeakMeterDisplay::onRightButtonDown()
 
 void PeakMeterDisplay::onUpdate()
 {
+	if (source){
+		*r = source->r;
+		*l = source->l;
+	}
 	panel->redraw(id);
 }

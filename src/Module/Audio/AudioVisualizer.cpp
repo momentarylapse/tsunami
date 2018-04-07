@@ -9,6 +9,8 @@
 #include "../../Session.h"
 #include "../../Plugins/Plugin.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Data/Audio/AudioBuffer.h"
+#include "../../Data/Audio/RingBuffer.h"
 #include "PeakMeter.h"
 
 AudioVisualizer::Output::Output(AudioVisualizer *v)
@@ -24,7 +26,13 @@ int AudioVisualizer::Output::read(AudioBuffer& buf)
 	if (r <= 0)
 		return r;
 
-	visualizer->process(buf);
+	visualizer->buffer->write(buf);
+
+	while (visualizer->buffer->available() >= visualizer->chunk_size){
+		AudioBuffer b;
+		visualizer->buffer->readRef(b, visualizer->chunk_size);
+		visualizer->process(b);
+	}
 	return r;
 }
 
@@ -49,11 +57,14 @@ AudioVisualizer::AudioVisualizer() :
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = NULL;
+	buffer = new RingBuffer(1 << 18);
+	chunk_size = 2084;
 }
 
 AudioVisualizer::~AudioVisualizer()
 {
 	delete out;
+	delete buffer;
 }
 
 void AudioVisualizer::__init__()
@@ -69,6 +80,11 @@ void AudioVisualizer::__delete__()
 void AudioVisualizer::set_source(AudioPort *s)
 {
 	source = s;
+}
+
+void AudioVisualizer::set_chunk_size(int _chunk_size)
+{
+	chunk_size = _chunk_size;
 }
 
 // TODO: move to PluginManager?

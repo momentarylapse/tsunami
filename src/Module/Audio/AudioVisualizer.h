@@ -39,6 +39,10 @@ public:
 	};
 	Output *out;
 
+	RingBuffer *buffer;
+	int chunk_size;
+	void set_chunk_size(int chunk_size);
+
 	virtual _cdecl void process(AudioBuffer &buf){}
 	virtual _cdecl void reset(){}
 };

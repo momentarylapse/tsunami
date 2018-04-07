@@ -14,11 +14,9 @@
 #include "../../lib/hui/hui.h"
 
 
-const int PeakMeter::NUM_SAMPLES = 1024;
 const int PeakMeter::SPECTRUM_SIZE = 30;
 const float PeakMeter::FREQ_MIN = 40.0f;
 const float PeakMeter::FREQ_MAX = 4000.0f;
-const float PeakMeter::UPDATE_DT = 0.05f;
 
 void PeakMeterData::reset()
 {
@@ -55,12 +53,10 @@ PeakMeter::PeakMeter(Session *s)
 	mode = MODE_PEAKS;
 	r.reset();
 	l.reset();
-	ring_buffer = new RingBuffer(1<<18);
 }
 
 PeakMeter::~PeakMeter()
 {
-	delete ring_buffer;
 }
 
 inline float nice_peak(float p)
@@ -114,7 +110,7 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 	}
 }
 
-void PeakMeter::update(AudioBuffer &buf)
+void PeakMeter::process(AudioBuffer& buf)
 {
 	if (mode == MODE_PEAKS)
 		find_peaks(buf);
@@ -122,20 +118,6 @@ void PeakMeter::update(AudioBuffer &buf)
 		find_spectrum(buf);
 	notify();
 	clear_data();
-}
-
-void PeakMeter::process(AudioBuffer& buf)
-{
-	AudioBuffer b;
-	b.set_as_ref(buf, 0, buf.length);
-	ring_buffer->write(b);
-
-	if (ring_buffer->available() > NUM_SAMPLES){
-		AudioBuffer b2;
-		b2.resize(ring_buffer->available());
-		ring_buffer->read(b2);
-		update(b2);
-	}
 }
 
 void PeakMeter::reset()

@@ -220,7 +220,7 @@ void SignalChain::load(const string& filename)
 				m = addAudioVisualizer(sub_type);
 			else if (type == "PitchDetector")
 				m = addPitchDetector();
-			else if (type == "AudioInputStream")
+			else if (type == "AudioInputStream" or type == "InputStreamAudio")
 				m = addAudioInputStream();
 			else if (type == "OutputStream")
 				m = addAudioOutputStream();
@@ -230,7 +230,7 @@ void SignalChain::load(const string& filename)
 				m = addMidiEffect(sub_type);
 			else if (type == "Synthesizer")
 				m = addSynthesizer(sub_type);
-			else if (type == "MidiInputStream")
+			else if (type == "MidiInputStream" or type == "InputStreamMidi")
 				m = addMidiInputStream();
 			//else if (type == "AudioSucker")
 			//	m = addAudioSucker();

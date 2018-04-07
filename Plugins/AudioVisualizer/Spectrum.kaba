@@ -1,0 +1,60 @@
+// Image = hui:media-play
+// Title[Deutsch] = Oszilloskop
+use "../api.kaba"
+
+const int NUM_SAMPLES = 2048
+
+class SpectrumPanel extends ConfigPanel
+	Spectrum* sp
+	
+	override void __init__(Spectrum *_sp)
+		super.__init__(_sp)
+		fromSource("
+DrawingArea area '' height=300")
+		
+		sp = _sp
+		sp.panel = self
+	
+		eventX("area", "hui:draw", &onDraw)
+	
+	override void __delete__()
+		sp.panel = nil
+	
+	void onDraw(Painter *p)
+		float w = p.width
+		float h = p.height
+		
+		p.setColor(colors.background)
+		p.drawRect(0, 0, w, h)
+		
+		AudioBuffer *buf = &sp.buffer
+		
+		complex[] z
+		fft_r2c(buf.r, z)
+		
+		p.setColor(color(0.2,0,1,0))
+		//p.setLineWidth(0.5)
+		for i in 0:z.num
+			float x = i
+			float y = h - z[i].abs() * h / 10
+			p.drawCircle(x, y, 2)
+
+class Spectrum extends AudioVisualizer
+	int n
+	AudioBuffer buffer
+	SpectrumPanel *panel
+	
+	override void __init__()
+		panel = nil
+	
+	override void reset_state()
+		n = 0
+	
+	override void process(AudioBuffer buf)
+		buffer = buf
+		if panel
+			panel.redraw("area")
+		
+	override ConfigPanel* create_panel()
+		return new SpectrumPanel(self)
+

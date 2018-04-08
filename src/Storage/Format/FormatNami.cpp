@@ -120,7 +120,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->write_str(me->name);
+		f->write_str(me->module_subtype);
 		f->write_bool(false);
 		f->write_int(0);
 		f->write_int(0);
@@ -149,7 +149,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->write_str(me->name);
+		f->write_str(me->module_subtype);
 		f->write_bool(false);
 		f->write_int(0);
 		f->write_int(0);
@@ -562,10 +562,10 @@ public:
 #if 0
 void ReadChunkSub(ChunkStack *s, Track *t)
 {
-	string name = s->f->read_str();
+	string module_subtype = s->f->read_str();
 	int pos = s->f->read_int();
 	int length = s->f->read_int();
-	SampleRef *r = __AddEmptySubTrack(t, Range(pos, length), name);
+	SampleRef *r = __AddEmptySubTrack(t, Range(pos, length), module_subtype);
 	r->volume = s->f->read_float();
 	r->muted = s->f->read_bool();
 	r->rep_num = s->f->read_int();
@@ -641,7 +641,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->write_str(me->name);
+		f->write_str(me->module_subtype);
 		f->write_bool(me->only_on_selection);
 		f->write_int(me->range.offset);
 		f->write_int(me->range.length);
@@ -889,7 +889,7 @@ public:
 	virtual void read(File *f)
 	{
 		Session *session = cur_op(this)->session;
-		me = session->plugin_manager->CreateSynthesizer(session, f->read_str());
+		me = CreateSynthesizer(session, f->read_str());
 		me->config_from_string(f->read_str());
 		f->read_str();
 		f->read_int();
@@ -899,7 +899,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		f->write_str(me->name);
+		f->write_str(me->module_subtype);
 		f->write_str(me->config_to_string());
 		f->write_str("");
 		f->write_int(0); // reserved

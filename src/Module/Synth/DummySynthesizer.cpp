@@ -22,7 +22,7 @@ void DummySynthesizer::reset_state()
 
 DummySynthesizer::DummySynthesizer()
 {
-	name = "Dummy";
+	module_subtype = "Dummy";
 	reset_state();
 	on_config();
 }

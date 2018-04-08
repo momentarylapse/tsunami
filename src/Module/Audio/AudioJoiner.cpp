@@ -9,7 +9,7 @@
 #include "../../Data/Audio/AudioBuffer.h"
 
 AudioJoiner::AudioJoiner(Session *session) :
-	Module(session, Type::AUDIO_JOINER)
+	Module(Type::AUDIO_JOINER)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));

@@ -6,6 +6,7 @@
  */
 
 #include "SignalChain.h"
+#include "ModuleFactory.h"
 #include "Synth/Synthesizer.h"
 #include "Audio/SongRenderer.h"
 #include "Audio/AudioSource.h"
@@ -172,7 +173,7 @@ void SignalChain::save(const string& filename)
 	f->write_int(modules.num);
 	for (auto *m: modules){
 		f->write_str(m->type_to_name(m->module_type));
-		f->write_str(m->name);
+		f->write_str(m->module_subtype);
 		f->write_str("");
 		f->write_str(m->config_to_string());
 		f->write_int(m->module_x);
@@ -208,38 +209,10 @@ void SignalChain::load(const string& filename)
 		if (i < 3){
 			m = modules[i];
 		}else{
-			if (type == "AudioSource")
-				m = addAudioSource(sub_type);
-			else if (type == "AudioEffect")
-				m = addAudioEffect(sub_type);
-			else if (type == "AudioJoiner")
-				m = addAudioJoiner();
-			else if (type == "PeakMeter")
-				m = addAudioVisualizer("PeakMeter");
-			else if (type == "AudioVisualizer")
-				m = addAudioVisualizer(sub_type);
-			else if (type == "PitchDetector")
-				m = addPitchDetector();
-			else if (type == "AudioInputStream" or type == "InputStreamAudio")
-				m = addAudioInputStream();
-			else if (type == "OutputStream")
-				m = addAudioOutputStream();
-			else if (type == "MidiSource")
-				m = addMidiSource(sub_type);
-			else if (type == "MidiEffect")
-				m = addMidiEffect(sub_type);
-			else if (type == "Synthesizer")
-				m = addSynthesizer(sub_type);
-			else if (type == "MidiInputStream" or type == "InputStreamMidi")
-				m = addMidiInputStream();
-			//else if (type == "AudioSucker")
-			//	m = addAudioSucker();
-			else if (type == "BeatMidifier")
-				m = addBeatMidifier();
-			else if (type == "BeatSource")
-				m = addBeatSource(sub_type);
-			else
+			int itype = Module::type_from_name(type);
+			if (itype < 0)
 				throw Exception("unhandled module type: " + type);
+			m = add(ModuleFactory::create(session, itype, sub_type));
 		}
 		string config = f->read_str();
 		m->config_from_string(config);
@@ -324,7 +297,7 @@ Module* SignalChain::addMidiEffect(const string &name)
 
 Module* SignalChain::addSynthesizer(const string &name)
 {
-	return add(session->plugin_manager->CreateSynthesizer(session, name));
+	return add(CreateSynthesizer(session, name));
 }
 
 Module* SignalChain::addMidiInputStream()

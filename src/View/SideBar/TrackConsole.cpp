@@ -85,7 +85,7 @@ void TrackConsole::loadData()
 			tuning = _(" - no strings -");
 		setString("tuning", tuning);
 
-		setString("select_synth", track->synth->name);
+		setString("select_synth", track->synth->module_subtype);
 	}else{
 		hideControl("td_t_bars", true);
 		setString("tuning", "");
@@ -136,9 +136,9 @@ void TrackConsole::onSelectSynth()
 {
 	if (!track)
 		return;
-	Synthesizer *s = session->plugin_manager->ChooseSynthesizer(win, session, track->synth->name);
-	if (s)
-		track->setSynthesizer(s);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER, track->synth->module_subtype);
+	if (name != "")
+		track->setSynthesizer(CreateSynthesizer(session, name));
 }
 
 void TrackConsole::applyData()

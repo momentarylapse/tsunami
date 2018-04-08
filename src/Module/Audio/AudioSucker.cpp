@@ -51,7 +51,7 @@ public:
 };
 
 AudioSucker::AudioSucker(Session *s) :
-	Module(s, Type::AUDIO_SUCKER)
+	Module(Type::AUDIO_SUCKER)
 {
 	perf_channel = PerformanceMonitor::create_channel("suck");
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));

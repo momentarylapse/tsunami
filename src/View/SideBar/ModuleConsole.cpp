@@ -50,7 +50,7 @@ void ModuleConsole::setModule(Module* m)
 	if (module){
 		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Module::MESSAGE_DELETE);
 		setString("category", Module::type_to_name(module->module_type));
-		setString("sub_category", m->name);
+		setString("sub_category", m->module_subtype);
 		module_panel = module->create_panel();
 		if (module_panel){
 			module_panel->update();

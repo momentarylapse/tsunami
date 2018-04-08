@@ -12,7 +12,6 @@
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Module/Module.h"
-#include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../lib/math/complex.h"
 #include "../../Module/SignalChain.h"
 #include "../../TsunamiWindow.h"
@@ -208,38 +207,32 @@ void SignalEditor::onKeyDown()
 
 void SignalEditor::onAddAudioSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_SOURCE, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addAudioSource(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_SOURCE);
+	if (name.num > 0){
+		auto *m = chain->addAudioSource(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddAudioEffect()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_EFFECT, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addAudioEffect(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+	if (name.num > 0){
+		auto *m = chain->addAudioEffect(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddAudioVisualizer()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::AUDIO_VISUALIZER, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addAudioVisualizer(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_VISUALIZER);
+	if (name.num > 0){
+		auto *m = chain->addAudioVisualizer(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddAudioJoiner()
@@ -265,38 +258,32 @@ void SignalEditor::onAddAudioInputStream()
 
 void SignalEditor::onAddMidiSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::MIDI_SOURCE, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addMidiSource(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::MIDI_SOURCE);
+	if (name.num > 0){
+		auto *m = chain->addMidiSource(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddMidiEffect()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::MIDI_EFFECT, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addMidiEffect(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::MIDI_EFFECT);
+	if (name.num > 0){
+		auto *m = chain->addMidiEffect(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddSynthesizer()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::SYNTHESIZER, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addSynthesizer(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER);
+	if (name.num > 0){
+		auto *m = chain->addSynthesizer(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddMidiInputStream()
@@ -315,14 +302,12 @@ void SignalEditor::onAddPitchDetector()
 
 void SignalEditor::onAddBeatSource()
 {
-	auto *dlg = new ConfigurableSelectorDialog(win, Module::Type::BEAT_SOURCE, session);
-	dlg->run();
-	if (dlg->_return.num > 0){
-		auto *m = chain->addBeatSource(dlg->_return);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::BEAT_SOURCE);
+	if (name.num > 0){
+		auto *m = chain->addBeatSource(name);
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
-	delete(dlg);
 }
 
 void SignalEditor::onAddBeatMidifier()

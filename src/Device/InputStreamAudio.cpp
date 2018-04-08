@@ -141,11 +141,11 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
-	Module(_session, Type::INPUT_STREAM_AUDIO),
+	Module(Type::INPUT_STREAM_AUDIO),
 	buffer(1048576)
 {
 //	printf("input new\n");
-	session = _session;
+	set_session_etc(_session, "", NULL);
 	_sample_rate = session->sample_rate();
 	chunk_size = -1;
 	update_dt = -1;

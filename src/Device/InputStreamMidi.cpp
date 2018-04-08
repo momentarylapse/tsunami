@@ -64,8 +64,9 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 }
 
 InputStreamMidi::InputStreamMidi(Session *_session) :
-	Module(_session, Type::INPUT_STREAM_MIDI)
+	Module(Type::INPUT_STREAM_MIDI)
 {
+	set_session_etc(_session, "", NULL);
 	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;

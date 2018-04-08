@@ -41,10 +41,12 @@ class PortDescription;
 class Module : public Observable<VirtualBase>
 {
 public:
-	Module(Session *session, int type);
+	Module(int type);
 	virtual ~Module();
-	void _cdecl __init__();
+	void _cdecl __init__(int type);
 	virtual void _cdecl __delete__();
+
+	void set_session_etc(Session *session, const string &sub_type, Plugin *plugin);
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
@@ -63,7 +65,7 @@ public:
 	Module *copy() const;
 
 	int module_type;
-	string name;
+	string module_subtype;
 	Session *session;
 
 	float module_x, module_y;
@@ -81,7 +83,7 @@ public:
 
 	enum Type
 	{
-		// plugins
+		// plug-ins
 		AUDIO_SOURCE,
 		AUDIO_EFFECT,
 		MIDI_SOURCE,
@@ -98,7 +100,10 @@ public:
 		BEAT_MIDIFIER,
 		AUDIO_SUCKER,
 		// recursion!
-		SIGNAL_CHAIN
+		SIGNAL_CHAIN,
+		// plug-in (not really Modules)
+		SONG_PLUGIN,
+		TSUNAMI_PLUGIN,
 	};
 
 	enum SignalType

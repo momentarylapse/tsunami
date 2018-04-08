@@ -29,18 +29,6 @@ public:
 
 	bool usable;
 	int type;
-	enum Type{
-		AUDIO_SOURCE,
-		AUDIO_EFFECT,
-		AUDIO_VISUALIZER,
-		MIDI_SOURCE,
-		MIDI_EFFECT,
-		SYNTHESIZER,
-		BEAT_SOURCE,
-		SONG_PLUGIN,
-		TSUNAMI_PLUGIN,
-		OTHER
-	};
 	string error_message;
 
 	string get_error();

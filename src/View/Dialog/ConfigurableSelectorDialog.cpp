@@ -24,7 +24,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int
 {
 	type = _type;
 	session = _session;
-	Array<string> tnames = session->plugin_manager->FindConfigurable(type);
+	Array<string> tnames = session->plugin_manager->FindModuleSubTypes(type);
 
 	for (string &s: tnames){
 		Label l = split_label(s);

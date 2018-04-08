@@ -73,11 +73,6 @@ void GlobalSetTempBackupFilename(const string &filename)
 	//InputStreamAudio::setTempBackupFilename(filename);
 }
 
-Synthesizer* GlobalCreateSynthesizer(Session *session, const string &name)
-{
-	return session->plugin_manager->CreateSynthesizer(session, name);
-}
-
 void PluginManager::LinkAppScriptData()
 {
 	Kaba::config.directory = "";
@@ -89,7 +84,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	Kaba::LinkExternal("CreateSynthesizer", (void*)&GlobalCreateSynthesizer);
+	Kaba::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateAudioEffect);
 	Kaba::LinkExternal("CreateAudioSource", (void*)&CreateAudioSource);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
@@ -114,9 +109,9 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 
 
-	Module module(Session::GLOBAL, -1);
+	Module module(-1);
 	Kaba::DeclareClassSize("Module", sizeof(Module));
-	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, name));
+	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, module_subtype));
 	Kaba::DeclareClassOffset("Module", "usable", _offsetof(Module, usable));
 	Kaba::DeclareClassOffset("Module", "session", _offsetof(Module, session));
 	Kaba::LinkExternal("Module." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Module::__init__));
@@ -539,37 +534,37 @@ void PluginManager::FindPlugins()
 	Kaba::Init();
 
 	// "AudioSource"
-	find_plugins_in_dir("AudioSource/", Plugin::Type::AUDIO_SOURCE, this);
+	find_plugins_in_dir("AudioSource/", Module::Type::AUDIO_SOURCE, this);
 
 	// "AudioEffect"
-	find_plugins_in_dir("AudioEffect/Channels/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Dynamics/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Echo/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Pitch/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Repair/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Sound/", Plugin::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Synthesizer/", Plugin::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Channels/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Dynamics/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Echo/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Pitch/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Repair/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Sound/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Synthesizer/", Module::Type::AUDIO_EFFECT, this);
 
 	// "AudioVisualizer"
-	find_plugins_in_dir("AudioVisualizer/", Plugin::Type::AUDIO_VISUALIZER, this);
+	find_plugins_in_dir("AudioVisualizer/", Module::Type::AUDIO_VISUALIZER, this);
 
 	// "MidiSource"
-	find_plugins_in_dir("MidiSource/", Plugin::Type::MIDI_SOURCE, this);
+	find_plugins_in_dir("MidiSource/", Module::Type::MIDI_SOURCE, this);
 
 	// "MidiEffect"
-	find_plugins_in_dir("MidiEffect/", Plugin::Type::MIDI_EFFECT, this);
+	find_plugins_in_dir("MidiEffect/", Module::Type::MIDI_EFFECT, this);
 
 	// "BeatSource"
-	find_plugins_in_dir("BeatSource/", Plugin::Type::BEAT_SOURCE, this);
+	find_plugins_in_dir("BeatSource/", Module::Type::BEAT_SOURCE, this);
 
 	// "All"
-	find_plugins_in_dir("All/", Plugin::Type::SONG_PLUGIN, this);
+	find_plugins_in_dir("All/", Module::Type::SONG_PLUGIN, this);
 
 	// rest
-	find_plugins_in_dir("Independent/", Plugin::Type::TSUNAMI_PLUGIN, this);
+	find_plugins_in_dir("Independent/", Module::Type::TSUNAMI_PLUGIN, this);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer/", Plugin::Type::SYNTHESIZER, this);
+	find_plugins_in_dir("Synthesizer/", Module::Type::SYNTHESIZER, this);
 }
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
@@ -629,26 +624,6 @@ Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
 	return p;
 }
 
-typedef void main_void_func();
-
-void PluginManager::_ExecutePlugin(Session *session, const string &filename)
-{
-	Plugin *p = LoadAndCompilePlugin(Plugin::Type::OTHER, filename);
-	if (!p->usable){
-		session->e(p->get_error());
-		return;
-	}
-
-	Kaba::Script *s = p->s;
-
-	main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
-	if (f_main){
-		f_main();
-	}else{
-		session->e(_("Plugin does not contain a function 'void main()'"));
-	}
-}
-
 
 Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
 {
@@ -660,81 +635,15 @@ Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
 			return p;
 		}
 	}
-	session->e(format(_("Can't find plugin: %s ..."), name.c_str()));
+	session->e(format(_("Can't find %s plugin: %s ..."), Module::type_to_name(type).c_str(), name.c_str()));
 	return NULL;
 }
-
-
-Array<string> PluginManager::FindSynthesizers()
-{
-	Array<string> names;
-	Array<DirEntry> list = dir_search(plugin_dir() + "Synthesizer/", "*.kaba", false);
-	for (DirEntry &e: list)
-		names.add(e.name.replace(".kaba", ""));
-	names.add("Dummy");
-	//names.add("Sample");
-	return names;
-}
-
-Synthesizer *PluginManager::__LoadSynthesizer(Session *session, const string &name)
-{
-	string filename = plugin_dir() + "Synthesizer/" + name + ".kaba";
-	if (!file_test_existence(filename))
-		return NULL;
-	Kaba::Script *s;
-	try{
-		s = Kaba::Load(filename);
-	}catch(Kaba::Exception &e){
-		session->e(e.message);
-		return NULL;
-	}
-	for (auto *t : s->syntax->classes){
-		if (!t->is_derived_from("Synthesizer"))
-			continue;
-		Synthesizer *synth = (Synthesizer*)t->create_instance();
-		synth->session = session;
-		synth->setSampleRate(session->song->sample_rate);
-		return synth;
-	}
-	return NULL;
-}
-// factory
-Synthesizer *PluginManager::CreateSynthesizer(Session *session, const string &name)
-{
-	if ((name == "Dummy") or (name == ""))
-		return new DummySynthesizer;
-	/*if (name == "Sample")
-		return new SampleSynthesizer;*/
-	Synthesizer *s = __LoadSynthesizer(session, name);
-	if (s){
-		s->name = name;
-		s->session = session;
-		s->reset_config();
-		return s;
-	}
-	session->e(_("unknown synthesizer: ") + name);
-	s = new DummySynthesizer;
-	s->session = session;
-	s->name = name;
-	return s;
-}
-
 
 string PluginManager::plugin_dir()
 {
 	if (tsunami->directory_static.find("/home/") == 0)
 		return "Plugins/";
 	return tsunami->directory_static + "Plugins/";
-}
-
-Array<string> PluginManager::FindAudioSources()
-{
-	Array<string> names;
-	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::Type::AUDIO_SOURCE)
-			names.add(pf.name);
-	names.add("SongRenderer");
-	return names;
 }
 
 Array<string> PluginManager::FindAudioEffects()
@@ -750,103 +659,43 @@ Array<string> PluginManager::FindAudioEffects()
 	return names;
 }
 
-Array<string> PluginManager::FindAudioVisualizers()
-{
-	Array<string> names;
-	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::Type::AUDIO_VISUALIZER)
-			names.add(pf.name);
-	names.add("PeakMeter");
-	return names;
-}
 
-Array<string> PluginManager::FindMidiEffects()
+Array<string> PluginManager::FindModuleSubTypes(int type)
 {
-	Array<string> names;
-	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::Type::MIDI_EFFECT)
-			names.add(pf.name);
-	return names;
-}
-
-Array<string> PluginManager::FindMidiSources()
-{
-	Array<string> names;
-	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::Type::MIDI_SOURCE)
-			names.add(pf.name);
-	return names;
-}
-
-Array<string> PluginManager::FindBeatSources()
-{
-	Array<string> names;
-	for (auto &pf: plugin_files)
-		if (pf.type == Plugin::Type::BEAT_SOURCE)
-			names.add(pf.name);
-	return names;
-}
-
-Array<string> PluginManager::FindConfigurable(int type)
-{
-	if (type == Module::Type::AUDIO_SOURCE)
-		return FindAudioSources();
 	if (type == Module::Type::AUDIO_EFFECT)
 		return FindAudioEffects();
-	if (type == Module::Type::AUDIO_VISUALIZER)
-		return FindAudioVisualizers();
-	if (type == Module::Type::MIDI_SOURCE)
-		return FindMidiSources();
+
+	Array<string> names;
+	for (auto &pf: plugin_files)
+		if (pf.type == type)
+			names.add(pf.name);
+
+	if (type == Module::Type::AUDIO_SOURCE){
+		names.add("SongRenderer");
+		//names.add("BufferStreamer");
+	}
 	if (type == Module::Type::MIDI_EFFECT)
-		return FindMidiEffects();
-	if (type == Module::Type::SYNTHESIZER)
-		return FindSynthesizers();
-	if (type == Module::Type::BEAT_SOURCE)
-		return FindBeatSources();
-	return Array<string>();
+		names.add("Dummy");
+	if (type == Module::Type::BEAT_SOURCE){
+		//names.add("BarStreamer");
+	}
+	if (type == Module::Type::AUDIO_VISUALIZER)
+		names.add("PeakMeter");
+	if (type == Module::Type::SYNTHESIZER){
+		names.add("Dummy");
+		//names.add("Sample");
+	}
+	return names;
 }
 
 
-AudioEffect* PluginManager::ChooseEffect(hui::Panel *parent, Session *session)
+string PluginManager::ChooseModule(hui::Panel *parent, Session *session, int type, const string &old_name)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Module::Type::AUDIO_EFFECT, session);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();
-	AudioEffect *e = NULL;
-	if (dlg->_return.num > 0)
-		e = CreateAudioEffect(session, dlg->_return);
+	string name = dlg->_return;
 	delete(dlg);
-	return e;
+	return name;
 }
-
-MidiEffect* PluginManager::ChooseMidiEffect(hui::Panel *parent, Session *session)
-{
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Module::Type::MIDI_EFFECT, session);
-	dlg->run();
-	MidiEffect *e = NULL;
-	if (dlg->_return.num > 0)
-		e = CreateMidiEffect(session, dlg->_return);
-	delete(dlg);
-	return e;
-}
-
-
-Synthesizer *PluginManager::ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name)
-{
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Module::Type::SYNTHESIZER, session, old_name);
-	dlg->run();
-	Synthesizer *s = NULL;
-	if (dlg->_return.num > 0)
-		s = CreateSynthesizer(session, dlg->_return);
-	delete(dlg);
-	return s;
-}
-
-/*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)
-{
-	string name = ChooseConfigurable(parent, Module::Type::SYNTHESIZER);
-	if (name == "")
-		return NULL;
-	return CreateSynthesizer(name);
-}*/
 
 

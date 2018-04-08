@@ -76,8 +76,6 @@ Menu menu ""
 		Separator
 		Item record "Record" image=hui:media-record
 	Menu menu_plugins "Plugins"
-		Item run_plugin "Execute script..." image=hui:execute
-		Separator
 		Item plugin_on_file "On audio buffer" disabled
 		Menu menu_plugins_channels "Channels"
 		Menu menu_plugins_dynamics "Dynamics"

@@ -6,11 +6,10 @@
  */
 
 #include "MidiEffect.h"
+#include "../ModuleFactory.h"
 
-#include "../../Plugins/Plugin.h"
 #include "../../Session.h"
 #include "../../lib/math/math.h"
-#include "../../Plugins/PluginManager.h"
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
@@ -33,7 +32,7 @@ void MidiEffect::Output::reset()
 }
 
 MidiEffect::MidiEffect() :
-	Module(Session::GLOBAL, Type::MIDI_EFFECT)
+	Module(Type::MIDI_EFFECT)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
@@ -163,20 +162,6 @@ void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::MIDI_EFFECT, name);
-	MidiEffect *fx = NULL;
-	if (p->usable)
-		fx = (MidiEffect*)p->create_instance(session, "MidiEffect");
-
-	// dummy?
-	if (!fx)
-		fx = new MidiEffect;
-
-	fx->name = name;
-	fx->plugin = p;
-	fx->usable = p->usable;
-	fx->session = session;
-	fx->reset_config();
-	return fx;
+	return (MidiEffect*)ModuleFactory::create(session, Module::Type::MIDI_EFFECT, name);
 }
 

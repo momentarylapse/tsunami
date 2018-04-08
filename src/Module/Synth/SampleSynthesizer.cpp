@@ -10,7 +10,7 @@
 
 SampleSynthesizer::SampleSynthesizer()
 {
-	name = "Sample";
+	module_subtype = "Sample";
 }
 
 SampleSynthesizer::~SampleSynthesizer()

@@ -1211,63 +1211,63 @@ menu_plugins
 
 8
 0
-15
-Item
-run_plugin
-image=hui:execute
-0
-0
-0
-Separator
-
-
-1
-0
-0
+13
 Item
 plugin_on_file
 disabled
-2
+0
 0
 0
 Menu
 menu_plugins_channels
 
-3
+1
 0
 0
 Menu
 menu_plugins_dynamics
 
-4
+2
 0
 0
 Menu
 menu_plugins_echo
 
-5
+3
 0
 0
 Menu
 menu_plugins_pitch
 
-6
+4
 0
 0
 Menu
 menu_plugins_repair
 
-7
+5
 0
 0
 Menu
 menu_plugins_sound
 
-8
+6
 0
 0
 Menu
 menu_plugins_synthesizer
+
+7
+0
+0
+Separator
+
+
+8
+0
+0
+Menu
+menu_plugins_on_midi
 
 9
 0
@@ -1279,27 +1279,15 @@ Separator
 0
 0
 Menu
-menu_plugins_on_midi
-
-11
-0
-0
-Separator
-
-
-12
-0
-0
-Menu
 menu_plugins_on_all
 
-13
+11
 0
 0
 Menu
 menu_plugins_other
 
-14
+12
 0
 0
 Menu
@@ -3913,7 +3901,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-374
+373
 // Text
 /cancel
 Cancel
@@ -4316,9 +4304,6 @@ On audio buffer
 
 menu/record
 Record
-
-menu/run_plugin
-Execute script...
 
 menu/sample_from_selection
 Cut out from selection

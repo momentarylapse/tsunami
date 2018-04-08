@@ -6,11 +6,9 @@
  */
 
 #include "AudioEffect.h"
-
-#include "../../Plugins/Plugin.h"
+#include "../ModuleFactory.h"
 #include "../../Session.h"
 #include "../../lib/math/math.h"
-#include "../../Plugins/PluginManager.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
@@ -45,7 +43,7 @@ int AudioEffect::Output::get_pos(int delta)
 }
 
 AudioEffect::AudioEffect() :
-	Module(Session::GLOBAL, Type::AUDIO_EFFECT)
+	Module(Type::AUDIO_EFFECT)
 {
 	source = NULL;
 	out = new Output(this);
@@ -84,23 +82,7 @@ void AudioEffect::do_process_track(Track *t, int layer, const Range &r)
 }
 
 
-// TODO: move to PluginManager?
 AudioEffect *CreateAudioEffect(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_EFFECT, name);
-	AudioEffect *fx = NULL;
-	if (p->usable)
-		fx = (AudioEffect*)p->create_instance(session, "AudioEffect");
-
-	// dummy?
-	if (!fx)
-		fx = new AudioEffect;
-
-	fx->name = name;
-	fx->plugin = p;
-	fx->usable = p->usable;
-	fx->session = session;
-	fx->reset_config();
-	fx->reset_state();
-	return fx;
+	return (AudioEffect*)ModuleFactory::create(session, Module::Type::AUDIO_EFFECT, name);
 }

@@ -96,7 +96,6 @@ public:
 	void onSelectAll();
 	void onSelectExpand();
 	void onShowLog();
-	void onFindAndExecutePlugin();
 	void onMenuExecuteEffect();
 	void onMenuExecuteMidiEffect();
 	void onMenuExecuteSongPlugin();

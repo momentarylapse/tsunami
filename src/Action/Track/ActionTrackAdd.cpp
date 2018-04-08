@@ -8,8 +8,6 @@
 #include "ActionTrackAdd.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Data/Song.h"
-#include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
 #include "../../lib/hui/hui.h"
 #include <assert.h>
 
@@ -35,7 +33,7 @@ void *ActionTrackAdd::execute(Data *d)
 
 	assert((index >= 0) and (index <= a->tracks.num));
 
-	Track *t = new Track(type, tsunami->plugin_manager->CreateSynthesizer(a->session, "Dummy"));
+	Track *t = new Track(type, CreateSynthesizer(a->session, "Dummy"));
 
 	t->song = a;
 	t->layers.resize(a->layers.num);

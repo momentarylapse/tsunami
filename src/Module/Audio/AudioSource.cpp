@@ -5,15 +5,12 @@
  *      Author: michi
  */
 
-#include "../Audio/AudioSource.h"
+#include "AudioSource.h"
+#include "../ModuleFactory.h"
 
-#include "../../Session.h"
-#include "../../Plugins/Plugin.h"
-#include "../../Plugins/PluginManager.h"
-#include "../Audio/SongRenderer.h"
 
 AudioSource::AudioSource() :
-	Module(Session::GLOBAL, Type::AUDIO_SOURCE)
+	Module(Type::AUDIO_SOURCE)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
@@ -55,27 +52,7 @@ int AudioSource::Output::get_pos(int delta)
 	return source->get_pos(delta);
 }
 
-// TODO: move to PluginManager?
 AudioSource *CreateAudioSource(Session *session, const string &name)
 {
-	AudioSource *s = NULL;
-
-	if (name == "SongRenderer"){
-		s = new SongRenderer(session->song);
-	}else{
-		Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_SOURCE, name);
-		if (p->usable)
-			s = (AudioSource*)p->create_instance(session, "AudioSource");
-		s->plugin = p;
-		s->usable = p->usable;
-	}
-
-	// dummy?
-	if (!s)
-		s = new AudioSource;
-
-	s->name = name;
-	s->session = session;
-	s->reset_config();
-	return s;
+	return (AudioSource*)ModuleFactory::create(session, Module::Type::AUDIO_SOURCE, name);
 }

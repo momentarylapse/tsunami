@@ -12,9 +12,6 @@
 #include "../lib/kaba/kaba.h"
 
 class Plugin;
-class AudioEffect;
-class MidiEffect;
-class Synthesizer;
 class Module;
 class FavoriteManager;
 class TsunamiWindow;
@@ -38,8 +35,6 @@ public:
 	void FindPlugins();
 	void AddPluginsToMenu(TsunamiWindow *win);
 
-	void _ExecutePlugin(Session *session, const string &filename);
-
 	Plugin *LoadAndCompilePlugin(int type, const string &filename);
 	Plugin *GetPlugin(Session *session, int type, const string &name);
 
@@ -47,20 +42,10 @@ public:
 	void SaveFavorite(Module *c, const string &name);
 	string SelectFavoriteName(hui::Window *win, Module *c, bool save);
 
-	Array<string> FindSynthesizers();
-	Array<string> FindAudioSources();
 	Array<string> FindAudioEffects();
-	Array<string> FindAudioVisualizers();
-	Array<string> FindMidiSources();
-	Array<string> FindMidiEffects();
-	Array<string> FindBeatSources();
-	Array<string> FindConfigurable(int type);
-	Synthesizer *__LoadSynthesizer(Session *session, const string &name);
-	Synthesizer *CreateSynthesizer(Session *session, const string &name);
+	Array<string> FindModuleSubTypes(int type);
 
-	AudioEffect *ChooseEffect(hui::Panel *parent, Session *session);
-	MidiEffect *ChooseMidiEffect(hui::Panel *parent, Session *session);
-	Synthesizer *ChooseSynthesizer(hui::Window *parent, Session *session, const string &old_name = "");
+	string ChooseModule(hui::Panel *parent, Session *session, int type, const string &old_name = "");
 
 
 	// not compiled yet

@@ -76,7 +76,7 @@ Array<string> FavoriteManager::GetList(Module *c)
 		Load(c->session);
 	Array<string> r;
 	for (Favorite &f: favorites){
-		if ((f.type == c->module_type) and (f.config_name == c->name))
+		if ((f.type == c->module_type) and (f.config_name == c->module_subtype))
 			r.add(f.name);
 	}
 	return r;
@@ -90,7 +90,7 @@ void FavoriteManager::Apply(Module *c, const string &name)
 	if (!loaded)
 		Load(c->session);
 	for (Favorite &f: favorites){
-		if ((f.type == c->module_type) and (f.config_name == c->name) and (f.name == name))
+		if ((f.type == c->module_type) and (f.config_name == c->module_subtype) and (f.name == name))
 			c->config_from_string(f.options);
 	}
 }
@@ -101,7 +101,7 @@ void FavoriteManager::Save(Module *c, const string &name)
 		Load(c->session);
 	Favorite f;
 	f.type = c->module_type;
-	f.config_name = c->name;
+	f.config_name = c->module_subtype;
 	f.name = name;
 	f.read_only = false;
 	f.options = c->config_to_string();

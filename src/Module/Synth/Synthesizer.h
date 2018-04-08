@@ -22,6 +22,7 @@ class DetuneSynthesizerDialog;
 class ActionTrackDetuneSynthesizer;
 class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
+class Session;
 
 class Synthesizer : public Module
 {
@@ -91,5 +92,7 @@ protected:
 	Tuning tuning;
 	float delta_phi[MAX_PITCH];
 };
+
+Synthesizer* CreateSynthesizer(Session *session, const string &name);
 
 #endif /* SRC_MODULE_SYNTH_SYNTHESIZER_H_ */

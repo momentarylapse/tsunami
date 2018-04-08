@@ -6,12 +6,10 @@
  */
 
 #include "AudioVisualizer.h"
+#include "../ModuleFactory.h"
 #include "../../Session.h"
-#include "../../Plugins/Plugin.h"
-#include "../../Plugins/PluginManager.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Audio/RingBuffer.h"
-#include "PeakMeter.h"
 
 AudioVisualizer::Output::Output(AudioVisualizer *v)
 {
@@ -51,7 +49,7 @@ void AudioVisualizer::Output::reset()
 }
 
 AudioVisualizer::AudioVisualizer() :
-	Module(Session::GLOBAL, Type::AUDIO_VISUALIZER)
+	Module(Type::AUDIO_VISUALIZER)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
@@ -90,26 +88,7 @@ void AudioVisualizer::set_chunk_size(int _chunk_size)
 // TODO: move to PluginManager?
 AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name)
 {
-	AudioVisualizer *s = NULL;
-
-	if (name == "PeakMeter"){
-		s = new PeakMeter(session);
-	}else{
-		Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::AUDIO_VISUALIZER, name);
-		if (p->usable)
-			s = (AudioVisualizer*)p->create_instance(session, "AudioVisualizer");
-		s->plugin = p;
-		s->usable = p->usable;
-	}
-
-	// dummy?
-	if (!s)
-		s = new AudioVisualizer;
-
-	s->name = name;
-	s->session = session;
-	s->reset_config();
-	return s;
+	return (AudioVisualizer*)ModuleFactory::create(session, Module::Type::AUDIO_VISUALIZER, name);
 }
 
 

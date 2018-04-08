@@ -29,7 +29,7 @@ public:
 
 		fromResource("fx_panel");
 
-		setString("name", fx->name);
+		setString("name", fx->module_subtype);
 		p = fx->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
@@ -164,9 +164,8 @@ void MidiFxConsole::onUpdate()
 
 void MidiFxConsole::onAdd()
 {
-	MidiEffect *effect = session->plugin_manager->ChooseMidiEffect(this, session);
-	if (!effect)
-		return;
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+	MidiEffect *effect = CreateMidiEffect(session, name);
 	if (track)
 		track->addMidiEffect(effect);
 }

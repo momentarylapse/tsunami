@@ -6,8 +6,9 @@
  */
 
 #include "Synthesizer.h"
-
+#include "../ModuleFactory.h"
 #include "../../Data/Song.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
 #include "../../lib/math/math.h"
@@ -69,7 +70,7 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 
 
 Synthesizer::Synthesizer() :
-	Module(NULL, Type::SYNTHESIZER)
+	Module(Type::SYNTHESIZER)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
@@ -164,6 +165,11 @@ void Synthesizer::reset()
 
 bool Synthesizer::isDefault()
 {
-	return (name == "Dummy") and (tuning.is_default());
+	return (module_subtype == "Dummy") and (tuning.is_default());
+}
+
+Synthesizer* CreateSynthesizer(Session *session, const string &name)
+{
+	return (Synthesizer*)ModuleFactory::create(session, Module::Type::SYNTHESIZER, name);
 }
 

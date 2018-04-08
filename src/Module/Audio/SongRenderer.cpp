@@ -21,7 +21,7 @@
 
 SongRenderer::SongRenderer(Song *s)
 {
-	name = "SongRenderer";
+	module_subtype = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
 	beat_midifier = NULL;

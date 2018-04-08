@@ -23,6 +23,8 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	enabled = false;
 	r = new PeakMeterData;
 	l = new PeakMeterData;
+	r->reset();
+	l->reset();
 
 	panel->eventXP(id, "hui:draw", std::bind(&PeakMeterDisplay::onDraw, this, std::placeholders::_1));
 	panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeterDisplay::onLeftButtonDown, this));

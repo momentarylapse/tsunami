@@ -158,7 +158,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("record", -1, "hui:media-record");
 	event("show_log", std::bind(&TsunamiWindow::onShowLog, this));
 	event("about", std::bind(&TsunamiWindow::onAbout, this));
-	event("run_plugin", std::bind(&TsunamiWindow::onFindAndExecutePlugin, this));
 	setKeyCode("run_plugin", hui::KEY_RETURN + hui::KEY_SHIFT, "hui:execute");
 	event("exit", std::bind(&TsunamiWindow::onExit, this));
 	setKeyCode("exit", hui::KEY_Q + hui::KEY_CONTROL, "hui:quit");
@@ -480,12 +479,6 @@ void TsunamiWindow::onPaste()
 void TsunamiWindow::onPasteAsSamples()
 {
 	app->clipboard->pasteAsSamples(view);
-}
-
-void TsunamiWindow::onFindAndExecutePlugin()
-{
-	if (hui::FileDialogOpen(win, _("Select plugin script"), tsunami->directory_static + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
-		app->plugin_manager->_ExecutePlugin(session, hui::Filename);
 }
 
 void TsunamiWindow::onMenuExecuteEffect()

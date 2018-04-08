@@ -168,10 +168,10 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 	}
 }
 
-Module::Module(Session *_session, int type)
+Module::Module(int type)
 {
 	module_type = type;
-	session = _session;
+	session = Session::GLOBAL;
 	usable = true;
 	plugin = NULL;
 	enabled = true;
@@ -185,14 +185,27 @@ Module::~Module()
 		*pd.port = NULL;
 }
 
-void Module::__init__()
+void Module::__init__(int type)
 {
-	new(this) Module(Session::GLOBAL, -1);
+	new(this) Module(type);
 }
 
 void Module::__delete__()
 {
 	this->Module::~Module();
+}
+
+
+void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *_plugin)
+{
+	session = _session;
+	module_subtype = sub_type;
+	plugin = _plugin;
+	if (plugin)
+		usable = plugin->usable;
+
+	reset_config();
+	reset_state();
 }
 
 ModuleConfiguration *Module::get_config() const
@@ -258,7 +271,7 @@ string Module::get_error()
 {
 	if (plugin)
 		return plugin->get_error();
-	return format(_("Can't load %s: \"%s\""), type_to_name(module_type).c_str(), name.c_str());
+	return format(_("Can't load %s: \"%s\""), type_to_name(module_type).c_str(), module_subtype.c_str());
 }
 
 
@@ -280,7 +293,7 @@ public:
 		progress = NULL;
 		ok = false;
 
-		setTitle(config->name);
+		setTitle(config->module_subtype);
 		embed(panel, "grid", 0, 1);
 
 		if (c->module_type != c->Type::AUDIO_EFFECT)
@@ -410,8 +423,7 @@ Module *Module::copy() const
 	}
 	Module *clone = (Module*)c->create_instance();
 
-	clone->module_type = module_type;
-	clone->session = session;
+	clone->set_session_etc(session, module_subtype, plugin);
 	clone->config_from_string(config_to_string());
 
 	return clone;
@@ -455,6 +467,10 @@ Module::Type Module::type_from_name(const string &str)
 {
 	if (str == "AudioSource")
 		return Module::Type::AUDIO_SOURCE;
+	if (str == "AudioSucker")
+		return Module::Type::AUDIO_SUCKER;
+	if (str == "AudioJoiner")
+		return Module::Type::AUDIO_JOINER;
 	if (str == "AudioEffect" or str == "Effect")
 		return Module::Type::AUDIO_EFFECT;
 	if (str == "Synthesizer" or str == "Synth")
@@ -465,8 +481,18 @@ Module::Type Module::type_from_name(const string &str)
 		return Module::Type::MIDI_SOURCE;
 	if (str == "BeatSource")
 		return Module::Type::BEAT_SOURCE;
+	if (str == "BeatMidifier")
+		return Module::Type::BEAT_MIDIFIER;
+	if (str == "PitchDetector")
+		return Module::Type::PITCH_DETECTOR;
 	if (str == "AudioVisualizer")
 		return Module::Type::AUDIO_VISUALIZER;
+	if (str == "AudioInputStream" or str == "InputStreamAudio")
+		return Module::Type::INPUT_STREAM_AUDIO;
+	if (str == "MidiInputStream" or str == "InputStreamMidi")
+		return Module::Type::INPUT_STREAM_MIDI;
+	if (str == "OutputStream" or str == "OutputStreamAudio")
+		return Module::Type::OUTPUT_STREAM_AUDIO;
 	return (Type)-1;
 }
 

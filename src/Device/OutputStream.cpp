@@ -216,12 +216,12 @@ public:
 };
 
 OutputStream::OutputStream(Session *_session, AudioPort *s) :
-	Module(_session, Type::OUTPUT_STREAM_AUDIO),
+	Module(Type::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
 {
 //	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
-	session = _session;
+	set_session_etc(_session, "", NULL);
 	source = s;
 
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));

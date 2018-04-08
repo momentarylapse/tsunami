@@ -6,15 +6,13 @@
  */
 
 #include "BeatSource.h"
-
+#include "../ModuleFactory.h"
 #include "../../Session.h"
-#include "../../Plugins/PluginManager.h"
-#include "../../Plugins/Plugin.h"
 
 DummyBeatSource* BeatSource::dummy = new DummyBeatSource;
 
 BeatSource::BeatSource() :
-	Module(Session::GLOBAL, Type::BEAT_SOURCE)
+	Module(Type::BEAT_SOURCE)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::BEATS, (Port**)&out, "out"));
@@ -52,24 +50,8 @@ void BeatSource::Output::reset()
 
 
 
-
-// TODO: move to PluginManager?
 BeatSource *CreateBeatSource(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Plugin::Type::BEAT_SOURCE, name);
-	BeatSource *s = NULL;
-	if (p->usable)
-		s = (BeatSource*)p->create_instance(session, "BeatSource");
-
-	// dummy?
-	if (!s)
-		s = new BeatSource;
-
-	s->name = name;
-	s->plugin = p;
-	s->usable = p->usable;
-	s->session = session;
-	s->reset_config();
-	return s;
+	return dynamic_cast<BeatSource*>(ModuleFactory::create(session, Module::Type::BEAT_SOURCE, name));
 }
 

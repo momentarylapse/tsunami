@@ -26,7 +26,7 @@ public:
 		track = t;
 		synth = t->synth;
 		fromResource("synth_panel");
-		setString("name", synth->name);
+		setString("name", synth->module_subtype);
 		p = synth->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
@@ -118,9 +118,9 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	Synthesizer *s = session->plugin_manager->ChooseSynthesizer(win, session, track->synth->name);
-	if (s)
-		track->setSynthesizer(s);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER, track->synth->module_subtype);
+	if (name != "")
+		track->setSynthesizer(CreateSynthesizer(session, name));
 }
 
 void SynthConsole::onDetune()

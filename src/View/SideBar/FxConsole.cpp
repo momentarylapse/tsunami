@@ -26,7 +26,7 @@ public:
 
 		fromResource("fx_panel");
 
-		setString("name", fx->name);
+		setString("name", fx->module_subtype);
 
 		p = fx->create_panel();
 		if (p){
@@ -148,9 +148,10 @@ FxConsole::~FxConsole()
 
 void FxConsole::onAdd()
 {
-	AudioEffect *effect = session->plugin_manager->ChooseEffect(this, session);
-	if (!effect)
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+	if (name == "")
 		return;
+	AudioEffect *effect = CreateAudioEffect(session, name);
 	if (track)
 		track->addEffect(effect);
 	else

@@ -10,6 +10,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../Port/AudioPort.h"
+#include "../ModuleFactory.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 const string AudioSucker::MESSAGE_UPDATE = "Update";
@@ -50,7 +51,7 @@ public:
 	}
 };
 
-AudioSucker::AudioSucker(Session *s) :
+AudioSucker::AudioSucker() :
 	Module(Type::AUDIO_SUCKER)
 {
 	perf_channel = PerformanceMonitor::create_channel("suck");
@@ -118,4 +119,10 @@ int AudioSucker::update()
 	}
 	Observable::notify(MESSAGE_UPDATE);
 	return r;
+}
+
+
+AudioSucker *CreateAudioSucker(Session *session)
+{
+	return (AudioSucker*)ModuleFactory::create(session, Module::Type::AUDIO_SUCKER, "");
 }

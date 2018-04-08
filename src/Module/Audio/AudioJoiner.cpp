@@ -8,7 +8,7 @@
 #include "AudioJoiner.h"
 #include "../../Data/Audio/AudioBuffer.h"
 
-AudioJoiner::AudioJoiner(Session *session) :
+AudioJoiner::AudioJoiner() :
 	Module(Type::AUDIO_JOINER)
 {
 	out = new Output(this);

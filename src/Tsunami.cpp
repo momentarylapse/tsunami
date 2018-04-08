@@ -8,7 +8,10 @@
 #include "Tsunami.h"
 
 #include "Device/DeviceManager.h"
+#include "Device/OutputStream.h"
 #include "Module/SignalChain.h"
+#include "Module/Audio/SongRenderer.h"
+#include "Module/Audio/PeakMeter.h"
 #include "TsunamiWindow.h"
 #include "Session.h"
 #include "Storage/Storage.h"
@@ -21,7 +24,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.9.0";
+const string AppVersion = "0.7.9.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -189,6 +192,9 @@ Session* Tsunami::createSession()
 	session->song = new Song(session);
 
 	session->signal_chain = SignalChain::create_default(session);
+	session->song_renderer = dynamic_cast<SongRenderer*>(session->signal_chain->modules[0]);
+	session->peak_meter = dynamic_cast<PeakMeter*>(session->signal_chain->modules[1]);
+	session->output_stream = dynamic_cast<OutputStream*>(session->signal_chain->modules[2]);
 
 	session->setWin(new TsunamiWindow(session));
 	session->win->auto_delete = true;

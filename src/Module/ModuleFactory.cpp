@@ -33,9 +33,9 @@ Module* ModuleFactory::_create_special(Session* session, int type, const string&
 	if (type == Module::Type::BEAT_MIDIFIER){
 		return new BeatMidifier;
 	}else if (type == Module::Type::AUDIO_JOINER){
-		return new AudioJoiner(session);
+		return new AudioJoiner;
 	}else if (type == Module::Type::AUDIO_SUCKER){
-		return new AudioSucker(session);
+		return new AudioSucker;
 	}else if (type == Module::Type::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song);
@@ -57,7 +57,7 @@ Module* ModuleFactory::_create_special(Session* session, int type, const string&
 			{}//return new BarStreamer()
 	}else if (type == Module::Type::AUDIO_VISUALIZER){
 		if (sub_type == "PeakMeter")
-			return new PeakMeter(session);
+			return new PeakMeter;
 	}else if (type == Module::Type::OUTPUT_STREAM_AUDIO){
 		return new OutputStream(session, NULL);
 	}else if (type == Module::Type::INPUT_STREAM_AUDIO){

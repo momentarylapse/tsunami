@@ -64,7 +64,7 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->set_source(input->out);
-	peak_meter = new PeakMeter(session);
+	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->set_source(preview_synth->out);
 	preview_stream = new OutputStream(session, peak_meter->out);
 	preview_stream->set_buffer_size(512);

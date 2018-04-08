@@ -46,10 +46,9 @@ void PeakMeterData::update(Array<float> &buf, float dt)
 	}
 }
 
-PeakMeter::PeakMeter(Session *s)
+PeakMeter::PeakMeter()
 {
 	module_subtype = "PeakMeter";
-	session = s;
 	mode = MODE_PEAKS;
 	r.reset();
 	l.reset();

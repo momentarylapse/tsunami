@@ -11,12 +11,10 @@
 #include "../Port/AudioPort.h"
 #include "../Module.h"
 
-class Session;
-
 class AudioJoiner : public Module
 {
 public:
-	AudioJoiner(Session *session);
+	AudioJoiner();
 	virtual ~AudioJoiner();
 
 	class Output : public AudioPort

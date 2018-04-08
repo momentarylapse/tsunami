@@ -105,7 +105,7 @@ void CaptureConsoleModeAudio::enter()
 	input->set_chunk_size(4096);
 	input->set_update_dt(0.03f);
 	view->mode_capture->setInputAudio(input);
-	peak_meter = new PeakMeter(session);
+	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->set_source(input->out);
 	cc->peak_meter->setSource(peak_meter);
 
@@ -120,7 +120,7 @@ void CaptureConsoleModeAudio::enter()
 		return;*/
 	}
 
-	sucker = new AudioSucker(session);
+	sucker = CreateAudioSucker(session);
 	sucker->set_source(peak_meter->out);
 	sucker->start();
 	export_view_sucker = sucker;

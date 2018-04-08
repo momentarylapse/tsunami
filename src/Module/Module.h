@@ -71,7 +71,7 @@ public:
 	float module_x, module_y;
 	virtual void module_start(){}
 	virtual void module_stop(){}
-	virtual void module_pause(bool paused){}
+	virtual void module_pause(bool paused);
 
 
 	Plugin *plugin;

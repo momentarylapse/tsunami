@@ -6,30 +6,11 @@
  */
 
 #include "SignalChain.h"
+#include "Module.h"
 #include "ModuleFactory.h"
-#include "Synth/Synthesizer.h"
-#include "Audio/SongRenderer.h"
-#include "Audio/AudioSource.h"
-#include "Audio/AudioJoiner.h"
 #include "Port/MidiPort.h"
-#include "Midi/MidiSource.h"
-#include "Midi/MidiEventStreamer.h"
-#include "Audio/PitchDetector.h"
-#include "Audio/AudioEffect.h"
-#include "Audio/AudioVisualizer.h"
-#include "Audio/PeakMeter.h"
-#include "Audio/AudioSucker.h"
-#include "Beats/BarStreamer.h"
-#include "Beats/BeatMidifier.h"
-#include "Beats/BeatSource.h"
-#include "Midi/MidiEffect.h"
 #include "../Session.h"
-#include "../Device/OutputStream.h"
-#include "../Device/InputStreamAudio.h"
-#include "../Device/InputStreamMidi.h"
 #include "../Plugins/PluginManager.h"
-#include "../Data/Rhythm/Bar.h"
-#include "../Data/Rhythm/BarCollection.h"
 #include "../lib/file/file.h"
 
 
@@ -55,10 +36,6 @@ SignalChain *SignalChain::create_default(Session *session)
 	auto *mod_renderer = chain->addAudioSource("SongRenderer");
 	auto *mod_peak = chain->addAudioVisualizer("PeakMeter");
 	auto *mod_out = chain->addAudioOutputStream();
-
-	session->song_renderer = dynamic_cast<SongRenderer*>(mod_renderer);
-	session->peak_meter = dynamic_cast<PeakMeter*>(mod_peak);
-	session->output_stream = dynamic_cast<OutputStream*>(mod_out);
 
 	chain->connect(mod_renderer, 0, mod_peak, 0);
 	chain->connect(mod_peak, 0, mod_out, 0);
@@ -245,74 +222,79 @@ void SignalChain::reset()
 	connect(modules[1], 0, modules[2], 0);
 }
 
+Module* SignalChain::add(int type, const string &sub_type)
+{
+	return add(ModuleFactory::create(session, type, sub_type));
+}
+
 Module* SignalChain::addAudioSource(const string &name)
 {
-	return add(CreateAudioSource(session, name));
+	return add(Module::Type::AUDIO_SOURCE, name);
 }
 
 Module* SignalChain::addMidiSource(const string &name)
 {
-	return add(CreateMidiSource(session, name));
+	return add(Module::Type::MIDI_SOURCE, name);
 }
 
 Module* SignalChain::addAudioEffect(const string &name)
 {
-	return add(CreateAudioEffect(session, name));
+	return add(Module::Type::AUDIO_EFFECT, name);
 }
 
 Module* SignalChain::addAudioJoiner()
 {
-	return add(new AudioJoiner(session));
+	return add(Module::Type::AUDIO_JOINER, "");
 }
 
 Module* SignalChain::addAudioSucker()
 {
-	return add(new AudioSucker(session));
+	return add(Module::Type::AUDIO_SUCKER, "");
 }
 
 Module* SignalChain::addPitchDetector()
 {
-	return add(new PitchDetector);
+	return add(Module::Type::PITCH_DETECTOR, "");
 }
 
 Module* SignalChain::addAudioVisualizer(const string &name)
 {
-	return add(CreateAudioVisualizer(session, name));
+	return add(Module::Type::AUDIO_VISUALIZER, name);
 }
 
 Module* SignalChain::addAudioInputStream()
 {
-	return add(new InputStreamAudio(session));
+	return add(Module::Type::INPUT_STREAM_AUDIO, "");
 }
 
 Module* SignalChain::addAudioOutputStream()
 {
-	return add(new OutputStream(session, NULL));
+	return add(Module::Type::OUTPUT_STREAM_AUDIO, "");
 }
 
 Module* SignalChain::addMidiEffect(const string &name)
 {
-	return add(CreateMidiEffect(session, name));
+	return add(Module::Type::MIDI_EFFECT, name);
 }
 
 Module* SignalChain::addSynthesizer(const string &name)
 {
-	return add(CreateSynthesizer(session, name));
+	return add(Module::Type::SYNTHESIZER, name);
 }
 
 Module* SignalChain::addMidiInputStream()
 {
-	return add(new InputStreamMidi(session));
+	return add(Module::Type::INPUT_STREAM_MIDI, "");
 }
 
 Module* SignalChain::addBeatMidifier()
 {
-	return add(new BeatMidifier);
+	return add(Module::Type::BEAT_MIDIFIER, "");
 }
 
 Module* SignalChain::addBeatSource(const string &name)
 {
-	return add(CreateBeatSource(session, name));
+	return add(Module::Type::BEAT_SOURCE, name);
 }
 
 void SignalChain::reset_state()

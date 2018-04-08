@@ -18,7 +18,7 @@ class AudioSucker : public Module
 {
 	friend class AudioSuckerThread;
 public:
-	AudioSucker(Session *s);
+	AudioSucker();
 	virtual ~AudioSucker();
 
 	void set_source(AudioPort *s);
@@ -45,6 +45,10 @@ public:
 	int perf_channel;
 
 	AudioSuckerThread *thread;
+	virtual void module_start(){ start(); }
+	virtual void module_stop(){ stop(); }
 };
+
+AudioSucker *CreateAudioSucker(Session *session);
 
 #endif /* SRC_MODULE_AUDIO_AUDIOSUCKER_H_ */

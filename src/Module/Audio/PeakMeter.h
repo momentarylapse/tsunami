@@ -13,7 +13,6 @@
 
 class PeakMeterDisplay;
 class AudioBuffer;
-class Session;
 
 
 struct PeakMeterData{
@@ -30,7 +29,7 @@ class PeakMeter : public AudioVisualizer
 {
 	friend class PeakMeterDisplay;
 public:
-	PeakMeter(Session *s);
+	PeakMeter();
 	virtual ~PeakMeter();
 
 	virtual _cdecl void process(AudioBuffer &buf);

@@ -429,6 +429,14 @@ Module *Module::copy() const
 	return clone;
 }
 
+void Module::module_pause(bool paused)
+{
+	if (paused)
+		module_stop();
+	else
+		module_start();
+}
+
 
 string Module::type_to_name(int type)
 {

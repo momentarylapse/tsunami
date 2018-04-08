@@ -34,6 +34,7 @@ public:
 
 	Array<Module*> modules;
 	Module* add(Module *m);
+	Module* add(int type, const string &sub_type);
 	Module* addAudioSource(const string &name);
 	Module* addMidiSource(const string &name);
 	Module* addAudioEffect(const string &name);

@@ -72,7 +72,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 
-#ifdef DEVICE_MIDI_ALSA
+#ifdef HAS_LIB_ALSA
 	subs = NULL;
 #endif
 
@@ -110,7 +110,7 @@ bool InputStreamMidi::unconnect()
 		return true;
 	int r = snd_seq_unsubscribe_port(device_manager->alsa_midi_handle, subs);
 	if (r != 0)
-		session->e(string("Error unconnecting from midi port: ") + snd_strerror(r));
+		session->e(_("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
 	return r == 0;

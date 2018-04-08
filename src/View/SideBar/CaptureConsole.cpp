@@ -109,6 +109,7 @@ void CaptureConsole::onLeave()
 {
 	if (mode->isCapturing())
 		mode->insert();
+	view->stream->unsubscribe(this);
 
 	view->stop();
 
@@ -184,6 +185,7 @@ void CaptureConsole::onPause()
 
 void CaptureConsole::onOk()
 {
+	view->stream->unsubscribe(this);
 	mode->stop();
 	if (mode->insert())
 		bar()->_hide();
@@ -191,6 +193,7 @@ void CaptureConsole::onOk()
 
 void CaptureConsole::onCancel()
 {
+	view->stream->unsubscribe(this);
 	mode->stop();
 	bar()->_hide();
 }

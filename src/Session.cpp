@@ -45,6 +45,7 @@ Session::~Session()
 		delete(signal_chain);
 	if (song)
 		delete(song);
+	delete(storage);
 }
 
 int Session::sample_rate()

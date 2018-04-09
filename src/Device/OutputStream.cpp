@@ -215,6 +215,8 @@ public:
 	}
 };
 
+extern bool ugly_hack_slow;
+
 OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	Module(Type::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
@@ -241,6 +243,8 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	update_dt = DEFAULT_UPDATE_DT;
+	if (ugly_hack_slow)
+		update_dt *= 10;
 	killed = false;
 	thread = NULL;
 #if HAS_LIB_PULSEAUDIO

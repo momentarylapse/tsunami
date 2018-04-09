@@ -30,6 +30,7 @@ gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
 	reinterpret_cast<ControlDrawingArea*>(user_data)->redraw_area.clear();
 	reinterpret_cast<Control*>(user_data)->notify("hui:draw");
+	//msg_write("/draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
 	return false;
 }
 
@@ -313,40 +314,46 @@ void ControlDrawingArea::make_current()
 		gtk_gl_area_make_current(GTK_GL_AREA(widget));
 }
 
+static bool __drawing_area_queue_redraw(void *p)
+{
+	gtk_widget_queue_draw(GTK_WIDGET(p));
+	return false;
+}
+
 void ControlDrawingArea::redraw()
 {
 	//msg_write("redraw " + id);
 	rect r = rect(0,0,1000000,1000000);
-	for (rect &rr: redraw_area)
-		if (rr.covers(r)){
-			if (delay_timer->peek() < 0.2f){
-				//msg_write("            IGNORE " + f2s(delay_timer->peek(), 3));
+	if (delay_timer->peek() < 0.2f){
+		for (rect &rr: redraw_area)
+			if (rr.covers(r)){
+				//msg_write("    IGNORE " + f2s(delay_timer->peek(), 3));
 				return;
-			}else{
-				delay_timer->reset();
-				redraw_area.clear();
-				break;
 			}
-		}
+	}else{
+		delay_timer->reset();
+		redraw_area.clear();
+	}
 	if (!widget)
 		return;
-	gtk_widget_queue_draw(widget);
+	//printf("                    DRAW\n");
+	g_idle_add((GSourceFunc)__drawing_area_queue_redraw,(void*)widget);
+	//gtk_widget_queue_draw(widget);
 	redraw_area.add(r);
 }
 
 void ControlDrawingArea::redraw(const rect &r)
 {
-	for (rect &rr: redraw_area)
-		if (rr.covers(r)){
-			if (delay_timer->peek() < 0.2f){
-				//msg_write("            IGNORE " + f2s(delay_timer->peek(), 3));
+	if (delay_timer->peek() < 0.2f){
+		for (rect &rr: redraw_area)
+			if (rr.covers(r)){
+				//msg_write("    IGNORE " + f2s(delay_timer->peek(), 3));
 				return;
-			}else{
-				delay_timer->reset();
-				redraw_area.clear();
-				break;
 			}
-		}
+	}else{
+		delay_timer->reset();
+		redraw_area.clear();
+	}
 	if (!widget)
 		return;
 	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());

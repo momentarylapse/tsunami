@@ -139,6 +139,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 	return r;
 }
 
+extern bool ugly_hack_slow;
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
 	Module(Type::INPUT_STREAM_AUDIO),
@@ -148,10 +149,12 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	set_session_etc(_session, "", NULL);
 	_sample_rate = session->sample_rate();
 	chunk_size = -1;
-	update_dt = -1;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 0;
+
+	if (ugly_hack_slow)
+		update_dt *= 50;
 
 	capturing = false;
 #if HAS_LIB_PULSEAUDIO
@@ -214,6 +217,8 @@ void InputStreamAudio::set_update_dt(float dt)
 		update_dt = dt;
 	else
 		update_dt = DEFAULT_UPDATE_TIME;
+	if (ugly_hack_slow)
+		update_dt *= 10;
 }
 
 Device *InputStreamAudio::get_device()

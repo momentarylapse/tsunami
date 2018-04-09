@@ -29,6 +29,8 @@ const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
 
+bool ugly_hack_slow = false;
+
 Tsunami::Tsunami() :
 	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
 {
@@ -172,6 +174,8 @@ bool Tsunami::handleArguments(Array<string> &args)
 		session->win->show();
 		session->signal_chain->load(args[i+1]);
 		i ++;
+	}else if (args[i] == "--slow"){
+		ugly_hack_slow = true;
 	}else if (args[i].head(2) == "--"){
 		session->e(_("unknown command: ") + args[i]);
 		return true;

@@ -249,7 +249,6 @@ string SerialNodeParam::str() const
 
 string SerialNode::str() const
 {
-	//msg_db_f("cmd_out", 4);
 	if (inst == INST_MARKER)
 		return format("-- Label %d --", p[0].p);
 	if (inst == INST_ASM)
@@ -804,8 +803,7 @@ int Serializer::temp_in_cmd(int c, int v)
 
 void Serializer::ScanTempVarUsage()
 {
-	/*msg_db_f("ScanTempVarUsage", 4);
-	msg_write("ScanTempVarUsage");
+	/*msg_write("ScanTempVarUsage");
 	foreachi(TempVar &v, temp_var, i){
 		v.first = -1;
 		v.last = -1;
@@ -848,7 +846,6 @@ inline bool param_combi_allowed(int inst, SerialNodeParam &p1, SerialNodeParam &
 // mov [0x..] [0x...]  ->  mov temp, [0x..]   mov [0x..] temp
 /*void CorrectUnallowedParamCombis()
 {
-	msg_db_f("CorrectCombis", 3);
 	for (int i=cmd.num-1;i>=0;i--)
 		if (!param_combi_allowed(cmd[i].inst, cmd[i].p[0], cmd[i].p[1])){
 			msg_write(string2("correcting param combi  cmd=%d", i));
@@ -917,7 +914,6 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 #if 0
 void ResolveDerefLocal()
 {
-	msg_db_f("ResolveDerefLocal", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst >= Asm::inst_marker)
 			continue;

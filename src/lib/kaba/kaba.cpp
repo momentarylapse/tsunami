@@ -414,7 +414,6 @@ void Script::__Execute()
 	if (__waiting_mode == WAITING_MODE_NONE)
 		return;
 	shift_right=0;
-//	msg_db_f(filename.c_str(),1);
 
 	// handle wait-commands
 	if (__waiting_mode == WAITING_MODE_FIRST){

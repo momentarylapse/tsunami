@@ -146,7 +146,6 @@ void NotifyWindowByWidget(Panel *panel, GtkWidget *widget, const string &message
 {
 	if (allow_signal_level > 0)
 		return;
-	msg_db_m("NotifyWindowByWidget", 2);
 	string id = panel->_get_id_by_widget_(widget);
 	panel->_set_cur_id_(id);
 	if (id.num > 0){

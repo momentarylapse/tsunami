@@ -31,12 +31,10 @@ namespace hui
 
 HuiMenu::HuiMenu()
 {
-	msg_db_r("HuiMenu()", 1);
 	_HuiMakeUsable_();
 
 	hMenu = CreateMenu();
-	
-	msg_db_l(1);
+
 }
 
 HuiMenu::~HuiMenu()
@@ -48,7 +46,6 @@ HuiMenu::~HuiMenu()
 void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 {
 #if 0
-	msg_db_r("HuiMenu::OpenPopup", 1);
 	tagPOINT pt;
 	pt.x = pt.y = 0;
 	ClientToScreen(win->hWnd, &pt);
@@ -57,7 +54,6 @@ void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 	TrackPopupMenu(hMenu, 0, pt.x + x, pt.y + y, 0, win->hWnd, NULL);
 	
 	win->popup = this;
-	msg_db_l(1);
 #endif
 }
 

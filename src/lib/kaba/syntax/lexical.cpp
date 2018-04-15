@@ -176,7 +176,7 @@ void ExpressionBuffer::Analyse(SyntaxTree *ps, const string &source)
 
 	// glue together lines ending with a "\" or ","
 	for (int i=0;i<(int)line.num-1;i++){
-		if ((line[i].exp.back().name == "\\") || (line[i].exp.back().name == ",")){
+		if ((line[i].exp.back().name == "\\") or (line[i].exp.back().name == ",")){
 			// glue... (without \\ but with ,)
 			if (line[i].exp.back().name == "\\")
 				line[i].exp.pop();
@@ -238,10 +238,10 @@ bool ExpressionBuffer::DoMultiLineComment(const char *source, int &pos)
 	while(true){
 		if (source[pos] == '\n')
 			return true;
-		if ((source[pos] == '/') && (source[pos + 1] == '*')){
+		if ((source[pos] == '/') and (source[pos + 1] == '*')){
 			pos ++;
 			comment_level ++;
-		}else if ((source[pos] == '*') && (source[pos + 1] == '/')){
+		}else if ((source[pos] == '*') and (source[pos + 1] == '/')){
 			comment_level --;
 			pos ++;
 			if (comment_level == 0){
@@ -264,7 +264,7 @@ void ExpressionBuffer::DoAsmBlock(const char *source, int &pos, int &line_no)
 	for (int i=0;i<1024;i++){
 		if (source[pos] == '{')
 			break;
-		if ((source[pos] != ' ') && (source[pos] != '\t') && (source[pos] != '\n'))
+		if ((source[pos] != ' ') and (source[pos] != '\t') and (source[pos] != '\n'))
 			syntax->DoError("'{' expected after \"asm\"");
 		if (source[pos] == '\n')
 			line_breaks ++;
@@ -314,19 +314,19 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 		}else if (source[pos]=='\t'){ // tab
 			if (l->exp.num == 0)
 				l->indent ++;
-		}else if ((source[pos] == '/') && (source[pos + 1]=='/')){ // single-line comment
+		}else if ((source[pos] == '/') and (source[pos + 1]=='/')){ // single-line comment
 			// skip to end of line
 			while (true){
 				pos ++;
-				if ((source[pos] == '\n') || (source[pos] == 0))
+				if ((source[pos] == '\n') or (source[pos] == 0))
 					return true;
 			}
-		}else if ((source[pos] == '/') && (source[pos + 1] == '*')){ // multi-line comment
+		}else if ((source[pos] == '/') and (source[pos + 1] == '*')){ // multi-line comment
 			if (DoMultiLineComment(source, pos))
 				return true;
 			ExpKind = ExpKindSpacing;
 			continue;
-		}else if ((source[pos] == 'a') && (source[pos + 1] == 's') && (source[pos + 2] == 'm')){ // asm block
+		}else if ((source[pos] == 'a') and (source[pos + 1] == 's') and (source[pos + 2] == 'm')){ // asm block
 			int pos0 = pos;
 			pos += 3;
 			DoAsmBlock(source, pos, line_no);
@@ -343,11 +343,10 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 
 	// string
 	if (source[pos] == '\"'){
-		msg_db_m("string", 1);
 		for (int i=0;true;i++){
 			char c = Temp[TempLength ++] = source[pos ++];
 			// end of string?
-			if ((c == '\"') && (i > 0)){
+			if ((c == '\"') and (i > 0)){
 				break;
 			}else if (c == 0){
 				syntax->DoError("string exceeds file");
@@ -378,19 +377,17 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 		}
 
 	// macro
-	}else if ((source[pos] == '#') && (GetKind(source[pos + 1]) == ExpKindLetter)){
-		msg_db_m("macro", 4);
+	}else if ((source[pos] == '#') and (GetKind(source[pos + 1]) == ExpKindLetter)){
 		for (int i=0;i<SCRIPT_MAX_NAME;i++){
 			int kind = GetKind(source[pos]);
 			// may contain letters and numbers
-			if ((i > 0) && (kind != ExpKindLetter) && (kind != ExpKindNumber))
+			if ((i > 0) and (kind != ExpKindLetter) and (kind != ExpKindNumber))
 				break;
 			Temp[TempLength ++] = source[pos ++];
 		}
 
 	// character
 	}else if (source[pos] == '\''){
-		msg_db_m("char", 4);
 		Temp[TempLength ++] = source[pos ++];
 		Temp[TempLength ++] = source[pos ++];
 		Temp[TempLength ++] = source[pos ++];
@@ -399,28 +396,26 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 
 	// word
 	}else if (ExpKind == ExpKindLetter){
-		msg_db_m("word", 4);
 		for (int i=0;i<SCRIPT_MAX_NAME;i++){
 			int kind = GetKind(source[pos]);
 			// may contain letters and numbers
-			if ((kind != ExpKindLetter) && (kind != ExpKindNumber))
+			if ((kind != ExpKindLetter) and (kind != ExpKindNumber))
 				break;
 			Temp[TempLength ++] = source[pos ++];
 		}
 
 	// number
 	}else if (ExpKind == ExpKindNumber){
-		msg_db_m("num", 4);
 		bool hex = false;
 		char last = 0;
 		for (int i=0;true;i++){
 			char c = Temp[TempLength] = source[pos];
 			// "0x..." -> hexadecimal
-			if ((i == 1) && (Temp[0] == '0') && (Temp[1] == 'x'))
+			if ((i == 1) and (Temp[0] == '0') and (Temp[1] == 'x'))
 				hex = true;
 			int kind = GetKind(c);
 			if (hex){
-				if ((i > 1) && (kind != ExpKindNumber) && ((c < 'a') || (c > 'f')))
+				if ((i > 1) and (kind != ExpKindNumber) and ((c < 'a') or (c > 'f')))
 					break;
 			}else{
 				// may contain numbers and '.' or 'e'/'E'
@@ -437,27 +432,26 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 
 	// symbol
 	}else if (ExpKind == ExpKindSign){
-		msg_db_m("sym", 4);
 		// mostly single-character symbols
 		char c = Temp[TempLength ++] = source[pos ++];
 		// double-character symbol
-		if (((c == '=') && (source[pos] == '=')) || // ==
-			((c == '!') && (source[pos] == '=')) || // !=
-			((c == '<') && (source[pos] == '=')) || // <=
-			((c == '>') && (source[pos] == '=')) || // >=
-			((c == '+') && (source[pos] == '=')) || // +=
-			((c == '-') && (source[pos] == '=')) || // -=
-			((c == '*') && (source[pos] == '=')) || // *=
-			((c == '/') && (source[pos] == '=')) || // /=
-			((c == '+') && (source[pos] == '+')) || // ++
-			((c == '-') && (source[pos] == '-')) || // --
-			((c == '&') && (source[pos] == '&')) || // &&
-			((c == '|') && (source[pos] == '|')) || // ||
-			((c == '<') && (source[pos] == '<')) || // <<
-			((c == '>') && (source[pos] == '>')) || // >>
-			((c == '+') && (source[pos] == '+')) || // ++
-			((c == '-') && (source[pos] == '-')) || // --
-			((c == '-') && (source[pos] == '>'))) // ->
+		if (((c == '=') and (source[pos] == '=')) or // ==
+			((c == '!') and (source[pos] == '=')) or // !=
+			((c == '<') and (source[pos] == '=')) or // <=
+			((c == '>') and (source[pos] == '=')) or // >=
+			((c == '+') and (source[pos] == '=')) or // +=
+			((c == '-') and (source[pos] == '=')) or // -=
+			((c == '*') and (source[pos] == '=')) or // *=
+			((c == '/') and (source[pos] == '=')) or // /=
+			((c == '+') and (source[pos] == '+')) or // ++
+			((c == '-') and (source[pos] == '-')) or // --
+			((c == '&') and (source[pos] == '&')) or // and
+			((c == '|') and (source[pos] == '|')) or // or
+			((c == '<') and (source[pos] == '<')) or // <<
+			((c == '>') and (source[pos] == '>')) or // >>
+			((c == '+') and (source[pos] == '+')) or // ++
+			((c == '-') and (source[pos] == '-')) or // --
+			((c == '-') and (source[pos] == '>'))) // ->
 				Temp[TempLength ++] = source[pos ++];
 	}
 

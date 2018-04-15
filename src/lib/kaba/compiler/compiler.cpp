@@ -563,8 +563,6 @@ void Script::Compiler()
 	if (!config.compile_os)
 		init_all_global_objects(syntax, g_var);
 
-	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
-
 	//_expand(Opcode,OpcodeSize);
 
 	if (__first_execution)

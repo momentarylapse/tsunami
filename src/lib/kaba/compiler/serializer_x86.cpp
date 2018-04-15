@@ -1052,7 +1052,6 @@ inline bool param_combi_allowed(int inst, SerialNodeParam &p1, SerialNodeParam &
 // mov [0x..] [0x...]  ->  mov temp, [0x..]   mov [0x..] temp
 /*void CorrectUnallowedParamCombis()
 {
-	msg_db_f("CorrectCombis", 3);
 	for (int i=cmd.num-1;i>=0;i--)
 		if (!param_combi_allowed(cmd[i].inst, cmd[i].p[0], cmd[i].p[1])){
 			msg_write(string2("correcting param combi  cmd=%d", i));

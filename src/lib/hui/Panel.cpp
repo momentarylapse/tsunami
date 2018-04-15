@@ -304,7 +304,7 @@ void Panel::addControl(const string &type, const string &title, int x, int y, co
 
 void Panel::_addControl(const string &ns, Resource &cmd, const string &parent_id)
 {
-	//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
+	//msg_write(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 	setTarget(parent_id);
 	addControl(cmd.type, GetLanguageR(ns, cmd),
 				cmd.x, cmd.y,

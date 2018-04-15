@@ -344,7 +344,6 @@ void Control::notify(const string &message, bool is_default)
 		msg_error("HuiControl.Notify without panel: " + id);
 		return;
 	}
-	msg_db_m("Control.Notify", 2);
 	panel->_set_cur_id_(id);
 	if (id.num == 0)
 		return;

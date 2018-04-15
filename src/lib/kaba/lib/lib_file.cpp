@@ -82,6 +82,11 @@ public: KabaFileError(const string &t) : KabaException(t){}
 class KabaFileNotWritableError : public KabaFileError
 { public: KabaFileNotWritableError(const string &t) : KabaFileError(t){} };*/
 
+
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+
+
 File* kaba_file_open(const string &filename)
 {
 	try{
@@ -171,6 +176,9 @@ void kaba_dir_delete(const string &f)
 	if (!dir_delete(f))
 		kaba_raise_exception(new KabaFileError("can not delete directory '" + f + "'"));
 }
+
+
+#pragma GCC pop_options
 
 void SIAddPackageFile()
 {

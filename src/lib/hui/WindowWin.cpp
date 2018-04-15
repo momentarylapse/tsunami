@@ -561,7 +561,6 @@ static LRESULT CALLBACK WindowProcedure(HWND hwnd,UINT message,WPARAM wParam,LPA
 // general window
 HuiWindow::HuiWindow(const char *title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode, bool show, message_function *mf)
 {
-	msg_db_r("HuiWindow()",1);
 	_Init_(root, allow_root, mf);
 
 	
@@ -598,7 +597,6 @@ HuiWindow::HuiWindow(const char *title, int x, int y, int width, int height, Hui
 
 	if (!RegisterClassEx(&wincl)){
 		msg_error("new HuiWindow - RegisterClassEx");
-		msg_db_l(1);
 		return;
 	}
 		
@@ -639,7 +637,6 @@ HuiWindow::HuiWindow(const char *title, int x, int y, int width, int height, Hui
 							NULL);
 	if (!hWnd){
 		msg_error("new HuiWindow - CreateWindowEx");
-		msg_db_l(1);
 		return;
 	}
 	ShowWindow(hWnd,SW_HIDE);
@@ -673,7 +670,6 @@ HuiWindow::HuiWindow(const char *title, int x, int y, int width, int height, Hui
 // well,.... kind of ugly....
 	//if (bg_mode==HuiBGModeStyleDialog)
 		//SetOuterior(irect(x,x+width+4,y,y+height+22));
-	msg_db_l(1);
 }
 
 
@@ -684,7 +680,6 @@ HuiWindow::HuiWindow(const char *title,int x,int y,int width,int height,message_
 
 HuiWindow::~HuiWindow()
 {
-	msg_db_r("~HuiWindow",1);
 	_CleanUp_();
 	
 	if (Root){
@@ -707,7 +702,6 @@ HuiWindow::~HuiWindow()
 				DestroyWindow(Control[i].hWnd);
 		DestroyWindow(hWnd);
 	}
-	msg_db_l(1);
 }
 
 // should be called after creating (and filling) the window to actually show it

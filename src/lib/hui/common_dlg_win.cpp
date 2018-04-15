@@ -70,7 +70,6 @@ bool HuiFileDialogDir(HuiWindow *win, const string &title, const string &dir/*, 
 // Datei-Auswahl zum Oeffnen (filter in der Form "*.txt")
 bool HuiFileDialogOpen(HuiWindow *win, const string &title, const string &dir, const string &show_filter, const string &filter)
 {
-	msg_db_r("HuiFileDialogOpen",1);
 	HWND hWnd=win?win->hWnd:NULL;
 	TCHAR _filter_[256];
 	// filter = $show_filter\0$filter\0\0
@@ -87,7 +86,6 @@ bool HuiFileDialogOpen(HuiWindow *win, const string &title, const string &dir, c
 						_filename_,TCHAR_STRING_LENGTH,_path_,sys_str(title),OFN_FILEMUSTEXIST,0,1,_T("????"),0,NULL,NULL};
 	bool done=(GetOpenFileName(&ofn)==TRUE);
 	HuiFilename = de_sys_str_f(_complete_name_);
-	msg_db_l(1);
 	return done;
 }
 

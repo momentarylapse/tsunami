@@ -8,9 +8,6 @@ namespace Kaba{
 //#define ScriptDebug
 
 
-/*#define PRESCRIPT_DB_LEVEL	2
-#define db_f(msg,level)		msg_db_f(msg,level+PRESCRIPT_DB_LEVEL)*/
-
 extern Class *TypeDynamicArray;
 
 

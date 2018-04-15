@@ -9,6 +9,8 @@
 #include "../kaba.h"
 #include "../../file/msg.h"
 #include <stdlib.h>
+#include <assert.h>
+
 
 namespace Kaba{
 
@@ -171,7 +173,7 @@ void relink_return(void *rip, void *rbp, void *rsp)
 		: "r" (rsp), "r" (rip)
 		: "%rsp");
 
-	printf("rbp=%p\n", rbp2);
+//	printf("rbp=%p\n", rbp2);
 
 	exit(0);
 }
@@ -198,6 +200,8 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 	Array<StackFrameInfo> trace;
 
 	void **rsp = NULL;
+//	msg_write("stack trace");
+//	printf("rbp=%p     ...%p\n", rbp, &rsp);
 
 	while (true){
 		rsp = rbp;
@@ -208,6 +212,7 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 		void *rip = *rsp;
 		//printf("-- rip: %p\n", rip);
 		rsp ++;
+//		printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
 		auto r = get_func_from_rip(rip);
 		if (r.f){
 			r.rsp = rsp;
@@ -225,17 +230,33 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 	return trace;
 }
 
+
+// stack unwinding does not work if gcc does not use a stack frame...
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+
 void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 {
 	// get stack frame base pointer rbp
 	void **rbp = NULL;
-	asm volatile("mov %%rbp, %0\n\t"
-		: "=r" (rbp)
+	void **rsp = NULL;
+	asm volatile("movq %%rbp, %0\n\t"
+			"movq %%rsp, %1\n\t"
+		: "=r" (rbp), "=r" (rsp)
 		:
 		: );
 
 	if (_verbose_exception_)
 		msg_error("raise...");
+
+//	printf("rbp=%p   rsp=%p    local=%p\n", rbp, rsp, &rsp);
+
+	// check sanity
+	void **local = (void**)&rsp;
+	// rbp  >  local > rsp
+	assert((rbp > rsp) and (rbp > local) and (local > rsp));
+	assert((long)rbp - (long)rsp < 10000);
+
 
 	auto trace = get_stack_trace(rbp);
 
@@ -293,6 +314,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 		msg_write(">>  " + r.s->filename + " : " + r.f->name + format("()  + 0x%x", r.offset));
 	exit(1);
 }
-
+#pragma GCC pop_options
 
 }
+

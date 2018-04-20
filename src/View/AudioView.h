@@ -82,6 +82,7 @@ public:
 	void drawBackground(Painter *c);
 	void drawAudioFile(Painter *c);
 
+	rect getBoxedStrRect(Painter *c, float x, float y, const string &str);
 	void drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
 
 	void optimizeView();

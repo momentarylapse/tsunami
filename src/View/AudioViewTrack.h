@@ -83,6 +83,7 @@ public:
 	rect area;
 	rect area_last, area_target;
 	Array<rect> marker_areas;
+	Array<rect> marker_label_areas;
 	Array<int> reference_tracks;
 	bool solo;
 	AudioView *view;

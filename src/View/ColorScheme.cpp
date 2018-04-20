@@ -26,6 +26,14 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 		c.hover = ColorInterpolate(hover, background, 0.3f);
 	}
 
+	if (text.r > background.r){
+		c.high_contrast_a = White;
+		c.high_contrast_b = Black;
+	}else{
+		c.high_contrast_a = Black;
+		c.high_contrast_b = White;
+	}
+
 	//c.background_track_selected = ColorInterpolate(background, c.selection*1.5f, 0.17f);
 	//c.background_track = ColorInterpolate(c.background, c.background_track_selected, 0.5f);
 	c.background_track_selected = ColorInterpolate(background, c.selection*1.2f, 0.15f);

@@ -364,6 +364,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
+	t->marker_label_areas.resize(t->track->markers.num);
 	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t->track) and (hover->index == i));
 
@@ -555,7 +556,7 @@ Selection ViewModeDefault::getHover()
 
 		// markers
 		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
-			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my)){
+			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my) or view->vtrack[s.index]->marker_label_areas[i].inside(mx, my)){
 				s.marker = s.track->markers[i];
 				s.type = Selection::Type::MARKER;
 				s.index = i;

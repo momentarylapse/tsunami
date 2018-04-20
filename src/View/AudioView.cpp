@@ -806,12 +806,19 @@ void AudioView::updateTracks()
 		notify(MESSAGE_VTRACK_CHANGE);
 }
 
-void AudioView::drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
+
+rect AudioView::getBoxedStrRect(Painter *c, float x, float y, const string &str)
 {
 	float w = c->getStrWidth(str);
+	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + FONT_SIZE + CORNER_RADIUS);
+}
+
+void AudioView::drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
+{
+	rect r = getBoxedStrRect(c, x, y, str);
 	c->setColor(col_bg);
 	c->setRoundness(CORNER_RADIUS);
-	c->drawRect(x-CORNER_RADIUS, y-CORNER_RADIUS, w + 2*CORNER_RADIUS, FONT_SIZE + 2*CORNER_RADIUS);
+	c->drawRect(r);
 	c->setRoundness(0);
 	c->setColor(col_text);
 	c->drawStr(x, y - FONT_SIZE/3, str);

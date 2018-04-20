@@ -105,7 +105,7 @@ public:
 
 	static void draw(Painter *p, float x, float y, float size, const string &s)
 	{
-#if 0
+#if 1
 		p->setFontSize(size);
 		p->drawStr(x, y, s);
 #else
@@ -467,7 +467,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	float x0 = view->cam.sample2screen(marker->range.start());
 	float x1 = view->cam.sample2screen(marker->range.end());
 	float y0 = area.y1;
-	float y1 = area.y1 + 30;
+	float y1 = area.y1 + 15;
 
 	w = max(w, x1 - x0);
 
@@ -485,7 +485,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	}
 
 	color col_bg2 = col2;
-	col_bg2.a = 0.25f;
+	col_bg2.a = 0.65f;
 	c->setColor(col_bg2);
 	c->drawRect(x0, y0, x1-x0, y1-y0);
 	c->setColor(col2);
@@ -496,6 +496,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	view->drawBoxedStr(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 
 	marker_areas[index] = rect(x0, x0 + w, y0, y1);
+	marker_label_areas[index] = view->getBoxedStrRect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
 
 	c->setFont("", -1, false, false);
 }
@@ -642,6 +643,7 @@ void AudioViewTrack::drawMidiClefTab(Painter *c)
 
 	c->setFontSize(h / 6);
 	c->drawStr(10, area.y1 + area.height() / 2 - h * 0.37f, "T\nA\nB");
+	c->setFontSize(view->FONT_SIZE);
 }
 
 void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
@@ -661,7 +663,7 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
 	}
 
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
+	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.high_contrast_a, 0.2f);
 	if (state & STATE_HOVER){
 		col = ColorInterpolate(col, view->colors.hover, 0.333f);
 	}else if (state & STATE_REFERENCE){
@@ -672,7 +674,7 @@ void AudioViewTrack::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 
 	if (x2 - x1 > r/4 and r > 5){
 		float font_size = r * 1.4f;
-		c->setColor(view->colors.text);
+		c->setColor(view->colors.high_contrast_b);//text);
 		SymbolRenderer::draw(c, x1 + font_size*0.2f, y - font_size*0.75f, font_size, i2s(n->pitch - track->instrument.string_pitch[n->stringno]));
 	}
 }

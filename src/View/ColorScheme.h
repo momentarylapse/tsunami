@@ -42,6 +42,7 @@ public:
 	color grid;
 	color sample;
 	color sample_selected;
+	color high_contrast_a, high_contrast_b;
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

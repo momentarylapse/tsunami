@@ -131,9 +131,16 @@ IMPLEMENT_FUNC(MidiNote, notes)
 IMPLEMENT_FUNC(Bar, bars)
 
 
-int SongSelection::getNumSamples() const
+int SongSelection::num_samples() const
 {
 	return samples.num;
+}
+
+bool SongSelection::is_empty() const
+{
+	if (!range.empty())
+		return false;
+	return (samples.num == 0) and (markers.num == 0) and (notes.num == 0) and (bars.num == 0);
 }
 
 SongSelection SongSelection::restrict_to_track(Track *t) const

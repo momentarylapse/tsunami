@@ -29,6 +29,7 @@ public:
 	{
 		mode = Mode::WAITING;
 		ttl = -1;
+		volume = 1.0f;
 	}
 	virtual int _cdecl read(MidiEventBuffer &midi)
 	{
@@ -40,7 +41,7 @@ public:
 
 		if (mode == Mode::START_NOTES){
 			for (int p: pitch)
-				midi.add(MidiEvent(0, p, 1));
+				midi.add(MidiEvent(0, p, volume));
 			mode = Mode::ACTIVE_NOTES;
 		}else if (mode == Mode::END_NOTES){
 			for (int p: pitch)
@@ -84,6 +85,7 @@ private:
 	int ttl;
 
 	Array<int> pitch;
+	float volume;
 };
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
@@ -144,6 +146,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 		preview_stream->set_buffer_size(2048);
 		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
+	preview_stream->set_volume(view->cur_track->volume);
 
 	preview_source->start(pitch, view->session->sample_rate() * ttl);
 	preview_stream->play();
@@ -188,7 +191,7 @@ void ViewModeMidi::onLeftButtonDown()
 			view->sel.set(hover->note, !view->sel.has(hover->note));
 		}else{
 			if (!view->sel.has(hover->note)){
-				view->sel.clear();
+				view->sel.clear_data();
 				view->sel.add(hover->note);
 			}
 		}

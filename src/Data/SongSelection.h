@@ -69,7 +69,8 @@ public:
 	void set(const Bar *b, bool selected);
 	bool has(const Bar *b) const;
 
-	int getNumSamples() const;
+	int num_samples() const;
+	bool is_empty() const;
 
 	SongSelection restrict_to_track(Track *t) const;
 	SongSelection operator||(const SongSelection &s) const;

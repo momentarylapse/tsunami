@@ -365,7 +365,7 @@ Track *Song::addTrackAfter(int type, Track *ref)
 
 void Song::insertSelectedSamples(const SongSelection &sel, int layer_no)
 {
-	if (sel.getNumSamples() > 0)
+	if (sel.num_samples() > 0)
 		execute(new ActionTrackInsertSelectedSamples(sel, layer_no));
 }
 
@@ -442,8 +442,7 @@ void Song::scaleSample(Sample *s, int new_size, int method)
 
 void Song::deleteSelection(const SongSelection &sel, int layer_no, bool all_layers)
 {
-	if (!sel.range.empty())
-		execute(new ActionSongDeleteSelection(layer_no, sel, all_layers));
+	execute(new ActionSongDeleteSelection(layer_no, sel, all_layers));
 }
 
 void Song::createSamplesFromSelection(const SongSelection &sel, int layer_no)

@@ -42,7 +42,7 @@ void ActionSongDeleteSelection::build(Data *d)
 				addSubAction(new ActionTrackDeleteMarker(t, i), d);
 
 
-		if (!sel.has(t))
+		if (!sel.has(t) or sel.range.empty())
 			continue;
 
 		// buffer boxes

@@ -538,7 +538,8 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 
 void TsunamiWindow::onDelete()
 {
-	song->deleteSelection(view->sel, view->cur_layer, false);
+	if (!view->sel.is_empty())
+		song->deleteSelection(view->sel, view->cur_layer, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -717,14 +718,13 @@ bool menu_layer_names_needs_update(TsunamiWindow *win)
 
 void TsunamiWindow::updateMenu()
 {
-	bool selected = !view->sel.range.empty();
 // menu / toolbar
 	// edit
 	enable("undo", song->action_manager->undoable());
 	enable("redo", song->action_manager->redoable());
 	enable("copy", app->clipboard->canCopy(view));
 	enable("paste", app->clipboard->hasData());
-	enable("delete", selected or (view->sel.getNumSamples() > 0));
+	enable("delete", !view->sel.is_empty());
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
@@ -742,9 +742,9 @@ void TsunamiWindow::updateMenu()
 	enable("scale_bars", view->sel.bars.num > 0);
 	check("bar_link_to_data", view->bars_edit_data);
 	// sample
-	enable("sample_from_selection", selected);
-	enable("insert_sample", view->sel.getNumSamples() > 0);
-	enable("remove_sample", view->sel.getNumSamples() > 0);
+	enable("sample_from_selection", !view->sel.range.empty());
+	enable("insert_sample", view->sel.num_samples() > 0);
+	enable("remove_sample", view->sel.num_samples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));

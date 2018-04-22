@@ -58,7 +58,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);
-		f->write_buffer(data.data, data.num);
+		f->write_buffer(data);
 
 		done += buf.length;
 	}

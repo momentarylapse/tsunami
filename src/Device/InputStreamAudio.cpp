@@ -133,7 +133,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 		// write to file
 		string data;
 		buf.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
-		stream->backup_file->write_buffer(&data[0], data.num);
+		stream->backup_file->write_buffer(data);
 	}
 
 	return r;

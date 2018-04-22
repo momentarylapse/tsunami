@@ -232,6 +232,7 @@ OBJ = Action/Bar/Action__ScaleData.o \
  lib/threads/Thread.o \
  lib/threads/ThreadedWork.o \
  lib/xfile/chunked.o \
+ lib/xfile/pdf.o \
  lib/xfile/xml.o \
  Module/Audio/AudioEffect.o \
  Module/Audio/AudioJoiner.o \
@@ -1029,6 +1030,9 @@ lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp lib/file/file.h lib/ba
 lib/xfile/chunked.o : lib/xfile/chunked.cpp lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/xfile/chunked.h
 	$(CPP) -c lib/xfile/chunked.cpp -o $@ $(CXXFLAGS)
 
+lib/xfile/pdf.o : lib/xfile/pdf.cpp lib/xfile/pdf.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/image/Painter.h lib/image/image.h lib/config.h lib/image/color.h lib/math/math.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
+	$(CPP) -c lib/xfile/pdf.cpp -o $@ $(CXXFLAGS)
+
 lib/xfile/xml.o : lib/xfile/xml.cpp lib/xfile/xml.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
 	$(CPP) -c lib/xfile/xml.cpp -o $@ $(CXXFLAGS)
 
@@ -1041,7 +1045,7 @@ Module/Audio/AudioJoiner.o : Module/Audio/AudioJoiner.cpp Module/Audio/AudioJoin
 Module/Audio/AudioSource.o : Module/Audio/AudioSource.cpp Module/Audio/AudioSource.h Module/Module.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Module/Port/AudioPort.h Module/Port/Port.h Module/ModuleFactory.h
 	$(CPP) -c Module/Audio/AudioSource.cpp -o $@ $(CXXFLAGS)
 
-Module/Audio/AudioSucker.o : Module/Audio/AudioSucker.cpp Module/Audio/AudioSucker.h Data/Audio/AudioBuffer.h Data/Range.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Module/Module.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h lib/threads/Thread.h Stuff/PerformanceMonitor.h Module/Port/AudioPort.h Module/Port/Port.h
+Module/Audio/AudioSucker.o : Module/Audio/AudioSucker.cpp Module/Audio/AudioSucker.h Data/Audio/AudioBuffer.h Data/Range.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Module/Module.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h lib/threads/Thread.h Stuff/PerformanceMonitor.h Module/Port/AudioPort.h Module/Port/Port.h Module/ModuleFactory.h
 	$(CPP) -c Module/Audio/AudioSucker.cpp -o $@ $(CXXFLAGS)
 
 Module/Audio/AudioVisualizer.o : Module/Audio/AudioVisualizer.cpp Module/Audio/AudioVisualizer.h Module/Module.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Module/Port/AudioPort.h Module/Port/Port.h Module/ModuleFactory.h Session.h Data/Audio/AudioBuffer.h Data/Range.h Data/Audio/RingBuffer.h

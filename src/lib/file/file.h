@@ -100,6 +100,8 @@ public:
 	// really low level
 	int _cdecl read_buffer(void *buffer, int size);
 	int _cdecl write_buffer(const void *buffer, int size);
+	int _cdecl read_buffer(string &str);
+	int _cdecl write_buffer(const string &str);
 	string read_complete();
 
 	// medium level

@@ -41,7 +41,7 @@ public:
 	void _cdecl __delete__()
 	{ this->~KabaFile(); }
 	int _cdecl _WriteBuffer(const string &s)
-	{ return write_buffer(s.data, s.num); }
+	{ return write_buffer(s); }
 	string _cdecl _ReadBuffer(int size)
 	{
 		string s;

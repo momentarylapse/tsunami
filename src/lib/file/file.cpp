@@ -278,14 +278,14 @@ string FileReadText(const string &filename)
 void FileWrite(const string &filename, const string &str)
 {
 	File *f = FileCreate(filename);
-	f->write_buffer(str.data, str.num);
+	f->write_buffer(str);
 	FileClose(f);
 }
 
 void FileWriteText(const string &filename, const string &str)
 {
 	File *f = FileCreateText(filename);
-	f->write_buffer(str.data, str.num);
+	f->write_buffer(str);
 	FileClose(f);
 }
 
@@ -481,6 +481,16 @@ int File::write_buffer(const void *buffer, int size)
 	if (r < 0)
 		throw FileError("failed writing file '" + filename + "'");
 	return r;
+}
+
+int File::read_buffer(string &str)
+{
+	return read_buffer(str.data, str.num);
+}
+
+int File::write_buffer(const string &str)
+{
+	return write_buffer(str.data, str.num);
 }
 
 
@@ -716,8 +726,8 @@ void File::write_str(const string &str)
 }
 void TextFile::write_str(const string &str)
 {
-	write_buffer(str.data, str.num);
-	write_buffer("\n", 1);
+	write_buffer(str);
+	write_buffer("\n");
 }
 
 // write a comment line

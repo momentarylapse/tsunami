@@ -114,7 +114,7 @@ void ShiftRight(File *f, int s)
 		r=_write(handle," >-\t",4);
 #else
 	for (int i=0;i<s;i++)
-		f->write_buffer("\t",1);
+		f->write_buffer("\t");
 #endif
 }
 

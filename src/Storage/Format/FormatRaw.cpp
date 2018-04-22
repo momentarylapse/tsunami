@@ -46,7 +46,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 		if (!buf.exports(data, config.channels, config.format))
 			od->warn(_("Amplitude too large, signal distorted."));
 		od->set(float(done) / (float)samples);
-		f->write_buffer(data.data, data.num);
+		f->write_buffer(data);
 		done += buf.length;
 	}
 

@@ -20,7 +20,7 @@ FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
 static void write_str1(File *f, const string &s)
 {
 	f->write_byte(s.num);
-	f->write_buffer(s.data, s.num);
+	f->write_buffer(s);
 }
 
 static void write_str1c(File *f, const string &s, int size)
@@ -28,13 +28,13 @@ static void write_str1c(File *f, const string &s, int size)
 	f->write_byte(s.num);
 	string t = s;
 	t.resize(size);
-	f->write_buffer(t.data, size);
+	f->write_buffer(t);
 }
 
 static void write_str4(File *f, const string &s)
 {
 	f->write_int(s.num);
-	f->write_buffer(s.data, s.num);
+	f->write_buffer(s);
 }
 
 static void write_str41(File *f, const string &s)

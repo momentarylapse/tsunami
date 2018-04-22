@@ -26,7 +26,7 @@ static void write_chunk_name(File *f, const string &name)
 {
 	string s = name;
 	s.resize(4);
-	f->write_buffer(s.data, 4);
+	f->write_buffer(s);
 }
 
 static int int_reverse(int i)
@@ -267,7 +267,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				f->write_byte(0xff);
 				f->write_byte(0x03);
 				write_var(f, t->name.num);
-				f->write_buffer(t->name.data, t->name.num);
+				f->write_buffer(t->name);
 			}
 			if (od->song->bars.num > 0) {
 				auto *b = od->song->bars[0];

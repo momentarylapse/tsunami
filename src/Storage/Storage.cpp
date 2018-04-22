@@ -15,6 +15,7 @@
 #include "Format/FormatFlac.h"
 #include "Format/FormatM4a.h"
 #include "Format/FormatMidi.h"
+#include "Format/FormatPdf.h"
 #include "Format/FormatMp3.h"
 #include "Format/FormatSoundFont2.h"
 #include "Format/FormatGuitarPro.h"
@@ -44,6 +45,7 @@ Storage::Storage(Session *_session)
 	formats.add(new FormatDescriptorM4a());
 #endif
 	formats.add(new FormatDescriptorMidi());
+	formats.add(new FormatDescriptorPdf());
 
 	current_directory = hui::Config.getStr("CurrentDirectory", "");
 }

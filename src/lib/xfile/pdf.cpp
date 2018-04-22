@@ -39,10 +39,10 @@ PagePainter::~PagePainter()
 void PagePainter::setColor(const color& c)
 {
 	*col = c;
-	page->content += format("     %.1f %.1f %.1f RG\n", c.r, c.g, c.b);
-	page->content += format("     %.1f %.1f %.1f rg\n", c.r, c.g, c.b);
-	//page->content += format("     %.1f CA\n", c.a);
-	//page->content += format("     %.1f ca\n", c.a);
+	page->content += format("     %.2f %.2f %.2f RG\n", c.r, c.g, c.b);
+	page->content += format("     %.2f %.2f %.2f rg\n", c.r, c.g, c.b);
+	//page->content += format("     %.2f CA\n", c.a);
+	//page->content += format("     %.2f ca\n", c.a);
 }
 
 void PagePainter::setFont(const string& font, float size, bool bold, bool italic)

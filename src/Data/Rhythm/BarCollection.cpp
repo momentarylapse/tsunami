@@ -54,11 +54,11 @@ Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hi
 			bar_no ++;
 		}else{
 			if (include_hidden)
-				beats.add(Beat(Range(pos_bar, b->length), -1, 0, -1));
+				beats.add(Beat(Range(pos_bar, b->length), -1, 0, 0));
 			pos_bar += b->length;
 		}
 	if (include_hidden and (collection.num > 0))
-		beats.add(Beat(Range(pos_bar, 0), -1, 0, -1));
+		beats.add(Beat(Range(pos_bar, 0), -1, 0, 0));
 	return beats;
 }
 

@@ -142,7 +142,7 @@ void PagePainter::drawStr(float x, float y, const string& str)
 	y = height - y - font_size*0.8f;
 	float dx = x - text_x;
 	float dy = y - text_y;
-	page->content += format("     /F1 %.1f Tf\n     %.1f %.1f Td\n     (%s) Tj\n", font_size, dx, dy, str.c_str());
+	page->content += format("     /F1 %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", font_size, dx, dy, str.c_str());
 
 	text_x = x;
 	text_y = y;

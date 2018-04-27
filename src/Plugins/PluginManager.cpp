@@ -464,6 +464,7 @@ void PluginManager::LinkAppScriptData()
 
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
+	Kaba::LinkExternal("Storage.saveViaRenderer", Kaba::mf(&Storage::saveViaRenderer));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 

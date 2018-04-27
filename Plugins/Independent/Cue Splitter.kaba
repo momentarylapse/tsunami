@@ -1,0 +1,95 @@
+// Image = hui:cut
+use "../api.kaba"
+
+class Part
+	string title
+	float foffset
+
+string sanitize(string s)
+	string t = s.replace("/", " - ")
+	//t = t.replace("", " - ")
+	return t
+
+class CueSplitter extends TsunamiPlugin
+	
+	override void onStart()
+		if HuiFileDialogOpen(session.win, "", "", "*.cue", "*.cue")
+			load_cue(HuiFilename)
+		//load_cue("/home/michi/Downloads/Deep Purple - 1970 Deep Purple  In Rock/Deep Purple - Deep Purple In Rock.cue")
+	
+	void load_cue(string filename)
+		string dir = filename.dirname()
+		string fn
+		string year, album, artist
+		Part*[] parts
+		Part *cur = nil
+		try
+			File *f = FileOpenText(filename)
+			while !f.eof()
+				string s
+				f >> s
+				//print(s)
+				
+				if s.head(6) == "FILE \""
+					fn = s.substr(6, s.num - 12)
+				if s.head(11) == "PERFORMER \""
+					artist = s.substr(11, s.num - 12)
+				if s.head(7) == "TITLE \""
+					album = s.substr(7, s.num - 8)
+				if s.head(6) == "YEAR \""
+					year = s.substr(6, s.num - 7)
+				if s.head(8) == "  TRACK "
+					cur = new Part
+					cur.foffset = 0
+					parts.add(cur)
+				if s.head(11) == "    TITLE \""
+					cur.title = s.substr(11, s.num - 12)
+					print(cur.title)
+				if s.head(10) == "    INDEX "
+					string soff = s.substr(13, -1)
+					print(soff)
+					string[] xx = soff.explode(":")
+					cur.foffset = 60 * xx[0].float() + xx[1].float() + xx[2].float() * 0.01
+					print(cur.foffset)
+		except
+			pass
+
+		if fn == ""
+			return
+		
+		session.storage.load(session.song, dir + fn)
+		SongRenderer* r = new SongRenderer(session.song)
+		
+		for p,i in parts
+			print("-----")
+			Tag[] tags
+			if artist != ""
+				tags.add(_Tag("artist", artist))
+			if album != ""
+				tags.add(_Tag("album", album))
+			if year != ""
+				tags.add(_Tag("year", year))
+			tags.add(_Tag("title", p.title))
+			tags.add(_Tag("tracknumber", i+1))
+			int offset = p.foffset * session.song.sample_rate
+			int end = session.song.getRange().length
+			if i < parts.num-1
+				print(parts[i+1].foffset)
+				float fsr = session.song.sample_rate
+				print(fsr)
+				float fend = parts[i+1].foffset * fsr
+				print(fend)
+				end = fend
+				print(end)
+			print("  " + offset + " : " + end)
+			r.prepare(_Range(offset, end - offset), false)
+			string _fn = i+1
+			if _fn.num < 2
+				_fn = "0" + _fn
+			_fn += " - " + sanitize(p.title) + ".flac"
+			session.storage.saveViaRenderer(r.out, dir + _fn, end - offset, tags)
+		print("-----------------done")
+		stop()
+		
+		
+	override void onStop()

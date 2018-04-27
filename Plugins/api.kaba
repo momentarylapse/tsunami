@@ -340,6 +340,11 @@ class Track
 
 class Tag
 	string key, value
+Tag _Tag(string key, string value)
+	Tag t
+	t.key = key
+	t.value = value
+	return t
 
 class SongLayer
 	string name
@@ -458,6 +463,7 @@ class InputStreamAudio extends Module
 class Storage
 	extern bool load(Song *s, string filename)
 	extern bool save(Song *s, string filename)
+	extern bool saveViaRenderer(AudioPort *source, string filename, int num_samples, Tag[] tags)
 	string current_directory
 
 class Session

@@ -17,6 +17,16 @@ static Date *_date;
 static DirEntry *_dir_entry;
 #define	GetDADirEntry(x)			long(&_dir_entry->x)-long(_dir_entry)
 
+
+
+#define KABA_EXCEPTION_WRAPPER(CODE) \
+try{ \
+	CODE; \
+}catch(::FileError &e){ \
+	kaba_raise_exception(new KabaFileError(e.message())); \
+}
+
+
 class DirEntryList : public Array<DirEntry>
 {
 public:
@@ -35,45 +45,44 @@ public:
 	}
 };
 
+class KabaFileError : public KabaException
+{
+public: KabaFileError() : KabaException(){}
+public: KabaFileError(const string &t) : KabaException(t){}
+};
+
 class KabaFile : public File
 {
 public:
 	void _cdecl __delete__()
 	{ this->~KabaFile(); }
-	int _cdecl _WriteBuffer(const string &s)
+	int _cdecl _write_buffer(const string &s)
 	{ return write_buffer(s); }
-	string _cdecl _ReadBuffer(int size)
+	string _cdecl _read_buffer(int size)
 	{
 		string s;
 		s.resize(size);
-		int r = read_buffer(s.data, size);
+		int r = read_buffer(s);
 		s.resize(r);
 		return s;
 	}
-	void _cdecl _ReadInt(int &i)
-	{ i = read_int(); }
-	void _cdecl _ReadFloat(float &f)
-	{ f = read_float(); }
-	void _cdecl _ReadBool(bool &b)
-	{ b = read_bool(); }
-	void _cdecl _ReadVector(vector &v)
-	{ read_vector(&v); }
-	void _cdecl _ReadStr(string &s)
-	{ s = read_str(); }
-	void _cdecl _WriteVector(const vector &v)
-	{ write_vector(&v); }
+	void _cdecl _read_int(int &i)
+	{ KABA_EXCEPTION_WRAPPER(i = read_int()); }
+	void _cdecl _read_float(float &f)
+	{ KABA_EXCEPTION_WRAPPER(f = read_float()); }
+	void _cdecl _read_bool(bool &b)
+	{ KABA_EXCEPTION_WRAPPER(b = read_bool()); }
+	void _cdecl _read_vector(vector &v)
+	{ KABA_EXCEPTION_WRAPPER(read_vector(&v)); }
+	void _cdecl _read_str(string &s)
+	{ KABA_EXCEPTION_WRAPPER(s = read_str()); }
+	void _cdecl _write_vector(const vector &v)
+	{ KABA_EXCEPTION_WRAPPER(write_vector(&v)); }
 
 	void _write_int(int i){ write_int(i); }
 	void _write_float(float f){ write_float(f); }
 	void _write_bool(bool b){ write_bool(b); }
 	void _write_str(const string &s){ write_str(s); }
-	void _write_vector(vector &v){ write_vector(&v); }
-};
-
-class KabaFileError : public KabaException
-{
-public: KabaFileError() : KabaException(){}
-public: KabaFileError(const string &t) : KabaException(t){}
 };
 
 /*class KabaFileNotFoundError : public KabaFileError
@@ -89,61 +98,37 @@ class KabaFileNotWritableError : public KabaFileError
 
 File* kaba_file_open(const string &filename)
 {
-	try{
-		return FileOpen(filename);
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return FileOpen(filename));
 	return NULL;
 }
 
 File* kaba_file_open_text(const string &filename)
 {
-	try{
-		return FileOpenText(filename);
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return FileOpenText(filename));
 	return NULL;
 }
 
 File* kaba_file_create(const string &filename)
 {
-	try{
-		return FileCreate(filename);
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return FileCreate(filename));
 	return NULL;
 }
 
 File* kaba_file_create_text(const string &filename)
 {
-	try{
-		return FileCreateText(filename);
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return FileCreateText(filename));
 	return NULL;
 }
 
 string kaba_file_read(const string &filename)
 {
-	try{
-		return FileRead(filename).replace("\\r", "");
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return FileRead(filename).replace("\\r", ""));
 	return "";
 }
 
 string kaba_file_hash(const string &filename, const string &type)
 {
-	try{
-		return file_hash(filename, type);
-	}catch(::FileError &e){
-		kaba_raise_exception(new KabaFileError(e.message()));
-	}
+	KABA_EXCEPTION_WRAPPER(return file_hash(filename, type));
 	return "";
 }
 
@@ -224,34 +209,35 @@ void SIAddPackageFile()
 		class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
 		class_add_func("getSize",		TypeInt,		mf(&File::get_size));
 		class_add_func("getPos",		TypeInt,		mf(&File::get_pos));
-		class_add_func("set_pos",		TypeVoid,		mf(&File::set_pos));
+		class_add_func("set_pos",		TypeVoid,		mf(&File::set_pos), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("pos",		TypeInt);
-		class_add_func("seek",		TypeVoid,		mf(&File::seek));
+		class_add_func("seek",		TypeVoid,		mf(&File::seek), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("delta",		TypeInt);
-		class_add_func("read",		TypeString,			mf(&KabaFile::_ReadBuffer));
+		class_add_func("read",		TypeString,			mf(&KabaFile::_read_buffer), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("size",			TypeInt);
-		class_add_func("write",		TypeInt,			mf(&KabaFile::_WriteBuffer));
+		class_add_func("write",		TypeInt,			mf(&KabaFile::_write_buffer), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s",			TypeString);
-		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_bool));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_bool), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("b",			TypeBool);
-		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_int));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_int), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("i",			TypeInt);
-		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_float));
+		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_float), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("x",			TypeFloat32);
-		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_vector));
+		class_add_func("__lshift__",	TypeVoid,			mf(&KabaFile::_write_vector), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("v",			TypeVector);
-		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_str));
+		class_add_func("__lshift__",		TypeVoid,			mf(&KabaFile::_write_str), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s",			TypeString);
-		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadBool));
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_read_bool), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("b",			TypeBoolPs);
-		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadInt));
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_read_int), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("i",			TypeIntPs);
-		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_ReadFloat));
+		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_read_float), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("x",			TypeFloatPs);
-		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_ReadVector));
+		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_read_vector), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("v",			TypeVector);
-		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadStr));
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_read_str), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s",			TypeString);
+		class_add_func("eof",		TypeBool,			mf(&KabaFile::eof));
 
 	
 	add_class(TypeDirEntry);

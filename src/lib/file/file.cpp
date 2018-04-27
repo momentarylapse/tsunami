@@ -493,19 +493,25 @@ int File::write_buffer(const string &str)
 	return write_buffer(str.data, str.num);
 }
 
+static void read_buffer_asserted(File *f, void *buf, int size)
+{
+	int r = f->read_buffer(buf, size);
+	if (r < size)
+		throw FileError("end of file '" + f->filename + "'");
+}
 
 // read a single character (1 byte)
 char File::read_char()
 {
 	char c;
-	read_buffer(&c, 1);
+	read_buffer_asserted(this, &c, 1);
 	return c;
 }
 char TextFile::read_char()
 {
 	char c = 0x0d;
 	while (c == 0x0d)
-		read_buffer(&c, 1);
+		read_buffer_asserted(this, &c, 1);
 	return c;
 }
 
@@ -537,7 +543,7 @@ void TextFile::read_comment()
 unsigned int File::read_word()
 {
 	unsigned int i = 0;
-	read_buffer(&i, 2);
+	read_buffer_asserted(this, &i, 2);
 	return i;
 }
 unsigned int TextFile::read_word()
@@ -557,7 +563,7 @@ unsigned int File::read_word_reversed()
 int File::read_int()
 {
 	int i;
-	read_buffer(&i, 4);
+	read_buffer_asserted(this, &i, 4);
 	return i;
 }
 int TextFile::read_int()
@@ -569,7 +575,7 @@ int TextFile::read_int()
 float File::read_float()
 {
 	float f;
-	read_buffer(&f, 4);
+	read_buffer_asserted(this, &f, 4);
 	return f;
 }
 float TextFile::read_float()
@@ -581,7 +587,7 @@ float TextFile::read_float()
 bool File::read_bool()
 {
 	char bb = 0;
-	read_buffer(&bb, 1);
+	read_buffer_asserted(this, &bb, 1);
 	return (bb == '1') or (bb == 0x01); // sigh, old style booleans
 }
 bool TextFile::read_bool()
@@ -599,7 +605,7 @@ string File::read_str()
 	int l = read_word();
 	string str;
 	str.resize(l + 16); // prevents "uninitialized" bytes in syscall parameter... (valgrind)
-	read_buffer(str.data, l);
+	read_buffer_asserted(this, str.data, l);
 	str.resize(l);
 	return str;
 }
@@ -642,7 +648,7 @@ string File::read_str_rw()
 	int l = read_word_reversed();
 	string str;
 	str.resize(l);
-	read_buffer(str.data, l);
+	read_buffer_asserted(this, str.data, l);
 	return str;
 }
 

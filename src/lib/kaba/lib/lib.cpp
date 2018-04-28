@@ -27,7 +27,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.16.0.0";
+string LibVersion = "0.16.1.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -147,6 +147,9 @@ Class *TypeImage;
 
 Class *TypeException;
 Class *TypeExceptionP;
+
+Class *TypeClass;
+Class *TypeClassP;
 
 
 Array<Package> Packages;
@@ -459,6 +462,84 @@ bool _cdecl _Pointer2Bool(void *p)
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
+
+template<class T>
+void _ultra_sort(DynamicArray &array, int offset_by)
+{
+	T *p = (T*)((char*)array.data + offset_by);
+	for (int i=0; i<array.num; i++){
+		T *q = (T*)((char*)p + array.element_size);
+		for (int j=i+1; j<array.num; j++){
+			if (*p > *q)
+				array.swap(i, j);
+			q = (T*)((char*)q + array.element_size);
+		}
+		p = (T*)((char*)p + array.element_size);
+	}
+}
+
+template<class T>
+void _ultra_sort_p(DynamicArray &array, int offset_by)
+{
+	char **p = (char**)array.data;
+	for (int i=0; i<array.num; i++){
+		T *pp = (T*)(*p + offset_by);
+		char **q = p + 1;
+		for (int j=i+1; j<array.num; j++){
+			T *qq = (T*)(*q + offset_by);
+			if (*pp > *qq){
+				array.swap(i, j);
+				pp = (T*)(*p + offset_by);
+			}
+			q ++;
+		}
+		p ++;
+	}
+}
+
+void _cdecl ultra_sort(DynamicArray &array, Class *type, const string &by)
+{
+	if (!type->is_super_array)
+		kaba_raise_exception(new KabaException("type '" + type->name + "' is not an array"));
+	Class *el = type->parent;
+	if (array.element_size != el->size)
+		kaba_raise_exception(new KabaException("element type size mismatch..."));
+
+	Class *rel = el;
+
+	if (el->is_pointer){
+		rel = el->parent;
+	}
+
+	ClassElement *ell = NULL;
+	for (auto &e: rel->elements)
+		if (e.name == by)
+			ell = &e;
+	if (!ell)
+		kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
+	int offset = ell->offset;
+
+
+	if (el->is_pointer){
+		if (ell->type == TypeString)
+			_ultra_sort_p<string>(array, offset);
+		else if (ell->type == TypeInt)
+			_ultra_sort_p<int>(array, offset);
+		else if (ell->type == TypeFloat)
+			_ultra_sort_p<float>(array, offset);
+		else
+			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
+	}else{
+		if (ell->type == TypeString)
+			_ultra_sort<string>(array, offset);
+		else if (ell->type == TypeInt)
+			_ultra_sort<int>(array, offset);
+		else if (ell->type == TypeFloat)
+			_ultra_sort<float>(array, offset);
+		else
+			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
+	}
+}
 
 string _cdecl kaba_shell_execute(const string &cmd)
 {
@@ -776,6 +857,9 @@ void SIAddPackageBase()
 	TypeException		= add_type  ("Exception",	sizeof(KabaException));
 	TypeExceptionP		= add_type_p("Exception*", TypeException);
 
+	TypeClass 			= add_type  ("Class",	sizeof(Class));
+	TypeClassP			= add_type_p("Class*", TypeClass);
+
 
 	// select default float type
 	TypeFloat = TypeFloat32;
@@ -1002,6 +1086,7 @@ void SIAddBasicCommands()
 	add_statement(IDENTIFIER_NEW, STATEMENT_NEW);
 	add_statement(IDENTIFIER_DELETE, STATEMENT_DELETE, 1);
 	add_statement("sizeof", STATEMENT_SIZEOF, 1);
+	add_statement("type", STATEMENT_TYPE, 1);
 	add_statement(IDENTIFIER_ASM, STATEMENT_ASM);
 	add_statement(IDENTIFIER_TRY, STATEMENT_TRY); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_EXCEPT, STATEMENT_EXCEPT); // return: ParamType will be defined by the parser!
@@ -1241,6 +1326,12 @@ void SIAddCommands()
 	// system
 	add_func("shell_execute",	TypeString,	(void*)&kaba_shell_execute, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("cmd",	TypeString);
+
+
+	add_func("sort_list",	TypeVoid,	(void*)&ultra_sort, FLAG_RAISES_EXCEPTIONS);
+		func_add_param("list",	TypePointer);
+		func_add_param("class",	TypeClassP);
+		func_add_param("by",	TypeString);
 
 
 // add_func("ExecuteScript",	TypeVoid);

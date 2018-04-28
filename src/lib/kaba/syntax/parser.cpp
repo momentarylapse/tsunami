@@ -301,33 +301,63 @@ Node *SyntaxTree::GetOperandExtension(Node *Operand, Block *block)
 Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node &link, Block *block)
 {
 	// sizeof
-	if ((link.kind != KIND_STATEMENT) or (link.link_no != STATEMENT_SIZEOF))
+	if (link.kind != KIND_STATEMENT)
 		DoError("evil special function");
 
-	Exp.next();
-	int nc = AddConstant(TypeInt);
-	Node *c = add_node_const(nc);
+	if (link.link_no == STATEMENT_SIZEOF){
+
+		Exp.next();
+		int nc = AddConstant(TypeInt);
+		Node *c = add_node_const(nc);
 
 
-	Class *type = FindType(Exp.cur);
-	Array<Node> links = GetExistence(Exp.cur, block);
-	if (type){
-		constants[nc]->as_int() = type->size;
-	}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
-		constants[nc]->as_int() = links[0].type->size;
-	}else{
-		type = GetConstantType(Exp.cur);
-		if (type)
+		Class *type = FindType(Exp.cur);
+		Array<Node> links = GetExistence(Exp.cur, block);
+		if (type){
 			constants[nc]->as_int() = type->size;
-		else
-			DoError("type-name or variable name expected in sizeof(...)");
-	}
-	Exp.next();
-	if (Exp.cur != ")")
-		DoError("\")\" expected after parameter list");
-	Exp.next();
+		}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
+			constants[nc]->as_int() = links[0].type->size;
+		}else{
+			type = GetConstantType(Exp.cur);
+			if (type)
+				constants[nc]->as_int() = type->size;
+			else
+				DoError("type-name or variable name expected in sizeof(...)");
+		}
+		Exp.next();
+		if (Exp.cur != ")")
+			DoError("\")\" expected after parameter list");
+		Exp.next();
+		return c;
+	}else if (link.link_no == STATEMENT_TYPE){
 
-	return c;
+		Exp.next();
+		int nc = AddConstant(TypeClassP);
+		Node *c = add_node_const(nc);
+
+
+		Class *type = FindType(Exp.cur);
+		Array<Node> links = GetExistence(Exp.cur, block);
+		if (type){
+			constants[nc]->as_int64() = (long)type;
+		}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
+			constants[nc]->as_int64() = (long)links[0].type;
+		}else{
+			type = GetConstantType(Exp.cur);
+			if (type)
+				constants[nc]->as_int64() = (long)type;
+			else
+				DoError("type-name or variable name expected in type(...)");
+		}
+		Exp.next();
+		if (Exp.cur != ")")
+			DoError("\")\" expected after parameter list");
+		Exp.next();
+		return c;
+	}else
+		DoError("evil special function");
+
+	return NULL;
 }
 
 
@@ -437,7 +467,7 @@ Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node> &links, Bloc
 
 	// "special" functions
     if (links[0].kind == KIND_STATEMENT)
-	    if (links[0].link_no == STATEMENT_SIZEOF){
+	    if ((links[0].link_no == STATEMENT_SIZEOF) or (links[0].link_no == STATEMENT_TYPE)){
 			return GetSpecialFunctionCall(f_name, links[0], block);
 	    }
 

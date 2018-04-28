@@ -27,6 +27,10 @@ try{ \
 }
 
 
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+
+
 class DirEntryList : public Array<DirEntry>
 {
 public:
@@ -91,9 +95,6 @@ public:
 class KabaFileNotWritableError : public KabaFileError
 { public: KabaFileNotWritableError(const string &t) : KabaFileError(t){} };*/
 
-
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
 
 
 File* kaba_file_open(const string &filename)

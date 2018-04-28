@@ -110,6 +110,8 @@ extern Class *TypeQuaternion;
 extern Class *TypeException;
 extern Class *TypeExceptionP;
 
+extern Class *TypeClassP;
+
 };
 
 #endif /* CLASS_H_ */

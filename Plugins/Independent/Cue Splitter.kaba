@@ -25,7 +25,7 @@ class CueSplitter extends TsunamiPlugin
 		Part *cur = nil
 		try
 			File *f = FileOpenText(filename)
-			while !f.eof()
+			while true
 				string s
 				f >> s
 				//print(s)

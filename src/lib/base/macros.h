@@ -12,7 +12,7 @@
 
 // which operating system?
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(WIN32) || defined(WIN64) || defined(__MINGW32__) || defined(__MINGW64__)
 	#define OS_WINDOWS
 #else
 	#define OS_LINUX
@@ -36,37 +36,38 @@
 
 // which cpu?
 
+#if defined(__ARM_ARCH_6__) || defined(__arm__) || defined(__ARM_EABI__) || defined(_M_ARM)
+	#define CPU_ARM
+#elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)
+	#define CPU_AMD64
+#else // _M_IX86
+	#define CPU_X86
+#endif
+
+
 #ifdef OS_WINDOWS
-	#if defined(_M_AMD64) || defined(_M_X64)
-		#define CPU_AMD64
-	#elif defined(_M_ARM)
-		#define CPU_ARM
-	#else // _M_IX86
-		#define CPU_X86
-	#endif
+	#define _cdecl
 #endif
-#ifdef OS_LINUX
-	#if defined(__ARM_ARCH_6__) || defined(__arm__) || defined(__ARM_EABI__)
-		#define CPU_ARM
-	#elif defined(__amd64__) || defined(__x86_64__)
-		#define CPU_AMD64
-	#else
-		#define CPU_X86
-	#endif
-#endif
-
-
 #ifdef OS_LINUX
 	#define _cdecl
 #endif
 
+typedef int int32;
+typedef long long int64;
+
+#ifdef CPU_AMD64
+typedef int64 int_p;
+#else
+typedef int int_p;
+#endif
 
 
 
-#ifdef OS_WINDOWS
+
+/*#ifdef OS_WINDOWS
 	#define and &&
 	#define or ||
-#endif
+#endif*/
 
 
 

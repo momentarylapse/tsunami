@@ -289,7 +289,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 	return c;
 }
 
-string LinkNr2Str(SyntaxTree *s, int kind, long long nr);
+string LinkNr2Str(SyntaxTree *s, int kind, int64 nr);
 
 // may not use AddConstant()!!!
 Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
@@ -341,7 +341,7 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 					Value r;
 					r.init(c->type);
 					f(r, d1, d2);
-					return AddNode(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(long*)r.p(), c->type);
+					return AddNode(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(int_p*)r.p(), c->type);
 				}
 			}
 		}
@@ -350,11 +350,11 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 			if ((c->params[0]->kind == KIND_VAR_GLOBAL) or (c->params[0]->kind == KIND_VAR_LOCAL) or (c->params[0]->kind == KIND_CONSTANT)){
 				// pre process ref var
 				if (c->params[0]->kind == KIND_VAR_GLOBAL){
-					return AddNode(KIND_ADDRESS, (long)c->params[0]->script->g_var[c->params[0]->link_no], c->type, c->params[0]->script);
+					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->g_var[c->params[0]->link_no], c->type, c->params[0]->script);
 				}else if (c->params[0]->kind == KIND_VAR_LOCAL){
-					return AddNode(KIND_LOCAL_ADDRESS, (long)cur_func->var[c->params[0]->link_no]._offset, c->type);
+					return AddNode(KIND_LOCAL_ADDRESS, (int_p)cur_func->var[c->params[0]->link_no]._offset, c->type);
 				}else /*if (c->param[0]->kind == KindConstant)*/{
-					return AddNode(KIND_ADDRESS, (long)c->params[0]->script->cnst[c->params[0]->link_no], c->type, c->params[0]->script);
+					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->cnst[c->params[0]->link_no], c->type, c->params[0]->script);
 				}
 			}
 		}

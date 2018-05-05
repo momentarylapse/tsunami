@@ -75,13 +75,13 @@ void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
 		try_init_global_var(v.type, g_var[i]);
 }
 
-static long _opcode_rand_state_ = 10000;
+static int64 _opcode_rand_state_ = 10000;
 
 void* get_nice_random_addr()
 {
-	long p = ((long)&Init) & 0xfffffffffffff000;
+	int64 p = ((int_p)&Init) & 0xfffffffffffff000;
 	_opcode_rand_state_ = (_opcode_rand_state_ * 1664525 + 1013904223);
-	p += (long)(_opcode_rand_state_ & 0x3fff) * 4096;
+	p += (int64)(_opcode_rand_state_ & 0x3fff) * 4096;
 	return (void*)p;
 
 }
@@ -104,8 +104,8 @@ void* get_nice_memory(long size, bool executable)
 		mem = (char*)mmap(addr0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
 		if (config.verbose)
 			printf("%d  %p  ->  %p\n", i, addr0, mem);
-		if ((long)mem != -1){
-			if (labs((long)mem - (long)addr0) < 1000000000)
+		if ((int_p)mem != -1){
+			if (labs((int_p)mem - (int_p)addr0) < 1000000000)
 				return mem;
 			else
 				munmap(mem, size);
@@ -116,7 +116,7 @@ void* get_nice_memory(long size, bool executable)
 
 	// no?...ok, try anywhere
 	mem = (char*)mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
-	if ((long)mem == -1)
+	if ((int_p)mem == -1)
 		mem = NULL;
 #endif
 
@@ -181,7 +181,7 @@ void Script::AllocateOpcode()
 	if (config.override_code_origin)
 		syntax->asm_meta_info->code_origin = config.code_origin;
 	else
-		syntax->asm_meta_info->code_origin = (long)opcode;
+		syntax->asm_meta_info->code_origin = (int_p)opcode;
 	opcode_size = 0;
 }
 
@@ -207,7 +207,7 @@ void Script::MapGlobalVariablesToMemory()
 				DoErrorLink("external variable " + v.name + " was not linked");
 		}else{
 			if (config.override_variables_offset)
-				g_var[i] = (char*)(long)(memory_size + config.variables_offset);
+				g_var[i] = (char*)(int_p)(memory_size + config.variables_offset);
 			else
 				g_var[i] = &memory[memory_size];
 			memory_size += mem_align(v.type->size, 4);
@@ -249,7 +249,7 @@ void Script::MapConstantsToOpcode()
 			t->_vtable_location_target_ = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
 			opcode_size += config.pointer_size * t->vtable.num;
 			for (Constant *c: syntax->constants)
-				if ((c->type == TypePointer) and (*(int*)c->value.data == (int)(long)t->vtable.data))
+				if ((c->type == TypePointer) and (*(int*)c->value.data == (int)(int_p)t->vtable.data))
 					memcpy(c->value.data, &t->_vtable_location_target_, config.pointer_size);
 		}
 
@@ -269,7 +269,7 @@ void Script::LinkOsEntryPoint()
 		if (ff->name == "main")
 			nf = index;
 	if (nf >= 0){
-		int lll = (long)func[nf] - syntax->asm_meta_info->code_origin - TaskReturnOffset;
+		int lll = (int_p)func[nf] - syntax->asm_meta_info->code_origin - TaskReturnOffset;
 		//printf("insert   %d  an %d\n", lll, OCORA);
 		//msg_write(lll);
 		//msg_write(d2h(&lll,4,false));
@@ -303,15 +303,15 @@ void Script::CompileTaskEntryPoint()
 	// intro
 	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the actual program
 	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((long)&__stack[config.stack_size], 4)); // start of the script stack
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((int_p)&__stack[config.stack_size], 4)); // start of the script stack
 	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // address of the old stack
 	AddEspAdd(list, -12); // space for wait() task data
 	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
 	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(WAITING_MODE_NONE, 4)); // "reset"
-	list->add2(Asm::INST_MOV, Asm::param_deref_imm((long)&__waiting_mode, 4), Asm::param_reg(Asm::REG_EAX));
+	list->add2(Asm::INST_MOV, Asm::param_deref_imm((int_p)&__waiting_mode, 4), Asm::param_reg(Asm::REG_EAX));
 
 	// call main()
-	list->add2(Asm::INST_CALL, Asm::param_imm((long)_main_, 4));
+	list->add2(Asm::INST_CALL, Asm::param_imm((int_p)_main_, 4));
 
 	// outro
 	AddEspAdd(list, 12); // make space for wait() task data
@@ -326,8 +326,8 @@ void Script::CompileTaskEntryPoint()
 	// Intro
 	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the external program
 	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_deref_imm((long)&__stack[config.stack_size - 4], 4), Asm::param_reg(Asm::REG_EBP)); // save the external ebp
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((long)&__stack[config.stack_size - 16], 4)); // to the eIP of the script
+	list->add2(Asm::INST_MOV, Asm::param_deref_imm((int_p)&__stack[config.stack_size - 4], 4), Asm::param_reg(Asm::REG_EBP)); // save the external ebp
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((int_p)&__stack[config.stack_size - 16], 4)); // to the eIP of the script
 	list->add2(Asm::INST_POP, Asm::param_reg(Asm::REG_EAX));
 	list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(AfterWaitOCSize, 4));
 	list->add2(Asm::INST_JMP, Asm::param_reg(Asm::REG_EAX));
@@ -339,8 +339,8 @@ void Script::CompileTaskEntryPoint()
 
 	list->Compile(__thread_opcode, __thread_opcode_size);
 
-	__first_execution = (t_func*)(long)list->label[label_first].value;
-	__continue_execution = (t_func*)(long)list->label[label_cont].value;
+	__first_execution = (t_func*)(int_p)list->label[label_first].value;
+	__continue_execution = (t_func*)(int_p)list->label[label_cont].value;
 
 	delete(list);
 }
@@ -465,7 +465,7 @@ void Script::LinkFunctions()
 		bool found = false;
 		foreachi(Function *f, syntax->functions, i)
 			if (f->name == name){
-				*(int*)&opcode[l.pos] = (long)func[i] - (syntax->asm_meta_info->code_origin + l.pos + 4);
+				*(int*)&opcode[l.pos] = (int_p)func[i] - (syntax->asm_meta_info->code_origin + l.pos + 4);
 				found = true;
 				break;
 			}
@@ -473,8 +473,8 @@ void Script::LinkFunctions()
 			DoErrorLink("could not link function: " + name);
 	}
 	for (int n: function_vars_to_link){
-		long p = (n + 0xefef0000);
-		long q = (long)func[n];
+		int64 p = (n + 0xefef0000);
+		int64 q = (int_p)func[n];
 		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
 			DoErrorLink("could not link function as variable: " + syntax->functions[n]->name);
 	}

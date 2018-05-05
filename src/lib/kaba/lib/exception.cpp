@@ -49,7 +49,7 @@ struct StackFrameInfo
 	void *rbp;
 	Script *s;
 	Function *f;
-	long offset;
+	int64 offset;
 };
 
 
@@ -63,7 +63,7 @@ inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, b
 		void *frip = (void*)s->func[i];
 		if (frip >= rip)
 			continue;
-		long offset = (long)rip - (long)frip;
+		int_p offset = (int_p)rip - (int_p)frip;
 		if (offset >= r.offset)
 			continue;
 		if (from_package and offset >= 500)
@@ -255,7 +255,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 	void **local = (void**)&rsp;
 	// rbp  >  local > rsp
 	assert((rbp > rsp) and (rbp > local) and (local > rsp));
-	assert((long)rbp - (long)rsp < 10000);
+	assert((int_p)rbp - (int_p)rsp < 10000);
 
 
 	auto trace = get_stack_trace(rbp);
@@ -292,12 +292,12 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 
 			if (ebd.except->params.num > 0){
 				auto v = r.f->var[ebd.except_block->vars[0]];
-				void **p = (void**)((long)r.rbp + v._offset);
+				void **p = (void**)((int_p)r.rbp + v._offset);
 				*p = kaba_exception;
 			}
 
 			// TODO special return
-			relink_return(ebd.except_block->_start, rbp, (void*)((long)r.rsp - 16));
+			relink_return(ebd.except_block->_start, rbp, (void*)((int_p)r.rsp - 16));
 			return;
 		}
 	}

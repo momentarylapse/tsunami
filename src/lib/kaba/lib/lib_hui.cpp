@@ -21,9 +21,9 @@ namespace Kaba{
 #ifdef _X_USE_HUI_
 	static hui::Event *_event;
 	static hui::Painter *_painter;
-	#define GetDAWindow(x)			long(&_win->x)-long(_win)
-	#define GetDAEvent(x)	long(&_event->x)-long(_event)
-	#define GetDAPainter(x)	long(&_painter->x)-long(_painter)
+	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
+	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
+	#define GetDAPainter(x)	int_p(&_painter->x)-int_p(_painter)
 	void HuiSetIdleFunctionKaba(hui::kaba_callback *f)
 	{
 		hui::SetIdleFunction(f);

@@ -334,7 +334,7 @@ struct Label
 {
 	string name;
 	int inst_no;
-	long long value;
+	int64 value;
 };
 
 struct WantedLabel
@@ -366,7 +366,7 @@ struct BitChange
 
 struct MetaInfo
 {
-	long long code_origin; // how to interpret opcode buffer[0]
+	int64 code_origin; // how to interpret opcode buffer[0]
 	bool mode16;
 	int line_offset; // number of script lines preceding asm block (to give correct error messages)
 
@@ -392,7 +392,7 @@ struct InstructionParam
 	Register *reg, *reg2;
 	bool deref;
 	int size;
-	long long value; // disp or immediate
+	int64 value; // disp or immediate
 	bool is_label;
 	bool write_back;
 	string str(bool hide_size = false);
@@ -434,10 +434,10 @@ InstructionParam param_reg_set(int set);
 InstructionParam param_deref_reg(int reg, int size);
 InstructionParam param_deref_reg_shift(int reg, int shift, int size);
 InstructionParam param_deref_reg_shift_reg(int reg, int reg2, int size);
-InstructionParam param_imm(long long value, int size);
-InstructionParam param_deref_imm(long long value, int size);
-InstructionParam param_label(long long value, int size);
-InstructionParam param_deref_label(long long value, int size);
+InstructionParam param_imm(int64 value, int size);
+InstructionParam param_deref_imm(int64 value, int size);
+InstructionParam param_label(int64 value, int size);
+InstructionParam param_deref_label(int64 value, int size);
 
 struct InstructionWithParamsList : public Array<InstructionWithParams>
 {

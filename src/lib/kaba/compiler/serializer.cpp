@@ -115,7 +115,7 @@ SerialNodeParam Serializer::param_global(Class *type, void *v)
 	SerialNodeParam p;
 	p.type = type;
 	p.kind = KIND_VAR_GLOBAL;
-	p.p = (long)v;
+	p.p = (int_p)v;
 	p.shift = 0;
 	return p;
 }
@@ -130,7 +130,7 @@ SerialNodeParam Serializer::param_local(Class *type, int offset)
 	return p;
 }
 
-SerialNodeParam Serializer::param_const(Class *type, long c)
+SerialNodeParam Serializer::param_const(Class *type, int64 c)
 {
 	SerialNodeParam p;
 	p.type = type;
@@ -305,7 +305,7 @@ void Serializer::set_cmd_param(SerialNode &c, int param_index, const SerialNodeP
 		if (p.virt >= 0)
 			use_virtual_reg(p.virt, c.index, c.index);
 	if ((p.kind == KIND_VAR_TEMP) or (p.kind == KIND_DEREF_VAR_TEMP)){
-		int v = (long)p.p;
+		int v = (int_p)p.p;
 		temp_var[v].use(c.index, c.index);
 		if ((c.inst == Asm::INST_LEA) and (param_index == 1)){
 //			msg_error("ref a " + i2s(v));
@@ -420,14 +420,14 @@ void Serializer::move_param(SerialNodeParam &p, int from, int to)
 {
 	if ((p.kind == KIND_VAR_TEMP) or (p.kind == KIND_DEREF_VAR_TEMP)){
 		// move_param temp
-		long v = (long)p.p;
+		int64 v = p.p;
 		if (temp_var[v].last < max(from, to))
 			temp_var[v].last = max(from, to);
 		if (temp_var[v].first > min(from, to))
 			temp_var[v].first = min(from, to);
 	}else if ((p.kind == KIND_REGISTER) or (p.kind == KIND_DEREF_REGISTER)){
 		// move_param reg
-		long r = Asm::RegRoot[p.p];
+		int r = Asm::RegRoot[p.p];
 		bool found = false;
 		for (VirtualRegister &rc: virtual_reg)
 			if ((r == rc.reg_root) and (from >= rc.first) and (from >= rc.first)){
@@ -796,7 +796,7 @@ int Serializer::temp_in_cmd(int c, int v)
 	int r = 0;
 	for (int i=0; i<SERIAL_NODE_NUM_PARAMS; i++)
 		if ((cmd[c].p[i].kind == KIND_VAR_TEMP) or (cmd[c].p[i].kind == KIND_DEREF_VAR_TEMP))
-			if ((long)cmd[c].p[i].p == v)
+			if (cmd[c].p[i].p == v)
 				r += (1<<i) + ((cmd[c].p[i].kind == KIND_DEREF_VAR_TEMP) ? (8<<i) : 0);
 	return r;
 }
@@ -885,7 +885,7 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 	SerialNodeParam p = cmd[c].p[np];
 	int shift = p.shift;
 
-	Class *type_pointer = is_local ? TypePointer : temp_var[(long)p.p].type;
+	Class *type_pointer = is_local ? TypePointer : temp_var[p.p].type;
 	Class *type_data = p.type;
 	
 	p.kind = is_local ? KIND_VAR_LOCAL : KIND_VAR_TEMP;
@@ -1030,8 +1030,8 @@ void Serializer::ResolveDerefTempAndLocal()
 			// inst [reg2], reg
 			SerialNodeParam p1 = cmd[i].p[0];
 			SerialNodeParam p2 = cmd[i].p[1];
-			long shift1 = p1.shift;
-			long shift2 = p2.shift;
+			int shift1 = p1.shift;
+			int shift2 = p2.shift;
 			p1.shift = p2.shift = 0;
 			
 			p1.kind = is_local1 ? KIND_VAR_LOCAL : KIND_VAR_TEMP;
@@ -1586,10 +1586,10 @@ void Serializer::MapTempVars()
 
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar)
 {
-	if ((p.kind == KIND_VAR_TEMP) and ((long)p.p == v)){
+	if ((p.kind == KIND_VAR_TEMP) and (p.p == v)){
 		p.kind = KIND_VAR_LOCAL;//stackvar.kind;
 		p.p = stackvar.p;
-	}else if ((p.kind == KIND_DEREF_VAR_TEMP) and ((long)p.p == v)){
+	}else if ((p.kind == KIND_DEREF_VAR_TEMP) and (p.p == v)){
 		p.kind = KIND_DEREF_VAR_LOCAL;
 		p.p = stackvar.p;
 	}
@@ -1600,10 +1600,10 @@ void Serializer::DisentangleShiftedTempVars()
 {
 	for (int i=0;i<cmd.num;i++){
 		if ((cmd[i].p[0].kind == KIND_VAR_TEMP) and (cmd[i].p[0].shift > 0)){
-			temp_var[(long)cmd[i].p[0].p].entangled = max(temp_var[(long)cmd[i].p[0].p].entangled, cmd[i].p[0].shift);
+			temp_var[cmd[i].p[0].p].entangled = max(temp_var[cmd[i].p[0].p].entangled, cmd[i].p[0].shift);
 		}
 		if ((cmd[i].p[1].kind == KIND_VAR_TEMP) and (cmd[i].p[1].shift > 0)){
-			temp_var[(long)cmd[i].p[1].p].entangled = max(temp_var[(long)cmd[i].p[1].p].entangled, cmd[i].p[1].shift);
+			temp_var[cmd[i].p[1].p].entangled = max(temp_var[cmd[i].p[1].p].entangled, cmd[i].p[1].shift);
 		}
 	}
 
@@ -1628,9 +1628,9 @@ void Serializer::DisentangleShiftedTempVars()
 			}
 			
 			for (int j=0;j<cmd.num;j++){
-				if ((cmd[j].p[0].kind == KIND_VAR_TEMP) and ((long)cmd[j].p[0].p == i))
+				if ((cmd[j].p[0].kind == KIND_VAR_TEMP) and (cmd[j].p[0].p == i))
 					set_cmd_param(cmd[j], 0, p[cmd[j].p[0].shift / 4]);
-				if ((cmd[j].p[1].kind == KIND_VAR_TEMP) and ((long)cmd[j].p[1].p == i))
+				if ((cmd[j].p[1].kind == KIND_VAR_TEMP) and (cmd[j].p[1].p == i))
 					set_cmd_param(cmd[j], 1, p[cmd[j].p[1].shift / 4]);
 			}
 			delete[]p;
@@ -1642,7 +1642,7 @@ void Serializer::DisentangleShiftedTempVars()
 
 void Serializer::_resolve_deref_reg_shift_(SerialNodeParam &p, int i)
 {
-	long s = p.shift;
+	int s = p.shift;
 	p.shift = 0;
 	msg_write("_resolve_deref_reg_shift_");
 	int v = p.virt;
@@ -1779,14 +1779,14 @@ void Serializer::TryMergeTempVars()
 	for (int i=0;i<cmd.num;i++)
 		if (cmd[i].inst == Asm::INST_MOV)
 			if ((cmd[i].p[0].kind == KIND_VAR_TEMP) and (cmd[i].p[1].kind == KIND_VAR_TEMP)){
-				int v1 = (long)cmd[i].p[0].p;
-				int v2 = (long)cmd[i].p[1].p;
+				int v1 = cmd[i].p[0].p;
+				int v2 = cmd[i].p[1].p;
 				if ((temp_var[v1].first == i) and (temp_var[v2].last == i)){
 					// swap v1 -> v2
 					for (int j=i+1;j<=temp_var[v1].last;j++){
-						if (((cmd[j].p[0].kind == KIND_VAR_TEMP) or (cmd[j].p[0].kind == KIND_DEREF_VAR_TEMP)) and ((long)cmd[j].p[0].p == v1))
+						if (((cmd[j].p[0].kind == KIND_VAR_TEMP) or (cmd[j].p[0].kind == KIND_DEREF_VAR_TEMP)) and (cmd[j].p[0].p == v1))
 							cmd[j].p[0].p = v2;
-						if (((cmd[j].p[1].kind == KIND_VAR_TEMP) or (cmd[j].p[1].kind == KIND_DEREF_VAR_TEMP)) and ((long)cmd[j].p[1].p == v1))
+						if (((cmd[j].p[1].kind == KIND_VAR_TEMP) or (cmd[j].p[1].kind == KIND_DEREF_VAR_TEMP)) and (cmd[j].p[1].p == v1))
 							cmd[j].p[1].p = v2;
 					}
 					temp_var[v2].last = temp_var[v1].last;
@@ -1801,7 +1801,7 @@ void Serializer::SimplifyFloatStore()
 	for (int i=0;i<cmd.num - 1;i++){
 		if ((cmd[i].inst == Asm::INST_FSTP) and (cmd[i+1].inst == Asm::INST_MOV)){
 			if (cmd[i].p[0].kind == KIND_VAR_TEMP){
-				int v = (long)cmd[i].p[0].p;
+				int v = cmd[i].p[0].p;
 				if ((temp_var[v].first == i) and (temp_var[v].last == i+1)){
 					cmd[i].p[0] = cmd[i+1].p[0];
 					remove_cmd(i + 1);
@@ -1818,7 +1818,7 @@ void Serializer::MapReferencedTempVarsToStack()
 	for (SerialNode &c: cmd)
 		if (c.inst == Asm::INST_LEA)
 			if (c.p[1].kind == KIND_VAR_TEMP){
-				int v = (long)c.p[1].p;
+				int v = c.p[1].p;
 //				msg_error("ref b " + i2s(v));
 				temp_var[v].referenced = true;
 				temp_var[v].force_stack = true;
@@ -1895,7 +1895,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 	}else if (p.kind == KIND_REF_TO_CONST){
 		bool imm_allowed = Asm::GetInstructionAllowConst(inst);
 		if ((imm_allowed) and (p.type->is_pointer)){
-			return Asm::param_imm(*(long*)(p.p + p.shift), p.type->size);
+			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
 		}else if ((p.type->size <= 4) and (imm_allowed)){
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
 		}else{
@@ -1957,7 +1957,7 @@ void Serializer::Assemble()
 	if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
 		foreachi(GlobalRef &g, global_refs, i){
 			g.label = list->add_label(format("_kaba_ref_%d_%d", cur_func_index, i));
-			list->add2(Asm::INST_DD, Asm::param_imm((long)g.p, 4));
+			list->add2(Asm::INST_DD, Asm::param_imm((int_p)g.p, 4));
 		}
 	}
 

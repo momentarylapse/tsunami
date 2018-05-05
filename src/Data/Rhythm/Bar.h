@@ -10,6 +10,10 @@
 
 #include "../Range.h"
 
+#ifdef IGNORE
+#undef IGNORE
+#endif
+
 class BarCollection;
 
 class BarPattern

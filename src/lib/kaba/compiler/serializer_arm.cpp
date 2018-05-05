@@ -20,7 +20,7 @@ int SerializerARM::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 	// grow stack (down) for local variables of the calling function
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
-	long push_size = 0;
+	int64 push_size = 0;
 
 	Array<SerialNodeParam> params = _params;
 
@@ -124,8 +124,8 @@ void SerializerARM::add_function_call(Script *script, int func_no, const SerialN
 
 		if (!func)
 			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
-		if (abs((long)func - (long)this->script->opcode) < 30000000){
-			add_cmd(Asm::INST_CALL, param_const(TypePointer, (long)func)); // the actual call
+		if (abs((int_p)func - (int_p)this->script->opcode) < 30000000){
+			add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)func)); // the actual call
 			// function pointer will be shifted later...
 		}else{
 
@@ -218,7 +218,7 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			if (com->params.num > 0){
 				// copy + edit command
 				Node sub = *com->params[0];
-				Node c_ret(KIND_VAR_TEMP, (long)ret.p, script, ret.type);
+				Node c_ret(KIND_VAR_TEMP, ret.p, script, ret.type);
 				sub.instance = &c_ret;
 				SerializeNode(&sub, block, index);
 			}else
@@ -407,7 +407,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 	p.shift = 0;
 
 	if (link->kind == KIND_VAR_FUNCTION){
-		p.p = (long)link->script->func[link->link_no];
+		p.p = (int_p)link->script->func[link->link_no];
 		p.kind = KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
@@ -422,7 +422,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 	}else if (link->kind == KIND_MEMORY){
 		return param_deref_lookup(p.type, add_global_ref((void*)p.p));
 	}else if (link->kind == KIND_ADDRESS){
-		return param_lookup(p.type, add_global_ref((void*)(long)link->link_no));
+		return param_lookup(p.type, add_global_ref((void*)link->link_no));
 	}else if (link->kind == KIND_VAR_GLOBAL){
 		if (!link->script->g_var[link->link_no])
 			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no].name);
@@ -833,10 +833,10 @@ void SerializerARM::ConvertGlobalRefs()
 	for (int i=0; i<cmd.num; i++){
 		if ((cmd[i].inst == Asm::INST_LDR) and (cmd[i].p[0].kind == KIND_REGISTER) and (cmd[i].p[1].kind == KIND_DEREF_MARKER)){
 			bool found = false;
-			long data;
+			int64 data;
 			for (GlobalRef &r: global_refs){
 				if (r.label == cmd[i].p[1].p){
-					data = (long)r.p;
+					data = (int_p)r.p;
 					found = true;
 					break;
 				}

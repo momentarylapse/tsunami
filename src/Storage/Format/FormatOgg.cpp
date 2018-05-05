@@ -12,7 +12,7 @@
 #include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
 
-#ifndef OS_WINDOWS
+#if HAS_LIB_OGG
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include <vorbis/vorbisenc.h>

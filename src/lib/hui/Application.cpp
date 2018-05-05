@@ -43,7 +43,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		g_set_prgname(app_name.c_str());
 	#endif
 
-	#ifdef OS_LINUX
+	#if defined(__GNUC__) || defined(OS_LINUX)
 		directory = initial_working_directory;
 		directory_static = directory + "static/";
 		if (_args.num > 0){
@@ -57,8 +57,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 			}
 		}
 		dir_create(directory);
-	#endif
-	#ifdef OS_WINDOWS
+	#else // OS_WINDOWS
 		char *ttt = NULL;
 		int r = _get_pgmptr(&ttt);
 		filename = ttt;

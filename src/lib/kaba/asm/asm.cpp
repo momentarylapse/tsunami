@@ -551,7 +551,7 @@ InstructionParam param_deref_reg_shift_reg(int reg, int reg2, int size)
 	return p;
 }
 
-InstructionParam param_imm(long long value, int size)
+InstructionParam param_imm(int64 value, int size)
 {
 	InstructionParam p;
 	p.type = PARAMT_IMMEDIATE;
@@ -560,7 +560,7 @@ InstructionParam param_imm(long long value, int size)
 	return p;
 }
 
-InstructionParam param_deref_imm(long long value, int size)
+InstructionParam param_deref_imm(int64 value, int size)
 {
 	InstructionParam p;
 	p.type = PARAMT_IMMEDIATE;
@@ -570,7 +570,7 @@ InstructionParam param_deref_imm(long long value, int size)
 	return p;
 }
 
-InstructionParam param_label(long long value, int size)
+InstructionParam param_label(int64 value, int size)
 {
 	InstructionParam p;
 	p.type = PARAMT_IMMEDIATE;
@@ -580,7 +580,7 @@ InstructionParam param_label(long long value, int size)
 	return p;
 }
 
-InstructionParam param_deref_label(long long value, int size)
+InstructionParam param_deref_label(int64 value, int size)
 {
 	InstructionParam p;
 	p.type = PARAMT_IMMEDIATE;
@@ -695,8 +695,8 @@ void InstructionWithParamsList::add_func_intro(int stack_alloc_size)
 {
 	if (InstructionSet.set == INSTRUCTION_SET_ARM)
 		return;
-	long reg_bp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RBP : REG_EBP;
-	long reg_sp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RSP : REG_ESP;
+	int_p reg_bp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RBP : REG_EBP;
+	int_p reg_sp = (InstructionSet.set == INSTRUCTION_SET_AMD64) ? REG_RSP : REG_ESP;
 	int s = InstructionSet.pointer_size;
 	add2(INST_PUSH, param_reg(reg_bp));
 	add2(INST_MOV, param_reg(reg_bp), param_reg(reg_sp));
@@ -1913,8 +1913,8 @@ string InstructionParam::str(bool hide_size)
 		string post;
 		if (write_back)
 			post = "!";
-			//msg_write((long)reg);
-			//msg_write((long)disp);
+			//msg_write((int_p)reg);
+			//msg_write((int_p)disp);
 		if (deref){
 			//msg_write("deref");
 			string ss;
@@ -2221,7 +2221,7 @@ inline void ReadParamData(char *&cur, InstructionParam &p, bool has_modrm)
 			*(int*)&p.value = *(int*)cur;		cur += 4;
 		}
 	}
-	//msg_write((long)cur - (long)o);
+	//msg_write((int_p)cur - (int_p)o);
 }
 
 string show_reg(int r)
@@ -2577,15 +2577,15 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 #if 0
 			// TODO
 			for (int i=0;i<CurrentMetaInfo->label.num;i++)
-				if ((long)code - (long)orig == CurrentMetaInfo->label[i].pos)
+				if ((int_p)code - (int_p)orig == CurrentMetaInfo->label[i].pos)
 					bufstr += "    " + CurrentMetaInfo->label[i].name + ":\n";
 #endif
 
 			// data blocks
 			bool inserted = false;
 			for (int i=0;i<CurrentMetaInfo->data.num;i++){
-				//printf("%d  %d  %d  %d\n", CurrentMetaInfo->data[i].Pos, (long)code, (long)orig, (long)code - (long)orig);
-				if ((long)code - (long)orig == CurrentMetaInfo->data[i].offset){
+				//printf("%d  %d  %d  %d\n", CurrentMetaInfo->data[i].Pos, (int_p)code, (int_p)orig, (int_p)code - (int_p)orig);
+				if ((int_p)code - (int_p)orig == CurrentMetaInfo->data[i].offset){
 					//msg_write("data");
 					if (CurrentMetaInfo->data[i].size==1){
 						bufstr += "  db\t";
@@ -2609,7 +2609,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 
 			// change of bits (processor mode)
 			for (int i=0;i<CurrentMetaInfo->bit_change.num;i++)
-				if ((long)code-(long)orig == CurrentMetaInfo->bit_change[i].offset){
+				if ((int_p)code-(int_p)orig == CurrentMetaInfo->bit_change[i].offset){
 					state.default_size = (CurrentMetaInfo->bit_change[i].bits == 16) ? SIZE_16 : SIZE_32;
 					state.reset(NULL);
 					if (state.default_size == SIZE_16)
@@ -2761,15 +2761,15 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 				for (int ii=0;ii<48-l;ii++)
 					str += " ";
 				str += "// ";
-				str += d2h(code,long(cur) - long(code), false);
+				str += d2h(code, (int_p)cur - (int_p)code, false);
 			}
 			//msg_write(str);
 			bufstr += str;
 			bufstr += "\n";
 
 		}else{
-			//msg_write(string2("????? -                          unknown         // %s\n",d2h(code,1+long(cur)-long(code),false)));
-			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+long(cur)-long(code),false).c_str());
+			//msg_write(string2("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false)));
+			bufstr += format("????? -                          unknown         // %s\n",d2h(code,1+int_p(cur)-int_p(code),false).c_str());
 			cur ++;
 		}
 
@@ -2923,7 +2923,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			printf("String:   ");
 		char *ps = new char[param.num - 1];
 		strcpy(ps, param.substr(1, -2).c_str());
-		p.value = (long)ps;
+		p.value = (int_p)ps;
 		p.type = PARAMT_IMMEDIATE;
 
 	// complex...
@@ -2959,7 +2959,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		GetParam(sub, part, list, pn);
 		if (sub.type == PARAMT_IMMEDIATE){
 			//msg_write("c2 = im");
-			if (((long)sub.value & 0xffffff00) == 0)
+			if (((int_p)sub.value & 0xffffff00) == 0)
 				p.disp = DISP_MODE_8;
 			else
 				p.disp = DISP_MODE_32;
@@ -2972,7 +2972,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 	// hex const
 	}else if ((param[0] == '0') and (param[1] == 'x')){
 		p.type = PARAMT_IMMEDIATE;
-		long long v = 0;
+		int64 v = 0;
 		for (int i=2;i<param.num;i++){
 			if (param[i] == '.'){
 			}else if ((param[i] >= 'a') and (param[i] <= 'f')){
@@ -2981,7 +2981,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			}else if ((param[i] >= 'A') and (param[i] <= 'F')){
 				v *= 16;
 				v += param[i]-'A'+10;
-			}else if ((param[i]>='0')and(param[i]<='9')){
+			}else if ((param[i]>='0') and (param[i]<='9')){
 				v*=16;
 				v+=param[i]-'0';
 			/*}else if (param[i]==':'){
@@ -2992,7 +2992,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 					p.type = PKInvalid;
 					return;						
 				}
-				p.value = (long)v;
+				p.value = (int_p)v;
 				p.value <<= 8 * sub.size;
 				p.value += sub.value;
 				p.size = sub.size;
@@ -3003,7 +3003,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				p.type = PARAMT_INVALID;
 				return;
 			}
-			p.value = (long)v;
+			p.value = (int_p)v;
 			p.size = SIZE_8;
 			if (param.num > 4)
 				p.size = SIZE_16;
@@ -3020,7 +3020,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 
 	// char const
 	}else if ((param[0] == '\'') and (param[param.num - 1] == '\'')){
-		p = param_imm((long)param[1], SIZE_8);
+		p = param_imm((int_p)param[1], SIZE_8);
 		if (DebugAsm)
 			printf("hex const:  %s\n",d2h((char*)&p.value,1).c_str());
 
@@ -3044,7 +3044,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		// script variable (global)
 		for (int i=0;i<CurrentMetaInfo->global_var.num;i++){
 			if (CurrentMetaInfo->global_var[i].name == param){
-				p = param_deref_imm((long)CurrentMetaInfo->global_var[i].pos, CurrentMetaInfo->global_var[i].size);
+				p = param_deref_imm((int_p)CurrentMetaInfo->global_var[i].pos, CurrentMetaInfo->global_var[i].size);
 				return;
 			}
 		}
@@ -3059,7 +3059,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		SetError("unknown parameter:  \"" + param + "\"\n");
 }
 
-inline void insert_val(char *oc, int &ocs, long long val, int size)
+inline void insert_val(char *oc, int &ocs, int64 val, int size)
 {
 	if (size == SIZE_8)
 		oc[ocs] = (char)val;
@@ -3070,7 +3070,7 @@ inline void insert_val(char *oc, int &ocs, long long val, int size)
 	else if (size == SIZE_32)
 		*(int*)&oc[ocs] = (int)val;
 	else if (size == SIZE_64)
-		*(long long int*)&oc[ocs] = val;
+		*(int64*)&oc[ocs] = val;
 	else if (size == SIZE_8L4){
 		val = arm_encode_8l4(val);
 		*(int*)&oc[ocs - 2] = (*(int*)&oc[ocs - 2] & 0xfffff000) | ((int)val & 0x00000fff);
@@ -3082,7 +3082,7 @@ inline void insert_val(char *oc, int &ocs, long long val, int size)
 		memcpy(&oc[ocs], &val, size);
 }
 
-inline void append_val(char *oc, int &ocs, long long val, int size)
+inline void append_val(char *oc, int &ocs, int64 val, int size)
 {
 	insert_val(oc, ocs, val, size);
 	ocs += size;
@@ -3090,7 +3090,7 @@ inline void append_val(char *oc, int &ocs, long long val, int size)
 
 void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction &inst, InstructionWithParamsList &list, int next_param_size)
 {
-	long long value = p.value;
+	int64 value = p.value;
 	int size = 0;
 	if (p.type == PARAMT_IMMEDIATE){
 		size = p.size;
@@ -3099,7 +3099,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 			size = state.addr_size; // inst.has_big_addr
 			if (InstructionSet.set == INSTRUCTION_SET_AMD64){
 				if (inst.has_modrm)
-					value -= (long)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
+					value -= (int_p)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
 				else
 					size = SIZE_64; // Ov/Mv...
 			}
@@ -3136,7 +3136,7 @@ void InstructionWithParamsList::LinkWantedLabels(void *oc)
 			continue;
 		so("linking label");
 
-		long long value = l.value;
+		int64 value = l.value;
 		if (w.relative){
 			int size = w.size;
 			if ((size == SIZE_8L4) or (size == SIZE_12))
@@ -3833,7 +3833,7 @@ void InstructionWithParamsList::AddInstructionARM(char *oc, int &ocs, int n)
 		if (iwp.p[0].is_label){
 			add_wanted_label(ocs + 1, value, n, true, false, SIZE_24);
 		}else if (iwp.inst == INST_CALL)
-			value = (iwp.p[0].value - (long)&oc[ocs] - 8) >> 2;
+			value = (iwp.p[0].value - (int_p)&oc[ocs] - 8) >> 2;
 		code |= (value & 0x00ffffff);
 	}else if (iwp.inst == INST_DD){
 		arm_expect(iwp, PARAMT_IMMEDIATE);
@@ -3887,7 +3887,7 @@ void InstructionWithParamsList::AddInstructionARM(char *oc, int &ocs, int n)
 				add_wanted_label(ocs + 3, iwp.p[1].value, n, true, true, SIZE_8S2);
 				iwp.p[1] = param_deref_reg_shift(REG_R15, label_after_now(this, iwp.p[1].value, n) ? 1 : -1, SIZE_32);
 			}else{
-				iwp.p[1] = param_deref_reg_shift(REG_R15, iwp.p[1].value - (long)&oc[ocs] - 8, SIZE_32);
+				iwp.p[1] = param_deref_reg_shift(REG_R15, iwp.p[1].value - (int_p)&oc[ocs] - 8, SIZE_32);
 			}
 		}
 
@@ -3956,7 +3956,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 	state.default_size = SIZE_32;
 	state.reset(this);
 	if (!CurrentMetaInfo){
-		DummyMetaInfo.code_origin = (long)oc;
+		DummyMetaInfo.code_origin = (int_p)oc;
 		CurrentMetaInfo = &DummyMetaInfo;
 	}
 

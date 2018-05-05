@@ -579,28 +579,28 @@ void OutputStream::set_volume(float _volume)
 	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 
+#if HAS_LIB_PULSEAUDIO
 bool OutputStream::_pulse_test_error(const string &msg)
 {
-#if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0){
 		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
-#endif
 	return false;
 }
+#endif
 
+#if HAS_LIB_PORTAUDIO
 bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 {
-#if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
 		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
-#endif
 	return false;
 }
+#endif
 
 void OutputStream::update()
 {

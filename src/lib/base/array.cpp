@@ -265,7 +265,11 @@ void DynamicArray::delete_single(int index)
 }
 
 int DynamicArray::index(const void *p)
+#ifdef OS_WINDOWS
+{	return ((long long)p - (long long)data) / element_size;	}
+#else
 {	return ((long)p - (long)data) / element_size;	}
+#endif
 
 
 DynamicArray DynamicArray::ref_subarray(int start, int num_elements)

@@ -635,24 +635,23 @@ void DeviceManager::moveDevicePriority(Device *d, int new_prio)
 	notify(MESSAGE_CHANGE);
 }
 
+#if HAS_LIB_PULSEAUDIO
 bool DeviceManager::_pulse_test_error(Session *session, const string &msg)
 {
-#if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(pulse_context);
 	if (e != 0)
 		session->e(msg + ": " + pa_strerror(e));
 	return (e != 0);
-#endif
-	return false;
 }
+#endif
 
+#if HAS_LIB_PORTAUDIO
 bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const string &msg)
 {
-#if HAS_LIB_PORTAUDIO
 	if (err != paNoError){
 		session->e(msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
-#endif
 	return false;
 }
+#endif

@@ -7,9 +7,9 @@
 
 #include "FastFourierTransform.h"
 
-#ifndef OS_WINDOWS
+//#ifndef OS_WINDOWS
 #include <fftw3.h>
-#endif
+//#endif
 
 namespace FastFourierTransform
 {
@@ -167,7 +167,7 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 		: "=r" (s) \
 		: : "%rax", "%rsp"); \
 	string ttt = p2s(s); \
-	long ds = ((long)s & 15); \
+	int_p ds = ((int_p)s & 15); \
 	if (ds != 0){ \
 		asm volatile( \
 			"subq %0, %%rsp\n\t" \
@@ -184,7 +184,7 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 		: "=r" (s) \
 		: : "%eax", "%esp"); \
 	string ttt = p2s(s); \
-	int ds = ((int)(long)s & 15); \
+	int ds = ((int)(int_p)s & 15); \
 	if (ds != 0){ \
 		asm volatile( \
 			"sub %0, %%esp\n\t" \
@@ -203,11 +203,9 @@ void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {
 	out.resize(in.num);
 	align_stack
-#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_1d(in.num, (float(*)[2])in.data, (float(*)[2])out.data, inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-#endif
 }
 
 void fft_r2c(Array<float> &in, Array<complex> &out)
@@ -217,11 +215,9 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 
 	out.resize(in.num / 2 + 1);
 	align_stack
-#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(in.num, (float*)in.data, (float(*)[2])out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-#endif
 }
 
 void fft_c2r_inv(Array<complex> &in, Array<float> &out)
@@ -231,11 +227,9 @@ void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 
 	align_stack
 	out.resize(in.num * 2 - 2);
-#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_c2r_1d(out.num, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-#endif
 }
 
 

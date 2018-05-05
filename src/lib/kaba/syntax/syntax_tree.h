@@ -37,7 +37,7 @@ struct Value
 
 	void* p() const;
 	int& as_int() const;
-	long long& as_int64() const;
+	int64& as_int64() const;
 	float& as_float() const;
 	double& as_float64() const;
 	string& as_string() const;
@@ -125,7 +125,7 @@ struct Variable
 {
 	Class *type; // for creating instances
 	string name;
-	long long _offset; // for compilation
+	int64 _offset; // for compilation
 	bool is_extern;
 };
 
@@ -150,7 +150,7 @@ struct Function
 	bool throws_exceptions; // for external
 	int inline_no;
 	// for compilation...
-	long long _var_size, _param_size;
+	int64 _var_size, _param_size;
 	int _logical_line_no;
 	int _exp_no;
 	Function(SyntaxTree *tree, const string &name, Class *return_type);
@@ -162,7 +162,7 @@ struct Function
 struct Node
 {
 	int kind;
-	long long link_no;
+	int64 link_no;
 	Script *script;
 	int ref_count;
 	// parameters
@@ -172,7 +172,7 @@ struct Node
 	// return value
 	Class *type;
 	Node();
-	Node(int kind, long long link_no, Script *script, Class *type);
+	Node(int kind, int64 link_no, Script *script, Class *type);
 	Block *as_block() const;
 	Function *as_func() const;
 	Constant *as_const() const;
@@ -310,8 +310,8 @@ public:
 	Function *AddFunction(const string &name, Class *type);
 
 	// nodes
-	Node *AddNode(int kind, long long link_no, Class *type);
-	Node *AddNode(int kind, long long link_no, Class *type, Script *s);
+	Node *AddNode(int kind, int64 link_no, Class *type);
+	Node *AddNode(int kind, int64 link_no, Class *type, Script *s);
 	Node *add_node_statement(int index);
 	Node *add_node_classfunc(ClassFunction *f, Node *inst, bool force_non_virtual = false);
 	Node *add_node_func(Script *script, int no, Class *return_type);
@@ -369,7 +369,7 @@ public:
 };
 
 string Kind2Str(int kind);
-string LinkNr2Str(SyntaxTree *s, int kind, long long nr);
+string LinkNr2Str(SyntaxTree *s, int kind, int64 nr);
 
 
 

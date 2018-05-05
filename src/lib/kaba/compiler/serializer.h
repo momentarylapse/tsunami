@@ -33,13 +33,13 @@ struct LoopData
 struct SerialNodeParam
 {
 	int kind;
-	long long p;
+	int64 p;
 	int virt; // virtual register (if p represents a physical register)
 	Class *type;
 	int shift;
 	//int c_id, v_id;
 	bool operator == (const SerialNodeParam &param) const
-	{	return (kind == param.kind) && (p == param.p) && (type == param.type) && (shift == param.shift);	}
+	{	return (kind == param.kind) and (p == param.p) and (type == param.type) and (shift == param.shift);	}
 	string str() const;
 	Class* get_type_save() const
 	{	return type ? type : TypeVoid;	}
@@ -219,7 +219,7 @@ public:
 	static SerialNodeParam param_shift(const SerialNodeParam &param, int shift, Class *t);
 	static SerialNodeParam param_global(Class *type, void *v);
 	static SerialNodeParam param_local(Class *type, int offset);
-	static SerialNodeParam param_const(Class *type, long c);
+	static SerialNodeParam param_const(Class *type, int64 c);
 	static SerialNodeParam param_marker(int m);
 	static SerialNodeParam param_deref_marker(Class *type, int m);
 	SerialNodeParam param_vreg(Class *type, int vreg, int preg = -1);

@@ -13,9 +13,9 @@ extern Class *TypeFloatPs;
 extern Class *TypeBoolPs;
 
 static Date *_date;
-#define	GetDADate(x)			long(&_date->x)-long(_date)
+#define	GetDADate(x)			int_p(&_date->x)-int_p(_date)
 static DirEntry *_dir_entry;
-#define	GetDADirEntry(x)			long(&_dir_entry->x)-long(_dir_entry)
+#define	GetDADirEntry(x)			int_p(&_dir_entry->x)-int_p(_dir_entry)
 
 
 

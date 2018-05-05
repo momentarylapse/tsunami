@@ -85,7 +85,7 @@ void ExpressionBuffer::set(int exp_no, int line_no)
 
 bool ExpressionBuffer::end_of_file()
 {
-	return ((long)cur_line >= (long)&line[line.num - 1]); // last line = "-eol-"*/
+	return ((int_p)cur_line >= (int_p)&line[line.num - 1]); // last line = "-eol-"*/
 }
 
 void ExpressionBuffer::reset_parser()

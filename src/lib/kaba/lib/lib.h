@@ -347,8 +347,8 @@ struct CompilerConfiguration
 	int abi;
 	bool allow_std_lib;
 
-	long long stack_size;
-	long long pointer_size;
+	int64 stack_size;
+	int64 pointer_size;
 	int super_array_size;
 
 	bool allow_simplification;
@@ -364,9 +364,9 @@ struct CompilerConfiguration
 	bool no_function_frame;
 	bool add_entry_point;
 	bool override_variables_offset;
-	long long variables_offset;
+	int64 variables_offset;
 	bool override_code_origin;
-	long long code_origin;
+	int64 code_origin;
 
 	int stack_mem_align;
 	int function_align;
@@ -385,8 +385,8 @@ void* mf(T tmf)
 	union{
 		T f;
 		struct{
-			long a;
-			long b;
+			int_p a;
+			int_p b;
 		};
 	}pp;
 	pp.a = 0;

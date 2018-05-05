@@ -72,7 +72,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 
-#ifdef HAS_LIB_ALSA
+#if HAS_LIB_ALSA
 	subs = NULL;
 #endif
 

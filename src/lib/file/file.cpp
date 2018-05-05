@@ -293,9 +293,9 @@ void set_mode(File *f)
 {
 #ifdef OS_WINDOWS
 	if (dynamic_cast<TextFile*>(f))
-		_setmode(handle,_O_TEXT);
+		_setmode(f->handle,_O_TEXT);
 	else
-		_setmode(handle,_O_BINARY);
+		_setmode(f->handle,_O_BINARY);
 #endif
 }
 

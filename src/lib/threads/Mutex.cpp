@@ -53,6 +53,13 @@ void Mutex::unlock()
 	ReleaseMutex(internal->mutex);
 }
 
+
+bool Mutex::tryLock()
+{
+	// argh
+	return true;
+}
+
 #endif
 #ifdef OS_LINUX
 

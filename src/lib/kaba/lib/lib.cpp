@@ -364,7 +364,7 @@ int get_virtual_index(void *func, const string &tname, const string &name)
 		}
 	}else{
 
-		long p = (long)func;
+		int_p p = (int_p)func;
 		if ((p & 1) > 0){
 			// virtual function
 			return p / sizeof(void*);
@@ -448,10 +448,10 @@ float _cdecl _Float642Float(double f)
 {	return (float)f;	}
 float _cdecl _Int2Float(int i)
 {	return (float)i;	}
-int _cdecl _Int642Int(long long i)
+int _cdecl _Int642Int(int64 i)
 {	return (int)i;	}
-long long _cdecl _Int2Int64(int i)
-{	return (long long)i;	}
+int64 _cdecl _Int2Int64(int i)
+{	return (int64)i;	}
 char _cdecl _Int2Char(int i)
 {	return (char)i;	}
 int _cdecl _Char2Int(char c)
@@ -688,7 +688,7 @@ void CastInt2Float(Value &r, Value &s)
 void CastInt2Int64(Value &r, Value &s)
 {
 	r.init(TypeInt64);
-	r.as_int64() = (long long)s.as_int();
+	r.as_int64() = (int64)s.as_int();
 }
 void CastInt2Char(Value &r, Value &s)
 {
@@ -782,7 +782,7 @@ public:
 
 class Int64Class
 {
-	long long i;
+	int64 i;
 public:
 	string _cdecl str(){	return i642s(i);	}
 };
@@ -848,7 +848,7 @@ void SIAddPackageBase()
 	TypeVoid			= add_type  ("void",		0, FLAG_CALL_BY_VALUE);
 	TypeBool			= add_type  ("bool",		sizeof(bool), FLAG_CALL_BY_VALUE);
 	TypeInt				= add_type  ("int",			sizeof(int), FLAG_CALL_BY_VALUE);
-	TypeInt64			= add_type  ("int64",		sizeof(long long), FLAG_CALL_BY_VALUE);
+	TypeInt64			= add_type  ("int64",		sizeof(int64), FLAG_CALL_BY_VALUE);
 	TypeFloat32			= add_type  ("float32",		sizeof(float), FLAG_CALL_BY_VALUE);
 	TypeFloat64			= add_type  ("float64",		sizeof(double), FLAG_CALL_BY_VALUE);
 	TypeChar			= add_type  ("char",		sizeof(char), FLAG_CALL_BY_VALUE);

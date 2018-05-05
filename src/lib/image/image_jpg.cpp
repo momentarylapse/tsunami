@@ -94,7 +94,7 @@ inline void jpg_update_bits(unsigned char *&b,int &bit_off)
 	// correct bit shifting over byte boundaries
 	if (bit_off>=16){
 		bit_off-=16;
-		if ( ((b[-1]==0xff)&&(b[0]==0x00)) || ((b[0]==0xff)&&(b[1]==0x00)) ){
+		if ( ((b[-1]==0xff) and (b[0]==0x00)) or ((b[0]==0xff) and (b[1]==0x00)) ){
 			b+=3;
 			//msg_write("+=3     (0xff00) 2");
 		}else{
@@ -103,7 +103,7 @@ inline void jpg_update_bits(unsigned char *&b,int &bit_off)
 		}
 	}else if (bit_off>=8){
 		bit_off-=8;
-		if ((b[-1]==0xff)&&(b[0]==0x00)){
+		if ((b[-1]==0xff)and(b[0]==0x00)){
 			b+=2;
 			//msg_write("+=2     (0xff00) 1");
 		}else{
@@ -113,13 +113,13 @@ inline void jpg_update_bits(unsigned char *&b,int &bit_off)
 	}
 	// convert 0xff00 to 0xff  m(T_T)m
 	unsigned char *a=b,b0,b1,b2;
-	if ((a[-1]==0xff)&&(a[0]==0x00))
+	if ((a[-1]==0xff) and (a[0]==0x00))
 		a++;
 	b0=a[0];
-	if ((a[0]==0xff)&&(a[1]==0x00))
+	if ((a[0]==0xff) and (a[1]==0x00))
 		a++;
 	b1=a[1];
-	if ((a[1]==0xff)&&(a[2]==0x00))
+	if ((a[1]==0xff) and (a[2]==0x00))
 		a++;
 	b2=a[2];
 	// join...but in "wrong" order!  m(T_T)m
@@ -133,7 +133,7 @@ inline unsigned char jpg_get_huffman(s_jpg_huffman_table *h,unsigned char *&b,in
 	//msg_write(d2h(&jpg_temp_bits,3,true));
 	for (int i=0;i<16;i++){
 		int c=jpg_get_bits(i+1,false);
-		if ((c>=h->min[i])&&(c<=h->max[i])){
+		if ((c>=h->min[i]) and (c<=h->max[i])){
 			//msg_write(i*256+(c-h->min[i]));
 			//msg_write(string2("gefunden!   ii=%d   i=%d   c=%d   min=%d   v=%d",htii,i,c,h->min[i],h->value[i*256+(c-h->min[i])]));
 			bit_off+=i+1;
@@ -490,7 +490,7 @@ void image_load_jpg(const string &filename, Image &image)
 			}else if (b[1]==0xda){	// StartOfScan
 				//msg_write("SOS");
 				b+=4;
-				while((b[seg_len]!=0xff)||(b[seg_len+1]==0x00)){
+				while((b[seg_len]!=0xff) or (b[seg_len+1]==0x00)){
 					seg_len++;
 				}
 				seg_len-=10;
@@ -514,7 +514,7 @@ void image_load_jpg(const string &filename, Image &image)
 				//msg_write(seg_len);
 				b+=seg_len;
 			}
-			if ((long)b-(long)buf > tt.num){
+			if ((int_p)b-(int_p)buf > tt.num){
 				msg_error("jpg: end of file");
 				break;
 			}

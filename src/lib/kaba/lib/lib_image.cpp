@@ -13,7 +13,7 @@ extern Class *TypeImage;
 
 #ifdef _X_USE_IMAGE_
 	static Image *_image;
-	#define	GetDAImage(x)		long(&_image->x)-long(_image)
+	#define	GetDAImage(x)		int_p(&_image->x)-int_p(_image)
 #else
 	typedef int Image;
 	#define	GetDAImage(x)		0

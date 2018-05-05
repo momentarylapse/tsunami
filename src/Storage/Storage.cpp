@@ -34,8 +34,10 @@ Storage::Storage(Session *_session)
 	formats.add(new FormatDescriptorNami());
 	formats.add(new FormatDescriptorWave());
 	formats.add(new FormatDescriptorRaw());
-#ifndef OS_WINDOWS
+#if HAS_LIB_OGG
 	formats.add(new FormatDescriptorOgg());
+#endif
+#if HAS_LIB_FLAC
 	formats.add(new FormatDescriptorFlac());
 #endif
 	formats.add(new FormatDescriptorGuitarPro());

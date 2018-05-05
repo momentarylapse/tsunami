@@ -13,7 +13,7 @@
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/Midi/MidiEffect.h"
 #include "../../Module/Synth/Synthesizer.h"
-#ifndef OS_WINDOWS
+#if HAS_LIB_FLAC
 #include <FLAC/all.h>
 #endif
 #include <math.h>
@@ -204,7 +204,7 @@ public:
 	}
 };
 
-#ifdef OS_WINDOWS
+#if HAS_LIB_FLAC == 0
 
 string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 {

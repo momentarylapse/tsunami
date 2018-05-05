@@ -10,7 +10,7 @@
 
 #include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
-#ifndef OS_WINDOWS
+#if HAS_LIB_FLAC
 #include <FLAC/all.h>
 
 bool flac_tells_samples;

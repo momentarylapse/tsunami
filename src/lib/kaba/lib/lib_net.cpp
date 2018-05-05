@@ -13,7 +13,7 @@ namespace Kaba{
 #ifdef _X_USE_NET_
 	#define net_p(p)		(void*)p
 	static NetAddress *_addr;
-	#define GetDAAddress(x)			long(&_addr->x)-long(_addr)
+	#define GetDAAddress(x)			int_p(&_addr->x)-int_p(_addr)
 #else
 	typedef int Socket;
 	typedef int NetAddress;

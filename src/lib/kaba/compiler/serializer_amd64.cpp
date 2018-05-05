@@ -22,7 +22,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 
 	// grow stack (down) for local variables of the calling function
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
-	long push_size = 0;
+	int64 push_size = 0;
 
 	Array<SerialNodeParam> params = _params;
 		
@@ -143,16 +143,16 @@ void SerializerAMD64::add_function_call(Script *script, int func_no, const Seria
 		void *func = (void*)script->func[func_no];
 		if (!func)
 			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
-		long d = (long)func - (long)this->script->opcode;
+		int_p d = (int_p)func - (int_p)this->script->opcode;
 		if (d < 0)
 			d = -d;
 		if (d < 0x70000000){
 			// 32bit call distance
-			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (long)func)); // the actual call
+			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (int_p)func)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
 		}else{
 			// 64bit call distance
-			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (long)func));
+			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (int_p)func));
 			add_cmd(Asm::INST_CALL, p_rax);
 		}
 	}

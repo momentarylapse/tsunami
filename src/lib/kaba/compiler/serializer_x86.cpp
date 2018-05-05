@@ -27,7 +27,7 @@ int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 	// grow stack (down) for local variables of the calling function
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
-	long push_size = 0;
+	int64 push_size = 0;
 
 	// push parameters onto stack
 	for (int p=params.num-1;p>=0;p--){
@@ -97,7 +97,7 @@ void SerializerX86::add_function_call(Script *script, int func_no, const SerialN
 		void *func = (void*)script->func[func_no];
 		if (!func)
 			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
-		add_cmd(Asm::INST_CALL, param_const(TypePointer, (long)func)); // the actual call
+		add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)func)); // the actual call
 		// function pointer will be shifted later...
 	}
 
@@ -128,7 +128,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 	p.shift = 0;
 
 	if (link->kind == KIND_VAR_FUNCTION){
-		p.p = (long)link->script->func[link->link_no];
+		p.p = (int_p)link->script->func[link->link_no];
 		p.kind = KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
@@ -143,10 +143,10 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		p.p = link->link_no;
 		p.kind = KIND_VAR_GLOBAL;
 	}else if (link->kind == KIND_ADDRESS){
-		p.p = (long)&link->link_no;
+		p.p = (int_p)&link->link_no;
 		p.kind = KIND_REF_TO_CONST;
 	}else if (link->kind == KIND_VAR_GLOBAL){
-		p.p = (long)link->script->g_var[link->link_no];
+		p.p = (int_p)link->script->g_var[link->link_no];
 		if (!p.p)
 			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no].name);
 	}else if (link->kind == KIND_VAR_LOCAL){
@@ -162,7 +162,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 			p.kind = KIND_VAR_GLOBAL;
 		else
 			p.kind = KIND_REF_TO_CONST;
-		p.p = (long)link->script->cnst[link->link_no];
+		p.p = (int_p)link->script->cnst[link->link_no];
 	}else if ((link->kind == KIND_OPERATOR) or (link->kind == KIND_FUNCTION) or (link->kind == KIND_INLINE_FUNCTION) or (link->kind == KIND_VIRTUAL_FUNCTION) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
 		p = SerializeNode(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
@@ -299,7 +299,7 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			if (com->params.num > 0){
 				// copy + edit command
 				Node sub = *com->params[0];
-				Node c_ret(KIND_VAR_TEMP, (long)ret.p, script, ret.type);
+				Node c_ret(KIND_VAR_TEMP, ret.p, script, ret.type);
 				sub.instance = &c_ret;
 				SerializeNode(&sub, block, index);
 			}else
@@ -372,11 +372,11 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 				// stack[-16] = rbp
 				// stack[-24] = rsp
 				// stack[-32] = rip
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (long)&script->__stack[config.stack_size-16]));
+				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-16]));
 				add_cmd(Asm::INST_MOV, p_deref_rax, param_preg(TypeReg64, Asm::REG_RBP));
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (long)&script->__stack[config.stack_size-24]));
+				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
 				add_cmd(Asm::INST_MOV, p_deref_rax, param_preg(TypeReg64, Asm::REG_RSP));
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (long)&script->__stack[config.stack_size-24]));
+				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
 				add_cmd(Asm::INST_CALL, param_const(TypePointer, 0)); // push rip
 			// load return
 				// mov rsp, &stack[-8]
@@ -384,7 +384,7 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 				// mov rbp, rsp
 				// leave
 				// ret
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (long)&script->__stack[config.stack_size-8])); // start of the script stack
+				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8])); // start of the script stack
 				add_cmd(Asm::INST_POP, param_preg(TypeReg64, Asm::REG_RSP)); // old stackpointer (real program)
 				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RBP), param_preg(TypeReg64, Asm::REG_RSP));
 				add_cmd(Asm::INST_LEAVE);
@@ -395,9 +395,9 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 				// rbp = &stack[-16]
 				// rsp = &stack[-24]
 				// GlobalWaitingMode = WaitingModeNone
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (long)&script->__stack[config.stack_size-16]));
+				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-16]));
 				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RBP), p_deref_rax);
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (long)&script->__stack[config.stack_size-24]));
+				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
 				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), p_deref_rax);
 				add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_NONE));
 
@@ -407,11 +407,11 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 						// stack[ -8] = ebp
 						// stack[-12] = esp
 						// stack[-16] = eip
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (long)&script->__stack[config.stack_size-8]));
+						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8]));
 						add_cmd(Asm::INST_MOV, p_deref_eax, param_preg(TypeReg32, Asm::REG_EBP));
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (long)&script->__stack[config.stack_size-12]));
+						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
 						add_cmd(Asm::INST_MOV, p_deref_eax, param_preg(TypeReg32, Asm::REG_ESP));
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (long)&script->__stack[config.stack_size-12]));
+						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
 						add_cmd(Asm::INST_CALL, param_const(TypePointer, 0)); // push eip
 					// load return
 						// mov esp, &stack[-4]
@@ -419,7 +419,7 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 						// mov ebp, esp
 						// leave
 						// ret
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (long)&script->__stack[config.stack_size-4])); // start of the script stack
+						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-4])); // start of the script stack
 						add_cmd(Asm::INST_POP, param_preg(TypeReg32, Asm::REG_ESP)); // old stackpointer (real program)
 						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_EBP), param_preg(TypeReg32, Asm::REG_ESP));
 						add_cmd(Asm::INST_LEAVE);
@@ -430,9 +430,9 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 						// ebp = &stack[-8]
 						// esp = &stack[-12]
 						// GlobalWaitingMode = WaitingModeNone
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (long)&script->__stack[config.stack_size-8]));
+						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8]));
 						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_EBP), p_deref_eax);
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (long)&script->__stack[config.stack_size-12]));
+						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
 						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), p_deref_eax);
 						add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_NONE));
 				}

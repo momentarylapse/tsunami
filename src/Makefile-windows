@@ -1,8 +1,8 @@
 BIN = ../tsunami
 CPP = g++
-GLOBALFLAGS = -O2 -g -std=c++11 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=1 -DHAS_LIB_PORTAUDIO=0 -DHAS_LIB_UNWIND=1
+GLOBALFLAGS = -O2 -g -std=c++11 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=0 -DHAS_LIB_PULSEAUDIO=0 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=0
 CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
-CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lz -lfftw3f -logg -lvorbis -lvorbisfile -lvorbisenc -lFLAC -lasound -lpulse -lunwind $(GLOBALFLAGS)
+CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lz -lfftw3f -logg -lvorbis -lvorbisfile -lvorbisenc -lFLAC -lportaudio -lws2_32 -lwinmm $(GLOBALFLAGS)
 
 OBJ = Action/Bar/Action__ScaleData.o \
  Action/Bar/Action__ShiftData.o \

@@ -4,7 +4,7 @@
 
 
 #if defined(OS_LINUX)// || defined(OS_MINGW)
-	//#include <sys/mman.h>
+	#include <sys/mman.h>
 	#if (!defined(__x86_64__)) && (!defined(__amd64__))
 		#define MAP_32BIT		0
 	#endif

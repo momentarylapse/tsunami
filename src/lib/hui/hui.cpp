@@ -115,7 +115,7 @@ int _tmain(int NumArgs, _TCHAR *Args[])
 
 #else
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
+int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
@@ -134,7 +134,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 #endif
 
 #endif
-#ifdef OS_LINUX
+#if  defined(OS_LINUX) || defined(OS_MINGW)
 
 int main(int NumArgs, char *Args[])
 {
@@ -142,6 +142,9 @@ int main(int NumArgs, char *Args[])
 }
 
 #endif
+
+
+
 
 // usage:
 //

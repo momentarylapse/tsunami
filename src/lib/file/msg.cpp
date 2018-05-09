@@ -16,6 +16,7 @@
 	#include <windows.h>
 #endif
 
+#undef HAS_LIB_UNWIND
 
 #if HAS_LIB_UNWIND
 #define UNW_LOCAL_ONLY

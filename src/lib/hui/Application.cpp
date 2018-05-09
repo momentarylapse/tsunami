@@ -43,19 +43,22 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		g_set_prgname(app_name.c_str());
 	#endif
 
-	#if defined(__GNUC__) || defined(OS_LINUX)
+	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 		directory = initial_working_directory;
 		directory_static = directory + "static/";
 		if (_args.num > 0){
-			filename = _args[0];
-			if ((_args[0].head(5) == "/usr/") or (_args[0].find("/") < 0)){
+			filename = _args[0].replace("\\", "/");
+			printf("%s\n", filename.c_str());
+
+			directory = filename.dirname();
+			if ((filename.head(5) == "/usr/") or (filename.find("/") < 0)){
 				installed = true;
 				// installed version?
-				filename = _args[0];
 				directory = format("%s/.%s/", getenv("HOME"), app_name.c_str());
 				directory_static = "/usr/share/" + app_name + "/";
 			}
 		}
+		printf("dir: %s\n", directory.c_str());
 		dir_create(directory);
 	#else // OS_WINDOWS
 		char *ttt = NULL;
@@ -68,6 +71,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		hui_win_instance = (HINSTANCE)GetModuleHandle(NULL);
 		directory_static = directory;
 	#endif
+	printf("init\n");
 
 	if (!msg_inited){
 		dir_create(directory);
@@ -81,6 +85,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	InitTimers();
 
 	_InitInput_();
+	printf("a\n");
 
 	ComboBoxSeparator = "\\";
 	_using_language_ = false;
@@ -93,6 +98,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 	//msg_write("HuiInitialWorkingDirectory " + HuiInitialWorkingDirectory);
 
+	printf("%s\n", directory_static.c_str());
 	if (flags & FLAG_LOAD_RESOURCE)
 		LoadResource(directory_static + "hui_resources.txt");
 
@@ -156,6 +162,7 @@ int Application::run()
 	}
 #endif
 #ifdef HUI_API_GTK
+	printf("aaaaaaaaaaaaa run\n");
 	gtk_main();
 #endif
 	return 0;

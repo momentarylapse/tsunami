@@ -28,10 +28,12 @@ void DynamicArray::reserve(int size)
 		if (size > 0){
 			allocated = size;
 #if ALIGNMENT > 0
-	#ifdef OS_WINDOWS
-			data = _aligned_malloc(ALIGNMENT, (size_t)allocated * (size_t)element_size);
-	#else
+	#if defined(OS_LINUX)
 			posix_memalign(&data, ALIGNMENT, (size_t)allocated * (size_t)element_size);
+	#elif defined(OS_WINDOWS)
+			data = _aligned_malloc(ALIGNMENT, (size_t)allocated * (size_t)element_size);
+	#else // defined(OS_MINGW)
+			data = malloc((size_t)allocated * (size_t)element_size);
 	#endif
 #else
 			data = malloc((size_t)allocated * (size_t)element_size);
@@ -265,11 +267,7 @@ void DynamicArray::delete_single(int index)
 }
 
 int DynamicArray::index(const void *p)
-#ifdef OS_WINDOWS
-{	return ((long long)p - (long long)data) / element_size;	}
-#else
-{	return ((long)p - (long)data) / element_size;	}
-#endif
+{	return ((int_p)p - (int_p)data) / element_size;	}
 
 
 DynamicArray DynamicArray::ref_subarray(int start, int num_elements)

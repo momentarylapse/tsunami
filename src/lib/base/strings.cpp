@@ -18,7 +18,7 @@
 	#include <winbase.h>
 	#include <winnt.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MINGW)
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <stdarg.h>
@@ -285,10 +285,11 @@ const char *string::c_str() const
 // accepts windows and linux paths ("/" and "\\")
 string string::sys_filename() const
 {
-#ifdef OS_WINDOWS
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
 	return replace("/", "\\");
-#endif
+#else
 	return replace("\\", "/");
+#endif
 }
 
 // ends with '/' or '\'

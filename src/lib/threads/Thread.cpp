@@ -2,10 +2,11 @@
 
 #include "../file/file.h"
 
+
 #ifdef OS_WINDOWS
 	#include <windows.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MINGW)
 	#include <pthread.h>
 	#include <unistd.h>
 #endif
@@ -15,7 +16,7 @@ struct ThreadInternal
 #ifdef OS_WINDOWS
 	HANDLE thread;
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MINGW)
 	pthread_t thread;
 #endif
 };
@@ -139,8 +140,7 @@ Thread *Thread::getSelf()
 }
 
 
-#endif
-#ifdef OS_LINUX
+#else //OS_LINUX/MINGW
 
 static void __thread_cleanup_func(void *p)
 {

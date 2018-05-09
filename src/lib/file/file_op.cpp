@@ -9,7 +9,7 @@
 	#include <io.h>
 	#include <direct.h>
 #endif
-#ifdef OS_LINUX
+#if defined (OS_LINUX) || defined(OS_MINGW)
 	#include <unistd.h>
 	#include <dirent.h>
 	//#include <sys/timeb.h>
@@ -28,6 +28,8 @@
 			return c-'A'+'a';
 		return c;
 	}
+#endif
+#ifdef OS_LINUX
 	int _stricmp(const char*a,const char*b)
 	{
 		unsigned char a_low=to_low(*a);
@@ -67,11 +69,12 @@ bool file_is_directory(const string &path)
 
 bool dir_create(const string &dir)
 {
-#ifdef OS_WINDOWS
-	return (_mkdir(dir.sys_filename().c_str())==0);
-#endif
-#ifdef OS_LINUX
-	return (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO)==0);
+#if defined(OS_WINDOWS)
+	return (_mkdir(dir.sys_filename().c_str()) == 0);
+#elif defined(OS_MINGW)
+	return (mkdir(dir.sys_filename().c_str()) == 0);
+#else // defined(OS_LINUX)
+	return (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) == 0);
 #endif
 	return false;
 }
@@ -89,8 +92,7 @@ string get_current_dir()
 	char *r=_getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "\\";
-#endif
-#ifdef OS_LINUX
+#else // defined(OS_LINUX) || defined(OS_MINGW)
 	char *r=getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "/";
@@ -128,8 +130,7 @@ bool file_copy(const string &source,const string &target)
 	int ht=_creat(target.sys_filename().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
-#endif
-#ifdef OS_LINUX
+#else // defined(OS_LINUX) || defined(OS_MINGW)
 	int ht=creat(target.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht<0){
@@ -210,8 +211,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 		}
 		e=_findnext(handle,&t);
 	}
-#endif
-#ifdef OS_LINUX
+#else // defined(OS_LINUX) || defined(OS_MINGW)
 	DIR *_dir;
 	_dir=opendir(dir2.c_str());
 	if (!_dir){

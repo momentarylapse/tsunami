@@ -12,8 +12,10 @@
 
 // which operating system?
 
-#if defined(WIN32) || defined(WIN64) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(WIN32) || defined(WIN64)
 	#define OS_WINDOWS
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+	#define OS_MINGW
 #else
 	#define OS_LINUX
 #endif
@@ -22,13 +24,9 @@
 
 // which compiler?
 
-#ifdef _MSC_VER
-	#if _MSC_VER >= 1400
-		#define COMPILER_VCS8
-	#else
-		#define COMPULER_VCS6
-	#endif
-#else // __GNUC__
+#if defined(_MSC_VER)
+	#define COMPILER_VISUAL_STUDIO
+#elif defined(__GNUC__)
 	#define COMPILER_GCC
 #endif
 
@@ -45,12 +43,12 @@
 #endif
 
 
-#ifdef OS_WINDOWS
+//#ifdef OS_WINDOWS
 	#define _cdecl
-#endif
+/*#endif
 #ifdef OS_LINUX
 	#define _cdecl
-#endif
+#endif*/
 
 typedef int int32;
 typedef long long int64;
@@ -62,12 +60,6 @@ typedef int int_p;
 #endif
 
 
-
-
-/*#ifdef OS_WINDOWS
-	#define and &&
-	#define or ||
-#endif*/
 
 
 

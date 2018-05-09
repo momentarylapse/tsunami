@@ -102,7 +102,7 @@ Date get_current_date()
 	GetLocalTime(&t);
 	return systime2date(t);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	time_t t;
 	t = time(NULL);
 	Date d;
@@ -148,7 +148,7 @@ bool File::eof()
 #ifdef OS_WINDOW
 	return _eof(handle);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	int pos = lseek(handle,0,SEEK_CUR);
 	struct stat stat;
 	fstat(handle, &stat);
@@ -323,7 +323,7 @@ void File::create(const string &_filename)
 #ifdef OS_WINDOWS
 	handle = _creat(_filename.sys_filename().c_str(), _S_IREAD | _S_IWRITE);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	handle = ::creat(_filename.sys_filename().c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
@@ -339,7 +339,7 @@ void File::append(const string &_filename)
 #ifdef OS_WINDOWS
 	handle = _open(_filename.sys_filename().c_str(), O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	handle = ::open(_filename.sys_filename().c_str(), O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle <= 0)
@@ -375,7 +375,7 @@ int File::get_size()
 #ifdef OS_WINDOWS
 	return (int)_filelength(handle);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	struct stat _stat;
 	fstat(handle, &_stat);
 	return _stat.st_size;
@@ -388,7 +388,7 @@ long long File::get_size64()
 #ifdef OS_WINDOWS
 	return (long long)_filelength(handle);
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) or defined(OS_MINGW)
 	struct stat _stat;
 	fstat(handle, &_stat);
 	return _stat.st_size;

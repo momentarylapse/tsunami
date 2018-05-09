@@ -18,8 +18,8 @@
 #ifdef OS_LINUX
 	#include <sys/mman.h>
 #endif
-#ifdef OS_WINDOWS
-	#include "windows.h"
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+	#include <windows.h>
 #endif
 
 namespace Kaba{
@@ -249,14 +249,14 @@ Script::~Script()
 {
 	if (memory and (!just_analyse)){
 		//delete[](Memory);
-		#ifdef OS_WINDOWS
+		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(memory, 0, memory_size);
 		#else
 			int r = munmap(memory, memory_size);
 		#endif
 	}
 	if (opcode){
-		#ifdef OS_WINDOWS
+		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(opcode, 0, MEM_RELEASE);
 		#else
 			int r = munmap(opcode, MAX_OPCODE);

@@ -27,8 +27,7 @@ private:
 #ifdef OS_WINDOWS
 	LONGLONG cur_time;
 	LONGLONG last_time;
-#endif
-#ifdef OS_LINUX
+#else
 	struct timeval cur_time;
 	struct timeval last_time;
 #endif

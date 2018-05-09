@@ -2,14 +2,15 @@
 #include "../../file/file.h"
 #include "../../base/set.h"
 
-#ifdef OS_LINUX
-	#include <sys/mman.h>
+
+#if defined(OS_LINUX)// || defined(OS_MINGW)
+	//#include <sys/mman.h>
 	#if (!defined(__x86_64__)) && (!defined(__amd64__))
 		#define MAP_32BIT		0
 	#endif
 #endif
-#ifdef OS_WINDOWS
-	#include "windows.h"
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
+	#include <windows.h>
 #endif
 #include <errno.h>
 
@@ -93,7 +94,7 @@ void* get_nice_memory(long size, bool executable)
 	if (config.verbose)
 		msg_write("get nice...");
 
-#ifdef OS_WINDOWS
+#if defined(OS_WINDOWS) || defined(OS_MINGW)
 	mem = (char*)VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 #else
 

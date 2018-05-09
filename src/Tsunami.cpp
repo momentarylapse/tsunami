@@ -46,6 +46,7 @@ Tsunami::Tsunami() :
 	setProperty("website", "http://michi.is-a-geek.org/software");
 	setProperty("copyright", "© 2007-2018 by Michael Ankele");
 	setProperty("author", "Michael Ankele <michi@lupina.de>");
+	printf("aaaaaaaaaaaaa\n");
 }
 
 Tsunami::~Tsunami()
@@ -67,6 +68,7 @@ void Tsunami::onEnd()
 
 bool Tsunami::onStartup(const Array<string> &_arg)
 {
+	printf("start\n");
 	Array<string> arg = _arg;
 	tsunami = this;
 
@@ -90,8 +92,12 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 
 	plugin_manager->LinkAppScriptData();
 
+	printf("aaaaaaaaaaaaa2\n");
+
 	if (handleArguments(arg))
 		return false;
+
+	printf("aaaaaaaaaaaaa3\n");
 
 	// ok, full window mode
 
@@ -103,6 +109,7 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 		Session *session = createSession();
 		session->win->show();
 	}
+	printf("aaaaaaaaaaaaa4\n");
 
 	return true;
 }
@@ -220,4 +227,23 @@ bool Tsunami::allowTermination()
 	return true;
 }
 
-HUI_EXECUTE(Tsunami);
+//HUI_EXECUTE(Tsunami);
+
+int hui_main(const Array<string> &args)
+{
+	printf("xxxx\n");
+
+
+        Tsunami::_args = args;
+        Tsunami *app = new Tsunami;
+	printf("aaaaa\n");
+        int r = 0;
+        if (app->onStartup(args))
+                r = app->run();
+        delete(app);
+        return r;
+
+
+	return 0;
+}
+

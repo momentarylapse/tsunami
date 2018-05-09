@@ -66,10 +66,8 @@ void Image::loadFlipped(const string &filename)
 		image_load_tga(filename, *this);
 	else if (ext == "jpg")
 		image_load_jpg(filename, *this);
-#ifndef OS_WINDOWS
 	else if (ext == "png")
 		image_load_png(filename, *this);
-#endif
 	else
 		msg_error("ImageLoad: unhandled file extension: " + ext);
 }

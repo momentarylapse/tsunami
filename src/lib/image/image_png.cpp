@@ -5,11 +5,13 @@
  *      Author: michi
  */
 
+#define HAS_LIB_ZLIB 1
+
+#if HAS_LIB_ZLIB
 #include "image.h"
 #include <stdio.h>
 #include "../file/file.h"
 
-#ifdef IMAGE_ALLOW_PNG
 #include <zlib.h>
 
 int endian_big_to_little(int i)

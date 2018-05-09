@@ -13,6 +13,8 @@ Tsunami.sdf
 Tsunami.opensdf
 Test/ringbuffer
 gui/TRANS
+*.exe
+*.dll
 *.nami
 *.wav
 *.ogg

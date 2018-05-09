@@ -339,13 +339,13 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node &link, Block
 		Class *type = FindType(Exp.cur);
 		Array<Node> links = GetExistence(Exp.cur, block);
 		if (type){
-			constants[nc]->as_int64() = (long)type;
+			constants[nc]->as_int64() = (int_p)type;
 		}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
-			constants[nc]->as_int64() = (long)links[0].type;
+			constants[nc]->as_int64() = (int_p)links[0].type;
 		}else{
 			type = GetConstantType(Exp.cur);
 			if (type)
-				constants[nc]->as_int64() = (long)type;
+				constants[nc]->as_int64() = (int_p)type;
 			else
 				DoError("type-name or variable name expected in type(...)");
 		}

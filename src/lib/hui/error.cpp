@@ -29,7 +29,6 @@ void _HuiSignalHandler(int)
 // apply a function to be executed when a critical error occures
 void SetErrorFunction(const Callback &function)
 {
-	return;
 	_error_function_ = function;
 	if (function){
 		signal(SIGSEGV, &_HuiSignalHandler);
@@ -154,7 +153,6 @@ public:
 
 void hui_default_error_handler()
 {
-	return;
 	_idle_function_ = NULL;
 
 	msg_reset_shift();
@@ -190,14 +188,12 @@ void hui_default_error_handler()
 
 void SetDefaultErrorHandler(const Callback &error_cleanup_function)
 {
-	return;
 	_eh_cleanup_function_ = error_cleanup_function;
 	SetErrorFunction(&hui_default_error_handler);
 }
 
 void RaiseError(const string &message)
 {
-	return;
 	msg_error(message + " (HuiRaiseError)");
 	/*int *p_i=NULL;
 	*p_i=4;*/

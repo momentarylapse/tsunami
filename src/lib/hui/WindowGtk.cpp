@@ -145,11 +145,9 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 	desired_height = height;
 
 	// icon
-#ifdef OS_LINUX
 	string logo = Application::getProperty("logo");
 	if (logo.num > 0)
 		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), NULL);
-#endif
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&on_gtk_window_close), this);

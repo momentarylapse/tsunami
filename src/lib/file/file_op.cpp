@@ -202,7 +202,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 		string name = t.name;
 		//if ((strcmp(t.name,".")!=0)and(strcmp(t.name,"..")!=0)and(strstr(t.name,"~")==NULL)){
 		if ((name != ".") and (name != "..") and (name.back() != '~')){
-			if ((name.match(filter))or ((show_directories)and(t.attrib==_A_SUBDIR)) ){
+			if (name.match(filter) or ((show_directories) and (t.attrib==_A_SUBDIR)) ){
 				entry.name = name;
 				entry.is_dir = (t.attrib == _A_SUBDIR);
 				entry.size = t.size;

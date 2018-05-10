@@ -510,6 +510,7 @@ void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(pm->plugin_dir() + dir, "*.kaba", false);
 	for (DirEntry &e : list){
+		msg_write("..." + e.name);
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
@@ -642,9 +643,9 @@ Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
 
 string PluginManager::plugin_dir()
 {
-	if (tsunami->directory_static.find("/home/") == 0)
-		return "Plugins/";
-	return tsunami->directory_static + "Plugins/";
+	if (tsunami->installed)
+		return tsunami->directory_static + "Plugins/";
+	return "Plugins/";
 }
 
 Array<string> PluginManager::FindAudioEffects()

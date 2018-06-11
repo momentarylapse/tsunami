@@ -510,7 +510,6 @@ void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(pm->plugin_dir() + dir, "*.kaba", false);
 	for (DirEntry &e : list){
-		msg_write("..." + e.name);
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");

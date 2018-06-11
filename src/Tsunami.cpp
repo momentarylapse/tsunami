@@ -24,7 +24,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.10.0";
+const string AppVersion = "0.7.10.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = NULL;
@@ -74,9 +74,9 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 
 	log = new Log;
 
-	clipboard = new Clipboard;
-
 	Session::GLOBAL = new Session(log, NULL, NULL, perf_mon);
+
+	clipboard = new Clipboard;
 
 	Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 	Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));

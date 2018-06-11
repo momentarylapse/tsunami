@@ -312,6 +312,7 @@ void SIAddPackageX()
 		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Layer::Draw)));
 		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Layer::Update)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Layer::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onHover", TypeVoid, x_p(mf(&Layer::OnHover)));
 		class_add_func_virtual("onClick", TypeVoid, x_p(mf(&Layer::OnClick)));
 		class_add_func_virtual("onMouseEnter", TypeVoid, x_p(mf(&Layer::OnMouseEnter)));
@@ -342,6 +343,7 @@ void SIAddPackageX()
 		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Picture::Draw)), FLAG_OVERRIDE);
 		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Picture::Update)), FLAG_OVERRIDE);
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Picture::OnIterate)), FLAG_OVERRIDE);
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onHover", TypeVoid, x_p(mf(&Picture::OnHover)), FLAG_OVERRIDE);
 		class_add_func_virtual("onClick", TypeVoid, x_p(mf(&Picture::OnClick)), FLAG_OVERRIDE);
 		class_add_func_virtual("onMouseEnter", TypeVoid, x_p(mf(&Picture::OnMouseEnter)), FLAG_OVERRIDE);
@@ -366,6 +368,7 @@ void SIAddPackageX()
 		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Picture3d::Draw)), FLAG_OVERRIDE);
 		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Picture3d::Update)), FLAG_OVERRIDE);
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Picture3d::OnIterate)), FLAG_OVERRIDE);
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onHover", TypeVoid, x_p(mf(&Picture3d::OnHover)), FLAG_OVERRIDE);
 		class_add_func_virtual("onClick", TypeVoid, x_p(mf(&Picture3d::OnClick)), FLAG_OVERRIDE);
 		class_add_func_virtual("onMouseEnter", TypeVoid, x_p(mf(&Picture3d::OnMouseEnter)), FLAG_OVERRIDE);
@@ -393,6 +396,7 @@ void SIAddPackageX()
 		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Text::Draw)), FLAG_OVERRIDE);
 		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Text::Update)), FLAG_OVERRIDE);
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Text::OnIterate)), FLAG_OVERRIDE);
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onHover", TypeVoid, x_p(mf(&Text::OnHover)), FLAG_OVERRIDE);
 		class_add_func_virtual("onClick", TypeVoid, x_p(mf(&Text::OnClick)), FLAG_OVERRIDE);
 		class_add_func_virtual("onMouseEnter", TypeVoid, x_p(mf(&Text::OnMouseEnter)), FLAG_OVERRIDE);
@@ -421,6 +425,7 @@ void SIAddPackageX()
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Particle::__init__)));
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, x_p(mf(&Particle::__delete__)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Particle::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_set_vtable_x(Particle);
 
 	add_class(TypeParticleRot);
@@ -435,6 +440,7 @@ void SIAddPackageX()
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&ParticleRot::__init__)));
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, x_p(mf(&ParticleRot::__delete__)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&ParticleRot::OnIterate)), FLAG_OVERRIDE);
+			func_add_param("dt", TypeFloat32);
 		class_set_vtable_x(ParticleRot);
 
 	add_class(TypeBeam);
@@ -449,6 +455,7 @@ void SIAddPackageX()
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Beam::__init__)));
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, x_p(mf(&Beam::__delete__)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Beam::OnIterate)), FLAG_OVERRIDE);
+			func_add_param("dt", TypeFloat32);
 		class_set_vtable_x(Beam);
 	
 	add_class(TypeEffect);
@@ -466,6 +473,7 @@ void SIAddPackageX()
 		class_add_func_virtual("onInit", TypeVoid, x_p(mf(&Effect::OnInit)));
 		class_add_func_virtual("onDelete", TypeVoid, x_p(mf(&Effect::OnDelete)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Effect::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onEnable", TypeVoid, x_p(mf(&Effect::OnEnable)));
 		class_set_vtable_x(Effect);
 
@@ -613,6 +621,7 @@ void SIAddPackageX()
 		class_add_func_virtual("onInit", TypeVoid, x_p(mf(&Model::OnInit)));
 		class_add_func_virtual("onDelete", TypeVoid, x_p(mf(&Model::OnDelete)));
 		class_add_func_virtual("onIterate", TypeVoid, x_p(mf(&Model::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onCollide", TypeVoid, x_p(mf(&Model::OnCollideM)));
 			func_add_param("m", TypeModelP);
 		class_add_func_virtual("onCollide", TypeVoid, x_p(mf(&Model::OnCollideT)));
@@ -669,6 +678,7 @@ void SIAddPackageX()
 			func_add_param("dpos",			TypeVector);
 		class_add_func("stop",		TypeVoid,	x_p(mf(&Camera::StopScript)));
 		class_add_func_virtual("onIterate",		TypeVoid,	x_p(mf(&Camera::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_add_func("project",		TypeVector,	amd64_wrap(mf(&Camera::Project), &amd64_camera_project));
 			func_add_param("v",			TypeVector);
 		class_add_func("unproject",		TypeVector,	amd64_wrap(mf(&Camera::Unproject), &amd64_camera_unproject));
@@ -683,6 +693,7 @@ void SIAddPackageX()
 		class_add_func_virtual("onInit",		TypeVoid,	x_p(mf(&Controller::OnInit)));
 		class_add_func_virtual("onDelete",		TypeVoid,	x_p(mf(&Controller::OnDelete)));
 		class_add_func_virtual("onIterate",		TypeVoid,	x_p(mf(&Controller::OnIterate)));
+			func_add_param("dt", TypeFloat32);
 		class_add_func_virtual("onInput",		TypeVoid,	x_p(mf(&Controller::OnInput)));
 		class_add_func_virtual("onPreDraw",		TypeVoid,	x_p(mf(&Controller::OnPreDraw)));
 		class_add_func_virtual("onMouseWheel",		TypeVoid,	x_p(mf(&Controller::OnMouseWheel)));

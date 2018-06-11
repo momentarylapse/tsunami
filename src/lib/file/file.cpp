@@ -532,7 +532,7 @@ void File::read_comment()
 void TextFile::read_comment()
 {
 #ifdef FILE_COMMENTS_DEBUG
-	msg_write("comment: " + ReadStr());
+	msg_write("comment: " + read_str());
 #else
 	read_str();
 #endif

@@ -49,7 +49,7 @@
 bool file_test_existence(const string &filename)
 {
 	struct stat s;
-	if (stat(filename.c_str(), &s) == 0){
+	if (stat(filename.sys_filename().c_str(), &s) == 0){
 		//if (s.st_mode & S_IFREG)
 			return true;
 	}
@@ -59,7 +59,7 @@ bool file_test_existence(const string &filename)
 bool file_is_directory(const string &path)
 {
 	struct stat s;
-	if (stat(path.c_str(), &s) == 0){
+	if (stat(path.sys_filename().c_str(), &s) == 0){
 		if (s.st_mode & S_IFDIR)
 			return true;
 	}

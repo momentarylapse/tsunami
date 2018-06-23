@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.16.1.0";
+string Version = "0.16.3.0";
 
 //#define ScriptDebug
 
@@ -35,13 +35,13 @@ float GlobalTimeToWait;
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Script *s) :
 	Asm::Exception(_message, _expression, _line, _column)
 {
-	message +=  ", " + s->filename;
+	text +=  ", " + s->filename;
 }
 
 Exception::Exception(const Asm::Exception &e, Script *s) :
 	Asm::Exception(e)
 {
-	message = "assembler: " + message + ", " + s->filename;
+	text = "assembler: " + message() + ", " + s->filename;
 }
 
 

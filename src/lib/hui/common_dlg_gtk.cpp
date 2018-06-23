@@ -22,7 +22,7 @@ bool FileDialogDir(Window *win, const string &title, const string &dir/*, const 
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
-												"gtk-accept",		GTK_RESPONSE_ACCEPT,
+												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												NULL);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));

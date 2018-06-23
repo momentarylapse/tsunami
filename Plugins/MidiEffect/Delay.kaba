@@ -12,6 +12,6 @@ class Delay extends MidiEffect
 	Config config
 	
 	override void process(MidiNoteBuffer midi)
-		int dt = song.sample_rate * config.delay
+		int dt = session.sample_rate() * config.delay
 		for n in midi
 			n.range.offset += dt

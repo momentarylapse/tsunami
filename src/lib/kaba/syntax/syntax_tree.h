@@ -154,8 +154,9 @@ struct Function
 	int _logical_line_no;
 	int _exp_no;
 	Function(SyntaxTree *tree, const string &name, Class *return_type);
-	int __get_var(const string &name);
+	int __get_var(const string &name) const;
 	void Update(Class *class_type);
+	string signature() const;
 };
 
 // single operand/command

@@ -349,3 +349,35 @@ void vector::_max(const vector &test_partner)
 	if (test_partner.y>y)	y=test_partner.y;
 	if (test_partner.z>z)	z=test_partner.z;
 }
+
+
+float _vec_length_(const vector &v)
+{
+	return sqrt(v*v);
+}
+
+float _vec_length_fuzzy_(const vector &v)
+{
+	float x = fabs(v.x);
+	float y = fabs(v.y);
+	float z = fabs(v.z);
+	float xy = (x > y) ? x : y;
+	return (xy > z) ? xy : z;
+}
+
+void _vec_normalize_(vector &v)
+{
+	float inv_norm = 1.0f / sqrt(v*v);
+	v *= inv_norm;
+}
+
+bool _vec_between_(const vector &v,const vector &a,const vector &b)
+{
+	float ff = _vec_factor_between_(v, a, b);
+	return (ff >= 0) and (ff <= 1);
+}
+
+float _vec_factor_between_(const vector &v,const vector &a,const vector &b)
+{
+	return ((v-a)*(b-a)) / ((b-a)*(b-a));
+}

@@ -12,15 +12,15 @@ class ClickCounterDialog extends Dialog
 	MicrophoneClickCounter *counter
 	void __init__(MicrophoneClickCounter *_counter)
 		super.__init__("Click Counter", 300, 175, _counter.session.win, false)
-		addGrid("", 0, 0, "grid")
-		setTarget("grid")
-		addDrawingArea("", 0, 0, "drawing")
-		addGrid("", 0, 1, "grid2")
-		setTarget("grid2")
-		addButton("+", 0, 0, "inc")
-		addButton("-", 1, 0, "dec")
-		addButton("Close", 2, 0, "close")
-		setImage("close", "hui:close")
+		add_grid("", 0, 0, "grid")
+		set_target("grid")
+		add_drawing_area("", 0, 0, "drawing")
+		add_grid("", 0, 1, "grid2")
+		set_target("grid2")
+		add_button("+", 0, 0, "inc")
+		add_button("-", 1, 0, "dec")
+		add_button("Close", 2, 0, "close")
+		set_image("close", "hui:close")
 		
 		counter = _counter
 	
@@ -32,23 +32,23 @@ class ClickCounterDialog extends Dialog
 
 
 	void drawVolume(Painter *c)
-		c.setColor(color(1, 0.8, 0.8, 0.8))
+		c.set_color(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = c.height - 5
 		float h = y1 - y0
-		c.drawRect(5, y0 + h * (1 - counter.Volume), 5, h)
-		c.setColor(color(1, 0.6, 0.6, 0.6))
-		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		c.draw_rect(5, y0 + h * (1 - counter.Volume), 5, h)
+		c.set_color(color(1, 0.6, 0.6, 0.6))
+		c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	override void onDraw(Painter *c)
-		c.setColor(White)
-		c.setFontSize(12)
-		c.drawRect(0, 0, c.width, c.height)
+	override void on_draw(Painter *c)
+		c.set_color(White)
+		c.set_font_size(12)
+		c.draw_rect(0, 0, c.width, c.height)
 	
 		drawVolume(c)
 	
-		c.setColor(Black)
-		c.drawStr(100, 100, counter.counter.str())
+		c.set_color(Black)
+		c.draw_str(100, 100, counter.counter.str())
 
 	void onClose()
 		counter.stop()
@@ -75,7 +75,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	int active_ttl
 	Dialog *dlg
 	
-	override void onStart()
+	override void on_start()
 
 		counter = 2265
 		active = false
@@ -95,7 +95,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		input.start()
 		input.subscribe(self, &onInput, "")
 		
-	override void onStop()
+	override void on_stop()
 		input.unsubscribe(self)
 		input.stop()
 		
@@ -109,7 +109,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		int available = input.current_buffer.available()
 	
 		AudioBuffer buf
-		input.current_buffer.readRef(buf, available)
+		input.current_buffer.read_ref(buf, available)
 	
 		float[] temp
 		temp = buf.r + buf.l

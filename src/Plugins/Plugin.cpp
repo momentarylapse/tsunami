@@ -25,7 +25,7 @@ Plugin::Plugin(const string &_filename, int _type)
 
 		usable = true;
 	}catch(Kaba::Exception &e){
-		error_message = e.message;
+		error_message = e.message();
 	}
 }
 

@@ -63,7 +63,7 @@ public:
 	Exception(){}
 	Exception(const string &msg){ text = msg; }
 	virtual ~Exception(){}
-	virtual string message(){ return text; }
+	virtual string message() const { return text; }
 	string text;
 };
 

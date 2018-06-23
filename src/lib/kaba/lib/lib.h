@@ -65,6 +65,7 @@ extern const string IDENTIFIER_AND;
 extern const string IDENTIFIER_OR;
 extern const string IDENTIFIER_XOR;
 extern const string IDENTIFIER_NOT;
+extern const string IDENTIFIER_IS;
 extern const string IDENTIFIER_ASM;
 
 
@@ -97,6 +98,8 @@ enum
 	OPERATOR_SHIFT_RIGHT,   // >>
 	OPERATOR_INCREASE,      // ++
 	OPERATOR_DECREASE,      // --
+	OPERATOR_IS,            // is
+	OPERATOR_EXTENDS,       // extends
 	NUM_PRIMITIVE_OPERATORS
 };
 

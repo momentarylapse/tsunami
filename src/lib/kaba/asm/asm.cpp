@@ -65,19 +65,19 @@ int arm_encode_8l4(unsigned int value);
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column)
 {
 	if (_expression.num > 0)
-		message += "\"" + _expression + "\": ";
-	message += _message;
+		text += "\"" + _expression + "\": ";
+	text += _message;
 	line = _line;
 	column = _column;
 	if (line >= 0)
-		message += "\nline " + i2s(line);
+		text += "\nline " + i2s(line);
 }
 
 Exception::~Exception(){}
 
 void Exception::print() const
 {
-	msg_error(message);
+	msg_error(message());
 }
 
 void SetError(const string &str)

@@ -32,9 +32,17 @@ ClassFunction::ClassFunction(const string &_name, Class *_return_type, Script *s
 	needs_overriding = false;
 }
 
-Function* ClassFunction::GetFunc()
+Function* ClassFunction::func() const
 {
 	return script->syntax->functions[nr];
+}
+
+string ClassFunction::signature() const
+{
+	Function* f = func();
+	if (needs_overriding)
+		return f->signature() + " [NEEDS OVERRIDING]";
+	return f->signature();
 }
 
 bool type_match(Class *given, Class *wanted)
@@ -117,7 +125,7 @@ bool Class::is_simple_class() const
 			return false;
 	if (get_default_constructor())
 		return false;
-	if (get_complex_constructor())
+	if (get_complex_constructors().num > 0)
 		return false;
 	if (get_destructor())
 		return false;
@@ -227,7 +235,7 @@ bool Class::is_derived_from(const string &root) const
 
 ClassFunction *Class::get_func(const string &_name, const Class *return_type, int num_params, const Class *param0) const
 {
-	foreachi(ClassFunction &f, functions, i)
+	for(ClassFunction &f: functions)
 		if ((f.name == _name) and (f.return_type == return_type) and (f.param_types.num == num_params)){
 			if ((param0) and (num_params > 0)){
 				if (f.param_types[0] == param0)
@@ -238,17 +246,32 @@ ClassFunction *Class::get_func(const string &_name, const Class *return_type, in
 	return NULL;
 }
 
+ClassFunction *Class::get_same_func(const string &_name, Function *ff) const
+{
+	for (ClassFunction &f: functions)
+		if ((f.name == _name) and (f.return_type == ff->literal_return_type) and (f.param_types.num == ff->num_params)){
+			bool match = true;
+			for (int i=0; i<ff->num_params; i++)
+				if (f.param_types[i] != ff->literal_param_type[i])
+					match = false;
+			if (match)
+				return &f;
+		}
+	return NULL;
+}
+
 ClassFunction *Class::get_default_constructor() const
 {
 	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
 }
 
-ClassFunction *Class::get_complex_constructor() const
+Array<ClassFunction*> Class::get_complex_constructors() const
 {
+	Array<ClassFunction*> c;
 	for (ClassFunction &f: functions)
 		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_types.num > 0))
-			return &f;
-	return NULL;
+			c.add(&f);
+	return c;
 }
 
 ClassFunction *Class::get_destructor() const
@@ -310,7 +333,7 @@ void Class::link_virtual_table()
 			}
 		}
 		if (cf.needs_overriding){
-			msg_error("needs overwriting: " + name + " : " + cf.name);
+			msg_error("needs overriding: " + name + " : " + cf.signature());
 		}
 	}
 }
@@ -355,17 +378,6 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 		if (!type_match(b.param_types[i], a.param_types[i]))
 			return false;
 	return true;
-}
-
-string func_signature(Function *f)
-{
-	string r = f->literal_return_type->name + " " + f->name + "(";
-	for (int i=0; i<f->num_params; i++){
-		if (i > 0)
-			r += ", ";
-		r += f->literal_param_type[i]->name;
-	}
-	return r + ")";
 }
 
 
@@ -414,9 +426,12 @@ void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool overr
 		if (class_func_match(cf, ocf))
 			orig = &ocf;
 	if (override and !orig)
-		s->DoError(format("can not override function '%s', no previous definition", func_signature(f).c_str()), f->_exp_no, f->_logical_line_no);
-	if (!override and orig)
-		s->DoError(format("function '%s' is already defined, use '%s' to override", func_signature(f).c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
+		s->DoError(format("can not override function '%s', no previous definition", f->signature().c_str()), f->_exp_no, f->_logical_line_no);
+	if (!override and orig){
+		msg_write(f->signature());
+		msg_write(orig->signature());
+		s->DoError(format("function '%s' is already defined, use '%s'", f->signature().c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
+	}
 	if (override){
 		orig->script = cf.script;
 		orig->nr = cf.nr;

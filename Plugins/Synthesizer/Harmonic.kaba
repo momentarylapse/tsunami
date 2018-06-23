@@ -24,25 +24,25 @@ class HarmonicGrid extends Grid
 	HarmonicPanel *p
 	int Selected, Hover
 
-	override void onDraw(Painter *c)
+	override void on_draw(Painter *c)
 	
 		// points
 		for i,n in hc.intensity
 			complex z0 = complex(n+1, 0)
 			complex z1 = complex(n+1, i)
-			c.setLineWidth(2)
-			drawLine2(c, z0, z1, n == Selected, n == Hover)
-			drawPoint2(c, z1, n == Selected, n == Hover)
+			c.set_line_width(2)
+			draw_line2(c, z0, z1, n == Selected, n == Hover)
+			draw_point2(c, z1, n == Selected, n == Hover)
 			
 	// left button down -> select
-	override void onLeftButtonDown()
+	override void on_left_button_down()
 		Selected = Hover
 		redraw()
 
-	override void onMouseMove()
+	override void on_mouse_move()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
-			hc.intensity[Selected] = clamp(getMouse2().y, 0, 1)
+			hc.intensity[Selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
 		// hover?
@@ -59,15 +59,15 @@ class HarmonicPanel extends ConfigPanel
 	HarmonicGrid grid
 	override void __init__(HarmonicSynthesizer *_s)
 		super.__init__(_s)
-		addGrid("", 0, 0, "main_table")
-		setTarget("main_table")
-		addGrid("", 0, 0, "table1")
-		addDrawingArea("!grabfocus,width=400", 0, 1, "drawing")
-		setTarget("table1")
-		addLabel("Release", 0, 0, "")
-		addSpinButton("!range=0:500:0.1\\0", 1, 0, "release")
-		addLabel("ms", 2, 0, "")
-		event("release", &onChange)
+		add_grid("", 0, 0, "main_table")
+		set_target("main_table")
+		add_grid("", 0, 0, "table1")
+		add_drawing_area("!grabfocus,width=400", 0, 1, "drawing")
+		set_target("table1")
+		add_label("Release", 0, 0, "")
+		add_spin_button("!range=0:500:0.1\\0", 1, 0, "release")
+		add_label("ms", 2, 0, "")
+		event("release", &on_change)
 		hc = &c.config
 		
 		grid.hc = hc
@@ -76,13 +76,13 @@ class HarmonicPanel extends ConfigPanel
 		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	void onChange()
-		hc.release = getFloat("release") / 1000
+	void on_change()
+		hc.release = get_float("release") / 1000
 		changed()
 	
 	override void update()
 		redraw("drawing")
-		setFloat("release", hc.release * 1000)
+		set_float("release", hc.release * 1000)
 		
 
 class HarmonicSynthesizer extends Synthesizer

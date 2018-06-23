@@ -51,7 +51,7 @@ void SIAddPackageSound()
 		class_add_func("stop",									TypeVoid,	sound_p(mf(&Music::Stop)));
 		class_add_func("pause",									TypeVoid,	sound_p(mf(&Music::Pause)));
 			func_add_param("pause",		TypeBool);
-		class_add_func("setRate",							TypeVoid,	sound_p(mf(&Music::SetRate)));
+		class_add_func("set_rate",							TypeVoid,	sound_p(mf(&Music::SetRate)));
 			func_add_param("rate",		TypeFloat32);
 	
 	// sound

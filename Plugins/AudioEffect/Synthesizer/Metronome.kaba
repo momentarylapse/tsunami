@@ -4,7 +4,7 @@
 use "../../api.kaba"
 use "../../MidiSource/Metronome.kaba"
 
-class Config extends PluginData
+class MetroConfig extends PluginData
 	float beats_per_minute
 	float volume
 	int beats_per_measure
@@ -16,7 +16,7 @@ class Config extends PluginData
 
 
 class Metronome extends AudioEffect
-	Config config
+	MetroConfig config
 	Synthesizer *synth
 	MetronomeSource *source
 	
@@ -33,9 +33,9 @@ class Metronome extends AudioEffect
 		float sample_rate = session.sample_rate()
 		synth.set_sample_rate(sample_rate)
 		source.sample_rate = sample_rate
-		source.volume = config.volume
-		source.num_beats = config.beats_per_measure
-		source.setBpm(config.beats_per_minute)
+		source.config.volume = config.volume
+		source.set_beats(config.beats_per_measure, 1)
+		source.set_bpm(config.beats_per_minute)
 		synth.out.read(buf)
 		
 	override ConfigPanel *create_panel()
@@ -46,16 +46,16 @@ class MetronomePanel extends ConfigPanel
 	override Metronome *c
 	override void __init__(Metronome *_m)
 		super.__init__(_m)
-		addGrid("!width=300", 0, 0, "table2")
-		setTarget("table2")
-		addLabel("Geschwindigkeit:", 0, 0, "")
-		addSpinButton("!expandx,range=0:1000:0.1\\", 1, 0, "beats_per_minute")
-		addLabel("/min", 2, 0, "")
-		addLabel("Schläge pro Takt:", 0, 1, "")
-		addSpinButton("!range=1:32:1\\", 1, 1, "beats_per_measure")
-		addLabel("Lautstärke:", 0, 2, "")
-		addSpinButton("!range=0:100:0.1\\", 1, 2, "volume")
-		addLabel("%", 2, 2, "")
+		add_grid("!width=300", 0, 0, "table2")
+		set_target("table2")
+		add_label("Geschwindigkeit:", 0, 0, "")
+		add_spin_button("!expandx,range=0:1000:0.1\\", 1, 0, "beats_per_minute")
+		add_label("/min", 2, 0, "")
+		add_label("Schläge pro Takt:", 0, 1, "")
+		add_spin_button("!range=1:32:1\\", 1, 1, "beats_per_measure")
+		add_label("Lautstärke:", 0, 2, "")
+		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
+		add_label("%", 2, 2, "")
 	
 		event("beats_per_minute", &onMetroBeats)
 		event("beats_per_measure", &onMetroMeasure)
@@ -64,21 +64,21 @@ class MetronomePanel extends ConfigPanel
 		update()
 
 	override void update()
-		setFloat("beats_per_minute", c.config.beats_per_minute)
-		setInt("beats_per_measure", c.config.beats_per_measure)
-		setFloat("volume", c.config.volume * 100)
+		set_float("beats_per_minute", c.config.beats_per_minute)
+		set_int("beats_per_measure", c.config.beats_per_measure)
+		set_float("volume", c.config.volume * 100)
 		//SliderSet(self, "volume", c.config.volume)
 
 	void onMetroBeats()
-		c.config.beats_per_minute = getFloat("")
+		c.config.beats_per_minute = get_float("")
 		changed()
 
 	void onMetroMeasure()
-		c.config.beats_per_measure = getInt("")
+		c.config.beats_per_measure = get_int("")
 		changed()
 
 	void onMetroVolume()
-		c.config.volume = getFloat("") / 100
+		c.config.volume = get_float("") / 100
 		//m.config.volume = SliderGet(self, "volume")
 		changed()
 

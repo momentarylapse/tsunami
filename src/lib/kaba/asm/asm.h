@@ -479,13 +479,12 @@ int QueryLocalInstructionSet();
 bool Assemble(const char *code, char *oc, int &ocs);
 string Disassemble(void *code, int length = -1, bool allow_comments = true);
 
-class Exception
+class Exception : public ::Exception
 {
 public:
 	Exception(const string &message, const string &expression, int line, int column);
 	virtual ~Exception();
 	void print() const;
-	string message;
 	int line, column;
 };
 

@@ -13,10 +13,10 @@ class Config extends PluginData
 class Octaver extends AudioEffect
 	Config config
 
-	void doOctaver(float[] b)
+	void do_octaver(float[] b)
 		for bb in b
 			bb = (bb * bb) * config.level + bb * (1 - config.level)
 
 	override void process(AudioBuffer buf)
-		doOctaver(buf.r)
-		doOctaver(buf.l)
+		do_octaver(buf.r)
+		do_octaver(buf.l)

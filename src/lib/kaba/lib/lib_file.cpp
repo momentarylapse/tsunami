@@ -19,13 +19,6 @@ static DirEntry *_dir_entry;
 
 
 
-#define KABA_EXCEPTION_WRAPPER(CODE) \
-try{ \
-	CODE; \
-}catch(::FileError &e){ \
-	kaba_raise_exception(new KabaFileError(e.message())); \
-}
-
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
@@ -205,11 +198,11 @@ void SIAddPackageFile()
 	
 	add_class(TypeFile);
 		class_add_func(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&KabaFile::__delete__));
-		class_add_func("getCDate",		TypeDate,		mf(&File::GetDateCreation));
-		class_add_func("getMDate",		TypeDate,		mf(&File::GetDateModification));
-		class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
-		class_add_func("getSize",		TypeInt,		mf(&File::get_size));
-		class_add_func("getPos",		TypeInt,		mf(&File::get_pos));
+		//class_add_func("getCDate",		TypeDate,		mf(&File::GetDateCreation));
+		class_add_func("get_date",		TypeDate,		mf(&File::GetDateModification));
+		//class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
+		class_add_func("get_size",		TypeInt,		mf(&File::get_size));
+		class_add_func("get_pos",		TypeInt,		mf(&File::get_pos));
 		class_add_func("set_pos",		TypeVoid,		mf(&File::set_pos), FLAG_RAISES_EXCEPTIONS);
 			func_add_param("pos",		TypeInt);
 		class_add_func("seek",		TypeVoid,		mf(&File::seek), FLAG_RAISES_EXCEPTIONS);

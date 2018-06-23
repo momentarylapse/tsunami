@@ -24,11 +24,11 @@ class PitchForkDialog extends Dialog
 	
 	void __init__(PitchFork *pf)
 		super.__init__("Pitchfork", 200, 80, pf.session.win, false)
-		addGrid("", 0, 0, "table")
-		setTarget("table")
-		addSpinButton("", 0, 0, "frequency")
-		addButton("Close", 0, 1, "close")
-		setImage("close", "hui:close")
+		add_grid("", 0, 0, "table")
+		set_target("table")
+		add_spin_button("", 0, 0, "frequency")
+		add_button("Close", 0, 1, "close")
+		set_image("close", "hui:close")
 		
 		fork = pf
 	
@@ -36,10 +36,10 @@ class PitchForkDialog extends Dialog
 		event("close", &onClose)
 		event("frequency", &onFrequency)
 	
-		setFloat("frequency", fork.renderer.freq)
+		set_float("frequency", fork.renderer.freq)
 
 	void onFrequency()
-		fork.renderer.freq = getFloat("")
+		fork.renderer.freq = get_float("")
 
 	void onClose()
 		fork.stop()
@@ -48,7 +48,7 @@ class PitchFork extends TsunamiPlugin
 	OutputStream *stream
 	ForkRenderer *renderer
 	PitchForkDialog *dlg
-	override void onStart()
+	override void on_start()
 	
 		renderer = new ForkRenderer
 		stream = new OutputStream(session, renderer.out)
@@ -57,7 +57,7 @@ class PitchFork extends TsunamiPlugin
 		dlg.show()
 		
 		stream.play()
-	override void onStop()
+	override void on_stop()
 		delete dlg
 		delete stream
 		delete renderer

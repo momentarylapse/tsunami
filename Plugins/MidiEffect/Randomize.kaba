@@ -18,8 +18,8 @@ class Randomize extends MidiEffect
 	Config config
 	
 	override void process(MidiNoteBuffer midi)
-		float delay = song.sample_rate * config.TimeDelay
-		float var = song.sample_rate * config.TimeVariation
+		float delay = session.sample_rate() * config.TimeDelay
+		float var = session.sample_rate() * config.TimeVariation
 		for n in midi
 			int dt = randi(var*2) - var + delay
 			n.range.offset += dt

@@ -68,8 +68,8 @@ string pitch_name(int pitch)
 	return name_rel + name_oct
 
 enum
-	ChordMajor
-	ChordMinor
+	CHORD_MAJOR
+	CHORD_MINOR
 
 class Chord
 	int base_tone
@@ -80,10 +80,10 @@ Chord[]  ParseChords(string str)
 	for a,i in str
 		Chord c
 		if a >= 'a' and a <= 'h'
-			c.type = ChordMinor
+			c.type = CHORD_MINOR
 			c.base_tone = char_to_rel_pitch(a) + 48
 		else if a >= 'A' and a <= 'H'
-			c.type = ChordMajor
+			c.type = CHORD_MAJOR
 			c.base_tone = char_to_rel_pitch(a + 32) + 48
 		else
 			continue

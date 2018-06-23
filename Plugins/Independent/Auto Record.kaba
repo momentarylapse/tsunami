@@ -3,12 +3,12 @@ use "../api.kaba"
 
 class AutoRecord extends TsunamiPlugin
 	
-	override void onStart()
-		win.show()
-		view.subscribe(self, &onUpdate, "InputChange")
+	override void on_start()
+		session.win.show()
+		session.view.subscribe(self, &on_update, "InputChange")
 		
-	override void onStop()
-		view.unsubscribe(self)
+	override void on_stop()
+		session.view.unsubscribe(self)
 		
 	string get_fn()
 		string base = "/home/michi/backup-"
@@ -28,7 +28,7 @@ class AutoRecord extends TsunamiPlugin
 			if !FileExists(fn)
 				return fn
 	
-	void onUpdate()
+	void on_update()
 		if view_input
 			string fn = get_fn()
 			SetTempBackupFilename(fn)

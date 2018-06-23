@@ -89,36 +89,36 @@ class FMPanel extends ConfigPanel
 	override void __init__(FMSynthesizer *_s)
 		super.__init__(_s)
 		fc = &c.config
-		addGrid("", 0, 0, "outer_table")
-		setTarget("outer_table")
-		addGrid("", 0, 0, "main_table")
-		addSeparator("!horizontal", 0, 1, "")
-		addGrid("", 0, 2, "osc_table")
-		setTarget("main_table")
-		addLabel("Frequency", 0, 0, "")
-		addLabel("Amplitude", 1, 0, "")
+		add_grid("", 0, 0, "outer_table")
+		set_target("outer_table")
+		add_grid("", 0, 0, "main_table")
+		add_separator("!horizontal", 0, 1, "")
+		add_grid("", 0, 2, "osc_table")
+		set_target("main_table")
+		add_label("Frequency", 0, 0, "")
+		add_label("Amplitude", 1, 0, "")
 		for j in 0:NUM_OSCILLATORS
-			addSpinButton("!range=0:32:0.001\\0", 0, j + 1, "factor_" + j)
-			addSpinButton("!range=0:1:0.001\\0", 1, j + 1, "amplitude_" + j)
-			addRadioButton("", 2, j+1, "chosen:osc_" + j)
+			add_spin_button("!range=0:32:0.001\\0", 0, j + 1, "factor_" + j)
+			add_spin_button("!range=0:1:0.001\\0", 1, j + 1, "amplitude_" + j)
+			add_radio_button("", 2, j+1, "chosen:osc_" + j)
 			event("chosen:osc_" + j, &onChosen)
-		setTarget("osc_table")
-		addLabel("Initial", 0, 1, "")
-		addLabel("Peak", 0, 2, "")
-		addLabel("Sustain", 0, 3, "")
-		addLabel("Attack (ms)", 0, 4, "")
-		addLabel("Decay (ms)", 0, 5, "")
-		addLabel("Release (ms)", 0, 6, "")
-		addSpinButton("!range=0:1:0.001\\0", 1, 1, "initial")
-		addSpinButton("!range=0:1:0.001\\0", 1, 2, "peak")
-		addSpinButton("!range=0:1:0.001\\0", 1, 3, "sustain")
-		addSpinButton("!range=0:1000:0.1\\0", 1, 4, "attack")
-		addSpinButton("!range=0:1000:0.1\\0", 1, 5, "decay")
-		addSpinButton("!range=0:1000:0.1\\0", 1, 6, "release")
+		set_target("osc_table")
+		add_label("Initial", 0, 1, "")
+		add_label("Peak", 0, 2, "")
+		add_label("Sustain", 0, 3, "")
+		add_label("Attack (ms)", 0, 4, "")
+		add_label("Decay (ms)", 0, 5, "")
+		add_label("Release (ms)", 0, 6, "")
+		add_spin_button("!range=0:1:0.001\\0", 1, 1, "initial")
+		add_spin_button("!range=0:1:0.001\\0", 1, 2, "peak")
+		add_spin_button("!range=0:1:0.001\\0", 1, 3, "sustain")
+		add_spin_button("!range=0:1000:0.1\\0", 1, 4, "attack")
+		add_spin_button("!range=0:1000:0.1\\0", 1, 5, "decay")
+		add_spin_button("!range=0:1000:0.1\\0", 1, 6, "release")
 		for j in 0:NUM_OSCILLATORS
-			addCheckBox("" + j, 2, j+1, "link_" + j)
-		addCheckBox("out", 2, NUM_OSCILLATORS + 1, "link_out")
-		addComboBox("sine\\square\\saw", 3, 1, "type")
+			add_check_box("" + j, 2, j+1, "link_" + j)
+		add_check_box("out", 2, NUM_OSCILLATORS + 1, "link_out")
+		add_combo_box("sine\\square\\saw", 3, 1, "type")
 		event("*", &onChange)
 		chosen = 0
 	
@@ -130,30 +130,30 @@ class FMPanel extends ConfigPanel
 		if HuiGetEvent().id.substr(0, 6) == "chosen"
 			return
 		for o,j in fc.osc
-			o.factor = getFloat("factor_" + j)
-			o.amplitude = getFloat("amplitude_" + j)
+			o.factor = get_float("factor_" + j)
+			o.amplitude = get_float("amplitude_" + j)
 			
 		OscillatorConfig *o = &fc.osc[chosen]
-		o.initial = getFloat("initial")
-		o.peak = getFloat("peak")
-		o.sustain = getFloat("sustain")
-		o.attack = getFloat("attack") / 1000
-		o.decay = getFloat("decay") / 1000
-		o.release = getFloat("release") / 1000
-		o.type = getInt("type")
+		o.initial = get_float("initial")
+		o.peak = get_float("peak")
+		o.sustain = get_float("sustain")
+		o.attack = get_float("attack") / 1000
+		o.decay = get_float("decay") / 1000
+		o.release = get_float("release") / 1000
+		o.type = get_int("type")
 		
 		/*for l,i in fc.link
 			if l.source == chosen
 				fc.link.remove(i)
 				i --*/
-		o.target_out = isChecked("link_out")
+		o.target_out = is_checked("link_out")
 		/*if isChecked("link_out")
 			OscillatorLink l
 			l.source = chosen
 			l.dest = -1
 			fc.link.add(l)*/
 		for j in 0:NUM_OSCILLATORS
-			o.target[j] = isChecked("link_" + j)
+			o.target[j] = is_checked("link_" + j)
 			/*if isChecked("link_" + j)
 				l.dest = j
 				fc.link.add(l)*/
@@ -162,16 +162,16 @@ class FMPanel extends ConfigPanel
 	
 	override void update()
 		for o,j in fc.osc
-			setFloat("factor_" + j, o.factor)
-			setFloat("amplitude_" + j, o.amplitude)
+			set_float("factor_" + j, o.factor)
+			set_float("amplitude_" + j, o.amplitude)
 		OscillatorConfig *o = &fc.osc[chosen]
-		setFloat("initial", o.initial)
-		setFloat("peak", o.peak)
-		setFloat("sustain", o.sustain)
-		setFloat("attack", o.attack * 1000)
-		setFloat("decay", o.decay * 1000)
-		setFloat("release", o.release * 1000)
-		setInt("type", o.type)
+		set_float("initial", o.initial)
+		set_float("peak", o.peak)
+		set_float("sustain", o.sustain)
+		set_float("attack", o.attack * 1000)
+		set_float("decay", o.decay * 1000)
+		set_float("release", o.release * 1000)
+		set_int("type", o.type)
 		for j in 0:NUM_OSCILLATORS
 			check("link_" + j, o.target[j])
 		check("link_out", o.target_out)

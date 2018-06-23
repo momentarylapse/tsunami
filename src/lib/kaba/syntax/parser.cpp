@@ -140,7 +140,7 @@ void SyntaxTree::GetConstantValue(const string &str, Value &value)
 Node *SyntaxTree::DoClassFunction(Node *ob, Array<ClassFunction> &cfs, Block *block)
 {
 	// the function
-	Function *ff = cfs[0].GetFunc();
+	Function *ff = cfs[0].func();
 
 	Array<Node> links;
 	for (ClassFunction &cf: cfs){
@@ -824,11 +824,41 @@ Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param)
 	return param;
 }
 
+Node *LinkSpecialOperatorIs(SyntaxTree *tree, Node *param1, Node *param2)
+{
+	if (param2->kind != KIND_TYPE)
+		tree->DoError("class name expexted after 'is'");
+	Class *t2 = param2->script->syntax->classes[param2->link_no];
+	if (t2->vtable.num == 0)
+		tree->DoError("class after 'is' needs to have virtual functions: '" + t2->name + "'");
+
+	Class *t1 = param1->type;
+	if (t1->is_pointer){
+		param1 = tree->deref_node(param1);
+		t1 = t1->parent;
+	}
+	if (!t2->is_derived_from(t1))
+		tree->DoError("'is': class '" + t2->name + "' is not derived from '" + t1->name + "'");
+
+	// vtable2
+	int nc = tree->AddConstant(TypePointer);
+	tree->constants[nc]->as_int64() = (int_p)t2->_vtable_location_compiler_;
+	Node *vtable2 = tree->add_node_const(nc);
+
+	// vtable1
+	param1->type = TypePointer;
+
+	return tree->add_node_operator_by_inline(param1, vtable2, INLINE_POINTER_EQUAL);
+}
+
 Node *SyntaxTree::LinkOperator(int op_no, Node *param1, Node *param2)
 {
 	bool left_modifiable = PrimitiveOperators[op_no].left_modifiable;
 	string op_func_name = PrimitiveOperators[op_no].function_name;
 	Node *op = NULL;
+
+	if (PrimitiveOperators[op_no].id == OPERATOR_IS)
+		return LinkSpecialOperatorIs(this, param1, param2);
 
 	Class *p1 = param1->type;
 	Class *p2 = param2->type;
@@ -1515,11 +1545,11 @@ void SyntaxTree::ParseImport()
 			string expr = Exp.line[logical_line].exp[exp_no].name;
 			e.line = physical_line;
 			e.column = pos;
-			e.message += "\n...imported from:\nline " + i2s(physical_line) + ", " + script->filename;
+			e.text += "\n...imported from:\nline " + i2s(physical_line) + ", " + script->filename;
 			throw e;
 			//msg_write(e.message);
 			//msg_write("...");
-			string msg = e.message + "\nimported file:";
+			string msg = e.message() + "\nimported file:";
 			//string msg = "in imported file:\n\"" + e.message + "\"";
 			DoError(msg);
 		}
@@ -1753,6 +1783,7 @@ void SyntaxTree::ParseClass()
 			_offset = mem_align(_offset, 4);
 	_class->size = ProcessClassSize(_class->name, _offset);
 
+
 	AddFunctionHeadersForClass(_class);
 
 	_class->fully_parsed = true;
@@ -1853,9 +1884,9 @@ bool SyntaxTree::ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_
 void Function::Update(Class *class_type)
 {
 	// save "original" param types (Var[].Type gets altered for call by reference)
-	literal_param_type.resize(num_params);
-	for (int i=0;i<num_params;i++)
-		literal_param_type[i] = var[i].type;
+	for (int i=literal_param_type.num;i<num_params;i++)
+		literal_param_type.add(var[i].type);
+	// but only, if not existing yet...
 
 	// return by memory
 	if (return_type->uses_return_by_memory())
@@ -1958,6 +1989,7 @@ Function *SyntaxTree::ParseFunctionHeader(Class *class_type, bool as_extern)
 			// type of parameter variable
 			Class *param_type = ParseType(); // force
 			f->block->add_var(Exp.cur, param_type);
+			f->literal_param_type.add(param_type);
 			Exp.next();
 			f->num_params ++;
 

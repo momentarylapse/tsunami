@@ -76,16 +76,16 @@ class MetronomeSource extends BeatSource
 		
 		return samples
 	
-	void setBpm(float bpm)
+	void set_bpm(float bpm)
 		config.bpm = bpm
 		changed()
 	
-	void setBeats(int beats, int sub_beats)
+	void set_beats(int beats, int sub_beats)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()
 	
-	void setPause(bool _pause)
+	void set_pause(bool _pause)
 		pause = _pause
 		changed()
 	

@@ -322,6 +322,11 @@ static bool __drawing_area_queue_redraw(void *p)
 
 void ControlDrawingArea::redraw()
 {
+	if (is_opengl){
+		gtk_widget_queue_draw(widget);
+		return;
+	}
+
 	//msg_write("redraw " + id);
 	rect r = rect(0,0,1000000,1000000);
 	if (delay_timer->peek() < 0.2f){
@@ -338,12 +343,16 @@ void ControlDrawingArea::redraw()
 		return;
 	//printf("                    DRAW\n");
 	g_idle_add((GSourceFunc)__drawing_area_queue_redraw,(void*)widget);
-	//gtk_widget_queue_draw(widget);
 	redraw_area.add(r);
 }
 
 void ControlDrawingArea::redraw(const rect &r)
 {
+	if (is_opengl){
+		gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
+		return;
+	}
+
 	if (delay_timer->peek() < 0.2f){
 		for (rect &rr: redraw_area)
 			if (rr.covers(r)){

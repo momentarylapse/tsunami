@@ -25,13 +25,14 @@ struct ClassFunction{
 	Script *script;
 	int nr; // index in functions[]
 	// _func_(x)  ->  p.func(x)
-	Array<Class*> param_types;
-	Class *return_type;
+	Array<Class*> param_types; // literal!
+	Class *return_type; // literal!
 	int virtual_index;
 	bool needs_overriding;
 	ClassFunction();
 	ClassFunction(const string &name, Class *return_type, Script *s, int no);
-	Function *GetFunc();
+	Function *func() const;
+	string signature() const;
 };
 
 typedef void *VirtualTable;
@@ -72,8 +73,9 @@ public:
 	Class *get_root() const;
 	void add_function(SyntaxTree *s, int func_no, bool as_virtual = false, bool override = false);
 	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = NULL) const;
+	ClassFunction *get_same_func(const string &name, Function *f) const;
 	ClassFunction *get_default_constructor() const;
-	ClassFunction *get_complex_constructor() const;
+	Array<ClassFunction*> get_complex_constructors() const;
 	ClassFunction *get_destructor() const;
 	ClassFunction *get_assign() const;
 	ClassFunction *get_virtual_function(int virtual_index) const;

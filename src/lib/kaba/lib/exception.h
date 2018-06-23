@@ -27,6 +27,16 @@ public:
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception);
 
+
+
+#define KABA_EXCEPTION_WRAPPER(CODE) \
+try{ \
+	CODE; \
+}catch(::Exception &e){ \
+	kaba_raise_exception(new KabaException(e.message())); \
+}
+
+
 }
 
 

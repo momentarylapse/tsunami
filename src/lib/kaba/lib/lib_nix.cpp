@@ -2,6 +2,7 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "common.h"
+#include "exception.h"
 
 #ifdef _X_USE_NIX_
 	#include "../../nix/nix.h"
@@ -12,6 +13,21 @@ namespace Kaba{
 
 #ifdef _X_USE_NIX_
 	#define nix_p(p)		(void*)p
+
+
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+
+nix::Texture* __LoadTexture(const string &filename)
+{
+	KABA_EXCEPTION_WRAPPER(return nix::LoadTexture(filename));
+	return NULL;
+}
+
+#pragma GCC pop_options
+
+
+
 #else
 	namespace nix{
 		typedef int VertexBuffer;
@@ -34,6 +50,7 @@ Class *TypeTexture;
 Class *TypeTextureP;
 Class *TypeTexturePList;
 Class *TypeDynamicTexture;
+Class *TypeDepthTexture;
 Class *TypeCubeMap;
 Class *TypeShader;
 Class *TypeShaderP;
@@ -50,6 +67,7 @@ void SIAddPackageNix()
 	TypeTextureP		= add_type_p("Texture*",	TypeTexture);
 	TypeTexturePList	= add_type_a("Texture*[]",	TypeTextureP, -1);
 	TypeDynamicTexture	= add_type  ("DynamicTexture", sizeof(nix::Texture));
+	TypeDepthTexture	= add_type  ("DepthTexture", sizeof(nix::Texture));
 	TypeCubeMap			= add_type  ("CubeMap", sizeof(nix::Texture));
 	TypeShader			= add_type  ("Shader", sizeof(nix::Shader));
 	TypeShaderP			= add_type_p("Shader*",	TypeShader);
@@ -59,7 +77,7 @@ void SIAddPackageNix()
 			func_add_param("num_textures", TypeInt);
 		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&nix::VertexBuffer::__delete__)));
 		class_add_func("clear", TypeVoid, nix_p(mf(&nix::VertexBuffer::clear)));
-		class_add_func("addTria",							TypeVoid,	nix_p(mf(&nix::VertexBuffer::addTria)));
+		class_add_func("add_tria",							TypeVoid,	nix_p(mf(&nix::VertexBuffer::addTria)));
 			func_add_param("p1",		TypeVector);
 			func_add_param("n1",		TypeVector);
 			func_add_param("u1",		TypeFloat32);
@@ -72,7 +90,7 @@ void SIAddPackageNix()
 			func_add_param("n3",		TypeVector);
 			func_add_param("u3",		TypeFloat32);
 			func_add_param("v3",		TypeFloat32);
-		class_add_func("addTrias",							TypeVoid,	nix_p(mf(&nix::VertexBuffer::addTrias)));
+		class_add_func("add_trias",							TypeVoid,	nix_p(mf(&nix::VertexBuffer::addTrias)));
 			func_add_param("num_trias",		TypeInt);
 			func_add_param("p",		TypeVectorArrayP);
 			func_add_param("n",		TypeVectorArrayP);
@@ -91,6 +109,12 @@ void SIAddPackageNix()
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
+	add_class(TypeDepthTexture);
+		TypeDepthTexture->derive_from(TypeTexture, false);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::DepthTexture::__init__)));
+			func_add_param("width", TypeInt);
+			func_add_param("height", TypeInt);
+
 	add_class(TypeCubeMap);
 		TypeCubeMap->derive_from(TypeTexture, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::CubeMap::__init__)));
@@ -98,16 +122,30 @@ void SIAddPackageNix()
 
 	add_class(TypeShader);
 		class_add_func("unref",										TypeVoid,	nix_p(mf(&nix::Shader::unref)));
-		class_add_func("setData",					TypeVoid,	nix_p(mf(&nix::Shader::set_data)));
+		class_add_func("location",					TypeInt,	nix_p(mf(&nix::Shader::get_location)));
 			func_add_param("name",		TypeString);
+		class_add_func("set_float",					TypeVoid,	nix_p(mf(&nix::Shader::set_float)));
+			func_add_param("loc",		TypeInt);
+			func_add_param("f",		TypeFloat32);
+		class_add_func("set_matrix",					TypeVoid,	nix_p(mf(&nix::Shader::set_matrix)));
+			func_add_param("loc",		TypeInt);
+			func_add_param("m",		TypeMatrix);
+		class_add_func("set_color",					TypeVoid,	nix_p(mf(&nix::Shader::set_color)));
+			func_add_param("loc",		TypeInt);
+			func_add_param("c",		TypeColor);
+		class_add_func("set_int",					TypeVoid,	nix_p(mf(&nix::Shader::set_int)));
+			func_add_param("loc",		TypeInt);
+			func_add_param("i",		TypeInt);
+		class_add_func("set",					TypeVoid,	nix_p(mf(&nix::Shader::set_data)));
+			func_add_param("loc",		TypeInt);
 			func_add_param("data",		TypePointer);
 			func_add_param("size",		TypeInt);
-		class_add_func("getData",					TypeVoid,	nix_p(mf(&nix::Shader::get_data)));
-			func_add_param("name",		TypeString);
+		/*class_add_func("get",					TypeVoid,	nix_p(mf(&nix::Shader::get_data)));
+			func_add_param("loc",		TypeInt);
 			func_add_param("data",		TypePointer);
-			func_add_param("size",		TypeInt);
+			func_add_param("size",		TypeInt);*/
 
-	add_func("LoadTexture",			TypeTextureP,	nix_p(&nix::LoadTexture));
+	add_func("LoadTexture",			TypeTextureP,	nix_p(&__LoadTexture));
 		func_add_param("filename",		TypeString);
 	
 		// drawing
@@ -234,6 +272,8 @@ void SIAddPackageNix()
 		func_add_param("c",			TypeColor);
 	add_func("NixSetTexture",		TypeVoid,	nix_p(&nix::SetTexture));
 		func_add_param("t",			TypeTextureP);
+	add_func("NixSetShader",		TypeVoid,	nix_p(&nix::SetShader));
+		func_add_param("s",			TypeShaderP);
 	add_func("VecProject",								TypeVoid,	nix_p(&nix::GetVecProject));
 		func_add_param("v_out",		TypeVector);
 		func_add_param("v_in",		TypeVector);

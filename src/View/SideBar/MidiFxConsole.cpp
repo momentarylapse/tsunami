@@ -164,7 +164,7 @@ void MidiFxConsole::onUpdate()
 
 void MidiFxConsole::onAdd()
 {
-	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::MIDI_EFFECT);
 	MidiEffect *effect = CreateMidiEffect(session, name);
 	if (track)
 		track->addMidiEffect(effect);

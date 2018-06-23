@@ -63,20 +63,20 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 class MidiEventBuffer extends MidiEvent[]
 	int samples
 	extern override void __init__()
-	extern MidiNote[] getNotes(Range r)
-	extern MidiEvent[] getEvents(Range r)
-	extern Range getRange()
-	void addNote(MidiNote n)
+	extern MidiNote[] get_notes(Range r)
+	extern MidiEvent[] get_events(Range r)
+	extern Range get_range()
+	void add_note(MidiNote n)
 		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
-	extern void addMetronomeClick(int pos, int level, float volume)
+	extern void add_metronome_click(int pos, int level, float volume)
 
 class MidiNoteBuffer extends MidiNote*[]
 	int samples
 	extern override void __init__()
-	extern MidiNote*[] getNotes(Range r)
-	extern MidiEvent[] getEvents(Range r)
-	extern Range getRange()
+	extern MidiNote*[] get_notes(Range r)
+	extern MidiEvent[] get_events(Range r)
+	extern Range get_range()
 
 class PluginData
 	extern void __init__()
@@ -151,11 +151,11 @@ class RingBuffer
 	extern int available()
 	extern void read(AudioBuffer b)
 	extern void write(AudioBuffer b)
-	extern void readRef(AudioBuffer b, int size)
-	extern void peekRef(AudioBuffer b, int size)
-	extern void writeRef(AudioBuffer b, int size)
-	extern void moveReadPos(int delta)
-	extern void moveWritePos(int delta)
+	extern void read_ref(AudioBuffer b, int size)
+	extern void peek_ref(AudioBuffer b, int size)
+	extern void write_ref(AudioBuffer b, int size)
+	extern void move_read_pos(int delta)
+	extern void move_write_pos(int delta)
 	extern void clear()
 	void __assign__(RingBuffer o)
 
@@ -276,8 +276,8 @@ class Sample // TODO
 	float volume
 	int uid
 	Tag[] tags
-	extern SampleRef *createRef()
-	extern string getValue(string key)
+	extern SampleRef *create_ref()
+	extern string get_value(string key)
 
 class SampleRef // TODO
 	Sample *origin
@@ -315,28 +315,28 @@ class Track
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern AudioBuffer getBuffers(int layer_no, Range r)
-	extern AudioBuffer readBuffers(Range r)
+	extern AudioBuffer get_buffers(int layer_no, Range r)
+	extern AudioBuffer read_buffers(Range r)
 	
-	extern void setName(string name)
-	extern void setMuted(bool muted)
-	extern void setVolume(float volume)
-	extern void setPanning(float panning)
-	extern void insertMidiData(int offset, MidiNoteBuffer midi)
-	extern void addEffect(AudioEffect *effect)
-	extern void deleteEffect(int index)
-	extern void editEffect(int index, string param_old)
-	extern void enableEffect(int index, bool enabled)
-	extern SampleRef* addSampleRef(int pos, Sample* sample)
-	extern void deleteSampleRef(int index)
-	extern void editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay)
-	extern void addMidiNote(MidiNote n)
-	//extern void addMidiNotes(MidiNoteBuffer midi)
-	extern void deleteMidiNote(int index)
-	extern void setSynthesizer(Synthesizer *synth)
-	extern TrackMarker* addMarker(Range range, string text)
-	extern void deleteMarker(int index)
-	extern void editMarker(int index, Range range, string text)
+	extern void set_name(string name)
+	extern void set_muted(bool muted)
+	extern void set_volume(float volume)
+	extern void set_panning(float panning)
+	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
+	extern void add_effect(AudioEffect *effect)
+	extern void delete_effect(int index)
+	extern void edit_effect(int index, string param_old)
+	extern void enable_effect(int index, bool enabled)
+	extern SampleRef* add_sample_ref(int pos, Sample* sample)
+	extern void delete_sample_ref(int index)
+	extern void edit_sample_ref(int index, float volume, bool mute, int rep_num, int rep_delay)
+	extern void add_midi_note(MidiNote n)
+	//extern void add_midi_notes(MidiNoteBuffer midi)
+	extern void delete_midi_note(int index)
+	extern void set_synthesizer(Synthesizer *synth)
+	extern TrackMarker* add_marker(Range range, string text)
+	extern void delete_marker(int index)
+	extern void edit_marker(int index, Range range, string text)
 
 class Tag
 	string key, value
@@ -368,17 +368,17 @@ class Song
 	extern void __init__(Session* session)
 	extern virtual void __delete__()
 	
-	extern Range getRange()
+	extern Range get_range()
 	
-	extern void newEmpty(int sample_rate)
-	extern Track* addTrack(int type, int index)
-	extern void deleteTrack(int index)
-	extern void addBar(int index, float bpm, int beats, bool affect_midi)
-	extern void addPause(int index, float time, bool affect_midi)
-	//extern void editBar(int index, BarPattern p, bool affect_midi)
-	extern void deleteBar(int index, bool affect_midi)
-	extern Sample* addSample(string name, AudioBuffer buf)
-	extern void deleteSample(Sample* sample)
+	extern void new_empty(int sample_rate)
+	extern Track* add_track(int type, int index)
+	extern void delete_track(int index)
+	extern void add_bar(int index, float bpm, int beats, bool affect_midi)
+	extern void add_pause(int index, float time, bool affect_midi)
+	//extern void edit_bar(int index, BarPattern p, bool affect_midi)
+	extern void delete_bar(int index, bool affect_midi)
+	extern Sample* add_sample(string name, AudioBuffer buf)
+	extern void delete_sample(Sample* sample)
 
 class SongSelection
 	Range range
@@ -463,7 +463,7 @@ class InputStreamAudio extends Module
 class Storage
 	extern bool load(Song *s, string filename)
 	extern bool save(Song *s, string filename)
-	extern bool saveViaRenderer(AudioPort *source, string filename, int num_samples, Tag[] tags)
+	extern bool save_via_renderer(AudioPort *source, string filename, int num_samples, Tag[] tags)
 	string current_directory
 
 class Session
@@ -500,8 +500,8 @@ class Slider
 class TsunamiPlugin
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void onStart()
-	extern virtual void onStop()
+	extern virtual void on_start()
+	extern virtual void on_stop()
 	extern void stop()
 	Session* session
 	Song* song

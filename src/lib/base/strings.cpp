@@ -1046,6 +1046,19 @@ string utf32_to_utf8(const Array<int> &s)
 	return r;
 }
 
+// LAZY... can only convert small code points (13bit)!!!!!
+Array<int> string::utf8_to_utf32() const
+{
+	Array<int> r;
+	for (int i=0; i<num; i++)
+		if ((((unsigned int)(*this)[i] & 0x80) > 0) and (i < (*this).num - 1)){
+			r.add((((*this)[i] & 0x1f) << 6) + ((*this)[i + 1] & 0x3f));
+			i ++;
+		}else
+			r.add((*this)[i]);
+	return r;
+}
+
 
 
 string str_unescape(const string &str)

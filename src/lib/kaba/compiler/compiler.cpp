@@ -73,7 +73,8 @@ void try_init_global_var(Class *type, char* g_var)
 void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
 {
 	foreachi(Variable &v, ps->root_of_all_evil.var, i)
-		try_init_global_var(v.type, g_var[i]);
+		if (!v.is_extern)
+			try_init_global_var(v.type, g_var[i]);
 }
 
 static int64 _opcode_rand_state_ = 10000;

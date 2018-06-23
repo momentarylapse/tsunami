@@ -96,24 +96,24 @@ class DrumsetPanel extends ConfigPanel
 	override void __init__(DrumsetSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addGrid("", 0, 0, "grid")
-		setTarget("grid")
-		addLabel("Set", 0 ,0, "")
-		addComboBox("", 1, 0, "sets")
+		add_grid("", 0, 0, "grid")
+		set_target("grid")
+		add_label("Set", 0 ,0, "")
+		add_combo_box("", 1, 0, "sets")
 		event("sets", &onSelect)
 
 	override void update()
 		reset("sets")
 		string[] sets = drumlist.getNames()
-		setString("sets", "  - Default -")
-		setInt("sets", 0)
+		set_string("sets", "  - Default -")
+		set_int("sets", 0)
 		for s,i in sets
-			setString("sets", s)
+			set_string("sets", s)
 			if s == sc.name
-				setInt("sets", i+1)
+				set_int("sets", i+1)
 		
 	void onSelect()
-		int n = getInt("")
+		int n = get_int("")
 		sc.name = ""
 		if n > 0
 			sc.name = drumlist.sets[n-1].name

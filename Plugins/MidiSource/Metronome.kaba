@@ -67,11 +67,11 @@ class MetronomeSource extends MidiSource
 			// render
 			if cur_sub_beat == 0
 				if cur_beat == 0
-					midi.addMetronomeClick(offset_sub_beat, 0, config.volume)
+					midi.add_metronome_click(offset_sub_beat, 0, config.volume)
 				else
-					midi.addMetronomeClick(offset_sub_beat, 1, config.volume)
+					midi.add_metronome_click(offset_sub_beat, 1, config.volume)
 			else
-				midi.addMetronomeClick(offset_sub_beat, 2, config.volume)
+				midi.add_metronome_click(offset_sub_beat, 2, config.volume)
 
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= midi.samples
@@ -80,16 +80,16 @@ class MetronomeSource extends MidiSource
 		
 		return midi.samples
 	
-	void setBpm(float bpm)
+	void set_bpm(float bpm)
 		config.bpm = bpm
 		changed()
 	
-	void setBeats(int beats, int sub_beats)
+	void set_beats(int beats, int sub_beats)
 		config.beats = beats
 		config.sub_beats = sub_beats
 		changed()
 	
-	void setPause(bool _pause)
+	void set_pause(bool _pause)
 		pause = _pause
 		changed()
 	

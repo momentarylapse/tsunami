@@ -523,9 +523,20 @@ Function::Function(SyntaxTree *_tree, const string &_name, Class *_return_type)
 	throws_exceptions = false;
 }
 
-int Function::__get_var(const string &name)
+int Function::__get_var(const string &name) const
 {
 	return block->get_var(name);
+}
+
+string Function::signature() const
+{
+	string r = literal_return_type->name + " " + name + "(";
+	for (int i=0; i<num_params; i++){
+		if (i > 0)
+			r += ", ";
+		r += literal_param_type[i]->name;
+	}
+	return r + ")";
 }
 
 Function *SyntaxTree::AddFunction(const string &name, Class *type)

@@ -70,11 +70,11 @@ void SIAddPackageImage()
 		class_add_func("scale",			TypeImageP,	image_p(mf(&Image::scale)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
-		class_add_func("setPixel",		TypeVoid,	image_p(mf(&Image::setPixel)));
+		class_add_func("set_pixel",		TypeVoid,	image_p(mf(&Image::setPixel)));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func("getPixel",		TypeColor,	amd64_wrap(mf(&Image::getPixel), &amd64_image_get_pixel));
+		class_add_func("get_pixel",		TypeColor,	amd64_wrap(mf(&Image::getPixel), &amd64_image_get_pixel));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 		class_add_func("clear",			TypeVoid,	image_p(mf(&Image::clear)));

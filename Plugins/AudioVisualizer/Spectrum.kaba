@@ -9,8 +9,8 @@ const float MAX_FREQ = 20000.0
 const int N = 512
 
 enum
-	TypeLinear
-	TypeLogarithm
+	TYPE_LINEAR
+	TYPE_LOGARITHM
 
 float todb(float v)
 	return log(v) / log(10) * 10
@@ -63,16 +63,16 @@ class SpecGrid extends Grid
 		peak_max = 0.01
 		
 
-		setType(TypeLogarithm)
+		set_type(TYPE_LOGARITHM)
 
-	void createLines()
+	void create_lines()
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
 			float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
-			if type == TypeLinear
+			if type == TYPE_LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
 			else //if type == TypeLogarithm
@@ -80,19 +80,19 @@ class SpecGrid extends Grid
 				float db_min = db_max - 60
 				pr[i].y = clamp(todb(ffr[i]), db_min, db_max)
 				pl[i].y = clamp(todb(ffl[i]), db_min, db_max)
-	void setType(int t)
+	void set_type(int t)
 		type = t
-		if type == TypeLinear
+		if type == TYPE_LINEAR
 			y_axis.set(0, 1, false, "")
 		else //if type == TypeLogarithm
 			float db_max = todb(peak_max)
 			float db_min = db_max - 60
 			y_axis.set(db_min, db_max, false, "db")
-		createLines()
+		create_lines()
 
-	override void onDraw(Painter *c)
-		drawCurveB(c, pr, true, Red)
-		drawCurveB(c, pl, true, Blue)
+	override void on_draw(Painter *c)
+		draw_curve_b(c, pr, true, Red)
+		draw_curve_b(c, pl, true, Blue)
 
 class SpectrumPanel extends ConfigPanel
 	Spectrum* sp
@@ -100,7 +100,7 @@ class SpectrumPanel extends ConfigPanel
 	
 	override void __init__(Spectrum *_sp)
 		super.__init__(_sp)
-		fromSource("
+		from_source("
 DrawingArea area '' height=300")
 		
 		sp = _sp

@@ -125,28 +125,28 @@ class PADGrid extends Grid
 		Selected = -1
 		Hover = -1
 
-	override void onDraw(Painter *c)
+	override void on_draw(Painter *c)
 		pc.A.resize(8)
 	
 		// curve + area below
 		complex[] curve
 		for a,i in pc.A
 			pc.fill_curve(curve, i)
-			drawCurveB(c, curve, false, Red)
+			draw_curve_b(c, curve, false, Red)
 	
 		// points
 		for a,i in pc.A
-			drawPoint2(c, complex(i+1, a), i == Selected, i == Hover)
+			draw_point2(c, complex(i+1, a), i == Selected, i == Hover)
 			
 	// left button down -> select
-	override void onLeftButtonDown()
+	override void on_left_button_down()
 		Selected = Hover
 		redraw()
 
-	override void onMouseMove()
+	override void on_mouse_move()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
-			pc.A[Selected] = clamp(getMouse2().y, 0, 1)
+			pc.A[Selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
 		// hover?
@@ -164,7 +164,7 @@ class PADPanel extends ConfigPanel
 	override void __init__(PADSynthesizer* _s)
 		super.__init__(_s)
 		pc = &c.config
-		fromSource("
+		from_source("
 Grid ? ''
 	Grid ? ''
 		Text ? 'bw'
@@ -177,9 +177,9 @@ Grid ? ''
 		SpinButton detune '0' range=-10:10:0.01
 	---|
 	DrawingArea drawing '' grabfocus height=300 noexpandy")
-		event("bw", &onChange)
-		event("bwscale", &onChange)
-		event("detune", &onChange)
+		event("bw", &on_change)
+		event("bwscale", &on_change)
+		event("detune", &on_change)
 		
 		grid.pc = pc
 		grid.p = self
@@ -187,15 +187,15 @@ Grid ? ''
 		grid.x_axis.set(0.5, 8.5, false, "")
 		grid.y_axis.set(0, 1.05, false, "")
 		
-	void onChange()
-		pc.bw = getFloat("bw")
-		pc.bwscale = getFloat("bwscale")
-		pc.detune = getFloat("detune")
+	void on_change()
+		pc.bw = get_float("bw")
+		pc.bwscale = get_float("bwscale")
+		pc.detune = get_float("detune")
 		grid.redraw()
 		changed()
 	
 	override void update()
-		setFloat("bw", pc.bw)
-		setFloat("bwscale", pc.bwscale)
-		setFloat("detune", pc.detune)
+		set_float("bw", pc.bw)
+		set_float("bwscale", pc.bwscale)
+		set_float("detune", pc.detune)
 		grid.redraw()

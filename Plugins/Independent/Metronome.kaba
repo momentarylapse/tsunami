@@ -10,7 +10,7 @@ class MetronomeDialog extends Dialog
 	
 	void __init__(Metronome *_metro)
 		super.__init__("Metronome", 300, 320, _metro.session.win, true)
-		fromSource("
+		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
 	Grid ? ''
@@ -30,17 +30,17 @@ Grid ? '' vertical
 		fraction_prev = 0
 		t_blink = 0
 	
-		setFloat("bpm", metro.source.config.bpm)
-		setInt("num_beats", metro.source.config.beats)
+		set_float("bpm", metro.source.config.bpm)
+		set_int("num_beats", metro.source.config.beats)
 	
-		event("hui:close", &onClose)
-		event("close", &onClose)
-		event("bpm", &onBpm)
-		event("num_beats", &onNumBeats)
-		event("num_sub_beats", &onNumBeats)
-		eventX("area", "hui:left-button-down", &onAreaLeftButtonDown)
+		event("hui:close", &on_close)
+		event("close", &on_close)
+		event("bpm", &on_bpm)
+		event("num_beats", &on_num_beats)
+		event("num_sub_beats", &on_num_beats)
+		event_x("area", "hui:left-button-down", &on_area_left_button_down)
 	
-	override void onDraw(Painter *p)
+	override void on_draw(Painter *p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -52,56 +52,56 @@ Grid ? '' vertical
 			t_blink = 1
 		
 		// background
-		p.setColor(colors.background)
+		p.set_color(colors.background)
 		if crossed_beat
-			p.setColor(ColorInterpolate(Red, colors.background, 0.5*sqrt(t_blink)))
-		p.drawRect(0, 0, w, h)
+			p.set_color(ColorInterpolate(Red, colors.background, 0.5*sqrt(t_blink)))
+		p.draw_rect(0, 0, w, h)
 		
 		
 		if metro.source.pause
-			p.setFontSize(r * 1.8)
-			p.setColor(ColorInterpolate(colors.grid, colors.background, 0.2))
-			p.drawStr(x0-r*1.0, y0-r*1.2, "⏸")
+			p.set_font_size(r * 1.8)
+			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
+			p.draw_str(x0-r*1.0, y0-r*1.2, "⏸")
 			//p.setFontSize(16)
 		
 		// circle
-		p.setColor(ColorInterpolate(colors.grid, colors.background, 0.5))
-		p.setFill(false)
-		p.drawCircle(x0, y0, r)
+		p.set_color(ColorInterpolate(colors.grid, colors.background, 0.5))
+		p.set_fill(false)
+		p.draw_circle(x0, y0, r)
 		
 		// top point
-		p.setFill(true)
-		p.setColor(colors.text_soft3)
-		p.drawCircle(x0, y0 - r, 3)
+		p.set_fill(true)
+		p.set_color(colors.text_soft3)
+		p.draw_circle(x0, y0 - r, 3)
 		
 		// moving point
-		p.setColor(colors.text)
+		p.set_color(colors.text)
 		float t = metro.source.fraction_beat - 0.5
 		float phi = 2 *pi * (2*t*t*t + t/2)
-		p.drawCircle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
+		p.draw_circle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
 		
 		// beat number
 		float fs = r * (1 + t_blink * 0.5) * 0.5
-		p.setFontSize(fs)
+		p.set_font_size(fs)
 		int n = metro.source.cur_beat + 1
-		p.drawStr(x0-fs*0.4, y0-fs*0.75, n)
+		p.draw_str(x0-fs*0.4, y0-fs*0.75, n)
 		
 		fraction_prev = metro.source.fraction_beat
 		t_blink *= 0.9
 	
-	void onAreaLeftButtonDown()
-		metro.source.setPause(!metro.source.pause)
+	void on_area_left_button_down()
+		metro.source.set_pause(!metro.source.pause)
 		redraw("area")
 
-	void onBpm()
-		metro.source.setBpm(getFloat(""))
+	void on_bpm()
+		metro.source.set_bpm(get_float(""))
 
-	void onNumBeats()
-		int beats = getInt("num_beats")
-		int sub_beats = getInt("num_sub_beats")
-		metro.source.setBeats(beats, sub_beats)
+	void on_num_beats()
+		int beats = get_int("num_beats")
+		int sub_beats = get_int("num_sub_beats")
+		metro.source.set_beats(beats, sub_beats)
 
-	void onClose()
+	void on_close()
 		metro.stop()
 
 class Metronome extends TsunamiPlugin
@@ -110,7 +110,7 @@ class Metronome extends TsunamiPlugin
 	Synthesizer *synth
 	Dialog *dlg
 	
-	override void onStart()
+	override void on_start()
 		synth = CreateSynthesizer(session, "")
 		source = new MetronomeSource
 		source.session = session
@@ -129,7 +129,7 @@ class Metronome extends TsunamiPlugin
 	void onUpdate()
 		dlg.redraw("area")
 		
-	override void onStop()
+	override void on_stop()
 		stream.unsubscribe(self)
 		delete dlg
 		delete stream

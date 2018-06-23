@@ -51,8 +51,8 @@ class SamplePanel extends ConfigPanel
 	override void __init__(SampleSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addListView("!width=300\\Note\\Sample", 0, 0, "list")
-		event("list", &onSelect)
+		add_list_view("!width=300\\Note\\Sample", 0, 0, "list")
+		event("list", &on_select)
 
 	override void update()
 		reset("list")
@@ -61,10 +61,10 @@ class SamplePanel extends ConfigPanel
 			if i < sc.samples.num
 				if sc.samples[i]
 					name = sc.samples[i].origin.name
-			setString("list", pitch_name(i) + "\\" + name)
+			set_string("list", pitch_name(i) + "\\" + name)
 		
-	void onSelect()
-		int n = getInt("")
+	void on_select()
+		int n = get_int("")
 		if n < 0
 			return
 		if n >= sc.samples.num
@@ -78,5 +78,5 @@ class SamplePanel extends ConfigPanel
 				delete sc.samples[n]
 				sc.samples[n] = nil
 			if s
-				sc.samples[n] = s.createRef()
+				sc.samples[n] = s.create_ref()
 			changed()

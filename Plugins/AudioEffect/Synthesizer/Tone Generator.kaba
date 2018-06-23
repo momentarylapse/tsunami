@@ -23,7 +23,7 @@ class ToneGenerator extends AudioEffect
 		
 		Range r = _Range(0, buf.length)
 		MidiEventBuffer midi
-		midi.addNote(_MidiNote(r, freq_to_pitch(config.Frequency), config.Volume))
+		midi.add_note(_MidiNote(r, freq_to_pitch(config.Frequency), config.Volume))
 		synth.feed(midi)
 		
 		synth.read(buf)

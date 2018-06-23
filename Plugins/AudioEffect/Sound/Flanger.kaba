@@ -29,7 +29,7 @@ class Flanger extends AudioEffect
 		temp_l.clear()
 		offset = 0
 
-	void doFlanger(float[] b, float[] temp)
+	void do_flanger(float[] b, float[] temp)
 		int p = offset % temp.num
 		float sample_rate = session.sample_rate()
 	
@@ -62,7 +62,7 @@ class Flanger extends AudioEffect
 		temp_r.resize(delay_samples)
 		temp_l.resize(delay_samples)
 	
-		doFlanger(buf.r, temp_r)
-		doFlanger(buf.l, temp_l)
+		do_flanger(buf.r, temp_r)
+		do_flanger(buf.l, temp_l)
 	
 		offset += buf.length

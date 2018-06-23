@@ -9,13 +9,13 @@ class OscilloscopePanel extends ConfigPanel
 	
 	override void __init__(Oscilloscope *_osci)
 		super.__init__(_osci)
-		fromSource("
+		from_source("
 DrawingArea area '' height=300")
 		
 		osci = _osci
 		osci.panel = self
 	
-		eventX("area", "hui:draw", &onDraw)
+		event_x("area", "hui:draw", &onDraw)
 	
 	override void __delete__()
 		osci.panel = nil
@@ -24,19 +24,19 @@ DrawingArea area '' height=300")
 		float w = p.width
 		float h = p.height
 		
-		p.setColor(colors.background)
-		p.drawRect(0, 0, w, h)
+		p.set_color(colors.background)
+		p.draw_rect(0, 0, w, h)
 		
 		AudioBuffer *buf = &osci.buffer
-		p.setColor(color(0.2,0,1,0))
-		//p.setLineWidth(0.5)
+		p.set_color(color(0.2,0,1,0))
+		//p.set_line_width(0.5)
 		float x0, y0, x1, y1
 		for i in 0:buf.length
 			x1 = w * (buf.r[i] / 2 + 0.5)
 			y1 = h * (buf.l[i] / 2 + 0.5)
-			p.setColor(color(i2f(i) / NUM_SAMPLES, 0,1,0))
+			p.set_color(color(i2f(i) / NUM_SAMPLES, 0,1,0))
 			if i > 0
-				p.drawLine(x0, y0, x1, y1)
+				p.draw_line(x0, y0, x1, y1)
 			x0 = x1
 			y0 = y1
 

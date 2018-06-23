@@ -7,7 +7,7 @@ void fold(float[] b, float[] k)
 	int n = 50000
 	for bb,i in b
 		if (i % 1000) == 0
-			print i
+			print(i)
 		o[i] = bb
 		for j in 0:n
 			if i >= j
@@ -16,6 +16,6 @@ void fold(float[] b, float[] k)
 
 class Folding extends AudioEffect
 	override void process(AudioBuffer buf)
-		fold(buf.r, song.tracks[0].layers[0].buffers[0].r)
-		fold(buf.l, song.tracks[0].layers[0].buffers[0].l)
+		fold(buf.r, session.song.tracks[0].layers[0].buffers[0].r)
+		fold(buf.l, session.song.tracks[0].layers[0].buffers[0].l)
 	

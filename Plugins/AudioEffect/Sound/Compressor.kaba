@@ -11,7 +11,7 @@ class CompressorConfig extends PluginData
 	float attack, release
 
 	void fill_inter(FloatInterpolator fi)
-		fi.setType("lerp")
+		fi.set_type("lerp")
 		fi.add(curve[0].y, 0)
 		for i in 1:curve.num
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
@@ -91,88 +91,88 @@ class Compressor extends AudioEffect
 		compress(buf.l, squares_l, &gain_l)
 
 class CompressorGrid extends Grid
-	int MouseOver, Selected
+	int hover, selected
 	CompressorConfig *config
 	ConfigPanel *cp
 
-	override void onDraw(Painter *p)
+	override void on_draw(Painter *p)
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
 		// curve
-		drawCurve(p, fi, true)
+		draw_curve(p, fi, true)
 		for i in 1:config.curve.num
-			drawPoint2(p, config.curve[i], i == Selected, i == MouseOver)
+			draw_point2(p, config.curve[i], i == selected, i == hover)
 
 	// left button down -> select
-	override void onLeftButtonDown()
-		Selected = MouseOver
+	override void on_left_button_down()
+		selected = hover
 		redraw()
 
 	// right button down -> new point
-	override void onRightButtonDown()
-		complex m = getMouse2()
+	override void on_right_button_down()
+		complex m = get_mouse2()
 		for i in 1:config.curve.num
 			complex q = config.curve[i - 1]
 			complex p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
 				cp.changed()
-				Selected = i
+				selected = i
 				redraw()
 				break
 
-	override void onMouseMove()
+	override void on_mouse_move()
 		// move
-		if HuiGetEvent().button_l and (Selected > 0)
-			config.curve[Selected] = getMouse2()
-			float xmin = config.curve[Selected - 1].x
+		if HuiGetEvent().button_l and (selected > 0)
+			config.curve[selected] = get_mouse2()
+			float xmin = config.curve[selected - 1].x
 			float xmax = 0
-			if Selected < config.curve.num - 1
-				xmax = config.curve[Selected + 1].x
-			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
-			if Selected == config.curve.num - 1
-				config.curve[Selected].x = 0
+			if selected < config.curve.num - 1
+				xmax = config.curve[selected + 1].x
+			config.curve[selected].x = clamp(config.curve[selected].x, xmin, xmax)
+			if selected == config.curve.num - 1
+				config.curve[selected].x = 0
 			cp.changed()
 		else
 		// mouse over?
-			MouseOver = -1
+			hover = -1
 			for i in 1:config.curve.num
-				if mouseOverPoint2(config.curve[i])
-					MouseOver = i
+				if mouse_over_point2(config.curve[i])
+					hover = i
 		redraw()
 
-	override void onKeyDown()
+	override void on_key_down()
 		int k = HuiGetEvent().key
 
 		// [Delete] -> remove point
-		if (k == KEY_DELETE) and (Selected > 0) and (Selected < config.curve.num - 1)
-			config.curve.remove(Selected)
+		if (k == KEY_DELETE) and (selected > 0) and (selected < config.curve.num - 1)
+			config.curve.remove(selected)
 			cp.changed()
-			Selected = -1
+			selected = -1
 			redraw()
 
 class CompressorPanel extends ConfigPanel
 	CompressorGrid grid
 	override void __init__(Compressor *_fx)
 		super.__init__(_fx)
-		addGrid("", 0, 0, "table1")
-		setTarget("table1")
-		addDrawingArea("!grabfocus,height=250\\", 0, 0, "drawing_area")
-		addGrid("!noexpandy", 0, 1, "table2")
-		setTarget("table2")
-		addLabel("Attack", 0, 0, "")
-		addSpinButton("!range=0:100:0.1\\", 1, 0, "attack")
-		addLabel("ms", 2, 0, "")
-		addLabel("Release", 3, 0, "")
-		addSpinButton("!range=0:1000:0.1\\", 4, 0, "release")
-		addLabel("ms", 5, 0, "")
+		add_grid("", 0, 0, "table1")
+		set_target("table1")
+		add_drawing_area("!grabfocus,height=250\\", 0, 0, "drawing_area")
+		add_grid("!noexpandy", 0, 1, "table2")
+		set_target("table2")
+		add_label("Attack", 0, 0, "")
+		add_spin_button("!range=0:100:0.1\\", 1, 0, "attack")
+		add_label("ms", 2, 0, "")
+		add_label("Release", 3, 0, "")
+		add_spin_button("!range=0:1000:0.1\\", 4, 0, "release")
+		add_label("ms", 5, 0, "")
 		
 		grid.config = &_fx.config
 		grid.cp = self
 		
-		event("attack", &onEdit)
-		event("release", &onEdit)
+		event("attack", &on_edit)
+		event("release", &on_edit)
 	
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_DB, 0, false, "dB")
@@ -182,11 +182,11 @@ class CompressorPanel extends ConfigPanel
 	
 	override void update()
 		grid.redraw()
-		setFloat("attack", grid.config.attack * 1000)
-		setFloat("release", grid.config.release * 1000)
+		set_float("attack", grid.config.attack * 1000)
+		set_float("release", grid.config.release * 1000)
 
-	void onEdit()
-		grid.config.attack = getFloat("attack") / 1000.0
-		grid.config.release = getFloat("release") / 1000.0
+	void on_edit()
+		grid.config.attack = get_float("attack") / 1000.0
+		grid.config.release = get_float("release") / 1000.0
 		changed()
 		

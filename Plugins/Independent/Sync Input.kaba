@@ -14,7 +14,7 @@ void fill(AudioBuffer buf)
 	buf.l = 0
 	
 	if offset == 0
-		synth.addMetronomeClick(offset_out, 1, 0, 880)
+		synth.add_metronome_click(offset_out, 1, 0, 880)
 		synth.read(buf)
 
 void sync()

@@ -67,32 +67,32 @@ class Equalizer15Panel extends ConfigPanel
 
 	override void __init__(Equalizer15 *_eq)
 		super.__init__(_eq)
-		addGrid("", 0, 1, "grid")
-		setTarget("grid")
+		add_grid("", 0, 1, "grid")
+		set_target("grid")
 		for i in 0:NUM_BANDS
-			addSlider("!expandy,vertical,height=200", i, 0, "slider_" + i)
-			//addString("slider_" + i, "0.5:0")
-		addLabel("20", 0, 1, "")
-		addLabel("54", 2, 1, "")
-		addLabel("140", 4, 1, "")
-		addLabel("390", 6, 1, "")
-		addLabel("1k", 8, 1, "")
-		addLabel("2k8", 10, 1, "")
-		addLabel("7k5", 12, 1, "")
-		addLabel("20k", 14, 1, "")
+			add_slider("!expandy,vertical,height=200", i, 0, "slider_" + i)
+			//add_string("slider_" + i, "0.5:0")
+		add_label("20", 0, 1, "")
+		add_label("54", 2, 1, "")
+		add_label("140", 4, 1, "")
+		add_label("390", 6, 1, "")
+		add_label("1k", 8, 1, "")
+		add_label("2k8", 10, 1, "")
+		add_label("7k5", 12, 1, "")
+		add_label("20k", 14, 1, "")
 	
-		event("*", &onEvent)
+		event("*", &on_event)
 	
 		update()
 
-	void onEvent()
+	void on_event()
 		Event *e = HuiGetEvent()
 		for i in 0:NUM_BANDS
 			if e.id == ("slider_" + i)
-				c.config.factor[i] = getFloat("") * 2
+				c.config.factor[i] = get_float("") * 2
 				changed()
 		
 	override void update()
 		for i in 0:NUM_BANDS
-			setFloat("slider_" + i, c.config.factor[i] / 2)
+			set_float("slider_" + i, c.config.factor[i] / 2)
 	

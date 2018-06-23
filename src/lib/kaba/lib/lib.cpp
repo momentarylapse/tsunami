@@ -27,7 +27,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.16.1.0";
+string LibVersion = "0.16.4.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -64,6 +64,7 @@ const string IDENTIFIER_AND = "and";
 const string IDENTIFIER_OR = "or";
 const string IDENTIFIER_XOR = "xor";
 const string IDENTIFIER_NOT = "not";
+const string IDENTIFIER_IS = "is";
 const string IDENTIFIER_ASM = "asm";
 
 CompilerConfiguration config;
@@ -241,7 +242,9 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 	{"<<", OPERATOR_SHIFT_LEFT,    false, 10, "__lshift__"},
 	{">>", OPERATOR_SHIFT_RIGHT,   false, 10, "__rshift__"},
 	{"++", OPERATOR_INCREASE,      true,  2, "__inc__"},
-	{"--", OPERATOR_DECREASE,      true,  2, "__dec__"}
+	{"--", OPERATOR_DECREASE,      true,  2, "__dec__"},
+	{IDENTIFIER_IS, OPERATOR_IS,   false, 2,  "-none-"},
+	{IDENTIFIER_EXTENDS, OPERATOR_EXTENDS, false, 2,  "-none-"}
 // Level = 15 - (official C-operator priority)
 // priority from "C als erste Programmiersprache", page 552
 };
@@ -291,15 +294,28 @@ void class_add_element(const string &name, Class *type, int offset, ScriptFlag f
 	cur_class->elements.add(e);
 }
 
+int _class_override_num_params = -1;
+
 ClassFunction *_class_add_func(Class *c, const ClassFunction &f, ScriptFlag flag)
 {
 	if ((flag & FLAG_OVERRIDE) > 0){
 		foreachi(ClassFunction &ff, c->functions, i)
 			if (ff.name == f.name){
-				ff = f;
-				return &ff;
+				if (_class_override_num_params < 0 or _class_override_num_params == ff.param_types.num){
+					ff = f;
+					return &ff;
+				}
 			}
 		msg_error("could not override " + c->name + "." + f.name);
+	}else{
+		// name alone is not enough for matching...
+		/*foreachi(ClassFunction &ff, c->functions, i)
+			if (ff.name == f.name){
+				if (_class_override_num_params < 0 or _class_override_num_params == ff.param_types.num){
+					msg_error("missing override " + c->name + "." + f.name);
+					break;
+				}
+			}*/
 	}
 	c->functions.add(f);
 	return &c->functions.back();

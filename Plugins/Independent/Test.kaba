@@ -5,7 +5,7 @@ class MyDialog extends Dialog
 	void __init__(TsunamiPlugin* _plugin)
 		super.__init__("", 300, 200, _plugin.session.win, false)
 		plugin = _plugin
-		addEdit("", 0, 0, "edit")
+		add_edit("", 0, 0, "edit")
 		event("edit", &onChange)
 		event("hui:close", &onClose)
 	void onChange()
@@ -15,8 +15,8 @@ class MyDialog extends Dialog
 
 class Test extends TsunamiPlugin
 	Dialog *dlg
-	override void onStart()
+	override void on_start()
 		dlg = new MyDialog(self)
 		dlg.show()
-	override void onStop()
+	override void on_stop()
 		delete dlg

@@ -35,8 +35,8 @@ void SIAddPackageThread()
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,	thread_p(mf(&Thread::__init__)));
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,	thread_p(mf(&Thread::__delete__)));
 		class_add_func("run",		TypeVoid,	thread_p(mf(&Thread::run)));
-		class_add_func_virtual("onRun",		TypeVoid,	thread_p(mf(&Thread::onRun)));
-		class_add_func("isDone",		TypeBool,	thread_p(mf(&Thread::isDone)));
+		class_add_func_virtual("on_run",		TypeVoid,	thread_p(mf(&Thread::onRun)));
+		class_add_func("is_done",		TypeBool,	thread_p(mf(&Thread::isDone)));
 		class_add_func("kill",		TypeVoid,	thread_p(mf(&Thread::kill)));
 		class_add_func("join",		TypeVoid,	thread_p(mf(&Thread::join)));
 #ifdef _X_USE_THREADS_
@@ -55,12 +55,12 @@ void SIAddPackageThread()
 		class_add_func("run",		TypeBool,	thread_p(mf(&ThreadedWork::run)));
 			func_add_param("total_size", TypeInt);
 			func_add_param("partition_size", TypeInt);
-		class_add_func_virtual("onStep",		TypeVoid,	thread_p(mf(&ThreadedWork::doStep)));
+		class_add_func_virtual("on_step",		TypeVoid,	thread_p(mf(&ThreadedWork::doStep)));
 			func_add_param("index", TypeInt);
 			func_add_param("worker_id", TypeInt);
-		class_add_func_virtual("onStatus",		TypeBool,	thread_p(mf(&ThreadedWork::onStatus)));
-		class_add_func("getTotal",		TypeInt,	thread_p(mf(&ThreadedWork::getTotal)));
-		class_add_func("getDone",		TypeInt,	thread_p(mf(&ThreadedWork::getDone)));
+		class_add_func_virtual("on_status",		TypeBool,	thread_p(mf(&ThreadedWork::onStatus)));
+		class_add_func("get_total",		TypeInt,	thread_p(mf(&ThreadedWork::getTotal)));
+		class_add_func("get_done",		TypeInt,	thread_p(mf(&ThreadedWork::getDone)));
 #ifdef _X_USE_THREADS_
 		class_set_vtable(ThreadedWork);
 #endif

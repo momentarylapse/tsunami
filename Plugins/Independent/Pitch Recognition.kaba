@@ -26,11 +26,11 @@ class PitchRecognitionDialog extends Dialog
 	
 	void __init__(PitchRecognition* _plugin)
 		super.__init__("Tonerkennung", 300, 175, _plugin.session.win, false)
-		addGrid("", 0, 0, "grid")
-		setTarget("grid")
-		addDrawingArea("", 5, 5, "drawing")
-		addButton("Schließen", 5, 145, "close")
-		setImage("close", "hui:close")
+		add_grid("", 0, 0, "grid")
+		set_target("grid")
+		add_drawing_area("", 5, 5, "drawing")
+		add_button("Schließen", 5, 145, "close")
+		set_image("close", "hui:close")
 		
 		plugin = _plugin
 	
@@ -49,18 +49,18 @@ class PitchRecognitionDialog extends Dialog
 		//note = i2s(n)
 
 	void drawVolume(Painter *c)
-		c.setColor(color(1, 0.8, 0.8, 0.8))
+		c.set_color(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = c.height - 5
 		float h = y1 - y0
-		c.drawRect(5, y0 + h * (1 - plugin.pitch_recognizer.volume), 5, h)
-		c.setColor(color(1, 0.6, 0.6, 0.6))
-		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		c.draw_rect(5, y0 + h * (1 - plugin.pitch_recognizer.volume), 5, h)
+		c.set_color(color(1, 0.6, 0.6, 0.6))
+		c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	override void onDraw(Painter *c)
-		c.setColor(White)
-		c.setFontSize(12)
-		c.drawRect(0, 0, c.width, c.height)
+	override void on_draw(Painter *c)
+		c.set_color(White)
+		c.set_font_size(12)
+		c.draw_rect(0, 0, c.width, c.height)
 	
 		drawVolume(c)
 	
@@ -70,20 +70,20 @@ class PitchRecognitionDialog extends Dialog
 		float x = c.width / 2
 		float y = c.height - 10
 	
-		c.setColor(color(1, 0.4, 0.4, 0.4))
+		c.set_color(color(1, 0.4, 0.4, 0.4))
 		for i in 0:9
 			float w = i * 0.125 * pi - pi / 2
-			c.drawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
+			c.draw_line(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
 	
-		c.setColor(Black)
+		c.set_color(Black)
 		if plugin.pitch_recognizer.loud_enough
-			c.drawStr(x - 8, y - r2 - 22, get_note(plugin.pitch_recognizer.frequency))
-			c.drawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
-			c.drawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-			c.drawStr(5, 5, plugin.pitch_recognizer.frequency.str2(1) + " Hz")
-			c.drawLine(x, y, x + r * sin(note_error * pi), y - r * cos(note_error * pi))
+			c.draw_str(x - 8, y - r2 - 22, get_note(plugin.pitch_recognizer.frequency))
+			c.draw_str(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
+			c.draw_str(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
+			c.draw_str(5, 5, plugin.pitch_recognizer.frequency.str2(1) + " Hz")
+			c.draw_line(x, y, x + r * sin(note_error * pi), y - r * cos(note_error * pi))
 		else
-			c.drawStr(x - 30, y - 20, "zu leise")
+			c.draw_str(x - 30, y - 20, "zu leise")
 
 	void onClose()
 		plugin.stop()
@@ -93,14 +93,14 @@ class PitchRecognition extends TsunamiPlugin
 	
 	PitchRecognizer* pitch_recognizer
 	
-	override void onStart()
+	override void on_start()
 		
 		dlg = new PitchRecognitionDialog(self)
 		dlg.show()
 	
 		pitch_recognizer = new MyPitchRecognizer(session, dlg)
 		
-	override void onStop()
+	override void on_stop()
 		delete dlg
 		delete pitch_recognizer
 	

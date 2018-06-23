@@ -55,12 +55,13 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool all
 			}
 		}
 
-		// add vtable reference
-		if (t->vtable.num > 0)
-			AutoImplementAddVirtualTable(self, f, t);
-
 		// call child constructors
 		AutoImplementAddChildConstructors(self, f, t);
+
+		// add vtable reference
+		// after child constructor (otherwise would get overwritten)
+		if (t->vtable.num > 0)
+			AutoImplementAddVirtualTable(self, f, t);
 	}
 }
 
@@ -70,22 +71,28 @@ void SyntaxTree::AutoImplementComplexConstructor(Function *f, Class *t)
 		return;
 	if (!f->auto_implement)
 		return;
-	ClassFunction *pcc = t->parent->get_complex_constructor();
 
 	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
-	// parent constructor
-	Node *c = add_node_classfunc(pcc, cp_node(self));
-	for (int i=0;i<pcc->param_types.num;i++)
-		c->set_param(i, add_node_local_var(i, pcc->param_types[i]));
-	f->block->nodes.add(c);
-
-	// add vtable reference
-	if (t->vtable.num > 0)
-		AutoImplementAddVirtualTable(self, f, t);
+	if (t->parent){
+		ClassFunction *pcc = t->parent->get_same_func(IDENTIFIER_FUNC_INIT, f);
+		if (pcc){
+			// parent constructor
+			Node *c = add_node_classfunc(pcc, cp_node(self));
+			for (int i=0;i<pcc->param_types.num;i++)
+				c->set_param(i, add_node_local_var(i, pcc->param_types[i]));
+			f->block->nodes.add(c);
+		}else
+			msg_error("internal error: parent constructor????");
+	}
 
 	// call child constructors
 	AutoImplementAddChildConstructors(self, f, t);
+
+	// add vtable reference
+	// after child constructor (otherwise would get overwritten)
+	if (t->vtable.num > 0)
+		AutoImplementAddVirtualTable(self, f, t);
 }
 
 
@@ -477,16 +484,26 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	b->nodes.add(cmd_assign);
 }
 
-void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, Class *param_type, const string &param_name, ClassFunction *cf = NULL)
+void add_func_headerx(SyntaxTree *s, Class *t, const string &name, Class *return_type, const Array<Class*> &param_types, const Array<string> &param_names, ClassFunction *cf = NULL)
 {
 	Function *f = s->AddFunction(name, return_type);
 	f->auto_implement = true;
-	if (param_type != TypeVoid){
-		f->block->add_var(param_name, param_type);
+	foreachi (auto &p, param_types, i){
+		f->literal_param_type.add(p);
+		f->block->add_var(param_names[i], p);
 		f->num_params ++;
 	}
 	f->Update(t);
-	t->add_function(s, s->functions.num - 1, false, cf);
+	bool override = cf;
+	t->add_function(s, s->functions.num - 1, false, override);
+}
+
+void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, Class *param_type, const string &param_name, ClassFunction *cf = NULL)
+{
+	Array<Class*> types;
+	if (param_type != TypeVoid)
+		types.add(param_type);
+	add_func_headerx(s, t, name, return_type, types, param_name, cf);
 }
 
 bool needs_new(ClassFunction *f)
@@ -494,6 +511,15 @@ bool needs_new(ClassFunction *f)
 	if (!f)
 		return true;
 	return f->needs_overriding;
+}
+
+Array<string> class_func_param_names(ClassFunction *cf)
+{
+	Array<string> names;
+	auto *f = cf->func();
+	for (int i=0; i<f->num_params; i++)
+		names.add(f->var[i].name);
+	return names;
 }
 
 void SyntaxTree::AddFunctionHeadersForClass(Class *t)
@@ -528,19 +554,15 @@ void SyntaxTree::AddFunctionHeadersForClass(Class *t)
 				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->get_assign());
 			}
 		}
-		if (needs_new(t->get_complex_constructor()))
-			if (t->parent)
-				if (t->parent->get_complex_constructor()){
-					Function *f = AddFunction(IDENTIFIER_FUNC_INIT, TypeVoid);
-					f->auto_implement = true;
-
-					Function *b = t->parent->get_complex_constructor()->GetFunc();
-					f->num_params = b->num_params;
-					f->var = b->var;
-					f->Update(t);
-					t->add_function(this, functions.num - 1, false, t->get_complex_constructor());
-
+		for (auto *c: t->get_complex_constructors()){
+			if (needs_new(c)){
+				if (t->parent){
+					auto pcc = t->parent->get_same_func(IDENTIFIER_FUNC_INIT, c->func());
+					if (pcc)
+						add_func_headerx(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
 				}
+			}
+		}
 	}
 }
 
@@ -548,7 +570,7 @@ Function* class_get_func(Class *t, const string &name, Class *return_type, int n
 {
 	ClassFunction *cf = t->get_func(name, return_type, num_params);
 	if (cf){
-		Function *f = cf->GetFunc();
+		Function *f = cf->func();
 		if (f->auto_implement){
 			cf->needs_overriding = false; // we're about to implement....
 			return f;
@@ -559,6 +581,20 @@ Function* class_get_func(Class *t, const string &name, Class *return_type, int n
 	return NULL;
 }
 
+Function* prepare_auto_impl(Class *t, ClassFunction *cf)
+{
+	if (!cf)
+		return NULL;
+	Function *f = cf->func();
+	if (f->auto_implement){
+		cf->needs_overriding = false; // we're about to implement....
+		return f;
+	}
+	return NULL;
+	t->owner->script->DoErrorInternal("prepare class func..." + t->name + ":  " + cf->signature());
+	return f;
+}
+
 void SyntaxTree::AutoImplementFunctions(Class *t)
 {
 	if (t->owner != this)
@@ -567,24 +603,23 @@ void SyntaxTree::AutoImplementFunctions(Class *t)
 		return;
 
 	if (t->is_super_array){
-		AutoImplementDefaultConstructor(class_get_func(t, IDENTIFIER_FUNC_INIT, TypeVoid, 0), t, true);
-		AutoImplementDestructor(class_get_func(t, IDENTIFIER_FUNC_DELETE, TypeVoid, 0), t);
-		AutoImplementArrayClear(class_get_func(t, "clear", TypeVoid, 0), t);
-		AutoImplementArrayResize(class_get_func(t, "resize", TypeVoid, 1), t);
-		AutoImplementArrayRemove(class_get_func(t, "remove", TypeVoid, 1), t);
+		AutoImplementDefaultConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
+		AutoImplementDestructor(prepare_auto_impl(t, t->get_destructor()), t);
+		AutoImplementArrayClear(prepare_auto_impl(t, t->get_func("clear", TypeVoid, 0)), t);
+		AutoImplementArrayResize(prepare_auto_impl(t, t->get_func("resize", TypeVoid, 1, TypeInt)), t);
+		AutoImplementArrayRemove(prepare_auto_impl(t, t->get_func("remove", TypeVoid, 1, TypeInt)), t);
 		AutoImplementArrayAdd(class_get_func(t, "add", TypeVoid, 1), t);
-		AutoImplementAssign(class_get_func(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1), t);
+		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
 	}else if (t->is_array){
-		AutoImplementAssign(class_get_func(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1), t);
-	}else if (!t->is_simple_class()){//needs_init){
+		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
+	}else if (!t->is_simple_class()){
 		if (t->needs_constructor())
-			AutoImplementDefaultConstructor(class_get_func(t, IDENTIFIER_FUNC_INIT, TypeVoid, 0), t, true);
+			AutoImplementDefaultConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 		if (t->needs_destructor())
-			AutoImplementDestructor(class_get_func(t, IDENTIFIER_FUNC_DELETE, TypeVoid, 0), t);
-		AutoImplementAssign(class_get_func(t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1), t);
-		ClassFunction *cf = t->get_complex_constructor();
-		if (cf)
-			AutoImplementComplexConstructor(cf->GetFunc(), t);
+			AutoImplementDestructor(prepare_auto_impl(t, t->get_destructor()), t);
+		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
+		for (ClassFunction *cf: t->get_complex_constructors())
+			AutoImplementComplexConstructor(prepare_auto_impl(t, cf), t);
 	}
 }
 

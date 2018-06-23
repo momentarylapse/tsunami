@@ -201,11 +201,11 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("RingBuffer.available", Kaba::mf(&RingBuffer::available));
 	Kaba::LinkExternal("RingBuffer.read", Kaba::mf(&RingBuffer::read));
 	Kaba::LinkExternal("RingBuffer.write", Kaba::mf(&RingBuffer::write));
-	Kaba::LinkExternal("RingBuffer.readRef", Kaba::mf(&RingBuffer::readRef));
-	Kaba::LinkExternal("RingBuffer.peekRef", Kaba::mf(&RingBuffer::peekRef));
-	Kaba::LinkExternal("RingBuffer.writeRef", Kaba::mf(&RingBuffer::writeRef));
-	Kaba::LinkExternal("RingBuffer.moveReadPos", Kaba::mf(&RingBuffer::moveReadPos));
-	Kaba::LinkExternal("RingBuffer.moveWritePos", Kaba::mf(&RingBuffer::moveWritePos));
+	Kaba::LinkExternal("RingBuffer.read_ref", Kaba::mf(&RingBuffer::readRef));
+	Kaba::LinkExternal("RingBuffer.peek_ref", Kaba::mf(&RingBuffer::peekRef));
+	Kaba::LinkExternal("RingBuffer.write_ref", Kaba::mf(&RingBuffer::writeRef));
+	Kaba::LinkExternal("RingBuffer.move_read_pos", Kaba::mf(&RingBuffer::moveReadPos));
+	Kaba::LinkExternal("RingBuffer.move_write_pos", Kaba::mf(&RingBuffer::moveWritePos));
 	Kaba::LinkExternal("RingBuffer.clear", Kaba::mf(&RingBuffer::clear));
 
 	Kaba::DeclareClassSize("Sample", sizeof(Sample));
@@ -216,8 +216,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
 	Kaba::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
 	Kaba::DeclareClassOffset("Sample", "tags", _offsetof(Sample, tags));
-	Kaba::LinkExternal("Sample.createRef", Kaba::mf(&Sample::create_ref));
-	Kaba::LinkExternal("Sample.getValue", Kaba::mf(&Sample::getValue));
+	Kaba::LinkExternal("Sample.create_ref", Kaba::mf(&Sample::create_ref));
+	Kaba::LinkExternal("Sample.get_value", Kaba::mf(&Sample::getValue));
 
 	Sample sample(0);
 	//sample.owner = tsunami->song;
@@ -294,17 +294,17 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("MidiEventBuffer", sizeof(MidiEventBuffer));
 	Kaba::DeclareClassOffset("MidiEventBuffer", "samples", _offsetof(MidiEventBuffer, samples));
 	Kaba::LinkExternal("MidiEventBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEventBuffer::__init__));
-	Kaba::LinkExternal("MidiEventBuffer.getEvents", Kaba::mf(&MidiEventBuffer::getEvents));
-	Kaba::LinkExternal("MidiEventBuffer.getNotes", Kaba::mf(&MidiEventBuffer::getNotes));
-	Kaba::LinkExternal("MidiEventBuffer.getRange", Kaba::mf(&MidiEventBuffer::getRange));
-	Kaba::LinkExternal("MidiEventBuffer.addMetronomeClick", Kaba::mf(&MidiEventBuffer::addMetronomeClick));
+	Kaba::LinkExternal("MidiEventBuffer.get_events", Kaba::mf(&MidiEventBuffer::getEvents));
+	Kaba::LinkExternal("MidiEventBuffer.get_notes", Kaba::mf(&MidiEventBuffer::getNotes));
+	Kaba::LinkExternal("MidiEventBuffer.get_range", Kaba::mf(&MidiEventBuffer::getRange));
+	Kaba::LinkExternal("MidiEventBuffer.add_metronome_click", Kaba::mf(&MidiEventBuffer::addMetronomeClick));
 
 	Kaba::DeclareClassSize("MidiNoteBuffer", sizeof(MidiNoteBuffer));
 	Kaba::DeclareClassOffset("MidiNoteBuffer", "samples", _offsetof(MidiNoteBuffer, samples));
 	Kaba::LinkExternal("MidiNoteBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiNoteBuffer::__init__));
-	Kaba::LinkExternal("MidiNoteBuffer.getEvents", Kaba::mf(&MidiNoteBuffer::getEvents));
-	Kaba::LinkExternal("MidiNoteBuffer.getNotes", Kaba::mf(&MidiNoteBuffer::getNotes));
-	Kaba::LinkExternal("MidiNoteBuffer.getRange", Kaba::mf(&MidiNoteBuffer::range));
+	Kaba::LinkExternal("MidiNoteBuffer.get_events", Kaba::mf(&MidiNoteBuffer::getEvents));
+	Kaba::LinkExternal("MidiNoteBuffer.get_notes", Kaba::mf(&MidiNoteBuffer::getNotes));
+	Kaba::LinkExternal("MidiNoteBuffer.get_range", Kaba::mf(&MidiNoteBuffer::range));
 
 	BeatPort bport;
 	Kaba::DeclareClassSize("BeatPort", sizeof(BeatPort));
@@ -343,27 +343,27 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
 	//Kaba::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
-	Kaba::LinkExternal("Track.getBuffers", Kaba::mf(&Track::getBuffers));
-	Kaba::LinkExternal("Track.readBuffers", Kaba::mf(&Track::readBuffers));
-	Kaba::LinkExternal("Track.setName", Kaba::mf(&Track::setName));
-	Kaba::LinkExternal("Track.setMuted", Kaba::mf(&Track::setMuted));
-	Kaba::LinkExternal("Track.setVolume", Kaba::mf(&Track::setVolume));
-	Kaba::LinkExternal("Track.setPanning", Kaba::mf(&Track::setPanning));
-	Kaba::LinkExternal("Track.insertMidiData", Kaba::mf(&Track::insertMidiData));
-	Kaba::LinkExternal("Track.addEffect", Kaba::mf(&Track::addEffect));
-	Kaba::LinkExternal("Track.deleteEffect", Kaba::mf(&Track::deleteEffect));
-	Kaba::LinkExternal("Track.editEffect", Kaba::mf(&Track::editEffect));
-	Kaba::LinkExternal("Track.enableEffect", Kaba::mf(&Track::enableEffect));
-	Kaba::LinkExternal("Track.addSampleRef", Kaba::mf(&Track::addSampleRef));
-	Kaba::LinkExternal("Track.deleteSampleRef", Kaba::mf(&Track::deleteSampleRef));
-	Kaba::LinkExternal("Track.editSampleRef", Kaba::mf(&Track::editSampleRef));
-	Kaba::LinkExternal("Track.addMidiNote", Kaba::mf(&Track::addMidiNote));
-	//Kaba::LinkExternal("Track.addMidiNotes", Kaba::mf(&Track::addMidiNotes));
-	Kaba::LinkExternal("Track.deleteMidiNote", Kaba::mf(&Track::deleteMidiNote));
-	Kaba::LinkExternal("Track.setSynthesizer", Kaba::mf(&Track::setSynthesizer));
-	Kaba::LinkExternal("Track.addMarker", Kaba::mf(&Track::addMarker));
-	Kaba::LinkExternal("Track.deleteMarker", Kaba::mf(&Track::deleteMarker));
-	Kaba::LinkExternal("Track.editMarker", Kaba::mf(&Track::editMarker));
+	Kaba::LinkExternal("Track.get_buffers", Kaba::mf(&Track::getBuffers));
+	Kaba::LinkExternal("Track.read_buffers", Kaba::mf(&Track::readBuffers));
+	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::setName));
+	Kaba::LinkExternal("Track.set_muted", Kaba::mf(&Track::setMuted));
+	Kaba::LinkExternal("Track.set_volume", Kaba::mf(&Track::setVolume));
+	Kaba::LinkExternal("Track.set_panning", Kaba::mf(&Track::setPanning));
+	Kaba::LinkExternal("Track.insert_midi_data", Kaba::mf(&Track::insertMidiData));
+	Kaba::LinkExternal("Track.add_effect", Kaba::mf(&Track::addEffect));
+	Kaba::LinkExternal("Track.delete_effect", Kaba::mf(&Track::deleteEffect));
+	Kaba::LinkExternal("Track.edit_effect", Kaba::mf(&Track::editEffect));
+	Kaba::LinkExternal("Track.enable_effect", Kaba::mf(&Track::enableEffect));
+	Kaba::LinkExternal("Track.add_sample_ref", Kaba::mf(&Track::addSampleRef));
+	Kaba::LinkExternal("Track.delete_sample_ref", Kaba::mf(&Track::deleteSampleRef));
+	Kaba::LinkExternal("Track.edit_sample_ref", Kaba::mf(&Track::editSampleRef));
+	Kaba::LinkExternal("Track.add_midi_note", Kaba::mf(&Track::addMidiNote));
+	//Kaba::LinkExternal("Track.add_midi_notes", Kaba::mf(&Track::addMidiNotes));
+	Kaba::LinkExternal("Track.delete_midi_note", Kaba::mf(&Track::deleteMidiNote));
+	Kaba::LinkExternal("Track.set_synthesizer", Kaba::mf(&Track::setSynthesizer));
+	Kaba::LinkExternal("Track.add_marker", Kaba::mf(&Track::addMarker));
+	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::deleteMarker));
+	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::editMarker));
 
 	Song af = Song(Session::GLOBAL);
 	Kaba::DeclareClassSize("Song", sizeof(Song));
@@ -378,16 +378,16 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);
-	Kaba::LinkExternal("Song.newEmpty", Kaba::mf(&Song::newEmpty));
-	Kaba::LinkExternal("Song.addTrack", Kaba::mf(&Song::addTrack));
-	Kaba::LinkExternal("Song.deleteTrack", Kaba::mf(&Song::deleteTrack));
-	Kaba::LinkExternal("Song.getRange", Kaba::mf(&Song::getRange));
-	Kaba::LinkExternal("Song.addBar", Kaba::mf(&Song::addBar));
-	Kaba::LinkExternal("Song.addPause", Kaba::mf(&Song::addPause));
-	Kaba::LinkExternal("Song.editBar", Kaba::mf(&Song::editBar));
-	Kaba::LinkExternal("Song.deleteBar", Kaba::mf(&Song::deleteBar));
-	Kaba::LinkExternal("Song.addSample", Kaba::mf(&Song::addSample));
-	Kaba::LinkExternal("Song.deleteSample", Kaba::mf(&Song::deleteSample));
+	Kaba::LinkExternal("Song.new_empty", Kaba::mf(&Song::newEmpty));
+	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::addTrack));
+	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::deleteTrack));
+	Kaba::LinkExternal("Song.get_range", Kaba::mf(&Song::getRange));
+	Kaba::LinkExternal("Song.add_bar", Kaba::mf(&Song::addBar));
+	Kaba::LinkExternal("Song.add_pause", Kaba::mf(&Song::addPause));
+	Kaba::LinkExternal("Song.edit_bar", Kaba::mf(&Song::editBar));
+	Kaba::LinkExternal("Song.delete_bar", Kaba::mf(&Song::deleteBar));
+	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::addSample));
+	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::deleteSample));
 
 	AudioPort aport;
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));
@@ -464,7 +464,7 @@ void PluginManager::LinkAppScriptData()
 
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
-	Kaba::LinkExternal("Storage.saveViaRenderer", Kaba::mf(&Storage::saveViaRenderer));
+	Kaba::LinkExternal("Storage.save_via_renderer", Kaba::mf(&Storage::saveViaRenderer));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 
@@ -490,8 +490,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
 	Kaba::LinkExternal("TsunamiPlugin." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&TsunamiPlugin::__init__));
 	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
-	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Kaba::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
-	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "onStop", Kaba::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
+	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "on_start", Kaba::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
+	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "on_stop", Kaba::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
 	Kaba::LinkExternal("TsunamiPlugin.stop", Kaba::mf(&TsunamiPlugin::stop_request));
 }
 

@@ -228,6 +228,7 @@ void ViewModeMidi::onLeftButtonUp()
 		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
 			view->cur_track->addMidiNotes(notes);
+			notes.clear(); // all notes owned by track now
 
 			preview_source->end();
 		}

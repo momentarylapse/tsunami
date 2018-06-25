@@ -6,17 +6,18 @@
  */
 
 #include "MarkerDialog.h"
+#include "../../Data/Track.h"
 
-MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, int _index):
+MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, const TrackMarker *_marker):
 	hui::Window("marker_dialog", _parent)
 {
 	track = _t;
 	range = _range;
-	index = _index;
+	marker = _marker;
 
-	if (index >= 0){
-		setString("text", track->markers[index]->text);
-		range = track->markers[index]->range;
+	if (marker){
+		setString("text", marker->text);
+		range = marker->range;
 
 		enable("ok", true);
 	}else{
@@ -40,8 +41,8 @@ void MarkerDialog::onEdit()
 
 void MarkerDialog::onOk()
 {
-	if (index >= 0){
-		track->editMarker(index, track->markers[index]->range, getString("text"));
+	if (marker){
+		track->editMarker(marker, marker->range, getString("text"));
 	}else{
 		track->addMarker(range, getString("text"));
 	}

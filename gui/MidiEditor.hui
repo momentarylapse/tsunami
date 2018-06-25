@@ -40,6 +40,8 @@ Dialog midi_editor "Midi" width=380 height=516
 						RadioButton modifier:natural "♮" expandx
 			Expander me_group_reference "Reference tracks"
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
+			Group grp_operations "Operations"
+				Button quantize "Quantize" "tooltip=Align selected notes to grid of sub beats"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

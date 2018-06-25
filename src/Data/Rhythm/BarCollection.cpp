@@ -14,14 +14,14 @@
 
 
 // pos is precise... beat length not...
-Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hidden, bool include_sub_beats, int overwrite_sub_beats = -1)
+Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool include_sub_beats, int overwrite_sub_beats)
 {
 	Array<Beat> beats;
 
 	int pos_bar = 0;
 	int bar_no = 0;
 
-	for (Bar *b: collection)
+	for (Bar *b: *this)
 		if (!b->is_pause()){
 			// bar
 			int beat_length = b->length / b->num_beats;
@@ -57,17 +57,12 @@ Array<Beat> get_beats(BarCollection &collection, const Range &r, bool include_hi
 				beats.add(Beat(Range(pos_bar, b->length), -1, 0, 0));
 			pos_bar += b->length;
 		}
-	if (include_hidden and (collection.num > 0))
+	if (include_hidden and (this->num > 0))
 		beats.add(Beat(Range(pos_bar, 0), -1, 0, 0));
 	return beats;
 }
 
-Array<Beat> BarCollection::getBeats(const Range &r, bool include_hidden, bool include_sub_beats)
-{
-	return get_beats(*this, r, include_hidden, include_sub_beats, -1);
-}
-
-Array<Bar*> BarCollection::getBars(const Range &r)
+Array<Bar*> BarCollection::get_bars(const Range &r)
 {
 	Array<Bar*> bars;
 
@@ -91,7 +86,7 @@ Array<Bar*> BarCollection::getBars(const Range &r)
 
 int BarCollection::getNextBeat(int pos)
 {
-	Array<Beat> beats = get_beats(*this, Range::ALL, true, false);
+	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
 			return b.range.offset;
@@ -100,7 +95,7 @@ int BarCollection::getNextBeat(int pos)
 
 int BarCollection::getPrevBeat(int pos)
 {
-	Array<Beat> beats = get_beats(*this, Range::ALL, true, false);
+	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	int prev = 0;
 	for (Beat &b: beats){
 		if (b.range.offset >= pos)
@@ -112,7 +107,7 @@ int BarCollection::getPrevBeat(int pos)
 
 int BarCollection::getNextSubBeat(int pos, int beat_partition)
 {
-	Array<Beat> beats = get_beats(*this, Range::ALL, true, true, beat_partition);
+	Array<Beat> beats = get_beats(Range::ALL, true, true, beat_partition);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
 			return b.range.offset;
@@ -121,7 +116,7 @@ int BarCollection::getNextSubBeat(int pos, int beat_partition)
 
 int BarCollection::getPrevSubBeat(int pos, int beat_partition)
 {
-	Array<Beat> beats = get_beats(*this, Range::ALL, true, true, beat_partition);
+	Array<Beat> beats = get_beats(Range::ALL, true, true, beat_partition);
 	int prev = 0;
 	for (Beat &b: beats){
 		if (b.range.offset >= pos)

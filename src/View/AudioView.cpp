@@ -456,7 +456,7 @@ void AudioView::onLeftButtonDown()
 
 void align_to_beats(Song *s, Range &r, int beat_partition)
 {
-	Array<Beat> beats = s->bars.getBeats(Range::ALL);//audio->getRange());
+	Array<Beat> beats = s->bars.get_beats(Range::ALL);//audio->getRange());
 	for (Beat &b : beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);

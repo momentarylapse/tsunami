@@ -1350,7 +1350,7 @@ me_grid_yes
 vertical
 1
 0
-3
+4
 Group
 me_group_view
 
@@ -1540,6 +1540,18 @@ me_group_reference
 ListView
 reference_tracks
 height=200,noexpandy,nobar,select-multi
+0
+0
+0
+Group
+grp_operations
+
+3
+0
+1
+Button
+quantize
+
 0
 0
 0
@@ -3901,7 +3913,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-373
+375
 // Text
 /cancel
 Cancel
@@ -4374,6 +4386,9 @@ Stop
 midi_editor/beat_partition
 4
 
+midi_editor/grp_operations
+Operations
+
 midi_editor/interval
 0
 
@@ -4440,6 +4455,9 @@ none
 midi_editor/modifier:sharp
 ♯
 
+midi_editor/quantize
+Quantize
+Align selected notes to grid of sub beats
 midi_fx_editor/add
 
 add new effect
@@ -5028,7 +5046,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-464
+466
 // Text
 /cancel
 Abbrechen
@@ -5639,6 +5657,9 @@ Stopp
 midi_editor/beat_partition
 4
 
+midi_editor/grp_operations
+Operationen
+
 midi_editor/interval
 0
 
@@ -5717,6 +5738,9 @@ nichts
 midi_editor/modifier:sharp
 ♯
 
+midi_editor/quantize
+Quantisieren
+Markierte Noten am Gitter der Teilschläge ausrichten
 midi_fx_editor/add
 
 neuen Effekt hinzufügen
@@ -6423,7 +6447,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-176
+179
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6495,6 +6519,8 @@ Can only edit bars or a single pause at a time.
 Kann entweder Takte oder eine einzelne Pause editieren.
 Can't execute plugin on an empty audio file
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
+Can't find %s plugin: %s ...
+Kann %s Plugin nicht finden: %s ...
 Can't find plugin: %s ...
 Kann Pluin nicht finden: %s ...
 Can't insert recorded data (%s) into target (%s).
@@ -6553,6 +6579,8 @@ Error
 Fehler
 Error in script file: \"%s\"\n%s
 Fehler in Script-Datei: \"%s\"\n%s
+Error unconnecting from midi port: 
+Fehler beim Trennen vom Midi Port: 
 Export file
 Datei exportieren
 Failed writing header to output stream\n
@@ -6621,6 +6649,8 @@ Organ
 Orgel
 Pause
 Pause
+Pdf sheet
+Pdf Notenblatt
 Phrygian
 Phrygisch
 Piano

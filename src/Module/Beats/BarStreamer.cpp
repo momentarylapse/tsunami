@@ -17,7 +17,7 @@ BarStreamer::BarStreamer(BarCollection &_bars)
 
 int BarStreamer::read(Array<Beat> &beats, int samples)
 {
-	beats = bars.getBeats(Range(offset, samples), false, false);
+	beats = bars.get_beats(Range(offset, samples), false, false);
 	for (Beat &b: beats)
 		if (b.range.offset >= offset)
 			b.range.offset -= offset;

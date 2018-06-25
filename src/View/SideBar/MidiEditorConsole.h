@@ -42,6 +42,8 @@ public:
 	void onModifierFlat();
 	void onModifierNatural();
 
+	void onQuantize();
+
 	void onEditTrack();
 	void onEditMidiFx();
 	void onEditSong();

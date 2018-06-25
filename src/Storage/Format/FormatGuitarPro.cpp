@@ -117,7 +117,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 			tt.t = t;
 			tracks.add(tt);
 		}
-	Array<Bar*> bars = a->bars.getBars(Range::ALL);
+	Array<Bar*> bars = a->bars.get_bars(Range::ALL);
 	tempo = 90;
 	if (bars.num > 0)
 		tempo = (bars[0]->bpm(a->sample_rate) + 0.5f);

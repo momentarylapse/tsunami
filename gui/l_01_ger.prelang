@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-465
+467
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1398,8 +1398,14 @@ AudioSucker
 popup_signal_chain_menu/signal_chain_add_audio_visualizer
 AudioVisualizer
 
+midi_editor/grp_operations
+Operationen
+
+midi_editor/quantize
+Quantisieren
+Markierte Noten am Gitter der Teilschläge ausrichten
 // Num Language Strings
-176
+179
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1753,3 +1759,9 @@ call: tsunami --chain <SIGNAL_CHAIN>
 Aufruf: tsunami --chain <SIGNAL_CHAIN>
 Can't load %s: \"%s\"
 Kann %s nicht laden: \"%s\"
+Can't find %s plugin: %s ...
+Kann %s Plugin nicht finden: %s ...
+Pdf sheet
+Pdf Notenblatt
+Error unconnecting from midi port: 
+Fehler beim Trennen vom Midi Port: 

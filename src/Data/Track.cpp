@@ -212,9 +212,10 @@ void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
 	song->execute(new ActionTrackEditSample(ref, volume, mute));
 }
 
+// will take ownership of this instance!
 void Track::addMidiNote(MidiNote *n)
 {
-	song->execute(new ActionTrackAddMidiNote(this, n->copy()));
+	song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
 void Track::addMidiNotes(const MidiNoteBuffer &notes)
@@ -225,9 +226,11 @@ void Track::addMidiNotes(const MidiNoteBuffer &notes)
 	song->action_manager->endActionGroup();
 }
 
-void Track::deleteMidiNote(int index)
+void Track::deleteMidiNote(const MidiNote *note)
 {
-	song->execute(new ActionTrackDeleteMidiNote(this, index));
+	foreachi(MidiNote *n, midi, index)
+		if (n == note)
+			song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
 
 void Track::setName(const string& name)
@@ -331,14 +334,18 @@ TrackMarker *Track::addMarker(const Range &range, const string &text)
 	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, range, text));
 }
 
-void Track::deleteMarker(int index)
+void Track::deleteMarker(const TrackMarker *marker)
 {
-	song->execute(new ActionTrackDeleteMarker(this, index));
+	foreachi(const TrackMarker *m, markers, index)
+		if (m == marker)
+			song->execute(new ActionTrackDeleteMarker(this, index));
 }
 
-void Track::editMarker(int index, const Range &range, const string &text)
+void Track::editMarker(const TrackMarker *marker, const Range &range, const string &text)
 {
-	song->execute(new ActionTrackEditMarker(this, index, range, text));
+	foreachi(const TrackMarker *m, markers, index)
+		if (m == marker)
+			song->execute(new ActionTrackEditMarker(this, index, range, text));
 }
 
 

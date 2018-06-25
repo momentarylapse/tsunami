@@ -6,6 +6,8 @@
  */
 
 #include "../../Data/Track.h"
+#include "../../Data/Rhythm/BarCollection.h"
+#include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
@@ -67,6 +69,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("modifier:sharp", std::bind(&MidiEditorConsole::onModifierSharp, this));
 	event("modifier:flat", std::bind(&MidiEditorConsole::onModifierFlat, this));
 	event("modifier:natural", std::bind(&MidiEditorConsole::onModifierNatural, this));
+	event("quantize", std::bind(&MidiEditorConsole::onQuantize, this));
 	event("edit_track", std::bind(&MidiEditorConsole::onEditTrack, this));
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::onEditMidiFx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::onEditSong, this));
@@ -295,3 +298,34 @@ void MidiEditorConsole::setMode(int mode)
 	update();
 }
 
+int align_to_beats(int pos, Array<Beat> &beats)
+{
+	int best = pos;
+	int best_diff = 100000000;
+	for (auto &b: beats){
+		int d = abs(b.range.offset - pos);
+		if (d < best_diff){
+			best_diff = d;
+			best = b.range.offset;
+		}
+	}
+	return best;
+}
+
+void MidiEditorConsole::onQuantize()
+{
+	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->beat_partition);
+
+	song->action_manager->beginActionGroup();
+	MidiNoteBufferRef ref = track->midi.getNotesBySelection(view->sel);
+	for (auto *n: ref){
+		view->sel.set(n, false);
+		MidiNote *nn = n->copy();
+		nn->range.set_start(align_to_beats(nn->range.start(), beats));
+		nn->range.set_end(align_to_beats(nn->range.end(), beats));
+		track->deleteMidiNote(n);
+		track->addMidiNote(nn);
+		view->sel.add(nn);
+	}
+	song->action_manager->endActionGroup();
+}

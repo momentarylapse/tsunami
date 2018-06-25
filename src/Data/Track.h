@@ -84,13 +84,13 @@ public:
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 	void _cdecl addMidiNote(MidiNote *n);
 	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
-	void _cdecl deleteMidiNote(int index);
+	void _cdecl deleteMidiNote(const MidiNote *note);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
 	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
 	TrackMarker* _cdecl addMarker(const Range &range, const string &text);
-	void _cdecl deleteMarker(int index);
-	void _cdecl editMarker(int index, const Range &range, const string &text);
+	void _cdecl deleteMarker(const TrackMarker *marker);
+	void _cdecl editMarker(const TrackMarker *marker, const Range &range, const string &text);
 
 
 	enum Type{

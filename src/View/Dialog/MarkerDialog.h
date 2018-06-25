@@ -10,12 +10,15 @@
 
 
 #include "../../lib/hui/hui.h"
-#include "../../Data/Track.h"
+#include "../../Data/Range.h"
+
+class Track;
+class TrackMarker;
 
 class MarkerDialog: public hui::Window
 {
 public:
-	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, int index);
+	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, const TrackMarker *marker);
 	virtual ~MarkerDialog();
 
 	void onEdit();
@@ -24,7 +27,7 @@ public:
 
 	Track *track;
 	Range range;
-	int index;
+	const TrackMarker *marker;
 };
 
 #endif /* SRC_VIEW_DIALOG_MARKERDIALOG_H_ */

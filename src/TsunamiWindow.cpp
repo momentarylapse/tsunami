@@ -365,7 +365,7 @@ void TsunamiWindow::onTrackAddMarker()
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover.pos))
 			range = Range(view->hover.pos, 0);
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, -1);
+		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, NULL);
 		dlg->run();
 		delete(dlg);
 	}else{
@@ -397,7 +397,7 @@ void TsunamiWindow::onSampleProperties()
 void TsunamiWindow::onDeleteMarker()
 {
 	if (view->hover.type == Selection::Type::MARKER)
-		view->cur_track->deleteMarker(view->hover.index);
+		view->cur_track->deleteMarker(view->hover.marker);
 	else
 		session->e(_("No marker selected"));
 }
@@ -405,7 +405,7 @@ void TsunamiWindow::onDeleteMarker()
 void TsunamiWindow::onEditMarker()
 {
 	if (view->hover.type == Selection::Type::MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, Range::EMPTY, view->hover.index);
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, Range::EMPTY, view->hover.marker);
 		dlg->run();
 		delete(dlg);
 	}else

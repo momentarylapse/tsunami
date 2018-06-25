@@ -15,12 +15,11 @@ class ActionTrackEditName: public ActionMergable<string>
 {
 public:
 	ActionTrackEditName(Track *t, const string &name);
-	virtual ~ActionTrackEditName();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
 	int track_no;

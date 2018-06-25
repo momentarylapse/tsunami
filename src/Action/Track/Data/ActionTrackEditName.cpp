@@ -15,10 +15,6 @@ ActionTrackEditName::ActionTrackEditName(Track *t, const string &_name)
 	new_value = _name;
 }
 
-ActionTrackEditName::~ActionTrackEditName()
-{
-}
-
 void *ActionTrackEditName::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

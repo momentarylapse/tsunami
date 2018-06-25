@@ -330,13 +330,13 @@ class Track
 	extern SampleRef* add_sample_ref(int pos, Sample* sample)
 	extern void delete_sample_ref(int index)
 	extern void edit_sample_ref(int index, float volume, bool mute, int rep_num, int rep_delay)
-	extern void add_midi_note(MidiNote n)
+	extern void add_midi_note(MidiNote *n)
 	//extern void add_midi_notes(MidiNoteBuffer midi)
-	extern void delete_midi_note(int index)
+	extern void delete_midi_note(MidiNote *n)
 	extern void set_synthesizer(Synthesizer *synth)
 	extern TrackMarker* add_marker(Range range, string text)
-	extern void delete_marker(int index)
-	extern void edit_marker(int index, Range range, string text)
+	extern void delete_marker(TrackMarker *marker)
+	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
 class Tag
 	string key, value

@@ -19,8 +19,8 @@ class Range;
 class BarCollection : public Array<Bar*>
 {
 public:
-	Array<Beat> getBeats(const Range &r, bool include_hidden = false, bool include_sub_beats = false);
-	Array<Bar*> getBars(const Range &r);
+	Array<Beat> get_beats(const Range &r, bool include_hidden = false, bool include_sub_beats = false, int overwrite_sub_beats = -1);
+	Array<Bar*> get_bars(const Range &r);
 	int getNextBeat(int pos);
 	int getPrevBeat(int pos);
 	int getNextSubBeat(int pos, int beat_partition);

@@ -56,7 +56,7 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 	//p->drawStr(x0, y0, clef.symbol);
 
 	// beats
-	auto beats = song->bars.getBeats(Range(r.offset, r.length + 1), true, false);
+	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
 	for (auto b: beats){
 		float x = x0 + (b.range.offset - r.offset) * scale;
 		float ya = clef_pos_to_pdf(y0, line_dy, 8);
@@ -121,7 +121,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 		p->drawLine(x0, y0 + i*string_dy + string_dy/2, x0 + w, y0 + i*string_dy + string_dy/2);
 
 	// beats
-	auto beats = song->bars.getBeats(Range(r.offset, r.length + 1), true, false);
+	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
 	for (auto b: beats){
 		if (b.level == 0){
 			p->setColor(color(1, 0.5f, 0.5f, 0.5f));
@@ -156,7 +156,7 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 {
 	float track_space = 20;
 
-	auto bars = song->bars.getBars(r + 1000);
+	auto bars = song->bars.get_bars(r + 1000);
 	p->setColor(SetColorHSB(1, 0, 0, 0.4f));
 	p->setFontSize(12);
 	if (bars.num > 0)
@@ -177,7 +177,7 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 
 static int good_samples(Song *song, const Range &r0)
 {
-	auto bars = song->bars.getBars(Range(r0.offset, r0.length * 2));
+	auto bars = song->bars.get_bars(Range(r0.offset, r0.length * 2));
 	int best_pos = -1;
 	for (auto b: bars){
 		if (b->range().offset <= r0.offset)

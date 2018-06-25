@@ -328,7 +328,7 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 	c->setColor(view->colors.selection_internal);
 	c->setFill(false);
 
-	auto bars = view->song->bars.getBars(Range::ALL);
+	auto bars = view->song->bars.get_bars(Range::ALL);
 	for (auto b: bars){
 		if ((view->sel.has(b)) or (b == view->hover.bar)){
 			color col = view->colors.hover;
@@ -449,7 +449,7 @@ void ViewModeDefault::setBarriers(Selection &s)
 		}
 
 		// time bar...
-		Array<Beat> beats = song->bars.getBeats(cam->range(), true);
+		Array<Beat> beats = song->bars.get_beats(cam->range(), true);
 		for (Beat &b: beats)
 			s.barrier.add(b.range.offset);
 	}
@@ -589,7 +589,7 @@ Selection ViewModeDefault::getHover()
 				if (i < view->song->bars.num)
 					offset += view->song->bars[i]->length;
 			}
-			auto bars = view->song->bars.getBars(Range(s.pos, 0));
+			auto bars = view->song->bars.get_bars(Range(s.pos, 0));
 			for (auto *b: bars){
 				//b.range.
 				s.bar = b;

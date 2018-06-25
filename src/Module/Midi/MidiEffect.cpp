@@ -101,7 +101,7 @@ void MidiEffect::process_track(Track *t, const SongSelection &sel)
 
 	for (int i=t->midi.num-1; i>=0; i--)
 		if (sel.has(t->midi[i]))
-			t->deleteMidiNote(i);
+			t->deleteMidiNote(t->midi[i]);
 
 	process(&midi);
 	for (MidiNote *n: midi)

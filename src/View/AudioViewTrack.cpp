@@ -814,7 +814,7 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 	dash.add(6);
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar*> bars = view->song->bars.getBars(Range(s0, s1 - s0));
+	Array<Bar*> bars = view->song->bars.get_bars(Range(s0, s1 - s0));
 	for (Bar *b: bars){
 		if (b->is_pause())
 			continue;

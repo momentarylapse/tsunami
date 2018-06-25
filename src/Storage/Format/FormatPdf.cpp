@@ -8,14 +8,94 @@
 #include "FormatPdf.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
+#include "../../Data/Midi/Clef.h"
 #include "../../lib/xfile/pdf.h"
+#include <math.h>
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
 	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE)
 {
 }
 
-static int render_track(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
+static float clef_pos_to_pdf(float y0, float line_dy, int i)
+{
+	return y0 + (12-i) * line_dy / 2;
+}
+
+static double pdf_bpm;
+
+static int render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
+{
+	float line_dy = 16;
+	float rr = line_dy/2;
+	Song *song = t->song;
+
+	int slack = t->song->sample_rate / 30;
+	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
+
+	auto clef = t->instrument.get_clef();
+
+	auto midi = t->midi.getNotes(r_inside);
+	int mm = 0;
+	for (auto n: midi){
+		mm = max(mm, n->range.offset);
+		float x1 = x0 + (n->range.offset - r.offset) * scale;
+		float x2 = x0 + (n->range.end() - r.offset) * scale;
+		int pos = n->clef_position;
+		float y = clef_pos_to_pdf(y0, line_dy, pos);
+		p->setColor(color(1, 0.9f, 0.9f, 0.9f));
+		p->drawRect(rect(x1 + rr, x2, y-rr, y + rr));
+	}
+
+	// clef lines
+	p->setColor(Gray);
+	for (int i=0; i<10; i+=2){
+		float y = clef_pos_to_pdf(y0, line_dy, i);
+		p->drawLine(x0, y, x0 + w, y);
+	}
+	//p->drawStr(x0, y0, clef.symbol);
+
+	// beats
+	auto beats = song->bars.getBeats(Range(r.offset, r.length + 1), true, false);
+	for (auto b: beats){
+		float x = x0 + (b.range.offset - r.offset) * scale;
+		float ya = clef_pos_to_pdf(y0, line_dy, 8);
+		float yb = clef_pos_to_pdf(y0, line_dy, 0);
+		if (b.level == 0){
+			if (b.bar_no >= 0){
+				double bpm = 60.0 * (double)song->sample_rate / (double)b.range.length;
+				if (fabs(bpm - pdf_bpm) > 0.2){
+					pdf_bpm = bpm;
+					p->setColor(color(1, 0.3f, 0.3f, 0.3f));
+					p->drawStr(x, ya-15, format("%.1f bpm", bpm));
+				}
+			}
+			p->setColor(color(1, 0.5f, 0.5f, 0.5f));
+			p->setLineWidth(2);
+		}else{
+			p->setColor(color(1, 0.8f, 0.8f, 0.8f));
+			p->setLineWidth(1);
+		}
+		p->drawLine(x, ya, x, yb);
+	}
+	p->setLineWidth(1);
+
+	// midi
+	float fs = 12;
+	p->setFontSize(fs);
+	auto midi2 = t->midi.getNotes(r_inside);
+	for (auto n: midi2){
+		float x1 = x0 + (n->range.offset - r.offset) * scale;
+		int pos = n->clef_position;
+		float y = clef_pos_to_pdf(y0, line_dy, pos);
+		p->setColor(color(1, 0.8f, 0.8f, 0.8f));
+		p->drawCircle(x1 + rr, y, rr);
+	}
+
+	return y0 + line_dy * 7;
+}
+
+static int render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
 {
 	float string_dy = 16;
 	float rr = string_dy/2;
@@ -79,13 +159,17 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 	auto bars = song->bars.getBars(r + 1000);
 	p->setColor(SetColorHSB(1, 0, 0, 0.4f));
 	p->setFontSize(12);
-	p->drawStr(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
+	if (bars.num > 0)
+		p->drawStr(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
 
 	for (Track* t : song->tracks){
 		if (t->type != t->Type::MIDI)
 			continue;
 
-		y0 = render_track(p, x0, w, y0, r, t, scale) + track_space;
+		y0 = render_track_classical(p, x0, w, y0, r, t, scale) + track_space;
+		if (t->instrument.string_pitch.num > 0)
+			y0 = render_track_tab(p, x0, w, y0, r, t, scale) + track_space;
+		y0 += track_space;
 	}
 
 	return y0;
@@ -132,6 +216,8 @@ void FormatPdf::saveSong(StorageOperationData* od)
 	p->setFontSize(15);
 	p->setColor(SetColorHSB(1, 0, 0, 0.4f));
 	p->drawStr(p->width - 300, 100, "by " + od->song->getTag("artist"));
+
+	pdf_bpm = 0;
 
 	int offset = 0;
 	while (offset < samples){

@@ -446,7 +446,7 @@ bool TsunamiWindow::allowTermination()
 			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
 				return false;
-			side_bar->capture_console->onDelete();
+			side_bar->capture_console->onDump();
 			side_bar->_hide();
 		}
 	}

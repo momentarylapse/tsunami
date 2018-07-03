@@ -30,10 +30,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	preview_synth = NULL;
 	preview_stream = NULL;
 
-	cc->enable("capture_midi_target", false);
-
-	cc->event("capture_midi_source", std::bind(&CaptureConsoleModeMidi::onSource, this));
-	//cc->event("capture_midi_target", std::bind(&CaptureConsoleModeMidi::onTarget, this));
+	cc->event("source", std::bind(&CaptureConsoleModeMidi::onSource, this));
 }
 
 void CaptureConsoleModeMidi::onSource()
@@ -43,11 +40,6 @@ void CaptureConsoleModeMidi::onSource()
 		chosen_device = sources[n];
 		input->set_device(chosen_device);
 	}
-}
-
-void CaptureConsoleModeMidi::onTarget()
-{
-	//setTarget(cc->song->tracks[cc->getInt("capture_midi_target")]);
 }
 
 
@@ -71,14 +63,13 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	preview_stream->play();
 	view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
-	cc->setInt("capture_midi_target", target->get_index());
 
 
 	bool ok = (target->type == Track::Type::MIDI);
-	cc->setString("capture_midi_message", "");
+	cc->setString("message", "");
 	if (!ok)
-		cc->setString("capture_midi_message", format(_("Please select a track of type %s."), track_type(Track::Type::MIDI).c_str()));
-	cc->enable("capture_start", ok);
+		cc->setString("message", format(_("Please select a track of type %s."), track_type(Track::Type::MIDI).c_str()));
+	cc->enable("start", ok);
 }
 
 void CaptureConsoleModeMidi::enterParent()
@@ -88,24 +79,18 @@ void CaptureConsoleModeMidi::enterParent()
 void CaptureConsoleModeMidi::enter()
 {
 	sources = cc->device_manager->getGoodDeviceList(Device::Type::MIDI_INPUT);
-	cc->hideControl("capture_midi_grid", false);
+	cc->hideControl("single_grid", false);
 
 	// add all
-	cc->reset("capture_midi_source");
+	cc->reset("source");
 	for (Device *d: sources)
-		cc->setString("capture_midi_source", d->get_name());
+		cc->setString("source", d->get_name());
 
 	// select current
 	foreachi(Device *d, sources, i)
 		if (d == chosen_device)
-			cc->setInt("capture_midi_source", i);
+			cc->setInt("source", i);
 
-
-	// target list
-	cc->reset("capture_midi_target");
-	for (Track *t: song->tracks)
-		cc->addString("capture_midi_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	//cc->addString("capture_midi_target", _("  - create new track -"));
 
 	input = new InputStreamMidi(session);
 	input->set_chunk_size(512);
@@ -144,8 +129,7 @@ void CaptureConsoleModeMidi::start()
 {
 	input->reset_sync();
 	input->accumulate(true);
-	cc->enable("capture_midi_source", false);
-	//cc->enable("capture_midi_target", false);
+	cc->enable("source", false);
 }
 
 void CaptureConsoleModeMidi::stop()
@@ -158,8 +142,7 @@ void CaptureConsoleModeMidi::dump()
 {
 	input->accumulate(false);
 	input->reset_accumulation();
-	cc->enable("capture_midi_source", true);
-	//cc->enable("capture_midi_target", true);
+	cc->enable("source", true);
 }
 
 bool CaptureConsoleModeMidi::insert()

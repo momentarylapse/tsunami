@@ -2659,59 +2659,35 @@ Grid
 vertical
 0
 0
-5
+4
 Grid
-capture_audio_grid
+single_grid
 
 0
 0
 2
 Group
-rdt_audio_source
+grp_source
 
 0
 0
 1
 ComboBox
-capture_audio_source
+source
 expandx
 0
 0
 0
 Text
-capture_audio_message
+message
 italic
 0
 1
 0
 Grid
-capture_midi_grid
+multi_grid
 
 1
-0
-2
-Group
-rdt_midi_source
-
-0
-0
-1
-ComboBox
-capture_midi_source
-expandx
-0
-0
-0
-Text
-capture_midi_message
-italic
-0
-1
-0
-Grid
-capture_multi_grid
-
-2
 0
 3
 Text
@@ -2735,7 +2711,7 @@ bold
 Group
 rdt_capture
 
-3
+2
 0
 1
 Grid
@@ -2751,13 +2727,13 @@ noexpandy
 0
 2
 Text
-capture_time
+time
 width=120
 0
 0
 0
 DrawingArea
-capture_level
+level
 height=25
 1
 0
@@ -2769,19 +2745,19 @@ Grid
 1
 3
 Button
-capture_start
+start
 flat,image=hui:media-record
 0
 0
 0
 Button
-capture_pause
+pause
 flat,image=hui:media-pause
 1
 0
 0
 Button
-capture_delete
+dump
 flat,image=hui:delete
 2
 0
@@ -2789,7 +2765,7 @@ flat,image=hui:delete
 Grid
 ?
 buttonbar
-4
+3
 0
 2
 Button
@@ -3913,7 +3889,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-375
+374
 // Text
 /cancel
 Cancel
@@ -4749,20 +4725,14 @@ Format
 raw_config_dialog/t_samplerate
 Samplerate
 
-record_dialog/capture_delete
+record_dialog/dump
 Dump
 
-record_dialog/capture_time
-0:00
-
-record_dialog/rdt_audio_source
+record_dialog/grp_source
 Source
 
 record_dialog/rdt_capture
 Recording
-
-record_dialog/rdt_midi_source
-Source
 
 record_dialog/rdt_multi_source
 Source
@@ -4775,6 +4745,9 @@ Type
 
 record_dialog/record_dialog
 Aufnahme
+
+record_dialog/time
+0:00
 
 sample_manager_dialog/create_from_selection
 
@@ -5046,7 +5019,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-466
+471
 // Text
 /cancel
 Abbrechen
@@ -6086,6 +6059,18 @@ Audio
 record_dialog/capture_type:midi
 Midi
 
+record_dialog/delete
+Verwerfen
+
+record_dialog/dump
+Verwerfen
+
+record_dialog/grp_single_source
+Quelle
+
+record_dialog/grp_source
+Quelle
+
 record_dialog/rdt_audio_source
 Quelle
 
@@ -6118,6 +6103,9 @@ Ziel
 
 record_dialog/record_dialog
 Aufnahme
+
+record_dialog/time
+0:00
 
 record_midi_dialog/capture_delete
 Verwerfen

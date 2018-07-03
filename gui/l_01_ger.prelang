@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-467
+472
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1404,6 +1404,21 @@ Operationen
 midi_editor/quantize
 Quantisieren
 Markierte Noten am Gitter der Teilschläge ausrichten
+record_dialog/grp_single_source
+Quelle
+
+record_dialog/grp_source
+Quelle
+
+record_dialog/delete
+Verwerfen
+
+record_dialog/time
+0:00
+
+record_dialog/dump
+Verwerfen
+
 // Num Language Strings
 179
 // Data (ID,Text)

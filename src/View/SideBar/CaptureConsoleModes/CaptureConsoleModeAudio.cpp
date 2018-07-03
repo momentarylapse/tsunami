@@ -33,10 +33,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	target = NULL;
 	sucker = NULL;
 
-	cc->enable("capture_audio_target", false);
-
-	cc->event("capture_audio_source", std::bind(&CaptureConsoleModeAudio::onSource, this));
-	//cc->event("capture_audio_target", std::bind(&CaptureConsoleModeAudio::onTarget, this));
+	cc->event("source", std::bind(&CaptureConsoleModeAudio::onSource, this));
 }
 
 void CaptureConsoleModeAudio::onSource()
@@ -48,25 +45,17 @@ void CaptureConsoleModeAudio::onSource()
 	}
 }
 
-void CaptureConsoleModeAudio::onTarget()
-{
-	/*int index = cc->getInt("capture_audio_target");
-	if (index >= 0)
-		setTarget(cc->song->tracks[index]);*/
-}
-
 void CaptureConsoleModeAudio::setTarget(Track *t)
 {
 	target = t;
 	view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
-	cc->setInt("capture_audio_target", target->get_index());
 
 	bool ok = (target->type == Track::Type::AUDIO);
-	cc->setString("capture_audio_message", "");
+	cc->setString("message", "");
 	if (!ok)
-		cc->setString("capture_audio_message", format(_("Please select a track of type %s."), track_type(Track::Type::AUDIO).c_str()));
-	cc->enable("capture_start", ok);
+		cc->setString("message", format(_("Please select a track of type %s."), track_type(Track::Type::AUDIO).c_str()));
+	cc->enable("start", ok);
 }
 
 void CaptureConsoleModeAudio::enterParent()
@@ -76,29 +65,22 @@ void CaptureConsoleModeAudio::enterParent()
 void CaptureConsoleModeAudio::enter()
 {
 	sources = cc->device_manager->getGoodDeviceList(Device::Type::AUDIO_INPUT);
-	cc->hideControl("capture_audio_grid", false);
+	cc->hideControl("single_grid", false);
 
 	// add all
-	cc->reset("capture_audio_source");
+	cc->reset("source");
 	for (Device *d: sources)
-		cc->setString("capture_audio_source", d->get_name());
+		cc->setString("source", d->get_name());
 
 	// select current
 	foreachi(Device *d, sources, i)
 		if (d == chosen_device)
-			cc->setInt("capture_audio_source", i);
+			cc->setInt("source", i);
 
-
-	// target list
-	cc->reset("capture_audio_target");
-	for (Track *t: song->tracks)
-		cc->addString("capture_audio_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	//cc->addString("capture_audio_target", _("  - create new track -"));
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == t->Type::AUDIO)
 			setTarget((Track*)t);
-
 
 	input = new InputStreamAudio(session);
 	input->set_backup_mode(BACKUP_MODE_TEMP);
@@ -145,8 +127,7 @@ void CaptureConsoleModeAudio::start()
 {
 	input->reset_sync();
 	sucker->accumulate(true);
-	cc->enable("capture_audio_source", false);
-	//cc->enable("capture_audio_target", false);
+	cc->enable("source", false);
 }
 
 void CaptureConsoleModeAudio::stop()
@@ -158,8 +139,7 @@ void CaptureConsoleModeAudio::dump()
 {
 	sucker->accumulate(false);
 	sucker->reset_accumulation();
-	cc->enable("capture_audio_source", true);
-	//cc->enable("capture_audio_target", true);
+	cc->enable("source", true);
 }
 
 bool CaptureConsoleModeAudio::insert()

@@ -29,7 +29,6 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc);
 	void onSource();
-	void onTarget();
 	void setTarget(Track *t);
 	virtual void enterParent();
 	virtual void enter();

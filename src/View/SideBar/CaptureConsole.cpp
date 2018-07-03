@@ -35,18 +35,15 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	peak_meter = new PeakMeterDisplay(this, "capture_level", NULL, view);
-
-	//enable("capture_type", false);
+	peak_meter = new PeakMeterDisplay(this, "level", NULL, view);
 
 
 	event("cancel", std::bind(&CaptureConsole::onCancel, this));
 	//event("hui:close", std::bind(&CaptureConsole::onClose, this));
 	event("ok", std::bind(&CaptureConsole::onOk, this));
-	//event("capture_type", std::bind(&CaptureConsole::onType, this));
-	event("capture_start", std::bind(&CaptureConsole::onStart, this));
-	event("capture_delete", std::bind(&CaptureConsole::onDelete, this));
-	event("capture_pause", std::bind(&CaptureConsole::onPause, this));
+	event("start", std::bind(&CaptureConsole::onStart, this));
+	event("dump", std::bind(&CaptureConsole::onDump, this));
+	event("pause", std::bind(&CaptureConsole::onPause, this));
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);
@@ -70,9 +67,8 @@ inline int dev_type(int type)
 
 void CaptureConsole::onEnter()
 {
-	hideControl("capture_audio_grid", true);
-	hideControl("capture_midi_grid", true);
-	hideControl("capture_multi_grid", true);
+	hideControl("single_grid", true);
+	hideControl("multi_grid", true);
 
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
@@ -84,13 +80,10 @@ void CaptureConsole::onEnter()
 
 	if ((num_audio == 1) and (num_midi == 0)){
 		mode = mode_audio;
-		setInt("capture_type", 0);
 	}else if ((num_audio == 0) and (num_midi == 1)){
 		mode = mode_midi;
-		setInt("capture_type", 1);
 	}else{ // TYPE_TIME
 		mode = mode_multi;
-		setInt("capture_type", 2);
 	}
 
 	mode_audio->enterParent();
@@ -123,21 +116,6 @@ void CaptureConsole::onLeave()
 }
 
 
-void CaptureConsole::onType()
-{
-	/*mode->leave();
-
-	int n = getInt("capture_type");
-	if (n == 0)
-		mode = mode_audio;
-	if (n == 1)
-		mode = mode_midi;
-	if (n == 2)
-		mode = mode_multi;
-	mode->enter();*/
-}
-
-
 void CaptureConsole::onStart()
 {
 	if (view->isPlaybackActive()){
@@ -150,24 +128,22 @@ void CaptureConsole::onStart()
 	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mode->start();
-	enable("capture_start", false);
-	enable("capture_pause", true);
-	enable("capture_delete", true);
+	enable("start", false);
+	enable("pause", true);
+	enable("dump", true);
 	enable("ok", true);
-	//enable("capture_type", false);
 }
 
-void CaptureConsole::onDelete()
+void CaptureConsole::onDump()
 {
 	if (view->isPlaybackActive()){
 		view->stream->unsubscribe(this);
 		view->stop();
 	}
 	mode->dump();
-	enable("capture_start", true);
-	enable("capture_pause", false);
-	enable("capture_delete", false);
-	//enable("capture_type", true);
+	enable("start", true);
+	enable("pause", false);
+	enable("dump", false);
 	enable("ok", false);
 	updateTime();
 }
@@ -178,8 +154,8 @@ void CaptureConsole::onPause()
 	//view->stream->unsubscribe(this);
 	view->pause(true);
 	mode->pause();
-	enable("capture_start", true);
-	enable("capture_pause", false);
+	enable("start", true);
+	enable("pause", false);
 }
 
 
@@ -205,7 +181,7 @@ void CaptureConsole::onClose()
 
 void CaptureConsole::updateTime()
 {
-	setString("capture_time", song->get_time_str_long(mode->getSampleCount()));
+	setString("time", song->get_time_str_long(mode->getSampleCount()));
 }
 
 void CaptureConsole::onOutputEndOfStream()
@@ -213,9 +189,9 @@ void CaptureConsole::onOutputEndOfStream()
 	view->stream->unsubscribe(this);
 	view->stop();
 	mode->pause();
-	enable("capture_start", true);
-	enable("capture_pause", false);
-	enable("capture_delete", true);
+	enable("start", true);
+	enable("pause", false);
+	enable("dump", true);
 }
 
 void CaptureConsole::onOutputUpdate()

@@ -30,10 +30,8 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	void onType();
-
 	void onStart();
-	void onDelete();
+	void onDump();
 	void onPause();
 	void onOk();
 	void onCancel();

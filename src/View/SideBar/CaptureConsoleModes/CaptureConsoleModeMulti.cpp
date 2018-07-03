@@ -24,7 +24,7 @@ CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
 
 void CaptureConsoleModeMulti::enter()
 {
-	cc->hideControl("capture_multi_grid", false);
+	cc->hideControl("multi_grid", false);
 	sources_audio = cc->device_manager->getGoodDeviceList(Device::Type::AUDIO_INPUT);
 	sources_midi = cc->device_manager->getGoodDeviceList(Device::Type::MIDI_INPUT);
 
@@ -38,10 +38,10 @@ void CaptureConsoleModeMulti::enter()
 		int i = items.num;
 		c.track = t;
 		c.device = NULL;
-		c.id_target = "capture-multi-target-" + i2s(i);
-		c.id_type = "capture-multi-type-" + i2s(i);
-		c.id_source = "capture-multi-source-" + i2s(i);
-		cc->setTarget("capture_multi_grid");
+		c.id_target = "target-" + i2s(i);
+		c.id_type = "type-" + i2s(i);
+		c.id_source = "source-" + i2s(i);
+		cc->setTarget("multi_grid");
 		cc->addLabel(t->getNiceName(), 0, i+1, c.id_target);
 		cc->addLabel(track_type(t->type), 1, i+1, c.id_type);
 		if (t->type == Track::Type::AUDIO){

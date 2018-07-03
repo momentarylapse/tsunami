@@ -51,14 +51,14 @@ void ActionBarAdd::build(Data *d)
 			foreachi (TrackMarker *m, t->markers, i){
 				if (m->range.is_inside(pos0)){
 					// stretch
-					addSubAction(new ActionTrackEditMarker(t, i, Range(m->range.offset, m->range.length + r.length), m->text), d);
+					addSubAction(new ActionTrackEditMarker(m, Range(m->range.offset, m->range.length + r.length), m->text), d);
 				}
 			}
 
 			foreachi (MidiNote *m, t->midi, i){
 				if (m->range.is_inside(pos0)){
 					// stretch
-					addSubAction(new ActionTrackEditMidiNote(t, m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume), d);
+					addSubAction(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume), d);
 				}
 			}
 		}

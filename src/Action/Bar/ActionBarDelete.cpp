@@ -45,13 +45,13 @@ void ActionBarDelete::build(Data *d)
 					addSubAction(new ActionTrackDeleteMarker(t, i), d);
 				}else if (r.is_inside(m->range.start())){
 					// cover start
-					addSubAction(new ActionTrackEditMarker(t, i, Range(r.offset, m->range.end() - r.end()), m->text), d);
+					addSubAction(new ActionTrackEditMarker(m, Range(r.offset, m->range.end() - r.end()), m->text), d);
 				}else if (r.is_inside(m->range.end())){
 					// cover end
-					addSubAction(new ActionTrackEditMarker(t, i, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
+					addSubAction(new ActionTrackEditMarker(m, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
 				}else if (m->range.covers(r)){
 					// cut out part
-					addSubAction(new ActionTrackEditMarker(t, i, Range(m->range.offset, m->range.length - r.length), m->text), d);
+					addSubAction(new ActionTrackEditMarker(m, Range(m->range.offset, m->range.length - r.length), m->text), d);
 				}
 			}
 
@@ -61,13 +61,13 @@ void ActionBarDelete::build(Data *d)
 					addSubAction(new ActionTrackDeleteMidiNote(t, i), d);
 				}else if (r.is_inside(m->range.start())){
 					// cover start
-					addSubAction(new ActionTrackEditMidiNote(t, m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume), d);
+					addSubAction(new ActionTrackEditMidiNote(m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume), d);
 				}else if (r.is_inside(m->range.end())){
 					// cover end
-					addSubAction(new ActionTrackEditMidiNote(t, m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume), d);
+					addSubAction(new ActionTrackEditMidiNote(m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume), d);
 				}else if (m->range.covers(r)){
 					// cut out part
-					addSubAction(new ActionTrackEditMidiNote(t, m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume), d);
+					addSubAction(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume), d);
 				}
 			}
 		}

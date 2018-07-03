@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-472
+473
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1418,6 +1418,9 @@ record_dialog/time
 
 record_dialog/dump
 Verwerfen
+
+record_dialog/new_version
+Neue Version starten
 
 // Num Language Strings
 179

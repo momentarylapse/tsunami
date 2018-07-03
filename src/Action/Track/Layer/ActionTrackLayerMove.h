@@ -8,7 +8,7 @@
 #ifndef SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_
 #define SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_
 
-#include "../Action.h"
+/*#include "../Action.h"
 
 class ActionLayerMove : public Action
 {
@@ -19,6 +19,6 @@ public:
 	virtual void undo(Data *d);
 
 	int source, target;
-};
+};*/
 
 #endif /* SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_ */

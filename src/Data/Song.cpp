@@ -18,11 +18,6 @@
 #include "../Action/Curve/ActionCurveDeletePoint.h"
 #include "../Action/Curve/ActionCurveEdit.h"
 #include "../Action/Curve/ActionCurveEditPoint.h"
-#include "../Action/Layer/ActionLayerAdd.h"
-#include "../Action/Layer/ActionLayerDelete.h"
-#include "../Action/Layer/ActionLayerMerge.h"
-#include "../Action/Layer/ActionLayerMove.h"
-#include "../Action/Layer/ActionLayerRename.h"
 #include "../Action/Sample/ActionSampleAdd.h"
 #include "../Action/Sample/ActionSampleDelete.h"
 #include "../Action/Sample/ActionSampleEditName.h"
@@ -76,12 +71,6 @@ Song::Exception::Exception(const string &_message)
 	message = _message;
 }
 
-Song::Layer::Layer(const string &_name)
-{
-	name = _name;
-	active = true;
-}
-
 Song::Song(Session *session) :
 	Data(session)
 {
@@ -89,7 +78,6 @@ Song::Song(Session *session) :
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
 	volume = 1;
-	layers.add(new Layer(""));
 }
 
 void Song::__init__(Session *session)
@@ -237,11 +225,6 @@ void Song::reset()
 		delete(c);
 	curves.clear();
 
-	for (Layer *l: layers)
-		delete(l);
-	layers.clear();
-	layers.add(new Layer(""));
-
 	action_manager->reset();
 
 	notify();
@@ -380,7 +363,7 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	action_manager->endActionGroup();
 }
 
-Song::Layer *Song::addLayer(const string &name, int index)
+/*Song::Layer *Song::addLayer(const string &name, int index)
 {
 	return (Song::Layer*)execute(new ActionLayerAdd(name, index));
 }
@@ -409,7 +392,7 @@ void Song::moveLayer(int source, int target)
 void Song::renameLayer(int index, const string &name)
 {
 	execute(new ActionLayerRename(index, name));
-}
+}*/
 
 void Song::deleteTrack(Track *track)
 {
@@ -588,13 +571,6 @@ Track *Song::getTimeTrack()
 		if (t->type == t->Type::TIME)
 			return t;
 	return NULL;
-}
-
-string Song::getNiceLayerName(int index)
-{
-	if (layers[index]->name.num > 0)
-		return layers[index]->name;
-	return format(_("Layer %d"), index + 1);
 }
 
 string Song::getTag(const string &key)

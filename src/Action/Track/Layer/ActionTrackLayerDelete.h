@@ -8,7 +8,7 @@
 #ifndef SRC_ACTION_LAYER_ACTIONLAYERDELETE_H_
 #define SRC_ACTION_LAYER_ACTIONLAYERDELETE_H_
 
-#include "../ActionGroup.h"
+/*#include "../ActionGroup.h"
 
 class Song;
 
@@ -20,6 +20,6 @@ public:
 	virtual void build(Data *d);
 
 	int index;
-};
+};*/
 
 #endif /* SRC_ACTION_LAYER_ACTIONLAYERDELETE_H_ */

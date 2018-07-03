@@ -8,7 +8,7 @@
 #ifndef SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_
 #define SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_
 
-#include "../ActionGroup.h"
+/*#include "../ActionGroup.h"
 
 class Song;
 
@@ -20,6 +20,6 @@ public:
 	virtual void build(Data *d);
 
 	int source, target;
-};
+};*/
 
 #endif /* SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_ */

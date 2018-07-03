@@ -59,15 +59,17 @@ public:
 	virtual void read(File *f)
 	{
 		int num = f->read_int();
-		me->layers.clear();
 		for (int i=0;i<num;i++)
-			me->layers.add(new Song::Layer(f->read_str()));
+			f->read_str();
+		/*me->layers.clear();
+		for (int i=0;i<num;i++)
+			me->layers.add(new Song::Layer(f->read_str()));*/
 	}
 	virtual void write(File *f)
 	{
-		f->write_int(me->layers.num);
+		/*f->write_int(me->layers.num);
 		for (auto l: me->layers)
-			f->write_str(l->name);
+			f->write_str(l->name);*/
 	}
 };
 
@@ -848,6 +850,11 @@ public:
 	virtual void read(File *f)
 	{
 		n = f->read_int();
+		if (n > 0){
+			TrackLayer l;
+			l.type = l.TYPE_MAIN;
+			parent->layers.add(l);
+		}
 		me = &parent->layers[n];
 	}
 	virtual void write(File *f)
@@ -1114,7 +1121,7 @@ public:
 	{
 		write_sub("format", me);
 		write_sub_array("tag", me->tags);
-		write_sub("lvlname", me);
+	//	write_sub("lvlname", me);
 		write_sub_parray("bar", me->bars);
 		write_sub_parray("sample", me->samples);
 		write_sub_parray("track", me->tracks);
@@ -1199,6 +1206,13 @@ void FormatNami::make_consistent(Song *a)
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
 				s->midi.samples = s->midi.back()->range.end();
 			}
+		}
+	}
+
+	for (Track *t: a->tracks){
+		for (int i=t->layers.num-1; i>=1; i--){
+			if (t->layers[i].buffers.num == 0)
+				t->layers.erase(i);
 		}
 	}
 }

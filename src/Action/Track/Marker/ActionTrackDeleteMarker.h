@@ -24,7 +24,7 @@ public:
 private:
 	int index;
 	TrackMarker *marker;
-	int track_no;
+	Track *track;
 };
 
 #endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_ */

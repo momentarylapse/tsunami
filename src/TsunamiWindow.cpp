@@ -196,9 +196,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// events
 	event("hui:close", std::bind(&TsunamiWindow::onExit, this));
-	for (int i=0;i<256;i++)
-		event(format("jump_to_layer_%d", i), std::bind(&TsunamiWindow::onCurLayer, this));
-
 
 	auto_delete = false;
 
@@ -706,16 +703,6 @@ void TsunamiWindow::onZoomOut()
 	view->zoomOut();
 }
 
-bool menu_layer_names_needs_update(TsunamiWindow *win)
-{
-	if (win->menu_layer_names.num != win->song->layers.num)
-		return true;
-	for (int i=0; i<win->menu_layer_names.num; i++)
-		if (win->menu_layer_names[i] != win->song->getNiceLayerName(i))
-			return true;
-	return false;
-}
-
 void TsunamiWindow::updateMenu()
 {
 // menu / toolbar
@@ -732,9 +719,9 @@ void TsunamiWindow::updateMenu()
 	enable("delete_track", view->cur_track);
 	enable("track_properties", view->cur_track);
 	// layer
-	enable("layer_delete", song->layers.num > 1);
+/*	enable("layer_delete", song->layers.num > 1);
 	enable("layer_up", view->cur_layer < song->layers.num -1);
-	enable("layer_down", view->cur_layer > 0);
+	enable("layer_down", view->cur_layer > 0);*/
 	// bars
 	enable("delete_time", !view->sel.range.empty());
 	enable("delete_bars", view->sel.bars.num > 0);
@@ -756,19 +743,6 @@ void TsunamiWindow::updateMenu()
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
 	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
-
-	if (menu_layer_names_needs_update(this)){
-		hui::Menu *m = getMenu()->getSubMenuByID("menu_layer_target");
-		if (m){
-			m->clear();
-			menu_layer_names.clear();
-			for (int i=0; i<song->layers.num; i++){
-				menu_layer_names.add(song->getNiceLayerName(i));
-				m->addItemCheckable(song->getNiceLayerName(i), format("jump_to_layer_%d", i));
-			}
-			check(format("jump_to_layer_%d", view->cur_layer), true);
-		}
-	}
 
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->isSave())

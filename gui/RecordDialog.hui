@@ -10,15 +10,15 @@ Dialog record_dialog "Aufnahme" width=300 height=200
 			Text rdt_multi_type "Type" bold
 			Text rdt_multi_source "Source" bold
 		Group rdt_capture "Recording"
-			Grid ? ""
+			Grid ? "" vertical
 				Grid ? "" noexpandy
 					Text time "0:00" width=120
 					DrawingArea level "" height=25
-				---|
 				Grid ? ""
 					Button start "" flat image=hui:media-record
 					Button pause "" flat image=hui:media-pause
 					Button dump "Dump" flat image=hui:delete
+				Button new_version "Start new version"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

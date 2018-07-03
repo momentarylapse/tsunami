@@ -10,7 +10,7 @@
 
 ActionTrackAddMidiNote::ActionTrackAddMidiNote(Track* t, MidiNote* n)
 {
-	track_no = get_track_index(t);
+	track = t;
 	note = n;
 
 	insert_index = 0;
@@ -27,20 +27,14 @@ ActionTrackAddMidiNote::~ActionTrackAddMidiNote()
 
 void* ActionTrackAddMidiNote::execute(Data* d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
-	t->midi.insert(note, insert_index);
+	track->midi.insert(note, insert_index);
 	note = NULL;
 
-	return NULL;
+	return note;
 }
 
 void ActionTrackAddMidiNote::undo(Data* d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
-	note = t->midi[insert_index];
-	t->midi.erase(insert_index);
+	note = track->midi[insert_index];
+	track->midi.erase(insert_index);
 }

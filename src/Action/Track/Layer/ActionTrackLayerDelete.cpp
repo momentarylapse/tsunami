@@ -5,11 +5,11 @@
  *      Author: michi
  */
 
-#include "ActionLayerDelete.h"
-
+#include "ActionTrackLayerDelete.h"
+/*
 #include "../../Data/Song.h"
 #include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
-#include "ActionLayer__Delete.h"
+#include "ActionTrackLayer__Delete.h"
 
 ActionLayerDelete::ActionLayerDelete(int _index)
 {
@@ -26,5 +26,5 @@ void ActionLayerDelete::build(Data *d)
 	}
 
 	addSubAction(new ActionLayer__Delete(index), s);
-}
+}*/
 

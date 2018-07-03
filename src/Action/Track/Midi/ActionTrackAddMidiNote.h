@@ -23,7 +23,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	int track_no;
+	Track *track;
 	MidiNote *note;
 	int insert_index;
 };

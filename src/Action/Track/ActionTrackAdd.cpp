@@ -36,7 +36,6 @@ void *ActionTrackAdd::execute(Data *d)
 	Track *t = new Track(type, CreateSynthesizer(a->session, "Dummy"));
 
 	t->song = a;
-	t->layers.resize(a->layers.num);
 
 	a->tracks.insert(t, index);
 

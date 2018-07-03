@@ -8,9 +8,8 @@
 #include "ActionTrackEditMidiNote.h"
 #include "../../../Data/Track.h"
 
-ActionTrackEditMidiNote::ActionTrackEditMidiNote(Track *t, MidiNote *n, const Range &range, float _pitch, float _volume)
+ActionTrackEditMidiNote::ActionTrackEditMidiNote(MidiNote *n, const Range &range, float _pitch, float _volume)
 {
-	track_no = get_track_index(t);
 	note = n;
 	offset = range.offset;
 	length = range.length;

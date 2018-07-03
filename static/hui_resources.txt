@@ -2716,10 +2716,10 @@ rdt_capture
 1
 Grid
 ?
-
+vertical
 0
 0
-2
+3
 Grid
 ?
 noexpandy
@@ -2741,8 +2741,8 @@ height=25
 Grid
 ?
 
-0
 1
+0
 3
 Button
 start
@@ -2759,6 +2759,12 @@ flat,image=hui:media-pause
 Button
 dump
 flat,image=hui:delete
+2
+0
+0
+Button
+new_version
+
 2
 0
 0
@@ -3889,7 +3895,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-374
+375
 // Text
 /cancel
 Cancel
@@ -4731,6 +4737,9 @@ Dump
 record_dialog/grp_source
 Source
 
+record_dialog/new_version
+Start new version
+
 record_dialog/rdt_capture
 Recording
 
@@ -5019,7 +5028,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-471
+472
 // Text
 /cancel
 Abbrechen
@@ -6070,6 +6079,9 @@ Quelle
 
 record_dialog/grp_source
 Quelle
+
+record_dialog/new_version
+Neue Version starten
 
 record_dialog/rdt_audio_source
 Quelle

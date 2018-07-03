@@ -13,6 +13,11 @@
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Data/ActionTrackSetInstrument.h"
+/*#include "../Action/Track/ActionTrackLayerAdd.h"
+#include "../Action/Track/ActionTrackLayerDelete.h"
+#include "../Action/Track/ActionTrackLayerMerge.h"
+#include "../Action/Track/ActionTrackLayerMove.h"
+#include "../Action/Track/ActionTrackLayerRename.h"*/
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -70,6 +75,9 @@ Track::Track(int _type, Synthesizer *_synth)
 	muted = false;
 
 	synth = _synth;
+
+	layers.resize(1);
+	layers[0].type = TrackLayer::TYPE_MAIN;
 }
 
 //tsunami->plugin_manager->CreateSynthesizer("Dummy", song)
@@ -343,9 +351,7 @@ void Track::deleteMarker(const TrackMarker *marker)
 
 void Track::editMarker(const TrackMarker *marker, const Range &range, const string &text)
 {
-	foreachi(const TrackMarker *m, markers, index)
-		if (m == marker)
-			song->execute(new ActionTrackEditMarker(this, index, range, text));
+	song->execute(new ActionTrackEditMarker((TrackMarker*)marker, range, text));
 }
 
 

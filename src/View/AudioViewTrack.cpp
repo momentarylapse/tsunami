@@ -369,26 +369,58 @@ void AudioViewTrack::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 	}
 }
 
-void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
+void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
 {
 	// non-current layers
 	foreachi(TrackLayer &lev, track->layers, layer_no){
 		if (layer_no == view->cur_layer)
 			continue;
 		for (AudioBuffer &b: lev.buffers)
-			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
+			tv->drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
 	for (AudioBuffer &b: track->layers[view->cur_layer].buffers)
-		drawBuffer(c, b, view_pos_rel, view->colors.text);
+		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
 
 	if (view->sel.has(track)){
 		// selection
 		for (AudioBuffer &b: track->layers[view->cur_layer].buffers){
-			drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}
+}
+
+void _draw_buffers_main(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
+{
+	// current
+	for (AudioBuffer &b: track->layers[0].buffers)
+		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
+
+	if (view->sel.has(track)){
+		// selection
+		for (AudioBuffer &b: track->layers[0].buffers){
+			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+		}
+	}
+}
+
+void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
+{
+	rect r0 = area;
+	float hmain = area.height() * 3 / (track->layers.num + 2);
+	area.y2 = area.y1 + hmain;
+	//_draw_buffers_all(c, track, view, view_pos_rel, this);
+	_draw_buffers_main(c, track, view, view_pos_rel, this);
+
+	for (int i=1; i<track->layers.num; i++){
+		float dh = (r0.height() - hmain) / (track->layers.num - 1);
+		area .y1 = r0.y1 + hmain + dh * (i-1);
+		area .y2 = r0.y1 + hmain + dh * i;
+		for (AudioBuffer &b: track->layers[i].buffers)
+			drawBuffer(c, b, view_pos_rel, view->colors.text);
+	}
+	area = r0;
 }
 
 void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)

@@ -374,7 +374,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
 	Kaba::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
 	Kaba::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
-	Kaba::DeclareClassOffset("Song", "layers", _offsetof(Song, layers));
+//	Kaba::DeclareClassOffset("Song", "layers", _offsetof(Song, layers));
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);

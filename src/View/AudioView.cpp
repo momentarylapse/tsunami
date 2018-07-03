@@ -29,7 +29,7 @@
 #include "../lib/threads/Mutex.h"
 
 const int AudioView::FONT_SIZE = 10;
-const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
+const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125/2;
 const float AudioView::LINE_WIDTH = 1.0f;
 const float AudioView::CORNER_RADIUS = 8.0f;
 const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
@@ -631,10 +631,10 @@ void AudioView::checkConsistency()
 			setCurTrack(song->tracks[0]);
 
 	// check cur_layer consistency
-	if ((cur_layer < 0) or (cur_layer >= song->layers.num)){
+/*	if ((cur_layer < 0) or (cur_layer >= song->layers.num)){
 		cur_layer = 0;
 		forceRedraw();
-	}
+	}*/
 }
 
 void AudioView::onSongUpdate()
@@ -1177,7 +1177,7 @@ void AudioView::setCurLayer(int l)
 {
 	if (cur_layer == l)
 		return;
-	if ((l < 0) or (l >= song->layers.num))
+	if ((l < 0) /*or (l >= song->layers.num)*/)
 		return;
 	cur_layer = l;
 	forceRedraw();

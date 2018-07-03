@@ -5,13 +5,13 @@
  *      Author: michi
  */
 
-#include "ActionLayerMerge.h"
-
+#include "ActionTrackLayerMerge.h"
+/*
 #include "../Track/Buffer/ActionTrackEditBuffer.h"
 #include "../Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../../Data/Song.h"
 #include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
-#include "ActionLayer__Delete.h"
+#include "ActionTrackLayer__Delete.h"
 
 ActionLayerMerge::ActionLayerMerge(int _source, int _target)
 {
@@ -40,4 +40,4 @@ void ActionLayerMerge::build(Data *d)
 
 	addSubAction(new ActionLayer__Delete(source), d);
 }
-
+*/

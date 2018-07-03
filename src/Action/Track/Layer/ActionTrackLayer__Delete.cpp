@@ -1,34 +1,27 @@
 /*
- * ActionLayer__Delete.cpp
+ * ActionTrackLayer__Delete.cpp
  *
  *  Created on: 27.08.2016
  *      Author: michi
  */
 
-#include "../../Data/Song.h"
+#include "ActionTrackLayer__Delete.h"
+
+#include "../../../Data/Song.h"
 #include <assert.h>
-#include "ActionLayer__Delete.h"
 
-ActionLayer__Delete::ActionLayer__Delete(int _index)
+ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)
 {
+	track = t;
 	index = _index;
-	layer = NULL;
+	type = t->layers[index].type;
 }
 
-ActionLayer__Delete::~ActionLayer__Delete()
-{
-	if (layer)
-		delete((Song::Layer*)layer);
-}
-
-void* ActionLayer__Delete::execute(Data* d)
+void* ActionTrackLayer__Delete::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
-	assert(index < a->layers.num);
-
-	layer = a->layers[index];
-	a->layers.erase(index);
+	assert(index < track->layers.num);
 
 	for (Track *t: a->tracks){
 		assert(t->layers[index].buffers.num == 0);
@@ -40,14 +33,12 @@ void* ActionLayer__Delete::execute(Data* d)
 	return NULL;
 }
 
-void ActionLayer__Delete::undo(Data* d)
+void ActionTrackLayer__Delete::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	a->layers.insert((Song::Layer*)layer, index);
-	layer = NULL;
-
 	TrackLayer new_layer;
+	new_layer.type = type;
 	for (Track *t: a->tracks)
 		t->layers.insert(new_layer, index);
 

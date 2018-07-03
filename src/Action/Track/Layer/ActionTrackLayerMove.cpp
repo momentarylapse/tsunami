@@ -5,8 +5,9 @@
  *      Author: michi
  */
 
-#include "ActionLayerMove.h"
-#include "../../Data/Song.h"
+#include "ActionTrackLayerMove.h"
+
+/*#include "../../Data/Song.h"
 
 ActionLayerMove::ActionLayerMove(int _source, int _target)
 {
@@ -34,4 +35,4 @@ void ActionLayerMove::undo(Data* d)
 	for (Track *t: a->tracks)
 		t->layers.move(target, source);
 }
-
+*/

@@ -31,6 +31,13 @@ class TrackLayer
 {
 public:
 	Array<AudioBuffer> buffers;
+
+	enum Type
+	{
+		TYPE_MAIN,
+		TYPE_ALTERNATIVE,
+	};
+	int type;
 };
 
 class TrackMarker
@@ -68,6 +75,10 @@ public:
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
+	void _cdecl addLayer(int type);
+	void _cdecl deleteLayer(int index);
+	void _cdecl mergeLayers(int source, int target);
+	void _cdecl moveLayer(int source, int target);
 	void _cdecl move(int target);
 	AudioBuffer _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);

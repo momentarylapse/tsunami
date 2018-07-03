@@ -270,13 +270,13 @@ void ViewModeDefault::onKeyUp(int k)
 
 void ViewModeDefault::updateTrackHeights()
 {
-	int n_ch = 1;
+	int n_ch = 2;
 	for (AudioViewTrack *t: view->vtrack){
 		t->height_min = view->TIME_SCALE_HEIGHT * 2;
 		if (t->track->type == Track::Type::AUDIO)
-			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch + view->TIME_SCALE_HEIGHT * 2 * (t->track->layers.num - 1);
 		else if (t->track->type == Track::Type::MIDI)
-			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
 		else
 			t->height_wish =view->TIME_SCALE_HEIGHT * 2;
 	}

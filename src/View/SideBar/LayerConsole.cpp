@@ -45,14 +45,14 @@ LayerConsole::~LayerConsole()
 
 void LayerConsole::loadData()
 {
-	reset("layers");
+	/*reset("layers");
 	foreachi(Song::Layer *l, song->layers, i)
 		addString("layers", i2s(i + 1) + "\\" + l->name + "\\" + b2s(l->active));
 	if (song->layers.num > 0)
 		setInt("layers", view->cur_layer);
 
 	enable("delete_layer", song->layers.num > 1);
-	enable("merge_layer", view->cur_layer > 0);
+	enable("merge_layer", view->cur_layer > 0);*/
 }
 
 
@@ -64,16 +64,16 @@ void LayerConsole::onSelect()
 
 void LayerConsole::onEdit()
 {
-	int row = hui::GetEvent()->row;
+	/*int row = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
 	if (row < 0)
 		return;
 	if (col == 1){
-		song->renameLayer(row, getCell("layers", row, 1));
+		//song->renameLayer(row, getCell("layers", row, 1));
 	}else if (col == 2){
 		song->layers[row]->active = getCell("layers", row, 2)._bool();
 		loadData();
-	}
+	}*/
 }
 
 void LayerConsole::onMove()
@@ -82,21 +82,21 @@ void LayerConsole::onMove()
 	int target = hui::GetEvent()->row_target;
 	if ((source < 0) or (target < 0))
 		return;
-	song->moveLayer(source, target);
+	//song->moveLayer(source, target);
 	view->setCurLayer(target);
 }
 
 void LayerConsole::onAdd()
 {
 	int cur_layer = view->cur_layer;
-	song->addLayer("", cur_layer + 1);
+	//song->addLayer("", cur_layer + 1);
 	view->setCurLayer(cur_layer + 1);
 }
 
 void LayerConsole::onDelete()
 {
 	try{
-		song->deleteLayer(view->cur_layer);
+		//song->deleteLayer(view->cur_layer);
 	}catch(Song::Exception &e){
 		session->e(e.message);
 	}
@@ -104,9 +104,9 @@ void LayerConsole::onDelete()
 
 void LayerConsole::onMerge()
 {
-	int s = getInt("layers");
+	/*int s = getInt("layers");
 	if (s >= 1)
-		song->mergeLayers(s, s - 1);
+		song->mergeLayers(s, s - 1);*/
 }
 
 void LayerConsole::onEditSong()

@@ -73,13 +73,6 @@ public:
 	};
 
 
-	struct Layer
-	{
-		string name;
-		bool active;
-		Layer(const string &name);
-	};
-
 	string _cdecl get_time_str(int t);
 	string _cdecl get_time_str_fuzzy(int t, float dt);
 	string _cdecl get_time_str_long(int t);
@@ -93,7 +86,6 @@ public:
 
 	Track *_cdecl getTimeTrack();
 	int _cdecl barOffset(int index);
-	string _cdecl getNiceLayerName(int index);
 
 	string _cdecl getTag(const string &key);
 
@@ -117,11 +109,6 @@ public:
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);
-	Layer *_cdecl addLayer(const string &name, int index);
-	void _cdecl deleteLayer(int index);
-	void _cdecl mergeLayers(int source, int target);
-	void _cdecl moveLayer(int source, int target);
-	void _cdecl renameLayer(int index, const string &name);
 	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, int mode);
 	void _cdecl addPause(int index, float time, int mode);
 	void _cdecl editBar(int index, int length, int num_beats, int num_sub_beats, int mode);
@@ -160,7 +147,6 @@ public:
 	Array<Sample*> samples;
 	Array<Curve*> curves;
 	BarCollection bars;
-	Array<Layer*> layers;
 };
 
 

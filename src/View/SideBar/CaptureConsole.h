@@ -27,8 +27,8 @@ public:
 
 
 
-	virtual void onEnter();
-	virtual void onLeave();
+	void onEnter() override;
+	void onLeave() override;
 
 	void onStart();
 	void onDump();
@@ -36,6 +36,7 @@ public:
 	void onOk();
 	void onCancel();
 	void onClose();
+	void onNewVersion();
 
 	DeviceManager *device_manager;
 

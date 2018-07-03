@@ -13,11 +13,11 @@
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Data/ActionTrackSetInstrument.h"
-/*#include "../Action/Track/ActionTrackLayerAdd.h"
-#include "../Action/Track/ActionTrackLayerDelete.h"
-#include "../Action/Track/ActionTrackLayerMerge.h"
-#include "../Action/Track/ActionTrackLayerMove.h"
-#include "../Action/Track/ActionTrackLayerRename.h"*/
+#include "../Action/Track/Layer/ActionTrackLayerAdd.h"
+/*#include "../Action/Track/Layer/ActionTrackLayerDelete.h"
+#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
+#include "../Action/Track/Layer/ActionTrackLayerMove.h"
+#include "../Action/Track/Layer/ActionTrackLayerRename.h"*/
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -354,5 +354,9 @@ void Track::editMarker(const TrackMarker *marker, const Range &range, const stri
 	song->execute(new ActionTrackEditMarker((TrackMarker*)marker, range, text));
 }
 
+void Track::addLayer(int type)
+{
+	song->execute(new ActionTrackLayerAdd(this, layers.num, type));
+}
 
 

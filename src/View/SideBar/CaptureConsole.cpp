@@ -44,6 +44,7 @@ CaptureConsole::CaptureConsole(Session *session):
 	event("start", std::bind(&CaptureConsole::onStart, this));
 	event("dump", std::bind(&CaptureConsole::onDump, this));
 	event("pause", std::bind(&CaptureConsole::onPause, this));
+	event("new_version", std::bind(&CaptureConsole::onNewVersion, this));
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);
@@ -177,6 +178,16 @@ void CaptureConsole::onCancel()
 void CaptureConsole::onClose()
 {
 	bar()->_hide();
+}
+
+void CaptureConsole::onNewVersion()
+{
+	if (view->isPlaybackActive()){
+		view->stream->unsubscribe(this);
+		view->stop();
+	}
+	mode->insert();
+	onStart();
 }
 
 void CaptureConsole::updateTime()

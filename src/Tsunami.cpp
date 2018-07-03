@@ -133,6 +133,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));
 			msg_write(format("tracks: %d", song->tracks.num));
+			msg_write(format("layers: %d", song->layers.num));
 			int n = 0;
 			for (Track *t: song->tracks)
 				n += t->samples.num;

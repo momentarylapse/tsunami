@@ -27,11 +27,14 @@ class AudioEffect;
 
 
 
-class TrackLayer
+class TrackLayer : public Observable<VirtualBase>
 {
 public:
 	TrackLayer(){}
 	TrackLayer(Track *track, bool is_main);
+	~TrackLayer();
+
+	Range range(int keep_notes = 0) const;
 	AudioBuffer _cdecl readBuffers(const Range &r);
 
 	// actions
@@ -86,7 +89,6 @@ public:
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);
 	void _cdecl move(int target);
-	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
 	void _cdecl addEffect(AudioEffect *effect);
 	void _cdecl deleteEffect(int index);
 	void _cdecl editEffect(int index, const string &param_old);
@@ -98,15 +100,18 @@ public:
 	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
 	void _cdecl deleteSampleRef(SampleRef *ref);
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
-	void _cdecl addMidiNote(MidiNote *n);
-	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
-	void _cdecl deleteMidiNote(const MidiNote *note);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
 	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
 	TrackMarker* _cdecl addMarker(const Range &range, const string &text);
 	void _cdecl deleteMarker(const TrackMarker *marker);
 	void _cdecl editMarker(const TrackMarker *marker, const Range &range, const string &text);
+
+
+	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
+	void _cdecl addMidiNote(MidiNote *n);
+	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
+	void _cdecl deleteMidiNote(const MidiNote *note);
 
 
 	enum Type{
@@ -128,12 +133,12 @@ public:
 	bool muted;
 
 	Array<AudioEffect*> fx;
+	Array<MidiEffect*> midi_fx;
 	Array<SampleRef*> samples;
-
-	Synthesizer *synth;
 
 	MidiNoteBuffer midi;
 
+	Synthesizer *synth;
 
 	Array<TrackMarker*> markers;
 

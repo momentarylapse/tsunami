@@ -11,27 +11,29 @@
 
 ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, MidiEffect *_effect)
 {
-	track_no = get_track_index(t);
+	track = t;
 	effect = _effect;
+}
+
+ActionTrackAddMidiEffect::~ActionTrackAddMidiEffect()
+{
+	if (effect)
+		delete effect;
 }
 
 void *ActionTrackAddMidiEffect::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	Track *t = a->get_track(track_no);
-	t->midi.fx.add(effect);
-	t->notify(t->MESSAGE_ADD_MIDI_EFFECT);
+	track->midi_fx.add(effect);
+	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
+	effect = NULL;
 
 	return NULL;
 }
 
 void ActionTrackAddMidiEffect::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
+	effect = track->midi_fx.pop();
 	effect->Observable::notify(effect->MESSAGE_DELETE);
-	Track *t = a->get_track(track_no);
-	t->midi.fx.pop();
-	t->notify(t->MESSAGE_DELETE_MIDI_EFFECT);
+	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
 }
 

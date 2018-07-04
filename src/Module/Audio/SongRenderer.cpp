@@ -295,7 +295,7 @@ void SongRenderer::build_data()
 			for (auto c: t->samples)
 				if (c->type() == t->Type::MIDI)
 					_midi.append(*c->midi, c->pos);
-			for (MidiEffect *fx: t->midi.fx){
+			for (MidiEffect *fx: t->midi_fx){
 				fx->prepare();
 				fx->process(&_midi);
 			}

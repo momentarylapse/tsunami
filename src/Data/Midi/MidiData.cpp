@@ -373,7 +373,6 @@ void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi)
 		add(n->copy());
 
 	samples = midi.samples;
-	fx = midi.fx;
 }
 
 void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi)
@@ -384,7 +383,6 @@ void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi)
 		add(n->copy());
 
 	samples = midi.samples;
-	fx = midi.fx;
 }
 
 Range MidiNoteBuffer::range(int elongation) const

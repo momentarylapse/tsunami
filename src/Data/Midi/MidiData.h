@@ -71,8 +71,6 @@ public:
 	//void update_meta(const Instrument &i, const Scale &s) const;
 	void update_meta(Track *t, const Scale &s) const;
 	void clear_meta() const;
-
-	Array<MidiEffect*> fx;
 };
 
 class MidiNoteBufferRef : public MidiNoteBuffer

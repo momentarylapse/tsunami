@@ -16,13 +16,14 @@ class ActionTrackDeleteMidiEffect: public Action
 {
 public:
 	ActionTrackDeleteMidiEffect(Track *t, int index);
+	~ActionTrackDeleteMidiEffect();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	MidiEffect *effect;
-	int track_no;
+	Track *track;
 	int index;
 };
 

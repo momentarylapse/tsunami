@@ -65,6 +65,24 @@ TrackLayer::TrackLayer(Track *t, bool _is_main)
 	is_main = _is_main;
 }
 
+TrackLayer::~TrackLayer()
+{
+	//midi.deep_clear();
+}
+
+Range TrackLayer::range(int keep_notes) const
+{
+	Range r = Range::EMPTY;
+
+	for (AudioBuffer &b: buffers)
+		r = r or b.range();
+
+	/*if ((type == Track::Type::MIDI) and (midi.num > 0))
+		r = r or midi.range(keep_notes);*/
+
+	return r;
+}
+
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
@@ -91,8 +109,6 @@ Track::Track(int _type, Synthesizer *_synth)
 
 Track::~Track()
 {
-	midi.deep_clear();
-
 	for (TrackLayer *l: layers)
 		delete(l);
 	layers.clear();
@@ -101,9 +117,15 @@ Track::~Track()
 		delete(f);
 	fx.clear();
 
+	for (MidiEffect *f: midi_fx)
+		delete(f);
+	midi_fx.clear();
+
 	for (SampleRef *r: samples)
 		delete(r);
 	samples.clear();
+
+	midi.deep_clear();
 
 	if (synth)
 		delete(synth);
@@ -114,8 +136,7 @@ Range Track::range() const
 	Range r = Range::EMPTY;
 
 	for (TrackLayer *l: layers)
-		for (AudioBuffer &b: l->buffers)
-			r = r or b.range();
+		r = r or l->range(synth->keep_notes);
 
 	for (SampleRef *s: samples)
 		r = r or s->range();
@@ -123,7 +144,7 @@ Range Track::range() const
 	for (TrackMarker *m: markers)
 		r = r or m->range;
 
-	if ((type == Type::MIDI) and (midi.num > 0))
+	if ((type == Track::Type::MIDI) and (midi.num > 0))
 		r = r or midi.range(synth->keep_notes);
 
 	return r;
@@ -317,12 +338,12 @@ void Track::addMidiEffect(MidiEffect *effect)
 // execute after editing...
 void Track::editMidiEffect(int index, const string &param_old)
 {
-	song->execute(new ActionTrackEditMidiEffect(this, index, param_old, midi.fx[index]));
+	song->execute(new ActionTrackEditMidiEffect(this, index, param_old, midi_fx[index]));
 }
 
 void Track::enableMidiEffect(int index, bool enabled)
 {
-	if (midi.fx[index]->enabled != enabled)
+	if (midi_fx[index]->enabled != enabled)
 		song->execute(new ActionTrackToggleMidiEffectEnabled(this, index));
 }
 

@@ -639,7 +639,8 @@ public:
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
-		parent->fx.add(me);
+		//parent->fx.add(me);
+		msg_write("todo: nami midi fx");
 	}
 	virtual void write(File *f)
 	{
@@ -685,7 +686,7 @@ public:
 	{
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
-		add_child(new FileChunkMidiEffect);
+		//add_child(new FileChunkMidiEffect);
 	}
 	virtual void create(){ me = &parent->midi; }
 	virtual void read(File *f)
@@ -732,7 +733,7 @@ public:
 	}
 	virtual void write_subs()
 	{
-		write_sub_parray("effect", me->fx);
+		//write_sub_parray("effect", me->fx);
 	}
 };
 
@@ -791,7 +792,7 @@ public:
 	}
 	virtual void write_subs()
 	{
-		write_sub_parray("effect", me->fx);
+		write_sub_parray("effect", parent->midi_fx);
 	}
 };
 

@@ -11,6 +11,7 @@
 #include "../lib/math/math.h"
 
 class Track;
+class TrackLayer;
 class Painter;
 class AudioView;
 class AudioBuffer;
@@ -93,6 +94,18 @@ public:
 
 	float clef_dy;
 	float clef_y0;
+
+
+	class Layer
+	{
+	public:
+		TrackLayer *layer;
+		rect area;
+		rect area_last, area_target;
+		int height_wish, height_min;
+		AudioView *view;
+	};
+	Array<Layer*> layers;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

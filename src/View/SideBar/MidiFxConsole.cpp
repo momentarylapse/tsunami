@@ -210,12 +210,12 @@ void MidiFxConsole::setTrack(Track *t)
 
 
 	if (track){
-		foreachi(MidiEffect *e, track->midi.fx, i){
+		foreachi(MidiEffect *e, track->midi_fx, i){
 			panels.add(new SingleMidiFxPanel(session, track, e, i));
 			embed(panels.back(), id_inner, 0, i*2 + 3);
 			addSeparator("!horizontal", 0, i*2 + 4, "separator_" + i2s(i));
 		}
-		hideControl("comment_no_fx", track->midi.fx.num > 0);
+		hideControl("comment_no_fx", track->midi_fx.num > 0);
 	}else{
 		hideControl("comment_no_fx", false);
 	}

@@ -11,37 +11,37 @@
 
 ActionTrackDeleteMidiEffect::ActionTrackDeleteMidiEffect(Track *t, int _index)
 {
-	track_no = get_track_index(t);
+	track = t;
 	index = _index;
 	effect = NULL;
 }
 
+ActionTrackDeleteMidiEffect::~ActionTrackDeleteMidiEffect()
+{
+	if (effect)
+		delete effect;
+}
+
 void *ActionTrackDeleteMidiEffect::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
+	assert(index < track->midi_fx.num);
 
-	Track *t = a->get_track(track_no);
-	assert(index < t->midi.fx.num);
-
-	effect = t->midi.fx[index];
+	effect = track->midi_fx[index];
 	effect->Observable::notify(effect->MESSAGE_DELETE);
-	t->midi.fx.erase(index);
-	t->notify(t->MESSAGE_DELETE_MIDI_EFFECT);
+	track->midi_fx.erase(index);
+	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
 
 	return NULL;
 }
 
 void ActionTrackDeleteMidiEffect::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
+	assert(index <= track->midi_fx.num);
 
-	Track *t = a->get_track(track_no);
-	assert(t);
-	assert(index <= t->midi.fx.num);
-
-	t->midi.fx.insert(effect, index);
-	t->notify(t->MESSAGE_ADD_MIDI_EFFECT);
+	track->midi_fx.insert(effect, index);
+	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
+	effect = NULL;
 }
 

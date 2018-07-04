@@ -337,7 +337,7 @@ Track *Song::addTrack(int type, int index)
 	}
 	if (index < 0)
 		index = tracks.num;
-	return (Track*)execute(new ActionTrackAdd(type, index));
+	return (Track*)execute(new ActionTrackAdd(new Track(type, CreateSynthesizer(session, "")), index));
 }
 
 Track *Song::addTrackAfter(int type, Track *ref)

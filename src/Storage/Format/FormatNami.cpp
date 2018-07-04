@@ -1058,6 +1058,7 @@ public:
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		me->type = f->read_int();
+		me->layers[0]->type = me->type;
 		me->panning = f->read_float();
 		me->instrument = Instrument(f->read_int());
 		f->read_int(); // reserved
@@ -1210,7 +1211,7 @@ void FormatNami::make_consistent(Song *a)
 
 	for (Track *t: a->tracks){
 		for (int i=t->layers.num-1; i>=1; i--){
-			if (t->layers[i]->buffers.num == 0)
+			if ((t->layers[i]->buffers.num == 0) and (t->layers[i]->midi.num == 0))
 				t->layers.erase(i);
 		}
 	}

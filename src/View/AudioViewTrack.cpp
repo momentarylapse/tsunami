@@ -138,7 +138,6 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 	solo = false;
 
 	area = rect(0, 0, 0, 0);
-	height_min = height_wish = 0;
 }
 
 AudioViewTrack::~AudioViewTrack()

@@ -15,13 +15,15 @@ class Track;
 class ActionTrackAdd : public Action
 {
 public:
-	ActionTrackAdd(int _type, int index);
+	ActionTrackAdd(Track *t, int index);
+	~ActionTrackAdd();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int index, type;
+	Track *track;
+	int index;
 };
 
 #endif /* ACTIONTRACKADD_H_ */

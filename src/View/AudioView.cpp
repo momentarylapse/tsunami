@@ -649,9 +649,13 @@ void AudioView::onSongUpdate()
 		updateTracks();
 		sel.range = Range(0, 0);
 		sel.clear();
-		for (Track *t: song->tracks)
+		for (Track *t: song->tracks){
 			sel.add(t);
+			for (TrackLayer *l: t->layers)
+				sel.add(l);
+		}
 		setCurTrack(NULL);
+		setCurLayer(NULL);
 		if (song->tracks.num > 0){
 			if ((song->tracks[0]->type == Track::Type::TIME) and song->tracks.num > 1)
 				setCurTrack(song->tracks[1]);

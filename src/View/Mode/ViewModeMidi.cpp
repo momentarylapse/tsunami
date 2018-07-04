@@ -334,18 +334,23 @@ void ViewModeMidi::onKeyDown(int k)
 
 void ViewModeMidi::updateTrackHeights()
 {
-	for (AudioViewTrack *t: view->vtrack){
-		t->height_min = view->TIME_SCALE_HEIGHT;
-		if (t->track->type == Track::Type::AUDIO){
-			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
-		}else if (t->track->type == Track::Type::MIDI){
-			if (t->track == view->cur_track){
-				if (view->midi_view_mode == view->MidiMode::CLASSICAL)
-					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
-				else
-					t->height_wish = 5000;
+	int n_ch = 2;
+	for (AudioViewLayer *t: view->vlayer){
+		t->height_min = view->TIME_SCALE_HEIGHT * 2;
+		if (t->layer->is_main){
+			if (t->layer->type == Track::Type::AUDIO){
+				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+			}else if (t->layer->type == Track::Type::MIDI){
+				if (t->layer == view->cur_layer){
+					if (view->midi_view_mode == view->MidiMode::CLASSICAL)
+						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+					else
+						t->height_wish = 5000;
+				}else{
+					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+				}
 			}else{
-				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+				t->height_wish = view->TIME_SCALE_HEIGHT * 2;
 			}
 		}else{
 			t->height_wish = view->TIME_SCALE_HEIGHT * 2;

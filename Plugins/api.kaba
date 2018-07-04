@@ -270,6 +270,10 @@ class TrackLayer
 	AudioBuffer[] buffers
 	extern AudioBuffer get_buffers(Range r)
 	extern AudioBuffer read_buffers(Range r)
+	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
+	extern void add_midi_note(MidiNote *n)
+	//extern void add_midi_notes(MidiNoteBuffer midi)
+	extern void delete_midi_note(MidiNote *n)
 
 class Sample // TODO
 	string name
@@ -322,7 +326,6 @@ class Track
 	extern void set_muted(bool muted)
 	extern void set_volume(float volume)
 	extern void set_panning(float panning)
-	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
 	extern void add_effect(AudioEffect *effect)
 	extern void delete_effect(int index)
 	extern void edit_effect(int index, string param_old)
@@ -330,9 +333,6 @@ class Track
 	extern SampleRef* add_sample_ref(int pos, Sample* sample)
 	extern void delete_sample_ref(int index)
 	extern void edit_sample_ref(int index, float volume, bool mute, int rep_num, int rep_delay)
-	extern void add_midi_note(MidiNote *n)
-	//extern void add_midi_notes(MidiNoteBuffer midi)
-	extern void delete_midi_note(MidiNote *n)
 	extern void set_synthesizer(Synthesizer *synth)
 	extern TrackMarker* add_marker(Range range, string text)
 	extern void delete_marker(TrackMarker *marker)

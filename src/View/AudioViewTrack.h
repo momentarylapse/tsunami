@@ -105,15 +105,12 @@ public:
 
 	Track *track;
 	rect area;
-	rect area_last, area_target;
 	Array<rect> marker_areas;
 	Array<rect> marker_label_areas;
 	Array<int> reference_tracks;
 	bool solo;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
-
-	int height_wish, height_min;
 
 
 	//Array<AudioViewLayer*> layers;

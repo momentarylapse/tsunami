@@ -271,24 +271,16 @@ void ViewModeDefault::onKeyUp(int k)
 void ViewModeDefault::updateTrackHeights()
 {
 	int n_ch = 2;
-	for (AudioViewTrack *t: view->vtrack){
-		t->height_min = view->TIME_SCALE_HEIGHT * 2;
-		if (t->track->type == Track::Type::AUDIO)
-			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch + view->TIME_SCALE_HEIGHT * 2 * (t->track->layers.num - 1);
-		else if (t->track->type == Track::Type::MIDI)
-			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
-		else
-			t->height_wish =view->TIME_SCALE_HEIGHT * 2;
-	}
 	for (AudioViewLayer *t: view->vlayer){
+		t->height_min = view->TIME_SCALE_HEIGHT * 2;
 		if (t->layer->is_main){
-			t->height_min = view->TIME_SCALE_HEIGHT * 2;
-			if (t->layer->type == Track::Type::AUDIO)
+			if (t->layer->type == Track::Type::AUDIO){
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-			else if (t->layer->type == Track::Type::MIDI)
+			}else if (t->layer->type == Track::Type::MIDI){
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
-			else
-				t->height_wish =view->TIME_SCALE_HEIGHT * 2;
+			}else{
+				t->height_wish = view->TIME_SCALE_HEIGHT * 2;
+			}
 		}else{
 			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
 		}

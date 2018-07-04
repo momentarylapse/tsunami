@@ -6,42 +6,44 @@
  */
 
 #include "ActionTrackAdd.h"
-#include "../../Module/Synth/Synthesizer.h"
 #include "../../Data/Song.h"
-#include "../../lib/hui/hui.h"
 #include <assert.h>
 
-ActionTrackAdd::ActionTrackAdd(int _type, int _index)
+ActionTrackAdd::ActionTrackAdd(Track *t, int _index)
 {
+	track = t;
 	index = _index;
-	type = _type;
+}
+
+ActionTrackAdd::~ActionTrackAdd()
+{
+	if (track)
+		delete track;
 }
 
 void ActionTrackAdd::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	delete(a->tracks[index]);
-	a->tracks.erase(index);
-	a->notify(a->MESSAGE_DELETE_TRACK);
+	Song *s = dynamic_cast<Song*>(d);
+	track = s->tracks[index];
+	s->tracks.erase(index);
+	s->notify(s->MESSAGE_DELETE_TRACK);
 }
 
 
 
 void *ActionTrackAdd::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
+	Song *s = dynamic_cast<Song*>(d);
+	track->song = s;
 
-	assert((index >= 0) and (index <= a->tracks.num));
+	assert((index >= 0) and (index <= s->tracks.num));
 
-	Track *t = new Track(type, CreateSynthesizer(a->session, "Dummy"));
+	s->tracks.insert(track, index);
 
-	t->song = a;
+	s->notify(s->MESSAGE_ADD_TRACK);
+	track = NULL;
 
-	a->tracks.insert(t, index);
-
-	a->notify(a->MESSAGE_ADD_TRACK);
-
-	return t;
+	return s->tracks[index];
 }
 
 

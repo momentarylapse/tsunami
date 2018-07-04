@@ -14,16 +14,15 @@
 class ActionTrackEditBuffer : public Action
 {
 public:
-	ActionTrackEditBuffer(Track *t, int _level_no, Range _range);
+	ActionTrackEditBuffer(TrackLayer *l, Range _range);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 	virtual void redo(Data *d);
 
 private:
-	int track_no;
+	TrackLayer *layer;
 	Range range;
-	int level_no;
 	AudioBuffer box;
 	int index;
 };

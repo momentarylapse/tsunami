@@ -15,6 +15,7 @@
 
 class Plugin;
 class Track;
+class TrackLayer;
 class AudioBuffer;
 class Session;
 
@@ -50,7 +51,7 @@ public:
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 
-	void do_process_track(Track *t, int layer, const Range &r);
+	void do_process_track(TrackLayer *l, const Range &r);
 };
 
 AudioEffect *_cdecl CreateAudioEffect(Session *session, const string &name);

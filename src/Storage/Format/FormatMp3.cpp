@@ -161,13 +161,13 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 		if (system("which avconv") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("yes | avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
-			od->storage->loadTrack(t, tmp, od->offset, od->layer);
+			od->storage->loadTrack(od->layer, tmp, od->offset);
 			od->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);
 		}else if (system("which ffmpeg") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("yes | ffmpeg -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
-			od->storage->loadTrack(od->track, tmp, od->offset, od->layer);
+			od->storage->loadTrack(od->layer, tmp, od->offset);
 			od->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);
 		}else

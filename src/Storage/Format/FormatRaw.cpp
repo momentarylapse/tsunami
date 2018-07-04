@@ -84,7 +84,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 			if (r > 0){
 				int dsamples = r / byte_per_sample;
 				int _offset = read / byte_per_sample + od->offset;
-				importData(od->track, data, config.channels, config.format, dsamples, _offset, od->layer);
+				importData(od->layer, data, config.channels, config.format, dsamples, _offset);
 				read += r;
 			}else{
 				throw Exception("could not read in raw file...");

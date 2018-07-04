@@ -70,8 +70,8 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 		}
 
 		// buffer
-		for (TrackLayer &l : t->layers)
-			for (AudioBuffer &b : l.buffers)
+		for (TrackLayer *l : t->layers)
+			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(r, new_length, b.offset);
 

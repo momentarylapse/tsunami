@@ -851,11 +851,9 @@ public:
 	{
 		n = f->read_int();
 		if (n > 0){
-			TrackLayer l;
-			l.type = l.TYPE_MAIN;
-			parent->layers.add(l);
+			parent->layers.add(new TrackLayer(parent, false));
 		}
-		me = &parent->layers[n];
+		me = parent->layers[n];
 	}
 	virtual void write(File *f)
 	{
@@ -1211,7 +1209,7 @@ void FormatNami::make_consistent(Song *a)
 
 	for (Track *t: a->tracks){
 		for (int i=t->layers.num-1; i>=1; i--){
-			if (t->layers[i].buffers.num == 0)
+			if (t->layers[i]->buffers.num == 0)
 				t->layers.erase(i);
 		}
 	}

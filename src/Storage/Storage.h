@@ -16,6 +16,7 @@ class Format;
 class FormatDescriptor;
 class Song;
 class Track;
+class TrackLayer;
 class AudioBuffer;
 class AudioPort;
 class StorageOperationData;
@@ -30,7 +31,7 @@ public:
 
 	bool load(Song *a, const string &filename);
 	bool load_ex(Song *a, const string &filename, bool only_metadata);
-	bool loadTrack(Track *t, const string &filename, int offset = 0, int layer = 0);
+	bool loadTrack(TrackLayer *t, const string &filename, int offset = 0);
 	bool loadBufferBox(Song *a, AudioBuffer *buf, const string &filename);
 	bool saveViaRenderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags);
 	bool save(Song *a, const string &filename);

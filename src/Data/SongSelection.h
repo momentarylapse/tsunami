@@ -14,6 +14,7 @@
 
 class Song;
 class Track;
+class TrackLayer;
 class SampleRef;
 class TrackMarker;
 class MidiNote;
@@ -42,6 +43,7 @@ public:
 	Range range;
 
 	Set<const Track*> tracks;
+	Set<const TrackLayer*> track_layers;
 	Set<const SampleRef*> samples;
 	Set<const TrackMarker*> markers;
 	Set<const MidiNote*> notes;
@@ -52,6 +54,10 @@ public:
 	void add(const Track *t);
 	void set(const Track *t, bool selected);
 	bool has(const Track *t) const;
+
+	void add(const TrackLayer *l);
+	void set(const TrackLayer *l, bool selected);
+	bool has(const TrackLayer *l) const;
 
 	void add(const SampleRef *s);
 	void set(const SampleRef *s, bool selected);

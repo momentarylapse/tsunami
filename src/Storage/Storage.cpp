@@ -99,7 +99,7 @@ bool Storage::load(Song *a, const string &filename)
 	return load_ex(a, filename, false);
 }
 
-bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
+bool Storage::loadTrack(TrackLayer *layer, const string &filename, int offset)
 {
 	current_directory = filename.dirname();
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::Flag::AUDIO);
@@ -109,8 +109,8 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 	session->i(_("loading track ") + filename);
 
 	Format *f = d->create();
-	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, session->win);
+	Song *a = layer->track->song;
+	StorageOperationData od = StorageOperationData(this, f, a, layer, NULL, filename, _("loading ") + d->description, session->win);
 	od.offset = offset;
 	od.layer = layer;
 
@@ -129,11 +129,11 @@ bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 
 	Song *aa = new Song(session);
 	aa->newWithOneTrack(Track::Type::AUDIO, a->sample_rate);
-	Track *t = aa->tracks[0];
-	bool ok = loadTrack(t, filename, 0, 0);
-	if (t->layers[0].buffers.num > 0){
-		buf->resize(t->layers[0].buffers[0].length);
-		buf->set(t->layers[0].buffers[0], 0, 1);
+	TrackLayer *l = aa->tracks[0]->layers[0];
+	bool ok = loadTrack(l, filename, 0);
+	if (l->buffers.num > 0){
+		buf->resize(l->buffers[0].length);
+		buf->set(l->buffers[0], 0, 1);
 	}
 	delete(aa);
 	return ok;

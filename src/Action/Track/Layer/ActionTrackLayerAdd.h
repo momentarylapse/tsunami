@@ -11,18 +11,20 @@
 #include "../../Action.h"
 
 class Track;
+class TrackLayer;
 
 class ActionTrackLayerAdd : public Action
 {
 public:
-	ActionTrackLayerAdd(Track *t, int index, int type);
+	ActionTrackLayerAdd(Track *t, int index, TrackLayer *l);
+	~ActionTrackLayerAdd();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 private:
 	Track *track;
 	int index;
-	int type;
+	TrackLayer *layer;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERADD_H_ */

@@ -372,20 +372,20 @@ void AudioViewTrack::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
 {
 	// non-current layers
-	foreachi(TrackLayer &lev, track->layers, layer_no){
+	foreachi(TrackLayer *lev, track->layers, layer_no){
 		if (layer_no == view->cur_layer)
 			continue;
-		for (AudioBuffer &b: lev.buffers)
+		for (AudioBuffer &b: lev->buffers)
 			tv->drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
-	for (AudioBuffer &b: track->layers[view->cur_layer].buffers)
+	for (AudioBuffer &b: track->layers[view->cur_layer]->buffers)
 		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
 
 	if (view->sel.has(track)){
 		// selection
-		for (AudioBuffer &b: track->layers[view->cur_layer].buffers){
+		for (AudioBuffer &b: track->layers[view->cur_layer]->buffers){
 			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}
@@ -394,12 +394,12 @@ void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_po
 void _draw_buffers_main(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
 {
 	// current
-	for (AudioBuffer &b: track->layers[0].buffers)
+	for (AudioBuffer &b: track->layers[0]->buffers)
 		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
 
 	if (view->sel.has(track)){
 		// selection
-		for (AudioBuffer &b: track->layers[0].buffers){
+		for (AudioBuffer &b: track->layers[0]->buffers){
 			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}
@@ -433,7 +433,7 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 
 	for (int i=1; i<track->layers.num; i++){
 		area = _version_area(this, i);
-		for (AudioBuffer &b: track->layers[i].buffers)
+		for (AudioBuffer &b: track->layers[i]->buffers)
 			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 		area = r0;
 	}

@@ -318,9 +318,9 @@ void TsunamiWindow::onTrackRender()
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
 	renderer.allow_tracks(view->get_selected_tracks());
-	AudioBuffer buf = t->getBuffers(view->cur_layer, range);
+	AudioBuffer buf = t->layers[0]->getBuffers(range);
 
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, range);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], range);
 	renderer.read(buf);
 	song->execute(a);
 	song->action_manager->endActionGroup();
@@ -487,11 +487,12 @@ void TsunamiWindow::onMenuExecuteEffect()
 	fx->reset_config();
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
-		for (Track *t : song->tracks)
-			if (view->sel.has(t) and (t->type == t->Type::AUDIO)){
-				fx->reset_state();
-				fx->do_process_track(t, view->cur_layer, view->sel.range);
-			}
+		for (Track *t: song->tracks)
+			for (TrackLayer *l: t->layers)
+				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
+					fx->reset_state();
+					fx->do_process_track(l, view->sel.range);
+				}
 		song->action_manager->endActionGroup();
 	}
 	delete(fx);
@@ -536,7 +537,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 void TsunamiWindow::onDelete()
 {
 	if (!view->sel.is_empty())
-		song->deleteSelection(view->sel, view->cur_layer, false);
+		song->deleteSelection(view->sel);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -573,7 +574,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::Type::AUDIO);
-		session->storage->loadTrack(t, hui::Filename, view->sel.range.start(), view->cur_layer);
+		session->storage->loadTrack(t->layers[view->cur_layer], hui::Filename, view->sel.range.start());
 	}
 }
 
@@ -615,7 +616,7 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertSample()
 {
-	song->insertSelectedSamples(view->sel, view->cur_layer);
+	song->insertSelectedSamples(view->sel);
 }
 
 void TsunamiWindow::onRecord()
@@ -655,7 +656,7 @@ void TsunamiWindow::onLayerManager()
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	song->createSamplesFromSelection(view->sel, view->cur_layer);
+	song->createSamplesFromSelection(view->sel);
 }
 
 void TsunamiWindow::onViewOptimal()

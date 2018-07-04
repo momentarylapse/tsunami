@@ -17,6 +17,7 @@ namespace hui{
 }
 class AudioBuffer;
 class Track;
+class TrackLayer;
 class Storage;
 class Format;
 class AudioPort;
@@ -27,7 +28,7 @@ class Session;
 class StorageOperationData
 {
 public:
-	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, AudioBuffer *b, const string &filename, const string &message, hui::Window *win);
+	StorageOperationData(Storage *storage, Format *format, Song *s, TrackLayer *l, AudioBuffer *b, const string &filename, const string &message, hui::Window *win);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -50,11 +51,11 @@ public:
 	string filename;
 	AudioBuffer *buf;
 	Track *track;
+	TrackLayer *layer;
 	AudioPort *renderer;
 	Array<Tag> tags;
 	int num_samples;
 	int offset;
-	int layer;
 
 	bool only_load_metadata;
 };

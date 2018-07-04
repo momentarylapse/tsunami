@@ -342,9 +342,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
 	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
-	//Kaba::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
-	Kaba::LinkExternal("Track.get_buffers", Kaba::mf(&Track::getBuffers));
-	Kaba::LinkExternal("Track.read_buffers", Kaba::mf(&Track::readBuffers));
+	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::getBuffers));
+	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::readBuffers));
 	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::setName));
 	Kaba::LinkExternal("Track.set_muted", Kaba::mf(&Track::setMuted));
 	Kaba::LinkExternal("Track.set_volume", Kaba::mf(&Track::setVolume));

@@ -14,7 +14,7 @@
 #include "../Data/Track.h"
 #include "../Data/Audio/AudioBuffer.h"
 
-StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
+StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, TrackLayer *l, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
 {
 	win = _win;
 	storage = _storage;
@@ -24,9 +24,10 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	filename = _filename;
 	progress = new Progress(message, win);
 	buf = b;
-	track = t;
+	msg_write("sod: " + p2s(l));
+	layer = l;
+	track = l->track;
 	offset = 0;
-	layer = 0;
 	renderer = NULL;
 	num_samples = 0;
 	only_load_metadata = false;

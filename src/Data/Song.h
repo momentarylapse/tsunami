@@ -114,10 +114,10 @@ public:
 	void _cdecl editBar(int index, int length, int num_beats, int num_sub_beats, int mode);
 	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl deleteTimeInterval(int index, const Range &range);
-	void _cdecl insertSelectedSamples(const SongSelection &sel, int layer_no);
+	void _cdecl insertSelectedSamples(const SongSelection &sel);
 	void _cdecl deleteSelectedSamples(const SongSelection &sel);
-	void _cdecl deleteSelection(const SongSelection &sel, int layer_no, bool all_layers);
-	void _cdecl createSamplesFromSelection(const SongSelection &sel, int layer_no);
+	void _cdecl deleteSelection(const SongSelection &sel);
+	void _cdecl createSamplesFromSelection(const SongSelection &sel);
 	Curve *_cdecl addCurve(const string &name, Array<Curve::Target> &targets);
 	void _cdecl deleteCurve(Curve *curve);
 	void _cdecl editCurve(Curve *curve, const string &name, float min, float max);

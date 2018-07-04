@@ -58,6 +58,13 @@ string track_type(int type)
 	return "???";
 }
 
+TrackLayer::TrackLayer(Track *t, bool _is_main)
+{
+	track = t;
+	type = t->type;
+	is_main = _is_main;
+}
+
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
@@ -76,16 +83,19 @@ Track::Track(int _type, Synthesizer *_synth)
 
 	synth = _synth;
 
-	layers.resize(1);
-	layers[0].type = TrackLayer::TYPE_MAIN;
-}
+	layers.add(new TrackLayer(this, true));
 
-//tsunami->plugin_manager->CreateSynthesizer("Dummy", song)
+	prefered_layer = NULL;
+}
 
 
 Track::~Track()
 {
 	midi.deep_clear();
+
+	for (TrackLayer *l: layers)
+		delete(l);
+	layers.clear();
 
 	for (AudioEffect *f: fx)
 		delete(f);
@@ -99,12 +109,12 @@ Track::~Track()
 		delete(synth);
 }
 
-Range Track::getRange()
+Range Track::range() const
 {
 	Range r = Range::EMPTY;
 
-	for (TrackLayer &l: layers)
-		for (AudioBuffer &b: l.buffers)
+	for (TrackLayer *l: layers)
+		for (AudioBuffer &b: l->buffers)
 			r = r or b.range();
 
 	for (SampleRef *s: samples)
@@ -135,12 +145,12 @@ int Track::get_index()
 	return song->tracks.find(this);
 }
 
-AudioBuffer Track::readBuffers(int layer_no, const Range &r)
+AudioBuffer TrackLayer::readBuffers(const Range &r)
 {
 	AudioBuffer buf;
 
 	// is <r> inside a buffer?
-	for (AudioBuffer &b: layers[layer_no].buffers){
+	for (AudioBuffer &b: buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) and (p1 <= b.length)){
@@ -154,7 +164,7 @@ AudioBuffer Track::readBuffers(int layer_no, const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (AudioBuffer &b: layers[layer_no].buffers)
+	for (AudioBuffer &b: buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
@@ -187,21 +197,21 @@ void Track::readBuffersCol(AudioBuffer &buf, int offset)
 	buf.scale(0);
 
 	// fill with overlap
-	for (TrackLayer &l: layers)
-		for (AudioBuffer &b: l.buffers)
+	for (TrackLayer *l: layers)
+		for (AudioBuffer &b: l->buffers)
 			buf.add(b, b.offset - offset, 1.0f, 0.0f);
 }
 
-AudioBuffer Track::getBuffers(int layer_no, const Range &r)
+AudioBuffer TrackLayer::getBuffers(const Range &r)
 {
-	song->execute(new ActionTrackCreateBuffers(this, layer_no, r));
-	return readBuffers(layer_no, r);
+	track->song->execute(new ActionTrackCreateBuffers(this, r));
+	return readBuffers(r);
 }
 
 void Track::invalidateAllPeaks()
 {
-	for (TrackLayer &l: layers)
-		for (AudioBuffer &b: l.buffers)
+	for (TrackLayer *l: layers)
+		for (AudioBuffer &b: l->buffers)
 			b.peaks.clear();
 }
 
@@ -354,9 +364,9 @@ void Track::editMarker(const TrackMarker *marker, const Range &range, const stri
 	song->execute(new ActionTrackEditMarker((TrackMarker*)marker, range, text));
 }
 
-void Track::addLayer(int type)
+TrackLayer *Track::addLayer(bool is_main)
 {
-	song->execute(new ActionTrackLayerAdd(this, layers.num, type));
+	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, layers.num, new TrackLayer(this, is_main)));
 }
 
 

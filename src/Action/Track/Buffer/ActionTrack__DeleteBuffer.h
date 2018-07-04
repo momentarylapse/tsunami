@@ -14,14 +14,13 @@
 class ActionTrack__DeleteBuffer : public Action
 {
 public:
-	ActionTrack__DeleteBuffer(Track *t, int level_no, int _index);
+	ActionTrack__DeleteBuffer(TrackLayer *l, int _index);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	int track_no;
-	int level_no;
+	TrackLayer *layer;
 	int index;
 	AudioBuffer buf;
 };

@@ -58,8 +58,8 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 		}
 
 		// buffer
-		for (TrackLayer &l: t->layers)
-			for (AudioBuffer &b : l.buffers)
+		for (TrackLayer *l: t->layers)
+			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= offset)
 					b.offset += delta;
 

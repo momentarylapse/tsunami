@@ -38,10 +38,10 @@ void ActionBarAdd::build(Data *d)
 		int pos0 = s->barOffset(index);
 
 		for (Track *t: s->tracks)
-			for (int l=0; l<t->layers.num; l++)
-				for (int i=t->layers[l].buffers.num-1; i>=0; i--)
-					if (t->layers[l].buffers[i].range().is_more_inside(pos0))
-						addSubAction(new ActionTrack__SplitBuffer(t, l, i, pos0 - t->layers[l].buffers[i].offset), d);
+			for (TrackLayer *l: t->layers)
+				for (int i=l->buffers.num-1; i>=0; i--)
+					if (l->buffers[i].range().is_more_inside(pos0))
+						addSubAction(new ActionTrack__SplitBuffer(l, i, pos0 - l->buffers[i].offset), d);
 
 		addSubAction(new Action__ShiftData(pos0, bar->length, mode), d);
 

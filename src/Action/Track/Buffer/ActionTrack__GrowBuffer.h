@@ -11,17 +11,19 @@
 #include "../../Action.h"
 #include "../../../Data/Track.h"
 
+class TrackLayer;
+
 class ActionTrack__GrowBuffer : public Action
 {
 public:
-	ActionTrack__GrowBuffer(Track *t, int _level_no, int _index, int _new_length);
+	ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	int track_no, index;
-	int level_no;
+	TrackLayer *layer;
+	int index;
 	int old_length, new_length;
 };
 

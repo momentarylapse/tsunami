@@ -61,24 +61,25 @@ Format::Format()
 	f = NULL;
 }
 
-void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int layer)
+void Format::importData(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)
 {
+	Track *t = layer->track;
 	if (t->song->action_manager->isEnabled()){
-		AudioBuffer buf = t->getBuffers(layer, Range(offset, samples));
+		AudioBuffer buf = layer->getBuffers(Range(offset, samples));
 
-		Action *a = new ActionTrackEditBuffer(t, layer, Range(offset, samples));
+		Action *a = new ActionTrackEditBuffer(layer, Range(offset, samples));
 		buf.import(data, channels, format, samples);
 		t->song->action_manager->execute(a);
 	}else{
-		if (t->layers[0].buffers.num == 0){
+		if (layer->buffers.num == 0){
 			AudioBuffer dummy;
-			t->layers[0].buffers.add(dummy);
+			layer->buffers.add(dummy);
 		}
 
-		if (t->layers[0].buffers[0].length < offset + samples)
-			t->layers[0].buffers[0].resize(offset + samples);
+		if (layer->buffers[0].length < offset + samples)
+			layer->buffers[0].resize(offset + samples);
 		AudioBuffer buf;
-		buf.set_as_ref(t->layers[0].buffers[0], offset, samples);
+		buf.set_as_ref(layer->buffers[0], offset, samples);
 
 		buf.import(data, channels, format, samples);
 	}

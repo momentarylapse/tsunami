@@ -11,18 +11,21 @@
 #include "../../Action.h"
 #include "../../../Data/Track.h"
 
+// TODO: move to layer
+
+class TrackLayer;
+
 class ActionTrack__AddBuffer : public Action
 {
 public:
-	ActionTrack__AddBuffer(Track *t, int _level_no, int index, Range r);
+	ActionTrack__AddBuffer(TrackLayer *l, int index, Range r);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	int track_no;
+	TrackLayer *layer;
 	int index;
-	int level_no;
 	Range range;
 };
 

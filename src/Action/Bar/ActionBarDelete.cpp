@@ -72,7 +72,7 @@ void ActionBarDelete::build(Data *d)
 			}
 		}
 
-		addSubAction(new ActionSongDeleteSelection(-1, sel, true), d);
+		addSubAction(new ActionSongDeleteSelection(sel), d);
 
 		addSubAction(new Action__ShiftData(r.end(), - r.length, Bar::EditMode::STRETCH), d);
 	}

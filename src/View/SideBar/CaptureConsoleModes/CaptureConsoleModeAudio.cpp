@@ -142,9 +142,9 @@ void CaptureConsoleModeAudio::dump()
 	cc->enable("source", true);
 }
 
-bool layer_available(TrackLayer &l, const Range &r)
+bool layer_available(TrackLayer *l, const Range &r)
 {
-	for (auto &b: l.buffers)
+	for (auto &b: l->buffers)
 		if (b.range().overlaps(r))
 			return false;
 	return true;
@@ -169,19 +169,17 @@ bool CaptureConsoleModeAudio::insert()
 	Range r = Range(i0, sucker->buf.length);
 	cc->song->action_manager->beginActionGroup();
 
-	int layer_no = -1;
-	foreachi (TrackLayer &l, target->layers, i)
+	TrackLayer *layer;
+	for (TrackLayer *l: target->layers)
 		if (layer_available(l, r)){
-			layer_no = i;
+			layer = l;
 			break;
 		}
-	if (layer_no < 0){
-		target->addLayer(TrackLayer::TYPE_ALTERNATIVE);
-		layer_no = target->layers.num - 1;
-	}
+	if (!layer)
+		layer = target->addLayer(false);
 
-	AudioBuffer tbuf = target->getBuffers(layer_no, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(target, layer_no, r);
+	AudioBuffer tbuf = layer->getBuffers(r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
 
 	if (hui::Config.getInt("Input.Mode", 0) == 1)
 		tbuf.add(sucker->buf, 0, 1.0f, 0);

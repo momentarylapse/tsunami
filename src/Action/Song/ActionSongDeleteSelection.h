@@ -16,14 +16,12 @@ class SongSelection;
 class ActionSongDeleteSelection : public ActionGroup
 {
 public:
-	ActionSongDeleteSelection(int layer_no, const SongSelection &sel, bool all_layers);
+	ActionSongDeleteSelection(const SongSelection &sel);
 
 	virtual void build(Data *d);
-	void DeleteBuffersFromTrackLayer(Song *s, Track *t, TrackLayer &l, const SongSelection &sel, int layer_no);
+	void DeleteBuffersFromTrackLayer(Song *s, Track *t, TrackLayer *l, const SongSelection &sel);
 
-	int layer_no;
 	const SongSelection &sel;
-	bool all_layers;
 };
 
 #endif /* SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_ */

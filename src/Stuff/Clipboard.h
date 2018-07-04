@@ -11,6 +11,7 @@
 #include "Observable.h"
 class Song;
 class Track;
+class TrackLayer;
 class AudioView;
 
 class Clipboard : public Observable<VirtualBase>
@@ -26,9 +27,9 @@ public:
 	bool test_compatibility(AudioView *view);
 
 	void clear();
-	void append_track(Track *t, AudioView *view);
-	void paste_track(int source_index, Track *target, AudioView *view);
-	void paste_track_as_samples(int source_index, Track *target, AudioView *view);
+	void append_track(TrackLayer *l, AudioView *view);
+	void paste_track(int source_index, TrackLayer *target, AudioView *view);
+	void paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view);
 	bool hasData();
 	bool canCopy(AudioView *view);
 

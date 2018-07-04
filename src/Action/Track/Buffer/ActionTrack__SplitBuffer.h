@@ -14,15 +14,14 @@
 class ActionTrack__SplitBuffer : public Action
 {
 public:
-	ActionTrack__SplitBuffer(Track *t, int _level_no, int _index, int _offset);
+	ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	int track_no;
+	TrackLayer *layer;
 	int index;
-	int level_no;
 	int offset;
 };
 

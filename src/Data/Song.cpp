@@ -248,7 +248,7 @@ Range Song::getRange()
 	Range r = Range::EMPTY;
 
 	for (Track *t: tracks)
-		r = r or t->getRange();
+		r = r or t->range();
 
 	return r;
 }
@@ -346,10 +346,10 @@ Track *Song::addTrackAfter(int type, Track *ref)
 	return addTrack(type, index + 1);
 }
 
-void Song::insertSelectedSamples(const SongSelection &sel, int layer_no)
+void Song::insertSelectedSamples(const SongSelection &sel)
 {
 	if (sel.num_samples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(sel, layer_no));
+		execute(new ActionTrackInsertSelectedSamples(sel, 0));
 }
 
 void Song::deleteSelectedSamples(const SongSelection &sel)
@@ -423,15 +423,15 @@ void Song::scaleSample(Sample *s, int new_size, int method)
 	execute(new ActionSampleScale(s, new_size, method));
 }
 
-void Song::deleteSelection(const SongSelection &sel, int layer_no, bool all_layers)
+void Song::deleteSelection(const SongSelection &sel)
 {
-	execute(new ActionSongDeleteSelection(layer_no, sel, all_layers));
+	execute(new ActionSongDeleteSelection(sel));
 }
 
-void Song::createSamplesFromSelection(const SongSelection &sel, int layer_no)
+void Song::createSamplesFromSelection(const SongSelection &sel)
 {
 	if (!sel.range.empty())
-		execute(new ActionTrackSampleFromSelection(sel, layer_no));
+		execute(new ActionTrackSampleFromSelection(sel));
 }
 
 void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)

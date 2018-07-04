@@ -12,25 +12,21 @@
 #include "ActionTrack__AddBuffer.h"
 #include "ActionTrack__GrowBuffer.h"
 
-ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int _level_no, const Range &_r)
+ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_r)
 {
-	track_no = t->get_index();
-	level_no = _level_no;
+	layer = l;
 	r = _r;
 }
 
 void ActionTrackCreateBuffers::build(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
-	Track *t = s->tracks[track_no];
-
-	TrackLayer &l = t->layers[level_no];
 
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;
 	int n_before = -1;
-	foreachi(AudioBuffer &b, l.buffers, i){
+	foreachi(AudioBuffer &b, layer->buffers, i){
 		if ((r.offset >= b.offset) and (r.offset <= b.offset + b.length))
 			n_pos = i;
 		if (r.offset >= b.offset)
@@ -44,22 +40,22 @@ void ActionTrackCreateBuffers::build(Data *d)
 		//msg_write("inside");
 
 		// use base buffers
-		AudioBuffer &b = l.buffers[n_pos];
+		AudioBuffer &b = layer->buffers[n_pos];
 
 		// too small?
 		if (r.end() > b.offset + b.length)
-			addSubAction(new ActionTrack__GrowBuffer(t, level_no, n_pos, r.end() - b.offset), d);
+			addSubAction(new ActionTrack__GrowBuffer(layer, n_pos, r.end() - b.offset), d);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		addSubAction(new ActionTrack__AddBuffer(t, level_no, n_pos, r), d);
+		addSubAction(new ActionTrack__AddBuffer(layer, n_pos, r), d);
 	}
 
 	// collision???  -> absorb
-	for (int i=l.buffers.num-1;i>n_pos;i--)
-		if (l.buffers[i].offset <= r.end())
-			addSubAction(new ActionTrack__AbsorbBuffer(t, level_no, n_pos, i), d);
+	for (int i=layer->buffers.num-1;i>n_pos;i--)
+		if (layer->buffers[i].offset <= r.end())
+			addSubAction(new ActionTrack__AbsorbBuffer(layer, n_pos, i), d);
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

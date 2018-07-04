@@ -14,7 +14,7 @@
 #include <FLAC/all.h>
 
 bool flac_tells_samples;
-int flac_offset, flac_layer;
+int flac_offset;
 int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 SampleFormat flac_format;
 int flac_read_samples;
@@ -39,11 +39,11 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
-	AudioBuffer buf = od->track->getBuffers(flac_layer, range);
+	AudioBuffer buf = od->layer->getBuffers(range);
 
 	Action *a;
 	if (od->song->action_manager->isEnabled())
-		a = new ActionTrackEditBuffer(od->track, 0, range);
+		a = new ActionTrackEditBuffer(od->layer, range);
 
 	float scale = pow(2.0f, flac_bits-1);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
@@ -105,7 +105,6 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		flac_file_size = f->get_size();
 		FileClose(f);
 
-		flac_layer = od->layer;
 		flac_offset = od->offset;
 		flac_read_samples = 0;
 		//bits = channels = samples = freq = 0;

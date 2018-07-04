@@ -8,10 +8,9 @@
 #include <assert.h>
 #include "ActionTrack__ShrinkBuffer.h"
 
-ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(Track *t, int _level_no, int _index, int _length)
+ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length)
 {
-	track_no = get_track_index(t);
-	level_no = _level_no;
+	layer = l;
 	index = _index;
 	new_length = _length;
 	old_length = 0;
@@ -20,8 +19,7 @@ ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(Track *t, int _level_no, in
 void ActionTrack__ShrinkBuffer::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-	AudioBuffer &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = layer->buffers[index];
 
 	// restore
 	b.resize(old_length);
@@ -36,8 +34,7 @@ void ActionTrack__ShrinkBuffer::undo(Data *d)
 void *ActionTrack__ShrinkBuffer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-	AudioBuffer &b = t->layers[level_no].buffers[index];
+	AudioBuffer &b = layer->buffers[index];
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));
 

@@ -14,11 +14,9 @@
 #include "../Track/Buffer/ActionTrack__ShrinkBuffer.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"
 
-ActionSongDeleteSelection::ActionSongDeleteSelection(int _layer_no, const SongSelection &_sel, bool _all_layers) :
+ActionSongDeleteSelection::ActionSongDeleteSelection(const SongSelection &_sel) :
 	sel(_sel)
 {
-	layer_no = _layer_no;
-	all_layers = _all_layers;
 }
 
 void ActionSongDeleteSelection::build(Data *d)
@@ -46,42 +44,39 @@ void ActionSongDeleteSelection::build(Data *d)
 			continue;
 
 		// buffer boxes
-		if (all_layers){
-			foreachi(TrackLayer &l, t->layers, li)
-				DeleteBuffersFromTrackLayer(s, t, l, sel, li);
-		}else{
-			DeleteBuffersFromTrackLayer(s, t, t->layers[layer_no], sel, layer_no);
-		}
+		for (TrackLayer *l: t->layers)
+			if (sel.has(l))
+				DeleteBuffersFromTrackLayer(s, t, l, sel);
 	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer& l, const SongSelection &sel, int layer_no)
+void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel)
 {
 	int i0 = sel.range.start();
 	int i1 = sel.range.end();
-	foreachib(AudioBuffer &b, l.buffers, n){
+	foreachib(AudioBuffer &b, l->buffers, n){
 		int bi0 = b.offset;
 		int bi1 = b.offset + b.length;
 
 
 		if (sel.range.covers(b.range())){
 			// b completely inside?
-			addSubAction(new ActionTrack__DeleteBuffer(t, layer_no, n), a);
+			addSubAction(new ActionTrack__DeleteBuffer(l, n), a);
 
 		}else if (sel.range.is_inside(bi1-1)){
 			// overlapping end of b?
-			addSubAction(new ActionTrack__ShrinkBuffer(t, layer_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__ShrinkBuffer(l, n, i0 - bi0), a);
 
 		}else if (sel.range.is_inside(bi0)){
 			// overlapping beginning of b?
-			addSubAction(new ActionTrack__SplitBuffer(t, layer_no, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBuffer(t, layer_no, n), a);
+			addSubAction(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBuffer(l, n), a);
 
 		}else if (b.range().covers(sel.range)){
 			// inside b?
-			addSubAction(new ActionTrack__SplitBuffer(t, layer_no, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__SplitBuffer(t, layer_no, n, i0 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBuffer(t, layer_no, n + 1), a);
+			addSubAction(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__SplitBuffer(l, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBuffer(l, n + 1), a);
 
 		}
 		_foreach_it_.update();

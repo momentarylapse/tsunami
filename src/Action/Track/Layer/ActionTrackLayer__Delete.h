@@ -11,18 +11,20 @@
 #include "../../Action.h"
 
 class Track;
+class TrackLayer;
 
 class ActionTrackLayer__Delete : public Action
 {
 public:
 	ActionTrackLayer__Delete(Track *t, int index);
+	~ActionTrackLayer__Delete();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 private:
 	Track *track;
 	int index;
-	int type;
+	TrackLayer *layer;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_ */

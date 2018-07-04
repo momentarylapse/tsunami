@@ -726,8 +726,8 @@ void AudioView::update_peaks(AudioBuffer &buf)
 
 void AudioView::update_peaks(Track *t)
 {
-	for (TrackLayer &l: t->layers)
-		for (AudioBuffer &b: l.buffers)
+	for (TrackLayer *l: t->layers)
+		for (AudioBuffer &b: l->buffers)
 			update_peaks(b);
 }
 
@@ -1100,8 +1100,8 @@ void AudioView::selectExpand()
 				test_range(n->range, r, update);
 
 			// buffers
-			for (TrackLayer &l: t->layers)
-				for (AudioBuffer &b: l.buffers)
+			for (TrackLayer *l: t->layers)
+				for (AudioBuffer &b: l->buffers)
 					test_range(b.range(), r, update);
 
 			// samples

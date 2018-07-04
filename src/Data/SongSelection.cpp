@@ -125,6 +125,7 @@ bool SongSelection::has(const TYPE* t) const          \
 
 
 IMPLEMENT_FUNC(Track, tracks)
+IMPLEMENT_FUNC(TrackLayer, track_layers)
 IMPLEMENT_FUNC(SampleRef, samples)
 IMPLEMENT_FUNC(TrackMarker, markers)
 IMPLEMENT_FUNC(MidiNote, notes)

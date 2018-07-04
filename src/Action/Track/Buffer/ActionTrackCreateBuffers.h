@@ -10,18 +10,19 @@
 
 #include "../../ActionGroup.h"
 #include "../../../Data/Range.h"
+
 class Track;
+class TrackLayer;
 
 
 class ActionTrackCreateBuffers : public ActionGroup
 {
 public:
-	ActionTrackCreateBuffers(Track *t, int level_no, const Range &r);
+	ActionTrackCreateBuffers(TrackLayer *l, const Range &r);
 
 	virtual void build(Data *d);
 
-	int track_no;
-	int level_no;
+	TrackLayer *layer;
 	Range r;
 };
 

@@ -12,20 +12,20 @@
 class Song;
 class SongSelection;
 class Track;
+class TrackLayer;
 
 class ActionTrackSampleFromSelection : public ActionGroup
 {
 public:
-	ActionTrackSampleFromSelection(const SongSelection &sel, int layer_no);
+	ActionTrackSampleFromSelection(const SongSelection &sel);
 
 	virtual void build(Data *d);
 
 private:
-	void CreateSamplesFromTrackAudio(Track *t, const SongSelection &sel, int layer_no);
+	void CreateSamplesFromTrackAudio(TrackLayer *l, const SongSelection &sel);
 	void CreateSamplesFromTrackMidi(Track *t, const SongSelection &sel);
 
 	const SongSelection &sel;
-	int layer_no;
 };
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

@@ -9,16 +9,17 @@
 #define ACTIONTRACKINSERTSAMPLE_H_
 
 #include "../../ActionGroup.h"
-class Song;
+class TrackLayer;
 
 class ActionTrackInsertSample : public ActionGroup
 {
 public:
-	ActionTrackInsertSample(int track_no, int index, int layer_no);
+	ActionTrackInsertSample(TrackLayer *layer, int index);
 
 	virtual void build(Data *d);
 
-	int track_no, index, layer_no;
+	TrackLayer *layer;
+	int index;
 };
 
 #endif /* ACTIONTRACKINSERTSAMPLE_H_ */

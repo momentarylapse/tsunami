@@ -30,14 +30,20 @@ class AudioEffect;
 class TrackLayer
 {
 public:
+	TrackLayer(){}
+	TrackLayer(Track *track, bool is_main);
+	AudioBuffer _cdecl readBuffers(const Range &r);
+
+	// actions
+	AudioBuffer _cdecl getBuffers(const Range &r);
+
 	Array<AudioBuffer> buffers;
 
-	enum Type
-	{
-		TYPE_MAIN,
-		TYPE_ALTERNATIVE,
-	};
+	//MidiNoteBuffer midi;
+
+	Track *track;
 	int type;
+	bool is_main;
 };
 
 class TrackMarker
@@ -55,7 +61,8 @@ class Track : public Observable<VirtualBase>
 public:
 	Track(int type, Synthesizer *synth);
 	virtual ~Track();
-	Range _cdecl getRange();
+
+	Range _cdecl range() const;
 
 	static const string MESSAGE_ADD_EFFECT;
 	static const string MESSAGE_DELETE_EFFECT;
@@ -63,7 +70,6 @@ public:
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
 	void _cdecl invalidateAllPeaks();
-	AudioBuffer _cdecl readBuffers(int layer_no, const Range &r);
 	void _cdecl readBuffersCol(AudioBuffer &buf, int offset);
 
 	string _cdecl getNiceName();
@@ -75,12 +81,11 @@ public:
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
-	void _cdecl addLayer(int type);
-	void _cdecl deleteLayer(int index);
+	TrackLayer _cdecl *addLayer(bool is_main);
+	void _cdecl deleteLayer(TrackLayer *layer);
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);
 	void _cdecl move(int target);
-	AudioBuffer _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
 	void _cdecl addEffect(AudioEffect *effect);
 	void _cdecl deleteEffect(int index);
@@ -116,7 +121,8 @@ public:
 
 	Instrument instrument;
 
-	Array<TrackLayer> layers;
+	Array<TrackLayer*> layers;
+	TrackLayer *prefered_layer;
 
 	float volume, panning;
 	bool muted;
@@ -124,10 +130,9 @@ public:
 	Array<AudioEffect*> fx;
 	Array<SampleRef*> samples;
 
-	// midi track
-	MidiNoteBuffer midi;
 	Synthesizer *synth;
 
+	MidiNoteBuffer midi;
 
 
 	Array<TrackMarker*> markers;

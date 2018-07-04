@@ -123,6 +123,7 @@ ViewModeMidi::~ViewModeMidi()
 void ViewModeMidi::setMode(int _mode)
 {
 	mode_wanted = _mode;
+	view->thm.dirty = true;
 	view->forceRedraw();
 }
 

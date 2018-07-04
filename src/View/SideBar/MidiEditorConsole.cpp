@@ -90,9 +90,9 @@ MidiEditorConsole::~MidiEditorConsole()
 void MidiEditorConsole::update()
 {
 	bool allow = false;
-	if (view->cur_layer)
-		if (get_track_index_save(view->song, view->cur_track) >= 0)
-			allow = (view->cur_track->type == Track::Type::MIDI);
+	if (layer)
+		//if (get_track_index_save(view->song, view->cur_track) >= 0)
+			allow = (layer->type == Track::Type::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
@@ -128,13 +128,11 @@ void MidiEditorConsole::update()
 
 void MidiEditorConsole::onLayerDelete()
 {
-	update();
 	setLayer(NULL);
 }
 
 void MidiEditorConsole::onViewCurLayerChange()
 {
-	update();
 	setLayer(view->cur_layer);
 }
 
@@ -155,7 +153,6 @@ void MidiEditorConsole::onViewVTrackChange()
 
 void MidiEditorConsole::onUpdate()
 {
-	update();
 	setLayer(layer);
 }
 

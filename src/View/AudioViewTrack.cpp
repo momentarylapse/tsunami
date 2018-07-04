@@ -1143,5 +1143,6 @@ void AudioViewLayer::draw(Painter *c)
 {
 	view->mode->drawLayerData(c, this);
 
-	drawHeader(c);
+	if (layer->track->layers.num > 1)
+		drawHeader(c);
 }

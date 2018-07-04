@@ -1017,8 +1017,6 @@ void AudioView::drawSelection(Painter *c)
 
 void AudioView::drawAudioFile(Painter *c)
 {
-	//msg_write("draw");
-
 	bool repeat = thm.update(this, song, area);
 	bool repeat_fast = repeat;
 	updateBufferZoom();

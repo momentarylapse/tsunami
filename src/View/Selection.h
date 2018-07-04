@@ -12,7 +12,9 @@
 #include "../Data/Range.h"
 
 class AudioViewTrack;
+class AudioViewLayer;
 class Track;
+class TrackLayer;
 class SampleRef;
 class MidiNote;
 class TrackMarker;
@@ -24,7 +26,9 @@ class Selection
 public:
 	int type;
 	AudioViewTrack *vtrack;
+	AudioViewLayer *vlayer;
 	Track *track;
+	TrackLayer *layer;
 	SampleRef *sample;
 	MidiNote *note;
 	TrackMarker *marker;
@@ -54,6 +58,7 @@ public:
 		TRACK_BUTTON_EDIT,
 		TRACK_BUTTON_CURVE,
 		TRACK_BUTTON_FX,
+		LAYER_HEADER,
 		SAMPLE,
 		MIDI_NOTE,
 		MIDI_PITCH,

@@ -34,6 +34,7 @@ public:
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
+	virtual void drawLayerData(Painter *c, AudioViewLayer *l);
 	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift);
 	virtual void drawPost(Painter *c);
 

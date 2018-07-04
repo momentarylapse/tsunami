@@ -24,6 +24,7 @@ class SongRenderer;
 class PeakMeter;
 class TsunamiWindow;
 class AudioViewTrack;
+class AudioViewLayer;
 class PeakThread;
 class ViewMode;
 class ViewModeDefault;
@@ -227,8 +228,11 @@ public:
 	ViewPort cam;
 
 	Array<AudioViewTrack*> vtrack;
+	Array<AudioViewLayer*> vlayer;
 	AudioViewTrack *dummy_vtrack;
+	AudioViewLayer *dummy_vlayer;
 	AudioViewTrack *get_track(Track *track);
+	AudioViewLayer *get_layer(TrackLayer *layer);
 	void updateTracks();
 
 	void update_peaks_now(AudioBuffer &buf);

@@ -78,7 +78,7 @@ void ViewModeCapture::drawPost(Painter *c)
 		AudioBuffer &buf = export_view_sucker->buf;
 		view->update_peaks_now(buf);
 		if (capturing_track)
-			view->get_track(capturing_track)->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
+			view->get_layer(capturing_track->layers[0])->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
 		view->drawTimeLine(c, view->sel.range.start() + buf.length, Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 

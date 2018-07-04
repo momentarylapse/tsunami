@@ -34,7 +34,9 @@ void Selection::clear()
 {
 	type = Type::NONE;
 	track = NULL;
+	layer = NULL;
 	vtrack = NULL;
+	vlayer = NULL;
 	sample = NULL;
 	note = NULL;
 	marker = NULL;

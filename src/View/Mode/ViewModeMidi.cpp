@@ -648,9 +648,6 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 			drawMidi(c, t, t->track->midi, false, 0);
 	}
 
-	// audio buffer
-	t->drawTrackBuffers(c, view->cam.pos);
-
 	// samples
 	for (SampleRef *s: t->track->samples)
 		t->drawSample(c, s);

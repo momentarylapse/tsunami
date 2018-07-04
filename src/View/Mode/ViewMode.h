@@ -12,6 +12,7 @@
 
 class AudioView;
 class AudioViewTrack;
+class AudioViewLayer;
 class Selection;
 class SongSelection;
 class Track;
@@ -47,6 +48,7 @@ public:
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
+	virtual void drawLayerData(Painter *c, AudioViewLayer *t){}
 	virtual void drawPost(Painter *c){}
 	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift){}
 

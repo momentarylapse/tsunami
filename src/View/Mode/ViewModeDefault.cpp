@@ -280,6 +280,19 @@ void ViewModeDefault::updateTrackHeights()
 		else
 			t->height_wish =view->TIME_SCALE_HEIGHT * 2;
 	}
+	for (AudioViewLayer *t: view->vlayer){
+		if (t->layer->is_main){
+			t->height_min = view->TIME_SCALE_HEIGHT * 2;
+			if (t->layer->type == Track::Type::AUDIO)
+				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+			else if (t->layer->type == Track::Type::MIDI)
+				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
+			else
+				t->height_wish =view->TIME_SCALE_HEIGHT * 2;
+		}else{
+			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
+		}
+	}
 }
 
 
@@ -355,9 +368,6 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 	if (t->track->type == Track::Type::MIDI)
 		drawMidi(c, t, t->track->midi, false, 0);
 
-	// audio buffer
-	t->drawTrackBuffers(c, view->cam.pos);
-
 	// samples
 	for (SampleRef *s: t->track->samples)
 		t->drawSample(c, s);
@@ -370,6 +380,16 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 
 	if (t->track->type == Track::Type::TIME)
 		draw_bar_selection(c, t, view);
+}
+
+void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
+{
+	// midi
+	//if (l->layer->type == Track::Type::MIDI)
+	//	drawMidi(c, t, t->track->midi, false, 0);
+
+	// audio buffer
+	l->drawTrackBuffers(c, view->cam.pos);
 }
 
 int ViewModeDefault::getTrackMoveTarget(bool visual)

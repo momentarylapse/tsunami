@@ -169,6 +169,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
 	dummy_vtrack = new AudioViewTrack(this, NULL);
+	dummy_vlayer = new AudioViewLayer(this, NULL);
 
 	midi_view_mode = hui::Config.getInt("View.MidiMode", MidiMode::CLASSICAL);
 
@@ -274,6 +275,7 @@ AudioView::~AudioView()
 	delete(peak_thread);
 
 	delete(dummy_vtrack);
+	delete(dummy_vlayer);
 
 	delete(images.speaker);
 	delete(images.speaker_bg);
@@ -660,6 +662,8 @@ void AudioView::onSongUpdate()
 	}else{
 		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
 			updateTracks();
+		if ((song->cur_message() == song->MESSAGE_ADD_LAYER) or (song->cur_message() == song->MESSAGE_DELETE_LAYER))
+			updateTracks();
 		forceRedraw();
 		updateMenu();
 	}
@@ -750,12 +754,26 @@ AudioViewTrack *AudioView::get_track(Track *track)
 	return dummy_vtrack;
 }
 
+AudioViewLayer *AudioView::get_layer(TrackLayer *layer)
+{
+	for (auto l: vlayer){
+		if (l->layer == layer)
+			return l;
+	}
+	return dummy_vlayer;
+}
+
 void AudioView::updateTracks()
 {
 	bool changed = false;
 
 	Array<AudioViewTrack*> vtrack2;
+	Array<AudioViewLayer*> vlayer2;
 	vtrack2.resize(song->tracks.num);
+	int nlayer = 0;
+	for (Track *t: song->tracks)
+		nlayer += t->layers.num;
+	vlayer2.resize(nlayer);
 	foreachi(Track *t, song->tracks, ti){
 		bool found = false;
 
@@ -778,13 +796,49 @@ void AudioView::updateTracks()
 		}
 	}
 
+	int li = 0;
+	for (Track *t: song->tracks){
+		for (TrackLayer *l: t->layers){
+
+			bool found = false;
+
+			// find existing
+			foreachi(AudioViewLayer *v, vlayer, vi)
+				if (v){
+					if (v->layer == l){
+						vlayer2[li] = v;
+						vlayer[vi] = NULL;
+						found = true;
+						break;
+					}
+				}
+
+			// new layer
+			if (!found){
+				msg_write("new vlayer");
+				vlayer2[li] = new AudioViewLayer(this, l);
+				changed = true;
+				sel.add(l);
+			}
+
+			li ++;
+		}
+	}
+
 	// delete deleted
 	for (AudioViewTrack *v: vtrack)
 		if (v){
 			delete(v);
 			changed = true;
 		}
+	for (AudioViewLayer *v: vlayer)
+		if (v){
+			msg_write("del vlayer");
+			delete(v);
+			changed = true;
+		}
 	vtrack = vtrack2;
+	vlayer = vlayer2;
 	thm.dirty = true;
 
 	// guess where to create new tracks
@@ -795,6 +849,19 @@ void AudioView::updateTracks()
 				v->area.y1 = v->area.y2;
 			}else if (vtrack.num > 1){
 				v->area = vtrack[i+1]->area;
+				v->area.y2 = v->area.y1;
+			}
+		}
+	}
+
+	// guess where to create new tracks
+	foreachi(AudioViewLayer *v, vlayer, i){
+		if (v->area.height() == 0){
+			if (i > 0){
+				v->area = vlayer[i-1]->area;
+				v->area.y1 = v->area.y2;
+			}else if (vtrack.num > 1){
+				v->area = vlayer[i+1]->area;
 				v->area.y2 = v->area.y1;
 			}
 		}
@@ -863,7 +930,7 @@ void AudioView::drawBackground(Painter *c)
 
 	// lines between tracks
 	c->setColor(colors.grid);
-	for (AudioViewTrack *t: vtrack)
+	for (AudioViewLayer *t: vlayer)
 		c->drawLine(clip.x1, t->area.y1, clip.width(), t->area.y1);
 	if (yy < clip.y2)
 		c->drawLine(clip.x1, yy, clip.width(), yy);
@@ -955,6 +1022,8 @@ void AudioView::drawAudioFile(Painter *c)
 	drawBackground(c);
 
 	// tracks
+	for (AudioViewLayer *t: vlayer)
+		t->draw(c);
 	for (AudioViewTrack *t: vtrack)
 		t->draw(c);
 

@@ -117,6 +117,20 @@ public:
 Array<SymbolRenderer::Symbol*> SymbolRenderer::symbols;
 
 
+AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
+{
+	view = _view;
+	layer = _layer;
+
+	//pitch_min = 55;
+	//pitch_max = pitch_min + PITCH_SHOW_COUNT;
+
+	area = rect(0, 0, 0, 0);
+	height_min = height_wish = 0;
+	//clef_dy = 0;
+	//clef_y0 = 0;
+}
+
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
@@ -258,7 +272,7 @@ inline void draw_peak_buffer_sel(Painter *c, int width, int di, double view_pos_
 	c->drawPolygon(tt);
 }
 
-void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col)
+void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col)
 {
 	float w = area.width();
 	float h = area.height();
@@ -319,7 +333,7 @@ void AudioViewTrack::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 	}
 }
 
-void AudioViewTrack::drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
+void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
 {
 	float w = area.width();
 	float h = area.height();
@@ -369,7 +383,7 @@ void AudioViewTrack::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 	}
 }
 
-void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
+/*void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
 {
 	// non-current layers
 	foreachi(TrackLayer *lev, track->layers, layer_no){
@@ -421,21 +435,21 @@ rect _version_area(AudioViewTrack *tv, int version)
 	a.y1 = m.y2 + hh * (version - 1);
 	a.y2 = m.y2 + hh * version ;
 	return a;
-}
+}*/
 
-void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
+void AudioViewLayer::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
-	rect r0 = area;
-	area = _main_area(this);
-	//_draw_buffers_all(c, track, view, view_pos_rel, this);
-	_draw_buffers_main(c, track, view, view_pos_rel, this);
-	area = r0;
+	color col = view->colors.text;
+	if (!layer->is_main)
+		col = view->colors.text_soft2;
+	for (AudioBuffer &b: layer->buffers)
+		drawBuffer(c, b, view_pos_rel, col);
 
-	for (int i=1; i<track->layers.num; i++){
-		area = _version_area(this, i);
-		for (AudioBuffer &b: track->layers[i]->buffers)
-			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
-		area = r0;
+	if (view->sel.has(layer)){
+		// selection
+		for (AudioBuffer &b: layer->buffers){
+			drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+		}
 	}
 }
 
@@ -478,7 +492,7 @@ void drawStrWithShadow(Painter *c, float x, float y, const string &str, const co
 
 void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 {
-	color col = view->colors.sample;
+	/*color col = view->colors.sample;
 	if (view->sel.has(s))
 		col = view->colors.sample_selected;
 	if (view->hover.sample == s)
@@ -495,7 +509,8 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	if (view->sel.has(s)){
 		int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 		drawStrWithShadow(c, asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name, view->colors.text, view->colors.background_track_selected);
-	}
+	}*/
+	msg_write("todo");
 }
 
 void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover)
@@ -1035,31 +1050,30 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 }
 
-void _draw_version_header(Painter *c, Track *track, int version, AudioView *view, AudioViewTrack *tv)
+void AudioViewLayer::drawHeader(Painter *c)
 {
-	rect area = _version_area(tv, version);
-	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
-	bool visible = hover or view->editingTrack(track);
-	bool playable = (view->get_playable_tracks().find(track) >= 0);
+	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::TRACK_HEADER);
+	bool visible = hover or false;//view->editingTrack(track);
+	bool playable = false;//(view->get_playable_tracks().find(track) >= 0);
 
 	color col = view->colors.background_track_selected;
-	if (view->sel.has(track))
+	if (view->sel.has(layer))
 		col = ColorInterpolate(col, view->colors.selection, 0.2f);
 	if (hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
 	c->setColor(col);
 	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
 	c->setRoundness(view->CORNER_RADIUS);
-	c->drawRect(area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h);
+	c->drawRect(area.x2 - view->TRACK_HANDLE_WIDTH,  area.y2 - h,  view->TRACK_HANDLE_WIDTH, h);
 	c->setRoundness(0);
 
 	// track title
-	c->setFont("", view->FONT_SIZE, view->sel.has(track) and playable, false);
+	c->setFont("", view->FONT_SIZE, view->sel.has(layer) and playable, false);
 	if (playable)
 		c->setColor(view->colors.text);
 	else
 		c->setColor(view->colors.text_soft3);
-	c->drawStr(area.x1 + 23, area.y1 + 3, "version " + i2s(version));//track->getNiceName() + (solo ? " (solo)" : ""));
+	c->drawStr(area.x2 - view->TRACK_HANDLE_WIDTH + 23, area.y2 - 18, "version x");//track->getNiceName() + (solo ? " (solo)" : ""));
 
 	c->setFont("", -1, false, false);
 
@@ -1080,13 +1094,14 @@ void _draw_version_header(Painter *c, Track *track, int version, AudioView *view
 	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	color col_but_hover = view->colors.text;
 
+#if 0
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_MUTE))
+		if ((view->hover.track == layer) and (view->hover.type == Selection::Type::TRACK_BUTTON_MUTE))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
-		if (track->muted)
+		if (layer->muted)
 			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
 	if ((view->song->tracks.num > 1) and visible){
@@ -1112,6 +1127,7 @@ void _draw_version_header(Painter *c, Track *track, int version, AudioView *view
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
+#endif
 }
 
 void AudioViewTrack::setSolo(bool _solo)
@@ -1126,6 +1142,12 @@ void AudioViewTrack::draw(Painter *c)
 	view->mode->drawTrackData(c, this);
 
 	drawHeader(c);
-	for (int i=1; i<track->layers.num; i++)
-		_draw_version_header(c,  track, i, view, this);
+}
+
+
+void AudioViewLayer::draw(Painter *c)
+{
+	view->mode->drawLayerData(c, this);
+
+	drawHeader(c);
 }

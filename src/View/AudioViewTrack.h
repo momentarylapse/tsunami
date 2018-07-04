@@ -24,6 +24,25 @@ class Clef;
 class Scale;
 class Range;
 
+
+class AudioViewLayer
+{
+public:
+	AudioViewLayer(AudioView *v, TrackLayer *l);
+
+	void drawTrackBuffers(Painter *c, double pos);
+	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
+	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
+	void drawHeader(Painter *c);
+	void draw(Painter *c);
+
+	TrackLayer *layer;
+	rect area;
+	rect area_last, area_target;
+	int height_wish, height_min;
+	AudioView *view;
+};
+
 class AudioViewTrack
 {
 public:
@@ -59,9 +78,6 @@ public:
 	void drawBlankBackground(Painter *c);
 	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
 
-	void drawTrackBuffers(Painter *c, double pos);
-	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
-	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
@@ -96,16 +112,7 @@ public:
 	float clef_y0;
 
 
-	class Layer
-	{
-	public:
-		TrackLayer *layer;
-		rect area;
-		rect area_last, area_target;
-		int height_wish, height_min;
-		AudioView *view;
-	};
-	Array<Layer*> layers;
+	//Array<AudioViewLayer*> layers;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

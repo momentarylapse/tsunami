@@ -24,9 +24,10 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	filename = _filename;
 	progress = new Progress(message, win);
 	buf = b;
-	msg_write("sod: " + p2s(l));
 	layer = l;
-	track = l->track;
+	track = NULL;
+	if (l)
+		track = l->track;
 	offset = 0;
 	renderer = NULL;
 	num_samples = 0;

@@ -169,7 +169,7 @@ bool CaptureConsoleModeAudio::insert()
 	Range r = Range(i0, sucker->buf.length);
 	cc->song->action_manager->beginActionGroup();
 
-	TrackLayer *layer;
+	TrackLayer *layer = NULL;
 	for (TrackLayer *l: target->layers)
 		if (layer_available(l, r)){
 			layer = l;

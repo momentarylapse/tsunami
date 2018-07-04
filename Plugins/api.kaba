@@ -266,7 +266,10 @@ enum
 	TRACK_TYPE_MIDI
 
 class TrackLayer
+	int type
 	AudioBuffer[] buffers
+	extern AudioBuffer get_buffers(Range r)
+	extern AudioBuffer read_buffers(Range r)
 
 class Sample // TODO
 	string name
@@ -294,7 +297,7 @@ enum
 class Track
 	int type
 	string name
-	TrackLayer[] layers
+	TrackLayer*[] layers
 	int length, pos
 
 	float volume, panning
@@ -314,9 +317,6 @@ class Track
 	Song *song
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
-	
-	extern AudioBuffer get_buffers(int layer_no, Range r)
-	extern AudioBuffer read_buffers(Range r)
 	
 	extern void set_name(string name)
 	extern void set_muted(bool muted)

@@ -50,7 +50,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	setInt("scale_type", view->midi_scale.type);
 
 
-	track = NULL;
+	layer = NULL;
 	//Enable("add", false);
 	enable("track_name", false);
 
@@ -74,7 +74,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::onEditMidiFx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::onEditSong, this));
 
-	view->subscribe(this, std::bind(&MidiEditorConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::onViewCurLayerChange, this), view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, std::bind(&MidiEditorConsole::onViewVTrackChange, this), view->MESSAGE_VTRACK_CHANGE);
 	view->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), view->MESSAGE_SETTINGS_CHANGE);
 	update();
@@ -90,14 +90,14 @@ MidiEditorConsole::~MidiEditorConsole()
 void MidiEditorConsole::update()
 {
 	bool allow = false;
-	if (view->cur_track)
+	if (view->cur_layer)
 		if (get_track_index_save(view->song, view->cur_track) >= 0)
 			allow = (view->cur_track->type == Track::Type::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
 
-	if (!track)
+	if (!layer)
 		return;
 
 	check("modifier:none", view->mode_midi->modifier == Modifier::NONE);
@@ -105,7 +105,7 @@ void MidiEditorConsole::update()
 	check("modifier:flat", view->mode_midi->modifier == Modifier::FLAT);
 	check("modifier:natural", view->mode_midi->modifier == Modifier::NATURAL);
 
-	int mode = view->mode->which_midi_mode(track);
+	int mode = view->mode->which_midi_mode(layer->track);
 	view->mode_midi->setMode(mode);
 	check("mode:linear", mode == view->MidiMode::LINEAR);
 	check("mode:classical", mode == view->MidiMode::CLASSICAL);
@@ -119,22 +119,23 @@ void MidiEditorConsole::update()
 	setInt("midi_edit_mode", view->mode_midi->creation_mode);
 
 
-	if (track->instrument.type == Instrument::Type::DRUMS){
+	if (layer->track->instrument.type == Instrument::Type::DRUMS){
 		// select a nicer pitch range in linear mode for drums
-		view->get_track(track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
+//		view->get_layer(layer->track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
+		msg_write("todo");
 	}
 }
 
-void MidiEditorConsole::onTrackDelete()
+void MidiEditorConsole::onLayerDelete()
 {
 	update();
-	setTrack(NULL);
+	setLayer(NULL);
 }
 
-void MidiEditorConsole::onViewCurTrackChange()
+void MidiEditorConsole::onViewCurLayerChange()
 {
 	update();
-	setTrack(view->cur_track);
+	setLayer(view->cur_layer);
 }
 
 void MidiEditorConsole::onViewVTrackChange()
@@ -147,15 +148,15 @@ void MidiEditorConsole::onViewVTrackChange()
 			addString("reference_tracks", t->getNiceName());
 	}
 
-	if (track){
-		setSelection("reference_tracks", view->get_track(track)->reference_tracks);
+	if (layer){
+		//setSelection("reference_tracks", view->get_layer(layer)->reference_tracks);
 	}
 }
 
 void MidiEditorConsole::onUpdate()
 {
 	update();
-	setTrack(track);
+	setLayer(layer);
 }
 
 void MidiEditorConsole::onScale()
@@ -214,9 +215,9 @@ void MidiEditorConsole::onChordInversion()
 
 void MidiEditorConsole::onReferenceTracks()
 {
-	int tn = track->get_index();
+	/*int tn = track->get_index();
 	view->vtrack[tn]->reference_tracks = getSelection("");
-	view->forceRedraw();
+	view->forceRedraw();*/
 }
 
 void MidiEditorConsole::onEditTrack()
@@ -256,9 +257,9 @@ void MidiEditorConsole::onModifierNatural()
 
 void MidiEditorConsole::clear()
 {
-	if (track)
-		track->unsubscribe(this);
-	track = NULL;
+	if (layer)
+		layer->unsubscribe(this);
+	layer = NULL;
 	setSelection("reference_tracks", Array<int>());
 }
 
@@ -272,20 +273,17 @@ void MidiEditorConsole::onLeave()
 	view->setMode(view->mode_default);
 }
 
-void MidiEditorConsole::setTrack(Track *t)
+void MidiEditorConsole::setLayer(TrackLayer *l)
 {
 	clear();
 
-	track = t;
-	if (track){
-		track->subscribe(this, std::bind(&MidiEditorConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-		track->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), track->MESSAGE_DELETE_MIDI_EFFECT);
+	layer = l;
+	if (layer){
+		layer->subscribe(this, std::bind(&MidiEditorConsole::onLayerDelete, this), layer->MESSAGE_DELETE);
 
-		int tn = track->get_index();
-		if ((tn >= 0) and (tn < view->vtrack.num))
-			if (view->vtrack[tn])
-				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
+		/*auto v = view->get_layer(layer);
+		if (v)
+			setSelection("reference_tracks", v->reference_tracks);*/
 
 		update();
 	}
@@ -317,14 +315,14 @@ void MidiEditorConsole::onQuantize()
 	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->beat_partition);
 
 	song->action_manager->beginActionGroup();
-	MidiNoteBufferRef ref = track->midi.getNotesBySelection(view->sel);
+	MidiNoteBufferRef ref = layer->midi.getNotesBySelection(view->sel);
 	for (auto *n: ref){
 		view->sel.set(n, false);
 		MidiNote *nn = n->copy();
 		nn->range.set_start(align_to_beats(nn->range.start(), beats));
 		nn->range.set_end(align_to_beats(nn->range.end(), beats));
-		track->deleteMidiNote(n);
-		track->addMidiNote(nn);
+		layer->deleteMidiNote(n);
+		layer->addMidiNote(nn);
 		view->sel.add(nn);
 	}
 	song->action_manager->endActionGroup();

@@ -10,7 +10,7 @@
 
 #include "SideBar.h"
 
-class Track;
+class TrackLayer;
 
 class MidiEditorConsole : public SideBarConsole
 {
@@ -21,8 +21,8 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	void onTrackDelete();
-	void onViewCurTrackChange();
+	void onLayerDelete();
+	void onViewCurLayerChange();
 	void onViewVTrackChange();
 	void onUpdate();
 	void update();
@@ -49,13 +49,13 @@ public:
 	void onEditSong();
 
 	void clear();
-	void setTrack(Track *t);
+	void setLayer(TrackLayer *t);
 	void setMode(int mode);
 
 
 	string id_inner;
 
-	Track *track;
+	TrackLayer *layer;
 };
 
 #endif /* MIDIEDITORCONSOLE_H_ */

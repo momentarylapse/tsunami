@@ -39,16 +39,16 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view)
 	if (l->type == Track::Type::TIME)
 		return;
 
-	Track *tt = temp->addTrack(l->type);
+	TrackLayer *ll = temp->addTrack(l->type)->layers[0];
 
 	if (l->type == Track::Type::AUDIO){
-		tt->layers[0]->buffers.add(l->readBuffers(view->sel.range));
-		tt->layers[0]->buffers[0].make_own();
+		ll->buffers.add(l->readBuffers(view->sel.range));
+		ll->buffers[0].make_own();
 	}else if (l->type == Track::Type::MIDI){
-		tt->midi = l->track->midi.getNotesBySelection(view->sel);
-		tt->midi.samples = view->sel.range.length;
-		tt->midi.sanify(view->sel.range);
-		for (MidiNote *n: tt->midi)
+		ll->midi = l->midi.getNotesBySelection(view->sel);
+		ll->midi.samples = view->sel.range.length;
+		ll->midi.sanify(view->sel.range);
+		for (MidiNote *n: ll->midi)
 			n->range.offset -= view->sel.range.offset;
 	}
 
@@ -76,19 +76,19 @@ void Clipboard::copy(AudioView *view)
 void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *view)
 {
 	Song *s = target->track->song;
-	Track *source = temp->tracks[source_index];
+	TrackLayer *source = temp->tracks[source_index]->layers[0];
 
 	if (target->type == Track::Type::AUDIO){
-		Range r = Range(view->sel.range.start(), source->layers[0]->buffers[0].length);
+		Range r = Range(view->sel.range.start(), source->buffers[0].length);
 		AudioBuffer buf = target->getBuffers(r);
 		Action *a = new ActionTrackEditBuffer(target, r);
-		buf.set(source->layers[0]->buffers[0], 0, 1.0f);
+		buf.set(source->buffers[0], 0, 1.0f);
 		s->execute(a);
 	}else if (target->type == Track::Type::MIDI){
 		for (MidiNote *n: source->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += view->sel.range.start();
-			target->track->addMidiNote(nn);
+			target->addMidiNote(nn);
 		}
 	}
 }

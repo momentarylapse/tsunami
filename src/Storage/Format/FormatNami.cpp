@@ -746,7 +746,7 @@ public:
 		add_child(new FileChunkMidiNote);
 		add_child(new FileChunkMidiEffect);
 	}
-	virtual void create(){ me = &parent->midi; }
+	virtual void create(){ me = &parent->layers[0]->midi; }
 	virtual void read(File *f)
 	{
 		f->read_str();
@@ -1087,8 +1087,8 @@ public:
 		if ((me->type == me->Type::TIME) or (me->type == me->Type::MIDI))
 			if (!me->synth->isDefault())
 				write_sub("synth", me->synth);
-		if (me->midi.num > 0)
-			write_sub("midi", &me->midi);
+		if (me->layers[0]->midi.num > 0)
+			write_sub("midi", &me->layers[0]->midi);
 	}
 };
 

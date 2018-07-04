@@ -209,7 +209,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	cur_track = NULL;
 	cur_sample = NULL;
-	cur_layer = 0;
+	cur_layer = NULL;
 
 	bars_edit_data = true;
 
@@ -637,11 +637,9 @@ void AudioView::checkConsistency()
 		if (song->tracks.num > 0)
 			setCurTrack(song->tracks[0]);
 
-	// check cur_layer consistency
-/*	if ((cur_layer < 0) or (cur_layer >= song->layers.num)){
-		cur_layer = 0;
-		forceRedraw();
-	}*/
+	if (cur_layer and !get_layer(cur_layer))
+		if (song->tracks.num > 0)
+			setCurLayer(cur_track->layers[0]);
 }
 
 void AudioView::onSongUpdate()
@@ -1168,8 +1166,10 @@ void AudioView::selectExpand()
 				continue;
 
 			// midi
-			for (MidiNote *n: t->midi)
-				test_range(n->range, r, update);
+			for (TrackLayer *l: t->layers)
+				if (sel.has(l))
+					for (MidiNote *n: l->midi)
+						test_range(n->range, r, update);
 
 			// buffers
 			for (TrackLayer *l: t->layers)
@@ -1202,29 +1202,6 @@ void AudioView::selectSample(SampleRef *s, bool diff)
 	}
 }
 
-void AudioView::selectTrack(Track *t, bool diff, bool soft)
-{
-	if (!t)
-		return;
-	if (diff){
-		bool is_only_selected = true;
-		for (Track *tt: t->song->tracks)
-			if (sel.has(tt) and (tt != t))
-				is_only_selected = false;
-		sel.set(t, !sel.has(t) or is_only_selected);
-	}else if (soft){
-		if (sel.has(t))
-			return;
-		sel.tracks.clear();
-		sel.add(t);
-	}else{
-		sel.tracks.clear();
-		sel.add(t);
-	}
-	// TODO: what to do???
-	setSelection(mode->getSelectionForRange(sel.range));
-}
-
 void AudioView::setCurSample(SampleRef *s)
 {
 	if (cur_sample == s)
@@ -1240,20 +1217,20 @@ void AudioView::setCurTrack(Track *t)
 	if (cur_track == t)
 		return;
 	cur_track = t;
+	// TODO ----cur layer...
 	mode->onCurTrackChange();
 	forceRedraw();
 	notify(MESSAGE_CUR_TRACK_CHANGE);
 }
 
-void AudioView::setCurLayer(int l)
+void AudioView::setCurLayer(TrackLayer *l)
 {
 	if (cur_layer == l)
-		return;
-	if ((l < 0) /*or (l >= song->layers.num)*/)
 		return;
 	cur_layer = l;
 	forceRedraw();
 	notify(MESSAGE_CUR_LAYER_CHANGE);
+	setCurTrack(l->track);
 }
 
 

@@ -47,7 +47,6 @@ SongConsole::SongConsole(Session *session) :
 	event("add_tag", std::bind(&SongConsole::onAddTag, this));
 	event("delete_tag", std::bind(&SongConsole::onDeleteTag, this));
 
-	event("edit_layers", std::bind(&SongConsole::onEditLayers, this));
 	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
 	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
 
@@ -129,11 +128,6 @@ void SongConsole::onDeleteTag()
 	int s = getInt("tags");
 	if (s >= 0)
 		song->deleteTag(s);
-}
-
-void SongConsole::onEditLayers()
-{
-	bar()->open(SideBar::LAYER_CONSOLE);
 }
 
 void SongConsole::onEditSamples()

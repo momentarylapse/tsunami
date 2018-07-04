@@ -36,7 +36,7 @@ public:
 	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
 	void drawTrackData(Painter *c, AudioViewTrack *t) override;
 	void drawLayerData(Painter *c, AudioViewLayer *l) override;
-	void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift) override;
+	void drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift) override;
 	void drawPost(Painter *c) override;
 
 	int which_midi_mode(Track *t) override;

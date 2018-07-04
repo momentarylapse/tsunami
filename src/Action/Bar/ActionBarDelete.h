@@ -17,7 +17,7 @@ class ActionBarDelete: public ActionGroup
 public:
 	ActionBarDelete(int index, bool affect_data);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	int index;
 	bool affect_data;

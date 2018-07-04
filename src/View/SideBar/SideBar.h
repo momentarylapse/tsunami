@@ -13,7 +13,6 @@
 
 class Song;
 class SongConsole;
-class LayerConsole;
 class TrackConsole;
 class MidiEditorConsole;
 class SampleRefConsole;
@@ -43,7 +42,6 @@ public:
 	enum
 	{
 		SONG_CONSOLE,
-		LAYER_CONSOLE,
 		SAMPLE_CONSOLE,
 		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
@@ -65,7 +63,6 @@ public:
 	bool visible;
 
 	SongConsole *song_console;
-	LayerConsole *layer_console;
 	FxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditorConsole *midi_editor_console;

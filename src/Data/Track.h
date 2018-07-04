@@ -40,9 +40,14 @@ public:
 	// actions
 	AudioBuffer _cdecl getBuffers(const Range &r);
 
+	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
+	void _cdecl addMidiNote(MidiNote *n);
+	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
+	void _cdecl deleteMidiNote(const MidiNote *note);
+
 	Array<AudioBuffer> buffers;
 
-	//MidiNoteBuffer midi;
+	MidiNoteBuffer midi;
 
 	Track *track;
 	int type;
@@ -108,12 +113,6 @@ public:
 	void _cdecl editMarker(const TrackMarker *marker, const Range &range, const string &text);
 
 
-	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
-	void _cdecl addMidiNote(MidiNote *n);
-	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
-	void _cdecl deleteMidiNote(const MidiNote *note);
-
-
 	enum Type{
 		AUDIO,
 		TIME,
@@ -135,8 +134,6 @@ public:
 	Array<AudioEffect*> fx;
 	Array<MidiEffect*> midi_fx;
 	Array<SampleRef*> samples;
-
-	MidiNoteBuffer midi;
 
 	Synthesizer *synth;
 

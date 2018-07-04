@@ -22,7 +22,6 @@
 //#include "View/BottomBar/DeviceConsole.h"
 #include "View/SideBar/SideBar.h"
 #include "View/SideBar/CaptureConsole.h"
-#include "View/SideBar/LayerConsole.h"
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
@@ -104,16 +103,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("track_edit_fx", -1, "hui:edit");
 	event("track_add_marker", std::bind(&TsunamiWindow::onTrackAddMarker, this));
 	setKeyCode("track_add_marker", -1, "hui:add");
-	event("layer_manager", std::bind(&TsunamiWindow::onLayerManager, this));
-	setKeyCode("layer_manager", -1, "hui:settings");
 	event("layer_add", std::bind(&TsunamiWindow::onAddLayer, this));
 	setKeyCode("layer_add", -1, "hui:add");
 	event("layer_delete", std::bind(&TsunamiWindow::onDeleteLayer, this));
 	setKeyCode("layer_delete", -1, "hui:delete");
-	event("layer_up", std::bind(&TsunamiWindow::onCurLayerUp, this));
-	setKeyCode("layer_up", -1, "hui:up");
-	event("layer_down", std::bind(&TsunamiWindow::onCurLayerDown, this));
-	setKeyCode("layer_down", -1, "hui:down");
 	event("add_bars", std::bind(&TsunamiWindow::onAddBars, this));
 	setKeyCode("add_bars", -1, "hui:add");
 	event("add_pause", std::bind(&TsunamiWindow::onAddPause, this));
@@ -508,9 +501,10 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 	if (fx->configure(this)){
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
-			if (view->sel.has(t) and (t->type == t->Type::MIDI)){
+			for (TrackLayer *l : t->layers)
+			if (view->sel.has(l) and (t->type == t->Type::MIDI)){
 				fx->reset_state();
-				fx->process_track(t, view->sel);
+				fx->process_layer(l, view->sel);
 			}
 		song->action_manager->endActionGroup();
 	}
@@ -574,7 +568,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::Type::AUDIO);
-		session->storage->loadTrack(t->layers[view->cur_layer], hui::Filename, view->sel.range.start());
+		session->storage->loadTrack(view->cur_layer, hui::Filename, view->sel.range.start());
 	}
 }
 
@@ -626,32 +620,12 @@ void TsunamiWindow::onRecord()
 
 void TsunamiWindow::onAddLayer()
 {
-	side_bar->layer_console->onAdd();
+	//side_bar->layer_console->onAdd();
 }
 
 void TsunamiWindow::onDeleteLayer()
 {
-	side_bar->layer_console->onDelete();
-}
-
-void TsunamiWindow::onCurLayer()
-{
-	view->setCurLayer(hui::GetEvent()->id.substr(14, -1)._int());
-}
-
-void TsunamiWindow::onCurLayerUp()
-{
-	view->setCurLayer(view->cur_layer + 1);
-}
-
-void TsunamiWindow::onCurLayerDown()
-{
-	view->setCurLayer(view->cur_layer - 1);
-}
-
-void TsunamiWindow::onLayerManager()
-{
-	side_bar->open(SideBar::LAYER_CONSOLE);
+	//side_bar->layer_console->onDelete();
 }
 
 void TsunamiWindow::onSampleFromSelection()

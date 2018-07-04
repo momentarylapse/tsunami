@@ -18,14 +18,14 @@ public:
 	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
 	virtual ~ActionTrackSetInstrument(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
-	virtual bool absorb(ActionMergableBase *a);
+	bool mergable(Action *a) override;
+	bool absorb(ActionMergableBase *a) override;
 
 private:
-	int track_no;
+	Track *track;
 };
 
 #endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_ */

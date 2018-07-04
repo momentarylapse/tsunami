@@ -16,7 +16,7 @@ class ActionTrackInsertSample : public ActionGroup
 public:
 	ActionTrackInsertSample(TrackLayer *layer, int index);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	TrackLayer *layer;
 	int index;

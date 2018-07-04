@@ -24,23 +24,23 @@ public:
 	ViewModeMidi(AudioView *view);
 	virtual ~ViewModeMidi();
 
-	virtual void onLeftButtonDown();
-	virtual void onLeftButtonUp();
-	virtual void onMouseMove();
-	virtual void onKeyDown(int k);
-	virtual void updateTrackHeights();
-	virtual void onCurTrackChange();
+	void onLeftButtonDown() override;
+	void onLeftButtonUp() override;
+	void onMouseMove() override;
+	void onKeyDown(int k) override;
+	void updateTrackHeights() override;
+	void onCurTrackChange() override;
 
-	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
-	virtual void drawLayerBackground(Painter *c, AudioViewLayer *l);
-	void drawTrackPitchGrid(Painter *c, AudioViewTrack *t);
-	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
-	virtual void drawPost(Painter *c);
+	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
+	void drawLayerPitchGrid(Painter *c, AudioViewLayer *l);
+	void drawLayerData(Painter *c, AudioViewLayer *l) override;
+	void drawTrackData(Painter *c, AudioViewTrack *t) override;
+	void drawPost(Painter *c) override;
 
-	virtual Selection getHover();
-	virtual void startSelection();
+	virtual Selection getHover() override;
+	virtual void startSelection() override;
 
-	virtual int which_midi_mode(Track *t);
+	virtual int which_midi_mode(Track *t) override;
 
 	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
@@ -75,7 +75,7 @@ public:
 	OutputStream *preview_stream;
 	MidiPreviewSource *preview_source;
 
-	AudioViewTrack *cur_track;
+	AudioViewLayer *cur_layer;
 
 	rect scroll_bar;
 	float scroll_offset;

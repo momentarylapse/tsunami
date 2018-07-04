@@ -55,7 +55,8 @@ void ActionBarAdd::build(Data *d)
 				}
 			}
 
-			foreachi (MidiNote *m, t->midi, i){
+			for (TrackLayer *l: t->layers)
+			foreachi (MidiNote *m, l->midi, i){
 				if (m->range.is_inside(pos0)){
 					// stretch
 					addSubAction(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume), d);

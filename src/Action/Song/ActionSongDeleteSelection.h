@@ -18,7 +18,7 @@ class ActionSongDeleteSelection : public ActionGroup
 public:
 	ActionSongDeleteSelection(const SongSelection &sel);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 	void DeleteBuffersFromTrackLayer(Song *s, Track *t, TrackLayer *l, const SongSelection &sel);
 
 	const SongSelection &sel;

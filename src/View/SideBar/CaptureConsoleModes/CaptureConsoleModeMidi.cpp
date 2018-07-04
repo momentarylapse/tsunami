@@ -61,7 +61,6 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	preview_stream = new OutputStream(session, peak_meter->out);
 	preview_stream->set_buffer_size(512);
 	preview_stream->play();
-	view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
 
 
@@ -160,7 +159,7 @@ bool CaptureConsoleModeMidi::insert()
 	}
 
 	// insert data
-	target->insertMidiData(i0, midi_events_to_notes(input->midi));
+	target->layers[0]->insertMidiData(i0, midi_events_to_notes(input->midi));
 
 	input->reset_accumulation();
 	return true;

@@ -29,7 +29,6 @@ public:
 	void onAddTag();
 	void onDeleteTag();
 
-	void onEditLayers();
 	void onEditSamples();
 	void onEditFx();
 

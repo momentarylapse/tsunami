@@ -164,7 +164,6 @@ public:
 	bool mouse_over_time(int pos);
 
 	void selectSample(SampleRef *s, bool diff);
-	void selectTrack(Track *t, bool diff, bool soft);
 
 	int detail_steps;
 	int preview_sleep_time;
@@ -209,10 +208,10 @@ public:
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);
-	void setCurLayer(int l);
+	void setCurLayer(TrackLayer *l);
 	Track *cur_track;
 	SampleRef *cur_sample;
-	int cur_layer;
+	TrackLayer *cur_layer;
 
 	bool editingTrack(Track *t);
 

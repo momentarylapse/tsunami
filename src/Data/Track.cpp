@@ -67,7 +67,7 @@ TrackLayer::TrackLayer(Track *t, bool _is_main)
 
 TrackLayer::~TrackLayer()
 {
-	//midi.deep_clear();
+	midi.deep_clear();
 }
 
 Range TrackLayer::range(int keep_notes) const
@@ -77,8 +77,8 @@ Range TrackLayer::range(int keep_notes) const
 	for (AudioBuffer &b: buffers)
 		r = r or b.range();
 
-	/*if ((type == Track::Type::MIDI) and (midi.num > 0))
-		r = r or midi.range(keep_notes);*/
+	if ((type == Track::Type::MIDI) and (midi.num > 0))
+		r = r or midi.range(keep_notes);
 
 	return r;
 }
@@ -125,8 +125,6 @@ Track::~Track()
 		delete(r);
 	samples.clear();
 
-	midi.deep_clear();
-
 	if (synth)
 		delete(synth);
 }
@@ -143,9 +141,6 @@ Range Track::range() const
 
 	for (TrackMarker *m: markers)
 		r = r or m->range;
-
-	if ((type == Track::Type::MIDI) and (midi.num > 0))
-		r = r or midi.range(synth->keep_notes);
 
 	return r;
 }
@@ -252,24 +247,24 @@ void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
 }
 
 // will take ownership of this instance!
-void Track::addMidiNote(MidiNote *n)
+void TrackLayer::addMidiNote(MidiNote *n)
 {
-	song->execute(new ActionTrackAddMidiNote(this, n));
+	track->song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
-void Track::addMidiNotes(const MidiNoteBuffer &notes)
+void TrackLayer::addMidiNotes(const MidiNoteBuffer &notes)
 {
-	song->action_manager->beginActionGroup();
+	track->song->action_manager->beginActionGroup();
 	for (MidiNote *n: notes)
 		addMidiNote(n);
-	song->action_manager->endActionGroup();
+	track->song->action_manager->endActionGroup();
 }
 
-void Track::deleteMidiNote(const MidiNote *note)
+void TrackLayer::deleteMidiNote(const MidiNote *note)
 {
 	foreachi(MidiNote *n, midi, index)
 		if (n == note)
-			song->execute(new ActionTrackDeleteMidiNote(this, index));
+			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
 }
 
 void Track::setName(const string& name)
@@ -303,9 +298,9 @@ void Track::move(int target)
 		song->execute(new ActionTrackMove(this, target));
 }
 
-void Track::insertMidiData(int offset, const MidiNoteBuffer& midi)
+void TrackLayer::insertMidiData(int offset, const MidiNoteBuffer& midi)
 {
-	song->execute(new ActionTrackInsertMidi(this, offset, midi));
+	track->song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }
 
 void Track::addEffect(AudioEffect *effect)

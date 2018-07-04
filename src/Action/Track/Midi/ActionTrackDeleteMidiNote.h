@@ -10,20 +10,20 @@
 
 #include "../../Action.h"
 
-class Track;
+class TrackLayer;
 class MidiNote;
 
 class ActionTrackDeleteMidiNote: public Action
 {
 public:
-	ActionTrackDeleteMidiNote(Track *t, int index);
+	ActionTrackDeleteMidiNote(TrackLayer *l, int index);
 	~ActionTrackDeleteMidiNote();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
+	TrackLayer *layer;
 	MidiNote *note;
 	int index;
 };

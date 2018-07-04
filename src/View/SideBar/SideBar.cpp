@@ -17,7 +17,6 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
-#include "LayerConsole.h"
 #include "ModuleConsole.h"
 #include "../../Session.h"
 
@@ -39,7 +38,6 @@ SideBar::SideBar(Session *session)
 	addLabel("!big,expandx,center\\...", 1, 0, "title");
 
 	song_console = new SongConsole(session);
-	layer_console = new LayerConsole(session);
 	sample_manager = new SampleManagerConsole(session);
 	global_fx_console = new FxConsole(session);
 	track_console = new TrackConsole(session);
@@ -53,7 +51,6 @@ SideBar::SideBar(Session *session)
 	module_console = new ModuleConsole(session);
 
 	addConsole(song_console);
-	addConsole(layer_console);
 	addConsole(sample_manager);
 	addConsole(global_fx_console);
 	addConsole(track_console);

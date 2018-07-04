@@ -8,13 +8,13 @@
 #include "ActionTrackAddMidiNote.h"
 #include "../../../Data/Track.h"
 
-ActionTrackAddMidiNote::ActionTrackAddMidiNote(Track* t, MidiNote* n)
+ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n)
 {
-	track = t;
+	layer = l;
 	note = n;
 
 	insert_index = 0;
-	foreachi(MidiNote *nn, t->midi, i)
+	foreachi(MidiNote *nn, l->midi, i)
 		if (note->range.offset > nn->range.offset)
 			insert_index = i + 1;
 }
@@ -27,7 +27,7 @@ ActionTrackAddMidiNote::~ActionTrackAddMidiNote()
 
 void* ActionTrackAddMidiNote::execute(Data* d)
 {
-	track->midi.insert(note, insert_index);
+	layer->midi.insert(note, insert_index);
 	note = NULL;
 
 	return note;
@@ -35,6 +35,6 @@ void* ActionTrackAddMidiNote::execute(Data* d)
 
 void ActionTrackAddMidiNote::undo(Data* d)
 {
-	note = track->midi[insert_index];
-	track->midi.erase(insert_index);
+	note = layer->midi[insert_index];
+	layer->midi.erase(insert_index);
 }

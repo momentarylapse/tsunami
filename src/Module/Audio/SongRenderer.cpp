@@ -291,7 +291,7 @@ void SongRenderer::build_data()
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
 		if (t->type == t->Type::MIDI){
-			MidiNoteBuffer _midi = t->midi;
+			MidiNoteBuffer _midi = t->layers[0]->midi;
 			for (auto c: t->samples)
 				if (c->type() == t->Type::MIDI)
 					_midi.append(*c->midi, c->pos);

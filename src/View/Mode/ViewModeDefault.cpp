@@ -297,29 +297,20 @@ void ViewModeDefault::updateTrackHeights()
 
 
 
-void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift)
+void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
-	int mode = which_midi_mode(t->track);
+	int mode = which_midi_mode(l->layer->track);
 	if (mode == view->MidiMode::LINEAR)
-		t->drawMidiLinear(c, midi, as_reference, shift);
+		l->drawMidiLinear(c, midi, as_reference, shift);
 	else if (mode == view->MidiMode::TAB)
-		t->drawMidiTab(c, midi, as_reference, shift);
+		l->drawMidiTab(c, midi, as_reference, shift);
 	else // if (mode == view->VIEW_MIDI_CLASSICAL)
-		t->drawMidiClassical(c, midi, as_reference, shift);
+		l->drawMidiClassical(c, midi, as_reference, shift);
 }
 
 void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
 
-	if (t->track->type == Track::Type::MIDI){
-		int mode = which_midi_mode(t->track);
-		if (mode == AudioView::MidiMode::CLASSICAL){
-			const Clef& clef = t->track->instrument.get_clef();
-			t->drawMidiClefClassical(c, clef, view->midi_scale);
-		}else if (mode == AudioView::MidiMode::TAB){
-			t->drawMidiClefTab(c);
-		}
-	}
 }
 
 void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
@@ -333,15 +324,15 @@ void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 		view->drawGridTime(c, l->area, cc, false);
 
 
-	/*if (t->track->type == Track::Type::MIDI){
-		int mode = which_midi_mode(t->track);
+	if (l->layer->type == Track::Type::MIDI){
+		int mode = which_midi_mode(l->layer->track);
 		if (mode == AudioView::MidiMode::CLASSICAL){
-			const Clef& clef = t->track->instrument.get_clef();
-			t->drawMidiClefClassical(c, clef, view->midi_scale);
+			const Clef& clef = l->layer->track->instrument.get_clef();
+			l->drawMidiClefClassical(c, clef, view->midi_scale);
 		}else if (mode == AudioView::MidiMode::TAB){
-			t->drawMidiClefTab(c);
+			l->drawMidiClefTab(c);
 		}
-	}*/
+	}
 }
 
 void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
@@ -378,10 +369,6 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
-	// midi
-	if (t->track->type == Track::Type::MIDI)
-		drawMidi(c, t, t->track->midi, false, 0);
-
 	// samples
 	for (SampleRef *s: t->track->samples)
 		t->drawSample(c, s);
@@ -399,8 +386,8 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
 {
 	// midi
-	//if (l->layer->type == Track::Type::MIDI)
-	//	drawMidi(c, t, t->track->midi, false, 0);
+	if (l->layer->type == Track::Type::MIDI)
+		drawMidi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
 	l->drawTrackBuffers(c, view->cam.pos);
@@ -508,16 +495,16 @@ Selection ViewModeDefault::getHoverBasic()
 
 
 	// track?
-	/*foreachi(AudioViewTrack *t, view->vtrack, i){
+	foreachi(AudioViewTrack *t, view->vtrack, i){
 		if (view->mouseOverTrack(t)){
 			s.vtrack = t;
 			s.index = i;
 			s.track = t->track;
+			s.layer = t->track->layers[0];
+			s.vlayer = view->get_layer(s.layer);
 			s.type = Selection::Type::TRACK;
-			if ((view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < t->area.y1 + view->TRACK_HANDLE_HEIGHT))
-				s.type = Selection::Type::TRACK_HEADER;
 		}
-	}*/
+	}
 
 	// layer?
 	foreachi(AudioViewLayer *l, view->vlayer, i){
@@ -676,20 +663,54 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 }
 
 
+void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
+{
+	if (!l)
+		return;
+	auto &sel = m->view->sel;
+	if (diff){
+		bool is_only_selected = true;
+		for (Track *tt: l->track->song->tracks)
+			for (TrackLayer *ll: tt->layers)
+				if (sel.has(ll) and (ll != l))
+					is_only_selected = false;
+		sel.set(l, !sel.has(l) or is_only_selected);
+	}else if (soft){
+		if (sel.has(l))
+			return;
+		sel.track_layers.clear();
+		sel.add(l);
+		sel.tracks.clear();
+		sel.add(l->track);
+	}else{
+		sel.track_layers.clear();
+		sel.add(l);
+		sel.add(l->track);
+		sel.tracks.clear();
+	}
+
+	sel.make_consistent(m->song);
+
+	// TODO: what to do???
+	m->view->setSelection(m->view->mode->getSelectionForRange(sel.range));
+}
+
 void ViewModeDefault::selectUnderMouse()
 {
 	view->sel_temp = view->sel;
 	*hover = getHover();
 	Track *t = hover->track;
+	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
 	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
-	if (hover->track)
-		view->setCurTrack(hover->track);
-	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER)){
-		view->selectTrack(t, control, true);
-	}
+	if (l)
+		view->setCurLayer(l);
+	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
+		selectLayer(this, l, control, true);
+	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER))
+		selectLayer(this, l, control, true);
 
 	view->setCurSample(s);
 
@@ -704,7 +725,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(b)){
 			}else{
-				view->selectTrack(t, control, true);
+				selectLayer(this, l, control, true);
 				view->sel.clear_data();
 				view->sel.add(b);
 			}
@@ -716,7 +737,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(m)){
 			}else{
-				view->selectTrack(t, control, true);
+				selectLayer(this, l, control, true);
 				view->sel.clear_data();
 				view->sel.add(m);
 			}
@@ -727,7 +748,7 @@ void ViewModeDefault::selectUnderMouse()
 		}else{
 			if (view->sel.has(s)){
 			}else{
-				view->selectTrack(t, control, true);
+				selectLayer(this, l, control, true);
 				view->sel.clear_data();
 				view->sel.add(s);
 			}
@@ -765,9 +786,12 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 		// markers
 		for (TrackMarker *m: t->markers)
 			s.set(m, s.range.overlaps(m->range));
+	}
 
+	for (auto vl: view->vlayer){
+		TrackLayer *l = vl->layer;
 		// midi
-		for (MidiNote *n: t->midi)
+		for (MidiNote *n: l->midi)
 			if ((n->y >= y0) and (n->y <= y1))
 				//s.set(n, s.range.is_inside(n->range.center()));
 				s.set(n, s.range.overlaps(n->range));

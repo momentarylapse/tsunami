@@ -35,7 +35,7 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 
 	auto clef = t->instrument.get_clef();
 
-	auto midi = t->midi.getNotes(r_inside);
+	auto midi = t->layers[0]->midi.getNotes(r_inside);
 	int mm = 0;
 	for (auto n: midi){
 		mm = max(mm, n->range.offset);
@@ -83,7 +83,7 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 	// midi
 	float fs = 12;
 	p->setFontSize(fs);
-	auto midi2 = t->midi.getNotes(r_inside);
+	auto midi2 = t->layers[0]->midi.getNotes(r_inside);
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		int pos = n->clef_position;
@@ -104,7 +104,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 	int slack = t->song->sample_rate / 30;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	auto midi = t->midi.getNotes(r_inside);
+	auto midi = t->layers[0]->midi.getNotes(r_inside);
 	int mm = 0;
 	for (auto n: midi){
 		mm = max(mm, n->range.offset);
@@ -138,7 +138,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 	// midi
 	float fs = 12;
 	p->setFontSize(fs);
-	auto midi2 = t->midi.getNotes(r_inside);
+	auto midi2 = t->layers[0]->midi.getNotes(r_inside);
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 0.5f) * string_dy;

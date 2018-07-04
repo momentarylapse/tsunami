@@ -74,10 +74,6 @@ public:
 	void onPause();
 	void onStop();
 	void onRecord();
-	void onCurLayer();
-	void onCurLayerUp();
-	void onCurLayerDown();
-	void onLayerManager();
 	void onAddBars();
 	void onAddPause();
 	void onDeleteBars();

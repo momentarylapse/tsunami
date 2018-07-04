@@ -85,11 +85,11 @@ void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 
 
 
-void MidiEffect::process_track(Track *t, const SongSelection &sel)
+void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 {
-	MidiNoteBuffer midi = t->midi.getNotesBySelection(sel);
+	MidiNoteBuffer midi = l->midi.getNotesBySelection(sel);
 
-	bh_song = t->song;
+	bh_song = l->track->song;
 	bh_offset = sel.range.offset;
 	int b2 = bh_song->bars.getNextBeat(bh_offset);
 	int b1 = bh_song->bars.getPrevBeat(b2);
@@ -97,18 +97,18 @@ void MidiEffect::process_track(Track *t, const SongSelection &sel)
 		bh_offset = b2;
 	bh_midi = &midi;
 
-	t->song->action_manager->beginActionGroup();
+	l->track->song->action_manager->beginActionGroup();
 
-	for (int i=t->midi.num-1; i>=0; i--)
-		if (sel.has(t->midi[i]))
-			t->deleteMidiNote(t->midi[i]);
+	for (int i=l->midi.num-1; i>=0; i--)
+		if (sel.has(l->midi[i]))
+			l->deleteMidiNote(l->midi[i]);
 
 	process(&midi);
 	for (MidiNote *n: midi)
 		n->reset_meta();
 
-	t->insertMidiData(0, midi);
-	t->song->action_manager->endActionGroup();
+	l->insertMidiData(0, midi);
+	l->track->song->action_manager->endActionGroup();
 }
 
 void MidiEffect::note(float pitch, float volume, int beats)

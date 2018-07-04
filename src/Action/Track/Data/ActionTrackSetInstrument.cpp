@@ -10,33 +10,29 @@
 
 ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &instrument)
 {
-	track_no = t->get_index();
+	track = t;
 	old_value = t->instrument;
 	new_value = instrument;
 }
 
 void* ActionTrackSetInstrument::execute(Data* d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
+	track->instrument = new_value;
+	for (TrackLayer *l: track->layers)
+		l->midi.clear_meta();
 
-	t->instrument = new_value;
-	t->midi.clear_meta();
-
-	t->notify();
+	track->notify();
 
 	return NULL;
 }
 
 void ActionTrackSetInstrument::undo(Data* d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
+	track->instrument = old_value;
+	for (TrackLayer *l: track->layers)
+		l->midi.clear_meta();
 
-	t->instrument = old_value;
-	t->midi.clear_meta();
-
-	t->notify();
+	track->notify();
 }
 
 bool ActionTrackSetInstrument::mergable(Action* a)
@@ -44,7 +40,7 @@ bool ActionTrackSetInstrument::mergable(Action* a)
 	ActionTrackSetInstrument *aa = dynamic_cast<ActionTrackSetInstrument*>(a);
 	if (!aa)
 		return false;
-	return (aa->track_no == track_no);
+	return (aa->track == track);
 }
 
 bool ActionTrackSetInstrument::absorb(ActionMergableBase* a)

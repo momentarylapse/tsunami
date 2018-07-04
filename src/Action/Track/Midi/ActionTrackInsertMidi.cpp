@@ -7,9 +7,9 @@
 
 #include "ActionTrackInsertMidi.h"
 
-ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiNoteBuffer &_midi)
+ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const MidiNoteBuffer &_midi)
 {
-	track_no = get_track_index(t);
+	layer = l;;
 	offset = _offset;
 	midi = _midi;
 	for (MidiNote *n: midi)
@@ -27,19 +27,16 @@ ActionTrackInsertMidi::~ActionTrackInsertMidi()
 
 void *ActionTrackInsertMidi::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
 	inserted_at.clear();
 
 	foreachb(MidiNote *n, midi){
-		int index = t->midi.num;
-		for (int i=0;i<t->midi.num;i++)
-			if (n->range.offset < t->midi[i]->range.offset){
+		int index = layer->midi.num;
+		for (int i=0;i<layer->midi.num;i++)
+			if (n->range.offset < layer->midi[i]->range.offset){
 				index = i;
 				break;
 			}
-		t->midi.insert(n, index);
+		layer->midi.insert(n, index);
 		inserted_at.add(index);
 	}
 	applied = true;
@@ -49,11 +46,8 @@ void *ActionTrackInsertMidi::execute(Data *d)
 
 void ActionTrackInsertMidi::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
 	foreachb(int i, inserted_at)
-		t->midi.erase(i);
+		layer->midi.erase(i);
 
 	applied = false;
 }

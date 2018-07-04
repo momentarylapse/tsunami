@@ -29,11 +29,6 @@ void ActionSongDeleteSelection::build(Data *d)
 			if (sel.has(t->samples[i]))
 				addSubAction(new ActionTrackDeleteSample(t->samples[i]), d);
 
-		// midi
-		for (int i=t->midi.num-1; i>=0; i--)
-			if (sel.has(t->midi[i]))
-				addSubAction(new ActionTrackDeleteMidiNote(t, i), d);
-
 		// marker
 		for (int i=t->markers.num-1; i>=0; i--)
 			if (sel.has(t->markers[i]))
@@ -43,10 +38,16 @@ void ActionSongDeleteSelection::build(Data *d)
 		if (!sel.has(t) or sel.range.empty())
 			continue;
 
-		// buffer boxes
-		for (TrackLayer *l: t->layers)
+		for (TrackLayer *l: t->layers){
+			// buffer boxes
 			if (sel.has(l))
 				DeleteBuffersFromTrackLayer(s, t, l, sel);
+
+			// midi
+			for (int i=l->midi.num-1; i>=0; i--)
+				if (sel.has(l->midi[i]))
+					addSubAction(new ActionTrackDeleteMidiNote(l, i), d);
+		}
 	}
 }
 

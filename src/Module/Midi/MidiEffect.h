@@ -16,6 +16,7 @@
 
 class Plugin;
 class Track;
+class TrackLayer;
 class AudioBuffer;
 class MidiNoteBuffer;
 class SongSelection;
@@ -38,7 +39,7 @@ public:
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
-	void process_track(Track *t, const SongSelection &sel);
+	void process_layer(TrackLayer *l, const SongSelection &sel);
 
 	void prepare();
 	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);

@@ -51,7 +51,7 @@ public:
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
 	virtual void drawLayerData(Painter *c, AudioViewLayer *t){}
 	virtual void drawPost(Painter *c){}
-	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift){}
+	virtual void drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift){}
 
 	virtual int which_midi_mode(Track *t) = 0;
 

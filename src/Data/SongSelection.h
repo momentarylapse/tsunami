@@ -32,6 +32,9 @@ public:
 	static SongSelection from_range(Song *s, const Range &r, int mask = Mask::ALL);
 	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, Set<const TrackLayer*> layers, int mask = Mask::ALL);
 
+	void make_consistent(Song *s);
+	void _update_tracks_from_layers(Song *s);
+
 	enum Mask{
 		SAMPLES = 1,
 		MARKERS = 2,

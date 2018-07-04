@@ -51,16 +51,6 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 	int pos0 = r.offset;
 	for (Track *t : s->tracks){
 
-		// midi
-		foreachi(MidiNote *n, t->midi, j){
-			// note start
-			if (n->range.start() >= pos0)
-				n->range.set_start(__shift_data_shift(r, new_length, n->range.start()));
-			// note end
-			if (n->range.end() >= pos0)
-				n->range.set_end(__shift_data_shift(r, new_length, n->range.end()));
-		}
-
 		// marker
 		for (TrackMarker *m : t->markers){
 			if (m->range.start() >= pos0)
@@ -70,12 +60,24 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 		}
 
 		// buffer
-		for (TrackLayer *l : t->layers)
+		for (TrackLayer *l : t->layers){
 			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(r, new_length, b.offset);
 
-		// marker
+
+			// midi
+			foreachi(MidiNote *n, l->midi, j){
+				// note start
+				if (n->range.start() >= pos0)
+					n->range.set_start(__shift_data_shift(r, new_length, n->range.start()));
+				// note end
+				if (n->range.end() >= pos0)
+					n->range.set_end(__shift_data_shift(r, new_length, n->range.end()));
+			}
+		}
+
+		// samples
 		for (SampleRef *s : t->samples)
 			if (s->pos >= pos0)
 				s->pos = __shift_data_shift(r, new_length, s->pos);

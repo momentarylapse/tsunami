@@ -39,15 +39,6 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 {
 	for (Track *t: s->tracks){
 
-		// midi
-		for (MidiNote *n: t->midi){
-			if (n->range.start() >= offset)
-				n->range.offset += delta;
-			/*else if (n->range.end() >= offset){
-				printf("end... %p %d\n", n, n->range.end());
-				n->range.length += delta;
-			}*/
-		}
 
 		// marker
 		for (TrackMarker *m: t->markers){
@@ -57,11 +48,22 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 				m->range.length += delta;*/
 		}
 
-		// buffer
-		for (TrackLayer *l: t->layers)
+		for (TrackLayer *l: t->layers){
+			// buffer
 			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= offset)
 					b.offset += delta;
+
+			// midi
+			for (MidiNote *n: l->midi){
+				if (n->range.start() >= offset)
+					n->range.offset += delta;
+				/*else if (n->range.end() >= offset){
+					printf("end... %p %d\n", n, n->range.end());
+					n->range.length += delta;
+				}*/
+			}
+		}
 
 		// samples
 		for (SampleRef *s: t->samples)

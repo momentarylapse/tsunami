@@ -19,6 +19,7 @@ void SongSelection::clear()
 {
 	bar_indices.clear();
 	tracks.clear();
+	track_layers.clear();
 	clear_data();
 }
 
@@ -71,15 +72,15 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			for (TrackMarker *m: t->markers)
 				s.set(m, s.range.overlaps(m->range));
 
-		// midi
-		if ((mask & Mask::MIDI_NOTES) > 0)
-			for (MidiNote *n: t->midi)
-				//set(n, range.is_inside(n->range.center()));
-				s.set(n, s.range.overlaps(n->range));
-
 		for (const TrackLayer *l: t->layers){
 			if (_layers.contains(l))
 				s.add(l);
+
+			// midi
+			if ((mask & Mask::MIDI_NOTES) > 0)
+				for (MidiNote *n: l->midi)
+					//set(n, range.is_inside(n->range.center()));
+					s.set(n, s.range.overlaps(n->range));
 		}
 	}
 
@@ -123,6 +124,22 @@ void SongSelection::_update_bars(Song* s)
 }
 
 
+// make sure a track is selected iff 1+ layers are selected
+void SongSelection::_update_tracks_from_layers(Song *s)
+{
+	for (Track *t: s->tracks){
+		bool any_layer_selected = false;
+		for (TrackLayer *l: t->layers)
+			any_layer_selected |= has(l);
+		set(t, any_layer_selected);
+	}
+}
+
+void SongSelection::make_consistent(Song *s)
+{
+	_update_tracks_from_layers(s);
+}
+
 
 #define IMPLEMENT_FUNC(TYPE, ARRAY)                   \
 void SongSelection::add(const TYPE* t)                \
@@ -159,8 +176,11 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 	sel.range = range;
 	sel.bars = bars;
 	sel.set(t, true);
-	for (auto n: t->midi)
-		sel.set(n, has(n));
+	for (auto *l: t->layers){
+		sel.set(l, true);
+		for (auto n: l->midi)
+			sel.set(n, has(n));
+	}
 	for (auto m: t->markers)
 		sel.set(m, has(m));
 	for (auto r: t->samples)
@@ -173,6 +193,8 @@ SongSelection SongSelection::operator||(const SongSelection &s) const
 	SongSelection r = *this;
 	for (auto t: s.tracks)
 		r.add(t);
+	for (auto l: s.track_layers)
+		r.add(l);
 	for (auto n: s.notes)
 		r.add(n);
 	for (auto m: s.markers)

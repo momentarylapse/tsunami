@@ -30,9 +30,27 @@ class AudioViewLayer
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 
+
+	enum MidiNoteState
+	{
+		STATE_DEFAULT = 0,
+		STATE_HOVER = 1,
+		STATE_REFERENCE = 2,
+		STATE_SELECTED = 4,
+	};
+
 	color getBackgroundColor();
 	void drawBlankBackground(Painter *c);
 	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
+
+	void drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
+	void drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state);
+	void drawMidiClefTab(Painter *c);
+	void drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale);
+	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
@@ -40,18 +58,14 @@ public:
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
+	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
+
 	TrackLayer *layer;
 	rect area;
 	rect area_last, area_target;
 	int height_wish, height_min;
 	AudioView *view;
-};
 
-class AudioViewTrack
-{
-public:
-	AudioViewTrack(AudioView *view, Track *track);
-	virtual ~AudioViewTrack();
 
 	static color getPitchColor(int pitch);
 
@@ -70,29 +84,22 @@ public:
 	void setPitchMinMax(int pitch_min, int pitch_max);
 	int pitch_min, pitch_max;
 
-	enum MidiNoteState
-	{
-		STATE_DEFAULT = 0,
-		STATE_HOVER = 1,
-		STATE_REFERENCE = 2,
-		STATE_SELECTED = 4,
-	};
+
+	float clef_dy;
+	float clef_y0;
+};
+
+class AudioViewTrack
+{
+public:
+	AudioViewTrack(AudioView *view, Track *track);
+	virtual ~AudioViewTrack();
 
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
 	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
-	void drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
-	void drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state);
-	void drawMidiClefTab(Painter *c);
-	void drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
-
-	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
 	void setSolo(bool solo);
 
@@ -107,9 +114,6 @@ public:
 	static const float MIN_GRID_DIST;
 
 	int height_wish, height_min;
-
-	float clef_dy;
-	float clef_y0;
 
 
 	//Array<AudioViewLayer*> layers;

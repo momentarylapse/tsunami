@@ -220,7 +220,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				Array<int> keys = events.keys();
 				for (int k : keys){
 					Track *t = od->song->addTrack(Track::Type::MIDI);
-					t->midi = midi_events_to_notes(events[k]);
+					t->layers[0]->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;
 				}
 			}
@@ -290,7 +290,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				f->write_byte(0);
 				f->write_byte(0);
 			}
-			MidiEventBuffer events = t->midi.getEvents(Range::ALL);
+			MidiEventBuffer events = t->layers[0]->midi.getEvents(Range::ALL);
 			events.sort();
 			int offset = 0;
 			for (MidiEvent& e: events) {

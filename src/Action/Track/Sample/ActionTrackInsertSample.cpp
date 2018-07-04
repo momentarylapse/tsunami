@@ -41,7 +41,7 @@ void ActionTrackInsertSample::build(Data *d)
 		for (MidiNote *n : *ref->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;
-			addSubAction(new ActionTrackAddMidiNote(t, nn), s);
+			addSubAction(new ActionTrackAddMidiNote(layer, nn), s);
 		}
 	}
 

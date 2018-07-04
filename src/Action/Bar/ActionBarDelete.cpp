@@ -55,10 +55,11 @@ void ActionBarDelete::build(Data *d)
 				}
 			}
 
-			foreachi (MidiNote *m, t->midi, i){
+			for (TrackLayer *l: t->layers)
+			foreachi (MidiNote *m, l->midi, i){
 				if (r.covers(m->range)){
 					// cover
-					addSubAction(new ActionTrackDeleteMidiNote(t, i), d);
+					addSubAction(new ActionTrackDeleteMidiNote(l, i), d);
 				}else if (r.is_inside(m->range.start())){
 					// cover start
 					addSubAction(new ActionTrackEditMidiNote(m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume), d);

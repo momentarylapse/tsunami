@@ -32,6 +32,7 @@ public:
 	virtual void onCurTrackChange();
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
+	virtual void drawLayerBackground(Painter *c, AudioViewLayer *l);
 	void drawTrackPitchGrid(Painter *c, AudioViewTrack *t);
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 	virtual void drawPost(Painter *c);

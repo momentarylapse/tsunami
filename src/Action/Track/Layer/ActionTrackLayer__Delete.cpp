@@ -31,6 +31,7 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 
 	layer = track->layers[index];
 	assert(layer->buffers.num == 0);
+	layer->notify(layer->MESSAGE_DELETE);
 	track->layers.erase(index);
 
 	a->notify(a->MESSAGE_DELETE_LAYER);

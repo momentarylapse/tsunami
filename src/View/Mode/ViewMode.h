@@ -47,6 +47,7 @@ public:
 	virtual void setBarriers(Selection &s){}
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
+	virtual void drawLayerBackground(Painter *c, AudioViewLayer *l){}
 	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
 	virtual void drawLayerData(Painter *c, AudioViewLayer *t){}
 	virtual void drawPost(Painter *c){}

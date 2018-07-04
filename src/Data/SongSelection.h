@@ -30,7 +30,7 @@ public:
 	void all(Song *s);
 	void _update_bars(Song *s);
 	static SongSelection from_range(Song *s, const Range &r, int mask = Mask::ALL);
-	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, int mask = Mask::ALL);
+	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, Set<const TrackLayer*> layers, int mask = Mask::ALL);
 
 	enum Mask{
 		SAMPLES = 1,

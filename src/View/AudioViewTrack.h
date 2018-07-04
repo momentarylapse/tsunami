@@ -30,6 +30,10 @@ class AudioViewLayer
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 
+	color getBackgroundColor();
+	void drawBlankBackground(Painter *c);
+	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
+
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
 	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
@@ -73,10 +77,6 @@ public:
 		STATE_REFERENCE = 2,
 		STATE_SELECTED = 4,
 	};
-
-	color getBackgroundColor();
-	void drawBlankBackground(Painter *c);
-	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
 
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);

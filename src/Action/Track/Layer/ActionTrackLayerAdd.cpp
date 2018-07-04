@@ -38,6 +38,7 @@ void ActionTrackLayerAdd::undo(Data* d)
 	Song *a = dynamic_cast<Song*>(d);
 
 	layer = track->layers[index];
+	layer->notify(layer->MESSAGE_DELETE);
 	track->layers.erase(index);
 
 	a->notify(a->MESSAGE_DELETE_LAYER);

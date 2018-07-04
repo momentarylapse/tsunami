@@ -158,6 +158,7 @@ public:
 
 	void setMouse();
 	bool mouseOverTrack(AudioViewTrack *t);
+	bool mouseOverLayer(AudioViewLayer *l);
 	int mouseOverSample(SampleRef *s);
 	void selectionUpdatePos(Selection &s);
 	bool mouse_over_time(int pos);

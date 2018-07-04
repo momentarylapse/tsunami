@@ -864,7 +864,7 @@ void AudioViewTrack::drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, b
 	c->setAntialiasing(false);
 }
 
-void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition)
+void AudioViewLayer::drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition)
 {
 	if (view->song->bars.num == 0)
 		return;
@@ -941,12 +941,12 @@ void AudioViewTrack::drawGridBars(Painter *c, const color &bg, bool show_time, i
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-color AudioViewTrack::getBackgroundColor()
+color AudioViewLayer::getBackgroundColor()
 {
-	return (view->sel.has(track)) ? view->colors.background_track_selected : view->colors.background_track;
+	return (view->sel.has(layer)) ? view->colors.background_track_selected : view->colors.background_track;
 }
 
-void AudioViewTrack::drawBlankBackground(Painter *c)
+void AudioViewLayer::drawBlankBackground(Painter *c)
 {
 	color cc = getBackgroundColor();
 	c->setColor(cc);
@@ -1052,7 +1052,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 
 void AudioViewLayer::drawHeader(Painter *c)
 {
-	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::TRACK_HEADER);
+	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
 	bool visible = hover or false;//view->editingTrack(track);
 	bool playable = false;//(view->get_playable_tracks().find(track) >= 0);
 

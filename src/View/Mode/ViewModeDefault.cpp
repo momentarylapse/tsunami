@@ -310,14 +310,6 @@ void ViewModeDefault::drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuff
 
 void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
-	t->drawBlankBackground(c);
-
-	color cc = t->getBackgroundColor();
-	if (song->bars.num > 0)
-		t->drawGridBars(c, cc, (t->track->type == Track::Type::TIME), 0);
-	else
-		view->drawGridTime(c, t->area, cc, false);
-
 
 	if (t->track->type == Track::Type::MIDI){
 		int mode = which_midi_mode(t->track);
@@ -328,6 +320,28 @@ void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 			t->drawMidiClefTab(c);
 		}
 	}
+}
+
+void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
+{
+	l->drawBlankBackground(c);
+
+	color cc = l->getBackgroundColor();
+	if (song->bars.num > 0)
+		l->drawGridBars(c, cc, (l->layer->type == Track::Type::TIME), 0);
+	else
+		view->drawGridTime(c, l->area, cc, false);
+
+
+	/*if (t->track->type == Track::Type::MIDI){
+		int mode = which_midi_mode(t->track);
+		if (mode == AudioView::MidiMode::CLASSICAL){
+			const Clef& clef = t->track->instrument.get_clef();
+			t->drawMidiClefClassical(c, clef, view->midi_scale);
+		}else if (mode == AudioView::MidiMode::TAB){
+			t->drawMidiClefTab(c);
+		}
+	}*/
 }
 
 void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
@@ -492,8 +506,9 @@ Selection ViewModeDefault::getHoverBasic()
 	s.y0 = s.y1 = my;
 	s.type = s.Type::BACKGROUND;
 
+
 	// track?
-	foreachi(AudioViewTrack *t, view->vtrack, i){
+	/*foreachi(AudioViewTrack *t, view->vtrack, i){
 		if (view->mouseOverTrack(t)){
 			s.vtrack = t;
 			s.index = i;
@@ -501,6 +516,22 @@ Selection ViewModeDefault::getHoverBasic()
 			s.type = Selection::Type::TRACK;
 			if ((view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < t->area.y1 + view->TRACK_HANDLE_HEIGHT))
 				s.type = Selection::Type::TRACK_HEADER;
+		}
+	}*/
+
+	// layer?
+	foreachi(AudioViewLayer *l, view->vlayer, i){
+		if (view->mouseOverLayer(l)){
+			s.vlayer = l;
+			s.index = i;
+			s.layer = l->layer;
+			s.track = l->layer->track;
+			s.type = Selection::Type::TRACK;
+			if (l->layer->is_main)
+			if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
+				s.type = Selection::Type::TRACK_HEADER;
+			if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my > l->area.y2 - view->TRACK_HANDLE_HEIGHT))
+				s.type = Selection::Type::LAYER_HEADER;
 		}
 	}
 
@@ -530,7 +561,7 @@ Selection ViewModeDefault::getHoverBasic()
 
 	// track header buttons?
 	if (s.track){
-		AudioViewTrack *t = s.vtrack;
+		AudioViewTrack *t = view->get_track(s.track);
 		int x = 5;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::Type::TRACK_BUTTON_MUTE;
@@ -546,11 +577,11 @@ Selection ViewModeDefault::getHoverBasic()
 			s.type = Selection::Type::TRACK_BUTTON_EDIT;
 			return s;
 		}
-		x += 17;
+		/*x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::Type::TRACK_BUTTON_FX;
 			return s;
-		}
+		}*/
 		/*x += 17;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::Type::TRACK_BUTTON_CURVE;
@@ -566,7 +597,7 @@ Selection ViewModeDefault::getHover()
 	Selection s = getHoverBasic();
 
 	// already found important stuff?
-	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::TRACK) and (s.type != Selection::Type::TIME))
+	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::LAYER) and (s.type != Selection::Type::TIME))
 		return s;
 
 	int mx = view->mx;
@@ -706,7 +737,7 @@ void ViewModeDefault::selectUnderMouse()
 
 SongSelection ViewModeDefault::getSelectionForRange(const Range &r)
 {
-	return SongSelection::from_range(song, r, view->sel.tracks);
+	return SongSelection::from_range(song, r, view->sel.tracks, view->sel.track_layers);
 }
 
 SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y1)
@@ -756,7 +787,12 @@ SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, 
 		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
 			_tracks.add(vt->track);
 	}
-	return SongSelection::from_range(song, r, _tracks);
+	Set<const TrackLayer*> _layers;
+	for (auto vt: view->vlayer){
+		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
+			_layers.add(vt->layer);
+	}
+	return SongSelection::from_range(song, r, _tracks, _layers);
 }
 
 void ViewModeDefault::startSelection()

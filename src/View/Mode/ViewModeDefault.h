@@ -20,37 +20,38 @@ public:
 	ViewModeDefault(AudioView *view);
 	virtual ~ViewModeDefault();
 
-	virtual void onLeftButtonDown();
-	virtual void onLeftButtonUp();
-	virtual void onLeftDoubleClick();
-	virtual void onRightButtonDown();
-	virtual void onRightButtonUp();
-	virtual void onMouseWheel();
-	virtual void onMouseMove();
-	virtual void onKeyDown(int k);
-	virtual void onKeyUp(int k);
-	virtual void updateTrackHeights();
+	void onLeftButtonDown() override;
+	void onLeftButtonUp() override;
+	void onLeftDoubleClick() override;
+	void onRightButtonDown() override;
+	void onRightButtonUp() override;
+	void onMouseWheel() override;
+	void onMouseMove() override;
+	void onKeyDown(int k) override;
+	void onKeyUp(int k) override;
+	void updateTrackHeights() override;
 
 
-	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
-	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
-	virtual void drawLayerData(Painter *c, AudioViewLayer *l);
-	virtual void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	virtual void drawPost(Painter *c);
+	void drawTrackBackground(Painter *c, AudioViewTrack *t) override;
+	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
+	void drawTrackData(Painter *c, AudioViewTrack *t) override;
+	void drawLayerData(Painter *c, AudioViewLayer *l) override;
+	void drawMidi(Painter *c, AudioViewTrack *t, const MidiNoteBuffer &midi, bool as_reference, int shift) override;
+	void drawPost(Painter *c) override;
 
-	virtual int which_midi_mode(Track *t);
+	int which_midi_mode(Track *t) override;
 
-	virtual SongSelection getSelectionForRange(const Range &r);
-	virtual SongSelection getSelectionForRect(const Range &r, int y0, int y1);
-	virtual SongSelection getSelectionForTrackRect(const Range &r, int y0, int y1);
-	virtual void startSelection();
+	SongSelection getSelectionForRange(const Range &r) override;
+	SongSelection getSelectionForRect(const Range &r, int y0, int y1) override;
+	SongSelection getSelectionForTrackRect(const Range &r, int y0, int y1) override;
+	void startSelection() override;
 
 	void selectUnderMouse();
 	void setCursorPos(int pos, bool keep_track_selection);
-	virtual Selection getHover();
+	Selection getHover() override;
 	Selection getHoverBasic();
 
-	virtual void setBarriers(Selection &s);
+	void setBarriers(Selection &s) override;
 
 	int getTrackMoveTarget(bool visual);
 

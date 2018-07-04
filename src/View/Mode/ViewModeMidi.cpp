@@ -433,14 +433,6 @@ void ViewModeMidi::setBeatPartition(int partition)
 
 void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
-	t->drawBlankBackground(c);
-
-	color cc = t->getBackgroundColor();
-	if (song->bars.num > 0)
-		t->drawGridBars(c, cc, (t->track->type == Track::Type::TIME), beat_partition);
-	else
-		view->drawGridTime(c, t->area, cc, false);
-
 	if (t->track->type == Track::Type::MIDI){
 		int mode = which_midi_mode(t->track);
 		if (t->track == view->cur_track){
@@ -457,6 +449,32 @@ void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 	}
 
 
+}
+
+void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
+{
+	l->drawBlankBackground(c);
+
+	color cc = l->getBackgroundColor();
+	if (song->bars.num > 0)
+		l->drawGridBars(c, cc, (l->layer->type == Track::Type::TIME), beat_partition);
+	else
+		view->drawGridTime(c, l->area, cc, false);
+
+	/*if (t->track->type == Track::Type::MIDI){
+		int mode = which_midi_mode(t->track);
+		if (t->track == view->cur_track){
+			if (mode == AudioView::MidiMode::LINEAR)
+				drawTrackPitchGrid(c, t);
+		}
+
+		if (mode == AudioView::MidiMode::CLASSICAL){
+			const Clef& clef = t->track->instrument.get_clef();
+			t->drawMidiClefClassical(c, clef, view->midi_scale);
+		}else if (mode == AudioView::MidiMode::TAB){
+			t->drawMidiClefTab(c);
+		}
+	}*/
 }
 
 void ViewModeMidi::drawTrackPitchGrid(Painter *c, AudioViewTrack *t)

@@ -339,6 +339,11 @@ bool AudioView::mouseOverTrack(AudioViewTrack *t)
 	return t->area.inside(mx, my);
 }
 
+bool AudioView::mouseOverLayer(AudioViewLayer *l)
+{
+	return l->area.inside(mx, my);
+}
+
 int AudioView::mouseOverSample(SampleRef *s)
 {
 	if ((mx >= s->area.x1) and (mx < s->area.x2)){
@@ -815,7 +820,6 @@ void AudioView::updateTracks()
 
 			// new layer
 			if (!found){
-				msg_write("new vlayer");
 				vlayer2[li] = new AudioViewLayer(this, l);
 				changed = true;
 				sel.add(l);
@@ -833,7 +837,6 @@ void AudioView::updateTracks()
 		}
 	for (AudioViewLayer *v: vlayer)
 		if (v){
-			msg_write("del vlayer");
 			delete(v);
 			changed = true;
 		}
@@ -908,8 +911,8 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 void AudioView::drawBackground(Painter *c)
 {
 	int yy = 0;
-	if (vtrack.num > 0)
-		yy = vtrack.back()->area.y2;
+	if (vlayer.num > 0)
+		yy = vlayer.back()->area.y2;
 
 	// time scale
 	c->setColor(colors.background_track);
@@ -917,8 +920,8 @@ void AudioView::drawBackground(Painter *c)
 	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
 
 	// tracks
-	for (AudioViewTrack *t: vtrack)
-		mode->drawTrackBackground(c, t);
+	for (AudioViewLayer *l: vlayer)
+		mode->drawLayerBackground(c, l);
 
 	// free space below tracks
 	if (yy < clip.y2){
@@ -953,9 +956,9 @@ void AudioView::drawSelection(Painter *c)
 	if (!hide_selection){
 	if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
 		c->setColor(colors.selection_internal);
-		for (AudioViewTrack *t: vtrack)
-			if (sel.has(t->track))
-				c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+		for (AudioViewLayer *l: vlayer)
+			if (sel.has(l->layer))
+				c->drawRect(rect(sxx1, sxx2, l->area.y1, l->area.y2));
 	}else if (selection_mode == SelectionMode::RECT){
 		int sx1 = cam.sample2screen(hover.range.start());
 		int sx2 = cam.sample2screen(hover.range.end());
@@ -976,8 +979,8 @@ void AudioView::drawSelection(Painter *c)
 		c->setAntialiasing(true);
 		c->setColor(colors.text_soft1);
 		c->setLineWidth(2.5f);
-		for (AudioViewTrack *t: vtrack)
-			if (t->track->type == Track::Type::TIME){
+		for (AudioViewLayer *t: vlayer)
+			if (t->layer->type == Track::Type::TIME){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
@@ -995,8 +998,8 @@ void AudioView::drawSelection(Painter *c)
 		c->setAntialiasing(true);
 		c->setColor(colors.hover);
 		c->setLineWidth(2.5f);
-		for (AudioViewTrack *t: vtrack)
-			if (t->track->type == Track::Type::TIME){
+		for (AudioViewLayer *t: vlayer)
+			if (t->layer->type == Track::Type::TIME){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);

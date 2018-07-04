@@ -41,10 +41,14 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, int mask)
 	Set<const Track*> _tracks;
 	for (Track *t: song->tracks)
 		_tracks.add(t);
-	return from_range(song, r, _tracks, mask);
+	Set<const TrackLayer*> _layers;
+	for (Track *t: song->tracks)
+		for (TrackLayer *l: t->layers)
+			_layers.add(l);
+	return from_range(song, r, _tracks, _layers, mask);
 }
 
-SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Track*> _tracks, int mask)
+SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Track*> _tracks, Set<const TrackLayer*> _layers, int mask)
 {
 	SongSelection s;
 	s.range = r;
@@ -53,7 +57,7 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 
 
 	for (const Track *t: song->tracks){
-		if (_tracks.find(t) < 0)
+		if (!_tracks.contains(t))
 			continue;
 		s.add(t);
 
@@ -72,6 +76,11 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			for (MidiNote *n: t->midi)
 				//set(n, range.is_inside(n->range.center()));
 				s.set(n, s.range.overlaps(n->range));
+
+		for (const TrackLayer *l: t->layers){
+			if (_layers.contains(l))
+				s.add(l);
+		}
 	}
 
 	// bars

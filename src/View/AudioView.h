@@ -204,7 +204,9 @@ public:
 	int playbackPos();
 	Set<Track*> get_playable_tracks();
 	Set<Track*> get_selected_tracks();
-	bool hasAnySolo();
+	bool hasAnySoloTrack();
+	Set<TrackLayer*> get_playable_layers();
+	bool hasAnySoloLayer(Track *t);
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);
@@ -214,6 +216,7 @@ public:
 	TrackLayer *cur_layer;
 
 	bool editingTrack(Track *t);
+	bool editingLayer(TrackLayer *l);
 
 
 	void setScale(const Scale &s);

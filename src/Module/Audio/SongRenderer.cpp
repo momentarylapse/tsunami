@@ -231,6 +231,13 @@ void SongRenderer::allow_tracks(const Set<Track*> &_allowed_tracks)
 	_seek(pos);
 }
 
+void SongRenderer::allow_layers(const Set<TrackLayer*> &_allowed_layers)
+{
+	allowed_layers = _allowed_layers;
+	//reset_state();
+	_seek(pos);
+}
+
 void SongRenderer::clear_data()
 {
 	for (auto m: midi_streamer)
@@ -248,6 +255,7 @@ void SongRenderer::clear_data()
 	}
 
 	allowed_tracks.clear();
+	allowed_layers.clear();
 }
 
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
@@ -259,6 +267,8 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);
+	for (TrackLayer* l: song->layers())
+		allowed_layers.add(l);
 
 	reset_state();
 	build_data();

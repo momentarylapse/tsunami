@@ -62,6 +62,7 @@ TrackLayer::TrackLayer(Track *t, bool _is_main)
 	track = t;
 	type = t->type;
 	is_main = _is_main;
+	muted = false;
 }
 
 TrackLayer::~TrackLayer()
@@ -80,6 +81,16 @@ Range TrackLayer::range(int keep_notes) const
 		r = r or midi.range(keep_notes);
 
 	return r;
+}
+
+int TrackLayer::version_number() const
+{
+	if (!track)
+		return 0;
+	foreachi (TrackLayer *l, track->layers, i)
+		if (l == this)
+			return i;
+	return 0;
 }
 
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
@@ -221,6 +232,12 @@ AudioBuffer TrackLayer::getBuffers(const Range &r)
 {
 	track->song->execute(new ActionTrackCreateBuffers(this, r));
 	return readBuffers(r);
+}
+
+void TrackLayer::setMuted(bool _muted)
+{
+	muted = _muted;
+	notify(MESSAGE_CHANGE); // TODO: action
 }
 
 void Track::invalidateAllPeaks()

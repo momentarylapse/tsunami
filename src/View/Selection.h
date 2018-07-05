@@ -25,7 +25,6 @@ class Selection
 {
 public:
 	int type;
-	AudioViewTrack *vtrack;
 	AudioViewLayer *vlayer;
 	Track *track;
 	TrackLayer *layer;
@@ -60,6 +59,8 @@ public:
 		TRACK_BUTTON_FX,
 		LAYER,
 		LAYER_HEADER,
+		LAYER_BUTTON_MUTE,
+		LAYER_BUTTON_SOLO,
 		SAMPLE,
 		MIDI_NOTE,
 		MIDI_PITCH,

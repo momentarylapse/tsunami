@@ -75,6 +75,10 @@ void ViewModeDefault::onLeftButtonDown()
 		view->win->side_bar->open(SideBar::FX_CONSOLE);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE){
 		view->win->side_bar->open(SideBar::CURVE_CONSOLE);
+	}else if (hover->type == Selection::Type::LAYER_BUTTON_MUTE){
+		hover->layer->setMuted(!hover->layer->muted);
+	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
+		hover->vlayer->setSolo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
 		cur_action = new ActionTrackMoveSample(view->song, view->sel);
 	}else if (hover->type == Selection::Type::TRACK_HEADER){
@@ -451,6 +455,10 @@ void ViewModeDefault::drawPost(Painter *c)
 		drawCursorHover(this, c, _("edit curves"));
 	if (hover->type == Selection::Type::TRACK_BUTTON_FX)
 		drawCursorHover(this, c, _("edit effects"));
+	if (hover->type == Selection::Type::LAYER_BUTTON_MUTE)
+		drawCursorHover(this, c, _("toggle mute"));
+	if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
+		drawCursorHover(this, c, _("toggle solo"));
 }
 
 void ViewModeDefault::setBarriers(Selection &s)
@@ -505,7 +513,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::TRACK_HEADER;
 			if (l->layer->track->layers.num > 0)
-				if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my > l->area.y2 - view->TRACK_HANDLE_HEIGHT))
+				if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::LAYER_HEADER;
 		}
 	}
@@ -562,6 +570,22 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 			s.type = Selection::Type::TRACK_BUTTON_CURVE;
 			return s;
 		}*/
+	}
+
+
+	// layer header buttons?
+	if (s.vlayer and (s.type == s.LAYER_HEADER)){
+		AudioViewLayer *l = s.vlayer;
+		int x = l->area.width() - view->TRACK_HANDLE_WIDTH + 5;
+		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
+			s.type = Selection::Type::LAYER_BUTTON_MUTE;
+			return s;
+		}
+		x += 17;
+		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
+			s.type = Selection::Type::LAYER_BUTTON_SOLO;
+			return s;
+		}
 	}
 
 	return s;

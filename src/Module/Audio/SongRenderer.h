@@ -17,6 +17,7 @@ class BarStreamer;
 class BeatMidifier;
 class Song;
 class Track;
+class TrackLayer;
 class AudioEffect;
 class AudioBuffer;
 class Range;
@@ -38,6 +39,7 @@ public:
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
 	void _cdecl allow_tracks(const Set<Track*> &allowed_tracks);
+	void _cdecl allow_layers(const Set<TrackLayer*> &allowed_layers);
 
 	void _cdecl seek(int pos);
 
@@ -63,6 +65,7 @@ private:
 	Range range_cur;
 	int pos;
 	Set<Track*> allowed_tracks;
+	Set<TrackLayer*> allowed_layers;
 
 	Array<MidiEventStreamer*> midi_streamer;
 	BarStreamer *bar_streamer;

@@ -1305,7 +1305,7 @@ int AudioView::playbackPos()
 	return stream->get_pos();
 }
 
-bool AudioView::hasAnySolo()
+bool AudioView::hasAnySoloTrack()
 {
 	for (auto *t: vtrack)
 		if (t->solo)
@@ -1316,7 +1316,7 @@ bool AudioView::hasAnySolo()
 Set<Track*> AudioView::get_playable_tracks()
 {
 	Set<Track*> tracks;
-	bool any_solo = hasAnySolo();
+	bool any_solo = hasAnySoloTrack();
 	for (Track* t: song->tracks)
 		if (get_track(t)->solo or !any_solo)
 			tracks.add(t);
@@ -1330,4 +1330,24 @@ Set<Track*> AudioView::get_selected_tracks()
 		if (sel.has(t))
 			tracks.add(t);
 	return tracks;
+}
+
+bool AudioView::hasAnySoloLayer(Track *t)
+{
+	for (auto *v: vlayer)
+		if (v->solo and (v->layer->track == t))
+			return true;
+	return false;
+}
+
+Set<TrackLayer*> AudioView::get_playable_layers()
+{
+	Set<TrackLayer*> layers;
+	for (Track* t: song->tracks){
+		bool any_solo = hasAnySoloLayer(t);
+		for (TrackLayer *l: t->layers)
+			if (get_layer(l)->solo or !any_solo)
+				layers.add(l);
+	}
+	return layers;
 }

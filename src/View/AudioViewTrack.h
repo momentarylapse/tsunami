@@ -95,6 +95,10 @@ public:
 
 	float clef_dy;
 	float clef_y0;
+
+
+	void setSolo(bool solo);
+	bool solo;
 };
 
 class AudioViewTrack

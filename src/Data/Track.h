@@ -39,6 +39,7 @@ public:
 
 	// actions
 	AudioBuffer _cdecl getBuffers(const Range &r);
+	void _cdecl setMuted(bool muted);
 
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
 	void _cdecl addMidiNote(MidiNote *n);
@@ -52,6 +53,9 @@ public:
 	Track *track;
 	int type;
 	bool is_main;
+	bool muted;
+
+	int version_number() const;
 };
 
 class TrackMarker

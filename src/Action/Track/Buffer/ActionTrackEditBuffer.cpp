@@ -21,7 +21,8 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 	assert(index >= 0);
 
 	// save old data
-	AudioBuffer b = layer->readBuffers(range);
+	AudioBuffer b;
+	layer->readBuffers(b, range, true);
 	box.resize(b.length);
 	box.set(b, 0, 1.0f);
 }
@@ -34,7 +35,8 @@ void ActionTrackEditBuffer::undo(Data *d)
 
 	layer->buffers[index].invalidate_peaks(range);
 
-	AudioBuffer b = layer->readBuffers(range);
+	AudioBuffer b;
+	layer->readBuffers(b, range, true);
 	box.swap_value(b);
 }
 

@@ -311,7 +311,8 @@ void TsunamiWindow::onTrackRender()
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
 	renderer.allow_tracks(view->get_selected_tracks());
-	AudioBuffer buf = t->layers[0]->getBuffers(range);
+	AudioBuffer buf;
+	t->layers[0]->getBuffers(buf, range);
 
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], range);
 	renderer.read(buf);

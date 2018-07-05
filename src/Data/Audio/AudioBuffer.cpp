@@ -136,6 +136,9 @@ void AudioBuffer::_truncate_peaks(int _length)
 
 void AudioBuffer::resize(int _length)
 {
+	if (is_ref())
+		make_own();
+
 	if (_length < length)
 		_truncate_peaks(_length);
 	for (int i=0; i<channels; i++)

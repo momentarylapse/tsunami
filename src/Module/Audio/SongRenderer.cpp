@@ -66,10 +66,39 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 	return !ir.empty();
 }
 
+
+int get_first_usable_layer(Track *t, Set<TrackLayer*> &allowed)
+{
+	foreachi(TrackLayer *l, t->layers, i)
+		if (!l->muted and allowed.contains(l))
+			return i;
+	return -1;
+}
+
 void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
-	// track buffer
-	t->readBuffersCol(buf, range_cur.offset);
+	// any un-muted layer?
+	int i0 = get_first_usable_layer(t, allowed_layers);
+	if (i0 < 0){
+		// no -> return silence
+		buf.scale(0);
+	}else{
+
+		// first (un-muted) layer
+		t->layers[i0]->readBuffers(buf, range_cur, false);
+		// TODO: allow_ref if no other layers + no fx
+
+		// other tracks
+		AudioBuffer tbuf;
+		for (int i=i0+1;i<t->layers.num;i++){
+			if (allowed_layers.contains(t->layers[i]))
+				continue;
+			if (t->layers[i]->muted)
+				continue;
+			t->layers[i]->readBuffers(tbuf, range_cur, true);
+			buf.add(tbuf, 0, 1.0f, 0.0f);
+		}
+	}
 
 	// subs
 	for (SampleRef *s: t->samples){
@@ -128,7 +157,7 @@ void SongRenderer::render_track_fx(AudioBuffer &buf, Track *t, int ti)
 int get_first_usable_track(Song *s, Set<Track*> &allowed)
 {
 	foreachi(Track *t, s->tracks, i)
-		if (!t->muted and (allowed.find(t) >= 0))
+		if (!t->muted and allowed.contains(t))
 			return i;
 	return -1;
 }

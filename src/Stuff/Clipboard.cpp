@@ -42,7 +42,9 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view)
 	TrackLayer *ll = temp->addTrack(l->type)->layers[0];
 
 	if (l->type == Track::Type::AUDIO){
-		ll->buffers.add(l->readBuffers(view->sel.range));
+		AudioBuffer buf;
+		l->readBuffers(buf, view->sel.range, true);
+		ll->buffers.add(buf);
 		ll->buffers[0].make_own();
 	}else if (l->type == Track::Type::MIDI){
 		ll->midi = l->midi.getNotesBySelection(view->sel);
@@ -80,7 +82,8 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 
 	if (target->type == Track::Type::AUDIO){
 		Range r = Range(view->sel.range.start(), source->buffers[0].length);
-		AudioBuffer buf = target->getBuffers(r);
+		AudioBuffer buf;
+		target->getBuffers(buf, r);
 		Action *a = new ActionTrackEditBuffer(target, r);
 		buf.set(source->buffers[0], 0, 1.0f);
 		s->execute(a);

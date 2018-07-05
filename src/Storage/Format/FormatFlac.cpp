@@ -39,7 +39,8 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
-	AudioBuffer buf = od->layer->getBuffers(range);
+	AudioBuffer buf;
+	od->layer->getBuffers(buf, range);
 
 	Action *a;
 	if (od->song->action_manager->isEnabled())

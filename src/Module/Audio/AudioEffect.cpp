@@ -75,7 +75,8 @@ void AudioEffect::set_source(AudioPort *_source)
 void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
 {
 	sample_rate = l->track->song->sample_rate;
-	AudioBuffer buf = l->getBuffers(r);
+	AudioBuffer buf;
+	l->getBuffers(buf, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);
 	process(buf);
 	session->song->execute(a);

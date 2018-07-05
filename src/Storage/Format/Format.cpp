@@ -65,7 +65,8 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 {
 	Track *t = layer->track;
 	if (t->song->action_manager->isEnabled()){
-		AudioBuffer buf = layer->getBuffers(Range(offset, samples));
+		AudioBuffer buf;
+		layer->getBuffers(buf, Range(offset, samples));
 
 		Action *a = new ActionTrackEditBuffer(layer, Range(offset, samples));
 		buf.import(data, channels, format, samples);

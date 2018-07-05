@@ -171,18 +171,16 @@ int Track::get_index()
 	return song->tracks.find(this);
 }
 
-AudioBuffer TrackLayer::readBuffers(const Range &r)
+void TrackLayer::readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 {
-	AudioBuffer buf;
-
 	// is <r> inside a buffer?
+	if (allow_ref)
 	for (AudioBuffer &b: buffers){
-		int p0 = r.offset - b.offset;
-		int p1 = r.offset - b.offset + r.length;
-		if ((p0 >= 0) and (p1 <= b.length)){
+		if (r.covers(b.range())){
+			int p0 = r.offset - b.offset;
 			// set as reference to subarrays
-			buf.set_as_ref(b, p0, p1 - p0);
-			return buf;
+			buf.set_as_ref(b, p0, r.length);
+			return;
 		}
 	}
 
@@ -192,10 +190,17 @@ AudioBuffer TrackLayer::readBuffers(const Range &r)
 	// fill with overlap
 	for (AudioBuffer &b: buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
+}
 
+// DEPRECATED
+AudioBuffer TrackLayer::_readBuffers(const Range &r, bool allow_ref)
+{
+	AudioBuffer buf;
+	readBuffers(buf, r, allow_ref);
 	return buf;
 }
 
+// DEPRECATED...
 void Track::readBuffersCol(AudioBuffer &buf, int offset)
 {
 	// is <r> inside a single buffer?
@@ -228,10 +233,18 @@ void Track::readBuffersCol(AudioBuffer &buf, int offset)
 			buf.add(b, b.offset - offset, 1.0f, 0.0f);
 }
 
-AudioBuffer TrackLayer::getBuffers(const Range &r)
+void TrackLayer::getBuffers(AudioBuffer &buf, const Range &r)
 {
 	track->song->execute(new ActionTrackCreateBuffers(this, r));
-	return readBuffers(r);
+	readBuffers(buf, r, true);
+}
+
+// DEPRECATED
+AudioBuffer TrackLayer::_getBuffers(const Range &r)
+{
+	AudioBuffer b;
+	getBuffers(b, r);
+	return b;
 }
 
 void TrackLayer::setMuted(bool _muted)

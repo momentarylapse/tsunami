@@ -35,10 +35,12 @@ public:
 	~TrackLayer();
 
 	Range range(int keep_notes = 0) const;
-	AudioBuffer _cdecl readBuffers(const Range &r);
+	AudioBuffer _cdecl _readBuffers(const Range &r, bool allow_ref);
+	void _cdecl readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref);
 
 	// actions
-	AudioBuffer _cdecl getBuffers(const Range &r);
+	AudioBuffer _cdecl _getBuffers(const Range &r);
+	void _cdecl getBuffers(AudioBuffer &buf, const Range &r);
 	void _cdecl setMuted(bool muted);
 
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);

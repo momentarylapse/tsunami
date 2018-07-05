@@ -31,7 +31,8 @@ void ActionTrackInsertSample::build(Data *d)
 		// get target buffer
 		Range r = ref->range();
 		addSubAction(new ActionTrackCreateBuffers(layer, r), s);
-		AudioBuffer buf = layer->readBuffers(r);
+		AudioBuffer buf;
+		layer->readBuffers(buf, r, true);
 
 		// insert sub (ignore muted)
 		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(layer, r);

@@ -178,7 +178,8 @@ bool CaptureConsoleModeAudio::insert()
 	if (!layer)
 		layer = target->addLayer(false);
 
-	AudioBuffer tbuf = layer->getBuffers(r);
+	AudioBuffer tbuf;
+	layer->getBuffers(tbuf, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
 
 	if (hui::Config.getInt("Input.Mode", 0) == 1)

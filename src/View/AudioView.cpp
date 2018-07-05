@@ -1262,6 +1262,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 
 	renderer->prepare(range, allow_loop);
 	renderer->allow_tracks(get_playable_tracks());
+	renderer->allow_layers(get_playable_layers());
 	playback_active = true;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	//stream->play();

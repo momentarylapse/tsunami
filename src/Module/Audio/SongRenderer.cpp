@@ -91,7 +91,7 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 		// other tracks
 		AudioBuffer tbuf;
 		for (int i=i0+1;i<t->layers.num;i++){
-			if (allowed_layers.contains(t->layers[i]))
+			if (!allowed_layers.contains(t->layers[i]))
 				continue;
 			if (t->layers[i]->muted)
 				continue;
@@ -178,7 +178,7 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 		// other tracks
 		AudioBuffer tbuf;
 		for (int i=i0+1;i<song->tracks.num;i++){
-			if (allowed_tracks.find(song->tracks[i]) < 0)
+			if (!allowed_tracks.contains(song->tracks[i]))
 				continue;
 			if (song->tracks[i]->muted)
 				continue;

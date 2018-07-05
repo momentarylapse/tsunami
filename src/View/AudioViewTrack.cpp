@@ -1058,8 +1058,7 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 		c->drawMaskImage(area.x2 - view->TRACK_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);
 		if (layer->muted)
 			c->drawImage(area.x2 - view->TRACK_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.x);
-	}
-	if ((view->song->tracks.num > 1) and visible){
+
 		c->setColor(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))
 			c->setColor(col_but_hover);
@@ -1072,12 +1071,13 @@ void AudioViewTrack::setSolo(bool _solo)
 {
 	solo = _solo;
 	view->renderer->allow_tracks(view->get_playable_tracks());
+	view->renderer->allow_layers(view->get_playable_layers());
 }
 
 void AudioViewLayer::setSolo(bool _solo)
 {
 	solo = _solo;
-	view->renderer->allow_tracks(view->get_playable_tracks());
+	view->renderer->allow_layers(view->get_playable_layers());
 }
 
 

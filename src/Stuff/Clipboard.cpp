@@ -95,24 +95,21 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 
 void Clipboard::paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view)
 {
-	/*Song *s = target->track->song;
+	Song *s = target->track->song;
 	Track *source = temp->tracks[source_index];
 
 	Sample* ref = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref){
-		target->addSampleRef(view->sel.range.start(), ref);
+		target->track->addSampleRef(view->sel.range.start(), ref);
 	}else{
 		if (target->type == Track::Type::AUDIO){MidiNoteBuffer midi;
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->buffers[0], true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target->track, view->sel.range.start(), source->layers[0]->buffers[0], true));
 			ref_uid[source_index] = sample->uid;
 		}else if (target->type == Track::Type::MIDI){
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi, true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target->track, view->sel.range.start(), source->layers[0]->midi, true));
 			ref_uid[source_index] = sample->uid;
 		}
-	}*/
-
-	// need tracks here...
-	msg_write("TODO: paste as sample");
+	}
 }
 
 bool Clipboard::test_compatibility(AudioView *view)

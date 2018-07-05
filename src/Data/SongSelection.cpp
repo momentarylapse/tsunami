@@ -79,7 +79,6 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			// midi
 			if ((mask & Mask::MIDI_NOTES) > 0)
 				for (MidiNote *n: l->midi)
-					//set(n, range.is_inside(n->range.center()));
 					s.set(n, s.range.overlaps(n->range));
 		}
 	}

@@ -89,13 +89,13 @@ bool Range::empty() const
 	return length <= 0;
 }
 
-// do <this> and <r> overlap?
+// do <this> and <r> have at least one sample of overlap?
 bool Range::overlaps(const Range &r) const
 {
-	return ((start() <= r.end()) and (end() >= r.start()));
+	return ((start() < r.end()) and (end() > r.start()));
 }
 
-// does <this> cover <r>?
+// does <this> completely cover <r>?
 bool Range::covers(const Range &r) const
 {
 	return ((start() <= r.start()) and (end() >= r.end()));

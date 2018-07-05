@@ -846,7 +846,6 @@ public:
 	}
 	virtual void create()
 	{
-		//me = &parent->layers[n];
 	}
 	virtual void read(File *f)
 	{
@@ -854,11 +853,15 @@ public:
 		if (n > 0){
 			parent->layers.add(new TrackLayer(parent, false));
 		}
-		me = parent->layers[n];
+		me = parent->layers.back();
 	}
 	virtual void write(File *f)
 	{
-		f->write_int(parent->layers.index(me));
+		int n = 0;
+		foreachi(TrackLayer *l, parent->layers, i)
+			if (l == me)
+				n = i;
+		f->write_int(n);
 	}
 	virtual void write_subs()
 	{
@@ -1081,7 +1084,7 @@ public:
 	{
 		if (!me->instrument.has_default_tuning())
 			write_sub("tuning", &me->instrument);
-		write_sub_array("level", me->layers);
+		write_sub_parray("level", me->layers);
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("marker", me->markers);

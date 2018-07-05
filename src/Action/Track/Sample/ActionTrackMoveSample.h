@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 class Song;
+class Track;
+class SampleRef;
 class SongSelection;
 
 class ActionTrackMoveSample: public Action
@@ -29,7 +31,8 @@ public:
 
 private:
 	struct SubSaveData{
-		int track_no, sub_no;
+		Track *track;
+		SampleRef *sample;
 		int pos_old;
 	};
 	Array<SubSaveData> sub;

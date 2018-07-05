@@ -11,21 +11,19 @@
 #include "../../ActionMergable.h"
 class Track;
 class MidiEffect;
-class Song;
 
 class ActionTrackEditMidiEffect: public ActionMergable<string>
 {
 public:
-	ActionTrackEditMidiEffect(Track *t, int index, const string &old_params, MidiEffect *fx);
+	ActionTrackEditMidiEffect(MidiEffect *fx, const string &old_params);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	int track_no;
-	int index;
+	MidiEffect *fx;
 };
 
 #endif /* ACTIONTRACKEDITMIDIEFFECT_H_ */

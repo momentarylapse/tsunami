@@ -22,7 +22,7 @@ public:
 	bool mergable(Action *a) override;
 
 private:
-	int track_no;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKEDITNAME_H_ */

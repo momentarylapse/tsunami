@@ -31,7 +31,7 @@ ViewModeDefault::~ViewModeDefault()
 
 void ViewModeDefault::onLeftButtonDown()
 {
-	bool track_hover_sel = view->sel.has(hover->track);
+	//bool track_hover_sel = view->sel.has(hover->track);
 	selectUnderMouse();
 
 	setBarriers(*hover);
@@ -40,7 +40,7 @@ void ViewModeDefault::onLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::CLEF_POSITION)){
+	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::CLEF_POSITION)){
 		setCursorPos(hover->pos, true);//track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::BAR){
@@ -127,7 +127,7 @@ void ViewModeDefault::onRightButtonDown()
 	selectUnderMouse();
 
 	// click outside sel.range -> select new position
-	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
+	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			setBarriers(*hover);
 			view->applyBarriers(hover->pos);
@@ -148,11 +148,13 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_marker->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::Type::TRACK) and (hover->track->type == Track::Type::TIME)){
+	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
+	}else if ((hover->type == Selection::Type::LAYER and !hover->layer->is_main) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::LAYER_HEADER)){
+		view->menu_layer->openPopup(view->win, 0, 0);
+	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
-		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::TRACK);
+		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->openPopup(view->win, 0, 0);
 	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);
@@ -361,15 +363,6 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
-	// samples
-	for (SampleRef *s: t->track->samples)
-		t->drawSample(c, s);
-
-	// marker
-	t->marker_areas.resize(t->track->markers.num);
-	t->marker_label_areas.resize(t->track->markers.num);
-	foreachi(TrackMarker *m, t->track->markers, i)
-		t->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t->track) and (hover->index == i));
 
 	if (t->track->type == Track::Type::TIME)
 		draw_bar_selection(c, t, view);
@@ -377,12 +370,27 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 
 void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
 {
+	Track *t = l->layer->track;
+
 	// midi
 	if (l->layer->type == Track::Type::MIDI)
 		drawMidi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
 	l->drawTrackBuffers(c, view->cam.pos);
+
+	if (l->layer->is_main){
+
+		// samples
+		for (SampleRef *s: l->layer->track->samples)
+			l->drawSample(c, s);
+
+		// marker
+		l->marker_areas.resize(t->markers.num);
+		l->marker_label_areas.resize(t->markers.num);
+		foreachi(TrackMarker *m, l->layer->track->markers, i)
+			l->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
+	}
 }
 
 int ViewModeDefault::getTrackMoveTarget(bool visual)
@@ -475,7 +483,7 @@ void ViewModeDefault::setBarriers(Selection &s)
 	}
 }
 
-Selection ViewModeDefault::getHoverBasic()
+Selection ViewModeDefault::getHoverBasic(bool editable)
 {
 	Selection s;
 	int mx = view->mx;
@@ -485,19 +493,6 @@ Selection ViewModeDefault::getHoverBasic()
 	s.y0 = s.y1 = my;
 	s.type = s.Type::BACKGROUND;
 
-
-	// track?
-	foreachi(AudioViewTrack *t, view->vtrack, i){
-		if (view->mouseOverTrack(t)){
-			s.vtrack = t;
-			s.index = i;
-			s.track = t->track;
-			s.layer = t->track->layers[0];
-			s.vlayer = view->get_layer(s.layer);
-			s.type = Selection::Type::TRACK;
-		}
-	}
-
 	// layer?
 	foreachi(AudioViewLayer *l, view->vlayer, i){
 		if (view->mouseOverLayer(l)){
@@ -505,12 +500,13 @@ Selection ViewModeDefault::getHoverBasic()
 			s.index = i;
 			s.layer = l->layer;
 			s.track = l->layer->track;
-			s.type = Selection::Type::TRACK;
+			s.type = Selection::Type::LAYER;
 			if (l->layer->is_main)
-			if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
-				s.type = Selection::Type::TRACK_HEADER;
-			if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my > l->area.y2 - view->TRACK_HANDLE_HEIGHT))
-				s.type = Selection::Type::LAYER_HEADER;
+				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
+					s.type = Selection::Type::TRACK_HEADER;
+			if (l->layer->track->layers.num > 0)
+				if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my > l->area.y2 - view->TRACK_HANDLE_HEIGHT))
+					s.type = Selection::Type::LAYER_HEADER;
 		}
 	}
 
@@ -552,7 +548,7 @@ Selection ViewModeDefault::getHoverBasic()
 			return s;
 		}
 		x += 17;
-		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34) and editable){
 			s.type = Selection::Type::TRACK_BUTTON_EDIT;
 			return s;
 		}
@@ -573,7 +569,7 @@ Selection ViewModeDefault::getHoverBasic()
 
 Selection ViewModeDefault::getHover()
 {
-	Selection s = getHoverBasic();
+	Selection s = getHoverBasic(true);
 
 	// already found important stuff?
 	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::LAYER) and (s.type != Selection::Type::TIME))
@@ -582,17 +578,22 @@ Selection ViewModeDefault::getHover()
 	int mx = view->mx;
 	int my = view->my;
 
-	if (s.track){
+	if (s.layer){
 
 		// markers
-		for (int i=0; i<min(s.track->markers.num, view->vtrack[s.index]->marker_areas.num); i++){
-			if (view->vtrack[s.index]->marker_areas[i].inside(mx, my) or view->vtrack[s.index]->marker_label_areas[i].inside(mx, my)){
-				s.marker = s.track->markers[i];
-				s.type = Selection::Type::MARKER;
-				s.index = i;
-				return s;
+		if (s.layer->is_main){
+			for (int i=0; i<min(s.track->markers.num, s.vlayer->marker_areas.num); i++){
+				if (s.vlayer->marker_areas[i].inside(mx, my) or s.vlayer->marker_label_areas[i].inside(mx, my)){
+					s.marker = s.track->markers[i];
+					s.type = Selection::Type::MARKER;
+					s.index = i;
+					return s;
+				}
 			}
 		}
+	}
+
+	if (s.track){
 
 		// TODO: prefer selected samples
 		for (SampleRef *ss: s.track->samples){
@@ -691,7 +692,6 @@ void ViewModeDefault::selectUnderMouse()
 {
 	view->sel_temp = view->sel;
 	*hover = getHover();
-	Track *t = hover->track;
 	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
 	bool control = win->getKey(hui::KEY_CONTROL);
@@ -701,7 +701,7 @@ void ViewModeDefault::selectUnderMouse()
 		view->setCurLayer(l);
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
 		selectLayer(this, l, control, true);
-	if ((hover->type == Selection::Type::TRACK) or (hover->type == Selection::Type::TRACK_HEADER))
+	if (hover->type == Selection::Type::TRACK_HEADER)
 		selectLayer(this, l, control, true);
 
 	view->setCurSample(s);

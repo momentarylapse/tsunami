@@ -33,42 +33,7 @@ ViewModeCapture::~ViewModeCapture()
 
 Selection ViewModeCapture::getHover()
 {
-	Selection s;
-	int mx = view->mx;
-	int my = view->my;
-
-	// track?
-	foreachi(AudioViewTrack *t, view->vtrack, i){
-		if (view->mouseOverTrack(t)){
-			s.vtrack = t;
-			s.index = i;
-			s.track = t->track;
-			s.type = Selection::Type::TRACK;
-			if (view->mx < t->area.x1 + view->TRACK_HANDLE_WIDTH)
-				s.type = Selection::Type::TRACK_HEADER;
-		}
-	}
-
-	// mute button?
-	if (s.track){
-		AudioViewTrack *t = s.vtrack;
-		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::Type::TRACK_BUTTON_MUTE;
-			return s;
-		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::Type::TRACK_BUTTON_SOLO;
-			return s;
-		}
-	}
-
-	// time scale
-	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::Type::TIME;
-		return s;
-	}
-
-	return s;
+	return getHoverBasic(false);
 }
 
 void ViewModeCapture::drawPost(Painter *c)

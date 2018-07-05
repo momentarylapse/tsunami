@@ -258,6 +258,7 @@ public:
 
 	hui::Menu *menu_track;
 	hui::Menu *menu_time_track;
+	hui::Menu *menu_layer;
 	hui::Menu *menu_sample;
 	hui::Menu *menu_marker;
 	hui::Menu *menu_bar;

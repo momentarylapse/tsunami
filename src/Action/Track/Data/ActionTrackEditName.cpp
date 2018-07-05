@@ -10,29 +10,23 @@
 
 ActionTrackEditName::ActionTrackEditName(Track *t, const string &_name)
 {
-	track_no = get_track_index(t);
+	track = t;
 	old_value = t->name;
 	new_value = _name;
 }
 
 void *ActionTrackEditName::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
-	t->name = new_value;
-	t->notify();
+	track->name = new_value;
+	track->notify();
 
 	return NULL;
 }
 
 void ActionTrackEditName::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-
-	t->name = old_value;
-	t->notify();
+	track->name = old_value;
+	track->notify();
 }
 
 
@@ -41,5 +35,5 @@ bool ActionTrackEditName::mergable(Action *a)
 	ActionTrackEditName *aa = dynamic_cast<ActionTrackEditName*>(a);
 	if (!aa)
 		return false;
-	return (aa->track_no == track_no);
+	return (aa->track == track);
 }

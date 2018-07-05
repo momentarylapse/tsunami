@@ -9,20 +9,18 @@
 #define ACTIONTRACKTOGGLEEFFECTENABLED_H_
 
 #include "../../Action.h"
-class Track;
 class AudioEffect;
 
 class ActionTrackToggleEffectEnabled: public Action
 {
 public:
-	ActionTrackToggleEffectEnabled(Track *t, int index);
+	ActionTrackToggleEffectEnabled(AudioEffect *fx);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
-	int index;
+	AudioEffect *fx;
 };
 
 #endif /* ACTIONTRACKTOGGLEEFFECTENABLED_H_ */

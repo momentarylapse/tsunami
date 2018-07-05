@@ -9,20 +9,18 @@
 #define ACTIONTRACKTOGGLEMIDIEFFECTENABLED_H_
 
 #include "../../Action.h"
-class Track;
 class MidiEffect;
 
 class ActionTrackToggleMidiEffectEnabled: public Action
 {
 public:
-	ActionTrackToggleMidiEffectEnabled(Track *t, int index);
+	ActionTrackToggleMidiEffectEnabled(MidiEffect *fx);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
-	int index;
+	MidiEffect *fx;
 };
 
 #endif /* ACTIONTRACKTOGGLEMIDIEFFECTENABLED_H_ */

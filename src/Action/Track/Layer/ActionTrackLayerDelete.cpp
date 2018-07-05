@@ -1,5 +1,5 @@
 /*
- * ActionLayerDelete.cpp
+ * ActionTrackLayerDelete.cpp
  *
  *  Created on: 27.08.2016
  *      Author: michi
@@ -11,13 +11,13 @@
 #include "../Buffer/ActionTrack__DeleteBuffer.h"
 #include "ActionTrackLayer__Delete.h"
 
-ActionLayerDelete::ActionLayerDelete(Track *t, int _index)
+ActionTrackLayerDelete::ActionTrackLayerDelete(Track *t, int _index)
 {
 	track = t;
 	index = _index;
 }
 
-void ActionLayerDelete::build(Data *d)
+void ActionTrackLayerDelete::build(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
 

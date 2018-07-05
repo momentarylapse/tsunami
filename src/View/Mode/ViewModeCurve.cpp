@@ -110,7 +110,7 @@ Selection ViewModeCurve::getHover()
 	int my = view->my;
 
 	// curve points
-	if ((s.type == s.Type::TRACK) and curve){
+	if ((s.type == s.Type::LAYER) and curve){
 		foreachi(Curve::Point &p, curve->points, i){
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
@@ -121,7 +121,7 @@ Selection ViewModeCurve::getHover()
 			}
 		}
 	}
-	if (s.type == s.Type::TRACK)
+	if (s.type == s.Type::LAYER)
 		s.type = Selection::Type::CURVE_POINT_NONE;
 
 	return s;

@@ -16,13 +16,14 @@ class ActionTrackAddEffect: public Action
 {
 public:
 	ActionTrackAddEffect(Track *t, AudioEffect *effect);
+	~ActionTrackAddEffect();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	AudioEffect *effect;
-	int track_no;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKADDEFFECT_H_ */

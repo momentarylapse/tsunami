@@ -11,20 +11,15 @@
 
 #include "../../../Module/Midi/MidiEffect.h"
 
-ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(Track *t, int _index, const string &_old_params, MidiEffect *fx)
+ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(MidiEffect *_fx, const string &_old_params)
 {
-	track_no = get_track_index(t);
-	index = _index;
+	fx = _fx;
 	old_value = _old_params;
 	new_value = fx->config_to_string();
 }
 
 void *ActionTrackEditMidiEffect::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	MidiEffect *fx = a->get_midi_fx(track_no, index);
-
 	fx->config_from_string(new_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
@@ -33,10 +28,6 @@ void *ActionTrackEditMidiEffect::execute(Data *d)
 
 void ActionTrackEditMidiEffect::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	MidiEffect *fx = a->get_midi_fx(track_no, index);
-
 	fx->config_from_string(old_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 }
@@ -46,6 +37,6 @@ bool ActionTrackEditMidiEffect::mergable(Action *a)
 	ActionTrackEditMidiEffect *aa = dynamic_cast<ActionTrackEditMidiEffect*>(a);
 	if (!aa)
 		return false;
-	return ((aa->track_no == track_no) and (aa->index == index));
+	return (aa->fx == fx);
 }
 

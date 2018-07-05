@@ -15,15 +15,14 @@ class ActionTrackEditVolume : public ActionMergable<float>
 {
 public:
 	ActionTrackEditVolume(Track *t, float volume);
-	virtual ~ActionTrackEditVolume();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	int track_no;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKEDITVOLUME_H_ */

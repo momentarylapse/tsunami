@@ -6,20 +6,15 @@
  */
 
 #include "ActionTrackToggleEffectEnabled.h"
-#include "../../../Data/Track.h"
 #include "../../../Module/Audio/AudioEffect.h"
 
-ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(Track *t, int _index)
+ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(AudioEffect *_fx)
 {
-	track_no = get_track_index(t);
-	index = _index;
+	_fx = fx;
 }
 
 void *ActionTrackToggleEffectEnabled::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	AudioEffect *fx = a->get_fx(track_no, index);
 	fx->enabled = !fx->enabled;
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 

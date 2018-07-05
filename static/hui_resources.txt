@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-49
+50
 // Resource
 Menu
 menu_fake
@@ -749,7 +749,7 @@ menu
 
 0
 0
-10
+9
 Menu
 menu_file
 
@@ -905,7 +905,7 @@ menu_track
 
 2
 0
-6
+7
 Item
 track_import
 image=hui:open
@@ -942,64 +942,16 @@ image=hui:add
 5
 0
 0
-Menu
-menu_layer
-
-3
-0
-8
-Item
-layer_manager
-image=hui:properties
-0
-0
-0
 Separator
 
 
-1
-0
-0
-Item
-layer_add
-image=hui:add
-2
-0
-0
-Item
-layer_delete
-image=hui:delete
-3
-0
-0
-Separator
-
-
-4
-0
-0
-Menu
-menu_layer_target
-
-5
-0
-0
-Item
-layer_up
-image=hui:up
 6
-0
-0
-Item
-layer_down
-image=hui:down
-7
 0
 0
 Menu
 menu_time
 
-4
+3
 0
 10
 Item
@@ -1065,7 +1017,7 @@ checkable
 Menu
 menu_sub
 
-5
+4
 0
 4
 Item
@@ -1095,7 +1047,7 @@ image=hui:add
 Menu
 menu_view
 
-6
+5
 0
 8
 Menu
@@ -1167,7 +1119,7 @@ image=hui:zoom-one
 Menu
 menu_sound
 
-7
+6
 0
 6
 Item
@@ -1209,7 +1161,7 @@ image=hui:media-record
 Menu
 menu_plugins
 
-8
+7
 0
 13
 Item
@@ -1293,7 +1245,7 @@ menu_plugins_other
 Menu
 menu_help
 
-9
+8
 0
 4
 Item
@@ -2202,6 +2154,37 @@ image=hui:zoom-in
 0
 // Resource
 Menu
+popup_layer_menu
+
+0
+0
+4
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+layer_merge
+
+2
+0
+0
+Item
+delete_layer
+
+3
+0
+0
+// Resource
+Menu
 popup_signal_chain_menu
 
 0
@@ -2456,7 +2439,7 @@ popup_track_menu
 
 0
 0
-7
+8
 Item
 track_menu_header
 disabled
@@ -2476,27 +2459,33 @@ delete_track
 0
 0
 Item
-track_add_marker
+layer_add
 
 3
 0
 0
 Item
-track_edit_fx
+track_add_marker
 
 4
 0
 0
 Item
-track_edit_midi
+track_edit_fx
 
 5
 0
 0
 Item
-track_properties
+track_edit_midi
 
 6
+0
+0
+Item
+track_properties
+
+7
 0
 0
 // Resource
@@ -3895,7 +3884,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-375
+372
 // Text
 /cancel
 Cancel
@@ -4203,21 +4192,6 @@ Insert statically
 menu/insert_time
 Insert silence...
 
-menu/layer_add
-Add
-
-menu/layer_delete
-Delete
-
-menu/layer_down
-Down
-
-menu/layer_manager
-Manage...
-
-menu/layer_up
-Up
-
 menu/menu_edit
 Edit
 
@@ -4226,12 +4200,6 @@ File
 
 menu/menu_help
 ?
-
-menu/menu_layer
-Layers
-
-menu/menu_layer_target
-Go to
 
 menu/menu_plugins
 Plugins
@@ -4569,6 +4537,15 @@ Scale
 popup_bar_menu/track_add_marker
 Add marker
 
+popup_layer_menu/delete_layer
+Delete
+
+popup_layer_menu/header
+Version
+
+popup_layer_menu/layer_merge
+Merge...
+
 popup_marker_menu/delete_marker
 Delete
 
@@ -4691,6 +4668,9 @@ Properties
 
 popup_track_menu/delete_track
 Delete
+
+popup_track_menu/layer_add
+Add version
 
 popup_track_menu/track_add_marker
 Add marker
@@ -5028,7 +5008,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-472
+476
 // Text
 /cancel
 Abbrechen
@@ -5861,6 +5841,15 @@ Skalieren
 popup_bar_menu/track_add_marker
 Marker hinzufügen
 
+popup_layer_menu/delete_layer
+Löschen
+
+popup_layer_menu/header
+Version
+
+popup_layer_menu/layer_merge
+Vereinen...
+
 popup_marker_menu/delete_marker
 Löschen
 
@@ -6004,6 +5993,9 @@ Eigenschaften
 
 popup_track_menu/delete_track
 Löschen
+
+popup_track_menu/layer_add
+Version hinzufügen
 
 popup_track_menu/song_edit_bars
 Takte bearbeiten

@@ -377,60 +377,6 @@ void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 	}
 }
 
-/*void _draw_buffers_all(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
-{
-	// non-current layers
-	foreachi(TrackLayer *lev, track->layers, layer_no){
-		if (layer_no == view->cur_layer)
-			continue;
-		for (AudioBuffer &b: lev->buffers)
-			tv->drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
-	}
-
-	// current
-	for (AudioBuffer &b: track->layers[view->cur_layer]->buffers)
-		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
-
-	if (view->sel.has(track)){
-		// selection
-		for (AudioBuffer &b: track->layers[view->cur_layer]->buffers){
-			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
-		}
-	}
-}
-
-void _draw_buffers_main(Painter *c, Track *track, AudioView *view, double view_pos_rel, AudioViewTrack *tv)
-{
-	// current
-	for (AudioBuffer &b: track->layers[0]->buffers)
-		tv->drawBuffer(c, b, view_pos_rel, view->colors.text);
-
-	if (view->sel.has(track)){
-		// selection
-		for (AudioBuffer &b: track->layers[0]->buffers){
-			tv->drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
-		}
-	}
-}
-
-rect _main_area(AudioViewTrack *tv)
-{
-	rect a = tv->area;
-	float hmain = tv->area.height() * 3 / (tv->track->layers.num + 2);
-	a.y2 = a.y1 + hmain;
-	return a;
-}
-
-rect _version_area(AudioViewTrack *tv, int version)
-{
-	rect m = _main_area(tv);
-	float hh = (tv->area.height() - m.height()) / (tv->track->layers.num - 1);
-	rect a = tv->area;
-	a.y1 = m.y2 + hh * (version - 1);
-	a.y2 = m.y2 + hh * version ;
-	return a;
-}*/
-
 void AudioViewLayer::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
 	color col = view->colors.text;
@@ -447,7 +393,7 @@ void AudioViewLayer::drawTrackBuffers(Painter *c, double view_pos_rel)
 	}
 }
 
-void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
+void AudioViewLayer::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
 {
 	// frame
 	Range rr = s->range() + delay;
@@ -484,9 +430,9 @@ void drawStrWithShadow(Painter *c, float x, float y, const string &str, const co
 	c->drawStr(x, y, str);
 }
 
-void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
+void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 {
-	/*color col = view->colors.sample;
+	color col = view->colors.sample;
 	if (view->sel.has(s))
 		col = view->colors.sample_selected;
 	if (view->hover.sample == s)
@@ -503,11 +449,10 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	if (view->sel.has(s)){
 		int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 		drawStrWithShadow(c, asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name, view->colors.text, view->colors.background_track_selected);
-	}*/
-	msg_write("todo");
+	}
 }
 
-void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover)
+void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover)
 {
 	string text = marker->text;
 	if (text.match(":pos *:"))
@@ -534,7 +479,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker *marker, int index
 	if (sel){
 		col = view->colors.selection;
 		col_bg = ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);
-		col2 = ColorInterpolate(col2, view->colors.selection, 0.5f);
+		col2 = ColorInterpolate(col2, view->colors.selection, 0.8f);
 	}
 	if (hover){
 		col = ColorInterpolate(col, view->colors.hover, 0.3f);
@@ -1032,10 +977,10 @@ void AudioViewTrack::drawHeader(Painter *c)
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
 
-		c->setColor(col_but);
+		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))
 			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...
+		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...*/
 
 		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_CURVE))
@@ -1044,7 +989,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 }
 
-void AudioViewLayer::drawHeader(Painter *c)
+void AudioViewLayer::drawVersionHeader(Painter *c)
 {
 	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
 	bool visible = hover or false;//view->editingTrack(track);
@@ -1144,5 +1089,5 @@ void AudioViewLayer::draw(Painter *c)
 	view->mode->drawLayerData(c, this);
 
 	if (layer->track->layers.num > 1)
-		drawHeader(c);
+		drawVersionHeader(c);
 }

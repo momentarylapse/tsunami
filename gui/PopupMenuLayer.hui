@@ -1,0 +1,5 @@
+Menu popup_layer_menu ""
+	Item header "Version" disabled
+	Separator
+	Item layer_merge "Merge..."
+	Item delete_layer "Delete"

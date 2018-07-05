@@ -129,20 +129,22 @@ void Song::addEffect(AudioEffect *effect)
 }
 
 // execute after editing...
-void Song::editEffect(int index, const string &param_old)
+void Song::editEffect(AudioEffect *effect, const string &param_old)
 {
-	execute(new ActionTrackEditEffect(NULL, index, param_old, fx[index]));
+	execute(new ActionTrackEditEffect(effect, param_old));
 }
 
-void Song::enableEffect(int index, bool enabled)
+void Song::enableEffect(AudioEffect *effect, bool enabled)
 {
-	if (fx[index]->enabled != enabled)
-		execute(new ActionTrackToggleEffectEnabled(NULL, index));
+	if (effect->enabled != enabled)
+		execute(new ActionTrackToggleEffectEnabled(effect));
 }
 
-void Song::deleteEffect(int index)
+void Song::deleteEffect(AudioEffect *effect)
 {
-	execute(new ActionTrackDeleteEffect(NULL, index));
+	foreachi (AudioEffect *f, fx, index)
+		if (f == effect)
+			execute(new ActionTrackDeleteEffect(NULL, index));
 }
 
 void Song::setVolume(float volume)
@@ -515,20 +517,12 @@ void Song::invalidateAllPeaks()
 		s->buf.peaks.clear();
 }
 
-Track *Song::get_track(int track_no)
-{
-	assert((track_no >= 0) and (track_no < tracks.num) and "AudioFile.get_track");
-	return tracks[track_no];
-}
 
-SampleRef *Song::get_sample_ref(int track_no, int index)
+SampleRef *Song::get_sample_ref(Track *track, int index)
 {
-	assert((track_no >= 0) and (track_no < tracks.num) and "AudioFile.get_sample");
-	Track *t = tracks[track_no];
-
 	assert((index >= 0) and "AudioFile.get_sample");
-	assert((index < t->samples.num) and "AudioFile.get_sample");
-	return t->samples[index];
+	assert((index < track->samples.num) and "AudioFile.get_sample");
+	return track->samples[index];
 }
 
 Sample* Song::get_sample_by_uid(int uid)
@@ -539,15 +533,13 @@ Sample* Song::get_sample_by_uid(int uid)
 	return NULL;
 }
 
-AudioEffect *Song::get_fx(int track_no, int index)
+AudioEffect *Song::get_fx(Track *track, int index)
 {
 	assert(index >= 0);
-	if (track_no >= 0){
-		Track *t = get_track(track_no);
-		assert(t);
-		assert(index < t->fx.num);
+	if (track >= 0){
+		assert(index < track->fx.num);
 
-		return t->fx[index];
+		return track->fx[index];
 	}else{
 		assert(index < fx.num);
 
@@ -555,14 +547,13 @@ AudioEffect *Song::get_fx(int track_no, int index)
 	}
 }
 
-MidiEffect *Song::get_midi_fx(int track_no, int index)
+// unused...
+MidiEffect *Song::get_midi_fx(Track *track, int index)
 {
 	assert(index >= 0);
-	Track *t = get_track(track_no);
-	assert(t);
-	assert(index < t->midi_fx.num);
+	assert(index < track->midi_fx.num);
 
-	return t->midi_fx[index];
+	return track->midi_fx[index];
 }
 
 Track *Song::getTimeTrack()
@@ -581,3 +572,11 @@ string Song::getTag(const string &key)
 	return "";
 }
 
+Array<TrackLayer*> Song::layers() const
+{
+	Array<TrackLayer*> layers;
+	for (Track *t: tracks)
+		layers.append(t->layers);
+	return layers;
+
+}

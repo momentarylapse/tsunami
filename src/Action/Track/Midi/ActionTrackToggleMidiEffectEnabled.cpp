@@ -9,17 +9,13 @@
 #include "../../../Data/Track.h"
 #include "../../../Module/Midi/MidiEffect.h"
 
-ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(Track *t, int _index)
+ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(MidiEffect *_fx)
 {
-	track_no = get_track_index(t);
-	index = _index;
+	fx = _fx;
 }
 
 void *ActionTrackToggleMidiEffectEnabled::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	MidiEffect *fx = a->get_midi_fx(track_no, index);
 	fx->enabled = !fx->enabled;
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 

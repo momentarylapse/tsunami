@@ -55,7 +55,13 @@ public:
 	void drawTrackBuffers(Painter *c, double pos);
 	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
 	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
-	void drawHeader(Painter *c);
+
+	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
+	void drawSample(Painter *c, SampleRef *s);
+
+	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
+
+	void drawVersionHeader(Painter *c);
 	void draw(Painter *c);
 
 	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
@@ -64,6 +70,8 @@ public:
 	rect area;
 	rect area_last, area_target;
 	int height_wish, height_min;
+	Array<rect> marker_areas;
+	Array<rect> marker_label_areas;
 	AudioView *view;
 
 
@@ -95,9 +103,6 @@ public:
 	AudioViewTrack(AudioView *view, Track *track);
 	virtual ~AudioViewTrack();
 
-	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
-	void drawSample(Painter *c, SampleRef *s);
-	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
@@ -105,8 +110,6 @@ public:
 
 	Track *track;
 	rect area;
-	Array<rect> marker_areas;
-	Array<rect> marker_label_areas;
 	Array<int> reference_tracks;
 	bool solo;
 	AudioView *view;

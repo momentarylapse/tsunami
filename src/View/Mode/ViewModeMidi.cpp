@@ -529,7 +529,7 @@ inline bool hover_note_linear(const MidiNote &n, Selection &s, ViewModeMidi *vmm
 Selection ViewModeMidi::getHover()
 {
 	Selection s = ViewModeDefault::getHover();
-	if (s.type != s.Type::TRACK)
+	if (s.type != s.Type::LAYER)
 		return s;
 
 	int mx = view->mx;
@@ -651,19 +651,26 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 		if (l->layer->type == Track::Type::MIDI)
 			drawMidi(c, l, l->layer->midi, false, 0);
 	}
+
+	if (l->layer->is_main){
+
+		Track *t = l->layer->track;
+
+		// samples
+		for (SampleRef *s: t->samples)
+			l->drawSample(c, s);
+
+		// marker
+		l->marker_areas.resize(t->markers.num);
+		l->marker_label_areas.resize(t->markers.num);
+		foreachi(TrackMarker *m, t->markers, i)
+			l->drawMarker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t) and (view->hover.index == i));
+	}
+
 }
 
 void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 {
-	// samples
-	for (SampleRef *s: t->track->samples)
-		t->drawSample(c, s);
-
-	// marker
-	t->marker_areas.resize(t->track->markers.num);
-	t->marker_label_areas.resize(t->track->markers.num);
-	foreachi(TrackMarker *m, t->track->markers, i)
-		t->drawMarker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
 }
 
 int ViewModeMidi::which_midi_mode(Track *t)

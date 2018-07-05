@@ -17,12 +17,13 @@ class ActionTrackSetSynthesizer : public Action
 {
 public:
 	ActionTrackSetSynthesizer(Track *t, Synthesizer *synth);
+	virtual ~ActionTrackSetSynthesizer();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
+	Track *track;
 	Synthesizer *synth;
 };
 

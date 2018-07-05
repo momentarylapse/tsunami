@@ -63,7 +63,7 @@ public:
 			return;
 		session->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
-			track->editMidiEffect(index, old_param);
+			track->editMidiEffect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
 	void onSave()
@@ -76,17 +76,17 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->enableMidiEffect(index, isChecked(""));
+			track->enableMidiEffect(fx, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
-			track->deleteMidiEffect(index);
+			track->deleteMidiEffect(fx);
 	}
 	void onFxChange()
 	{
 		if (track)
-			track->editMidiEffect(index, old_param);
+			track->editMidiEffect(fx, old_param);
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->config_to_string();

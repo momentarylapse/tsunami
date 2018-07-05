@@ -49,7 +49,7 @@ public:
 	void selectUnderMouse();
 	void setCursorPos(int pos, bool keep_track_selection);
 	Selection getHover() override;
-	Selection getHoverBasic();
+	Selection getHoverBasic(bool editable);
 
 	void setBarriers(Selection &s) override;
 

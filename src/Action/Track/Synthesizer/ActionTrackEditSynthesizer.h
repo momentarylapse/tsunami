@@ -16,13 +16,13 @@ class ActionTrackEditSynthesizer: public ActionMergable<string>
 public:
 	ActionTrackEditSynthesizer(Track *t, const string &params_old);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	int track_no;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKEDITSYNTHESIZER_H_ */

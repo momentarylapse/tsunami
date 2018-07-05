@@ -9,23 +9,20 @@
 #define ACTIONTRACKEDITEFFECT_H_
 
 #include "../../ActionMergable.h"
-class Track;
 class AudioEffect;
-class Song;
 
 class ActionTrackEditEffect: public ActionMergable<string>
 {
 public:
-	ActionTrackEditEffect(Track *t, int index, const string &old_params, AudioEffect *fx);
+	ActionTrackEditEffect(AudioEffect *fx, const string &old_params);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	int track_no;
-	int index;
+	AudioEffect *fx;
 };
 
 #endif /* ACTIONTRACKEDITEFFECT_H_ */

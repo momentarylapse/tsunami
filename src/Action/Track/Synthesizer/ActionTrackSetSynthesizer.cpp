@@ -12,8 +12,13 @@
 
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth)
 {
-	track_no = get_track_index(t);
+	track = t;
 	synth = _synth;
+}
+
+ActionTrackSetSynthesizer::~ActionTrackSetSynthesizer()
+{
+	delete synth;
 }
 
 void ActionTrackSetSynthesizer::undo(Data *d)
@@ -24,17 +29,11 @@ void ActionTrackSetSynthesizer::undo(Data *d)
 
 void *ActionTrackSetSynthesizer::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	assert((track_no >= 0) and (track_no <= a->tracks.num));
-
-	Track *t = a->tracks[track_no];
-
 	Synthesizer *temp = synth;
-	synth = t->synth;
-	t->synth = temp;
-	t->notify();
+	synth = track->synth;
+	track->synth = temp;
+	track->notify();
 
-	return t;
+	return synth;
 }
 

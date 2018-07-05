@@ -6,14 +6,21 @@
  */
 
 #include "../../../Data/Track.h"
+#include "../../../Module/Audio/AudioEffect.h"
 #include <assert.h>
 #include "ActionTrackDeleteAudioEffect.h"
 
 ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
 {
-	track_no = get_track_index(t);
+	track = t;
 	index = _index;
 	effect = NULL;
+}
+
+ActionTrackDeleteEffect::~ActionTrackDeleteEffect()
+{
+	if (effect)
+		delete effect;
 }
 
 void *ActionTrackDeleteEffect::execute(Data *d)
@@ -21,14 +28,13 @@ void *ActionTrackDeleteEffect::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
-	if (track_no >= 0){
-		Track *t = a->get_track(track_no);
-		assert(index < t->fx.num);
+	if (track >= 0){
+		assert(index < track->fx.num);
 
-		effect = t->fx[index];
+		effect = track->fx[index];
 		effect->Observable::notify(effect->MESSAGE_DELETE);
-		t->fx.erase(index);
-		t->notify(t->MESSAGE_DELETE_EFFECT);
+		track->fx.erase(index);
+		track->notify(track->MESSAGE_DELETE_EFFECT);
 	}else{
 		assert(index < a->fx.num);
 
@@ -46,18 +52,17 @@ void ActionTrackDeleteEffect::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
-	if (track_no >= 0){
-		Track *t = a->get_track(track_no);
-		assert(t);
-		assert(index <= t->fx.num);
+	if (track >= 0){
+		assert(index <= track->fx.num);
 
-		t->fx.insert(effect, index);
-		t->notify(t->MESSAGE_ADD_EFFECT);
+		track->fx.insert(effect, index);
+		track->notify(track->MESSAGE_ADD_EFFECT);
 	}else{
 		assert(index < a->fx.num);
 
 		a->fx.insert(effect, index);
 		a->notify(a->MESSAGE_ADD_EFFECT);
 	}
+	effect = NULL;
 }
 

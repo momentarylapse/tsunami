@@ -14,10 +14,9 @@
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Data/ActionTrackSetInstrument.h"
 #include "../Action/Track/Layer/ActionTrackLayerAdd.h"
-/*#include "../Action/Track/Layer/ActionTrackLayerDelete.h"
-#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
-#include "../Action/Track/Layer/ActionTrackLayerMove.h"
-#include "../Action/Track/Layer/ActionTrackLayerRename.h"*/
+#include "../Action/Track/Layer/ActionTrackLayerDelete.h"
+/*#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
+#include "../Action/Track/Layer/ActionTrackLayerMove.h"*/
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -309,20 +308,22 @@ void Track::addEffect(AudioEffect *effect)
 }
 
 // execute after editing...
-void Track::editEffect(int index, const string &param_old)
+void Track::editEffect(AudioEffect *effect, const string &param_old)
 {
-	song->execute(new ActionTrackEditEffect(this, index, param_old, fx[index]));
+	song->execute(new ActionTrackEditEffect(effect, param_old));
 }
 
-void Track::enableEffect(int index, bool enabled)
+void Track::enableEffect(AudioEffect *effect, bool enabled)
 {
-	if (fx[index]->enabled != enabled)
-		song->execute(new ActionTrackToggleEffectEnabled(this, index));
+	if (effect->enabled != enabled)
+		song->execute(new ActionTrackToggleEffectEnabled(effect));
 }
 
-void Track::deleteEffect(int index)
+void Track::deleteEffect(AudioEffect *effect)
 {
-	song->execute(new ActionTrackDeleteEffect(this, index));
+	foreachi(AudioEffect *f, fx, index)
+		if (f == effect)
+			song->execute(new ActionTrackDeleteEffect(this, index));
 }
 
 void Track::addMidiEffect(MidiEffect *effect)
@@ -331,20 +332,22 @@ void Track::addMidiEffect(MidiEffect *effect)
 }
 
 // execute after editing...
-void Track::editMidiEffect(int index, const string &param_old)
+void Track::editMidiEffect(MidiEffect *effect, const string &param_old)
 {
-	song->execute(new ActionTrackEditMidiEffect(this, index, param_old, midi_fx[index]));
+	song->execute(new ActionTrackEditMidiEffect(effect, param_old));
 }
 
-void Track::enableMidiEffect(int index, bool enabled)
+void Track::enableMidiEffect(MidiEffect *effect, bool enabled)
 {
-	if (midi_fx[index]->enabled != enabled)
-		song->execute(new ActionTrackToggleMidiEffectEnabled(this, index));
+	if (effect->enabled != enabled)
+		song->execute(new ActionTrackToggleMidiEffectEnabled(effect));
 }
 
-void Track::deleteMidiEffect(int index)
+void Track::deleteMidiEffect(MidiEffect *effect)
 {
-	song->execute(new ActionTrackDeleteMidiEffect(this, index));
+	foreachi(MidiEffect *f, midi_fx, index)
+		if (f == effect)
+			song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }
 
 void Track::setSynthesizer(Synthesizer *_synth)
@@ -383,6 +386,13 @@ void Track::editMarker(const TrackMarker *marker, const Range &range, const stri
 TrackLayer *Track::addLayer(bool is_main)
 {
 	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, layers.num, new TrackLayer(this, is_main)));
+}
+
+void Track::deleteLayer(TrackLayer *layer)
+{
+	foreachi(TrackLayer *l, layers, index)
+		if (l == layer)
+			song->execute(new ActionTrackLayerDelete(this, index));
 }
 
 

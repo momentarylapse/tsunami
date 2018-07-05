@@ -19,7 +19,9 @@
 
 class Data;
 class AudioEffect;
+class MidiEffect;
 class Track;
+class TrackLayer;
 class Sample;
 class Synthesizer;
 class Curve;
@@ -94,9 +96,9 @@ public:
 	void _cdecl editTag(int index, const string &key, const string &value);
 	void _cdecl deleteTag(int index);
 	void _cdecl addEffect(AudioEffect *effect);
-	void _cdecl deleteEffect(int index);
-	void _cdecl editEffect(int index, const string &param_old);
-	void _cdecl enableEffect(int index, bool enabled);
+	void _cdecl deleteEffect(AudioEffect *effect);
+	void _cdecl editEffect(AudioEffect *effect, const string &param_old);
+	void _cdecl enableEffect(AudioEffect *effect, bool enabled);
 	void _cdecl setVolume(float volume);
 	void _cdecl changeAllTrackVolumes(Track *t, float volume);
 	void _cdecl setSampleRate(int sample_rate);
@@ -127,11 +129,10 @@ public:
 	void _cdecl curveEditPoint(Curve *curve, int index, int pos, float value);
 
 	// helper
-	Track *_cdecl get_track(int track_no);
-	SampleRef *_cdecl get_sample_ref(int track_no, int index);
+	SampleRef *_cdecl get_sample_ref(Track *track, int index);
 	Sample* _cdecl get_sample_by_uid(int uid);
-	AudioEffect *_cdecl get_fx(int track_no, int index);
-	MidiEffect *_cdecl get_midi_fx(int track_no, int index);
+	AudioEffect *_cdecl get_fx(Track *track, int index);
+	MidiEffect *_cdecl get_midi_fx(Track *track, int index);
 
 // data
 	string filename;
@@ -147,6 +148,8 @@ public:
 	Array<Sample*> samples;
 	Array<Curve*> curves;
 	BarCollection bars;
+
+	Array<TrackLayer*> layers() const;
 };
 
 

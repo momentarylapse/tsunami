@@ -251,6 +251,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	menu_song = hui::CreateResourceMenu("popup_song_menu");
 	menu_track = hui::CreateResourceMenu("popup_track_menu");
+	menu_layer = hui::CreateResourceMenu("popup_layer_menu");
 	menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
 	menu_sample = hui::CreateResourceMenu("popup_sample_menu");
 	menu_marker = hui::CreateResourceMenu("popup_marker_menu");
@@ -804,31 +805,29 @@ void AudioView::updateTracks()
 	}
 
 	int li = 0;
-	for (Track *t: song->tracks){
-		for (TrackLayer *l: t->layers){
+	for (TrackLayer *l: song->layers()){
 
-			bool found = false;
+		bool found = false;
 
-			// find existing
-			foreachi(AudioViewLayer *v, vlayer, vi)
-				if (v){
-					if (v->layer == l){
-						vlayer2[li] = v;
-						vlayer[vi] = NULL;
-						found = true;
-						break;
-					}
+		// find existing
+		foreachi(AudioViewLayer *v, vlayer, vi)
+			if (v){
+				if (v->layer == l){
+					vlayer2[li] = v;
+					vlayer[vi] = NULL;
+					found = true;
+					break;
 				}
-
-			// new layer
-			if (!found){
-				vlayer2[li] = new AudioViewLayer(this, l);
-				changed = true;
-				sel.add(l);
 			}
 
-			li ++;
+		// new layer
+		if (!found){
+			vlayer2[li] = new AudioViewLayer(this, l);
+			changed = true;
+			sel.add(l);
 		}
+
+		li ++;
 	}
 
 	// delete deleted

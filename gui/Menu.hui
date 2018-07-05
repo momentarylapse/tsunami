@@ -31,15 +31,7 @@ Menu menu ""
 		Item add_track "Add empty audio track" image=hui:add
 		Item add_midi_track "Add midi track" image=hui:add
 		Item add_time_track "Add rhythm track" image=hui:add
-	Menu menu_layer "Layers"
-		Item layer_manager "Manage..." image=hui:properties
 		Separator
-		Item layer_add "Add" image=hui:add
-		Item layer_delete "Delete" image=hui:delete
-		Separator
-		Menu menu_layer_target "Go to"
-		Item layer_up "Up" image=hui:up
-		Item layer_down "Down" image=hui:down
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add

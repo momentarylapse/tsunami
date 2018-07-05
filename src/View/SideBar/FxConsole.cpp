@@ -61,9 +61,9 @@ public:
 			return;
 		session->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
-			track->editEffect(index, old_param);
+			track->editEffect(fx, old_param);
 		else
-			song->editEffect(index, old_param);
+			song->editEffect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
 	void onSave()
@@ -76,23 +76,23 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->enableEffect(index, isChecked(""));
+			track->enableEffect(fx, isChecked(""));
 		else
-			song->enableEffect(index, isChecked(""));
+			song->enableEffect(fx, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
-			track->deleteEffect(index);
+			track->deleteEffect(fx);
 		else
-			song->deleteEffect(index);
+			song->deleteEffect(fx);
 	}
 	void onfxChange()
 	{
 		if (track)
-			track->editEffect(index, old_param);
+			track->editEffect(fx, old_param);
 		else
-			song->editEffect(index, old_param);
+			song->editEffect(fx, old_param);
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->config_to_string();

@@ -25,8 +25,8 @@ bool Selection::is_in(int _type) const
 		return true;
 	if (_type == Type::TRACK_HEADER)
 		return (type == Type::TRACK_BUTTON_MUTE) or (type == Type::TRACK_BUTTON_SOLO) or (type == Type::TRACK_BUTTON_EDIT) or (type == Type::TRACK_BUTTON_CURVE) or (type == Type::TRACK_BUTTON_FX);
-	if (_type == Type::TRACK)
-		return (track != NULL);
+	if (_type == Type::LAYER)
+		return (layer != NULL);
 	return false;
 }
 

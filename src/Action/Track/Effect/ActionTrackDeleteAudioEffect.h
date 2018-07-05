@@ -8,21 +8,22 @@
 #ifndef ACTIONTRACKDELETEEFFECT_H_
 #define ACTIONTRACKDELETEEFFECT_H_
 
-#include "../../../Module/Audio/AudioEffect.h"
 #include "../../Action.h"
 class Track;
+class AudioEffect;
 
 class ActionTrackDeleteEffect: public Action
 {
 public:
 	ActionTrackDeleteEffect(Track *t, int index);
+	~ActionTrackDeleteEffect();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	AudioEffect *effect;
-	int track_no;
+	Track *track;
 	int index;
 };
 

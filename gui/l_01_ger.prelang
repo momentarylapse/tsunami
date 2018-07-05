@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-473
+477
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1421,6 +1421,18 @@ Verwerfen
 
 record_dialog/new_version
 Neue Version starten
+
+popup_layer_menu/delete_layer
+Löschen
+
+popup_layer_menu/header
+Version
+
+popup_layer_menu/layer_merge
+Vereinen...
+
+popup_track_menu/layer_add
+Version hinzufügen
 
 // Num Language Strings
 179

@@ -11,22 +11,28 @@
 
 ActionTrackAddEffect::ActionTrackAddEffect(Track *t, AudioEffect *_effect)
 {
-	track_no = get_track_index(t);
+	track = t;
 	effect = _effect;
+}
+
+ActionTrackAddEffect::~ActionTrackAddEffect()
+{
+	if (effect)
+		delete effect;
 }
 
 void *ActionTrackAddEffect::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	if (track_no >= 0){
-		Track *t = a->get_track(track_no);
-		t->fx.add(effect);
-		t->notify(t->MESSAGE_ADD_EFFECT);
+	if (track){
+		track->fx.add(effect);
+		track->notify(track->MESSAGE_ADD_EFFECT);
 	}else{
 		a->fx.add(effect);
 		a->notify(a->MESSAGE_ADD_EFFECT);
 	}
+	effect = NULL;
 
 	return NULL;
 }
@@ -34,12 +40,14 @@ void *ActionTrackAddEffect::execute(Data *d)
 void ActionTrackAddEffect::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	effect->Observable::notify(effect->MESSAGE_DELETE);
-	if (track_no >= 0){
-		Track *t = a->get_track(track_no);
-		t->fx.pop();
-		t->notify(t->MESSAGE_DELETE_EFFECT);
+	if (track){
+		effect = track->fx.back();
+		effect->Observable::notify(effect->MESSAGE_DELETE);
+		track->fx.pop();
+		track->notify(track->MESSAGE_DELETE_EFFECT);
 	}else{
+		effect = a->fx.back();
+		effect->Observable::notify(effect->MESSAGE_DELETE);
 		a->fx.pop();
 		a->notify(a->MESSAGE_DELETE_EFFECT);
 	}

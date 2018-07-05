@@ -15,15 +15,14 @@ class ActionTrackEditPanning : public ActionMergable<float>
 {
 public:
 	ActionTrackEditPanning(Track *t, float panning);
-	virtual ~ActionTrackEditPanning();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
-	int track_no;
+	Track *track;
 };
 
 #endif /* ACTIONTRACKEDITPANNING_H_ */

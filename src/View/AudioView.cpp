@@ -935,8 +935,17 @@ void AudioView::drawBackground(Painter *c)
 
 	// lines between tracks
 	c->setColor(colors.grid);
-	for (AudioViewLayer *t: vlayer)
+	Array<float> dash_pattern;
+	dash_pattern.add(5);
+	dash_pattern.add(3);
+	for (AudioViewLayer *t: vlayer){
+		if (t->layer->is_main)
+			c->setLineDash(Array<float>(), 0);
+		else
+			c->setLineDash(dash_pattern, 0);
 		c->drawLine(clip.x1, t->area.y1, clip.width(), t->area.y1);
+	}
+	c->setLineDash(Array<float>(), 0);
 	if (yy < clip.y2)
 		c->drawLine(clip.x1, yy, clip.width(), yy);
 

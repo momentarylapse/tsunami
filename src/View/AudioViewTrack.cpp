@@ -1067,7 +1067,7 @@ void AudioViewLayer::drawHeader(Painter *c)
 		c->setColor(view->colors.text);
 	else
 		c->setColor(view->colors.text_soft3);
-	c->drawStr(area.x2 - view->TRACK_HANDLE_WIDTH + 23, area.y2 - 18, "version x");//track->getNiceName() + (solo ? " (solo)" : ""));
+	c->drawStr(area.x2 - view->TRACK_HANDLE_WIDTH + 23, area.y2 - 18, layer->is_main ? "main" : "version x");//track->getNiceName() + (solo ? " (solo)" : ""));
 
 	c->setFont("", -1, false, false);
 

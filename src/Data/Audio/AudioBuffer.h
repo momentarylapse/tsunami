@@ -54,6 +54,7 @@ public:
 	Range _cdecl range0() const;
 
 	void _cdecl clear();
+	void _cdecl clear_x(int channels);
 	void _cdecl resize(int length);
 	bool _cdecl is_ref() const;
 	void _cdecl make_own();

@@ -28,9 +28,11 @@ Menu menu ""
 		Item track_import "Import from file..." image=hui:open
 		Item track_render "Render from selection"
 		Separator
-		Item add_track "Add empty audio track" image=hui:add
-		Item add_midi_track "Add midi track" image=hui:add
-		Item add_time_track "Add rhythm track" image=hui:add
+		Menu menu_track_new "Add new track"
+			Item add_audio_track_mono "Audio (mono)" image=hui:add
+			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
+			Item add_midi_track "Midi" image=hui:add
+			Item add_time_track "Rhythm" image=hui:add
 		Separator
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete

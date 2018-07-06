@@ -276,8 +276,8 @@ void ViewModeDefault::onKeyUp(int k)
 
 void ViewModeDefault::updateTrackHeights()
 {
-	int n_ch = 2;
 	for (AudioViewLayer *t: view->vlayer){
+		int n_ch = t->layer->channels;
 		t->height_min = view->TIME_SCALE_HEIGHT * 2;
 		if (t->layer->is_main){
 			if (t->layer->type == Track::Type::AUDIO){

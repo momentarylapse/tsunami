@@ -45,7 +45,8 @@ public:
 	void onExport();
 	void onUndo();
 	void onRedo();
-	void onAddTrack();
+	void onAddAudioTrackMono();
+	void onAddAudioTrackStereo();
 	void onAddTimeTrack();
 	void onAddMidiTrack();
 	void onDeleteTrack();

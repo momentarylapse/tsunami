@@ -35,10 +35,14 @@ NewDialog::NewDialog(hui::Window *_parent):
 void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
-	bool midi = isChecked("new_track_type:midi");
+	int type = Track::Type::AUDIO_MONO;
+	if (isChecked("new_track_type:midi"))
+		type = Track::Type::MIDI;
+	else if (isChecked("new_track_type:audio-stereo"))
+		type = Track::Type::AUDIO_STEREO;
 	Session *session = tsunami->createSession();
 	Song *song = session->song;
-	song->newWithOneTrack(midi ? Track::Type::MIDI : Track::Type::AUDIO, sample_rate);
+	song->newWithOneTrack(type, sample_rate);
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
 		Track *t = song->addTrack(Track::Type::TIME, 0);

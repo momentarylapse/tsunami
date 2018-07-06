@@ -89,8 +89,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("redo", std::bind(&TsunamiWindow::onRedo, this));
 	setKeyCode("redo", hui::KEY_Y + hui::KEY_CONTROL, "hui:redo");
 	event("track_render", std::bind(&TsunamiWindow::onTrackRender, this));
-	event("add_track", std::bind(&TsunamiWindow::onAddTrack, this));
-	setKeyCode("add_track", -1, "hui:add");
+	event("add_audio_track_mono", std::bind(&TsunamiWindow::onAddAudioTrackMono, this));
+	setKeyCode("add_audio_track_mono", -1, "hui:add");
+	event("add_audio_track_stereo", std::bind(&TsunamiWindow::onAddAudioTrackStereo, this));
+	setKeyCode("add_audio_track_stereo", -1, "hui:add");
 	event("add_time_track", std::bind(&TsunamiWindow::onAddTimeTrack, this));
 	setKeyCode("add_time_track", -1, "hui:add");
 	event("add_midi_track", std::bind(&TsunamiWindow::onAddMidiTrack, this));
@@ -214,7 +216,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 
 
-	song->newWithOneTrack(Track::Type::AUDIO, DEFAULT_SAMPLE_RATE);
+	song->newWithOneTrack(Track::Type::AUDIO_STEREO, DEFAULT_SAMPLE_RATE);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	updateMenu();
@@ -274,9 +276,14 @@ void TsunamiWindow::onAbout()
 
 
 
-void TsunamiWindow::onAddTrack()
+void TsunamiWindow::onAddAudioTrackMono()
 {
-	song->addTrack(Track::Type::AUDIO);
+	song->addTrack(Track::Type::AUDIO_MONO);
+}
+
+void TsunamiWindow::onAddAudioTrackStereo()
+{
+	song->addTrack(Track::Type::AUDIO_STEREO);
 }
 
 void TsunamiWindow::onAddTimeTrack()

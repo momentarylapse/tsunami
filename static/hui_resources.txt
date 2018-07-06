@@ -905,7 +905,7 @@ menu_track
 
 2
 0
-7
+5
 Item
 track_import
 image=hui:open
@@ -924,28 +924,40 @@ Separator
 2
 0
 0
-Item
-add_track
-image=hui:add
+Menu
+menu_track_new
+
 3
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
 0
 0
 Item
 add_midi_track
 image=hui:add
-4
+2
 0
 0
 Item
 add_time_track
 image=hui:add
-5
+3
 0
 0
 Separator
 
 
-6
+4
 0
 0
 Menu
@@ -1859,9 +1871,9 @@ Grid
 
 0
 0
-2
+3
 RadioButton
-new_track_type:audio
+new_track_type:audio-mono
 
 0
 0
@@ -1871,6 +1883,12 @@ new_track_type:midi
 
 1
 0
+0
+RadioButton
+new_track_type:audio-stereo
+
+0
+1
 0
 Group
 nd_g_metronome
@@ -2341,7 +2359,7 @@ popup_song_menu
 
 0
 0
-6
+5
 Item
 song_menu_header
 disabled
@@ -2354,28 +2372,46 @@ Separator
 1
 0
 0
-Item
-add_track
+Menu
+menu_track_new
 
 2
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
 0
 0
 Item
 add_midi_track
-
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
 3
 0
 0
 Item
 song_edit_samples
 
-4
+3
 0
 0
 Item
 song_properties
 
-5
+4
 0
 0
 // Resource
@@ -3884,7 +3920,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-372
+378
 // Text
 /cancel
 Cancel
@@ -4150,20 +4186,23 @@ Marker
 menu/about
 About
 
+menu/add_audio_track_mono
+Audio (mono)
+
+menu/add_audio_track_stereo
+Audio (stereo)
+
 menu/add_bars
 Add bars...
 
 menu/add_midi_track
-Add midi track
+Midi
 
 menu/add_pause
 Add pause...
 
 menu/add_time_track
-Add rhythm track
-
-menu/add_track
-Add empty audio track
+Rhythm
 
 menu/bar_link_to_data
 Apply changes to data
@@ -4245,6 +4284,9 @@ Time
 
 menu/menu_track
 Track
+
+menu/menu_track_new
+Add new track
 
 menu/menu_view
 View
@@ -4486,8 +4528,11 @@ Speed
 new_dialog/new_dialog
 New file
 
-new_dialog/new_track_type:audio
-Audio
+new_dialog/new_track_type:audio-mono
+Audio (mono)
+
+new_dialog/new_track_type:audio-stereo
+Audio (stereo)
 
 new_dialog/new_track_type:midi
 Midi
@@ -4630,11 +4675,20 @@ Configure
 popup_signal_module_menu/signal_module_delete
 Delete
 
-popup_song_menu/add_midi_track
-Add midi track
+popup_song_menu/add_audio_track_mono
+Audio (mono)
 
-popup_song_menu/add_track
-Add empty audio track
+popup_song_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_song_menu/add_midi_track
+Midi
+
+popup_song_menu/add_time_track
+Rhythm
+
+popup_song_menu/menu_track_new
+Add new track
 
 popup_song_menu/song_edit_samples
 Manage samples
@@ -5008,7 +5062,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-476
+485
 // Text
 /cancel
 Abbrechen
@@ -5346,6 +5400,12 @@ Marker
 menu/about
 Info
 
+menu/add_audio_track_mono
+Audio (mono)
+
+menu/add_audio_track_stereo
+Audio (stereo)
+
 menu/add_bar
 Neue Takte einfügen
 
@@ -5486,6 +5546,9 @@ Zeit
 
 menu/menu_track
 Spur
+
+menu/menu_track_new
+Neue Spur hinzufügen
 
 menu/menu_view
 Ansicht
@@ -5784,6 +5847,12 @@ Neue Datei
 new_dialog/new_track_type:audio
 Audio
 
+new_dialog/new_track_type:audio-mono
+Audio (mono)
+
+new_dialog/new_track_type:audio-stereo
+Audio (stereo)
+
 new_dialog/new_track_type:midi
 Midi
 
@@ -5952,11 +6021,23 @@ Konfigurieren
 popup_signal_module_menu/signal_module_delete
 Löschen
 
+popup_song_menu/add_audio_track_mono
+Audio (mono)
+
+popup_song_menu/add_audio_track_stereo
+Audio (stereo)
+
 popup_song_menu/add_midi_track
 Midi Spur hinzufügen
 
+popup_song_menu/add_time_track
+Taktspur
+
 popup_song_menu/add_track
 Leere Spur hinzufügen
+
+popup_song_menu/menu_track_new
+Neue Spur hinzufügen
 
 popup_song_menu/song_edit_bars
 Takte bearbeiten

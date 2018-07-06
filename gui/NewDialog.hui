@@ -6,8 +6,10 @@ Dialog new_dialog "New file" width=250 height=80
 				Text /per_second "/s"
 		Group nd_g_track "First track"
 			Grid ? ""
-				RadioButton new_track_type:audio "Audio"
+				RadioButton new_track_type:audio-mono "Audio (mono)"
 				RadioButton new_track_type:midi "Midi"
+				---|
+				RadioButton new_track_type:audio-stereo "Audio (stereo)"
 		Group nd_g_metronome "Metronome"
 			Grid ? "" vertical
 				CheckBox metronome "add"

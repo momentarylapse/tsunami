@@ -54,6 +54,10 @@ string track_type(int type)
 		return _("Midi");
 	if (type == Track::Type::TIME)
 		return _("Metronome");
+	if (type == Track::Type::AUDIO_MONO)
+		return _("Audio (mono)");
+	if (type == Track::Type::AUDIO_STEREO)
+		return _("Audio (stereo)");
 	return "???";
 }
 
@@ -61,6 +65,7 @@ TrackLayer::TrackLayer(Track *t, bool _is_main)
 {
 	track = t;
 	type = t->type;
+	channels = t->channels;
 	is_main = _is_main;
 	muted = false;
 }
@@ -101,6 +106,14 @@ const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 Track::Track(int _type, Synthesizer *_synth)
 {
 	type = _type;
+	channels = 2;
+	if (type == Type::AUDIO_MONO){
+		type = Type::AUDIO;
+		channels = 1;
+	}else if (type == Type::AUDIO_STEREO){
+		type = Type::AUDIO;
+		channels = 2;
+	}
 	muted = false;
 	volume = 1;
 	panning = 0;

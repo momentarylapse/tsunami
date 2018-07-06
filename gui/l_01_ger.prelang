@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-477
+486
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1433,6 +1433,33 @@ Vereinen...
 
 popup_track_menu/layer_add
 Version hinzufügen
+
+menu/add_audio_track_mono
+Audio (mono)
+
+menu/add_audio_track_stereo
+Audio (stereo)
+
+menu/menu_track_new
+Neue Spur hinzufügen
+
+new_dialog/new_track_type:audio-mono
+Audio (mono)
+
+new_dialog/new_track_type:audio-stereo
+Audio (stereo)
+
+popup_song_menu/add_audio_track_mono
+Audio (mono)
+
+popup_song_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_song_menu/add_time_track
+Taktspur
+
+popup_song_menu/menu_track_new
+Neue Spur hinzufügen
 
 // Num Language Strings
 179

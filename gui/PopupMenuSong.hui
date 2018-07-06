@@ -1,7 +1,10 @@
 Menu popup_song_menu ""
 	Item song_menu_header "File" disabled
 	Separator
-	Item add_track "Add empty audio track"
-	Item add_midi_track "Add midi track"
+	Menu menu_track_new "Add new track"
+		Item add_audio_track_mono "Audio (mono)" image=hui:add
+		Item add_audio_track_stereo "Audio (stereo)" image=hui:add
+		Item add_midi_track "Midi" image=hui:add
+		Item add_time_track "Rhythm" image=hui:add
 	Item song_edit_samples "Manage samples"
 	Item song_properties "Properties"

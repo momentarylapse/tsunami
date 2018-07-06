@@ -54,6 +54,7 @@ public:
 
 	Track *track;
 	int type;
+	int channels;
 	bool is_main;
 	bool muted;
 
@@ -122,11 +123,15 @@ public:
 	enum Type{
 		AUDIO,
 		TIME,
-		MIDI
+		MIDI,
+
+		AUDIO_MONO,
+		AUDIO_STEREO
 	};
 
 // data
 	int type;
+	int channels;
 	string name;
 
 	Instrument instrument;

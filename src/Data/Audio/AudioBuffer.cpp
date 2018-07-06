@@ -121,6 +121,15 @@ void AudioBuffer::clear()
 	peaks.clear();
 }
 
+void AudioBuffer::clear_x(int _channels)
+{
+	for (int i=0; i<channels; i++)
+		c[i].clear();
+	length = 0;
+	peaks.clear();
+	channels = _channels;
+}
+
 void AudioBuffer::_truncate_peaks(int _length)
 {
 	int level4 = 0;
@@ -170,7 +179,7 @@ void AudioBuffer::make_own()
 void AudioBuffer::swap_ref(AudioBuffer &b)
 {
 	// buffer
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<2; i++)
 		c[i].exchange(b.c[i]);
 
 	// peaks

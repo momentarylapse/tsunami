@@ -43,9 +43,8 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view)
 
 	if (l->type == Track::Type::AUDIO){
 		AudioBuffer buf;
-		l->readBuffers(buf, view->sel.range, true);
 		ll->buffers.add(buf);
-		ll->buffers[0].make_own();
+		l->readBuffers(ll->buffers[0], view->sel.range, false);
 	}else if (l->type == Track::Type::MIDI){
 		ll->midi = l->midi.getNotesBySelection(view->sel);
 		ll->midi.samples = view->sel.range.length;

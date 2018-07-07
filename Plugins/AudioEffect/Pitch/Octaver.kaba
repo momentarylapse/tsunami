@@ -19,4 +19,5 @@ class Octaver extends AudioEffect
 
 	override void process(AudioBuffer buf)
 		do_octaver(buf.r)
-		do_octaver(buf.l)
+		if buf.channels > 1
+			do_octaver(buf.l)

@@ -4,5 +4,6 @@ use "../../api.kaba"
 
 class LToR extends AudioEffect
 	override void process(AudioBuffer buf)
-		buf.r = buf.l
+		if buf.channels > 1
+			buf.r = buf.l
 

@@ -259,9 +259,7 @@ class FMSynthesizer extends Synthesizer
 				for o,oi in s.osc
 					OscillatorConfig *co = &config.osc[oi]
 					if co.target_out
-						float d = o.output
-						buf.r[i] += d
-						buf.l[i] += d
+						buf.r[i] += o.output
 					for t,j in co.target
 						if t
 							s.osc[j].input += o.output
@@ -273,7 +271,9 @@ class FMSynthesizer extends Synthesizer
 						float d = s.osc[l.source].output
 						buf.r[i] += d
 						buf.l[i] += d*/
-			
+			if buf.channels > 1
+				buf.l = buf.r
+				
 			for p in del_me
 				enable_pitch(p, false)
 			

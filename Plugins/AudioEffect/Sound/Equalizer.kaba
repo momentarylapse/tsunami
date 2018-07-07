@@ -59,7 +59,8 @@ class Equalizer extends AudioEffect
 
 	override void process(AudioBuffer buf)
 		equalize(buf.r)
-		equalize(buf.l)
+		if buf.channels > 1
+			equalize(buf.l)
 
 	override ConfigPanel *create_panel()
 		return new EqualizerPanel(self)

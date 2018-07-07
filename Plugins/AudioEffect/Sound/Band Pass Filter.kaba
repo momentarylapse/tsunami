@@ -13,51 +13,47 @@ class LowPassFilter extends AudioEffect
 	Config config
 	
 	
-	float in_r, in_l, out_r, out_l
-	bool used
+	float[2] _in, _out
+	bool[2] used
 	
 	override void __init__()
-		used = false
+		used[0] = false
+		used[1] = false
 	
 	override void reset_state()
-		used = false
+		used[0] = false
+		used[1] = false
 
 
 	// y[i] := α * (y[i-1] + x[i] - x[i-1])
 	// z[i] := α * x[i] + (1-α) * z[i-1]
 	
-	override void process(AudioBuffer buf)
+	void do(float[] buf, int c)
 		float RC = 1 / (2 * pi * config.frequency)
 		float dt = 1.0 / session.sample_rate()
 		float aa = dt / (RC + dt)
 		float bb = 1 - aa
-		float prev_in_r = 0
-		float prev_in_l = 0
-		if used
-			float tr = buf.r[0]
-			float tl = buf.l[0]
-			buf.r[0] = bb * (buf.r[0] + out_r - in_r)
-			buf.l[0] = bb * (buf.l[0] + out_l - in_l)
-			prev_in_r = tr
-			prev_in_l = tl
+		float prev_in = 0
+		if used[c]
+			float t = buf[0]
+			buf[0] = bb * (buf[0] + _out[c] - _in[c])
+			prev_in = t
 			//buf.r[0] = aa * buf.r[0] + bb * state.out_r
-			//buf.l[0] = aa * buf.l[0] + bb * state.out_l
 		
 		// y[i] := b * (y[i-1] + x[i] - x[i-1])
 		// z[i] := α * y[i] + b * z[i-1]
 	
-		for i in 1:buf.length
-			float tr = buf.r[i]
-			float tl = buf.l[i]
-			buf.r[i] = bb * (buf.r[i] + buf.r[i-1] - prev_in_r)
-			buf.l[i] = bb * (buf.l[i] + buf.l[i-1] - prev_in_l)
-			prev_in_r = tr
-			prev_in_l = tl
-			//buf.r[i] = aa * buf.r[i] + bb * buf.r[i-1]
-			//buf.l[i] = aa * buf.l[i] + bb * buf.l[i-1]
+		for i in 1:buf.num
+			float t = buf[i]
+			buf[i] = bb * (buf[i] + buf[i-1] - prev_in)
+			prev_in = t
+			//buf[i] = aa * buf[i] + bb * buf[i-1]
 		
-		used = true
-		in_r = prev_in_r
-		in_l = prev_in_l
-		out_r = buf.r[buf.length - 1]
-		out_l = buf.l[buf.length - 1]
+		used[c] = true
+		_in[c] = prev_in
+		_out[c] = buf[buf.num - 1]
+		
+	override void process(AudioBuffer buf)
+		do(buf.r, 0)
+		if buf.channels > 1
+			do(buf.l, 1)

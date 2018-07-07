@@ -4,4 +4,5 @@ use "../../api.kaba"
 
 class ClearL extends AudioEffect
 	override void process(AudioBuffer buf)
-		buf.l = 0
+		if buf.channels > 1
+			buf.l = 0

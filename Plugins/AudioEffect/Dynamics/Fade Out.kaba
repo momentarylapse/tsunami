@@ -8,5 +8,6 @@ class FadeOut extends AudioEffect
 		for i in 0:buf.length
 			float vol = 1 - i2f(i) / buf.length
 			buf.r[i] = buf.r[i] * vol
-			buf.l[i] = buf.l[i] * vol
+			if buf.channels > 1
+				buf.l[i] = buf.l[i] * vol
 

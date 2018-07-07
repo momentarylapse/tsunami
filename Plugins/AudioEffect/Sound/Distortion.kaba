@@ -19,4 +19,6 @@ class Distortion extends AudioEffect
 	
 		for i in 0:buf.length
 			buf.r[i] = b * atan(buf.r[i] * a)
-			buf.l[i] = b * atan(buf.l[i] * a)
+		if buf.channels > 1
+			for i in 0:buf.length
+				buf.l[i] = b * atan(buf.l[i] * a)

@@ -63,6 +63,7 @@ class Flanger extends AudioEffect
 		temp_l.resize(delay_samples)
 	
 		do_flanger(buf.r, temp_r)
-		do_flanger(buf.l, temp_l)
+		if buf.channels > 1
+			do_flanger(buf.l, temp_l)
 	
 		offset += buf.length

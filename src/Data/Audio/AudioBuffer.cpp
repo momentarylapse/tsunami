@@ -305,7 +305,7 @@ inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, con
 		float *ps = &source.c[sc][source_offset];
 		float *ps_end = ps + length;
 		while(ps < ps_end){
-			*pt = *ps;
+			*pt = *ps * volume;
 			ps ++;
 			pt ++;
 		}
@@ -531,19 +531,36 @@ inline float _clamp_(float f)
 	return f;
 }
 
+// always outputting stereo... (for OutputStreams)
 void AudioBuffer::interleave(float *p, float volume) const
 {
 	float *pr = &c[0][0];
 	float *pl = &c[1][0];
 	if (volume == 1.0f){
-		for (int i=0; i<length; i++){
-			*p ++ = _clamp_(*pr ++);
-			*p ++ = _clamp_(*pl ++);
+		if (channels == 2){
+			for (int i=0; i<length; i++){
+				*p ++ = _clamp_(*pr ++);
+				*p ++ = _clamp_(*pl ++);
+			}
+		}else{
+			for (int i=0; i<length; i++){
+				float ff = _clamp_(*pr ++);
+				*p ++ = ff;
+				*p ++ = ff;
+			}
 		}
 	}else{
-		for (int i=0; i<length; i++){
-			*p ++ = _clamp_((*pr ++) * volume);
-			*p ++ = _clamp_((*pl ++) * volume);
+		if (channels == 2){
+			for (int i=0; i<length; i++){
+				*p ++ = _clamp_((*pr ++) * volume);
+				*p ++ = _clamp_((*pl ++) * volume);
+			}
+		}else{
+			for (int i=0; i<length; i++){
+				float ff = _clamp_((*pr ++) * volume);
+				*p ++ = ff;
+				*p ++ = ff;
+			}
 		}
 	}
 }
@@ -553,14 +570,25 @@ void AudioBuffer::deinterleave(float *p, int num_channels)
 	float *pr = &c[0][0];
 	float *pl = &c[1][0];
 	if (num_channels == 1){
-		for (int i=0; i<length; i++){
-			*pr ++ = *p;
-			*pl ++ = *p ++;
+		if (channels == 2){
+			for (int i=0; i<length; i++){
+				*pr ++ = *p;
+				*pl ++ = *p ++;
+			}
+		}else{
+			memcpy(pr, p, length * sizeof(float));
 		}
 	}else if (num_channels == 2){
-		for (int i=0; i<length; i++){
-			*pr ++ = *p ++;
-			*pl ++ = *p ++;
+		if (channels == 2){
+			for (int i=0; i<length; i++){
+				*pr ++ = *p ++;
+				*pl ++ = *p ++;
+			}
+		}else{
+			for (int i=0; i<length; i++){
+				*pr ++ = *p ++;
+				p ++;
+			}
 		}
 	}
 }
@@ -653,7 +681,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 		for (int i=i0; i<i1; i++)
 			peaks[j][i] = fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254;
 	}
-	memcpy(&peaks[2][i0], &peaks[0][i0], n);
+	memcpy(&peaks[2][i0], &peaks[0][i0], n); // FIXME  *sizeof(float) ???
 	memcpy(&peaks[3][i0], &peaks[1][i0], n);
 
 	// medium levels

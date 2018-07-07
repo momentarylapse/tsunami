@@ -35,7 +35,8 @@ class PitchShift extends AudioEffect
 
 	override void process(AudioBuffer buf)
 		shift_buf(buf.r)
-		shift_buf(buf.l)
+		if buf.channels > 1
+			shift_buf(buf.l)
 		buf1.clear()
 		buf2.clear()
 

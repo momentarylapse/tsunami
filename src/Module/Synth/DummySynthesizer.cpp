@@ -131,11 +131,12 @@ void DummySynthesizer::render(AudioBuffer& buf)
 
 			float d = sin(s.phi) * s.volume;
 			buf.c[0][i] += d;
-			buf.c[1][i] += d;
 
 			s.phi += delta_phi[p];
 			if (s.phi > 8*pi)
 				s.phi = loopf(s.phi, 0, 2*pi);
 		}
+		if (buf.channels > 1)
+			buf.c[1][i] = buf.c[0][i];
 	}
 }

@@ -129,8 +129,10 @@ class HarmonicSynthesizer extends Synthesizer
 				for j in 0:NUM_HARMONICS
 					d += sin(s.phi * (j+1)) * config.intensity[j]
 				buf.r[i] += d * s.volume
-				buf.l[i] += d * s.volume
 
 				s.phi += delta_phi[p]
 				if s.phi > 8*pi
 					s.phi = loop(s.phi, 0, 2*pi)
+		
+		if buf.channels > 1
+			buf.l = buf.r

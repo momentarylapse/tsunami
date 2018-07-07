@@ -13,26 +13,29 @@ class LowPassFilter extends AudioEffect
 	Config config
 	
 	
-	float l, r
-	bool used
+	float[2] temp
+	bool[2] used
 	override void reset_state()
-		used = false
+		used[0] = false
+		used[1] = false
 
 	// y[i] := α * x[i] + (1-α) * y[i-1]
-	override void process(AudioBuffer buf)
+	void do(float[] buf, int c)
 		float RC = 1 / (2 * pi * config.frequency)
 		float dt = 1.0 / session.sample_rate()
 		float a = dt / (RC + dt)
 		float b = 1 - a
 		
-		if used
-			buf.r[0] = a * buf.r[0] + b * r
-			buf.l[0] = a * buf.l[0] + b * l
+		if used[c]
+			buf[0] = a * buf[0] + b * temp[c]
 	
-		for i in 1:buf.length
-			buf.r[i] = a * buf.r[i] + b * buf.r[i-1]
-			buf.l[i] = a * buf.l[i] + b * buf.l[i-1]
+		for i in 1:buf.num
+			buf[i] = a * buf[i] + b * buf[i-1]
 		
-		used = true
-		r = buf.r[buf.length-1]
-		l = buf.l[buf.length-1]
+		used[c] = true
+		temp[c] = buf[buf.num-1]
+			
+	override void process(AudioBuffer buf)
+		do(buf.r, 0)
+		if buf.channels > 1
+			do(buf.l, 1)

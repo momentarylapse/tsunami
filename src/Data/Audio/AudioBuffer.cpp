@@ -255,43 +255,54 @@ void AudioBuffer::scale(float volume, float panning)
 	peaks.clear();
 }
 
-void AudioBuffer::add(const AudioBuffer &b, int _offset, float volume, float panning)
+void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, float panning)
 {
+	if (source.channels > channels)
+		printf("AudioBuffer.add: channels\n");
+
 	// relative to b
 	int i0 = max(0, -_offset);
-	int i1 = min(b.length, length - _offset);
+	int i1 = min(source.length, length - _offset);
 
 	// add buffers
 	if ((volume == 1.0f) and (panning == 0.0f)){
-		for (int j=0; j<channels; j++)
+		for (int tc=0; tc<channels; tc++){
+			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
-				c[j][i + _offset] += b.c[j][i];
+				c[tc][i + _offset] += source.c[sc][i];
+		}
 	}else{
 		float f[2];
 		if (channels == 2){
+			// for source.channels = 1,2
 			f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
 			f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
 		}else{
 			f[0] = volume;
 		}
-		for (int j=0; j<channels; j++)
+		for (int tc=0; tc<channels; tc++){
+			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
-				c[j][i + _offset] += b.c[j][i] * f[j];
+				c[tc][i + _offset] += source.c[sc][i] * f[tc];
+		}
 	}
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
 inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length)
 {
-	for (int j=0; j<source.channels; j++)
-		memcpy(&target.c[j][target_offset], &source.c[j][source_offset], sizeof(float) * length);
+	for (int tc=0; tc<target.channels; tc++){
+		int sc = min(tc, source.channels-1);
+		memcpy(&target.c[tc][target_offset], &source.c[sc][source_offset], sizeof(float) * length);
+	}
 }
 
 inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length, float volume)
 {
-	for (int j=0; j<source.channels; j++){
-		float *pt = &target.c[j][target_offset];
-		float *ps = &source.c[j][source_offset];
+	for (int tc=0; tc<target.channels; tc++){
+		int sc = min(tc, source.channels-1);
+		float *pt = &target.c[tc][target_offset];
+		float *ps = &source.c[sc][source_offset];
 		float *ps_end = ps + length;
 		while(ps < ps_end){
 			*pt = *ps;
@@ -304,6 +315,9 @@ inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, con
 // this[offset:] = source[:length]
 void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume)
 {
+	if (source.channels > channels)
+		printf("AudioBuffer.set_x: channels >\n");
+
 	_length = min(_length, source.length);
 
 	// relative to self

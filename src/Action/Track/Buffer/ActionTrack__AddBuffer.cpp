@@ -36,6 +36,7 @@ void *ActionTrack__AddBuffer::execute(Data *d)
 	// reserve memory
 	AudioBuffer &b = layer->buffers[index];
 	b.offset = range.start();
+	b.clear_x(layer->channels);
 	b.resize(range.length);
 	return &b;
 }

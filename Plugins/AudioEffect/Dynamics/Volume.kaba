@@ -24,12 +24,16 @@ class Volume extends AudioEffect
 			for i in 0:buf.length
 				if abs(buf.r[i]) > max
 					max = abs(buf.r[i])
-				if abs(buf.l[i]) > max
-					max = abs(buf.l[i])
+			if buf.channels > 1
+				for i in 0:buf.length
+					if abs(buf.l[i]) > max
+						max = abs(buf.l[i])
 			factor = 1 / max
 		for i in 0:buf.length
 			buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
-			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
+		if buf.channels > 1
+			for i in 0:buf.length
+				buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	
 class VolumePanel extends ConfigPanel
 	override Volume *c

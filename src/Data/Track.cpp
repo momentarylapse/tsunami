@@ -186,6 +186,8 @@ int Track::get_index()
 
 void TrackLayer::readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 {
+	buf.clear_x(channels);
+
 	// is <r> inside a buffer?
 	if (allow_ref)
 	for (AudioBuffer &b: buffers){

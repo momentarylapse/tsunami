@@ -5,5 +5,7 @@ class Noise extends AudioEffect
 	override void process(AudioBuffer buf)
 		for i in 0:buf.length
 			buf.r[i] = rand(2.0) - 1.0
-			buf.l[i] = rand(2.0) - 1.0
+		if buf.channels > 1
+			for i in 0:buf.length
+				buf.l[i] = rand(2.0) - 1.0
 

@@ -51,7 +51,8 @@ class Echo extends AudioEffect
 		buf_l.resize(delay_samples)
 	
 		do_delay(buf.r, buf_r)
-		do_delay(buf.l, buf_l)
+		if buf.channels > 1
+			do_delay(buf.l, buf_l)
 	
 		offset += buf.length
 	

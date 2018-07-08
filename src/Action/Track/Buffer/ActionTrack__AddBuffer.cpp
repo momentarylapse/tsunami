@@ -31,6 +31,7 @@ void *ActionTrack__AddBuffer::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 
 	AudioBuffer dummy;
+	dummy.clear_x(layer->channels);
 	layer->buffers.insert(dummy, index);
 
 	// reserve memory

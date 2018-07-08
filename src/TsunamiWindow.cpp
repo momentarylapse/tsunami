@@ -105,6 +105,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("track_edit_fx", -1, "hui:edit");
 	event("track_add_marker", std::bind(&TsunamiWindow::onTrackAddMarker, this));
 	setKeyCode("track_add_marker", -1, "hui:add");
+	event("track_convert_mono", std::bind(&TsunamiWindow::onTrackConvertMono, this));
+	event("track_convert_stereo", std::bind(&TsunamiWindow::onTrackConvertStereo, this));
 	event("layer_add", std::bind(&TsunamiWindow::onAddLayer, this));
 	setKeyCode("layer_add", -1, "hui:add");
 	event("delete_layer", std::bind(&TsunamiWindow::onDeleteLayer, this));
@@ -370,6 +372,22 @@ void TsunamiWindow::onTrackAddMarker()
 	}else{
 		session->e(_("No track selected"));
 	}
+}
+
+void TsunamiWindow::onTrackConvertMono()
+{
+	if (view->cur_track)
+		view->cur_track->setChannels(1);
+	else
+		session->e(_("No track selected"));
+}
+
+void TsunamiWindow::onTrackConvertStereo()
+{
+	if (view->cur_track)
+		view->cur_track->setChannels(2);
+	else
+		session->e(_("No track selected"));
 }
 
 void TsunamiWindow::onSongProperties()

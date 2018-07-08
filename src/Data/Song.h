@@ -63,6 +63,7 @@ public:
 	static const string MESSAGE_ADD_LAYER;
 	static const string MESSAGE_EDIT_LAYER;
 	static const string MESSAGE_DELETE_LAYER;
+	static const string MESSAGE_CHANGE_CHANNELS;
 	static const string MESSAGE_EDIT_BARS;
 
 

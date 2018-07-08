@@ -16,8 +16,8 @@ class ActionTrack__ShrinkBuffer : public Action
 public:
 	ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;

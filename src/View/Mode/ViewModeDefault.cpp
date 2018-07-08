@@ -159,6 +159,8 @@ void ViewModeDefault::onRightButtonDown()
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
+		view->menu_track->enable("track_convert_stereo", view->cur_track->channels == 1);
+		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
 		view->menu_track->openPopup(view->win, 0, 0);
 	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);

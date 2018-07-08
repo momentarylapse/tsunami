@@ -672,6 +672,8 @@ void AudioView::onSongUpdate()
 			updateTracks();
 		if ((song->cur_message() == song->MESSAGE_ADD_LAYER) or (song->cur_message() == song->MESSAGE_DELETE_LAYER))
 			updateTracks();
+		if (song->cur_message() == song->MESSAGE_CHANGE_CHANNELS)
+			updateTracks();
 		forceRedraw();
 		updateMenu();
 	}

@@ -16,8 +16,8 @@ class ActionTrack__SplitBuffer : public Action
 public:
 	ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;

@@ -54,6 +54,8 @@ public:
 	void onTrackEditMidi();
 	void onTrackEditFX();
 	void onTrackAddMarker();
+	void onTrackConvertMono();
+	void onTrackConvertStereo();
 	void onSampleFromSelection();
 	void onInsertSample();
 	void onRemoveSample();

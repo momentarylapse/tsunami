@@ -2475,7 +2475,7 @@ popup_track_menu
 
 0
 0
-8
+9
 Item
 track_menu_header
 disabled
@@ -2506,22 +2506,40 @@ track_add_marker
 4
 0
 0
-Item
-track_edit_fx
+Menu
+convert_menu
 
 5
 0
+2
+Item
+track_convert_mono
+
+0
+0
 0
 Item
-track_edit_midi
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
 
 6
 0
 0
 Item
-track_properties
+track_edit_midi
 
 7
+0
+0
+Item
+track_properties
+
+8
 0
 0
 // Resource
@@ -3920,7 +3938,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-378
+381
 // Text
 /cancel
 Cancel
@@ -4720,6 +4738,9 @@ Edit effects
 popup_time_track_menu/track_properties
 Properties
 
+popup_track_menu/convert_menu
+Convert
+
 popup_track_menu/delete_track
 Delete
 
@@ -4728,6 +4749,12 @@ Add version
 
 popup_track_menu/track_add_marker
 Add marker
+
+popup_track_menu/track_convert_mono
+Mono
+
+popup_track_menu/track_convert_stereo
+Stereo
 
 popup_track_menu/track_edit_fx
 Edit effects
@@ -5062,7 +5089,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-485
+488
 // Text
 /cancel
 Abbrechen
@@ -6072,6 +6099,9 @@ Effekte bearbeiten
 popup_time_track_menu/track_properties
 Eigenschaften
 
+popup_track_menu/convert_menu
+Konvertieren
+
 popup_track_menu/delete_track
 Löschen
 
@@ -6083,6 +6113,12 @@ Takte bearbeiten
 
 popup_track_menu/track_add_marker
 Marker setzen
+
+popup_track_menu/track_convert_mono
+Mono
+
+popup_track_menu/track_convert_stereo
+Stereo
 
 popup_track_menu/track_edit_fx
 Effekte bearbeiten
@@ -6520,7 +6556,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-179
+181
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6570,6 +6606,10 @@ At least one layer has to exist.
 Es muss mindestens eine Ebene existieren.
 Audio
 Audio
+Audio (mono)
+Audio (mono)
+Audio (stereo)
+Audio (stereo)
 Augmented
 Übermäßig
 Bars

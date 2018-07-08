@@ -28,7 +28,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	if (format == SAMPLE_FORMAT_32_FLOAT)
 		format = SAMPLE_FORMAT_32;
 	int bit_depth = format_get_bits(format);
-	int channels = 2;
+	int channels = od->buf->channels;
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
@@ -54,7 +54,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	while ((samples_read = r->read(buf)) > 0){
 		buf.resize(samples_read);
 		string data;
-		if (!buf.exports(data, 2, SAMPLE_FORMAT_16))
+		if (!buf.exports(data, channels, SAMPLE_FORMAT_16))
 			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);

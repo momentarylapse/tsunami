@@ -13,6 +13,8 @@ ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, i
 	layer = l;
 	dest = _dest;
 	src = _src;
+	src_offset = 0;
+	src_length = 0;
 }
 
 ActionTrack__AbsorbBuffer::~ActionTrack__AbsorbBuffer()
@@ -48,6 +50,7 @@ void ActionTrack__AbsorbBuffer::undo(Data *d)
 
 	//msg_todo("absorb undo...");
 	AudioBuffer dummy;
+	dummy.clear_x(layer->channels);
 	layer->buffers.insert(dummy, src);
 	AudioBuffer &b_src  = layer->buffers[src];
 	AudioBuffer &b_dest = layer->buffers[dest];

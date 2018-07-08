@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-486
+489
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1461,8 +1461,17 @@ Taktspur
 popup_song_menu/menu_track_new
 Neue Spur hinzufügen
 
+popup_track_menu/convert_menu
+Konvertieren
+
+popup_track_menu/track_convert_mono
+Mono
+
+popup_track_menu/track_convert_stereo
+Stereo
+
 // Num Language Strings
-179
+181
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1822,3 +1831,7 @@ Pdf sheet
 Pdf Notenblatt
 Error unconnecting from midi port: 
 Fehler beim Trennen vom Midi Port: 
+Audio (mono)
+Audio (mono)
+Audio (stereo)
+Audio (stereo)

@@ -14,6 +14,7 @@ ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, 
 	index = _index;
 	new_length = _length;
 	old_length = 0;
+	buf.clear_x(l->channels);
 }
 
 void ActionTrack__ShrinkBuffer::undo(Data *d)

@@ -8,6 +8,7 @@
 #include "Track.h"
 #include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
+#include "../Action/Track/Buffer/ActionTrackSetChannels.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
@@ -340,6 +341,11 @@ void Track::move(int target)
 {
 	if (target != get_index())
 		song->execute(new ActionTrackMove(this, target));
+}
+void Track::setChannels(int _channels)
+{
+	if (channels != _channels)
+		song->execute(new ActionTrackSetChannels(this, _channels));
 }
 
 void TrackLayer::insertMidiData(int offset, const MidiNoteBuffer& midi)

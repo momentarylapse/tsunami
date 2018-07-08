@@ -101,6 +101,7 @@ public:
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);
 	void _cdecl move(int target);
+	void _cdecl setChannels(int channels);
 	void _cdecl addEffect(AudioEffect *effect);
 	void _cdecl deleteEffect(AudioEffect *effect);
 	void _cdecl editEffect(AudioEffect *effect, const string &param_old);

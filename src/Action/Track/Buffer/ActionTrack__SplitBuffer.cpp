@@ -20,7 +20,6 @@ ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, in
 
 void ActionTrack__SplitBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
 	AudioBuffer &b = layer->buffers[index];
 	AudioBuffer &b2 = layer->buffers[index + 1];
 
@@ -37,13 +36,13 @@ void ActionTrack__SplitBuffer::undo(Data *d)
 void *ActionTrack__SplitBuffer::execute(Data *d)
 {
 	//msg_write(format("cut %d   at %d", index, offset));
-	Song *a = dynamic_cast<Song*>(d);
 
 	assert(offset > 0);
 	assert(offset < (layer->buffers[index].length - 1));
 
 	// create new
 	AudioBuffer dummy;
+	dummy.clear_x(layer->channels);
 	layer->buffers.insert(dummy, index + 1);
 
 	AudioBuffer &b = layer->buffers[index];
@@ -54,6 +53,7 @@ void *ActionTrack__SplitBuffer::execute(Data *d)
 
 	// transfer data
 	b2.resize(b.length - offset);
+	printf("split... %d %d\n", b.channels, b2.channels);
 	b2.set(b, -offset, 1.0f);
 	b.resize(offset);
 	return &b;

@@ -104,6 +104,7 @@ const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
 const string Song::MESSAGE_ADD_LAYER = "AddLayer";
 const string Song::MESSAGE_EDIT_LAYER = "EditLayer";
 const string Song::MESSAGE_DELETE_LAYER = "DeleteLayer";
+const string Song::MESSAGE_CHANGE_CHANNELS = "ChangeChannels";
 const string Song::MESSAGE_EDIT_BARS = "EditBars";
 
 

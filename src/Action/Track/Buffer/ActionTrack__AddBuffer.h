@@ -18,10 +18,10 @@ class TrackLayer;
 class ActionTrack__AddBuffer : public Action
 {
 public:
-	ActionTrack__AddBuffer(TrackLayer *l, int index, Range r);
+	ActionTrack__AddBuffer(TrackLayer *l, int index, const Range &r);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;

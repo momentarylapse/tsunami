@@ -9,16 +9,18 @@
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACKEDITBUFFER_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/Audio/AudioBuffer.h"
+
+class TrackLayer;
 
 class ActionTrackEditBuffer : public Action
 {
 public:
 	ActionTrackEditBuffer(TrackLayer *l, Range _range);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
-	virtual void redo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
+	void redo(Data *d) override;
 
 private:
 	TrackLayer *layer;

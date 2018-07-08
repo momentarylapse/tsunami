@@ -6,8 +6,8 @@
  */
 
 #include <assert.h>
-
 #include "ActionTrack__SplitBuffer.h"
+#include "../../../Data/Track.h"
 
 ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset)
 {
@@ -53,7 +53,6 @@ void *ActionTrack__SplitBuffer::execute(Data *d)
 
 	// transfer data
 	b2.resize(b.length - offset);
-	printf("split... %d %d\n", b.channels, b2.channels);
 	b2.set(b, -offset, 1.0f);
 	b.resize(offset);
 	return &b;

@@ -19,7 +19,6 @@ ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, 
 
 void ActionTrack__ShrinkBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
 	AudioBuffer &b = layer->buffers[index];
 
 	// restore
@@ -34,7 +33,6 @@ void ActionTrack__ShrinkBuffer::undo(Data *d)
 
 void *ActionTrack__ShrinkBuffer::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
 	AudioBuffer &b = layer->buffers[index];
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));

@@ -22,7 +22,7 @@ public:
 		track->song->notify(Song::MESSAGE_CHANGE_CHANNELS);
 		return NULL;
 	}
-	void undo(Data *d)
+	void undo(Data *d) override
 	{ execute(d); }
 private:
 	Track *track;

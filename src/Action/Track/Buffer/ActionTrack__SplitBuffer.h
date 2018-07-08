@@ -9,7 +9,8 @@
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SPLITBUFFER_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
+
+class TrackLayer;
 
 class ActionTrack__SplitBuffer : public Action
 {

@@ -15,17 +15,11 @@ ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, i
 	src = _src;
 	src_offset = 0;
 	src_length = 0;
-}
-
-ActionTrack__AbsorbBuffer::~ActionTrack__AbsorbBuffer()
-{
+	dest_old_length = 0;
 }
 
 void *ActionTrack__AbsorbBuffer::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-
 	AudioBuffer &b_src  = layer->buffers[src];
 	AudioBuffer &b_dest = layer->buffers[dest];
 	dest_old_length = b_dest.length;
@@ -46,9 +40,6 @@ void *ActionTrack__AbsorbBuffer::execute(Data *d)
 
 void ActionTrack__AbsorbBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
-	//msg_todo("absorb undo...");
 	AudioBuffer dummy;
 	dummy.clear_x(layer->channels);
 	layer->buffers.insert(dummy, src);

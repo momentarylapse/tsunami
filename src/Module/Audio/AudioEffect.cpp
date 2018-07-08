@@ -10,6 +10,7 @@
 #include "../../Session.h"
 #include "../../lib/math/math.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../Data/Song.h"
 
 
 AudioEffect::Output::Output(AudioEffect *_fx)

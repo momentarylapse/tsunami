@@ -14,12 +14,15 @@ ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_laye
 	layer = _layer;
 	index = _index;
 	channels = _channels;
+	if (channels == 2)
+		temp = layer->buffers[index].c[0];
 }
 
 void *ActionTrack__BufferSetChannels::execute(Data *d)
 {
 	layer->buffers[index].c[1].exchange(temp);
 	std::swap(layer->buffers[index].channels, channels);
+	layer->buffers[index].invalidate_peaks(Range::ALL);
 	return NULL;
 }
 

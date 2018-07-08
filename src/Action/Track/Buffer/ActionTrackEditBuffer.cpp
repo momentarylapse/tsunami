@@ -7,6 +7,7 @@
 
 #include "ActionTrackEditBuffer.h"
 #include <assert.h>
+#include "../../../Data/Track.h"
 
 ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 {
@@ -23,6 +24,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 	// save old data
 	AudioBuffer b;
 	layer->readBuffers(b, range, true);
+	box.clear_x(l->channels);
 	box.resize(b.length);
 	box.set(b, 0, 1.0f);
 }
@@ -31,8 +33,6 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 
 void ActionTrackEditBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	layer->buffers[index].invalidate_peaks(range);
 
 	AudioBuffer b;
@@ -47,8 +47,6 @@ void ActionTrackEditBuffer::redo(Data *d)
 
 void *ActionTrackEditBuffer::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	layer->buffers[index].invalidate_peaks(range);
 
 	// nothing to do...

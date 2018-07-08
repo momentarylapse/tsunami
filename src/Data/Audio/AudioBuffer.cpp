@@ -625,13 +625,13 @@ unsigned char inline shrink_mean(unsigned char a, unsigned char b)
 
 void AudioBuffer::invalidate_peaks(const Range &_range)
 {
-	assert(range().covers(_range));
+	Range r = range() and _range;
 
 	if (peaks.num < PEAK_MAGIC_LEVEL4)
 		return;
 
-	int i0 = (_range.start() - offset) / PEAK_CHUNK_SIZE;
-	int i1 = min((_range.end() - offset) / PEAK_CHUNK_SIZE + 1, peaks[PEAK_MAGIC_LEVEL4].num);
+	int i0 = (r.start() - offset) / PEAK_CHUNK_SIZE;
+	int i1 = min((r.end() - offset) / PEAK_CHUNK_SIZE + 1, peaks[PEAK_MAGIC_LEVEL4].num);
 
 	for (int i=i0; i<i1; i++)
 		peaks[PEAK_MAGIC_LEVEL4][i] = 255;

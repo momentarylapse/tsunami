@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "ActionTrack__AddBuffer.h"
 
-ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, Range r)
+ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, const Range &r)
 {
 	layer = l;
 	index = _index;
@@ -18,8 +18,6 @@ ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, Range 
 
 void ActionTrack__AddBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	// should be zeroes at this point...
 	layer->buffers.erase(index);
 }
@@ -28,8 +26,6 @@ void ActionTrack__AddBuffer::undo(Data *d)
 
 void *ActionTrack__AddBuffer::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	AudioBuffer dummy;
 	dummy.clear_x(layer->channels);
 	layer->buffers.insert(dummy, index);

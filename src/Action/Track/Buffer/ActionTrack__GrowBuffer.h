@@ -9,7 +9,6 @@
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__GROWBUFFER_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
 
 class TrackLayer;
 
@@ -18,8 +17,8 @@ class ActionTrack__GrowBuffer : public Action
 public:
 	ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;

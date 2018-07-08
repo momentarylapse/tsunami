@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include "ActionTrack__DeleteBuffer.h"
+#include "../../../Data/Track.h"
 
 ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index)
 {
@@ -18,8 +19,6 @@ ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index)
 
 void ActionTrack__DeleteBuffer::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	// restore
 	layer->buffers.insert(buf, index);
 
@@ -31,9 +30,6 @@ void ActionTrack__DeleteBuffer::undo(Data *d)
 
 void *ActionTrack__DeleteBuffer::execute(Data *d)
 {
-	//msg_write("delete " + i2s(index));
-	Song *a = dynamic_cast<Song*>(d);
-
 	AudioBuffer &b = layer->buffers[index];
 
 	assert(index >= 0 and index < layer->buffers.num);

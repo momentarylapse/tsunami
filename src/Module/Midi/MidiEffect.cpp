@@ -10,6 +10,7 @@
 
 #include "../../Session.h"
 #include "../../lib/math/math.h"
+#include "../../Data/Song.h"
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 

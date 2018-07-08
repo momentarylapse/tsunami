@@ -15,11 +15,10 @@ class TrackLayer;
 class ActionTrack__AbsorbBuffer : public Action
 {
 public:
-	ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, int _src);
-	virtual ~ActionTrack__AbsorbBuffer();
+	ActionTrack__AbsorbBuffer(TrackLayer *l, int dest, int src);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackLayer *layer;

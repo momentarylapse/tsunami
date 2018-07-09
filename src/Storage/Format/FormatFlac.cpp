@@ -219,9 +219,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 
 		// read blocks of samples from WAVE file and feed to encoder
 		float scale = (float)(1 << (bits-1));
-		AudioBuffer buf;
-		buf.clear_x(channels);
-		buf.resize(CHUNK_SAMPLES);
+		AudioBuffer buf(CHUNK_SAMPLES, channels);
 		int samples_read;
 		while ((samples_read = r->read(buf)) > 0){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */

@@ -73,8 +73,7 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 		t->song->action_manager->execute(a);
 	}else{
 		if (layer->buffers.num == 0){
-			AudioBuffer dummy;
-			dummy.clear_x(layer->channels);
+			AudioBuffer dummy(0, layer->channels);
 			layer->buffers.add(dummy);
 		}
 

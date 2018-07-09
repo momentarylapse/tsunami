@@ -41,8 +41,7 @@ void *ActionTrack__SplitBuffer::execute(Data *d)
 	assert(offset < (layer->buffers[index].length - 1));
 
 	// create new
-	AudioBuffer dummy;
-	dummy.clear_x(layer->channels);
+	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, index + 1);
 
 	AudioBuffer &b = layer->buffers[index];

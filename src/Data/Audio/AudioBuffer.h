@@ -36,6 +36,7 @@ class AudioBuffer
 public:
 	AudioBuffer();
 	AudioBuffer(const AudioBuffer &b);
+	AudioBuffer(int length, int channels);
 	~AudioBuffer();
 
 	void _cdecl __init__();

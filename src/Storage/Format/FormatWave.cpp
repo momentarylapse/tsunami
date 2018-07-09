@@ -48,9 +48,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	f->write_buffer("data", 4);
 	f->write_int(samples * bytes_per_sample);
 
-	AudioBuffer buf;
-	buf.clear_x(channels);
-	buf.resize(CHUNK_SIZE);
+	AudioBuffer buf(CHUNK_SIZE, channels);
 	int done = 0;
 	int samples_read;
 	while ((samples_read = r->read(buf)) > 0){

@@ -24,8 +24,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 	// save old data
 	AudioBuffer b;
 	layer->readBuffers(b, range, true);
-	box.clear_x(l->channels);
-	box.resize(b.length);
+	box = AudioBuffer(b.length, l->channels);
 	box.set(b, 0, 1.0f);
 }
 

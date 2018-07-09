@@ -80,6 +80,14 @@ AudioBuffer::AudioBuffer()
 	channels = 2;
 }
 
+AudioBuffer::AudioBuffer(int _length, int _channels)
+{
+	offset = 0;
+	length = 0;
+	channels = _channels;
+	resize(_length);
+}
+
 AudioBuffer::AudioBuffer(const AudioBuffer &b)
 {
 	offset = b.offset;
@@ -693,7 +701,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 		for (int i=i0; i<i1; i++)
 			peaks[j][i] = fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254;
 	}
-	memcpy(&peaks[2][i0], &peaks[0][i0], n); // FIXME  *sizeof(float) ???
+	memcpy(&peaks[2][i0], &peaks[0][i0], n);
 	memcpy(&peaks[3][i0], &peaks[1][i0], n);
 
 	// medium levels

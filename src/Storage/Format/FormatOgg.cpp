@@ -125,9 +125,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 #define READSIZE		1<<12
 	int nn = 0;
 
-	AudioBuffer buf;
-	buf.clear_x(channels);
-	buf.resize(READSIZE);
+	AudioBuffer buf(READSIZE, channels);
 
 	int eos = 0;
 	while(!eos){

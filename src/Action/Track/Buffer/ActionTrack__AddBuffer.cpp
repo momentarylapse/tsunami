@@ -26,14 +26,12 @@ void ActionTrack__AddBuffer::undo(Data *d)
 
 void *ActionTrack__AddBuffer::execute(Data *d)
 {
-	AudioBuffer dummy;
-	dummy.clear_x(layer->channels);
+	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, index);
 
 	// reserve memory
 	AudioBuffer &b = layer->buffers[index];
 	b.offset = range.start();
-	b.clear_x(layer->channels);
 	b.resize(range.length);
 	return &b;
 }

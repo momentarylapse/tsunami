@@ -28,7 +28,7 @@ class Session;
 class StorageOperationData
 {
 public:
-	StorageOperationData(Storage *storage, Format *format, Song *s, TrackLayer *l, AudioBuffer *b, const string &filename, const string &message, hui::Window *win);
+	StorageOperationData(Storage *storage, Format *format, Song *s, TrackLayer *l, const string &filename, const string &message, hui::Window *win);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -40,6 +40,11 @@ public:
 
 	int get_num_samples();
 
+	void suggest_samplerate(int samplerate);
+	void suggest_channels(int channels);
+	void suggest_default_format(int format);
+	void suggest_tag(const string &key, const string &value);
+
 	Storage *storage;
 	Format *format;
 
@@ -50,6 +55,8 @@ public:
 	Progress *progress;
 	string filename;
 	AudioBuffer *buf;
+	int channels_suggested;
+	bool allow_channels_change;
 	Track *track;
 	TrackLayer *layer;
 	AudioPort *renderer;

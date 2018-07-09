@@ -14,7 +14,7 @@
 #include "../Data/Track.h"
 #include "../Data/Audio/AudioBuffer.h"
 
-StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, TrackLayer *l, AudioBuffer *b, const string &_filename, const string &message, hui::Window *_win)
+StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, TrackLayer *l, const string &_filename, const string &message, hui::Window *_win)
 {
 	win = _win;
 	storage = _storage;
@@ -23,11 +23,16 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	song = s;
 	filename = _filename;
 	progress = new Progress(message, win);
-	buf = b;
+	channels_suggested = 2;
+	allow_channels_change = false;
 	layer = l;
 	track = NULL;
-	if (l)
+	if (l){
 		track = l->track;
+		channels_suggested = l->channels;
+	}
+	buf = NULL;
+
 	offset = 0;
 	renderer = NULL;
 	num_samples = 0;
@@ -71,4 +76,31 @@ int StorageOperationData::get_num_samples()
 	if (renderer)
 		return num_samples;
 	return 0;
+}
+
+void StorageOperationData::suggest_samplerate(int samplerate)
+{
+	// TODO
+	if (track->get_index() == 0)
+		song->setSampleRate(samplerate);
+}
+
+void StorageOperationData::suggest_channels(int channels)
+{
+	if (allow_channels_change){
+		track->setChannels(channels);
+		channels_suggested = channels;
+	}
+}
+
+void StorageOperationData::suggest_default_format(int format)
+{
+	if (track->get_index() == 0)
+		song->setDefaultFormat((SampleFormat)format);
+}
+
+void StorageOperationData::suggest_tag(const string &key, const string &value)
+{
+	//if (track->get_index() == 0)
+		song->addTag(key, value);
 }

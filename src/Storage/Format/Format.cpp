@@ -74,6 +74,7 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 	}else{
 		if (layer->buffers.num == 0){
 			AudioBuffer dummy;
+			dummy.clear_x(layer->channels);
 			layer->buffers.add(dummy);
 		}
 
@@ -89,13 +90,33 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 
 void Format::loadSong(StorageOperationData *od)
 {
-	od->track = od->song->addTrack(Track::Type::AUDIO, 0);
+	od->track = od->song->addTrack(Track::Type::AUDIO_STEREO, 0);
+	od->layer = od->track->layers[0];
+	od->allow_channels_change = true;
 	loadTrack(od);
+}
+
+bool is_simple_track(Song *s)
+{
+	if (s->tracks.num > 1)
+		return false;
+	if (s->tracks[0]->type != Track::Type::AUDIO)
+		return false;
+	if (s->tracks[0]->fx.num > 0)
+		return false;
+	if (s->tracks[0]->layers.num > 1)
+		return false;
+	return true;
 }
 
 void Format::saveSong(StorageOperationData* od)
 {
 	SongRenderer renderer(od->song);
+
+	if (is_simple_track(od->song)){
+		od->channels_suggested = od->song->tracks[0]->channels;
+	}
+
 	od->num_samples = renderer.get_num_samples();
 	od->renderer = renderer.out;
 	saveViaRenderer(od);

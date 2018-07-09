@@ -67,7 +67,8 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
-	if (vorbis_encode_setup_vbr(&vi, 2, od->session->sample_rate(), OggQuality)){
+	int channels = od->channels_suggested;
+	if (vorbis_encode_setup_vbr(&vi, channels, od->session->sample_rate(), OggQuality)){
 		od->error("vorbis_encode_setup_vbr");
 		return;
 	}
@@ -125,6 +126,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 	int nn = 0;
 
 	AudioBuffer buf;
+	buf.clear_x(channels);
 	buf.resize(READSIZE);
 
 	int eos = 0;
@@ -136,10 +138,10 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 			break;
 
 		float **buffer = vorbis_analysis_buffer(&vd, samples_read);
-		for (int i=0;i<samples_read;i++){
-			buffer[0][i] = buf.c[0][i];
-			buffer[1][i] = buf.c[1][i];
-		}
+		for (int c=0; c<channels; c++)
+			for (int i=0;i<samples_read;i++)
+				buffer[c][i] = buf.c[c][i];
+
 		written += samples_read;
 		vorbis_analysis_wrote(&vd, samples_read);
 
@@ -191,6 +193,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
         }
 	}
 
+	ogg_stream_flush(&os, &og);
 	ogg_stream_clear(&os);
 	vorbis_block_clear(&vb);
 	vorbis_dsp_clear(&vd);
@@ -215,8 +218,8 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		channels = vi->channels;
 		freq = vi->rate;
 	}
-	if (t->get_index() == 0)
-		t->song->setSampleRate(freq);
+	od->suggest_samplerate(freq);
+	od->suggest_channels(channels);
 
 	// tags
 	t->song->tags.clear();
@@ -265,7 +268,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		if ((error) or (chunk_read == 0))
 			break;
 
-		int dsamples = chunk_read / 4;
+		int dsamples = chunk_read / 4; // channels?!?!
 		int _offset = read / 4 + od->offset;
 		importData(od->layer, data, channels, SAMPLE_FORMAT_16, dsamples, _offset);
 		read += chunk_read;

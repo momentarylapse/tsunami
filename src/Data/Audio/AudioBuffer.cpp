@@ -404,25 +404,32 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 		if (_channels == 2){
 			if (format == SAMPLE_FORMAT_8){
 				c[0][i] = (float)cb[i*2    ] / 128.0f;
-				c[1][i] = (float)cb[i*2 + 1] / 128.0f;
+				if (channels > 1)
+					c[1][i] = (float)cb[i*2 + 1] / 128.0f;
 			}else if (format == SAMPLE_FORMAT_16){
 				c[0][i] = (float)sb[i*2    ] / 32768.0f;
-				c[1][i] = (float)sb[i*2 + 1] / 32768.0f;
+				if (channels > 1)
+					c[1][i] = (float)sb[i*2 + 1] / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
 				c[0][i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
-				c[1][i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
+				if (channels > 1)
+					c[1][i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_24){
 				c[0][i] = import_24(*(int*)&cb[i*6    ]);
-				c[1][i] = import_24(*(int*)&cb[i*6 + 3]);
+				if (channels > 1)
+					c[1][i] = import_24(*(int*)&cb[i*6 + 3]);
 			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
 				c[0][i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
-				c[1][i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
+				if (channels > 1)
+					c[1][i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
 			}else if (format == SAMPLE_FORMAT_32){
 				c[0][i] = (float)ib[i*2  ] / 2147483648.0f;
-				c[1][i] = (float)ib[i*2+1] / 2147483648.0f;
+				if (channels > 1)
+					c[1][i] = (float)ib[i*2+1] / 2147483648.0f;
 			}else if (format == SAMPLE_FORMAT_32_FLOAT){
 				c[0][i] = fb[i*2];
-				c[1][i] = fb[i*2+1];
+				if (channels > 1)
+					c[1][i] = fb[i*2+1];
 			}else
 				throw string("BufferBox.import: unhandled format");
 		}else{
@@ -442,7 +449,8 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 				c[0][i] = fb[i];
 			}else
 				throw string("BufferBox.import: unhandled format");
-			c[1][i] = c[0][i];
+			if (channels > 1)
+				c[1][i] = c[0][i];
 		}
 	}
 }
@@ -484,30 +492,34 @@ inline void set_data_24(int *data, float value)
 bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool align32) const
 {
 	wtb_overflow = false;
+	float*source[2];
+	for (int ci=0; ci<_channels; ci++)
+		source[ci] = &c[min(ci, _channels-1)][0];
 
 	if (format == SAMPLE_FORMAT_16){
 		short *sb = (short*)data;
 		int d = align32 ? 2 : 1;
 		for (int i=0;i<length;i++){
-			set_data_16(sb, c[0][i]);
-			sb += d;
-			set_data_16(sb, c[1][i]);
-			sb += d;
+			for (int ci=0; ci<_channels; ci++){
+				set_data_16(sb, *(source[ci]++));
+				sb += d;
+			}
 		}
 	}else if (format == SAMPLE_FORMAT_24){
 		char *sc = (char*)data;
 		int d = align32 ? 4 : 3;
 		for (int i=0;i<length;i++){
-			set_data_24((int*)sc, c[0][i]);
-			sc += d;
-			set_data_24((int*)sc, c[1][i]);
-			sc += d;
+			for (int ci=0; ci<_channels; ci++){
+				set_data_24((int*)sc, *(source[ci]++));
+				sc += d;
+			}
 		}
 	}else if (format == SAMPLE_FORMAT_32_FLOAT){
 		float *fc = (float*)data;
 		for (int i=0;i<length;i++){
-			*(fc ++) = c[0][i];
-			*(fc ++) = c[1][i];
+			for (int ci=0; ci<_channels; ci++){
+				*(fc ++) = *(source[ci]++);
+			}
 		}
 	}else{
 		throw Exception("invalid export format");

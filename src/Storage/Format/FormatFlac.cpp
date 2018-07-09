@@ -47,9 +47,11 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 		a = new ActionTrackEditBuffer(od->layer, range);
 
 	float scale = pow(2.0f, flac_bits-1);
-	for (int i=0;i<(int)frame->header.blocksize;i++)
-		for (int j=0;j<flac_channels;j++)
-			buf.c[j][i] = buffer[j][i] / scale;
+	for (int ci=0; ci<buf.channels; ci++){
+		const FLAC__int32 *source = buffer[min(ci, flac_channels)];
+		for (int i=0;i<(int)frame->header.blocksize;i++)
+			buf.c[ci][i] = source[i] / scale;
+	}
 
 	if (od->song->action_manager->isEnabled())
 		od->song->execute(a);
@@ -60,6 +62,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
+	StorageOperationData *od = (StorageOperationData*)client_data;
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
 		flac_freq = metadata->data.stream_info.sample_rate;
 		flac_bits = metadata->data.stream_info.bits_per_sample;
@@ -67,17 +70,18 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 		flac_samples = metadata->data.stream_info.total_samples;
 		flac_tells_samples = (flac_samples != 0);
 		flac_channels = metadata->data.stream_info.channels;
+		od->suggest_channels(flac_channels);
+		od->suggest_samplerate(flac_freq);
+		od->suggest_default_format(format_for_bits(flac_bits));
 		//printf("%d %d %d %d\n", flac_channels, flac_bits, (int)flac_samples, flac_freq);
 	}else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT){
-		StorageOperationData *od = (StorageOperationData*)client_data;
 		for (int i=0;i<(int)metadata->data.vorbis_comment.num_comments;i++){
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
-				od->song->addTag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
+				od->suggest_tag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
 		}
 	}else{
-		StorageOperationData *od = (StorageOperationData*)client_data;
 		od->warn("flac_metadata_callback: unhandled type: " + i2s(metadata->type));
 	}
 }
@@ -136,11 +140,6 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		}
 
 
-		if (t->get_index() == 0){
-			t->song->setSampleRate(flac_freq);
-			t->song->setDefaultFormat(format_for_bits(flac_bits));
-		}
-
 	}catch(Exception &e){
 		od->error(e.message());
 	}
@@ -172,7 +171,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		FLAC__StreamEncoderInitStatus init_status;
 		FLAC__StreamMetadata_VorbisComment_Entry entry;
 
-		int channels = 2;
+		int channels = od->channels_suggested;
 		SampleFormat format = SAMPLE_FORMAT_16;
 		if (od->song)
 			format = od->song->default_format;
@@ -216,18 +215,20 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			throw Exception(string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 
 
-		FLAC__int32 *flac_pcm = new FLAC__int32[CHUNK_SAMPLES/*samples*/ * 2/*channels*/];
+		FLAC__int32 *flac_pcm = new FLAC__int32[CHUNK_SAMPLES/*samples*/ * channels];
 
 		// read blocks of samples from WAVE file and feed to encoder
 		float scale = (float)(1 << (bits-1));
 		AudioBuffer buf;
+		buf.clear_x(channels);
 		buf.resize(CHUNK_SAMPLES);
 		int samples_read;
 		while ((samples_read = r->read(buf)) > 0){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
+			FLAC__int32 *pp = flac_pcm;
 			for (int i=0;i<samples_read;i++){
-				flac_pcm[i * 2 + 0] = (int)(buf.c[0][i] * scale);
-				flac_pcm[i * 2 + 1] = (int)(buf.c[1][i] * scale);
+				for (int c=0; c<channels; c++)
+					*(pp ++) = (int)(buf.c[0][i] * scale);
 			}
 			/* feed samples to encoder */
 			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, samples_read))

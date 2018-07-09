@@ -26,6 +26,7 @@ SongRenderer::SongRenderer(Song *s)
 	song = s;
 	beat_midifier = NULL;
 	bar_streamer = NULL;
+	channels = 2;
 
 	preview_effect = NULL;
 	allow_loop = false;
@@ -206,6 +207,7 @@ void unapply_curves(Song *audio)
 void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 {
 	range_cur = Range(pos, buf.length);
+	channels = buf.channels;
 
 	apply_curves(song, pos);
 
@@ -245,6 +247,7 @@ int SongRenderer::read(AudioBuffer &buf)
 
 void SongRenderer::render(const Range &range, AudioBuffer &buf)
 {
+	channels = buf.channels;
 	prepare(range, false);
 	buf.resize(range.length);
 	read(buf);

@@ -192,7 +192,7 @@ void TrackLayer::readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 	// is <r> inside a buffer?
 	if (allow_ref)
 	for (AudioBuffer &b: buffers){
-		if (r.covers(b.range())){
+		if (b.range().covers(r)){
 			int p0 = r.offset - b.offset;
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, r.length);

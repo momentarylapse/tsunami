@@ -71,7 +71,7 @@ bool Storage::load_ex(Song *a, const string &filename, bool only_metadata)
 	session->i(_("loading ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, session->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, filename, _("loading ") + d->description, session->win);
 	od.only_load_metadata = only_metadata;
 
 	a->reset();
@@ -110,7 +110,7 @@ bool Storage::loadTrack(TrackLayer *layer, const string &filename, int offset)
 
 	Format *f = d->create();
 	Song *a = layer->track->song;
-	StorageOperationData od = StorageOperationData(this, f, a, layer, NULL, filename, _("loading ") + d->description, session->win);
+	StorageOperationData od = StorageOperationData(this, f, a, layer, filename, _("loading ") + d->description, session->win);
 	od.offset = offset;
 	od.layer = layer;
 
@@ -168,7 +168,7 @@ bool Storage::save(Song *a, const string &filename)
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, session->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, filename, _("saving ") + d->description, session->win);
 
 	a->filename = filename;
 
@@ -191,7 +191,7 @@ bool Storage::saveViaRenderer(AudioPort *r, const string &filename, int num_samp
 	session->i(_("exporting ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), session->win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, filename, _("exporting"), session->win);
 
 	od.renderer = r;
 	od.tags = tags;

@@ -29,12 +29,12 @@ public:
 	virtual ~SongRenderer();
 
 	void _cdecl __init__(Song *s);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	// from AudioSource
-	virtual int _cdecl read(AudioBuffer &buf);
-	virtual void _cdecl reset();
-	virtual int _cdecl get_pos(int delta);
+	int _cdecl read(AudioBuffer &buf) override;
+	void _cdecl reset() override;
+	int _cdecl get_pos(int delta) override;
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
@@ -76,6 +76,8 @@ private:
 	void reset_track_state(Track *t);
 	void build_data();
 	void _seek(int pos);
+
+	int channels;
 
 public:
 	AudioEffect *preview_effect;

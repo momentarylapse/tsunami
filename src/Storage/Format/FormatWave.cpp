@@ -28,7 +28,8 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	if (format == SAMPLE_FORMAT_32_FLOAT)
 		format = SAMPLE_FORMAT_32;
 	int bit_depth = format_get_bits(format);
-	int channels = od->buf->channels;
+	int channels = od->channels_suggested;
+	msg_write(channels);
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
@@ -48,6 +49,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	f->write_int(samples * bytes_per_sample);
 
 	AudioBuffer buf;
+	buf.clear_x(channels);
 	buf.resize(CHUNK_SIZE);
 	int done = 0;
 	int samples_read;
@@ -146,6 +148,8 @@ void FormatWave::loadTrack(StorageOperationData *od)
 			byte_per_sample = (bits / 8) * channels;
 
 			format = format_for_bits(bits);
+			od->suggest_samplerate(freq);
+			od->suggest_channels(channels);
 			if (t->get_index() == 0)
 				t->song->setDefaultFormat(format);
 
@@ -209,7 +213,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 					//msg_write(key + " : " + value.hex() + " - " + value);
 					offset += 8 + length;
 
-					t->song->tags.add(Tag(tag_from_wave(key), value));
+					od->suggest_tag(tag_from_wave(key), value);
 				}
 			}
 

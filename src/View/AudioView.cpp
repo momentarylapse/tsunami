@@ -29,7 +29,7 @@
 #include "../lib/threads/Mutex.h"
 
 const int AudioView::FONT_SIZE = 10;
-const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125/2;
+const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
 const float AudioView::LINE_WIDTH = 1.0f;
 const float AudioView::CORNER_RADIUS = 8.0f;
 const int AudioView::SAMPLE_FRAME_HEIGHT = 20;

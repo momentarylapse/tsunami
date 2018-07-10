@@ -726,9 +726,9 @@ void ViewModeDefault::selectUnderMouse()
 	if (l)
 		view->setCurLayer(l);
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
-		selectLayer(this, l, control, true);
+		selectLayer(this, l, control, false);
 	if (hover->type == Selection::Type::TRACK_HEADER)
-		selectLayer(this, l, control, true);
+		selectLayer(this, l, control, false);
 
 	view->setCurSample(s);
 

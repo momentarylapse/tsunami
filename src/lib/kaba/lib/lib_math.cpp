@@ -757,15 +757,21 @@ void SIAddPackageMath()
 			func_add_param("cut",		TypeBool);
 
 	add_class(TypeRandom);
-		class_add_element("n",	TypeRandom, 0);
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid, mf(&Random::__init__));
+		class_add_func(IDENTIFIER_FUNC_ASSIGN,		TypeVoid, mf(&Random::__assign__));
+			func_add_param("o",		TypeRandom);
+		//class_add_element("n",	TypeRandom, 0);
 		class_add_func("seed",		TypeVoid, mf(&Random::seed));
 			func_add_param("str",		TypeString);
-		class_add_func("int",		TypeInt, mf(&Random::geti));
+		class_add_func("int",		TypeInt, mf(&Random::_int));
 			func_add_param("max",		TypeInt);
-		class_add_func("getu",		TypeFloat32, mf(&Random::getu));
-		class_add_func("float",		TypeFloat32, mf(&Random::getf));
+		class_add_func("uniform01",		TypeFloat32, mf(&Random::uniform01));
+		class_add_func("uniform",		TypeFloat32, mf(&Random::uniform));
 			func_add_param("min",		TypeFloat32);
 			func_add_param("max",		TypeFloat32);
+		class_add_func("normal",		TypeFloat32, mf(&Random::normal));
+			func_add_param("mean",		TypeFloat32);
+			func_add_param("stddev",		TypeFloat32);
 		class_add_func("inBall",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));
 			func_add_param("r",		TypeFloat32);
 		class_add_func("dir",		TypeVector, amd64_wrap(mf(&Random::dir), &amd64_vec_rand_dir));

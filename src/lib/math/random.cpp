@@ -2,6 +2,21 @@
 
 #define PHI 0x9e3779b9
 
+Random::Random()
+{
+	seed("");
+}
+
+void Random::__init__()
+{
+	new(this) Random;
+}
+
+void Random::__assign__(Random *other)
+{
+	*this = *other;
+}
+
 // TODO: more possible seeds
 void Random::seed(const string &s)
 {
@@ -34,7 +49,7 @@ int Random::_get()
 	return Q[i];
 }
 
-int Random::geti(int max)
+int Random::_int(int max)
 {
 	int r = _get();
 	if (r < 0)
@@ -42,15 +57,12 @@ int Random::geti(int max)
 	return r % max;
 }
 
-float Random::getu()
+float Random::uniform01()
 {
-	float r = (float)_get();
-	if (r < 0)
-		r = - r;
-	return r / 2147483648.0f;
+	return uniform(0,1);
 }
 
-float Random::getf(float min, float max)
+float Random::uniform(float min, float max)
 {
 	float r = (float)_get();
 	if (r < 0)
@@ -58,10 +70,28 @@ float Random::getf(float min, float max)
 	return min + (max - min) * r / 2147483648.0f;
 }
 
+float Random::normal(float mean, float stddev)
+{
+	float x = uniform(-1,1);
+	float y = uniform(0, 2*pi);
+
+	float xx = 0;
+	if (x > 0){
+		xx = sqrt( -2.0f * log(x));
+	}else if (x < 0){
+		xx = -sqrt( -2.0f * log(-x));
+	}
+
+	float a = xx * cos(y);
+	float b = xx * sin(y);
+
+	return mean + a * stddev;
+}
+
 vector Random::in_ball(float r)
 {
 	while(true){
-		vector v = vector(getf(-1, 1), getf(-1, 1), getf(-1, 1));
+		vector v = vector(uniform(-1, 1), uniform(-1, 1), uniform(-1, 1));
 		if (v.length_sqr() < 1)
 			return v * r;
 	}

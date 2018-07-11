@@ -199,7 +199,7 @@ public:
 		p->setColor(signal_color(c->type));
 
 		complex qq;
-		for (float t=0; t<1.0f; t+=0.01f){
+		for (float t=0; t<1.0f; t+=0.025f){
 			complex q = inter.get(t);
 			if (t > 0)
 				p->drawLine(qq.x, qq.y, q.x, q.y);
@@ -210,9 +210,10 @@ public:
 		d /= d.abs();
 		complex e = d * c_i;
 		Array<complex> pp;
-		pp.add(m + d * 13);
-		pp.add(m - d * 13 + e * 7);
-		pp.add(m - d * 13 - e * 7);
+		float arrow_length = min(length / 7, 18.0f);
+		pp.add(m + d * arrow_length);
+		pp.add(m - d * arrow_length + e * arrow_length / 2);
+		pp.add(m - d * arrow_length - e * arrow_length / 2);
 		p->drawPolygon(pp);
 		//p->dr
 	}

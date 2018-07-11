@@ -457,7 +457,7 @@ Grid
 2
 TabControl
 dev-tab
-
+left
 0
 0
 3
@@ -3452,23 +3452,17 @@ Grid
 
 0
 0
-3
-Button
-edit_layers
-
-0
-0
-0
+2
 Button
 edit_samples
 
-1
+0
 0
 0
 Button
 edit_fx
 
-2
+1
 0
 0
 // Resource
@@ -3938,7 +3932,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-381
+380
 // Text
 /cancel
 Cancel
@@ -3960,9 +3954,6 @@ Curves
 
 /edit_fx
 Fx
-
-/edit_layers
-Layers
 
 /edit_midi
 Midi

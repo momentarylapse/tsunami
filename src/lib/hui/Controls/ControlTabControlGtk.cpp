@@ -28,8 +28,9 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 	widget = gtk_notebook_new();
 	this->panel = panel; // for addPage()
 
-	for (int i=0;i<PartString.num;i++)
-		addPage(PartString[i]);
+	if (PartString.num > 1 or PartString[0] != "")
+		for (int i=0;i<PartString.num;i++)
+			addPage(PartString[i]);
 
 	cur_page = 0;
 	g_signal_connect(G_OBJECT(widget), "switch-page", G_CALLBACK(&OnGtkTabControlSwitch), this);
@@ -104,6 +105,14 @@ void ControlTabControl::__setOption(const string &op, const string &value)
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
 	else if (op == "bar")
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), value._bool());
+	else if (op == "top")
+		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_TOP);
+	else if (op == "bottom")
+		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_BOTTOM);
+	else if (op == "left")
+		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_LEFT);
+	else if (op == "right")
+		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_RIGHT);
 }
 
 };

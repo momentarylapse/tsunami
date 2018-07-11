@@ -1,6 +1,6 @@
 Dialog device-manager "" width=400 height=200
 	Grid ? ""
-		TabControl dev-tab "Output\\Input\\Midi Input"
+		TabControl dev-tab "Output\\Input\\Midi Input" left
 			ListView output-list "#\\name\\internal name\\channels\\show\\present" format=ttttCc reorderable
 			ListView input-list "#\\name\\internal name\\channels\\show\\present\\latency (ms)" format=ttttCcT reorderable
 			ListView midi-input-list "#\\name\\internal name\\show\\present" format=tttCc reorderable

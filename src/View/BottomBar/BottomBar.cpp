@@ -29,7 +29,7 @@ BottomBar::BottomBar(Session *session)
 	setTarget("button_grid");
 	addButton("!noexpandy,flat", 0, 0, "close");
 	setImage("close", "hui:close");
-	addListView("!nobar\\name", 0, 1, "choose");
+	addTabControl("!left,expandx,expandy", 0, 1, "choose");
 
 	mixing_console = new MixingConsole(session);
 	signal_editor = new SignalEditor(session);
@@ -40,7 +40,7 @@ BottomBar::BottomBar(Session *session)
 	addConsole(device_console, "");
 	addConsole(log_console, "");
 
-	eventX("choose", "hui:select", std::bind(&BottomBar::onChoose, this));
+	event("choose", std::bind(&BottomBar::onChoose, this));
 	event("close", std::bind(&BottomBar::onClose, this));
 
 	reveal("revealer", false);

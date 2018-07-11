@@ -15,9 +15,10 @@
 
 
 
-SignalChain::SignalChain(Session *s)
+SignalChain::SignalChain(Session *s, const string &_name)
 {
 	session = s;
+	name = _name;
 }
 
 SignalChain::~SignalChain()
@@ -31,7 +32,7 @@ SignalChain::~SignalChain()
 
 SignalChain *SignalChain::create_default(Session *session)
 {
-	SignalChain *chain = new SignalChain(session);
+	SignalChain *chain = new SignalChain(session, "playback");
 
 	auto *mod_renderer = chain->addAudioSource("SongRenderer");
 	auto *mod_peak = chain->addAudioVisualizer("PeakMeter");

@@ -74,6 +74,12 @@ void ControlTabControl::__removeString(int row)
 	gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 }
 
+void ControlTabControl::__changeString(int row, const string& str)
+{
+	auto *child = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), row);
+	gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(widget), child, str.c_str());
+}
+
 void ControlTabControl::addPage(const string &str)
 {
 	GtkWidget *inside;

@@ -23,7 +23,7 @@ BottomBar::BottomBar(Session *session)
 	addSeparator("!horizontal,expandx", 0, 0, "");
 	addGrid("!expandx", 0, 1, "root_grid");
 	setTarget("root_grid");
-	addGrid("!noexpandx,width=130", 0, 0, "button_grid");
+	addGrid("!noexpandx", 0, 0, "button_grid");
 	addSeparator("!vertical", 1, 0, "");
 	addGrid("", 2, 0, "console_grid");
 	setTarget("button_grid");

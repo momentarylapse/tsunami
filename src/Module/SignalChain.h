@@ -20,7 +20,7 @@ class Session;
 class SignalChain : public Observable<VirtualBase>
 {
 public:
-	SignalChain(Session *session);
+	SignalChain(Session *session, const string &name);
 	virtual ~SignalChain();
 
 	Session *session;
@@ -31,6 +31,7 @@ public:
 
 	static SignalChain *create_default(Session *session);
 
+	string name;
 
 	Array<Module*> modules;
 	Module* add(Module *m);

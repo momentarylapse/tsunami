@@ -30,6 +30,7 @@ public:
 	void onMouseMove();
 	void onKeyDown();
 	void onDraw(Painter *p);
+	void draw_module(Painter *p, Module *m);
 
 	void onReset();
 	void onLoad();

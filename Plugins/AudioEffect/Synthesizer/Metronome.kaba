@@ -40,6 +40,10 @@ class Metronome extends AudioEffect
 		
 	override ConfigPanel *create_panel()
 		return new MetronomePanel(self)
+	
+	override void reset_state()
+		synth.reset_state()
+		source.reset_state()
 
 	
 class MetronomePanel extends ConfigPanel

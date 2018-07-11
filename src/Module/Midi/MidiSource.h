@@ -17,18 +17,18 @@ class MidiSource : public Module
 {
 public:
 	MidiSource();
-	virtual ~MidiSource();
+	~MidiSource() override;
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	class Output : public MidiPort
 	{
 	public:
 		Output(MidiSource *s);
-		virtual ~Output(){}
-		virtual int _cdecl read(MidiEventBuffer &midi);
-		virtual void _cdecl reset();
+		~Output() override {}
+		int _cdecl read(MidiEventBuffer &midi) override;
+		void _cdecl reset() override;
 		MidiSource *source;
 	};
 	Output *out;

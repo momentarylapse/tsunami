@@ -14,8 +14,10 @@ class BeatMidifier : public MidiSource
 {
 public:
 	BeatMidifier();
-	virtual int _cdecl read(MidiEventBuffer &midi);
-	virtual void _cdecl reset();
+	int _cdecl read(MidiEventBuffer &midi) override;
+	void _cdecl reset() override;
+
+	float volume;
 };
 
 #endif /* SRC_MODULE_BEATS_BEATMIDIFIER_H_ */

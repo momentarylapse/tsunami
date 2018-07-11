@@ -410,6 +410,42 @@ void draw_cable(Painter *p, SignalChain::Cable *c)
 	//p->dr
 }
 
+void SignalEditor::draw_module(Painter *p, Module *m)
+{
+	p->setColor(view->colors.background_track_selected);
+	if (hover.type == Selection::TYPE_MODULE and hover.module == m)
+		p->setColor(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
+	p->setRoundness(view->CORNER_RADIUS);
+	p->drawRect(module_rect(m));
+	p->setRoundness(0);
+	if (sel.type == sel.TYPE_MODULE and sel.module == m){
+		p->setColor(view->colors.text);
+		p->setFont("", 12, true, false);
+	}else{
+		p->setColor(view->colors.text_soft1);
+	}
+	string type = m->module_subtype;
+	if (type == "")
+		type = m->type_to_name(m->module_type);
+	float ww = p->getStrWidth(type);
+	p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
+	p->setFont("", 12, false, false);
+
+	foreachi(auto &pd, m->port_in, i){
+		p->setColor(signal_color(pd.type));
+		float r = 4;
+		if (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i)
+			r = 8;
+		p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
+	}
+	foreachi(auto &pd, m->port_out, i){
+		p->setColor(signal_color(pd.type));
+		float r = 4;
+		if (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i)
+			r = 8;
+		p->drawCircle(module_port_out_x(m), module_port_out_y(m, i), r);
+	}
+}
 
 void SignalEditor::onDraw(Painter* p)
 {
@@ -419,39 +455,8 @@ void SignalEditor::onDraw(Painter* p)
 	p->drawRect(0, 0, w, h);
 	p->setFontSize(12);
 
-	for (auto *m: chain->modules){
-		p->setColor(view->colors.background_track_selected);
-		if (hover.type == Selection::TYPE_MODULE and hover.module == m)
-			p->setColor(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
-		p->setRoundness(view->CORNER_RADIUS);
-		p->drawRect(module_rect(m));
-		p->setRoundness(0);
-		if (sel.type == sel.TYPE_MODULE and sel.module == m){
-			p->setColor(view->colors.text);
-			p->setFont("", 12, true, false);
-		}else{
-			p->setColor(view->colors.text_soft1);
-		}
-		string type = m->type_to_name(m->module_type);
-		float ww = p->getStrWidth(type);
-		p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
-		p->setFont("", 12, false, false);
-
-		foreachi(auto &pd, m->port_in, i){
-			p->setColor(signal_color(pd.type));
-			float r = 4;
-			if (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i)
-				r = 8;
-			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
-		}
-		foreachi(auto &pd, m->port_out, i){
-			p->setColor(signal_color(pd.type));
-			float r = 4;
-			if (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i)
-				r = 8;
-			p->drawCircle(module_port_out_x(m), module_port_out_y(m, i), r);
-		}
-	}
+	for (auto *m: chain->modules)
+		draw_module(p, m);
 
 	for (auto *c: chain->cables)
 		draw_cable(p, c);

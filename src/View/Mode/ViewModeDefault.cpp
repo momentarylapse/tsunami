@@ -240,6 +240,15 @@ void ViewModeDefault::onMouseWheel()
 		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
 }
 
+void playback_seek_relative(AudioView *view, float dt)
+{
+	int pos = view->playbackPos();
+	pos += dt * view->song->sample_rate;
+	pos = max(pos, view->renderer->range().offset);
+	view->renderer->seek(pos);
+	view->stream->clear_buffer();
+}
+
 void ViewModeDefault::onKeyDown(int k)
 {
 
@@ -269,6 +278,16 @@ void ViewModeDefault::onKeyDown(int k)
 			//view->play(); unsafe for recording...
 		}
 	}
+
+	// playback
+	if (view->isPlaybackActive()){
+		if (k == hui::KEY_CONTROL + hui::KEY_RIGHT)
+			playback_seek_relative(view, 5);
+		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
+			playback_seek_relative(view, -5);
+
+	}
+
 	view->updateMenu();
 }
 

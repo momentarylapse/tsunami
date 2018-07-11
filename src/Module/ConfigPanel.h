@@ -17,9 +17,9 @@ class ConfigPanel : public hui::Panel
 public:
 	ConfigPanel();
 	ConfigPanel(Module *c);
-	virtual ~ConfigPanel();
+	~ConfigPanel() override;
 	void _cdecl __init__(Module *c);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	void _cdecl changed();
 	virtual void _cdecl update(){}

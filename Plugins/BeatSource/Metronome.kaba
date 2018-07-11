@@ -35,6 +35,9 @@ class MetronomeSource extends BeatSource
 	float sample_rate
 	
 	override void __init__()
+		reset_config()
+
+	override void reset_config()
 		sample_rate = session.sample_rate()
 
 		offset_sub_beat = 0

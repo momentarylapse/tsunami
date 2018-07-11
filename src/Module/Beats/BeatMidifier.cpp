@@ -14,6 +14,8 @@ BeatMidifier::BeatMidifier()
 {
 	module_type = Type::BEAT_MIDIFIER;
 	port_in.add(PortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
+
+	volume = 0.8f;
 }
 
 int BeatMidifier::read(MidiEventBuffer &midi)
@@ -25,7 +27,7 @@ int BeatMidifier::read(MidiEventBuffer &midi)
 	beat_source->read(beats, midi.samples);
 
 	for (Beat &b: beats)
-		midi.addMetronomeClick(b.range.offset, b.level, 0.8f);
+		midi.addMetronomeClick(b.range.offset, b.level, volume);
 
 	return midi.samples;
 }

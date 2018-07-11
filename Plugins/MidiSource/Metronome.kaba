@@ -40,13 +40,15 @@ class MetronomeSource extends MidiSource
 	float sample_rate
 	
 	override void __init__()
-
+		reset_state()
+	
+	override void reset_state()
 		offset_sub_beat = 0
 		cur_beat = 0
 		cur_sub_beat = -1
 		fraction_beat = 0
 //		fraction_sub_beat = 0
-		
+
 		pause = false
 		
 		on_config()

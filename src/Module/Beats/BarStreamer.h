@@ -15,8 +15,8 @@ class BarStreamer : public BeatSource
 {
 public:
 	BarStreamer(BarCollection &bars);
-	virtual int _cdecl read(Array<Beat> &beats, int samples);
-	virtual void _cdecl reset();
+	int _cdecl read(Array<Beat> &beats, int samples) override;
+	void _cdecl reset() override;
 	void seek(int pos);
 
 	BarCollection bars;

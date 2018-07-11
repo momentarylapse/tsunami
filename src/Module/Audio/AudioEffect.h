@@ -28,10 +28,10 @@ class AudioEffect : public Module
 {
 public:
 	AudioEffect();
-	virtual ~AudioEffect();
+	~AudioEffect() override;
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	int sample_rate;
 
@@ -39,9 +39,9 @@ public:
 	{
 	public:
 		Output(AudioEffect *fx);
-		virtual int _cdecl read(AudioBuffer &buf);
-		virtual void _cdecl reset();
-		virtual int _cdecl get_pos(int delta);
+		int _cdecl read(AudioBuffer &buf) override;
+		void _cdecl reset() override;
+		int _cdecl get_pos(int delta) override;
 		AudioEffect *fx;
 	};
 	Output *out;

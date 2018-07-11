@@ -20,15 +20,15 @@ public:
 	virtual ~BeatSource();
 
 	void _cdecl __init__();
-	void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	class Output : public BeatPort
 	{
 	public:
 		Output(BeatSource *s);
-		virtual ~Output(){}
-		virtual int _cdecl read(Array<Beat> &beats, int samples);
-		virtual void _cdecl reset();
+		virtual ~Output() override {}
+		int _cdecl read(Array<Beat> &beats, int samples) override;
+		void _cdecl reset() override;
 		BeatSource *source;
 	};
 	Output *out;
@@ -42,7 +42,7 @@ public:
 class DummyBeatSource : public BeatSource
 {
 public:
-	virtual int _cdecl read(Array<Beat> &beats, int samples){ return samples; }
+	int _cdecl read(Array<Beat> &beats, int samples) override { return samples; }
 };
 
 BeatSource *CreateBeatSource(Session *session, const string &name);

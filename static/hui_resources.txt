@@ -1175,7 +1175,7 @@ menu_plugins
 
 7
 0
-13
+16
 Item
 plugin_on_file
 disabled
@@ -1224,34 +1224,52 @@ menu_plugins_synthesizer
 7
 0
 0
-Separator
-
+Menu
+menu_plugins_audio_source
 
 8
 0
 0
-Menu
-menu_plugins_on_midi
+Separator
+
 
 9
 0
 0
-Separator
-
-
+Item
+plugin_on_midi
+disabled
 10
 0
 0
 Menu
-menu_plugins_on_all
+menu_plugins_midi_effects
 
 11
 0
 0
 Menu
-menu_plugins_other
+menu_plugins_midi_source
 
 12
+0
+0
+Separator
+
+
+13
+0
+0
+Menu
+menu_plugins_on_all
+
+14
+0
+0
+Menu
+menu_plugins_other
+
+15
 0
 0
 Menu
@@ -3932,7 +3950,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-380
+383
 // Text
 /cancel
 Cancel
@@ -4252,6 +4270,9 @@ menu/menu_help
 menu/menu_plugins
 Plugins
 
+menu/menu_plugins_audio_source
+From source
+
 menu/menu_plugins_channels
 Channels
 
@@ -4261,11 +4282,14 @@ Dynamics
 menu/menu_plugins_echo
 Echo
 
+menu/menu_plugins_midi_effects
+Effects
+
+menu/menu_plugins_midi_source
+From source
+
 menu/menu_plugins_on_all
 On all
-
-menu/menu_plugins_on_midi
-On midi
 
 menu/menu_plugins_other
 Independent
@@ -4314,6 +4338,9 @@ Loop
 
 menu/plugin_on_file
 On audio buffer
+
+menu/plugin_on_midi
+On midi
 
 menu/record
 Record
@@ -5080,7 +5107,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-488
+493
 // Text
 /cancel
 Abbrechen
@@ -5523,6 +5550,9 @@ Gehe zu
 menu/menu_plugins
 Plugins
 
+menu/menu_plugins_audio_source
+Aus Quelle
+
 menu/menu_plugins_channels
 Kanäle
 
@@ -5531,6 +5561,12 @@ Dynamik
 
 menu/menu_plugins_echo
 Echo
+
+menu/menu_plugins_midi_effects
+Effekte
+
+menu/menu_plugins_midi_source
+Aus Quelle
 
 menu/menu_plugins_on_all
 Auf Alles
@@ -5549,6 +5585,9 @@ Reparieren
 
 menu/menu_plugins_sound
 Klang
+
+menu/menu_plugins_source
+Aus Quelle
 
 menu/menu_plugins_synthesizer
 Synthese
@@ -5591,6 +5630,9 @@ Schleife
 
 menu/plugin_on_file
 Auf Audiopuffer
+
+menu/plugin_on_midi
+Auf Midi
 
 menu/record
 Aufnehmen

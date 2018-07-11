@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-489
+494
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1469,6 +1469,21 @@ Mono
 
 popup_track_menu/track_convert_stereo
 Stereo
+
+menu/menu_plugins_source
+Aus Quelle
+
+menu/menu_plugins_audio_source
+Aus Quelle
+
+menu/menu_plugins_midi_source
+Aus Quelle
+
+menu/menu_plugins_midi_effects
+Effekte
+
+menu/plugin_on_midi
+Auf Midi
 
 // Num Language Strings
 181

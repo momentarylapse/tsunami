@@ -95,8 +95,10 @@ public:
 	void onSelectAll();
 	void onSelectExpand();
 	void onShowLog();
-	void onMenuExecuteEffect();
+	void onMenuExecuteAudioEffect();
+	void onMenuExecuteAudioSource();
 	void onMenuExecuteMidiEffect();
+	void onMenuExecuteMidiSource();
 	void onMenuExecuteSongPlugin();
 	void onMenuExecuteTsunamiPlugin();
 	void onExit();

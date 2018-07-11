@@ -40,7 +40,9 @@
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "Data/Rhythm/Bar.h"
 #include "Module/Audio/AudioEffect.h"
+#include "Module/Audio/AudioSource.h"
 #include "Module/Midi/MidiEffect.h"
+#include "Module/Midi/MidiSource.h"
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
@@ -498,7 +500,7 @@ void TsunamiWindow::onPasteAsSamples()
 	app->clipboard->pasteAsSamples(view);
 }
 
-void TsunamiWindow::onMenuExecuteEffect()
+void TsunamiWindow::onMenuExecuteAudioEffect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
@@ -516,6 +518,28 @@ void TsunamiWindow::onMenuExecuteEffect()
 		song->action_manager->endActionGroup();
 	}
 	delete(fx);
+}
+
+void TsunamiWindow::onMenuExecuteAudioSource()
+{
+	string name = hui::GetEvent()->id.explode("--")[1];
+
+	AudioSource *s = CreateAudioSource(session, name);
+
+	s->reset_config();
+	if (s->configure(this)){
+		song->action_manager->beginActionGroup();
+		for (Track *t: song->tracks)
+			for (TrackLayer *l: t->layers)
+				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
+					s->reset_state();
+					AudioBuffer buf;
+					l->getBuffers(buf, view->sel.range);
+					s->read(buf);
+				}
+		song->action_manager->endActionGroup();
+	}
+	delete(s);
 }
 
 void TsunamiWindow::onMenuExecuteMidiEffect()
@@ -536,6 +560,29 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 		song->action_manager->endActionGroup();
 	}
 	delete(fx);
+}
+
+void TsunamiWindow::onMenuExecuteMidiSource()
+{
+	string name = hui::GetEvent()->id.explode("--")[1];
+
+	MidiSource *s = CreateMidiSource(session, name);
+
+	s->reset_config();
+	if (s->configure(this)){
+		song->action_manager->beginActionGroup();
+		for (Track *t : song->tracks)
+			for (TrackLayer *l : t->layers)
+			if (view->sel.has(l) and (t->type == t->Type::MIDI)){
+				s->reset_state();
+				MidiEventBuffer buf;
+				buf.samples = view->sel.range.length;
+				s->read(buf);
+				l->insertMidiData(view->sel.range.offset, midi_events_to_notes(buf));
+			}
+		song->action_manager->endActionGroup();
+	}
+	delete(s);
 }
 
 void TsunamiWindow::onMenuExecuteSongPlugin()

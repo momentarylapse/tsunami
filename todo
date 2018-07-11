@@ -134,3 +134,4 @@ J selection background...
 J Gaussian noise
 * new signal chain file format
 * module auto x/y
+J AudioSource into buffer

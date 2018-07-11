@@ -579,16 +579,19 @@ void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 	hui::Menu *m = win->getMenu();
 
 	// "Buffer"
-	add_plugins_in_dir("AudioEffect/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Echo/", this, m->getSubMenuByID("menu_plugins_echo"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Repair/", this, m->getSubMenuByID("menu_plugins_repair"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Sound/", this, m->getSubMenuByID("menu_plugins_sound"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
-	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("AudioEffect/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Echo/", this, m->getSubMenuByID("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Repair/", this, m->getSubMenuByID("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Sound/", this, m->getSubMenuByID("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+
+	add_plugins_in_dir("AudioSource/", this, m->getSubMenuByID("menu_plugins_audio_source"), "source", win, &TsunamiWindow::onMenuExecuteAudioSource);
 
 	// "Midi"
-	add_plugins_in_dir("MidiEffect/", this, m->getSubMenuByID("menu_plugins_on_midi"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
+	add_plugins_in_dir("MidiEffect/", this, m->getSubMenuByID("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
+	add_plugins_in_dir("MidiSource/", this, m->getSubMenuByID("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::onMenuExecuteMidiSource);
 
 	// "All"
 	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_all"), "song", win, &TsunamiWindow::onMenuExecuteSongPlugin);

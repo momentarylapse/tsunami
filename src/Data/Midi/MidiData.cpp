@@ -375,6 +375,7 @@ void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi)
 	samples = midi.samples;
 }
 
+// deep copy!
 void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi)
 {
 	deep_clear();

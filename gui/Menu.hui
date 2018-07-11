@@ -78,8 +78,11 @@ Menu menu ""
 		Menu menu_plugins_repair "Repair"
 		Menu menu_plugins_sound "Sound"
 		Menu menu_plugins_synthesizer "Synthesizer"
+		Menu menu_plugins_audio_source "From source"
 		Separator
-		Menu menu_plugins_on_midi "On midi"
+		Item plugin_on_midi "On midi" disabled
+		Menu menu_plugins_midi_effects "Effects"
+		Menu menu_plugins_midi_source "From source"
 		Separator
 		Menu menu_plugins_on_all "On all"
 		Menu menu_plugins_other "Independent"

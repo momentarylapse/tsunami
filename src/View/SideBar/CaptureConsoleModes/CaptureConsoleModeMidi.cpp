@@ -159,7 +159,7 @@ bool CaptureConsoleModeMidi::insert()
 	}
 
 	// insert data
-	target->layers[0]->insertMidiData(i0, midi_events_to_notes(input->midi));
+	target->layers[0]->insertMidiData(i0, midi_events_to_notes(input->midi).duplicate());
 
 	input->reset_accumulation();
 	return true;

@@ -102,9 +102,6 @@ Element* Element::find(const string &tag)
 void Parser::load(const string &filename)
 {
 	File *f = FileOpen(filename);
-	if (!f){
-		return;
-	}
 
 	while(true){
 		try{

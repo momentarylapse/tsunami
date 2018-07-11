@@ -487,13 +487,13 @@ public:
 
 	void onLoad()
 	{
-		if (hui::FileDialogOpen(win, "", "", "*", "*"))
+		if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain"))
 			chain->load(hui::Filename);
 	}
 
 	void onSave()
 	{
-		if (hui::FileDialogSave(win, "", "", "*", "*"))
+		if (hui::FileDialogSave(win, "", "", "*.chain", "*.chain"))
 			chain->save(hui::Filename);
 	}
 

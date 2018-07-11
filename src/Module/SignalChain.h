@@ -23,6 +23,11 @@ public:
 	SignalChain(Session *session, const string &name);
 	virtual ~SignalChain();
 
+	static const string MESSAGE_ADD_MODULE;
+	static const string MESSAGE_DELETE_MODULE;
+	static const string MESSAGE_ADD_CABLE;
+	static const string MESSAGE_DELETE_CABLE;
+
 	Session *session;
 
 	void reset();

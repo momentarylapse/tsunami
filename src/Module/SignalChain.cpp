@@ -14,6 +14,10 @@
 #include "../lib/file/file.h"
 
 
+const string SignalChain::MESSAGE_ADD_MODULE = "AddModule";
+const string SignalChain::MESSAGE_DELETE_MODULE = "DeleteModule";
+const string SignalChain::MESSAGE_ADD_CABLE = "AddCable";
+const string SignalChain::MESSAGE_DELETE_CABLE = "DeleteCable";
 
 SignalChain::SignalChain(Session *s, const string &_name)
 {
@@ -52,6 +56,7 @@ Module *SignalChain::add(Module *m)
 
 	m->reset_state();
 	modules.add(m);
+	notify(MESSAGE_ADD_MODULE);
 	return m;
 }
 
@@ -68,7 +73,7 @@ void SignalChain::remove(Module *m)
 	int index = module_index(m);
 	if (index < 0)
 		return;
-	if (index < 3){
+	if ((index < 3) and (this == session->signal_chain)){
 		session->e(_("not allowed to delete system modules"));
 		return;
 	}
@@ -87,7 +92,7 @@ void SignalChain::remove(Module *m)
 
 	modules.erase(index);
 	delete m;
-	notify();
+	notify(MESSAGE_DELETE_MODULE);
 }
 
 void SignalChain::connect(Module *source, int source_port, Module *target, int target_port)
@@ -110,7 +115,7 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 
 	*target->port_in[target_port].port = *source->port_out[source_port].port;
 
-	notify();
+	notify(MESSAGE_ADD_CABLE);
 }
 
 void SignalChain::disconnect(SignalChain::Cable *c)
@@ -121,7 +126,7 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 
 			delete(c);
 			cables.erase(i);
-			notify();
+			notify(MESSAGE_DELETE_CABLE);
 			break;
 		}
 }
@@ -184,7 +189,7 @@ void SignalChain::load(const string& filename)
 		string sub_type = f->read_str();
 		string name = f->read_str();
 		Module *m = NULL;
-		if (i < 3){
+		if ((i < 3) and (this == session->signal_chain)){
 			m = modules[i];
 		}else{
 			int itype = Module::type_from_name(type);

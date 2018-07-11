@@ -39,6 +39,8 @@ class Metronome extends AudioEffect
 		synth.out.read(buf)
 		
 	override ConfigPanel *create_panel()
+		// how to deal with configuration/string exports...
+		//return source.create_panel()
 		return new MetronomePanel(self)
 	
 	override void reset_state()

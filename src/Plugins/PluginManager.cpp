@@ -120,6 +120,9 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Module.reset_config", Kaba::mf(&Module::reset_config));
 	Kaba::DeclareClassVirtualIndex("Module", "reset_state", Kaba::mf(&Module::reset_state), &module);
 	Kaba::LinkExternal("Module.changed", Kaba::mf(&Module::changed));
+	Kaba::DeclareClassVirtualIndex("Module", "get_config", Kaba::mf(&Module::get_config), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "config_to_string", Kaba::mf(&Module::config_to_string), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "config_from_string", Kaba::mf(&Module::config_from_string), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);

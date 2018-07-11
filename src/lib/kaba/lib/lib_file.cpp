@@ -22,6 +22,8 @@ static DirEntry *_dir_entry;
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
 
 
 class DirEntryList : public Array<DirEntry>
@@ -92,37 +94,37 @@ class KabaFileNotWritableError : public KabaFileError
 
 File* kaba_file_open(const string &filename)
 {
-	KABA_EXCEPTION_WRAPPER(return FileOpen(filename));
+	KABA_EXCEPTION_WRAPPER2(return FileOpen(filename), KabaFileError);
 	return NULL;
 }
 
 File* kaba_file_open_text(const string &filename)
 {
-	KABA_EXCEPTION_WRAPPER(return FileOpenText(filename));
+	KABA_EXCEPTION_WRAPPER2(return FileOpenText(filename), KabaFileError);
 	return NULL;
 }
 
 File* kaba_file_create(const string &filename)
 {
-	KABA_EXCEPTION_WRAPPER(return FileCreate(filename));
+	KABA_EXCEPTION_WRAPPER2(return FileCreate(filename), KabaFileError);
 	return NULL;
 }
 
 File* kaba_file_create_text(const string &filename)
 {
-	KABA_EXCEPTION_WRAPPER(return FileCreateText(filename));
+	KABA_EXCEPTION_WRAPPER2(return FileCreateText(filename), KabaFileError);
 	return NULL;
 }
 
 string kaba_file_read(const string &filename)
 {
-	KABA_EXCEPTION_WRAPPER(return FileRead(filename).replace("\\r", ""));
+	KABA_EXCEPTION_WRAPPER2(return FileRead(filename).replace("\\r", ""), KabaFileError);
 	return "";
 }
 
 string kaba_file_hash(const string &filename, const string &type)
 {
-	KABA_EXCEPTION_WRAPPER(return file_hash(filename, type));
+	KABA_EXCEPTION_WRAPPER2(return file_hash(filename, type), KabaFileError);
 	return "";
 }
 

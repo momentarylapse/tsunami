@@ -36,6 +36,13 @@ try{ \
 	kaba_raise_exception(new KabaException(e.message())); \
 }
 
+#define KABA_EXCEPTION_WRAPPER2(CODE,EXCLASS) \
+try{ \
+	CODE; \
+}catch(::Exception &e){ \
+	kaba_raise_exception(new EXCLASS(e.message())); \
+}
+
 
 }
 

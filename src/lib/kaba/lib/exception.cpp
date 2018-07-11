@@ -234,6 +234,8 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 // stack unwinding does not work if gcc does not use a stack frame...
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 {

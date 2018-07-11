@@ -478,6 +478,8 @@ bool _cdecl _Pointer2Bool(void *p)
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
 
 template<class T>
 void _ultra_sort(DynamicArray &array, int offset_by)

@@ -42,6 +42,8 @@ namespace Kaba{
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
 
 
 Gui::Font* __LoadFont(const string &filename)

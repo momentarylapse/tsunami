@@ -32,7 +32,6 @@ public:
 	void updateTrackHeights() override;
 
 
-	void drawTrackBackground(Painter *c, AudioViewTrack *t) override;
 	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
 	void drawTrackData(Painter *c, AudioViewTrack *t) override;
 	void drawLayerData(Painter *c, AudioViewLayer *l) override;

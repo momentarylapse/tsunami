@@ -966,22 +966,22 @@ void AudioView::drawSelection(Painter *c)
 	drawTimeLine(c, sel.range.end(), Selection::Type::SELECTION_END, colors.selection_boundary);
 
 	if (!hide_selection){
-	if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
-		c->setColor(colors.selection_internal);
-		for (AudioViewLayer *l: vlayer)
-			if (sel.has(l->layer))
-				c->drawRect(rect(sxx1, sxx2, l->area.y1, l->area.y2));
-	}else if (selection_mode == SelectionMode::RECT){
-		int sx1 = cam.sample2screen(hover.range.start());
-		int sx2 = cam.sample2screen(hover.range.end());
-		int sxx1 = clampi(sx1, clip.x1, clip.x2);
-		int sxx2 = clampi(sx2, clip.x1, clip.x2);
-		c->setColor(colors.selection_internal);
-		c->setFill(false);
-		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
-		c->setFill(true);
-		c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
-	}
+		if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
+			c->setColor(colors.selection_internal);
+			for (AudioViewLayer *l: vlayer)
+				if (sel.has(l->layer))
+					c->drawRect(rect(sxx1, sxx2, l->area.y1, l->area.y2));
+		}else if (selection_mode == SelectionMode::RECT){
+			int sx1 = cam.sample2screen(hover.range.start());
+			int sx2 = cam.sample2screen(hover.range.end());
+			int sxx1 = clampi(sx1, clip.x1, clip.x2);
+			int sxx2 = clampi(sx2, clip.x1, clip.x2);
+			c->setColor(colors.selection_internal);
+			c->setFill(false);
+			c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+			c->setFill(true);
+			c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+		}
 	}
 
 	// bar selection

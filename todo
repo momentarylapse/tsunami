@@ -118,3 +118,16 @@ J curve actions
 * read-only mode (while saving etc)
 * abort saving?
 
+
+== new ==
+
+* multiple signal chains
+* "synth" audio fx from signal chains?
+* more pre-def colors, less ColorInterpolate
+* selection background...
+* fix: last chunk of peaks
+* perfmon window
+* perfmon more fine grained
+* thread system...
+* buffer moving mode
+* layer merging

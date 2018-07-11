@@ -890,8 +890,20 @@ color AudioViewLayer::getBackgroundColor()
 void AudioViewLayer::drawBlankBackground(Painter *c)
 {
 	color cc = getBackgroundColor();
-	c->setColor(cc);
-	c->drawRect(area);
+	if ((view->sel.range.length > 0) and (view->sel.has(layer))){
+		c->setColor(cc);
+		c->drawRect(area);
+
+		color cs = view->colors.background_track_selection;
+		float x1 = max((float)view->cam.sample2screen(view->sel.range.start()), area.x1);
+		float x2 = min((float)view->cam.sample2screen(view->sel.range.end()), area.x2);
+		c->setColor(cs);
+		c->drawRect(x1, area.y1, x2-x1, area.height());
+
+	}else{
+		c->setColor(cc);
+		c->drawRect(area);
+	}
 }
 
 bool AudioView::editingTrack(Track *t)

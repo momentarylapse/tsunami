@@ -37,9 +37,13 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	//c.background_track_selected = ColorInterpolate(background, c.selection*1.5f, 0.17f);
 	//c.background_track = ColorInterpolate(c.background, c.background_track_selected, 0.5f);
 	c.background_track_selected = ColorInterpolate(background, c.selection*1.2f, 0.15f);
+	c.background_track_selection = ColorInterpolate(background, c.selection*1.2f, 0.4f);
 	c.background_track = c.background;
+	c.selection_bars = c.selection;
+	c.selection_bars.a = pow(0.2f, gamma);
+	c.selection_bars_hover = ColorInterpolate(c.selection_bars, hover, 0.5f);
 	c.selection_internal = c.selection;
-	c.selection_internal.a = pow(0.2f, gamma);
+	c.selection_internal.a = pow(0.1f, gamma);
 	c.selection_boundary = c.selection;
 	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
 	c.preview_marker = color(1, 0, 0.7f, 0);

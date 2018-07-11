@@ -327,11 +327,6 @@ void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuff
 		l->drawMidiClassical(c, midi, as_reference, shift);
 }
 
-void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
-{
-
-}
-
 void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 {
 	l->drawBlankBackground(c);
@@ -362,7 +357,7 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 	float lw = 3;
 
 	c->setLineWidth(lw*2);
-	c->setColor(view->colors.selection_internal);
+	c->setColor(view->colors.selection_bars);
 	c->setFill(false);
 
 	auto bars = view->song->bars.get_bars(Range::ALL);
@@ -371,9 +366,9 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 			color col = view->colors.hover;
 			col.a = 0.3f;
 			if (view->sel.has(b)){
-				col = view->colors.selection_internal;
+				col = view->colors.selection_bars;
 				if (b == view->hover.bar)
-					col = ColorInterpolate(col, view->colors.hover, 0.5f);
+					col = view->colors.selection_bars_hover;
 			}
 			c->setColor(col);
 			float x1 = view->cam.sample2screen(b->range().offset);

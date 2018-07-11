@@ -17,7 +17,8 @@
 #include "../../TsunamiWindow.h"
 #include "../SideBar/SideBar.h"
 #include "../SideBar/ModuleConsole.h"
-
+#include "../../lib/math/interpolation.h"
+//template class Interpolator<complex>;
 
 
 
@@ -189,15 +190,29 @@ public:
 	{
 		complex p0 = complex(module_port_out_x(c->source), module_port_out_y(c->source, c->source_port));
 		complex p1 = complex(module_port_in_x(c->target), module_port_in_y(c->target, c->target_port));
+
+		float length = (p1 - p0).abs();
+		Interpolator<complex> inter(Interpolator<complex>::TYPE_CUBIC_SPLINE);
+		inter.add2(p0, complex(length,0));
+		inter.add2(p1, complex(length,0));
+
 		p->setColor(signal_color(c->type));
-		p->drawLine(p0.x, p0.y, p1.x, p1.y);
-		complex m = (p0 + p1) / 2;
-		complex d = (p1 - p0) / (p1 - p0).abs();
+
+		complex qq;
+		for (float t=0; t<1.0f; t+=0.01f){
+			complex q = inter.get(t);
+			if (t > 0)
+				p->drawLine(qq.x, qq.y, q.x, q.y);
+			qq = q;
+		}
+		complex m = inter.get(0.5f);
+		complex d = inter.getTang(0.5);
+		d /= d.abs();
 		complex e = d * c_i;
 		Array<complex> pp;
-		pp.add(m + d * 12);
-		pp.add(m - d * 12 + e * 5);
-		pp.add(m - d * 12 - e * 5);
+		pp.add(m + d * 13);
+		pp.add(m - d * 13 + e * 7);
+		pp.add(m - d * 13 - e * 7);
 		p->drawPolygon(pp);
 		//p->dr
 	}

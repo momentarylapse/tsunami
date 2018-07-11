@@ -74,6 +74,14 @@ template<>
 inline vector _inter_zero_<vector>()
 {	return v_0;	}
 
+template<>
+inline complex _inter_zero_<complex>()
+{	return complex(0,0);	}
+
+template<>
+inline quaternion _inter_zero_<quaternion>()
+{	return quaternion(0,v_0);	}
+
 
 
 template<class T>
@@ -233,6 +241,9 @@ inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t)
 template<>
 inline float _inter_angular_lerp_(const Interpolator<float>::Part &p, float t)
 {	return 0;	}
+template<>
+inline complex _inter_angular_lerp_(const Interpolator<complex>::Part &p, float t)
+{	return complex(0,0);	}
 
 float clampf(float, float, float);
 
@@ -309,5 +320,6 @@ Array<T> Interpolator<T>::getList(Array<float> &t)
 
 template class Interpolator<float>;
 template class Interpolator<vector>;
+template class Interpolator<complex>;
 //template class Interpolator<quaternion>;
 

@@ -47,6 +47,9 @@ public:
 	color sample_selected;
 	color high_contrast_a, high_contrast_b;
 
+	color red, blue, green, white;
+	color red_hover, blue_hover, green_hover, white_hover;
+
 	/*color layer(bool selected, bool hover);
 	color sample(bool selected, bool hover);
 	color buffer(bool selected, bool hover);

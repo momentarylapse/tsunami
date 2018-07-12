@@ -50,17 +50,6 @@ static float module_port_out_y(Module *m, int index)
 	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
-static color signal_color(int type)
-{
-	if (type == Module::SignalType::AUDIO)
-		return Red;
-	if (type == Module::SignalType::MIDI)
-		return Green;
-	if (type == Module::SignalType::BEATS)
-		return Blue;
-	return White;
-}
-
 
 
 
@@ -93,10 +82,14 @@ public:
 		event("signal_chain_add_beat_source", std::bind(&SignalEditorTab::onAddBeatSource, this));
 		event("signal_chain_add_beat_midifier", std::bind(&SignalEditorTab::onAddBeatMidifier, this));
 		event("signal_chain_reset", std::bind(&SignalEditorTab::onReset, this));
-		event("signal_chain_load", std::bind(&SignalEditorTab::onLoad, this));
+		event("signal_chain_activate", std::bind(&SignalEditorTab::onActivate, this));
+		event("signal_chain_delete", std::bind(&SignalEditorTab::onDelete, this));
 		event("signal_chain_save", std::bind(&SignalEditorTab::onSave, this));
 		event("signal_module_delete", std::bind(&SignalEditorTab::onModuleDelete, this));
 		event("signal_module_configure", std::bind(&SignalEditorTab::onModuleConfigure, this));
+
+		event("signal_chain_new", std::bind(&SignalEditor::onNew, ed));
+		event("signal_chain_load", std::bind(&SignalEditor::onLoad, ed));
 
 		editor = ed;
 		view = ed->view;
@@ -186,6 +179,18 @@ public:
 		return s;
 	}
 
+
+	color signal_color(int type, bool hover = false)
+	{
+		if (type == Module::SignalType::AUDIO)
+			return hover ? view->colors.red_hover : view->colors.red;
+		if (type == Module::SignalType::MIDI)
+			return hover ? view->colors.green_hover : view->colors.green;
+		if (type == Module::SignalType::BEATS)
+			return hover ? view->colors.blue_hover : view->colors.blue;
+		return hover ? view->colors.white_hover : view->colors.white;
+	}
+
 	void draw_cable(Painter *p, SignalChain::Cable *c)
 	{
 		complex p0 = complex(module_port_out_x(c->source), module_port_out_y(c->source, c->source_port));
@@ -238,19 +243,20 @@ public:
 		float ww = p->getStrWidth(type);
 		p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
 		p->setFont("", 12, false, false);
+	}
 
+	void draw_ports(Painter *p, Module *m)
+	{
 		foreachi(auto &pd, m->port_in, i){
-			p->setColor(signal_color(pd.type));
-			float r = 4;
-			if (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i)
-				r = 8;
+			bool hovering = (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i);
+			p->setColor(signal_color(pd.type, hovering));
+			float r = hovering ? 6 : 4;
 			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
 		foreachi(auto &pd, m->port_out, i){
-			p->setColor(signal_color(pd.type));
-			float r = 4;
-			if (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i)
-				r = 8;
+			bool hovering = (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i);
+			p->setColor(signal_color(pd.type, hovering));
+			float r = hovering ? 6 : 4;
 			p->drawCircle(module_port_out_x(m), module_port_out_y(m, i), r);
 		}
 	}
@@ -268,6 +274,9 @@ public:
 
 		for (auto *c: chain->cables)
 			draw_cable(p, c);
+
+		for (auto *m: chain->modules)
+			draw_ports(p, m);
 
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 			p->setColor(White);
@@ -380,6 +389,15 @@ public:
 	{
 		session->win->side_bar->module_console->setModule(sel.module);
 
+	}
+
+	void onActivate()
+	{
+	}
+
+	void onDelete()
+	{
+		hui::RunLater(0.001f, [&](){ editor->deleteChain(chain); });
 	}
 
 
@@ -501,11 +519,11 @@ public:
 		chain->reset();
 	}
 
-	void onLoad()
+	/*void onLoad()
 	{
 		if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain"))
 			chain->load(hui::Filename);
-	}
+	}*/
 
 	void onSave()
 	{
@@ -542,7 +560,6 @@ SignalEditor::SignalEditor(Session *session) :
 	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
 
 	addChain(session->signal_chain);
-	addChain(new SignalChain(session, "dummy"));
 }
 
 SignalEditor::~SignalEditor()
@@ -565,4 +582,35 @@ void SignalEditor::addChain(SignalChain *c)
 	embed(tab, grid_id, 0, 0);
 	tabs.add(tab);
 
+	setInt("selector", index);
+}
+
+void SignalEditor::onNew()
+{
+	addChain(new SignalChain(session, "new"));
+}
+
+void SignalEditor::onLoad()
+{
+	if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain")){
+		auto *c = new SignalChain(session, "new");
+		c->load(hui::Filename);
+		addChain(c);
+	}
+}
+
+void SignalEditor::deleteChain(SignalChain *c)
+{
+	foreachi(auto *t, tabs, i)
+		if (t->chain == c){
+			if (i == 0){
+				session->e(_("not allowed to delete the main signal chain"));
+			}else{
+				delete t;
+				delete c;
+				tabs.erase(i);
+				removeString("selector", i);
+				setInt("selector", 0);
+			}
+		}
 }

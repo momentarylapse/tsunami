@@ -54,6 +54,15 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.grid = c.text_soft3;
 	c.sample = c.text_soft2;
 	c.sample_selected = c.selection;
+
+	c.red = ColorInterpolate(Red, background, 0.3f);
+	c.green = ColorInterpolate(Green, background, 0.3f);
+	c.blue = ColorInterpolate(Blue, background, 0.3f);
+	c.white = ColorInterpolate(White, background, 0.3f);
+	c.red_hover = ColorInterpolate(c.red, hover, 0.3f);
+	c.green_hover = ColorInterpolate(c.green, hover, 0.3f);
+	c.blue_hover = ColorInterpolate(c.blue, hover, 0.3f);
+	c.white_hover = ColorInterpolate(c.white, hover, 0.3f);
 	return c;
 }
 

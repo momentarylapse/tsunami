@@ -27,6 +27,10 @@ public:
 
 	void addChain(SignalChain *c);
 
+	void onNew();
+	void onLoad();
+	void deleteChain(SignalChain *c);
+
 	Array<SignalEditorTab*> tabs;
 
 	hui::Menu *menu_chain, *menu_module;

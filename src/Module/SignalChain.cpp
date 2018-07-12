@@ -181,6 +181,7 @@ void SignalChain::load(const string& filename)
 		disconnect(c);
 
 	try{
+		name = filename.basename().replace(".chain", "");
 	File *f = FileOpenText(filename);
 	f->read_str();
 	int n = f->read_int();

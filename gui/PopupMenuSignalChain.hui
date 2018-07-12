@@ -15,6 +15,9 @@ Menu popup_signal_chain_menu ""
 		Item signal_chain_add_midi_input "MidiInputStream"
 		Item signal_chain_add_beat_source "BeatSource"
 		Item signal_chain_add_beat_midifier "BeatMidifier"
-	Item signal_chain_reset "Reset"
+	Separator
+	Item signal_chain_new "New"
 	Item signal_chain_load "Load..."
 	Item signal_chain_save "Save..."
+	Item signal_chain_activate "Activate" checkable
+	Item signal_chain_delete "Delete"

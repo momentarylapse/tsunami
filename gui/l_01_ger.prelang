@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-494
+497
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1484,6 +1484,15 @@ Effekte
 
 menu/plugin_on_midi
 Auf Midi
+
+popup_signal_chain_menu/signal_chain_activate
+Aktivieren
+
+popup_signal_chain_menu/signal_chain_delete
+Löschen
+
+popup_signal_chain_menu/signal_chain_new
+Neu
 
 // Num Language Strings
 181

@@ -58,7 +58,9 @@ class SignalEditorTab : public hui::Panel
 public:
 	SignalEditorTab(SignalEditor *ed, SignalChain *_chain)
 	{
-		addDrawingArea("!expandx,expandy,grabfocus", 1, 0, "area");
+		addGrid("", 0, 0, "grid");
+		setTarget("grid");
+		addDrawingArea("!expandx,expandy,grabfocus", 0, 0, "area");
 
 		eventXP("area", "hui:draw", std::bind(&SignalEditorTab::onDraw, this, std::placeholders::_1));
 		eventX("area", "hui:mouse-move", std::bind(&SignalEditorTab::onMouseMove, this));

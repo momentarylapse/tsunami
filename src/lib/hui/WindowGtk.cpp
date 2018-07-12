@@ -18,6 +18,10 @@ namespace hui
 {
 
 
+void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_DONE();
+
+
 #if !GTK_CHECK_VERSION(3,0,0)
 GtkWidget *gtk_box_new(GtkOrientation orientation, int spacing); // -> hui_window_control_gtk.cpp
 #endif
@@ -219,16 +223,14 @@ void Window::__delete__()
 
 void Window::destroy()
 {
-	msg_write("<del window " + id + " " + p2s(this) + ">");
-	msg_right();
+	DBDEL("window", id, this);
 	onDestroy();
 
 	_clean_up_();
 
 	gtk_widget_destroy(window);
 	window = NULL;
-	msg_left();
-	msg_write("</>");
+	DBDEL_DONE();
 }
 
 bool Window::gotDestroyed()

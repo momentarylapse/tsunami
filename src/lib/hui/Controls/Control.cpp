@@ -13,6 +13,10 @@
 namespace hui
 {
 
+
+void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_DONE();
+
 void WinTrySendByKeyCode(Window *win, int key_code);
 
 // safety feature... in case we delete the control while it notifies us
@@ -75,8 +79,7 @@ void unset_widgets_rec(Control *c)
 Control::~Control()
 {
 	notify_set_del(this);
-	msg_write("<del " + id + " " + p2s(this) + ">");
-	msg_right();
+	DBDEL("control", id, this);
 
 #ifdef HUI_API_GTK
 	//if (widget)
@@ -95,15 +98,14 @@ Control::~Control()
 	}
 
 
-	msg_write("widget: " + p2s(widget));
+	//msg_write("widget: " + p2s(widget));
 #ifdef HUI_API_GTK
 	if (widget)
 		gtk_widget_destroy(widget);
 	widget = NULL;
 	//unset_widgets_rec(this);
 #endif
-	msg_left();
-	msg_write("</>");
+	DBDEL_DONE();
 }
 
 #ifdef HUI_API_WIN
@@ -405,7 +407,8 @@ void Control::apply_foreach(const string &_id, std::function<void(Control*)> f)
 	if ((id == _id) or (_id == "*"))
 		f(this);
 	for (Control *c: children)
-		c->apply_foreach(_id, f);
+		if (c->panel == panel)
+			c->apply_foreach(_id, f);
 }
 
 };

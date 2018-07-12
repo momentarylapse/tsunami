@@ -33,7 +33,6 @@ Panel::Panel()
 
 Panel::~Panel()
 {
-	msg_write("~Panel");
 	_ClearPanel_();
 }
 
@@ -47,17 +46,29 @@ void Panel::__delete__()
 	this->Panel::~Panel();
 }
 
+void DBDEL(const string &type, const string &id, void *p)
+{
+	//msg_write("<del " + type + " " + id + " " + p2s(p) + ">");
+	//msg_right();
+}
+
+void DBDEL_DONE()
+{
+	//msg_left();
+	//msg_write("</>");
+}
+
 // might be executed repeatedly
 void Panel::_ClearPanel_()
 {
-	msg_write("<del panel " + id + " " + p2s(this) + ">");
-	msg_right();
+	DBDEL("panel", id, this);
 	event_listeners.clear();
 	if (parent){
 		// disconnect
 		for (int i=0; i<parent->children.num; i++)
-			if (parent->children[i] == this)
+			if (parent->children[i] == this){
 				parent->children.erase(i);
+			}
 		parent = NULL;
 	}
 	while (children.num > 0){
@@ -71,8 +82,7 @@ void Panel::_ClearPanel_()
 
 	id.clear();
 	cur_id.clear();
-	msg_left();
-	msg_write("</>");
+	DBDEL_DONE();
 }
 
 void Panel::setBorderWidth(int width)
@@ -439,8 +449,8 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 
 	setTarget(parent_id);
 	_insert_control_(panel->root_control, x, y);
-	if (cur_control) // don't really add... (stop some information propagation between Panels)
-		cur_control->children.pop();
+//	if (cur_control) // don't really add... (stop some information propagation between Panels)
+//		cur_control->children.pop();    ...no...now checked in apply_foreach()
 	panel->root_control->panel = orig;//panel;
 }
 
@@ -456,6 +466,12 @@ void Panel::set_win(Window *_win)
 // data exchanging functions for control items
 
 
+// used for automatic type casting...
+bool panel_equal(Panel *a, Panel *b)
+{
+	return a == b;
+}
+
 void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
 {
 	string id = _id;
@@ -463,7 +479,9 @@ void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
 		id = cur_id;
 	if (root_control)
 		root_control->apply_foreach(id, f);
-	if (dynamic_cast<Window*>(this)){
+
+	// FIXME: might be a derived class by kaba....
+	if (panel_equal(win, this)){
 		if (win->getMenu())
 			win->getMenu()->apply_foreach(id, f);
 		/*if (win->popup)

@@ -11,6 +11,9 @@
 namespace hui
 {
 
+void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_DONE();
+
 #ifdef HUI_API_GTK
 
 Toolbar::Toolbar(Window *_win, bool vertical)
@@ -28,11 +31,9 @@ Toolbar::Toolbar(Window *_win, bool vertical)
 
 Toolbar::~Toolbar()
 {
-	msg_write("<del toolbar " + id + " " + p2s(this) + ">");
-	msg_right();
+	DBDEL("toolbar", id, this);
 	reset();
-	msg_left();
-	msg_write("</>");
+	DBDEL_DONE();
 }
 
 

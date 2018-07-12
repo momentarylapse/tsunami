@@ -31,6 +31,8 @@ public:
 	void addPage(const string &str);
 
 	int cur_page;
+
+	Array<Control*> pages; // sorted...
 };
 
 };

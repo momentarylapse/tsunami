@@ -15,6 +15,9 @@
 namespace hui
 {
 
+void DBDEL(const string &type, const string &id, void *p);
+void DBDEL_DONE();
+
 void Menu::__init__()
 {
 	new(this) Menu;
@@ -27,13 +30,11 @@ void Menu::__delete__()
 
 void Menu::clear()
 {
-	msg_write("<del menu " + p2s(this) + ">");
-	msg_right();
+	DBDEL("menu", "", this);
 	for (Control *c: items)
 		delete(c);
 	items.clear();
-	msg_left();
-	msg_write("</>");
+	DBDEL_DONE();
 }
 
 void Menu::addItem(const string &name, const string &id)

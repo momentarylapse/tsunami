@@ -104,15 +104,15 @@ class FileChunk : public FileChunkBasic
 {
 public:
 	FileChunk(const string &name) : FileChunkBasic(name){ me = NULL; parent = NULL; }
-	virtual void *get()
+	void *get() override
 	{
 		return me;
 	}
-	virtual void set(void *_me)
+	void set(void *_me) override
 	{
 		me = (T*)_me;
 	}
-	virtual void set_parent(void *_parent)
+	void set_parent(void *_parent) override
 	{
 		parent = (PT*)_parent;
 	}

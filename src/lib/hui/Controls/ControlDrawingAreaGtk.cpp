@@ -197,7 +197,8 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
 	kmk.keycode = event->hardware_keycode;
 	kmk.group = event->group;
 	kmk.level = 0;
-	int keyvalue = gdk_keymap_lookup_key(gdk_keymap_get_default(), &kmk);
+	auto *map = gdk_keymap_get_for_display(gdk_display_get_default());
+	int keyvalue = gdk_keymap_lookup_key(map, &kmk);
 	// TODO GTK3
 	//int keyvalue = event->keyval;
 	//msg_write(keyvalue);

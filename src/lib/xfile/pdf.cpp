@@ -161,14 +161,14 @@ void PagePainter::drawMaskImage(float x, float y, const Image& image)
 {
 }
 
-rect PagePainter::getArea()
+rect PagePainter::area()
 {
 	return rect(0, width, 0, height);
 }
 
 rect PagePainter::getClip()
 {
-	return getArea();
+	return area();
 }
 
 Parser::Parser()

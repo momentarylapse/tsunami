@@ -1065,7 +1065,7 @@ void AudioView::onDraw(Painter *c)
 
 	colors = basic_colors.create(win->isActive(id));
 
-	area = c->getArea();
+	area = c->area();
 	clip = c->getClip();
 
 	c->setFontSize(FONT_SIZE);

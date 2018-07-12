@@ -905,7 +905,7 @@ menu_track
 
 2
 0
-5
+4
 Item
 track_import
 image=hui:open
@@ -952,12 +952,6 @@ Item
 add_time_track
 image=hui:add
 3
-0
-0
-Separator
-
-
-4
 0
 0
 Menu

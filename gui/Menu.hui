@@ -33,7 +33,6 @@ Menu menu ""
 			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
 			Item add_midi_track "Midi" image=hui:add
 			Item add_time_track "Rhythm" image=hui:add
-		Separator
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add

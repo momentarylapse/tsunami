@@ -175,6 +175,7 @@ private:
 	int desired_width, desired_height;
 #endif
 	
+protected:
 	Menu *menu, *popup;
 	bool statusbar_enabled;
 	bool allowed, allow_keys;

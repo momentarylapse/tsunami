@@ -75,6 +75,8 @@ void unset_widgets_rec(Control *c)
 Control::~Control()
 {
 	notify_set_del(this);
+	msg_write("<del " + id + " " + p2s(this) + ">");
+	msg_right();
 
 #ifdef HUI_API_GTK
 	//if (widget)
@@ -91,18 +93,17 @@ Control::~Control()
 		Control *c = children.pop();
 		delete(c);
 	}
-	if (panel){
-		for (int i=0;i<panel->controls.num;i++)
-			if (panel->controls[i] == this)
-				panel->controls.erase(i);
-	}
 
+
+	msg_write("widget: " + p2s(widget));
 #ifdef HUI_API_GTK
 	if (widget)
 		gtk_widget_destroy(widget);
 	widget = NULL;
 	//unset_widgets_rec(this);
 #endif
+	msg_left();
+	msg_write("</>");
 }
 
 #ifdef HUI_API_WIN
@@ -396,6 +397,15 @@ void Control::notify(const string &message, bool is_default)
 		}
 	}
 	notify_pop();
+}
+
+
+void Control::apply_foreach(const string &_id, std::function<void(Control*)> f)
+{
+	if ((id == _id) or (_id == "*"))
+		f(this);
+	for (Control *c: children)
+		c->apply_foreach(_id, f);
 }
 
 };

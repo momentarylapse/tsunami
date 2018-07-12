@@ -103,7 +103,6 @@ void Panel::_insert_control_(Control *c, int x, int y)
 		gtk_widget_show(frame);
 	gtk_widget_show(c->widget);
 	c->enabled = true;
-	controls.add(c);
 }
 
 Control *Panel ::_get_control_(const string &id)
@@ -113,9 +112,11 @@ Control *Panel ::_get_control_(const string &id)
 
 	// search backwards -> multiple AddText()s with identical ids
 	//   will always set their own text
-	foreachb(Control *c, controls)
-		if (c->id == id)
-			return c;
+
+	Control *r = NULL;
+	apply_foreach(id, [&](Control *c){ r = c; });
+	if (r)
+		return r;
 
 	if (id.num != 0){
 		// ...test if exists in menu/toolbar before reporting an error!
@@ -126,18 +127,16 @@ Control *Panel ::_get_control_(const string &id)
 
 Control *Panel::_get_control_by_widget_(GtkWidget *widget)
 {
-	for (int j=0;j<controls.num;j++)
-		if (controls[j]->widget == widget)
-			return controls[j];
-	return NULL;
+	Control *r = NULL;
+	apply_foreach("*", [&](Control *c){ if (c->widget == widget) r = c; });
+	return r;
 }
 
 string Panel::_get_id_by_widget_(GtkWidget *widget)
 {
-	for (int j=0;j<controls.num;j++)
-		if (controls[j]->widget == widget)
-			return controls[j]->id;
-	return "";
+	string r = "";
+	apply_foreach("*", [&](Control *c){ if (c->widget == widget) r = c->id; });
+	return r;
 }
 
 
@@ -182,11 +181,15 @@ void Panel::addColorButton(const string &title, int x, int y, const string &id)
 
 void Panel::addDefButton(const string &title, int x, int y, const string &id)
 {
-	addButton(title, x, y, id);
-	GtkWidget *b = controls.back()->widget;
-	gtk_widget_set_can_default(b, true);
+	auto *b = new ControlButton(title, id);
+	_insert_control_(b, x, y);
+
+	SetImageById(this, id);
+
+	GtkWidget *bw = b->widget;
+	gtk_widget_set_can_default(bw, true);
 	if (win) // otherwise gtk will complain
-		gtk_widget_grab_default(b);
+		gtk_widget_grab_default(bw);
 }
 
 
@@ -211,10 +214,11 @@ void Panel::addEdit(const string &title, int x, int y, const string &id)
 
 void Panel::addMultilineEdit(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlMultilineEdit(title, id), x, y);
+	auto *m = new ControlMultilineEdit(title, id);
+	_insert_control_(m, x, y);
 	if (win)
-		if ((!win->main_input_control) and ((ControlMultilineEdit*)controls.back())->handle_keys)
-			win->main_input_control = controls.back();
+		if ((!win->main_input_control) and m->handle_keys)
+			win->main_input_control = m;
 }
 
 void Panel::addSpinButton(const string &title, int x, int y, const string &id)
@@ -324,9 +328,10 @@ void Panel::addImage(const string &title, int x, int y, const string &id)
 
 void Panel::addDrawingArea(const string &title, int x, int y, const string &id)
 {
-	_insert_control_(new ControlDrawingArea(title, id), x, y);
-	if (win and (!win->main_input_control))
-		win->main_input_control = controls.back();
+	auto *da = new ControlDrawingArea(title, id);
+	_insert_control_(da, x, y);
+	if (win and !win->main_input_control)
+		win->main_input_control = da;
 }
 
 

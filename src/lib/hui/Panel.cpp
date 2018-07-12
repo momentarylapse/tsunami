@@ -33,6 +33,7 @@ Panel::Panel()
 
 Panel::~Panel()
 {
+	msg_write("~Panel");
 	_ClearPanel_();
 }
 
@@ -49,6 +50,9 @@ void Panel::__delete__()
 // might be executed repeatedly
 void Panel::_ClearPanel_()
 {
+	msg_write("<del panel " + id + " " + p2s(this) + ">");
+	msg_right();
+	event_listeners.clear();
 	if (parent){
 		// disconnect
 		for (int i=0; i<parent->children.num; i++)
@@ -57,19 +61,18 @@ void Panel::_ClearPanel_()
 		parent = NULL;
 	}
 	while (children.num > 0){
-		Panel *p = children[0];
-		children.erase(0);
+		Panel *p = children.pop();
 		delete(p);
 	}
 
-	while (controls.num > 0){
-		Control *c = controls[0];
-		controls.erase(0);
-		delete(c);
-	}
+	if (root_control)
+		delete root_control;
+	root_control = NULL;
+
 	id.clear();
 	cur_id.clear();
-	event_listeners.clear();
+	msg_left();
+	msg_write("</>");
 }
 
 void Panel::setBorderWidth(int width)
@@ -436,7 +439,8 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 
 	setTarget(parent_id);
 	_insert_control_(panel->root_control, x, y);
-	controls.pop(); // dont' really add to us
+	if (cur_control) // don't really add... (stop some information propagation between Panels)
+		cur_control->children.pop();
 	panel->root_control->panel = orig;//panel;
 }
 
@@ -452,10 +456,23 @@ void Panel::set_win(Window *_win)
 // data exchanging functions for control items
 
 
-#define test_controls(_id, c)	\
-	string tid = (_id.num == 0) ? cur_id : _id; \
-	for (Control *c: controls) \
-		if (c->id == tid)
+void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
+{
+	string id = _id;
+	if (id == "")
+		id = cur_id;
+	if (root_control)
+		root_control->apply_foreach(id, f);
+	if (dynamic_cast<Window*>(this)){
+		if (win->getMenu())
+			win->getMenu()->apply_foreach(id, f);
+		/*if (win->popup)
+			win->popup->apply_foreach(id, f);*/
+		for (int i=0; i<4; i++)
+			win->toolbar[i]->apply_foreach(id, f);
+	}
+}
+
 
 // replace all the text
 //    for all
@@ -463,8 +480,7 @@ void Panel::setString(const string &_id, const string &str)
 {
 	if (win and (id == _id))
 		win->setTitle(str);
-	test_controls(_id, c)
-		c->setString(str);
+	apply_foreach(_id, [&](Control *c){ c->setString(str); });
 }
 
 // replace all the text with a numerical value (int)
@@ -473,28 +489,24 @@ void Panel::setString(const string &_id, const string &str)
 //    for ComboBox, TabControl, ListView?
 void Panel::setInt(const string &_id, int n)
 {
-	test_controls(_id, c)
-		c->setInt(n);
+	apply_foreach(_id, [&](Control *c){ c->setInt(n); });
 }
 
 // replace all the text with a float
 //    for all
 void Panel::setFloat(const string &_id, float f)
 {
-	test_controls(_id, c)
-		c->setFloat(f);
+	apply_foreach(_id, [&](Control *c){ c->setFloat(f); });
 }
 
 void Panel::setImage(const string &_id, const string &image)
 {
-	test_controls(_id, c)
-		c->setImage(image);
+	apply_foreach(_id, [&](Control *c){ c->setImage(image); });
 }
 
 void Panel::setTooltip(const string &_id, const string &tip)
 {
-	test_controls(_id, c)
-		c->setTooltip(tip);
+	apply_foreach(_id, [&](Control *c){ c->setTooltip(tip); });
 }
 
 
@@ -502,62 +514,56 @@ void Panel::setTooltip(const string &_id, const string &tip)
 //    for ComboBox, ListView, ListViewTree, ListViewIcons
 void Panel::addString(const string &_id, const string &str)
 {
-	test_controls(_id, c)
-		c->addString(str);
+	apply_foreach(_id, [&](Control *c){ c->addString(str); });
 }
 
 // add a single line as a child in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::addChildString(const string &_id, int parent_row, const string &str)
 {
-	test_controls(_id, c)
-		c->addChildString(parent_row, str);
+	apply_foreach(_id, [&](Control *c){ c->addChildString(parent_row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::changeString(const string &_id, int row, const string &str)
 {
-	test_controls(_id, c)
-		c->changeString(row, str);
+	apply_foreach(_id, [&](Control *c){ c->changeString(row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::removeString(const string &_id, int row)
 {
-	test_controls(_id, c)
-		c->removeString(row);
+	apply_foreach(_id, [&](Control *c){ c->removeString(row); });
 }
 
 // listview / treeview
 string Panel::getCell(const string &_id, int row, int column)
 {
-	test_controls(_id, c)
-		return c->getCell(row, column);
-	return "";
+	string r = "";
+	apply_foreach(_id, [&](Control *c){ r = c->getCell(row, column); });
+	return r;
 }
 
 // listview / treeview
 void Panel::setCell(const string &_id, int row, int column, const string &str)
 {
-	test_controls(_id, c)
-		c->setCell(row, column, str);
+	apply_foreach(_id, [&](Control *c){ c->setCell(row, column, str); });
 }
 
 void Panel::setColor(const string &_id, const color &col)
 {
-	test_controls(_id, c)
-		c->setColor(col);
+	apply_foreach(_id, [&](Control *c){ c->setColor(col); });
 }
 
 // retrieve the text
 //    for edit
 string Panel::getString(const string &_id)
 {
-	test_controls(_id, c)
-		return c->getString();
-	return "";
+	string r = "";
+	apply_foreach(_id, [&](Control *c){ r = c->getString(); });
+	return r;
 }
 
 // retrieve the text as a numerical value (int)
@@ -566,135 +572,123 @@ string Panel::getString(const string &_id)
 //    for ComboBox, TabControl, ListView
 int Panel::getInt(const string &_id)
 {
-	test_controls(_id, c)
-		return c->getInt();
-	return 0;
+	int r = 0;
+	apply_foreach(_id, [&](Control *c){ r = c->getInt(); });
+	return r;
 }
 
 // retrieve the text as a numerical value (float)
 //    for edit
 float Panel::getFloat(const string &_id)
 {
-	test_controls(_id, c)
-		return c->getFloat();
-	return 0;
+	float r = 0;
+	apply_foreach(_id, [&](Control *c){ r = c->getFloat(); });
+	return r;
 }
 
 color Panel::getColor(const string &_id)
 {
-	test_controls(_id, c)
-		return c->getColor();
-	return Black;
+	color r = Black;
+	apply_foreach(_id, [&](Control *c){ r = c->getColor(); });
+	return r;
 }
 
 // switch control to usable/unusable
 //    for all
 void Panel::enable(const string &_id,bool enabled)
 {
-	test_controls(_id, c)
-		c->enable(enabled);
+	apply_foreach(_id, [&](Control *c){ c->enable(enabled); });
 }
 
 // show/hide control
 //    for all
 void Panel::hideControl(const string &_id,bool hide)
 {
-	test_controls(_id, c)
-		c->hide(hide);
+	apply_foreach(_id, [&](Control *c){ c->hide(hide); });
 }
 
 // mark as "checked"
 //    for CheckBox, ToolBarItemCheckable
 void Panel::check(const string &_id,bool checked)
 {
-	test_controls(_id, c)
-		c->check(checked);
+	apply_foreach(_id, [&](Control *c){ c->check(checked); });
 }
 
 // is marked as "checked"?
 //    for CheckBox
 bool Panel::isChecked(const string &_id)
 {
-	test_controls(_id, c)
-		return c->isChecked();
-	return false;
+	bool r = false;
+	apply_foreach(_id, [&](Control *c){ r = c->isChecked(); });
+	return r;
 }
 
 // which lines are selected?
 //    for ListView
 Array<int> Panel::getSelection(const string &_id)
 {
-	test_controls(_id, c)
-		return c->getSelection();
-	Array<int> sel;
-	return sel;
+	Array<int> r;
+	apply_foreach(_id, [&](Control *c){ r = c->getSelection(); });
+	return r;
 }
 
 void Panel::setSelection(const string &_id, const Array<int> &sel)
 {
-	test_controls(_id, c)
-		c->setSelection(sel);
+	apply_foreach(_id, [&](Control *c){ c->setSelection(sel); });
 }
 
 // delete all the content
 //    for ComboBox, ListView
 void Panel::reset(const string &_id)
 {
-	test_controls(_id, c)
-		c->reset();
+	apply_foreach(_id, [&](Control *c){ c->reset(); });
 }
 
 // expand a single row
 //    for TreeView
 void Panel::expand(const string &_id, int row, bool expand)
 {
-	test_controls(_id, c)
-		c->expand(row, expand);
+	apply_foreach(_id, [&](Control *c){ c->expand(row, expand); });
 }
 
 // expand all rows
 //    for TreeView
 void Panel::expandAll(const string &_id, bool expand)
 {
-	test_controls(_id, c)
-		c->expandAll(expand);
+	apply_foreach(_id, [&](Control *c){ c->expandAll(expand); });
 }
 
 // is column in tree expanded?
 //    for TreeView
 bool Panel::isExpanded(const string &_id, int row)
 {
-	test_controls(_id, c)
-		return false;
-	return false;
+	bool r = false;
+//	apply_foreach(_id, [&](Control *c){ r = c->isExpanded(); });
+	return r;
 }
 
 //    for Revealer
 void Panel::reveal(const string &_id, bool reveal)
 {
-	test_controls(_id, c)
-		c->reveal(reveal);
+	apply_foreach(_id, [&](Control *c){ c->reveal(reveal); });
 }
 
 //    for Revealer
 bool Panel::isRevealed(const string &_id)
 {
-	test_controls(_id, c)
-		return c->isRevealed();
-	return false;
+	bool r = false;
+	apply_foreach(_id, [&](Control *c){ r = c->isRevealed(); });
+	return r;
 }
 
 void Panel::deleteControl(const string &_id)
 {
-	for(int i=controls.num-1;i>=0;i--)
-		if (controls[i]->id == _id)
-			delete(controls[i]);
+	apply_foreach(_id, [&](Control *c){ delete c; });
 }
 
 void Panel::setOptions(const string &_id, const string &options)
 {
-	test_controls(_id, c)
-		c->setOptions(options);
+	apply_foreach(_id, [&](Control *c){ c->setOptions(options); });
 }
 
 };

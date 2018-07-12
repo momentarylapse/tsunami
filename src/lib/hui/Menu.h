@@ -54,6 +54,8 @@ public:
 #endif
 	Array<Control*> items;
 	Panel *panel;
+
+	void apply_foreach(const string &id, std::function<void(Control*)> f);
 };
 
 };

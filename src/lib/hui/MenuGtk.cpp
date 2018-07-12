@@ -61,6 +61,14 @@ void Menu::gtk_realize()
 	widget = gtk_menu_new();
 }
 
+
+void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data)
+{
+	Menu *m = (Menu*)user_data;
+	m->set_panel(NULL);
+}
+
+
 // window coordinate system!
 void Menu::openPopup(Panel *panel, int x, int y)
 {
@@ -70,6 +78,8 @@ void Menu::openPopup(Panel *panel, int x, int y)
 #else
 	gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 #endif
+
+	//g_signal_connect(G_OBJECT(widget), "selection-done", G_CALLBACK(&OnGtkMenuClose), this);
 	set_panel(panel);
 }
 
@@ -79,8 +89,6 @@ void Menu::add(Control *c)
 	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);
 	gtk_widget_show(c->widget);
 	c->panel = panel;
-	if (panel)
-		panel->controls.add(c);
 }
 
 

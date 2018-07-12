@@ -11,6 +11,7 @@
 #include "../../image/image.h"
 #include "../common.h"
 #include "../language.h"
+#include <functional>
 
 namespace hui
 {
@@ -105,6 +106,8 @@ public:
 	void getSize(int &w, int &h);
 
 	void notify(const string &message = "", bool is_default = true);
+
+	void apply_foreach(const string &id, std::function<void(Control*)> f);
 };
 
 

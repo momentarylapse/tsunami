@@ -27,9 +27,13 @@ void Menu::__delete__()
 
 void Menu::clear()
 {
+	msg_write("<del menu " + p2s(this) + ">");
+	msg_right();
 	for (Control *c: items)
 		delete(c);
 	items.clear();
+	msg_left();
+	msg_write("</>");
 }
 
 void Menu::addItem(const string &name, const string &id)
@@ -66,7 +70,8 @@ void Menu::set_panel(Panel *_panel)
 	panel = _panel;
 	for (Control *c: items){
 		c->panel = panel;
-		try_add_accel(c->widget, c->id, panel);
+		if (panel)
+			try_add_accel(c->widget, c->id, panel);
 		MenuItemSubmenu *s = dynamic_cast<MenuItemSubmenu*>(c);
 		if (s)
 			s->sub_menu->set_panel(panel);
@@ -144,6 +149,20 @@ void Menu::enable(const string &id, bool enabled)
 		if (c->type == MENU_ITEM_SUBMENU)
 			dynamic_cast<MenuItemSubmenu*>(c)->sub_menu->enable(id, enabled);
 	}
+}
+
+
+void Menu::apply_foreach(const string &_id, std::function<void(Control*)> f)
+{
+	/*for (Control *c: items)
+		c->apply_foreach(_id, f);*/
+
+	// FIXME: menu items don't really know their children.... inconsistent...argh
+	auto list = get_all_controls();
+	for (auto *c: list)
+		if (c->id == _id)
+			f(c);
+
 }
 
 };

@@ -13,6 +13,7 @@
 
 #include "../config.h"
 #include "../base/base.h"
+#include <functional>
 
 // which api?
 

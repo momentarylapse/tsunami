@@ -46,6 +46,8 @@ public:
 	void _cdecl fromResource(Resource *r);
 
 	void add(Control *c);
+
+	void apply_foreach(const string &id, std::function<void(Control*)> f);
 };
 
 };

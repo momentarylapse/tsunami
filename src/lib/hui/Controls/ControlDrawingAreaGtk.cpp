@@ -342,7 +342,11 @@ void ControlDrawingArea::redraw()
 	if (!widget)
 		return;
 	//printf("                    DRAW\n");
+#if 1
+	gtk_widget_queue_draw(widget);
+#else
 	g_idle_add((GSourceFunc)__drawing_area_queue_redraw,(void*)widget);
+#endif
 	redraw_area.add(r);
 }
 

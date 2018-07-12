@@ -134,6 +134,8 @@ void Painter::clip(const rect &r)
 
 rect Painter::getClip()
 {
+	if (!cr)
+		return r_id;
 	double x1, x2, y1, y2;
 	cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
 	return rect(x1, x2, y1, y2);

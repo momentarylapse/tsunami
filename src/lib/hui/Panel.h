@@ -173,9 +173,9 @@ protected:
 	int desired_width, desired_height;
 #endif
 
-	Array<Control*> controls;
 	Control *cur_control;
 	Control *root_control;
+	void apply_foreach(const string &id, std::function<void(Control*)> f);
 public:
 	Array<EventListener> event_listeners;
 	Array<EventKeyCode> event_key_codes;

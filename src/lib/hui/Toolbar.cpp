@@ -110,5 +110,13 @@ void Toolbar::fromSource(const string &source)
 	fromResource(&res);
 }
 
+
+void Toolbar::apply_foreach(const string &id, std::function<void(Control*)> f)
+{
+	for (Control *c: item)
+		c->apply_foreach(id, f);
+
+}
+
 };
 

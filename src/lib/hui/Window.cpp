@@ -101,6 +101,7 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 
 void Window::_clean_up_()
 {
+	msg_write("Window.cleanup");
 	for (int i=0; i<4; i++)
 		delete(toolbar[i]);
 

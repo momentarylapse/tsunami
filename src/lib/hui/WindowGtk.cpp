@@ -219,16 +219,16 @@ void Window::__delete__()
 
 void Window::destroy()
 {
+	msg_write("<del window " + id + " " + p2s(this) + ">");
+	msg_right();
 	onDestroy();
-
-	// quick'n'dirty fix (gtk destroys its widgets recursively)
-	for (Control *c: controls)
-		c->widget = NULL;
 
 	_clean_up_();
 
 	gtk_widget_destroy(window);
 	window = NULL;
+	msg_left();
+	msg_write("</>");
 }
 
 bool Window::gotDestroyed()
@@ -309,10 +309,6 @@ void Window::setMenu(Menu *_menu)
 		}
 		gtk_menu.clear();
 		/*menu->set_win(NULL);
-		foreach(HuiControl *c, list){
-			for (int i=0;i<control.num;i++)
-				if (control[i] == c)
-					control.erase(i);
 		}*/
 		delete(menu);
 	}
@@ -334,8 +330,6 @@ void Window::setMenu(Menu *_menu)
 			gtk_menu_shell_append(GTK_MENU_SHELL(menubar), gtk_menu[i]);
 			g_object_unref(it->widget);
 		}
-		Array<Control*> list = menu->get_all_controls();
-		controls.append(list);
 	}else
 		gtk_widget_hide(menubar);
 }
@@ -502,18 +496,15 @@ void Panel::activate(const string &control_id)
 	gtk_widget_grab_focus(win->window);
 	gtk_window_present(GTK_WINDOW(win->window));
 	if (control_id.num > 0)
-		for (int i=0;i<controls.num;i++)
-			if (control_id == controls[i]->id)
-				controls[i]->focus();
+		apply_foreach(control_id, [&](Control *c){ c->focus(); });
 }
 
 bool Panel::isActive(const string &control_id)
 {
 	if (control_id.num > 0){
-		for (int i=0;i<controls.num;i++)
-			if (control_id == controls[i]->id)
-				return controls[i]->hasFocus();
-		return false;
+		bool r = false;
+		apply_foreach(control_id, [&](Control *c){ r = c->hasFocus(); });
+		return r;
 	}
 	return (bool)gtk_widget_has_focus(win->window);
 }

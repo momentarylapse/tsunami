@@ -23,11 +23,15 @@ ControlRadioButton::ControlRadioButton(const string &title, const string &id, Pa
 	GetPartStrings(title);
 	string group_id = id.head(id.find(":"));
 	GSList *group = NULL;
-	for (Control *c: panel->controls)
+
+	panel->apply_foreach("*", [&](Control *c){
 		if (c->type == CONTROL_RADIOBUTTON)
 			if (c->id.find(":"))
-				if (c->id.head(c->id.find(":")) == group_id)
+				if (c->id.head(c->id.find(":")) == group_id){
 					group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(c->widget));
+				}
+	});
+
 
 	widget = gtk_radio_button_new_with_label(group, sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkRadioButtonToggle), this);

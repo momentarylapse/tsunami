@@ -12,6 +12,7 @@
 #include "../Session.h"
 #include "../Plugins/PluginManager.h"
 #include "../lib/file/file.h"
+#include "../lib/xfile/xml.h"
 
 
 const string SignalChain::MESSAGE_ADD_MODULE = "AddModule";
@@ -149,69 +150,102 @@ void SignalChain::disconnect_target(Module *target, int target_port)
 		}
 }
 
+bool is_system_module(Module *m)
+{
+	if (m == (Module*)m->session->output_stream)
+		return true;
+	if (m == (Module*)m->session->peak_meter)
+		return true;
+	if (m == (Module*)m->session->song_renderer)
+		return true;
+	return false;
+}
+
 void SignalChain::save(const string& filename)
 {
-	File* f = FileCreateText(filename);
-	f->write_str("1");
-	f->write_int(modules.num);
-	for (auto *m: modules){
-		f->write_str(m->type_to_name(m->module_type));
-		f->write_str(m->module_subtype);
-		f->write_str("");
-		f->write_str(m->config_to_string());
-		f->write_int(m->module_x);
-		f->write_int(m->module_y);
+	xml::Parser p;
+	xml::Element root("chain");
+	xml::Element hh("head");
+	hh.add(xml::Element("version", "1.0"));
+	hh.add(xml::Element("system", "false"));
+	hh.add(xml::Element("name", name));
+	root.add(hh);
+	xml::Element mm("modules");
+	for (Module *m: modules){
+		xml::Element e("module");
+		e.add(xml::Element("category", m->type_to_name(m->module_type)));
+		e.add(xml::Element("class", m->module_subtype));
+		e.add(xml::Element("position").with("x", f2s(m->module_x, 0)).with("y", f2s(m->module_y, 0)));
+		if (m->allow_config_in_chain)
+			e.add_attribute("configurable", "true");
+		if (is_system_module(m))
+			e.add_attribute("system", "true");
+		if (m->config_to_string().num > 0)
+			e.add(xml::Element("config", m->config_to_string()));
+		mm.add(e);
 	}
-	f->write_int(cables.num);
-	for (auto *c: cables){
-		f->write_int(module_index(c->source));
-		f->write_int(c->source_port);
-		f->write_int(module_index(c->target));
-		f->write_int(c->target_port);
+	root.add(mm);
+	xml::Element cc("cables");
+	for (Cable *c: cables){
+		xml::Element e("cable");
+		e.add(xml::Element("source").witha("id", i2s(module_index(c->source))).witha("port", i2s(c->source_port)));
+		e.add(xml::Element("target").witha("id", i2s(module_index(c->target))).witha("port", i2s(c->target_port)));
+		cc.add(e);
 	}
-	delete f;
+	root.add(cc);
+	p.elements.add(root);
+	p.save(filename);
 }
 
 void SignalChain::load(const string& filename)
 {
 	for (int i=modules.num-1; i>=3; i--)
 		remove(modules[i]);
-	Array<Cable*> _cables = cables;
 	for (auto *c: cables)
 		disconnect(c);
 
+
+
 	try{
-		name = filename.basename().replace(".chain", "");
-	File *f = FileOpenText(filename);
-	f->read_str();
-	int n = f->read_int();
-	for (int i=0; i<n; i++){
-		string type = f->read_str();
-		string sub_type = f->read_str();
-		string name = f->read_str();
-		Module *m = NULL;
-		if ((i < 3) and (this == session->signal_chain)){
-			m = modules[i];
-		}else{
-			int itype = Module::type_from_name(type);
-			if (itype < 0)
-				throw Exception("unhandled module type: " + type);
-			m = add(ModuleFactory::create(session, itype, sub_type));
+
+		xml::Parser p;
+		p.load(filename);
+		if (p.elements.num == 0)
+			throw Exception("no root element");
+		auto &root = p.elements[0];
+		if (root.tag != "chain")
+			throw Exception("root element is not called 'chain', but: " + root.tag);
+		auto *head = root.find("head");
+		name = head->value("name");
+
+		auto *mm = root.find("modules");
+		for (auto &e: mm->elements){
+			string type = e.value("category");
+			string sub_type = e.value("class");
+			string name = e.value("name");
+			string sys = e.value("system");
+			Module *m = NULL;
+			/*if ((i < 3) and (this == session->signal_chain)){
+				m = modules[i];
+			}else*/{
+				int itype = Module::type_from_name(type);
+				if (itype < 0)
+					throw Exception("unhandled module type: " + type);
+				m = add(ModuleFactory::create(session, itype, sub_type));
+			}
+			m->config_from_string(e.value("config"));
+			m->module_x = e.find("position")->value("x")._float();
+			m->module_y = e.find("position")->value("y")._float();
 		}
-		string config = f->read_str();
-		m->config_from_string(config);
-		m->module_x = f->read_int();
-		m->module_y = f->read_int();
-	}
-	n = f->read_int();
-	for (int i=0; i<n; i++){
-		int s = f->read_int();
-		int sp = f->read_int();
-		int t = f->read_int();
-		int tp = f->read_int();
-		connect(modules[s], sp, modules[t], tp);
-	}
-	delete f;
+
+		auto *cc = root.find("cables");
+		for (auto &e: cc->elements){
+			int s = e.find("source")->value("id")._int();
+			int sp = e.find("source")->value("port")._int();
+			int t = e.find("target")->value("id")._int();
+			int tp = e.find("target")->value("port")._int();
+			connect(modules[s], sp, modules[t], tp);
+		}
 	}catch(Exception &e){
 		session->e(e.message());
 	}

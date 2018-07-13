@@ -13,6 +13,8 @@ namespace xml{
 int nn = 0;
 const int NMAX = 1000000;
 
+SyntaxError::SyntaxError() : Exception("xml syntax error"){}
+
 
 class EndOfFile{};
 
@@ -89,6 +91,37 @@ string read_next_exp(File *f)
 	return e;
 }
 
+Element::Element(const string &_tag, const string &_text)
+{
+	tag = _tag;
+	text = _text;
+}
+
+void Element::add_attribute(const string &key, const string &value)
+{
+	Attribute a;
+	a.key = key;
+	a.value = value;
+	attributes.add(a);
+}
+
+Element Element::with(const string &tag, const string &text)
+{
+	add(Element(tag, text));
+	return *this;
+}
+
+Element Element::witha(const string &key, const string &value)
+{
+	add_attribute(key, value);
+	return *this;
+}
+
+void Element::add(const Element &child)
+{
+	elements.add(child);
+}
+
 Element dummy_element;
 
 Element* Element::find(const string &tag)
@@ -99,6 +132,17 @@ Element* Element::find(const string &tag)
 	return &dummy_element;
 }
 
+string Element::value(const string &key)
+{
+	for (auto &a: attributes)
+		if (a.key == key)
+			return a.value;
+	for (auto &e: elements)
+		if (e.tag == key)
+			return e.text;
+	return "";
+}
+
 void Parser::load(const string &filename)
 {
 	File *f = FileOpen(filename);
@@ -106,13 +150,53 @@ void Parser::load(const string &filename)
 	while(true){
 		try{
 			Element e = read_element(f);
+			//msg_write(e.tag);
 			if ((e.tag != "!--") and (e.tag != "!DOCTYPE") and (e.tag != "?xml"))
 				elements.add(e);
 		}catch (EndOfFile &eof){
-			msg_write("eof");
+			//msg_write("eof");
+
+			//show();
 			return;
 		}
 	}
+}
+
+void Parser::write_element(File *f, Element &e, int indent)
+{
+	for (int i=0; i<indent; i++)
+		f->write_char('\t');
+
+	f->write_buffer("<" + e.tag);
+	for (auto &a: e.attributes)
+		f->write_buffer(" " + a.key + "=\"" + a.value + "\"");
+
+	if (e.text.num + e.elements.num == 0){
+		f->write_buffer(" />\n");
+	}else if (e.elements.num > 0){
+		f->write_buffer(">\n");
+
+		for (Element &child: e.elements)
+			write_element(f, child, indent + 1);
+
+		for (int i=0; i<indent; i++)
+			f->write_char('\t');
+		f->write_buffer("</" + e.tag + ">\n");
+	}else if (e.elements.num == 0){
+		f->write_buffer(">" + e.text + "</" + e.tag + ">\n");
+	}
+}
+
+void Parser::save(const string &filename)
+{
+	File *f = FileCreate(filename);
+	f->write_buffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+
+	// should be exactly one root!
+	for (Element &e: elements)
+		write_element(f, e, 0);
+
+	delete f;
 }
 
 void Parser::show()
@@ -229,8 +313,10 @@ Element Parser::read_tag(File *f)
 		//msg_write(s);
 		if (s == "?")
 			continue;
-		if (s == ">")
+		if (s == ">"){
+			//msg_write("-end");
 			return e;
+		}
 
 		// />
 		if (s == "/"){

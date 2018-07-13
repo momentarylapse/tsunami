@@ -176,6 +176,7 @@ Module::Module(int type)
 	plugin = NULL;
 	enabled = true;
 	module_x = module_y = 0;
+	allow_config_in_chain = false;
 }
 
 Module::~Module()

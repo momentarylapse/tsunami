@@ -73,6 +73,8 @@ public:
 	virtual void module_stop(){}
 	virtual void module_pause(bool paused);
 
+	bool allow_config_in_chain;
+
 
 	Plugin *plugin;
 	bool usable;

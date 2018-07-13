@@ -14,8 +14,10 @@ class File;
 
 namespace xml{
 
-class SyntaxError
+class SyntaxError : public Exception
 {
+public:
+	SyntaxError();
 };
 
 struct Attribute
@@ -34,7 +36,15 @@ struct Element : Tag
 {
 	string text;
 	Array<Element> elements;
+
+	Element(){}
+	Element(const string &tag, const string &text = "");
+	void add_attribute(const string &key, const string &value);
+	void add(const Element &child);
+	Element with(const string &tag, const string &text = "");
+	Element witha(const string &key, const string &value);
 	Element* find(const string &tag);
+	string value(const string &key);
 };
 
 class Parser
@@ -44,6 +54,9 @@ public:
 
 	Element read_element(File *f);
 	Element read_tag(File *f);
+
+	void _cdecl save(const string &filename);
+	void write_element(File *f, Element &e, int indent);
 
 	Array<Element> elements;
 

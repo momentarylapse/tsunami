@@ -266,8 +266,9 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		if ((error) or (chunk_read == 0))
 			break;
 
-		int dsamples = chunk_read / 4; // channels?!?!
-		int _offset = read / 4 + od->offset;
+		int bytes_per_sample = 2 * channels;
+		int dsamples = chunk_read / bytes_per_sample;
+		int _offset = read / bytes_per_sample + od->offset;
 		importData(od->layer, data, channels, SAMPLE_FORMAT_16, dsamples, _offset);
 		read += chunk_read;
 		nn ++;

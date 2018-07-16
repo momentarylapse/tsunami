@@ -82,14 +82,14 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
 		hover->vlayer->setSolo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
-		dnd_start_soon(view->sel);
+		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
 	}else if (hover->type == Selection::Type::TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::MARKER){
 	}
 }
 
-void ViewModeDefault::dnd_start_soon(SongSelection &sel)
+void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
 {
 	*dnd_selection = sel;
 	dnd_pos0 = view->hover.pos;

@@ -10,7 +10,7 @@
 #include "../../Data/SongSelection.h"
 
 
-ActionSongMoveSelection::ActionSongMoveSelection(Song *a, SongSelection &sel)
+ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &sel)
 {
 	for (Track *t: a->tracks){
 		for (SampleRef *s: t->samples)

@@ -140,4 +140,5 @@ J AudioSource into buffer
 
 J delete with empty range
 * selection rect with correct y range...
-* move selection
+J move selection
+* fix barrier system

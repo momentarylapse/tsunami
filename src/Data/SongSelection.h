@@ -29,8 +29,8 @@ public:
 	void clear_data();
 	void all(Song *s);
 	void _update_bars(Song *s);
-	static SongSelection from_range(Song *s, const Range &r, int mask = Mask::ALL);
-	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, Set<const TrackLayer*> layers, int mask = Mask::ALL);
+	static SongSelection from_range(Song *s, const Range &r);
+	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, Set<const TrackLayer*> layers);
 
 	void make_consistent(Song *s);
 	void _update_tracks_from_layers(Song *s);
@@ -42,6 +42,7 @@ public:
 		BARS = 8,
 		ALL = -1
 	};
+	SongSelection filter(int mask) const;
 
 	Range range;
 

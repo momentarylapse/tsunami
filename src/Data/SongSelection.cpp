@@ -37,7 +37,7 @@ void SongSelection::all(Song* s)
 	from_range(s, s->getRangeWithTime());
 }
 
-SongSelection SongSelection::from_range(Song *song, const Range &r, int mask)
+SongSelection SongSelection::from_range(Song *song, const Range &r)
 {
 	Set<const Track*> _tracks;
 	for (Track *t: song->tracks)
@@ -46,10 +46,10 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, int mask)
 	for (Track *t: song->tracks)
 		for (TrackLayer *l: t->layers)
 			_layers.add(l);
-	return from_range(song, r, _tracks, _layers, mask);
+	return from_range(song, r, _tracks, _layers);
 }
 
-SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Track*> _tracks, Set<const TrackLayer*> _layers, int mask)
+SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Track*> _tracks, Set<const TrackLayer*> _layers)
 {
 	SongSelection s;
 	s.range = r;
@@ -63,29 +63,41 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 		s.add(t);
 
 		// samples
-		if ((mask & Mask::SAMPLES) > 0)
-			for (SampleRef *sr: t->samples)
-				s.set(sr, s.range.overlaps(sr->range()));
+		for (SampleRef *sr: t->samples)
+			s.set(sr, s.range.overlaps(sr->range()));
 
 		// markers
-		if ((mask & Mask::MARKERS) > 0)
-			for (TrackMarker *m: t->markers)
-				s.set(m, s.range.overlaps(m->range));
+		for (TrackMarker *m: t->markers)
+			s.set(m, s.range.overlaps(m->range));
 
 		for (const TrackLayer *l: t->layers){
 			if (_layers.contains(l))
 				s.add(l);
 
 			// midi
-			if ((mask & Mask::MIDI_NOTES) > 0)
-				for (MidiNote *n: l->midi)
-					s.set(n, s.range.overlaps(n->range));
+			for (MidiNote *n: l->midi)
+				s.set(n, s.range.overlaps(n->range));
 		}
 	}
 
 	// bars
-	if ((mask & Mask::BARS) > 0)
-		s._update_bars(song);
+	s._update_bars(song);
+	return s;
+}
+
+SongSelection SongSelection::filter(int mask) const
+{
+	SongSelection s = *this;
+
+	if ((mask & Mask::SAMPLES) == 0)
+		s.samples.clear();
+	if ((mask & Mask::MIDI_NOTES) == 0)
+		s.notes.clear();
+	if ((mask & Mask::BARS) == 0)
+		s.bars.clear();
+	if ((mask & Mask::MARKERS) == 0)
+		s.markers.clear();
+
 	return s;
 }
 

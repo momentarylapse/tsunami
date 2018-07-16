@@ -20,7 +20,7 @@ class SongSelection;
 class ActionSongMoveSelection: public Action
 {
 public:
-	ActionSongMoveSelection(Song *s, SongSelection &sel);
+	ActionSongMoveSelection(Song *s, const SongSelection &sel);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

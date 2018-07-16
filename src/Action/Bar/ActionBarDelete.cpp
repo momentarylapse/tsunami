@@ -36,7 +36,7 @@ void ActionBarDelete::build(Data *d)
 	addSubAction(new ActionBar__Delete(index), d);
 
 	if (affect_data){
-		SongSelection sel = SongSelection::from_range(s, r, SongSelection::Mask::SAMPLES);
+		SongSelection sel = SongSelection::from_range(s, r).filter(SongSelection::Mask::SAMPLES);
 
 		for (Track *t: s->tracks){
 			foreachi (TrackMarker *m, t->markers, i){

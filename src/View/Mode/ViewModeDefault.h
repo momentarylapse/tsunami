@@ -59,7 +59,7 @@ public:
 	ActionSongMoveSelection *cur_action;
 	SongSelection *dnd_selection;
 	int dnd_pos0;
-	void dnd_start_soon(SongSelection &sel);
+	void dnd_start_soon(const SongSelection &sel);
 	void dnd_start();
 	void dnd_stop();
 	void dnd_update();

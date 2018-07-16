@@ -57,26 +57,32 @@ public:
 	void add(const Track *t);
 	void set(const Track *t, bool selected);
 	bool has(const Track *t) const;
+	void click(const Track *t, bool control_pressed);
 
 	void add(const TrackLayer *l);
 	void set(const TrackLayer *l, bool selected);
 	bool has(const TrackLayer *l) const;
+	void click(const TrackLayer *l, bool control_pressed);
 
 	void add(const SampleRef *s);
 	void set(const SampleRef *s, bool selected);
 	bool has(const SampleRef *s) const;
+	void click(const SampleRef *s, bool control_pressed);
 
 	void add(const TrackMarker *m);
 	void set(const TrackMarker *m, bool selected);
 	bool has(const TrackMarker *m) const;
+	void click(const TrackMarker *m, bool control_pressed);
 
 	void add(const MidiNote *n);
 	void set(const MidiNote *n, bool selected);
 	bool has(const MidiNote *n) const;
+	void click(const MidiNote *n, bool control_pressed);
 
 	void add(const Bar *b);
 	void set(const Bar *b, bool selected);
 	bool has(const Bar *b) const;
+	void click(const Bar *b, bool control_pressed);
 
 	int num_samples() const;
 	bool is_empty() const;

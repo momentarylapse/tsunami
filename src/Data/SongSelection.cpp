@@ -146,7 +146,10 @@ void SongSelection::add(const TYPE* t)                \
 void SongSelection::set(const TYPE* t, bool selected) \
 { if (selected) ARRAY.add(t); else ARRAY.erase(t); }  \
 bool SongSelection::has(const TYPE* t) const          \
-{ return ARRAY.contains(t); }
+{ return ARRAY.contains(t); }                         \
+void SongSelection::click(const TYPE* t, bool control)  \
+{ if (control){ set(t, !has(t)); }else{ if (!has(t)){ clear_data(); add(t); } } }
+
 
 
 IMPLEMENT_FUNC(Track, tracks)

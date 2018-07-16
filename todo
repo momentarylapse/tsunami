@@ -135,3 +135,9 @@ J Gaussian noise
 * new signal chain file format
 * module auto x/y
 J AudioSource into buffer
+
+== midi ed ==
+
+J delete with empty range
+* selection rect with correct y range...
+* move selection

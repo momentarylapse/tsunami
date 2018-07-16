@@ -188,16 +188,9 @@ void ViewModeMidi::onLeftButtonDown()
 	}
 
 	if (hover->type == Selection::Type::MIDI_NOTE){
-		if (win->getKey(hui::KEY_CONTROL)){
-			view->sel.set(hover->note, !view->sel.has(hover->note));
-		}else{
-			if (!view->sel.has(hover->note)){
-				view->sel.clear_data();
-				view->sel.add(hover->note);
-			}
-		}
-		// start moving
-		moving = true;
+		view->sel.click(hover->note, win->getKey(hui::KEY_CONTROL));
+
+		dnd_start_soon(view->sel);
 	}else if (hover->type == Selection::Type::CLEF_POSITION){
 		/*if (creation_mode != CreationMode::SELECT){
 			view->msp.stop();
@@ -234,22 +227,16 @@ void ViewModeMidi::onLeftButtonUp()
 			preview_source->end();
 		}
 	}
-	moving = false;
+
+	if (moving){
+		moving = false;
+	}
 }
 
 void ViewModeMidi::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
 	auto e = hui::GetEvent();
-
-	// drag & drop
-	if (moving){
-		/**hover = getHover();
-		if ((hover->type == Selection::Type::MIDI_NOTE) and (hover->track == view->cur_track)){
-			hover->track->deleteMidiNote(hover->index);
-			hover->clear();
-		}*/
-	}
 
 	if (hover->type == Selection::Type::MIDI_PITCH){
 		// creating notes

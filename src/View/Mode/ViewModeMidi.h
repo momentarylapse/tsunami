@@ -81,6 +81,8 @@ public:
 	float scroll_offset;
 
 	bool moving;
+	Array<int> pre_moving_offsets;
+	int mouse_pre_moving_pos;
 	int string_no;
 	int octave;
 };

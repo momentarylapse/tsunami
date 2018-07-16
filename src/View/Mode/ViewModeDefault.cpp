@@ -11,7 +11,7 @@
 #include "../SideBar/SideBar.h"
 #include "../../TsunamiWindow.h"
 #include "../../Device/OutputStream.h"
-#include "../../Action/Track/Sample/ActionTrackMoveSample.h"
+#include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Data/Rhythm/Bar.h"
@@ -22,10 +22,12 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 {
 	cur_action = NULL;
 	moving_track = NULL;
+	dnd_selection = new SongSelection;
 }
 
 ViewModeDefault::~ViewModeDefault()
 {
+	delete dnd_selection;
 }
 
 
@@ -80,19 +82,30 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
 		hover->vlayer->setSolo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
-		cur_action = new ActionTrackMoveSample(view->song, view->sel);
+		dnd_start_soon(view->sel);
 	}else if (hover->type == Selection::Type::TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::MARKER){
 	}
 }
 
+void ViewModeDefault::dnd_start_soon(SongSelection &sel)
+{
+	*dnd_selection = sel;
+	dnd_pos0 = view->hover.pos;
+	cur_action = new ActionSongMoveSelection(view->song, sel);
+}
+
+void ViewModeDefault::dnd_stop()
+{
+	song->execute(cur_action);
+	cur_action = NULL;
+}
+
 void ViewModeDefault::onLeftButtonUp()
 {
-	if (cur_action){
-		song->execute(cur_action);
-		cur_action = NULL;
-	}
+	if (cur_action)
+		dnd_stop();
 
 	if (moving_track){
 		int target = getTrackMoveTarget(false);
@@ -220,11 +233,18 @@ void ViewModeDefault::onMouseMove()
 		view->renderer->seek(hover->pos);
 		_force_redraw_ = true;
 	}else if (hover->type == Selection::Type::SAMPLE){
-		view->applyBarriers(hover->pos);
+		/*view->applyBarriers(hover->pos);
 		int dpos = (float)hover->pos - hover->sample_offset - hover->sample->pos;
 		if (cur_action)
 			cur_action->set_param_and_notify(view->song, dpos);
+		_force_redraw_ = true;*/
+	}
+
+	if (cur_action){
+		int dpos = (float)hover->pos - dnd_pos0;
+		cur_action->set_param_and_notify(view->song, dpos);
 		_force_redraw_ = true;
+
 	}
 
 	if (_force_redraw_)
@@ -285,7 +305,12 @@ void ViewModeDefault::onKeyDown(int k)
 			playback_seek_relative(view, 5);
 		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
 			playback_seek_relative(view, -5);
+	}
 
+	// action
+	if (k == hui::KEY_ESCAPE){
+		if (cur_action)
+			dnd_stop();
 	}
 
 	view->updateMenu();
@@ -485,7 +510,10 @@ void ViewModeDefault::setBarriers(Selection &s)
 
 	int dpos = 0;
 	if (s.type == s.Type::SAMPLE)
-		dpos = s.sample_offset;
+		dpos = s.sample->pos;
+	// FIXME...
+	if (s.type == s.Type::MIDI_NOTE)
+		dpos = s.note->range.offset;
 
 	for (Track *t: song->tracks){
 		// add subs

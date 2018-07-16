@@ -35,12 +35,9 @@ void ActionSongDeleteSelection::build(Data *d)
 				addSubAction(new ActionTrackDeleteMarker(t, i), d);
 
 
-		if (!sel.has(t) or sel.range.empty())
-			continue;
-
 		for (TrackLayer *l: t->layers){
 			// buffer boxes
-			if (sel.has(l))
+			if (sel.has(l) and !sel.range.empty())
 				DeleteBuffersFromTrackLayer(s, t, l, sel);
 
 			// midi

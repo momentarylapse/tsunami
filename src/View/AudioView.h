@@ -123,7 +123,7 @@ public:
 	bool hide_selection;
 
 
-	void applyBarriers(int &pos);
+	void snap_to_grid(int &pos);
 
 	void _cdecl unselectAllSamples();
 

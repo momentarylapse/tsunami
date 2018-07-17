@@ -36,8 +36,6 @@ public:
 	Range range;
 	int y0;
 	int y1;
-	int sample_offset;
-	Array<int> barrier;
 	int pitch;
 	int clef_position, modifier;
 	int index;

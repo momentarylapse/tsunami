@@ -46,7 +46,6 @@ void Selection::clear()
 	pos = 0;
 	range = Range::EMPTY;
 	y0 = y1 = 0;
-	sample_offset = 0;
 	pitch = -1;
 	clef_position = -1;
 	modifier = Modifier::UNKNOWN;

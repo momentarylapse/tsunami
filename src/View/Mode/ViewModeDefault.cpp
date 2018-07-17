@@ -23,7 +23,8 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 	cur_action = NULL;
 	moving_track = NULL;
 	dnd_selection = new SongSelection;
-	dnd_pos0 = 0;
+	dnd_ref_pos = 0;
+	dnd_mouse_pos0 = 0;
 }
 
 ViewModeDefault::~ViewModeDefault()
@@ -39,7 +40,7 @@ void ViewModeDefault::onLeftButtonDown()
 
 	setBarriers(*hover);
 
-	view->applyBarriers(hover->pos);
+	view->snap_to_grid(hover->pos);
 
 	// selection:
 	//   start after lb down and moving
@@ -91,10 +92,22 @@ void ViewModeDefault::onLeftButtonDown()
 	}
 }
 
+int hover_reference_pos(Selection &s)
+{
+	if (s.marker)
+		return s.marker->range.offset;
+	if (s.note)
+		return s.note->range.offset;
+	if (s.sample)
+		return s.sample->pos;
+	return s.pos;
+}
+
 void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
 {
 	*dnd_selection = sel;
-	dnd_pos0 = view->hover.pos;
+	dnd_mouse_pos0 = view->hover.pos;
+	dnd_ref_pos = hover_reference_pos(view->hover);
 	cur_action = new ActionSongMoveSelection(view->song, sel);
 	setBarriers(*hover);
 }
@@ -149,8 +162,7 @@ void ViewModeDefault::onRightButtonDown()
 	// click outside sel.range -> select new position
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
-			setBarriers(*hover);
-			view->applyBarriers(hover->pos);
+			view->snap_to_grid(hover->pos);
 			setCursorPos(hover->pos, track_hover_sel);
 		}
 	}
@@ -244,7 +256,9 @@ void ViewModeDefault::onMouseMove()
 	}
 
 	if (cur_action){
-		int dpos = (float)hover->pos - dnd_pos0;
+		int p = hover->pos + (dnd_ref_pos - dnd_mouse_pos0);
+		view->snap_to_grid(p);
+		int dpos = p - dnd_mouse_pos0 - (dnd_ref_pos - dnd_mouse_pos0);
 		cur_action->set_param_and_notify(view->song, dpos);
 		_force_redraw_ = true;
 
@@ -505,39 +519,6 @@ void ViewModeDefault::drawPost(Painter *c)
 		drawCursorHover(this, c, _("toggle solo"));
 }
 
-void ViewModeDefault::setBarriers(Selection &s)
-{
-	s.barrier.clear();
-	if (s.type == s.Type::NONE)
-		return;
-
-	int dpos = 0;
-	if (s.type == s.Type::SAMPLE)
-		dpos = s.sample->pos;
-	// FIXME...
-	if (s.type == s.Type::MIDI_NOTE)
-		dpos = s.note->range.offset;
-
-	for (Track *t: song->tracks){
-		// add subs
-		for (SampleRef *sam: t->samples){
-			s.barrier.add(sam->pos + dpos);
-		}
-
-		// time bar...
-		Array<Beat> beats = song->bars.get_beats(cam->range(), true);
-		for (Beat &b: beats)
-			s.barrier.add(b.range.offset);
-	}
-
-	// selection marker
-	if (!view->sel.range.empty()){
-		s.barrier.add(view->sel.range.start());
-		if (view->msp.dist < 0)
-			s.barrier.add(view->sel.range.end());
-	}
-}
-
 Selection ViewModeDefault::getHoverBasic(bool editable)
 {
 	Selection s;
@@ -672,7 +653,6 @@ Selection ViewModeDefault::getHover()
 			if (offset >= 0){
 				s.sample = ss;
 				s.type = Selection::Type::SAMPLE;
-				s.sample_offset = offset;
 				return s;
 			}
 		}

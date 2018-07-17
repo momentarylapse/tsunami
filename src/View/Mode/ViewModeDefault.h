@@ -51,14 +51,13 @@ public:
 	Selection getHover() override;
 	Selection getHoverBasic(bool editable);
 
-	void setBarriers(Selection &s) override;
-
 	int getTrackMoveTarget(bool visual);
 
 	// drag and drop
 	ActionSongMoveSelection *cur_action;
 	SongSelection *dnd_selection;
-	int dnd_pos0;
+	int dnd_ref_pos;
+	int dnd_mouse_pos0;
 	void dnd_start_soon(const SongSelection &sel);
 	void dnd_start();
 	void dnd_stop();

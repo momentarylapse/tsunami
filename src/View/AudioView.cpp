@@ -409,20 +409,28 @@ Range AudioView::getPlaybackSelection(bool for_recording)
 	return sel.range;
 }
 
-void AudioView::applyBarriers(int &pos)
+void AudioView::snap_to_grid(int &pos)
 {
 	int dmin = BARRIER_DIST;
 	bool found = false;
 	int new_pos;
-	for (int b: hover.barrier){
-		int dist = fabs(cam.sample2screen(b) - cam.sample2screen(pos));
+
+	int sub_beats = 1;
+	if (mode == mode_midi)
+		sub_beats = mode_midi->beat_partition;
+
+	// time bar...
+	Array<Beat> beats = song->bars.get_beats(cam.range(), true, true, sub_beats);
+	for (Beat &b: beats){
+		int dist = fabs(cam.sample2screen(b.range.offset) - cam.sample2screen(pos));
 		if (dist < dmin){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
-			new_pos = b;
+			new_pos = b.range.offset;
 			found = true;
 			dmin = dist;
 		}
 	}
+
 	if (found)
 		pos = new_pos;
 }
@@ -435,7 +443,7 @@ void AudioView::onMouseMove()
 
 	if (selection_mode != SelectionMode::NONE){
 
-		applyBarriers(hover.pos);
+		snap_to_grid(hover.pos);
 		hover.range.set_end(hover.pos);
 		hover.y1 = my;
 		if (win->getKey(hui::KEY_CONTROL))

@@ -182,7 +182,7 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_time_track->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::Type::LAYER and !hover->layer->is_main) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::LAYER_HEADER)){
+	}else if ((hover->type == Selection::Type::LAYER and !hover->layer->is_main) or (hover->type == Selection::Type::LAYER_HEADER)){
 		view->menu_layer->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);

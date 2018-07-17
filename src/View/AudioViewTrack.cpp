@@ -103,14 +103,24 @@ class SymbolRenderer
 	}
 public:
 
-	static void draw(Painter *p, float x, float y, float size, const string &s)
+	static void draw(Painter *p, float x, float y, float size, const string &s, int align = 1)
 	{
 #if 1
 		p->setFontSize(size);
-		p->drawStr(x, y, s);
+		float dx = 0;
+		if (align == 0)
+			dx = - p->getStrWidth(s) / 2;
+		if (align == -1)
+			dx = - p->getStrWidth(s);
+		p->drawStr(x + dx, y, s);
 #else
 		Symbol *sym = get_symbol(size, s);
-		p->drawImage(x, y, sym->im);
+		float dx = 0;
+		if (align == 0)
+			dx = - sym->size / 2;
+		if (align == -1)
+			dx = - sym->size;
+		p->drawImage(x + dx, y, sym->im);
 #endif
 	}
 };
@@ -555,6 +565,32 @@ int AudioViewLayer::y2clef_linear(float y, int &mod)
 	return clef.pitch_to_position(pitch, view->midi_scale, mod);
 }
 
+void get_col(color &col, color &col_shadow, const MidiNote *n, AudioViewLayer::MidiNoteState state, AudioView *view)
+{
+
+	col = ColorInterpolate(AudioViewLayer::getPitchColor(n->pitch), view->colors.text, 0.2f);
+	if (state & AudioViewLayer::STATE_HOVER){
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	}else if (state & AudioViewLayer::STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
+	}
+	col_shadow = ColorInterpolate(col, view->colors.background_track, 0.3f);
+}
+
+void AudioViewLayer::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r)
+{
+	if (state & AudioViewLayer::STATE_SELECTED){
+		color col1 = view->colors.selection;
+		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	color col, col_shadow;
+	get_col(col, col_shadow, n, state, view);
+
+	draw_simple_note(c, x1, x2, y, r, 0, col, col_shadow, false);
+
+}
+
 
 void AudioViewLayer::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
 {
@@ -567,19 +603,7 @@ void AudioViewLayer::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift
 	n.y = y;
 	float r = max((y2 - y1) / 2.3f, 2.0f);
 
-	if (state & AudioViewLayer::STATE_SELECTED){
-		color col1 = view->colors.selection;
-		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
-	}
-
-	color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.2f);
-	if (state & AudioViewLayer::STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state & AudioViewLayer::STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}
-
-	AudioViewLayer::draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
+	draw_complex_note(c, &n, state, x1, x2, y, r);
 }
 
 inline AudioViewLayer::MidiNoteState note_state(MidiNote *n, bool as_reference, AudioView *view)
@@ -611,11 +635,11 @@ void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool
 
 void AudioViewLayer::draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
 {
-	x1 += r/2;
+	//x1 += r;
 	// "shadow" to indicate length
-	if (x2 - x1 > r*2){
+	if (x2 - x1 > r*1.5f){
 		c->setColor(col_shadow);
-		c->drawRect(x1, y - r - rx, x2 - x1 + rx, r*2 + rx*2);
+		c->drawRect(x1, y - r*0.7f - rx, x2 - x1 + rx, r*2*0.7f + rx*2);
 	}
 
 	// the note circle
@@ -661,24 +685,12 @@ void AudioViewLayer::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 	float y = string_to_screen(p);
 	n->y = y;
 
-	if (state & STATE_SELECTED){
-		color col1 = view->colors.selection;
-		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
-	}
-
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.high_contrast_a, 0.2f);
-	if (state & STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state & STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}
-
-	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
+	draw_complex_note(c, n, state, x1, x2, y, r);
 
 	if (x2 - x1 > r/4 and r > 5){
 		float font_size = r * 1.2f;
 		c->setColor(view->colors.high_contrast_b);//text);
-		SymbolRenderer::draw(c, x1 - font_size*0.4f, y - font_size*0.75f, font_size, i2s(n->pitch - layer->track->instrument.string_pitch[n->stringno]));
+		SymbolRenderer::draw(c, x1, y - font_size*0.75f, font_size, i2s(n->pitch - layer->track->instrument.string_pitch[n->stringno]), 0);
 	}
 }
 
@@ -721,7 +733,6 @@ void AudioViewLayer::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 
 	float x1 = view->cam.sample2screen(n->range.offset + shift);
 	float x2 = view->cam.sample2screen(n->range.end() + shift);
-	float x = x1 + r;
 
 	// checked before...
 //	if (n.clef_position < 0)
@@ -735,25 +746,15 @@ void AudioViewLayer::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 	for (int i=10; i<=p; i+=2){
 		c->setColor(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->drawLine(x - clef_dy, y, x + clef_dy, y);
+		c->drawLine(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 	for (int i=-2; i>=p; i-=2){
 		c->setColor(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->drawLine(x - clef_dy, y, x + clef_dy, y);
+		c->drawLine(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 
-	if (state & STATE_SELECTED){
-		color col1 = view->colors.selection;
-		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
-	}
-
-	color col = ColorInterpolate(getPitchColor(n->pitch), view->colors.text, 0.2f);
-	if (state & STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
-	}else if (state & STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
-	}
+	draw_complex_note(c, n, state, x1, x2, y, r);
 
 	if ((n->modifier != Modifier::NONE) and (r >= 3)){
 		c->setColor(view->colors.text);
@@ -761,8 +762,6 @@ void AudioViewLayer::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 		float size = r*2.8f;
 		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.8f , size, modifier_symbol(n->modifier));
 	}
-
-	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
 }
 
 void AudioViewLayer::drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale)

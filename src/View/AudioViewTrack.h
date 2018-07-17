@@ -64,6 +64,7 @@ public:
 	void drawVersionHeader(Painter *c);
 	void draw(Painter *c);
 
+	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
 	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
 	TrackLayer *layer;

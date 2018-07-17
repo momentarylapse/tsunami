@@ -89,6 +89,43 @@ void input_success_callback(pa_stream *s, int success, void *userdata)
 #endif
 
 
+#if HAS_LIB_PORTAUDIO
+
+int InputStreamAudio::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
+                                                    unsigned long frames,
+                                                    const PaStreamCallbackTimeInfo* timeInfo,
+                                                    PaStreamCallbackFlags statusFlags,
+                                                    void *userData)
+{
+	//printf("request %d\n", (int)frames);
+	InputStreamAudio *input = (InputStreamAudio*)userData;
+
+	(void)outputBuffer; /* Prevent unused variable warning. */
+	float *in = (float*) inputBuffer;
+
+
+	if (in){
+		if (input->is_capturing()){
+
+			RingBuffer &buf = input->buffer;
+			AudioBuffer b;
+			buf.writeRef(b, frames);
+			b.deinterleave(in, input->num_channels);
+
+			int done = b.length;
+			if (done < (int)frames){
+				buf.writeRef(b, frames - done);
+				b.deinterleave(&in[input->num_channels * done], input->num_channels);
+			}
+		}
+	}
+	return 0;
+}
+
+#endif
+
+
+
 void InputStreamAudio::SyncData::reset()
 {
 	num_points = 0;
@@ -254,21 +291,29 @@ void InputStreamAudio::_stop()
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
-//	printf("disconnect\n");
-	pa_stream_disconnect(pulse_stream);
-	_pulse_test_error("disconnect");
+	//	printf("disconnect\n");
+		pa_stream_disconnect(pulse_stream);
+		_pulse_test_error("disconnect");
 
-	for (int i=0; i<1000; i++){
-		if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED){
-//			printf("terminated\n");
-			break;
+		for (int i=0; i<1000; i++){
+			if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED){
+	//			printf("terminated\n");
+				break;
+			}
+			hui::Sleep(0.001f);
 		}
-		hui::Sleep(0.001f);
-	}
-//	printf("unref\n");
+	//	printf("unref\n");
 
-	pa_stream_unref(pulse_stream);
-	_pulse_test_error("unref");
+		pa_stream_unref(pulse_stream);
+		_pulse_test_error("unref");
+	}
+#endif
+
+#if HAS_LIB_PORTAUDIO
+	if (portaudio_stream){
+		PaError err = Pa_CloseStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_CloseStream");
+		portaudio_stream = NULL;
 	}
 #endif
 
@@ -294,36 +339,55 @@ bool InputStreamAudio::start()
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
-	pa_sample_spec ss;
-	ss.rate = _sample_rate;
-	ss.channels = 2;
-	ss.format = PA_SAMPLE_FLOAT32LE;
-	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
-	_pulse_test_error("pa_stream_new");
+		pa_sample_spec ss;
+		ss.rate = _sample_rate;
+		ss.channels = 2;
+		ss.format = PA_SAMPLE_FLOAT32LE;
+		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
+		_pulse_test_error("pa_stream_new");
 
 
-	pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
-	//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, NULL);
+		pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
+		//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, NULL);
 
-	pa_buffer_attr attr_in;
-//	attr_in.fragsize = -1;
-	attr_in.fragsize = chunk_size;
-	attr_in.maxlength = -1;
-	attr_in.minreq = -1;
-	attr_in.tlength = -1;
-	attr_in.prebuf = -1;
-	const char *dev = NULL;
-	if (!device->is_default())
-		dev = device->internal_name.c_str();
-	pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
-	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
-	_pulse_test_error("pa_stream_connect_record");
+		pa_buffer_attr attr_in;
+	//	attr_in.fragsize = -1;
+		attr_in.fragsize = chunk_size;
+		attr_in.maxlength = -1;
+		attr_in.minreq = -1;
+		attr_in.tlength = -1;
+		attr_in.prebuf = -1;
+		const char *dev = NULL;
+		if (!device->is_default())
+			dev = device->internal_name.c_str();
+		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
+		_pulse_test_error("pa_stream_connect_record");
 
-	if (!pa_wait_stream_ready(pulse_stream)){
+		if (!pa_wait_stream_ready(pulse_stream)){
 
-		session->e("pa_wait_for_stream_ready");
-		return false;
+			session->e("pa_wait_for_stream_ready");
+			return false;
+		}
 	}
+#endif
+
+#if HAS_LIB_PORTAUDIO
+	if (api == DeviceManager::API_PORTAUDIO){
+		session->i("open def stream");
+
+		/*PaStreamParameters params;
+		params.channelCount = 2;
+		params.sampleFormat = paFloat32;
+		params.device = ...
+		Pa_OpenStream(&_stream, NULL, &params, dev_sample_rate, 256, paNoFlag, &stream_request_callback, this)*/
+
+		PaError err = Pa_OpenDefaultStream(&portaudio_stream, 2, 0, paFloat32, _sample_rate, 256,
+				&portaudio_stream_request_callback, this);
+		_portaudio_test_error(err, "Pa_OpenDefaultStream");
+
+		err = Pa_StartStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_StartStream");
 	}
 #endif
 
@@ -348,6 +412,17 @@ bool InputStreamAudio::_pulse_test_error(const string &msg)
 #endif
 	return false;
 }
+
+#if HAS_LIB_PORTAUDIO
+bool InputStreamAudio::_portaudio_test_error(PaError err, const string &msg)
+{
+	if (err != paNoError){
+		session->e(msg + ": (input): " + Pa_GetErrorText(err));
+		return true;
+	}
+	return false;
+}
+#endif
 
 float InputStreamAudio::get_playback_delay_const()
 {

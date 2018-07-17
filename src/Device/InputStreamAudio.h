@@ -139,6 +139,7 @@ private:
 	                                             const PaStreamCallbackTimeInfo* timeInfo,
 	                                             PaStreamCallbackFlags statusFlags,
 	                                             void *userData);
+	bool _portaudio_test_error(PaError err, const string &msg);
 #endif
 
 public:

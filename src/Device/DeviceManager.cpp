@@ -381,7 +381,7 @@ void DeviceManager::init()
 
 	Session *session = Session::GLOBAL;
 
-	audio_api = select_api(hui::Config.getStr("AudioApi", "pulseaudio"), 1);
+	audio_api = select_api(hui::Config.getStr("AudioApi", "porteaudio"), 1);
 	session->i(_("audio library selected: ") + api_descriptions[audio_api].name);
 	midi_api = select_api(hui::Config.getStr("MidiApi", "alsa"), 2);
 	session->i(_("midi library selected: ") + api_descriptions[midi_api].name);

@@ -316,15 +316,27 @@ void OutputStream::_create_dev()
 	if (api == DeviceManager::API_PORTAUDIO){
 		session->i("open def stream");
 
-		/*PaStreamParameters params;
-		params.channelCount = 2;
-		params.sampleFormat = paFloat32;
-		params.device = ...
-		Pa_OpenStream(&_stream, NULL, &params, dev_sample_rate, 256, paNoFlag, &stream_request_callback, this)*/
 
-		PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, 256,
-				&portaudio_stream_request_callback, this);
-		_portaudio_test_error(err, "Pa_OpenDefaultStream");
+		if (device->is_default()){
+			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, 256,
+					&portaudio_stream_request_callback, this);
+			_portaudio_test_error(err, "Pa_OpenDefaultStream");
+		}else{
+			PaStreamParameters params;
+			params.channelCount = 2;
+			params.sampleFormat = paFloat32;
+			params.device = Pa_GetDefaultOutputDevice();
+
+			int count = Pa_GetDeviceCount();
+			for (int i=0; i<count; i++){
+				const PaDeviceInfo* dev = Pa_GetDeviceInfo(i);
+				if (string(dev->name) == device->internal_name)
+					params.device = i;
+			}
+			PaError err = Pa_OpenStream(&portaudio_stream, NULL, &params, dev_sample_rate, 256,
+					paNoFlag, &portaudio_stream_request_callback, this);
+			_portaudio_test_error(err, "Pa_OpenStream");
+		}
 	}
 #endif
 }

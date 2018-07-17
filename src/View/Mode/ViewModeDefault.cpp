@@ -23,6 +23,7 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 	cur_action = NULL;
 	moving_track = NULL;
 	dnd_selection = new SongSelection;
+	dnd_pos0 = 0;
 }
 
 ViewModeDefault::~ViewModeDefault()
@@ -83,9 +84,10 @@ void ViewModeDefault::onLeftButtonDown()
 		hover->vlayer->setSolo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
 		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
+	}else if (hover->type == Selection::Type::MARKER){
+		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
 	}else if (hover->type == Selection::Type::TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
-	}else if (hover->type == Selection::Type::MARKER){
 	}
 }
 
@@ -94,6 +96,7 @@ void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
 	*dnd_selection = sel;
 	dnd_pos0 = view->hover.pos;
 	cur_action = new ActionSongMoveSelection(view->song, sel);
+	setBarriers(*hover);
 }
 
 void ViewModeDefault::dnd_stop()

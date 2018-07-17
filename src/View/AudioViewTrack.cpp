@@ -611,20 +611,19 @@ void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool
 
 void AudioViewLayer::draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
 {
-	float x = x1 + r;
-
+	x1 += r/2;
 	// "shadow" to indicate length
 	if (x2 - x1 > r*2){
 		c->setColor(col_shadow);
-		c->drawRect(x, y - r - rx, x2 - x + rx, r*2 + rx*2);
+		c->drawRect(x1, y - r - rx, x2 - x1 + rx, r*2 + rx*2);
 	}
 
 	// the note circle
 	c->setColor(col);
 	if ((x2 - x1 > 6) or force_circle)
-		c->drawCircle(x, y, r+rx);
+		c->drawCircle(x1, y, r+rx);
 	else
-		c->drawRect(x - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
+		c->drawRect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
 }
 
 void AudioViewLayer::drawMidiClefTab(Painter *c)
@@ -677,9 +676,9 @@ void AudioViewLayer::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 	draw_simple_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
 
 	if (x2 - x1 > r/4 and r > 5){
-		float font_size = r * 1.4f;
+		float font_size = r * 1.2f;
 		c->setColor(view->colors.high_contrast_b);//text);
-		SymbolRenderer::draw(c, x1 + font_size*0.2f, y - font_size*0.75f, font_size, i2s(n->pitch - layer->track->instrument.string_pitch[n->stringno]));
+		SymbolRenderer::draw(c, x1 - font_size*0.4f, y - font_size*0.75f, font_size, i2s(n->pitch - layer->track->instrument.string_pitch[n->stringno]));
 	}
 }
 

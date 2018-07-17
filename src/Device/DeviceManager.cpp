@@ -64,12 +64,18 @@ void pa_wait_op(Session *session, pa_operation *op)
 		if (pa_operation_get_state(op) == PA_OPERATION_CANCELLED)
 			break;
 		n ++;
-		if (n > 200)
+		if (n > 1000)
 			break;
 		hui::Sleep(0.005f);
 	}
-	if (pa_operation_get_state(op) != PA_OPERATION_DONE)
-		session->e("pa_wait_op: failed");
+	auto status = pa_operation_get_state(op);
+	if (status != PA_OPERATION_DONE){
+		session->e("pa_wait_op() failed:");
+		if (status == PA_OPERATION_RUNNING)
+			session->e("still running");
+		if (status == PA_OPERATION_CANCELLED)
+			session->e("cancelled");
+	}
 	pa_operation_unref(op);
 	//msg_write(" ok");
 //	printf("-o-");

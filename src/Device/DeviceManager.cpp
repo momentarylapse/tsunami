@@ -171,12 +171,6 @@ DeviceManager::DeviceManager()
 {
 	initialized = false;
 
-	output_devices = str2devs(hui::Config.getStr("Output.Devices", ""), Device::Type::AUDIO_OUTPUT);
-	input_devices = str2devs(hui::Config.getStr("Input.Devices", ""), Device::Type::AUDIO_INPUT);
-	midi_input_devices = str2devs(hui::Config.getStr("MidiInput.Devices", ""), Device::Type::MIDI_INPUT);
-
-	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
-
 	audio_api = -1;
 	midi_api = -1;
 
@@ -188,12 +182,7 @@ DeviceManager::DeviceManager()
 	alsa_midi_handle = NULL;
 #endif
 
-	// system defaults
-	default_devices[Device::Type::AUDIO_OUTPUT] = get_device_create(Device::Type::AUDIO_OUTPUT, ":default:");
-	default_devices[Device::Type::AUDIO_OUTPUT]->channels = 2;
-	default_devices[Device::Type::AUDIO_INPUT] = get_device_create(Device::Type::AUDIO_INPUT, ":default:");
-	default_devices[Device::Type::AUDIO_INPUT]->channels = 2;
-	default_devices[Device::Type::MIDI_INPUT] = get_device_create(Device::Type::MIDI_INPUT, ":default:");
+	dummy_device = new Device(-1, "dummy");
 
 	init();
 
@@ -209,11 +198,13 @@ DeviceManager::~DeviceManager()
 	kill();
 
 	for (Device *d: output_devices)
-		delete(d);
+		delete d;
 	for (Device *d: input_devices)
-		delete(d);
+		delete d;
 	for (Device *d: midi_input_devices)
-		delete(d);
+		delete d;
+
+	delete dummy_device;
 }
 
 void DeviceManager::remove_device(int type, int index)
@@ -234,11 +225,14 @@ void DeviceManager::remove_device(int type, int index)
 
 void DeviceManager::write_config()
 {
+	string audio_api_name = api_descriptions[audio_api].name;
+	string midi_api_name = api_descriptions[midi_api].name;
+
 	//hui::Config.setStr("Output.ChosenDevice", chosen_device);
 	hui::Config.setFloat("Output.Volume", output_volume);
-	hui::Config.setStr("Output.Devices", devs2str(output_devices));
-	hui::Config.setStr("Input.Devices", devs2str(input_devices));
-	hui::Config.setStr("MidiInput.Devices", devs2str(midi_input_devices));
+	hui::Config.setStr("Output.Devices[" + audio_api_name + "]", devs2str(output_devices));
+	hui::Config.setStr("Input.Devices[" + audio_api_name + "]", devs2str(input_devices));
+	hui::Config.setStr("MidiInput.Devices[" + midi_api_name + "]", devs2str(midi_input_devices));
 }
 
 
@@ -261,59 +255,69 @@ void DeviceManager::update_devices()
 	write_config();
 }
 
+
 void DeviceManager::_update_devices_audio_pulse()
 {
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PULSEAUDIO
 
+	// system default
+	auto *def = get_device_create(Device::Type::AUDIO_OUTPUT, "");
+	def->channels = 2;
+	def->default_by_lib = true;
+	def->present = true;
+
 	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pa_sink_info_callback, this);
 	if (!_pulse_test_error(session, "pa_context_get_sink_info_list"))
 		pa_wait_op(session, op);
 
-	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
-
+	// system default
+	def = get_device_create(Device::Type::AUDIO_INPUT, "");
+	def->channels = 2;
+	def->default_by_lib = true;
+	def->present = true;
 
 	op = pa_context_get_source_info_list(pulse_context, pa_source_info_callback, this);
 	if (!_pulse_test_error(session, "pa_context_get_source_info_list"))
 		pa_wait_op(session, op);
 
 
-	default_devices[Device::Type::AUDIO_INPUT]->present = true;
 #endif
 }
+
+#if HAS_LIB_PORTAUDIO
+void _portaudio_add_dev(DeviceManager *dm, int type, int index)
+{
+	const PaDeviceInfo* dev = Pa_GetDeviceInfo(index);
+	int channels = (type == Device::Type::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
+	if (channels > 0){
+		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
+		d->name = dev->name;
+		d->channels = min(channels, 2);
+		d->index_in_lib = index;
+		if (type == Device::Type::AUDIO_OUTPUT)
+			d->default_by_lib = (index == Pa_GetDefaultOutputDevice());
+		else
+			d->default_by_lib = (index == Pa_GetDefaultInputDevice());
+		d->present = true;
+		dm->setDeviceConfig(d);
+	}
+}
+#endif
 
 void DeviceManager::_update_devices_audio_portaudio()
 {
 #if HAS_LIB_PORTAUDIO
-	/*int count = Pa_GetHostApiCount();
-	for (int i=0; i<count; i++){
-		const PaHostApiInfo* api_info = Pa_GetHostApiInfo(i);
-		msg_write(api_info->name);
-		msg_write(api_info->deviceCount);
-	}*/
+
+	_portaudio_add_dev(this, Device::Type::AUDIO_OUTPUT, Pa_GetDefaultOutputDevice());
+	_portaudio_add_dev(this, Device::Type::AUDIO_INPUT, Pa_GetDefaultInputDevice());
+
 	int count = Pa_GetDeviceCount();
 	for (int i=0; i<count; i++){
-		const PaDeviceInfo* dev = Pa_GetDeviceInfo(i);
-		if (dev->maxOutputChannels > 0){
-			Device *d = get_device_create(Device::Type::AUDIO_OUTPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
-			d->name = dev->name;
-			d->channels = min(dev->maxOutputChannels, 2);
-			d->index_in_lib = i;
-			d->present = true;
-			setDeviceConfig(d);
-		}
-		if (dev->maxInputChannels > 0){
-			Device *d = get_device_create(Device::Type::AUDIO_INPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
-			d->name = dev->name;
-			d->channels = min(dev->maxInputChannels, 2);
-			d->index_in_lib = i;
-			d->present = true;
-			setDeviceConfig(d);
-		}
+		_portaudio_add_dev(this, Device::Type::AUDIO_OUTPUT, i);
+		_portaudio_add_dev(this, Device::Type::AUDIO_INPUT, i);
 	}
-	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
-	default_devices[Device::Type::AUDIO_INPUT]->present = true;
 #endif
 }
 
@@ -328,6 +332,11 @@ void DeviceManager::_update_devices_midi_alsa()
 		d->present_old = d->present;
 		d->present = false;
 	}
+
+	// default
+	auto *def = get_device_create(Device::Type::MIDI_INPUT, "");
+	def->default_by_lib = true;
+	def->present = true;
 
 	snd_seq_client_info_t *cinfo;
 	snd_seq_port_info_t *pinfo;
@@ -350,8 +359,6 @@ void DeviceManager::_update_devices_midi_alsa()
 			d->present = true;
 		}
 	}
-
-	default_devices[Device::Type::MIDI_INPUT]->present = true;
 
 
 	bool changed = false;
@@ -386,12 +393,22 @@ void DeviceManager::init()
 	Session *session = Session::GLOBAL;
 
 	audio_api = select_api(hui::Config.getStr("AudioApi", "porteaudio"), 1);
-	session->i(_("audio library selected: ") + api_descriptions[audio_api].name);
+	string audio_api_name = api_descriptions[audio_api].name;
+	session->i(_("audio library selected: ") + audio_api_name);
 	midi_api = select_api(hui::Config.getStr("MidiApi", "alsa"), 2);
-	session->i(_("midi library selected: ") + api_descriptions[midi_api].name);
+	string midi_api_name = api_descriptions[midi_api].name;
+	session->i(_("midi library selected: ") + midi_api_name);
 
-	hui::Config.setStr("AudioApi", api_descriptions[audio_api].name);
-	hui::Config.setStr("MidiApi", api_descriptions[midi_api].name);
+	hui::Config.setStr("AudioApi", audio_api_name);
+	hui::Config.setStr("MidiApi", midi_api_name);
+
+
+
+	output_devices = str2devs(hui::Config.getStr("Output.Devices[" + audio_api_name + "]", ""), Device::Type::AUDIO_OUTPUT);
+	input_devices = str2devs(hui::Config.getStr("Input.Devices[" + audio_api_name + "]", ""), Device::Type::AUDIO_INPUT);
+	midi_input_devices = str2devs(hui::Config.getStr("MidiInput.Devices[" + midi_api_name + "]", ""), Device::Type::MIDI_INPUT);
+
+	output_volume = hui::Config.getFloat("Output.Volume", 1.0f);
 
 	// audio
 	if (audio_api == API_PULSE)
@@ -599,7 +616,7 @@ Device *DeviceManager::chooseDevice(int type)
 			return d;
 
 	// unusable ...but not NULL
-	return default_devices[type];
+	return dummy_device;
 }
 
 void DeviceManager::setDeviceConfig(Device *d)

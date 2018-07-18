@@ -18,7 +18,8 @@ Device::Device()
 	visible = true;
 	latency = 0;
 	client = port = -1;
-	index_in_lib = 0;
+	index_in_lib = -1;
+	default_by_lib = false;
 }
 
 Device::Device(int _type, const string &_name, const string &_internal_name, int _channels)
@@ -32,7 +33,8 @@ Device::Device(int _type, const string &_name, const string &_internal_name, int
 	visible = true;
 	latency = 0;
 	client = port = -1;
-	index_in_lib = 0;
+	index_in_lib = -1;
+	default_by_lib = false;
 }
 
 Device::Device(int _type, const string &s)
@@ -45,7 +47,9 @@ Device::Device(int _type, const string &s)
 	visible = true;
 	latency = 0;
 	client = port = -1;
-	index_in_lib = 0;
+	index_in_lib = -1;
+	default_by_lib = false;
+
 	if (c.num >= 5){
 		name = c[0].replace("${COMMA}", ",").replace("${PIPE}", "|");
 		internal_name = c[1].replace("${COMMA}", ",").replace("${PIPE}", "|");
@@ -58,19 +62,21 @@ Device::Device(int _type, const string &s)
 string Device::get_name() const
 {
 	if (is_default()){
-		if (type == Type::AUDIO_OUTPUT)
+		/*if (type == Type::AUDIO_OUTPUT)
 			return _("        - Default -");
 		if (type == Type::AUDIO_INPUT)
-			return _("        - Default -");
+			return _("        - Default -");*/
 		if (type == Type::MIDI_INPUT)
 			return _("        - don't connect -");
+		return name + " (default)";
 	}
 	return name;
 }
 
 bool Device::is_default() const
 {
-	return (internal_name == ":default:");
+	return default_by_lib;
+	//return (internal_name == ":default:");
 }
 
 string Device::to_config()

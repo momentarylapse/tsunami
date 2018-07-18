@@ -39,6 +39,7 @@ public:
 	float latency;
 	int client, port;
 	int index_in_lib;
+	bool default_by_lib;
 
 	bool present_old;
 };

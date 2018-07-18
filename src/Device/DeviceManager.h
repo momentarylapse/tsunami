@@ -112,7 +112,7 @@ public:
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;
 	Array<Device*> midi_input_devices;
-	Device* default_devices[4];
+	Device *dummy_device;
 
 	void write_config();
 

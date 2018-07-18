@@ -26,11 +26,15 @@ GdkGLContext *gtk_gl_context = NULL;
 
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	reinterpret_cast<ControlDrawingArea*>(user_data)->cur_cairo = cr;
+	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
+
+	std::lock_guard<std::mutex> lock(da->mutex);
+
+	da->cur_cairo = cr;
 	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
-	reinterpret_cast<ControlDrawingArea*>(user_data)->redraw_area.clear();
-	reinterpret_cast<Control*>(user_data)->notify("hui:draw");
-	//msg_write("/draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
+	da->redraw_area.clear();
+	da->notify("hui:draw");
+	//msg_write("/draw " + da->id);
 	return false;
 }
 
@@ -323,6 +327,8 @@ static bool __drawing_area_queue_redraw(void *p)
 
 void ControlDrawingArea::redraw()
 {
+	std::lock_guard<std::mutex> lock(mutex);
+
 	if (is_opengl){
 		gtk_widget_queue_draw(widget);
 		return;
@@ -353,6 +359,8 @@ void ControlDrawingArea::redraw()
 
 void ControlDrawingArea::redraw(const rect &r)
 {
+	std::lock_guard<std::mutex> lock(mutex);
+
 	if (is_opengl){
 		gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
 		return;

@@ -6,6 +6,7 @@
  */
 
 #include "hui.h"
+#include <mutex>
 
 namespace hui
 {
@@ -14,6 +15,9 @@ namespace hui
 
 Callback _idle_function_;
 Callback _error_function_;
+
+// the Runner[] list needs protection!
+static std::mutex runner_mutex;
 
 #ifdef HUI_API_GTK
 	int idle_id = -1;
@@ -95,6 +99,7 @@ void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*funct
 
 int RunLater(float time, const Callback &c)
 {
+	std::lock_guard<std::mutex> lock (runner_mutex);
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");
 		return 0;
@@ -109,6 +114,7 @@ int RunLater(float time, const Callback &c)
 
 int RunRepeated(float time, const Callback &c)
 {
+	std::lock_guard<std::mutex> lock (runner_mutex);
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunRepeated");
 		return 0;
@@ -123,6 +129,7 @@ int RunRepeated(float time, const Callback &c)
 
 void CancelRunner(int id)
 {
+	std::lock_guard<std::mutex> lock (runner_mutex);
 #ifdef HUI_API_GTK
 	g_source_remove(id);
 	_hui_runner_delete_(id);

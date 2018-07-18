@@ -7,6 +7,7 @@
 #define THREAD_H_INCLUDED
 
 #include "../base/base.h"
+#include <atomic>
 
 
 struct ThreadInternal;
@@ -27,7 +28,7 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	bool running;
+	std::atomic<bool> running;
 	ThreadInternal *internal;
 
 

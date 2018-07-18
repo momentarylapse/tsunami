@@ -17,6 +17,7 @@
 #include "ViewPort.h"
 #include "Selection.h"
 #include "ColorScheme.h"
+#include <atomic>
 
 class DeviceManager;
 class OutputStream;
@@ -248,7 +249,7 @@ public:
 	void updateBufferZoom();
 
 	PeakThread *peak_thread;
-	bool is_updating_peaks;
+	std::atomic<bool> is_updating_peaks;
 
 	struct ImageData
 	{

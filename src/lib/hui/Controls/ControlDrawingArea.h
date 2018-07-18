@@ -9,6 +9,7 @@
 #define CONTROLDRAWINGAREA_H_
 
 #include "Control.h"
+#include <mutex>
 
 class rect;
 
@@ -29,6 +30,8 @@ public:
 
 	Array<rect> redraw_area;
 	Timer *delay_timer;
+
+	std::mutex mutex;
 
 	void redraw();
 	void redraw(const rect &r);

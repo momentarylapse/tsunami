@@ -15,6 +15,7 @@
 #include "../Data/Song.h"
 #include "../Data/Audio/RingBuffer.h"
 #include "../Module/Module.h"
+#include <atomic>
 
 class AudioPort;
 class DeviceManager;
@@ -90,11 +91,11 @@ private:
 	AudioPort *source;
 	RingBuffer ring_buf;
 
-	bool keep_thread_running;
-	bool reading;
-	bool read_more;
-	bool read_end_of_stream;
-	bool played_end_of_stream;
+	std::atomic<bool> keep_thread_running;
+	std::atomic<bool> reading;
+	std::atomic<bool> read_more;
+	std::atomic<bool> read_end_of_stream;
+	std::atomic<bool> played_end_of_stream;
 
 	int data_samples;
 

@@ -314,26 +314,20 @@ void OutputStream::_create_dev()
 
 #if HAS_LIB_PORTAUDIO
 	if (api == DeviceManager::API_PORTAUDIO){
-		session->i("open def stream");
 
 
 		if (device->is_default()){
-			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, 256,
+			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, paFramesPerBufferUnspecified,//256,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
 		}else{
 			PaStreamParameters params;
 			params.channelCount = 2;
 			params.sampleFormat = paFloat32;
-			params.device = Pa_GetDefaultOutputDevice();
-
-			int count = Pa_GetDeviceCount();
-			for (int i=0; i<count; i++){
-				const PaDeviceInfo* dev = Pa_GetDeviceInfo(i);
-				if (string(dev->name) == device->internal_name)
-					params.device = i;
-			}
-			PaError err = Pa_OpenStream(&portaudio_stream, NULL, &params, dev_sample_rate, 256,
+			params.device = device->index_in_lib;
+			params.hostApiSpecificStreamInfo = NULL;
+			params.suggestedLatency = 0;
+			PaError err = Pa_OpenStream(&portaudio_stream, NULL, &params, dev_sample_rate, paFramesPerBufferUnspecified,//256,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}
@@ -396,6 +390,12 @@ void OutputStream::_pause()
 		pa_wait_op(session, op);
 	}
 #endif
+#if HAS_LIB_PORTAUDIO
+	if (portaudio_stream){
+		PaError err = Pa_StopStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_StopStream");
+	}
+#endif
 //	printf("ok\n");
 
 	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
@@ -419,6 +419,12 @@ void OutputStream::_unpause()
 		pa_operation *op = pa_stream_cork(pulse_stream, false, NULL, NULL);
 		_pulse_test_error("pa_stream_cork");
 		pa_wait_op(session, op);
+	}
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (portaudio_stream){
+		PaError err = Pa_StartStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_StartStream");
 	}
 #endif
 //	printf("ok\n");

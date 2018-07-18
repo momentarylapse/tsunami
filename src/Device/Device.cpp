@@ -18,6 +18,7 @@ Device::Device()
 	visible = true;
 	latency = 0;
 	client = port = -1;
+	index_in_lib = 0;
 }
 
 Device::Device(int _type, const string &_name, const string &_internal_name, int _channels)
@@ -31,6 +32,7 @@ Device::Device(int _type, const string &_name, const string &_internal_name, int
 	visible = true;
 	latency = 0;
 	client = port = -1;
+	index_in_lib = 0;
 }
 
 Device::Device(int _type, const string &s)
@@ -43,6 +45,7 @@ Device::Device(int _type, const string &s)
 	visible = true;
 	latency = 0;
 	client = port = -1;
+	index_in_lib = 0;
 	if (c.num >= 5){
 		name = c[0].replace("${COMMA}", ",").replace("${PIPE}", "|");
 		internal_name = c[1].replace("${COMMA}", ",").replace("${PIPE}", "|");

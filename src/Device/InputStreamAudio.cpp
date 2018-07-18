@@ -384,14 +384,9 @@ bool InputStreamAudio::start()
 			PaStreamParameters params;
 			params.channelCount = 2;
 			params.sampleFormat = paFloat32;
-			params.device = Pa_GetDefaultInputDevice();
-
-			int count = Pa_GetDeviceCount();
-			for (int i=0; i<count; i++){
-				const PaDeviceInfo* dev = Pa_GetDeviceInfo(i);
-				if (string(dev->name) == device->internal_name)
-					params.device = i;
-			}
+			params.device = device->index_in_lib;
+			params.hostApiSpecificStreamInfo = NULL;
+			params.suggestedLatency = 0;
 			PaError err = Pa_OpenStream(&portaudio_stream, &params, NULL, _sample_rate, 256,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");

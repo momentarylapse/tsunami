@@ -299,6 +299,7 @@ void DeviceManager::_update_devices_audio_portaudio()
 			Device *d = get_device_create(Device::Type::AUDIO_OUTPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
 			d->name = dev->name;
 			d->channels = min(dev->maxOutputChannels, 2);
+			d->index_in_lib = i;
 			d->present = true;
 			setDeviceConfig(d);
 		}
@@ -306,10 +307,13 @@ void DeviceManager::_update_devices_audio_portaudio()
 			Device *d = get_device_create(Device::Type::AUDIO_INPUT, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
 			d->name = dev->name;
 			d->channels = min(dev->maxInputChannels, 2);
+			d->index_in_lib = i;
 			d->present = true;
 			setDeviceConfig(d);
 		}
 	}
+	default_devices[Device::Type::AUDIO_OUTPUT]->present = true;
+	default_devices[Device::Type::AUDIO_INPUT]->present = true;
 #endif
 }
 

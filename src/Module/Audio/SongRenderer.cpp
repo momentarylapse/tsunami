@@ -76,6 +76,24 @@ int get_first_usable_layer(Track *t, Set<TrackLayer*> &allowed)
 	return -1;
 }
 
+static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
+{
+	// subs
+	for (SampleRef *s: l->samples){
+		if (s->muted)
+			continue;
+
+		Range intersect_range;
+		int bpos;
+		if (!intersect_sub(s, range_cur, intersect_range, bpos))
+			continue;
+
+		bpos = s->pos - range_cur.start();
+		buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
+	}
+
+}
+
 void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
 	// any un-muted layer?
@@ -88,6 +106,7 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 		// first (un-muted) layer
 		t->layers[i0]->readBuffers(buf, range_cur, false);
 		// TODO: allow_ref if no other layers + no fx
+		add_samples(t->layers[i0], range_cur, buf);
 
 		// other tracks
 		AudioBuffer tbuf;
@@ -97,22 +116,9 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 			if (t->layers[i]->muted)
 				continue;
 			t->layers[i]->readBuffers(tbuf, range_cur, true);
+			add_samples(t->layers[i], range_cur, tbuf);
 			buf.add(tbuf, 0, 1.0f, 0.0f);
 		}
-	}
-
-	// subs
-	for (SampleRef *s: t->samples){
-		if (s->muted)
-			continue;
-
-		Range intersect_range;
-		int bpos;
-		if (!intersect_sub(s, range_cur, intersect_range, bpos))
-			continue;
-
-		bpos = s->pos - range_cur.start();
-		buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
 	}
 }
 
@@ -334,9 +340,10 @@ void SongRenderer::build_data()
 		//midi.add(t, t->midi);
 		if (t->type == t->Type::MIDI){
 			MidiNoteBuffer _midi = t->layers[0]->midi;
-			for (auto c: t->samples)
-				if (c->type() == t->Type::MIDI)
-					_midi.append(*c->midi, c->pos);
+			for (TrackLayer *l: t->layers)
+				for (auto c: l->samples)
+					if (c->type() == t->Type::MIDI)
+					_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
 			for (MidiEffect *fx: t->midi_fx){
 				fx->prepare();
 				fx->process(&_midi);

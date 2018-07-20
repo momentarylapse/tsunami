@@ -18,7 +18,7 @@ class ActionTrackDelete : public ActionGroup
 public:
 	ActionTrackDelete(Track *track);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	Track *track;
 };

@@ -460,11 +460,11 @@ void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
 	// audio buffer
 	l->drawTrackBuffers(c, view->cam.pos);
 
-	if (l->layer->is_main){
+	// samples
+	for (SampleRef *s: l->layer->samples)
+		l->drawSample(c, s);
 
-		// samples
-		for (SampleRef *s: l->layer->track->samples)
-			l->drawSample(c, s);
+	if (l->layer->is_main){
 
 		// marker
 		l->marker_areas.resize(t->markers.num);
@@ -668,12 +668,9 @@ Selection ViewModeDefault::getHover()
 				}
 			}
 		}
-	}
-
-	if (s.track){
 
 		// TODO: prefer selected samples
-		for (SampleRef *ss: s.track->samples){
+		for (SampleRef *ss: s.layer->samples){
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;
@@ -681,6 +678,9 @@ Selection ViewModeDefault::getHover()
 				return s;
 			}
 		}
+	}
+
+	if (s.track){
 
 		// bars
 		if (s.track->type == Track::Type::TIME){
@@ -847,10 +847,6 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 			continue;
 		s.add(t);
 
-		// subs
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
 		// markers
 		for (TrackMarker *m: t->markers)
 			s.set(m, s.range.overlaps(m->range));
@@ -858,6 +854,13 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 
 	for (auto vl: view->vlayer){
 		TrackLayer *l = vl->layer;
+		if ((y1 < vl->area.y1) or (y0 > vl->area.y2))
+			continue;
+
+		// subs
+		for (SampleRef *sr: l->samples)
+			s.set(sr, s.range.overlaps(sr->range()));
+
 		// midi
 		for (MidiNote *n: l->midi)
 			if ((n->y >= y0) and (n->y <= y1))

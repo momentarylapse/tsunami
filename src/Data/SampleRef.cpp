@@ -20,7 +20,7 @@ SampleRef::SampleRef(Sample *sample)
 	midi = &sample->midi;
 	origin = sample;
 	origin->ref();
-	track_no = -1;
+	layer = NULL;
 	owner = NULL;
 	pos = 0;
 	volume = 1;
@@ -45,19 +45,18 @@ void SampleRef::__delete__()
 
 int SampleRef::get_index() const
 {
-	Track *t = track();
-	if (t){
-		return t->samples.find((SampleRef*)this);
+	if (layer){
+		return layer->samples.find((SampleRef*)this);
 	}
 	return -1;
 }
 
-Track *SampleRef::track() const
+/*Track *SampleRef::track() const
 {
 	if (owner)
 		return owner->tracks[track_no];
 	return NULL;
-}
+}*/
 
 Range SampleRef::range() const
 {

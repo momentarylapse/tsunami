@@ -359,10 +359,11 @@ void Song::insertSelectedSamples(const SongSelection &sel)
 void Song::deleteSelectedSamples(const SongSelection &sel)
 {
 	action_manager->beginActionGroup();
-	for (Track *t: tracks){
-		for (int j=t->samples.num-1; j>=0; j--)
-			if (sel.has(t->samples[j]))
-				t->deleteSampleRef(t->samples[j]);
+	for (Track *t: tracks)
+	for (TrackLayer *l: t->layers){
+		for (int j=l->samples.num-1; j>=0; j--)
+			if (sel.has(l->samples[j]))
+				l->deleteSampleRef(l->samples[j]);
 	}
 	action_manager->endActionGroup();
 }
@@ -519,13 +520,6 @@ void Song::invalidateAllPeaks()
 		s->buf.peaks.clear();
 }
 
-
-SampleRef *Song::get_sample_ref(Track *track, int index)
-{
-	assert((index >= 0) and "AudioFile.get_sample");
-	assert((index < track->samples.num) and "AudioFile.get_sample");
-	return track->samples[index];
-}
 
 Sample* Song::get_sample_by_uid(int uid)
 {

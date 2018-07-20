@@ -10,6 +10,7 @@
 
 #include "SideBar.h"
 class Track;
+class TrackLayer;
 class SampleRef;
 
 class SampleRefConsole: public SideBarConsole
@@ -33,7 +34,7 @@ public:
 	void onViewCurSampleChange();
 	void onUpdate();
 
-	Track *track;
+	TrackLayer *layer;
 	SampleRef *sample;
 };
 

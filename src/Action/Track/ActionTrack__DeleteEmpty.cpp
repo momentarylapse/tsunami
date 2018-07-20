@@ -26,10 +26,15 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	assert(index >= 0 and index < a->tracks.num);
 	Track *t = a->tracks[index];
 	int num_buf = 0;
-	for (TrackLayer *l : t->layers)
+	int num_samples = 0;
+	for (TrackLayer *l : t->layers){
 		num_buf += l->buffers.num;
+		num_samples += l->samples.num;
+	}
 	assert(num_buf == 0);
-	assert(t->samples.num == 0);
+	assert(num_samples == 0);
+
+	// TODO: no layers allowed?!?
 
 	// save data
 	track = t;

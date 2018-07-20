@@ -274,6 +274,7 @@ class TrackLayer
 	bool muted
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
+	SampleRef*[] samples
 	
 	extern void set_muted(bool muted)
 	extern void get_buffers(AudioBuffer buf, Range r)
@@ -282,6 +283,9 @@ class TrackLayer
 	extern void add_midi_note(MidiNote *n)
 	//extern void add_midi_notes(MidiNoteBuffer midi)
 	extern void delete_midi_note(MidiNote *n)
+	extern SampleRef* add_sample_ref(int pos, Sample* sample)
+	extern void delete_sample_ref(SampleRef *ref)
+	extern void edit_sample_ref(SampleRef *ref, float volume, bool mute)
 
 class Sample // TODO
 	string name
@@ -310,21 +314,18 @@ class Track
 	int type
 	string name
 	TrackLayer*[] layers
-	int length, pos
 
 	float volume, panning
 	bool muted
 	
 	AudioEffect*[] fx
 	MidiEffect*[] midi_fx
-	SampleRef*[] samples
 	
 	Synthesizer *synth
 	
 	TrackMarker[] markers
 
 	// editing
-	int parent
 	Song *song
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
@@ -337,9 +338,6 @@ class Track
 	extern void delete_effect(int index)
 	extern void edit_effect(int index, string param_old)
 	extern void enable_effect(int index, bool enabled)
-	extern SampleRef* add_sample_ref(int pos, Sample* sample)
-	extern void delete_sample_ref(int index)
-	extern void edit_sample_ref(int index, float volume, bool mute, int rep_num, int rep_delay)
 	extern void set_synthesizer(Synthesizer *synth)
 	extern TrackMarker* add_marker(Range range, string text)
 	extern void delete_marker(TrackMarker *marker)

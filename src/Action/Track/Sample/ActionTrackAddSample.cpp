@@ -9,33 +9,38 @@
 
 #include "../../../Data/Song.h"
 
-ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, Sample *_sample)
+ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample)
 {
-	track_no = get_track_index(t);
+	layer = l;
 	pos = _pos;
 	sample = _sample;
+	ref = new SampleRef(sample);
+	ref->origin->unref(); // cancel ref() until execute()
+	ref->layer = l;
+	ref->pos = pos;
+	ref->owner = l->track->song;
+}
+
+ActionTrackAddSample::~ActionTrackAddSample()
+{
+	if (ref)
+		delete ref;
 }
 
 void ActionTrackAddSample::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->tracks[track_no];
-	SampleRef *s = t->samples.pop();
-	s->notify(s->MESSAGE_DELETE);
-	delete(s);
+	ref = layer->samples.pop();
+	ref->notify(ref->MESSAGE_DELETE);
+	ref->origin->unref();
 }
 
 
 
 void *ActionTrackAddSample::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->tracks[track_no];
-	SampleRef *s = new SampleRef(sample);
-	s->pos = pos;
-	s->track_no = track_no;
-	s->owner = a;
-	t->samples.add(s);
-	return s;
+	ref->origin->ref();
+	layer->samples.add(ref);
+	ref = NULL;
+	return layer->samples.back();
 }
 

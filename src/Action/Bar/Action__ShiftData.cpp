@@ -63,11 +63,11 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 					n->range.length += delta;
 				}*/
 			}
-		}
 
-		// samples
-		for (SampleRef *s: t->samples)
-			if (s->pos >= offset)
-				s->pos += delta;
+			// samples
+			for (SampleRef *s: l->samples)
+				if (s->pos >= offset)
+					s->pos += delta;
+		}
 	}
 }

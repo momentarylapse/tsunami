@@ -135,7 +135,8 @@ bool Tsunami::handleArguments(Array<string> &args)
 			msg_write(format("tracks: %d", song->tracks.num));
 			int n = 0;
 			for (Track *t: song->tracks)
-				n += t->samples.num;
+				for (TrackLayer *l: t->layers)
+					n += l->samples.num;
 			msg_write(format("refs: %d / %d", n, song->samples.num));
 			for (Tag &t: song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);

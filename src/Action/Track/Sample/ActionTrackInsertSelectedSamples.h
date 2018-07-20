@@ -17,7 +17,7 @@ class ActionTrackInsertSelectedSamples : public ActionGroup
 public:
 	ActionTrackInsertSelectedSamples(const SongSelection &sel, int layer_no);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	const SongSelection &sel;
 	int layer_no;

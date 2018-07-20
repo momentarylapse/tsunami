@@ -62,10 +62,6 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			continue;
 		s.add(t);
 
-		// samples
-		for (SampleRef *sr: t->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
-
 		// markers
 		for (TrackMarker *m: t->markers)
 			s.set(m, s.range.overlaps(m->range));
@@ -77,6 +73,10 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 			// midi
 			for (MidiNote *n: l->midi)
 				s.set(n, s.range.overlaps(n->range));
+
+			// samples
+			for (SampleRef *sr: l->samples)
+				s.set(sr, s.range.overlaps(sr->range()));
 		}
 	}
 
@@ -194,11 +194,11 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 		sel.set(l, true);
 		for (auto n: l->midi)
 			sel.set(n, has(n));
+		for (auto r: l->samples)
+			sel.set(r, has(r));
 	}
 	for (auto m: t->markers)
 		sel.set(m, has(m));
-	for (auto r: t->samples)
-		sel.set(r, has(r));
 	return sel;
 }
 

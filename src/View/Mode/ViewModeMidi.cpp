@@ -639,13 +639,15 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 			drawMidi(c, l, l->layer->midi, false, 0);
 	}
 
+
+	// samples
+	for (SampleRef *s: l->layer->samples)
+		l->drawSample(c, s);
+
+
 	if (l->layer->is_main){
 
 		Track *t = l->layer->track;
-
-		// samples
-		for (SampleRef *s: t->samples)
-			l->drawSample(c, s);
 
 		// marker
 		l->marker_areas.resize(t->markers.num);

@@ -74,6 +74,10 @@ TrackLayer::TrackLayer(Track *t, bool _is_main)
 TrackLayer::~TrackLayer()
 {
 	midi.deep_clear();
+
+	for (SampleRef *r: samples)
+		delete(r);
+	samples.clear();
 }
 
 Range TrackLayer::range(int keep_notes) const
@@ -85,6 +89,9 @@ Range TrackLayer::range(int keep_notes) const
 
 	if ((type == Track::Type::MIDI) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
+
+	for (SampleRef *s: samples)
+		r = r or s->range();
 
 	return r;
 }
@@ -126,8 +133,6 @@ Track::Track(int _type, Synthesizer *_synth)
 	synth = _synth;
 
 	layers.add(new TrackLayer(this, true));
-
-	prefered_layer = NULL;
 }
 
 
@@ -145,10 +150,6 @@ Track::~Track()
 		delete(f);
 	midi_fx.clear();
 
-	for (SampleRef *r: samples)
-		delete(r);
-	samples.clear();
-
 	if (synth)
 		delete(synth);
 }
@@ -159,9 +160,6 @@ Range Track::range() const
 
 	for (TrackLayer *l: layers)
 		r = r or l->range(synth->keep_notes);
-
-	for (SampleRef *s: samples)
-		r = r or s->range();
 
 	for (TrackMarker *m: markers)
 		r = r or m->range;
@@ -276,19 +274,19 @@ void Track::invalidateAllPeaks()
 			b.peaks.clear();
 }
 
-SampleRef *Track::addSampleRef(int pos, Sample* sample)
+SampleRef *TrackLayer::addSampleRef(int pos, Sample* sample)
 {
-	return (SampleRef*)song->execute(new ActionTrackAddSample(this, pos, sample));
+	return (SampleRef*)track->song->execute(new ActionTrackAddSample(this, pos, sample));
 }
 
-void Track::deleteSampleRef(SampleRef *ref)
+void TrackLayer::deleteSampleRef(SampleRef *ref)
 {
-	song->execute(new ActionTrackDeleteSample(ref));
+	track->song->execute(new ActionTrackDeleteSample(ref));
 }
 
-void Track::editSampleRef(SampleRef *ref, float volume, bool mute)
+void TrackLayer::editSampleRef(SampleRef *ref, float volume, bool mute)
 {
-	song->execute(new ActionTrackEditSample(ref, volume, mute));
+	track->song->execute(new ActionTrackEditSample(ref, volume, mute));
 }
 
 // will take ownership of this instance!

@@ -528,10 +528,10 @@ public:
 	}
 };
 
-class FileChunkSampleRef : public FileChunk<Track,SampleRef>
+class FileChunkSampleRef : public FileChunk<TrackLayer,SampleRef>
 {
 public:
-	FileChunkSampleRef() : FileChunk<Track,SampleRef>("samref"){}
+	FileChunkSampleRef() : FileChunk<TrackLayer,SampleRef>("samref"){}
 	virtual void create()
 	{}
 	virtual void read(File *f)
@@ -539,7 +539,7 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->addSampleRef(pos, parent->song->samples[index]);
+		me = parent->addSampleRef(pos, parent->track->song->samples[index]);
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		f->read_int();
@@ -561,24 +561,30 @@ public:
 	}
 };
 
-#if 0
-void ReadChunkSub(ChunkStack *s, Track *t)
+// deprecated
+class _FileChunkTrackSampleRef : public FileChunk<Track,SampleRef>
 {
-	string module_subtype = s->f->read_str();
-	int pos = s->f->read_int();
-	int length = s->f->read_int();
-	SampleRef *r = __AddEmptySubTrack(t, Range(pos, length), module_subtype);
-	r->volume = s->f->read_float();
-	r->muted = s->f->read_bool();
-	r->rep_num = s->f->read_int();
-	r->rep_delay = s->f->read_int();
-	s->f->read_int(); // reserved
-	s->f->read_int();
-
-	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &r->buf);
-	tsunami->log->error("\"sub\" chunk is deprecated!");
-}
-#endif
+public:
+	_FileChunkTrackSampleRef() : FileChunk<Track,SampleRef>("samref"){}
+	virtual void create()
+	{}
+	virtual void read(File *f)
+	{
+		string name = f->read_str();
+		int pos = f->read_int();
+		int index = f->read_int();
+		me = parent->layers[0]->addSampleRef(pos, parent->song->samples[index]);
+		me->volume = f->read_float();
+		me->muted = f->read_bool();
+		f->read_int();
+		f->read_int();
+		f->read_int(); // reserved
+		f->read_int();
+	}
+	virtual void write(File *f)
+	{
+	}
+};
 
 
 class FileChunkMidiEvent : public FileChunk<MidiNoteBuffer,MidiEvent>
@@ -843,6 +849,7 @@ public:
 	{
 		n = 0;
 		add_child(new FileChunkBufferBox);
+		add_child(new FileChunkSampleRef);
 	}
 	virtual void create()
 	{
@@ -866,6 +873,7 @@ public:
 	virtual void write_subs()
 	{
 		write_sub_array("bufbox", me->buffers);
+		write_sub_parray("samref", me->samples);
 	}
 };
 
@@ -1048,7 +1056,7 @@ public:
 		add_child(new FileChunkTrackMidiData);
 		//add_child(new FileChunkTrackBar);
 		add_child(new FileChunkMarker);
-		add_child(new FileChunkSampleRef);
+		add_child(new _FileChunkTrackSampleRef); // deprecated
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	}
 	virtual void create()
@@ -1085,7 +1093,6 @@ public:
 		if (!me->instrument.has_default_tuning())
 			write_sub("tuning", &me->instrument);
 		write_sub_parray("level", me->layers);
-		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("marker", me->markers);
 		if ((me->type == me->Type::TIME) or (me->type == me->Type::MIDI))

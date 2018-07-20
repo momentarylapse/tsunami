@@ -1192,14 +1192,15 @@ void AudioView::selectExpand()
 					for (MidiNote *n: l->midi)
 						test_range(n->range, r, update);
 
-			// buffers
-			for (TrackLayer *l: t->layers)
+			for (TrackLayer *l: t->layers){
+				// buffers
 				for (AudioBuffer &b: l->buffers)
 					test_range(b.range(), r, update);
 
-			// samples
-			for (SampleRef *s: t->samples)
-				test_range(s->range(), r, update);
+				// samples
+				for (SampleRef *s: l->samples)
+					test_range(s->range(), r, update);
+			}
 		}
 	}
 

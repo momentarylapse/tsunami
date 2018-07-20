@@ -12,7 +12,7 @@
 #include "../lib/math/rect.h"
 
 class Song;
-class Track;
+class TrackLayer;
 class Sample;
 class MidiNoteBuffer;
 class AudioBuffer;
@@ -28,7 +28,6 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	Track *_cdecl track() const;
 	Range _cdecl range() const;
 	int _cdecl type() const;
 
@@ -43,7 +42,7 @@ public:
 
 	// editing
 	rect area;
-	int track_no;
+	TrackLayer *layer;
 	Song *owner;
 };
 

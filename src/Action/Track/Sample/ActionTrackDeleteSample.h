@@ -10,19 +10,20 @@
 
 #include "../../Action.h"
 class SampleRef;
-class Track;
+class TrackLayer;
 
 class ActionTrackDeleteSample : public Action
 {
 public:
 	ActionTrackDeleteSample(SampleRef *ref);
-	virtual ~ActionTrackDeleteSample();
+	~ActionTrackDeleteSample() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no, index;
+	TrackLayer *layer;
+	int index;
 	SampleRef *ref;
 };
 

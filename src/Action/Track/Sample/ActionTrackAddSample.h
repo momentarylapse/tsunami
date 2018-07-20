@@ -12,19 +12,21 @@
 
 class Sample;
 class SampleRef;
-class Track;
+class TrackLayer;
 
 class ActionTrackAddSample: public Action
 {
 public:
-	ActionTrackAddSample(Track *t, int pos, Sample *sample);
+	ActionTrackAddSample(TrackLayer *l, int pos, Sample *sample);
+	~ActionTrackAddSample() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
+	TrackLayer *layer;
 	Sample *sample;
+	SampleRef *ref;
 	int pos;
 };
 

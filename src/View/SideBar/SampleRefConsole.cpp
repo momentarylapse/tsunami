@@ -15,7 +15,7 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	SideBarConsole(_("Sample properties"), session)
 {
 	fromResource("sample_ref_dialog");
-	track = NULL;
+	layer = NULL;
 	sample = NULL;
 
 	event("volume", std::bind(&SampleRefConsole::onVolume, this));
@@ -47,7 +47,7 @@ void SampleRefConsole::onMute()
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	track->editSampleRef(sample, sample->volume, isChecked(""));
+	layer->editSampleRef(sample, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
 	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
@@ -63,7 +63,7 @@ void SampleRefConsole::onVolume()
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	track->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
+	layer->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
 	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
 }
 
@@ -103,14 +103,14 @@ void SampleRefConsole::loadData()
 	reset("track");
 	for (Track *t: song->tracks)
 		addString("track", t->getNiceName());
-	setInt("track", sample->track_no);
+	//setInt("track", sample->track_no);
 }
 
 void SampleRefConsole::onViewCurSampleChange()
 {
 	if (sample)
 		sample->unsubscribe(this);
-	track = view->cur_track;
+	layer = view->cur_layer;
 	sample = view->cur_sample;
 	if (sample)
 		sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));

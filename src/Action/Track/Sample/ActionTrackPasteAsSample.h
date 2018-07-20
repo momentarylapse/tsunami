@@ -10,7 +10,7 @@
 
 #include "../../ActionGroup.h"
 
-class Track;
+class TrackLayer;
 class Song;
 class AudioBuffer;
 class MidiNoteBuffer;
@@ -19,13 +19,13 @@ class Sample;
 class ActionTrackPasteAsSample : public ActionGroup
 {
 public:
-	ActionTrackPasteAsSample(Track *t, int pos, const AudioBuffer &buf, bool auto_delete);
-	ActionTrackPasteAsSample(Track *t, int pos, const MidiNoteBuffer &midi, bool auto_delete);
+	ActionTrackPasteAsSample(TrackLayer *t, int pos, const AudioBuffer &buf, bool auto_delete);
+	ActionTrackPasteAsSample(TrackLayer *t, int pos, const MidiNoteBuffer &midi, bool auto_delete);
 
-	virtual void build(Data *d);
-	virtual void *execute_return(Data *d);
+	void build(Data *d) override;
+	void *execute_return(Data *d) override;
 
-	Track *t;
+	TrackLayer *layer;
 	int pos;
 	const AudioBuffer *buf;
 	const MidiNoteBuffer *midi;

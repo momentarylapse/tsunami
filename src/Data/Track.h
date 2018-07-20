@@ -48,15 +48,21 @@ public:
 	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
 	void _cdecl deleteMidiNote(const MidiNote *note);
 
-	Array<AudioBuffer> buffers;
-
-	MidiNoteBuffer midi;
+	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
+	void _cdecl deleteSampleRef(SampleRef *ref);
+	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 
 	Track *track;
 	int type;
 	int channels;
 	bool is_main;
 	bool muted;
+
+	Array<AudioBuffer> buffers;
+
+	MidiNoteBuffer midi;
+
+	Array<SampleRef*> samples;
 
 	int version_number() const;
 };
@@ -110,9 +116,6 @@ public:
 	void _cdecl deleteMidiEffect(MidiEffect *effect);
 	void _cdecl editMidiEffect(MidiEffect *effect, const string &param_old);
 	void _cdecl enableMidiEffect(MidiEffect *effect, bool enabled);
-	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
-	void _cdecl deleteSampleRef(SampleRef *ref);
-	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
 	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
@@ -138,14 +141,12 @@ public:
 	Instrument instrument;
 
 	Array<TrackLayer*> layers;
-	TrackLayer *prefered_layer;
 
 	float volume, panning;
 	bool muted;
 
 	Array<AudioEffect*> fx;
 	Array<MidiEffect*> midi_fx;
-	Array<SampleRef*> samples;
 
 	Synthesizer *synth;
 

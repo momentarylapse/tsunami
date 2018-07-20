@@ -24,7 +24,7 @@ void ActionTrackInsertSample::build(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 
 	Track *t = layer->track;
-	SampleRef *ref = t->samples[index];
+	SampleRef *ref = layer->samples[index];
 	Sample *sample = ref->origin;
 	if (t->type == t->Type::AUDIO){
 

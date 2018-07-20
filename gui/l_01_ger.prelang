@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-497
+538
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1494,8 +1494,131 @@ Löschen
 popup_signal_chain_menu/signal_chain_new
 Neu
 
+popup_all_menu/add_audio_track_mono
+Audio (mono)
+
+popup_all_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_all_menu/add_bars
+Takte hinzufügen...
+
+popup_all_menu/add_midi_track
+Midi
+
+popup_all_menu/add_pause
+Pause hinzufügen...
+
+popup_all_menu/add_time_track
+Taktspur
+
+popup_all_menu/convert_menu
+Konvertieren
+
+popup_all_menu/delete_bars
+Löschen
+
+popup_all_menu/delete_buffer
+Löschen
+
+popup_all_menu/delete_layer
+Löschen
+
+popup_all_menu/delete_marker
+Löschen
+
+popup_all_menu/delete_track
+Löschen
+
+popup_all_menu/edit_bars
+Bearbeiten...
+
+popup_all_menu/edit_marker
+Bearbeiten
+
+popup_all_menu/insert_sample
+Fest einfügen
+
+popup_all_menu/layer_add
+Neue Version
+
+popup_all_menu/layer_merge
+Zusammenfügen...
+
+popup_all_menu/make_buffer_movable
+Beweglich machen
+
+popup_all_menu/menu_bar
+Takt
+
+popup_all_menu/menu_buffer
+Audiopuffer
+
+popup_all_menu/menu_marker
+Marker
+
+popup_all_menu/menu_sample
+Sample
+
+popup_all_menu/menu_song
+Datei
+
+popup_all_menu/menu_time_track
+Takt Spur
+
+popup_all_menu/menu_track
+Spur
+
+popup_all_menu/menu_track_new
+Neue Spur hinzufügen
+
+popup_all_menu/menu_version
+Version
+
+popup_all_menu/remove_sample
+Löschen
+
+popup_all_menu/sample_properties
+Eigenschaften
+
+popup_all_menu/scale_bars
+Skalieren
+
+popup_all_menu/song_edit_samples
+Samples verwalten
+
+popup_all_menu/song_properties
+Eigenschaften
+
+popup_all_menu/track_add_marker
+Marker hinzufügen
+
+popup_all_menu/track_convert_mono
+Mono
+
+popup_all_menu/track_convert_stereo
+Stereo
+
+popup_all_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_all_menu/track_edit_midi
+Midi bearbeiten
+
+popup_all_menu/track_properties
+Eigenschaften
+
+popup_track_menu/delete_layer
+Löschen
+
+popup_track_menu/layer_merge
+Zusammenfügen...
+
+popup_track_menu/menu_version
+Version
+
 // Num Language Strings
-181
+183
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1859,3 +1982,7 @@ Audio (mono)
 Audio (mono)
 Audio (stereo)
 Audio (stereo)
+not allowed to delete the main signal chain
+die Haupt-Signalkette darf nicht gelöscht werden
+marker 
+Marker 

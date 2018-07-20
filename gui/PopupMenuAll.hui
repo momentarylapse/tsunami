@@ -1,0 +1,40 @@
+Menu popup_all_menu ""
+	Menu menu_buffer "Audio buffer"
+		Item make_buffer_movable "Make movable"
+		Item delete_buffer "Delete"
+	Menu menu_marker "Marker"
+		Item edit_marker "Edit"
+		Item delete_marker "Delete"
+	Menu menu_sample "Samples"
+		Item insert_sample "Insert statically"
+		Item remove_sample "Delete"
+		Item sample_properties "Properties"
+	Menu menu_bar "Bar"
+		Item delete_bars "Delete"
+		Item track_add_marker "Add marker"
+		Item edit_bars "Edit..."
+		Item scale_bars "Scale" image=hui:zoom-in
+	Menu menu_time_track "Time track"
+		Item add_bars "Add bars..." flat image=hui:add
+		Item add_pause "Add pause..." image=hui:add
+	Menu menu_track "Track"
+		Item delete_track "Delete"
+		Item track_add_marker "Add marker"
+		Menu menu_version "Version"
+			Item layer_add "Add version"
+			Item layer_merge "Merge..."
+			Item delete_layer "Delete"
+		Menu convert_menu "Convert"
+			Item track_convert_mono "Mono"
+			Item track_convert_stereo "Stereo"
+		Item track_edit_fx "Edit effects"
+		Item track_edit_midi "Edit midi"
+		Item track_properties "Properties"
+	Menu menu_song "File"
+		Menu menu_track_new "Add new track"
+			Item add_audio_track_mono "Audio (mono)" image=hui:add
+			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
+			Item add_midi_track "Midi" image=hui:add
+			Item add_time_track "Rhythm" image=hui:add
+		Item song_edit_samples "Manage samples"
+		Item song_properties "Properties"

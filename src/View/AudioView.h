@@ -267,6 +267,7 @@ public:
 	hui::Menu *menu_marker;
 	hui::Menu *menu_bar;
 	hui::Menu *menu_song;
+	hui::Menu *menu_all;
 
 	int perf_channel;
 };

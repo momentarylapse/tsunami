@@ -417,7 +417,7 @@ void AudioViewLayer::drawSampleFrame(Painter *c, SampleRef *s, const color &col,
 
 
 	color col2 = col;
-	col2.a *= 0.2f;
+	col2.a *= 0.5f;
 	c->setColor(col2);
 	c->drawRect(asx, area.y1,                             aex - asx, view->SAMPLE_FRAME_HEIGHT);
 	c->drawRect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);

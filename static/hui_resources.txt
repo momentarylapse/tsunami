@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-50
+51
 // Resource
 Menu
 menu_fake
@@ -2141,6 +2141,247 @@ delete_marker
 0
 // Resource
 Menu
+popup_all_menu
+
+0
+0
+7
+Menu
+menu_buffer
+
+0
+0
+2
+Item
+make_buffer_movable
+
+0
+0
+0
+Item
+delete_buffer
+
+1
+0
+0
+Menu
+menu_marker
+
+1
+0
+2
+Item
+edit_marker
+
+0
+0
+0
+Item
+delete_marker
+
+1
+0
+0
+Menu
+menu_sample
+
+2
+0
+3
+Item
+insert_sample
+
+0
+0
+0
+Item
+remove_sample
+
+1
+0
+0
+Item
+sample_properties
+
+2
+0
+0
+Menu
+menu_bar
+
+3
+0
+4
+Item
+delete_bars
+
+0
+0
+0
+Item
+track_add_marker
+
+1
+0
+0
+Item
+edit_bars
+
+2
+0
+0
+Item
+scale_bars
+image=hui:zoom-in
+3
+0
+0
+Menu
+menu_time_track
+
+4
+0
+2
+Item
+add_bars
+flat,image=hui:add
+0
+0
+0
+Item
+add_pause
+image=hui:add
+1
+0
+0
+Menu
+menu_track
+
+5
+0
+7
+Item
+delete_track
+
+0
+0
+0
+Item
+track_add_marker
+
+1
+0
+0
+Menu
+menu_version
+
+2
+0
+3
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_merge
+
+1
+0
+0
+Item
+delete_layer
+
+2
+0
+0
+Menu
+convert_menu
+
+3
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+4
+0
+0
+Item
+track_edit_midi
+
+5
+0
+0
+Item
+track_properties
+
+6
+0
+0
+Menu
+menu_song
+
+6
+0
+3
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+song_properties
+
+2
+0
+0
+// Resource
+Menu
 popup_bar_menu
 
 0
@@ -2525,15 +2766,33 @@ delete_track
 0
 0
 Item
-layer_add
+track_add_marker
 
 3
 0
 0
-Item
-track_add_marker
+Menu
+menu_version
 
 4
+0
+3
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_merge
+
+1
+0
+0
+Item
+delete_layer
+
+2
 0
 0
 Menu
@@ -3962,7 +4221,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-385
+426
 // Text
 /cancel
 Cancel
@@ -4615,6 +4874,120 @@ Edit pause
 pause_edit_dialog/t_duration
 Duration
 
+popup_all_menu/add_audio_track_mono
+Audio (mono)
+
+popup_all_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_all_menu/add_bars
+Add bars...
+
+popup_all_menu/add_midi_track
+Midi
+
+popup_all_menu/add_pause
+Add pause...
+
+popup_all_menu/add_time_track
+Rhythm
+
+popup_all_menu/convert_menu
+Convert
+
+popup_all_menu/delete_bars
+Delete
+
+popup_all_menu/delete_buffer
+Delete
+
+popup_all_menu/delete_layer
+Delete
+
+popup_all_menu/delete_marker
+Delete
+
+popup_all_menu/delete_track
+Delete
+
+popup_all_menu/edit_bars
+Edit...
+
+popup_all_menu/edit_marker
+Edit
+
+popup_all_menu/insert_sample
+Insert statically
+
+popup_all_menu/layer_add
+Add version
+
+popup_all_menu/layer_merge
+Merge...
+
+popup_all_menu/make_buffer_movable
+Make movable
+
+popup_all_menu/menu_bar
+Bar
+
+popup_all_menu/menu_buffer
+Audio buffer
+
+popup_all_menu/menu_marker
+Marker
+
+popup_all_menu/menu_sample
+Samples
+
+popup_all_menu/menu_song
+File
+
+popup_all_menu/menu_time_track
+Time track
+
+popup_all_menu/menu_track
+Track
+
+popup_all_menu/menu_track_new
+Add new track
+
+popup_all_menu/menu_version
+Version
+
+popup_all_menu/remove_sample
+Delete
+
+popup_all_menu/sample_properties
+Properties
+
+popup_all_menu/scale_bars
+Scale
+
+popup_all_menu/song_edit_samples
+Manage samples
+
+popup_all_menu/song_properties
+Properties
+
+popup_all_menu/track_add_marker
+Add marker
+
+popup_all_menu/track_convert_mono
+Mono
+
+popup_all_menu/track_convert_stereo
+Stereo
+
+popup_all_menu/track_edit_fx
+Edit effects
+
+popup_all_menu/track_edit_midi
+Edit midi
+
+popup_all_menu/track_properties
+Properties
+
 popup_bar_menu/bar_menu_header
 Bar
 
@@ -4777,11 +5150,20 @@ Properties
 popup_track_menu/convert_menu
 Convert
 
+popup_track_menu/delete_layer
+Delete
+
 popup_track_menu/delete_track
 Delete
 
 popup_track_menu/layer_add
 Add version
+
+popup_track_menu/layer_merge
+Merge...
+
+popup_track_menu/menu_version
+Version
 
 popup_track_menu/track_add_marker
 Add marker
@@ -5125,7 +5507,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-496
+537
 // Text
 /cancel
 Abbrechen
@@ -5973,6 +6355,120 @@ Dauer
 pause_edit_dialog/t_s
 s
 
+popup_all_menu/add_audio_track_mono
+Audio (mono)
+
+popup_all_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_all_menu/add_bars
+Takte hinzufügen...
+
+popup_all_menu/add_midi_track
+Midi
+
+popup_all_menu/add_pause
+Pause hinzufügen...
+
+popup_all_menu/add_time_track
+Taktspur
+
+popup_all_menu/convert_menu
+Konvertieren
+
+popup_all_menu/delete_bars
+Löschen
+
+popup_all_menu/delete_buffer
+Löschen
+
+popup_all_menu/delete_layer
+Löschen
+
+popup_all_menu/delete_marker
+Löschen
+
+popup_all_menu/delete_track
+Löschen
+
+popup_all_menu/edit_bars
+Bearbeiten...
+
+popup_all_menu/edit_marker
+Bearbeiten
+
+popup_all_menu/insert_sample
+Fest einfügen
+
+popup_all_menu/layer_add
+Neue Version
+
+popup_all_menu/layer_merge
+Zusammenfügen...
+
+popup_all_menu/make_buffer_movable
+Beweglich machen
+
+popup_all_menu/menu_bar
+Takt
+
+popup_all_menu/menu_buffer
+Audiopuffer
+
+popup_all_menu/menu_marker
+Marker
+
+popup_all_menu/menu_sample
+Sample
+
+popup_all_menu/menu_song
+Datei
+
+popup_all_menu/menu_time_track
+Takt Spur
+
+popup_all_menu/menu_track
+Spur
+
+popup_all_menu/menu_track_new
+Neue Spur hinzufügen
+
+popup_all_menu/menu_version
+Version
+
+popup_all_menu/remove_sample
+Löschen
+
+popup_all_menu/sample_properties
+Eigenschaften
+
+popup_all_menu/scale_bars
+Skalieren
+
+popup_all_menu/song_edit_samples
+Samples verwalten
+
+popup_all_menu/song_properties
+Eigenschaften
+
+popup_all_menu/track_add_marker
+Marker hinzufügen
+
+popup_all_menu/track_convert_mono
+Mono
+
+popup_all_menu/track_convert_stereo
+Stereo
+
+popup_all_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_all_menu/track_edit_midi
+Midi bearbeiten
+
+popup_all_menu/track_properties
+Eigenschaften
+
 popup_bar_menu/bar_menu_header
 Takt
 
@@ -6162,11 +6658,20 @@ Eigenschaften
 popup_track_menu/convert_menu
 Konvertieren
 
+popup_track_menu/delete_layer
+Löschen
+
 popup_track_menu/delete_track
 Löschen
 
 popup_track_menu/layer_add
 Version hinzufügen
+
+popup_track_menu/layer_merge
+Zusammenfügen...
+
+popup_track_menu/menu_version
+Version
 
 popup_track_menu/song_edit_bars
 Takte bearbeiten
@@ -6616,7 +7121,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-181
+183
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -6950,6 +7455,8 @@ loading buffer
 lade Audiopuffer 
 loading track 
 Lade Spur 
+marker 
+Marker 
 midi library selected: 
 Midibibliothek gewählt: 
 move selection to scale
@@ -6958,6 +7465,8 @@ no sample selected
 kein Sample gewählt
 not allowed to delete system modules
 System Module dürfen nicht gelöscht werden
+not allowed to delete the main signal chain
+die Haupt-Signalkette darf nicht gelöscht werden
 not configurable
 nicht konfigurierbar
 open message.txt

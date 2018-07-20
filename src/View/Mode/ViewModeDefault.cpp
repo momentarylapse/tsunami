@@ -153,6 +153,18 @@ void ViewModeDefault::onLeftDoubleClick()
 	}
 }
 
+static void open_popup(AudioView *view, Selection *hover)
+{
+	view->menu_all->enable("menu_buffer", false);
+	view->menu_all->enable("menu_sample", hover->sample);
+	view->menu_all->enable("menu_bar", hover->bar);
+	view->menu_all->enable("menu_marker", hover->marker);
+	view->menu_all->enable("menu_time_track", hover->track and (hover->track->type == Track::Type::TIME));
+	view->menu_all->enable("menu_track", hover->track);
+	view->menu_all->enable("menu_layer", hover->layer);
+	view->menu_all->openPopup(view->win, 0, 0);
+}
+
 void ViewModeDefault::onRightButtonDown()
 {
 	bool track_hover_sel = view->sel.has(hover->track);
@@ -172,26 +184,33 @@ void ViewModeDefault::onRightButtonDown()
 
 	if (hover->type == Selection::Type::SAMPLE){
 		view->menu_sample->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::BAR){
-		//if (song->bars[hover->index].type == BarPattern::Type::PAUSE)
-		//	view->menu_bar->items[0]->setString(_("Pause"));
-		view->menu_bar->openPopup(view->win, 0, 0);
+		//view->menu_bar->openPopup(view->win, 0, 0);
+		open_popup(view, hover);
 	}else if (hover->type == Selection::Type::MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		view->menu_time_track->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
-		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::Type::LAYER and !hover->layer->is_main) or (hover->type == Selection::Type::LAYER_HEADER)){
+		//view->menu_time_track->openPopup(view->win, 0, 0);
+		open_popup(view, hover);
+	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		view->menu_layer->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->enable("track_convert_stereo", view->cur_track->channels == 1);
 		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
+		view->menu_track->enable("layer_merge", !view->cur_layer->is_main);
+		view->menu_track->enable("delete_layer", !view->cur_layer->is_main);
 		view->menu_track->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}
 }
 
@@ -503,20 +522,26 @@ void ViewModeDefault::drawPost(Painter *c)
 
 	if (hover->type == Selection::Type::SAMPLE)
 		drawCursorHover(this, c, _("sample ") + hover->sample->origin->name);
-	if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
+	else if (hover->type == Selection::Type::MARKER)
+		drawCursorHover(this, c, _("marker ") + hover->marker->text);
+	else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
 		drawCursorHover(this, c, _("edit track properties"));
-	if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)
+	else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)
 		drawCursorHover(this, c, _("toggle mute"));
-	if (hover->type == Selection::Type::TRACK_BUTTON_SOLO)
+	else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO)
 		drawCursorHover(this, c, _("toggle solo"));
-	if (hover->type == Selection::Type::TRACK_BUTTON_CURVE)
+	else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE)
 		drawCursorHover(this, c, _("edit curves"));
-	if (hover->type == Selection::Type::TRACK_BUTTON_FX)
+	else if (hover->type == Selection::Type::TRACK_BUTTON_FX)
 		drawCursorHover(this, c, _("edit effects"));
-	if (hover->type == Selection::Type::LAYER_BUTTON_MUTE)
+	else if (hover->type == Selection::Type::LAYER_BUTTON_MUTE)
 		drawCursorHover(this, c, _("toggle mute"));
-	if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
+	else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
 		drawCursorHover(this, c, _("toggle solo"));
+	else if (hover->type == Selection::Type::BAR)
+		drawCursorHover(this, c, format(_("bar %d/\u2084 \u2669=%.1f"), hover->bar->num_beats, hover->bar->bpm(song->sample_rate)));
+	else if (hover->type == Selection::Type::BAR_GAP)
+		{}//drawCursorHover(this, c, _("bar gap"));
 }
 
 Selection ViewModeDefault::getHoverBasic(bool editable)
@@ -540,7 +565,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 			if (l->layer->is_main)
 				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::TRACK_HEADER;
-			if (l->layer->track->layers.num > 0)
+			if (l->layer->track->layers.num > 1)
 				if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::LAYER_HEADER;
 		}

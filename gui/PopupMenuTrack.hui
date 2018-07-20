@@ -2,8 +2,11 @@ Menu popup_track_menu ""
 	Item track_menu_header "Track" disabled
 	Separator
 	Item delete_track "Delete"
-	Item layer_add "Add version"
 	Item track_add_marker "Add marker"
+	Menu menu_version "Version"
+		Item layer_add "Add version"
+		Item layer_merge "Merge..."
+		Item delete_layer "Delete"
 	Menu convert_menu "Convert"
 		Item track_convert_mono "Mono"
 		Item track_convert_stereo "Stereo"

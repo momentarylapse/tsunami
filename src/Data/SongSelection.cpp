@@ -63,12 +63,16 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 		s.add(t);
 
 		// markers
+		if (_layers.contains(t->layers[0]))
 		for (TrackMarker *m: t->markers)
 			s.set(m, s.range.overlaps(m->range));
+	}
 
+	for (const Track *t: song->tracks){
 		for (const TrackLayer *l: t->layers){
-			if (_layers.contains(l))
-				s.add(l);
+			if (!_layers.contains(l))
+				continue;
+			s.add(l);
 
 			// midi
 			for (MidiNote *n: l->midi)

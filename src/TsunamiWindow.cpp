@@ -396,10 +396,10 @@ void TsunamiWindow::onTrackConvertStereo()
 }
 void TsunamiWindow::onBufferDelete()
 {
-	if (view->hover.layer){
-		foreachi (AudioBuffer &buf, view->hover.layer->buffers, i)
+	if (view->cur_layer){
+		foreachi (AudioBuffer &buf, view->cur_layer->buffers, i)
 			if (buf.range().is_inside(view->hover.pos)){
-				SongSelection s = SongSelection::from_range(song, buf.range(), view->hover.track, view->hover.layer).filter(0);
+				SongSelection s = SongSelection::from_range(song, buf.range(), Set<const Track*>(), view->cur_layer).filter(0);
 				song->deleteSelection(s);
 			}
 	}
@@ -407,10 +407,10 @@ void TsunamiWindow::onBufferDelete()
 
 void TsunamiWindow::onBufferMakeMovable()
 {
-	if (view->hover.layer){
-		for (AudioBuffer &buf: view->hover.layer->buffers)
+	if (view->cur_layer){
+		for (AudioBuffer &buf: view->cur_layer->buffers)
 			if (buf.range().is_inside(view->hover.pos)){
-				SongSelection s = SongSelection::from_range(song, buf.range(), view->hover.track, view->hover.layer).filter(0);
+				SongSelection s = SongSelection::from_range(song, buf.range(), Set<const Track*>(), view->cur_layer).filter(0);
 				song->createSamplesFromSelection(s);
 			}
 	}

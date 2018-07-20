@@ -40,7 +40,7 @@ void BarEditDialog::onOk()
 	bool edit_beats = isChecked("edit_beats");
 	bool edit_sub_beats = isChecked("edit_sub_beats");
 	bool edit_bpm = isChecked("edit_bpm");
-	song->action_manager->beginActionGroup();
+	song->beginActionGroup();
 	foreachb(int i, sel){
 		BarPattern b = *song->bars[i];
 		if (edit_beats)
@@ -51,7 +51,7 @@ void BarEditDialog::onOk()
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
 		song->editBar(i, b.length, b.num_beats, b.num_sub_beats, apply_to_midi);
 	}
-	song->action_manager->endActionGroup();
+	song->endActionGroup();
 
 	destroy();
 }

@@ -687,7 +687,7 @@ void AudioView::onSongUpdate()
 	}
 
 	if (song->cur_message() == MESSAGE_CHANGE)
-		if (song->action_manager->isEnabled())
+		if (song->history_enabled())
 			updatePeaks();
 }
 

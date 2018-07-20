@@ -14,6 +14,7 @@
 #include "../../Session.h"
 #include <math.h>
 
+#include "../../Action/ActionManager.h"
 #include "../../Data/Song.h"
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"

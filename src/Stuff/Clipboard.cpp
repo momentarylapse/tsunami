@@ -153,7 +153,7 @@ void Clipboard::paste(AudioView *view)
 		return;
 
 
-	s->action_manager->beginActionGroup();
+	s->beginActionGroup();
 
 	int ti = 0;
 	for (Track *t: s->tracks){
@@ -167,7 +167,7 @@ void Clipboard::paste(AudioView *view)
 			ti ++;
 		}
 	}
-	s->action_manager->endActionGroup();
+	s->endActionGroup();
 }
 
 void Clipboard::pasteAsSamples(AudioView *view)
@@ -180,7 +180,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 		return;
 
 
-	s->action_manager->beginActionGroup();
+	s->beginActionGroup();
 
 	int ti = 0;
 	for (Track *t: s->tracks){
@@ -194,7 +194,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 			ti ++;
 		}
 	}
-	s->action_manager->endActionGroup();
+	s->endActionGroup();
 }
 
 bool Clipboard::hasData()

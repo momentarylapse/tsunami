@@ -299,10 +299,10 @@ void TrackLayer::addMidiNote(MidiNote *n)
 
 void TrackLayer::addMidiNotes(const MidiNoteBuffer &notes)
 {
-	track->song->action_manager->beginActionGroup();
+	track->song->beginActionGroup();
 	for (MidiNote *n: notes)
 		addMidiNote(n);
-	track->song->action_manager->endActionGroup();
+	track->song->endActionGroup();
 }
 
 void TrackLayer::deleteMidiNote(const MidiNote *note)

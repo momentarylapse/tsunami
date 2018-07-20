@@ -98,7 +98,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 		bh_offset = b2;
 	bh_midi = &midi;
 
-	l->track->song->action_manager->beginActionGroup();
+	l->track->song->beginActionGroup();
 
 	for (int i=l->midi.num-1; i>=0; i--)
 		if (sel.has(l->midi[i]))
@@ -109,7 +109,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 		n->reset_meta();
 
 	l->insertMidiData(0, midi);
-	l->track->song->action_manager->endActionGroup();
+	l->track->song->endActionGroup();
 }
 
 void MidiEffect::note(float pitch, float volume, int beats)

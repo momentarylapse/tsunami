@@ -20,6 +20,7 @@
 #include "Format/FormatSoundFont2.h"
 #include "Format/FormatGuitarPro.h"
 #include "Format/FormatNami.h"
+#include "../Action/ActionManager.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Session.h"
@@ -114,10 +115,10 @@ bool Storage::loadTrack(TrackLayer *layer, const string &filename, int offset)
 	od.offset = offset;
 	od.layer = layer;
 
-	a->action_manager->beginActionGroup();
+	a->beginActionGroup();
 
 	f->loadTrack(&od);
-	a->action_manager->endActionGroup();
+	a->endActionGroup();
 
 	delete(f);
 	return true;

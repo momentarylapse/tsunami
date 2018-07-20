@@ -49,14 +49,14 @@ void BarAddDialog::onOk()
 	int beats = getInt("beats");
 	int sub_beats = getInt("sub_beats");
 	float bpm = getFloat("bpm");
-	song->action_manager->beginActionGroup();
+	song->beginActionGroup();
 
 	if (!song->getTimeTrack())
 		song->addTrack(Track::Type::TIME, 0);
 
 	for (int i=0; i<count; i++)
 		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
-	song->action_manager->endActionGroup();
+	song->endActionGroup();
 
 	destroy();
 }

@@ -6,6 +6,7 @@
  */
 
 #include "Data.h"
+#include "../Action/ActionManager.h"
 #include "../lib/threads/Mutex.h"
 
 
@@ -45,11 +46,25 @@ void *Data::execute(Action *a)
 	return action_manager->execute(a);
 }
 
+void Data::beginActionGroup()
+{
+	action_manager->beginActionGroup();
+}
+
+void Data::endActionGroup()
+{
+	action_manager->endActionGroup();
+}
 
 
 void Data::resetHistory()
 {
 	action_manager->reset();
+}
+
+bool Data::history_enabled()
+{
+	return action_manager->isEnabled();
 }
 
 // "low level" -> don't use ActionManager.lock()!

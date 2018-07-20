@@ -7,6 +7,7 @@
 
 #include "NewDialog.h"
 #include "../../Data/Song.h"
+#include "../../Action/ActionManager.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"

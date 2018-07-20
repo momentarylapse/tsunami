@@ -29,13 +29,13 @@ PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int _in
 void PauseAddDialog::onOk()
 {
 	float duration = getFloat("duration");
-	song->action_manager->beginActionGroup();
+	song->beginActionGroup();
 
 	if (!song->getTimeTrack())
 		song->addTrack(Track::Type::TIME, 0);
 
 	song->addPause(index, duration, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
-	song->action_manager->endActionGroup();
+	song->endActionGroup();
 
 	destroy();
 }

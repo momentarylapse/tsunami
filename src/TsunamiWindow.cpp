@@ -37,6 +37,7 @@
 #include "Device/DeviceManager.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
+#include "Action/ActionManager.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "Data/Rhythm/Bar.h"
 #include "Module/Audio/AudioEffect.h"
@@ -292,7 +293,7 @@ void TsunamiWindow::onAddAudioTrackStereo()
 
 void TsunamiWindow::onAddTimeTrack()
 {
-	song->action_manager->beginActionGroup();
+	song->beginActionGroup();
 	try{
 		song->addTrack(Track::Type::TIME, 0);
 		// some default data
@@ -301,7 +302,7 @@ void TsunamiWindow::onAddTimeTrack()
 	}catch(Song::Exception &e){
 		session->e(e.message);
 	}
-	song->action_manager->endActionGroup();
+	song->endActionGroup();
 }
 
 void TsunamiWindow::onAddMidiTrack()
@@ -316,7 +317,7 @@ void TsunamiWindow::onTrackRender()
 		session->e(_("Selection range is empty"));
 		return;
 	}
-	song->action_manager->beginActionGroup();
+	song->beginActionGroup();
 	Track *t = song->addTrack(Track::Type::AUDIO);
 
 	SongRenderer renderer(song);
@@ -329,7 +330,7 @@ void TsunamiWindow::onTrackRender()
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], range);
 	renderer.read(buf);
 	song->execute(a);
-	song->action_manager->endActionGroup();
+	song->endActionGroup();
 
 }
 
@@ -438,12 +439,12 @@ void TsunamiWindow::onShowLog()
 
 void TsunamiWindow::onUndo()
 {
-	song->action_manager->undo();
+	song->undo();
 }
 
 void TsunamiWindow::onRedo()
 {
-	song->action_manager->redo();
+	song->redo();
 }
 
 void TsunamiWindow::onSendBugReport()
@@ -508,14 +509,14 @@ void TsunamiWindow::onMenuExecuteAudioEffect()
 
 	fx->reset_config();
 	if (fx->configure(this)){
-		song->action_manager->beginActionGroup();
+		song->beginActionGroup();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
 				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
 					fx->reset_state();
 					fx->do_process_track(l, view->sel.range);
 				}
-		song->action_manager->endActionGroup();
+		song->endActionGroup();
 	}
 	delete(fx);
 }
@@ -528,7 +529,7 @@ void TsunamiWindow::onMenuExecuteAudioSource()
 
 	s->reset_config();
 	if (s->configure(this)){
-		song->action_manager->beginActionGroup();
+		song->beginActionGroup();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
 				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
@@ -537,7 +538,7 @@ void TsunamiWindow::onMenuExecuteAudioSource()
 					l->getBuffers(buf, view->sel.range);
 					s->read(buf);
 				}
-		song->action_manager->endActionGroup();
+		song->endActionGroup();
 	}
 	delete(s);
 }
@@ -570,7 +571,7 @@ void TsunamiWindow::onMenuExecuteMidiSource()
 
 	s->reset_config();
 	if (s->configure(this)){
-		song->action_manager->beginActionGroup();
+		song->beginActionGroup();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
 			if (view->sel.has(l) and (t->type == t->Type::MIDI)){
@@ -580,7 +581,7 @@ void TsunamiWindow::onMenuExecuteMidiSource()
 				s->read(buf);
 				l->insertMidiData(view->sel.range.offset, midi_events_to_notes(buf));
 			}
-		song->action_manager->endActionGroup();
+		song->endActionGroup();
 	}
 	delete(s);
 }

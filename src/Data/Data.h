@@ -9,8 +9,6 @@
 #define SRC_DATA_DATA_H_
 
 #include "../lib/base/base.h"
-#include "../Action/Action.h"
-#include "../Action/ActionManager.h"
 #include "../Stuff/Observable.h"
 
 class ActionManager;
@@ -31,6 +29,8 @@ public:
 	void *execute(Action *a);
 	void _cdecl undo();
 	void _cdecl redo();
+	void _cdecl beginActionGroup();
+	void _cdecl endActionGroup();
 
 	Session *session;
 	string filename;
@@ -38,6 +38,7 @@ public:
 	bool binary_file_format;
 
 	ActionManager *action_manager;
+	bool history_enabled();
 
 	void lock();
 	bool try_lock();

@@ -9,6 +9,7 @@
 #include "SongSelection.h"
 #include "Curve.h"
 #include "Rhythm/Bar.h"
+#include "../Action/ActionManager.h"
 #include "../Action/Bar/ActionBarAdd.h"
 #include "../Action/Bar/ActionBarDelete.h"
 #include "../Action/Bar/ActionBarEdit.h"

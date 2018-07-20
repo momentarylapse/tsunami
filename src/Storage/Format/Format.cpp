@@ -7,6 +7,7 @@
 
 #include "Format.h"
 #include "../../Tsunami.h"
+#include "../../Action/ActionManager.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Module/Audio/SongRenderer.h"
 

@@ -16,6 +16,7 @@
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
 #include "../../../Stuff/BackupManager.h"
+#include "../../../Action/ActionManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"

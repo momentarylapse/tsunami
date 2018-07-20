@@ -9,6 +9,7 @@
 #include "../../Data/Rhythm/BarCollection.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/MidiData.h"
+#include "../../Action/ActionManager.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"

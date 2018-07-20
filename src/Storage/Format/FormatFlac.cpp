@@ -43,7 +43,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	od->layer->getBuffers(buf, range);
 
 	Action *a;
-	if (od->song->action_manager->isEnabled())
+	if (od->song->history_enabled())
 		a = new ActionTrackEditBuffer(od->layer, range);
 
 	float scale = pow(2.0f, flac_bits-1);
@@ -53,7 +53,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 			buf.c[ci][i] = source[i] / scale;
 	}
 
-	if (od->song->action_manager->isEnabled())
+	if (od->song->history_enabled())
 		od->song->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
@@ -100,7 +100,7 @@ FormatDescriptorFlac::FormatDescriptorFlac() :
 void FormatFlac::loadTrack(StorageOperationData *od)
 {
 	Track *t = od->track;
-	t->song->action_manager->beginActionGroup();
+	t->song->beginActionGroup();
 
 	FLAC__StreamDecoder *decoder = NULL;
 
@@ -147,7 +147,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 	if (decoder)
 		FLAC__stream_decoder_delete(decoder);
 
-	t->song->action_manager->endActionGroup();
+	t->song->endActionGroup();
 }
 
 

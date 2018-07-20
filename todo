@@ -142,3 +142,4 @@ J delete with empty range
 * selection rect with correct y range...
 J move selection
 j fix barrier system
+J copy/pase

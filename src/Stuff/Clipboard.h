@@ -27,7 +27,7 @@ public:
 	bool test_compatibility(AudioView *view);
 
 	void clear();
-	void append_track(TrackLayer *l, AudioView *view);
+	void append_track(TrackLayer *l, AudioView *view, int offset);
 	void paste_track(int source_index, TrackLayer *target, AudioView *view);
 	void paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view);
 	bool hasData();

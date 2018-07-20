@@ -34,7 +34,7 @@ void Clipboard::clear()
 	ref_uid.clear();
 }
 
-void Clipboard::append_track(TrackLayer *l, AudioView *view)
+void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset)
 {
 	if (l->type == Track::Type::TIME)
 		return;
@@ -50,10 +50,26 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view)
 		ll->midi.samples = view->sel.range.length;
 		ll->midi.sanify(view->sel.range);
 		for (MidiNote *n: ll->midi)
-			n->range.offset -= view->sel.range.offset;
+			n->range.offset -= offset;
 	}
 
 	ref_uid.add(-1);
+}
+
+static int find_offset(AudioView *view)
+{
+	if (!view->sel.range.empty())
+		return view->sel.range.offset;
+
+	int offset = view->song->getRange().end();
+	for (Track *t: view->song->tracks)
+		for (TrackLayer *l: t->layers)
+			if (view->sel.has(l))
+				for (MidiNote *n: l->midi)
+					if (view->sel.has(n))
+						offset = min(offset, n->range.offset);
+
+	return offset;
 }
 
 void Clipboard::copy(AudioView *view)
@@ -66,10 +82,12 @@ void Clipboard::copy(AudioView *view)
 
 	temp->sample_rate = s->sample_rate;
 
+	int offset = find_offset(view);
+
 	for (Track *t: s->tracks)
 		for (TrackLayer *l: t->layers)
 			if (view->sel.has(l))
-				append_track(l, view);
+				append_track(l, view, offset);
 
 	notify();
 }
@@ -204,6 +222,12 @@ bool Clipboard::hasData()
 
 bool Clipboard::canCopy(AudioView *view)
 {
-	return !view->sel.range.empty();// or (view->audio->GetNumSelectedSamples() > 0);
+	if (!view->sel.range.empty())
+		return true;
+	if (view->sel.notes.num > 0)
+		return true;
+	//if (view->sel.samples.num > 0)
+	//	return true;
+	return false;
 }
 

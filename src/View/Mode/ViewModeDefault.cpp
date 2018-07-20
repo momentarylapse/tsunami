@@ -861,6 +861,7 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 		TrackLayer *l = vl->layer;
 		if ((y1 < vl->area.y1) or (y0 > vl->area.y2))
 			continue;
+		s.add(l);
 
 		// subs
 		for (SampleRef *sr: l->samples)

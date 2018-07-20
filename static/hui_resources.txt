@@ -2691,7 +2691,7 @@ popup_time_track_menu
 
 0
 0
-8
+7
 Item
 time_track_menu_header
 disabled
@@ -2711,6 +2711,36 @@ delete_track
 0
 0
 Item
+track_add_marker
+
+3
+0
+0
+Menu
+menu_bar
+
+4
+0
+5
+Item
+delete_bars
+
+0
+0
+0
+Item
+edit_bars
+
+1
+0
+0
+Item
+scale_bars
+image=hui:zoom-in
+2
+0
+0
+Item
 add_bars
 flat,image=hui:add
 3
@@ -2723,21 +2753,15 @@ image=hui:add
 0
 0
 Item
-track_add_marker
+track_edit_fx
 
 5
 0
 0
 Item
-track_edit_fx
-
-6
-0
-0
-Item
 track_properties
 
-7
+6
 0
 0
 // Resource
@@ -4239,7 +4263,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-429
+433
 // Text
 /cancel
 Cancel
@@ -5150,8 +5174,20 @@ Add bars...
 popup_time_track_menu/add_pause
 Add pause...
 
+popup_time_track_menu/delete_bars
+Delete
+
 popup_time_track_menu/delete_track
 Delete
+
+popup_time_track_menu/edit_bars
+Edit...
+
+popup_time_track_menu/menu_bar
+Bar
+
+popup_time_track_menu/scale_bars
+Scale
 
 popup_time_track_menu/time_track_menu_header
 Time track
@@ -5534,7 +5570,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-540
+544
 // Text
 /cancel
 Abbrechen
@@ -6667,8 +6703,20 @@ Takte hinzufügen...
 popup_time_track_menu/add_pause
 Pause hinzufügen...
 
+popup_time_track_menu/delete_bars
+Löschen
+
 popup_time_track_menu/delete_track
 Löschen
+
+popup_time_track_menu/edit_bars
+Bearbeiten...
+
+popup_time_track_menu/menu_bar
+Takt
+
+popup_time_track_menu/scale_bars
+Skalieren
 
 popup_time_track_menu/time_track_menu_header
 Metronom Spur

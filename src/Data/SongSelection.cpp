@@ -111,6 +111,14 @@ void SongSelection::_update_bars(Song* s)
 	bar_indices.clear();
 	bar_gap = -1;
 
+	bool metro_selected = false;
+	for (Track *t: s->tracks)
+		if (has(t) and t->type == t->Type::TIME)
+			metro_selected = true;
+	if (!metro_selected)
+		return;
+
+
 	if (range.end() <= 0){
 		bar_gap = 0;
 		return;

@@ -183,16 +183,26 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_sample->openPopup(view->win, 0, 0);
 		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::BAR){
+		view->menu_time_track->enable("delete_bars", true);
+		view->menu_time_track->enable("edit_bars", true);
+		view->menu_time_track->enable("scale_bars", true);
+		view->menu_time_track->openPopup(view->win, 0, 0);
 		//view->menu_bar->openPopup(view->win, 0, 0);
-		open_popup(view, hover);
+		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::Type::BAR_GAP){
+		view->menu_time_track->enable("delete_bars", false);
+		view->menu_time_track->enable("edit_bars", false);
+		view->menu_time_track->enable("scale_bars", false);
 		view->menu_time_track->openPopup(view->win, 0, 0);
 		//open_popup(view, hover);
 	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
-		//view->menu_time_track->openPopup(view->win, 0, 0);
-		open_popup(view, hover);
+		view->menu_time_track->enable("delete_bars", false);
+		view->menu_time_track->enable("edit_bars", false);
+		view->menu_time_track->enable("scale_bars", false);
+		view->menu_time_track->openPopup(view->win, 0, 0);
+		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		view->menu_layer->openPopup(view->win, 0, 0);
 		//open_popup(view, hover);
@@ -788,6 +798,7 @@ void ViewModeDefault::selectUnderMouse()
 	if (hover->type == Selection::Type::BAR_GAP){
 		view->sel.clear_data();
 		view->sel.bar_gap = hover->index;
+		selectLayer(this, l, control, true);
 	}else if (hover->type == Selection::Type::BAR){
 		auto b = hover->bar;
 		if (control){

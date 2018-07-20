@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-541
+545
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1625,6 +1625,18 @@ Beweglich machen
 
 popup_track_menu/menu_buffer
 Audiopuffer
+
+popup_time_track_menu/delete_bars
+Löschen
+
+popup_time_track_menu/edit_bars
+Bearbeiten...
+
+popup_time_track_menu/menu_bar
+Takt
+
+popup_time_track_menu/scale_bars
+Skalieren
 
 // Num Language Strings
 184

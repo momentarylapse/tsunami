@@ -712,7 +712,6 @@ Range ViewModeMidi::getMidiEditRange()
 
 void ViewModeMidi::startSelection()
 {
-	setBarriers(*hover);
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
 	if (hover->type == Selection::Type::TIME){

@@ -44,7 +44,6 @@ public:
 	virtual void onCurTrackChange(){}
 
 	virtual Selection getHover();
-	virtual void setBarriers(Selection &s){}
 
 	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
 	virtual void drawLayerBackground(Painter *c, AudioViewLayer *l){}

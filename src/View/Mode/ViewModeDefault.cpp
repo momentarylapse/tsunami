@@ -38,8 +38,6 @@ void ViewModeDefault::onLeftButtonDown()
 	//bool track_hover_sel = view->sel.has(hover->track);
 	selectUnderMouse();
 
-	setBarriers(*hover);
-
 	view->snap_to_grid(hover->pos);
 
 	// selection:
@@ -109,7 +107,6 @@ void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
 	dnd_mouse_pos0 = view->hover.pos;
 	dnd_ref_pos = hover_reference_pos(view->hover);
 	cur_action = new ActionSongMoveSelection(view->song, sel);
-	setBarriers(*hover);
 }
 
 void ViewModeDefault::dnd_stop()
@@ -898,7 +895,6 @@ SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, 
 
 void ViewModeDefault::startSelection()
 {
-	setBarriers(*hover);
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
 	if (hover->type == Selection::Type::TRACK_HEADER){

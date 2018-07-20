@@ -51,7 +51,7 @@ J temporäre Samples automatisch löschen
 J graphischer Takteditor
 J View Modes
 J Tab-Mode
-* Echtzeit-Effekte auf Aufnahme
+~ Echtzeit-Effekte auf Aufnahme
 J Song.range mit bars
 
 J auto scrollen beim Markieren
@@ -70,7 +70,7 @@ J PluginManager.cur_script/fx
 J Slider Plugin-Klasse
 J viele InputStream Objekte
 J AudioOutput -> DeviceManager
-* mehr-Fenster-freundlich
+J mehr-Fenster-freundlich
 J bars in Song statt Track
 
 == bugs ==
@@ -93,9 +93,9 @@ J Animation zum MidiEditor
 
 J Englisch
 J klarere SideBar
-* besseres Takt-Editieren
-* Instrumente (midi)
-* interner Kurven-Editor
+j besseres Takt-Editieren
+J Instrumente (midi)
+j interner Kurven-Editor
 J Spur-Icons hover
 
 == Wunschliste ==
@@ -110,9 +110,9 @@ J Spur-Icons hover
 
 J save progress bar fix
 * nicer sample drawing
-* beat relative midi creation
+~ beat relative midi creation
 J beat source?
-* always auto record
+J always auto record
 ~ repair curve editor
 J curve actions
 * read-only mode (while saving etc)
@@ -132,7 +132,7 @@ J selection background...
 * buffer moving mode
 * layer merging
 J Gaussian noise
-* new signal chain file format
+J new signal chain file format
 * module auto x/y
 J AudioSource into buffer
 
@@ -141,4 +141,4 @@ J AudioSource into buffer
 J delete with empty range
 * selection rect with correct y range...
 J move selection
-* fix barrier system
+j fix barrier system

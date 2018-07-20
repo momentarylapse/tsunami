@@ -2746,7 +2746,7 @@ popup_track_menu
 
 0
 0
-9
+10
 Item
 track_menu_header
 disabled
@@ -2772,9 +2772,27 @@ track_add_marker
 0
 0
 Menu
-menu_version
+menu_buffer
 
 4
+0
+2
+Item
+make_buffer_movable
+
+0
+0
+0
+Item
+delete_buffer
+
+1
+0
+0
+Menu
+menu_version
+
+5
 0
 3
 Item
@@ -2798,7 +2816,7 @@ delete_layer
 Menu
 convert_menu
 
-5
+6
 0
 2
 Item
@@ -2816,19 +2834,19 @@ track_convert_stereo
 Item
 track_edit_fx
 
-6
+7
 0
 0
 Item
 track_edit_midi
 
-7
+8
 0
 0
 Item
 track_properties
 
-8
+9
 0
 0
 // Resource
@@ -4221,7 +4239,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-426
+429
 // Text
 /cancel
 Cancel
@@ -5150,6 +5168,9 @@ Properties
 popup_track_menu/convert_menu
 Convert
 
+popup_track_menu/delete_buffer
+Delete
+
 popup_track_menu/delete_layer
 Delete
 
@@ -5161,6 +5182,12 @@ Add version
 
 popup_track_menu/layer_merge
 Merge...
+
+popup_track_menu/make_buffer_movable
+Make movable
+
+popup_track_menu/menu_buffer
+Audio buffer
 
 popup_track_menu/menu_version
 Version
@@ -5507,7 +5534,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-537
+540
 // Text
 /cancel
 Abbrechen
@@ -6658,6 +6685,9 @@ Eigenschaften
 popup_track_menu/convert_menu
 Konvertieren
 
+popup_track_menu/delete_buffer
+Löschen
+
 popup_track_menu/delete_layer
 Löschen
 
@@ -6669,6 +6699,12 @@ Version hinzufügen
 
 popup_track_menu/layer_merge
 Zusammenfügen...
+
+popup_track_menu/make_buffer_movable
+Beweglich machen
+
+popup_track_menu/menu_buffer
+Audiopuffer
 
 popup_track_menu/menu_version
 Version
@@ -7121,7 +7157,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-183
+184
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7413,6 +7449,8 @@ audio library selected:
 Audiobibliothek gewählt: 
 backup done: 
 Backup abgeschlossen: 
+bar %d/\\u2084 \\u2669=%.1f
+Takt %d/\\u2084 \\u2669=%.1f
 call: tsunami --chain <SIGNAL_CHAIN>
 Aufruf: tsunami --chain <SIGNAL_CHAIN>
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]

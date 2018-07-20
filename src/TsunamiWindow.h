@@ -56,6 +56,8 @@ public:
 	void onTrackAddMarker();
 	void onTrackConvertMono();
 	void onTrackConvertStereo();
+	void onBufferDelete();
+	void onBufferMakeMovable();
 	void onSampleFromSelection();
 	void onInsertSample();
 	void onRemoveSample();

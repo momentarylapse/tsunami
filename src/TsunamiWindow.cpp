@@ -110,6 +110,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("track_add_marker", -1, "hui:add");
 	event("track_convert_mono", std::bind(&TsunamiWindow::onTrackConvertMono, this));
 	event("track_convert_stereo", std::bind(&TsunamiWindow::onTrackConvertStereo, this));
+	event("delete_buffer", std::bind(&TsunamiWindow::onBufferDelete, this));
+	event("make_buffer_movable", std::bind(&TsunamiWindow::onBufferMakeMovable, this));
 	event("layer_add", std::bind(&TsunamiWindow::onAddLayer, this));
 	setKeyCode("layer_add", -1, "hui:add");
 	event("delete_layer", std::bind(&TsunamiWindow::onDeleteLayer, this));
@@ -391,6 +393,28 @@ void TsunamiWindow::onTrackConvertStereo()
 		view->cur_track->setChannels(2);
 	else
 		session->e(_("No track selected"));
+}
+void TsunamiWindow::onBufferDelete()
+{
+	if (view->hover.layer){
+		foreachi (AudioBuffer &buf, view->hover.layer->buffers, i)
+			if (buf.range().is_inside(view->hover.pos)){
+				SongSelection s = SongSelection::from_range(song, buf.range(), view->hover.track, view->hover.layer).filter(0);
+				song->deleteSelection(s);
+			}
+	}
+}
+
+void TsunamiWindow::onBufferMakeMovable()
+{
+	if (view->hover.layer){
+		for (AudioBuffer &buf: view->hover.layer->buffers)
+			if (buf.range().is_inside(view->hover.pos)){
+				SongSelection s = SongSelection::from_range(song, buf.range(), view->hover.track, view->hover.layer).filter(0);
+				song->createSamplesFromSelection(s);
+			}
+	}
+
 }
 
 void TsunamiWindow::onSongProperties()

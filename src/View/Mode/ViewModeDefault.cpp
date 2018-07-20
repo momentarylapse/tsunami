@@ -206,6 +206,11 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
 		view->menu_track->enable("layer_merge", !view->cur_layer->is_main);
 		view->menu_track->enable("delete_layer", !view->cur_layer->is_main);
+		bool over_buffer = false;
+		for (AudioBuffer &b: hover->layer->buffers)
+			if (b.range().is_inside(hover->pos))
+				over_buffer = true;
+		view->menu_track->enable("menu_buffer", over_buffer);
 		view->menu_track->openPopup(view->win, 0, 0);
 		//open_popup(view, hover);
 	}else if (!hover->track){

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-538
+541
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1617,8 +1617,17 @@ Zusammenfügen...
 popup_track_menu/menu_version
 Version
 
+popup_track_menu/delete_buffer
+Löschen
+
+popup_track_menu/make_buffer_movable
+Beweglich machen
+
+popup_track_menu/menu_buffer
+Audiopuffer
+
 // Num Language Strings
-183
+184
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1986,3 +1995,5 @@ not allowed to delete the main signal chain
 die Haupt-Signalkette darf nicht gelöscht werden
 marker 
 Marker 
+bar %d/\\u2084 \\u2669=%.1f
+Takt %d/\\u2084 \\u2669=%.1f

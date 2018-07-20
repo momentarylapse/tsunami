@@ -10,6 +10,8 @@
 #include "../Buffer/ActionTrackEditBuffer.h"
 #include "../Midi/ActionTrackDeleteMidiNote.h"
 #include "../../../Data/SongSelection.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
 #include "../Buffer/ActionTrack__DeleteBuffer.h"
 
 ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel) :
@@ -19,35 +21,36 @@ ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelecti
 
 void ActionTrackSampleFromSelection::build(Data *d)
 {
-	/*Song *s = dynamic_cast<Song*>(d);
+	Song *s = dynamic_cast<Song*>(d);
 	for (Track *t: s->tracks)
-		if (sel.has(t)){
+		for (TrackLayer *l: t->layers)
+		if (sel.has(l)){
 			if (t->type == t->Type::AUDIO)
-				CreateSamplesFromTrackAudio(t, sel, layer_no);
+				CreateSamplesFromLayerAudio(l, sel);
 			else if (t->type == t->Type::MIDI)
-				CreateSamplesFromTrackMidi(t, sel);
-		}*/
+				CreateSamplesFromLayerMidi(l, sel);
+		}
 }
 
-void ActionTrackSampleFromSelection::CreateSamplesFromTrackAudio(TrackLayer *l, const SongSelection &sel)
+void ActionTrackSampleFromSelection::CreateSamplesFromLayerAudio(TrackLayer *l, const SongSelection &sel)
 {
-/*	foreachib(AudioBuffer &b, l->buffers, bi)
+	foreachib(AudioBuffer &b, l->buffers, bi)
 		if (sel.range.covers(b.range())){
-			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b, false), t->song);
-			addSubAction(new ActionTrack__DeleteBuffer(t, layer_no, bi), t->song);
-		}*/
+			addSubAction(new ActionTrackPasteAsSample(l, b.offset, b, false), l->track->song);
+			addSubAction(new ActionTrack__DeleteBuffer(l, bi), l->track->song);
+		}
 }
 
-void ActionTrackSampleFromSelection::CreateSamplesFromTrackMidi(Track *t, const SongSelection &selo)
+void ActionTrackSampleFromSelection::CreateSamplesFromLayerMidi(TrackLayer *l, const SongSelection &sel)
 {
-	/*MidiNoteBuffer midi = t->midi.getNotesBySelection(sel);
+	MidiNoteBuffer midi = l->midi.getNotesBySelection(sel);
 	midi.samples = sel.range.length;
 	if (midi.num == 0)
 		return;
 	for (auto n: midi)
 		n->range.offset -= sel.range.offset;
-	addSubAction(new ActionTrackPasteAsSample(t, sel.range.offset, midi, false), t->song);
-	foreachib(MidiNote *n, t->midi, i)
+	addSubAction(new ActionTrackPasteAsSample(l, sel.range.offset, midi, false), l->track->song);
+	foreachib(MidiNote *n, l->midi, i)
 		if (sel.has(n))
-			addSubAction(new ActionTrackDeleteMidiNote(t, i), t->song);*/
+			addSubAction(new ActionTrackDeleteMidiNote(l, i), l->track->song);
 }

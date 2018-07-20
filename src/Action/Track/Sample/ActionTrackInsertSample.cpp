@@ -9,7 +9,8 @@
 #include "ActionTrackDeleteSample.h"
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/SampleRef.h"
 #include "../Midi/ActionTrackAddMidiNote.h"
 #include "../../Sample/ActionSampleDelete.h"
 

@@ -7,7 +7,7 @@
 
 #include "ActionSampleEditName.h"
 
-#include "../../Data/Song.h"
+#include "../../Data/Sample.h"
 
 ActionSampleEditName::ActionSampleEditName(Sample *s, const string &name)
 {

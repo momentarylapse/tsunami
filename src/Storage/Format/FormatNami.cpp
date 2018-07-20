@@ -9,6 +9,7 @@
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Data/Curve.h"
+#include "../../Data/SampleRef.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/Midi/MidiEffect.h"

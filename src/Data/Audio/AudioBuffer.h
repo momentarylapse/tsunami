@@ -9,6 +9,7 @@
 #define SRC_DATA_AUDIO_AUDIOBUFFER_H_
 
 #include "../Range.h"
+#include <shared_mutex>
 
 
 #define NUM_PEAK_LEVELS		24
@@ -50,6 +51,8 @@ public:
 	Array<float> c[2];
 
 	Array<string> peaks;
+
+	std::shared_timed_mutex mtx;
 
 	Range _cdecl range() const;
 	Range _cdecl range0() const;

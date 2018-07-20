@@ -7,6 +7,7 @@
 
 #include "../AudioView.h"
 #include "../../Data/Track.h"
+#include "../../Data/SampleRef.h"
 #include "../Helper/Slider.h"
 #include "SampleRefConsole.h"
 #include "SampleManagerConsole.h"

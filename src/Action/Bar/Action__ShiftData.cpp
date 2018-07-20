@@ -8,6 +8,7 @@
 #include "Action__ShiftData.h"
 
 #include "../../Data/Track.h"
+#include "../../Data/SampleRef.h"
 #include <assert.h>
 
 Action__ShiftData::Action__ShiftData(int _offset, int _shift, int _mode)

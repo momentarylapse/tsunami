@@ -14,8 +14,11 @@
 #include "../Synth/Synthesizer.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/Curve.h"
 #include "../../Data/SongSelection.h"
+#include "../../Data/SampleRef.h"
 #include "../../Tsunami.h"
 #include "../../lib/math/math.h"
 
@@ -32,7 +35,7 @@ SongRenderer::SongRenderer(Song *s)
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	prepare(s->getRange(), false);
+	prepare(s->range(), false);
 	song->subscribe(this, std::bind(&SongRenderer::on_song_change, this));
 }
 

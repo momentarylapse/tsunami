@@ -7,7 +7,8 @@
 
 #include "ActionTrackDeleteSample.h"
 
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/SampleRef.h"
 
 ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref)
 {

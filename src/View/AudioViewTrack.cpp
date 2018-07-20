@@ -13,6 +13,7 @@
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
 #include "../Data/Song.h"
+#include "../Data/SampleRef.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Data/Rhythm/Beat.h"
 #include "../Data/Rhythm/BarCollection.h"

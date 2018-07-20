@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include "../../Data/Song.h"
+#include "../../Data/Sample.h"
 
 ActionSampleDelete::ActionSampleDelete(Sample *s)
 {

@@ -373,7 +373,7 @@ class Song
 	extern void __init__(Session* session)
 	extern virtual void __delete__()
 	
-	extern Range get_range()
+	extern Range range()
 	
 	extern void new_empty(int sample_rate)
 	extern Track* add_track(int type, int index)

@@ -130,8 +130,8 @@ bool Tsunami::handleArguments(Array<string> &args)
 			session->e(_("call: tsunami --info <File>"));
 		}else if (session->storage->load_ex(song, args[i+1], true)){
 			msg_write(format("sample-rate: %d", song->sample_rate));
-			msg_write(format("samples: %d", song->getRange().length));
-			msg_write("length: " + song->get_time_str(song->getRange().length));
+			msg_write(format("samples: %d", song->range().length));
+			msg_write("length: " + song->get_time_str(song->range().length));
 			msg_write(format("tracks: %d", song->tracks.num));
 			int n = 0;
 			for (Track *t: song->tracks)

@@ -7,7 +7,8 @@
 
 #include "ActionTrackAddSample.h"
 
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/SampleRef.h"
 
 ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample)
 {

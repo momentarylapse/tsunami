@@ -17,6 +17,7 @@
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Device/OutputStream.h"
+#include "../Data/SampleRef.h"
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 

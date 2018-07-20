@@ -17,6 +17,7 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Data/Rhythm/Beat.h"
+#include "../Data/SampleRef.h"
 #include "../Device/OutputStream.h"
 #include "../Module/Audio/SongRenderer.h"
 #include "../Module/Synth/Synthesizer.h"
@@ -402,7 +403,7 @@ Range AudioView::getPlaybackSelection(bool for_recording)
 	if (sel.range.empty()){
 		if (for_recording)
 			return Range(sel.range.start(), 0x70000000);
-		int num = song->getRangeWithTime().end() - sel.range.start();
+		int num = song->range_with_time().end() - sel.range.start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
 		return Range(sel.range.start(), num);
@@ -1098,7 +1099,7 @@ void AudioView::optimizeView()
 	if (area.x2 <= 0)
 		area.x2 = 1024;
 
-	Range r = song->getRangeWithTime();
+	Range r = song->range_with_time();
 
 	if (r.length == 0)
 		r.length = 10 * song->sample_rate;
@@ -1154,7 +1155,7 @@ void AudioView::zoomOut()
 
 void AudioView::selectAll()
 {
-	setSelection(mode->getSelectionForRange(song->getRange()));
+	setSelection(mode->getSelectionForRange(song->range()));
 }
 
 void AudioView::selectNone()

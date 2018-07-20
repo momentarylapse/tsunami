@@ -61,7 +61,7 @@ static int find_offset(AudioView *view)
 	if (!view->sel.range.empty())
 		return view->sel.range.offset;
 
-	int offset = view->song->getRange().end();
+	int offset = view->song->range().end();
 	for (Track *t: view->song->tracks)
 		for (TrackLayer *l: t->layers)
 			if (view->sel.has(l))

@@ -7,7 +7,8 @@
 
 #include "ActionTrackEditSample.h"
 
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/SampleRef.h"
 
 ActionTrackEditSample::ActionTrackEditSample(SampleRef *_ref, float volume, bool mute)
 {

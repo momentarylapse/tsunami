@@ -8,6 +8,7 @@
 #include "ActionSongMoveSelection.h"
 #include "../../Data/Song.h"
 #include "../../Data/SongSelection.h"
+#include "../../Data/SampleRef.h"
 
 
 ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &sel)

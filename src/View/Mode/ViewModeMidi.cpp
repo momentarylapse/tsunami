@@ -13,6 +13,7 @@
 #include "../../Device/OutputStream.h"
 #include "../../Data/Midi/Clef.h"
 #include "../../Data/SongSelection.h"
+#include "../../Data/SampleRef.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../AudioView.h"

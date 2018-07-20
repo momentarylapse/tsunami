@@ -6,6 +6,7 @@
  */
 
 #include "Sample.h"
+#include "SampleRef.h"
 #include "../lib/math/math.h"
 #include "Song.h"
 

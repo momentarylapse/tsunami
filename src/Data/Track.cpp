@@ -6,6 +6,7 @@
  */
 
 #include "Track.h"
+#include "SampleRef.h"
 #include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../Action/Track/Buffer/ActionTrackSetChannels.h"
@@ -94,6 +95,13 @@ Range TrackLayer::range(int keep_notes) const
 		r = r or s->range();
 
 	return r;
+}
+
+Song *TrackLayer::song() const
+{
+	if (!track)
+		return NULL;
+	return track->song;
 }
 
 int TrackLayer::version_number() const

@@ -11,11 +11,10 @@
 #include "Data.h"
 #include "Track.h"
 #include "Sample.h"
-#include "SampleRef.h"
 #include "Curve.h"
 #include "../lib/base/base.h"
-#include "../lib/math/rect.h"
 #include "Rhythm/BarCollection.h"
+#include <shared_mutex>
 
 class Data;
 class AudioEffect;
@@ -47,8 +46,8 @@ public:
 	void _cdecl __init__(Session *session);
 	void _cdecl __delete__();
 
-	Range _cdecl getRange();
-	Range _cdecl getRangeWithTime();
+	Range _cdecl range();
+	Range _cdecl range_with_time();
 
 	static const string MESSAGE_NEW;
 	static const string MESSAGE_ADD_TRACK;
@@ -130,7 +129,6 @@ public:
 	void _cdecl curveEditPoint(Curve *curve, int index, int pos, float value);
 
 	// helper
-	SampleRef *_cdecl get_sample_ref(Track *track, int index);
 	Sample* _cdecl get_sample_by_uid(int uid);
 	AudioEffect *_cdecl get_fx(Track *track, int index);
 	MidiEffect *_cdecl get_midi_fx(Track *track, int index);
@@ -151,6 +149,8 @@ public:
 	BarCollection bars;
 
 	Array<TrackLayer*> layers() const;
+
+	std::shared_timed_mutex mtx;
 };
 
 

@@ -12,7 +12,6 @@
 #include "Midi/MidiData.h"
 #include "Sample.h"
 #include "Midi/Instrument.h"
-#include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 #include "Audio/AudioBuffer.h"
 #include "Song.h"
@@ -23,6 +22,8 @@ class AudioBuffer;
 class Song;
 class Synthesizer;
 class AudioEffect;
+class SampleRef;
+class Sample;
 
 
 
@@ -53,6 +54,7 @@ public:
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 
 	Track *track;
+	Song *song() const;
 	int type;
 	int channels;
 	bool is_main;

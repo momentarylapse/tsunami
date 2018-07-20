@@ -247,7 +247,7 @@ bool Song::is_empty()
 	return action_manager->isSave();
 }
 
-Range Song::getRange()
+Range Song::range()
 {
 	Range r = Range::EMPTY;
 
@@ -257,9 +257,9 @@ Range Song::getRange()
 	return r;
 }
 
-Range Song::getRangeWithTime()
+Range Song::range_with_time()
 {
-	Range r = getRange();
+	Range r = range();
 
 	if (bars.num > 0)
 		r = r or bars.range();

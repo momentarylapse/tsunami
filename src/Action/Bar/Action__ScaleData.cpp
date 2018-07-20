@@ -8,6 +8,7 @@
 #include "Action__ScaleData.h"
 
 #include "../../Data/Track.h"
+#include "../../Data/SampleRef.h"
 #include <assert.h>
 
 Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size)

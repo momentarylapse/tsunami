@@ -8,6 +8,7 @@
 #include "ActionTrackEditBuffer.h"
 #include <assert.h>
 #include "../../../Data/Track.h"
+#include "../../ActionManager.h"
 
 ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 {
@@ -20,6 +21,9 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 		if (buf.range().covers(range))
 			index = i;
 	assert(index >= 0);
+
+	if (!l->track->song->action_manager->isEnabled())
+		return;
 
 	// save old data
 	AudioBuffer b;

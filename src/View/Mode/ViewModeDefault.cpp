@@ -16,6 +16,8 @@
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
+#include "../../Data/Track.h"
+#include "../../Data/SampleRef.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)

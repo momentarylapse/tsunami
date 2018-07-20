@@ -205,7 +205,7 @@ void FormatPdf::saveSong(StorageOperationData* od)
 	float avg_scale = 100.0f / od->song->sample_rate;
 	float avg_samples_per_line = w / avg_scale;
 
-	int samples = od->song->getRangeWithTime().end();
+	int samples = od->song->range_with_time().end();
 	//int num_lines =  / samples_per_line + 1;
 	float y0 = 140;
 	float line_space = 50;

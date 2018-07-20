@@ -9,6 +9,8 @@
 
 #include "Rhythm/Bar.h"
 #include "Song.h"
+#include "Track.h"
+#include "SampleRef.h"
 
 SongSelection::SongSelection()
 {
@@ -34,7 +36,7 @@ void SongSelection::clear_data()
 
 void SongSelection::all(Song* s)
 {
-	from_range(s, s->getRangeWithTime());
+	from_range(s, s->range_with_time());
 }
 
 SongSelection SongSelection::from_range(Song *song, const Range &r)

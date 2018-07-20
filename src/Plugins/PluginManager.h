@@ -8,7 +8,6 @@
 #ifndef PLUGINMANAGER_H_
 #define PLUGINMANAGER_H_
 
-#include "../Data/Song.h"
 #include "../lib/kaba/kaba.h"
 
 class Plugin;

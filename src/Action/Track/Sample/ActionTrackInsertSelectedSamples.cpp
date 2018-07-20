@@ -7,7 +7,8 @@
 
 #include "ActionTrackInsertSelectedSamples.h"
 
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/SampleRef.h"
 #include "../../../Data/SongSelection.h"
 #include "ActionTrackInsertSample.h"
 
@@ -21,8 +22,7 @@ void ActionTrackInsertSelectedSamples::build(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
 
-	for (Track *t: s->tracks)
-		for (TrackLayer *l: t->layers)
+	for (TrackLayer *l: s->layers())
 		foreachib(SampleRef *ss, l->samples, si)
 			if (sel.has(ss))
 				addSubAction(new ActionTrackInsertSample(l, si), d);

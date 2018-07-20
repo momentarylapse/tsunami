@@ -68,9 +68,9 @@ void SongConsole::loadData()
 
 	// data
 	reset("data_list");
-	int samples = song->getRange().length;
-	addString("data_list", _("Start") + "\\" + song->get_time_str_long(song->getRange().start()));
-	addString("data_list", _("End") + "\\" + song->get_time_str_long(song->getRange().end()));
+	int samples = song->range().length;
+	addString("data_list", _("Start") + "\\" + song->get_time_str_long(song->range().start()));
+	addString("data_list", _("End") + "\\" + song->get_time_str_long(song->range().end()));
 	addString("data_list", _("Length") + "\\" + song->get_time_str_long(samples));
 	addString("data_list", _("Samples") + "\\" + i2s(samples));
 	//addString("data_list", _("Samplerate") + "\\ + i2s(audio->sample_rate) + " Hz");

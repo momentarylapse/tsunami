@@ -12,6 +12,8 @@
 #include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
+#include "../Data/Song.h"
+#include "../Data/SampleRef.h"
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Module/ConfigPanel.h"
@@ -371,7 +373,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::deleteMarker));
 	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::editMarker));
 
-	Song af = Song(Session::GLOBAL);
+	Song af(Session::GLOBAL);
 	Kaba::DeclareClassSize("Song", sizeof(Song));
 	Kaba::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
 	Kaba::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
@@ -387,7 +389,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.new_empty", Kaba::mf(&Song::newEmpty));
 	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::addTrack));
 	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::deleteTrack));
-	Kaba::LinkExternal("Song.get_range", Kaba::mf(&Song::getRange));
+	Kaba::LinkExternal("Song.range", Kaba::mf(&Song::range));
 	Kaba::LinkExternal("Song.add_bar", Kaba::mf(&Song::addBar));
 	Kaba::LinkExternal("Song.add_pause", Kaba::mf(&Song::addPause));
 	Kaba::LinkExternal("Song.edit_bar", Kaba::mf(&Song::editBar));

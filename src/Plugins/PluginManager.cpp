@@ -207,11 +207,13 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("RingBuffer.available", Kaba::mf(&RingBuffer::available));
 	Kaba::LinkExternal("RingBuffer.read", Kaba::mf(&RingBuffer::read));
 	Kaba::LinkExternal("RingBuffer.write", Kaba::mf(&RingBuffer::write));
-	Kaba::LinkExternal("RingBuffer.read_ref", Kaba::mf(&RingBuffer::readRef));
-	Kaba::LinkExternal("RingBuffer.peek_ref", Kaba::mf(&RingBuffer::peekRef));
-	Kaba::LinkExternal("RingBuffer.write_ref", Kaba::mf(&RingBuffer::writeRef));
-	Kaba::LinkExternal("RingBuffer.move_read_pos", Kaba::mf(&RingBuffer::moveReadPos));
-	Kaba::LinkExternal("RingBuffer.move_write_pos", Kaba::mf(&RingBuffer::moveWritePos));
+	Kaba::LinkExternal("RingBuffer.read_ref", Kaba::mf(&RingBuffer::read_ref));
+	Kaba::LinkExternal("RingBuffer.read_ref_done", Kaba::mf(&RingBuffer::read_ref_done));
+	Kaba::LinkExternal("RingBuffer.peek_ref", Kaba::mf(&RingBuffer::peek_ref));
+	Kaba::LinkExternal("RingBuffer.write_ref", Kaba::mf(&RingBuffer::write_ref));
+	Kaba::LinkExternal("RingBuffer.write_ref_done", Kaba::mf(&RingBuffer::write_ref_done));
+//	Kaba::LinkExternal("RingBuffer.move_read_pos", Kaba::mf(&RingBuffer::move_read_pos));
+//	Kaba::LinkExternal("RingBuffer.move_write_pos", Kaba::mf(&RingBuffer::move_write_pos));
 	Kaba::LinkExternal("RingBuffer.clear", Kaba::mf(&RingBuffer::clear));
 
 	Kaba::DeclareClassSize("Sample", sizeof(Sample));

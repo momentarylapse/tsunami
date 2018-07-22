@@ -7,11 +7,13 @@
 
 #include "PerformanceMonitor.h"
 #include "../lib/hui/hui.h"
+#include <mutex>
 
 #define ALLOW_PERF_MON	1
 
 static const float UPDATE_DT = 1.0f;
 static PerformanceMonitor *perf_mon = NULL;
+static std::mutex pm_mutex;
 
 #if ALLOW_PERF_MON
 struct Channel
@@ -78,6 +80,7 @@ PerformanceMonitor::~PerformanceMonitor()
 int PerformanceMonitor::create_channel(const string &name)
 {
 #if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
 	foreachi(Channel &c, channels, i)
 		if (!c.used){
 			c.init(name);
@@ -95,6 +98,7 @@ int PerformanceMonitor::create_channel(const string &name)
 void PerformanceMonitor::delete_channel(int channel)
 {
 #if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
 	channels[channel].used = false;
 #endif
 }
@@ -102,6 +106,7 @@ void PerformanceMonitor::delete_channel(int channel)
 void PerformanceMonitor::start_busy(int channel)
 {
 #if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
 	//float t = timer.peek();
 	//printf("+ %d %f\n", channel, t);
 	auto &c = channels[channel];
@@ -122,6 +127,8 @@ void pm_notify()
 void PerformanceMonitor::end_busy(int channel)
 {
 #if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
+
 	//float t = timer.peek();
 	auto &c = channels[channel];
 	//printf("- %d %f\n", channel, t);
@@ -141,6 +148,7 @@ void PerformanceMonitor::end_busy(int channel)
 
 Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
 {
+	std::lock_guard<std::mutex> lock(pm_mutex);
 	Array<PerformanceMonitor::ChannelInfo> infos;
 	for (auto &c: channels)
 		if (c.used){

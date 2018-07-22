@@ -10,7 +10,6 @@
 #include "ActionMergable.h"
 #include "ActionGroup.h"
 #include "../Data/Data.h"
-#include "../lib/threads/Mutex.h"
 #include <assert.h>
 
 ActionManager::ActionManager(Data *_data)
@@ -18,7 +17,7 @@ ActionManager::ActionManager(Data *_data)
 	data = _data;
 	cur_group = NULL;
 	lock_level = 0;
-	mutex = new Mutex;
+	//mutex = new Mutex;
 	timer = new hui::Timer;
 	reset();
 }
@@ -26,7 +25,7 @@ ActionManager::ActionManager(Data *_data)
 ActionManager::~ActionManager()
 {
 	reset();
-	delete(mutex);
+	//delete(mutex);
 	delete(timer);
 }
 
@@ -196,7 +195,7 @@ void ActionManager::endActionGroup()
 void ActionManager::lock()
 {
 	if (lock_level == 0)
-		mutex->lock();
+		mtx.lock();
 	lock_level ++;
 }
 
@@ -204,6 +203,6 @@ void ActionManager::unlock()
 {
 	lock_level --;
 	if (lock_level == 0)
-		mutex->unlock();
+		mtx.unlock();
 }
 

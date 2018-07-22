@@ -87,9 +87,9 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 //		printf("  j\n");
 		for (int n=0; (n<2) and (done < frames); n++){
 			AudioBuffer b;
-			stream->ring_buf.readRef(b, frames - done);
-
+			stream->ring_buf.read_ref(b, frames - done);
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
+			stream->ring_buf.read_ref_done(b);
 			out += b.length * 2;
 			done += b.length;
 			break;
@@ -160,9 +160,9 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 //		printf("  j\n");
 		for (int n=0; (n<2) and (done < (int)frames); n++){
 			AudioBuffer b;
-			stream->ring_buf.readRef(b, frames - done);
-
+			stream->ring_buf.read_ref(b, frames - done);
 			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
+			stream->ring_buf.read_ref_done(b);
 			out += b.length * 2;
 			done += b.length;
 			break;
@@ -203,7 +203,8 @@ public:
 	{
 		//printf("thread start\n");
 		while(stream->keep_thread_running){
-			if (stream->read_more){
+			//if (stream->read_more){
+			if (stream->ring_buf.available() <= stream->buffer_size){
 				PerformanceMonitor::start_busy(perf_channel);
 				stream->_read_stream();
 				PerformanceMonitor::end_busy(perf_channel);
@@ -453,7 +454,7 @@ void OutputStream::_read_stream()
 
 	int size = 0;
 	AudioBuffer b;
-	b.resize(buffer_size);
+	ring_buf.write_ref(b, buffer_size);
 
 	// read data
 	size = source->read(b);
@@ -476,7 +477,7 @@ void OutputStream::_read_stream()
 
 	// add to queue
 	b.length = size;
-	ring_buf.write(b);
+	ring_buf.write_ref_done(b);
 //	printf(" -> %d of %d\n", size, buffer_size);
 
 	reading = false;

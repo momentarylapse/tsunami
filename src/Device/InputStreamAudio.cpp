@@ -53,13 +53,15 @@ void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes
 
 			RingBuffer &buf = input->buffer;
 			AudioBuffer b;
-			buf.writeRef(b, frames);
+			buf.write_ref(b, frames);
 			b.deinterleave(in, input->num_channels);
+			buf.write_ref_done(b);
 
 			int done = b.length;
 			if (done < frames){
-				buf.writeRef(b, frames - done);
+				buf.write_ref(b, frames - done);
 				b.deinterleave(&in[input->num_channels * done], input->num_channels);
+				buf.write_ref_done(b);
 			}
 		}
 
@@ -109,13 +111,15 @@ int InputStreamAudio::portaudio_stream_request_callback(const void *inputBuffer,
 
 			RingBuffer &buf = input->buffer;
 			AudioBuffer b;
-			buf.writeRef(b, frames);
+			buf.write_ref(b, frames);
 			b.deinterleave(in, input->num_channels);
+			buf.write_ref_done(b);
 
 			int done = b.length;
 			if (done < (int)frames){
-				buf.writeRef(b, frames - done);
+				buf.write_ref(b, frames - done);
 				b.deinterleave(&in[input->num_channels * done], input->num_channels);
+				buf.write_ref_done(b);
 			}
 		}
 	}

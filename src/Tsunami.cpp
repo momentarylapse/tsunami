@@ -21,6 +21,7 @@
 #include "Stuff/BackupManager.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
+#include "Test/TestAudioBuffer.h"
 
 
 const string AppName = "Tsunami";
@@ -177,6 +178,10 @@ bool Tsunami::handleArguments(Array<string> &args)
 		i ++;
 	}else if (args[i] == "--slow"){
 		ugly_hack_slow = true;
+	}else if (args[i] == "--run-tests"){
+		TestAudioBuffer t;
+		t.run();
+		return true;
 	}else if (args[i].head(2) == "--"){
 		session->e(_("unknown command: ") + args[i]);
 		return true;

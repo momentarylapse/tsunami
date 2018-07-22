@@ -28,8 +28,9 @@ int AudioVisualizer::Output::read(AudioBuffer& buf)
 
 	while (visualizer->buffer->available() >= visualizer->chunk_size){
 		AudioBuffer b;
-		visualizer->buffer->readRef(b, visualizer->chunk_size);
+		visualizer->buffer->read_ref(b, visualizer->chunk_size);
 		visualizer->process(b);
+		visualizer->buffer->read_ref_done(b);
 	}
 	return r;
 }

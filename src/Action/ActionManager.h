@@ -11,11 +11,12 @@
 #include "../lib/base/base.h"
 #include "Action.h"
 #include "../Data/Data.h"
+#include <shared_mutex>
 
 class Data;
 class Action;
 class ActionGroup;
-class Mutex;
+//class Mutex;
 namespace hui{
 	class Timer;
 }
@@ -66,7 +67,8 @@ private:
 	// for merging
 	hui::Timer *timer;
 
-	Mutex *mutex;
+	//Mutex *mutex;
+	std::shared_timed_mutex mtx;
 };
 
 #endif /* ACTIONMANAGER_H_ */

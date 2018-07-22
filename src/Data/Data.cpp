@@ -70,17 +70,17 @@ bool Data::history_enabled()
 // "low level" -> don't use ActionManager.lock()!
 void Data::lock()
 {
-	action_manager->mutex->lock();
+	action_manager->mtx.lock();
 }
 
 bool Data::try_lock()
 {
-	return action_manager->mutex->tryLock();
+	return action_manager->mtx.try_lock();
 }
 
 void Data::unlock()
 {
-	action_manager->mutex->unlock();
+	action_manager->mtx.unlock();
 }
 
 

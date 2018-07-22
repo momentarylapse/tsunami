@@ -34,6 +34,8 @@ public:
 	}
 	virtual int _cdecl read(MidiEventBuffer &midi)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
+
 		//printf("mps.read\n");
 		if (mode == Mode::END_OF_STREAM){
 			//printf("  - end\n");
@@ -59,6 +61,8 @@ public:
 
 	void start(const Array<int> &_pitch, int _ttl)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
+
 		if ((mode != Mode::WAITING) and (mode != Mode::END_OF_STREAM))
 			return;
 		pitch = _pitch;
@@ -67,6 +71,8 @@ public:
 	}
 	void end()
 	{
+		std::lock_guard<std::mutex> lock(mutex);
+
 		if (mode == Mode::START_NOTES){
 			mode = Mode::WAITING;
 		}else if (mode == Mode::ACTIVE_NOTES){
@@ -75,7 +81,8 @@ public:
 	}
 
 private:
-	int mode;
+	std::mutex mutex;
+	std::atomic<int> mode;
 	enum Mode{
 		WAITING,
 		START_NOTES,

@@ -74,7 +74,7 @@ public:
 	{
 		view = _view;
 	}
-	virtual void _cdecl onRun()
+	void _cdecl on_run() override
 	{
 		//msg_write("  run");
 		//HuiSleep(0.1f);
@@ -734,17 +734,17 @@ void AudioView::update_peaks(AudioBuffer &buf)
 	int n = buf._update_peaks_prepare();
 	song->unlock();
 
-	Thread::cancelationPoint();
+	Thread::cancelation_point();
 
 	for (int i=0; i<n; i++)
 		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
 			while (!song->try_lock()){
-				Thread::cancelationPoint();
+				Thread::cancelation_point();
 				hui::Sleep(0.01f);
 			}
 			buf._update_peaks_chunk(i);
 			song->unlock();
-			Thread::cancelationPoint();
+			Thread::cancelation_point();
 		}
 }
 
@@ -1127,7 +1127,7 @@ void AudioView::updatePeaks()
 	is_updating_peaks = true;
 	peak_thread->run();
 	for (int i=0; i<5; i++){
-		if (peak_thread->isDone()){
+		if (peak_thread->is_done()){
 			forceRedraw();
 			break;
 		}else

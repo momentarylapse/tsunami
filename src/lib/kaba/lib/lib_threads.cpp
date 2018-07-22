@@ -35,8 +35,8 @@ void SIAddPackageThread()
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,	thread_p(mf(&Thread::__init__)));
 		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,	thread_p(mf(&Thread::__delete__)));
 		class_add_func("run",		TypeVoid,	thread_p(mf(&Thread::run)));
-		class_add_func_virtual("on_run",		TypeVoid,	thread_p(mf(&Thread::onRun)));
-		class_add_func("is_done",		TypeBool,	thread_p(mf(&Thread::isDone)));
+		class_add_func_virtual("on_run",		TypeVoid,	thread_p(mf(&Thread::on_run)));
+		class_add_func("is_done",		TypeBool,	thread_p(mf(&Thread::is_done)));
 		class_add_func("kill",		TypeVoid,	thread_p(mf(&Thread::kill)));
 		class_add_func("join",		TypeVoid,	thread_p(mf(&Thread::join)));
 #ifdef _X_USE_THREADS_
@@ -65,9 +65,9 @@ void SIAddPackageThread()
 		class_set_vtable(ThreadedWork);
 #endif
 
-	add_func("ThreadGetNumCores",		TypeInt,	thread_p(&Thread::getNumCores));
+	add_func("ThreadGetNumCores",		TypeInt,	thread_p(&Thread::get_num_cores));
 	add_func("ThreadExit",				TypeVoid,	thread_p(&Thread::exit));
-	add_func("ThreadSelf",				TypeThreadP,thread_p(&Thread::getSelf));
+	add_func("ThreadSelf",				TypeThreadP,thread_p(&Thread::get_self));
 }
 
 };

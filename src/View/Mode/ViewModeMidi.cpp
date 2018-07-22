@@ -120,6 +120,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	preview_synth = NULL;
 	preview_stream = NULL;
+
+	mouse_pre_moving_pos = -1;
 }
 
 ViewModeMidi::~ViewModeMidi()

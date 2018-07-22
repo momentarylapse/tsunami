@@ -199,7 +199,7 @@ public:
 		perf_channel = stream->perf_channel;
 	}
 
-	virtual void _cdecl onRun()
+	void on_run() override
 	{
 		//printf("thread start\n");
 		while(stream->keep_thread_running){

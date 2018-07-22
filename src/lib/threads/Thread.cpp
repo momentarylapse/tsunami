@@ -28,7 +28,7 @@ static Array<Thread*> _Thread_List_;
 //------------------------------------------------------------------------------
 // auxiliary
 
-int Thread::getNumCores()
+int Thread::get_num_cores()
 {
 #ifdef OS_WINDOWS
 	SYSTEM_INFO siSysInfo;
@@ -51,6 +51,7 @@ Thread::Thread()
 {
 	internal = NULL;
 	running = false;
+	done = false;
 	_Thread_List_.add(this);
 }
 
@@ -145,7 +146,7 @@ Thread *Thread::getSelf()
 static void __thread_cleanup_func(void *p)
 {
 	Thread *t = (Thread*)p;
-	t->onCancel();
+	t->on_cancel();
 }
 
 static void *__thread_start_func(void *p)
@@ -154,8 +155,9 @@ static void *__thread_start_func(void *p)
 
 	pthread_cleanup_push(&__thread_cleanup_func, p);
 
-	t->onRun();
-	t->running = false;
+	t->done = false;
+	t->on_run();
+	t->done = true;
 
     pthread_cleanup_pop(0);
 	return NULL;
@@ -165,6 +167,10 @@ static void *__thread_start_func(void *p)
 // create and run a new thread
 void Thread::run()
 {
+	if (internal){
+		msg_error("multiple Thread.run()");
+	}
+
 	if (!internal)
 		internal = new ThreadInternal;
 	running = true;
@@ -197,7 +203,7 @@ void Thread::exit()
 	pthread_exit(NULL);
 }
 
-Thread *Thread::getSelf()
+Thread *Thread::get_self()
 {
 	pthread_t s = pthread_self();
 	for (Thread *t : _Thread_List_)
@@ -207,7 +213,7 @@ Thread *Thread::getSelf()
 	return NULL;
 }
 
-void Thread::cancelationPoint()
+void Thread::cancelation_point()
 {
 	pthread_testcancel();
 }
@@ -216,8 +222,8 @@ void Thread::cancelationPoint()
 #endif
 
 
-bool Thread::isDone()
+bool Thread::is_done()
 {
-	return !running;
+	return done;
 }
 

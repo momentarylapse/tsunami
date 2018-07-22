@@ -9,14 +9,28 @@
 #define SRC_TEST_UNITTEST_H_
 
 #include "../lib/base/base.h"
+#include <functional>
 
 class UnitTest
 {
 public:
-	UnitTest();
+	UnitTest(const string &name);
 	virtual ~UnitTest();
 
-	virtual void run(){}
+	string name;
+
+	class Test
+	{
+	public:
+		string name;
+		std::function<void()> f;
+		Test(){}
+		Test(const string &_name, std::function<void()> _f)
+		{ name = _name; f = _f; }
+	};
+	virtual Array<Test> tests() = 0;
+
+	void run();
 
 	//void assert(bool )
 
@@ -25,6 +39,8 @@ public:
 	public:
 		Failure(const string &s) : Exception(s){}
 	};
+
+	static void run_all(const string &filter);
 };
 
 #endif /* SRC_TEST_UNITTEST_H_ */

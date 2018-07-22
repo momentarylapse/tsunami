@@ -14,10 +14,10 @@ class TestAudioBuffer : public UnitTest
 {
 public:
 	TestAudioBuffer();
-	virtual ~TestAudioBuffer();
-	void run() override;
 
-	void test_ring_buffer_thread_safety();
+	Array<Test> tests() override;
+
+	static void test_ring_buffer_thread_safety();
 };
 
 #endif /* SRC_TEST_TESTAUDIOBUFFER_H_ */

@@ -18,26 +18,27 @@ public:
 	Thread();
 	virtual ~Thread();
 	void _cdecl run();
-	bool _cdecl isDone();
+	bool _cdecl is_done();
 	void _cdecl kill();
 	void _cdecl join();
 
-	virtual void _cdecl onRun(){}// = 0;
-	virtual void _cdecl onCancel(){}
+	virtual void _cdecl on_run(){}// = 0;
+	virtual void _cdecl on_cancel(){}
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
+	std::atomic<bool> done;
 	std::atomic<bool> running;
 	ThreadInternal *internal;
 
 
 	// auxiliary
-	static int _cdecl getNumCores();
+	static int _cdecl get_num_cores();
 
 	static void _cdecl exit();
-	static Thread *_cdecl getSelf();
-	static void cancelationPoint();
+	static Thread *_cdecl get_self();
+	static void cancelation_point();
 };
 
 

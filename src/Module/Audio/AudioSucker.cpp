@@ -28,7 +28,7 @@ public:
 		perf_channel = sucker->perf_channel;
 	}
 
-	virtual void _cdecl onRun()
+	void on_run() override
 	{
 		//msg_write("thread run");
 		while(true){

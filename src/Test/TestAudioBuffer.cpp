@@ -10,23 +10,16 @@
 #include "../lib/file/msg.h"
 #include <thread>
 
-TestAudioBuffer::TestAudioBuffer()
+TestAudioBuffer::TestAudioBuffer() : UnitTest("AudioBuffer")
 {
 }
 
-TestAudioBuffer::~TestAudioBuffer()
-{
-}
 
-void TestAudioBuffer::run()
+Array<UnitTest::Test> TestAudioBuffer::tests()
 {
-	msg_write("ring_buffer_thread_safety");
-	try{
-		test_ring_buffer_thread_safety();
-		msg_write("  ok");
-	}catch(Exception &e){
-		msg_error(e.message());
-	}
+	Array<Test> list;
+	list.add(Test("thread-safety", TestAudioBuffer::test_ring_buffer_thread_safety));
+	return list;
 }
 
 void TestAudioBuffer::test_ring_buffer_thread_safety()

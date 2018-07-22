@@ -291,6 +291,8 @@ OBJ = Action/Bar/Action__ScaleData.o \
  Stuff/Observable.o \
  Stuff/PerformanceMonitor.o \
  Test/TestAudioBuffer.o \
+ Test/TestStreams.o \
+ Test/TestThreads.o \
  Test/UnitTest.o \
  View/BottomBar/BottomBar.o \
  View/BottomBar/DeviceConsole.o \
@@ -1207,10 +1209,16 @@ Stuff/Observable.o : Stuff/Observable.cpp Stuff/Observable.h lib/base/base.h lib
 Stuff/PerformanceMonitor.o : Stuff/PerformanceMonitor.cpp Stuff/PerformanceMonitor.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h
 	$(CPP) -c Stuff/PerformanceMonitor.cpp -o $@ $(CXXFLAGS)
 
-Test/TestAudioBuffer.o : Test/TestAudioBuffer.cpp Test/TestAudioBuffer.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/Audio/RingBuffer.h Data/Audio/AudioBuffer.h Data/Range.h
+Test/TestAudioBuffer.o : Test/TestAudioBuffer.cpp Test/TestAudioBuffer.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Data/Audio/RingBuffer.h Data/Audio/AudioBuffer.h Data/Range.h lib/file/msg.h
 	$(CPP) -c Test/TestAudioBuffer.cpp -o $@ $(CXXFLAGS)
 
-Test/UnitTest.o : Test/UnitTest.cpp Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h
+Test/TestStreams.o : Test/TestStreams.cpp Test/TestStreams.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/math/math.h lib/image/color.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h Device/OutputStream.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/file_op.h lib/image/image.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Data/Song.h Data/Data.h Stuff/Observable.h Data/Track.h Data/Range.h Data/Midi/MidiData.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Sample.h Data/Audio/AudioBuffer.h Data/Midi/Instrument.h Data/Curve.h Data/Rhythm/BarCollection.h Data/Audio/RingBuffer.h Module/Module.h Module/Audio/AudioSource.h Module/Port/AudioPort.h Module/Port/Port.h Session.h
+	$(CPP) -c Test/TestStreams.cpp -o $@ $(CXXFLAGS)
+
+Test/TestThreads.o : Test/TestThreads.cpp Test/TestThreads.h Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/msg.h lib/threads/Thread.h
+	$(CPP) -c Test/TestThreads.cpp -o $@ $(CXXFLAGS)
+
+Test/UnitTest.o : Test/UnitTest.cpp Test/UnitTest.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h Test/TestAudioBuffer.h Test/TestStreams.h Test/TestThreads.h
 	$(CPP) -c Test/UnitTest.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp View/BottomBar/BottomBar.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/image/color.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h Stuff/Observable.h View/BottomBar/MixingConsole.h View/BottomBar/LogConsole.h View/BottomBar/DeviceConsole.h View/BottomBar/SignalEditor.h View/AudioView.h Data/Song.h Data/Data.h Data/Track.h Data/Range.h Data/Midi/MidiData.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Sample.h lib/math/rect.h Data/Audio/AudioBuffer.h Data/Midi/Instrument.h Data/Curve.h Data/Rhythm/BarCollection.h Data/SongSelection.h Data/Midi/Scale.h View/TrackHeightManager.h View/ViewPort.h View/Selection.h View/ColorScheme.h View/BottomBar/MiniBar.h Session.h

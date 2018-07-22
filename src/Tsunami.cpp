@@ -179,8 +179,10 @@ bool Tsunami::handleArguments(Array<string> &args)
 	}else if (args[i] == "--slow"){
 		ugly_hack_slow = true;
 	}else if (args[i] == "--run-tests"){
-		TestAudioBuffer t;
-		t.run();
+		if (args.num > i + 1)
+			UnitTest::run_all(args[i+1]);
+		else
+			UnitTest::run_all("");
 		return true;
 	}else if (args[i].head(2) == "--"){
 		session->e(_("unknown command: ") + args[i]);

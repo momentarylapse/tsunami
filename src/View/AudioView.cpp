@@ -1118,6 +1118,7 @@ void AudioView::updateMenu()
 
 void AudioView::updatePeaks()
 {
+	return;
 	//msg_write("-------------------- view update peaks");
 	if (is_updating_peaks){
 		//msg_error("   already updating peaks...");

@@ -91,9 +91,6 @@ private:
 	AudioPort *source;
 	RingBuffer ring_buf;
 
-	std::atomic<bool> keep_thread_running;
-	std::atomic<bool> reading;
-	std::atomic<bool> read_more;
 	std::atomic<bool> read_end_of_stream;
 	std::atomic<bool> played_end_of_stream;
 

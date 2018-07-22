@@ -101,14 +101,8 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	stream->_pulse_test_error("pa_stream_write");
 
 
-	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
-//		printf("+\n");
-		stream->read_more = true;
-	}
-
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
-//		printf("end of data...\n");
+		//printf("end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
 	}
@@ -136,7 +130,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
                                                     PaStreamCallbackFlags statusFlags,
                                                     void *userData)
 {
-	//printf("request %d\n", (int)frames);
+//	printf("request %d\n", (int)frames);
 	OutputStream *stream = (OutputStream*)userData;
 
 	float *out = (float*)outputBuffer;
@@ -146,7 +140,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	int done = 0;
 
 	int available = stream->ring_buf.available();
-	//printf("%d\n", available);
+//	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
 	if (stream->paused or (available < (int)frames)){
 //		printf("  x\n");
 		if (!stream->paused and !stream->read_end_of_stream)
@@ -171,14 +165,8 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	}
 
 
-	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->read_end_of_stream)){
-//		printf("+\n");
-		stream->read_more = true;
-	}
-
 	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
-//		printf("end of data...\n");
+		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
 	}
@@ -202,15 +190,16 @@ public:
 	void on_run() override
 	{
 		//printf("thread start\n");
-		while(stream->keep_thread_running){
-			//if (stream->read_more){
-			if (stream->ring_buf.available() <= stream->buffer_size){
+		while(true){
+			if (!stream->read_end_of_stream and stream->ring_buf.available() <= stream->buffer_size){
 				PerformanceMonitor::start_busy(perf_channel);
+			//	printf("READ\n");
 				stream->_read_stream();
 				PerformanceMonitor::end_busy(perf_channel);
 			}else{
 				hui::Sleep(0.005f);
 			}
+			Thread::cancelation_point();
 		}
 		//printf("thread end\n");
 	}
@@ -232,10 +221,7 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	fully_initialized = false;
 	paused = false;
 	volume = 1;
-	read_more = false;
-	reading = false;
 	hui_runner_id = -1;
-	keep_thread_running = true;
 
 	device_manager = session->device_manager;
 	device = device_manager->chooseDevice(Device::Type::AUDIO_OUTPUT);
@@ -275,10 +261,7 @@ OutputStream::~OutputStream()
 	killed = true;
 
 	if (thread){
-		keep_thread_running = false;
-		thread->join();
-		//thread->kill();
-		delete(thread);
+		delete(thread); // automatic cancel
 		thread = NULL;
 	}
 	PerformanceMonitor::delete_channel(perf_channel);
@@ -364,12 +347,11 @@ void OutputStream::_kill_dev()
 void OutputStream::stop()
 {
 	_pause();
+	delete thread;
+	thread = NULL;
+
 	if (source)
 		source->reset();
-
-	// wait till the thread finished reading
-	while(reading)
-		hui::Sleep(0.01f);
 
 	clear_buffer();
 }
@@ -412,8 +394,10 @@ void OutputStream::_unpause()
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
-	reading = false;
 	paused = false;
+
+	thread = new StreamThread(this);
+	thread->run();
 
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::API_PULSE){
@@ -449,8 +433,6 @@ void OutputStream::_read_stream()
 	if (!source)
 		return;
 	//printf("read stream\n");
-	reading = true;
-	read_more = false;
 
 	int size = 0;
 	AudioBuffer b;
@@ -461,16 +443,14 @@ void OutputStream::_read_stream()
 
 	if (size == source->NOT_ENOUGH_DATA){
 		//printf(" -> no data\n");
-		read_more = true;
 		// keep trying...
 		return;
 	}
 
 	// out of data?
 	if (size == source->END_OF_STREAM){
-		//printf(" -> end\n");
+		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		reading = false;
 		hui::RunLater(0.001f,  std::bind(&OutputStream::on_read_end_of_stream, this));
 		return;
 	}
@@ -479,8 +459,6 @@ void OutputStream::_read_stream()
 	b.length = size;
 	ring_buf.write_ref_done(b);
 //	printf(" -> %d of %d\n", size, buffer_size);
-
-	reading = false;
 }
 
 void OutputStream::set_source(AudioPort *s)
@@ -506,7 +484,6 @@ void OutputStream::_start_first_time()
 //	printf("stream start first\n");
 	read_end_of_stream = false;
 	played_end_of_stream = false;
-	reading = false;
 
 	// we need some data in the buffer...
 	_read_stream();
@@ -631,15 +608,16 @@ void OutputStream::update()
 
 void OutputStream::on_played_end_of_stream()
 {
-	//printf("stream end\n");
+	//printf("---------ON PLAY END OF STREAM\n");
 	//pause(true);
 	Observable<VirtualBase>::notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
 void OutputStream::on_read_end_of_stream()
 {
+	//printf("---------ON READ END OF STREAM\n");
 	read_end_of_stream = true;
-	reading = false;
+
 /*#ifdef DEVICE_PULSEAUDIO
 	pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
 	testError("pa_stream_drain");

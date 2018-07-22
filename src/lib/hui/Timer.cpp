@@ -6,6 +6,8 @@
  */
 
 #include "Timer.h"
+#include <thread>
+static std::thread::id main_thread_id = std::this_thread::get_id();
 
 
 #ifdef OS_WINDOWS
@@ -76,11 +78,14 @@ float Timer::get()
 
 
 
-
+// don't call in main thread!!!!!
 void Sleep(float duration)
 {
 	if (duration <= 0)
 		return;
+	if (main_thread_id == std::this_thread::get_id())
+		msg_error("don't call hui::Sleep() in main thread!!!");
+
 #ifdef OS_WINDOWS
 	Sleep((DWORD)(duration * 1000.0f));
 #endif

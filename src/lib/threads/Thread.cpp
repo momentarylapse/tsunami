@@ -157,6 +157,8 @@ static void *__thread_start_func(void *p)
 
 	t->done = false;
 	t->on_run();
+
+	std::lock_guard<std::mutex> lock(t->control_mutex);
 	t->done = true;
 
     pthread_cleanup_pop(0);
@@ -224,6 +226,7 @@ void Thread::cancelation_point()
 
 bool Thread::is_done()
 {
+	std::lock_guard<std::mutex> lock(control_mutex);
 	return done;
 }
 

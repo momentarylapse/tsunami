@@ -49,8 +49,16 @@ void TestStreams::test_output_stream()
 	auto *source = new DebugAudioSource;
 	auto *stream = new OutputStream(Session::GLOBAL, source->out);
 
+	msg_write("play");
 	stream->play();
-	hui::Sleep(1);
+	sleep(1);
+	msg_write("stop");
+	stream->stop();
+	sleep(1);
+	msg_write("play");
+	stream->play();
+	sleep(1);
+	msg_write("stop");
 	stream->stop();
 	delete(stream);
 	delete(source);

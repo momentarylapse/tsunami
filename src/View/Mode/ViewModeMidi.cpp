@@ -18,83 +18,11 @@
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../Helper/MidiPreview.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
 const int PITCH_SHOW_COUNT = 30;
-
-class MidiPreviewSource : public MidiPort
-{
-public:
-	MidiPreviewSource()
-	{
-		mode = Mode::WAITING;
-		ttl = -1;
-		volume = 1.0f;
-	}
-	virtual int _cdecl read(MidiEventBuffer &midi)
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-
-		//printf("mps.read\n");
-		if (mode == Mode::END_OF_STREAM){
-			//printf("  - end\n");
-			return END_OF_STREAM;
-		}
-
-		if (mode == Mode::START_NOTES){
-			for (int p: pitch)
-				midi.add(MidiEvent(0, p, volume));
-			mode = Mode::ACTIVE_NOTES;
-		}else if (mode == Mode::END_NOTES){
-			for (int p: pitch)
-				midi.add(MidiEvent(0, p, 0));
-			mode = Mode::END_OF_STREAM;
-		}
-		if (mode == Mode::ACTIVE_NOTES){
-			ttl -= midi.samples;
-			if (ttl < 0)
-				end();
-		}
-		return midi.samples;
-	}
-
-	void start(const Array<int> &_pitch, int _ttl)
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-
-		if ((mode != Mode::WAITING) and (mode != Mode::END_OF_STREAM))
-			return;
-		pitch = _pitch;
-		ttl = _ttl;
-		mode = Mode::START_NOTES;
-	}
-	void end()
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-
-		if (mode == Mode::START_NOTES){
-			mode = Mode::WAITING;
-		}else if (mode == Mode::ACTIVE_NOTES){
-			mode = Mode::END_NOTES;
-		}
-	}
-
-private:
-	std::mutex mutex;
-	std::atomic<int> mode;
-	enum Mode{
-		WAITING,
-		START_NOTES,
-		ACTIVE_NOTES,
-		END_NOTES,
-		END_OF_STREAM
-	};
-	int ttl;
-
-	Array<int> pitch;
-	float volume;
-};
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
@@ -116,18 +44,14 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	scroll_offset = 0;
 	scroll_bar = rect(0, 0, 0, 0);
 
-	preview_source = new MidiPreviewSource;
-
-	preview_synth = NULL;
-	preview_stream = NULL;
+	preview = new MidiPreview(view->session);
 
 	mouse_pre_moving_pos = -1;
 }
 
 ViewModeMidi::~ViewModeMidi()
 {
-	kill_preview();
-	delete preview_source;
+	delete preview;
 }
 
 void ViewModeMidi::setMode(int _mode)
@@ -146,41 +70,7 @@ void ViewModeMidi::setCreationMode(int _mode)
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
-	//kill_preview();
-	if (!preview_synth){
-		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
-		preview_synth->setInstrument(view->cur_track->instrument);
-		preview_synth->set_source(preview_source);
-	}
-	if (!preview_stream){
-		preview_stream = new OutputStream(view->session, preview_synth->out);
-		preview_stream->set_buffer_size(2048);
-		preview_stream->subscribe(this, std::bind(&ViewModeMidi::onEndOfStream, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
-	}
-	preview_stream->set_volume(view->cur_track->volume);
-
-	preview_source->start(pitch, view->session->sample_rate() * ttl);
-	preview_stream->play();
-}
-
-void ViewModeMidi::onEndOfStream()
-{
-	//msg_write("view: end of stream");
-	preview_stream->stop();
-	//hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
-}
-
-void ViewModeMidi::kill_preview()
-{
-	//msg_write("kill");
-	if (preview_stream){
-		preview_stream->stop();
-		delete preview_stream;
-	}
-	preview_stream = NULL;
-	if (preview_synth)
-		delete preview_synth;
-	preview_synth = NULL;
+	preview->start(view->cur_track->synth, pitch, view->cur_track->volume, ttl);
 }
 
 void ViewModeMidi::onLeftButtonDown()
@@ -234,7 +124,7 @@ void ViewModeMidi::onLeftButtonUp()
 			view->cur_layer->addMidiNotes(notes);
 			notes.clear(); // all notes owned by track now
 
-			preview_source->end();
+			preview->end();
 		}
 	}
 

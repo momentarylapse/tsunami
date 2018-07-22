@@ -8,6 +8,7 @@
 
 #include "../base/base.h"
 #include <atomic>
+#include <mutex>
 
 
 struct ThreadInternal;
@@ -31,6 +32,7 @@ public:
 	std::atomic<bool> done;
 	std::atomic<bool> running;
 	ThreadInternal *internal;
+	std::mutex control_mutex;
 
 
 	// auxiliary

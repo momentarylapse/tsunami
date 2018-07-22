@@ -16,7 +16,7 @@ class MidiNote;
 class MidiEvent;
 class OutputStream;
 class Synthesizer;
-class MidiPreviewSource;
+class MidiPreview;
 
 class ViewModeMidi : public ViewModeDefault
 {
@@ -48,8 +48,6 @@ public:
 	Array<int> getCreationPitch(int base_pitch);
 	Range getMidiEditRange();
 	void startMidiPreview(const Array<int> &pitch, float ttl);
-	void onEndOfStream();
-	void kill_preview();
 
 	int beat_partition;
 	int chord_type;
@@ -71,9 +69,7 @@ public:
 		CHORD
 	};
 
-	Synthesizer *preview_synth;
-	OutputStream *preview_stream;
-	MidiPreviewSource *preview_source;
+	MidiPreview *preview;
 
 	AudioViewLayer *cur_layer;
 

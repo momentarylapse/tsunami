@@ -239,7 +239,8 @@ void Application::doSingleMainLoop()
 
 	//SetIdleFunction(NULL);
 	do{
-		gtk_main_iteration();
+		g_main_context_iteration(NULL, true);
+		gtk_main_iteration_do(false);
 	}while (gtk_events_pending());
 
 	// pop idle function

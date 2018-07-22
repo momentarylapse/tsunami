@@ -7,6 +7,8 @@
 
 #include "UnitTest.h"
 #include "../lib/file/msg.h"
+#include "../lib/hui/hui.h"
+#include <unistd.h>
 
 UnitTest::UnitTest(const string &_name)
 {
@@ -19,17 +21,27 @@ UnitTest::~UnitTest()
 
 void UnitTest::run()
 {
-	msg_write("== " + name + " ==");
+	msg_write("<<<<<<<<<<<<<<<<<<<<  " + name + "  >>>>>>>>>>>>>>>>>>>>");
 	for (auto &t: tests()){
-		msg_write(t.name);
+		msg_write("== " + t.name + " ==");
 		t.f();
 		msg_write("  ok");
+	}
+}
+
+void UnitTest::sleep(float t)
+{
+	hui::Timer timer;
+	while (timer.peek() < t){
+		hui::Application::doSingleMainLoop();
+		usleep(1000);
 	}
 }
 
 #include "TestAudioBuffer.h"
 #include "TestStreams.h"
 #include "TestThreads.h"
+#include "TestMidiPreview.h"
 
 void UnitTest::run_all(const string &filter)
 {
@@ -37,6 +49,7 @@ void UnitTest::run_all(const string &filter)
 	tests.add(new TestAudioBuffer);
 	tests.add(new TestThreads);
 	tests.add(new TestStreams);
+	tests.add(new TestMidiPreview);
 
 	for (auto *t: tests)
 		if (filter.num == 0 or filter.find(t->name) >= 0)

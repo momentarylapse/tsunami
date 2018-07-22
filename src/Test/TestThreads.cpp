@@ -38,9 +38,7 @@ void TestThreads::test_thread_safety()
 
 	t->run();
 	while (!t->is_done())
-	{
-		hui::Sleep(0.1f);
-	}
+		sleep(0.01f);
 	t->join();
 	delete t;
 

@@ -41,6 +41,8 @@ public:
 	};
 
 	static void run_all(const string &filter);
+
+	static void sleep(float t);
 };
 
 #endif /* SRC_TEST_UNITTEST_H_ */

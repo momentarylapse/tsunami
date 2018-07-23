@@ -165,18 +165,6 @@ void ViewModeDefault::onLeftDoubleClick()
 	}
 }
 
-static void open_popup(AudioView *view, Selection *hover)
-{
-	view->menu_all->enable("menu_buffer", false);
-	view->menu_all->enable("menu_sample", hover->sample);
-	view->menu_all->enable("menu_bar", hover->bar);
-	view->menu_all->enable("menu_marker", hover->marker);
-	view->menu_all->enable("menu_time_track", hover->track and (hover->track->type == Track::Type::TIME));
-	view->menu_all->enable("menu_track", hover->track);
-	view->menu_all->enable("menu_layer", hover->layer);
-	view->menu_all->openPopup(view->win, 0, 0);
-}
-
 void ViewModeDefault::onRightButtonDown()
 {
 	bool track_hover_sel = view->sel.has(hover->track);
@@ -196,14 +184,12 @@ void ViewModeDefault::onRightButtonDown()
 
 	if (hover->type == Selection::Type::SAMPLE){
 		view->menu_sample->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::BAR){
 		view->menu_time_track->enable("delete_bars", true);
 		view->menu_time_track->enable("edit_bars", true);
 		view->menu_time_track->enable("scale_bars", true);
 		view->menu_time_track->openPopup(view->win, 0, 0);
 		//view->menu_bar->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::MARKER){
 		view->menu_marker->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::Type::BAR_GAP){
@@ -211,16 +197,13 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
 		view->menu_time_track->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
 		view->menu_time_track->enable("delete_bars", false);
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
 		view->menu_time_track->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		view->menu_layer->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
@@ -230,10 +213,8 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_track->enable("delete_layer", !view->cur_layer->is_main);
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
 		view->menu_track->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}else if (!hover->track){
 		view->menu_song->openPopup(view->win, 0, 0);
-		//open_popup(view, hover);
 	}
 }
 

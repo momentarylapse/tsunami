@@ -75,40 +75,39 @@ void RingBuffer::_move_write_pos(int delta)
 
 int RingBuffer::read(AudioBuffer& b)
 {
-	std::unique_lock<std::shared_timed_mutex> lock(buf.mtx);
+	AudioBuffer ref;
+	read_ref(ref, b.length);
+	int samples_a = ref.length;
+	b.set_x(ref, 0, ref.length, 1.0f);
+	read_ref_done(ref);
 
-	int samples = min(b.length, available());
+	int samples_b = b.length - samples_a;
+	if (samples_b <= 0)
+		return samples_a;
 
-	int samples_a = min(samples, buf.length - read_pos);
-	b.set_x(buf, -read_pos, read_pos + samples_a, 1.0f);
-	_move_read_pos(samples_a);
+	read_ref(ref, samples_b);
+	b.set_x(ref, samples_a, ref.length, 1.0f);
+	read_ref_done(ref);
+	return samples_a + samples_b;
+}
 
-	int samples_b = samples - samples_a;
+int RingBuffer::write(AudioBuffer& b)
+{
+	AudioBuffer ref;
+	write_ref(ref, b.length);
+	int samples_a = ref.length;
+	ref.set_x(b, 0, samples_a, 1.0f);
+	write_ref_done(ref);
+	return samples_a;
+
+	/*int samples_b = b.length - samples_a;
 	if (samples_b == 0)
 		return samples_a;
 
-	AudioBuffer bb;
-	bb.set_as_ref(b, samples_a,  samples_b);
-	bb.set_x(buf, 0, samples_b, 1.0f);
-	_move_read_pos(samples_b);
-	return samples;
-}
-
-void RingBuffer::write(AudioBuffer& b)
-{
-	std::unique_lock<std::shared_timed_mutex> lock(buf.mtx);
-
-	int samples = min(b.length, writable_size());
-
-	int size_a = min(samples, buf.length - write_pos);
-	buf.set(b, write_pos, 1.0f);
-
-	int size_b = samples - size_a;
-	if (size_b > 0){
-		buf.set(b, -size_a, 1.0f);
-	}
-
-	_move_write_pos(samples);
+	write_ref(ref, samples_b);
+	ref.set_x(b, samples_a, ref.length, 1.0f);
+	write_ref_done(ref);
+	return samples_a + samples_b;*/
 }
 
 // size > 0: from read_pos

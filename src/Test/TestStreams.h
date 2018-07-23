@@ -18,6 +18,7 @@ public:
 	Array<Test> tests() override;
 
 	static void test_output_stream();
+	static void test_input_stream();
 };
 
 #endif /* SRC_TEST_TESTSTREAMS_H_ */

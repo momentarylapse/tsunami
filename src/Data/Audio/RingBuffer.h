@@ -24,7 +24,7 @@ public:
 	int writable_size();
 
 	int read(AudioBuffer &b);
-	void write(AudioBuffer &b);
+	int write(AudioBuffer &b);
 
 	void read_ref(AudioBuffer &b, int size);
 	void read_ref_done(AudioBuffer &b);

@@ -386,7 +386,8 @@ bool InputStreamAudio::start()
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
 		}else{
 			PaStreamParameters params;
-			params.channelCount = 2;
+			num_channels = min(device->channels, 2);
+			params.channelCount = num_channels;
 			params.sampleFormat = paFloat32;
 			params.device = device->index_in_lib;
 			params.hostApiSpecificStreamInfo = NULL;

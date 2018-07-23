@@ -9,7 +9,9 @@
 #include "../lib/file/msg.h"
 #include "../lib/math/math.h"
 #include "../Device/OutputStream.h"
+#include "../Device/InputStreamAudio.h"
 #include "../Module/Audio/AudioSource.h"
+#include "../Module/Audio/AudioSucker.h"
 #include "../Session.h"
 
 TestStreams::TestStreams() : UnitTest("Streams")
@@ -20,6 +22,7 @@ Array<UnitTest::Test> TestStreams::tests()
 {
 	Array<Test> list;
 	list.add(Test("output", TestStreams::test_output_stream));
+	list.add(Test("input", TestStreams::test_input_stream));
 	return list;
 }
 
@@ -62,6 +65,25 @@ void TestStreams::test_output_stream()
 	stream->stop();
 	delete(stream);
 	delete(source);
+
+}
+
+void TestStreams::test_input_stream()
+{
+	auto *stream = new InputStreamAudio(Session::GLOBAL);
+	auto *sucker = new AudioSucker;
+
+	sucker->set_source(stream->out);
+
+	msg_write("capture");
+	stream->start();
+	sucker->start();
+	sleep(2);
+	msg_write("stop");
+	sucker->stop();
+	stream->stop();
+	delete(sucker);
+	delete(stream);
 
 }
 

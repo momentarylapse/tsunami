@@ -86,11 +86,12 @@ void ViewModeCapture::onInputUpdate()
 		AudioBuffer &buf = export_view_sucker->buf;
 		if (input_audio->is_capturing())
 			view->cam.makeSampleVisible(view->sel.range.start() + buf.length);
-		view->forceRedraw();
+		//view->forceRedraw();
 	}
 	if (input_midi){
 		if (input_midi->is_capturing())
 			view->cam.makeSampleVisible(view->sel.range.start() + input_midi->get_sample_count());
-		view->forceRedraw();
+		//view->forceRedraw();
 	}
+	// no need to redraw... already triggered by the OutputStream
 }

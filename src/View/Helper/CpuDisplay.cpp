@@ -18,30 +18,34 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	perf_mon = session->perf_mon;
 	view = session->view;
 
+	dlg = NULL;
+
 	if (!hui::Config.getBool("CpuDisplay", false))
 		panel->hideControl(id, true);
 
-	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::onDraw, this, std::placeholders::_1));
-	//panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::onLeftButtonDown, this));
+	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
+	panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::on_left_button_down, this));
 
-	runner_id = hui::RunRepeated(2.0f, std::bind(&CpuDisplay::onUpdate, this));
+	runner_id = hui::RunRepeated(2.0f, std::bind(&CpuDisplay::update, this));
 }
 
 CpuDisplay::~CpuDisplay()
 {
 	hui::CancelRunner(runner_id);
+	if (dlg)
+		delete dlg;
 }
 
 color type_color(int t)
 {
 	if (t == CpuDisplay::TYPE_VIEW)
-		return color(1, 0.3f, 0.7f, 0.4f);
+		return color(1, 0.1f, 0.9f, 0.2f);
 	if (t == CpuDisplay::TYPE_PEAK)
-		return color(1, 0.3f, 0.7f, 0.7f);
+		return color(1, 0.1f, 0.9f, 0.9f);
 	if (t == CpuDisplay::TYPE_OUT)
-		return color(1, 0.4f, 0.3f, 0.8f);
+		return color(1, 0.2f, 0.2f, 0.9f);
 	if (t == CpuDisplay::TYPE_SUCK)
-		return color(1, 0.8f, 0.3f, 0.3f);
+		return color(1, 0.9f, 0.1f, 0.1f);
 	return Black;
 }
 
@@ -58,19 +62,21 @@ string type_name(int t)
 	return "?";
 }
 
-void CpuDisplay::onDraw(Painter* p)
+void CpuDisplay::on_draw(Painter* p)
 {
 	int w = p->width;
 	int h = p->height;
+	bool large = (h > 50);
 
 	p->setColor(view->colors.background);
 	p->drawRect(2, 2, w-4, h-4);
+	p->setLineWidth(large ? 1.5f : 1.0f);
 
 	for (int t=0; t<NUM_TYPES; t++){
 		p->setColor(type_color(t));
 		for (int j=1; j<cpu[t].num; j++){
-			float x0 = w - 2 - (cpu[t].num - j - 1) * 2;
-			float x1 = w - 2 - (cpu[t].num - j    ) * 2;
+			float x0 = w - 2 - (cpu[t].num - (j-1)) * 2;
+			float x1 = w - 2 - (cpu[t].num -  j   ) * 2;
 			float y0 = 2 + (h - 4) * (1 - cpu[t][j-1]);
 			float y1 = 2 + (h - 4) * (1 - cpu[t][j]);
 			if (x1 >= 2)
@@ -78,14 +84,43 @@ void CpuDisplay::onDraw(Painter* p)
 		}
 		if (cpu[t].num > 0){
 			p->setColor(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
-			p->setFontSize(7);
-			p->drawStr(20 + t * 30, h / 2-14, format("%.0f%%", cpu[t].back() * 100));
-			p->drawStr(20 + t * 30, h / 2-6, format("%.0fms", avg[t].back() * 1000));
+			if (large){
+				p->setFontSize(10);
+				p->drawStr(20, 20  + t * 20, type_name(t));
+				p->drawStr(68, 20  + t * 20, format("%.0f%%", cpu[t].back() * 100));
+				p->drawStr(110, 20  + t * 20, format("%.0fms", avg[t].back() * 1000));
+
+			}else{
+				p->setFontSize(7);
+				p->drawStr(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", cpu[t].back() * 100));
+			}
 		}
 	}
 }
 
-void CpuDisplay::onUpdate()
+void CpuDisplay::on_left_button_down()
+{
+	if (dlg){
+		dlg->show();
+
+	}else{
+		dlg = new hui::Dialog("cpu", 250, 180, panel->win, true);
+		dlg->setBorderWidth(0);
+		dlg->addDrawingArea("", 0, 0, "area");
+		dlg->eventXP("area", "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
+		dlg->event("hui:close", std::bind(&CpuDisplay::on_dialog_close, this));
+		dlg->show();
+	}
+}
+
+void CpuDisplay::on_dialog_close()
+{
+	if (!dlg)
+		return;
+	dlg->hide();
+}
+
+void CpuDisplay::update()
 {
 	float c[NUM_TYPES], a[NUM_TYPES];
 	for (int t=0; t<NUM_TYPES; t++)
@@ -105,4 +140,6 @@ void CpuDisplay::onUpdate()
 	}
 
 	panel->redraw(id);
+	if (dlg)
+		dlg->redraw("area");
 }

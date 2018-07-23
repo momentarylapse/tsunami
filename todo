@@ -126,10 +126,10 @@ J curve actions
 ~ more pre-def colors, less ColorInterpolate
 J selection background...
 * fix: last chunk of peaks
-* perfmon window
-* perfmon more fine grained
-* thread system...
-* buffer moving mode
+J perfmon window
+~ perfmon more fine grained
+~ thread system...
+j buffer moving mode
 * layer merging
 J Gaussian noise
 J new signal chain file format

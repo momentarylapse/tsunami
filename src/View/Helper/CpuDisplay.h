@@ -12,6 +12,7 @@
 
 namespace hui{
 	class Panel;
+	class Dialog;
 }
 class Painter;
 class PerformanceMonitor;
@@ -24,8 +25,10 @@ public:
 	CpuDisplay(hui::Panel *panel, const string &id, Session *session);
 	virtual ~CpuDisplay();
 
-	void onDraw(Painter *p);
-	void onUpdate();
+	void on_dialog_close();
+	void on_left_button_down();
+	void on_draw(Painter *p);
+	void update();
 
 	PerformanceMonitor *perf_mon;
 	AudioView *view;
@@ -34,6 +37,8 @@ public:
 	string id;
 
 	int runner_id;
+
+	hui::Dialog *dlg;
 
 	enum{
 		TYPE_VIEW,

@@ -249,7 +249,6 @@ public:
 	void updateBufferZoom();
 
 	PeakThread *peak_thread;
-	std::atomic<bool> is_updating_peaks;
 
 	struct ImageData
 	{

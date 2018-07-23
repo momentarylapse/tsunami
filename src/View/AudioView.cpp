@@ -76,15 +76,8 @@ public:
 	}
 	void _cdecl on_run() override
 	{
-		//msg_write("  run");
-		//HuiSleep(0.1f);
 		view->update_peaks(view->song);
-		view->is_updating_peaks = false;
 	}
-	/*virtual void _cdecl onCancel()
-	{
-		msg_error("onCancel!!!");
-	}*/
 };
 
 // make shadows thicker
@@ -214,8 +207,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	bars_edit_data = true;
 
-	peak_thread = new PeakThread(this);
-	is_updating_peaks = false;
+	peak_thread = NULL;
 
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
@@ -275,7 +267,8 @@ AudioView::~AudioView()
 	delete(mode_capture);
 	delete(mode_default);
 
-	delete(peak_thread);
+	if (peak_thread)
+		delete(peak_thread);
 
 	delete(dummy_vtrack);
 	delete(dummy_vlayer);
@@ -1061,7 +1054,8 @@ void AudioView::drawAudioFile(Painter *c)
 
 	mode->drawPost(c);
 
-	repeat |= is_updating_peaks;
+	if (peak_thread and !peak_thread->is_done())
+		repeat = true;
 
 	if (repeat)
 		hui::RunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
@@ -1118,22 +1112,22 @@ void AudioView::updateMenu()
 
 void AudioView::updatePeaks()
 {
-	return;
 	//msg_write("-------------------- view update peaks");
-	if (is_updating_peaks){
+	if (peak_thread){
 		//msg_error("   already updating peaks...");
 		delete(peak_thread);
-		peak_thread = new PeakThread(this);
 	}
-	is_updating_peaks = true;
+
+	peak_thread = new PeakThread(this);
 	peak_thread->run();
-	for (int i=0; i<5; i++){
+
+	/*for (int i=0; i<5; i++){
 		if (peak_thread->is_done()){
 			forceRedraw();
 			break;
 		}else
 			hui::Sleep(0.001f);
-	}
+	}*/
 }
 
 void AudioView::setMidiViewMode(int mode)

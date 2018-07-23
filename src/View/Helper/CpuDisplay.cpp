@@ -11,6 +11,8 @@
 #include "../../Session.h"
 #include "../AudioView.h"
 
+static const float UPDATE_DT = 2.0f;
+
 CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 {
 	panel = _panel;
@@ -26,7 +28,7 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
 	panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::on_left_button_down, this));
 
-	runner_id = hui::RunRepeated(2.0f, std::bind(&CpuDisplay::update, this));
+	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&CpuDisplay::update, this));
 }
 
 CpuDisplay::~CpuDisplay()
@@ -72,6 +74,14 @@ void CpuDisplay::on_draw(Painter* p)
 	p->drawRect(2, 2, w-4, h-4);
 	p->setLineWidth(large ? 1.5f : 1.0f);
 
+	if (large){
+		p->setFontSize(10);
+		p->setColor(view->colors.text_soft1);
+		p->drawStr(68, 10, "cpu");
+		p->drawStr(118, 10, "avg");
+		p->drawStr(173, 10, "freq");
+	}
+
 	for (int t=0; t<NUM_TYPES; t++){
 		p->setColor(type_color(t));
 		for (int j=1; j<cpu[t].num; j++){
@@ -86,9 +96,10 @@ void CpuDisplay::on_draw(Painter* p)
 			p->setColor(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
 			if (large){
 				p->setFontSize(10);
-				p->drawStr(20, 20  + t * 20, type_name(t));
-				p->drawStr(68, 20  + t * 20, format("%.0f%%", cpu[t].back() * 100));
-				p->drawStr(110, 20  + t * 20, format("%.0fms", avg[t].back() * 1000));
+				p->drawStr(20, 30  + t * 20, type_name(t));
+				p->drawStr(68, 30  + t * 20, format("%.0f%%", cpu[t].back() * 100));
+				p->drawStr(118, 30  + t * 20, format("%.0fms", avg[t].back() * 1000));
+				p->drawStr(173, 30  + t * 20, format("%.1f", (float)count[t].back() / UPDATE_DT));
 
 			}else{
 				p->setFontSize(7);
@@ -123,8 +134,11 @@ void CpuDisplay::on_dialog_close()
 void CpuDisplay::update()
 {
 	float c[NUM_TYPES], a[NUM_TYPES];
-	for (int t=0; t<NUM_TYPES; t++)
+	int cc[NUM_TYPES];
+	for (int t=0; t<NUM_TYPES; t++){
 		c[t] = a[t] = 0;
+		cc[t] = 0;
+	}
 
 	auto infos = perf_mon->get_info();
 	for (auto &i: infos)
@@ -132,11 +146,13 @@ void CpuDisplay::update()
 			if (i.name == type_name(t)){
 				c[t] += i.cpu;
 				a[t] += i.avg;
+				cc[t] += i.counter;
 			}
 
 	for (int t=0; t<NUM_TYPES; t++){
 		cpu[t].add(c[t]);
 		avg[t].add(a[t]);
+		count[t].add(cc[t]);
 	}
 
 	panel->redraw(id);

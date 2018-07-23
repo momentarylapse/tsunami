@@ -19,6 +19,7 @@ public:
 	struct ChannelInfo{
 		string name;
 		float cpu, avg;
+		int counter;
 	};
 	Array<ChannelInfo> get_info();
 

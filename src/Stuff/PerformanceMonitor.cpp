@@ -120,6 +120,7 @@ Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
 			i.name = c.name;
 			i.cpu = c.t_busy / dt;
 			i.avg = 0;
+			i.counter = c.counter;
 			if (c.counter > 0)
 				i.avg = c.t_busy / c.counter;
 			infos.add(i);

@@ -11,6 +11,9 @@
 #include "../internal.h"
 #include "../../math/rect.h"
 
+#include <thread>
+static std::thread::id main_thread_id = std::this_thread::get_id();
+
 #include <GL/gl.h>
 
 #ifdef HUI_API_GTK
@@ -28,7 +31,7 @@ gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
-	std::lock_guard<std::mutex> lock(da->mutex);
+	//std::lock_guard<std::mutex> lock(da->mutex);
 
 	da->cur_cairo = cr;
 	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
@@ -327,7 +330,14 @@ static bool __drawing_area_queue_redraw(void *p)
 
 void ControlDrawingArea::redraw()
 {
-	std::lock_guard<std::mutex> lock(mutex);
+	// non
+	if (std::this_thread::get_id() != main_thread_id){
+		//printf("readraw from other thread...redirect\n");
+		hui::RunLater(0, std::bind(&ControlDrawingArea::redraw, this));
+		return;
+	}
+
+	//std::lock_guard<std::mutex> lock(mutex);
 
 	if (is_opengl){
 		gtk_widget_queue_draw(widget);
@@ -357,9 +367,14 @@ void ControlDrawingArea::redraw()
 	redraw_area.add(r);
 }
 
-void ControlDrawingArea::redraw(const rect &r)
+void ControlDrawingArea::redraw_partial(const rect &r)
 {
-	std::lock_guard<std::mutex> lock(mutex);
+	if (std::this_thread::get_id() != main_thread_id){
+		//printf("readraw from other thread...redirect\n");
+		hui::RunLater(0, std::bind(&ControlDrawingArea::redraw_partial, this, r));
+		return;
+	}
+	//std::lock_guard<std::mutex> lock(mutex);
 
 	if (is_opengl){
 		gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());

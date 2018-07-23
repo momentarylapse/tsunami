@@ -30,10 +30,10 @@ class PeakMeter : public AudioVisualizer
 	friend class PeakMeterDisplay;
 public:
 	PeakMeter();
-	virtual ~PeakMeter();
+	~PeakMeter() override;
 
-	virtual _cdecl void process(AudioBuffer &buf);
-	virtual _cdecl void reset();
+	_cdecl void process(AudioBuffer &buf) override;
+	_cdecl void reset() override;
 
 	void set_mode(int mode);
 

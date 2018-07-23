@@ -136,11 +136,13 @@ void PeakMeterDisplay::onRightButtonDown()
 {
 }
 
+// in PeakMeter/SignalChain's thread
 void PeakMeterDisplay::onUpdate()
 {
 	if (source){
 		*r = source->r;
 		*l = source->l;
 	}
+	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	panel->redraw(id);
 }

@@ -412,6 +412,7 @@ void Panel::removeControl(const string &id)
 //----------------------------------------------------------------------------------
 // drawing
 
+// can handle calls from non-main threads
 void Panel::redraw(const string &_id)
 {
 	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(_get_control_(_id));
@@ -423,7 +424,7 @@ void Panel::redrawRect(const string &_id, const rect &r)
 {
 	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(_get_control_(_id));
 	if (c)
-		c->redraw(r);
+		c->redraw_partial(r);
 }
 
 }

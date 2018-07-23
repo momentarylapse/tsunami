@@ -34,7 +34,7 @@ public:
 	std::mutex mutex;
 
 	void redraw();
-	void redraw(const rect &r);
+	void redraw_partial(const rect &r);
 };
 
 };

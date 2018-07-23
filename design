@@ -1,0 +1,64 @@
+== data ==
+
+* mostly pointer arrays
+	* addresses as UUIDs
+
+
+
+
+== actions ==
+
+* keep instances (don't delete/new)
+
+
+
+
+== signal chains ==
+
+
+
+
+== threads ==
+
+=== layout ===
+
+* GUI thread
+	* editing (Actions)
+	* Observer messages
+* PeakThread
+* in/out signal chains having their own threads
+	* SongRenderer might become multi-threaded...
+
+* Observer messages from other threads must be forwarded via hui::RunLater()
+
+=== safety ===
+
+???
+Song.StructureReader
+
+RingBuffer
+ * safe for single consumer + single producer
+
+=== false positives ===
+
+OutputStream.paused
+AudioSucker.running
+RingBuffer
+ * reading/writing: locks before and after, but not during mem access
+                    still safe because of these locks
+
+
+
+== observer ==
+
+* InputStreamAudio sends in main thread
+* InputStreamMidi sends in main thread (well, does not send at all...)
+* OutputStream sends in main thread
+but needs to be controlled from main thread
+
+
+
+== plugins ==
+
+
+

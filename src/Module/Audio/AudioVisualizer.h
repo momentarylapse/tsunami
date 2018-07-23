@@ -19,10 +19,10 @@ class AudioVisualizer : public Module
 {
 public:
 	AudioVisualizer();
-	virtual ~AudioVisualizer();
+	~AudioVisualizer() override;
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	AudioPort *source;
 	void set_source(AudioPort *s);
@@ -31,10 +31,10 @@ public:
 	{
 	public:
 		Output(AudioVisualizer *v);
-		virtual ~Output(){}
-		virtual int _cdecl read(AudioBuffer &buf);
-		virtual int _cdecl get_pos(int delta);
-		virtual void _cdecl reset();
+		~Output() override {}
+		int _cdecl read(AudioBuffer &buf) override;
+		int _cdecl get_pos(int delta) override;
+		void _cdecl reset() override;
 		AudioVisualizer *visualizer;
 	};
 	Output *out;

@@ -133,6 +133,14 @@ void ViewModeDefault::onLeftButtonUp()
 	view->msp.stop();
 }
 
+int hover_buffer(Selection *hover)
+{
+	foreachi (AudioBuffer &b, hover->layer->buffers, i)
+		if (b.range().is_inside(hover->pos))
+			return i;
+	return -1;
+}
+
 void ViewModeDefault::onLeftDoubleClick()
 {
 	if (view->selection_mode != view->SelectionMode::NONE)
@@ -140,11 +148,16 @@ void ViewModeDefault::onLeftDoubleClick()
 
 	selectUnderMouse();
 
+	int buffer_index = hover_buffer(hover);
+
 	if (hover->type == Selection::Type::SAMPLE){
 		view->sel = getSelectionForRange(view->cur_sample->range());
 		view->updateSelection();
 	}else if (hover->type == Selection::Type::MARKER){
 		view->sel = getSelectionForRange(hover->marker->range);
+		view->updateSelection();
+	}else if ((hover->type == Selection::Type::LAYER) and (buffer_index >= 0)){
+		view->sel = getSelectionForRange(hover->layer->buffers[buffer_index].range());
 		view->updateSelection();
 	}else if (hover->type == Selection::Type::BAR){
 		view->sel = getSelectionForRange(hover->bar->range());
@@ -215,11 +228,7 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
 		view->menu_track->enable("layer_merge", !view->cur_layer->is_main);
 		view->menu_track->enable("delete_layer", !view->cur_layer->is_main);
-		bool over_buffer = false;
-		for (AudioBuffer &b: hover->layer->buffers)
-			if (b.range().is_inside(hover->pos))
-				over_buffer = true;
-		view->menu_track->enable("menu_buffer", over_buffer);
+		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
 		view->menu_track->openPopup(view->win, 0, 0);
 		//open_popup(view, hover);
 	}else if (!hover->track){

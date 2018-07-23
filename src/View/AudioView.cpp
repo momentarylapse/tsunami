@@ -70,13 +70,58 @@ class PeakThread : public Thread
 {
 public:
 	AudioView *view;
+	Song *song;
+	int perf_channel;
 	PeakThread(AudioView *_view)
 	{
 		view = _view;
+		song = view->song;
+		perf_channel = PerformanceMonitor::create_channel("peak");
+	}
+	~PeakThread()
+	{
+		PerformanceMonitor::delete_channel(perf_channel);
 	}
 	void _cdecl on_run() override
 	{
-		view->update_peaks(view->song);
+		update_song();
+	}
+
+	void update_buffer(AudioBuffer &buf)
+	{
+		song->lock();
+		int n = buf._update_peaks_prepare();
+		song->unlock();
+
+		Thread::cancelation_point();
+
+		for (int i=0; i<n; i++)
+			if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
+				while (!song->try_lock()){
+					Thread::cancelation_point();
+					hui::Sleep(0.01f);
+				}
+				PerformanceMonitor::start_busy(perf_channel);
+				buf._update_peaks_chunk(i);
+				PerformanceMonitor::end_busy(perf_channel);
+				song->unlock();
+				Thread::cancelation_point();
+			}
+	}
+
+	void update_track(Track *t)
+	{
+		for (TrackLayer *l: t->layers)
+			for (AudioBuffer &b: l->buffers)
+				update_buffer(b);
+	}
+
+	void update_song()
+	{
+		for (Track *t: song->tracks)
+			update_track(t);
+		for (Sample *s: song->samples)
+			update_buffer(s->buf);
 	}
 };
 
@@ -718,43 +763,6 @@ void AudioView::update_peaks_now(AudioBuffer &buf)
 	for (int i=0; i<n; i++)
 		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255)
 			buf._update_peaks_chunk(i);
-}
-
-void AudioView::update_peaks(AudioBuffer &buf)
-{
-	song->lock();
-	int n = buf._update_peaks_prepare();
-	song->unlock();
-
-	Thread::cancelation_point();
-
-	for (int i=0; i<n; i++)
-		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
-			while (!song->try_lock()){
-				Thread::cancelation_point();
-				hui::Sleep(0.01f);
-			}
-			buf._update_peaks_chunk(i);
-			song->unlock();
-			Thread::cancelation_point();
-		}
-}
-
-void AudioView::update_peaks(Track *t)
-{
-	for (TrackLayer *l: t->layers)
-		for (AudioBuffer &b: l->buffers)
-			update_peaks(b);
-}
-
-void AudioView::update_peaks(Song *song)
-{
-	debug_timer.reset();
-	for (Track *t: song->tracks)
-		update_peaks(t);
-	for (Sample *s: song->samples)
-		update_peaks(s->buf);
-	//msg_write(format("up %f", debug_timer.get()));
 }
 
 AudioViewTrack *AudioView::get_track(Track *track)

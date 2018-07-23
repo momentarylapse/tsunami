@@ -24,18 +24,20 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::onDraw, this, std::placeholders::_1));
 	//panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::onLeftButtonDown, this));
 
-	perf_mon->subscribe(this, std::bind(&CpuDisplay::onUpdate, this));
+	runner_id = hui::RunRepeated(2.0f, std::bind(&CpuDisplay::onUpdate, this));
 }
 
 CpuDisplay::~CpuDisplay()
 {
-	perf_mon->unsubscribe(this);
+	hui::CancelRunner(runner_id);
 }
 
 color type_color(int t)
 {
 	if (t == CpuDisplay::TYPE_VIEW)
 		return color(1, 0.3f, 0.7f, 0.4f);
+	if (t == CpuDisplay::TYPE_PEAK)
+		return color(1, 0.3f, 0.7f, 0.7f);
 	if (t == CpuDisplay::TYPE_OUT)
 		return color(1, 0.4f, 0.3f, 0.8f);
 	if (t == CpuDisplay::TYPE_SUCK)
@@ -47,6 +49,8 @@ string type_name(int t)
 {
 	if (t == CpuDisplay::TYPE_VIEW)
 		return "view";
+	if (t == CpuDisplay::TYPE_PEAK)
+		return "peak";
 	if (t == CpuDisplay::TYPE_OUT)
 		return "out";
 	if (t == CpuDisplay::TYPE_SUCK)

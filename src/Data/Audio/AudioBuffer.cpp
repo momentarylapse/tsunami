@@ -13,8 +13,6 @@
 
 
 
-//#include "../Data/Song.h"
-
 // peaks:
 // ...
 
@@ -265,8 +263,8 @@ void AudioBuffer::scale(float volume, float panning)
 
 void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, float panning)
 {
-	if (source.channels > channels)
-		printf("AudioBuffer.add: channels\n");
+	/*if (source.channels > channels)
+		printf("AudioBuffer.add: channels\n");*/
 
 	// relative to b
 	int i0 = max(0, -_offset);
@@ -323,8 +321,8 @@ inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, con
 // this[offset:] = source[:length]
 void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume)
 {
-	if (source.channels > channels)
-		printf("AudioBuffer.set_x: channels >\n");
+	/*if (source.channels > channels)
+		printf("AudioBuffer.set_x: channels >\n");*/
 
 	_length = min(_length, source.length);
 
@@ -675,13 +673,11 @@ void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid)
 	if (peaks.num < level4 + 4)
 		peaks.resize(level4 + 4);
 	if (peaks[level4].num < n){
+		int n0 = peaks[level4].num;
 		for (int k=0; k<4; k++){
-			int n0 = peaks[level4].num;
 			peaks[level4 + k].resize(n);
 			if (set_invalid)
 				memset(&peaks[level4 + k][n0], 255, (n - n0));
-				//for (int i=n0; i<n; i++)
-				//	peaks[level4 + k][i] = 255;
 		}
 	}
 }

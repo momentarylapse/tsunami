@@ -9,9 +9,8 @@
 #define SRC_STUFF_PERFORMANCEMONITOR_H_
 
 #include "../lib/base/base.h"
-#include "Observable.h"
 
-class PerformanceMonitor : public Observable<VirtualBase>
+class PerformanceMonitor
 {
 public:
 	PerformanceMonitor();

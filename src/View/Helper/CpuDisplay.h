@@ -33,8 +33,11 @@ public:
 	hui::Panel *panel;
 	string id;
 
+	int runner_id;
+
 	enum{
 		TYPE_VIEW,
+		TYPE_PEAK,
 		TYPE_OUT,
 		TYPE_SUCK,
 		NUM_TYPES

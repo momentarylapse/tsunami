@@ -24,8 +24,12 @@ public:
 
 	AudioSuckerThread(AudioSucker *s)
 	{
+		perf_channel = PerformanceMonitor::create_channel("suck");
 		sucker = s;
-		perf_channel = sucker->perf_channel;
+	}
+	~AudioSuckerThread()
+	{
+		PerformanceMonitor::delete_channel(perf_channel);
 	}
 
 	void on_run() override
@@ -46,6 +50,7 @@ public:
 			}else{
 				hui::Sleep(0.200f);
 			}
+			Thread::cancelation_point();
 		}
 		//msg_write("thread done...");
 	}
@@ -54,7 +59,6 @@ public:
 AudioSucker::AudioSucker() :
 	Module(Type::AUDIO_SUCKER)
 {
-	perf_channel = PerformanceMonitor::create_channel("suck");
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = NULL;
 	accumulating = false;
@@ -72,7 +76,6 @@ AudioSucker::~AudioSucker()
 		delete(thread);
 		thread = NULL;
 	}
-	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioSucker::set_source(AudioPort* s)

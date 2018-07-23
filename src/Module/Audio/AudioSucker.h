@@ -42,8 +42,6 @@ public:
 	int buffer_size;
 	float no_data_wait;
 
-	int perf_channel;
-
 	AudioSuckerThread *thread;
 	virtual void module_start(){ start(); }
 	virtual void module_stop(){ stop(); }

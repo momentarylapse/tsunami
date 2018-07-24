@@ -11,7 +11,12 @@
 
 #define ALLOW_PERF_MON	1
 
-static PerformanceMonitor *perf_mon = NULL;
+static const float UPDATE_DT = 2.0f;
+
+
+static Set<PerformanceMonitor*> pm_instances;
+static Array<PerformanceMonitor::ChannelInfo> pm_info;
+int PerformanceMonitor::runner_id;
 static std::mutex pm_mutex;
 static hui::Timer pm_timer;
 
@@ -45,13 +50,20 @@ static Array<Channel> channels;
 
 PerformanceMonitor::PerformanceMonitor()
 {
-	perf_mon = this;
+	pm_instances.add(this);
 #if ALLOW_PERF_MON
+	if (pm_instances.num == 1)
+		runner_id = hui::RunRepeated(UPDATE_DT, PerformanceMonitor::update);
 #endif
 }
 
 PerformanceMonitor::~PerformanceMonitor()
 {
+#if ALLOW_PERF_MON
+	if (pm_instances.num == 1)
+		hui::CancelRunner(runner_id);
+#endif
+	pm_instances.erase(this);
 }
 
 int PerformanceMonitor::create_channel(const string &name)
@@ -107,13 +119,14 @@ void PerformanceMonitor::end_busy(int channel)
 #endif
 }
 
-Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
+// called in main thread
+void PerformanceMonitor::update()
 {
 	std::lock_guard<std::mutex> lock(pm_mutex);
 
 	float dt = pm_timer.get();
 
-	Array<PerformanceMonitor::ChannelInfo> infos;
+	pm_info.clear();
 	for (auto &c: channels)
 		if (c.used){
 			ChannelInfo i;
@@ -123,8 +136,17 @@ Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
 			i.counter = c.counter;
 			if (c.counter > 0)
 				i.avg = c.t_busy / c.counter;
-			infos.add(i);
+			pm_info.add(i);
 			c.reset_state();
 		}
-	return infos;
+
+	for (auto *p: pm_instances)
+		p->notify();
+}
+
+// call from main thread!!!
+Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
+{
+	//std::lock_guard<std::mutex> lock(pm_mutex);
+	return pm_info;
 }

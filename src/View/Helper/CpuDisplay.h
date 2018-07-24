@@ -36,8 +36,6 @@ public:
 	hui::Panel *panel;
 	string id;
 
-	int runner_id;
-
 	hui::Dialog *dlg;
 
 	enum{

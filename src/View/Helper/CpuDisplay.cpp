@@ -28,12 +28,12 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
 	panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::on_left_button_down, this));
 
-	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&CpuDisplay::update, this));
+	perf_mon->subscribe(this, std::bind(&CpuDisplay::update, this));
 }
 
 CpuDisplay::~CpuDisplay()
 {
-	hui::CancelRunner(runner_id);
+	perf_mon->unsubscribe(this);
 	if (dlg)
 		delete dlg;
 }

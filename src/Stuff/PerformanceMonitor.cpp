@@ -14,9 +14,8 @@
 static const float UPDATE_DT = 2.0f;
 
 
-static Set<PerformanceMonitor*> pm_instances;
+static PerformanceMonitor *pm_instance;
 static Array<PerformanceMonitor::ChannelInfo> pm_info;
-int PerformanceMonitor::runner_id;
 static std::mutex pm_mutex;
 static hui::Timer pm_timer;
 
@@ -48,22 +47,20 @@ static Array<Channel> channels;
 
 #endif
 
+// single instance!
 PerformanceMonitor::PerformanceMonitor()
 {
-	pm_instances.add(this);
+	pm_instance = this;
 #if ALLOW_PERF_MON
-	if (pm_instances.num == 1)
-		runner_id = hui::RunRepeated(UPDATE_DT, PerformanceMonitor::update);
+	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&PerformanceMonitor::update, this));
 #endif
 }
 
 PerformanceMonitor::~PerformanceMonitor()
 {
 #if ALLOW_PERF_MON
-	if (pm_instances.num == 1)
-		hui::CancelRunner(runner_id);
+	hui::CancelRunner(runner_id);
 #endif
-	pm_instances.erase(this);
 }
 
 int PerformanceMonitor::create_channel(const string &name)
@@ -140,8 +137,7 @@ void PerformanceMonitor::update()
 			c.reset_state();
 		}
 
-	for (auto *p: pm_instances)
-		p->notify();
+	notify();
 }
 
 // call from main thread!!!

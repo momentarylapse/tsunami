@@ -22,8 +22,8 @@ public:
 		float cpu, avg;
 		int counter;
 	};
-	static void update();
-	static int runner_id;
+	void update();
+	int runner_id;
 	static Array<ChannelInfo> get_info();
 
 	static int create_channel(const string &name);

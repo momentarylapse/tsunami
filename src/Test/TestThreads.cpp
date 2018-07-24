@@ -10,7 +10,7 @@
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Thread.h"
 
-TestThreads::TestThreads() : UnitTest("Threads")
+TestThreads::TestThreads() : UnitTest("threads")
 {
 }
 

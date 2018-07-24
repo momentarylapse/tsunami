@@ -14,7 +14,7 @@
 #include "../Module/Audio/AudioSucker.h"
 #include "../Session.h"
 
-TestStreams::TestStreams() : UnitTest("Streams")
+TestStreams::TestStreams() : UnitTest("streams")
 {
 }
 

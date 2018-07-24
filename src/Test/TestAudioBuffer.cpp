@@ -11,7 +11,7 @@
 #include <thread>
 #include <math.h>
 
-TestAudioBuffer::TestAudioBuffer() : UnitTest("AudioBuffer")
+TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer")
 {
 }
 

@@ -12,7 +12,7 @@
 #include "../Session.h"
 #include <thread>
 
-TestMidiPreview::TestMidiPreview() : UnitTest("MidiPreview")
+TestMidiPreview::TestMidiPreview() : UnitTest("midi-preview")
 {
 }
 

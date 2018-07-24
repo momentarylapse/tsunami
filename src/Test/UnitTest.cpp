@@ -42,6 +42,7 @@ void UnitTest::sleep(float t)
 #include "TestStreams.h"
 #include "TestThreads.h"
 #include "TestMidiPreview.h"
+#include "TestPlugins.h"
 
 void UnitTest::run_all(const string &filter)
 {
@@ -50,6 +51,7 @@ void UnitTest::run_all(const string &filter)
 	tests.add(new TestThreads);
 	tests.add(new TestStreams);
 	tests.add(new TestMidiPreview);
+	tests.add(new TestPlugins);
 
 	for (auto *t: tests)
 		if (filter.num == 0 or filter.find(t->name) >= 0)

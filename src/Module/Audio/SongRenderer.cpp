@@ -35,13 +35,16 @@ SongRenderer::SongRenderer(Song *s)
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	prepare(s->range(), false);
-	song->subscribe(this, std::bind(&SongRenderer::on_song_change, this));
+	if (song){
+		prepare(song->range(), false);
+		song->subscribe(this, std::bind(&SongRenderer::on_song_change, this));
+	}
 }
 
 SongRenderer::~SongRenderer()
 {
-	song->unsubscribe(this);
+	if (song)
+		song->unsubscribe(this);
 	clear_data();
 }
 
@@ -317,6 +320,8 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 
 void SongRenderer::reset_state()
 {
+	if (!song)
+		return;
 	for (AudioEffect *fx: song->fx)
 		fx->reset_state();
 	if (preview_effect)

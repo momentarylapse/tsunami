@@ -143,3 +143,10 @@ J delete with empty range
 J move selection
 j fix barrier system
 J copy/pase
+
+== refactoring ==
+
+* Array move
+* AudioBuffer move
+* enum class
+* enum descriptors via set?

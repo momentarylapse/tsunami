@@ -11,7 +11,7 @@
 
 Device::Device()
 {
-	type = -1;
+	type = (DeviceType)-1;
 	channels = 0;
 	present = false;
 	present_old = false;
@@ -22,7 +22,7 @@ Device::Device()
 	default_by_lib = false;
 }
 
-Device::Device(int _type, const string &_name, const string &_internal_name, int _channels)
+Device::Device(DeviceType _type, const string &_name, const string &_internal_name, int _channels)
 {
 	type = _type;
 	name = _name;
@@ -37,7 +37,7 @@ Device::Device(int _type, const string &_name, const string &_internal_name, int
 	default_by_lib = false;
 }
 
-Device::Device(int _type, const string &s)
+Device::Device(DeviceType _type, const string &s)
 {
 	Array<string> c = s.explode(",");
 	type = _type;
@@ -62,11 +62,11 @@ Device::Device(int _type, const string &s)
 string Device::get_name() const
 {
 	if (is_default()){
-		/*if (type == Type::AUDIO_OUTPUT)
+		/*if (type == DeviceType::AUDIO_OUTPUT)
 			return _("        - Default -");
-		if (type == Type::AUDIO_INPUT)
+		if (type == DeviceType::AUDIO_INPUT)
 			return _("        - Default -");*/
-		if (type == Type::MIDI_INPUT)
+		if (type == DeviceType::MIDI_INPUT)
 			return _("        - don't connect -");
 		return name + " (default)";
 	}

@@ -13,6 +13,7 @@
 #include "OutputStream.h"
 #include "../Module/Port/MidiPort.h"
 #include "../Stuff/BackupManager.h"
+#include "../Data/base.h"
 
 #if HAS_LIB_ALSA
 #include <alsa/asoundlib.h>
@@ -64,7 +65,7 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 }
 
 InputStreamMidi::InputStreamMidi(Session *_session) :
-	Module(Type::INPUT_STREAM_MIDI)
+	Module(ModuleType::INPUT_STREAM_MIDI)
 {
 	set_session_etc(_session, "", NULL);
 	_sample_rate = session->sample_rate();
@@ -100,7 +101,7 @@ InputStreamMidi::~InputStreamMidi()
 
 void InputStreamMidi::init()
 {
-	set_device(device_manager->chooseDevice(Device::Type::MIDI_INPUT));
+	set_device(device_manager->chooseDevice(DeviceType::MIDI_INPUT));
 }
 
 bool InputStreamMidi::unconnect()

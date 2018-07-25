@@ -8,7 +8,9 @@
 #include "Action__ScaleData.h"
 
 #include "../../Data/Track.h"
+#include "../../Data/Song.h"
 #include "../../Data/SampleRef.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include <assert.h>
 
 Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size)

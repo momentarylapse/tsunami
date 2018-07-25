@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/Rhythm/BarCollection.h"
 #include "../../Data/Rhythm/Beat.h"
@@ -93,7 +95,7 @@ void MidiEditorConsole::update()
 	bool allow = false;
 	if (layer)
 		//if (get_track_index_save(view->song, view->cur_track) >= 0)
-			allow = (layer->type == Track::Type::MIDI);
+			allow = (layer->type == SignalType::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
@@ -106,18 +108,18 @@ void MidiEditorConsole::update()
 	check("modifier:flat", view->mode_midi->modifier == Modifier::FLAT);
 	check("modifier:natural", view->mode_midi->modifier == Modifier::NATURAL);
 
-	int mode = view->mode->which_midi_mode(layer->track);
+	MidiMode mode = view->mode->which_midi_mode(layer->track);
 	view->mode_midi->setMode(mode);
-	check("mode:linear", mode == view->MidiMode::LINEAR);
-	check("mode:classical", mode == view->MidiMode::CLASSICAL);
-	check("mode:tab", mode == view->MidiMode::TAB);
+	check("mode:linear", mode == MidiMode::LINEAR);
+	check("mode:classical", mode == MidiMode::CLASSICAL);
+	check("mode:tab", mode == MidiMode::TAB);
 
-	enable("modifier:none", mode == view->MidiMode::CLASSICAL);
-	enable("modifier:sharp", mode == view->MidiMode::CLASSICAL);
-	enable("modifier:flat", mode == view->MidiMode::CLASSICAL);
-	enable("modifier:natural", mode == view->MidiMode::CLASSICAL);
+	enable("modifier:none", mode == MidiMode::CLASSICAL);
+	enable("modifier:sharp", mode == MidiMode::CLASSICAL);
+	enable("modifier:flat", mode == MidiMode::CLASSICAL);
+	enable("modifier:natural", mode == MidiMode::CLASSICAL);
 
-	setInt("midi_edit_mode", view->mode_midi->creation_mode);
+	setInt("midi_edit_mode", (int)view->mode_midi->creation_mode);
 
 
 	if (layer->track->instrument.type == Instrument::Type::DRUMS){
@@ -183,17 +185,17 @@ void MidiEditorConsole::onCreationMode()
 
 void MidiEditorConsole::onViewModeLinear()
 {
-	setMode(AudioView::MidiMode::LINEAR);
+	setMode(MidiMode::LINEAR);
 }
 
 void MidiEditorConsole::onViewModeClassical()
 {
-	setMode(AudioView::MidiMode::CLASSICAL);
+	setMode(MidiMode::CLASSICAL);
 }
 
 void MidiEditorConsole::onViewModeTab()
 {
-	setMode(AudioView::MidiMode::TAB);
+	setMode(MidiMode::TAB);
 }
 
 void MidiEditorConsole::onInterval()
@@ -288,7 +290,7 @@ void MidiEditorConsole::setLayer(TrackLayer *l)
 
 }
 
-void MidiEditorConsole::setMode(int mode)
+void MidiEditorConsole::setMode(MidiMode mode)
 {
 	view->mode_midi->setMode(mode);
 	update();

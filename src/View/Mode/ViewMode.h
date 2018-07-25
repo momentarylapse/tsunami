@@ -10,6 +10,7 @@
 
 #include "../../Stuff/Observable.h"
 
+enum class MidiMode;
 class AudioView;
 class AudioViewTrack;
 class AudioViewLayer;
@@ -52,7 +53,7 @@ public:
 	virtual void drawPost(Painter *c){}
 	virtual void drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift){}
 
-	virtual int which_midi_mode(Track *t) = 0;
+	virtual MidiMode which_midi_mode(Track *t) = 0;
 
 	SongSelection getSelection(const Range &r);
 	virtual SongSelection getSelectionForRange(const Range &r);

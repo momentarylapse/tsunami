@@ -10,6 +10,7 @@
 #include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 #include "Buffer/ActionTrack__DeleteBuffer.h"
+#include "../../Data/Track.h"
 
 ActionTrackDelete::ActionTrackDelete(Track *_track)
 {

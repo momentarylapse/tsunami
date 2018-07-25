@@ -7,10 +7,11 @@
 
 #include "ActionBar__Edit.h"
 
-#include "../../Data/Track.h"
 #include <assert.h>
 #include <algorithm>
 #include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
 
 
 ActionBar__Edit::ActionBar__Edit(int _index, int _length, int _num_beats, int _num_sub_beats)

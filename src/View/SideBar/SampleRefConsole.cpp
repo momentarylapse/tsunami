@@ -6,7 +6,10 @@
  */
 
 #include "../AudioView.h"
+#include "../../Data/base.h"
 #include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../Helper/Slider.h"
 #include "SampleRefConsole.h"

@@ -12,8 +12,12 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
+#include "../Data/base.h"
 #include "../Data/Song.h"
+#include "../Data/Track.h"
 #include "../Data/SampleRef.h"
+#include "../Data/Sample.h"
+#include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Data/Rhythm/Beat.h"
 #include "../Data/Rhythm/BarCollection.h"
@@ -454,9 +458,9 @@ void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 	drawSampleFrame(c, s, col, 0);
 
 	// buffer
-	if (s->type() == Track::Type::AUDIO)
+	if (s->type() == SignalType::AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
-	else if (s->type() == Track::Type::MIDI)
+	else if (s->type() == SignalType::MIDI)
 		view->mode->drawMidi(c, this, *s->midi, true, s->pos);
 
 	if (view->sel.has(s)){
@@ -963,10 +967,10 @@ void AudioViewTrack::drawHeader(Painter *c)
 	c->setFont("", -1, false, false);
 
 	// icons
-	if (track->type == track->Type::TIME){
+	if (track->type == SignalType::BEATS){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	}else if (track->type == track->Type::MIDI){
+	}else if (track->type == SignalType::MIDI){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{
@@ -1046,10 +1050,10 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 	c->setFont("", -1, false, false);
 
 	// icons
-	if (layer->type == Track::Type::TIME){
+	if (layer->type == SignalType::BEATS){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x2 - view->TRACK_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	}else if (layer->type == Track::Type::MIDI){
+	}else if (layer->type == SignalType::MIDI){
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x2 - view->TRACK_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{

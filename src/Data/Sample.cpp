@@ -7,6 +7,7 @@
 
 #include "Sample.h"
 #include "SampleRef.h"
+#include "base.h"
 #include "../lib/math/math.h"
 #include "Song.h"
 
@@ -14,7 +15,7 @@ const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Sample::MESSAGE_REFERENCE = "Reference";
 const string Sample::MESSAGE_UNREFERENCE= "Unreference";
 
-Sample::Sample(int _type)
+Sample::Sample(SignalType _type)
 {
 	owner = NULL;
 	type = _type;
@@ -49,7 +50,7 @@ int Sample::get_index() const
 
 Range Sample::range() const
 {
-	if (type == Track::Type::MIDI)
+	if (type == SignalType::MIDI)
 		return Range(0, midi.samples);
 	return buf.range0();
 }

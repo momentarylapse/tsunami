@@ -7,6 +7,7 @@
 
 #include "FxConsole.h"
 #include "../AudioView.h"
+#include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/ConfigPanel.h"
@@ -148,7 +149,7 @@ FxConsole::~FxConsole()
 
 void FxConsole::onAdd()
 {
-	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
 	if (name == "")
 		return;
 	AudioEffect *effect = CreateAudioEffect(session, name);

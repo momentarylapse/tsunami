@@ -6,6 +6,8 @@
  */
 
 #include "../../Device/OutputStream.h"
+#include "../../Data/base.h"
+#include "../../Data/Track.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
 #include "CaptureConsoleModes/CaptureConsoleMode.h"
@@ -59,11 +61,11 @@ CaptureConsole::~CaptureConsole()
 	delete(peak_meter);
 }
 
-inline int dev_type(int type)
+DeviceType dev_type(SignalType type)
 {
-	if (type == Track::Type::AUDIO)
-		return Device::Type::AUDIO_INPUT;
-	return Device::Type::MIDI_INPUT;
+	if (type == SignalType::AUDIO)
+		return DeviceType::AUDIO_INPUT;
+	return DeviceType::MIDI_INPUT;
 }
 
 void CaptureConsole::onEnter()
@@ -73,9 +75,9 @@ void CaptureConsole::onEnter()
 
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
-		if (t->type == t->Type::AUDIO)
+		if (t->type == SignalType::AUDIO)
 			num_audio ++;
-		if (t->type == t->Type::MIDI)
+		if (t->type == SignalType::MIDI)
 			num_midi ++;
 	}
 

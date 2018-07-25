@@ -6,11 +6,13 @@
  */
 
 #include "ActionTrackCreateBuffers.h"
-#include "../../../Data/Track.h"
 #include <assert.h>
 #include "ActionTrack__AbsorbBuffer.h"
 #include "ActionTrack__AddBuffer.h"
 #include "ActionTrack__GrowBuffer.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_r)
 {

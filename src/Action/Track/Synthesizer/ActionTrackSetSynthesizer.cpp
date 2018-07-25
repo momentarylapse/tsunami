@@ -7,7 +7,7 @@
 
 #include "ActionTrackSetSynthesizer.h"
 #include <assert.h>
-#include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
 #include "../../../Module/Synth/Synthesizer.h"
 
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth)

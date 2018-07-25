@@ -9,6 +9,7 @@
 
 #include "../../../Data/Track.h"
 #include "../../../Data/SampleRef.h"
+#include "../../../Data/Sample.h"
 
 ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample)
 {

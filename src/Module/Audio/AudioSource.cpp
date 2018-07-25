@@ -7,10 +7,11 @@
 
 #include "AudioSource.h"
 #include "../ModuleFactory.h"
+#include "../../Data/base.h"
 
 
 AudioSource::AudioSource() :
-	Module(Type::AUDIO_SOURCE)
+	Module(ModuleType::AUDIO_SOURCE)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
@@ -54,5 +55,5 @@ int AudioSource::Output::get_pos(int delta)
 
 AudioSource *CreateAudioSource(Session *session, const string &name)
 {
-	return (AudioSource*)ModuleFactory::create(session, Module::Type::AUDIO_SOURCE, name);
+	return (AudioSource*)ModuleFactory::create(session, ModuleType::AUDIO_SOURCE, name);
 }

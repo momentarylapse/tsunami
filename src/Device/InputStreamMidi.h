@@ -8,7 +8,7 @@
 #ifndef INPUTSTREAMMIDI_H_
 #define INPUTSTREAMMIDI_H_
 
-#include "../Data/Song.h"
+#include "../Data/Midi/MidiData.h"
 #include "../Module/Port/MidiPort.h"
 #include "../Module/Module.h"
 

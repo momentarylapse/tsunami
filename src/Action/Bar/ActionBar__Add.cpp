@@ -8,6 +8,7 @@
 #include "ActionBar__Add.h"
 
 #include "../../Data/Track.h"
+#include "../../Data/Song.h"
 #include <assert.h>
 
 

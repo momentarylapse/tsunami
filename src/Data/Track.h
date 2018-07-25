@@ -10,11 +10,8 @@
 
 #include "Range.h"
 #include "Midi/MidiData.h"
-#include "Sample.h"
 #include "Midi/Instrument.h"
 #include "../Stuff/Observable.h"
-#include "Audio/AudioBuffer.h"
-#include "Song.h"
 
 
 
@@ -24,14 +21,14 @@ class Synthesizer;
 class AudioEffect;
 class SampleRef;
 class Sample;
-
+enum class SignalType;
 
 
 
 class TrackLayer : public Observable<VirtualBase>
 {
 public:
-	TrackLayer(){}
+	TrackLayer();
 	TrackLayer(Track *track, bool is_main);
 	~TrackLayer();
 
@@ -55,7 +52,7 @@ public:
 
 	Track *track;
 	Song *song() const;
-	int type;
+	SignalType type;
 	int channels;
 	bool is_main;
 	bool muted;
@@ -77,12 +74,10 @@ public:
 	Array<AudioEffect*> fx;
 };
 
-string track_type(int type);
-
 class Track : public Observable<VirtualBase>
 {
 public:
-	Track(int type, Synthesizer *synth);
+	Track(SignalType type, Synthesizer *synth);
 	virtual ~Track();
 
 	Range _cdecl range() const;
@@ -126,17 +121,8 @@ public:
 	void _cdecl editMarker(const TrackMarker *marker, const Range &range, const string &text);
 
 
-	enum Type{
-		AUDIO,
-		TIME,
-		MIDI,
-
-		AUDIO_MONO,
-		AUDIO_STEREO
-	};
-
 // data
-	int type;
+	SignalType type;
 	int channels;
 	string name;
 

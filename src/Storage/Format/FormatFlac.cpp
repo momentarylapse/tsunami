@@ -10,6 +10,9 @@
 
 #include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/base.h"
 #if HAS_LIB_FLAC
 #include <FLAC/all.h>
 
@@ -172,7 +175,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		FLAC__StreamMetadata_VorbisComment_Entry entry;
 
 		int channels = od->channels_suggested;
-		SampleFormat format = SAMPLE_FORMAT_16;
+		SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
 		if (od->song)
 			format = od->song->default_format;
 		int bits = format_get_bits(format);

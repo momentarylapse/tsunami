@@ -9,6 +9,11 @@
 
 #include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
+#include "../../lib/file/file.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/Track.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
 
 
@@ -22,11 +27,11 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 
-	SampleFormat format = SAMPLE_FORMAT_16;
+	SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
 	if (od->song)
 		format = od->song->default_format;
-	if (format == SAMPLE_FORMAT_32_FLOAT)
-		format = SAMPLE_FORMAT_32;
+	if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT)
+		format = SampleFormat::SAMPLE_FORMAT_32;
 	int bit_depth = format_get_bits(format);
 	int channels = od->channels_suggested;
 	msg_write(channels);
@@ -54,7 +59,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	while ((samples_read = r->read(buf)) > 0){
 		buf.resize(samples_read);
 		string data;
-		if (!buf.exports(data, channels, SAMPLE_FORMAT_16))
+		if (!buf.exports(data, channels, SampleFormat::SAMPLE_FORMAT_16))
 			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);

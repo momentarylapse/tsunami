@@ -10,7 +10,10 @@
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../Session.h"
+#include "../Data/base.h"
 #include "../Data/Song.h"
+#include "../Data/Track.h"
+#include "../Data/Sample.h"
 #include "../Data/SongSelection.h"
 #include <assert.h>
 
@@ -36,16 +39,16 @@ void Clipboard::clear()
 
 void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset)
 {
-	if (l->type == Track::Type::TIME)
+	if (l->type == SignalType::BEATS)
 		return;
 
 	TrackLayer *ll = temp->addTrack(l->type)->layers[0];
 
-	if (l->type == Track::Type::AUDIO){
+	if (l->type == SignalType::AUDIO){
 		AudioBuffer buf;
 		ll->buffers.add(buf);
 		l->readBuffers(ll->buffers[0], view->sel.range, false);
-	}else if (l->type == Track::Type::MIDI){
+	}else if (l->type == SignalType::MIDI){
 		ll->midi = l->midi.getNotesBySelection(view->sel);
 		ll->midi.samples = view->sel.range.length;
 		ll->midi.sanify(view->sel.range);
@@ -97,14 +100,14 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 	Song *s = target->track->song;
 	TrackLayer *source = temp->tracks[source_index]->layers[0];
 
-	if (target->type == Track::Type::AUDIO){
+	if (target->type == SignalType::AUDIO){
 		Range r = Range(view->sel.range.start(), source->buffers[0].length);
 		AudioBuffer buf;
 		target->getBuffers(buf, r);
 		Action *a = new ActionTrackEditBuffer(target, r);
 		buf.set(source->buffers[0], 0, 1.0f);
 		s->execute(a);
-	}else if (target->type == Track::Type::MIDI){
+	}else if (target->type == SignalType::MIDI){
 		for (MidiNote *n: source->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += view->sel.range.start();
@@ -122,10 +125,10 @@ void Clipboard::paste_track_as_samples(int source_index, TrackLayer *target, Aud
 	if (ref){
 		target->addSampleRef(view->sel.range.start(), ref);
 	}else{
-		if (target->type == Track::Type::AUDIO){MidiNoteBuffer midi;
+		if (target->type == SignalType::AUDIO){MidiNoteBuffer midi;
 			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->buffers[0], true));
 			ref_uid[source_index] = sample->uid;
-		}else if (target->type == Track::Type::MIDI){
+		}else if (target->type == SignalType::MIDI){
 			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->midi, true));
 			ref_uid[source_index] = sample->uid;
 		}
@@ -139,14 +142,14 @@ bool Clipboard::test_compatibility(AudioView *view)
 		for (TrackLayer *l: t->layers){
 			if (!view->sel.has(l))
 				continue;
-			if (l->type == Track::Type::TIME)
+			if (l->type == SignalType::BEATS)
 				continue;
-			dest_type.add(track_type(l->type));
+			dest_type.add(signal_type_name(l->type));
 		}
 	}
 
 	for (Track *t: temp->tracks)
-		temp_type.add(track_type(t->type));
+		temp_type.add(signal_type_name(t->type));
 
 	if (dest_type.num != temp->tracks.num){
 		view->session->e(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
@@ -178,7 +181,7 @@ void Clipboard::paste(AudioView *view)
 		for (TrackLayer *l: t->layers){
 			if (!view->sel.has(l))
 				continue;
-			if (t->type == Track::Type::TIME)
+			if (t->type == SignalType::BEATS)
 				continue;
 
 			paste_track(ti, l, view);
@@ -205,7 +208,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 		for (TrackLayer *l: t->layers){
 			if (!view->sel.has(l))
 				continue;
-			if (t->type == Track::Type::TIME)
+			if (t->type == SignalType::BEATS)
 				continue;
 
 			paste_track_as_samples(ti, l, view);

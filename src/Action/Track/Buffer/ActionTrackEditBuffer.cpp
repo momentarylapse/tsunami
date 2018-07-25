@@ -7,8 +7,10 @@
 
 #include "ActionTrackEditBuffer.h"
 #include <assert.h>
-#include "../../../Data/Track.h"
 #include "../../ActionManager.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 {

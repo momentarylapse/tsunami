@@ -21,7 +21,7 @@
 struct ApiDescription
 {
 	string name;
-	int index;
+	DeviceManager::ApiType type;
 	int mode;
 	bool available;
 };
@@ -94,19 +94,19 @@ void SettingsDialog::loadData()
 	//enable("scroll_speed", false);
 
 	int n_audio = 0, n_midi = 0;
-	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;
 		if (a.mode & 1){
 			addString("audio_api", a.name);
-			if (a.index == Session::GLOBAL->device_manager->audio_api)
+			if (a.type == Session::GLOBAL->device_manager->audio_api)
 				setInt("audio_api", n_audio);
 			n_audio ++;
 		}
 		if (a.mode & 2){
 			addString("midi_api", a.name);
-			if (a.index == Session::GLOBAL->device_manager->midi_api)
+			if (a.type == Session::GLOBAL->device_manager->midi_api)
 				setInt("midi_api", n_midi);
 			n_midi ++;
 		}
@@ -152,7 +152,7 @@ void SettingsDialog::onAudioApi()
 {
 	int n = getInt("");
 	int n_audio = 0;
-	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;
@@ -168,7 +168,7 @@ void SettingsDialog::onMidiApi()
 {
 	int n = getInt("");
 	int n_midi = 0;
-	for (int i=0; i<DeviceManager::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;

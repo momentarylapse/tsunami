@@ -11,6 +11,8 @@
 
 #include "Format.h"
 
+class Bar;
+
 class FormatGuitarPro: public Format
 {
 public:

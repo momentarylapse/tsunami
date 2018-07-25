@@ -7,18 +7,19 @@
 
 #include "RawConfigDialog.h"
 #include "../../Data/Track.h"
+#include "../../Data/base.h"
 
 RawConfigDialog::RawConfigDialog(RawConfigData *_data, hui::Window *parent) :
 	hui::Window("raw_config_dialog", parent)
 {
 	data = _data;
 	data->channels = 1;
-	data->format = SAMPLE_FORMAT_8;
+	data->format = SampleFormat::SAMPLE_FORMAT_8;
 	data->sample_rate = DEFAULT_SAMPLE_RATE;
 	data->offset = 0;
 	ok = false;
 
-	for (int i=1;i<NUM_SAMPLE_FORMATS;i++)
+	for (int i=1;i<(int)SampleFormat::NUM_SAMPLE_FORMATS;i++)
 		addString("format", format_name((SampleFormat)i));
 	setInt("format", 0);
 

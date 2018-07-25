@@ -9,6 +9,7 @@
 
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
+#include "../../Data/base.h"
 #include "../AudioView.h"
 
 BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):
@@ -52,7 +53,7 @@ void BarAddDialog::onOk()
 	song->beginActionGroup();
 
 	if (!song->getTimeTrack())
-		song->addTrack(Track::Type::TIME, 0);
+		song->addTrack(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
 		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);

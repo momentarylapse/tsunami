@@ -6,11 +6,12 @@
  */
 
 #include "Curve.h"
+#include "Track.h"
+#include "Song.h"
 #include "../Module/Module.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
-#include "Song.h"
 
 Curve::Target::Target()
 {

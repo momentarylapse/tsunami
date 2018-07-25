@@ -118,7 +118,7 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER, track->synth->module_subtype);
+	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
 		track->setSynthesizer(CreateSynthesizer(session, name));
 }

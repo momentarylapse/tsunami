@@ -41,26 +41,26 @@ DeviceConsole::~DeviceConsole()
 
 string DeviceConsole::to_format(int i, const Device *d)
 {
-	if (d->type == d->Type::AUDIO_OUTPUT)
+	if (d->type == DeviceType::AUDIO_OUTPUT)
 		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
-	if (d->type == d->Type::AUDIO_INPUT)
+	if (d->type == DeviceType::AUDIO_INPUT)
 		return format("%d\\%s\\%s\\%d\\%s\\%s\\%.1f", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false", d->latency);
-	if (d->type == d->Type::MIDI_INPUT)
+	if (d->type == DeviceType::MIDI_INPUT)
 		return format("%d\\%s\\%s\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->visible ? "true" : "false", d->present ? "true" : "false");
 	return "";
 }
 
 void DeviceConsole::change_data()
 {
-	output_devices = device_manager->getDeviceList(Device::Type::AUDIO_OUTPUT);
+	output_devices = device_manager->getDeviceList(DeviceType::AUDIO_OUTPUT);
 	foreachi(Device *d, output_devices, i)
 		changeString("output-list", i, to_format(i, d));
 
-	input_devices = device_manager->getDeviceList(Device::Type::AUDIO_INPUT);
+	input_devices = device_manager->getDeviceList(DeviceType::AUDIO_INPUT);
 	foreachi(Device *d, input_devices, i)
 		changeString("input-list", i, to_format(i, d));
 
-	midi_input_devices = device_manager->getDeviceList(Device::Type::MIDI_INPUT);
+	midi_input_devices = device_manager->getDeviceList(DeviceType::MIDI_INPUT);
 	foreachi(Device *d, midi_input_devices, i)
 		changeString("midi-input-list", i, to_format(i, d));
 }
@@ -77,7 +77,7 @@ void DeviceConsole::update_full()
 		sel_midi_in = midi_input_devices[getInt("midi-input-list")];
 
 	reset("output-list");
-	output_devices = device_manager->getDeviceList(Device::Type::AUDIO_OUTPUT);
+	output_devices = device_manager->getDeviceList(DeviceType::AUDIO_OUTPUT);
 	foreachi(Device *d, output_devices, i){
 		addString("output-list", to_format(i, d));
 		if (d == sel_out)
@@ -85,7 +85,7 @@ void DeviceConsole::update_full()
 	}
 
 	reset("input-list");
-	input_devices = device_manager->getDeviceList(Device::Type::AUDIO_INPUT);
+	input_devices = device_manager->getDeviceList(DeviceType::AUDIO_INPUT);
 	foreachi(Device *d, input_devices, i){
 		addString("input-list", to_format(i, d));
 		if (d == sel_in)
@@ -93,7 +93,7 @@ void DeviceConsole::update_full()
 	}
 
 	reset("midi-input-list");
-	midi_input_devices = device_manager->getDeviceList(Device::Type::MIDI_INPUT);
+	midi_input_devices = device_manager->getDeviceList(DeviceType::MIDI_INPUT);
 	foreachi(Device *d, midi_input_devices, i){
 		addString("midi-input-list", to_format(i, d));
 		if (d == sel_midi_in)
@@ -105,15 +105,15 @@ void DeviceConsole::update_full()
 void DeviceConsole::add_device()
 {
 	Array<Device*> &devices = device_manager->getDeviceList(device_manager->msg_type);
-	if (device_manager->msg_type == Device::Type::AUDIO_OUTPUT){
+	if (device_manager->msg_type == DeviceType::AUDIO_OUTPUT){
 		output_devices = devices;
 		Device *d = output_devices.back();
 		addString("output-list", to_format(devices.num - 1, d));
-	}else if (device_manager->msg_type == Device::Type::AUDIO_INPUT){
+	}else if (device_manager->msg_type == DeviceType::AUDIO_INPUT){
 		input_devices = devices;
 		Device *d = input_devices.back();
 		addString("input-list", to_format(devices.num - 1, d));
-	}else if (device_manager->msg_type == Device::Type::MIDI_INPUT){
+	}else if (device_manager->msg_type == DeviceType::MIDI_INPUT){
 		midi_input_devices = devices;
 		Device *d = midi_input_devices.back();
 		addString("midi-input-list", to_format(devices.num - 1, d));
@@ -209,14 +209,14 @@ void DeviceConsole::onErase()
 	if (t == 0){
 		int n = getInt("output-list");
 		if (n >= 0)
-			device_manager->remove_device(Device::Type::AUDIO_OUTPUT, n);
+			device_manager->remove_device(DeviceType::AUDIO_OUTPUT, n);
 	}else if (t == 1){
 		int n = getInt("input-list");
 		if (n >= 0)
-			device_manager->remove_device(Device::Type::AUDIO_INPUT, n);
+			device_manager->remove_device(DeviceType::AUDIO_INPUT, n);
 	}else if (t == 2){
 		int n = getInt("midi-input-list");
 		if (n >= 0)
-			device_manager->remove_device(Device::Type::MIDI_INPUT, n);
+			device_manager->remove_device(DeviceType::MIDI_INPUT, n);
 	}
 }

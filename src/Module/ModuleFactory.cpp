@@ -28,69 +28,69 @@
 #include "../Session.h"
 
 
-Module* ModuleFactory::_create_special(Session* session, int type, const string& sub_type)
+Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type)
 {
-	if (type == Module::Type::BEAT_MIDIFIER){
+	if (type == ModuleType::BEAT_MIDIFIER){
 		return new BeatMidifier;
-	}else if (type == Module::Type::AUDIO_JOINER){
+	}else if (type == ModuleType::AUDIO_JOINER){
 		return new AudioJoiner;
-	}else if (type == Module::Type::AUDIO_SUCKER){
+	}else if (type == ModuleType::AUDIO_SUCKER){
 		return new AudioSucker;
-	}else if (type == Module::Type::AUDIO_SOURCE){
+	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song);
-	}else if (type == Module::Type::AUDIO_EFFECT){
+	}else if (type == ModuleType::AUDIO_EFFECT){
 		if (sub_type == "Dummy" or sub_type == "")
 			return new AudioEffect;
-	}else if (type == Module::Type::MIDI_EFFECT){
+	}else if (type == ModuleType::MIDI_EFFECT){
 		if (sub_type == "Dummy" or sub_type == "")
 			return new MidiEffect;
-	}else if (type == Module::Type::SYNTHESIZER){
+	}else if (type == ModuleType::SYNTHESIZER){
 		if (sub_type == "Dummy" or sub_type == "")
 			return new DummySynthesizer;
 		//if (sub_type == "Sample")
 		//	return new SampleSynthesizer;
-	}else if (type == Module::Type::PITCH_DETECTOR){
+	}else if (type == ModuleType::PITCH_DETECTOR){
 		return new PitchDetector;
-	}else if (type == Module::Type::BEAT_SOURCE){
+	}else if (type == ModuleType::BEAT_SOURCE){
 		if (sub_type == "BarStreamer")
 			{}//return new BarStreamer()
-	}else if (type == Module::Type::AUDIO_VISUALIZER){
+	}else if (type == ModuleType::AUDIO_VISUALIZER){
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
-	}else if (type == Module::Type::OUTPUT_STREAM_AUDIO){
+	}else if (type == ModuleType::OUTPUT_STREAM_AUDIO){
 		return new OutputStream(session, NULL);
-	}else if (type == Module::Type::INPUT_STREAM_AUDIO){
+	}else if (type == ModuleType::INPUT_STREAM_AUDIO){
 		return new InputStreamAudio(session);
-	}else if (type == Module::Type::INPUT_STREAM_MIDI){
+	}else if (type == ModuleType::INPUT_STREAM_MIDI){
 		return new InputStreamMidi(session);
 	}
 	return NULL;
 }
 
-Module* ModuleFactory::_create_dummy(int type)
+Module* ModuleFactory::_create_dummy(ModuleType type)
 {
-	if (type == Module::Type::SYNTHESIZER)
+	if (type == ModuleType::SYNTHESIZER)
 		return new DummySynthesizer;
-	if (type == Module::Type::AUDIO_SOURCE)
+	if (type == ModuleType::AUDIO_SOURCE)
 		return new AudioSource;
-	if (type == Module::Type::AUDIO_VISUALIZER)
+	if (type == ModuleType::AUDIO_VISUALIZER)
 		return new AudioVisualizer;
-	if (type == Module::Type::MIDI_SOURCE)
+	if (type == ModuleType::MIDI_SOURCE)
 		return new MidiSource;
-	if (type == Module::Type::AUDIO_EFFECT)
+	if (type == ModuleType::AUDIO_EFFECT)
 		return new AudioEffect;
-	if (type == Module::Type::MIDI_EFFECT)
+	if (type == ModuleType::MIDI_EFFECT)
 		return new MidiEffect;
 	return NULL;
 }
 
-string ModuleFactory::base_class(int type)
+string ModuleFactory::base_class(ModuleType type)
 {
 	return Module::type_to_name(type);
 }
 
-Module* ModuleFactory::create(Session* session, int type, const string& sub_type)
+Module* ModuleFactory::create(Session* session, ModuleType type, const string& sub_type)
 {
 	Module *m = NULL;
 	Plugin *p = NULL;
@@ -113,7 +113,7 @@ Module* ModuleFactory::create(Session* session, int type, const string& sub_type
 		m->set_session_etc(session, sub_type, p);
 
 	// type specific initialization
-	if (m and type == Module::Type::SYNTHESIZER)
+	if (m and type == ModuleType::SYNTHESIZER)
 		((Synthesizer*)m)->sample_rate = session->sample_rate();
 
 	return m;

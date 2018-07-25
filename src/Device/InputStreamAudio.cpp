@@ -14,6 +14,7 @@
 #include "InputStreamAudio.h"
 #include "OutputStream.h"
 #include "../Stuff/BackupManager.h"
+#include "../Data/base.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -173,7 +174,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 	if (stream->backup_file){
 		// write to file
 		string data;
-		buf.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
+		buf.exports(data, 2, SampleFormat::SAMPLE_FORMAT_32_FLOAT);
 		stream->backup_file->write_buffer(data);
 	}
 
@@ -183,7 +184,7 @@ int InputStreamAudio::Output::read(AudioBuffer &buf)
 extern bool ugly_hack_slow;
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
-	Module(Type::INPUT_STREAM_AUDIO),
+	Module(ModuleType::INPUT_STREAM_AUDIO),
 	buffer(1048576)
 {
 //	printf("input new\n");
@@ -208,8 +209,8 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
 
-	device = session->device_manager->chooseDevice(Device::Type::AUDIO_INPUT);
-	api = session->device_manager->audio_api;
+	device = session->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
+	dev_man = session->device_manager;
 	playback_delay_const = 0;
 	if (device){
 		playback_delay_const = device->latency;
@@ -294,7 +295,7 @@ void InputStreamAudio::_stop()
 	_stop_update();
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
+	if (dev_man->audio_api == DeviceManager::ApiType::PULSE){
 	//	printf("disconnect\n");
 		pa_stream_disconnect(pulse_stream);
 		_pulse_test_error("disconnect");
@@ -342,7 +343,7 @@ bool InputStreamAudio::start()
 	num_channels = 2;
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
+	if (dev_man->audio_api == DeviceManager::ApiType::PULSE){
 		pa_sample_spec ss;
 		ss.rate = _sample_rate;
 		ss.channels = 2;
@@ -377,7 +378,7 @@ bool InputStreamAudio::start()
 #endif
 
 #if HAS_LIB_PORTAUDIO
-	if (api == DeviceManager::API_PORTAUDIO){
+	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO){
 		session->i("open def stream");
 
 		if (device->is_default()){

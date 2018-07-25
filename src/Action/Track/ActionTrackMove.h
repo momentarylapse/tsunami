@@ -8,7 +8,6 @@
 #ifndef SRC_ACTION_TRACK_ACTIONTRACKMOVE_H_
 #define SRC_ACTION_TRACK_ACTIONTRACKMOVE_H_
 
-#include "../../Data/Song.h"
 #include "../Action.h"
 
 class Track;
@@ -18,10 +17,9 @@ class ActionTrackMove: public Action
 public:
 	ActionTrackMove(Track *track, int target);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	//Track *track;
 	int origin, target;
 };
 

@@ -11,8 +11,6 @@
 
 
 #include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
-#include "../Data/Song.h"
 #include "../Data/Audio/RingBuffer.h"
 #include "../Module/Module.h"
 #include <atomic>
@@ -48,8 +46,6 @@ public:
 
 	void _create_dev();
 	void _kill_dev();
-
-	int api;
 
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_READ_END_OF_STREAM;

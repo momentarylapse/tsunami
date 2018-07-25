@@ -9,7 +9,9 @@
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SHRINKBUFFER_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/Audio/AudioBuffer.h"
+
+class TrackLayer;
 
 class ActionTrack__ShrinkBuffer : public Action
 {

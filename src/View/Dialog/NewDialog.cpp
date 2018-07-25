@@ -6,6 +6,7 @@
  */
 
 #include "NewDialog.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Action/ActionManager.h"
 #include "../../Tsunami.h"
@@ -36,17 +37,17 @@ NewDialog::NewDialog(hui::Window *_parent):
 void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
-	int type = Track::Type::AUDIO_MONO;
+	auto type = SignalType::AUDIO_MONO;
 	if (isChecked("new_track_type:midi"))
-		type = Track::Type::MIDI;
+		type = SignalType::MIDI;
 	else if (isChecked("new_track_type:audio-stereo"))
-		type = Track::Type::AUDIO_STEREO;
+		type = SignalType::AUDIO_STEREO;
 	Session *session = tsunami->createSession();
 	Song *song = session->song;
 	song->newWithOneTrack(type, sample_rate);
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
-		Track *t = song->addTrack(Track::Type::TIME, 0);
+		Track *t = song->addTrack(SignalType::BEATS, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
 			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);

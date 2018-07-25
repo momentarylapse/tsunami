@@ -9,16 +9,17 @@
 #define ACTIONTRACK__DELETEEMPTY_H_
 
 #include "../Action.h"
-#include "../../Data/Song.h"
+
+class Track;
 
 class ActionTrack__DeleteEmpty: public Action
 {
 public:
 	ActionTrack__DeleteEmpty(Track *track);
-	virtual ~ActionTrack__DeleteEmpty();
+	~ActionTrack__DeleteEmpty() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	int index;

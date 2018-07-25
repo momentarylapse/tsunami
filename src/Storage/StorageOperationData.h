@@ -24,6 +24,7 @@ class AudioPort;
 class Tag;
 class Storage;
 class Session;
+enum class SampleFormat;
 
 class StorageOperationData
 {
@@ -42,7 +43,7 @@ public:
 
 	void suggest_samplerate(int samplerate);
 	void suggest_channels(int channels);
-	void suggest_default_format(int format);
+	void suggest_default_format(SampleFormat format);
 	void suggest_tag(const string &key, const string &value);
 
 	Storage *storage;

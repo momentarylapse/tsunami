@@ -59,7 +59,7 @@ void TsunamiPlugin::stop()
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, Module::Type::TSUNAMI_PLUGIN, name);
+	Plugin *p = session->plugin_manager->GetPlugin(session, ModuleType::TSUNAMI_PLUGIN, name);
 	TsunamiPlugin *t = NULL;
 
 	if (p->usable)

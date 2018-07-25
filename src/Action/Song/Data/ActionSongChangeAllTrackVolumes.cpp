@@ -7,6 +7,7 @@
 
 #include "ActionSongChangeAllTrackVolumes.h"
 #include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
 
 ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t, float _volume)
 {

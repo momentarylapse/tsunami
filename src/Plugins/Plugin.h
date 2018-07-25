@@ -11,24 +11,25 @@
 #include "../lib/base/base.h"
 
 namespace Kaba{
-class Script;
-class Class;
+	class Script;
+	class Class;
 };
 
 class Session;
+enum class ModuleType;
 
 // represents a compiled script
 class Plugin
 {
 public:
-	Plugin(const string &_filename, int type);
+	Plugin(const string &_filename, ModuleType type);
 
 	string filename;
 	int index;
 	Kaba::Script *s;
 
 	bool usable;
-	int type;
+	ModuleType type;
 	string error_message;
 
 	string get_error();

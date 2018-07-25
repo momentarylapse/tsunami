@@ -5,10 +5,11 @@
  *      Author: michi
  */
 
-#include "../../../Data/Track.h"
-#include "../../../Module/Audio/AudioEffect.h"
 #include <assert.h>
 #include "ActionTrackDeleteAudioEffect.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
+#include "../../../Module/Audio/AudioEffect.h"
 
 ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
 {

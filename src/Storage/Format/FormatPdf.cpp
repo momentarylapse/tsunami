@@ -6,10 +6,15 @@
  */
 
 #include "FormatPdf.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/Clef.h"
 #include "../../lib/xfile/pdf.h"
+#include "../../lib/image/Painter.h"
+#include "../../lib/math/rect.h"
 #include <math.h>
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
@@ -163,7 +168,7 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 		p->drawStr(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
 
 	for (Track* t : song->tracks){
-		if (t->type != t->Type::MIDI)
+		if (t->type != SignalType::MIDI)
 			continue;
 
 		y0 = render_track_classical(p, x0, w, y0, r, t, scale) + track_space;

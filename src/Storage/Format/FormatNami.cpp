@@ -8,8 +8,14 @@
 #include "FormatNami.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../lib/file/file.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/base.h"
 #include "../../Data/Curve.h"
 #include "../../Data/SampleRef.h"
+#include "../../Data/Sample.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/Midi/MidiEffect.h"
@@ -93,7 +99,7 @@ public:
 	virtual void write(File *f)
 	{
 		f->write_int(me->sample_rate);
-		f->write_int(me->default_format);
+		f->write_int((int)me->default_format);
 		f->write_int(2); // channels
 		f->write_int(me->compression);
 		f->write_int(0); // reserved
@@ -813,7 +819,7 @@ public:
 	}
 	virtual void create()
 	{
-		me = new Sample(Track::Type::AUDIO);
+		me = new Sample(SignalType::AUDIO);
 		me->set_owner(parent);
 		parent->samples.add(me);
 	}
@@ -822,7 +828,7 @@ public:
 		me->name = f->read_str();
 		me->volume = f->read_float();
 		me->offset = f->read_int();
-		me->type = f->read_int();
+		me->type = (SignalType)f->read_int();
 		f->read_int(); // reserved
 	}
 	virtual void write(File *f)
@@ -830,14 +836,14 @@ public:
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_int(me->offset);
-		f->write_int(me->type);
+		f->write_int((int)me->type);
 		f->write_int(0); // reserved
 	}
 	virtual void write_subs()
 	{
-		if (me->type == Track::Type::AUDIO)
+		if (me->type == SignalType::AUDIO)
 			write_sub("bufbox", &me->buf);
-		else if (me->type == Track::Type::MIDI)
+		else if (me->type == SignalType::MIDI)
 			write_sub("midi", &me->midi);
 	}
 };
@@ -1062,14 +1068,14 @@ public:
 	}
 	virtual void create()
 	{
-		me = parent->addTrack(Track::Type::AUDIO);
+		me = parent->addTrack(SignalType::AUDIO);
 	}
 	virtual void read(File *f)
 	{
 		me->name = f->read_str();
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
-		me->type = f->read_int();
+		me->type = (SignalType)f->read_int();
 		me->layers[0]->type = me->type;
 		me->panning = f->read_float();
 		me->instrument = Instrument(f->read_int());
@@ -1082,7 +1088,7 @@ public:
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_bool(me->muted);
-		f->write_int(me->type);
+		f->write_int((int)me->type);
 		f->write_float(me->panning);
 		f->write_int(me->instrument.type);
 		f->write_int(0); // reserved
@@ -1096,7 +1102,7 @@ public:
 		write_sub_parray("level", me->layers);
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("marker", me->markers);
-		if ((me->type == me->Type::TIME) or (me->type == me->Type::MIDI))
+		if ((me->type == SignalType::BEATS) or (me->type == SignalType::MIDI))
 			if (!me->synth->isDefault())
 				write_sub("synth", me->synth);
 		if (me->layers[0]->midi.num > 0)
@@ -1213,7 +1219,7 @@ void check_empty_subs(Song *a)
 void FormatNami::make_consistent(Song *a)
 {
 	for (Sample *s : a->samples){
-		if (s->type == Track::Type::MIDI){
+		if (s->type == SignalType::MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
 				s->midi.samples = s->midi.back()->range.end();
 			}

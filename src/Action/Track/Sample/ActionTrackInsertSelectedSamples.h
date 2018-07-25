@@ -9,18 +9,18 @@
 #define ACTIONTRACKINSERTSELECTEDSAMPLES_H_
 
 #include "../../ActionGroup.h"
-class Song;
+class TrackLayer;
 class SongSelection;
 
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(const SongSelection &sel, int layer_no);
+	ActionTrackInsertSelectedSamples(const SongSelection &sel, TrackLayer *l);
 
 	void build(Data *d) override;
 
 	const SongSelection &sel;
-	int layer_no;
+	TrackLayer *layer;
 };
 
 #endif /* ACTIONTRACKINSERTSELECTEDSAMPLES_H_ */

@@ -8,6 +8,7 @@
 #include "SongSelection.h"
 
 #include "Rhythm/Bar.h"
+#include "base.h"
 #include "Song.h"
 #include "Track.h"
 #include "SampleRef.h"
@@ -115,7 +116,7 @@ void SongSelection::_update_bars(Song* s)
 
 	bool metro_selected = false;
 	for (Track *t: s->tracks)
-		if (has(t) and t->type == t->Type::TIME)
+		if (has(t) and t->type == SignalType::BEATS)
 			metro_selected = true;
 	if (!metro_selected)
 		return;

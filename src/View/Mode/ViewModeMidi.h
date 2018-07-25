@@ -37,10 +37,10 @@ public:
 	void drawTrackData(Painter *c, AudioViewTrack *t) override;
 	void drawPost(Painter *c) override;
 
-	virtual Selection getHover() override;
-	virtual void startSelection() override;
+	Selection getHover() override;
+	void startSelection() override;
 
-	virtual int which_midi_mode(Track *t) override;
+	MidiMode which_midi_mode(Track *t) override;
 
 	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
@@ -56,18 +56,18 @@ public:
 
 	int modifier;
 
-	void setMode(int mode);
-	int mode_wanted;
+	void setMode(MidiMode mode);
+	MidiMode mode_wanted;
 
-	void setCreationMode(int mode);
-	int creation_mode;
-	enum CreationMode
+	enum class CreationMode
 	{
 		SELECT,
 		NOTE,
 		INTERVAL,
 		CHORD
 	};
+	void setCreationMode(CreationMode mode);
+	CreationMode creation_mode;
 
 	MidiPreview *preview;
 

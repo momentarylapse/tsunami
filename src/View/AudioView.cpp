@@ -16,6 +16,10 @@
 #include "../Session.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
+#include "../Data/base.h"
+#include "../Data/Track.h"
+#include "../Data/Song.h"
+#include "../Data/Sample.h"
 #include "../Data/Rhythm/Beat.h"
 #include "../Data/SampleRef.h"
 #include "../Device/OutputStream.h"
@@ -210,7 +214,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dummy_vtrack = new AudioViewTrack(this, NULL);
 	dummy_vlayer = new AudioViewLayer(this, NULL);
 
-	midi_view_mode = hui::Config.getInt("View.MidiMode", MidiMode::CLASSICAL);
+	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	// modes
 	mode = NULL;
@@ -336,7 +340,7 @@ AudioView::~AudioView()
 	hui::Config.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.setFloat("View.ZoomSpeed", ZoomSpeed);
 	hui::Config.setBool("View.Antialiasing", antialiasing);
-	hui::Config.setInt("View.MidiMode", midi_view_mode);
+	hui::Config.setInt("View.MidiMode", (int)midi_view_mode);
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
@@ -705,7 +709,7 @@ void AudioView::onSongUpdate()
 		setCurTrack(NULL);
 		setCurLayer(NULL);
 		if (song->tracks.num > 0){
-			if ((song->tracks[0]->type == Track::Type::TIME) and song->tracks.num > 1)
+			if ((song->tracks[0]->type == SignalType::BEATS) and song->tracks.num > 1)
 				setCurTrack(song->tracks[1]);
 			else
 				setCurTrack(song->tracks[0]);
@@ -911,7 +915,7 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 {
 	int p = cam.sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){
-		color cc = (type == hover.type) ? colors.selection_boundary_hover : col;
+		color cc = (type == (int)hover.type) ? colors.selection_boundary_hover : col;
 		c->setColor(cc);
 		c->setLineWidth(2.0f);
 		c->drawLine(p, area.y1, p, area.y2);
@@ -972,8 +976,8 @@ void AudioView::drawSelection(Painter *c)
 	int sxx2 = clampi(sx2, clip.x1, clip.x2);
 	c->setColor(colors.selection_internal);
 	c->drawRect(rect(sxx1, sxx2, clip.y1, clip.y1 + TIME_SCALE_HEIGHT));
-	drawTimeLine(c, sel.range.start(), Selection::Type::SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel.range.end(), Selection::Type::SELECTION_END, colors.selection_boundary);
+	drawTimeLine(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
 
 	if (!hide_selection){
 		if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
@@ -1002,7 +1006,7 @@ void AudioView::drawSelection(Painter *c)
 		c->setColor(colors.text_soft1);
 		c->setLineWidth(2.5f);
 		for (AudioViewLayer *t: vlayer)
-			if (t->layer->type == Track::Type::TIME){
+			if (t->layer->type == SignalType::BEATS){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
@@ -1021,7 +1025,7 @@ void AudioView::drawSelection(Painter *c)
 		c->setColor(colors.hover);
 		c->setLineWidth(2.5f);
 		for (AudioViewLayer *t: vlayer)
-			if (t->layer->type == Track::Type::TIME){
+			if (t->layer->type == SignalType::BEATS){
 				float dy = t->area.height();
 				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
 				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
@@ -1057,7 +1061,7 @@ void AudioView::drawAudioFile(Painter *c)
 
 	// playing/capturing position
 	if (isPlaybackActive())
-		drawTimeLine(c, playbackPos(), Selection::Type::PLAYBACK, colors.preview_marker, true);
+		drawTimeLine(c, playbackPos(), (int)Selection::Type::PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
 
@@ -1137,7 +1141,7 @@ void AudioView::updatePeaks()
 	}*/
 }
 
-void AudioView::setMidiViewMode(int mode)
+void AudioView::setMidiViewMode(MidiMode mode)
 {
 	midi_view_mode = mode;
 	forceRedraw();

@@ -10,13 +10,20 @@
 
 #include "../lib/base/base.h"
 
+enum class DeviceType{
+	AUDIO_OUTPUT,
+	AUDIO_INPUT,
+	MIDI_OUTPUT,
+	MIDI_INPUT
+};
 
 class Device
 {
 public:
+
 	Device();
-	Device(int type, const string &name, const string &internal_name, int channels);
-	Device(int type, const string &s);
+	Device(DeviceType type, const string &name, const string &internal_name, int channels);
+	Device(DeviceType type, const string &s);
 
 	string to_config();
 	string get_name() const;
@@ -25,14 +32,7 @@ public:
 	string name;
 	string internal_name;
 
-	enum Type{
-		AUDIO_OUTPUT,
-		AUDIO_INPUT,
-		MIDI_OUTPUT,
-		MIDI_INPUT
-	};
-
-	int type;
+	DeviceType type;
 	int channels;
 	bool visible;
 	bool present;

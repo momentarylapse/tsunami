@@ -8,11 +8,12 @@
 #include "BeatSource.h"
 #include "../ModuleFactory.h"
 #include "../../Session.h"
+#include "../../Data/base.h"
 
 DummyBeatSource* BeatSource::dummy = new DummyBeatSource;
 
 BeatSource::BeatSource() :
-	Module(Type::BEAT_SOURCE)
+	Module(ModuleType::BEAT_SOURCE)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::BEATS, (Port**)&out, "out"));
@@ -52,6 +53,6 @@ void BeatSource::Output::reset()
 
 BeatSource *CreateBeatSource(Session *session, const string &name)
 {
-	return dynamic_cast<BeatSource*>(ModuleFactory::create(session, Module::Type::BEAT_SOURCE, name));
+	return dynamic_cast<BeatSource*>(ModuleFactory::create(session, ModuleType::BEAT_SOURCE, name));
 }
 

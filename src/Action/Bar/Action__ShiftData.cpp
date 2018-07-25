@@ -8,7 +8,9 @@
 #include "Action__ShiftData.h"
 
 #include "../../Data/Track.h"
+#include "../../Data/Song.h"
 #include "../../Data/SampleRef.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include <assert.h>
 
 Action__ShiftData::Action__ShiftData(int _offset, int _shift, int _mode)

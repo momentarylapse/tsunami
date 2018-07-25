@@ -13,6 +13,7 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Module/Module.h"
 #include "../../lib/math/complex.h"
+#include "../../Data/base.h"
 #include "../../Module/SignalChain.h"
 #include "../../TsunamiWindow.h"
 #include "../SideBar/SideBar.h"
@@ -116,14 +117,16 @@ public:
 		{
 			type = -1;
 			module = NULL;
-			port = port_type = -1;
+			port = -1;
+			port_type = SignalType::AUDIO;
 			target_module = NULL;
 			target_port = -1;
 			dx = dy = 0;
 		}
 		int type;
 		Module *module;
-		int port, port_type;
+		int port;
+		SignalType port_type;
 		float dx, dy;
 		enum{
 			TYPE_MODULE,
@@ -182,13 +185,13 @@ public:
 	}
 
 
-	color signal_color(int type, bool hover = false)
+	color signal_color(SignalType type, bool hover = false)
 	{
-		if (type == Module::SignalType::AUDIO)
+		if (type == SignalType::AUDIO)
 			return hover ? view->colors.red_hover : view->colors.red;
-		if (type == Module::SignalType::MIDI)
+		if (type == SignalType::MIDI)
 			return hover ? view->colors.green_hover : view->colors.green;
-		if (type == Module::SignalType::BEATS)
+		if (type == SignalType::BEATS)
 			return hover ? view->colors.blue_hover : view->colors.blue;
 		return hover ? view->colors.white_hover : view->colors.white;
 	}
@@ -406,7 +409,7 @@ public:
 
 	void onAddAudioSource()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_SOURCE);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addAudioSource(name);
 			m->module_x = sel.dx;
@@ -416,7 +419,7 @@ public:
 
 	void onAddAudioEffect()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_EFFECT);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
 		if (name.num > 0){
 			auto *m = chain->addAudioEffect(name);
 			m->module_x = sel.dx;
@@ -426,7 +429,7 @@ public:
 
 	void onAddAudioVisualizer()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::AUDIO_VISUALIZER);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_VISUALIZER);
 		if (name.num > 0){
 			auto *m = chain->addAudioVisualizer(name);
 			m->module_x = sel.dx;
@@ -457,7 +460,7 @@ public:
 
 	void onAddMidiSource()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::MIDI_SOURCE);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addMidiSource(name);
 			m->module_x = sel.dx;
@@ -467,7 +470,7 @@ public:
 
 	void onAddMidiEffect()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::MIDI_EFFECT);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_EFFECT);
 		if (name.num > 0){
 			auto *m = chain->addMidiEffect(name);
 			m->module_x = sel.dx;
@@ -477,7 +480,7 @@ public:
 
 	void onAddSynthesizer()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER);
 		if (name.num > 0){
 			auto *m = chain->addSynthesizer(name);
 			m->module_x = sel.dx;
@@ -501,7 +504,7 @@ public:
 
 	void onAddBeatSource()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, Module::Type::BEAT_SOURCE);
+		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::BEAT_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addBeatSource(name);
 			m->module_x = sel.dx;

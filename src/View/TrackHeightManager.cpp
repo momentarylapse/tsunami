@@ -10,6 +10,7 @@
 #include "AudioView.h"
 #include "AudioViewTrack.h"
 #include "Mode/ViewMode.h"
+#include "../Data/Track.h"
 
 TrackHeightManager::TrackHeightManager()
 {

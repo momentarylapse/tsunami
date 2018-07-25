@@ -8,6 +8,10 @@
 #include "FormatMp3.h"
 #include "../Storage.h"
 #include "../../lib/math/math.h"
+#include "../../lib/file/file.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/base.h"
 
 FormatDescriptorMp3::FormatDescriptorMp3() :
 	FormatDescriptor("Mp3", "mp3", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)

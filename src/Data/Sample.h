@@ -17,11 +17,12 @@ class Song;
 class Track;
 class SampleRef;
 struct Tag;
+enum class SignalType;
 
 class Sample : public Observable<VirtualBase>
 {
 public:
-	Sample(int type);
+	Sample(SignalType type);
 	virtual ~Sample();
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
@@ -36,7 +37,7 @@ public:
 	void unset_owner();
 
 	string name;
-	int type;
+	SignalType type;
 	AudioBuffer buf;
 	MidiNoteBuffer midi;
 	float volume;

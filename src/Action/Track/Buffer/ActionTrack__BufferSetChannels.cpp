@@ -6,8 +6,8 @@
  */
 
 #include "ActionTrack__BufferSetChannels.h"
-
 #include "../../../Data/Track.h"
+#include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_layer, int _index, int _channels)
 {

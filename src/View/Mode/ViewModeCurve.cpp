@@ -9,6 +9,7 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Data/Curve.h"
+#include "../../Data/Song.h"
 #include "../../Device/OutputStream.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"

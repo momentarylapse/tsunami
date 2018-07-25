@@ -6,6 +6,11 @@
  */
 
 #include "FormatSoundFont2.h"
+#include "../../lib/file/file.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/Sample.h"
+#include "../../Data/Audio/AudioBuffer.h"
 
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
 	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
@@ -139,7 +144,7 @@ void FormatSoundFont2::read_samples(File *f)
 		char *data = new char[num_samples*2];
 		f->read_buffer(data, num_samples*2);
 		buf.resize(num_samples);
-		buf.import(data, 1, SAMPLE_FORMAT_16, num_samples);// / 2);
+		buf.import(data, 1, SampleFormat::SAMPLE_FORMAT_16, num_samples);// / 2);
 		Sample *sample = song->addSample(s.name, buf);
 		delete data;
 

@@ -7,9 +7,10 @@
 
 #include "AudioJoiner.h"
 #include "../../Data/Audio/AudioBuffer.h"
+#include "../../Data/base.h"
 
 AudioJoiner::AudioJoiner() :
-	Module(Type::AUDIO_JOINER)
+	Module(ModuleType::AUDIO_JOINER)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));

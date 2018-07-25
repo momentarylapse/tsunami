@@ -14,6 +14,7 @@
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/SongSelection.h"
 #include <assert.h>
 

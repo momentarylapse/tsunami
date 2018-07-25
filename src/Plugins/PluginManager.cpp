@@ -12,7 +12,10 @@
 #include "../Session.h"
 #include "FastFourierTransform.h"
 #include "../View/Helper/Slider.h"
+#include "../Data/base.h"
 #include "../Data/Song.h"
+#include "../Data/Track.h"
+#include "../Data/Sample.h"
 #include "../Data/SampleRef.h"
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Rhythm/Bar.h"
@@ -111,7 +114,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 
 
-	Module module(-1);
+	Module module(ModuleType::AUDIO_EFFECT);
 	Kaba::DeclareClassSize("Module", sizeof(Module));
 	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, module_subtype));
 	Kaba::DeclareClassOffset("Module", "usable", _offsetof(Module, usable));
@@ -227,7 +230,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Sample.create_ref", Kaba::mf(&Sample::create_ref));
 	Kaba::LinkExternal("Sample.get_value", Kaba::mf(&Sample::getValue));
 
-	Sample sample(0);
+	Sample sample(SignalType::AUDIO);
 	//sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
 	Kaba::DeclareClassSize("SampleRef", sizeof(SampleRef));
@@ -516,7 +519,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	}catch(...){}
 }
 
-void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
+void find_plugins_in_dir(const string &dir, ModuleType type, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(pm->plugin_dir() + dir, "*.kaba", false);
 	for (DirEntry &e : list){
@@ -545,37 +548,37 @@ void PluginManager::FindPlugins()
 	Kaba::Init();
 
 	// "AudioSource"
-	find_plugins_in_dir("AudioSource/", Module::Type::AUDIO_SOURCE, this);
+	find_plugins_in_dir("AudioSource/", ModuleType::AUDIO_SOURCE, this);
 
 	// "AudioEffect"
-	find_plugins_in_dir("AudioEffect/Channels/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Dynamics/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Echo/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Pitch/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Repair/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Sound/", Module::Type::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Synthesizer/", Module::Type::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Channels/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Dynamics/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Echo/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Pitch/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Repair/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Sound/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/Synthesizer/", ModuleType::AUDIO_EFFECT, this);
 
 	// "AudioVisualizer"
-	find_plugins_in_dir("AudioVisualizer/", Module::Type::AUDIO_VISUALIZER, this);
+	find_plugins_in_dir("AudioVisualizer/", ModuleType::AUDIO_VISUALIZER, this);
 
 	// "MidiSource"
-	find_plugins_in_dir("MidiSource/", Module::Type::MIDI_SOURCE, this);
+	find_plugins_in_dir("MidiSource/", ModuleType::MIDI_SOURCE, this);
 
 	// "MidiEffect"
-	find_plugins_in_dir("MidiEffect/", Module::Type::MIDI_EFFECT, this);
+	find_plugins_in_dir("MidiEffect/", ModuleType::MIDI_EFFECT, this);
 
 	// "BeatSource"
-	find_plugins_in_dir("BeatSource/", Module::Type::BEAT_SOURCE, this);
+	find_plugins_in_dir("BeatSource/", ModuleType::BEAT_SOURCE, this);
 
 	// "All"
-	find_plugins_in_dir("All/", Module::Type::SONG_PLUGIN, this);
+	find_plugins_in_dir("All/", ModuleType::SONG_PLUGIN, this);
 
 	// rest
-	find_plugins_in_dir("Independent/", Module::Type::TSUNAMI_PLUGIN, this);
+	find_plugins_in_dir("Independent/", ModuleType::TSUNAMI_PLUGIN, this);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer/", Module::Type::SYNTHESIZER, this);
+	find_plugins_in_dir("Synthesizer/", ModuleType::SYNTHESIZER, this);
 }
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
@@ -622,7 +625,7 @@ string PluginManager::SelectFavoriteName(hui::Window *win, Module *c, bool save)
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
+Plugin *PluginManager::LoadAndCompilePlugin(ModuleType type, const string &filename)
 {
 	for (Plugin *p: plugins)
 		if (filename == p->filename)
@@ -639,7 +642,7 @@ Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
 }
 
 
-Plugin *PluginManager::GetPlugin(Session *session, int type, const string &name)
+Plugin *PluginManager::GetPlugin(Session *session, ModuleType type, const string &name)
 {
 	for (PluginFile &pf: plugin_files){
 		if ((pf.name == name) and (pf.type == type)){
@@ -674,9 +677,9 @@ Array<string> PluginManager::FindAudioEffects()
 }
 
 
-Array<string> PluginManager::FindModuleSubTypes(int type)
+Array<string> PluginManager::FindModuleSubTypes(ModuleType type)
 {
-	if (type == Module::Type::AUDIO_EFFECT)
+	if (type == ModuleType::AUDIO_EFFECT)
 		return FindAudioEffects();
 
 	Array<string> names;
@@ -684,18 +687,18 @@ Array<string> PluginManager::FindModuleSubTypes(int type)
 		if (pf.type == type)
 			names.add(pf.name);
 
-	if (type == Module::Type::AUDIO_SOURCE){
+	if (type == ModuleType::AUDIO_SOURCE){
 		names.add("SongRenderer");
 		//names.add("BufferStreamer");
 	}
-	if (type == Module::Type::MIDI_EFFECT)
+	if (type == ModuleType::MIDI_EFFECT)
 		names.add("Dummy");
-	if (type == Module::Type::BEAT_SOURCE){
+	if (type == ModuleType::BEAT_SOURCE){
 		//names.add("BarStreamer");
 	}
-	if (type == Module::Type::AUDIO_VISUALIZER)
+	if (type == ModuleType::AUDIO_VISUALIZER)
 		names.add("PeakMeter");
-	if (type == Module::Type::SYNTHESIZER){
+	if (type == ModuleType::SYNTHESIZER){
 		names.add("Dummy");
 		//names.add("Sample");
 	}
@@ -703,7 +706,7 @@ Array<string> PluginManager::FindModuleSubTypes(int type)
 }
 
 
-string PluginManager::ChooseModule(hui::Panel *parent, Session *session, int type, const string &old_name)
+string PluginManager::ChooseModule(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();

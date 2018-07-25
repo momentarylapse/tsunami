@@ -6,6 +6,9 @@
  */
 
 #include "Song.h"
+#include "base.h"
+#include "Track.h"
+#include "Sample.h"
 #include "SongSelection.h"
 #include "Curve.h"
 #include "Rhythm/Bar.h"
@@ -46,18 +49,6 @@
 #include "../View/AudioView.h"
 #include "../lib/threads/Mutex.h"
 #include <assert.h>
-#include <math.h>
-
-
-float amplitude2db(float amp)
-{
-	return log10(amp) * 20.0f;
-}
-
-float db2amplitude(float db)
-{
-	return pow(10, db * 0.05);
-}
 
 
 int get_track_index(Track *t)
@@ -76,7 +67,7 @@ Song::Song(Session *session) :
 	Data(session)
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	default_format = SAMPLE_FORMAT_16;
+	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
 	volume = 1;
 }
@@ -190,7 +181,7 @@ void Song::newEmpty(int _sample_rate)
 	notify();
 }
 
-void Song::newWithOneTrack(int track_type, int _sample_rate)
+void Song::newWithOneTrack(SignalType track_type, int _sample_rate)
 {
 	notifyBegin();
 	newEmpty(_sample_rate);
@@ -209,7 +200,7 @@ void Song::reset()
 	tags.clear();
 	bars.clear();
 	volume = 1;
-	default_format = SAMPLE_FORMAT_16;
+	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
@@ -332,9 +323,9 @@ int Song::barOffset(int index)
 
 
 
-Track *Song::addTrack(int type, int index)
+Track *Song::addTrack(SignalType type, int index)
 {
-	if (type == Track::Type::TIME){
+	if (type == SignalType::BEATS){
 		// force single time track
 		if (getTimeTrack())
 			throw Exception(_("There already is one rhythm track."));
@@ -344,7 +335,7 @@ Track *Song::addTrack(int type, int index)
 	return (Track*)execute(new ActionTrackAdd(new Track(type, CreateSynthesizer(session, "")), index));
 }
 
-Track *Song::addTrackAfter(int type, Track *ref)
+Track *Song::addTrackAfter(SignalType type, Track *ref)
 {
 	int index = ref->get_index();
 	return addTrack(type, index + 1);
@@ -555,7 +546,7 @@ MidiEffect *Song::get_midi_fx(Track *track, int index)
 Track *Song::getTimeTrack()
 {
 	for (Track *t: tracks)
-		if (t->type == t->Type::TIME)
+		if (t->type == SignalType::BEATS)
 			return t;
 	return NULL;
 }

@@ -14,11 +14,14 @@
 #include "../Synth/Synthesizer.h"
 #include "../Midi/MidiEventStreamer.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/Sample.h"
 #include "../../Data/Curve.h"
 #include "../../Data/SongSelection.h"
 #include "../../Data/SampleRef.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../Tsunami.h"
 #include "../../lib/math/math.h"
 
@@ -140,11 +143,11 @@ void SongRenderer::render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 
 void SongRenderer::render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 {
-	if (t->type == Track::Type::AUDIO)
+	if (t->type == SignalType::AUDIO)
 		render_audio_track_no_fx(buf, t, ti);
-	else if (t->type == Track::Type::TIME)
+	else if (t->type == SignalType::BEATS)
 		render_time_track_no_fx(buf, t, ti);
-	else if (t->type == Track::Type::MIDI)
+	else if (t->type == SignalType::MIDI)
 		render_midi_track_no_fx(buf, t, ti);
 }
 
@@ -346,11 +349,11 @@ void SongRenderer::build_data()
 
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
-		if (t->type == t->Type::MIDI){
+		if (t->type == SignalType::MIDI){
 			MidiNoteBuffer _midi = t->layers[0]->midi;
 			for (TrackLayer *l: t->layers)
 				for (auto c: l->samples)
-					if (c->type() == t->Type::MIDI)
+					if (c->type() == SignalType::MIDI)
 					_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
 			for (MidiEffect *fx: t->midi_fx){
 				fx->prepare();
@@ -366,7 +369,7 @@ void SongRenderer::build_data()
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);
 			t->synth->set_source(m->out);
-		}else if (t->type == t->Type::TIME){
+		}else if (t->type == SignalType::BEATS){
 
 			t->synth->setSampleRate(song->sample_rate);
 			t->synth->setInstrument(t->instrument);

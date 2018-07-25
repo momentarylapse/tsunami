@@ -7,6 +7,7 @@
 
 #include "SampleRef.h"
 #include "Sample.h"
+#include "Track.h"
 #include "../lib/math/math.h"
 #include "Song.h"
 
@@ -63,7 +64,7 @@ Range SampleRef::range() const
 	return origin->range() + pos;
 }
 
-int SampleRef::type() const
+SignalType SampleRef::type() const
 {
 	return origin->type;
 }

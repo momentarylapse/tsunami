@@ -6,6 +6,8 @@
  */
 
 #include "Track.h"
+#include "base.h"
+#include "Song.h"
 #include "SampleRef.h"
 #include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
@@ -48,20 +50,7 @@
 #include "../lib/threads/Mutex.h"
 
 
-string track_type(int type)
-{
-	if (type == Track::Type::AUDIO)
-		return _("Audio");
-	if (type == Track::Type::MIDI)
-		return _("Midi");
-	if (type == Track::Type::TIME)
-		return _("Metronome");
-	if (type == Track::Type::AUDIO_MONO)
-		return _("Audio (mono)");
-	if (type == Track::Type::AUDIO_STEREO)
-		return _("Audio (stereo)");
-	return "???";
-}
+TrackLayer::TrackLayer(){}
 
 TrackLayer::TrackLayer(Track *t, bool _is_main)
 {
@@ -88,7 +77,7 @@ Range TrackLayer::range(int keep_notes) const
 	for (AudioBuffer &b: buffers)
 		r = r or b.range();
 
-	if ((type == Track::Type::MIDI) and (midi.num > 0))
+	if ((type == SignalType::MIDI) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
 
 	for (SampleRef *s: samples)
@@ -119,15 +108,15 @@ const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 
-Track::Track(int _type, Synthesizer *_synth)
+Track::Track(SignalType _type, Synthesizer *_synth)
 {
 	type = _type;
 	channels = 2;
-	if (type == Type::AUDIO_MONO){
-		type = Type::AUDIO;
+	if (type == SignalType::AUDIO_MONO){
+		type = SignalType::AUDIO;
 		channels = 1;
-	}else if (type == Type::AUDIO_STEREO){
-		type = Type::AUDIO;
+	}else if (type == SignalType::AUDIO_STEREO){
+		type = SignalType::AUDIO;
 		channels = 2;
 	}
 	muted = false;
@@ -179,7 +168,7 @@ string Track::getNiceName()
 {
 	if (name.num > 0)
 		return name;
-	if (type == Type::TIME)
+	if (type == SignalType::BEATS)
 		return _("Metronome");
 	int n = get_track_index(this);
 	return format(_("Track %d"), n+1);

@@ -11,11 +11,12 @@
 #include "../../lib/hui/hui.h"
 
 class Session;
+enum class ModuleType;
 
 class ConfigurableSelectorDialog: public hui::Window
 {
 public:
-	ConfigurableSelectorDialog(hui::Window *_parent, int type, Session *session, const string &old_name = "");
+	ConfigurableSelectorDialog(hui::Window *_parent, ModuleType type, Session *session, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
 	void onListSelect();
@@ -24,7 +25,7 @@ public:
 	void onCancel();
 	void onOk();
 
-	int type;
+	ModuleType type;
 	Session *session;
 	struct Label
 	{

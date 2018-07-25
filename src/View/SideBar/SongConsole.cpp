@@ -9,14 +9,15 @@
 #include "../../View/AudioView.h"
 #include "../BottomBar/BottomBar.h"
 #include "../../Data/Song.h"
+#include "../../Data/base.h"
 #include "SongConsole.h"
 
 const int NUM_POSSIBLE_FORMATS = 4;
 const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
-	SAMPLE_FORMAT_16,
-	SAMPLE_FORMAT_24,
-	SAMPLE_FORMAT_32,
-	SAMPLE_FORMAT_32_FLOAT
+	SampleFormat::SAMPLE_FORMAT_16,
+	SampleFormat::SAMPLE_FORMAT_24,
+	SampleFormat::SAMPLE_FORMAT_32,
+	SampleFormat::SAMPLE_FORMAT_32_FLOAT
 };
 
 SongConsole::SongConsole(Session *session) :

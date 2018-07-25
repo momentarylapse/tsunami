@@ -16,6 +16,7 @@
 class OutputStream;
 class InputStreamAudio;
 class Device;
+enum class DeviceType;
 class Session;
 
 #if HAS_LIB_PULSEAUDIO
@@ -51,15 +52,15 @@ public:
 	void _init_audio_portaudio();
 	void _init_midi_alsa();
 
-	enum ApiType{
-		API_ALSA,
-		API_PULSE,
-		API_PORTAUDIO,
-		API_NONE,
+	enum class ApiType{
+		ALSA,
+		PULSE,
+		PORTAUDIO,
+		NONE,
 		NUM_APIS
 	};
-	int audio_api;
-	int midi_api;
+	ApiType audio_api;
+	ApiType midi_api;
 
 
 	float getOutputVolume();
@@ -69,18 +70,18 @@ public:
 	void removeStream(OutputStream *s);
 	bool streamExists(OutputStream *s);
 
-	void remove_device(int type, int index);
+	void remove_device(DeviceType type, int index);
 
 	void setDeviceConfig(Device *d);
 	void makeDeviceTopPriority(Device *d);
 	void moveDevicePriority(Device *d, int new_prio);
 
-	Device *get_device(int type, const string &internal_name);
-	Device *get_device_create(int type, const string &internal_name);
-	Array<Device*> &getDeviceList(int type);
-	Array<Device*> getGoodDeviceList(int type);
+	Device *get_device(DeviceType type, const string &internal_name);
+	Device *get_device_create(DeviceType type, const string &internal_name);
+	Array<Device*> &getDeviceList(DeviceType type);
+	Array<Device*> getGoodDeviceList(DeviceType type);
 
-	Device *chooseDevice(int type);
+	Device *chooseDevice(DeviceType type);
 
 //private:
 
@@ -117,7 +118,8 @@ public:
 	void write_config();
 
 public:
-	int msg_type, msg_index;
+	DeviceType msg_type;
+	int msg_index;
 };
 
 #endif /* DEVICEMANAGER_H_ */

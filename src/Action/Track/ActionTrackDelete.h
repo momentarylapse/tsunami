@@ -8,7 +8,6 @@
 #ifndef ACTIONTRACKDELETET_H_
 #define ACTIONTRACKDELETET_H_
 
-#include "../../Data/Song.h"
 #include "../ActionGroup.h"
 
 class Track;

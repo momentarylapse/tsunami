@@ -8,6 +8,7 @@
 #include "ActionTrackLayer__Delete.h"
 
 #include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
 #include <assert.h>
 
 ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)

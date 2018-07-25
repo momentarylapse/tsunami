@@ -6,13 +6,12 @@
  */
 
 #include "ActionBarEdit.h"
-
 #include "../../Data/Track.h"
-#include <assert.h>
-
+#include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "Action__ScaleData.h"
 #include "ActionBar__Edit.h"
+#include <assert.h>
 
 ActionBarEdit::ActionBarEdit(int _index, int _length, int _num_beats, int _num_sub_beats, bool _affect_data)
 {

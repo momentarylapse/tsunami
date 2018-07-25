@@ -9,6 +9,7 @@
 
 #include "../../../Data/Track.h"
 #include "../../../Data/SampleRef.h"
+#include "../../../Data/Sample.h"
 
 ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref)
 {

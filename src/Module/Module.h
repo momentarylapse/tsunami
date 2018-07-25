@@ -38,12 +38,38 @@ class Session;
 class Plugin;
 class PortDescription;
 
+enum class ModuleType
+{
+	// plug-ins
+	AUDIO_SOURCE,
+	AUDIO_EFFECT,
+	MIDI_SOURCE,
+	MIDI_EFFECT,
+	SYNTHESIZER,
+	BEAT_SOURCE,
+	OUTPUT_STREAM_AUDIO,
+	INPUT_STREAM_AUDIO,
+	INPUT_STREAM_MIDI,
+	AUDIO_VISUALIZER,
+	// other
+	PITCH_DETECTOR,
+	AUDIO_JOINER,
+	BEAT_MIDIFIER,
+	AUDIO_SUCKER,
+	// recursion!
+	SIGNAL_CHAIN,
+	// plug-in (not really Modules)
+	SONG_PLUGIN,
+	TSUNAMI_PLUGIN,
+};
+
 class Module : public Observable<VirtualBase>
 {
 public:
-	Module(int type);
+
+	Module(ModuleType type);
 	virtual ~Module();
-	void _cdecl __init__(int type);
+	void _cdecl __init__(ModuleType type);
 	virtual void _cdecl __delete__();
 
 	void set_session_etc(Session *session, const string &sub_type, Plugin *plugin);
@@ -64,7 +90,7 @@ public:
 
 	Module *copy() const;
 
-	int module_type;
+	ModuleType module_type;
 	string module_subtype;
 	Session *session;
 
@@ -83,40 +109,8 @@ public:
 
 	Array<PortDescription> port_in, port_out;
 
-	enum Type
-	{
-		// plug-ins
-		AUDIO_SOURCE,
-		AUDIO_EFFECT,
-		MIDI_SOURCE,
-		MIDI_EFFECT,
-		SYNTHESIZER,
-		BEAT_SOURCE,
-		OUTPUT_STREAM_AUDIO,
-		INPUT_STREAM_AUDIO,
-		INPUT_STREAM_MIDI,
-		AUDIO_VISUALIZER,
-		// other
-		PITCH_DETECTOR,
-		AUDIO_JOINER,
-		BEAT_MIDIFIER,
-		AUDIO_SUCKER,
-		// recursion!
-		SIGNAL_CHAIN,
-		// plug-in (not really Modules)
-		SONG_PLUGIN,
-		TSUNAMI_PLUGIN,
-	};
-
-	enum SignalType
-	{
-		AUDIO,
-		MIDI,
-		BEATS
-	};
-
-	static string type_to_name(int type);
-	static Type type_from_name(const string &name);
+	static string type_to_name(ModuleType type);
+	static ModuleType type_from_name(const string &name);
 };
 
 

@@ -35,11 +35,13 @@
 #include "Stuff/Clipboard.h"
 #include "Stuff/BackupManager.h"
 #include "Device/DeviceManager.h"
+#include "Data/base.h"
+#include "Data/Track.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
+#include "Data/Rhythm/Bar.h"
 #include "Action/ActionManager.h"
 #include "Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "Data/Rhythm/Bar.h"
 #include "Module/Audio/AudioEffect.h"
 #include "Module/Audio/AudioSource.h"
 #include "Module/Midi/MidiEffect.h"
@@ -223,7 +225,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 
 
-	song->newWithOneTrack(Track::Type::AUDIO_STEREO, DEFAULT_SAMPLE_RATE);
+	song->newWithOneTrack(SignalType::AUDIO_STEREO, DEFAULT_SAMPLE_RATE);
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	updateMenu();
@@ -285,19 +287,19 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddAudioTrackMono()
 {
-	song->addTrack(Track::Type::AUDIO_MONO);
+	song->addTrack(SignalType::AUDIO_MONO);
 }
 
 void TsunamiWindow::onAddAudioTrackStereo()
 {
-	song->addTrack(Track::Type::AUDIO_STEREO);
+	song->addTrack(SignalType::AUDIO_STEREO);
 }
 
 void TsunamiWindow::onAddTimeTrack()
 {
 	song->beginActionGroup();
 	try{
-		song->addTrack(Track::Type::TIME, 0);
+		song->addTrack(SignalType::BEATS, 0);
 		// some default data
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
@@ -309,7 +311,7 @@ void TsunamiWindow::onAddTimeTrack()
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	song->addTrack(Track::Type::MIDI);
+	song->addTrack(SignalType::MIDI);
 }
 
 void TsunamiWindow::onTrackRender()
@@ -320,7 +322,7 @@ void TsunamiWindow::onTrackRender()
 		return;
 	}
 	song->beginActionGroup();
-	Track *t = song->addTrack(Track::Type::AUDIO);
+	Track *t = song->addTrack(SignalType::AUDIO);
 
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
@@ -536,7 +538,7 @@ void TsunamiWindow::onMenuExecuteAudioEffect()
 		song->beginActionGroup();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
-				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
 					fx->reset_state();
 					fx->do_process_track(l, view->sel.range);
 				}
@@ -556,7 +558,7 @@ void TsunamiWindow::onMenuExecuteAudioSource()
 		song->beginActionGroup();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
-				if (view->sel.has(l) and (t->type == t->Type::AUDIO)){
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
 					s->reset_state();
 					AudioBuffer buf;
 					l->getBuffers(buf, view->sel.range);
@@ -578,7 +580,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 		song->action_manager->beginActionGroup();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
-			if (view->sel.has(l) and (t->type == t->Type::MIDI)){
+			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
 				fx->reset_state();
 				fx->process_layer(l, view->sel);
 			}
@@ -598,7 +600,7 @@ void TsunamiWindow::onMenuExecuteMidiSource()
 		song->beginActionGroup();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
-			if (view->sel.has(l) and (t->type == t->Type::MIDI)){
+			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
 				s->reset_state();
 				MidiEventBuffer buf;
 				buf.samples = view->sel.range.length;
@@ -666,7 +668,7 @@ void TsunamiWindow::onSettings()
 void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
-		Track *t = song->addTrack(Track::Type::AUDIO);
+		Track *t = song->addTrack(SignalType::AUDIO);
 		session->storage->loadTrack(view->cur_layer, hui::Filename, view->sel.range.start());
 	}
 }
@@ -754,17 +756,17 @@ void TsunamiWindow::onSelectExpand()
 
 void TsunamiWindow::onViewMidiDefault()
 {
-	view->setMidiViewMode(view->MidiMode::LINEAR);
+	view->setMidiViewMode(MidiMode::LINEAR);
 }
 
 void TsunamiWindow::onViewMidiTab()
 {
-	view->setMidiViewMode(view->MidiMode::TAB);
+	view->setMidiViewMode(MidiMode::TAB);
 }
 
 void TsunamiWindow::onViewMidiScore()
 {
-	view->setMidiViewMode(view->MidiMode::CLASSICAL);
+	view->setMidiViewMode(MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::onZoomIn()
@@ -895,11 +897,11 @@ string _suggest_filename(Song *s, const string &dir)
 	string base = get_current_date().format("%Y-%m-%d");
 
 	string ext = "nami";
-	if ((s->tracks.num == 1) and (s->tracks[0]->type == Track::Type::AUDIO))
+	if ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::AUDIO))
 		ext = "ogg";
 	bool allow_midi = true;
 	for (Track* t: s->tracks)
-		if ((t->type != Track::Type::MIDI) and (t->type != Track::Type::TIME))
+		if ((t->type != SignalType::MIDI) and (t->type != SignalType::BEATS))
 			allow_midi = false;
 	if (allow_midi)
 		ext = "midi";

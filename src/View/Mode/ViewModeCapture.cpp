@@ -8,6 +8,7 @@
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../../Data/Track.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
 #include "../../Module/Audio/AudioSucker.h"
@@ -44,14 +45,14 @@ void ViewModeCapture::drawPost(Painter *c)
 		view->update_peaks_now(buf);
 		if (capturing_track)
 			view->get_layer(capturing_track->layers[0])->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
-		view->drawTimeLine(c, view->sel.range.start() + buf.length, Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+		view->drawTimeLine(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 
 
 	if (input_midi and input_midi->is_capturing()){
 		if (capturing_track)
 			drawMidi(c, view->get_layer(capturing_track->layers[0]), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
-		view->drawTimeLine(c, view->sel.range.start() + input_midi->get_sample_count(), Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+		view->drawTimeLine(c, view->sel.range.start() + input_midi->get_sample_count(), (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 }
 

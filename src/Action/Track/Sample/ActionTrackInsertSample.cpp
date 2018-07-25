@@ -9,7 +9,10 @@
 #include "ActionTrackDeleteSample.h"
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
+#include "../../../Data/base.h"
+#include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/Sample.h"
 #include "../../../Data/SampleRef.h"
 #include "../Midi/ActionTrackAddMidiNote.h"
 #include "../../Sample/ActionSampleDelete.h"
@@ -27,7 +30,7 @@ void ActionTrackInsertSample::build(Data *d)
 	Track *t = layer->track;
 	SampleRef *ref = layer->samples[index];
 	Sample *sample = ref->origin;
-	if (t->type == t->Type::AUDIO){
+	if (t->type == SignalType::AUDIO){
 
 		// get target buffer
 		Range r = ref->range();
@@ -39,7 +42,7 @@ void ActionTrackInsertSample::build(Data *d)
 		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(layer, r);
 		buf.set(*ref->buf, 0, ref->volume);
 		addSubAction(action, s);
-	}else if (t->type == t->Type::MIDI){
+	}else if (t->type == SignalType::MIDI){
 		for (MidiNote *n : *ref->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;

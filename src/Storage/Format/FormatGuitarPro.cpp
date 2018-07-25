@@ -8,6 +8,10 @@
 #include "FormatGuitarPro.h"
 
 #include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/base.h"
+#include "../../lib/file/file.h"
 
 const int BEAT_PARTITION = 12;
 
@@ -107,7 +111,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 
 	//Array<Track*> tracks;
 	for (Track *t : a->tracks)
-		if (t->type == t->Type::MIDI){
+		if (t->type == SignalType::MIDI){
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
 			tt.midi_instrument = t->instrument.midi_no();
@@ -236,7 +240,7 @@ void FormatGuitarPro::loadSong(StorageOperationData *_od)
 		msg_write(format("measures: %d   tracks: %d", num_measures, num_tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header();
-		a->addTrack(Track::Type::TIME);
+		a->addTrack(SignalType::BEATS);
 		for (int i=0; i<num_tracks; i++)
 			read_track();
 
@@ -471,7 +475,7 @@ void FormatGuitarPro::read_track()
 {
 	f->read_byte();
 	GpTrack tt;
-	tt.t = a->addTrack(Track::Type::MIDI);
+	tt.t = a->addTrack(SignalType::MIDI);
 	tt.t->setName(read_str1c(f, 40));
 	int stringCount = f->read_int();
 	for (int i=0; i<7; i++){

@@ -18,8 +18,6 @@ ActionTrackEditMarker::ActionTrackEditMarker(TrackMarker *m, const Range &_range
 
 void *ActionTrackEditMarker::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	string temp = text;
 	text = marker->text;
 	marker->text = temp;

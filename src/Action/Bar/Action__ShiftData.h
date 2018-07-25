@@ -9,7 +9,8 @@
 #define SRC_ACTION_BAR_ACTION__SHIFTDATA_H_
 
 #include "../Action.h"
-#include "../../Data/Song.h"
+
+class Song;
 
 class Action__ShiftData: public Action
 {

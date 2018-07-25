@@ -5,9 +5,10 @@
  *      Author: michi
  */
 
-#include "../../Data/Track.h"
 #include <assert.h>
 #include "ActionBar__Delete.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
 
 
 ActionBar__Delete::ActionBar__Delete(int _index)

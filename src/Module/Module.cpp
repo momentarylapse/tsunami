@@ -18,6 +18,8 @@
 #include "../View/AudioView.h"
 #include "../Device/OutputStream.h"
 #include "../Data/SampleRef.h"
+#include "../Data/Sample.h"
+#include "../Data/Song.h"
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
@@ -169,7 +171,7 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 	}
 }
 
-Module::Module(int type)
+Module::Module(ModuleType type)
 {
 	module_type = type;
 	session = Session::GLOBAL;
@@ -187,7 +189,7 @@ Module::~Module()
 		*pd.port = NULL;
 }
 
-void Module::__init__(int type)
+void Module::__init__(ModuleType type)
 {
 	new(this) Module(type);
 }
@@ -298,7 +300,7 @@ public:
 		setTitle(config->module_subtype);
 		embed(panel, "grid", 0, 1);
 
-		if (c->module_type != c->Type::AUDIO_EFFECT)
+		if (c->module_type != ModuleType::AUDIO_EFFECT)
 			hideControl("preview", true);
 
 		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
@@ -419,7 +421,7 @@ Module *Module::copy() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c){
-		if (this->module_type == Type::SYNTHESIZER)
+		if (this->module_type == ModuleType::SYNTHESIZER)
 			return new DummySynthesizer;
 		return NULL;
 	}
@@ -440,70 +442,70 @@ void Module::module_pause(bool paused)
 }
 
 
-string Module::type_to_name(int type)
+string Module::type_to_name(ModuleType type)
 {
-	if (type == Module::Type::AUDIO_SOURCE)
+	if (type == ModuleType::AUDIO_SOURCE)
 		return "AudioSource";
-	if (type == Module::Type::AUDIO_EFFECT)
+	if (type == ModuleType::AUDIO_EFFECT)
 		return "AudioEffect";
-	if (type == Module::Type::SYNTHESIZER)
+	if (type == ModuleType::SYNTHESIZER)
 		return "Synthesizer";
-	if (type == Module::Type::MIDI_SOURCE)
+	if (type == ModuleType::MIDI_SOURCE)
 		return "MidiSource";
-	if (type == Module::Type::MIDI_EFFECT)
+	if (type == ModuleType::MIDI_EFFECT)
 		return "MidiEffect";
-	if (type == Module::Type::BEAT_SOURCE)
+	if (type == ModuleType::BEAT_SOURCE)
 		return "BeatSource";
-	if (type == Module::Type::AUDIO_VISUALIZER)
+	if (type == ModuleType::AUDIO_VISUALIZER)
 		return "AudioVisualizer";
-	if (type == Module::Type::PITCH_DETECTOR)
+	if (type == ModuleType::PITCH_DETECTOR)
 		return "PitchDetector";
-	if (type == Module::Type::OUTPUT_STREAM_AUDIO)
+	if (type == ModuleType::OUTPUT_STREAM_AUDIO)
 		return "OutputStream";
-	if (type == Module::Type::INPUT_STREAM_AUDIO)
+	if (type == ModuleType::INPUT_STREAM_AUDIO)
 		return "InputStreamAudio";
-	if (type == Module::Type::INPUT_STREAM_MIDI)
+	if (type == ModuleType::INPUT_STREAM_MIDI)
 		return "InputStreamMidi";
-	if (type == Module::Type::AUDIO_SUCKER)
+	if (type == ModuleType::AUDIO_SUCKER)
 		return "AudioSucker";
-	if (type == Module::Type::AUDIO_JOINER)
+	if (type == ModuleType::AUDIO_JOINER)
 		return "AudioJoiner";
-	if (type == Module::Type::BEAT_MIDIFIER)
+	if (type == ModuleType::BEAT_MIDIFIER)
 		return "BeatMidifier";
 	return "???";
 }
 
-Module::Type Module::type_from_name(const string &str)
+ModuleType Module::type_from_name(const string &str)
 {
 	if (str == "AudioSource")
-		return Module::Type::AUDIO_SOURCE;
+		return ModuleType::AUDIO_SOURCE;
 	if (str == "AudioSucker")
-		return Module::Type::AUDIO_SUCKER;
+		return ModuleType::AUDIO_SUCKER;
 	if (str == "AudioJoiner")
-		return Module::Type::AUDIO_JOINER;
+		return ModuleType::AUDIO_JOINER;
 	if (str == "AudioEffect" or str == "Effect")
-		return Module::Type::AUDIO_EFFECT;
+		return ModuleType::AUDIO_EFFECT;
 	if (str == "Synthesizer" or str == "Synth")
-		return Module::Type::SYNTHESIZER;
+		return ModuleType::SYNTHESIZER;
 	if (str == "MidiEffect")
-		return Module::Type::MIDI_EFFECT;
+		return ModuleType::MIDI_EFFECT;
 	if (str == "MidiSource")
-		return Module::Type::MIDI_SOURCE;
+		return ModuleType::MIDI_SOURCE;
 	if (str == "BeatSource")
-		return Module::Type::BEAT_SOURCE;
+		return ModuleType::BEAT_SOURCE;
 	if (str == "BeatMidifier")
-		return Module::Type::BEAT_MIDIFIER;
+		return ModuleType::BEAT_MIDIFIER;
 	if (str == "PitchDetector")
-		return Module::Type::PITCH_DETECTOR;
+		return ModuleType::PITCH_DETECTOR;
 	if (str == "AudioVisualizer")
-		return Module::Type::AUDIO_VISUALIZER;
+		return ModuleType::AUDIO_VISUALIZER;
 	if (str == "AudioInputStream" or str == "InputStreamAudio")
-		return Module::Type::INPUT_STREAM_AUDIO;
+		return ModuleType::INPUT_STREAM_AUDIO;
 	if (str == "MidiInputStream" or str == "InputStreamMidi")
-		return Module::Type::INPUT_STREAM_MIDI;
+		return ModuleType::INPUT_STREAM_MIDI;
 	if (str == "OutputStream" or str == "OutputStreamAudio")
-		return Module::Type::OUTPUT_STREAM_AUDIO;
-	return (Type)-1;
+		return ModuleType::OUTPUT_STREAM_AUDIO;
+	return (ModuleType)-1;
 }
 
 

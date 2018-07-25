@@ -13,6 +13,7 @@
 #include "../Module/Port/AudioPort.h"
 #include "../Data/Track.h"
 #include "../Data/Audio/AudioBuffer.h"
+#include "../Data/Song.h"
 
 StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, TrackLayer *l, const string &_filename, const string &message, hui::Window *_win)
 {
@@ -93,10 +94,10 @@ void StorageOperationData::suggest_channels(int channels)
 	}
 }
 
-void StorageOperationData::suggest_default_format(int format)
+void StorageOperationData::suggest_default_format(SampleFormat format)
 {
 	if (track->get_index() == 0)
-		song->setDefaultFormat((SampleFormat)format);
+		song->setDefaultFormat(format);
 }
 
 void StorageOperationData::suggest_tag(const string &key, const string &value)

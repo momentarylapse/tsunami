@@ -6,6 +6,7 @@
  */
 
 #include "../../Data/Track.h"
+#include "../../Data/base.h"
 #include "../Helper/Slider.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
@@ -64,10 +65,10 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		enable("_edit_midi", track->type == Track::Type::MIDI);
-		enable("_edit_midi_fx", track->type == Track::Type::MIDI);
-		enable("_edit_synth", track->type != Track::Type::AUDIO);
-		enable("select_synth", track->type != Track::Type::AUDIO);
+		enable("_edit_midi", track->type == SignalType::MIDI);
+		enable("_edit_midi_fx", track->type == SignalType::MIDI);
+		enable("_edit_synth", track->type != SignalType::AUDIO);
+		enable("select_synth", track->type != SignalType::AUDIO);
 
 		Array<Instrument> instruments = Instrument::enumerate();
 		foreachi(Instrument &ii, instruments, i){
@@ -136,7 +137,7 @@ void TrackConsole::onSelectSynth()
 {
 	if (!track)
 		return;
-	string name = session->plugin_manager->ChooseModule(win, session, Module::Type::SYNTHESIZER, track->synth->module_subtype);
+	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
 		track->setSynthesizer(CreateSynthesizer(session, name));
 }

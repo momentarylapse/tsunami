@@ -7,6 +7,7 @@
 
 #include "ActionTrackAddEffect.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
 #include "../../../Module/Audio/AudioEffect.h"
 
 ActionTrackAddEffect::ActionTrackAddEffect(Track *t, AudioEffect *_effect)

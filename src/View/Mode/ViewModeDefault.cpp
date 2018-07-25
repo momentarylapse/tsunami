@@ -14,9 +14,12 @@
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Track.h"
+#include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
@@ -197,7 +200,7 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
 		view->menu_time_track->openPopup(view->win, 0, 0);
-	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == Track::Type::TIME)){
+	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == SignalType::BEATS)){
 		view->menu_time_track->enable("delete_bars", false);
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
@@ -205,7 +208,7 @@ void ViewModeDefault::onRightButtonDown()
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		view->menu_layer->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
-		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::Type::MIDI);
+		view->menu_track->enable("track_edit_midi", view->cur_track->type == SignalType::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->enable("track_convert_stereo", view->cur_track->channels == 1);
 		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
@@ -366,9 +369,9 @@ void ViewModeDefault::updateTrackHeights()
 		int n_ch = t->layer->channels;
 		t->height_min = view->TIME_SCALE_HEIGHT * 2;
 		if (t->layer->is_main){
-			if (t->layer->type == Track::Type::AUDIO){
+			if (t->layer->type == SignalType::AUDIO){
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-			}else if (t->layer->type == Track::Type::MIDI){
+			}else if (t->layer->type == SignalType::MIDI){
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
 			}else{
 				t->height_wish = view->TIME_SCALE_HEIGHT * 2;
@@ -383,12 +386,12 @@ void ViewModeDefault::updateTrackHeights()
 
 void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
-	int mode = which_midi_mode(l->layer->track);
-	if (mode == view->MidiMode::LINEAR)
+	auto mode = which_midi_mode(l->layer->track);
+	if (mode == MidiMode::LINEAR)
 		l->drawMidiLinear(c, midi, as_reference, shift);
-	else if (mode == view->MidiMode::TAB)
+	else if (mode == MidiMode::TAB)
 		l->drawMidiTab(c, midi, as_reference, shift);
-	else // if (mode == view->VIEW_MIDI_CLASSICAL)
+	else // if (mode == MidiMode::CLASSICAL)
 		l->drawMidiClassical(c, midi, as_reference, shift);
 }
 
@@ -398,17 +401,17 @@ void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 
 	color cc = l->getBackgroundColor();
 	if (song->bars.num > 0)
-		l->drawGridBars(c, cc, (l->layer->type == Track::Type::TIME), 0);
+		l->drawGridBars(c, cc, (l->layer->type == SignalType::BEATS), 0);
 	else
 		view->drawGridTime(c, l->area, cc, false);
 
 
-	if (l->layer->type == Track::Type::MIDI){
-		int mode = which_midi_mode(l->layer->track);
-		if (mode == AudioView::MidiMode::CLASSICAL){
+	if (l->layer->type == SignalType::MIDI){
+		auto mode = which_midi_mode(l->layer->track);
+		if (mode == MidiMode::CLASSICAL){
 			const Clef& clef = l->layer->track->instrument.get_clef();
 			l->drawMidiClefClassical(c, clef, view->midi_scale);
-		}else if (mode == AudioView::MidiMode::TAB){
+		}else if (mode == MidiMode::TAB){
 			l->drawMidiClefTab(c);
 		}
 	}
@@ -449,7 +452,7 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 
-	if (t->track->type == Track::Type::TIME)
+	if (t->track->type == SignalType::BEATS)
 		draw_bar_selection(c, t, view);
 }
 
@@ -458,7 +461,7 @@ void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
 	Track *t = l->layer->track;
 
 	// midi
-	if (l->layer->type == Track::Type::MIDI)
+	if (l->layer->type == SignalType::MIDI)
 		drawMidi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
@@ -631,7 +634,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 
 
 	// layer header buttons?
-	if (s.vlayer and (s.type == s.LAYER_HEADER)){
+	if (s.vlayer and (s.type == s.Type::LAYER_HEADER)){
 		AudioViewLayer *l = s.vlayer;
 		int x = l->area.width() - view->TRACK_HANDLE_WIDTH + 5;
 		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
@@ -687,7 +690,7 @@ Selection ViewModeDefault::getHover()
 	if (s.track){
 
 		// bars
-		if (s.track->type == Track::Type::TIME){
+		if (s.track->type == SignalType::BEATS){
 			int offset = 0;
 			for (int i=0; i<view->song->bars.num+1; i++){
 				float x = view->cam.sample2screen(offset);
@@ -913,12 +916,12 @@ void ViewModeDefault::startSelection()
 	view->setSelection(getSelection(hover->range));
 }
 
-int ViewModeDefault::which_midi_mode(Track *t)
+MidiMode ViewModeDefault::which_midi_mode(Track *t)
 {
-	if (view->midi_view_mode == view->MidiMode::LINEAR)
-			return view->MidiMode::LINEAR;
-	if ((view->midi_view_mode == view->MidiMode::TAB) and (t->instrument.string_pitch.num > 0))
-		return view->MidiMode::TAB;
-	return view->MidiMode::CLASSICAL;
+	if (view->midi_view_mode == MidiMode::LINEAR)
+			return MidiMode::LINEAR;
+	if ((view->midi_view_mode == MidiMode::TAB) and (t->instrument.string_pitch.num > 0))
+		return MidiMode::TAB;
+	return MidiMode::CLASSICAL;
 }
 

@@ -7,6 +7,7 @@
 
 #include "PitchDetector.h"
 #include "../Port/AudioPort.h"
+#include "../../Data/base.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Plugins/FastFourierTransform.h"
@@ -30,7 +31,7 @@ int freq_to_index(float f)
 
 PitchDetector::PitchDetector()
 {
-	module_type = Type::PITCH_DETECTOR;
+	module_type = ModuleType::PITCH_DETECTOR;
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = NULL;
 	loud_enough = false;

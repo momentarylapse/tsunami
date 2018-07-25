@@ -9,6 +9,7 @@
 #include "../../Session.h"
 #include "../ModuleFactory.h"
 #include "../Beats/BeatSource.h"
+#include "../../Data/base.h"
 
 
 MidiSource::Output::Output(MidiSource *s)
@@ -27,7 +28,7 @@ void  MidiSource::Output::reset()
 }
 
 MidiSource::MidiSource() :
-	Module(Type::MIDI_SOURCE)
+	Module(ModuleType::MIDI_SOURCE)
 {
 	beat_source = BeatSource::dummy->out;
 	out = new Output(this);
@@ -59,6 +60,6 @@ void MidiSource::set_beat_source(BeatPort *s)
 
 MidiSource *CreateMidiSource(Session *session, const string &name)
 {
-	return (MidiSource*)ModuleFactory::create(session, Module::Type::MIDI_SOURCE, name);
+	return (MidiSource*)ModuleFactory::create(session, ModuleType::MIDI_SOURCE, name);
 }
 

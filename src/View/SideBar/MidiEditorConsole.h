@@ -11,6 +11,7 @@
 #include "SideBar.h"
 
 class TrackLayer;
+enum class MidiMode;
 
 class MidiEditorConsole : public SideBarConsole
 {
@@ -50,7 +51,7 @@ public:
 
 	void clear();
 	void setLayer(TrackLayer *t);
-	void setMode(int mode);
+	void setMode(MidiMode mode);
 
 
 	string id_inner;

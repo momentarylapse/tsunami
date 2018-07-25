@@ -228,8 +228,8 @@ void SignalChain::load(const string& filename)
 			/*if ((i < 3) and (this == session->signal_chain)){
 				m = modules[i];
 			}else*/{
-				int itype = Module::type_from_name(type);
-				if (itype < 0)
+				auto itype = Module::type_from_name(type);
+				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
 				m = add(ModuleFactory::create(session, itype, sub_type));
 			}
@@ -263,79 +263,79 @@ void SignalChain::reset()
 	connect(modules[1], 0, modules[2], 0);
 }
 
-Module* SignalChain::add(int type, const string &sub_type)
+Module* SignalChain::add(ModuleType type, const string &sub_type)
 {
 	return add(ModuleFactory::create(session, type, sub_type));
 }
 
 Module* SignalChain::addAudioSource(const string &name)
 {
-	return add(Module::Type::AUDIO_SOURCE, name);
+	return add(ModuleType::AUDIO_SOURCE, name);
 }
 
 Module* SignalChain::addMidiSource(const string &name)
 {
-	return add(Module::Type::MIDI_SOURCE, name);
+	return add(ModuleType::MIDI_SOURCE, name);
 }
 
 Module* SignalChain::addAudioEffect(const string &name)
 {
-	return add(Module::Type::AUDIO_EFFECT, name);
+	return add(ModuleType::AUDIO_EFFECT, name);
 }
 
 Module* SignalChain::addAudioJoiner()
 {
-	return add(Module::Type::AUDIO_JOINER, "");
+	return add(ModuleType::AUDIO_JOINER, "");
 }
 
 Module* SignalChain::addAudioSucker()
 {
-	return add(Module::Type::AUDIO_SUCKER, "");
+	return add(ModuleType::AUDIO_SUCKER, "");
 }
 
 Module* SignalChain::addPitchDetector()
 {
-	return add(Module::Type::PITCH_DETECTOR, "");
+	return add(ModuleType::PITCH_DETECTOR, "");
 }
 
 Module* SignalChain::addAudioVisualizer(const string &name)
 {
-	return add(Module::Type::AUDIO_VISUALIZER, name);
+	return add(ModuleType::AUDIO_VISUALIZER, name);
 }
 
 Module* SignalChain::addAudioInputStream()
 {
-	return add(Module::Type::INPUT_STREAM_AUDIO, "");
+	return add(ModuleType::INPUT_STREAM_AUDIO, "");
 }
 
 Module* SignalChain::addAudioOutputStream()
 {
-	return add(Module::Type::OUTPUT_STREAM_AUDIO, "");
+	return add(ModuleType::OUTPUT_STREAM_AUDIO, "");
 }
 
 Module* SignalChain::addMidiEffect(const string &name)
 {
-	return add(Module::Type::MIDI_EFFECT, name);
+	return add(ModuleType::MIDI_EFFECT, name);
 }
 
 Module* SignalChain::addSynthesizer(const string &name)
 {
-	return add(Module::Type::SYNTHESIZER, name);
+	return add(ModuleType::SYNTHESIZER, name);
 }
 
 Module* SignalChain::addMidiInputStream()
 {
-	return add(Module::Type::INPUT_STREAM_MIDI, "");
+	return add(ModuleType::INPUT_STREAM_MIDI, "");
 }
 
 Module* SignalChain::addBeatMidifier()
 {
-	return add(Module::Type::BEAT_MIDIFIER, "");
+	return add(ModuleType::BEAT_MIDIFIER, "");
 }
 
 Module* SignalChain::addBeatSource(const string &name)
 {
-	return add(Module::Type::BEAT_SOURCE, name);
+	return add(ModuleType::BEAT_SOURCE, name);
 }
 
 void SignalChain::reset_state()

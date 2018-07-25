@@ -8,13 +8,14 @@
 #ifndef FORMAT_H_
 #define FORMAT_H_
 
-#include "../../Data/Track.h"
-#include "../../Data/Song.h"
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
 class AudioPort;
 class Format;
+class Song;
+class File;
+enum class SampleFormat;
 
 const int CHUNK_SIZE = 1 << 18;
 const int CHUNK_SAMPLES = 1 << 16;

@@ -31,19 +31,19 @@ Array<UnitTest::Test> TestPlugins::tests()
 		string name = xxx.explode("/")[1];
 		list.add(Test("audio-effect:" + name, std::bind(TestPlugins::test_audio_effect, name)));
 	}
-	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(Module::Type::AUDIO_SOURCE);
+	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(ModuleType::AUDIO_SOURCE);
 	for (auto &name: names)
 		list.add(Test("audio-source:" + name, std::bind(TestPlugins::test_audio_source, name)));
 
-	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(Module::Type::MIDI_EFFECT);
+	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(ModuleType::MIDI_EFFECT);
 	for (auto &name: names)
 		list.add(Test("midi-effect:" + name, std::bind(TestPlugins::test_midi_effect, name)));
 
-	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(Module::Type::MIDI_SOURCE);
+	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(ModuleType::MIDI_SOURCE);
 	for (auto &name: names)
 		list.add(Test("midi-source:" + name, std::bind(TestPlugins::test_midi_source, name)));
 
-	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(Module::Type::SYNTHESIZER);
+	names = Session::GLOBAL->plugin_manager->FindModuleSubTypes(ModuleType::SYNTHESIZER);
 	for (auto &name: names)
 		list.add(Test("synthesizer:" + name, std::bind(TestPlugins::test_synthesizer, name)));
 

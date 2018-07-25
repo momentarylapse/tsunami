@@ -8,6 +8,7 @@
 #include "DummySynthesizer.h"
 
 #include "../../Data/Song.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
 
 

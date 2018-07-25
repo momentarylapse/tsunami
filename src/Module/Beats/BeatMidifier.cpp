@@ -9,10 +9,11 @@
 #include "../Port/BeatPort.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Rhythm/Beat.h"
+#include "../../Data/base.h"
 
 BeatMidifier::BeatMidifier()
 {
-	module_type = Type::BEAT_MIDIFIER;
+	module_type = ModuleType::BEAT_MIDIFIER;
 	port_in.add(PortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 
 	volume = 0.8f;

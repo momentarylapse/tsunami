@@ -10,6 +10,7 @@
 #include "../../Session.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Audio/RingBuffer.h"
+#include "../../Data/base.h"
 
 AudioVisualizer::Output::Output(AudioVisualizer *v)
 {
@@ -50,7 +51,7 @@ void AudioVisualizer::Output::reset()
 }
 
 AudioVisualizer::AudioVisualizer() :
-	Module(Type::AUDIO_VISUALIZER)
+	Module(ModuleType::AUDIO_VISUALIZER)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
@@ -89,7 +90,7 @@ void AudioVisualizer::set_chunk_size(int _chunk_size)
 // TODO: move to PluginManager?
 AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name)
 {
-	return (AudioVisualizer*)ModuleFactory::create(session, Module::Type::AUDIO_VISUALIZER, name);
+	return (AudioVisualizer*)ModuleFactory::create(session, ModuleType::AUDIO_VISUALIZER, name);
 }
 
 

@@ -12,6 +12,7 @@
 
 class Plugin;
 class Module;
+enum class ModuleType;
 class FavoriteManager;
 class TsunamiWindow;
 class SongPlugin;
@@ -34,17 +35,17 @@ public:
 	void FindPlugins();
 	void AddPluginsToMenu(TsunamiWindow *win);
 
-	Plugin *LoadAndCompilePlugin(int type, const string &filename);
-	Plugin *GetPlugin(Session *session, int type, const string &name);
+	Plugin *LoadAndCompilePlugin(ModuleType type, const string &filename);
+	Plugin *GetPlugin(Session *session, ModuleType type, const string &name);
 
 	void ApplyFavorite(Module *c, const string &name);
 	void SaveFavorite(Module *c, const string &name);
 	string SelectFavoriteName(hui::Window *win, Module *c, bool save);
 
 	Array<string> FindAudioEffects();
-	Array<string> FindModuleSubTypes(int type);
+	Array<string> FindModuleSubTypes(ModuleType type);
 
-	string ChooseModule(hui::Panel *parent, Session *session, int type, const string &old_name = "");
+	string ChooseModule(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
 
 
 	// not compiled yet
@@ -53,7 +54,7 @@ public:
 		string name;
 		string filename;
 		string image;
-		int type;
+		ModuleType type;
 		Array<string> title;
 	};
 

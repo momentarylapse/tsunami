@@ -16,6 +16,8 @@ class BeatPort;
 class ConfigPanel;
 class Module;
 class Session;
+enum class SignalType;
+enum class ModuleType;
 
 class SignalChain : public Observable<VirtualBase>
 {
@@ -40,7 +42,7 @@ public:
 
 	Array<Module*> modules;
 	Module* add(Module *m);
-	Module* add(int type, const string &sub_type);
+	Module* add(ModuleType type, const string &sub_type);
 	Module* addAudioSource(const string &name);
 	Module* addMidiSource(const string &name);
 	Module* addAudioEffect(const string &name);
@@ -60,7 +62,7 @@ public:
 
 	struct Cable
 	{
-		int type;
+		SignalType type;
 		Module *source, *target;
 		int source_port, target_port;
 	};

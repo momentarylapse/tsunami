@@ -5,9 +5,10 @@
  *      Author: michi
  */
 
-#include "../../../Data/Song.h"
-#include <assert.h>
 #include "ActionTrack__AddBuffer.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Audio/AudioBuffer.h"
+#include <assert.h>
 
 ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, const Range &r)
 {

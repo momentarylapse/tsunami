@@ -9,6 +9,7 @@
 
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
+#include "../../Data/base.h"
 #include "../AudioView.h"
 
 PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):
@@ -32,7 +33,7 @@ void PauseAddDialog::onOk()
 	song->beginActionGroup();
 
 	if (!song->getTimeTrack())
-		song->addTrack(Track::Type::TIME, 0);
+		song->addTrack(SignalType::BEATS, 0);
 
 	song->addPause(index, duration, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->endActionGroup();

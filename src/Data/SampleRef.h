@@ -17,6 +17,7 @@ class Sample;
 class MidiNoteBuffer;
 class AudioBuffer;
 class Range;
+enum class SignalType;
 
 class SampleRef : public Observable<VirtualBase>
 {
@@ -29,7 +30,7 @@ public:
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
 	Range _cdecl range() const;
-	int _cdecl type() const;
+	SignalType _cdecl type() const;
 
 	int _cdecl get_index() const;
 

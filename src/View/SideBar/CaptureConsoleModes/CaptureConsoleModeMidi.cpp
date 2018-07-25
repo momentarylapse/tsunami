@@ -11,7 +11,9 @@
 #include "../../../Device/OutputStream.h"
 #include "../../../Device/DeviceManager.h"
 #include "../../../Device/Device.h"
+#include "../../../Data/base.h"
 #include "../../../Data/Song.h"
+#include "../../../Data/Track.h"
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/Audio/PeakMeter.h"
@@ -22,7 +24,7 @@
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = cc->device_manager->chooseDevice(Device::Type::MIDI_INPUT);
+	chosen_device = cc->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
 	input = NULL;
 	target = NULL;
 
@@ -64,10 +66,10 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	view->mode_capture->capturing_track = target;
 
 
-	bool ok = (target->type == Track::Type::MIDI);
+	bool ok = (target->type == SignalType::MIDI);
 	cc->setString("message", "");
 	if (!ok)
-		cc->setString("message", format(_("Please select a track of type %s."), track_type(Track::Type::MIDI).c_str()));
+		cc->setString("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::MIDI).c_str()));
 	cc->enable("start", ok);
 }
 
@@ -77,7 +79,7 @@ void CaptureConsoleModeMidi::enterParent()
 
 void CaptureConsoleModeMidi::enter()
 {
-	sources = cc->device_manager->getGoodDeviceList(Device::Type::MIDI_INPUT);
+	sources = cc->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
 	cc->hideControl("single_grid", false);
 
 	// add all
@@ -100,7 +102,7 @@ void CaptureConsoleModeMidi::enter()
 	input->set_device(chosen_device);
 
 	for (const Track *t: view->sel.tracks)
-		if (t->type == t->Type::MIDI)
+		if (t->type == SignalType::MIDI)
 			setTarget((Track*)t);
 
 	if (!input->start()){
@@ -153,8 +155,8 @@ bool CaptureConsoleModeMidi::insert()
 
 	int i0 = s_start + dpos;
 
-	if (target->type != Track::Type::MIDI){
-		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(Track::Type::MIDI).c_str(), track_type(target->type).c_str()));
+	if (target->type != SignalType::MIDI){
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::MIDI).c_str(), signal_type_name(target->type).c_str()));
 		return false;
 	}
 

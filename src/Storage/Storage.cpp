@@ -27,7 +27,10 @@
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
+#include "../Data/base.h"
+#include "../Data/Track.h"
 #include "../Data/Song.h"
+#include "../Data/Audio/AudioBuffer.h"
 
 Storage::Storage(Session *_session)
 {
@@ -129,7 +132,7 @@ bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 	session->i(_("loading buffer ") + filename);
 
 	Song *aa = new Song(session);
-	aa->newWithOneTrack(Track::Type::AUDIO, a->sample_rate);
+	aa->newWithOneTrack(SignalType::AUDIO, a->sample_rate);
 	TrackLayer *l = aa->tracks[0]->layers[0];
 	bool ok = loadTrack(l, filename, 0);
 	if (l->buffers.num > 0){

@@ -9,8 +9,6 @@
 #define SRC_DATA_SONG_H_
 
 #include "Data.h"
-#include "Track.h"
-#include "Sample.h"
 #include "Curve.h"
 #include "../lib/base/base.h"
 #include "Rhythm/BarCollection.h"
@@ -25,6 +23,9 @@ class Sample;
 class Synthesizer;
 class Curve;
 class SongSelection;
+class AudioBuffer;
+enum class SampleFormat;
+enum class SignalType;
 
 struct Tag
 {
@@ -82,7 +83,7 @@ public:
 	virtual void _cdecl reset();
 	bool is_empty();
 	void _cdecl newEmpty(int _sample_rate);
-	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
+	void _cdecl newWithOneTrack(SignalType track_type, int _sample_rate);
 
 	void _cdecl invalidateAllPeaks();
 
@@ -104,8 +105,8 @@ public:
 	void _cdecl setSampleRate(int sample_rate);
 	void _cdecl setDefaultFormat(SampleFormat format);
 	void _cdecl setCompression(int compression);
-	Track *_cdecl addTrack(int type, int index = -1);
-	Track *_cdecl addTrackAfter(int type, Track *insert_after = NULL);
+	Track *_cdecl addTrack(SignalType type, int index = -1);
+	Track *_cdecl addTrackAfter(SignalType type, Track *insert_after = NULL);
 	void _cdecl deleteTrack(Track *track);
 	Sample *_cdecl addSample(const string &name, AudioBuffer &buf);
 	void _cdecl deleteSample(Sample *s);
@@ -156,7 +157,5 @@ public:
 
 int get_track_index(Track *t);
 
-float amplitude2db(float amp);
-float db2amplitude(float db);
 
 #endif /* SRC_DATA_SONG_H_ */

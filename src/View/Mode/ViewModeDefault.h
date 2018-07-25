@@ -39,7 +39,7 @@ public:
 	void drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift) override;
 	void drawPost(Painter *c) override;
 
-	int which_midi_mode(Track *t) override;
+	MidiMode which_midi_mode(Track *t) override;
 
 	SongSelection getSelectionForRange(const Range &r) override;
 	SongSelection getSelectionForRect(const Range &r, int y0, int y1) override;

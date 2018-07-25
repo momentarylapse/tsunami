@@ -8,11 +8,13 @@
 #include "ActionSampleAdd.h"
 
 #include <assert.h>
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Sample.h"
 
 ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete)
 {
-	sample = new Sample(Track::Type::AUDIO);
+	sample = new Sample(SignalType::AUDIO);
 	sample->buf = buf;
 	sample->buf.offset = 0;
 	sample->name = name;
@@ -22,7 +24,7 @@ ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, boo
 
 ActionSampleAdd::ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete)
 {
-	sample = new Sample(Track::Type::MIDI);
+	sample = new Sample(SignalType::MIDI);
 	sample->midi = midi;
 	sample->midi.sort();
 	sample->name = name;

@@ -19,7 +19,7 @@ ConfigurableSelectorDialog::Label ConfigurableSelectorDialog::split_label(const 
 	return l;
 }
 
-ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, int _type, Session *_session, const string &old_name) :
+ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, ModuleType _type, Session *_session, const string &old_name) :
 	hui::Window("configurable-selection-dialog", _parent)
 {
 	type = _type;

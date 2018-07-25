@@ -7,10 +7,12 @@
 
 #include "ActionBarAdd.h"
 
-#include "../../Data/Track.h"
 #include <assert.h>
 
 #include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Track.h"
+#include "../../Data/Song.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"
 #include "../Track/Marker/ActionTrackEditMarker.h"
 #include "../Track/Midi/ActionTrackEditMidiNote.h"

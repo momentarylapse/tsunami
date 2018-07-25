@@ -8,6 +8,7 @@
 #include "../Session.h"
 #include "../Stuff/PerformanceMonitor.h"
 #include "../lib/threads/Thread.h"
+#include "../Data/base.h"
 #include "DeviceManager.h"
 #include "Device.h"
 #include "OutputStream.h"
@@ -165,7 +166,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	}
 
 
-	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
+	if (available <= (int)frames and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
@@ -208,7 +209,7 @@ public:
 extern bool ugly_hack_slow;
 
 OutputStream::OutputStream(Session *_session, AudioPort *s) :
-	Module(Type::OUTPUT_STREAM_AUDIO),
+	Module(ModuleType::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
 {
 //	printf("output new\n");
@@ -224,8 +225,7 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 	hui_runner_id = -1;
 
 	device_manager = session->device_manager;
-	device = device_manager->chooseDevice(Device::Type::AUDIO_OUTPUT);
-	api = device_manager->audio_api;
+	device = device_manager->chooseDevice(DeviceType::AUDIO_OUTPUT);
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -282,7 +282,7 @@ void OutputStream::_create_dev()
 	dev_sample_rate = session->sample_rate();
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
+	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
 		pa_sample_spec ss;
 		ss.rate = dev_sample_rate;
 		ss.channels = 2;
@@ -297,7 +297,7 @@ void OutputStream::_create_dev()
 #endif
 
 #if HAS_LIB_PORTAUDIO
-	if (api == DeviceManager::API_PORTAUDIO){
+	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO){
 
 
 		if (device->is_default()){
@@ -367,7 +367,7 @@ void OutputStream::_pause()
 	paused = true;
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
+	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, true, NULL, NULL);
 		_pulse_test_error("pa_stream_cork");
 		pa_wait_op(session, op);
@@ -400,7 +400,7 @@ void OutputStream::_unpause()
 	thread->run();
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
+	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, false, NULL, NULL);
 		_pulse_test_error("pa_stream_cork");
 		pa_wait_op(session, op);
@@ -495,50 +495,50 @@ void OutputStream::_start_first_time()
 	_create_dev();
 
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::API_PULSE){
-	if (!pulse_stream)
-		return;
+	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
+		if (!pulse_stream)
+			return;
 
-	pa_buffer_attr attr_out;
-	attr_out.fragsize = 1024;//-1;//512;
-	attr_out.maxlength = 4096;
-	attr_out.minreq = -1;
-	attr_out.tlength = -1;
-	attr_out.prebuf = -1;
+		pa_buffer_attr attr_out;
+		attr_out.fragsize = 1024;//-1;//512;
+		attr_out.maxlength = 4096;
+		attr_out.minreq = -1;
+		attr_out.tlength = -1;
+		attr_out.prebuf = -1;
 
-	const char *dev = NULL;
-	if (!device->is_default())
-		dev = device->internal_name.c_str();
-	pa_stream_connect_playback(pulse_stream, dev, &attr_out, (pa_stream_flags)0, NULL, NULL);
-	_pulse_test_error("pa_stream_connect_playback");
-
-
-	if (!pa_wait_stream_ready(pulse_stream)){
-		msg_write("retry");
-
-		// retry with default device
-		pa_stream_connect_playback(pulse_stream, NULL, &attr_out, (pa_stream_flags)0, NULL, NULL);
+		const char *dev = NULL;
+		if (!device->is_default())
+			dev = device->internal_name.c_str();
+		pa_stream_connect_playback(pulse_stream, dev, &attr_out, (pa_stream_flags)0, NULL, NULL);
 		_pulse_test_error("pa_stream_connect_playback");
 
+
 		if (!pa_wait_stream_ready(pulse_stream)){
-			// still no luck... give up
-			msg_write("aaaaa");
-			session->e("pa_wait_for_stream_ready");
-			stop();
-			return;
+			msg_write("retry");
+
+			// retry with default device
+			pa_stream_connect_playback(pulse_stream, NULL, &attr_out, (pa_stream_flags)0, NULL, NULL);
+			_pulse_test_error("pa_stream_connect_playback");
+
+			if (!pa_wait_stream_ready(pulse_stream)){
+				// still no luck... give up
+				msg_write("aaaaa");
+				session->e("pa_wait_for_stream_ready");
+				stop();
+				return;
+			}
 		}
-	}
 
-	//stream_request_callback(_stream, ring_buf.available(), this);
+		//stream_request_callback(_stream, ring_buf.available(), this);
 
-	pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, NULL);
-	_pulse_test_error("pa_stream_trigger");
-	pa_wait_op(session, op);
+		pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, NULL);
+		_pulse_test_error("pa_stream_trigger");
+		pa_wait_op(session, op);
 	}
 #endif
 
 #if HAS_LIB_PORTAUDIO
-	if (api == DeviceManager::API_PORTAUDIO){
+	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO){
 		if (!portaudio_stream)
 			return;
 		PaError err = Pa_StartStream(portaudio_stream);

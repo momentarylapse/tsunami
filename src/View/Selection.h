@@ -24,7 +24,6 @@ class SongSelection;
 class Selection
 {
 public:
-	int type;
 	AudioViewLayer *vlayer;
 	Track *track;
 	TrackLayer *layer;
@@ -40,7 +39,7 @@ public:
 	int clef_position, modifier;
 	int index;
 
-	enum Type
+	enum class Type
 	{
 		NONE,
 		BACKGROUND,
@@ -70,10 +69,11 @@ public:
 		CURVE_POINT,
 		CURVE_POINT_NONE,
 	};
+	Type type;
 
 	Selection();
 	bool allow_auto_scroll() const;
-	bool is_in(int type) const;
+	bool is_in(Type type) const;
 	void clear();
 
 	SongSelection to_song_sel() const;

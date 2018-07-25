@@ -7,6 +7,9 @@
 
 #include "Format.h"
 #include "../../Tsunami.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Action/ActionManager.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Module/Audio/SongRenderer.h"
@@ -34,9 +37,9 @@ bool FormatDescriptor::testFormatCompatibility(Song *a)
 	int num_midi = 0;
 	for (Track *t : a->tracks){
 		num_fx += t->fx.num;
-		if (t->type == t->Type::AUDIO)
+		if (t->type == SignalType::AUDIO)
 			num_audio ++;
-		if (t->type == t->Type::MIDI)
+		if (t->type == SignalType::MIDI)
 			num_midi ++;
 	}
 
@@ -75,7 +78,7 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 
 void Format::loadSong(StorageOperationData *od)
 {
-	od->track = od->song->addTrack(Track::Type::AUDIO_STEREO, 0);
+	od->track = od->song->addTrack(SignalType::AUDIO_STEREO, 0);
 	od->layer = od->track->layers[0];
 	od->allow_channels_change = true;
 	loadTrack(od);
@@ -85,7 +88,7 @@ bool is_simple_track(Song *s)
 {
 	if (s->tracks.num > 1)
 		return false;
-	if (s->tracks[0]->type != Track::Type::AUDIO)
+	if (s->tracks[0]->type != SignalType::AUDIO)
 		return false;
 	if (s->tracks[0]->fx.num > 0)
 		return false;

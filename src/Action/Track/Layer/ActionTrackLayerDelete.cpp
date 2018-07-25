@@ -8,6 +8,7 @@
 #include "ActionTrackLayerDelete.h"
 
 #include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
 #include "../Buffer/ActionTrack__DeleteBuffer.h"
 #include "ActionTrackLayer__Delete.h"
 

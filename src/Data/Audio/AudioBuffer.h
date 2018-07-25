@@ -15,22 +15,7 @@
 #define NUM_PEAK_LEVELS		24
 #define PEAK_FACTOR			2
 
-#define DEFAULT_SAMPLE_RATE		44100
-
-
-enum SampleFormat
-{
-	SAMPLE_FORMAT_UNKNOWN,
-	SAMPLE_FORMAT_8,
-	SAMPLE_FORMAT_16,
-	SAMPLE_FORMAT_16_BIGENDIAN,
-	SAMPLE_FORMAT_24,
-	SAMPLE_FORMAT_24_BIGENDIAN,
-	SAMPLE_FORMAT_32,
-	SAMPLE_FORMAT_32_BIGENDIAN,
-	SAMPLE_FORMAT_32_FLOAT,
-	NUM_SAMPLE_FORMATS
-};
+enum class SampleFormat;
 
 class AudioBuffer
 {
@@ -93,9 +78,5 @@ public:
 	void _update_peaks_chunk(int index);
 	void _truncate_peaks(int length);
 };
-
-SampleFormat format_for_bits(int bits);
-int format_get_bits(SampleFormat);
-string format_name(SampleFormat format);
 
 #endif /* SRC_AUDIO_AUDIOBUFFER_H_ */

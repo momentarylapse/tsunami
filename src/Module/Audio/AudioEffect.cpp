@@ -10,7 +10,9 @@
 #include "../../Session.h"
 #include "../../lib/math/math.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 
 
 AudioEffect::Output::Output(AudioEffect *_fx)
@@ -44,7 +46,7 @@ int AudioEffect::Output::get_pos(int delta)
 }
 
 AudioEffect::AudioEffect() :
-	Module(Type::AUDIO_EFFECT)
+	Module(ModuleType::AUDIO_EFFECT)
 {
 	source = NULL;
 	out = new Output(this);
@@ -86,5 +88,5 @@ void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
 
 AudioEffect *CreateAudioEffect(Session *session, const string &name)
 {
-	return (AudioEffect*)ModuleFactory::create(session, Module::Type::AUDIO_EFFECT, name);
+	return (AudioEffect*)ModuleFactory::create(session, ModuleType::AUDIO_EFFECT, name);
 }

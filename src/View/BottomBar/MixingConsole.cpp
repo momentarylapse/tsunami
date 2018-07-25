@@ -11,7 +11,9 @@
 #include <math.h>
 
 #include "../../Device/DeviceManager.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Session.h"
 #include "../AudioView.h"
 

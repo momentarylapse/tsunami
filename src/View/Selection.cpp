@@ -19,7 +19,7 @@ bool Selection::allow_auto_scroll() const
 	return (type == Type::SELECTION_END) or (type == Type::SAMPLE) or (type == Type::PLAYBACK);
 }
 
-bool Selection::is_in(int _type) const
+bool Selection::is_in(Type _type) const
 {
 	if (type == _type)
 		return true;

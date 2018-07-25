@@ -8,10 +8,8 @@
 #ifndef AUDIOVIEW_H_
 #define AUDIOVIEW_H_
 
-#include "../Data/Song.h"
 #include "../Data/SongSelection.h"
 #include "../Data/Midi/Scale.h"
-#include "../lib/hui/hui.h"
 #include "../Stuff/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
@@ -19,6 +17,16 @@
 #include "ColorScheme.h"
 #include <atomic>
 
+namespace hui{
+	class Menu;
+}
+
+class Song;
+class Track;
+class TrackLayer;
+class Sample;
+class SampleRef;
+class AudioBuffer;
 class DeviceManager;
 class OutputStream;
 class SongRenderer;
@@ -34,6 +42,15 @@ class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
 class Session;
+
+
+enum class MidiMode{
+	LINEAR,
+	TAB,
+	CLASSICAL,
+	DRUM
+};
+
 
 class AudioView : public Observable<VirtualBase>
 {
@@ -113,7 +130,7 @@ public:
 	SongSelection sel;
 	SongSelection sel_temp;
 
-	enum SelectionMode{
+	enum class SelectionMode{
 		NONE,
 		TIME,
 		RECT,
@@ -171,14 +188,8 @@ public:
 	bool antialiasing;
 
 
-	void setMidiViewMode(int mode);
-	int midi_view_mode;
-	enum MidiMode{
-		LINEAR,
-		TAB,
-		CLASSICAL,
-		DRUM
-	};
+	void setMidiViewMode(MidiMode mode);
+	MidiMode midi_view_mode;
 
 	ViewMode *mode;
 	void setMode(ViewMode *m);

@@ -10,6 +10,8 @@
 
 #include "../../lib/base/base.h"
 
+enum class SignalType;
+
 class Port : public VirtualBase
 {
 public:
@@ -24,8 +26,8 @@ class PortDescription
 {
 public:
 	PortDescription(){}
-	PortDescription(int type, Port **port, const string &name);
-	int type;
+	PortDescription(SignalType type, Port **port, const string &name);
+	SignalType type;
 	Port **port;
 	string name;
 };

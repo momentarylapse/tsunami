@@ -12,19 +12,16 @@
 #include "../../../Data/SongSelection.h"
 #include "ActionTrackInsertSample.h"
 
-ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(const SongSelection &_sel, int _layer_no) :
+ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(const SongSelection &_sel, TrackLayer *l) :
 	sel(_sel)
 {
-	layer_no = _layer_no;
+	layer = l;
 }
 
 void ActionTrackInsertSelectedSamples::build(Data *d)
 {
-	Song *s = dynamic_cast<Song*>(d);
-
-	for (TrackLayer *l: s->layers())
-		foreachib(SampleRef *ss, l->samples, si)
-			if (sel.has(ss))
-				addSubAction(new ActionTrackInsertSample(l, si), d);
+	foreachib(SampleRef *ss, layer->samples, si)
+		if (sel.has(ss))
+			addSubAction(new ActionTrackInsertSample(layer, si), d);
 }
 

@@ -9,7 +9,9 @@
 #define SRC_ACTION_BAR_ACTION__SCALEDATA_H_
 
 #include "../Action.h"
-#include "../../Data/Song.h"
+#include "../../Data/Range.h"
+
+class Song;
 
 class Action__ScaleData: public Action
 {

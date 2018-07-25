@@ -9,8 +9,6 @@
 #define SRC_DEVICE_INPUTSTREAMAUDIO_H_
 
 #include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
-#include "../Data/Song.h"
 #include "../Data/Audio/RingBuffer.h"
 #include "../Module/Port/AudioPort.h"
 #include "../Module/Module.h"
@@ -95,7 +93,7 @@ public:
 
 private:
 
-	int api;
+	DeviceManager *dev_man;
 
 	//bool accumulating;
 	bool capturing;

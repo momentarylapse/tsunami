@@ -5,8 +5,9 @@
  *      Author: michi
  */
 
-#include "../../../Data/Song.h"
 #include "ActionTrack__AbsorbBuffer.h"
+#include "../../../Data/Track.h"
+#include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, int _src)
 {

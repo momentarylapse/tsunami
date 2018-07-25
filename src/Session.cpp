@@ -10,6 +10,7 @@
 #include "Stuff/Log.h"
 #include "Storage/Storage.h"
 #include "Plugins/TsunamiPlugin.h"
+#include "Data/base.h"
 #include "Data/Song.h"
 #include "lib/hui/hui.h"
 #include "Module/SignalChain.h"

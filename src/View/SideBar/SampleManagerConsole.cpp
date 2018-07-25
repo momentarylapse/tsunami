@@ -15,7 +15,10 @@
 #include <math.h>
 
 #include "../../Action/ActionManager.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
+#include "../../Data/Sample.h"
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
@@ -58,9 +61,9 @@ string render_sample(Sample *s, AudioView *view)
 {
 	Image im;
 	im.create(150, 32, color(0, 0, 0, 0));
-	if (s->type == Track::Type::AUDIO)
+	if (s->type == SignalType::AUDIO)
 		render_bufbox(im, s->buf, view);
-	else if (s->type == Track::Type::MIDI)
+	else if (s->type == SignalType::MIDI)
 		render_midi(im, s->midi);
 	return hui::SetImage(im);
 }
@@ -206,7 +209,7 @@ void SampleManagerConsole::onExport()
 		return;
 
 	if (session->storage->askSaveExport(win)){
-		if (sel[0]->type == Track::Type::AUDIO){
+		if (sel[0]->type == SignalType::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
 			session->storage->saveViaRenderer(rr.out, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
@@ -243,7 +246,7 @@ void SampleManagerConsole::onScale()
 {
 	Array<Sample*> sel = getSelected();
 	for (Sample* s: sel){
-		if (s->type != Track::Type::AUDIO)
+		if (s->type != SignalType::AUDIO)
 			continue;
 		SampleScaleDialog *dlg = new SampleScaleDialog(parent->win, s);
 		dlg->run();

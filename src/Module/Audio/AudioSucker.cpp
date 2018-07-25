@@ -11,6 +11,7 @@
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../Port/AudioPort.h"
 #include "../ModuleFactory.h"
+#include "../../Data/base.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 const string AudioSucker::MESSAGE_UPDATE = "Update";
@@ -57,7 +58,7 @@ public:
 };
 
 AudioSucker::AudioSucker() :
-	Module(Type::AUDIO_SUCKER)
+	Module(ModuleType::AUDIO_SUCKER)
 {
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = NULL;
@@ -127,5 +128,5 @@ int AudioSucker::update()
 
 AudioSucker *CreateAudioSucker(Session *session)
 {
-	return (AudioSucker*)ModuleFactory::create(session, Module::Type::AUDIO_SUCKER, "");
+	return (AudioSucker*)ModuleFactory::create(session, ModuleType::AUDIO_SUCKER, "");
 }

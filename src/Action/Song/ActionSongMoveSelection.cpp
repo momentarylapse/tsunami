@@ -7,6 +7,7 @@
 
 #include "ActionSongMoveSelection.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/SongSelection.h"
 #include "../../Data/SampleRef.h"
 

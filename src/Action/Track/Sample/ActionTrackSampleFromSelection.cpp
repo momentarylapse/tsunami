@@ -9,6 +9,7 @@
 #include "ActionTrackPasteAsSample.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
 #include "../Midi/ActionTrackDeleteMidiNote.h"
+#include "../../../Data/base.h"
 #include "../../../Data/SongSelection.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
@@ -25,9 +26,9 @@ void ActionTrackSampleFromSelection::build(Data *d)
 	for (Track *t: s->tracks)
 		for (TrackLayer *l: t->layers)
 		if (sel.has(l)){
-			if (t->type == t->Type::AUDIO)
+			if (t->type == SignalType::AUDIO)
 				CreateSamplesFromLayerAudio(l, sel);
-			else if (t->type == t->Type::MIDI)
+			else if (t->type == SignalType::MIDI)
 				CreateSamplesFromLayerMidi(l, sel);
 		}
 }

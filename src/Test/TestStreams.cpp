@@ -8,6 +8,7 @@
 #include "TestStreams.h"
 #include "../lib/file/msg.h"
 #include "../lib/math/math.h"
+#include "../Data/base.h"
 #include "../Device/OutputStream.h"
 #include "../Device/InputStreamAudio.h"
 #include "../Module/Audio/AudioSource.h"

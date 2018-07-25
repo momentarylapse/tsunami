@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 
 class Module;
+enum class ModuleType;
 namespace hui{
 	class Window;
 }
@@ -29,7 +30,7 @@ public:
 		string name;
 		string config_name;
 		string options;
-		int type;
+		ModuleType type;
 		bool read_only;
 	};
 

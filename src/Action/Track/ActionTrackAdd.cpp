@@ -7,6 +7,7 @@
 
 #include "ActionTrackAdd.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include <assert.h>
 
 ActionTrackAdd::ActionTrackAdd(Track *t, int _index)

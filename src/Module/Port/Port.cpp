@@ -18,7 +18,7 @@ Port::~Port()
 {
 }
 
-PortDescription::PortDescription(int _type, Port** _port, const string& _name)
+PortDescription::PortDescription(SignalType _type, Port** _port, const string& _name)
 {
 	type = _type;
 	port = _port;

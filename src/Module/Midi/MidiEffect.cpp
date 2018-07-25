@@ -10,7 +10,10 @@
 
 #include "../../Session.h"
 #include "../../lib/math/math.h"
+#include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
+#include "../../Data/Midi/MidiData.h"
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
@@ -33,7 +36,7 @@ void MidiEffect::Output::reset()
 }
 
 MidiEffect::MidiEffect() :
-	Module(Type::MIDI_EFFECT)
+	Module(ModuleType::MIDI_EFFECT)
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
@@ -163,6 +166,6 @@ void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name)
 {
-	return (MidiEffect*)ModuleFactory::create(session, Module::Type::MIDI_EFFECT, name);
+	return (MidiEffect*)ModuleFactory::create(session, ModuleType::MIDI_EFFECT, name);
 }
 

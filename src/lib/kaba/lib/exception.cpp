@@ -9,6 +9,7 @@
 #include "../kaba.h"
 #include "../../file/msg.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 

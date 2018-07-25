@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "../../file/file.h"
 #include "../../base/set.h"
+#include <stdio.h>
 
 
 #if defined(OS_LINUX)// || defined(OS_MINGW)

@@ -3,6 +3,7 @@
 
 #include <new>
 #include <string.h>
+#include <initializer_list>
 
 // dynamic arrays
 
@@ -42,8 +43,6 @@ class DynamicArray
 	int num, allocated, element_size;
 };
 
-#include <stdio.h>
-
 template <class T>
 class Array : public DynamicArray
 {
@@ -63,6 +62,15 @@ class Array : public DynamicArray
 		{
 			init(sizeof(T));
 			exchange(a);
+		}
+
+		Array(std::initializer_list<T> il)
+		{
+			init(sizeof(T));
+			resize(il.size());
+			for (int i=0; i<num; i++)
+				(*this)[i] = il[i];
+
 		}
 
 		// convenience

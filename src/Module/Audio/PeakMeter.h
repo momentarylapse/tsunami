@@ -35,7 +35,11 @@ public:
 	_cdecl void process(AudioBuffer &buf) override;
 	_cdecl void reset() override;
 
-	void set_mode(int mode);
+	enum class Mode{
+		PEAKS,
+		SPECTRUM
+	};
+	void set_mode(Mode mode);
 
 //private:
 	void clear_data();
@@ -44,12 +48,7 @@ public:
 
 	float i_to_freq(int i);
 
-	int mode;
-
-	enum{
-		MODE_PEAKS,
-		MODE_SPECTRUM
-	};
+	Mode mode;
 
 	PeakMeterData r, l;
 

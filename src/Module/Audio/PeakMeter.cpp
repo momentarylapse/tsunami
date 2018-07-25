@@ -49,7 +49,7 @@ void PeakMeterData::update(Array<float> &buf, float dt)
 PeakMeter::PeakMeter()
 {
 	module_subtype = "PeakMeter";
-	mode = MODE_PEAKS;
+	mode = Mode::PEAKS;
 	r.reset();
 	l.reset();
 }
@@ -79,7 +79,7 @@ void PeakMeter::clear_data()
 inline float PeakMeter::i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
-void PeakMeter::set_mode(int _mode)
+void PeakMeter::set_mode(Mode _mode)
 {
 	mode = _mode;
 }
@@ -111,12 +111,12 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 
 void PeakMeter::process(AudioBuffer& buf)
 {
-	if (mode == MODE_PEAKS)
+	clear_data();
+	if (mode == Mode::PEAKS)
 		find_peaks(buf);
-	else if (mode == MODE_SPECTRUM)
+	else if (mode == Mode::SPECTRUM)
 		find_spectrum(buf);
 	notify();
-	clear_data();
 }
 
 void PeakMeter::reset()

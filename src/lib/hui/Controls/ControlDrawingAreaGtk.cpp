@@ -14,6 +14,8 @@
 #include <thread>
 static std::thread::id main_thread_id = std::this_thread::get_id();
 
+#define STUPID_HACK 0
+
 #include <GL/gl.h>
 
 #ifdef HUI_API_GTK
@@ -27,6 +29,10 @@ int GtkAreaMouseSetX, GtkAreaMouseSetY;
 static ControlDrawingArea *NixGlArea = NULL;
 GdkGLContext *gtk_gl_context = NULL;
 
+static Set<ControlDrawingArea*> _recently_deleted_areas;
+
+
+
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
@@ -35,7 +41,9 @@ gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
 	da->cur_cairo = cr;
 	//msg_write("draw " + reinterpret_cast<ControlDrawingArea*>(user_data)->id);
+#if STUPID_HACK
 	da->redraw_area.clear();
+#endif
 	da->notify("hui:draw");
 	//msg_write("/draw " + da->id);
 	return false;
@@ -265,7 +273,9 @@ gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
+#if STUPID_HACK
 	delay_timer = new Timer;
+#endif
 	GetPartStrings(title);
 	// FIXME: this needs to be supplied as title... fromSource() won't work...
 	is_opengl = (OptionString.find("opengl") >= 0);
@@ -313,7 +323,14 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 
 ControlDrawingArea::~ControlDrawingArea()
 {
+	_recently_deleted_areas.add(this);
+
+#if STUPID_HACK
 	delete delay_timer;
+#endif
+
+	// clean-up list later
+	hui::RunLater(10, [&]{ _recently_deleted_areas.erase(this); });
 }
 
 void ControlDrawingArea::make_current()
@@ -336,6 +353,9 @@ void ControlDrawingArea::redraw()
 		hui::RunLater(0, std::bind(&ControlDrawingArea::redraw, this));
 		return;
 	}
+
+
+#if STUPID_HACK
 
 	//std::lock_guard<std::mutex> lock(mutex);
 
@@ -365,6 +385,14 @@ void ControlDrawingArea::redraw()
 	g_idle_add((GSourceFunc)__drawing_area_queue_redraw,(void*)widget);
 #endif
 	redraw_area.add(r);
+#else
+	if (_recently_deleted_areas.contains(this)){
+		//msg_error("saved by me!!!!");
+		return;
+	}
+
+	gtk_widget_queue_draw(widget);
+#endif
 }
 
 void ControlDrawingArea::redraw_partial(const rect &r)
@@ -376,6 +404,7 @@ void ControlDrawingArea::redraw_partial(const rect &r)
 	}
 	//std::lock_guard<std::mutex> lock(mutex);
 
+#if STUPID_HACK
 	if (is_opengl){
 		gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
 		return;
@@ -395,6 +424,14 @@ void ControlDrawingArea::redraw_partial(const rect &r)
 		return;
 	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
 	redraw_area.add(r);
+#else
+	if (_recently_deleted_areas.contains(this)){
+		//msg_error("saved by me!!!!");
+		return;
+	}
+
+	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
+#endif
 }
 
 };

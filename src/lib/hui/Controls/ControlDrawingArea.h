@@ -28,10 +28,10 @@ public:
 	void *cur_cairo;
 	bool is_opengl;
 
-	Array<rect> redraw_area;
-	Timer *delay_timer;
+	//Array<rect> redraw_area;
+	//Timer *delay_timer;
 
-	std::mutex mutex;
+	//std::mutex mutex;
 
 	void redraw();
 	void redraw_partial(const rect &r);

@@ -109,7 +109,7 @@ void PeakMeterDisplay::onDraw(Painter *c)
 		return;
 	int w = c->width;
 	int h = c->height;
-	if (source->mode == PeakMeter::MODE_PEAKS){
+	if (source->mode == PeakMeter::Mode::PEAKS){
 
 		drawPeak(c, rect(2, w-2, 2, h/2-1), *r, view);
 		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l, view);
@@ -129,7 +129,7 @@ void PeakMeterDisplay::onDraw(Painter *c)
 void PeakMeterDisplay::onLeftButtonDown()
 {
 	if (source)
-		source->set_mode((source->mode == PeakMeter::MODE_PEAKS) ? PeakMeter::MODE_SPECTRUM : PeakMeter::MODE_PEAKS);
+		source->set_mode((source->mode == PeakMeter::Mode::PEAKS) ? PeakMeter::Mode::SPECTRUM : PeakMeter::Mode::PEAKS);
 }
 
 void PeakMeterDisplay::onRightButtonDown()

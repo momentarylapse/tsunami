@@ -68,8 +68,9 @@ class Array : public DynamicArray
 		{
 			init(sizeof(T));
 			resize(il.size());
+			auto it = il.begin();
 			for (int i=0; i<num; i++)
-				(*this)[i] = il[i];
+				(*this)[i] = *(it++);
 
 		}
 

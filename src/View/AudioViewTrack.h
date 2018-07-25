@@ -23,6 +23,7 @@ class TrackMarker;
 class Clef;
 class Scale;
 class Range;
+enum class NoteModifier;
 
 
 class AudioViewLayer
@@ -85,10 +86,10 @@ public:
 
 	float pitch2y_classical(int pitch);
 	float pitch2y_linear(int pitch);
-	int y2pitch_classical(float y, int modifier);
+	int y2pitch_classical(float y, NoteModifier modifier);
 	int y2pitch_linear(float y);
-	int y2clef_classical(float y, int &mod);
-	int y2clef_linear(float y, int &mod);
+	int y2clef_classical(float y, NoteModifier &mod);
+	int y2clef_linear(float y, NoteModifier &mod);
 
 	void setPitchMinMax(int pitch_min, int pitch_max);
 	int pitch_min, pitch_max;

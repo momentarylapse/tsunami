@@ -48,7 +48,7 @@ void Selection::clear()
 	y0 = y1 = 0;
 	pitch = -1;
 	clef_position = -1;
-	modifier = Modifier::UNKNOWN;
+	modifier = NoteModifier::UNKNOWN;
 }
 
 bool hover_changed(Selection &hover, Selection &hover_old)

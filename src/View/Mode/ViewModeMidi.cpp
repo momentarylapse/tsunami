@@ -37,9 +37,9 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	mode_wanted = MidiMode::CLASSICAL;
 	creation_mode = CreationMode::NOTE;
 	midi_interval = 3;
-	chord_type = 0;
+	chord_type = ChordType::MINOR;
 	chord_inversion = 0;
-	modifier = Modifier::NONE;
+	modifier = NoteModifier::NONE;
 
 	moving = false;
 	string_no = 0;
@@ -158,16 +158,16 @@ void ViewModeMidi::onKeyDown(int k)
 	auto mode = which_midi_mode(cur_layer->layer->track);
 	if (mode == MidiMode::CLASSICAL){
 		if (k == hui::KEY_1){
-			modifier = Modifier::NONE;
+			modifier = NoteModifier::NONE;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_2){
-			modifier = Modifier::SHARP;
+			modifier = NoteModifier::SHARP;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_3){
-			modifier = Modifier::FLAT;
+			modifier = NoteModifier::FLAT;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_4){
-			modifier = Modifier::NATURAL;
+			modifier = NoteModifier::NATURAL;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}
 

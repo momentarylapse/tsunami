@@ -537,7 +537,7 @@ float AudioViewLayer::pitch2y_linear(int pitch)
 
 float AudioViewLayer::pitch2y_classical(int pitch)
 {
-	int mod;
+	NoteModifier mod;
 	const Clef& clef = layer->track->instrument.get_clef();
 	int p = clef.pitch_to_position(pitch, view->midi_scale, mod);
 	return clef_pos_to_screen(p);
@@ -548,22 +548,22 @@ int AudioViewLayer::y2pitch_linear(float y)
 	return pitch_min + ((area.y2 - y) * (pitch_max - pitch_min) / area.height());
 }
 
-int AudioViewLayer::y2pitch_classical(float y, int modifier)
+int AudioViewLayer::y2pitch_classical(float y, NoteModifier modifier)
 {
 	const Clef& clef = layer->track->instrument.get_clef();
 	int pos = screen_to_clef_pos(y);
 	return clef.position_to_pitch(pos, view->midi_scale, modifier);
 }
 
-int AudioViewLayer::y2clef_classical(float y, int &mod)
+int AudioViewLayer::y2clef_classical(float y, NoteModifier &mod)
 {
-	mod = Modifier::UNKNOWN;//modifier;
+	mod = NoteModifier::UNKNOWN;//modifier;
 	return screen_to_clef_pos(y);
 }
 
-int AudioViewLayer::y2clef_linear(float y, int &mod)
+int AudioViewLayer::y2clef_linear(float y, NoteModifier &mod)
 {
-	mod = Modifier::UNKNOWN;//modifier;
+	mod = NoteModifier::UNKNOWN;//modifier;
 
 	int pitch = y2pitch_linear(y);
 	const Clef& clef = layer->track->instrument.get_clef();
@@ -761,7 +761,7 @@ void AudioViewLayer::drawMidiNoteClassical(Painter *c, const MidiNote *n, int sh
 
 	draw_complex_note(c, n, state, x1, x2, y, r);
 
-	if ((n->modifier != Modifier::NONE) and (r >= 3)){
+	if ((n->modifier != NoteModifier::NONE) and (r >= 3)){
 		c->setColor(view->colors.text);
 		//c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
@@ -786,7 +786,7 @@ void AudioViewLayer::drawMidiClefClassical(Painter *c, const Clef &clef, const S
 	c->setFontSize(dy);
 
 	for (int i=0; i<7; i++)
-		if (scale.modifiers[i] != Modifier::NONE)
+		if (scale.modifiers[i] != NoteModifier::NONE)
 			c->drawStr(18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
 	c->setFontSize(view->FONT_SIZE);
 }

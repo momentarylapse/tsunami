@@ -166,6 +166,19 @@ string drum_pitch_name(int pitch)
 	return pitch_name(pitch);
 }
 
+string modifier_symbol(NoteModifier mod)
+{
+	if (mod == NoteModifier::NONE)
+		return "";
+	if (mod == NoteModifier::SHARP)
+		return "\u266f";
+	if (mod == NoteModifier::FLAT)
+		return "\u266d";
+	if (mod == NoteModifier::NATURAL)
+		return "\u266e";
+	return "?";
+}
+
 
 MidiEventBuffer::MidiEventBuffer()
 {
@@ -457,7 +470,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events)
 }
 
 
-string chord_type_name(int type)
+string chord_type_name(ChordType type)
 {
 	if (type == ChordType::MINOR)
 		return _("Minor");
@@ -470,7 +483,7 @@ string chord_type_name(int type)
 	return "???";
 }
 
-Array<int> chord_notes(int type, int inversion, int pitch)
+Array<int> chord_notes(ChordType type, int inversion, int pitch)
 {
 	Array<int> r;
 	r.add(pitch);
@@ -545,6 +558,6 @@ void MidiNoteBuffer::clear_meta() const
 		n->stringno = -1;
 	for (MidiNote *n: *this){
 		n->clef_position = -1;
-		n->modifier = Modifier::UNKNOWN;
+		n->modifier = NoteModifier::UNKNOWN;
 	}
 }

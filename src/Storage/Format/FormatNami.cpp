@@ -1078,7 +1078,7 @@ public:
 		me->type = (SignalType)f->read_int();
 		me->layers[0]->type = me->type;
 		me->panning = f->read_float();
-		me->instrument = Instrument(f->read_int());
+		me->instrument = Instrument((Instrument::Type)f->read_int());
 		f->read_int(); // reserved
 
 		notify();
@@ -1090,7 +1090,7 @@ public:
 		f->write_bool(me->muted);
 		f->write_int((int)me->type);
 		f->write_float(me->panning);
-		f->write_int(me->instrument.type);
+		f->write_int((int)me->instrument.type);
 		f->write_int(0); // reserved
 
 		notify();

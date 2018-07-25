@@ -126,7 +126,7 @@ enum DrumPitch
 	BONGO_LOW = 61,
 };
 
-enum ChordType
+enum class ChordType
 {
 	MINOR,
 	MAJOR,
@@ -135,12 +135,12 @@ enum ChordType
 	NUM
 };
 
-string chord_type_name(int type);
-Array<int> chord_notes(int type, int inversion, int pitch);
+string chord_type_name(ChordType type);
+Array<int> chord_notes(ChordType type, int inversion, int pitch);
 
 
 
-enum Modifier
+enum class NoteModifier
 {
 	NONE,
 	SHARP,
@@ -149,18 +149,7 @@ enum Modifier
 	UNKNOWN = -1,
 };
 
-inline string modifier_symbol(int mod)
-{
-	if (mod == Modifier::NONE)
-		return "";
-	if (mod == Modifier::SHARP)
-		return "\u266f";
-	if (mod == Modifier::FLAT)
-		return "\u266d";
-	if (mod == Modifier::NATURAL)
-		return "\u266e";
-	return "?";
-}
+string modifier_symbol(NoteModifier mod);
 
 
 #endif /* SRC_DATA_MIDI_MIDIDATA_H_ */

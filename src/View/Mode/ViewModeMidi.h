@@ -17,6 +17,8 @@ class MidiEvent;
 class OutputStream;
 class Synthesizer;
 class MidiPreview;
+enum class NoteModifier;
+enum class ChordType;
 
 class ViewModeMidi : public ViewModeDefault
 {
@@ -50,11 +52,11 @@ public:
 	void startMidiPreview(const Array<int> &pitch, float ttl);
 
 	int beat_partition;
-	int chord_type;
+	ChordType chord_type;
 	int chord_inversion;
 	int midi_interval;
 
-	int modifier;
+	NoteModifier modifier;
 
 	void setMode(MidiMode mode);
 	MidiMode mode_wanted;

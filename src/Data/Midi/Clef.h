@@ -11,6 +11,7 @@
 #include "../../lib/base/base.h"
 
 class Scale;
+enum class NoteModifier;
 
 class Clef
 {
@@ -35,8 +36,8 @@ public:
 	int offset;
 	string symbol;
 
-	int pitch_to_position(int pitch, const Scale &s, int &modifier) const;
-	int position_to_pitch(int position, const Scale &s, int modifier) const;
+	int pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) const;
+	int position_to_pitch(int position, const Scale &s, NoteModifier modifier) const;
 };
 
 #endif /* SRC_DATA_MIDI_CLEF_H_ */

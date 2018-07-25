@@ -135,6 +135,7 @@ J Gaussian noise
 J new signal chain file format
 * module auto x/y
 J AudioSource into buffer
+* Area.redraw queued after delete
 
 == midi ed ==
 
@@ -143,10 +144,13 @@ J delete with empty range
 J move selection
 j fix barrier system
 J copy/pase
+* apply hand-pos
 
 == refactoring ==
 
-* Array move
-* AudioBuffer move
-* enum class
+J Array move
+J AudioBuffer move
+J enum class
 * enum descriptors via set?
+J Array initializer_list
+* nullptr

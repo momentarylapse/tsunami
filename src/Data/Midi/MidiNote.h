@@ -12,6 +12,7 @@
 
 class Scale;
 class Instrument;
+enum class NoteModifier;
 
 class MidiNote
 {
@@ -23,7 +24,8 @@ public:
 	Range range;
 	float pitch;
 	float volume;
-	mutable int stringno, clef_position, modifier;
+	mutable int stringno, clef_position;
+	mutable NoteModifier modifier;
 	mutable int y;
 
 	void reset_meta();

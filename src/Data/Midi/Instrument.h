@@ -15,10 +15,7 @@ class Clef;
 class Instrument
 {
 public:
-	Instrument();
-	Instrument(int type);
-
-	enum Type{
+	enum class Type{
 		NONE,
 		PIANO,
 		ORGAN,
@@ -42,7 +39,10 @@ public:
 		NUM_TYPES,
 	};
 
-	int type;
+	Instrument();
+	Instrument(Type type);
+
+	Type type;
 	Array<int> string_pitch;
 
 	Array<int> default_tuning() const;

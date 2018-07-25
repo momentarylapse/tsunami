@@ -37,8 +37,8 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	setInt("interval", view->mode_midi->midi_interval);
 
-	for (int i=0; i<ChordType::NUM; i++)
-		addString("chord_type", chord_type_name(i));
+	for (int i=0; i<(int)ChordType::NUM; i++)
+		addString("chord_type", chord_type_name((ChordType)i));
 	setInt("chord_type", 0);
 	addString("chord_inversion", _("Basic form"));
 	addString("chord_inversion", _("1st inversion"));
@@ -47,10 +47,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	for (int i=0; i<12; i++)
 		addString("scale_root", rel_pitch_name(11 - i));
-	for (int i=0; i<Scale::NUM_TYPES; i++)
-		addString("scale_type", Scale::get_type_name(i));
+	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
+		addString("scale_type", Scale::get_type_name((Scale::Type)i));
 	setInt("scale_root", 11 - view->midi_scale.root);
-	setInt("scale_type", view->midi_scale.type);
+	setInt("scale_type", (int)view->midi_scale.type);
 
 
 	layer = NULL;
@@ -103,10 +103,10 @@ void MidiEditorConsole::update()
 	if (!layer)
 		return;
 
-	check("modifier:none", view->mode_midi->modifier == Modifier::NONE);
-	check("modifier:sharp", view->mode_midi->modifier == Modifier::SHARP);
-	check("modifier:flat", view->mode_midi->modifier == Modifier::FLAT);
-	check("modifier:natural", view->mode_midi->modifier == Modifier::NATURAL);
+	check("modifier:none", view->mode_midi->modifier == NoteModifier::NONE);
+	check("modifier:sharp", view->mode_midi->modifier == NoteModifier::SHARP);
+	check("modifier:flat", view->mode_midi->modifier == NoteModifier::FLAT);
+	check("modifier:natural", view->mode_midi->modifier == NoteModifier::NATURAL);
 
 	MidiMode mode = view->mode->which_midi_mode(layer->track);
 	view->mode_midi->setMode(mode);
@@ -161,7 +161,7 @@ void MidiEditorConsole::onUpdate()
 
 void MidiEditorConsole::onScale()
 {
-	view->setScale(Scale(getInt("scale_type"), 11 - getInt("scale_root")));
+	view->setScale(Scale((Scale::Type)getInt("scale_type"), 11 - getInt("scale_root")));
 }
 
 void MidiEditorConsole::onBeatPartition()
@@ -205,7 +205,7 @@ void MidiEditorConsole::onInterval()
 
 void MidiEditorConsole::onChordType()
 {
-	view->mode_midi->chord_type = getInt("");
+	view->mode_midi->chord_type = (ChordType)getInt("");
 }
 
 void MidiEditorConsole::onChordInversion()
@@ -237,22 +237,22 @@ void MidiEditorConsole::onEditSong()
 
 void MidiEditorConsole::onModifierNone()
 {
-	view->mode_midi->modifier = Modifier::NONE;
+	view->mode_midi->modifier = NoteModifier::NONE;
 }
 
 void MidiEditorConsole::onModifierSharp()
 {
-	view->mode_midi->modifier = Modifier::SHARP;
+	view->mode_midi->modifier = NoteModifier::SHARP;
 }
 
 void MidiEditorConsole::onModifierFlat()
 {
-	view->mode_midi->modifier = Modifier::FLAT;
+	view->mode_midi->modifier = NoteModifier::FLAT;
 }
 
 void MidiEditorConsole::onModifierNatural()
 {
-	view->mode_midi->modifier = Modifier::NATURAL;
+	view->mode_midi->modifier = NoteModifier::NATURAL;
 }
 
 void MidiEditorConsole::clear()

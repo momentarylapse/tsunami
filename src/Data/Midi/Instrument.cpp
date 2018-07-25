@@ -15,7 +15,7 @@ Instrument::Instrument()
 	type = Type::NONE;
 }
 
-Instrument::Instrument(int _type)
+Instrument::Instrument(Type _type)
 {
 	type = _type;
 	string_pitch = default_tuning();
@@ -23,40 +23,17 @@ Instrument::Instrument(int _type)
 
 Array<int> Instrument::default_tuning() const
 {
-	Array<int> tuning;
-	if ((type == Type::GUITAR) or (type == Type::ELECTRIC_GUITAR)){
-		tuning.add(40);
-		tuning.add(45);
-		tuning.add(50);
-		tuning.add(55);
-		tuning.add(59);
-		tuning.add(64);
-	}
-	if (type == Type::ELECTRIC_BASS){
-		tuning.add(28);
-		tuning.add(33);
-		tuning.add(38);
-		tuning.add(43);
-	}
-	if (type == Type::DOUBLE_BASS){
-		tuning.add(28);
-		tuning.add(33);
-		tuning.add(38);
-		tuning.add(43);
-	}
-	if (type == Type::CELLO){
-		tuning.add(36);
-		tuning.add(43);
-		tuning.add(50);
-		tuning.add(57);
-	}
-	if (type == Type::VIOLIN){
-		tuning.add(55);
-		tuning.add(62);
-		tuning.add(69);
-		tuning.add(76);
-	}
-	return tuning;
+	if ((type == Type::GUITAR) or (type == Type::ELECTRIC_GUITAR))
+		return {40,45,50,55,59,64};
+	if (type == Type::ELECTRIC_BASS)
+		return {28,33,38,43};
+	if (type == Type::DOUBLE_BASS)
+		return {28,33,38,43};
+	if (type == Type::CELLO)
+		return {36,43,50,57};
+	if (type == Type::VIOLIN)
+		return {55,62,69,76};
+	return {};
 }
 
 string Instrument::name() const
@@ -192,8 +169,8 @@ void Instrument::set_midi_no(int no)
 Array<Instrument> Instrument::enumerate()
 {
 	Array<Instrument> instruments;
-	for (int i=0; i<NUM_TYPES; i++)
-		instruments.add(Instrument(i));
+	for (int i=0; i<(int)Instrument::Type::NUM_TYPES; i++)
+		instruments.add(Instrument((Instrument::Type)i));
 	return instruments;
 }
 

@@ -11,19 +11,19 @@
 
 
 
-static const int scale_major_modifiers[12][7] = {
-	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE}, // C
-	{Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::FLAT}, // Db
-	{Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::NONE}, // D
-	{Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::FLAT}, // Eb
-	{Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::NONE}, // E
-	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::FLAT}, // F
-	{Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::NONE}, // F#
-	{Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::NONE}, // G
-	{Modifier::NONE, Modifier::FLAT, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::FLAT}, // Ab
-	{Modifier::SHARP,Modifier::NONE, Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::NONE}, // A
-	{Modifier::NONE, Modifier::NONE, Modifier::FLAT, Modifier::NONE, Modifier::NONE, Modifier::NONE, Modifier::FLAT}, // Bb
-	{Modifier::SHARP,Modifier::SHARP,Modifier::NONE, Modifier::SHARP,Modifier::SHARP,Modifier::SHARP,Modifier::NONE}, // B
+static const NoteModifier scale_major_modifiers[12][7] = {
+	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // C
+	{NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::FLAT}, // Db
+	{NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // D
+	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT}, // Eb
+	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE}, // E
+	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT}, // F
+	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE}, // F#
+	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // G
+	{NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT}, // Ab
+	{NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE}, // A
+	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT}, // Bb
+	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE}, // B
 };
 
 inline int scale_to_major(const Scale &s)
@@ -45,7 +45,7 @@ inline int scale_to_major(const Scale &s)
 	return s.root;
 }
 
-Scale::Scale(int _type, int _root)
+Scale::Scale(Type _type, int _root)
 {
 	type = _type;
 	root = _root;
@@ -55,13 +55,13 @@ Scale::Scale(int _type, int _root)
 
 	int offset[7] = {0, 2, 4, 5, 7, 9, 11};
 	for (int i=0; i<12; i++){
-		int r = (i - root + offset[type] + 24) % 12;
+		int r = (i - root + offset[(int)type] + 24) % 12;
 		// 69 = 9 = a
 		_contains[i] = !((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
 	}
 }
 
-string Scale::get_type_name(int type)
+string Scale::get_type_name(Type type)
 {
 	if (type == Type::MAJOR)
 		return _("Major");
@@ -90,24 +90,24 @@ bool Scale::contains(int pitch) const
 	return _contains[pitch % 12];
 }
 
-inline int apply_modifier(int pitch, int scale_mod, int mod)
+inline int apply_modifier(int pitch, NoteModifier scale_mod, NoteModifier mod)
 {
 	int d = 0;
-	if (scale_mod == Modifier::SHARP)
+	if (scale_mod == NoteModifier::SHARP)
 		d = 1;
-	else if (scale_mod == Modifier::FLAT)
+	else if (scale_mod == NoteModifier::FLAT)
 		d = -1;
-	if (mod == Modifier::SHARP)
+	if (mod == NoteModifier::SHARP)
 		d += 1;
-	else if (mod == Modifier::FLAT)
+	else if (mod == NoteModifier::FLAT)
 		d -= 1;
-	else if (mod == Modifier::NATURAL)
+	else if (mod == NoteModifier::NATURAL)
 		d = 0;
 	return pitch + d;
 }
 
 // x in major scale notation
-int Scale::transform_out(int x, int mod) const
+int Scale::transform_out(int x, NoteModifier mod) const
 {
 	const int pp[7] = {0,2,4,5,7,9,11};
 

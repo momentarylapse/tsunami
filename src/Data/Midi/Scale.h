@@ -8,11 +8,13 @@
 #ifndef SRC_DATA_MIDI_SCALE_H_
 #define SRC_DATA_MIDI_SCALE_H_
 
+enum class NoteModifier;
+
 class Scale
 {
 public:
 
-	enum Type{
+	enum class Type{
 		MAJOR,
 		DORIAN,
 		PHRYGIAN,
@@ -23,15 +25,16 @@ public:
 		NUM_TYPES,
 		CUSTOM = -1
 	};
-	int type, root;
-	int modifiers[7];
+	Type type;
+	int root;
+	NoteModifier modifiers[7];
 	bool _contains[12];
 
-	Scale(int type, int root);
+	Scale(Type type, int root);
 	bool contains(int pitch) const;
-	int transform_out(int x, int modifier) const;
+	int transform_out(int x, NoteModifier modifier) const;
 
-	static string get_type_name(int type);
+	static string get_type_name(Type type);
 	string type_name() const;
 };
 

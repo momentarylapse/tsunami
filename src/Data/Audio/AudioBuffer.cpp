@@ -86,6 +86,7 @@ AudioBuffer::AudioBuffer(int _length, int _channels)
 	resize(_length);
 }
 
+// copy constructor
 AudioBuffer::AudioBuffer(const AudioBuffer &b)
 {
 	offset = b.offset;
@@ -93,6 +94,16 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b)
 	channels = b.channels;
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
+}
+
+// move constructor
+AudioBuffer::AudioBuffer(AudioBuffer &&b)
+{
+	offset = b.offset;
+	length = b.length;
+	channels = b.channels;
+	for (int i=0; i<channels; i++)
+		c[i] = std::move(b.c[i]);
 }
 
 void AudioBuffer::__init__()
@@ -113,6 +124,16 @@ void AudioBuffer::operator=(const AudioBuffer &b)
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
 	peaks = b.peaks;
+}
+
+void AudioBuffer::operator=(AudioBuffer &&b)
+{
+	offset = b.offset;
+	length = b.length;
+	channels = b.channels;
+	for (int i=0; i<channels; i++)
+		c[i] = std::move(b.c[i]);
+	peaks = std::move(b.peaks);
 }
 
 AudioBuffer::~AudioBuffer()
@@ -162,7 +183,7 @@ void AudioBuffer::resize(int _length)
 }
 
 bool AudioBuffer::is_ref() const
-{	return ((length > 0) and (c[0].allocated == 0));	}
+{	return c[0].is_ref();	}
 
 void fa_make_own(Array<float> &a)
 {

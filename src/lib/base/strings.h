@@ -16,6 +16,7 @@ class string : public Array<char>
 	// constructors
 	string();
 	string(const string &s);
+	string(string &&s);
 	string(const char *str);
 	string(const void *str, int l);
 	void _cdecl __init__();
@@ -71,6 +72,8 @@ class string : public Array<char>
 	void _cdecl operator = (const string &s)
 	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
 	{	assign(&s);	}
+	void _cdecl operator = (string &&s)
+	{	exchange(s);	}
 	void _cdecl operator += (const string &s)
 	{	DynamicArray::append(&s);	}
 	string _cdecl operator + (const string &s) const

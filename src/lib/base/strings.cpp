@@ -56,6 +56,12 @@ string::string(const string &s)
 	assign(&s);
 }
 
+string::string(string &&s)
+{
+	init(sizeof(unsigned char));
+	exchange(s);
+}
+
 void string::__init__()
 {
 	new(this) string;

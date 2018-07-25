@@ -37,6 +37,7 @@ class AudioBuffer
 public:
 	AudioBuffer();
 	AudioBuffer(const AudioBuffer &b);
+	AudioBuffer(AudioBuffer &&b);
 	AudioBuffer(int length, int channels);
 	~AudioBuffer();
 
@@ -44,6 +45,7 @@ public:
 	void _cdecl __delete__();
 
 	void operator=(const AudioBuffer &b);
+	void operator=(AudioBuffer &&b);
 	void __assign__(const AudioBuffer &other){ *this = other; }
 
 	int offset, length;

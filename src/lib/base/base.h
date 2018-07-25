@@ -57,7 +57,7 @@ public:
 
 
 // strings.cpp
-class Exception
+class Exception : public VirtualBase
 {
 public:
 	Exception(){}

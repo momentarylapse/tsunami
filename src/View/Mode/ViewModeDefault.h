@@ -30,7 +30,7 @@ public:
 	void onMouseMove() override;
 	void onKeyDown(int k) override;
 	void onKeyUp(int k) override;
-	void updateTrackHeights() override;
+	float suggest_layer_height(AudioViewLayer *l) override;
 
 
 	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;

@@ -61,6 +61,7 @@ void AudioViewLayer::set_midi_mode(MidiMode wanted)
 	midi_mode = wanted;
 	if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
 		midi_mode = MidiMode::TAB;
+	view->thm.dirty = true;
 	view->forceRedraw();
 }
 

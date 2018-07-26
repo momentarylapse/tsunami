@@ -378,23 +378,18 @@ void ViewModeDefault::onKeyUp(int k)
 {
 }
 
-void ViewModeDefault::updateTrackHeights()
+float ViewModeDefault::suggest_layer_height(AudioViewLayer *l)
 {
-	for (AudioViewLayer *t: view->vlayer){
-		int n_ch = t->layer->channels;
-		t->height_min = view->TIME_SCALE_HEIGHT * 2;
-		if (t->layer->is_main){
-			if (t->layer->type == SignalType::AUDIO){
-				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-			}else if (t->layer->type == SignalType::MIDI){
-				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 2;
-			}else{
-				t->height_wish = view->TIME_SCALE_HEIGHT * 2;
-			}
-		}else{
-			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
-		}
+	int n_ch = l->layer->channels;
+	if (l->layer->is_main){
+		if (l->layer->type == SignalType::AUDIO)
+			return view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+		else if (l->layer->type == SignalType::MIDI)
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 2;
+		else
+			return view->TIME_SCALE_HEIGHT * 2;
 	}
+	return view->TIME_SCALE_HEIGHT * 2;
 }
 
 

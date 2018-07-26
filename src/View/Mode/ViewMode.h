@@ -41,8 +41,8 @@ public:
 	virtual void onMouseWheel(){}
 	virtual void onKeyDown(int k){}
 	virtual void onKeyUp(int k){}
-	virtual void updateTrackHeights(){}
-	virtual void onCurTrackChange(){}
+	virtual float suggest_layer_height(AudioViewLayer *l) = 0;
+	virtual void on_cur_layer_change(){}
 
 	virtual Selection getHover();
 

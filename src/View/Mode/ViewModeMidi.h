@@ -17,6 +17,7 @@ class MidiEvent;
 class OutputStream;
 class Synthesizer;
 class MidiPreview;
+class TrackLayer;
 enum class NoteModifier;
 enum class ChordType;
 
@@ -30,8 +31,8 @@ public:
 	void onLeftButtonUp() override;
 	void onMouseMove() override;
 	void onKeyDown(int k) override;
-	void updateTrackHeights() override;
-	void onCurTrackChange() override;
+	float suggest_layer_height(AudioViewLayer *l) override;
+	void on_cur_layer_change() override;
 
 	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
 	void drawLayerPitchGrid(Painter *c, AudioViewLayer *l);
@@ -74,6 +75,7 @@ public:
 	MidiPreview *preview;
 
 	AudioViewLayer *cur_layer;
+	bool editing(TrackLayer *l);
 
 	rect scroll_bar;
 	float scroll_offset;

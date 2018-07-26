@@ -73,6 +73,17 @@ void ViewModeMidi::setCreationMode(CreationMode _mode)
 	//view->forceRedraw();
 }
 
+bool ViewModeMidi::editing(TrackLayer *l)
+{
+	if (view->mode != this)
+		return false;
+	if (l != view->cur_layer)
+		return false;
+	if (l->type != SignalType::MIDI)
+		return false;
+	return true;
+}
+
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
@@ -252,36 +263,22 @@ void ViewModeMidi::onKeyDown(int k)
 	ViewModeDefault::onKeyDown(k);
 }
 
-void ViewModeMidi::updateTrackHeights()
+float ViewModeMidi::suggest_layer_height(AudioViewLayer *l)
 {
-	int n_ch = 2;
-	for (AudioViewLayer *t: view->vlayer){
-		t->height_min = view->TIME_SCALE_HEIGHT * 2;
-		if (t->layer->is_main){
-			if (t->layer->type == SignalType::AUDIO){
-				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-			}else if (t->layer->type == SignalType::MIDI){
-				if (t->layer == view->cur_layer){
-					auto mode = t->midi_mode;
-					if (mode == MidiMode::LINEAR)
-						t->height_wish = 5000;
-					else if (mode == MidiMode::CLASSICAL)
-						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 6;
-					else // TAB
-						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
-				}else{
-					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
-				}
-			}else{
-				t->height_wish = view->TIME_SCALE_HEIGHT * 2;
-			}
-		}else{
-			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
-		}
+	if (editing(l->layer)){
+		auto mode = l->midi_mode;
+		if (mode == MidiMode::LINEAR)
+			return 5000;
+		else if (mode == MidiMode::CLASSICAL)
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 6;
+		else // TAB
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 	}
+
+	return ViewModeDefault::suggest_layer_height(l);
 }
 
-void ViewModeMidi::onCurTrackChange()
+void ViewModeMidi::on_cur_layer_change()
 {
 	view->thm.dirty = true;
 }

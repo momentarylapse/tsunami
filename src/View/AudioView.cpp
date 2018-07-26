@@ -1254,7 +1254,6 @@ void AudioView::setCurTrack(Track *t)
 		return;
 	cur_track = t;
 	// TODO ----cur layer...
-	mode->onCurTrackChange();
 	forceRedraw();
 	notify(MESSAGE_CUR_TRACK_CHANGE);
 }
@@ -1264,6 +1263,7 @@ void AudioView::setCurLayer(TrackLayer *l)
 	if (cur_layer == l)
 		return;
 	cur_layer = l;
+	mode->on_cur_layer_change();
 	forceRedraw();
 	notify(MESSAGE_CUR_LAYER_CHANGE);
 	setCurTrack(l->track);

@@ -24,6 +24,7 @@ class Clef;
 class Scale;
 class Range;
 enum class NoteModifier;
+enum class MidiMode;
 
 
 class AudioViewLayer
@@ -75,6 +76,8 @@ public:
 	Array<rect> marker_areas;
 	Array<rect> marker_label_areas;
 	AudioView *view;
+	void set_midi_mode(MidiMode wanted);
+	MidiMode midi_mode;
 
 
 	static color getPitchColor(int pitch);

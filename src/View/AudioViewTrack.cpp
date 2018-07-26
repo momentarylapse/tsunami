@@ -52,6 +52,16 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 	height_min = height_wish = 0;
 	clef_dy = 0;
 	clef_y0 = 0;
+
+	set_midi_mode(view->midi_view_mode);
+}
+
+void AudioViewLayer::set_midi_mode(MidiMode wanted)
+{
+	midi_mode = wanted;
+	if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
+		midi_mode = MidiMode::TAB;
+	view->forceRedraw();
 }
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)

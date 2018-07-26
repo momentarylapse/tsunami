@@ -57,9 +57,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("mode:linear", std::bind(&MidiEditorConsole::onViewModeLinear, this));
-	event("mode:tab", std::bind(&MidiEditorConsole::onViewModeTab, this));
-	event("mode:classical", std::bind(&MidiEditorConsole::onViewModeClassical, this));
 	event("beat_partition", std::bind(&MidiEditorConsole::onBeatPartition, this));
 	event("note_length", std::bind(&MidiEditorConsole::onNoteLength, this));
 	event("scale_root", std::bind(&MidiEditorConsole::onScale, this));
@@ -109,11 +106,7 @@ void MidiEditorConsole::update()
 	check("modifier:flat", view->mode_midi->modifier == NoteModifier::FLAT);
 	check("modifier:natural", view->mode_midi->modifier == NoteModifier::NATURAL);
 
-	MidiMode mode = view->mode->which_midi_mode(layer->track);
-	view->mode_midi->setMode(mode);
-	check("mode:linear", mode == MidiMode::LINEAR);
-	check("mode:classical", mode == MidiMode::CLASSICAL);
-	check("mode:tab", mode == MidiMode::TAB);
+	MidiMode mode = view->get_layer(layer)->midi_mode;
 
 	enable("modifier:none", mode == MidiMode::CLASSICAL);
 	enable("modifier:sharp", mode == MidiMode::CLASSICAL);
@@ -187,21 +180,6 @@ void MidiEditorConsole::onCreationMode()
 	}else if (n == 3){
 		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::CHORD);
 	}
-}
-
-void MidiEditorConsole::onViewModeLinear()
-{
-	setMode(MidiMode::LINEAR);
-}
-
-void MidiEditorConsole::onViewModeClassical()
-{
-	setMode(MidiMode::CLASSICAL);
-}
-
-void MidiEditorConsole::onViewModeTab()
-{
-	setMode(MidiMode::TAB);
 }
 
 void MidiEditorConsole::onInterval()
@@ -294,12 +272,6 @@ void MidiEditorConsole::setLayer(TrackLayer *l)
 		update();
 	}
 
-}
-
-void MidiEditorConsole::setMode(MidiMode mode)
-{
-	view->mode_midi->setMode(mode);
-	update();
 }
 
 int align_to_beats(int pos, Array<Beat> &beats)

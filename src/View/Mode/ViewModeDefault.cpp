@@ -21,6 +21,12 @@
 #include "../../Data/Track.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
+#include "../../lib/hui/Controls/Control.h"
+
+void menu_check(hui::Menu *menu, const string &id, bool checked)
+{
+	menu->apply_foreach(id, [checked](hui::Control*c){ c->check(checked); });
+}
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
@@ -206,14 +212,23 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_time_track->enable("scale_bars", false);
 		view->menu_time_track->openPopup(view->win, 0, 0);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
+		view->menu_layer->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
+		menu_check(view->menu_layer, "layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+		menu_check(view->menu_layer, "layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+		menu_check(view->menu_layer, "layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
 		view->menu_layer->openPopup(view->win, 0, 0);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
-		view->menu_track->enable("track_edit_midi", view->cur_track->type == SignalType::MIDI);
+		view->menu_track->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
+		menu_check(view->menu_track, "layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+		menu_check(view->menu_track, "layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+		menu_check(view->menu_track, "layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+
+		view->menu_track->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
-		view->menu_track->enable("track_convert_stereo", view->cur_track->channels == 1);
-		view->menu_track->enable("track_convert_mono", view->cur_track->channels == 2);
-		view->menu_track->enable("layer_merge", !view->cur_layer->is_main);
-		view->menu_track->enable("delete_layer", !view->cur_layer->is_main);
+		view->menu_track->enable("track_convert_stereo", hover->track->channels == 1);
+		view->menu_track->enable("track_convert_mono", hover->track->channels == 2);
+		view->menu_track->enable("layer_merge", !hover->layer->is_main);
+		view->menu_track->enable("delete_layer", !hover->layer->is_main);
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
 		view->menu_track->openPopup(view->win, 0, 0);
 	}else if (!hover->track){
@@ -386,7 +401,7 @@ void ViewModeDefault::updateTrackHeights()
 
 void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
-	auto mode = which_midi_mode(l->layer->track);
+	auto mode = l->midi_mode;
 	if (mode == MidiMode::LINEAR)
 		l->drawMidiLinear(c, midi, as_reference, shift);
 	else if (mode == MidiMode::TAB)
@@ -407,7 +422,7 @@ void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 
 
 	if (l->layer->type == SignalType::MIDI){
-		auto mode = which_midi_mode(l->layer->track);
+		auto mode = l->midi_mode;
 		if (mode == MidiMode::CLASSICAL){
 			const Clef& clef = l->layer->track->instrument.get_clef();
 			l->drawMidiClefClassical(c, clef, view->midi_scale);

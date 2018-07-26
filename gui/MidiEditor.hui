@@ -5,12 +5,6 @@ Dialog midi_editor "Midi" width=380 height=516
 		Grid me_grid_yes "" vertical
 			Group me_group_view "View"
 				Grid ? ""
-					Text me_t_mode "Mode:"
-					Grid ? ""
-						RadioButton mode:linear "Linear" expandx
-						RadioButton mode:classical "Classical" expandx
-						RadioButton mode:tab "Tab" expandx
-					---|
 					Text me_t_partition "Sub beats"
 					SpinButton beat_partition "4" range=1:256 expandx
 					---|

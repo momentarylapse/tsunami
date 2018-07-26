@@ -82,7 +82,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 void ViewModeMidi::onLeftButtonDown()
 {
 	ViewModeDefault::onLeftButtonDown();
-	auto mode = which_midi_mode(cur_layer->layer->track);
+	auto mode = cur_layer->midi_mode;
 
 	if (creation_mode == CreationMode::SELECT){
 		setCursorPos(hover->pos, true);
@@ -123,7 +123,7 @@ void ViewModeMidi::onLeftButtonUp()
 	ViewModeDefault::onLeftButtonUp();
 	view->hide_selection = false;
 
-	auto mode = which_midi_mode(cur_layer->layer->track);
+	auto mode = cur_layer->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
@@ -170,7 +170,7 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 
 void ViewModeMidi::onKeyDown(int k)
 {
-	auto mode = which_midi_mode(cur_layer->layer->track);
+	auto mode = cur_layer->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (k == hui::KEY_0){
 			modifier = NoteModifier::NONE;
@@ -262,7 +262,7 @@ void ViewModeMidi::updateTrackHeights()
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
 			}else if (t->layer->type == SignalType::MIDI){
 				if (t->layer == view->cur_layer){
-					auto mode = which_midi_mode(t->layer->track);
+					auto mode = t->midi_mode;
 					if (mode == MidiMode::LINEAR)
 						t->height_wish = 5000;
 					else if (mode == MidiMode::CLASSICAL)
@@ -376,7 +376,7 @@ void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
 		view->drawGridTime(c, l->area, cc, false);
 
 	if (l->layer->type == SignalType::MIDI){
-		auto mode = which_midi_mode(l->layer->track);
+		auto mode = l->midi_mode;
 		if (l->layer== view->cur_layer){
 			if (mode == MidiMode::LINEAR)
 				drawLayerPitchGrid(c, l);
@@ -465,7 +465,7 @@ Selection ViewModeMidi::getHover()
 
 	// midi
 	if ((s.layer) and (s.layer->type == SignalType::MIDI) and (s.layer == view->cur_layer)){
-		auto mode = which_midi_mode(s.track);
+		auto mode = s.vlayer->midi_mode;
 
 		// scroll bar
 		if ((mode == MidiMode::LINEAR) and (scroll_bar.inside(view->mx, view->my))){
@@ -541,7 +541,7 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 
 		drawMidi(c, l, l->layer->midi, false, 0);
 
-		auto mode = which_midi_mode(l->layer->track);
+		auto mode = l->midi_mode;
 
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 
@@ -603,24 +603,11 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 }
 
-MidiMode ViewModeMidi::which_midi_mode(Track *t)
-{
-	if ((view->cur_track == t) and (t->type == SignalType::MIDI)){
-		if (mode_wanted == MidiMode::TAB){
-			if (t->instrument.string_pitch.num > 0)
-				return MidiMode::TAB;
-			return MidiMode::CLASSICAL;
-		}
-		return mode_wanted;
-	}
-	return ViewModeDefault::which_midi_mode(t);
-}
-
 void ViewModeMidi::drawPost(Painter *c)
 {
 	ViewModeDefault::drawPost(c);
 
-	auto mode = which_midi_mode(cur_layer->layer->track);
+	auto mode = cur_layer->midi_mode;
 	Range r = getMidiEditRange();
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());

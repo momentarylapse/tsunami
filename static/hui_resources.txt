@@ -1338,60 +1338,30 @@ Grid
 
 0
 0
-6
-Text
-me_t_mode
-
-0
-0
-0
-Grid
-?
-
-1
-0
-3
-RadioButton
-mode:linear
-expandx
-0
-0
-0
-RadioButton
-mode:classical
-expandx
-1
-0
-0
-RadioButton
-mode:tab
-expandx
-2
-0
-0
+4
 Text
 me_t_partition
 
 0
-1
+0
 0
 SpinButton
 beat_partition
 range=1:256,expandx
 1
-1
+0
 0
 Text
 me_t_scale
 
 0
-2
+1
 0
 Grid
 ?
 
 1
-2
+1
 2
 ComboBox
 scale_root
@@ -2447,7 +2417,7 @@ popup_layer_menu
 
 0
 0
-4
+6
 Item
 header
 disabled
@@ -2460,16 +2430,46 @@ Separator
 1
 0
 0
+Menu
+menu_midi_mode
+
+2
+0
+3
+Item
+layer_midi_mode_linear
+checkable
+0
+0
+0
+Item
+layer_midi_mode_tab
+checkable
+1
+0
+0
+Item
+layer_midi_mode_classical
+checkable
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
 Item
 layer_merge
 
-2
+4
 0
 0
 Item
 delete_layer
 
-3
+5
 0
 0
 // Resource
@@ -2788,7 +2788,7 @@ popup_track_menu
 
 0
 0
-10
+11
 Item
 track_menu_header
 disabled
@@ -2814,9 +2814,33 @@ track_add_marker
 0
 0
 Menu
-menu_buffer
+menu_midi_mode
 
 4
+0
+3
+Item
+layer_midi_mode_linear
+checkable
+0
+0
+0
+Item
+layer_midi_mode_tab
+checkable
+1
+0
+0
+Item
+layer_midi_mode_classical
+checkable
+2
+0
+0
+Menu
+menu_buffer
+
+5
 0
 2
 Item
@@ -2834,7 +2858,7 @@ delete_buffer
 Menu
 menu_version
 
-5
+6
 0
 3
 Item
@@ -2858,7 +2882,7 @@ delete_layer
 Menu
 convert_menu
 
-6
+7
 0
 2
 Item
@@ -2876,19 +2900,19 @@ track_convert_stereo
 Item
 track_edit_fx
 
-7
+8
 0
 0
 Item
 track_edit_midi
 
-8
+9
 0
 0
 Item
 track_properties
 
-9
+10
 0
 0
 // Resource
@@ -4281,7 +4305,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-435
+440
 // Text
 /cancel
 Cancel
@@ -4775,9 +4799,6 @@ Reference tracks
 midi_editor/me_group_view
 View
 
-midi_editor/me_t_mode
-Mode:
-
 midi_editor/me_t_modifier
 Modifier:
 
@@ -4792,15 +4813,6 @@ Select\\Single tone\\Interval\\Chord
 
 midi_editor/midi_editor
 Midi
-
-midi_editor/mode:classical
-Classical
-
-midi_editor/mode:linear
-Linear
-
-midi_editor/mode:tab
-Tab
 
 midi_editor/modifier:flat
 ♭
@@ -5078,6 +5090,21 @@ Version
 popup_layer_menu/layer_merge
 Merge...
 
+popup_layer_menu/layer_midi_mode_classical
+Score
+
+popup_layer_menu/layer_midi_mode_linear
+Linear
+
+popup_layer_menu/layer_midi_mode_tab
+Tabulature
+
+popup_layer_menu/menu_midi_mode
+Midi mode
+
+popup_layer_menu/track_edit_midi
+Edit midi
+
 popup_marker_menu/delete_marker
 Delete
 
@@ -5243,11 +5270,23 @@ Add version
 popup_track_menu/layer_merge
 Merge...
 
+popup_track_menu/layer_midi_mode_classical
+Score
+
+popup_track_menu/layer_midi_mode_linear
+Linear
+
+popup_track_menu/layer_midi_mode_tab
+Tabulature
+
 popup_track_menu/make_buffer_movable
 Make movable
 
 popup_track_menu/menu_buffer
 Audio buffer
+
+popup_track_menu/menu_midi_mode
+Midi mode
 
 popup_track_menu/menu_version
 Version
@@ -5594,7 +5633,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-546
+555
 // Text
 /cancel
 Abbrechen
@@ -6586,6 +6625,21 @@ Version
 popup_layer_menu/layer_merge
 Vereinen...
 
+popup_layer_menu/layer_midi_mode_classical
+Klassisch
+
+popup_layer_menu/layer_midi_mode_linear
+Linear
+
+popup_layer_menu/layer_midi_mode_tab
+Tabulatur
+
+popup_layer_menu/menu_midi_mode
+Midi Modus
+
+popup_layer_menu/track_edit_midi
+Midi bearbeiten
+
 popup_marker_menu/delete_marker
 Löschen
 
@@ -6778,11 +6832,23 @@ Version hinzufügen
 popup_track_menu/layer_merge
 Zusammenfügen...
 
+popup_track_menu/layer_midi_mode_classical
+Klassisch
+
+popup_track_menu/layer_midi_mode_linear
+Linear
+
+popup_track_menu/layer_midi_mode_tab
+Tabulatur
+
 popup_track_menu/make_buffer_movable
 Beweglich machen
 
 popup_track_menu/menu_buffer
 Audiopuffer
+
+popup_track_menu/menu_midi_mode
+Midi Modus
 
 popup_track_menu/menu_version
 Version

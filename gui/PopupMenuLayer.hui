@@ -1,5 +1,10 @@
 Menu popup_layer_menu ""
 	Item header "Version" disabled
 	Separator
+	Menu menu_midi_mode "Midi mode"
+		Item layer_midi_mode_linear "Linear" checkable
+		Item layer_midi_mode_tab "Tabulature" checkable
+		Item layer_midi_mode_classical "Score" checkable
+	Item track_edit_midi "Edit midi"
 	Item layer_merge "Merge..."
 	Item delete_layer "Delete"

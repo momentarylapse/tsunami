@@ -58,6 +58,9 @@ public:
 	void onTrackConvertStereo();
 	void onBufferDelete();
 	void onBufferMakeMovable();
+	void onLayerMidiModeLinear();
+	void onLayerMidiModeTab();
+	void onLayerMidiModeClassical();
 	void onSampleFromSelection();
 	void onInsertSample();
 	void onRemoveSample();

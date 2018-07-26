@@ -1,7 +1,7 @@
-X portaudio stabiler???
+J portaudio stabiler???
 J pulse verwenden
-j midi Noten löschen
-j saubere Midi-Aufnahmen
+J midi Noten löschen
+J saubere Midi-Aufnahmen
 J Klicks entfernen
 
 J MidiData mit Range?
@@ -15,13 +15,13 @@ j midi-Inkonsistenzen
 J leichteres midi Bearbeiten
   J kleiner Ansichts-Bug
   J markieren/editieren
-  j auto-einrasten
-  j logischeres copy/paste
+  J auto-einrasten
+  J logischeres copy/paste
 
 X Ausgabe Ziel Combobox?
 * Ausgabe Puffergröße
 
-* Kurven in Spur
+j Kurven in Spur
 * Kurven Ziel mitändern
 
 * Plugins
@@ -46,7 +46,7 @@ J MidiEvents anzeigen
 j MidiEvent +-1 Problem
 j hyperaktive Observer
 J temporäre Samples automatisch löschen
-* Speicher sparen bei Laden (action)
+J Speicher sparen bei Laden (action)
 
 J graphischer Takteditor
 J View Modes
@@ -85,7 +85,7 @@ J Selektionseinrasten
 j Stream Abstürze
 j SelectionRange beim Abspielen
 * Änderungen beim Abspielen
-~ freeze beim Midi Editieren
+j freeze beim Midi Editieren
 J Animation zum MidiEditor
 
 
@@ -151,6 +151,7 @@ J better preview pitch-range (linear)
 J linear: track height
 J linear: keys
 J cursor by click
+J mode per track
 
 == refactoring ==
 
@@ -159,6 +160,7 @@ J AudioBuffer move
 J enum class
 * enum descriptors via set?
 J Array initializer_list
-* nullptr
+J nullptr
 * TrackLayer in separate file
+J SymbolRenderer in separate file
 * MidiBuffer move/ownership

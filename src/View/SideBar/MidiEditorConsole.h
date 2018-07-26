@@ -31,9 +31,6 @@ public:
 	void onScale();
 	void onBeatPartition();
 	void onNoteLength();
-	void onViewModeLinear();
-	void onViewModeClassical();
-	void onViewModeTab();
 	void onCreationMode();
 	void onInterval();
 	void onChordType();
@@ -52,7 +49,6 @@ public:
 
 	void clear();
 	void setLayer(TrackLayer *t);
-	void setMode(MidiMode mode);
 
 
 	string id_inner;

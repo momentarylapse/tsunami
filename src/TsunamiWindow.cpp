@@ -27,6 +27,7 @@
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/AudioView.h"
+#include "View/AudioViewTrack.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Plugins/SongPlugin.h"
@@ -114,6 +115,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track_convert_stereo", std::bind(&TsunamiWindow::onTrackConvertStereo, this));
 	event("delete_buffer", std::bind(&TsunamiWindow::onBufferDelete, this));
 	event("make_buffer_movable", std::bind(&TsunamiWindow::onBufferMakeMovable, this));
+
+
+	event("layer_midi_mode_linear", std::bind(&TsunamiWindow::onLayerMidiModeLinear, this));
+	event("layer_midi_mode_tab", std::bind(&TsunamiWindow::onLayerMidiModeTab, this));
+	event("layer_midi_mode_classical", std::bind(&TsunamiWindow::onLayerMidiModeClassical, this));
+
 	event("layer_add", std::bind(&TsunamiWindow::onAddLayer, this));
 	setKeyCode("layer_add", -1, "hui:add");
 	event("delete_layer", std::bind(&TsunamiWindow::onDeleteLayer, this));
@@ -417,6 +424,21 @@ void TsunamiWindow::onBufferMakeMovable()
 			}
 	}
 
+}
+
+void TsunamiWindow::onLayerMidiModeLinear()
+{
+	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::LINEAR);
+}
+
+void TsunamiWindow::onLayerMidiModeTab()
+{
+	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::TAB);
+}
+
+void TsunamiWindow::onLayerMidiModeClassical()
+{
+	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::onSongProperties()

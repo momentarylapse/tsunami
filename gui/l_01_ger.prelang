@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-547
+556
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1643,6 +1643,33 @@ Länge
 
 midi_editor/note_length
 1
+
+popup_layer_menu/layer_midi_mode_classical
+Klassisch
+
+popup_layer_menu/layer_midi_mode_linear
+Linear
+
+popup_layer_menu/layer_midi_mode_tab
+Tabulatur
+
+popup_layer_menu/menu_midi_mode
+Midi Modus
+
+popup_layer_menu/track_edit_midi
+Midi bearbeiten
+
+popup_track_menu/layer_midi_mode_classical
+Klassisch
+
+popup_track_menu/layer_midi_mode_linear
+Linear
+
+popup_track_menu/layer_midi_mode_tab
+Tabulatur
+
+popup_track_menu/menu_midi_mode
+Midi Modus
 
 // Num Language Strings
 184

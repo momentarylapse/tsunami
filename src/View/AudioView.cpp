@@ -692,6 +692,11 @@ void AudioView::checkConsistency()
 	if (cur_layer and !get_layer(cur_layer))
 		if (song->tracks.num > 0)
 			setCurLayer(cur_track->layers[0]);
+
+	// illegal midi mode?
+	for (auto *l: vlayer)
+		if ((l->midi_mode == MidiMode::TAB) and (l->layer->track->instrument.string_pitch.num == 0))
+			l->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void AudioView::onSongUpdate()
@@ -1144,7 +1149,9 @@ void AudioView::updatePeaks()
 void AudioView::setMidiViewMode(MidiMode mode)
 {
 	midi_view_mode = mode;
-	forceRedraw();
+	for (auto *l: vlayer)
+		l->set_midi_mode(mode);
+	//forceRedraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
 	updateMenu();
 }

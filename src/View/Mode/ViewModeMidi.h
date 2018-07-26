@@ -42,8 +42,6 @@ public:
 	Selection getHover() override;
 	void startSelection() override;
 
-	MidiMode which_midi_mode(Track *t) override;
-
 	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
 	void setNoteLength(int length);

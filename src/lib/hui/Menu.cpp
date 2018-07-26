@@ -161,8 +161,9 @@ void Menu::apply_foreach(const string &_id, std::function<void(Control*)> f)
 	// FIXME: menu items don't really know their children.... inconsistent...argh
 	auto list = get_all_controls();
 	for (auto *c: list)
-		if (c->id == _id)
+		if (c->id == _id){
 			f(c);
+		}
 
 }
 

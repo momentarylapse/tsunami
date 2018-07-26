@@ -373,7 +373,7 @@ void TsunamiWindow::onTrackAddMarker()
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover.pos))
 			range = Range(view->hover.pos, 0);
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, NULL);
+		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, nullptr);
 		dlg->run();
 		delete(dlg);
 	}else{

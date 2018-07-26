@@ -80,7 +80,7 @@ void SetIdleFunction(const Callback &c)
 	bool old_idle = (bool)_idle_function_;
 	bool new_idle = (bool)c;
 	if (new_idle and !old_idle)
-		idle_id = g_idle_add_full(300, GtkIdleFunction, NULL, NULL);
+		idle_id = g_idle_add_full(300, GtkIdleFunction, nullptr, nullptr);
 	if (!new_idle and old_idle and (idle_id >= 0)){
 		g_source_remove(idle_id);
 		idle_id = -1;
@@ -109,7 +109,7 @@ int RunLater(float time, const Callback &c)
 	#ifdef HUI_API_GTK
 		HuiGtkRunner *r = new HuiGtkRunner(c);
 		_hui_runners_.add(r);
-		r->id = g_timeout_add_full(300, max((int)(time * 1000), 1), &GtkRunLaterFunction, (void*)r, NULL);
+		r->id = g_timeout_add_full(300, max((int)(time * 1000), 1), &GtkRunLaterFunction, (void*)r, nullptr);
 		return r->id;
 	#endif
 }
@@ -124,7 +124,7 @@ int RunRepeated(float time, const Callback &c)
 	#ifdef HUI_API_GTK
 		HuiGtkRunner *r = new HuiGtkRunner(c);
 		_hui_runners_.add(r);
-		r->id = g_timeout_add_full(300, max((int)(time * 1000), 1), &GtkRunRepeatedFunction, (void*)r, NULL);
+		r->id = g_timeout_add_full(300, max((int)(time * 1000), 1), &GtkRunRepeatedFunction, (void*)r, nullptr);
 		return r->id;
 	#endif
 }

@@ -35,7 +35,7 @@
 		#ifdef _UNICODE
 			string s;
 			s.resize(4096);
-			int r = WideCharToMultiByte(CP_UTF8,0,str,-1,(LPSTR)s.data,s.num,NULL,NULL);
+			int r = WideCharToMultiByte(CP_UTF8,0,str,-1,(LPSTR)s.data,s.num,nullptr,nullptr);
 			s.resize(r);
 			return s;
 		#else
@@ -127,7 +127,7 @@ namespace hui
 // language
 bool _using_language_;
 Array<Language> _languages_;
-Language *cur_lang = NULL;
+Language *cur_lang = nullptr;
 
 
 bool Language::Command::match(const string &_ns, const string &_id)
@@ -140,7 +140,7 @@ bool Language::Command::match(const string &_ns, const string &_id)
 
 void SetLanguage(const string &language)
 {
-	cur_lang = NULL;
+	cur_lang = nullptr;
 	_using_language_ = false;
 	for (Language &l: _languages_)
 		if (l.name == language){

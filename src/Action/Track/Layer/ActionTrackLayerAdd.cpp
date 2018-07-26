@@ -29,7 +29,7 @@ void* ActionTrackLayerAdd::execute(Data* d)
 
 	track->layers.insert(layer, index);
 	a->notify(a->MESSAGE_ADD_LAYER);
-	layer = NULL;
+	layer = nullptr;
 
 	return track->layers[index];
 }

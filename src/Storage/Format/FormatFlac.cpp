@@ -105,7 +105,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 	Track *t = od->track;
 	t->song->beginActionGroup();
 
-	FLAC__StreamDecoder *decoder = NULL;
+	FLAC__StreamDecoder *decoder = nullptr;
 
 	try{
 
@@ -167,8 +167,8 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 
-	FLAC__StreamEncoder *encoder = NULL;
-	FLAC__StreamMetadata *metadata = NULL;
+	FLAC__StreamEncoder *encoder = nullptr;
+	FLAC__StreamMetadata *metadata = nullptr;
 
 	try{
 		FLAC__StreamEncoderInitStatus init_status;

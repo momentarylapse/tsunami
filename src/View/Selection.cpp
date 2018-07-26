@@ -28,20 +28,20 @@ bool Selection::is_in(Type _type) const
 	if (_type == Type::LAYER_HEADER)
 		return (type == Type::LAYER_BUTTON_MUTE) or (type == Type::LAYER_BUTTON_SOLO);
 	if (_type == Type::LAYER)
-		return (layer != NULL);
+		return (layer != nullptr);
 	return false;
 }
 
 void Selection::clear()
 {
 	type = Type::NONE;
-	track = NULL;
-	layer = NULL;
-	vlayer = NULL;
-	sample = NULL;
-	note = NULL;
-	marker = NULL;
-	bar = NULL;
+	track = nullptr;
+	layer = nullptr;
+	vlayer = nullptr;
+	sample = nullptr;
+	note = nullptr;
+	marker = nullptr;
+	bar = nullptr;
 	index = 0;
 	pos = 0;
 	range = Range::EMPTY;

@@ -98,7 +98,7 @@ void ExpressionBuffer::reset_parser()
 
 void ExpressionBuffer::clear()
 {
-	cur_line = NULL;
+	cur_line = nullptr;
 	line.clear();
 	cur_line = &temp_line;
 	cur_exp = -1;

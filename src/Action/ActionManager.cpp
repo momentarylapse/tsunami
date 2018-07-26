@@ -15,7 +15,7 @@
 ActionManager::ActionManager(Data *_data)
 {
 	data = _data;
-	cur_group = NULL;
+	cur_group = nullptr;
 	lock_level = 0;
 	//mutex = new Mutex;
 	timer = new hui::Timer;
@@ -41,7 +41,7 @@ void ActionManager::reset()
 	cur_group_level = 0;
 	if (cur_group)
 		delete(cur_group);
-	cur_group = NULL;
+	cur_group = nullptr;
 }
 
 
@@ -184,7 +184,7 @@ void ActionManager::endActionGroup()
 
 	if (cur_group_level == 0){
 		ActionGroup *g = cur_group;
-		cur_group = NULL;
+		cur_group = nullptr;
 		//execute(g);
 		add(g);
 		data->notify();

@@ -26,7 +26,7 @@ void *ActionSongSetDefaultFormat::execute(Data *d)
 	s->compression = compression;
 	compression = t2;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionSongSetDefaultFormat::undo(Data *d)

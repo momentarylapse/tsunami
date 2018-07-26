@@ -93,7 +93,7 @@ static string ascii2utf8(const string &s)
 
 void FormatMidi::loadSong(StorageOperationData *od)
 {
-	File *f = NULL;
+	File *f = nullptr;
 	try{
 		f = FileOpen(od->filename);
 
@@ -239,7 +239,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 }
 void FormatMidi::saveSong(StorageOperationData* od)
 {
-	File *f = NULL;
+	File *f = nullptr;
 	try {
 		f = FileCreate(od->filename);
 

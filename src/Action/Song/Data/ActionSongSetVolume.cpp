@@ -20,7 +20,7 @@ void *ActionSongSetVolume::execute(Data *d)
 
 	s->volume = new_value;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionSongSetVolume::undo(Data *d)

@@ -123,7 +123,7 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 {
 	foreachi(Cable *cc, cables, i)
 		if (cc == c){
-			*c->target->port_in[c->target_port].port = NULL;
+			*c->target->port_in[c->target_port].port = nullptr;
 
 			delete(c);
 			cables.erase(i);
@@ -224,7 +224,7 @@ void SignalChain::load(const string& filename)
 			string sub_type = e.value("class");
 			string name = e.value("name");
 			string sys = e.value("system");
-			Module *m = NULL;
+			Module *m = nullptr;
 			/*if ((i < 3) and (this == session->signal_chain)){
 				m = modules[i];
 			}else*/{

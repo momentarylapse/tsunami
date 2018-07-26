@@ -26,7 +26,7 @@ void *Action__ShiftData::execute(Data *d)
 
 	do_shift(s, shift);
 
-	return NULL;
+	return nullptr;
 }
 
 void Action__ShiftData::undo(Data *d)

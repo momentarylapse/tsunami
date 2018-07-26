@@ -30,18 +30,18 @@ const string AppName = "Tsunami";
 const string AppVersion = "0.7.12.1";
 const string AppNickname = "absolute 2er0";
 
-Tsunami *tsunami = NULL;
+Tsunami *tsunami = nullptr;
 
 bool ugly_hack_slow = false;
 
 Tsunami::Tsunami() :
 	hui::Application("tsunami", "English", hui::FLAG_LOAD_RESOURCE)
 {
-	device_manager = NULL;
-	log = NULL;
-	clipboard = NULL;
-	plugin_manager = NULL;
-	perf_mon = NULL;
+	device_manager = nullptr;
+	log = nullptr;
+	clipboard = nullptr;
+	plugin_manager = nullptr;
+	perf_mon = nullptr;
 
 	setProperty("name", AppName);
 	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
@@ -77,7 +77,7 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 
 	log = new Log;
 
-	Session::GLOBAL = new Session(log, NULL, NULL, perf_mon);
+	Session::GLOBAL = new Session(log, nullptr, nullptr, perf_mon);
 
 	clipboard = new Clipboard;
 

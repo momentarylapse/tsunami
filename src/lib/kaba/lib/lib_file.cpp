@@ -95,25 +95,25 @@ class KabaFileNotWritableError : public KabaFileError
 File* kaba_file_open(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER2(return FileOpen(filename), KabaFileError);
-	return NULL;
+	return nullptr;
 }
 
 File* kaba_file_open_text(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER2(return FileOpenText(filename), KabaFileError);
-	return NULL;
+	return nullptr;
 }
 
 File* kaba_file_create(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER2(return FileCreate(filename), KabaFileError);
-	return NULL;
+	return nullptr;
 }
 
 File* kaba_file_create_text(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER2(return FileCreateText(filename), KabaFileError);
-	return NULL;
+	return nullptr;
 }
 
 string kaba_file_read(const string &filename)

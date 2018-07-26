@@ -18,11 +18,11 @@ namespace hui
 
 Painter::Painter()
 {
-	win = NULL;
-	cr = NULL;
-	layout = NULL;
-	target_surface = NULL;
-	font_desc = NULL;
+	win = nullptr;
+	cr = nullptr;
+	layout = nullptr;
+	target_surface = nullptr;
+	font_desc = nullptr;
 	width = 0;
 	height = 0;
 	mode_fill = true;
@@ -37,10 +37,10 @@ Painter::Painter(Panel *panel, const string &_id)
 {
 	win = panel->win;
 	id = _id;
-	cr = NULL;
-	layout = NULL;
-	target_surface = NULL;
-	font_desc = NULL;
+	cr = nullptr;
+	layout = nullptr;
+	target_surface = nullptr;
+	font_desc = nullptr;
 	width = 0;
 	height = 0;
 	mode_fill = true;
@@ -70,7 +70,7 @@ Painter::~Painter()
 	if (target_surface)
 		cairo_surface_destroy(target_surface);
 //	cairo_destroy(cr);
-	cr = NULL;
+	cr = nullptr;
 }
 
 void Painter::setColor(const color &c)

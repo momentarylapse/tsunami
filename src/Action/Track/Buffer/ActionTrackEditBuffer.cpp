@@ -55,6 +55,6 @@ void *ActionTrackEditBuffer::execute(Data *d)
 	layer->buffers[index].invalidate_peaks(range);
 
 	// nothing to do...
-	return NULL;
+	return nullptr;
 }
 

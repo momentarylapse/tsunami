@@ -61,7 +61,7 @@ Event::Event(const string &_id, const string &_message)
 	key = -1;
 	key_code = -1;
 	mx = my = 0;
-	win = NULL;
+	win = nullptr;
 	row = row_target = 0;
 	rbut = mbut = lbut = false;
 	column = 0;

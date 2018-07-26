@@ -28,7 +28,7 @@ void FormatSoundFont2::loadSong(StorageOperationData *_od)
 	od = _od;
 	song = od->song;
 
-	File *f = NULL;
+	File *f = nullptr;
 
 	sample_offset = -1;
 

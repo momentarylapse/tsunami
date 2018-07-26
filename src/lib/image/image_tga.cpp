@@ -88,7 +88,7 @@ void image_load_tga(const string &filename, Image &image)
 	//msg_write("tga");
 	unsigned char Header[18];
 	int x;
-	unsigned char *data=NULL,*pal=NULL;
+	unsigned char *data=nullptr,*pal=nullptr;
 	FILE* f=fopen(filename.sys_filename().c_str(),"rb");
 	int r=fread(&Header, 18, 1, f);
 	int offset=get_int_from_buffer(Header,0,1)+18;

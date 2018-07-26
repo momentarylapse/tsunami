@@ -24,7 +24,7 @@ void *ActionTagEdit::execute(Data *d)
 	old_tag = a->tags[index];
 	a->tags[index] = new_tag;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTagEdit::undo(Data *d)

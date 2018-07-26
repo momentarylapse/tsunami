@@ -27,7 +27,7 @@ void* ActionCurveAdd::execute(Data* d)
 
 	a->curves.insert(curve, index);
 	a->notify(a->MESSAGE_ADD_CURVE);
-	curve = NULL;
+	curve = nullptr;
 
 	return curve;
 }

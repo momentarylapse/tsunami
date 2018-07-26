@@ -121,7 +121,7 @@ FxConsole::FxConsole(Session *session) :
 
 	fromResource("fx_editor");
 
-	track = NULL;
+	track = nullptr;
 	//Enable("add", false);
 
 	if (!view)
@@ -178,7 +178,7 @@ void FxConsole::clear()
 		removeControl("separator_" + i2s(i));
 	}
 	panels.clear();
-	track = NULL;
+	track = nullptr;
 	//Enable("add", false);
 }
 
@@ -209,7 +209,7 @@ void FxConsole::setTrack(Track *t)
 
 void FxConsole::onTrackDelete()
 {
-	setTrack(NULL);
+	setTrack(nullptr);
 }
 void FxConsole::onViewCurTrackChange()
 {

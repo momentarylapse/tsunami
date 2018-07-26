@@ -57,7 +57,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 	Track *t = od->track;
 
 	unsigned char *data = new unsigned char[4096];
-	File *f = NULL;
+	File *f = nullptr;
 
 	try{
 		f = FileOpen(od->filename);

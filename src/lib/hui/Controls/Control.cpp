@@ -55,15 +55,15 @@ Control::Control(int _type, const string &_id)
 {
 	type = _type;
 	id = _id;
-	panel = NULL;
-	parent = NULL;
+	panel = nullptr;
+	parent = nullptr;
 	enabled = true;
 #ifdef HUI_API_WIN
-	hWnd = NULL;
+	hWnd = nullptr;
 #endif
 #ifdef HUI_API_GTK
-	widget = NULL;
-	frame = NULL;
+	widget = nullptr;
+	frame = nullptr;
 #endif
 	grab_focus = false;
 	indent = -1;
@@ -73,7 +73,7 @@ void unset_widgets_rec(Control *c)
 {
 	for (auto *cc: c->children)
 		unset_widgets_rec(cc);
-	c->widget = NULL;
+	c->widget = nullptr;
 }
 
 Control::~Control()
@@ -102,7 +102,7 @@ Control::~Control()
 #ifdef HUI_API_GTK
 	if (widget)
 		gtk_widget_destroy(widget);
-	widget = NULL;
+	widget = nullptr;
 	//unset_widgets_rec(this);
 #endif
 	DBDEL_DONE();

@@ -22,7 +22,7 @@ void *ActionTagAdd::execute(Data *d)
 
 	a->tags.add(tag);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTagAdd::undo(Data *d)

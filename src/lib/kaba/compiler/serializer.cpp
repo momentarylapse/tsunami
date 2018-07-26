@@ -21,7 +21,7 @@ void TempVar::use(int _first, int _last)
 		last = _last;
 }
 
-const SerialNodeParam Serializer::p_none = {-1, -1, 0, NULL, 0};
+const SerialNodeParam Serializer::p_none = {-1, -1, 0, nullptr, 0};
 
 
 int Serializer::add_virtual_reg(int preg)
@@ -684,7 +684,7 @@ void Serializer::SerializeBlock(Block *block)
 
 	for (int i=0;i<block->nodes.num;i++){
 		stack_offset = cur_func->_var_size;
-		next_node = NULL;
+		next_node = nullptr;
 		if (block->nodes.num > i + 1)
 			next_node = block->nodes[i + 1];
 
@@ -2038,7 +2038,7 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list)
 		return new SerializerX86(s, list);
 	if (config.instruction_set == Asm::INSTRUCTION_SET_ARM)
 		return new SerializerARM(s, list);
-	return NULL;
+	return nullptr;
 }
 
 void Script::AssembleFunction(int index, Function *f, Asm::InstructionWithParamsList *list)

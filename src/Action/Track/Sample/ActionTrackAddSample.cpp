@@ -42,7 +42,7 @@ void *ActionTrackAddSample::execute(Data *d)
 {
 	ref->origin->ref();
 	layer->samples.add(ref);
-	ref = NULL;
+	ref = nullptr;
 	return layer->samples.back();
 }
 

@@ -19,8 +19,8 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	SideBarConsole(_("Sample properties"), session)
 {
 	fromResource("sample_ref_dialog");
-	layer = NULL;
-	sample = NULL;
+	layer = nullptr;
+	sample = nullptr;
 
 	event("volume", std::bind(&SampleRefConsole::onVolume, this));
 	event("mute", std::bind(&SampleRefConsole::onMute, this));
@@ -125,7 +125,7 @@ void SampleRefConsole::onUpdate()
 {
 	if (sample->cur_message() == sample->MESSAGE_DELETE){
 		sample->unsubscribe(this);
-		sample = NULL;
+		sample = nullptr;
 	}
 	loadData();
 }

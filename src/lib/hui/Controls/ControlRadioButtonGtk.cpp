@@ -22,7 +22,7 @@ ControlRadioButton::ControlRadioButton(const string &title, const string &id, Pa
 {
 	GetPartStrings(title);
 	string group_id = id.head(id.find(":"));
-	GSList *group = NULL;
+	GSList *group = nullptr;
 
 	panel->apply_foreach("*", [&](Control *c){
 		if (c->type == CONTROL_RADIOBUTTON)

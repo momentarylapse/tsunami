@@ -28,7 +28,7 @@ ActionTrackAddMidiNote::~ActionTrackAddMidiNote()
 void* ActionTrackAddMidiNote::execute(Data* d)
 {
 	layer->midi.insert(note, insert_index);
-	note = NULL;
+	note = nullptr;
 
 	return note;
 }

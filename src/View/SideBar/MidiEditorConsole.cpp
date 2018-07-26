@@ -53,7 +53,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	setInt("scale_type", (int)view->midi_scale.type);
 
 
-	layer = NULL;
+	layer = nullptr;
 	//Enable("add", false);
 	enable("track_name", false);
 
@@ -132,7 +132,7 @@ void MidiEditorConsole::update()
 
 void MidiEditorConsole::onLayerDelete()
 {
-	setLayer(NULL);
+	setLayer(nullptr);
 }
 
 void MidiEditorConsole::onViewCurLayerChange()
@@ -265,7 +265,7 @@ void MidiEditorConsole::clear()
 {
 	if (layer)
 		layer->unsubscribe(this);
-	layer = NULL;
+	layer = nullptr;
 	setSelection("reference_tracks", Array<int>());
 }
 

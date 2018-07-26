@@ -27,7 +27,7 @@ void *ActionTagDelete::execute(Data *d)
 	old_tag = a->tags[index];
 	a->tags.erase(index);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTagDelete::undo(Data *d)

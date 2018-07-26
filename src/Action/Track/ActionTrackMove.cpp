@@ -20,7 +20,7 @@ void *ActionTrackMove::execute(Data *d)
 
 	s->tracks.move(origin, target);
 	s->notify(s->MESSAGE_ADD_TRACK);
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackMove::undo(Data *d)

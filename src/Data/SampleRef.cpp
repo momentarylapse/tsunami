@@ -21,8 +21,8 @@ SampleRef::SampleRef(Sample *sample)
 	midi = &sample->midi;
 	origin = sample;
 	origin->ref();
-	layer = NULL;
-	owner = NULL;
+	layer = nullptr;
+	owner = nullptr;
 	pos = 0;
 	volume = 1;
 	muted = false;

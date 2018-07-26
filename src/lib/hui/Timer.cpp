@@ -63,7 +63,7 @@ float Timer::peek()
 		elapsed = (float)(cur_time - last_time) * HuitTimerScal;
 	#endif
 	#ifdef OS_LINUX
-		gettimeofday(&cur_time, NULL);
+		gettimeofday(&cur_time, nullptr);
 		elapsed = float(cur_time.tv_sec - last_time.tv_sec) + float(cur_time.tv_usec - last_time.tv_usec) * 0.000001f;
 	#endif
 	return elapsed;

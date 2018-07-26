@@ -264,7 +264,7 @@ string compress_buffer(AudioBuffer &b, Song *song, FileChunkBasic *p)
 
 	// initialize encoder
 	if (ok){
-		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, NULL, NULL, NULL, (void*)&data);
+		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, nullptr, nullptr, nullptr, (void*)&data);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
 			p->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
@@ -384,7 +384,7 @@ void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p)
 	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_stream(
 							decoder,
 							&FlacUncompressReadCallback,
-							NULL, NULL, NULL, NULL,
+							nullptr, nullptr, nullptr, nullptr,
 							&FlacUncompressWriteCallback,
 							&FlacUncompressMetaCallback,
 							flac_error_callback, &d);
@@ -939,7 +939,7 @@ class FileChunkBar : public FileChunk<Song,Bar>
 {
 public:
 	FileChunkBar() : FileChunk<Song,Bar>("bar"){}
-	virtual void create(){ me = NULL; }
+	virtual void create(){ me = nullptr; }
 	virtual void read(File *f)
 	{
 		int type = f->read_int();
@@ -1153,7 +1153,7 @@ public:
 	ChunkedFileFormatNami() :
 		ChunkedFileParser(8)
 	{
-		od = NULL;
+		od = nullptr;
 		base = new FileChunkNami;
 	}
 	StorageOperationData *od;

@@ -38,7 +38,7 @@ inline Window *win_from_widget(void *widget)
 	for (Window *win: _all_windows_)
 		if (win->window == widget)
 			return win;
-	return NULL;
+	return nullptr;
 }
 
 void WinTrySendByKeyCode(Window *win, int key_code)
@@ -93,7 +93,7 @@ static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data)
 
 void Window::_init_(const string &title, int width, int height, Window *root, bool allow_root, int mode)
 {
-	window = NULL;
+	window = nullptr;
 	win = this;
 	if ((mode & WIN_MODE_DUMMY) > 0)
 		return;
@@ -151,7 +151,7 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 	// icon
 	string logo = Application::getProperty("logo");
 	if (logo.num > 0)
-		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), NULL);
+		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), nullptr);
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&on_gtk_window_close), this);
@@ -187,8 +187,8 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar[TOOLBAR_LEFT]->widget, FALSE, FALSE, 0);
 
-	plugable = NULL;
-	cur_control = NULL;
+	plugable = nullptr;
+	cur_control = nullptr;
 	// free to use...
 	//cur_control = hbox;
 	plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -204,7 +204,7 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 	gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
 	
 #ifdef OS_WINDOWS
-	hWnd = NULL;
+	hWnd = nullptr;
 #endif
 }
 
@@ -229,13 +229,13 @@ void Window::destroy()
 	_clean_up_();
 
 	gtk_widget_destroy(window);
-	window = NULL;
+	window = nullptr;
 	DBDEL_DONE();
 }
 
 bool Window::gotDestroyed()
 {
-	return window == NULL;
+	return window == nullptr;
 }
 
 // should be called after creating (and filling) the window to actually show it
@@ -270,9 +270,9 @@ void Window::run()
 			break;
 		bool allow=true;
 		if (HuiIdleFunction)
-			got_message=(PeekMessage(&messages,NULL,0U,0U,PM_REMOVE)!=0);
+			got_message=(PeekMessage(&messages,nullptr,0U,0U,PM_REMOVE)!=0);
 		else
-			got_message=(GetMessage(&messages,NULL,0,0)!=0);
+			got_message=(GetMessage(&messages,nullptr,0,0)!=0);
 		if (got_message){
 			allow=false;
 			TranslateMessage(&messages);
@@ -415,7 +415,7 @@ void Window::showCursor(bool show)
 	}
 #else
 	if (show)
-		gdk_window_set_cursor(gtk_widget_get_window(vbox), NULL);
+		gdk_window_set_cursor(gtk_widget_get_window(vbox), nullptr);
 	else
 		gdk_window_set_cursor(gtk_widget_get_window(vbox), (GdkCursor*)invisible_cursor);
 #endif

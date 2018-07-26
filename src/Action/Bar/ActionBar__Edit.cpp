@@ -36,7 +36,7 @@ void *ActionBar__Edit::execute(Data *d)
 
 	s->notify(s->MESSAGE_EDIT_BARS);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionBar__Edit::undo(Data *d)

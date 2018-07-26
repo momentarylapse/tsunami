@@ -16,7 +16,7 @@ namespace Kaba{
 #else
 	typedef int Sound;
 	typedef int Music;
-	#define sound_p(p)		NULL
+	#define sound_p(p)		nullptr
 #endif
 
 extern Class *TypeFloatList;

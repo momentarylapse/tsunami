@@ -98,7 +98,7 @@ public:
 	{
 		if (s){
 			s->unsubscribe(this);
-			s = NULL;
+			s = nullptr;
 			hui::DeleteImage(icon);
 		}
 	}
@@ -130,11 +130,11 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 
 	event("edit_song", std::bind(&SampleManagerConsole::onEditSong, this));
 
-	preview_renderer = NULL;
-	preview_stream = NULL;
-	preview_sample = NULL;
+	preview_renderer = nullptr;
+	preview_stream = nullptr;
+	preview_sample = nullptr;
 
-	progress = NULL;
+	progress = nullptr;
 
 	updateList();
 
@@ -339,13 +339,13 @@ void SampleManagerConsole::endPreview()
 	if (progress){
 		progress->unsubscribe(this);
 		delete(progress);
-		progress = NULL;
+		progress = nullptr;
 	}
 	preview_stream->unsubscribe(this);
 	preview_stream->stop();
 	delete(preview_stream);
 	delete(preview_renderer);
-	preview_sample = NULL;
+	preview_sample = nullptr;
 }
 
 
@@ -356,7 +356,7 @@ public:
 		hui::Dialog("", 300, 400, parent->win, false)
 	{
 		song = session->song;
-		ret = NULL;;
+		ret = nullptr;;
 		_old = old;
 
 		fromResource("sample_selection_dialog");
@@ -387,7 +387,7 @@ public:
 	void onSelect()
 	{
 		int n = getInt("");
-		ret = NULL;
+		ret = nullptr;
 		if (n >= 1)
 			ret = song->samples[n - 1];
 		enable("ok", n >= 0);
@@ -397,7 +397,7 @@ public:
 	{
 		int n = getInt("");
 		if (n == 0){
-			ret = NULL;
+			ret = nullptr;
 			destroy();
 		}else if (n >= 1){
 			ret = song->samples[n - 1];

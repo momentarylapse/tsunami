@@ -368,7 +368,7 @@ string format(const string str,...)
 #ifdef OS_WINDOWS
 	int len = _vscprintf(str.c_str(), args);
 #else
-	int len = vsnprintf(NULL, 0, str.c_str(), args);
+	int len = vsnprintf(nullptr, 0, str.c_str(), args);
 #endif
 	tmp.resize(len + 1);
     va_start(args, str);

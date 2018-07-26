@@ -116,10 +116,10 @@ public:
 		Selection()
 		{
 			type = -1;
-			module = NULL;
+			module = nullptr;
 			port = -1;
 			port_type = SignalType::AUDIO;
-			target_module = NULL;
+			target_module = nullptr;
 			target_port = -1;
 			dx = dy = 0;
 		}
@@ -345,7 +345,7 @@ public:
 				m->module_x = mx + sel.dx;
 				m->module_y = my + sel.dy;
 			}else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
-				hover.target_module = NULL;
+				hover.target_module = nullptr;
 				auto h = getHover(mx, my);
 				if (h.module != sel.module and h.port_type == sel.port_type){
 					if (h.type == sel.TYPE_PORT_IN and sel.type == sel.TYPE_PORT_OUT){

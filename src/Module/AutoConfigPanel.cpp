@@ -73,8 +73,8 @@ struct AutoConfigDataFloat : public AutoConfigData
 		max = 100000000;
 		step = 1;
 		factor = 1;
-		value = NULL;
-		slider = NULL;
+		value = nullptr;
+		slider = nullptr;
 	}
 	virtual ~AutoConfigDataFloat()
 	{
@@ -125,8 +125,8 @@ struct AutoConfigDataInt : public AutoConfigData
 	{
 		min = 0;
 		max = 1000;
-		value = NULL;
-		panel = NULL;
+		value = nullptr;
+		panel = nullptr;
 	}
 	virtual ~AutoConfigDataInt()
 	{}
@@ -167,8 +167,8 @@ struct AutoConfigDataPitch : public AutoConfigData
 	AutoConfigDataPitch(const string &_name) :
 		AutoConfigData(TYPE_PITCH, _name)
 	{
-		value = NULL;
-		panel = NULL;
+		value = nullptr;
+		panel = nullptr;
 	}
 	virtual ~AutoConfigDataPitch()
 	{}
@@ -202,8 +202,8 @@ struct AutoConfigDataString : public AutoConfigData
 	AutoConfigDataString(const string &_name) :
 		AutoConfigData(TYPE_STRING, _name)
 	{
-		value = NULL;
-		panel = NULL;
+		value = nullptr;
+		panel = nullptr;
 	}
 	virtual ~AutoConfigDataString()
 	{

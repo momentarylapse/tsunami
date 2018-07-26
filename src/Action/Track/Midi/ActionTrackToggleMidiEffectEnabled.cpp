@@ -19,7 +19,7 @@ void *ActionTrackToggleMidiEffectEnabled::execute(Data *d)
 	fx->enabled = !fx->enabled;
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackToggleMidiEffectEnabled::undo(Data *d)

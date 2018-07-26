@@ -57,7 +57,7 @@ Array<Script*> DeadScript;
 Script *Load(const string &filename, bool just_analyse)
 {
 	//msg_write(string("Lade ",filename));
-	Script *s = NULL;
+	Script *s = nullptr;
 
 	// already loaded?
 	for (Script *ps: PublicScript)
@@ -152,7 +152,7 @@ Class *GetDynamicType(const void *p)
 				return t;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Array<Script*> loading_script_stack;
@@ -223,24 +223,24 @@ Script::Script()
 
 	reference_counter = 0;
 
-	cur_func = NULL;
-	__first_execution = NULL;
+	cur_func = nullptr;
+	__first_execution = nullptr;
 	__waiting_mode = WAITING_MODE_FIRST;
 	__time_to_wait = 0;
 	show_compiler_stats = !config.compile_silently;
 
-	__thread_opcode = NULL;
+	__thread_opcode = nullptr;
 	__thread_opcode_size = 0;
 
-	__continue_execution = NULL;
+	__continue_execution = nullptr;
 	just_analyse = false;
 
-	opcode = NULL;
+	opcode = nullptr;
 	opcode_size = 0;
-	memory = NULL;
+	memory = nullptr;
 	memory_size = 0;
 	memory_used = 0;
-	__stack = NULL;
+	__stack = nullptr;
 
 	syntax = new SyntaxTree(this);
 }
@@ -351,7 +351,7 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 			}
 		}
 
-	return NULL;
+	return nullptr;
 }
 
 void *Script::MatchClassFunction(const string &_class, bool allow_derived, const string &name, const string &return_type, int num_params, ...)
@@ -366,7 +366,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 
 	Class *root_type = syntax->FindType(_class);
 	if (!root_type)
-		return NULL;
+		return nullptr;
 
 	// match
 	foreachi(Function *f, syntax->functions, i){
@@ -390,7 +390,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void print_var(void *p, const string &name, Class *t)

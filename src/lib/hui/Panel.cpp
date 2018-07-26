@@ -17,13 +17,13 @@ static int current_uid = 0;
 
 Panel::Panel()
 {
-	win = NULL;
-	parent = NULL;
+	win = nullptr;
+	parent = nullptr;
 	border_width = 5;
 	id = "";
 	num_float_decimals = 3;
-	root_control = NULL;
-	plugable = NULL;
+	root_control = nullptr;
+	plugable = nullptr;
 	current_event_listener_uid = 0;
 
 	unique_id = current_uid ++;
@@ -69,7 +69,7 @@ void Panel::_ClearPanel_()
 			if (parent->children[i] == this){
 				parent->children.erase(i);
 			}
-		parent = NULL;
+		parent = nullptr;
 	}
 	while (children.num > 0){
 		Panel *p = children.pop();
@@ -78,7 +78,7 @@ void Panel::_ClearPanel_()
 
 	if (root_control)
 		delete root_control;
-	root_control = NULL;
+	root_control = nullptr;
 
 	id.clear();
 	cur_id.clear();

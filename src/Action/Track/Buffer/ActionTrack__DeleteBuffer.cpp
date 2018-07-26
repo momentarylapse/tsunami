@@ -39,7 +39,7 @@ void *ActionTrack__DeleteBuffer::execute(Data *d)
 
 	// delete
 	layer->buffers.erase(index);
-	return NULL;
+	return nullptr;
 }
 
 

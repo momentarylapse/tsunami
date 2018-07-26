@@ -45,7 +45,7 @@ BottomBar::BottomBar(Session *session)
 
 	reveal("revealer", false);
 	visible = false;
-	active_console = NULL;
+	active_console = nullptr;
 
 	choose(mixing_console);
 

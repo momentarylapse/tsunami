@@ -67,14 +67,14 @@ void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
 InputStreamMidi::InputStreamMidi(Session *_session) :
 	Module(ModuleType::INPUT_STREAM_MIDI)
 {
-	set_session_etc(_session, "", NULL);
+	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 
 #if HAS_LIB_ALSA
-	subs = NULL;
+	subs = nullptr;
 #endif
 
 	chunk_size = 512;
@@ -113,7 +113,7 @@ bool InputStreamMidi::unconnect()
 	if (r != 0)
 		session->e(_("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
-	subs = NULL;
+	subs = nullptr;
 	return r == 0;
 #endif
 	return true;
@@ -145,7 +145,7 @@ void InputStreamMidi::set_device(Device *d)
 	if (r != 0){
 		session->e(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
-		subs = NULL;
+		subs = nullptr;
 	}
 	return;// r == 0;
 

@@ -17,7 +17,7 @@ void DynamicArray::init(int _element_size_)
 	num = 0;
 	element_size = _element_size_;
 	allocated = 0;
-	data = NULL;
+	data = nullptr;
 //	printf("init %d\n", element_size);
 }
 
@@ -249,7 +249,7 @@ void DynamicArray::clear()
 //		printf("        ~   %p %d  %d\n", data, element_size, num);
 		free(data);
 	}
-	data = NULL;
+	data = nullptr;
 	allocated = 0;
 	num = 0;
 }

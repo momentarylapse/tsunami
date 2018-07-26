@@ -25,8 +25,8 @@
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
-	cur_action = NULL;
-	moving_track = NULL;
+	cur_action = nullptr;
+	moving_track = nullptr;
 	dnd_selection = new SongSelection;
 	dnd_ref_pos = 0;
 	dnd_mouse_pos0 = 0;
@@ -117,7 +117,7 @@ void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
 void ViewModeDefault::dnd_stop()
 {
 	song->execute(cur_action);
-	cur_action = NULL;
+	cur_action = nullptr;
 }
 
 void ViewModeDefault::onLeftButtonUp()
@@ -129,7 +129,7 @@ void ViewModeDefault::onLeftButtonUp()
 		int target = getTrackMoveTarget(false);
 		//int orig = get_track_index(moving_track);
 		moving_track->move(target);
-		moving_track = NULL;
+		moving_track = nullptr;
 	}
 
 	view->selection_mode = view->SelectionMode::NONE;

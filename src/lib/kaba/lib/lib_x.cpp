@@ -49,19 +49,19 @@ namespace Kaba{
 Gui::Font* __LoadFont(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER(return Gui::LoadFont(filename))
-	return NULL;
+	return nullptr;
 }
 
 Model* __LoadModel(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER(return LoadModelFull(filename));
-	return NULL;
+	return nullptr;
 }
 
 Model* __CreateObject(const string &filename, const vector &pos)
 {
 	KABA_EXCEPTION_WRAPPER(return GodCreateObject(filename, filename, pos, q_id));
-	return NULL;
+	return nullptr;
 }
 
 #pragma GCC pop_options
@@ -69,7 +69,7 @@ Model* __CreateObject(const string &filename, const vector &pos)
 
 
 #else
-	#define x_p(p)		NULL
+	#define x_p(p)		nullptr
 #endif
 
 extern int _class_override_num_params;
@@ -256,7 +256,7 @@ void amd64_getg(vector &r, vector &v)
 {	r = GetG(v);	}
 #define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 #else
-#define amd64_wrap(a, b)	NULL
+#define amd64_wrap(a, b)	nullptr
 #endif
 
 
@@ -963,7 +963,7 @@ void SIAddPackageX()
 	add_func("SplashScreen",					TypeVoid,	x_p(DrawSplashScreen));
 		func_add_param("status",		TypeString);
 		func_add_param("progress",		TypeFloat32);
-	add_func("RenderScene",									TypeVoid, 	NULL);
+	add_func("RenderScene",									TypeVoid, 	nullptr);
 	add_func("GetG",											TypeVector,	amd64_wrap(&GetG, &amd64_getg));
 		func_add_param("pos",		TypeVector);
 	add_func("Trace",											TypeBool,	x_p(&GodTrace));

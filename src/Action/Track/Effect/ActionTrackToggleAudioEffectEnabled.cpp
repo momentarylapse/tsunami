@@ -10,7 +10,7 @@
 
 ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(AudioEffect *_fx)
 {
-	_fx = fx;
+	fx = _fx;
 }
 
 void *ActionTrackToggleEffectEnabled::execute(Data *d)
@@ -18,7 +18,7 @@ void *ActionTrackToggleEffectEnabled::execute(Data *d)
 	fx->enabled = !fx->enabled;
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackToggleEffectEnabled::undo(Data *d)

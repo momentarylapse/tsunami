@@ -30,11 +30,11 @@ SongRenderer::SongRenderer(Song *s)
 	module_subtype = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
-	beat_midifier = NULL;
-	bar_streamer = NULL;
+	beat_midifier = nullptr;
+	bar_streamer = nullptr;
 	channels = 2;
 
-	preview_effect = NULL;
+	preview_effect = nullptr;
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
@@ -231,7 +231,7 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 
 	// apply global fx
 	if (song->fx.num > 0)
-		apply_fx(buf, NULL, song->fx);
+		apply_fx(buf, nullptr, song->fx);
 
 	unapply_curves(song);
 }
@@ -293,12 +293,12 @@ void SongRenderer::clear_data()
 
 	if (beat_midifier){
 		delete beat_midifier;
-		beat_midifier = NULL;
+		beat_midifier = nullptr;
 	}
 
 	if (bar_streamer){
 		delete bar_streamer;
-		bar_streamer = NULL;
+		bar_streamer = nullptr;
 	}
 
 	allowed_tracks.clear();

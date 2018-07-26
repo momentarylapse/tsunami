@@ -134,8 +134,8 @@ MidiPreview::MidiPreview(Session *s)
 {
 	session = s;
 	source = new MidiPreviewSource;
-	stream = NULL;
-	synth = NULL;
+	stream = nullptr;
+	synth = nullptr;
 }
 
 MidiPreview::~MidiPreview()
@@ -185,9 +185,9 @@ void MidiPreview::kill()
 		stream->stop();
 		delete stream;
 	}
-	stream = NULL;
+	stream = nullptr;
 	if (synth)
 		delete synth;
-	synth = NULL;
+	synth = nullptr;
 }
 

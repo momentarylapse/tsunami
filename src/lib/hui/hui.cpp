@@ -76,7 +76,7 @@ string ComboBoxSeparator;
 
 
 #ifdef HUI_API_GTK
-	void *invisible_cursor = NULL;
+	void *invisible_cursor = nullptr;
 #endif
 
 Array<HuiImage> _all_images_;
@@ -168,7 +168,7 @@ void _MakeUsable_()
 #ifdef HUI_API_WIN
 
 	//InitCommonControls(); comctl32.lib
-	CoInitialize(NULL);
+	CoInitialize(nullptr);
 	//WinStandartFont=CreateFont(8,0,0,0,FW_NORMAL,FALSE,FALSE,0,ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,DEFAULT_PITCH|FF_SWISS,"MS Sans Serif");
 	hui_win_default_font=(HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
@@ -176,7 +176,7 @@ void _MakeUsable_()
 
 #endif
 #ifdef HUI_API_GTK
-	gtk_init(NULL, NULL);
+	gtk_init(nullptr, nullptr);
 	#ifdef OS_LINUX
 #if HAS_LIB_XLIB
 		x_display = XOpenDisplay(0);

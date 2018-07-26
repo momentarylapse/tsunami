@@ -27,7 +27,7 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 {
 	GetPartStrings(title);
 
-	GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
+	GtkWidget *sw = gtk_scrolled_window_new(nullptr, nullptr);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	// "model"
@@ -45,7 +45,7 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 	// frame
 	frame = sw;
 	if (panel->border_width > 0){
-		frame = gtk_frame_new(NULL);
+		frame = gtk_frame_new(nullptr);
 		gtk_container_add(GTK_CONTAINER(frame), sw);
 	}
 	gtk_container_add(GTK_CONTAINER(sw), view);
@@ -107,7 +107,7 @@ void ControlTreeView::__addString(const string& str)
 	GtkTreeIter iter;
 	GetPartStrings(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
-	gtk_tree_store_append(store, &iter, NULL);
+	gtk_tree_store_append(store, &iter, nullptr);
 	for (int j=0;j<PartString.num;j++)
 		set_tree_cell(store, iter, j, PartString[j]);
 	_item_.add(iter);
@@ -119,7 +119,7 @@ void ControlTreeView::__setInt(int i)
 	if (i >= 0){
 		gtk_tree_selection_select_iter(sel, &_item_[i]);
 		GtkTreePath *path = gtk_tree_path_new_from_indices(i, -1);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(widget), path, NULL, false, 0, 0);
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(widget), path, nullptr, false, 0, 0);
 		gtk_tree_path_free(path);
 	}else
 		gtk_tree_selection_unselect_all(sel);

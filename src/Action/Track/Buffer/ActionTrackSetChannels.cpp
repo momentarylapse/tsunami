@@ -21,7 +21,7 @@ public:
 		for (TrackLayer *l: track->layers)
 			l->channels = track->channels;
 		track->song->notify(Song::MESSAGE_CHANGE_CHANNELS);
-		return NULL;
+		return nullptr;
 	}
 	void undo(Data *d) override
 	{ execute(d); }

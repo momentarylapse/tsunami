@@ -18,8 +18,8 @@ ModuleConsole::ModuleConsole(Session* session) :
 
 	fromResource("module_console");
 
-	module = NULL;
-	module_panel = NULL;
+	module = nullptr;
+	module_panel = nullptr;
 
 	event("edit_song", std::bind(&ModuleConsole::onEditSong, this));
 }
@@ -33,10 +33,10 @@ void ModuleConsole::clear()
 {
 	if (module_panel)
 		delete module_panel;
-	module_panel = NULL;
+	module_panel = nullptr;
 	if (module)
 		module->unsubscribe(this);
-	module = NULL;
+	module = nullptr;
 	reset("category");
 	reset("sub_category");
 }

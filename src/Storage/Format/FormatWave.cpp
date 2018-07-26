@@ -107,7 +107,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 	Track *t = od->track;
 
 	char *data = new char[CHUNK_SIZE];
-	File *f = NULL;
+	File *f = nullptr;
 
 	try{
 		f = FileOpen(od->filename);

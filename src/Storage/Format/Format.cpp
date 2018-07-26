@@ -60,9 +60,9 @@ bool FormatDescriptor::testFormatCompatibility(Song *a)
 
 Format::Format()
 {
-	song = NULL;
-	od = NULL;
-	f = NULL;
+	song = nullptr;
+	od = nullptr;
+	f = nullptr;
 }
 
 void Format::importData(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)

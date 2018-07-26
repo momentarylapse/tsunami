@@ -42,7 +42,7 @@ void *ActionTrackAdd::execute(Data *d)
 	s->tracks.insert(track, index);
 
 	s->notify(s->MESSAGE_ADD_TRACK);
-	track = NULL;
+	track = nullptr;
 
 	return s->tracks[index];
 }

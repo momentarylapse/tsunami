@@ -20,7 +20,7 @@ void *ActionTrackEditPanning::execute(Data *d)
 	track->panning = new_value;
 	track->notify();
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditPanning::undo(Data *d)

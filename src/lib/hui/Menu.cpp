@@ -99,7 +99,7 @@ Menu *Menu::getSubMenuByID(const string &id)
 				return m;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 

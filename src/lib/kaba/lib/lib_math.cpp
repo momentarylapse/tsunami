@@ -23,13 +23,13 @@ namespace Kaba{
 #ifdef _X_USE_ALGEBRA_
 	#define algebra_p(p)		(void*)p
 #else
-	#define algebra_p(p)		NULL
+	#define algebra_p(p)		nullptr
 #endif
 
 #ifdef _X_USE_ANY_
 	#define any_p(p)		(void*)p
 #else
-	#define any_p(p)		NULL
+	#define any_p(p)		nullptr
 #endif
 
 // we're always using math types

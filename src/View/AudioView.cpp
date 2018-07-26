@@ -211,13 +211,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
-	dummy_vtrack = new AudioViewTrack(this, NULL);
-	dummy_vlayer = new AudioViewLayer(this, NULL);
+	dummy_vtrack = new AudioViewTrack(this, nullptr);
+	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
 	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	// modes
-	mode = NULL;
+	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
 	mode_midi = new ViewModeMidi(this);
 	mode_scale_bars = new ViewModeScaleBars(this);
@@ -250,13 +250,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
-	cur_track = NULL;
-	cur_sample = NULL;
-	cur_layer = NULL;
+	cur_track = nullptr;
+	cur_sample = nullptr;
+	cur_layer = nullptr;
 
 	bars_edit_data = true;
 
-	peak_thread = NULL;
+	peak_thread = nullptr;
 
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
@@ -706,8 +706,8 @@ void AudioView::onSongUpdate()
 			for (TrackLayer *l: t->layers)
 				sel.add(l);
 		}
-		setCurTrack(NULL);
-		setCurLayer(NULL);
+		setCurTrack(nullptr);
+		setCurLayer(nullptr);
 		if (song->tracks.num > 0){
 			if ((song->tracks[0]->type == SignalType::BEATS) and song->tracks.num > 1)
 				setCurTrack(song->tracks[1]);
@@ -806,7 +806,7 @@ void AudioView::updateTracks()
 			if (v){
 				if (v->track == t){
 					vtrack2[ti] = v;
-					vtrack[vi] = NULL;
+					vtrack[vi] = nullptr;
 					found = true;
 					break;
 				}
@@ -830,7 +830,7 @@ void AudioView::updateTracks()
 			if (v){
 				if (v->layer == l){
 					vlayer2[li] = v;
-					vlayer[vi] = NULL;
+					vlayer[vi] = nullptr;
 					found = true;
 					break;
 				}
@@ -1168,7 +1168,7 @@ void AudioView::selectNone()
 {
 	// select all/none
 	setSelection(SongSelection());
-	setCurSample(NULL);
+	setCurSample(nullptr);
 }
 
 inline void test_range(const Range &r, Range &sel, bool &update)

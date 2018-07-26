@@ -323,8 +323,8 @@ public:
 	Node *add_node_parray(Node *p, Node *index, Class *type);
 	Node *add_node_block(Block *b);
 	Node *cp_node(Node *c);
-	Node *ref_node(Node *sub, Class *override_type = NULL);
-	Node *deref_node(Node *sub, Class *override_type = NULL);
+	Node *ref_node(Node *sub, Class *override_type = nullptr);
+	Node *deref_node(Node *sub, Class *override_type = nullptr);
 	Node *shift_node(Node *sub, bool deref, int shift, Class *type);
 
 	// pre processor

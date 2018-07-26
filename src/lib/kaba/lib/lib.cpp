@@ -154,13 +154,13 @@ Class *TypeClassP;
 
 
 Array<Package> Packages;
-Script *cur_package_script = NULL;
+Script *cur_package_script = nullptr;
 int cur_package_index;
 
 
-static Function *cur_func = NULL;
+static Function *cur_func = nullptr;
 static Class *cur_class;
-static ClassFunction *cur_class_func = NULL;
+static ClassFunction *cur_class_func = nullptr;
 
 
 void add_package(const string &name, bool used_by_default)
@@ -251,7 +251,7 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 
 //   with type information
 
-void add_operator(int primitive_op, Class *return_type, Class *param_type1, Class *param_type2, int inline_index, void *func = NULL)
+void add_operator(int primitive_op, Class *return_type, Class *param_type1, Class *param_type2, int inline_index, void *func = nullptr)
 {
 	Operator o;
 	o.primitive_id = primitive_op;
@@ -325,7 +325,7 @@ void _class_add_func_virtual(const string &tname, const string &name, Class *ret
 {
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
-	int cmd = add_func(tname + "." + name + "[virtual]", return_type, NULL, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
+	int cmd = add_func(tname + "." + name + "[virtual]", return_type, nullptr, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), flag);
 	cur_class_func->virtual_index = index;
@@ -436,7 +436,7 @@ void add_const(const string &name, Class *type, void *value)
 void add_ext_var(const string &name, Class *type, void *var)
 {
 	cur_package_script->syntax->root_of_all_evil.block->add_var(name, type);
-	cur_package_script->g_var.add(config.allow_std_lib ? (char*)var : NULL);
+	cur_package_script->g_var.add(config.allow_std_lib ? (char*)var : nullptr);
 };
 
 //------------------------------------------------------------------------------------------------//
@@ -473,7 +473,7 @@ char _cdecl _Int2Char(int i)
 int _cdecl _Char2Int(char c)
 {	return (int)c;	}
 bool _cdecl _Pointer2Bool(void *p)
-{	return (p != NULL);	}
+{	return (p != nullptr);	}
 
 
 #pragma GCC push_options
@@ -529,7 +529,7 @@ void _cdecl ultra_sort(DynamicArray &array, Class *type, const string &by)
 		rel = el->parent;
 	}
 
-	ClassElement *ell = NULL;
+	ClassElement *ell = nullptr;
 	for (auto &e: rel->elements)
 		if (e.name == by)
 			ell = &e;
@@ -580,9 +580,9 @@ int add_func(const string &name, Class *return_type, void *func, ScriptFlag flag
 	f->is_pure = ((flag & FLAG_PURE) > 0);
 	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
 	cur_package_script->syntax->functions.add(f);
-	cur_package_script->func.add(config.allow_std_lib ? (void (*)())func : NULL);
+	cur_package_script->func.add(config.allow_std_lib ? (void (*)())func : nullptr);
 	cur_func = f;
-	cur_class_func = NULL;
+	cur_class_func = nullptr;
 	return cur_package_script->syntax->functions.num - 1;
 }
 
@@ -721,7 +721,7 @@ void CastChar2Int(Value &r, Value &s)
 void CastPointer2Bool(Value &r, Value &s)
 {
 	r.init(TypeBool);
-	r.as_int() = ((*(void**)s.p()) != NULL);
+	r.as_int() = ((*(void**)s.p()) != nullptr);
 }
 void CastInt2String(Value &r, Value &s)
 {
@@ -769,7 +769,7 @@ void add_type_cast(int penalty, Class *source, Class *dest, const string &cmd, v
 		}
 	if (c.func_no < 0){
 #ifdef _X_USE_HUI_
-		hui::ErrorBox(NULL, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
+		hui::ErrorBox(nullptr, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
 		hui::RaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");
 #else
 		msg_error("add_type_cast (ScriptInit): " + string(cmd) + " not found"));
@@ -1068,7 +1068,7 @@ void SIAddPackageBase()
 
 
 	// constants
-	add_const("nil", TypePointer, NULL);
+	add_const("nil", TypePointer, nullptr);
 	add_const("false", TypeBool, (void*)false);
 	add_const("true",  TypeBool, (void*)true);
 
@@ -1450,10 +1450,10 @@ void Init(int instruction_set, int abi, bool allow_std_lib)
 	add_type_cast(50,	TypeFloat64,	TypeString,	"@f642sf",	(void*)&CastFloat642String);
 	add_type_cast(50,	TypeBool,		TypeString,	"@b2s",	(void*)&CastBool2String);
 	add_type_cast(50,	TypePointer,	TypeString,	"p2s",	(void*)&CastPointer2String);
-	add_type_cast(50,	TypeIntList,	TypeString,	"@ia2s",	NULL);
-	add_type_cast(50,	TypeFloatList,	TypeString,	"@fa2s",	NULL);
-	add_type_cast(50,	TypeBoolList,	TypeString,	"@ba2s",	NULL);
-	add_type_cast(50,	TypeStringList,	TypeString,	"@sa2s",	NULL);
+	add_type_cast(50,	TypeIntList,	TypeString,	"@ia2s",	nullptr);
+	add_type_cast(50,	TypeFloatList,	TypeString,	"@fa2s",	nullptr);
+	add_type_cast(50,	TypeBoolList,	TypeString,	"@ba2s",	nullptr);
+	add_type_cast(50,	TypeStringList,	TypeString,	"@sa2s",	nullptr);
 
 	/*msg_write("------------------test");
 	foreach(PreType, t){
@@ -1506,7 +1506,7 @@ void *GetExternalLink(const string &name)
 	for (ExternalLinkData &l: ExternalLinks)
 		if (l.name == name)
 			return l.pointer;
-	return NULL;
+	return nullptr;
 }
 
 void DeclareClassSize(const string &class_name, int size)

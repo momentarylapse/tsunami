@@ -31,7 +31,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d)
 		tt->notify(tt->MESSAGE_CHANGE);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionSongChangeAllTrackVolumes::undo(Data *d)

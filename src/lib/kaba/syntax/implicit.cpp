@@ -484,7 +484,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	b->nodes.add(cmd_assign);
 }
 
-void add_func_headerx(SyntaxTree *s, Class *t, const string &name, Class *return_type, const Array<Class*> &param_types, const Array<string> &param_names, ClassFunction *cf = NULL)
+void add_func_headerx(SyntaxTree *s, Class *t, const string &name, Class *return_type, const Array<Class*> &param_types, const Array<string> &param_names, ClassFunction *cf = nullptr)
 {
 	Function *f = s->AddFunction(name, return_type);
 	f->auto_implement = true;
@@ -498,7 +498,7 @@ void add_func_headerx(SyntaxTree *s, Class *t, const string &name, Class *return
 	t->add_function(s, s->functions.num - 1, false, override);
 }
 
-void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, Class *param_type, const string &param_name, ClassFunction *cf = NULL)
+void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, Class *param_type, const string &param_name, ClassFunction *cf = nullptr)
 {
 	Array<Class*> types;
 	if (param_type != TypeVoid)
@@ -575,22 +575,22 @@ Function* class_get_func(Class *t, const string &name, Class *return_type, int n
 			cf->needs_overriding = false; // we're about to implement....
 			return f;
 		}
-		return NULL;
+		return nullptr;
 	}
 	//t->owner->DoError("class_get_func... " + t->name + "." + name);
-	return NULL;
+	return nullptr;
 }
 
 Function* prepare_auto_impl(Class *t, ClassFunction *cf)
 {
 	if (!cf)
-		return NULL;
+		return nullptr;
 	Function *f = cf->func();
 	if (f->auto_implement){
 		cf->needs_overriding = false; // we're about to implement....
 		return f;
 	}
-	return NULL;
+	return nullptr;
 	t->owner->script->DoErrorInternal("prepare class func..." + t->name + ":  " + cf->signature());
 	return f;
 }

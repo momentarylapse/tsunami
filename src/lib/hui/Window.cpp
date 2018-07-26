@@ -18,7 +18,7 @@ namespace hui
 
 Array<Window*> _all_windows_;
 
-Window *CurWindow = NULL;
+Window *CurWindow = nullptr;
 
 // recursively find a menu item and execute message_function
 /*bool TestMenuID(CHuiMenu *menu, const string &id, message_function *mf)
@@ -49,12 +49,12 @@ void InputData::reset()
 
 Window::Window()
 {
-	_init_("", 0, 0, NULL, true, WIN_MODE_DUMMY);
+	_init_("", 0, 0, nullptr, true, WIN_MODE_DUMMY);
 }
 
 Window::Window(const string &title, int width, int height)
 {
-	_init_(title, width, height, NULL, true, 0);
+	_init_(title, width, height, nullptr, true, 0);
 }
 
 void Window::__init_ext__(const string& title, int width, int height)
@@ -84,11 +84,11 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 	allowed = true;
 	allow_keys = true;
 	parent = _root;
-	main_input_control = NULL;
+	main_input_control = nullptr;
 	if (parent){
 		parent->allowed = _allow_root;
 	}
-	menu = popup = NULL;
+	menu = popup = nullptr;
 	statusbar_enabled = false;
 	toolbar[TOOLBAR_TOP] = new Toolbar(this);
 	toolbar[TOOLBAR_LEFT] = new Toolbar(this, true);

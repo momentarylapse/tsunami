@@ -37,7 +37,7 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 
 	a->notify(a->MESSAGE_DELETE_LAYER);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackLayer__Delete::undo(Data* d)
@@ -45,7 +45,7 @@ void ActionTrackLayer__Delete::undo(Data* d)
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.insert(layer, index);
-	layer = NULL;
+	layer = nullptr;
 
 	a->notify(a->MESSAGE_ADD_LAYER);
 }

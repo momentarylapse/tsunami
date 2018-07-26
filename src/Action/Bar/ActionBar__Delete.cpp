@@ -14,7 +14,7 @@
 ActionBar__Delete::ActionBar__Delete(int _index)
 {
 	index = _index;
-	bar = NULL;
+	bar = nullptr;
 }
 
 void *ActionBar__Delete::execute(Data *d)
@@ -27,7 +27,7 @@ void *ActionBar__Delete::execute(Data *d)
 	s->bars.erase(index);
 	s->notify(s->MESSAGE_EDIT_BARS);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionBar__Delete::undo(Data *d)

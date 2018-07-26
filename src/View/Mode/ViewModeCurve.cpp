@@ -17,8 +17,8 @@
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
-	curve = NULL;
-	cur_track = NULL;
+	curve = nullptr;
+	cur_track = nullptr;
 }
 
 ViewModeCurve::~ViewModeCurve()

@@ -98,8 +98,8 @@ SynthConsole::SynthConsole(Session *session) :
 	event("edit_song", std::bind(&SynthConsole::onEditSong, this));
 	event("edit_track", std::bind(&SynthConsole::onEditTrack, this));
 
-	track = NULL;
-	panel = NULL;
+	track = nullptr;
+	panel = nullptr;
 
 	view->subscribe(this, std::bind(&SynthConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
 }
@@ -146,11 +146,11 @@ void SynthConsole::clear()
 		if (track->synth){
 			track->synth->unsubscribe(this);
 			delete(panel);
-			panel = NULL;
+			panel = nullptr;
 			removeControl("separator_0");
 		}
 	}
-	track = NULL;
+	track = nullptr;
 }
 
 void SynthConsole::setTrack(Track *t)
@@ -173,7 +173,7 @@ void SynthConsole::setTrack(Track *t)
 
 void SynthConsole::onTrackDelete()
 {
-	setTrack(NULL);
+	setTrack(nullptr);
 }
 
 void SynthConsole::onTrackChange()

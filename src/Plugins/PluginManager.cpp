@@ -438,7 +438,7 @@ void PluginManager::LinkAppScriptData()
 	}
 
 	{
-	OutputStream stream(Session::GLOBAL, NULL);
+	OutputStream stream(Session::GLOBAL, nullptr);
 	Kaba::DeclareClassSize("OutputStream", sizeof(OutputStream));
 	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
 	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);
@@ -653,7 +653,7 @@ Plugin *PluginManager::GetPlugin(Session *session, ModuleType type, const string
 		}
 	}
 	session->e(format(_("Can't find %s plugin: %s ..."), Module::type_to_name(type).c_str(), name.c_str()));
-	return NULL;
+	return nullptr;
 }
 
 string PluginManager::plugin_dir()

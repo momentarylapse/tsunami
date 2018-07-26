@@ -9,7 +9,7 @@ ClassElement::ClassElement()
 {
 	hidden = false;
 	offset = 0;
-	type = NULL;
+	type = nullptr;
 }
 
 
@@ -18,8 +18,8 @@ ClassFunction::ClassFunction()
 	nr = -1;
 	virtual_index = -1;
 	needs_overriding = false;
-	return_type = NULL;
-	script = NULL;
+	return_type = nullptr;
+	script = nullptr;
 }
 
 ClassFunction::ClassFunction(const string &_name, Class *_return_type, Script *s, int no)
@@ -89,9 +89,9 @@ Class::Class(const string &_name, int _size, SyntaxTree *_owner, Class *_parent)
 	parent = _parent;
 	force_call_by_value = false;
 	fully_parsed = true;
-	_vtable_location_target_ = NULL;
-	_vtable_location_compiler_ = NULL;
-	_vtable_location_external_ = NULL;
+	_vtable_location_target_ = nullptr;
+	_vtable_location_compiler_ = nullptr;
+	_vtable_location_external_ = nullptr;
 };
 
 Class::~Class()
@@ -155,10 +155,10 @@ Class *Class::get_array_element() const
 	if (is_array or is_super_array)
 		return parent;
 	if (is_pointer)
-		return NULL;
+		return nullptr;
 	if (parent)
 		return parent->get_array_element();
-	return NULL;
+	return nullptr;
 }
 
 bool Class::needs_constructor() const
@@ -243,7 +243,7 @@ ClassFunction *Class::get_func(const string &_name, const Class *return_type, in
 			}else
 				return &f;
 		}
-	return NULL;
+	return nullptr;
 }
 
 ClassFunction *Class::get_same_func(const string &_name, Function *ff) const
@@ -257,7 +257,7 @@ ClassFunction *Class::get_same_func(const string &_name, Function *ff) const
 			if (match)
 				return &f;
 		}
-	return NULL;
+	return nullptr;
 }
 
 ClassFunction *Class::get_default_constructor() const
@@ -295,7 +295,7 @@ ClassFunction *Class::get_get(const Class *index) const
 			continue;
 		return &cf;
 	}
-	return NULL;
+	return nullptr;
 }
 
 ClassFunction *Class::get_virtual_function(int virtual_index) const
@@ -303,7 +303,7 @@ ClassFunction *Class::get_virtual_function(int virtual_index) const
 	for (ClassFunction &f: functions)
 		if (f.virtual_index == virtual_index)
 			return &f;
-	return NULL;
+	return nullptr;
 }
 
 void Class::link_virtual_table()
@@ -421,7 +421,7 @@ void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool overr
 	}
 
 	// override?
-	ClassFunction *orig = NULL;
+	ClassFunction *orig = nullptr;
 	for (ClassFunction &ocf: functions)
 		if (class_func_match(cf, ocf))
 			orig = &ocf;

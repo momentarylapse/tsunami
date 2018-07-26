@@ -15,7 +15,7 @@ ActionTrackDeleteSample::ActionTrackDeleteSample(SampleRef *_ref)
 {
 	layer = _ref->layer;
 	index = _ref->get_index();
-	ref = NULL;
+	ref = nullptr;
 }
 
 ActionTrackDeleteSample::~ActionTrackDeleteSample()
@@ -30,12 +30,12 @@ void* ActionTrackDeleteSample::execute(Data* d)
 
 	ref = layer->samples[index];
 	ref->origin->unref();
-	ref->owner = NULL;
+	ref->owner = nullptr;
 
 	ref->notify(ref->MESSAGE_DELETE);
 	layer->samples.erase(index);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackDeleteSample::undo(Data* d)
@@ -43,7 +43,7 @@ void ActionTrackDeleteSample::undo(Data* d)
 	layer->samples.insert(ref, index);
 	ref->origin->ref();
 	ref->owner = layer->track->song;
-	ref = NULL;
+	ref = nullptr;
 }
 
 

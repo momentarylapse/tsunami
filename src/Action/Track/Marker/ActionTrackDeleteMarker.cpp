@@ -13,7 +13,7 @@ ActionTrackDeleteMarker::ActionTrackDeleteMarker(Track *t, int _index)
 {
 	track = t;
 	index = _index;
-	marker = NULL;
+	marker = nullptr;
 }
 
 void *ActionTrackDeleteMarker::execute(Data *d)
@@ -24,7 +24,7 @@ void *ActionTrackDeleteMarker::execute(Data *d)
 	marker = track->markers[index];
 	track->markers.erase(index);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackDeleteMarker::undo(Data *d)

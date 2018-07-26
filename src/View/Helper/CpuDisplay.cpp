@@ -20,7 +20,7 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	perf_mon = session->perf_mon;
 	view = session->view;
 
-	dlg = NULL;
+	dlg = nullptr;
 
 	if (!hui::Config.getBool("CpuDisplay", false))
 		panel->hideControl(id, true);

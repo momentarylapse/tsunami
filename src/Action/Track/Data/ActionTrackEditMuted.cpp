@@ -21,7 +21,7 @@ void *ActionTrackEditMuted::execute(Data *d)
 	track->muted = temp;
 	track->notify();
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditMuted::undo(Data *d)

@@ -103,7 +103,7 @@ template<class PT, class T>
 class FileChunk : public FileChunkBasic
 {
 public:
-	FileChunk(const string &name) : FileChunkBasic(name){ me = NULL; parent = NULL; }
+	FileChunk(const string &name) : FileChunkBasic(name){ me = nullptr; parent = nullptr; }
 	void *get() override
 	{
 		return me;

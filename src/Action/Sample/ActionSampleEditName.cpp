@@ -25,7 +25,7 @@ void *ActionSampleEditName::execute(Data *d)
 	sample->name = new_value;
 	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionSampleEditName::undo(Data *d)

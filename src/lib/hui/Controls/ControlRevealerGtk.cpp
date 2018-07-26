@@ -24,7 +24,7 @@ ControlRevealer::ControlRevealer(const string &title, const string &id) :
 #else
 	widget = gtk_expander_new(sys_str("<b>Revealer...</b>"));
 	gtk_expander_set_use_markup(GTK_EXPANDER(widget), true);
-	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), NULL);
+	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), nullptr);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
 #endif

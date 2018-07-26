@@ -13,23 +13,23 @@
 #include "../../Device/InputStreamMidi.h"
 #include "../../Module/Audio/AudioSucker.h"
 
-InputStreamAudio *export_view_input = NULL;
-AudioSucker *export_view_sucker = NULL;
+InputStreamAudio *export_view_input = nullptr;
+AudioSucker *export_view_sucker = nullptr;
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
-	input_audio = NULL;
-	input_midi = NULL;
-	export_view_input = NULL;
-	capturing_track = NULL;
+	input_audio = nullptr;
+	input_midi = nullptr;
+	export_view_input = nullptr;
+	capturing_track = nullptr;
 	//console_mode = NULL;
 }
 
 ViewModeCapture::~ViewModeCapture()
 {
-	setInputAudio(NULL);
-	setInputMidi(NULL);
+	setInputAudio(nullptr);
+	setInputMidi(nullptr);
 }
 
 Selection ViewModeCapture::getHover()

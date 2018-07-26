@@ -66,8 +66,8 @@ static string get_obs_name(VirtualBase *o)
 
 ObservableData::Subscription::Subscription()
 {
-	observer = NULL;
-	message = NULL;
+	observer = nullptr;
+	message = nullptr;
 }
 
 ObservableData::Subscription::Subscription(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback, const ObservableData::CallbackP &_callback_p)
@@ -80,8 +80,8 @@ ObservableData::Subscription::Subscription(VirtualBase *o, const string *_messag
 
 ObservableData::Notification::Notification()
 {
-	observer = NULL;
-	message = NULL;
+	observer = nullptr;
+	message = nullptr;
 }
 
 ObservableData::Notification::Notification(VirtualBase *o, const string *_message, const ObservableData::Callback &_callback, const ObservableData::CallbackP &_callback_p)
@@ -95,9 +95,9 @@ ObservableData::Notification::Notification(VirtualBase *o, const string *_messag
 
 ObservableData::ObservableData()
 {
-	me = NULL; // it is only useful, when set by subscribe anyways...
+	me = nullptr; // it is only useful, when set by subscribe anyways...
 	notify_level = 0;
-	cur_message = NULL;
+	cur_message = nullptr;
 }
 
 ObservableData::~ObservableData()

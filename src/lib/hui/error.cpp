@@ -84,9 +84,9 @@ public:
 		string comment = getString("comment");
 		string return_msg;
 		if (NetSendBugReport(sender, Application::getProperty("name"), Application::getProperty("version"), comment, return_msg))
-			InfoBox(NULL, "ok", return_msg);
+			InfoBox(nullptr, "ok", return_msg);
 		else
-			ErrorBox(NULL, "error", return_msg);
+			ErrorBox(nullptr, "error", return_msg);
 		destroy();
 	}
 };
@@ -104,7 +104,7 @@ class ErrorDialog : public Dialog
 {
 public:
 	ErrorDialog() :
-		Dialog(_("Error"), 600, 500, NULL, false)
+		Dialog(_("Error"), 600, 500, nullptr, false)
 	{
 		addGrid("", 0, 0, "root");
 		setTarget("root");
@@ -153,7 +153,7 @@ public:
 
 void hui_default_error_handler()
 {
-	_idle_function_ = NULL;
+	_idle_function_ = nullptr;
 
 	msg_reset_shift();
 	msg_write("");

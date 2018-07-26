@@ -15,7 +15,7 @@
 
 Curve::Target::Target()
 {
-	p = NULL;
+	p = nullptr;
 }
 
 Curve::Target::Target(float *_p)
@@ -51,7 +51,7 @@ string Curve::Target::niceStr(Song *a)
 void Curve::Target::fromString(const string &str, Song *s)
 {
 	auto targets = enumerate(s);
-	p = NULL;
+	p = nullptr;
 	for (auto t: targets)
 		if (t.str(s) == str)
 			*this = t;

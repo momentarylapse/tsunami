@@ -23,7 +23,7 @@ namespace Kaba{
 nix::Texture* __LoadTexture(const string &filename)
 {
 	KABA_EXCEPTION_WRAPPER(return nix::LoadTexture(filename));
-	return NULL;
+	return nullptr;
 }
 
 #pragma GCC pop_options
@@ -36,7 +36,7 @@ nix::Texture* __LoadTexture(const string &filename)
 		typedef int Texture;
 		typedef int Shader;
 	};
-	#define nix_p(p)		NULL
+	#define nix_p(p)		nullptr
 #endif
 
 

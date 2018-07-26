@@ -38,7 +38,7 @@ void* ActionCurveAddPoint::execute(Data* d)
 
 	//a->notify(a->MESSAGE_EDIT_CURVE);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionCurveAddPoint::undo(Data* d)

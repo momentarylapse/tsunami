@@ -45,7 +45,7 @@ long long s2i2(const string &str)
 Class *SyntaxTree::GetConstantType(const string &str)
 {
 	FoundConstantNr = -1;
-	FoundConstantScript = NULL;
+	FoundConstantScript = nullptr;
 
 	// named constants
 	foreachi(Constant *c, constants, i)
@@ -198,7 +198,7 @@ Node *SyntaxTree::GetOperandExtensionElement(Node *operand, Block *block)
 	}
 
 	DoError("unknown element of " + type->name);
-	return NULL;
+	return nullptr;
 }
 
 Node *SyntaxTree::GetOperandExtensionArray(Node *Operand, Block *block)
@@ -289,7 +289,7 @@ Node *SyntaxTree::GetOperandExtension(Node *Operand, Block *block)
 			if (operators[i].primitive_id == op)
 				if ((operators[i].param_type_1 == Operand->type) and (operators[i].param_type_2 == TypeVoid)){
 					Exp.next();
-					return add_node_operator_by_index(Operand, NULL, i);
+					return add_node_operator_by_index(Operand, nullptr, i);
 				}
 		return Operand;
 	}
@@ -357,7 +357,7 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node &link, Block
 	}else
 		DoError("evil special function");
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -560,7 +560,7 @@ Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node> &links, Bloc
 		available += ")";
 	}
 	DoError("invalid function parameters: " + found + ", valid:\n" + available);
-	return NULL;
+	return nullptr;
 
 	/*if (links.num > 1){
 
@@ -600,7 +600,7 @@ Node *build_list(SyntaxTree *ps, Array<Node*> &el)
 
 Node *SyntaxTree::GetOperand(Block *block)
 {
-	Node *operand = NULL;
+	Node *operand = nullptr;
 
 	// ( -> one level down and combine commands
 	if (Exp.cur == "("){
@@ -646,7 +646,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 			if (cfs.num == 0)
 				DoError(format("class \"%s\" does not have a constructor with parameters", t->name.c_str()));
 			operand->set_num_params(1);
-			operand->set_param(0, DoClassFunction(NULL, cfs, block));
+			operand->set_param(0, DoClassFunction(nullptr, cfs, block));
 		}
 	}else if (Exp.cur == "delete"){ // delete operator
 		Exp.next();
@@ -711,7 +711,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 
 				if (!ok)
 					DoError("unknown unitary operator " + PrimitiveOperators[po].name + " " + p2->name, _ie);
-				return add_node_operator_by_index(sub_command, NULL, o);
+				return add_node_operator_by_index(sub_command, nullptr, o);
 			}else{
 
 				// variables etc...
@@ -743,7 +743,7 @@ Node *SyntaxTree::GetPrimitiveOperator(Block *block)
 {
 	int op = WhichPrimitiveOperator(Exp.cur);
 	if (op < 0)
-		return NULL;
+		return nullptr;
 
 	// command from operator
 	Node *cmd = AddNode(KIND_PRIMITIVE_OPERATOR, op, TypeUnknown);
@@ -855,7 +855,7 @@ Node *SyntaxTree::LinkOperator(int op_no, Node *param1, Node *param2)
 {
 	bool left_modifiable = PrimitiveOperators[op_no].left_modifiable;
 	string op_func_name = PrimitiveOperators[op_no].function_name;
-	Node *op = NULL;
+	Node *op = nullptr;
 
 	if (PrimitiveOperators[op_no].id == OPERATOR_IS)
 		return LinkSpecialOperatorIs(this, param1, param2);
@@ -947,7 +947,7 @@ Node *SyntaxTree::LinkOperator(int op_no, Node *param1, Node *param2)
 		return op;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void SyntaxTree::LinkMostImportantOperator(Array<Node*> &Operand, Array<Node*> &Operator, Array<int> &op_exp)
@@ -1027,7 +1027,7 @@ void SyntaxTree::ParseStatementFor(Block *block)
 	Exp.next();
 	Node *val1 = GetCommand(block);
 
-	Node *val_step = NULL;
+	Node *val_step = nullptr;
 	if (Exp.cur == ":"){
 		Exp.next();
 		val_step = GetCommand(block);
@@ -1657,7 +1657,7 @@ void SyntaxTree::ParseClass()
 	Exp.next();
 
 	// create class and type
-	Class *_class = CreateNewClass(name, 0, false, false, false, 0, NULL);
+	Class *_class = CreateNewClass(name, 0, false, false, false, 0, nullptr);
 
 	// parent class
 	if (Exp.cur == IDENTIFIER_EXTENDS){
@@ -1717,7 +1717,7 @@ void SyntaxTree::ParseClass()
 			}
 
 			// override?
-			ClassElement *orig = NULL;
+			ClassElement *orig = nullptr;
 			for (ClassElement &e: _class->elements)
 				if (e.name == el.name) //and e.type->is_pointer and el.type->is_pointer)
 					orig = &e;
@@ -2008,7 +2008,7 @@ Function *SyntaxTree::ParseFunctionHeader(Class *class_type, bool as_extern)
 	f->Update(class_type);
 
 	f->is_extern = as_extern;
-	cur_func = NULL;
+	cur_func = nullptr;
 
 	return f;
 }
@@ -2050,7 +2050,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 	// auto implement destructor?
 	if (f->name.tail(11) == "." + IDENTIFIER_FUNC_DELETE)
 		AutoImplementDestructor(f, f->_class);
-	cur_func = NULL;
+	cur_func = nullptr;
 
 	Exp.cur_line --;
 }
@@ -2063,7 +2063,7 @@ void SyntaxTree::ParseAllClassNames()
 			if (Exp.cur == IDENTIFIER_CLASS){
 				Exp.next();
 				int nt0 = classes.num;
-				Class *t = CreateNewClass(Exp.cur, 0, false, false, false, 0, NULL);
+				Class *t = CreateNewClass(Exp.cur, 0, false, false, false, 0, nullptr);
 				if (nt0 == classes.num)
 					DoError("class already exists");
 				t->fully_parsed = false;
@@ -2086,7 +2086,7 @@ void SyntaxTree::ParseAllFunctionBodies()
 void SyntaxTree::Parser()
 {
 	root_of_all_evil.name = "RootOfAllEvil";
-	cur_func = NULL;
+	cur_func = nullptr;
 
 	// syntax analysis
 
@@ -2133,7 +2133,7 @@ void SyntaxTree::Parser()
 
 			// function?
 			if (is_function){
-				ParseFunctionHeader(NULL, next_extern);
+				ParseFunctionHeader(nullptr, next_extern);
 				SkipParsingFunctionBody();
 
 			// global variables

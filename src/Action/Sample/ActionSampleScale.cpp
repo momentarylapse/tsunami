@@ -15,7 +15,7 @@ ActionSampleScale::ActionSampleScale(Sample *s, int _new_size, int _method)
 	sample = s;
 	new_size = _new_size;
 	method = _method;
-	buf = NULL;
+	buf = nullptr;
 }
 
 ActionSampleScale::~ActionSampleScale()

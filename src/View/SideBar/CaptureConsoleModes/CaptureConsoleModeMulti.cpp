@@ -39,7 +39,7 @@ void CaptureConsoleModeMulti::enter()
 		CaptureItem c;
 		int i = items.num;
 		c.track = t;
-		c.device = NULL;
+		c.device = nullptr;
 		c.id_target = "target-" + i2s(i);
 		c.id_type = "type-" + i2s(i);
 		c.id_source = "source-" + i2s(i);

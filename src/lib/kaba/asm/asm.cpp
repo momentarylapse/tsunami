@@ -35,7 +35,7 @@ struct ParserState
 			if (CurrentMetaInfo->mode16)
 				default_size = SIZE_16;
 
-		list = NULL;
+		list = nullptr;
 	}
 	void reset(InstructionWithParamsList *_list)
 	{
@@ -57,7 +57,7 @@ struct ParserState
 static ParserState state;
 
 const char *code_buffer;
-MetaInfo *CurrentMetaInfo = NULL;
+MetaInfo *CurrentMetaInfo = nullptr;
 MetaInfo DummyMetaInfo;
 
 int arm_encode_8l4(unsigned int value);
@@ -671,7 +671,7 @@ void *InstructionWithParamsList::get_label_value(const string &name)
 	for (Label &l: label)
 		if (l.name == name)
 			return (void*)l.value;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -844,7 +844,7 @@ bool CPUInstruction::match(InstructionWithParams &iwp)
 //   returns true if mod/rm byte needed
 bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 {
-	ip.reg = NULL;
+	ip.reg = nullptr;
 	ip.reg_group = REG_GROUP_NONE;
 	ip.mrm_mode = MRM_NONE;
 	ip.reg_group = -1;
@@ -1891,8 +1891,8 @@ InstructionParam::InstructionParam()
 {
 	type = PARAMT_NONE;
 	disp = DISP_MODE_NONE;
-	reg = NULL;
-	reg2 = NULL;
+	reg = nullptr;
+	reg2 = nullptr;
 	deref = false;
 	size = SIZE_UNKNOWN;
 	value = 0;
@@ -1997,7 +1997,7 @@ string InstructionWithParams::str(bool hide_size)
 inline void UnfuzzyParam(InstructionParam &p, InstructionParamFuzzy &pf)
 {
 	p.type = pf._type_;
-	p.reg2 = NULL;
+	p.reg2 = nullptr;
 	p.disp = DISP_MODE_NONE;
 	p.reg = pf.reg;
 	if ((p.reg) and (state.extend_mod_rm_base)){
@@ -2114,14 +2114,14 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 				if (rm == 0x03){p.reg = RegisterByID[REG_BP];	p.reg2 = RegisterByID[REG_DI];	p.disp = DISP_MODE_REG2;	}
 				if (rm == 0x04)	p.reg = RegisterByID[REG_SI];
 				if (rm == 0x05)	p.reg = RegisterByID[REG_DI];
-				if (rm == 0x06){p.reg = NULL;	p.type = PARAMT_IMMEDIATE;	}
+				if (rm == 0x06){p.reg = nullptr;	p.type = PARAMT_IMMEDIATE;	}
 				if (rm == 0x07)	p.reg = RegisterByID[REG_BX];
 			}else{
 				p.type = PARAMT_REGISTER;
 				p.deref = true;
 				//if (rm == 0x04){p.reg = NULL;	p.disp = DispModeSIB;	p.type = ParamTImmediate;}//p.type = ParamTInvalid;	Error("kein SIB byte...");}
 				if (rm == 0x04){p.reg = RegisterByID[REG_EAX];	p.disp = DISP_MODE_SIB;	} // eax = provisoric
-				else if (rm == 0x05){p.reg = NULL;	p.type = PARAMT_IMMEDIATE;	}
+				else if (rm == 0x05){p.reg = nullptr;	p.type = PARAMT_IMMEDIATE;	}
 				else
 					p.reg = RegisterByID[GetModRMRegister(rm, SIZE_32, REG_GROUP_GENERAL)];
 			}
@@ -2562,7 +2562,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 
 
 	while(code < end){
-		state.reset(NULL);
+		state.reset(nullptr);
 		opcode = cur;
 		code = cur;
 
@@ -2611,7 +2611,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 			for (int i=0;i<CurrentMetaInfo->bit_change.num;i++)
 				if ((int_p)code-(int_p)orig == CurrentMetaInfo->bit_change[i].offset){
 					state.default_size = (CurrentMetaInfo->bit_change[i].bits == 16) ? SIZE_16 : SIZE_32;
-					state.reset(NULL);
+					state.reset(nullptr);
 					if (state.default_size == SIZE_16)
 						bufstr += "   bits_16\n";
 					else
@@ -2620,7 +2620,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 		}
 
 		// code
-		Register *seg = NULL;
+		Register *seg = nullptr;
 
 		// prefix
 		while (true){
@@ -2665,7 +2665,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 		opcode=cur;
 
 		// instruction
-		CPUInstruction *inst = NULL;
+		CPUInstruction *inst = nullptr;
 		for (CPUInstruction &ci: CPUInstructions){
 			if (ci.code_size == 0)
 				continue;
@@ -2895,7 +2895,7 @@ string FindMnemonic(int &pos)
 void GetParam(InstructionParam &p, const string &param, InstructionWithParamsList &list, int pn)
 {
 	p.type = PARAMT_INVALID;
-	p.reg = NULL;
+	p.reg = nullptr;
 	p.deref = false;
 	p.size = SIZE_UNKNOWN;
 	p.disp = DISP_MODE_NONE;
@@ -4006,7 +4006,7 @@ void AddInstruction(char *oc, int &ocs, int inst, const InstructionParam &p1, co
 	/*if (!CPUInstructions)
 		SetInstructionSet(InstructionSetDefault);*/
 	state.default_size = SIZE_32;
-	state.reset(NULL);
+	state.reset(nullptr);
 	/*msg_write("--------");
 	for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
 		if (InstructionName[i].inst == inst)

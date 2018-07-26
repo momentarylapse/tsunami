@@ -13,7 +13,7 @@ const float PROGRESS_DT = 0.05f;
 
 Progress::Progress(const string &str, hui::Window *parent)
 {
-	dlg = NULL;
+	dlg = nullptr;
 	allow_next = 0;
 	if (parent){
 		dlg = hui::CreateResourceDialog("progress_dialog", parent);
@@ -26,7 +26,7 @@ Progress::Progress(const string &str, hui::Window *parent)
 
 Progress::Progress()
 {
-	dlg = NULL;
+	dlg = nullptr;
 	cancelled = false;
 	allow_next = 0;
 }

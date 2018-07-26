@@ -44,7 +44,7 @@ void* ActionCurveEdit::execute(Data* d)
 
 	a->notify(a->MESSAGE_EDIT_CURVE);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionCurveEdit::undo(Data* d)

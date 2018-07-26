@@ -20,7 +20,7 @@ void *ActionTrackEditVolume::execute(Data *d)
 	track->volume = new_value;
 	track->notify();
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditVolume::undo(Data *d)

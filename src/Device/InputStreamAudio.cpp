@@ -188,7 +188,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	buffer(1048576)
 {
 //	printf("input new\n");
-	set_session_etc(_session, "", NULL);
+	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
 	chunk_size = -1;
 	update_dt = DEFAULT_UPDATE_TIME;
@@ -200,10 +200,10 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 
 	capturing = false;
 #if HAS_LIB_PULSEAUDIO
-	pulse_stream = NULL;
+	pulse_stream = nullptr;
 #endif
 #if HAS_LIB_PORTAUDIO
-	portaudio_stream = NULL;
+	portaudio_stream = nullptr;
 #endif
 
 	out = new Output(this);
@@ -216,7 +216,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 		playback_delay_const = device->latency;
 		num_channels = device->channels;
 	}
-	backup_file = NULL;
+	backup_file = nullptr;
 	backup_mode = BACKUP_MODE_NONE;
 
 	running = false;
@@ -318,7 +318,7 @@ void InputStreamAudio::_stop()
 	if (portaudio_stream){
 		PaError err = Pa_CloseStream(portaudio_stream);
 		_portaudio_test_error(err, "Pa_CloseStream");
-		portaudio_stream = NULL;
+		portaudio_stream = nullptr;
 	}
 #endif
 
@@ -326,7 +326,7 @@ void InputStreamAudio::_stop()
 	buffer.clear();
 	if (backup_file){
 		BackupManager::done(backup_file);
-		backup_file = NULL;
+		backup_file = nullptr;
 		//if (backup_mode != BACKUP_MODE_KEEP)
 		//	file_delete(cur_backup_filename);
 	}
@@ -348,7 +348,7 @@ bool InputStreamAudio::start()
 		ss.rate = _sample_rate;
 		ss.channels = 2;
 		ss.format = PA_SAMPLE_FLOAT32LE;
-		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, NULL);
+		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
 		_pulse_test_error("pa_stream_new");
 
 
@@ -362,7 +362,7 @@ bool InputStreamAudio::start()
 		attr_in.minreq = -1;
 		attr_in.tlength = -1;
 		attr_in.prebuf = -1;
-		const char *dev = NULL;
+		const char *dev = nullptr;
 		if (!device->is_default())
 			dev = device->internal_name.c_str();
 		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
@@ -391,9 +391,9 @@ bool InputStreamAudio::start()
 			params.channelCount = num_channels;
 			params.sampleFormat = paFloat32;
 			params.device = device->index_in_lib;
-			params.hostApiSpecificStreamInfo = NULL;
+			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, &params, NULL, _sample_rate, 256,
+			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, 256,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}

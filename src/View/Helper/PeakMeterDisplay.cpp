@@ -18,7 +18,7 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 {
 	panel = _panel;
 	id = _id;
-	source = NULL;
+	source = nullptr;
 	view = _view;
 	enabled = false;
 	r = new PeakMeterData;
@@ -35,7 +35,7 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 
 PeakMeterDisplay::~PeakMeterDisplay()
 {
-	setSource(NULL);
+	setSource(nullptr);
 	delete r;
 	delete l;
 }

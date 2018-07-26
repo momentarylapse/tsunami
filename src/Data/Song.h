@@ -106,7 +106,7 @@ public:
 	void _cdecl setDefaultFormat(SampleFormat format);
 	void _cdecl setCompression(int compression);
 	Track *_cdecl addTrack(SignalType type, int index = -1);
-	Track *_cdecl addTrackAfter(SignalType type, Track *insert_after = NULL);
+	Track *_cdecl addTrackAfter(SignalType type, Track *insert_after = nullptr);
 	void _cdecl deleteTrack(Track *track);
 	Sample *_cdecl addSample(const string &name, AudioBuffer &buf);
 	void _cdecl deleteSample(Sample *s);

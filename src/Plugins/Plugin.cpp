@@ -13,7 +13,7 @@
 
 Plugin::Plugin(const string &_filename, ModuleType _type)
 {
-	s = NULL;
+	s = nullptr;
 	type = _type;
 	filename = _filename;
 	index = -1;
@@ -37,12 +37,12 @@ string Plugin::get_error()
 void *Plugin::create_instance(Session *session, const string &root_type)
 {
 	if (!usable)
-		return NULL;
+		return nullptr;
 
 	for (auto *t : s->syntax->classes){
 		if (t->is_derived_from(root_type))
 			return t->create_instance();
 	}
 	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));
-	return NULL;
+	return nullptr;
 }

@@ -15,7 +15,7 @@ ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
 {
 	track = t;
 	index = _index;
-	effect = NULL;
+	effect = nullptr;
 }
 
 ActionTrackDeleteEffect::~ActionTrackDeleteEffect()
@@ -45,7 +45,7 @@ void *ActionTrackDeleteEffect::execute(Data *d)
 		a->notify(a->MESSAGE_DELETE_EFFECT);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackDeleteEffect::undo(Data *d)
@@ -64,6 +64,6 @@ void ActionTrackDeleteEffect::undo(Data *d)
 		a->fx.insert(effect, index);
 		a->notify(a->MESSAGE_ADD_EFFECT);
 	}
-	effect = NULL;
+	effect = nullptr;
 }
 

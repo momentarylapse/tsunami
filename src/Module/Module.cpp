@@ -152,7 +152,7 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 		pos ++; // ']'
 	}else if (type->name == "SampleRef*"){
 		string ss = get_next(s, pos);
-		*(SampleRef**)v = NULL;
+		*(SampleRef**)v = nullptr;
 		if ((ss != "nil") and song){
 			int n = ss._int();
 			if ((n >= 0) and (n < song->samples.num)){
@@ -176,7 +176,7 @@ Module::Module(ModuleType type)
 	module_type = type;
 	session = Session::GLOBAL;
 	usable = true;
-	plugin = NULL;
+	plugin = nullptr;
 	enabled = true;
 	module_x = module_y = 0;
 	allow_config_in_chain = false;
@@ -186,7 +186,7 @@ Module::~Module()
 {
 	// unlink sources
 	for (auto &pd: port_in)
-		*pd.port = NULL;
+		*pd.port = nullptr;
 }
 
 void Module::__init__(ModuleType type)
@@ -216,14 +216,14 @@ ModuleConfiguration *Module::get_config() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c)
-		return NULL;
+		return nullptr;
 	for (auto &e: c->elements)
 		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
 			ModuleConfiguration *config = (ModuleConfiguration*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
 		}
-	return NULL;
+	return nullptr;
 }
 
 string Module::config_to_string() const
@@ -264,10 +264,10 @@ ConfigPanel *Module::create_panel()
 {
 	ModuleConfiguration *config = get_config();
 	if (!config)
-		return NULL;
+		return nullptr;
 	auto aa = get_auto_conf(config);
 	if (aa.num == 0)
-		return NULL;
+		return nullptr;
 	return new AutoConfigPanel(aa, this);
 }
 
@@ -294,7 +294,7 @@ public:
 	{
 		config = c;
 		panel = p;
-		progress = NULL;
+		progress = nullptr;
 		ok = false;
 
 		setTitle(config->module_subtype);
@@ -423,7 +423,7 @@ Module *Module::copy() const
 	if (!c){
 		if (this->module_type == ModuleType::SYNTHESIZER)
 			return new DummySynthesizer;
-		return NULL;
+		return nullptr;
 	}
 	Module *clone = (Module*)c->create_instance();
 

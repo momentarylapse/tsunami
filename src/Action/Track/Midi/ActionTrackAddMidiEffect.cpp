@@ -25,9 +25,9 @@ void *ActionTrackAddMidiEffect::execute(Data *d)
 {
 	track->midi_fx.add(effect);
 	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
-	effect = NULL;
+	effect = nullptr;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackAddMidiEffect::undo(Data *d)

@@ -33,7 +33,7 @@ PitchDetector::PitchDetector()
 {
 	module_type = ModuleType::PITCH_DETECTOR;
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
-	source = NULL;
+	source = nullptr;
 	loud_enough = false;
 	volume = 0;
 	frequency = 0;

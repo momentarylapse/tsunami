@@ -23,7 +23,7 @@ void* ActionTrackSetInstrument::execute(Data* d)
 
 	track->notify();
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackSetInstrument::undo(Data* d)

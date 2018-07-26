@@ -41,11 +41,11 @@ MidiEffect::MidiEffect() :
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
 	port_in.add(PortDescription(SignalType::MIDI, (Port**)&source, "in"));
-	source = NULL;
+	source = nullptr;
 	only_on_selection = false;
 	bh_offset = 0;
-	bh_song = NULL;
-	bh_midi = NULL;
+	bh_song = nullptr;
+	bh_midi = nullptr;
 }
 
 MidiEffect::~MidiEffect()

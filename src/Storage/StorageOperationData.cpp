@@ -27,15 +27,15 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	channels_suggested = 2;
 	allow_channels_change = false;
 	layer = l;
-	track = NULL;
+	track = nullptr;
 	if (l){
 		track = l->track;
 		channels_suggested = l->channels;
 	}
-	buf = NULL;
+	buf = nullptr;
 
 	offset = 0;
-	renderer = NULL;
+	renderer = nullptr;
 	num_samples = 0;
 	only_load_metadata = false;
 }

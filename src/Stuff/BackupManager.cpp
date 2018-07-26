@@ -33,7 +33,7 @@ void BackupManager::set_save_state(Session *session)
 		if (bf.session == session){
 			session->i(_("deleting backup: ") + bf.filename);
 			file_delete(bf.filename);
-			bf.session = NULL; // auto remove
+			bf.session = nullptr; // auto remove
 		}
 	}
 	_clear_old();
@@ -47,8 +47,8 @@ void BackupManager::check_old_files(Session *session)
 	auto _files = dir_search(tsunami->directory, "backup-*", false);
 	for (auto &f: _files){
 		BackupFile bf;
-		bf.session = NULL;
-		bf.f = NULL;
+		bf.session = nullptr;
+		bf.f = nullptr;
 		bf.filename = tsunami->directory + f.name;
 		files.add(bf);
 	}
@@ -73,7 +73,7 @@ File *BackupManager::create_file(const string &extension, Session *session)
 	}catch(FileError &e){
 		session->e(e.message());
 	}
-	return NULL;
+	return nullptr;
 }
 
 void BackupManager::abort(File *f)
@@ -88,18 +88,18 @@ void BackupManager::done(File *f)
 	auto bf = _find_by_file(f);
 	if (bf){
 		bf->session->i(_("backup done: ") + bf->filename);
-		bf->f = NULL;
+		bf->f = nullptr;
 	}
 }
 
 BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
 {
 	if (!f)
-		return NULL;
+		return nullptr;
 	for (auto &bf: files)
 		if (bf.f == f)
 			return &bf;
-	return NULL;
+	return nullptr;
 }
 
 void BackupManager::_clear_old()

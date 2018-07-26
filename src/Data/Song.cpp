@@ -118,7 +118,7 @@ void Song::deleteTag(int index)
 
 void Song::addEffect(AudioEffect *effect)
 {
-	execute(new ActionTrackAddEffect(NULL, effect));
+	execute(new ActionTrackAddEffect(nullptr, effect));
 }
 
 // execute after editing...
@@ -137,7 +137,7 @@ void Song::deleteEffect(AudioEffect *effect)
 {
 	foreachi (AudioEffect *f, fx, index)
 		if (f == effect)
-			execute(new ActionTrackDeleteEffect(NULL, index));
+			execute(new ActionTrackDeleteEffect(nullptr, index));
 }
 
 void Song::setVolume(float volume)
@@ -517,7 +517,7 @@ Sample* Song::get_sample_by_uid(int uid)
 	for (Sample *s: samples)
 		if (s->uid == uid)
 			return s;
-	return NULL;
+	return nullptr;
 }
 
 AudioEffect *Song::get_fx(Track *track, int index)
@@ -548,7 +548,7 @@ Track *Song::getTimeTrack()
 	for (Track *t: tracks)
 		if (t->type == SignalType::BEATS)
 			return t;
-	return NULL;
+	return nullptr;
 }
 
 string Song::getTag(const string &key)

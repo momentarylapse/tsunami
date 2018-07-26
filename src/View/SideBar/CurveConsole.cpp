@@ -132,7 +132,7 @@ void CurveConsole::onDelete()
 	int n = getInt(id_list);
 	if (n >= 0){
 		song->deleteCurve(song->curves[n]);
-		view->mode_curve->setCurve(NULL);
+		view->mode_curve->setCurve(nullptr);
 	}
 }
 
@@ -152,12 +152,12 @@ void CurveConsole::onTarget()
 
 void CurveConsole::onListSelect()
 {
-	view->mode_curve->setCurve(NULL);
+	view->mode_curve->setCurve(nullptr);
 	int n = getInt(id_list);
 	if (n >= 0){
 		view->mode_curve->setCurve(song->curves[n]);
 	}else{
-		view->mode_curve->setCurve(NULL);
+		view->mode_curve->setCurve(nullptr);
 	}
 	view->forceRedraw();
 }

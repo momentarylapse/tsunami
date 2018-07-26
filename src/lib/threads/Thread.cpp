@@ -49,7 +49,7 @@ int Thread::get_num_cores()
 
 Thread::Thread()
 {
-	internal = NULL;
+	internal = nullptr;
 	running = false;
 	done = false;
 	_Thread_List_.add(this);
@@ -100,7 +100,7 @@ void Thread::run()
 	if (!internal)
 		internal = new ThreadInternal;
 	running = true;
-	internal->thread = CreateThread(NULL, 0, &thread_start_func, (void*)this, 0, NULL);
+	internal->thread = CreateThread(nullptr, 0, &thread_start_func, (void*)this, 0, nullptr);
 
 	if (!internal->thread)
 		running = false;
@@ -137,7 +137,7 @@ Thread *Thread::getSelf()
 	for (Thread *t : _Thread_List_)
 		if (h == t->internal->thread)
 			return t;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -162,7 +162,7 @@ static void *__thread_start_func(void *p)
 	t->done = true;
 
     pthread_cleanup_pop(0);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -176,7 +176,7 @@ void Thread::run()
 	if (!internal)
 		internal = new ThreadInternal;
 	running = true;
-	int ret = pthread_create(&internal->thread, NULL, &__thread_start_func, (void*)this);
+	int ret = pthread_create(&internal->thread, nullptr, &__thread_start_func, (void*)this);
 
 	if (ret != 0)
 		running = false;
@@ -187,7 +187,7 @@ void Thread::kill()
 {
 	if (running){
 		pthread_cancel(internal->thread);
-		pthread_join(internal->thread, NULL);
+		pthread_join(internal->thread, nullptr);
 		//pthread_detach(internal->thread);
 	}
 	running = false;
@@ -196,13 +196,13 @@ void Thread::kill()
 void Thread::join()
 {
 	if (running)
-		pthread_join(internal->thread, NULL);
+		pthread_join(internal->thread, nullptr);
 	running = false;
 }
 
 void Thread::exit()
 {
-	pthread_exit(NULL);
+	pthread_exit(nullptr);
 }
 
 Thread *Thread::get_self()
@@ -212,7 +212,7 @@ Thread *Thread::get_self()
 		if (t->internal)
 			if (t->internal->thread == s)
 				return t;
-	return NULL;
+	return nullptr;
 }
 
 void Thread::cancelation_point()

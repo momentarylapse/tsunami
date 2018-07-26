@@ -198,7 +198,7 @@ Socket *NetListen(int port, bool block)
 	if (s->_create(port, block))
 		return s;
 	delete(s);
-	return NULL;
+	return nullptr;
 }
 
 // host
@@ -219,7 +219,7 @@ Socket *Socket::accept()
 	if (con->s < 0){
 		//so("  -FEHLER");
 		delete(con);
-		return NULL;
+		return nullptr;
 	}else{
 		so(1,"accept...");
 		so(1,"  -ok");
@@ -244,7 +244,7 @@ bool Socket::_connect(const string &addr,int port)
 	so(1,"GetHostByName...");
 		so(1,addr);
 	host = gethostbyname(addr.c_str());
-	if (host == NULL){
+	if (host == nullptr){
 		so(1,"  -ERROR (GetHostByName)");
 		return false;
 	}else
@@ -276,7 +276,7 @@ bool Socket::_connect(const string &addr,int port)
 		struct timeval t;
 		t.tv_sec=0;
 		t.tv_usec=10000;
-		status=select(s+1,&r,&w,NULL,&t);
+		status=select(s+1,&r,&w,nullptr,&t);
 		so(2,format("select: %d  r=%d  w=%d",status,FD_ISSET(s,&r),FD_ISSET(s,&w)));
 		if ((FD_ISSET(s,&w)>0)&&(status>0)){
 			so(2,"test");
@@ -331,7 +331,7 @@ Socket *NetConnect(const string &addr, int port)
 	if (s->_connect(addr, port))
 		return s;
 	delete(s);
-	return NULL;
+	return nullptr;
 }
 
 Socket *NetCreateUDP(int port)
@@ -340,7 +340,7 @@ Socket *NetCreateUDP(int port)
 	if (s->_create(port, true))
 		return s;
 	delete(s);
-	return NULL;
+	return nullptr;
 }
 
 bool Socket::isConnected()
@@ -442,7 +442,7 @@ bool Socket::canWrite()
 	struct timeval t;
 	t.tv_sec = 0;
 	t.tv_usec = 10;
-	select(s+1, NULL, &w, NULL, &t);
+	select(s+1, nullptr, &w, nullptr, &t);
 	return (FD_ISSET(s, &w) > 0);
 }
 
@@ -456,7 +456,7 @@ bool Socket::canRead()
 	struct timeval t;
 	t.tv_sec = 0;
 	t.tv_usec = 10;
-	select(s+1, &r, NULL, NULL, &t);
+	select(s+1, &r, nullptr, nullptr, &t);
 	return (FD_ISSET(s, &r) > 0);
 }
 

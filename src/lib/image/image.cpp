@@ -270,6 +270,6 @@ Image *LoadImage(const string &filename)
 	if (!im->error)
 		return im;
 	delete(im);
-	return NULL;
+	return nullptr;
 }
 

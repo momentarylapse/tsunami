@@ -12,7 +12,7 @@ ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer* l, int _index)
 {
 	layer = l;
 	index = _index;
-	note = NULL;
+	note = nullptr;
 }
 
 ActionTrackDeleteMidiNote::~ActionTrackDeleteMidiNote()
@@ -25,11 +25,11 @@ void* ActionTrackDeleteMidiNote::execute(Data* d)
 {
 	note = layer->midi[index];
 	layer->midi.erase(index);
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackDeleteMidiNote::undo(Data* d)
 {
 	layer->midi.insert(note, index);
-	note = NULL;
+	note = nullptr;
 }

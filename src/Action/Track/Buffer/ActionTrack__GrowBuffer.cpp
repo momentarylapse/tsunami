@@ -23,7 +23,7 @@ void *ActionTrack__GrowBuffer::execute(Data *d)
 	old_length = b.length;
 	b.resize(new_length);
 
-	return NULL;
+	return nullptr;
 }
 
 

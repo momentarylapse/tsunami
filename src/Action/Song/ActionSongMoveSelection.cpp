@@ -55,7 +55,7 @@ void *ActionSongMoveSelection::execute(Data *d)
 		d.note->range.offset = d.pos_old + param;
 	for (MarkerSaveData &d: markers)
 		d.marker->range.offset = d.pos_old + param;
-	return NULL;
+	return nullptr;
 }
 
 

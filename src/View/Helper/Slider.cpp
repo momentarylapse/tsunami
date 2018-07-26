@@ -12,7 +12,7 @@ Slider::Slider()
 	value_min = 0;
 	value_max = 0;
 	factor = 1;
-	panel = NULL;
+	panel = nullptr;
 	event_handler_id[0] = -1;
 	event_handler_id[1] = -1;
 }

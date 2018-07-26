@@ -16,20 +16,20 @@
 #include "Module/SignalChain.h"
 
 int Session::next_id = 0;
-Session *Session::GLOBAL = NULL;
+Session *Session::GLOBAL = nullptr;
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon)
 {
-	win = NULL;
-	view = NULL;
-	_kaba_win = NULL;
-	song = NULL;
+	win = nullptr;
+	view = nullptr;
+	_kaba_win = nullptr;
+	song = nullptr;
 	storage = new Storage(this);
 
-	signal_chain = NULL;
-	song_renderer = NULL;
-	peak_meter = NULL;
-	output_stream = NULL;
+	signal_chain = nullptr;
+	song_renderer = nullptr;
+	peak_meter = nullptr;
+	output_stream = nullptr;
 
 	log = _log;
 	device_manager = _device_manager;

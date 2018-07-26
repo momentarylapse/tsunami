@@ -34,7 +34,7 @@ void *ActionTrack__AbsorbBuffer::execute(Data *d)
 
 	layer->buffers.erase(src);
 
-	return NULL;
+	return nullptr;
 }
 
 

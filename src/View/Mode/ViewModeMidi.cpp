@@ -31,7 +31,7 @@ const int PITCH_SHOW_COUNT = 30;
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
-	cur_layer = NULL;
+	cur_layer = nullptr;
 	beat_partition = 4;
 	note_length = 1;
 	win->setInt("beat_partition", beat_partition);
@@ -410,7 +410,7 @@ void ViewModeMidi::drawLayerPitchGrid(Painter *c, AudioViewLayer *l)
 	// pitch names
 	color cc = view->colors.text;
 	cc.a = 0.4f;
-	Array<SampleRef*> *p = NULL;
+	Array<SampleRef*> *p = nullptr;
 	if ((l->layer->track->synth) and (l->layer->track->synth->module_subtype == "Sample")){
 		auto *c = l->layer->track->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];

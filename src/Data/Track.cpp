@@ -89,7 +89,7 @@ Range TrackLayer::range(int keep_notes) const
 Song *TrackLayer::song() const
 {
 	if (!track)
-		return NULL;
+		return nullptr;
 	return track->song;
 }
 
@@ -122,7 +122,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 	muted = false;
 	volume = 1;
 	panning = 0;
-	song = NULL;
+	song = nullptr;
 
 	volume = 1;
 	muted = false;

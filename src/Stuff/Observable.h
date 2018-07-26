@@ -79,11 +79,11 @@ public:
 	}
 	void subscribe(VirtualBase *observer, const ObservableData::Callback &callback, const string &message = MESSAGE_ANY)
 	{
-		observable_data.subscribe(this, observer, callback, NULL, message);
+		observable_data.subscribe(this, observer, callback, nullptr, message);
 	}
 	void subscribe3(VirtualBase *observer, const ObservableData::CallbackP &callback_p, const string &message = MESSAGE_ANY)
 	{
-		observable_data.subscribe(this, observer, NULL, callback_p, message);
+		observable_data.subscribe(this, observer, nullptr, callback_p, message);
 	}
 	void subscribe_kaba(hui::EventHandler* handler, hui::kaba_member_callback *function, const string &message)
 	{

@@ -20,7 +20,7 @@ void *ActionSongSetSampleRate::execute(Data *d)
 
 	s->sample_rate = new_value;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionSongSetSampleRate::undo(Data *d)

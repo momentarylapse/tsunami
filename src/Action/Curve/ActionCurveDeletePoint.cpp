@@ -32,7 +32,7 @@ void* ActionCurveDeletePoint::execute(Data* d)
 
 	//a->notify(a->MESSAGE_EDIT_CURVE);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionCurveDeletePoint::undo(Data* d)

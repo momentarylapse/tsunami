@@ -18,12 +18,12 @@ void strip(string &s)
 ChunkedFileParser::ChunkedFileParser(int _header_name_size)
 {
 	header_name_size = _header_name_size;
-	base = NULL;
+	base = nullptr;
 }
 
 ChunkedFileParser::Context::Context()
 {
-	f = NULL;
+	f = nullptr;
 }
 
 void ChunkedFileParser::Context::pop()
@@ -57,8 +57,8 @@ string ChunkedFileParser::Context::str()
 FileChunkBasic::FileChunkBasic(const string &_name)
 {
 	name = _name;
-	root = NULL;
-	context = NULL;
+	root = nullptr;
+	context = nullptr;
 }
 FileChunkBasic::~FileChunkBasic()
 {

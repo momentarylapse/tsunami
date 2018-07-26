@@ -61,7 +61,7 @@ AudioSucker::AudioSucker() :
 	Module(ModuleType::AUDIO_SUCKER)
 {
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
-	source = NULL;
+	source = nullptr;
 	accumulating = false;
 	running = false;
 	thread = new AudioSuckerThread(this);
@@ -75,7 +75,7 @@ AudioSucker::~AudioSucker()
 	if (thread){
 		thread->kill();
 		delete(thread);
-		thread = NULL;
+		thread = nullptr;
 	}
 }
 

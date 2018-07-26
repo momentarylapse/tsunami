@@ -26,7 +26,7 @@
 CaptureConsole::CaptureConsole(Session *session):
 	SideBarConsole(_("Recording"), session)
 {
-	mode = NULL;
+	mode = nullptr;
 
 
 	// dialog
@@ -37,7 +37,7 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	peak_meter = new PeakMeterDisplay(this, "level", NULL, view);
+	peak_meter = new PeakMeterDisplay(this, "level", nullptr, view);
 
 
 	event("cancel", std::bind(&CaptureConsole::onCancel, this));

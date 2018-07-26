@@ -175,11 +175,11 @@ DeviceManager::DeviceManager()
 	midi_api = ApiType::NONE;
 
 #if HAS_LIB_PULSEAUDIO
-	pulse_context = NULL;
+	pulse_context = nullptr;
 #endif
 
 #if HAS_LIB_ALSA
-	alsa_midi_handle = NULL;
+	alsa_midi_handle = nullptr;
 #endif
 
 	dummy_device = new Device((DeviceType)-1, "dummy");
@@ -447,7 +447,7 @@ void DeviceManager::_init_audio_pulse()
 	if (_pulse_test_error(session, "pa_context_new"))
 		return;
 
-	pa_context_connect(pulse_context, NULL, (pa_context_flags_t)0, NULL);
+	pa_context_connect(pulse_context, nullptr, (pa_context_flags_t)0, nullptr);
 	if (_pulse_test_error(session, "pa_context_connect"))
 		return;
 
@@ -462,7 +462,7 @@ void DeviceManager::_init_audio_pulse()
 
 	pa_context_set_subscribe_callback(pulse_context, &pa_subscription_callback, this);
 	_pulse_test_error(session, "pa_context_set_subscribe_callback");
-	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
+	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), nullptr, this);
 	_pulse_test_error(session, "pa_context_subscribe");
 #endif
 }
@@ -570,7 +570,7 @@ Device* DeviceManager::get_device(DeviceType type, const string &internal_name)
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
 			return d;
-	return NULL;
+	return nullptr;
 }
 
 Device* DeviceManager::get_device_create(DeviceType type, const string &internal_name)

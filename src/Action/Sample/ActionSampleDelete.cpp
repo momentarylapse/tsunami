@@ -37,7 +37,7 @@ void *ActionSampleDelete::execute(Data *d)
 	sample->unset_owner();
 
 	a->notify(a->MESSAGE_DELETE_SAMPLE);
-	return NULL;
+	return nullptr;
 }
 
 void ActionSampleDelete::undo(Data *d)

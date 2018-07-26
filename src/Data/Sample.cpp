@@ -17,7 +17,7 @@ const string Sample::MESSAGE_UNREFERENCE= "Unreference";
 
 Sample::Sample(SignalType _type)
 {
-	owner = NULL;
+	owner = nullptr;
 	type = _type;
 
 	volume = 1;
@@ -108,6 +108,6 @@ void Sample::unset_owner()
 {
 	if (owner)
 		_pointer_unref();
-	owner = NULL;
+	owner = nullptr;
 }
 

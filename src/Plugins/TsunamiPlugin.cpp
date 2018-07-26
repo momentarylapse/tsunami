@@ -15,8 +15,8 @@ const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
 TsunamiPlugin::TsunamiPlugin()
 {
-	session = NULL;
-	song = NULL;
+	session = nullptr;
+	song = nullptr;
 	active = false;
 }
 
@@ -60,7 +60,7 @@ void TsunamiPlugin::stop()
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
 	Plugin *p = session->plugin_manager->GetPlugin(session, ModuleType::TSUNAMI_PLUGIN, name);
-	TsunamiPlugin *t = NULL;
+	TsunamiPlugin *t = nullptr;
 
 	if (p->usable)
 		t = (TsunamiPlugin*)p->create_instance(session, "TsunamiPlugin");

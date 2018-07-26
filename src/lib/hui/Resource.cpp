@@ -50,7 +50,7 @@ Resource *Resource::get_node(const string &id) const
 		if (ret)
 			return ret;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void LoadResourceCommand7(File *f, Resource *c)
@@ -144,7 +144,7 @@ Resource *GetResource(const string &id)
 			return &r;
 	if (id.num > 0)
 		msg_error("hui resource not found: " + id);
-	return NULL;
+	return nullptr;
 }
 
 Window *CreateResourceDialog(const string &id, Window *root)
@@ -153,13 +153,13 @@ Window *CreateResourceDialog(const string &id, Window *root)
 	Resource *res = GetResource(id);
 	if (!res){
 		msg_error(format("CreateResourceDialog  (id=%s)  m(-_-)m",id.c_str()));
-		return NULL;
+		return nullptr;
 	}
 	
 
 	if ((res->type != "Dialog") and (res->type != "Window")){
 		msg_error("resource type should be Dialog or Window, but is " + res->type);
-		return NULL;
+		return nullptr;
 	}
 
 	string menu_id = res->value("menu");
@@ -219,7 +219,7 @@ Menu *CreateResourceMenu(const string &id)
 	Resource *res = GetResource(id);
 	if (!res){
 		msg_error(format("CreateResourceMenu  (id=%d)  m(-_-)m", id.c_str()).c_str());
-		return NULL;
+		return nullptr;
 	}
 
 	return _create_res_menu_(id, res);

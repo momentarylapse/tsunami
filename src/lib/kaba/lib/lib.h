@@ -27,7 +27,7 @@ class Class;
 struct Value;
 
 
-void script_make_super_array(Class *t, SyntaxTree *ps = NULL);
+void script_make_super_array(Class *t, SyntaxTree *ps = nullptr);
 
 
 extern const string IDENTIFIER_CLASS;

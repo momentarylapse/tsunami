@@ -25,12 +25,12 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
 	chosen_device = cc->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
-	input = NULL;
-	target = NULL;
+	input = nullptr;
+	target = nullptr;
 
-	peak_meter = NULL;
-	preview_synth = NULL;
-	preview_stream = NULL;
+	peak_meter = nullptr;
+	preview_synth = nullptr;
+	preview_stream = nullptr;
 
 	cc->event("source", std::bind(&CaptureConsoleModeMidi::onSource, this));
 }
@@ -97,7 +97,7 @@ void CaptureConsoleModeMidi::enter()
 	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
 	view->mode_capture->setInputMidi(input);
-	cc->peak_meter->setSource(NULL);//input);
+	cc->peak_meter->setSource(nullptr);//input);
 
 	input->set_device(chosen_device);
 
@@ -115,10 +115,10 @@ void CaptureConsoleModeMidi::enter()
 
 void CaptureConsoleModeMidi::leave()
 {
-	cc->peak_meter->setSource(NULL);
-	view->mode_capture->setInputMidi(NULL);
+	cc->peak_meter->setSource(nullptr);
+	view->mode_capture->setInputMidi(nullptr);
 	delete(input);
-	input = NULL;
+	input = nullptr;
 }
 
 void CaptureConsoleModeMidi::pause()

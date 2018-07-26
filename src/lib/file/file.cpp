@@ -104,7 +104,7 @@ Date get_current_date()
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)
 	time_t t;
-	t = time(NULL);
+	t = time(nullptr);
 	Date d;
 	d = time2date(t);
 	timeb tb;

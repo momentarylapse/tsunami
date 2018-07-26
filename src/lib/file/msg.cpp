@@ -41,7 +41,7 @@ static Array<string> TodoStr;
 
 bool msg_inited = false;
 
-static File *file = NULL;
+static File *file = nullptr;
 static string msg_file_name = "message.txt";
 static int Shift;
 
@@ -322,7 +322,7 @@ void msg_end(bool del_file)
 	msg_inited=false;
 	file->close();
 	delete(file);
-	file = NULL;
+	file = nullptr;
 }
 
 void msg_db_out(int dl,const char *str)

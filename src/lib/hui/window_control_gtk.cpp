@@ -47,8 +47,8 @@ extern string OptionString, HuiFormatString;
 #if !GTK_CHECK_VERSION(2,22,0)
 	void gtk_table_get_size(GtkTable *table, guint *rows, guint *columns)
 	{
-		g_object_get(G_OBJECT(table), "n-rows", rows, NULL);
-		g_object_get(G_OBJECT(table), "n-columns", columns, NULL);
+		g_object_get(G_OBJECT(table), "n-rows", rows, nullptr);
+		g_object_get(G_OBJECT(table), "n-columns", columns, nullptr);
 	}
 #endif
 
@@ -64,7 +64,7 @@ extern string OptionString, HuiFormatString;
 	void gtk_combo_box_text_remove_all(GtkComboBoxText *c)
 	{
 		GtkTreeModel *m = gtk_combo_box_get_model(GTK_COMBO_BOX(c));
-		int n = gtk_tree_model_iter_n_children(m, NULL);
+		int n = gtk_tree_model_iter_n_children(m, nullptr);
 		for (int i=0;i<n;i++)
 			gtk_combo_box_text_remove(c, 0);
 	}
@@ -113,7 +113,7 @@ Control *Panel ::_get_control_(const string &id)
 	// search backwards -> multiple AddText()s with identical ids
 	//   will always set their own text
 
-	Control *r = NULL;
+	Control *r = nullptr;
 	apply_foreach(id, [&](Control *c){ r = c; });
 	if (r)
 		return r;
@@ -122,12 +122,12 @@ Control *Panel ::_get_control_(const string &id)
 		// ...test if exists in menu/toolbar before reporting an error!
 		//msg_error("hui: unknown id: '" + id + "'");
 	}
-	return NULL;
+	return nullptr;
 }
 
 Control *Panel::_get_control_by_widget_(GtkWidget *widget)
 {
-	Control *r = NULL;
+	Control *r = nullptr;
 	apply_foreach("*", [&](Control *c){ if (c->widget == widget) r = c; });
 	return r;
 }
@@ -253,7 +253,7 @@ void Panel::addTabControl(const string &title, int x, int y, const string &id)
 
 void Panel::setTarget(const string &id)
 {
-	cur_control = NULL;
+	cur_control = nullptr;
 	if (id.num > 0)
 		cur_control = _get_control_(id);
 }

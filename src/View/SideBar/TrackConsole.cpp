@@ -19,7 +19,7 @@
 TrackConsole::TrackConsole(Session *session) :
 	SideBarConsole(_("Track properties"), session)
 {
-	track = NULL;
+	track = nullptr;
 	setBorderWidth(5);
 	fromResource("track_dialog");
 	setDecimals(1);
@@ -184,7 +184,7 @@ void TrackConsole::onViewCurTrackChange()
 void TrackConsole::onUpdate()
 {
 	if (track->cur_message() == track->MESSAGE_DELETE){
-		setTrack(NULL);
+		setTrack(nullptr);
 	}else{
 		loadData();
 	}

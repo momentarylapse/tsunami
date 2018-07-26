@@ -15,7 +15,7 @@ ConfigPanel::ConfigPanel(Module *_c)
 
 ConfigPanel::ConfigPanel()
 {
-	c = NULL;
+	c = nullptr;
 }
 
 ConfigPanel::~ConfigPanel()

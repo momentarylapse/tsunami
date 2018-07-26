@@ -59,13 +59,13 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
 	}else if (type == ModuleType::OUTPUT_STREAM_AUDIO){
-		return new OutputStream(session, NULL);
+		return new OutputStream(session, nullptr);
 	}else if (type == ModuleType::INPUT_STREAM_AUDIO){
 		return new InputStreamAudio(session);
 	}else if (type == ModuleType::INPUT_STREAM_MIDI){
 		return new InputStreamMidi(session);
 	}
-	return NULL;
+	return nullptr;
 }
 
 Module* ModuleFactory::_create_dummy(ModuleType type)
@@ -82,7 +82,7 @@ Module* ModuleFactory::_create_dummy(ModuleType type)
 		return new AudioEffect;
 	if (type == ModuleType::MIDI_EFFECT)
 		return new MidiEffect;
-	return NULL;
+	return nullptr;
 }
 
 string ModuleFactory::base_class(ModuleType type)
@@ -92,8 +92,8 @@ string ModuleFactory::base_class(ModuleType type)
 
 Module* ModuleFactory::create(Session* session, ModuleType type, const string& sub_type)
 {
-	Module *m = NULL;
-	Plugin *p = NULL;
+	Module *m = nullptr;
+	Plugin *p = nullptr;
 
 	// non plug-ins
 	m = _create_special(session, type, sub_type);

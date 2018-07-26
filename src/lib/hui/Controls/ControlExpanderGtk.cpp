@@ -28,7 +28,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 	GetPartStrings(title);
 	widget = gtk_expander_new(sys_str("<b>" + PartString[0] + "</b>"));
 	gtk_expander_set_use_markup(GTK_EXPANDER(widget), true);
-	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), NULL);
+	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), nullptr);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
 	setOptions(OptionString);

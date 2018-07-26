@@ -59,14 +59,14 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		}
 		dir_create(directory);
 	#else // OS_WINDOWS
-		char *ttt = NULL;
+		char *ttt = nullptr;
 		int r = _get_pgmptr(&ttt);
 		filename = ttt;
 		directory = filename.dirname();
 		directory = directory.replace("\\Release\\", "\\");
 		directory = directory.replace("\\Debug\\", "\\");
 		directory = directory.replace("\\Unoptimized\\", "\\");
-		hui_win_instance = (HINSTANCE)GetModuleHandle(NULL);
+		hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
 		directory_static = directory;
 	#endif
 
@@ -85,7 +85,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	ComboBoxSeparator = "\\";
 	_using_language_ = false;
-	SetDefaultErrorHandler(NULL);
+	SetDefaultErrorHandler(nullptr);
 	//msg_write("");
 
 	Config.filename = directory + "config.txt";
@@ -139,9 +139,9 @@ int Application::run()
 	while ((!HuiHaveToExit) and (WM_QUIT!=messages.message)){
 		bool allow=true;
 		if (_idle_function_.is_set())
-			got_message=(PeekMessage(&messages,NULL,0U,0U,PM_REMOVE)!=0);
+			got_message=(PeekMessage(&messages,nullptr,0U,0U,PM_REMOVE)!=0);
 		else
-			got_message=(GetMessage(&messages,NULL,0,0)!=0);
+			got_message=(GetMessage(&messages,nullptr,0,0)!=0);
 		if (got_message){
 			allow=false;
 			TranslateMessage(&messages);
@@ -165,7 +165,7 @@ int Application::run()
 // FIXME: when closing the last window, hard_end() gets called... ignoring onEnd()!!!
 void Application::end()
 {
-	SetIdleFunction(NULL);
+	SetIdleFunction(nullptr);
 
 	onEnd();
 
@@ -175,7 +175,7 @@ void Application::end()
 // ends the system loop of the run() command
 void Application::hard_end()
 {
-	SetIdleFunction(NULL);
+	SetIdleFunction(nullptr);
 
 	foreachb(Window *w, _all_windows_)
 		delete(w);
@@ -216,9 +216,9 @@ void Application::doSingleMainLoop()
 
 	bool allow=true;
 	if (_idle_function_)
-		got_message=(PeekMessage(&messages,NULL,0U,0U,PM_REMOVE)!=0);
+		got_message=(PeekMessage(&messages,nullptr,0U,0U,PM_REMOVE)!=0);
 	else
-		got_message=(GetMessage(&messages,NULL,0,0)!=0);
+		got_message=(GetMessage(&messages,nullptr,0,0)!=0);
 	if (got_message){
 		allow=false;
 		TranslateMessage(&messages);
@@ -239,7 +239,7 @@ void Application::doSingleMainLoop()
 
 	//SetIdleFunction(NULL);
 	do{
-		g_main_context_iteration(NULL, true);
+		g_main_context_iteration(nullptr, true);
 		gtk_main_iteration_do(false);
 	}while (gtk_events_pending());
 

@@ -23,7 +23,7 @@ void *ActionTrack__BufferSetChannels::execute(Data *d)
 	layer->buffers[index].c[1].exchange(temp);
 	std::swap(layer->buffers[index].channels, channels);
 	layer->buffers[index].invalidate_peaks(Range::ALL);
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrack__BufferSetChannels::undo(Data *d)

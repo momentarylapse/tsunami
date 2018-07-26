@@ -48,7 +48,7 @@ int AudioEffect::Output::get_pos(int delta)
 AudioEffect::AudioEffect() :
 	Module(ModuleType::AUDIO_EFFECT)
 {
-	source = NULL;
+	source = nullptr;
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
 	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));

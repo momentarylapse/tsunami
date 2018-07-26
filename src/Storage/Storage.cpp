@@ -75,7 +75,7 @@ bool Storage::load_ex(Song *a, const string &filename, bool only_metadata)
 	session->i(_("loading ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, filename, _("loading ") + d->description, session->win);
+	StorageOperationData od = StorageOperationData(this, f, a, nullptr, filename, _("loading ") + d->description, session->win);
 	od.only_load_metadata = only_metadata;
 
 	a->reset();
@@ -151,7 +151,7 @@ bool Storage::saveBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, buf, filename, _("exporting ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, nullptr, buf, filename, _("exporting ") + f->description, tsunami->_win);
 
 	// save
 	return _saveBufferBox(&od);
@@ -172,7 +172,7 @@ bool Storage::save(Song *a, const string &filename)
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, filename, _("saving ") + d->description, session->win);
+	StorageOperationData od = StorageOperationData(this, f, a, nullptr, filename, _("saving ") + d->description, session->win);
 
 	a->filename = filename;
 
@@ -195,7 +195,7 @@ bool Storage::saveViaRenderer(AudioPort *r, const string &filename, int num_samp
 	session->i(_("exporting ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, filename, _("exporting"), session->win);
+	StorageOperationData od = StorageOperationData(this, f, nullptr, nullptr, filename, _("exporting"), session->win);
 
 	od.renderer = r;
 	od.tags = tags;
@@ -273,12 +273,12 @@ FormatDescriptor *Storage::getFormat(const string &ext, int flags)
 				return d;
 			}else{
 				session->e(_("file format is incompatible for this action: ") + ext);
-				return NULL;
+				return nullptr;
 
 			}
 		}
 	}
 
 	session->e(_("unknown file extension: ") + ext);
-	return NULL;
+	return nullptr;
 }

@@ -79,7 +79,7 @@ StackFrameInfo get_func_from_rip(void *rip)
 {
 	StackFrameInfo r;
 	r.rip = rip;
-	r.f = NULL;
+	r.f = nullptr;
 	r.offset = 1000000;
 
 	// compiled functions
@@ -117,8 +117,8 @@ inline bool ex_type_match(Class *ex_type, Class *catch_type)
 ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 {
 	ExceptionBlockData ebd;
-	ebd.except_block = NULL;
-	ebd.except = NULL;
+	ebd.except_block = nullptr;
+	ebd.except = nullptr;
 
 	Array<Block*> blocks;
 	foreachb (Block *b, s->syntax->blocks)
@@ -158,7 +158,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 }
 
 
-void* rbp2 = NULL;
+void* rbp2 = nullptr;
 
 void relink_return(void *rip, void *rbp, void *rsp)
 {
@@ -200,7 +200,7 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 {
 	Array<StackFrameInfo> trace;
 
-	void **rsp = NULL;
+	void **rsp = nullptr;
 //	msg_write("stack trace");
 //	printf("rbp=%p     ...%p\n", rbp, &rsp);
 
@@ -241,8 +241,8 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 {
 	// get stack frame base pointer rbp
-	void **rbp = NULL;
-	void **rsp = NULL;
+	void **rbp = nullptr;
+	void **rsp = nullptr;
 	asm volatile("movq %%rbp, %0\n\t"
 			"movq %%rsp, %1\n\t"
 		: "=r" (rbp), "=r" (rsp)

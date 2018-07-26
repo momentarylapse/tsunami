@@ -13,7 +13,7 @@ ActionTrackDeleteMidiEffect::ActionTrackDeleteMidiEffect(Track *t, int _index)
 {
 	track = t;
 	index = _index;
-	effect = NULL;
+	effect = nullptr;
 }
 
 ActionTrackDeleteMidiEffect::~ActionTrackDeleteMidiEffect()
@@ -32,7 +32,7 @@ void *ActionTrackDeleteMidiEffect::execute(Data *d)
 	track->midi_fx.erase(index);
 	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackDeleteMidiEffect::undo(Data *d)
@@ -42,6 +42,6 @@ void ActionTrackDeleteMidiEffect::undo(Data *d)
 
 	track->midi_fx.insert(effect, index);
 	track->notify(track->MESSAGE_ADD_MIDI_EFFECT);
-	effect = NULL;
+	effect = nullptr;
 }
 

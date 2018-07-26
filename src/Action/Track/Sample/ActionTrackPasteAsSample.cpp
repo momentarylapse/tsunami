@@ -17,8 +17,8 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 	layer = l;
 	pos = _pos;
 	buf = &_buf;
-	midi = NULL;
-	sample = NULL;
+	midi = nullptr;
+	sample = nullptr;
 	auto_delete = _auto_delete;
 }
 
@@ -26,9 +26,9 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 {
 	layer = l;
 	pos = _pos;
-	buf = NULL;
+	buf = nullptr;
 	midi = &_midi;
-	sample = NULL;
+	sample = nullptr;
 	auto_delete = _auto_delete;
 }
 

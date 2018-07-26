@@ -40,7 +40,7 @@ typedef void *VirtualTable;
 class Class{
 public:
 	//Class();
-	Class(const string &name, int size, SyntaxTree *owner, Class *parent = NULL);
+	Class(const string &name, int size, SyntaxTree *owner, Class *parent = nullptr);
 	~Class();
 	string name;
 	long long size; // complete size of type
@@ -72,7 +72,7 @@ public:
 	Class *get_pointer() const;
 	Class *get_root() const;
 	void add_function(SyntaxTree *s, int func_no, bool as_virtual = false, bool override = false);
-	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = NULL) const;
+	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = nullptr) const;
 	ClassFunction *get_same_func(const string &name, Function *f) const;
 	ClassFunction *get_default_constructor() const;
 	Array<ClassFunction*> get_complex_constructors() const;

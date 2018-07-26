@@ -20,7 +20,7 @@ void *ActionTrackEditName::execute(Data *d)
 	track->name = new_value;
 	track->notify();
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditName::undo(Data *d)

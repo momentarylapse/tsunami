@@ -22,7 +22,7 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 	track->synth->config_from_string(new_value);
 	track->synth->Observable::notify(track->synth->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditSynthesizer::undo(Data *d)

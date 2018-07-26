@@ -28,7 +28,7 @@ void *ActionGroup::addSubAction(Action *a, Data *d)
 
 // to be overwritten by subclasses
 void *ActionGroup::execute_return(Data *d)
-{	return NULL;	}
+{	return nullptr;	}
 
 
 void *ActionGroup::execute(Data *d)

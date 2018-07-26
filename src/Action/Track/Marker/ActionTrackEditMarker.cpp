@@ -26,7 +26,7 @@ void *ActionTrackEditMarker::execute(Data *d)
 	range = marker->range;
 	marker->range = r;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditMarker::undo(Data *d)

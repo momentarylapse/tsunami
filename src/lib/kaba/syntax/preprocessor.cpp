@@ -214,7 +214,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			else if (c->params[i]->kind != KIND_CONSTANT)
 				all_const = false;
 		}
-		void *inst = NULL;
+		void *inst = nullptr;
 		if (c->instance){
 			return c;
 			if (c->instance->kind != KIND_CONSTANT)

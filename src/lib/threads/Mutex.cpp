@@ -40,7 +40,7 @@ Mutex::~Mutex()
 void Mutex::__init__()
 {
 	internal = new MutexInternal;
-	internal->mutex = CreateMutex(NULL, false, NULL);
+	internal->mutex = CreateMutex(nullptr, false, nullptr);
 }
 
 void Mutex::lock()
@@ -72,7 +72,7 @@ Mutex::~Mutex()
 void Mutex::__init__()
 {
 	internal = new MutexInternal;
-	pthread_mutex_init(&internal->mutex, NULL);
+	pthread_mutex_init(&internal->mutex, nullptr);
 }
 
 void Mutex::lock()

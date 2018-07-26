@@ -41,7 +41,7 @@ void *ActionTrackInsertMidi::execute(Data *d)
 	}
 	applied = true;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackInsertMidi::undo(Data *d)

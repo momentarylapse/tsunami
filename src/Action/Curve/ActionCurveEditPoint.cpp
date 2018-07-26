@@ -28,7 +28,7 @@ void* ActionCurveEditPoint::execute(Data* d)
 	old_value = curve->points[index];
 	curve->points[index] = new_value;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionCurveEditPoint::undo(Data* d)

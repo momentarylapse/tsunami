@@ -173,7 +173,7 @@ rect PagePainter::getClip()
 
 Parser::Parser()
 {
-	f = NULL;
+	f = nullptr;
 }
 
 Parser::~Parser()
@@ -293,7 +293,7 @@ void Parser::end()
 
 	f->write_buffer("%%EOF\n");
 	delete f;
-	f = NULL;
+	f = nullptr;
 }
 
 Parser* save(const string& filename)

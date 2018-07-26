@@ -31,10 +31,10 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
 	chosen_device = cc->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
-	input = NULL;
-	peak_meter = NULL;
-	target = NULL;
-	sucker = NULL;
+	input = nullptr;
+	peak_meter = nullptr;
+	target = nullptr;
+	sucker = nullptr;
 
 	cc->event("source", std::bind(&CaptureConsoleModeAudio::onSource, this));
 }
@@ -114,11 +114,11 @@ void CaptureConsoleModeAudio::enter()
 void CaptureConsoleModeAudio::leave()
 {
 	delete sucker;
-	cc->peak_meter->setSource(NULL);
+	cc->peak_meter->setSource(nullptr);
 	delete peak_meter;
-	view->mode_capture->setInputAudio(NULL);
+	view->mode_capture->setInputAudio(nullptr);
 	delete(input);
-	input = NULL;
+	input = nullptr;
 }
 
 void CaptureConsoleModeAudio::pause()
@@ -172,7 +172,7 @@ bool CaptureConsoleModeAudio::insert()
 	Range r = Range(i0, sucker->buf.length);
 	cc->song->action_manager->beginActionGroup();
 
-	TrackLayer *layer = NULL;
+	TrackLayer *layer = nullptr;
 	for (TrackLayer *l: target->layers)
 		if (layer_available(l, r)){
 			layer = l;

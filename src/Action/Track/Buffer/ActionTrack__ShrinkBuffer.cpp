@@ -49,7 +49,7 @@ void *ActionTrack__ShrinkBuffer::execute(Data *d)
 	// shrink
 	b.resize(new_length);
 
-	return NULL;
+	return nullptr;
 }
 
 

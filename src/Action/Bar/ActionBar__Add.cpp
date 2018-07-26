@@ -27,7 +27,7 @@ void *ActionBar__Add::execute(Data *d)
 	s->bars.insert(bar, index);
 	s->notify(s->MESSAGE_EDIT_BARS);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionBar__Add::undo(Data *d)

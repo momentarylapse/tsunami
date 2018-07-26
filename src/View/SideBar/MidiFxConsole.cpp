@@ -115,7 +115,7 @@ MidiFxConsole::MidiFxConsole(Session *session) :
 
 	id_inner = "midi_fx_inner_table";
 
-	track = NULL;
+	track = nullptr;
 	//Enable("add", false);
 	enable("track_name", false);
 
@@ -155,7 +155,7 @@ void MidiFxConsole::onViewCurTrackChange()
 void MidiFxConsole::onTrackDelete()
 {
 	update();
-	setTrack(NULL);
+	setTrack(nullptr);
 }
 
 void MidiFxConsole::onUpdate()
@@ -181,7 +181,7 @@ void MidiFxConsole::clear()
 		removeControl("separator_" + i2s(i));
 	}
 	panels.clear();
-	track = NULL;
+	track = nullptr;
 	//Enable("add", false);
 }
 

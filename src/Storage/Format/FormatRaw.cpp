@@ -59,7 +59,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 	RawConfigData config = GetRawConfigData(od->win);
 
 	char *data = new char[CHUNK_SIZE];
-	File *f = NULL;
+	File *f = nullptr;
 
 	try{
 		f = FileOpen(od->filename);

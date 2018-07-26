@@ -33,9 +33,9 @@ void *ActionTrackAddEffect::execute(Data *d)
 		a->fx.add(effect);
 		a->notify(a->MESSAGE_ADD_EFFECT);
 	}
-	effect = NULL;
+	effect = nullptr;
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackAddEffect::undo(Data *d)

@@ -23,7 +23,7 @@ void *ActionTrackEditMidiEffect::execute(Data *d)
 	fx->config_from_string(new_value);
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditMidiEffect::undo(Data *d)

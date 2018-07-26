@@ -27,7 +27,7 @@ void *ActionTrackEditSample::execute(Data *d)
 	ref->muted = new_value.mute;
 	ref->notify(ref->MESSAGE_CHANGE_BY_ACTION);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditSample::undo(Data *d)

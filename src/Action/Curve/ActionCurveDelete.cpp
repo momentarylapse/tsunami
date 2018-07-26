@@ -11,7 +11,7 @@
 
 ActionCurveDelete::ActionCurveDelete(int _index)
 {
-	curve = NULL;
+	curve = nullptr;
 	index = _index;
 }
 
@@ -30,7 +30,7 @@ void* ActionCurveDelete::execute(Data* d)
 
 	a->notify(a->MESSAGE_DELETE_CURVE);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionCurveDelete::undo(Data* d)
@@ -39,6 +39,6 @@ void ActionCurveDelete::undo(Data* d)
 
 	a->curves.insert(curve, index);
 	a->notify(a->MESSAGE_ADD_CURVE);
-	curve = NULL;
+	curve = nullptr;
 }
 

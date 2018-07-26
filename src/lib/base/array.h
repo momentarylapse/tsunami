@@ -210,7 +210,7 @@ class Array : public DynamicArray
 		}
 		void _cdecl forget()
 		{
-			data = NULL;
+			data = nullptr;
 			allocated = 0;
 			num = 0;
 		}

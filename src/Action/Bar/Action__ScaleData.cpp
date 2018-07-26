@@ -25,7 +25,7 @@ void *Action__ScaleData::execute(Data *d)
 
 	do_scale(s, source, new_size);
 
-	return NULL;
+	return nullptr;
 }
 
 void Action__ScaleData::undo(Data *d)

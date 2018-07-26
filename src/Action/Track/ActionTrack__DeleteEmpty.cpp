@@ -13,7 +13,7 @@
 ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track)
 {
 	index = _track->get_index();
-	track = NULL;
+	track = nullptr;
 }
 
 ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
@@ -45,7 +45,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	track->notify(track->MESSAGE_DELETE);
 	a->tracks.erase(index);
 	a->notify(a->MESSAGE_DELETE_TRACK);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -55,7 +55,7 @@ void ActionTrack__DeleteEmpty::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
-	track = NULL;
+	track = nullptr;
 }
 
 

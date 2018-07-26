@@ -189,7 +189,7 @@ Node *SyntaxTree::add_node_statement(int index)
 	Node *c = AddNode(KIND_STATEMENT, index, TypeVoid);
 
 	c->script = Packages[0].script;
-	c->instance = NULL;
+	c->instance = nullptr;
 	c->set_num_params(Statements[index].num_params);
 
 	return c;
@@ -236,7 +236,7 @@ Node *SyntaxTree::add_node_operator_by_inline(Node *p1, Node *p2, int inline_ind
 			return add_node_operator_by_index(p1, p2, i);
 
 	DoError("operator inline index not found: " + i2s(inline_index));
-	return NULL;
+	return nullptr;
 }
 
 
@@ -264,15 +264,15 @@ Node *SyntaxTree::add_node_block(Block *b)
 SyntaxTree::SyntaxTree(Script *_script) :
 	root_of_all_evil(this, "RootOfAllEvil", TypeVoid)
 {
-	root_of_all_evil.block = AddBlock(&root_of_all_evil, NULL);
+	root_of_all_evil.block = AddBlock(&root_of_all_evil, nullptr);
 
 	flag_string_const_as_cstring = false;
 	flag_immortal = false;
-	cur_func = NULL;
+	cur_func = nullptr;
 	script = _script;
 	asm_meta_info = new Asm::MetaInfo;
 	for_index_count = 0;
-	Exp.cur_line = NULL;
+	Exp.cur_line = nullptr;
 	parser_loop_depth = 0;
 
 	// "include" default stuff
@@ -507,11 +507,11 @@ Function::Function(SyntaxTree *_tree, const string &_name, Class *_return_type)
 {
 	tree = _tree;
 	name = _name;
-	block = NULL;
+	block = nullptr;
 	num_params = 0;
 	return_type = _return_type;
 	literal_return_type = _return_type;
-	_class = NULL;
+	_class = nullptr;
 	is_extern = false;
 	auto_implement = false;
 	is_pure = false;
@@ -543,7 +543,7 @@ Function *SyntaxTree::AddFunction(const string &name, Class *type)
 {
 	Function *f = new Function(this, name, type);
 	functions.add(f);
-	f->block = AddBlock(f, NULL);
+	f->block = AddBlock(f, nullptr);
 	return f;
 }
 
@@ -556,7 +556,7 @@ Node::Node(int _kind, long long _link_no, Script *_script, Class *_type)
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
-	instance = NULL;
+	instance = nullptr;
 	script = _script;
 	ref_count = 0;
 }
@@ -654,7 +654,7 @@ Node exlink_make_var_local(SyntaxTree *ps, Class *t, int var_no)
 	link.kind = KIND_VAR_LOCAL;
 	link.set_num_params(0);
 	link.script = ps->script;
-	link.instance = NULL;
+	link.instance = nullptr;
 	return link;
 }
 
@@ -668,7 +668,7 @@ Node exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 	link.set_num_params(1);
 	link.params[0] = self;
 	link.script = ps->script;
-	link.instance = NULL;
+	link.instance = nullptr;
 	return link;
 }
 
@@ -697,7 +697,7 @@ Array<Node> SyntaxTree::GetExistenceShared(const string &name)
 	link.type = TypeUnknown;
 	link.params.clear();
 	link.script = script;
-	link.instance = NULL;
+	link.instance = nullptr;
 
 	// global variables (=local variables in "RootOfAllEvil")
 	foreachi(Variable &v, root_of_all_evil.var, i)
@@ -741,7 +741,7 @@ Array<Node> SyntaxTree::GetExistence(const string &name, Block *block)
 	link.type = TypeUnknown;
 	link.params.clear();
 	link.script = script;
-	link.instance = NULL;
+	link.instance = nullptr;
 
 	if (block){
 		Function *f = block->function;
@@ -813,7 +813,7 @@ Class *SyntaxTree::FindType(const string &name)
 		for (Class *c: inc->syntax->classes)
 			if (name == c->name)
 				return c;
-	return NULL;
+	return nullptr;
 }
 
 Class *SyntaxTree::CreateNewClass(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub)
@@ -1026,7 +1026,7 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 			continue;
 
 		// convert into   *-return- = param
-		Node *p_ret = NULL;
+		Node *p_ret = nullptr;
 		foreachi(Variable &v, f->var, i)
 			if (v.name == IDENTIFIER_RETURN_VAR){
 				p_ret = ps->AddNode(KIND_VAR_LOCAL, i, v.type);

@@ -48,7 +48,7 @@ ThreadedWork::ThreadedWork()
 	work_given = 0;
 	total_size = 0;
 
-	mx_list = NULL;
+	mx_list = nullptr;
 	// use max. number of cores?
 	int num_threads = Thread::get_num_cores();
 	if (OverwriteThreadNum >= 0)

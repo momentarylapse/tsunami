@@ -11,7 +11,7 @@ string file_dialog_default;
 static GtkWindow *get_window_save(Window *win)
 {
 	_MakeUsable_();
-	return win ? GTK_WINDOW(win->window) : NULL;
+	return win ? GTK_WINDOW(win->window) : nullptr;
 }
 
 // choose a directory (<dir> will be selected initially)
@@ -23,7 +23,7 @@ bool FileDialogDir(Window *win, const string &title, const string &dir/*, const 
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
-												NULL);
+												nullptr);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT){
@@ -57,7 +57,7 @@ bool FileDialogOpen(Window *win,const string &title,const string &dir,const stri
 												GTK_FILE_CHOOSER_ACTION_OPEN,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-open",		GTK_RESPONSE_ACCEPT,
-												NULL);
+												nullptr);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	add_filters(dlg, show_filter, filter);
@@ -89,13 +89,13 @@ static void try_to_ensure_extension(string &filename, const string &filter)
 // file selection for saving
 bool FileDialogSave(Window *win,const string &title,const string &dir,const string &show_filter,const string &filter)
 {
-	GtkWindow *w = win ? GTK_WINDOW(win->window) : NULL;
+	GtkWindow *w = win ? GTK_WINDOW(win->window) : nullptr;
 	GtkWidget* dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
 												"gtk-cancel",	GTK_RESPONSE_CANCEL,
 												"gtk-save",		GTK_RESPONSE_ACCEPT,
-												NULL);
+												nullptr);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	if (file_dialog_default.num > 0)
@@ -197,9 +197,9 @@ void AboutBox(Window *win)
 		strcpy(p, author.c_str());
 		_a_.add(p);
 	}
-	_a_.add(NULL);
+	_a_.add(nullptr);
 
-	GError *error = NULL;
+	GError *error = nullptr;
 	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(Application::getProperty("logo").c_str(), &error);
 	gtk_show_about_dialog(get_window_save(win),
 		"program-name", Application::getProperty("name").c_str(),
@@ -210,7 +210,7 @@ void AboutBox(Window *win)
 		"authors", _a_.data,
 		"logo", _logo,
 		"copyright", Application::getProperty("copyright").c_str(),
-		NULL);
+		nullptr);
 
 	for (char *aa : _a_)
 		delete(aa);

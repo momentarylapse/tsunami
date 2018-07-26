@@ -22,9 +22,9 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	Control(CONTROL_MULTILINEEDIT, id)
 {
 	GetPartStrings(title);
-	GtkTextBuffer *tb = gtk_text_buffer_new(NULL);
+	GtkTextBuffer *tb = gtk_text_buffer_new(nullptr);
 	widget = gtk_text_view_new_with_buffer(tb);
-	GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+	GtkWidget *scroll = gtk_scrolled_window_new(nullptr, nullptr);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_show(scroll);
 	gtk_container_add(GTK_CONTAINER(scroll), widget);
@@ -32,7 +32,7 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	// frame
 	frame = scroll;
 	if (OptionString.find("noframe") < 0){ //(border_width > 0){
-		frame = gtk_frame_new(NULL);
+		frame = gtk_frame_new(nullptr);
 		gtk_container_add(GTK_CONTAINER(frame), scroll);
 	}
 	gtk_widget_set_hexpand(widget, true);
@@ -83,9 +83,9 @@ void ControlMultilineEdit::__setOption(const string &op, const string &value)
 	if (op == "handlekeys"){
 		handle_keys = true;
 		int mask;
-		g_object_get(G_OBJECT(widget), "events", &mask, NULL);
+		g_object_get(G_OBJECT(widget), "events", &mask, nullptr);
 		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
-		g_object_set(G_OBJECT(widget), "events", mask, NULL);
+		g_object_set(G_OBJECT(widget), "events", mask, nullptr);
 		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
 	}

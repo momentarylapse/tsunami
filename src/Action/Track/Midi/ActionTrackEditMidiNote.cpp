@@ -24,7 +24,7 @@ void* ActionTrackEditMidiNote::execute(Data* d)
 	std::swap(note->range.offset, offset);
 	std::swap(note->range.length, length);
 
-	return NULL;
+	return nullptr;
 }
 
 void ActionTrackEditMidiNote::undo(Data* d)

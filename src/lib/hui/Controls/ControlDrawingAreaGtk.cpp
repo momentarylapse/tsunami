@@ -26,8 +26,8 @@ namespace hui
 int GtkAreaMouseSet = -1;
 int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
-static ControlDrawingArea *NixGlArea = NULL;
-GdkGLContext *gtk_gl_context = NULL;
+static ControlDrawingArea *NixGlArea = nullptr;
+GdkGLContext *gtk_gl_context = nullptr;
 
 static Set<ControlDrawingArea*> _recently_deleted_areas;
 
@@ -70,7 +70,7 @@ void OnGtkGLAreaRealize(GtkGLArea *area)
 {
 	//printf("realize...\n");
 	gtk_gl_area_make_current(area);
-	if (gtk_gl_area_get_error(area) != NULL){
+	if (gtk_gl_area_get_error(area) != nullptr){
 		printf("realize: gl area make current error...\n");
 		return;
 	}
@@ -318,7 +318,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	gtk_widget_set_vexpand(widget, true);
 	setOptions(OptionString);
 
-	cur_cairo = NULL;
+	cur_cairo = nullptr;
 }
 
 ControlDrawingArea::~ControlDrawingArea()

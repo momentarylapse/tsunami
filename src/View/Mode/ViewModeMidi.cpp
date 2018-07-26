@@ -33,7 +33,9 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 {
 	cur_layer = NULL;
 	beat_partition = 4;
+	note_length = 1;
 	win->setInt("beat_partition", beat_partition);
+	win->setInt("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
 	creation_mode = CreationMode::NOTE;
 	midi_interval = 3;
@@ -171,7 +173,7 @@ void ViewModeMidi::onKeyDown(int k)
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}
 
-
+		// add note
 		if ((k >= hui::KEY_A) and (k <= hui::KEY_G)){
 			Range r = getMidiEditRange();
 			int number = (k - hui::KEY_A);
@@ -179,10 +181,16 @@ void ViewModeMidi::onKeyDown(int k)
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
 			cur_layer->layer->addMidiNote(new MidiNote(r, pitch, 1.0f));
 			setCursorPos(r.end() + 1, true);
-			//view->updateSelection();
 			startMidiPreview(pitch, 0.1f);
-
 		}
+
+		// add break
+		if (k == hui::KEY_DOT){
+			Range r = getMidiEditRange();
+			setCursorPos(r.end() + 1, true);
+		}
+
+		// select octave
 		if (k == hui::KEY_UP){
 			octave = min(octave + 1, 7);
 			view->forceRedraw();
@@ -193,6 +201,7 @@ void ViewModeMidi::onKeyDown(int k)
 		}
 	}else if (mode == MidiMode::TAB){
 
+		// add note
 		if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
 			Range r = getMidiEditRange();
 			int number = (k - hui::KEY_0);
@@ -203,10 +212,16 @@ void ViewModeMidi::onKeyDown(int k)
 			n->stringno = string_no;
 			cur_layer->layer->addMidiNote(n);
 			setCursorPos(r.end() + 1, true);
-			//view->updateSelection();
 			startMidiPreview(pitch, 0.1f);
-
 		}
+
+		// add break
+		if (k == hui::KEY_DOT){
+			Range r = getMidiEditRange();
+			setCursorPos(r.end() + 1, true);
+		}
+
+		// select string
 		if (k == hui::KEY_UP){
 			string_no = min(string_no + 1, cur_layer->layer->track->instrument.string_pitch.num - 1);
 			view->forceRedraw();
@@ -325,6 +340,12 @@ MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 void ViewModeMidi::setBeatPartition(int partition)
 {
 	beat_partition = partition;
+	view->forceRedraw();
+}
+
+void ViewModeMidi::setNoteLength(int length)
+{
+	note_length = length;
 	view->forceRedraw();
 }
 
@@ -610,6 +631,8 @@ Range ViewModeMidi::getMidiEditRange()
 	int a = song->bars.getPrevSubBeat(view->sel.range.offset+1, beat_partition);
 	int b = song->bars.getNextSubBeat(view->sel.range.end()-1, beat_partition);
 	if (a == b)
+		b = song->bars.getNextSubBeat(b, beat_partition);
+	for (int i=1; i<note_length; i++)
 		b = song->bars.getNextSubBeat(b, beat_partition);
 	return Range(a, b - a);
 }

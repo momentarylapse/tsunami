@@ -46,12 +46,14 @@ public:
 
 	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
 	void setBeatPartition(int partition);
+	void setNoteLength(int length);
 
 	Array<int> getCreationPitch(int base_pitch);
 	Range getMidiEditRange();
 	void startMidiPreview(const Array<int> &pitch, float ttl);
 
 	int beat_partition;
+	int note_length;
 	ChordType chord_type;
 	int chord_inversion;
 	int midi_interval;

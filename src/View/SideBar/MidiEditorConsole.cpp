@@ -61,6 +61,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("mode:tab", std::bind(&MidiEditorConsole::onViewModeTab, this));
 	event("mode:classical", std::bind(&MidiEditorConsole::onViewModeClassical, this));
 	event("beat_partition", std::bind(&MidiEditorConsole::onBeatPartition, this));
+	event("note_length", std::bind(&MidiEditorConsole::onNoteLength, this));
 	event("scale_root", std::bind(&MidiEditorConsole::onScale, this));
 	event("scale_type", std::bind(&MidiEditorConsole::onScale, this));
 	event("midi_edit_mode", std::bind(&MidiEditorConsole::onCreationMode, this));
@@ -167,6 +168,11 @@ void MidiEditorConsole::onScale()
 void MidiEditorConsole::onBeatPartition()
 {
 	view->mode_midi->setBeatPartition(getInt(""));
+}
+
+void MidiEditorConsole::onNoteLength()
+{
+	view->mode_midi->setNoteLength(getInt(""));
 }
 
 void MidiEditorConsole::onCreationMode()

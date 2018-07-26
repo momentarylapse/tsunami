@@ -1476,36 +1476,54 @@ Grid
 
 1
 0
-5
+4
 Text
 me_t_modifier
 
 0
 0
 0
+Grid
+?
+
+1
+0
+4
 RadioButton
 modifier:none
 expandx
-1
+0
 0
 0
 RadioButton
 modifier:sharp
 expandx
-2
+1
 0
 0
 RadioButton
 modifier:flat
 expandx
-3
+2
 0
 0
 RadioButton
 modifier:natural
 expandx
-4
+3
 0
+0
+Text
+t_note_length
+
+0
+1
+0
+SpinButton
+note_length
+range=1:16
+1
+1
 0
 Expander
 me_group_reference
@@ -4263,7 +4281,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-433
+435
 // Text
 /cancel
 Cancel
@@ -4796,9 +4814,15 @@ none
 midi_editor/modifier:sharp
 ♯
 
+midi_editor/note_length
+1
+
 midi_editor/quantize
 Quantize
 Align selected notes to grid of sub beats
+midi_editor/t_note_length
+Length
+
 midi_fx_editor/add
 
 add new effect
@@ -5570,7 +5594,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-544
+546
 // Text
 /cancel
 Abbrechen
@@ -6286,9 +6310,15 @@ nichts
 midi_editor/modifier:sharp
 ♯
 
+midi_editor/note_length
+1
+
 midi_editor/quantize
 Quantisieren
 Markierte Noten am Gitter der Teilschläge ausrichten
+midi_editor/t_note_length
+Länge
+
 midi_fx_editor/add
 
 neuen Effekt hinzufügen

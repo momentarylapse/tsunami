@@ -30,6 +30,7 @@ public:
 
 	void onScale();
 	void onBeatPartition();
+	void onNoteLength();
 	void onViewModeLinear();
 	void onViewModeClassical();
 	void onViewModeTab();

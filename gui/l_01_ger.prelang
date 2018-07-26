@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-545
+547
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1637,6 +1637,12 @@ Takt
 
 popup_time_track_menu/scale_bars
 Skalieren
+
+midi_editor/t_note_length
+Länge
+
+midi_editor/note_length
+1
 
 // Num Language Strings
 184

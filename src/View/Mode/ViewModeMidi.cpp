@@ -31,7 +31,6 @@ const int EDIT_PITCH_SHOW_COUNT = 30;
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
-	cur_layer = nullptr;
 	beat_partition = 4;
 	note_length = 1;
 	win->setInt("beat_partition", beat_partition);
@@ -84,6 +83,16 @@ bool ViewModeMidi::editing(TrackLayer *l)
 	return true;
 }
 
+TrackLayer* ViewModeMidi::cur_layer()
+{
+	return view->cur_layer;
+}
+
+AudioViewLayer* ViewModeMidi::cur_vlayer()
+{
+	return view->cur_vlayer;
+}
+
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
@@ -93,7 +102,7 @@ void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 void ViewModeMidi::onLeftButtonDown()
 {
 	ViewModeDefault::onLeftButtonDown();
-	auto mode = cur_layer->midi_mode;
+	auto mode = cur_vlayer()->midi_mode;
 
 	if (creation_mode == CreationMode::SELECT){
 		setCursorPos(hover->pos, true);
@@ -114,7 +123,7 @@ void ViewModeMidi::onLeftButtonDown()
 		}*/
 		view->msp.start_pos = hover->pos; // TODO ...bad
 		if (mode == MidiMode::TAB){
-			string_no = clampi(hover->clef_position, 0, cur_layer->layer->track->instrument.string_pitch.num - 1);
+			string_no = clampi(hover->clef_position, 0, view->cur_track->instrument.string_pitch.num - 1);
 		}
 	}else if (hover->type == Selection::Type::MIDI_PITCH){
 		view->msp.start_pos = hover->pos; // TODO ...bad
@@ -134,7 +143,7 @@ void ViewModeMidi::onLeftButtonUp()
 	ViewModeDefault::onLeftButtonUp();
 	view->hide_selection = false;
 
-	auto mode = cur_layer->midi_mode;
+	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
@@ -161,8 +170,8 @@ void ViewModeMidi::onMouseMove()
 		//view->forceRedraw();
 	}else if (hover->type == Selection::Type::SCROLL){
 		if (e->lbut){
-			int _pitch_max = (cur_layer->area.y2 + scroll_offset - view->my) / cur_layer->area.height() * (MAX_PITCH - 1.0f);
-			cur_layer->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
+			int _pitch_max = (cur_vlayer()->area.y2 + scroll_offset - view->my) / cur_vlayer()->area.height() * (MAX_PITCH - 1.0f);
+			cur_vlayer()->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}
 }
@@ -173,7 +182,7 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 	n->modifier = mod;
 
 	// dirty hack for clef position...
-	const Clef& clef = m->cur_layer->layer->track->instrument.get_clef();
+	const Clef& clef = m->view->cur_track->instrument.get_clef();
 	NoteModifier dummy;
 	n->clef_position = clef.pitch_to_position(pitch, m->view->midi_scale, dummy);
 	return n;
@@ -181,7 +190,7 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 
 void ViewModeMidi::onKeyDown(int k)
 {
-	auto mode = cur_layer->midi_mode;
+	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (k == hui::KEY_0){
 			modifier = NoteModifier::NONE;
@@ -203,7 +212,7 @@ void ViewModeMidi::onKeyDown(int k)
 			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
-			cur_layer->layer->addMidiNote(make_note(this, r, pitch, modifier));
+			view->cur_layer->addMidiNote(make_note(this, r, pitch, modifier));
 			setCursorPos(r.end() + 1, true);
 			startMidiPreview(pitch, 0.1f);
 		}
@@ -231,10 +240,10 @@ void ViewModeMidi::onKeyDown(int k)
 			int number = (k - hui::KEY_0);
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
-			int pitch = cur_layer->layer->track->instrument.string_pitch[string_no] + number;
+			int pitch = cur_layer()->track->instrument.string_pitch[string_no] + number;
 			MidiNote *n = new MidiNote(r, pitch, 1.0f);
 			n->stringno = string_no;
-			cur_layer->layer->addMidiNote(n);
+			cur_layer()->addMidiNote(n);
 			setCursorPos(r.end() + 1, true);
 			startMidiPreview(pitch, 0.1f);
 		}
@@ -247,7 +256,7 @@ void ViewModeMidi::onKeyDown(int k)
 
 		// select string
 		if (k == hui::KEY_UP){
-			string_no = min(string_no + 1, cur_layer->layer->track->instrument.string_pitch.num - 1);
+			string_no = min(string_no + 1, cur_layer()->track->instrument.string_pitch.num - 1);
 			view->forceRedraw();
 		}
 		if (k == hui::KEY_DOWN){
@@ -390,8 +399,6 @@ void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
 
 void ViewModeMidi::drawLayerPitchGrid(Painter *c, AudioViewLayer *l)
 {
-	cur_layer = l;
-
 	// pitch grid
 	c->setColor(color(0.25f, 0, 0, 0));
 	for (int i=l->pitch_min; i<l->pitch_max; i++){
@@ -472,8 +479,8 @@ Selection ViewModeMidi::getHover()
 
 		/*if (creation_mode != CreationMode::SELECT)*/{
 			if ((mode == MidiMode::CLASSICAL)){
-				s.pitch = cur_layer->y2pitch_classical(my, modifier);
-				s.clef_position = cur_layer->screen_to_clef_pos(my);
+				s.pitch = cur_vlayer()->y2pitch_classical(my, modifier);
+				s.clef_position = cur_vlayer()->screen_to_clef_pos(my);
 				s.modifier = modifier;
 				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -487,7 +494,7 @@ Selection ViewModeMidi::getHover()
 					}
 			}else if ((mode == MidiMode::TAB)){
 				//s.pitch = cur_track->y2pitch_classical(my, modifier);
-				s.clef_position = cur_layer->screen_to_string(my);
+				s.clef_position = cur_vlayer()->screen_to_string(my);
 				s.modifier = modifier;
 				s.type = Selection::Type::CLEF_POSITION;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -500,8 +507,8 @@ Selection ViewModeMidi::getHover()
 						return s;
 					}
 			}else if (mode == MidiMode::LINEAR){
-				s.pitch = cur_layer->y2pitch_linear(my);
-				s.clef_position = cur_layer->y2clef_linear(my, s.modifier);
+				s.pitch = cur_vlayer()->y2pitch_linear(my);
+				s.clef_position = cur_vlayer()->y2clef_linear(my, s.modifier);
 				//s.modifier = modifier;
 				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -528,9 +535,7 @@ Selection ViewModeMidi::getHover()
 void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 {
 	// midi
-	if ((view->cur_layer == l->layer) and (l->layer->type == SignalType::MIDI)){
-		// we're editing this track...
-		cur_layer = l;
+	if (editing(l->layer)){
 
 		/*for (int n: t->reference_tracks)
 			if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))
@@ -567,7 +572,7 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 				c->setColor(view->colors.text);
 			else
 				c->setColor(view->colors.text_soft1);
-			scroll_bar = rect(l->area.x2 - 40, l->area.x2 - 20, l->area.y2 - l->area.height() * cur_layer->pitch_max / (MAX_PITCH - 1.0f), l->area.y2 - l->area.height() * cur_layer->pitch_min / (MAX_PITCH - 1.0f));
+			scroll_bar = rect(l->area.x2 - 40, l->area.x2 - 20, l->area.y2 - l->area.height() * l->pitch_max / (MAX_PITCH - 1.0f), l->area.y2 - l->area.height() * l->pitch_min / (MAX_PITCH - 1.0f));
 			c->drawRect(scroll_bar);
 		}
 	}else{
@@ -604,28 +609,29 @@ void ViewModeMidi::drawPost(Painter *c)
 {
 	ViewModeDefault::drawPost(c);
 
-	auto mode = cur_layer->midi_mode;
+	auto *l = cur_vlayer();
+	auto mode = l->midi_mode;
 	Range r = getMidiEditRange();
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
 
 	c->setColor(view->colors.selection_internal);
 	if (mode == MidiMode::TAB){
-		int y = cur_layer->string_to_screen(string_no);
-		int y1 = y - cur_layer->clef_dy/2;
-		int y2 = y + cur_layer->clef_dy/2;
+		int y = l->string_to_screen(string_no);
+		int y1 = y - l->clef_dy/2;
+		int y2 = y + l->clef_dy/2;
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::CLASSICAL){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = cur_layer->pitch2y_classical(p2);
-		int y2 = cur_layer->pitch2y_classical(p1);
+		int y1 = l->pitch2y_classical(p2);
+		int y2 = l->pitch2y_classical(p1);
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::LINEAR){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = cur_layer->pitch2y_linear(p2);
-		int y2 = cur_layer->pitch2y_linear(p1);
+		int y1 = l->pitch2y_linear(p2);
+		int y2 = l->pitch2y_linear(p1);
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
 }

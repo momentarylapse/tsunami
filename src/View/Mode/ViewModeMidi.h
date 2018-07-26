@@ -74,7 +74,8 @@ public:
 
 	MidiPreview *preview;
 
-	AudioViewLayer *cur_layer;
+	AudioViewLayer *cur_vlayer();
+	TrackLayer *cur_layer();
 	bool editing(TrackLayer *l);
 
 	rect scroll_bar;

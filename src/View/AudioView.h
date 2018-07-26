@@ -226,6 +226,7 @@ public:
 	Track *cur_track;
 	SampleRef *cur_sample;
 	TrackLayer *cur_layer;
+	AudioViewLayer *cur_vlayer;
 
 	bool editingTrack(Track *t);
 	bool editingLayer(TrackLayer *l);

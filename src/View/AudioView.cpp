@@ -253,6 +253,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cur_track = nullptr;
 	cur_sample = nullptr;
 	cur_layer = nullptr;
+	cur_vlayer = nullptr;
 
 	bars_edit_data = true;
 
@@ -1263,6 +1264,7 @@ void AudioView::setCurLayer(TrackLayer *l)
 	if (cur_layer == l)
 		return;
 	cur_layer = l;
+	cur_vlayer = get_layer(l);
 	mode->on_cur_layer_change();
 	forceRedraw();
 	notify(MESSAGE_CUR_LAYER_CHANGE);

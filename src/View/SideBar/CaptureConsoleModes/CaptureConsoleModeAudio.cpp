@@ -30,7 +30,7 @@ extern AudioSucker *export_view_sucker;
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = cc->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
+	chosen_device = nullptr;
 	input = nullptr;
 	peak_meter = nullptr;
 	target = nullptr;
@@ -67,6 +67,7 @@ void CaptureConsoleModeAudio::enterParent()
 
 void CaptureConsoleModeAudio::enter()
 {
+	chosen_device = cc->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
 	sources = cc->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
 	cc->hideControl("single_grid", false);
 

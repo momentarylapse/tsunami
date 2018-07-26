@@ -90,7 +90,7 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)){
 		//printf("----change   %d\n", idx);
 
-		hui::RunLater(0.1f, std::bind(&DeviceManager::update_devices, out));
+		hui::RunLater(0.1f, [out]{ out->update_devices(true); });
 	}
 }
 
@@ -186,8 +186,9 @@ DeviceManager::DeviceManager()
 
 	init();
 
-	if (midi_api == ApiType::ALSA)
-		hui_rep_id = hui::RunRepeated(2.0f, std::bind(&DeviceManager::_update_devices_midi_alsa, this));
+	// only updating alsa makes sense...
+	// pulse sends notifications and portaudio does not refresh internally (-_-)'
+	hui_rep_id = hui::RunRepeated(2.0f, [&]{ _update_devices_midi_alsa(); });
 }
 
 DeviceManager::~DeviceManager()
@@ -236,17 +237,15 @@ void DeviceManager::write_config()
 }
 
 
-void DeviceManager::update_devices()
+// don't poll pulse too much... it will send notifications anyways
+void DeviceManager::update_devices(bool serious)
 {
-	for (Device *d: output_devices)
-		d->present = false;
-	for (Device *d: input_devices)
-		d->present = false;
-
-	if (audio_api == ApiType::PULSE)
-		_update_devices_audio_pulse();
-	else if (audio_api == ApiType::PORTAUDIO)
+	if (audio_api == ApiType::PULSE){
+		if (serious)
+			_update_devices_audio_pulse();
+	}else if (audio_api == ApiType::PORTAUDIO){
 		_update_devices_audio_portaudio();
+	}
 
 	if (midi_api == ApiType::ALSA)
 		_update_devices_midi_alsa();
@@ -261,6 +260,11 @@ void DeviceManager::_update_devices_audio_pulse()
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PULSEAUDIO
+
+	for (Device *d: output_devices)
+		d->present = false;
+	for (Device *d: input_devices)
+		d->present = false;
 
 	// system default
 	auto *def = get_device_create(DeviceType::AUDIO_OUTPUT, "");
@@ -309,6 +313,10 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index)
 void DeviceManager::_update_devices_audio_portaudio()
 {
 #if HAS_LIB_PORTAUDIO
+	for (Device *d: output_devices)
+		d->present = false;
+	for (Device *d: input_devices)
+		d->present = false;
 
 	_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, Pa_GetDefaultOutputDevice());
 	_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, Pa_GetDefaultInputDevice());
@@ -421,7 +429,7 @@ void DeviceManager::init()
 	if (midi_api == ApiType::ALSA)
 		_init_midi_alsa();
 
-	update_devices();
+	update_devices(true);
 
 	initialized = true;
 }
@@ -474,6 +482,8 @@ void DeviceManager::_init_audio_portaudio()
 #if HAS_LIB_PORTAUDIO
 	PaError err = Pa_Initialize();
 	_portaudio_test_error(err, session, "Pa_Initialize");
+
+	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
 #endif
 }
 

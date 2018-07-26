@@ -105,7 +105,7 @@ public:
 
 	Array<OutputStream*> streams;
 
-	void update_devices();
+	void update_devices(bool serious);
 	void _update_devices_midi_alsa();
 	void _update_devices_audio_pulse();
 	void _update_devices_audio_portaudio();

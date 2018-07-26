@@ -24,7 +24,7 @@
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = cc->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
+	chosen_device = nullptr;
 	input = nullptr;
 	target = nullptr;
 
@@ -79,6 +79,7 @@ void CaptureConsoleModeMidi::enterParent()
 
 void CaptureConsoleModeMidi::enter()
 {
+	chosen_device = cc->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
 	sources = cc->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
 	cc->hideControl("single_grid", false);
 

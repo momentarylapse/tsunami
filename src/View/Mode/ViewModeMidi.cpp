@@ -156,6 +156,22 @@ void ViewModeMidi::onMouseMove()
 	}
 }
 
+MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod, float volume = 1.0f)
+{
+	auto *n = new MidiNote(r, pitch, volume);
+	n->modifier = mod;
+
+	// dirty hack for clef position...
+	const Clef& clef = m->cur_layer->layer->track->instrument.get_clef();
+	NoteModifier dummy;
+	n->clef_position = clef.pitch_to_position(pitch, m->view->midi_scale, dummy);
+	if (mod == NoteModifier::SHARP)
+		n->pitch += 1;
+	else if (mod == NoteModifier::FLAT)
+		n->pitch -= 1;
+	return n;
+}
+
 void ViewModeMidi::onKeyDown(int k)
 {
 	auto mode = which_midi_mode(cur_layer->layer->track);
@@ -180,7 +196,7 @@ void ViewModeMidi::onKeyDown(int k)
 			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
-			cur_layer->layer->addMidiNote(new MidiNote(r, pitch, 1.0f));
+			cur_layer->layer->addMidiNote(make_note(this, r, pitch, modifier));
 			setCursorPos(r.end() + 1, true);
 			startMidiPreview(pitch, 0.1f);
 		}

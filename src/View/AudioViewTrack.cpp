@@ -28,6 +28,8 @@
 
 
 const int PITCH_SHOW_COUNT = 30;
+const int PITCH_MIN_DEFAULT = 25;
+const int PITCH_MAX_DEFAULT = 105;
 
 string i2s_small(int i); // -> MidiData.cpp
 
@@ -138,8 +140,11 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 	layer = _layer;
 	solo = false;
 
-	pitch_min = 55;
-	pitch_max = pitch_min + PITCH_SHOW_COUNT;
+	edit_pitch_min = 55;
+	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
+
+	pitch_min = PITCH_MIN_DEFAULT;
+	pitch_max = PITCH_MAX_DEFAULT;
 
 	area = rect(0, 0, 0, 0);
 	height_min = height_wish = 0;
@@ -522,11 +527,11 @@ void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index
 
 
 
-void AudioViewLayer::setPitchMinMax(int _min, int _max)
+void AudioViewLayer::setEditPitchMinMax(int _min, int _max)
 {
 	int diff = _max - _min;
-	pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
-	pitch_max = pitch_min + diff;
+	edit_pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
+	edit_pitch_max = edit_pitch_min + diff;
 	view->forceRedraw();
 }
 
@@ -629,6 +634,13 @@ void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool
 	MidiNoteBufferRef notes = midi.getNotes(range);
 	//c->setLineWidth(3.0f);
 
+	if (layer == view->cur_layer and view->mode == view->mode_midi){
+		pitch_min = edit_pitch_min;
+		pitch_max = edit_pitch_max;
+	}else{
+		pitch_min = PITCH_MIN_DEFAULT;
+		pitch_max = PITCH_MAX_DEFAULT;
+	}
 
 	// draw notes
 	for (MidiNote *n: midi){

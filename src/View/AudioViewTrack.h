@@ -91,8 +91,9 @@ public:
 	int y2clef_classical(float y, NoteModifier &mod);
 	int y2clef_linear(float y, NoteModifier &mod);
 
-	void setPitchMinMax(int pitch_min, int pitch_max);
+	void setEditPitchMinMax(int pitch_min, int pitch_max);
 	int pitch_min, pitch_max;
+	int edit_pitch_min, edit_pitch_max;
 
 
 	float clef_dy;

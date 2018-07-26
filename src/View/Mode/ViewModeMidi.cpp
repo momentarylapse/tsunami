@@ -26,7 +26,7 @@
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
-const int PITCH_SHOW_COUNT = 30;
+const int EDIT_PITCH_SHOW_COUNT = 30;
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
@@ -151,7 +151,7 @@ void ViewModeMidi::onMouseMove()
 	}else if (hover->type == Selection::Type::SCROLL){
 		if (e->lbut){
 			int _pitch_max = (cur_layer->area.y2 + scroll_offset - view->my) / cur_layer->area.height() * (MAX_PITCH - 1.0f);
-			cur_layer->setPitchMinMax(_pitch_max - PITCH_SHOW_COUNT, _pitch_max);
+			cur_layer->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}
 }
@@ -429,7 +429,7 @@ void ViewModeMidi::drawLayerPitchGrid(Painter *c, AudioViewLayer *l)
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->drawStr(20, l->area.y1 + l->area.height() * (l->pitch_max - i - 1) / PITCH_SHOW_COUNT, name);
+		c->drawStr(20, l->area.y1 + l->area.height() * (l->pitch_max - i - 1) / EDIT_PITCH_SHOW_COUNT, name);
 	}
 }
 

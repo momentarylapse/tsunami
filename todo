@@ -147,10 +147,10 @@ j fix barrier system
 J copy/pase
 * apply hand-pos
 * note length via keys
-* better preview pitch-range (linear)
+J better preview pitch-range (linear)
 J linear: track height
-* linear: keys
-* cursor by click
+J linear: keys
+J cursor by click
 
 == refactoring ==
 

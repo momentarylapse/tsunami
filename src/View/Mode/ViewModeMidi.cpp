@@ -127,9 +127,10 @@ void ViewModeMidi::onLeftButtonUp()
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
+			setCursorPos(notes[0]->range.end() + 1, true);
+			octave = pitch_get_octave(hover->pitch);
 			view->cur_layer->addMidiNotes(notes);
 			notes.clear(); // all notes owned by track now
-
 			preview->end();
 		}
 	}

@@ -135,7 +135,8 @@ J Gaussian noise
 J new signal chain file format
 * module auto x/y
 J AudioSource into buffer
-* Area.redraw queued after delete
+J Area.redraw queued after delete
+* midi buffer boxes?
 
 == midi ed ==
 
@@ -145,6 +146,11 @@ J move selection
 j fix barrier system
 J copy/pase
 * apply hand-pos
+* note length via keys
+* better preview pitch-range (linear)
+J linear: track height
+* linear: keys
+* cursor by click
 
 == refactoring ==
 
@@ -154,3 +160,5 @@ J enum class
 * enum descriptors via set?
 J Array initializer_list
 * nullptr
+* TrackLayer in separate file
+* MidiBuffer move/ownership

@@ -158,11 +158,11 @@ void ViewModeMidi::onMouseMove()
 void ViewModeMidi::onKeyDown(int k)
 {
 	auto mode = which_midi_mode(cur_layer->layer->track);
-	if (mode == MidiMode::CLASSICAL){
-		if (k == hui::KEY_1){
+	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
+		if (k == hui::KEY_0){
 			modifier = NoteModifier::NONE;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
-		}else if (k == hui::KEY_2){
+		}else if (k == hui::KEY_FENCE){
 			modifier = NoteModifier::SHARP;
 			view->notify(view->MESSAGE_SETTINGS_CHANGE);
 		}else if (k == hui::KEY_3){
@@ -249,10 +249,13 @@ void ViewModeMidi::updateTrackHeights()
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
 			}else if (t->layer->type == SignalType::MIDI){
 				if (t->layer == view->cur_layer){
-					if (view->midi_view_mode == MidiMode::CLASSICAL)
-						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
-					else
+					auto mode = which_midi_mode(t->layer->track);
+					if (mode == MidiMode::LINEAR)
 						t->height_wish = 5000;
+					else if (mode == MidiMode::CLASSICAL)
+						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 6;
+					else // TAB
+						t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 				}else{
 					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
 				}
@@ -605,8 +608,6 @@ void ViewModeMidi::drawPost(Painter *c)
 	ViewModeDefault::drawPost(c);
 
 	auto mode = which_midi_mode(cur_layer->layer->track);
-	if ((mode != MidiMode::CLASSICAL) and (mode != MidiMode::TAB))
-		return;
 	Range r = getMidiEditRange();
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
@@ -622,6 +623,12 @@ void ViewModeMidi::drawPost(Painter *c)
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = cur_layer->pitch2y_classical(p2);
 		int y2 = cur_layer->pitch2y_classical(p1);
+		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+	}else if (mode == MidiMode::LINEAR){
+		int p1 = pitch_from_octave_and_rel(0, octave);
+		int p2 = pitch_from_octave_and_rel(0, octave+1);
+		int y1 = cur_layer->pitch2y_linear(p2);
+		int y2 = cur_layer->pitch2y_linear(p1);
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
 }

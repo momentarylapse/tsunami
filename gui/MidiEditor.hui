@@ -20,7 +20,7 @@ Dialog midi_editor "Midi" width=380 height=516
 						ComboBox scale_type "" expandx
 			Group me_group_creation "Creation"
 				Grid ? "" vertical
-					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord"
+					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord" left
 						.
 						.
 						Grid me_group_interval ""

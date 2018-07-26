@@ -1419,7 +1419,7 @@ vertical
 2
 TabControl
 midi_edit_mode
-
+left
 0
 0
 2

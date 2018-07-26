@@ -125,10 +125,13 @@ void ControlTabControl::__setOption(const string &op, const string &value)
 		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_TOP);
 	else if (op == "bottom")
 		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_BOTTOM);
-	else if (op == "left")
+	else if (op == "left"){
 		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_LEFT);
-	else if (op == "right")
+		gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), false);
+	}else if (op == "right"){
 		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_RIGHT);
+		gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), false);
+	}
 }
 
 };

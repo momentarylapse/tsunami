@@ -152,4 +152,8 @@ enum class NoteModifier
 string modifier_symbol(NoteModifier mod);
 
 
+int modifier_apply(int pitch, NoteModifier mod);
+int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod);
+
+
 #endif /* SRC_DATA_MIDI_MIDIDATA_H_ */

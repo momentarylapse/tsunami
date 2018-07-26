@@ -90,22 +90,6 @@ bool Scale::contains(int pitch) const
 	return _contains[pitch % 12];
 }
 
-inline int apply_modifier(int pitch, NoteModifier scale_mod, NoteModifier mod)
-{
-	int d = 0;
-	if (scale_mod == NoteModifier::SHARP)
-		d = 1;
-	else if (scale_mod == NoteModifier::FLAT)
-		d = -1;
-	if (mod == NoteModifier::SHARP)
-		d += 1;
-	else if (mod == NoteModifier::FLAT)
-		d -= 1;
-	else if (mod == NoteModifier::NATURAL)
-		d = 0;
-	return pitch + d;
-}
-
 // x in major scale notation
 int Scale::transform_out(int x, NoteModifier mod) const
 {
@@ -114,7 +98,7 @@ int Scale::transform_out(int x, NoteModifier mod) const
 	int octave = x / 7;
 	int rel = x % 7;
 
-	return apply_modifier(pitch_from_octave_and_rel(pp[rel], octave), modifiers[rel], mod);
+	return modifier_apply(pitch_from_octave_and_rel(pp[rel], octave), mod, modifiers[rel]);
 }
 
 

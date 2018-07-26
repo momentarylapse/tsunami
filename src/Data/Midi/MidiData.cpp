@@ -179,6 +179,22 @@ string modifier_symbol(NoteModifier mod)
 	return "?";
 }
 
+int modifier_apply(int pitch, NoteModifier mod)
+{
+	if (mod == NoteModifier::SHARP)
+		return pitch + 1;
+	if (mod == NoteModifier::FLAT)
+		return pitch - 1;
+	return pitch;
+}
+
+int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod)
+{
+	if (mod == NoteModifier::NATURAL)
+		return pitch;
+	return modifier_apply(modifier_apply(pitch, scale_mod), mod);
+}
+
 
 MidiEventBuffer::MidiEventBuffer()
 {

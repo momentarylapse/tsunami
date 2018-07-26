@@ -158,17 +158,13 @@ void ViewModeMidi::onMouseMove()
 
 MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod, float volume = 1.0f)
 {
-	auto *n = new MidiNote(r, pitch, volume);
+	auto *n = new MidiNote(r, modifier_apply(pitch, mod), volume);
 	n->modifier = mod;
 
 	// dirty hack for clef position...
 	const Clef& clef = m->cur_layer->layer->track->instrument.get_clef();
 	NoteModifier dummy;
 	n->clef_position = clef.pitch_to_position(pitch, m->view->midi_scale, dummy);
-	if (mod == NoteModifier::SHARP)
-		n->pitch += 1;
-	else if (mod == NoteModifier::FLAT)
-		n->pitch -= 1;
 	return n;
 }
 

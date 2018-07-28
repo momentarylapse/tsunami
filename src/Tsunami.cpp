@@ -7,6 +7,7 @@
 
 #include "Tsunami.h"
 
+#include "Data/base.h"
 #include "Data/Song.h"
 #include "Data/Track.h"
 #include "Device/DeviceManager.h"
@@ -104,6 +105,8 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 	// create a window and load file
 	if (sessions.num == 0){
 		Session *session = createSession();
+		session->song->addTrack(SignalType::AUDIO_STEREO);
+		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
 		session->win->show();
 	}
 

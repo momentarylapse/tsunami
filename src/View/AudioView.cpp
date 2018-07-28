@@ -213,8 +213,16 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
 
+	cur_sample = nullptr;
+	cur_vlayer = nullptr;
+	_prev_cur_track = nullptr;
+
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
+
+	selection_mode = SelectionMode::NONE;
+	hide_selection = false;
+	song->subscribe(this, std::bind(&AudioView::onSongUpdate, this));
 
 	// modes
 	mode = nullptr;
@@ -250,10 +258,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
-	cur_sample = nullptr;
-	cur_vlayer = nullptr;
-	_prev_cur_track = nullptr;
-
 	bars_edit_data = true;
 
 	peak_thread = nullptr;
@@ -268,9 +272,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	mx = my = 0;
 	msp.stop();
-	selection_mode = SelectionMode::NONE;
-	hide_selection = false;
-	song->subscribe(this, std::bind(&AudioView::onSongUpdate, this));
 
 
 
@@ -911,8 +912,8 @@ void AudioView::updateTracks()
 	}
 
 	if (changed){
-		notify(MESSAGE_VTRACK_CHANGE);
 		checkConsistency();
+		notify(MESSAGE_VTRACK_CHANGE);
 	}
 }
 
@@ -1271,6 +1272,8 @@ Track *AudioView::cur_track()
 		return nullptr;
 	if (!cur_vlayer->layer)
 		return nullptr;
+	//if (song->layers().find(cur_vlayer->layer) < 0)
+	//	return nullptr;
 	return cur_vlayer->layer->track;
 }
 
@@ -1278,12 +1281,15 @@ TrackLayer *AudioView::cur_layer()
 {
 	if (!cur_vlayer)
 		return nullptr;
+	//if (song->layers().find(cur_vlayer->layer) < 0)
+	//	return nullptr;
 	return cur_vlayer->layer;
 }
 
+// l must be from vlayer[] or null
 void AudioView::setCurLayer(AudioViewLayer *l)
 {
-	auto *prev_track = cur_track();
+	auto *prev_track = _prev_cur_track;
 	auto *prev_vlayer = cur_vlayer;
 	cur_vlayer = l;
 	_prev_cur_track = cur_track();

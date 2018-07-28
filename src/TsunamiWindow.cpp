@@ -231,10 +231,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	side_bar->subscribe(this, std::bind(&TsunamiWindow::onSideBarUpdate, this));
 
 
-
-	song->newWithOneTrack(SignalType::AUDIO_STEREO, DEFAULT_SAMPLE_RATE);
-	song->notify(song->MESSAGE_FINISHED_LOADING);
-
 	updateMenu();
 }
 

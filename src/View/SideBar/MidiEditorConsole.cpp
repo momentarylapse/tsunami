@@ -84,8 +84,8 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 MidiEditorConsole::~MidiEditorConsole()
 {
 	clear();
+	view->mode_midi->unsubscribe(this);
 	view->unsubscribe(this);
-	song->unsubscribe(this);
 }
 
 void MidiEditorConsole::update()
@@ -244,7 +244,7 @@ void MidiEditorConsole::clear()
 	if (layer)
 		layer->unsubscribe(this);
 	layer = nullptr;
-	setSelection("reference_tracks", Array<int>());
+	setSelection("reference_tracks", {});
 }
 
 void MidiEditorConsole::onEnter()

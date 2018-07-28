@@ -27,8 +27,12 @@ void ActionTrackAdd::undo(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	track = s->tracks[index];
 	s->tracks.erase(index);
+
+	// notify outer structures first!
 	s->notify(s->MESSAGE_DELETE_LAYER);
 	s->notify(s->MESSAGE_DELETE_TRACK);
+	track->layers[0]->notify(track->layers[0]->MESSAGE_DELETE);
+	track->notify(track->MESSAGE_DELETE);
 }
 
 

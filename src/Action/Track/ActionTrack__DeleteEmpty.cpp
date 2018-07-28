@@ -42,11 +42,13 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	track = t;
 
 	// delete
-	track->layers[0]->notify(track->layers[0]->MESSAGE_DELETE);
-	track->notify(track->MESSAGE_DELETE);
 	a->tracks.erase(index);
+
+	// notify outer structures first!
 	a->notify(a->MESSAGE_DELETE_LAYER);
 	a->notify(a->MESSAGE_DELETE_TRACK);
+	track->layers[0]->notify(track->layers[0]->MESSAGE_DELETE);
+	track->notify(track->MESSAGE_DELETE);
 	return nullptr;
 }
 

@@ -148,20 +148,17 @@ void MidiFxConsole::update()
 
 void MidiFxConsole::onViewCurTrackChange()
 {
-	update();
 	setTrack(view->cur_track());
 }
 
 void MidiFxConsole::onTrackDelete()
 {
-	update();
 	setTrack(nullptr);
 }
 
 void MidiFxConsole::onUpdate()
 {
 	update();
-	setTrack(track);
 }
 
 void MidiFxConsole::onAdd()
@@ -222,5 +219,6 @@ void MidiFxConsole::setTrack(Track *t)
 		hideControl("comment_no_fx", false);
 	}
 	//Enable("add", track);
+	update();
 }
 

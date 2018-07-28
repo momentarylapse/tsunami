@@ -27,7 +27,6 @@ ActionTrackDeleteSample::~ActionTrackDeleteSample()
 
 void* ActionTrackDeleteSample::execute(Data* d)
 {
-
 	ref = layer->samples[index];
 	ref->origin->unref();
 	ref->owner = nullptr;

@@ -413,7 +413,7 @@ void TsunamiWindow::onBufferMakeMovable()
 	for (AudioBuffer &buf: view->cur_layer()->buffers)
 		if (buf.range().is_inside(view->hover.pos)){
 			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
-			song->createSamplesFromSelection(s);
+			song->createSamplesFromSelection(s, true);
 		}
 }
 
@@ -744,7 +744,7 @@ void TsunamiWindow::onDeleteLayer()
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	song->createSamplesFromSelection(view->sel);
+	song->createSamplesFromSelection(view->sel, false);
 }
 
 void TsunamiWindow::onViewOptimal()

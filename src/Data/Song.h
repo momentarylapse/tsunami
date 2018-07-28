@@ -118,7 +118,7 @@ public:
 	void _cdecl insertSelectedSamples(const SongSelection &sel);
 	void _cdecl deleteSelectedSamples(const SongSelection &sel);
 	void _cdecl deleteSelection(const SongSelection &sel);
-	void _cdecl createSamplesFromSelection(const SongSelection &sel);
+	void _cdecl createSamplesFromSelection(const SongSelection &sel, bool auto_delete);
 	Curve *_cdecl addCurve(const string &name, Array<Curve::Target> &targets);
 	void _cdecl deleteCurve(Curve *curve);
 	void _cdecl editCurve(Curve *curve, const string &name, float min, float max);

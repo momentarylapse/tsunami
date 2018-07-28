@@ -15,12 +15,11 @@ class SongSelection;
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(const SongSelection &sel, TrackLayer *l);
+	ActionTrackInsertSelectedSamples(const SongSelection &sel);
 
 	void build(Data *d) override;
 
 	const SongSelection &sel;
-	TrackLayer *layer;
 };
 
 #endif /* ACTIONTRACKINSERTSELECTEDSAMPLES_H_ */

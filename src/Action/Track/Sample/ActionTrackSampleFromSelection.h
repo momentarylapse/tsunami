@@ -9,23 +9,22 @@
 #define ACTIONTRACKSAMPLEFROMSELECTION_H_
 
 #include "../../ActionGroup.h"
-class Song;
 class SongSelection;
-class Track;
 class TrackLayer;
 
 class ActionTrackSampleFromSelection : public ActionGroup
 {
 public:
-	ActionTrackSampleFromSelection(const SongSelection &sel);
+	ActionTrackSampleFromSelection(const SongSelection &sel, bool auto_delete);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 private:
-	void CreateSamplesFromLayerAudio(TrackLayer *l, const SongSelection &sel);
-	void CreateSamplesFromLayerMidi(TrackLayer *l, const SongSelection &sel);
+	void CreateSamplesFromLayerAudio(TrackLayer *l);
+	void CreateSamplesFromLayerMidi(TrackLayer *l);
 
 	const SongSelection &sel;
+	bool auto_delete;
 };
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

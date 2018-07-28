@@ -225,7 +225,7 @@ void SampleManagerConsole::onInsert()
 
 void SampleManagerConsole::onCreateFromSelection()
 {
-	song->createSamplesFromSelection(view->sel);
+	song->createSamplesFromSelection(view->sel, false);
 }
 
 void SampleManagerConsole::onDelete()

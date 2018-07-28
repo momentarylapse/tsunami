@@ -317,7 +317,7 @@ Track *Song::addTrackAfter(SignalType type, Track *ref)
 void Song::insertSelectedSamples(const SongSelection &sel)
 {
 	if (sel.num_samples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(sel, 0));
+		execute(new ActionTrackInsertSelectedSamples(sel));
 }
 
 void Song::deleteSelectedSamples(const SongSelection &sel)
@@ -397,10 +397,10 @@ void Song::deleteSelection(const SongSelection &sel)
 	execute(new ActionSongDeleteSelection(sel));
 }
 
-void Song::createSamplesFromSelection(const SongSelection &sel)
+void Song::createSamplesFromSelection(const SongSelection &sel, bool auto_delete)
 {
 	if (!sel.range.empty())
-		execute(new ActionTrackSampleFromSelection(sel));
+		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 
 void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)

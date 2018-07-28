@@ -1413,7 +1413,7 @@ Set<TrackLayer*> AudioView::get_playable_layers()
 	for (Track* t: song->tracks){
 		bool any_solo = hasAnySoloLayer(t);
 		for (auto *l: vlayer)
-			if ((l->layer->track == t) and l->solo and !any_solo)
+			if ((l->layer->track == t) and (l->solo or !any_solo))
 				layers.add(l->layer);
 	}
 	return layers;

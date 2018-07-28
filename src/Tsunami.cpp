@@ -28,7 +28,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.12.1";
+const string AppVersion = "0.7.12.2";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -108,9 +108,10 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 		session->song->addTrack(SignalType::AUDIO_STEREO);
 
 		// default tags
-		session->song->addTag("title", "New Audio File");//_("New Audio File"));
+		session->song->addTag("title", _("New Audio File"));
 		session->song->addTag("album", AppName);
 		session->song->addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
+		session->song->resetHistory();
 
 		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
 		session->win->show();

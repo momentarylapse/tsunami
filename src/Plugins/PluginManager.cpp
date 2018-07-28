@@ -378,7 +378,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::deleteMarker));
 	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::editMarker));
 
-	Song af(Session::GLOBAL);
+	Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Kaba::DeclareClassSize("Song", sizeof(Song));
 	Kaba::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
 	Kaba::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
@@ -391,7 +391,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);
-	Kaba::LinkExternal("Song.new_empty", Kaba::mf(&Song::newEmpty));
 	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::addTrack));
 	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::deleteTrack));
 	Kaba::LinkExternal("Song.range", Kaba::mf(&Song::range));

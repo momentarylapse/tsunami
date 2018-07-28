@@ -41,10 +41,10 @@ struct Tag
 class Song : public Data
 {
 public:
-	Song(Session *session);
+	Song(Session *session, int sample_rate);
 	virtual ~Song();
 
-	void _cdecl __init__(Session *session);
+	void _cdecl __init__(Session *session, int sample_rate);
 	void _cdecl __delete__();
 
 	Range _cdecl range();
@@ -80,10 +80,8 @@ public:
 	string _cdecl get_time_str_fuzzy(int t, float dt);
 	string _cdecl get_time_str_long(int t);
 
-	virtual void _cdecl reset();
+	void _cdecl reset() override;
 	bool is_empty();
-	void _cdecl newEmpty(int _sample_rate);
-	void _cdecl newWithOneTrack(SignalType track_type, int _sample_rate);
 
 	void _cdecl invalidateAllPeaks();
 

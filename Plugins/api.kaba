@@ -353,10 +353,6 @@ Tag _Tag(string key, string value)
 	t.value = value
 	return t
 
-class SongLayer
-	string name
-	bool active
-
 class Song
 	string filename
 	Tag[] tags
@@ -370,14 +366,11 @@ class Song
 	
 	Bar*[] bars
 	
-	SongLayer*[] layers
-	
-	extern void __init__(Session* session)
+	extern void __init__(Session* session, int sample_rate)
 	extern virtual void __delete__()
 	
 	extern Range range()
 	
-	extern void new_empty(int sample_rate)
 	extern Track* add_track(int type, int index)
 	extern void delete_track(int index)
 	extern void add_bar(int index, float bpm, int beats, bool affect_midi)

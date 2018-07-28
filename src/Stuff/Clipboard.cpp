@@ -19,8 +19,7 @@
 
 Clipboard::Clipboard()
 {
-	temp = new Song(Session::GLOBAL);
-	temp->reset();
+	temp = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 }
 
 Clipboard::~Clipboard()

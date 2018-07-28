@@ -106,6 +106,12 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 	if (sessions.num == 0){
 		Session *session = createSession();
 		session->song->addTrack(SignalType::AUDIO_STEREO);
+
+		// default tags
+		session->song->addTag("title", "New Audio File");//_("New Audio File"));
+		session->song->addTag("album", AppName);
+		session->song->addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
+
 		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
 		session->win->show();
 	}
@@ -130,7 +136,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 		session->i("--chain <SIGNAL_CHAIN_FILE>");
 		return true;
 	}else if (args[i] == "--info"){
-		Song* song = new Song(session);
+		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (args.num < i+2){
 			session->e(_("call: tsunami --info <File>"));
@@ -150,7 +156,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 		delete(song);
 		return true;
 	}else if (args[i] == "--export"){
-		Song* song = new Song(session);
+		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (args.num < i + 3){
 			session->e(_("call: tsunami --export <File> <Exportfile>"));
@@ -206,7 +212,7 @@ Session* Tsunami::createSession()
 {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
-	session->song = new Song(session);
+	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
 	session->signal_chain = SignalChain::create_default(session);
 	session->song_renderer = dynamic_cast<SongRenderer*>(session->signal_chain->modules[0]);

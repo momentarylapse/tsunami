@@ -44,9 +44,7 @@
 #include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Audio/AudioEffect.h"
-#include "../Tsunami.h"
 #include "../Stuff/Log.h"
-#include "../View/AudioView.h"
 #include "../lib/threads/Mutex.h"
 #include <assert.h>
 
@@ -63,18 +61,18 @@ Song::Exception::Exception(const string &_message)
 	message = _message;
 }
 
-Song::Song(Session *session) :
+Song::Song(Session *session, int _sample_rate) :
 	Data(session)
 {
-	sample_rate = DEFAULT_SAMPLE_RATE;
+	sample_rate = _sample_rate;
 	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
 	volume = 1;
 }
 
-void Song::__init__(Session *session)
+void Song::__init__(Session *session, int _sample_rate)
 {
-	new(this) Song(session);
+	new(this) Song(session, _sample_rate);
 }
 
 void Song::__delete__()
@@ -164,31 +162,6 @@ void Song::setDefaultFormat(SampleFormat _format)
 void Song::setCompression(int _compression)
 {
 	execute(new ActionSongSetDefaultFormat(default_format, _compression));
-}
-
-void Song::newEmpty(int _sample_rate)
-{
-	reset();
-	action_manager->enable(false);
-	sample_rate = _sample_rate;
-
-	// default tags
-	addTag("title", "New Audio File");//_("New Audio File"));
-	addTag("album", AppName);
-	addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
-
-	action_manager->enable(true);
-	notify();
-}
-
-void Song::newWithOneTrack(SignalType track_type, int _sample_rate)
-{
-	notifyBegin();
-	newEmpty(_sample_rate);
-	action_manager->enable(false);
-	addTrack(track_type);
-	action_manager->enable(true);
-	notifyEnd();
 }
 
 // delete all data

@@ -8,7 +8,7 @@ class Drumset
 	void load(Session* session)
 		if a
 			return
-		a = new Song(session)
+		a = new Song(session, DEFAULT_SAMPLE_RATE)
 		Song *owner = session.song
 		session.song = a
 		string temp = session.storage.current_directory

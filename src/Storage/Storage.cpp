@@ -131,9 +131,9 @@ bool Storage::loadBufferBox(Song *a, AudioBuffer *buf, const string &filename)
 {
 	session->i(_("loading buffer ") + filename);
 
-	Song *aa = new Song(session);
-	aa->newWithOneTrack(SignalType::AUDIO, a->sample_rate);
-	TrackLayer *l = aa->tracks[0]->layers[0];
+	Song *aa = new Song(session, a->sample_rate);
+	Track *t = aa->addTrack(SignalType::AUDIO);
+	TrackLayer *l = t->layers[0];
 	bool ok = loadTrack(l, filename, 0);
 	if (l->buffers.num > 0){
 		buf->resize(l->buffers[0].length);

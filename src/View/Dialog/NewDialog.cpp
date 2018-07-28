@@ -44,7 +44,7 @@ void NewDialog::onOk()
 		type = SignalType::AUDIO_STEREO;
 	Session *session = tsunami->createSession();
 	Song *song = session->song;
-	song->newWithOneTrack(type, sample_rate);
+	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
 		Track *t = song->addTrack(SignalType::BEATS, 0);
@@ -52,6 +52,12 @@ void NewDialog::onOk()
 		for (int i=0; i<count; i++)
 			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);
 	}
+	song->addTrack(type);
+
+	song->addTag("title", _("New Audio File"));
+	song->addTag("album", AppName);
+	song->addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
+
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_FINISHED_LOADING);

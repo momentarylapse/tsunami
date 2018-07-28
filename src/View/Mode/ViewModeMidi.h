@@ -57,6 +57,7 @@ public:
 	int chord_inversion;
 	int midi_interval;
 
+	void setModifier(NoteModifier mod);
 	NoteModifier modifier;
 
 	void setMode(MidiMode mode);

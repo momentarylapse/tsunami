@@ -77,7 +77,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	view->subscribe(this, std::bind(&MidiEditorConsole::onViewCurLayerChange, this), view->MESSAGE_CUR_LAYER_CHANGE);
 	view->subscribe(this, std::bind(&MidiEditorConsole::onViewVTrackChange, this), view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, std::bind(&MidiEditorConsole::onUpdate, this), view->MESSAGE_SETTINGS_CHANGE);
+	view->mode_midi->subscribe(this, std::bind(&MidiEditorConsole::on_settings_change, this));
 	update();
 }
 
@@ -148,9 +148,9 @@ void MidiEditorConsole::onViewVTrackChange()
 	}*/
 }
 
-void MidiEditorConsole::onUpdate()
+void MidiEditorConsole::on_settings_change()
 {
-	setLayer(layer);
+	update();
 }
 
 void MidiEditorConsole::onScale()

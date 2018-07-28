@@ -59,17 +59,26 @@ ViewModeMidi::~ViewModeMidi()
 	delete preview;
 }
 
+
+void ViewModeMidi::setModifier(NoteModifier mod)
+{
+	modifier = mod;
+	notify();
+}
+
 void ViewModeMidi::setMode(MidiMode _mode)
 {
 	mode_wanted = _mode;
 	view->thm.dirty = true;
 	view->forceRedraw();
+	notify();
 }
 
 void ViewModeMidi::setCreationMode(CreationMode _mode)
 {
 	creation_mode = _mode;
 	//view->forceRedraw();
+	notify();
 }
 
 bool ViewModeMidi::editing(AudioViewLayer *l)
@@ -193,17 +202,13 @@ void ViewModeMidi::onKeyDown(int k)
 	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (k == hui::KEY_0){
-			modifier = NoteModifier::NONE;
-			view->notify(view->MESSAGE_SETTINGS_CHANGE);
+			setModifier(NoteModifier::NONE);
 		}else if (k == hui::KEY_FENCE){
-			modifier = NoteModifier::SHARP;
-			view->notify(view->MESSAGE_SETTINGS_CHANGE);
+			setModifier(NoteModifier::SHARP);
 		}else if (k == hui::KEY_3){
-			modifier = NoteModifier::FLAT;
-			view->notify(view->MESSAGE_SETTINGS_CHANGE);
+			setModifier(NoteModifier::FLAT);
 		}else if (k == hui::KEY_4){
-			modifier = NoteModifier::NATURAL;
-			view->notify(view->MESSAGE_SETTINGS_CHANGE);
+			setModifier(NoteModifier::NATURAL);
 		}
 
 		// add note

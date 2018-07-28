@@ -25,7 +25,7 @@ public:
 	void onLayerDelete();
 	void onViewCurLayerChange();
 	void onViewVTrackChange();
-	void onUpdate();
+	void on_settings_change();
 	void update();
 
 	void onScale();

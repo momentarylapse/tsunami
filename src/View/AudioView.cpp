@@ -1265,17 +1265,6 @@ void AudioView::setCurSample(SampleRef *s)
 	notify(MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
-
-/*void AudioView::setCurTrack(Track *t)
-{
-	if (cur_track == t)
-		return;
-	cur_track = t;
-	// TODO ----cur layer...
-	forceRedraw();
-	notify(MESSAGE_CUR_TRACK_CHANGE);
-}*/
-
 Track *AudioView::cur_track()
 {
 	if (!cur_vlayer)

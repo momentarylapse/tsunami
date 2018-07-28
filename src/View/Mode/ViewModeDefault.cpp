@@ -223,6 +223,7 @@ void ViewModeDefault::onRightButtonDown()
 		menu_check(view->menu_track, "layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
 		menu_check(view->menu_track, "layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
 
+		view->menu_track->enable("menu_midi_mode", hover->track->type == SignalType::MIDI);
 		view->menu_track->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->enable("track_convert_stereo", hover->track->channels == 1);

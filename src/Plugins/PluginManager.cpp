@@ -231,6 +231,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Sample.get_value", Kaba::mf(&Sample::getValue));
 
 	Sample sample(SignalType::AUDIO);
+	sample._pointer_ref(); // stack allocated... don't auto-delete!
 	//sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
 	Kaba::DeclareClassSize("SampleRef", sizeof(SampleRef));

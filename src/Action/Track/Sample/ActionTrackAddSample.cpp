@@ -15,9 +15,15 @@ ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sam
 {
 	layer = l;
 	pos = _pos;
+
 	sample = _sample;
+	sample->_pointer_ref();
+
 	ref = new SampleRef(sample);
-	ref->origin->unref(); // cancel ref() until execute()
+
+	// "unlink" until execute()
+	sample->unref();
+
 	ref->layer = l;
 	ref->pos = pos;
 	ref->owner = l->track->song;
@@ -25,22 +31,29 @@ ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sam
 
 ActionTrackAddSample::~ActionTrackAddSample()
 {
-	if (ref)
+	if (ref){
+		sample->ref();
 		delete ref;
+	}
+
+	sample->_pointer_unref();
+	sample = nullptr;
 }
 
 void ActionTrackAddSample::undo(Data *d)
 {
 	ref = layer->samples.pop();
 	ref->notify(ref->MESSAGE_DELETE);
-	ref->origin->unref();
+
+	sample->unref();
 }
 
 
 
 void *ActionTrackAddSample::execute(Data *d)
 {
-	ref->origin->ref();
+	sample->ref();
+
 	layer->samples.add(ref);
 	ref = nullptr;
 	return layer->samples.back();

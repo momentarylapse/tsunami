@@ -21,6 +21,7 @@ SampleRef::SampleRef(Sample *sample)
 	midi = &sample->midi;
 	origin = sample;
 	origin->ref();
+	origin->_pointer_ref();
 	layer = nullptr;
 	owner = nullptr;
 	pos = 0;
@@ -32,6 +33,7 @@ SampleRef::~SampleRef()
 {
 	notify(MESSAGE_DELETE);
 	origin->unref();
+	origin->_pointer_unref();
 }
 
 void SampleRef::__init__(Sample *sam)

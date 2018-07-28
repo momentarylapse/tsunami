@@ -10,6 +10,7 @@
 #include "base.h"
 #include "../lib/math/math.h"
 #include "Song.h"
+#include <assert.h>
 
 const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Sample::MESSAGE_REFERENCE = "Reference";
@@ -96,6 +97,7 @@ void Sample::_pointer_unref()
 
 void Sample::set_owner(Song *s)
 {
+	assert(s);
 	if (owner){
 		owner = s;
 	}else{

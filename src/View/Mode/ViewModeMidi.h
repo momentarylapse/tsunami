@@ -76,7 +76,7 @@ public:
 
 	AudioViewLayer *cur_vlayer();
 	TrackLayer *cur_layer();
-	bool editing(TrackLayer *l);
+	bool editing(AudioViewLayer *l);
 
 	rect scroll_bar;
 	float scroll_offset;

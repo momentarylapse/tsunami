@@ -42,8 +42,10 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	track = t;
 
 	// delete
+	track->layers[0]->notify(track->layers[0]->MESSAGE_DELETE);
 	track->notify(track->MESSAGE_DELETE);
 	a->tracks.erase(index);
+	a->notify(a->MESSAGE_DELETE_LAYER);
 	a->notify(a->MESSAGE_DELETE_TRACK);
 	return nullptr;
 }
@@ -55,6 +57,7 @@ void ActionTrack__DeleteEmpty::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
+	a->notify(a->MESSAGE_ADD_LAYER);
 	track = nullptr;
 }
 

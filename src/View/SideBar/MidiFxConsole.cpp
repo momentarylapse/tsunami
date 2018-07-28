@@ -139,8 +139,8 @@ MidiFxConsole::~MidiFxConsole()
 void MidiFxConsole::update()
 {
 	bool allow = false;
-	if (view->cur_track)
-		allow = (view->cur_track->type == SignalType::MIDI);
+	if (view->cur_track())
+		allow = (view->cur_track()->type == SignalType::MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
@@ -149,7 +149,7 @@ void MidiFxConsole::update()
 void MidiFxConsole::onViewCurTrackChange()
 {
 	update();
-	setTrack(view->cur_track);
+	setTrack(view->cur_track());
 }
 
 void MidiFxConsole::onTrackDelete()

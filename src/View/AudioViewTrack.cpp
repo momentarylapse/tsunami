@@ -547,7 +547,7 @@ void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool
 	MidiNoteBufferRef notes = midi.getNotes(range);
 	//c->setLineWidth(3.0f);
 
-	if (layer == view->cur_layer and view->mode == view->mode_midi){
+	if (view->mode_midi->editing(this)){
 		pitch_min = edit_pitch_min;
 		pitch_max = edit_pitch_max;
 	}else{
@@ -836,7 +836,7 @@ void AudioViewLayer::drawBlankBackground(Painter *c)
 
 bool AudioView::editingTrack(Track *t)
 {
-	if (cur_track != t)
+	if (cur_track() != t)
 		return false;
 	if (win->side_bar->isActive(SideBar::TRACK_CONSOLE))
 		return true;
@@ -853,9 +853,9 @@ bool AudioView::editingTrack(Track *t)
 	return false;
 }
 
-bool AudioView::editingLayer(TrackLayer *l)
+bool AudioView::editingLayer(AudioViewLayer *l)
 {
-	if (cur_layer != l)
+	if (cur_vlayer != l)
 		return false;
 	if (win->side_bar->isActive(SideBar::MIDI_EDITOR_CONSOLE))
 		return true;
@@ -945,7 +945,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 void AudioViewLayer::drawVersionHeader(Painter *c)
 {
 	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
-	bool visible = hover or view->editingLayer(layer);
+	bool visible = hover or view->editingLayer(this);
 	bool playable = view->get_playable_layers().contains(layer);
 
 	color col = view->colors.background_track_selected;

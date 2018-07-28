@@ -72,20 +72,20 @@ void ViewModeMidi::setCreationMode(CreationMode _mode)
 	//view->forceRedraw();
 }
 
-bool ViewModeMidi::editing(TrackLayer *l)
+bool ViewModeMidi::editing(AudioViewLayer *l)
 {
 	if (view->mode != this)
 		return false;
-	if (l != view->cur_layer)
+	if (l != view->cur_vlayer)
 		return false;
-	if (l->type != SignalType::MIDI)
+	if (l->layer->type != SignalType::MIDI)
 		return false;
 	return true;
 }
 
 TrackLayer* ViewModeMidi::cur_layer()
 {
-	return view->cur_layer;
+	return view->cur_layer();
 }
 
 AudioViewLayer* ViewModeMidi::cur_vlayer()
@@ -96,7 +96,7 @@ AudioViewLayer* ViewModeMidi::cur_vlayer()
 
 void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
 {
-	preview->start(view->cur_track->synth, pitch, view->cur_track->volume, ttl);
+	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
 }
 
 void ViewModeMidi::onLeftButtonDown()
@@ -123,7 +123,7 @@ void ViewModeMidi::onLeftButtonDown()
 		}*/
 		view->msp.start_pos = hover->pos; // TODO ...bad
 		if (mode == MidiMode::TAB){
-			string_no = clampi(hover->clef_position, 0, view->cur_track->instrument.string_pitch.num - 1);
+			string_no = clampi(hover->clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
 		}
 	}else if (hover->type == Selection::Type::MIDI_PITCH){
 		view->msp.start_pos = hover->pos; // TODO ...bad
@@ -149,7 +149,7 @@ void ViewModeMidi::onLeftButtonUp()
 			auto notes = getCreationNotes(hover, view->msp.start_pos);
 			setCursorPos(notes[0]->range.end() + 1, true);
 			octave = pitch_get_octave(hover->pitch);
-			view->cur_layer->addMidiNotes(notes);
+			view->cur_layer()->addMidiNotes(notes);
 			notes.clear(); // all notes owned by track now
 			preview->end();
 		}
@@ -182,7 +182,7 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 	n->modifier = mod;
 
 	// dirty hack for clef position...
-	const Clef& clef = m->view->cur_track->instrument.get_clef();
+	const Clef& clef = m->view->cur_track()->instrument.get_clef();
 	NoteModifier dummy;
 	n->clef_position = clef.pitch_to_position(pitch, m->view->midi_scale, dummy);
 	return n;
@@ -212,7 +212,7 @@ void ViewModeMidi::onKeyDown(int k)
 			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
 			int pitch = pitch_from_octave_and_rel(rel[number], octave);
-			view->cur_layer->addMidiNote(make_note(this, r, pitch, modifier));
+			view->cur_layer()->addMidiNote(make_note(this, r, pitch, modifier));
 			setCursorPos(r.end() + 1, true);
 			startMidiPreview(pitch, 0.1f);
 		}
@@ -274,7 +274,7 @@ void ViewModeMidi::onKeyDown(int k)
 
 float ViewModeMidi::suggest_layer_height(AudioViewLayer *l)
 {
-	if (editing(l->layer)){
+	if (editing(l)){
 		auto mode = l->midi_mode;
 		if (mode == MidiMode::LINEAR)
 			return 5000;
@@ -344,7 +344,7 @@ MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 	Array<int> pitch = getCreationPitch(sel->pitch);
 
 	// collision?
-	Range allowed = get_allowed_midi_range(view->cur_layer, pitch, pos0);
+	Range allowed = get_allowed_midi_range(view->cur_layer(), pitch, pos0);
 
 	// create notes
 	MidiNoteBuffer notes;
@@ -383,7 +383,7 @@ void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
 
 	if (l->layer->type == SignalType::MIDI){
 		auto mode = l->midi_mode;
-		if (l->layer== view->cur_layer){
+		if (l == view->cur_vlayer){
 			if (mode == MidiMode::LINEAR)
 				drawLayerPitchGrid(c, l);
 		}
@@ -468,7 +468,7 @@ Selection ViewModeMidi::getHover()
 	int my = view->my;
 
 	// midi
-	if ((s.layer) and (s.layer->type == SignalType::MIDI) and (s.layer == view->cur_layer)){
+	if ((s.layer) and (s.layer->type == SignalType::MIDI) and (s.vlayer == view->cur_vlayer)){
 		auto mode = s.vlayer->midi_mode;
 
 		// scroll bar
@@ -535,7 +535,7 @@ Selection ViewModeMidi::getHover()
 void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 {
 	// midi
-	if (editing(l->layer)){
+	if (editing(l)){
 
 		/*for (int n: t->reference_tracks)
 			if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))

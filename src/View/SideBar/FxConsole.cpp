@@ -213,7 +213,7 @@ void FxConsole::onTrackDelete()
 }
 void FxConsole::onViewCurTrackChange()
 {
-	setTrack(view->cur_track);
+	setTrack(view->cur_track());
 }
 
 void FxConsole::onUpdate()

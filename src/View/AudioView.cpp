@@ -211,10 +211,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
+	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
+
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
-
-	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	// modes
 	mode = nullptr;
@@ -250,10 +250,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
-	cur_track = nullptr;
 	cur_sample = nullptr;
-	cur_layer = nullptr;
 	cur_vlayer = nullptr;
+	_prev_cur_track = nullptr;
 
 	bars_edit_data = true;
 
@@ -682,17 +681,38 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 	}
 }
 
+void _try_set_good_cur_layer(AudioView *v)
+{
+	for (auto *l: v->vlayer)
+		if (l->layer->track == v->_prev_cur_track){
+			//msg_write("  -> set by track");
+			v->setCurLayer(l);
+			return;
+		}
+	if (v->vlayer.num > 0){
+		//msg_write("  -> set first layer");
+		v->setCurLayer(v->vlayer[0]);
+	}else{
+		//msg_error("....no vlayers");
+	}
+}
+
 void AudioView::checkConsistency()
 {
-	// check cur_track consistency
-	int n = get_track_index_save(song, cur_track);
-	if (cur_track and (n < 0))
-		if (song->tracks.num > 0)
-			setCurTrack(song->tracks[0]);
+	// cur_vlayer = null
+	if (!cur_vlayer and (vlayer.num > 0)){
+		//msg_error("cur_vlayer = nil");
+		//msg_write(msg_get_trace());
+		//msg_write("  -> setting first");
+		setCurLayer(vlayer[0]);
+	}
 
-	if (cur_layer and !get_layer(cur_layer))
-		if (song->tracks.num > 0)
-			setCurLayer(cur_track->layers[0]);
+	// cur_vlayer illegal?
+	if (cur_vlayer and (vlayer.find(cur_vlayer) < 0)){
+		//msg_error("cur_vlayer illegal...");
+		//msg_write(msg_get_trace());
+		_try_set_good_cur_layer(this);
+	}
 
 	// illegal midi mode?
 	for (auto *l: vlayer)
@@ -702,8 +722,8 @@ void AudioView::checkConsistency()
 
 void AudioView::onSongUpdate()
 {
-	checkConsistency();
 	if (song->cur_message() == song->MESSAGE_NEW){
+		setCurLayer(nullptr);
 		updateTracks();
 		sel.range = Range(0, 0);
 		sel.clear();
@@ -712,14 +732,7 @@ void AudioView::onSongUpdate()
 			for (TrackLayer *l: t->layers)
 				sel.add(l);
 		}
-		setCurTrack(nullptr);
-		setCurLayer(nullptr);
-		if (song->tracks.num > 0){
-			if ((song->tracks[0]->type == SignalType::BEATS) and song->tracks.num > 1)
-				setCurTrack(song->tracks[1]);
-			else
-				setCurTrack(song->tracks[0]);
-		}
+		checkConsistency();
 		optimizeView();
 	}else if (song->cur_message() == song->MESSAGE_FINISHED_LOADING){
 		optimizeView();
@@ -790,6 +803,10 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer)
 		if (l->layer == layer)
 			return l;
 	}
+
+	msg_write("get_layer() failed for " + p2s(layer));
+	msg_write(msg_get_trace());
+
 	return dummy_vlayer;
 }
 
@@ -893,10 +910,10 @@ void AudioView::updateTracks()
 		}
 	}
 
-	checkConsistency();
-
-	if (changed)
+	if (changed){
 		notify(MESSAGE_VTRACK_CHANGE);
+		checkConsistency();
+	}
 }
 
 
@@ -1249,7 +1266,7 @@ void AudioView::setCurSample(SampleRef *s)
 }
 
 
-void AudioView::setCurTrack(Track *t)
+/*void AudioView::setCurTrack(Track *t)
 {
 	if (cur_track == t)
 		return;
@@ -1257,19 +1274,45 @@ void AudioView::setCurTrack(Track *t)
 	// TODO ----cur layer...
 	forceRedraw();
 	notify(MESSAGE_CUR_TRACK_CHANGE);
+}*/
+
+Track *AudioView::cur_track()
+{
+	if (!cur_vlayer)
+		return nullptr;
+	if (!cur_vlayer->layer)
+		return nullptr;
+	return cur_vlayer->layer->track;
 }
 
-void AudioView::setCurLayer(TrackLayer *l)
+TrackLayer *AudioView::cur_layer()
 {
-	if (cur_layer == l)
-		return;
-	cur_layer = l;
-	cur_vlayer = get_layer(l);
-	mode->on_cur_layer_change();
-	forceRedraw();
-	notify(MESSAGE_CUR_LAYER_CHANGE);
-	setCurTrack(l->track);
+	if (!cur_vlayer)
+		return nullptr;
+	return cur_vlayer->layer;
 }
+
+void AudioView::setCurLayer(AudioViewLayer *l)
+{
+	auto *prev_track = cur_track();
+	auto *prev_vlayer = cur_vlayer;
+	cur_vlayer = l;
+	_prev_cur_track = cur_track();
+
+	if (!cur_vlayer){
+		//msg_write("   ...setting cur_vlayer = nil");
+		//msg_write(msg_get_trace());
+	}
+
+	if (cur_vlayer != prev_vlayer){
+		mode->on_cur_layer_change();
+		forceRedraw();
+		notify(MESSAGE_CUR_LAYER_CHANGE);
+	}
+	if (cur_track() != prev_track)
+		notify(MESSAGE_CUR_TRACK_CHANGE);
+}
+
 
 
 // unused?!?
@@ -1374,9 +1417,9 @@ Set<TrackLayer*> AudioView::get_playable_layers()
 	Set<TrackLayer*> layers;
 	for (Track* t: song->tracks){
 		bool any_solo = hasAnySoloLayer(t);
-		for (TrackLayer *l: t->layers)
-			if (get_layer(l)->solo or !any_solo)
-				layers.add(l);
+		for (auto *l: vlayer)
+			if ((l->layer->track == t) and l->solo and !any_solo)
+				layers.add(l->layer);
 	}
 	return layers;
 }

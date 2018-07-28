@@ -178,7 +178,7 @@ void TrackConsole::onEditSynth()
 
 void TrackConsole::onViewCurTrackChange()
 {
-	setTrack(view->cur_track);
+	setTrack(view->cur_track());
 }
 
 void TrackConsole::onUpdate()

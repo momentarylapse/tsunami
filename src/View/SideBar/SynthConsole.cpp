@@ -188,6 +188,6 @@ void SynthConsole::onSynthDelete()
 
 void SynthConsole::onViewCurTrackChange()
 {
-	setTrack(view->cur_track);
+	setTrack(view->cur_track());
 }
 

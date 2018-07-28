@@ -55,7 +55,8 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 		delete preview_synth;
 
 	target = t;
-	view->setCurTrack(target);
+	// FIXME ...
+	//view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
 	preview_synth->set_source(input->out);
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");

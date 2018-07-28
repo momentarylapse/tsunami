@@ -51,7 +51,8 @@ void CaptureConsoleModeAudio::onSource()
 void CaptureConsoleModeAudio::setTarget(Track *t)
 {
 	target = t;
-	view->setCurTrack(target);
+	// FIXME ...
+	//view->setCurTrack(target);
 	view->mode_capture->capturing_track = target;
 
 	bool ok = (target->type == SignalType::AUDIO);

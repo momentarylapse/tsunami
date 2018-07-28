@@ -73,7 +73,7 @@ void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 {
 	ViewModeDefault::drawTrackData(c, t);
 
-	if (t->track != view->cur_track)
+	if (t->track != view->cur_track())
 		return;
 
 	cur_track = t;

@@ -20,6 +20,7 @@ void *ActionTrackMove::execute(Data *d)
 
 	s->tracks.move(origin, target);
 	s->notify(s->MESSAGE_ADD_TRACK);
+	s->notify(s->MESSAGE_ADD_LAYER);
 	return nullptr;
 }
 
@@ -29,5 +30,6 @@ void ActionTrackMove::undo(Data *d)
 
 	s->tracks.move(target, origin);
 	s->notify(s->MESSAGE_ADD_TRACK);
+	s->notify(s->MESSAGE_ADD_LAYER);
 }
 

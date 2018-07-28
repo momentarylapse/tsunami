@@ -743,7 +743,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	//view->msp.start(hover->pos, hover->y0);
 	view->sel.clear_data();
 	if (!keep_track_selection)
-		view->sel.tracks = view->cur_track;
+		view->sel.tracks = view->cur_track();
 		//view->sel.all_tracks(view->song);
 	view->setSelection(getSelectionForRange(Range(pos, 0)));
 }
@@ -790,8 +790,8 @@ void ViewModeDefault::selectUnderMouse()
 	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
-	if (l)
-		view->setCurLayer(l);
+	if (hover->vlayer)
+		view->setCurLayer(hover->vlayer);
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
 		selectLayer(this, l, control, false);
 	if (hover->type == Selection::Type::TRACK_HEADER)

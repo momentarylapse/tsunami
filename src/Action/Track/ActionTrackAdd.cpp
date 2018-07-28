@@ -27,6 +27,7 @@ void ActionTrackAdd::undo(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	track = s->tracks[index];
 	s->tracks.erase(index);
+	s->notify(s->MESSAGE_DELETE_LAYER);
 	s->notify(s->MESSAGE_DELETE_TRACK);
 }
 
@@ -42,6 +43,7 @@ void *ActionTrackAdd::execute(Data *d)
 	s->tracks.insert(track, index);
 
 	s->notify(s->MESSAGE_ADD_TRACK);
+	s->notify(s->MESSAGE_ADD_LAYER);
 	track = nullptr;
 
 	return s->tracks[index];

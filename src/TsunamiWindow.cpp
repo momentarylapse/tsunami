@@ -347,9 +347,9 @@ void TsunamiWindow::onTrackRender()
 
 void TsunamiWindow::onDeleteTrack()
 {
-	if (view->cur_track){
+	if (view->cur_track()){
 		try{
-			song->deleteTrack(view->cur_track);
+			song->deleteTrack(view->cur_track());
 		}catch(Song::Exception &e){
 			session->e(e.message);
 		}
@@ -360,7 +360,7 @@ void TsunamiWindow::onDeleteTrack()
 
 void TsunamiWindow::onTrackEditMidi()
 {
-	if (view->cur_track)
+	if (view->cur_track())
 		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	else
 		session->e(_("No track selected"));
@@ -368,7 +368,7 @@ void TsunamiWindow::onTrackEditMidi()
 
 void TsunamiWindow::onTrackEditFX()
 {
-	if (view->cur_track)
+	if (view->cur_track())
 		side_bar->open(SideBar::FX_CONSOLE);
 	else
 		session->e(_("No track selected"));
@@ -390,55 +390,50 @@ void TsunamiWindow::onTrackAddMarker()
 
 void TsunamiWindow::onTrackConvertMono()
 {
-	if (view->cur_track)
-		view->cur_track->setChannels(1);
+	if (view->cur_track())
+		view->cur_track()->setChannels(1);
 	else
 		session->e(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackConvertStereo()
 {
-	if (view->cur_track)
-		view->cur_track->setChannels(2);
+	if (view->cur_track())
+		view->cur_track()->setChannels(2);
 	else
 		session->e(_("No track selected"));
 }
 void TsunamiWindow::onBufferDelete()
 {
-	if (view->cur_layer){
-		foreachi (AudioBuffer &buf, view->cur_layer->buffers, i)
-			if (buf.range().is_inside(view->hover.pos)){
-				SongSelection s = SongSelection::from_range(song, buf.range(), Set<const Track*>(), view->cur_layer).filter(0);
-				song->deleteSelection(s);
-			}
-	}
+	foreachi (AudioBuffer &buf, view->cur_layer()->buffers, i)
+		if (buf.range().is_inside(view->hover.pos)){
+			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			song->deleteSelection(s);
+		}
 }
 
 void TsunamiWindow::onBufferMakeMovable()
 {
-	if (view->cur_layer){
-		for (AudioBuffer &buf: view->cur_layer->buffers)
-			if (buf.range().is_inside(view->hover.pos)){
-				SongSelection s = SongSelection::from_range(song, buf.range(), Set<const Track*>(), view->cur_layer).filter(0);
-				song->createSamplesFromSelection(s);
-			}
-	}
-
+	for (AudioBuffer &buf: view->cur_layer()->buffers)
+		if (buf.range().is_inside(view->hover.pos)){
+			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			song->createSamplesFromSelection(s);
+		}
 }
 
 void TsunamiWindow::onLayerMidiModeLinear()
 {
-	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::LINEAR);
+	view->cur_vlayer->set_midi_mode(MidiMode::LINEAR);
 }
 
 void TsunamiWindow::onLayerMidiModeTab()
 {
-	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::TAB);
+	view->cur_vlayer->set_midi_mode(MidiMode::TAB);
 }
 
 void TsunamiWindow::onLayerMidiModeClassical()
 {
-	view->get_layer(view->cur_layer)->set_midi_mode(MidiMode::CLASSICAL);
+	view->cur_vlayer->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::onSongProperties()
@@ -448,7 +443,7 @@ void TsunamiWindow::onSongProperties()
 
 void TsunamiWindow::onTrackProperties()
 {
-	if (view->cur_track)
+	if (view->cur_track())
 		side_bar->open(SideBar::TRACK_CONSOLE);
 	else
 		session->e(_("No track selected"));
@@ -465,7 +460,7 @@ void TsunamiWindow::onSampleProperties()
 void TsunamiWindow::onDeleteMarker()
 {
 	if (view->hover.type == Selection::Type::MARKER)
-		view->cur_track->deleteMarker(view->hover.marker);
+		view->cur_track()->deleteMarker(view->hover.marker);
 	else
 		session->e(_("No marker selected"));
 }
@@ -473,7 +468,7 @@ void TsunamiWindow::onDeleteMarker()
 void TsunamiWindow::onEditMarker()
 {
 	if (view->hover.type == Selection::Type::MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, Range::EMPTY, view->hover.marker);
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), Range::EMPTY, view->hover.marker);
 		dlg->run();
 		delete(dlg);
 	}else
@@ -691,7 +686,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
 		Track *t = song->addTrack(SignalType::AUDIO);
-		session->storage->loadTrack(view->cur_layer, hui::Filename, view->sel.range.start());
+		session->storage->loadTrack(view->cur_layer(), hui::Filename, view->sel.range.start());
 	}
 }
 
@@ -743,12 +738,12 @@ void TsunamiWindow::onRecord()
 
 void TsunamiWindow::onAddLayer()
 {
-	view->cur_track->addLayer(false);
+	view->cur_track()->addLayer(false);
 }
 
 void TsunamiWindow::onDeleteLayer()
 {
-	view->cur_layer->track->deleteLayer(view->cur_layer);
+	view->cur_track()->deleteLayer(view->cur_layer());
 }
 
 void TsunamiWindow::onSampleFromSelection()
@@ -814,8 +809,8 @@ void TsunamiWindow::updateMenu()
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
 	// track
-	enable("delete_track", view->cur_track);
-	enable("track_properties", view->cur_track);
+	enable("delete_track", view->cur_track());
+	enable("track_properties", view->cur_track());
 	// layer
 /*	enable("layer_delete", song->layers.num > 1);
 	enable("layer_up", view->cur_layer < song->layers.num -1);

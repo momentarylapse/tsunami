@@ -221,15 +221,16 @@ public:
 	bool hasAnySoloLayer(Track *t);
 
 	void setCurSample(SampleRef *s);
-	void setCurTrack(Track *t);
-	void setCurLayer(TrackLayer *l);
-	Track *cur_track;
-	SampleRef *cur_sample;
-	TrackLayer *cur_layer;
+	//void setCurTrack(Track *t);
+	void setCurLayer(AudioViewLayer *l);
 	AudioViewLayer *cur_vlayer;
+	Track *_prev_cur_track;
+	Track *cur_track();
+	SampleRef *cur_sample;
+	TrackLayer *cur_layer();
 
 	bool editingTrack(Track *t);
-	bool editingLayer(TrackLayer *l);
+	bool editingLayer(AudioViewLayer *l);
 
 
 	void setScale(const Scale &s);

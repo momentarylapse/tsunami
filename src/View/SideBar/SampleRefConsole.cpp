@@ -114,7 +114,7 @@ void SampleRefConsole::onViewCurSampleChange()
 {
 	if (sample)
 		sample->unsubscribe(this);
-	layer = view->cur_layer;
+	layer = view->cur_layer();
 	sample = view->cur_sample;
 	if (sample)
 		sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));

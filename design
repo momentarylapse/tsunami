@@ -5,7 +5,6 @@
 
 
 
-
 == actions ==
 
 * keep instances (don't delete/new)
@@ -14,6 +13,16 @@
 
 
 == signal chains ==
+
+
+
+
+== gui ==
+
+* AudioView.cur_vlayer
+	* always trying to be valid, as long as there are valid tracks/vlayers
+	* determines cur_layer, cur_track
+
 
 
 

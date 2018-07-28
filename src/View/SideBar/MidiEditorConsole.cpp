@@ -130,12 +130,12 @@ void MidiEditorConsole::onLayerDelete()
 
 void MidiEditorConsole::onViewCurLayerChange()
 {
-	setLayer(view->cur_layer);
+	setLayer(view->cur_layer());
 }
 
 void MidiEditorConsole::onViewVTrackChange()
 {
-	update();
+	/*update();
 
 	reset("reference_tracks");
 	if (song){
@@ -145,7 +145,7 @@ void MidiEditorConsole::onViewVTrackChange()
 
 	if (layer){
 		//setSelection("reference_tracks", view->get_layer(layer)->reference_tracks);
-	}
+	}*/
 }
 
 void MidiEditorConsole::onUpdate()

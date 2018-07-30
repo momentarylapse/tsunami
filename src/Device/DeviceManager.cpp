@@ -293,7 +293,11 @@ void DeviceManager::_update_devices_audio_pulse()
 #if HAS_LIB_PORTAUDIO
 void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index)
 {
+	if (index < 0)
+		return;
 	const PaDeviceInfo* dev = Pa_GetDeviceInfo(index);
+	if (!dev)
+		return;
 	int channels = (type == DeviceType::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
 	if (channels > 0){
 		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);

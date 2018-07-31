@@ -44,7 +44,7 @@ const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
 const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
 const int AudioView::BARRIER_DIST = 8;
 ColorSchemeBasic AudioView::basic_colors;
-ColorScheme AudioView::_export_colors;
+ColorScheme AudioView::colors;
 
 extern hui::Timer debug_timer;
 
@@ -355,7 +355,6 @@ void AudioView::setColorScheme(const string &name)
 			basic_colors = b;
 
 	colors = basic_colors.create(true);
-	_export_colors = colors;
 	forceRedraw();
 }
 
@@ -908,21 +907,36 @@ void AudioView::updateTracks()
 }
 
 
-rect AudioView::getBoxedStrRect(Painter *c, float x, float y, const string &str)
+rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str)
 {
 	float w = c->getStrWidth(str);
 	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + FONT_SIZE + CORNER_RADIUS);
 }
 
-void AudioView::drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
+void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
 {
-	rect r = getBoxedStrRect(c, x, y, str);
+	rect r = get_boxed_str_rect(c, x, y, str);
 	c->setColor(col_bg);
 	c->setRoundness(CORNER_RADIUS);
 	c->drawRect(r);
 	c->setRoundness(0);
 	c->setColor(col_text);
 	c->drawStr(x, y - FONT_SIZE/3, str);
+}
+
+
+void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my)
+{
+	float x = max(mx - 20.0f, 2.0f);
+	float y = my + 20;
+	c->setFont("", -1, true, false);
+	draw_boxed_str(c, x, y, msg, colors.background, colors.text_soft1);
+	c->setFont("", -1, false, false);
+}
+
+void AudioView::draw_cursor_hover(Painter *c, const string &msg)
+{
+	draw_cursor_hover(c, msg, mx, my);
 }
 
 void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time)
@@ -934,7 +948,7 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 		c->setLineWidth(2.0f);
 		c->drawLine(p, area.y1, p, area.y2);
 		if (show_time)
-			drawBoxedStr(c,  p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
+			draw_boxed_str(c,  p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
 		c->setLineWidth(1.0f);
 	}
 }

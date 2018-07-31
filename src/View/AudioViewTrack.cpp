@@ -430,10 +430,10 @@ void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index
 	c->drawLine(x0, area.y1, x0, area.y2);
 	c->drawLine(x1, area.y1, x1, area.y2);
 	c->setLineWidth(1.0f);
-	view->drawBoxedStr(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
+	view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 
 	marker_areas[index] = rect(x0, x0 + w, y0, y1);
-	marker_label_areas[index] = view->getBoxedStrRect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
+	marker_label_areas[index] = view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
 
 	c->setFont("", -1, false, false);
 }

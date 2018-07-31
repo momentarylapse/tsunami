@@ -506,15 +506,6 @@ int ViewModeDefault::getTrackMoveTarget(bool visual)
 	return visual ? song->tracks.num : (song->tracks.num-1);
 }
 
-void drawCursorHover(ViewMode *m, Painter *c, const string &msg)
-{
-	float x = max(m->view->mx - 20.0f, 2.0f);
-	float y = m->view->my + 20;
-	c->setFont("", -1, true, false);
-	m->view->drawBoxedStr(c, x, y, msg, m->view->colors.background, m->view->colors.text_soft1);
-	c->setFont("", -1, false, false);
-}
-
 void ViewModeDefault::drawPost(Painter *c)
 {
 	if (moving_track){
@@ -534,31 +525,31 @@ void ViewModeDefault::drawPost(Painter *c)
 		r.x2 = view->TRACK_HANDLE_WIDTH;
 		c->drawRect(r);*/
 
-		drawCursorHover(this, c, moving_track->getNiceName());
+		view->draw_cursor_hover(c, moving_track->getNiceName());
 	}
 
 	if (hover->type == Selection::Type::SAMPLE)
-		drawCursorHover(this, c, _("sample ") + hover->sample->origin->name);
+		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
 	else if (hover->type == Selection::Type::MARKER)
-		drawCursorHover(this, c, _("marker ") + hover->marker->text);
+		view->draw_cursor_hover(c, _("marker ") + hover->marker->text);
 	else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
-		drawCursorHover(this, c, _("edit track properties"));
+		view->draw_cursor_hover(c, _("edit track properties"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)
-		drawCursorHover(this, c, _("toggle mute"));
+		view->draw_cursor_hover(c, _("toggle mute"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO)
-		drawCursorHover(this, c, _("toggle solo"));
+		view->draw_cursor_hover(c, _("toggle solo"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE)
-		drawCursorHover(this, c, _("edit curves"));
+		view->draw_cursor_hover(c, _("edit curves"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_FX)
-		drawCursorHover(this, c, _("edit effects"));
+		view->draw_cursor_hover(c, _("edit effects"));
 	else if (hover->type == Selection::Type::LAYER_BUTTON_MUTE)
-		drawCursorHover(this, c, _("toggle mute"));
+		view->draw_cursor_hover(c, _("toggle mute"));
 	else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
-		drawCursorHover(this, c, _("toggle solo"));
+		view->draw_cursor_hover(c, _("toggle solo"));
 	else if (hover->type == Selection::Type::BAR)
-		drawCursorHover(this, c, format(_("bar %d/\u2084 \u2669=%.1f"), hover->bar->num_beats, hover->bar->bpm(song->sample_rate)));
+		view->draw_cursor_hover(c, _("bar ") + format("%d/\u2084 \u2669=%.1f", hover->bar->num_beats, hover->bar->bpm(song->sample_rate)));
 	else if (hover->type == Selection::Type::BAR_GAP)
-		{}//drawCursorHover(this, c, _("bar gap"));
+		{}//view->draw_cursor_hover(c, _("bar gap"));
 }
 
 Selection ViewModeDefault::getHoverBasic(bool editable)

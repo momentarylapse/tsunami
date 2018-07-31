@@ -101,8 +101,11 @@ public:
 	void drawBackground(Painter *c);
 	void drawAudioFile(Painter *c);
 
-	rect getBoxedStrRect(Painter *c, float x, float y, const string &str);
-	void drawBoxedStr(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
+	static rect get_boxed_str_rect(Painter *c, float x, float y, const string &str);
+	static void draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
+
+	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my);
+	void draw_cursor_hover(Painter *c, const string &msg);
 
 	void optimizeView();
 	void updateMenu();
@@ -111,8 +114,7 @@ public:
 
 	Array<ColorSchemeBasic> basic_schemes;
 	static ColorSchemeBasic basic_colors;
-	static ColorScheme _export_colors;
-	ColorScheme colors;
+	static ColorScheme colors;
 	void setColorScheme(const string &name);
 
 	static const int SAMPLE_FRAME_HEIGHT;

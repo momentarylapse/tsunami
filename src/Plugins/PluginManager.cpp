@@ -84,7 +84,7 @@ void PluginManager::LinkAppScriptData()
 
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
-	Kaba::LinkExternal("colors", &AudioView::_export_colors);
+	Kaba::LinkExternal("colors", &AudioView::colors);
 	Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);

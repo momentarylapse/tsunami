@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>metronome</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>PeakMeter</class>
+			<position>
+				<x>263</x>
+				<y>137</y>
+			</position>
+		</module>
+		<module>
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>530</x>
+				<y>77</y>
+			</position>
+		</module>
+		<module>
+			<category>BeatSource</category>
+			<class>Metronome</class>
+			<position>
+				<x>16</x>
+				<y>76</y>
+			</position>
+			<config>(90.000000 4 1)</config>
+		</module>
+		<module>
+			<category>BeatMidifier</category>
+			<class />
+			<position>
+				<x>263</x>
+				<y>15</y>
+			</position>
+		</module>
+		<module>
+			<category>Synthesizer</category>
+			<class>FM</class>
+			<position>
+				<x>263</x>
+				<y>73</y>
+			</position>
+			<config>([(1.000000 0.500000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] true) (1.000000 0.000000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] false) (1.000000 0.000000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] false) (1.000000 0.000000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] false) (1.000000 0.000000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] false) (1.000000 0.000000 0.010000 1.000000 0.600000 0.010000 0.400000 0.400000 0 [false false false false false false] false)])</config>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="0" port="0" />
+			<target id="1" port="0" />
+		</cable>
+		<cable>
+			<source id="2" port="0" />
+			<target id="3" port="0" />
+		</cable>
+		<cable>
+			<source id="3" port="0" />
+			<target id="4" port="0" />
+		</cable>
+		<cable>
+			<source id="4" port="0" />
+			<target id="0" port="0" />
+		</cable>
+	</cables>
+</chain>

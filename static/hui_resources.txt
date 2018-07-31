@@ -7292,7 +7292,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-184
+189
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7456,6 +7456,8 @@ Layers
 Ebenen
 Length
 Dauer
+Load a signal chain
+Eine Signalkette laden
 Locrian
 Locrisch
 Lydian
@@ -7528,6 +7530,8 @@ Samples
 Samples
 Save file
 Datei speichern
+Save the signal chain
+Die Signalkette speichern
 Saxophone
 Saxophon
 Script (*.kaba)
@@ -7584,6 +7588,8 @@ audio library selected:
 Audiobibliothek gewählt: 
 backup done: 
 Backup abgeschlossen: 
+bar 
+Takt 
 bar %d/\\u2084 \\u2669=%.1f
 Takt %d/\\u2084 \\u2669=%.1f
 call: tsunami --chain <SIGNAL_CHAIN>
@@ -7622,6 +7628,8 @@ found old recording:
 alte Aufnahmedaten gefunden: 
 i'm now going to clean up...
 i'm now going to clean up...
+input: 
+Eingang: 
 loading 
 lade 
 loading buffer 
@@ -7644,6 +7652,8 @@ not configurable
 nicht konfigurierbar
 open message.txt
 message.txt öffnen
+output: 
+Ausgang: 
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 recording backup found: 

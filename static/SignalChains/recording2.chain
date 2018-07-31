@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>recording2</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>PeakMeter</class>
+			<position>
+				<x>400</x>
+				<y>41</y>
+			</position>
+		</module>
+		<module>
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>620</x>
+				<y>84</y>
+			</position>
+		</module>
+		<module>
+			<category>InputStreamAudio</category>
+			<class />
+			<position>
+				<x>-0</x>
+				<y>45</y>
+			</position>
+		</module>
+		<module>
+			<category>AudioEffect</category>
+			<class>Echo</class>
+			<position>
+				<x>205</x>
+				<y>85</y>
+			</position>
+			<config>(0.150000 0.200000 0.500000)</config>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="0" port="0" />
+			<target id="1" port="0" />
+		</cable>
+		<cable>
+			<source id="2" port="0" />
+			<target id="3" port="0" />
+		</cable>
+		<cable>
+			<source id="3" port="0" />
+			<target id="0" port="0" />
+		</cable>
+	</cables>
+</chain>

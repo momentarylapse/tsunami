@@ -1672,7 +1672,7 @@ popup_track_menu/menu_midi_mode
 Midi Modus
 
 // Num Language Strings
-184
+189
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2042,3 +2042,13 @@ marker
 Marker 
 bar %d/\\u2084 \\u2669=%.1f
 Takt %d/\\u2084 \\u2669=%.1f
+Load a signal chain
+Eine Signalkette laden
+Save the signal chain
+Die Signalkette speichern
+input: 
+Eingang: 
+output: 
+Ausgang: 
+bar 
+Takt 

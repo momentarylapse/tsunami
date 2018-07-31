@@ -10,6 +10,7 @@
 #include "../../Module/Port/MidiPort.h"
 #include "../AudioView.h"
 #include "../../Session.h"
+#include "../../Storage/Storage.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Module/Module.h"
 #include "../../lib/math/complex.h"
@@ -296,6 +297,15 @@ public:
 			}else
 				p->drawLine(sel.dx, sel.dy, hui::GetEvent()->mx, hui::GetEvent()->my);
 		}
+
+
+		float mx = hui::GetEvent()->mx;
+		float my = hui::GetEvent()->my;
+		Selection hh = getHover(mx, my);
+		if (hh.type == hover.TYPE_PORT_IN)
+			AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my);
+		if (hh.type == hover.TYPE_PORT_OUT)
+			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my);
 	}
 
 	void onChainUpdate()
@@ -303,10 +313,11 @@ public:
 		redraw("area");
 	}
 
-
 	void onLeftButtonDown()
 	{
-		hover = getHover(hui::GetEvent()->mx, hui::GetEvent()->my);
+		float mx = hui::GetEvent()->mx;
+		float my = hui::GetEvent()->my;
+		hover = getHover(mx, my);
 		sel = hover;
 		apply_sel();
 		if (sel.type == sel.TYPE_PORT_IN){
@@ -366,8 +377,8 @@ public:
 
 	void onRightButtonDown()
 	{
-		int mx = hui::GetEvent()->mx;
-		int my = hui::GetEvent()->my;
+		float mx = hui::GetEvent()->mx;
+		float my = hui::GetEvent()->my;
 		hover = getHover(mx, my);
 		sel = hover;
 		apply_sel();
@@ -532,8 +543,10 @@ public:
 
 	void onSave()
 	{
-		if (hui::FileDialogSave(win, "", "", "*.chain", "*.chain"))
+		if (hui::FileDialogSave(win, _("Save the signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
+			session->storage->current_chain_directory = hui::Filename.dirname();
 			chain->save(hui::Filename);
+		}
 	}
 
 
@@ -597,7 +610,8 @@ void SignalEditor::onNew()
 
 void SignalEditor::onLoad()
 {
-	if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain")){
+	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
+		session->storage->current_chain_directory = hui::Filename.dirname();
 		auto *c = new SignalChain(session, "new");
 		c->load(hui::Filename);
 		addChain(c);

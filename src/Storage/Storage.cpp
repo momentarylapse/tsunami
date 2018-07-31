@@ -54,6 +54,7 @@ Storage::Storage(Session *_session)
 	formats.add(new FormatDescriptorPdf());
 
 	current_directory = hui::Config.getStr("CurrentDirectory", "");
+	current_chain_directory = hui::Application::directory_static + "SignalChains/";
 }
 
 Storage::~Storage()

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>spec</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>PeakMeter</class>
+			<position>
+				<x>461</x>
+				<y>44</y>
+			</position>
+		</module>
+		<module>
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>689</x>
+				<y>84</y>
+			</position>
+		</module>
+		<module>
+			<category>InputStreamAudio</category>
+			<class />
+			<position>
+				<x>32</x>
+				<y>57</y>
+			</position>
+		</module>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>Spectrum</class>
+			<position>
+				<x>256</x>
+				<y>92</y>
+			</position>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="0" port="0" />
+			<target id="1" port="0" />
+		</cable>
+		<cable>
+			<source id="2" port="0" />
+			<target id="3" port="0" />
+		</cable>
+		<cable>
+			<source id="3" port="0" />
+			<target id="0" port="0" />
+		</cable>
+	</cables>
+</chain>

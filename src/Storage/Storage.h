@@ -48,6 +48,7 @@ public:
 //private:
 	Array<FormatDescriptor*> formats;
 	string current_directory;
+	string current_chain_directory;
 
 	Session *session;
 };

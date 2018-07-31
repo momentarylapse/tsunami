@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>recording</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioSource</category>
+			<class>SongRenderer</class>
+			<position>
+				<x>50</x>
+				<y>50</y>
+			</position>
+		</module>
+		<module>
+			<category>AudioVisualizer</category>
+			<class>PeakMeter</class>
+			<position>
+				<x>280</x>
+				<y>80</y>
+			</position>
+		</module>
+		<module>
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>510</x>
+				<y>50</y>
+			</position>
+		</module>
+		<module>
+			<category>InputStreamAudio</category>
+			<class />
+			<position>
+				<x>69</x>
+				<y>142</y>
+			</position>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="1" port="0" />
+			<target id="2" port="0" />
+		</cable>
+		<cable>
+			<source id="3" port="0" />
+			<target id="1" port="0" />
+		</cable>
+	</cables>
+</chain>

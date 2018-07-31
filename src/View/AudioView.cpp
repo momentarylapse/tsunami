@@ -379,16 +379,6 @@ void AudioView::setMouse()
 	my = hui::GetEvent()->my;
 }
 
-bool AudioView::mouseOverTrack(AudioViewTrack *t)
-{
-	return t->area.inside(mx, my);
-}
-
-bool AudioView::mouseOverLayer(AudioViewLayer *l)
-{
-	return l->area.inside(mx, my);
-}
-
 int AudioView::mouseOverSample(SampleRef *s)
 {
 	if ((mx >= s->area.x1) and (mx < s->area.x2)){
@@ -1384,9 +1374,9 @@ Set<Track*> AudioView::get_playable_tracks()
 {
 	Set<Track*> tracks;
 	bool any_solo = hasAnySoloTrack();
-	for (Track* t: song->tracks)
-		if (get_track(t)->solo or !any_solo)
-			tracks.add(t);
+	for (auto *t: vtrack)
+		if (t->solo or !any_solo)
+			tracks.add(t->track);
 	return tracks;
 }
 

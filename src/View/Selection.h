@@ -26,8 +26,9 @@ class Selection
 {
 public:
 	AudioViewLayer *vlayer;
-	Track *track;
 	TrackLayer *layer;
+	AudioViewTrack *vtrack;
+	Track *track;
 	SampleRef *sample;
 	MidiNote *note;
 	TrackMarker *marker;

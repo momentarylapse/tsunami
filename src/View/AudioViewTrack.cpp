@@ -488,6 +488,11 @@ int AudioViewLayer::y2clef_linear(float y, NoteModifier &mod)
 	return clef.pitch_to_position(pitch, view->midi_scale, mod);
 }
 
+bool AudioViewLayer::mouse_over()
+{
+	return area.inside(view->mx, view->my);
+}
+
 void get_col(color &col, color &col_shadow, const MidiNote *n, AudioViewLayer::MidiNoteState state, AudioView *view)
 {
 

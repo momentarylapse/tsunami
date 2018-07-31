@@ -105,6 +105,9 @@ public:
 
 	void setSolo(bool solo);
 	bool solo;
+
+
+	bool mouse_over();
 };
 
 class AudioViewTrack

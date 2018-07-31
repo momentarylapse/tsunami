@@ -80,8 +80,7 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE){
 		hover->track->setMuted(!hover->track->muted);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO){
-		auto vt = view->get_track(hover->track);
-		vt->setSolo(!vt->solo);
+		hover->vtrack->setSolo(!hover->vtrack->solo);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT){
 		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_FX){
@@ -574,11 +573,12 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 
 	// layer?
 	foreachi(AudioViewLayer *l, view->vlayer, i){
-		if (view->mouseOverLayer(l)){
+		if (l->mouse_over()){
 			s.vlayer = l;
 			s.index = i;
 			s.layer = l->layer;
 			s.track = l->layer->track;
+			s.vtrack = view->get_track(s.track);
 			s.type = Selection::Type::LAYER;
 			if (l->layer->is_main)
 				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
@@ -615,7 +615,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 
 	// track header buttons?
 	if (s.track){
-		AudioViewTrack *t = view->get_track(s.track);
+		AudioViewTrack *t = s.vtrack;
 		int x = 5;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::Type::TRACK_BUTTON_MUTE;

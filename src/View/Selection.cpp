@@ -36,6 +36,7 @@ void Selection::clear()
 {
 	type = Type::NONE;
 	track = nullptr;
+	vtrack = nullptr;
 	layer = nullptr;
 	vlayer = nullptr;
 	sample = nullptr;

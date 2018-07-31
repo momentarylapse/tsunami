@@ -471,6 +471,11 @@ void OutputStream::set_device(Device *d)
 	device = d;
 }
 
+void OutputStream::set_update_dt(float dt)
+{
+	update_dt = dt;
+}
+
 void OutputStream::play()
 {
 	if (fully_initialized)

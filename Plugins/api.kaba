@@ -427,6 +427,7 @@ class OutputStream extends Module
 	extern float get_volume()
 	extern void set_volume(float volume)
 	extern void set_buffer_size(int size)
+	extern void set_update_dt(float dt)
 	extern bool is_paused()
 
 /*class AudioInput //: Observable

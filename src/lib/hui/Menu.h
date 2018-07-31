@@ -19,7 +19,7 @@ class Menu;
 class Control;
 
 
-class Menu
+class Menu : public VirtualBase
 {
 public:
 	Menu();
@@ -27,20 +27,21 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__();
 	void _cdecl clear();
-	void _cdecl openPopup(Panel *panel, int x, int y);
-	void _cdecl addItem(const string &name, const string &id);
-	void _cdecl addItemImage(const string &name, const string &image, const string &id);
-	void _cdecl addItemCheckable(const string &name, const string &id);
-	void _cdecl addSeparator();
-	void _cdecl addSubMenu(const string &name, const string &id, Menu *menu);
+	void _cdecl open_popup(Panel *panel);
+	void _cdecl add(const string &name, const string &id);
+	void _cdecl add_with_image(const string &name, const string &image, const string &id);
+	void _cdecl add_checkable(const string &name, const string &id);
+	void _cdecl add_separator();
+	void _cdecl add_sub_menu(const string &name, const string &id, Menu *menu);
 	void _cdecl enable(const string &id, bool enabled);
-	void _cdecl setID(const string &id);
-	Menu *getSubMenuByID(const string &id);
+	void _cdecl check(const string &id, bool checked);
+	void _cdecl set_id(const string &id);
+	Menu *get_sub_menu_by_id(const string &id);
 
-	void add(Control *c);
+	void _add(Control *c);
 	Array<Control*> get_all_controls();
 
-	void updateLanguage();
+	void __update_language();
 	void set_panel(Panel *panel);
 	
 #ifdef HUI_API_GTK

@@ -197,16 +197,16 @@ Menu *_create_res_menu_(const string &ns, Resource *res)
 	for (Resource &c: res->children){
 		if (c.type == "Item"){
 			if (sa_contains(c.options, "checkable"))
-				menu->addItemCheckable(get_lang(ns, c.id, c.title, true), c.id);
+				menu->add_checkable(get_lang(ns, c.id, c.title, true), c.id);
 			else if (c.image().num > 0)
-				menu->addItemImage(get_lang(ns, c.id, c.title, true), c.image(), c.id);
+				menu->add_with_image(get_lang(ns, c.id, c.title, true), c.image(), c.id);
 			else
-				menu->addItem(get_lang(ns, c.id, c.title, true), c.id);
+				menu->add(get_lang(ns, c.id, c.title, true), c.id);
 		}else if (c.type == "Separator"){
-			menu->addSeparator();
+			menu->add_separator();
 		}else if (c.type == "Menu"){
 			Menu *sub = _create_res_menu_(ns, &c);
-			menu->addSubMenu(get_lang(ns, c.id, c.title, true), c.id, sub);
+			menu->add_sub_menu(get_lang(ns, c.id, c.title, true), c.id, sub);
 		}
 		if (menu->items.num > 0)
 			menu->items.back()->enable(c.enabled());

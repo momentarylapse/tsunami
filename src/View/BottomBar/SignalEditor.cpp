@@ -384,9 +384,9 @@ public:
 		apply_sel();
 
 		if (hover.type == hover.TYPE_MODULE){
-			editor->menu_module->openPopup(this, mx, my);
+			editor->menu_module->open_popup(this);
 		}else if (hover.type < 0){
-			editor->menu_chain->openPopup(this, mx, my);
+			editor->menu_chain->open_popup(this);
 		}
 	}
 

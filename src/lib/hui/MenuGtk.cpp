@@ -70,7 +70,7 @@ void OnGtkMenuClose(GtkMenuShell *menushell, gpointer user_data)
 
 
 // window coordinate system!
-void Menu::openPopup(Panel *panel, int x, int y)
+void Menu::open_popup(Panel *panel)
 {
 	gtk_widget_show(widget);
 #if GTK_CHECK_VERSION(3,22,0)
@@ -83,7 +83,7 @@ void Menu::openPopup(Panel *panel, int x, int y)
 	set_panel(panel);
 }
 
-void Menu::add(Control *c)
+void Menu::_add(Control *c)
 {
 	items.add(c);
 	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);

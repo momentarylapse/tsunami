@@ -6,11 +6,19 @@ use "../MidiSource/Metronome.kaba"
 enum
 	MODE_CIRCLE
 	MODE_BOUNCE
+	MODE_BOUNCE_WALK
+
+const float MAX_BACKGROUND_REDNESS = 0.7
 
 class MetronomeDialog extends Dialog
 	Metronome *metro
 	Timer timer
 	float fraction_prev
+	
+	bool allow_blink_background
+	bool allow_blink_number
+	int mode
+	Menu *popup_menu
 	
 	void __init__(Metronome *_metro)
 		super.__init__("Metronome", 400, 520, _metro.session.win, true)
@@ -23,15 +31,28 @@ Grid ? '' vertical
 		Text ? '/min'
 		---|
 		Text ? 'Beats'
-		SpinButton num_beats '4' range=1:99
+		SpinButton num-beats '4' range=1:99
 		---|
 		Text ? 'Sub Beats'
-		SpinButton num_sub_beats '1' range=1:99
+		SpinButton num-sub-beats '1' range=1:99
 	Grid ? '' buttonbar
 		Button close 'Close' image=hui:close")
 		
 		metro = _metro
 		fraction_prev = 0
+		
+		mode = HuiConfig.get_int("Plugins/Metronome/Mode", MODE_CIRCLE)
+		allow_blink_background = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
+		allow_blink_number = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
+		
+		popup_menu = new Menu
+		popup_menu.add_checkable("Blink background", "blink-background")
+		popup_menu.add_checkable("Blink number", "blink-number")
+		Menu *sub_mode = new Menu
+		sub_mode.add_checkable("Circle", "mode-circle")
+		sub_mode.add_checkable("Bounce", "mode-bounce")
+		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
+		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
 		set_float("bpm", metro.source.config.bpm)
 		set_int("num_beats", metro.source.config.beats)
@@ -39,9 +60,19 @@ Grid ? '' vertical
 		event("hui:close", &on_close)
 		event("close", &on_close)
 		event("bpm", &on_bpm)
-		event("num_beats", &on_num_beats)
-		event("num_sub_beats", &on_num_beats)
+		event("num-beats", &on_num_beats)
+		event("num-sub-beats", &on_num_beats)
 		event_x("area", "hui:left-button-down", &on_area_left_button_down)
+		event_x("area", "hui:right-button-down", &on_area_right_button_down)
+		
+		event("blink-background", &on_blink_background)
+		event("blink-number", &on_blink_number)
+		event("mode-circle", &on_mode_circle)
+		event("mode-bounce", &on_mode_bounce)
+		event("mode-bounce-walk", &on_mode_bounce_walk)
+	
+	override void __delete__()
+		delete popup_menu
 	
 	override void on_draw(Painter *p)
 		float w = p.width
@@ -53,39 +84,60 @@ Grid ? '' vertical
 		float closeness = metro.source.fraction_beat*2-1
 		if metro.source.fraction_beat < 0.5
 			closeness = 1 - metro.source.fraction_beat*2
-		
-		bool crossed_beat = fraction_prev > metro.source.fraction_beat
-		if crossed_beat
-			pass
+		float bar_fraction = (metro.source.cur_beat + metro.source.fraction_beat) / metro.source.config.beats
 		
 		// background
-		p.set_color(ColorInterpolate(Red, colors.background, 1 - pow(closeness, 20)))
+		if allow_blink_background
+			p.set_color(ColorInterpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 20)))
+		else
+			p.set_color(colors.background)
 		p.draw_rect(0, 0, w, h)
 		
-		// circle
-		p.set_line_width(r*0.05)
-		p.set_color(ColorInterpolate(colors.grid, colors.background, 0.5))
-		p.set_fill(false)
-		p.draw_circle(x0, y0, r)
+		if mode == MODE_CIRCLE
+			// circle
+			p.set_line_width(r*0.05)
+			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.5))
+			p.set_fill(false)
+			p.draw_circle(x0, y0, r)
 		
-		// top point
-		p.set_fill(true)
-		p.set_color(colors.text_soft3)
-		p.draw_circle(x0, y0 - r, r*0.07)
+			// top point
+			p.set_fill(true)
+			p.set_color(colors.text_soft3)
+			p.draw_circle(x0, y0 - r, r*0.07)
 		
-		// moving point
-		p.set_color(colors.text)
-		float t = metro.source.fraction_beat - 0.5
-		float phi = 2 *pi * (2*t*t*t + t/2)
-		p.draw_circle(x0 - sin(phi) * r, y0 + cos(phi) * r, r*0.1)
+			// moving point
+			p.set_color(colors.text)
+			float t = metro.source.fraction_beat - 0.5
+			float phi = 2 *pi * (2*t*t*t + t/2)
+			p.draw_circle(x0 - sin(phi) * r, y0 + cos(phi) * r, r*0.1)
+		else if mode == MODE_BOUNCE
+			p.set_color(colors.text)
+			float t = metro.source.fraction_beat
+			p.draw_circle(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r, r*0.1)
+		else if mode == MODE_BOUNCE_WALK
+			p.set_color(colors.text_soft3)
+			for i in 0:metro.source.config.beats
+				float tx = loop((i + 0.5)/metro.source.config.beats, 0, 1)
+				if i == 0
+					p.draw_circle(w * tx, y0 + r, r*0.05)
+				else
+					p.draw_circle(w * tx, y0 + r, r*0.03)
+			
+			p.set_color(colors.text)
+			float t = metro.source.fraction_beat
+			float tx = loop(bar_fraction + 0.5/metro.source.config.beats, 0, 1)
+			p.draw_circle(w*tx, y0 + r - 2*abs(sin(t*pi)) * r, r*0.1)
 		
 		// beat number
-		float fs = r * (1 + pow(closeness,5) * 0.5) * 0.5
+		float fs = r * 0.5
+		if allow_blink_number
+			fs *= (1 + pow(closeness,5) * 0.5)
 		p.set_font_size(fs)
 		if metro.source.pause
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, "⏸")
 		else
+			p.set_color(colors.text)
 			int n = metro.source.cur_beat + 1
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, n)
 		
@@ -95,13 +147,41 @@ Grid ? '' vertical
 	void on_area_left_button_down()
 		metro.source.set_pause(!metro.source.pause)
 		redraw("area")
+	
+	void on_area_right_button_down()
+		popup_menu.check("blink-background", allow_blink_background)
+		popup_menu.check("blink-number", allow_blink_number)
+		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
+		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
+		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
+		popup_menu.popup(self)
+	
+	void on_blink_background()
+		allow_blink_background = !allow_blink_background
+		HuiConfig.set_bool("Plugins/Metronome/AllowBlinkBackground", allow_blink_background)
+	
+	void on_blink_number()
+		allow_blink_number = !allow_blink_number
+		HuiConfig.set_bool("Plugins/Metronome/AllowBlinkNumber", allow_blink_number)
+	
+	void on_mode_circle()
+		mode = MODE_CIRCLE
+		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+	
+	void on_mode_bounce()
+		mode = MODE_BOUNCE
+		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+	
+	void on_mode_bounce_walk()
+		mode = MODE_BOUNCE_WALK
+		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
 
 	void on_bpm()
 		metro.source.set_bpm(get_float(""))
 
 	void on_num_beats()
-		int beats = get_int("num_beats")
-		int sub_beats = get_int("num_sub_beats")
+		int beats = get_int("num-beats")
+		int sub_beats = get_int("num-sub-beats")
 		metro.source.set_beats(beats, sub_beats)
 
 	void on_close()

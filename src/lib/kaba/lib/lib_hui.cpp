@@ -62,6 +62,8 @@ void SIAddPackageHui()
 	Class*
 	TypeHuiPanel	= add_type  ("Panel", sizeof(hui::Panel));
 	Class*
+	TypeHuiPanelP	= add_type_p("Panel*", TypeHuiPanel);
+	Class*
 	TypeHuiWindow	= add_type  ("Window", sizeof(hui::Window));
 	TypeHuiWindowP	= add_type_p("Window*",	TypeHuiWindow);
 	Class*
@@ -87,25 +89,29 @@ void SIAddPackageHui()
 
 	add_class(TypeHuiMenu);
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::Menu::__init__));
-		class_add_func("popup",	TypeVoid,		mf(&hui::Menu::openPopup));
-			func_add_param("w",			TypeHuiWindowP);
-			func_add_param("x",			TypeInt);
-			func_add_param("y",			TypeInt);
-		class_add_func("add",		TypeVoid,		mf(&hui::Menu::addItem));
+		class_add_func("popup",	TypeVoid,		mf(&hui::Menu::open_popup));
+			func_add_param("p",			TypeHuiPanelP);
+		class_add_func("add",		TypeVoid,		mf(&hui::Menu::add));
 			func_add_param("name",		TypeString);
-			func_add_param("id",		TypeInt);
-		class_add_func("add_with_image",	TypeVoid,		mf(&hui::Menu::addItemImage));
+			func_add_param("id",		TypeString);
+		class_add_func("add_with_image",	TypeVoid,		mf(&hui::Menu::add_with_image));
 			func_add_param("name",		TypeString);
 			func_add_param("image",		TypeInt);
-			func_add_param("id",		TypeInt);
-		class_add_func("add_checkable",	TypeVoid,		mf(&hui::Menu::addItemCheckable));
+			func_add_param("id",		TypeString);
+		class_add_func("add_checkable",	TypeVoid,		mf(&hui::Menu::add_checkable));
 			func_add_param("name",		TypeString);
-			func_add_param("id",		TypeInt);
-		class_add_func("add_separator",	TypeVoid,		mf(&hui::Menu::addSeparator));
-		class_add_func("add_sub_menu",	TypeVoid,		mf(&hui::Menu::addSubMenu));
+			func_add_param("id",		TypeString);
+		class_add_func("add_separator",	TypeVoid,		mf(&hui::Menu::add_separator));
+		class_add_func("add_sub_menu",	TypeVoid,		mf(&hui::Menu::add_sub_menu));
 			func_add_param("name",		TypeString);
-			func_add_param("id",		TypeInt);
+			func_add_param("id",		TypeString);
 			func_add_param("sub_menu",	TypeHuiMenuP);
+		class_add_func("enable",	TypeVoid,		mf(&hui::Menu::enable));
+			func_add_param("id",		TypeString);
+			func_add_param("enabled",		TypeBool);
+		class_add_func("check",	TypeVoid,		mf(&hui::Menu::check));
+			func_add_param("id",		TypeString);
+			func_add_param("checked",		TypeBool);
 
 		add_class(TypeHuiToolbar);
 			class_add_func("set_by_id", TypeVoid, mf(&hui::Toolbar::setByID));
@@ -452,28 +458,28 @@ void SIAddPackageHui()
 
 
 	add_class(TypeHuiConfiguration);
-		class_add_func("set_int",								TypeVoid,	mf(&hui::Configuration::getInt));
+		class_add_func("set_int",								TypeVoid,	mf(&hui::Configuration::setInt));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeInt);
-		class_add_func("set_float",								TypeVoid,	mf(&hui::Configuration::getFloat));
+		class_add_func("set_float",								TypeVoid,	mf(&hui::Configuration::setFloat));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeFloat32);
-		class_add_func("set_bool",								TypeVoid,	mf(&hui::Configuration::getBool));
+		class_add_func("set_bool",								TypeVoid,	mf(&hui::Configuration::setBool));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeBool);
-		class_add_func("set_str",								TypeVoid,	mf(&hui::Configuration::getStr));
+		class_add_func("set_str",								TypeVoid,	mf(&hui::Configuration::setStr));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeString);
-		class_add_func("get_int",								TypeInt,	mf(&hui::Configuration::setInt));
+		class_add_func("get_int",								TypeInt,	mf(&hui::Configuration::getInt));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeInt);
-		class_add_func("get_float",								TypeFloat32,	mf(&hui::Configuration::setFloat));
+		class_add_func("get_float",								TypeFloat32,	mf(&hui::Configuration::getFloat));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeFloat32);
-		class_add_func("get_bool",								TypeBool,	mf(&hui::Configuration::setBool));
+		class_add_func("get_bool",								TypeBool,	mf(&hui::Configuration::getBool));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeBool);
-		class_add_func("get_str",								TypeString,	mf(&hui::Configuration::setStr));
+		class_add_func("get_str",								TypeString,	mf(&hui::Configuration::getStr));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeString);
 	

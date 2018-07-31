@@ -23,11 +23,6 @@
 #include "../../Data/SampleRef.h"
 #include "../../lib/hui/Controls/Control.h"
 
-void menu_check(hui::Menu *menu, const string &id, bool checked)
-{
-	menu->apply_foreach(id, [checked](hui::Control*c){ c->check(checked); });
-}
-
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
@@ -191,36 +186,36 @@ void ViewModeDefault::onRightButtonDown()
 	view->updateMenu();
 
 	if (hover->type == Selection::Type::SAMPLE){
-		view->menu_sample->openPopup(view->win, 0, 0);
+		view->menu_sample->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR){
 		view->menu_time_track->enable("delete_bars", true);
 		view->menu_time_track->enable("edit_bars", true);
 		view->menu_time_track->enable("scale_bars", true);
-		view->menu_time_track->openPopup(view->win, 0, 0);
-		//view->menu_bar->openPopup(view->win, 0, 0);
+		view->menu_time_track->open_popup(view->win);
+		//view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::MARKER){
-		view->menu_marker->openPopup(view->win, 0, 0);
+		view->menu_marker->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		view->menu_time_track->enable("delete_bars", false);
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
-		view->menu_time_track->openPopup(view->win, 0, 0);
+		view->menu_time_track->open_popup(view->win);
 	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == SignalType::BEATS)){
 		view->menu_time_track->enable("delete_bars", false);
 		view->menu_time_track->enable("edit_bars", false);
 		view->menu_time_track->enable("scale_bars", false);
-		view->menu_time_track->openPopup(view->win, 0, 0);
+		view->menu_time_track->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		view->menu_layer->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
-		menu_check(view->menu_layer, "layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-		menu_check(view->menu_layer, "layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-		menu_check(view->menu_layer, "layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
-		view->menu_layer->openPopup(view->win, 0, 0);
+		view->menu_layer->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+		view->menu_layer->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+		view->menu_layer->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+		view->menu_layer->open_popup(view->win);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 		view->menu_track->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
-		menu_check(view->menu_track, "layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-		menu_check(view->menu_track, "layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-		menu_check(view->menu_track, "layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+		view->menu_track->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+		view->menu_track->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+		view->menu_track->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
 
 		view->menu_track->enable("menu_midi_mode", hover->track->type == SignalType::MIDI);
 		view->menu_track->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
@@ -230,9 +225,9 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_track->enable("layer_merge", !hover->layer->is_main);
 		view->menu_track->enable("delete_layer", !hover->layer->is_main);
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
-		view->menu_track->openPopup(view->win, 0, 0);
+		view->menu_track->open_popup(view->win);
 	}else if (!hover->track){
-		view->menu_song->openPopup(view->win, 0, 0);
+		view->menu_song->open_popup(view->win);
 	}
 }
 

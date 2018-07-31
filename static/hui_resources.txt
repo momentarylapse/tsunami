@@ -674,17 +674,11 @@ Grid
 
 0
 0
-2
+1
 ListView
 log_list
 format=it,nobar
 0
-0
-0
-Button
-clear
-image=hui:clear
-1
 0
 0
 // Resource
@@ -4305,7 +4299,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-440
+439
 // Text
 /cancel
 Cancel
@@ -4547,9 +4541,6 @@ Edit
 layer_dialog/merge_layer
 
 Merge the selected layer with the one below it
-log_console/clear
-
-delete all messages
 log_console/log_console
 Nachrichten
 

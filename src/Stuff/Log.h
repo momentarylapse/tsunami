@@ -25,23 +25,23 @@ public:
 	void warn(Session *session, const string &message);
 	void info(Session *session, const string &message);
 
-	enum{
-		TYPE_ERROR,
-		TYPE_WARNING,
-		TYPE_INFO
+	enum class Type{
+		ERROR,
+		WARNING,
+		INFO
 	};
 
 	struct Message
 	{
 		Session *session;
-		int type;
+		Type type;
 		string text;
 	};
 
 	Array<Message> all(Session *session);
 
 private:
-	void addMessage(Session *session, int type, const string &message);
+	void addMessage(Session *session, Type type, const string &message);
 	Array<Message> messages;
 };
 

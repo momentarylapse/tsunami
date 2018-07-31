@@ -18,10 +18,9 @@ public:
 	LogConsole(Session *session);
 	virtual ~LogConsole();
 
-	void onClear();
 	void reload();
 
-	void onLogAdd();
+	void on_log_add();
 
 	Log *log;
 	int messages_loaded;

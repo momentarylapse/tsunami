@@ -14,19 +14,19 @@ const string Log::MESSAGE_ADD = "Add";
 
 void Log::error(Session *session, const string &message)
 {
-	addMessage(session, TYPE_ERROR, message);
+	addMessage(session, Type::ERROR, message);
 }
 
 
 void Log::warn(Session *session, const string &message)
 {
-	addMessage(session, TYPE_WARNING, message);
+	addMessage(session, Type::WARNING, message);
 }
 
 
 void Log::info(Session *session, const string &message)
 {
-	addMessage(session, TYPE_INFO, message);
+	addMessage(session, Type::INFO, message);
 }
 
 
@@ -40,7 +40,7 @@ Array<Log::Message> Log::all(Session *session)
 }
 
 
-void Log::addMessage(Session *session, int type, const string &_message)
+void Log::addMessage(Session *session, Type type, const string &_message)
 {
 	Message m;
 	m.session = session;
@@ -48,9 +48,9 @@ void Log::addMessage(Session *session, int type, const string &_message)
 	m.text = _message;
 	messages.add(m);
 
-	if (type == TYPE_ERROR){
+	if (type == Type::ERROR){
 		msg_error(_message);
-	}else if (type == TYPE_WARNING){
+	}else if (type == Type::WARNING){
 		msg_write(_message);
 	}else{
 		msg_write(_message);

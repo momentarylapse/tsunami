@@ -8,17 +8,50 @@ enum
 	MODE_BOUNCE
 	MODE_BOUNCE_WALK
 
+const float UPDATE_DT = 1.0 / 50
 const float MAX_BACKGROUND_REDNESS = 0.7
+const int MOTION_BLUR_COUNT = 20
+
+
+class BlurredDot
+	complex pos, pos0
+	bool has_prev
+	void __init__()
+		has_prev = false
+	void move(float x, float y)
+		pos0 = pos
+		pos.x = x
+		pos.y = y
+		has_prev = true
+	void jump(float x, float y)
+		pos.x = x
+		pos.y = y
+		has_prev = false
+	void draw(Painter *p, color c, float r)
+		if has_prev
+			float dt = 1.0 / MOTION_BLUR_COUNT
+			color cc = c
+			cc.a = sqrt(dt)
+			p.set_color(cc)
+			for t in 0.0:1.0:dt
+				float tt = pow(t-0.5, 3)*4+0.5
+				p.draw_circle(pos.x * tt + pos0.x * (1-tt), pos.y * tt + pos0.y * (1-tt), r)
+		else
+			p.set_color(c)
+			p.draw_circle(pos.x, pos.y, r)
 
 class MetronomeDialog extends Dialog
 	Metronome *metro
 	Timer timer
 	float fraction_prev
 	
+	bool fullscreen
 	bool allow_blink_background
 	bool allow_blink_number
 	int mode
 	Menu *popup_menu
+	
+	BlurredDot dot
 	
 	void __init__(Metronome *_metro)
 		super.__init__("Metronome", 400, 520, _metro.session.win, true)
@@ -41,6 +74,7 @@ Grid ? '' vertical
 		metro = _metro
 		fraction_prev = 0
 		
+		fullscreen = false
 		mode = HuiConfig.get_int("Plugins/Metronome/Mode", MODE_CIRCLE)
 		allow_blink_background = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
@@ -53,6 +87,7 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
+		popup_menu.add_checkable("Fullscreen", "fullscreen")
 	
 		set_float("bpm", metro.source.config.bpm)
 		set_int("num_beats", metro.source.config.beats)
@@ -70,6 +105,7 @@ Grid ? '' vertical
 		event("mode-circle", &on_mode_circle)
 		event("mode-bounce", &on_mode_bounce)
 		event("mode-bounce-walk", &on_mode_bounce_walk)
+		event("fullscreen", &on_fullscreen)
 	
 	override void __delete__()
 		delete popup_menu
@@ -87,10 +123,10 @@ Grid ? '' vertical
 		float bar_fraction = (metro.source.cur_beat + metro.source.fraction_beat) / metro.source.config.beats
 		
 		// background
+		color bg = colors.background
 		if allow_blink_background
-			p.set_color(ColorInterpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 20)))
-		else
-			p.set_color(colors.background)
+			bg = ColorInterpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+		p.set_color(bg)
 		p.draw_rect(0, 0, w, h)
 		
 		if mode == MODE_CIRCLE
@@ -106,14 +142,14 @@ Grid ? '' vertical
 			p.draw_circle(x0, y0 - r, r*0.07)
 		
 			// moving point
-			p.set_color(colors.text)
 			float t = metro.source.fraction_beat - 0.5
 			float phi = 2 *pi * (2*t*t*t + t/2)
-			p.draw_circle(x0 - sin(phi) * r, y0 + cos(phi) * r, r*0.1)
+			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
+			dot.draw(p, colors.text, r*0.1)
 		else if mode == MODE_BOUNCE
-			p.set_color(colors.text)
 			float t = metro.source.fraction_beat
-			p.draw_circle(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r, r*0.1)
+			dot.move(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r)
+			dot.draw(p, colors.text, r*0.1)
 		else if mode == MODE_BOUNCE_WALK
 			p.set_color(colors.text_soft3)
 			for i in 0:metro.source.config.beats
@@ -123,26 +159,33 @@ Grid ? '' vertical
 				else
 					p.draw_circle(w * tx, y0 + r, r*0.03)
 			
-			p.set_color(colors.text)
 			float t = metro.source.fraction_beat
 			float tx = loop(bar_fraction + 0.5/metro.source.config.beats, 0, 1)
-			p.draw_circle(w*tx, y0 + r - 2*abs(sin(t*pi)) * r, r*0.1)
+			if w*tx < dot.pos.x
+				dot.jump(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
+			else
+				dot.move(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
+			dot.draw(p, colors.text, r*0.1)
 		
 		// beat number
 		float fs = r * 0.5
 		if allow_blink_number
-			fs *= (1 + pow(closeness,5) * 0.5)
-		p.set_font_size(fs)
+			fs *= (1 + pow(closeness,5) * 0.2)
 		if metro.source.pause
+			p.set_font_size(fs)
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, "⏸")
 		else
-			p.set_color(colors.text)
 			int n = metro.source.cur_beat + 1
+			if n == 1
+				p.set_color(colors.text)
+			else
+				fs *= 0.8
+				p.set_color(colors.text_soft2)
+			p.set_font_size(fs)
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, n)
 		
 		fraction_prev = metro.source.fraction_beat
-		//t_blink *= exp(-dt*20)
 	
 	void on_area_left_button_down()
 		metro.source.set_pause(!metro.source.pause)
@@ -154,6 +197,7 @@ Grid ? '' vertical
 		popup_menu.check("mode-circle", mode == MODE_CIRCLE)
 		popup_menu.check("mode-bounce", mode == MODE_BOUNCE)
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
+		popup_menu.check("fullscreen", fullscreen)
 		popup_menu.popup(self)
 	
 	void on_blink_background()
@@ -175,6 +219,11 @@ Grid ? '' vertical
 	void on_mode_bounce_walk()
 		mode = MODE_BOUNCE_WALK
 		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
+	
+	void on_fullscreen()
+		fullscreen = !fullscreen
+		set_fullscreen(fullscreen)
+		//show_control()
 
 	void on_bpm()
 		metro.source.set_bpm(get_float(""))
@@ -205,7 +254,7 @@ class Metronome extends TsunamiPlugin
 	
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(1024)
-		stream.set_update_dt(1.0 / 50)
+		stream.set_update_dt(UPDATE_DT)
 		stream.play()
 		
 		stream.subscribe(self, &onUpdate, "Update")

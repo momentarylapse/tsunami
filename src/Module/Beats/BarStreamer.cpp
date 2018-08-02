@@ -8,6 +8,7 @@
 #include "BarStreamer.h"
 
 #include "../../Data/Rhythm/Beat.h"
+#include "../../Data/Rhythm/Bar.h"
 
 BarStreamer::BarStreamer(BarCollection &_bars)
 {
@@ -15,6 +16,7 @@ BarStreamer::BarStreamer(BarCollection &_bars)
 	offset = 0;
 	_cur_beat = 0;
 	_beat_fraction = 0;
+	_beats_per_bar = 4;
 }
 
 int BarStreamer::read(Array<Beat> &beats, int samples)
@@ -25,6 +27,7 @@ int BarStreamer::read(Array<Beat> &beats, int samples)
 			b.range.offset -= offset;
 			_cur_beat = b.beat_no;
 			_beat_fraction = 0;
+			_beats_per_bar = bars[b.bar_no]->num_beats;
 		}
 	offset += samples;
 	return samples;
@@ -40,6 +43,12 @@ void BarStreamer::reset()
 	offset = 0;
 	_cur_beat = 0;
 	_beat_fraction = 0;
+	_beats_per_bar = 4;
+}
+
+int BarStreamer::beats_per_bar()
+{
+	return _beats_per_bar;
 }
 
 int BarStreamer::cur_beat()

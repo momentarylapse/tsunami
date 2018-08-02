@@ -36,6 +36,7 @@ public:
 	virtual int _cdecl read(Array<Beat> &beats, int samples){ return samples; }
 	virtual void _cdecl reset(){}
 
+	virtual int _cdecl beats_per_bar(){ return 1; }
 	virtual int _cdecl cur_beat(){ return 0; }
 	virtual float _cdecl beat_fraction(){ return 0; }
 

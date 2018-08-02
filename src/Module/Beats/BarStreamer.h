@@ -19,12 +19,14 @@ public:
 	void _cdecl reset() override;
 	void seek(int pos);
 
+	int _cdecl beats_per_bar() override;
 	int _cdecl cur_beat() override;
 	float _cdecl beat_fraction() override;
 
 	BarCollection bars;
 	int offset;
 
+	int _beats_per_bar;
 	int _cur_beat;
 	float _beat_fraction;
 };

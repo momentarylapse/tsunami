@@ -40,7 +40,7 @@ struct AutoConfigData
 		TYPE_STRING,
 		TYPE_PITCH,
 	};
-	string name, label;
+	string name, label, unit;
 	int type;
 	AutoConfigData(int _type, const string &_name)
 	{
@@ -62,7 +62,6 @@ struct AutoConfigData
 
 struct AutoConfigDataFloat : public AutoConfigData
 {
-	string unit;
 	float min, max, step, factor;
 	float *value;
 	Slider *slider;
@@ -101,7 +100,7 @@ struct AutoConfigDataFloat : public AutoConfigData
 		p->addSlider("!width=150,expandx", 0, 0, "slider-" + i);
 		p->addSpinButton(f2s(*value, 6), 1, 0, "spin-" + i);
 		p->setOptions("spin-" + i, format("range=%f:%f:%f", min*factor, max*factor, step));
-		p->addLabel(unit, 2, 0, "");
+		//p->addLabel(unit, 2, 0, "");
 		slider = new Slider(p, "slider-" + i, "spin-" + i, min, max, factor, callback, *value);
 	}
 	virtual void get_value()
@@ -274,6 +273,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	foreachi(AutoConfigData *a, aa, i){
 		setTarget("grid");
 		addLabel(a->label, 0, i, "");
+		addLabel(a->unit, 2, i, "");
 		a->add_gui(this, i, std::bind(&AutoConfigPanel::onChange, this));
 	}
 }

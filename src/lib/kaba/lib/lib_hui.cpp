@@ -249,6 +249,11 @@ void SIAddPackageHui()
 				func_add_param("x",			TypeInt);
 				func_add_param("y",			TypeInt);
 				func_add_param("id",		TypeString);
+			class_add_func("embed", TypeVoid, mf(&hui::Panel::embed));
+				func_add_param("panel", TypeHuiPanelP);
+				func_add_param("id", TypeString);
+				func_add_param("x", TypeInt);
+				func_add_param("y", TypeInt);
 			class_add_func("set_string",						TypeVoid,		mf(&hui::Panel::setString));
 				func_add_param("id",		TypeString);
 				func_add_param("s",			TypeString);

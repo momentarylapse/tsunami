@@ -437,6 +437,8 @@ void Panel::embedSource(const string &buffer, const string &parent_id, int x, in
 
 void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 {
+	if (!panel)
+		return;
 	if (!panel->root_control){
 		msg_error("trying to embed an empty panel");
 		return;

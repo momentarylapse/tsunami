@@ -67,6 +67,9 @@ class MetronomeSource extends BeatSource
 		
 		return samples
 	
+	override int beats_per_bar()
+		return config.beats
+	
 	override int cur_beat()
 		if next_beat == 0
 			return config.beats - 1

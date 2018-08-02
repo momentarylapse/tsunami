@@ -2,7 +2,7 @@
 // Title[Deutsch] = Metronom
 use "../api.kaba"
 //use "../MidiSource/Metronome.kaba"
-use "../BeatSource/Metronome.kaba"
+//use "../BeatSource/Metronome.kaba"
 
 enum
 	MODE_CIRCLE
@@ -42,6 +42,8 @@ class BlurredDot
 			p.draw_circle(pos.x, pos.y, r)
 
 class MetronomeDialog extends Dialog
+	BeatSource *source
+	OutputStream *stream
 	Metronome *metro
 	//Timer timer
 	float fraction_prev
@@ -54,30 +56,25 @@ class MetronomeDialog extends Dialog
 	
 	BlurredDot dot
 	
-	void __init__(Metronome *_metro)
-		super.__init__("Metronome", 400, 520, _metro.session.win, true)
+	void __init__(Session *session, BeatSource *_source, OutputStream *_stream, Metronome *_metro)
+		super.__init__("Metronome", 400, 520, session.win, true)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
-	Grid ? ''
-		Text ? 'Speed'
-		SpinButton bpm '0' range=1: expandx
-		Text ? '/min'
-		---|
-		Text ? 'Beats'
-		SpinButton num-beats '4' range=1:99
-		---|
-		Text ? 'Sub Beats'
-		SpinButton num-sub-beats '1' range=1:99
+	Grid config ''
 	Grid ? '' buttonbar
 		CheckBox fullscreen 'Fullscreen'
 		Button /close 'Close' image=hui:close")
-		
-		metro = _metro
+
+		metro = _metro		
+		source = _source
+		stream = _stream
 		fraction_prev = 0
 		
+		embed(source.create_panel(), "config", 0, 0)
+		
 		fullscreen = false
-		mode = HuiConfig.get_int("Plugins/Metronome/Mode", MODE_CIRCLE)
+		mode = HuiConfig.get_int("Plugins/Metronome/Mode", MODE_BOUNCE_WALK)
 		allow_blink_background = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = HuiConfig.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
@@ -90,14 +87,14 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
-		set_float("bpm", metro.source.config.bpm)
-		set_int("num_beats", metro.source.config.beats)
+		//set_float("bpm", source.config.bpm)
+		//set_int("num_beats", source.config.beats)
 	
 		event("hui:close", &on_close)
 		event("close", &on_close)
-		event("bpm", &on_bpm)
-		event("num-beats", &on_num_beats)
-		event("num-sub-beats", &on_num_beats)
+		//event("bpm", &on_bpm)
+		//event("num-beats", &on_num_beats)
+		//event("num-sub-beats", &on_num_beats)
 		event_x("area", "hui:left-button-down", &on_area_left_button_down)
 		event_x("area", "hui:right-button-down", &on_area_right_button_down)
 		
@@ -118,9 +115,9 @@ Grid ? '' vertical
 		float y0 = h / 2
 		float r = min(x0, y0) * 0.9
 		
-		float beat_fraction = metro.source.beat_fraction()
-		int cur_beat = metro.source.cur_beat()
-		int num_beats = metro.source.config.beats
+		float beat_fraction = source.beat_fraction()
+		int cur_beat = source.cur_beat()
+		int num_beats = source.beats_per_bar()
 		
 		float closeness = beat_fraction*2-1
 		if beat_fraction < 0.5
@@ -176,7 +173,10 @@ Grid ? '' vertical
 		float fs = r * 0.5
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
-		if metro.stream.is_paused()
+		bool paused = false
+		if stream
+			paused = stream.is_paused()
+		if paused
 			p.set_font_size(fs)
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, "⏸")
@@ -192,7 +192,8 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	void on_area_left_button_down()
-		metro.stream.pause(!metro.stream.is_paused())
+		if stream
+			stream.pause(!stream.is_paused())
 		redraw("area")
 	
 	void on_area_right_button_down()
@@ -228,40 +229,44 @@ Grid ? '' vertical
 		set_fullscreen(fullscreen)
 		//show_control()
 
-	void on_bpm()
+	/*void on_bpm()
 		metro.source.set_bpm(get_float(""))
 
 	void on_num_beats()
 		int beats = get_int("num-beats")
 		int sub_beats = get_int("num-sub-beats")
-		metro.source.set_beats(beats, sub_beats)
+		metro.source.set_beats(beats, sub_beats)*/
 
 	void on_close()
-		metro.stop()
+		if metro
+			metro.stop()
+		else
+			destroy()
 
 class Metronome extends TsunamiPlugin
 	BeatMidifier *beat_midifier
 	OutputStream *stream
-	MetronomeSource *source
+	BeatSource *source
 	Synthesizer *synth
 	Dialog *dlg
 	
 	override void on_start()
 		source = CreateBeatSource(session, "Metronome")
-		source.session = session
-		source.reset_config()
 		beat_midifier = CreateBeatMidifier(session)
 		beat_midifier.set_beat_source(source.out)
 		synth = CreateSynthesizer(session, "")
 		synth.set_source(beat_midifier.out)
-		
-		dlg = new MetronomeDialog(self)
-		dlg.show()
 	
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(1024)
 		stream.set_update_dt(UPDATE_DT)
 		stream.play()
+		
+		print("---------")
+		print(source)
+		dlg = new MetronomeDialog(session, source, stream, self)
+		//dlg.event("hui:close", &stop)
+		dlg.show()
 		
 		stream.subscribe(self, &on_update, "Update")
 	

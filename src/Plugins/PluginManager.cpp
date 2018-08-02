@@ -34,6 +34,7 @@
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Beats/BeatSource.h"
+#include "../Module/Beats/BeatMidifier.h"
 #include "../Module/Midi/MidiEffect.h"
 #include "../Module/Port/BeatPort.h"
 #include "../View/Helper/Progress.h"
@@ -94,6 +95,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("CreateAudioSource", (void*)&CreateAudioSource);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Kaba::LinkExternal("CreateMidiSource", (void*)&CreateMidiSource);
+	Kaba::LinkExternal("CreateBeatMidifier", (void*)&CreateBeatMidifier);
+	Kaba::LinkExternal("CreateBeatSource", (void*)&CreateBeatSource);
 	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
@@ -200,6 +203,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AudioBuffer.clear", Kaba::mf(&AudioBuffer::clear));
 	Kaba::LinkExternal("AudioBuffer." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&AudioBuffer::__assign__));
 	Kaba::LinkExternal("AudioBuffer.range", Kaba::mf(&AudioBuffer::range));
+	Kaba::LinkExternal("AudioBuffer.resize", Kaba::mf(&AudioBuffer::resize));
 	Kaba::LinkExternal("AudioBuffer.add", Kaba::mf(&AudioBuffer::add));
 	Kaba::LinkExternal("AudioBuffer.set", Kaba::mf(&AudioBuffer::set));
 	Kaba::LinkExternal("AudioBuffer.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
@@ -255,6 +259,16 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "reset", Kaba::mf(&MidiSource::reset), &msource);
+	Kaba::LinkExternal("MidiSource.set_beat_source", Kaba::mf(&MidiSource::set_beat_source));
+
+
+	BeatMidifier bmidifier;
+	Kaba::DeclareClassSize("BeatMidifier", sizeof(BeatMidifier));
+	Kaba::LinkExternal("BeatMidifier." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatMidifier::__init__));
+	//Kaba::DeclareClassVirtualIndex("BeatMidifier", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &bmidifier);
+	Kaba::DeclareClassVirtualIndex("BeatMidifier", "read", Kaba::mf(&BeatMidifier::read), &bmidifier);
+	Kaba::DeclareClassVirtualIndex("BeatMidifier", "reset", Kaba::mf(&BeatMidifier::reset), &bmidifier);
+	Kaba::DeclareClassOffset("BeatMidifier", "volume", _offsetof(BeatMidifier, volume));
 
 	Synthesizer synth;
 	Kaba::DeclareClassSize("Synthesizer", sizeof(Synthesizer));

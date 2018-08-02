@@ -146,6 +146,7 @@ class AudioBuffer
 	extern void __assign__(AudioBuffer other)
 	extern void clear()
 	extern Range range()
+	extern void resize(int length)
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume, float panning)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
@@ -192,6 +193,7 @@ class MidiSource extends Module
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
 	MidiPort *out
+	extern void set_beat_source(BeatPort *source)
 
 class Synthesizer extends Module
 	int sample_rate
@@ -236,6 +238,13 @@ class BeatSource extends Module
 	extern virtual int read(Beat[] beats, int samples)
 	extern virtual void reset()
 	BeatPort *out
+
+class BeatMidifier extends MidiSource
+	extern override void __init__()
+	//extern override void __delete__()
+	extern override int read(MidiEventBuffer midi)
+	extern override void reset()
+	float volume
 
 class TrackRenderBuffer
 	int dummy
@@ -530,5 +539,7 @@ extern AudioSource* CreateAudioSource(Session* session, string name)
 extern AudioEffect* CreateAudioEffect(Session* session, string name)
 extern MidiSource* CreateMidiSource(Session* session, string name)
 extern MidiEffect* CreateMidiEffect(Session* session, string name)
+extern BeatMidifier* CreateBeatMidifier(Session* session)
+extern BeatSource* CreateBeatSource(Session* session, string name)
 extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
 //extern void SetTempBackupFilename(string filename)

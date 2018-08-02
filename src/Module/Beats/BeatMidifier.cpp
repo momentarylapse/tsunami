@@ -7,6 +7,7 @@
 
 #include "BeatMidifier.h"
 #include "../Port/BeatPort.h"
+#include "../ModuleFactory.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/base.h"
@@ -25,16 +26,23 @@ int BeatMidifier::read(MidiEventBuffer &midi)
 		return midi.samples;
 
 	Array<Beat> beats;
-	beat_source->read(beats, midi.samples);
+	int r = beat_source->read(beats, midi.samples);
 
 	for (Beat &b: beats)
 		midi.addMetronomeClick(b.range.offset, b.level, volume);
 
-	return midi.samples;
+	return r;
 }
 
 void BeatMidifier::reset()
 {
 	if (beat_source)
 		beat_source->reset();
+}
+
+
+
+BeatMidifier *CreateBeatMidifier(Session *session)
+{
+	return (BeatMidifier*)ModuleFactory::create(session, ModuleType::BEAT_MIDIFIER, "");
 }

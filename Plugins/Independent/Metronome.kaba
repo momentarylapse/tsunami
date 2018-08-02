@@ -1,7 +1,8 @@
 // Image = hui:media-play
 // Title[Deutsch] = Metronom
 use "../api.kaba"
-use "../MidiSource/Metronome.kaba"
+//use "../MidiSource/Metronome.kaba"
+use "../BeatSource/Metronome.kaba"
 
 enum
 	MODE_CIRCLE
@@ -237,17 +238,20 @@ Grid ? '' vertical
 		metro.stop()
 
 class Metronome extends TsunamiPlugin
+	BeatMidifier *beat_midifier
 	OutputStream *stream
 	MetronomeSource *source
 	Synthesizer *synth
 	Dialog *dlg
 	
 	override void on_start()
-		synth = CreateSynthesizer(session, "")
-		source = new MetronomeSource
+		source = CreateBeatSource(session, "Metronome")
 		source.session = session
 		source.reset_config()
-		synth.set_source(source.out)
+		beat_midifier = CreateBeatMidifier(session)
+		beat_midifier.set_beat_source(source.out)
+		synth = CreateSynthesizer(session, "")
+		synth.set_source(beat_midifier.out)
 		
 		dlg = new MetronomeDialog(self)
 		dlg.show()
@@ -257,10 +261,9 @@ class Metronome extends TsunamiPlugin
 		stream.set_update_dt(UPDATE_DT)
 		stream.play()
 		
-		stream.subscribe(self, &onUpdate, "Update")
-		
+		stream.subscribe(self, &on_update, "Update")
 	
-	void onUpdate()
+	void on_update()
 		dlg.redraw("area")
 		
 	override void on_stop()

@@ -187,6 +187,9 @@ Module::~Module()
 	// unlink sources
 	for (auto &pd: port_in)
 		*pd.port = nullptr;
+
+	for (Module* c: children)
+		delete c;
 }
 
 void Module::__init__(ModuleType type)

@@ -25,13 +25,13 @@ class ClickCounterDialog extends Dialog
 		counter = _counter
 	
 		//eventX("drawing", "hui:draw", &onDraw)
-		event("inc", &onIncrease)
-		event("dec", &onDecrease)
-		event("hui:close", &onClose)
-		event("close", &onClose)
+		event("inc", &on_increase)
+		event("dec", &on_decrease)
+		event("hui:close", &on_close)
+		event("close", &on_close)
 
 
-	void drawVolume(Painter *c)
+	void draw_volume(Painter *c)
 		c.set_color(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = c.height - 5
@@ -45,19 +45,19 @@ class ClickCounterDialog extends Dialog
 		c.set_font_size(12)
 		c.draw_rect(0, 0, c.width, c.height)
 	
-		drawVolume(c)
+		draw_volume(c)
 	
 		c.set_color(Black)
 		c.draw_str(100, 100, counter.counter.str())
 
-	void onClose()
+	void on_close()
 		counter.stop()
 
-	void onIncrease()
+	void on_increase()
 		counter.counter ++
 		redraw("drawing")
 
-	void onDecrease()
+	void on_decrease()
 		counter.counter --
 		redraw("drawing")
 
@@ -93,7 +93,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		
 		input = new InputStreamAudio(session)
 		input.start()
-		input.subscribe(self, &onInput, "")
+		input.subscribe(self, &on_input, "")
 		
 	override void on_stop()
 		input.unsubscribe(self)
@@ -105,7 +105,7 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		delete stream
 		delete synth
 
-	void onInput()
+	void on_input()
 		int available = input.current_buffer.available()
 	
 		AudioBuffer buf
@@ -113,6 +113,8 @@ class MicrophoneClickCounter extends TsunamiPlugin
 	
 		float[] temp
 		temp = buf.r + buf.l
+		
+		input.current_buffer.read_ref_done(buf)
 	
 		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
 	

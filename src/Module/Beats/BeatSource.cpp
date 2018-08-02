@@ -53,6 +53,6 @@ void BeatSource::Output::reset()
 
 BeatSource *CreateBeatSource(Session *session, const string &name)
 {
-	return dynamic_cast<BeatSource*>(ModuleFactory::create(session, ModuleType::BEAT_SOURCE, name));
+	return (BeatSource*)ModuleFactory::create(session, ModuleType::BEAT_SOURCE, name);
 }
 

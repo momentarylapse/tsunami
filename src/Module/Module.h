@@ -111,6 +111,8 @@ public:
 
 	static string type_to_name(ModuleType type);
 	static ModuleType type_from_name(const string &name);
+
+	Array<Module*> children;
 };
 
 

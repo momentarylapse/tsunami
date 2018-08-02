@@ -20,4 +20,6 @@ public:
 	float volume;
 };
 
+BeatMidifier *_cdecl CreateBeatMidifier(Session *session);
+
 #endif /* SRC_MODULE_BEATS_BEATMIDIFIER_H_ */

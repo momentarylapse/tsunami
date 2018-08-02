@@ -19,7 +19,8 @@ MidiSource::Output::Output(MidiSource *s)
 
 int MidiSource::Output::read(MidiEventBuffer &midi)
 {
-	return source->read(midi);
+	int r = source->read(midi);
+	return r;
 }
 
 void  MidiSource::Output::reset()

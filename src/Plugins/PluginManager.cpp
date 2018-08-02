@@ -346,6 +346,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("BeatSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatSource::__delete__), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "read", Kaba::mf(&BeatSource::read), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "reset", Kaba::mf(&BeatSource::reset), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "cur_beat", Kaba::mf(&BeatSource::cur_beat), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "beat_fraction", Kaba::mf(&BeatSource::beat_fraction), &bsource);
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, text));

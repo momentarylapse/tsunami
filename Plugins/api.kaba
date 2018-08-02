@@ -237,6 +237,8 @@ class BeatSource extends Module
 	extern override void __delete__()
 	extern virtual int read(Beat[] beats, int samples)
 	extern virtual void reset()
+	extern virtual int cur_beat()
+	extern virtual float beat_fraction()
 	BeatPort *out
 
 class BeatMidifier extends MidiSource

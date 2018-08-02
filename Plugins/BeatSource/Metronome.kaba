@@ -19,8 +19,6 @@ class Config extends PluginData
 class MetronomeSource extends BeatSource
 	Config config
 	
-	bool pause
-	
 	// state/output
 	int next_beat
 	int next_sub_beat
@@ -38,13 +36,9 @@ class MetronomeSource extends BeatSource
 		next_sub_beat = 0
 		fraction_beat = 1
 		
-		pause = false
-		
 		on_config()
 		
 	override int read(Beat[] beats, int samples)
-		if pause
-			return samples
 	
 		// render clicks
 		while offset_sub_beat < samples
@@ -73,10 +67,14 @@ class MetronomeSource extends BeatSource
 		
 		return samples
 	
-	int cur_beat()
+	override int cur_beat()
 		if next_beat == 0
 			return config.beats - 1
 		return next_beat - 1
+	
+	override float beat_fraction()
+		return fraction_beat
+
 	int cur_sub_beat()
 		if next_sub_beat == 0
 			return config.sub_beats - 1
@@ -89,10 +87,6 @@ class MetronomeSource extends BeatSource
 	void set_beats(int beats, int sub_beats)
 		config.beats = beats
 		config.sub_beats = sub_beats
-		changed()
-	
-	void set_pause(bool _pause)
-		pause = _pause
 		changed()
 	
 	override void on_config()

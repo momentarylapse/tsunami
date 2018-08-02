@@ -426,6 +426,7 @@ class SongRenderer extends AudioSource
 	extern override void reset()
 	extern Range range()
 	extern int seek()
+	extern BeatSource* get_beat_source()
 
 
 class OutputStream extends Module
@@ -484,6 +485,8 @@ class Session
 	//TsunamiWindow* win
 	Window* win
 	Song* song
+	SongRenderer *song_renderer
+	OutputStream *output_stream
 	AudioView* view
 	Storage* storage
 	

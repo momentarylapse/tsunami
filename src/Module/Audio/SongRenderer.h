@@ -48,6 +48,8 @@ public:
 
 	int _cdecl get_num_samples();
 
+	BeatSource _cdecl *get_beat_source(){ return (BeatSource*)bar_streamer; }
+
 private:
 	void read_basic(AudioBuffer &buf, int pos);
 	void render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti);

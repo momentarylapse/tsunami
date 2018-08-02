@@ -14,9 +14,6 @@ BarStreamer::BarStreamer(BarCollection &_bars)
 {
 	bars = _bars;
 	offset = 0;
-	_cur_beat = 0;
-	_beat_fraction = 0;
-	_beats_per_bar = 4;
 }
 
 int BarStreamer::read(Array<Beat> &beats, int samples)
@@ -25,9 +22,6 @@ int BarStreamer::read(Array<Beat> &beats, int samples)
 	for (Beat &b: beats)
 		if (b.range.offset >= offset){
 			b.range.offset -= offset;
-			_cur_beat = b.beat_no;
-			_beat_fraction = 0;
-			_beats_per_bar = bars[b.bar_no]->num_beats;
 		}
 	offset += samples;
 	return samples;
@@ -41,22 +35,30 @@ void BarStreamer::seek(int pos)
 void BarStreamer::reset()
 {
 	offset = 0;
-	_cur_beat = 0;
-	_beat_fraction = 0;
-	_beats_per_bar = 4;
 }
 
 int BarStreamer::beats_per_bar()
 {
-	return _beats_per_bar;
+	auto beats = bars.get_beats(Range(0, offset), false, false);
+	if (beats.num > 0)
+		return bars[beats.back().bar_index]->num_beats;
+	return 4;
 }
 
 int BarStreamer::cur_beat()
 {
-	return _cur_beat;
+	auto beats = bars.get_beats(Range(0, offset), false, false);
+	if (beats.num > 0)
+		return beats.back().beat_no;
+	return 0;
 }
 
 float BarStreamer::beat_fraction()
 {
-	return _beat_fraction;
+	auto beats = bars.get_beats(Range(0, offset), false, false);
+	if (beats.num > 0){
+		auto &r = beats.back().range;
+		return (float)(offset - r.offset) / (float)r.length;
+	}
+	return 0;//_beat_fraction;
 }

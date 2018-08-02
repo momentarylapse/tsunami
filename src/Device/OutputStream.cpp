@@ -396,8 +396,10 @@ void OutputStream::_unpause()
 	played_end_of_stream = false;
 	paused = false;
 
-	//thread = new StreamThread(this);
-	//thread->run();
+	if (!thread){
+		thread = new StreamThread(this);
+		thread->run();
+	}
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream){

@@ -25,10 +25,6 @@ public:
 
 	BarCollection bars;
 	int offset;
-
-	int _beats_per_bar;
-	int _cur_beat;
-	float _beat_fraction;
 };
 
 

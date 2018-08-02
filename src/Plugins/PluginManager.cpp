@@ -111,6 +111,9 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Session", "storage", _offsetof(Session, storage));
 	Kaba::DeclareClassOffset("Session", "win", _offsetof(Session, _kaba_win));
 	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
+	Kaba::DeclareClassOffset("Session", "song_renderer", _offsetof(Session, song_renderer));
+	Kaba::DeclareClassOffset("Session", "output_stream", _offsetof(Session, output_stream));
+
 	Kaba::LinkExternal("Session.sample_rate", Kaba::mf(&Session::sample_rate));
 	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
 	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
@@ -438,6 +441,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
 	Kaba::LinkExternal("SongRenderer.seek", Kaba::mf(&SongRenderer::seek));
+	Kaba::LinkExternal("SongRenderer.get_beat_source", Kaba::mf(&SongRenderer::get_beat_source));
 
 	{
 	InputStreamAudio input(Session::GLOBAL);

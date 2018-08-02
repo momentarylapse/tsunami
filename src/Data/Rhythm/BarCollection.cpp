@@ -19,9 +19,10 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 	Array<Beat> beats;
 
 	int pos_bar = 0;
+	int bar_index = 0;
 	int bar_no = 0;
 
-	for (Bar *b: *this)
+	for (Bar *b: *this){
 		if (!b->is_pause()){
 			// bar
 			int beat_length = b->length / b->num_beats;
@@ -39,14 +40,14 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 						// sub beat
 						int pos_sub_beat = pos_beat + k * sub_beat_length;
 						if (r.is_inside(pos_sub_beat))
-							beats.add(Beat(Range(pos_sub_beat, sub_beat_length), bar_no, i, level));
+							beats.add(Beat(Range(pos_sub_beat, sub_beat_length), i, level, bar_index, bar_no));
 						level = 2;
 					}
 
 				}else{
 
 					if (r.is_inside(pos_beat))
-						beats.add(Beat(Range(pos_beat, beat_length), bar_no, i, level));
+						beats.add(Beat(Range(pos_beat, beat_length), i, level, bar_index, bar_no));
 				}
 				level = 1;
 			}
@@ -54,11 +55,13 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 			bar_no ++;
 		}else{
 			if (include_hidden)
-				beats.add(Beat(Range(pos_bar, b->length), -1, 0, 0));
+				beats.add(Beat(Range(pos_bar, b->length), 0, 0, bar_index, -1));
 			pos_bar += b->length;
 		}
+		bar_index ++;
+	}
 	if (include_hidden and (this->num > 0))
-		beats.add(Beat(Range(pos_bar, 0), -1, 0, 0));
+		beats.add(Beat(Range(pos_bar, 0), 0, 0, bar_index, -1));
 	return beats;
 }
 

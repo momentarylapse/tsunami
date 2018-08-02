@@ -8,9 +8,10 @@
 #include "Beat.h"
 
 
-Beat::Beat(const Range &r, int _bar_no, int _beat_no, int _level)
+Beat::Beat(const Range &r, int _beat_no, int _level, int _bar_index, int _bar_no)
 {
 	range = r;
+	bar_index = _bar_index;
 	bar_no = _bar_no;
 	beat_no = _beat_no;
 	level = _level;

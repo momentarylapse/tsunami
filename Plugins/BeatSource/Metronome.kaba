@@ -22,12 +22,11 @@ class MetronomeSource extends BeatSource
 	bool pause
 	
 	// state/output
-	int cur_beat
-	int cur_sub_beat
+	int next_beat
+	int next_sub_beat
 
 	int offset_sub_beat
 	float fraction_beat
-	//float fraction_sub_beat
 	int samples_beat
 	int samples_sub_beat
 	
@@ -35,10 +34,9 @@ class MetronomeSource extends BeatSource
 	override void reset_state()
 
 		offset_sub_beat = 0
-		cur_beat = 0
-		cur_sub_beat = -1
-		fraction_beat = 0
-//		fraction_sub_beat = 0
+		next_beat = 0
+		next_sub_beat = 0
+		fraction_beat = 1
 		
 		pause = false
 		
@@ -50,28 +48,39 @@ class MetronomeSource extends BeatSource
 	
 		// render clicks
 		while offset_sub_beat < samples
-			cur_sub_beat ++
-			if cur_sub_beat >= config.sub_beats
-				cur_sub_beat = 0
-				cur_beat ++
-			if cur_beat >= config.beats
-				cur_beat = 0
 			
 			// render
-			if cur_sub_beat == 0
-				if cur_beat == 0
+			if next_sub_beat == 0
+				if next_beat == 0
 					beats.add(_Beat(offset_sub_beat, 0))
 				else
 					beats.add(_Beat(offset_sub_beat, 1))
 			else
 				beats.add(_Beat(offset_sub_beat, 2))
+			
+			if next_sub_beat == 0
+				next_beat ++
+				if next_beat >= config.beats
+					next_beat = 0
+			next_sub_beat ++
+			if next_sub_beat >= config.sub_beats
+				next_sub_beat = 0
 
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= samples
 		float fraction_sub_beat = 1 - i2f(offset_sub_beat) / i2f(samples_sub_beat)
-		fraction_beat = (i2f(cur_sub_beat) + fraction_sub_beat) / i2f(config.sub_beats)
+		fraction_beat = (i2f(cur_sub_beat()) + fraction_sub_beat) / i2f(config.sub_beats)
 		
 		return samples
+	
+	int cur_beat()
+		if next_beat == 0
+			return config.beats - 1
+		return next_beat - 1
+	int cur_sub_beat()
+		if next_sub_beat == 0
+			return config.sub_beats - 1
+		return next_sub_beat - 1
 	
 	void set_bpm(float bpm)
 		config.bpm = bpm
@@ -95,5 +104,8 @@ class MetronomeSource extends BeatSource
 		
 		//if cur_beat >
 		
-		cur_sub_beat = config.sub_beats * fraction_beat
-		offset_sub_beat = (1 + cur_sub_beat - fraction_beat * config.sub_beats) * samples_sub_beat
+		int _cur_sub_beat = config.sub_beats * fraction_beat
+		next_sub_beat = _cur_sub_beat + 1
+		if next_sub_beat >= config.sub_beats
+			next_sub_beat = 0
+		offset_sub_beat = (1 + _cur_sub_beat - fraction_beat * config.sub_beats) * samples_sub_beat

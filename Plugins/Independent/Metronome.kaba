@@ -121,7 +121,7 @@ Grid ? '' vertical
 		float closeness = metro.source.fraction_beat*2-1
 		if metro.source.fraction_beat < 0.5
 			closeness = 1 - metro.source.fraction_beat*2
-		float bar_fraction = (metro.source.cur_beat + metro.source.fraction_beat) / metro.source.config.beats
+		float bar_fraction = (metro.source.cur_beat() + metro.source.fraction_beat) / metro.source.config.beats
 		
 		// background
 		color bg = colors.background
@@ -177,7 +177,7 @@ Grid ? '' vertical
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
 			p.draw_str(x0-fs*0.4, y0-fs*0.75, "⏸")
 		else
-			int n = metro.source.cur_beat + 1
+			int n = metro.source.cur_beat() + 1
 			if n == 1
 				p.set_color(colors.text)
 			else

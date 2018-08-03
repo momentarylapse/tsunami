@@ -509,8 +509,10 @@ void Script::Compiler()
 	syntax->Show();
 #endif
 
+
 	syntax->SimplifyRefDeref();
 	syntax->SimplifyShiftDeref();
+
 	syntax->PreProcessor();
 
 	if (config.verbose)

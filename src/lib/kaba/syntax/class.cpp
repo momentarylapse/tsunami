@@ -12,6 +12,13 @@ ClassElement::ClassElement()
 	type = nullptr;
 }
 
+string ClassElement::signature(bool include_class) const
+{
+	if (include_class)
+		return type->name + " " + name;
+	return type->name + " " + name;
+}
+
 
 ClassFunction::ClassFunction()
 {
@@ -37,12 +44,12 @@ Function* ClassFunction::func() const
 	return script->syntax->functions[nr];
 }
 
-string ClassFunction::signature() const
+string ClassFunction::signature(bool include_class) const
 {
 	Function* f = func();
 	if (needs_overriding)
-		return f->signature() + " [NEEDS OVERRIDING]";
-	return f->signature();
+		return f->signature(include_class) + " [NEEDS OVERRIDING]";
+	return f->signature(include_class);
 }
 
 bool type_match(Class *given, Class *wanted)
@@ -333,7 +340,7 @@ void Class::link_virtual_table()
 			}
 		}
 		if (cf.needs_overriding){
-			msg_error("needs overriding: " + name + " : " + cf.signature());
+			msg_error("needs overriding: " + cf.signature(true));
 		}
 	}
 }
@@ -426,11 +433,11 @@ void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool overr
 		if (class_func_match(cf, ocf))
 			orig = &ocf;
 	if (override and !orig)
-		s->DoError(format("can not override function '%s', no previous definition", f->signature().c_str()), f->_exp_no, f->_logical_line_no);
+		s->DoError(format("can not override function %s, no previous definition", f->signature(true).c_str()), f->_exp_no, f->_logical_line_no);
 	if (!override and orig){
-		msg_write(f->signature());
-		msg_write(orig->signature());
-		s->DoError(format("function '%s' is already defined, use '%s'", f->signature().c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
+		msg_write(f->signature(true));
+		msg_write(orig->signature(true));
+		s->DoError(format("function %s is already defined, use '%s'", f->signature(true).c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
 	}
 	if (override){
 		orig->script = cf.script;

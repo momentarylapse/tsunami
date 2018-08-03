@@ -100,6 +100,9 @@ StackFrameInfo get_func_from_rip(void *rip)
 
 struct ExceptionBlockData
 {
+	// needs_killing might be a reference to blocks... std::move()...
+	// better keep blocks alive for a while
+	Array<Block*> blocks;
 	Array<Block*> needs_killing;
 	Block *except_block;
 	Node *except;
@@ -120,19 +123,18 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 	ebd.except_block = nullptr;
 	ebd.except = nullptr;
 
-	Array<Block*> blocks;
 	foreachb (Block *b, s->syntax->blocks)
 		if ((b->_start <= rip) and (b->_end >= rip))
-			blocks.add(b);
-	ebd.needs_killing = blocks;
+			ebd.blocks.add(b);
+	ebd.needs_killing = ebd.blocks;
 
 	Array<int> node_index;
-	foreachi (Block *b, blocks, bi){
+	foreachi (Block *b, ebd.blocks, bi){
 		if (bi == 0)
 			continue;
 		int index = -1;
 		foreachi (Node *n, b->nodes, ni){
-			if (n->kind == KIND_BLOCK and n->link_no == blocks[bi-1]->index){
+			if (n->kind == KIND_BLOCK and n->link_no == ebd.blocks[bi-1]->index){
 				node_index.add(ni);
 				index = ni;
 			}
@@ -147,7 +149,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 				if (!ex_type_match(ex_type, ee->type))
 					continue;
 				//msg_write("try...");
-				ebd.needs_killing = blocks.sub(0, bi);
+				ebd.needs_killing = ebd.blocks.sub(0, bi);
 				//msg_write(b->nodes[index + 2]->link_no);
 				ebd.except = ee;
 				ebd.except_block = s->syntax->blocks[b->nodes[index + 2]->link_no];

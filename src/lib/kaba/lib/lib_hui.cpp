@@ -302,20 +302,20 @@ void SIAddPackageHui()
 				func_add_param("id",		TypeString);
 			class_add_func("event",						TypeInt,		mf(&hui::Panel::_kaba_event));
 				func_add_param("id",			TypeString);
-				func_add_param("func",			TypePointer);
+				func_add_param("func",			TypeFunctionP);
 			class_add_func("event_o",						TypeInt,		mf(&hui::Panel::_kaba_eventO));
 				func_add_param("id",			TypeString);
 				func_add_param("handler",		TypePointer);
-				func_add_param("func",			TypePointer);
+				func_add_param("func",			TypeFunctionP);
 			class_add_func("event_x",						TypeInt,		mf(&hui::Panel::_kaba_eventX));
 				func_add_param("id",			TypeString);
 				func_add_param("msg",			TypeString);
-				func_add_param("func",			TypePointer);
+				func_add_param("func",			TypeFunctionP);
 			class_add_func("event_ox",						TypeInt,		mf(&hui::Panel::_kaba_eventOX));
 				func_add_param("id",			TypeString);
 				func_add_param("msg",			TypeString);
 				func_add_param("handler",		TypePointer);
-				func_add_param("func",			TypePointer);
+				func_add_param("func",			TypeFunctionP);
 			class_add_func("remove_event_handler",		TypeVoid,		mf(&hui::Panel::removeEventHandler));
 				func_add_param("uid",			TypeInt);
 			//class_add_func("beginDraw",								TypeHuiPainterP,		mf(&hui::HuiPanel::beginDraw));
@@ -490,7 +490,7 @@ void SIAddPackageHui()
 	
 	// user interface
 	add_func("HuiSetIdleFunction",	TypeVoid,		(void*)&HuiSetIdleFunctionKaba);
-		func_add_param("idle_func",	TypePointer);
+		func_add_param("idle_func",	TypeFunctionP);
 	/*add_func("HuiAddKeyCode",	TypeVoid,		(void*)&hui::AddKeyCode);
 		func_add_param("id",	TypeString);
 		func_add_param("key_code",	TypeInt);
@@ -498,7 +498,7 @@ void SIAddPackageHui()
 		func_add_param("id",	TypeString);
 		func_add_param("image",	TypeString);
 		func_add_param("key_code",	TypeInt);
-		func_add_param("func",	TypePointer);*/
+		func_add_param("func",	TypeFunctionP);*/
 	add_func("HuiGetEvent",	TypeHuiEventP,		(void*)&hui::GetEvent);
 	/*add_func("HuiRun",				TypeVoid,		(void*)&hui::Run);
 	add_func("HuiEnd",				TypeVoid,		(void*)&hui::End);

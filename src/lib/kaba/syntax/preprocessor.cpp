@@ -184,10 +184,10 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 					// pre process operator
 					int nc = AddConstant(o->return_type);
 					if (c->params.num > 1){
-						f(*constants[nc], *constants[c->params[0]->link_no], *constants[c->params[1]->link_no]);
+						f(*constants[nc], *c->params[0]->as_const(), *c->params[1]->as_const());
 					}else{
 						Value dummy;
-						f(*constants[nc], *constants[c->params[0]->link_no], dummy);
+						f(*constants[nc], *c->params[0]->as_const(), dummy);
 					}
 					return add_node_const(nc);
 				}
@@ -195,7 +195,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 		}
 #if 1
 	}else if (c->kind == KIND_FUNCTION){
-		Function *f = c->script->syntax->functions[c->link_no];
+		Function *f = c->as_func();
 		if (!f->is_pure)
 			return c;
 		if (f->return_type->get_default_constructor()) // TODO
@@ -219,7 +219,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			return c;
 			if (c->instance->kind != KIND_CONSTANT)
 				all_const = false;
-			inst = constants[c->instance->link_no]->value.data;
+			inst = c->instance->as_const()->p();
 		}
 		if (!all_const)
 			return c;
@@ -229,7 +229,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 		temp.init(f->return_type);
 		Array<void*> p;
 		for (int i=0; i<c->params.num; i++)
-			p.add(constants[c->params[i]->link_no]->p());
+			p.add(c->params[i]->as_const()->p());
 		if (!call_function(f, ff, temp.p(), inst, p))
 			return c;
 		int nc = AddConstant(f->return_type);
@@ -249,7 +249,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			da->init(el_size);
 			da->resize(c->params.num);
 			for (int i=0; i<c->params.num; i++)
-				memcpy((char*)da->data + el_size * i, constants[c->params[i]->link_no]->p(), el_size);
+				memcpy((char*)da->data + el_size * i, c->params[i]->as_const()->p(), el_size);
 			return add_node_const(nc);
 		}
 	}/*else if (c->kind == KindReference){
@@ -335,9 +335,9 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 					*(void**)d1.p() = (void*)c->params[0]->link_no;
 					*(void**)d2.p() = (void*)c->params[1]->link_no;
 					if (c->params[0]->kind == KIND_CONSTANT)
-					    d1.set(*constants[c->params[0]->link_no]);
+					    d1.set(*c->params[0]->as_const());
 					if (c->params[1]->kind == KIND_CONSTANT)
-					    d2.set(*constants[c->params[1]->link_no]);
+					    d2.set(*c->params[1]->as_const());
 					Value r;
 					r.init(c->type);
 					f(r, d1, d2);

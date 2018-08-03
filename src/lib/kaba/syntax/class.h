@@ -17,6 +17,7 @@ struct ClassElement{
 	long long offset;
 	bool hidden;
 	ClassElement();
+	string signature(bool include_class) const;
 };
 
 // TODO: use Function instead!
@@ -32,7 +33,7 @@ struct ClassFunction{
 	ClassFunction();
 	ClassFunction(const string &name, Class *return_type, Script *s, int no);
 	Function *func() const;
-	string signature() const;
+	string signature(bool include_class) const;
 };
 
 typedef void *VirtualTable;
@@ -94,6 +95,8 @@ extern Class *TypeReg8; // dummy for compilation
 extern Class *TypeVoid;
 extern Class *TypePointer;
 extern Class *TypeChunk;
+extern Class *TypeFunction;
+extern Class *TypeFunctionP;
 extern Class *TypeBool;
 extern Class *TypeInt;
 extern Class *TypeInt64;

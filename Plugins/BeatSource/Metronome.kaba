@@ -44,13 +44,14 @@ class MetronomeSource extends BeatSource
 		while offset_sub_beat < samples
 			
 			// render
+			int level = 2
 			if next_sub_beat == 0
 				if next_beat == 0
-					beats.add(_Beat(offset_sub_beat, 0))
+					level = 0
 				else
-					beats.add(_Beat(offset_sub_beat, 1))
-			else
-				beats.add(_Beat(offset_sub_beat, 2))
+					level = 1
+			Beat b = _Beat(offset_sub_beat, level)
+			beats.add(b)
 			
 			if next_sub_beat == 0
 				next_beat ++

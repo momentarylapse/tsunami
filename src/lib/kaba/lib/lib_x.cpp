@@ -779,7 +779,7 @@ void SIAddPackageX()
 		class_add_func_virtual("on_remove_client",		TypeVoid,	x_p(mf(&Controller::on_remove_client)));
 		class_add_func("add_net_msg_handler",		TypeVoid,			x_p(mf(&Controller::add_net_msg_handler)));
 			func_add_param("name",		TypeString);
-			func_add_param("func",		TypePointer);
+			func_add_param("func",		TypeFunctionP);
 		class_add_func("start_net_msg",		TypeVoid,			x_p(mf(&Controller::start_net_msg)));
 			func_add_param("name",		TypeString);
 			func_add_param("target",		TypeInt);

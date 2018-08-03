@@ -108,7 +108,7 @@ class Module
 	extern virtual void module_start()
 	extern virtual void module_stop()
 	extern virtual void module_pause(bool paused)
-	extern void subscribe(void* handler, void* func, string message)
+	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
 
 class AudioEffect extends Module
@@ -265,6 +265,7 @@ class Bar
 
 class Beat
 	Range range
+	int bar_index
 	int bar_no
 	int beat_no
 	int level
@@ -413,7 +414,7 @@ class AudioView
 	OutputStream* stream
 	SongRenderer* renderer
 	//InputStreamAny* input
-	extern void subscribe(void* handler, void* func, string message)
+	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
 
 class SongRenderer extends AudioSource

@@ -142,7 +142,7 @@ void SerializerAMD64::add_function_call(Script *script, int func_no, const Seria
 	}else{
 		void *func = (void*)script->func[func_no];
 		if (!func)
-			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
+			DoErrorLink("could not link function " + script->syntax->functions[func_no]->signature(true));
 		int_p d = (int_p)func - (int_p)this->script->opcode;
 		if (d < 0)
 			d = -d;

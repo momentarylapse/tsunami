@@ -1846,6 +1846,9 @@ bool peek_commands_super(ExpressionBuffer &Exp)
 
 bool SyntaxTree::ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line)
 {
+	if (Exp.end_of_file())
+		return false;
+
 	Exp.next_line();
 	Exp.indented = false;
 

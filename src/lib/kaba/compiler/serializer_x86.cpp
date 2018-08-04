@@ -96,7 +96,7 @@ void SerializerX86::add_function_call(Script *script, int func_no, const SerialN
 	}else{
 		void *func = (void*)script->func[func_no];
 		if (!func)
-			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
+			DoErrorLink("could not link function " + script->syntax->functions[func_no]->signature(true));
 		add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)func)); // the actual call
 		// function pointer will be shifted later...
 	}

@@ -39,10 +39,10 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool all
 	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
 
 	if (t->is_super_array){
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = t->parent->size;
+		Node *c_el_size = add_node_const(AddConstant(TypeInt));
+		c_el_size->as_const()->as_int() = t->parent->size;
 		Node *c = add_node_classfunc(t->get_func("__mem_init__", TypeVoid, 1, TypeInt), self);
-		c->set_param(0, add_node_const(nc));
+		c->set_param(0, c_el_size);
 		f->block->nodes.add(c);
 	}else{
 
@@ -164,9 +164,8 @@ void SyntaxTree::AutoImplementAssign(Function *f, Class *t)
 
 
 		// for_var = 0
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = 0;
-		Node *cmd_0 = add_node_const(nc);
+		Node *cmd_0 = add_node_const(AddConstant(TypeInt));
+		cmd_0->as_const()->as_int() = 0;
 		Node *cmd_assign0 = add_node_operator_by_inline(for_var, cmd_0, INLINE_INT_ASSIGN);
 		f->block->nodes.add(cmd_assign0);
 
@@ -205,17 +204,15 @@ void SyntaxTree::AutoImplementAssign(Function *f, Class *t)
 		//    self[i].__assign__(other[i])
 
 		f->block->add_var("i", TypeInt);
-		int nc_num = AddConstant(TypeInt);
-		constants[nc_num]->as_int() = t->array_length;
+		Node *c_num = add_node_const(AddConstant(TypeInt));
+		c_num->as_const()->as_int() = t->array_length;
 
 		Node *for_var = add_node_local_var(f->__get_var("i"), TypeInt);
-		Node *c_num = add_node_const(nc_num);
 
 
 		// for_var = 0
-		int nc_0 = AddConstant(TypeInt);
-		constants[nc_0]->as_int() = 0;
-		Node *cmd_0 = add_node_const(nc_0);
+		Node *cmd_0 = add_node_const(AddConstant(TypeInt));
+		cmd_0->as_const()->as_int() = 0;
 		Node *cmd_assign0 = add_node_operator_by_inline(for_var, cmd_0, INLINE_INT_ASSIGN);
 		f->block->nodes.add(cmd_assign0);
 
@@ -292,9 +289,8 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Class *t)
 	ClassFunction *f_del = t->parent->get_destructor();
 	if (f_del){
 		// for_var = 0
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = 0;
-		Node *cmd_0 = add_node_const(nc);
+		Node *cmd_0 = add_node_const(AddConstant(TypeInt));
+		cmd_0->as_const()->as_int() = 0;
 		Node *cmd_assign = add_node_operator_by_inline(for_var, cmd_0, INLINE_INT_ASSIGN);
 		f->block->nodes.add(cmd_assign);
 
@@ -462,9 +458,8 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 
 
 	// resize(self.num + 1)
-	int nc = AddConstant(TypeInt);
-	constants[nc]->as_int() = 1;
-	Node *cmd_1 = add_node_const(nc);
+	Node *cmd_1 = add_node_const(AddConstant(TypeInt));
+	cmd_1->as_const()->as_int() = 1;
 	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, INLINE_INT_ADD);
 	Node *cmd_resize = add_node_classfunc(t->get_func("resize", TypeVoid, 1, TypeInt), self);
 	cmd_resize->set_param(0, cmd_add);

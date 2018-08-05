@@ -279,20 +279,19 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node &link, Block
 	if (link.link_no == STATEMENT_SIZEOF){
 
 		Exp.next();
-		int nc = AddConstant(TypeInt);
-		Node *c = add_node_const(nc);
+		Node *c = add_node_const(AddConstant(TypeInt));
 
 
 		Class *type = FindType(Exp.cur);
 		Array<Node> links = GetExistence(Exp.cur, block);
 		if (type){
-			constants[nc]->as_int() = type->size;
+			c->as_const()->as_int() = type->size;
 		}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
-			constants[nc]->as_int() = links[0].type->size;
+			c->as_const()->as_int() = links[0].type->size;
 		}else{
 			type = GetConstantType(Exp.cur);
 			if (type)
-				constants[nc]->as_int() = type->size;
+				c->as_const()->as_int() = type->size;
 			else
 				DoError("type-name or variable name expected in sizeof(...)");
 		}
@@ -304,20 +303,19 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node &link, Block
 	}else if (link.link_no == STATEMENT_TYPE){
 
 		Exp.next();
-		int nc = AddConstant(TypeClassP);
-		Node *c = add_node_const(nc);
+		Node *c = add_node_const(AddConstant(TypeClassP));
 
 
 		Class *type = FindType(Exp.cur);
 		Array<Node> links = GetExistence(Exp.cur, block);
 		if (type){
-			constants[nc]->as_int64() = (int_p)type;
+			c->as_const()->as_int64() = (int_p)type;
 		}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
-			constants[nc]->as_int64() = (int_p)links[0].type;
+			c->as_const()->as_int64() = (int_p)links[0].type;
 		}else{
 			type = GetConstantType(Exp.cur);
 			if (type)
-				constants[nc]->as_int64() = (int_p)type;
+				c->as_const()->as_int64() = (int_p)type;
 			else
 				DoError("type-name or variable name expected in type(...)");
 		}
@@ -706,9 +704,9 @@ Node *SyntaxTree::GetOperand(Block *block)
 		}else{
 			Class *t = GetConstantType(Exp.cur);
 			if (t != TypeUnknown){
-				operand = AddNode(KIND_CONSTANT, AddConstant(t), t);
+				operand = add_node_const(AddConstant(t));
 				// constant for parameter (via variable)
-				GetConstantValue(Exp.cur, *constants[operand->link_no]);
+				GetConstantValue(Exp.cur, *operand->as_const());
 				Exp.next();
 			}else{
 				//Operand.Kind=0;
@@ -786,12 +784,11 @@ Node *apply_type_cast(SyntaxTree *ps, int tc, Node *param)
 		return param;
 	}
 	if (param->kind == KIND_CONSTANT){
-		int nc = ps->AddConstant(TypeCasts[tc].dest);
-		Constant *c_new = ps->constants[nc];
-		TypeCasts[tc].func(*c_new, *param->as_const());
+		Node *c_new = ps->add_node_const(ps->AddConstant(TypeCasts[tc].dest));
+		TypeCasts[tc].func(*c_new->as_const(), *param->as_const());
 
 		// relink node
-		return ps->add_node_const(nc);
+		return c_new;
 	}else{
 		Node *c = ps->add_node_func(TypeCasts[tc].script, TypeCasts[tc].func_no, TypeCasts[tc].dest);
 		c->set_param(0, param);
@@ -817,9 +814,8 @@ Node *LinkSpecialOperatorIs(SyntaxTree *tree, Node *param1, Node *param2)
 		tree->DoError("'is': class '" + t2->name + "' is not derived from '" + t1->name + "'");
 
 	// vtable2
-	int nc = tree->AddConstant(TypePointer);
-	tree->constants[nc]->as_int64() = (int_p)t2->_vtable_location_compiler_;
-	Node *vtable2 = tree->add_node_const(nc);
+	Node *vtable2 = tree->add_node_const(tree->AddConstant(TypePointer));
+	vtable2->as_const()->as_int64() = (int_p)t2->_vtable_location_compiler_;
 
 	// vtable1
 	param1->type = TypePointer;
@@ -1103,9 +1099,8 @@ void SyntaxTree::ParseStatementForall(Block *block)
 	Node *for_var = add_node_local_var(var_no, var_type);
 
 	// 0
-	int nc = AddConstant(TypeInt);
-	constants[nc]->as_int() = 0;
-	Node *val0 = add_node_const(nc);
+	Node *val0 = add_node_const(AddConstant(TypeInt));
+	val0->as_const()->as_int() = 0;
 
 	// implement
 	// for_index = 0
@@ -1120,9 +1115,8 @@ void SyntaxTree::ParseStatementForall(Block *block)
 		val1->set_param(0, for_array);
 	}else{
 		// array.size
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = for_array->type->array_length;
-		val1 = add_node_const(nc);
+		val1 = add_node_const(AddConstant(TypeInt));
+		val1->as_const()->as_int() = for_array->type->array_length;
 	}
 
 	// while(for_index < val1)
@@ -1933,7 +1927,7 @@ Class *SyntaxTree::ParseType()
 
 				if ((c->kind != KIND_CONSTANT) or (c->type != TypeInt))
 					DoError("only constants of type \"int\" allowed for size of arrays");
-				array_size = constants[c->link_no]->as_int();
+				array_size = c->as_const()->as_int();
 				//Exp.next();
 				if (Exp.cur != "]")
 					DoError("\"]\" expected after array size");

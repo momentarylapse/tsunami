@@ -1150,9 +1150,8 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		// & array
 		Node *c_ref_array = ref_node(c->params[0]);
 		// create command for size constant
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = el_type->size;
-		Node *c_size = add_node_const(nc);
+		Node *c_size = add_node_const(AddConstant(TypeInt));
+		c_size->as_const()->as_int() = el_type->size;
 		// offset = size * index
 		Node *c_offset = add_node_operator_by_inline(c_index, c_size, INLINE_INT_MULTIPLY);
 		c_offset->type = TypeInt;//TypePointer;
@@ -1175,9 +1174,8 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		Node *c_index = c->params[1];
 		Node *c_ref_array = c->params[0];
 		// create command for size constant
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = el_type->size;
-		Node *c_size = add_node_const(nc);
+		Node *c_size = add_node_const(AddConstant(TypeInt));
+		c_size->as_const()->as_int() = el_type->size;
 		// offset = size * index
 		Node *c_offset = add_node_operator_by_inline(c_index, c_size, INLINE_INT_MULTIPLY);
 		c_offset->type = TypeInt;
@@ -1199,9 +1197,8 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		// & struct
 		Node *c_ref_struct = ref_node(c->params[0]);
 		// create command for shift constant
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = c->link_no;
-		Node *c_shift = add_node_const(nc);
+		Node *c_shift = add_node_const(AddConstant(TypeInt));
+		c_shift->as_const()->as_int() = c->link_no;
 		// address = &struct + shift
 		Node *c_address = add_node_operator_by_inline(c_ref_struct, c_shift, __get_pointer_add_int());
 		c_address->type = el_type->get_pointer();//TypePointer;
@@ -1219,9 +1216,8 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 
 		Node *c_ref_struct = c->params[0];
 		// create command for shift constant
-		int nc = AddConstant(TypeInt);
-		constants[nc]->as_int() = c->link_no;
-		Node *c_shift = add_node_const(nc);
+		Node *c_shift = add_node_const(AddConstant(TypeInt));
+		c_shift->as_const()->as_int() = c->link_no;
 		// address = &struct + shift
 		Node *c_address = add_node_operator_by_inline(c_ref_struct, c_shift, __get_pointer_add_int());
 		c_address->type = el_type->get_pointer();//TypePointer;

@@ -12,8 +12,8 @@ const float MAX_VOL = 0.0
 SpectrumDialog *dlg
 
 enum
-	TypeLinear
-	TypeLogarithm
+	TYPE_LINEAR
+	TYPE_LOG
 
 //float[] x, yr, yl
 float[] ffr, ffl
@@ -31,14 +31,14 @@ class SpecGrid extends Grid
 	int type
 	complex[] pr, pl
 
-	void createLines()
+	void create_lines()
 		pr.resize(N)
 		pl.resize(N)
 		for i in 0:N
 			float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
-			if type == TypeLinear
+			if type == TYPE_LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
 			else //if type == TypeLogarithm
@@ -46,25 +46,25 @@ class SpecGrid extends Grid
 				float vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
 				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
-	void setType(int t)
+	void set_type(int t)
 		type = t
-		if type == TypeLinear
+		if type == TYPE_LINEAR
 			y_axis.set(0, peak_max, false, "")
 		else //if type == TypeLogarithm
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
-		createLines()
+		create_lines()
 
-	override void onDraw(Painter *c)
-		drawCurveB(c, pr, true, Red)
-		drawCurveB(c, pl, true, Blue)
+	override void on_draw(Painter *c)
+		draw_curve_b(c, pr, true, Red)
+		draw_curve_b(c, pl, true, Blue)
 
 class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(SongPlugin *plugin)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
-		fromSource("
+		from_source("
 Grid ? ''
 	DrawingArea drawing_area ''
 	---|
@@ -75,17 +75,17 @@ Grid ? ''
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-		event("type", &onType)
-		event("hui:close", &onClose)
-		event("close", &onClose)
+		event("type", &on_type)
+		event("hui:close", &on_close)
+		event("close", &on_close)
 	
-		setInt("type", TypeLogarithm)
+		set_int("type", TYPE_LOG)
 
-	void onType()
-		grid.setType(getInt("type"))
+	void on_type()
+		grid.set_type(get_int("type"))
 		grid.redraw()
 
-	void onClose()
+	void on_close()
 		destroy()
 
 class ShowSpectrum extends SongPlugin
@@ -134,7 +134,7 @@ class ShowSpectrum extends SongPlugin
 			ffl /= mmax
 		peak_max /= mmax
 
-		dlg.onType()
+		dlg.on_type()
 
 		dlg.run()
 		delete dlg

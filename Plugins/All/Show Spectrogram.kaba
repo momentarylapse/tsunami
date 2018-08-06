@@ -18,7 +18,7 @@ float[NT][NF] sg
 Image im0
 
 class SpecGrid extends Grid
-	override void onDraw(Painter *c)
+	override void on_draw(Painter *c)
 		rect r = plot_rect
 		int w = r.width()
 		int h = r.height()
@@ -34,8 +34,8 @@ class SpecGrid extends Grid
 		im.create(w, h, Black)
 		for x in 0:w
 			for y in 0:h
-				im.setPixel(x, y, im0.getPixel(x * xa + xb, y * ya + yb))
-		c.drawImage(r.x1, r.y1, im)
+				im.set_pixel(x, y, im0.get_pixel(x * xa + xb, y * ya + yb))
+		c.draw_image(r.x1, r.y1, im)
 	
 		/*Image *im = im0.scale(r.width(), r.height())
 		c.DrawImage(r.x1, r.y1, *im)
@@ -45,7 +45,7 @@ class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(ShowSpectrogram* plugin, Song* song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
-		fromSource("
+		from_source("
 Grid ? ''
 	DrawingArea drawing_area ''
 	---|
@@ -60,9 +60,9 @@ Grid ? ''
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	
-		event("close", &onClose)
+		event("close", &on_close)
 
-	void onClose()
+	void on_close()
 		destroy()
 
 color f2col(float f)
@@ -123,7 +123,7 @@ class ShowSpectrogram extends SongPlugin
 		for t in 0:NT
 			for i in 0:NF
 				float ff = sg[t][i] / _max
-				im0.setPixel(t, NF - i - 1, f2col(ff))
+				im0.set_pixel(t, NF - i - 1, f2col(ff))
 	
 
 		dlg.redraw("drawing_area")

@@ -23,6 +23,7 @@ public:
 
 	void _cdecl changed();
 	virtual void _cdecl update(){}
+	virtual void _cdecl set_large(bool large){}
 
 	Module *c;
 };

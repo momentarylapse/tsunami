@@ -154,6 +154,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("ConfigPanel." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ConfigPanel::__init__));
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ConfigPanel::__delete__), &config_panel);
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", "update", Kaba::mf(&ConfigPanel::update), &config_panel);
+	Kaba::DeclareClassVirtualIndex("ConfigPanel", "set_large", Kaba::mf(&ConfigPanel::set_large), &config_panel);
 	Kaba::LinkExternal("ConfigPanel.changed", Kaba::mf(&ConfigPanel::changed));
 	Kaba::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
 

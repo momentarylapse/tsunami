@@ -407,6 +407,7 @@ bool Module::configure(hui::Window *win)
 	ConfigPanel *panel = create_panel();
 	if (!panel)
 		return true;
+	panel->set_large(true);
 	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel, win);
 	dlg->run();
 	bool ok = dlg->ok;

@@ -228,6 +228,7 @@ void FxConsole::set_exclusive(AudioEffect *fx)
 	for (auto *p: panels){
 		SingleFxPanel *pp = (SingleFxPanel*)p;
 		pp->hideControl("content", !allow_show(pp->fx));
+		pp->p->set_large(exclusive == pp->fx);
 	}
 }
 

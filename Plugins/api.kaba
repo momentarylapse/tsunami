@@ -87,6 +87,7 @@ class ConfigPanel extends Panel
 	extern void __init__(void *c)
 	extern override void __delete__()
 	extern virtual void update()
+	extern virtual void set_large(bool large)
 	extern void changed()
 	void *c
 

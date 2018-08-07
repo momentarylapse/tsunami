@@ -843,17 +843,17 @@ bool AudioView::editingTrack(Track *t)
 {
 	if (cur_track() != t)
 		return false;
-	if (win->side_bar->isActive(SideBar::TRACK_CONSOLE))
+	if (win->side_bar->is_active(SideBar::TRACK_CONSOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::FX_CONSOLE))
+	if (win->side_bar->is_active(SideBar::FX_CONSOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::MIDI_FX_CONCOLE))
+	if (win->side_bar->is_active(SideBar::MIDI_FX_CONCOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::SYNTH_CONSOLE))
+	if (win->side_bar->is_active(SideBar::SYNTH_CONSOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::MIDI_EDITOR_CONSOLE))
+	if (win->side_bar->is_active(SideBar::MIDI_EDITOR_CONSOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+	if (win->side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		return true;
 	return false;
 }
@@ -862,9 +862,9 @@ bool AudioView::editingLayer(AudioViewLayer *l)
 {
 	if (cur_vlayer != l)
 		return false;
-	if (win->side_bar->isActive(SideBar::MIDI_EDITOR_CONSOLE))
+	if (win->side_bar->is_active(SideBar::MIDI_EDITOR_CONSOLE))
 		return true;
-	if (win->side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+	if (win->side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		return true;
 	return false;
 }

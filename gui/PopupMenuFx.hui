@@ -2,5 +2,7 @@ Menu popup_fx_menu ""
 	Item load_favorite "Load parameters" image=hui:open
 	Item save_favorite "Save parameters" image=hui:save
 	Separator
+	Item show_large "Show large" image=hui:zoom-in
+	Separator
 	Item delete "Delete" image=hui:delete
 

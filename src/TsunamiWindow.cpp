@@ -500,7 +500,7 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allowTermination()
 {
-	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
+	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE)){
 		if (side_bar->capture_console->isCapturing()){
 			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
@@ -682,7 +682,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
 		Track *t = song->addTrack(SignalType::AUDIO);
-		session->storage->loadTrack(view->cur_layer(), hui::Filename, view->sel.range.start());
+		session->storage->loadTrack(t->layers[0], hui::Filename, view->sel.range.start());
 	}
 }
 
@@ -699,7 +699,7 @@ void TsunamiWindow::onPlayLoop()
 
 void TsunamiWindow::onPlay()
 {
-	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		return;
 	if (view->isPaused())
 		view->pause(false);
@@ -709,14 +709,14 @@ void TsunamiWindow::onPlay()
 
 void TsunamiWindow::onPause()
 {
-	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		return;
 	view->pause(true);
 }
 
 void TsunamiWindow::onStop()
 {
-	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		side_bar->_hide();
 	else
 		view->stop();
@@ -823,15 +823,15 @@ void TsunamiWindow::updateMenu()
 	enable("remove_sample", view->sel.num_samples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
-	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
-	enable("stop", view->isPlaybackActive() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
+	enable("play", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
+	enable("stop", view->isPlaybackActive() or side_bar->is_active(SideBar::CAPTURE_CONSOLE));
 	enable("pause", view->isPlaybackActive() and !view->isPaused());
 	check("play_loop", view->renderer->loop_if_allowed);
-	enable("record", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
+	enable("record", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
 	// view
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
-	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
-	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
+	check("show_fx_console", side_bar->is_active(SideBar::FX_CONSOLE));
+	check("sample_manager", side_bar->is_active(SideBar::SAMPLE_CONSOLE));
 
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->isSave())

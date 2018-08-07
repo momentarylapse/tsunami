@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef LOGCONSOLE_H_
-#define LOGCONSOLE_H_
+#ifndef SRC_VIEW_BOTTOMBAR_LOGCONSOLE_H_
+#define SRC_VIEW_BOTTOMBAR_LOGCONSOLE_H_
 
 #include "BottomBar.h"
 
@@ -26,4 +26,4 @@ public:
 	int messages_loaded;
 };
 
-#endif /* LOGCONSOLE_H_ */
+#endif /* SRC_VIEW_BOTTOMBAR_LOGCONSOLE_H_ */

@@ -35,8 +35,8 @@ public:
 	void onEditTrack();
 	void onEditFx();
 
-	virtual void onEnter();
-	virtual void onLeave();
+	virtual void on_enter();
+	virtual void on_leave();
 
 	Curve* curve();
 

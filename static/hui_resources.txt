@@ -561,10 +561,10 @@ width=200,height=200
 1
 Grid
 grid
-expandx,noexpandy
+expandx,noexpandy,vertical
 0
 0
-1
+2
 Grid
 ?
 
@@ -587,6 +587,12 @@ CheckBox
 enabled
 
 2
+0
+0
+Grid
+content
+
+1
 0
 0
 // Resource
@@ -2399,7 +2405,7 @@ popup_fx_menu
 
 0
 0
-4
+6
 Item
 load_favorite
 image=hui:open
@@ -2419,9 +2425,21 @@ Separator
 0
 0
 Item
+show_large
+image=hui:zoom-in
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
 delete
 image=hui:delete
-3
+5
 0
 0
 // Resource
@@ -4318,7 +4336,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-437
+438
 // Text
 /cancel
 Cancel
@@ -5091,6 +5109,9 @@ Load parameters
 popup_fx_menu/save_favorite
 Save parameters
 
+popup_fx_menu/show_large
+Show large
+
 popup_layer_menu/delete_layer
 Delete
 
@@ -5637,7 +5658,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-559
+560
 // Text
 /cancel
 Abbrechen
@@ -6628,6 +6649,9 @@ Parameter laden
 
 popup_fx_menu/save_favorite
 Parameter speichern
+
+popup_fx_menu/show_large
+Groß...
 
 popup_layer_menu/delete_layer
 Löschen

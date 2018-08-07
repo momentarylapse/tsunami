@@ -247,12 +247,12 @@ void MidiEditorConsole::clear()
 	setSelection("reference_tracks", {});
 }
 
-void MidiEditorConsole::onEnter()
+void MidiEditorConsole::on_enter()
 {
 	view->setMode(view->mode_midi);
 }
 
-void MidiEditorConsole::onLeave()
+void MidiEditorConsole::on_leave()
 {
 	view->setMode(view->mode_default);
 }

@@ -26,7 +26,6 @@ public:
 	void onEditSong();
 
 	void onModuleDelete();
-	void onModuleSelectionChange();
 
 	string id_inner;
 

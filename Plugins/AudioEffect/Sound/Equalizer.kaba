@@ -68,7 +68,7 @@ class Equalizer extends AudioEffect
 
 class EqualizerGrid extends Grid
 	Config *c
-	ConfigPanel *cp
+	EqualizerPanel *cp
 	int hover, selected
 	override void on_draw(Painter *p)
 		// curve + area below
@@ -79,6 +79,11 @@ class EqualizerGrid extends Grid
 		// points
 		for i in 0:c.curve.num
 			draw_point3(p, c.curve[i], i == selected, i == hover)
+		
+		if p.width > 500
+			cp.set_options(id, "height=350")
+		else
+			cp.set_options(id, "height=250")
 			
 
 	// left button down -> select

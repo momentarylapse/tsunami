@@ -68,7 +68,7 @@ DeviceType dev_type(SignalType type)
 	return DeviceType::MIDI_INPUT;
 }
 
-void CaptureConsole::onEnter()
+void CaptureConsole::on_enter()
 {
 	hideControl("single_grid", true);
 	hideControl("multi_grid", true);
@@ -101,7 +101,7 @@ void CaptureConsole::onEnter()
 	onStart();
 }
 
-void CaptureConsole::onLeave()
+void CaptureConsole::on_leave()
 {
 	if (mode->isCapturing())
 		mode->insert();

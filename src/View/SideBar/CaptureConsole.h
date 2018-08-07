@@ -27,8 +27,8 @@ public:
 
 
 
-	void onEnter() override;
-	void onLeave() override;
+	void on_enter() override;
+	void on_leave() override;
 
 	void onStart();
 	void onDump();

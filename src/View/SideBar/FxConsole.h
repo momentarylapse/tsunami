@@ -14,6 +14,7 @@ class Track;
 class Song;
 class AudioView;
 class Session;
+class AudioEffect;
 
 class FxConsole : public SideBarConsole
 {
@@ -32,6 +33,10 @@ public:
 	void onTrackDelete();
 	void onViewCurTrackChange();
 	void onUpdate();
+
+	void set_exclusive(AudioEffect *fx);
+	AudioEffect *exclusive;
+	bool allow_show(AudioEffect *fx);
 
 	string id_inner;
 

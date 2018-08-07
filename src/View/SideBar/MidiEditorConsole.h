@@ -19,8 +19,8 @@ public:
 	MidiEditorConsole(Session *session);
 	virtual ~MidiEditorConsole();
 
-	virtual void onEnter();
-	virtual void onLeave();
+	virtual void on_enter();
+	virtual void on_leave();
 
 	void onLayerDelete();
 	void onViewCurLayerChange();

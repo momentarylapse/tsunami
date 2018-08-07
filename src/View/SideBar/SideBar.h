@@ -33,8 +33,12 @@ public:
 	SideBar(Session *session);
 	virtual ~SideBar();
 
-	void onClose();
-	void onChoose();
+	void on_close();
+	void on_large();
+	void on_choose();
+
+	bool is_large;
+	void set_large(bool large);
 
 	void _show();
 	void _hide();
@@ -58,7 +62,7 @@ public:
 
 	void choose(int console);
 	void open(int console);
-	bool isActive(int console);
+	bool is_active(int console);
 	int active_console;
 	bool visible;
 
@@ -76,7 +80,7 @@ public:
 	ModuleConsole *module_console;
 
 	Array<SideBarConsole*> consoles;
-	void addConsole(SideBarConsole *c);
+	void add_console(SideBarConsole *c);
 };
 
 
@@ -90,8 +94,8 @@ public:
 	AudioView *view;
 	SideBar *bar(){ return dynamic_cast<SideBar*>(parent); }
 
-	virtual void onEnter(){}
-	virtual void onLeave(){}
+	virtual void on_enter(){}
+	virtual void on_leave(){}
 };
 
 #endif /* BOTTOMBAR_H_ */

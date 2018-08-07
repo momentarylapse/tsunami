@@ -20,6 +20,9 @@
 #include "ModuleConsole.h"
 #include "../../Session.h"
 
+const int WIDTH_DEFAULT = 380;
+const int WIDTH_LARGE = 750;
+
 SideBar::SideBar(Session *session)
 {
 	addRevealer("!slide-left", 0, 0, "revealer");
@@ -35,7 +38,11 @@ SideBar::SideBar(Session *session)
 	setTarget("button_grid");
 	addButton("!noexpandx,flat", 0, 0, "close");
 	setImage("close", "hui:close");
-	addLabel("!big,expandx,center\\...", 1, 0, "title");
+	//addButton("!noexpandx,flat", 1, 0, "large");
+	//setImage("large", "hui:up");
+	addLabel("!big,bold,expandx,center\\...", 2, 0, "title");
+
+	is_large = false;
 
 	song_console = new SongConsole(session);
 	sample_manager = new SampleManagerConsole(session);
@@ -50,20 +57,21 @@ SideBar::SideBar(Session *session)
 	capture_console = new CaptureConsole(session);
 	module_console = new ModuleConsole(session);
 
-	addConsole(song_console);
-	addConsole(sample_manager);
-	addConsole(global_fx_console);
-	addConsole(track_console);
-	addConsole(midi_editor_console);
-	addConsole(fx_console);
-	addConsole(curve_console);
-	addConsole(synth_console);
-	addConsole(midi_fx_console);
-	addConsole(sample_ref_console);
-	addConsole(capture_console);
-	addConsole(module_console);
+	add_console(song_console);
+	add_console(sample_manager);
+	add_console(global_fx_console);
+	add_console(track_console);
+	add_console(midi_editor_console);
+	add_console(fx_console);
+	add_console(curve_console);
+	add_console(synth_console);
+	add_console(midi_fx_console);
+	add_console(sample_ref_console);
+	add_console(capture_console);
+	add_console(module_console);
 
-	event("close", std::bind(&SideBar::onClose, this));
+	event("close", std::bind(&SideBar::on_close, this));
+	event("large", std::bind(&SideBar::on_large, this));
 
 	reveal("revealer", false);
 	visible = false;
@@ -76,22 +84,40 @@ SideBar::~SideBar()
 {
 }
 
-void SideBar::addConsole(SideBarConsole *c)
+void SideBar::add_console(SideBarConsole *c)
 {
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
 	c->hide();
 }
 
-void SideBar::onClose()
+void SideBar::on_close()
 {
 	_hide();
+}
+
+void SideBar::on_large()
+{
+	set_large(!is_large);
+}
+
+void SideBar::set_large(bool large)
+{
+	is_large = large;
+	if (is_large){
+		setOptions("root_grid0", format("width=%d", WIDTH_LARGE));
+		setImage("large", "hui:down");
+	}else{
+		setOptions("root_grid0", format("width=%d", WIDTH_DEFAULT));
+		setImage("large", "hui:up");
+	}
+
 }
 
 void SideBar::_show()
 {
 	if ((!visible) and (active_console >= 0))
-		consoles[active_console]->onEnter();
+		consoles[active_console]->on_enter();
 
 	reveal("revealer", true);
 	visible = true;
@@ -101,7 +127,7 @@ void SideBar::_show()
 void SideBar::_hide()
 {
 	if ((visible) and (active_console >= 0))
-		consoles[active_console]->onLeave();
+		consoles[active_console]->on_leave();
 
 	reveal("revealer", false);
 	visible = false;
@@ -112,15 +138,16 @@ void SideBar::choose(int console)
 {
 	if (active_console >= 0){
 		if (visible)
-			consoles[active_console]->onLeave();
+			consoles[active_console]->on_leave();
 		consoles[active_console]->hide();
 	}
+	set_large(false);
 
 	active_console = console;
 
 	consoles[active_console]->show();
 	if (visible)
-		consoles[active_console]->onEnter();
+		consoles[active_console]->on_enter();
 	setString("title", consoles[active_console]->title);
 
 	notify();
@@ -135,7 +162,7 @@ void SideBar::open(int console)
 	notify();
 }
 
-bool SideBar::isActive(int console)
+bool SideBar::is_active(int console)
 {
 	return (active_console == console) and visible;
 }

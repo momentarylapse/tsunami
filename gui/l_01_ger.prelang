@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-560
+561
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1683,6 +1683,9 @@ Parameter speichern
 track-mixer/solo
 
 Solo
+popup_fx_menu/show_large
+Groß...
+
 // Num Language Strings
 190
 // Data (ID,Text)

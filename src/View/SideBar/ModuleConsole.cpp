@@ -69,7 +69,3 @@ void ModuleConsole::onModuleDelete()
 {
 	clear();
 }
-
-void ModuleConsole::onModuleSelectionChange()
-{
-}

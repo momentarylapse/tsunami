@@ -311,6 +311,8 @@ void Panel::addControl(const string &type, const string &title, int x, int y, co
 		addSeparator(title, x, y, id);
 	else if (type == "Revealer")
 		addRevealer(title, x, y, id);
+	else if (type == "MenuButton")
+		addMenuButton(title, x, y, id);
 	else
 		msg_error("unknown hui control: " + type);
 }

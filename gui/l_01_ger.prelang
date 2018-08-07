@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-556
+559
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1670,6 +1670,15 @@ Tabulatur
 
 popup_track_menu/menu_midi_mode
 Midi Modus
+
+popup_fx_menu/delete
+Löschen
+
+popup_fx_menu/load_favorite
+Parameter laden
+
+popup_fx_menu/save_favorite
+Parameter speichern
 
 // Num Language Strings
 190

@@ -67,7 +67,6 @@ namespace hui
 
 
 
-// dialog controls (don't change the order!!!)
 enum{
 	CONTROL_BUTTON,
 	CONTROL_DEFBUTTON,
@@ -95,6 +94,7 @@ enum{
 	CONTROL_SEPARATOR,
 	CONTROL_PANED,
 	CONTROL_REVEALER,
+	CONTROL_MENU_BUTTON,
 
 	TOOL_ITEM_BUTTON,
 	TOOL_ITEM_TOGGLEBUTTON,

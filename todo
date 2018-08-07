@@ -85,7 +85,7 @@ J Selektionseinrasten
 j Stream Abstürze
 j SelectionRange beim Abspielen
 * Änderungen beim Abspielen
-j freeze beim Midi Editieren
+J freeze beim Midi Editieren
 J Animation zum MidiEditor
 
 
@@ -164,3 +164,8 @@ J nullptr
 * TrackLayer in separate file
 J SymbolRenderer in separate file
 * MidiBuffer move/ownership
+
+== more bugs ==
+
+* crash when closing (after fx/synth?)
+* crash when tuning strings

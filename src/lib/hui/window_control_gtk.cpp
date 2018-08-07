@@ -10,6 +10,7 @@
 #include "Controls/ControlLabel.h"
 #include "Controls/ControlListView.h"
 #include "Controls/ControlMultilineEdit.h"
+#include "Controls/ControlMenuButton.h"
 #include "Controls/ControlPaned.h"
 #include "Controls/ControlProgressBar.h"
 #include "Controls/ControlRadioButton.h"
@@ -363,6 +364,11 @@ void Panel::addSeparator(const string &title, int x, int y, const string &id)
 void Panel::addRevealer(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlRevealer(title, id), x, y);
+}
+
+void Panel::addMenuButton(const string &title, int x, int y, const string &id)
+{
+	_insert_control_(new ControlMenuButton(title, id), x, y);
 }
 
 void Panel::embedDialog(const string &id, int x, int y)

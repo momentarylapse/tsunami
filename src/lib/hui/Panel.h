@@ -98,6 +98,7 @@ public:
 	void _cdecl addSeparator(const string &title, int x, int y, const string &id);
 	void _cdecl addPaned(const string &title, int x, int y, const string &id);
 	void _cdecl addRevealer(const string &title, int x, int y, const string &id);
+	void _cdecl addMenuButton(const string &title, int x, int y, const string &id);
 
 	void _cdecl embedDialog(const string &id, int x, int y);
 	void _cdecl embedSource(const string &source, const string &parent_id, int x, int y);

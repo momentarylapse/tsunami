@@ -1,0 +1,6 @@
+Menu popup_fx_menu ""
+	Item load_favorite "Load parameters" image=hui:open
+	Item save_favorite "Save parameters" image=hui:save
+	Separator
+	Item delete "Delete" image=hui:delete
+

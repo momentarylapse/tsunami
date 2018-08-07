@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-51
+52
 // Resource
 Menu
 menu_fake
@@ -570,35 +570,23 @@ Grid
 
 0
 0
-5
-Button
-load_favorite
-flat,image=hui:open
+3
+MenuButton
+menu
+image=hui:preferences,flat,menu=popup_fx_menu
 0
-0
-0
-Button
-save_favorite
-flat,image=hui:save
-1
 0
 0
 Text
 name
 bold,center,expandx
-2
+1
 0
 0
 CheckBox
 enabled
 
-3
-0
-0
-Button
-delete
-flat,image=hui:delete
-4
+2
 0
 0
 // Resource
@@ -2403,6 +2391,37 @@ Item
 scale_bars
 image=hui:zoom-in
 5
+0
+0
+// Resource
+Menu
+popup_fx_menu
+
+0
+0
+4
+Item
+load_favorite
+image=hui:open
+0
+0
+0
+Item
+save_favorite
+image=hui:save
+1
+0
+0
+Separator
+
+
+2
+0
+0
+Item
+delete
+image=hui:delete
+3
 0
 0
 // Resource
@@ -4499,18 +4518,9 @@ Edit
 fx_editor/fx_editor
 Effects
 
-fx_panel/delete
-Delete
-delete effect
 fx_panel/enabled
 
 active?
-fx_panel/load_favorite
-
-load parameter
-fx_panel/save_favorite
-
-save parameter
 layer_dialog/add_layer
 
 Add a new empty layer at the top
@@ -5060,6 +5070,15 @@ Scale
 popup_bar_menu/track_add_marker
 Add marker
 
+popup_fx_menu/delete
+Delete
+
+popup_fx_menu/load_favorite
+Load parameters
+
+popup_fx_menu/save_favorite
+Save parameters
+
 popup_layer_menu/delete_layer
 Delete
 
@@ -5603,7 +5622,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-555
+558
 // Text
 /cancel
 Abbrechen
@@ -6585,6 +6604,15 @@ Skalieren
 
 popup_bar_menu/track_add_marker
 Marker hinzufügen
+
+popup_fx_menu/delete
+Löschen
+
+popup_fx_menu/load_favorite
+Parameter laden
+
+popup_fx_menu/save_favorite
+Parameter speichern
 
 popup_layer_menu/delete_layer
 Löschen

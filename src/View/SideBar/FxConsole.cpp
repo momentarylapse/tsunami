@@ -83,10 +83,12 @@ public:
 	}
 	void onDelete()
 	{
-		if (track)
-			track->deleteEffect(fx);
-		else
-			song->deleteEffect(fx);
+		hui::RunLater(0, [&]{
+			if (track)
+				track->deleteEffect(fx);
+			else
+				song->deleteEffect(fx);
+		});
 	}
 	void onfxChange()
 	{

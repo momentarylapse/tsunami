@@ -68,6 +68,7 @@ const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 const string AudioView::MESSAGE_INPUT_CHANGE = "InputChange";
 const string AudioView::MESSAGE_OUTPUT_STATE_CHANGE = "OutputStateChange";
+const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
 
 
 class PeakThread : public Thread
@@ -1389,7 +1390,7 @@ Set<Track*> AudioView::get_playable_tracks()
 	Set<Track*> tracks;
 	bool any_solo = hasAnySoloTrack();
 	for (auto *t: vtrack)
-		if (t->solo or !any_solo)
+		if (!t->track->muted and (t->solo or !any_solo))
 			tracks.add(t->track);
 	return tracks;
 }

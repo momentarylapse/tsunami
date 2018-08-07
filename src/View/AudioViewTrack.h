@@ -9,6 +9,7 @@
 #define SRC_VIEW_AUDIOVIEWTRACK_H_
 
 #include "../lib/math/math.h"
+#include "../Stuff/Observable.h"
 
 class Track;
 class TrackLayer;
@@ -27,7 +28,7 @@ enum class NoteModifier;
 enum class MidiMode;
 
 
-class AudioViewLayer
+class AudioViewLayer : public Observable<VirtualBase>
 {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
@@ -110,7 +111,7 @@ public:
 	bool mouse_over();
 };
 
-class AudioViewTrack
+class AudioViewTrack : public Observable<VirtualBase>
 {
 public:
 	AudioViewTrack(AudioView *view, Track *track);

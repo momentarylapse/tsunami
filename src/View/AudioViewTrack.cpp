@@ -1018,12 +1018,18 @@ void AudioViewTrack::setSolo(bool _solo)
 	solo = _solo;
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
+	view->forceRedraw();
+	notify();
+	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
 void AudioViewLayer::setSolo(bool _solo)
 {
 	solo = _solo;
 	view->renderer->allow_layers(view->get_playable_layers());
+	view->forceRedraw();
+	notify();
+	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
 

@@ -16,8 +16,8 @@ class Song;
 class MixingConsole;
 class PeakMeterDisplay;
 class DeviceManager;
-class OutputStream;
 class AudioView;
+class AudioViewTrack;
 
 class TrackMixer: public hui::Panel
 {
@@ -26,8 +26,9 @@ public:
 	~TrackMixer();
 	void onVolume();
 	void onMute();
+	void onSolo();
 	void onPanning();
-	void setTrack(Track *t);
+	void setTrack(AudioViewTrack *t);
 	void update();
 
 	static const float DB_MIN;
@@ -39,6 +40,7 @@ public:
 	static float slider2vol(float val);
 
 	Track *track;
+	AudioViewTrack *vtrack;
 	//Slider *volume_slider;
 	//Slider *panning_slider;
 	string id_name;
@@ -46,6 +48,7 @@ public:
 	string pan_slider_id;
 	string mute_id;
 	string id_separator;
+	AudioView *view;
 };
 
 class MixingConsole: public BottomBar::Console
@@ -58,7 +61,8 @@ public:
 
 	void onOutputVolume();
 
-	void onUpdateSong();
+	void on_tracks_change();
+	void on_solo_change();
 	void onUpdateDeviceManager();
 
 	virtual void _cdecl onShow();

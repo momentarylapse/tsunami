@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-559
+560
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1144,8 +1144,8 @@ synth_panel/save_favorite
 
 Parameter speichern
 track-mixer/mute
-Stumm
 
+Stumm
 track-mixer/panning
 0
 Balance
@@ -1680,6 +1680,9 @@ Parameter laden
 popup_fx_menu/save_favorite
 Parameter speichern
 
+track-mixer/solo
+
+Solo
 // Num Language Strings
 190
 // Data (ID,Text)

@@ -4258,10 +4258,22 @@ range=0:1:0.001,vertical,expandy
 2
 0
 0
+Grid
+?
+
+3
+0
+2
 CheckBox
 mute
 
-3
+0
+0
+0
+CheckBox
+solo
+
+1
 0
 0
 // Resource
@@ -4306,7 +4318,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-436
+437
 // Text
 /cancel
 Cancel
@@ -5563,11 +5575,14 @@ synth_panel/save_favorite
 
 load parameter
 track-mixer/mute
-Mute
 
+Mute
 track-mixer/panning
 0
 Balance
+track-mixer/solo
+
+Solo
 track-mixer/volume
 0
 Volume in dB
@@ -5622,7 +5637,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-558
+559
 // Text
 /cancel
 Abbrechen
@@ -7218,11 +7233,14 @@ synth_panel/save_favorite
 
 Parameter speichern
 track-mixer/mute
-Stumm
 
+Stumm
 track-mixer/panning
 0
 Balance
+track-mixer/solo
+
+Solo
 track-mixer/volume
 0
 Lautstärke in dB

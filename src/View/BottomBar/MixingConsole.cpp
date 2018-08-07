@@ -16,6 +16,7 @@
 #include "../../Data/Track.h"
 #include "../../Session.h"
 #include "../AudioView.h"
+#include "../AudioViewTrack.h"
 
 const float TrackMixer::DB_MIN = -1000000;
 const float TrackMixer::DB_MAX = 10;
@@ -24,6 +25,9 @@ const float TrackMixer::TAN_SCALE = 10.0f;
 TrackMixer::TrackMixer()
 {
 	fromResource("track-mixer");
+
+	track = nullptr;
+	vtrack = nullptr;
 
 	id_separator = "mixing-track-separator";
 	id_name = "name";
@@ -39,11 +43,12 @@ TrackMixer::TrackMixer()
 	addString(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
 	addString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
 	addString(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
-	addString(vol_slider_id, format("%f\\-inf", db2slider(DB_MIN))); // \u221e
+	addString(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
 	event(vol_slider_id, std::bind(&TrackMixer::onVolume, this));
 	event(pan_slider_id, std::bind(&TrackMixer::onPanning, this));
 	event(mute_id, std::bind(&TrackMixer::onMute, this));
+	event("solo", std::bind(&TrackMixer::onSolo, this));
 }
 
 TrackMixer::~TrackMixer()
@@ -72,25 +77,46 @@ float TrackMixer::vol2slider(float vol)
 
 void TrackMixer::onVolume()
 {
-	if (parent->isChecked("link-volumes"))
-		track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
-	else
-		track->setVolume(slider2vol(getFloat("")));
+	if (track){
+		if (parent->isChecked("link-volumes"))
+			track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
+		else
+			track->setVolume(slider2vol(getFloat("")));
+	}
 }
 
 void TrackMixer::onMute()
 {
-	track->setMuted(isChecked(""));
+	if (track)
+		track->setMuted(isChecked(""));
+}
+
+void TrackMixer::onSolo()
+{
+	if (vtrack)
+		vtrack->setSolo(isChecked(""));
 }
 
 void TrackMixer::onPanning()
 {
-	track->setPanning(getFloat(""));
+	if (track)
+		track->setPanning(getFloat(""));
 }
 
-void TrackMixer::setTrack(Track* t)
+void TrackMixer::setTrack(AudioViewTrack* t)
 {
-	track = t;
+	if (track)
+		track->unsubscribe(this);
+	if (vtrack)
+		vtrack->unsubscribe(this);
+	vtrack = t;
+	track = nullptr;
+	if (t)
+		track = t->track;
+	if (track)
+		track->subscribe(this, [&]{ update(); }, track->MESSAGE_CHANGE);
+	if (vtrack)
+		vtrack->subscribe(this, [&]{ update(); }, track->MESSAGE_CHANGE);
 	update();
 }
 
@@ -99,7 +125,10 @@ void TrackMixer::update()
 	setFloat(vol_slider_id, vol2slider(track->volume));
 	setFloat(pan_slider_id, track->panning);
 	check(mute_id, track->muted);
+	check("solo", vtrack->solo);
 	setString(id_name, track->getNiceName());
+	bool is_playable = vtrack->view->get_playable_tracks().contains(track);
+	enable(id_name, is_playable);
 }
 
 
@@ -116,14 +145,17 @@ MixingConsole::MixingConsole(Session *session) :
 
 	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
 
-	song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
+	view->subscribe(this, std::bind(&MixingConsole::on_tracks_change, this), session->view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, std::bind(&MixingConsole::on_solo_change, this), session->view->MESSAGE_SOLO_CHANGE);
+	//song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
 	device_manager->subscribe(this, std::bind(&MixingConsole::onUpdateDeviceManager, this));
 	loadData();
 }
 
 MixingConsole::~MixingConsole()
 {
-	song->unsubscribe(this);
+	//song->unsubscribe(this);
+	view->unsubscribe(this);
 	device_manager->unsubscribe(this);
 	for (TrackMixer *m: mixer)
 		delete(m);
@@ -137,22 +169,23 @@ void MixingConsole::onOutputVolume()
 
 void MixingConsole::loadData()
 {
-	for (int i=mixer.num; i<song->tracks.num; i++){
+	int n = view->vtrack.num;
+	for (int i=mixer.num; i<n; i++){
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
 		embed(m, id_inner, i*2, 0);
 		addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
 	}
-	for (int i=song->tracks.num; i<mixer.num; i++){
+	for (int i=n; i<mixer.num; i++){
 		delete(mixer[i]);
 		removeControl("separator-" + i2s(i));
 	}
-	mixer.resize(song->tracks.num);
+	mixer.resize(n);
 
-	foreachi(Track *t, song->tracks, i)
+	foreachi(AudioViewTrack *t, view->vtrack, i)
 		mixer[i]->setTrack(t);
 
-	hideControl("link-volumes", song->tracks.num <= 1);
+	hideControl("link-volumes", n <= 1);
 }
 
 void MixingConsole::onUpdateDeviceManager()
@@ -160,9 +193,15 @@ void MixingConsole::onUpdateDeviceManager()
 	setFloat("output-volume", device_manager->getOutputVolume());
 }
 
-void MixingConsole::onUpdateSong()
+void MixingConsole::on_tracks_change()
 {
 	loadData();
+}
+
+void MixingConsole::on_solo_change()
+{
+	for (auto *m: mixer)
+		m->update();
 }
 
 void MixingConsole::onShow()

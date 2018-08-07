@@ -21,6 +21,9 @@ public:
 	virtual string getString();
 	virtual void __setString(const string &str);
 	virtual void __setOption(const string &op, const string &value);
+
+	string text;
+	bool flag_bold, flag_italic, flag_big, flag_small, flag_underline, flag_strikeout;
 };
 
 };

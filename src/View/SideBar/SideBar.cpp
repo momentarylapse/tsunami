@@ -121,7 +121,7 @@ void SideBar::choose(int console)
 	consoles[active_console]->show();
 	if (visible)
 		consoles[active_console]->onEnter();
-	setString("title", "!big\\" + consoles[active_console]->title);
+	setString("title", consoles[active_console]->title);
 
 	notify();
 }

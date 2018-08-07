@@ -901,7 +901,9 @@ void AudioView::updateTracks()
 		}
 	}
 
-	if (changed){
+	// TODO: detect order change
+
+	/*if (changed)*/{
 		checkConsistency();
 		notify(MESSAGE_VTRACK_CHANGE);
 	}

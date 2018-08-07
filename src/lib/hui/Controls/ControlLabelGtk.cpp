@@ -23,8 +23,10 @@ ControlLabel::ControlLabel(const string &title, const string &id) :
 #else
 	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
 #endif
-	ControlLabel::__setString(title);
+	flag_bold = flag_italic = flag_big = flag_small = false;
+	flag_underline = flag_strikeout = false;
 	setOptions(OptionString);
+	ControlLabel::__setString(title);
 }
 
 string ControlLabel::getString()
@@ -35,13 +37,21 @@ string ControlLabel::getString()
 void ControlLabel::__setString(const string &str)
 {
 	GetPartStrings(str);
-	string s = sys_str(PartString[0]);
-	if (OptionString.find("bold") >= 0)
-		s = "<b>" + s + "</b>";
-	else if (OptionString.find("italic") >= 0)
+	text = PartString[0];
+	setOptions(OptionString);
+	string s = sys_str(text);
+	if (flag_bold)
+		s = "<b>" + text + "</b>";
+	if (flag_italic)
 		s = "<i>" + s + "</i>";
-	if (OptionString.find("big") >= 0)
+	if (flag_underline)
+		s = "<u>" + s + "</u>";
+	if (flag_strikeout)
+		s = "<s>" + s + "</s>";
+	if (flag_big)
 		s = "<big>" + s + "</big>";
+	else if (flag_small)
+		s = "<small>" + s + "</small>";
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 
@@ -63,6 +73,18 @@ void ControlLabel::__setOption(const string &op, const string &value)
 #endif
 	}else if (op == "angle"){
 		gtk_label_set_angle(GTK_LABEL(widget), value._float());
+	}else if (op == "bold"){
+		flag_bold = true;
+	}else if (op == "italic"){
+		flag_italic = true;
+	}else if (op == "big"){
+		flag_big = true;
+	}else if (op == "small"){
+		flag_small = true;
+	}else if (op == "underline"){
+		flag_underline = true;
+	}else if (op == "strikeout"){
+		flag_strikeout = true;
 	}
 }
 

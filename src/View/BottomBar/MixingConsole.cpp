@@ -126,9 +126,12 @@ void TrackMixer::update()
 	setFloat(pan_slider_id, track->panning);
 	check(mute_id, track->muted);
 	check("solo", vtrack->solo);
-	setString(id_name, track->getNiceName());
 	bool is_playable = vtrack->view->get_playable_tracks().contains(track);
 	enable(id_name, is_playable);
+	if (is_playable)
+		setString(id_name, track->getNiceName());
+	else
+		setString(id_name, "<s>" + track->getNiceName() + "</s>");
 }
 
 

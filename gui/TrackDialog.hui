@@ -18,10 +18,6 @@ Dialog track_dialog "Spur" width=380 height=516
 				Grid ? ""
 					Text tuning "" expandx
 					Button edit_tuning "" image=hui:properties flat
-		Group g_midi "Midi"
-			Grid ? ""
-				Button _edit_midi "Edit" flat expandx
-				Button _edit_midi_fx "Fx" flat
 		Group g_synth "Synthesizer"
 			Grid ? ""
 				Button select_synth "" expandx flat "tooltip=Select synthesizer" flat
@@ -29,6 +25,8 @@ Dialog track_dialog "Spur" width=380 height=516
 		Text ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_fx "Fx"
-				Button /edit_curves "Curves"
+				Button /edit_song "File" link
+				Button /edit_fx "Fx" link
+				Button /edit_midi "Midi" link
+				Button /edit_midi_fx "Midi-Fx" link
+				Button /edit_curves "Curves" link

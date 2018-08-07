@@ -12,7 +12,7 @@ Dialog sample_ref_dialog "Sample" width=375 height=230
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_track "Track"
-				Button edit_sample "Sample"
+				Button /edit_song "File" link
+				Button /edit_track "Track" link
+				Button edit_sample "Sample" link
 

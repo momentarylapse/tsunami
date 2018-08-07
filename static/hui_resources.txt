@@ -333,19 +333,19 @@ Grid
 3
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
 Button
 edit_fx
-
+link
 2
 0
 0
@@ -542,13 +542,13 @@ Grid
 2
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
@@ -658,7 +658,7 @@ Grid
 1
 Button
 edit_song
-
+link
 0
 0
 0
@@ -1533,19 +1533,19 @@ Grid
 3
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
 Button
 edit_midi_fx
-
+link
 2
 0
 0
@@ -1612,19 +1612,19 @@ Grid
 3
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
 Button
 edit_midi
-
+link
 2
 0
 0
@@ -1813,7 +1813,7 @@ Grid
 1
 Button
 edit_song
-
+link
 0
 0
 0
@@ -3277,7 +3277,7 @@ Grid
 1
 Button
 edit_song
-
+link
 0
 0
 0
@@ -3368,19 +3368,19 @@ Grid
 3
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
 Button
 edit_sample
-
+link
 2
 0
 0
@@ -3822,13 +3822,13 @@ Grid
 2
 Button
 edit_samples
-
+link
 0
 0
 0
 Button
 edit_fx
-
+link
 1
 0
 0
@@ -3883,13 +3883,13 @@ Grid
 2
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_track
-
+link
 1
 0
 0
@@ -4039,7 +4039,7 @@ Grid
 vertical
 0
 0
-7
+6
 Group
 g_name
 
@@ -4137,33 +4137,9 @@ image=hui:properties,flat
 0
 0
 Group
-g_midi
-
-3
-0
-1
-Grid
-?
-
-0
-0
-2
-Button
-_edit_midi
-flat,expandx
-0
-0
-0
-Button
-_edit_midi_fx
-flat
-1
-0
-0
-Group
 g_synth
 
-4
+3
 0
 1
 Grid
@@ -4187,13 +4163,13 @@ noexpandx,flat,image=hui:properties,flat
 Text
 ?
 expandy
-5
+4
 0
 0
 Group
 td_t_edit
 
-6
+5
 0
 1
 Grid
@@ -4201,23 +4177,35 @@ Grid
 
 0
 0
-3
+5
 Button
 edit_song
-
+link
 0
 0
 0
 Button
 edit_fx
-
+link
 1
 0
 0
 Button
-edit_curves
-
+edit_midi
+link
 2
+0
+0
+Button
+edit_midi_fx
+link
+3
+0
+0
+Button
+edit_curves
+link
+4
 0
 0
 // Resource
@@ -4299,7 +4287,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-439
+436
 // Text
 /cancel
 Cancel
@@ -5564,20 +5552,11 @@ Balance
 track-mixer/volume
 0
 Volume in dB
-track_dialog/_edit_midi
-Edit
-
-track_dialog/_edit_midi_fx
-Fx
-
 track_dialog/_edit_synth
 
 Configure synthesizer
 track_dialog/g_instrument
 Instrument
-
-track_dialog/g_midi
-Midi
 
 track_dialog/g_name
 Name
@@ -7292,7 +7271,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-189
+190
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7654,6 +7633,8 @@ open message.txt
 message.txt öffnen
 output: 
 Ausgang: 
+please note, that portaudio does not support refreshing the device list after program launch
+Geräte, die nach Programmstart angeschlossen werden, können von Portaudio leider nicht erkannt werden!
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 recording backup found: 

@@ -11,4 +11,4 @@ Dialog sample_manager_dialog "Sample Manager" width=400 height=400 allow-parent
 			Button scale_sample "" flat image=hui:zoom-in "tooltip=scale/resize"
 		Group smd_group_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
+				Button /edit_song "File" link

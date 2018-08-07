@@ -43,6 +43,6 @@ Dialog midi_editor "Midi" width=380 height=516
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_track "Track"
-				Button /edit_midi_fx "Midi-Fx"
+				Button /edit_song "File" link
+				Button /edit_track "Track" link
+				Button /edit_midi_fx "Midi-Fx" link

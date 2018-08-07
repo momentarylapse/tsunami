@@ -9,5 +9,5 @@ Dialog synth_console "" width=300 height=200
 		---|
 		Group sc_group_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_track "Track"
+				Button /edit_song "File" link
+				Button /edit_track "Track" link

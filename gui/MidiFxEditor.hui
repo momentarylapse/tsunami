@@ -41,6 +41,6 @@ Dialog midi_fx_editor "Midi Fx" width=380 height=516
 		---|
 		Group mfe_g_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_track "Track"
-				Button /edit_midi "Midi"
+				Button /edit_song "File" link
+				Button /edit_track "Track" link
+				Button /edit_midi "Midi" link

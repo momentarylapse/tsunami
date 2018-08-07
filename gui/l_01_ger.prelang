@@ -1672,7 +1672,7 @@ popup_track_menu/menu_midi_mode
 Midi Modus
 
 // Num Language Strings
-189
+190
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2052,3 +2052,5 @@ output:
 Ausgang: 
 bar 
 Takt 
+please note, that portaudio does not support refreshing the device list after program launch
+Geräte, die nach Programmstart angeschlossen werden, können von Portaudio leider nicht erkannt werden!

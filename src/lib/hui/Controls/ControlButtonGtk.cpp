@@ -17,12 +17,23 @@ void *get_gtk_image(const string &image, bool large); // -> hui_menu_gtk.cpp
 void OnGtkButtonPress(GtkWidget *widget, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:click");	}
 
+gboolean OnGtkLinkButtonActivate(GtkWidget *widget, gpointer data)
+{
+	reinterpret_cast<Control*>(data)->notify("hui:click");
+	return true;
+}
+
 ControlButton::ControlButton(const string &title, const string &id) :
 	Control(CONTROL_BUTTON, id)
 {
 	GetPartStrings(title);
-	widget = gtk_button_new_with_label(sys_str(PartString[0]));
-	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
+	if (OptionString.find("link") >= 0){
+		widget = gtk_link_button_new_with_label(sys_str(PartString[0]), sys_str(PartString[0]));
+		g_signal_connect(G_OBJECT(widget), "activate-link", G_CALLBACK(&OnGtkLinkButtonActivate), this);
+	}else{
+		widget = gtk_button_new_with_label(sys_str(PartString[0]));
+		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
+	}
 
 //	SetImageById(this, id);
 	setOptions(OptionString);

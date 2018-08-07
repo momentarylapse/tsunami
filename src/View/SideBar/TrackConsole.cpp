@@ -41,8 +41,8 @@ TrackConsole::TrackConsole(Session *session) :
 	event("edit_song", std::bind(&TrackConsole::onEditSong, this));
 	event("edit_fx", std::bind(&TrackConsole::onEditFx, this));
 	event("edit_curves", std::bind(&TrackConsole::onEditCurves, this));
-	event("_edit_midi", std::bind(&TrackConsole::onEditMidi, this));
-	event("_edit_midi_fx", std::bind(&TrackConsole::onEditMidiFx, this));
+	event("edit_midi", std::bind(&TrackConsole::onEditMidi, this));
+	event("edit_midi_fx", std::bind(&TrackConsole::onEditMidiFx, this));
 	event("_edit_synth", std::bind(&TrackConsole::onEditSynth, this));
 }
 
@@ -65,8 +65,8 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		enable("_edit_midi", track->type == SignalType::MIDI);
-		enable("_edit_midi_fx", track->type == SignalType::MIDI);
+		hideControl("edit_midi", track->type != SignalType::MIDI);
+		hideControl("edit_midi_fx", track->type != SignalType::MIDI);
 		enable("_edit_synth", track->type != SignalType::AUDIO);
 		enable("select_synth", track->type != SignalType::AUDIO);
 

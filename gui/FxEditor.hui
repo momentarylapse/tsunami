@@ -6,5 +6,5 @@ Dialog fx_editor "Effects" width=380 height=516
 		Text ? "" expandy
 		Group fe_g_edit "Edit"
 			Grid ? ""
-				Button /edit_song "File"
-				Button /edit_track "Track"
+				Button /edit_song "File" link
+				Button /edit_track "Track" link

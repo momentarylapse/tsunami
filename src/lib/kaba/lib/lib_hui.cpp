@@ -274,6 +274,11 @@ void SIAddPackageHui()
 				func_add_param("checked",	TypeBool);
 			class_add_func("is_checked",					TypeBool,		mf(&hui::Panel::isChecked));
 				func_add_param("id",		TypeString);
+			class_add_func("hide_control",								TypeVoid,		mf(&hui::Panel::hideControl));
+				func_add_param("id",		TypeString);
+				func_add_param("hide",	TypeBool);
+			class_add_func("delete_control",								TypeVoid,		mf(&hui::Panel::deleteControl));
+				func_add_param("id",		TypeString);
 			class_add_func("get_int",			TypeInt,		mf(&hui::Panel::getInt));
 				func_add_param("id",		TypeString);
 			class_add_func("get_selection",			TypeIntList,		mf(&hui::Panel::getSelection));

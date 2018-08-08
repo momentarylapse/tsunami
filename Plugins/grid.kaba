@@ -1,6 +1,14 @@
 use "tone.kaba"
 use "api.kaba"
 
+class Curve
+	virtual float get(float x)
+	virtual float[] get_list(float[] xx)
+		float[] r
+		r.resize(xx.num)
+		for x,i in xx
+			r[i] = get(x)
+		return r
 
 float log2lin(float f, float f_min, float f_max)
 	return exp(f * log(f_max / f_min)) * f_min
@@ -268,6 +276,26 @@ class GridData
 		c.set_color(col_line)
 		c.draw_lines(pp)
 	
+	void draw_curve_c(Painter *c, Curve curve, bool fill_below)
+		float[] tt, yy
+		complex[] pp
+		tt = rangef(0, 1, 0.003)
+		//yy = curve.get_list(tt)
+		for t,i in tt
+			float x = x_axis.rel2val(t)
+			float y = curve.get(x)
+			complex zz = project2(complex(x, y))
+			pp.add(zz)
+		if fill_below
+			pp.add(complex(x + w, y + h))
+			pp.add(complex(x, y + h))
+			c.set_color(color(0.3, 0.3, 0.3, 1))
+			c.draw_polygon(pp)
+			pp.resize(pp.num - 2)
+		c.set_line_width(2)
+		c.set_color(col_line)
+		c.draw_lines(pp)
+	
 	void draw_curve_b(Painter *c, complex[] _p, bool fill_below, color col)
 		complex[] pp
 		for p in _p
@@ -283,6 +311,20 @@ class GridData
 		c.set_line_width(0.9)
 		c.set_color(col)
 		c.draw_lines(pp)
+	
+	
+	color point_color(bool selected, bool hover)
+		if hover
+			return Red
+		if selected
+			return color(1, 0.7, 0, 0)
+		return col_text
+	
+	void draw_point_xy(Painter *c, float x, float y, bool selected, bool hover)
+		complex z
+		z.x = x
+		z.y = y
+		draw_point2(c, z, selected, hover)
 	
 	void draw_point2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)

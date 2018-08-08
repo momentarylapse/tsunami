@@ -551,3 +551,5 @@ extern BeatMidifier* CreateBeatMidifier(Session* session)
 extern BeatSource* CreateBeatSource(Session* session, string name)
 extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
 //extern void SetTempBackupFilename(string filename)
+
+extern void draw_boxed_str(Painter *c, float x, float y, string str, color col_text, color col_bg)

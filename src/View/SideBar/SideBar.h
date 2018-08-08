@@ -47,7 +47,7 @@ public:
 	{
 		SONG_CONSOLE,
 		SAMPLE_CONSOLE,
-		GLOBAL_FX_CONSOLE,
+	//	GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
 		FX_CONSOLE,
@@ -67,7 +67,7 @@ public:
 	bool visible;
 
 	SongConsole *song_console;
-	FxConsole *global_fx_console;
+	//FxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditorConsole *midi_editor_console;
 	FxConsole *fx_console;
@@ -96,6 +96,7 @@ public:
 
 	virtual void on_enter(){}
 	virtual void on_leave(){}
+	virtual void on_set_large(bool large){}
 };
 
 #endif /* BOTTOMBAR_H_ */

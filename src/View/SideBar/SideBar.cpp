@@ -38,15 +38,16 @@ SideBar::SideBar(Session *session)
 	setTarget("button_grid");
 	addButton("!noexpandx,flat", 0, 0, "close");
 	setImage("close", "hui:close");
-	//addButton("!noexpandx,flat", 1, 0, "large");
-	//setImage("large", "hui:up");
+	addButton("!noexpandx,flat", 1, 0, "large");
+	setImage("large", "hui:up");
 	addLabel("!big,bold,expandx,center\\...", 2, 0, "title");
 
 	is_large = false;
+	hideControl("large", true);
 
 	song_console = new SongConsole(session);
 	sample_manager = new SampleManagerConsole(session);
-	global_fx_console = new FxConsole(session);
+	//global_fx_console = new FxConsole(session);
 	track_console = new TrackConsole(session);
 	midi_editor_console = new MidiEditorConsole(session);
 	fx_console = new FxConsole(session);
@@ -59,7 +60,7 @@ SideBar::SideBar(Session *session)
 
 	add_console(song_console);
 	add_console(sample_manager);
-	add_console(global_fx_console);
+	//add_console(global_fx_console);
 	add_console(track_console);
 	add_console(midi_editor_console);
 	add_console(fx_console);
@@ -103,6 +104,8 @@ void SideBar::on_large()
 
 void SideBar::set_large(bool large)
 {
+	if (large == is_large)
+		return;
 	is_large = large;
 	if (is_large){
 		setOptions("root_grid0", format("width=%d", WIDTH_LARGE));
@@ -111,6 +114,9 @@ void SideBar::set_large(bool large)
 		setOptions("root_grid0", format("width=%d", WIDTH_DEFAULT));
 		setImage("large", "hui:up");
 	}
+	hideControl("large", !is_large);
+	if (active_console >= 0)
+		consoles[active_console]->on_set_large(is_large);
 
 }
 

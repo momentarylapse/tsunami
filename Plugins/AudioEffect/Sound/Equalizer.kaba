@@ -3,6 +3,7 @@
 
 use "../../api.kaba"
 use "../../grid.kaba"
+use "../../tone.kaba"
 
 
 
@@ -15,45 +16,46 @@ enum
 	POINT_PEAK
 	POINT_LOW_PASS
 	POINT_HIGH_PASS
-	//POINT_SHELF
+	POINT_LOW_SHELF
+	POINT_HIGH_SHELF
 
 class Peak
 	bool enabled
 	int mode
-	float freq
+	float pitch
 	float gain
-	float q
+	float width
 	complex z(float g0)
 		complex r
-		r.x = freq
+		r.x = pitch_to_freq(pitch)
 		r.y = gain + g0
 		return r
-	vector v(float g0)
-		return vector(freq, gain + g0, q)
+	float q()
+		// ~ (f1 - f0) / f0 = f1/f0 - 1
+		return pow(2, width/12) - 1
 	float dgain(float _pitch)
 		if !enabled
 			return 0
-		float pitch = log(freq)
-		float d = (_pitch-pitch) / (pitch * q)
-		//float df = p.freq * p.q
+		float dpitch = _pitch-pitch
+		float d = dpitch / width
 		if mode == POINT_PEAK
-			//float d = (p.freq - f) / df
-			return gain * exp( - d*d)
+			return gain * exp(-d*d)
 		if mode == POINT_LOW_PASS
-			if d < 0
-				return 0
-			return gain * d
+			return - log(1 + exp( abs(gain)/12 * d))*width
 		if mode == POINT_HIGH_PASS
-			if d > 0
-				return 0
-			return - gain * d //- exp(min(-d, 5))
-Peak _Peak(int mode, float f, float gain)
+			return - log(1 + exp(-abs(gain)/12 * d))*width
+		if mode == POINT_LOW_SHELF
+			return gain / (1+ exp(d))
+		if mode == POINT_HIGH_SHELF
+			return gain / (1+ exp(-d))
+		return 0
+Peak _Peak(int mode, float pitch, float gain, float width)
 	Peak p
 	p.enabled = true
 	p.mode = mode
-	p.freq = f
+	p.pitch = pitch
 	p.gain = gain
-	p.q = 0.1
+	p.width = width
 	return p
 				
 
@@ -64,7 +66,7 @@ class EqCurve extends Curve
 		gain = c.gain
 		peaks = c.peaks
 	override float get(float f)
-		float pitch = log(f)
+		float pitch = freq_to_pitch(f)
 		float r = gain
 		for p in peaks
 			r += p.dgain(pitch)
@@ -77,8 +79,8 @@ class Config extends PluginData
 	override void reset()
 		gain = 0
 		peaks.clear()
-		peaks.add(_Peak(POINT_HIGH_PASS, 100, -10))
-		peaks.add(_Peak(POINT_LOW_PASS, 10000, -10))
+	//	peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 10))
+	//	peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
 		//for p in peaks
 		//	p.enabled = false
 
@@ -124,6 +126,9 @@ class EqualizerGrid extends Grid
 	Config *c
 	EqualizerPanel *cp
 	int hover, selected
+	override void __init__()
+		hover = -1
+		selected = -1
 	override void on_draw(Painter *p)
 		// curve + area below
 		EqCurve curve
@@ -136,16 +141,21 @@ class EqualizerGrid extends Grid
 			
 			p.set_line_width(2)
 			color col = point_color(i == selected, i == hover)
-			col.a = 0.6
-			p.set_color(col)
+			color col2 = col
+			col2.a = 0.6
+			p.set_color(col2)
 			p.draw_line(pp.x, 0, pp.x, p.height)
+			
+			p.set_font_size(12)
+			draw_boxed_str(p, pp.x-5, 10, (i+1), col, colors.text_soft3)
 			
 			draw_point2(p, pk.z(c.gain), i == selected, i == hover)
 			if i == hover
+				p.set_font_size(8)
 				p.set_color(Red)
-				p.draw_str(pp.x - 20, pp.y - 50, pk.freq.str2(1) + " Hz")
+				p.draw_str(pp.x - 20, pp.y - 50, pitch_to_freq(pk.pitch).str2(1) + " Hz")
 				p.draw_str(pp.x - 20, pp.y - 35, pk.gain.str2(1) + " dB")
-				p.draw_str(pp.x - 20, pp.y - 20, "q " + pk.q.str2(3))
+				p.draw_str(pp.x - 20, pp.y - 20, "q " + pk.q().str2(3))
 			
 
 	// left button down -> select
@@ -156,16 +166,16 @@ class EqualizerGrid extends Grid
 	override void on_mouse_wheel()
 		if hover >= 0
 			if HuiGetEvent().scroll_y > 0
-				c.peaks[hover].q *= 1.04
+				c.peaks[hover].width *= 1.04
 			else
-				c.peaks[hover].q /= 1.04
+				c.peaks[hover].width /= 1.04
 			cp.changed()
 			redraw()
 
 	// right button down -> new point
 	override void on_right_button_down()
 		vector m = get_mouse3(0)
-		c.peaks.add(_Peak(POINT_PEAK, m.x, m.y - c.gain))
+		c.peaks.add(_Peak(POINT_PEAK, freq_to_pitch(m.x), m.y - c.gain, 10))
 		selected = c.peaks.num - 1
 		hover = selected
 		cp.changed()
@@ -174,7 +184,7 @@ class EqualizerGrid extends Grid
 	override void on_mouse_move()
 		// move
 		if HuiGetEvent().button_l and (selected >= 0)
-			c.peaks[selected].freq = get_mouse2().x
+			c.peaks[selected].pitch = freq_to_pitch(get_mouse2().x)
 			c.peaks[selected].gain = get_mouse2().y - c.gain
 			/*float xmin = MIN_FREQ
 			float xmax = MAX_FREQ
@@ -221,6 +231,7 @@ class EqualizerPanel extends ConfigPanel
 		add_label("!width=80\\Gain", 0, 0, "")
 		add_spin_button("!range=-40:40:0.1,expandx", 1, 0, "gain")
 		add_label("dB", 2, 0, "")
+		hide_control("peaks", true)
 	
 		grid.init(self, "drawing")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
@@ -230,12 +241,14 @@ class EqualizerPanel extends ConfigPanel
 		grid.c = &e.config
 		num_peaks = 0
 		
-		event("gain", &on_gain)
+		event("*", &on_ui_change)
 	
 		grid.redraw()
 		
-	void on_gain()
-		grid.c.gain = get_float("")
+	void on_ui_change()
+		grid.c.gain = get_float("gain")
+		for pk,i in grid.c.peaks
+			pk.mode = get_int("mode-" + i)
 		grid.redraw()
 		changed()
 		
@@ -248,7 +261,7 @@ class EqualizerPanel extends ConfigPanel
 			add_grid("", i, 0, "peak-" + i)
 			set_target("peak-" + i)
 			add_check_box("" + (i+1), 0, 0, "enabled-" + i)
-			add_combo_box("Peak\\Low pass\\High pass\\Shelf...", 0, 1, "mode-" + i)
+			add_combo_box("Peak\\Low pass\\High pass\\Low shelf\\High shelf", 0, 1, "mode-" + i)
 			/*add_spin_button("!range=::0.1", 0, 2, "freq-" + i)
 			add_spin_button("!range=::0.1", 0, 2, "gain-" + i)
 			add_spin_button("!range=::0.001", 0, 2, "q-" + i)*/
@@ -256,7 +269,7 @@ class EqualizerPanel extends ConfigPanel
 			add_label("", 0, 3, "gain-" + i)
 			add_label("", 0, 4, "q-" + i)*/
 		for i in grid.c.peaks.num:num_peaks
-			delete_control("peaks-" + i)
+			delete_control("peak-" + i)
 		num_peaks = grid.c.peaks.num
 		
 		for pk,i in grid.c.peaks
@@ -274,4 +287,5 @@ class EqualizerPanel extends ConfigPanel
 			set_options("drawing", "height=380")
 		else
 			set_options("drawing", "height=250")
+		hide_control("peaks", !large)
 

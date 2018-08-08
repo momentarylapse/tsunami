@@ -22,17 +22,21 @@ public:
 	FxConsole(Session *session);
 	virtual ~FxConsole();
 
+	void on_enter() override;
+	void on_leave() override;
+	void on_set_large(bool large) override;
+
 	void clear();
-	void setTrack(Track *t);
+	void set_track(Track *t);
 
-	void onAdd();
+	void on_add();
 
-	void onEditSong();
-	void onEditTrack();
+	void on_edit_song();
+	void on_edit_track();
 
-	void onTrackDelete();
-	void onViewCurTrackChange();
-	void onUpdate();
+	void on_track_delete();
+	void on_view_cur_track_change();
+	void on_update();
 
 	void set_exclusive(AudioEffect *fx);
 	AudioEffect *exclusive;

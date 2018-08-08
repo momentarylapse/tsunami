@@ -100,6 +100,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
+	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
 
 	Kaba::DeclareClassSize("Range", sizeof(Range));
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));

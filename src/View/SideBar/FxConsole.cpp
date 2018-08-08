@@ -138,16 +138,16 @@ FxConsole::FxConsole(Session *session) :
 	if (!view)
 		hideControl("edit_track", true);
 
-	event("add", std::bind(&FxConsole::onAdd, this));
+	event("add", std::bind(&FxConsole::on_add, this));
 
-	event("edit_song", std::bind(&FxConsole::onEditSong, this));
-	event("edit_track", std::bind(&FxConsole::onEditTrack, this));
+	event("edit_song", std::bind(&FxConsole::on_edit_song, this));
+	event("edit_track", std::bind(&FxConsole::on_edit_track, this));
 
 	if (view)
-		view->subscribe(this, std::bind(&FxConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
-	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_NEW);
-	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_ADD_EFFECT);
-	song->subscribe(this, std::bind(&FxConsole::onUpdate, this), song->MESSAGE_DELETE_EFFECT);
+		view->subscribe(this, std::bind(&FxConsole::on_view_cur_track_change, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
@@ -158,7 +158,24 @@ FxConsole::~FxConsole()
 	song->unsubscribe(this);
 }
 
-void FxConsole::onAdd()
+void FxConsole::on_enter()
+{
+	set_exclusive(nullptr);
+}
+
+void FxConsole::on_leave()
+{
+	set_exclusive(nullptr);
+}
+
+void FxConsole::on_set_large(bool large)
+{
+	if (!large){
+		set_exclusive(nullptr);
+	}
+}
+
+void FxConsole::on_add()
 {
 	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
 	if (name == "")
@@ -170,12 +187,12 @@ void FxConsole::onAdd()
 		song->addEffect(effect);
 }
 
-void FxConsole::onEditSong()
+void FxConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void FxConsole::onEditTrack()
+void FxConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
@@ -193,15 +210,15 @@ void FxConsole::clear()
 	//Enable("add", false);
 }
 
-void FxConsole::setTrack(Track *t)
+void FxConsole::set_track(Track *t)
 {
 	clear();
 	set_exclusive(nullptr);
 	track = t;
 	if (track){
-		track->subscribe(this, std::bind(&FxConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-		track->subscribe(this, std::bind(&FxConsole::onUpdate, this), track->MESSAGE_ADD_EFFECT);
-		track->subscribe(this, std::bind(&FxConsole::onUpdate, this), track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, std::bind(&FxConsole::on_track_delete, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_DELETE_EFFECT);
 	}
 
 
@@ -239,17 +256,17 @@ bool FxConsole::allow_show(AudioEffect *fx)
 	return true;
 }
 
-void FxConsole::onTrackDelete()
+void FxConsole::on_track_delete()
 {
-	setTrack(nullptr);
+	set_track(nullptr);
 }
-void FxConsole::onViewCurTrackChange()
+void FxConsole::on_view_cur_track_change()
 {
-	setTrack(view->cur_track());
+	set_track(view->cur_track());
 }
 
-void FxConsole::onUpdate()
+void FxConsole::on_update()
 {
-	setTrack(track);
+	set_track(track);
 }
 

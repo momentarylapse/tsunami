@@ -113,7 +113,7 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 	}else{
 
 		// first (un-muted) layer
-		t->layers[i0]->readBuffers(buf, range_cur, false);
+		t->layers[i0]->read_buffers_fixed(buf, range_cur);
 		// TODO: allow_ref if no other layers + no fx
 		add_samples(t->layers[i0], range_cur, buf);
 
@@ -242,13 +242,12 @@ int SongRenderer::read(AudioBuffer &buf)
 	if (size <= 0)
 		return AudioPort::END_OF_STREAM;
 
-	if (song->curves.num >= 0){
-		int chunk = 128;
+	if (song->curves.num > 0){
+		int chunk = 1024;
 		for (int d=0; d<size; d+=chunk){
 			AudioBuffer tbuf;
 			tbuf.set_as_ref(buf, d, min(size - d, chunk));
 			read_basic(tbuf, pos + d);
-			buf.set(tbuf, d, 1.0f);
 		}
 	}else
 		read_basic(buf, pos);

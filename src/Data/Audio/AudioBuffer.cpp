@@ -322,14 +322,14 @@ void AudioBuffer::set(const AudioBuffer &source, int _offset, float volume)
 	set_x(source, _offset, source.length, volume);
 }
 
-void AudioBuffer::set_as_ref(const AudioBuffer &target, int _offset, int _length)
+void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length)
 {
 	clear();
 	length = _length;
-	offset = _offset + target.offset;
-	channels = target.channels;
+	offset = _offset + source.offset;
+	channels = source.channels;
 	for (int i=0; i<channels; i++)
-		c[i].set_ref(target.c[i].sub(_offset, _length));
+		c[i].set_ref(source.c[i].sub(_offset, _length));
 }
 
 #if 0

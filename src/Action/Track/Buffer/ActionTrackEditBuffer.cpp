@@ -28,10 +28,8 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 		return;
 
 	// save old data
-	AudioBuffer b;
-	layer->readBuffers(b, range, true);
-	box = AudioBuffer(b.length, l->channels);
-	box.set(b, 0, 1.0f);
+	box = AudioBuffer(range.length, l->channels);
+	layer->read_buffers_fixed(box, range);
 }
 
 

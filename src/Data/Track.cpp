@@ -185,18 +185,29 @@ void TrackLayer::readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 	buf.clear_x(channels);
 
 	// is <r> inside a buffer?
-	if (allow_ref)
-	for (AudioBuffer &b: buffers){
-		if (b.range().covers(r)){
-			int p0 = r.offset - b.offset;
-			// set as reference to subarrays
-			buf.set_as_ref(b, p0, r.length);
-			return;
+	if (allow_ref){
+		for (AudioBuffer &b: buffers){
+			if (b.range().covers(r)){
+				int p0 = r.offset - b.offset;
+				// set as reference to subarrays
+				buf.set_as_ref(b, p0, r.length);
+				return;
+			}
 		}
 	}
 
 	// create own...
 	buf.resize(r.length);
+
+	// fill with overlap
+	for (AudioBuffer &b: buffers)
+		buf.set(b, b.offset - r.offset, 1.0f);
+}
+
+void TrackLayer::read_buffers_fixed(AudioBuffer &buf, const Range &r)
+{
+	if (r.length != buf.length)
+		msg_error("TrackLayer.read_buffers_fixed: length mismatch");
 
 	// fill with overlap
 	for (AudioBuffer &b: buffers)

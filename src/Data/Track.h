@@ -35,6 +35,7 @@ public:
 	Range range(int keep_notes = 0) const;
 	AudioBuffer _cdecl _readBuffers(const Range &r, bool allow_ref);
 	void _cdecl readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref);
+	void _cdecl read_buffers_fixed(AudioBuffer &buf, const Range &r);
 
 	// actions
 	AudioBuffer _cdecl _getBuffers(const Range &r);

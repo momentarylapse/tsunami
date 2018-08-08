@@ -177,12 +177,16 @@ class GridData
 	color col_grid
 	color col_line
 	color col_text
+	color col_hover
+	color col_sel
 	
 	void data_init()
 		col_grid = colors.grid
 		col_text = colors.text
 		col_line = colors.text_soft1
 		col_bg = colors.background
+		col_hover = colors.hover
+		col_sel = colors.selection
 		allow_bg = true
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
@@ -315,10 +319,10 @@ class GridData
 	
 	color point_color(bool selected, bool hover)
 		if hover
-			return Red
+			return ColorInterpolate(col_hover, col_line, 0.0)
 		if selected
-			return color(1, 0.7, 0, 0)
-		return col_text
+			return ColorInterpolate(col_sel, col_line, 0.5)//color(1, 0.7, 0, 0)
+		return col_line
 	
 	void draw_point_xy(Painter *c, float x, float y, bool selected, bool hover)
 		complex z
@@ -328,25 +332,19 @@ class GridData
 	
 	void draw_point2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)
-		c.set_color(col_text)
+		c.set_color(point_color(selected, hover))
 		float radius = 3
 		if hover
-			c.set_color(Red)
 			radius = 4
-		else if selected
-			c.set_color(color(1, 0.7, 0, 0))
 		c.draw_circle(pp.x, pp.y, radius)
 	
 	void draw_point3(Painter *c, vector p, bool selected, bool hover)
 		vector pp = project3(p)
-		c.set_color(col_text)
+		c.set_color(point_color(selected, hover))
 		float radius = 3
 		if hover
-			c.set_color(Red)
 			c.draw_str(pp.x, pp.y - 20, pp.z.str2(1))
 			radius = 4
-		else if selected
-			c.set_color(color(1, 0.7, 0, 0))
 		c.draw_circle(pp.x, pp.y, radius)
 	
 	void draw_line2(Painter *c, complex p0, complex p1, bool selected, bool hover)

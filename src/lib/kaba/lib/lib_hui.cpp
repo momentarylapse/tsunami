@@ -43,6 +43,7 @@ namespace Kaba{
 
 extern Class *TypeIntList;
 extern Class *TypeIntPs;
+extern Class *TypeFloatList;
 extern Class *TypeComplexList;
 extern Class *TypeImage;
 Class *TypeHuiWindowP;
@@ -420,6 +421,8 @@ void SIAddPackageHui()
 			func_add_param("c",			TypeColor);
 		class_add_func_virtual("set_line_width",								TypeVoid,		mf(&hui::Painter::setLineWidth));
 			func_add_param("w",			TypeFloat32);
+		class_add_func_virtual("set_line_dash",								TypeVoid,		mf(&hui::Painter::setLineDash));
+			func_add_param("w",			TypeFloatList);
 		class_add_func_virtual("set_antialiasing",								TypeVoid,		mf(&hui::Painter::setAntialiasing));
 			func_add_param("enabled",			TypeBool);
 		class_add_func_virtual("set_font_size",								TypeVoid,		mf(&hui::Painter::setFontSize));

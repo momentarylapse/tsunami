@@ -4,6 +4,7 @@
 use "../../api.kaba"
 use "../../grid.kaba"
 use "../../tone.kaba"
+use "../../filter.kaba"
 
 
 
@@ -12,108 +13,9 @@ const float MAX_FREQ = 20000.0
 const int MIN_VOL = 0-55
 const int MAX_VOL = 35
 
-class Filter
-	float[3] a, b
-	float sample_rate
-	void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
-		// overlap
-		y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
-		y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
-		// main chunk
-		for i in 2:x.num
-			y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
-	void __init__()
-		a[0] = 0
-		a[1] = 0
-		a[2] = 0
-		b[0] = 1
-		b[1] = 0
-		b[2] = 0
-	void __assign__(Filter o)
-	float gain(float f)
-		complex z
-		z.x = cos(2*pi*f/sample_rate)
-		z.y = sin(2*pi*f/sample_rate)
-		complex H = complex(b[0], 0) + b[1]*z + b[2]*z*z
-		complex y = complex(1,0) + a[1]*z + a[2]*z*z
-		
-		float fac = H.abs() / y.abs()
-		return factor_to_db(fac)
-
-	void create_peak(float f_res, float Q, float g)
-		float c = 1 / tan(pi * f_res / sample_rate)
-		float B = 1 / Q
-		float a0 = c*c + B*c + 1
-		b[0] = (c*c + B*c*g + 1) / a0
-		a[1] = (2 - 2*c*c) / a0
-		b[1] = a[1]
-		a[2] = (c*c - B*c + 1) / a0
-		b[2] = (c*c - B*g*c + 1) / a0
-
-	void create_low_pass(float f_res)
-		b[0] = 1 / (1 + sample_rate/f_res/2/pi)
-		b[1] = 0
-		b[2] = 0
-		a[1] = b[0]-1
-		a[2] = 0
-
-	void create_high_pass(float f_res)
-		b[0] = 1 / (1 + f_res*2*pi / sample_rate)
-		b[1] = -b[0]
-		b[2] = 0
-		a[1] = -b[0]
-		a[2] = 0
-
-	void create_low_shelf(float f_res, float q, float gain)
-		float V = db_to_factor(abs(gain))
-		float c = tan(pi * f_res / sample_rate)
-		
-		if gain > 0
-			float a0 = 1 + sqrt(2)*c + c*c
-			b[0] = (1 + sqrt(2*V)*c + V*c*c) / a0
-			b[1] = 2*(V*c*c - 1) / a0
-			b[2] = (1-sqrt(2*V)*c + V*c*c) / a0
-			a[1] = 2*(c*c - 1) / a0
-			a[2] = (1-sqrt(2)*c + c*c) / a0
-		else
-			float a0 = 1 + sqrt(2*V)*c + V*c*c
-			b[0] = (1 + sqrt(2)*c + c*c) / a0
-			b[1] = 2*(c*c - 1) / a0
-			b[2] = (1 - sqrt(2)*c + c*c) / a0
-			a[1] = 2*(V*c*c - 1) / a0
-			a[2] = (1 - sqrt(2*V)*c + V*c*c) / a0
-		
-		/*float c = 2 * sample_rate//1 / tan(pi * f_res / sample_rate)
-		float w = 2*pi*f_res
-		float ww = w * (B+1)
-		float a0 = w+ww
-		b[0] = (c+ww) / a0
-		b[1] = (ww-c) / a0
-		b[2] = 0
-		a[1] = (w-c) / a0
-		a[2] = 0*/
-
-	void create_high_shelf(float f_res, float q, float gain)
-		float V = db_to_factor(abs(gain))
-		float c = tan(pi * f_res / sample_rate)
-		
-		if gain > 0
-			float a0 = 1 + sqrt(2)*c + c*c
-			b[0] = (V + sqrt(2*V)*c + c*c) / a0
-			b[1] = 2*(c*c - V) / a0
-			b[2] = (V - sqrt(2*V)*c + c*c) / a0
-			a[1] = 2*(c*c - 1) / a0
-			a[2] = (1 - sqrt(2)*c + c*c) / a0
-		else
-			float a0 = V + sqrt(2*V)*c + c*c
-			b[0] = (1 + sqrt(2)*c + c*c) / a0
-			b[1] = 2*(c*c - 1) / a0
-			b[2] = (1 - sqrt(2)*c + c*c) / a0
-			a[1] = 2*(c*c - V) / a0
-			a[2] = (V - sqrt(2*V)*c + c*c) / a0
-
 enum
 	POINT_PEAK
+	//POINT_NOTCH
 	POINT_LOW_PASS
 	POINT_HIGH_PASS
 	POINT_LOW_SHELF
@@ -136,18 +38,21 @@ class Peak
 	
 	void create_filter(Filter f, float sample_rate)
 		f.sample_rate = sample_rate
+		float freq = pitch_to_freq(pitch)
 		if mode == POINT_LOW_PASS
-			f.create_low_pass(pitch_to_freq(pitch))
+			f.create_low_pass(freq, q)
 		else if mode == POINT_HIGH_PASS
-			f.create_high_pass(pitch_to_freq(pitch))
+			f.create_high_pass(freq, q)
 		else if mode == POINT_PEAK
-			f.create_peak(pitch_to_freq(pitch), q, db_to_factor(gain))
+			f.create_peak(freq, q, gain)
+		/*else if mode == POINT_NOTCH
+			f.create_notch(freq, q, gain)*/
 		else if mode == POINT_LOW_SHELF
-			f.create_low_shelf(pitch_to_freq(pitch), q, gain)
+			f.create_low_shelf(freq, q, gain)
 		else if mode == POINT_HIGH_SHELF
-			f.create_high_shelf(pitch_to_freq(pitch), q, gain)
+			f.create_high_shelf(freq, q, gain)
 				
-	float dgain(float _pitch)
+	/*float dgain(float _pitch)
 		if !enabled
 			return 0
 		float dpitch = _pitch-pitch
@@ -163,7 +68,8 @@ class Peak
 			return gain / (1+ exp(d))
 		if mode == POINT_HIGH_SHELF
 			return gain / (1+ exp(-d))
-		return 0
+		return 0*/
+
 Peak _Peak(int mode, float pitch, float gain, float q)
 	Peak p
 	p.enabled = true
@@ -199,8 +105,8 @@ class Config extends PluginData
 	override void reset()
 		gain = 0
 		peaks.clear()
-		peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 10))
-		peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
+		peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 2))
+		peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 2))
 		//for p in peaks
 		//	p.enabled = false
 
@@ -218,6 +124,11 @@ class Equalizer extends AudioEffect
 					overlap[c][p][i] = 0
 
 	void equalize(float[] buf, int channel)
+	
+		// base gain
+		buf *= db_to_factor(config.gain)
+		
+		// filters
 		int num_stages = config.peaks.num
 		for p,stage in config.peaks
 			Filter f
@@ -236,8 +147,8 @@ class Equalizer extends AudioEffect
 
 	override void process(AudioBuffer buf)
 		equalize(buf.r, 0)
-	//	if buf.channels > 1
-	//		equalize(buf.l, 1)
+		if buf.channels > 1
+			equalize(buf.l, 1)
 
 	override ConfigPanel *create_panel()
 		return new EqualizerPanel(self)
@@ -305,7 +216,7 @@ class EqualizerGrid extends Grid
 	// right button down -> new point
 	override void on_right_button_down()
 		vector m = get_mouse3(0)
-		c.peaks.add(_Peak(POINT_PEAK, freq_to_pitch(m.x), m.y - c.gain, 10))
+		c.peaks.add(_Peak(POINT_PEAK, freq_to_pitch(m.x), m.y - c.gain, 2))
 		selected = c.peaks.num - 1
 		hover = selected
 		cp.changed()

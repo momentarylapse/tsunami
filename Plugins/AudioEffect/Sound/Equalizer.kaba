@@ -64,6 +64,54 @@ class Filter
 		a[1] = -b[0]
 		a[2] = 0
 
+	void create_low_shelf(float f_res, float q, float gain)
+		float V = db_to_factor(abs(gain))
+		float c = tan(pi * f_res / sample_rate)
+		
+		if gain > 0
+			float a0 = 1 + sqrt(2)*c + c*c
+			b[0] = (1 + sqrt(2*V)*c + V*c*c) / a0
+			b[1] = 2*(V*c*c - 1) / a0
+			b[2] = (1-sqrt(2*V)*c + V*c*c) / a0
+			a[1] = 2*(c*c - 1) / a0
+			a[2] = (1-sqrt(2)*c + c*c) / a0
+		else
+			float a0 = 1 + sqrt(2*V)*c + V*c*c
+			b[0] = (1 + sqrt(2)*c + c*c) / a0
+			b[1] = 2*(c*c - 1) / a0
+			b[2] = (1 - sqrt(2)*c + c*c) / a0
+			a[1] = 2*(V*c*c - 1) / a0
+			a[2] = (1 - sqrt(2*V)*c + V*c*c) / a0
+		
+		/*float c = 2 * sample_rate//1 / tan(pi * f_res / sample_rate)
+		float w = 2*pi*f_res
+		float ww = w * (B+1)
+		float a0 = w+ww
+		b[0] = (c+ww) / a0
+		b[1] = (ww-c) / a0
+		b[2] = 0
+		a[1] = (w-c) / a0
+		a[2] = 0*/
+
+	void create_high_shelf(float f_res, float q, float gain)
+		float V = db_to_factor(abs(gain))
+		float c = tan(pi * f_res / sample_rate)
+		
+		if gain > 0
+			float a0 = 1 + sqrt(2)*c + c*c
+			b[0] = (V + sqrt(2*V)*c + c*c) / a0
+			b[1] = 2*(c*c - V) / a0
+			b[2] = (V - sqrt(2*V)*c + c*c) / a0
+			a[1] = 2*(c*c - 1) / a0
+			a[2] = (1 - sqrt(2)*c + c*c) / a0
+		else
+			float a0 = V + sqrt(2*V)*c + c*c
+			b[0] = (1 + sqrt(2)*c + c*c) / a0
+			b[1] = 2*(c*c - 1) / a0
+			b[2] = (1 - sqrt(2)*c + c*c) / a0
+			a[1] = 2*(c*c - V) / a0
+			a[2] = (V - sqrt(2*V)*c + c*c) / a0
+
 enum
 	POINT_PEAK
 	POINT_LOW_PASS
@@ -94,6 +142,10 @@ class Peak
 			f.create_high_pass(pitch_to_freq(pitch))
 		else if mode == POINT_PEAK
 			f.create_peak(pitch_to_freq(pitch), q, db_to_factor(gain))
+		else if mode == POINT_LOW_SHELF
+			f.create_low_shelf(pitch_to_freq(pitch), q, gain)
+		else if mode == POINT_HIGH_SHELF
+			f.create_high_shelf(pitch_to_freq(pitch), q, gain)
 				
 	float dgain(float _pitch)
 		if !enabled
@@ -169,15 +221,9 @@ class Equalizer extends AudioEffect
 		int num_stages = config.peaks.num
 		for p,stage in config.peaks
 			Filter f
-			f.sample_rate = session.sample_rate()
 			float[] input = buf
 			
-			if p.mode == POINT_LOW_PASS
-				f.create_low_pass(pitch_to_freq(p.pitch))
-			else if p.mode == POINT_HIGH_PASS
-				f.create_high_pass(pitch_to_freq(p.pitch))
-			else if p.mode == POINT_PEAK
-				f.create_peak(pitch_to_freq(p.pitch), 0.2, 1 + db_to_factor(p.gain))
+			p.create_filter(f, session.sample_rate())
 			if p.enabled
 				f.apply(input, buf, overlap[channel][stage], overlap[channel][stage+1])
 			

@@ -312,9 +312,12 @@ public:
 		event("preview", std::bind(&ConfigurationDialog::onPreview, this));
 		event("cancel", std::bind(&ConfigurationDialog::onClose, this));
 		event("hui:close", std::bind(&ConfigurationDialog::onClose, this));
+
+		config->subscribe(this, std::bind(&ConfigurationDialog::onConfigChange, this), config->MESSAGE_CHANGE);
 	}
 	~ConfigurationDialog()
 	{
+		config->unsubscribe(this);
 	}
 	void onOk()
 	{
@@ -343,6 +346,11 @@ public:
 		if (name.num == 0)
 			return;
 		config->session->plugin_manager->SaveFavorite(config, name);
+	}
+
+	void onConfigChange()
+	{
+		panel->update();
 	}
 
 	void previewStart()
@@ -408,6 +416,7 @@ bool Module::configure(hui::Window *win)
 	if (!panel)
 		return true;
 	panel->set_large(true);
+	panel->update();
 	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel, win);
 	dlg->run();
 	bool ok = dlg->ok;

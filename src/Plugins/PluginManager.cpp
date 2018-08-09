@@ -111,6 +111,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Session", "id", _offsetof(Session, id));
 	Kaba::DeclareClassOffset("Session", "storage", _offsetof(Session, storage));
 	Kaba::DeclareClassOffset("Session", "win", _offsetof(Session, _kaba_win));
+	Kaba::DeclareClassOffset("Session", "view", _offsetof(Session, view));
 	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
 	Kaba::DeclareClassOffset("Session", "song_renderer", _offsetof(Session, song_renderer));
 	Kaba::DeclareClassOffset("Session", "output_stream", _offsetof(Session, output_stream));

@@ -1,0 +1,46 @@
+use "../api.kaba"
+
+const int CHUNK_SIZE = 1024
+const int NUM_CHUNKS = 4
+
+class Test extends TsunamiPlugin
+	override void on_start()
+		AudioBuffer buf
+		buf.resize(CHUNK_SIZE * NUM_CHUNKS)
+		float omega = 0.13
+		for i in 0:buf.length
+			buf.r[i] = sin(omega * i)
+		
+		for j in 0:NUM_CHUNKS
+			print("-----")
+			complex[] c
+			float[] b, b2
+			for i in 0:CHUNK_SIZE
+				b.add(buf.r[i + j*CHUNK_SIZE])
+			fft_r2c(b, c)
+			for i in 20:25
+				c[i].x = 0
+				c[i].y = 0
+			for z in c
+				print(z.abs())
+			b2.resize(CHUNK_SIZE)
+			fft_c2r_inv(c, b2)
+			b2 /= CHUNK_SIZE
+			for i in 0:CHUNK_SIZE
+				buf.l[i + j*CHUNK_SIZE] = b2[i]
+		
+		float dmax = 0
+		float step_max = 0
+		for i in 1:buf.length
+			dmax = max(dmax, abs(buf.l[i] - buf.r[i]))
+			step_max = max(step_max, abs(buf.l[i] - buf.l[i-1]))
+			if step_max > 0.2
+				print("AAAAARGH!!!!!!")
+				print(i)
+				break
+		print("________")
+		print(dmax)
+		print(step_max)
+		print(buf.l.max())
+		
+		stop()

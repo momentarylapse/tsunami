@@ -242,7 +242,7 @@ int SongRenderer::read(AudioBuffer &buf)
 	if (size <= 0)
 		return AudioPort::END_OF_STREAM;
 
-	if (song->curves.num > 0){
+	if (song->curves.num >= 0){
 		int chunk = 1024;
 		for (int d=0; d<size; d+=chunk){
 			AudioBuffer tbuf;

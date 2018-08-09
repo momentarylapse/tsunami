@@ -12,6 +12,34 @@ const float MAX_FREQ = 20000.0
 const int MIN_VOL = 0-55
 const int MAX_VOL = 35
 
+class Filter
+	float[3] a, b
+	float sample_rate
+	void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
+		// overlap
+		y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
+		y[1] = b[0] * x[1] + b[1] * x[0]      + b[2] * prev_x[1] - a[1] * y[0]      - a[2] * prev_y[1]
+		// main chunk
+		for i in 2:x.num
+			y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
+
+	void create_peak(float f_res, float Q, float g)
+		float c = 1 / tan(pi * f_res / sample_rate)
+		float B = 1 / Q
+		float a0 = c*c + B*c + 1
+		b[0] = (c*c + B*c*g + 1) / a0
+		a[1] = (2 - 2*c*c) / a0
+		b[1] = a[1]
+		a[2] = (c*c - B*c + 1) / a0
+		b[2] = (c*c - B*g*c + 1) / a0
+
+	void create_low_pass(float f_res)
+		b[0] = 1 / (1 + sample_rate/f_res/2/pi)
+		b[1] = 0
+		b[2] = 0
+		a[1] = b[0]-1
+		a[2] = 0
+
 enum
 	POINT_PEAK
 	POINT_LOW_PASS
@@ -79,43 +107,50 @@ class Config extends PluginData
 	override void reset()
 		gain = 0
 		peaks.clear()
+		peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
+		peaks.add(_Peak(POINT_PEAK, 40, -30, 10))
 	//	peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 10))
 	//	peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
 		//for p in peaks
 		//	p.enabled = false
 
+const int MAX_PEAKS = 32
+
 class Equalizer extends AudioEffect
 
 	Config config
+	float[2][MAX_PEAKS+1][2] overlap
+	
+	override void reset_state()
+		for c in 0:2
+			for p in 0:MAX_PEAKS+1
+				for i in 0:2
+					overlap[c][p][i] = 0
 
-	void equalize(float[] b)
-		float sample_rate = session.sample_rate()
-		complex[] f
-	
-	
-		// transform
-		int len2 = b.num / 2 + 1
-		f.resize(len2)
-		fft_r2c(b, f)
-	
-		EqCurve curve
-		curve.set(config)
-	
-		// equalize
-		f *= (1.0 / b.num)
-		float w = i2f(b.num) / sample_rate
-		for i in 1:f.num
-			float freq = i2f(i) / w
-			float db = curve.get(freq)
-			f[i] = f[i] * pow(10, db / 20)
-		
-		// transform back
-		fft_c2r_inv(f, b)
+	void equalize(float[] buf, int channel)
+		int num_stages = config.peaks.num
+		for p,stage in config.peaks
+			Filter f
+			f.sample_rate = session.sample_rate()
+			float[] input = buf
+			
+			if p.mode == POINT_LOW_PASS
+				f.create_low_pass(pitch_to_freq(p.pitch))
+			else if p.mode == POINT_PEAK
+				f.create_peak(pitch_to_freq(p.pitch), 0.2, 0.02)
+			f.apply(input, buf, overlap[channel][stage], overlap[channel][stage+1])
+			
+			// save input overlap
+			for i in 0:2
+				overlap[channel][stage][i] = input[buf.num - 2 + i]
+		// save output overlap
+		for i in 0:2
+			overlap[channel][num_stages][i] = buf[buf.num - 2 + i]
 
 	override void process(AudioBuffer buf)
-		equalize(buf.r)
-		if buf.channels > 1
-			equalize(buf.l)
+		equalize(buf.r, 0)
+	//	if buf.channels > 1
+	//		equalize(buf.l, 1)
 
 	override ConfigPanel *create_panel()
 		return new EqualizerPanel(self)
@@ -249,15 +284,17 @@ class EqualizerPanel extends ConfigPanel
 		num_peaks = 0
 		
 		event("*", &on_ui_change)
-	
-		grid.redraw()
 		
 	void on_ui_change()
+		string id = HuiGetEvent().id
+		if id != "gain" and id.head(5) != "mode-" and id.head(8) != "enabled-"
+			return
+			
 		grid.c.gain = get_float("gain")
 		for pk,i in grid.c.peaks
 			pk.mode = get_int("mode-" + i)
 			pk.enabled = is_checked("enabled-" + i)
-		grid.redraw()
+		//grid.redraw()
 		changed()
 		
 	override void update()

@@ -16,6 +16,7 @@
 #include "common.h"
 #include "exception.h"
 #include "../../config.h"
+#include "../../math/complex.h"
 
 
 
@@ -1169,6 +1170,11 @@ void op_float64_mul(Value &r, Value &a, Value &b)
 void op_float64_div(Value &r, Value &a, Value &b)
 {	r.as_float64() = a.as_float64() / b.as_float64();	}
 
+void op_complex_mul(Value &r, Value &a, Value &b)
+{	r.as_complex() = a.as_complex() * b.as_complex(); }
+void op_complex_div(Value &r, Value &a, Value &b)
+{	r.as_complex() = a.as_complex() / b.as_complex(); }
+
 void SIAddOperators()
 {
 	// same order as in .h file...
@@ -1281,10 +1287,10 @@ void SIAddOperators()
 //	add_operator(OPERATOR_ASSIGN,		TypeVoid,		TypeComplex,	TypeComplex, INLINE_COMPLEX_ASSIGN);
 	add_operator(OPERATOR_ADD,			TypeComplex,	TypeComplex,	TypeComplex, INLINE_COMPLEX_ADD);
 	add_operator(OPERATOR_SUBTRACT,		TypeComplex,	TypeComplex,	TypeComplex, INLINE_COMPLEX_SUBTRACT);
-	add_operator(OPERATOR_MULTIPLY,		TypeComplex,	TypeComplex,	TypeComplex, INLINE_COMPLEX_MULTIPLY);
+	add_operator(OPERATOR_MULTIPLY,		TypeComplex,	TypeComplex,	TypeComplex, INLINE_COMPLEX_MULTIPLY, (void*)op_complex_mul);
 	add_operator(OPERATOR_MULTIPLY,		TypeComplex,	TypeFloat32,		TypeComplex, INLINE_COMPLEX_MULTIPLY_FC);
 	add_operator(OPERATOR_MULTIPLY,		TypeComplex,	TypeComplex,	TypeFloat32, INLINE_COMPLEX_MULTIPLY_CF);
-	add_operator(OPERATOR_DIVIDE,		TypeComplex,	TypeComplex,	TypeComplex, INLINE_COMPLEX_DIVIDE);
+	add_operator(OPERATOR_DIVIDE,		TypeComplex,	TypeComplex,	TypeComplex, -1/*INLINE_COMPLEX_DIVIDE*/, (void*)op_complex_div);
 	add_operator(OPERATOR_ADDS,			TypeVoid,		TypeComplex,	TypeComplex, INLINE_COMPLEX_ADD_ASSIGN);
 	add_operator(OPERATOR_SUBTRACTS,		TypeVoid,		TypeComplex,	TypeComplex, INLINE_COMPLEX_SUBTARCT_ASSIGN);
 	add_operator(OPERATOR_MULTIPLYS,		TypeVoid,		TypeComplex,	TypeComplex, INLINE_COMPLEX_MULTIPLY_ASSIGN);

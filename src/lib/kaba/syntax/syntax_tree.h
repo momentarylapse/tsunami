@@ -5,6 +5,9 @@
 #include "class.h"
 #include "lexical.h"
 
+
+class complex;
+
 namespace Asm{
 	struct MetaInfo;
 };
@@ -40,6 +43,7 @@ struct Value
 	int64& as_int64() const;
 	float& as_float() const;
 	double& as_float64() const;
+	complex& as_complex() const;
 	string& as_string() const;
 	DynamicArray& as_array() const;
 

@@ -22,6 +22,23 @@ class Filter
 		// main chunk
 		for i in 2:x.num
 			y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
+	void __init__()
+		a[0] = 0
+		a[1] = 0
+		a[2] = 0
+		b[0] = 1
+		b[1] = 0
+		b[2] = 0
+	void __assign__(Filter o)
+	float gain(float f)
+		complex z
+		z.x = cos(2*pi*f/sample_rate)
+		z.y = sin(2*pi*f/sample_rate)
+		complex H = complex(b[0], 0) + b[1]*z + b[2]*z*z
+		complex y = complex(1,0) + a[1]*z + a[2]*z*z
+		
+		float fac = H.abs() / y.abs()
+		return factor_to_db(fac)
 
 	void create_peak(float f_res, float Q, float g)
 		float c = 1 / tan(pi * f_res / sample_rate)
@@ -40,6 +57,13 @@ class Filter
 		a[1] = b[0]-1
 		a[2] = 0
 
+	void create_high_pass(float f_res)
+		b[0] = 1 / (1 + f_res*2*pi / sample_rate)
+		b[1] = -b[0]
+		b[2] = 0
+		a[1] = -b[0]
+		a[2] = 0
+
 enum
 	POINT_PEAK
 	POINT_LOW_PASS
@@ -52,19 +76,30 @@ class Peak
 	int mode
 	float pitch
 	float gain
-	float width
+	float q
 	complex z(float g0)
 		complex r
 		r.x = pitch_to_freq(pitch)
 		r.y = gain + g0
 		return r
-	float q()
+	//float q()
 		// ~ (f1 - f0) / f0 = f1/f0 - 1
-		return pow(2, width/12) - 1
+	//	return pow(2, width/12) - 1
+	
+	void create_filter(Filter f, float sample_rate)
+		f.sample_rate = sample_rate
+		if mode == POINT_LOW_PASS
+			f.create_low_pass(pitch_to_freq(pitch))
+		else if mode == POINT_HIGH_PASS
+			f.create_high_pass(pitch_to_freq(pitch))
+		else if mode == POINT_PEAK
+			f.create_peak(pitch_to_freq(pitch), q, db_to_factor(gain))
+				
 	float dgain(float _pitch)
 		if !enabled
 			return 0
 		float dpitch = _pitch-pitch
+		float width = 20
 		float d = dpitch / width
 		if mode == POINT_PEAK
 			return gain * exp(-d*d)
@@ -77,27 +112,32 @@ class Peak
 		if mode == POINT_HIGH_SHELF
 			return gain / (1+ exp(-d))
 		return 0
-Peak _Peak(int mode, float pitch, float gain, float width)
+Peak _Peak(int mode, float pitch, float gain, float q)
 	Peak p
 	p.enabled = true
 	p.mode = mode
 	p.pitch = pitch
 	p.gain = gain
-	p.width = width
+	p.q = q
 	return p
 				
 
 class EqCurve extends Curve
 	float gain
 	Peak[] peaks
-	void set(Config c)
+	float sample_rate
+	void set(Config c, float _sample_rate)
 		gain = c.gain
 		peaks = c.peaks
-	override float get(float f)
-		float pitch = freq_to_pitch(f)
+		sample_rate = _sample_rate
+	override float get(float freq)
+		/*float pitch = freq_to_pitch(f)*/
 		float r = gain
 		for p in peaks
-			r += p.dgain(pitch)
+			if p.enabled
+				Filter f
+				p.create_filter(f, sample_rate)
+				r += f.gain(freq)//p.dgain(pitch)
 		return r
 
 class Config extends PluginData
@@ -107,10 +147,8 @@ class Config extends PluginData
 	override void reset()
 		gain = 0
 		peaks.clear()
+		peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 10))
 		peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
-		peaks.add(_Peak(POINT_PEAK, 40, -30, 10))
-	//	peaks.add(_Peak(POINT_HIGH_PASS, 30, -10, 10))
-	//	peaks.add(_Peak(POINT_LOW_PASS, 100, -10, 10))
 		//for p in peaks
 		//	p.enabled = false
 
@@ -136,9 +174,12 @@ class Equalizer extends AudioEffect
 			
 			if p.mode == POINT_LOW_PASS
 				f.create_low_pass(pitch_to_freq(p.pitch))
+			else if p.mode == POINT_HIGH_PASS
+				f.create_high_pass(pitch_to_freq(p.pitch))
 			else if p.mode == POINT_PEAK
-				f.create_peak(pitch_to_freq(p.pitch), 0.2, 0.02)
-			f.apply(input, buf, overlap[channel][stage], overlap[channel][stage+1])
+				f.create_peak(pitch_to_freq(p.pitch), 0.2, 1 + db_to_factor(p.gain))
+			if p.enabled
+				f.apply(input, buf, overlap[channel][stage], overlap[channel][stage+1])
 			
 			// save input overlap
 			for i in 0:2
@@ -159,6 +200,7 @@ class Equalizer extends AudioEffect
 class EqualizerGrid extends Grid
 	Config *c
 	EqualizerPanel *cp
+	float sample_rate
 	int hover, selected
 	override void __init__()
 		hover = -1
@@ -166,7 +208,7 @@ class EqualizerGrid extends Grid
 	override void on_draw(Painter *p)
 		// curve + area below
 		EqCurve curve
-		curve.set(*c)
+		curve.set(*c, sample_rate)
 		draw_curve_c(p, curve, true)
 		
 		// gain base-line
@@ -197,7 +239,7 @@ class EqualizerGrid extends Grid
 				p.set_color(col_hover)
 				p.draw_str(pp.x - 20, pp.y - 50, pitch_to_freq(pk.pitch).str2(1) + " Hz")
 				p.draw_str(pp.x - 20, pp.y - 35, pk.gain.str2(1) + " dB")
-				p.draw_str(pp.x - 20, pp.y - 20, "q " + pk.q().str2(3))
+				p.draw_str(pp.x - 20, pp.y - 20, "Q " + pk.q.str2(1))
 			
 
 	// left button down -> select
@@ -208,9 +250,9 @@ class EqualizerGrid extends Grid
 	override void on_mouse_wheel()
 		if hover >= 0
 			if HuiGetEvent().scroll_y > 0
-				c.peaks[hover].width *= 1.04
+				c.peaks[hover].q *= 1.04
 			else
-				c.peaks[hover].width /= 1.04
+				c.peaks[hover].q /= 1.04
 			cp.changed()
 			redraw()
 
@@ -281,6 +323,7 @@ class EqualizerPanel extends ConfigPanel
 		
 		grid.cp = self
 		grid.c = &e.config
+		grid.sample_rate = e.session.sample_rate()
 		num_peaks = 0
 		
 		event("*", &on_ui_change)

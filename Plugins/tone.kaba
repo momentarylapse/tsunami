@@ -8,6 +8,12 @@ float pitch_to_freq(float pitch)
 float freq_to_pitch(float freq)
 	return log(freq / 440.0) / log(2) * 12.0 + 69.0
 
+float db_to_factor(float db)
+	return pow(10, db/20)
+
+float factor_to_db(float f)
+	return log(f) / log(10) * 20
+
 // "scientific" notation
 //   naive MIDI octave is off by 1
 int pitch_get_octave(int pitch)

@@ -86,6 +86,11 @@ double& Value::as_float64() const
 	return *(double*)value.data;
 }
 
+complex& Value::as_complex() const
+{
+	return *(complex*)value.data;
+}
+
 string& Value::as_string() const
 {
 	return *(string*)value.data;

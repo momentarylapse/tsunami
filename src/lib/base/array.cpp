@@ -275,7 +275,7 @@ DynamicArray DynamicArray::ref_subarray(int start, int num_elements)
 	DynamicArray s;
 	s.init(element_size);
 	if (num_elements < 0)
-		num_elements = start - num;
+		num_elements = num - start;
 	if (num_elements > num - start)
 		num_elements = num - start;
 	s.num = num_elements;

@@ -1,0 +1,91 @@
+use "../../api.kaba"
+
+const string AUTO_CONFIG_SAMPLE = ""
+
+// TODO: cache FFT(h)...
+// needs to be recreated when buf.length changes
+
+void fold(float[] x, float[] h, float[] result)
+	int N = x.num
+	int K = h.num
+	float[] xx = x
+	xx.resize(N + K)
+	float[] hh = h
+	hh.resize(N + K)
+	complex[] XX, HH
+	fft_r2c(xx, XX)
+	fft_r2c(hh, HH)
+	for z,i in HH
+		XX[i] = XX[i] * z
+	result.resize(N + K)
+	fft_c2r_inv(XX, result)
+	result /= N + K
+	
+
+void test()
+	print("--------test")
+	float[] x = [1.0, 1.0, 0.0, 1.0]
+	float[] h = [0.5, 0.5, 0.0, 0.0]
+	float[] result
+	fold(x, h, result)
+	print(result)
+
+class Config extends PluginData
+	SampleRef* sample
+	override void __init__()
+		sample = nil
+	override void reset()
+		if sample
+			delete sample
+		sample = nil
+
+
+class Folding extends AudioEffect
+	Config config
+
+	float[] h
+	float[] overlapr
+	float[] overlapl
+	
+	override void on_config()
+		if config.sample
+			h = config.sample.buf.r
+		else
+			h = [1.0]
+	
+	override void process(AudioBuffer buf)
+		if !config.sample
+			return
+		
+		do(buf.r, overlapr)
+		if buf.channels > 1
+			do(buf.l, overlapl)
+	
+	override void reset_state()
+		overlapr.clear()
+		overlapl.clear()
+	
+	void do(float[] buf, float[] overlap)
+		float[] y
+		int N = buf.num
+		int K = h.num
+		
+		float[] ttt
+		fold(buf, h, ttt)
+		
+		if overlap.num < N
+			overlap.resize(N)
+		
+		//for i in 0:N
+		//	buf[i] = ttt[i] + overlap[i]
+		//buf = ttt.subarray
+		buf = ttt.subarray(0,N)
+		buf += overlap
+		
+		// overlap = overlap[:-N]
+		for i in N:overlap.num
+			overlap[i-N] = overlap[i]
+		overlap.resize(overlap.num - N)
+		
+		overlap.resize(K)
+		overlap += ttt.subarray(N, K)

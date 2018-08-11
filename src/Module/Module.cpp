@@ -268,7 +268,7 @@ ConfigPanel *Module::create_panel()
 	ModuleConfiguration *config = get_config();
 	if (!config)
 		return nullptr;
-	auto aa = get_auto_conf(config);
+	auto aa = get_auto_conf(config, session);
 	if (aa.num == 0)
 		return nullptr;
 	return new AutoConfigPanel(aa, this);

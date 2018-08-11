@@ -38,9 +38,9 @@ public:
 	void on_view_cur_track_change();
 	void on_update();
 
-	void set_exclusive(AudioEffect *fx);
-	AudioEffect *exclusive;
-	bool allow_show(AudioEffect *fx);
+	void set_exclusive(hui::Panel *p);
+	hui::Panel *exclusive;
+	bool allow_show(hui::Panel *p);
 
 	string id_inner;
 

@@ -155,8 +155,10 @@ void SongRenderer::apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_
 {
 	// apply fx
 	for (AudioEffect *fx: fx_list)
-		if (fx->enabled)
+		if (fx->enabled){
+			buf.make_own();
 			fx->process(buf);
+		}
 }
 
 void SongRenderer::render_track_fx(AudioBuffer &buf, Track *t, int ti)
@@ -227,6 +229,7 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 	apply_curves(song, pos);
 
 	// render without fx
+	buf.scale(0);
 	render_song_no_fx(buf);
 
 	// apply global fx

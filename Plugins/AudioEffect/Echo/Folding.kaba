@@ -1,6 +1,8 @@
 use "../../api.kaba"
 
-void fold(float[] b, float[] k)
+const string AUTO_CONFIG_SAMPLE = ""
+
+/*void fold(float[] b, float[] k)
 	float[] o
 	o.resize(b.num)
 	
@@ -12,10 +14,103 @@ void fold(float[] b, float[] k)
 		for j in 0:n
 			if i >= j
 				o[i] += b[i - j] * k[j] * 0.07
-	b = o
+	b = o*/
+
+void fold(float[] x, float[] h, float[] y, float[] overlap)
+	int N = x.num
+	int K = h.num
+	float[] xx = x
+	xx.resize(N + K)
+	float[] hh = h
+	hh.resize(N + K)
+	complex[] XX, HH
+	fft_r2c(xx, XX)
+	fft_r2c(hh, HH)
+	for z,i in HH
+		XX[i] = XX[i] * z
+	float[] result
+	result.resize(N + K)
+	fft_c2r_inv(XX, result)
+	result /= N + K
+	
+	y.resize(N)
+	overlap.resize(K)
+	for i in 0:N
+		y[i] = result[i]
+	for i in 0:K
+		overlap[i] = result[i + N]
+	
+
+void test()
+	print("--------test")
+	float[] x = [1.0, 1.0, 0.0, 1.0]
+	float[] h = [0.5, 0.5, 0.0, 0.0]
+	float[] y, overlap
+	fold(x, h, y, overlap)
+	print(y)
+	print(overlap)
+
+class Config extends PluginData
+	SampleRef* sample
+	override void __init__()
+		sample = nil
+	override void reset()
+		if sample
+			delete sample
+		sample = nil
+
 
 class Folding extends AudioEffect
+	Config config
+
+	bool first
+	int index
+	float[] h
+	float[] overlap0r
+	float[] overlap1r
+	float[] overlap0l
+	float[] overlap1l
+	
+	override void on_config()
+		first = true
+		if config.sample
+			h = config.sample.buf.r
+		else
+			h = [1.0]
+		index = 0
+	
 	override void process(AudioBuffer buf)
-		fold(buf.r, session.song.tracks[0].layers[0].buffers[0].r)
-		fold(buf.l, session.song.tracks[0].layers[0].buffers[0].l)
+		/*if first
+			print(buf.length)
+			if config.sample
+				print(config.sample.buf.length)
+				h = config.sample.buf.r
+			//h.resize(buf.length)
+			first = false
+			//test()*/
+		
+		if index == 0
+			do(buf.r, overlap0r, overlap1r)
+			if buf.channels > 1
+				do(buf.l, overlap0l, overlap1l)
+		else
+			do(buf.r, overlap1r, overlap0r)
+			if buf.channels > 1
+				do(buf.l, overlap1l, overlap0l)
+		
+		index = (index + 1) % 2
+	
+	override void reset_state()
+		overlap0r.clear()
+		overlap1r.clear()
+		overlap0l.clear()
+		overlap1l.clear()
+		index = 0
+	
+	void do(float[] buf, float[] overlap_in, float[] overlap_out)
+		float[] y
+		
+		fold(buf, h, y, overlap_out)
+		buf = y
+		buf += overlap_in
 	

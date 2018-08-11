@@ -12,6 +12,7 @@
 
 class AutoConfigData;
 class ModuleConfiguration;
+class Session;
 
 class AutoConfigPanel : public ConfigPanel
 {
@@ -23,7 +24,7 @@ public:
 	virtual void _cdecl update();
 };
 
-Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config);
+Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session);
 
 
 #endif /* SRC_MODULE_AUTOCONFIGPANEL_H_ */

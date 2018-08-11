@@ -9,8 +9,13 @@
 #include "AutoConfigPanel.h"
 #include "Module.h"
 #include "../View/Helper/Slider.h"
+#include "../View/SideBar/SampleManagerConsole.h"
+#include "../Data/Song.h"
+#include "../Data/Sample.h"
+#include "../Data/SampleRef.h"
 #include "../Data/Midi/MidiData.h"
 #include "../lib/kaba/kaba.h"
+#include "../Session.h"
 
 
 string to_camel_case(const string &s)
@@ -34,15 +39,16 @@ string to_camel_case(const string &s)
 
 struct AutoConfigData
 {
-	enum{
-		TYPE_FLOAT,
-		TYPE_INT,
-		TYPE_STRING,
-		TYPE_PITCH,
+	enum class Type{
+		FLOAT,
+		INT,
+		STRING,
+		PITCH,
+		SAMPLE_REF,
 	};
 	string name, label, unit;
-	int type;
-	AutoConfigData(int _type, const string &_name)
+	Type type;
+	AutoConfigData(Type _type, const string &_name)
 	{
 		type = _type;
 		name = _name;
@@ -66,7 +72,7 @@ struct AutoConfigDataFloat : public AutoConfigData
 	float *value;
 	Slider *slider;
 	AutoConfigDataFloat(const string &_name) :
-		AutoConfigData(TYPE_FLOAT, _name)
+		AutoConfigData(Type::FLOAT, _name)
 	{
 		min = -100000000;
 		max = 100000000;
@@ -120,7 +126,7 @@ struct AutoConfigDataInt : public AutoConfigData
 	ConfigPanel *panel;
 	string id;
 	AutoConfigDataInt(const string &_name) :
-		AutoConfigData(TYPE_INT, _name)
+		AutoConfigData(Type::INT, _name)
 	{
 		min = 0;
 		max = 1000;
@@ -164,7 +170,7 @@ struct AutoConfigDataPitch : public AutoConfigData
 	string id;
 	ConfigPanel *panel;
 	AutoConfigDataPitch(const string &_name) :
-		AutoConfigData(TYPE_PITCH, _name)
+		AutoConfigData(Type::PITCH, _name)
 	{
 		value = nullptr;
 		panel = nullptr;
@@ -199,7 +205,7 @@ struct AutoConfigDataString : public AutoConfigData
 	string id;
 	ConfigPanel *panel;
 	AutoConfigDataString(const string &_name) :
-		AutoConfigData(TYPE_STRING, _name)
+		AutoConfigData(Type::STRING, _name)
 	{
 		value = nullptr;
 		panel = nullptr;
@@ -227,7 +233,69 @@ struct AutoConfigDataString : public AutoConfigData
 	}
 };
 
-Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config)
+struct AutoConfigDataSampleRef : public AutoConfigData
+{
+	SampleRef **value;
+	string id;
+	ConfigPanel *panel;
+	Session *session;
+	hui::Callback callback;
+	AutoConfigDataSampleRef(const string &_name, Session *_session) :
+		AutoConfigData(Type::SAMPLE_REF, _name)
+	{
+		value = nullptr;
+		panel = nullptr;
+		session = _session;
+	}
+	virtual ~AutoConfigDataSampleRef()
+	{}
+	virtual void parse(const string &s)
+	{}
+	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &_callback)
+	{
+		id = "sample-" + i;
+		panel = p;
+		p->addButton("!expandx", 1, i, id);
+		p->addButton("", 2, i, "clear");
+		p->setImage("clear", "hui:delete");
+		set_value();
+		p->event(id, [&]{ on_button(); });
+		p->event("clear", [&]{ on_clear(); });
+		callback = _callback;
+	}
+	void on_button()
+	{
+		Sample *s = SampleManagerConsole::select(session, panel, nullptr);
+		if (s){
+			if (*value)
+				delete *value;
+			*value = s->create_ref();
+			set_value();
+			callback();
+		}
+	}
+	void on_clear()
+	{
+		if (*value){
+			delete *value;
+			*value = nullptr;
+			set_value();
+			callback();
+		}
+	}
+	virtual void get_value()
+	{
+	}
+	virtual void set_value()
+	{
+		if (*value)
+			panel->setString(id, (*value)->origin->name);
+		else
+			panel->setString(id, _(" - none -"));
+	}
+};
+
+Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session)
 {
 	Kaba::SyntaxTree *ps = config->_class->owner;
 	Array<AutoConfigData*> r;
@@ -249,6 +317,10 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config)
 		}else if (e.type == Kaba::TypeString){
 			AutoConfigDataString *a = new AutoConfigDataString(e.name);
 			a->value = (string*)((char*)config + e.offset);
+			r.add(a);
+		}else if (e.type->name == "SampleRef*"){
+			AutoConfigDataSampleRef *a = new AutoConfigDataSampleRef(e.name, session);
+			a->value = (SampleRef**)((char*)config + e.offset);
 			r.add(a);
 		}
 	}

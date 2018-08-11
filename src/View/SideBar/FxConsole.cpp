@@ -94,7 +94,7 @@ public:
 	}
 	void on_large()
 	{
-		console->set_exclusive(fx);
+		console->set_exclusive(this);
 
 	}
 	void onfxChange()
@@ -104,14 +104,16 @@ public:
 		else
 			song->editEffect(fx, old_param);
 		check("enabled", fx->enabled);
-		p->update();
+		if (p)
+			p->update();
 		old_param = fx->config_to_string();
 
 	}
 	void onfxChangeByAction()
 	{
 		check("enabled", fx->enabled);
-		p->update();
+		if (p)
+			p->update();
 		old_param = fx->config_to_string();
 	}
 	Session *session;
@@ -229,7 +231,7 @@ void FxConsole::set_track(Track *t)
 		fx = song->fx;
 	foreachi(AudioEffect *e, fx, i){
 		auto *p = new SingleFxPanel(session, this, track, e, i);
-		p->hideControl("content", !allow_show(e));
+		p->hideControl("content", !allow_show(p));
 		panels.add(p);
 		embed(panels.back(), id_inner, 0, i*2);
 		addSeparator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
@@ -238,21 +240,22 @@ void FxConsole::set_track(Track *t)
 	//Enable("add", track);
 }
 
-void FxConsole::set_exclusive(AudioEffect *fx)
+void FxConsole::set_exclusive(hui::Panel *ex)
 {
-	exclusive = fx;
+	exclusive = ex;
 	bar()->set_large(exclusive);
 	for (auto *p: panels){
 		SingleFxPanel *pp = (SingleFxPanel*)p;
-		pp->hideControl("content", !allow_show(pp->fx));
-		pp->p->set_large(exclusive == pp->fx);
+		pp->hideControl("content", !allow_show(pp));
+		if (pp->p)
+			pp->p->set_large(exclusive == pp);
 	}
 }
 
-bool FxConsole::allow_show(AudioEffect *fx)
+bool FxConsole::allow_show(hui::Panel *p)
 {
 	if (exclusive)
-		return fx == exclusive;
+		return p == exclusive;
 	return true;
 }
 

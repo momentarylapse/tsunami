@@ -487,7 +487,7 @@ void DeviceManager::_init_audio_portaudio()
 	PaError err = Pa_Initialize();
 	_portaudio_test_error(err, session, "Pa_Initialize");
 
-	session->w(_("please note, that portaudio does not support refreshing the device list after program launch"));
+	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
 #endif
 }
 

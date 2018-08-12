@@ -20,7 +20,7 @@ public:
 	virtual ~TrackConsole();
 
 	void loadData();
-	void applyData();
+	void update_strings();
 
 	void onName();
 	void onVolume();

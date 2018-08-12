@@ -77,21 +77,26 @@ void TrackConsole::loadData()
 				setInt("instrument", i);
 		}
 
-		string tuning = format(_("%d strings: "), track->instrument.string_pitch.num);
-		for (int i=0; i<track->instrument.string_pitch.num; i++){
-			if (i > 0)
-				tuning += ", ";
-			tuning += pitch_name(track->instrument.string_pitch[i]);
-		}
-		if (track->instrument.string_pitch.num == 0)
-			tuning = _(" - no strings -");
-		setString("tuning", tuning);
+		update_strings();
 
 		setString("select_synth", track->synth->module_subtype);
 	}else{
 		hideControl("td_t_bars", true);
 		setString("tuning", "");
 	}
+}
+
+void TrackConsole::update_strings()
+{
+	string tuning = format(_("%d strings: "), track->instrument.string_pitch.num);
+	for (int i=0; i<track->instrument.string_pitch.num; i++){
+		if (i > 0)
+			tuning += ", ";
+		tuning += pitch_name(track->instrument.string_pitch[i]);
+	}
+	if (track->instrument.string_pitch.num == 0)
+		tuning = _(" - no strings -");
+	setString("tuning", tuning);
 }
 
 void TrackConsole::setTrack(Track *t)
@@ -132,6 +137,7 @@ void TrackConsole::onInstrument()
 	Array<int> tuning;
 	Array<Instrument> instruments = Instrument::enumerate();
 	track->setInstrument(instruments[n]);
+	update_strings();
 	editing = false;
 }
 
@@ -149,10 +155,6 @@ void TrackConsole::onSelectSynth()
 	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
 		track->setSynthesizer(CreateSynthesizer(session, name));
-}
-
-void TrackConsole::applyData()
-{
 }
 
 void TrackConsole::onEditSong()

@@ -241,6 +241,8 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 
 int SongRenderer::read(AudioBuffer &buf)
 {
+	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
+
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
 		return AudioPort::END_OF_STREAM;
@@ -309,6 +311,7 @@ void SongRenderer::clear_data()
 
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
+	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
 	clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;

@@ -10,14 +10,9 @@
 
 
 #include "BottomBar.h"
-class Track;
-class Slider;
-class Song;
-class MixingConsole;
+
 class PeakMeterDisplay;
 class DeviceManager;
-class AudioView;
-class AudioViewTrack;
 
 class TrackMixer;
 
@@ -27,16 +22,16 @@ public:
 	MixingConsole(Session *session);
 	virtual ~MixingConsole();
 
-	void loadData();
+	void load_data();
 
-	void onOutputVolume();
+	void on_output_volume();
 
 	void on_tracks_change();
-	void on_solo_change();
-	void onUpdateDeviceManager();
+	void update_all();
+	void on_update_device_manager();
 
-	virtual void _cdecl onShow();
-	virtual void _cdecl onHide();
+	void _cdecl onShow() override;
+	void _cdecl onHide() override;
 
 	DeviceManager *device_manager;
 	PeakMeterDisplay *peak_meter;

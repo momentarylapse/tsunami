@@ -18,8 +18,6 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 
-
-
 class TrackMixer: public hui::Panel
 {
 public:
@@ -181,13 +179,15 @@ MixingConsole::MixingConsole(Session *session) :
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, view);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
-	event("output-volume", std::bind(&MixingConsole::onOutputVolume, this));
+	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));
 
 	view->subscribe(this, std::bind(&MixingConsole::on_tracks_change, this), session->view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, std::bind(&MixingConsole::on_solo_change, this), session->view->MESSAGE_SOLO_CHANGE);
+	view->subscribe(this, [&]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
+	song->subscribe(this, [&]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
+
 	//song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
-	device_manager->subscribe(this, std::bind(&MixingConsole::onUpdateDeviceManager, this));
-	loadData();
+	device_manager->subscribe(this, std::bind(&MixingConsole::on_update_device_manager, this));
+	load_data();
 }
 
 MixingConsole::~MixingConsole()
@@ -200,52 +200,56 @@ MixingConsole::~MixingConsole()
 	delete(peak_meter);
 }
 
-void MixingConsole::onOutputVolume()
+void MixingConsole::on_output_volume()
 {
 	device_manager->setOutputVolume(getFloat(""));
 }
 
-void MixingConsole::loadData()
+void MixingConsole::load_data()
 {
-	int n = view->vtrack.num;
-	/*for (int i=mixer.num; i<n; i++){
-		TrackMixer *m = new TrackMixer();
-		mixer.add(m);
-		embed(m, id_inner, i*2, 0);
-		addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
-	}
-	for (int i=n; i<mixer.num; i++){
-		delete(mixer[i]);
-		removeControl("separator-" + i2s(i));
-	}
-	mixer.resize(n);*/
+	// how many TrackMixers still match?
+	int n_ok = 0;
 	foreachi (auto *m, mixer, i){
-		delete m;
+		if (!m->vtrack)
+			break;
+		if (i >= view->vtrack.num)
+			break;
+		if (m->vtrack != view->vtrack[i])
+			break;
+		n_ok ++;
+	}
+
+	// delete non-matching
+	for (int i=n_ok; i<mixer.num; i++){
+		delete mixer[i];
 		removeControl("separator-" + i2s(i));
 	}
-	mixer.clear();
+	mixer.resize(n_ok);
 
+	// add new
 	foreachi(AudioViewTrack *t, view->vtrack, i){
-		TrackMixer *m = new TrackMixer(t);
-		mixer.add(m);
-		embed(m, id_inner, i*2, 0);
-		addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
+		if (i >= n_ok){
+			TrackMixer *m = new TrackMixer(t);
+			mixer.add(m);
+			embed(m, id_inner, i*2, 0);
+			addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
+		}
 	}
 
-	hideControl("link-volumes", n <= 1);
+	hideControl("link-volumes", mixer.num <= 1);
 }
 
-void MixingConsole::onUpdateDeviceManager()
+void MixingConsole::on_update_device_manager()
 {
 	setFloat("output-volume", device_manager->getOutputVolume());
 }
 
 void MixingConsole::on_tracks_change()
 {
-	loadData();
+	load_data();
 }
 
-void MixingConsole::on_solo_change()
+void MixingConsole::update_all()
 {
 	for (auto *m: mixer)
 		m->update();

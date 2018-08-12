@@ -42,6 +42,7 @@ public:
 	void onUpdate();
 
 	Track *track;
+	bool editing;
 };
 
 #endif /* TRACKCONSOLE_H_ */

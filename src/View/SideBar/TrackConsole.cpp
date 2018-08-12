@@ -20,6 +20,7 @@ TrackConsole::TrackConsole(Session *session) :
 	SideBarConsole(_("Track properties"), session)
 {
 	track = nullptr;
+	editing = false;
 	setBorderWidth(5);
 	fromResource("track_dialog");
 	setDecimals(1);
@@ -105,25 +106,33 @@ void TrackConsole::setTrack(Track *t)
 
 void TrackConsole::onName()
 {
+	editing = true;
 	track->setName(getString(""));
+	editing = false;
 }
 
 void TrackConsole::onVolume()
 {
+	editing = true;
 	track->setVolume(db2amplitude(getFloat("volume")));
+	editing = false;
 }
 
 void TrackConsole::onPanning()
 {
+	editing = true;
 	track->setPanning(getFloat("panning") / 100.0f);
+	editing = false;
 }
 
 void TrackConsole::onInstrument()
 {
+	editing = true;
 	int n = getInt("");
 	Array<int> tuning;
 	Array<Instrument> instruments = Instrument::enumerate();
 	track->setInstrument(instruments[n]);
+	editing = false;
 }
 
 void TrackConsole::onEditTuning()
@@ -186,6 +195,7 @@ void TrackConsole::onUpdate()
 	if (track->cur_message() == track->MESSAGE_DELETE){
 		setTrack(nullptr);
 	}else{
-		loadData();
+		if (!editing)
+			loadData();
 	}
 }

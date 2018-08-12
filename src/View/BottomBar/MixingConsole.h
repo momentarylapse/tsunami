@@ -19,37 +19,7 @@ class DeviceManager;
 class AudioView;
 class AudioViewTrack;
 
-class TrackMixer: public hui::Panel
-{
-public:
-	TrackMixer();
-	~TrackMixer();
-	void onVolume();
-	void onMute();
-	void onSolo();
-	void onPanning();
-	void setTrack(AudioViewTrack *t);
-	void update();
-
-	static const float DB_MIN;
-	static const float DB_MAX;
-	static const float TAN_SCALE;
-	static float db2slider(float db);
-	static float slider2db(float val);
-	static float vol2slider(float vol);
-	static float slider2vol(float val);
-
-	Track *track;
-	AudioViewTrack *vtrack;
-	//Slider *volume_slider;
-	//Slider *panning_slider;
-	string id_name;
-	string vol_slider_id;
-	string pan_slider_id;
-	string mute_id;
-	string id_separator;
-	AudioView *view;
-};
+class TrackMixer;
 
 class MixingConsole: public BottomBar::Console
 {

@@ -808,10 +808,8 @@ void AudioView::updateTracks()
 	Array<AudioViewTrack*> vtrack2;
 	Array<AudioViewLayer*> vlayer2;
 	vtrack2.resize(song->tracks.num);
-	int nlayer = 0;
-	for (Track *t: song->tracks)
-		nlayer += t->layers.num;
-	vlayer2.resize(nlayer);
+	vlayer2.resize(song->layers().num);
+
 	foreachi(Track *t, song->tracks, ti){
 		bool found = false;
 

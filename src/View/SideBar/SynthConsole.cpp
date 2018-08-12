@@ -143,7 +143,7 @@ void SynthConsole::clear()
 {
 	if (track){
 		track->unsubscribe(this);
-		if (track->synth){
+		if (track->synth and panel){
 			track->synth->unsubscribe(this);
 			delete(panel);
 			panel = nullptr;
@@ -183,7 +183,14 @@ void SynthConsole::onTrackChange()
 
 void SynthConsole::onSynthDelete()
 {
-	clear();
+	if (track){
+		if (track->synth and panel){
+			track->synth->unsubscribe(this);
+			delete(panel);
+			panel = nullptr;
+			removeControl("separator_0");
+		}
+	}
 }
 
 void SynthConsole::onViewCurTrackChange()

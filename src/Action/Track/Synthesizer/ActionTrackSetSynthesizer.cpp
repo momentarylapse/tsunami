@@ -29,9 +29,12 @@ void ActionTrackSetSynthesizer::undo(Data *d)
 
 void *ActionTrackSetSynthesizer::execute(Data *d)
 {
+	msg_write("notify 1");
+	track->synth->notify(Synthesizer::MESSAGE_DELETE);
 	Synthesizer *temp = synth;
 	synth = track->synth;
 	track->synth = temp;
+	msg_write("notify 2");
 	track->notify();
 
 	return synth;

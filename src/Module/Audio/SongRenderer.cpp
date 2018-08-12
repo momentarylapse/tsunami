@@ -156,7 +156,7 @@ void SongRenderer::apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_
 	// apply fx
 	for (AudioEffect *fx: fx_list)
 		if (fx->enabled){
-			buf.make_own();
+			//buf.make_own();
 			fx->process(buf);
 		}
 }

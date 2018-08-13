@@ -117,7 +117,7 @@ void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
 		// TODO: allow_ref if no other layers + no fx
 		add_samples(t->layers[i0], range_cur, buf);
 
-		// other tracks
+		// other layers
 		AudioBuffer tbuf;
 		for (int i=i0+1;i<t->layers.num;i++){
 			if (!allowed_layers.contains(t->layers[i]))

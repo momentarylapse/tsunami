@@ -73,7 +73,7 @@ void ViewModeDefault::onLeftButtonDown()
 		hover->range.invert();
 		view->selection_mode = view->SelectionMode::TIME;
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE){
-		hover->track->setMuted(!hover->track->muted);
+		hover->vtrack->setMuted(!hover->track->muted);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO){
 		hover->vtrack->setSolo(!hover->vtrack->solo);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT){

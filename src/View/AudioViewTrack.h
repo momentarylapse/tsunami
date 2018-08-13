@@ -106,6 +106,7 @@ public:
 
 	void setSolo(bool solo);
 	bool solo;
+	void setMuted(bool muted);
 
 
 	bool mouse_over();
@@ -121,6 +122,9 @@ public:
 	void draw(Painter *c);
 
 	void setSolo(bool solo);
+	void setMuted(bool muted);
+	void setPanning(float panning);
+	void setVolume(float volume);
 
 	Track *track;
 	rect area;

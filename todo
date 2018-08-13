@@ -169,3 +169,7 @@ J SymbolRenderer in separate file
 
 * crash when closing (after fx/synth?)
 * crash when tuning strings
+* playback: muted at start => always muted
+* playback stop => deadlock?
+* playback no samples?
+* saving....

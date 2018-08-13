@@ -64,7 +64,7 @@ public:
 			if (parent->isChecked("link-volumes"))
 				track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
 			else
-				track->setVolume(slider2vol(getFloat("")));
+				vtrack->setVolume(slider2vol(getFloat("")));
 		}
 		editing = false;
 	}
@@ -72,8 +72,8 @@ public:
 	// allow update() for mute/solo!
 	void on_mute()
 	{
-		if (track)
-			track->setMuted(isChecked(""));
+		if (vtrack)
+			vtrack->setMuted(isChecked(""));
 	}
 	void on_solo()
 	{
@@ -84,8 +84,8 @@ public:
 	void on_panning()
 	{
 		editing = true;
-		if (track)
-			track->setPanning(getFloat(""));
+		if (vtrack)
+			vtrack->setPanning(getFloat(""));
 		editing = false;
 	}
 	void set_track(AudioViewTrack *t)

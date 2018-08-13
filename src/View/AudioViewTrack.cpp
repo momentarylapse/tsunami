@@ -1013,6 +1013,16 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 	}
 }
 
+void AudioViewTrack::setMuted(bool muted)
+{
+	track->setMuted(muted);
+	view->renderer->allow_tracks(view->get_playable_tracks());
+	view->renderer->allow_layers(view->get_playable_layers());
+	view->forceRedraw();
+	notify();
+	view->notify(view->MESSAGE_SOLO_CHANGE);
+}
+
 void AudioViewTrack::setSolo(bool _solo)
 {
 	solo = _solo;
@@ -1021,6 +1031,16 @@ void AudioViewTrack::setSolo(bool _solo)
 	view->forceRedraw();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
+}
+
+void AudioViewTrack::setPanning(float panning)
+{
+	track->setPanning(panning);
+}
+
+void AudioViewTrack::setVolume(float volume)
+{
+	track->setVolume(volume);
 }
 
 void AudioViewLayer::setSolo(bool _solo)

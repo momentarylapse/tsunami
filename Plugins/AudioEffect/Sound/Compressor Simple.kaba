@@ -1,0 +1,95 @@
+// Image = hui:properties
+// Title[Deutsch] = Kompressor
+
+use "../../api.kaba"
+
+const float MIN_DB = 0.0 - 60.0
+
+const string AUTO_CONFIG_THRESHOLD = "-60:0:1:1:db"
+const string AUTO_CONFIG_RATIO = "1:60:0.1:1:"
+const string AUTO_CONFIG_ATTACK = "0:1:1:1000:ms"
+const string AUTO_CONFIG_RELEASE = "0:1:1:1000:ms"
+const string AUTO_CONFIG_SOFTNESS = "0:1:0.1:100:%"
+const string AUTO_CONFIG_UPWARD = ""
+
+class CompressorConfig extends PluginData
+	float threshold
+	float ratio
+	float attack, release
+	float softness
+	bool upward
+
+	override void reset()
+		threshold = -20
+		ratio = 4
+		attack = 0.01
+		release = 0.1
+		softness = 0.5
+		upward = false
+
+
+class Compressor extends AudioEffect
+	CompressorConfig config
+	
+	
+	float gain_r, gain_l
+	float[] squares_r
+	float[] squares_l
+	
+	override void reset_state()
+		gain_r = 1
+		gain_l = 1
+		squares_r.clear()
+		squares_r.resize(70)
+		squares_l.clear()
+		squares_l.resize(70)
+
+	float dgain_attack, dgain_release
+
+	void compress(float[] b, float[] squares, float *gain)
+		float bmin = pow(10, MIN_DB/20)
+		for i in 0:b.num
+		
+			// in level (filtered)
+			squares[i%squares.num] = b[i]*b[i]
+			float rms = sqrt(squares.sum() / squares.num * 2)
+			if config.attack < 0.00005 // = 0
+				rms = abs(b[i])
+			float in_level = MIN_DB
+			if rms > bmin
+				in_level = log(rms) / log(10) * 20
+		
+			// out level
+			float out_level = in_level
+			if config.upward
+				if in_level > config.threshold
+					out_level = 1 - (1 - in_level) / config.ratio
+				else
+					out_level = in_level - config.threshold / (config.ratio - 1)
+			else
+				if in_level > config.threshold
+					out_level = config.threshold + (in_level - config.threshold) / config.ratio
+			
+			// slow gain changes
+			float cur_gain = out_level - in_level
+			if cur_gain > *gain
+				if config.release < 0.00005
+					*gain = cur_gain
+				else
+					*gain += dgain_release
+			else if cur_gain < *gain
+				if config.attack < 0.00005
+					*gain = cur_gain
+				else
+					*gain -= dgain_attack
+			
+			// apply gain
+			b[i] *= pow(10, *gain / 20)
+
+	override void process(AudioBuffer buf)
+		dgain_attack = 10 / (config.attack * session.sample_rate())
+		dgain_release = 10 / (config.release * session.sample_rate())
+		
+		compress(buf.r, squares_r, &gain_r)
+		if buf.channels > 1
+			compress(buf.l, squares_l, &gain_l)

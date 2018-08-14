@@ -42,6 +42,7 @@ struct AutoConfigData
 	enum class Type{
 		FLOAT,
 		INT,
+		BOOL,
 		STRING,
 		PITCH,
 		SAMPLE_REF,
@@ -81,11 +82,11 @@ struct AutoConfigDataFloat : public AutoConfigData
 		value = nullptr;
 		slider = nullptr;
 	}
-	virtual ~AutoConfigDataFloat()
+	~AutoConfigDataFloat() override
 	{
 		delete(slider);
 	}
-	virtual void parse(const string &s)
+	void parse(const string &s) override
 	{
 		Array<string> p = s.explode(":");
 		if (p.num == 5){
@@ -99,7 +100,7 @@ struct AutoConfigDataFloat : public AutoConfigData
 		}
 
 	}
-	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
 		p->addGrid("", 1, i, "grid-" + i);
 		p->setTarget("grid-" + i);
@@ -109,13 +110,43 @@ struct AutoConfigDataFloat : public AutoConfigData
 		//p->addLabel(unit, 2, 0, "");
 		slider = new Slider(p, "slider-" + i, "spin-" + i, min, max, factor, callback, *value);
 	}
-	virtual void get_value()
+	void get_value() override
 	{
 		*value = slider->get();
 	}
-	virtual void set_value()
+	void set_value() override
 	{
 		slider->set(*value);
+	}
+};
+
+struct AutoConfigDataBool : public AutoConfigData
+{
+	bool *value;
+	ConfigPanel *panel;
+	string id;
+	AutoConfigDataBool(const string &_name) :
+		AutoConfigData(Type::BOOL, _name)
+	{
+		value = nullptr;
+		panel = nullptr;
+	}
+	~AutoConfigDataBool() override {};
+	void parse(const string &s) override {};
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
+	{
+		id = "check-" + i;
+		panel = p;
+		p->addCheckBox("!width=150,expandx", 1, i, id);
+		p->event(id, callback);
+	}
+	void get_value() override
+	{
+		*value = panel->isChecked(id);
+	}
+	void set_value() override
+	{
+		panel->check(id, *value);
 	}
 };
 
@@ -133,9 +164,7 @@ struct AutoConfigDataInt : public AutoConfigData
 		value = nullptr;
 		panel = nullptr;
 	}
-	virtual ~AutoConfigDataInt()
-	{}
-	virtual void parse(const string &s)
+	void parse(const string &s) override
 	{
 		Array<string> p = s.explode(":");
 		if (p.num == 2){
@@ -144,9 +173,8 @@ struct AutoConfigDataInt : public AutoConfigData
 		}else{
 			msg_write("required format: min:max");
 		}
-
 	}
-	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
 		id = "spin-" + i;
 		panel = p;
@@ -154,11 +182,11 @@ struct AutoConfigDataInt : public AutoConfigData
 		p->setOptions(id, format("range=%d:%d", min, max));
 		p->event(id, callback);
 	}
-	virtual void get_value()
+	void get_value() override
 	{
 		*value = panel->getInt(id);
 	}
-	virtual void set_value()
+	void set_value() override
 	{
 		panel->setInt(id, *value);
 	}
@@ -175,11 +203,9 @@ struct AutoConfigDataPitch : public AutoConfigData
 		value = nullptr;
 		panel = nullptr;
 	}
-	virtual ~AutoConfigDataPitch()
+	void parse(const string &s) override
 	{}
-	virtual void parse(const string &s)
-	{}
-	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
 		id = "pitch-" + i;
 		panel = p;
@@ -189,11 +215,11 @@ struct AutoConfigDataPitch : public AutoConfigData
 		p->setInt(id, *value);
 		p->event(id, callback);
 	}
-	virtual void get_value()
+	void get_value() override
 	{
 		*value = panel->getInt(id);
 	}
-	virtual void set_value()
+	void set_value() override
 	{
 		panel->setInt(id, *value);
 	}
@@ -210,24 +236,20 @@ struct AutoConfigDataString : public AutoConfigData
 		value = nullptr;
 		panel = nullptr;
 	}
-	virtual ~AutoConfigDataString()
-	{
-	}
-	virtual void parse(const string &s)
-	{
-	}
-	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback)
+	void parse(const string &s) override
+	{}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
 		id = "edit-" + i;
 		panel = p;
 		p->addEdit("!width=150,expandx\\" + *value, 1, i, id);
 		p->event(id, callback);
 	}
-	virtual void get_value()
+	void get_value() override
 	{
 		*value = panel->getString(id);
 	}
-	virtual void set_value()
+	void set_value() override
 	{
 		panel->setString(id, *value);
 	}
@@ -247,11 +269,9 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 		panel = nullptr;
 		session = _session;
 	}
-	virtual ~AutoConfigDataSampleRef()
+	void parse(const string &s) override
 	{}
-	virtual void parse(const string &s)
-	{}
-	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &_callback)
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &_callback) override
 	{
 		id = "sample-" + i;
 		panel = p;
@@ -283,10 +303,10 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 			callback();
 		}
 	}
-	virtual void get_value()
+	void get_value() override
 	{
 	}
-	virtual void set_value()
+	void set_value() override
 	{
 		if (*value)
 			panel->setString(id, (*value)->origin->name);
@@ -313,6 +333,10 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 		}else if (e.type == Kaba::TypeInt){
 			AutoConfigDataInt *a = new AutoConfigDataInt(e.name);
 			a->value = (int*)((char*)config + e.offset);
+			r.add(a);
+		}else if (e.type == Kaba::TypeBool){
+			AutoConfigDataBool *a = new AutoConfigDataBool(e.name);
+			a->value = (bool*)((char*)config + e.offset);
 			r.add(a);
 		}else if (e.type == Kaba::TypeString){
 			AutoConfigDataString *a = new AutoConfigDataString(e.name);

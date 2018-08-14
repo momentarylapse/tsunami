@@ -2448,7 +2448,7 @@ popup_layer_menu
 
 0
 0
-6
+7
 Item
 header
 disabled
@@ -2492,15 +2492,21 @@ track_edit_midi
 0
 0
 Item
-layer_merge
+layer_make_track
 
 4
 0
 0
 Item
-delete_layer
+layer_merge
 
 5
+0
+0
+Item
+delete_layer
+
+6
 0
 0
 // Resource
@@ -4336,7 +4342,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-438
+439
 // Text
 /cancel
 Cancel
@@ -5118,6 +5124,9 @@ Delete
 popup_layer_menu/header
 Version
 
+popup_layer_menu/layer_make_track
+Turn into track
+
 popup_layer_menu/layer_merge
 Merge...
 
@@ -5658,7 +5667,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-560
+561
 // Text
 /cancel
 Abbrechen
@@ -6659,6 +6668,9 @@ Löschen
 popup_layer_menu/header
 Version
 
+popup_layer_menu/layer_make_track
+In Spur umwandeln
+
 popup_layer_menu/layer_merge
 Vereinen...
 
@@ -7341,7 +7353,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-190
+191
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7361,6 +7373,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
   ...keine Sorge, das wird schon!
  - no strings -
  - keine Saiten -
+ - none -
+ - leer -
  has crashed.\t\tThe last lines of the file message.txt:
  ist abgestürtzt.\t\tDie letzten Zeilen der Datei message.txt:
 %d strings: 

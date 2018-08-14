@@ -51,6 +51,8 @@ public:
 	void _cdecl deleteSampleRef(SampleRef *ref);
 	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
 
+	void _cdecl make_own_track();
+
 	Track *track;
 	Song *song() const;
 	SignalType type;

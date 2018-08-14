@@ -19,6 +19,7 @@
 #include "../Action/Track/Data/ActionTrackSetInstrument.h"
 #include "../Action/Track/Layer/ActionTrackLayerAdd.h"
 #include "../Action/Track/Layer/ActionTrackLayerDelete.h"
+#include "../Action/Track/Layer/ActionTrackLayerMakeTrack.h"
 /*#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
 #include "../Action/Track/Layer/ActionTrackLayerMove.h"*/
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
@@ -316,6 +317,11 @@ void TrackLayer::deleteMidiNote(const MidiNote *note)
 	foreachi(MidiNote *n, midi, index)
 		if (n == note)
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
+}
+
+void TrackLayer::make_own_track()
+{
+	track->song->execute(new ActionTrackLayerMakeTrack(this));
 }
 
 void Track::setName(const string& name)

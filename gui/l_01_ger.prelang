@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-561
+562
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1686,8 +1686,11 @@ Solo
 popup_fx_menu/show_large
 Groß...
 
+popup_layer_menu/layer_make_track
+In Spur umwandeln
+
 // Num Language Strings
-190
+191
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2069,3 +2072,5 @@ bar
 Takt 
 please note, that portaudio does not support refreshing the device list after program launch
 Geräte, die nach Programmstart angeschlossen werden, können von Portaudio leider nicht erkannt werden!
+ - none -
+ - leer -

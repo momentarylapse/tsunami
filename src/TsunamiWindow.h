@@ -67,6 +67,8 @@ public:
 	void onTrackImport();
 	void onAddLayer();
 	void onDeleteLayer();
+	void onLayerMakeTrack();
+	void onLayerMerge();
 	void onSampleManager();
 	void onMixingConsole();
 	void onFxConsole();

@@ -125,6 +125,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("layer_add", -1, "hui:add");
 	event("delete_layer", std::bind(&TsunamiWindow::onDeleteLayer, this));
 	setKeyCode("delete_layer", -1, "hui:delete");
+	event("layer_make_track", std::bind(&TsunamiWindow::onLayerMakeTrack, this));
+	event("layer_merge", std::bind(&TsunamiWindow::onLayerMerge, this));
 	event("add_bars", std::bind(&TsunamiWindow::onAddBars, this));
 	setKeyCode("add_bars", -1, "hui:add");
 	event("add_pause", std::bind(&TsunamiWindow::onAddPause, this));
@@ -740,6 +742,15 @@ void TsunamiWindow::onAddLayer()
 void TsunamiWindow::onDeleteLayer()
 {
 	view->cur_track()->deleteLayer(view->cur_layer());
+}
+
+void TsunamiWindow::onLayerMakeTrack()
+{
+	view->cur_layer()->make_own_track();
+}
+
+void TsunamiWindow::onLayerMerge()
+{
 }
 
 void TsunamiWindow::onSampleFromSelection()

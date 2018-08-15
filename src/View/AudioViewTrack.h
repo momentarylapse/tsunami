@@ -126,6 +126,8 @@ public:
 	void setPanning(float panning);
 	void setVolume(float volume);
 
+	void on_track_change();
+
 	Track *track;
 	rect area;
 	Array<int> reference_tracks;

@@ -15,7 +15,6 @@ class CueSplitter extends TsunamiPlugin
 	override void on_start()
 		if HuiFileDialogOpen(session.win, "", "", "*.cue", "*.cue")
 			load_cue(HuiFilename)
-		//load_cue("/home/michi/Downloads/Deep Purple - 1970 Deep Purple  In Rock/Deep Purple - Deep Purple In Rock.cue")
 	
 	void load_cue(string filename)
 		string dir = filename.dirname()
@@ -72,7 +71,7 @@ class CueSplitter extends TsunamiPlugin
 			tags.add(_Tag("title", p.title))
 			tags.add(_Tag("tracknumber", i+1))
 			int offset = p.foffset * session.song.sample_rate
-			int end = session.song.get_range().length
+			int end = session.song.range().length
 			if i < parts.num-1
 				print(parts[i+1].foffset)
 				float fsr = session.song.sample_rate

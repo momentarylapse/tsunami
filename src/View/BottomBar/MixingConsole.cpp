@@ -50,11 +50,15 @@ public:
 		event(mute_id, std::bind(&TrackMixer::on_mute, this));
 		event("solo", std::bind(&TrackMixer::on_solo, this));
 
-		set_track(t);
+		vtrack = t;
+		track = t->track;
+		vtrack->subscribe(this, [&]{ update(); }, vtrack->MESSAGE_CHANGE);
+		vtrack->subscribe(this, [&]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
+		update();
 	}
 	~TrackMixer()
 	{
-		set_track(nullptr);
+		clear_track();
 	}
 
 	void on_volume()
@@ -88,27 +92,16 @@ public:
 			vtrack->setPanning(getFloat(""));
 		editing = false;
 	}
-	void set_track(AudioViewTrack *t)
+	void clear_track()
 	{
-		if (track)
-			track->unsubscribe(this);
 		if (vtrack)
 			vtrack->unsubscribe(this);
-		vtrack = t;
+		vtrack = nullptr;
 		track = nullptr;
-		if (t)
-			track = t->track;
-		if (track)
-			track->subscribe(this, [&]{ update(); }, track->MESSAGE_CHANGE);
-		if (vtrack){
-			vtrack->subscribe(this, [&]{ update(); }, vtrack->MESSAGE_CHANGE);
-			vtrack->subscribe(this, [&]{ on_vtrack_delete(); }, track->MESSAGE_DELETE);
-		}
-		update();
 	}
 	void on_vtrack_delete()
 	{
-		set_track(nullptr);
+		clear_track();
 
 	}
 	void update()

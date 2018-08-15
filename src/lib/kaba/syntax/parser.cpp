@@ -2053,9 +2053,12 @@ void SyntaxTree::ParseAllClassNames()
 
 void SyntaxTree::ParseAllFunctionBodies()
 {
-	for (auto *f: functions)
+	//for (auto *f: functions)   NO... might encounter new classes creating new functions!
+	for (int i=0; i<functions.num; i++){
+		auto *f = functions[i];
 		if ((!f->is_extern) and (f->_logical_line_no >= 0))
 			ParseFunctionBody(f);
+	}
 }
 
 void SyntaxTree::ParseTopLevel()

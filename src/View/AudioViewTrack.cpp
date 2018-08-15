@@ -72,10 +72,22 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 	solo = false;
 
 	area = rect(0, 0, 0, 0);
+
+	if (track){
+		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_CHANGE);
+		track->subscribe(this, [&]{ track = NULL; }, track->MESSAGE_DELETE);
+	}
 }
 
 AudioViewTrack::~AudioViewTrack()
 {
+	if (track)
+		track->unsubscribe(this);
+}
+
+void AudioViewTrack::on_track_change()
+{
+	notify(MESSAGE_CHANGE);
 }
 
 

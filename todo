@@ -137,6 +137,7 @@ J new signal chain file format
 J AudioSource into buffer
 J Area.redraw queued after delete
 * midi buffer boxes?
+* load sample from SampleSelection dialog
 
 == midi ed ==
 
@@ -167,9 +168,10 @@ J SymbolRenderer in separate file
 
 == more bugs ==
 
-* crash when closing (after fx/synth?)
-* crash when tuning strings
-* playback: muted at start => always muted
+J crash when closing (after fx/synth?)
+J crash when tuning strings
+J playback: muted at start => always muted
 * playback stop => deadlock?
-* playback no samples?
+J playback no samples?
 * saving....
+J playback line hover...

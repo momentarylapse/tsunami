@@ -256,8 +256,8 @@ void ViewModeDefault::onMouseMove()
 		//Selection hover_old = *hover;
 		*hover = getHover();
 		/*if (hover_changed(*hover, hover_old))
-			view->forceRedraw();
-		return;*/
+			view->forceRedraw();*/
+		return;
 	}
 
 

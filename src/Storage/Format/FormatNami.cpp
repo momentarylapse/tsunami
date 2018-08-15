@@ -482,9 +482,11 @@ public:
 	{
 		me->offset = f->read_int();
 		int num = f->read_int();
-		me->resize(num);
 		int channels = f->read_int(); // channels (2)
 		int bits = f->read_int(); // bit (16)
+
+		me->clear_x(channels);
+		me->resize(num);
 
 		string data;
 
@@ -515,19 +517,18 @@ public:
 	{
 		Song *song = (Song*)root->base->get();
 
-		int channels = 2;
 		f->write_int(me->offset);
 		f->write_int(me->length);
-		f->write_int(channels);
+		f->write_int(me->channels);
 		f->write_int(format_get_bits(song->default_format));
 
 		string data;
 		if (song->compression == 0){
-			if (!me->exports(data, channels, song->default_format))
+			if (!me->exports(data, me->channels, song->default_format))
 				warn(_("Amplitude too large, signal distorted."));
 		}else{
 
-			int uncompressed_size = me->length * channels * format_get_bits(song->default_format) / 8;
+			int uncompressed_size = me->length * me->channels * format_get_bits(song->default_format) / 8;
 			data = compress_buffer(*me, song, this);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}

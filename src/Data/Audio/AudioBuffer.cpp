@@ -475,7 +475,7 @@ bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool a
 	wtb_overflow = false;
 	float*source[2];
 	for (int ci=0; ci<_channels; ci++)
-		source[ci] = &c[min(ci, _channels-1)][0];
+		source[ci] = &c[min(ci, channels-1)][0];
 
 	if (format == SampleFormat::SAMPLE_FORMAT_16){
 		short *sb = (short*)data;

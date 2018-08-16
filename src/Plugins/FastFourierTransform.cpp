@@ -6,6 +6,8 @@
  */
 
 #include "FastFourierTransform.h"
+#include <mutex>
+
 
 //#ifndef OS_WINDOWS
 #include <fftw3.h>
@@ -13,6 +15,9 @@
 
 namespace FastFourierTransform
 {
+
+
+static std::mutex planer_mtx;
 
 inline void fft_c2c_4(complex *in, complex *out, int stride)
 {
@@ -202,10 +207,15 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {
 	out.resize(in.num);
-	align_stack
+	//align_stack
+
+	planer_mtx.lock();
 	fftwf_plan plan = fftwf_plan_dft_1d(in.num, (float(*)[2])in.data, (float(*)[2])out.data, inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
+	planer_mtx.unlock();
 	fftwf_execute(plan);
+	planer_mtx.lock();
 	fftwf_destroy_plan(plan);
+	planer_mtx.unlock();
 }
 
 void fft_r2c(Array<float> &in, Array<complex> &out)
@@ -214,10 +224,15 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 		return;
 
 	out.resize(in.num / 2 + 1);
-	align_stack
+	//align_stack
+
+	planer_mtx.lock();
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(in.num, (float*)in.data, (float(*)[2])out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+	planer_mtx.unlock();
 	fftwf_execute(plan);
+	planer_mtx.lock();
 	fftwf_destroy_plan(plan);
+	planer_mtx.unlock();
 }
 
 void fft_c2r_inv(Array<complex> &in, Array<float> &out)
@@ -225,11 +240,16 @@ void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 	if (out.num == 0)
 		return;
 
-	align_stack
+	//align_stack
 	out.resize(in.num * 2 - 2);
+
+	planer_mtx.lock();
 	fftwf_plan plan = fftwf_plan_dft_c2r_1d(out.num, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+	planer_mtx.unlock();
 	fftwf_execute(plan);
+	planer_mtx.lock();
 	fftwf_destroy_plan(plan);
+	planer_mtx.unlock();
 }
 
 

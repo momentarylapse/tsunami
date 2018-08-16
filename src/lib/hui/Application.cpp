@@ -238,9 +238,13 @@ void Application::doSingleMainLoop()
 	//Callback _if_ = _idle_function_;
 
 	//SetIdleFunction(NULL);
+	int counter = 0;
 	do{
 		g_main_context_iteration(nullptr, true);
 		gtk_main_iteration_do(false);
+		counter ++;
+		if (counter > 5)
+			break;
 	}while (gtk_events_pending());
 
 	// pop idle function

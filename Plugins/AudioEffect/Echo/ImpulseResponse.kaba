@@ -5,18 +5,25 @@ const string AUTO_CONFIG_SAMPLE = ""
 // TODO: cache FFT(h)...
 // needs to be recreated when buf.length changes
 
-void fold(float[] x, float[] h, float[] result)
+void fold(float[] x, float[] h, complex[] HH, float[] result)
 	int N = x.num
 	int K = h.num
+	
+	// fft of input
 	float[] xx = x
 	xx.resize(N + K)
-	float[] hh = h
-	hh.resize(N + K)
-	complex[] XX, HH
+	complex[] XX
 	fft_r2c(xx, XX)
-	fft_r2c(hh, HH)
-	for z,i in HH
-		XX[i] = XX[i] * z
+	
+	// fft of kernel
+	if HH.num != (N+K)/2+1
+		//print("recalc HH")
+		float[] hh = h
+		hh.resize(N + K)
+		fft_r2c(hh, HH)
+	
+	// convolution
+	XX *= HH
 	result.resize(N + K)
 	fft_c2r_inv(XX, result)
 	result /= N + K
@@ -27,7 +34,8 @@ void test()
 	float[] x = [1.0, 1.0, 0.0, 1.0]
 	float[] h = [0.5, 0.5, 0.0, 0.0]
 	float[] result
-	fold(x, h, result)
+	complex[] HH
+	fold(x, h, HH, result)
 	print(result)
 
 class Config extends PluginData
@@ -44,6 +52,8 @@ class Folding extends AudioEffect
 	Config config
 
 	float[] h
+	complex[] HH
+	
 	float[] overlapr
 	float[] overlapl
 	
@@ -52,11 +62,13 @@ class Folding extends AudioEffect
 			h = config.sample.buf.r
 		else
 			h = [1.0]
+		reset_state()
 	
 	override void process(AudioBuffer buf)
 		if !config.sample
 			return
 		
+		// apply
 		do(buf.r, overlapr)
 		if buf.channels > 1
 			do(buf.l, overlapl)
@@ -64,6 +76,7 @@ class Folding extends AudioEffect
 	override void reset_state()
 		overlapr.clear()
 		overlapl.clear()
+		HH.clear()
 	
 	void do(float[] buf, float[] overlap)
 		float[] y
@@ -71,16 +84,13 @@ class Folding extends AudioEffect
 		int K = h.num
 		
 		float[] ttt
-		fold(buf, h, ttt)
+		fold(buf, h, HH, ttt)
 		
 		if overlap.num < N
 			overlap.resize(N)
 		
-		//for i in 0:N
-		//	buf[i] = ttt[i] + overlap[i]
-		//buf = ttt.subarray
 		buf = ttt[:N]
-		buf += overlap
+		buf += overlap // [:N]
 		
 		// overlap = overlap[:-N]
 		for i in N:overlap.num

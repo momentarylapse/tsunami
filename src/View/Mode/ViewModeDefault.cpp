@@ -138,6 +138,8 @@ void ViewModeDefault::onLeftButtonUp()
 
 int hover_buffer(Selection *hover)
 {
+	if (!hover->layer)
+		return -1;
 	foreachi (AudioBuffer &b, hover->layer->buffers, i)
 		if (b.range().is_inside(hover->pos))
 			return i;

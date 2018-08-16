@@ -194,12 +194,12 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 		buf.scale(song->tracks[i0]->volume, song->tracks[i0]->panning);
 
 		// other tracks
-		AudioBuffer tbuf;
 		for (int i=i0+1;i<song->tracks.num;i++){
 			if (!allowed_tracks.contains(song->tracks[i]))
 				continue;
 			if (song->tracks[i]->muted)
 				continue;
+			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
 			render_track_fx(tbuf, song->tracks[i], i);
 			buf.add(tbuf, 0, song->tracks[i]->volume, song->tracks[i]->panning);

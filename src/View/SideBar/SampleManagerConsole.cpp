@@ -60,7 +60,7 @@ void render_midi(Image &im, MidiNoteBuffer &m)
 string render_sample(Sample *s, AudioView *view)
 {
 	Image im;
-	im.create(150, 32, color(0, 0, 0, 0));
+	im.create(120, 32, color(0, 0, 0, 0));
 	if (s->type == SignalType::AUDIO)
 		render_bufbox(im, s->buf, view);
 	else if (s->type == SignalType::MIDI)
@@ -105,7 +105,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->owner->get_time_str_long(s->range().length) + "\\" + s->name + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;
@@ -352,31 +352,30 @@ void SampleManagerConsole::endPreview()
 class SampleSelector : public hui::Dialog
 {
 public:
-	SampleSelector(Session *session, hui::Panel *parent, Sample *old) :
+	SampleSelector(Session *_session, hui::Panel *parent, Sample *old) :
 		hui::Dialog("", 300, 400, parent->win, false)
 	{
+		session = _session;
 		song = session->song;
-		ret = nullptr;;
+		selected = nullptr;
 		_old = old;
+		for (Sample *s: song->samples)
+			if (s == old)
+				selected = s;
+
 
 		fromResource("sample_selection_dialog");
 
 		list_id = "sample_selection_list";
 
-		setString(list_id, _("\\- none -\\"));
-		setInt(list_id, 0);
-		foreachi(Sample *s, song->samples, i){
-			icon_names.add(render_sample(s, session->view));
-			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.length));
-			if (s == old)
-				setInt(list_id, i + 1);
-		}
+		fill_list();
 
-		event("ok", std::bind(&SampleSelector::onOk, this));
-		event("cancel", std::bind(&SampleSelector::onCancel, this));
-		event("hui:close", std::bind(&SampleSelector::onCancel, this));
-		eventX(list_id, "hui:select", std::bind(&SampleSelector::onSelect, this));
-		event(list_id, std::bind(&SampleSelector::onList, this));
+		event("import", std::bind(&SampleSelector::on_import, this));
+		event("ok", std::bind(&SampleSelector::on_ok, this));
+		event("cancel", std::bind(&SampleSelector::on_cancel, this));
+		event("hui:close", std::bind(&SampleSelector::on_cancel, this));
+		eventX(list_id, "hui:select", std::bind(&SampleSelector::on_select, this));
+		event(list_id, std::bind(&SampleSelector::on_list, this));
 	}
 	virtual ~SampleSelector()
 	{
@@ -384,42 +383,68 @@ public:
 			hui::DeleteImage(name);
 	}
 
-	void onSelect()
+	void fill_list()
+	{
+		reset(list_id);
+
+		setString(list_id, _("\\- none -\\"));
+		setInt(list_id, 0);
+		foreachi(Sample *s, song->samples, i){
+			icon_names.add(render_sample(s, session->view));
+			setString(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf.length) + "\\" + s->name);
+			if (s == selected)
+				setInt(list_id, i + 1);
+		}
+	}
+
+	void on_select()
 	{
 		int n = getInt("");
-		ret = nullptr;
+		selected = nullptr;
 		if (n >= 1)
-			ret = song->samples[n - 1];
+			selected = song->samples[n - 1];
 		enable("ok", n >= 0);
 	}
 
-	void onList()
+	void on_list()
 	{
 		int n = getInt("");
 		if (n == 0){
-			ret = nullptr;
+			selected = nullptr;
 			destroy();
 		}else if (n >= 1){
-			ret = song->samples[n - 1];
+			selected = song->samples[n - 1];
 			destroy();
 		}
 	}
 
-	void onOk()
+	void on_import()
+	{
+		if (session->storage->askOpenImport(win)){
+			AudioBuffer buf;
+			session->storage->loadBufferBox(song, &buf, hui::Filename);
+			song->addSample(hui::Filename.basename(), buf);
+			fill_list();
+		}
+
+	}
+
+	void on_ok()
 	{
 		destroy();
 	}
 
-	void onCancel()
+	void on_cancel()
 	{
-		ret = _old;
+		selected = _old;
 		destroy();
 	}
 
-	Sample *ret;
+	Sample *selected;
 	Sample *_old;
 	Array<string> icon_names;
 	Song *song;
+	Session *session;
 	string list_id;
 };
 
@@ -427,7 +452,7 @@ Sample *SampleManagerConsole::select(Session *session, hui::Panel *parent, Sampl
 {
 	SampleSelector *s = new SampleSelector(session, parent, old);
 	s->run();
-	Sample *r = s->ret;
+	Sample *r = s->selected;
 	delete(s);
 	return r;
 }

@@ -1,6 +1,7 @@
-Dialog sample_selection_dialog "Sample wählen" width=300 height=400
+Dialog sample_selection_dialog "Sample wählen" width=500 height=400
 	Grid ? "" vertical
-		ListView sample_selection_list "Preview\\Name\\Duration" format=itt
+		ListView sample_selection_list "Preview\\Duration\\Name" format=itt
 		Grid ? "" buttonbar
+			Button import "" image=hui:open "tooltip=import from file"
 			Button /cancel "Cancel"
 			Button /ok "OK"

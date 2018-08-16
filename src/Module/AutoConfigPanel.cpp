@@ -285,11 +285,16 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 	}
 	void on_button()
 	{
-		Sample *s = SampleManagerConsole::select(session, panel, nullptr);
-		if (s){
+		Sample *old = nullptr;
+		if (*value)
+			old = (*value)->origin;
+		Sample *s = SampleManagerConsole::select(session, panel, old);
+		if (s != old){
 			if (*value)
 				delete *value;
-			*value = s->create_ref();
+			*value = nullptr;
+			if (s)
+				*value = s->create_ref();
 			set_value();
 			callback();
 		}

@@ -3563,7 +3563,7 @@ image=hui:ok
 // Resource
 Dialog
 sample_selection_dialog
-width=300,height=400
+width=500,height=400
 0
 0
 1
@@ -3584,17 +3584,23 @@ Grid
 buttonbar
 1
 0
-2
+3
+Button
+import
+image=hui:open
+0
+0
+0
 Button
 cancel
 
-0
+1
 0
 0
 Button
 ok
 
-1
+2
 0
 0
 // Resource
@@ -4342,7 +4348,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-439
+440
 // Text
 /cancel
 Cancel
@@ -5505,11 +5511,14 @@ Sample rate
 sample_scale_dialog/ssd_t_samples
 Samples
 
+sample_selection_dialog/import
+
+import from file
 sample_selection_dialog/sample_selection_dialog
 Sample wählen
 
 sample_selection_dialog/sample_selection_list
-Preview\\Name\\Duration
+Preview\\Duration\\Name
 
 settings_dialog/audio_api
 
@@ -5667,7 +5676,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-561
+562
 // Text
 /cancel
 Abbrechen
@@ -7059,7 +7068,7 @@ sample_manager_dialog/preview_sample
 
 Vorschau
 sample_manager_dialog/sample_list
-Vorschau\\Name\\Dauer\\Benutzung\\Temporär
+Vorschau\\Dauer\\Name\\Benutzung\\Temporär
 
 sample_manager_dialog/sample_manager_dialog
 Sample Manager
@@ -7157,11 +7166,14 @@ Sample rate
 sample_scale_dialog/ssd_t_samples
 Samples
 
+sample_selection_dialog/import
+
+aus Datei importieren
 sample_selection_dialog/sample_selection_dialog
 Sample wählen
 
 sample_selection_dialog/sample_selection_list
-Vorschau\\Name\\Dauer
+Vorschau\\Dauer\\Name
 
 settings_dialog/audio_api
 

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-562
+563
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -964,7 +964,7 @@ sample_manager_dialog/preview_sample
 
 Vorschau
 sample_manager_dialog/sample_list
-Vorschau\\Name\\Dauer\\Benutzung\\Temporär
+Vorschau\\Dauer\\Name\\Benutzung\\Temporär
 
 sample_manager_dialog/sample_manager_dialog
 Sample Manager
@@ -1066,7 +1066,7 @@ sample_selection_dialog/sample_selection_dialog
 Sample wählen
 
 sample_selection_dialog/sample_selection_list
-Vorschau\\Name\\Dauer
+Vorschau\\Dauer\\Name
 
 settings_dialog/capture_filename
 
@@ -1689,6 +1689,9 @@ Groß...
 popup_layer_menu/layer_make_track
 In Spur umwandeln
 
+sample_selection_dialog/import
+
+aus Datei importieren
 // Num Language Strings
 191
 // Data (ID,Text)

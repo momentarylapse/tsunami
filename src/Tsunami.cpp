@@ -28,7 +28,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.13.1";
+const string AppVersion = "0.7.13.2";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -105,7 +105,7 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 	// create a window and load file
 	if (sessions.num == 0){
 		Session *session = createSession();
-		session->song->addTrack(SignalType::AUDIO_STEREO);
+		session->song->addTrack(SignalType::AUDIO_MONO);
 
 		// default tags
 		session->song->addTag("title", _("New Audio File"));

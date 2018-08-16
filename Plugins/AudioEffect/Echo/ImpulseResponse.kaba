@@ -79,7 +79,7 @@ class Folding extends AudioEffect
 		//for i in 0:N
 		//	buf[i] = ttt[i] + overlap[i]
 		//buf = ttt.subarray
-		buf = ttt.subarray(0,N)
+		buf = ttt[:N]
 		buf += overlap
 		
 		// overlap = overlap[:-N]
@@ -88,4 +88,4 @@ class Folding extends AudioEffect
 		overlap.resize(overlap.num - N)
 		
 		overlap.resize(K)
-		overlap += ttt.subarray(N, K)
+		overlap += ttt[N:]

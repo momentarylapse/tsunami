@@ -853,6 +853,24 @@ int xop_int_add(int a, int b)
 	return a + b;
 }
 
+
+DynamicArray __ref_subarray__(DynamicArray *a, int start, int end)
+{
+	DynamicArray s;
+	s.init(a->element_size);
+	if (start < 0)
+		start += a->num;
+	if (start < 0)
+		start = 0;
+	if (end < 0)
+		end = a->num;
+	if (end > a->num)
+		end = a->num;
+	s.num = max(end - start, 0);
+	s.data = &((char*)a->data)[a->element_size * start];
+	return s;
+}
+
 void SIAddPackageBase()
 {
 	add_package("base", true);
@@ -903,9 +921,9 @@ void SIAddPackageBase()
 		func_add_param("pointer", TypePointerPs);
 	class_add_func("index", TypeInt, mf(&DynamicArray::index));
 		func_add_param("pointer", TypePointer);*/
-	class_add_func("subarray", TypeDynamicArray, mf(&DynamicArray::ref_subarray));
+	class_add_func("subarray", TypeDynamicArray, (void*)&__ref_subarray__);
 		func_add_param("start", TypeInt);
-		func_add_param("num", TypeInt);
+		func_add_param("end", TypeInt);
 	// low level operations
 	class_add_func("__mem_init__", TypeVoid, mf(&DynamicArray::init));
 		func_add_param("element_size", TypeInt);

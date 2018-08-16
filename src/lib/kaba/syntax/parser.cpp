@@ -177,13 +177,41 @@ Node *SyntaxTree::GetOperandExtensionArray(Node *Operand, Block *block)
 {
 	// array index...
 	Exp.next();
-	Node *index = GetCommand(block);
+	Node *index = nullptr;
+	Node *index2 = nullptr;
+	if (Exp.cur == ":"){
+		index = add_node_const(AddConstant(TypeInt));
+		index->as_const()->as_int() = 0;
+	}else{
+		index = GetCommand(block);
+	}
+	if (Exp.cur == ":"){
+		Exp.next();
+		if (Exp.cur == "]"){
+			index2 = add_node_const(AddConstant(TypeInt));
+			index2->as_const()->as_int() = -1;
+
+		}else{
+			index2 = GetCommand(block);
+		}
+	}
 	if (Exp.cur != "]")
 		DoError("\"]\" expected after array index");
 	Exp.next();
 
+	// subarray() ?
+	if (index2){
+		auto *cf = Operand->type->get_func("subarray", Operand->type, 2, index->type);
+		if (cf){
+			Node *f = add_node_classfunc(cf, ref_node(Operand));
+			f->set_param(0, index);
+			f->set_param(1, index2);
+			return f;
+		}
+	}
+
 	// __get__() ?
-	ClassFunction *cf = Operand->type->get_get(index->type);
+	auto *cf = Operand->type->get_get(index->type);
 	if (cf){
 		Node *f = add_node_classfunc(cf, ref_node(Operand));
 		f->set_param(0, index);

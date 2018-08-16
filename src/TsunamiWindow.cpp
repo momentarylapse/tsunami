@@ -326,6 +326,8 @@ void TsunamiWindow::onTrackRender()
 		session->e(_("Selection range is empty"));
 		return;
 	}
+
+	auto *p = new ProgressCancelable(_(""), this);
 	song->beginActionGroup();
 	Track *t = song->addTrack(SignalType::AUDIO);
 
@@ -333,13 +335,27 @@ void TsunamiWindow::onTrackRender()
 	renderer.prepare(range, false);
 	renderer.allow_tracks(view->get_selected_tracks());
 	renderer.allow_layers(view->get_playable_layers());
-	AudioBuffer buf;
-	t->layers[0]->getBuffers(buf, range);
 
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], range);
-	renderer.read(buf);
-	song->execute(a);
+	int chunk_size = 1<<12;
+	int offset = range.offset;
+
+	while (offset < range.end()){
+		p->set((float)(offset - range.offset) / range.length);
+
+		AudioBuffer buf;
+		Range r = Range(offset, min(chunk_size, range.end() - offset));
+		t->layers[0]->getBuffers(buf, r);
+
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], r);
+		renderer.read(buf);
+		song->execute(a);
+
+		offset += chunk_size;
+		if (p->isCancelled())
+			break;
+	}
 	song->endActionGroup();
+	delete p;
 
 }
 

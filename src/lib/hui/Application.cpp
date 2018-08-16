@@ -240,7 +240,7 @@ void Application::doSingleMainLoop()
 	//SetIdleFunction(NULL);
 	int counter = 0;
 	do{
-		g_main_context_iteration(nullptr, true);
+		g_main_context_iteration(nullptr, false);
 		gtk_main_iteration_do(false);
 		counter ++;
 		if (counter > 5)

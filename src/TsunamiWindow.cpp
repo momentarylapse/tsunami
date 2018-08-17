@@ -331,7 +331,7 @@ void TsunamiWindow::onImportBackup()
 	if (song->is_empty()){
 		session->storage_options = "f32:2:44100";
 		session->storage->load(song, filename);
-		BackupManager::set_save_state(session);
+		//BackupManager::set_save_state(session);
 		session->storage_options = "";
 	}else{
 		Session *s = tsunami->createSession();

@@ -26,6 +26,7 @@ RawConfigData GetRawConfigData(Session *session)
 	if (session->storage_options != ""){
 		auto x = session->storage_options.explode(":");
 		if (x.num >= 3){
+			data.offset = 0;
 			data.format = SampleFormat::SAMPLE_FORMAT_16;
 			if (x[0] == "f32")
 				data.format = SampleFormat::SAMPLE_FORMAT_32_FLOAT;

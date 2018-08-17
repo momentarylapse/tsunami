@@ -388,10 +388,11 @@ void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
 	l->drawBlankBackground(c);
 
 	color cc = l->getBackgroundColor();
+	color cc_sel = l->getBackgroundSelectionColor();
 	if (song->bars.num > 0)
-		l->drawGridBars(c, cc, (l->layer->type == SignalType::BEATS), beat_partition);
+		view->drawGridBars(c, l->area, cc, cc_sel, (l->layer->type == SignalType::BEATS), beat_partition);
 	else
-		view->drawGridTime(c, l->area, cc, false);
+		view->drawGridTime(c, l->area, cc, cc_sel, false);
 
 	if (l->layer->type == SignalType::MIDI){
 		auto mode = l->midi_mode;

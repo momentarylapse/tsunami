@@ -96,7 +96,8 @@ public:
 	void zoomIn();
 	void zoomOut();
 
-	void drawGridTime(Painter *c, const rect &r, const color &bg, bool show_time = false);
+	void drawGridTime(Painter *c, const rect &r, const color &bg, const color &bg_sel, bool show_text);
+	void drawGridBars(Painter *c, const rect &r, const color &bg, const color &bg_sel, bool show_text, int beat_partition);
 	void drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time = false);
 	void drawSelection(Painter *c);
 	void drawBackground(Painter *c);

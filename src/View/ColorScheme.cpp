@@ -49,9 +49,10 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.preview_marker = color(1, 0, 0.7f, 0);
 	c.capture_marker = color(1, 0.7f, 0, 0);
 	c.text_soft1 = ColorInterpolate(background, c.text, pow(0.72f, gamma));
-	c.text_soft3 = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.7f), pow(0.3f, gamma));
+	c.text_soft3 = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.3f), pow(0.3f, gamma));
 	c.text_soft2 = ColorInterpolate(c.text_soft3, c.text_soft1, 0.4f);
-	c.grid = c.text_soft3;
+	c.grid = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.7f), pow(0.2f, gamma));
+	//c.grid = c.text_soft3;
 	c.sample = c.text_soft2;
 	c.sample_selected = c.selection;
 

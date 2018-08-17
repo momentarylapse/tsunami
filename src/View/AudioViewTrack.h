@@ -43,8 +43,8 @@ public:
 	};
 
 	color getBackgroundColor();
+	color getBackgroundSelectionColor();
 	void drawBlankBackground(Painter *c);
-	void drawGridBars(Painter *c, const color &bg, bool show_time, int beat_partition);
 
 	void drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
 	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
@@ -99,6 +99,8 @@ public:
 	int pitch_min, pitch_max;
 	int edit_pitch_min, edit_pitch_max;
 
+	bool is_playable();
+
 
 	float clef_dy;
 	float clef_y0;
@@ -134,6 +136,8 @@ public:
 	bool solo;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
+
+	bool is_playable();
 
 
 	//Array<AudioViewLayer*> layers;

@@ -20,6 +20,8 @@
 #include "../Data/Track.h"
 #include "../Data/Song.h"
 #include "../Data/Sample.h"
+#include "../Data/Rhythm/Bar.h"
+#include "../Data/Rhythm/BarCollection.h"
 #include "../Data/Rhythm/Beat.h"
 #include "../Data/SampleRef.h"
 #include "../Device/OutputStream.h"
@@ -32,6 +34,8 @@
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
+
+string i2s_small(int i); // -> MidiData.cpp
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
@@ -206,7 +210,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dark.text = color(1, 0.95f, 0.95f, 0.95f);
 	dark.selection = color(1, 0.3f, 0.3f, 0.9f);
 	dark.hover = White;
-	dark.gamma = 0.4f;
+	dark.gamma = 0.3f;
 	dark.name = "dark";
 	basic_schemes.add(dark);
 
@@ -625,7 +629,7 @@ void AudioView::updateBufferZoom()
 		}
 }
 
-void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool show_time)
+void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, const color &bg_sel, bool show_time)
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam.scale; // >= 10 pixel
 	double dt = dl / song->sample_rate;
@@ -641,15 +645,23 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 	dt = pow(10, exp_s) / factor;
 	dl = dt * song->sample_rate;
 //	double dw = dl * a->view_zoom;
-	int nx0 = floor(cam.screen2sample(r.x1 - 1) / dl);
+	int nx0 = ceil(cam.screen2sample(r.x1) / dl);
 	int nx1 = ceil(cam.screen2sample(r.x2) / dl);
-	color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
-	color c2 = colors.grid;
+	color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod * 0.8f);
+	color c2 = ColorInterpolate(bg, colors.grid, 0.8f);
+	color c1s = ColorInterpolate(bg_sel, colors.grid, exp_s_mod * 0.8f);
+	color c2s = ColorInterpolate(bg_sel, colors.grid, 0.8f);
+
 	for (int n=nx0; n<nx1; n++){
-		c->setColor(((n % 10) == 0) ? c2 : c1);
-		int xx = cam.sample2screen(n * dl);
+		double sample = n * dl;
+		if (sel.range.is_inside(sample))
+			c->setColor(((n % 10) == 0) ? c2s : c1s);
+		else
+			c->setColor(((n % 10) == 0) ? c2 : c1);
+		int xx = cam.sample2screen(sample);
 		c->drawLine(xx, r.y1, xx, r.y2);
 	}
+
 	if (show_time){
 		if (isPlaybackActive()){
 			color cc = colors.preview_marker;
@@ -670,6 +682,105 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 			}
 		}
 	}
+}
+
+
+void AudioView::drawGridBars(Painter *c, const rect &area, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
+{
+	if (song->bars.num == 0)
+		return;
+	int prev_num_beats = 0;
+	float prev_bpm = 0;
+	int s0 = cam.screen2sample(area.x1 - 1);
+	int s1 = cam.screen2sample(area.x2);
+	//c->SetLineWidth(2.0f);
+	Array<float> dash = {5,4}, no_dash;
+
+
+	//color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
+	//color c2 = colors.grid;
+
+	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
+	Array<Bar*> bars = song->bars.get_bars(Range(s0, s1 - s0));
+	for (Bar *b: bars){
+		if (b->is_pause())
+			continue;
+		int xx = cam.sample2screen(b->range().offset);
+
+		float dx_bar = cam.dsample2screen(b->range().length);
+		float dx_beat = dx_bar / b->num_beats;
+		float f1 = min(1.0f, dx_bar / 40.0f);
+		if ((b->index_text % 5) == 0)
+			f1 = 1;
+		float f2 = min(1.0f, dx_beat / 25.0f);
+
+		if (f1 >= 0.1f){
+			if (sel.range.is_inside(b->range().offset))
+				c->setColor(ColorInterpolate(bg_sel, colors.grid, f1));
+			else
+				c->setColor(ColorInterpolate(bg, colors.grid, f1));
+//			c->setLineDash(no_dash, area.y1);
+			c->drawLine(xx, area.y1, xx, area.y2);
+		}
+
+		if (f2 >= 0.1f){
+			color c1 = ColorInterpolate(bg, colors.grid, f2*0.5f);
+			color c1s = ColorInterpolate(bg_sel, colors.grid, f2*0.5f);
+			float beat_length = (float)b->range().length / (float)b->num_beats;
+//			c->setLineDash(dash, area.y1);
+			for (int i=0; i<b->num_beats; i++){
+				float beat_offset = b->range().offset + (float)i * beat_length;
+				color c2 = ColorInterpolate(bg, c1, 0.6f);
+				color c2s = ColorInterpolate(bg_sel, c1, 0.6f);
+				//c->setColor(c2);
+				for (int j=1; j<beat_partition; j++){
+					double sample = beat_offset + beat_length * j / beat_partition;
+					int x = cam.sample2screen(sample);
+					c->setColor(sel.range.is_inside(sample) ? c2s : c2);
+					c->drawLine(x, area.y1, x, area.y2);
+				}
+				if (i == 0)
+					continue;
+				c->setColor(sel.range.is_inside(beat_offset) ? c1s : c1);
+				int x = cam.sample2screen(beat_offset);
+				c->drawLine(x, area.y1, x, area.y2);
+			}
+		}
+	}
+
+	for (Bar *b: bars){
+		if (b->is_pause())
+			continue;
+		int xx = cam.sample2screen(b->range().offset);
+
+		float dx_bar = cam.dsample2screen(b->range().length);
+		float dx_beat = dx_bar / b->num_beats;
+		float f1 = min(1.0f, dx_bar / 40.0f);
+		if ((b->index_text % 5) == 0)
+			f1 = 1;
+		if (show_time){
+			if (f1 > 0.9f){
+				c->setColor(colors.text_soft2);
+				c->drawStr(xx + 4, area.y1, i2s(b->index_text + 1));
+			}
+			float bpm = b->bpm(song->sample_rate);
+			string s;
+			if (prev_num_beats != b->num_beats)
+				s = i2s(b->num_beats) + "/" + i2s_small(4);
+			if (fabs(prev_bpm - bpm) > 0.5f)
+				s += format(" \u2669=%.0f", bpm);
+			if (s.num > 0){
+				c->setColor(colors.text_soft2);
+				c->setFont("", FONT_SIZE, true, false);
+				c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
+				c->setFont("", FONT_SIZE, false, false);
+			}
+			prev_num_beats = b->num_beats;
+			prev_bpm = bpm;
+		}
+	}
+	//c->setLineDash(no_dash, 0);
+	c->setLineWidth(LINE_WIDTH);
 }
 
 void _try_set_good_cur_layer(AudioView *v)
@@ -963,7 +1074,7 @@ void AudioView::drawBackground(Painter *c)
 	// time scale
 	c->setColor(colors.background_track);
 	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
+	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.background_track, colors.background_track, true);
 
 	// tracks
 	for (AudioViewLayer *l: vlayer)
@@ -974,7 +1085,7 @@ void AudioView::drawBackground(Painter *c)
 		c->setColor(colors.background);
 		rect rr = rect(clip.x1, clip.x2, yy, clip.y2);
 		c->drawRect(rr);
-		drawGridTime(c, rr, colors.background, false);
+		drawGridTime(c, rr, colors.background, colors.background, false);
 	}
 
 	// lines between tracks
@@ -1414,8 +1525,12 @@ bool AudioView::hasAnySoloLayer(Track *t)
 
 Set<TrackLayer*> AudioView::get_playable_layers()
 {
+	auto tracks = get_playable_tracks();
+
 	Set<TrackLayer*> layers;
 	for (Track* t: song->tracks){
+		if (!tracks.contains(t))
+			continue;
 		bool any_solo = hasAnySoloLayer(t);
 		for (auto *l: vlayer)
 			if ((l->layer->track == t) and (l->solo or !any_solo))

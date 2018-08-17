@@ -117,6 +117,7 @@ public:
 	void _cdecl enableStatusbar(bool enabled);
 	//bool _cdecl isStatusbarEnabled();
 	void _cdecl setStatusText(const string &str);
+	void _cdecl setInfoText(const string &str, const Array<string> &options);
 
 	// events by overwriting
 	virtual void _cdecl onMouseMove(){}
@@ -169,7 +170,7 @@ private:
 public:
 	GtkWidget *window;
 private:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar;
+	GtkWidget *vbox, *hbox, *menubar, *statusbar, *infobar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	int desired_width, desired_height;

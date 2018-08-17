@@ -179,6 +179,8 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 #endif
 	gtk_box_pack_start(GTK_BOX(vbox), toolbar[TOOLBAR_TOP]->widget, FALSE, FALSE, 0);
 
+	infobar = nullptr;
+
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
@@ -489,6 +491,74 @@ void Window::enableStatusbar(bool enabled)
 void Window::setStatusText(const string &str)
 {
 	gtk_statusbar_push(GTK_STATUSBAR(statusbar),0,sys_str(str));
+}
+
+static Array<string> __info_bar_responses;
+static int make_info_bar_response(const string &id)
+{
+	foreachi (string &_id, __info_bar_responses, i)
+		if (_id == id)
+			return i + 1234;
+	__info_bar_responses.add(id);
+	return __info_bar_responses.num - 1 + 1234;
+}
+
+void __GtkOnInfoBarResponse(GtkWidget *widget, int response, gpointer data)
+{
+	gtk_widget_destroy(widget);
+	Window *win = (Window*)data;
+
+	int index = response - 1234;
+	if (index >= 0 and index < __info_bar_responses.num){
+		Event e = Event(__info_bar_responses[index], "hui:info");
+		win->_send_event_(&e);
+	}
+	//win->infobar = nullptr;
+	//win->
+}
+
+void Window::setInfoText(const string &str, const Array<string> &options)
+{
+	/*if (infobar)
+		return;*/
+
+
+	infobar = gtk_info_bar_new();
+	gtk_box_pack_start(GTK_BOX(vbox), infobar, FALSE, FALSE, 0);
+	gtk_box_reorder_child(GTK_BOX(vbox), infobar, 2);
+	//gtk_widget_set_no_show_all(infobar, TRUE);
+
+	auto *content_area = gtk_info_bar_get_content_area(GTK_INFO_BAR(infobar));
+	auto *message_label = gtk_label_new("");
+	gtk_label_set_text(GTK_LABEL (message_label), sys_str(str));
+	gtk_container_add(GTK_CONTAINER(content_area), message_label);
+	gtk_widget_show(message_label);
+
+	GtkMessageType type = GTK_MESSAGE_INFO;
+	bool allow_close = false;
+	int num_buttons = 0;
+	for (auto &o: options){
+		if (o == "error")
+			type = GTK_MESSAGE_ERROR;
+		if (o == "warning")
+			type = GTK_MESSAGE_WARNING;
+		if (o == "question")
+			type = GTK_MESSAGE_QUESTION;
+		if (o == "allow-close")
+			allow_close = true;
+		if (o.head(7) == "button:"){
+			auto x = o.explode(":");
+			if (x.num >= 3)
+				gtk_info_bar_add_button(GTK_INFO_BAR(infobar), sys_str(x[2]), make_info_bar_response(x[1]));
+		}
+	}
+	gtk_info_bar_set_message_type(GTK_INFO_BAR(infobar), type);
+	gtk_info_bar_set_show_close_button(GTK_INFO_BAR(infobar), allow_close);
+
+
+	g_signal_connect(infobar, "response", G_CALLBACK(&__GtkOnInfoBarResponse), this);
+
+	gtk_widget_show(infobar);
 }
 
 

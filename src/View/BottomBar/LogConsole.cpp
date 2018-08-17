@@ -18,9 +18,8 @@ LogConsole::LogConsole(Session *session) :
 
 	fromResource("log_console");
 
-	reload();
-
-	log->subscribe3(this, std::bind(&LogConsole::on_log_add, this), Log::MESSAGE_ADD);
+	// only start after this->win is set
+	hui::RunLater(0.01f, [&]{ reload(); });
 }
 
 LogConsole::~LogConsole()
@@ -36,10 +35,19 @@ void console_add_message(LogConsole *lc, Log::Message &m)
 		text = "[global] " + text;
 	if (m.type == Log::Type::ERROR){
 		lc->addString("log_list", "hui:error§§" + text);
-		lc->blink();
+		//lc->blink();
+		lc->win->setInfoText(m.text, {"error", "allow-close"});
 	}else if (m.type == Log::Type::WARNING){
 		lc->addString("log_list", "hui:warning§§" + text);
-		lc->blink();
+		//lc->blink();
+		lc->win->setInfoText(m.text, {"warning", "allow-close"});
+	}else if (m.type == Log::Type::QUESTION){
+		lc->addString("log_list", "hui:question§§" + text);
+		//lc->blink();
+		Array<string> options = {"warning", "allow-close"};
+		for (auto &o: m.responses)
+			options.add("button:" + o);
+		lc->win->setInfoText(m.text, options);
 	}else{
 		lc->addString("log_list", "§§" + text);
 	}
@@ -48,11 +56,15 @@ void console_add_message(LogConsole *lc, Log::Message &m)
 
 void LogConsole::reload()
 {
+	log->unsubscribe(this);
+
 	reset("log_list");
 	auto messages = log->all(session);
 	for (auto &m: messages)
 		console_add_message(this, m);
 	messages_loaded = messages.num;
+
+	log->subscribe3(this, std::bind(&LogConsole::on_log_add, this), Log::MESSAGE_ADD);
 }
 
 void LogConsole::on_log_add()

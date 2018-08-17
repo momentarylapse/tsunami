@@ -78,6 +78,10 @@ void Session::e(const string &message)
 	log->error(this, message);
 }
 
+void Session::q(const string &message, const Array<string> &responses)
+{
+	log->question(this, message, responses);
+}
 
 void Session::executeTsunamiPlugin(const string& name)
 {

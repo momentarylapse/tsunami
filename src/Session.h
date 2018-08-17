@@ -45,6 +45,8 @@ public:
 	AudioView *view;
 	Storage *storage;
 
+	string storage_options;
+
 	SignalChain *signal_chain;
 	SongRenderer *song_renderer;
 	PeakMeter *peak_meter;
@@ -70,6 +72,7 @@ public:
 	void i(const string &msg);
 	void w(const string &msg);
 	void e(const string &msg);
+	void q(const string &msg, const Array<string> &responses);
 
 	static Session *GLOBAL;
 };

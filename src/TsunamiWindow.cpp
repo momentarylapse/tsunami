@@ -210,6 +210,11 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// events
 	event("hui:close", std::bind(&TsunamiWindow::onExit, this));
 
+	for (int i=0; i<256; i++){
+		event("import-backup-"+i2s(i), std::bind(&TsunamiWindow::onImportBackup, this));
+		event("delete-backup-"+i2s(i), std::bind(&TsunamiWindow::onDeleteBackup, this));
+	}
+
 	auto_delete = false;
 
 
@@ -312,6 +317,38 @@ void TsunamiWindow::onAddTimeTrack()
 		session->e(e.message);
 	}
 	song->endActionGroup();
+}
+
+void TsunamiWindow::onImportBackup()
+{
+	string id = hui::GetEvent()->id;
+	int uuid = id.explode(":").back()._int();
+	string filename = BackupManager::get_filename_for_uuid(uuid);
+	if (filename == "")
+		return;
+
+
+	if (song->is_empty()){
+		session->storage_options = "f32:2:44100";
+		session->storage->load(song, filename);
+		BackupManager::set_save_state(session);
+		session->storage_options = "";
+	}else{
+		Session *s = tsunami->createSession();
+		s->storage_options = "f32:2:44100";
+		s->win->show();
+		s->storage->load(s->song, filename);
+		s->storage_options = "";
+	}
+
+	//BackupManager::del
+}
+
+void TsunamiWindow::onDeleteBackup()
+{
+	string id = hui::GetEvent()->id;
+	int uuid = id.explode(":").back()._int();
+	BackupManager::delete_old(uuid);
 }
 
 void TsunamiWindow::onAddMidiTrack()

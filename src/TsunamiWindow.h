@@ -102,6 +102,8 @@ public:
 	void onSelectAll();
 	void onSelectExpand();
 	void onShowLog();
+	void onImportBackup();
+	void onDeleteBackup();
 	void onMenuExecuteAudioEffect();
 	void onMenuExecuteAudioSource();
 	void onMenuExecuteMidiEffect();

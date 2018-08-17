@@ -11,6 +11,7 @@
 #include "../Session.h"
 
 Array<BackupManager::BackupFile> BackupManager::files;
+int BackupManager::next_uuid;
 
 string BackupManager::get_filename(const string &extension)
 {
@@ -47,6 +48,7 @@ void BackupManager::check_old_files(Session *session)
 	auto _files = dir_search(tsunami->directory, "backup-*", false);
 	for (auto &f: _files){
 		BackupFile bf;
+		bf.uuid = next_uuid ++;
 		bf.session = nullptr;
 		bf.f = nullptr;
 		bf.filename = tsunami->directory + f.name;
@@ -56,13 +58,14 @@ void BackupManager::check_old_files(Session *session)
 	// check
 	for (auto &bf: files){
 		if (!bf.session)
-			session->w(_("recording backup found: ") + bf.filename);
+			session->q(_("recording backup found: ") + bf.filename, {format("import-backup-%d:", bf.uuid) + _("import"), format("delete-backup-%d:", bf.uuid) + _("delete")});
 	}
 }
 
 File *BackupManager::create_file(const string &extension, Session *session)
 {
 	BackupFile bf;
+	bf.uuid = -1;//next_uuid ++;
 	bf.session = session;
 	bf.filename = get_filename(extension);
 	session->i(_("creating backup: ") + bf.filename);
@@ -100,6 +103,32 @@ BackupManager::BackupFile* BackupManager::_find_by_file(File *f)
 		if (bf.f == f)
 			return &bf;
 	return nullptr;
+}
+
+BackupManager::BackupFile* BackupManager::_find_by_uuid(int uuid)
+{
+	for (auto &bf: files)
+		if (bf.uuid == uuid)
+			return &bf;
+	return nullptr;
+}
+
+string BackupManager::get_filename_for_uuid(int uuid)
+{
+	auto *bf = _find_by_uuid(uuid);
+	if (bf)
+		return bf->filename;
+	return "";
+}
+
+void BackupManager::delete_old(int uuid)
+{
+	auto *bf = _find_by_uuid(uuid);
+	if (bf){
+		Session::GLOBAL->i(_("deleting backup: ") + bf->filename);
+		file_delete(bf->filename);
+		bf->session = nullptr;
+	}
 }
 
 void BackupManager::_clear_old()

@@ -24,10 +24,12 @@ public:
 	void error(Session *session, const string &message);
 	void warn(Session *session, const string &message);
 	void info(Session *session, const string &message);
+	void question(Session *session, const string &message, const Array<string> &responses);
 
 	enum class Type{
 		ERROR,
 		WARNING,
+		QUESTION,
 		INFO
 	};
 
@@ -36,12 +38,13 @@ public:
 		Session *session;
 		Type type;
 		string text;
+		Array<string> responses;
 	};
 
 	Array<Message> all(Session *session);
 
 private:
-	void addMessage(Session *session, Type type, const string &message);
+	void addMessage(Session *session, Type type, const string &message, const Array<string> &responses);
 	Array<Message> messages;
 };
 

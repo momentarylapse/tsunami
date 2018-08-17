@@ -10,6 +10,8 @@
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../lib/math/math.h"
 #include "../../Data/base.h"
+#include "../../Session.h"
+#include "../../TsunamiWindow.h"
 #include "../Dialog/RawConfigDialog.h"
 
 
@@ -18,17 +20,28 @@ FormatDescriptorRaw::FormatDescriptorRaw() :
 {
 }
 
-RawConfigData GetRawConfigData(hui::Window *win)
+RawConfigData GetRawConfigData(Session *session)
 {
 	RawConfigData data;
-	RawConfigDialog *dlg = new RawConfigDialog(&data, win);
+	if (session->storage_options != ""){
+		auto x = session->storage_options.explode(":");
+		if (x.num >= 3){
+			data.format = SampleFormat::SAMPLE_FORMAT_16;
+			if (x[0] == "f32")
+				data.format = SampleFormat::SAMPLE_FORMAT_32_FLOAT;
+			data.channels = x[1]._int();
+			data.sample_rate = x[2]._int();
+			return data;
+		}
+	}
+	RawConfigDialog *dlg = new RawConfigDialog(&data, session->win);
 	dlg->run();
 	return data;
 }
 
 void FormatRaw::saveViaRenderer(StorageOperationData *od)
 {
-	RawConfigData config = GetRawConfigData(od->win);
+	RawConfigData config = GetRawConfigData(od->session);
 	AudioPort *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
@@ -56,7 +69,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 
 void FormatRaw::loadTrack(StorageOperationData *od)
 {
-	RawConfigData config = GetRawConfigData(od->win);
+	RawConfigData config = GetRawConfigData(od->session);
 
 	char *data = new char[CHUNK_SIZE];
 	File *f = nullptr;

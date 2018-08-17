@@ -8,6 +8,16 @@
 #include "ColorScheme.h"
 #include <math.h>
 
+color col_inter(const color a, const color &b, float t)
+{
+	float e = 0.7f;
+	color c;
+	c.a = 1;//(1-t) * a.a + t * b.a;
+	c.r = pow((1-t) * pow(a.r, e) + t * pow(b.r, e), 1/e);
+	c.g = pow((1-t) * pow(a.g, e) + t * pow(b.g, e), 1/e);
+	c.b = pow((1-t) * pow(a.b, e) + t * pow(b.b, e), 1/e);
+	return c;
+}
 
 
 ColorScheme ColorSchemeBasic::create(bool active) const
@@ -36,8 +46,8 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 
 	//c.background_track_selected = ColorInterpolate(background, c.selection*1.5f, 0.17f);
 	//c.background_track = ColorInterpolate(c.background, c.background_track_selected, 0.5f);
-	c.background_track_selected = ColorInterpolate(background, c.selection*1.2f, 0.15f);
-	c.background_track_selection = ColorInterpolate(background, c.selection*1.2f, 0.4f);
+	c.background_track_selected = col_inter(background, c.selection*1.2f, 0.15f);
+	c.background_track_selection = col_inter(background, c.selection*1.2f, 0.4f);
 	c.background_track = c.background;
 	c.selection_bars = c.selection;
 	c.selection_bars.a = pow(0.2f, gamma);
@@ -48,10 +58,18 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
 	c.preview_marker = color(1, 0, 0.7f, 0);
 	c.capture_marker = color(1, 0.7f, 0, 0);
-	c.text_soft1 = ColorInterpolate(background, c.text, pow(0.72f, gamma));
+	/*c.text_soft1 = ColorInterpolate(background, c.text, pow(0.72f, gamma));
 	c.text_soft3 = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.3f), pow(0.3f, gamma));
 	c.text_soft2 = ColorInterpolate(c.text_soft3, c.text_soft1, 0.4f);
 	c.grid = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.7f), pow(0.2f, gamma));
+*/
+
+	c.text_soft1 = col_inter(background, c.text, 0.72f);
+	c.text_soft3 = col_inter(background, col_inter(c.text, c.selection, 0.3f), 0.3f);
+	c.text_soft2 = col_inter(c.text_soft3, c.text_soft1, 0.4f);
+	c.grid = col_inter(background, col_inter(c.text, c.selection, 0.4f), 0.35f);
+	c.grid_selected = col_inter(c.grid, c.selection, 0.4f);
+
 	//c.grid = c.text_soft3;
 	c.sample = c.text_soft2;
 	c.sample_selected = c.selection;

@@ -36,6 +36,7 @@
 #include "../lib/threads/Mutex.h"
 
 string i2s_small(int i); // -> MidiData.cpp
+color col_inter(const color a, const color &b, float t); // -> ColorScheme.cpp
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
@@ -629,7 +630,7 @@ void AudioView::updateBufferZoom()
 		}
 }
 
-void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, const color &bg_sel, bool show_time)
+void AudioView::drawGridTime(Painter *c, const rect &r, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time)
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam.scale; // >= 10 pixel
 	double dt = dl / song->sample_rate;
@@ -647,10 +648,10 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, const c
 //	double dw = dl * a->view_zoom;
 	int nx0 = ceil(cam.screen2sample(r.x1) / dl);
 	int nx1 = ceil(cam.screen2sample(r.x2) / dl);
-	color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod * 0.8f);
-	color c2 = ColorInterpolate(bg, colors.grid, 0.8f);
-	color c1s = ColorInterpolate(bg_sel, colors.grid, exp_s_mod * 0.8f);
-	color c2s = ColorInterpolate(bg_sel, colors.grid, 0.8f);
+	color c1 = col_inter(bg, fg, exp_s_mod * 0.8f);
+	color c2 = col_inter(bg, fg, 0.8f);
+	color c1s = col_inter(bg_sel, fg, exp_s_mod * 0.8f);
+	color c2s = col_inter(bg_sel, fg_sel, 0.8f);
 
 	for (int n=nx0; n<nx1; n++){
 		double sample = n * dl;
@@ -685,7 +686,7 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, const c
 }
 
 
-void AudioView::drawGridBars(Painter *c, const rect &area, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
+void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
 {
 	if (song->bars.num == 0)
 		return;
@@ -716,22 +717,22 @@ void AudioView::drawGridBars(Painter *c, const rect &area, const color &bg, cons
 
 		if (f1 >= 0.1f){
 			if (sel.range.is_inside(b->range().offset))
-				c->setColor(ColorInterpolate(bg_sel, colors.grid, f1));
+				c->setColor(col_inter(bg_sel, colors.grid_selected, f1));
 			else
-				c->setColor(ColorInterpolate(bg, colors.grid, f1));
+				c->setColor(col_inter(bg, colors.grid, f1));
 //			c->setLineDash(no_dash, area.y1);
 			c->drawLine(xx, area.y1, xx, area.y2);
 		}
 
 		if (f2 >= 0.1f){
-			color c1 = ColorInterpolate(bg, colors.grid, f2*0.5f);
-			color c1s = ColorInterpolate(bg_sel, colors.grid, f2*0.5f);
+			color c1 = col_inter(bg, colors.grid, f2*0.5f);
+			color c1s = col_inter(bg_sel, colors.grid_selected, f2*0.5f);
 			float beat_length = (float)b->range().length / (float)b->num_beats;
 //			c->setLineDash(dash, area.y1);
 			for (int i=0; i<b->num_beats; i++){
 				float beat_offset = b->range().offset + (float)i * beat_length;
-				color c2 = ColorInterpolate(bg, c1, 0.6f);
-				color c2s = ColorInterpolate(bg_sel, c1, 0.6f);
+				color c2 = col_inter(bg, c1, 0.6f);
+				color c2s = col_inter(bg_sel, c1, 0.6f);
 				//c->setColor(c2);
 				for (int j=1; j<beat_partition; j++){
 					double sample = beat_offset + beat_length * j / beat_partition;
@@ -1074,7 +1075,7 @@ void AudioView::drawBackground(Painter *c)
 	// time scale
 	c->setColor(colors.background_track);
 	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.background_track, colors.background_track, true);
+	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.grid, colors.grid, colors.background_track, colors.background_track, true);
 
 	// tracks
 	for (AudioViewLayer *l: vlayer)
@@ -1085,7 +1086,7 @@ void AudioView::drawBackground(Painter *c)
 		c->setColor(colors.background);
 		rect rr = rect(clip.x1, clip.x2, yy, clip.y2);
 		c->drawRect(rr);
-		drawGridTime(c, rr, colors.background, colors.background, false);
+		drawGridTime(c, rr, colors.grid, colors.grid, colors.background, colors.background, false);
 	}
 
 	// lines between tracks

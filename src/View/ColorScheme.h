@@ -43,6 +43,7 @@ public:
 	color text_soft2;
 	color text_soft3;
 	color grid;
+	color grid_selected;
 	color sample;
 	color sample_selected;
 	color high_contrast_a, high_contrast_b;

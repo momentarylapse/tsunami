@@ -408,10 +408,12 @@ void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 
 	color cc = l->getBackgroundColor();
 	color cc_sel = l->getBackgroundSelectionColor();
+	color fg = view->colors.grid;
+	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->drawGridBars(c, l->area, cc, cc_sel, (l->layer->type == SignalType::BEATS), 0);
+		view->drawGridBars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), 0);
 	else
-		view->drawGridTime(c, l->area, cc, cc_sel, false);
+		view->drawGridTime(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
 
 	if (l->layer->type == SignalType::MIDI){

@@ -113,7 +113,12 @@ void ViewModeMidi::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 	auto mode = cur_vlayer()->midi_mode;
 
-	if (creation_mode == CreationMode::SELECT){
+	bool over_sel_note = false;
+	if (hover->note)
+		over_sel_note = view->sel.has(hover->note);
+
+
+	if (creation_mode == CreationMode::SELECT and !over_sel_note){
 		setCursorPos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 

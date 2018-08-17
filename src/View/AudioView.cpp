@@ -717,22 +717,22 @@ void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, cons
 
 		if (f1 >= 0.1f){
 			if (sel.range.is_inside(b->range().offset))
-				c->setColor(col_inter(bg_sel, colors.grid_selected, f1));
+				c->setColor(col_inter(bg_sel, fg_sel, f1));
 			else
-				c->setColor(col_inter(bg, colors.grid, f1));
+				c->setColor(col_inter(bg, fg, f1));
 //			c->setLineDash(no_dash, area.y1);
 			c->drawLine(xx, area.y1, xx, area.y2);
 		}
 
 		if (f2 >= 0.1f){
-			color c1 = col_inter(bg, colors.grid, f2*0.5f);
-			color c1s = col_inter(bg_sel, colors.grid_selected, f2*0.5f);
+			color c1 = col_inter(bg, fg, f2*0.5f);
+			color c1s = col_inter(bg_sel, fg_sel, f2*0.5f);
 			float beat_length = (float)b->range().length / (float)b->num_beats;
 //			c->setLineDash(dash, area.y1);
 			for (int i=0; i<b->num_beats; i++){
 				float beat_offset = b->range().offset + (float)i * beat_length;
 				color c2 = col_inter(bg, c1, 0.6f);
-				color c2s = col_inter(bg_sel, c1, 0.6f);
+				color c2s = col_inter(bg_sel, c1s, 0.6f);
 				//c->setColor(c2);
 				for (int j=1; j<beat_partition; j++){
 					double sample = beat_offset + beat_length * j / beat_partition;
@@ -749,6 +749,7 @@ void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, cons
 		}
 	}
 
+	c->setFont("", FONT_SIZE, true, false);
 	for (Bar *b: bars){
 		if (b->is_pause())
 			continue;
@@ -761,7 +762,7 @@ void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, cons
 			f1 = 1;
 		if (show_time){
 			if (f1 > 0.9f){
-				c->setColor(colors.text_soft2);
+				c->setColor(colors.text_soft1);
 				c->drawStr(xx + 4, area.y1, i2s(b->index_text + 1));
 			}
 			float bpm = b->bpm(song->sample_rate);
@@ -771,15 +772,14 @@ void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, cons
 			if (fabs(prev_bpm - bpm) > 0.5f)
 				s += format(" \u2669=%.0f", bpm);
 			if (s.num > 0){
-				c->setColor(colors.text_soft2);
-				c->setFont("", FONT_SIZE, true, false);
+				c->setColor(colors.text_soft1);
 				c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
-				c->setFont("", FONT_SIZE, false, false);
 			}
 			prev_num_beats = b->num_beats;
 			prev_bpm = bpm;
 		}
 	}
+	c->setFont("", FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);
 	c->setLineWidth(LINE_WIDTH);
 }
@@ -1066,6 +1066,31 @@ void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bo
 	}
 }
 
+void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, AudioView *view)
+{
+	float y = 0;
+	bool sel_any = false;
+	bool same_track = false;
+	if (l1){
+		y = l1->area.y2;
+		sel_any |= view->sel.has(l1->layer);
+	}
+	if (l2){
+		y = l2->area.y1;
+		sel_any |= view->sel.has(l2->layer);
+	}
+	if (l1 and l2){
+		same_track = (l1->layer->track == l2->layer->track);
+	}
+	if (same_track)
+		c->setLineDash({3,10}, 0);
+
+	c->setColor(AudioView::colors.grid);
+	c->drawLine(view->clip.x1, y, view->clip.width(), y);
+	c->setLineDash({}, 0);
+
+}
+
 void AudioView::drawBackground(Painter *c)
 {
 	int yy = 0;
@@ -1090,20 +1115,12 @@ void AudioView::drawBackground(Painter *c)
 	}
 
 	// lines between tracks
-	c->setColor(colors.grid);
-	Array<float> dash_pattern = {5, 3};
-	for (AudioViewLayer *t: vlayer){
-		if (t->layer->is_main)
-			c->setLineDash({}, 0);
-		else
-			c->setLineDash(dash_pattern, 0);
-		c->drawLine(clip.x1, t->area.y1, clip.width(), t->area.y1);
+	AudioViewLayer *prev = nullptr;
+	for (AudioViewLayer *l: vlayer){
+		draw_layer_separator(c, prev, l, this);
+		prev = l;
 	}
-	c->setLineDash({}, 0);
-	if (yy < clip.y2)
-		c->drawLine(clip.x1, yy, clip.width(), yy);
-
-	//DrawGrid(c, r, ColorBackgroundCurWave, true);
+	draw_layer_separator(c, prev, nullptr, this);
 }
 
 void AudioView::drawSelection(Painter *c)

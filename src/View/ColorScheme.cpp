@@ -50,7 +50,7 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.background_track_selection = col_inter(background, c.selection*1.2f, 0.4f);
 	c.background_track = c.background;
 	c.selection_bars = c.selection;
-	c.selection_bars.a = pow(0.2f, gamma);
+	c.selection_bars.a = pow(0.13f, gamma);
 	c.selection_bars_hover = ColorInterpolate(c.selection_bars, hover, 0.5f);
 	c.selection_internal = c.selection;
 	c.selection_internal.a = pow(0.1f, gamma);
@@ -58,12 +58,6 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
 	c.preview_marker = color(1, 0, 0.7f, 0);
 	c.capture_marker = color(1, 0.7f, 0, 0);
-	/*c.text_soft1 = ColorInterpolate(background, c.text, pow(0.72f, gamma));
-	c.text_soft3 = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.3f), pow(0.3f, gamma));
-	c.text_soft2 = ColorInterpolate(c.text_soft3, c.text_soft1, 0.4f);
-	c.grid = ColorInterpolate(background, ColorInterpolate(c.text, c.selection, 0.7f), pow(0.2f, gamma));
-*/
-
 	c.text_soft1 = col_inter(background, c.text, 0.72f);
 	c.text_soft3 = col_inter(background, col_inter(c.text, c.selection, 0.3f), 0.3f);
 	c.text_soft2 = col_inter(c.text_soft3, c.text_soft1, 0.4f);

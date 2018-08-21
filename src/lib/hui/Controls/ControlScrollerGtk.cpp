@@ -20,6 +20,10 @@ ControlScroller::ControlScroller(const string &title, const string &id) :
 	//viewport = gtk_viewport_new(NULL, NULL);
 	//gtk_container_add(GTK_CONTAINER(widget), viewport);
 	//gtk_widget_show(viewport);
+#if GTK_CHECK_VERSION(3,22,0)
+	gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(widget), true);
+	gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(widget), true);
+#endif
 	setOptions(OptionString);
 }
 

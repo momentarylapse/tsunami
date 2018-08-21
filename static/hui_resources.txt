@@ -510,10 +510,16 @@ center,italic
 0
 0
 0
+Scroller
+scroller
+scrollx=no
+1
+0
+1
 Grid
 fx_inner_table
 
-1
+0
 0
 0
 Button

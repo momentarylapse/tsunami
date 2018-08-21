@@ -1716,7 +1716,7 @@ Separator
 0
 Scroller
 ?
-expandx
+expandx,scrolly=no
 2
 0
 1
@@ -5614,13 +5614,13 @@ synth_panel/save_favorite
 
 load parameter
 track-mixer/mute
-
+M
 Mute
 track-mixer/panning
 0
 Balance
 track-mixer/solo
-
+S
 Solo
 track-mixer/volume
 0

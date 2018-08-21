@@ -134,14 +134,7 @@ void write_date()
 
 void msg_write(int i)
 {
-	if (!Verbose)	return;
-	write_date();
-	ShiftRight(file, Shift);
-	if (file)
-		file->write_int(i);
-
-	string s = i2s(i);
-	msg_add_str(s);
+	msg_write(i2s(i));
 }
 
 void msg_write(const string &str)

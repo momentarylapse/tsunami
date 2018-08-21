@@ -180,7 +180,8 @@ void Script::Load(const string &_filename, bool _just_analyse)
 		}
 
 	}catch(FileError &e){
-		DoError("script file not loadable");
+		loading_script_stack.pop();
+		DoError("script file not loadable: " + filename);
 	}catch(Exception &e){
 		loading_script_stack.pop();
 		throw e;

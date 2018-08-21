@@ -332,7 +332,7 @@ string string::no_recursion() const
 	Array<string> p = str.explode("/");
 
 	for (int i=1;i<p.num;i++)
-		if (p[i] == ".."){
+		if ((p[i] == "..") and (p[i-1] != "..")){
 			p.erase(i);
 			p.erase(i - 1);
 			i -= 2;

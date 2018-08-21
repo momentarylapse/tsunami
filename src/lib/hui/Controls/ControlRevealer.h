@@ -18,10 +18,12 @@ class ControlRevealer : public Control
 public:
 	ControlRevealer(const string &text, const string &id);
 
-	virtual void add(Control *child, int x, int y);
+	void add(Control *child, int x, int y) override;
 
-	virtual void reveal(bool reveal);
-	virtual bool isRevealed();
+	void reveal(bool reveal) override;
+	bool isRevealed() override;
+
+	void __setOption(const string &op, const string &value) override;
 };
 
 };

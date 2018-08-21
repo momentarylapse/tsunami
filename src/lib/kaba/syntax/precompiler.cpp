@@ -144,7 +144,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 		Exp.set(0, i);
 		if (Exp.cur[0] == '#'){
 			HandleMacro(i, NumIfDefs, IfDefed, just_analyse);
-		}else if (Exp.line[i].exp[0].name == "use"){
+		}else if (Exp.line[i].exp[0].name == IDENTIFIER_USE){
 			ParseImport();
 			Exp.line.erase(i);
 			i --;

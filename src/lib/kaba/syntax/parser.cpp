@@ -1520,7 +1520,7 @@ void SyntaxTree::ParseImport()
 	string name = Exp.cur;
 	if (name.find(".kaba") >= 0){
 
-		string filename = script->filename.dirname() + name.substr(1, name.num - 2); // remove "
+		string filename = script->filename.dirname() + name.substr(1, name.num - 2); // remove ""
 		filename = filename.no_recursion();
 
 

@@ -25,7 +25,7 @@ const int WIDTH_LARGE = 750;
 
 SideBar::SideBar(Session *session)
 {
-	addRevealer("!slide-left", 0, 0, "revealer");
+	addRevealer("!slide=left", 0, 0, "revealer");
 	setTarget("revealer");
 	addGrid("!noexpandx,width=380,expandy", 0, 0, "root_grid0");
 	setTarget("root_grid0");

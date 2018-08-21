@@ -30,19 +30,6 @@ ControlRevealer::ControlRevealer(const string &title, const string &id) :
 #endif
 
 	setOptions(OptionString);
-
-#if GTK_CHECK_VERSION(3,10,0)
-	if (OptionString.find("slide-up") >= 0)
-		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
-	if (OptionString.find("slide-down") >= 0)
-		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN);
-	if (OptionString.find("slide-left") >= 0)
-		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_LEFT);
-	if (OptionString.find("slide-right") >= 0)
-		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_RIGHT);
-	if (OptionString.find("cross-fade") >= 0)
-		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_CROSSFADE);
-#endif
 }
 
 
@@ -69,6 +56,24 @@ bool ControlRevealer::isRevealed()
 	return gtk_revealer_get_reveal_child(GTK_REVEALER(widget));
 #else
 	return (bool)gtk_expander_get_expanded(GTK_EXPANDER(widget));
+#endif
+}
+
+
+void ControlRevealer::__setOption(const string& op, const string& value)
+{
+#if GTK_CHECK_VERSION(3,10,0)
+	if (op == "slide"){
+		if (value == "up")
+			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
+		else if (value == "down")
+			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN);
+		else if (value == "left")
+			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_LEFT);
+		else if (value == "right")
+			gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_RIGHT);
+	}else if (op == "cross-fade")
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_CROSSFADE);
 #endif
 }
 

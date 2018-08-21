@@ -349,7 +349,7 @@ void ControlDrawingArea::redraw()
 {
 	// non
 	if (std::this_thread::get_id() != main_thread_id){
-		printf("readraw from other thread...redirect\n");
+		//printf("readraw from other thread...redirect\n");
 		hui::RunLater(0, std::bind(&ControlDrawingArea::redraw, this));
 		return;
 	}

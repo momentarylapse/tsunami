@@ -52,6 +52,13 @@ public:
 	Range getMidiEditRange();
 	void startMidiPreview(const Array<int> &pitch, float ttl);
 
+	void edit_add_pause();
+	void edit_add_note_on_string(int hand_pos);
+	void edit_add_note_by_relative(int relative);
+	void edit_backspace();
+	void jump_string(int delta);
+	void jump_octave(int delta);
+
 	int beat_partition;
 	int note_length;
 	ChordType chord_type;

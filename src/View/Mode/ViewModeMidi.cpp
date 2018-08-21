@@ -204,6 +204,54 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 	return n;
 }
 
+void ViewModeMidi::edit_add_pause()
+{
+	Range r = getMidiEditRange();
+	setCursorPos(r.end() + 1, true);
+}
+
+void ViewModeMidi::edit_add_note_by_relative(int relative)
+{
+	Range r = getMidiEditRange();
+	int pitch = pitch_from_octave_and_rel(relative, octave);
+	view->cur_layer()->addMidiNote(make_note(this, r, pitch, modifier));
+	setCursorPos(r.end() + 1, true);
+	startMidiPreview(pitch, 0.1f);
+}
+
+void ViewModeMidi::edit_add_note_on_string(int hand_pos)
+{
+	Range r = getMidiEditRange();
+	int pitch = cur_layer()->track->instrument.string_pitch[string_no] + hand_pos;
+	MidiNote *n = new MidiNote(r, pitch, 1.0f);
+	n->stringno = string_no;
+	cur_layer()->addMidiNote(n);
+	setCursorPos(r.end() + 1, true);
+	startMidiPreview(pitch, 0.1f);
+}
+
+void ViewModeMidi::edit_backspace()
+{
+	int a = song->bars.getPrevSubBeat(view->sel.range.offset-1, beat_partition);
+	Range r = Range(a, view->sel.range.offset-a);
+	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
+	view->song->deleteSelection(s);
+	setCursorPos(a, true);
+}
+
+void ViewModeMidi::jump_string(int delta)
+{
+	string_no = max(min(string_no + delta, cur_layer()->track->instrument.string_pitch.num - 1), 0);
+	view->forceRedraw();
+
+}
+
+void ViewModeMidi::jump_octave(int delta)
+{
+	octave = max(min(octave + delta, 7), 0);
+	view->forceRedraw();
+}
+
 void ViewModeMidi::onKeyDown(int k)
 {
 	auto mode = cur_vlayer()->midi_mode;
@@ -220,61 +268,47 @@ void ViewModeMidi::onKeyDown(int k)
 
 		// add note
 		if ((k >= hui::KEY_A) and (k <= hui::KEY_G)){
-			Range r = getMidiEditRange();
 			int number = (k - hui::KEY_A);
 			int rel[7] = {9,11,0,2,4,5,7};
-			int pitch = pitch_from_octave_and_rel(rel[number], octave);
-			view->cur_layer()->addMidiNote(make_note(this, r, pitch, modifier));
-			setCursorPos(r.end() + 1, true);
-			startMidiPreview(pitch, 0.1f);
+			edit_add_note_by_relative(rel[number]);
 		}
 
 		// add break
-		if (k == hui::KEY_DOT){
-			Range r = getMidiEditRange();
-			setCursorPos(r.end() + 1, true);
-		}
+		if (k == hui::KEY_DOT)
+			edit_add_pause();
+
+		// remove
+		if (k == hui::KEY_BACKSPACE)
+			edit_backspace();
 
 		// select octave
-		if (k == hui::KEY_UP){
-			octave = min(octave + 1, 7);
-			view->forceRedraw();
-		}
-		if (k == hui::KEY_DOWN){
-			octave = max(octave - 1, 0);
-			view->forceRedraw();
-		}
+		if (k == hui::KEY_UP)
+			jump_octave(1);
+		if (k == hui::KEY_DOWN)
+			jump_octave(-1);
 	}else if (mode == MidiMode::TAB){
 
 		// add note
 		if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
-			Range r = getMidiEditRange();
 			int number = (k - hui::KEY_0);
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
-			int pitch = cur_layer()->track->instrument.string_pitch[string_no] + number;
-			MidiNote *n = new MidiNote(r, pitch, 1.0f);
-			n->stringno = string_no;
-			cur_layer()->addMidiNote(n);
-			setCursorPos(r.end() + 1, true);
-			startMidiPreview(pitch, 0.1f);
+			edit_add_note_on_string(number);
 		}
 
 		// add break
-		if (k == hui::KEY_DOT){
-			Range r = getMidiEditRange();
-			setCursorPos(r.end() + 1, true);
-		}
+		if (k == hui::KEY_DOT)
+			edit_add_pause();
+
+		// remove
+		if (k == hui::KEY_BACKSPACE)
+			edit_backspace();
 
 		// select string
-		if (k == hui::KEY_UP){
-			string_no = min(string_no + 1, cur_layer()->track->instrument.string_pitch.num - 1);
-			view->forceRedraw();
-		}
-		if (k == hui::KEY_DOWN){
-			string_no = max(string_no - 1, 0);
-			view->forceRedraw();
-		}
+		if (k == hui::KEY_UP)
+			jump_string(1);
+		if (k == hui::KEY_DOWN)
+			jump_string(-1);
 	}
 
 	//if (k == hui::KEY_ESCAPE)

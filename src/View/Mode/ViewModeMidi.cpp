@@ -284,7 +284,22 @@ void ViewModeMidi::onKeyDown(int k)
 	ViewModeDefault::onKeyDown(k);
 }
 
-float ViewModeMidi::suggest_layer_height(AudioViewLayer *l)
+float ViewModeMidi::layer_min_height(AudioViewLayer *l)
+{
+	if (editing(l)){
+		auto mode = l->midi_mode;
+		if (mode == MidiMode::LINEAR)
+			return 500;
+		else if (mode == MidiMode::CLASSICAL)
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 6;
+		else // TAB
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+	}
+
+	return ViewModeDefault::layer_min_height(l);
+}
+
+float ViewModeMidi::layer_suggested_height(AudioViewLayer *l)
 {
 	if (editing(l)){
 		auto mode = l->midi_mode;
@@ -296,7 +311,7 @@ float ViewModeMidi::suggest_layer_height(AudioViewLayer *l)
 			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 	}
 
-	return ViewModeDefault::suggest_layer_height(l);
+	return ViewModeDefault::layer_suggested_height(l);
 }
 
 void ViewModeMidi::on_cur_layer_change()

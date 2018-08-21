@@ -375,7 +375,12 @@ void ViewModeDefault::onKeyUp(int k)
 {
 }
 
-float ViewModeDefault::suggest_layer_height(AudioViewLayer *l)
+float ViewModeDefault::layer_min_height(AudioViewLayer *l)
+{
+	return view->TIME_SCALE_HEIGHT * 2;
+}
+
+float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 {
 	int n_ch = l->layer->channels;
 	if (l->layer->is_main){

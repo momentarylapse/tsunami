@@ -30,7 +30,8 @@ public:
 	void onMouseMove() override;
 	void onKeyDown(int k) override;
 	void onKeyUp(int k) override;
-	float suggest_layer_height(AudioViewLayer *l) override;
+	float layer_min_height(AudioViewLayer *l) override;
+	float layer_suggested_height(AudioViewLayer *l) override;
 
 
 	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;

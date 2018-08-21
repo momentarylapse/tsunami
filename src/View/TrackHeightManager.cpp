@@ -114,8 +114,8 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 {
 	for (auto *l: v->vlayer){
-		l->height_min =v->TIME_SCALE_HEIGHT * 2;
-		l->height_wish = v->mode->suggest_layer_height(l);
+		l->height_min = v->mode->layer_min_height(l);
+		l->height_wish = v->mode->layer_suggested_height(l);
 	}
 
 	// wanted space

@@ -137,7 +137,12 @@ J new signal chain file format
 J AudioSource into buffer
 J Area.redraw queued after delete
 * midi buffer boxes?
-* load sample from SampleSelection dialog
+J load sample from SampleSelection dialog
+J mixer toggle buttons
+J fx panel scroll
+J midi editing min layer height
+* global scroll bar
+
 
 == midi ed ==
 
@@ -173,5 +178,6 @@ J crash when tuning strings
 J playback: muted at start => always muted
 * playback stop => deadlock?
 J playback no samples?
-* saving....
+J saving crash (samples)
 J playback line hover...
+J mixer v-scroll

@@ -18,7 +18,7 @@ BottomBar::BottomBar(Session *session)
 {
 	addRevealer("!slide=up", 0, 0, "revealer");
 	setTarget("revealer");
-	addGrid("!noexpandy,height=300,expandx", 0, 0, "root_grid0");
+	addGrid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
 	setTarget("root_grid0");
 	addSeparator("!horizontal,expandx", 0, 0, "");
 	addGrid("!expandx", 0, 1, "root_grid");

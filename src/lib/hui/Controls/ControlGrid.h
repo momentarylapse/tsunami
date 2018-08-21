@@ -22,6 +22,7 @@ public:
 	virtual void __setOption(const string &op, const string &value);
 
 	bool button_bar;
+	bool action_bar;
 	bool vertical;
 };
 

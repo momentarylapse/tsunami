@@ -18,6 +18,7 @@ ControlGrid::ControlGrid(const string &title, const string &id, Panel *panel) :
 {
 	vertical = false;
 	button_bar = false;
+	action_bar = false;
 	GetPartStrings(title);
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
@@ -43,6 +44,8 @@ void ControlGrid::add(Control *child, int x, int y)
 		if (width < 0)
 			gtk_widget_set_size_request(child_widget, 100, height);
 		//gtk_widget_set_halign(child_widget, GTK_ALIGN_END);
+	}else if (action_bar){
+		child->setOptions("min-width=25,min-height=25,padding=3");
 	}
 }
 
@@ -53,6 +56,8 @@ void ControlGrid::__setOption(const string &op, const string &value)
 		gtk_widget_set_margin_top(widget, 7);
 		gtk_widget_set_margin_bottom(widget, 4);
 		gtk_widget_set_halign(widget, GTK_ALIGN_END);
+	}else if (op == "actionbar"){
+		action_bar = true;
 	}else if (op == "vertical"){
 		vertical = true;
 	}

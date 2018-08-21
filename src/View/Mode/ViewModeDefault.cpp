@@ -575,7 +575,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::TRACK_HEADER;
 			if (l->layer->track->layers.num > 1)
-				if ((view->mx > l->area.x2 - view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
+				if ((view->mx > l->area.x2 - view->LAYER_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::LAYER_HEADER;
 		}
 	}
@@ -638,7 +638,7 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 	// layer header buttons?
 	if (s.vlayer and (s.type == s.Type::LAYER_HEADER)){
 		AudioViewLayer *l = s.vlayer;
-		int x = l->area.width() - view->TRACK_HANDLE_WIDTH + 5;
+		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5;
 		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
 			s.type = Selection::Type::LAYER_BUTTON_MUTE;
 			return s;

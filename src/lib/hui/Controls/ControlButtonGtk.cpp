@@ -30,6 +30,7 @@ ControlButton::ControlButton(const string &title, const string &id) :
 	if (OptionString.find("link") >= 0){
 		widget = gtk_link_button_new_with_label(sys_str(PartString[0]), sys_str(PartString[0]));
 		g_signal_connect(G_OBJECT(widget), "activate-link", G_CALLBACK(&OnGtkLinkButtonActivate), this);
+		setOptions("padding=4");
 	}else{
 		widget = gtk_button_new_with_label(sys_str(PartString[0]));
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);

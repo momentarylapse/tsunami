@@ -108,6 +108,9 @@ public:
 	void notify(const string &message = "", bool is_default = true);
 
 	void apply_foreach(const string &id, std::function<void(Control*)> f);
+
+private:
+	int min_width, min_height;
 };
 
 

@@ -23,7 +23,6 @@ ControlToggleButton::ControlToggleButton(const string &title, const string &id) 
 	GetPartStrings(title);
 	widget = gtk_toggle_button_new_with_label(sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkToggleButtonToggle), this);
-	//SetInt(id, 0);
 	setOptions(OptionString);
 }
 
@@ -51,6 +50,12 @@ void ControlToggleButton::__check(bool checked)
 bool ControlToggleButton::isChecked()
 {
 	return (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+}
+
+void ControlToggleButton::__setOption(const string &op, const string &value)
+{
+	if (op == "flat")
+		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
 }
 
 };

@@ -45,6 +45,7 @@ const float AudioView::CORNER_RADIUS = 8.0f;
 const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 120;
+const int AudioView::LAYER_HANDLE_WIDTH = 70;
 const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
 const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
 const int AudioView::BARRIER_DIST = 8;

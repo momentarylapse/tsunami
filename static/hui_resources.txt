@@ -1704,7 +1704,7 @@ bold,center
 0
 DrawingArea
 output-peaks
-width=100,height=30,noexpandx,noexpandy
+width=80,height=30,noexpandx,noexpandy
 1
 0
 0
@@ -4296,19 +4296,19 @@ range=0:1:0.001,vertical,expandy
 0
 Grid
 ?
-
+action-bar
 3
 0
 2
-CheckBox
+ToggleButton
 mute
-
+flat
 0
 0
 0
-CheckBox
+ToggleButton
 solo
-
+flat
 1
 0
 0
@@ -7287,13 +7287,13 @@ synth_panel/save_favorite
 
 Parameter speichern
 track-mixer/mute
-
+M
 Stumm
 track-mixer/panning
 0
 Balance
 track-mixer/solo
-
+S
 Solo
 track-mixer/volume
 0

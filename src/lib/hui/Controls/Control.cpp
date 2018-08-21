@@ -67,6 +67,8 @@ Control::Control(int _type, const string &_id)
 #endif
 	grab_focus = false;
 	indent = -1;
+	min_width = -1;
+	min_height = -1;
 }
 
 void unset_widgets_rec(Control *c)
@@ -171,8 +173,9 @@ void Control::setOptions(const string &options)
 {
 	allow_signal_level ++;
 	Array<string> a = options.explode(",");
-	int width = -1;
-	int height = -1;
+
+	gtk_widget_set_name(widget, id.c_str());
+
 	for (string &aa : a){
 		int eq = aa.find("=");
 		string op;
@@ -208,12 +211,15 @@ void Control::setOptions(const string &options)
 			gtk_widget_set_can_focus(widget, true);
 			gtk_widget_grab_focus(widget);
 		}else if (eq >= 0){
+
 			string a1 = aa.tail(aa.num-eq-1);
-			if (op == "width")
-				width = a1._int();
-			else if (op == "height")
-				height = a1._int();
-			else if ((op == "marginleft") or (op == "indent")){
+			if ((op == "width") or (op == "min-width")){
+				min_width = a1._int();
+				gtk_widget_set_size_request(get_frame(), min_width, min_height);
+			}else if ((op == "height") or (op == "min-height")){
+				min_height = a1._int();
+				gtk_widget_set_size_request(get_frame(), min_width, min_height);
+			}else if ((op == "marginleft") or (op == "indent")){
 				indent = a1._int();
 				printf("indent %d\n", indent);
 #if GTK_CHECK_VERSION(3,12,0)
@@ -231,14 +237,32 @@ void Control::setOptions(const string &options)
 				gtk_widget_set_margin_top(get_frame(), a1._int());
 			}else if (op == "marginbottom"){
 				gtk_widget_set_margin_bottom(get_frame(), a1._int());
+			}else if (op == "padding"){
+				string css = "#" + id + format("{padding: %dpx}", a1._int());
+				//msg_write(css);
+				GError *error = nullptr;
+
+				auto *css_provider = gtk_css_provider_new();
+				gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num, &error);
+				if (error)
+					msg_error(string("css: ") + error->message);
+
+
+				auto *context = gtk_widget_get_style_context(widget);
+				gtk_style_context_add_provider(context,
+								                                GTK_STYLE_PROVIDER(css_provider),
+																GTK_STYLE_PROVIDER_PRIORITY_USER);
+				/*gtk_style_context_add_provider_for_screen
+				                               (gdk_screen_get_default(),
+				                                GTK_STYLE_PROVIDER(css_provider),
+												GTK_STYLE_PROVIDER_PRIORITY_USER);*/
 			}else{
 				__setOption(op, a1);
 			}
 		}else
 			__setOption(op, "");
 	}
-	if ((width >= 0) or (height >= 0))
-		gtk_widget_set_size_request(get_frame(), width, height);
+
 	allow_signal_level --;
 }
 

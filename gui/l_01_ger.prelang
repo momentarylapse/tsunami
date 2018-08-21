@@ -1144,7 +1144,7 @@ synth_panel/save_favorite
 
 Parameter speichern
 track-mixer/mute
-
+M
 Stumm
 track-mixer/panning
 0
@@ -1681,7 +1681,7 @@ popup_fx_menu/save_favorite
 Parameter speichern
 
 track-mixer/solo
-
+S
 Solo
 popup_fx_menu/show_large
 Groß...

@@ -17,11 +17,12 @@ class ControlToggleButton : public Control
 {
 public:
 	ControlToggleButton(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void setImage(const string &str);
-	virtual void __check(bool checked);
-	virtual bool isChecked();
+	string getString() override;
+	void __setString(const string &str) override;
+	void setImage(const string &str) override;
+	void __check(bool checked) override;
+	bool isChecked() override;
+	void __setOption(const string &op, const string &value) override;
 };
 
 };

@@ -47,8 +47,8 @@ Exception::Exception(const Asm::Exception &e, Script *s) :
 
 static int shift_right=0;
 
-Array<Script*> PublicScript;
-Array<Script*> DeadScript;
+Array<Script*> _public_scripts_;
+Array<Script*> _dead_scripts_;
 
 
 
@@ -60,7 +60,7 @@ Script *Load(const string &filename, bool just_analyse)
 	Script *s = nullptr;
 
 	// already loaded?
-	for (Script *ps: PublicScript)
+	for (Script *ps: _public_scripts_)
 		if (ps->filename == filename.sys_filename())
 			return ps;
 	
@@ -74,7 +74,7 @@ Script *Load(const string &filename, bool just_analyse)
 	}
 
 	// store script in database
-	PublicScript.add(s);
+	_public_scripts_.add(s);
 	return s;
 }
 
@@ -101,33 +101,34 @@ void Remove(Script *s)
 		i->reference_counter --;
 
 	// put on to-delete-list
-	DeadScript.add(s);
+	_dead_scripts_.add(s);
 
 	// remove from normal list
-	for (int i=0;i<PublicScript.num;i++)
-		if (PublicScript[i] == s)
-			PublicScript.erase(i);
+	for (int i=0;i<_public_scripts_.num;i++)
+		if (_public_scripts_[i] == s)
+			_public_scripts_.erase(i);
 
 	// delete all deletables
-	for (int i=DeadScript.num-1;i>=0;i--)
-		if (DeadScript[i]->reference_counter <= 0){
-			delete(DeadScript[i]);
-			DeadScript.erase(i);
+	for (int i=_dead_scripts_.num-1;i>=0;i--)
+		if (_dead_scripts_[i]->reference_counter <= 0){
+			delete(_dead_scripts_[i]);
+			_dead_scripts_.erase(i);
 		}
 }
 
 void DeleteAllScripts(bool even_immortal, bool force)
 {
 	// try to erase them...
-	foreachb(Script *s, PublicScript)
+	auto to_del = _public_scripts_;
+	foreachb(Script *s, to_del)
 		if ((!s->syntax->flag_immortal) or even_immortal)
 			Remove(s);
 
 	// undead... really KILL!
 	if (force){
-		foreachb(Script *s, DeadScript)
+		foreachb(Script *s, _dead_scripts_)
 			delete(s);
-		DeadScript.clear();
+		_dead_scripts_.clear();
 	}
 
 	//ScriptResetSemiExternalData();
@@ -141,12 +142,10 @@ void DeleteAllScripts(bool even_immortal, bool force)
 }
 
 
-extern Array<Script*> PublicScript;
-
 Class *GetDynamicType(const void *p)
 {
 	VirtualTable *pp = *(VirtualTable**)p;
-	for (Script *s: PublicScript){
+	for (Script *s: _public_scripts_){
 		for (Class *t: s->syntax->classes){
 			if (t->vtable.data == pp)
 				return t;

@@ -209,7 +209,7 @@ void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *
 	module_subtype = sub_type;
 	plugin = _plugin;
 	if (plugin)
-		usable = plugin->usable;
+		usable = plugin->usable(session);
 
 	reset_config();
 	reset_state();

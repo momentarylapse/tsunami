@@ -17,16 +17,8 @@ Plugin::Plugin(const string &_filename, ModuleType _type)
 	type = _type;
 	filename = _filename;
 	index = -1;
-	usable = false;
 
-	// load + compile
-	try{
-		s = Kaba::Load(filename);
-
-		usable = true;
-	}catch(Kaba::Exception &e){
-		error_message = e.message();
-	}
+	file_date = -1;
 }
 
 string Plugin::get_error()
@@ -34,9 +26,50 @@ string Plugin::get_error()
 	return format(_("Error in script file: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
 }
 
+bool Plugin::file_changed()
+{
+	int new_date = -1;
+	try{
+		File *f = FileOpen(filename);
+		new_date = f->GetDateModification().time;
+		if (new_date != file_date){
+			file_date = new_date;
+			return true;
+		}
+	}catch(...){}
+	return false;
+
+}
+
+void Plugin::recompile(Session *session)
+{
+	session->i(_("compiling script: ") + filename);
+
+	if (s){
+		Kaba::Remove(s);
+		s = nullptr;
+	}
+
+	// load + compile
+	try{
+		s = Kaba::Load(filename);
+
+	}catch(Kaba::Exception &e){
+		error_message = e.message();
+		session->e(get_error());
+	}
+}
+
+bool Plugin::usable(Session *session)
+{
+	if (file_changed())
+		recompile(session);
+	return s;
+}
+
 void *Plugin::create_instance(Session *session, const string &root_type)
 {
-	if (!usable)
+	if (!usable(session))
 		return nullptr;
 
 	for (auto *t : s->syntax->classes){

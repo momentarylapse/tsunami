@@ -54,7 +54,7 @@ struct StackFrameInfo
 };
 
 
-extern Array<Script*> PublicScript;
+extern Array<Script*> _public_scripts_;
 
 inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, bool from_package)
 {
@@ -83,7 +83,7 @@ StackFrameInfo get_func_from_rip(void *rip)
 	r.offset = 1000000;
 
 	// compiled functions
-	for (Script* s: PublicScript){
+	for (Script* s: _public_scripts_){
 		if ((rip < s->opcode) or (rip > &s->opcode[s->opcode_size]))
 			continue;
 		func_from_rip_test_script(r, s, rip, false);
@@ -186,7 +186,7 @@ Class* get_type(void *p)
 	if (!p)
 		return TypeUnknown;
 	void *vtable = *(void**)p;
-	Array<Script*> scripts = PublicScript;
+	Array<Script*> scripts = _public_scripts_;
 	for (auto p: Packages)
 		scripts.add(p.script);
 	for (Script* s: scripts)

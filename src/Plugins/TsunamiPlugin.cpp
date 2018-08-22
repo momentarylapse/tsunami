@@ -60,10 +60,7 @@ void TsunamiPlugin::stop()
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
 	Plugin *p = session->plugin_manager->GetPlugin(session, ModuleType::TSUNAMI_PLUGIN, name);
-	TsunamiPlugin *t = nullptr;
-
-	if (p->usable)
-		t = (TsunamiPlugin*)p->create_instance(session, "TsunamiPlugin");
+	TsunamiPlugin *t = (TsunamiPlugin*)p->create_instance(session, "TsunamiPlugin");
 
 	// dummy?
 	if (!t)

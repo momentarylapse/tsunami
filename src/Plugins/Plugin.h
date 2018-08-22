@@ -25,14 +25,18 @@ public:
 	Plugin(const string &_filename, ModuleType type);
 
 	string filename;
+	int file_date;
 	int index;
 	Kaba::Script *s;
 
-	bool usable;
+	bool usable(Session *session);
 	ModuleType type;
 	string error_message;
 
 	string get_error();
+
+	bool file_changed();
+	void recompile(Session *session);
 
 	void *create_instance(Session *session, const string &root_type);
 };

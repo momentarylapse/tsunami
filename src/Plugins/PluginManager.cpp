@@ -672,8 +672,6 @@ Plugin *PluginManager::GetPlugin(Session *session, ModuleType type, const string
 	for (PluginFile &pf: plugin_files){
 		if ((pf.name == name) and (pf.type == type)){
 			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
-			if (!p->usable)
-				session->e(p->get_error());
 			return p;
 		}
 	}

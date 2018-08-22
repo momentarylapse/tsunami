@@ -34,6 +34,7 @@
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
+#include "Helper/ScrollBar.h"
 
 string i2s_small(int i); // -> MidiData.cpp
 color col_inter(const color a, const color &b, float t); // -> ColorScheme.cpp
@@ -48,21 +49,12 @@ const int AudioView::TRACK_HANDLE_WIDTH = 120;
 const int AudioView::LAYER_HANDLE_WIDTH = 70;
 const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
 const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
-const int AudioView::BARRIER_DIST = 8;
+const int AudioView::SCROLLBAR_WIDTH = 20;
+const int AudioView::SNAPPING_DIST = 8;
 ColorSchemeBasic AudioView::basic_colors;
 ColorScheme AudioView::colors;
 
 extern hui::Timer debug_timer;
-
-int get_track_index_save(Song *song, Track *t)
-{
-	if (t){
-		foreachi(Track *tt, song->tracks, i)
-			if (t == tt)
-				return i;
-	}
-	return -1;
-}
 
 
 const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
@@ -216,7 +208,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dark.name = "dark";
 	basic_schemes.add(dark);
 
-	setColorScheme(hui::Config.getStr("View.ColorScheme", "bright"));
+	set_color_scheme(hui::Config.getStr("View.ColorScheme", "bright"));
 
 	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
 
@@ -242,12 +234,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	area = rect(0, 1024, 0, 768);
 	enabled = true;
+	scroll = new ScrollBar;
 
 	detail_steps = hui::Config.getInt("View.DetailSteps", 1);
 	msp.min_move_to_select = hui::Config.getInt("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = hui::Config.getInt("PreviewSleepTime", 10);
-	ScrollSpeed = hui::Config.getInt("View.ScrollSpeed", 300);
-	ScrollSpeedFast = hui::Config.getInt("View.ScrollSpeedFast", 3000);
+	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
+	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
 	ZoomSpeed = hui::Config.getFloat("View.ZoomSpeed", 0.1f);
 	mouse_wheel_speed = hui::Config.getFloat("View.MouseWheelSpeed", 1.0f);
 	antialiasing = hui::Config.getBool("View.Antialiasing", false);
@@ -308,7 +301,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_bar = hui::CreateResourceMenu("popup_bar_menu");
 
 	//ForceRedraw();
-	updateMenu();
+	update_menu();
 }
 
 AudioView::~AudioView()
@@ -316,6 +309,8 @@ AudioView::~AudioView()
 	stream->unsubscribe(this);
 
 	song->unsubscribe(this);
+
+	delete(scroll);
 
 	delete(mode_curve);
 	delete(mode_scale_bars);
@@ -353,7 +348,7 @@ AudioView::~AudioView()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void AudioView::setColorScheme(const string &name)
+void AudioView::set_color_scheme(const string &name)
 {
 	hui::Config.setStr("View.ColorScheme", name);
 	basic_colors = basic_schemes[0];
@@ -362,21 +357,21 @@ void AudioView::setColorScheme(const string &name)
 			basic_colors = b;
 
 	colors = basic_colors.create(true);
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::setMode(ViewMode *m)
 {
 	mode = m;
 	thm.dirty = true;
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::setScale(const Scale &s)
 {
 	midi_scale = s;
 	notify(MESSAGE_SETTINGS_CHANGE);
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::setMouse()
@@ -416,7 +411,7 @@ void AudioView::updateSelection()
 			stop();
 		}
 	}
-	forceRedraw();
+	force_redraw();
 
 	notify(MESSAGE_SELECTION_CHANGE);
 }
@@ -451,7 +446,7 @@ Range AudioView::getPlaybackSelection(bool for_recording)
 
 void AudioView::snap_to_grid(int &pos)
 {
-	int dmin = BARRIER_DIST;
+	int dmin = SNAPPING_DIST;
 	bool found = false;
 	int new_pos;
 
@@ -498,7 +493,7 @@ void AudioView::onMouseMove()
 			msp.stop();
 		}
 	}
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::onLeftButtonDown()
@@ -506,8 +501,8 @@ void AudioView::onLeftButtonDown()
 	setMouse();
 	mode->onLeftButtonDown();
 
-	forceRedraw();
-	updateMenu();
+	force_redraw();
+	update_menu();
 }
 
 void align_to_beats(Song *s, Range &r, int beat_partition)
@@ -536,8 +531,8 @@ void AudioView::onLeftButtonUp()
 {
 	mode->onLeftButtonUp();
 
-	forceRedraw();
-	updateMenu();
+	force_redraw();
+	update_menu();
 }
 
 
@@ -569,8 +564,8 @@ void AudioView::onRightButtonUp()
 void AudioView::onLeftDoubleClick()
 {
 	mode->onLeftDoubleClick();
-	forceRedraw();
-	updateMenu();
+	force_redraw();
+	update_menu();
 }
 
 
@@ -599,18 +594,18 @@ void AudioView::onMouseWheel()
 }
 
 
-void AudioView::forceRedraw()
+void AudioView::force_redraw()
 {
 	win->redraw(id);
 	//win->redrawRect(id, rect(200, 300, 0, area.y2));
 }
 
-void AudioView::forceRedrawPart(const rect &r)
+void AudioView::force_redraw_part(const rect &r)
 {
 	win->redrawRect(id, r);
 }
 
-void AudioView::unselectAllSamples()
+void AudioView::unselect_all_samples()
 {
 	sel.samples.clear();
 }
@@ -631,7 +626,7 @@ void AudioView::updateBufferZoom()
 		}
 }
 
-void AudioView::drawGridTime(Painter *c, const rect &r, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time)
+void AudioView::draw_grid_time(Painter *c, const rect &r, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time)
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam.scale; // >= 10 pixel
 	double dt = dl / song->sample_rate;
@@ -687,7 +682,7 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &fg, const c
 }
 
 
-void AudioView::drawGridBars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
+void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
 {
 	if (song->bars.num == 0)
 		return;
@@ -837,10 +832,10 @@ void AudioView::onSongUpdate()
 				sel.add(l);
 		}
 		checkConsistency();
-		optimizeView();
+		optimize_view();
 	}else if (song->cur_message() == song->MESSAGE_FINISHED_LOADING){
-		optimizeView();
-		hui::RunLater(0.5f, std::bind(&AudioView::optimizeView, this));
+		optimize_view();
+		hui::RunLater(0.5f, std::bind(&AudioView::optimize_view, this));
 	}else{
 		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
 			updateTracks();
@@ -848,8 +843,8 @@ void AudioView::onSongUpdate()
 			updateTracks();
 		if (song->cur_message() == song->MESSAGE_CHANGE_CHANNELS)
 			updateTracks();
-		forceRedraw();
-		updateMenu();
+		force_redraw();
+		update_menu();
 	}
 
 	if (song->cur_message() == MESSAGE_CHANGE)
@@ -860,7 +855,7 @@ void AudioView::onSongUpdate()
 void AudioView::onStreamUpdate()
 {
 	cam.make_sample_visible(playbackPos());
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::onStreamStateChange()
@@ -880,7 +875,7 @@ void AudioView::onUpdate()
 {
 	checkConsistency();
 
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::update_peaks_now(AudioBuffer &buf)
@@ -1053,16 +1048,16 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg)
 	draw_cursor_hover(c, msg, mx, my);
 }
 
-void AudioView::drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time)
+void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time)
 {
 	int p = cam.sample2screen(pos);
-	if ((p >= area.x1) and (p <= area.x2)){
+	if ((p >= song_area.x1) and (p <= song_area.x2)){
 		color cc = (type == (int)hover.type) ? colors.selection_boundary_hover : col;
 		c->setColor(cc);
 		c->setLineWidth(2.0f);
-		c->drawLine(p, area.y1, p, area.y2);
+		c->drawLine(p, song_area.y1, p, song_area.y2);
 		if (show_time)
-			draw_boxed_str(c,  p, (area.y1 + area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
+			draw_boxed_str(c,  p, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
 		c->setLineWidth(1.0f);
 	}
 }
@@ -1087,32 +1082,27 @@ void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, Au
 		c->setLineDash({3,10}, 0);
 
 	c->setColor(AudioView::colors.grid);
-	c->drawLine(view->clip.x1, y, view->clip.width(), y);
+	c->drawLine(view->song_area.x1, y, view->song_area.x2, y);
 	c->setLineDash({}, 0);
 
 }
 
-void AudioView::drawBackground(Painter *c)
+void AudioView::draw_background(Painter *c)
 {
-	int yy = 0;
+	int yy = song_area.y1;
 	if (vlayer.num > 0)
 		yy = vlayer.back()->area.y2;
-
-	// time scale
-	c->setColor(colors.background_track);
-	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.grid, colors.grid, colors.background_track, colors.background_track, true);
 
 	// tracks
 	for (AudioViewLayer *l: vlayer)
 		mode->drawLayerBackground(c, l);
 
 	// free space below tracks
-	if (yy < clip.y2){
+	if (yy < song_area.y2){
 		c->setColor(colors.background);
-		rect rr = rect(clip.x1, clip.x2, yy, clip.y2);
+		rect rr = rect(song_area.x1, song_area.x2, yy, song_area.y2);
 		c->drawRect(rr);
-		drawGridTime(c, rr, colors.grid, colors.grid, colors.background, colors.background, false);
+		draw_grid_time(c, rr, colors.grid, colors.grid, colors.background, colors.background, false);
 	}
 
 	// lines between tracks
@@ -1124,17 +1114,24 @@ void AudioView::drawBackground(Painter *c)
 	draw_layer_separator(c, prev, nullptr, this);
 }
 
-void AudioView::drawSelection(Painter *c)
+void AudioView::draw_time_scale(Painter *c)
+{
+	c->setColor(colors.background_track);
+	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
+	draw_grid_time(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.grid, colors.grid, colors.background_track, colors.background_track, true);
+}
+
+void AudioView::draw_selection(Painter *c)
 {
 	// time selection
 	int sx1 = cam.sample2screen(sel.range.start());
 	int sx2 = cam.sample2screen(sel.range.end());
-	int sxx1 = clampi(sx1, clip.x1, clip.x2);
-	int sxx2 = clampi(sx2, clip.x1, clip.x2);
+	int sxx1 = clampi(sx1, song_area.x1, song_area.x2);
+	int sxx2 = clampi(sx2, song_area.x1, song_area.x2);
 	c->setColor(colors.selection_internal);
-	c->drawRect(rect(sxx1, sxx2, clip.y1, clip.y1 + TIME_SCALE_HEIGHT));
-	drawTimeLine(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
+	c->drawRect(rect(sxx1, sxx2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
+	draw_time_line(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
+	draw_time_line(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
 
 	if (!hide_selection){
 		if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
@@ -1196,17 +1193,23 @@ void AudioView::drawSelection(Painter *c)
 	}
 }
 
-void AudioView::drawAudioFile(Painter *c)
+void AudioView::draw_song(Painter *c)
 {
 	bool slow_repeat = false;
-	bool animating = thm.update(this, song, area);
+	song_area = area;
+	song_area.y1 += TIME_SCALE_HEIGHT;
+	song_area.x1 += SCROLLBAR_WIDTH;
+	bool animating = thm.update(this, song, song_area);
 
 	cam.update(0.1f);
 
 	updateBufferZoom();
 
-	// background
-	drawBackground(c);
+	draw_time_scale(c);
+
+	c->clip(song_area);
+
+	draw_background(c);
 
 	// tracks
 	for (AudioViewLayer *t: vlayer)
@@ -1214,14 +1217,19 @@ void AudioView::drawAudioFile(Painter *c)
 	for (AudioViewTrack *t: vtrack)
 		t->draw(c);
 
+	c->clip(clip);
+
 
 	// selection
-	drawSelection(c);
+	draw_selection(c);
+
+	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
+	scroll->draw(c, hover.type == hover.Type::SCROLLBAR_GLOBAL);
 
 
 	// playing/capturing position
 	if (isPlaybackActive())
-		drawTimeLine(c, playbackPos(), (int)Selection::Type::PLAYBACK, colors.preview_marker, true);
+		draw_time_line(c, playbackPos(), (int)Selection::Type::PLAYBACK, colors.preview_marker, true);
 
 	mode->drawPost(c);
 
@@ -1232,7 +1240,7 @@ void AudioView::drawAudioFile(Painter *c)
 		animating = true;
 
 	if (animating or slow_repeat)
-		hui::RunLater(animating ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
+		hui::RunLater(animating ? 0.03f : 0.2f, std::bind(&AudioView::force_redraw, this));
 }
 
 int frame = 0;
@@ -1252,7 +1260,7 @@ void AudioView::onDraw(Painter *c)
 	//c->setColor(ColorWaveCur);
 
 	if (enabled)
-		drawAudioFile(c);
+		draw_song(c);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
@@ -1262,7 +1270,7 @@ void AudioView::onDraw(Painter *c)
 	PerformanceMonitor::end_busy(perf_channel);
 }
 
-void AudioView::optimizeView()
+void AudioView::optimize_view()
 {
 	if (area.x2 <= 0)
 		area.x2 = 1024;
@@ -1275,7 +1283,7 @@ void AudioView::optimizeView()
 	cam.show(r);
 }
 
-void AudioView::updateMenu()
+void AudioView::update_menu()
 {
 	// view
 	win->check("view_midi_default", midi_view_mode == MidiMode::LINEAR);
@@ -1311,7 +1319,7 @@ void AudioView::setMidiViewMode(MidiMode mode)
 		l->set_midi_mode(mode);
 	//forceRedraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
-	updateMenu();
+	update_menu();
 }
 
 void AudioView::zoomIn()
@@ -1389,7 +1397,7 @@ void AudioView::selectSample(SampleRef *s, bool diff)
 		sel.set(s, !sel.has(s));
 	}else{
 		if (!sel.has(s))
-			unselectAllSamples();
+			unselect_all_samples();
 
 		// select this sub
 		sel.add(s);
@@ -1401,7 +1409,7 @@ void AudioView::setCurSample(SampleRef *s)
 	if (cur_sample == s)
 		return;
 	cur_sample = s;
-	forceRedraw();
+	force_redraw();
 	notify(MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
@@ -1440,7 +1448,7 @@ void AudioView::setCurLayer(AudioViewLayer *l)
 
 	if (cur_vlayer != prev_vlayer){
 		mode->on_cur_layer_change();
-		forceRedraw();
+		force_redraw();
 		notify(MESSAGE_CUR_LAYER_CHANGE);
 	}
 	if (cur_track() != prev_track)
@@ -1472,7 +1480,7 @@ void AudioView::play(const Range &range, bool allow_loop)
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	//stream->play();
 	session->signal_chain->start();
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::stop()
@@ -1483,7 +1491,7 @@ void AudioView::stop()
 	//stream->stop();
 	playback_active = false;
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	forceRedraw();
+	force_redraw();
 }
 
 void AudioView::pause(bool _pause)

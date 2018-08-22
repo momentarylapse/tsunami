@@ -41,6 +41,7 @@ class ViewModeMidi;
 class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
+class ScrollBar;
 class Session;
 
 
@@ -59,8 +60,8 @@ public:
 	virtual ~AudioView();
 
 	void checkConsistency();
-	void forceRedraw();
-	void forceRedrawPart(const rect &r);
+	void force_redraw();
+	void force_redraw_part(const rect &r);
 
 	void onDraw(Painter *p);
 	void onMouseMove();
@@ -96,12 +97,13 @@ public:
 	void zoomIn();
 	void zoomOut();
 
-	void drawGridTime(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text);
-	void drawGridBars(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text, int beat_partition);
-	void drawTimeLine(Painter *c, int pos, int type, const color &col, bool show_time = false);
-	void drawSelection(Painter *c);
-	void drawBackground(Painter *c);
-	void drawAudioFile(Painter *c);
+	void draw_time_scale(Painter *c);
+	void draw_grid_time(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text);
+	void draw_grid_bars(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text, int beat_partition);
+	void draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time = false);
+	void draw_selection(Painter *c);
+	void draw_background(Painter *c);
+	void draw_song(Painter *c);
 
 	static rect get_boxed_str_rect(Painter *c, float x, float y, const string &str);
 	static void draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg);
@@ -109,15 +111,15 @@ public:
 	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my);
 	void draw_cursor_hover(Painter *c, const string &msg);
 
-	void optimizeView();
-	void updateMenu();
+	void optimize_view();
+	void update_menu();
 
 	string id;
 
 	Array<ColorSchemeBasic> basic_schemes;
 	static ColorSchemeBasic basic_colors;
 	static ColorScheme colors;
-	void setColorScheme(const string &name);
+	void set_color_scheme(const string &name);
 
 	static const int SAMPLE_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;
@@ -129,7 +131,8 @@ public:
 	static const int LAYER_HANDLE_WIDTH;
 	static const int TRACK_HANDLE_HEIGHT;
 	static const int TRACK_HANDLE_HEIGHT_SMALL;
-	static const int BARRIER_DIST;
+	static const int SCROLLBAR_WIDTH;
+	static const int SNAPPING_DIST;
 
 	Selection hover;
 	SongSelection sel;
@@ -148,7 +151,7 @@ public:
 
 	void snap_to_grid(int &pos);
 
-	void _cdecl unselectAllSamples();
+	void _cdecl unselect_all_samples();
 
 	bool enabled;
 	void enable(bool enabled);
@@ -242,10 +245,13 @@ public:
 	bool bars_edit_data;
 
 	rect area;
+	rect song_area;
 	rect clip;
 	TrackHeightManager thm;
 
 	ViewPort cam;
+
+	ScrollBar *scroll;
 
 	Array<AudioViewTrack*> vtrack;
 	Array<AudioViewLayer*> vlayer;

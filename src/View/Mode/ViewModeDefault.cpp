@@ -21,6 +21,7 @@
 #include "../../Data/Track.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
+#include "../Helper/ScrollBar.h"
 #include "../../lib/hui/Controls/Control.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
@@ -92,6 +93,8 @@ void ViewModeDefault::onLeftButtonDown()
 		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
 	}else if (hover->type == Selection::Type::TRACK_HEADER){
 		view->msp.start(hover->pos, hover->y0);
+	}else if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
+		view->scroll->drag_start(view->mx, view->my);
 	}
 }
 
@@ -185,7 +188,7 @@ void ViewModeDefault::onRightButtonDown()
 	}
 
 	// pop up menu...
-	view->updateMenu();
+	view->update_menu();
 
 	if (hover->type == Selection::Type::SAMPLE){
 		view->menu_sample->open_popup(view->win);
@@ -253,6 +256,11 @@ void ViewModeDefault::onMouseMove()
 				cam->move(10 / cam->scale);
 		}
 
+		if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
+			view->scroll->drag_update(view->mx, view->my);
+			view->thm.update_immediately(view, view->song, view->song_area);
+		}
+
 		view->selectionUpdatePos(view->hover);
 	}else{
 		//Selection hover_old = *hover;
@@ -303,7 +311,7 @@ void ViewModeDefault::onMouseMove()
 	}
 
 	if (_force_redraw_)
-		view->forceRedraw();
+		view->force_redraw();
 }
 
 void ViewModeDefault::onMouseWheel()
@@ -372,7 +380,7 @@ void ViewModeDefault::onKeyDown(int k)
 			dnd_stop();
 	}
 
-	view->updateMenu();
+	view->update_menu();
 }
 
 void ViewModeDefault::onKeyUp(int k)
@@ -420,9 +428,9 @@ void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->drawGridBars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), 0);
+		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), 0);
 	else
-		view->drawGridTime(c, l->area, fg, fg_sel, cc, cc_sel, false);
+		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
 
 	if (l->layer->type == SignalType::MIDI){
@@ -571,6 +579,11 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 	s.y0 = s.y1 = my;
 	s.type = s.Type::BACKGROUND;
 
+	if (view->scroll->area.inside(mx, my)){
+		s.type = s.Type::SCROLLBAR_GLOBAL;
+		return s;
+	}
+
 	// layer?
 	foreachi(AudioViewLayer *l, view->vlayer, i){
 		if (l->mouse_over()){
@@ -705,7 +718,7 @@ Selection ViewModeDefault::getHover()
 			int offset = 0;
 			for (int i=0; i<view->song->bars.num+1; i++){
 				float x = view->cam.sample2screen(offset);
-				if (fabs(x - mx) < view->BARRIER_DIST){
+				if (fabs(x - mx) < view->SNAPPING_DIST){
 					s.index = i;
 					s.type = Selection::Type::BAR_GAP;
 					s.pos = offset;
@@ -735,7 +748,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 			view->renderer->seek(pos);
 			view->stream->clear_buffer();
 			hover->type = Selection::Type::PLAYBACK;
-			view->forceRedraw();
+			view->force_redraw();
 			return;
 		}else{
 			view->stop();

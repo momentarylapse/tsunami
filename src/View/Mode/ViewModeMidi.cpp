@@ -70,7 +70,7 @@ void ViewModeMidi::setMode(MidiMode _mode)
 {
 	mode_wanted = _mode;
 	view->thm.dirty = true;
-	view->forceRedraw();
+	view->force_redraw();
 	notify();
 }
 
@@ -146,7 +146,7 @@ void ViewModeMidi::onLeftButtonDown()
 			// create new note
 			startMidiPreview(getCreationPitch(hover->pitch), 1.0f);
 		}
-	}else if (hover->type == Selection::Type::SCROLL){
+	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
 		scroll_offset = view->my - scroll_bar.y1;
 		view->msp.stop();
 	}
@@ -184,7 +184,7 @@ void ViewModeMidi::onMouseMove()
 	if (hover->type == Selection::Type::MIDI_PITCH){
 		// creating notes
 		//view->forceRedraw();
-	}else if (hover->type == Selection::Type::SCROLL){
+	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
 		if (e->lbut){
 			int _pitch_max = (cur_vlayer()->area.y2 + scroll_offset - view->my) / cur_vlayer()->area.height() * (MAX_PITCH - 1.0f);
 			cur_vlayer()->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
@@ -242,14 +242,14 @@ void ViewModeMidi::edit_backspace()
 void ViewModeMidi::jump_string(int delta)
 {
 	string_no = max(min(string_no + delta, cur_layer()->track->instrument.string_pitch.num - 1), 0);
-	view->forceRedraw();
+	view->force_redraw();
 
 }
 
 void ViewModeMidi::jump_octave(int delta)
 {
 	octave = max(min(octave + delta, 7), 0);
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 void ViewModeMidi::onKeyDown(int k)
@@ -423,13 +423,13 @@ MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 void ViewModeMidi::setBeatPartition(int partition)
 {
 	beat_partition = partition;
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 void ViewModeMidi::setNoteLength(int length)
 {
 	note_length = length;
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
@@ -441,9 +441,9 @@ void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->drawGridBars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), beat_partition);
+		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), beat_partition);
 	else
-		view->drawGridTime(c, l->area, fg, fg_sel, cc, cc_sel, false);
+		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
 	if (l->layer->type == SignalType::MIDI){
 		auto mode = l->midi_mode;
@@ -537,7 +537,7 @@ Selection ViewModeMidi::getHover()
 
 		// scroll bar
 		if ((mode == MidiMode::LINEAR) and (scroll_bar.inside(view->mx, view->my))){
-			s.type = Selection::Type::SCROLL;
+			s.type = Selection::Type::SCROLLBAR_MIDI;
 			return s;
 		}
 
@@ -632,7 +632,7 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 		}else if (mode == MidiMode::LINEAR){
 
 			// scrollbar
-			if (hover->type == Selection::Type::SCROLL)
+			if (hover->type == Selection::Type::SCROLLBAR_MIDI)
 				c->setColor(view->colors.text);
 			else
 				c->setColor(view->colors.text_soft1);

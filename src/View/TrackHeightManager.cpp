@@ -10,6 +10,7 @@
 #include "AudioView.h"
 #include "AudioViewTrack.h"
 #include "Mode/ViewMode.h"
+#include "Helper/ScrollBar.h"
 #include "../Data/Track.h"
 
 TrackHeightManager::TrackHeightManager()
@@ -111,6 +112,18 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 	return animating;
 }
 
+void TrackHeightManager::update_immediately(AudioView *view, Song *a, const rect &r)
+{
+	plan(view, a, r);
+	animating = false;
+	dirty = false;
+
+	for (AudioViewLayer *v : view->vlayer)
+		v->area = v->area_target;
+
+	set_track_areas_from_layers(view);
+}
+
 void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 {
 	for (auto *l: v->vlayer){
@@ -119,25 +132,28 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 	}
 
 	// wanted space
-	int h_wish = 0;
-	int h_min = 0;
+	float h_wish = 0;
+	float h_min = 0;
 	for (AudioViewLayer *t : v->vlayer){
 		h_wish += t->height_wish;
 		h_min += t->height_min;
 	}
 
 	// available
-	int h_available = (int)v->area.height() - v->TIME_SCALE_HEIGHT;
+	float h_available = r.height();
 	float f = 1.0f;
 	if (h_wish > h_min)
 		f = clampf((float)(h_available - h_min) / (float)(h_wish - h_min), 0, 1);
 
+	v->scroll->update(h_available, h_min + (h_wish - h_min) * f);
+
+
 	// distribute
-	int y0 = (int)r.y1 + v->TIME_SCALE_HEIGHT;
+	float y0 = r.y1 - v->scroll->offset;
 	foreachi(AudioViewLayer *t, v->vlayer, i){
 		float h = t->height_min + (t->height_wish - t->height_min) * f;
 		t->area_target = rect(r.x1, r.x2, y0, y0 + h);
-		y0 += (int)h;
+		y0 += h;
 	}
 }
 

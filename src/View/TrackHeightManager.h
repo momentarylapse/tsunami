@@ -29,6 +29,7 @@ public:
 	bool check(Song *s);
 	bool update(AudioView *v, Song *s, const rect &r);
 	void plan(AudioView *v, Song *s, const rect &r);
+	void update_immediately(AudioView *v, Song *s, const rect &r);
 };
 
 #endif /* SRC_VIEW_TRACKHEIGHTMANAGER_H_ */

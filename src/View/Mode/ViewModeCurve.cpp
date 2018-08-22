@@ -131,7 +131,7 @@ Selection ViewModeCurve::getHover()
 void ViewModeCurve::setCurve(Curve* c)
 {
 	curve = c;
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 float ViewModeCurve::value2screen(float value)

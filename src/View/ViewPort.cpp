@@ -47,7 +47,7 @@ void ViewPort::zoom(float f)
 	pos_target = pos_pre_animation = pos;
 	scale = scale_new;
 	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 void ViewPort::move(float dpos)
@@ -67,7 +67,7 @@ void ViewPort::set_target(float target, float nonlin)
 	animation_time = 0;
 	animation_non_linearity = nonlin;
 	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 void ViewPort::update(float dt)
@@ -85,7 +85,7 @@ void ViewPort::update(float dt)
 		pos = t * pos_target + (1-t) * pos_pre_animation;
 	}
 	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 bool ViewPort::needs_update()
@@ -128,6 +128,6 @@ void ViewPort::show(Range &r)
 	pos_pre_animation = pos;
 	pos_target = pos;
 	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->forceRedraw();
+	view->force_redraw();
 }
 

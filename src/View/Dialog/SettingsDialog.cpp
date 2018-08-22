@@ -129,7 +129,7 @@ void SettingsDialog::onColorScheme()
 {
 	int i = getInt("");
 	if ((i >= 0) and (i < view->basic_schemes.num))
-		view->setColorScheme(view->basic_schemes[i].name);
+		view->set_color_scheme(view->basic_schemes[i].name);
 }
 
 void SettingsDialog::onOggBitrate()

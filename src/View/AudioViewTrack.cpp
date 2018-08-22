@@ -60,7 +60,7 @@ void AudioViewLayer::set_midi_mode(MidiMode wanted)
 	if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
 		midi_mode = MidiMode::TAB;
 	view->thm.dirty = true;
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
@@ -455,7 +455,7 @@ void AudioViewLayer::setEditPitchMinMax(int _min, int _max)
 	int diff = _max - _min;
 	edit_pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
 	edit_pitch_max = edit_pitch_min + diff;
-	view->forceRedraw();
+	view->force_redraw();
 }
 
 float AudioViewLayer::pitch2y_linear(int pitch)
@@ -738,12 +738,12 @@ void AudioViewLayer::drawMidiClefClassical(Painter *c, const Clef &clef, const S
 
 	// clef symbol
 	c->setFontSize(dy*4);
-	c->drawStr(10, clef_pos_to_screen(10), clef.symbol);
+	c->drawStr(area.x1 + 10, clef_pos_to_screen(10), clef.symbol);
 	c->setFontSize(dy);
 
 	for (int i=0; i<7; i++)
 		if (scale.modifiers[i] != NoteModifier::NONE)
-			c->drawStr(18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
+			c->drawStr(area.x1 + 18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
 	c->setFontSize(view->FONT_SIZE);
 }
 
@@ -972,7 +972,7 @@ void AudioViewTrack::setMuted(bool muted)
 	track->setMuted(muted);
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
-	view->forceRedraw();
+	view->force_redraw();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
@@ -982,7 +982,7 @@ void AudioViewTrack::setSolo(bool _solo)
 	solo = _solo;
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
-	view->forceRedraw();
+	view->force_redraw();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
@@ -1001,7 +1001,7 @@ void AudioViewLayer::setSolo(bool _solo)
 {
 	solo = _solo;
 	view->renderer->allow_layers(view->get_playable_layers());
-	view->forceRedraw();
+	view->force_redraw();
 	notify();
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }

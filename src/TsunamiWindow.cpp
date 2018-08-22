@@ -813,7 +813,7 @@ void TsunamiWindow::onSampleFromSelection()
 
 void TsunamiWindow::onViewOptimal()
 {
-	view->optimizeView();
+	view->optimize_view();
 }
 
 void TsunamiWindow::onSelectNone()

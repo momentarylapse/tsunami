@@ -45,14 +45,14 @@ void ViewModeCapture::drawPost(Painter *c)
 		view->update_peaks_now(buf);
 		if (capturing_track)
 			view->get_layer(capturing_track->layers[0])->drawBuffer(c, buf, view->cam.pos - view->sel.range.offset, view->colors.capture_marker);
-		view->drawTimeLine(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+		view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 
 
 	if (input_midi and input_midi->is_capturing()){
 		if (capturing_track)
 			drawMidi(c, view->get_layer(capturing_track->layers[0]), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
-		view->drawTimeLine(c, view->sel.range.start() + input_midi->get_sample_count(), (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+		view->draw_time_line(c, view->sel.range.start() + input_midi->get_sample_count(), (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 }
 

@@ -141,7 +141,7 @@ J load sample from SampleSelection dialog
 J mixer toggle buttons
 J fx panel scroll
 J midi editing min layer height
-* global scroll bar
+J global scroll bar
 
 
 == midi ed ==
@@ -181,3 +181,4 @@ J playback no samples?
 J saving crash (samples)
 J playback line hover...
 J mixer v-scroll
+J selection auto-scroll

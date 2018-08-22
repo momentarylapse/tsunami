@@ -249,7 +249,7 @@ void ViewModeDefault::onMouseMove()
 	if (e->lbut){
 
 		// cheap auto scrolling
-		if (hover->allow_auto_scroll()){
+		if (hover->allow_auto_scroll() or (view->selection_mode != view->SelectionMode::NONE)){
 			if (view->mx < 50)
 				cam->move(-10 / cam->scale);
 			if (view->mx > view->area.width() - 50)

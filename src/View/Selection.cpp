@@ -16,7 +16,7 @@ Selection::Selection()
 
 bool Selection::allow_auto_scroll() const
 {
-	return (type == Type::SELECTION_END) or (type == Type::SAMPLE) or (type == Type::PLAYBACK);
+	return (type == Type::SELECTION_END) or (type == Type::SAMPLE) or (type == Type::PLAYBACK) or (type == Type::MIDI_PITCH) or (type == Type::CLEF_POSITION);
 }
 
 bool Selection::is_in(Type _type) const

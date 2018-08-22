@@ -2,9 +2,6 @@ use "../../api.kaba"
 
 const string AUTO_CONFIG_SAMPLE = ""
 
-// TODO: cache FFT(h)...
-// needs to be recreated when buf.length changes
-
 void fold(float[] x, float[] h, complex[] HH, float[] result)
 	int N = x.num
 	int K = h.num

@@ -189,7 +189,6 @@ void ViewModeMidi::onMouseMove()
 		if (e->lbut){
 			scroll->drag_update(view->mx, view->my);
 			int _pitch_max = 127 - scroll->offset;
-			//int _pitch_max = (cur_vlayer()->area.y2 + scroll_offset - view->my) / cur_vlayer()->area.height() * (MAX_PITCH - 1.0f);
 			cur_vlayer()->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}

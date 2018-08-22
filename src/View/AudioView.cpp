@@ -1195,10 +1195,12 @@ void AudioView::draw_selection(Painter *c)
 
 void AudioView::draw_song(Painter *c)
 {
+	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
 	bool slow_repeat = false;
 	song_area = area;
 	song_area.y1 += TIME_SCALE_HEIGHT;
-	song_area.x1 += SCROLLBAR_WIDTH;
+	if (scroll_bar_needed)
+		song_area.x1 += SCROLLBAR_WIDTH;
 	bool animating = thm.update(this, song, song_area);
 
 	cam.update(0.1f);
@@ -1223,8 +1225,12 @@ void AudioView::draw_song(Painter *c)
 	// selection
 	draw_selection(c);
 
-	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
-	scroll->draw(c, hover.type == hover.Type::SCROLLBAR_GLOBAL);
+	if (scroll_bar_needed){
+		scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
+		scroll->draw(c, hover.type == hover.Type::SCROLLBAR_GLOBAL);
+	}else{
+		scroll->set_area(rect(-1,0,-1,0));
+	}
 
 
 	// playing/capturing position

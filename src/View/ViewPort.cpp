@@ -9,7 +9,7 @@
 #include "AudioView.h"
 #include "../lib/math/math.h"
 
-const float ViewPort::BORDER_FACTOR = 1.0f / 15.0f;
+const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 
 ViewPort::ViewPort(AudioView *v)
 {
@@ -112,11 +112,19 @@ void ViewPort::make_sample_visible(int sample)
 
 void ViewPort::show(Range &r)
 {
-	int border = r.length * BORDER_FACTOR;
-	r.offset -= border;
-	r.length += border * 2;
-	scale = view->area.width() / (double)r.length;
-	pos = (double)r.start();
+	// mapping target area
+	float x0 = view->area.x1;
+	float x1 = view->area.x2;
+	if (x1 - x0 > 800)
+		x0 += view->TRACK_HANDLE_WIDTH;
+	float w = x1 - x0;
+	x0 += w * BORDER_FACTOR;
+	x1 -= w * BORDER_FACTOR;
+
+
+	// map r into (x0,x1)
+	scale = (x1 - x0) / (double)r.length;
+	pos = (double)r.start() - (x0 - view->area.x1) / scale;
 	pos_pre_animation = pos;
 	pos_target = pos;
 	view->notify(view->MESSAGE_VIEW_CHANGE);

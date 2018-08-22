@@ -859,7 +859,7 @@ void AudioView::onSongUpdate()
 
 void AudioView::onStreamUpdate()
 {
-	cam.makeSampleVisible(playbackPos());
+	cam.make_sample_visible(playbackPos());
 	forceRedraw();
 }
 
@@ -1198,8 +1198,11 @@ void AudioView::drawSelection(Painter *c)
 
 void AudioView::drawAudioFile(Painter *c)
 {
-	bool repeat = thm.update(this, song, area);
-	bool repeat_fast = repeat;
+	bool slow_repeat = false;
+	bool animating = thm.update(this, song, area);
+
+	cam.update(0.1f);
+
 	updateBufferZoom();
 
 	// background
@@ -1223,10 +1226,13 @@ void AudioView::drawAudioFile(Painter *c)
 	mode->drawPost(c);
 
 	if (peak_thread and !peak_thread->is_done())
-		repeat = true;
+		slow_repeat = true;
 
-	if (repeat)
-		hui::RunLater(repeat_fast ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
+	if (cam.needs_update())
+		animating = true;
+
+	if (animating or slow_repeat)
+		hui::RunLater(animating ? 0.03f : 0.2f, std::bind(&AudioView::forceRedraw, this));
 }
 
 int frame = 0;

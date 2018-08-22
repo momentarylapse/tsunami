@@ -21,8 +21,15 @@ public:
 	AudioView *view;
 
 	double pos;
+	double pos_pre_animation;
+	double pos_target;
+	double animation_time;
+	double animation_non_linearity;
 	double scale;
 	Range range();
+
+	void update(float dt);
+	bool needs_update();
 
 	double screen2sample(double x);
 	double sample2screen(double s);
@@ -30,8 +37,9 @@ public:
 
 	void zoom(float f);
 	void move(float dpos);
+	void set_target(float pos, float nonlin);
 
-	void makeSampleVisible(int sample);
+	void make_sample_visible(int sample);
 	void show(Range &r);
 };
 

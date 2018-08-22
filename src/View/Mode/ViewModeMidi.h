@@ -18,6 +18,7 @@ class OutputStream;
 class Synthesizer;
 class MidiPreview;
 class TrackLayer;
+class ScrollBar;
 enum class NoteModifier;
 enum class ChordType;
 
@@ -87,8 +88,7 @@ public:
 	TrackLayer *cur_layer();
 	bool editing(AudioViewLayer *l);
 
-	rect scroll_bar;
-	float scroll_offset;
+	ScrollBar *scroll;
 
 	bool moving;
 	Array<int> pre_moving_offsets;

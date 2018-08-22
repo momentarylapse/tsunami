@@ -23,6 +23,7 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../Helper/MidiPreview.h"
+#include "../Helper/ScrollBar.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
@@ -46,8 +47,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	string_no = 0;
 	octave = 3;
 
-	scroll_offset = 0;
-	scroll_bar = rect(0, 0, 0, 0);
+	scroll = new ScrollBar;
+	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);
 
 	preview = new MidiPreview(view->session);
 
@@ -147,7 +148,7 @@ void ViewModeMidi::onLeftButtonDown()
 			startMidiPreview(getCreationPitch(hover->pitch), 1.0f);
 		}
 	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
-		scroll_offset = view->my - scroll_bar.y1;
+		scroll->drag_start(view->mx, view->my);
 		view->msp.stop();
 	}
 }
@@ -186,7 +187,9 @@ void ViewModeMidi::onMouseMove()
 		//view->forceRedraw();
 	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
 		if (e->lbut){
-			int _pitch_max = (cur_vlayer()->area.y2 + scroll_offset - view->my) / cur_vlayer()->area.height() * (MAX_PITCH - 1.0f);
+			scroll->drag_update(view->mx, view->my);
+			int _pitch_max = 127 - scroll->offset;
+			//int _pitch_max = (cur_vlayer()->area.y2 + scroll_offset - view->my) / cur_vlayer()->area.height() * (MAX_PITCH - 1.0f);
 			cur_vlayer()->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}
@@ -536,7 +539,7 @@ Selection ViewModeMidi::getHover()
 		auto mode = s.vlayer->midi_mode;
 
 		// scroll bar
-		if ((mode == MidiMode::LINEAR) and (scroll_bar.inside(view->mx, view->my))){
+		if ((mode == MidiMode::LINEAR) and (scroll->area.inside(view->mx, view->my))){
 			s.type = Selection::Type::SCROLLBAR_MIDI;
 			return s;
 		}
@@ -632,12 +635,9 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 		}else if (mode == MidiMode::LINEAR){
 
 			// scrollbar
-			if (hover->type == Selection::Type::SCROLLBAR_MIDI)
-				c->setColor(view->colors.text);
-			else
-				c->setColor(view->colors.text_soft1);
-			scroll_bar = rect(l->area.x2 - 40, l->area.x2 - 20, l->area.y2 - l->area.height() * l->pitch_max / (MAX_PITCH - 1.0f), l->area.y2 - l->area.height() * l->pitch_min / (MAX_PITCH - 1.0f));
-			c->drawRect(scroll_bar);
+			scroll->offset = 127 - cur_vlayer()->pitch_max;
+			scroll->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
+			scroll->draw(c, hover->type == Selection::Type::SCROLLBAR_MIDI);
 		}
 	}else{
 

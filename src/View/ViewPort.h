@@ -17,6 +17,7 @@ public:
 	ViewPort(AudioView *v);
 
 	static const float BORDER_FACTOR;
+	static const float BORDER_FACTOR_RIGHT;
 
 	AudioView *view;
 

@@ -10,6 +10,7 @@
 #include "../lib/math/math.h"
 
 const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
+const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
 ViewPort::ViewPort(AudioView *v)
 {
@@ -102,7 +103,8 @@ void ViewPort::make_sample_visible(int sample)
 {
 	double x = sample2screen(sample);
 	float dx = view->area.width() * BORDER_FACTOR;
-	if ((x > view->area.x2 - dx) or (x < view->area.x1 + dx)){
+	float dxr = view->area.width() * BORDER_FACTOR_RIGHT;
+	if ((x > view->area.x2 - dxr) or (x < view->area.x1 + dx)){
 		//pos = sample - view->area.width() / scale * BORDER_FACTOR;
 		set_target(sample - view->area.width() / scale * BORDER_FACTOR, 0.7f);
 		//view->notify(view->MESSAGE_VIEW_CHANGE);

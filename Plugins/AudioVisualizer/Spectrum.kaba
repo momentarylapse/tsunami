@@ -101,7 +101,7 @@ class SpectrumPanel extends ConfigPanel
 	override void __init__(Spectrum *_sp)
 		super.__init__(_sp)
 		from_source("
-DrawingArea area '' height=300")
+DrawingArea area '' height=200")
 		
 		sp = _sp
 		sp.panel = self

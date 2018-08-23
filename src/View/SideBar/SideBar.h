@@ -33,6 +33,9 @@ public:
 	SideBar(Session *session);
 	virtual ~SideBar();
 
+	static const int WIDTH_DEFAULT;
+	static const int WIDTH_LARGE;
+
 	void on_close();
 	void on_large();
 	void on_choose();

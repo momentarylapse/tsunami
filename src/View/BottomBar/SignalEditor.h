@@ -18,6 +18,7 @@ namespace hui{
 	class Menu;
 }
 class SignalEditorTab;
+class ConfigPanel;
 
 class SignalEditor: public BottomBar::Console
 {
@@ -32,6 +33,15 @@ public:
 	void deleteChain(SignalChain *c);
 
 	Array<SignalEditorTab*> tabs;
+
+	void on_chain_switch();
+
+	string grid_id;
+	string config_grid_id;
+	Module *config_module;
+	ConfigPanel *config_panel;
+
+	void show_config(Module *m);
 
 	hui::Menu *menu_chain, *menu_module;
 };

@@ -20,8 +20,8 @@
 #include "ModuleConsole.h"
 #include "../../Session.h"
 
-const int WIDTH_DEFAULT = 380;
-const int WIDTH_LARGE = 750;
+const int SideBar::WIDTH_DEFAULT = 380;
+const int SideBar::WIDTH_LARGE = 750;
 
 SideBar::SideBar(Session *session)
 {

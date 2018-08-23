@@ -13,6 +13,7 @@
 #include "../../Storage/Storage.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Module/Module.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../lib/math/complex.h"
 #include "../../Data/base.h"
 #include "../../Module/SignalChain.h"
@@ -52,7 +53,12 @@ static float module_port_out_y(Module *m, int index)
 	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
-
+static string module_header(Module *m)
+{
+	if (m->module_subtype.num > 0)
+		return m->module_subtype;
+	return m->type_to_name(m->module_type);
+}
 
 
 class SignalEditorTab : public hui::Panel
@@ -243,9 +249,7 @@ public:
 		}else{
 			p->setColor(view->colors.text_soft1);
 		}
-		string type = m->module_subtype;
-		if (type == "")
-			type = m->type_to_name(m->module_type);
+		string type = module_header(m);
 		float ww = p->getStrWidth(type);
 		p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
 		p->setFont("", 12, false, false);
@@ -404,7 +408,7 @@ public:
 	void apply_sel()
 	{
 		session->win->side_bar->module_console->setModule(sel.module);
-
+		editor->show_config(sel.module);
 	}
 
 	void onActivate()
@@ -572,16 +576,30 @@ public:
 SignalEditor::SignalEditor(Session *session) :
 	BottomBar::Console(_("Signal Chain"), session)
 {
+	grid_id = "main-grid";
+	config_grid_id = "config-panel-grid";
+	addGrid("", 0, 0, grid_id);
+	setTarget(grid_id);
 	addTabControl("!left\\aaa", 0, 0, "selector");
+	addGrid("!width=380,noexpandx", 1, 0, config_grid_id);
+	setTarget(config_grid_id);
+	addLabel("!bold,center,big,expandx", 0, 0, "config-label");
+	addLabel("!bold,center,expandx\\not configurable", 0, 1, "noconf-label");
 
 	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
 	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
+
+	config_module = nullptr;
+	config_panel = nullptr;
+
+	event("selector", [&]{ on_chain_switch(); });
 
 	addChain(session->signal_chain);
 }
 
 SignalEditor::~SignalEditor()
 {
+	show_config(nullptr);
 	delete menu_chain;
 	delete menu_module;
 }
@@ -615,6 +633,31 @@ void SignalEditor::onLoad()
 		auto *c = new SignalChain(session, "new");
 		c->load(hui::Filename);
 		addChain(c);
+	}
+}
+
+void SignalEditor::on_chain_switch()
+{
+	//msg_write("switch");
+}
+
+void SignalEditor::show_config(Module *m)
+{
+	if (m == config_module)
+		return;
+	if (config_panel)
+		delete config_panel;
+	config_panel = nullptr;
+	config_module = m;
+	if (m){
+		setString("config-label", module_header(m));
+		config_panel = m->create_panel();
+		if (config_panel){
+			embed(config_panel, config_grid_id, 0, 2);
+			config_panel->set_large(false);
+			//setOptions(config_grid_id, "width=330,noexpandx");
+		}
+		hideControl("noconf-label", config_panel);
 	}
 }
 

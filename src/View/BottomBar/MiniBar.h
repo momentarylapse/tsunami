@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef MINIBAR_H_
-#define MINIBAR_H_
+#ifndef SRC_VIEW_BOTTOMBAR_MINIBAR_H_
+#define SRC_VIEW_BOTTOMBAR_MINIBAR_H_
 
 #include "../../lib/hui/hui.h"
 
@@ -42,4 +42,4 @@ public:
 	AudioView *view;
 };
 
-#endif /* MINIBAR_H_ */
+#endif /* SRC_VIEW_BOTTOMBAR_MINIBAR_H_ */

@@ -485,6 +485,8 @@ string Module::type_to_name(ModuleType type)
 		return "AudioJoiner";
 	if (type == ModuleType::BEAT_MIDIFIER)
 		return "BeatMidifier";
+	if (type == ModuleType::TSUNAMI_PLUGIN)
+		return "TsunamiPlugin";
 	return "???";
 }
 

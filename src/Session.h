@@ -9,6 +9,7 @@
 #define SRC_SESSION_H_
 
 #include "lib/base/base.h"
+#include "Stuff/Observable.h"
 
 class TsunamiWindow;
 class Log;
@@ -28,11 +29,14 @@ namespace hui{
 }
 
 // representing one instance/window
-class Session : public VirtualBase
+class Session : public Observable<VirtualBase>
 {
 public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
 	virtual ~Session();
+
+	static const string MESSAGE_ADD_PLUGIN;
+	static const string MESSAGE_REMOVE_PLUGIN;
 
 	static int next_id;
 
@@ -53,6 +57,7 @@ public:
 	OutputStream *output_stream;
 
 	Array<TsunamiPlugin*> plugins;
+	TsunamiPlugin *last_plugin;
 	bool die_on_plugin_stop;
 
 

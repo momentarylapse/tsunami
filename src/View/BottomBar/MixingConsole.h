@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef MIXINGCONSOLE_H_
-#define MIXINGCONSOLE_H_
+#ifndef SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_
+#define SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_
 
 
 #include "BottomBar.h"
@@ -40,4 +40,4 @@ public:
 	Array<TrackMixer*> mixer;
 };
 
-#endif /* MIXINGCONSOLE_H_ */
+#endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

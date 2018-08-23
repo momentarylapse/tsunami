@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef BOTTOMBAR_H_
-#define BOTTOMBAR_H_
+#ifndef SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_
+#define SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_
 
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observable.h"
@@ -21,6 +21,7 @@ class DeviceConsole;
 class SignalEditor;
 class Session;
 class BottomBarConsole;
+class PluginConsole;
 
 class BottomBar : public Observable<hui::Panel>
 {
@@ -33,6 +34,7 @@ public:
 		MIXING_CONSOLE,
 		SIGNAL_EDITOR,
 		DEVICE_CONSOLE,
+		PLUGIN_CONSOLE,
 		LOG_CONSOLE
 	};
 
@@ -68,6 +70,7 @@ public:
 	MixingConsole *mixing_console;
 	SignalEditor *signal_editor;
 	DeviceConsole *device_console;
+	PluginConsole *plugin_console;
 	LogConsole *log_console;
 
 	int index(Console *console);
@@ -76,4 +79,4 @@ public:
 	void addConsole(Console *c, const string &list_name);
 };
 
-#endif /* BOTTOMBAR_H_ */
+#endif /* SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_ */

@@ -18,6 +18,9 @@
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
 
+const string Session::MESSAGE_ADD_PLUGIN = "AddPlugin";
+const string Session::MESSAGE_REMOVE_PLUGIN = "RemovePlugin";
+
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon)
 {
 	win = nullptr;
@@ -35,6 +38,8 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
 	perf_mon = _perf_mon;
+
+	last_plugin = nullptr;
 
 	id = next_id ++;
 	die_on_plugin_stop = false;
@@ -85,36 +90,29 @@ void Session::q(const string &message, const Array<string> &responses)
 
 void Session::executeTsunamiPlugin(const string& name)
 {
-	/*for (TsunamiPlugin *p: plugins)
-		if (p->name == name){
-			if (p->active)
-				p->stop();
-			else
-				p->start();
-			return;
-		}*/
-
 	TsunamiPlugin *p = CreateTsunamiPlugin(this, name);
 
 	plugins.add(p);
 	p->subscribe3(this, std::bind(&Session::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
 
 	p->on_start();
+
+	last_plugin = p;
+	notify(MESSAGE_ADD_PLUGIN);
 }
 
 
 void Session::onPluginStopRequest(VirtualBase *o)
 {
 	TsunamiPlugin *p = (TsunamiPlugin*)o;
-	msg_write("stop request..." + p2s(p));
 
 	hui::RunLater(0.001f, [this,p]{
-		msg_write("stop " + p2s(p));
+		last_plugin = p;
+		notify(MESSAGE_REMOVE_PLUGIN);
 		p->on_stop();
 		foreachi (auto *pp, plugins, i)
 			if (p == pp)
 				plugins.erase(i);
-		msg_write("del");
 		delete p;
 	});
 

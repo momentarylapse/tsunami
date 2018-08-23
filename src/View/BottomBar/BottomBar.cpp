@@ -10,6 +10,7 @@
 #include "LogConsole.h"
 #include "DeviceConsole.h"
 #include "SignalEditor.h"
+#include "PluginConsole.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
 #include "../../Session.h"
@@ -34,10 +35,12 @@ BottomBar::BottomBar(Session *session)
 	mixing_console = new MixingConsole(session);
 	signal_editor = new SignalEditor(session);
 	device_console = new DeviceConsole(session);
+	plugin_console = new PluginConsole(session);
 	log_console = new LogConsole(session);
 	addConsole(mixing_console, "");
 	addConsole(signal_editor, "");
 	addConsole(device_console, "");
+	addConsole(plugin_console, "");
 	addConsole(log_console, "");
 
 	event("choose", std::bind(&BottomBar::onChoose, this));

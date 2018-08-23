@@ -14,29 +14,22 @@ const int BUFFER_SIZE = 32768
 
 
 class MyPitchRecognizer extends PitchRecognizer
-	Dialog* dlg
-	void __init__(Session* session, Dialog* _dlg)
+	PitchRecognition *pr
+	void __init__(Session* session, PitchRecognition* _pr)
 		super.__init__(session)
-		dlg = _dlg
-	override void onUpdate()
-		dlg.redraw("drawing")
+		pr = _pr
+	override void on_update()
+		pr.on_pitch_update()
 
-class PitchRecognitionDialog extends Dialog
+class PitchRecognitionPanel extends ConfigPanel
 	PitchRecognition* plugin
 	
-	void __init__(PitchRecognition* _plugin)
-		super.__init__("Tonerkennung", 300, 175, _plugin.session.win, true)
-		add_grid("", 0, 0, "grid")
-		set_target("grid")
+	override void __init__(PitchRecognition* _plugin)
 		add_drawing_area("", 5, 5, "drawing")
-		add_button("Schließen", 5, 145, "close")
-		set_image("close", "hui:close")
 		
 		plugin = _plugin
 	
-		//eventX("drawing", "hui:draw", &Draw)
-		event("hui:close", &onClose)
-		event("close", &onClose)
+		event_x("drawing", "hui:draw", &on_draw)
 	
 	float note_error
 
@@ -57,8 +50,8 @@ class PitchRecognitionDialog extends Dialog
 		c.set_color(color(1, 0.6, 0.6, 0.6))
 		c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	override void on_draw(Painter *c)
-		c.set_color(White)
+	void on_draw(Painter *c)
+		c.set_color(colors.background)
 		c.set_font_size(12)
 		c.draw_rect(0, 0, c.width, c.height)
 	
@@ -70,12 +63,12 @@ class PitchRecognitionDialog extends Dialog
 		float x = c.width / 2
 		float y = c.height - 10
 	
-		c.set_color(color(1, 0.4, 0.4, 0.4))
+		c.set_color(colors.text_soft1)
 		for i in 0:9
 			float w = i * 0.125 * pi - pi / 2
 			c.draw_line(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
 	
-		c.set_color(Black)
+		c.set_color(colors.text)
 		if plugin.pitch_recognizer.loud_enough
 			c.draw_str(x - 8, y - r2 - 22, get_note(plugin.pitch_recognizer.frequency))
 			c.draw_str(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
@@ -85,22 +78,23 @@ class PitchRecognitionDialog extends Dialog
 		else
 			c.draw_str(x - 30, y - 20, "zu leise")
 
-	void onClose()
-		plugin.stop()
-
 class PitchRecognition extends TsunamiPlugin
-	Dialog* dlg
 	
 	PitchRecognizer* pitch_recognizer
+	PitchRecognitionPanel* panel
 	
 	override void on_start()
-		
-		dlg = new PitchRecognitionDialog(self)
-		dlg.show()
-	
-		pitch_recognizer = new MyPitchRecognizer(session, dlg)
+		panel = nil
+		pitch_recognizer = new MyPitchRecognizer(session, self)
 		
 	override void on_stop()
-		delete dlg
 		delete pitch_recognizer
+	
+	void on_pitch_update()
+		if panel
+			panel.redraw("drawing")
+	
+	override ConfigPanel* create_panel()
+		panel = new PitchRecognitionPanel(self)
+		return panel
 	

@@ -10,6 +10,7 @@
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "../Module/Module.h"
+#include "../Module/ModuleFactory.h"
 
 const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
@@ -39,16 +40,5 @@ void TsunamiPlugin::stop_request()
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name)
 {
-	Plugin *p = session->plugin_manager->GetPlugin(session, ModuleType::TSUNAMI_PLUGIN, name);
-	TsunamiPlugin *t = (TsunamiPlugin*)p->create_instance(session, "TsunamiPlugin");
-
-	// dummy?
-	if (!t)
-		t = new TsunamiPlugin;
-
-	t->session = session;
-	/*t->plugin = p;
-	t->usable = p->usable;
-	t->resetConfig();*/
-	return t;
+	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleType::TSUNAMI_PLUGIN, name);
 }

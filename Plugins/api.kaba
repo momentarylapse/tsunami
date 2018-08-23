@@ -515,14 +515,12 @@ class Slider
 	extern float get()
 	extern void set(float f)
 
-class TsunamiPlugin
-	extern void __init__()
-	extern virtual void __delete__()
+class TsunamiPlugin extends Module
+	extern override void __init__()
+	extern override void __delete__()
 	extern virtual void on_start()
 	extern virtual void on_stop()
 	extern void stop()
-	Session* session
-	Song* song
 	string[] args
 
 class SongPlugin

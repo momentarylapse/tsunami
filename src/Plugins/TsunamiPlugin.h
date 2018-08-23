@@ -8,40 +8,24 @@
 #ifndef SRC_PLUGINS_TSUNAMIPLUGIN_H_
 #define SRC_PLUGINS_TSUNAMIPLUGIN_H_
 
-#include "../Stuff/Observable.h"
+#include "../Module/Module.h"
 
-namespace hui{
-	class Window;
-}
-class Session;
-class Song;
-
-class TsunamiPlugin : public Observable<VirtualBase>
+class TsunamiPlugin : public Module
 {
 public:
 	TsunamiPlugin();
 	virtual ~TsunamiPlugin();
 
-	static const string MESSAGE_START;
-	static const string MESSAGE_STOP;
 	static const string MESSAGE_STOP_REQUEST;
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	virtual void _cdecl onStart(){}
-	virtual void _cdecl onStop(){}
-
-	void _cdecl start();
-	void _cdecl stop();
+	virtual void _cdecl on_start(){};
+	virtual void _cdecl on_stop(){};
 
 	void _cdecl stop_request();
 
-	Session *session;
-	Song *song;
-
-	string name;
-	bool active;
 	Array<string> args;
 };
 

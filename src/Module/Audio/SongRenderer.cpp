@@ -226,6 +226,9 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 	range_cur = Range(pos, buf.length);
 	channels = buf.channels;
 
+	// in case, the metronome track is muted
+	bar_streamer->seek(range_cur.offset);
+
 	apply_curves(song, pos);
 
 	// render without fx

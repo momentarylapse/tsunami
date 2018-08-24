@@ -273,6 +273,7 @@ class EqualizerPanel extends ConfigPanel
 		add_spin_button("!range=-40:40:0.1,expandx", 1, 0, "gain")
 		add_label("dB", 2, 0, "")
 		hide_control("peaks", true)
+		hide_control("stuff", true)
 	
 		grid.init(self, "drawing")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
@@ -332,5 +333,6 @@ class EqualizerPanel extends ConfigPanel
 			set_options("drawing", "height=380")
 		else
 			set_options("drawing", "height=250")
+		hide_control("stuff", !large)
 		hide_control("peaks", !large)
 

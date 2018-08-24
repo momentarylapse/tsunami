@@ -50,6 +50,7 @@ class MetronomePanel extends ConfigPanel
 	Menu *popup_menu
 	
 	BlurredDot dot
+	int sr_id
 	
 	void __init__(Session *session, Metronome *_metro)
 		from_source("
@@ -83,10 +84,10 @@ Grid ? '' vertical
 		event("mode-bounce-walk", &on_mode_bounce_walk)
 		//event("fullscreen", &on_fullscreen)
 		
-		session.output_stream.subscribe(self, &on_update, "Update")
+		sr_id = HuiRunRepeated(UPDATE_DT, self, &on_update)
 	
 	override void __delete__()
-		metro.session.output_stream.unsubscribe(self)
+		HuiCancelRunner(sr_id)
 		delete popup_menu
 	
 	void on_update()

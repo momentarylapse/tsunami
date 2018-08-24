@@ -95,14 +95,13 @@ Grid ? '' vertical
 		
 		//reveal("config", true)
 		lr_id = -1
-		
-		stream.subscribe(self, &on_update, "Update")
+		sr_id = HuiRunRepeated(UPDATE_DT, self, &on_update)
 	
 	void on_update()
 		redraw("area")
 	
 	override void __delete__()
-		stream.unsubscribe(self)
+		HuiCancelRunner(sr_id)
 		if lr_id >= 0
 			HuiCancelRunner(lr_id)
 		delete popup_menu
@@ -204,6 +203,7 @@ Grid ? '' vertical
 		popup_menu.popup(self)
 	
 	int lr_id
+	int sr_id
 	void on_area_mouse_enter()
 		if lr_id >= 0
 			HuiCancelRunner(lr_id)
@@ -259,7 +259,7 @@ class Metronome extends TsunamiPlugin
 	
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(1024)
-		stream.set_update_dt(UPDATE_DT)
+		//stream.set_update_dt(UPDATE_DT)
 		stream.play()
 			
 	override ConfigPanel* create_panel()

@@ -80,8 +80,6 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
-		//event("hui:close", &on_close)
-		//event("close", &on_close)
 		event_x("area", "hui:draw", &on_draw)
 		event_x("area", "hui:left-button-down", &on_area_left_button_down)
 		event_x("area", "hui:right-button-down", &on_area_right_button_down)
@@ -97,8 +95,14 @@ Grid ? '' vertical
 		
 		//reveal("config", true)
 		lr_id = -1
+		
+		stream.subscribe(self, &on_update, "Update")
+	
+	void on_update()
+		redraw("area")
 	
 	override void __delete__()
+		stream.unsubscribe(self)
 		if lr_id >= 0
 			HuiCancelRunner(lr_id)
 		delete popup_menu
@@ -238,20 +242,13 @@ Grid ? '' vertical
 	/*void on_fullscreen()
 		fullscreen = !fullscreen
 		set_fullscreen(fullscreen)
-		//show_control()
-
-	void on_close()
-		if metro
-			metro.stop()
-		else
-			destroy()*/
+		//show_control()*/
 
 class Metronome extends TsunamiPlugin
 	BeatMidifier *beat_midifier
 	OutputStream *stream
 	BeatSource *source
 	Synthesizer *synth
-	ConfigPanel *panel
 	
 	override void on_start()
 		source = CreateBeatSource(session, "Metronome")
@@ -264,25 +261,11 @@ class Metronome extends TsunamiPlugin
 		stream.set_buffer_size(1024)
 		stream.set_update_dt(UPDATE_DT)
 		stream.play()
-		
-		panel = nil
-		
-		//dlg = new MetronomeDialog(session, source, stream, self)
-		//dlg.show()
-		
-		stream.subscribe(self, &on_update, "Update")
-	
-	void on_update()
-		if panel
-			panel.redraw("area")
 			
 	override ConfigPanel* create_panel()
-		panel = new MetronomePanel(session, source, stream, self)
-		return panel
+		return new MetronomePanel(session, source, stream, self)
 		
 	override void on_stop()
-		stream.unsubscribe(self)
-		//delete dlg
 		delete stream
 		delete synth
 		delete source

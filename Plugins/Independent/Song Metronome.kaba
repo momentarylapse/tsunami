@@ -39,7 +39,7 @@ class BlurredDot
 			p.set_color(c)
 			p.draw_circle(pos.x, pos.y, r)
 
-class MetronomeDialog extends Dialog
+class MetronomePanel extends ConfigPanel
 	Metronome *metro
 	float fraction_prev
 	
@@ -52,13 +52,9 @@ class MetronomeDialog extends Dialog
 	BlurredDot dot
 	
 	void __init__(Session *session, Metronome *_metro)
-		super.__init__("Metronome", 400, 520, session.win, true)
 		from_source("
 Grid ? '' vertical
-	DrawingArea area ''
-	Grid ? '' buttonbar
-		CheckBox fullscreen 'Fullscreen'
-		Button /close 'Close' image=hui:close")
+	DrawingArea area ''")
 
 		metro = _metro
 		fraction_prev = 0
@@ -77,8 +73,7 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
-		event("hui:close", &on_close)
-		event("close", &on_close)
+		event_x("area", "hui:draw", &on_draw)
 		event_x("area", "hui:right-button-down", &on_area_right_button_down)
 		
 		event("blink-background", &on_blink_background)
@@ -86,12 +81,18 @@ Grid ? '' vertical
 		event("mode-circle", &on_mode_circle)
 		event("mode-bounce", &on_mode_bounce)
 		event("mode-bounce-walk", &on_mode_bounce_walk)
-		event("fullscreen", &on_fullscreen)
+		//event("fullscreen", &on_fullscreen)
+		
+		session.output_stream.subscribe(self, &on_update, "Update")
 	
 	override void __delete__()
+		metro.session.output_stream.unsubscribe(self)
 		delete popup_menu
 	
-	override void on_draw(Painter *p)
+	void on_update()
+		redraw("area")
+	
+	void on_draw(Painter *p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -198,32 +199,20 @@ Grid ? '' vertical
 		mode = MODE_BOUNCE_WALK
 		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
 	
-	void on_fullscreen()
+	/*void on_fullscreen()
 		fullscreen = !fullscreen
 		set_fullscreen(fullscreen)
-		//show_control()
-
-	void on_close()
-		if metro
-			metro.stop()
-		else
-			destroy()
+		//show_control()*/
 
 class Metronome extends TsunamiPlugin
-	Dialog *dlg
 	
 	override void on_start()
 		
-		dlg = new MetronomeDialog(session, self)
-		dlg.show()
-		
 		session.output_stream.set_update_dt(UPDATE_DT)
 		session.output_stream.set_buffer_size(1024)
-		session.output_stream.subscribe(self, &on_update, "Update")
-	
-	void on_update()
-		dlg.redraw("area")
+			
+	override ConfigPanel* create_panel()
+		return new MetronomePanel(session, self)
 		
 	override void on_stop()
-		session.output_stream.unsubscribe(self)
-		delete dlg
+		pass

@@ -142,6 +142,10 @@ J mixer toggle buttons
 J fx panel scroll
 J midi editing min layer height
 J global scroll bar
+* hover=none on mouse leave
+* better in/out syncing
+* output underrun treatment?
+* multiple mixing profiles
 
 
 == midi ed ==
@@ -182,3 +186,13 @@ J saving crash (samples)
 J playback line hover...
 J mixer v-scroll
 J selection auto-scroll
+* deleting main version
+
+== new plugin ui ==
+
+J PluginConsole
+J SignalEditor: integrated module config
+* integrate Metronome
+* smaller Equalizer (context menu, graphical gain)
+* FxEditor: track name
+

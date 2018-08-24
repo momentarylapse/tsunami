@@ -39,7 +39,7 @@ class BlurredDot
 			p.set_color(c)
 			p.draw_circle(pos.x, pos.y, r)
 
-class MetronomeDialog extends Dialog
+class MetronomePanel extends ConfigPanel
 	BeatSource *source
 	OutputStream *stream
 	Metronome *metro
@@ -54,14 +54,10 @@ class MetronomeDialog extends Dialog
 	BlurredDot dot
 	
 	void __init__(Session *session, BeatSource *_source, OutputStream *_stream, Metronome *_metro)
-		super.__init__("Metronome", 400, 520, session.win, true)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
-	Grid config ''
-	Grid ? '' buttonbar
-		CheckBox fullscreen 'Fullscreen'
-		Button /close 'Close' image=hui:close")
+	Revealer config ''")
 
 		metro = _metro		
 		source = _source
@@ -84,22 +80,30 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
-		event("hui:close", &on_close)
-		event("close", &on_close)
+		//event("hui:close", &on_close)
+		//event("close", &on_close)
+		event_x("area", "hui:draw", &on_draw)
 		event_x("area", "hui:left-button-down", &on_area_left_button_down)
 		event_x("area", "hui:right-button-down", &on_area_right_button_down)
+		event_x("area", "hui:mouse-enter", &on_area_mouse_enter)
+		event_x("area", "hui:mouse-leave", &on_area_mouse_leave)
 		
 		event("blink-background", &on_blink_background)
 		event("blink-number", &on_blink_number)
 		event("mode-circle", &on_mode_circle)
 		event("mode-bounce", &on_mode_bounce)
 		event("mode-bounce-walk", &on_mode_bounce_walk)
-		event("fullscreen", &on_fullscreen)
+		//event("fullscreen", &on_fullscreen)
+		
+		//reveal("config", true)
+		lr_id = -1
 	
 	override void __delete__()
+		if lr_id >= 0
+			HuiCancelRunner(lr_id)
 		delete popup_menu
 	
-	override void on_draw(Painter *p)
+	void on_draw(Painter *p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -195,6 +199,22 @@ Grid ? '' vertical
 		popup_menu.check("mode-bounce-walk", mode == MODE_BOUNCE_WALK)
 		popup_menu.popup(self)
 	
+	int lr_id
+	void on_area_mouse_enter()
+		if lr_id >= 0
+			HuiCancelRunner(lr_id)
+			lr_id = -1
+		reveal("config", true)
+	
+	void on_area_mouse_leave()
+		if lr_id >= 0
+			HuiCancelRunner(lr_id)
+		lr_id = HuiRunLater(5, self, &_later_unreveal)
+	
+	void _later_unreveal()
+		lr_id = -1
+		reveal("config", false)
+	
 	void on_blink_background()
 		allow_blink_background = !allow_blink_background
 		HuiConfig.set_bool("Plugins/Metronome/AllowBlinkBackground", allow_blink_background)
@@ -215,7 +235,7 @@ Grid ? '' vertical
 		mode = MODE_BOUNCE_WALK
 		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
 	
-	void on_fullscreen()
+	/*void on_fullscreen()
 		fullscreen = !fullscreen
 		set_fullscreen(fullscreen)
 		//show_control()
@@ -224,14 +244,14 @@ Grid ? '' vertical
 		if metro
 			metro.stop()
 		else
-			destroy()
+			destroy()*/
 
 class Metronome extends TsunamiPlugin
 	BeatMidifier *beat_midifier
 	OutputStream *stream
 	BeatSource *source
 	Synthesizer *synth
-	Dialog *dlg
+	ConfigPanel *panel
 	
 	override void on_start()
 		source = CreateBeatSource(session, "Metronome")
@@ -245,17 +265,24 @@ class Metronome extends TsunamiPlugin
 		stream.set_update_dt(UPDATE_DT)
 		stream.play()
 		
-		dlg = new MetronomeDialog(session, source, stream, self)
-		dlg.show()
+		panel = nil
+		
+		//dlg = new MetronomeDialog(session, source, stream, self)
+		//dlg.show()
 		
 		stream.subscribe(self, &on_update, "Update")
 	
 	void on_update()
-		dlg.redraw("area")
+		if panel
+			panel.redraw("area")
+			
+	override ConfigPanel* create_panel()
+		panel = new MetronomePanel(session, source, stream, self)
+		return panel
 		
 	override void on_stop()
 		stream.unsubscribe(self)
-		delete dlg
+		//delete dlg
 		delete stream
 		delete synth
 		delete source

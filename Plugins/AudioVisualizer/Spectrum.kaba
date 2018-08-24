@@ -109,51 +109,17 @@ DrawingArea area '' height=200")
 		grid.init(self, "area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-		//eventX("area", "hui:draw", &onDraw)
-	
 	override void __delete__()
 		sp.panel = nil
-	
-	/*void onDraw(Painter *p)
-		float w = p.width
-		float h = p.height
-		
-		p.setColor(colors.background)
-		p.drawRect(0, 0, w, h)
-		
-		AudioBuffer *buf = &sp.buffer
-		
-		complex[] z
-		fft_r2c(buf.r, z)
-		
-		p.setColor(colors.text_soft1)
-		//p.setLineWidth(0.5)
-		float f = h / sqrt(NUM_SAMPLES)
-		float x0, y0
-		for i in 0:z.num
-			float x = i*2
-			float y = h - z[i].abs() * f
-			if i > 0
-				p.drawLine(x0, y0, x, y)
-			x0 = x
-			y0 = y
-			if x > w
-				break*/
 
 class Spectrum extends AudioVisualizer
-	int n
-	//AudioBuffer buffer
 	SpectrumPanel *panel
 	
 	override void __init__()
 		set_chunk_size(NUM_SAMPLES)
 		panel = nil
 	
-	override void reset_state()
-		n = 0
-	
 	override void process(AudioBuffer buf)
-		//buffer = buf
 		if panel
 			panel.grid.set(buf, session.sample_rate())
 			panel.redraw("area")

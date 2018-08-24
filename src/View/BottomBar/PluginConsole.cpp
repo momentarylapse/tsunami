@@ -16,7 +16,7 @@ class PluginPanel : public hui::Panel
 public:
 	PluginPanel(TsunamiPlugin *p, PluginConsole *_console)
 	{
-		addGrid("!width=330,noexpandx", 0, 0, "grid");
+		addGrid("!width=380,noexpandx", 0, 0, "grid");
 		setTarget("grid");
 		addGrid("", 0, 0, "header-grid");
 		setTarget("header-grid");
@@ -76,6 +76,7 @@ void PluginConsole::on_add_plugin()
 	auto *p = new PluginPanel(session->last_plugin, this);
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
+	blink();
 }
 
 void PluginConsole::on_remove_plugin()

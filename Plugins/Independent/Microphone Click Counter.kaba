@@ -8,10 +8,10 @@ const float THRESHOLD1 = 0.20
 const float THRESHOLD2 = 0.15
 const float RECOVER_TIME = 0.40
 
-class ClickCounterDialog extends Dialog
+class ClickCounterDialog extends ConfigPanel
 	MicrophoneClickCounter *counter
-	void __init__(MicrophoneClickCounter *_counter)
-		super.__init__("Click Counter", 300, 175, _counter.session.win, false)
+	override void __init__(MicrophoneClickCounter *_counter)
+		//super.__init__("Click Counter", 300, 175, _counter.session.win, false)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
 		add_drawing_area("", 0, 0, "drawing")
@@ -19,39 +19,41 @@ class ClickCounterDialog extends Dialog
 		set_target("grid2")
 		add_button("+", 0, 0, "inc")
 		add_button("-", 1, 0, "dec")
-		add_button("Close", 2, 0, "close")
-		set_image("close", "hui:close")
 		
 		counter = _counter
 	
-		//eventX("drawing", "hui:draw", &onDraw)
+		event_x("drawing", "hui:draw", &on_draw)
 		event("inc", &on_increase)
 		event("dec", &on_decrease)
-		event("hui:close", &on_close)
-		event("close", &on_close)
+		
+		id = HuiRunRepeated(0.05, self, &poll)
+	
+	override void __delete__()
+		HuiCancelRunner(id)
+	void poll()
+		redraw("drawing")
+	int id
+	
 
 
 	void draw_volume(Painter *c)
-		c.set_color(color(1, 0.8, 0.8, 0.8))
+		c.set_color(colors.text_soft3)
 		float y0 = 30
 		float y1 = c.height - 5
 		float h = y1 - y0
 		c.draw_rect(5, y0 + h * (1 - counter.Volume), 5, h)
-		c.set_color(color(1, 0.6, 0.6, 0.6))
+		c.set_color(colors.text_soft2)
 		c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	override void on_draw(Painter *c)
-		c.set_color(White)
+	void on_draw(Painter *c)
+		c.set_color(colors.background)
 		c.set_font_size(12)
 		c.draw_rect(0, 0, c.width, c.height)
 	
 		draw_volume(c)
 	
-		c.set_color(Black)
+		c.set_color(colors.text)
 		c.draw_str(100, 100, counter.counter.str())
-
-	void on_close()
-		counter.stop()
 
 	void on_increase()
 		counter.counter ++
@@ -73,7 +75,6 @@ class MicrophoneClickCounter extends TsunamiPlugin
 
 	bool active
 	int active_ttl
-	Dialog *dlg
 	
 	override void on_start()
 
@@ -88,18 +89,20 @@ class MicrophoneClickCounter extends TsunamiPlugin
 		stream.set_buffer_size(2048)
 		stream.play()
 		
-		dlg = new ClickCounterDialog(self)
-		dlg.show()
+		//dlg = new ClickCounterDialog(self)
+		//dlg.show()
 		
 		input = new InputStreamAudio(session)
 		input.start()
 		input.subscribe(self, &on_input, "")
+	
+	override ConfigPanel* create_panel()
+		return new ClickCounterDialog(self)
 		
 	override void on_stop()
 		input.unsubscribe(self)
 		input.stop()
 		
-		delete dlg
 		delete input
 	
 		delete stream
@@ -141,4 +144,4 @@ class MicrophoneClickCounter extends TsunamiPlugin
 				active = false
 				active_ttl = -1
 	
-		dlg.redraw("drawing")
+		//dlg.redraw("drawing")

@@ -19,21 +19,17 @@ class ForkRenderer extends AudioSource
 		offset += buf.length
 		return buf.length
 
-class PitchForkDialog extends Dialog
+class PitchForkDialog extends ConfigPanel
 	PitchFork *fork
 	
-	void __init__(PitchFork *pf)
-		super.__init__("Pitchfork", 200, 80, pf.session.win, false)
+	override void __init__(PitchFork *pf)
 		add_grid("", 0, 0, "table")
 		set_target("table")
-		add_spin_button("", 0, 0, "frequency")
-		add_button("Close", 0, 1, "close")
-		set_image("close", "hui:close")
+		add_spin_button("!expandx", 0, 0, "frequency")
+		add_label("Hz", 1, 0, "")
 		
 		fork = pf
 	
-		event("hui:close", &onClose)
-		event("close", &onClose)
 		event("frequency", &onFrequency)
 	
 		set_float("frequency", fork.renderer.freq)
@@ -41,23 +37,19 @@ class PitchForkDialog extends Dialog
 	void onFrequency()
 		fork.renderer.freq = get_float("")
 
-	void onClose()
-		fork.stop()
-
 class PitchFork extends TsunamiPlugin
 	OutputStream *stream
 	ForkRenderer *renderer
-	PitchForkDialog *dlg
 	override void on_start()
 	
 		renderer = new ForkRenderer
 		stream = new OutputStream(session, renderer.out)
 		
-		dlg = new PitchForkDialog(self)
-		dlg.show()
-		
 		stream.play()
+	
+	override ConfigPanel* create_panel()
+		return new PitchForkDialog(self)
+
 	override void on_stop()
-		delete dlg
 		delete stream
 		delete renderer

@@ -44,7 +44,8 @@ PluginConsole::PluginConsole(Session *s) :
 	addGrid("", 0, 0, "main-grid");
 	setTarget("main-grid");
 	addScroller("", 0, 0, "scroller");
-	addButton("!expandy,noexpandx", 1, 0, "add");
+	addLabel("!angle=90,bold,width=60\\" + _("no plugins yet"), 1, 0, "no-plugins-label");
+	addButton("!expandy,noexpandx", 2, 0, "add");
 	setImage("add", "hui:add");
 	setTooltip("add", _("add plugin"));
 	setTarget("scroller");
@@ -76,6 +77,7 @@ void PluginConsole::on_add_plugin()
 	auto *p = new PluginPanel(session->last_plugin, this);
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
+	hideControl("no-plugins-label", true);
 	blink();
 }
 
@@ -87,5 +89,6 @@ void PluginConsole::on_remove_plugin()
 			panels.erase(i);
 			break;
 		}
+	hideControl("no-plugins-label", panels.num > 0);
 }
 

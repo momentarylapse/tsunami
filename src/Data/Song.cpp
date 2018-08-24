@@ -208,7 +208,7 @@ bool Song::is_empty()
 {
 	if (filename.num > 0)
 		return false;
-	return action_manager->isSave();
+	return action_manager->is_save();
 }
 
 Range Song::range()
@@ -322,14 +322,14 @@ void Song::insertSelectedSamples(const SongSelection &sel)
 
 void Song::deleteSelectedSamples(const SongSelection &sel)
 {
-	action_manager->beginActionGroup();
+	action_manager->group_begin();
 	for (Track *t: tracks)
 	for (TrackLayer *l: t->layers){
 		for (int j=l->samples.num-1; j>=0; j--)
 			if (sel.has(l->samples[j]))
 				l->deleteSampleRef(l->samples[j]);
 	}
-	action_manager->endActionGroup();
+	action_manager->group_end();
 }
 
 /*Song::Layer *Song::addLayer(const string &name, int index)

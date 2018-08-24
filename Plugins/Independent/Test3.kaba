@@ -1,0 +1,22 @@
+use "../api.kaba"
+
+
+class Test extends TsunamiPlugin
+	int id
+	bool playing
+	
+	override void on_start()
+		playing = false
+		id = HuiRunRepeated(2, self, &toggle)
+		
+	override void on_stop()
+		HuiCancelRunner(id)
+	
+	void toggle()
+		print("toggle")
+		if playing
+			session.stop()
+		else
+			session.play()
+			
+		playing = !playing

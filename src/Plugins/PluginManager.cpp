@@ -24,6 +24,7 @@
 #include "../Device/InputStreamMidi.h"
 #include "../Device/OutputStream.h"
 #include "../Device/DeviceManager.h"
+#include "../Module/SignalChain.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Port/AudioPort.h"
@@ -79,6 +80,17 @@ void GlobalSetTempBackupFilename(const string &filename)
 	//InputStreamAudio::setTempBackupFilename(filename);
 }
 
+void __play__(Session *s)
+{
+	s->win->onPlay();
+	//s->signal_chain->start();
+}
+void __stop__(Session *s)
+{
+	s->win->onStop();
+	//s->signal_chain->stop();
+}
+
 void PluginManager::LinkAppScriptData()
 {
 	Kaba::config.directory = "";
@@ -120,6 +132,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
 	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
+	Kaba::LinkExternal("Session.play", (void*)&__play__);
+	Kaba::LinkExternal("Session.stop", (void*)&__stop__);
 
 
 	Module module(ModuleType::AUDIO_EFFECT);

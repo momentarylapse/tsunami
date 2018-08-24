@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 #include "Action.h"
 #include "../Data/Data.h"
+#include "../Stuff/Observable.h"
 #include <shared_mutex>
 
 class Data;
@@ -21,7 +22,7 @@ namespace hui{
 	class Timer;
 }
 
-class ActionManager
+class ActionManager : public Observable<VirtualBase>
 {
 	friend class Data;
 public:
@@ -29,19 +30,19 @@ public:
 	virtual ~ActionManager();
 	void reset();
 	void enable(bool enabled);
-	bool isEnabled();
+	bool is_enabled();
 
 	void *execute(Action *a);
 	void undo();
 	void redo();
 
-	void beginActionGroup();
-	void endActionGroup();
+	void group_begin();
+	void group_end();
 
 	bool undoable();
 	bool redoable();
-	bool isSave();
-	void markCurrentAsSave();
+	bool is_save();
+	void mark_current_as_save();
 
 private:
 	void truncate();

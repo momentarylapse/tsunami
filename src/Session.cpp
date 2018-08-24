@@ -91,6 +91,8 @@ void Session::q(const string &message, const Array<string> &responses)
 void Session::executeTsunamiPlugin(const string& name)
 {
 	TsunamiPlugin *p = CreateTsunamiPlugin(this, name);
+	if (!p)
+		return;
 
 	plugins.add(p);
 	p->subscribe3(this, std::bind(&Session::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);

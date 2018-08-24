@@ -232,10 +232,10 @@ void SampleManagerConsole::onDelete()
 {
 	Array<Sample*> sel = getSelected();
 
-	song->action_manager->beginActionGroup();
+	song->action_manager->group_begin();
 	for (Sample* s: sel)
 		song->deleteSample(s);
-	song->action_manager->endActionGroup();
+	song->action_manager->group_end();
 
 	// hui bug
 	setInt("sample_list", -1);

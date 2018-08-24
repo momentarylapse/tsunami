@@ -24,7 +24,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
 			index = i;
 	assert(index >= 0);
 
-	if (!l->track->song->action_manager->isEnabled())
+	if (!l->track->song->action_manager->is_enabled())
 		return;
 
 	// save old data

@@ -49,7 +49,7 @@ static int read_int(File *f)
 	return int_reverse(i);
 }
 
-static int write_int(File *f, int i)
+static void write_int(File *f, int i)
 {
 	f->write_int(int_reverse(i));
 }

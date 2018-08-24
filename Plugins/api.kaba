@@ -501,6 +501,9 @@ class Session
 	extern void i(string msg)
 	extern void w(string msg)
 	extern void e(string msg)
+	
+	extern void play()
+	extern void stop()
 
 /*class PluginContext
 	Song *song

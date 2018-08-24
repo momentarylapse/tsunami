@@ -172,7 +172,7 @@ bool CaptureConsoleModeAudio::insert()
 
 	// insert data
 	Range r = Range(i0, sucker->buf.length);
-	cc->song->action_manager->beginActionGroup();
+	cc->song->action_manager->group_begin();
 
 	TrackLayer *layer = nullptr;
 	for (TrackLayer *l: target->layers)
@@ -192,7 +192,7 @@ bool CaptureConsoleModeAudio::insert()
 	else
 		tbuf.set(sucker->buf, 0, 1.0f);
 	song->execute(a);
-	song->action_manager->endActionGroup();
+	song->action_manager->group_end();
 
 	sucker->reset_accumulation();
 	return true;

@@ -364,6 +364,8 @@ void OutputStream::_pause()
 		return;
 //	printf("pause...");
 
+	hui::CancelRunner(hui_runner_id);
+	hui_runner_id = -1;
 	paused = true;
 
 #if HAS_LIB_PULSEAUDIO
@@ -416,6 +418,7 @@ void OutputStream::_unpause()
 #endif
 //	printf("ok\n");
 
+	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
 	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
 }
 

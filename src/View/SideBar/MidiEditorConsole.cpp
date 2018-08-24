@@ -292,7 +292,7 @@ void MidiEditorConsole::onQuantize()
 {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->beat_partition);
 
-	song->action_manager->beginActionGroup();
+	song->action_manager->group_begin();
 	MidiNoteBufferRef ref = layer->midi.getNotesBySelection(view->sel);
 	for (auto *n: ref){
 		view->sel.set(n, false);
@@ -303,5 +303,5 @@ void MidiEditorConsole::onQuantize()
 		layer->addMidiNote(nn);
 		view->sel.add(nn);
 	}
-	song->action_manager->endActionGroup();
+	song->action_manager->group_end();
 }

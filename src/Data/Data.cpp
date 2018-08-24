@@ -48,12 +48,12 @@ void *Data::execute(Action *a)
 
 void Data::beginActionGroup()
 {
-	action_manager->beginActionGroup();
+	action_manager->group_begin();
 }
 
 void Data::endActionGroup()
 {
-	action_manager->endActionGroup();
+	action_manager->group_end();
 }
 
 
@@ -64,7 +64,7 @@ void Data::resetHistory()
 
 bool Data::history_enabled()
 {
-	return action_manager->isEnabled();
+	return action_manager->is_enabled();
 }
 
 // "low level" -> don't use ActionManager.lock()!

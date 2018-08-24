@@ -42,6 +42,7 @@ void ActionManager::reset()
 	if (cur_group)
 		delete(cur_group);
 	cur_group = nullptr;
+	notify();
 }
 
 
@@ -63,6 +64,7 @@ void ActionManager::add(Action *a)
 
 	action.add(a);
 	cur_pos ++;
+	notify();
 }
 
 bool ActionManager::merge(Action *a)
@@ -111,6 +113,7 @@ void ActionManager::undo()
 	unlock();
 
 	data->notify();
+	notify();
 }
 
 
@@ -125,6 +128,7 @@ void ActionManager::redo()
 	unlock();
 
 	data->notify();
+	notify();
 }
 
 bool ActionManager::undoable()
@@ -141,14 +145,15 @@ bool ActionManager::redoable()
 
 
 
-void ActionManager::markCurrentAsSave()
+void ActionManager::mark_current_as_save()
 {
 	save_pos = cur_pos;
+	notify();
 }
 
 
 
-bool ActionManager::isSave()
+bool ActionManager::is_save()
 {
 	return (cur_pos == save_pos);
 }
@@ -158,7 +163,7 @@ void ActionManager::enable(bool _enabled)
 	enabled = _enabled;
 }
 
-bool ActionManager::isEnabled()
+bool ActionManager::is_enabled()
 {
 	return enabled;
 }
@@ -168,7 +173,7 @@ class DummyActionGroup : public ActionGroup
 	virtual void build(Data *d){}
 };
 
-void ActionManager::beginActionGroup()
+void ActionManager::group_begin()
 {
 	if (!cur_group){
 		cur_group = new DummyActionGroup;
@@ -177,7 +182,7 @@ void ActionManager::beginActionGroup()
 	cur_group_level ++;
 }
 
-void ActionManager::endActionGroup()
+void ActionManager::group_end()
 {
 	cur_group_level --;
 	assert(cur_group_level >= 0);

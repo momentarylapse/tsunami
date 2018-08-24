@@ -119,6 +119,7 @@ void PerformanceMonitor::end_busy(int channel)
 // called in main thread
 void PerformanceMonitor::update()
 {
+	{
 	std::lock_guard<std::mutex> lock(pm_mutex);
 
 	float dt = pm_timer.get();
@@ -136,6 +137,7 @@ void PerformanceMonitor::update()
 			pm_info.add(i);
 			c.reset_state();
 		}
+	}
 
 	notify();
 }

@@ -179,7 +179,7 @@ bool Storage::save(Song *a, const string &filename)
 
 	f->saveSong(&od);
 
-	a->action_manager->markCurrentAsSave();
+	a->action_manager->mark_current_as_save();
 	if (session->win)
 		session->win->updateMenu();
 

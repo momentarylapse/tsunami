@@ -232,7 +232,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	embed(mini_bar, "main_table", 0, 2);
 
 	view->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
-	song->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
+	song->action_manager->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
 	app->clipboard->subscribe(this, std::bind(&TsunamiWindow::onUpdate, this));
 	bottom_bar->subscribe(this, std::bind(&TsunamiWindow::onBottomBarUpdate, this));
 	side_bar->subscribe(this, std::bind(&TsunamiWindow::onSideBarUpdate, this));
@@ -274,7 +274,7 @@ void TsunamiWindow::onDestroy()
 	hui::Config.setBool("Window.Maximized", isMaximized());
 
 	view->unsubscribe(this);
-	song->unsubscribe(this);
+	song->action_manager->unsubscribe(this);
 	app->clipboard->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	side_bar->unsubscribe(this);
@@ -565,7 +565,7 @@ bool TsunamiWindow::allowTermination()
 		}
 	}
 
-	if (song->action_manager->isSave())
+	if (song->action_manager->is_save())
 		return true;
 	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
 	if (answer == "hui:yes"){
@@ -645,14 +645,14 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 
 	fx->reset_config();
 	if (fx->configure(this)){
-		song->action_manager->beginActionGroup();
+		song->action_manager->group_begin();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
 				fx->reset_state();
 				fx->process_layer(l, view->sel);
 			}
-		song->action_manager->endActionGroup();
+		song->action_manager->group_end();
 	}
 	delete(fx);
 }
@@ -869,8 +869,8 @@ void TsunamiWindow::updateMenu()
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
 	// track
-	enable("delete_track", view->cur_track());
-	enable("track_properties", view->cur_track());
+//	enable("delete_track", view->cur_track());
+//	enable("track_properties", view->cur_track());
 	// layer
 /*	enable("layer_delete", song->layers.num > 1);
 	enable("layer_up", view->cur_layer < song->layers.num -1);
@@ -898,7 +898,7 @@ void TsunamiWindow::updateMenu()
 	check("sample_manager", side_bar->is_active(SideBar::SAMPLE_CONSOLE));
 
 	string title = title_filename(song->filename) + " - " + AppName;
-	if (!song->action_manager->isSave())
+	if (!song->action_manager->is_save())
 		title = "*" + title;
 	setTitle(title);
 }
@@ -1041,12 +1041,12 @@ void TsunamiWindow::onAddPause()
 
 void TsunamiWindow::onDeleteBars()
 {
-	song->action_manager->beginActionGroup();
+	song->action_manager->group_begin();
 
 	for (int i=view->sel.bar_indices.end()-1; i>=view->sel.bar_indices.start(); i--){
 		song->deleteBar(i, view->bars_edit_data);
 	}
-	song->action_manager->endActionGroup();
+	song->action_manager->group_end();
 }
 
 void TsunamiWindow::onDeleteTimeInterval()

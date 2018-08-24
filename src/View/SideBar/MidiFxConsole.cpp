@@ -116,8 +116,7 @@ MidiFxConsole::MidiFxConsole(Session *session) :
 	id_inner = "midi_fx_inner_table";
 
 	track = nullptr;
-	//Enable("add", false);
-	enable("track_name", false);
+	/*enable("track_name", false);
 
 	event("add", std::bind(&MidiFxConsole::onAdd, this));
 
@@ -126,14 +125,14 @@ MidiFxConsole::MidiFxConsole(Session *session) :
 	event("edit_midi", std::bind(&MidiFxConsole::onEditMidi, this));
 
 	view->subscribe(this, std::bind(&MidiFxConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
-	update();
+	update();*/
 }
 
 MidiFxConsole::~MidiFxConsole()
 {
-	clear();
+	/*clear();
 	view->unsubscribe(this);
-	song->unsubscribe(this);
+	song->unsubscribe(this);*/
 }
 
 void MidiFxConsole::update()

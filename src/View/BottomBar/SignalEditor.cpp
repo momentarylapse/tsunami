@@ -584,7 +584,7 @@ SignalEditor::SignalEditor(Session *session) :
 	addGrid("!width=380,noexpandx", 1, 0, config_grid_id);
 	setTarget(config_grid_id);
 	addLabel("!bold,center,big,expandx", 0, 0, "config-label");
-	addLabel("!bold,center,expandx\\not configurable", 0, 1, "noconf-label");
+	addLabel("!bold,center,expandx", 0, 1, "message");
 
 	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
 	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
@@ -595,6 +595,7 @@ SignalEditor::SignalEditor(Session *session) :
 	event("selector", [&]{ on_chain_switch(); });
 
 	addChain(session->signal_chain);
+	show_config(nullptr);
 }
 
 SignalEditor::~SignalEditor()
@@ -643,7 +644,7 @@ void SignalEditor::on_chain_switch()
 
 void SignalEditor::show_config(Module *m)
 {
-	if (m == config_module)
+	if (m and (m == config_module))
 		return;
 	if (config_panel)
 		delete config_panel;
@@ -656,8 +657,15 @@ void SignalEditor::show_config(Module *m)
 			embed(config_panel, config_grid_id, 0, 2);
 			config_panel->set_large(false);
 			//setOptions(config_grid_id, "width=330,noexpandx");
+			hideControl("message", true);
+		}else{
+			setString("message", _("module not configurable"));
+			hideControl("message", false);
 		}
-		hideControl("noconf-label", config_panel);
+	}else{
+		setString("config-label", "");
+		setString("message", _("no module selected"));
+		hideControl("message", false);
 	}
 }
 

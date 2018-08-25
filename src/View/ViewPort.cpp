@@ -26,12 +26,12 @@ ViewPort::ViewPort(AudioView *v)
 
 double ViewPort::screen2sample(double _x)
 {
-	return (_x - view->area.x1) / scale + pos;
+	return (_x - view->song_area.x1) / scale + pos;
 }
 
 double ViewPort::sample2screen(double s)
 {
-	return view->area.x1 + (s - pos) * scale;
+	return view->song_area.x1 + (s - pos) * scale;
 }
 
 double ViewPort::dsample2screen(double ds)
@@ -44,7 +44,7 @@ void ViewPort::zoom(float f)
 	// max zoom: 20 pixel per sample
 	double scale_new = clampf(scale * f, 0.000001, 20.0);
 
-	pos += (view->mx - view->area.x1) * (1.0/scale - 1.0/scale_new);
+	pos += (view->mx - view->song_area.x1) * (1.0/scale - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;
 	scale = scale_new;
 	view->notify(view->MESSAGE_VIEW_CHANGE);
@@ -96,17 +96,17 @@ bool ViewPort::needs_update()
 
 Range ViewPort::range()
 {
-	return Range(pos, view->area.width() / scale);
+	return Range(pos, view->song_area.width() / scale);
 }
 
 void ViewPort::make_sample_visible(int sample)
 {
 	double x = sample2screen(sample);
-	float dx = view->area.width() * BORDER_FACTOR;
-	float dxr = view->area.width() * BORDER_FACTOR_RIGHT;
-	if ((x > view->area.x2 - dxr) or (x < view->area.x1 + dx)){
+	float dx = view->song_area.width() * BORDER_FACTOR;
+	float dxr = view->song_area.width() * BORDER_FACTOR_RIGHT;
+	if ((x > view->song_area.x2 - dxr) or (x < view->song_area.x1 + dx)){
 		//pos = sample - view->area.width() / scale * BORDER_FACTOR;
-		set_target(sample - view->area.width() / scale * BORDER_FACTOR, 0.7f);
+		set_target(sample - view->song_area.width() / scale * BORDER_FACTOR, 0.7f);
 		//view->notify(view->MESSAGE_VIEW_CHANGE);
 		//view->forceRedraw();
 	}
@@ -115,8 +115,8 @@ void ViewPort::make_sample_visible(int sample)
 void ViewPort::show(Range &r)
 {
 	// mapping target area
-	float x0 = view->area.x1;
-	float x1 = view->area.x2;
+	float x0 = view->song_area.x1;
+	float x1 = view->song_area.x2;
 	if (x1 - x0 > 800)
 		x0 += view->TRACK_HANDLE_WIDTH;
 	float w = x1 - x0;
@@ -126,7 +126,7 @@ void ViewPort::show(Range &r)
 
 	// map r into (x0,x1)
 	scale = (x1 - x0) / (double)r.length;
-	pos = (double)r.start() - (x0 - view->area.x1) / scale;
+	pos = (double)r.start() - (x0 - view->song_area.x1) / scale;
 	pos_pre_animation = pos;
 	pos_target = pos;
 	view->notify(view->MESSAGE_VIEW_CHANGE);

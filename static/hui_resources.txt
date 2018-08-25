@@ -4272,7 +4272,7 @@ track-mixer
 1
 Grid
 ?
-vertical
+vertical,width=90,noexpandx
 0
 0
 4
@@ -4284,7 +4284,7 @@ center,bold
 0
 Slider
 panning
-range=-1:1:0.01,width=80,origin=no
+range=-1:1:0.01,expandx,origin=no
 1
 0
 0
@@ -4296,19 +4296,19 @@ range=0:1:0.001,vertical,expandy
 0
 Grid
 ?
-action-bar
+
 3
 0
 2
 ToggleButton
 mute
-flat
+flat,height=20,expandx,padding=1
 0
 0
 0
 ToggleButton
 solo
-flat
+flat,height=20,expandx,padding=1
 1
 0
 0
@@ -7371,7 +7371,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-191
+199
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7593,6 +7593,8 @@ Plugin does not contain a function 'void main()'
 Plugin enthält keine Funktion 'void main()'
 Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
+Plugins
+Plugins
 Preview
 Vorschau
 Program was compiled without network support...
@@ -7661,6 +7663,8 @@ Your comments and the contents of the file message.txt will be sent.
 Der Kommentar und der Inhalt der Datei message.txt werden versandt
 \\- none -\\
 \\- keines -\\
+add plugin
+Plugin hinzufügen
 all files
 alle Dateien
 all known files
@@ -7685,10 +7689,14 @@ capture audio start
 Audioaufnahme start
 capture audio stop
 Audioaufnahme stopp
+compiling script: 
+kompiliere Script: 
 creating backup: 
 Erstelle Backup: 
 data loss when saving in this format!
 Datenverlust beim Speichern in diesem Format!
+delete
+löschen
 deleting backup: 
 Lösche Backup: 
 edit curves
@@ -7709,6 +7717,8 @@ found old recording:
 alte Aufnahmedaten gefunden: 
 i'm now going to clean up...
 i'm now going to clean up...
+import
+importieren
 input: 
 Eingang: 
 loading 
@@ -7721,8 +7731,14 @@ marker
 Marker 
 midi library selected: 
 Midibibliothek gewählt: 
+module not configurable
+Modul nicht konfigurierbar
 move selection to scale
 Selektierung ziehen zum Skalieren
+no module selected
+kein Modul ausgewählt
+no plugins yet
+noch keine Plugins
 no sample selected
 kein Sample gewählt
 not allowed to delete system modules

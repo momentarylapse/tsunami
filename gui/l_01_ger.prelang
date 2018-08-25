@@ -1693,7 +1693,7 @@ sample_selection_dialog/import
 
 aus Datei importieren
 // Num Language Strings
-191
+199
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2077,3 +2077,19 @@ please note, that portaudio does not support refreshing the device list after pr
 Geräte, die nach Programmstart angeschlossen werden, können von Portaudio leider nicht erkannt werden!
  - none -
  - leer -
+Plugins
+Plugins
+add plugin
+Plugin hinzufügen
+compiling script: 
+kompiliere Script: 
+delete
+löschen
+import
+importieren
+module not configurable
+Modul nicht konfigurierbar
+no module selected
+kein Modul ausgewählt
+no plugins yet
+noch keine Plugins

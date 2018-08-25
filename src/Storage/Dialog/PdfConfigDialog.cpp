@@ -19,11 +19,16 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 
 	addGrid("", 0, 0, "root");
 	setTarget("root");
-	addGrid("", 0, 0, "tracks");
-	addGrid("!button-bar", 0, 1, "buttons");
+	addGrid("", 0, 0, "stuff");
+	addGrid("", 0, 1, "tracks");
+	addGrid("!button-bar", 0, 2, "buttons");
 	setTarget("buttons");
 	addButton(_("Cancel"), 0, 0, "cancel");
 	addButton(_("Ok"), 1, 0, "ok");
+	setTarget("stuff");
+	addLabel("scale", 0, 0, "");
+	addSpinButton("!expandx", 1, 0, "scale");
+	addLabel("%", 2, 0, "");
 	setTarget("tracks");
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
@@ -35,6 +40,7 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 		check(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
 		enable(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
 	}
+	setFloat("scale", 100.0f);
 
 	event("hui:close", [&]{ on_close(); });
 	event("cancel", [&]{ on_close(); });
@@ -61,6 +67,7 @@ void PdfConfigDialog::on_ok()
 		bool tab = isChecked(format("tab-%d"));
 		data->track_mode[i] = (classical ? 1 : 0) + (tab ? 2 : 0);
 	}
+	data->horizontal_scale = getFloat("scale") / 100;
 
 	destroy();
 }

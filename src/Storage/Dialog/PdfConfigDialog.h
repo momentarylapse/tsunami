@@ -14,6 +14,7 @@ class Song;
 
 struct PdfConfigData
 {
+	float horizontal_scale;
 	Array<int> track_mode;
 };
 

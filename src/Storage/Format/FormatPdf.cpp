@@ -18,6 +18,9 @@
 #include "../Dialog/PdfConfigDialog.h"
 #include <math.h>
 
+static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
+static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
+
 FormatDescriptorPdf::FormatDescriptorPdf() :
 	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE)
 {
@@ -87,15 +90,19 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 	p->setLineWidth(1);
 
 	// midi
-	float fs = 12;
+	float fs = 18;
 	p->setFontSize(fs);
 	auto midi2 = t->layers[0]->midi.getNotes(r_inside);
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		int pos = n->clef_position;
 		float y = clef_pos_to_pdf(y0, line_dy, pos);
-		p->setColor(color(1, 0.8f, 0.8f, 0.8f));
+		p->setColor(NOTE_COLOR);
 		p->drawCircle(x1 + rr, y, rr);
+		if (n->modifier == NoteModifier::FLAT)
+			p->drawStr(x1 - rr, y-fs/2, "b");
+		else if (n->modifier == NoteModifier::SHARP)
+			p->drawStr(x1 - rr, y-fs/2, "#");
 	}
 
 	return y0 + line_dy * 7;
@@ -148,7 +155,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 0.5f) * string_dy;
-		p->setColor(color(1, 0.8f, 0.8f, 0.8f));
+		p->setColor(NOTE_COLOR_TAB);
 		p->drawCircle(x1 + rr, y, rr);
 		p->setColor(Black);
 		string hand = i2s(n->pitch - t->instrument.string_pitch[n->stringno]);
@@ -218,7 +225,7 @@ void FormatPdf::saveSong(StorageOperationData* od)
 	float x0 = border;
 	float w = page_width - 2*border;
 
-	float avg_scale = 100.0f / od->song->sample_rate;
+	float avg_scale = 100.0f / od->song->sample_rate * data.horizontal_scale;
 	float avg_samples_per_line = w / avg_scale;
 
 	int samples = od->song->range_with_time().end();

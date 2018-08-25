@@ -15,6 +15,7 @@
 #include "../../lib/xfile/pdf.h"
 #include "../../lib/image/Painter.h"
 #include "../../lib/math/rect.h"
+#include "../Dialog/PdfConfigDialog.h"
 #include <math.h>
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
@@ -157,7 +158,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 	return y0 + string_dy * t->instrument.string_pitch.num;
 }
 
-static int render_line(Painter *p, float x0, float w, float y0, const Range &r, Song *song, float scale)
+static int render_line(Painter *p, float x0, float w, float y0, const Range &r, Song *song, float scale, PdfConfigData *data)
 {
 	float track_space = 20;
 
@@ -167,12 +168,15 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 	if (bars.num > 0)
 		p->drawStr(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
 
-	for (Track* t : song->tracks){
+	foreachi (Track* t, song->tracks, ti){
 		if (t->type != SignalType::MIDI)
 			continue;
 
-		y0 = render_track_classical(p, x0, w, y0, r, t, scale) + track_space;
-		if (t->instrument.string_pitch.num > 0)
+		bool allow_classical = (data->track_mode[ti] & 1);
+		bool allow_tab = (data->track_mode[ti] & 2);
+		if (allow_classical)
+			y0 = render_track_classical(p, x0, w, y0, r, t, scale) + track_space;
+		if (t->instrument.string_pitch.num > 0 and allow_tab)
 			y0 = render_track_tab(p, x0, w, y0, r, t, scale) + track_space;
 		y0 += track_space;
 	}
@@ -199,13 +203,20 @@ static int good_samples(Song *song, const Range &r0)
 
 void FormatPdf::saveSong(StorageOperationData* od)
 {
+	PdfConfigData data;
+	auto *dlg = new PdfConfigDialog(&data, od->song, od->win);
+	dlg->run();
+	delete dlg;
+
+	float page_width = 1200;
+	float page_height = 2000;
+
 	auto parser = pdf::save(od->filename);
-	auto p = parser->add_page(1200, 2000);
 
 	float border = 50;
 
 	float x0 = border;
-	float w = p->width - 2*border;
+	float w = page_width - 2*border;
 
 	float avg_scale = 100.0f / od->song->sample_rate;
 	float avg_samples_per_line = w / avg_scale;
@@ -215,12 +226,19 @@ void FormatPdf::saveSong(StorageOperationData* od)
 	float y0 = 140;
 	float line_space = 50;
 
+	bool first_page = true;
 
-	p->setFontSize(40);
-	p->drawStr(200, 50, od->song->getTag("title"));
-	p->setFontSize(15);
-	p->setColor(SetColorHSB(1, 0, 0, 0.4f));
-	p->drawStr(p->width - 300, 100, "by " + od->song->getTag("artist"));
+
+	auto p = parser->add_page(page_width, page_height);
+
+	if (first_page){
+		p->setFontSize(40);
+		p->drawStr(200, 50, od->song->getTag("title"));
+		p->setFontSize(15);
+		p->setColor(SetColorHSB(1, 0, 0, 0.4f));
+		p->drawStr(p->width - 300, 100, "by " + od->song->getTag("artist"));
+		first_page = false;
+	}
 
 	pdf_bpm = 0;
 
@@ -230,10 +248,18 @@ void FormatPdf::saveSong(StorageOperationData* od)
 		float scale = w / line_samples;
 		Range r = Range(offset, line_samples);
 
-
-		y0 = render_line(p, x0, w, y0, r, od->song, scale) + line_space;
+		float y_prev = y0;
+		y0 = render_line(p, x0, w, y0, r, od->song, scale, &data) + line_space;
 
 		offset += line_samples;
+
+		// new page?
+		float dy = y0 - y_prev;
+		if (y0 + dy > page_height and offset < samples){
+			delete p;
+			p = parser->add_page(page_width, page_height);
+			y0 = 100;
+		}
 	}
 
 	delete p;

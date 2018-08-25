@@ -18,15 +18,15 @@ public:
 	ViewModeScaleBars(AudioView *view);
 	virtual ~ViewModeScaleBars();
 
-	virtual void onLeftButtonUp();
-	virtual void onRightButtonDown();
-	virtual void onMouseMove();
-	virtual void onKeyDown(int k);
+	virtual void on_left_button_up();
+	virtual void on_right_button_down();
+	virtual void on_mouse_move();
+	virtual void on_key_down(int k);
 
-	virtual void drawPost(Painter *c);
+	virtual void draw_post(Painter *c);
 
-	void startScaling(const Array<int> &sel);
-	void performScale();
+	void start_scaling(const Array<int> &sel);
+	void perform_scale();
 
 	bool scaling_change;
 	Array<int> scaling_sel;

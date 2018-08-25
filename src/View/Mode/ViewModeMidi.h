@@ -28,30 +28,30 @@ public:
 	ViewModeMidi(AudioView *view);
 	virtual ~ViewModeMidi();
 
-	void onLeftButtonDown() override;
-	void onLeftButtonUp() override;
-	void onMouseMove() override;
-	void onKeyDown(int k) override;
+	void on_left_button_down() override;
+	void on_left_button_up() override;
+	void on_mouse_move() override;
+	void on_key_down(int k) override;
 	float layer_min_height(AudioViewLayer *l) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
 	void on_cur_layer_change() override;
 
-	void drawLayerBackground(Painter *c, AudioViewLayer *l) override;
+	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 	void drawLayerPitchGrid(Painter *c, AudioViewLayer *l);
-	void drawLayerData(Painter *c, AudioViewLayer *l) override;
-	void drawTrackData(Painter *c, AudioViewTrack *t) override;
-	void drawPost(Painter *c) override;
+	void draw_layer_data(Painter *c, AudioViewLayer *l) override;
+	void draw_track_data(Painter *c, AudioViewTrack *t) override;
+	void draw_post(Painter *c) override;
 
-	Selection getHover() override;
-	void startSelection() override;
+	Selection get_hover() override;
+	void start_selection() override;
 
-	MidiNoteBuffer getCreationNotes(Selection *sel, int pos0);
-	void setBeatPartition(int partition);
-	void setNoteLength(int length);
+	MidiNoteBuffer get_creation_notes(Selection *sel, int pos0);
+	void set_beat_partition(int partition);
+	void set_note_length(int length);
 
-	Array<int> getCreationPitch(int base_pitch);
-	Range getMidiEditRange();
-	void startMidiPreview(const Array<int> &pitch, float ttl);
+	Array<int> get_creation_pitch(int base_pitch);
+	Range get_midi_edit_range();
+	void start_midi_preview(const Array<int> &pitch, float ttl);
 
 	void edit_add_pause();
 	void edit_add_note_on_string(int hand_pos);
@@ -66,10 +66,10 @@ public:
 	int chord_inversion;
 	int midi_interval;
 
-	void setModifier(NoteModifier mod);
+	void set_modifier(NoteModifier mod);
 	NoteModifier modifier;
 
-	void setMode(MidiMode mode);
+	void set_mode(MidiMode mode);
 	MidiMode mode_wanted;
 
 	enum class CreationMode
@@ -79,7 +79,7 @@ public:
 		INTERVAL,
 		CHORD
 	};
-	void setCreationMode(CreationMode mode);
+	void set_creation_mode(CreationMode mode);
 	CreationMode creation_mode;
 
 	MidiPreview *preview;

@@ -98,7 +98,7 @@ void CaptureConsoleModeMidi::enter()
 	input = new InputStreamMidi(session);
 	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
-	view->mode_capture->setInputMidi(input);
+	view->mode_capture->set_input_midi(input);
 	cc->peak_meter->setSource(nullptr);//input);
 
 	input->set_device(chosen_device);
@@ -118,7 +118,7 @@ void CaptureConsoleModeMidi::enter()
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->setSource(nullptr);
-	view->mode_capture->setInputMidi(nullptr);
+	view->mode_capture->set_input_midi(nullptr);
 	delete(input);
 	input = nullptr;
 }

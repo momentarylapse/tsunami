@@ -28,16 +28,16 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 
 ViewModeCapture::~ViewModeCapture()
 {
-	setInputAudio(nullptr);
-	setInputMidi(nullptr);
+	set_input_audio(nullptr);
+	set_input_midi(nullptr);
 }
 
-Selection ViewModeCapture::getHover()
+Selection ViewModeCapture::get_hover()
 {
-	return getHoverBasic(false);
+	return get_hover_basic(false);
 }
 
-void ViewModeCapture::drawPost(Painter *c)
+void ViewModeCapture::draw_post(Painter *c)
 {
 	// capturing preview
 	if (input_audio and input_audio->is_capturing()){
@@ -51,12 +51,12 @@ void ViewModeCapture::drawPost(Painter *c)
 
 	if (input_midi and input_midi->is_capturing()){
 		if (capturing_track)
-			drawMidi(c, view->get_layer(capturing_track->layers[0]), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
+			draw_midi(c, view->get_layer(capturing_track->layers[0]), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
 		view->draw_time_line(c, view->sel.range.start() + input_midi->get_sample_count(), (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 	}
 }
 
-void ViewModeCapture::setInputAudio(InputStreamAudio *_input)
+void ViewModeCapture::set_input_audio(InputStreamAudio *_input)
 {
 	if (input_audio)
 		input_audio->unsubscribe(this);
@@ -66,10 +66,10 @@ void ViewModeCapture::setInputAudio(InputStreamAudio *_input)
 	view->notify(view->MESSAGE_INPUT_CHANGE);
 
 	if (input_audio)
-		input_audio->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
+		input_audio->subscribe(this, std::bind(&ViewModeCapture::on_input_update, this));
 }
 
-void ViewModeCapture::setInputMidi(InputStreamMidi *_input)
+void ViewModeCapture::set_input_midi(InputStreamMidi *_input)
 {
 	if (input_midi)
 		input_midi->unsubscribe(this);
@@ -78,10 +78,10 @@ void ViewModeCapture::setInputMidi(InputStreamMidi *_input)
 	view->notify(view->MESSAGE_INPUT_CHANGE);
 
 	if (input_midi)
-		input_midi->subscribe(this, std::bind(&ViewModeCapture::onInputUpdate, this));
+		input_midi->subscribe(this, std::bind(&ViewModeCapture::on_input_update, this));
 }
 
-void ViewModeCapture::onInputUpdate()
+void ViewModeCapture::on_input_update()
 {
 	if (input_audio){
 		AudioBuffer &buf = export_view_sucker->buf;

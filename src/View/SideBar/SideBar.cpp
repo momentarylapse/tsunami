@@ -78,7 +78,7 @@ SideBar::SideBar(Session *session)
 	visible = false;
 	active_console = -1;
 
-	subscribe(session->view, std::bind(&AudioView::onUpdate, session->view)); // EVIL HACK?!?
+	subscribe(session->view, std::bind(&AudioView::on_update, session->view)); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()

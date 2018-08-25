@@ -61,13 +61,13 @@ ViewModeMidi::~ViewModeMidi()
 }
 
 
-void ViewModeMidi::setModifier(NoteModifier mod)
+void ViewModeMidi::set_modifier(NoteModifier mod)
 {
 	modifier = mod;
 	notify();
 }
 
-void ViewModeMidi::setMode(MidiMode _mode)
+void ViewModeMidi::set_mode(MidiMode _mode)
 {
 	mode_wanted = _mode;
 	view->thm.dirty = true;
@@ -75,7 +75,7 @@ void ViewModeMidi::setMode(MidiMode _mode)
 	notify();
 }
 
-void ViewModeMidi::setCreationMode(CreationMode _mode)
+void ViewModeMidi::set_creation_mode(CreationMode _mode)
 {
 	creation_mode = _mode;
 	//view->forceRedraw();
@@ -104,14 +104,14 @@ AudioViewLayer* ViewModeMidi::cur_vlayer()
 }
 
 
-void ViewModeMidi::startMidiPreview(const Array<int> &pitch, float ttl)
+void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl)
 {
 	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
 }
 
-void ViewModeMidi::onLeftButtonDown()
+void ViewModeMidi::on_left_button_down()
 {
-	ViewModeDefault::onLeftButtonDown();
+	ViewModeDefault::on_left_button_down();
 	auto mode = cur_vlayer()->midi_mode;
 
 	bool over_sel_note = false;
@@ -120,7 +120,7 @@ void ViewModeMidi::onLeftButtonDown()
 
 
 	if (creation_mode == CreationMode::SELECT and !over_sel_note){
-		setCursorPos(hover->pos, true);
+		set_cursor_pos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 
 	}else{
@@ -145,7 +145,7 @@ void ViewModeMidi::onLeftButtonDown()
 		if (mode == MidiMode::TAB){
 		}else{ // CLASSICAL/LINEAR
 			// create new note
-			startMidiPreview(getCreationPitch(hover->pitch), 1.0f);
+			start_midi_preview(get_creation_pitch(hover->pitch), 1.0f);
 		}
 	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
 		scroll->drag_start(view->mx, view->my);
@@ -153,17 +153,17 @@ void ViewModeMidi::onLeftButtonDown()
 	}
 }
 
-void ViewModeMidi::onLeftButtonUp()
+void ViewModeMidi::on_left_button_up()
 {
-	ViewModeDefault::onLeftButtonUp();
+	ViewModeDefault::on_left_button_up();
 	view->hide_selection = false;
 
 	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (hover->type == Selection::Type::MIDI_PITCH){
-			auto notes = getCreationNotes(hover, view->msp.start_pos);
+			auto notes = get_creation_notes(hover, view->msp.start_pos);
 			if (notes.num > 0){
-				setCursorPos(notes[0]->range.end() + 1, true);
+				set_cursor_pos(notes[0]->range.end() + 1, true);
 				octave = pitch_get_octave(hover->pitch);
 				view->cur_layer()->addMidiNotes(notes);
 				notes.clear(); // all notes owned by track now
@@ -177,9 +177,9 @@ void ViewModeMidi::onLeftButtonUp()
 	}
 }
 
-void ViewModeMidi::onMouseMove()
+void ViewModeMidi::on_mouse_move()
 {
-	ViewModeDefault::onMouseMove();
+	ViewModeDefault::on_mouse_move();
 	auto e = hui::GetEvent();
 
 	if (hover->type == Selection::Type::MIDI_PITCH){
@@ -208,28 +208,28 @@ MidiNote *make_note(ViewModeMidi *m, const Range &r, int pitch, NoteModifier mod
 
 void ViewModeMidi::edit_add_pause()
 {
-	Range r = getMidiEditRange();
-	setCursorPos(r.end() + 1, true);
+	Range r = get_midi_edit_range();
+	set_cursor_pos(r.end() + 1, true);
 }
 
 void ViewModeMidi::edit_add_note_by_relative(int relative)
 {
-	Range r = getMidiEditRange();
+	Range r = get_midi_edit_range();
 	int pitch = pitch_from_octave_and_rel(relative, octave);
 	view->cur_layer()->addMidiNote(make_note(this, r, pitch, modifier));
-	setCursorPos(r.end() + 1, true);
-	startMidiPreview(pitch, 0.1f);
+	set_cursor_pos(r.end() + 1, true);
+	start_midi_preview(pitch, 0.1f);
 }
 
 void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 {
-	Range r = getMidiEditRange();
+	Range r = get_midi_edit_range();
 	int pitch = cur_layer()->track->instrument.string_pitch[string_no] + hand_pos;
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
 	n->stringno = string_no;
 	cur_layer()->addMidiNote(n);
-	setCursorPos(r.end() + 1, true);
-	startMidiPreview(pitch, 0.1f);
+	set_cursor_pos(r.end() + 1, true);
+	start_midi_preview(pitch, 0.1f);
 }
 
 void ViewModeMidi::edit_backspace()
@@ -238,7 +238,7 @@ void ViewModeMidi::edit_backspace()
 	Range r = Range(a, view->sel.range.offset-a);
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
 	view->song->deleteSelection(s);
-	setCursorPos(a, true);
+	set_cursor_pos(a, true);
 }
 
 void ViewModeMidi::jump_string(int delta)
@@ -254,18 +254,18 @@ void ViewModeMidi::jump_octave(int delta)
 	view->force_redraw();
 }
 
-void ViewModeMidi::onKeyDown(int k)
+void ViewModeMidi::on_key_down(int k)
 {
 	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (k == hui::KEY_0){
-			setModifier(NoteModifier::NONE);
+			set_modifier(NoteModifier::NONE);
 		}else if (k == hui::KEY_FENCE){
-			setModifier(NoteModifier::SHARP);
+			set_modifier(NoteModifier::SHARP);
 		}else if (k == hui::KEY_3){
-			setModifier(NoteModifier::FLAT);
+			set_modifier(NoteModifier::FLAT);
 		}else if (k == hui::KEY_4){
-			setModifier(NoteModifier::NATURAL);
+			set_modifier(NoteModifier::NATURAL);
 		}
 
 		// add note
@@ -317,7 +317,7 @@ void ViewModeMidi::onKeyDown(int k)
 		//tsunami->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 		//view->setMode(view->mode_default);
 
-	ViewModeDefault::onKeyDown(k);
+	ViewModeDefault::on_key_down(k);
 }
 
 float ViewModeMidi::layer_min_height(AudioViewLayer *l)
@@ -379,7 +379,7 @@ Range get_allowed_midi_range(TrackLayer *l, Array<int> pitch, int start)
 	return allowed;
 }
 
-Array<int> ViewModeMidi::getCreationPitch(int base_pitch)
+Array<int> ViewModeMidi::get_creation_pitch(int base_pitch)
 {
 	Array<int> pitch;
 	if (creation_mode == CreationMode::NOTE){
@@ -394,7 +394,7 @@ Array<int> ViewModeMidi::getCreationPitch(int base_pitch)
 	return pitch;
 }
 
-MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
+MidiNoteBuffer ViewModeMidi::get_creation_notes(Selection *sel, int pos0)
 {
 	int start = min(pos0, sel->pos);
 	int end = max(pos0, sel->pos);
@@ -404,7 +404,7 @@ MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 	if (song->bars.num > 0)
 		align_to_beats(song, r, beat_partition);
 
-	Array<int> pitch = getCreationPitch(sel->pitch);
+	Array<int> pitch = get_creation_pitch(sel->pitch);
 
 	// collision?
 	Range allowed = get_allowed_midi_range(view->cur_layer(), pitch, pos0);
@@ -422,19 +422,19 @@ MidiNoteBuffer ViewModeMidi::getCreationNotes(Selection *sel, int pos0)
 	return notes;
 }
 
-void ViewModeMidi::setBeatPartition(int partition)
+void ViewModeMidi::set_beat_partition(int partition)
 {
 	beat_partition = partition;
 	view->force_redraw();
 }
 
-void ViewModeMidi::setNoteLength(int length)
+void ViewModeMidi::set_note_length(int length)
 {
 	note_length = length;
 	view->force_redraw();
 }
 
-void ViewModeMidi::drawLayerBackground(Painter *c, AudioViewLayer *l)
+void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
 	l->drawBlankBackground(c);
 
@@ -524,9 +524,9 @@ inline bool hover_note_linear(const MidiNote &n, Selection &s, ViewModeMidi *vmm
 	return n.range.is_inside(s.pos);
 }
 
-Selection ViewModeMidi::getHover()
+Selection ViewModeMidi::get_hover()
 {
-	Selection s = ViewModeDefault::getHover();
+	Selection s = ViewModeDefault::get_hover();
 	if (s.type != s.Type::LAYER)
 		return s;
 
@@ -598,7 +598,7 @@ Selection ViewModeMidi::getHover()
 	return s;
 }
 
-void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
+void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
 	// midi
 	if (editing(l)){
@@ -607,7 +607,7 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 			if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))
 				drawMidi(c, t, song->tracks[n]->midi, true, 0);*/
 
-		drawMidi(c, l, l->layer->midi, false, 0);
+		draw_midi(c, l, l->layer->midi, false, 0);
 
 		auto mode = l->midi_mode;
 
@@ -615,16 +615,16 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 
 			// current creation
 			if ((hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
-				auto notes = getCreationNotes(hover, view->msp.start_pos);
-				drawMidi(c, l, notes, false, 0);
+				auto notes = get_creation_notes(hover, view->msp.start_pos);
+				draw_midi(c, l, notes, false, 0);
 				//c->setFontSize(view->FONT_SIZE);
 			}
 
 
 			// creation preview
 			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
-				auto notes = getCreationNotes(hover, hover->pos);
-				drawMidi(c, l, notes, false, 0);
+				auto notes = get_creation_notes(hover, hover->pos);
+				draw_midi(c, l, notes, false, 0);
 			}
 		}
 
@@ -642,7 +642,7 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 
 		// not editing -> just draw
 		if (l->layer->type == SignalType::MIDI)
-			drawMidi(c, l, l->layer->midi, false, 0);
+			draw_midi(c, l, l->layer->midi, false, 0);
 	}
 
 
@@ -664,17 +664,17 @@ void ViewModeMidi::drawLayerData(Painter *c, AudioViewLayer *l)
 
 }
 
-void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
+void ViewModeMidi::draw_track_data(Painter *c, AudioViewTrack *t)
 {
 }
 
-void ViewModeMidi::drawPost(Painter *c)
+void ViewModeMidi::draw_post(Painter *c)
 {
-	ViewModeDefault::drawPost(c);
+	ViewModeDefault::draw_post(c);
 
 	auto *l = cur_vlayer();
 	auto mode = l->midi_mode;
-	Range r = getMidiEditRange();
+	Range r = get_midi_edit_range();
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
 
@@ -699,7 +699,7 @@ void ViewModeMidi::drawPost(Painter *c)
 	}
 }
 
-Range ViewModeMidi::getMidiEditRange()
+Range ViewModeMidi::get_midi_edit_range()
 {
 	int a = song->bars.getPrevSubBeat(view->sel.range.offset+1, beat_partition);
 	int b = song->bars.getNextSubBeat(view->sel.range.end()-1, beat_partition);
@@ -710,7 +710,7 @@ Range ViewModeMidi::getMidiEditRange()
 	return Range(a, b - a);
 }
 
-void ViewModeMidi::startSelection()
+void ViewModeMidi::start_selection()
 {
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
@@ -722,5 +722,5 @@ void ViewModeMidi::startSelection()
 		hover->y1 = view->my;
 		view->selection_mode = view->SelectionMode::RECT;
 	}
-	view->setSelection(getSelection(hover->range));
+	view->set_selection(get_selection(hover->range));
 }

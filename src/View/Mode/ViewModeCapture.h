@@ -23,21 +23,21 @@ public:
 	ViewModeCapture(AudioView *view);
 	virtual ~ViewModeCapture();
 
-	virtual Selection getHover();
-	virtual void onLeftButtonDown(){}
-	virtual void onLeftDoubleClick(){}
+	virtual Selection get_hover();
+	virtual void on_left_button_down(){}
+	virtual void on_left_double_click(){}
 
-	virtual void drawPost(Painter *c);
+	virtual void draw_post(Painter *c);
 
 	//CaptureConsoleMode *console_mode;
 
 	InputStreamAudio *input_audio;
 	InputStreamMidi *input_midi;
-	void setInputAudio(InputStreamAudio *input);
-	void setInputMidi(InputStreamMidi *input);
+	void set_input_audio(InputStreamAudio *input);
+	void set_input_midi(InputStreamMidi *input);
 	Track *capturing_track;
 
-	void onInputUpdate();
+	void on_input_update();
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

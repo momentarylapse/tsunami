@@ -40,29 +40,29 @@ ViewModeDefault::~ViewModeDefault()
 }
 
 
-void ViewModeDefault::onLeftButtonDown()
+void ViewModeDefault::on_left_button_down()
 {
 	//bool track_hover_sel = view->sel.has(hover->track);
-	selectUnderMouse();
+	select_under_mouse();
 
 	view->snap_to_grid(hover->pos);
 
 	// selection:
 	//   start after lb down and moving
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::CLEF_POSITION)){
-		setCursorPos(hover->pos, true);//track_hover_sel);
+		set_cursor_pos(hover->pos, true);//track_hover_sel);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::BAR){
-		setCursorPos(hover->pos, true);
+		set_cursor_pos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::TIME){
-		setCursorPos(hover->pos, true);
+		set_cursor_pos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		setCursorPos(hover->pos, true);
+		set_cursor_pos(hover->pos, true);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::BACKGROUND){
-		setCursorPos(hover->pos, false);
+		set_cursor_pos(hover->pos, false);
 		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::SELECTION_END){
 		hover->range = view->sel.range;
@@ -123,13 +123,13 @@ void ViewModeDefault::dnd_stop()
 	cur_action = nullptr;
 }
 
-void ViewModeDefault::onLeftButtonUp()
+void ViewModeDefault::on_left_button_up()
 {
 	if (cur_action)
 		dnd_stop();
 
 	if (moving_track){
-		int target = getTrackMoveTarget(false);
+		int target = get_track_move_target(false);
 		//int orig = get_track_index(moving_track);
 		moving_track->move(target);
 		moving_track = nullptr;
@@ -149,41 +149,41 @@ int hover_buffer(Selection *hover)
 	return -1;
 }
 
-void ViewModeDefault::onLeftDoubleClick()
+void ViewModeDefault::on_left_double_click()
 {
 	if (view->selection_mode != view->SelectionMode::NONE)
 		return;
 
-	selectUnderMouse();
+	select_under_mouse();
 
 	int buffer_index = hover_buffer(hover);
 
 	if (hover->type == Selection::Type::SAMPLE){
-		view->sel = getSelectionForRange(view->cur_sample->range());
-		view->updateSelection();
+		view->sel = get_selection_for_range(view->cur_sample->range());
+		view->update_selection();
 	}else if (hover->type == Selection::Type::MARKER){
-		view->sel = getSelectionForRange(hover->marker->range);
-		view->updateSelection();
+		view->sel = get_selection_for_range(hover->marker->range);
+		view->update_selection();
 	}else if ((hover->type == Selection::Type::LAYER) and (buffer_index >= 0)){
-		view->sel = getSelectionForRange(hover->layer->buffers[buffer_index].range());
-		view->updateSelection();
+		view->sel = get_selection_for_range(hover->layer->buffers[buffer_index].range());
+		view->update_selection();
 	}else if (hover->type == Selection::Type::BAR){
-		view->sel = getSelectionForRange(hover->bar->range());
-		view->updateSelection();
+		view->sel = get_selection_for_range(hover->bar->range());
+		view->update_selection();
 	}
 }
 
-void ViewModeDefault::onRightButtonDown()
+void ViewModeDefault::on_right_button_down()
 {
 	bool track_hover_sel = view->sel.has(hover->track);
 
-	selectUnderMouse();
+	select_under_mouse();
 
 	// click outside sel.range -> select new position
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			view->snap_to_grid(hover->pos);
-			setCursorPos(hover->pos, track_hover_sel);
+			set_cursor_pos(hover->pos, track_hover_sel);
 		}
 	}
 
@@ -236,11 +236,11 @@ void ViewModeDefault::onRightButtonDown()
 	}
 }
 
-void ViewModeDefault::onRightButtonUp()
+void ViewModeDefault::on_right_button_up()
 {
 }
 
-void ViewModeDefault::onMouseMove()
+void ViewModeDefault::on_mouse_move()
 {
 	bool _force_redraw_ = false;
 
@@ -261,10 +261,10 @@ void ViewModeDefault::onMouseMove()
 			view->thm.update_immediately(view, view->song, view->song_area);
 		}
 
-		view->selectionUpdatePos(view->hover);
+		view->selection_update_pos(view->hover);
 	}else{
 		//Selection hover_old = *hover;
-		*hover = getHover();
+		*hover = get_hover();
 		/*if (hover_changed(*hover, hover_old))
 			view->forceRedraw();*/
 		return;
@@ -314,7 +314,7 @@ void ViewModeDefault::onMouseMove()
 		view->force_redraw();
 }
 
-void ViewModeDefault::onMouseWheel()
+void ViewModeDefault::on_mouse_wheel()
 {
 	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f){
@@ -329,14 +329,14 @@ void ViewModeDefault::onMouseWheel()
 
 void playback_seek_relative(AudioView *view, float dt)
 {
-	int pos = view->playbackPos();
+	int pos = view->playback_pos();
 	pos += dt * view->song->sample_rate;
 	pos = max(pos, view->renderer->range().offset);
 	view->renderer->seek(pos);
 	view->stream->clear_buffer();
 }
 
-void ViewModeDefault::onKeyDown(int k)
+void ViewModeDefault::on_key_down(int k)
 {
 
 // view
@@ -358,8 +358,8 @@ void ViewModeDefault::onKeyDown(int k)
 		cam->zoom(exp(- view->ZoomSpeed));
 
 	if (k == hui::KEY_SPACE){
-		if (view->isPlaybackActive()){
-			view->pause(!view->isPaused());
+		if (view->is_playback_active()){
+			view->pause(!view->is_paused());
 		}else{
 			win->onPlay();
 			//view->play(); unsafe for recording...
@@ -367,7 +367,7 @@ void ViewModeDefault::onKeyDown(int k)
 	}
 
 	// playback
-	if (view->isPlaybackActive()){
+	if (view->is_playback_active()){
 		if (k == hui::KEY_CONTROL + hui::KEY_RIGHT)
 			playback_seek_relative(view, 5);
 		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
@@ -383,7 +383,7 @@ void ViewModeDefault::onKeyDown(int k)
 	view->update_menu();
 }
 
-void ViewModeDefault::onKeyUp(int k)
+void ViewModeDefault::on_key_up(int k)
 {
 }
 
@@ -408,7 +408,7 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 
 
 
-void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
+void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	auto mode = l->midi_mode;
 	if (mode == MidiMode::LINEAR)
@@ -419,7 +419,7 @@ void ViewModeDefault::drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuff
 		l->drawMidiClassical(c, midi, as_reference, shift);
 }
 
-void ViewModeDefault::drawLayerBackground(Painter *c, AudioViewLayer *l)
+void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
 	l->drawBlankBackground(c);
 
@@ -476,20 +476,20 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 }
 
-void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
+void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 {
 
 	if (t->track->type == SignalType::BEATS)
 		draw_bar_selection(c, t, view);
 }
 
-void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
+void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
 	Track *t = l->layer->track;
 
 	// midi
 	if (l->layer->type == SignalType::MIDI)
-		drawMidi(c, l, l->layer->midi, false, 0);
+		draw_midi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
 	l->drawTrackBuffers(c, view->cam.pos);
@@ -508,7 +508,7 @@ void ViewModeDefault::drawLayerData(Painter *c, AudioViewLayer *l)
 	}
 }
 
-int ViewModeDefault::getTrackMoveTarget(bool visual)
+int ViewModeDefault::get_track_move_target(bool visual)
 {
 	int orig = get_track_index(moving_track);
 	foreachi(auto vt, view->vtrack, i){
@@ -523,11 +523,11 @@ int ViewModeDefault::getTrackMoveTarget(bool visual)
 	return visual ? song->tracks.num : (song->tracks.num-1);
 }
 
-void ViewModeDefault::drawPost(Painter *c)
+void ViewModeDefault::draw_post(Painter *c)
 {
 	if (moving_track){
 		//int orig = get_track_index(moving_track);
-		int t = getTrackMoveTarget(true);
+		int t = get_track_move_target(true);
 		int y = view->vtrack.back()->area.y2;
 		if (t < view->vtrack.num)
 			y = view->vtrack[t]->area.y1;
@@ -569,7 +569,7 @@ void ViewModeDefault::drawPost(Painter *c)
 		{}//view->draw_cursor_hover(c, _("bar gap"));
 }
 
-Selection ViewModeDefault::getHoverBasic(bool editable)
+Selection ViewModeDefault::get_hover_basic(bool editable)
 {
 	Selection s;
 	int mx = view->mx;
@@ -612,8 +612,8 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 			s.type = Selection::Type::SELECTION_START;
 			return s;
 		}
-		if (view->isPlaybackActive()){
-			if (view->mouse_over_time(view->playbackPos())){
+		if (view->is_playback_active()){
+			if (view->mouse_over_time(view->playback_pos())){
 				s.type = Selection::Type::PLAYBACK;
 				return s;
 			}
@@ -675,9 +675,9 @@ Selection ViewModeDefault::getHoverBasic(bool editable)
 	return s;
 }
 
-Selection ViewModeDefault::getHover()
+Selection ViewModeDefault::get_hover()
 {
-	Selection s = getHoverBasic(true);
+	Selection s = get_hover_basic(true);
 
 	// already found important stuff?
 	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::LAYER) and (s.type != Selection::Type::TIME))
@@ -702,7 +702,7 @@ Selection ViewModeDefault::getHover()
 
 		// TODO: prefer selected samples
 		for (SampleRef *ss: s.layer->samples){
-			int offset = view->mouseOverSample(ss);
+			int offset = view->mouse_over_sample(ss);
 			if (offset >= 0){
 				s.sample = ss;
 				s.type = Selection::Type::SAMPLE;
@@ -741,9 +741,9 @@ Selection ViewModeDefault::getHover()
 	return s;
 }
 
-void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
+void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 {
-	if (view->isPlaybackActive()){
+	if (view->is_playback_active()){
 		if (view->renderer->range().is_inside(pos)){
 			view->renderer->seek(pos);
 			view->stream->clear_buffer();
@@ -759,7 +759,7 @@ void ViewModeDefault::setCursorPos(int pos, bool keep_track_selection)
 	if (!keep_track_selection)
 		view->sel.tracks = view->cur_track();
 		//view->sel.all_tracks(view->song);
-	view->setSelection(getSelectionForRange(Range(pos, 0)));
+	view->set_selection(get_selection_for_range(Range(pos, 0)));
 }
 
 
@@ -792,26 +792,26 @@ void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 	sel.make_consistent(m->song);
 
 	// TODO: what to do???
-	m->view->setSelection(m->view->mode->getSelectionForRange(sel.range));
+	m->view->set_selection(m->view->mode->get_selection_for_range(sel.range));
 }
 
-void ViewModeDefault::selectUnderMouse()
+void ViewModeDefault::select_under_mouse()
 {
 	view->sel_temp = view->sel;
-	*hover = getHover();
+	*hover = get_hover();
 	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
 	bool control = win->getKey(hui::KEY_CONTROL);
 
 	// track
 	if (hover->vlayer)
-		view->setCurLayer(hover->vlayer);
+		view->set_cur_layer(hover->vlayer);
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
 		selectLayer(this, l, control, false);
 	if (hover->type == Selection::Type::TRACK_HEADER)
 		selectLayer(this, l, control, false);
 
-	view->setCurSample(s);
+	view->set_cur_sample(s);
 
 
 	if (hover->type == Selection::Type::BAR_GAP){
@@ -856,12 +856,12 @@ void ViewModeDefault::selectUnderMouse()
 	}
 }
 
-SongSelection ViewModeDefault::getSelectionForRange(const Range &r)
+SongSelection ViewModeDefault::get_selection_for_range(const Range &r)
 {
 	return SongSelection::from_range(song, r, view->sel.tracks, view->sel.track_layers);
 }
 
-SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y1)
+SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1)
 {
 	SongSelection s;
 	s.range = r;
@@ -903,7 +903,7 @@ SongSelection ViewModeDefault::getSelectionForRect(const Range &r, int y0, int y
 	return s;
 }
 
-SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, int y1)
+SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int y0, int y1)
 {
 	if (y0 > y1){
 		int t = y0;
@@ -923,7 +923,7 @@ SongSelection ViewModeDefault::getSelectionForTrackRect(const Range &r, int y0, 
 	return SongSelection::from_range(song, r, _tracks, _layers);
 }
 
-void ViewModeDefault::startSelection()
+void ViewModeDefault::start_selection()
 {
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
@@ -937,7 +937,7 @@ void ViewModeDefault::startSelection()
 		hover->y1 = view->my;
 		view->selection_mode = view->SelectionMode::TRACK_RECT;
 	}
-	view->setSelection(getSelection(hover->range));
+	view->set_selection(get_selection(hover->range));
 }
 
 MidiMode ViewModeDefault::which_midi_mode(Track *t)

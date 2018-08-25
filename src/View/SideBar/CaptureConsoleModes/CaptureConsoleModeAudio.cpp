@@ -91,7 +91,7 @@ void CaptureConsoleModeAudio::enter()
 	input->set_backup_mode(BACKUP_MODE_TEMP);
 	input->set_chunk_size(4096);
 	input->set_update_dt(0.03f);
-	view->mode_capture->setInputAudio(input);
+	view->mode_capture->set_input_audio(input);
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->set_source(input->out);
 	cc->peak_meter->setSource(peak_meter);
@@ -118,7 +118,7 @@ void CaptureConsoleModeAudio::leave()
 	delete sucker;
 	cc->peak_meter->setSource(nullptr);
 	delete peak_meter;
-	view->mode_capture->setInputAudio(nullptr);
+	view->mode_capture->set_input_audio(nullptr);
 	delete(input);
 	input = nullptr;
 }

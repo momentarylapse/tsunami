@@ -155,30 +155,30 @@ void MidiEditorConsole::on_settings_change()
 
 void MidiEditorConsole::onScale()
 {
-	view->setScale(Scale((Scale::Type)getInt("scale_type"), 11 - getInt("scale_root")));
+	view->set_scale(Scale((Scale::Type)getInt("scale_type"), 11 - getInt("scale_root")));
 }
 
 void MidiEditorConsole::onBeatPartition()
 {
-	view->mode_midi->setBeatPartition(getInt(""));
+	view->mode_midi->set_beat_partition(getInt(""));
 }
 
 void MidiEditorConsole::onNoteLength()
 {
-	view->mode_midi->setNoteLength(getInt(""));
+	view->mode_midi->set_note_length(getInt(""));
 }
 
 void MidiEditorConsole::onCreationMode()
 {
 	int n = getInt("midi_edit_mode");
 	if (n == 0){
-		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::SELECT);
+		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::SELECT);
 	}else if (n == 1){
-		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::NOTE);
+		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::NOTE);
 	}else if (n == 2){
-		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::INTERVAL);
+		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL);
 	}else if (n == 3){
-		view->mode_midi->setCreationMode(ViewModeMidi::CreationMode::CHORD);
+		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::CHORD);
 	}
 }
 
@@ -249,12 +249,12 @@ void MidiEditorConsole::clear()
 
 void MidiEditorConsole::on_enter()
 {
-	view->setMode(view->mode_midi);
+	view->set_mode(view->mode_midi);
 }
 
 void MidiEditorConsole::on_leave()
 {
-	view->setMode(view->mode_default);
+	view->set_mode(view->mode_default);
 }
 
 void MidiEditorConsole::setLayer(TrackLayer *l)

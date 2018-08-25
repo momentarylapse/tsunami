@@ -32,35 +32,35 @@ public:
 	ViewMode(AudioView *view);
 	virtual ~ViewMode();
 
-	virtual void onLeftButtonDown(){}
-	virtual void onLeftButtonUp(){}
-	virtual void onLeftDoubleClick(){}
-	virtual void onRightButtonDown(){}
-	virtual void onRightButtonUp(){}
-	virtual void onMouseMove(){}
-	virtual void onMouseWheel(){}
-	virtual void onKeyDown(int k){}
-	virtual void onKeyUp(int k){}
+	virtual void on_left_button_down(){}
+	virtual void on_left_button_up(){}
+	virtual void on_left_double_click(){}
+	virtual void on_right_button_down(){}
+	virtual void on_right_button_up(){}
+	virtual void on_mouse_move(){}
+	virtual void on_mouse_wheel(){}
+	virtual void on_key_down(int k){}
+	virtual void on_key_up(int k){}
 	virtual float layer_min_height(AudioViewLayer *l) = 0;
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change(){}
 
-	virtual Selection getHover();
+	virtual Selection get_hover();
 
-	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
-	virtual void drawLayerBackground(Painter *c, AudioViewLayer *l){}
-	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
-	virtual void drawLayerData(Painter *c, AudioViewLayer *t){}
-	virtual void drawPost(Painter *c){}
-	virtual void drawMidi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift){}
+	virtual void draw_track_background(Painter *c, AudioViewTrack *t){}
+	virtual void draw_layer_background(Painter *c, AudioViewLayer *l){}
+	virtual void draw_track_data(Painter *c, AudioViewTrack *t){}
+	virtual void draw_layer_data(Painter *c, AudioViewLayer *t){}
+	virtual void draw_post(Painter *c){}
+	virtual void draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift){}
 
 	virtual MidiMode which_midi_mode(Track *t) = 0;
 
-	SongSelection getSelection(const Range &r);
-	virtual SongSelection getSelectionForRange(const Range &r);
-	virtual SongSelection getSelectionForRect(const Range &r, int y0, int y1);
-	virtual SongSelection getSelectionForTrackRect(const Range &r, int y0, int y1);
-	virtual void startSelection(){}
+	SongSelection get_selection(const Range &r);
+	virtual SongSelection get_selection_for_range(const Range &r);
+	virtual SongSelection get_selection_for_rect(const Range &r, int y0, int y1);
+	virtual SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1);
+	virtual void start_selection(){}
 
 	AudioView *view;
 	ViewPort *cam;

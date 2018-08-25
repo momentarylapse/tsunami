@@ -21,33 +21,33 @@ ViewMode::~ViewMode()
 {
 }
 
-Selection ViewMode::getHover()
+Selection ViewMode::get_hover()
 {
 	return Selection();
 }
 
-SongSelection ViewMode::getSelection(const Range &r)
+SongSelection ViewMode::get_selection(const Range &r)
 {
 	if (view->selection_mode == view->SelectionMode::TIME)
-		return getSelectionForRange(r);
+		return get_selection_for_range(r);
 	if (view->selection_mode == view->SelectionMode::RECT)
-		return getSelectionForRect(r, hover->y0, hover->y1);
+		return get_selection_for_rect(r, hover->y0, hover->y1);
 	if (view->selection_mode == view->SelectionMode::TRACK_RECT)
-		return getSelectionForTrackRect(r, hover->y0, hover->y1);
+		return get_selection_for_track_rect(r, hover->y0, hover->y1);
 	return SongSelection();
 }
 
-SongSelection ViewMode::getSelectionForRange(const Range &r)
+SongSelection ViewMode::get_selection_for_range(const Range &r)
 {
 	return SongSelection();
 }
 
-SongSelection ViewMode::getSelectionForRect(const Range &r, int y0, int y1)
+SongSelection ViewMode::get_selection_for_rect(const Range &r, int y0, int y1)
 {
 	return SongSelection();
 }
 
-SongSelection ViewMode::getSelectionForTrackRect(const Range &r, int y0, int y1)
+SongSelection ViewMode::get_selection_for_track_rect(const Range &r, int y0, int y1)
 {
 	return SongSelection();
 }

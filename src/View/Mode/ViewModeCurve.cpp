@@ -25,9 +25,9 @@ ViewModeCurve::~ViewModeCurve()
 {
 }
 
-void ViewModeCurve::onLeftButtonDown()
+void ViewModeCurve::on_left_button_down()
 {
-	ViewModeDefault::onLeftButtonDown();
+	ViewModeDefault::on_left_button_down();
 
 
 	if (curve and (hover->type == Selection::Type::CURVE_POINT_NONE)){
@@ -38,14 +38,14 @@ void ViewModeCurve::onLeftButtonDown()
 	}
 }
 
-void ViewModeCurve::onLeftButtonUp()
+void ViewModeCurve::on_left_button_up()
 {
-	ViewModeDefault::onLeftButtonUp();
+	ViewModeDefault::on_left_button_up();
 }
 
-void ViewModeCurve::onMouseMove()
+void ViewModeCurve::on_mouse_move()
 {
-	ViewModeDefault::onMouseMove();
+	ViewModeDefault::on_mouse_move();
 
 	if (hui::GetEvent()->lbut){
 		if (curve and (hover->type == Selection::Type::CURVE_POINT)){
@@ -57,9 +57,9 @@ void ViewModeCurve::onMouseMove()
 	}
 }
 
-void ViewModeCurve::onKeyDown(int k)
+void ViewModeCurve::on_key_down(int k)
 {
-	ViewModeDefault::onKeyDown(k);
+	ViewModeDefault::on_key_down(k);
 
 	if (curve and (hover->type == Selection::Type::CURVE_POINT))
 		if (k == hui::KEY_DELETE){
@@ -69,9 +69,9 @@ void ViewModeCurve::onKeyDown(int k)
 		}
 }
 
-void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
+void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 {
-	ViewModeDefault::drawTrackData(c, t);
+	ViewModeDefault::draw_track_data(c, t);
 
 	if (t->track != view->cur_track())
 		return;
@@ -104,9 +104,9 @@ void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 	}
 }
 
-Selection ViewModeCurve::getHover()
+Selection ViewModeCurve::get_hover()
 {
-	Selection s = ViewModeDefault::getHover();
+	Selection s = ViewModeDefault::get_hover();
 	int mx = view->mx;
 	int my = view->my;
 

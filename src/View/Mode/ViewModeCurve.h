@@ -18,14 +18,14 @@ public:
 	ViewModeCurve(AudioView *view);
 	virtual ~ViewModeCurve();
 
-	virtual void onLeftButtonDown();
-	virtual void onLeftButtonUp();
-	virtual void onMouseMove();
-	virtual void onKeyDown(int k);
+	virtual void on_left_button_down();
+	virtual void on_left_button_up();
+	virtual void on_mouse_move();
+	virtual void on_key_down(int k);
 
-	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
+	virtual void draw_track_data(Painter *c, AudioViewTrack *t);
 
-	virtual Selection getHover();
+	virtual Selection get_hover();
 
 
 	float value2screen(float value);

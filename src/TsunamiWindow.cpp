@@ -756,10 +756,10 @@ void TsunamiWindow::onPlay()
 {
 	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
 		return;
-	if (view->isPaused())
+	if (view->is_paused())
 		view->pause(false);
 	else
-		view->play(view->getPlaybackSelection(false), true);
+		view->play(view->get_playback_selection(false), true);
 }
 
 void TsunamiWindow::onPause()
@@ -818,42 +818,42 @@ void TsunamiWindow::onViewOptimal()
 
 void TsunamiWindow::onSelectNone()
 {
-	view->selectNone();
+	view->select_none();
 }
 
 void TsunamiWindow::onSelectAll()
 {
-	view->selectAll();
+	view->select_all();
 }
 
 void TsunamiWindow::onSelectExpand()
 {
-	view->selectExpand();
+	view->select_expand();
 }
 
 void TsunamiWindow::onViewMidiDefault()
 {
-	view->setMidiViewMode(MidiMode::LINEAR);
+	view->set_midi_view_mode(MidiMode::LINEAR);
 }
 
 void TsunamiWindow::onViewMidiTab()
 {
-	view->setMidiViewMode(MidiMode::TAB);
+	view->set_midi_view_mode(MidiMode::TAB);
 }
 
 void TsunamiWindow::onViewMidiScore()
 {
-	view->setMidiViewMode(MidiMode::CLASSICAL);
+	view->set_midi_view_mode(MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::onZoomIn()
 {
-	view->zoomIn();
+	view->zoom_in();
 }
 
 void TsunamiWindow::onZoomOut()
 {
-	view->zoomOut();
+	view->zoom_out();
 }
 
 void TsunamiWindow::updateMenu()
@@ -888,8 +888,8 @@ void TsunamiWindow::updateMenu()
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("play", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
-	enable("stop", view->isPlaybackActive() or side_bar->is_active(SideBar::CAPTURE_CONSOLE));
-	enable("pause", view->isPlaybackActive() and !view->isPaused());
+	enable("stop", view->is_playback_active() or side_bar->is_active(SideBar::CAPTURE_CONSOLE));
+	enable("pause", view->is_playback_active() and !view->is_paused());
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
 	// view
@@ -1008,7 +1008,7 @@ void TsunamiWindow::onExport()
 {
 	if (session->storage->askSaveExport(this)){
 		SongRenderer renderer(song);
-		renderer.prepare(view->getPlaybackSelection(false), false);
+		renderer.prepare(view->get_playback_selection(false), false);
 		renderer.allow_tracks(view->get_selected_tracks());
 		session->storage->saveViaRenderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags);
 	}
@@ -1098,11 +1098,11 @@ void TsunamiWindow::onEditBars()
 
 void TsunamiWindow::onScaleBars()
 {
-	view->setMode(view->mode_scale_bars);
+	view->set_mode(view->mode_scale_bars);
 	Set<int> s;
 	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
 		s.add(i);
-	view->mode_scale_bars->startScaling(s);
+	view->mode_scale_bars->start_scaling(s);
 }
 
 void TsunamiWindow::onBarsModifyMidi()

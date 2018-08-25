@@ -389,7 +389,7 @@ void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 	if (s->type() == SignalType::AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
 	else if (s->type() == SignalType::MIDI)
-		view->mode->drawMidi(c, this, *s->midi, true, s->pos);
+		view->mode->draw_midi(c, this, *s->midi, true, s->pos);
 
 	if (view->sel.has(s)){
 		int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
@@ -793,7 +793,7 @@ void AudioViewLayer::drawBlankBackground(Painter *c)
 	}
 }
 
-bool AudioView::editingTrack(Track *t)
+bool AudioView::editing_track(Track *t)
 {
 	if (cur_track() != t)
 		return false;
@@ -812,7 +812,7 @@ bool AudioView::editingTrack(Track *t)
 	return false;
 }
 
-bool AudioView::editingLayer(AudioViewLayer *l)
+bool AudioView::editing_layer(AudioViewLayer *l)
 {
 	if (cur_vlayer != l)
 		return false;
@@ -826,7 +826,7 @@ bool AudioView::editingLayer(AudioViewLayer *l)
 void AudioViewTrack::drawHeader(Painter *c)
 {
 	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
-	bool visible = hover or view->editingTrack(track);
+	bool visible = hover or view->editing_track(track);
 	bool playable = view->get_playable_tracks().contains(track);
 
 	color col = view->colors.background_track_selected;
@@ -904,7 +904,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 void AudioViewLayer::drawVersionHeader(Painter *c)
 {
 	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
-	bool visible = hover or view->editingLayer(this);
+	bool visible = hover or view->editing_layer(this);
 	bool playable = view->get_playable_layers().contains(layer);
 
 	color col = view->colors.background_track_selected;
@@ -1009,7 +1009,7 @@ void AudioViewLayer::setSolo(bool _solo)
 
 void AudioViewTrack::draw(Painter *c)
 {
-	view->mode->drawTrackData(c, this);
+	view->mode->draw_track_data(c, this);
 
 	drawHeader(c);
 }
@@ -1017,7 +1017,7 @@ void AudioViewTrack::draw(Painter *c)
 
 void AudioViewLayer::draw(Painter *c)
 {
-	view->mode->drawLayerData(c, this);
+	view->mode->draw_layer_data(c, this);
 
 	if (layer->track->layers.num > 1)
 		drawVersionHeader(c);

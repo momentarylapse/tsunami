@@ -96,12 +96,12 @@ void CurveConsole::onUpdate()
 
 void CurveConsole::on_enter()
 {
-	view->setMode(view->mode_curve);
+	view->set_mode(view->mode_curve);
 }
 
 void CurveConsole::on_leave()
 {
-	view->setMode(view->mode_default);
+	view->set_mode(view->mode_default);
 }
 
 void CurveConsole::updateList()

@@ -93,7 +93,7 @@ void CaptureConsole::on_enter()
 	mode_midi->enterParent();
 	mode_multi->enterParent();
 
-	view->setMode(view->mode_capture);
+	view->set_mode(view->mode_capture);
 
 	mode->enter();
 
@@ -115,17 +115,17 @@ void CaptureConsole::on_leave()
 	mode_midi->leaveParent();
 	mode_multi->leaveParent();
 
-	view->setMode(view->mode_default);
+	view->set_mode(view->mode_default);
 }
 
 
 void CaptureConsole::onStart()
 {
-	if (view->isPlaybackActive()){
+	if (view->is_playback_active()){
 		view->pause(false);
 	}else{
 		mode->dump();
-		view->play(view->getPlaybackSelection(true), false);
+		view->play(view->get_playback_selection(true), false);
 	}
 	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputUpdate, this), view->stream->MESSAGE_UPDATE);
 	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
@@ -139,7 +139,7 @@ void CaptureConsole::onStart()
 
 void CaptureConsole::onDump()
 {
-	if (view->isPlaybackActive()){
+	if (view->is_playback_active()){
 		view->stream->unsubscribe(this);
 		view->stop();
 	}
@@ -184,7 +184,7 @@ void CaptureConsole::onClose()
 
 void CaptureConsole::onNewVersion()
 {
-	if (view->isPlaybackActive()){
+	if (view->is_playback_active()){
 		view->stream->unsubscribe(this);
 		view->stop();
 	}

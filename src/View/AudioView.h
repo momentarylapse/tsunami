@@ -59,29 +59,30 @@ public:
 	AudioView(Session *session, const string &id);
 	virtual ~AudioView();
 
-	void checkConsistency();
+	void check_consistency();
 	void force_redraw();
 	void force_redraw_part(const rect &r);
 
-	void onDraw(Painter *p);
-	void onMouseMove();
-	void onLeftButtonDown();
-	void onLeftButtonUp();
-	void onMiddleButtonDown();
-	void onMiddleButtonUp();
-	void onRightButtonDown();
-	void onRightButtonUp();
-	void onLeftDoubleClick();
-	void onMouseWheel();
-	void onKeyDown();
-	void onKeyUp();
-	void onCommand(const string &id);
+	void on_draw(Painter *p);
+	void on_mouse_move();
+	void on_left_button_down();
+	void on_left_button_up();
+	void on_middle_button_down();
+	void on_middle_button_up();
+	void on_right_button_down();
+	void on_right_button_up();
+	void on_left_double_click();
+	void on_mouse_leave();
+	void on_mouse_wheel();
+	void on_key_down();
+	void on_key_up();
+	void on_command(const string &id);
 
-	void onSongUpdate();
-	void onStreamUpdate();
-	void onStreamStateChange();
-	void onStreamEndOfStream();
-	void onUpdate();
+	void on_song_update();
+	void on_stream_update();
+	void on_stream_state_change();
+	void on_stream_end_of_stream();
+	void on_update();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
 	static const string MESSAGE_CUR_LAYER_CHANGE;
@@ -93,9 +94,9 @@ public:
 	static const string MESSAGE_OUTPUT_STATE_CHANGE;
 	static const string MESSAGE_SOLO_CHANGE;
 
-	void updatePeaks();
-	void zoomIn();
-	void zoomOut();
+	void update_peaks();
+	void zoom_in();
+	void zoom_out();
 
 	void draw_time_scale(Painter *c);
 	void draw_grid_time(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text);
@@ -175,30 +176,30 @@ public:
 		void stop();
 	}msp;
 
-	void selectNone();
-	void selectAll();
-	void selectExpand();
-	void updateSelection();
-	void setSelection(const SongSelection &s);
-	Range getPlaybackSelection(bool for_recording);
+	void select_none();
+	void select_all();
+	void select_expand();
+	void update_selection();
+	void set_selection(const SongSelection &s);
+	Range get_playback_selection(bool for_recording);
 
-	void setMouse();
-	int mouseOverSample(SampleRef *s);
-	void selectionUpdatePos(Selection &s);
+	void set_mouse();
+	int mouse_over_sample(SampleRef *s);
+	void selection_update_pos(Selection &s);
 	bool mouse_over_time(int pos);
 
-	void selectSample(SampleRef *s, bool diff);
+	void select_sample(SampleRef *s, bool diff);
 
 	int detail_steps;
 	int preview_sleep_time;
 	bool antialiasing;
 
 
-	void setMidiViewMode(MidiMode mode);
+	void set_midi_view_mode(MidiMode mode);
 	MidiMode midi_view_mode;
 
 	ViewMode *mode;
-	void setMode(ViewMode *m);
+	void set_mode(ViewMode *m);
 	ViewModeDefault *mode_default;
 	ViewModeMidi *mode_midi;
 	ViewModeScaleBars *mode_scale_bars;
@@ -217,29 +218,29 @@ public:
 	void play(const Range &range, bool allow_loop);
 	void stop();
 	void pause(bool pause);
-	bool isPlaybackActive();
-	bool isPaused();
-	int playbackPos();
+	bool is_playback_active();
+	bool is_paused();
+	int playback_pos();
 	Set<Track*> get_playable_tracks();
 	Set<Track*> get_selected_tracks();
-	bool hasAnySoloTrack();
+	bool has_any_solo_track();
 	Set<TrackLayer*> get_playable_layers();
-	bool hasAnySoloLayer(Track *t);
+	bool has_any_solo_layer(Track *t);
 
-	void setCurSample(SampleRef *s);
+	void set_cur_sample(SampleRef *s);
 	//void setCurTrack(Track *t);
-	void setCurLayer(AudioViewLayer *l);
+	void set_cur_layer(AudioViewLayer *l);
 	AudioViewLayer *cur_vlayer;
 	Track *_prev_cur_track;
 	Track *cur_track();
 	SampleRef *cur_sample;
 	TrackLayer *cur_layer();
 
-	bool editingTrack(Track *t);
-	bool editingLayer(AudioViewLayer *l);
+	bool editing_track(Track *t);
+	bool editing_layer(AudioViewLayer *l);
 
 
-	void setScale(const Scale &s);
+	void set_scale(const Scale &s);
 	Scale midi_scale;
 
 	bool bars_edit_data;
@@ -259,13 +260,13 @@ public:
 	AudioViewLayer *dummy_vlayer;
 	AudioViewTrack *get_track(Track *track);
 	AudioViewLayer *get_layer(TrackLayer *layer);
-	void updateTracks();
+	void update_tracks();
 
 	void update_peaks_now(AudioBuffer &buf);
 
 	int prefered_buffer_layer;
 	double buffer_zoom_factor;
-	void updateBufferZoom();
+	void update_buffer_zoom();
 
 	PeakThread *peak_thread;
 

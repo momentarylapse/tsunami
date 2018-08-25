@@ -760,6 +760,7 @@ void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 		view->sel.tracks = view->cur_track();
 		//view->sel.all_tracks(view->song);
 	view->set_selection(get_selection_for_range(Range(pos, 0)));
+	view->cam.make_sample_visible(pos);
 }
 
 

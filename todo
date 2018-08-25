@@ -100,7 +100,7 @@ J Spur-Icons hover
 
 == Wunschliste ==
 
-* Aufnahme-Metronom (grafisch + Vorlauf)
+j Aufnahme-Metronom (grafisch + Vorlauf)
 
 
 
@@ -128,7 +128,7 @@ J selection background...
 * fix: last chunk of peaks
 J perfmon window
 ~ perfmon more fine grained
-~ thread system...
+J thread system...
 j buffer moving mode
 * layer merging
 J Gaussian noise
@@ -142,7 +142,7 @@ J mixer toggle buttons
 J fx panel scroll
 J midi editing min layer height
 J global scroll bar
-* hover=none on mouse leave
+J hover=none on mouse leave
 * better in/out syncing
 * output underrun treatment?
 * multiple mixing profiles
@@ -192,7 +192,7 @@ J selection auto-scroll
 
 J PluginConsole
 J SignalEditor: integrated module config
-* integrate Metronome
+j integrate Metronome
 * smaller Equalizer (context menu, graphical gain)
 * FxEditor: track name
 

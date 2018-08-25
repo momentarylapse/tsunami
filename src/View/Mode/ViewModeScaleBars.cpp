@@ -33,8 +33,9 @@ void ViewModeScaleBars::draw_post(Painter *c)
 	c->setColor(color(0.1f, 1, 1, 1));
 	c->drawRect(sxx1, view->area.y1, 30, view->area.height());
 	c->drawRect(sxx2 - 30, view->area.y1, 30, view->area.height());
-	c->setColor(view->colors.text);
-	c->drawStr((sxx1 + sxx2) / 2, (view->area.y1 + view->area.y2) / 2, _("move selection to scale"));
+
+	string message = _("move right selection handle to scale");
+	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selection, 0);
 }
 
 

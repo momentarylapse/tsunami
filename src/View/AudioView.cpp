@@ -1031,15 +1031,19 @@ rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &s
 	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + FONT_SIZE + CORNER_RADIUS);
 }
 
-void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg)
+void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align)
 {
 	rect r = get_boxed_str_rect(c, x, y, str);
+	float dx =r.width() / 2 - CORNER_RADIUS;
+	dx *= (align - 1);
+	r.x1 += dx;
+	r.x2 += dx;
 	c->setColor(col_bg);
 	c->setRoundness(CORNER_RADIUS);
 	c->drawRect(r);
 	c->setRoundness(0);
 	c->setColor(col_text);
-	c->drawStr(x, y - FONT_SIZE/3, str);
+	c->drawStr(x + dx, y - FONT_SIZE/3, str);
 }
 
 

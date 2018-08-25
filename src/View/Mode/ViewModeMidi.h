@@ -37,7 +37,7 @@ public:
 	void on_cur_layer_change() override;
 
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
-	void drawLayerPitchGrid(Painter *c, AudioViewLayer *l);
+	void draw_layer_pitch_grid(Painter *c, AudioViewLayer *l);
 	void draw_layer_data(Painter *c, AudioViewLayer *l) override;
 	void draw_track_data(Painter *c, AudioViewTrack *t) override;
 	void draw_post(Painter *c) override;
@@ -81,6 +81,15 @@ public:
 	};
 	void set_creation_mode(CreationMode mode);
 	CreationMode creation_mode;
+
+	enum class InputMode
+	{
+		DEFAULT,
+		NOTE_LENGTH,
+		BEAT_PARTITION
+	};
+	void set_input_mode(InputMode mode);
+	InputMode input_mode;
 
 	MidiPreview *preview;
 

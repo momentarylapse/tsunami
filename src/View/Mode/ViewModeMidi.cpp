@@ -38,6 +38,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	win->setInt("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
 	creation_mode = CreationMode::NOTE;
+	input_mode = InputMode::DEFAULT;
 	midi_interval = 3;
 	chord_type = ChordType::MINOR;
 	chord_inversion = 0;
@@ -78,7 +79,14 @@ void ViewModeMidi::set_mode(MidiMode _mode)
 void ViewModeMidi::set_creation_mode(CreationMode _mode)
 {
 	creation_mode = _mode;
-	//view->forceRedraw();
+	view->force_redraw();
+	notify();
+}
+
+void ViewModeMidi::set_input_mode(InputMode _mode)
+{
+	input_mode = _mode;
+	view->force_redraw();
 	notify();
 }
 
@@ -258,21 +266,23 @@ void ViewModeMidi::on_key_down(int k)
 {
 	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
-		if (k == hui::KEY_0){
-			set_modifier(NoteModifier::NONE);
-		}else if (k == hui::KEY_FENCE){
-			set_modifier(NoteModifier::SHARP);
-		}else if (k == hui::KEY_3){
-			set_modifier(NoteModifier::FLAT);
-		}else if (k == hui::KEY_4){
-			set_modifier(NoteModifier::NATURAL);
-		}
+		if (input_mode == InputMode::DEFAULT){
+			if (k == hui::KEY_0){
+				set_modifier(NoteModifier::NONE);
+			}else if (k == hui::KEY_FENCE){
+				set_modifier(NoteModifier::SHARP);
+			}else if (k == hui::KEY_3){
+				set_modifier(NoteModifier::FLAT);
+			}else if (k == hui::KEY_4){
+				set_modifier(NoteModifier::NATURAL);
+			}
 
-		// add note
-		if ((k >= hui::KEY_A) and (k <= hui::KEY_G)){
-			int number = (k - hui::KEY_A);
-			int rel[7] = {9,11,0,2,4,5,7};
-			edit_add_note_by_relative(rel[number]);
+			// add note
+			if ((k >= hui::KEY_A) and (k <= hui::KEY_G)){
+				int number = (k - hui::KEY_A);
+				int rel[7] = {9,11,0,2,4,5,7};
+				edit_add_note_by_relative(rel[number]);
+			}
 		}
 
 		// add break
@@ -289,13 +299,15 @@ void ViewModeMidi::on_key_down(int k)
 		if (k == hui::KEY_DOWN)
 			jump_octave(-1);
 	}else if (mode == MidiMode::TAB){
+		if (input_mode == InputMode::DEFAULT){
 
-		// add note
-		if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
-			int number = (k - hui::KEY_0);
-			if (k >= hui::KEY_A)
-				number = 10 + (k - hui::KEY_A);
-			edit_add_note_on_string(number);
+			// add note
+			if (((k >= hui::KEY_0) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
+				int number = (k - hui::KEY_0);
+				if (k >= hui::KEY_A)
+					number = 10 + (k - hui::KEY_A);
+				edit_add_note_on_string(number);
+			}
 		}
 
 		// add break
@@ -311,6 +323,34 @@ void ViewModeMidi::on_key_down(int k)
 			jump_string(1);
 		if (k == hui::KEY_DOWN)
 			jump_string(-1);
+	}
+
+	if (input_mode == InputMode::NOTE_LENGTH){
+		if (((k >= hui::KEY_1) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
+			int number = (k - hui::KEY_0);
+			if (k >= hui::KEY_A)
+				number = 10 + (k - hui::KEY_A);
+			set_note_length(number);
+			set_input_mode(InputMode::DEFAULT);
+		}
+	}else if (input_mode == InputMode::BEAT_PARTITION){
+		if (((k >= hui::KEY_1) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
+			int number = (k - hui::KEY_0);
+			if (k >= hui::KEY_A)
+				number = 10 + (k - hui::KEY_A);
+			set_beat_partition(number);
+			set_input_mode(InputMode::DEFAULT);
+		}
+	}
+
+	if (k == hui::KEY_L){
+		set_input_mode(InputMode::NOTE_LENGTH);
+	}
+	if (k == hui::KEY_P){
+		set_input_mode(InputMode::BEAT_PARTITION);
+	}
+	if (k == hui::KEY_ESCAPE){
+		set_input_mode(InputMode::DEFAULT);
 	}
 
 	//if (k == hui::KEY_ESCAPE)
@@ -426,12 +466,14 @@ void ViewModeMidi::set_beat_partition(int partition)
 {
 	beat_partition = partition;
 	view->force_redraw();
+	notify();
 }
 
 void ViewModeMidi::set_note_length(int length)
 {
 	note_length = length;
 	view->force_redraw();
+	notify();
 }
 
 void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
@@ -451,7 +493,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 		auto mode = l->midi_mode;
 		if (l == view->cur_vlayer){
 			if (mode == MidiMode::LINEAR)
-				drawLayerPitchGrid(c, l);
+				draw_layer_pitch_grid(c, l);
 		}
 
 		if (mode == MidiMode::CLASSICAL){
@@ -463,7 +505,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 	}
 }
 
-void ViewModeMidi::drawLayerPitchGrid(Painter *c, AudioViewLayer *l)
+void ViewModeMidi::draw_layer_pitch_grid(Painter *c, AudioViewLayer *l)
 {
 	// pitch grid
 	c->setColor(color(0.25f, 0, 0, 0));
@@ -697,6 +739,18 @@ void ViewModeMidi::draw_post(Painter *c)
 		int y2 = l->pitch2y_linear(p1);
 		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
+
+	string message = _("add pause (.)    delete (⟵)    note length (L)    beat partition (P)");
+	if (mode == MidiMode::TAB)
+		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
+	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
+		message += "    " + _("octave (↑,↓)    modifiers (#,3,0)    add note (A-G)");
+	if (input_mode == InputMode::NOTE_LENGTH)
+		message = _("enter note length (1-9, A-F)    cancel (Esc)");
+	else if (input_mode == InputMode::BEAT_PARTITION)
+		message = _("enter beat partition (1-9, A-F)    cancel (Esc)");
+	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selected, 0);
+
 }
 
 Range ViewModeMidi::get_midi_edit_range()

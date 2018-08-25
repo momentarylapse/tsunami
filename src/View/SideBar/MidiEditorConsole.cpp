@@ -115,6 +115,9 @@ void MidiEditorConsole::update()
 
 	setInt("midi_edit_mode", (int)view->mode_midi->creation_mode);
 
+	setInt("beat_partition", view->mode_midi->beat_partition);
+	setInt("note_length", view->mode_midi->note_length);
+
 
 	if (layer->track->instrument.type == Instrument::Type::DRUMS){
 		// select a nicer pitch range in linear mode for drums

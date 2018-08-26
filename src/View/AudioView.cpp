@@ -233,6 +233,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	set_mode(mode_default);
 
 	area = rect(0, 1024, 0, 768);
+	song_area = area;
 	enabled = true;
 	scroll = new ScrollBar;
 

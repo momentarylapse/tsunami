@@ -51,7 +51,8 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 	clef_dy = 0;
 	clef_y0 = 0;
 
-	set_midi_mode(view->midi_view_mode);
+	if (layer)
+		set_midi_mode(view->midi_view_mode);
 }
 
 void AudioViewLayer::set_midi_mode(MidiMode wanted)

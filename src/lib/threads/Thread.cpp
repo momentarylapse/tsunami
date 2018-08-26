@@ -153,15 +153,15 @@ static void *__thread_start_func(void *p)
 {
 	Thread *t = (Thread*)p;
 
-	pthread_cleanup_push(&__thread_cleanup_func, p);
+	//pthread_cleanup_push(&__thread_cleanup_func, p);
 
 	t->done = false;
 	t->on_run();
 
-	std::lock_guard<std::mutex> lock(t->control_mutex);
+	//std::lock_guard<std::mutex> lock(t->control_mutex);
 	t->done = true;
 
-    pthread_cleanup_pop(0);
+    //pthread_cleanup_pop(0);
 	return nullptr;
 }
 
@@ -226,7 +226,7 @@ void Thread::cancelation_point()
 
 bool Thread::is_done()
 {
-	std::lock_guard<std::mutex> lock(control_mutex);
+	//std::lock_guard<std::mutex> lock(control_mutex);
 	return done;
 }
 

@@ -59,6 +59,7 @@ public:
 	void _cdecl update();
 
 	bool fully_initialized;
+	bool buffer_is_cleared;
 	void _start_first_time();
 	void _unpause();
 	void _pause();
@@ -112,6 +113,8 @@ private:
 
 	Thread *thread;
 	int perf_channel;
+
+	bool feed_stream_output(int frames, float *out);
 
 #if HAS_LIB_PULSEAUDIO
 	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);

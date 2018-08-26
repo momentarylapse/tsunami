@@ -69,40 +69,15 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	stream->_pulse_test_error("pa_stream_begin_write");
 	//printf("%d  %p  %d\n", r, data, (int)nbytes);
 
-	int done = 0;
 	int frames = nbytes / 8;
 	float *out = (float*)data;
 
-	int available = stream->ring_buf.available();
-	//printf("%d\n", available);
-	if (stream->paused or (available < frames)){
-//		printf("  x\n");
-		if (!stream->paused and !stream->read_end_of_stream)
-			printf("< underflow\n");
-		// output silence...
-		for (int i=0; i<frames; i++){
-			*out ++ = 0;
-			*out ++ = 0;
-		}
-	}else{
-//		printf("  j\n");
-		for (int n=0; (n<2) and (done < frames); n++){
-			AudioBuffer b;
-			stream->ring_buf.read_ref(b, frames - done);
-			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
-			stream->ring_buf.read_ref_done(b);
-			out += b.length * 2;
-			done += b.length;
-			break;
-		}
-		done = frames;
-	}
+	bool out_of_data = stream->feed_stream_output(frames, out);
 
 	pa_stream_write(p, data, nbytes, nullptr, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
 	stream->_pulse_test_error("pa_stream_write");
 
-
-	if (available <= frames and stream->read_end_of_stream and !stream->played_end_of_stream){
+	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
@@ -123,6 +98,52 @@ void OutputStream::pulse_stream_underflow_callback(pa_stream *s, void *userdata)
 
 #endif
 
+bool OutputStream::feed_stream_output(int frames_request, float *out)
+{
+	if (paused){
+		// output silence...
+		memset(out, 0, frames_request * 8);
+		return false;
+	}
+
+
+	int done = 0;
+
+	int available = ring_buf.available();
+	int frames = min(frames_request, available);
+
+
+//	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
+
+
+//	printf("  j\n");
+	for (int n=0; (n<2) and (done < (int)frames); n++){
+		AudioBuffer b;
+		ring_buf.read_ref(b, frames - done);
+		b.interleave(out, device_manager->getOutputVolume() * volume);
+		ring_buf.read_ref_done(b);
+		out += b.length * 2;
+		done += b.length;
+	}
+	done = frames;
+
+
+	if (available < frames_request){
+//		printf("  x\n");
+		if (!read_end_of_stream and !buffer_is_cleared)
+			printf("< underflow  %d < %d\n", available, frames_request);
+		// output silence...
+		for (int i=done; i<frames_request; i++){
+			*out ++ = 0;
+			*out ++ = 0;
+		}
+		return true;
+	}
+
+	return false;
+
+}
+
 #if HAS_LIB_PORTAUDIO
 
 int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
@@ -137,39 +158,13 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	float *out = (float*)outputBuffer;
 	(void) inputBuffer; /* Prevent unused variable warning. */
 
+	bool out_of_data = stream->feed_stream_output((int)frames, out);
 
-	int done = 0;
-
-	int available = stream->ring_buf.available();
-//	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
-	if (stream->paused or (available < (int)frames)){
-//		printf("  x\n");
-		if (!stream->paused and !stream->read_end_of_stream)
-			printf("< underflow\n");
-		// output silence...
-		for (int i=0; i<(int)frames; i++){
-			*out ++ = 0;
-			*out ++ = 0;
-		}
-	}else{
-//		printf("  j\n");
-		for (int n=0; (n<2) and (done < (int)frames); n++){
-			AudioBuffer b;
-			stream->ring_buf.read_ref(b, frames - done);
-			b.interleave(out, stream->device_manager->getOutputVolume() * stream->volume);
-			stream->ring_buf.read_ref_done(b);
-			out += b.length * 2;
-			done += b.length;
-			break;
-		}
-		done = frames;
-	}
-
-
-	if (available <= (int)frames and stream->read_end_of_stream and !stream->played_end_of_stream){
-		//printf("XXX end of data...\n");
+	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
+		printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
+		printf("/XXX end of data...\n");
 	}
 	return 0;
 }
@@ -192,13 +187,17 @@ public:
 	{
 		//printf("thread start\n");
 		while(true){
-			if (!stream->read_end_of_stream and stream->ring_buf.available() <= stream->buffer_size){
-				PerformanceMonitor::start_busy(perf_channel);
-			//	printf("READ\n");
-				stream->_read_stream();
-				PerformanceMonitor::end_busy(perf_channel);
+			if (stream->read_end_of_stream){
+				hui::Sleep(0.010f);
 			}else{
-				hui::Sleep(0.005f);
+				if (stream->ring_buf.available() <= stream->buffer_size){
+					PerformanceMonitor::start_busy(perf_channel);
+				//	printf("READ\n");
+					stream->_read_stream();
+					PerformanceMonitor::end_busy(perf_channel);
+				}else{
+					hui::Sleep(0.002f);
+				}
 			}
 			Thread::cancelation_point();
 		}
@@ -244,6 +243,8 @@ OutputStream::OutputStream(Session *_session, AudioPort *s) :
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
+
+	buffer_is_cleared = true;
 
 	device_manager->addStream(this);
 }
@@ -463,6 +464,7 @@ void OutputStream::_read_stream()
 	// add to queue
 	b.length = size;
 	ring_buf.write_ref_done(b);
+	buffer_is_cleared = false;
 //	printf(" -> %d of %d\n", size, buffer_size);
 }
 
@@ -620,6 +622,7 @@ void OutputStream::on_played_end_of_stream()
 {
 	//printf("---------ON PLAY END OF STREAM\n");
 	//pause(true);
+
 	Observable<VirtualBase>::notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
@@ -641,4 +644,5 @@ void OutputStream::on_read_end_of_stream()
 void OutputStream::clear_buffer()
 {
 	ring_buf.clear();
+	buffer_is_cleared = true;
 }

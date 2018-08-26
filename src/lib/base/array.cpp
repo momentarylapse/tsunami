@@ -27,7 +27,7 @@ void DynamicArray::reserve(int size)
 	if (allocated == 0){
 		if (size > 0){
 			allocated = size;
-#if ALIGNMENT > 0
+/*#if ALIGNMENT > 0
 	#if defined(OS_LINUX)
 			posix_memalign(&data, ALIGNMENT, (size_t)allocated * (size_t)element_size);
 	#elif defined(OS_WINDOWS)
@@ -35,9 +35,9 @@ void DynamicArray::reserve(int size)
 	#else // defined(OS_MINGW)
 			data = malloc((size_t)allocated * (size_t)element_size);
 	#endif
-#else
+#else*/
 			data = malloc((size_t)allocated * (size_t)element_size);
-#endif
+//#endif
 //			printf("          new  %p  ", data);
 		}
 	}else if (size > allocated){

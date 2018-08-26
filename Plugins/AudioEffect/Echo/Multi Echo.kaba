@@ -1,0 +1,196 @@
+// Image = hui:copy
+// Title[Deutsch] = Echo
+
+use "../../api.kaba"
+use "../../grid.kaba"
+
+
+class Reflector
+	float delay
+	float volume
+	float feedback
+
+class Config extends PluginData
+	Reflector[] refl
+
+	override void reset()
+		refl.clear()
+		Reflector r
+		r.volume = 0.2
+		r.feedback = 0.5
+		r.delay = 0.15
+		refl.add(r)
+
+class ReflectorState
+	float[] buf_r, buf_l
+	int offset
+
+class MultiEcho extends AudioEffect
+	Config config
+	ReflectorState[] refl
+
+
+	void do_delay(float[] b, float[] d, ReflectorState rs, Reflector r)
+		int p = rs.offset % d.num
+		for bb in b
+	
+			// old value
+			float b0 = bb
+		
+			// add echo
+			bb = bb + d[p] * r.volume
+			//clampf(b[i], -1, 1)
+		
+			// add to echo
+			d[p] = b0 + d[p] * r.feedback
+		
+			p ++
+			if p >= d.num
+				p = 0
+
+
+	override void process(AudioBuffer buf)
+
+		int n = config.refl.num
+		refl.resize(n)
+		for r,i in refl
+			int delay_samples = session.sample_rate() * config.refl[i].delay
+			r.buf_r.resize(delay_samples)
+			r.buf_l.resize(delay_samples)
+	
+			do_delay(buf.r, r.buf_r, r, config.refl[i])
+			if buf.channels > 1
+				do_delay(buf.l, r.buf_l, r, config.refl[i])
+	
+			r.offset += buf.length
+	
+	override void reset_state()
+		refl.clear()
+		on_config()
+
+
+
+	override ConfigPanel *create_panel()
+		return new MultiEchoPanel(self)
+
+class MultiEchoGrid extends Grid
+	Config *config
+	ConfigPanel *cp
+	int hover, selected
+	
+	
+	override void __init__()
+		hover = -1
+		selected = -1
+
+	override void on_draw(Painter *c)
+	
+		c.set_line_width(1)
+		for r in config.refl
+			c.set_color(colors.text_soft1)
+			float v = r.volume
+			float t = r.delay
+			for i in 0:20
+				float x = x_axis.project(t)
+				float y = y_axis.project(v)
+				c.draw_line(x, c.height, x, y)
+				v *= r.feedback
+				t += r.delay
+				c.set_color(colors.text_soft2)
+			
+	
+		// points
+		for r,i in config.refl
+			complex z
+			z.x = r.delay
+			z.y = r.volume
+			draw_point2(c, z, i == selected, i == hover)
+	
+		if hover >= 0
+			draw_details(c, config.refl[hover])
+			
+	void draw_details(Painter* p, Reflector r)
+		p.set_font_size(8)
+		p.set_color(col_hover)
+		float x = x_axis.project(r.delay)
+		float y = y_axis.project(r.volume)
+		
+		p.draw_str(x - 20, y - 50, "delay: " + (r.delay * 1000).str2(0) + " ms")
+		p.draw_str(x - 20, y - 35, "volume: " + (r.volume * 100.0).str2(0) + " %")
+		p.draw_str(x - 20, y - 20, "feedback " + (r.feedback * 100).str2(0) + "%")
+
+	// left button down -> select
+	override void on_left_button_down()
+		selected = hover
+		redraw()
+
+	// [Delete] -> remove point
+	override void on_key_down()
+		if HuiGetEvent().key_code == KEY_DELETE
+			if selected >= 0
+				config.refl.remove(selected)
+				cp.changed()
+				selected = -1
+				redraw()
+
+	// right button down -> new point
+	override void on_right_button_down()
+		Reflector r
+		r.delay = get_mouse2().x
+		r.volume = get_mouse2().y
+		r.feedback = 0.5
+		config.refl.add(r)
+		cp.changed()
+		selected = config.refl.num - 1
+		redraw()
+
+	override void on_mouse_move()
+		// move
+		if HuiGetEvent().button_l and (selected >= 0)
+			config.refl[selected].delay = max(get_mouse2().x, 0)
+			config.refl[selected].volume = max(get_mouse2().y, 0)
+			cp.changed()
+		else
+		// mouse over?
+			hover = -1
+			for r,i in config.refl
+				complex z
+				z.x = r.delay
+				z.y = r.volume
+				complex p = project2(z)
+				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+					hover = i
+		redraw()
+	
+	override void on_mouse_wheel()
+		if hover >= 0
+			config.refl[hover].feedback *= exp(HuiGetEvent().scroll_y * 0.02)
+			cp.changed()
+
+class MultiEchoPanel extends ConfigPanel
+	MultiEchoGrid grid
+	override void __init__(MultiEcho *_h)
+		super.__init__(_h)
+		from_source("
+Grid ? ''
+	DrawingArea drawing '' grabfocus height=250")
+	
+		grid.config = &_h.config
+		grid.cp = self
+		grid.init(self, "drawing")
+		grid.x_axis.set(0, 1, false, "s")
+		grid.y_axis.set(0, 1, false, "%")
+	
+		grid.redraw()
+	
+	override void update()
+		redraw("drawing")
+
+	override void set_large(bool large)
+		if large
+			set_options("drawing", "height=380")
+		else
+			set_options("drawing", "height=250")
+
+
+

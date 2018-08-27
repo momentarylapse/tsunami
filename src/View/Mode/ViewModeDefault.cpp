@@ -350,6 +350,10 @@ void ViewModeDefault::on_key_down(int k)
 		cam->move(view->ScrollSpeedFast * dt / cam->scale);
 	if (k == hui::KEY_PRIOR)
 		cam->move(- view->ScrollSpeedFast * dt / cam->scale);
+	if (k == hui::KEY_HOME)
+		set_cursor_pos(view->song->range_with_time().start(), true);
+	if (k == hui::KEY_END)
+		set_cursor_pos(view->song->range_with_time().end(), true);
 
 	// zoom
 	if (k == hui::KEY_ADD)

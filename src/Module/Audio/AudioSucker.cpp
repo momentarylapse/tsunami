@@ -22,6 +22,7 @@ class AudioSuckerThread : public Thread
 public:
 	AudioSucker *sucker;
 	int perf_channel;
+	bool keep_running = true;
 
 	AudioSuckerThread(AudioSucker *s)
 	{
@@ -36,7 +37,7 @@ public:
 	void on_run() override
 	{
 		//msg_write("thread run");
-		while(true){
+		while(keep_running){
 			//msg_write(".");
 			if (sucker->running){
 				PerformanceMonitor::start_busy(perf_channel);
@@ -64,7 +65,7 @@ AudioSucker::AudioSucker() :
 	source = nullptr;
 	accumulating = false;
 	running = false;
-	thread = new AudioSuckerThread(this);
+	thread = nullptr;//new AudioSuckerThread(this);
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	no_data_wait = 0.005f;
 
@@ -73,7 +74,9 @@ AudioSucker::AudioSucker() :
 AudioSucker::~AudioSucker()
 {
 	if (thread){
-		thread->kill();
+		thread->keep_running = false;
+		thread->join();
+		//thread->kill();
 		delete(thread);
 		thread = nullptr;
 	}
@@ -98,13 +101,19 @@ void AudioSucker::start()
 {
 	if (running)
 		return;
+	thread = new AudioSuckerThread(this);
 	thread->run();
 	running = true;
 }
 
 void AudioSucker::stop()
 {
-	thread->kill();
+	if (thread){
+		thread->keep_running = false;
+		thread->join();
+		delete thread;
+		thread = nullptr;
+	}
 	running = false;
 }
 

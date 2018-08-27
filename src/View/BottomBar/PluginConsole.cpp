@@ -23,16 +23,55 @@ public:
 		addButton("", 0, 0, "close");
 		setImage("close", "hui:close");
 		setTooltip("close", _("stop plugin"));
-		addLabel("!expandx,center,bold,big\\" + p->module_subtype, 1, 0, "label");
+		addButton("", 1, 0, "big");
+		setImage("big", "hui:up");
+		setTooltip("big", _("big!!!"));
+		addLabel("!expandx,center,bold,big\\" + p->module_subtype, 2, 0, "label");
 		plugin = p;
 		console = _console;
-		auto *c = p->create_panel();
-		if (c)
-			embed(c, "grid", 0, 1);
+		config_panel = p->create_panel();
+		if (config_panel)
+			embed(config_panel, "grid", 0, 1);
+		hideControl("big", !config_panel);
 
 		event("close", [&]{ plugin->stop_request(); });
+		event("big", [&]{ on_big(); });
 	}
 
+	~PluginPanel()
+	{
+		if (dlg)
+			delete dlg;
+	}
+
+	void on_big()
+	{
+		if (dlg or !config_panel)
+			return;
+		delete config_panel;
+		config_panel = nullptr;
+		auto *c = plugin->create_panel();
+		if (!c)
+			return;
+		dlg = new hui::Dialog(plugin->module_subtype, 500, 400, console->win, true);
+		dlg->addGrid("", 0, 0, "root");
+		dlg->embed(plugin->create_panel(), "root", 0, 0);
+		dlg->show();
+
+		dlg->event("hui:close", [this]{ hui::RunLater(0.001f, [this]{ close_dialog(); }); });
+	}
+
+	void close_dialog()
+	{
+		delete dlg;
+		dlg = nullptr;
+		config_panel = plugin->create_panel();
+		if (config_panel)
+			embed(config_panel, "grid", 0, 1);
+	}
+
+	ConfigPanel *config_panel;
+	hui::Dialog *dlg = nullptr;
 	TsunamiPlugin *plugin;
 	PluginConsole *console;
 

@@ -54,7 +54,6 @@
 
 extern InputStreamAudio *export_view_input;
 
-
 PluginManager::PluginManager()
 {
 	favorites = new FavoriteManager;
@@ -185,6 +184,7 @@ void PluginManager::LinkAppScriptData()
 	AudioEffect aeffect;
 	Kaba::DeclareClassSize("AudioEffect", sizeof(AudioEffect));
 	Kaba::DeclareClassOffset("AudioEffect", "sample_rate", _offsetof(AudioEffect, sample_rate));
+	Kaba::DeclareClassOffset("AudioEffect", "out", _offsetof(AudioEffect, out));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioEffect::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioEffect::__delete__), &aeffect);
 	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&AudioEffect::process), &aeffect);

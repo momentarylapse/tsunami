@@ -111,7 +111,7 @@ private:
 	Device *device;
 	bool killed;
 
-	Thread *thread;
+	StreamThread *thread;
 	int perf_channel;
 
 	bool feed_stream_output(int frames, float *out);

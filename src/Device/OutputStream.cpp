@@ -176,6 +176,7 @@ class StreamThread : public Thread
 public:
 	OutputStream *stream;
 	int perf_channel;
+	bool keep_running = true;
 
 	StreamThread(OutputStream *s)
 	{
@@ -186,7 +187,7 @@ public:
 	void on_run() override
 	{
 		//printf("thread start\n");
-		while(true){
+		while(keep_running){
 			if (stream->read_end_of_stream){
 				hui::Sleep(0.010f);
 			}else{
@@ -262,6 +263,8 @@ OutputStream::~OutputStream()
 	killed = true;
 
 	if (thread){
+		thread->keep_running = false;
+		thread->join();
 		delete(thread); // automatic cancel
 		thread = nullptr;
 	}
@@ -345,11 +348,18 @@ void OutputStream::_kill_dev()
 #endif
 }
 
+
+
+
 void OutputStream::stop()
 {
 	_pause();
-	delete thread;
-	thread = nullptr;
+	if (thread){
+		thread->keep_running = false;
+		thread->join();
+		delete thread;
+		thread = nullptr;
+	}
 
 	if (source)
 		source->reset();

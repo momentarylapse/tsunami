@@ -53,6 +53,8 @@ PerformanceMonitor::PerformanceMonitor()
 	pm_instance = this;
 #if ALLOW_PERF_MON
 	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&PerformanceMonitor::update, this));
+#else
+	runner_id = -1;
 #endif
 }
 
@@ -119,6 +121,7 @@ void PerformanceMonitor::end_busy(int channel)
 // called in main thread
 void PerformanceMonitor::update()
 {
+#if ALLOW_PERF_MON
 	{
 	std::lock_guard<std::mutex> lock(pm_mutex);
 
@@ -140,6 +143,7 @@ void PerformanceMonitor::update()
 	}
 
 	notify();
+#endif
 }
 
 // call from main thread!!!

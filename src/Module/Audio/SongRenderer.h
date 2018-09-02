@@ -20,12 +20,15 @@ class Track;
 class TrackLayer;
 class AudioEffect;
 class AudioBuffer;
+class Synthesizer;
 class Range;
+class TrackRenderer;
 
 class SongRenderer : public AudioSource
 {
+	friend TrackRenderer;
 public:
-	SongRenderer(Song *s);
+	SongRenderer(Song *s, bool direct_mode = false);
 	virtual ~SongRenderer();
 
 	void _cdecl __init__(Song *s);
@@ -52,15 +55,11 @@ public:
 
 private:
 	void read_basic(AudioBuffer &buf, int pos);
-	void render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void render_track_no_fx(AudioBuffer &buf, Track *t, int ti);
-	void apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_list);
-	void render_track_fx(AudioBuffer &buf, Track *t, int ti);
 	void render_song_no_fx(AudioBuffer &buf);
 
-	void on_song_change();
+	void on_song_add_track();
+	void on_song_delete_track();
+	void update_tracks();
 
 	Song *song;
 	Range _range;
@@ -68,14 +67,18 @@ private:
 	int pos;
 	Set<Track*> allowed_tracks;
 	Set<TrackLayer*> allowed_layers;
+	bool direct_mode;
 
-	Array<MidiEventStreamer*> midi_streamer;
+	Array<TrackRenderer*> tracks;
+
+
+	int get_first_usable_track();
+
 	BarStreamer *bar_streamer;
 	BeatMidifier *beat_midifier;
 
 	void clear_data();
 	void reset_state();
-	void reset_track_state(Track *t);
 	void build_data();
 	void _seek(int pos);
 

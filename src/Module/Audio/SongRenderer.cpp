@@ -6,23 +6,16 @@
  */
 
 #include "SongRenderer.h"
+#include "TrackRenderer.h"
 #include "AudioEffect.h"
-#include "../Port/MidiPort.h"
 #include "../Beats/BarStreamer.h"
 #include "../Beats/BeatMidifier.h"
-#include "../Midi/MidiEffect.h"
 #include "../Synth/Synthesizer.h"
-#include "../Midi/MidiEventStreamer.h"
-#include "../../Plugins/PluginManager.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
-#include "../../Data/Sample.h"
 #include "../../Data/Curve.h"
-#include "../../Data/SongSelection.h"
-#include "../../Data/SampleRef.h"
 #include "../../Data/Audio/AudioBuffer.h"
-#include "../../Tsunami.h"
 #include "../../lib/math/math.h"
 
 
@@ -74,7 +67,7 @@ if (temp_r15 != temp2_r15) \
 
 
 
-SongRenderer::SongRenderer(Song *s)
+SongRenderer::SongRenderer(Song *s, bool _direct_mode)
 {
 	module_subtype = "SongRenderer";
 	MidiEventBuffer no_midi;
@@ -82,22 +75,26 @@ SongRenderer::SongRenderer(Song *s)
 	beat_midifier = nullptr;
 	bar_streamer = nullptr;
 	channels = 2;
+	direct_mode = _direct_mode;
 
 	preview_effect = nullptr;
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
 	if (song){
+		build_data();
 		prepare(song->range(), false);
-		song->subscribe(this, std::bind(&SongRenderer::on_song_change, this));
+		song->subscribe(this, [&]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
+		song->subscribe(this, [&]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
 	}
 }
 
 SongRenderer::~SongRenderer()
 {
-	if (song)
+	if (song){
 		song->unsubscribe(this);
-	clear_data();
+		clear_data();
+	}
 }
 
 void SongRenderer::__init__(Song *s)
@@ -110,121 +107,10 @@ void SongRenderer::__delete__()
 	this->SongRenderer::~SongRenderer();
 }
 
-bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
+int SongRenderer::get_first_usable_track()
 {
-	// intersected intervall (track-coordinates)
-	int i0 = max(s->pos, r.start());
-	int i1 = min(s->pos + s->buf->length, r.end());
-
-	// beginning of the intervall (relative to sub)
-	ir.offset = i0 - s->pos;
-	// ~ (relative to old intervall)
-	bpos = i0 - r.start();
-	ir.length = i1 - i0;
-
-	return !ir.empty();
-}
-
-
-int get_first_usable_layer(Track *t, Set<TrackLayer*> &allowed)
-{
-	foreachi(TrackLayer *l, t->layers, i)
-		if (!l->muted and allowed.contains(l))
-			return i;
-	return -1;
-}
-
-static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
-{
-	// subs
-	for (SampleRef *s: l->samples){
-		if (s->muted)
-			continue;
-
-		Range intersect_range;
-		int bpos;
-		if (!intersect_sub(s, range_cur, intersect_range, bpos))
-			continue;
-
-		bpos = s->pos - range_cur.start();
-		buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
-	}
-
-}
-
-void SongRenderer::render_audio_track_no_fx(AudioBuffer &buf, Track *t, int ti)
-{
-	// any un-muted layer?
-	int i0 = get_first_usable_layer(t, allowed_layers);
-	if (i0 < 0){
-		// no -> return silence
-		buf.scale(0);
-	}else{
-
-		// first (un-muted) layer
-		t->layers[i0]->read_buffers_fixed(buf, range_cur);
-		// TODO: allow_ref if no other layers + no fx
-		add_samples(t->layers[i0], range_cur, buf);
-
-		// other layers
-		AudioBuffer tbuf;
-		for (int i=i0+1;i<t->layers.num;i++){
-			if (!allowed_layers.contains(t->layers[i]))
-				continue;
-			if (t->layers[i]->muted)
-				continue;
-			t->layers[i]->readBuffers(tbuf, range_cur, true);
-			add_samples(t->layers[i], range_cur, tbuf);
-			buf.add(tbuf, 0, 1.0f, 0.0f);
-		}
-	}
-}
-
-void SongRenderer::render_time_track_no_fx(AudioBuffer &buf, Track *t, int ti)
-{
-	t->synth->out->read(buf);
-}
-
-void SongRenderer::render_midi_track_no_fx(AudioBuffer &buf, Track *t, int ti)
-{
-	t->synth->out->read(buf);
-}
-
-void SongRenderer::render_track_no_fx(AudioBuffer &buf, Track *t, int ti)
-{
-	if (t->type == SignalType::AUDIO)
-		render_audio_track_no_fx(buf, t, ti);
-	else if (t->type == SignalType::BEATS)
-		render_time_track_no_fx(buf, t, ti);
-	else if (t->type == SignalType::MIDI)
-		render_midi_track_no_fx(buf, t, ti);
-}
-
-
-void SongRenderer::apply_fx(AudioBuffer &buf, Track *t, Array<AudioEffect*> &fx_list)
-{
-	// apply fx
-	for (AudioEffect *fx: fx_list)
-		if (fx->enabled){
-			fx->process(buf);
-		}
-}
-
-void SongRenderer::render_track_fx(AudioBuffer &buf, Track *t, int ti)
-{
-	render_track_no_fx(buf, t, ti);
-
-	Array<AudioEffect*> fx = t->fx;
-	if (preview_effect)
-		fx.add(preview_effect);
-	if (fx.num > 0)
-		apply_fx(buf, t, fx);
-}
-
-int get_first_usable_track(Song *s, Set<Track*> &allowed)
-{
-	foreachi(Track *t, s->tracks, i)
-		if (!t->muted and allowed.contains(t))
+	foreachi(auto *tr, tracks, i)
+		if (!tr->track->muted and allowed_tracks.contains(tr->track))
 			return i;
 	return -1;
 }
@@ -232,26 +118,27 @@ int get_first_usable_track(Song *s, Set<Track*> &allowed)
 void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 {
 	// any un-muted track?
-	int i0 = get_first_usable_track(song, allowed_tracks);
+	int i0 = get_first_usable_track();
 	if (i0 < 0){
 		// no -> return silence
 		buf.scale(0);
 	}else{
 
 		// first (un-muted) track
-		render_track_fx(buf, song->tracks[i0], i0);
+		tracks[i0]->render_fx(buf);
 		buf.scale(song->tracks[i0]->volume, song->tracks[i0]->panning);
 
 		// other tracks
-		for (int i=i0+1;i<song->tracks.num;i++){
-			if (!allowed_tracks.contains(song->tracks[i]))
+		for (int i=i0+1;i<tracks.num;i++){
+			Track *t = tracks[i]->track;
+			if (!allowed_tracks.contains(t))
 				continue;
-			if (song->tracks[i]->muted)
+			if (t->muted)
 				continue;
 			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
-			render_track_fx(tbuf, song->tracks[i], i);
-			buf.add(tbuf, 0, song->tracks[i]->volume, song->tracks[i]->panning);
+			tracks[i]->render_fx(tbuf);
+			buf.add(tbuf, 0, t->volume, t->panning);
 		}
 
 		buf.scale(song->volume);
@@ -275,9 +162,6 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 	range_cur = Range(pos, buf.length);
 	channels = buf.channels;
 
-	// in case, the metronome track is muted
-	bar_streamer->seek(range_cur.offset);
-
 	apply_curves(song, pos);
 
 	// render without fx
@@ -286,7 +170,7 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 
 	// apply global fx
 	if (song->fx.num > 0)
-		apply_fx(buf, nullptr, song->fx);
+		TrackRenderer::apply_fx(buf, song->fx);
 
 	unapply_curves(song);
 }
@@ -298,6 +182,12 @@ int SongRenderer::read(AudioBuffer &buf)
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
 		return AudioPort::END_OF_STREAM;
+
+
+	bar_streamer->bars = song->bars;
+	// in case, the metronome track is muted
+	bar_streamer->seek(pos);
+
 
 	if (song->curves.num >= 0){
 		int chunk = 1024;
@@ -326,26 +216,27 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 
 void SongRenderer::allow_tracks(const Set<Track*> &_allowed_tracks)
 {
-	for (Track *t: _allowed_tracks)
-		if (!allowed_tracks.contains(t))
-			reset_track_state(t);
+	// reset previously unused tracks
+	for (auto *tr: tracks)
+		if (!allowed_tracks.contains(tr->track)){
+			tr->reset_state();
+			tr->seek(pos);
+		}
 	allowed_tracks = _allowed_tracks;
-	//reset_state();
-	_seek(pos);
+	//_seek(pos);
 }
 
 void SongRenderer::allow_layers(const Set<TrackLayer*> &_allowed_layers)
 {
 	allowed_layers = _allowed_layers;
-	//reset_state();
 	_seek(pos);
 }
 
 void SongRenderer::clear_data()
 {
-	for (auto m: midi_streamer)
-		delete m;
-	midi_streamer.clear();
+	for (auto *tr: tracks)
+		delete tr;
+	tracks.clear();
 
 	if (beat_midifier){
 		delete beat_midifier;
@@ -364,7 +255,7 @@ void SongRenderer::clear_data()
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
 	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
-	clear_data();
+	//clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
@@ -375,7 +266,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 		allowed_layers.add(l);
 
 	reset_state();
-	build_data();
+	//build_data();
 }
 
 void SongRenderer::reset_state()
@@ -387,15 +278,8 @@ void SongRenderer::reset_state()
 	if (preview_effect)
 		preview_effect->reset_state();
 
-	for (Track *t: song->tracks)
-		reset_track_state(t);
-}
-
-void SongRenderer::reset_track_state(Track *t)
-{
-	for (AudioEffect *fx: t->fx)
-		fx->reset_state();
-	t->synth->reset();
+	for (auto *t: tracks)
+		t->reset_state();
 }
 
 void SongRenderer::build_data()
@@ -404,35 +288,10 @@ void SongRenderer::build_data()
 	beat_midifier = new BeatMidifier;
 	beat_midifier->set_beat_source(bar_streamer->out);
 
-	foreachi(Track *t, song->tracks, i){
-		//midi.add(t, t->midi);
-		if (t->type == SignalType::MIDI){
-			MidiNoteBuffer _midi = t->layers[0]->midi;
-			for (TrackLayer *l: t->layers)
-				for (auto c: l->samples)
-					if (c->type() == SignalType::MIDI)
-					_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
-			for (MidiEffect *fx: t->midi_fx){
-				fx->prepare();
-				fx->process(&_midi);
-			}
+	for (Track *t: song->tracks)
+		tracks.add(new TrackRenderer(t, this));
 
-			MidiEventBuffer raw = midi_notes_to_events(_midi);
-			MidiEventStreamer *m = new MidiEventStreamer(raw);
-			m->ignore_end = true;
-			m->seek(pos);
-			midi_streamer.add(m);
-
-			t->synth->setSampleRate(song->sample_rate);
-			t->synth->setInstrument(t->instrument);
-			t->synth->set_source(m->out);
-		}else if (t->type == SignalType::BEATS){
-
-			t->synth->setSampleRate(song->sample_rate);
-			t->synth->setInstrument(t->instrument);
-			t->synth->set_source(beat_midifier->out);
-		}
-	}
+	seek(0);
 }
 
 void SongRenderer::reset()
@@ -456,10 +315,8 @@ void SongRenderer::seek(int _pos)
 void SongRenderer::_seek(int _pos)
 {
 	pos = _pos;
-	for (auto m: midi_streamer)
-		m->seek(pos);
-	if (bar_streamer)
-		bar_streamer->seek(pos);
+	for (auto &tr: tracks)
+		tr->seek(pos);
 }
 
 int SongRenderer::get_pos(int delta)
@@ -468,9 +325,37 @@ int SongRenderer::get_pos(int delta)
 	return loopi(pos + delta, r.start(), r.end());
 }
 
-void SongRenderer::on_song_change()
+void SongRenderer::on_song_add_track()
 {
-	//reset_state();
-	_seek(pos);
+	update_tracks();
+}
+
+void SongRenderer::on_song_delete_track()
+{
+	update_tracks();
+}
+
+void SongRenderer::update_tracks()
+{
+	// new tracks
+	for (Track *t: song->tracks){
+		bool found = false;
+		for (auto &tr: tracks)
+			if (tr->track == t)
+				found = true;
+		if (!found)
+			tracks.add(new TrackRenderer(t, this));
+	}
+
+	foreachi (TrackRenderer *tr, tracks, ti){
+		bool found = false;
+		for (Track *t: song->tracks)
+			if (t == tr->track)
+				found = true;
+		if (!found){
+			delete tr;
+			tracks.erase(ti);
+		}
+	}
 }
 

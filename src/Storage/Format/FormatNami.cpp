@@ -919,8 +919,7 @@ public:
 		f->read_str();
 		f->read_int();
 
-		delete(parent->synth);
-		parent->synth = me;
+		parent->setSynthesizer(me);
 	}
 	virtual void write(File *f)
 	{
@@ -1069,15 +1068,18 @@ public:
 	}
 	virtual void create()
 	{
-		me = parent->addTrack(SignalType::AUDIO);
+		//me = parent->addTrack(SignalType::AUDIO);
 	}
 	virtual void read(File *f)
 	{
-		me->name = f->read_str();
-		me->volume = f->read_float();
-		me->muted = f->read_bool();
-		me->type = (SignalType)f->read_int();
-		me->layers[0]->type = me->type;
+		string name = f->read_str();
+		float volume = f->read_float();
+		float muted = f->read_bool();
+		auto type = (SignalType)f->read_int();
+		me = parent->addTrack(type);
+		me->name = name;
+		me->volume = volume;
+		me->muted = muted;
 		me->panning = f->read_float();
 		me->instrument = Instrument((Instrument::Type)f->read_int());
 		f->read_int(); // reserved

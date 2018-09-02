@@ -161,7 +161,7 @@ void SynthConsole::setTrack(Track *t)
 		return;
 
 	track->subscribe(this, std::bind(&SynthConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-	track->subscribe(this, std::bind(&SynthConsole::onTrackChange, this), track->MESSAGE_CHANGE);
+	track->subscribe(this, std::bind(&SynthConsole::onTrackChange, this), track->MESSAGE_REPLACE_SYNTHESIZER);
 
 	if (track->synth){
 		track->synth->subscribe(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);

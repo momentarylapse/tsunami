@@ -108,6 +108,7 @@ const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
+const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
 
 Track::Track(SignalType _type, Synthesizer *_synth)
 {

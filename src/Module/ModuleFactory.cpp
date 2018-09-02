@@ -38,7 +38,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		return new AudioSucker;
 	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
-			return new SongRenderer(session->song);
+			return new SongRenderer(session->song, true);
 	}else if (type == ModuleType::AUDIO_EFFECT){
 		if (sub_type == "Dummy" or sub_type == "")
 			return new AudioEffect;

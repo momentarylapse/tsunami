@@ -89,6 +89,7 @@ public:
 	static const string MESSAGE_DELETE_EFFECT;
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
+	static const string MESSAGE_REPLACE_SYNTHESIZER;
 
 	void _cdecl invalidateAllPeaks();
 	void _cdecl readBuffersCol(AudioBuffer &buf, int offset);

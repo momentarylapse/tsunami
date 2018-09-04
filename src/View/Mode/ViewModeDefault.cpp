@@ -227,8 +227,9 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->enable("track_convert_stereo", hover->track->channels == 1);
 		view->menu_track->enable("track_convert_mono", hover->track->channels == 2);
-		view->menu_track->enable("layer_merge", !hover->layer->is_main);
-		view->menu_track->enable("delete_layer", !hover->layer->is_main);
+		view->menu_track->enable("layer_merge", !hover->layer->is_main());
+		view->menu_track->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
+		//view->menu_track->enable("delete_layer", !hover->layer->is_main());
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
 		view->menu_track->open_popup(view->win);
 	}else if (!hover->track){
@@ -399,7 +400,7 @@ float ViewModeDefault::layer_min_height(AudioViewLayer *l)
 float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 {
 	int n_ch = l->layer->channels;
-	if (l->layer->is_main){
+	if (l->layer->is_main()){
 		if (l->layer->type == SignalType::AUDIO)
 			return view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
 		else if (l->layer->type == SignalType::MIDI)
@@ -487,6 +488,14 @@ void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 		draw_bar_selection(c, t, view);
 }
 
+Range dominant_range(Track *t, int index)
+{
+	int start = t->fades[index].position - t->fades[index].samples;
+	if (index + 1 < t->fades.num)
+		return Range(start, t->fades[index + 1].position + t->fades[index + 1].samples - start);
+	return Range(start, 0);
+}
+
 void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
 	Track *t = l->layer->track;
@@ -502,13 +511,39 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 	for (SampleRef *s: l->layer->samples)
 		l->drawSample(c, s);
 
-	if (l->layer->is_main){
+	if (l->layer->is_main()){
 
 		// marker
 		l->marker_areas.resize(t->markers.num);
 		l->marker_label_areas.resize(t->markers.num);
 		foreachi(TrackMarker *m, l->layer->track->markers, i)
 			l->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
+	}
+
+	c->setLineWidth(1.0f);
+
+	int index_before = 0;
+	int index_own = l->layer->version_number();
+
+	foreachi (auto &f, l->layer->track->fades, i){
+		if (f.target == l->layer->version_number() and index_own > 0){
+			Range r = dominant_range(l->layer->track, i);
+			color cs = color(0.2f, 0,0.7f,0);
+			float xx1 = (float)view->cam.sample2screen(r.start());
+			float xx2 = (float)view->cam.sample2screen(r.end());
+			float x1 = max(xx1, l->area.x1);
+			float x2 = min(xx2, l->area.x2);
+			c->setColor(cs);
+			c->drawRect(x1, l->area.y1, x2-x1, l->area.height());
+		}
+		if (f.target == index_own or index_before == index_own){
+			float x1 = (float)view->cam.sample2screen(f.position - f.samples);
+			float x2 = (float)view->cam.sample2screen(f.position + f.samples);
+			c->setColor(color(1,0,0.7f,0));
+			c->drawLine(x1, l->area.y1, x1, l->area.y2);
+			c->drawLine(x2, l->area.y1, x2, l->area.y2);
+		}
+		index_before = f.target;
 	}
 }
 
@@ -597,7 +632,7 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 			s.track = l->layer->track;
 			s.vtrack = view->get_track(s.track);
 			s.type = Selection::Type::LAYER;
-			if (l->layer->is_main)
+			if (l->layer->is_main())
 				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
 					s.type = Selection::Type::TRACK_HEADER;
 			if (l->layer->track->layers.num > 1)
@@ -693,7 +728,7 @@ Selection ViewModeDefault::get_hover()
 	if (s.layer){
 
 		// markers
-		if (s.layer->is_main){
+		if (s.layer->is_main()){
 			for (int i=0; i<min(s.track->markers.num, s.vlayer->marker_areas.num); i++){
 				if (s.vlayer->marker_areas[i].inside(mx, my) or s.vlayer->marker_label_areas[i].inside(mx, my)){
 					s.marker = s.track->markers[i];

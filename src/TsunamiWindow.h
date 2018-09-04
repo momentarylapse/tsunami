@@ -69,6 +69,7 @@ public:
 	void onDeleteLayer();
 	void onLayerMakeTrack();
 	void onLayerMerge();
+	void onLayerMarkSelectionDominant();
 	void onSampleManager();
 	void onMixingConsole();
 	void onFxConsole();

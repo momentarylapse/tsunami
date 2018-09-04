@@ -866,7 +866,7 @@ public:
 	{
 		n = f->read_int();
 		if (n > 0){
-			parent->layers.add(new TrackLayer(parent, false));
+			parent->layers.add(new TrackLayer(parent));
 		}
 		me = parent->layers.back();
 	}

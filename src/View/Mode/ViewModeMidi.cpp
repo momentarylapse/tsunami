@@ -693,7 +693,7 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 		l->drawSample(c, s);
 
 
-	if (l->layer->is_main){
+	if (l->layer->is_main()){
 
 		Track *t = l->layer->track;
 

@@ -2903,7 +2903,7 @@ menu_version
 
 6
 0
-3
+4
 Item
 layer_add
 
@@ -2911,15 +2911,21 @@ layer_add
 0
 0
 Item
-layer_merge
+layer_mark_dominant
 
 1
 0
 0
 Item
-delete_layer
+layer_merge
 
 2
+0
+0
+Item
+delete_layer
+
+3
 0
 0
 Menu
@@ -4354,7 +4360,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-440
+441
 // Text
 /cancel
 Cancel
@@ -5319,6 +5325,9 @@ Delete
 popup_track_menu/layer_add
 Add version
 
+popup_track_menu/layer_mark_dominant
+Mark selection as dominant
+
 popup_track_menu/layer_merge
 Merge...
 
@@ -5682,7 +5691,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-562
+563
 // Text
 /cancel
 Abbrechen
@@ -6893,6 +6902,9 @@ Löschen
 popup_track_menu/layer_add
 Version hinzufügen
 
+popup_track_menu/layer_mark_dominant
+Auswahl dominant setzen
+
 popup_track_menu/layer_merge
 Zusammenfügen...
 
@@ -7371,7 +7383,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-199
+205
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7663,6 +7675,8 @@ Your comments and the contents of the file message.txt will be sent.
 Der Kommentar und der Inhalt der Datei message.txt werden versandt
 \\- none -\\
 \\- keines -\\
+add pause (.)    delete (⟵)    note length (L)    beat partition (P)
+Pause einfügen (.)    löschen (⟵)    Noten Länge (L)    Schlagteiler (P)
 add plugin
 Plugin hinzufügen
 all files
@@ -7705,8 +7719,12 @@ edit effects
 Effekte bearbeiten
 edit track properties
 Eigenschaften der Spur bearbeiten
+enter beat partition (1-9, A-F)    cancel (Esc)
+Schlagteiler eingeben (1-9, A-F)    abbrechen (Esc)
 enter new name
 neuen Namen eingeben
+enter note length (1-9, A-F)    cancel (Esc)
+Noten Länge eingeben (1-9, A-F)    abbrechen (Esc)
 exporting
 exportiere 
 exporting 
@@ -7747,6 +7765,8 @@ not allowed to delete the main signal chain
 die Haupt-Signalkette darf nicht gelöscht werden
 not configurable
 nicht konfigurierbar
+octave (↑,↓)    modifiers (#,3,0)    add note (A-G)
+Oktave (↑,↓)    Vorzeichen (#,3,0)    Note einfügen (A-G)
 open message.txt
 message.txt öffnen
 output: 
@@ -7761,6 +7781,10 @@ sample
 sample 
 saving 
 speichere 
+stop plugin
+Plugin stoppen
+string (↑,↓)    add note (0-9, A-F)
+Saite (↑,↓)    Note hinzufügen (0-9, A-F)
 toggle mute
 stumm an/aus
 toggle solo

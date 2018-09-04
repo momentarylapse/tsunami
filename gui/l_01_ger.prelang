@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-563
+564
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1692,8 +1692,11 @@ In Spur umwandeln
 sample_selection_dialog/import
 
 aus Datei importieren
+popup_track_menu/layer_mark_dominant
+Auswahl dominant setzen
+
 // Num Language Strings
-199
+205
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2093,3 +2096,15 @@ no module selected
 kein Modul ausgewählt
 no plugins yet
 noch keine Plugins
+add pause (.)    delete (⟵)    note length (L)    beat partition (P)
+Pause einfügen (.)    löschen (⟵)    Noten Länge (L)    Schlagteiler (P)
+enter beat partition (1-9, A-F)    cancel (Esc)
+Schlagteiler eingeben (1-9, A-F)    abbrechen (Esc)
+enter note length (1-9, A-F)    cancel (Esc)
+Noten Länge eingeben (1-9, A-F)    abbrechen (Esc)
+octave (↑,↓)    modifiers (#,3,0)    add note (A-G)
+Oktave (↑,↓)    Vorzeichen (#,3,0)    Note einfügen (A-G)
+stop plugin
+Plugin stoppen
+string (↑,↓)    add note (0-9, A-F)
+Saite (↑,↓)    Note hinzufügen (0-9, A-F)

@@ -20,6 +20,7 @@
 #include "../Action/Track/Layer/ActionTrackLayerAdd.h"
 #include "../Action/Track/Layer/ActionTrackLayerDelete.h"
 #include "../Action/Track/Layer/ActionTrackLayerMakeTrack.h"
+#include "../Action/Track/Layer/ActionTrackLayerMarkDominant.h"
 /*#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
 #include "../Action/Track/Layer/ActionTrackLayerMove.h"*/
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
@@ -53,12 +54,11 @@
 
 TrackLayer::TrackLayer(){}
 
-TrackLayer::TrackLayer(Track *t, bool _is_main)
+TrackLayer::TrackLayer(Track *t)
 {
 	track = t;
 	type = t->type;
 	channels = t->channels;
-	is_main = _is_main;
 	muted = false;
 }
 
@@ -131,7 +131,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 
 	synth = _synth;
 
-	layers.add(new TrackLayer(this, true));
+	layers.add(new TrackLayer(this));
 }
 
 
@@ -325,6 +325,21 @@ void TrackLayer::make_own_track()
 	track->song->execute(new ActionTrackLayerMakeTrack(this));
 }
 
+void TrackLayer::mark_dominant(const Range &range)
+{
+	track->song->execute(new ActionTrackLayerMarkDominant(this, range));
+}
+
+bool TrackLayer::is_main()
+{
+	return (this == track->layers[0]);
+}
+
+bool Track::has_version_selection()
+{
+	return fades.num > 0;
+}
+
 void Track::setName(const string& name)
 {
 	song->execute(new ActionTrackEditName(this, name));
@@ -447,9 +462,9 @@ void Track::editMarker(const TrackMarker *marker, const Range &range, const stri
 	song->execute(new ActionTrackEditMarker((TrackMarker*)marker, range, text));
 }
 
-TrackLayer *Track::addLayer(bool is_main)
+TrackLayer *Track::addLayer()
 {
-	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, layers.num, new TrackLayer(this, is_main)));
+	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, layers.num, new TrackLayer(this)));
 }
 
 void Track::deleteLayer(TrackLayer *layer)

@@ -181,7 +181,7 @@ bool CaptureConsoleModeAudio::insert()
 			break;
 		}
 	if (!layer)
-		layer = target->addLayer(false);
+		layer = target->addLayer();
 
 	AudioBuffer tbuf;
 	layer->getBuffers(tbuf, r);

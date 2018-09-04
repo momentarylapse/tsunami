@@ -29,7 +29,7 @@ class TrackLayer : public Observable<VirtualBase>
 {
 public:
 	TrackLayer();
-	TrackLayer(Track *track, bool is_main);
+	TrackLayer(Track *track);
 	~TrackLayer();
 
 	Range range(int keep_notes = 0) const;
@@ -53,11 +53,13 @@ public:
 
 	void _cdecl make_own_track();
 
+	void _cdecl mark_dominant(const Range &range);
+
 	Track *track;
 	Song *song() const;
 	SignalType type;
 	int channels;
-	bool is_main;
+	bool is_main();
 	bool muted;
 
 	Array<AudioBuffer> buffers;
@@ -103,7 +105,7 @@ public:
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
-	TrackLayer _cdecl *addLayer(bool is_main);
+	TrackLayer _cdecl *addLayer();
 	void _cdecl deleteLayer(TrackLayer *layer);
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);
@@ -143,6 +145,15 @@ public:
 	Synthesizer *synth;
 
 	Array<TrackMarker*> markers;
+
+	struct Fade
+	{
+		int position;
+		int target;
+		int samples;
+	};
+	Array<Fade> fades;
+	bool has_version_selection();
 
 	Song *song;
 };

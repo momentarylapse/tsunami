@@ -177,6 +177,22 @@ void TrackRenderer::seek(int pos)
 
 void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 {
+	if (track->has_version_selection()){
+		int index = 0;
+		foreachi(auto &f, track->fades, i){
+				// FIXME: cheap cheat...
+				/*if (r.overlaps(song_renderer->range_cur)){
+					Range rr = r and song_renderer->range_cur;
+				}*/
+			if (f.position <= song_renderer->range_cur.start()){
+				index = f.target;
+			}
+		}
+		track->layers[index]->read_buffers_fixed(buf, song_renderer->range_cur);
+
+		return;
+	}
+
 	// any un-muted layer?
 	int i0 = get_first_usable_layer(track, song_renderer->allowed_layers);
 	if (i0 < 0){

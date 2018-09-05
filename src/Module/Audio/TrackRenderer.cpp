@@ -212,13 +212,8 @@ static void apply_fade(TrackLayer *l1, TrackLayer *l2, const Range &r, AudioBuff
 	tbuf1.add(tbuf2, 0, 1, 0);
 }
 
-
-void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
+void TrackRenderer::render_audio_versioned(AudioBuffer &buf)
 {
-	/*bool has_solo = false;
-	for (auto *l: track->layers)
-		if (l->)*/
-
 	Range cur = Range(offset, buf.length);
 
 	int index_before = 0;
@@ -255,10 +250,10 @@ void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 		add_samples(track->layers[index_before], cur, buf);
 	}
 
-		/*
-		return;
-	//}
+}
 
+void TrackRenderer::render_audio_layered(AudioBuffer &buf)
+{
 	// any un-muted layer?
 	int i0 = get_first_usable_layer(track, song_renderer->allowed_layers);
 	if (i0 < 0){
@@ -276,33 +271,42 @@ void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 		for (int i=i0+1;i<track->layers.num;i++){
 			if (!song_renderer->allowed_layers.contains(track->layers[i]))
 				continue;
-			if (track->layers[i]->muted)
-				continue;
+			//if (track->layers[i]->muted)
+			//	continue;
 			track->layers[i]->readBuffers(tbuf, song_renderer->range_cur, true);
 			add_samples(track->layers[i], song_renderer->range_cur, tbuf);
 			buf.add(tbuf, 0, 1.0f, 0.0f);
 		}
-	}*/
+	}
 }
 
-void TrackRenderer::render_time_no_fx(AudioBuffer &buf)
+void TrackRenderer::render_audio(AudioBuffer &buf)
+{
+	if (track->has_version_selection()){
+		render_audio_versioned(buf);
+	}else{
+		render_audio_layered(buf);
+	}
+}
+
+void TrackRenderer::render_time(AudioBuffer &buf)
 {
 	synth->out->read(buf);
 }
 
-void TrackRenderer::render_midi_no_fx(AudioBuffer &buf)
+void TrackRenderer::render_midi(AudioBuffer &buf)
 {
 	synth->out->read(buf);
 }
 
-void TrackRenderer::render_no_fx(AudioBuffer &buf)
+void TrackRenderer::render(AudioBuffer &buf)
 {
 	if (track->type == SignalType::AUDIO)
-		render_audio_no_fx(buf);
+		render_audio(buf);
 	else if (track->type == SignalType::BEATS)
-		render_time_no_fx(buf);
+		render_time(buf);
 	else if (track->type == SignalType::MIDI)
-		render_midi_no_fx(buf);
+		render_midi(buf);
 	offset += buf.length;
 }
 
@@ -317,7 +321,7 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list)
 
 void TrackRenderer::render_fx(AudioBuffer &buf)
 {
-	render_no_fx(buf);
+	render(buf);
 
 	Array<AudioEffect*> _fx = fx;
 	if (song_renderer and song_renderer->preview_effect)

@@ -34,10 +34,12 @@ public:
 
 	void seek(int pos);
 
-	void render_audio_no_fx(AudioBuffer &buf);
-	void render_time_no_fx(AudioBuffer &buf);
-	void render_midi_no_fx(AudioBuffer &buf);
-	void render_no_fx(AudioBuffer &buf);
+	void render_audio_versioned(AudioBuffer &buf);
+	void render_audio_layered(AudioBuffer &buf);
+	void render_audio(AudioBuffer &buf);
+	void render_time(AudioBuffer &buf);
+	void render_midi(AudioBuffer &buf);
+	void render(AudioBuffer &buf);
 	void render_fx(AudioBuffer &buf);
 
 	static void apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list);

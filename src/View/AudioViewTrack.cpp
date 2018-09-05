@@ -925,7 +925,9 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 		c->setColor(view->colors.text);
 	else
 		c->setColor(view->colors.text_soft2);
-	string title = "v" + i2s(layer->version_number() + 1);
+	string title = (layer->track->has_version_selection() ? "v" : "l") + i2s(layer->version_number() + 1);
+	if (layer->is_main())
+		title = _("base");
 	//if (layer->is_main)
 	//	title = "main";
 	if (solo)

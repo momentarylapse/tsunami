@@ -36,7 +36,7 @@ void ActionTrackLayerMerge::build(Data *d)
 	addSubAction(new ActionTrackCreateBuffers(lnew, r), d);
 	lnew->readBuffers(buf, r, true);
 
-	tr->render_audio_no_fx(buf);
+	tr->render_audio(buf);
 
 	for (int i=track->layers.num-2; i>=0; i--)
 		addSubAction(new ActionTrackLayerDelete(track, i), d);

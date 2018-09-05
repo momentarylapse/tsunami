@@ -186,6 +186,7 @@ void ViewModeDefault::on_right_button_down()
 			set_cursor_pos(hover->pos, track_hover_sel);
 		}
 	}
+	view->hover_before_leave = *hover;
 
 	// pop up menu...
 	view->update_menu();

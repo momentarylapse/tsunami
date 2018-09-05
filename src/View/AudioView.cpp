@@ -290,6 +290,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mx = my = 0;
 	msp.stop();
 
+	hover_before_leave = hover = Selection();
+
 
 
 	// events
@@ -579,7 +581,7 @@ void AudioView::on_right_button_up()
 
 void AudioView::on_mouse_leave()
 {
-	if (!hui::GetEvent()->lbut){
+	if (!hui::GetEvent()->lbut and !hui::GetEvent()->rbut){
 		hover.clear();
 		force_redraw();
 	}

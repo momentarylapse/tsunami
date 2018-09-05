@@ -428,11 +428,11 @@ void TsunamiWindow::onTrackEditFX()
 
 void TsunamiWindow::onTrackAddMarker()
 {
-	if (view->hover.track){
+	if (view->hover_before_leave.track){
 		Range range = view->sel.range;
-		if (!range.is_inside(view->hover.pos))
-			range = Range(view->hover.pos, 0);
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover.track, range, nullptr);
+		if (!range.is_inside(view->hover_before_leave.pos))
+			range = Range(view->hover_before_leave.pos, 0);
+		MarkerDialog *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, nullptr);
 		dlg->run();
 		delete(dlg);
 	}else{
@@ -458,7 +458,7 @@ void TsunamiWindow::onTrackConvertStereo()
 void TsunamiWindow::onBufferDelete()
 {
 	foreachi (AudioBuffer &buf, view->cur_layer()->buffers, i)
-		if (buf.range().is_inside(view->hover.pos)){
+		if (buf.range().is_inside(view->hover_before_leave.pos)){
 			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
 			song->deleteSelection(s);
 		}
@@ -466,11 +466,12 @@ void TsunamiWindow::onBufferDelete()
 
 void TsunamiWindow::onBufferMakeMovable()
 {
-	for (AudioBuffer &buf: view->cur_layer()->buffers)
-		if (buf.range().is_inside(view->hover.pos)){
+	for (AudioBuffer &buf: view->cur_layer()->buffers){
+		if (buf.range().is_inside(view->hover_before_leave.pos)){
 			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
 			song->createSamplesFromSelection(s, true);
 		}
+	}
 }
 
 void TsunamiWindow::onLayerMidiModeLinear()
@@ -511,16 +512,16 @@ void TsunamiWindow::onSampleProperties()
 
 void TsunamiWindow::onDeleteMarker()
 {
-	if (view->hover.type == Selection::Type::MARKER)
-		view->cur_track()->deleteMarker(view->hover.marker);
+	if (view->hover_before_leave.type == Selection::Type::MARKER)
+		view->cur_track()->deleteMarker(view->hover_before_leave.marker);
 	else
 		session->e(_("No marker selected"));
 }
 
 void TsunamiWindow::onEditMarker()
 {
-	if (view->hover.type == Selection::Type::MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), Range::EMPTY, view->hover.marker);
+	if (view->hover_before_leave.type == Selection::Type::MARKER){
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), Range::EMPTY, view->hover_before_leave.marker);
 		dlg->run();
 		delete(dlg);
 	}else
@@ -1027,7 +1028,7 @@ int pref_bar_index(AudioView *view)
 		return view->sel.bar_gap;
 	if (!view->sel.bar_indices.empty())
 		return view->sel.bar_indices.end() + 1;
-	if (view->hover.pos > 0)
+	if (view->hover_before_leave.pos > 0)
 		return view->song->bars.num;
 	return 0;
 }

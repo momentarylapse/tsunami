@@ -136,6 +136,7 @@ public:
 	static const int SNAPPING_DIST;
 
 	Selection hover;
+	Selection hover_before_leave;
 	SongSelection sel;
 	SongSelection sel_temp;
 

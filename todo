@@ -169,7 +169,7 @@ J mode per track
 J Array move
 J AudioBuffer move
 J enum class
-* enum descriptors via set?
+X enum descriptors via set?
 J Array initializer_list
 J nullptr
 * TrackLayer in separate file
@@ -187,7 +187,8 @@ J saving crash (samples)
 J playback line hover...
 J mixer v-scroll
 J selection auto-scroll
-* deleting main version
+J deleting main version
+J making buffers movable (popup menu/hover)
 
 == new plugin ui ==
 
@@ -211,5 +212,5 @@ j integrate Metronome
 
 == xxx ==
 
-* version selection mode (overlap)
+J version selection mode (overlap)
 * add/edit/delete bars -> dialog what to change how

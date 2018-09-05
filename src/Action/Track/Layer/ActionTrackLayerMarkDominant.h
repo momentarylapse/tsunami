@@ -8,29 +8,21 @@
 #ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_
 #define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_
 
-#include "../../Action.h"
+#include "../../ActionGroup.h"
+#include "../../../Data/Range.h"
 
-class Track;
 class TrackLayer;
 class Range;
 
-class ActionTrackLayerMarkDominant : public Action
+class ActionTrackLayerMarkDominant : public ActionGroup
 {
 public:
 	ActionTrackLayerMarkDominant(TrackLayer *layer, const Range &range);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void build(Data *d) override;
 
-	struct Operation
-	{
-		int index;
-		int target;
-		int position;
-		int samples;
-	};
-	Array<Operation> inserts, deletes;
-	Track *track;
+	TrackLayer *layer;
+	Range range;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYERMARKDOMINANT_H_ */

@@ -11,6 +11,7 @@
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "ActionTrackLayerDelete.h"
 #include "ActionTrackLayerAdd.h"
+#include "ActionTrackFadeDelete.h"
 
 #include "../../../Module/Audio/TrackRenderer.h"
 
@@ -40,7 +41,8 @@ void ActionTrackLayerMerge::build(Data *d)
 	for (int i=track->layers.num-2; i>=0; i--)
 		addSubAction(new ActionTrackLayerDelete(track, i), d);
 
-	track->fades.clear();
+	for (int i=track->fades.num-1; i>=0; i--)
+		addSubAction(new ActionTrackFadeDelete(track, i), d);
 
 	delete tr;
 

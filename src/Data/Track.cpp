@@ -21,8 +21,8 @@
 #include "../Action/Track/Layer/ActionTrackLayerDelete.h"
 #include "../Action/Track/Layer/ActionTrackLayerMakeTrack.h"
 #include "../Action/Track/Layer/ActionTrackLayerMarkDominant.h"
-/*#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
-#include "../Action/Track/Layer/ActionTrackLayerMove.h"*/
+#include "../Action/Track/Layer/ActionTrackLayerMerge.h"
+//#include "../Action/Track/Layer/ActionTrackLayerMove.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -467,9 +467,12 @@ TrackLayer *Track::addLayer()
 
 void Track::deleteLayer(TrackLayer *layer)
 {
-	foreachi(TrackLayer *l, layers, index)
-		if (l == layer)
-			song->execute(new ActionTrackLayerDelete(this, index));
+	song->execute(new ActionTrackLayerDelete(this, layer->version_number()));
+}
+
+void Track::mergeLayers()
+{
+	song->execute(new ActionTrackLayerMerge(this));
 }
 
 

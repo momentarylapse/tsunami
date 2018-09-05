@@ -105,7 +105,7 @@ public:
 	void _cdecl setPanning(float panning);
 	TrackLayer _cdecl *addLayer();
 	void _cdecl deleteLayer(TrackLayer *layer);
-	void _cdecl mergeLayers(int source, int target);
+	void _cdecl mergeLayers();
 	void _cdecl moveLayer(int source, int target);
 	void _cdecl move(int target);
 	void _cdecl setChannels(int channels);

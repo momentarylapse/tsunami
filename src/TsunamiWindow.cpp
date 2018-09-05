@@ -805,6 +805,7 @@ void TsunamiWindow::onLayerMakeTrack()
 
 void TsunamiWindow::onLayerMerge()
 {
+	view->cur_track()->mergeLayers();
 }
 
 void TsunamiWindow::onLayerMarkSelectionDominant()

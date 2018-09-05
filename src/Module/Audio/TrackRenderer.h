@@ -29,6 +29,8 @@ public:
 	Synthesizer *synth;
 	MidiEventStreamer* midi_streamer;
 	SongRenderer *song_renderer;
+	bool direct_mode;
+	int offset;
 
 	void seek(int pos);
 

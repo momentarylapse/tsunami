@@ -5,21 +5,21 @@
  *      Author: michi
  */
 
-#ifndef SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_
-#define SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_
+#ifndef SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_
+#define SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_
 
-/*#include "../ActionGroup.h"
+#include "../../ActionGroup.h"
 
-class Song;
+class Track;
 
-class ActionLayerMerge : public ActionGroup
+class ActionTrackLayerMerge : public ActionGroup
 {
 public:
-	ActionLayerMerge(int source, int target);
+	ActionTrackLayerMerge(Track *t);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
-	int source, target;
-};*/
+	Track *track;
+};
 
-#endif /* SRC_ACTION_LAYER_ACTIONLAYERMERGE_H_ */
+#endif /* SRC_ACTION_LAYER_ACTIONTRACKLAYERMERGE_H_ */

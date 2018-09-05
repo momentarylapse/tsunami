@@ -6,38 +6,42 @@
  */
 
 #include "ActionTrackLayerMerge.h"
-/*
-#include "../Track/Buffer/ActionTrackEditBuffer.h"
-#include "../Track/Buffer/ActionTrackCreateBuffers.h"
-#include "../../Data/Song.h"
-#include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
-#include "ActionTrackLayer__Delete.h"
+#include "../../../Data/Track.h"
+#include "../Buffer/ActionTrackEditBuffer.h"
+#include "../Buffer/ActionTrackCreateBuffers.h"
+#include "ActionTrackLayerDelete.h"
+#include "ActionTrackLayerAdd.h"
 
-ActionLayerMerge::ActionLayerMerge(int _source, int _target)
+#include "../../../Module/Audio/TrackRenderer.h"
+
+
+ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t)
 {
-	source = _source;
-	target = _target;
+	track = t;
 }
 
-void ActionLayerMerge::build(Data *d)
+
+void ActionTrackLayerMerge::build(Data *d)
 {
-	Song *s = dynamic_cast<Song*>(d);
-	for (Track* t : s->tracks){
-		TrackLayer &ls = t->layers[source];
-		for (int i=ls.buffers.num-1; i>=0; i--){
-			Range r = ls.buffers[i].range();
+	TrackLayer *lnew = new TrackLayer(track);
+	addSubAction(new ActionTrackLayerAdd(track, lnew), d);
 
-			addSubAction(new ActionTrackCreateBuffers(t, target, r), d);
+	Range r = track->range();
+	TrackRenderer *tr = new TrackRenderer(track, nullptr);
+	tr->seek(r.start());
 
-			Action* a = new ActionTrackEditBuffer(t, target, r);
-			AudioBuffer buf = t->readBuffers(target, r);
-			buf.add(ls.buffers[i], 0, 1.0f, 0.0f);
-			addSubAction(a, d);
+	AudioBuffer buf;
+	//lnew->getBuffers(buf, r);
+	addSubAction(new ActionTrackCreateBuffers(lnew, r), d);
+	lnew->readBuffers(buf, r, true);
 
-			addSubAction(new ActionTrack__DeleteBuffer(t, source, i), d);
-		}
-	}
+	tr->render_audio_no_fx(buf);
 
-	addSubAction(new ActionLayer__Delete(source), d);
+	for (int i=track->layers.num-2; i>=0; i--)
+		addSubAction(new ActionTrackLayerDelete(track, i), d);
+
+	track->fades.clear();
+
+	delete tr;
+
 }
-*/

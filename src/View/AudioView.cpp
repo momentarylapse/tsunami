@@ -75,6 +75,7 @@ public:
 	AudioView *view;
 	Song *song;
 	int perf_channel;
+	bool allow_running = true;
 	PeakThread(AudioView *_view)
 	{
 		view = _view;
@@ -87,22 +88,34 @@ public:
 	}
 	void _cdecl on_run() override
 	{
-		update_song();
+		try{
+			update_song();
+		}catch(...){
+		}
 	}
 
 	void update_buffer(AudioBuffer &buf)
 	{
 		song->lock();
+		if (!allow_running){
+			song->unlock();
+			throw "";
+		}
 		int n = buf._update_peaks_prepare();
 		song->unlock();
 
 		Thread::cancelation_point();
 
-		for (int i=0; i<n; i++)
+		if (!allow_running)
+			throw "";
+
+		for (int i=0; i<n; i++){
 			if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
 				while (!song->try_lock()){
 					Thread::cancelation_point();
 					hui::Sleep(0.01f);
+					if (!allow_running)
+						throw "";
 				}
 				PerformanceMonitor::start_busy(perf_channel);
 				buf._update_peaks_chunk(i);
@@ -110,6 +123,9 @@ public:
 				song->unlock();
 				Thread::cancelation_point();
 			}
+			if (!allow_running)
+				throw "";
+		}
 	}
 
 	void update_track(Track *t)
@@ -1320,6 +1336,8 @@ void AudioView::update_peaks()
 	//msg_write("-------------------- view update peaks");
 	if (peak_thread){
 		//msg_error("   already updating peaks...");
+		peak_thread->allow_running = false;
+		peak_thread->join();
 		delete(peak_thread);
 	}
 

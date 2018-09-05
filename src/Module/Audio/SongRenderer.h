@@ -54,7 +54,7 @@ public:
 	BeatSource _cdecl *get_beat_source(){ return (BeatSource*)bar_streamer; }
 
 private:
-	void read_basic(AudioBuffer &buf, int pos);
+	void read_basic(AudioBuffer &buf);
 	void render_song_no_fx(AudioBuffer &buf);
 
 	void on_song_add_track();

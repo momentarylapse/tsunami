@@ -157,7 +157,7 @@ void unapply_curves(Song *audio)
 		c->unapply();
 }
 
-void SongRenderer::read_basic(AudioBuffer &buf, int pos)
+void SongRenderer::read_basic(AudioBuffer &buf)
 {
 	range_cur = Range(pos, buf.length);
 	channels = buf.channels;
@@ -173,6 +173,8 @@ void SongRenderer::read_basic(AudioBuffer &buf, int pos)
 		TrackRenderer::apply_fx(buf, song->fx);
 
 	unapply_curves(song);
+
+	pos += buf.length;
 }
 
 int SongRenderer::read(AudioBuffer &buf)
@@ -188,19 +190,18 @@ int SongRenderer::read(AudioBuffer &buf)
 	// in case, the metronome track is muted
 	bar_streamer->seek(pos);
 
+	buf.offset = pos;
 
 	if (song->curves.num >= 0){
 		int chunk = 1024;
 		for (int d=0; d<size; d+=chunk){
 			AudioBuffer tbuf;
 			tbuf.set_as_ref(buf, d, min(size - d, chunk));
-			read_basic(tbuf, pos + d);
+			read_basic(tbuf);
 		}
 	}else
-		read_basic(buf, pos);
+		read_basic(buf);
 
-	buf.offset = pos;
-	pos += size;
 	if ((pos >= _range.end()) and allow_loop and loop_if_allowed)
 		seek(_range.offset);
 	return size;
@@ -258,7 +259,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 	//clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;
-	pos = _range.offset;
+	_seek(_range.offset);
 
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);

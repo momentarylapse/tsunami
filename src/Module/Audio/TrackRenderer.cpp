@@ -76,7 +76,9 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 {
 	song_renderer = sr;
 	track = t;
-	if (song_renderer->direct_mode)
+	offset = 0;
+	direct_mode = song_renderer and song_renderer->direct_mode;
+	if (direct_mode)
 		synth = t->synth;
 	else
 		synth = (Synthesizer*)t->synth->copy();
@@ -84,7 +86,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	synth->setInstrument(t->instrument);
 	midi_streamer = nullptr;
 
-	if (song_renderer->direct_mode){
+	if (direct_mode){
 		fx = t->fx;
 	}else{
 		for (AudioEffect *f: t->fx)
@@ -124,7 +126,7 @@ TrackRenderer::~TrackRenderer()
 	track->unsubscribe(this);
 	if (midi_streamer)
 		delete midi_streamer;
-	if (!song_renderer->direct_mode){
+	if (!direct_mode){
 		for (auto *f: fx)
 			delete f;
 		delete synth;
@@ -138,7 +140,7 @@ void TrackRenderer::on_track_add_or_delete_fx()
 
 void TrackRenderer::on_track_replace_synth()
 {
-	if (song_renderer->direct_mode){
+	if (direct_mode){
 		synth = track->synth;
 	}else{
 		delete synth;
@@ -169,10 +171,45 @@ void TrackRenderer::on_track_change_data()
 
 void TrackRenderer::seek(int pos)
 {
+	offset = pos;
 	if (midi_streamer)
 		midi_streamer->seek(pos);
 	if (track->type == SignalType::BEATS)
 		song_renderer->bar_streamer->seek(pos);
+}
+
+static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur)
+{
+	Range r1 = r and cur;
+	AudioBuffer tbuf1;
+	tbuf1.set_as_ref(buf, r1.start() - cur.start(), r1.length);
+	l->read_buffers_fixed(tbuf1, r1);
+}
+
+static void apply_fade(TrackLayer *l1, TrackLayer *l2, const Range &r, AudioBuffer &buf, const Range &cur)
+{
+	Range r1 = r and cur;
+	AudioBuffer tbuf1;
+	tbuf1.set_as_ref(buf, r1.start() - cur.start(), r1.length);
+	l1->read_buffers_fixed(tbuf1, r1);
+
+	AudioBuffer tbuf2;
+	tbuf2.resize(r1.length);
+	l2->read_buffers_fixed(tbuf2, r1);
+
+	// perform (linear) fade
+	for (int i=r1.start(); i<r1.end(); i++){
+		float a = (float)(r.end() - i) / (float)r.length;
+		for (int c=0; c<buf.channels; c++)
+			tbuf1.c[c][i - r1.start()] *= a;
+	}
+	for (int i=r1.start(); i<r1.end(); i++){
+		float a = (float)(i - r.start()) / (float)r.length;
+		for (int c=0; c<buf.channels; c++)
+			tbuf2.c[c][i - r1.start()] *= a;
+	}
+
+	tbuf1.add(tbuf2, 0, 1, 0);
 }
 
 
@@ -182,54 +219,40 @@ void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 	for (auto *l: track->layers)
 		if (l->)*/
 
-	Range &cur = song_renderer->range_cur;
+	Range cur = Range(offset, buf.length);
 
 	int index_before = 0;
-	Track::Fade *ff = nullptr;
+	Array<Track::Fade*> fades;
 	foreachi(auto &f, track->fades, i){
 		Range r = f.range();
-		if (r.end() <= song_renderer->range_cur.start())
+		if (r.end() <= cur.start())
 			index_before = f.target;
-		if (r.overlaps(song_renderer->range_cur)){
-			if (ff)
-				song_renderer->session->e("SongRenderer: double fade...");
-			ff = &f;
+		if (r.overlaps(cur)){
+			fades.add(&f);
 		}
 	}
-	if (ff){
-		Range r = ff->range();
-		// influence of previous layer
-		Range r1 = RangeTo(cur.offset, r.end()) and cur;
-		AudioBuffer tbuf1;
-		tbuf1.set_as_ref(buf, 0, r1.length);
-		track->layers[index_before]->read_buffers_fixed(tbuf1, r1);
+	if (fades.num > 0){
+		int prev_end = offset;
+		for (auto *ff: fades){
+			Range r = ff->range();
 
+			// before
+			copy_direct(track->layers[index_before], RangeTo(prev_end, r.start()), buf, cur);
 
-		// influence of target layer
-		Range r2 = RangeTo(r.start(), cur.end()) and cur;
-		AudioBuffer tbuf2;
-		tbuf2.resize(r2.length);
-		track->layers[ff->target]->read_buffers_fixed(tbuf2, r2);
+			apply_fade(track->layers[index_before], track->layers[ff->target], r, buf, cur);
 
-		// perform (linear) fade
-		Range r3 = r and cur;
-		for (int i=r3.start(); i<r3.end(); i++){
-			float a = 1 - (float)(i - r.start()) / (float)ff->samples;
-			for (int c=0; c<buf.channels; c++)
-				buf.c[c][i - r1.start()] *= a;
-		}
-		for (int i=r3.start(); i<r3.end(); i++){
-			float a = 1 - (float)(r.end() - i) / (float)ff->samples;
-			for (int c=0; c<buf.channels; c++)
-				tbuf2.c[c][i - r2.start()] *= a;
+			index_before = ff->target;
+			prev_end = r.end();
 		}
 
-		buf.add(tbuf2, r2.start() - r1.start(), 1, 0);
+		// after
+		auto *ff = fades.back();
+		copy_direct(track->layers[ff->target], RangeTo(prev_end, cur.end()), buf, cur);
 
 	}else{
 		// direct mode
-		track->layers[index_before]->read_buffers_fixed(buf, song_renderer->range_cur);
-		add_samples(track->layers[index_before], song_renderer->range_cur, buf);
+		track->layers[index_before]->read_buffers_fixed(buf, cur);
+		add_samples(track->layers[index_before], cur, buf);
 	}
 
 		/*
@@ -280,6 +303,7 @@ void TrackRenderer::render_no_fx(AudioBuffer &buf)
 		render_time_no_fx(buf);
 	else if (track->type == SignalType::MIDI)
 		render_midi_no_fx(buf);
+	offset += buf.length;
 }
 
 void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list)
@@ -296,7 +320,7 @@ void TrackRenderer::render_fx(AudioBuffer &buf)
 	render_no_fx(buf);
 
 	Array<AudioEffect*> _fx = fx;
-	if (song_renderer->preview_effect)
+	if (song_renderer and song_renderer->preview_effect)
 		_fx.add(song_renderer->preview_effect);
 	if (_fx.num > 0)
 		apply_fx(buf, _fx);

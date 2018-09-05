@@ -1029,6 +1029,33 @@ public:
 	}
 };
 
+class FileChunkFade: public FileChunk<Track,Track::Fade>
+{
+public:
+	FileChunkFade() : FileChunk<Track,Track::Fade>("fade"){}
+	virtual void create()
+	{
+	}
+	virtual void read(File *f)
+	{
+		Track::Fade ff;
+		ff.position = f->read_int();
+		ff.target = f->read_int();
+		ff.samples = f->read_int();
+		f->read_int();
+		f->read_int();
+		parent->fades.add(ff);
+	}
+	virtual void write(File *f)
+	{
+		f->write_int(me->position);
+		f->write_int(me->target);
+		f->write_int(me->samples);
+		f->write_int(0);
+		f->write_int(0);
+	}
+};
+
 class FileChunkTuning : public FileChunk<Track,Instrument>
 {
 public:
@@ -1065,6 +1092,7 @@ public:
 		add_child(new FileChunkMarker);
 		add_child(new _FileChunkTrackSampleRef); // deprecated
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
+		add_child(new FileChunkFade);
 	}
 	virtual void create()
 	{
@@ -1110,6 +1138,8 @@ public:
 				write_sub("synth", me->synth);
 		if (me->layers[0]->midi.num > 0)
 			write_sub("midi", &me->layers[0]->midi);
+		if (me->has_version_selection())
+			write_sub_array("fade", me->fades);
 	}
 };
 

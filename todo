@@ -84,7 +84,7 @@ j invalid free beim Abspielen
 J Selektionseinrasten
 j Stream Abstürze
 j SelectionRange beim Abspielen
-* Änderungen beim Abspielen
+j Änderungen beim Abspielen
 J freeze beim Midi Editieren
 J Animation zum MidiEditor
 
@@ -130,13 +130,13 @@ J perfmon window
 ~ perfmon more fine grained
 J thread system...
 j buffer moving mode
-* layer merging
+J layer merging
 J Gaussian noise
 J new signal chain file format
 * module auto x/y
 J AudioSource into buffer
 J Area.redraw queued after delete
-* midi buffer boxes?
+X midi buffer boxes?
 J load sample from SampleSelection dialog
 J mixer toggle buttons
 J fx panel scroll
@@ -214,3 +214,7 @@ j integrate Metronome
 
 J version selection mode (overlap)
 * add/edit/delete bars -> dialog what to change how
+
+== minor ==
+
+J hover text boundaries

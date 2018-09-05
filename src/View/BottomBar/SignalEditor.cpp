@@ -307,9 +307,9 @@ public:
 		float my = hui::GetEvent()->my;
 		Selection hh = getHover(mx, my);
 		if (hh.type == hover.TYPE_PORT_IN)
-			AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my);
+			AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my, p->area());
 		if (hh.type == hover.TYPE_PORT_OUT)
-			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my);
+			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());
 	}
 
 	void onChainUpdate()

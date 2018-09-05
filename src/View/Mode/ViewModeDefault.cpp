@@ -228,7 +228,7 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
 		view->menu_track->enable("track_convert_stereo", hover->track->channels == 1);
 		view->menu_track->enable("track_convert_mono", hover->track->channels == 2);
-		view->menu_track->enable("layer_merge", !hover->layer->is_main());
+		view->menu_track->enable("layer_merge", hover->layer->track->layers.num > 1);
 		view->menu_track->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
 		//view->menu_track->enable("delete_layer", !hover->layer->is_main());
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);

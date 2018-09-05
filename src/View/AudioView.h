@@ -109,7 +109,7 @@ public:
 	static rect get_boxed_str_rect(Painter *c, float x, float y, const string &str);
 	static void draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align=1);
 
-	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my);
+	static void draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area);
 	void draw_cursor_hover(Painter *c, const string &msg);
 
 	void optimize_view();

@@ -1066,18 +1066,19 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 }
 
 
-void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my)
+void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area)
 {
-	float x = max(mx - 20.0f, 2.0f);
-	float y = my + 20;
 	c->setFont("", -1, true, false);
+	float w = c->getStrWidth(msg);
+	float x = min(max(mx - 20.0f, area.x1 + 2.0f), area.x2 - w);
+	float y = min(max(my + 20, area.y1 + 2.0f), area.y2 - FONT_SIZE - 5);
 	draw_boxed_str(c, x, y, msg, colors.background, colors.text_soft1);
 	c->setFont("", -1, false, false);
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg)
 {
-	draw_cursor_hover(c, msg, mx, my);
+	draw_cursor_hover(c, msg, mx, my, song_area);
 }
 
 void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time)

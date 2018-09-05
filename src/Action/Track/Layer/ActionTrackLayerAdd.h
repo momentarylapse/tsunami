@@ -16,14 +16,13 @@ class TrackLayer;
 class ActionTrackLayerAdd : public Action
 {
 public:
-	ActionTrackLayerAdd(Track *t, int index, TrackLayer *l);
+	ActionTrackLayerAdd(Track *t, TrackLayer *l);
 	~ActionTrackLayerAdd();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 private:
 	Track *track;
-	int index;
 	TrackLayer *layer;
 };
 

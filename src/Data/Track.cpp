@@ -462,7 +462,7 @@ void Track::editMarker(const TrackMarker *marker, const Range &range, const stri
 
 TrackLayer *Track::addLayer()
 {
-	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, layers.num, new TrackLayer(this)));
+	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, new TrackLayer(this)));
 }
 
 void Track::deleteLayer(TrackLayer *layer)

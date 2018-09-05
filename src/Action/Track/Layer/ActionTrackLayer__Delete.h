@@ -19,12 +19,13 @@ public:
 	ActionTrackLayer__Delete(Track *t, int index);
 	~ActionTrackLayer__Delete();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 private:
 	Track *track;
 	int index;
 	TrackLayer *layer;
+	Array<int> fades_shifted;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_ */

@@ -490,10 +490,38 @@ void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 
 Range dominant_range(Track *t, int index)
 {
+	if (index == -1){
+		return t->fades[0].range();
+	}
 	int start = t->fades[index].position;
 	if (index + 1 < t->fades.num)
 		return RangeTo(start, t->fades[index + 1].position + t->fades[index + 1].samples);
-	return Range(start, 0);
+	return Range(start, t->fades[index].samples);
+}
+
+void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
+{
+	Range r = dominant_range(l->layer->track, i);
+	color cs = color(0.2f, 0,0.7f,0);
+	float xx1 = (float)view->cam.sample2screen(r.start());
+	float xx2 = (float)view->cam.sample2screen(r.end());
+	if (i == l->layer->track->fades.num - 1)
+		xx2 += 50;
+	if (i == -1)
+		xx1 -= 50;
+	float x1 = max(xx1, l->area.x1);
+	float x2 = min(xx2, l->area.x2);
+	c->setColor(cs);
+	c->drawRect(x1, l->area.y1, x2-x1, l->area.height());
+	if (i == l->layer->track->fades.num - 1){
+		cs.a *= 0.5f;
+		c->setColor(cs);
+		c->drawRect(xx2, l->area.y1, 50, l->area.height());
+	}else if (i == -1){
+		cs.a *= 0.5f;
+		c->setColor(cs);
+		c->drawRect(xx1 - 50, l->area.y1, 50, l->area.height());
+	}
 }
 
 void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
@@ -525,16 +553,13 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 	int index_before = 0;
 	int index_own = l->layer->version_number();
 
+	if (index_own == 0 and l->layer->track->has_version_selection()){
+		draw_fade_bg(c, l, view, -1);
+	}
+
 	foreachi (auto &f, l->layer->track->fades, i){
-		if (f.target == l->layer->version_number() and index_own > 0){
-			Range r = dominant_range(l->layer->track, i);
-			color cs = color(0.2f, 0,0.7f,0);
-			float xx1 = (float)view->cam.sample2screen(r.start());
-			float xx2 = (float)view->cam.sample2screen(r.end());
-			float x1 = max(xx1, l->area.x1);
-			float x2 = min(xx2, l->area.x2);
-			c->setColor(cs);
-			c->drawRect(x1, l->area.y1, x2-x1, l->area.height());
+		if (f.target == index_own){
+			draw_fade_bg(c, l, view, i);
 		}
 		if (f.target == index_own or index_before == index_own){
 			float x1 = (float)view->cam.sample2screen(f.position);

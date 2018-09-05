@@ -16,6 +16,10 @@ ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)
 	track = t;
 	index = _index;
 	layer = t->layers[index];
+
+	foreachi (auto &f, track->fades, i)
+		if (f.target >= index and f.target > 0)
+			fades_shifted.add(i);
 }
 
 ActionTrackLayer__Delete::~ActionTrackLayer__Delete()
@@ -30,6 +34,9 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 	assert(index >= 0);
 	assert(index < track->layers.num);
 
+	for (int i: fades_shifted)
+		track->fades[i].target --;
+
 	layer = track->layers[index];
 	assert(layer->buffers.num == 0);
 	layer->notify(layer->MESSAGE_DELETE);
@@ -43,6 +50,9 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 void ActionTrackLayer__Delete::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
+
+	for (int i: fades_shifted)
+		track->fades[i].target ++;
 
 	track->layers.insert(layer, index);
 	layer = nullptr;

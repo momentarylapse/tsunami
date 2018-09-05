@@ -10,10 +10,9 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 
-ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, int _index, TrackLayer *l)
+ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l)
 {
 	track = t;
-	index = _index;
 	layer = l;
 }
 
@@ -27,20 +26,20 @@ void* ActionTrackLayerAdd::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	track->layers.insert(layer, index);
+	track->layers.add(layer);
 	a->notify(a->MESSAGE_ADD_LAYER);
 	layer = nullptr;
 
-	return track->layers[index];
+	return track->layers.back();
 }
 
 void ActionTrackLayerAdd::undo(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	layer = track->layers[index];
+	layer = track->layers.back();
 	layer->notify(layer->MESSAGE_DELETE);
-	track->layers.erase(index);
+	track->layers.pop();
 
 	a->notify(a->MESSAGE_DELETE_LAYER);
 }

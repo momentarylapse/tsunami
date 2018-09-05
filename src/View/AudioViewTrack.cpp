@@ -945,20 +945,16 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 		c->setColor(view->colors.text);
 		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
 	}
-	if (layer->muted and !visible)
-		c->drawImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.x);
 
 	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	color col_but_hover = view->colors.text;
 
 	if (visible){
 		c->setColor(col_but);
-		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_MUTE))
+		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_DOMINANT))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);
-		if (layer->muted)
-			c->drawImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.x);
 
 		c->setColor(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))

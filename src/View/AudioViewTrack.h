@@ -108,7 +108,6 @@ public:
 
 	void setSolo(bool solo);
 	bool solo;
-	void setMuted(bool muted);
 
 
 	bool mouse_over();

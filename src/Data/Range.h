@@ -51,4 +51,6 @@ public:
 	Range operator- (int shift) const;
 };
 
+Range RangeTo(int start, int end);
+
 #endif /* RANGE_H_ */

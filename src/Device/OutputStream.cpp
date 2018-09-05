@@ -161,10 +161,10 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	bool out_of_data = stream->feed_stream_output((int)frames, out);
 
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
-		printf("XXX end of data...\n");
+		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
 		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
-		printf("/XXX end of data...\n");
+		//printf("/XXX end of data...\n");
 	}
 	return 0;
 }

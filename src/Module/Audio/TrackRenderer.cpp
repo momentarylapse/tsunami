@@ -20,6 +20,7 @@
 #include "../../Data/SampleRef.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
+#include "../../Session.h"
 
 
 
@@ -42,7 +43,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 int get_first_usable_layer(Track *t, Set<TrackLayer*> &allowed)
 {
 	foreachi(TrackLayer *l, t->layers, i)
-		if (!l->muted and allowed.contains(l))
+		if (allowed.contains(l))
 			return i;
 	return -1;
 }
@@ -177,21 +178,63 @@ void TrackRenderer::seek(int pos)
 
 void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 {
-	if (track->has_version_selection()){
-		int index = 0;
-		foreachi(auto &f, track->fades, i){
-				// FIXME: cheap cheat...
-				/*if (r.overlaps(song_renderer->range_cur)){
-					Range rr = r and song_renderer->range_cur;
-				}*/
-			if (f.position <= song_renderer->range_cur.start()){
-				index = f.target;
-			}
-		}
-		track->layers[index]->read_buffers_fixed(buf, song_renderer->range_cur);
+	/*bool has_solo = false;
+	for (auto *l: track->layers)
+		if (l->)*/
 
-		return;
+	Range &cur = song_renderer->range_cur;
+
+	int index_before = 0;
+	Track::Fade *ff = nullptr;
+	foreachi(auto &f, track->fades, i){
+		Range r = f.range();
+		if (r.end() <= song_renderer->range_cur.start())
+			index_before = f.target;
+		if (r.overlaps(song_renderer->range_cur)){
+			if (ff)
+				song_renderer->session->e("SongRenderer: double fade...");
+			ff = &f;
+		}
 	}
+	if (ff){
+		Range r = ff->range();
+		// influence of previous layer
+		Range r1 = RangeTo(cur.offset, r.end()) and cur;
+		AudioBuffer tbuf1;
+		tbuf1.set_as_ref(buf, 0, r1.length);
+		track->layers[index_before]->read_buffers_fixed(tbuf1, r1);
+
+
+		// influence of target layer
+		Range r2 = RangeTo(r.start(), cur.end()) and cur;
+		AudioBuffer tbuf2;
+		tbuf2.resize(r2.length);
+		track->layers[ff->target]->read_buffers_fixed(tbuf2, r2);
+
+		// perform (linear) fade
+		Range r3 = r and cur;
+		for (int i=r3.start(); i<r3.end(); i++){
+			float a = 1 - (float)(i - r.start()) / (float)ff->samples;
+			for (int c=0; c<buf.channels; c++)
+				buf.c[c][i - r1.start()] *= a;
+		}
+		for (int i=r3.start(); i<r3.end(); i++){
+			float a = 1 - (float)(r.end() - i) / (float)ff->samples;
+			for (int c=0; c<buf.channels; c++)
+				tbuf2.c[c][i - r2.start()] *= a;
+		}
+
+		buf.add(tbuf2, r2.start() - r1.start(), 1, 0);
+
+	}else{
+		// direct mode
+		track->layers[index_before]->read_buffers_fixed(buf, song_renderer->range_cur);
+		add_samples(track->layers[index_before], song_renderer->range_cur, buf);
+	}
+
+		/*
+		return;
+	//}
 
 	// any un-muted layer?
 	int i0 = get_first_usable_layer(track, song_renderer->allowed_layers);
@@ -216,7 +259,7 @@ void TrackRenderer::render_audio_no_fx(AudioBuffer &buf)
 			add_samples(track->layers[i], song_renderer->range_cur, tbuf);
 			buf.add(tbuf, 0, 1.0f, 0.0f);
 		}
-	}
+	}*/
 }
 
 void TrackRenderer::render_time_no_fx(AudioBuffer &buf)

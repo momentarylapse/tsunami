@@ -59,7 +59,6 @@ TrackLayer::TrackLayer(Track *t)
 	track = t;
 	type = t->type;
 	channels = t->channels;
-	muted = false;
 }
 
 TrackLayer::~TrackLayer()
@@ -271,12 +270,6 @@ AudioBuffer TrackLayer::_getBuffers(const Range &r)
 	return b;
 }
 
-void TrackLayer::setMuted(bool _muted)
-{
-	muted = _muted;
-	notify(MESSAGE_CHANGE); // TODO: action
-}
-
 void Track::invalidateAllPeaks()
 {
 	for (TrackLayer *l: layers)
@@ -333,6 +326,11 @@ void TrackLayer::mark_dominant(const Range &range)
 bool TrackLayer::is_main()
 {
 	return (this == track->layers[0]);
+}
+
+Range Track::Fade::range()
+{
+	return Range(position, samples);
 }
 
 bool Track::has_version_selection()

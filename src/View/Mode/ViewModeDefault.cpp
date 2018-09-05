@@ -83,8 +83,8 @@ void ViewModeDefault::on_left_button_down()
 		view->win->side_bar->open(SideBar::FX_CONSOLE);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE){
 		view->win->side_bar->open(SideBar::CURVE_CONSOLE);
-	}else if (hover->type == Selection::Type::LAYER_BUTTON_MUTE){
-		hover->layer->setMuted(!hover->layer->muted);
+	}else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT){
+
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
 		hover->vlayer->setSolo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
@@ -490,9 +490,9 @@ void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 
 Range dominant_range(Track *t, int index)
 {
-	int start = t->fades[index].position - t->fades[index].samples;
+	int start = t->fades[index].position;
 	if (index + 1 < t->fades.num)
-		return Range(start, t->fades[index + 1].position + t->fades[index + 1].samples - start);
+		return RangeTo(start, t->fades[index + 1].position + t->fades[index + 1].samples);
 	return Range(start, 0);
 }
 
@@ -537,7 +537,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 			c->drawRect(x1, l->area.y1, x2-x1, l->area.height());
 		}
 		if (f.target == index_own or index_before == index_own){
-			float x1 = (float)view->cam.sample2screen(f.position - f.samples);
+			float x1 = (float)view->cam.sample2screen(f.position);
 			float x2 = (float)view->cam.sample2screen(f.position + f.samples);
 			c->setColor(color(1,0,0.7f,0));
 			c->drawLine(x1, l->area.y1, x1, l->area.y2);
@@ -598,8 +598,8 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("edit curves"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_FX)
 		view->draw_cursor_hover(c, _("edit effects"));
-	else if (hover->type == Selection::Type::LAYER_BUTTON_MUTE)
-		view->draw_cursor_hover(c, _("toggle mute"));
+	else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT)
+		view->draw_cursor_hover(c, _("make main version"));
 	else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
 		view->draw_cursor_hover(c, _("toggle solo"));
 	else if (hover->type == Selection::Type::BAR)
@@ -701,7 +701,7 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 		AudioViewLayer *l = s.vlayer;
 		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5;
 		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
-			s.type = Selection::Type::LAYER_BUTTON_MUTE;
+			s.type = Selection::Type::LAYER_BUTTON_DOMINANT;
 			return s;
 		}
 		x += 17;

@@ -287,12 +287,10 @@ enum
 class TrackLayer
 	int type
 	Track *track
-	bool muted
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
 	SampleRef*[] samples
 	
-	extern void set_muted(bool muted)
 	extern void get_buffers(AudioBuffer buf, Range r)
 	extern void read_buffers(AudioBuffer buf, Range r, bool allow_ref)
 	extern void insert_midi_data(int offset, MidiNoteBuffer midi)

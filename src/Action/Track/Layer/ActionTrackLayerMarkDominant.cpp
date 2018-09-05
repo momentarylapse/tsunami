@@ -16,6 +16,7 @@ ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(TrackLayer *layer, co
 	int index_before = 0;
 	int index_after = 0;
 
+	// delete fades in range
 	foreachi (auto &f, track->fades, i){
 		if (f.position < range.start())
 			index_before = f.target;
@@ -28,14 +29,15 @@ ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(TrackLayer *layer, co
 		}
 	}
 
+	// add new fades
 	Operation op;
 	op.position = range.start();
-	op.samples = 500;
+	op.samples = 2000; // for now, use default value
 	op.target = index;
 	if (index != index_before)
 		inserts.add(op);
 	op.position = range.end();
-	op.samples = 500;
+	op.samples = 2000;
 	op.target = index_after;
 	if (index != index_after)
 		inserts.add(op);

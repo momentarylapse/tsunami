@@ -40,7 +40,6 @@ public:
 	// actions
 	AudioBuffer _cdecl _getBuffers(const Range &r);
 	void _cdecl getBuffers(AudioBuffer &buf, const Range &r);
-	void _cdecl setMuted(bool muted);
 
 	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
 	void _cdecl addMidiNote(MidiNote *n);
@@ -60,7 +59,6 @@ public:
 	SignalType type;
 	int channels;
 	bool is_main();
-	bool muted;
 
 	Array<AudioBuffer> buffers;
 
@@ -151,6 +149,7 @@ public:
 		int position;
 		int target;
 		int samples;
+		Range range();
 	};
 	Array<Fade> fades;
 	bool has_version_selection();

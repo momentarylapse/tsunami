@@ -380,10 +380,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("TrackLayer", "midi", _offsetof(TrackLayer, midi));
 	Kaba::DeclareClassOffset("TrackLayer", "samples", _offsetof(TrackLayer, samples));
 	Kaba::DeclareClassOffset("TrackLayer", "track", _offsetof(TrackLayer, track));
-	Kaba::DeclareClassOffset("TrackLayer", "muted", _offsetof(TrackLayer, muted));
 	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::getBuffers));
 	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::readBuffers));
-	Kaba::LinkExternal("TrackLayer.set_muted", Kaba::mf(&TrackLayer::setMuted));
 	Kaba::LinkExternal("TrackLayer.insert_midi_data", Kaba::mf(&TrackLayer::insertMidiData));
 	Kaba::LinkExternal("TrackLayer.add_midi_note", Kaba::mf(&TrackLayer::addMidiNote));
 	//Kaba::LinkExternal("TrackLayer.add_midi_notes", Kaba::mf(&TrackLayer::addMidiNotes));

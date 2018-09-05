@@ -157,7 +157,7 @@ J move selection
 j fix barrier system
 J copy/pase
 * apply hand-pos
-* note length via keys
+J note length via keys
 J better preview pitch-range (linear)
 J linear: track height
 J linear: keys
@@ -181,7 +181,7 @@ J SymbolRenderer in separate file
 J crash when closing (after fx/synth?)
 J crash when tuning strings
 J playback: muted at start => always muted
-* playback stop => deadlock?
+J playback stop => deadlock?
 J playback no samples?
 J saving crash (samples)
 J playback line hover...
@@ -197,3 +197,19 @@ j integrate Metronome
 * smaller Equalizer (context menu, graphical gain)
 * FxEditor: track name
 
+== plugins ==
+
+* grid
+	* scrolling with keys (wheel in use)
+	* better ticks
+* CompressorSimple graphical + indicator
+* flexible naming "BlaBla" "Bla Bla"
+* MultiEcho envelope curves
+* merge/remove deprecated fx
+
+* synth envelope graphical
+
+== xxx ==
+
+* version selection mode (overlap)
+* add/edit/delete bars -> dialog what to change how

@@ -723,13 +723,13 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 
 
 	// layer header buttons?
-	if (s.vlayer and (s.type == s.Type::LAYER_HEADER)){
+	if (s.vlayer and (s.type == s.Type::LAYER_HEADER) and !s.track->has_version_selection()){
 		AudioViewLayer *l = s.vlayer;
 		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5;
-		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
+		/*if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
 			s.type = Selection::Type::LAYER_BUTTON_DOMINANT;
 			return s;
-		}
+		}*/
 		x += 17;
 		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
 			s.type = Selection::Type::LAYER_BUTTON_SOLO;

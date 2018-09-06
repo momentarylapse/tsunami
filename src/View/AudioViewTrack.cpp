@@ -925,11 +925,15 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 		c->setColor(view->colors.text);
 	else
 		c->setColor(view->colors.text_soft2);
-	string title = (layer->track->has_version_selection() ? "v" : "l") + i2s(layer->version_number() + 1);
-	if (layer->is_main())
-		title = _("base");
-	//if (layer->is_main)
-	//	title = "main";
+	string title;
+	if (layer->track->has_version_selection()){
+		if (layer->is_main())
+			title = _("base");
+		else
+			title = "v" + i2s(layer->version_number() + 1);
+	}else{
+		title = "l" + i2s(layer->version_number() + 1);
+	}
 	if (solo)
 		title += " (solo)";
 	c->drawStr(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 3, title);
@@ -951,12 +955,12 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	color col_but_hover = view->colors.text;
 
-	if (visible){
-		c->setColor(col_but);
+	if (visible and !layer->track->has_version_selection()){
+		/*c->setColor(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_DOMINANT))
 			c->setColor(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);
+		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);*/
 
 		c->setColor(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))

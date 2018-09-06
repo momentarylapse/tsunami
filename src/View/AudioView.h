@@ -244,8 +244,6 @@ public:
 	void set_scale(const Scale &s);
 	Scale midi_scale;
 
-	bool bars_edit_data;
-
 	rect area;
 	rect song_area;
 	rect clip;

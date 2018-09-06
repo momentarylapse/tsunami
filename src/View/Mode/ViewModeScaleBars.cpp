@@ -34,7 +34,7 @@ void ViewModeScaleBars::draw_post(Painter *c)
 	c->drawRect(sxx1, view->area.y1, 30, view->area.height());
 	c->drawRect(sxx2 - 30, view->area.y1, 30, view->area.height());
 
-	string message = _("move right selection handle to scale");
+	string message = _("move right selection handle to scale   cancel (Esc)");
 	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selection, 0);
 }
 
@@ -81,7 +81,7 @@ void ViewModeScaleBars::perform_scale()
 	foreachb(int i, scaling_sel){
 		Bar *b = song->bars[i];
 		int length = (int)((float)b->length * factor);
-		song->editBar(i, length, b->num_beats, b->num_sub_beats, view->bars_edit_data);
+		song->editBar(i, length, b->num_beats, b->num_sub_beats, Bar::EditMode::STRETCH);
 	}
 	song->endActionGroup();
 

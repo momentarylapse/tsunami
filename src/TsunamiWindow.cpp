@@ -145,7 +145,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	setKeyCode("edit_bars", -1, "hui:edit");
 	event("scale_bars", std::bind(&TsunamiWindow::onScaleBars, this));
 	setKeyCode("scale_bars", -1, "hui:scale");
-	event("bar_link_to_data", std::bind(&TsunamiWindow::onBarsModifyMidi, this));
 	event("sample_manager", std::bind(&TsunamiWindow::onSampleManager, this));
 	event("song_edit_samples", std::bind(&TsunamiWindow::onSampleManager, this));
 	event("show_mixing_console", std::bind(&TsunamiWindow::onMixingConsole, this));
@@ -881,20 +880,11 @@ void TsunamiWindow::updateMenu()
 	enable("delete", !view->sel.is_empty());
 	// file
 	//Enable("export_selection", true);
-	//Enable("wave_properties", true);
-	// track
-//	enable("delete_track", view->cur_track());
-//	enable("track_properties", view->cur_track());
-	// layer
-/*	enable("layer_delete", song->layers.num > 1);
-	enable("layer_up", view->cur_layer < song->layers.num -1);
-	enable("layer_down", view->cur_layer > 0);*/
 	// bars
 	enable("delete_time", !view->sel.range.empty());
 	enable("delete_bars", view->sel.bars.num > 0);
 	enable("edit_bars", view->sel.bars.num > 0);
 	enable("scale_bars", view->sel.bars.num > 0);
-	check("bar_link_to_data", view->bars_edit_data);
 	// sample
 	enable("sample_from_selection", !view->sel.range.empty());
 	enable("insert_sample", view->sel.num_samples() > 0);
@@ -1114,10 +1104,4 @@ void TsunamiWindow::onScaleBars()
 	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
 		s.add(i);
 	view->mode_scale_bars->start_scaling(s);
-}
-
-void TsunamiWindow::onBarsModifyMidi()
-{
-	view->bars_edit_data = ! view->bars_edit_data;
-	updateMenu();
 }

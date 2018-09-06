@@ -92,7 +92,6 @@ public:
 	void onDeleteTimeInterval();
 	void onEditBars();
 	void onScaleBars();
-	void onBarsModifyMidi();
 	void onViewMidiDefault();
 	void onViewMidiTab();
 	void onViewMidiScore();

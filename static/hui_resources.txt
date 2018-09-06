@@ -1008,7 +1008,7 @@ menu_time
 
 3
 0
-10
+9
 Item
 delete_time
 image=hui:delete
@@ -1061,12 +1061,6 @@ Item
 delete_bars
 flat,image=hui:delete
 8
-0
-0
-Item
-bar_link_to_data
-checkable
-9
 0
 0
 Menu
@@ -4427,7 +4421,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-448
+447
 // Text
 /cancel
 Cancel
@@ -4710,9 +4704,6 @@ Add pause...
 
 menu/add_time_track
 Rhythm
-
-menu/bar_link_to_data
-Apply changes to data
 
 menu/bars_label
 Bars

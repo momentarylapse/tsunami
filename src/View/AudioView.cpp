@@ -293,8 +293,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
-	bars_edit_data = true;
-
 	peak_thread = nullptr;
 
 	renderer = session->song_renderer;

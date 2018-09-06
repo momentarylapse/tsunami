@@ -43,7 +43,6 @@ Menu menu ""
 		Item edit_bars "Edit..." image=hui:edit
 		Item scale_bars "Scale" image=hui:zoom-in "tooltip=scale selected bars (by moving the selection on the left)"
 		Item delete_bars "Löschen" flat image=hui:delete
-		Item bar_link_to_data "Apply changes to data" checkable
 	Menu menu_sub "Samples"
 		Item sample_manager "Manage..." image=hui:properties
 		Separator

@@ -9,6 +9,7 @@
 #define SRC_ACTION_TRACK_LAYER_ACTIONTRACKFADEDELETE_H_
 
 #include "../../Action.h"
+#include "../../../Data/CrossFade.h"
 
 class Track;
 
@@ -21,7 +22,7 @@ public:
 	void undo(Data *d) override;
 
 	Track *track;
-	int position, samples, target;
+	CrossFade fade;
 	int index;
 };
 

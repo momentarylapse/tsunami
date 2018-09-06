@@ -12,6 +12,7 @@
 #include "Song.h"
 #include "Track.h"
 #include "TrackLayer.h"
+#include "TrackMarker.h"
 #include "SampleRef.h"
 
 SongSelection::SongSelection()

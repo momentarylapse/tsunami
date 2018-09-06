@@ -7,6 +7,7 @@
 
 #include "ActionTrackAddMarker.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackMarker.h"
 
 ActionTrackAddMarker::ActionTrackAddMarker(Track *t, const Range &range, const string &text)
 {

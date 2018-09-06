@@ -20,17 +20,11 @@ class Song;
 class TrackLayer;
 class Synthesizer;
 class AudioEffect;
+class CrossFade;
+class TrackMarker;
 enum class SignalType;
 
 
-
-class TrackMarker
-{
-public:
-	Range range;
-	string text;
-	Array<AudioEffect*> fx;
-};
 
 class Track : public Observable<VirtualBase>
 {
@@ -98,14 +92,7 @@ public:
 
 	Array<TrackMarker*> markers;
 
-	struct Fade
-	{
-		int position;
-		int target;
-		int samples;
-		Range range();
-	};
-	Array<Fade> fades;
+	Array<CrossFade> fades;
 	bool has_version_selection();
 
 	Song *song;

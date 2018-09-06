@@ -16,6 +16,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
 #include "../../Data/SongSelection.h"
 #include <assert.h>
 

@@ -7,6 +7,8 @@
 
 #include "Track.h"
 #include "TrackLayer.h"
+#include "TrackMarker.h"
+#include "CrossFade.h"
 #include "base.h"
 #include "Song.h"
 #include "Audio/AudioBuffer.h"
@@ -126,11 +128,6 @@ void Track::invalidateAllPeaks()
 	for (TrackLayer *l: layers)
 		for (AudioBuffer &b: l->buffers)
 			b.peaks.clear();
-}
-
-Range Track::Fade::range()
-{
-	return Range(position, samples);
 }
 
 bool Track::has_version_selection()

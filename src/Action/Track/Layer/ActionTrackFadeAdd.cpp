@@ -12,23 +12,19 @@
 ActionTrackFadeAdd::ActionTrackFadeAdd(Track* t, int _position, int _samples, int _target)
 {
 	track = t;
-	position = _position;
-	samples = _samples;
-	target = _target;
+	fade.position = _position;
+	fade.samples = _samples;
+	fade.target = _target;
 	index = 0;
 }
 
 void* ActionTrackFadeAdd::execute(Data* d)
 {
-	Track::Fade f;
-	f.position = position;
-	f.samples = samples;
-	f.target = target;
 	for (int i=0; i<track->fades.num; i++)
-		if (track->fades[i].position < f.position){
+		if (track->fades[i].position < fade.position){
 			index = i + 1;
 		}
-	track->fades.insert(f, index);
+	track->fades.insert(fade, index);
 
 	return nullptr;
 }

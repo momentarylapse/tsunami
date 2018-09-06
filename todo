@@ -172,9 +172,12 @@ J enum class
 X enum descriptors via set?
 J Array initializer_list
 J nullptr
-* TrackLayer in separate file
-J AudioViewLayer in separate file
-J SymbolRenderer in separate file
+J TrackLayer in separate file
+* separate files
+	J AudioViewLayer
+	J TrackLayer
+	J TrackMarker
+	J CrossFade
 * MidiBuffer move/ownership
 
 == more bugs ==

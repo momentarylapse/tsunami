@@ -9,6 +9,8 @@
 
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
+#include "../../Data/CrossFade.h"
 #include "../../Data/Song.h"
 #include "../../Data/SampleRef.h"
 #include "../../Data/Audio/AudioBuffer.h"
@@ -51,6 +53,11 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 			/*else if (m->range.end() >= offset)
 				m->range.length += delta;*/
 		}
+
+		for (CrossFade &f: t->fades)
+			if (f.position >= offset)
+				f.position += delta;
+
 
 		for (TrackLayer *l: t->layers){
 			// buffer

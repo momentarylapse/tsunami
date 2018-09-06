@@ -8,6 +8,7 @@
 #include "MidiData.h"
 #include "Instrument.h"
 #include "../Track.h"
+#include "../TrackMarker.h"
 #include "../SongSelection.h"
 #include "../../lib/hui/hui.h"
 #include <math.h>
@@ -547,6 +548,7 @@ struct HandPosition
 
 void MidiNoteBuffer::update_meta(Track *t, const Scale& scale) const
 {
+	// FIXME argh bad system... better have a button to edit...
 	Set<HandPosition> hands;
 	for (TrackMarker *m: t->markers)
 		if (m->text.match(":pos *:"))

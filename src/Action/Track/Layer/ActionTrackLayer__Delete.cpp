@@ -10,6 +10,7 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
+#include "../../../Data/CrossFade.h"
 #include <assert.h>
 
 ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)

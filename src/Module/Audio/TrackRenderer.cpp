@@ -17,6 +17,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/CrossFade.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../../Data/Audio/AudioBuffer.h"
@@ -218,7 +219,7 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf)
 	Range cur = Range(offset, buf.length);
 
 	int index_before = 0;
-	Array<Track::Fade*> fades;
+	Array<CrossFade*> fades;
 	foreachi(auto &f, track->fades, i){
 		Range r = f.range();
 		if (r.end() <= cur.start())

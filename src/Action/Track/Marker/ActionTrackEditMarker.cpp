@@ -7,6 +7,7 @@
 
 #include "ActionTrackEditMarker.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackMarker.h"
 #include <assert.h>
 
 ActionTrackEditMarker::ActionTrackEditMarker(TrackMarker *m, const Range &_range, const string &_text)

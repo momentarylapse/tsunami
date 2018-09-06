@@ -11,9 +11,11 @@
 #include "../../lib/file/file.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
 #include "../../Data/Song.h"
 #include "../../Data/base.h"
 #include "../../Data/Curve.h"
+#include "../../Data/CrossFade.h"
 #include "../../Data/SampleRef.h"
 #include "../../Data/Sample.h"
 #include "../../Data/Audio/AudioBuffer.h"
@@ -1030,16 +1032,16 @@ public:
 	}
 };
 
-class FileChunkFade: public FileChunk<Track,Track::Fade>
+class FileChunkFade: public FileChunk<Track,CrossFade>
 {
 public:
-	FileChunkFade() : FileChunk<Track,Track::Fade>("fade"){}
+	FileChunkFade() : FileChunk<Track,CrossFade>("fade"){}
 	virtual void create()
 	{
 	}
 	virtual void read(File *f)
 	{
-		Track::Fade ff;
+		CrossFade ff;
 		ff.position = f->read_int();
 		ff.target = f->read_int();
 		ff.samples = f->read_int();

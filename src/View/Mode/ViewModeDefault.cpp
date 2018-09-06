@@ -21,6 +21,8 @@
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
+#include "../../Data/CrossFade.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../Helper/ScrollBar.h"

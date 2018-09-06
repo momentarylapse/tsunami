@@ -7,6 +7,7 @@
 
 #include "MarkerDialog.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackMarker.h"
 
 MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, const TrackMarker *_marker):
 	hui::Window("marker_dialog", _parent)

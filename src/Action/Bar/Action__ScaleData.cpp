@@ -9,6 +9,8 @@
 
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
+#include "../../Data/CrossFade.h"
 #include "../../Data/Song.h"
 #include "../../Data/SampleRef.h"
 #include "../../Data/Audio/AudioBuffer.h"
@@ -56,15 +58,20 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 	for (Track *t : s->tracks){
 
 		// marker
-		for (TrackMarker *m : t->markers){
+		for (TrackMarker *m: t->markers){
 			if (m->range.start() >= pos0)
 				m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
 			if (m->range.end() >= pos0)
 				m->range.set_end(__shift_data_shift(r, new_length, m->range.end()));
 		}
 
+		// fades
+		for (CrossFade &f: t->fades)
+			if (f.position >= pos0)
+				f.position = __shift_data_shift(r, new_length, f.position);
+
 		// buffer
-		for (TrackLayer *l : t->layers){
+		for (TrackLayer *l: t->layers){
 			for (AudioBuffer &b : l->buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(r, new_length, b.offset);
@@ -81,7 +88,7 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 			}
 
 			// samples
-			for (SampleRef *s : l->samples)
+			for (SampleRef *s: l->samples)
 				if (s->pos >= pos0)
 					s->pos = __shift_data_shift(r, new_length, s->pos);
 		}

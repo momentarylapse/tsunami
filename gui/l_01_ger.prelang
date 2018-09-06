@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-568
+572
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1706,6 +1706,18 @@ Daten entsprechend verschieben
 
 pause_edit_dialog/shift-data
 Daten entsprechend verschieben
+
+bar_delete_dialog/bar_delete_dialog
+Takte löschen
+
+bar_delete_dialog/relpace-by-pause
+Durch Pause ersetzen
+
+bar_delete_dialog/shift-data
+Daten entsprechend verschieben
+
+bar_delete_dialog/replace-by-pause
+Durch Pause ersetzen
 
 // Num Language Strings
 207

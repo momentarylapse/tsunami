@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-52
+53
 // Resource
 Menu
 menu_fake
@@ -86,6 +86,49 @@ bpm
 range=0:1000:0.1,expandx
 1
 3
+0
+CheckBox
+shift-data
+
+1
+0
+0
+Grid
+?
+buttonbar
+2
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+DefButton
+ok
+image=hui:ok
+1
+0
+0
+// Resource
+Dialog
+bar_delete_dialog
+width=150,height=80
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
+CheckBox
+replace-by-pause
+
+0
+0
 0
 CheckBox
 shift-data
@@ -4384,7 +4427,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-445
+448
 // Text
 /cancel
 Cancel
@@ -4508,6 +4551,15 @@ bar_add_dialog/sub_beats
 
 bar_add_dialog/t_sub_beats
 Sub beats
+
+bar_delete_dialog/bar_delete_dialog
+Delete bars
+
+bar_delete_dialog/replace-by-pause
+Replace by pause
+
+bar_delete_dialog/shift-data
+Move data accordingly
 
 bar_edit_dialog/bar_edit_dialog
 Edit bars
@@ -5727,7 +5779,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-567
+571
 // Text
 /cancel
 Abbrechen
@@ -5869,6 +5921,18 @@ bar_add_dialog/sub_beats
 
 bar_add_dialog/t_sub_beats
 Teil-Schläge
+
+bar_delete_dialog/bar_delete_dialog
+Takte löschen
+
+bar_delete_dialog/relpace-by-pause
+Durch Pause ersetzen
+
+bar_delete_dialog/replace-by-pause
+Durch Pause ersetzen
+
+bar_delete_dialog/shift-data
+Daten entsprechend verschieben
 
 bar_edit_dialog/bar_edit_dialog
 Takte bearbeiten

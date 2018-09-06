@@ -1,0 +1,7 @@
+Dialog bar_delete_dialog "Delete bars" width=150 height=80
+	Grid ? "" vertical
+		CheckBox replace-by-pause "Replace by pause"
+		CheckBox shift-data "Move data accordingly"
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			DefButton /ok "OK" image=hui:ok

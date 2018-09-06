@@ -1,0 +1,27 @@
+/*
+ * BarDeleteDialog.h
+ *
+ *  Created on: 06.09.2018
+ *      Author: michi
+ */
+
+#ifndef SRC_VIEW_DIALOG_BARDELETEDIALOG_H_
+#define SRC_VIEW_DIALOG_BARDELETEDIALOG_H_
+
+#include "../../lib/hui/hui.h"
+
+class Song;
+class Range;
+
+class BarDeleteDialog : public hui::Dialog
+{
+public:
+	Song *song;
+	Array<int> sel;
+
+	BarDeleteDialog(hui::Window *root, Song *s, const Range &bars);
+	void onOk();
+	void onClose();
+};
+
+#endif /* SRC_VIEW_DIALOG_BARDELETEDIALOG_H_ */

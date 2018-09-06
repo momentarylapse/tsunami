@@ -14,6 +14,7 @@
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/MarkerDialog.h"
 #include "View/Dialog/BarAddDialog.h"
+#include "View/Dialog/BarDeleteDialog.h"
 #include "View/Dialog/BarEditDialog.h"
 #include "View/Dialog/PauseAddDialog.h"
 #include "View/Dialog/PauseEditDialog.h"
@@ -256,8 +257,8 @@ void TsunamiCleanUp()
 		again = false;
 		foreachi(Session *s, tsunami->sessions, i)
 			if (s->win->gotDestroyed() and s->win->auto_delete){
-				delete(s->win);
-				delete(s);
+				delete s->win;
+				delete s;
 				tsunami->sessions.erase(i);
 				again = true;
 				break;
@@ -282,10 +283,10 @@ void TsunamiWindow::onDestroy()
 	bottom_bar->unsubscribe(this);
 	side_bar->unsubscribe(this);
 
-	delete(side_bar);
-	delete(mini_bar);
-	delete(bottom_bar);
-	delete(view);
+	delete side_bar;
+	delete mini_bar;
+	delete bottom_bar;
+	delete view;
 
 	hui::RunLater(0.010f, &TsunamiCleanUp);
 }
@@ -436,7 +437,7 @@ void TsunamiWindow::onTrackAddMarker()
 			range = Range(view->hover_before_leave.pos, 0);
 		MarkerDialog *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, nullptr);
 		dlg->run();
-		delete(dlg);
+		delete dlg;
 	}else{
 		session->e(_("No track selected"));
 	}
@@ -525,7 +526,7 @@ void TsunamiWindow::onEditMarker()
 	if (view->hover_before_leave.type == Selection::Type::MARKER){
 		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), Range::EMPTY, view->hover_before_leave.marker);
 		dlg->run();
-		delete(dlg);
+		delete dlg;
 	}else
 		session->e(_("No marker selected"));
 }
@@ -616,7 +617,7 @@ void TsunamiWindow::onMenuExecuteAudioEffect()
 				}
 		song->endActionGroup();
 	}
-	delete(fx);
+	delete fx;
 }
 
 void TsunamiWindow::onMenuExecuteAudioSource()
@@ -638,7 +639,7 @@ void TsunamiWindow::onMenuExecuteAudioSource()
 				}
 		song->endActionGroup();
 	}
-	delete(s);
+	delete s;
 }
 
 void TsunamiWindow::onMenuExecuteMidiEffect()
@@ -658,7 +659,7 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 			}
 		song->action_manager->group_end();
 	}
-	delete(fx);
+	delete fx;
 }
 
 void TsunamiWindow::onMenuExecuteMidiSource()
@@ -681,7 +682,7 @@ void TsunamiWindow::onMenuExecuteMidiSource()
 			}
 		song->endActionGroup();
 	}
-	delete(s);
+	delete s;
 }
 
 void TsunamiWindow::onMenuExecuteSongPlugin()
@@ -691,7 +692,7 @@ void TsunamiWindow::onMenuExecuteSongPlugin()
 	SongPlugin *p = CreateSongPlugin(session, name);
 
 	p->apply();
-	delete(p);
+	delete p;
 }
 
 void TsunamiWindow::onMenuExecuteTsunamiPlugin()
@@ -734,7 +735,7 @@ void TsunamiWindow::onSettings()
 {
 	SettingsDialog *dlg = new SettingsDialog(view, this);
 	dlg->run();
-	delete(dlg);
+	delete dlg;
 }
 
 void TsunamiWindow::onTrackImport()
@@ -950,7 +951,7 @@ void TsunamiWindow::onNew()
 {
 	NewDialog *dlg = new NewDialog(this);
 	dlg->run();
-	delete(dlg);
+	delete dlg;
 	//BackupManager::set_save_state();
 }
 
@@ -1042,24 +1043,21 @@ void TsunamiWindow::onAddBars()
 {
 	auto dlg = new BarAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
-	delete(dlg);
+	delete dlg;
 }
 
 void TsunamiWindow::onAddPause()
 {
-	auto dlg = new PauseAddDialog(win, song, pref_bar_index(view));
+	auto *dlg = new PauseAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
-	delete(dlg);
+	delete dlg;
 }
 
 void TsunamiWindow::onDeleteBars()
 {
-	song->action_manager->group_begin();
-
-	for (int i=view->sel.bar_indices.end()-1; i>=view->sel.bar_indices.start(); i--){
-		song->deleteBar(i, view->bars_edit_data);
-	}
-	song->action_manager->group_end();
+	auto *dlg = new BarDeleteDialog(win, song, view->sel.bar_indices);
+	dlg->run();
+	delete dlg;
 }
 
 void TsunamiWindow::onDeleteTimeInterval()
@@ -1099,11 +1097,11 @@ void TsunamiWindow::onEditBars()
 	if (num_bars > 0 and num_pauses == 0){
 		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bar_indices);
 		dlg->run();
-		delete(dlg);
+		delete dlg;
 	}else if (num_bars == 0 and num_pauses == 1){
 		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start());
 		dlg->run();
-		delete(dlg);
+		delete dlg;
 	}else{
 		hui::ErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
 	}

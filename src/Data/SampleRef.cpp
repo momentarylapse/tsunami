@@ -7,7 +7,7 @@
 
 #include "SampleRef.h"
 #include "Sample.h"
-#include "Track.h"
+#include "TrackLayer.h"
 #include "../lib/math/math.h"
 #include "Song.h"
 

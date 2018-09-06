@@ -8,6 +8,7 @@
 #include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 
 ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track)

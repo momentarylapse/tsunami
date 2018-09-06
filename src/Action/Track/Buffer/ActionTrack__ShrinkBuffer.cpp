@@ -7,7 +7,7 @@
 
 #include <assert.h>
 #include "ActionTrack__ShrinkBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length)

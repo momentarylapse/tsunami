@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackDeleteMidiNote.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer* l, int _index)
 {

@@ -9,6 +9,7 @@
 #include "ActionTrackFadeAdd.h"
 #include "ActionTrackFadeDelete.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(TrackLayer *_layer, const Range &_range)
 {

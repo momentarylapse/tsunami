@@ -13,6 +13,7 @@
 #include "../../../Device/Device.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/base.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"

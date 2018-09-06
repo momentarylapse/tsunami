@@ -11,6 +11,7 @@
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../../Data/SongSelection.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../Track/Buffer/ActionTrack__DeleteBuffer.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBuffer.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"

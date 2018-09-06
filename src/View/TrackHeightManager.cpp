@@ -13,6 +13,7 @@
 #include "Mode/ViewMode.h"
 #include "Helper/ScrollBar.h"
 #include "../Data/Track.h"
+#include "../Data/TrackLayer.h"
 
 TrackHeightManager::TrackHeightManager()
 {

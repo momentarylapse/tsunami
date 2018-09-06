@@ -11,6 +11,7 @@
 #include <assert.h>
 #include "Buffer/ActionTrack__DeleteBuffer.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 
 ActionTrackDelete::ActionTrackDelete(Track *_track)
 {

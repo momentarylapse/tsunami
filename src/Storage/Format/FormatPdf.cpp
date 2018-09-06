@@ -9,6 +9,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/Clef.h"

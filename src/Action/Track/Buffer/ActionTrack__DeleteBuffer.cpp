@@ -7,7 +7,7 @@
 
 #include <assert.h>
 #include "ActionTrack__DeleteBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index)
 {

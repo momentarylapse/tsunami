@@ -11,6 +11,7 @@
 
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../Track/Buffer/ActionTrack__SplitBuffer.h"

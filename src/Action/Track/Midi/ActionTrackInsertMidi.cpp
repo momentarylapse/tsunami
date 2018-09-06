@@ -6,6 +6,7 @@
  */
 
 #include "ActionTrackInsertMidi.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const MidiNoteBuffer &_midi)
 {

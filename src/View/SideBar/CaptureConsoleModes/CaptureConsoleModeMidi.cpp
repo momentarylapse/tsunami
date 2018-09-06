@@ -14,6 +14,7 @@
 #include "../../../Data/base.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/Audio/PeakMeter.h"

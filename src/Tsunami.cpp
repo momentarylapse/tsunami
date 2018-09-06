@@ -10,6 +10,7 @@
 #include "Data/base.h"
 #include "Data/Song.h"
 #include "Data/Track.h"
+#include "Data/TrackLayer.h"
 #include "Device/DeviceManager.h"
 #include "Device/OutputStream.h"
 #include "Module/SignalChain.h"

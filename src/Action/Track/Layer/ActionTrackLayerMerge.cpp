@@ -7,6 +7,7 @@
 
 #include "ActionTrackLayerMerge.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "ActionTrackLayerDelete.h"

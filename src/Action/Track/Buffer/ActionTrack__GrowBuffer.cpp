@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__GrowBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length)

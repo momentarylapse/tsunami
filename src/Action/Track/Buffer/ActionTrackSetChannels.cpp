@@ -7,6 +7,7 @@
 
 #include "ActionTrackSetChannels.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Song.h"
 #include "ActionTrack__BufferSetChannels.h"
 

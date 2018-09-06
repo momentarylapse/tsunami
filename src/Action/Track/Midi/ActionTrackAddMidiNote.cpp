@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackAddMidiNote.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, MidiNote* n)
 {

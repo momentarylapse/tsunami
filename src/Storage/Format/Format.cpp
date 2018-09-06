@@ -10,6 +10,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Action/ActionManager.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Module/Audio/SongRenderer.h"

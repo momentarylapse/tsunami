@@ -7,7 +7,7 @@
 
 #include "ActionTrackAddSample.h"
 
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/SampleRef.h"
 #include "../../../Data/Sample.h"
 
@@ -26,7 +26,7 @@ ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sam
 
 	ref->layer = l;
 	ref->pos = pos;
-	ref->owner = l->track->song;
+	ref->owner = l->song();
 }
 
 ActionTrackAddSample::~ActionTrackAddSample()

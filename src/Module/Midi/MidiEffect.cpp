@@ -12,7 +12,7 @@
 #include "../../lib/math/math.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
-#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
@@ -93,7 +93,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 {
 	MidiNoteBuffer midi = l->midi.getNotesBySelection(sel);
 
-	bh_song = l->track->song;
+	bh_song = l->song();
 	bh_offset = sel.range.offset;
 	int b2 = bh_song->bars.getNextBeat(bh_offset);
 	int b1 = bh_song->bars.getPrevBeat(b2);
@@ -101,7 +101,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 		bh_offset = b2;
 	bh_midi = &midi;
 
-	l->track->song->beginActionGroup();
+	l->song()->beginActionGroup();
 
 	for (int i=l->midi.num-1; i>=0; i--)
 		if (sel.has(l->midi[i]))
@@ -112,7 +112,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 		n->reset_meta();
 
 	l->insertMidiData(0, midi);
-	l->track->song->endActionGroup();
+	l->song()->endActionGroup();
 }
 
 void MidiEffect::note(float pitch, float volume, int beats)

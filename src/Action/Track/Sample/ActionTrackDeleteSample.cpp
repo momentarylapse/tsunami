@@ -7,7 +7,7 @@
 
 #include "ActionTrackDeleteSample.h"
 
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/SampleRef.h"
 #include "../../../Data/Sample.h"
 
@@ -41,7 +41,7 @@ void ActionTrackDeleteSample::undo(Data* d)
 {
 	layer->samples.insert(ref, index);
 	ref->origin->ref();
-	ref->owner = layer->track->song;
+	ref->owner = layer->song();
 	ref = nullptr;
 }
 

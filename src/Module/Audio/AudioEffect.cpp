@@ -12,7 +12,7 @@
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
-#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 
 
 AudioEffect::Output::Output(AudioEffect *_fx)
@@ -77,7 +77,7 @@ void AudioEffect::set_source(AudioPort *_source)
 
 void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
 {
-	sample_rate = l->track->song->sample_rate;
+	sample_rate = l->song()->sample_rate;
 	AudioBuffer buf;
 	l->getBuffers(buf, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);

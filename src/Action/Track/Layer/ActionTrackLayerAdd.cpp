@@ -9,6 +9,7 @@
 
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l)
 {

@@ -7,6 +7,7 @@
 
 #include "ActionTrackSetInstrument.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &instrument)
 {

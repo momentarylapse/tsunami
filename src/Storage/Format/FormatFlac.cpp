@@ -11,6 +11,7 @@
 #include "../../Module/Port/AudioPort.h"
 #include "../../Session.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 #include "../../Data/base.h"
 #if HAS_LIB_FLAC

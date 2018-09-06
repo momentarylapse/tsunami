@@ -9,7 +9,9 @@
 #define ACTIONTRACKINSERTMIDI_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/Midi/MidiData.h"
+
+class TrackLayer;
 
 class ActionTrackInsertMidi : public Action
 {

@@ -7,7 +7,7 @@
 
 #include <assert.h>
 #include "ActionTrack__SplitBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset)

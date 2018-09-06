@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__AbsorbBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
 ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, int _src)

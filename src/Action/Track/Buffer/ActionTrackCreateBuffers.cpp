@@ -10,7 +10,7 @@
 #include "ActionTrack__AbsorbBuffer.h"
 #include "ActionTrack__AddBuffer.h"
 #include "ActionTrack__GrowBuffer.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
@@ -22,8 +22,6 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_
 
 void ActionTrackCreateBuffers::build(Data *d)
 {
-	Song *s = dynamic_cast<Song*>(d);
-
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;

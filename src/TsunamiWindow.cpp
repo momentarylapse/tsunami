@@ -39,6 +39,7 @@
 #include "Device/DeviceManager.h"
 #include "Data/base.h"
 #include "Data/Track.h"
+#include "Data/TrackLayer.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
 #include "Data/Rhythm/Bar.h"

@@ -7,7 +7,7 @@
 
 #include "ActionTrackInsertSelectedSamples.h"
 
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/SampleRef.h"
 #include "../../../Data/SongSelection.h"

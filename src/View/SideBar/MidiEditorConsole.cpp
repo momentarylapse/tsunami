@@ -8,6 +8,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Rhythm/BarCollection.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/MidiData.h"

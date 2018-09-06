@@ -8,6 +8,7 @@
 #include "Song.h"
 #include "base.h"
 #include "Track.h"
+#include "TrackLayer.h"
 #include "Sample.h"
 #include "SongSelection.h"
 #include "Curve.h"

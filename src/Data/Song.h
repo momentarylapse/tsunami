@@ -111,7 +111,7 @@ public:
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);
 	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, int mode);
-	void _cdecl addPause(int index, float time, int mode);
+	void _cdecl addPause(int index, int length, int mode);
 	void _cdecl editBar(int index, int length, int num_beats, int num_sub_beats, int mode);
 	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl deleteTimeInterval(int index, const Range &range);

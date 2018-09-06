@@ -20,8 +20,9 @@ public:
 	Array<int> sel;
 
 	BarDeleteDialog(hui::Window *root, Song *s, const Range &bars);
-	void onOk();
-	void onClose();
+	void on_ok();
+	void on_close();
+	void on_replace_by_pause();
 };
 
 #endif /* SRC_VIEW_DIALOG_BARDELETEDIALOG_H_ */

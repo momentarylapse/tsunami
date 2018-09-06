@@ -36,6 +36,7 @@ void PauseAddDialog::onOk()
 	if (!song->getTimeTrack())
 		song->addTrack(SignalType::BEATS, 0);
 
+	int length = (int)(duration * (float)song->sample_rate);
 	song->addPause(index, duration, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->endActionGroup();
 

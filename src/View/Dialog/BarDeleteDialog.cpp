@@ -21,28 +21,45 @@ BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Range &_bars)
 		sel.add(i);
 
 	check("shift-data", true);
-	enable("replace-by-pause", false);
+	//enable("replace-by-pause", false);
 
-	event("ok", std::bind(&BarDeleteDialog::onOk, this));
-	event("cancel", std::bind(&BarDeleteDialog::onClose, this));
-	event("hui:close", std::bind(&BarDeleteDialog::onClose, this));
+	event("ok", [&]{ on_ok(); });
+	event("cancel", [&]{ on_close(); });
+	event("hui:close", [&]{ on_close(); });
+	event("replace-by-pause", [&]{ on_replace_by_pause(); });
 }
 
-void BarDeleteDialog::onOk()
+void BarDeleteDialog::on_replace_by_pause()
+{
+	enable("shift-data", !isChecked(""));
+}
+
+void BarDeleteDialog::on_ok()
 {
 	bool move_data = isChecked("shift-data");
+	bool replace_by_pause = isChecked("replace-by-pause");
 
 	song->beginActionGroup();
 
-	foreachb(int i, sel)
-		song->deleteBar(i, move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	if (replace_by_pause){
+		int length = 0;
+		foreachb(int i, sel){
+			length += song->bars[i]->length;
+			song->deleteBar(i, false);
+		}
+		song->addPause(sel[0], length, Bar::EditMode::IGNORE);
+	}else{
+
+		foreachb(int i, sel)
+			song->deleteBar(i, move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	}
 
 	song->endActionGroup();
 
 	destroy();
 }
 
-void BarDeleteDialog::onClose()
+void BarDeleteDialog::on_close()
 {
 	destroy();
 }

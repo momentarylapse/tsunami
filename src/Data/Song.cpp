@@ -413,9 +413,8 @@ void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)
 		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, mode));
 }
 
-void Song::addPause(int index, float time, int mode)
+void Song::addPause(int index, int length, int mode)
 {
-	int length = (int)((float)sample_rate * time);
 	if (index >= 0)
 		execute(new ActionBarAdd(index, length, 0, 0, mode));
 	else

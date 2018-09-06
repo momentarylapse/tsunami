@@ -8,6 +8,7 @@
 #include "ViewModeDefault.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../AudioViewLayer.h"
 #include "../SideBar/SideBar.h"
 #include "../../TsunamiWindow.h"
 #include "../../Device/OutputStream.h"

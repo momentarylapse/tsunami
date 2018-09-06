@@ -8,6 +8,7 @@
 #include "AudioView.h"
 
 #include "AudioViewTrack.h"
+#include "AudioViewLayer.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
@@ -166,6 +167,22 @@ Image *ExpandImageMask(Image *im, float d)
 		}
 	return r;
 }
+
+
+
+void draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow)
+{
+	c->setFill(false);
+	c->setLineWidth(3);
+	c->setColor(col_shadow);
+	c->drawStr(x, y, str);
+
+	c->setFill(true);
+	c->setLineWidth(1);
+	c->setColor(col_text);
+	c->drawStr(x, y, str);
+}
+
 
 
 

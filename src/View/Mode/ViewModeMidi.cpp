@@ -21,7 +21,7 @@
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../AudioViewLayer.h"
 #include "../Helper/MidiPreview.h"
 #include "../Helper/ScrollBar.h"
 

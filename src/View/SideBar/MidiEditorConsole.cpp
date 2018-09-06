@@ -15,7 +15,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../AudioViewLayer.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"

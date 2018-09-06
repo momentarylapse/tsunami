@@ -28,6 +28,7 @@
 #include "View/Helper/Progress.h"
 #include "View/AudioView.h"
 #include "View/AudioViewTrack.h"
+#include "View/AudioViewLayer.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Plugins/SongPlugin.h"

@@ -173,6 +173,7 @@ X enum descriptors via set?
 J Array initializer_list
 J nullptr
 * TrackLayer in separate file
+J AudioViewLayer in separate file
 J SymbolRenderer in separate file
 * MidiBuffer move/ownership
 

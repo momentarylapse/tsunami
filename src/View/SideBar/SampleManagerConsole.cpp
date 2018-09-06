@@ -7,7 +7,7 @@
 
 #include "../../Storage/Storage.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../AudioViewLayer.h"
 #include "../../Device/OutputStream.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"

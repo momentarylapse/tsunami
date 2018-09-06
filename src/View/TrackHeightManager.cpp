@@ -9,6 +9,7 @@
 
 #include "AudioView.h"
 #include "AudioViewTrack.h"
+#include "AudioViewLayer.h"
 #include "Mode/ViewMode.h"
 #include "Helper/ScrollBar.h"
 #include "../Data/Track.h"

@@ -18,9 +18,8 @@ class BarEditDialog : public hui::Dialog
 public:
 	Song *song;
 	Array<int> sel;
-	bool apply_to_midi;
 
-	BarEditDialog(hui::Window *root, Song *song, const Range &bars, bool apply_to_midi);
+	BarEditDialog(hui::Window *root, Song *song, const Range &bars);
 	void onOk();
 	void onClose();
 	void onBeats();

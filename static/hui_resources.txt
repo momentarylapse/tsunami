@@ -29,10 +29,10 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
-2
+3
 Grid
 ?
 
@@ -87,11 +87,17 @@ range=0:1000:0.1,expandx
 1
 3
 0
+CheckBox
+shift-data
+
+1
+0
+0
 Grid
 ?
 buttonbar
+2
 0
-1
 2
 Button
 cancel
@@ -114,10 +120,10 @@ width=250,height=80
 1
 Grid
 ?
-
+vertical
 0
 0
-2
+3
 Grid
 ?
 
@@ -160,11 +166,17 @@ range=0:1000:0.1,expandx
 1
 2
 0
+CheckBox
+shift-data
+
+1
+0
+0
 Grid
 ?
 buttonbar
+2
 0
-1
 2
 Button
 cancel
@@ -1992,7 +2004,7 @@ Grid
 vertical
 0
 0
-2
+3
 Grid
 ?
 
@@ -2017,10 +2029,16 @@ t_s
 2
 0
 0
+CheckBox
+shift-data
+
+1
+0
+0
 Grid
 ?
 buttonbar
-1
+2
 0
 2
 Button
@@ -2047,7 +2065,7 @@ Grid
 vertical
 0
 0
-2
+3
 Grid
 ?
 
@@ -2072,10 +2090,16 @@ s
 2
 0
 0
+CheckBox
+shift-data
+
+1
+0
+0
 Grid
 ?
 buttonbar
-1
+2
 0
 2
 Button
@@ -4360,7 +4384,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-441
+445
 // Text
 /cancel
 Cancel
@@ -4476,6 +4500,9 @@ bar_add_dialog/bpm
 bar_add_dialog/count
 1
 
+bar_add_dialog/shift-data
+Move data accordingly
+
 bar_add_dialog/sub_beats
 1
 
@@ -4499,6 +4526,9 @@ Bpm
 
 bar_edit_dialog/edit_sub_beats
 Sub beats
+
+bar_edit_dialog/shift-data
+Move data accordingly
 
 bar_edit_dialog/sub_beats
 1
@@ -4980,6 +5010,9 @@ pause_add_dialog/duration
 pause_add_dialog/pause_add_dialog
 New pause
 
+pause_add_dialog/shift-data
+Move data accordingly
+
 pause_add_dialog/t_duration
 Duration
 
@@ -4991,6 +5024,9 @@ pause_edit_dialog/duration
 
 pause_edit_dialog/pause_edit_dialog
 Edit pause
+
+pause_edit_dialog/shift-data
+Move data accordingly
 
 pause_edit_dialog/t_duration
 Duration
@@ -5691,7 +5727,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-563
+567
 // Text
 /cancel
 Abbrechen
@@ -5825,6 +5861,9 @@ danach
 bar_add_dialog/insert:before
 davor
 
+bar_add_dialog/shift-data
+Daten entsprechend verschieben
+
 bar_add_dialog/sub_beats
 1
 
@@ -5848,6 +5887,9 @@ Bpm
 
 bar_edit_dialog/edit_sub_beats
 Teil-Schläge
+
+bar_edit_dialog/shift-data
+Daten entsprechend verschieben
 
 bar_edit_dialog/sub_beats
 1
@@ -6527,6 +6569,9 @@ davor
 pause_add_dialog/pause_add_dialog
 Neue Pause
 
+pause_add_dialog/shift-data
+Daten entsprechend verschieben
+
 pause_add_dialog/t_duration
 Länge
 
@@ -6538,6 +6583,9 @@ pause_edit_dialog/duration
 
 pause_edit_dialog/pause_edit_dialog
 Pause bearbeiten
+
+pause_edit_dialog/shift-data
+Daten entsprechend verschieben
 
 pause_edit_dialog/t_duration
 Dauer
@@ -7383,7 +7431,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-205
+207
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7691,6 +7739,8 @@ bar
 Takt 
 bar %d/\\u2084 \\u2669=%.1f
 Takt %d/\\u2084 \\u2669=%.1f
+base
+base
 call: tsunami --chain <SIGNAL_CHAIN>
 Aufruf: tsunami --chain <SIGNAL_CHAIN>
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
@@ -7699,6 +7749,8 @@ call: tsunami --export <File> <Exportfile>
 call: tsunami --export <File> <Exportfile>
 call: tsunami --info <File>
 call: tsunami --info <File>
+can not delete the only version of a track
+eine Version kann nicht gelöscht werden, wenn es sonst keine anderen Versionen mehr gibt
 capture audio start
 Audioaufnahme start
 capture audio stop

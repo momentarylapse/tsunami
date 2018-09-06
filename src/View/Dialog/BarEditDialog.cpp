@@ -10,19 +10,19 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 
-BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars, bool _apply_to_midi):
+BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("bar_edit_dialog");
 	song = _song;
 	for (int i=_bars.start(); i<_bars.end(); i++)
 		sel.add(i);
-	apply_to_midi = _apply_to_midi;
 
 	Bar *b = song->bars[sel[0]];
 	setInt("beats", b->num_beats);
 	setInt("sub_beats", b->num_sub_beats);
 	setFloat("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
+	check("shift-data", true);
 
 	event("ok", std::bind(&BarEditDialog::onOk, this));
 	event("cancel", std::bind(&BarEditDialog::onClose, this));
@@ -40,6 +40,8 @@ void BarEditDialog::onOk()
 	bool edit_beats = isChecked("edit_beats");
 	bool edit_sub_beats = isChecked("edit_sub_beats");
 	bool edit_bpm = isChecked("edit_bpm");
+	bool move_data = isChecked("shift-data");
+
 	song->beginActionGroup();
 	foreachb(int i, sel){
 		BarPattern b = *song->bars[i];
@@ -49,7 +51,7 @@ void BarEditDialog::onOk()
 			b.num_sub_beats = sub_beats;
 		if (edit_bpm)
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
-		song->editBar(i, b.length, b.num_beats, b.num_sub_beats, apply_to_midi);
+		song->editBar(i, b.length, b.num_beats, b.num_sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	}
 	song->endActionGroup();
 

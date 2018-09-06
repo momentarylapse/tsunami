@@ -1040,14 +1040,14 @@ int pref_bar_index(AudioView *view)
 
 void TsunamiWindow::onAddBars()
 {
-	auto dlg = new BarAddDialog(win, song, view, pref_bar_index(view));
+	auto dlg = new BarAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
 	delete(dlg);
 }
 
 void TsunamiWindow::onAddPause()
 {
-	auto dlg = new PauseAddDialog(win, song, view, pref_bar_index(view));
+	auto dlg = new PauseAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
 	delete(dlg);
 }
@@ -1097,11 +1097,11 @@ void TsunamiWindow::onEditBars()
 		else
 			num_bars ++;
 	if (num_bars > 0 and num_pauses == 0){
-		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bar_indices, view->bars_edit_data);
+		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bar_indices);
 		dlg->run();
 		delete(dlg);
 	}else if (num_bars == 0 and num_pauses == 1){
-		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start(), view->bars_edit_data);
+		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start());
 		dlg->run();
 		delete(dlg);
 	}else{

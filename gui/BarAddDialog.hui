@@ -1,5 +1,5 @@
 Dialog bar_add_dialog "New bars" width=250 height=80
-	Grid ? ""
+	Grid ? "" vertical
 		Grid ? ""
 			Text bad_t_count "Number"
 			SpinButton count "1" range=1:10000:1 expandx
@@ -12,7 +12,7 @@ Dialog bar_add_dialog "New bars" width=250 height=80
 			---|
 			Text bad_t_bpm "Bpm"
 			SpinButton bpm "0" range=0:1000:0.1 expandx
-		---|
+		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

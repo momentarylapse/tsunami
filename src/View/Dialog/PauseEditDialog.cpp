@@ -10,16 +10,16 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 
-PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index, bool _apply_to_midi):
+PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("pause_edit_dialog");
 	song = _song;
 	index = _index;
-	apply_to_midi = _apply_to_midi;
 
 	Bar *b = song->bars[index];
 	setFloat("duration", (float)b->length / (float)song->sample_rate);
+	check("shift-data", true);
 
 	event("ok", std::bind(&PauseEditDialog::onOk, this));
 	event("cancel", std::bind(&PauseEditDialog::destroy, this));
@@ -28,10 +28,11 @@ PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index, boo
 
 void PauseEditDialog::onOk()
 {
+	bool move_data = isChecked("shift-data");
 	float duration = getFloat("duration");
 	BarPattern b = *song->bars[index];
 	b.length = (float)song->sample_rate * duration;
-	song->editBar(index, b.length, b.num_beats, b.num_sub_beats, apply_to_midi);
+	song->editBar(index, b.length, b.num_beats, b.num_sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 
 	destroy();
 }

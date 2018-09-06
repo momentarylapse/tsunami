@@ -12,12 +12,11 @@
 #include "../../Data/base.h"
 #include "../AudioView.h"
 
-BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index):
+BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
 	fromResource("bar_add_dialog");
 	song = s;
-	view = v;
 	index = max(_index, 0);
 
 
@@ -38,6 +37,7 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, AudioView *v, int _index)
 	setInt("beats", beats);
 	setInt("sub_beats", sub_beats);
 	setFloat("bpm", bpm);
+	check("shift-data", true);
 
 	event("ok", std::bind(&BarAddDialog::onOk, this));
 	event("cancel", std::bind(&BarAddDialog::onClose, this));
@@ -50,13 +50,15 @@ void BarAddDialog::onOk()
 	int beats = getInt("beats");
 	int sub_beats = getInt("sub_beats");
 	float bpm = getFloat("bpm");
+	bool move_data = isChecked("shift-data");
+
 	song->beginActionGroup();
 
 	if (!song->getTimeTrack())
 		song->addTrack(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
-		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+		song->addBar(index, bpm, beats, sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->endActionGroup();
 
 	destroy();

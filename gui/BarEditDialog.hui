@@ -1,5 +1,5 @@
 Dialog bar_edit_dialog "Edit bars" width=250 height=80
-	Grid ? ""
+	Grid ? "" vertical
 		Grid ? ""
 			CheckBox edit_beats "Beats"
 			SpinButton beats "1" range=1:1000:1 expandx
@@ -9,7 +9,7 @@ Dialog bar_edit_dialog "Edit bars" width=250 height=80
 			---|
 			CheckBox edit_bpm "Bpm"
 			SpinButton bpm "0" range=0:1000:0.1 expandx
-		---|
+		CheckBox shift-data "Move data accordingly"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

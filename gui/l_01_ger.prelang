@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-564
+568
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1695,8 +1695,20 @@ aus Datei importieren
 popup_track_menu/layer_mark_dominant
 Auswahl dominant setzen
 
+bar_add_dialog/shift-data
+Daten entsprechend verschieben
+
+bar_edit_dialog/shift-data
+Daten entsprechend verschieben
+
+pause_add_dialog/shift-data
+Daten entsprechend verschieben
+
+pause_edit_dialog/shift-data
+Daten entsprechend verschieben
+
 // Num Language Strings
-205
+207
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2108,3 +2120,7 @@ stop plugin
 Plugin stoppen
 string (↑,↓)    add note (0-9, A-F)
 Saite (↑,↓)    Note hinzufügen (0-9, A-F)
+base
+base
+can not delete the only version of a track
+eine Version kann nicht gelöscht werden, wenn es sonst keine anderen Versionen mehr gibt

@@ -16,6 +16,7 @@
 #include "../../../Data/Song.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
+#include "../../../Stuff/BackupManager.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"
 
@@ -56,6 +57,7 @@ void CaptureConsoleModeMulti::enter()
 		cc->addLabel(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO){
 			c.input_audio = new InputStreamAudio(session);
+			c.input_audio->set_backup_mode(BACKUP_MODE_TEMP);
 			cc->addComboBox(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->addString(c.id_source, d->get_name());
@@ -180,13 +182,19 @@ void CaptureConsoleModeMulti::leave()
 
 void CaptureConsoleModeMulti::start()
 {
+	Array<CaptureTrackData> data;
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			c.input_audio->reset_sync();
 			c.sucker->accumulate(true);
+			data.add({c.track, c.input_audio, c.sucker});
+		}else if (c.track->type == SignalType::MIDI){
+			c.input_midi->accumulate(true);
+			data.add({c.track, c.input_midi, nullptr});
 		}
 		cc->enable(c.id_source, false);
 	}
+	view->mode_capture->set_data(data);
 }
 
 void CaptureConsoleModeMulti::stop()
@@ -194,6 +202,8 @@ void CaptureConsoleModeMulti::stop()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			c.input_audio->stop();
+		}else if (c.track->type == SignalType::MIDI){
+			c.input_midi->stop();
 		}
 	}
 }
@@ -204,8 +214,10 @@ void CaptureConsoleModeMulti::dump()
 		if (c.track->type == SignalType::AUDIO){
 			c.sucker->accumulate(false);
 			c.sucker->reset_accumulation();
-			cc->enable(c.id_source, true);
+		}else if (c.track->type == SignalType::MIDI){
+			c.input_midi->accumulate(true);
 		}
+		cc->enable(c.id_source, true);
 	}
 }
 
@@ -214,6 +226,8 @@ int CaptureConsoleModeMulti::get_sample_count()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			return c.sucker->buf.length;
+		}else if (c.track->type == SignalType::MIDI){
+			return c.input_midi->get_sample_count();
 		}
 	}
 	return 0;

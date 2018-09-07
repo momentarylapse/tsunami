@@ -14,6 +14,7 @@
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/Song.h"
+#include "../../../Session.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Stuff/BackupManager.h"
@@ -32,8 +33,8 @@ CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
 void CaptureConsoleModeMulti::enter()
 {
 	cc->hideControl("multi_grid", false);
-	sources_audio = cc->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
-	sources_midi = cc->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
+	sources_audio = session->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
+	sources_midi = session->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
 
 	// target list multi
 	for (Track *t: song->tracks){
@@ -89,6 +90,8 @@ bool CaptureConsoleModeMulti::is_capturing()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			return c.input_audio->is_capturing();
+		}else if (c.track->type == SignalType::MIDI){
+				return c.input_midi->is_capturing();
 		}
 	}
 	return false;
@@ -98,31 +101,28 @@ void CaptureConsoleModeMulti::pause()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			return c.sucker->accumulate(false);
+			c.sucker->accumulate(false);
+		}else if (c.track->type == SignalType::MIDI){
+			c.input_midi->accumulate(false);
 		}
 	}
 }
 
 bool CaptureConsoleModeMulti::insert()
 {
-	int s_start = view->sel.range.start();
 	bool ok = true;
 
 	song->beginActionGroup();
 
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-
-			// insert recorded data with some delay
 			int dpos = c.input_audio->get_delay();
-
-			// overwrite
-			int i0 = s_start + dpos;
-
-			ok &= cc->insert_audio(c.track, c.sucker->buf, i0);
-
-
+			ok &= cc->insert_audio(c.track, c.sucker->buf, dpos);
 			c.sucker->reset_accumulation();
+		}else if (c.track->type == SignalType::MIDI){
+			int dpos = c.input_midi->get_delay();
+			ok &= cc->insert_midi(c.track, c.input_midi->midi, dpos);
+			c.input_midi->reset_accumulation();
 		}
 	}
 	song->endActionGroup();
@@ -135,17 +135,17 @@ void CaptureConsoleModeMulti::on_source()
 	if (index < 0 or index >= items.num)
 		return;
 	int n = cc->getInt("");
-	auto &it = items[index];
-	if (it.track->type == SignalType::AUDIO){
+	auto &c = items[index];
+	if (c.track->type == SignalType::AUDIO){
 		if (n > 0){
-			it.input_audio->set_device(sources_audio[n - 1]);
-			it.input_audio->start();
-			it.sucker->start();
+			c.input_audio->set_device(sources_audio[n - 1]);
+			c.input_audio->start();
+			c.sucker->start();
 		}
-	}else if (it.track->type == SignalType::MIDI){
+	}else if (c.track->type == SignalType::MIDI){
 		if (n > 0){
-			it.input_midi->set_device(sources_midi[n - 1]);
-			it.input_midi->start();
+			c.input_midi->set_device(sources_midi[n - 1]);
+			c.input_midi->start();
 		}
 	}
 	/*if ((n >= 0) and (n < sources.num)){
@@ -201,6 +201,7 @@ void CaptureConsoleModeMulti::stop()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
+			c.sucker->stop();
 			c.input_audio->stop();
 		}else if (c.track->type == SignalType::MIDI){
 			c.input_midi->stop();

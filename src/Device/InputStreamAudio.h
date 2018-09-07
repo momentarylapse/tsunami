@@ -14,6 +14,7 @@
 #include "../Module/Module.h"
 
 class PluginManager;
+class DeviceManager;
 class Device;
 class Session;
 

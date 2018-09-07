@@ -13,14 +13,12 @@
 #include "../../Data/Song.h"
 #include "../Helper/PeakMeterDisplay.h"
 
-class AudioView;
-class DeviceManager;
-class Device;
 class CaptureConsoleMode;
 class Session;
 
 class InputStreamAudio;
 class AudioSucker;
+class MidiEventBuffer;
 
 class CaptureConsole : public SideBarConsole
 {
@@ -41,8 +39,6 @@ public:
 	void on_close();
 	void on_new_version();
 
-	DeviceManager *device_manager;
-
 	void update_time();
 
 	void on_putput_update();
@@ -58,7 +54,8 @@ public:
 	CaptureConsoleMode *mode_multi;
 
 
-	bool insert_audio(Track *target, AudioBuffer &buf, int s_start);
+	bool insert_audio(Track *target, AudioBuffer &buf, int delay);
+	bool insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

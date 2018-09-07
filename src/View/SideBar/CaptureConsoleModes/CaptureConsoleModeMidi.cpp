@@ -80,8 +80,8 @@ void CaptureConsoleModeMidi::enter_parent()
 
 void CaptureConsoleModeMidi::enter()
 {
-	chosen_device = cc->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
-	sources = cc->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
+	chosen_device = session->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
+	sources = session->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
 	cc->hideControl("single_grid", false);
 
 	// add all
@@ -150,23 +150,12 @@ void CaptureConsoleModeMidi::dump()
 
 bool CaptureConsoleModeMidi::insert()
 {
-	int s_start = view->sel.range.start();
-
 	// insert recorded data with some delay
 	int dpos = input->get_delay();
-
-	int i0 = s_start + dpos;
-
-	if (target->type != SignalType::MIDI){
-		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::MIDI).c_str(), signal_type_name(target->type).c_str()));
-		return false;
-	}
-
-	// insert data
-	target->layers[0]->insertMidiData(i0, midi_events_to_notes(input->midi).duplicate());
+	bool ok = cc->insert_midi(target, input->midi, dpos);
 
 	input->reset_accumulation();
-	return true;
+	return ok;
 }
 
 int CaptureConsoleModeMidi::get_sample_count()

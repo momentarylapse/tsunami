@@ -18,8 +18,6 @@
 
 #include "CaptureConsole.h"
 #include "../../Session.h"
-#include "../../Device/DeviceManager.h"
-#include "../../Device/Device.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
@@ -35,8 +33,6 @@ CaptureConsole::CaptureConsole(Session *session):
 	// dialog
 	setBorderWidth(5);
 	embedDialog("record_dialog", 0, 0);
-
-	device_manager = session->device_manager;
 
 
 	// dialog
@@ -62,13 +58,6 @@ CaptureConsole::~CaptureConsole()
 	delete(mode_midi);
 	delete(mode_multi);
 	delete(peak_meter);
-}
-
-DeviceType dev_type(SignalType type)
-{
-	if (type == SignalType::AUDIO)
-		return DeviceType::AUDIO_INPUT;
-	return DeviceType::MIDI_INPUT;
 }
 
 void CaptureConsole::on_enter()
@@ -230,9 +219,29 @@ bool layer_available(TrackLayer *l, const Range &r)
 	return true;
 }
 
-bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int i0)
+bool CaptureConsole::insert_midi(Track *target, const MidiEventBuffer &midi, int delay)
+{
+	int s_start = view->sel.range.start();
+
+	int i0 = s_start + delay;
+
+	if (target->type != SignalType::MIDI){
+		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::MIDI).c_str(), signal_type_name(target->type).c_str()));
+		return false;
+	}
+
+	// insert data
+	target->layers[0]->insertMidiData(i0, midi_events_to_notes(midi).duplicate());
+	return true;
+}
+
+
+bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int delay)
 {
 	Song *song = target->song;
+
+	int s_start = view->sel.range.start();
+	int i0 = s_start + delay;
 
 	if (target->type != SignalType::AUDIO){
 		song->session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::AUDIO).c_str(), signal_type_name(target->type).c_str()));

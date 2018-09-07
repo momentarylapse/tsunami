@@ -66,8 +66,8 @@ void CaptureConsoleModeAudio::enter_parent()
 
 void CaptureConsoleModeAudio::enter()
 {
-	chosen_device = cc->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
-	sources = cc->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
+	chosen_device = session->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
+	sources = session->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
 	cc->hideControl("single_grid", false);
 
 	// add all
@@ -146,15 +146,10 @@ void CaptureConsoleModeAudio::dump()
 
 bool CaptureConsoleModeAudio::insert()
 {
-	int s_start = view->sel.range.start();
-
 	// insert recorded data with some delay
 	int dpos = input->get_delay();
 
-	// overwrite
-	int i0 = s_start + dpos;
-
-	bool ok = cc->insert_audio(target, sucker->buf, i0);
+	bool ok = cc->insert_audio(target, sucker->buf, dpos);
 	sucker->reset_accumulation();
 	return ok;
 

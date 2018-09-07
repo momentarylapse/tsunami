@@ -1590,9 +1590,10 @@ bool AudioView::has_any_solo_track()
 Set<Track*> AudioView::get_playable_tracks()
 {
 	Set<Track*> tracks;
+	Set<Track*> prevented = mode->prevent_playback();
 	bool any_solo = has_any_solo_track();
 	for (auto *t: vtrack)
-		if (!t->track->muted and (t->solo or !any_solo))
+		if (!t->track->muted and (t->solo or !any_solo) and !prevented.contains(t->track))
 			tracks.add(t->track);
 	return tracks;
 }

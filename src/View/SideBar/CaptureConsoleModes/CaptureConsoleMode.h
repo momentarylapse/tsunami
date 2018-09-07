@@ -22,13 +22,13 @@ public:
 	virtual void stop() = 0;
 	virtual void enter() = 0;
 	virtual void leave() = 0;
-	virtual void enterParent(){};
-	virtual void leaveParent(){};
+	virtual void enter_parent(){};
+	virtual void leave_parent(){};
 	virtual bool insert() = 0;
 	virtual void pause() = 0;
 	virtual void dump() = 0;
-	virtual int getSampleCount() = 0;
-	virtual bool isCapturing() = 0;
+	virtual int get_sample_count() = 0;
+	virtual bool is_capturing() = 0;
 
 	CaptureConsole *cc;
 	Session *session;

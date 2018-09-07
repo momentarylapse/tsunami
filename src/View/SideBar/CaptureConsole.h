@@ -30,22 +30,22 @@ public:
 	void on_enter() override;
 	void on_leave() override;
 
-	void onStart();
-	void onDump();
-	void onPause();
-	void onOk();
-	void onCancel();
-	void onClose();
-	void onNewVersion();
+	void on_start();
+	void on_dump();
+	void on_pause();
+	void on_ok();
+	void on_cancel();
+	void on_close();
+	void on_new_version();
 
 	DeviceManager *device_manager;
 
-	void updateTime();
+	void update_time();
 
-	void onOutputUpdate();
-	void onOutputEndOfStream();
+	void on_putput_update();
+	void on_output_end_of_stream();
 
-	bool isCapturing();
+	bool is_capturing();
 
 	PeakMeterDisplay *peak_meter;
 	CaptureConsoleMode *mode;

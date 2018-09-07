@@ -37,10 +37,10 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	target = nullptr;
 	sucker = nullptr;
 
-	cc->event("source", std::bind(&CaptureConsoleModeAudio::onSource, this));
+	cc->event("source", std::bind(&CaptureConsoleModeAudio::on_source, this));
 }
 
-void CaptureConsoleModeAudio::onSource()
+void CaptureConsoleModeAudio::on_source()
 {
 	int n = cc->getInt("");
 	if ((n >= 0) and (n < sources.num)){
@@ -49,7 +49,7 @@ void CaptureConsoleModeAudio::onSource()
 	}
 }
 
-void CaptureConsoleModeAudio::setTarget(Track *t)
+void CaptureConsoleModeAudio::set_target(Track *t)
 {
 	target = t;
 	// FIXME ...
@@ -63,7 +63,7 @@ void CaptureConsoleModeAudio::setTarget(Track *t)
 	cc->enable("start", ok);
 }
 
-void CaptureConsoleModeAudio::enterParent()
+void CaptureConsoleModeAudio::enter_parent()
 {
 }
 
@@ -86,7 +86,7 @@ void CaptureConsoleModeAudio::enter()
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == SignalType::AUDIO)
-			setTarget((Track*)t);
+			set_target((Track*)t);
 
 	input = new InputStreamAudio(session);
 	input->set_backup_mode(BACKUP_MODE_TEMP);
@@ -199,12 +199,12 @@ bool CaptureConsoleModeAudio::insert()
 	return true;
 }
 
-int CaptureConsoleModeAudio::getSampleCount()
+int CaptureConsoleModeAudio::get_sample_count()
 {
 	return sucker->buf.length;
 }
 
-bool CaptureConsoleModeAudio::isCapturing()
+bool CaptureConsoleModeAudio::is_capturing()
 {
 	return input->is_capturing();
 }

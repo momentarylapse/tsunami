@@ -56,6 +56,13 @@ void ViewModeCapture::draw_post(Painter *c)
 	}
 }
 
+Set<Track*> ViewModeCapture::prevent_playback()
+{
+	if (input_audio or input_midi)
+		return capturing_track;
+	return {};
+}
+
 void ViewModeCapture::set_input_audio(InputStreamAudio *_input)
 {
 	if (input_audio)

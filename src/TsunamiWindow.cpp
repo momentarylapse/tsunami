@@ -560,11 +560,11 @@ string title_filename(const string &filename)
 bool TsunamiWindow::allowTermination()
 {
 	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE)){
-		if (side_bar->capture_console->isCapturing()){
+		if (side_bar->capture_console->is_capturing()){
 			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
 				return false;
-			side_bar->capture_console->onDump();
+			side_bar->capture_console->on_dump();
 			side_bar->_hide();
 		}
 	}

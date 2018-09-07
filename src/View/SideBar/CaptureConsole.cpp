@@ -40,13 +40,13 @@ CaptureConsole::CaptureConsole(Session *session):
 	peak_meter = new PeakMeterDisplay(this, "level", nullptr, view);
 
 
-	event("cancel", std::bind(&CaptureConsole::onCancel, this));
+	event("cancel", std::bind(&CaptureConsole::on_cancel, this));
 	//event("hui:close", std::bind(&CaptureConsole::onClose, this));
-	event("ok", std::bind(&CaptureConsole::onOk, this));
-	event("start", std::bind(&CaptureConsole::onStart, this));
-	event("dump", std::bind(&CaptureConsole::onDump, this));
-	event("pause", std::bind(&CaptureConsole::onPause, this));
-	event("new_version", std::bind(&CaptureConsole::onNewVersion, this));
+	event("ok", std::bind(&CaptureConsole::on_ok, this));
+	event("start", std::bind(&CaptureConsole::on_start, this));
+	event("dump", std::bind(&CaptureConsole::on_dump, this));
+	event("pause", std::bind(&CaptureConsole::on_pause, this));
+	event("new_version", std::bind(&CaptureConsole::on_new_version, this));
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);
@@ -89,21 +89,22 @@ void CaptureConsole::on_enter()
 		mode = mode_multi;
 	}
 
-	mode_audio->enterParent();
-	mode_midi->enterParent();
-	mode_multi->enterParent();
+	mode_audio->enter_parent();
+	mode_midi->enter_parent();
+	mode_multi->enter_parent();
 
 	view->set_mode(view->mode_capture);
 
 	mode->enter();
 
 	// automatically start
-	onStart();
+	if (num_audio + num_midi == 1)
+		on_start();
 }
 
 void CaptureConsole::on_leave()
 {
-	if (mode->isCapturing())
+	if (mode->is_capturing())
 		mode->insert();
 	view->stream->unsubscribe(this);
 
@@ -111,15 +112,15 @@ void CaptureConsole::on_leave()
 
 	mode->leave();
 
-	mode_audio->leaveParent();
-	mode_midi->leaveParent();
-	mode_multi->leaveParent();
+	mode_audio->leave_parent();
+	mode_midi->leave_parent();
+	mode_multi->leave_parent();
 
 	view->set_mode(view->mode_default);
 }
 
 
-void CaptureConsole::onStart()
+void CaptureConsole::on_start()
 {
 	if (view->is_playback_active()){
 		view->pause(false);
@@ -127,8 +128,8 @@ void CaptureConsole::onStart()
 		mode->dump();
 		view->play(view->get_playback_selection(true), false);
 	}
-	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputUpdate, this), view->stream->MESSAGE_UPDATE);
-	view->stream->subscribe(this, std::bind(&CaptureConsole::onOutputEndOfStream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
+	view->stream->subscribe(this, std::bind(&CaptureConsole::on_putput_update, this), view->stream->MESSAGE_UPDATE);
+	view->stream->subscribe(this, std::bind(&CaptureConsole::on_output_end_of_stream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mode->start();
 	enable("start", false);
@@ -137,7 +138,7 @@ void CaptureConsole::onStart()
 	enable("ok", true);
 }
 
-void CaptureConsole::onDump()
+void CaptureConsole::on_dump()
 {
 	if (view->is_playback_active()){
 		view->stream->unsubscribe(this);
@@ -148,10 +149,10 @@ void CaptureConsole::onDump()
 	enable("pause", false);
 	enable("dump", false);
 	enable("ok", false);
-	updateTime();
+	update_time();
 }
 
-void CaptureConsole::onPause()
+void CaptureConsole::on_pause()
 {
 	// TODO...
 	//view->stream->unsubscribe(this);
@@ -162,7 +163,7 @@ void CaptureConsole::onPause()
 }
 
 
-void CaptureConsole::onOk()
+void CaptureConsole::on_ok()
 {
 	view->stream->unsubscribe(this);
 	mode->stop();
@@ -170,34 +171,34 @@ void CaptureConsole::onOk()
 		bar()->_hide();
 }
 
-void CaptureConsole::onCancel()
+void CaptureConsole::on_cancel()
 {
 	view->stream->unsubscribe(this);
 	mode->stop();
 	bar()->_hide();
 }
 
-void CaptureConsole::onClose()
+void CaptureConsole::on_close()
 {
 	bar()->_hide();
 }
 
-void CaptureConsole::onNewVersion()
+void CaptureConsole::on_new_version()
 {
 	if (view->is_playback_active()){
 		view->stream->unsubscribe(this);
 		view->stop();
 	}
 	mode->insert();
-	onStart();
+	on_start();
 }
 
-void CaptureConsole::updateTime()
+void CaptureConsole::update_time()
 {
-	setString("time", song->get_time_str_long(mode->getSampleCount()));
+	setString("time", song->get_time_str_long(mode->get_sample_count()));
 }
 
-void CaptureConsole::onOutputEndOfStream()
+void CaptureConsole::on_output_end_of_stream()
 {
 	view->stream->unsubscribe(this);
 	view->stop();
@@ -207,12 +208,12 @@ void CaptureConsole::onOutputEndOfStream()
 	enable("dump", true);
 }
 
-void CaptureConsole::onOutputUpdate()
+void CaptureConsole::on_putput_update()
 {
-	updateTime();
+	update_time();
 }
 
-bool CaptureConsole::isCapturing()
+bool CaptureConsole::is_capturing()
 {
-	return mode->isCapturing();
+	return mode->is_capturing();
 }

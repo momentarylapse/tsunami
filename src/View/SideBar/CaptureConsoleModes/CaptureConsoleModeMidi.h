@@ -32,19 +32,19 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode
 
 public:
 	CaptureConsoleModeMidi(CaptureConsole *cc);
-	void onSource();
-	void onTarget();
-	void setTarget(Track *t);
-	virtual void enterParent();
-	virtual void enter();
-	virtual void leave();
-	virtual void pause();
-	virtual void start();
-	virtual void stop();
-	virtual void dump();
-	virtual bool insert();
-	virtual int getSampleCount();
-	virtual bool isCapturing();
+	void on_source();
+	void on_target();
+	void set_target(Track *t);
+	virtual void enter_parent() override;
+	virtual void enter() override;
+	virtual void leave() override;
+	virtual void pause() override;
+	virtual void start() override;
+	virtual void stop() override;
+	virtual void dump() override;
+	virtual bool insert() override;
+	virtual int get_sample_count() override;
+	virtual bool is_capturing() override;
 };
 
 

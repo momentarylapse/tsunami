@@ -31,17 +31,17 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 public:
 	CaptureConsoleModeMulti(CaptureConsole *cc);
 	virtual ~CaptureConsoleModeMulti();
-	//virtual void enterParent();
-	//virtual void leaveParent();
-	virtual void enter();
-	virtual void leave();
-	virtual void pause(){}
-	virtual void start(){}
-	virtual void stop(){}
-	virtual void dump(){}
-	virtual bool insert(){ return false; }
-	virtual int getSampleCount(){ return 0; }
-	virtual bool isCapturing(){ return false; }
+	//virtual void enter_parent();
+	//virtual void leave_parent();
+	void enter() override;
+	void leave() override;
+	void pause() override {}
+	void start() override {}
+	void stop() override {}
+	void dump() override {}
+	bool insert() override { return false; }
+	int get_sample_count() override { return 0; }
+	bool is_capturing() override { return false; }
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEMULTI_H_ */

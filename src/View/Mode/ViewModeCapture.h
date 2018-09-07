@@ -23,11 +23,14 @@ public:
 	ViewModeCapture(AudioView *view);
 	virtual ~ViewModeCapture();
 
-	virtual Selection get_hover();
-	virtual void on_left_button_down(){}
-	virtual void on_left_double_click(){}
+	Selection get_hover() override;
+	void on_left_button_down() override {}
+	void on_left_double_click() override {}
 
-	virtual void draw_post(Painter *c);
+	void draw_post(Painter *c) override;
+
+
+	virtual Set<Track*> prevent_playback() override;
 
 	//CaptureConsoleMode *console_mode;
 

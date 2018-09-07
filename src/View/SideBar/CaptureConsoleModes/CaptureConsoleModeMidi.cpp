@@ -33,10 +33,10 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	preview_synth = nullptr;
 	preview_stream = nullptr;
 
-	cc->event("source", std::bind(&CaptureConsoleModeMidi::onSource, this));
+	cc->event("source", std::bind(&CaptureConsoleModeMidi::on_source, this));
 }
 
-void CaptureConsoleModeMidi::onSource()
+void CaptureConsoleModeMidi::on_source()
 {
 	int n = cc->getInt("");
 	if ((n >= 0) and (n < sources.num)){
@@ -46,7 +46,7 @@ void CaptureConsoleModeMidi::onSource()
 }
 
 
-void CaptureConsoleModeMidi::setTarget(Track *t)
+void CaptureConsoleModeMidi::set_target(Track *t)
 {
 	if (preview_stream)
 		delete preview_stream;
@@ -75,7 +75,7 @@ void CaptureConsoleModeMidi::setTarget(Track *t)
 	cc->enable("start", ok);
 }
 
-void CaptureConsoleModeMidi::enterParent()
+void CaptureConsoleModeMidi::enter_parent()
 {
 }
 
@@ -106,7 +106,7 @@ void CaptureConsoleModeMidi::enter()
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == SignalType::MIDI)
-			setTarget((Track*)t);
+			set_target((Track*)t);
 
 	if (!input->start()){
 		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
@@ -170,12 +170,12 @@ bool CaptureConsoleModeMidi::insert()
 	return true;
 }
 
-int CaptureConsoleModeMidi::getSampleCount()
+int CaptureConsoleModeMidi::get_sample_count()
 {
 	return input->get_sample_count();
 }
 
-bool CaptureConsoleModeMidi::isCapturing()
+bool CaptureConsoleModeMidi::is_capturing()
 {
 	return input->is_capturing();
 }

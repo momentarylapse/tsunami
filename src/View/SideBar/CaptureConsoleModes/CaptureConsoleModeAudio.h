@@ -28,18 +28,18 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 
 public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc);
-	void onSource();
-	void setTarget(Track *t);
-	virtual void enterParent();
-	virtual void enter();
-	virtual void leave();
-	virtual void pause();
-	virtual void start();
-	virtual void stop();
-	virtual void dump();
-	virtual bool insert();
-	virtual int getSampleCount();
-	virtual bool isCapturing();
+	void on_source();
+	void set_target(Track *t);
+	void enter_parent() override;
+	void enter() override;
+	void leave() override;
+	void pause() override;
+	void start() override;
+	void stop() override;
+	void dump() override;
+	bool insert() override;
+	int get_sample_count() override;
+	bool is_capturing() override;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

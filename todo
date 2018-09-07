@@ -217,7 +217,9 @@ j integrate Metronome
 == xxx ==
 
 J version selection mode (overlap)
-* add/edit/delete bars -> dialog what to change how
+J add/edit/delete bars -> dialog what to change how
+J mute recording track
+* multi-track recording!
 
 == minor ==
 

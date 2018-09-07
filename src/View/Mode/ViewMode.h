@@ -62,6 +62,8 @@ public:
 	virtual SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1);
 	virtual void start_selection(){}
 
+	virtual Set<Track*> prevent_playback(){ return {}; }
+
 	AudioView *view;
 	ViewPort *cam;
 	Selection *hover;

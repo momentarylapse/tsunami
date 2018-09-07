@@ -35,7 +35,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	target = nullptr;
 	sucker = nullptr;
 
-	cc->event("source", std::bind(&CaptureConsoleModeAudio::on_source, this));
+	cc->event("source", [&]{ on_source(); });
 }
 
 void CaptureConsoleModeAudio::on_source()
@@ -91,7 +91,7 @@ void CaptureConsoleModeAudio::enter()
 	input->set_update_dt(0.03f);
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->set_source(input->out);
-	cc->peak_meter->setSource(peak_meter);
+	cc->peak_meter->set_source(peak_meter);
 
 	input->set_device(chosen_device);
 
@@ -114,7 +114,7 @@ void CaptureConsoleModeAudio::leave()
 {
 	view->mode_capture->set_data({});
 	delete sucker;
-	cc->peak_meter->setSource(nullptr);
+	cc->peak_meter->set_source(nullptr);
 	delete peak_meter;
 	delete input;
 	input = nullptr;
@@ -144,14 +144,6 @@ void CaptureConsoleModeAudio::dump()
 	cc->enable("source", true);
 }
 
-bool layer_available(TrackLayer *l, const Range &r)
-{
-	for (auto &b: l->buffers)
-		if (b.range().overlaps(r))
-			return false;
-	return true;
-}
-
 bool CaptureConsoleModeAudio::insert()
 {
 	int s_start = view->sel.range.start();
@@ -162,37 +154,10 @@ bool CaptureConsoleModeAudio::insert()
 	// overwrite
 	int i0 = s_start + dpos;
 
-	if (target->type != SignalType::AUDIO){
-		session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::AUDIO).c_str(), signal_type_name(target->type).c_str()));
-		return false;
-	}
-
-	// insert data
-	Range r = Range(i0, sucker->buf.length);
-	cc->song->action_manager->group_begin();
-
-	TrackLayer *layer = nullptr;
-	for (TrackLayer *l: target->layers)
-		if (layer_available(l, r)){
-			layer = l;
-			break;
-		}
-	if (!layer)
-		layer = target->addLayer();
-
-	AudioBuffer tbuf;
-	layer->getBuffers(tbuf, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
-
-	if (hui::Config.getInt("Input.Mode", 0) == 1)
-		tbuf.add(sucker->buf, 0, 1.0f, 0);
-	else
-		tbuf.set(sucker->buf, 0, 1.0f);
-	song->execute(a);
-	song->action_manager->group_end();
-
+	bool ok = cc->insert_audio(target, sucker->buf, i0);
 	sucker->reset_accumulation();
-	return true;
+	return ok;
+
 }
 
 int CaptureConsoleModeAudio::get_sample_count()

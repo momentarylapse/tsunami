@@ -19,6 +19,9 @@ class Device;
 class CaptureConsoleMode;
 class Session;
 
+class InputStreamAudio;
+class AudioSucker;
+
 class CaptureConsole : public SideBarConsole
 {
 public:
@@ -53,6 +56,9 @@ public:
 	CaptureConsoleMode *mode_audio;
 	CaptureConsoleMode *mode_midi;
 	CaptureConsoleMode *mode_multi;
+
+
+	bool insert_audio(Track *target, AudioBuffer &buf, int s_start);
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

@@ -14,33 +14,34 @@
 #include "../../Module/Audio/PeakMeter.h"
 
 
-PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMeter *_source, AudioView *_view)
+PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMeter *_source)
 {
 	panel = _panel;
 	id = _id;
 	source = nullptr;
-	view = _view;
 	enabled = false;
 	r = new PeakMeterData;
 	l = new PeakMeterData;
 	r->reset();
 	l->reset();
 
-	panel->eventXP(id, "hui:draw", std::bind(&PeakMeterDisplay::onDraw, this, std::placeholders::_1));
-	panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeterDisplay::onLeftButtonDown, this));
+	handler_id_draw = panel->eventXP(id, "hui:draw", std::bind(&PeakMeterDisplay::on_draw, this, std::placeholders::_1));
+	handler_id_lbut = panel->eventX(id, "hui:left-button-down", std::bind(&PeakMeterDisplay::on_left_button_down, this));
 
-	setSource(_source);
+	set_source(_source);
 	enable(true);
 }
 
 PeakMeterDisplay::~PeakMeterDisplay()
 {
-	setSource(nullptr);
+	panel->removeEventHandler(handler_id_draw);
+	panel->removeEventHandler(handler_id_lbut);
+	set_source(nullptr);
 	delete r;
 	delete l;
 }
 
-void PeakMeterDisplay::setSource(PeakMeter *_source)
+void PeakMeterDisplay::set_source(PeakMeter *_source)
 {
 	if (source and enabled)
 		source->unsubscribe(this);
@@ -48,14 +49,14 @@ void PeakMeterDisplay::setSource(PeakMeter *_source)
 	source = _source;
 
 	if (source and enabled)
-		source->subscribe(this, std::bind(&PeakMeterDisplay::onUpdate, this));
+		source->subscribe(this, std::bind(&PeakMeterDisplay::on_update, this));
 }
 
 void PeakMeterDisplay::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			source->subscribe(this, std::bind(&PeakMeterDisplay::onUpdate, this));
+			source->subscribe(this, std::bind(&PeakMeterDisplay::on_update, this));
 		if (enabled and !_enabled)
 			source->unsubscribe(this);
 	}
@@ -81,13 +82,13 @@ inline float nice_peak(float p)
 	return min((float)pow(p, 0.8f), 1.0f);
 }
 
-void drawPeak(Painter *c, const rect &r, PeakMeterData &d, AudioView *view)
+void drawPeak(Painter *c, const rect &r, PeakMeterData &d)
 {
 	int w = r.width();
 	int h = r.height();
 	float sp = d.get_sp();
 
-	c->setColor(view->colors.background);
+	c->setColor(AudioView::colors.background);
 	if (sp > 1)
 		c->setColor(Red);
 	c->drawRect(r);
@@ -98,12 +99,12 @@ void drawPeak(Painter *c, const rect &r, PeakMeterData &d, AudioView *view)
 	c->setColor(peak_color(d.peak));
 	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
 
-	c->setColor(view->colors.text);
+	c->setColor(AudioView::colors.text);
 	if (sp > 0)
 		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
 }
 
-void PeakMeterDisplay::onDraw(Painter *c)
+void PeakMeterDisplay::on_draw(Painter *c)
 {
 	if (!source)
 		return;
@@ -111,12 +112,12 @@ void PeakMeterDisplay::onDraw(Painter *c)
 	int h = c->height;
 	if (source->mode == PeakMeter::Mode::PEAKS){
 
-		drawPeak(c, rect(2, w-2, 2, h/2-1), *r, view);
-		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l, view);
+		drawPeak(c, rect(2, w-2, 2, h/2-1), *r);
+		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l);
 	}else{
-		c->setColor(view->colors.background);
+		c->setColor(AudioView::colors.background);
 		c->drawRect(2, 2, w - 4, h - 4);
-		c->setColor(view->colors.text);
+		c->setColor(AudioView::colors.text);
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
 		for (int i=0;i<100;i++){
 			float x0 = 2 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
@@ -126,18 +127,18 @@ void PeakMeterDisplay::onDraw(Painter *c)
 	}
 }
 
-void PeakMeterDisplay::onLeftButtonDown()
+void PeakMeterDisplay::on_left_button_down()
 {
 	if (source)
 		source->set_mode((source->mode == PeakMeter::Mode::PEAKS) ? PeakMeter::Mode::SPECTRUM : PeakMeter::Mode::PEAKS);
 }
 
-void PeakMeterDisplay::onRightButtonDown()
+void PeakMeterDisplay::on_right_button_down()
 {
 }
 
 // in PeakMeter/SignalChain's thread
-void PeakMeterDisplay::onUpdate()
+void PeakMeterDisplay::on_update()
 {
 	if (source){
 		*r = source->r;

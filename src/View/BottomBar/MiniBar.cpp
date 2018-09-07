@@ -23,7 +23,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	fromResource("mini_bar");
 
-	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter, view);
+	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter);
 	setFloat("volume", dev_manager->getOutputVolume());
 
 	cpu_display = new CpuDisplay(this, "cpu", session);

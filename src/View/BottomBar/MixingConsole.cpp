@@ -169,7 +169,7 @@ MixingConsole::MixingConsole(Session *session) :
 
 	fromResource("mixing-console");
 
-	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, view);
+	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
 	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));

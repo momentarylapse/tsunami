@@ -10,7 +10,6 @@
 
 #include "../../Stuff/Observable.h"
 
-class AudioView;
 class PeakMeter;
 class PeakMeterData;
 namespace hui{
@@ -20,15 +19,15 @@ namespace hui{
 class PeakMeterDisplay : public VirtualBase
 {
 public:
-	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, AudioView *view);
+	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source);
 	virtual ~PeakMeterDisplay();
 
-	void setSource(PeakMeter *source);
+	void set_source(PeakMeter *source);
 
-	void onDraw(Painter *p);
-	void onLeftButtonDown();
-	void onRightButtonDown();
-	void onUpdate();
+	void on_draw(Painter *p);
+	void on_left_button_down();
+	void on_right_button_down();
+	void on_update();
 	void enable(bool enabled);
 
 private:
@@ -36,9 +35,9 @@ private:
 	PeakMeterData *r, *l;
 
 	hui::Panel *panel;
-	AudioView *view;
 	string id;
 	PeakMeter *source;
+	int handler_id_draw, handler_id_lbut;
 
 	bool enabled;
 };

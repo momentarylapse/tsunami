@@ -99,7 +99,7 @@ void CaptureConsoleModeMidi::enter()
 	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
 	view->mode_capture->set_data({{target,input}});
-	cc->peak_meter->setSource(nullptr);//input);
+	cc->peak_meter->set_source(nullptr);//input);
 
 	input->set_device(chosen_device);
 
@@ -117,7 +117,7 @@ void CaptureConsoleModeMidi::enter()
 
 void CaptureConsoleModeMidi::leave()
 {
-	cc->peak_meter->setSource(nullptr);
+	cc->peak_meter->set_source(nullptr);
 	view->mode_capture->set_data({});
 	delete(input);
 	input = nullptr;

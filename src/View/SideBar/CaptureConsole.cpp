@@ -8,6 +8,7 @@
 #include "../../Device/OutputStream.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
 #include "CaptureConsoleModes/CaptureConsoleMode.h"
@@ -19,6 +20,8 @@
 #include "../../Session.h"
 #include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
+#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+
 
 
 
@@ -37,7 +40,7 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	peak_meter = new PeakMeterDisplay(this, "level", nullptr, view);
+	peak_meter = new PeakMeterDisplay(this, "level", nullptr);
 
 
 	event("cancel", std::bind(&CaptureConsole::on_cancel, this));
@@ -216,4 +219,49 @@ void CaptureConsole::on_putput_update()
 bool CaptureConsole::is_capturing()
 {
 	return mode->is_capturing();
+}
+
+
+bool layer_available(TrackLayer *l, const Range &r)
+{
+	for (auto &b: l->buffers)
+		if (b.range().overlaps(r))
+			return false;
+	return true;
+}
+
+bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int i0)
+{
+	Song *song = target->song;
+
+	if (target->type != SignalType::AUDIO){
+		song->session->e(format(_("Can't insert recorded data (%s) into target (%s)."), signal_type_name(SignalType::AUDIO).c_str(), signal_type_name(target->type).c_str()));
+		return false;
+	}
+
+	// insert data
+	Range r = Range(i0, buf.length);
+	song->beginActionGroup();
+
+	TrackLayer *layer = nullptr;
+	for (TrackLayer *l: target->layers)
+		if (layer_available(l, r)){
+			layer = l;
+			break;
+		}
+	if (!layer)
+		layer = target->addLayer();
+
+	AudioBuffer tbuf;
+	layer->getBuffers(tbuf, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
+
+	/*if (hui::Config.getInt("Input.Mode", 0) == 1)
+		tbuf.add(buf, 0, 1.0f, 0);
+	else*/
+		tbuf.set(buf, 0, 1.0f);
+	song->execute(a);
+	song->endActionGroup();
+
+	return true;
 }

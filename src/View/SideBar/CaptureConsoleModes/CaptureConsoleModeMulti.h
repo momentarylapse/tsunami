@@ -13,6 +13,11 @@
 
 class Device;
 class Track;
+class InputStreamAudio;
+class InputStreamMidi;
+class AudioSucker;
+class PeakMeter;
+class PeakMeterDisplay;
 
 class CaptureConsoleModeMulti: public CaptureConsoleMode
 {
@@ -22,8 +27,13 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 	struct CaptureItem
 	{
 		Track *track;
+		InputStreamAudio *input_audio;
+		AudioSucker *sucker;
+		InputStreamMidi *input_midi;
+		PeakMeterDisplay *peak_meter_display;
+		PeakMeter *peak_meter;
 		Device *device;
-		string id_source, id_target, id_type;
+		string id_source, id_target, id_type, id_peaks;
 	};
 	Array<CaptureItem> items;
 
@@ -35,13 +45,15 @@ public:
 	//virtual void leave_parent();
 	void enter() override;
 	void leave() override;
-	void pause() override {}
-	void start() override {}
-	void stop() override {}
-	void dump() override {}
-	bool insert() override { return false; }
-	int get_sample_count() override { return 0; }
-	bool is_capturing() override { return false; }
+	void pause() override;
+	void start() override;
+	void stop() override;
+	void dump() override;
+	bool insert() override;
+	int get_sample_count() override;
+	bool is_capturing() override;
+
+	void on_source();
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEMULTI_H_ */

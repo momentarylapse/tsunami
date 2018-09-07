@@ -26,8 +26,6 @@
 
 
 
-extern AudioSucker *export_view_sucker;
-
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
@@ -54,7 +52,6 @@ void CaptureConsoleModeAudio::set_target(Track *t)
 	target = t;
 	// FIXME ...
 	//view->setCurTrack(target);
-	view->mode_capture->capturing_track = target;
 
 	bool ok = (target->type == SignalType::AUDIO);
 	cc->setString("message", "");
@@ -92,7 +89,6 @@ void CaptureConsoleModeAudio::enter()
 	input->set_backup_mode(BACKUP_MODE_TEMP);
 	input->set_chunk_size(4096);
 	input->set_update_dt(0.03f);
-	view->mode_capture->set_input_audio(input);
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->set_source(input->out);
 	cc->peak_meter->setSource(peak_meter);
@@ -111,16 +107,16 @@ void CaptureConsoleModeAudio::enter()
 	sucker = CreateAudioSucker(session);
 	sucker->set_source(peak_meter->out);
 	sucker->start();
-	export_view_sucker = sucker;
+	view->mode_capture->set_data({{target,input,sucker}});
 }
 
 void CaptureConsoleModeAudio::leave()
 {
+	view->mode_capture->set_data({});
 	delete sucker;
 	cc->peak_meter->setSource(nullptr);
 	delete peak_meter;
-	view->mode_capture->set_input_audio(nullptr);
-	delete(input);
+	delete input;
 	input = nullptr;
 }
 

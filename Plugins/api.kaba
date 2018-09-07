@@ -533,7 +533,7 @@ class SongPlugin
 
 //extern PluginContext plugin_context
 extern ColorScheme colors
-extern InputStreamAudio* view_input
+//extern InputStreamAudio* view_input
 
 
 extern void fft_c2c(complex[] in, complex[] out, bool inverse)

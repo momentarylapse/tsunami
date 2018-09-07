@@ -54,8 +54,6 @@
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
-extern InputStreamAudio *export_view_input;
-
 PluginManager::PluginManager()
 {
 	favorites = new FavoriteManager;
@@ -99,7 +97,7 @@ void PluginManager::LinkAppScriptData()
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("colors", &AudioView::colors);
-	Kaba::LinkExternal("view_input", &export_view_input);
+	//Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);

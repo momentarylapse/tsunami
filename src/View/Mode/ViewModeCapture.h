@@ -14,8 +14,16 @@
 
 class InputStreamAudio;
 class InputStreamMidi;
+class Module;
+enum class SignalType;
 
-//class CaptureConsoleMode;
+struct CaptureTrackData
+{
+	Track *target;
+	Module *input;
+	Module *sucker;
+	SignalType type();
+};
 
 class ViewModeCapture : public ViewModeDefault
 {
@@ -32,13 +40,8 @@ public:
 
 	virtual Set<Track*> prevent_playback() override;
 
-	//CaptureConsoleMode *console_mode;
-
-	InputStreamAudio *input_audio;
-	InputStreamMidi *input_midi;
-	void set_input_audio(InputStreamAudio *input);
-	void set_input_midi(InputStreamMidi *input);
-	Track *capturing_track;
+	Array<CaptureTrackData> data;
+	void set_data(const Array<CaptureTrackData> &data);
 
 	void on_input_update();
 };

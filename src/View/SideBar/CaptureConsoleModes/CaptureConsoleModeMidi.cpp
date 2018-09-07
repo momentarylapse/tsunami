@@ -65,7 +65,6 @@ void CaptureConsoleModeMidi::set_target(Track *t)
 	preview_stream = new OutputStream(session, peak_meter->out);
 	preview_stream->set_buffer_size(512);
 	preview_stream->play();
-	view->mode_capture->capturing_track = target;
 
 
 	bool ok = (target->type == SignalType::MIDI);
@@ -99,7 +98,7 @@ void CaptureConsoleModeMidi::enter()
 	input = new InputStreamMidi(session);
 	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
-	view->mode_capture->set_input_midi(input);
+	view->mode_capture->set_data({{target,input}});
 	cc->peak_meter->setSource(nullptr);//input);
 
 	input->set_device(chosen_device);
@@ -119,7 +118,7 @@ void CaptureConsoleModeMidi::enter()
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->setSource(nullptr);
-	view->mode_capture->set_input_midi(nullptr);
+	view->mode_capture->set_data({});
 	delete(input);
 	input = nullptr;
 }

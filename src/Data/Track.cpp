@@ -54,13 +54,14 @@ const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
 Track::Track(SignalType _type, Synthesizer *_synth)
 {
 	type = _type;
-	channels = 2;
 	if (type == SignalType::AUDIO_MONO){
 		type = SignalType::AUDIO;
 		channels = 1;
 	}else if (type == SignalType::AUDIO_STEREO){
 		type = SignalType::AUDIO;
 		channels = 2;
+	}else if (type == SignalType::AUDIO){
+		channels = 1;
 	}
 	muted = false;
 	volume = 1;

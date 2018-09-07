@@ -1272,10 +1272,10 @@ void FormatNami::make_consistent(Song *a)
 			if ((t->layers[i]->buffers.num == 0) and (t->layers[i]->midi.num == 0))
 				t->layers.erase(i);
 
-		if (n[1] > 0 and n[2] == 0){
-			t->channels = 1;
+		if (n[2] > 0 and n[1] == 0){
+			t->channels = 2;
 			for (TrackLayer *l: t->layers)
-				l->channels = 1;
+				l->channels = 2;
 		}
 	}
 }

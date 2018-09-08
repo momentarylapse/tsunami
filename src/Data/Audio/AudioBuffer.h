@@ -76,6 +76,7 @@ public:
 	void _ensure_peak_size(int level4, int n, bool set_invalid = false);
 	int _update_peaks_prepare();
 	void _update_peaks_chunk(int index);
+	bool _peaks_chunk_needs_update(int index);
 	void _truncate_peaks(int length);
 };
 

@@ -112,7 +112,7 @@ public:
 			throw "";
 
 		for (int i=0; i<n; i++){
-			if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255){
+			if (buf._peaks_chunk_needs_update(i)){
 				while (!song->try_lock()){
 					Thread::cancelation_point();
 					hui::Sleep(0.01f);
@@ -927,7 +927,7 @@ void AudioView::update_peaks_now(AudioBuffer &buf)
 	int n = buf._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
-		if (buf.peaks[buf.PEAK_MAGIC_LEVEL4][i] == 255)
+		if (buf._peaks_chunk_needs_update(i))
 			buf._update_peaks_chunk(i);
 }
 

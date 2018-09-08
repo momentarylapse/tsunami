@@ -234,7 +234,7 @@ void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 		// invalid peaks...
 		int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
 		for (int i=0; i<nn; i++){
-			if (b.peaks[b.PEAK_MAGIC_LEVEL4][i] == 255){
+			if (b._peaks_chunk_needs_update(i)){
 				c->setColor(ColorInterpolate(col, Red, 0.3f));
 				float x1 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), 0.0f);
 				float x2 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), w);

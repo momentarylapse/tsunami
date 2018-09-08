@@ -654,13 +654,23 @@ void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid)
 			if (set_invalid)
 				memset(&peaks[level4 + k][n0], 255, (n - n0));
 		}
+	}else if (peaks[level4].num < n){
+		for (int k=0; k<4; k++)
+			peaks[level4 + k].resize(n);
 	}
+}
+
+bool AudioBuffer::_peaks_chunk_needs_update(int index)
+{
+	if (index == peaks[PEAK_MAGIC_LEVEL4].num)
+		return true;
+	return (peaks[PEAK_MAGIC_LEVEL4][index] == 255);
 }
 
 void AudioBuffer::_update_peaks_chunk(int index)
 {
 	// first level
-	int i0 = index * PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE;
+	int i0 = index * (PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE);
 	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, length / PEAK_FINEST_SIZE);
 	int n = i1 - i0;
 
@@ -684,14 +694,12 @@ void AudioBuffer::_update_peaks_chunk(int index)
 		i1 = i0 + n;
 		_ensure_peak_size(level4, i1);
 
-		for (int i=i0; i<i1; i++)
+		for (int i=i0; i<i1; i++){
 			peaks[level4    ][i] = shrink_max(peaks[level4 - 4][i * 2], peaks[level4 - 4][i * 2 + 1]);
-		for (int i=i0; i<i1; i++)
 			peaks[level4 + 1][i] = shrink_max(peaks[level4 - 3][i * 2], peaks[level4 - 3][i * 2 + 1]);
-		for (int i=i0; i<i1; i++)
 			peaks[level4 + 2][i] = shrink_mean(peaks[level4 - 2][i * 2], peaks[level4 - 2][i * 2 + 1]);
-		for (int i=i0; i<i1; i++)
 			peaks[level4 + 3][i] = shrink_mean(peaks[level4 - 1][i * 2], peaks[level4 - 1][i * 2 + 1]);
+		}
 	}
 
 	//	msg_write(format("%d  %d  %d", level4 / 4, peaks.num / 4 - 1, n));
@@ -719,11 +727,11 @@ int AudioBuffer::_update_peaks_prepare()
 	if (!_shrink_table_created)
 		update_shrink_table();
 
-	int n = length / PEAK_CHUNK_SIZE;
+	int n = (int)ceil((float)length / (float)PEAK_CHUNK_SIZE);
 
 	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
 		_ensure_peak_size((i - PEAK_OFFSET_EXP) * 4, length >> i, true);
-	_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
+	//_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
 
 	return n;
 }

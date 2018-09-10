@@ -208,7 +208,7 @@ j integrate Metronome
 	* scrolling with keys (wheel in use)
 	* better ticks
 * CompressorSimple graphical + indicator
-* flexible naming "BlaBla" "Bla Bla"
+J flexible naming "BlaBla" "Bla Bla"
 * MultiEcho envelope curves
 * merge/remove deprecated fx
 
@@ -224,3 +224,6 @@ j multi-track recording!
 == minor ==
 
 J hover text boundaries
+J version cross fade draw as active/inactive buffers
+* draw cross fade with green "flare"
+J auto-conf Sample: remove "clear" button

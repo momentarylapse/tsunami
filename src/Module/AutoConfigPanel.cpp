@@ -276,11 +276,8 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 		id = "sample-" + i;
 		panel = p;
 		p->addButton("!expandx", 1, i, id);
-		p->addButton("", 2, i, "clear");
-		p->setImage("clear", "hui:delete");
 		set_value();
 		p->event(id, [&]{ on_button(); });
-		p->event("clear", [&]{ on_clear(); });
 		callback = _callback;
 	}
 	void on_button()
@@ -295,15 +292,6 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 			*value = nullptr;
 			if (s)
 				*value = s->create_ref();
-			set_value();
-			callback();
-		}
-	}
-	void on_clear()
-	{
-		if (*value){
-			delete *value;
-			*value = nullptr;
 			set_value();
 			callback();
 		}

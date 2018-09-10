@@ -681,7 +681,7 @@ Plugin *PluginManager::LoadAndCompilePlugin(ModuleType type, const string &filen
 Plugin *PluginManager::GetPlugin(Session *session, ModuleType type, const string &name)
 {
 	for (PluginFile &pf: plugin_files){
-		if ((pf.name == name) and (pf.type == type)){
+		if ((pf.name.replace(" ", "") == name.replace(" ", "")) and (pf.type == type)){
 			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
 			return p;
 		}

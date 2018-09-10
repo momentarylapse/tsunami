@@ -75,6 +75,9 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 	char *data = new char[CHUNK_SIZE];
 	File *f = nullptr;
 
+	od->suggest_samplerate(config.sample_rate);
+	od->suggest_channels(config.channels);
+
 	try{
 		f = FileOpen(od->filename);
 

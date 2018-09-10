@@ -740,7 +740,7 @@ void TsunamiWindow::onSettings()
 void TsunamiWindow::onTrackImport()
 {
 	if (session->storage->askOpenImport(this)){
-		Track *t = song->addTrack(SignalType::AUDIO);
+		Track *t = song->addTrack(SignalType::AUDIO_STEREO);
 		session->storage->loadTrack(t->layers[0], hui::Filename, view->sel.range.start());
 	}
 }

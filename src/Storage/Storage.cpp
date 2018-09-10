@@ -123,6 +123,7 @@ bool Storage::loadTrack(TrackLayer *layer, const string &filename, int offset)
 	a->beginActionGroup();
 
 	f->loadTrack(&od);
+
 	a->endActionGroup();
 
 	delete(f);

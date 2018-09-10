@@ -56,8 +56,6 @@ const int AudioView::SNAPPING_DIST = 8;
 ColorSchemeBasic AudioView::basic_colors;
 ColorScheme AudioView::colors;
 
-extern hui::Timer debug_timer;
-
 
 const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
 const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";

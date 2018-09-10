@@ -125,7 +125,7 @@ J curve actions
 * "synth" audio fx from signal chains?
 ~ more pre-def colors, less ColorInterpolate
 J selection background...
-* fix: last chunk of peaks
+J fix: last chunk of peaks
 J perfmon window
 ~ perfmon more fine grained
 J thread system...
@@ -173,7 +173,7 @@ X enum descriptors via set?
 J Array initializer_list
 J nullptr
 J TrackLayer in separate file
-* separate files
+J separate files
 	J AudioViewLayer
 	J TrackLayer
 	J TrackMarker
@@ -219,7 +219,7 @@ j integrate Metronome
 J version selection mode (overlap)
 J add/edit/delete bars -> dialog what to change how
 J mute recording track
-* multi-track recording!
+j multi-track recording!
 
 == minor ==
 

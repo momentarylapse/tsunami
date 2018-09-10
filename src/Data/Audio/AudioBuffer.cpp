@@ -654,14 +654,16 @@ void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid)
 			if (set_invalid)
 				memset(&peaks[level4 + k][n0], 255, (n - n0));
 		}
-	}else if (peaks[level4].num < n){
+	}/*else if (peaks[level4].num < n){
 		for (int k=0; k<4; k++)
 			peaks[level4 + k].resize(n);
-	}
+	}*/
 }
 
 bool AudioBuffer::_peaks_chunk_needs_update(int index)
 {
+	if (peaks.num <= PEAK_MAGIC_LEVEL4)
+		return true;
 	if (index == peaks[PEAK_MAGIC_LEVEL4].num)
 		return true;
 	return (peaks[PEAK_MAGIC_LEVEL4][index] == 255);
@@ -711,8 +713,12 @@ void AudioBuffer::_update_peaks_chunk(int index)
 		if ((index & (1<<k)) == 0)
 			break;
 
+		if (peaks[level4].num <= (i0 | 1))
+			break;
+
 		level4 += 4;
 		i0 = i0 / 2;
+
 		_ensure_peak_size(level4, i0 + 1);
 
 		peaks[level4    ][i0] = shrink_max(peaks[level4 - 4][i0 * 2], peaks[level4 - 4][i0 * 2 + 1]);
@@ -729,7 +735,7 @@ int AudioBuffer::_update_peaks_prepare()
 
 	int n = (int)ceil((float)length / (float)PEAK_CHUNK_SIZE);
 
-	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
+	for (int i=PEAK_OFFSET_EXP; i<=PEAK_CHUNK_EXP; i++)
 		_ensure_peak_size((i - PEAK_OFFSET_EXP) * 4, length >> i, true);
 	//_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
 

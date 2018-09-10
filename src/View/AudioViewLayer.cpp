@@ -76,11 +76,11 @@ color AudioViewLayer::getPitchColor(int pitch)
 
 static Array<complex> tt;
 
-inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
+inline void draw_line_buffer(Painter *c, double view_pos, double zoom, float hf, float x0, float x1, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
-	int i0 = max((double) x          / zoom + view_pos - offset    , 0.0);
-	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, (double)buf.num);
+	int i0 = max((double)x0 / zoom + view_pos - offset    , 0.0);
+	int i1 = min((double)x1 / zoom + view_pos - offset + 2, (double)buf.num);
 	if (i1 < i0)
 		return;
 
@@ -88,7 +88,7 @@ inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom
 
 	for (int i=i0; i<i1; i++){
 
-		double p = x + ((double)(i + offset) + 0.5 - view_pos) * zoom;
+		double p = x0 + ((double)(i + offset) + 0.5 - view_pos) * zoom;
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
@@ -98,11 +98,11 @@ inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom
 	c->drawLines(tt);
 }
 
-inline void draw_line_buffer_sel(Painter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset, const Range &r)
+inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float hf, float x0, float x1, float y0, const Array<float> &buf, int offset, const Range &r)
 {
 	int nl = 0;
-	int i0 = max((double) x          / zoom + view_pos - offset    , 0.0);
-	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, (double)buf.num);
+	int i0 = max((double)x0 / zoom + view_pos - offset    , 0.0);
+	int i1 = min((double)x1 / zoom + view_pos - offset + 2, (double)buf.num);
 	if (i1 < i0)
 		return;
 
@@ -113,7 +113,7 @@ inline void draw_line_buffer_sel(Painter *c, int width, double view_pos, double 
 		if (!r.is_inside(i + offset))
 			continue;
 
-		double p = x + ((double)(i + offset) + 0.5 - view_pos) * zoom;
+		double p = x0 + ((double)(i + offset) + 0.5 - view_pos) * zoom;
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
@@ -125,25 +125,27 @@ inline void draw_line_buffer_sel(Painter *c, int width, double view_pos, double 
 	c->setLineWidth(1.0f);
 }
 
-inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+inline void draw_peak_buffer(Painter *c, int di, double view_pos_rel, double zoom, float f, float hf, float x0, float x1, float y0, const string &buf, int offset)
 {
+	if ((x1 - x0) / di < 1)
+		return;
 	int nl = 0;
 	double dpos = 1.0 / zoom;
 	// pixel position
 	// -> buffer position
 	double p0 = view_pos_rel;
-	tt.resize(width/di + 10);
-	for (int i=0; i<width+di; i+=di){
+	tt.resize((int)((x1 - x0)/di + 10));
+	for (int i=x0; i<x1+di; i+=di){
 
 		double p = p0 + dpos * (double)i + 0.5;
 		int ip = (int)(p - offset)/f;
 		if ((ip >= 0) and (ip < buf.num))
-		if (((int)(p) < offset + buf.num*f) and (p >= offset)){
-			tt[nl].x = (float)x+i;
-			float dy = ((float)(buf[ip])/255.0f) * hf;
-			tt[nl].y  = y0 - dy;
-			nl ++;
-		}
+			if (((int)(p) < offset + buf.num*f) and (p >= offset)){
+				tt[nl].x = i;
+				float dy = ((float)(buf[ip])/255.0f) * hf;
+				tt[nl].y  = y0 - dy;
+				nl ++;
+			}
 	}
 	if (nl == 0)
 		return;
@@ -155,27 +157,27 @@ inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel,
 	c->drawPolygon(tt);
 }
 
-inline void draw_peak_buffer_sel(Painter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset, int xmin, int xmax)
+inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double zoom, float f, float hf, float x0, float x1, float y0, const string &buf, int offset)
 {
+	if ((x1 - x0) / di < 1)
+		return;
 	int nl = 0;
 	double dpos = 1.0 / zoom;
 	// pixel position
 	// -> buffer position
 	double p0 = view_pos_rel;
-	tt.resize(width/di + 10);
-	for (int i=0; i<width+di; i+=di){
+	tt.resize((int)((x1 - x0)/di + 10));
+	for (int i=x0; i<x1+di; i+=di){
 
 		double p = p0 + dpos * (double)i + 0.5;
 		int ip = (int)(p - offset)/f;
 		if ((ip >= 0) and (ip < buf.num))
-		if (((int)(p) < offset + buf.num*f) and (p >= offset)){
-			if ((((float)x+i) >= xmin) and (((float)x+i)<= xmax)){
-				tt[nl].x = (float)x+i;
+			if (((int)(p) < offset + buf.num*f) and (p >= offset)){
+				tt[nl].x = i;
 				float dy = ((float)(buf[ip])/255.0f) * hf;
 				tt[nl].y  = y0 - dy - 1;
 				nl ++;
 			}
-		}
 	}
 	if (nl == 0)
 		return;
@@ -192,7 +194,8 @@ void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 	float w = area.width();
 	float h = area.height();
 	float hf = h / (2 * b.channels);
-	float x1 = area.x1;
+	float x0 = area.x1;
+	float x1 = area.x2;
 
 	// zero heights of both channels
 	float y0[2];
@@ -222,39 +225,41 @@ void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 		cc.a *= 0.3f;
 		c->setColor(cc);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0[ci], b.peaks[ll+ci], b.offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], b.offset);
 
 
 		// mean square
 		c->setColor(col);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0[ci], b.peaks[l+2+ci], b.offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], b.offset);
 
 
 		// invalid peaks...
-		int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
-		for (int i=0; i<nn; i++){
-			if (b._peaks_chunk_needs_update(i)){
-				c->setColor(ColorInterpolate(col, Red, 0.3f));
-				float x1 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), 0.0f);
-				float x2 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), w);
-				c->drawRect(x1, area.y1, x2 - x1, h);
+		if (b.peaks.num >= b.PEAK_MAGIC_LEVEL4){
+			int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
+			for (int i=0; i<nn; i++){
+				if (b._peaks_chunk_needs_update(i)){
+					c->setColor(ColorInterpolate(col, Red, 0.3f));
+					float xx0 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), x0);
+					float xx1 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
+					c->drawRect(xx0, area.y1, xx1 - xx0, h);
+				}
 			}
 		}
 	}else{
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0[ci], b.c[ci], b.offset);
+			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x0 + w, y0[ci], b.c[ci], b.offset);
 	}
 }
 
 void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
 {
-	float w = area.width();
 	float h = area.height();
 	float hf = h / (2 * b.channels);
-	float x1 = area.x1;
+	float x0 = area.x1;
+	float x1 = area.x2;
 
 	// zero heights of both channels
 	float y0[2];
@@ -274,7 +279,7 @@ void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 
 
 		// no peaks yet? -> show dummy
-		if (b.peaks.num < l){
+		if (b.peaks.num <= l){
 			c->setColor(ColorInterpolate(col, Red, 0.3f));
 			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			return;
@@ -283,19 +288,21 @@ void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 		// maximum
 		double _bzf = bzf;
 		int ll = l;
+		/*double _bzf = bzf;
+		int ll = l;
 		if (ll + 4 < b.peaks.num){
 			ll += 4;
 			_bzf *= 2;
-		}
-		int xmin = view->cam.sample2screen(r.start());
-		int xmax = view->cam.sample2screen(r.end());
+		}*/
+		float xmin = max(x0, (float)view->cam.sample2screen(r.start()));
+		float xmax = min(x1, (float)view->cam.sample2screen(r.end()));
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer_sel(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0[ci], b.peaks[ll+ci], b.offset, xmin, xmax);
+			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.scale, _bzf, hf, xmin, xmax, y0[ci], b.peaks[ll+ci], b.offset);
 	}else{
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer_sel(c, w, view_pos_rel, view->cam.scale, hf, x1, y0[ci], b.c[ci], b.offset, r);
+			draw_line_buffer_sel(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], b.offset, r);
 	}
 }
 

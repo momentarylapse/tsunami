@@ -538,7 +538,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		draw_midi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
-	l->drawTrackBuffers(c, view->cam.pos);
+	l->drawTrackBuffers(c);
 
 	// samples
 	for (SampleRef *s: l->layer->samples)

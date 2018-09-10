@@ -55,7 +55,7 @@ public:
 	void drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale);
 	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 
-	void drawTrackBuffers(Painter *c, double pos);
+	void drawTrackBuffers(Painter *c);
 	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1);
 	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 

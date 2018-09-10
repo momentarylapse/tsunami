@@ -331,8 +331,9 @@ Array<Range> version_ranges(TrackLayer *l)
 	return r;
 }
 
-void AudioViewLayer::drawTrackBuffers(Painter *c, double view_pos_rel)
+void AudioViewLayer::drawTrackBuffers(Painter *c)
 {
+	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
 	if (is_playable() and layer->track->has_version_selection()){
 		Array<Range> rr = version_ranges(layer);
 		for (AudioBuffer &b: layer->buffers){

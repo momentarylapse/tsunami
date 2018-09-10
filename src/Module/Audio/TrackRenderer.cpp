@@ -154,7 +154,9 @@ void TrackRenderer::fill_midi_streamer()
 
 void TrackRenderer::on_track_add_or_delete_fx()
 {
-	msg_error("track del/rm fx");
+	if (direct_mode){
+		fx = track->fx;
+	}
 }
 
 void TrackRenderer::on_track_replace_synth()

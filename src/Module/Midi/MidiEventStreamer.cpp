@@ -49,7 +49,6 @@ void MidiEventStreamer::reset()
 void MidiEventStreamer::set_data(const MidiEventBuffer &_midi)
 {
 	midi = _midi;
-	offset = 0;
 }
 
 void MidiEventStreamer::seek(int pos)

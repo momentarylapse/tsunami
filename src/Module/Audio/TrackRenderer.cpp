@@ -97,21 +97,10 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 
 	//midi.add(t, t->midi);
 	if (t->type == SignalType::MIDI){
-		MidiNoteBuffer _midi = t->layers[0]->midi;
-		for (TrackLayer *l: t->layers)
-			for (auto c: l->samples)
-				if (c->type() == SignalType::MIDI)
-				_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
-		for (MidiEffect *fx: t->midi_fx){
-			fx->prepare();
-			fx->process(&_midi);
-		}
-
-		MidiEventBuffer raw = midi_notes_to_events(_midi);
+		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer(raw);
-		midi_streamer->ignore_end = true;
-
 		synth->set_source(midi_streamer->out);
+		fill_midi_streamer();
 	}else if (t->type == SignalType::BEATS){
 
 		synth->set_source(sr->beat_midifier->out);
@@ -121,6 +110,11 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	track->subscribe(this, [&]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
 	track->subscribe(this, [&]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
 	track->subscribe(this, [&]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
+
+	/*for (TrackLayer *l: track->layers){
+		l->subscribe(this, [&]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
+		l->subscribe(this, [&]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
+	}*/
 }
 
 TrackRenderer::~TrackRenderer()
@@ -133,6 +127,24 @@ TrackRenderer::~TrackRenderer()
 			delete f;
 		delete synth;
 	}
+}
+
+void TrackRenderer::fill_midi_streamer()
+{
+	MidiNoteBuffer _midi = track->layers[0]->midi;
+	for (TrackLayer *l: track->layers)
+		for (auto c: l->samples)
+			if (c->type() == SignalType::MIDI)
+			_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
+	for (MidiEffect *fx: track->midi_fx){
+		fx->prepare();
+		fx->process(&_midi);
+	}
+
+	MidiEventBuffer raw = midi_notes_to_events(_midi);
+	midi_streamer->set_data(raw);
+	midi_streamer->ignore_end = true;
+
 }
 
 void TrackRenderer::on_track_add_or_delete_fx()
@@ -162,13 +174,16 @@ void TrackRenderer::on_track_replace_synth()
 void TrackRenderer::on_track_change_data()
 {
 	if (midi_streamer){
-		MidiNoteBuffer _midi = track->layers[0]->midi;
-		for (TrackLayer *l: track->layers)
-			for (auto c: l->samples)
-				if (c->type() == SignalType::MIDI)
-				_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
-		midi_streamer->midi = _midi.getEvents(Range::ALL);
+		fill_midi_streamer();
 	}
+}
+
+void TrackRenderer::on_track_delete_layer()
+{
+}
+
+void TrackRenderer::on_track_add_layer()
+{
 }
 
 void TrackRenderer::seek(int pos)

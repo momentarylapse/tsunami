@@ -86,6 +86,7 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode)
 		prepare(song->range(), false);
 		song->subscribe(this, [&]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
 		song->subscribe(this, [&]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
+		song->subscribe(this, [&]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
 	}
 }
 
@@ -334,6 +335,12 @@ void SongRenderer::on_song_add_track()
 void SongRenderer::on_song_delete_track()
 {
 	update_tracks();
+}
+
+void SongRenderer::on_song_finished_loading()
+{
+	for (auto *tr: tracks)
+		tr->on_track_change_data();
 }
 
 void SongRenderer::update_tracks()

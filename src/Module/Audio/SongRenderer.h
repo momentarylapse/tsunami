@@ -59,6 +59,7 @@ private:
 
 	void on_song_add_track();
 	void on_song_delete_track();
+	void on_song_finished_loading();
 	void update_tracks();
 
 	Song *song;

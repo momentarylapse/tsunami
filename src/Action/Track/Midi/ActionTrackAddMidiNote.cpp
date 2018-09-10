@@ -29,6 +29,7 @@ void* ActionTrackAddMidiNote::execute(Data* d)
 {
 	layer->midi.insert(note, insert_index);
 	note = nullptr;
+	layer->notify(layer->MESSAGE_CHANGE);
 
 	return note;
 }
@@ -37,4 +38,5 @@ void ActionTrackAddMidiNote::undo(Data* d)
 {
 	note = layer->midi[insert_index];
 	layer->midi.erase(insert_index);
+	layer->notify(layer->MESSAGE_CHANGE);
 }

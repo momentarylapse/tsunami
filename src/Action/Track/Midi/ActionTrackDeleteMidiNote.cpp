@@ -25,6 +25,7 @@ void* ActionTrackDeleteMidiNote::execute(Data* d)
 {
 	note = layer->midi[index];
 	layer->midi.erase(index);
+	layer->notify(layer->MESSAGE_CHANGE);
 	return nullptr;
 }
 
@@ -32,4 +33,5 @@ void ActionTrackDeleteMidiNote::undo(Data* d)
 {
 	layer->midi.insert(note, index);
 	note = nullptr;
+	layer->notify(layer->MESSAGE_CHANGE);
 }

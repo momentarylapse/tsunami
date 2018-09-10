@@ -42,6 +42,8 @@ public:
 	void render(AudioBuffer &buf);
 	void render_fx(AudioBuffer &buf);
 
+	void fill_midi_streamer();
+
 	static void apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list);
 
 	void reset_state();
@@ -49,6 +51,8 @@ public:
 	void on_track_replace_synth();
 	void on_track_add_or_delete_fx();
 	void on_track_change_data();
+	void on_track_delete_layer();
+	void on_track_add_layer();
 };
 
 #endif /* SRC_MODULE_AUDIO_TRACKRENDERER_H_ */

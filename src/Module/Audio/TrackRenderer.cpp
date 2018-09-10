@@ -69,6 +69,11 @@ static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
 
 void TrackRenderer::reset_state()
 {
+	if (direct_mode)
+		fx = track->fx;
+	if (midi_streamer)
+		fill_midi_streamer();
+
 	for (AudioEffect *fx: fx)
 		fx->reset_state();
 	synth->reset();
@@ -191,6 +196,8 @@ void TrackRenderer::seek(int pos)
 	offset = pos;
 	if (midi_streamer)
 		midi_streamer->seek(pos);
+	for (auto *f: fx)
+		f->reset_state();
 	if (track->type == SignalType::BEATS)
 		song_renderer->bar_streamer->seek(pos);
 }

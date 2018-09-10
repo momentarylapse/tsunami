@@ -221,7 +221,7 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_layer->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
 		view->menu_layer->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
 		view->menu_layer->open_popup(view->win);
-	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER) or (hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
+	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER)){
 		view->menu_track->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
 		view->menu_track->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
 		view->menu_track->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
@@ -237,6 +237,7 @@ void ViewModeDefault::on_right_button_down()
 		//view->menu_track->enable("delete_layer", !hover->layer->is_main());
 		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
 		view->menu_track->open_popup(view->win);
+	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 	}else if (!hover->track){
 		view->menu_song->open_popup(view->win);
 	}

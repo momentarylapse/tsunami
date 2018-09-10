@@ -189,13 +189,11 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 	c->drawPolygon(tt);
 }
 
-void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col)
+void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1)
 {
-	float w = area.width();
+	//float w = area.width();
 	float h = area.height();
 	float hf = h / (2 * b.channels);
-	float x0 = area.x1;
-	float x1 = area.x2;
 
 	// zero heights of both channels
 	float y0[2];
@@ -250,7 +248,7 @@ void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x0 + w, y0[ci], b.c[ci], b.offset);
+			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], b.offset);
 	}
 }
 
@@ -306,13 +304,50 @@ void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view
 	}
 }
 
+
+#include "../Data/CrossFade.h"
+
+// active | passive | active | ...
+Array<Range> version_ranges(TrackLayer *l)
+{
+	Array<Range> r;
+	if (!l->is_main())
+		r.add(Range::EMPTY);
+	int own_index = l->version_number();
+	CrossFade prev;
+	prev.position = -2000000000;
+	prev.samples = 0;
+	prev.target = 0;
+	for (auto &f: l->track->fades){
+		if (f.target == own_index){
+			r.add(RangeTo(prev.range().end(), f.range().start()));
+			prev = f;
+		}else if (prev.target == own_index){
+			r.add(RangeTo(prev.range().start(), f.range().end()));
+			prev = f;
+		}
+	}
+	r.add(RangeTo(r.back().end(), 2000000000));
+	return r;
+}
+
 void AudioViewLayer::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
-	color col = view->colors.text;
-	if (!is_playable())
-		col = view->colors.text_soft3;
-	for (AudioBuffer &b: layer->buffers)
-		drawBuffer(c, b, view_pos_rel, col);
+	if (is_playable() and layer->track->has_version_selection()){
+		Array<Range> rr = version_ranges(layer);
+		for (AudioBuffer &b: layer->buffers){
+			foreachi(Range &r, rr, i){
+				float x0 = max((float)view->cam.sample2screen(r.start()), area.x1);
+				float x1 = min((float)view->cam.sample2screen(r.end()), area.x2);
+				drawBuffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
+			}
+		}
+	}else{
+		color col = is_playable() ? view->colors.text : view->colors.text_soft3;
+		for (AudioBuffer &b: layer->buffers)
+			drawBuffer(c, b, view_pos_rel, col, area.x1, area.x2);
+
+	}
 
 	if (view->sel.has(layer)){
 		// selection
@@ -359,7 +394,7 @@ void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 
 	// buffer
 	if (s->type() == SignalType::AUDIO)
-		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
+		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col, area.x1, area.x2);
 	else if (s->type() == SignalType::MIDI)
 		view->mode->draw_midi(c, this, *s->midi, true, s->pos);
 

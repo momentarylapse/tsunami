@@ -558,14 +558,15 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 	int index_before = 0;
 	int index_own = l->layer->version_number();
 
-	if (index_own == 0 and l->layer->track->has_version_selection()){
+	/*if (index_own == 0 and l->layer->track->has_version_selection()){
 		draw_fade_bg(c, l, view, -1);
-	}
+	}*/
 
+	c->setLineWidth(2);
 	foreachi (auto &f, l->layer->track->fades, i){
-		if (f.target == index_own){
+		/*if (f.target == index_own){
 			draw_fade_bg(c, l, view, i);
-		}
+		}*/
 		if (f.target == index_own or index_before == index_own){
 			float x1 = (float)view->cam.sample2screen(f.position);
 			float x2 = (float)view->cam.sample2screen(f.position + f.samples);
@@ -575,6 +576,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		}
 		index_before = f.target;
 	}
+	c->setLineWidth(1);
 }
 
 int ViewModeDefault::get_track_move_target(bool visual)

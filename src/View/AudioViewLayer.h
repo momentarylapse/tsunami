@@ -56,7 +56,7 @@ public:
 	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 
 	void drawTrackBuffers(Painter *c, double pos);
-	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col);
+	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1);
 	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);

@@ -39,6 +39,11 @@ double ViewPort::dsample2screen(double ds)
 	return ds * scale;
 }
 
+double ViewPort::dscreen2sample(double dx)
+{
+	return dx / scale;
+}
+
 void ViewPort::zoom(float f)
 {
 	// max zoom: 20 pixel per sample
@@ -99,20 +104,29 @@ Range ViewPort::range()
 	return Range(pos, view->song_area.width() / scale);
 }
 
-void ViewPort::make_sample_visible(int sample)
+void ViewPort::make_sample_visible(int sample, int samples_ahead)
 {
 	double x = sample2screen(sample);
+	float border = 0;
+	if (view->is_playback_active())
+		border = dsample2screen(samples_ahead);
 	float dx = view->song_area.width() * BORDER_FACTOR;
-	float dxr = view->song_area.width() * BORDER_FACTOR_RIGHT;
-	if ((x > view->song_area.x2 - dxr) or (x < view->song_area.x1 + dx)){
-		//pos = sample - view->area.width() / scale * BORDER_FACTOR;
-		set_target(sample - view->song_area.width() / scale * BORDER_FACTOR, 0.7f);
-		//view->notify(view->MESSAGE_VIEW_CHANGE);
-		//view->forceRedraw();
+	float dxr = min(view->song_area.width() * BORDER_FACTOR_RIGHT, dx + border);
+
+	if (samples_ahead > 0){
+		// playback: always jump until the cursor is on the left border
+		if ((x > view->song_area.x2 - dxr) or (x < view->song_area.x1 + dx))
+			set_target(sample - dscreen2sample(dx), 0.7f);
+	}else{
+		// no playback: minimal jump until the cursor is between the borders
+		if (x > view->song_area.x2 - dxr)
+			set_target(sample - dscreen2sample(view->song_area.width() - dxr), 0.7f);
+		else if (x < view->song_area.x1 + dx)
+			set_target(sample - dscreen2sample(dx), 0.7f);
 	}
 }
 
-void ViewPort::show(Range &r)
+rect ViewPort::nice_mapping_area()
 {
 	// mapping target area
 	float x0 = view->song_area.x1;
@@ -122,11 +136,16 @@ void ViewPort::show(Range &r)
 	float w = x1 - x0;
 	x0 += w * BORDER_FACTOR;
 	x1 -= w * BORDER_FACTOR;
+	return rect(x0, x1, view->song_area.y1, view->song_area.y2);
+}
 
+void ViewPort::show(Range &r)
+{
+	rect mr = nice_mapping_area();
 
 	// map r into (x0,x1)
-	scale = (x1 - x0) / (double)r.length;
-	pos = (double)r.start() - (x0 - view->song_area.x1) / scale;
+	scale = mr.width() / (double)r.length;
+	pos = (double)r.start() - (mr.x1 - view->song_area.x1) / scale;
 	pos_pre_animation = pos;
 	pos_target = pos;
 	view->notify(view->MESSAGE_VIEW_CHANGE);

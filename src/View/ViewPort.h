@@ -10,6 +10,7 @@
 
 class AudioView;
 class Range;
+class rect;
 
 class ViewPort
 {
@@ -35,12 +36,14 @@ public:
 	double screen2sample(double x);
 	double sample2screen(double s);
 	double dsample2screen(double ds);
+	double dscreen2sample(double dx);
 
 	void zoom(float f);
 	void move(float dpos);
 	void set_target(float pos, float nonlin);
 
-	void make_sample_visible(int sample);
+	void make_sample_visible(int sample, int samples_ahead);
+	rect nice_mapping_area();
 	void show(Range &r);
 };
 

@@ -896,7 +896,7 @@ void AudioView::on_song_update()
 
 void AudioView::on_stream_update()
 {
-	cam.make_sample_visible(playback_pos());
+	cam.make_sample_visible(playback_pos(), session->sample_rate() * 2);
 	force_redraw();
 }
 

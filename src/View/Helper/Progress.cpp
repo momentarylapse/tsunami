@@ -38,6 +38,18 @@ Progress::~Progress()
 }
 
 
+
+void Progress::__init__(const string &str, hui::Window *parent)
+{
+	new(this) Progress(str, parent);
+}
+
+void Progress::__delete__()
+{
+	this->~Progress();
+}
+
+
 void Progress::set(const string &str, float progress)
 {
 	if (dlg){
@@ -68,18 +80,27 @@ void Progress::set(float progress)
 	set("", progress);
 }
 
+void Progress::set_kaba(const string &str, float progress)
+{
+	set(str, progress);
+}
+
 void Progress::cancel()
 {
 	cancelled = true;
 	notify(MESSAGE_CANCEL);
 }
 
-bool Progress::isCancelled()
+bool Progress::is_cancelled()
 {
 	return cancelled;
 }
 
 
+ProgressCancelable::ProgressCancelable() :
+	Progress()
+{
+}
 
 ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 	Progress()
@@ -97,4 +118,15 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 
 ProgressCancelable::~ProgressCancelable()
 {
+}
+
+
+void ProgressCancelable::__init__(const string &str, hui::Window *parent)
+{
+	new(this) ProgressCancelable(str, parent);
+}
+
+void ProgressCancelable::__delete__()
+{
+	this->ProgressCancelable::~ProgressCancelable();
 }

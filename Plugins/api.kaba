@@ -531,6 +531,17 @@ class SongPlugin
 	Session* session
 	Song* song
 
+/*class Progress
+	extern void __init__(string title, Window *parent)
+	virtual extern void __delete__()
+	extern void set(string msg, float progress)*/
+class ProgressX
+	extern void __init__(string title, Window *parent)
+	extern virtual void __delete__()
+	extern void set(string msg, float progress)
+	extern void cancel()
+	extern bool is_cancelled()
+
 //extern PluginContext plugin_context
 extern ColorScheme colors
 //extern InputStreamAudio* view_input

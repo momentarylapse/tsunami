@@ -391,7 +391,7 @@ void TsunamiWindow::onTrackRender()
 		song->execute(a);
 
 		offset += chunk_size;
-		if (p->isCancelled())
+		if (p->is_cancelled())
 			break;
 	}
 	song->endActionGroup();

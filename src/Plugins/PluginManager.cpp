@@ -542,6 +542,19 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "on_start", Kaba::mf(&TsunamiPlugin::on_start), &tsunami_plugin);
 	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "on_stop", Kaba::mf(&TsunamiPlugin::on_stop), &tsunami_plugin);
 	Kaba::LinkExternal("TsunamiPlugin.stop", Kaba::mf(&TsunamiPlugin::stop_request));
+
+	Kaba::DeclareClassSize("Progress", sizeof(Progress));
+	Kaba::LinkExternalClassFunc("Progress." + Kaba::IDENTIFIER_FUNC_INIT, &Progress::__init__);
+	Kaba::LinkExternalClassFunc("Progress." + Kaba::IDENTIFIER_FUNC_DELETE, &Progress::__delete__);
+	Kaba::LinkExternalClassFunc("Progress.set", &Progress::set_kaba);
+
+	ProgressCancelable prog_can;
+	Kaba::DeclareClassSize("ProgressX", sizeof(ProgressCancelable));
+	Kaba::LinkExternalClassFunc("ProgressX." + Kaba::IDENTIFIER_FUNC_INIT, &ProgressCancelable::__init__);
+	Kaba::DeclareClassVirtualIndex("ProgressX", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ProgressCancelable::__delete__), &prog_can);
+	Kaba::LinkExternalClassFunc("ProgressX.set", &ProgressCancelable::set_kaba);
+	Kaba::LinkExternalClassFunc("ProgressX.cancel", &ProgressCancelable::cancel);
+	Kaba::LinkExternalClassFunc("ProgressX.is_cancelled", &ProgressCancelable::is_cancelled);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)

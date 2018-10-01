@@ -1,0 +1,34 @@
+use "../api.kaba"
+
+class VolumeChecker extends SongPlugin
+	override void apply()
+		SongRenderer *renderer = new SongRenderer(song)
+		
+		ProgressX *p = new ProgressX("checking", self.session.win)
+		
+		Range range = song.range()
+		AudioBuffer buf
+		renderer.prepare(range, false)
+		
+		buf.resize(1024*16)
+		
+		float vol_max = 0
+		int done = 0
+		while !p.is_cancelled()
+			int n = renderer.read(buf)
+			if n < 0
+				break
+			
+			float _max = max(buf.r.max(), buf.l.max())
+			float _min = min(buf.r.min(), buf.l.min())
+			vol_max = max(vol_max, max(abs(_max), abs(_min)))
+			print(vol_max)
+			done += n
+			p.set("", i2f(done) / i2f(range.length))
+
+		if !p.is_cancelled()
+			HuiInfoBox(session.win, "maximum volume", (vol_max * 100.0).str2(1) + "%")
+
+		delete p
+		delete renderer
+		

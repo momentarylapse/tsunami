@@ -1,0 +1,23 @@
+// Image = hui:zoom-in
+// Title[Deutsch] = Lautstärke
+
+use "../../api.kaba"
+
+const string AUTO_CONFIG_VOLUME_RIGHT = "0:2:0.1:100:%"
+const string AUTO_CONFIG_VOLUME_LEFT = "0:2:0.1:100:%"
+
+class Config extends PluginData
+	float volume_right
+	float volume_left
+	
+	override void reset()
+		volume_right = 1
+		volume_left = 1
+
+class Volume extends AudioEffect
+	Config config
+
+	override void process(AudioBuffer buf)
+		buf.r *= config.volume_right
+		if buf.channels > 1
+			buf.l *= config.volume_left

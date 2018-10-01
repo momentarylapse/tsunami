@@ -1,0 +1,11 @@
+// Image = hui:back
+// Title[Deutsch] = Kanäle L <- R
+use "../../api.kaba"
+
+class Swap extends AudioEffect
+	override void process(AudioBuffer buf)
+		if buf.channels > 1
+			float[] temp
+			temp = buf.l
+			buf.l = buf.r
+			buf.r = temp

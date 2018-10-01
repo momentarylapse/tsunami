@@ -9,7 +9,8 @@ class Config extends PluginData
 	bool maximize
 	
 	override void reset()
-		self.volume = 1
+		volume = 1
+		maximize = false
 
 class Volume extends AudioEffect
 	Config config

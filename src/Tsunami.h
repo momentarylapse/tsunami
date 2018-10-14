@@ -33,14 +33,14 @@ public:
 	Tsunami();
 	virtual ~Tsunami();
 
-	virtual bool onStartup(const Array<string> &arg);
-	virtual void onEnd();
+	bool on_startup(const Array<string> &arg) override;
+	void on_end() override;
 
-	bool handleArguments(Array<string> &arg);
-	void loadKeyCodes();
+	bool handle_arguments(Array<string> &arg);
+	void load_key_codes();
 
-	Session* createSession();
-	bool allowTermination();
+	Session* create_session();
+	bool allow_termination();
 
 	Array<Session*> sessions;
 

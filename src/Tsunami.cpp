@@ -45,12 +45,12 @@ Tsunami::Tsunami() :
 	plugin_manager = nullptr;
 	perf_mon = nullptr;
 
-	setProperty("name", AppName);
-	setProperty("version", AppVersion + " \"" + AppNickname + "\"");
-	setProperty("comment", _("Editor for audio files"));
-	setProperty("website", "http://michi.is-a-geek.org/software");
-	setProperty("copyright", "© 2007-2018 by Michael Ankele");
-	setProperty("author", "Michael Ankele <michi@lupina.de>");
+	set_property("name", AppName);
+	set_property("version", AppVersion + " \"" + AppNickname + "\"");
+	set_property("comment", _("Editor for audio files"));
+	set_property("website", "http://michi.is-a-geek.org/software");
+	set_property("copyright", "© 2007-2018 by Michael Ankele");
+	set_property("author", "Michael Ankele <michi@lupina.de>");
 }
 
 Tsunami::~Tsunami()
@@ -62,7 +62,7 @@ Tsunami::~Tsunami()
 	delete(perf_mon);
 }
 
-void Tsunami::onEnd()
+void Tsunami::on_end()
 {
 	while (sessions.num > 0){
 		Session *s = sessions.pop();
@@ -70,7 +70,7 @@ void Tsunami::onEnd()
 	}
 }
 
-bool Tsunami::onStartup(const Array<string> &_arg)
+bool Tsunami::on_startup(const Array<string> &_arg)
 {
 	Array<string> arg = _arg;
 	tsunami = this;
@@ -95,7 +95,7 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 
 	plugin_manager->LinkAppScriptData();
 
-	if (handleArguments(arg))
+	if (handle_arguments(arg))
 		return false;
 
 	// ok, full window mode
@@ -105,13 +105,13 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 
 	// create a window and load file
 	if (sessions.num == 0){
-		Session *session = createSession();
+		Session *session = create_session();
 		session->song->addTrack(SignalType::AUDIO_MONO);
 
 		// default tags
 		session->song->addTag("title", _("New Audio File"));
 		session->song->addTag("album", AppName);
-		session->song->addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
+		session->song->addTag("artist", hui::Config.get_str("DefaultArtist", AppName));
 		session->song->resetHistory();
 
 		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
@@ -121,7 +121,7 @@ bool Tsunami::onStartup(const Array<string> &_arg)
 	return true;
 }
 
-bool Tsunami::handleArguments(Array<string> &args)
+bool Tsunami::handle_arguments(Array<string> &args)
 {
 	if (args.num < 2)
 		return false;
@@ -173,7 +173,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 			return true;
 		}
 		if (session == Session::GLOBAL)
-			session = createSession();
+			session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
 		session->executeTsunamiPlugin(args[i+1]);
@@ -185,7 +185,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 			return true;
 		}
 		if (session == Session::GLOBAL)
-			session = createSession();
+			session = create_session();
 		session->win->show();
 		session->signal_chain->load(args[i+1]);
 		i ++;
@@ -202,7 +202,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 		return true;
 	}else{
 		if (session == Session::GLOBAL)
-			session = createSession();
+			session = create_session();
 		session->win->show();
 		session->storage->load(session->song, args[i]);
 	}
@@ -210,7 +210,7 @@ bool Tsunami::handleArguments(Array<string> &args)
 	return false;
 }
 
-Session* Tsunami::createSession()
+Session* Tsunami::create_session()
 {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
@@ -229,11 +229,11 @@ Session* Tsunami::createSession()
 	return session;
 }
 
-void Tsunami::loadKeyCodes()
+void Tsunami::load_key_codes()
 {
 }
 
-bool Tsunami::allowTermination()
+bool Tsunami::allow_termination()
 {
 	for (auto *s: sessions)
 		if (!s->win->allowTermination())

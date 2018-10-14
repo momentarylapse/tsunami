@@ -195,11 +195,15 @@ void FormatMidi::loadSong(StorageOperationData *od)
 					if (type == 9){ // on
 						int c1 = f->read_byte() & 127;
 						int c2 = f->read_byte() & 127;
+						if (!events.contains(channel))
+							events.set(channel, {});
 						events[channel].add(MidiEvent(offset, c1, (float)c2 / 127.0f));
 						//msg_write(format("on %d  %d   %d %d", offset, c1, type, channel));
 					}else if (type == 8){ // off
 						int c1 = f->read_byte() & 127;
 						int c2 = f->read_byte() & 127;
+						if (!events.contains(channel))
+							events.set(channel, {});
 						events[channel].add(MidiEvent(offset, c1, 0));
 					}else if (type == 10){ // note after touch
 						f->read_byte();

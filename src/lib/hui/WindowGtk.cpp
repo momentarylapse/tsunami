@@ -149,7 +149,7 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 	desired_height = height;
 
 	// icon
-	string logo = Application::getProperty("logo");
+	string logo = Application::get_property("logo");
 	if (logo.num > 0)
 		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), nullptr);
 
@@ -293,7 +293,7 @@ void Window::run()
 		gtk_dialog_run(GTK_DIALOG(window));
 	}else{
 		while(!gotDestroyed()){
-			Application::doSingleMainLoop();
+			Application::do_single_main_loop();
 		}
 	}
 #endif

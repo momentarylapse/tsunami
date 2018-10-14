@@ -62,7 +62,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 
-	float OggQuality = hui::Config.getFloat("OggQuality", 0.5f);
+	float OggQuality = hui::Config.get_float("OggQuality", 0.5f);
 
 	FILE *f = fopen(od->filename.c_str(), "wb");
 	if (!f){

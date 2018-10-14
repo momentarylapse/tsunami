@@ -32,21 +32,21 @@ public:
 
 	static void _init(const Array<string> &arg, const string &program, bool load_res, const string &def_lang);
 
-	virtual bool onStartup(const Array<string> &arg) = 0;
-	virtual void onEnd(){}
+	virtual bool on_startup(const Array<string> &arg) = 0;
+	virtual void on_end(){}
 
 	void end();
 
 	static int run();
 	static void hard_end();
-	static void doSingleMainLoop();
+	static void do_single_main_loop();
 
 
 
 
-	static void _cdecl aboutBox(Window *win);
-	static void _cdecl setProperty(const string &name, const string &value);
-	static string getProperty(const string &name);
+	static void _cdecl about_box(Window *win);
+	static void _cdecl set_property(const string &name, const string &value);
+	static string get_property(const string &name);
 
 	static Map<string, string> _properties_;
 
@@ -68,7 +68,7 @@ int hui_main(const Array<string> &arg) \
 	APP_CLASS::_args = arg; \
 	APP_CLASS *app = new APP_CLASS; \
 	int r = 0; \
-	if (app->onStartup(arg)) \
+	if (app->on_startup(arg)) \
 		r = app->run(); \
 	delete(app); \
 	return r; \

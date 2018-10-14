@@ -240,9 +240,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dark.name = "dark";
 	basic_schemes.add(dark);
 
-	set_color_scheme(hui::Config.getStr("View.ColorScheme", "bright"));
+	set_color_scheme(hui::Config.get_str("View.ColorScheme", "bright"));
 
-	midi_view_mode = (MidiMode)hui::Config.getInt("View.MidiMode", (int)MidiMode::CLASSICAL);
+	midi_view_mode = (MidiMode)hui::Config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	cur_sample = nullptr;
 	cur_vlayer = nullptr;
@@ -269,14 +269,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	enabled = true;
 	scroll = new ScrollBar;
 
-	detail_steps = hui::Config.getInt("View.DetailSteps", 1);
-	msp.min_move_to_select = hui::Config.getInt("View.MouseMinMoveToSelect", 5);
-	preview_sleep_time = hui::Config.getInt("PreviewSleepTime", 10);
+	detail_steps = hui::Config.get_int("View.DetailSteps", 1);
+	msp.min_move_to_select = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
+	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
-	ZoomSpeed = hui::Config.getFloat("View.ZoomSpeed", 0.1f);
-	mouse_wheel_speed = hui::Config.getFloat("View.MouseWheelSpeed", 1.0f);
-	antialiasing = hui::Config.getBool("View.Antialiasing", false);
+	ZoomSpeed = hui::Config.get_float("View.ZoomSpeed", 0.1f);
+	mouse_wheel_speed = hui::Config.get_float("View.MouseWheelSpeed", 1.0f);
+	antialiasing = hui::Config.get_bool("View.Antialiasing", false);
 
 	images.speaker = LoadImage(tsunami->directory_static + "volume.tga");
 	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
@@ -371,20 +371,20 @@ AudioView::~AudioView()
 	delete(images.track_time);
 	delete(images.track_time_bg);
 
-	hui::Config.setInt("View.DetailSteps", detail_steps);
-	hui::Config.setInt("View.MouseMinMoveToSelect", msp.min_move_to_select);
-	hui::Config.setInt("View.ScrollSpeed", ScrollSpeed);
-	hui::Config.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
-	hui::Config.setFloat("View.ZoomSpeed", ZoomSpeed);
-	hui::Config.setBool("View.Antialiasing", antialiasing);
-	hui::Config.setInt("View.MidiMode", (int)midi_view_mode);
+	hui::Config.set_int("View.DetailSteps", detail_steps);
+	hui::Config.set_int("View.MouseMinMoveToSelect", msp.min_move_to_select);
+	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
+	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
+	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
+	hui::Config.set_bool("View.Antialiasing", antialiasing);
+	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioView::set_color_scheme(const string &name)
 {
-	hui::Config.setStr("View.ColorScheme", name);
+	hui::Config.set_str("View.ColorScheme", name);
 	basic_colors = basic_schemes[0];
 	for (ColorSchemeBasic &b: basic_schemes)
 		if (b.name == name)

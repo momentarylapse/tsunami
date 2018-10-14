@@ -22,7 +22,7 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 
 	dlg = nullptr;
 
-	if (!hui::Config.getBool("CpuDisplay", false))
+	if (!hui::Config.get_bool("CpuDisplay", false))
 		panel->hideControl(id, true);
 
 	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));

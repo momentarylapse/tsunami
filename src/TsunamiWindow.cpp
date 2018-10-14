@@ -71,9 +71,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	song = session->song;
 	app = tsunami;
 
-	int width = hui::Config.getInt("Window.Width", 800);
-	int height = hui::Config.getInt("Window.Height", 600);
-	bool maximized = hui::Config.getBool("Window.Maximized", true);
+	int width = hui::Config.get_int("Window.Width", 800);
+	int height = hui::Config.get_int("Window.Height", 600);
+	bool maximized = hui::Config.get_bool("Window.Maximized", true);
 
 	event("new", std::bind(&TsunamiWindow::onNew, this));
 	setKeyCode("new", hui::KEY_N + hui::KEY_CONTROL, "hui:new");
@@ -272,9 +272,9 @@ void TsunamiWindow::onDestroy()
 {
 	int w, h;
 	getSizeDesired(w, h);
-	hui::Config.setInt("Window.Width", w);
-	hui::Config.setInt("Window.Height", h);
-	hui::Config.setBool("Window.Maximized", isMaximized());
+	hui::Config.set_int("Window.Width", w);
+	hui::Config.set_int("Window.Height", h);
+	hui::Config.set_bool("Window.Maximized", isMaximized());
 
 	view->unsubscribe(this);
 	song->action_manager->unsubscribe(this);
@@ -337,7 +337,7 @@ void TsunamiWindow::onImportBackup()
 		//BackupManager::set_save_state(session);
 		session->storage_options = "";
 	}else{
-		Session *s = tsunami->createSession();
+		Session *s = tsunami->create_session();
 		s->storage_options = "f32:2:44100";
 		s->win->show();
 		s->storage->load(s->song, filename);
@@ -953,7 +953,7 @@ void TsunamiWindow::onOpen()
 			session->storage->load(song, hui::Filename);
 			BackupManager::set_save_state(session);
 		}else{
-			Session *s = tsunami->createSession();
+			Session *s = tsunami->create_session();
 			s->win->show();
 			s->storage->load(s->song, hui::Filename);
 		}

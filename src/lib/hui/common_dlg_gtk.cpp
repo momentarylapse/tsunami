@@ -185,13 +185,13 @@ void ErrorBox(Window *win,const string &title,const string &text)
 void AboutBox(Window *win)
 {
 	// load license
-	if (Application::getProperty("license") == "")
+	if (Application::get_property("license") == "")
 		if (file_test_existence(Application::directory_static + "license_small.txt"))
-			Application::setProperty("license", FileRead(Application::directory_static + "license_small.txt"));
+			Application::set_property("license", FileRead(Application::directory_static + "license_small.txt"));
 
 	// author list
 	Array<char*> _a_;
-	Array<string> authors = Application::getProperty("author").explode(";");
+	Array<string> authors = Application::get_property("author").explode(";");
 	for (string &author : authors){
 		char *p = new char[author.num + 1];
 		strcpy(p, author.c_str());
@@ -200,16 +200,16 @@ void AboutBox(Window *win)
 	_a_.add(nullptr);
 
 	GError *error = nullptr;
-	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(Application::getProperty("logo").c_str(), &error);
+	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(Application::get_property("logo").c_str(), &error);
 	gtk_show_about_dialog(get_window_save(win),
-		"program-name", Application::getProperty("name").c_str(),
-		"website", Application::getProperty("website").c_str(),
-		"version", Application::getProperty("version").c_str(),
-		"license", Application::getProperty("license").c_str(),
-		"comments", sys_str(Application::getProperty("comment").c_str()),
+		"program-name", Application::get_property("name").c_str(),
+		"website", Application::get_property("website").c_str(),
+		"version", Application::get_property("version").c_str(),
+		"license", Application::get_property("license").c_str(),
+		"comments", sys_str(Application::get_property("comment").c_str()),
 		"authors", _a_.data,
 		"logo", _logo,
-		"copyright", Application::getProperty("copyright").c_str(),
+		"copyright", Application::get_property("copyright").c_str(),
 		nullptr);
 
 	for (char *aa : _a_)

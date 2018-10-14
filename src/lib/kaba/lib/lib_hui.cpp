@@ -484,28 +484,28 @@ void SIAddPackageHui()
 
 
 	add_class(TypeHuiConfiguration);
-		class_add_func("set_int",								TypeVoid,	mf(&hui::Configuration::setInt));
+		class_add_func("set_int",								TypeVoid,	mf(&hui::Configuration::set_int));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeInt);
-		class_add_func("set_float",								TypeVoid,	mf(&hui::Configuration::setFloat));
+		class_add_func("set_float",								TypeVoid,	mf(&hui::Configuration::set_float));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeFloat32);
-		class_add_func("set_bool",								TypeVoid,	mf(&hui::Configuration::setBool));
+		class_add_func("set_bool",								TypeVoid,	mf(&hui::Configuration::set_bool));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeBool);
-		class_add_func("set_str",								TypeVoid,	mf(&hui::Configuration::setStr));
+		class_add_func("set_str",								TypeVoid,	mf(&hui::Configuration::set_str));
 			func_add_param("name",		TypeString);
 			func_add_param("value",		TypeString);
-		class_add_func("get_int",								TypeInt,	mf(&hui::Configuration::getInt));
+		class_add_func("get_int",								TypeInt,	mf(&hui::Configuration::get_int));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeInt);
-		class_add_func("get_float",								TypeFloat32,	mf(&hui::Configuration::getFloat));
+		class_add_func("get_float",								TypeFloat32,	mf(&hui::Configuration::get_float));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeFloat32);
-		class_add_func("get_bool",								TypeBool,	mf(&hui::Configuration::getBool));
+		class_add_func("get_bool",								TypeBool,	mf(&hui::Configuration::get_bool));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeBool);
-		class_add_func("get_str",								TypeString,	mf(&hui::Configuration::getStr));
+		class_add_func("get_str",								TypeString,	mf(&hui::Configuration::get_str));
 			func_add_param("name",		TypeString);
 			func_add_param("default",	TypeString);
 	

@@ -98,7 +98,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		LoadResource(directory_static + "hui_resources.txt");
 
 	if (def_lang.num > 0)
-		SetLanguage(Config.getStr("Language", def_lang));
+		SetLanguage(Config.get_str("Language", def_lang));
 
 	// at this point:
 	//   HuiAppDirectory -> dir to run binary in (binary dir or ~/.my_app/)
@@ -109,9 +109,9 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 
 	if (file_test_existence(directory_static + "icon.svg"))
-		setProperty("logo", directory_static + "icon.svg");
+		set_property("logo", directory_static + "icon.svg");
 	else if (file_test_existence(directory_static + "icon.ico"))
-		setProperty("logo", directory_static + "icon.ico");
+		set_property("logo", directory_static + "icon.ico");
 }
 
 Application::~Application()
@@ -167,7 +167,7 @@ void Application::end()
 {
 	SetIdleFunction(nullptr);
 
-	onEnd();
+	on_end();
 
 	hard_end();
 }
@@ -206,7 +206,7 @@ void Application::hard_end()
 	if (msg_inited)
 		msg_end();
 }
-void Application::doSingleMainLoop()
+void Application::do_single_main_loop()
 {
 #ifdef HUI_API_WIN
 	MSG messages;
@@ -253,17 +253,21 @@ void Application::doSingleMainLoop()
 }
 
 
-void Application::setProperty(const string &name, const string &value)
+void Application::set_property(const string &name, const string &value)
 {
-	_properties_[name] = value;
+	_properties_.set(name, value);
 }
 
-string Application::getProperty(const string &name)
+string Application::get_property(const string &name)
 {
-	return _properties_[name];
+	try{
+		return _properties_[name];
+	}catch(...){
+		return "";
+	}
 }
 
-void Application::aboutBox(Window *win)
+void Application::about_box(Window *win)
 {
 	AboutBox(win);
 }

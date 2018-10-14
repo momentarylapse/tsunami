@@ -83,7 +83,7 @@ public:
 		string sender = getString("sender");
 		string comment = getString("comment");
 		string return_msg;
-		if (NetSendBugReport(sender, Application::getProperty("name"), Application::getProperty("version"), comment, return_msg))
+		if (NetSendBugReport(sender, Application::get_property("name"), Application::get_property("version"), comment, return_msg))
 			InfoBox(nullptr, "ok", return_msg);
 		else
 			ErrorBox(nullptr, "error", return_msg);
@@ -108,7 +108,7 @@ public:
 	{
 		addGrid("", 0, 0, "root");
 		setTarget("root");
-		addLabel(Application::getProperty("name") + " " + Application::getProperty("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
+		addLabel(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
 		addListView(_("Messages"), 0, 1, "message_list");
 		addGrid("!buttonbar", 0, 2, "buttonbar");
 		setTarget("buttonbar");

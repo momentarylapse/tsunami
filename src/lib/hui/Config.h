@@ -24,14 +24,14 @@ public:
 	void _cdecl __init_ext__(const string &filename);
 	void _cdecl __del__();
 
-	void _cdecl setInt(const string &name, int val);
-	void _cdecl setFloat(const string &name, float val);
-	void _cdecl setBool(const string &name, bool val);
-	void _cdecl setStr(const string &name, const string &str);
-	int _cdecl getInt(const string &name, int default_val = 0);
-	float _cdecl getFloat(const string &name, float default_val = 0);
-	bool _cdecl getBool(const string &name, bool default_val = false);
-	string _cdecl getStr(const string &name, const string &default_str);
+	void _cdecl set_int(const string &name, int val);
+	void _cdecl set_float(const string &name, float val);
+	void _cdecl set_bool(const string &name, bool val);
+	void _cdecl set_str(const string &name, const string &str);
+	int _cdecl get_int(const string &name, int default_val = 0);
+	float _cdecl get_float(const string &name, float default_val = 0);
+	bool _cdecl get_bool(const string &name, bool default_val = false);
+	string _cdecl get_str(const string &name, const string &default_str);
 	void _cdecl load();
 	void _cdecl save();
 

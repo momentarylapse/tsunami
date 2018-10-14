@@ -55,49 +55,51 @@ void Configuration::__del__()
 	this->~Configuration();
 }
 
-void Configuration::setInt(const string& name, int val)
+void Configuration::set_int(const string& name, int val)
 {
-	setStr(name, i2s(val));
+	set_str(name, i2s(val));
 }
 
-void Configuration::setFloat(const string& name, float val)
+void Configuration::set_float(const string& name, float val)
 {
-	setStr(name, f2s(val, 6));
+	set_str(name, f2s(val, 6));
 }
 
-void Configuration::setBool(const string& name, bool val)
+void Configuration::set_bool(const string& name, bool val)
 {
-	setStr(name, b2s(val));
+	set_str(name, b2s(val));
 }
 
-void Configuration::setStr(const string& name, const string& str)
+void Configuration::set_str(const string& name, const string& str)
 {
-	map[name] = str;
+	map.set(name, str);
 	changed = true;
 }
 
-int Configuration::getInt(const string& name, int default_val)
+int Configuration::get_int(const string& name, int default_val)
 {
-	return s2i(getStr(name, i2s(default_val)));
+	return s2i(get_str(name, i2s(default_val)));
 }
 
-float Configuration::getFloat(const string& name, float default_val)
+float Configuration::get_float(const string& name, float default_val)
 {
-	return s2f(getStr(name, f2s(default_val, 6)));
+	return s2f(get_str(name, f2s(default_val, 6)));
 }
 
-bool Configuration::getBool(const string& name, bool default_val)
+bool Configuration::get_bool(const string& name, bool default_val)
 {
-	return (getStr(name, b2s(default_val)) == "true");
+	return (get_str(name, b2s(default_val)) == "true");
 }
 
-string Configuration::getStr(const string& name, const string& default_str)
+string Configuration::get_str(const string& name, const string& default_str)
 {
 	if (!loaded)
 		load();
-	if (map.contains(name))
+	try{
 		return map[name];
-	return default_str;
+	}catch(...){
+		return default_str;
+	}
 }
 
 void Configuration::load()
@@ -111,7 +113,7 @@ void Configuration::load()
 			string temp = f->read_str();
 			string key = temp.substr(3, temp.num - 3);
 			string value = f->read_str();
-			map[key] = value;
+			map.set(key, value);
 		}
 		FileClose(f);
 		loaded = true;

@@ -70,7 +70,7 @@ PluginManager::~PluginManager()
 
 bool GlobalAllowTermination()
 {
-	return tsunami->allowTermination();
+	return tsunami->allow_termination();
 }
 
 

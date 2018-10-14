@@ -33,7 +33,7 @@ void UnitTest::sleep(float t)
 {
 	hui::Timer timer;
 	while (timer.peek() < t){
-		hui::Application::doSingleMainLoop();
+		hui::Application::do_single_main_loop();
 		usleep(1000);
 	}
 }

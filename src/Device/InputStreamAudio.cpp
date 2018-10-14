@@ -444,7 +444,7 @@ float InputStreamAudio::get_playback_delay_const()
 void InputStreamAudio::set_playback_delay_const(float f)
 {
 	playback_delay_const = f;
-	hui::Config.setFloat("Input.PlaybackDelay", playback_delay_const);
+	hui::Config.set_float("Input.PlaybackDelay", playback_delay_const);
 }
 
 int InputStreamAudio::do_capturing()

@@ -79,18 +79,18 @@ void SettingsDialog::loadData()
 	}
 
 	// ogg quality
-	float CurOggQuality = hui::Config.getFloat("OggQuality", 0.5f);
+	float CurOggQuality = hui::Config.get_float("OggQuality", 0.5f);
 	foreachi(OggQuality &q, ogg_quality, i)
 		if (CurOggQuality > q.quality - 0.05f)
 			setInt("ogg_bitrate", i);
 	setDecimals(1);
 
-	setString("default_artist", hui::Config.getStr("DefaultArtist", ""));
+	setString("default_artist", hui::Config.get_str("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
-	check("cpu_meter", hui::Config.getBool("CpuDisplay", false));
-	setFloat("scroll_speed", hui::Config.getFloat("View.MouseWheelSpeed", 1.0f));
+	check("cpu_meter", hui::Config.get_bool("CpuDisplay", false));
+	setFloat("scroll_speed", hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
 	//enable("scroll_speed", false);
 
 	int n_audio = 0, n_midi = 0;
@@ -122,7 +122,7 @@ void SettingsDialog::onLanguage()
 	Array<string> lang = hui::GetLanguages();
 	int l = getInt("");
 	hui::SetLanguage(lang[l]);
-	hui::Config.setStr("Language", lang[l]);
+	hui::Config.set_str("Language", lang[l]);
 }
 
 void SettingsDialog::onColorScheme()
@@ -134,18 +134,18 @@ void SettingsDialog::onColorScheme()
 
 void SettingsDialog::onOggBitrate()
 {
-	hui::Config.setFloat("OggQuality", ogg_quality[getInt("")].quality);
+	hui::Config.set_float("OggQuality", ogg_quality[getInt("")].quality);
 }
 
 void SettingsDialog::onDefaultArtist()
 {
-	hui::Config.setStr("DefaultArtist", getString(""));
+	hui::Config.set_str("DefaultArtist", getString(""));
 }
 
 void SettingsDialog::onScrollSpeed()
 {
 	view->mouse_wheel_speed = getFloat("");
-	hui::Config.setFloat("View.MouseWheelSpeed", getFloat(""));
+	hui::Config.set_float("View.MouseWheelSpeed", getFloat(""));
 }
 
 void SettingsDialog::onAudioApi()
@@ -158,7 +158,7 @@ void SettingsDialog::onAudioApi()
 			continue;
 		if (a.mode & 1){
 			if (n_audio == n)
-				hui::Config.setStr("AudioApi", a.name);
+				hui::Config.set_str("AudioApi", a.name);
 			n_audio ++;
 		}
 	}
@@ -174,7 +174,7 @@ void SettingsDialog::onMidiApi()
 			continue;
 		if (a.mode & 2){
 			if (n_midi == n)
-				hui::Config.setStr("MidiApi", a.name);
+				hui::Config.set_str("MidiApi", a.name);
 			n_midi ++;
 		}
 	}
@@ -183,6 +183,6 @@ void SettingsDialog::onMidiApi()
 void SettingsDialog::onCpuMeter()
 {
 	bool show = isChecked("");
-	hui::Config.setBool("CpuDisplay", show);
+	hui::Config.set_bool("CpuDisplay", show);
 	view->win->mini_bar->cpu_display->panel->hideControl(view->win->mini_bar->cpu_display->id, !show);
 }

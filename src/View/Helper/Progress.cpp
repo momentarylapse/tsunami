@@ -69,7 +69,7 @@ void Progress::set(const string &str, float progress)
 		}
 		//dlg->setString("progress_bar", str);
 		dlg->setFloat("progress_bar", progress);
-		hui::Application::doSingleMainLoop();
+		hui::Application::do_single_main_loop();
 		allow_next = t + PROGRESS_DT;
 	}
 }
@@ -112,7 +112,7 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 		dlg->show();
 		dlg->event("hui:close", std::bind(&Progress::cancel, this));
 		dlg->event("cancel", std::bind(&Progress::cancel, this));
-		hui::Application::doSingleMainLoop();
+		hui::Application::do_single_main_loop();
 	}
 }
 

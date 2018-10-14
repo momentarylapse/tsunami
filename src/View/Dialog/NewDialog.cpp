@@ -42,7 +42,7 @@ void NewDialog::onOk()
 		type = SignalType::MIDI;
 	else if (isChecked("new_track_type:audio-stereo"))
 		type = SignalType::AUDIO_STEREO;
-	Session *session = tsunami->createSession();
+	Session *session = tsunami->create_session();
 	Song *song = session->song;
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
@@ -56,7 +56,7 @@ void NewDialog::onOk()
 
 	song->addTag("title", _("New Audio File"));
 	song->addTag("album", AppName);
-	song->addTag("artist", hui::Config.getStr("DefaultArtist", AppName));
+	song->addTag("artist", hui::Config.get_str("DefaultArtist", AppName));
 
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);

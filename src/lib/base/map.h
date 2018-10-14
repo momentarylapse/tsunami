@@ -16,22 +16,32 @@ struct MapEntry
 	{	return key > e.key;	}
 };
 
+class MapKeyError : public Exception
+{
+public:
+	MapKeyError(): Exception("key not found"){}
+};
+
 template<class T1, class T2>
 class Map : public Set<MapEntry<T1, T2> >
 {
-	T2 dummy;
 public:
 	typedef MapEntry<T1, T2> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int _cdecl add(const T1 &key, const T2 &value)
+	void _cdecl set(const T1 &key, const T2 &value)
 	{
-		MapEntry<T1, T2> e = {key, value};
-		return Set<MapEntry<T1, T2> >::add(e);
+		int n = find(key);
+		if (n >= 0){
+			((Entry*)data)[n].value = value;
+		}else{
+			MapEntry<T1, T2> e = {key, value};
+			Set<MapEntry<T1, T2> >::add(e);
+		}
 	}
 	int _cdecl find(const T1 &key) const
 	{
-		Entry e = {key, dummy};
+		Entry e = {key, T2()};
 		return Set<Entry>::find(e);
 	}
 	bool _cdecl contains(const T1 &key) const
@@ -44,7 +54,8 @@ public:
 		int n = find(key);
 		if (n >= 0)
 			return ((Entry*)data)[n].value;
-		return dummy;
+		throw MapKeyError();
+		//return T2();
 	}
 	T2 &operator[] (const T1 &key)
 	{
@@ -52,8 +63,8 @@ public:
 		if (n >= 0)
 			return ((Entry*)data)[n].value;
 
-		n = add(key, dummy);
-		return ((Entry*)data)[n].value;
+		throw MapKeyError();
+		//return T2();
 	}
 	Array<T1> keys() const
 	{
@@ -79,7 +90,6 @@ struct HashMapEntry
 template<class T1, class T2>
 class HashMap : public Set<HashMapEntry<T1, T2> >
 {
-	T2 dummy;
 public:
 	typedef HashMapEntry<T1, T2> Entry;
 	using DynamicArray::num;
@@ -96,7 +106,8 @@ public:
 		for (int i=0;i<num;i++)
 			if (((Entry*)data)[i].hash == hash)
 				return ((Entry*)data)[i].value;
-		return dummy;
+		throw MapKeyError();
+		//return T2();
 	}
 	T2 &operator[] (const T1 &key)
 	{
@@ -111,8 +122,8 @@ public:
 		for (int i=0;i<num;i++)
 			if (((Entry*)data)[i].hash == hash)
 				return ((Entry*)data)[i].value;
-		int n = add(key, dummy);
-		return ((Entry*)data)[n].value;
+		throw MapKeyError();
+		//return T2();
 	}
 };
 

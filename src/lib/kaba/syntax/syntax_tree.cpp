@@ -31,7 +31,7 @@ void Value::init(Class *_type)
 	clear();
 	type = _type;
 
-	if (type->is_super_array){
+	if (type->is_super_array()){
 		value.resize(sizeof(DynamicArray));
 		as_array().init(type->parent->size);
 	}else{
@@ -41,7 +41,7 @@ void Value::init(Class *_type)
 
 void Value::clear()
 {
-	if (type->is_super_array)
+	if (type->is_super_array())
 		as_array().clear();
 
 	value.clear();
@@ -51,7 +51,7 @@ void Value::clear()
 void Value::set(const Value &v)
 {
 	init(v.type);
-	if (type->is_super_array){
+	if (type->is_super_array()){
 		as_array().resize(v.as_array().num);
 		memcpy(as_array().data, v.as_array().data, as_array().num * type->parent->size);
 
@@ -103,7 +103,7 @@ DynamicArray& Value::as_array() const
 
 int Value::mapping_size() const
 {
-	if (type->is_super_array)
+	if (type->is_super_array())
 		return config.super_array_size + (as_array().num * type->parent->size);
 	if (type == TypeCString)
 		return strlen((char*)p()) + 1;
@@ -114,7 +114,7 @@ int Value::mapping_size() const
 
 void Value::map_into(char *memory, char *addr) const
 {
-	if (type->is_super_array){
+	if (type->is_super_array()){
 		// const string -> variable length
 		int size = as_array().element_size * as_array().num;
 		int data_offset = config.super_array_size;
@@ -835,7 +835,7 @@ Class *SyntaxTree::FindType(const string &name)
 	return nullptr;
 }
 
-Class *SyntaxTree::CreateNewClass(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub)
+Class *SyntaxTree::CreateNewClass(const string &name, Class::Type type, int size, int array_size, Class *sub)
 {
 	// check if it already exists
 	for (Class *t: classes)
@@ -848,38 +848,39 @@ Class *SyntaxTree::CreateNewClass(const string &name, int size, bool is_pointer,
 
 	// add new class
 	Class *t = new Class(name, size, this);
-	t->is_array = is_array and (array_size >= 0);
-	t->is_super_array = is_array and (array_size < 0);
+	t->type = type;
 	t->array_length = max(array_size, 0);
-	t->is_pointer = is_pointer;
-	t->is_silent = is_silent;
 	t->name = name;
 	t->size = size;
 	t->parent = sub;
 	classes.add(t);
-	if (t->is_super_array){
+	if (t->is_super_array() or t->is_dict()){
 		Class *parent = t->parent;
 		t->derive_from(TypeDynamicArray, false);
 		t->parent = parent;
 		AddFunctionHeadersForClass(t);
-	}else if (t->is_array){
+	}else if (t->is_array()){
 		AddFunctionHeadersForClass(t);
 	}
 	return t;
 }
 
-Class *SyntaxTree::CreateArrayClass(Class *element_type, int num_elements, const string &_name_pre, const string &suffix)
+Class *SyntaxTree::CreateArrayClass(Class *element_type, int num_elements)
 {
-	string name_pre = _name_pre;
-	if (name_pre.num == 0)
-		name_pre = element_type->name;
+	string name_pre = element_type->name;
 	if (num_elements < 0){
-		return CreateNewClass(name_pre + "[]" +  suffix,
-			config.super_array_size, false, false, true, num_elements, element_type);
+		return CreateNewClass(name_pre + "[]",
+				Class::Type::SUPER_ARRAY, config.super_array_size, num_elements, element_type);
 	}else{
-		return CreateNewClass(name_pre + format("[%d]", num_elements) + suffix,
-			element_type->size * num_elements, false, false, true, num_elements, element_type);
+		return CreateNewClass(name_pre + format("[%d]", num_elements),
+				Class::Type::ARRAY, element_type->size * num_elements, num_elements, element_type);
 	}
+}
+
+Class *SyntaxTree::CreateDictClass(Class *element_type)
+{
+	return CreateNewClass(element_type->name + "{}",
+			Class::Type::DICT, config.super_array_size, 0, element_type);
 }
 
 void SyntaxTree::ConvertInline()
@@ -948,7 +949,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 
 	if ((c->kind == KIND_STATEMENT) and (c->link_no == STATEMENT_RETURN))
 		if (c->params.num > 0){
-			if ((c->params[0]->type->is_array) /*or (c->Param[j]->Type->IsSuperArray)*/){
+			if ((c->params[0]->type->is_array()) /*or (c->Param[j]->Type->IsSuperArray)*/){
 				c->set_param(0, ps->ref_node(c->params[0]));
 			}
 			return c;
@@ -963,7 +964,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 			}
 
 		// return: array reference (-> dereference)
-		if ((c->type->is_array) /*or (c->Type->IsSuperArray)*/){
+		if ((c->type->is_array()) /*or (c->Type->IsSuperArray)*/){
 			c->type = c->type->get_pointer();
 			return ps->deref_node(c);
 			//deref_command_old(this, c);
@@ -974,7 +975,7 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 	if (c->kind == KIND_OPERATOR){
 		// parameters: super array as reference
 		for (int j=0;j<c->params.num;j++)
-			if ((c->params[j]->type->is_array) or (c->params[j]->type->is_super_array)){
+			if ((c->params[j]->type->is_array()) or (c->params[j]->type->is_super_array())){
 				c->set_param(j, ps->ref_node(c->params[j]));
 			}
   	}

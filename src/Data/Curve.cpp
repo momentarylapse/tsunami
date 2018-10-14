@@ -85,11 +85,11 @@ void Curve::Target::enumerateType(char *pp, Kaba::Class *t, Array<Target> &list,
 {
 	if (t->name == "float"){
 		list.add(Target((float*)pp, prefix, prefix_nice));
-	}else if (t->is_array){
+	}else if (t->is_array()){
 		for (int i=0; i<t->array_length; i++){
 			enumerateType(pp + t->parent->size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
 		}
-	}else if (t->is_super_array){
+	}else if (t->is_super_array()){
 		DynamicArray *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++){
 			enumerateType(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));

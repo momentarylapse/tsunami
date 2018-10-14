@@ -129,6 +129,7 @@ Class *TypeBoolList;
 Class *TypeIntPs;
 Class *TypeIntList;
 Class *TypeIntArray;
+Class *TypeIntDict;
 Class *TypeFloatP;
 Class *TypeFloatPs;
 Class *TypeFloatList;
@@ -137,6 +138,7 @@ Class *TypeFloatArrayP;
 Class *TypeComplex;
 Class *TypeComplexList;
 Class *TypeStringList;
+Class *TypeStringDict;
 Class *TypeVectorArray;
 Class *TypeVectorArrayP;
 Class *TypeVectorList;
@@ -189,9 +191,9 @@ Class *add_type(const string &name, int size, ScriptFlag flag)
 Class *add_type_p(const string &name, Class *sub_type, ScriptFlag flag)
 {
 	Class *t = new Class(name, config.pointer_size, cur_package_script->syntax);
-	t->is_pointer = true;
+	t->type = t->Type::POINTER;
 	if ((flag & FLAG_SILENT) > 0)
-		t->is_silent = true;
+		t->type = t->Type::POINTER_SILENT;
 	t->parent = sub_type;
 	cur_package_script->syntax->classes.add(t);
 	return t;
@@ -202,14 +204,23 @@ Class *add_type_a(const string &name, Class *sub_type, int array_length)
 	if (array_length < 0){
 		// super array
 		t->size = config.super_array_size;
-		t->is_super_array = true;
+		t->type = t->Type::SUPER_ARRAY;
 		script_make_super_array(t);
 	}else{
 		// standard array
 		t->size = sub_type->size * array_length;
-		t->is_array = true;
+		t->type = t->Type::ARRAY;
 		t->array_length = array_length;
 	}
+	cur_package_script->syntax->classes.add(t);
+	return t;
+}
+
+Class *add_type_d(const string &name, Class *sub_type)
+{
+	Class *t = new Class(name, config.super_array_size, cur_package_script->syntax, sub_type);
+	t->type = t->Type::DICT;
+	script_make_dict(t);
 	cur_package_script->syntax->classes.add(t);
 	return t;
 }
@@ -343,7 +354,7 @@ void class_add_func(const string &name, Class *return_type, void *func, ScriptFl
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
 		for (Class *t: cur_package_script->syntax->classes)
-			if (t->is_pointer and (t->parent == cur_class))
+			if (t->is_pointer() and (t->parent == cur_class))
 				tname = t->name;
 	}
 	int cmd = add_func(tname + "." + name, return_type, func, ScriptFlag(flag | FLAG_CLASS));
@@ -401,7 +412,7 @@ void class_add_func_virtual(const string &name, Class *return_type, void *func, 
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
 		for (Class *t: cur_package_script->syntax->classes)
-			if ((t->is_pointer) and (t->parent == cur_class))
+			if ((t->is_pointer()) and (t->parent == cur_class))
 				tname = t->name;
 	}
 	int index = get_virtual_index(func, tname, name);
@@ -424,7 +435,7 @@ void add_const(const string &name, Class *type, void *value)
 	c->name = name;
 
 	// config.PointerSize might be smaller than needed for the following assignment
-	if ((type == TypeInt) or (type == TypeFloat32) or (type == TypeChar)  or (type == TypeBool) or (type->is_pointer))
+	if ((type == TypeInt) or (type == TypeFloat32) or (type == TypeChar)  or (type == TypeBool) or (type->is_pointer()))
 		*(void**)c->p() = value;
 	else
 		memcpy(c->p(), value, type->size);
@@ -521,7 +532,7 @@ void _ultra_sort_p(DynamicArray &array, int offset_by)
 
 void _cdecl ultra_sort(DynamicArray &array, Class *type, const string &by)
 {
-	if (!type->is_super_array)
+	if (!type->is_super_array())
 		kaba_raise_exception(new KabaException("type '" + type->name + "' is not an array"));
 	Class *el = type->parent;
 	if (array.element_size != el->size)
@@ -529,7 +540,7 @@ void _cdecl ultra_sort(DynamicArray &array, Class *type, const string &by)
 
 	Class *rel = el;
 
-	if (el->is_pointer){
+	if (el->is_pointer()){
 		rel = el->parent;
 	}
 
@@ -542,7 +553,7 @@ void _cdecl ultra_sort(DynamicArray &array, Class *type, const string &by)
 	int offset = ell->offset;
 
 
-	if (el->is_pointer){
+	if (el->is_pointer()){
 		if (ell->type == TypeString)
 			_ultra_sort_p<string>(array, offset);
 		else if (ell->type == TypeInt)
@@ -634,7 +645,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 		// FIXME  wrong for complicated classes
 		if (t->parent->is_simple_class()){
 			if (!t->parent->uses_call_by_reference()){
-				if (t->parent->is_pointer){
+				if (t->parent->is_pointer()){
 					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<void*>::__init__));
 					class_add_func("add", TypeVoid, mf(&Array<void*>::add));
 						func_add_param("x",		t->parent);
@@ -687,6 +698,43 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 			class_add_func("resize", TypeVoid, mf(&DynamicArray::resize));
 				func_add_param("num",		TypeInt);
 		}
+}
+
+class IntDict : public Map<string,int>
+{
+public:
+	void add_int(const string &k, int v)
+	{ add(k, v); }
+	string str()
+	{
+		string s;
+		for (string &k: keys()){
+			if (s != "")
+				s += ", ";
+			s += "\"" + k + "\": " + i2s((*this)[k]);
+		}
+		return "{" + s + "}";
+	}
+};
+
+void script_make_dict(Class *t, SyntaxTree *ps)
+{
+	Class *parent = t->parent;
+	t->derive_from(TypeDynamicArray, false);
+	t->parent = parent;
+	add_class(t);
+
+	if (t->parent == TypeInt){
+		class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Map<string,int>::__init__));
+		class_add_func("add", TypeVoid, mf(&IntDict::add_int));
+			func_add_param("key",		TypeString);
+			func_add_param("x",		t->parent);
+		class_add_func(IDENTIFIER_FUNC_DELETE,	TypeVoid, mf(&Map<string,int>::clear));
+		class_add_func("clear", TypeVoid, mf(&Map<string,int>::clear));
+		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&Map<string,int>::assign));
+			func_add_param("other",		t);
+		class_add_func("str", TypeString, mf(&IntDict::str));
+	}
 }
 
 
@@ -950,6 +998,9 @@ void SIAddPackageBase()
 	TypeCString     = add_type_a("cstring",   TypeChar, 256);	// cstring := char[256]
 	TypeString      = add_type_a("string",    TypeChar, -1);	// string := char[]
 	TypeStringList  = add_type_a("string[]",  TypeString, -1);
+
+	TypeIntDict     = add_type_d("int{}",     TypeInt);
+	TypeStringDict  = add_type_d("string{}",  TypeString);
 
 
 	//	add_func_special("f2i",			TypeInt,	(void*)&_Float2Int);

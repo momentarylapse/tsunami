@@ -129,7 +129,7 @@ Node *SyntaxTree::GetOperandExtensionElement(Node *operand, Block *block)
 
 	// pointer -> dereference
 	bool deref = false;
-	if (type->is_pointer){
+	if (type->is_pointer()){
 		type = type->parent;
 		deref = true;
 	}
@@ -219,11 +219,11 @@ Node *SyntaxTree::GetOperandExtensionArray(Node *Operand, Block *block)
 	}
 
 	// allowed?
-	bool allowed = ((Operand->type->is_array) or (Operand->type->usable_as_super_array()));
+	bool allowed = ((Operand->type->is_array()) or (Operand->type->usable_as_super_array()));
 	bool pparray = false;
 	if (!allowed)
-		if (Operand->type->is_pointer){
-			if ((!Operand->type->parent->is_array) and (!Operand->type->parent->usable_as_super_array()))
+		if (Operand->type->is_pointer()){
+			if ((!Operand->type->parent->is_array()) and (!Operand->type->parent->usable_as_super_array()))
 				DoError(format("using pointer type \"%s\" as an array (like in C) is not allowed any more", Operand->type->name.c_str()));
 			allowed = true;
 			pparray = (Operand->type->parent->usable_as_super_array());
@@ -244,7 +244,7 @@ Node *SyntaxTree::GetOperandExtensionArray(Node *Operand, Block *block)
 	}else if (Operand->type->usable_as_super_array()){
 		array = add_node_parray(shift_node(Operand, false, 0, Operand->type->get_pointer()),
 		                           index, Operand->type->get_array_element());
-	}else if (Operand->type->is_pointer){
+	}else if (Operand->type->is_pointer()){
 		array = add_node_parray(Operand, index, Operand->type->parent->parent);
 	}else{
 		array = AddNode(KIND_ARRAY, 0, Operand->type->parent);
@@ -417,12 +417,12 @@ Node *SyntaxTree::CheckParamLink(Node *link, Class *wanted, const string &f_name
 	if (type_match(given, wanted))
 		return link;
 
-	if (wanted->is_pointer and wanted->is_silent){
+	if (wanted->is_pointer_silent()){
 		// "silent" pointer (&)?
 		if (type_match(given, wanted->parent)){
 
 			return ref_node(link);
-		}else if ((given->is_pointer) and (type_match(given->parent, wanted->parent))){
+		}else if ((given->is_pointer()) and (type_match(given->parent, wanted->parent))){
 			// silent reference & of *
 
 			return link;
@@ -453,7 +453,7 @@ Class *get_func_type(SyntaxTree *syntax, Function *f)
 			params += ",";
 		params += f->literal_param_type[i]->name;
 	}
-	return syntax->CreateNewClass("func(" + params + ")->" + f->return_type->name, config.pointer_size, true, false, false, 0, TypeVoid);
+	return syntax->CreateNewClass("func(" + params + ")->" + f->return_type->name, Class::Type::POINTER, config.pointer_size, 0, TypeVoid);
 
 	return TypePointer;
 }
@@ -627,7 +627,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 	}else if (Exp.cur == "*"){ // * -> dereference
 		Exp.next();
 		operand = GetOperand(block);
-		if (!operand->type->is_pointer){
+		if (!operand->type->is_pointer()){
 			Exp.rewind();
 			DoError("only pointers can be dereferenced using \"*\"");
 		}
@@ -664,7 +664,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 		Exp.next();
 		operand = add_node_statement(STATEMENT_DELETE);
 		operand->set_param(0, GetOperand(block));
-		if (!operand->params[0]->type->is_pointer)
+		if (!operand->params[0]->type->is_pointer())
 			DoError("pointer expected after delete");
 	}else{
 		// direct operand
@@ -834,7 +834,7 @@ Node *LinkSpecialOperatorIs(SyntaxTree *tree, Node *param1, Node *param2)
 		tree->DoError("class after 'is' needs to have virtual functions: '" + t2->name + "'");
 
 	Class *t1 = param1->type;
-	if (t1->is_pointer){
+	if (t1->is_pointer()){
 		param1 = tree->deref_node(param1);
 		t1 = t1->parent;
 	}
@@ -864,19 +864,19 @@ Node *SyntaxTree::LinkOperator(int op_no, Node *param1, Node *param2)
 	Class *p2 = param2->type;
 	bool equal_classes = false;
 	if (p1 == p2)
-		if (!p1->is_super_array)
+		if (!p1->is_super_array())
 			if (p1->elements.num > 0)
 				equal_classes = true;
 
 	Class *pp1 = p1;
-	if (pp1->is_pointer)
+	if (pp1->is_pointer())
 		pp1 = p1->parent;
 
 	// exact match as class function?
 	for (ClassFunction &f: pp1->functions)
 		if (f.name == op_func_name){
 			// exact match as class function but missing a "&"?
-			if (f.param_types[0]->is_pointer and f.param_types[0]->is_silent){
+			if (f.param_types[0]->is_pointer() and f.param_types[0]->is_pointer_silent()){
 				if (type_match(p2, f.param_types[0]->parent)){
 					Node *inst = ref_node(param1);
 					if (p1 == pp1)
@@ -1117,7 +1117,7 @@ void SyntaxTree::ParseStatementForall(Block *block)
 		DoError("\"in\" expected after variable in \"for . in .\"");
 	Exp.next();
 	Node *for_array = GetOperand(block);
-	if ((!for_array->type->usable_as_super_array()) and (!for_array->type->is_array))
+	if ((!for_array->type->usable_as_super_array()) and (!for_array->type->is_array()))
 		DoError("array or list expected as second parameter in \"for . in .\"");
 	//Exp.next();
 
@@ -1624,7 +1624,7 @@ void SyntaxTree::ParseClassFunctionHeader(Class *t, bool as_extern, bool as_virt
 
 inline bool type_needs_alignment(Class *t)
 {
-	if (t->is_array)
+	if (t->is_array())
 		return type_needs_alignment(t->parent);
 	return (t->size >= 4);
 }
@@ -1655,7 +1655,7 @@ void SyntaxTree::ParseClass()
 	Exp.next();
 
 	// create class and type
-	Class *_class = CreateNewClass(name, 0, false, false, false, 0, nullptr);
+	Class *_class = CreateNewClass(name, Class::Type::OTHER, 0, 0, nullptr);
 
 	// parent class
 	if (Exp.cur == IDENTIFIER_EXTENDS){
@@ -1724,7 +1724,7 @@ void SyntaxTree::ParseClass()
 			if (!override and orig)
 				DoError(format("element '%s' is already defined, use '%s' to override", el.name.c_str(), IDENTIFIER_OVERRIDE.c_str()));
 			if (override){
-				if (orig->type->is_pointer and el.type->is_pointer)
+				if (orig->type->is_pointer() and el.type->is_pointer())
 					orig->type = el.type;
 				else
 					DoError("can only override pointer elements with other pointer type");
@@ -1909,15 +1909,6 @@ void Function::Update(Class *class_type)
 	}
 }
 
-Class *_make_array_(SyntaxTree *s, Class *t, Array<int> dim)
-{
-	string orig_name = t->name;
-	foreachb(int d, dim){
-		// create array       (complicated name necessary to get correct ordering   int a[2][4] = (int[4])[2])
-		t = s->CreateArrayClass(t, d, orig_name, t->name.substr(orig_name.num, -1));
-	}
-	return t;
-}
 
 Class *SyntaxTree::ParseType()
 {
@@ -1927,27 +1918,18 @@ Class *SyntaxTree::ParseType()
 		DoError("unknown type");
 	Exp.next();
 
-	Array<int> array_dim;
-
 	while (true){
 
 		// pointer?
 		if (Exp.cur == "*"){
-			t = _make_array_(this, t, array_dim);
 			Exp.next();
 			t = t->get_pointer();
-			array_dim.clear();
-			continue;
-		}
-
-		if (Exp.cur == "["){
-			int array_size;
+		}else if (Exp.cur == "["){
 			Exp.next();
 
 			// no index -> super array
 			if (Exp.cur == "]"){
-				array_size = -1;
-
+				t = CreateArrayClass(t, -1);
 			}else{
 
 				// find array index
@@ -1955,21 +1937,29 @@ Class *SyntaxTree::ParseType()
 
 				if ((c->kind != KIND_CONSTANT) or (c->type != TypeInt))
 					DoError("only constants of type \"int\" allowed for size of arrays");
-				array_size = c->as_const()->as_int();
+				int array_size = c->as_const()->as_int();
 				//Exp.next();
 				if (Exp.cur != "]")
 					DoError("\"]\" expected after array size");
+				t = CreateArrayClass(t, array_size);
 			}
 
 			Exp.next();
+		}else if (Exp.cur == "{"){
+			Exp.next();
 
-			array_dim.add(array_size);
-			continue;
+			if (Exp.cur != "}")
+				DoError("\"}\" expected after dict{");
+
+			Exp.next();
+
+			t = CreateDictClass(t);
+		}else{
+			break;
 		}
-		break;
 	}
 
-	return _make_array_(this, t, array_dim);
+	return t;
 }
 
 Function *SyntaxTree::ParseFunctionHeader(Class *class_type, bool as_extern)
@@ -2069,7 +2059,7 @@ void SyntaxTree::ParseAllClassNames()
 			if (Exp.cur == IDENTIFIER_CLASS){
 				Exp.next();
 				int nt0 = classes.num;
-				Class *t = CreateNewClass(Exp.cur, 0, false, false, false, 0, nullptr);
+				Class *t = CreateNewClass(Exp.cur, Class::Type::OTHER, 0, 0, nullptr);
 				if (nt0 == classes.num)
 					DoError("class already exists");
 				t->fully_parsed = false;

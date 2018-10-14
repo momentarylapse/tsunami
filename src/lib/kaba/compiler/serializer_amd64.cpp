@@ -42,7 +42,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> xmm_param;
 	for (SerialNodeParam &p: params){
-		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
+		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
 			if (reg_param.num < 6){
 				reg_param.add(p);
 			}else{
@@ -202,7 +202,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
 	for (Variable &p: param){
-		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
+		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
 			if (reg_param.num < 6){
 				reg_param.add(p);
 			}else{

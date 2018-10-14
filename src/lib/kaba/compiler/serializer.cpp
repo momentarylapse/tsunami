@@ -65,7 +65,7 @@ SerialNodeParam Serializer::add_temp(Class *t, bool add_constructor)
 	v.last = -1;
 	v.type = t;
 	v.referenced = false;
-	v.force_stack = (t->size > config.pointer_size) or (t->is_super_array) or (t->is_array) or (t->elements.num > 0);
+	v.force_stack = (t->size > config.pointer_size) or t->is_super_array() or t->is_array() or (t->elements.num > 0);
 	v.entangled = 0;
 	temp_var.add(v);
 	SerialNodeParam param;
@@ -1894,7 +1894,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
 	}else if (p.kind == KIND_REF_TO_CONST){
 		bool imm_allowed = Asm::GetInstructionAllowConst(inst);
-		if ((imm_allowed) and (p.type->is_pointer)){
+		if ((imm_allowed) and (p.type->is_pointer())){
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
 		}else if ((p.type->size <= 4) and (imm_allowed)){
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);

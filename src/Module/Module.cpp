@@ -57,7 +57,7 @@ string var_to_string(Kaba::Class *c, char *v)
 		r += (*(bool*)v) ? "true" : "false";
 	}else if (c == Kaba::TypeString){
 		r += "\"" + str_escape(*(string*)v) + "\"";
-	}else if (c->is_array){
+	}else if (c->is_array()){
 		r += "[";
 		for (int i=0; i<c->array_length; i++){
 			if (i > 0)
@@ -65,7 +65,7 @@ string var_to_string(Kaba::Class *c, char *v)
 			r += var_to_string(c->parent, &v[i * c->parent->size]);
 		}
 		r += "]";
-	}else if (c->is_super_array){
+	}else if (c->is_super_array()){
 		DynamicArray *a = (DynamicArray*)v;
 		r += "[";
 		for (int i=0; i<a->num; i++){
@@ -129,7 +129,7 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 		*(bool*)v = (get_next(s, pos) == "true");
 	}else if (type == Kaba::TypeString){
 		*(string*)v = get_next(s, pos);
-	}else if (type->is_array){
+	}else if (type->is_array()){
 		pos ++; // '['
 		for (int i=0;i<type->array_length;i++){
 			if (i > 0)
@@ -137,7 +137,7 @@ void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song
 			var_from_string(type->parent, &v[i * type->parent->size], s, pos, song);
 		}
 		pos ++; // ']'
-	}else if (type->is_super_array){
+	}else if (type->is_super_array()){
 		pos ++; // '['
 		DynamicArray *a = (DynamicArray*)v;
 		a->clear(); // todo...

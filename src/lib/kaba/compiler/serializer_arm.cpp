@@ -39,7 +39,7 @@ int SerializerARM::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> xmm_param;
 	for (SerialNodeParam &p: params){
-		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
+		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{
@@ -738,7 +738,7 @@ void SerializerARM::AddFunctionIntro(Function *f)
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
 	for (Variable &p: param){
-		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
+		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{

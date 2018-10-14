@@ -735,7 +735,7 @@ void SIAddPackageMath()
 		class_add_func("__get__",			TypeAny,			any_p(mf(&Any::at)));
 			func_add_param("index",			TypeInt);
 		class_add_func("aset",			TypeVoid,			any_p(mf(&Any::aset)));
-			func_add_param("index",			TypeString);
+			func_add_param("index",			TypeInt);
 			func_add_param("value",			TypeAny);
 		class_add_func("bool",		TypeBool,			any_p(mf(&Any::_bool)));
 		class_add_func("int",		TypeInt,			any_p(mf(&Any::_int)));

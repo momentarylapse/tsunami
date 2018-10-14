@@ -46,8 +46,22 @@ public:
 	string name;
 	long long size; // complete size of type
 	int array_length;
-	bool is_array, is_super_array; // mutially exclusive!
-	bool is_pointer, is_silent; // pointer silent (&)
+
+	enum class Type{
+		OTHER,
+		ARRAY,
+		SUPER_ARRAY,
+		POINTER,
+		POINTER_SILENT, // pointer silent (&)
+		DICT,
+	};
+	Type type;
+
+	bool is_array() const;
+	bool is_super_array() const;
+	bool is_dict() const;
+	bool is_pointer() const;
+	bool is_pointer_silent() const;
 	bool fully_parsed;
 	Array<ClassElement> elements;
 	Array<ClassFunction> functions;

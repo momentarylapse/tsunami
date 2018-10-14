@@ -27,10 +27,17 @@ class Range
 	int offset, length
 	int end()
 		return offset + length
+	string str()
+		return "(" + offset + ":" + end() + ")"
 Range _Range(int offset, int length)
 	Range r
 	r.offset = offset
 	r.length = length
+	return r
+Range RangeTo(int start, int end)
+	Range r
+	r.offset = start
+	r.length = end - start
 	return r
 
 
@@ -150,6 +157,7 @@ class AudioBuffer
 	extern void resize(int length)
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume, float panning)
+	extern void set_as_ref(AudioBuffer source, int offset, int length)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 
 class RingBuffer

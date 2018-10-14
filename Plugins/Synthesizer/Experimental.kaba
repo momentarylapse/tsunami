@@ -1,0 +1,22 @@
+use "../api.kaba"
+use "../experimental.kaba"
+
+class SinusToneRenderer extends ToneRenderer
+	float phi
+	override void __init__()
+		phi = 0
+	override int read(AudioBuffer buf, float volume)
+		if volume <= 0
+			return -1
+			
+		for i in 0:buf.length
+			buf.r[i] += volume * sin(phi) * 0.1
+			buf.l[i] += volume * sin(phi) * 0.1
+			phi += delta_phi
+		return buf.length
+
+
+class SynthX extends SynthesizerX
+
+	override ToneRenderer* create_tone()
+		return new SinusToneRenderer

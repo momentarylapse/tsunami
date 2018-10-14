@@ -226,6 +226,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("AudioBuffer.resize", Kaba::mf(&AudioBuffer::resize));
 	Kaba::LinkExternal("AudioBuffer.add", Kaba::mf(&AudioBuffer::add));
 	Kaba::LinkExternal("AudioBuffer.set", Kaba::mf(&AudioBuffer::set));
+	Kaba::LinkExternal("AudioBuffer.set_as_ref", Kaba::mf(&AudioBuffer::set_as_ref));
 	Kaba::LinkExternal("AudioBuffer.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
 
 

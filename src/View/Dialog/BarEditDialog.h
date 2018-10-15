@@ -30,6 +30,7 @@ public:
 	void on_number();
 	void on_mode();
 	void update_result_bpm();
+	void on_shift_data();
 };
 
 #endif /* SRC_VIEW_DIALOG_BAREDITDIALOG_H_ */

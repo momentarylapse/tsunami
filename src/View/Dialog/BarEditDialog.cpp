@@ -27,7 +27,7 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	setInt("sub_beats", b->num_sub_beats);
 	setFloat("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
 	check("shift-data", true);
-	enable("scale-audio", false);
+	check("scale-audio", false);
 
 	update_result_bpm();
 
@@ -39,6 +39,7 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	event("bpm", std::bind(&BarEditDialog::on_bpm, this));
 	event("number", std::bind(&BarEditDialog::on_number, this));
 	event("mode", std::bind(&BarEditDialog::on_mode, this));
+	event("shift-data", std::bind(&BarEditDialog::on_shift_data, this));
 }
 
 void BarEditDialog::on_ok()
@@ -48,11 +49,19 @@ void BarEditDialog::on_ok()
 	if (mode == 0){
 		float bpm = getFloat("bpm");
 		bool move_data = isChecked("shift-data");
+		bool scale_audio = isChecked("scale-audio");
+
+		int bmode = Bar::EditMode::IGNORE;
+		if (move_data){
+			bmode = Bar::EditMode::STRETCH;
+			if (scale_audio)
+				bmode = Bar::EditMode::STRETCH_AND_SCALE_AUDIO;
+		}
 
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
-			song->editBar(i, b.length, b.num_beats, b.num_sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+			song->editBar(i, b.length, b.num_beats, b.num_sub_beats, bmode);
 		}
 
 	}else{
@@ -126,4 +135,9 @@ void BarEditDialog::update_result_bpm()
 	int number = getInt("number");
 	int beats = getInt("beats");
 	setFloat("result_bpm", 60.0f * (float)(number * beats) / t);
+}
+
+void BarEditDialog::on_shift_data()
+{
+	enable("scale-audio", isChecked(""));
 }

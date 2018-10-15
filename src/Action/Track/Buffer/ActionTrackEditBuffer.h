@@ -16,7 +16,7 @@ class TrackLayer;
 class ActionTrackEditBuffer : public Action
 {
 public:
-	ActionTrackEditBuffer(TrackLayer *l, Range _range);
+	ActionTrackEditBuffer(TrackLayer *l, const Range &_range);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

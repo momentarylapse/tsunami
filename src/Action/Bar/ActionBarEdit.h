@@ -15,13 +15,13 @@ class Song;
 class ActionBarEdit: public ActionGroup
 {
 public:
-	ActionBarEdit(int index, int length, int num_beats, int num_sub_beats, bool affect_data);
+	ActionBarEdit(int index, int length, int num_beats, int num_sub_beats, int mode);
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	int index;
 	int length, num_beats, num_sub_beats;
-	bool affect_data;
+	int mode;
 };
 
 #endif /* ACTIONBAREDIT_H_ */

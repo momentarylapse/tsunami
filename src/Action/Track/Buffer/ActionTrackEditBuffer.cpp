@@ -12,7 +12,7 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, Range _range)
+ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range)
 {
 	// prepare...
 	range = _range;

@@ -50,7 +50,8 @@ public:
 	enum EditMode{
 		IGNORE,
 		INSERT_SILENCE,
-		STRETCH
+		STRETCH,
+		STRETCH_AND_SCALE_AUDIO
 	};
 };
 

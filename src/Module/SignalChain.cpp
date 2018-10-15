@@ -20,7 +20,8 @@ const string SignalChain::MESSAGE_DELETE_MODULE = "DeleteModule";
 const string SignalChain::MESSAGE_ADD_CABLE = "AddCable";
 const string SignalChain::MESSAGE_DELETE_CABLE = "DeleteCable";
 
-SignalChain::SignalChain(Session *s, const string &_name)
+SignalChain::SignalChain(Session *s, const string &_name) :
+	Module(ModuleType::SIGNAL_CHAIN)
 {
 	session = s;
 	name = _name;
@@ -246,9 +247,26 @@ void SignalChain::load(const string& filename)
 			int tp = e.find("target")->value("port")._int();
 			connect(modules[s], sp, modules[t], tp);
 		}
+
+		auto *pp = root.find("ports");
+		for (auto &e: pp->elements){
+			PortX p;
+			int m = e.value("module")._int();
+			p.port = e.value("port")._int();
+			p.module = modules[m];
+			_ports_out.add(p);
+		}
+		update_ports();
 	}catch(Exception &e){
 		session->e(e.message());
 	}
+}
+
+void SignalChain::update_ports()
+{
+	port_out.clear();
+	for (auto &p: _ports_out)
+		port_out.add(p.module->port_out[p.port]);
 }
 
 void SignalChain::reset()

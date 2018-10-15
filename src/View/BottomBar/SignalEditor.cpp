@@ -288,6 +288,11 @@ public:
 		for (auto *m: chain->modules)
 			draw_ports(p, m);
 
+		for (auto &pp: chain->_ports_out){
+			p->setColor(Red);
+			p->drawCircle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
+		}
+
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 			p->setColor(White);
 			if (hover.target_module){

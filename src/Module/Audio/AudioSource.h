@@ -36,9 +36,6 @@ public:
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
 	virtual void _cdecl reset(){}
 	virtual int _cdecl get_pos(int delta){ return 0; }
-
-	BeatSource *beat_source;
-	void setBeatSource(BeatSource *beat_source);
 };
 
 AudioSource *_cdecl CreateAudioSource(Session *session, const string &name);

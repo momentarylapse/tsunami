@@ -8,7 +8,7 @@
 #ifndef SRC_MODULE_SIGNALCHAIN_H_
 #define SRC_MODULE_SIGNALCHAIN_H_
 
-#include "../Stuff/Observable.h"
+#include "Module.h"
 
 class AudioPort;
 class MidiPort;
@@ -19,7 +19,7 @@ class Session;
 enum class SignalType;
 enum class ModuleType;
 
-class SignalChain : public Observable<VirtualBase>
+class SignalChain : public Module
 {
 public:
 	SignalChain(Session *session, const string &name);
@@ -29,8 +29,6 @@ public:
 	static const string MESSAGE_DELETE_MODULE;
 	static const string MESSAGE_ADD_CABLE;
 	static const string MESSAGE_DELETE_CABLE;
-
-	Session *session;
 
 	void reset();
 	void save(const string &filename);
@@ -67,6 +65,13 @@ public:
 		int source_port, target_port;
 	};
 	Array<Cable*> cables;
+	struct PortX
+	{
+		Module *module;
+		int port;
+	};
+	Array<PortX> _ports_in, _ports_out;
+	void update_ports();
 
 	void connect(Module *source, int source_port, Module *target, int target_port);
 	void disconnect_source(Module *source, int source_port);

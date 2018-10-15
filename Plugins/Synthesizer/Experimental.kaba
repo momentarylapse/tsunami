@@ -1,22 +1,30 @@
 use "../api.kaba"
 use "../experimental.kaba"
 
+class SinusConfig extends PluginData
+	float volume
+	override void reset()
+		volume = 0.3
+
 class SinusToneRenderer extends ToneRenderer
+	override SinusConfig* config
 	float phi
 	override void __init__()
 		phi = 0
 	override int read(AudioBuffer buf, float volume)
 		if volume <= 0
 			return -1
-			
+		
 		for i in 0:buf.length
-			buf.r[i] += volume * sin(phi) * 0.1
-			buf.l[i] += volume * sin(phi) * 0.1
+			buf.r[i] += volume * sin(phi) * config.volume
+			if buf.channels > 1
+				buf.l[i] += volume * sin(phi) * config.volume
 			phi += delta_phi
+		phi = loop(phi, 0, 2*pi)
 		return buf.length
 
 
 class SynthX extends SynthesizerX
-
+	SinusConfig config
 	override ToneRenderer* create_tone()
 		return new SinusToneRenderer

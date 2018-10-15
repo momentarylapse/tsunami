@@ -15,7 +15,6 @@ AudioSource::AudioSource() :
 {
 	out = new Output(this);
 	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	beat_source = nullptr;
 }
 
 AudioSource::~AudioSource()

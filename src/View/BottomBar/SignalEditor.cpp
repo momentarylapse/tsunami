@@ -70,43 +70,43 @@ public:
 		setTarget("grid");
 		addDrawingArea("!expandx,expandy,grabfocus", 0, 0, "area");
 
-		eventXP("area", "hui:draw", std::bind(&SignalEditorTab::onDraw, this, std::placeholders::_1));
-		eventX("area", "hui:mouse-move", std::bind(&SignalEditorTab::onMouseMove, this));
-		eventX("area", "hui:left-button-down", std::bind(&SignalEditorTab::onLeftButtonDown, this));
-		eventX("area", "hui:left-button-up", std::bind(&SignalEditorTab::onLeftButtonUp, this));
-		eventX("area", "hui:right-button-down", std::bind(&SignalEditorTab::onRightButtonDown, this));
-		eventX("area", "hui:key-down", std::bind(&SignalEditorTab::onKeyDown, this));
+		eventXP("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
+		eventX("area", "hui:mouse-move", std::bind(&SignalEditorTab::on_mouse_move, this));
+		eventX("area", "hui:left-button-down", std::bind(&SignalEditorTab::on_left_button_down, this));
+		eventX("area", "hui:left-button-up", std::bind(&SignalEditorTab::on_left_button_up, this));
+		eventX("area", "hui:right-button-down", std::bind(&SignalEditorTab::on_right_button_down, this));
+		eventX("area", "hui:key-down", std::bind(&SignalEditorTab::on_key_down, this));
 
 
-		event("signal_chain_add_audio_source", std::bind(&SignalEditorTab::onAddAudioSource, this));
-		event("signal_chain_add_audio_effect", std::bind(&SignalEditorTab::onAddAudioEffect, this));
-		event("signal_chain_add_audio_input", std::bind(&SignalEditorTab::onAddAudioInputStream, this));
-		event("signal_chain_add_audio_joiner", std::bind(&SignalEditorTab::onAddAudioJoiner, this));
-		event("signal_chain_add_audio_sucker", std::bind(&SignalEditorTab::onAddAudioSucker, this));
-		event("signal_chain_add_audio_visualizer", std::bind(&SignalEditorTab::onAddAudioVisualizer, this));
-		event("signal_chain_add_midi_source", std::bind(&SignalEditorTab::onAddMidiSource, this));
-		event("signal_chain_add_midi_effect", std::bind(&SignalEditorTab::onAddMidiEffect, this));
-		event("signal_chain_add_midi_input", std::bind(&SignalEditorTab::onAddMidiInputStream, this));
-		event("signal_chain_add_synthesizer", std::bind(&SignalEditorTab::onAddSynthesizer, this));
-		event("signal_chain_add_pitch_detector", std::bind(&SignalEditorTab::onAddPitchDetector, this));
-		event("signal_chain_add_beat_source", std::bind(&SignalEditorTab::onAddBeatSource, this));
-		event("signal_chain_add_beat_midifier", std::bind(&SignalEditorTab::onAddBeatMidifier, this));
-		event("signal_chain_reset", std::bind(&SignalEditorTab::onReset, this));
-		event("signal_chain_activate", std::bind(&SignalEditorTab::onActivate, this));
-		event("signal_chain_delete", std::bind(&SignalEditorTab::onDelete, this));
-		event("signal_chain_save", std::bind(&SignalEditorTab::onSave, this));
-		event("signal_module_delete", std::bind(&SignalEditorTab::onModuleDelete, this));
-		event("signal_module_configure", std::bind(&SignalEditorTab::onModuleConfigure, this));
+		event("signal_chain_add_audio_source", std::bind(&SignalEditorTab::on_add_audio_source, this));
+		event("signal_chain_add_audio_effect", std::bind(&SignalEditorTab::on_add_audio_effect, this));
+		event("signal_chain_add_audio_input", std::bind(&SignalEditorTab::on_add_audio_input_stream, this));
+		event("signal_chain_add_audio_joiner", std::bind(&SignalEditorTab::on_add_audio_joiner, this));
+		event("signal_chain_add_audio_sucker", std::bind(&SignalEditorTab::on_add_audio_sucker, this));
+		event("signal_chain_add_audio_visualizer", std::bind(&SignalEditorTab::on_add_audio_visualizer, this));
+		event("signal_chain_add_midi_source", std::bind(&SignalEditorTab::on_add_midi_source, this));
+		event("signal_chain_add_midi_effect", std::bind(&SignalEditorTab::on_add_midi_effect, this));
+		event("signal_chain_add_midi_input", std::bind(&SignalEditorTab::on_add_midi_input_stream, this));
+		event("signal_chain_add_synthesizer", std::bind(&SignalEditorTab::on_add_synthesizer, this));
+		event("signal_chain_add_pitch_detector", std::bind(&SignalEditorTab::on_add_pitch_detector, this));
+		event("signal_chain_add_beat_source", std::bind(&SignalEditorTab::on_add_beat_source, this));
+		event("signal_chain_add_beat_midifier", std::bind(&SignalEditorTab::on_add_beat_midifier, this));
+		event("signal_chain_reset", std::bind(&SignalEditorTab::on_reset, this));
+		event("signal_chain_activate", std::bind(&SignalEditorTab::on_activate, this));
+		event("signal_chain_delete", std::bind(&SignalEditorTab::on_delete, this));
+		event("signal_chain_save", std::bind(&SignalEditorTab::on_save, this));
+		event("signal_module_delete", std::bind(&SignalEditorTab::on_module_delete, this));
+		event("signal_module_configure", std::bind(&SignalEditorTab::on_module_configure, this));
 
-		event("signal_chain_new", std::bind(&SignalEditor::onNew, ed));
-		event("signal_chain_load", std::bind(&SignalEditor::onLoad, ed));
+		event("signal_chain_new", std::bind(&SignalEditor::on_new, ed));
+		event("signal_chain_load", std::bind(&SignalEditor::on_load, ed));
 
 		editor = ed;
 		view = ed->view;
 		session = ed->session;
 
 		chain = _chain;
-		chain->subscribe(this, std::bind(&SignalEditorTab::onChainUpdate, this));
+		chain->subscribe(this, std::bind(&SignalEditorTab::on_chain_update, this));
 	}
 	virtual ~SignalEditorTab()
 	{
@@ -147,7 +147,7 @@ public:
 	Selection hover, sel;
 
 
-	Selection getHover(float mx, float my)
+	Selection get_hover(float mx, float my)
 	{
 		Selection s;
 		s.dx = mx;
@@ -271,7 +271,7 @@ public:
 		}
 	}
 
-	void onDraw(Painter* p)
+	void on_draw(Painter* p)
 	{
 		int w = p->width;
 		int h = p->height;
@@ -310,23 +310,23 @@ public:
 
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
-		Selection hh = getHover(mx, my);
+		Selection hh = get_hover(mx, my);
 		if (hh.type == hover.TYPE_PORT_IN)
 			AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my, p->area());
 		if (hh.type == hover.TYPE_PORT_OUT)
 			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());
 	}
 
-	void onChainUpdate()
+	void on_chain_update()
 	{
 		redraw("area");
 	}
 
-	void onLeftButtonDown()
+	void on_left_button_down()
 	{
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
-		hover = getHover(mx, my);
+		hover = get_hover(mx, my);
 		sel = hover;
 		apply_sel();
 		if (sel.type == sel.TYPE_PORT_IN){
@@ -337,7 +337,7 @@ public:
 		redraw("area");
 	}
 
-	void onLeftButtonUp()
+	void on_left_button_up()
 	{
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 			if (hover.target_module){
@@ -355,7 +355,7 @@ public:
 		redraw("area");
 	}
 
-	void onMouseMove()
+	void on_mouse_move()
 	{
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
@@ -366,7 +366,7 @@ public:
 				m->module_y = my + sel.dy;
 			}else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
 				hover.target_module = nullptr;
-				auto h = getHover(mx, my);
+				auto h = get_hover(mx, my);
 				if (h.module != sel.module and h.port_type == sel.port_type){
 					if (h.type == sel.TYPE_PORT_IN and sel.type == sel.TYPE_PORT_OUT){
 						hover.target_module = h.module;
@@ -379,16 +379,16 @@ public:
 				}
 			}
 		}else{
-			hover = getHover(mx, my);
+			hover = get_hover(mx, my);
 		}
 		redraw("area");
 	}
 
-	void onRightButtonDown()
+	void on_right_button_down()
 	{
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
-		hover = getHover(mx, my);
+		hover = get_hover(mx, my);
 		sel = hover;
 		apply_sel();
 
@@ -399,7 +399,7 @@ public:
 		}
 	}
 
-	void onKeyDown()
+	void on_key_down()
 	{
 		int key = hui::GetEvent()->key_code;
 		if (key == hui::KEY_DELETE){
@@ -416,18 +416,18 @@ public:
 		editor->show_config(sel.module);
 	}
 
-	void onActivate()
+	void on_activate()
 	{
 	}
 
-	void onDelete()
+	void on_delete()
 	{
-		hui::RunLater(0.001f, [&](){ editor->deleteChain(chain); });
+		hui::RunLater(0.001f, [&](){ editor->delete_chain(chain); });
 	}
 
 
 
-	void onAddAudioSource()
+	void on_add_audio_source()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_SOURCE);
 		if (name.num > 0){
@@ -437,7 +437,7 @@ public:
 		}
 	}
 
-	void onAddAudioEffect()
+	void on_add_audio_effect()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
 		if (name.num > 0){
@@ -447,7 +447,7 @@ public:
 		}
 	}
 
-	void onAddAudioVisualizer()
+	void on_add_audio_visualizer()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_VISUALIZER);
 		if (name.num > 0){
@@ -457,28 +457,28 @@ public:
 		}
 	}
 
-	void onAddAudioJoiner()
+	void on_add_audio_joiner()
 	{
 		auto *m = chain->addAudioJoiner();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onAddAudioSucker()
+	void on_add_audio_sucker()
 	{
 		auto *m = chain->addAudioSucker();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onAddAudioInputStream()
+	void on_add_audio_input_stream()
 	{
 		auto *m = chain->addAudioInputStream();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onAddMidiSource()
+	void on_add_midi_source()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_SOURCE);
 		if (name.num > 0){
@@ -488,7 +488,7 @@ public:
 		}
 	}
 
-	void onAddMidiEffect()
+	void on_add_midi_effect()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_EFFECT);
 		if (name.num > 0){
@@ -498,7 +498,7 @@ public:
 		}
 	}
 
-	void onAddSynthesizer()
+	void on_add_synthesizer()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER);
 		if (name.num > 0){
@@ -508,21 +508,21 @@ public:
 		}
 	}
 
-	void onAddMidiInputStream()
+	void on_add_midi_input_stream()
 	{
 		auto *m = chain->addMidiInputStream();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onAddPitchDetector()
+	void on_add_pitch_detector()
 	{
 		auto *m = chain->addPitchDetector();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onAddBeatSource()
+	void on_add_beat_source()
 	{
 		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::BEAT_SOURCE);
 		if (name.num > 0){
@@ -532,25 +532,25 @@ public:
 		}
 	}
 
-	void onAddBeatMidifier()
+	void on_add_beat_midifier()
 	{
 		auto *m = chain->addBeatMidifier();
 		m->module_x = sel.dx;
 		m->module_y = sel.dy;
 	}
 
-	void onReset()
+	void on_reset()
 	{
 		chain->reset();
 	}
 
-	/*void onLoad()
+	/*void on_load()
 	{
 		if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain"))
 			chain->load(hui::Filename);
 	}*/
 
-	void onSave()
+	void on_save()
 	{
 		if (hui::FileDialogSave(win, _("Save the signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
 			session->storage->current_chain_directory = hui::Filename.dirname();
@@ -560,7 +560,7 @@ public:
 
 
 
-	void onModuleDelete()
+	void on_module_delete()
 	{
 		if (sel.type == sel.TYPE_MODULE){
 			chain->remove(sel.module);
@@ -569,7 +569,7 @@ public:
 		}
 	}
 
-	void onModuleConfigure()
+	void on_module_configure()
 	{
 		apply_sel();
 		session->win->side_bar->open(SideBar::MODULE_CONSOLE);
@@ -599,7 +599,7 @@ SignalEditor::SignalEditor(Session *session) :
 
 	event("selector", [&]{ on_chain_switch(); });
 
-	addChain(session->signal_chain);
+	add_chain(session->signal_chain);
 	show_config(nullptr);
 }
 
@@ -610,7 +610,7 @@ SignalEditor::~SignalEditor()
 	delete menu_module;
 }
 
-void SignalEditor::addChain(SignalChain *c)
+void SignalEditor::add_chain(SignalChain *c)
 {
 	auto *tab = new SignalEditorTab(this, c);
 	int index = tabs.num;
@@ -627,18 +627,18 @@ void SignalEditor::addChain(SignalChain *c)
 	setInt("selector", index);
 }
 
-void SignalEditor::onNew()
+void SignalEditor::on_new()
 {
-	addChain(new SignalChain(session, "new"));
+	add_chain(new SignalChain(session, "new"));
 }
 
-void SignalEditor::onLoad()
+void SignalEditor::on_load()
 {
 	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
 		session->storage->current_chain_directory = hui::Filename.dirname();
 		auto *c = new SignalChain(session, "new");
 		c->load(hui::Filename);
-		addChain(c);
+		add_chain(c);
 	}
 }
 
@@ -674,7 +674,7 @@ void SignalEditor::show_config(Module *m)
 	}
 }
 
-void SignalEditor::deleteChain(SignalChain *c)
+void SignalEditor::delete_chain(SignalChain *c)
 {
 	foreachi(auto *t, tabs, i)
 		if (t->chain == c){

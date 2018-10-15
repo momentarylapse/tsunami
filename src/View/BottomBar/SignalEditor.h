@@ -26,11 +26,11 @@ public:
 	SignalEditor(Session *session);
 	virtual ~SignalEditor();
 
-	void addChain(SignalChain *c);
+	void add_chain(SignalChain *c);
 
-	void onNew();
-	void onLoad();
-	void deleteChain(SignalChain *c);
+	void on_new();
+	void on_load();
+	void delete_chain(SignalChain *c);
 
 	Array<SignalEditorTab*> tabs;
 

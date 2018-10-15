@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-572
+581
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1719,8 +1719,35 @@ Daten entsprechend verschieben
 bar_delete_dialog/replace-by-pause
 Durch Pause ersetzen
 
+/bpm
+Bpm
+
+bar_edit_dialog/edit_number
+Anzahl
+
+bar_edit_dialog/mode
+Geschwindigkeit\\Ersetzen
+
+bar_edit_dialog/number
+1
+
+bar_edit_dialog/result_bpm
+0
+
+bar_edit_dialog/scale-audio
+Audio skalieren
+
+bar_edit_dialog/t_info
+Die Gesamtdauer konstant lassen
+
+bar_edit_dialog/t_result_bpm
+=> Bpm
+
+bar_edit_dialog/t_bpm
+Bpm
+
 // Num Language Strings
-207
+208
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2136,3 +2163,5 @@ base
 base
 can not delete the only version of a track
 eine Version kann nicht gelöscht werden, wenn es sonst keine anderen Versionen mehr gibt
+big!!!
+groß!!!

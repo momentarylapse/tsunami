@@ -221,7 +221,7 @@ void Control::setOptions(const string &options)
 				gtk_widget_set_size_request(get_frame(), min_width, min_height);
 			}else if ((op == "marginleft") or (op == "indent")){
 				indent = a1._int();
-				printf("indent %d\n", indent);
+				//printf("indent %d\n", indent);
 #if GTK_CHECK_VERSION(3,12,0)
 				gtk_widget_set_margin_start(get_frame(), a1._int());
 #else

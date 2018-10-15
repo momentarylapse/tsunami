@@ -157,7 +157,7 @@ image=hui:ok
 // Resource
 Dialog
 bar_edit_dialog
-width=250,height=80
+width=350,height=80
 0
 0
 1
@@ -166,59 +166,125 @@ Grid
 vertical
 0
 0
-3
+2
+TabControl
+mode
+
+0
+0
+2
+Grid
+?
+vertical
+0
+0
+2
 Grid
 ?
 
 0
 0
-6
+2
+SpinButton
+bpm
+range=0:1000:0.1,expandx
+0
+0
+0
+Label
+t_bpm
+
+1
+0
+0
+Grid
+?
+vertical
+1
+0
+2
 CheckBox
-edit_beats
+shift-data
+
+0
+0
+0
+CheckBox
+scale-audio
+margin-left=30
+1
+0
+0
+Grid
+?
+vertical
+1
+0
+2
+Label
+t_info
+
+0
+0
+0
+Grid
+?
+
+1
+0
+8
+CheckBox
+edit_number
 
 0
 0
 0
 SpinButton
-beats
+number
 range=1:1000:1,expandx
 1
 0
 0
 CheckBox
-edit_sub_beats
+edit_beats
 
 0
 1
+0
+SpinButton
+beats
+range=1:1000:1,expandx
+1
+1
+0
+CheckBox
+edit_sub_beats
+
+0
+2
 0
 SpinButton
 sub_beats
 range=1:24:1,expandx
 1
-1
+2
 0
-CheckBox
-edit_bpm
+Label
+t_result_bpm
 
 0
-2
+3
 0
 SpinButton
-bpm
-range=0:1000:0.1,expandx
+result_bpm
+range=0:1000:0.1,expandx,disabled
 1
-2
-0
-CheckBox
-shift-data
-
-1
-0
+3
 0
 Grid
 ?
 buttonbar
-2
+1
 0
 2
 Button
@@ -4421,7 +4487,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-447
+454
 // Text
 /cancel
 Cancel
@@ -4567,17 +4633,38 @@ bar_edit_dialog/bpm
 bar_edit_dialog/edit_beats
 Beats
 
-bar_edit_dialog/edit_bpm
-Bpm
+bar_edit_dialog/edit_number
+Number
 
 bar_edit_dialog/edit_sub_beats
 Sub beats
+
+bar_edit_dialog/mode
+Speed\\Replace
+
+bar_edit_dialog/number
+1
+
+bar_edit_dialog/result_bpm
+0
+
+bar_edit_dialog/scale-audio
+Scale audio
 
 bar_edit_dialog/shift-data
 Move data accordingly
 
 bar_edit_dialog/sub_beats
 1
+
+bar_edit_dialog/t_bpm
+Bpm
+
+bar_edit_dialog/t_info
+Keeping the overall duration
+
+bar_edit_dialog/t_result_bpm
+=> Bpm
 
 configurable-selection-dialog/configurable-selection-dialog
 Auswahl
@@ -5770,8 +5857,11 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-571
+580
 // Text
+/bpm
+Bpm
+
 /cancel
 Abbrechen
 
@@ -5940,14 +6030,38 @@ Schläge
 bar_edit_dialog/edit_bpm
 Bpm
 
+bar_edit_dialog/edit_number
+Anzahl
+
 bar_edit_dialog/edit_sub_beats
 Teil-Schläge
+
+bar_edit_dialog/mode
+Geschwindigkeit\\Ersetzen
+
+bar_edit_dialog/number
+1
+
+bar_edit_dialog/result_bpm
+0
+
+bar_edit_dialog/scale-audio
+Audio skalieren
 
 bar_edit_dialog/shift-data
 Daten entsprechend verschieben
 
 bar_edit_dialog/sub_beats
 1
+
+bar_edit_dialog/t_bpm
+Bpm
+
+bar_edit_dialog/t_info
+Die Gesamtdauer konstant lassen
+
+bar_edit_dialog/t_result_bpm
+=> Bpm
 
 bars_dialog/add_bar
 Takt
@@ -7486,7 +7600,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-207
+208
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7796,6 +7910,8 @@ bar %d/\\u2084 \\u2669=%.1f
 Takt %d/\\u2084 \\u2669=%.1f
 base
 base
+big!!!
+groß!!!
 call: tsunami --chain <SIGNAL_CHAIN>
 Aufruf: tsunami --chain <SIGNAL_CHAIN>
 call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]

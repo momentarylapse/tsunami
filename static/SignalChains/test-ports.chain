@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>new</name>
+	</head>
+	<modules>
+		<module>
+			<category>AudioSource</category>
+			<class>Noise</class>
+			<position>
+				<x>173</x>
+				<y>102</y>
+			</position>
+			<config>(1.000000 0)</config>
+		</module>
+		<module>
+			<category>AudioEffect</category>
+			<class>Equalizer</class>
+			<position>
+				<x>427</x>
+				<y>107</y>
+			</position>
+			<config>(0.000000 [(true 2 30.000000 -10.000000 2.000000) (true 1 100.000000 -10.000000 2.000000) (true 0 66.902008 -40.808723 0.123499)])</config>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="0" port="0" />
+			<target id="1" port="0" />
+		</cable>
+	</cables>
+	<ports>
+		<out module="1" port="0" />
+	</ports>
+</chain>

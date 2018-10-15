@@ -19,12 +19,17 @@ public:
 	Song *song;
 	Array<int> sel;
 
+	int duration;
+
 	BarEditDialog(hui::Window *root, Song *song, const Range &bars);
-	void onOk();
-	void onClose();
-	void onBeats();
-	void onSubBeats();
-	void onBpm();
+	void on_ok();
+	void on_close();
+	void on_beats();
+	void on_sub_beats();
+	void on_bpm();
+	void on_number();
+	void on_mode();
+	void update_result_bpm();
 };
 
 #endif /* SRC_VIEW_DIALOG_BAREDITDIALOG_H_ */

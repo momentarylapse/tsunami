@@ -1,15 +1,27 @@
-Dialog bar_edit_dialog "Edit bars" width=250 height=80
+Dialog bar_edit_dialog "Edit bars" width=350 height=80
 	Grid ? "" vertical
-		Grid ? ""
-			CheckBox edit_beats "Beats"
-			SpinButton beats "1" range=1:1000:1 expandx
-			---|
-			CheckBox edit_sub_beats "Sub beats"
-			SpinButton sub_beats "1" range=1:24:1 expandx
-			---|
-			CheckBox edit_bpm "Bpm"
-			SpinButton bpm "0" range=0:1000:0.1 expandx
-		CheckBox shift-data "Move data accordingly"
+		TabControl mode "Speed\\Replace"
+			Grid ? "" vertical
+				Grid ? ""
+					SpinButton bpm "0" range=0:1000:0.1 expandx
+					Label t_bpm "Bpm"
+				Grid ? "" vertical
+					CheckBox shift-data "Move data accordingly"
+					CheckBox scale-audio "Scale audio" margin-left=30
+			Grid ? "" vertical
+				Label t_info "Keeping the overall duration"
+				Grid ? ""
+					CheckBox edit_number "Number"
+					SpinButton number "1" range=1:1000:1 expandx
+					---|
+					CheckBox edit_beats "Beats"
+					SpinButton beats "1" range=1:1000:1 expandx
+					---|
+					CheckBox edit_sub_beats "Sub beats"
+					SpinButton sub_beats "1" range=1:24:1 expandx
+					---|
+					Label t_result_bpm "=> Bpm"
+					SpinButton result_bpm "0" range=0:1000:0.1 expandx disabled
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

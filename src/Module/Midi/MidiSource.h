@@ -36,7 +36,6 @@ public:
 	virtual void _cdecl reset(){}
 
 	BeatPort *beat_source;
-	void _cdecl set_beat_source(BeatPort *s);
 };
 
 MidiSource *_cdecl CreateMidiSource(Session *session, const string &name);

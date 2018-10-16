@@ -25,7 +25,6 @@ public:
 	void _cdecl __delete__() override;
 
 	AudioPort *source;
-	void set_source(AudioPort *s);
 
 	class Output : public AudioPort
 	{

@@ -22,8 +22,6 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	void set_source(AudioPort *source);
-
 	int _cdecl read(MidiEventBuffer &midi) override;
 
 	void process(MidiEventBuffer &midi, AudioBuffer &buf);

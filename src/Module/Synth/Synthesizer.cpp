@@ -92,11 +92,6 @@ void Synthesizer::__delete__()
 	this->Synthesizer::~Synthesizer();
 }
 
-void Synthesizer::set_source(MidiPort *_source)
-{
-	source = _source;
-}
-
 void Synthesizer::Tuning::set_default()
 {
 	for (int p=0; p<MAX_PITCH; p++)

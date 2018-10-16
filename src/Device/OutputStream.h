@@ -38,10 +38,10 @@ class OutputStream : public Module
 	friend StreamThread;
 public:
 	//AudioStream();
-	OutputStream(Session *session, AudioPort *r);
+	OutputStream(Session *session);
 	virtual ~OutputStream();
 
-	void _cdecl __init__(Session *session, AudioPort *r);
+	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
 
 	void _create_dev();
@@ -65,7 +65,6 @@ public:
 	void _pause();
 
 	bool _cdecl is_paused();
-	void _cdecl set_source(AudioPort *r);
 	void _cdecl set_device(Device *d);
 	int _cdecl get_pos();
 

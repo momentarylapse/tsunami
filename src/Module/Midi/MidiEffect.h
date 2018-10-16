@@ -34,7 +34,6 @@ public:
 	Range range;
 
 	MidiPort *source;
-	void set_source(MidiPort *s);
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 

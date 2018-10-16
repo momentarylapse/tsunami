@@ -51,7 +51,8 @@ public:
 void TestStreams::test_output_stream()
 {
 	auto *source = new DebugAudioSource;
-	auto *stream = new OutputStream(Session::GLOBAL, source->out);
+	auto *stream = new OutputStream(Session::GLOBAL);
+	stream->plug(0, source, 0);
 
 	msg_write("play");
 	stream->play();
@@ -74,7 +75,7 @@ void TestStreams::test_input_stream()
 	auto *stream = new InputStreamAudio(Session::GLOBAL);
 	auto *sucker = new AudioSucker;
 
-	sucker->set_source(stream->out);
+	sucker->plug(0, stream, 0);
 
 	msg_write("capture");
 	stream->start();

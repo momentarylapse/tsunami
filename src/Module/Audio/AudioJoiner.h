@@ -29,8 +29,6 @@ public:
 	Output *out;
 
 	AudioPort *a, *b;
-	void _cdecl set_source_a(AudioPort *a);
-	void _cdecl set_source_b(AudioPort *b);
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOJOINER_H_ */

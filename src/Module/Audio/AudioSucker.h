@@ -21,7 +21,6 @@ public:
 	AudioSucker();
 	~AudioSucker() override;
 
-	void set_source(AudioPort *s);
 	void accumulate(bool enable);
 	void reset_accumulation();
 	void set_buffer_size(int size);

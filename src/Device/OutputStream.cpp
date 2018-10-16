@@ -208,14 +208,14 @@ public:
 
 extern bool ugly_hack_slow;
 
-OutputStream::OutputStream(Session *_session, AudioPort *s) :
+OutputStream::OutputStream(Session *_session) :
 	Module(ModuleType::OUTPUT_STREAM_AUDIO),
 	ring_buf(1048576)
 {
 //	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
 	set_session_etc(_session, "", nullptr);
-	source = s;
+	source = nullptr;
 
 	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 
@@ -271,9 +271,9 @@ OutputStream::~OutputStream()
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
-void OutputStream::__init__(Session *s, AudioPort *r)
+void OutputStream::__init__(Session *s)
 {
-	new(this) OutputStream(s, r);
+	new(this) OutputStream(s);
 }
 
 void OutputStream::__delete__()
@@ -476,11 +476,6 @@ void OutputStream::_read_stream()
 	ring_buf.write_ref_done(b);
 	buffer_is_cleared = false;
 //	printf(" -> %d of %d\n", size, buffer_size);
-}
-
-void OutputStream::set_source(AudioPort *s)
-{
-	source = s;
 }
 
 void OutputStream::set_device(Device *d)

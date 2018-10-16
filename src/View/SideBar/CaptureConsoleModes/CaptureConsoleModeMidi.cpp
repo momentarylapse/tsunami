@@ -59,10 +59,11 @@ void CaptureConsoleModeMidi::set_target(Track *t)
 	// FIXME ...
 	//view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
-	preview_synth->set_source(input->out);
+	preview_synth->plug(0, input, 0);
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
-	peak_meter->set_source(preview_synth->out);
-	preview_stream = new OutputStream(session, peak_meter->out);
+	peak_meter->plug(0, preview_synth, 0);
+	preview_stream = new OutputStream(session);
+	preview_stream->plug(0, peak_meter, 0);
 	preview_stream->set_buffer_size(512);
 	preview_stream->play();
 

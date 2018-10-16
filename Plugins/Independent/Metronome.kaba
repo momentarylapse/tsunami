@@ -255,7 +255,7 @@ class Metronome extends TsunamiPlugin
 		beat_midifier = CreateBeatMidifier(session)
 		beat_midifier.set_beat_source(source.out)
 		synth = CreateSynthesizer(session, "")
-		synth.set_source(beat_midifier.out)
+		synth.plug(0, beat_midifier, 0)
 	
 		stream = new OutputStream(session, synth.out)
 		stream.set_buffer_size(1024)

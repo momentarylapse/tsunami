@@ -23,7 +23,7 @@ class Metronome extends AudioEffect
 	override void __init__()
 		synth = new DummySynthesizer
 		source = new MetronomeSource
-		synth.set_source(source.out)
+		synth.plug(0, source, 0)
 	
 	override void __delete__()
 		delete source

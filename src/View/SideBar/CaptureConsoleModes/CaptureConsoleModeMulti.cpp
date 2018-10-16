@@ -75,9 +75,9 @@ void CaptureConsoleModeMulti::enter()
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, c.peak_meter);
 
 		if (t->type == SignalType::AUDIO){
-			c.peak_meter->set_source(c.input_audio->out);
+			c.peak_meter->plug(0, c.input_audio, 0);
 			c.sucker = CreateAudioSucker(session);
-			c.sucker->set_source(c.peak_meter->out);
+			c.sucker->plug(0, c.peak_meter, 0);
 		}
 
 		items.add(c);
@@ -159,13 +159,13 @@ void CaptureConsoleModeMulti::leave()
 	view->mode_capture->set_data({});
 	for (auto c: items){
 		c.peak_meter_display->set_source(nullptr);
-		c.peak_meter->set_source(nullptr);
+		c.peak_meter->unplug(0);
 
 		if (c.track->type == SignalType::AUDIO){
 			delete c.sucker;
 			delete c.input_audio;
 		}else if (c.track->type == SignalType::MIDI){
-			c.peak_meter->set_source(nullptr);
+			c.peak_meter->unplug(0);
 			delete c.input_midi;
 		}
 

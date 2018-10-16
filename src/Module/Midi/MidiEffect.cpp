@@ -58,11 +58,6 @@ void MidiEffect::__delete__()
 	this->MidiEffect::~MidiEffect();
 }
 
-void MidiEffect::set_source(MidiPort *s)
-{
-	source = s;
-}
-
 void MidiEffect::prepare()
 {
 	reset_state();

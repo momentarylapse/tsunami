@@ -116,6 +116,8 @@ class Module
 	extern virtual void module_start()
 	extern virtual void module_stop()
 	extern virtual void module_pause(bool paused)
+	extern void plug(int in_port, Module* source, int out_port)
+	extern void unplug(int in_port)
 	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
 
@@ -202,7 +204,7 @@ class MidiSource extends Module
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
 	MidiPort *out
-	extern void set_beat_source(BeatPort *source)
+	//extern void set_beat_source(BeatPort *source)
 
 class Synthesizer extends Module
 	int sample_rate
@@ -216,7 +218,6 @@ class Synthesizer extends Module
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
 	extern void set_sample_rate(int sample_rate)
-	extern void set_source(MidiPort* source)
 //	extern void feed(MidiEventBuffer midi)
 	extern void enable_pitch(int pitch, bool enable)
 
@@ -438,7 +439,7 @@ class SongRenderer extends AudioSource
 
 
 class OutputStream extends Module
-	extern void __init__(Session *session, AudioPort* source)
+	extern void __init__(Session *session)
 	extern override void __delete__()
 	extern void stop()
 	extern void play()

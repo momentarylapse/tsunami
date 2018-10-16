@@ -104,7 +104,7 @@ void TestPlugins::test_synthesizer(const string &name)
 	MidiSource *source = CreateMidiSource(Session::GLOBAL, "Metronome");
 
 	auto *synth = CreateSynthesizer(Session::GLOBAL, name);
-	synth->set_source(source->out);
+	synth->plug(0, source, 0);
 
 	AudioBuffer buf;
 	buf.resize(1 << 12);

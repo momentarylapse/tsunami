@@ -67,7 +67,6 @@ public:
 	};
 	Output *out;
 
-	void set_source(MidiPort *source);
 	MidiPort *source;
 
 protected:

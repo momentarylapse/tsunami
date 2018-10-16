@@ -59,7 +59,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
 	}else if (type == ModuleType::OUTPUT_STREAM_AUDIO){
-		return new OutputStream(session, nullptr);
+		return new OutputStream(session);
 	}else if (type == ModuleType::INPUT_STREAM_AUDIO){
 		return new InputStreamAudio(session);
 	}else if (type == ModuleType::INPUT_STREAM_MIDI){

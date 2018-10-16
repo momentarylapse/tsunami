@@ -153,6 +153,8 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "module_pause", Kaba::mf(&Module::module_pause), &module);
+	Kaba::LinkExternal("Module.plug", Kaba::mf(&Module::plug));
+	Kaba::LinkExternal("Module.unplug", Kaba::mf(&Module::unplug));
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 
@@ -280,7 +282,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "reset", Kaba::mf(&MidiSource::reset), &msource);
-	Kaba::LinkExternal("MidiSource.set_beat_source", Kaba::mf(&MidiSource::set_beat_source));
 
 
 	BeatMidifier bmidifier;
@@ -305,7 +306,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Synthesizer.enable_pitch", Kaba::mf(&Synthesizer::enablePitch));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
 	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::setSampleRate));
-	Kaba::LinkExternal("Synthesizer.set_source", Kaba::mf(&Synthesizer::set_source));
 
 
 	DummySynthesizer dsynth;
@@ -475,7 +475,7 @@ void PluginManager::LinkAppScriptData()
 	}
 
 	{
-	OutputStream stream(Session::GLOBAL, nullptr);
+	OutputStream stream(Session::GLOBAL);
 	Kaba::DeclareClassSize("OutputStream", sizeof(OutputStream));
 	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
 	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);

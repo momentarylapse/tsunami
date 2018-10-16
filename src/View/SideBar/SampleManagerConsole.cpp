@@ -325,7 +325,8 @@ void SampleManagerConsole::onPreview()
 	int sel = getInt("sample_list");
 	preview_sample = items[sel]->s;
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
-	preview_stream = new OutputStream(session, preview_renderer->out);
+	preview_stream = new OutputStream(session);
+	preview_stream->plug(0, preview_renderer, 0);
 
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));

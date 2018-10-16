@@ -34,6 +34,7 @@ MidiSource::MidiSource() :
 	beat_source = BeatSource::dummy->out;
 	out = new Output(this);
 	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "beats"));
 }
 
 void MidiSource::__init__()
@@ -44,11 +45,6 @@ void MidiSource::__init__()
 void MidiSource::__delete__()
 {
 	this->MidiSource::~MidiSource();
-}
-
-void MidiSource::set_beat_source(BeatPort *s)
-{
-	beat_source = s;
 }
 
 

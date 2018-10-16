@@ -61,13 +61,3 @@ int AudioJoiner::Output::get_pos(int delta)
 		return joiner->b->get_pos(delta);
 	return 0;
 }
-
-void AudioJoiner::set_source_a(AudioPort* _a)
-{
-	a = _a;
-}
-
-void AudioJoiner::set_source_b(AudioPort* _b)
-{
-	b = _b;
-}

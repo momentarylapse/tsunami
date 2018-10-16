@@ -53,11 +53,6 @@ void PitchDetector::__delete__()
 	this->PitchDetector::~PitchDetector();
 }
 
-void PitchDetector::set_source(AudioPort *s)
-{
-	source = s;
-}
-
 void PitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf)
 {
 	Array<float> temp;

@@ -65,11 +65,6 @@ void AudioEffect::__delete__()
 	this->AudioEffect::~AudioEffect();
 }
 
-void AudioEffect::set_source(AudioPort *_source)
-{
-	source = _source;
-}
-
 void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
 {
 	sample_rate = l->song()->sample_rate;

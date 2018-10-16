@@ -76,11 +76,6 @@ void AudioVisualizer::__delete__()
 	this->AudioVisualizer::~AudioVisualizer();
 }
 
-void AudioVisualizer::set_source(AudioPort *s)
-{
-	source = s;
-}
-
 void AudioVisualizer::set_chunk_size(int _chunk_size)
 {
 	chunk_size = _chunk_size;

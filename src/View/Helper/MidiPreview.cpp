@@ -12,30 +12,31 @@
 #include "../../Device/OutputStream.h"
 
 
-// FIXME: make MidiSource...
-class MidiPreviewSource : public MidiPort
+class MidiPreviewSource : public MidiSource
 {
 public:
-	bool debug;
-	MidiPreviewSource() : MidiPort("out")
+	MidiPreviewSource()
 	{
 		mode = Mode::WAITING;
 		ttl = -1;
 		volume = 1.0f;
 		debug = false;
 	}
-	void out(const string &str)
+
+	bool debug;
+	void o(const string &str)
 	{
 		if (debug)
 			msg_write(str);
 	}
-	virtual int _cdecl read(MidiEventBuffer &midi)
+
+	int read(MidiEventBuffer &midi) override
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 
-		out("mps.read");
+		o("mps.read");
 		if (mode == Mode::END_OF_STREAM){
-			out("  - end of stream");
+			o("  - end of stream");
 			return Port::END_OF_STREAM;
 		}
 
@@ -63,36 +64,6 @@ public:
 		}
 		return midi.samples;
 	}
-
-	void start(const Array<int> &_pitch, int _ttl)
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-		out("START");
-
-		pitch_queued = _pitch;
-		ttl = _ttl;
-
-		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)){
-			set_mode(Mode::START_NOTES);
-		}else if ((mode == Mode::END_NOTES) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
-			set_mode(Mode::CHANGE_NOTES);
-		}
-	}
-	void end()
-	{
-		out("END");
-		std::lock_guard<std::mutex> lock(mutex);
-
-		if (mode == Mode::START_NOTES){
-			// skip queue
-			set_mode(Mode::WAITING);
-		}else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
-			set_mode(Mode::END_NOTES);
-		}
-	}
-
-private:
-	std::mutex mutex;
 	int mode;
 	enum Mode{
 		WAITING,
@@ -120,7 +91,7 @@ private:
 	}
 	void set_mode(int new_mode)
 	{
-		out("    " + mode_str(mode) + " -> " + mode_str(new_mode));
+		o("    " + mode_str(mode) + " -> " + mode_str(new_mode));
 		mode = new_mode;
 	}
 	int ttl;
@@ -128,6 +99,37 @@ private:
 	Array<int> pitch_active;
 	Array<int> pitch_queued;
 	float volume;
+
+
+	void start(const Array<int> &_pitch, int _ttl)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		o("START");
+
+		pitch_queued = _pitch;
+		ttl = _ttl;
+
+		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)){
+			set_mode(Mode::START_NOTES);
+		}else if ((mode == Mode::END_NOTES) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
+			set_mode(Mode::CHANGE_NOTES);
+		}
+	}
+	void end()
+	{
+		o("END");
+		std::lock_guard<std::mutex> lock(mutex);
+
+		if (mode == Mode::START_NOTES){
+			// skip queue
+			set_mode(Mode::WAITING);
+		}else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
+			set_mode(Mode::END_NOTES);
+		}
+	}
+
+private:
+	std::mutex mutex;
 };
 
 MidiPreview::MidiPreview(Session *s)
@@ -153,10 +155,11 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 	if (!synth){
 		synth = (Synthesizer*)s->copy();
 //		synth->setInstrument(view->cur_track->instrument);
-		synth->set_source(source);
+		synth->plug(0, source, 0);
 	}
 	if (!stream){
-		stream = new OutputStream(session, synth->out);
+		stream = new OutputStream(session);
+		stream->plug(0, synth, 0);
 		stream->subscribe(this, std::bind(&MidiPreview::on_end_of_stream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
 	stream->set_volume(volume);

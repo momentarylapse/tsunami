@@ -82,11 +82,6 @@ AudioSucker::~AudioSucker()
 	}
 }
 
-void AudioSucker::set_source(AudioPort* s)
-{
-	source = s;
-}
-
 void AudioSucker::accumulate(bool enable)
 {
 	accumulating = enable;

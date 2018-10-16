@@ -46,7 +46,6 @@ public:
 	Output *out;
 
 	AudioPort *source;
-	void set_source(AudioPort *source);
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 

@@ -31,7 +31,6 @@ public:
 		void _cdecl reset() override;
 		MidiSource *source;
 	};
-	Output *out;
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
@@ -43,8 +42,6 @@ public:
 	void skip(int beats);
 	void skip_x(int beats, int sub_beats, int beat_partition);
 	MidiEventBuffer *bh_midi;
-
-	BeatPort *beat_source;
 };
 
 MidiSource *_cdecl CreateMidiSource(Session *session, const string &name);

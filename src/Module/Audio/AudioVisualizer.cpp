@@ -53,8 +53,7 @@ void AudioVisualizer::Output::reset()
 AudioVisualizer::AudioVisualizer() :
 	Module(ModuleType::AUDIO_VISUALIZER)
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = nullptr;
 	buffer = new RingBuffer(1 << 18);

@@ -273,7 +273,6 @@ void PluginManager::LinkAppScriptData()
 
 	MidiSource msource;
 	Kaba::DeclareClassSize("MidiSource", sizeof(MidiSource));
-	Kaba::DeclareClassOffset("MidiSource", "out", _offsetof(MidiSource, out));
 	Kaba::DeclareClassOffset("MidiSource", "bh_midi", _offsetof(MidiSource, bh_midi));
 	Kaba::LinkExternal("MidiSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiSource::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &msource);
@@ -363,7 +362,6 @@ void PluginManager::LinkAppScriptData()
 
 	BeatSource bsource;
 	Kaba::DeclareClassSize("BeatSource", sizeof(BeatSource));
-	Kaba::DeclareClassOffset("BeatSource", "out", _offsetof(BeatSource, out));
 	Kaba::LinkExternal("BeatSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatSource::__init__));
 	Kaba::DeclareClassVirtualIndex("BeatSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatSource::__delete__), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "read", Kaba::mf(&BeatSource::read), &bsource);

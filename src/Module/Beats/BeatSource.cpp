@@ -10,8 +10,6 @@
 #include "../../Session.h"
 #include "../../Data/base.h"
 
-DummyBeatSource* BeatSource::dummy = new DummyBeatSource;
-
 BeatSource::BeatSource() :
 	Module(ModuleType::BEAT_SOURCE)
 {

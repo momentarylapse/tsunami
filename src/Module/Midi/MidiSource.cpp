@@ -8,7 +8,6 @@
 #include "MidiSource.h"
 #include "../../Session.h"
 #include "../ModuleFactory.h"
-#include "../Beats/BeatSource.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
@@ -33,10 +32,7 @@ void  MidiSource::Output::reset()
 MidiSource::MidiSource() :
 	Module(ModuleType::MIDI_SOURCE)
 {
-	beat_source = BeatSource::dummy->out;
-	out = new Output(this);
-	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "beats"));
+	port_out.add(new Output(this));
 
 	bh_offset = 0;
 	bh_midi = nullptr;

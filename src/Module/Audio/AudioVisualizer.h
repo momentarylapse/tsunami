@@ -36,7 +36,6 @@ public:
 		void _cdecl reset() override;
 		AudioVisualizer *visualizer;
 	};
-	Output *out;
 
 	RingBuffer *buffer;
 	int chunk_size;

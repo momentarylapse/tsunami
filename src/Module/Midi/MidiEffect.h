@@ -50,7 +50,6 @@ public:
 
 		MidiEffect *fx;
 	};
-	Output *out;
 };
 
 MidiEffect *_cdecl CreateMidiEffect(Session *session, const string &name);

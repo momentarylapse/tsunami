@@ -288,7 +288,7 @@ void SongRenderer::build_data()
 {
 	bar_streamer = new BarStreamer(song->bars);
 	beat_midifier = new BeatMidifier;
-	beat_midifier->plug(1, bar_streamer, 0);
+	beat_midifier->plug(0, bar_streamer, 0);
 
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));

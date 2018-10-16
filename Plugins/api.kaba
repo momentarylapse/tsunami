@@ -199,7 +199,6 @@ class MidiSource extends Module
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
-	MidiPort* out
 	// crappy experimental note api:
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
@@ -215,7 +214,6 @@ class Synthesizer extends Module
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	MidiEventBuffer events
-	AudioPort* out
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
@@ -252,7 +250,6 @@ class BeatSource extends Module
 	extern virtual int beats_per_bar()
 	extern virtual int cur_beat()
 	extern virtual float beat_fraction()
-	BeatPort *out
 
 class BeatMidifier extends MidiSource
 	extern override void __init__()
@@ -476,7 +473,6 @@ class _MidiPort
 class InputStreamAudio extends Module
 	RingBuffer current_buffer
 	AudioBuffer buffer
-	AudioPort* out
 	extern void __init__(Session* session)
 	extern override void __delete__()
 	extern bool start()

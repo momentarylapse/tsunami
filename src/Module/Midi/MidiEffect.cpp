@@ -37,8 +37,7 @@ void MidiEffect::Output::reset()
 MidiEffect::MidiEffect() :
 	Module(ModuleType::MIDI_EFFECT)
 {
-	out = new Output(this);
-	port_out.add(out);
+	port_out.add(new Output(this));
 	port_in.add(InPortDescription(SignalType::MIDI, (Port**)&source, "in"));
 	source = nullptr;
 	only_on_selection = false;

@@ -10,6 +10,8 @@
 
 #include "../Midi/MidiSource.h"
 
+class BeatPort;
+
 class BeatMidifier : public MidiSource
 {
 public:
@@ -17,6 +19,7 @@ public:
 	int _cdecl read(MidiEventBuffer &midi) override;
 	void _cdecl reset() override;
 
+	BeatPort *beat_source;
 	float volume;
 };
 

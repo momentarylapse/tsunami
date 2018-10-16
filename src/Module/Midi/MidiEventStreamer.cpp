@@ -37,8 +37,6 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi)
 
 void MidiEventStreamer::reset()
 {
-	if (beat_source)
-		beat_source->reset();
 	offset = 0;
 }
 

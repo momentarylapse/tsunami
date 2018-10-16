@@ -23,7 +23,7 @@ const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
 static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
-InputStreamMidi::Output::Output(InputStreamMidi *_input)
+InputStreamMidi::Output::Output(InputStreamMidi *_input) : MidiPort("out")
 {
 	input = _input;
 	real_time_mode = true;
@@ -84,7 +84,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	device_manager = session->device_manager;
 
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
+	port_out.add(out);
 
 	timer = new hui::Timer;
 
@@ -95,7 +95,6 @@ InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	unconnect();
-	delete out;
 	delete timer;
 }
 

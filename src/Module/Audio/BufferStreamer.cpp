@@ -47,7 +47,7 @@ void BufferStreamer::reset()
 	offset = 0;
 }
 
-void BufferStreamer::seek(int pos)
+/*void BufferStreamer::seek(int pos)
 {
 	offset = pos;
-}
+}*/

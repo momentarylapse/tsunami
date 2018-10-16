@@ -36,7 +36,8 @@ public:
 class ConfigPanel;
 class Session;
 class Plugin;
-class PortDescription;
+class Port;
+class InPortDescription;
 
 enum class ModuleType
 {
@@ -107,7 +108,10 @@ public:
 	bool enabled;
 	string get_error();
 
-	Array<PortDescription> port_in, port_out;
+	Array<InPortDescription> port_in;
+	Array<Port*> port_out;
+	void plug(int in_port, Module *source, int out_port);
+	void unplug(int in_port);
 
 	static string type_to_name(ModuleType type);
 	static ModuleType type_from_name(const string &name);

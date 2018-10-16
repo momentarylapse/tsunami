@@ -6,14 +6,16 @@
  */
 
 #include "AudioPort.h"
+#include "../../Data/base.h"
 
-AudioPort::AudioPort()
+AudioPort::AudioPort(const string &name) :
+	Port(SignalType::AUDIO, name)
 {
 }
 
-void AudioPort::__init__()
+void AudioPort::__init__(const string &name)
 {
-	new(this) AudioPort;
+	new(this) AudioPort(name);
 }
 
 void AudioPort::__delete__()

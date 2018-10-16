@@ -15,7 +15,7 @@
 #include "../../Data/TrackLayer.h"
 
 
-AudioEffect::Output::Output(AudioEffect *_fx)
+AudioEffect::Output::Output(AudioEffect *_fx) : AudioPort("out")
 {
 	fx = _fx;
 }
@@ -50,14 +50,9 @@ AudioEffect::AudioEffect() :
 {
 	source = nullptr;
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
-}
-
-AudioEffect::~AudioEffect()
-{
-	delete out;
 }
 
 void AudioEffect::__init__()

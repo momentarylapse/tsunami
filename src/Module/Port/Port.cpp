@@ -10,15 +10,13 @@
 const int Port::NOT_ENOUGH_DATA = 0;
 const int Port::END_OF_STREAM = -2;
 
-Port::Port()
+Port::Port(SignalType _type, const string &_name)
 {
+	type = _type;
+	name = _name;
 }
 
-Port::~Port()
-{
-}
-
-PortDescription::PortDescription(SignalType _type, Port** _port, const string& _name)
+InPortDescription::InPortDescription(SignalType _type, Port** _port, const string& _name)
 {
 	type = _type;
 	port = _port;

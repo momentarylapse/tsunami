@@ -17,7 +17,6 @@ class BeatSource : public Module
 {
 public:
 	BeatSource();
-	virtual ~BeatSource();
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;

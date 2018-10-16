@@ -181,7 +181,7 @@ public:
 					s.type = Selection::TYPE_PORT_OUT;
 					s.module = m;
 					s.port = i;
-					s.port_type = m->port_out[i].type;
+					s.port_type = m->port_out[i]->type;
 					s.dx = x;
 					s.dy = y;
 					return s;
@@ -263,9 +263,9 @@ public:
 			float r = hovering ? 6 : 4;
 			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
-		foreachi(auto &pd, m->port_out, i){
+		foreachi(auto *pd, m->port_out, i){
 			bool hovering = (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i);
-			p->setColor(signal_color(pd.type, hovering));
+			p->setColor(signal_color(pd->type, hovering));
 			float r = hovering ? 6 : 4;
 			p->drawCircle(module_port_out_x(m), module_port_out_y(m, i), r);
 		}

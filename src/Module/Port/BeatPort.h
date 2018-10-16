@@ -16,8 +16,9 @@ class Beat;
 class BeatPort : public Port
 {
 public:
+	BeatPort(const string &name);
 	virtual ~BeatPort(){}
-	virtual void _cdecl __init__();
+	virtual void _cdecl __init__(const string &name);
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(Array<Beat> &beats, int samples){ return 0; }

@@ -15,18 +15,21 @@ enum class SignalType;
 class Port : public VirtualBase
 {
 public:
-	Port();
-	virtual ~Port();
+	Port(SignalType type, const string &name);
+	virtual ~Port(){}
+
+	SignalType type;
+	string name;
 
 	static const int END_OF_STREAM;
 	static const int NOT_ENOUGH_DATA;
 };
 
-class PortDescription
+class InPortDescription
 {
 public:
-	PortDescription(){}
-	PortDescription(SignalType type, Port **port, const string &name);
+	InPortDescription(){}
+	InPortDescription(SignalType type, Port **port, const string &name);
 	SignalType type;
 	Port **port;
 	string name;

@@ -158,7 +158,8 @@ int InputStreamAudio::SyncData::get_delay()
 	return 0;
 }
 
-InputStreamAudio::Output::Output(InputStreamAudio *s)
+InputStreamAudio::Output::Output(InputStreamAudio *s) :
+	AudioPort("out")
 {
 	stream = s;
 }
@@ -207,7 +208,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 #endif
 
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
+	port_out.add(out);
 
 	device = session->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
 	dev_man = session->device_manager;
@@ -227,7 +228,6 @@ InputStreamAudio::~InputStreamAudio()
 {
 //	printf("input del\n");
 	stop();
-	delete out;
 }
 
 void InputStreamAudio::__init__(Session *session)

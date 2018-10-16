@@ -33,9 +33,9 @@ class Synthesizer : public Module
 	friend class FileChunkSynthesizerTuning;
 public:
 	Synthesizer();
-	virtual ~Synthesizer();
+
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	virtual void _cdecl render(AudioBuffer &buf){}
 
@@ -61,9 +61,8 @@ public:
 	public:
 		Output(Synthesizer *synth);
 		Synthesizer *synth;
-		virtual int _cdecl read(AudioBuffer &buf);
-		virtual void _cdecl reset();
-		virtual int _cdecl sample_rate();
+		int _cdecl read(AudioBuffer &buf) override;
+		void _cdecl reset() override;
 
 	};
 	Output *out;

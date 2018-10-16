@@ -13,15 +13,11 @@ AudioJoiner::AudioJoiner() :
 	Module(ModuleType::AUDIO_JOINER)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&a, "a"));
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&b, "b"));
+	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&a, "a"));
+	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&b, "b"));
 	a = nullptr;
 	b = nullptr;
-}
-
-AudioJoiner::~AudioJoiner()
-{
 }
 
 int AudioJoiner::Output::read(AudioBuffer& buf)
@@ -44,7 +40,7 @@ int AudioJoiner::Output::read(AudioBuffer& buf)
 	return buf.length;
 }
 
-AudioJoiner::Output::Output(AudioJoiner *j)
+AudioJoiner::Output::Output(AudioJoiner *j) : AudioPort("out")
 {
 	joiner = j;
 }

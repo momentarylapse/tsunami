@@ -20,11 +20,11 @@ public:
 	virtual ~PitchDetector();
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	void set_source(AudioPort *source);
 
-	virtual int _cdecl read(MidiEventBuffer &midi);
+	int _cdecl read(MidiEventBuffer &midi) override;
 
 	void process(MidiEventBuffer &midi, AudioBuffer &buf);
 

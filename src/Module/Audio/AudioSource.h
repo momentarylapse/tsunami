@@ -17,18 +17,17 @@ class AudioSource : public Module
 {
 public:
 	AudioSource();
-	virtual ~AudioSource();
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	class Output : public AudioPort
 	{
 	public:
 		Output(AudioSource *s);
-		virtual int _cdecl read(AudioBuffer &buf);
-		virtual void _cdecl reset();
-		virtual int _cdecl get_pos(int delta);
+		int _cdecl read(AudioBuffer &buf) override;
+		void _cdecl reset() override;
+		int _cdecl get_pos(int delta) override;
 		AudioSource *source;
 	};
 	Output *out;

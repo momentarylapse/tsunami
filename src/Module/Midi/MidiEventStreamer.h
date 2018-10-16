@@ -16,10 +16,9 @@ class MidiEventStreamer : public MidiSource
 {
 public:
 	MidiEventStreamer(const MidiEventBuffer &midi);
-	virtual ~MidiEventStreamer();
 
-	virtual int _cdecl read(MidiEventBuffer &midi);
-	virtual void _cdecl reset();
+	int _cdecl read(MidiEventBuffer &midi) override;
+	void _cdecl reset() override;
 
 	void _cdecl set_data(const MidiEventBuffer &midi);
 

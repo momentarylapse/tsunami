@@ -266,7 +266,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("SampleRef." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SampleRef::__init__));
 	Kaba::DeclareClassVirtualIndex("SampleRef", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SampleRef::__delete__), &sampleref);
 
-	MidiPort mport;
+	MidiPort mport("");
 	Kaba::DeclareClassSize("MidiPort", sizeof(MidiPort));
 	Kaba::LinkExternal("MidiPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiPort::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiPort::__delete__), &mport);
@@ -353,7 +353,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiNoteBuffer.get_notes", Kaba::mf(&MidiNoteBuffer::getNotes));
 	Kaba::LinkExternal("MidiNoteBuffer.get_range", Kaba::mf(&MidiNoteBuffer::range));
 
-	BeatPort bport;
+	BeatPort bport("");
 	Kaba::DeclareClassSize("BeatPort", sizeof(BeatPort));
 	Kaba::LinkExternal("BeatPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatPort::__init__));
 	Kaba::DeclareClassVirtualIndex("BeatPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatPort::__delete__), &bport);
@@ -438,7 +438,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::addSample));
 	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::deleteSample));
 
-	AudioPort aport;
+	AudioPort aport("");
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));
 	Kaba::LinkExternal("AudioPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioPort::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioPort::__delete__), &aport);

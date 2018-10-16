@@ -12,7 +12,7 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Data/base.h"
 
-AudioVisualizer::Output::Output(AudioVisualizer *v)
+AudioVisualizer::Output::Output(AudioVisualizer *v) : AudioPort("out")
 {
 	visualizer = v;
 }
@@ -54,8 +54,8 @@ AudioVisualizer::AudioVisualizer() :
 	Module(ModuleType::AUDIO_VISUALIZER)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = nullptr;
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;
@@ -63,7 +63,6 @@ AudioVisualizer::AudioVisualizer() :
 
 AudioVisualizer::~AudioVisualizer()
 {
-	delete out;
 	delete buffer;
 }
 

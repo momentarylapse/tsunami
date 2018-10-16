@@ -6,15 +6,17 @@
  */
 
 #include "MidiPort.h"
+#include "../../Data/base.h"
 
 
-MidiPort::MidiPort()
+MidiPort::MidiPort(const string &name) :
+	Port(SignalType::MIDI, name)
 {
 }
 
-void MidiPort::__init__()
+void MidiPort::__init__(const string &name)
 {
-	new(this) MidiPort;
+	new(this) MidiPort(name);
 }
 
 void MidiPort::__delete__()

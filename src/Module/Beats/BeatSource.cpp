@@ -16,12 +16,7 @@ BeatSource::BeatSource() :
 	Module(ModuleType::BEAT_SOURCE)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::BEATS, (Port**)&out, "out"));
-}
-
-BeatSource::~BeatSource()
-{
-	delete out;
+	port_out.add(out);
 }
 
 void BeatSource::__init__()
@@ -34,7 +29,7 @@ void BeatSource::__delete__()
 	this->BeatSource::~BeatSource();
 }
 
-BeatSource::Output::Output(BeatSource* s)
+BeatSource::Output::Output(BeatSource* s) : BeatPort("out")
 {
 	source = s;
 }

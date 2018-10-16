@@ -14,15 +14,14 @@ class BufferStreamer : public AudioSource
 {
 public:
 	BufferStreamer(AudioBuffer *buf);
-	virtual ~BufferStreamer(){}
 
 	void _cdecl __init__(AudioBuffer *buf);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
-	virtual int _cdecl read(AudioBuffer &buf);
-	virtual void _cdecl reset();
-	virtual int _cdecl get_pos(int delta){ return offset + delta; }
-	void _cdecl seek(int pos);
+	int _cdecl read(AudioBuffer &buf) override;
+	void _cdecl reset() override;
+	int _cdecl get_pos(int delta) override { return offset + delta; }
+	//void _cdecl seek(int pos);
 
 	AudioBuffer *buf;
 	int offset;

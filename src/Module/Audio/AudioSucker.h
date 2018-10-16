@@ -19,7 +19,7 @@ class AudioSucker : public Module
 	friend class AudioSuckerThread;
 public:
 	AudioSucker();
-	virtual ~AudioSucker();
+	~AudioSucker() override;
 
 	void set_source(AudioPort *s);
 	void accumulate(bool enable);
@@ -43,8 +43,8 @@ public:
 	float no_data_wait;
 
 	AudioSuckerThread *thread;
-	virtual void module_start(){ start(); }
-	virtual void module_stop(){ stop(); }
+	void module_start() override { start(); }
+	void module_stop() override { stop(); }
 };
 
 AudioSucker *CreateAudioSucker(Session *session);

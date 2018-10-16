@@ -12,7 +12,7 @@
 #include "../../Data/base.h"
 
 
-MidiSource::Output::Output(MidiSource *s)
+MidiSource::Output::Output(MidiSource *s) : MidiPort("out")
 {
 	source = s;
 }
@@ -33,12 +33,7 @@ MidiSource::MidiSource() :
 {
 	beat_source = BeatSource::dummy->out;
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::MIDI, (Port**)&out, "out"));
-}
-
-MidiSource::~MidiSource()
-{
-	delete out;
+	port_out.add(out);
 }
 
 void MidiSource::__init__()

@@ -26,10 +26,9 @@ class MidiEffect : public Module
 {
 public:
 	MidiEffect();
-	virtual ~MidiEffect();
 
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	bool only_on_selection;
 	Range range;
@@ -56,9 +55,8 @@ public:
 	{
 	public:
 		Output(MidiEffect *fx);
-		virtual ~Output(){}
-		virtual int _cdecl read(MidiEventBuffer &midi);
-		virtual void _cdecl reset();
+		int _cdecl read(MidiEventBuffer &midi) override;
+		void _cdecl reset() override;
 
 		MidiEffect *fx;
 	};

@@ -14,12 +14,7 @@ AudioSource::AudioSource() :
 	Module(ModuleType::AUDIO_SOURCE)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-}
-
-AudioSource::~AudioSource()
-{
-	delete out;
+	port_out.add(out);
 }
 
 void AudioSource::__init__()
@@ -32,7 +27,7 @@ void AudioSource::__delete__()
 	this->AudioSource::~AudioSource();
 }
 
-AudioSource::Output::Output(AudioSource *s)
+AudioSource::Output::Output(AudioSource *s) : AudioPort("out")
 {
 	source = s;
 }

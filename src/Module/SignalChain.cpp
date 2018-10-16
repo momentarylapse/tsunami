@@ -99,23 +99,16 @@ void SignalChain::remove(Module *m)
 
 void SignalChain::connect(Module *source, int source_port, Module *target, int target_port)
 {
-	if (source_port < 0 or source_port >= source->port_out.num)
-		throw Exception("bla");
-	if (target_port < 0 or target_port >= target->port_in.num)
-		throw Exception("bla");
-	//msg_write("connect " + i2s(source->port_out[source_port].type) + " -> " + i2s(target->port_in[target_port].type));
-	if (source->port_out[source_port].type != target->port_in[target_port].type)
-		throw Exception("bla");
+	target->plug(target_port, source, source_port);
+
 	// TODO: check ports in use
 	Cable *c = new Cable;
-	c->type = source->port_out[source_port].type;
+	c->type = source->port_out[source_port]->type;
 	c->source = source;
 	c->target = target;
 	c->source_port = source_port;
 	c->target_port = target_port;
 	cables.add(c);
-
-	*target->port_in[target_port].port = *source->port_out[source_port].port;
 
 	notify(MESSAGE_ADD_CABLE);
 }
@@ -124,7 +117,7 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 {
 	foreachi(Cable *cc, cables, i)
 		if (cc == c){
-			*c->target->port_in[c->target_port].port = nullptr;
+			c->target->unplug(c->target_port);
 
 			delete(c);
 			cables.erase(i);

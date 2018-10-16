@@ -15,7 +15,7 @@
 BeatMidifier::BeatMidifier()
 {
 	module_type = ModuleType::BEAT_MIDIFIER;
-	port_in.add(PortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
+	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 
 	volume = 1.0f;
 }

@@ -16,10 +16,10 @@ class MidiEventBuffer;
 class MidiPort : public Port
 {
 public:
-	MidiPort();
+	MidiPort(const string &name);
 	virtual ~MidiPort(){}
 
-	void _cdecl __init__();
+	void _cdecl __init__(const string &name);
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };

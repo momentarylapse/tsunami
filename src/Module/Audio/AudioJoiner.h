@@ -15,7 +15,6 @@ class AudioJoiner : public Module
 {
 public:
 	AudioJoiner();
-	virtual ~AudioJoiner();
 
 	class Output : public AudioPort
 	{

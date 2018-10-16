@@ -61,7 +61,7 @@ public:
 AudioSucker::AudioSucker() :
 	Module(ModuleType::AUDIO_SUCKER)
 {
-	port_in.add(PortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 	source = nullptr;
 	accumulating = false;
 	running = false;

@@ -17,10 +17,6 @@ MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi)
 	ignore_end = false;
 }
 
-MidiEventStreamer::~MidiEventStreamer()
-{
-}
-
 int MidiEventStreamer::read(MidiEventBuffer& _midi)
 {
 	int n = min(midi.samples - offset, _midi.samples);

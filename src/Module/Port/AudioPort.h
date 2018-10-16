@@ -15,10 +15,10 @@ class AudioBuffer;
 class AudioPort : public Port
 {
 public:
-	AudioPort();
+	AudioPort(const string &name);
 	virtual ~AudioPort(){}
 
-	void _cdecl __init__();
+	void _cdecl __init__(const string &name);
 	virtual void _cdecl __delete__();
 
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }

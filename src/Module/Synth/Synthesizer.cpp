@@ -15,14 +15,9 @@
 #include "../../lib/math/math.h"
 #include "../Port/MidiPort.h"
 
-Synthesizer::Output::Output(Synthesizer *s)
+Synthesizer::Output::Output(Synthesizer *s) : AudioPort("out")
 {
 	synth = s;
-}
-
-int Synthesizer::Output::sample_rate()
-{
-	return synth->sample_rate;
 }
 
 void Synthesizer::Output::reset()
@@ -74,8 +69,8 @@ Synthesizer::Synthesizer() :
 	Module(ModuleType::SYNTHESIZER)
 {
 	out = new Output(this);
-	port_out.add(PortDescription(SignalType::AUDIO, (Port**)&out, "out"));
-	port_in.add(PortDescription(SignalType::MIDI, (Port**)&source, "in"));
+	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::MIDI, (Port**)&source, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);
@@ -85,11 +80,6 @@ Synthesizer::Synthesizer() :
 	tuning.set_default();
 
 	setSampleRate(DEFAULT_SAMPLE_RATE);
-}
-
-Synthesizer::~Synthesizer()
-{
-	delete out;
 }
 
 void Synthesizer::__init__()

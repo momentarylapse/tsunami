@@ -6,10 +6,15 @@
  */
 
 #include "BeatPort.h"
+#include "../../Data/base.h"
 
-void BeatPort::__init__()
+BeatPort::BeatPort(const string &name) :
+	Port(SignalType::BEATS, name)
+{}
+
+void BeatPort::__init__(const string &name)
 {
-	new(this) BeatPort;
+	new(this) BeatPort(name);
 }
 
 void BeatPort::__delete__()

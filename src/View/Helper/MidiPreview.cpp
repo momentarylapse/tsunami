@@ -12,12 +12,12 @@
 #include "../../Device/OutputStream.h"
 
 
-
+// FIXME: make MidiSource...
 class MidiPreviewSource : public MidiPort
 {
 public:
 	bool debug;
-	MidiPreviewSource()
+	MidiPreviewSource() : MidiPort("out")
 	{
 		mode = Mode::WAITING;
 		ttl = -1;

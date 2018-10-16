@@ -12,6 +12,7 @@
 #include "../Port/MidiPort.h"
 
 class BeatPort;
+class Song;
 
 class MidiSource : public Module
 {
@@ -34,6 +35,14 @@ public:
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
+
+
+	int bh_offset;
+	void note(float pitch, float volume, int beats);
+	void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition);
+	void skip(int beats);
+	void skip_x(int beats, int sub_beats, int beat_partition);
+	MidiEventBuffer *bh_midi;
 
 	BeatPort *beat_source;
 };

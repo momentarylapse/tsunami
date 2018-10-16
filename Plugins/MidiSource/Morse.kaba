@@ -76,11 +76,19 @@ class Config extends PluginData
 		text = "test"
 		beat_partition = 2
 
-class Morse extends MidiEffect
+class Morse extends MidiSource
 	Config config
+	bool first
 	
-	override void process(MidiNoteBuffer midi)
-		int[] l = morse(config.text)
-		for ll in l
-			note_x(config.pitch, 1, 0, ll, config.beat_partition)
-			skip_x(0, 1, config.beat_partition)
+	override void reset_state()
+		first = true
+	
+	override int read(MidiEventBuffer midi)
+		if first
+			bh_midi = &midi
+			int[] l = morse(config.text)
+			for ll in l
+				note_x(config.pitch, 1, 0, ll, config.beat_partition)
+				skip_x(0, 1, config.beat_partition)
+			first = false
+		return midi.samples

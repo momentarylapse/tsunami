@@ -44,7 +44,7 @@ void ActionTrackSampleFromSelection::CreateSamplesFromLayerAudio(TrackLayer *l)
 
 void ActionTrackSampleFromSelection::CreateSamplesFromLayerMidi(TrackLayer *l)
 {
-	MidiNoteBuffer midi = l->midi.getNotesBySelection(sel);
+	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 	midi.samples = sel.range.length;
 	if (midi.num == 0)
 		return;

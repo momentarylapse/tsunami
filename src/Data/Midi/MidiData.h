@@ -29,18 +29,19 @@ class MidiEventBuffer : public Array<MidiEvent>
 public:
 	MidiEventBuffer();
 	void _cdecl __init__();
-	MidiEventBuffer getEvents(const Range &r) const;
+	MidiEventBuffer get_events(const Range &r) const;
 	int read(MidiEventBuffer &data, const Range &r) const;
-	Array<MidiNote> getNotes(const Range &r) const;
-	int getNextEvent(int pos) const;
+	Array<MidiNote> get_notes(const Range &r) const;
+	int get_next_event(int pos) const;
 
-	Range getRange(int elongation) const;
+	Range range(int elongation) const;
 	int samples;
 
 	void sort();
 	void sanify(const Range &r);
 
-	void addMetronomeClick(int pos, int level, float volume);
+	void add_note(const Range &range, float pitch, float volume);
+	void add_metronome_click(int pos, int level, float volume);
 	void append(const MidiEventBuffer &data);
 };
 
@@ -53,9 +54,9 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__();
 	void deep_clear();
-	MidiEventBuffer getEvents(const Range &r) const;
-	MidiNoteBufferRef getNotes(const Range &r) const;
-	MidiNoteBufferRef getNotesBySelection(const SongSelection &s) const;
+	MidiEventBuffer get_events(const Range &r) const;
+	MidiNoteBufferRef get_notes(const Range &r) const;
+	MidiNoteBufferRef get_notes_by_selection(const SongSelection &s) const;
 	MidiNoteBuffer duplicate() const;
 	void append(const MidiNoteBuffer &midi, int offset);
 

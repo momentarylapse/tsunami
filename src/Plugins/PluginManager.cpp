@@ -198,10 +198,6 @@ void PluginManager::LinkAppScriptData()
 	Kaba::LinkExternal("MidiEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEffect::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiEffect::__delete__), &meffect);
 	Kaba::DeclareClassVirtualIndex("MidiEffect", "process", Kaba::mf(&MidiEffect::process), &meffect);
-	Kaba::LinkExternal("MidiEffect.note", Kaba::mf(&MidiEffect::note));
-	Kaba::LinkExternal("MidiEffect.skip", Kaba::mf(&MidiEffect::skip));
-	Kaba::LinkExternal("MidiEffect.note_x", Kaba::mf(&MidiEffect::note_x));
-	Kaba::LinkExternal("MidiEffect.skip_x", Kaba::mf(&MidiEffect::skip_x));
 
 	AudioVisualizer avis;
 	Kaba::DeclareClassSize("AudioVisualizer", sizeof(AudioVisualizer));
@@ -278,10 +274,15 @@ void PluginManager::LinkAppScriptData()
 	MidiSource msource;
 	Kaba::DeclareClassSize("MidiSource", sizeof(MidiSource));
 	Kaba::DeclareClassOffset("MidiSource", "out", _offsetof(MidiSource, out));
+	Kaba::DeclareClassOffset("MidiSource", "bh_midi", _offsetof(MidiSource, bh_midi));
 	Kaba::LinkExternal("MidiSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiSource::__init__));
 	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "reset", Kaba::mf(&MidiSource::reset), &msource);
+	Kaba::LinkExternal("MidiSource.note", Kaba::mf(&MidiSource::note));
+	Kaba::LinkExternal("MidiSource.skip", Kaba::mf(&MidiSource::skip));
+	Kaba::LinkExternal("MidiSource.note_x", Kaba::mf(&MidiSource::note_x));
+	Kaba::LinkExternal("MidiSource.skip_x", Kaba::mf(&MidiSource::skip_x));
 
 
 	BeatMidifier bmidifier;
@@ -341,16 +342,16 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassSize("MidiEventBuffer", sizeof(MidiEventBuffer));
 	Kaba::DeclareClassOffset("MidiEventBuffer", "samples", _offsetof(MidiEventBuffer, samples));
 	Kaba::LinkExternal("MidiEventBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEventBuffer::__init__));
-	Kaba::LinkExternal("MidiEventBuffer.get_events", Kaba::mf(&MidiEventBuffer::getEvents));
-	Kaba::LinkExternal("MidiEventBuffer.get_notes", Kaba::mf(&MidiEventBuffer::getNotes));
-	Kaba::LinkExternal("MidiEventBuffer.get_range", Kaba::mf(&MidiEventBuffer::getRange));
-	Kaba::LinkExternal("MidiEventBuffer.add_metronome_click", Kaba::mf(&MidiEventBuffer::addMetronomeClick));
+	Kaba::LinkExternal("MidiEventBuffer.get_events", Kaba::mf(&MidiEventBuffer::get_events));
+	Kaba::LinkExternal("MidiEventBuffer.get_notes", Kaba::mf(&MidiEventBuffer::get_notes));
+	Kaba::LinkExternal("MidiEventBuffer.get_range", Kaba::mf(&MidiEventBuffer::range));
+	Kaba::LinkExternal("MidiEventBuffer.add_metronome_click", Kaba::mf(&MidiEventBuffer::add_metronome_click));
 
 	Kaba::DeclareClassSize("MidiNoteBuffer", sizeof(MidiNoteBuffer));
 	Kaba::DeclareClassOffset("MidiNoteBuffer", "samples", _offsetof(MidiNoteBuffer, samples));
 	Kaba::LinkExternal("MidiNoteBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiNoteBuffer::__init__));
-	Kaba::LinkExternal("MidiNoteBuffer.get_events", Kaba::mf(&MidiNoteBuffer::getEvents));
-	Kaba::LinkExternal("MidiNoteBuffer.get_notes", Kaba::mf(&MidiNoteBuffer::getNotes));
+	Kaba::LinkExternal("MidiNoteBuffer.get_events", Kaba::mf(&MidiNoteBuffer::get_events));
+	Kaba::LinkExternal("MidiNoteBuffer.get_notes", Kaba::mf(&MidiNoteBuffer::get_notes));
 	Kaba::LinkExternal("MidiNoteBuffer.get_range", Kaba::mf(&MidiNoteBuffer::range));
 
 	BeatPort bport("");

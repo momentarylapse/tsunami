@@ -132,10 +132,6 @@ class MidiEffect extends Module
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)
-	extern void note(float pitch, float volume, int beats)
-	extern void skip(int beats)
-	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
-	extern void skip_x(int beats, int sub_beats, int beat_partition)
 
 class AudioVisualizer extends Module
 	AudioPort *out
@@ -203,7 +199,13 @@ class MidiSource extends Module
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	extern virtual void reset()
-	MidiPort *out
+	MidiPort* out
+	// crappy experimental note api:
+	extern void note(float pitch, float volume, int beats)
+	extern void skip(int beats)
+	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
+	extern void skip_x(int beats, int sub_beats, int beat_partition)
+	MidiEventBuffer* bh_midi
 	//extern void set_beat_source(BeatPort *source)
 
 class Synthesizer extends Module

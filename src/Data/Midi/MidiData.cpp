@@ -207,7 +207,7 @@ void MidiEventBuffer::__init__()
 	new(this) MidiEventBuffer;
 }
 
-MidiEventBuffer MidiEventBuffer::getEvents(const Range &r) const
+MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const
 {
 	MidiEventBuffer a;
 	for (int i=0;i<num;i++)
@@ -226,7 +226,7 @@ int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const
 	return data.samples;
 }
 
-Array<MidiNote> MidiEventBuffer::getNotes(const Range &r) const
+Array<MidiNote> MidiEventBuffer::get_notes(const Range &r) const
 {
 	MidiNoteBuffer a = midi_events_to_notes(*this);
 	Array<MidiNote> b;
@@ -236,12 +236,12 @@ Array<MidiNote> MidiEventBuffer::getNotes(const Range &r) const
 	return b;
 }
 
-int MidiEventBuffer::getNextEvent(int pos) const
+int MidiEventBuffer::get_next_event(int pos) const
 {
 	return 0;
 }
 
-Range MidiEventBuffer::getRange(int elongation) const
+Range MidiEventBuffer::range(int elongation) const
 {
 	if (num == 0)
 		return Range::EMPTY;
@@ -301,7 +301,13 @@ void MidiEventBuffer::sanify(const Range &r)
 		add(MidiEvent(r.end(), p, 0));
 }
 
-void MidiEventBuffer::addMetronomeClick(int pos, int level, float volume)
+void MidiEventBuffer::add_note(const Range &r, float pitch, float volume)
+{
+	add(MidiEvent(r.start(), pitch, volume));
+	add(MidiEvent(r.end(), pitch, 0));
+}
+
+void MidiEventBuffer::add_metronome_click(int pos, int level, float volume)
 {
 	if (level == 0){
 		add(MidiEvent(pos, 81, volume));
@@ -354,13 +360,13 @@ void MidiNoteBuffer::deep_clear()
 	clear();
 }
 
-MidiEventBuffer MidiNoteBuffer::getEvents(const Range &r) const
+MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const
 {
-	MidiNoteBufferRef b = getNotes(r);
+	MidiNoteBufferRef b = get_notes(r);
 	return midi_notes_to_events(b);
 }
 
-MidiNoteBufferRef MidiNoteBuffer::getNotes(const Range &r) const
+MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const
 {
 	MidiNoteBufferRef b;
 	for (MidiNote *n: *this)
@@ -369,7 +375,7 @@ MidiNoteBufferRef MidiNoteBuffer::getNotes(const Range &r) const
 	return b;
 }
 
-MidiNoteBufferRef MidiNoteBuffer::getNotesBySelection(const SongSelection &s) const
+MidiNoteBufferRef MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const
 {
 	MidiNoteBufferRef b;
 	for (MidiNote *n: *this)

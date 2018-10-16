@@ -243,7 +243,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 
 void ViewModeMidi::edit_backspace()
 {
-	int a = song->bars.getPrevSubBeat(view->sel.range.offset-1, beat_partition);
+	int a = song->bars.get_prev_sub_beat(view->sel.range.offset-1, beat_partition);
 	Range r = Range(a, view->sel.range.offset-a);
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
 	view->song->deleteSelection(s);
@@ -756,12 +756,12 @@ void ViewModeMidi::draw_post(Painter *c)
 
 Range ViewModeMidi::get_midi_edit_range()
 {
-	int a = song->bars.getPrevSubBeat(view->sel.range.offset+1, beat_partition);
-	int b = song->bars.getNextSubBeat(view->sel.range.end()-1, beat_partition);
+	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, beat_partition);
+	int b = song->bars.get_next_sub_beat(view->sel.range.end()-1, beat_partition);
 	if (a == b)
-		b = song->bars.getNextSubBeat(b, beat_partition);
+		b = song->bars.get_next_sub_beat(b, beat_partition);
 	for (int i=1; i<note_length; i++)
-		b = song->bars.getNextSubBeat(b, beat_partition);
+		b = song->bars.get_next_sub_beat(b, beat_partition);
 	return Range(a, b - a);
 }
 

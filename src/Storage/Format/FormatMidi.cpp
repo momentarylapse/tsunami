@@ -299,7 +299,7 @@ void FormatMidi::saveSong(StorageOperationData* od)
 				f->write_byte(0);
 				f->write_byte(0);
 			}
-			MidiEventBuffer events = t->layers[0]->midi.getEvents(Range::ALL);
+			MidiEventBuffer events = t->layers[0]->midi.get_events(Range::ALL);
 			events.sort();
 			int offset = 0;
 			for (MidiEvent& e: events) {

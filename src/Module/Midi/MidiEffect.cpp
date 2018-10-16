@@ -13,7 +13,6 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
-#include "../../Data/Midi/MidiData.h"
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
@@ -43,9 +42,6 @@ MidiEffect::MidiEffect() :
 	port_in.add(InPortDescription(SignalType::MIDI, (Port**)&source, "in"));
 	source = nullptr;
 	only_on_selection = false;
-	bh_offset = 0;
-	bh_song = nullptr;
-	bh_midi = nullptr;
 }
 
 void MidiEffect::__init__()
@@ -81,15 +77,7 @@ void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
 
 void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 {
-	MidiNoteBuffer midi = l->midi.getNotesBySelection(sel);
-
-	bh_song = l->song();
-	bh_offset = sel.range.offset;
-	int b2 = bh_song->bars.getNextBeat(bh_offset);
-	int b1 = bh_song->bars.getPrevBeat(b2);
-	if (b1 < bh_offset)
-		bh_offset = b2;
-	bh_midi = &midi;
+	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
 	l->song()->beginActionGroup();
 
@@ -103,54 +91,6 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 
 	l->insertMidiData(0, midi);
 	l->song()->endActionGroup();
-}
-
-void MidiEffect::note(float pitch, float volume, int beats)
-{
-	if (!bh_song)
-		return;
-	int pos = bh_offset;
-	for (int i=0; i<beats; i++)
-		pos = bh_song->bars.getNextBeat(pos);
-
-	bh_midi->add(new MidiNote(Range(bh_offset, pos - bh_offset), pitch, volume));
-	bh_offset = pos;
-
-}
-
-void MidiEffect::skip(int beats)
-{
-	if (!bh_song)
-		return;
-
-	for (int i=0; i<beats; i++)
-		bh_offset = bh_song->bars.getNextBeat(bh_offset);
-}
-
-void MidiEffect::note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
-{
-	if (!bh_song)
-		return;
-	int pos = bh_offset;
-	for (int i=0; i<beats; i++)
-		pos = bh_song->bars.getNextBeat(pos);
-	for (int i=0; i<sub_beats; i++)
-		pos = bh_song->bars.getNextSubBeat(pos, beat_partition);
-
-	bh_midi->add(new MidiNote(Range(bh_offset, pos - bh_offset), pitch, volume));
-	bh_offset = pos;
-
-}
-
-void MidiEffect::skip_x(int beats, int sub_beats, int beat_partition)
-{
-	if (!bh_song)
-		return;
-
-	for (int i=0; i<beats; i++)
-		bh_offset = bh_song->bars.getNextBeat(bh_offset);
-	for (int i=0; i<sub_beats; i++)
-		bh_offset = bh_song->bars.getNextSubBeat(bh_offset, beat_partition);
 }
 
 

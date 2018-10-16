@@ -87,7 +87,7 @@ Array<Bar*> BarCollection::get_bars(const Range &r)
 	return bars;
 }
 
-int BarCollection::getNextBeat(int pos)
+int BarCollection::get_next_beat(int pos)
 {
 	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	for (Beat &b: beats)
@@ -96,7 +96,7 @@ int BarCollection::getNextBeat(int pos)
 	return 0;
 }
 
-int BarCollection::getPrevBeat(int pos)
+int BarCollection::get_prev_beat(int pos)
 {
 	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	int prev = 0;
@@ -108,7 +108,7 @@ int BarCollection::getPrevBeat(int pos)
 	return 0;
 }
 
-int BarCollection::getNextSubBeat(int pos, int beat_partition)
+int BarCollection::get_next_sub_beat(int pos, int beat_partition)
 {
 	Array<Beat> beats = get_beats(Range::ALL, true, true, beat_partition);
 	for (Beat &b: beats)
@@ -117,7 +117,7 @@ int BarCollection::getNextSubBeat(int pos, int beat_partition)
 	return 0;
 }
 
-int BarCollection::getPrevSubBeat(int pos, int beat_partition)
+int BarCollection::get_prev_sub_beat(int pos, int beat_partition)
 {
 	Array<Beat> beats = get_beats(Range::ALL, true, true, beat_partition);
 	int prev = 0;
@@ -134,8 +134,8 @@ int BarCollection::getPrevSubBeat(int pos, int beat_partition)
 Range BarCollection::expand(const Range &r, int beat_partition)
 {
 	Range o = r;
-	o.set_start(getPrevSubBeat(r.start(), beat_partition));
-	o.set_end(getNextSubBeat(r.end(), beat_partition));
+	o.set_start(get_prev_sub_beat(r.start(), beat_partition));
+	o.set_end(get_next_sub_beat(r.end(), beat_partition));
 	return r;
 }
 

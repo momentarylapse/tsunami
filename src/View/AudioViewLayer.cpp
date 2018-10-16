@@ -570,7 +570,7 @@ inline AudioViewLayer::MidiNoteState note_state(MidiNote *n, bool as_reference, 
 void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
-	MidiNoteBufferRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.get_notes(range);
 	//c->setLineWidth(3.0f);
 
 	if (view->mode_midi->editing(this)){
@@ -657,7 +657,7 @@ void AudioViewLayer::drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(layer->track, view->midi_scale);
-	MidiNoteBufferRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.get_notes(range);
 
 	for (MidiNote *n: notes)
 		drawMidiNoteTab(c,  n,  shift,  note_state(n, as_reference, view));
@@ -759,7 +759,7 @@ void AudioViewLayer::drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, b
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(layer->track, view->midi_scale);
-	MidiNoteBufferRef notes = midi.getNotes(range);
+	MidiNoteBufferRef notes = midi.get_notes(range);
 
 	const Clef& clef = layer->track->instrument.get_clef();
 

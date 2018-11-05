@@ -127,7 +127,7 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 
 		// first (un-muted) track
 		tracks[i0]->render_fx(buf);
-		buf.scale(song->tracks[i0]->volume, song->tracks[i0]->panning);
+		buf.scale(tracks[i0]->track->volume, tracks[i0]->track->panning);
 
 		// other tracks
 		for (int i=i0+1;i<tracks.num;i++){

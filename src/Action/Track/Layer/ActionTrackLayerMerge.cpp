@@ -26,7 +26,6 @@ ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t)
 void ActionTrackLayerMerge::build(Data *d)
 {
 	TrackLayer *lnew = new TrackLayer(track);
-	addSubAction(new ActionTrackLayerAdd(track, lnew), d);
 
 	Range r = track->range();
 	TrackRenderer *tr = new TrackRenderer(track, nullptr);
@@ -35,9 +34,14 @@ void ActionTrackLayerMerge::build(Data *d)
 	AudioBuffer buf;
 	//lnew->getBuffers(buf, r);
 	addSubAction(new ActionTrackCreateBuffers(lnew, r), d);
+	auto *a = new ActionTrackEditBuffer(lnew, r);
 	lnew->readBuffers(buf, r, true);
 
 	tr->render_audio(buf);
+
+	addSubAction(a, d);
+
+	addSubAction(new ActionTrackLayerAdd(track, lnew), d);
 
 	for (int i=track->layers.num-2; i>=0; i--)
 		addSubAction(new ActionTrackLayerDelete(track, i), d);

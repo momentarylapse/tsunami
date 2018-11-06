@@ -43,6 +43,7 @@ public:
 	void render_fx(AudioBuffer &buf);
 
 	void fill_midi_streamer();
+	int get_first_usable_layer();
 
 	static void apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list);
 

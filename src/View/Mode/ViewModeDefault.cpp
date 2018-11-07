@@ -78,9 +78,9 @@ void ViewModeDefault::on_left_button_down()
 		hover->range.invert();
 		view->selection_mode = view->SelectionMode::TIME;
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE){
-		hover->vtrack->setMuted(!hover->track->muted);
+		hover->vtrack->set_muted(!hover->track->muted);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO){
-		hover->vtrack->setSolo(!hover->vtrack->solo);
+		hover->vtrack->set_solo(!hover->vtrack->solo);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT){
 		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_FX){
@@ -90,7 +90,7 @@ void ViewModeDefault::on_left_button_down()
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT){
 
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
-		hover->vlayer->setSolo(!hover->vlayer->solo);
+		hover->vlayer->set_solo(!hover->vlayer->solo);
 	}else if (hover->type == Selection::Type::SAMPLE){
 		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
 	}else if (hover->type == Selection::Type::MARKER){
@@ -423,19 +423,19 @@ void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuf
 {
 	auto mode = l->midi_mode;
 	if (mode == MidiMode::LINEAR)
-		l->drawMidiLinear(c, midi, as_reference, shift);
+		l->draw_midi_linear(c, midi, as_reference, shift);
 	else if (mode == MidiMode::TAB)
-		l->drawMidiTab(c, midi, as_reference, shift);
+		l->draw_midi_tab(c, midi, as_reference, shift);
 	else // if (mode == MidiMode::CLASSICAL)
-		l->drawMidiClassical(c, midi, as_reference, shift);
+		l->draw_midi_classical(c, midi, as_reference, shift);
 }
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
-	l->drawBlankBackground(c);
+	l->draw_blank_background(c);
 
-	color cc = l->getBackgroundColor();
-	color cc_sel = l->getBackgroundSelectionColor();
+	color cc = l->background_color();
+	color cc_sel = l->background_selection_color();
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
@@ -448,9 +448,9 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 		auto mode = l->midi_mode;
 		if (mode == MidiMode::CLASSICAL){
 			const Clef& clef = l->layer->track->instrument.get_clef();
-			l->drawMidiClefClassical(c, clef, view->midi_scale);
+			l->draw_midi_clef_classical(c, clef, view->midi_scale);
 		}else if (mode == MidiMode::TAB){
-			l->drawMidiClefTab(c);
+			l->draw_midi_clef_tab(c);
 		}
 	}
 }
@@ -539,11 +539,11 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		draw_midi(c, l, l->layer->midi, false, 0);
 
 	// audio buffer
-	l->drawTrackBuffers(c);
+	l->draw_track_buffers(c);
 
 	// samples
 	for (SampleRef *s: l->layer->samples)
-		l->drawSample(c, s);
+		l->draw_sample(c, s);
 
 	if (l->layer->is_main()){
 
@@ -551,7 +551,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		l->marker_areas.resize(t->markers.num);
 		l->marker_label_areas.resize(t->markers.num);
 		foreachi(TrackMarker *m, l->layer->track->markers, i)
-			l->drawMarker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
+			l->draw_marker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
 	}
 
 	c->setLineWidth(1.0f);

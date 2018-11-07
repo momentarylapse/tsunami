@@ -50,7 +50,7 @@ void ViewModeCapture::draw_post(Painter *c)
 				AudioBuffer &buf = ((AudioSucker*)d.sucker)->buf;
 				view->update_peaks_now(buf);
 				auto *l = view->get_layer(d.target->layers[0]);
-				l->drawBuffer(c, buf, view_pos_rel - view->sel.range.offset, view->colors.capture_marker, l->area.x1, l->area.x2);
+				l->draw_buffer(c, buf, view_pos_rel - view->sel.range.offset, view->colors.capture_marker, l->area.x1, l->area.x2);
 				view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 			}
 		}else if (d.type() == SignalType::MIDI){

@@ -74,7 +74,7 @@ bool AudioView::editing_track(Track *t)
 	return false;
 }
 
-void AudioViewTrack::drawHeader(Painter *c)
+void AudioViewTrack::draw_header(Painter *c)
 {
 	bool hover = (view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
 	bool visible = hover or view->editing_track(track);
@@ -152,7 +152,7 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 }
 
-void AudioViewTrack::setMuted(bool muted)
+void AudioViewTrack::set_muted(bool muted)
 {
 	track->setMuted(muted);
 	view->renderer->allow_tracks(view->get_playable_tracks());
@@ -162,7 +162,7 @@ void AudioViewTrack::setMuted(bool muted)
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
-void AudioViewTrack::setSolo(bool _solo)
+void AudioViewTrack::set_solo(bool _solo)
 {
 	solo = _solo;
 	view->renderer->allow_tracks(view->get_playable_tracks());
@@ -172,12 +172,12 @@ void AudioViewTrack::setSolo(bool _solo)
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
-void AudioViewTrack::setPanning(float panning)
+void AudioViewTrack::set_panning(float panning)
 {
 	track->setPanning(panning);
 }
 
-void AudioViewTrack::setVolume(float volume)
+void AudioViewTrack::set_volume(float volume)
 {
 	track->setVolume(volume);
 }
@@ -187,6 +187,6 @@ void AudioViewTrack::draw(Painter *c)
 {
 	view->mode->draw_track_data(c, this);
 
-	drawHeader(c);
+	draw_header(c);
 }
 

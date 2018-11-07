@@ -51,7 +51,7 @@ void render_midi(Image &im, MidiNoteBuffer &m)
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);
 		float x1 = w * clampf((float)n->range.end() / (float)r.length, 0, 1);
-		color c = AudioViewLayer::getPitchColor(n->pitch);
+		color c = AudioViewLayer::pitch_color(n->pitch);
 		for (int x=x0; x<=x1; x++)
 			im.setPixel(x, y, c);
 	}
@@ -88,7 +88,7 @@ public:
 		if (s->cur_message() == s->MESSAGE_DELETE){
 			manager->remove(this);
 		}else{
-			int n = manager->getIndex(s);
+			int n = manager->get_index(s);
 			if (n >= 0)
 				manager->changeString("sample_list", n, str());
 		}
@@ -117,18 +117,18 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 {
 	fromResource("sample_manager_dialog");
 
-	event("import_from_file", std::bind(&SampleManagerConsole::onImport, this));
-	event("export_sample", std::bind(&SampleManagerConsole::onExport, this));
-	event("preview_sample", std::bind(&SampleManagerConsole::onPreview, this));
-	event("paste_sample", std::bind(&SampleManagerConsole::onInsert, this));
-	event("create_from_selection", std::bind(&SampleManagerConsole::onCreateFromSelection, this));
-	event("delete_sample", std::bind(&SampleManagerConsole::onDelete, this));
-	event("scale_sample", std::bind(&SampleManagerConsole::onScale, this));
-	eventX("sample_list", "hui:change", std::bind(&SampleManagerConsole::onListEdit, this));
-	eventX("sample_list", "hui:select", std::bind(&SampleManagerConsole::onListSelect, this));
-	event("sample_list", std::bind(&SampleManagerConsole::onPreview, this));
+	event("import_from_file", std::bind(&SampleManagerConsole::on_import, this));
+	event("export_sample", std::bind(&SampleManagerConsole::on_export, this));
+	event("preview_sample", std::bind(&SampleManagerConsole::on_preview, this));
+	event("paste_sample", std::bind(&SampleManagerConsole::on_insert, this));
+	event("create_from_selection", std::bind(&SampleManagerConsole::on_create_from_selection, this));
+	event("delete_sample", std::bind(&SampleManagerConsole::on_delete, this));
+	event("scale_sample", std::bind(&SampleManagerConsole::on_scale, this));
+	eventX("sample_list", "hui:change", std::bind(&SampleManagerConsole::on_list_edit, this));
+	eventX("sample_list", "hui:select", std::bind(&SampleManagerConsole::on_list_select, this));
+	event("sample_list", std::bind(&SampleManagerConsole::on_preview, this));
 
-	event("edit_song", std::bind(&SampleManagerConsole::onEditSong, this));
+	event("edit_song", std::bind(&SampleManagerConsole::on_edit_song, this));
 
 	preview_renderer = nullptr;
 	preview_stream = nullptr;
@@ -136,11 +136,11 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 
 	progress = nullptr;
 
-	updateList();
+	update_list();
 
-	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_ADD_SAMPLE);
-	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe(this, std::bind(&SampleManagerConsole::onSongUpdate, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_ADD_SAMPLE);
+	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_NEW);
 }
 
 SampleManagerConsole::~SampleManagerConsole()
@@ -152,7 +152,7 @@ SampleManagerConsole::~SampleManagerConsole()
 	song->unsubscribe(this);
 }
 
-int SampleManagerConsole::getIndex(Sample *s)
+int SampleManagerConsole::get_index(Sample *s)
 {
 	foreachi(SampleManagerItem *si, items, i)
 		if (si->s == s)
@@ -160,19 +160,19 @@ int SampleManagerConsole::getIndex(Sample *s)
 	return -1;
 }
 
-void SampleManagerConsole::updateList()
+void SampleManagerConsole::update_list()
 {
 	// new samples?
 	for (Sample *s: song->samples)
-		if (getIndex(s) < 0)
+		if (get_index(s) < 0)
 			add(new SampleManagerItem(this, s, view));
 
-	onListSelect();
+	on_list_select();
 }
 
-void SampleManagerConsole::onListSelect()
+void SampleManagerConsole::on_list_select()
 {
-	Array<Sample*> sel = getSelected();
+	Array<Sample*> sel = get_selected();
 
 	enable("export_sample", sel.num == 1);
 	enable("preview_sample", sel.num == 1);
@@ -181,7 +181,7 @@ void SampleManagerConsole::onListSelect()
 	enable("scale_sample", sel.num == 1);
 }
 
-void SampleManagerConsole::onListEdit()
+void SampleManagerConsole::on_list_edit()
 {
 	int sel = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
@@ -191,20 +191,20 @@ void SampleManagerConsole::onListEdit()
 		items[sel]->s->auto_delete = getCell("sample_list", sel, 4)._bool();
 }
 
-void SampleManagerConsole::onImport()
+void SampleManagerConsole::on_import()
 {
 	if (session->storage->askOpenImport(win)){
 		AudioBuffer buf;
 		session->storage->loadBufferBox(song, &buf, hui::Filename);
 		song->addSample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
-		onListSelect();
+		on_list_select();
 	}
 }
 
-void SampleManagerConsole::onExport()
+void SampleManagerConsole::on_export()
 {
-	Array<Sample*> sel = getSelected();
+	Array<Sample*> sel = get_selected();
 	if (sel.num != 1)
 		return;
 
@@ -216,21 +216,21 @@ void SampleManagerConsole::onExport()
 	}
 }
 
-void SampleManagerConsole::onInsert()
+void SampleManagerConsole::on_insert()
 {
-	Array<Sample*> sel = getSelected();
+	Array<Sample*> sel = get_selected();
 	for (Sample* s: sel)
 		view->cur_layer()->addSampleRef(view->sel.range.start(), s);
 }
 
-void SampleManagerConsole::onCreateFromSelection()
+void SampleManagerConsole::on_create_from_selection()
 {
 	song->createSamplesFromSelection(view->sel, false);
 }
 
-void SampleManagerConsole::onDelete()
+void SampleManagerConsole::on_delete()
 {
-	Array<Sample*> sel = getSelected();
+	Array<Sample*> sel = get_selected();
 
 	song->action_manager->group_begin();
 	for (Sample* s: sel)
@@ -242,9 +242,9 @@ void SampleManagerConsole::onDelete()
 }
 
 
-void SampleManagerConsole::onScale()
+void SampleManagerConsole::on_scale()
 {
-	Array<Sample*> sel = getSelected();
+	Array<Sample*> sel = get_selected();
 	for (Sample* s: sel){
 		if (s->type != SignalType::AUDIO)
 			continue;
@@ -273,7 +273,7 @@ void SampleManagerConsole::remove(SampleManagerItem *item)
 		}
 }
 
-Array<Sample*> SampleManagerConsole::getSelected()
+Array<Sample*> SampleManagerConsole::get_selected()
 {
 	Array<int> indices = getSelection("sample_list");
 	Array<Sample*> sel;
@@ -282,46 +282,46 @@ Array<Sample*> SampleManagerConsole::getSelected()
 	return sel;
 }
 
-void SampleManagerConsole::setSelection(const Array<Sample*> &samples)
+void SampleManagerConsole::set_selection(const Array<Sample*> &samples)
 {
 	Array<int> indices;
 	for (Sample *s: samples)
-		indices.add(getIndex(s));
+		indices.add(get_index(s));
 	hui::Panel::setSelection("sample_list", indices);
 }
 
-void SampleManagerConsole::onEditSong()
+void SampleManagerConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleManagerConsole::onProgressCancel()
+void SampleManagerConsole::on_progress_cancel()
 {
 	if (progress)
-		endPreview();
+		end_preview();
 }
 
-void SampleManagerConsole::onSongUpdate()
+void SampleManagerConsole::on_song_update()
 {
-	updateList();
+	update_list();
 }
 
-void SampleManagerConsole::onPreviewStreamUpdate()
+void SampleManagerConsole::on_preview_stream_update()
 {
 	int pos = preview_stream->get_pos();
 	Range r = preview_sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 }
 
-void SampleManagerConsole::onPreviewStreamEnd()
+void SampleManagerConsole::on_preview_stream_end()
 {
-	endPreview();
+	end_preview();
 }
 
-void SampleManagerConsole::onPreview()
+void SampleManagerConsole::on_preview()
 {
 	if (progress)
-		endPreview();
+		end_preview();
 	int sel = getInt("sample_list");
 	preview_sample = items[sel]->s;
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
@@ -329,13 +329,13 @@ void SampleManagerConsole::onPreview()
 	preview_stream->plug(0, preview_renderer, 0);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this, std::bind(&SampleManagerConsole::onProgressCancel, this));
-	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamUpdate, this));
-	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::onPreviewStreamEnd, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
+	progress->subscribe(this, std::bind(&SampleManagerConsole::on_progress_cancel, this));
+	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::on_preview_stream_update, this));
+	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::on_preview_stream_end, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
 	preview_stream->play();
 }
 
-void SampleManagerConsole::endPreview()
+void SampleManagerConsole::end_preview()
 {
 	if (progress){
 		progress->unsubscribe(this);

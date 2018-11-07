@@ -24,35 +24,35 @@ public:
 	SampleManagerConsole(Session *session);
 	virtual ~SampleManagerConsole();
 
-	void updateList();
+	void update_list();
 
-	void onListSelect();
-	void onListEdit();
-	void onImport();
-	void onExport();
-	void onPreview();
-	void onInsert();
-	void onCreateFromSelection();
-	void onDelete();
-	void onScale();
+	void on_list_select();
+	void on_list_edit();
+	void on_import();
+	void on_export();
+	void on_preview();
+	void on_insert();
+	void on_create_from_selection();
+	void on_delete();
+	void on_scale();
 
-	void onEditSong();
+	void on_edit_song();
 
-	void onProgressCancel();
-	void onSongUpdate();
-	void onPreviewStreamUpdate();
-	void onPreviewStreamEnd();
+	void on_progress_cancel();
+	void on_song_update();
+	void on_preview_stream_update();
+	void on_preview_stream_end();
 
-	void endPreview();
+	void end_preview();
 
 	Array<SampleManagerItem*> items;
 	Array<SampleManagerItem*> old_items;
 	void add(SampleManagerItem *item);
 	void remove(SampleManagerItem *item);
-	int getIndex(Sample *s);
-	Array<Sample*> getSelected();
+	int get_index(Sample *s);
+	Array<Sample*> get_selected();
 
-	void setSelection(const Array<Sample*> &samples);
+	void set_selection(const Array<Sample*> &samples);
 
 	OutputStream *preview_stream;
 	BufferStreamer *preview_renderer;

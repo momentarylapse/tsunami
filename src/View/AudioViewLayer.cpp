@@ -69,9 +69,14 @@ void AudioViewLayer::set_midi_mode(MidiMode wanted)
 	view->force_redraw();
 }
 
-color AudioViewLayer::getPitchColor(int pitch)
+color AudioViewLayer::pitch_color(int pitch)
 {
 	return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
+}
+
+color AudioViewLayer::marker_color(const TrackMarker *m)
+{
+	return pitch_color(m->text.hash() % MAX_PITCH);
 }
 
 static Array<complex> tt;
@@ -189,7 +194,7 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 	c->drawPolygon(tt);
 }
 
-void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1)
+void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1)
 {
 	//float w = area.width();
 	float h = area.height();
@@ -252,7 +257,7 @@ void AudioViewLayer::drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel,
 	}
 }
 
-void AudioViewLayer::drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
+void AudioViewLayer::draw_buffer_selection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r)
 {
 	float h = area.height();
 	float hf = h / (2 * b.channels);
@@ -331,7 +336,7 @@ Array<Range> version_ranges(TrackLayer *l)
 	return r;
 }
 
-void AudioViewLayer::drawTrackBuffers(Painter *c)
+void AudioViewLayer::draw_track_buffers(Painter *c)
 {
 	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
 	if (is_playable() and layer->track->has_version_selection()){
@@ -340,25 +345,25 @@ void AudioViewLayer::drawTrackBuffers(Painter *c)
 			foreachi(Range &r, rr, i){
 				float x0 = max((float)view->cam.sample2screen(r.start()), area.x1);
 				float x1 = min((float)view->cam.sample2screen(r.end()), area.x2);
-				drawBuffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
+				draw_buffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
 			}
 		}
 	}else{
 		color col = is_playable() ? view->colors.text : view->colors.text_soft3;
 		for (AudioBuffer &b: layer->buffers)
-			drawBuffer(c, b, view_pos_rel, col, area.x1, area.x2);
+			draw_buffer(c, b, view_pos_rel, col, area.x1, area.x2);
 
 	}
 
 	if (view->sel.has(layer)){
 		// selection
 		for (AudioBuffer &b: layer->buffers){
-			drawBufferSelection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}
 }
 
-void AudioViewLayer::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
+void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &col, int delay)
 {
 	// frame
 	Range rr = s->range() + delay;
@@ -383,7 +388,7 @@ void AudioViewLayer::drawSampleFrame(Painter *c, SampleRef *s, const color &col,
 }
 
 
-void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
+void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 {
 	color col = view->colors.sample;
 	if (view->sel.has(s))
@@ -391,11 +396,11 @@ void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 	if (view->hover.sample == s)
 		col = ColorInterpolate(col,  view->colors.hover, 0.2f);
 
-	drawSampleFrame(c, s, col, 0);
+	draw_sample_frame(c, s, col, 0);
 
 	// buffer
 	if (s->type() == SignalType::AUDIO)
-		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col, area.x1, area.x2);
+		draw_buffer(c, *s->buf, view->cam.pos - (double)s->pos, col, area.x1, area.x2);
 	else if (s->type() == SignalType::MIDI)
 		view->mode->draw_midi(c, this, *s->midi, true, s->pos);
 
@@ -405,7 +410,7 @@ void AudioViewLayer::drawSample(Painter *c, SampleRef *s)
 	}
 }
 
-void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover)
+void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover)
 {
 	string text = marker->text;
 	if (text.match(":pos *:"))
@@ -428,7 +433,7 @@ void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index
 
 	color col = view->colors.text;
 	color col_bg = view->colors.background_track;
-	color col2 = AudioViewLayer::getPitchColor(marker->text.hash() % MAX_PITCH);
+	color col2 = marker_color(marker);
 	if (sel){
 		col = view->colors.selection;
 		col_bg = ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);
@@ -458,7 +463,7 @@ void AudioViewLayer::drawMarker(Painter *c, const TrackMarker *marker, int index
 
 
 
-void AudioViewLayer::setEditPitchMinMax(int _min, int _max)
+void AudioViewLayer::set_edit_pitch_min_max(int _min, int _max)
 {
 	int diff = _max - _min;
 	edit_pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
@@ -514,7 +519,7 @@ bool AudioViewLayer::mouse_over()
 void get_col(color &col, color &col_shadow, const MidiNote *n, AudioViewLayer::MidiNoteState state, AudioView *view, bool playable)
 {
 	if (playable)
-		col = ColorInterpolate(AudioViewLayer::getPitchColor(n->pitch), view->colors.text, 0.2f);
+		col = ColorInterpolate(AudioViewLayer::pitch_color(n->pitch), view->colors.text, 0.2f);
 	else
 		col = view->colors.text_soft3;
 
@@ -541,7 +546,7 @@ void AudioViewLayer::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteSt
 }
 
 
-void AudioViewLayer::drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
+void AudioViewLayer::draw_midi_note_linear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
 {
 	float x1 = view->cam.sample2screen(n.range.offset + shift);
 	float x2 = view->cam.sample2screen(n.range.end() + shift);
@@ -567,7 +572,7 @@ inline AudioViewLayer::MidiNoteState note_state(MidiNote *n, bool as_reference, 
 	return s;
 }
 
-void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
+void AudioViewLayer::draw_midi_linear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiNoteBufferRef notes = midi.get_notes(range);
@@ -585,7 +590,7 @@ void AudioViewLayer::drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool
 	for (MidiNote *n: midi){
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
-		drawMidiNoteLinear(c, *n, shift, note_state(n, as_reference, view));
+		draw_midi_note_linear(c, *n, shift, note_state(n, as_reference, view));
 	}
 }
 
@@ -606,7 +611,7 @@ void AudioViewLayer::draw_simple_note(Painter *c, float x1, float x2, float y, f
 		c->drawRect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
 }
 
-void AudioViewLayer::drawMidiClefTab(Painter *c)
+void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 {
 	if (is_playable())
 		c->setColor(view->colors.text);
@@ -632,7 +637,7 @@ void AudioViewLayer::drawMidiClefTab(Painter *c)
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewLayer::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
+void AudioViewLayer::draw_midi_note_tab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
 {
 	float r = min(clef_dy/2, 15.0f);
 
@@ -653,14 +658,14 @@ void AudioViewLayer::drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, M
 	}
 }
 
-void AudioViewLayer::drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
+void AudioViewLayer::draw_midi_tab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(layer->track, view->midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(range);
 
 	for (MidiNote *n: notes)
-		drawMidiNoteTab(c,  n,  shift,  note_state(n, as_reference, view));
+		draw_midi_note_tab(c,  n,  shift,  note_state(n, as_reference, view));
 
 	c->setAntialiasing(false);
 	c->setFontSize(view->FONT_SIZE);
@@ -686,7 +691,7 @@ int AudioViewLayer::screen_to_string(float y)
 	return (int)floor((clef_y0 - y) / clef_dy + 0.5f);
 }
 
-void AudioViewLayer::drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef)
+void AudioViewLayer::draw_midi_note_classical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef)
 {
 	float r = clef_dy/2;
 
@@ -728,7 +733,7 @@ bool AudioViewLayer::is_playable()
 	return view->get_playable_layers().contains(layer);
 }
 
-void AudioViewLayer::drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale)
+void AudioViewLayer::draw_midi_clef_classical(Painter *c, const Clef &clef, const Scale &scale)
 {
 	// clef lines
 	float dy = min(area.height() / 13, 30.0f);
@@ -755,7 +760,7 @@ void AudioViewLayer::drawMidiClefClassical(Painter *c, const Clef &clef, const S
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewLayer::drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
+void AudioViewLayer::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(layer->track, view->midi_scale);
@@ -766,30 +771,30 @@ void AudioViewLayer::drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, b
 	c->setAntialiasing(true);
 
 	for (MidiNote *n: notes)
-		drawMidiNoteClassical(c, n, shift, note_state(n, as_reference, view), clef);
+		draw_midi_note_classical(c, n, shift, note_state(n, as_reference, view), clef);
 
 	c->setFontSize(view->FONT_SIZE);
 	c->setAntialiasing(false);
 }
 
-color AudioViewLayer::getBackgroundColor()
+color AudioViewLayer::background_color()
 {
 	return (view->sel.has(layer)) ? view->colors.background_track_selected : view->colors.background_track;
 }
 
-color AudioViewLayer::getBackgroundSelectionColor()
+color AudioViewLayer::background_selection_color()
 {
 	return (view->sel.has(layer)) ? view->colors.background_track_selection : view->colors.background_track;
 }
 
-void AudioViewLayer::drawBlankBackground(Painter *c)
+void AudioViewLayer::draw_blank_background(Painter *c)
 {
-	color cc = getBackgroundColor();
+	color cc = background_color();
 	if ((view->sel.range.length > 0) and (view->sel.has(layer))){
 		c->setColor(cc);
 		c->drawRect(area);
 
-		color cs = getBackgroundSelectionColor();
+		color cs = background_selection_color();
 		float x1 = max((float)view->cam.sample2screen(view->sel.range.start()), area.x1);
 		float x2 = min((float)view->cam.sample2screen(view->sel.range.end()), area.x2);
 		c->setColor(cs);
@@ -798,6 +803,11 @@ void AudioViewLayer::drawBlankBackground(Painter *c)
 	}else{
 		c->setColor(cc);
 		c->drawRect(area);
+	}
+
+	auto *tt = layer->song()->getTimeTrack();
+	for (auto *m: tt->markers){
+
 	}
 }
 
@@ -813,7 +823,7 @@ bool AudioView::editing_layer(AudioViewLayer *l)
 }
 
 
-void AudioViewLayer::drawVersionHeader(Painter *c)
+void AudioViewLayer::draw_version_header(Painter *c)
 {
 	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
 	bool visible = hover or view->editing_layer(this);
@@ -881,7 +891,7 @@ void AudioViewLayer::drawVersionHeader(Painter *c)
 	}
 }
 
-void AudioViewLayer::setSolo(bool _solo)
+void AudioViewLayer::set_solo(bool _solo)
 {
 	solo = _solo;
 	view->renderer->allow_layers(view->get_playable_layers());
@@ -896,5 +906,5 @@ void AudioViewLayer::draw(Painter *c)
 	view->mode->draw_layer_data(c, this);
 
 	if (layer->track->layers.num > 1)
-		drawVersionHeader(c);
+		draw_version_header(c);
 }

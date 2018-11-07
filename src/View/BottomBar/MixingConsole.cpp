@@ -68,7 +68,7 @@ public:
 			if (parent->isChecked("link-volumes"))
 				track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
 			else
-				vtrack->setVolume(slider2vol(getFloat("")));
+				vtrack->set_volume(slider2vol(getFloat("")));
 		}
 		editing = false;
 	}
@@ -77,19 +77,19 @@ public:
 	void on_mute()
 	{
 		if (vtrack)
-			vtrack->setMuted(isChecked(""));
+			vtrack->set_muted(isChecked(""));
 	}
 	void on_solo()
 	{
 		if (vtrack)
-			vtrack->setSolo(isChecked(""));
+			vtrack->set_solo(isChecked(""));
 	}
 
 	void on_panning()
 	{
 		editing = true;
 		if (vtrack)
-			vtrack->setPanning(getFloat(""));
+			vtrack->set_panning(getFloat(""));
 		editing = false;
 	}
 	void clear_track()

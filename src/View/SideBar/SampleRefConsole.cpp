@@ -84,7 +84,7 @@ void SampleRefConsole::onEditTrack()
 
 void SampleRefConsole::onEditSample()
 {
-	bar()->sample_manager->setSelection(sample->origin);
+	bar()->sample_manager->set_selection(sample->origin);
 	bar()->open(SideBar::SAMPLE_CONSOLE);
 }
 

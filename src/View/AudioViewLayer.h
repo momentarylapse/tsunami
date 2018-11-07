@@ -42,29 +42,29 @@ public:
 		STATE_SELECTED = 4,
 	};
 
-	color getBackgroundColor();
-	color getBackgroundSelectionColor();
-	void drawBlankBackground(Painter *c);
+	color background_color();
+	color background_selection_color();
+	void draw_blank_background(Painter *c);
 
-	void drawMidiLinear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiNoteLinear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
-	void drawMidiTab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiNoteTab(Painter *c, const MidiNote *n, int shift, MidiNoteState state);
-	void drawMidiClefTab(Painter *c);
-	void drawMidiClassical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
-	void drawMidiClefClassical(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteClassical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
+	void draw_midi_linear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void draw_midi_note_linear(Painter *c, const MidiNote &n, int shift, MidiNoteState state);
+	void draw_midi_tab(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void draw_midi_note_tab(Painter *c, const MidiNote *n, int shift, MidiNoteState state);
+	void draw_midi_clef_tab(Painter *c);
+	void draw_midi_classical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
+	void draw_midi_clef_classical(Painter *c, const Clef &clef, const Scale &scale);
+	void draw_midi_note_classical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 
-	void drawTrackBuffers(Painter *c);
-	void drawBuffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1);
-	void drawBufferSelection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
+	void draw_track_buffers(Painter *c);
+	void draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1);
+	void draw_buffer_selection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 
-	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
-	void drawSample(Painter *c, SampleRef *s);
+	void draw_sample_frame(Painter *c, SampleRef *s, const color &col, int delay);
+	void draw_sample(Painter *c, SampleRef *s);
 
-	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
+	void draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover);
 
-	void drawVersionHeader(Painter *c);
+	void draw_version_header(Painter *c);
 	void draw(Painter *c);
 
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
@@ -81,7 +81,8 @@ public:
 	MidiMode midi_mode;
 
 
-	static color getPitchColor(int pitch);
+	static color pitch_color(int pitch);
+	static color marker_color(const TrackMarker *m);
 
 	float clef_pos_to_screen(int pos);
 	int screen_to_clef_pos(float y);
@@ -95,7 +96,7 @@ public:
 	int y2clef_classical(float y, NoteModifier &mod);
 	int y2clef_linear(float y, NoteModifier &mod);
 
-	void setEditPitchMinMax(int pitch_min, int pitch_max);
+	void set_edit_pitch_min_max(int pitch_min, int pitch_max);
 	int pitch_min, pitch_max;
 	int edit_pitch_min, edit_pitch_max;
 
@@ -106,7 +107,7 @@ public:
 	float clef_y0;
 
 
-	void setSolo(bool solo);
+	void set_solo(bool solo);
 	bool solo;
 
 

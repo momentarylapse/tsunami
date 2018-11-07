@@ -198,7 +198,7 @@ void ViewModeMidi::on_mouse_move()
 		if (e->lbut){
 			scroll->drag_update(view->mx, view->my);
 			int _pitch_max = 127 - scroll->offset;
-			cur_vlayer()->setEditPitchMinMax(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
+			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}
 }
@@ -479,10 +479,10 @@ void ViewModeMidi::set_note_length(int length)
 
 void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
-	l->drawBlankBackground(c);
+	l->draw_blank_background(c);
 
-	color cc = l->getBackgroundColor();
-	color cc_sel = l->getBackgroundSelectionColor();
+	color cc = l->background_color();
+	color cc_sel = l->background_selection_color();
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
@@ -499,9 +499,9 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 		if (mode == MidiMode::CLASSICAL){
 			const Clef& clef = l->layer->track->instrument.get_clef();
-			l->drawMidiClefClassical(c, clef, view->midi_scale);
+			l->draw_midi_clef_classical(c, clef, view->midi_scale);
 		}else if (mode == MidiMode::TAB){
-			l->drawMidiClefTab(c);
+			l->draw_midi_clef_tab(c);
 		}
 	}
 }
@@ -691,7 +691,7 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 
 	// samples
 	for (SampleRef *s: l->layer->samples)
-		l->drawSample(c, s);
+		l->draw_sample(c, s);
 
 
 	if (l->layer->is_main()){
@@ -702,7 +702,7 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 		l->marker_areas.resize(t->markers.num);
 		l->marker_label_areas.resize(t->markers.num);
 		foreachi(TrackMarker *m, t->markers, i)
-			l->drawMarker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t) and (view->hover.index == i));
+			l->draw_marker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t) and (view->hover.index == i));
 	}
 
 }

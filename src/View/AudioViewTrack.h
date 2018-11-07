@@ -22,13 +22,13 @@ public:
 	AudioViewTrack(AudioView *view, Track *track);
 	virtual ~AudioViewTrack();
 
-	void drawHeader(Painter *c);
+	void draw_header(Painter *c);
 	void draw(Painter *c);
 
-	void setSolo(bool solo);
-	void setMuted(bool muted);
-	void setPanning(float panning);
-	void setVolume(float volume);
+	void set_solo(bool solo);
+	void set_muted(bool muted);
+	void set_panning(float panning);
+	void set_volume(float volume);
 
 	void on_track_change();
 

@@ -23,6 +23,8 @@ NewDialog::NewDialog(hui::Window *_parent):
 	setInt("sample_rate", 1);
 	hideControl("nd_g_metronome_params", true);
 
+	check("new_track_type:audio-stereo", true);
+
 	setInt("num_bars", 32);
 	setInt("beats_per_bar", 4);
 	setInt("sub_beats", 1);

@@ -898,8 +898,15 @@ void AudioViewLayer::set_solo(bool _solo)
 
 void AudioViewLayer::draw(Painter *c)
 {
+	if (!on_screen())
+		return;
 	view->mode->draw_layer_data(c, this);
 
 	if (layer->track->layers.num > 1)
 		draw_version_header(c);
+}
+
+bool AudioViewLayer::on_screen()
+{
+	return (area.y1 < view->song_area.y2) and (area.y2 > view->song_area.y1);
 }

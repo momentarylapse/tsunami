@@ -432,6 +432,8 @@ void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuf
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
+	if (!l->on_screen())
+		return;
 	l->draw_blank_background(c);
 
 	color cc = l->background_color();
@@ -546,6 +548,8 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 
 void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
+	if (!l->on_screen())
+		return;
 	Track *t = l->layer->track;
 
 	// midi

@@ -70,6 +70,8 @@ public:
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
 	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 
+	bool on_screen();
+
 	TrackLayer *layer;
 	rect area;
 	rect area_last, area_target;

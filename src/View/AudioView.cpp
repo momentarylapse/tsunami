@@ -1284,7 +1284,7 @@ void AudioView::draw_song(Painter *c)
 
 	if (need_metro_overlay(song, this)){
 		metronome_overlay_vlayer->layer = song->getTimeTrack()->layers[0];
-		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + 100);
+		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
 		metronome_overlay_vlayer->draw(c);
 	}
 

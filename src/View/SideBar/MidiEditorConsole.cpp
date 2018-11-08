@@ -274,6 +274,10 @@ void MidiEditorConsole::set_layer(TrackLayer *l)
 		if (v)
 			setSelection("reference_tracks", v->reference_tracks);*/
 
+		enable("apply_string", layer->track->instrument.string_pitch.num);
+		enable("string_no", layer->track->instrument.string_pitch.num);
+		set_options("string_no", format("range=1:%d", layer->track->instrument.string_pitch.num));
+
 		update();
 	}
 
@@ -313,7 +317,7 @@ void MidiEditorConsole::on_quantize()
 
 void MidiEditorConsole::on_apply_string()
 {
-	int string_no = get_int("string_no");
+	int string_no = get_int("string_no") - 1;
 
 	song->action_manager->group_begin();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);

@@ -44,18 +44,18 @@ void ActionTrackCreateBuffers::build(Data *d)
 
 		// too small?
 		if (r.end() > b.offset + b.length)
-			addSubAction(new ActionTrack__GrowBuffer(layer, n_pos, r.end() - b.offset), d);
+			add_sub_action(new ActionTrack__GrowBuffer(layer, n_pos, r.end() - b.offset), d);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		addSubAction(new ActionTrack__AddBuffer(layer, n_pos, r), d);
+		add_sub_action(new ActionTrack__AddBuffer(layer, n_pos, r), d);
 	}
 
 	// collision???  -> absorb
 	for (int i=layer->buffers.num-1;i>n_pos;i--)
 		if (layer->buffers[i].offset <= r.end())
-			addSubAction(new ActionTrack__AbsorbBuffer(layer, n_pos, i), d);
+			add_sub_action(new ActionTrack__AbsorbBuffer(layer, n_pos, i), d);
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

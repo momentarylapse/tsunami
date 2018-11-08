@@ -157,7 +157,7 @@ void DetuneSynthesizerDialog::onMouseWheel()
 		auto e = hui::GetEvent();
 		float speed = mode_relative ? 0.01f : 0.1f;
 		if (e->scroll_y != 0)
-			track->detuneSynthesizer(hover, speed * e->scroll_y, isChecked("all_octaves"));
+			track->detune_synthesizer(hover, speed * e->scroll_y, isChecked("all_octaves"));
 		redraw("detune_area");
 	}
 }

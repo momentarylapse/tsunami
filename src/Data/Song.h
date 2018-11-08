@@ -83,49 +83,49 @@ public:
 	void _cdecl reset() override;
 	bool is_empty();
 
-	void _cdecl invalidateAllPeaks();
+	void _cdecl invalidate_all_peaks();
 
-	Track *_cdecl getTimeTrack();
-	int _cdecl barOffset(int index);
+	Track *_cdecl time_track();
+	int _cdecl bar_offset(int index);
 
-	string _cdecl getTag(const string &key);
+	string _cdecl get_tag(const string &key);
 
 	// action
-	void _cdecl addTag(const string &key, const string &value);
-	void _cdecl editTag(int index, const string &key, const string &value);
-	void _cdecl deleteTag(int index);
-	void _cdecl addEffect(AudioEffect *effect);
-	void _cdecl deleteEffect(AudioEffect *effect);
-	void _cdecl editEffect(AudioEffect *effect, const string &param_old);
-	void _cdecl enableEffect(AudioEffect *effect, bool enabled);
-	void _cdecl setVolume(float volume);
-	void _cdecl changeAllTrackVolumes(Track *t, float volume);
-	void _cdecl setSampleRate(int sample_rate);
-	void _cdecl setDefaultFormat(SampleFormat format);
-	void _cdecl setCompression(int compression);
-	Track *_cdecl addTrack(SignalType type, int index = -1);
-	Track *_cdecl addTrackAfter(SignalType type, Track *insert_after = nullptr);
-	void _cdecl deleteTrack(Track *track);
-	Sample *_cdecl addSample(const string &name, AudioBuffer &buf);
-	void _cdecl deleteSample(Sample *s);
-	void _cdecl editSampleName(Sample *s, const string &name);
-	void _cdecl scaleSample(Sample *s, int new_size, int method);
-	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, int mode);
-	void _cdecl addPause(int index, int length, int mode);
-	void _cdecl editBar(int index, int length, int num_beats, int num_sub_beats, int mode);
-	void _cdecl deleteBar(int index, bool affect_midi);
-	void _cdecl deleteTimeInterval(int index, const Range &range);
-	void _cdecl insertSelectedSamples(const SongSelection &sel);
-	void _cdecl deleteSelectedSamples(const SongSelection &sel);
-	void _cdecl deleteSelection(const SongSelection &sel);
-	void _cdecl createSamplesFromSelection(const SongSelection &sel, bool auto_delete);
-	Curve *_cdecl addCurve(const string &name, Array<Curve::Target> &targets);
-	void _cdecl deleteCurve(Curve *curve);
-	void _cdecl editCurve(Curve *curve, const string &name, float min, float max);
-	void _cdecl curveSetTargets(Curve *curve, Array<Curve::Target> &targets);
-	void _cdecl curveAddPoint(Curve *curve, int pos, float value);
-	void _cdecl curveDeletePoint(Curve *curve, int index);
-	void _cdecl curveEditPoint(Curve *curve, int index, int pos, float value);
+	void _cdecl add_tag(const string &key, const string &value);
+	void _cdecl edit_tag(int index, const string &key, const string &value);
+	void _cdecl delete_tag(int index);
+	void _cdecl add_effect(AudioEffect *effect);
+	void _cdecl delete_effect(AudioEffect *effect);
+	void _cdecl edit_effect(AudioEffect *effect, const string &param_old);
+	void _cdecl enable_effect(AudioEffect *effect, bool enabled);
+	void _cdecl set_volume(float volume);
+	void _cdecl change_all_track_volumes(Track *t, float volume);
+	void _cdecl set_sample_rate(int sample_rate);
+	void _cdecl set_default_format(SampleFormat format);
+	void _cdecl set_compression(int compression);
+	Track *_cdecl add_track(SignalType type, int index = -1);
+	Track *_cdecl add_track_after(SignalType type, Track *insert_after = nullptr);
+	void _cdecl delete_track(Track *track);
+	Sample *_cdecl add_sample(const string &name, AudioBuffer &buf);
+	void _cdecl delete_sample(Sample *s);
+	void _cdecl edit_sample_name(Sample *s, const string &name);
+	void _cdecl scale_sample(Sample *s, int new_size, int method);
+	void _cdecl add_bar(int index, float bpm, int beats, int sub_beats, int mode);
+	void _cdecl add_pause(int index, int length, int mode);
+	void _cdecl edit_bar(int index, int length, int num_beats, int num_sub_beats, int mode);
+	void _cdecl delete_bar(int index, bool affect_midi);
+	void _cdecl delete_time_interval(int index, const Range &range);
+	void _cdecl insert_selected_samples(const SongSelection &sel);
+	void _cdecl delete_selected_samples(const SongSelection &sel);
+	void _cdecl delete_selection(const SongSelection &sel);
+	void _cdecl create_samples_from_selection(const SongSelection &sel, bool auto_delete);
+	Curve *_cdecl add_curve(const string &name, Array<Curve::Target> &targets);
+	void _cdecl delete_curve(Curve *curve);
+	void _cdecl edit_curve(Curve *curve, const string &name, float min, float max);
+	void _cdecl curve_set_targets(Curve *curve, Array<Curve::Target> &targets);
+	void _cdecl curve_add_point(Curve *curve, int pos, float value);
+	void _cdecl curve_delete_point(Curve *curve, int index);
+	void _cdecl curve_edit_point(Curve *curve, int index, int pos, float value);
 
 	// helper
 	Sample* _cdecl get_sample_by_uid(int uid);

@@ -44,7 +44,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
 	AudioBuffer buf;
-	od->layer->getBuffers(buf, range);
+	od->layer->get_buffers(buf, range);
 
 	Action *a;
 	if (od->song->history_enabled())
@@ -101,10 +101,10 @@ FormatDescriptorFlac::FormatDescriptorFlac() :
 {
 }
 
-void FormatFlac::loadTrack(StorageOperationData *od)
+void FormatFlac::load_track(StorageOperationData *od)
 {
 	Track *t = od->track;
-	t->song->beginActionGroup();
+	t->song->begin_action_group();
 
 	FLAC__StreamDecoder *decoder = nullptr;
 
@@ -137,7 +137,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		if (od->only_load_metadata){
 			if (!FLAC__stream_decoder_process_until_end_of_metadata(decoder))
 				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
-			t->addMarker(Range(0, flac_samples), "dummy");
+			t->add_marker(Range(0, flac_samples), "dummy");
 		}else{
 			if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
 				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
@@ -151,7 +151,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 	if (decoder)
 		FLAC__stream_decoder_delete(decoder);
 
-	t->song->endActionGroup();
+	t->song->end_action_group();
 }
 
 
@@ -164,7 +164,7 @@ void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 byt
 
 
 
-void FormatFlac::saveViaRenderer(StorageOperationData *od)
+void FormatFlac::save_via_renderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 

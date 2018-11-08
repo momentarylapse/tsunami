@@ -59,37 +59,37 @@ public:
 	}
 	void onLoad()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, fx, false);
+		string name = session->plugin_manager->select_favorite_name(win, fx, false);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->ApplyFavorite(fx, name);
+		session->plugin_manager->apply_favorite(fx, name);
 		if (track)
-			track->editEffect(fx, old_param);
+			track->edit_effect(fx, old_param);
 		else
-			song->editEffect(fx, old_param);
+			song->edit_effect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
 	void onSave()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, fx, true);
+		string name = session->plugin_manager->select_favorite_name(win, fx, true);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->SaveFavorite(fx, name);
+		session->plugin_manager->save_favorite(fx, name);
 	}
 	void onEnabled()
 	{
 		if (track)
-			track->enableEffect(fx, isChecked(""));
+			track->enable_effect(fx, isChecked(""));
 		else
-			song->enableEffect(fx, isChecked(""));
+			song->enable_effect(fx, isChecked(""));
 	}
 	void onDelete()
 	{
 		hui::RunLater(0, [&]{
 			if (track)
-				track->deleteEffect(fx);
+				track->delete_effect(fx);
 			else
-				song->deleteEffect(fx);
+				song->delete_effect(fx);
 		});
 	}
 	void on_large()
@@ -100,9 +100,9 @@ public:
 	void onfxChange()
 	{
 		if (track)
-			track->editEffect(fx, old_param);
+			track->edit_effect(fx, old_param);
 		else
-			song->editEffect(fx, old_param);
+			song->edit_effect(fx, old_param);
 		check("enabled", fx->enabled);
 		if (p)
 			p->update();
@@ -179,14 +179,14 @@ void FxConsole::on_set_large(bool large)
 
 void FxConsole::on_add()
 {
-	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
+	string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_EFFECT);
 	if (name == "")
 		return;
 	AudioEffect *effect = CreateAudioEffect(session, name);
 	if (track)
-		track->addEffect(effect);
+		track->add_effect(effect);
 	else
-		song->addEffect(effect);
+		song->add_effect(effect);
 }
 
 void FxConsole::on_edit_song()

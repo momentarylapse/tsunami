@@ -31,26 +31,26 @@ void ActionTrackInsertSample::build(Data *d)
 
 		// get target buffer
 		Range r = ref->range();
-		addSubAction(new ActionTrackCreateBuffers(layer, r), d);
+		add_sub_action(new ActionTrackCreateBuffers(layer, r), d);
 		AudioBuffer buf;
-		layer->readBuffers(buf, r, true);
+		layer->read_buffers(buf, r, true);
 
 		// insert sub (ignore muted)
 		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(layer, r);
 		buf.set(*ref->buf, 0, ref->volume);
-		addSubAction(action, d);
+		add_sub_action(action, d);
 	}else if (layer->type == SignalType::MIDI){
 		for (MidiNote *n : *ref->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;
-			addSubAction(new ActionTrackAddMidiNote(layer, nn), d);
+			add_sub_action(new ActionTrackAddMidiNote(layer, nn), d);
 		}
 	}
 
 	// delete sub
-	addSubAction(new ActionTrackDeleteSample(ref), d);
+	add_sub_action(new ActionTrackDeleteSample(ref), d);
 
 	if (sample->auto_delete and (sample->ref_count == 0))
-		addSubAction(new ActionSampleDelete(sample), d);
+		add_sub_action(new ActionSampleDelete(sample), d);
 }
 

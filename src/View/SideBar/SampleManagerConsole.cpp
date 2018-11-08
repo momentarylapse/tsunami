@@ -186,17 +186,17 @@ void SampleManagerConsole::on_list_edit()
 	int sel = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
 	if (col == 1)
-		song->editSampleName(items[sel]->s, getCell("sample_list", sel, 1));
+		song->edit_sample_name(items[sel]->s, getCell("sample_list", sel, 1));
 	else if (col == 4)
 		items[sel]->s->auto_delete = getCell("sample_list", sel, 4)._bool();
 }
 
 void SampleManagerConsole::on_import()
 {
-	if (session->storage->askOpenImport(win)){
+	if (session->storage->ask_open_import(win)){
 		AudioBuffer buf;
-		session->storage->loadBufferBox(song, &buf, hui::Filename);
-		song->addSample(hui::Filename.basename(), buf);
+		session->storage->load_buffer(song, &buf, hui::Filename);
+		song->add_sample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		on_list_select();
 	}
@@ -208,10 +208,10 @@ void SampleManagerConsole::on_export()
 	if (sel.num != 1)
 		return;
 
-	if (session->storage->askSaveExport(win)){
+	if (session->storage->ask_save_export(win)){
 		if (sel[0]->type == SignalType::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			session->storage->saveViaRenderer(rr.out, hui::Filename, sel[0]->buf.length, Array<Tag>());
+			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf.length, Array<Tag>());
 		}
 	}
 }
@@ -220,12 +220,12 @@ void SampleManagerConsole::on_insert()
 {
 	Array<Sample*> sel = get_selected();
 	for (Sample* s: sel)
-		view->cur_layer()->addSampleRef(view->sel.range.start(), s);
+		view->cur_layer()->add_sample_ref(view->sel.range.start(), s);
 }
 
 void SampleManagerConsole::on_create_from_selection()
 {
-	song->createSamplesFromSelection(view->sel, false);
+	song->create_samples_from_selection(view->sel, false);
 }
 
 void SampleManagerConsole::on_delete()
@@ -234,7 +234,7 @@ void SampleManagerConsole::on_delete()
 
 	song->action_manager->group_begin();
 	for (Sample* s: sel)
-		song->deleteSample(s);
+		song->delete_sample(s);
 	song->action_manager->group_end();
 
 	// hui bug
@@ -421,10 +421,10 @@ public:
 
 	void on_import()
 	{
-		if (session->storage->askOpenImport(win)){
+		if (session->storage->ask_open_import(win)){
 			AudioBuffer buf;
-			session->storage->loadBufferBox(song, &buf, hui::Filename);
-			song->addSample(hui::Filename.basename(), buf);
+			session->storage->load_buffer(song, &buf, hui::Filename);
+			song->add_sample(hui::Filename.basename(), buf);
 			fill_list();
 		}
 

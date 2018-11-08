@@ -66,8 +66,8 @@ void CaptureConsoleModeAudio::enter_parent()
 
 void CaptureConsoleModeAudio::enter()
 {
-	chosen_device = session->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
-	sources = session->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
+	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
+	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	cc->hideControl("single_grid", false);
 
 	// add all

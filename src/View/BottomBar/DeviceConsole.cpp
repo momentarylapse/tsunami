@@ -52,15 +52,15 @@ string DeviceConsole::to_format(int i, const Device *d)
 
 void DeviceConsole::change_data()
 {
-	output_devices = device_manager->getDeviceList(DeviceType::AUDIO_OUTPUT);
+	output_devices = device_manager->device_list(DeviceType::AUDIO_OUTPUT);
 	foreachi(Device *d, output_devices, i)
 		changeString("output-list", i, to_format(i, d));
 
-	input_devices = device_manager->getDeviceList(DeviceType::AUDIO_INPUT);
+	input_devices = device_manager->device_list(DeviceType::AUDIO_INPUT);
 	foreachi(Device *d, input_devices, i)
 		changeString("input-list", i, to_format(i, d));
 
-	midi_input_devices = device_manager->getDeviceList(DeviceType::MIDI_INPUT);
+	midi_input_devices = device_manager->device_list(DeviceType::MIDI_INPUT);
 	foreachi(Device *d, midi_input_devices, i)
 		changeString("midi-input-list", i, to_format(i, d));
 }
@@ -77,7 +77,7 @@ void DeviceConsole::update_full()
 		sel_midi_in = midi_input_devices[getInt("midi-input-list")];
 
 	reset("output-list");
-	output_devices = device_manager->getDeviceList(DeviceType::AUDIO_OUTPUT);
+	output_devices = device_manager->device_list(DeviceType::AUDIO_OUTPUT);
 	foreachi(Device *d, output_devices, i){
 		addString("output-list", to_format(i, d));
 		if (d == sel_out)
@@ -85,7 +85,7 @@ void DeviceConsole::update_full()
 	}
 
 	reset("input-list");
-	input_devices = device_manager->getDeviceList(DeviceType::AUDIO_INPUT);
+	input_devices = device_manager->device_list(DeviceType::AUDIO_INPUT);
 	foreachi(Device *d, input_devices, i){
 		addString("input-list", to_format(i, d));
 		if (d == sel_in)
@@ -93,7 +93,7 @@ void DeviceConsole::update_full()
 	}
 
 	reset("midi-input-list");
-	midi_input_devices = device_manager->getDeviceList(DeviceType::MIDI_INPUT);
+	midi_input_devices = device_manager->device_list(DeviceType::MIDI_INPUT);
 	foreachi(Device *d, midi_input_devices, i){
 		addString("midi-input-list", to_format(i, d));
 		if (d == sel_midi_in)
@@ -104,7 +104,7 @@ void DeviceConsole::update_full()
 
 void DeviceConsole::add_device()
 {
-	Array<Device*> &devices = device_manager->getDeviceList(device_manager->msg_type);
+	Array<Device*> &devices = device_manager->device_list(device_manager->msg_type);
 	if (device_manager->msg_type == DeviceType::AUDIO_OUTPUT){
 		output_devices = devices;
 		Device *d = output_devices.back();
@@ -129,7 +129,7 @@ void DeviceConsole::onOutputEdit()
 	if (col == 4){
 		output_devices[index]->visible = getCell("", index, col)._bool();
 	}
-	device_manager->setDeviceConfig(output_devices[index]);
+	device_manager->set_device_config(output_devices[index]);
 }
 
 void DeviceConsole::onInputEdit()
@@ -142,7 +142,7 @@ void DeviceConsole::onInputEdit()
 	}else if (col == 6){
 		input_devices[index]->latency = getCell("", index, col)._float();
 	}
-	device_manager->setDeviceConfig(input_devices[index]);
+	device_manager->set_device_config(input_devices[index]);
 }
 
 void DeviceConsole::onMidiInputEdit()
@@ -153,7 +153,7 @@ void DeviceConsole::onMidiInputEdit()
 	if (col == 3){
 		midi_input_devices[index]->visible = getCell("", index, col)._bool();
 	}
-	device_manager->setDeviceConfig(midi_input_devices[index]);
+	device_manager->set_device_config(midi_input_devices[index]);
 }
 
 void DeviceConsole::onTopPriority()
@@ -162,15 +162,15 @@ void DeviceConsole::onTopPriority()
 	if (t == 0){
 		int n = getInt("output-list");
 		if (n >= 0)
-			device_manager->makeDeviceTopPriority(output_devices[n]);
+			device_manager->make_device_top_priority(output_devices[n]);
 	}else if (t == 1){
 		int n = getInt("input-list");
 		if (n >= 0)
-			device_manager->makeDeviceTopPriority(input_devices[n]);
+			device_manager->make_device_top_priority(input_devices[n]);
 	}else if (t == 2){
 		int n = getInt("midi-input-list");
 		if (n >= 0)
-			device_manager->makeDeviceTopPriority(midi_input_devices[n]);
+			device_manager->make_device_top_priority(midi_input_devices[n]);
 	}
 }
 
@@ -181,7 +181,7 @@ void DeviceConsole::onOutputMove()
 	int source = e->row;
 	int target = e->row_target;
 	//msg_write(format("  move  %d  ->  %d", source, target));
-	device_manager->moveDevicePriority(output_devices[source], target);
+	device_manager->move_device_priority(output_devices[source], target);
 	setInt("output-list", target);
 }
 
@@ -190,7 +190,7 @@ void DeviceConsole::onInputMove()
 	auto e = hui::GetEvent();
 	int source = e->row;
 	int target = e->row_target;
-	device_manager->moveDevicePriority(input_devices[source], target);
+	device_manager->move_device_priority(input_devices[source], target);
 	setInt("input-list", target);
 }
 
@@ -199,7 +199,7 @@ void DeviceConsole::onMidiInputMove()
 	auto e = hui::GetEvent();
 	int source = e->row;
 	int target = e->row_target;
-	device_manager->moveDevicePriority(midi_input_devices[source], target);
+	device_manager->move_device_priority(midi_input_devices[source], target);
 	setInt("midi-input-list", target);
 }
 

@@ -66,7 +66,7 @@ public:
 		editing = true;
 		if (track){
 			if (parent->isChecked("link-volumes"))
-				track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
+				track->song->change_all_track_volumes(track, slider2vol(getFloat("")));
 			else
 				vtrack->set_volume(slider2vol(getFloat("")));
 		}
@@ -117,9 +117,9 @@ public:
 		bool is_playable = vtrack->view->get_playable_tracks().contains(track);
 		enable(id_name, is_playable);
 		if (is_playable)
-			setString(id_name, track->getNiceName());
+			setString(id_name, track->nice_name());
 		else
-			setString(id_name, "<s>" + track->getNiceName() + "</s>");
+			setString(id_name, "<s>" + track->nice_name() + "</s>");
 	}
 
 
@@ -170,7 +170,7 @@ MixingConsole::MixingConsole(Session *session) :
 	fromResource("mixing-console");
 
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter);
-	setFloat("output-volume", device_manager->getOutputVolume());
+	setFloat("output-volume", device_manager->get_output_volume());
 
 	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));
 
@@ -195,7 +195,7 @@ MixingConsole::~MixingConsole()
 
 void MixingConsole::on_output_volume()
 {
-	device_manager->setOutputVolume(getFloat(""));
+	device_manager->set_output_volume(getFloat(""));
 }
 
 void MixingConsole::load_data()
@@ -234,7 +234,7 @@ void MixingConsole::load_data()
 
 void MixingConsole::on_update_device_manager()
 {
-	setFloat("output-volume", device_manager->getOutputVolume());
+	setFloat("output-volume", device_manager->get_output_volume());
 }
 
 void MixingConsole::on_tracks_change()

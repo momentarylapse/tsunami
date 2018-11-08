@@ -88,7 +88,7 @@ bool ActionManager::merge(Action *a)
 void *ActionManager::execute(Action *a)
 {
 	if (cur_group)
-		return cur_group->addSubAction(a, data);
+		return cur_group->add_sub_action(a, data);
 
 	lock();
 	void *r = a->execute(data);

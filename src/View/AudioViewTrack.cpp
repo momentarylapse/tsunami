@@ -97,7 +97,7 @@ void AudioViewTrack::draw_header(Painter *c)
 		c->set_color(view->colors.text);
 	else
 		c->set_color(view->colors.text_soft2);
-	c->draw_str(area.x1 + 23, area.y1 + 3, track->getNiceName() + (solo ? " (solo)" : ""));
+	c->draw_str(area.x1 + 23, area.y1 + 3, track->nice_name() + (solo ? " (solo)" : ""));
 
 	c->set_font("", -1, false, false);
 
@@ -154,7 +154,7 @@ void AudioViewTrack::draw_header(Painter *c)
 
 void AudioViewTrack::set_muted(bool muted)
 {
-	track->setMuted(muted);
+	track->set_muted(muted);
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
 	view->force_redraw();
@@ -174,12 +174,12 @@ void AudioViewTrack::set_solo(bool _solo)
 
 void AudioViewTrack::set_panning(float panning)
 {
-	track->setPanning(panning);
+	track->set_panning(panning);
 }
 
 void AudioViewTrack::set_volume(float volume)
 {
-	track->setVolume(volume);
+	track->set_volume(volume);
 }
 
 

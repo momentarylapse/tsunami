@@ -64,8 +64,8 @@ void ActionTrackLayerMakeTrack::build(Data *d)
 	t->instrument = orig->instrument;
 	t->volume = orig->volume;
 	t->panning = orig->panning;
-	addSubAction(new ActionTrackAdd(t, orig->get_index() + 1), d);
-	addSubAction(new ActionLayerMoveData(layer, t->layers[0]), d);
-	addSubAction(new ActionTrackLayerDelete(layer->track, get_layer_index(layer)), d);
+	add_sub_action(new ActionTrackAdd(t, orig->get_index() + 1), d);
+	add_sub_action(new ActionLayerMoveData(layer, t->layers[0]), d);
+	add_sub_action(new ActionTrackLayerDelete(layer->track, get_layer_index(layer)), d);
 }
 

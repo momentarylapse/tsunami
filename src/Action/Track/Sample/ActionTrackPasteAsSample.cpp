@@ -35,11 +35,11 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 void ActionTrackPasteAsSample::build(Data *d)
 {
 	if (buf){
-		sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *buf, auto_delete), d);
-		addSubAction(new ActionTrackAddSample(layer, pos, sample), d);
+		sample = (Sample*)add_sub_action(new ActionSampleAdd("-paste-", *buf, auto_delete), d);
+		add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
 	}else if (midi){
-		sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *midi, auto_delete), d);
-		addSubAction(new ActionTrackAddSample(layer, pos, sample), d);
+		sample = (Sample*)add_sub_action(new ActionSampleAdd("-paste-", *midi, auto_delete), d);
+		add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
 	}
 }
 

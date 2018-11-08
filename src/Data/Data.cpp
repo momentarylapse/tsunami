@@ -46,18 +46,18 @@ void *Data::execute(Action *a)
 	return action_manager->execute(a);
 }
 
-void Data::beginActionGroup()
+void Data::begin_action_group()
 {
 	action_manager->group_begin();
 }
 
-void Data::endActionGroup()
+void Data::end_action_group()
 {
 	action_manager->group_end();
 }
 
 
-void Data::resetHistory()
+void Data::reset_history()
 {
 	action_manager->reset();
 }

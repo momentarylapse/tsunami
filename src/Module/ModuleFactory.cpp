@@ -100,7 +100,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& s
 
 	// plug-ins
 	if (!m){
-		p = session->plugin_manager->GetPlugin(session, type, sub_type);
+		p = session->plugin_manager->get_plugin(session, type, sub_type);
 		if (p)
 			m = (Module*)p->create_instance(session, base_class(type));
 	}

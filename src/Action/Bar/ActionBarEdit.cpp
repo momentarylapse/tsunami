@@ -31,11 +31,11 @@ ActionBarEdit::ActionBarEdit(int _index, int _length, int _num_beats, int _num_s
 void ActionBarEdit::build(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
-	Range r = Range(s->barOffset(index), s->bars[index]->length);
+	Range r = Range(s->bar_offset(index), s->bars[index]->length);
 
 	float scale_factor = (float)length / (float)r.length;
 
-	addSubAction(new ActionBar__Edit(index, length, num_beats, num_sub_beats), d);
+	add_sub_action(new ActionBar__Edit(index, length, num_beats, num_sub_beats), d);
 	if (mode != Bar::EditMode::IGNORE){
 		bool scale_audio = (mode == Bar::EditMode::STRETCH_AND_SCALE_AUDIO);
 
@@ -55,7 +55,7 @@ void ActionBarEdit::build(Data *d)
 
 							// grow?
 							if (scale_factor > 1.0f)
-								addSubAction(new ActionTrack__GrowBuffer(l, index, new_buffer_size), d);
+								add_sub_action(new ActionTrack__GrowBuffer(l, index, new_buffer_size), d);
 
 							// stretch input
 							AudioBuffer b_stretch_in;
@@ -73,18 +73,18 @@ void ActionBarEdit::build(Data *d)
 							// re-insert after stretch
 							b.set(b_after_stretch, new_buffer_size - b_after_stretch.length, 1.0f);
 
-							addSubAction(a, d);
+							add_sub_action(a, d);
 
 
 							// shrink?
 							if (scale_factor < 1.0f)
-								addSubAction(new ActionTrack__ShrinkBuffer(l, index, new_buffer_size), d);
+								add_sub_action(new ActionTrack__ShrinkBuffer(l, index, new_buffer_size), d);
 
 						}
 		}
 
 
-		addSubAction(new Action__ScaleData(r, length), d);
+		add_sub_action(new Action__ScaleData(r, length), d);
 	}
 }
 

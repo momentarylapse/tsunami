@@ -120,7 +120,7 @@ bool OutputStream::feed_stream_output(int frames_request, float *out)
 	for (int n=0; (n<2) and (done < (int)frames); n++){
 		AudioBuffer b;
 		ring_buf.read_ref(b, frames - done);
-		b.interleave(out, device_manager->getOutputVolume() * volume);
+		b.interleave(out, device_manager->get_output_volume() * volume);
 		ring_buf.read_ref_done(b);
 		out += b.length * 2;
 		done += b.length;
@@ -225,7 +225,7 @@ OutputStream::OutputStream(Session *_session) :
 	hui_runner_id = -1;
 
 	device_manager = session->device_manager;
-	device = device_manager->chooseDevice(DeviceType::AUDIO_OUTPUT);
+	device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -247,7 +247,7 @@ OutputStream::OutputStream(Session *_session) :
 
 	buffer_is_cleared = true;
 
-	device_manager->addStream(this);
+	device_manager->add_stream(this);
 }
 
 OutputStream::~OutputStream()
@@ -259,7 +259,7 @@ OutputStream::~OutputStream()
 
 	_kill_dev();
 
-	device_manager->removeStream(this);
+	device_manager->remove_stream(this);
 	killed = true;
 
 	if (thread){

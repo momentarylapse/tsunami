@@ -63,7 +63,7 @@ void TrackConsole::loadData()
 	hideControl("td_t_edit", !track);
 	if (track){
 		setString("name", track->name);
-		setOptions("name", "placeholder=" + track->getNiceName());
+		setOptions("name", "placeholder=" + track->nice_name());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
 		hideControl("edit_midi", track->type != SignalType::MIDI);
@@ -112,21 +112,21 @@ void TrackConsole::setTrack(Track *t)
 void TrackConsole::onName()
 {
 	editing = true;
-	track->setName(getString(""));
+	track->set_name(getString(""));
 	editing = false;
 }
 
 void TrackConsole::onVolume()
 {
 	editing = true;
-	track->setVolume(db2amplitude(getFloat("volume")));
+	track->set_volume(db2amplitude(getFloat("volume")));
 	editing = false;
 }
 
 void TrackConsole::onPanning()
 {
 	editing = true;
-	track->setPanning(getFloat("panning") / 100.0f);
+	track->set_panning(getFloat("panning") / 100.0f);
 	editing = false;
 }
 
@@ -136,7 +136,7 @@ void TrackConsole::onInstrument()
 	int n = getInt("");
 	Array<int> tuning;
 	Array<Instrument> instruments = Instrument::enumerate();
-	track->setInstrument(instruments[n]);
+	track->set_instrument(instruments[n]);
 	update_strings();
 	editing = false;
 }
@@ -152,9 +152,9 @@ void TrackConsole::onSelectSynth()
 {
 	if (!track)
 		return;
-	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
+	string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
-		track->setSynthesizer(CreateSynthesizer(session, name));
+		track->set_synthesizer(CreateSynthesizer(session, name));
 }
 
 void TrackConsole::onEditSong()

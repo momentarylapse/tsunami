@@ -22,7 +22,7 @@ FormatDescriptor::FormatDescriptor(const string &_description, const string &_ex
 	flags = _flags;
 }
 
-bool FormatDescriptor::canHandle(const string & _extension)
+bool FormatDescriptor::can_handle(const string & _extension)
 {
 	for (string &e : extensions)
 		if (e == _extension)
@@ -30,7 +30,7 @@ bool FormatDescriptor::canHandle(const string & _extension)
 	return false;
 }
 
-bool FormatDescriptor::testFormatCompatibility(Song *a)
+bool FormatDescriptor::test_compatibility(Song *a)
 {
 	int num_subs = a->samples.num;
 	int num_fx = a->fx.num;
@@ -69,7 +69,7 @@ Format::Format()
 void Format::importData(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)
 {
 	AudioBuffer buf;
-	layer->getBuffers(buf, Range(offset, samples));
+	layer->get_buffers(buf, Range(offset, samples));
 
 	Action *a = new ActionTrackEditBuffer(layer, Range(offset, samples));
 	buf.import(data, channels, format, samples);
@@ -77,12 +77,12 @@ void Format::importData(TrackLayer *layer, void *data, int channels, SampleForma
 }
 
 
-void Format::loadSong(StorageOperationData *od)
+void Format::load_song(StorageOperationData *od)
 {
-	od->track = od->song->addTrack(SignalType::AUDIO_STEREO, 0);
+	od->track = od->song->add_track(SignalType::AUDIO_STEREO, 0);
 	od->layer = od->track->layers[0];
 	od->allow_channels_change = true;
-	loadTrack(od);
+	load_track(od);
 }
 
 bool is_simple_track(Song *s)
@@ -98,7 +98,7 @@ bool is_simple_track(Song *s)
 	return true;
 }
 
-void Format::saveSong(StorageOperationData* od)
+void Format::save_song(StorageOperationData* od)
 {
 	SongRenderer renderer(od->song);
 
@@ -108,5 +108,5 @@ void Format::saveSong(StorageOperationData* od)
 
 	od->num_samples = renderer.get_num_samples();
 	od->renderer = renderer.out;
-	saveViaRenderer(od);
+	save_via_renderer(od);
 }

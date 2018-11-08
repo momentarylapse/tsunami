@@ -33,7 +33,7 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		addLabel(t->getNiceName(), 0, i, "");
+		addLabel(t->nice_name(), 0, i, "");
 		addCheckBox("Classical", 1, i, format("classical-%d"));
 		addCheckBox("TAB", 2, i, format("tab-%d"));
 		check(format("classical-%d"), true);

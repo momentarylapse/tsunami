@@ -305,7 +305,7 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf)
 
 			//if (track->layers[i]->muted)
 			//	continue;
-			track->layers[i]->readBuffers(tbuf, cur, true);
+			track->layers[i]->read_buffers(tbuf, cur, true);
 			add_samples(track->layers[i], cur, tbuf);
 			buf.add(tbuf, 0, 1.0f, 0.0f);
 		}

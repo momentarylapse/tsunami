@@ -303,8 +303,8 @@ void MidiEditorConsole::onQuantize()
 		MidiNote *nn = n->copy();
 		nn->range.set_start(align_to_beats(nn->range.start(), beats));
 		nn->range.set_end(align_to_beats(nn->range.end(), beats));
-		layer->deleteMidiNote(n);
-		layer->addMidiNote(nn);
+		layer->delete_midi_note(n);
+		layer->add_midi_note(nn);
 		view->sel.add(nn);
 	}
 	song->action_manager->group_end();

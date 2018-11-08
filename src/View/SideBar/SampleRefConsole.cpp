@@ -52,7 +52,7 @@ void SampleRefConsole::onMute()
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	layer->editSampleRef(sample, sample->volume, isChecked(""));
+	layer->edit_sample_ref(sample, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
 	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
@@ -68,7 +68,7 @@ void SampleRefConsole::onVolume()
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	layer->editSampleRef(sample, db2amplitude(getFloat("")), sample->muted);
+	layer->edit_sample_ref(sample, db2amplitude(getFloat("")), sample->muted);
 	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
 }
 
@@ -107,7 +107,7 @@ void SampleRefConsole::loadData()
 	enable("volume", !sample->muted);
 	reset("track");
 	for (Track *t: song->tracks)
-		addString("track", t->getNiceName());
+		addString("track", t->nice_name());
 	//setInt("track", sample->track_no);
 }
 

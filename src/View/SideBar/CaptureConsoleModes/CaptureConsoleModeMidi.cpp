@@ -81,8 +81,8 @@ void CaptureConsoleModeMidi::enter_parent()
 
 void CaptureConsoleModeMidi::enter()
 {
-	chosen_device = session->device_manager->chooseDevice(DeviceType::MIDI_INPUT);
-	sources = session->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
+	chosen_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	cc->hideControl("single_grid", false);
 
 	// add all

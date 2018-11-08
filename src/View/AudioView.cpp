@@ -1215,7 +1215,7 @@ void AudioView::draw_selection(Painter *c)
 
 	// bar selection
 	if (sel.bar_gap >= 0){
-		sx1 = cam.sample2screen(song->barOffset(sel.bar_gap));
+		sx1 = cam.sample2screen(song->bar_offset(sel.bar_gap));
 		sx2 = sx1;
 		c->set_antialiasing(true);
 		c->set_color(colors.text_soft1);
@@ -1234,7 +1234,7 @@ void AudioView::draw_selection(Painter *c)
 		c->set_antialiasing(false);
 	}
 	if (hover.type == Selection::Type::BAR_GAP){
-		sx1 = cam.sample2screen(song->barOffset(hover.index));
+		sx1 = cam.sample2screen(song->bar_offset(hover.index));
 		sx2 = sx1;
 		c->set_antialiasing(true);
 		c->set_color(colors.hover);
@@ -1256,7 +1256,7 @@ void AudioView::draw_selection(Painter *c)
 
 bool need_metro_overlay(Song *song, AudioView *view)
 {
-	Track *tt = song->getTimeTrack();
+	Track *tt = song->time_track();
 	if (!tt)
 		return false;
 	auto *vv = view->get_layer(tt->layers[0]);
@@ -1292,7 +1292,7 @@ void AudioView::draw_song(Painter *c)
 		t->draw(c);
 
 	if (need_metro_overlay(song, this)){
-		metronome_overlay_vlayer->layer = song->getTimeTrack()->layers[0];
+		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
 		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
 		metronome_overlay_vlayer->draw(c);
 	}

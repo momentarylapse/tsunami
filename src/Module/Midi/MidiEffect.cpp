@@ -78,18 +78,18 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 {
 	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
-	l->song()->beginActionGroup();
+	l->song()->begin_action_group();
 
 	for (int i=l->midi.num-1; i>=0; i--)
 		if (sel.has(l->midi[i]))
-			l->deleteMidiNote(l->midi[i]);
+			l->delete_midi_note(l->midi[i]);
 
 	process(&midi);
 	for (MidiNote *n: midi)
 		n->reset_meta();
 
-	l->insertMidiData(0, midi);
-	l->song()->endActionGroup();
+	l->insert_midi_data(0, midi);
+	l->song()->end_action_group();
 }
 
 

@@ -13,8 +13,8 @@
 class FormatMp3: public Format
 {
 public:
-	void loadTrack(StorageOperationData *od);
-	void saveViaRenderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od);
+	void save_via_renderer(StorageOperationData *od){}
 };
 
 class FormatDescriptorMp3 : public FormatDescriptor

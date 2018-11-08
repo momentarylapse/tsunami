@@ -25,8 +25,8 @@ public:
 	RawConfigDialog(RawConfigData *data, hui::Window *parent);
 	virtual ~RawConfigDialog();
 
-	void onClose();
-	void onOk();
+	void on_close();
+	void on_ok();
 
 	RawConfigData *data;
 	bool ok;

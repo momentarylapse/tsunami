@@ -67,7 +67,7 @@ void TuningDialog::onOk()
 {
 	Instrument i = track->instrument;
 	i.string_pitch = tuning;
-	track->setInstrument(i);
+	track->set_instrument(i);
 	destroy();
 }
 

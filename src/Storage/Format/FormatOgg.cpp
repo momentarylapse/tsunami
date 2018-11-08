@@ -58,7 +58,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 }
 
 
-void FormatOgg::saveViaRenderer(StorageOperationData *od)
+void FormatOgg::save_via_renderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 
@@ -205,7 +205,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 }
 
 
-void FormatOgg::loadTrack(StorageOperationData *od)
+void FormatOgg::load_track(StorageOperationData *od)
 {
 	Track *t = od->track;
 
@@ -238,7 +238,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 	int samples = (int)ov_pcm_total(&vf, -1);
 	if (od->only_load_metadata){
 		ov_clear(&vf);
-		t->addMarker(Range(0, samples), "dummy");
+		t->add_marker(Range(0, samples), "dummy");
 		return;
 	}
 

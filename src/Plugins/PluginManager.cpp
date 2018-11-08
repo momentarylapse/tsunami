@@ -58,7 +58,7 @@ PluginManager::PluginManager()
 {
 	favorites = new FavoriteManager;
 
-	FindPlugins();
+	find_plugins();
 }
 
 PluginManager::~PluginManager()
@@ -81,16 +81,16 @@ void GlobalSetTempBackupFilename(const string &filename)
 
 void __play__(Session *s)
 {
-	s->win->onPlay();
+	s->win->on_play();
 	//s->signal_chain->start();
 }
 void __stop__(Session *s)
 {
-	s->win->onStop();
+	s->win->on_stop();
 	//s->signal_chain->stop();
 }
 
-void PluginManager::LinkAppScriptData()
+void PluginManager::link_app_script_data()
 {
 	Kaba::config.directory = "";
 
@@ -380,15 +380,15 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("TrackLayer", "midi", _offsetof(TrackLayer, midi));
 	Kaba::DeclareClassOffset("TrackLayer", "samples", _offsetof(TrackLayer, samples));
 	Kaba::DeclareClassOffset("TrackLayer", "track", _offsetof(TrackLayer, track));
-	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::getBuffers));
-	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::readBuffers));
-	Kaba::LinkExternal("TrackLayer.insert_midi_data", Kaba::mf(&TrackLayer::insertMidiData));
-	Kaba::LinkExternal("TrackLayer.add_midi_note", Kaba::mf(&TrackLayer::addMidiNote));
+	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::get_buffers));
+	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::read_buffers));
+	Kaba::LinkExternal("TrackLayer.insert_midi_data", Kaba::mf(&TrackLayer::insert_midi_data));
+	Kaba::LinkExternal("TrackLayer.add_midi_note", Kaba::mf(&TrackLayer::add_midi_note));
 	//Kaba::LinkExternal("TrackLayer.add_midi_notes", Kaba::mf(&TrackLayer::addMidiNotes));
-	Kaba::LinkExternal("TrackLayer.delete_midi_note", Kaba::mf(&TrackLayer::deleteMidiNote));
-	Kaba::LinkExternal("TrackLayer.add_sample_ref", Kaba::mf(&TrackLayer::addSampleRef));
-	Kaba::LinkExternal("TrackLayer.delete_sample_ref", Kaba::mf(&TrackLayer::deleteSampleRef));
-	Kaba::LinkExternal("TrackLayer.edit_sample_ref", Kaba::mf(&TrackLayer::editSampleRef));
+	Kaba::LinkExternal("TrackLayer.delete_midi_note", Kaba::mf(&TrackLayer::delete_midi_note));
+	Kaba::LinkExternal("TrackLayer.add_sample_ref", Kaba::mf(&TrackLayer::add_sample_ref));
+	Kaba::LinkExternal("TrackLayer.delete_sample_ref", Kaba::mf(&TrackLayer::delete_sample_ref));
+	Kaba::LinkExternal("TrackLayer.edit_sample_ref", Kaba::mf(&TrackLayer::edit_sample_ref));
 
 	Kaba::DeclareClassSize("Track", sizeof(Track));
 	Kaba::DeclareClassOffset("Track", "type", _offsetof(Track, type));
@@ -401,18 +401,18 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
 	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
-	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::setName));
-	Kaba::LinkExternal("Track.set_muted", Kaba::mf(&Track::setMuted));
-	Kaba::LinkExternal("Track.set_volume", Kaba::mf(&Track::setVolume));
-	Kaba::LinkExternal("Track.set_panning", Kaba::mf(&Track::setPanning));
-	Kaba::LinkExternal("Track.add_effect", Kaba::mf(&Track::addEffect));
-	Kaba::LinkExternal("Track.delete_effect", Kaba::mf(&Track::deleteEffect));
-	Kaba::LinkExternal("Track.edit_effect", Kaba::mf(&Track::editEffect));
-	Kaba::LinkExternal("Track.enable_effect", Kaba::mf(&Track::enableEffect));
-	Kaba::LinkExternal("Track.set_synthesizer", Kaba::mf(&Track::setSynthesizer));
-	Kaba::LinkExternal("Track.add_marker", Kaba::mf(&Track::addMarker));
-	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::deleteMarker));
-	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::editMarker));
+	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::set_name));
+	Kaba::LinkExternal("Track.set_muted", Kaba::mf(&Track::set_muted));
+	Kaba::LinkExternal("Track.set_volume", Kaba::mf(&Track::set_volume));
+	Kaba::LinkExternal("Track.set_panning", Kaba::mf(&Track::set_panning));
+	Kaba::LinkExternal("Track.add_effect", Kaba::mf(&Track::add_effect));
+	Kaba::LinkExternal("Track.delete_effect", Kaba::mf(&Track::delete_effect));
+	Kaba::LinkExternal("Track.edit_effect", Kaba::mf(&Track::edit_effect));
+	Kaba::LinkExternal("Track.enable_effect", Kaba::mf(&Track::enable_effect));
+	Kaba::LinkExternal("Track.set_synthesizer", Kaba::mf(&Track::set_synthesizer));
+	Kaba::LinkExternal("Track.add_marker", Kaba::mf(&Track::add_marker));
+	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::delete_marker));
+	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::edit_marker));
 
 	Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Kaba::DeclareClassSize("Song", sizeof(Song));
@@ -427,15 +427,15 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);
-	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::addTrack));
-	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::deleteTrack));
+	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::add_track));
+	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::delete_track));
 	Kaba::LinkExternal("Song.range", Kaba::mf(&Song::range));
-	Kaba::LinkExternal("Song.add_bar", Kaba::mf(&Song::addBar));
-	Kaba::LinkExternal("Song.add_pause", Kaba::mf(&Song::addPause));
-	Kaba::LinkExternal("Song.edit_bar", Kaba::mf(&Song::editBar));
-	Kaba::LinkExternal("Song.delete_bar", Kaba::mf(&Song::deleteBar));
-	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::addSample));
-	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::deleteSample));
+	Kaba::LinkExternal("Song.add_bar", Kaba::mf(&Song::add_bar));
+	Kaba::LinkExternal("Song.add_pause", Kaba::mf(&Song::add_pause));
+	Kaba::LinkExternal("Song.edit_bar", Kaba::mf(&Song::edit_bar));
+	Kaba::LinkExternal("Song.delete_bar", Kaba::mf(&Song::delete_bar));
+	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::add_sample));
+	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::delete_sample));
 
 	AudioPort aport("");
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));
@@ -514,7 +514,7 @@ void PluginManager::LinkAppScriptData()
 
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
-	Kaba::LinkExternal("Storage.save_via_renderer", Kaba::mf(&Storage::saveViaRenderer));
+	Kaba::LinkExternal("Storage.save_via_renderer", Kaba::mf(&Storage::save_via_renderer));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 
@@ -592,7 +592,7 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, cons
 	}
 }
 
-void PluginManager::FindPlugins()
+void PluginManager::find_plugins()
 {
 	Kaba::Init();
 
@@ -630,51 +630,51 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("Synthesizer/", ModuleType::SYNTHESIZER, this);
 }
 
-void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
+void PluginManager::add_plugins_to_menu(TsunamiWindow *win)
 {
 	hui::Menu *m = win->getMenu();
 
 	// "Buffer"
-	add_plugins_in_dir("AudioEffect/Channels/", this, m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Echo/", this, m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Pitch/", this, m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Repair/", this, m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Sound/", this, m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
-	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->get_sub_menu_by_id("menu_plugins_synthesizer"), "audio-effect", win, &TsunamiWindow::onMenuExecuteAudioEffect);
+	add_plugins_in_dir("AudioEffect/Channels/", this, m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Echo/", this, m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Pitch/", this, m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Repair/", this, m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Sound/", this, m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->get_sub_menu_by_id("menu_plugins_synthesizer"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 
-	add_plugins_in_dir("AudioSource/", this, m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::onMenuExecuteAudioSource);
+	add_plugins_in_dir("AudioSource/", this, m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::on_menu_execute_audio_source);
 
 	// "Midi"
-	add_plugins_in_dir("MidiEffect/", this, m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
-	add_plugins_in_dir("MidiSource/", this, m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::onMenuExecuteMidiSource);
+	add_plugins_in_dir("MidiEffect/", this, m->get_sub_menu_by_id("menu_plugins_midi_effects"), "midi-effect", win, &TsunamiWindow::on_menu_execute_midi_effect);
+	add_plugins_in_dir("MidiSource/", this, m->get_sub_menu_by_id("menu_plugins_midi_source"), "midi-source", win, &TsunamiWindow::on_menu_execute_midi_source);
 
 	// "All"
-	add_plugins_in_dir("All/", this, m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, &TsunamiWindow::onMenuExecuteSongPlugin);
+	add_plugins_in_dir("All/", this, m->get_sub_menu_by_id("menu_plugins_on_all"), "song", win, &TsunamiWindow::on_menu_execute_song_plugin);
 
 	// rest
-	add_plugins_in_dir("Independent/", this, m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::onMenuExecuteTsunamiPlugin);
+	add_plugins_in_dir("Independent/", this, m->get_sub_menu_by_id("menu_plugins_other"), "tsunami", win, &TsunamiWindow::on_menu_execute_tsunami_plugin);
 }
 
-void PluginManager::ApplyFavorite(Module *c, const string &name)
+void PluginManager::apply_favorite(Module *c, const string &name)
 {
-	favorites->Apply(c, name);
+	favorites->apply(c, name);
 }
 
-void PluginManager::SaveFavorite(Module *c, const string &name)
+void PluginManager::save_favorite(Module *c, const string &name)
 {
-	favorites->Save(c, name);
+	favorites->save(c, name);
 }
 
 
-string PluginManager::SelectFavoriteName(hui::Window *win, Module *c, bool save)
+string PluginManager::select_favorite_name(hui::Window *win, Module *c, bool save)
 {
-	return favorites->SelectName(win, c, save);
+	return favorites->select_name(win, c, save);
 }
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::LoadAndCompilePlugin(ModuleType type, const string &filename)
+Plugin *PluginManager::load_and_compile_plugin(ModuleType type, const string &filename)
 {
 	for (Plugin *p: plugins)
 		if (filename == p->filename)
@@ -691,11 +691,11 @@ Plugin *PluginManager::LoadAndCompilePlugin(ModuleType type, const string &filen
 }
 
 
-Plugin *PluginManager::GetPlugin(Session *session, ModuleType type, const string &name)
+Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const string &name)
 {
 	for (PluginFile &pf: plugin_files){
 		if ((pf.name.replace(" ", "") == name.replace(" ", "")) and (pf.type == type)){
-			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
+			Plugin *p = load_and_compile_plugin(type, pf.filename);
 			return p;
 		}
 	}
@@ -710,7 +710,7 @@ string PluginManager::plugin_dir()
 	return "Plugins/";
 }
 
-Array<string> PluginManager::FindAudioEffects()
+Array<string> PluginManager::find_audio_effects()
 {
 	Array<string> names;
 	string prefix = plugin_dir() + "AudioEffect/";
@@ -724,10 +724,10 @@ Array<string> PluginManager::FindAudioEffects()
 }
 
 
-Array<string> PluginManager::FindModuleSubTypes(ModuleType type)
+Array<string> PluginManager::find_module_sub_types(ModuleType type)
 {
 	if (type == ModuleType::AUDIO_EFFECT)
-		return FindAudioEffects();
+		return find_audio_effects();
 
 	Array<string> names;
 	for (auto &pf: plugin_files)
@@ -753,7 +753,7 @@ Array<string> PluginManager::FindModuleSubTypes(ModuleType type)
 }
 
 
-string PluginManager::ChooseModule(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
+string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();

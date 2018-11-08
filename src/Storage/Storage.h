@@ -31,19 +31,19 @@ public:
 
 	bool load(Song *a, const string &filename);
 	bool load_ex(Song *a, const string &filename, bool only_metadata);
-	bool loadTrack(TrackLayer *t, const string &filename, int offset = 0);
-	bool loadBufferBox(Song *a, AudioBuffer *buf, const string &filename);
-	bool saveViaRenderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags);
+	bool load_track(TrackLayer *t, const string &filename, int offset = 0);
+	bool load_buffer(Song *a, AudioBuffer *buf, const string &filename);
+	bool save_via_renderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags);
 	bool save(Song *a, const string &filename);
 
-	bool askByFlags(hui::Window *win, const string &title, int flags);
+	bool ask_by_flags(hui::Window *win, const string &title, int flags);
 
-	bool askOpen(hui::Window *win);
-	bool askSave(hui::Window *win);
-	bool askOpenImport(hui::Window *win);
-	bool askSaveExport(hui::Window *win);
+	bool ask_open(hui::Window *win);
+	bool ask_save(hui::Window *win);
+	bool ask_open_import(hui::Window *win);
+	bool ask_save_export(hui::Window *win);
 
-	FormatDescriptor *getFormat(const string &ext, int flags);
+	FormatDescriptor *get_format(const string &ext, int flags);
 
 //private:
 	Array<FormatDescriptor*> formats;

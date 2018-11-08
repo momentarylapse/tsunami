@@ -37,8 +37,8 @@ void ActionTrackSampleFromSelection::CreateSamplesFromLayerAudio(TrackLayer *l)
 {
 	foreachib(AudioBuffer &b, l->buffers, bi)
 		if (sel.range.covers(b.range())){
-			addSubAction(new ActionTrackPasteAsSample(l, b.offset, b, auto_delete), l->song());
-			addSubAction(new ActionTrack__DeleteBuffer(l, bi), l->song());
+			add_sub_action(new ActionTrackPasteAsSample(l, b.offset, b, auto_delete), l->song());
+			add_sub_action(new ActionTrack__DeleteBuffer(l, bi), l->song());
 		}
 }
 
@@ -50,8 +50,8 @@ void ActionTrackSampleFromSelection::CreateSamplesFromLayerMidi(TrackLayer *l)
 		return;
 	for (auto n: midi)
 		n->range.offset -= sel.range.offset;
-	addSubAction(new ActionTrackPasteAsSample(l, sel.range.offset, midi, auto_delete), l->song());
+	add_sub_action(new ActionTrackPasteAsSample(l, sel.range.offset, midi, auto_delete), l->song());
 	foreachib(MidiNote *n, l->midi, i)
 		if (sel.has(n))
-			addSubAction(new ActionTrackDeleteMidiNote(l, i), l->song());
+			add_sub_action(new ActionTrackDeleteMidiNote(l, i), l->song());
 }

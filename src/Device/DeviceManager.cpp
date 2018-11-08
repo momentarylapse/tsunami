@@ -125,7 +125,7 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
 	d->present = true;
-	dm->setDeviceConfig(d);
+	dm->set_device_config(d);
 }
 
 void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
@@ -140,7 +140,7 @@ void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, vo
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
 	d->present = true;
-	dm->setDeviceConfig(d);
+	dm->set_device_config(d);
 }
 
 #endif
@@ -210,7 +210,7 @@ DeviceManager::~DeviceManager()
 
 void DeviceManager::remove_device(DeviceType type, int index)
 {
-	Array<Device*> &devices = getDeviceList(type);
+	Array<Device*> &devices = device_list(type);
 	if ((index < 0) or (index >= devices.num))
 		return;
 	if (devices[index]->present)
@@ -309,7 +309,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index)
 		else
 			d->default_by_lib = (index == Pa_GetDefaultInputDevice());
 		d->present = true;
-		dm->setDeviceConfig(d);
+		dm->set_device_config(d);
 	}
 }
 #endif
@@ -547,30 +547,30 @@ void DeviceManager::kill()
 }
 
 
-float DeviceManager::getOutputVolume()
+float DeviceManager::get_output_volume()
 {
 	return output_volume;
 }
 
-void DeviceManager::setOutputVolume(float _volume)
+void DeviceManager::set_output_volume(float _volume)
 {
 	output_volume = _volume;
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::addStream(OutputStream* s)
+void DeviceManager::add_stream(OutputStream* s)
 {
 	streams.add(s);
 }
 
-void DeviceManager::removeStream(OutputStream* s)
+void DeviceManager::remove_stream(OutputStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
 			streams.erase(i);
 }
 
-bool DeviceManager::streamExists(OutputStream* s)
+bool DeviceManager::stream_exists(OutputStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
@@ -580,7 +580,7 @@ bool DeviceManager::streamExists(OutputStream* s)
 
 Device* DeviceManager::get_device(DeviceType type, const string &internal_name)
 {
-	Array<Device*> &devices = getDeviceList(type);
+	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
 			return d;
@@ -589,7 +589,7 @@ Device* DeviceManager::get_device(DeviceType type, const string &internal_name)
 
 Device* DeviceManager::get_device_create(DeviceType type, const string &internal_name)
 {
-	Array<Device*> &devices = getDeviceList(type);
+	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
 			return d;
@@ -601,7 +601,7 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 	return d;
 }
 
-Array<Device*> &DeviceManager::getDeviceList(DeviceType type)
+Array<Device*> &DeviceManager::device_list(DeviceType type)
 {
 	if (type == DeviceType::AUDIO_OUTPUT)
 		return output_devices;
@@ -612,9 +612,9 @@ Array<Device*> &DeviceManager::getDeviceList(DeviceType type)
 	return empty_device_list;
 }
 
-Array<Device*> DeviceManager::getGoodDeviceList(DeviceType type)
+Array<Device*> DeviceManager::good_device_list(DeviceType type)
 {
-	Array<Device*> &all = getDeviceList(type);
+	Array<Device*> &all = device_list(type);
 	Array<Device*> list;
 	for (Device *d: all)
 		if (d->visible and d->present)
@@ -622,9 +622,9 @@ Array<Device*> DeviceManager::getGoodDeviceList(DeviceType type)
 	return list;
 }
 
-Device *DeviceManager::chooseDevice(DeviceType type)
+Device *DeviceManager::choose_device(DeviceType type)
 {
-	Array<Device*> &devices = getDeviceList(type);
+	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->present and d->visible)
 			return d;
@@ -633,7 +633,7 @@ Device *DeviceManager::chooseDevice(DeviceType type)
 	return dummy_device;
 }
 
-void DeviceManager::setDeviceConfig(Device *d)
+void DeviceManager::set_device_config(Device *d)
 {
 	/*Device *dd = get_device(d.type, d.internal_name);
 	if (dd){
@@ -651,9 +651,9 @@ void DeviceManager::setDeviceConfig(Device *d)
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::makeDeviceTopPriority(Device *d)
+void DeviceManager::make_device_top_priority(Device *d)
 {
-	Array<Device*> &devices = getDeviceList(d->type);
+	Array<Device*> &devices = device_list(d->type);
 	for (int i=0; i<devices.num; i++)
 		if (devices[i] == d){
 			devices.insert(d, 0);
@@ -664,9 +664,9 @@ void DeviceManager::makeDeviceTopPriority(Device *d)
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::moveDevicePriority(Device *d, int new_prio)
+void DeviceManager::move_device_priority(Device *d, int new_prio)
 {
-	Array<Device*> &devices = getDeviceList(d->type);
+	Array<Device*> &devices = device_list(d->type);
 	for (int i=0; i<devices.num; i++)
 		if (devices[i] == d){
 			devices.move(i, new_prio);

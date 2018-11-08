@@ -39,7 +39,7 @@ void ActionTrackEditBuffer::undo(Data *d)
 	layer->buffers[index].invalidate_peaks(range);
 
 	AudioBuffer b;
-	layer->readBuffers(b, range, true);
+	layer->read_buffers(b, range, true);
 	box.swap_value(b);
 }
 

@@ -42,12 +42,12 @@ void Clipboard::append_track(TrackLayer *l, AudioView *view, int offset)
 	if (l->type == SignalType::BEATS)
 		return;
 
-	TrackLayer *ll = temp->addTrack(l->type)->layers[0];
+	TrackLayer *ll = temp->add_track(l->type)->layers[0];
 
 	if (l->type == SignalType::AUDIO){
 		AudioBuffer buf;
 		ll->buffers.add(buf);
-		l->readBuffers(ll->buffers[0], view->sel.range, false);
+		l->read_buffers(ll->buffers[0], view->sel.range, false);
 	}else if (l->type == SignalType::MIDI){
 		ll->midi = l->midi.get_notes_by_selection(view->sel);
 		ll->midi.samples = view->sel.range.length;
@@ -103,7 +103,7 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 	if (target->type == SignalType::AUDIO){
 		Range r = Range(view->sel.range.start(), source->buffers[0].length);
 		AudioBuffer buf;
-		target->getBuffers(buf, r);
+		target->get_buffers(buf, r);
 		Action *a = new ActionTrackEditBuffer(target, r);
 		buf.set(source->buffers[0], 0, 1.0f);
 		s->execute(a);
@@ -111,7 +111,7 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 		for (MidiNote *n: source->midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += view->sel.range.start();
-			target->addMidiNote(nn);
+			target->add_midi_note(nn);
 		}
 	}
 }
@@ -123,7 +123,7 @@ void Clipboard::paste_track_as_samples(int source_index, TrackLayer *target, Aud
 
 	Sample* ref = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref){
-		target->addSampleRef(view->sel.range.start(), ref);
+		target->add_sample_ref(view->sel.range.start(), ref);
 	}else{
 		if (target->type == SignalType::AUDIO){MidiNoteBuffer midi;
 			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->buffers[0], true));
@@ -174,7 +174,7 @@ void Clipboard::paste(AudioView *view)
 		return;
 
 
-	s->beginActionGroup();
+	s->begin_action_group();
 
 	int ti = 0;
 	for (Track *t: s->tracks){
@@ -188,7 +188,7 @@ void Clipboard::paste(AudioView *view)
 			ti ++;
 		}
 	}
-	s->endActionGroup();
+	s->end_action_group();
 }
 
 void Clipboard::pasteAsSamples(AudioView *view)
@@ -201,7 +201,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 		return;
 
 
-	s->beginActionGroup();
+	s->begin_action_group();
 
 	int ti = 0;
 	for (Track *t: s->tracks){
@@ -215,7 +215,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 			ti ++;
 		}
 	}
-	s->endActionGroup();
+	s->end_action_group();
 }
 
 bool Clipboard::hasData()

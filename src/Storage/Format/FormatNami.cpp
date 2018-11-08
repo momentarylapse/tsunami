@@ -550,7 +550,7 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->addSampleRef(pos, parent->track->song->samples[index]);
+		me = parent->add_sample_ref(pos, parent->track->song->samples[index]);
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		f->read_int();
@@ -584,7 +584,7 @@ public:
 		string name = f->read_str();
 		int pos = f->read_int();
 		int index = f->read_int();
-		me = parent->layers[0]->addSampleRef(pos, parent->song->samples[index]);
+		me = parent->layers[0]->add_sample_ref(pos, parent->song->samples[index]);
 		me->volume = f->read_float();
 		me->muted = f->read_bool();
 		f->read_int();
@@ -922,7 +922,7 @@ public:
 		f->read_str();
 		f->read_int();
 
-		parent->setSynthesizer(me);
+		parent->set_synthesizer(me);
 	}
 	virtual void write(File *f)
 	{
@@ -1107,7 +1107,7 @@ public:
 		float volume = f->read_float();
 		float muted = f->read_bool();
 		auto type = (SignalType)f->read_int();
-		me = parent->addTrack(type);
+		me = parent->add_track(type);
 		me->name = name;
 		me->volume = volume;
 		me->muted = muted;
@@ -1228,7 +1228,7 @@ StorageOperationData *cur_op(FileChunkBasic *c)
 }
 
 
-void FormatNami::saveSong(StorageOperationData *_od)
+void FormatNami::save_song(StorageOperationData *_od)
 {
 	od = _od;
 	song = od->song;
@@ -1280,7 +1280,7 @@ void FormatNami::make_consistent(Song *a)
 	}
 }
 
-void FormatNami::loadSong(StorageOperationData *_od)
+void FormatNami::load_song(StorageOperationData *_od)
 {
 	od = _od;
 

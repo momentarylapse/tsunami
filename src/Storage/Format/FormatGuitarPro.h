@@ -16,11 +16,11 @@ class Bar;
 class FormatGuitarPro: public Format
 {
 public:
-	void loadTrack(StorageOperationData *od){}
-	void saveViaRenderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od){}
+	void save_via_renderer(StorageOperationData *od){}
 
-	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od);
+	void load_song(StorageOperationData *od);
+	void save_song(StorageOperationData *od);
 
 	int version;
 

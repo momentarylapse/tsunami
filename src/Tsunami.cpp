@@ -93,7 +93,7 @@ bool Tsunami::on_startup(const Array<string> &_arg)
 	plugin_manager = new PluginManager;
 	Session::GLOBAL->plugin_manager = plugin_manager;
 
-	plugin_manager->LinkAppScriptData();
+	plugin_manager->link_app_script_data();
 
 	if (handle_arguments(arg))
 		return false;
@@ -106,13 +106,13 @@ bool Tsunami::on_startup(const Array<string> &_arg)
 	// create a window and load file
 	if (sessions.num == 0){
 		Session *session = create_session();
-		session->song->addTrack(SignalType::AUDIO_STEREO);
+		session->song->add_track(SignalType::AUDIO_STEREO);
 
 		// default tags
-		session->song->addTag("title", _("New Audio File"));
-		session->song->addTag("album", AppName);
-		session->song->addTag("artist", hui::Config.get_str("DefaultArtist", AppName));
-		session->song->resetHistory();
+		session->song->add_tag("title", _("New Audio File"));
+		session->song->add_tag("album", AppName);
+		session->song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
+		session->song->reset_history();
 
 		session->song->notify(session->song->MESSAGE_FINISHED_LOADING);
 		session->win->show();
@@ -176,7 +176,7 @@ bool Tsunami::handle_arguments(Array<string> &args)
 			session = create_session();
 		session->win->hide();
 		session->die_on_plugin_stop = true;
-		session->executeTsunamiPlugin(args[i+1]);
+		session->execute_tsunami_plugin(args[i+1]);
 		i ++;
 		//return false;
 	}else if (args[i] == "--chain"){
@@ -221,7 +221,7 @@ Session* Tsunami::create_session()
 	session->peak_meter = dynamic_cast<PeakMeter*>(session->signal_chain->modules[1]);
 	session->output_stream = dynamic_cast<OutputStream*>(session->signal_chain->modules[2]);
 
-	session->setWin(new TsunamiWindow(session));
+	session->set_win(new TsunamiWindow(session));
 	session->win->auto_delete = true;
 	session->win->show();
 
@@ -236,7 +236,7 @@ void Tsunami::load_key_codes()
 bool Tsunami::allow_termination()
 {
 	for (auto *s: sessions)
-		if (!s->win->allowTermination())
+		if (!s->win->allow_termination())
 			return false;
 	return true;
 }

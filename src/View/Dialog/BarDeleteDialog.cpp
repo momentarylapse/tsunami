@@ -39,22 +39,22 @@ void BarDeleteDialog::on_ok()
 	bool move_data = isChecked("shift-data");
 	bool replace_by_pause = isChecked("replace-by-pause");
 
-	song->beginActionGroup();
+	song->begin_action_group();
 
 	if (replace_by_pause){
 		int length = 0;
 		foreachb(int i, sel){
 			length += song->bars[i]->length;
-			song->deleteBar(i, false);
+			song->delete_bar(i, false);
 		}
-		song->addPause(sel[0], length, Bar::EditMode::IGNORE);
+		song->add_pause(sel[0], length, Bar::EditMode::IGNORE);
 	}else{
 
 		foreachb(int i, sel)
-			song->deleteBar(i, move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+			song->delete_bar(i, move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	}
 
-	song->endActionGroup();
+	song->end_action_group();
 
 	destroy();
 }

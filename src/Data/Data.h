@@ -25,12 +25,12 @@ public:
 
 	virtual void _cdecl reset() = 0;
 
-	void resetHistory();
+	void reset_history();
 	void *execute(Action *a);
 	void _cdecl undo();
 	void _cdecl redo();
-	void _cdecl beginActionGroup();
-	void _cdecl endActionGroup();
+	void _cdecl begin_action_group();
+	void _cdecl end_action_group();
 
 	Session *session;
 	string filename;

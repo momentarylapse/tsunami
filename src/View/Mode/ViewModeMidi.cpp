@@ -174,7 +174,7 @@ void ViewModeMidi::on_left_button_up()
 			if (notes.num > 0){
 				set_cursor_pos(notes[0]->range.end() + 1, true);
 				octave = pitch_get_octave(hover->pitch);
-				view->cur_layer()->addMidiNotes(notes);
+				view->cur_layer()->add_midi_notes(notes);
 				notes.clear(); // all notes owned by track now
 			}
 			preview->end();
@@ -225,7 +225,7 @@ void ViewModeMidi::edit_add_note_by_relative(int relative)
 {
 	Range r = get_midi_edit_range();
 	int pitch = pitch_from_octave_and_rel(relative, octave);
-	view->cur_layer()->addMidiNote(make_note(this, r, pitch, modifier));
+	view->cur_layer()->add_midi_note(make_note(this, r, pitch, modifier));
 	set_cursor_pos(r.end() + 1, true);
 	start_midi_preview(pitch, 0.1f);
 }
@@ -236,7 +236,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 	int pitch = cur_layer()->track->instrument.string_pitch[string_no] + hand_pos;
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
 	n->stringno = string_no;
-	cur_layer()->addMidiNote(n);
+	cur_layer()->add_midi_note(n);
 	set_cursor_pos(r.end() + 1, true);
 	start_midi_preview(pitch, 0.1f);
 }
@@ -246,7 +246,7 @@ void ViewModeMidi::edit_backspace()
 	int a = song->bars.get_prev_sub_beat(view->sel.range.offset-1, beat_partition);
 	Range r = Range(a, view->sel.range.offset-a);
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
-	view->song->deleteSelection(s);
+	view->song->delete_selection(s);
 	set_cursor_pos(a, true);
 }
 

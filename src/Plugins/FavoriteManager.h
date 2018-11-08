@@ -37,17 +37,17 @@ public:
 	bool loaded;
 	Array<Favorite> favorites;
 
-	void Load(Session *session);
-	void LoadFromFile(const string &filename, bool read_only, Session *session);
-	void Save(Session *session);
+	void load(Session *session);
+	void load_from_file(const string &filename, bool read_only, Session *session);
+	void save(Session *session);
 
 	void set(const Favorite &f);
 
-	Array<string> GetList(Module *c);
-	void Apply(Module *c, const string &name);
-	void Save(Module *c, const string &name);
+	Array<string> get_list(Module *c);
+	void apply(Module *c, const string &name);
+	void save(Module *c, const string &name);
 
-	string SelectName(hui::Window *win, Module *c, bool save);
+	string select_name(hui::Window *win, Module *c, bool save);
 };
 
 #endif /* FAVORITEMANAGER_H_ */

@@ -78,7 +78,7 @@ int TrackLayer::version_number() const
 }
 
 
-void TrackLayer::readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref)
+void TrackLayer::read_buffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 {
 	buf.clear_x(channels);
 
@@ -113,58 +113,58 @@ void TrackLayer::read_buffers_fixed(AudioBuffer &buf, const Range &r)
 }
 
 // DEPRECATED
-AudioBuffer TrackLayer::_readBuffers(const Range &r, bool allow_ref)
+AudioBuffer TrackLayer::_read_buffers(const Range &r, bool allow_ref)
 {
 	AudioBuffer buf;
-	readBuffers(buf, r, allow_ref);
+	read_buffers(buf, r, allow_ref);
 	return buf;
 }
 
 
-void TrackLayer::getBuffers(AudioBuffer &buf, const Range &r)
+void TrackLayer::get_buffers(AudioBuffer &buf, const Range &r)
 {
 	track->song->execute(new ActionTrackCreateBuffers(this, r));
-	readBuffers(buf, r, true);
+	read_buffers(buf, r, true);
 }
 
 // DEPRECATED
-AudioBuffer TrackLayer::_getBuffers(const Range &r)
+AudioBuffer TrackLayer::_get_buffers(const Range &r)
 {
 	AudioBuffer b;
-	getBuffers(b, r);
+	get_buffers(b, r);
 	return b;
 }
 
-SampleRef *TrackLayer::addSampleRef(int pos, Sample* sample)
+SampleRef *TrackLayer::add_sample_ref(int pos, Sample* sample)
 {
 	return (SampleRef*)track->song->execute(new ActionTrackAddSample(this, pos, sample));
 }
 
-void TrackLayer::deleteSampleRef(SampleRef *ref)
+void TrackLayer::delete_sample_ref(SampleRef *ref)
 {
 	track->song->execute(new ActionTrackDeleteSample(ref));
 }
 
-void TrackLayer::editSampleRef(SampleRef *ref, float volume, bool mute)
+void TrackLayer::edit_sample_ref(SampleRef *ref, float volume, bool mute)
 {
 	track->song->execute(new ActionTrackEditSample(ref, volume, mute));
 }
 
 // will take ownership of this instance!
-void TrackLayer::addMidiNote(MidiNote *n)
+void TrackLayer::add_midi_note(MidiNote *n)
 {
 	track->song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
-void TrackLayer::addMidiNotes(const MidiNoteBuffer &notes)
+void TrackLayer::add_midi_notes(const MidiNoteBuffer &notes)
 {
-	track->song->beginActionGroup();
+	track->song->begin_action_group();
 	for (MidiNote *n: notes)
-		addMidiNote(n);
-	track->song->endActionGroup();
+		add_midi_note(n);
+	track->song->end_action_group();
 }
 
-void TrackLayer::deleteMidiNote(const MidiNote *note)
+void TrackLayer::delete_midi_note(const MidiNote *note)
 {
 	foreachi(MidiNote *n, midi, index)
 		if (n == note)
@@ -186,7 +186,7 @@ bool TrackLayer::is_main()
 	return (this == track->layers[0]);
 }
 
-void TrackLayer::insertMidiData(int offset, const MidiNoteBuffer& midi)
+void TrackLayer::insert_midi_data(int offset, const MidiNoteBuffer& midi)
 {
 	track->song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }

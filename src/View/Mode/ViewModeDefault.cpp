@@ -372,7 +372,7 @@ void ViewModeDefault::on_key_down(int k)
 		if (view->is_playback_active()){
 			view->pause(!view->is_paused());
 		}else{
-			win->onPlay();
+			win->on_play();
 			//view->play(); unsafe for recording...
 		}
 	}
@@ -458,7 +458,7 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 
 
-	auto *tt = l->layer->song()->getTimeTrack();
+	auto *tt = l->layer->song()->time_track();
 	if (tt){
 		c->set_line_width(2.0f);
 	for (auto *m: tt->markers){
@@ -644,7 +644,7 @@ void ViewModeDefault::draw_post(Painter *c)
 		r.x2 = view->TRACK_HANDLE_WIDTH;
 		c->drawRect(r);*/
 
-		view->draw_cursor_hover(c, moving_track->getNiceName());
+		view->draw_cursor_hover(c, moving_track->nice_name());
 	}
 
 	if (hover->type == Selection::Type::SAMPLE)

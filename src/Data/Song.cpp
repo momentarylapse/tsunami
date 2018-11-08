@@ -99,68 +99,68 @@ const string Song::MESSAGE_CHANGE_CHANNELS = "ChangeChannels";
 const string Song::MESSAGE_EDIT_BARS = "EditBars";
 
 
-void Song::addTag(const string &key, const string &value)
+void Song::add_tag(const string &key, const string &value)
 {
 	if ((key != "") and (value != ""))
 		execute(new ActionTagAdd(Tag(key, value)));
 }
 
-void Song::editTag(int index, const string &key, const string &value)
+void Song::edit_tag(int index, const string &key, const string &value)
 {
 	execute(new ActionTagEdit(index, Tag(key, value)));
 }
 
-void Song::deleteTag(int index)
+void Song::delete_tag(int index)
 {
 	execute(new ActionTagDelete(index));
 }
 
-void Song::addEffect(AudioEffect *effect)
+void Song::add_effect(AudioEffect *effect)
 {
 	execute(new ActionTrackAddEffect(nullptr, effect));
 }
 
 // execute after editing...
-void Song::editEffect(AudioEffect *effect, const string &param_old)
+void Song::edit_effect(AudioEffect *effect, const string &param_old)
 {
 	execute(new ActionTrackEditEffect(effect, param_old));
 }
 
-void Song::enableEffect(AudioEffect *effect, bool enabled)
+void Song::enable_effect(AudioEffect *effect, bool enabled)
 {
 	if (effect->enabled != enabled)
 		execute(new ActionTrackToggleEffectEnabled(effect));
 }
 
-void Song::deleteEffect(AudioEffect *effect)
+void Song::delete_effect(AudioEffect *effect)
 {
 	foreachi (AudioEffect *f, fx, index)
 		if (f == effect)
 			execute(new ActionTrackDeleteEffect(nullptr, index));
 }
 
-void Song::setVolume(float volume)
+void Song::set_volume(float volume)
 {
 	execute(new ActionSongSetVolume(this, volume));
 }
 
-void Song::changeAllTrackVolumes(Track *t, float volume)
+void Song::change_all_track_volumes(Track *t, float volume)
 {
 	execute(new ActionSongChangeAllTrackVolumes(this, t, volume));
 }
 
-void Song::setSampleRate(int _sample_rate)
+void Song::set_sample_rate(int _sample_rate)
 {
 	if (_sample_rate > 0)
 		execute(new ActionSongSetSampleRate(this, _sample_rate));
 }
 
-void Song::setDefaultFormat(SampleFormat _format)
+void Song::set_default_format(SampleFormat _format)
 {
 	execute(new ActionSongSetDefaultFormat(_format, compression));
 }
 
-void Song::setCompression(int _compression)
+void Song::set_compression(int _compression)
 {
 	execute(new ActionSongSetDefaultFormat(default_format, _compression));
 }
@@ -287,7 +287,7 @@ string Song::get_time_str_long(int t)
 	return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
 }
 
-int Song::barOffset(int index)
+int Song::bar_offset(int index)
 {
 	int pos = 0;
 	for (int i=0; i<min(index, bars.num); i++)
@@ -297,11 +297,11 @@ int Song::barOffset(int index)
 
 
 
-Track *Song::addTrack(SignalType type, int index)
+Track *Song::add_track(SignalType type, int index)
 {
 	if (type == SignalType::BEATS){
 		// force single time track
-		if (getTimeTrack())
+		if (time_track())
 			throw Exception(_("There already is one rhythm track."));
 	}
 	if (index < 0)
@@ -309,26 +309,26 @@ Track *Song::addTrack(SignalType type, int index)
 	return (Track*)execute(new ActionTrackAdd(new Track(type, CreateSynthesizer(session, "")), index));
 }
 
-Track *Song::addTrackAfter(SignalType type, Track *ref)
+Track *Song::add_track_after(SignalType type, Track *ref)
 {
 	int index = ref->get_index();
-	return addTrack(type, index + 1);
+	return add_track(type, index + 1);
 }
 
-void Song::insertSelectedSamples(const SongSelection &sel)
+void Song::insert_selected_samples(const SongSelection &sel)
 {
 	if (sel.num_samples() > 0)
 		execute(new ActionTrackInsertSelectedSamples(sel));
 }
 
-void Song::deleteSelectedSamples(const SongSelection &sel)
+void Song::delete_selected_samples(const SongSelection &sel)
 {
 	action_manager->group_begin();
 	for (Track *t: tracks)
 	for (TrackLayer *l: t->layers){
 		for (int j=l->samples.num-1; j>=0; j--)
 			if (sel.has(l->samples[j]))
-				l->deleteSampleRef(l->samples[j]);
+				l->delete_sample_ref(l->samples[j]);
 	}
 	action_manager->group_end();
 }
@@ -364,47 +364,47 @@ void Song::renameLayer(int index, const string &name)
 	execute(new ActionLayerRename(index, name));
 }*/
 
-void Song::deleteTrack(Track *track)
+void Song::delete_track(Track *track)
 {
 	if (tracks.num < 2)
 		throw Exception(_("At least one layer has to exist."));
 	execute(new ActionTrackDelete(track));
 }
 
-Sample *Song::addSample(const string &name, AudioBuffer &buf)
+Sample *Song::add_sample(const string &name, AudioBuffer &buf)
 {
 	return (Sample*)execute(new ActionSampleAdd(name, buf, false));
 }
 
-void Song::deleteSample(Sample *s)
+void Song::delete_sample(Sample *s)
 {
 	if (s->ref_count > 0)
 		throw Exception(_("Can only delete samples which are unused."));
 	execute(new ActionSampleDelete(s));
 }
 
-void Song::editSampleName(Sample *s, const string &name)
+void Song::edit_sample_name(Sample *s, const string &name)
 {
 	execute(new ActionSampleEditName(s, name));
 }
 
-void Song::scaleSample(Sample *s, int new_size, int method)
+void Song::scale_sample(Sample *s, int new_size, int method)
 {
 	execute(new ActionSampleScale(s, new_size, method));
 }
 
-void Song::deleteSelection(const SongSelection &sel)
+void Song::delete_selection(const SongSelection &sel)
 {
 	execute(new ActionSongDeleteSelection(sel));
 }
 
-void Song::createSamplesFromSelection(const SongSelection &sel, bool auto_delete)
+void Song::create_samples_from_selection(const SongSelection &sel, bool auto_delete)
 {
 	if (!sel.range.empty())
 		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 
-void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)
+void Song::add_bar(int index, float bpm, int beats, int sub_beats, int mode)
 {
 	int length = (int)((float)beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
@@ -413,7 +413,7 @@ void Song::addBar(int index, float bpm, int beats, int sub_beats, int mode)
 		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, mode));
 }
 
-void Song::addPause(int index, int length, int mode)
+void Song::add_pause(int index, int length, int mode)
 {
 	if (index >= 0)
 		execute(new ActionBarAdd(index, length, 0, 0, mode));
@@ -421,22 +421,22 @@ void Song::addPause(int index, int length, int mode)
 		execute(new ActionBarAdd(bars.num, length, 0, 0, mode));
 }
 
-void Song::editBar(int index, int length, int beats, int sub_beats, int mode)
+void Song::edit_bar(int index, int length, int beats, int sub_beats, int mode)
 {
 	execute(new ActionBarEdit(index, length, beats, sub_beats, mode));
 }
 
-void Song::deleteBar(int index, bool affect_midi)
+void Song::delete_bar(int index, bool affect_midi)
 {
 	execute(new ActionBarDelete(index, affect_midi));
 }
 
-void Song::deleteTimeInterval(int index, const Range &range)
+void Song::delete_time_interval(int index, const Range &range)
 {
 	//execute(new ActionBarDelete(index, affect_midi));
 }
 
-Curve *Song::addCurve(const string &name, Array<Curve::Target> &targets)
+Curve *Song::add_curve(const string &name, Array<Curve::Target> &targets)
 {
 	Curve *c = new Curve;
 	c->name = name;
@@ -444,42 +444,42 @@ Curve *Song::addCurve(const string &name, Array<Curve::Target> &targets)
 	execute(new ActionCurveAdd(c, curves.num));
 	return c;
 }
-void Song::deleteCurve(Curve *curve)
+void Song::delete_curve(Curve *curve)
 {
 	foreachi(auto c, curves, i)
 		if (c == curve)
 			execute(new ActionCurveDelete(i));
 }
 
-void Song::editCurve(Curve *curve, const string &name, float min, float max)
+void Song::edit_curve(Curve *curve, const string &name, float min, float max)
 {
 	execute(new ActionCurveEdit(curve, name, min, max, curve->targets));
 }
 
-void Song::curveSetTargets(Curve *curve, Array<Curve::Target> &targets)
+void Song::curve_set_targets(Curve *curve, Array<Curve::Target> &targets)
 {
 	execute(new ActionCurveEdit(curve, curve->name, curve->min, curve->max, targets));
 }
 
-void Song::curveAddPoint(Curve *curve, int pos, float value)
+void Song::curve_add_point(Curve *curve, int pos, float value)
 {
 	execute(new ActionCurveAddPoint(curve, pos, value));
 }
 
-void Song::curveDeletePoint(Curve *curve, int index)
+void Song::curve_delete_point(Curve *curve, int index)
 {
 	execute(new ActionCurveDeletePoint(curve, index));
 }
 
-void Song::curveEditPoint(Curve *curve, int index, int pos, float value)
+void Song::curve_edit_point(Curve *curve, int index, int pos, float value)
 {
 	execute(new ActionCurveEditPoint(curve, index, pos, value));
 }
 
-void Song::invalidateAllPeaks()
+void Song::invalidate_all_peaks()
 {
 	for (Track *t: tracks)
-		t->invalidateAllPeaks();
+		t->invalidate_all_peaks();
 	for (Sample *s: samples)
 		s->buf.peaks.clear();
 }
@@ -516,7 +516,7 @@ MidiEffect *Song::get_midi_fx(Track *track, int index)
 	return track->midi_fx[index];
 }
 
-Track *Song::getTimeTrack()
+Track *Song::time_track()
 {
 	for (Track *t: tracks)
 		if (t->type == SignalType::BEATS)
@@ -524,7 +524,7 @@ Track *Song::getTimeTrack()
 	return nullptr;
 }
 
-string Song::getTag(const string &key)
+string Song::get_tag(const string &key)
 {
 	for (Tag &t: tags)
 		if (t.key == key)

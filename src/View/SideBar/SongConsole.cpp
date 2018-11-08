@@ -85,19 +85,19 @@ void SongConsole::loadData()
 
 void SongConsole::onSamplerate()
 {
-	song->setSampleRate(getString("")._int());
+	song->set_sample_rate(getString("")._int());
 }
 
 void SongConsole::onFormat()
 {
 	int i = getInt("");
 	if (i >= 0)
-		song->setDefaultFormat(POSSIBLE_FORMATS[i]);
+		song->set_default_format(POSSIBLE_FORMATS[i]);
 }
 
 void SongConsole::onCompression()
 {
-	song->setCompression(isChecked("") ? 1 : 0);
+	song->set_compression(isChecked("") ? 1 : 0);
 }
 
 void SongConsole::onTagsSelect()
@@ -116,19 +116,19 @@ void SongConsole::onTagsEdit()
 		t.key = getCell("tags", r, 0);
 	else
 		t.value = getCell("tags", r, 1);
-	song->editTag(r, t.key, t.value);
+	song->edit_tag(r, t.key, t.value);
 }
 
 void SongConsole::onAddTag()
 {
-	song->addTag("key", "value");
+	song->add_tag("key", "value");
 }
 
 void SongConsole::onDeleteTag()
 {
 	int s = getInt("tags");
 	if (s >= 0)
-		song->deleteTag(s);
+		song->delete_tag(s);
 }
 
 void SongConsole::onEditSamples()

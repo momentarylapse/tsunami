@@ -61,7 +61,7 @@ int Session::sample_rate()
 	return DEFAULT_SAMPLE_RATE;
 }
 
-void Session::setWin(TsunamiWindow *_win)
+void Session::set_win(TsunamiWindow *_win)
 {
 	win = _win;
 	view = win->view;
@@ -88,14 +88,14 @@ void Session::q(const string &message, const Array<string> &responses)
 	log->question(this, message, responses);
 }
 
-void Session::executeTsunamiPlugin(const string& name)
+void Session::execute_tsunami_plugin(const string& name)
 {
 	TsunamiPlugin *p = CreateTsunamiPlugin(this, name);
 	if (!p)
 		return;
 
 	plugins.add(p);
-	p->subscribe3(this, std::bind(&Session::onPluginStopRequest, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
+	p->subscribe3(this, std::bind(&Session::on_plugin_stop_request, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
 
 	p->on_start();
 
@@ -104,7 +104,7 @@ void Session::executeTsunamiPlugin(const string& name)
 }
 
 
-void Session::onPluginStopRequest(VirtualBase *o)
+void Session::on_plugin_stop_request(VirtualBase *o)
 {
 	TsunamiPlugin *p = (TsunamiPlugin*)o;
 

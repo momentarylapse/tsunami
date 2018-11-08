@@ -18,7 +18,7 @@ ActionGroup::~ActionGroup()
 	action.clear();
 }
 
-void *ActionGroup::addSubAction(Action *a, Data *d)
+void *ActionGroup::add_sub_action(Action *a, Data *d)
 {
 	void *r = a->execute(d);
 	if (!a->is_trivial())

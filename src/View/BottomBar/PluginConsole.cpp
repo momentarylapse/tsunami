@@ -106,9 +106,9 @@ PluginConsole::~PluginConsole()
 
 void PluginConsole::on_add_button()
 {
-	string name = session->plugin_manager->ChooseModule(this, session, ModuleType::TSUNAMI_PLUGIN, "");
+	string name = session->plugin_manager->choose_module(this, session, ModuleType::TSUNAMI_PLUGIN, "");
 	if (name != "")
-		session->executeTsunamiPlugin(name);
+		session->execute_tsunami_plugin(name);
 }
 
 void PluginConsole::on_add_plugin()

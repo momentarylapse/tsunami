@@ -40,7 +40,7 @@ RawConfigData GetRawConfigData(Session *session)
 	return data;
 }
 
-void FormatRaw::saveViaRenderer(StorageOperationData *od)
+void FormatRaw::save_via_renderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->session);
 	AudioPort *r = od->renderer;
@@ -68,7 +68,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 	FileClose(f);
 }
 
-void FormatRaw::loadTrack(StorageOperationData *od)
+void FormatRaw::load_track(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->session);
 

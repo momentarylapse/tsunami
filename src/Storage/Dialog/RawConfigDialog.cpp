@@ -23,22 +23,22 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, hui::Window *parent) :
 		addString("format", format_name((SampleFormat)i));
 	setInt("format", 0);
 
-	event("hui:close", std::bind(&RawConfigDialog::onClose, this));
-	event("close", std::bind(&RawConfigDialog::onClose, this));
-	event("cancel", std::bind(&RawConfigDialog::onClose, this));
-	event("ok", std::bind(&RawConfigDialog::onOk, this));
+	event("hui:close", std::bind(&RawConfigDialog::on_close, this));
+	event("close", std::bind(&RawConfigDialog::on_close, this));
+	event("cancel", std::bind(&RawConfigDialog::on_close, this));
+	event("ok", std::bind(&RawConfigDialog::on_ok, this));
 }
 
 RawConfigDialog::~RawConfigDialog()
 {
 }
 
-void RawConfigDialog::onClose()
+void RawConfigDialog::on_close()
 {
 	destroy();
 }
 
-void RawConfigDialog::onOk()
+void RawConfigDialog::on_ok()
 {
 	data->format = (SampleFormat)(getInt("format") + 1);
 	data->channels = getInt("channels") + 1;

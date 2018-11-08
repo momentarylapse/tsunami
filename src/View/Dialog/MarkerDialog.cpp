@@ -43,9 +43,9 @@ void MarkerDialog::onEdit()
 void MarkerDialog::onOk()
 {
 	if (marker){
-		track->editMarker(marker, marker->range, getString("text"));
+		track->edit_marker(marker, marker->range, getString("text"));
 	}else{
-		track->addMarker(range, getString("text"));
+		track->add_marker(range, getString("text"));
 	}
 	destroy();
 }

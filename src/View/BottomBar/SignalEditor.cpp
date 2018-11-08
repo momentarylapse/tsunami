@@ -429,7 +429,7 @@ public:
 
 	void on_add_audio_source()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_SOURCE);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addAudioSource(name);
 			m->module_x = sel.dx;
@@ -439,7 +439,7 @@ public:
 
 	void on_add_audio_effect()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_EFFECT);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_EFFECT);
 		if (name.num > 0){
 			auto *m = chain->addAudioEffect(name);
 			m->module_x = sel.dx;
@@ -449,7 +449,7 @@ public:
 
 	void on_add_audio_visualizer()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::AUDIO_VISUALIZER);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_VISUALIZER);
 		if (name.num > 0){
 			auto *m = chain->addAudioVisualizer(name);
 			m->module_x = sel.dx;
@@ -480,7 +480,7 @@ public:
 
 	void on_add_midi_source()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_SOURCE);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addMidiSource(name);
 			m->module_x = sel.dx;
@@ -490,7 +490,7 @@ public:
 
 	void on_add_midi_effect()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_EFFECT);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_EFFECT);
 		if (name.num > 0){
 			auto *m = chain->addMidiEffect(name);
 			m->module_x = sel.dx;
@@ -500,7 +500,7 @@ public:
 
 	void on_add_synthesizer()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER);
 		if (name.num > 0){
 			auto *m = chain->addSynthesizer(name);
 			m->module_x = sel.dx;
@@ -524,7 +524,7 @@ public:
 
 	void on_add_beat_source()
 	{
-		string name = session->plugin_manager->ChooseModule(win, session, ModuleType::BEAT_SOURCE);
+		string name = session->plugin_manager->choose_module(win, session, ModuleType::BEAT_SOURCE);
 		if (name.num > 0){
 			auto *m = chain->addBeatSource(name);
 			m->module_x = sel.dx;

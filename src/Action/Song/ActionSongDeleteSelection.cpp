@@ -29,7 +29,7 @@ void ActionSongDeleteSelection::build(Data *d)
 		// marker
 		for (int i=t->markers.num-1; i>=0; i--)
 			if (sel.has(t->markers[i]))
-				addSubAction(new ActionTrackDeleteMarker(t, i), d);
+				add_sub_action(new ActionTrackDeleteMarker(t, i), d);
 
 
 		for (TrackLayer *l: t->layers){
@@ -40,12 +40,12 @@ void ActionSongDeleteSelection::build(Data *d)
 			// midi
 			for (int i=l->midi.num-1; i>=0; i--)
 				if (sel.has(l->midi[i]))
-					addSubAction(new ActionTrackDeleteMidiNote(l, i), d);
+					add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);
 
 			// samples
 			for (int i=l->samples.num-1; i>=0; i--)
 				if (sel.has(l->samples[i]))
-					addSubAction(new ActionTrackDeleteSample(l->samples[i]), d);
+					add_sub_action(new ActionTrackDeleteSample(l->samples[i]), d);
 		}
 	}
 }
@@ -61,22 +61,22 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, T
 
 		if (sel.range.covers(b.range())){
 			// b completely inside?
-			addSubAction(new ActionTrack__DeleteBuffer(l, n), a);
+			add_sub_action(new ActionTrack__DeleteBuffer(l, n), a);
 
 		}else if (sel.range.is_inside(bi1-1)){
 			// overlapping end of b?
-			addSubAction(new ActionTrack__ShrinkBuffer(l, n, i0 - bi0), a);
+			add_sub_action(new ActionTrack__ShrinkBuffer(l, n, i0 - bi0), a);
 
 		}else if (sel.range.is_inside(bi0)){
 			// overlapping beginning of b?
-			addSubAction(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBuffer(l, n), a);
+			add_sub_action(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
+			add_sub_action(new ActionTrack__DeleteBuffer(l, n), a);
 
 		}else if (b.range().covers(sel.range)){
 			// inside b?
-			addSubAction(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__SplitBuffer(l, n, i0 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBuffer(l, n + 1), a);
+			add_sub_action(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
+			add_sub_action(new ActionTrack__SplitBuffer(l, n, i0 - bi0), a);
+			add_sub_action(new ActionTrack__DeleteBuffer(l, n + 1), a);
 
 		}
 		_foreach_it_.update();

@@ -49,16 +49,16 @@ void NewDialog::onOk()
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
 	if (isChecked("metronome")){
-		Track *t = song->addTrack(SignalType::BEATS, 0);
+		Track *t = song->add_track(SignalType::BEATS, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
-			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);
+			song->add_bar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);
 	}
-	song->addTrack(type);
+	song->add_track(type);
 
-	song->addTag("title", _("New Audio File"));
-	song->addTag("album", AppName);
-	song->addTag("artist", hui::Config.get_str("DefaultArtist", AppName));
+	song->add_tag("title", _("New Audio File"));
+	song->add_tag("album", AppName);
+	song->add_tag("artist", hui::Config.get_str("DefaultArtist", AppName));
 
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);

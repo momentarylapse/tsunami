@@ -60,35 +60,35 @@ public:
 	}
 	void onLoad()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, fx, false);
+		string name = session->plugin_manager->select_favorite_name(win, fx, false);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->ApplyFavorite(fx, name);
+		session->plugin_manager->apply_favorite(fx, name);
 		if (track)
-			track->editMidiEffect(fx, old_param);
+			track->edit_midi_effect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
 	void onSave()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, fx, true);
+		string name = session->plugin_manager->select_favorite_name(win, fx, true);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->SaveFavorite(fx, name);
+		session->plugin_manager->save_favorite(fx, name);
 	}
 	void onEnabled()
 	{
 		if (track)
-			track->enableMidiEffect(fx, isChecked(""));
+			track->enable_midi_effect(fx, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
-			track->deleteMidiEffect(fx);
+			track->delete_midi_effect(fx);
 	}
 	void onFxChange()
 	{
 		if (track)
-			track->editMidiEffect(fx, old_param);
+			track->edit_midi_effect(fx, old_param);
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->config_to_string();
@@ -162,10 +162,10 @@ void MidiFxConsole::onUpdate()
 
 void MidiFxConsole::onAdd()
 {
-	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::MIDI_EFFECT);
+	string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_EFFECT);
 	MidiEffect *effect = CreateMidiEffect(session, name);
 	if (track)
-		track->addMidiEffect(effect);
+		track->add_midi_effect(effect);
 }
 
 void MidiFxConsole::clear()

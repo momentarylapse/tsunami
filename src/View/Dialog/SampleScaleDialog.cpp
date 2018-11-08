@@ -85,7 +85,7 @@ void SampleScaleDialog::onOk()
 	else if (getInt("method") == 3)
 		method = BufferInterpolator::METHOD_FOURIER;
 
-	sample->owner->scaleSample(sample, new_size, method);
+	sample->owner->scale_sample(sample, new_size, method);
 	destroy();
 }
 

@@ -209,7 +209,7 @@ static int good_samples(Song *song, const Range &r0)
 	return best_pos - r0.offset;
 }
 
-void FormatPdf::saveSong(StorageOperationData* od)
+void FormatPdf::save_song(StorageOperationData* od)
 {
 	PdfConfigData data;
 	auto *dlg = new PdfConfigDialog(&data, od->song, od->win);
@@ -241,10 +241,10 @@ void FormatPdf::saveSong(StorageOperationData* od)
 
 	if (first_page){
 		p->set_font_size(40);
-		p->draw_str(200, 50, od->song->getTag("title"));
+		p->draw_str(200, 50, od->song->get_tag("title"));
 		p->set_font_size(15);
 		p->set_color(SetColorHSB(1, 0, 0, 0.4f));
-		p->draw_str(p->width - 300, 100, "by " + od->song->getTag("artist"));
+		p->draw_str(p->width - 300, 100, "by " + od->song->get_tag("artist"));
 		first_page = false;
 	}
 

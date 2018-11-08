@@ -24,7 +24,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 	fromResource("mini_bar");
 
 	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter);
-	setFloat("volume", dev_manager->getOutputVolume());
+	setFloat("volume", dev_manager->get_output_volume());
 
 	cpu_display = new CpuDisplay(this, "cpu", session);
 
@@ -51,7 +51,7 @@ void MiniBar::onShowBottomBar()
 
 void MiniBar::onVolume()
 {
-	dev_manager->setOutputVolume(getFloat(""));
+	dev_manager->set_output_volume(getFloat(""));
 }
 
 void MiniBar::onShow()
@@ -74,7 +74,7 @@ void MiniBar::onBottomBarUpdate()
 
 void MiniBar::onVolumeChange()
 {
-	setFloat("volume", dev_manager->getOutputVolume());
+	setFloat("volume", dev_manager->get_output_volume());
 }
 
 

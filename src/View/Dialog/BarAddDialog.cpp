@@ -52,14 +52,14 @@ void BarAddDialog::onOk()
 	float bpm = getFloat("bpm");
 	bool move_data = isChecked("shift-data");
 
-	song->beginActionGroup();
+	song->begin_action_group();
 
-	if (!song->getTimeTrack())
-		song->addTrack(SignalType::BEATS, 0);
+	if (!song->time_track())
+		song->add_track(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
-		song->addBar(index, bpm, beats, sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
-	song->endActionGroup();
+		song->add_bar(index, bpm, beats, sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	song->end_action_group();
 
 	destroy();
 }

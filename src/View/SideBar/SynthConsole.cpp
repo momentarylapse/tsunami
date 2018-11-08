@@ -51,23 +51,23 @@ public:
 	}
 	void onLoad()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, synth, false);
+		string name = session->plugin_manager->select_favorite_name(win, synth, false);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->ApplyFavorite(synth, name);
-		track->editSynthesizer(old_param);
+		session->plugin_manager->apply_favorite(synth, name);
+		track->edit_synthesizer(old_param);
 		old_param = synth->config_to_string();
 	}
 	void onSave()
 	{
-		string name = session->plugin_manager->SelectFavoriteName(win, synth, true);
+		string name = session->plugin_manager->select_favorite_name(win, synth, true);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->SaveFavorite(synth, name);
+		session->plugin_manager->save_favorite(synth, name);
 	}
 	void onSynthChange()
 	{
-		track->editSynthesizer(old_param);
+		track->edit_synthesizer(old_param);
 		if (p)
 			p->update();
 		old_param = synth->config_to_string();
@@ -118,9 +118,9 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	string name = session->plugin_manager->ChooseModule(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
+	string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER, track->synth->module_subtype);
 	if (name != "")
-		track->setSynthesizer(CreateSynthesizer(session, name));
+		track->set_synthesizer(CreateSynthesizer(session, name));
 }
 
 void SynthConsole::onDetune()

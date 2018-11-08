@@ -23,7 +23,7 @@ FormatSoundFont2::FormatSoundFont2()
 	sample_count = 0;
 }
 
-void FormatSoundFont2::loadSong(StorageOperationData *_od)
+void FormatSoundFont2::load_song(StorageOperationData *_od)
 {
 	od = _od;
 	song = od->song;
@@ -145,7 +145,7 @@ void FormatSoundFont2::read_samples(File *f)
 		f->read_buffer(data, num_samples*2);
 		buf.resize(num_samples);
 		buf.import(data, 1, SampleFormat::SAMPLE_FORMAT_16, num_samples);// / 2);
-		Sample *sample = song->addSample(s.name, buf);
+		Sample *sample = song->add_sample(s.name, buf);
 		delete data;
 
 		sample->tags.add(Tag("pitch", i2s(s.original_key)));

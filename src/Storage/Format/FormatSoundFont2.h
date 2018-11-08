@@ -15,11 +15,11 @@ class FormatSoundFont2: public Format
 public:
 	FormatSoundFont2();
 
-	void loadTrack(StorageOperationData *od){}
-	void saveViaRenderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od){}
+	void save_via_renderer(StorageOperationData *od){}
 
-	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od){}
+	void load_song(StorageOperationData *od);
+	void save_song(StorageOperationData *od){}
 
 	void read_chunk(File *f);
 	void read_samples(File *f);

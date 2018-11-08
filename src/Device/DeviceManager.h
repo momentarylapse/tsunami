@@ -63,25 +63,25 @@ public:
 	ApiType midi_api;
 
 
-	float getOutputVolume();
-	void setOutputVolume(float volume);
+	float get_output_volume();
+	void set_output_volume(float volume);
 
-	void addStream(OutputStream *s);
-	void removeStream(OutputStream *s);
-	bool streamExists(OutputStream *s);
+	void add_stream(OutputStream *s);
+	void remove_stream(OutputStream *s);
+	bool stream_exists(OutputStream *s);
 
 	void remove_device(DeviceType type, int index);
 
-	void setDeviceConfig(Device *d);
-	void makeDeviceTopPriority(Device *d);
-	void moveDevicePriority(Device *d, int new_prio);
+	void set_device_config(Device *d);
+	void make_device_top_priority(Device *d);
+	void move_device_priority(Device *d, int new_prio);
 
 	Device *get_device(DeviceType type, const string &internal_name);
 	Device *get_device_create(DeviceType type, const string &internal_name);
-	Array<Device*> &getDeviceList(DeviceType type);
-	Array<Device*> getGoodDeviceList(DeviceType type);
+	Array<Device*> &device_list(DeviceType type);
+	Array<Device*> good_device_list(DeviceType type);
 
-	Device *chooseDevice(DeviceType type);
+	Device *choose_device(DeviceType type);
 
 //private:
 

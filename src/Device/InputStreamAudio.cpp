@@ -210,7 +210,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	out = new Output(this);
 	port_out.add(out);
 
-	device = session->device_manager->chooseDevice(DeviceType::AUDIO_INPUT);
+	device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 	dev_man = session->device_manager;
 	playback_delay_const = 0;
 	if (device){

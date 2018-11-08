@@ -25,8 +25,8 @@ void ActionTrackLayerDelete::build(Data *d)
 
 	TrackLayer *l = track->layers[index];
 	for (int i=l->buffers.num-1; i>=0; i--)
-		addSubAction(new ActionTrack__DeleteBuffer(l, i), s);
+		add_sub_action(new ActionTrack__DeleteBuffer(l, i), s);
 
-	addSubAction(new ActionTrackLayer__Delete(track, index), s);
+	add_sub_action(new ActionTrackLayer__Delete(track, index), s);
 }
 

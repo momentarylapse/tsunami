@@ -44,7 +44,7 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 
 void BarEditDialog::on_ok()
 {
-	song->beginActionGroup();
+	song->begin_action_group();
 	int mode = getInt("mode");
 	if (mode == 0){
 		float bpm = getFloat("bpm");
@@ -61,7 +61,7 @@ void BarEditDialog::on_ok()
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
-			song->editBar(i, b.length, b.num_beats, b.num_sub_beats, bmode);
+			song->edit_bar(i, b.length, b.num_beats, b.num_sub_beats, bmode);
 		}
 
 	}else{
@@ -74,11 +74,11 @@ void BarEditDialog::on_ok()
 
 		if (edit_number){
 			foreachb(int i, sel)
-				song->deleteBar(i, false);
+				song->delete_bar(i, false);
 			float t = (float)duration / (float)song->sample_rate;
 			float bpm = 60.0f * (float)(number * beats) / t;
 			for (int i=0; i<number; i++){
-				song->addBar(sel[0], bpm, beats, sub_beats, Bar::EditMode::IGNORE);
+				song->add_bar(sel[0], bpm, beats, sub_beats, Bar::EditMode::IGNORE);
 			}
 		}else{
 			foreachb(int i, sel){
@@ -88,11 +88,11 @@ void BarEditDialog::on_ok()
 				if (edit_sub_beats)
 					b.num_sub_beats = sub_beats;
 				b.length = duration / number;
-				song->editBar(i, b.length, b.num_beats, b.num_sub_beats, Bar::EditMode::IGNORE);
+				song->edit_bar(i, b.length, b.num_beats, b.num_sub_beats, Bar::EditMode::IGNORE);
 			}
 		}
 	}
-	song->endActionGroup();
+	song->end_action_group();
 
 	destroy();
 }

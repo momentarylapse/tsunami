@@ -69,7 +69,7 @@ void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
 {
 	sample_rate = l->song()->sample_rate;
 	AudioBuffer buf;
-	l->getBuffers(buf, r);
+	l->get_buffers(buf, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);
 	process(buf);
 	session->song->execute(a);

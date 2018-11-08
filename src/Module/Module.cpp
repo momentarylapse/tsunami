@@ -337,18 +337,18 @@ public:
 	}
 	void onLoad()
 	{
-		string name = config->session->plugin_manager->SelectFavoriteName(this, config, false);
+		string name = config->session->plugin_manager->select_favorite_name(this, config, false);
 		if (name.num == 0)
 			return;
-		config->session->plugin_manager->ApplyFavorite(config, name);
+		config->session->plugin_manager->apply_favorite(config, name);
 		panel->update();
 	}
 	void onSave()
 	{
-		string name = config->session->plugin_manager->SelectFavoriteName(this, config, true);
+		string name = config->session->plugin_manager->select_favorite_name(this, config, true);
 		if (name.num == 0)
 			return;
-		config->session->plugin_manager->SaveFavorite(config, name);
+		config->session->plugin_manager->save_favorite(config, name);
 	}
 
 	void onConfigChange()

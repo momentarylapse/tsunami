@@ -77,13 +77,13 @@ void ViewModeScaleBars::perform_scale()
 {
 	float factor = (float)view->sel.range.length / (float)scaling_range_orig.length;
 
-	song->beginActionGroup();
+	song->begin_action_group();
 	foreachb(int i, scaling_sel){
 		Bar *b = song->bars[i];
 		int length = (int)((float)b->length * factor);
-		song->editBar(i, length, b->num_beats, b->num_sub_beats, Bar::EditMode::STRETCH);
+		song->edit_bar(i, length, b->num_beats, b->num_sub_beats, Bar::EditMode::STRETCH);
 	}
-	song->endActionGroup();
+	song->end_action_group();
 
 	view->set_mode(view->mode_default);
 }

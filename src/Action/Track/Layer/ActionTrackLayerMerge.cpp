@@ -33,21 +33,21 @@ void ActionTrackLayerMerge::build(Data *d)
 
 	AudioBuffer buf;
 	//lnew->getBuffers(buf, r);
-	addSubAction(new ActionTrackCreateBuffers(lnew, r), d);
+	add_sub_action(new ActionTrackCreateBuffers(lnew, r), d);
 	auto *a = new ActionTrackEditBuffer(lnew, r);
-	lnew->readBuffers(buf, r, true);
+	lnew->read_buffers(buf, r, true);
 
 	tr->render_audio(buf);
 
-	addSubAction(a, d);
+	add_sub_action(a, d);
 
-	addSubAction(new ActionTrackLayerAdd(track, lnew), d);
+	add_sub_action(new ActionTrackLayerAdd(track, lnew), d);
 
 	for (int i=track->layers.num-2; i>=0; i--)
-		addSubAction(new ActionTrackLayerDelete(track, i), d);
+		add_sub_action(new ActionTrackLayerDelete(track, i), d);
 
 	for (int i=track->fades.num-1; i>=0; i--)
-		addSubAction(new ActionTrackFadeDelete(track, i), d);
+		add_sub_action(new ActionTrackFadeDelete(track, i), d);
 
 	delete tr;
 

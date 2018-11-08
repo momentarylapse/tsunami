@@ -40,7 +40,7 @@ public:
 
 	static int next_id;
 
-	void setWin(TsunamiWindow *win);
+	void set_win(TsunamiWindow *win);
 
 	int id;
 	TsunamiWindow *win;
@@ -61,8 +61,8 @@ public:
 	bool die_on_plugin_stop;
 
 
-	void executeTsunamiPlugin(const string &name);
-	void onPluginStopRequest(VirtualBase *o);
+	void execute_tsunami_plugin(const string &name);
+	void on_plugin_stop_request(VirtualBase *o);
 
 	int sample_rate();
 

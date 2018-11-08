@@ -100,7 +100,7 @@ InputStreamMidi::~InputStreamMidi()
 
 void InputStreamMidi::init()
 {
-	set_device(device_manager->chooseDevice(DeviceType::MIDI_INPUT));
+	set_device(device_manager->choose_device(DeviceType::MIDI_INPUT));
 }
 
 bool InputStreamMidi::unconnect()

@@ -32,7 +32,7 @@ public:
 	virtual bool is_trivial();
 
 protected:
-	void *addSubAction(Action *a, Data *d);
+	void *add_sub_action(Action *a, Data *d);
 	virtual void *execute_return(Data *d);
 
 private:

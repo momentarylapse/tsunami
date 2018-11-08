@@ -84,13 +84,13 @@ void StorageOperationData::suggest_samplerate(int samplerate)
 {
 	// TODO
 	if (track->get_index() == 0)
-		song->setSampleRate(samplerate);
+		song->set_sample_rate(samplerate);
 }
 
 void StorageOperationData::suggest_channels(int channels)
 {
 	if (allow_channels_change){
-		track->setChannels(channels);
+		track->set_channels(channels);
 		channels_suggested = channels;
 	}
 }
@@ -98,11 +98,11 @@ void StorageOperationData::suggest_channels(int channels)
 void StorageOperationData::suggest_default_format(SampleFormat format)
 {
 	if (track->get_index() == 0)
-		song->setDefaultFormat(format);
+		song->set_default_format(format);
 }
 
 void StorageOperationData::suggest_tag(const string &key, const string &value)
 {
 	//if (track->get_index() == 0)
-		song->addTag(key, value);
+		song->add_tag(key, value);
 }

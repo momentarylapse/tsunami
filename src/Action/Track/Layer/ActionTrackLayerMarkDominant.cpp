@@ -35,13 +35,13 @@ void ActionTrackLayerMarkDominant::build(Data *d)
 	// delete fades in range
 	foreachib (auto &f, track->fades, i){
 		if (range.is_inside(f.position))
-			addSubAction(new ActionTrackFadeDelete(track, i), d);
+			add_sub_action(new ActionTrackFadeDelete(track, i), d);
 	}
 
 	// add new fades
 	int samples = 2000; // for now, use default value
 	if (index != index_before)
-		addSubAction(new ActionTrackFadeAdd(track, range.start(), samples, index), d);
+		add_sub_action(new ActionTrackFadeAdd(track, range.start(), samples, index), d);
 	if (index != index_after)
-		addSubAction(new ActionTrackFadeAdd(track, range.end(), samples, index_after), d);
+		add_sub_action(new ActionTrackFadeAdd(track, range.end(), samples, index_after), d);
 }

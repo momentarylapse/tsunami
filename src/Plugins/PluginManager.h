@@ -31,21 +31,21 @@ public:
 
 	string plugin_dir();
 
-	void LinkAppScriptData();
-	void FindPlugins();
-	void AddPluginsToMenu(TsunamiWindow *win);
+	void link_app_script_data();
+	void find_plugins();
+	void add_plugins_to_menu(TsunamiWindow *win);
 
-	Plugin *LoadAndCompilePlugin(ModuleType type, const string &filename);
-	Plugin *GetPlugin(Session *session, ModuleType type, const string &name);
+	Plugin *load_and_compile_plugin(ModuleType type, const string &filename);
+	Plugin *get_plugin(Session *session, ModuleType type, const string &name);
 
-	void ApplyFavorite(Module *c, const string &name);
-	void SaveFavorite(Module *c, const string &name);
-	string SelectFavoriteName(hui::Window *win, Module *c, bool save);
+	void apply_favorite(Module *c, const string &name);
+	void save_favorite(Module *c, const string &name);
+	string select_favorite_name(hui::Window *win, Module *c, bool save);
 
-	Array<string> FindAudioEffects();
-	Array<string> FindModuleSubTypes(ModuleType type);
+	Array<string> find_audio_effects();
+	Array<string> find_module_sub_types(ModuleType type);
 
-	string ChooseModule(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
+	string choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
 
 
 	// not compiled yet

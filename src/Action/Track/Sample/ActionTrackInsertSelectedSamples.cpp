@@ -25,6 +25,6 @@ void ActionTrackInsertSelectedSamples::build(Data *d)
 	for (TrackLayer *l: s->layers())
 		foreachib(SampleRef *ss, l->samples, si)
 			if (sel.has(ss))
-				addSubAction(new ActionTrackInsertSample(l, si), d);
+				add_sub_action(new ActionTrackInsertSample(l, si), d);
 }
 

@@ -41,7 +41,7 @@ void ActionTrackSetChannels::build(Data *d)
 {
 	for (TrackLayer *l: track->layers)
 		for (int i=0; i<l->buffers.num; i++)
-			addSubAction(new ActionTrack__BufferSetChannels(l, i, channels), d);
-	addSubAction(new ActionTrack__SetChannel(track, channels), d);
+			add_sub_action(new ActionTrack__BufferSetChannels(l, i, channels), d);
+	add_sub_action(new ActionTrack__SetChannel(track, channels), d);
 }
 

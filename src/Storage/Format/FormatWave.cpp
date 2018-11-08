@@ -23,7 +23,7 @@ FormatDescriptorWave::FormatDescriptorWave() :
 }
 
 
-void FormatWave::saveViaRenderer(StorageOperationData *od)
+void FormatWave::save_via_renderer(StorageOperationData *od)
 {
 	AudioPort *r = od->renderer;
 
@@ -102,7 +102,7 @@ static string tag_from_wave(const string &key)
 	return key;
 }
 
-void FormatWave::loadTrack(StorageOperationData *od)
+void FormatWave::load_track(StorageOperationData *od)
 {
 	Track *t = od->track;
 
@@ -154,7 +154,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 			od->suggest_samplerate(freq);
 			od->suggest_channels(channels);
 			if (t->get_index() == 0)
-				t->song->setDefaultFormat(format);
+				t->song->set_default_format(format);
 
 			fmt_chunk_read = true;
 		}else if (chunk_name == "data"){

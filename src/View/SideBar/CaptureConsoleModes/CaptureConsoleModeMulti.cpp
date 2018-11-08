@@ -33,8 +33,8 @@ CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
 void CaptureConsoleModeMulti::enter()
 {
 	cc->hideControl("multi_grid", false);
-	sources_audio = session->device_manager->getGoodDeviceList(DeviceType::AUDIO_INPUT);
-	sources_midi = session->device_manager->getGoodDeviceList(DeviceType::MIDI_INPUT);
+	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
+	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
 	// target list multi
 	for (Track *t: song->tracks){
@@ -54,7 +54,7 @@ void CaptureConsoleModeMulti::enter()
 		c.id_source = "source-" + i2s(i);
 		c.id_peaks = "peaks-" + i2s(i);
 		cc->setTarget("multi_grid");
-		cc->addLabel(t->getNiceName(), 0, i*2+1, c.id_target);
+		cc->addLabel(t->nice_name(), 0, i*2+1, c.id_target);
 		cc->addLabel(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO){
 			c.input_audio = new InputStreamAudio(session);
@@ -112,7 +112,7 @@ bool CaptureConsoleModeMulti::insert()
 {
 	bool ok = true;
 
-	song->beginActionGroup();
+	song->begin_action_group();
 
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
@@ -125,7 +125,7 @@ bool CaptureConsoleModeMulti::insert()
 			c.input_midi->reset_accumulation();
 		}
 	}
-	song->endActionGroup();
+	song->end_action_group();
 	return ok;
 }
 

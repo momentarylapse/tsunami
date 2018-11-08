@@ -31,22 +31,22 @@ public:
 	~TrackLayer();
 
 	Range range(int keep_notes = 0) const;
-	AudioBuffer _cdecl _readBuffers(const Range &r, bool allow_ref);
-	void _cdecl readBuffers(AudioBuffer &buf, const Range &r, bool allow_ref);
+	AudioBuffer _cdecl _read_buffers(const Range &r, bool allow_ref);
+	void _cdecl read_buffers(AudioBuffer &buf, const Range &r, bool allow_ref);
 	void _cdecl read_buffers_fixed(AudioBuffer &buf, const Range &r);
 
 	// actions
-	AudioBuffer _cdecl _getBuffers(const Range &r);
-	void _cdecl getBuffers(AudioBuffer &buf, const Range &r);
+	AudioBuffer _cdecl _get_buffers(const Range &r);
+	void _cdecl get_buffers(AudioBuffer &buf, const Range &r);
 
-	void _cdecl insertMidiData(int offset, const MidiNoteBuffer &midi);
-	void _cdecl addMidiNote(MidiNote *n);
-	void _cdecl addMidiNotes(const MidiNoteBuffer &notes);
-	void _cdecl deleteMidiNote(const MidiNote *note);
+	void _cdecl insert_midi_data(int offset, const MidiNoteBuffer &midi);
+	void _cdecl add_midi_note(MidiNote *n);
+	void _cdecl add_midi_notes(const MidiNoteBuffer &notes);
+	void _cdecl delete_midi_note(const MidiNote *note);
 
-	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
-	void _cdecl deleteSampleRef(SampleRef *ref);
-	void _cdecl editSampleRef(SampleRef *ref, float volume, bool mute);
+	SampleRef *_cdecl add_sample_ref(int pos, Sample* sample);
+	void _cdecl delete_sample_ref(SampleRef *ref);
+	void _cdecl edit_sample_ref(SampleRef *ref, float volume, bool mute);
 
 	void _cdecl make_own_track();
 

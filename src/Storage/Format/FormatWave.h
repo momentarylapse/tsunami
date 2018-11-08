@@ -13,8 +13,8 @@
 class FormatWave: public Format
 {
 public:
-	virtual void loadTrack(StorageOperationData *od);
-	virtual void saveViaRenderer(StorageOperationData *od);
+	virtual void load_track(StorageOperationData *od);
+	virtual void save_via_renderer(StorageOperationData *od);
 };
 
 class FormatDescriptorWave : public FormatDescriptor

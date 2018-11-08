@@ -231,7 +231,7 @@ bool CaptureConsole::insert_midi(Track *target, const MidiEventBuffer &midi, int
 	}
 
 	// insert data
-	target->layers[0]->insertMidiData(i0, midi_events_to_notes(midi).duplicate());
+	target->layers[0]->insert_midi_data(i0, midi_events_to_notes(midi).duplicate());
 	return true;
 }
 
@@ -250,7 +250,7 @@ bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int delay)
 
 	// insert data
 	Range r = Range(i0, buf.length);
-	song->beginActionGroup();
+	song->begin_action_group();
 
 	TrackLayer *layer = nullptr;
 	for (TrackLayer *l: target->layers)
@@ -259,10 +259,10 @@ bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int delay)
 			break;
 		}
 	if (!layer)
-		layer = target->addLayer();
+		layer = target->add_layer();
 
 	AudioBuffer tbuf;
-	layer->getBuffers(tbuf, r);
+	layer->get_buffers(tbuf, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
 
 	/*if (hui::Config.getInt("Input.Mode", 0) == 1)
@@ -270,7 +270,7 @@ bool CaptureConsole::insert_audio(Track *target, AudioBuffer &buf, int delay)
 	else*/
 		tbuf.set(buf, 0, 1.0f);
 	song->execute(a);
-	song->endActionGroup();
+	song->end_action_group();
 
 	return true;
 }

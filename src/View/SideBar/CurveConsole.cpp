@@ -121,7 +121,7 @@ void CurveConsole::onAdd()
 	dlg->run();
 	delete(dlg);
 	if (targets.num > 0){
-		Curve *c = song->addCurve("new", targets);
+		Curve *c = song->add_curve("new", targets);
 		view->mode_curve->setCurve(c);
 		updateList();
 	}
@@ -131,7 +131,7 @@ void CurveConsole::onDelete()
 {
 	int n = getInt(id_list);
 	if (n >= 0){
-		song->deleteCurve(song->curves[n]);
+		song->delete_curve(song->curves[n]);
 		view->mode_curve->setCurve(nullptr);
 	}
 }
@@ -144,7 +144,7 @@ void CurveConsole::onTarget()
 	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
 	dlg->run();
 	//if (dlg->id == "ok")
-		song->curveSetTargets(curve(), targets);
+		song->curve_set_targets(curve(), targets);
 
 	delete(dlg);
 	updateList();
@@ -176,7 +176,7 @@ void CurveConsole::onListEdit()
 			min = getCell(id_list, n, col)._float();
 		else if (col == 2)
 			max = getCell(id_list, n, col)._float();
-		song->editCurve(song->curves[n], name, min, max);
+		song->edit_curve(song->curves[n], name, min, max);
 	}
 	view->force_redraw();
 }

@@ -25,8 +25,8 @@ class FormatDescriptor
 public:
 	FormatDescriptor(const string &description, const string &extensions, int _flags);
 	virtual ~FormatDescriptor(){}
-	bool canHandle(const string &extension);
-	bool testFormatCompatibility(Song *s);
+	bool can_handle(const string &extension);
+	bool test_compatibility(Song *s);
 
 	virtual Format *create() = 0;
 
@@ -55,11 +55,11 @@ public:
 
 	void importData(TrackLayer *l, void *data, int channels, SampleFormat format, int samples, int offset);
 
-	virtual void loadTrack(StorageOperationData *od) = 0;
-	virtual void saveViaRenderer(StorageOperationData *od) = 0;
+	virtual void load_track(StorageOperationData *od) = 0;
+	virtual void save_via_renderer(StorageOperationData *od) = 0;
 
-	virtual void loadSong(StorageOperationData *od);
-	virtual void saveSong(StorageOperationData *od);
+	virtual void load_song(StorageOperationData *od);
+	virtual void save_song(StorageOperationData *od);
 
 	File *f;
 	Song *song;

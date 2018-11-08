@@ -92,7 +92,7 @@ static string ascii2utf8(const string &s)
 	return r;
 }
 
-void FormatMidi::loadSong(StorageOperationData *od)
+void FormatMidi::load_song(StorageOperationData *od)
 {
 	File *f = nullptr;
 	try{
@@ -129,7 +129,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		int denominator = 4;
 		int last_bar = 0;
 
-		od->song->addTrack(SignalType::BEATS);
+		od->song->add_track(SignalType::BEATS);
 
 		for (int i=0; i<num_tracks; i++){
 			string tn = read_chunk_name(f);
@@ -149,7 +149,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				int dt = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
 				offset += dt;
 				while (offset > last_bar){
-					od->song->addBar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
+					od->song->add_bar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
 					last_bar = od->song->bars.range().end();
 				}
 				int c0 = f->read_byte();
@@ -228,7 +228,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 			if ((events.num > 0) or (i > 0)){
 				Array<int> keys = events.keys();
 				for (int k : keys){
-					Track *t = od->song->addTrack(SignalType::MIDI);
+					Track *t = od->song->add_track(SignalType::MIDI);
 					t->layers[0]->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;
 				}
@@ -242,7 +242,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		od->error(e.message());
 	}
 }
-void FormatMidi::saveSong(StorageOperationData* od)
+void FormatMidi::save_song(StorageOperationData* od)
 {
 	File *f = nullptr;
 	try {

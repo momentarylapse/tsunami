@@ -82,24 +82,24 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 	if (curve){
 
 		// lines
-		c->setAntialiasing(true);
-		c->setLineWidth(1.0f);
-		c->setColor(view->colors.text);
+		c->set_antialiasing(true);
+		c->set_line_width(1.0f);
+		c->set_color(view->colors.text);
 		Array<complex> pp;
 		for (int x=r.x1; x<r.x2; x+=3)
 			pp.add(complex(x, value2screen(curve->get(cam->screen2sample(x)))));
-		c->drawLines(pp);
+		c->draw_lines(pp);
 
 		// points
 		foreachi(Curve::Point &p, curve->points, i){
 			if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
-				c->setColor(view->colors.selection_boundary_hover);
+				c->set_color(view->colors.selection_boundary_hover);
 			else if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
 				// TODO.... selected...
-				c->setColor(view->colors.selection_boundary);
+				c->set_color(view->colors.selection_boundary);
 			else
-				c->setColor(view->colors.text);
-			c->drawCircle(cam->sample2screen(p.pos), value2screen(p.value), 3);
+				c->set_color(view->colors.text);
+			c->draw_circle(cam->sample2screen(p.pos), value2screen(p.value), 3);
 		}
 	}
 }

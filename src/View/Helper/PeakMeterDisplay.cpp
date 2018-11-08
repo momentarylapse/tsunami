@@ -88,20 +88,20 @@ void drawPeak(Painter *c, const rect &r, PeakMeterData &d)
 	int h = r.height();
 	float sp = d.get_sp();
 
-	c->setColor(AudioView::colors.background);
+	c->set_color(AudioView::colors.background);
 	if (sp > 1)
-		c->setColor(Red);
-	c->drawRect(r);
+		c->set_color(Red);
+	c->draw_rect(r);
 
-	c->setColor(peak_color(sp, 0.4f));
-	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(sp), h);
+	c->set_color(peak_color(sp, 0.4f));
+	c->draw_rect(r.x1, r.y1,       (float)w * nice_peak(sp), h);
 
-	c->setColor(peak_color(d.peak));
-	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
+	c->set_color(peak_color(d.peak));
+	c->draw_rect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
 
-	c->setColor(AudioView::colors.text);
+	c->set_color(AudioView::colors.text);
 	if (sp > 0)
-		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
+		c->draw_rect(w * nice_peak(sp), r.y1, 2, h);
 }
 
 void PeakMeterDisplay::on_draw(Painter *c)
@@ -115,14 +115,14 @@ void PeakMeterDisplay::on_draw(Painter *c)
 		drawPeak(c, rect(2, w-2, 2, h/2-1), *r);
 		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l);
 	}else{
-		c->setColor(AudioView::colors.background);
-		c->drawRect(2, 2, w - 4, h - 4);
-		c->setColor(AudioView::colors.text);
+		c->set_color(AudioView::colors.background);
+		c->draw_rect(2, 2, w - 4, h - 4);
+		c->set_color(AudioView::colors.text);
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
 		for (int i=0;i<100;i++){
 			float x0 = 2 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
 			float hh = (h - 4) * r->spec[i];
-			c->drawRect(x0, h - 2 - hh, dx, hh);
+			c->draw_rect(x0, h - 2 - hh, dx, hh);
 		}
 	}
 }

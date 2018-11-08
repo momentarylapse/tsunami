@@ -15,7 +15,7 @@ ImagePainter::ImagePainter(Image *im)
 	image = im;
 	width = image->width;
 	height = image->height;
-	clip(rect(0, width, 0, height));
+	set_clip(rect(0, width, 0, height));
 	_color = Black;
 	dash_offset = 0;
 	line_width = 1.0f;
@@ -32,51 +32,51 @@ void ImagePainter::end()
 {
 }
 
-void ImagePainter::setColor(const color& c)
+void ImagePainter::set_color(const color& c)
 {
 	_color = c;
 }
 
-void ImagePainter::setFont(const string& font, float size, bool bold, bool italic)
+void ImagePainter::set_font(const string& font, float size, bool bold, bool italic)
 {
 }
 
-void ImagePainter::setFontSize(float size)
+void ImagePainter::set_font_size(float size)
 {
 }
 
-void ImagePainter::setAntialiasing(bool enabled)
+void ImagePainter::set_antialiasing(bool enabled)
 {
 	anti_aliasing = enabled;
 }
 
-void ImagePainter::setLineWidth(float w)
+void ImagePainter::set_line_width(float w)
 {
 	line_width = w;
 }
 
-void ImagePainter::setLineDash(const Array<float>& _dash, float offset)
+void ImagePainter::set_line_dash(const Array<float>& _dash, float offset)
 {
 	dash = _dash;
 	dash_offset = offset;
 }
 
-void ImagePainter::setFill(bool _fill)
+void ImagePainter::set_fill(bool _fill)
 {
 	fill = _fill;
 }
 
-void ImagePainter::clip(const rect& r)
+void ImagePainter::set_clip(const rect& r)
 {
 	_clip = r;
 }
 
-void ImagePainter::drawPoint(float x, float y)
+void ImagePainter::draw_point(float x, float y)
 {
 	image->drawPixel(x, y, _color);
 }
 
-void ImagePainter::drawLine(float x1, float y1, float x2, float y2)
+void ImagePainter::draw_line(float x1, float y1, float x2, float y2)
 {
 	complex p0 = complex(x1, y1);
 	complex p1 = complex(x2, y2);
@@ -110,18 +110,18 @@ void ImagePainter::drawLine(float x1, float y1, float x2, float y2)
 		}
 }
 
-void ImagePainter::drawLines(const Array<complex>& p)
+void ImagePainter::draw_lines(const Array<complex>& p)
 {
 	for (int i=1; i<p.num; i++)
-		drawLine(p[i-1].x, p[i-1].y, p[i].x, p[i].y);
+		draw_line(p[i-1].x, p[i-1].y, p[i].x, p[i].y);
 }
 
-void ImagePainter::drawPolygon(const Array<complex>& p)
+void ImagePainter::draw_polygon(const Array<complex>& p)
 {
-	drawLines(p);
+	draw_lines(p);
 }
 
-void ImagePainter::drawRect(float xx, float yy, float w, float h)
+void ImagePainter::draw_rect(float xx, float yy, float w, float h)
 {
 	int x0 = max(xx, _clip.x1);
 	int x1 = min(xx + w, _clip.x2);
@@ -133,12 +133,12 @@ void ImagePainter::drawRect(float xx, float yy, float w, float h)
 			image->drawPixel(x, y, _color);
 }
 
-void ImagePainter::drawRect(const rect& r)
+void ImagePainter::draw_rect(const rect& r)
 {
-	drawRect(r.x1, r.y1, r.width(), r.height());
+	draw_rect(r.x1, r.y1, r.width(), r.height());
 }
 
-void ImagePainter::drawCircle(float cx, float cy, float radius)
+void ImagePainter::draw_circle(float cx, float cy, float radius)
 {
 	int x0 = max(cx - radius - line_width/2 - 1, _clip.x1);
 	int x1 = min(cx + radius + line_width/2 + 1, _clip.x2);
@@ -176,16 +176,16 @@ void ImagePainter::drawCircle(float cx, float cy, float radius)
 	}
 }
 
-void ImagePainter::drawStr(float x, float y, const string& str)
+void ImagePainter::draw_str(float x, float y, const string& str)
 {
 }
 
-float ImagePainter::getStrWidth(const string& str)
+float ImagePainter::get_str_width(const string& str)
 {
 	return 0;
 }
 
-void ImagePainter::drawImage(float dx, float dy, const Image& im)
+void ImagePainter::draw_image(float dx, float dy, const Image& im)
 {
 	int _x0 = max(dx, _clip.x1);
 	int _x1 = min(dx + im.width, _clip.x2);
@@ -197,6 +197,6 @@ void ImagePainter::drawImage(float dx, float dy, const Image& im)
 			image->drawPixel(x, y, im.getPixel(x - dx, y - dy));
 }
 
-void ImagePainter::drawMaskImage(float x, float y, const Image& image)
+void ImagePainter::draw_mask_image(float x, float y, const Image& image)
 {
 }

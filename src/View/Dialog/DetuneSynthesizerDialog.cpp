@@ -42,49 +42,49 @@ DetuneSynthesizerDialog::~DetuneSynthesizerDialog()
 
 void DetuneSynthesizerDialog::onDraw(Painter *p)
 {
-	p->setLineWidth(0.8f);
-	p->setFontSize(12);
+	p->set_line_width(0.8f);
+	p->set_font_size(12);
 	float w = p->width;
 	float h = p->height;
 	height = h;
 	width = w;
 
-	p->setColor(view->colors.background);
-	p->drawRect(0, 0, w, h);
+	p->set_color(view->colors.background);
+	p->draw_rect(0, 0, w, h);
 
 	if (hover >= 0){
 		if (isChecked("all_octaves")){
 			color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.1f);
-			p->setColor(c);
+			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
-				p->drawRect(pitch2x(i), 0, pitch2x(1), h);
+				p->draw_rect(pitch2x(i), 0, pitch2x(1), h);
 		}
 		color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.2f);
-		p->setColor(c);
-		p->drawRect(pitch2x(hover), 0, pitch2x(1), h);
+		p->set_color(c);
+		p->draw_rect(pitch2x(hover), 0, pitch2x(1), h);
 	}
 
 	// grid
-	p->setColor(view->colors.text_soft3);
+	p->set_color(view->colors.text_soft3);
 	for (int i=1; i<MAX_PITCH; i++){
 		float x = pitch2x(i);
-		p->drawLine(x, 0, x, h);
+		p->draw_line(x, 0, x, h);
 	}
 	if (mode_relative){
 		for (int i=-RELATIVE_NUM_PITCHES; i<=RELATIVE_NUM_PITCHES; i++){
 			float y = relpitch2y(i, 0);
-			p->drawLine(0, y, w, y);
+			p->draw_line(0, y, w, y);
 		}
 	}else{
 		for (int i=0; i<=MAX_PITCH; i++){
 			float y = pitch2y(i);
-			p->drawLine(0, y, w, y);
+			p->draw_line(0, y, w, y);
 		}
 	}
 
 
 	// reference
-	p->setColor(view->colors.preview_marker);
+	p->set_color(view->colors.preview_marker);
 	for (int i=0; i<MAX_PITCH; i++){
 		float y = pitch2y(i);
 		if (mode_relative){
@@ -92,13 +92,13 @@ void DetuneSynthesizerDialog::onDraw(Painter *p)
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
-		p->drawLine(x0, y, x1, y);
-		p->setLineWidth(2.0f);
+		p->draw_line(x0, y, x1, y);
+		p->set_line_width(2.0f);
 	}
 
 	// current tuning
-	p->setLineWidth(2.0f);
-	p->setColor(view->colors.capture_marker);
+	p->set_line_width(2.0f);
+	p->set_color(view->colors.capture_marker);
 	for (int i=0; i<MAX_PITCH; i++){
 		float y = pitch2y(freq_to_pitch(synth->tuning.freq[i]));
 		if (mode_relative){
@@ -106,15 +106,15 @@ void DetuneSynthesizerDialog::onDraw(Painter *p)
 		}
 		float x0 = pitch2x(i);
 		float x1 = pitch2x(i + 1);
-		p->drawLine(x0, y, x1, y);
+		p->draw_line(x0, y, x1, y);
 	}
-	p->setLineWidth(1.0f);
+	p->set_line_width(1.0f);
 
 
 	if (hover >= 0){
-		p->setColor(view->colors.text);
-		p->drawStr(20, 20, pitch_name(hover));
-		p->drawStr(70, 20, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
+		p->set_color(view->colors.text);
+		p->draw_str(20, 20, pitch_name(hover));
+		p->draw_str(70, 20, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}
 }
 

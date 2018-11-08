@@ -460,13 +460,13 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 	auto *tt = l->layer->song()->getTimeTrack();
 	if (tt){
-		c->setLineWidth(2.0f);
+		c->set_line_width(2.0f);
 	for (auto *m: tt->markers){
 		color col = l->marker_color(m);
 		//col.a = 0.5f;
 		float x1 = (float)view->cam.sample2screen(m->range.start());
-		c->setColor(col);
-		c->drawLine(x1, l->area.y1, x1, l->area.y2);
+		c->set_color(col);
+		c->draw_line(x1, l->area.y1, x1, l->area.y2);
 	}
 	}
 }
@@ -478,9 +478,9 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 
 	float lw = 3;
 
-	c->setLineWidth(lw*2);
-	c->setColor(view->colors.selection_bars);
-	c->setFill(false);
+	c->set_line_width(lw*2);
+	c->set_color(view->colors.selection_bars);
+	c->set_fill(false);
 
 	auto bars = view->song->bars.get_bars(Range::ALL);
 	for (auto b: bars){
@@ -492,14 +492,14 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 				if (b == view->hover.bar)
 					col = view->colors.selection_bars_hover;
 			}
-			c->setColor(col);
+			c->set_color(col);
 			float x1 = view->cam.sample2screen(b->range().offset);
 			float x2 = view->cam.sample2screen(b->range().end());
-			c->drawRect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
+			c->draw_rect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
 		}
 	}
-	c->setFill(true);
-	c->setLineWidth(1);
+	c->set_fill(true);
+	c->set_line_width(1);
 
 }
 
@@ -533,16 +533,16 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 		xx1 -= 50;
 	float x1 = max(xx1, l->area.x1);
 	float x2 = min(xx2, l->area.x2);
-	c->setColor(cs);
-	c->drawRect(x1, l->area.y1, x2-x1, l->area.height());
+	c->set_color(cs);
+	c->draw_rect(x1, l->area.y1, x2-x1, l->area.height());
 	if (i == l->layer->track->fades.num - 1){
 		cs.a *= 0.5f;
-		c->setColor(cs);
-		c->drawRect(xx2, l->area.y1, 50, l->area.height());
+		c->set_color(cs);
+		c->draw_rect(xx2, l->area.y1, 50, l->area.height());
 	}else if (i == -1){
 		cs.a *= 0.5f;
-		c->setColor(cs);
-		c->drawRect(xx1 - 50, l->area.y1, 50, l->area.height());
+		c->set_color(cs);
+		c->draw_rect(xx1 - 50, l->area.y1, 50, l->area.height());
 	}
 }
 
@@ -584,7 +584,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 			l->draw_marker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
 	}
 
-	c->setLineWidth(1.0f);
+	c->set_line_width(1.0f);
 
 	int index_before = 0;
 	int index_own = l->layer->version_number();
@@ -593,7 +593,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		draw_fade_bg(c, l, view, -1);
 	}*/
 
-	c->setLineWidth(2);
+	c->set_line_width(2);
 	foreachi (auto &f, l->layer->track->fades, i){
 		/*if (f.target == index_own){
 			draw_fade_bg(c, l, view, i);
@@ -601,13 +601,13 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		if (f.target == index_own or index_before == index_own){
 			float x1 = (float)view->cam.sample2screen(f.position);
 			float x2 = (float)view->cam.sample2screen(f.position + f.samples);
-			c->setColor(color(1,0,0.7f,0));
-			c->drawLine(x1, l->area.y1, x1, l->area.y2);
-			c->drawLine(x2, l->area.y1, x2, l->area.y2);
+			c->set_color(color(1,0,0.7f,0));
+			c->draw_line(x1, l->area.y1, x1, l->area.y2);
+			c->draw_line(x2, l->area.y1, x2, l->area.y2);
 		}
 		index_before = f.target;
 	}
-	c->setLineWidth(1);
+	c->set_line_width(1);
 }
 
 int ViewModeDefault::get_track_move_target(bool visual)
@@ -634,10 +634,10 @@ void ViewModeDefault::draw_post(Painter *c)
 		if (t < view->vtrack.num)
 			y = view->vtrack[t]->area.y1;
 
-		c->setColor(view->colors.selection_boundary);
-		c->setLineWidth(2.0f);
-		c->drawLine(view->area.x1,  y,  view->area.x2,  y);
-		c->setLineWidth(1.0f);
+		c->set_color(view->colors.selection_boundary);
+		c->set_line_width(2.0f);
+		c->draw_line(view->area.x1,  y,  view->area.x2,  y);
+		c->set_line_width(1.0f);
 
 		/*c->setColor(view->colors.selection_internal);
 		rect r = view->vtrack[orig]->area;

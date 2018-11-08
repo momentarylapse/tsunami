@@ -85,60 +85,60 @@ void AudioViewTrack::draw_header(Painter *c)
 		col = ColorInterpolate(col, view->colors.selection, 0.4f);
 	if (hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
-	c->setColor(col);
+	c->set_color(col);
 	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	c->setRoundness(view->CORNER_RADIUS);
-	c->drawRect(area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h);
-	c->setRoundness(0);
+	c->set_roundness(view->CORNER_RADIUS);
+	c->draw_rect(area.x1,  area.y1,  view->TRACK_HANDLE_WIDTH, h);
+	c->set_roundness(0);
 
 	// track title
-	c->setFont("", view->FONT_SIZE, view->sel.has(track) and playable, false);
+	c->set_font("", view->FONT_SIZE, view->sel.has(track) and playable, false);
 	if (playable)
-		c->setColor(view->colors.text);
+		c->set_color(view->colors.text);
 	else
-		c->setColor(view->colors.text_soft2);
-	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName() + (solo ? " (solo)" : ""));
+		c->set_color(view->colors.text_soft2);
+	c->draw_str(area.x1 + 23, area.y1 + 3, track->getNiceName() + (solo ? " (solo)" : ""));
 
-	c->setFont("", -1, false, false);
+	c->set_font("", -1, false, false);
 
 	// icons
 	if (track->type == SignalType::BEATS){
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time); // "⏱"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x1 + 5, area.y1 + 5, *view->images.track_time); // "⏱"
 	}else if (track->type == SignalType::MIDI){
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi); // "♫"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x1 + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio); // "∿"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x1 + 5, area.y1 + 5, *view->images.track_audio); // "∿"
 	}
 	if (track->muted and !visible)
-		c->drawImage(area.x1 + 5, area.y1 + 5, *view->images.x);
+		c->draw_image(area.x1 + 5, area.y1 + 5, *view->images.x);
 
 	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	color col_but_hover = view->colors.text;
 
 	if (visible){
-		c->setColor(col_but);
+		c->set_color(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_MUTE))
-			c->setColor(col_but_hover);
+			c->set_color(col_but_hover);
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
-		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
+		c->draw_mask_image(area.x1 + 5, area.y1 + 22, *view->images.speaker);
 		if (track->muted)
-			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
+			c->draw_image(area.x1 + 5, area.y1 + 22, *view->images.x);
 	}
 	if ((view->song->tracks.num > 1) and visible){
-		c->setColor(col_but);
+		c->set_color(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_SOLO))
-			c->setColor(col_but_hover);
+			c->set_color(col_but_hover);
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
+		c->draw_mask_image(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}
 	if (visible){
-		c->setColor(col_but);
+		c->set_color(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_EDIT))
-			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
+			c->set_color(col_but_hover);
+		c->draw_str(area.x1 + 5 + 17*2, area.y1 + 22-2, "\U0001f527"); // U+1F527 "🔧"
 
 		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))

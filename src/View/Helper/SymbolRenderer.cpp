@@ -33,9 +33,9 @@ struct Symbol
 	{
 		// render symbol into image
 		Painter *p = hui::start_image_paint(im);
-		p->setColor(White);
-		p->setFontSize(size);
-		p->drawStr(0, 0, text);
+		p->set_color(White);
+		p->set_font_size(size);
+		p->draw_str(0, 0, text);
 		hui::end_image_paint(im, p);
 	}
 
@@ -102,7 +102,7 @@ void draw(Painter *p, float x, float y, float size, const string &s, int align)
 	if (align == -1)
 		dx = - sym->size;
 	//p->drawImage(x + dx, y, sym->im);
-	p->drawMaskImage(x + dx, y, sym->im);
+	p->draw_mask_image(x + dx, y, sym->im);
 #else
 	p->setFontSize(size);
 	float dx = 0;

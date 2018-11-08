@@ -171,15 +171,15 @@ Image *ExpandImageMask(Image *im, float d)
 
 void draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow)
 {
-	c->setFill(false);
-	c->setLineWidth(3);
-	c->setColor(col_shadow);
-	c->drawStr(x, y, str);
+	c->set_fill(false);
+	c->set_line_width(3);
+	c->set_color(col_shadow);
+	c->draw_str(x, y, str);
 
-	c->setFill(true);
-	c->setLineWidth(1);
-	c->setColor(col_text);
-	c->drawStr(x, y, str);
+	c->set_fill(true);
+	c->set_line_width(1);
+	c->set_color(col_text);
+	c->draw_str(x, y, str);
 }
 
 
@@ -641,7 +641,7 @@ void AudioView::on_mouse_wheel()
 void AudioView::force_redraw()
 {
 	win->redraw(id);
-	//win->redrawRect(id, rect(200, 300, 0, area.y2));
+	//win->redraw_rect(id, rect(200, 300, 0, area.y2));
 }
 
 void AudioView::force_redraw_part(const rect &r)
@@ -696,30 +696,30 @@ void AudioView::draw_grid_time(Painter *c, const rect &r, const color &fg, const
 	for (int n=nx0; n<nx1; n++){
 		double sample = n * dl;
 		if (sel.range.is_inside(sample))
-			c->setColor(((n % 10) == 0) ? c2s : c1s);
+			c->set_color(((n % 10) == 0) ? c2s : c1s);
 		else
-			c->setColor(((n % 10) == 0) ? c2 : c1);
+			c->set_color(((n % 10) == 0) ? c2 : c1);
 		int xx = cam.sample2screen(sample);
-		c->drawLine(xx, r.y1, xx, r.y2);
+		c->draw_line(xx, r.y1, xx, r.y2);
 	}
 
 	if (show_time){
 		if (is_playback_active()){
 			color cc = colors.preview_marker;
 			cc.a = 0.25f;
-			c->setColor(cc);
+			c->set_color(cc);
 			float x0 = cam.sample2screen(renderer->range().start());
 			float x1 = cam.sample2screen(renderer->range().end());
-			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
+			c->draw_rect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
-		c->setColor(colors.grid);
+		c->set_color(colors.grid);
 		for (int n=nx0; n<nx1; n++){
 			if ((cam.sample2screen(dl) - cam.sample2screen(0)) > 25){
 				if (n % 5 == 0)
-					c->drawStr(cam.sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 5));
+					c->draw_str(cam.sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 5));
 			}else{
 				if ((n % 10) == 0)
-					c->drawStr(cam.sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 10));
+					c->draw_str(cam.sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 10));
 			}
 		}
 	}
@@ -757,11 +757,11 @@ void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, co
 
 		if (f1 >= 0.1f){
 			if (sel.range.is_inside(b->range().offset))
-				c->setColor(col_inter(bg_sel, fg_sel, f1));
+				c->set_color(col_inter(bg_sel, fg_sel, f1));
 			else
-				c->setColor(col_inter(bg, fg, f1));
+				c->set_color(col_inter(bg, fg, f1));
 //			c->setLineDash(no_dash, area.y1);
-			c->drawLine(xx, area.y1, xx, area.y2);
+			c->draw_line(xx, area.y1, xx, area.y2);
 		}
 
 		if (f2 >= 0.1f){
@@ -777,14 +777,14 @@ void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, co
 				for (int j=1; j<beat_partition; j++){
 					double sample = beat_offset + beat_length * j / beat_partition;
 					int x = cam.sample2screen(sample);
-					c->setColor(sel.range.is_inside(sample) ? c2s : c2);
-					c->drawLine(x, area.y1, x, area.y2);
+					c->set_color(sel.range.is_inside(sample) ? c2s : c2);
+					c->draw_line(x, area.y1, x, area.y2);
 				}
 				if (i == 0)
 					continue;
-				c->setColor(sel.range.is_inside(beat_offset) ? c1s : c1);
+				c->set_color(sel.range.is_inside(beat_offset) ? c1s : c1);
 				int x = cam.sample2screen(beat_offset);
-				c->drawLine(x, area.y1, x, area.y2);
+				c->draw_line(x, area.y1, x, area.y2);
 			}
 		}
 	}
@@ -800,7 +800,7 @@ void AudioView::draw_bar_numbers(Painter *c, const rect &area, const color &fg, 
 	int s1 = cam.screen2sample(area.x2);
 	Array<Bar*> bars = song->bars.get_bars(RangeTo(s0, s1));
 
-	c->setFont("", FONT_SIZE, true, false);
+	c->set_font("", FONT_SIZE, true, false);
 	for (Bar *b: bars){
 		if (b->is_pause())
 			continue;
@@ -812,8 +812,8 @@ void AudioView::draw_bar_numbers(Painter *c, const rect &area, const color &fg, 
 		if ((b->index_text % 5) == 0)
 			f1 = 1;
 		if (f1 > 0.9f){
-			c->setColor(colors.text_soft1);
-			c->drawStr(xx + 4, area.y1, i2s(b->index_text + 1));
+			c->set_color(colors.text_soft1);
+			c->draw_str(xx + 4, area.y1, i2s(b->index_text + 1));
 		}
 		float bpm = b->bpm(song->sample_rate);
 		string s;
@@ -822,15 +822,15 @@ void AudioView::draw_bar_numbers(Painter *c, const rect &area, const color &fg, 
 		if (fabs(prev_bpm - bpm) > 0.5f)
 			s += format(" \u2669=%.0f", bpm);
 		if (s.num > 0){
-			c->setColor(colors.text_soft1);
-			c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
+			c->set_color(colors.text_soft1);
+			c->draw_str(max(xx + 4, 20), area.y2 - 16, s);
 		}
 		prev_num_beats = b->num_beats;
 		prev_bpm = bpm;
 	}
-	c->setFont("", FONT_SIZE, false, false);
+	c->set_font("", FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);
-	c->setLineWidth(LINE_WIDTH);
+	c->set_line_width(LINE_WIDTH);
 }
 
 void _try_set_good_cur_layer(AudioView *v)
@@ -1071,7 +1071,7 @@ void AudioView::update_tracks()
 
 rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str)
 {
-	float w = c->getStrWidth(str);
+	float w = c->get_str_width(str);
 	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + FONT_SIZE + CORNER_RADIUS);
 }
 
@@ -1082,23 +1082,23 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 	dx *= (align - 1);
 	r.x1 += dx;
 	r.x2 += dx;
-	c->setColor(col_bg);
-	c->setRoundness(CORNER_RADIUS);
-	c->drawRect(r);
-	c->setRoundness(0);
-	c->setColor(col_text);
-	c->drawStr(x + dx, y - FONT_SIZE/3, str);
+	c->set_color(col_bg);
+	c->set_roundness(CORNER_RADIUS);
+	c->draw_rect(r);
+	c->set_roundness(0);
+	c->set_color(col_text);
+	c->draw_str(x + dx, y - FONT_SIZE/3, str);
 }
 
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area)
 {
-	c->setFont("", -1, true, false);
-	float w = c->getStrWidth(msg);
+	c->set_font("", -1, true, false);
+	float w = c->get_str_width(msg);
 	float x = min(max(mx - 20.0f, area.x1 + 2.0f), area.x2 - w);
 	float y = min(max(my + 20, area.y1 + 2.0f), area.y2 - FONT_SIZE - 5);
 	draw_boxed_str(c, x, y, msg, colors.background, colors.text_soft1);
-	c->setFont("", -1, false, false);
+	c->set_font("", -1, false, false);
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg)
@@ -1111,12 +1111,12 @@ void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, 
 	int p = cam.sample2screen(pos);
 	if ((p >= song_area.x1) and (p <= song_area.x2)){
 		color cc = (type == (int)hover.type) ? colors.selection_boundary_hover : col;
-		c->setColor(cc);
-		c->setLineWidth(2.0f);
-		c->drawLine(p, area.y1, p, area.y2);
+		c->set_color(cc);
+		c->set_line_width(2.0f);
+		c->draw_line(p, area.y1, p, area.y2);
 		if (show_time)
 			draw_boxed_str(c,  p, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
-		c->setLineWidth(1.0f);
+		c->set_line_width(1.0f);
 	}
 }
 
@@ -1137,11 +1137,11 @@ void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, Au
 		same_track = (l1->layer->track == l2->layer->track);
 	}
 	if (same_track)
-		c->setLineDash({3,10}, 0);
+		c->set_line_dash({3,10}, 0);
 
-	c->setColor(AudioView::colors.grid);
-	c->drawLine(view->song_area.x1, y, view->song_area.x2, y);
-	c->setLineDash({}, 0);
+	c->set_color(AudioView::colors.grid);
+	c->draw_line(view->song_area.x1, y, view->song_area.x2, y);
+	c->set_line_dash({}, 0);
 
 }
 
@@ -1157,9 +1157,9 @@ void AudioView::draw_background(Painter *c)
 
 	// free space below tracks
 	if (yy < song_area.y2){
-		c->setColor(colors.background);
+		c->set_color(colors.background);
 		rect rr = rect(song_area.x1, song_area.x2, yy, song_area.y2);
-		c->drawRect(rr);
+		c->draw_rect(rr);
 		if (song->bars.num > 0)
 			draw_grid_bars(c, rr, colors.grid, colors.grid, colors.background, colors.background, 0);
 		else
@@ -1177,8 +1177,8 @@ void AudioView::draw_background(Painter *c)
 
 void AudioView::draw_time_scale(Painter *c)
 {
-	c->setColor(colors.background_track);
-	c->drawRect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
+	c->set_color(colors.background_track);
+	c->draw_rect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
 	draw_grid_time(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.grid, colors.grid, colors.background_track, colors.background_track, true);
 }
 
@@ -1189,8 +1189,8 @@ void AudioView::draw_selection(Painter *c)
 	int sx2 = cam.sample2screen(sel.range.end());
 	int sxx1 = clampi(sx1, song_area.x1, song_area.x2);
 	int sxx2 = clampi(sx2, song_area.x1, song_area.x2);
-	c->setColor(colors.selection_internal);
-	c->drawRect(rect(sxx1, sxx2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
+	c->set_color(colors.selection_internal);
+	c->draw_rect(rect(sxx1, sxx2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
 	draw_time_line(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
 	draw_time_line(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
 
@@ -1199,17 +1199,17 @@ void AudioView::draw_selection(Painter *c)
 			/*c->setColor(colors.selection_internal);
 			for (AudioViewLayer *l: vlayer)
 				if (sel.has(l->layer))
-					c->drawRect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
+					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
 		}else if (selection_mode == SelectionMode::RECT){
 			int sx1 = cam.sample2screen(hover.range.start());
 			int sx2 = cam.sample2screen(hover.range.end());
 			int sxx1 = clampi(sx1, clip.x1, clip.x2);
 			int sxx2 = clampi(sx2, clip.x1, clip.x2);
-			c->setColor(colors.selection_internal);
-			c->setFill(false);
-			c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
-			c->setFill(true);
-			c->drawRect(rect(sxx1, sxx2, hover.y0, hover.y1));
+			c->set_color(colors.selection_internal);
+			c->set_fill(false);
+			c->draw_rect(rect(sxx1, sxx2, hover.y0, hover.y1));
+			c->set_fill(true);
+			c->draw_rect(rect(sxx1, sxx2, hover.y0, hover.y1));
 		}
 	}
 
@@ -1217,40 +1217,40 @@ void AudioView::draw_selection(Painter *c)
 	if (sel.bar_gap >= 0){
 		sx1 = cam.sample2screen(song->barOffset(sel.bar_gap));
 		sx2 = sx1;
-		c->setAntialiasing(true);
-		c->setColor(colors.text_soft1);
-		c->setLineWidth(2.5f);
+		c->set_antialiasing(true);
+		c->set_color(colors.text_soft1);
+		c->set_line_width(2.5f);
 		for (AudioViewLayer *t: vlayer)
 			if (t->layer->type == SignalType::BEATS){
 				float dy = t->area.height();
-				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
-				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
-				c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
-				c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
-				c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
-				c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
+				c->draw_line(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
+				c->draw_line(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
+				c->draw_line(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
+				c->draw_line(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
+				c->draw_line(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
+				c->draw_line(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
 		}
-		c->setLineWidth(1.0f);
-		c->setAntialiasing(false);
+		c->set_line_width(1.0f);
+		c->set_antialiasing(false);
 	}
 	if (hover.type == Selection::Type::BAR_GAP){
 		sx1 = cam.sample2screen(song->barOffset(hover.index));
 		sx2 = sx1;
-		c->setAntialiasing(true);
-		c->setColor(colors.hover);
-		c->setLineWidth(2.5f);
+		c->set_antialiasing(true);
+		c->set_color(colors.hover);
+		c->set_line_width(2.5f);
 		for (AudioViewLayer *t: vlayer)
 			if (t->layer->type == SignalType::BEATS){
 				float dy = t->area.height();
-				c->drawLine(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
-				c->drawLine(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
-				c->drawLine(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
-				c->drawLine(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
-				c->drawLine(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
-				c->drawLine(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
+				c->draw_line(sx2 + 5, t->area.y1, sx2 + 2, t->area.y1 + dy*0.3f);
+				c->draw_line(sx2 + 2, t->area.y1 + dy*0.3f, sx2 + 2, t->area.y2-dy*0.3f);
+				c->draw_line(sx2 + 2, t->area.y2-dy*0.3f, sx2 + 5, t->area.y2);
+				c->draw_line(sx1 - 5, t->area.y1, sx1 - 2, t->area.y1 + dy*0.3f);
+				c->draw_line(sx1 - 2, t->area.y1 + dy*0.3f, sx1 - 2, t->area.y2-dy*0.3f);
+				c->draw_line(sx1 - 2, t->area.y2-dy*0.3f, sx1 - 5, t->area.y2);
 		}
-		c->setLineWidth(1.0f);
-		c->setAntialiasing(false);
+		c->set_line_width(1.0f);
+		c->set_antialiasing(false);
 	}
 }
 
@@ -1281,7 +1281,7 @@ void AudioView::draw_song(Painter *c)
 
 	draw_time_scale(c);
 
-	c->clip(song_area);
+	c->set_clip(song_area);
 
 	draw_background(c);
 
@@ -1297,7 +1297,7 @@ void AudioView::draw_song(Painter *c)
 		metronome_overlay_vlayer->draw(c);
 	}
 
-	c->clip(clip);
+	c->set_clip(clip);
 
 
 	// selection
@@ -1336,17 +1336,17 @@ void AudioView::on_draw(Painter *c)
 	colors = basic_colors.create(win->isActive(id));
 
 	area = c->area();
-	clip = c->getClip();
+	clip = c->clip();
 
-	c->setFontSize(FONT_SIZE);
-	c->setLineWidth(LINE_WIDTH);
-	c->setAntialiasing(antialiasing);
-	//c->setColor(ColorWaveCur);
+	c->set_font_size(FONT_SIZE);
+	c->set_line_width(LINE_WIDTH);
+	c->set_antialiasing(antialiasing);
+	//c->set_color(ColorWaveCur);
 
 	if (enabled)
 		draw_song(c);
 
-	//c->DrawStr(100, 100, i2s(frame++));
+	//c->draw_str(100, 100, i2s(frame++));
 
 	colors = basic_colors.create(true);
 

@@ -509,13 +509,13 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 void ViewModeMidi::draw_layer_pitch_grid(Painter *c, AudioViewLayer *l)
 {
 	// pitch grid
-	c->setColor(color(0.25f, 0, 0, 0));
+	c->set_color(color(0.25f, 0, 0, 0));
 	for (int i=l->pitch_min; i<l->pitch_max; i++){
 		float y0 = l->pitch2y_linear(i + 1);
 		float y1 = l->pitch2y_linear(i);
 		if (!view->midi_scale.contains(i)){
-			c->setColor(color(0.2f, 0, 0, 0));
-			c->drawRect(l->area.x1, y0, l->area.width(), y1 - y0);
+			c->set_color(color(0.2f, 0, 0, 0));
+			c->draw_rect(l->area.x1, y0, l->area.width(), y1 - y0);
 		}
 	}
 
@@ -530,9 +530,9 @@ void ViewModeMidi::draw_layer_pitch_grid(Painter *c, AudioViewLayer *l)
 	}
 	bool is_drum = (l->layer->track->instrument.type == Instrument::Type::DRUMS);
 	for (int i=l->pitch_min; i<l->pitch_max; i++){
-		c->setColor(cc);
+		c->set_color(cc);
 		if (((hover->type == Selection::Type::MIDI_PITCH) or (hover->type == Selection::Type::MIDI_NOTE)) and (i == hover->pitch))
-			c->setColor(view->colors.text);
+			c->set_color(view->colors.text);
 
 		string name = pitch_name(i);
 		if (is_drum){
@@ -542,7 +542,7 @@ void ViewModeMidi::draw_layer_pitch_grid(Painter *c, AudioViewLayer *l)
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->drawStr(20, l->area.y1 + l->area.height() * (l->pitch_max - i - 1) / EDIT_PITCH_SHOW_COUNT, name);
+		c->draw_str(20, l->area.y1 + l->area.height() * (l->pitch_max - i - 1) / EDIT_PITCH_SHOW_COUNT, name);
 	}
 }
 
@@ -721,24 +721,24 @@ void ViewModeMidi::draw_post(Painter *c)
 	int x1 = view->cam.sample2screen(r.start());
 	int x2 = view->cam.sample2screen(r.end());
 
-	c->setColor(view->colors.selection_internal);
+	c->set_color(view->colors.selection_internal);
 	if (mode == MidiMode::TAB){
 		int y = l->string_to_screen(string_no);
 		int y1 = y - l->clef_dy/2;
 		int y2 = y + l->clef_dy/2;
-		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::CLASSICAL){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = l->pitch2y_classical(p2);
 		int y2 = l->pitch2y_classical(p1);
-		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::LINEAR){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
 		int y1 = l->pitch2y_linear(p2);
 		int y2 = l->pitch2y_linear(p1);
-		c->drawRect(x1,  y1,  x2 - x1,  y2 - y1);
+		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
 
 	string message = _("add pause (.)    delete (⟵)    note length (L)    beat partition (P)");

@@ -53,17 +53,17 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 		float x2 = x0 + (n->range.end() - r.offset) * scale;
 		int pos = n->clef_position;
 		float y = clef_pos_to_pdf(y0, line_dy, pos);
-		p->setColor(color(1, 0.9f, 0.9f, 0.9f));
-		p->drawRect(rect(x1 + rr, x2, y-rr, y + rr));
+		p->set_color(color(1, 0.9f, 0.9f, 0.9f));
+		p->draw_rect(rect(x1 + rr, x2, y-rr, y + rr));
 	}
 
 	// clef lines
-	p->setColor(Gray);
+	p->set_color(Gray);
 	for (int i=0; i<10; i+=2){
 		float y = clef_pos_to_pdf(y0, line_dy, i);
-		p->drawLine(x0, y, x0 + w, y);
+		p->draw_line(x0, y, x0 + w, y);
 	}
-	//p->drawStr(x0, y0, clef.symbol);
+	//p->draw_str(x0, y0, clef.symbol);
 
 	// beats
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
@@ -76,34 +76,34 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 				double bpm = 60.0 * (double)song->sample_rate / (double)b.range.length;
 				if (fabs(bpm - pdf_bpm) > 0.2){
 					pdf_bpm = bpm;
-					p->setColor(color(1, 0.3f, 0.3f, 0.3f));
-					p->drawStr(x, ya-15, format("%.1f bpm", bpm));
+					p->set_color(color(1, 0.3f, 0.3f, 0.3f));
+					p->draw_str(x, ya-15, format("%.1f bpm", bpm));
 				}
 			}
-			p->setColor(color(1, 0.5f, 0.5f, 0.5f));
-			p->setLineWidth(2);
+			p->set_color(color(1, 0.5f, 0.5f, 0.5f));
+			p->set_line_width(2);
 		}else{
-			p->setColor(color(1, 0.8f, 0.8f, 0.8f));
-			p->setLineWidth(1);
+			p->set_color(color(1, 0.8f, 0.8f, 0.8f));
+			p->set_line_width(1);
 		}
-		p->drawLine(x, ya, x, yb);
+		p->draw_line(x, ya, x, yb);
 	}
-	p->setLineWidth(1);
+	p->set_line_width(1);
 
 	// midi
 	float fs = 18;
-	p->setFontSize(fs);
+	p->set_font_size(fs);
 	auto midi2 = t->layers[0]->midi.get_notes(r_inside);
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		int pos = n->clef_position;
 		float y = clef_pos_to_pdf(y0, line_dy, pos);
-		p->setColor(NOTE_COLOR);
-		p->drawCircle(x1 + rr, y, rr);
+		p->set_color(NOTE_COLOR);
+		p->draw_circle(x1 + rr, y, rr);
 		if (n->modifier == NoteModifier::FLAT)
-			p->drawStr(x1 - rr, y-fs/2, "b");
+			p->draw_str(x1 - rr, y-fs/2, "b");
 		else if (n->modifier == NoteModifier::SHARP)
-			p->drawStr(x1 - rr, y-fs/2, "#");
+			p->draw_str(x1 - rr, y-fs/2, "#");
 	}
 
 	return y0 + line_dy * 7;
@@ -125,42 +125,42 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		float x2 = x0 + (n->range.end() - r.offset) * scale;
 		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 1) * string_dy;
-		p->setColor(color(1, 0.9f, 0.9f, 0.9f));
-		p->drawRect(rect(x1 + rr, x2, y, y + string_dy));
+		p->set_color(color(1, 0.9f, 0.9f, 0.9f));
+		p->draw_rect(rect(x1 + rr, x2, y, y + string_dy));
 	}
 
 	// string lines
-	p->setColor(Gray);
+	p->set_color(Gray);
 	for (int i=0; i<t->instrument.string_pitch.num; i++)
-		p->drawLine(x0, y0 + i*string_dy + string_dy/2, x0 + w, y0 + i*string_dy + string_dy/2);
+		p->draw_line(x0, y0 + i*string_dy + string_dy/2, x0 + w, y0 + i*string_dy + string_dy/2);
 
 	// beats
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
 	for (auto b: beats){
 		if (b.level == 0){
-			p->setColor(color(1, 0.5f, 0.5f, 0.5f));
-			p->setLineWidth(2);
+			p->set_color(color(1, 0.5f, 0.5f, 0.5f));
+			p->set_line_width(2);
 		}else{
-			p->setColor(color(1, 0.8f, 0.8f, 0.8f));
-			p->setLineWidth(1);
+			p->set_color(color(1, 0.8f, 0.8f, 0.8f));
+			p->set_line_width(1);
 		}
 		float x = x0 + (b.range.offset - r.offset) * scale;
-		p->drawLine(x, y0, x, y0 + string_dy * t->instrument.string_pitch.num);
+		p->draw_line(x, y0, x, y0 + string_dy * t->instrument.string_pitch.num);
 	}
-	p->setLineWidth(1);
+	p->set_line_width(1);
 
 	// midi
 	float fs = 12;
-	p->setFontSize(fs);
+	p->set_font_size(fs);
 	auto midi2 = t->layers[0]->midi.get_notes(r_inside);
 	for (auto n: midi2){
 		float x1 = x0 + (n->range.offset - r.offset) * scale;
 		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 0.5f) * string_dy;
-		p->setColor(NOTE_COLOR_TAB);
-		p->drawCircle(x1 + rr, y, rr);
-		p->setColor(Black);
+		p->set_color(NOTE_COLOR_TAB);
+		p->draw_circle(x1 + rr, y, rr);
+		p->set_color(Black);
 		string hand = i2s(n->pitch - t->instrument.string_pitch[n->stringno]);
-		p->drawStr(x1 + rr - hand.num * fs*0.35f, y-fs/2, hand);
+		p->draw_str(x1 + rr - hand.num * fs*0.35f, y-fs/2, hand);
 	}
 
 	return y0 + string_dy * t->instrument.string_pitch.num;
@@ -171,10 +171,10 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 	float track_space = 20;
 
 	auto bars = song->bars.get_bars(r + 1000);
-	p->setColor(SetColorHSB(1, 0, 0, 0.4f));
-	p->setFontSize(12);
+	p->set_color(SetColorHSB(1, 0, 0, 0.4f));
+	p->set_font_size(12);
 	if (bars.num > 0)
-		p->drawStr(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
+		p->draw_str(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
 
 	foreachi (Track* t, song->tracks, ti){
 		if (t->type != SignalType::MIDI)
@@ -240,11 +240,11 @@ void FormatPdf::saveSong(StorageOperationData* od)
 	auto p = parser->add_page(page_width, page_height);
 
 	if (first_page){
-		p->setFontSize(40);
-		p->drawStr(200, 50, od->song->getTag("title"));
-		p->setFontSize(15);
-		p->setColor(SetColorHSB(1, 0, 0, 0.4f));
-		p->drawStr(p->width - 300, 100, "by " + od->song->getTag("artist"));
+		p->set_font_size(40);
+		p->draw_str(200, 50, od->song->getTag("title"));
+		p->set_font_size(15);
+		p->set_color(SetColorHSB(1, 0, 0, 0.4f));
+		p->draw_str(p->width - 300, 100, "by " + od->song->getTag("artist"));
 		first_page = false;
 	}
 

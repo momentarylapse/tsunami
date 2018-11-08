@@ -97,10 +97,10 @@ inline void draw_line_buffer(Painter *c, double view_pos, double zoom, float hf,
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
-			c->drawCircle(p, tt[nl].y, 2);
+			c->draw_circle(p, tt[nl].y, 2);
 		nl ++;
 	}
-	c->drawLines(tt);
+	c->draw_lines(tt);
 }
 
 inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float hf, float x0, float x1, float y0, const Array<float> &buf, int offset, const Range &r)
@@ -112,7 +112,7 @@ inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float
 		return;
 
 	tt.resize(i1 - i0);
-	c->setLineWidth(3.0f);
+	c->set_line_width(3.0f);
 
 	for (int i=i0; i<i1; i++){
 		if (!r.is_inside(i + offset))
@@ -122,12 +122,12 @@ inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
-			c->drawCircle(p, tt[nl].y, 4);
+			c->draw_circle(p, tt[nl].y, 4);
 		nl ++;
 	}
 	tt.resize(nl);
-	c->drawLines(tt);
-	c->setLineWidth(1.0f);
+	c->draw_lines(tt);
+	c->set_line_width(1.0f);
 }
 
 inline void draw_peak_buffer(Painter *c, int di, double view_pos_rel, double zoom, float f, float hf, float x0, float x1, float y0, const string &buf, int offset)
@@ -159,7 +159,7 @@ inline void draw_peak_buffer(Painter *c, int di, double view_pos_rel, double zoo
 		tt[nl + i].x = tt[nl - i - 1].x;
 		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y + 1;
 	}
-	c->drawPolygon(tt);
+	c->draw_polygon(tt);
 }
 
 inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double zoom, float f, float hf, float x0, float x1, float y0, const string &buf, int offset)
@@ -191,7 +191,7 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 		tt[nl + i].x = tt[nl - i - 1].x;
 		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y + 1;
 	}
-	c->drawPolygon(tt);
+	c->draw_polygon(tt);
 }
 
 void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1)
@@ -207,7 +207,7 @@ void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel
 
 
 	int di = view->detail_steps;
-	c->setColor(col);
+	c->set_color(col);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
 	int l = view->prefered_buffer_layer * 4;
@@ -216,8 +216,8 @@ void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
-			c->setColor(ColorInterpolate(col, Red, 0.3f));
-			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->set_color(ColorInterpolate(col, Red, 0.3f));
+			c->draw_rect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			return;
 		}
 
@@ -226,13 +226,13 @@ void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel
 		int ll = l;
 		color cc = col;
 		cc.a *= 0.3f;
-		c->setColor(cc);
+		c->set_color(cc);
 		for (int ci=0; ci<b.channels; ci++)
 			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], b.offset);
 
 
 		// mean square
-		c->setColor(col);
+		c->set_color(col);
 		for (int ci=0; ci<b.channels; ci++)
 			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], b.offset);
 
@@ -242,10 +242,10 @@ void AudioViewLayer::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel
 			int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[b.PEAK_MAGIC_LEVEL4].num);
 			for (int i=0; i<nn; i++){
 				if (b._peaks_chunk_needs_update(i)){
-					c->setColor(ColorInterpolate(col, Red, 0.3f));
+					c->set_color(ColorInterpolate(col, Red, 0.3f));
 					float xx0 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), x0);
 					float xx1 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
-					c->drawRect(xx0, area.y1, xx1 - xx0, h);
+					c->draw_rect(xx0, area.y1, xx1 - xx0, h);
 				}
 			}
 		}
@@ -273,7 +273,7 @@ void AudioViewLayer::draw_buffer_selection(Painter *c, AudioBuffer &b, double vi
 	int di = view->detail_steps;
 	color cc = col;
 	cc.a = 0.7f;
-	c->setColor(cc);
+	c->set_color(cc);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
 	int l = view->prefered_buffer_layer * 4;
@@ -283,8 +283,8 @@ void AudioViewLayer::draw_buffer_selection(Painter *c, AudioBuffer &b, double vi
 
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
-			c->setColor(ColorInterpolate(col, Red, 0.3f));
-			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->set_color(ColorInterpolate(col, Red, 0.3f));
+			c->draw_rect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			return;
 		}
 
@@ -376,15 +376,15 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 
 	color col2 = col;
 	col2.a *= 0.5f;
-	c->setColor(col2);
-	c->drawRect(asx, area.y1,                             aex - asx, view->SAMPLE_FRAME_HEIGHT);
-	c->drawRect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);
+	c->set_color(col2);
+	c->draw_rect(asx, area.y1,                             aex - asx, view->SAMPLE_FRAME_HEIGHT);
+	c->draw_rect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);
 
-	c->setColor(col);
-	c->drawLine(asx, area.y1, asx, area.y2);
-	c->drawLine(aex, area.y1, aex, area.y2);
-	c->drawLine(asx, area.y1, aex, area.y1);
-	c->drawLine(asx, area.y2, aex, area.y2);
+	c->set_color(col);
+	c->draw_line(asx, area.y1, asx, area.y2);
+	c->draw_line(aex, area.y1, aex, area.y2);
+	c->draw_line(asx, area.y1, aex, area.y1);
+	c->draw_line(asx, area.y2, aex, area.y2);
 }
 
 
@@ -421,9 +421,9 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 	bool sel = view->sel.has(marker);
 
 	if (sel)
-		c->setFont("", -1, true, false);
+		c->set_font("", -1, true, false);
 
-	float w = c->getStrWidth(text) + view->CORNER_RADIUS * 2;
+	float w = c->get_str_width(text) + view->CORNER_RADIUS * 2;
 	float x0 = view->cam.sample2screen(marker->range.start());
 	float x1 = view->cam.sample2screen(marker->range.end());
 	float y0 = area.y1;
@@ -446,19 +446,19 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 
 	color col_bg2 = col2;
 	col_bg2.a = 0.65f;
-	c->setColor(col_bg2);
-	c->drawRect(x0, y0, x1-x0, y1-y0);
-	c->setColor(col2);
-	c->setLineWidth(2.0f);
-	c->drawLine(x0, area.y1, x0, area.y2);
-	c->drawLine(x1, area.y1, x1, area.y2);
-	c->setLineWidth(1.0f);
+	c->set_color(col_bg2);
+	c->draw_rect(x0, y0, x1-x0, y1-y0);
+	c->set_color(col2);
+	c->set_line_width(2.0f);
+	c->draw_line(x0, area.y1, x0, area.y2);
+	c->draw_line(x1, area.y1, x1, area.y2);
+	c->set_line_width(1.0f);
 	view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 
 	marker_areas[index] = rect(x0, x0 + w, y0, y1);
 	marker_label_areas[index] = view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
 
-	c->setFont("", -1, false, false);
+	c->set_font("", -1, false, false);
 }
 
 
@@ -599,24 +599,24 @@ void AudioViewLayer::draw_simple_note(Painter *c, float x1, float x2, float y, f
 	//x1 += r;
 	// "shadow" to indicate length
 	if (x2 - x1 > r*1.5f){
-		c->setColor(col_shadow);
-		c->drawRect(x1, y - r*0.7f - rx, x2 - x1 + rx, r*2*0.7f + rx*2);
+		c->set_color(col_shadow);
+		c->draw_rect(x1, y - r*0.7f - rx, x2 - x1 + rx, r*2*0.7f + rx*2);
 	}
 
 	// the note circle
-	c->setColor(col);
+	c->set_color(col);
 	if ((x2 - x1 > 6) or force_circle)
-		c->drawCircle(x1, y, r+rx);
+		c->draw_circle(x1, y, r+rx);
 	else
-		c->drawRect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
+		c->draw_rect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
 }
 
 void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 {
 	if (is_playable())
-		c->setColor(view->colors.text);
+		c->set_color(view->colors.text);
 	else
-		c->setColor(view->colors.text_soft3);
+		c->set_color(view->colors.text_soft3);
 
 	// clef lines
 	float dy = (area.height() * 0.7f) / layer->track->instrument.string_pitch.num;
@@ -628,13 +628,13 @@ void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 	clef_y0 = y0;
 	for (int i=0; i<layer->track->instrument.string_pitch.num; i++){
 		float y = y0 - i*dy;
-		c->drawLine(area.x1, y, area.x2, y);
+		c->draw_line(area.x1, y, area.x2, y);
 	}
-	c->setAntialiasing(true);
+	c->set_antialiasing(true);
 
-	c->setFontSize(h / 6);
-	c->drawStr(10, area.y1 + area.height() / 2 - h * 0.37f, "T\nA\nB");
-	c->setFontSize(view->FONT_SIZE);
+	c->set_font_size(h / 6);
+	c->draw_str(10, area.y1 + area.height() / 2 - h * 0.37f, "T\nA\nB");
+	c->set_font_size(view->FONT_SIZE);
 }
 
 void AudioViewLayer::draw_midi_note_tab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
@@ -653,7 +653,7 @@ void AudioViewLayer::draw_midi_note_tab(Painter *c, const MidiNote *n, int shift
 
 	if (x2 - x1 > r/4 and r > 5){
 		float font_size = r * 1.2f;
-		c->setColor(view->colors.high_contrast_b);//text);
+		c->set_color(view->colors.high_contrast_b);//text);
 		SymbolRenderer::draw(c, x1, y - font_size*0.75f, font_size, i2s(n->pitch - layer->track->instrument.string_pitch[n->stringno]), 0);
 	}
 }
@@ -667,8 +667,8 @@ void AudioViewLayer::draw_midi_tab(Painter *c, const MidiNoteBuffer &midi, bool 
 	for (MidiNote *n: notes)
 		draw_midi_note_tab(c,  n,  shift,  note_state(n, as_reference, view));
 
-	c->setAntialiasing(false);
-	c->setFontSize(view->FONT_SIZE);
+	c->set_antialiasing(false);
+	c->set_font_size(view->FONT_SIZE);
 }
 
 float AudioViewLayer::clef_pos_to_screen(int pos)
@@ -708,20 +708,20 @@ void AudioViewLayer::draw_midi_note_classical(Painter *c, const MidiNote *n, int
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2){
-		c->setColor(view->colors.text_soft2);
+		c->set_color(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->drawLine(x1 - clef_dy, y, x1 + clef_dy, y);
+		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 	for (int i=-2; i>=p; i-=2){
-		c->setColor(view->colors.text_soft2);
+		c->set_color(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
-		c->drawLine(x1 - clef_dy, y, x1 + clef_dy, y);
+		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 
 	draw_complex_note(c, n, state, x1, x2, y, r);
 
 	if ((n->modifier != NoteModifier::NONE) and (r >= 3)){
-		c->setColor(view->colors.text);
+		c->set_color(view->colors.text);
 		//c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
 		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.8f , size, modifier_symbol(n->modifier));
@@ -740,24 +740,24 @@ void AudioViewLayer::draw_midi_clef_classical(Painter *c, const Clef &clef, cons
 	clef_dy = dy;
 
 	if (is_playable())
-		c->setColor(view->colors.text);
+		c->set_color(view->colors.text);
 	else
-		c->setColor(view->colors.text_soft3);
+		c->set_color(view->colors.text_soft3);
 
 	for (int i=0; i<10; i+=2){
 		float y = clef_pos_to_screen(i);
-		c->drawLine(area.x1, y, area.x2, y);
+		c->draw_line(area.x1, y, area.x2, y);
 	}
 
 	// clef symbol
-	c->setFontSize(dy*4);
-	c->drawStr(area.x1 + 10, clef_pos_to_screen(10), clef.symbol);
-	c->setFontSize(dy);
+	c->set_font_size(dy*4);
+	c->draw_str(area.x1 + 10, clef_pos_to_screen(10), clef.symbol);
+	c->set_font_size(dy);
 
 	for (int i=0; i<7; i++)
 		if (scale.modifiers[i] != NoteModifier::NONE)
-			c->drawStr(area.x1 + 18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
-	c->setFontSize(view->FONT_SIZE);
+			c->draw_str(area.x1 + 18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
+	c->set_font_size(view->FONT_SIZE);
 }
 
 void AudioViewLayer::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
@@ -768,13 +768,13 @@ void AudioViewLayer::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi,
 
 	const Clef& clef = layer->track->instrument.get_clef();
 
-	c->setAntialiasing(true);
+	c->set_antialiasing(true);
 
 	for (MidiNote *n: notes)
 		draw_midi_note_classical(c, n, shift, note_state(n, as_reference, view), clef);
 
-	c->setFontSize(view->FONT_SIZE);
-	c->setAntialiasing(false);
+	c->set_font_size(view->FONT_SIZE);
+	c->set_antialiasing(false);
 }
 
 color AudioViewLayer::background_color()
@@ -791,18 +791,18 @@ void AudioViewLayer::draw_blank_background(Painter *c)
 {
 	color cc = background_color();
 	if ((view->sel.range.length > 0) and (view->sel.has(layer))){
-		c->setColor(cc);
-		c->drawRect(area);
+		c->set_color(cc);
+		c->draw_rect(area);
 
 		color cs = background_selection_color();
 		float x1 = max((float)view->cam.sample2screen(view->sel.range.start()), area.x1);
 		float x2 = min((float)view->cam.sample2screen(view->sel.range.end()), area.x2);
-		c->setColor(cs);
-		c->drawRect(x1, area.y1, x2-x1, area.height());
+		c->set_color(cs);
+		c->draw_rect(x1, area.y1, x2-x1, area.height());
 
 	}else{
-		c->setColor(cc);
-		c->drawRect(area);
+		c->set_color(cc);
+		c->draw_rect(area);
 	}
 }
 
@@ -829,18 +829,18 @@ void AudioViewLayer::draw_version_header(Painter *c)
 		col = ColorInterpolate(col, view->colors.selection, 0.2f);
 	if (hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
-	c->setColor(col);
+	c->set_color(col);
 	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	c->setRoundness(view->CORNER_RADIUS);
-	c->drawRect(area.x2 - view->LAYER_HANDLE_WIDTH,  area.y1,  view->LAYER_HANDLE_WIDTH, h);
-	c->setRoundness(0);
+	c->set_roundness(view->CORNER_RADIUS);
+	c->draw_rect(area.x2 - view->LAYER_HANDLE_WIDTH,  area.y1,  view->LAYER_HANDLE_WIDTH, h);
+	c->set_roundness(0);
 
 	// track title
-	c->setFont("", view->FONT_SIZE, view->sel.has(layer) and playable, false);
+	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable, false);
 	if (playable)
-		c->setColor(view->colors.text);
+		c->set_color(view->colors.text);
 	else
-		c->setColor(view->colors.text_soft2);
+		c->set_color(view->colors.text_soft2);
 	string title;
 	if (layer->track->has_version_selection()){
 		if (layer->is_main())
@@ -852,20 +852,20 @@ void AudioViewLayer::draw_version_header(Painter *c)
 	}
 	if (solo)
 		title += " (solo)";
-	c->drawStr(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 3, title);
+	c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 3, title);
 
-	c->setFont("", -1, false, false);
+	c->set_font("", -1, false, false);
 
 	// icons
 	if (layer->type == SignalType::BEATS){
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
 	}else if (layer->type == SignalType::MIDI){
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
 	}else{
-		c->setColor(view->colors.text);
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
+		c->set_color(view->colors.text);
+		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
 	}
 
 	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
@@ -878,11 +878,11 @@ void AudioViewLayer::draw_version_header(Painter *c)
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);*/
 
-		c->setColor(col_but);
+		c->set_color(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))
-			c->setColor(col_but_hover);
+			c->set_color(col_but_hover);
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 22, area.y1 + 22, *view->images.solo);
+		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 22, area.y1 + 22, *view->images.solo);
 	}
 }
 

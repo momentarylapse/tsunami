@@ -213,13 +213,13 @@ public:
 		inter.add2(p0, complex(length,0));
 		inter.add2(p1, complex(length,0));
 
-		p->setColor(signal_color(c->type));
+		p->set_color(signal_color(c->type));
 
 		complex qq;
 		for (float t=0; t<1.0f; t+=0.025f){
 			complex q = inter.get(t);
 			if (t > 0)
-				p->drawLine(qq.x, qq.y, q.x, q.y);
+				p->draw_line(qq.x, qq.y, q.x, q.y);
 			qq = q;
 		}
 		complex m = inter.get(0.5f);
@@ -231,43 +231,43 @@ public:
 		pp.add(m + d * arrow_length);
 		pp.add(m - d * arrow_length + e * arrow_length / 2);
 		pp.add(m - d * arrow_length - e * arrow_length / 2);
-		p->drawPolygon(pp);
+		p->draw_polygon(pp);
 		//p->dr
 	}
 
 	void draw_module(Painter *p, Module *m)
 	{
-		p->setColor(view->colors.background_track_selected);
+		p->set_color(view->colors.background_track_selected);
 		if (hover.type == Selection::TYPE_MODULE and hover.module == m)
-			p->setColor(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
-		p->setRoundness(view->CORNER_RADIUS);
-		p->drawRect(module_rect(m));
-		p->setRoundness(0);
+			p->set_color(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
+		p->set_roundness(view->CORNER_RADIUS);
+		p->draw_rect(module_rect(m));
+		p->set_roundness(0);
 		if (sel.type == sel.TYPE_MODULE and sel.module == m){
-			p->setColor(view->colors.text);
-			p->setFont("", 12, true, false);
+			p->set_color(view->colors.text);
+			p->set_font("", 12, true, false);
 		}else{
-			p->setColor(view->colors.text_soft1);
+			p->set_color(view->colors.text_soft1);
 		}
 		string type = module_header(m);
-		float ww = p->getStrWidth(type);
-		p->drawStr(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
-		p->setFont("", 12, false, false);
+		float ww = p->get_str_width(type);
+		p->draw_str(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
+		p->set_font("", 12, false, false);
 	}
 
 	void draw_ports(Painter *p, Module *m)
 	{
 		foreachi(auto &pd, m->port_in, i){
 			bool hovering = (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i);
-			p->setColor(signal_color(pd.type, hovering));
+			p->set_color(signal_color(pd.type, hovering));
 			float r = hovering ? 6 : 4;
-			p->drawCircle(module_port_in_x(m), module_port_in_y(m, i), r);
+			p->draw_circle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
 		foreachi(auto *pd, m->port_out, i){
 			bool hovering = (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i);
-			p->setColor(signal_color(pd->type, hovering));
+			p->set_color(signal_color(pd->type, hovering));
 			float r = hovering ? 6 : 4;
-			p->drawCircle(module_port_out_x(m), module_port_out_y(m, i), r);
+			p->draw_circle(module_port_out_x(m), module_port_out_y(m, i), r);
 		}
 	}
 
@@ -275,9 +275,9 @@ public:
 	{
 		int w = p->width;
 		int h = p->height;
-		p->setColor(view->colors.background);
-		p->drawRect(0, 0, w, h);
-		p->setFontSize(12);
+		p->set_color(view->colors.background);
+		p->draw_rect(0, 0, w, h);
+		p->set_font_size(12);
 
 		for (auto *m: chain->modules)
 			draw_module(p, m);
@@ -289,22 +289,22 @@ public:
 			draw_ports(p, m);
 
 		for (auto &pp: chain->_ports_out){
-			p->setColor(Red);
-			p->drawCircle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
+			p->set_color(Red);
+			p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
 		}
 
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
-			p->setColor(White);
+			p->set_color(White);
 			if (hover.target_module){
-				p->setLineWidth(5);
+				p->set_line_width(5);
 				Module *t = hover.target_module;
 				if (hover.type == hover.TYPE_PORT_IN)
-					p->drawLine(sel.dx, sel.dy, module_port_out_x(t), module_port_out_y(t, hover.target_port));
+					p->draw_line(sel.dx, sel.dy, module_port_out_x(t), module_port_out_y(t, hover.target_port));
 				else
-					p->drawLine(sel.dx, sel.dy, module_port_in_x(t), module_port_in_y(t, hover.target_port));
-				p->setLineWidth(1);
+					p->draw_line(sel.dx, sel.dy, module_port_in_x(t), module_port_in_y(t, hover.target_port));
+				p->set_line_width(1);
 			}else
-				p->drawLine(sel.dx, sel.dy, hui::GetEvent()->mx, hui::GetEvent()->my);
+				p->draw_line(sel.dx, sel.dy, hui::GetEvent()->mx, hui::GetEvent()->my);
 		}
 
 

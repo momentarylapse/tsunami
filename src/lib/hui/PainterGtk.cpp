@@ -54,7 +54,7 @@ Painter::Painter(Panel *panel, const string &_id)
 		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
 		width = gdk_window_get_width(gtk_widget_get_window(c->widget));
 		height = gdk_window_get_height(gtk_widget_get_window(c->widget));
-		setFont("Sans", 16, false, false);
+		set_font("Sans", 16, false, false);
 	}
 }
 
@@ -73,21 +73,21 @@ Painter::~Painter()
 	cr = nullptr;
 }
 
-void Painter::setColor(const color &c)
+void Painter::set_color(const color &c)
 {
 	if (!cr)
 		return;
 	cairo_set_source_rgba(cr, c.r, c.g, c.b, c.a);
 }
 
-void Painter::setLineWidth(float w)
+void Painter::set_line_width(float w)
 {
 	if (!cr)
 		return;
 	cairo_set_line_width(cr, w);
 }
 
-void Painter::setLineDash(const Array<float> &dash, float offset)
+void Painter::set_line_dash(const Array<float> &dash, float offset)
 {
 	if (!cr)
 		return;
@@ -97,19 +97,19 @@ void Painter::setLineDash(const Array<float> &dash, float offset)
 	cairo_set_dash(cr, (double*)d.data, d.num, offset);
 }
 
-void Painter::setRoundness(float radius)
+void Painter::set_roundness(float radius)
 {
 	corner_radius = radius;
 }
 
-void Painter::clip(const rect &r)
+void Painter::set_clip(const rect &r)
 {
 	cairo_reset_clip(cr);
 	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
 	cairo_clip(cr);
 }
 
-rect Painter::getClip()
+rect Painter::clip()
 {
 	if (!cr)
 		return r_id;
@@ -123,13 +123,13 @@ rect Painter::area()
 	return rect(0, width, 0, height);
 }
 
-void Painter::drawPoint(float x, float y)
+void Painter::draw_point(float x, float y)
 {
 	if (!cr)
 		return;
 }
 
-void Painter::drawLine(float x1, float y1, float x2, float y2)
+void Painter::draw_line(float x1, float y1, float x2, float y2)
 {
 	if (!cr)
 		return;
@@ -138,7 +138,7 @@ void Painter::drawLine(float x1, float y1, float x2, float y2)
 	cairo_stroke(cr);
 }
 
-void Painter::drawLines(const Array<complex> &p)
+void Painter::draw_lines(const Array<complex> &p)
 {
 	if (!cr)
 		return;
@@ -152,7 +152,7 @@ void Painter::drawLines(const Array<complex> &p)
 	cairo_stroke(cr);
 }
 
-void Painter::drawPolygon(const Array<complex> &p)
+void Painter::draw_polygon(const Array<complex> &p)
 {
 	if (!cr)
 		return;
@@ -169,7 +169,7 @@ void Painter::drawPolygon(const Array<complex> &p)
 		cairo_stroke(cr);
 }
 
-void Painter::drawStr(float x, float y, const string &str)
+void Painter::draw_str(float x, float y, const string &str)
 {
 	if (!cr)
 		return;
@@ -187,7 +187,7 @@ void Painter::drawStr(float x, float y, const string &str)
 	//cairo_show_text(cr, str);
 }
 
-float Painter::getStrWidth(const string &str)
+float Painter::get_str_width(const string &str)
 {
 	if (!cr)
 		return 0;
@@ -199,7 +199,7 @@ float Painter::getStrWidth(const string &str)
 	return (float)w / 1000.0f;
 }
 
-void Painter::drawRect(float x, float y, float w, float h)
+void Painter::draw_rect(float x, float y, float w, float h)
 {
 	if (!cr)
 		return;
@@ -220,12 +220,12 @@ void Painter::drawRect(float x, float y, float w, float h)
 		cairo_stroke(cr);
 }
 
-void Painter::drawRect(const rect &r)
+void Painter::draw_rect(const rect &r)
 {
-	drawRect(r.x1, r.y1, r.width(), r.height());
+	draw_rect(r.x1, r.y1, r.width(), r.height());
 }
 
-void Painter::drawCircle(float x, float y, float radius)
+void Painter::draw_circle(float x, float y, float radius)
 {
 	if (!cr)
 		return;
@@ -237,7 +237,7 @@ void Painter::drawCircle(float x, float y, float radius)
 		cairo_stroke(cr);
 }
 
-void Painter::drawImage(float x, float y, const Image &image)
+void Painter::draw_image(float x, float y, const Image &image)
 {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
@@ -259,7 +259,7 @@ void Painter::drawImage(float x, float y, const Image &image)
 #endif
 }
 
-void Painter::drawMaskImage(float x, float y, const Image &image)
+void Painter::draw_mask_image(float x, float y, const Image &image)
 {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
@@ -276,7 +276,7 @@ void Painter::drawMaskImage(float x, float y, const Image &image)
 #endif
 }
 
-void Painter::setFont(const string &font, float size, bool bold, bool italic)
+void Painter::set_font(const string &font, float size, bool bold, bool italic)
 {
 	if (!cr)
 		return;
@@ -307,14 +307,14 @@ void Painter::setFont(const string &font, float size, bool bold, bool italic)
 
 }
 
-void Painter::setFontSize(float size)
+void Painter::set_font_size(float size)
 {
 	if (!cr)
 		return;
-	setFont(cur_font, size, cur_font_bold, cur_font_italic);
+	set_font(cur_font, size, cur_font_bold, cur_font_italic);
 }
 
-void Painter::setAntialiasing(bool enabled)
+void Painter::set_antialiasing(bool enabled)
 {
 	if (!cr)
 		return;
@@ -324,7 +324,7 @@ void Painter::setAntialiasing(bool enabled)
 		cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
 }
 
-void Painter::setFill(bool fill)
+void Painter::set_fill(bool fill)
 {
 	mode_fill = fill;
 }
@@ -342,7 +342,7 @@ Painter *start_image_paint(Image &im)
 
 	p->width = im.width;
 	p->height = im.height;
-	p->setFont("Sans", 16, false, false);
+	p->set_font("Sans", 16, false, false);
 	return p;
 }
 

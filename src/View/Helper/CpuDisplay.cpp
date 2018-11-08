@@ -70,40 +70,40 @@ void CpuDisplay::on_draw(Painter* p)
 	int h = p->height;
 	bool large = (h > 50);
 
-	p->setColor(view->colors.background);
-	p->drawRect(2, 2, w-4, h-4);
-	p->setLineWidth(large ? 1.5f : 1.0f);
+	p->set_color(view->colors.background);
+	p->draw_rect(2, 2, w-4, h-4);
+	p->set_line_width(large ? 1.5f : 1.0f);
 
 	if (large){
-		p->setFontSize(10);
-		p->setColor(view->colors.text_soft1);
-		p->drawStr(68, 10, "cpu");
-		p->drawStr(118, 10, "avg");
-		p->drawStr(173, 10, "freq");
+		p->set_font_size(10);
+		p->set_color(view->colors.text_soft1);
+		p->draw_str(68, 10, "cpu");
+		p->draw_str(118, 10, "avg");
+		p->draw_str(173, 10, "freq");
 	}
 
 	for (int t=0; t<NUM_TYPES; t++){
-		p->setColor(type_color(t));
+		p->set_color(type_color(t));
 		for (int j=1; j<cpu[t].num; j++){
 			float x0 = w - 2 - (cpu[t].num - (j-1)) * 2;
 			float x1 = w - 2 - (cpu[t].num -  j   ) * 2;
 			float y0 = 2 + (h - 4) * (1 - cpu[t][j-1]);
 			float y1 = 2 + (h - 4) * (1 - cpu[t][j]);
 			if (x1 >= 2)
-				p->drawLine(x0, y0, x1, y1);
+				p->draw_line(x0, y0, x1, y1);
 		}
 		if (cpu[t].num > 0){
-			p->setColor(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
+			p->set_color(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
 			if (large){
-				p->setFontSize(10);
-				p->drawStr(20, 30  + t * 20, type_name(t));
-				p->drawStr(68, 30  + t * 20, format("%.0f%%", cpu[t].back() * 100));
-				p->drawStr(118, 30  + t * 20, format("%.0fms", avg[t].back() * 1000));
-				p->drawStr(173, 30  + t * 20, format("%.1f", (float)count[t].back() / UPDATE_DT));
+				p->set_font_size(10);
+				p->draw_str(20, 30  + t * 20, type_name(t));
+				p->draw_str(68, 30  + t * 20, format("%.0f%%", cpu[t].back() * 100));
+				p->draw_str(118, 30  + t * 20, format("%.0fms", avg[t].back() * 1000));
+				p->draw_str(173, 30  + t * 20, format("%.1f", (float)count[t].back() / UPDATE_DT));
 
 			}else{
-				p->setFontSize(7);
-				p->drawStr(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", cpu[t].back() * 100));
+				p->set_font_size(7);
+				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", cpu[t].back() * 100));
 			}
 		}
 	}

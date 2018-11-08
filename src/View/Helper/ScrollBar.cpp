@@ -21,15 +21,15 @@ void ScrollBar::drag_update(float mx, float my)
 
 void ScrollBar::draw(Painter *c, bool hover)
 {
-	c->setColor(AudioView::colors.background);
-	c->drawRect(area);
-	c->setColor(hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
+	c->set_color(AudioView::colors.background);
+	c->draw_rect(area);
+	c->set_color(hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
 	float d = 5;
 	float f = min(page_size / content_size, 1.0f);
 	float h = area.height() - 2*d;
-	c->setRoundness(area.width()/2 - d);
-	c->drawRect(area.x1 + d, area.y1 + d +  offset / content_size * h, area.width() - 2*d, h * f);
-	c->setRoundness(0);
+	c->set_roundness(area.width()/2 - d);
+	c->draw_rect(area.x1 + d, area.y1 + d +  offset / content_size * h, area.width() - 2*d, h * f);
+	c->set_roundness(0);
 }
 
 

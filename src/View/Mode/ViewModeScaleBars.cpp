@@ -30,9 +30,9 @@ void ViewModeScaleBars::draw_post(Painter *c)
 	int sxx1 = clampi(sx1, view->area.x1, view->area.x2);
 	int sxx2 = clampi(sx2, view->area.x1, view->area.x2);
 
-	c->setColor(color(0.1f, 1, 1, 1));
-	c->drawRect(sxx1, view->area.y1, 30, view->area.height());
-	c->drawRect(sxx2 - 30, view->area.y1, 30, view->area.height());
+	c->set_color(color(0.1f, 1, 1, 1));
+	c->draw_rect(sxx1, view->area.y1, 30, view->area.height());
+	c->draw_rect(sxx2 - 30, view->area.y1, 30, view->area.height());
 
 	string message = _("move right selection handle to scale   cancel (Esc)");
 	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selection, 0);

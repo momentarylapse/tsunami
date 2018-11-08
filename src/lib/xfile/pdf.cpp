@@ -28,7 +28,7 @@ PagePainter::PagePainter(Parser* _parser, Page *_page)
 	font_size = 12;
 	filling = true;
 	text_x = text_y = 0;
-	setColor(Black);
+	set_color(Black);
 }
 
 PagePainter::~PagePainter()
@@ -36,7 +36,7 @@ PagePainter::~PagePainter()
 	delete col;
 }
 
-void PagePainter::setColor(const color& c)
+void PagePainter::set_color(const color& c)
 {
 	*col = c;
 	page->content += format("     %.2f %.2f %.2f RG\n", c.r, c.g, c.b);
@@ -45,65 +45,65 @@ void PagePainter::setColor(const color& c)
 	//page->content += format("     %.2f ca\n", c.a);
 }
 
-void PagePainter::setFont(const string& font, float size, bool bold, bool italic)
+void PagePainter::set_font(const string& font, float size, bool bold, bool italic)
 {
 	font_size = size;
 }
 
-void PagePainter::setFontSize(float size)
+void PagePainter::set_font_size(float size)
 {
 	font_size = size;
 }
 
-void PagePainter::setAntialiasing(bool enabled)
+void PagePainter::set_antialiasing(bool enabled)
 {
 }
 
-void PagePainter::setLineWidth(float w)
+void PagePainter::set_line_width(float w)
 {
 	line_width = w;
 	page->content += format("     %.1f w\n", w);
 }
 
-void PagePainter::setLineDash(const Array<float>& dash, float offset)
+void PagePainter::set_line_dash(const Array<float>& dash, float offset)
 {
 }
 
-void PagePainter::setFill(bool fill)
+void PagePainter::set_fill(bool fill)
 {
 	filling = fill;
 }
 
-void PagePainter::clip(const rect& r)
+void PagePainter::set_clip(const rect& r)
 {
 }
 
-void PagePainter::drawPoint(float x, float y)
+void PagePainter::draw_point(float x, float y)
 {
 }
 
-void PagePainter::drawLine(float x1, float y1, float x2, float y2)
+void PagePainter::draw_line(float x1, float y1, float x2, float y2)
 {
 	page->content += format("     %.1f %.1f m\n", x1, height-y1);
 	page->content += format("     %.1f %.1f l\n", x2, height-y2);
 	page->content += "     S\n";
 }
 
-void PagePainter::drawLines(const Array<complex>& p)
+void PagePainter::draw_lines(const Array<complex>& p)
 {
 }
 
-void PagePainter::drawPolygon(const Array<complex>& p)
+void PagePainter::draw_polygon(const Array<complex>& p)
 {
 }
 
-void PagePainter::drawRect(float x1, float y1, float w, float h)
+void PagePainter::draw_rect(float x1, float y1, float w, float h)
 {
-	drawRect(rect(x1, x1+w, y1, y1+h));
+	draw_rect(rect(x1, x1+w, y1, y1+h));
 	//page->content += format("     %.1f %.1f %.1f %.1f re\n", x1, height-y1-h, w, h);
 }
 
-void PagePainter::drawRect(const rect& r)
+void PagePainter::draw_rect(const rect& r)
 {
 	page->content += format("     %.1f %.1f %.1f %.1f re\n", r.x1, height-r.y2, r.width(), r.height());
 	if (filling)
@@ -112,7 +112,7 @@ void PagePainter::drawRect(const rect& r)
 		page->content += "     S\n";
 }
 
-void PagePainter::drawCircle(float x, float y, float radius)
+void PagePainter::draw_circle(float x, float y, float radius)
 {
 	complex p[12];
 	float rr = radius * 0.6f;
@@ -137,7 +137,7 @@ void PagePainter::drawCircle(float x, float y, float radius)
 		page->content += "     S\n";
 }
 
-void PagePainter::drawStr(float x, float y, const string& str)
+void PagePainter::draw_str(float x, float y, const string& str)
 {
 	y = height - y - font_size*0.8f;
 	float dx = x - text_x;
@@ -148,16 +148,16 @@ void PagePainter::drawStr(float x, float y, const string& str)
 	text_y = y;
 }
 
-float PagePainter::getStrWidth(const string& str)
+float PagePainter::get_str_width(const string& str)
 {
 	return font_size * str.num * 0.5f;
 }
 
-void PagePainter::drawImage(float x, float y, const Image& image)
+void PagePainter::draw_image(float x, float y, const Image& image)
 {
 }
 
-void PagePainter::drawMaskImage(float x, float y, const Image& image)
+void PagePainter::draw_mask_image(float x, float y, const Image& image)
 {
 }
 
@@ -166,7 +166,7 @@ rect PagePainter::area()
 	return rect(0, width, 0, height);
 }
 
-rect PagePainter::getClip()
+rect PagePainter::clip()
 {
 	return area();
 }

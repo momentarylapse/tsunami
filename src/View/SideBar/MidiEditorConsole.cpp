@@ -315,10 +315,9 @@ void MidiEditorConsole::on_apply_string()
 {
 	int string_no = get_int("string_no");
 
+	song->action_manager->group_begin();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref){
-		n->stringno = string_no;
-	}
-	// TODO hmmm, make actions... stringno essential data?
-	song->notify();
+	for (auto *n: ref)
+		layer->midi_note_set_string(n, string_no);
+	song->action_manager->group_end();
 }

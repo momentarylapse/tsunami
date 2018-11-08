@@ -63,7 +63,7 @@ void ActionBarAdd::build(Data *d)
 			foreachi (MidiNote *m, l->midi, i){
 				if (m->range.is_inside(pos0)){
 					// stretch
-					add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume), d);
+					add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume, m->stringno), d);
 				}
 			}
 		}

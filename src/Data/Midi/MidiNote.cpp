@@ -46,17 +46,18 @@ void MidiNote::reset_meta()
 	modifier = NoteModifier::UNKNOWN;
 }
 
-void MidiNote::update_meta(const Instrument &instrument, const Scale& scale, int hand_position) const
+void MidiNote::update_meta(const Instrument &instrument, const Scale& scale) const
 {
 	if ((clef_position < 0) or (modifier == NoteModifier::UNKNOWN)){
 		const Clef& clef = instrument.get_clef();
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}
 
+	// worst case fret positions...
 	if (stringno < 0){
 		stringno = 0;
 		for (int i=0; i<instrument.string_pitch.num; i++)
-			if (pitch >= instrument.string_pitch[i] + hand_position){
+			if (pitch >= instrument.string_pitch[i]){
 				stringno = i;
 			}
 	}

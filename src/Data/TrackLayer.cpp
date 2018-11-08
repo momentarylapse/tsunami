@@ -20,6 +20,7 @@
 #include "../Action/Track/Sample/ActionTrackEditSample.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
+#include "../Action/Track/Midi/ActionTrackEditMidiNote.h"
 //#include "../Plugins/PluginManager.h"
 //#include "../Tsunami.h"
 #include "../lib/hui/hui.h"
@@ -162,6 +163,16 @@ void TrackLayer::add_midi_notes(const MidiNoteBuffer &notes)
 	for (MidiNote *n: notes)
 		add_midi_note(n);
 	track->song->end_action_group();
+}
+
+void TrackLayer::edit_midi_note(MidiNote *note, const Range &range, float pitch, float volume)
+{
+	track->song->execute(new ActionTrackEditMidiNote(note, range, pitch, volume, note->stringno));
+}
+
+void TrackLayer::midi_note_set_string(MidiNote *note, int stringno)
+{
+	track->song->execute(new ActionTrackEditMidiNote(note, note->range, note->pitch, note->volume, stringno));
 }
 
 void TrackLayer::delete_midi_note(const MidiNote *note)

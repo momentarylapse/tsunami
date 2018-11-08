@@ -532,48 +532,11 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch)
 	return r;
 }
 
-struct HandPosition
-{
-	HandPosition()
-	{
-		offset = 0;
-		value = 0;
-	}
-	HandPosition(int _offset, int _value)
-	{
-		offset = _offset;
-		value = _value;
-	}
-	bool operator>(const HandPosition &o) const
-	{ return offset > o.offset; }
-	bool operator==(const HandPosition &o) const
-	{ return offset == o.offset; }
-	int offset, value;
-};
-
 
 void MidiNoteBuffer::update_meta(Track *t, const Scale& scale) const
 {
-	// FIXME argh bad system... better have a button to edit...
-	Set<HandPosition> hands;
-	for (TrackMarker *m: t->markers)
-		if (m->text.match(":pos *:"))
-			hands.add(HandPosition(m->range.offset, m->text.substr(4, -2)._int()));
-
-
-	int hand_position = 0;
-	int next = 0;
-
-	for (MidiNote *n: *this){
-		while(next < hands.num){
-			if (n->range.offset >= hands[next].offset)
-				hand_position = hands[next ++].value;
-			else
-				break;
-		}
-
-		n->update_meta(t->instrument, scale, hand_position);
-	}
+	for (MidiNote *n: *this)
+		n->update_meta(t->instrument, scale);
 }
 
 void MidiNoteBuffer::clear_meta() const

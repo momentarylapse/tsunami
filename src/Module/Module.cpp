@@ -303,11 +303,11 @@ public:
 		progress = nullptr;
 		ok = false;
 
-		setTitle(config->module_subtype);
+		set_title(config->module_subtype);
 		embed(panel, "grid", 0, 1);
 
 		if (c->module_type != ModuleType::AUDIO_EFFECT)
-			hideControl("preview", true);
+			hide_control("preview", true);
 
 		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
 		event("save_favorite", std::bind(&ConfigurationDialog::onSave, this));

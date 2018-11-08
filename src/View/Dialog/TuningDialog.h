@@ -19,12 +19,12 @@ public:
 
 	void update();
 
-	void onOk();
+	void on_ok();
 
-	void onAddFirst();
-	void onAdd();
-	void onDelete();
-	void onEdit();
+	void on_add_first();
+	void on_add();
+	void on_delete();
+	void on_edit();
 
 	Track *track;
 	Array<int> tuning;

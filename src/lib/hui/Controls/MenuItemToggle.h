@@ -18,8 +18,8 @@ class MenuItemToggle : public Control
 public:
 	MenuItemToggle(const string &title, const string &id);
 
-	virtual void __check(bool checked);
-	virtual bool isChecked();
+	void __check(bool checked) override;
+	bool is_checked() override;
 };
 
 };

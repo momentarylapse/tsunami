@@ -26,19 +26,19 @@ public:
 		fx = _fx;
 		index = _index;
 
-		fromResource("fx_panel");
+		from_resource("fx_panel");
 
-		setString("name", fx->module_subtype);
+		set_string("name", fx->module_subtype);
 
 		p = fx->create_panel();
 		if (p){
 			embed(p, "content", 0, 0);
 			p->update();
 		}else{
-			setTarget("content");
-			addLabel(_("not configurable"), 0, 1, "");
-			hideControl("load_favorite", true);
-			hideControl("save_favorite", true);
+			set_target("content");
+			add_label(_("not configurable"), 0, 1, "");
+			hide_control("load_favorite", true);
+			hide_control("save_favorite", true);
 		}
 
 		event("enabled", std::bind(&SingleFxPanel::onEnabled, this));
@@ -79,9 +79,9 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->enable_effect(fx, isChecked(""));
+			track->enable_effect(fx, is_checked(""));
 		else
-			song->enable_effect(fx, isChecked(""));
+			song->enable_effect(fx, is_checked(""));
 	}
 	void onDelete()
 	{
@@ -131,14 +131,14 @@ FxConsole::FxConsole(Session *session) :
 {
 	id_inner = "fx_inner_table";
 
-	fromResource("fx_editor");
+	from_resource("fx_editor");
 
 	track = nullptr;
 	exclusive = nullptr;
 	//Enable("add", false);
 
 	if (!view)
-		hideControl("edit_track", true);
+		hide_control("edit_track", true);
 
 	event("add", std::bind(&FxConsole::on_add, this));
 
@@ -205,7 +205,7 @@ void FxConsole::clear()
 		track->unsubscribe(this);
 	foreachi(hui::Panel *p, panels, i){
 		delete(p);
-		removeControl("separator_" + i2s(i));
+		remove_control("separator_" + i2s(i));
 	}
 	panels.clear();
 	track = nullptr;
@@ -231,12 +231,12 @@ void FxConsole::set_track(Track *t)
 		fx = song->fx;
 	foreachi(AudioEffect *e, fx, i){
 		auto *p = new SingleFxPanel(session, this, track, e, i);
-		p->hideControl("content", !allow_show(p));
+		p->hide_control("content", !allow_show(p));
 		panels.add(p);
 		embed(panels.back(), id_inner, 0, i*2);
-		addSeparator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
+		add_separator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
 	}
-	hideControl("comment_no_fx", fx.num > 0);
+	hide_control("comment_no_fx", fx.num > 0);
 	//Enable("add", track);
 }
 
@@ -246,7 +246,7 @@ void FxConsole::set_exclusive(hui::Panel *ex)
 	bar()->set_large(exclusive);
 	for (auto *p: panels){
 		SingleFxPanel *pp = (SingleFxPanel*)p;
-		pp->hideControl("content", !allow_show(pp));
+		pp->hide_control("content", !allow_show(pp));
 		if (pp->p)
 			pp->p->set_large(exclusive == pp);
 	}

@@ -15,22 +15,22 @@
 PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("pause_add_dialog");
+	from_resource("pause_add_dialog");
 	song = s;
 	index = _index;
 
-	setFloat("duration", 1.0f);
+	set_float("duration", 1.0f);
 	check("shift-data", true);
 
-	event("ok", std::bind(&PauseAddDialog::onOk, this));
-	event("cancel", std::bind(&PauseAddDialog::onClose, this));
-	event("hui:close", std::bind(&PauseAddDialog::onClose, this));
+	event("ok", std::bind(&PauseAddDialog::on_ok, this));
+	event("cancel", std::bind(&PauseAddDialog::on_close, this));
+	event("hui:close", std::bind(&PauseAddDialog::on_close, this));
 }
 
-void PauseAddDialog::onOk()
+void PauseAddDialog::on_ok()
 {
-	bool move_data = isChecked("shift-data");
-	float duration = getFloat("duration");
+	bool move_data = is_checked("shift-data");
+	float duration = get_float("duration");
 	song->begin_action_group();
 
 	if (!song->time_track())
@@ -43,7 +43,7 @@ void PauseAddDialog::onOk()
 	destroy();
 }
 
-void PauseAddDialog::onClose()
+void PauseAddDialog::on_close()
 {
 	destroy();
 }

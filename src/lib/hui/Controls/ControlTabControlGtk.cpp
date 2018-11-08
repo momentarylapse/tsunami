@@ -35,7 +35,7 @@ ControlTabControl::ControlTabControl(const string &title, const string &id, Pane
 	cur_page = 0;
 	g_signal_connect(G_OBJECT(widget), "switch-page", G_CALLBACK(&OnGtkTabControlSwitch), this);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
 ControlTabControl::~ControlTabControl()
@@ -44,32 +44,32 @@ ControlTabControl::~ControlTabControl()
 	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
 }
 
-string ControlTabControl::getString()
+string ControlTabControl::get_string()
 {
 	return "";
 }
 
-void ControlTabControl::__setString(const string& str)
+void ControlTabControl::__set_string(const string& str)
 {
 }
 
-void ControlTabControl::__setInt(int i)
+void ControlTabControl::__set_int(int i)
 {
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(widget), i);
 	cur_page = i;
 }
 
-int ControlTabControl::getInt()
+int ControlTabControl::get_int()
 {
 	return cur_page;
 }
 
-void ControlTabControl::__addString(const string &str)
+void ControlTabControl::__add_string(const string &str)
 {
 	addPage(str);
 }
 
-void ControlTabControl::__removeString(int row)
+void ControlTabControl::__remove_string(int row)
 {
 	if (row >= 0 and row < pages.num){
 		delete pages[row];
@@ -78,7 +78,7 @@ void ControlTabControl::__removeString(int row)
 	gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
 }
 
-void ControlTabControl::__changeString(int row, const string& str)
+void ControlTabControl::__change_string(int row, const string& str)
 {
 	auto *child = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), row);
 	gtk_notebook_set_tab_label_text(GTK_NOTEBOOK(widget), child, str.c_str());
@@ -115,7 +115,7 @@ void ControlTabControl::add(Control *child, int x, int y)
 	child->parent = this;
 }
 
-void ControlTabControl::__setOption(const string &op, const string &value)
+void ControlTabControl::__set_option(const string &op, const string &value)
 {
 	if (op == "nobar")
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);

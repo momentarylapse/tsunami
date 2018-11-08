@@ -16,12 +16,12 @@ ModuleConsole::ModuleConsole(Session* session) :
 {
 	id_inner = "grid";
 
-	fromResource("module_console");
+	from_resource("module_console");
 
 	module = nullptr;
 	module_panel = nullptr;
 
-	event("edit_song", std::bind(&ModuleConsole::onEditSong, this));
+	event("edit_song", std::bind(&ModuleConsole::on_edit_song, this));
 }
 
 ModuleConsole::~ModuleConsole()
@@ -41,31 +41,31 @@ void ModuleConsole::clear()
 	reset("sub_category");
 }
 
-void ModuleConsole::setModule(Module* m)
+void ModuleConsole::set_module(Module* m)
 {
 	clear();
 
 	module = m;
 
 	if (module){
-		module->subscribe(this, std::bind(&ModuleConsole::onModuleDelete, this), Module::MESSAGE_DELETE);
-		setString("category", Module::type_to_name(module->module_type));
-		setString("sub_category", m->module_subtype);
+		module->subscribe(this, std::bind(&ModuleConsole::on_module_delete, this), Module::MESSAGE_DELETE);
+		set_string("category", Module::type_to_name(module->module_type));
+		set_string("sub_category", m->module_subtype);
 		module_panel = module->create_panel();
 		if (module_panel){
 			module_panel->update();
 			embed(module_panel, "grid", 0, 0);
 		}
-		hideControl("no_config", module_panel);
+		hide_control("no_config", module_panel);
 	}
 }
 
-void ModuleConsole::onEditSong()
+void ModuleConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void ModuleConsole::onModuleDelete()
+void ModuleConsole::on_module_delete()
 {
 	clear();
 }

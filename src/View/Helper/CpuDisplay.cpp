@@ -23,10 +23,10 @@ CpuDisplay::CpuDisplay(hui::Panel* _panel, const string& _id, Session *session)
 	dlg = nullptr;
 
 	if (!hui::Config.get_bool("CpuDisplay", false))
-		panel->hideControl(id, true);
+		panel->hide_control(id, true);
 
-	panel->eventXP(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
-	panel->eventX(id, "hui:left-button-down", std::bind(&CpuDisplay::on_left_button_down, this));
+	panel->event_xp(id, "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
+	panel->event_x(id, "hui:left-button-down", std::bind(&CpuDisplay::on_left_button_down, this));
 
 	perf_mon->subscribe(this, std::bind(&CpuDisplay::update, this));
 }
@@ -116,9 +116,9 @@ void CpuDisplay::on_left_button_down()
 
 	}else{
 		dlg = new hui::Dialog("cpu", 250, 180, panel->win, true);
-		dlg->setBorderWidth(0);
-		dlg->addDrawingArea("", 0, 0, "area");
-		dlg->eventXP("area", "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
+		dlg->set_border_width(0);
+		dlg->add_drawing_area("", 0, 0, "area");
+		dlg->event_xp("area", "hui:draw", std::bind(&CpuDisplay::on_draw, this, std::placeholders::_1));
 		dlg->event("hui:close", std::bind(&CpuDisplay::on_dialog_close, this));
 		dlg->show();
 	}

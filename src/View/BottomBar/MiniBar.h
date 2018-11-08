@@ -24,14 +24,14 @@ public:
 	MiniBar(BottomBar *bottom_bar, Session *session);
 	virtual ~MiniBar();
 
-	void onShowBottomBar();
-	void onVolume();
+	void on_show_bottom_bar();
+	void on_volume();
 
-	virtual void _cdecl onShow();
-	virtual void _cdecl onHide();
+	void _cdecl on_show() override;
+	void _cdecl on_hide() override;
 
-	void onBottomBarUpdate();
-	void onVolumeChange();
+	void on_bottom_bar_update();
+	void on_volume_change();
 
 	//OutputStream *stream;
 	Session *session;

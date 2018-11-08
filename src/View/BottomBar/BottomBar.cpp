@@ -17,34 +17,34 @@
 
 BottomBar::BottomBar(Session *session)
 {
-	addRevealer("!slide=up", 0, 0, "revealer");
-	setTarget("revealer");
-	addGrid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
-	setTarget("root_grid0");
-	addSeparator("!horizontal,expandx", 0, 0, "");
-	addGrid("!expandx", 0, 1, "root_grid");
-	setTarget("root_grid");
-	addGrid("!noexpandx", 0, 0, "button_grid");
-	addSeparator("!vertical", 1, 0, "");
-	addGrid("", 2, 0, "console_grid");
-	setTarget("button_grid");
-	addButton("!noexpandy,flat", 0, 0, "close");
-	setImage("close", "hui:close");
-	addTabControl("!left,expandx,expandy", 0, 1, "choose");
+	add_revealer("!slide=up", 0, 0, "revealer");
+	set_target("revealer");
+	add_grid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
+	set_target("root_grid0");
+	add_separator("!horizontal,expandx", 0, 0, "");
+	add_grid("!expandx", 0, 1, "root_grid");
+	set_target("root_grid");
+	add_grid("!noexpandx", 0, 0, "button_grid");
+	add_separator("!vertical", 1, 0, "");
+	add_grid("", 2, 0, "console_grid");
+	set_target("button_grid");
+	add_button("!noexpandy,flat", 0, 0, "close");
+	set_image("close", "hui:close");
+	add_tab_control("!left,expandx,expandy", 0, 1, "choose");
 
 	mixing_console = new MixingConsole(session);
 	signal_editor = new SignalEditor(session);
 	device_console = new DeviceConsole(session);
 	plugin_console = new PluginConsole(session);
 	log_console = new LogConsole(session);
-	addConsole(mixing_console, "");
-	addConsole(signal_editor, "");
-	addConsole(device_console, "");
-	addConsole(plugin_console, "");
-	addConsole(log_console, "");
+	add_console(mixing_console, "");
+	add_console(signal_editor, "");
+	add_console(device_console, "");
+	add_console(plugin_console, "");
+	add_console(log_console, "");
 
-	event("choose", std::bind(&BottomBar::onChoose, this));
-	event("close", std::bind(&BottomBar::onClose, this));
+	event("choose", std::bind(&BottomBar::on_choose, this));
+	event("close", std::bind(&BottomBar::on_close, this));
 
 	reveal("revealer", false);
 	visible = false;
@@ -62,7 +62,7 @@ BottomBar::~BottomBar()
 {
 }
 
-void BottomBar::onClose()
+void BottomBar::on_close()
 {
 	_hide();
 }
@@ -81,11 +81,11 @@ void BottomBar::_hide()
 	notify();
 }
 
-void BottomBar::addConsole(BottomBar::Console *c, const string &list_name)
+void BottomBar::add_console(BottomBar::Console *c, const string &list_name)
 {
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
-	addString("choose", list_name + c->title);
+	add_string("choose", list_name + c->title);
 	c->hide();
 }
 
@@ -97,9 +97,9 @@ int BottomBar::index(BottomBar::Console *console)
 	return -1;
 }
 
-void BottomBar::onChoose()
+void BottomBar::on_choose()
 {
-	int n = getInt("");
+	int n = get_int("");
 	if (n >= 0)
 		open(consoles[n]);
 }
@@ -112,7 +112,7 @@ void BottomBar::choose(BottomBar::Console *console)
 	active_console = console;
 
 	active_console->show();
-	setInt("choose", index(active_console));
+	set_int("choose", index(active_console));
 
 	notify();
 }
@@ -131,7 +131,7 @@ void BottomBar::open(int console_index)
 	open(consoles[console_index]);
 }
 
-bool BottomBar::isActive(int console_index)
+bool BottomBar::is_active(int console_index)
 {
 	return (active_console == consoles[console_index]) and visible;
 }

@@ -35,8 +35,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 {
 	beat_partition = 4;
 	note_length = 1;
-	win->setInt("beat_partition", beat_partition);
-	win->setInt("note_length", note_length);
+	win->set_int("beat_partition", beat_partition);
+	win->set_int("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
 	creation_mode = CreationMode::NOTE;
 	input_mode = InputMode::DEFAULT;
@@ -138,7 +138,7 @@ void ViewModeMidi::on_left_button_down()
 	}
 
 	if (hover->type == Selection::Type::MIDI_NOTE){
-		view->sel.click(hover->note, win->getKey(hui::KEY_CONTROL));
+		view->sel.click(hover->note, win->get_key(hui::KEY_CONTROL));
 
 		dnd_start_soon(view->sel);
 	}else if (hover->type == Selection::Type::CLEF_POSITION){

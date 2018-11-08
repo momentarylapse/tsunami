@@ -18,14 +18,14 @@ class ControlTabControl : public Control
 public:
 	ControlTabControl(const string &text, const string &id, Panel *panel);
 	~ControlTabControl() override;
-	string getString() override;
-	void __setString(const string &str) override;
-	void __setInt(int i) override;
-	int getInt() override;
-	void __addString(const string &str) override;
-	void __removeString(int row) override;
-	void __changeString(int row, const string &str) override;
-	void __setOption(const string &op, const string &value);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __set_int(int i) override;
+	int get_int() override;
+	void __add_string(const string &str) override;
+	void __remove_string(int row) override;
+	void __change_string(int row, const string &str) override;
+	void __set_option(const string &op, const string &value);
 
 	void add(Control *child, int x, int y) override;
 	void addPage(const string &str);

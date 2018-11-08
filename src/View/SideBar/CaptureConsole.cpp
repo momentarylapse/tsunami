@@ -31,8 +31,8 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	// dialog
-	setBorderWidth(5);
-	embedDialog("record_dialog", 0, 0);
+	set_border_width(5);
+	embed_dialog("record_dialog", 0, 0);
 
 
 	// dialog
@@ -62,8 +62,8 @@ CaptureConsole::~CaptureConsole()
 
 void CaptureConsole::on_enter()
 {
-	hideControl("single_grid", true);
-	hideControl("multi_grid", true);
+	hide_control("single_grid", true);
+	hide_control("multi_grid", true);
 
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
@@ -187,7 +187,7 @@ void CaptureConsole::on_new_version()
 
 void CaptureConsole::update_time()
 {
-	setString("time", song->get_time_str_long(mode->get_sample_count()));
+	set_string("time", song->get_time_str_long(mode->get_sample_count()));
 }
 
 void CaptureConsole::on_output_end_of_stream()

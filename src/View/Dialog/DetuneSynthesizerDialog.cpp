@@ -17,7 +17,7 @@ const int RELATIVE_NUM_PITCHES = 6;
 DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, hui::Window *parent) :
 	hui::Dialog("", 500, 550, parent, false)
 {
-	fromResource("detune_synthesizer_dialog");
+	from_resource("detune_synthesizer_dialog");
 
 	track = t;
 	synth = s;
@@ -31,16 +31,16 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 	check("all_octaves", true);
 	check("relative", mode_relative);
 
-	event("close", std::bind(&DetuneSynthesizerDialog::onClose, this));
-	event("hui:close", std::bind(&DetuneSynthesizerDialog::onClose, this));
-	event("relative", std::bind(&DetuneSynthesizerDialog::onRelative, this));
+	event("close", std::bind(&DetuneSynthesizerDialog::on_close, this));
+	event("hui:close", std::bind(&DetuneSynthesizerDialog::on_close, this));
+	event("relative", std::bind(&DetuneSynthesizerDialog::on_relative, this));
 }
 
 DetuneSynthesizerDialog::~DetuneSynthesizerDialog()
 {
 }
 
-void DetuneSynthesizerDialog::onDraw(Painter *p)
+void DetuneSynthesizerDialog::on_draw(Painter *p)
 {
 	p->set_line_width(0.8f);
 	p->set_font_size(12);
@@ -53,7 +53,7 @@ void DetuneSynthesizerDialog::onDraw(Painter *p)
 	p->draw_rect(0, 0, w, h);
 
 	if (hover >= 0){
-		if (isChecked("all_octaves")){
+		if (is_checked("all_octaves")){
 			color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
@@ -133,15 +133,15 @@ float DetuneSynthesizerDialog::relpitch2y(float p, float p0)
 	return height/2 - height/RELATIVE_NUM_PITCHES/2 * (p - p0);
 }
 
-void DetuneSynthesizerDialog::onLeftButtonDown()
+void DetuneSynthesizerDialog::on_left_button_down()
 {
 }
 
-void DetuneSynthesizerDialog::onLeftButtonUp()
+void DetuneSynthesizerDialog::on_left_button_up()
 {
 }
 
-void DetuneSynthesizerDialog::onMouseMove()
+void DetuneSynthesizerDialog::on_mouse_move()
 {
 	hover = -1;
 	auto e = hui::GetEvent();
@@ -151,24 +151,24 @@ void DetuneSynthesizerDialog::onMouseMove()
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::onMouseWheel()
+void DetuneSynthesizerDialog::on_mouse_wheel()
 {
 	if (hover >= 0){
 		auto e = hui::GetEvent();
 		float speed = mode_relative ? 0.01f : 0.1f;
 		if (e->scroll_y != 0)
-			track->detune_synthesizer(hover, speed * e->scroll_y, isChecked("all_octaves"));
+			track->detune_synthesizer(hover, speed * e->scroll_y, is_checked("all_octaves"));
 		redraw("detune_area");
 	}
 }
 
-void DetuneSynthesizerDialog::onRelative()
+void DetuneSynthesizerDialog::on_relative()
 {
-	mode_relative = isChecked("relative");
+	mode_relative = is_checked("relative");
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::onClose()
+void DetuneSynthesizerDialog::on_close()
 {
 	destroy();
 }

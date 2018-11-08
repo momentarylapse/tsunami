@@ -19,36 +19,36 @@ public:
 	MidiEditorConsole(Session *session);
 	virtual ~MidiEditorConsole();
 
-	virtual void on_enter();
-	virtual void on_leave();
+	void on_enter() override;
+	void on_leave() override;
 
-	void onLayerDelete();
-	void onViewCurLayerChange();
-	void onViewVTrackChange();
+	void on_layer_delete();
+	void on_view_cur_layer_change();
+	void on_view_vtrack_change();
 	void on_settings_change();
 	void update();
 
-	void onScale();
-	void onBeatPartition();
-	void onNoteLength();
-	void onCreationMode();
-	void onInterval();
-	void onChordType();
-	void onChordInversion();
-	void onReferenceTracks();
-	void onModifierNone();
-	void onModifierSharp();
-	void onModifierFlat();
-	void onModifierNatural();
+	void on_scale();
+	void on_beat_partition();
+	void on_note_length();
+	void on_creation_mode();
+	void on_interval();
+	void on_chord_type();
+	void on_chord_inversion();
+	void on_reference_tracks();
+	void on_modifier_none();
+	void on_modifier_sharp();
+	void on_modifier_flat();
+	void on_modifier_natural();
 
-	void onQuantize();
+	void on_quantize();
 
-	void onEditTrack();
-	void onEditMidiFx();
-	void onEditSong();
+	void on_edit_track();
+	void on_edit_midi_fx();
+	void on_edit_song();
 
 	void clear();
-	void setLayer(TrackLayer *t);
+	void set_layer(TrackLayer *t);
 
 
 	string id_inner;

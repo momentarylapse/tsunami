@@ -17,30 +17,30 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 	song = _song;
 	ok = false;
 
-	addGrid("", 0, 0, "root");
-	setTarget("root");
-	addGrid("", 0, 0, "stuff");
-	addGrid("", 0, 1, "tracks");
-	addGrid("!button-bar", 0, 2, "buttons");
-	setTarget("buttons");
-	addButton(_("Cancel"), 0, 0, "cancel");
-	addButton(_("Ok"), 1, 0, "ok");
-	setTarget("stuff");
-	addLabel("scale", 0, 0, "");
-	addSpinButton("!expandx", 1, 0, "scale");
-	addLabel("%", 2, 0, "");
-	setTarget("tracks");
+	add_grid("", 0, 0, "root");
+	set_target("root");
+	add_grid("", 0, 0, "stuff");
+	add_grid("", 0, 1, "tracks");
+	add_grid("!button-bar", 0, 2, "buttons");
+	set_target("buttons");
+	add_button(_("Cancel"), 0, 0, "cancel");
+	add_button(_("Ok"), 1, 0, "ok");
+	set_target("stuff");
+	add_label("scale", 0, 0, "");
+	add_spin_button("!expandx", 1, 0, "scale");
+	add_label("%", 2, 0, "");
+	set_target("tracks");
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		addLabel(t->nice_name(), 0, i, "");
-		addCheckBox("Classical", 1, i, format("classical-%d"));
-		addCheckBox("TAB", 2, i, format("tab-%d"));
+		add_label(t->nice_name(), 0, i, "");
+		add_check_box("Classical", 1, i, format("classical-%d"));
+		add_check_box("TAB", 2, i, format("tab-%d"));
 		check(format("classical-%d"), true);
 		check(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
 		enable(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
 	}
-	setFloat("scale", 100.0f);
+	set_float("scale", 100.0f);
 
 	event("hui:close", [&]{ on_close(); });
 	event("cancel", [&]{ on_close(); });
@@ -63,11 +63,11 @@ void PdfConfigDialog::on_ok()
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		bool classical = isChecked(format("classical-%d"));
-		bool tab = isChecked(format("tab-%d"));
+		bool classical = is_checked(format("classical-%d"));
+		bool tab = is_checked(format("tab-%d"));
 		data->track_mode[i] = (classical ? 1 : 0) + (tab ? 2 : 0);
 	}
-	data->horizontal_scale = getFloat("scale") / 100;
+	data->horizontal_scale = get_float("scale") / 100;
 
 	destroy();
 }

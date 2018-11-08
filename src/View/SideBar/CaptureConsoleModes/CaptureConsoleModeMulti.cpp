@@ -32,7 +32,7 @@ CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
 
 void CaptureConsoleModeMulti::enter()
 {
-	cc->hideControl("multi_grid", false);
+	cc->hide_control("multi_grid", false);
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
@@ -53,24 +53,24 @@ void CaptureConsoleModeMulti::enter()
 		c.id_type = "type-" + i2s(i);
 		c.id_source = "source-" + i2s(i);
 		c.id_peaks = "peaks-" + i2s(i);
-		cc->setTarget("multi_grid");
-		cc->addLabel(t->nice_name(), 0, i*2+1, c.id_target);
-		cc->addLabel(signal_type_name(t->type), 1, i*2+1, c.id_type);
+		cc->set_target("multi_grid");
+		cc->add_label(t->nice_name(), 0, i*2+1, c.id_target);
+		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO){
 			c.input_audio = new InputStreamAudio(session);
 			c.input_audio->set_backup_mode(BACKUP_MODE_TEMP);
-			cc->addComboBox(_("        - none -"), 2, i*2+1, c.id_source);
+			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
-				cc->addString(c.id_source, d->get_name());
+				cc->add_string(c.id_source, d->get_name());
 		}else if (t->type == SignalType::MIDI){
 			c.input_midi = new InputStreamMidi(session);
-			cc->addComboBox(_("        - none -"), 2, i*2+1, c.id_source);
+			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_midi)
-				cc->addString(c.id_source, d->get_name());
+				cc->add_string(c.id_source, d->get_name());
 		/*}else{
 			cc->addLabel(_("        - none -"), 2, i*2+1, c.id_source);*/
 		}
-		cc->addDrawingArea("!height=30,noexpandy", 2, i*2+2, c.id_peaks);
+		cc->add_drawing_area("!height=30,noexpandy", 2, i*2+2, c.id_peaks);
 		c.peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, c.peak_meter);
 
@@ -134,7 +134,7 @@ void CaptureConsoleModeMulti::on_source()
 	int index = hui::GetEvent()->id.substr(7, -1)._int();
 	if (index < 0 or index >= items.num)
 		return;
-	int n = cc->getInt("");
+	int n = cc->get_int("");
 	auto &c = items[index];
 	if (c.track->type == SignalType::AUDIO){
 		if (n > 0){
@@ -171,10 +171,10 @@ void CaptureConsoleModeMulti::leave()
 
 		delete c.peak_meter_display;
 		delete c.peak_meter;
-		cc->removeControl(c.id_target);
-		cc->removeControl(c.id_type);
-		cc->removeControl(c.id_source);
-		cc->removeControl(c.id_peaks);
+		cc->remove_control(c.id_target);
+		cc->remove_control(c.id_type);
+		cc->remove_control(c.id_source);
+		cc->remove_control(c.id_peaks);
 	}
 	items.clear();
 }

@@ -17,23 +17,23 @@ class ControlTreeView : public Control
 {
 public:
 	ControlTreeView(const string &title, const string &id, Panel *panel);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __addString(const string &str);
-	virtual void __setInt(int i);
-	virtual int getInt();
-	virtual void __addChildString(int parent_row, const string &str);
-	virtual void __changeString(int row, const string &str);
-	virtual void __removeString(int row);
-	virtual string getCell(int row, int column);
-	virtual void __setCell(int row, int column, const string &str);
-	virtual Array<int> getSelection();
-	virtual void __setSelection(Array<int> &sel);
-	virtual void __reset();
-	virtual void expand(int row, bool expand);
-	virtual void expandAll(bool expand);
-	virtual bool isExpanded(int row);
-	virtual void __setOption(const string &op, const string &value);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __add_string(const string &str) override;
+	void __set_int(int i) override;
+	int get_int() override;
+	void __add_child_string(int parent_row, const string &str) override;
+	void __change_string(int row, const string &str) override;
+	void __remove_string(int row) override;
+	string get_cell(int row, int column) override;
+	void __set_cell(int row, int column, const string &str) override;
+	Array<int> get_selection() override;
+	void __set_selection(const Array<int> &sel) override;
+	void __reset() override;
+	void expand(int row, bool expand) override;
+	void expand_all(bool expand) override;
+	bool is_expanded(int row) override;
+	void __set_option(const string &op, const string &value) override;
 
 #ifdef HUI_API_GTK
 	Array<GtkTreeIter> _item_;

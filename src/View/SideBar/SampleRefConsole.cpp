@@ -19,19 +19,19 @@
 SampleRefConsole::SampleRefConsole(Session *session):
 	SideBarConsole(_("Sample properties"), session)
 {
-	fromResource("sample_ref_dialog");
+	from_resource("sample_ref_dialog");
 	layer = nullptr;
 	sample = nullptr;
 
-	event("volume", std::bind(&SampleRefConsole::onVolume, this));
-	event("mute", std::bind(&SampleRefConsole::onMute, this));
-	event("track", std::bind(&SampleRefConsole::onTrack, this));
+	event("volume", std::bind(&SampleRefConsole::on_volume, this));
+	event("mute", std::bind(&SampleRefConsole::on_mute, this));
+	event("track", std::bind(&SampleRefConsole::on_track, this));
 
-	event("edit_song", std::bind(&SampleRefConsole::onEditSong, this));
-	event("edit_track", std::bind(&SampleRefConsole::onEditTrack, this));
-	event("edit_sample", std::bind(&SampleRefConsole::onEditSample, this));
+	event("edit_song", std::bind(&SampleRefConsole::on_edit_song, this));
+	event("edit_track", std::bind(&SampleRefConsole::on_edit_track, this));
+	event("edit_sample", std::bind(&SampleRefConsole::on_edit_sample, this));
 
-	view->subscribe(this, std::bind(&SampleRefConsole::onViewCurSampleChange, this), view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->subscribe(this, std::bind(&SampleRefConsole::on_view_cur_sample_change, this), view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SampleRefConsole::~SampleRefConsole()
@@ -42,53 +42,53 @@ SampleRefConsole::~SampleRefConsole()
 }
 
 
-void SampleRefConsole::onName()
+void SampleRefConsole::on_name()
 {
 	//sample->origin->name = GetString("");
 }
 
-void SampleRefConsole::onMute()
+void SampleRefConsole::on_mute()
 {
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	layer->edit_sample_ref(sample, sample->volume, isChecked(""));
+	layer->edit_sample_ref(sample, sample->volume, is_checked(""));
 
 	enable("volume", !sample->muted);
-	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
+	sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
 }
 
-void SampleRefConsole::onTrack()
+void SampleRefConsole::on_track()
 {
 	//int n = getInt("");
 }
 
-void SampleRefConsole::onVolume()
+void SampleRefConsole::on_volume()
 {
 	if (!sample)
 		return;
 	sample->unsubscribe(this);
-	layer->edit_sample_ref(sample, db2amplitude(getFloat("")), sample->muted);
-	sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
+	layer->edit_sample_ref(sample, db2amplitude(get_float("")), sample->muted);
+	sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
 }
 
-void SampleRefConsole::onEditSong()
+void SampleRefConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleRefConsole::onEditTrack()
+void SampleRefConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
-void SampleRefConsole::onEditSample()
+void SampleRefConsole::on_edit_sample()
 {
 	bar()->sample_manager->set_selection(sample->origin);
 	bar()->open(SideBar::SAMPLE_CONSOLE);
 }
 
-void SampleRefConsole::loadData()
+void SampleRefConsole::load_data()
 {
 	enable("name", false);
 	enable("mute", sample);
@@ -96,37 +96,37 @@ void SampleRefConsole::loadData()
 	enable("repnum", sample);
 	enable("repdelay", sample);
 
-	setString("name", _("no sample selected"));
+	set_string("name", _("no sample selected"));
 
 	if (!sample)
 		return;
-	setString("name", sample->origin->name);
-	setDecimals(1);
+	set_string("name", sample->origin->name);
+	set_decimals(1);
 	check("mute", sample->muted);
-	setFloat("volume", amplitude2db(sample->volume));
+	set_float("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
 	reset("track");
 	for (Track *t: song->tracks)
-		addString("track", t->nice_name());
+		add_string("track", t->nice_name());
 	//setInt("track", sample->track_no);
 }
 
-void SampleRefConsole::onViewCurSampleChange()
+void SampleRefConsole::on_view_cur_sample_change()
 {
 	if (sample)
 		sample->unsubscribe(this);
 	layer = view->cur_layer();
 	sample = view->cur_sample;
 	if (sample)
-		sample->subscribe(this, std::bind(&SampleRefConsole::onUpdate, this));
-	loadData();
+		sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
+	load_data();
 }
 
-void SampleRefConsole::onUpdate()
+void SampleRefConsole::on_update()
 {
 	if (sample->cur_message() == sample->MESSAGE_DELETE){
 		sample->unsubscribe(this);
 		sample = nullptr;
 	}
-	loadData();
+	load_data();
 }

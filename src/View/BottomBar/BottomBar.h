@@ -54,8 +54,8 @@ public:
 		bool notify;
 	};
 
-	void onClose();
-	void onChoose();
+	void on_close();
+	void on_choose();
 
 	void _show();
 	void _hide();
@@ -63,7 +63,7 @@ public:
 	void choose(Console *console);
 	void open(Console *console);
 	void open(int console_index);
-	bool isActive(int console_index);
+	bool is_active(int console_index);
 	Console *active_console;
 	bool visible;
 
@@ -76,7 +76,7 @@ public:
 	int index(Console *console);
 
 	Array<Console*> consoles;
-	void addConsole(Console *c, const string &list_name);
+	void add_console(Console *c, const string &list_name);
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_ */

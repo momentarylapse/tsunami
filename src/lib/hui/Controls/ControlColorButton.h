@@ -19,9 +19,9 @@ class ControlColorButton : public Control
 public:
 	ControlColorButton(const string &text, const string &id);
 
-	virtual void __setOption(const string &op, const string &value);
-	virtual void __setColor(const color &c);
-	virtual color getColor();
+	void __set_option(const string &op, const string &value) override;
+	void __set_color(const color &c) override;
+	color get_color() override;
 };
 
 };

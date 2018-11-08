@@ -29,7 +29,7 @@ ControlRevealer::ControlRevealer(const string &title, const string &id) :
 		gtk_widget_set_vexpand(widget, false);
 #endif
 
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
 
@@ -50,7 +50,7 @@ void ControlRevealer::reveal(bool reveal)
 #endif
 }
 
-bool ControlRevealer::isRevealed()
+bool ControlRevealer::is_revealed()
 {
 #if GTK_CHECK_VERSION(3,10,0)
 	return gtk_revealer_get_reveal_child(GTK_REVEALER(widget));
@@ -60,7 +60,7 @@ bool ControlRevealer::isRevealed()
 }
 
 
-void ControlRevealer::__setOption(const string& op, const string& value)
+void ControlRevealer::__set_option(const string& op, const string& value)
 {
 #if GTK_CHECK_VERSION(3,10,0)
 	if (op == "slide"){

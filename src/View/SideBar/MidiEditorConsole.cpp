@@ -32,52 +32,52 @@ int get_track_index_save(Song *song, Track *t);
 MidiEditorConsole::MidiEditorConsole(Session *session) :
 	SideBarConsole(_("Midi"), session)
 {
-	fromResource("midi_editor");
+	from_resource("midi_editor");
 
 	id_inner = "midi_fx_inner_table";
 
-	setInt("interval", view->mode_midi->midi_interval);
+	set_int("interval", view->mode_midi->midi_interval);
 
 	for (int i=0; i<(int)ChordType::NUM; i++)
-		addString("chord_type", chord_type_name((ChordType)i));
-	setInt("chord_type", 0);
-	addString("chord_inversion", _("Basic form"));
-	addString("chord_inversion", _("1st inversion"));
-	addString("chord_inversion", _("2nd inversion"));
-	setInt("chord_inversion", 0);
+		add_string("chord_type", chord_type_name((ChordType)i));
+	set_int("chord_type", 0);
+	add_string("chord_inversion", _("Basic form"));
+	add_string("chord_inversion", _("1st inversion"));
+	add_string("chord_inversion", _("2nd inversion"));
+	set_int("chord_inversion", 0);
 
 	for (int i=0; i<12; i++)
-		addString("scale_root", rel_pitch_name(11 - i));
+		add_string("scale_root", rel_pitch_name(11 - i));
 	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
-		addString("scale_type", Scale::get_type_name((Scale::Type)i));
-	setInt("scale_root", 11 - view->midi_scale.root);
-	setInt("scale_type", (int)view->midi_scale.type);
+		add_string("scale_type", Scale::get_type_name((Scale::Type)i));
+	set_int("scale_root", 11 - view->midi_scale.root);
+	set_int("scale_type", (int)view->midi_scale.type);
 
 
 	layer = nullptr;
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("beat_partition", std::bind(&MidiEditorConsole::onBeatPartition, this));
-	event("note_length", std::bind(&MidiEditorConsole::onNoteLength, this));
-	event("scale_root", std::bind(&MidiEditorConsole::onScale, this));
-	event("scale_type", std::bind(&MidiEditorConsole::onScale, this));
-	event("midi_edit_mode", std::bind(&MidiEditorConsole::onCreationMode, this));
-	event("interval", std::bind(&MidiEditorConsole::onInterval, this));
-	event("chord_type", std::bind(&MidiEditorConsole::onChordType, this));
-	event("chord_inversion", std::bind(&MidiEditorConsole::onChordInversion, this));
-	eventX("reference_tracks", "hui:select", std::bind(&MidiEditorConsole::onReferenceTracks, this));
-	event("modifier:none", std::bind(&MidiEditorConsole::onModifierNone, this));
-	event("modifier:sharp", std::bind(&MidiEditorConsole::onModifierSharp, this));
-	event("modifier:flat", std::bind(&MidiEditorConsole::onModifierFlat, this));
-	event("modifier:natural", std::bind(&MidiEditorConsole::onModifierNatural, this));
-	event("quantize", std::bind(&MidiEditorConsole::onQuantize, this));
-	event("edit_track", std::bind(&MidiEditorConsole::onEditTrack, this));
-	event("edit_midi_fx", std::bind(&MidiEditorConsole::onEditMidiFx, this));
-	event("edit_song", std::bind(&MidiEditorConsole::onEditSong, this));
+	event("beat_partition", std::bind(&MidiEditorConsole::on_beat_partition, this));
+	event("note_length", std::bind(&MidiEditorConsole::on_note_length, this));
+	event("scale_root", std::bind(&MidiEditorConsole::on_scale, this));
+	event("scale_type", std::bind(&MidiEditorConsole::on_scale, this));
+	event("midi_edit_mode", std::bind(&MidiEditorConsole::on_creation_mode, this));
+	event("interval", std::bind(&MidiEditorConsole::on_interval, this));
+	event("chord_type", std::bind(&MidiEditorConsole::on_chord_type, this));
+	event("chord_inversion", std::bind(&MidiEditorConsole::on_chord_inversion, this));
+	event_x("reference_tracks", "hui:select", std::bind(&MidiEditorConsole::on_reference_tracks, this));
+	event("modifier:none", std::bind(&MidiEditorConsole::on_modifier_none, this));
+	event("modifier:sharp", std::bind(&MidiEditorConsole::on_modifier_sharp, this));
+	event("modifier:flat", std::bind(&MidiEditorConsole::on_modifier_flat, this));
+	event("modifier:natural", std::bind(&MidiEditorConsole::on_modifier_natural, this));
+	event("quantize", std::bind(&MidiEditorConsole::on_quantize, this));
+	event("edit_track", std::bind(&MidiEditorConsole::on_edit_track, this));
+	event("edit_midi_fx", std::bind(&MidiEditorConsole::on_edit_midi_fx, this));
+	event("edit_song", std::bind(&MidiEditorConsole::on_edit_song, this));
 
-	view->subscribe(this, std::bind(&MidiEditorConsole::onViewCurLayerChange, this), view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, std::bind(&MidiEditorConsole::onViewVTrackChange, this), view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::on_view_cur_layer_change, this), view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, std::bind(&MidiEditorConsole::on_view_vtrack_change, this), view->MESSAGE_VTRACK_CHANGE);
 	view->mode_midi->subscribe(this, std::bind(&MidiEditorConsole::on_settings_change, this));
 	update();
 }
@@ -95,9 +95,9 @@ void MidiEditorConsole::update()
 	if (layer)
 		//if (get_track_index_save(view->song, view->cur_track) >= 0)
 			allow = (layer->type == SignalType::MIDI);
-	hideControl("me_grid_yes", !allow);
-	hideControl("me_grid_no", allow);
-	hideControl(id_inner, !allow);
+	hide_control("me_grid_yes", !allow);
+	hide_control("me_grid_no", allow);
+	hide_control(id_inner, !allow);
 
 	if (!layer)
 		return;
@@ -114,10 +114,10 @@ void MidiEditorConsole::update()
 	enable("modifier:flat", mode == MidiMode::CLASSICAL);
 	enable("modifier:natural", mode == MidiMode::CLASSICAL);
 
-	setInt("midi_edit_mode", (int)view->mode_midi->creation_mode);
+	set_int("midi_edit_mode", (int)view->mode_midi->creation_mode);
 
-	setInt("beat_partition", view->mode_midi->beat_partition);
-	setInt("note_length", view->mode_midi->note_length);
+	set_int("beat_partition", view->mode_midi->beat_partition);
+	set_int("note_length", view->mode_midi->note_length);
 
 
 	if (layer->track->instrument.type == Instrument::Type::DRUMS){
@@ -127,17 +127,17 @@ void MidiEditorConsole::update()
 	}
 }
 
-void MidiEditorConsole::onLayerDelete()
+void MidiEditorConsole::on_layer_delete()
 {
-	setLayer(nullptr);
+	set_layer(nullptr);
 }
 
-void MidiEditorConsole::onViewCurLayerChange()
+void MidiEditorConsole::on_view_cur_layer_change()
 {
-	setLayer(view->cur_layer());
+	set_layer(view->cur_layer());
 }
 
-void MidiEditorConsole::onViewVTrackChange()
+void MidiEditorConsole::on_view_vtrack_change()
 {
 	/*update();
 
@@ -157,24 +157,24 @@ void MidiEditorConsole::on_settings_change()
 	update();
 }
 
-void MidiEditorConsole::onScale()
+void MidiEditorConsole::on_scale()
 {
-	view->set_scale(Scale((Scale::Type)getInt("scale_type"), 11 - getInt("scale_root")));
+	view->set_scale(Scale((Scale::Type)get_int("scale_type"), 11 - get_int("scale_root")));
 }
 
-void MidiEditorConsole::onBeatPartition()
+void MidiEditorConsole::on_beat_partition()
 {
-	view->mode_midi->set_beat_partition(getInt(""));
+	view->mode_midi->set_beat_partition(get_int(""));
 }
 
-void MidiEditorConsole::onNoteLength()
+void MidiEditorConsole::on_note_length()
 {
-	view->mode_midi->set_note_length(getInt(""));
+	view->mode_midi->set_note_length(get_int(""));
 }
 
-void MidiEditorConsole::onCreationMode()
+void MidiEditorConsole::on_creation_mode()
 {
-	int n = getInt("midi_edit_mode");
+	int n = get_int("midi_edit_mode");
 	if (n == 0){
 		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::SELECT);
 	}else if (n == 1){
@@ -186,59 +186,59 @@ void MidiEditorConsole::onCreationMode()
 	}
 }
 
-void MidiEditorConsole::onInterval()
+void MidiEditorConsole::on_interval()
 {
-	view->mode_midi->midi_interval = getInt("");
+	view->mode_midi->midi_interval = get_int("");
 }
 
-void MidiEditorConsole::onChordType()
+void MidiEditorConsole::on_chord_type()
 {
-	view->mode_midi->chord_type = (ChordType)getInt("");
+	view->mode_midi->chord_type = (ChordType)get_int("");
 }
 
-void MidiEditorConsole::onChordInversion()
+void MidiEditorConsole::on_chord_inversion()
 {
-	view->mode_midi->chord_inversion = getInt("");
+	view->mode_midi->chord_inversion = get_int("");
 }
 
-void MidiEditorConsole::onReferenceTracks()
+void MidiEditorConsole::on_reference_tracks()
 {
 	/*int tn = track->get_index();
 	view->vtrack[tn]->reference_tracks = getSelection("");
 	view->forceRedraw();*/
 }
 
-void MidiEditorConsole::onEditTrack()
+void MidiEditorConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
-void MidiEditorConsole::onEditMidiFx()
+void MidiEditorConsole::on_edit_midi_fx()
 {
 	bar()->open(SideBar::MIDI_FX_CONCOLE);
 }
 
-void MidiEditorConsole::onEditSong()
+void MidiEditorConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void MidiEditorConsole::onModifierNone()
+void MidiEditorConsole::on_modifier_none()
 {
 	view->mode_midi->modifier = NoteModifier::NONE;
 }
 
-void MidiEditorConsole::onModifierSharp()
+void MidiEditorConsole::on_modifier_sharp()
 {
 	view->mode_midi->modifier = NoteModifier::SHARP;
 }
 
-void MidiEditorConsole::onModifierFlat()
+void MidiEditorConsole::on_modifier_flat()
 {
 	view->mode_midi->modifier = NoteModifier::FLAT;
 }
 
-void MidiEditorConsole::onModifierNatural()
+void MidiEditorConsole::on_modifier_natural()
 {
 	view->mode_midi->modifier = NoteModifier::NATURAL;
 }
@@ -248,7 +248,7 @@ void MidiEditorConsole::clear()
 	if (layer)
 		layer->unsubscribe(this);
 	layer = nullptr;
-	setSelection("reference_tracks", {});
+	set_selection("reference_tracks", {});
 }
 
 void MidiEditorConsole::on_enter()
@@ -261,13 +261,13 @@ void MidiEditorConsole::on_leave()
 	view->set_mode(view->mode_default);
 }
 
-void MidiEditorConsole::setLayer(TrackLayer *l)
+void MidiEditorConsole::set_layer(TrackLayer *l)
 {
 	clear();
 
 	layer = l;
 	if (layer){
-		layer->subscribe(this, std::bind(&MidiEditorConsole::onLayerDelete, this), layer->MESSAGE_DELETE);
+		layer->subscribe(this, std::bind(&MidiEditorConsole::on_layer_delete, this), layer->MESSAGE_DELETE);
 
 		/*auto v = view->get_layer(layer);
 		if (v)
@@ -292,7 +292,7 @@ int align_to_beats(int pos, Array<Beat> &beats)
 	return best;
 }
 
-void MidiEditorConsole::onQuantize()
+void MidiEditorConsole::on_quantize()
 {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->beat_partition);
 

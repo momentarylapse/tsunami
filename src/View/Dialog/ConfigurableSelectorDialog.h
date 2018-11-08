@@ -19,11 +19,11 @@ public:
 	ConfigurableSelectorDialog(hui::Window *_parent, ModuleType type, Session *session, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
-	void onListSelect();
-	void onSelect();
-	void onClose();
-	void onCancel();
-	void onOk();
+	void on_list_select();
+	void on_select();
+	void on_close();
+	void on_cancel();
+	void on_ok();
 
 	ModuleType type;
 	Session *session;

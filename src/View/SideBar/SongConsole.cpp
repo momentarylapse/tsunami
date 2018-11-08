@@ -24,34 +24,34 @@ SongConsole::SongConsole(Session *session) :
 	SideBarConsole(_("File properties"), session)
 {
 	// dialog
-	setBorderWidth(5);
-	embedDialog("song_dialog", 0, 0);
-	setDecimals(1);
+	set_border_width(5);
+	embed_dialog("song_dialog", 0, 0);
+	set_decimals(1);
 
 	expand("ad_t_tags", 0, true);
 
-	addString("samplerate", "22050");
-	addString("samplerate", i2s(DEFAULT_SAMPLE_RATE));
-	addString("samplerate", "48000");
-	addString("samplerate", "96000");
+	add_string("samplerate", "22050");
+	add_string("samplerate", i2s(DEFAULT_SAMPLE_RATE));
+	add_string("samplerate", "48000");
+	add_string("samplerate", "96000");
 
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
-		addString("format", format_name(POSSIBLE_FORMATS[i]));
+		add_string("format", format_name(POSSIBLE_FORMATS[i]));
 
-	loadData();
+	load_data();
 
-	event("samplerate", std::bind(&SongConsole::onSamplerate, this));
-	event("format", std::bind(&SongConsole::onFormat, this));
-	event("compress", std::bind(&SongConsole::onCompression, this));
-	eventX("tags", "hui:select", std::bind(&SongConsole::onTagsSelect, this));
-	eventX("tags", "hui:change", std::bind(&SongConsole::onTagsEdit, this));
-	event("add_tag", std::bind(&SongConsole::onAddTag, this));
-	event("delete_tag", std::bind(&SongConsole::onDeleteTag, this));
+	event("samplerate", std::bind(&SongConsole::on_samplerate, this));
+	event("format", std::bind(&SongConsole::on_format, this));
+	event("compress", std::bind(&SongConsole::on_compression, this));
+	event_x("tags", "hui:select", std::bind(&SongConsole::on_tags_select, this));
+	event_x("tags", "hui:change", std::bind(&SongConsole::on_tags_edit, this));
+	event("add_tag", std::bind(&SongConsole::on_add_tag, this));
+	event("delete_tag", std::bind(&SongConsole::on_delete_tag, this));
 
-	event("edit_samples", std::bind(&SongConsole::onEditSamples, this));
-	event("edit_fx", std::bind(&SongConsole::onEditFx, this));
+	event("edit_samples", std::bind(&SongConsole::on_edit_samples, this));
+	event("edit_fx", std::bind(&SongConsole::on_edit_fx, this));
 
-	song->subscribe(this, std::bind(&SongConsole::onUpdate, this));
+	song->subscribe(this, std::bind(&SongConsole::on_update, this));
 }
 
 SongConsole::~SongConsole()
@@ -59,89 +59,89 @@ SongConsole::~SongConsole()
 	song->unsubscribe(this);
 }
 
-void SongConsole::loadData()
+void SongConsole::load_data()
 {
 	// tags
 	reset("tags");
 	for (Tag &t: song->tags)
-		addString("tags", t.key + "\\" + t.value);
+		add_string("tags", t.key + "\\" + t.value);
 	enable("delete_tag", false);
 
 	// data
 	reset("data_list");
 	int samples = song->range().length;
-	addString("data_list", _("Start") + "\\" + song->get_time_str_long(song->range().start()));
-	addString("data_list", _("End") + "\\" + song->get_time_str_long(song->range().end()));
-	addString("data_list", _("Length") + "\\" + song->get_time_str_long(samples));
-	addString("data_list", _("Samples") + "\\" + i2s(samples));
+	add_string("data_list", _("Start") + "\\" + song->get_time_str_long(song->range().start()));
+	add_string("data_list", _("End") + "\\" + song->get_time_str_long(song->range().end()));
+	add_string("data_list", _("Length") + "\\" + song->get_time_str_long(samples));
+	add_string("data_list", _("Samples") + "\\" + i2s(samples));
 	//addString("data_list", _("Samplerate") + "\\ + i2s(audio->sample_rate) + " Hz");
 
-	setString("samplerate", i2s(song->sample_rate));
+	set_string("samplerate", i2s(song->sample_rate));
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		if (song->default_format == POSSIBLE_FORMATS[i])
-			setInt("format", i);
+			set_int("format", i);
 	check("compress", song->compression > 0);
 }
 
-void SongConsole::onSamplerate()
+void SongConsole::on_samplerate()
 {
-	song->set_sample_rate(getString("")._int());
+	song->set_sample_rate(get_string("")._int());
 }
 
-void SongConsole::onFormat()
+void SongConsole::on_format()
 {
-	int i = getInt("");
+	int i = get_int("");
 	if (i >= 0)
 		song->set_default_format(POSSIBLE_FORMATS[i]);
 }
 
-void SongConsole::onCompression()
+void SongConsole::on_compression()
 {
-	song->set_compression(isChecked("") ? 1 : 0);
+	song->set_compression(is_checked("") ? 1 : 0);
 }
 
-void SongConsole::onTagsSelect()
+void SongConsole::on_tags_select()
 {
-	int s = getInt("tags");
+	int s = get_int("tags");
 	enable("delete_tag", s >= 0);
 }
 
-void SongConsole::onTagsEdit()
+void SongConsole::on_tags_edit()
 {
 	int r = hui::GetEvent()->row;
 	if (r < 0)
 		return;
 	Tag t = song->tags[r];
 	if (hui::GetEvent()->column == 0)
-		t.key = getCell("tags", r, 0);
+		t.key = get_cell("tags", r, 0);
 	else
-		t.value = getCell("tags", r, 1);
+		t.value = get_cell("tags", r, 1);
 	song->edit_tag(r, t.key, t.value);
 }
 
-void SongConsole::onAddTag()
+void SongConsole::on_add_tag()
 {
 	song->add_tag("key", "value");
 }
 
-void SongConsole::onDeleteTag()
+void SongConsole::on_delete_tag()
 {
-	int s = getInt("tags");
+	int s = get_int("tags");
 	if (s >= 0)
 		song->delete_tag(s);
 }
 
-void SongConsole::onEditSamples()
+void SongConsole::on_edit_samples()
 {
 	bar()->open(SideBar::SAMPLE_CONSOLE);
 }
 
-void SongConsole::onEditFx()
+void SongConsole::on_edit_fx()
 {
 	//bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
-void SongConsole::onUpdate()
+void SongConsole::on_update()
 {
-	loadData();
+	load_data();
 }

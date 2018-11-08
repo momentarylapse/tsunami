@@ -17,10 +17,10 @@ class ControlProgressBar : public Control
 {
 public:
 	ControlProgressBar(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual float getFloat();
-	virtual void __setFloat(float f);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	float get_float() override;
+	void __set_float(float f) override;
 };
 
 };

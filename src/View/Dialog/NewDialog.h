@@ -18,12 +18,12 @@ class NewDialog: public hui::Window
 public:
 	NewDialog(hui::Window *_parent);
 
-	void loadData();
-	void applyData();
+	void load_data();
+	void apply_data();
 
-	void onOk();
-	void onMetronome();
-	void onTypeMidi();
+	void on_ok();
+	void on_metronome();
+	void on_type_midi();
 };
 
 #endif /* NEWDIALOG_H_ */

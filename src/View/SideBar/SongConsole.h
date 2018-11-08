@@ -17,22 +17,22 @@ public:
 	SongConsole(Session *session);
 	virtual ~SongConsole();
 
-	void loadData();
-	void applyData();
+	void load_data();
+	void apply_data();
 
-	void onSamplerate();
-	void onFormat();
-	void onCompression();
-	void onTrackList();
-	void onTagsSelect();
-	void onTagsEdit();
-	void onAddTag();
-	void onDeleteTag();
+	void on_samplerate();
+	void on_format();
+	void on_compression();
+	void on_track_list();
+	void on_tags_select();
+	void on_tags_edit();
+	void on_add_tag();
+	void on_delete_tag();
 
-	void onEditSamples();
-	void onEditFx();
+	void on_edit_samples();
+	void on_edit_fx();
 
-	void onUpdate();
+	void on_update();
 };
 
 #endif /* SONGCONSOLE_H_ */

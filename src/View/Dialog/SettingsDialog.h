@@ -20,14 +20,14 @@ public:
 	void loadData();
 	void applyData();
 
-	void onLanguage();
-	void onColorScheme();
-	void onOggBitrate();
-	void onDefaultArtist();
-	void onScrollSpeed();
-	void onAudioApi();
-	void onMidiApi();
-	void onCpuMeter();
+	void on_language();
+	void on_color_scheme();
+	void on_ogg_bitrate();
+	void on_default_artist();
+	void on_scroll_speed();
+	void on_audio_api();
+	void on_midi_api();
+	void on_cpu_meter();
 
 
 private:

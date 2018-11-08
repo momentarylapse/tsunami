@@ -23,7 +23,7 @@ class TrackMixer: public hui::Panel
 public:
 	TrackMixer(AudioViewTrack *t)
 	{
-		fromResource("track-mixer");
+		from_resource("track-mixer");
 
 		track = nullptr;
 		vtrack = nullptr;
@@ -34,16 +34,16 @@ public:
 		vol_slider_id = "volume";
 		pan_slider_id = "panning";
 		mute_id = "mute";
-		addString(pan_slider_id, "-1\\L");
-		addString(pan_slider_id, "0\\");
-		addString(pan_slider_id, "1\\R");
-		addString(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
-		addString(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
-		addString(vol_slider_id, format("%f\\%d", db2slider(0), 0));
-		addString(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
-		addString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
-		addString(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
-		addString(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
+		add_string(pan_slider_id, "-1\\L");
+		add_string(pan_slider_id, "0\\");
+		add_string(pan_slider_id, "1\\R");
+		add_string(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
+		add_string(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
+		add_string(vol_slider_id, format("%f\\%d", db2slider(0), 0));
+		add_string(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
+		add_string(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
+		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
+		add_string(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
 		event(vol_slider_id, std::bind(&TrackMixer::on_volume, this));
 		event(pan_slider_id, std::bind(&TrackMixer::on_panning, this));
@@ -65,10 +65,10 @@ public:
 	{
 		editing = true;
 		if (track){
-			if (parent->isChecked("link-volumes"))
-				track->song->change_all_track_volumes(track, slider2vol(getFloat("")));
+			if (parent->is_checked("link-volumes"))
+				track->song->change_all_track_volumes(track, slider2vol(get_float("")));
 			else
-				vtrack->set_volume(slider2vol(getFloat("")));
+				vtrack->set_volume(slider2vol(get_float("")));
 		}
 		editing = false;
 	}
@@ -77,19 +77,19 @@ public:
 	void on_mute()
 	{
 		if (vtrack)
-			vtrack->set_muted(isChecked(""));
+			vtrack->set_muted(is_checked(""));
 	}
 	void on_solo()
 	{
 		if (vtrack)
-			vtrack->set_solo(isChecked(""));
+			vtrack->set_solo(is_checked(""));
 	}
 
 	void on_panning()
 	{
 		editing = true;
 		if (vtrack)
-			vtrack->set_panning(getFloat(""));
+			vtrack->set_panning(get_float(""));
 		editing = false;
 	}
 	void clear_track()
@@ -110,16 +110,16 @@ public:
 			return;
 		if (editing)
 			return;
-		setFloat(vol_slider_id, vol2slider(track->volume));
-		setFloat(pan_slider_id, track->panning);
+		set_float(vol_slider_id, vol2slider(track->volume));
+		set_float(pan_slider_id, track->panning);
 		check(mute_id, track->muted);
 		check("solo", vtrack->solo);
 		bool is_playable = vtrack->view->get_playable_tracks().contains(track);
 		enable(id_name, is_playable);
 		if (is_playable)
-			setString(id_name, track->nice_name());
+			set_string(id_name, track->nice_name());
 		else
-			setString(id_name, "<s>" + track->nice_name() + "</s>");
+			set_string(id_name, "<s>" + track->nice_name() + "</s>");
 	}
 
 
@@ -167,10 +167,10 @@ MixingConsole::MixingConsole(Session *session) :
 	device_manager = session->device_manager;
 	id_inner = "inner-grid";
 
-	fromResource("mixing-console");
+	from_resource("mixing-console");
 
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter);
-	setFloat("output-volume", device_manager->get_output_volume());
+	set_float("output-volume", device_manager->get_output_volume());
 
 	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));
 
@@ -195,7 +195,7 @@ MixingConsole::~MixingConsole()
 
 void MixingConsole::on_output_volume()
 {
-	device_manager->set_output_volume(getFloat(""));
+	device_manager->set_output_volume(get_float(""));
 }
 
 void MixingConsole::load_data()
@@ -215,7 +215,7 @@ void MixingConsole::load_data()
 	// delete non-matching
 	for (int i=n_ok; i<mixer.num; i++){
 		delete mixer[i];
-		removeControl("separator-" + i2s(i));
+		remove_control("separator-" + i2s(i));
 	}
 	mixer.resize(n_ok);
 
@@ -225,16 +225,16 @@ void MixingConsole::load_data()
 			TrackMixer *m = new TrackMixer(t);
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
-			addSeparator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
+			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
 		}
 	}
 
-	hideControl("link-volumes", mixer.num <= 1);
+	hide_control("link-volumes", mixer.num <= 1);
 }
 
 void MixingConsole::on_update_device_manager()
 {
-	setFloat("output-volume", device_manager->get_output_volume());
+	set_float("output-volume", device_manager->get_output_volume());
 }
 
 void MixingConsole::on_tracks_change()
@@ -248,12 +248,12 @@ void MixingConsole::update_all()
 		m->update();
 }
 
-void MixingConsole::onShow()
+void MixingConsole::on_show()
 {
 	peak_meter->enable(true);
 }
 
-void MixingConsole::onHide()
+void MixingConsole::on_hide()
 {
 	peak_meter->enable(false);
 }

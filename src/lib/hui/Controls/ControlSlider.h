@@ -17,10 +17,10 @@ class ControlSlider : public Control
 {
 public:
 	ControlSlider(const string &text, const string &id);
-	virtual float getFloat();
-	virtual void __setFloat(float f);
-	virtual void __addString(const string &s);
-	virtual void __setOption(const string &op, const string &value);
+	float get_float() override;
+	void __set_float(float f) override;
+	void __add_string(const string &s) override;
+	void __set_option(const string &op, const string &value) override;
 	bool vertical;
 };
 

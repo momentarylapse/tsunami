@@ -54,56 +54,56 @@ public:
 
 	virtual void __reset(){}
 	void reset();
-	virtual string getString(){ return ""; }
-	virtual int getInt(){ return getString()._int(); }
-	virtual float getFloat(){ return getString()._float(); }
-	virtual color getColor(){ return Black; }
-	virtual void __setString(const string &str){}
-	void setString(const string &str);
-	virtual void __addString(const string &str){}
-	void addString(const string &str);
-	virtual void __setInt(int i){ __setString(i2s(i)); }
-	void setInt(int i);
-	virtual void __setFloat(float f){ __setString(f2s(f, 3)); }
-	void setFloat(float f);
-	virtual void __setColor(const color &c){}
-	void setColor(const color &c);
-	virtual void setImage(const string &str){}
+	virtual string get_string(){ return ""; }
+	virtual int get_int(){ return get_string()._int(); }
+	virtual float get_float(){ return get_string()._float(); }
+	virtual color get_color(){ return Black; }
+	virtual void __set_string(const string &str){}
+	void set_string(const string &str);
+	virtual void __add_string(const string &str){}
+	void add_string(const string &str);
+	virtual void __set_int(int i){ __set_string(i2s(i)); }
+	void set_int(int i);
+	virtual void __set_float(float f){ __set_string(f2s(f, 3)); }
+	void set_float(float f);
+	virtual void __set_color(const color &c){}
+	void set_color(const color &c);
+	virtual void set_image(const string &str){}
 
-	virtual void __addChildString(int parent_row, const string &str){}
-	void addChildString(int parent_row, const string &str);
-	virtual void __changeString(int row, const string &str){}
-	void changeString(int row, const string &str);
-	virtual void __removeString(int row){}
-	void removeString(int row);
-	virtual string getCell(int row, int column){ return ""; }
-	virtual void __setCell(int row, int column, const string &str){}
-	void setCell(int row, int column, const string &str);
-	virtual Array<int> getSelection(){ Array<int> r; return r; }
-	virtual void __setSelection(const Array<int> &sel){}
-	void setSelection(const Array<int> &sel);
+	virtual void __add_child_string(int parent_row, const string &str){}
+	void add_child_string(int parent_row, const string &str);
+	virtual void __change_string(int row, const string &str){}
+	void change_string(int row, const string &str);
+	virtual void __remove_string(int row){}
+	void remove_string(int row);
+	virtual string get_cell(int row, int column){ return ""; }
+	virtual void __set_cell(int row, int column, const string &str){}
+	void set_cell(int row, int column, const string &str);
+	virtual Array<int> get_selection(){ Array<int> r; return r; }
+	virtual void __set_selection(const Array<int> &sel){}
+	void set_selection(const Array<int> &sel);
 	virtual void expand(int row, bool expand){}
-	virtual void expandAll(bool expand){}
-	virtual bool isExpanded(int row){ return false; }
+	virtual void expand_all(bool expand){}
+	virtual bool is_expanded(int row){ return false; }
 	virtual void reveal(bool reveal){}
-	virtual bool isRevealed(){ return false; }
+	virtual bool is_revealed(){ return false; }
 
 	virtual void enable(bool enabled);
-	virtual bool isEnabled();
+	virtual bool is_enabled();
 	virtual void hide(bool hidden);
 	virtual void __check(bool checked){}
 	virtual void check(bool checked);
-	virtual bool isChecked(){ return false; }
-	virtual void setTooltip(const string &str);
+	virtual bool is_checked(){ return false; }
+	virtual void set_tooltip(const string &str);
 	virtual void focus();
-	virtual bool hasFocus();
-	virtual void completionAdd(const string &text){}
-	virtual void completionClear(){}
+	virtual bool has_focus();
+	virtual void completion_add(const string &text){}
+	virtual void completion_clear(){}
 
 	virtual void add(Control *child, int x, int y){}
-	void setOptions(const string &options);
-	virtual void __setOption(const string &op, const string &value){}
-	void getSize(int &w, int &h);
+	void set_options(const string &options);
+	virtual void __set_option(const string &op, const string &value){}
+	void get_size(int &w, int &h);
 
 	void notify(const string &message = "", bool is_default = true);
 

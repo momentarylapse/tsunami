@@ -21,9 +21,9 @@ public:
 	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, const TrackMarker *marker);
 	virtual ~MarkerDialog();
 
-	void onEdit();
-	void onOk();
-	void onClose();
+	void on_edit();
+	void on_ok();
+	void on_close();
 
 	Track *track;
 	Range range;

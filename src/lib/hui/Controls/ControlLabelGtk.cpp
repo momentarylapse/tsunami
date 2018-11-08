@@ -25,20 +25,20 @@ ControlLabel::ControlLabel(const string &title, const string &id) :
 #endif
 	flag_bold = flag_italic = flag_big = flag_small = false;
 	flag_underline = flag_strikeout = false;
-	setOptions(OptionString);
-	ControlLabel::__setString(title);
+	set_options(OptionString);
+	ControlLabel::__set_string(title);
 }
 
-string ControlLabel::getString()
+string ControlLabel::get_string()
 {
 	return "";
 }
 
-void ControlLabel::__setString(const string &str)
+void ControlLabel::__set_string(const string &str)
 {
 	GetPartStrings(str);
 	text = PartString[0];
-	setOptions(OptionString);
+	set_options(OptionString);
 	string s = sys_str(text);
 	if (flag_bold)
 		s = "<b>" + text + "</b>";
@@ -55,7 +55,7 @@ void ControlLabel::__setString(const string &str)
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 
-void ControlLabel::__setOption(const string &op, const string &value)
+void ControlLabel::__set_option(const string &op, const string &value)
 {
 	if (op == "wrap"){
 		gtk_label_set_line_wrap(GTK_LABEL(widget), true);

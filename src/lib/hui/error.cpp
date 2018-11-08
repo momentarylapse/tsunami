@@ -53,25 +53,25 @@ public:
 	ReportDialog(Window *parent) :
 		Dialog(_("Bug Report"), 450, 400, parent, false)
 	{
-		addGrid("", 0, 0, "root");
-		setTarget("root");
+		add_grid("", 0, 0, "root");
+		set_target("root");
 
-		addGroup(_("Name:"), 0, 0, "grp_name");
-		addGroup(_("Comment/what happened:"), 0, 1, "grp_comment");
-		addLabel("!wrap//" + _("Your comments and the contents of the file message.txt will be sent."), 0, 2, "t_explanation");
-		addGrid("!buttonbar", 0, 3, "buttonbar");
+		add_group(_("Name:"), 0, 0, "grp_name");
+		add_group(_("Comment/what happened:"), 0, 1, "grp_comment");
+		add_label("!wrap//" + _("Your comments and the contents of the file message.txt will be sent."), 0, 2, "t_explanation");
+		add_grid("!buttonbar", 0, 3, "buttonbar");
 
-		setTarget("grp_name");
-		addEdit(_("(anonymous)"), 0, 0, "sender");
+		set_target("grp_name");
+		add_edit(_("(anonymous)"), 0, 0, "sender");
 
-		setTarget("grp_comment");
-		addMultilineEdit("!expandy,expandx//" + _("Just happened somehow..."), 0, 0, "comment");
+		set_target("grp_comment");
+		add_multiline_edit("!expandy,expandx//" + _("Just happened somehow..."), 0, 0, "comment");
 
-		setTarget("buttonbar");
-		addButton(_("Cancel"),0, 0,"cancel");
-		setImage("cancel", "hui:cancel");
-		addDefButton(_("Ok"), 1, 0 ,"ok");
-		setImage("ok", "hui:ok");
+		set_target("buttonbar");
+		add_button(_("Cancel"),0, 0,"cancel");
+		set_image("cancel", "hui:cancel");
+		add_def_button(_("Ok"), 1, 0 ,"ok");
+		set_image("ok", "hui:ok");
 
 		event("ok", std::bind(&ReportDialog::onOk, this));
 		event("cancel", std::bind(&ReportDialog::destroy, this));
@@ -80,8 +80,8 @@ public:
 
 	void onOk()
 	{
-		string sender = getString("sender");
-		string comment = getString("comment");
+		string sender = get_string("sender");
+		string comment = get_string("comment");
 		string return_msg;
 		if (NetSendBugReport(sender, Application::get_property("name"), Application::get_property("version"), comment, return_msg))
 			InfoBox(nullptr, "ok", return_msg);
@@ -106,16 +106,16 @@ public:
 	ErrorDialog() :
 		Dialog(_("Error"), 600, 500, nullptr, false)
 	{
-		addGrid("", 0, 0, "root");
-		setTarget("root");
-		addLabel(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
-		addListView(_("Messages"), 0, 1, "message_list");
-		addGrid("!buttonbar", 0, 2, "buttonbar");
-		setTarget("buttonbar");
-		addButton(_("open message.txt"), 0, 0, "show_log");
-		addButton(_("Send bug report to Michi"), 1, 0, "send_report");
-		addButton(_("Ok"), 2, 0, "ok");
-		setImage("ok", "hui:ok");
+		add_grid("", 0, 0, "root");
+		set_target("root");
+		add_label(Application::get_property("name") + " " + Application::get_property("version") + _(" has crashed.		The last lines of the file message.txt:"), 0, 0, "error_header");
+		add_list_view(_("Messages"), 0, 1, "message_list");
+		add_grid("!buttonbar", 0, 2, "buttonbar");
+		set_target("buttonbar");
+		add_button(_("open message.txt"), 0, 0, "show_log");
+		add_button(_("Send bug report to Michi"), 1, 0, "send_report");
+		add_button(_("Ok"), 2, 0, "ok");
+		set_image("ok", "hui:ok");
 
 	#ifdef _X_USE_NET_
 		event("send_report", std::bind(&ErrorDialog::onSendBugReport, this));
@@ -126,7 +126,7 @@ public:
 		for (int i=1023;i>=0;i--){
 			string temp = msg_get_str(i);
 			if (temp.num > 0)
-				addString("message_list", temp);
+				add_string("message_list", temp);
 		}
 		event("show_log", std::bind(&ErrorDialog::onShowLog, this));
 		//event("cancel", std::bind(&ErrorDialog::onClose, this));

@@ -24,7 +24,7 @@ public:
 		Array<int> sel;
 
 		foreachi(Curve::Target &t, all_targets, i){
-			addString("list", t.niceStr(song));
+			add_string("list", t.niceStr(song));
 
 			for (auto &tt : targets)
 				if (t.p == tt.p){
@@ -32,7 +32,7 @@ public:
 					break;
 				}
 		}
-		setSelection("list", sel);
+		set_selection("list", sel);
 
 		event("hui:close", std::bind(&CurveTargetDialog::destroy, this));
 		event("cancel", std::bind(&CurveTargetDialog::destroy, this));
@@ -45,7 +45,7 @@ public:
 
 	void onOk()
 	{
-		Array<int> sel = getSelection("list");
+		Array<int> sel = get_selection("list");
 		targets.clear();
 		for (int i: sel)
 			targets.add(all_targets[i]);
@@ -57,24 +57,24 @@ CurveConsole::CurveConsole(Session *session) :
 	SideBarConsole(_("Curves"), session)
 {
 
-	fromResource("curve_console");
+	from_resource("curve_console");
 
 	id_list = "curves";
 
-	event("add", std::bind(&CurveConsole::onAdd, this));
-	event("delete", std::bind(&CurveConsole::onDelete, this));
-	event("target", std::bind(&CurveConsole::onTarget, this));
-	eventX(id_list, "hui:select", std::bind(&CurveConsole::onListSelect, this));
-	eventX(id_list, "hui:change", std::bind(&CurveConsole::onListEdit, this));
-	event("edit_song", std::bind(&CurveConsole::onEditSong, this));
-	event("edit_track", std::bind(&CurveConsole::onEditTrack, this));
-	event("edit_fx", std::bind(&CurveConsole::onEditFx, this));
+	event("add", std::bind(&CurveConsole::on_add, this));
+	event("delete", std::bind(&CurveConsole::on_delete, this));
+	event("target", std::bind(&CurveConsole::on_target, this));
+	event_x(id_list, "hui:select", std::bind(&CurveConsole::on_list_select, this));
+	event_x(id_list, "hui:change", std::bind(&CurveConsole::on_list_edit, this));
+	event("edit_song", std::bind(&CurveConsole::on_edit_song, this));
+	event("edit_track", std::bind(&CurveConsole::on_edit_track, this));
+	event("edit_fx", std::bind(&CurveConsole::on_edit_fx, this));
 
-	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_NEW);
-	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_ADD_CURVE);
-	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_DELETE_CURVE);
-	song->subscribe(this, std::bind(&CurveConsole::onUpdate, this), song->MESSAGE_EDIT_CURVE);
-	view->subscribe(this, std::bind(&CurveConsole::onViewChange, this), view->MESSAGE_VIEW_CHANGE);
+	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_ADD_CURVE);
+	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_DELETE_CURVE);
+	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_EDIT_CURVE);
+	view->subscribe(this, std::bind(&CurveConsole::on_view_change, this), view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
@@ -84,14 +84,14 @@ CurveConsole::~CurveConsole()
 }
 
 
-void CurveConsole::onViewChange()
+void CurveConsole::on_view_change()
 {
 	view->force_redraw();
 }
 
-void CurveConsole::onUpdate()
+void CurveConsole::on_update()
 {
-	updateList();
+	update_list();
 }
 
 void CurveConsole::on_enter()
@@ -104,17 +104,17 @@ void CurveConsole::on_leave()
 	view->set_mode(view->mode_default);
 }
 
-void CurveConsole::updateList()
+void CurveConsole::update_list()
 {
 	reset(id_list);
 	foreachi(Curve *c, song->curves, i){
-		addString(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
+		add_string(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
 		if (c == curve())
-			setInt(id_list, i);
+			set_int(id_list, i);
 	}
 }
 
-void CurveConsole::onAdd()
+void CurveConsole::on_add()
 {
 	Array<Curve::Target> targets;
 	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
@@ -123,20 +123,20 @@ void CurveConsole::onAdd()
 	if (targets.num > 0){
 		Curve *c = song->add_curve("new", targets);
 		view->mode_curve->setCurve(c);
-		updateList();
+		update_list();
 	}
 }
 
-void CurveConsole::onDelete()
+void CurveConsole::on_delete()
 {
-	int n = getInt(id_list);
+	int n = get_int(id_list);
 	if (n >= 0){
 		song->delete_curve(song->curves[n]);
 		view->mode_curve->setCurve(nullptr);
 	}
 }
 
-void CurveConsole::onTarget()
+void CurveConsole::on_target()
 {
 	if (!curve())
 		return;
@@ -147,13 +147,13 @@ void CurveConsole::onTarget()
 		song->curve_set_targets(curve(), targets);
 
 	delete(dlg);
-	updateList();
+	update_list();
 }
 
-void CurveConsole::onListSelect()
+void CurveConsole::on_list_select()
 {
 	view->mode_curve->setCurve(nullptr);
-	int n = getInt(id_list);
+	int n = get_int(id_list);
 	if (n >= 0){
 		view->mode_curve->setCurve(song->curves[n]);
 	}else{
@@ -162,7 +162,7 @@ void CurveConsole::onListSelect()
 	view->force_redraw();
 }
 
-void CurveConsole::onListEdit()
+void CurveConsole::on_list_edit()
 {
 	int n = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
@@ -171,27 +171,27 @@ void CurveConsole::onListEdit()
 		float min = song->curves[n]->min;
 		float max = song->curves[n]->max;
 		if (col == 0)
-			name = getCell(id_list, n, col);
+			name = get_cell(id_list, n, col);
 		else if (col == 1)
-			min = getCell(id_list, n, col)._float();
+			min = get_cell(id_list, n, col)._float();
 		else if (col == 2)
-			max = getCell(id_list, n, col)._float();
+			max = get_cell(id_list, n, col)._float();
 		song->edit_curve(song->curves[n], name, min, max);
 	}
 	view->force_redraw();
 }
 
-void CurveConsole::onEditSong()
+void CurveConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void CurveConsole::onEditTrack()
+void CurveConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
-void CurveConsole::onEditFx()
+void CurveConsole::on_edit_fx()
 {
 	bar()->open(SideBar::FX_CONSOLE);
 }

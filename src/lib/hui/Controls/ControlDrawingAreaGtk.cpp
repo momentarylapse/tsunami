@@ -316,7 +316,7 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
-	setOptions(OptionString);
+	set_options(OptionString);
 
 	cur_cairo = nullptr;
 }

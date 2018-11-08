@@ -158,29 +158,29 @@ void NotifyWindowByWidget(Panel *panel, GtkWidget *widget, const string &message
 void SetImageById(Panel *panel, const string &id)
 {
 	if ((id == "ok") or (id == "cancel") or (id == "apply"))
-		panel->setImage(id, "hui:" + id);
+		panel->set_image(id, "hui:" + id);
 	else if (id != ""){
 		for (auto &c: panel->event_listeners)
 			if ((c.id == id) and (c.image != ""))
-				panel->setImage(id, c.image);
+				panel->set_image(id, c.image);
 	}
 }
 
 
 
-void Panel::addButton(const string &title, int x, int y, const string &id)
+void Panel::add_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlButton(title, id), x, y);
 
 	SetImageById(this, id);
 }
 
-void Panel::addColorButton(const string &title, int x, int y, const string &id)
+void Panel::add_color_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlColorButton(title, id), x, y);
 }
 
-void Panel::addDefButton(const string &title, int x, int y, const string &id)
+void Panel::add_def_button(const string &title, int x, int y, const string &id)
 {
 	auto *b = new ControlButton(title, id);
 	_insert_control_(b, x, y);
@@ -196,24 +196,24 @@ void Panel::addDefButton(const string &title, int x, int y, const string &id)
 
 
 
-void Panel::addCheckBox(const string &title, int x, int y, const string &id)
+void Panel::add_check_box(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlCheckBox(title, id), x, y);
 }
 
-void Panel::addLabel(const string &title, int x, int y, const string &id)
+void Panel::add_label(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlLabel(title, id), x, y);
 }
 
 
 
-void Panel::addEdit(const string &title, int x, int y, const string &id)
+void Panel::add_edit(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlEdit(title, id), x, y);
 }
 
-void Panel::addMultilineEdit(const string &title, int x, int y, const string &id)
+void Panel::add_multiline_edit(const string &title, int x, int y, const string &id)
 {
 	auto *m = new ControlMultilineEdit(title, id);
 	_insert_control_(m, x, y);
@@ -222,54 +222,54 @@ void Panel::addMultilineEdit(const string &title, int x, int y, const string &id
 			win->main_input_control = m;
 }
 
-void Panel::addSpinButton(const string &title, int x, int y, const string &id)
+void Panel::add_spin_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlSpinButton(title, id), x, y);
 }
 
-void Panel::addGroup(const string &title, int x, int y, const string &id)
+void Panel::add_group(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlGroup(title, id), x, y);
 }
 
-void Panel::addComboBox(const string &title, int x, int y, const string &id)
+void Panel::add_combo_box(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlComboBox(title, id), x, y);
 }
 
-void Panel::addToggleButton(const string &title, int x, int y, const string &id)
+void Panel::add_toggle_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlToggleButton(title, id), x, y);
 }
 
-void Panel::addRadioButton(const string &title, int x, int y, const string &id)
+void Panel::add_radio_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlRadioButton(title, id, this), x, y);
 }
 
-void Panel::addTabControl(const string &title, int x, int y, const string &id)
+void Panel::add_tab_control(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlTabControl(title, id, this), x, y);
 }
 
-void Panel::setTarget(const string &id)
+void Panel::set_target(const string &id)
 {
 	cur_control = nullptr;
 	if (id.num > 0)
 		cur_control = _get_control_(id);
 }
 
-void Panel::addListView(const string &title, int x, int y, const string &id)
+void Panel::add_list_view(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlListView(title, id, this), x, y);
 }
 
-void Panel::addTreeView(const string &title, int x, int y, const string &id)
+void Panel::add_tree_view(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlTreeView(title, id, this), x, y);
 }
 
-void Panel::addIconView(const string &title, int x, int y, const string &id)
+void Panel::add_icon_view(const string &title, int x, int y, const string &id)
 {
 	msg_todo("AddIconView: deprecated");
 	/*
@@ -301,17 +301,17 @@ void Panel::addIconView(const string &title, int x, int y, const string &id)
 	_InsertControl_(view, x, y, id, HuiKindIconView, frame);*/
 }
 
-void Panel::addProgressBar(const string &title, int x, int y, const string &id)
+void Panel::add_progress_bar(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlProgressBar(title, id), x, y);
 }
 
-void Panel::addSlider(const string &title, int x, int y, const string &id)
+void Panel::add_slider(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlSlider(title, id), x, y);
 }
 
-void Panel::addImage(const string &title, int x, int y, const string &id)
+void Panel::add_image(const string &title, int x, int y, const string &id)
 {
 	msg_todo("AddImage: deprecated");
 	/*GetPartStrings(id, title);
@@ -327,7 +327,7 @@ void Panel::addImage(const string &title, int x, int y, const string &id)
 }
 
 
-void Panel::addDrawingArea(const string &title, int x, int y, const string &id)
+void Panel::add_drawing_area(const string &title, int x, int y, const string &id)
 {
 	auto *da = new ControlDrawingArea(title, id);
 	_insert_control_(da, x, y);
@@ -336,42 +336,42 @@ void Panel::addDrawingArea(const string &title, int x, int y, const string &id)
 }
 
 
-void Panel::addGrid(const string &title, int x, int y, const string &id)
+void Panel::add_grid(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlGrid(title, id, this), x, y);
 }
 
-void Panel::addExpander(const string &title, int x, int y, const string &id)
+void Panel::add_expander(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlExpander(title, id), x, y);
 }
 
-void Panel::addPaned(const string &title, int x, int y, const string &id)
+void Panel::add_paned(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlPaned(title, id), x, y);
 }
 
-void Panel::addScroller(const string &title, int x, int y, const string &id)
+void Panel::add_scroller(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlScroller(title, id), x, y);
 }
 
-void Panel::addSeparator(const string &title, int x, int y, const string &id)
+void Panel::add_separator(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlSeparator(title, id), x, y);
 }
 
-void Panel::addRevealer(const string &title, int x, int y, const string &id)
+void Panel::add_revealer(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlRevealer(title, id), x, y);
 }
 
-void Panel::addMenuButton(const string &title, int x, int y, const string &id)
+void Panel::add_menu_button(const string &title, int x, int y, const string &id)
 {
 	_insert_control_(new ControlMenuButton(title, id), x, y);
 }
 
-void Panel::embedDialog(const string &id, int x, int y)
+void Panel::embed_dialog(const string &id, int x, int y)
 {
 	border_width = 8;
 
@@ -389,7 +389,7 @@ void Panel::embedDialog(const string &id, int x, int y)
 	string parent_id;
 	if (cur_control)
 		parent_id = cur_control->id;
-	_addControl(id, rr, parent_id);
+	_add_control(id, rr, parent_id);
 }
 
 void hui_rm_event(Array<EventListener> &event, Control *c)
@@ -404,7 +404,7 @@ void hui_rm_event(Array<EventListener> &event, Control *c)
 		hui_rm_event(event, cc);
 }
 
-void Panel::removeControl(const string &id)
+void Panel::remove_control(const string &id)
 {
 	Control *c = _get_control_(id);
 	if (c){
@@ -426,7 +426,7 @@ void Panel::redraw(const string &_id)
 		c->redraw();
 }
 
-void Panel::redrawRect(const string &_id, const rect &r)
+void Panel::redraw_rect(const string &_id, const rect &r)
 {
 	ControlDrawingArea *c = dynamic_cast<ControlDrawingArea*>(_get_control_(_id));
 	if (c)

@@ -18,52 +18,52 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 
 	update();
 
-	event("ok", std::bind(&TuningDialog::onOk, this));
+	event("ok", std::bind(&TuningDialog::on_ok, this));
 	event("cancel", std::bind(&TuningDialog::destroy, this));
 	event("hui:close", std::bind(&TuningDialog::destroy, this));
-	event("add_first", std::bind(&TuningDialog::onAddFirst, this));
+	event("add_first", std::bind(&TuningDialog::on_add_first, this));
 }
 
 void TuningDialog::update()
 {
 	for (int i=tuning.num; i<gui_num_strings; i++){
 		string id = format("string%d", i);
-		removeControl(id);
-		removeControl(id + "_label");
-		removeControl("delete_" + id);
-		removeControl("add_" + id);
+		remove_control(id);
+		remove_control(id + "_label");
+		remove_control("delete_" + id);
+		remove_control("add_" + id);
 	}
-	removeControl("add_first");
+	remove_control("add_first");
 
-	setTarget("td_g_tuning");
+	set_target("td_g_tuning");
 	foreachi(int t, tuning, i){
 		string id = format("string%d", i);
 		if (i >= gui_num_strings){
-			addLabel(i2s(i+1), 0, 100 - i, id + "_label");
-			addComboBox("", 1, 100 - i, id);
-			addButton("", 2, 100 - i, "delete_" + id);
-			setImage("delete_" + id, "hui:delete");
-			addButton("", 3, 100 - i, "add_" + id);
-			setImage("add_" + id, "hui:add");
-			event(id, std::bind(&TuningDialog::onEdit, this));
-			event("delete_" + id, std::bind(&TuningDialog::onDelete, this));
-			event("add_" + id, std::bind(&TuningDialog::onAdd, this));
+			add_label(i2s(i+1), 0, 100 - i, id + "_label");
+			add_combo_box("", 1, 100 - i, id);
+			add_button("", 2, 100 - i, "delete_" + id);
+			set_image("delete_" + id, "hui:delete");
+			add_button("", 3, 100 - i, "add_" + id);
+			set_image("add_" + id, "hui:add");
+			event(id, std::bind(&TuningDialog::on_edit, this));
+			event("delete_" + id, std::bind(&TuningDialog::on_delete, this));
+			event("add_" + id, std::bind(&TuningDialog::on_add, this));
 
 			// reverse order list... nicer gui
 			for (int p=MAX_PITCH-1; p>=0; p--)
-				setString(id, pitch_name(p));
+				set_string(id, pitch_name(p));
 		}
-		setInt(id, MAX_PITCH - 1 - t);
+		set_int(id, MAX_PITCH - 1 - t);
 	}
 	if (tuning.num == 0){
-		addButton("", 0, 0, "add_first");
-		setImage("add_first", "hui:add");
+		add_button("", 0, 0, "add_first");
+		set_image("add_first", "hui:add");
 	}
 
 	gui_num_strings = tuning.num;
 }
 
-void TuningDialog::onOk()
+void TuningDialog::on_ok()
 {
 	Instrument i = track->instrument;
 	i.string_pitch = tuning;
@@ -71,15 +71,15 @@ void TuningDialog::onOk()
 	destroy();
 }
 
-void TuningDialog::onEdit()
+void TuningDialog::on_edit()
 {
 	string id = hui::GetEvent()->id;
 	int n = id.substr(6, -1)._int();
-	int p = MAX_PITCH - 1 - getInt(id);
+	int p = MAX_PITCH - 1 - get_int(id);
 	tuning[n] = p;
 }
 
-void TuningDialog::onDelete()
+void TuningDialog::on_delete()
 {
 	string id = hui::GetEvent()->id;
 	int n = id.substr(7+6, -1)._int();
@@ -87,7 +87,7 @@ void TuningDialog::onDelete()
 	update();
 }
 
-void TuningDialog::onAdd()
+void TuningDialog::on_add()
 {
 	string id = hui::GetEvent()->id;
 	int n = id.substr(4+6, -1)._int();
@@ -95,7 +95,7 @@ void TuningDialog::onAdd()
 	update();
 }
 
-void TuningDialog::onAddFirst()
+void TuningDialog::on_add_first()
 {
 	tuning.add(69);
 	update();

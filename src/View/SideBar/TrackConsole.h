@@ -19,27 +19,27 @@ public:
 	TrackConsole(Session *session);
 	virtual ~TrackConsole();
 
-	void loadData();
+	void load_data();
 	void update_strings();
 
-	void onName();
-	void onVolume();
-	void onPanning();
-	void onInstrument();
-	void onEditTuning();
-	void onSelectSynth();
+	void on_name();
+	void on_volume();
+	void on_panning();
+	void on_instrument();
+	void on_edit_tuning();
+	void on_select_synth();
 
-	void onEditSong();
-	void onEditFx();
-	void onEditCurves();
-	void onEditMidi();
-	void onEditMidiFx();
-	void onEditSynth();
+	void on_edit_song();
+	void on_edit_fx();
+	void on_edit_curves();
+	void on_edit_midi();
+	void on_edit_midi_fx();
+	void on_edit_synth();
 
-	void setTrack(Track *t);
+	void set_track(Track *t);
 
-	void onViewCurTrackChange();
-	void onUpdate();
+	void on_view_cur_track_change();
+	void on_update();
 
 	Track *track;
 	bool editing;

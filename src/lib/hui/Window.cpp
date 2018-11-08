@@ -73,7 +73,7 @@ Window::Window(const string &id, Window *parent)
 	}
 	_init_("", 300, 200, parent, res->has("allowparent"), 0);
 
-	setFromResource(res);
+	set_from_resource(res);
 }
 
 void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
@@ -116,7 +116,7 @@ void Window::_clean_up_()
 }
 
 // default handler when trying to close the windows
-void Window::onCloseRequest()
+void Window::on_close_request()
 {
 	destroy();
 	
@@ -128,21 +128,21 @@ void Window::onCloseRequest()
 
 
 // identify window (for automatic title assignment with language strings)
-void Window::setID(const string &_id)
+void Window::set_id(const string &_id)
 {
 	id = _id;
 	if (_using_language_ and (id.num > 0))
-		setTitle(GetLanguage(id, id));
+		set_title(GetLanguage(id, id));
 }
 
 // align window relative to another window (like..."top right corner")
-void Window::setPositionSpecial(Window *win,int mode)
+void Window::set_position_special(Window *win,int mode)
 {
 	int pw, ph, cw, ch, px, py, cx, cy;
-	win->getSize(pw, ph);
-	win->getPosition(px, py);
-	getSize(cw, ch);
-	getPosition(cx, cy);
+	win->get_size(pw, ph);
+	win->get_position(px, py);
+	get_size(cw, ch);
+	get_position(cx, cy);
 	if ((mode & HUI_LEFT) > 0)
 		cx = px + 2;
 	if ((mode & HUI_RIGHT) > 0)
@@ -151,20 +151,20 @@ void Window::setPositionSpecial(Window *win,int mode)
 		cy = py + 20;
 	if ((mode & HUI_BOTTOM) > 0)
 		cy = py + ph - ch - 2;
-	setPosition(cx, cy);
+	set_position(cx, cy);
 }
 
-Menu *Window::getMenu()
+Menu *Window::get_menu()
 {
 	return menu;
 }
 
-Window *Window::getParent()
+Window *Window::get_parent()
 {
 	return parent;
 }
 
-bool Window::getKey(int k)
+bool Window::get_key(int k)
 {
 	if (k == KEY_CONTROL)
 		return (input.key[KEY_RCONTROL] or input.key[KEY_LCONTROL]);
@@ -174,7 +174,7 @@ bool Window::getKey(int k)
 		return input.key[k];
 }
 
-bool Window::getMouse(int &x, int &y, int button)
+bool Window::get_mouse(int &x, int &y, int button)
 {
 	x = (int)input.x;
 	y = (int)input.y;
@@ -201,7 +201,7 @@ void FuncClose()
 NixWindow::NixWindow(const string& title, int width, int height) :
 	Window(title, width, height)
 {
-	addDrawingArea("!opengl", 0, 0, "nix-area");
+	add_drawing_area("!opengl", 0, 0, "nix-area");
 }
 
 void NixWindow::__init_ext__(const string& title, int width, int height)
@@ -224,7 +224,7 @@ void Dialog::__init_ext__(const string& title, int width, int height, Window* pa
 SourceWindow::SourceWindow(const string &buffer, Window *parent)
 {
 	_init_("", 300, 200, parent, buffer.find("allow-parent"), 0);
-	fromSource(buffer);
+	from_source(buffer);
 }
 
 };

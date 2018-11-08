@@ -20,7 +20,7 @@ public:
 	int index;
 
 	PauseEditDialog(hui::Window *root, Song *song, int index);
-	void onOk();
+	void on_ok();
 };
 
 #endif /* SRC_VIEW_DIALOG_PAUSEEDITDIALOG_H_ */

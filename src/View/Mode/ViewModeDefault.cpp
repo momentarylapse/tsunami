@@ -325,7 +325,7 @@ void ViewModeDefault::on_mouse_wheel()
 {
 	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f){
-		if (win->getKey(hui::KEY_CONTROL))
+		if (win->get_key(hui::KEY_CONTROL))
 			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f));
 		else
 			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
@@ -705,7 +705,7 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	}
 
 	// selection boundaries?
-	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(hui::KEY_SHIFT))){
+	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->get_key(hui::KEY_SHIFT))){
 		if (view->mouse_over_time(view->sel.range.end())){
 			s.type = Selection::Type::SELECTION_END;
 			return s;
@@ -905,7 +905,7 @@ void ViewModeDefault::select_under_mouse()
 	*hover = get_hover();
 	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
-	bool control = win->getKey(hui::KEY_CONTROL);
+	bool control = win->get_key(hui::KEY_CONTROL);
 
 	// track
 	if (hover->vlayer)

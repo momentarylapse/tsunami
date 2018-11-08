@@ -23,13 +23,13 @@ public:
 
 	void update(int mode = -1);
 
-	void onSamples();
-	void onFactor();
-	void onSampleRate();
-	void onSampleRateInv();
+	void on_samples();
+	void on_factor();
+	void on_sample_rate();
+	void on_sample_rate_inv();
 
-	void onOk();
-	void onClose();
+	void on_ok();
+	void on_close();
 };
 
 #endif /* SRC_VIEW_DIALOG_SAMPLESCALEDIALOG_H_ */

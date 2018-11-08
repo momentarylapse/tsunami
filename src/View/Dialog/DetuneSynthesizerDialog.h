@@ -20,15 +20,15 @@ public:
 	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, hui::Window *parent);
 	virtual ~DetuneSynthesizerDialog();
 
-	virtual void _cdecl onDraw(Painter *p);
-	virtual void _cdecl onLeftButtonDown();
-	virtual void _cdecl onLeftButtonUp();
-	virtual void _cdecl onMouseMove();
-	virtual void _cdecl onMouseWheel();
+	void _cdecl on_draw(Painter *p) override;
+	void _cdecl on_left_button_down() override;
+	void _cdecl on_left_button_up() override;
+	void _cdecl on_mouse_move() override;
+	void _cdecl on_mouse_wheel() override;
 
 
-	void onClose();
-	void onRelative();
+	void on_close();
+	void on_relative();
 
 	float pitch2x(float p);
 	float pitch2y(float p);

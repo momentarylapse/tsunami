@@ -34,24 +34,24 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, Mod
 	}
 
 	for (string &g: ugroups)
-		setString("list", g);
+		set_string("list", g);
 
 	foreachi (Label &l, labels, i){
 		int n = i;
 		if (ugroups.num > 0){
 			int r = ugroups.find(l.group);
-			addChildString("list", r, l.name);
+			add_child_string("list", r, l.name);
 		}else
-			setString("list", l.name);
+			set_string("list", l.name);
 		if (l.name == old_name)
-			setInt("list", n);
+			set_int("list", n);
 	}
 
-	event("hui:close", std::bind(&ConfigurableSelectorDialog::onClose, this));
-	eventX("list", "hui:select", std::bind(&ConfigurableSelectorDialog::onListSelect, this));
-	event("list", std::bind(&ConfigurableSelectorDialog::onSelect, this));
-	event("cancel", std::bind(&ConfigurableSelectorDialog::onCancel, this));
-	event("ok", std::bind(&ConfigurableSelectorDialog::onOk, this));
+	event("hui:close", std::bind(&ConfigurableSelectorDialog::on_close, this));
+	event_x("list", "hui:select", std::bind(&ConfigurableSelectorDialog::on_list_select, this));
+	event("list", std::bind(&ConfigurableSelectorDialog::on_select, this));
+	event("cancel", std::bind(&ConfigurableSelectorDialog::on_cancel, this));
+	event("ok", std::bind(&ConfigurableSelectorDialog::on_ok, this));
 	enable("ok", false);
 }
 
@@ -59,32 +59,32 @@ ConfigurableSelectorDialog::~ConfigurableSelectorDialog()
 {
 }
 
-void ConfigurableSelectorDialog::onListSelect()
+void ConfigurableSelectorDialog::on_list_select()
 {
-	int n = getInt("list") - ugroups.num;
+	int n = get_int("list") - ugroups.num;
 	enable("ok", n >= 0);
 }
 
-void ConfigurableSelectorDialog::onSelect()
+void ConfigurableSelectorDialog::on_select()
 {
-	int n = getInt("list") - ugroups.num;
+	int n = get_int("list") - ugroups.num;
 	if (n < 0)
 		return;
 	_return = labels[n].name;
 	destroy();
 }
 
-void ConfigurableSelectorDialog::onClose()
+void ConfigurableSelectorDialog::on_close()
 {
 	destroy();
 }
 
-void ConfigurableSelectorDialog::onCancel()
+void ConfigurableSelectorDialog::on_cancel()
 {
 	destroy();
 }
 
-void ConfigurableSelectorDialog::onOk()
+void ConfigurableSelectorDialog::on_ok()
 {
-	onSelect();
+	on_select();
 }

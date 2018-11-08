@@ -20,8 +20,8 @@ public:
 	int index;
 
 	BarAddDialog(hui::Window *root, Song *s, int index);
-	void onOk();
-	void onClose();
+	void on_ok();
+	void on_close();
 };
 
 #endif /* SRC_VIEW_DIALOG_BARADDDIALOG_H_ */

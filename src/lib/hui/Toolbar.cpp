@@ -19,34 +19,34 @@ Menu *_create_res_menu_(const string &ns, Resource *res);
 
 
 // add a default button
-void Toolbar::addItem(const string &title, const string &image, const string &id)
+void Toolbar::add(const string &title, const string &image, const string &id)
 {
-	add(new ToolItemButton(title, image, id));
+	_add(new ToolItemButton(title, image, id));
 }
 
 // add a checkable button
-void Toolbar::addItemCheckable(const string &title, const string &image, const string &id)
+void Toolbar::add_checkable(const string &title, const string &image, const string &id)
 {
-	add(new ToolItemToggleButton(title, image, id));
+	_add(new ToolItemToggleButton(title, image, id));
 }
 
-void Toolbar::addItemMenu(const string &title, const string &image, Menu *menu, const string &id)
+void Toolbar::add_menu(const string &title, const string &image, Menu *menu, const string &id)
 {
 	if (!menu)
 		return;
-	add(new ToolItemMenuButton(title, menu, image, id));
+	_add(new ToolItemMenuButton(title, menu, image, id));
 	menu->set_panel(win);
 }
 
-void Toolbar::addItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id)
+void Toolbar::add_menu_by_id(const string &title, const string &image, const string &menu_id, const string &id)
 {
 	Menu *menu = CreateResourceMenu(menu_id);
-	addItemMenu(title, image, menu, id);
+	add_menu(title, image, menu, id);
 }
 
-void Toolbar::addSeparator()
+void Toolbar::add_separator()
 {
-	add(new ToolItemSeparator());
+	_add(new ToolItemSeparator());
 }
 
 // remove all items from the toolbar
@@ -58,17 +58,17 @@ void Toolbar::reset()
 }
 
 // create and apply a toolbar bar resource id
-void Toolbar::setByID(const string &id)
+void Toolbar::set_by_id(const string &id)
 {
 	Resource *res = GetResource(id);
 	if (!res){
 		msg_error("Toolbar.SetByID  :~~(");
 		return;
 	}
-	fromResource(res);
+	from_resource(res);
 }
 
-void Toolbar::fromResource(Resource *res)
+void Toolbar::from_resource(Resource *res)
 {
 	reset();
 	id = res->id;
@@ -81,33 +81,33 @@ void Toolbar::fromResource(Resource *res)
 
 		if (cmd.type == "Item"){
 			if (sa_contains(cmd.options, "checkable"))
-				addItemCheckable(title, cmd.image(), cmd.id);
+				add_checkable(title, cmd.image(), cmd.id);
 			else
-				addItem(title, cmd.image(), cmd.id);
-			item.back()->setTooltip(tooltip);
+				add(title, cmd.image(), cmd.id);
+			item.back()->set_tooltip(tooltip);
 		}else if (cmd.type == "Separator"){
-			addSeparator();
+			add_separator();
 		}else if (cmd.type == "Menu"){
 			bool ok = false;
 			for (string &o: cmd.options)
 				if (o.find("menu=") == 0){
-					addItemMenuByID(title, cmd.image(), o.substr(5, -1), cmd.id);
-					item.back()->setTooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
+					add_menu_by_id(title, cmd.image(), o.substr(5, -1), cmd.id);
+					item.back()->set_tooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 					ok = true;
 				}
 			if ((!ok) and (cmd.children.num > 0)){
-				addItemMenu(title, cmd.image(), _create_res_menu_(id, &cmd), cmd.id);
-				item.back()->setTooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
+				add_menu(title, cmd.image(), _create_res_menu_(id, &cmd), cmd.id);
+				item.back()->set_tooltip(GetLanguageT(id, cmd.id, cmd.tooltip));
 			}
 		}
 	}
 	enable(true);
 }
 
-void Toolbar::fromSource(const string &source)
+void Toolbar::from_source(const string &source)
 {
 	Resource res = ParseResource(source);
-	fromResource(&res);
+	from_resource(&res);
 }
 
 

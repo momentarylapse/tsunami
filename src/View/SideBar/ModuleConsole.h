@@ -21,11 +21,11 @@ public:
 	virtual ~ModuleConsole();
 
 	void clear();
-	void setModule(Module *m);
+	void set_module(Module *m);
 
-	void onEditSong();
+	void on_edit_song();
 
-	void onModuleDelete();
+	void on_module_delete();
 
 	string id_inner;
 

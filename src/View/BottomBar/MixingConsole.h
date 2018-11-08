@@ -30,8 +30,8 @@ public:
 	void update_all();
 	void on_update_device_manager();
 
-	void _cdecl onShow() override;
-	void _cdecl onHide() override;
+	void _cdecl on_show() override;
+	void _cdecl on_hide() override;
 
 	DeviceManager *device_manager;
 	PeakMeterDisplay *peak_meter;

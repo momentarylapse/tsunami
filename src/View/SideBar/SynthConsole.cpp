@@ -25,17 +25,17 @@ public:
 		session = _session;
 		track = t;
 		synth = t->synth;
-		fromResource("synth_panel");
-		setString("name", synth->module_subtype);
+		from_resource("synth_panel");
+		set_string("name", synth->module_subtype);
 		p = synth->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
-			setTarget("grid");
-			addLabel(_("not configurable"), 0, 1, "");
-			hideControl("load_favorite", true);
-			hideControl("save_favorite", true);
+			set_target("grid");
+			add_label(_("not configurable"), 0, 1, "");
+			hide_control("load_favorite", true);
+			hide_control("save_favorite", true);
 		}
 
 		event("load_favorite", std::bind(&SynthPanel::onLoad, this));
@@ -90,18 +90,18 @@ SynthConsole::SynthConsole(Session *session) :
 {
 	id_inner = "grid";
 
-	fromResource("synth_console");
+	from_resource("synth_console");
 
-	event("select", std::bind(&SynthConsole::onSelect, this));
-	event("detune", std::bind(&SynthConsole::onDetune, this));
+	event("select", std::bind(&SynthConsole::on_select, this));
+	event("detune", std::bind(&SynthConsole::on_detune, this));
 
-	event("edit_song", std::bind(&SynthConsole::onEditSong, this));
-	event("edit_track", std::bind(&SynthConsole::onEditTrack, this));
+	event("edit_song", std::bind(&SynthConsole::on_edit_song, this));
+	event("edit_track", std::bind(&SynthConsole::on_edit_track, this));
 
 	track = nullptr;
 	panel = nullptr;
 
-	view->subscribe(this, std::bind(&SynthConsole::onViewCurTrackChange, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, std::bind(&SynthConsole::on_view_cur_track_change, this), view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 SynthConsole::~SynthConsole()
@@ -114,7 +114,7 @@ SynthConsole::~SynthConsole()
 	}
 }
 
-void SynthConsole::onSelect()
+void SynthConsole::on_select()
 {
 	if (!track)
 		return;
@@ -123,18 +123,18 @@ void SynthConsole::onSelect()
 		track->set_synthesizer(CreateSynthesizer(session, name));
 }
 
-void SynthConsole::onDetune()
+void SynthConsole::on_detune()
 {
 	hui::Dialog *dlg = new DetuneSynthesizerDialog(track->synth, track, view, win);
 	dlg->show();
 }
 
-void SynthConsole::onEditSong()
+void SynthConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void SynthConsole::onEditTrack()
+void SynthConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
@@ -147,54 +147,54 @@ void SynthConsole::clear()
 			track->synth->unsubscribe(this);
 			delete(panel);
 			panel = nullptr;
-			removeControl("separator_0");
+			remove_control("separator_0");
 		}
 	}
 	track = nullptr;
 }
 
-void SynthConsole::setTrack(Track *t)
+void SynthConsole::set_track(Track *t)
 {
 	clear();
 	track = t;
 	if (!track)
 		return;
 
-	track->subscribe(this, std::bind(&SynthConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-	track->subscribe(this, std::bind(&SynthConsole::onTrackChange, this), track->MESSAGE_REPLACE_SYNTHESIZER);
+	track->subscribe(this, std::bind(&SynthConsole::on_track_delete, this), track->MESSAGE_DELETE);
+	track->subscribe(this, std::bind(&SynthConsole::on_track_change, this), track->MESSAGE_REPLACE_SYNTHESIZER);
 
 	if (track->synth){
-		track->synth->subscribe(this, std::bind(&SynthConsole::onSynthDelete, this), track->synth->MESSAGE_DELETE);
+		track->synth->subscribe(this, std::bind(&SynthConsole::on_synth_delete, this), track->synth->MESSAGE_DELETE);
 		panel = new SynthPanel(session, track);
 		embed(panel, id_inner, 0, 0);
-		addSeparator("!horizontal", 0, 1, "separator_0");
+		add_separator("!horizontal", 0, 1, "separator_0");
 	}
 }
 
-void SynthConsole::onTrackDelete()
+void SynthConsole::on_track_delete()
 {
-	setTrack(nullptr);
+	set_track(nullptr);
 }
 
-void SynthConsole::onTrackChange()
+void SynthConsole::on_track_change()
 {
-	setTrack(track);
+	set_track(track);
 }
 
-void SynthConsole::onSynthDelete()
+void SynthConsole::on_synth_delete()
 {
 	if (track){
 		if (track->synth and panel){
 			track->synth->unsubscribe(this);
 			delete(panel);
 			panel = nullptr;
-			removeControl("separator_0");
+			remove_control("separator_0");
 		}
 	}
 }
 
-void SynthConsole::onViewCurTrackChange()
+void SynthConsole::on_view_cur_track_change()
 {
-	setTrack(view->cur_track());
+	set_track(view->cur_track());
 }
 

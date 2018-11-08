@@ -18,10 +18,10 @@ class ControlCheckBox : public Control
 {
 public:
 	ControlCheckBox(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __check(bool checked);
-	virtual bool isChecked();
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __check(bool checked) override;
+	bool is_checked() override;
 };
 
 };

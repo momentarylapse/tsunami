@@ -17,12 +17,13 @@ class ControlMultilineEdit : public Control
 {
 public:
 	ControlMultilineEdit(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __addString(const string &str);
-	virtual void __reset();
-	virtual void setTabSize(int tab_size);
-	virtual void __setOption(const string &op, const string &value);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __add_string(const string &str) override;
+	void __reset() override;
+	void __set_option(const string &op, const string &value) override;
+
+	void set_tab_size(int tab_size);
 
 	bool handle_keys;
 };

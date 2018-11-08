@@ -39,17 +39,17 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	gtk_widget_set_vexpand(widget, true);
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&OnGtkMultilineEditChange), this);
 	handle_keys = false;
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
-void ControlMultilineEdit::__setString(const string &str)
+void ControlMultilineEdit::__set_string(const string &str)
 {
 	GtkTextBuffer *tb = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 	const char *str2 = sys_str(str);
 	gtk_text_buffer_set_text(tb, str2, strlen(str2));
 }
 
-string ControlMultilineEdit::getString()
+string ControlMultilineEdit::get_string()
 {
 	GtkTextBuffer *tb = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 	GtkTextIter is, ie;
@@ -58,16 +58,16 @@ string ControlMultilineEdit::getString()
 	return de_sys_str(gtk_text_buffer_get_text(tb, &is, &ie, false));
 }
 
-void ControlMultilineEdit::__addString(const string& str)
+void ControlMultilineEdit::__add_string(const string& str)
 {
 }
 
 void ControlMultilineEdit::__reset()
 {
-	__setString("");
+	__set_string("");
 }
 
-void ControlMultilineEdit::setTabSize(int tab_size)
+void ControlMultilineEdit::set_tab_size(int tab_size)
 {
 	PangoLayout *layout = gtk_widget_create_pango_layout(widget, "W");
 	int width, height;
@@ -78,7 +78,7 @@ void ControlMultilineEdit::setTabSize(int tab_size)
 }
 
 
-void ControlMultilineEdit::__setOption(const string &op, const string &value)
+void ControlMultilineEdit::__set_option(const string &op, const string &value)
 {
 	if (op == "handlekeys"){
 		handle_keys = true;

@@ -19,7 +19,7 @@ public:
 	ControlScroller(const string &text, const string &id);
 
 	void add(Control *child, int x, int y) override;
-	void __setOption(const string &op, const string &value) override;
+	void __set_option(const string &op, const string &value) override;
 
 	GtkWidget *viewport;
 };

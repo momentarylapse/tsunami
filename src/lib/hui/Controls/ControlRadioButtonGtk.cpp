@@ -35,10 +35,10 @@ ControlRadioButton::ControlRadioButton(const string &title, const string &id, Pa
 
 	widget = gtk_radio_button_new_with_label(group, sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkRadioButtonToggle), this);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
-void ControlRadioButton::__setString(const string &str)
+void ControlRadioButton::__set_string(const string &str)
 {
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(str));
 }
@@ -48,12 +48,12 @@ void ControlRadioButton::__check(bool checked)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), checked);
 }
 
-string ControlRadioButton::getString()
+string ControlRadioButton::get_string()
 {
 	return gtk_button_get_label(GTK_BUTTON(widget));
 }
 
-bool ControlRadioButton::isChecked()
+bool ControlRadioButton::is_checked()
 {
 	return (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }

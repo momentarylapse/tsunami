@@ -54,7 +54,7 @@ void Toolbar::configure(bool _text_enabled, bool _large_icons)
 	large_icons = _large_icons;
 }
 
-void Toolbar::add(Control *c)
+void Toolbar::_add(Control *c)
 {
 	c->panel = win;
 	item.add(c);

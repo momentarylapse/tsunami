@@ -25,39 +25,39 @@ ControlSpinButton::ControlSpinButton(const string &title, const string &id) :
 	float step = 1;
 	widget = gtk_spin_button_new_with_range(vmin, vmax, step);
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
-	setOptions(OptionString);
+	set_options(OptionString);
 
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkSpinButtonChange), this);
 }
 
-string ControlSpinButton::getString()
+string ControlSpinButton::get_string()
 {
 	return f2s((float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget)), gtk_spin_button_get_digits(GTK_SPIN_BUTTON(widget)));
 	//return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
-void ControlSpinButton::__setString(const string &str)
+void ControlSpinButton::__set_string(const string &str)
 {
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
 }
 
-void ControlSpinButton::__setInt(int i)
+void ControlSpinButton::__set_int(int i)
 {
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), i);
 }
 
-int ControlSpinButton::getInt()
+int ControlSpinButton::get_int()
 {
 	return gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
 }
 
-float ControlSpinButton::getFloat()
+float ControlSpinButton::get_float()
 {
 	return (float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget));
 }
 
-void ControlSpinButton::__setFloat(float f)
+void ControlSpinButton::__set_float(float f)
 {
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), f);
 }
@@ -69,7 +69,7 @@ int count_digits(float f)
 	return max(0, (int)(0.5-log10(f)));
 }
 
-void ControlSpinButton::__setOption(const string &op, const string &value)
+void ControlSpinButton::__set_option(const string &op, const string &value)
 {
 	if (op == "range"){
 		float vmin = -100000000000.0f;

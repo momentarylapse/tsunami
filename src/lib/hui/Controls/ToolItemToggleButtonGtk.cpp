@@ -34,7 +34,7 @@ void ToolItemToggleButton::__check(bool checked)
 	gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(widget), checked);
 }
 
-bool ToolItemToggleButton::isChecked()
+bool ToolItemToggleButton::is_checked()
 {
 	return gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
 }

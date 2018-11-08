@@ -32,7 +32,7 @@ MenuItem::MenuItem(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
 }
 
-void MenuItem::setImage(const string &image)
+void MenuItem::set_image(const string &image)
 {
 	/*GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
 	if (im)

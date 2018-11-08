@@ -173,15 +173,15 @@ Window *CreateResourceDialog(const string &id, Window *root)
 
 	// menu?
 	if (menu_id.num > 0)
-		dlg->setMenu(CreateResourceMenu(menu_id));
+		dlg->set_menu(CreateResourceMenu(menu_id));
 
 	// toolbar?
 	if (toolbar_id.num > 0)
-		dlg->toolbar[TOOLBAR_TOP]->setByID(toolbar_id);
+		dlg->toolbar[TOOLBAR_TOP]->set_by_id(toolbar_id);
 
 	// controls
 	for (Resource &cmd: res->children)
-		dlg->_addControl(id, cmd, "");
+		dlg->_add_control(id, cmd, "");
 
 	return dlg;
 	

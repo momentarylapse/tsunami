@@ -56,8 +56,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 Slider::~Slider()
 {
 	if (panel){
-		panel->removeEventHandler(event_handler_id[0]);
-		panel->removeEventHandler(event_handler_id[1]);
+		panel->remove_event_handler(event_handler_id[0]);
+		panel->remove_event_handler(event_handler_id[1]);
 	}
 }
 
@@ -73,15 +73,15 @@ void Slider::__delete__()
 
 void Slider::set(float value)
 {
-	panel->setFloat(id_slider, (value - value_min) / (value_max - value_min));
-	panel->setFloat(id_edit, value * factor);
+	panel->set_float(id_slider, (value - value_min) / (value_max - value_min));
+	panel->set_float(id_edit, value * factor);
 }
 
 
 
 float Slider::get()
 {
-	return panel->getFloat(id_edit) / factor;
+	return panel->get_float(id_edit) / factor;
 }
 
 
@@ -94,15 +94,15 @@ void Slider::enable(bool enabled)
 
 void Slider::onSlide()
 {
-	float value = value_min + panel->getFloat(id_slider) * (value_max - value_min);
-	panel->setFloat(id_edit, value * factor);
+	float value = value_min + panel->get_float(id_slider) * (value_max - value_min);
+	panel->set_float(id_edit, value * factor);
 	func();
 }
 
 void Slider::onEdit()
 {
-	float value = panel->getFloat(id_edit) / factor;
-	panel->setFloat(id_slider, (value - value_min) / (value_max - value_min));
+	float value = panel->get_float(id_edit) / factor;
+	panel->set_float(id_slider, (value - value_min) / (value_max - value_min));
 	func();
 }
 

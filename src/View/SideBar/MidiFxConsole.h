@@ -18,19 +18,19 @@ public:
 	MidiFxConsole(Session *session);
 	virtual ~MidiFxConsole();
 
-	void onViewCurTrackChange();
-	void onTrackDelete();
-	void onUpdate();
+	void on_view_cur_track_change();
+	void on_track_delete();
+	void on_update();
 	void update();
 
 	void clear();
-	void setTrack(Track *t);
+	void set_track(Track *t);
 
-	void onAdd();
+	void on_add();
 
-	void onEditSong();
-	void onEditTrack();
-	void onEditMidi();
+	void on_edit_song();
+	void on_edit_track();
+	void on_edit_midi();
 
 	string id_inner;
 

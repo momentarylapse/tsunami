@@ -13,7 +13,7 @@
 BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("bar_edit_dialog");
+	from_resource("bar_edit_dialog");
 	song = _song;
 	duration = 0;
 	for (int i=_bars.start(); i<_bars.end(); i++){
@@ -22,10 +22,10 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	}
 
 	Bar *b = song->bars[sel[0]];
-	setInt("number", sel.num);
-	setInt("beats", b->num_beats);
-	setInt("sub_beats", b->num_sub_beats);
-	setFloat("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
+	set_int("number", sel.num);
+	set_int("beats", b->num_beats);
+	set_int("sub_beats", b->num_sub_beats);
+	set_float("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
 	check("shift-data", true);
 	check("scale-audio", false);
 
@@ -45,11 +45,11 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 void BarEditDialog::on_ok()
 {
 	song->begin_action_group();
-	int mode = getInt("mode");
+	int mode = get_int("mode");
 	if (mode == 0){
-		float bpm = getFloat("bpm");
-		bool move_data = isChecked("shift-data");
-		bool scale_audio = isChecked("scale-audio");
+		float bpm = get_float("bpm");
+		bool move_data = is_checked("shift-data");
+		bool scale_audio = is_checked("scale-audio");
 
 		int bmode = Bar::EditMode::IGNORE;
 		if (move_data){
@@ -65,12 +65,12 @@ void BarEditDialog::on_ok()
 		}
 
 	}else{
-		int number = getInt("number");
-		int beats = getInt("beats");
-		int sub_beats = getInt("sub_beats");
-		bool edit_number = isChecked("edit_number");
-		bool edit_beats = isChecked("edit_beats");
-		bool edit_sub_beats = isChecked("edit_sub_beats");
+		int number = get_int("number");
+		int beats = get_int("beats");
+		int sub_beats = get_int("sub_beats");
+		bool edit_number = is_checked("edit_number");
+		bool edit_beats = is_checked("edit_beats");
+		bool edit_sub_beats = is_checked("edit_sub_beats");
 
 		if (edit_number){
 			foreachb(int i, sel)
@@ -132,12 +132,12 @@ void BarEditDialog::on_number()
 void BarEditDialog::update_result_bpm()
 {
 	float t = (float)duration / (float)song->sample_rate;
-	int number = getInt("number");
-	int beats = getInt("beats");
-	setFloat("result_bpm", 60.0f * (float)(number * beats) / t);
+	int number = get_int("number");
+	int beats = get_int("beats");
+	set_float("result_bpm", 60.0f * (float)(number * beats) / t);
 }
 
 void BarEditDialog::on_shift_data()
 {
-	enable("scale-audio", isChecked(""));
+	enable("scale-audio", is_checked(""));
 }

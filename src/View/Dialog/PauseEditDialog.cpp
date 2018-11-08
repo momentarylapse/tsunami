@@ -13,23 +13,23 @@
 PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("pause_edit_dialog");
+	from_resource("pause_edit_dialog");
 	song = _song;
 	index = _index;
 
 	Bar *b = song->bars[index];
-	setFloat("duration", (float)b->length / (float)song->sample_rate);
+	set_float("duration", (float)b->length / (float)song->sample_rate);
 	check("shift-data", true);
 
-	event("ok", std::bind(&PauseEditDialog::onOk, this));
+	event("ok", std::bind(&PauseEditDialog::on_ok, this));
 	event("cancel", std::bind(&PauseEditDialog::destroy, this));
 	event("hui:close", std::bind(&PauseEditDialog::destroy, this));
 }
 
-void PauseEditDialog::onOk()
+void PauseEditDialog::on_ok()
 {
-	bool move_data = isChecked("shift-data");
-	float duration = getFloat("duration");
+	bool move_data = is_checked("shift-data");
+	float duration = get_float("duration");
 	BarPattern b = *song->bars[index];
 	b.length = (float)song->sample_rate * duration;
 	song->edit_bar(index, b.length, b.num_beats, b.num_sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);

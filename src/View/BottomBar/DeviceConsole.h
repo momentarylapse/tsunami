@@ -23,14 +23,14 @@ public:
 	void change_data();
 	void add_device();
 
-	void onOutputEdit();
-	void onInputEdit();
-	void onMidiInputEdit();
-	void onOutputMove();
-	void onInputMove();
-	void onMidiInputMove();
-	void onTopPriority();
-	void onErase();
+	void on_output_edit();
+	void on_input_edit();
+	void on_midi_input_edit();
+	void on_output_move();
+	void on_input_move();
+	void on_midi_input_move();
+	void on_top_priority();
+	void on_erase();
 
 	string to_format(int i, const Device *d);
 

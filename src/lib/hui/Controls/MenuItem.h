@@ -18,7 +18,7 @@ class MenuItem : public Control
 public:
 	MenuItem(const string &title, const string &id);
 
-	virtual void setImage(const string &image);
+	void set_image(const string &image) override;
 };
 
 };

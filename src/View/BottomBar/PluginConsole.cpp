@@ -16,23 +16,23 @@ class PluginPanel : public hui::Panel
 public:
 	PluginPanel(TsunamiPlugin *p, PluginConsole *_console)
 	{
-		addGrid("!width=380,noexpandx", 0, 0, "grid");
-		setTarget("grid");
-		addGrid("", 0, 0, "header-grid");
-		setTarget("header-grid");
-		addButton("", 0, 0, "close");
-		setImage("close", "hui:close");
-		setTooltip("close", _("stop plugin"));
-		addButton("", 1, 0, "big");
-		setImage("big", "hui:up");
-		setTooltip("big", _("big!!!"));
-		addLabel("!expandx,center,bold,big\\" + p->module_subtype, 2, 0, "label");
+		add_grid("!width=380,noexpandx", 0, 0, "grid");
+		set_target("grid");
+		add_grid("", 0, 0, "header-grid");
+		set_target("header-grid");
+		add_button("", 0, 0, "close");
+		set_image("close", "hui:close");
+		set_tooltip("close", _("stop plugin"));
+		add_button("", 1, 0, "big");
+		set_image("big", "hui:up");
+		set_tooltip("big", _("big!!!"));
+		add_label("!expandx,center,bold,big\\" + p->module_subtype, 2, 0, "label");
 		plugin = p;
 		console = _console;
 		config_panel = p->create_panel();
 		if (config_panel)
 			embed(config_panel, "grid", 0, 1);
-		hideControl("big", !config_panel);
+		hide_control("big", !config_panel);
 
 		event("close", [&]{ plugin->stop_request(); });
 		event("big", [&]{ on_big(); });
@@ -54,7 +54,7 @@ public:
 		if (!c)
 			return;
 		dlg = new hui::Dialog(plugin->module_subtype, 500, 400, console->win, true);
-		dlg->addGrid("", 0, 0, "root");
+		dlg->add_grid("", 0, 0, "root");
 		dlg->embed(plugin->create_panel(), "root", 0, 0);
 		dlg->show();
 
@@ -80,15 +80,15 @@ public:
 PluginConsole::PluginConsole(Session *s) :
 	BottomBar::Console(_("Plugins"), s)
 {
-	addGrid("", 0, 0, "main-grid");
-	setTarget("main-grid");
-	addScroller("", 0, 0, "scroller");
-	addLabel("!angle=90,bold,width=60\\" + _("no plugins yet"), 1, 0, "no-plugins-label");
-	addButton("!expandy,noexpandx", 2, 0, "add");
-	setImage("add", "hui:add");
-	setTooltip("add", _("add plugin"));
-	setTarget("scroller");
-	addGrid("", 0, 0, "panel-grid");
+	add_grid("", 0, 0, "main-grid");
+	set_target("main-grid");
+	add_scroller("", 0, 0, "scroller");
+	add_label("!angle=90,bold,width=60\\" + _("no plugins yet"), 1, 0, "no-plugins-label");
+	add_button("!expandy,noexpandx", 2, 0, "add");
+	set_image("add", "hui:add");
+	set_tooltip("add", _("add plugin"));
+	set_target("scroller");
+	add_grid("", 0, 0, "panel-grid");
 	next_x = 0;
 
 	event("add", [&]{ on_add_button(); });
@@ -116,7 +116,7 @@ void PluginConsole::on_add_plugin()
 	auto *p = new PluginPanel(session->last_plugin, this);
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
-	hideControl("no-plugins-label", true);
+	hide_control("no-plugins-label", true);
 	blink();
 }
 
@@ -128,6 +128,6 @@ void PluginConsole::on_remove_plugin()
 			panels.erase(i);
 			break;
 		}
-	hideControl("no-plugins-label", panels.num > 0);
+	hide_control("no-plugins-label", panels.num > 0);
 }
 

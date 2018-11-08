@@ -29,18 +29,18 @@ public:
 		fx = _fx;
 		index = _index;
 
-		fromResource("fx_panel");
+		from_resource("fx_panel");
 
-		setString("name", fx->module_subtype);
+		set_string("name", fx->module_subtype);
 		p = fx->create_panel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
-			setTarget("grid");
-			addLabel(_("not configurable"), 0, 1, "");
-			hideControl("load_favorite", true);
-			hideControl("save_favorite", true);
+			set_target("grid");
+			add_label(_("not configurable"), 0, 1, "");
+			hide_control("load_favorite", true);
+			hide_control("save_favorite", true);
 		}
 
 		event("enabled", std::bind(&SingleMidiFxPanel::onEnabled, this));
@@ -78,7 +78,7 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->enable_midi_effect(fx, isChecked(""));
+			track->enable_midi_effect(fx, is_checked(""));
 	}
 	void onDelete()
 	{
@@ -111,7 +111,7 @@ public:
 MidiFxConsole::MidiFxConsole(Session *session) :
 	SideBarConsole(_("Midi Fx"), session)
 {
-	fromResource("midi_fx_editor");
+	from_resource("midi_fx_editor");
 
 	id_inner = "midi_fx_inner_table";
 
@@ -140,27 +140,27 @@ void MidiFxConsole::update()
 	bool allow = false;
 	if (view->cur_track())
 		allow = (view->cur_track()->type == SignalType::MIDI);
-	hideControl("me_grid_yes", !allow);
-	hideControl("me_grid_no", allow);
-	hideControl(id_inner, !allow);
+	hide_control("me_grid_yes", !allow);
+	hide_control("me_grid_no", allow);
+	hide_control(id_inner, !allow);
 }
 
-void MidiFxConsole::onViewCurTrackChange()
+void MidiFxConsole::on_view_cur_track_change()
 {
-	setTrack(view->cur_track());
+	set_track(view->cur_track());
 }
 
-void MidiFxConsole::onTrackDelete()
+void MidiFxConsole::on_track_delete()
 {
-	setTrack(nullptr);
+	set_track(nullptr);
 }
 
-void MidiFxConsole::onUpdate()
+void MidiFxConsole::on_update()
 {
 	update();
 }
 
-void MidiFxConsole::onAdd()
+void MidiFxConsole::on_add()
 {
 	string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_EFFECT);
 	MidiEffect *effect = CreateMidiEffect(session, name);
@@ -174,36 +174,36 @@ void MidiFxConsole::clear()
 		track->unsubscribe(this);
 	foreachi(hui::Panel *p, panels, i){
 		delete(p);
-		removeControl("separator_" + i2s(i));
+		remove_control("separator_" + i2s(i));
 	}
 	panels.clear();
 	track = nullptr;
 	//Enable("add", false);
 }
 
-void MidiFxConsole::onEditSong()
+void MidiFxConsole::on_edit_song()
 {
 	bar()->open(SideBar::SONG_CONSOLE);
 }
 
-void MidiFxConsole::onEditTrack()
+void MidiFxConsole::on_edit_track()
 {
 	bar()->open(SideBar::TRACK_CONSOLE);
 }
 
-void MidiFxConsole::onEditMidi()
+void MidiFxConsole::on_edit_midi()
 {
 	bar()->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
-void MidiFxConsole::setTrack(Track *t)
+void MidiFxConsole::set_track(Track *t)
 {
 	clear();
 	track = t;
 	if (track){
-		track->subscribe(this, std::bind(&MidiFxConsole::onTrackDelete, this), track->MESSAGE_DELETE);
-		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, std::bind(&MidiFxConsole::onUpdate, this), track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiFxConsole::on_track_delete, this), track->MESSAGE_DELETE);
+		track->subscribe(this, std::bind(&MidiFxConsole::on_update, this), track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, std::bind(&MidiFxConsole::on_update, this), track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 
@@ -211,11 +211,11 @@ void MidiFxConsole::setTrack(Track *t)
 		foreachi(MidiEffect *e, track->midi_fx, i){
 			panels.add(new SingleMidiFxPanel(session, track, e, i));
 			embed(panels.back(), id_inner, 0, i*2 + 3);
-			addSeparator("!horizontal", 0, i*2 + 4, "separator_" + i2s(i));
+			add_separator("!horizontal", 0, i*2 + 4, "separator_" + i2s(i));
 		}
-		hideControl("comment_no_fx", track->midi_fx.num > 0);
+		hide_control("comment_no_fx", track->midi_fx.num > 0);
 	}else{
-		hideControl("comment_no_fx", false);
+		hide_control("comment_no_fx", false);
 	}
 	//Enable("add", track);
 	update();

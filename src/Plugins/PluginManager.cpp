@@ -632,7 +632,7 @@ void PluginManager::find_plugins()
 
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win)
 {
-	hui::Menu *m = win->getMenu();
+	hui::Menu *m = win->get_menu();
 
 	// "Buffer"
 	add_plugins_in_dir("AudioEffect/Channels/", this, m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);

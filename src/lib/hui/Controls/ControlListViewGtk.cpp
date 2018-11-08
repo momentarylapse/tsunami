@@ -205,17 +205,17 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	configure_tree_view_columns(this, view, HuiFormatString, PartString);
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
-string ControlListView::getString()
+string ControlListView::get_string()
 {
 	return "";
 }
 
-void ControlListView::__setString(const string &str)
+void ControlListView::__set_string(const string &str)
 {
-	__addString(str);
+	__add_string(str);
 }
 
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str)
@@ -232,7 +232,7 @@ void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const str
 	}
 }
 
-void ControlListView::__addString(const string& str)
+void ControlListView::__add_string(const string& str)
 {
 	allow_change_messages = false;
 	GtkTreeIter iter;
@@ -244,7 +244,7 @@ void ControlListView::__addString(const string& str)
 	allow_change_messages = true;
 }
 
-void ControlListView::__setInt(int i)
+void ControlListView::__set_int(int i)
 {
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	if (i >= 0){
@@ -259,7 +259,7 @@ void ControlListView::__setInt(int i)
 		gtk_tree_selection_unselect_all(sel);
 }
 
-int ControlListView::getInt()
+int ControlListView::get_int()
 {
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 
@@ -274,7 +274,7 @@ int ControlListView::getInt()
 	return -1;
 }
 
-void ControlListView::__changeString(int row, const string& str)
+void ControlListView::__change_string(int row, const string& str)
 {
 	if (row < 0)
 		return;
@@ -286,7 +286,7 @@ void ControlListView::__changeString(int row, const string& str)
 			set_list_cell(store, iter, j, PartString[j]);
 }
 
-void ControlListView::__removeString(int row)
+void ControlListView::__remove_string(int row)
 {
 	if (row < 0)
 		return;
@@ -298,7 +298,7 @@ void ControlListView::__removeString(int row)
 	allow_change_messages = true;
 }
 
-string ControlListView::getCell(int row, int column)
+string ControlListView::get_cell(int row, int column)
 {
 	if (row < 0)
 		return "";
@@ -309,7 +309,7 @@ string ControlListView::getCell(int row, int column)
 	return tree_get_cell(store, iter, column);
 }
 
-void ControlListView::__setCell(int row, int column, const string& str)
+void ControlListView::__set_cell(int row, int column, const string& str)
 {
 	if (row < 0)
 		return;
@@ -319,7 +319,7 @@ void ControlListView::__setCell(int row, int column, const string& str)
 		set_list_cell(store, iter, column, str);
 }
 
-Array<int> ControlListView::getSelection()
+Array<int> ControlListView::get_selection()
 {
 	Array<int> selected;
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
@@ -335,7 +335,7 @@ Array<int> ControlListView::getSelection()
 	return selected;
 }
 
-void ControlListView::__setSelection(Array<int>& selected)
+void ControlListView::__set_selection(const Array<int>& selected)
 {
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	gtk_tree_selection_set_mode(sel, GTK_SELECTION_MULTIPLE);
@@ -357,7 +357,7 @@ void ControlListView::__reset()
 	allow_change_messages = true;
 }
 
-void ControlListView::__setOption(const string &op, const string &value)
+void ControlListView::__set_option(const string &op, const string &value)
 {
 	if ((op == "multiline") || (op == "select-multi")){
 		GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));

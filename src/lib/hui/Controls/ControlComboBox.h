@@ -18,12 +18,12 @@ class ControlComboBox : public Control
 {
 public:
 	ControlComboBox(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __addString(const string &str);
-	virtual void __setInt(int i);
-	virtual int getInt();
-	virtual void __reset();
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __add_string(const string &str) override;
+	void __set_int(int i) override;
+	int get_int() override;
+	void __reset() override;
 
 	bool editable;
 };

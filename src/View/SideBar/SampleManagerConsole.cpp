@@ -76,13 +76,13 @@ public:
 		manager = _manager;
 		s = _s;
 		icon = render_sample(s, view);
-		s->subscribe(this, std::bind(&SampleManagerItem::onUpdate, this));
+		s->subscribe(this, std::bind(&SampleManagerItem::on_update, this));
 	}
 	virtual ~SampleManagerItem()
 	{
 		zombify();
 	}
-	virtual void onUpdate()
+	void on_update()
 	{
 		//msg_write("item:  " + message);
 		if (s->cur_message() == s->MESSAGE_DELETE){
@@ -90,7 +90,7 @@ public:
 		}else{
 			int n = manager->get_index(s);
 			if (n >= 0)
-				manager->changeString("sample_list", n, str());
+				manager->change_string("sample_list", n, str());
 		}
 	}
 
@@ -115,7 +115,7 @@ public:
 SampleManagerConsole::SampleManagerConsole(Session *session) :
 	SideBarConsole(_("Samples"), session)
 {
-	fromResource("sample_manager_dialog");
+	from_resource("sample_manager_dialog");
 
 	event("import_from_file", std::bind(&SampleManagerConsole::on_import, this));
 	event("export_sample", std::bind(&SampleManagerConsole::on_export, this));
@@ -124,8 +124,8 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 	event("create_from_selection", std::bind(&SampleManagerConsole::on_create_from_selection, this));
 	event("delete_sample", std::bind(&SampleManagerConsole::on_delete, this));
 	event("scale_sample", std::bind(&SampleManagerConsole::on_scale, this));
-	eventX("sample_list", "hui:change", std::bind(&SampleManagerConsole::on_list_edit, this));
-	eventX("sample_list", "hui:select", std::bind(&SampleManagerConsole::on_list_select, this));
+	event_x("sample_list", "hui:change", std::bind(&SampleManagerConsole::on_list_edit, this));
+	event_x("sample_list", "hui:select", std::bind(&SampleManagerConsole::on_list_select, this));
 	event("sample_list", std::bind(&SampleManagerConsole::on_preview, this));
 
 	event("edit_song", std::bind(&SampleManagerConsole::on_edit_song, this));
@@ -186,9 +186,9 @@ void SampleManagerConsole::on_list_edit()
 	int sel = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
 	if (col == 1)
-		song->edit_sample_name(items[sel]->s, getCell("sample_list", sel, 1));
+		song->edit_sample_name(items[sel]->s, get_cell("sample_list", sel, 1));
 	else if (col == 4)
-		items[sel]->s->auto_delete = getCell("sample_list", sel, 4)._bool();
+		items[sel]->s->auto_delete = get_cell("sample_list", sel, 4)._bool();
 }
 
 void SampleManagerConsole::on_import()
@@ -238,7 +238,7 @@ void SampleManagerConsole::on_delete()
 	song->action_manager->group_end();
 
 	// hui bug
-	setInt("sample_list", -1);
+	set_int("sample_list", -1);
 }
 
 
@@ -257,7 +257,7 @@ void SampleManagerConsole::on_scale()
 void SampleManagerConsole::add(SampleManagerItem *item)
 {
 	items.add(item);
-	addString("sample_list", item->str());
+	add_string("sample_list", item->str());
 }
 
 void SampleManagerConsole::remove(SampleManagerItem *item)
@@ -265,7 +265,7 @@ void SampleManagerConsole::remove(SampleManagerItem *item)
 	foreachi(SampleManagerItem *si, items, i)
 		if (si == item){
 			items.erase(i);
-			removeString("sample_list", i);
+			remove_string("sample_list", i);
 
 			// don't delete now... we're still in notify()?
 			item->zombify();
@@ -275,7 +275,7 @@ void SampleManagerConsole::remove(SampleManagerItem *item)
 
 Array<Sample*> SampleManagerConsole::get_selected()
 {
-	Array<int> indices = getSelection("sample_list");
+	Array<int> indices = get_selection("sample_list");
 	Array<Sample*> sel;
 	for (int i: indices)
 		sel.add(items[i]->s);
@@ -287,7 +287,7 @@ void SampleManagerConsole::set_selection(const Array<Sample*> &samples)
 	Array<int> indices;
 	for (Sample *s: samples)
 		indices.add(get_index(s));
-	hui::Panel::setSelection("sample_list", indices);
+	hui::Panel::set_selection("sample_list", indices);
 }
 
 void SampleManagerConsole::on_edit_song()
@@ -322,7 +322,7 @@ void SampleManagerConsole::on_preview()
 {
 	if (progress)
 		end_preview();
-	int sel = getInt("sample_list");
+	int sel = get_int("sample_list");
 	preview_sample = items[sel]->s;
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
 	preview_stream = new OutputStream(session);
@@ -365,7 +365,7 @@ public:
 				selected = s;
 
 
-		fromResource("sample_selection_dialog");
+		from_resource("sample_selection_dialog");
 
 		list_id = "sample_selection_list";
 
@@ -375,7 +375,7 @@ public:
 		event("ok", std::bind(&SampleSelector::on_ok, this));
 		event("cancel", std::bind(&SampleSelector::on_cancel, this));
 		event("hui:close", std::bind(&SampleSelector::on_cancel, this));
-		eventX(list_id, "hui:select", std::bind(&SampleSelector::on_select, this));
+		event_x(list_id, "hui:select", std::bind(&SampleSelector::on_select, this));
 		event(list_id, std::bind(&SampleSelector::on_list, this));
 	}
 	virtual ~SampleSelector()
@@ -388,19 +388,19 @@ public:
 	{
 		reset(list_id);
 
-		setString(list_id, _("\\- none -\\"));
-		setInt(list_id, 0);
+		set_string(list_id, _("\\- none -\\"));
+		set_int(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
 			icon_names.add(render_sample(s, session->view));
-			setString(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf.length) + "\\" + s->name);
+			set_string(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf.length) + "\\" + s->name);
 			if (s == selected)
-				setInt(list_id, i + 1);
+				set_int(list_id, i + 1);
 		}
 	}
 
 	void on_select()
 	{
-		int n = getInt("");
+		int n = get_int("");
 		selected = nullptr;
 		if (n >= 1)
 			selected = song->samples[n - 1];
@@ -409,7 +409,7 @@ public:
 
 	void on_list()
 	{
-		int n = getInt("");
+		int n = get_int("");
 		if (n == 0){
 			selected = nullptr;
 			destroy();

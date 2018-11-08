@@ -45,7 +45,7 @@ void Menu::add(const string &name, const string &id)
 void Menu::add_with_image(const string &name, const string &image, const string &id)
 {
 	_add(new MenuItem(name, id));
-	items.back()->setImage(image);
+	items.back()->set_image(image);
 }
 
 void Menu::add_checkable(const string &name, const string &id)

@@ -15,7 +15,7 @@
 BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Range &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("bar_delete_dialog");
+	from_resource("bar_delete_dialog");
 	song = s;
 	for (int i=_bars.start(); i<_bars.end(); i++)
 		sel.add(i);
@@ -31,13 +31,13 @@ BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Range &_bars)
 
 void BarDeleteDialog::on_replace_by_pause()
 {
-	enable("shift-data", !isChecked(""));
+	enable("shift-data", !is_checked(""));
 }
 
 void BarDeleteDialog::on_ok()
 {
-	bool move_data = isChecked("shift-data");
-	bool replace_by_pause = isChecked("replace-by-pause");
+	bool move_data = is_checked("shift-data");
+	bool replace_by_pause = is_checked("replace-by-pause");
 
 	song->begin_action_group();
 

@@ -310,19 +310,19 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
-	win->eventXP(id, "hui:draw", std::bind(&AudioView::on_draw, this, std::placeholders::_1));
-	win->eventX(id, "hui:mouse-move", std::bind(&AudioView::on_mouse_move, this));
-	win->eventX(id, "hui:left-button-down", std::bind(&AudioView::on_left_button_down, this));
-	win->eventX(id, "hui:left-double-click", std::bind(&AudioView::on_left_double_click, this));
-	win->eventX(id, "hui:left-button-up", std::bind(&AudioView::on_left_button_up, this));
-	win->eventX(id, "hui:middle-button-down", std::bind(&AudioView::on_middle_button_down, this));
-	win->eventX(id, "hui:middle-button-up", std::bind(&AudioView::on_middle_button_up, this));
-	win->eventX(id, "hui:right-button-down", std::bind(&AudioView::on_right_button_down, this));
-	win->eventX(id, "hui:right-button-up", std::bind(&AudioView::on_right_button_up, this));
-	win->eventX(id, "hui:mouse-leave", std::bind(&AudioView::on_mouse_leave, this));
-	win->eventX(id, "hui:key-down", std::bind(&AudioView::on_key_down, this));
-	win->eventX(id, "hui:key-up", std::bind(&AudioView::on_key_up, this));
-	win->eventX(id, "hui:mouse-wheel", std::bind(&AudioView::on_mouse_wheel, this));
+	win->event_xp(id, "hui:draw", std::bind(&AudioView::on_draw, this, std::placeholders::_1));
+	win->event_x(id, "hui:mouse-move", std::bind(&AudioView::on_mouse_move, this));
+	win->event_x(id, "hui:left-button-down", std::bind(&AudioView::on_left_button_down, this));
+	win->event_x(id, "hui:left-double-click", std::bind(&AudioView::on_left_double_click, this));
+	win->event_x(id, "hui:left-button-up", std::bind(&AudioView::on_left_button_up, this));
+	win->event_x(id, "hui:middle-button-down", std::bind(&AudioView::on_middle_button_down, this));
+	win->event_x(id, "hui:middle-button-up", std::bind(&AudioView::on_middle_button_up, this));
+	win->event_x(id, "hui:right-button-down", std::bind(&AudioView::on_right_button_down, this));
+	win->event_x(id, "hui:right-button-up", std::bind(&AudioView::on_right_button_up, this));
+	win->event_x(id, "hui:mouse-leave", std::bind(&AudioView::on_mouse_leave, this));
+	win->event_x(id, "hui:key-down", std::bind(&AudioView::on_key_down, this));
+	win->event_x(id, "hui:key-up", std::bind(&AudioView::on_key_up, this));
+	win->event_x(id, "hui:mouse-wheel", std::bind(&AudioView::on_mouse_wheel, this));
 
 	win->activate(id);
 
@@ -517,7 +517,7 @@ void AudioView::on_mouse_move()
 		snap_to_grid(hover.pos);
 		hover.range.set_end(hover.pos);
 		hover.y1 = my;
-		if (win->getKey(hui::KEY_CONTROL))
+		if (win->get_key(hui::KEY_CONTROL))
 			set_selection(sel_temp or mode->get_selection(hover.range));
 		else
 			set_selection(mode->get_selection(hover.range));
@@ -646,7 +646,7 @@ void AudioView::force_redraw()
 
 void AudioView::force_redraw_part(const rect &r)
 {
-	win->redrawRect(id, r);
+	win->redraw_rect(id, r);
 }
 
 void AudioView::unselect_all_samples()
@@ -1333,7 +1333,7 @@ void AudioView::on_draw(Painter *c)
 {
 	PerformanceMonitor::start_busy(perf_channel);
 
-	colors = basic_colors.create(win->isActive(id));
+	colors = basic_colors.create(win->is_active(id));
 
 	area = c->area();
 	clip = c->clip();

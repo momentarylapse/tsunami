@@ -20,8 +20,8 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, hui::Window *parent) :
 	ok = false;
 
 	for (int i=1;i<(int)SampleFormat::NUM_SAMPLE_FORMATS;i++)
-		addString("format", format_name((SampleFormat)i));
-	setInt("format", 0);
+		add_string("format", format_name((SampleFormat)i));
+	set_int("format", 0);
 
 	event("hui:close", std::bind(&RawConfigDialog::on_close, this));
 	event("close", std::bind(&RawConfigDialog::on_close, this));
@@ -40,10 +40,10 @@ void RawConfigDialog::on_close()
 
 void RawConfigDialog::on_ok()
 {
-	data->format = (SampleFormat)(getInt("format") + 1);
-	data->channels = getInt("channels") + 1;
-	data->sample_rate = getInt("sample_rate");
-	data->offset = getInt("offset");
+	data->format = (SampleFormat)(get_int("format") + 1);
+	data->channels = get_int("channels") + 1;
+	data->sample_rate = get_int("sample_rate");
+	data->offset = get_int("offset");
 	ok = true;
 	destroy();
 }

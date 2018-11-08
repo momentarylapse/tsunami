@@ -31,7 +31,7 @@ ControlExpander::ControlExpander(const string &title, const string &id) :
 	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), nullptr);
 	if (!gtk_expander_get_expanded(GTK_EXPANDER(widget)))
 		gtk_widget_set_vexpand(widget, false);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
 void ControlExpander::expand(int row, bool expand)
@@ -39,12 +39,12 @@ void ControlExpander::expand(int row, bool expand)
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-void ControlExpander::expandAll(bool expand)
+void ControlExpander::expand_all(bool expand)
 {
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-bool ControlExpander::isExpanded(int row)
+bool ControlExpander::is_expanded(int row)
 {
 	return (bool)gtk_expander_get_expanded(GTK_EXPANDER(widget));
 }

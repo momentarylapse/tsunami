@@ -57,18 +57,18 @@ void Progress::set(const string &str, float progress)
 		if (t < allow_next)
 			return;
 		if (str.num > 0)
-			dlg->setTitle(str);
+			dlg->set_title(str);
 		if (t > 2){
 			int eta = (int)(t / progress * (1-progress) + 0.7f);
 			if (eta >= 60)
-				dlg->setString("progress_bar", format("%.1f%% (%dmin %ds)", progress * 100, eta/60, eta %60));
+				dlg->set_string("progress_bar", format("%.1f%% (%dmin %ds)", progress * 100, eta/60, eta %60));
 			else
-				dlg->setString("progress_bar", format("%.1f%% (%ds)", progress * 100, eta));
+				dlg->set_string("progress_bar", format("%.1f%% (%ds)", progress * 100, eta));
 		}else{
-			dlg->setString("progress_bar", format("%.1f%%", progress * 100));
+			dlg->set_string("progress_bar", format("%.1f%%", progress * 100));
 		}
 		//dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", progress);
+		dlg->set_float("progress_bar", progress);
 		hui::Application::do_single_main_loop();
 		allow_next = t + PROGRESS_DT;
 	}
@@ -107,8 +107,8 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 {
 	if (parent){
 		dlg = hui::CreateResourceDialog("progress_cancelable_dialog", parent);
-		dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", 0);
+		dlg->set_string("progress_bar", str);
+		dlg->set_float("progress_bar", 0);
 		dlg->show();
 		dlg->event("hui:close", std::bind(&Progress::cancel, this));
 		dlg->event("cancel", std::bind(&Progress::cancel, this));

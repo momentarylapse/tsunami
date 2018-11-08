@@ -25,25 +25,25 @@ const int SideBar::WIDTH_LARGE = 750;
 
 SideBar::SideBar(Session *session)
 {
-	addRevealer("!slide=left", 0, 0, "revealer");
-	setTarget("revealer");
-	addGrid("!noexpandx,width=380,expandy", 0, 0, "root_grid0");
-	setTarget("root_grid0");
-	addSeparator("!vertical,expandy", 0, 0, "");
-	addGrid("!expandx,expandy,margin-right=5,margin-bottom=5", 1, 0, "root_grid");
-	setTarget("root_grid");
-	addGrid("", 0, 0, "button_grid");
-	addSeparator("", 0, 1, "");
-	addGrid("", 0, 2, "console_grid");
-	setTarget("button_grid");
-	addButton("!noexpandx,flat", 0, 0, "close");
-	setImage("close", "hui:close");
-	addButton("!noexpandx,flat", 1, 0, "large");
-	setImage("large", "hui:up");
-	addLabel("!big,bold,expandx,center\\...", 2, 0, "title");
+	add_revealer("!slide=left", 0, 0, "revealer");
+	set_target("revealer");
+	add_grid("!noexpandx,width=380,expandy", 0, 0, "root_grid0");
+	set_target("root_grid0");
+	add_separator("!vertical,expandy", 0, 0, "");
+	add_grid("!expandx,expandy,margin-right=5,margin-bottom=5", 1, 0, "root_grid");
+	set_target("root_grid");
+	add_grid("", 0, 0, "button_grid");
+	add_separator("", 0, 1, "");
+	add_grid("", 0, 2, "console_grid");
+	set_target("button_grid");
+	add_button("!noexpandx,flat", 0, 0, "close");
+	set_image("close", "hui:close");
+	add_button("!noexpandx,flat", 1, 0, "large");
+	set_image("large", "hui:up");
+	add_label("!big,bold,expandx,center\\...", 2, 0, "title");
 
 	is_large = false;
-	hideControl("large", true);
+	hide_control("large", true);
 
 	song_console = new SongConsole(session);
 	sample_manager = new SampleManagerConsole(session);
@@ -108,13 +108,13 @@ void SideBar::set_large(bool large)
 		return;
 	is_large = large;
 	if (is_large){
-		setOptions("root_grid0", format("width=%d", WIDTH_LARGE));
-		setImage("large", "hui:down");
+		set_options("root_grid0", format("width=%d", WIDTH_LARGE));
+		set_image("large", "hui:down");
 	}else{
-		setOptions("root_grid0", format("width=%d", WIDTH_DEFAULT));
-		setImage("large", "hui:up");
+		set_options("root_grid0", format("width=%d", WIDTH_DEFAULT));
+		set_image("large", "hui:up");
 	}
-	hideControl("large", !is_large);
+	hide_control("large", !is_large);
 	if (active_console >= 0)
 		consoles[active_console]->on_set_large(is_large);
 
@@ -154,7 +154,7 @@ void SideBar::choose(int console)
 	consoles[active_console]->show();
 	if (visible)
 		consoles[active_console]->on_enter();
-	setString("title", consoles[active_console]->title);
+	set_string("title", consoles[active_console]->title);
 
 	notify();
 }

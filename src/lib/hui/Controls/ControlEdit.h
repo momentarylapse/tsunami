@@ -17,12 +17,12 @@ class ControlEdit : public Control
 {
 public:
 	ControlEdit(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __reset();
-	virtual void completionAdd(const string &text);
-	virtual void completionClear();
-	virtual void __setOption(const string &op, const string &value);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __reset() override;
+	void completion_add(const string &text) override;
+	void completion_clear() override;
+	void __set_option(const string &op, const string &value) override;
 };
 
 };

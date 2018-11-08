@@ -21,18 +21,18 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 	dev_manager = session->device_manager;
 	bottom_bar = _bottom_bar;
 
-	fromResource("mini_bar");
+	from_resource("mini_bar");
 
 	peak_meter = new PeakMeterDisplay(this, "peaks", view->peak_meter);
-	setFloat("volume", dev_manager->get_output_volume());
+	set_float("volume", dev_manager->get_output_volume());
 
 	cpu_display = new CpuDisplay(this, "cpu", session);
 
-	event("show_bottom_bar", std::bind(&MiniBar::onShowBottomBar, this));
-	event("volume", std::bind(&MiniBar::onVolume, this));
+	event("show_bottom_bar", std::bind(&MiniBar::on_show_bottom_bar, this));
+	event("volume", std::bind(&MiniBar::on_volume, this));
 
-	bottom_bar->subscribe(this, std::bind(&MiniBar::onBottomBarUpdate, this));
-	dev_manager->subscribe(this, std::bind(&MiniBar::onVolumeChange, this));
+	bottom_bar->subscribe(this, std::bind(&MiniBar::on_bottom_bar_update, this));
+	dev_manager->subscribe(this, std::bind(&MiniBar::on_volume_change, this));
 }
 
 MiniBar::~MiniBar()
@@ -43,28 +43,28 @@ MiniBar::~MiniBar()
 	delete(cpu_display);
 }
 
-void MiniBar::onShowBottomBar()
+void MiniBar::on_show_bottom_bar()
 {
 	bottom_bar->_show();
 	hide();
 }
 
-void MiniBar::onVolume()
+void MiniBar::on_volume()
 {
-	dev_manager->set_output_volume(getFloat(""));
+	dev_manager->set_output_volume(get_float(""));
 }
 
-void MiniBar::onShow()
+void MiniBar::on_show()
 {
 	peak_meter->enable(true);
 }
 
-void MiniBar::onHide()
+void MiniBar::on_hide()
 {
 	peak_meter->enable(false);
 }
 
-void MiniBar::onBottomBarUpdate()
+void MiniBar::on_bottom_bar_update()
 {
 	if (bottom_bar->visible)
 		hide();
@@ -72,9 +72,9 @@ void MiniBar::onBottomBarUpdate()
 		show();
 }
 
-void MiniBar::onVolumeChange()
+void MiniBar::on_volume_change()
 {
-	setFloat("volume", dev_manager->get_output_volume());
+	set_float("volume", dev_manager->get_output_volume());
 }
 
 

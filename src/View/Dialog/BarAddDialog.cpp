@@ -15,12 +15,12 @@
 BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("bar_add_dialog");
+	from_resource("bar_add_dialog");
 	song = s;
 	index = max(_index, 0);
 
 
-	setInt("count", 1);
+	set_int("count", 1);
 	int beats = 4;
 	int sub_beats = 1;
 	float bpm = 90.0f;
@@ -34,23 +34,23 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 				bpm = song->sample_rate * 60.0f / (b->length / b->num_beats);
 			}
 	}
-	setInt("beats", beats);
-	setInt("sub_beats", sub_beats);
-	setFloat("bpm", bpm);
+	set_int("beats", beats);
+	set_int("sub_beats", sub_beats);
+	set_float("bpm", bpm);
 	check("shift-data", true);
 
-	event("ok", std::bind(&BarAddDialog::onOk, this));
-	event("cancel", std::bind(&BarAddDialog::onClose, this));
-	event("hui:close", std::bind(&BarAddDialog::onClose, this));
+	event("ok", std::bind(&BarAddDialog::on_ok, this));
+	event("cancel", std::bind(&BarAddDialog::on_close, this));
+	event("hui:close", std::bind(&BarAddDialog::on_close, this));
 }
 
-void BarAddDialog::onOk()
+void BarAddDialog::on_ok()
 {
-	int count = getInt("count");
-	int beats = getInt("beats");
-	int sub_beats = getInt("sub_beats");
-	float bpm = getFloat("bpm");
-	bool move_data = isChecked("shift-data");
+	int count = get_int("count");
+	int beats = get_int("beats");
+	int sub_beats = get_int("sub_beats");
+	float bpm = get_float("bpm");
+	bool move_data = is_checked("shift-data");
 
 	song->begin_action_group();
 
@@ -64,7 +64,7 @@ void BarAddDialog::onOk()
 	destroy();
 }
 
-void BarAddDialog::onClose()
+void BarAddDialog::on_close()
 {
 	destroy();
 }

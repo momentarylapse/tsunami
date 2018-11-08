@@ -26,25 +26,25 @@ ControlEdit::ControlEdit(const string &title, const string &id) :
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkEditChange), this);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
-void ControlEdit::__setString(const string &str)
+void ControlEdit::__set_string(const string &str)
 {
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
 }
 
-string ControlEdit::getString()
+string ControlEdit::get_string()
 {
 	return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
 void ControlEdit::__reset()
 {
-	__setString("");
+	__set_string("");
 }
 
-void ControlEdit::completionAdd(const string &text)
+void ControlEdit::completion_add(const string &text)
 {
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));
 	if (!comp){
@@ -63,12 +63,12 @@ void ControlEdit::completionAdd(const string &text)
 	set_list_cell(GTK_LIST_STORE(m), iter, 0, text);
 }
 
-void ControlEdit::completionClear()
+void ControlEdit::completion_clear()
 {
 	gtk_entry_set_completion(GTK_ENTRY(widget), nullptr);
 }
 
-void ControlEdit::__setOption(const string &op, const string &value)
+void ControlEdit::__set_option(const string &op, const string &value)
 {
 	if (op == "clear-placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), "");
@@ -77,7 +77,7 @@ void ControlEdit::__setOption(const string &op, const string &value)
 	else if (op == "placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), value.c_str());
 	else if (op == "completion")
-		completionAdd(value);
+		completion_add(value);
 }
 
 };

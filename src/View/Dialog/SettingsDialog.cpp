@@ -31,19 +31,19 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	hui::Window("settings_dialog", _parent)
 {
 	view = _view;
-	event("language", std::bind(&SettingsDialog::onLanguage, this));
-	event("color_scheme", std::bind(&SettingsDialog::onColorScheme, this));
-	event("ogg_bitrate", std::bind(&SettingsDialog::onOggBitrate, this));
-	event("default_artist", std::bind(&SettingsDialog::onDefaultArtist, this));
-	event("scroll_speed", std::bind(&SettingsDialog::onScrollSpeed, this));
-	event("cpu_meter", std::bind(&SettingsDialog::onCpuMeter, this));
-	event("audio_api", std::bind(&SettingsDialog::onAudioApi, this));
-	event("midi_api", std::bind(&SettingsDialog::onMidiApi, this));
+	event("language", std::bind(&SettingsDialog::on_language, this));
+	event("color_scheme", std::bind(&SettingsDialog::on_color_scheme, this));
+	event("ogg_bitrate", std::bind(&SettingsDialog::on_ogg_bitrate, this));
+	event("default_artist", std::bind(&SettingsDialog::on_default_artist, this));
+	event("scroll_speed", std::bind(&SettingsDialog::on_scroll_speed, this));
+	event("cpu_meter", std::bind(&SettingsDialog::on_cpu_meter, this));
+	event("audio_api", std::bind(&SettingsDialog::on_audio_api, this));
+	event("midi_api", std::bind(&SettingsDialog::on_midi_api, this));
 	event("hui:close", std::bind(&SettingsDialog::destroy, this));
 	event("close", std::bind(&SettingsDialog::destroy, this));
 
 	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
-	setOptions("default_artist", "placeholder=" + AppName);
+	set_options("default_artist", "placeholder=" + AppName);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -66,31 +66,31 @@ void SettingsDialog::loadData()
 	// language
 	Array<string> lang = hui::GetLanguages();
 	foreachi(string &l, lang, i){
-		addString("language", l);
+		add_string("language", l);
 		if (l == hui::GetCurLanguage())
-			setInt("language", i);
+			set_int("language", i);
 	}
 
 	// color scheme
 	foreachi(ColorSchemeBasic &b, view->basic_schemes, i){
-		addString("color_scheme", b.name);
+		add_string("color_scheme", b.name);
 		if (b.name == view->colors.name)
-			setInt("color_scheme", i);
+			set_int("color_scheme", i);
 	}
 
 	// ogg quality
 	float CurOggQuality = hui::Config.get_float("OggQuality", 0.5f);
 	foreachi(OggQuality &q, ogg_quality, i)
 		if (CurOggQuality > q.quality - 0.05f)
-			setInt("ogg_bitrate", i);
-	setDecimals(1);
+			set_int("ogg_bitrate", i);
+	set_decimals(1);
 
-	setString("default_artist", hui::Config.get_str("DefaultArtist", ""));
+	set_string("default_artist", hui::Config.get_str("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
 	check("cpu_meter", hui::Config.get_bool("CpuDisplay", false));
-	setFloat("scroll_speed", hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
+	set_float("scroll_speed", hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
 	//enable("scroll_speed", false);
 
 	int n_audio = 0, n_midi = 0;
@@ -99,15 +99,15 @@ void SettingsDialog::loadData()
 		if (!a.available)
 			continue;
 		if (a.mode & 1){
-			addString("audio_api", a.name);
+			add_string("audio_api", a.name);
 			if (a.type == Session::GLOBAL->device_manager->audio_api)
-				setInt("audio_api", n_audio);
+				set_int("audio_api", n_audio);
 			n_audio ++;
 		}
 		if (a.mode & 2){
-			addString("midi_api", a.name);
+			add_string("midi_api", a.name);
 			if (a.type == Session::GLOBAL->device_manager->midi_api)
-				setInt("midi_api", n_midi);
+				set_int("midi_api", n_midi);
 			n_midi ++;
 		}
 	}
@@ -117,40 +117,40 @@ void SettingsDialog::applyData()
 {
 }
 
-void SettingsDialog::onLanguage()
+void SettingsDialog::on_language()
 {
 	Array<string> lang = hui::GetLanguages();
-	int l = getInt("");
+	int l = get_int("");
 	hui::SetLanguage(lang[l]);
 	hui::Config.set_str("Language", lang[l]);
 }
 
-void SettingsDialog::onColorScheme()
+void SettingsDialog::on_color_scheme()
 {
-	int i = getInt("");
+	int i = get_int("");
 	if ((i >= 0) and (i < view->basic_schemes.num))
 		view->set_color_scheme(view->basic_schemes[i].name);
 }
 
-void SettingsDialog::onOggBitrate()
+void SettingsDialog::on_ogg_bitrate()
 {
-	hui::Config.set_float("OggQuality", ogg_quality[getInt("")].quality);
+	hui::Config.set_float("OggQuality", ogg_quality[get_int("")].quality);
 }
 
-void SettingsDialog::onDefaultArtist()
+void SettingsDialog::on_default_artist()
 {
-	hui::Config.set_str("DefaultArtist", getString(""));
+	hui::Config.set_str("DefaultArtist", get_string(""));
 }
 
-void SettingsDialog::onScrollSpeed()
+void SettingsDialog::on_scroll_speed()
 {
-	view->mouse_wheel_speed = getFloat("");
-	hui::Config.set_float("View.MouseWheelSpeed", getFloat(""));
+	view->mouse_wheel_speed = get_float("");
+	hui::Config.set_float("View.MouseWheelSpeed", get_float(""));
 }
 
-void SettingsDialog::onAudioApi()
+void SettingsDialog::on_audio_api()
 {
-	int n = getInt("");
+	int n = get_int("");
 	int n_audio = 0;
 	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
 		auto &a = api_descriptions[i];
@@ -164,9 +164,9 @@ void SettingsDialog::onAudioApi()
 	}
 }
 
-void SettingsDialog::onMidiApi()
+void SettingsDialog::on_midi_api()
 {
-	int n = getInt("");
+	int n = get_int("");
 	int n_midi = 0;
 	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
 		auto &a = api_descriptions[i];
@@ -180,9 +180,9 @@ void SettingsDialog::onMidiApi()
 	}
 }
 
-void SettingsDialog::onCpuMeter()
+void SettingsDialog::on_cpu_meter()
 {
-	bool show = isChecked("");
+	bool show = is_checked("");
 	hui::Config.set_bool("CpuDisplay", show);
-	view->win->mini_bar->cpu_display->panel->hideControl(view->win->mini_bar->cpu_display->id, !show);
+	view->win->mini_bar->cpu_display->panel->hide_control(view->win->mini_bar->cpu_display->id, !show);
 }

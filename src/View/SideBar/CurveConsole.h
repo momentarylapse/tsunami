@@ -22,21 +22,21 @@ public:
 	CurveConsole(Session *session);
 	virtual ~CurveConsole();
 
-	void onViewChange();
-	void onUpdate();
+	void on_view_change();
+	void on_update();
 
-	void updateList();
-	void onAdd();
-	void onDelete();
-	void onTarget();
-	void onListEdit();
-	void onListSelect();
-	void onEditSong();
-	void onEditTrack();
-	void onEditFx();
+	void update_list();
+	void on_add();
+	void on_delete();
+	void on_target();
+	void on_list_edit();
+	void on_list_select();
+	void on_edit_song();
+	void on_edit_track();
+	void on_edit_fx();
 
-	virtual void on_enter();
-	virtual void on_leave();
+	void on_enter() override;
+	void on_leave() override;
 
 	Curve* curve();
 

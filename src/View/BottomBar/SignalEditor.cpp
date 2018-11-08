@@ -66,16 +66,16 @@ class SignalEditorTab : public hui::Panel
 public:
 	SignalEditorTab(SignalEditor *ed, SignalChain *_chain)
 	{
-		addGrid("", 0, 0, "grid");
-		setTarget("grid");
-		addDrawingArea("!expandx,expandy,grabfocus", 0, 0, "area");
+		add_grid("", 0, 0, "grid");
+		set_target("grid");
+		add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
 
-		eventXP("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
-		eventX("area", "hui:mouse-move", std::bind(&SignalEditorTab::on_mouse_move, this));
-		eventX("area", "hui:left-button-down", std::bind(&SignalEditorTab::on_left_button_down, this));
-		eventX("area", "hui:left-button-up", std::bind(&SignalEditorTab::on_left_button_up, this));
-		eventX("area", "hui:right-button-down", std::bind(&SignalEditorTab::on_right_button_down, this));
-		eventX("area", "hui:key-down", std::bind(&SignalEditorTab::on_key_down, this));
+		event_xp("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
+		event_x("area", "hui:mouse-move", std::bind(&SignalEditorTab::on_mouse_move, this));
+		event_x("area", "hui:left-button-down", std::bind(&SignalEditorTab::on_left_button_down, this));
+		event_x("area", "hui:left-button-up", std::bind(&SignalEditorTab::on_left_button_up, this));
+		event_x("area", "hui:right-button-down", std::bind(&SignalEditorTab::on_right_button_down, this));
+		event_x("area", "hui:key-down", std::bind(&SignalEditorTab::on_key_down, this));
 
 
 		event("signal_chain_add_audio_source", std::bind(&SignalEditorTab::on_add_audio_source, this));
@@ -412,7 +412,7 @@ public:
 
 	void apply_sel()
 	{
-		session->win->side_bar->module_console->setModule(sel.module);
+		session->win->side_bar->module_console->set_module(sel.module);
 		editor->show_config(sel.module);
 	}
 
@@ -583,13 +583,13 @@ SignalEditor::SignalEditor(Session *session) :
 {
 	grid_id = "main-grid";
 	config_grid_id = "config-panel-grid";
-	addGrid("", 0, 0, grid_id);
-	setTarget(grid_id);
-	addTabControl("!left\\aaa", 0, 0, "selector");
-	addGrid("!width=380,noexpandx", 1, 0, config_grid_id);
-	setTarget(config_grid_id);
-	addLabel("!bold,center,big,expandx", 0, 0, "config-label");
-	addLabel("!bold,center,expandx", 0, 1, "message");
+	add_grid("", 0, 0, grid_id);
+	set_target(grid_id);
+	add_tab_control("!left\\aaa", 0, 0, "selector");
+	add_grid("!width=380,noexpandx", 1, 0, config_grid_id);
+	set_target(config_grid_id);
+	add_label("!bold,center,big,expandx", 0, 0, "config-label");
+	add_label("!bold,center,expandx", 0, 1, "message");
 
 	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
 	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
@@ -616,15 +616,15 @@ void SignalEditor::add_chain(SignalChain *c)
 	int index = tabs.num;
 	string grid_id = "grid-" + i2s(index);
 	if (index > 0)
-		addString("selector", c->name);
+		add_string("selector", c->name);
 	else
-		changeString("selector", index, c->name);
-	setTarget("selector");
-	addGrid("", index, 0, grid_id);
+		change_string("selector", index, c->name);
+	set_target("selector");
+	add_grid("", index, 0, grid_id);
 	embed(tab, grid_id, 0, 0);
 	tabs.add(tab);
 
-	setInt("selector", index);
+	set_int("selector", index);
 }
 
 void SignalEditor::on_new()
@@ -656,21 +656,21 @@ void SignalEditor::show_config(Module *m)
 	config_panel = nullptr;
 	config_module = m;
 	if (m){
-		setString("config-label", module_header(m));
+		set_string("config-label", module_header(m));
 		config_panel = m->create_panel();
 		if (config_panel){
 			embed(config_panel, config_grid_id, 0, 2);
 			config_panel->set_large(false);
 			//setOptions(config_grid_id, "width=330,noexpandx");
-			hideControl("message", true);
+			hide_control("message", true);
 		}else{
-			setString("message", _("module not configurable"));
-			hideControl("message", false);
+			set_string("message", _("module not configurable"));
+			hide_control("message", false);
 		}
 	}else{
-		setString("config-label", "");
-		setString("message", _("no module selected"));
-		hideControl("message", false);
+		set_string("config-label", "");
+		set_string("message", _("no module selected"));
+		hide_control("message", false);
 	}
 }
 
@@ -684,8 +684,8 @@ void SignalEditor::delete_chain(SignalChain *c)
 				delete t;
 				delete c;
 				tabs.erase(i);
-				removeString("selector", i);
-				setInt("selector", 0);
+				remove_string("selector", i);
+				set_int("selector", 0);
 			}
 		}
 }

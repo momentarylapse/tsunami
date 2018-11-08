@@ -19,18 +19,18 @@ public:
 	virtual ~SynthConsole();
 
 	void clear();
-	void setTrack(Track *t);
+	void set_track(Track *t);
 
-	void onSelect();
-	void onDetune();
+	void on_select();
+	void on_detune();
 
-	void onEditSong();
-	void onEditTrack();
+	void on_edit_song();
+	void on_edit_track();
 
-	void onSynthDelete();
-	void onTrackDelete();
-	void onTrackChange();
-	void onViewCurTrackChange();
+	void on_synth_delete();
+	void on_track_delete();
+	void on_track_change();
+	void on_view_cur_track_change();
 
 	string id_inner;
 

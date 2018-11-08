@@ -23,7 +23,7 @@ class TsunamiWindow : public hui::Window
 public:
 	TsunamiWindow(Session *session);
 	virtual ~TsunamiWindow();
-	virtual void onDestroy();
+	virtual void on_destroy();
 
 	void on_about();
 	void on_send_bug_report();

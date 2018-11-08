@@ -85,60 +85,60 @@ public:
 	void _clean_up_();
 
 	void _cdecl destroy();
-	bool _cdecl gotDestroyed();
-	virtual void _cdecl onDestroy(){}
+	bool _cdecl got_destroyed();
+	virtual void _cdecl on_destroy(){}
 
 	// the window
 	void _cdecl run();
 	void _cdecl show();
 	void _cdecl hide();
-	void _cdecl setMaximized(bool maximized);
-	bool _cdecl isMaximized();
-	bool _cdecl isMinimized();
-	void _cdecl setID(const string &id);
-	void _cdecl setFullscreen(bool fullscreen);
-	void _cdecl setTitle(const string &title);
-	void _cdecl setPosition(int x, int y);
-	void _cdecl setPositionSpecial(Window *win, int mode);
-	void _cdecl getPosition(int &x, int &y);
-	void _cdecl setSize(int width, int height);
-	void _cdecl getSize(int &width, int &height);
-	void _cdecl setSizeDesired(int width, int height);
-	void _cdecl getSizeDesired(int &width, int &height);
-	void _cdecl setMenu(Menu *menu);
-	Menu* _cdecl getMenu();
-	Window* _cdecl getParent();
+	void _cdecl set_maximized(bool maximized);
+	bool _cdecl is_maximized();
+	bool _cdecl is_minimized();
+	void _cdecl set_id(const string &id);
+	void _cdecl set_fullscreen(bool fullscreen);
+	void _cdecl set_title(const string &title);
+	void _cdecl set_position(int x, int y);
+	void _cdecl set_position_special(Window *win, int mode);
+	void _cdecl get_position(int &x, int &y);
+	void _cdecl set_size(int width, int height);
+	void _cdecl get_size(int &width, int &height);
+	void _cdecl set_size_desired(int width, int height);
+	void _cdecl get_size_desired(int &width, int &height);
+	void _cdecl set_menu(Menu *menu);
+	Menu* _cdecl get_menu();
+	Window* _cdecl get_parent();
 
 
-	void _cdecl setCursorPos(int x,int y);
-	void _cdecl showCursor(bool show);
+	void _cdecl set_cursor_pos(int x,int y);
+	void _cdecl show_cursor(bool show);
 
 	// status bar
-	void _cdecl enableStatusbar(bool enabled);
-	//bool _cdecl isStatusbarEnabled();
-	void _cdecl setStatusText(const string &str);
-	void _cdecl setInfoText(const string &str, const Array<string> &options);
+	void _cdecl enable_statusbar(bool enabled);
+	//bool _cdecl is_statusbar_enabled();
+	void _cdecl set_status_text(const string &str);
+	void _cdecl set_info_text(const string &str, const Array<string> &options);
 
 	// events by overwriting
-	virtual void _cdecl onMouseMove(){}
-	virtual void _cdecl onMouseEnter(){}
-	virtual void _cdecl onMouseLeave(){}
-	virtual void _cdecl onLeftButtonDown(){}
-	virtual void _cdecl onMiddleButtonDown(){}
-	virtual void _cdecl onRightButtonDown(){}
-	virtual void _cdecl onLeftButtonUp(){}
-	virtual void _cdecl onMiddleButtonUp(){}
-	virtual void _cdecl onRightButtonUp(){}
-	virtual void _cdecl onDoubleClick(){}
-	virtual void _cdecl onMouseWheel(){}
-	virtual void _cdecl onCloseRequest();
-	virtual void _cdecl onKeyDown(){}
-	virtual void _cdecl onKeyUp(){}
-	virtual void _cdecl onDraw(::Painter *p){}
+	virtual void _cdecl on_mouse_move(){}
+	virtual void _cdecl on_mouse_enter(){}
+	virtual void _cdecl on_mouse_leave(){}
+	virtual void _cdecl on_left_button_down(){}
+	virtual void _cdecl on_middle_button_down(){}
+	virtual void _cdecl on_right_button_down(){}
+	virtual void _cdecl on_left_button_up(){}
+	virtual void _cdecl on_middle_button_up(){}
+	virtual void _cdecl on_right_button_up(){}
+	virtual void _cdecl on_double_click(){}
+	virtual void _cdecl on_mouse_wheel(){}
+	virtual void _cdecl on_close_request();
+	virtual void _cdecl on_key_down(){}
+	virtual void _cdecl on_key_up(){}
+	virtual void _cdecl on_draw(::Painter *p){}
 
 	// input
-	bool _cdecl getKey(int key);
-	bool _cdecl getMouse(int &x, int &y, int button);
+	bool _cdecl get_key(int key);
+	bool _cdecl get_mouse(int &x, int &y, int button);
 
 
 	// hui internal
@@ -148,7 +148,7 @@ public:
 	Control *main_input_control;
 
 	Toolbar *toolbar[4];
-	Toolbar *_cdecl getToolbar(int index){ return toolbar[index]; }
+	Toolbar *_cdecl get_toolbar(int index){ return toolbar[index]; }
 
 private:
 

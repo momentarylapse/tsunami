@@ -18,11 +18,11 @@ class ControlExpander : public Control
 public:
 	ControlExpander(const string &text, const string &id);
 
-	virtual void expand(int row, bool expand);
-	virtual void expandAll(bool expand);
-	virtual bool isExpanded(int row);
+	void expand(int row, bool expand) override;
+	void expand_all(bool expand) override;
+	bool is_expanded(int row) override;
 
-	virtual void add(Control *child, int x, int y);
+	void add(Control *child, int x, int y) override;
 };
 
 };

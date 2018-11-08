@@ -17,13 +17,13 @@ class ControlSpinButton : public Control
 {
 public:
 	ControlSpinButton(const string &text, const string &id);
-	virtual string getString();
-	virtual void __setString(const string &str);
-	virtual void __setInt(int i);
-	virtual int getInt();
-	virtual float getFloat();
-	virtual void __setFloat(float f);
-	virtual void __setOption(const string &op, const string &value);
+	string get_string() override;
+	void __set_string(const string &str) override;
+	void __set_int(int i) override;
+	int get_int() override;
+	float get_float() override;
+	void __set_float(float f) override;
+	void __set_option(const string &op, const string &value) override;
 };
 
 };

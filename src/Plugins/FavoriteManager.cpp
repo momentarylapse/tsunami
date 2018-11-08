@@ -130,49 +130,49 @@ public:
 	{
 		save = _save;
 		names = _names;
-		addGrid("", 0, 0, "grid");
-		setTarget("grid");
-		addListView("Name", 0, 0, "list");
-		addGrid("", 0, 1, "grid2");
-		setTarget("grid2");
-		addEdit("!expandx,placeholder=" + _("enter new name"), 0, 0, "name");
-		addDefButton("Ok", 1, 0, "ok");
+		add_grid("", 0, 0, "grid");
+		set_target("grid");
+		add_list_view("Name", 0, 0, "list");
+		add_grid("", 0, 1, "grid2");
+		set_target("grid2");
+		add_edit("!expandx,placeholder=" + _("enter new name"), 0, 0, "name");
+		add_def_button("Ok", 1, 0, "ok");
 		if (!save)
-			addString("list", _("-Default  Parameters-"));
+			add_string("list", _("-Default  Parameters-"));
 		for (string &n: names)
-			addString("list", n);
+			add_string("list", n);
 		if (!save)
 			names.insert(":def:", 0);
-		hideControl("grid2", !save);
+		hide_control("grid2", !save);
 		event("list", std::bind(&FavoriteSelectionDialog::on_list, this));
-		eventX("list", "hui:select", std::bind(&FavoriteSelectionDialog::on_list_select, this));
+		event_x("list", "hui:select", std::bind(&FavoriteSelectionDialog::on_list_select, this));
 		event("name", std::bind(&FavoriteSelectionDialog::on_name, this));
 		event("ok", std::bind(&FavoriteSelectionDialog::on_ok, this));
-		setInt("list", -1);
+		set_int("list", -1);
 	}
 	void on_list()
 	{
-		int n = getInt("list");
+		int n = get_int("list");
 		selection = "";
 		if (n >= 0){
 			selection = names[n];
-			setString("name", names[n]);
+			set_string("name", names[n]);
 		}
 		destroy();
 	}
 	void on_list_select()
 	{
-		int n = getInt("list");
+		int n = get_int("list");
 		if (n >= 0)
-			setString("name", names[n]);
+			set_string("name", names[n]);
 	}
 	void on_name()
 	{
-		setInt("list", -1);
+		set_int("list", -1);
 	}
 	void on_ok()
 	{
-		selection = getString("name");
+		selection = get_string("name");
 		destroy();
 	}
 

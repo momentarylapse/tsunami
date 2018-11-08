@@ -38,7 +38,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 
 void CaptureConsoleModeMidi::on_source()
 {
-	int n = cc->getInt("");
+	int n = cc->get_int("");
 	if ((n >= 0) and (n < sources.num)){
 		chosen_device = sources[n];
 		input->set_device(chosen_device);
@@ -69,9 +69,9 @@ void CaptureConsoleModeMidi::set_target(Track *t)
 
 
 	bool ok = (target->type == SignalType::MIDI);
-	cc->setString("message", "");
+	cc->set_string("message", "");
 	if (!ok)
-		cc->setString("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::MIDI).c_str()));
+		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::MIDI).c_str()));
 	cc->enable("start", ok);
 }
 
@@ -83,17 +83,17 @@ void CaptureConsoleModeMidi::enter()
 {
 	chosen_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
-	cc->hideControl("single_grid", false);
+	cc->hide_control("single_grid", false);
 
 	// add all
 	cc->reset("source");
 	for (Device *d: sources)
-		cc->setString("source", d->get_name());
+		cc->set_string("source", d->get_name());
 
 	// select current
 	foreachi(Device *d, sources, i)
 		if (d == chosen_device)
-			cc->setInt("source", i);
+			cc->set_int("source", i);
 
 
 	input = new InputStreamMidi(session);

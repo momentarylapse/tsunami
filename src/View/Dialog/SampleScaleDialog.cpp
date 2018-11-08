@@ -13,23 +13,23 @@
 SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
 	hui::Dialog("", 100, 100, root, false)
 {
-	fromResource("sample_scale_dialog");
+	from_resource("sample_scale_dialog");
 	sample = s;
 
-	setInt("samples_orig", sample->buf.length);
-	setInt("rate_orig", sample->owner->sample_rate);
-	setInt("rate_inv_new", sample->owner->sample_rate);
+	set_int("samples_orig", sample->buf.length);
+	set_int("rate_orig", sample->owner->sample_rate);
+	set_int("rate_inv_new", sample->owner->sample_rate);
 
 	new_size = sample->buf.length;
 	update();
 
-	event("factor", std::bind(&SampleScaleDialog::onFactor, this));
-	event("samples_new", std::bind(&SampleScaleDialog::onSamples, this));
-	event("rate_new", std::bind(&SampleScaleDialog::onSampleRate, this));
-	event("rate_inv_orig", std::bind(&SampleScaleDialog::onSampleRateInv, this));
-	event("ok", std::bind(&SampleScaleDialog::onOk, this));
-	event("cancel", std::bind(&SampleScaleDialog::onClose, this));
-	event("hui:close", std::bind(&SampleScaleDialog::onClose, this));
+	event("factor", std::bind(&SampleScaleDialog::on_factor, this));
+	event("samples_new", std::bind(&SampleScaleDialog::on_samples, this));
+	event("rate_new", std::bind(&SampleScaleDialog::on_sample_rate, this));
+	event("rate_inv_orig", std::bind(&SampleScaleDialog::on_sample_rate_inv, this));
+	event("ok", std::bind(&SampleScaleDialog::on_ok, this));
+	event("cancel", std::bind(&SampleScaleDialog::on_close, this));
+	event("hui:close", std::bind(&SampleScaleDialog::on_close, this));
 }
 
 SampleScaleDialog::~SampleScaleDialog()
@@ -42,54 +42,54 @@ void SampleScaleDialog::update(int mode)
 	float new_rate = (float)sample->owner->sample_rate * factor;
 	float orig_rate_inv = (float)sample->owner->sample_rate / factor;
 	if (mode != 0)
-		setInt("samples_new", new_size);
+		set_int("samples_new", new_size);
 	if (mode != 1)
-		setInt("rate_new", new_rate);
+		set_int("rate_new", new_rate);
 	if (mode != 2)
-		setInt("rate_inv_orig", orig_rate_inv);
+		set_int("rate_inv_orig", orig_rate_inv);
 	if (mode != 3)
-		setFloat("factor", factor * 100.0f);
+		set_float("factor", factor * 100.0f);
 }
 
-void SampleScaleDialog::onSamples()
+void SampleScaleDialog::on_samples()
 {
-	new_size = getInt("");
+	new_size = get_int("");
 	update(0);
 }
 
-void SampleScaleDialog::onSampleRate()
+void SampleScaleDialog::on_sample_rate()
 {
-	new_size = (double)sample->buf.length * (double)getInt("") / (double)sample->owner->sample_rate;
+	new_size = (double)sample->buf.length * (double)get_int("") / (double)sample->owner->sample_rate;
 	update(1);
 }
 
-void SampleScaleDialog::onSampleRateInv()
+void SampleScaleDialog::on_sample_rate_inv()
 {
-	new_size = (double)sample->buf.length / (double)getInt("") * (double)sample->owner->sample_rate;
+	new_size = (double)sample->buf.length / (double)get_int("") * (double)sample->owner->sample_rate;
 	update(2);
 }
 
-void SampleScaleDialog::onFactor()
+void SampleScaleDialog::on_factor()
 {
-	new_size = sample->buf.length * getFloat("") / 100.0f;
+	new_size = sample->buf.length * get_float("") / 100.0f;
 	update(3);
 }
 
-void SampleScaleDialog::onOk()
+void SampleScaleDialog::on_ok()
 {
 	BufferInterpolator::Method method = BufferInterpolator::METHOD_LINEAR;
-	if (getInt("method") == 1)
+	if (get_int("method") == 1)
 		method = BufferInterpolator::METHOD_CUBIC;
-	else if (getInt("method") == 2)
+	else if (get_int("method") == 2)
 		method = BufferInterpolator::METHOD_SINC;
-	else if (getInt("method") == 3)
+	else if (get_int("method") == 3)
 		method = BufferInterpolator::METHOD_FOURIER;
 
 	sample->owner->scale_sample(sample, new_size, method);
 	destroy();
 }
 
-void SampleScaleDialog::onClose()
+void SampleScaleDialog::on_close()
 {
 	destroy();
 }

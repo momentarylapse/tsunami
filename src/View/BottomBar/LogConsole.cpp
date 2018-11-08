@@ -16,7 +16,7 @@ LogConsole::LogConsole(Session *session) :
 	log = session->log;
 	messages_loaded = 0;
 
-	fromResource("log_console");
+	from_resource("log_console");
 
 	// only start after this->win is set
 	hui::RunLater(0.01f, [&]{ reload(); });
@@ -34,22 +34,22 @@ void console_add_message(LogConsole *lc, Log::Message &m)
 	if (m.session == Session::GLOBAL)
 		text = "[global] " + text;
 	if (m.type == Log::Type::ERROR){
-		lc->addString("log_list", "hui:error§§" + text);
+		lc->add_string("log_list", "hui:error§§" + text);
 		//lc->blink();
-		lc->win->setInfoText(m.text, {"error", "allow-close"});
+		lc->win->set_info_text(m.text, {"error", "allow-close"});
 	}else if (m.type == Log::Type::WARNING){
-		lc->addString("log_list", "hui:warning§§" + text);
+		lc->add_string("log_list", "hui:warning§§" + text);
 		//lc->blink();
-		lc->win->setInfoText(m.text, {"warning", "allow-close"});
+		lc->win->set_info_text(m.text, {"warning", "allow-close"});
 	}else if (m.type == Log::Type::QUESTION){
-		lc->addString("log_list", "hui:question§§" + text);
+		lc->add_string("log_list", "hui:question§§" + text);
 		//lc->blink();
 		Array<string> options = {"warning", "allow-close"};
 		for (auto &o: m.responses)
 			options.add("button:" + o);
-		lc->win->setInfoText(m.text, options);
+		lc->win->set_info_text(m.text, options);
 	}else{
-		lc->addString("log_list", "§§" + text);
+		lc->add_string("log_list", "§§" + text);
 	}
 	hui::ComboBoxSeparator = "\\";
 }

@@ -18,7 +18,7 @@ class ControlPaned : public Control
 public:
 	ControlPaned(const string &text, const string &id);
 
-	virtual void add(Control *child, int x, int y);
+	void add(Control *child, int x, int y) override;
 };
 
 };

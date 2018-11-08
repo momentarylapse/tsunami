@@ -32,20 +32,20 @@ ControlMenuButton::ControlMenuButton(const string &title, const string &id) :
 	menu = NULL;
 
 //	SetImageById(this, id);
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
-string ControlMenuButton::getString()
+string ControlMenuButton::get_string()
 {
 	return gtk_button_get_label(GTK_BUTTON(widget));
 }
 
-void ControlMenuButton::__setString(const string &str)
+void ControlMenuButton::__set_string(const string &str)
 {
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(str));
 }
 
-void ControlMenuButton::setImage(const string& str)
+void ControlMenuButton::set_image(const string& str)
 {
 	GtkWidget *im = (GtkWidget*)get_gtk_image(str, false);
 	gtk_button_set_image(GTK_BUTTON(widget), im);
@@ -55,7 +55,7 @@ void ControlMenuButton::setImage(const string& str)
 #endif
 }
 
-void ControlMenuButton::__setOption(const string &op, const string &value)
+void ControlMenuButton::__set_option(const string &op, const string &value)
 {
 	if (op == "flat")
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);

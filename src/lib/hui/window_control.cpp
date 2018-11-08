@@ -6,7 +6,7 @@ namespace hui
 
 
 //    for all
-bool Panel::isEnabled(const string &id)
+bool Panel::is_enabled(const string &id)
 {
 	bool r = false;;
 	apply_foreach(id, [&](Control *c){ r = c->enabled; });

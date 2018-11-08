@@ -17,7 +17,7 @@ MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range,
 	marker = _marker;
 
 	if (marker){
-		setString("text", marker->text);
+		set_string("text", marker->text);
 		range = marker->range;
 
 		enable("ok", true);
@@ -25,32 +25,32 @@ MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range,
 		enable("ok", false);
 	}
 
-	event("text", std::bind(&MarkerDialog::onEdit, this));
-	event("cancel", std::bind(&MarkerDialog::onClose, this));
-	event("hui:close", std::bind(&MarkerDialog::onClose, this));
-	event("ok", std::bind(&MarkerDialog::onOk, this));
+	event("text", std::bind(&MarkerDialog::on_edit, this));
+	event("cancel", std::bind(&MarkerDialog::on_close, this));
+	event("hui:close", std::bind(&MarkerDialog::on_close, this));
+	event("ok", std::bind(&MarkerDialog::on_ok, this));
 }
 
 MarkerDialog::~MarkerDialog()
 {
 }
 
-void MarkerDialog::onEdit()
+void MarkerDialog::on_edit()
 {
-	enable("ok", getString("text").num > 0);
+	enable("ok", get_string("text").num > 0);
 }
 
-void MarkerDialog::onOk()
+void MarkerDialog::on_ok()
 {
 	if (marker){
-		track->edit_marker(marker, marker->range, getString("text"));
+		track->edit_marker(marker, marker->range, get_string("text"));
 	}else{
-		track->add_marker(range, getString("text"));
+		track->add_marker(range, get_string("text"));
 	}
 	destroy();
 }
 
-void MarkerDialog::onClose()
+void MarkerDialog::on_close()
 {
 	destroy();
 }

@@ -24,7 +24,7 @@ ControlScroller::ControlScroller(const string &title, const string &id) :
 	gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(widget), true);
 	gtk_scrolled_window_set_propagate_natural_width(GTK_SCROLLED_WINDOW(widget), true);
 #endif
-	setOptions(OptionString);
+	set_options(OptionString);
 }
 
 void ControlScroller::add(Control *child, int x, int y)
@@ -37,7 +37,7 @@ void ControlScroller::add(Control *child, int x, int y)
 }
 
 
-void ControlScroller::__setOption(const string& op, const string& value)
+void ControlScroller::__set_option(const string& op, const string& value)
 {
 	GtkPolicyType h_policy, v_policy;
 	gtk_scrolled_window_get_policy(GTK_SCROLLED_WINDOW(widget), &h_policy, &v_policy);

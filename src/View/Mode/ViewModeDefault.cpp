@@ -441,7 +441,7 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), 0);
+		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, 0);
 	else
 		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
@@ -551,6 +551,18 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 	if (!l->on_screen())
 		return;
 	Track *t = l->layer->track;
+
+
+
+	if (l->layer->type == SignalType::BEATS){
+		color cc = l->background_color();
+		color cc_sel = l->background_selection_color();
+		color fg = view->colors.grid;
+		color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
+		if (song->bars.num > 0)
+			view->draw_bar_numbers(c, l->area, fg, fg_sel, cc, cc_sel);
+	}
+
 
 	// midi
 	if (l->layer->type == SignalType::MIDI)

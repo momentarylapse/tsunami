@@ -486,7 +486,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, (l->layer->type == SignalType::BEATS), beat_partition);
+		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, beat_partition);
 	else
 		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 

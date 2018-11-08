@@ -726,7 +726,7 @@ void AudioView::draw_grid_time(Painter *c, const rect &r, const color &fg, const
 }
 
 
-void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time, int beat_partition)
+void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, int beat_partition)
 {
 	if (song->bars.num == 0)
 		return;
@@ -788,6 +788,17 @@ void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, co
 			}
 		}
 	}
+}
+
+void AudioView::draw_bar_numbers(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel)
+{
+	if (song->bars.num == 0)
+		return;
+	int prev_num_beats = 0;
+	float prev_bpm = 0;
+	int s0 = cam.screen2sample(area.x1 - 1);
+	int s1 = cam.screen2sample(area.x2);
+	Array<Bar*> bars = song->bars.get_bars(RangeTo(s0, s1));
 
 	c->setFont("", FONT_SIZE, true, false);
 	for (Bar *b: bars){
@@ -800,24 +811,22 @@ void AudioView::draw_grid_bars(Painter *c, const rect &area, const color &fg, co
 		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b->index_text % 5) == 0)
 			f1 = 1;
-		if (show_time){
-			if (f1 > 0.9f){
-				c->setColor(colors.text_soft1);
-				c->drawStr(xx + 4, area.y1, i2s(b->index_text + 1));
-			}
-			float bpm = b->bpm(song->sample_rate);
-			string s;
-			if (prev_num_beats != b->num_beats)
-				s = i2s(b->num_beats) + "/" + i2s_small(4);
-			if (fabs(prev_bpm - bpm) > 0.5f)
-				s += format(" \u2669=%.0f", bpm);
-			if (s.num > 0){
-				c->setColor(colors.text_soft1);
-				c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
-			}
-			prev_num_beats = b->num_beats;
-			prev_bpm = bpm;
+		if (f1 > 0.9f){
+			c->setColor(colors.text_soft1);
+			c->drawStr(xx + 4, area.y1, i2s(b->index_text + 1));
 		}
+		float bpm = b->bpm(song->sample_rate);
+		string s;
+		if (prev_num_beats != b->num_beats)
+			s = i2s(b->num_beats) + "/" + i2s_small(4);
+		if (fabs(prev_bpm - bpm) > 0.5f)
+			s += format(" \u2669=%.0f", bpm);
+		if (s.num > 0){
+			c->setColor(colors.text_soft1);
+			c->drawStr(max(xx + 4, 20), area.y2 - 16, s);
+		}
+		prev_num_beats = b->num_beats;
+		prev_bpm = bpm;
 	}
 	c->setFont("", FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);
@@ -1152,7 +1161,7 @@ void AudioView::draw_background(Painter *c)
 		rect rr = rect(song_area.x1, song_area.x2, yy, song_area.y2);
 		c->drawRect(rr);
 		if (song->bars.num > 0)
-			draw_grid_bars(c, rr, colors.grid, colors.grid, colors.background, colors.background, false, 0);
+			draw_grid_bars(c, rr, colors.grid, colors.grid, colors.background, colors.background, 0);
 		else
 			draw_grid_time(c, rr, colors.grid, colors.grid, colors.background, colors.background, false);
 	}

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-581
+582
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1746,6 +1746,9 @@ bar_edit_dialog/t_result_bpm
 bar_edit_dialog/t_bpm
 Bpm
 
+midi_editor/apply_string
+Saite setzen
+(TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern
 // Num Language Strings
 208
 // Data (ID,Text)

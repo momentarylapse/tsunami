@@ -72,6 +72,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("modifier:flat", std::bind(&MidiEditorConsole::on_modifier_flat, this));
 	event("modifier:natural", std::bind(&MidiEditorConsole::on_modifier_natural, this));
 	event("quantize", std::bind(&MidiEditorConsole::on_quantize, this));
+	event("apply_string", std::bind(&MidiEditorConsole::on_apply_string, this));
 	event("edit_track", std::bind(&MidiEditorConsole::on_edit_track, this));
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::on_edit_midi_fx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::on_edit_song, this));
@@ -308,4 +309,16 @@ void MidiEditorConsole::on_quantize()
 		view->sel.add(nn);
 	}
 	song->action_manager->group_end();
+}
+
+void MidiEditorConsole::on_apply_string()
+{
+	int string_no = get_int("string_no");
+
+	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: ref){
+		n->stringno = string_no;
+	}
+	// TODO hmmm, make actions... stringno essential data?
+	song->notify();
 }

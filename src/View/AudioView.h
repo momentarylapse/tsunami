@@ -255,6 +255,7 @@ public:
 
 	Array<AudioViewTrack*> vtrack;
 	Array<AudioViewLayer*> vlayer;
+	AudioViewLayer *metronome_overlay_vlayer;
 	AudioViewTrack *dummy_vtrack;
 	AudioViewLayer *dummy_vlayer;
 	AudioViewTrack *get_track(Track *track);

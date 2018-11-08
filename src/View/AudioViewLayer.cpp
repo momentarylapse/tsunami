@@ -427,7 +427,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 	float x0 = view->cam.sample2screen(marker->range.start());
 	float x1 = view->cam.sample2screen(marker->range.end());
 	float y0 = area.y1;
-	float y1 = area.y1 + 15;
+	float y1 = y0 + 15;
 
 	w = max(w, x1 - x0);
 
@@ -803,11 +803,6 @@ void AudioViewLayer::draw_blank_background(Painter *c)
 	}else{
 		c->setColor(cc);
 		c->drawRect(area);
-	}
-
-	auto *tt = layer->song()->getTimeTrack();
-	for (auto *m: tt->markers){
-
 	}
 }
 

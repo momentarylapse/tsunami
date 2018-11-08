@@ -453,6 +453,20 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 			l->draw_midi_clef_tab(c);
 		}
 	}
+
+
+
+	auto *tt = l->layer->song()->getTimeTrack();
+	if (tt){
+		c->setLineWidth(2.0f);
+	for (auto *m: tt->markers){
+		color col = l->marker_color(m);
+		//col.a = 0.5f;
+		float x1 = (float)view->cam.sample2screen(m->range.start());
+		c->setColor(col);
+		c->drawLine(x1, l->area.y1, x1, l->area.y2);
+	}
+	}
 }
 
 void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)

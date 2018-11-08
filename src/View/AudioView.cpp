@@ -248,6 +248,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cur_vlayer = nullptr;
 	_prev_cur_track = nullptr;
 
+	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
@@ -357,6 +358,7 @@ AudioView::~AudioView()
 
 	delete(dummy_vtrack);
 	delete(dummy_vlayer);
+	delete(metronome_overlay_vlayer);
 
 	delete(images.speaker);
 	delete(images.speaker_bg);
@@ -1243,6 +1245,17 @@ void AudioView::draw_selection(Painter *c)
 	}
 }
 
+bool need_metro_overlay(Song *song, AudioView *view)
+{
+	Track *tt = song->getTimeTrack();
+	if (!tt)
+		return false;
+	auto *vv = view->get_layer(tt->layers[0]);
+	if (!vv)
+		return false;
+	return vv->area.y1 < 0;
+}
+
 void AudioView::draw_song(Painter *c)
 {
 	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
@@ -1268,6 +1281,12 @@ void AudioView::draw_song(Painter *c)
 		t->draw(c);
 	for (AudioViewTrack *t: vtrack)
 		t->draw(c);
+
+	if (need_metro_overlay(song, this)){
+		metronome_overlay_vlayer->layer = song->getTimeTrack()->layers[0];
+		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + 100);
+		metronome_overlay_vlayer->draw(c);
+	}
 
 	c->clip(clip);
 

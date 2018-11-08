@@ -44,6 +44,9 @@ Dialog midi_editor "Midi" width=380 height=516
 					Grid ? ""
 						Button apply_string "Apply string" "tooltip=(TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch" expandx
 						SpinButton string_no "" range=0:99
+					Grid ? ""
+						Button apply_hand_position "Apply hand" "tooltip=(TAB mode) Find positions on the fretboard for the selected notes" expandx
+						SpinButton fret_no "" range=0:99
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

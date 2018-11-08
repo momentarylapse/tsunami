@@ -73,6 +73,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("modifier:natural", std::bind(&MidiEditorConsole::on_modifier_natural, this));
 	event("quantize", std::bind(&MidiEditorConsole::on_quantize, this));
 	event("apply_string", std::bind(&MidiEditorConsole::on_apply_string, this));
+	event("apply_hand_position", std::bind(&MidiEditorConsole::on_apply_hand_position, this));
 	event("edit_track", std::bind(&MidiEditorConsole::on_edit_track, this));
 	event("edit_midi_fx", std::bind(&MidiEditorConsole::on_edit_midi_fx, this));
 	event("edit_song", std::bind(&MidiEditorConsole::on_edit_song, this));
@@ -323,5 +324,23 @@ void MidiEditorConsole::on_apply_string()
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref)
 		layer->midi_note_set_string(n, string_no);
+	song->action_manager->group_end();
+}
+
+void MidiEditorConsole::on_apply_hand_position()
+{
+	int hand_position = get_int("fret_no");
+	auto &string_pitch = layer->track->instrument.string_pitch;
+
+	song->action_manager->group_begin();
+	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	for (auto *n: ref){
+ 		int stringno = 0;
+ 		for (int i=0; i<string_pitch.num; i++)
+			if (n->pitch >= string_pitch[i] + hand_position){
+ 				stringno = i;
+ 			}
+		layer->midi_note_set_string(n, stringno);
+	}
 	song->action_manager->group_end();
 }

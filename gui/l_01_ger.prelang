@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-582
+583
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1749,6 +1749,9 @@ Bpm
 midi_editor/apply_string
 Saite setzen
 (TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern
+midi_editor/apply_hand_position
+Hand setzen
+(TAB Modus) Positionen auf dem Griffbrett für die markierten Noten finden
 // Num Language Strings
 208
 // Data (ID,Text)

@@ -1627,7 +1627,7 @@ Grid
 vertical
 0
 0
-2
+3
 Button
 quantize
 expandx
@@ -1648,6 +1648,24 @@ expandx
 0
 SpinButton
 string_no
+range=0:99
+1
+0
+0
+Grid
+?
+
+2
+0
+2
+Button
+apply_hand_position
+expandx
+0
+0
+0
+SpinButton
+fret_no
 range=0:99
 1
 0
@@ -4511,7 +4529,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-455
+456
 // Text
 /cancel
 Cancel
@@ -4993,6 +5011,9 @@ Play
 menu_fake/stop
 Stop
 
+midi_editor/apply_hand_position
+Apply hand
+(TAB mode) Find positions on the fretboard for the selected notes
 midi_editor/apply_string
 Apply string
 (TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch
@@ -5884,7 +5905,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-581
+582
 // Text
 /bpm
 Bpm
@@ -6561,6 +6582,9 @@ Abspielen
 menu_fake/stop
 Stopp
 
+midi_editor/apply_hand_position
+Hand setzen
+(TAB Modus) Positionen auf dem Griffbrett für die markierten Noten finden
 midi_editor/apply_string
 Saite setzen
 (TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern

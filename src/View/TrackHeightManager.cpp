@@ -47,7 +47,7 @@ float smooth_parametrization(float t)
 
 void set_track_areas_from_layers(AudioView *view)
 {
-	for (AudioViewTrack *v : view->vtrack){
+	for (AudioViewTrack *v: view->vtrack){
 		bool first = true;
 
 		for (AudioViewLayer *l: view->vlayer){
@@ -74,7 +74,7 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 		animating = true;
 		dirty = false;
 
-		for (AudioViewLayer *v : view->vlayer)
+		for (auto *v: view->vlayer)
 			v->area_last = v->area;
 	}
 
@@ -84,13 +84,13 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 
 		// instant change?
 		if (!animating){
-			for (AudioViewLayer *v : view->vlayer)
+			for (auto *v: view->vlayer)
 				v->area = v->area_target;
 		}
 	}
 
 	// force instant changes on x-axis
-	for (AudioViewLayer *v : view->vlayer){
+	for (auto *v: view->vlayer){
 		v->area.x1 = v->area_target.x1 = v->area_last.x1 = r.x1;
 		v->area.x2 = v->area_target.x2 = v->area_last.x2 = r.x2;
 	}
@@ -106,7 +106,7 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 		t = 1;
 		animating = false;
 	}
-	for (AudioViewLayer *v : view->vlayer)
+	for (auto *v: view->vlayer)
 		v->area = rect_inter(v->area_last, v->area_target, smooth_parametrization(t));
 
 	set_track_areas_from_layers(view);
@@ -131,14 +131,16 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 	for (auto *l: v->vlayer){
 		l->height_min = v->mode->layer_min_height(l);
 		l->height_wish = v->mode->layer_suggested_height(l);
+		if (l->hidden)
+			l->height_wish = l->height_min = 0;
 	}
 
 	// wanted space
 	float h_wish = 0;
 	float h_min = 0;
-	for (AudioViewLayer *t : v->vlayer){
-		h_wish += t->height_wish;
-		h_min += t->height_min;
+	for (auto *l: v->vlayer){
+		h_wish += l->height_wish;
+		h_min += l->height_min;
 	}
 
 	// available
@@ -152,9 +154,9 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 
 	// distribute
 	float y0 = r.y1 - v->scroll->offset;
-	foreachi(AudioViewLayer *t, v->vlayer, i){
-		float h = t->height_min + (t->height_wish - t->height_min) * f;
-		t->area_target = rect(r.x1, r.x2, y0, y0 + h);
+	for (auto *l: v->vlayer){
+		float h = l->height_min + (l->height_wish - l->height_min) * f;
+		l->area_target = rect(r.x1, r.x2, y0, y0 + h);
 		y0 += h;
 	}
 }

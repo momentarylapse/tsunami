@@ -25,14 +25,12 @@ ViewModeScaleBars::~ViewModeScaleBars()
 
 void ViewModeScaleBars::draw_post(Painter *c)
 {
-	int sx1 = cam->sample2screen(view->sel.range.start());
-	int sx2 = cam->sample2screen(view->sel.range.end());
-	int sxx1 = clampi(sx1, view->area.x1, view->area.x2);
-	int sxx2 = clampi(sx2, view->area.x1, view->area.x2);
+	float x1, x2;
+	cam->range2screen_clip(view->sel.range, view->area, x1, x2);
 
 	c->set_color(color(0.1f, 1, 1, 1));
-	c->draw_rect(sxx1, view->area.y1, 30, view->area.height());
-	c->draw_rect(sxx2 - 30, view->area.y1, 30, view->area.height());
+	c->draw_rect(x1, view->area.y1, 30, view->area.height());
+	c->draw_rect(x2 - 30, view->area.y1, 30, view->area.height());
 
 	string message = _("move right selection handle to scale   cancel (Esc)");
 	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selection, 0);

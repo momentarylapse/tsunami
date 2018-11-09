@@ -91,6 +91,10 @@ void ViewModeDefault::on_left_button_down()
 
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){
 		hover->vlayer->set_solo(!hover->vlayer->solo);
+	}else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE){
+		view->implode_track(hover->track);
+	}else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE){
+		view->explode_track(hover->track);
 	}else if (hover->type == Selection::Type::SAMPLE){
 		dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES));
 	}else if (hover->type == Selection::Type::MARKER){
@@ -493,8 +497,8 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 					col = view->colors.selection_bars_hover;
 			}
 			c->set_color(col);
-			float x1 = view->cam.sample2screen(b->range().offset);
-			float x2 = view->cam.sample2screen(b->range().end());
+			float x1, x2;
+			view->cam.range2screen(b->range(), x1, x2);
 			c->draw_rect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
 		}
 	}
@@ -508,6 +512,60 @@ void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 
 	if (t->track->type == SignalType::BEATS)
 		draw_bar_selection(c, t, view);
+}
+
+void ViewModeDefault::draw_imploded_track_background(Painter *c, AudioViewTrack *t)
+{
+}
+
+void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
+{
+	auto *l = view->get_layer(t->track->layers[0]);
+
+
+	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
+	if (t->track->has_version_selection()){
+		Range r = Range(0, 0);
+		int index = 0;
+		for (auto &f: t->track->fades){
+			r.set_start(r.end());
+			r.set_end(f.position);
+
+
+			for (AudioBuffer &b: t->track->layers[index]->buffers){
+				float x0, x1;
+				view->cam.range2screen_clip(r, t->area, x0, x1);
+				l->draw_buffer(c, b, view_pos_rel, t->is_playable() ? view->colors.text : view->colors.text_soft3, x0, x1);
+			}
+
+			index = f.target;
+		}
+		/*Array<Range> rr = version_ranges(layer);
+		for (AudioBuffer &b: layer->buffers){
+			foreachi(Range &r, rr, i){
+				float x0, x1;
+				view->cam.range2screen_clip(r, area, x0, x1);
+				draw_buffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
+			}
+		}*/
+	}else{
+		color col = t->is_playable() ? view->colors.text : view->colors.text_soft3;
+		for (auto *layer: t->track->layers)
+			for (AudioBuffer &b: layer->buffers)
+				l->draw_buffer(c, b, view_pos_rel, col, t->area.x1, t->area.x2);
+
+	}
+
+	/*if (view->sel.has(layer)){
+		// selection
+		for (AudioBuffer &b: layer->buffers){
+			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+		}
+	}*/
+
+
+
+	view->draw_boxed_str(c, t->area.x2 - 200, t->area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
 }
 
 Range dominant_range(Track *t, int index)
@@ -525,8 +583,8 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 {
 	Range r = dominant_range(l->layer->track, i);
 	color cs = color(0.2f, 0,0.7f,0);
-	float xx1 = (float)view->cam.sample2screen(r.start());
-	float xx2 = (float)view->cam.sample2screen(r.end());
+	float xx1, xx2;
+	view->cam.range2screen(r, xx1, xx2);
 	if (i == l->layer->track->fades.num - 1)
 		xx2 += 50;
 	if (i == -1)
@@ -548,8 +606,6 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 
 void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
-	if (!l->on_screen())
-		return;
 	Track *t = l->layer->track;
 
 
@@ -599,8 +655,8 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 			draw_fade_bg(c, l, view, i);
 		}*/
 		if (f.target == index_own or index_before == index_own){
-			float x1 = (float)view->cam.sample2screen(f.position);
-			float x2 = (float)view->cam.sample2screen(f.position + f.samples);
+			float x1, x2;
+			view->cam.range2screen(f.range(), x1, x2);
 			c->set_color(color(1,0,0.7f,0));
 			c->draw_line(x1, l->area.y1, x1, l->area.y2);
 			c->draw_line(x2, l->area.y1, x2, l->area.y2);
@@ -665,6 +721,10 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("make main version"));
 	else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
 		view->draw_cursor_hover(c, _("toggle solo"));
+	else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE)
+		view->draw_cursor_hover(c, _("implode"));
+	else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE)
+		view->draw_cursor_hover(c, _("explode"));
 	else if (hover->type == Selection::Type::BAR)
 		view->draw_cursor_hover(c, _("bar ") + format("%d/\u2084 \u2669=%.1f", hover->bar->num_beats, hover->bar->bpm(song->sample_rate)));
 	else if (hover->type == Selection::Type::BAR_GAP)
@@ -770,6 +830,17 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 		x += 17;
 		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
 			s.type = Selection::Type::LAYER_BUTTON_SOLO;
+			return s;
+		}
+	}
+	if (s.vlayer and (s.type == s.Type::LAYER_HEADER) and s.layer->is_main()){
+		AudioViewLayer *l = s.vlayer;
+		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5 + 17 + 17;
+		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
+			if (l->represents_imploded)
+				s.type = Selection::Type::LAYER_BUTTON_EXPLODE;
+			else
+				s.type = Selection::Type::LAYER_BUTTON_IMPLODE;
 			return s;
 		}
 	}

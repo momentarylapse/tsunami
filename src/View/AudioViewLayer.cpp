@@ -19,6 +19,7 @@
 #include "../Data/TrackMarker.h"
 #include "../Data/SampleRef.h"
 #include "../Data/Sample.h"
+#include "../Data/CrossFade.h"
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Data/Rhythm/Beat.h"
@@ -55,6 +56,9 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 	height_min = height_wish = 0;
 	clef_dy = 0;
 	clef_y0 = 0;
+
+	hidden = false;
+	represents_imploded = false;
 
 	if (layer)
 		set_midi_mode(view->midi_view_mode);
@@ -310,7 +314,6 @@ void AudioViewLayer::draw_buffer_selection(Painter *c, AudioBuffer &b, double vi
 }
 
 
-#include "../Data/CrossFade.h"
 
 // active | passive | active | ...
 Array<Range> version_ranges(TrackLayer *l)
@@ -343,8 +346,8 @@ void AudioViewLayer::draw_track_buffers(Painter *c)
 		Array<Range> rr = version_ranges(layer);
 		for (AudioBuffer &b: layer->buffers){
 			foreachi(Range &r, rr, i){
-				float x0 = max((float)view->cam.sample2screen(r.start()), area.x1);
-				float x1 = min((float)view->cam.sample2screen(r.end()), area.x2);
+				float x0, x1;
+				view->cam.range2screen_clip(r, area, x0, x1);
 				draw_buffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
 			}
 		}
@@ -367,8 +370,8 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 {
 	// frame
 	Range rr = s->range() + delay;
-	int asx = clampi(view->cam.sample2screen(rr.start()), area.x1, area.x2);
-	int aex = clampi(view->cam.sample2screen(rr.end()), area.x1, area.x2);
+	float asx, aex;
+	view->cam.range2screen_clip(rr, area, asx, aex);
 
 	if (delay == 0)
 		s->area = rect(asx, aex, area.y1, area.y2);
@@ -424,8 +427,8 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 		c->set_font("", -1, true, false);
 
 	float w = c->get_str_width(text) + view->CORNER_RADIUS * 2;
-	float x0 = view->cam.sample2screen(marker->range.start());
-	float x1 = view->cam.sample2screen(marker->range.end());
+	float x0, x1;
+	view->cam.range2screen(marker->range, x0, x1);
 	float y0 = area.y1;
 	float y1 = y0 + 15;
 
@@ -513,7 +516,7 @@ int AudioViewLayer::y2clef_linear(float y, NoteModifier &mod)
 
 bool AudioViewLayer::mouse_over()
 {
-	return area.inside(view->mx, view->my);
+	return !hidden and area.inside(view->mx, view->my);
 }
 
 void get_col(color &col, color &col_shadow, const MidiNote *n, AudioViewLayer::MidiNoteState state, AudioView *view, bool playable)
@@ -548,8 +551,8 @@ void AudioViewLayer::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteSt
 
 void AudioViewLayer::draw_midi_note_linear(Painter *c, const MidiNote &n, int shift, MidiNoteState state)
 {
-	float x1 = view->cam.sample2screen(n.range.offset + shift);
-	float x2 = view->cam.sample2screen(n.range.end() + shift);
+	float x1, x2;
+	view->cam.range2screen(n.range, x1, x2);
 	float y1 = pitch2y_linear(n.pitch + 1);
 	float y2 = pitch2y_linear(n.pitch);
 
@@ -641,8 +644,8 @@ void AudioViewLayer::draw_midi_note_tab(Painter *c, const MidiNote *n, int shift
 {
 	float r = min(clef_dy/2, 15.0f);
 
-	float x1 = view->cam.sample2screen(n->range.offset + shift);
-	float x2 = view->cam.sample2screen(n->range.end() + shift);
+	float x1, x2;
+	view->cam.range2screen(n->range + shift, x1, x2);
 
 
 	int p = n->stringno;
@@ -695,8 +698,8 @@ void AudioViewLayer::draw_midi_note_classical(Painter *c, const MidiNote *n, int
 {
 	float r = clef_dy/2;
 
-	float x1 = view->cam.sample2screen(n->range.offset + shift);
-	float x2 = view->cam.sample2screen(n->range.end() + shift);
+	float x1, x2;
+	view->cam.range2screen(n->range + shift, x1, x2);
 
 	// checked before...
 //	if (n.clef_position < 0)
@@ -795,8 +798,8 @@ void AudioViewLayer::draw_blank_background(Painter *c)
 		c->draw_rect(area);
 
 		color cs = background_selection_color();
-		float x1 = max((float)view->cam.sample2screen(view->sel.range.start()), area.x1);
-		float x2 = min((float)view->cam.sample2screen(view->sel.range.end()), area.x2);
+		float x1, x2;
+		view->cam.range2screen_clip(view->sel.range, area, x1, x2);
 		c->set_color(cs);
 		c->draw_rect(x1, area.y1, x2-x1, area.height());
 
@@ -878,11 +881,26 @@ void AudioViewLayer::draw_version_header(Painter *c)
 		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
 		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);*/
 
+
 		c->set_color(col_but);
 		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))
 			c->set_color(col_but_hover);
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 22, area.y1 + 22, *view->images.solo);
+	}
+
+	if (visible and layer->is_main()){
+		if (represents_imploded){
+			c->set_color(col_but);
+			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_EXPLODE))
+				c->set_color(col_but_hover);
+			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22-2, "+");
+		}else{
+			c->set_color(col_but);
+			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_IMPLODE))
+				c->set_color(col_but_hover);
+			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22-2, "-");
+		}
 	}
 }
 
@@ -898,9 +916,11 @@ void AudioViewLayer::set_solo(bool _solo)
 
 void AudioViewLayer::draw(Painter *c)
 {
-	if (!on_screen())
+	if (!on_screen() or hidden)
 		return;
-	view->mode->draw_layer_data(c, this);
+
+	if (!represents_imploded)
+		view->mode->draw_layer_data(c, this);
 
 	if (layer->track->layers.num > 1)
 		draw_version_header(c);

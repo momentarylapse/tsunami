@@ -43,6 +43,7 @@ public:
 
 
 	//Array<AudioViewLayer*> layers;
+	bool imploded;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

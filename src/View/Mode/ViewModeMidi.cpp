@@ -718,8 +718,8 @@ void ViewModeMidi::draw_post(Painter *c)
 	auto *l = cur_vlayer();
 	auto mode = l->midi_mode;
 	Range r = get_midi_edit_range();
-	int x1 = view->cam.sample2screen(r.start());
-	int x2 = view->cam.sample2screen(r.end());
+	float x1, x2;
+	view->cam.range2screen(r, x1, x2);
 
 	c->set_color(view->colors.selection_internal);
 	if (mode == MidiMode::TAB){

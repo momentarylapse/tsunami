@@ -44,6 +44,19 @@ double ViewPort::dscreen2sample(double dx)
 	return dx / scale;
 }
 
+void ViewPort::range2screen(const Range &r, float &x1, float &x2)
+{
+	x1 = sample2screen((double)r.start());
+	x2 = sample2screen((double)r.end());
+}
+
+void ViewPort::range2screen_clip(const Range &r, const rect &area, float &x1, float &x2)
+{
+	range2screen(r, x1, x2);
+	x1 = clampf(x1, area.x1, area.x2);
+	x2 = clampf(x2, area.x1, area.x2);
+}
+
 void ViewPort::zoom(float f)
 {
 	// max zoom: 20 pixel per sample

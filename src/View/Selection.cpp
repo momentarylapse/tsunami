@@ -26,7 +26,7 @@ bool Selection::is_in(Type _type) const
 	if (_type == Type::TRACK_HEADER)
 		return (type == Type::TRACK_BUTTON_MUTE) or (type == Type::TRACK_BUTTON_SOLO) or (type == Type::TRACK_BUTTON_EDIT) or (type == Type::TRACK_BUTTON_CURVE) or (type == Type::TRACK_BUTTON_FX);
 	if (_type == Type::LAYER_HEADER)
-		return (type == Type::LAYER_BUTTON_DOMINANT) or (type == Type::LAYER_BUTTON_SOLO);
+		return (type == Type::LAYER_BUTTON_DOMINANT) or (type == Type::LAYER_BUTTON_SOLO) or (type == Type::LAYER_BUTTON_IMPLODE) or (type == Type::LAYER_BUTTON_EXPLODE);
 	if (_type == Type::LAYER)
 		return (layer != nullptr);
 	return false;

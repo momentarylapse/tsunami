@@ -37,6 +37,8 @@ public:
 	double sample2screen(double s);
 	double dsample2screen(double ds);
 	double dscreen2sample(double dx);
+	void range2screen(const Range &r, float &x1, float &x2);
+	void range2screen_clip(const Range &r, const rect &area, float &x1, float &x2);
 
 	void zoom(float f);
 	void move(float dpos);

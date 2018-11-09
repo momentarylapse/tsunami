@@ -36,6 +36,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 	solo = false;
 
 	area = rect(0, 0, 0, 0);
+	imploded = false;
 
 	if (track){
 		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_CHANGE);
@@ -185,8 +186,18 @@ void AudioViewTrack::set_volume(float volume)
 
 void AudioViewTrack::draw(Painter *c)
 {
-	view->mode->draw_track_data(c, this);
+	if (imploded){
+		view->mode->draw_imploded_track_data(c, this);
+
+	}else{
+		view->mode->draw_track_data(c, this);
+	}
 
 	draw_header(c);
+}
+
+bool AudioViewTrack::is_playable()
+{
+	return view->get_playable_tracks().contains(track);
 }
 

@@ -32,6 +32,7 @@ class AudioViewLayer : public Observable<VirtualBase>
 {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
+	virtual ~AudioViewLayer(){}
 
 
 	enum MidiNoteState
@@ -65,7 +66,7 @@ public:
 	void draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover);
 
 	void draw_version_header(Painter *c);
-	void draw(Painter *c);
+	virtual void draw(Painter *c);
 
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
 	static void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
@@ -102,7 +103,7 @@ public:
 	int pitch_min, pitch_max;
 	int edit_pitch_min, edit_pitch_max;
 
-	bool is_playable();
+	virtual bool is_playable();
 
 
 	float clef_dy;
@@ -114,6 +115,9 @@ public:
 
 
 	bool mouse_over();
+
+	bool hidden;
+	bool represents_imploded;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWLAYER_H_ */

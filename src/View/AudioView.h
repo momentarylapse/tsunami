@@ -263,6 +263,9 @@ public:
 	AudioViewLayer *get_layer(TrackLayer *layer);
 	void update_tracks();
 
+	void implode_track(Track *t);
+	void explode_track(Track *t);
+
 	void update_peaks_now(AudioBuffer &buf);
 
 	int prefered_buffer_layer;

@@ -27,6 +27,8 @@ class Range
 	int offset, length
 	int end()
 		return offset + length
+	bool inside(int pos)
+		return pos >= offset and pos < offset + length
 	string str()
 		return "(" + offset + ":" + end() + ")"
 Range _Range(int offset, int length)
@@ -249,6 +251,7 @@ class BeatSource extends Module
 	extern virtual void reset()
 	extern virtual int beats_per_bar()
 	extern virtual int cur_beat()
+	extern virtual int cur_bar()
 	extern virtual float beat_fraction()
 
 class BeatMidifier extends MidiSource
@@ -269,7 +272,12 @@ class TrackMarker
 class Bar
 	int num_beats
 	int num_sub_beats
+	int index
+	int index_text
 	int length
+	int offset
+	extern float bpm(float sample_rate)
+	extern Range range()
 
 
 class Beat
@@ -345,7 +353,7 @@ class Track
 	
 	Synthesizer *synth
 	
-	TrackMarker[] markers
+	TrackMarker*[] markers
 
 	// editing
 	Song *song
@@ -390,6 +398,7 @@ class Song
 	extern virtual void __delete__()
 	
 	extern Range range()
+	extern Track* time_track()
 	
 	extern Track* add_track(int type, int index)
 	extern void delete_track(int index)

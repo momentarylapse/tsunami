@@ -104,6 +104,7 @@ Grid ? '' vertical
 		if !source
 			return
 		
+		int cur_bar = source.cur_bar()
 		float beat_fraction = source.beat_fraction()
 		int cur_beat = source.cur_beat()
 		int num_beats = source.beats_per_bar()
@@ -170,7 +171,49 @@ Grid ? '' vertical
 		p.set_font_size(fs)
 		p.draw_str(x0-fs*0.4, y0-fs*0.75, cur_beat + 1)
 		
+		draw_part_info(p, cur_bar)
+		
 		fraction_prev = beat_fraction
+	
+	void draw_part_info(Painter* p, int cur_bar_index)
+		float w = p.width
+		float h = p.height
+		
+		Song* song = metro.session.song
+		Track* t = song.time_track()
+		if !t
+			return
+		
+		Bar* cur_bar = song.bars[cur_bar_index]
+		Bar* next_bar = nil
+		if cur_bar_index + 1 < song.bars.num
+			next_bar = song.bars[cur_bar_index + 1]
+		
+		int offset = cur_bar.offset
+		TrackMarker *cur_part = get_part(t, offset)
+		TrackMarker *next_part = get_part(t, offset + cur_bar.length + 10)
+		p.set_color(colors.text_soft2)
+		float fs = h * 0.08
+		p.set_font_size(fs)
+		if cur_part
+			p.draw_str(10, 5, cur_part.text)
+			int first_bar = bar_index(song, cur_part.range.offset)
+			p.draw_str(w - 5 - fs*3, 5, (cur_bar.index - first_bar) + 1)
+	
+		string change
+		if next_part and next_part != cur_part
+			change = next_part.text
+		if next_bar
+			if next_bar.num_beats != cur_bar.num_beats
+				change += "  " + next_bar.num_beats + "/₄"
+			float cur_bpm = cur_bar.bpm(song.sample_rate)
+			float next_bpm = next_bar.bpm(song.sample_rate)
+			if abs(cur_bpm - next_bpm) > 2
+				change += "  " + next_bpm.str2(0) + " bpm"
+		if change.num > 0
+			p.set_color(colors.text)
+			p.draw_str(20, 5 + fs*1.4, "> " + change)
+				
 	
 	void on_area_right_button_down()
 		popup_menu.check("blink-background", allow_blink_background)
@@ -204,6 +247,20 @@ Grid ? '' vertical
 		fullscreen = !fullscreen
 		set_fullscreen(fullscreen)
 		//show_control()*/
+
+
+int bar_index(Song* song, int offset)
+	for b,i in song.bars
+		if b.offset >= offset
+			return i
+	return 0
+
+
+TrackMarker* get_part(Track* t, int offset)
+	for m in t.markers
+		if m.range.inside(offset)
+			return m
+	return nil
 
 class Metronome extends TsunamiPlugin
 	

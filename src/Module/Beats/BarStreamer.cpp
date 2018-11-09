@@ -53,6 +53,14 @@ int BarStreamer::cur_beat()
 	return 0;
 }
 
+int BarStreamer::cur_bar()
+{
+	auto beats = bars.get_beats(Range(0, offset), false, false);
+	if (beats.num > 0)
+		return beats.back().bar_no;
+	return 0;
+}
+
 float BarStreamer::beat_fraction()
 {
 	auto beats = bars.get_beats(Range(0, offset), false, false);

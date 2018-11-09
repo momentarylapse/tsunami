@@ -117,6 +117,15 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
 	Kaba::DeclareClassOffset("Range", "length", _offsetof(Range, length));
 
+	Kaba::DeclareClassSize("Bar", sizeof(Bar));
+	Kaba::DeclareClassOffset("Bar", "num_beats", _offsetof(Bar, num_beats));
+	Kaba::DeclareClassOffset("Bar", "num_sub_beats", _offsetof(Bar, num_sub_beats));
+	Kaba::DeclareClassOffset("Bar", "length", _offsetof(Bar, length));
+	Kaba::DeclareClassOffset("Bar", "index", _offsetof(Bar, index));
+	Kaba::DeclareClassOffset("Bar", "index_text", _offsetof(Bar, index_text));
+	Kaba::DeclareClassOffset("Bar", "offset", _offsetof(Bar, offset));
+	Kaba::LinkExternal("Bar.range", Kaba::mf(&Bar::range));
+	Kaba::LinkExternal("Bar.bpm", Kaba::mf(&Bar::bpm));
 
 	Kaba::DeclareClassSize("Session", sizeof(Session));
 	Kaba::DeclareClassOffset("Session", "id", _offsetof(Session, id));
@@ -368,6 +377,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("BeatSource", "reset", Kaba::mf(&BeatSource::reset), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "beats_per_bar", Kaba::mf(&BeatSource::beats_per_bar), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "cur_beat", Kaba::mf(&BeatSource::cur_beat), &bsource);
+	Kaba::DeclareClassVirtualIndex("BeatSource", "cur_bar", Kaba::mf(&BeatSource::cur_bar), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "beat_fraction", Kaba::mf(&BeatSource::beat_fraction), &bsource);
 
 	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
@@ -436,6 +446,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Song.delete_bar", Kaba::mf(&Song::delete_bar));
 	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::add_sample));
 	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::delete_sample));
+	Kaba::LinkExternal("Song.time_track", Kaba::mf(&Song::time_track));
 
 	AudioPort aport("");
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));

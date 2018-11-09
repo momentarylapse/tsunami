@@ -21,6 +21,7 @@ public:
 
 	int _cdecl beats_per_bar() override;
 	int _cdecl cur_beat() override;
+	int _cdecl cur_bar() override;
 	float _cdecl beat_fraction() override;
 
 	BarCollection bars;

@@ -6,6 +6,7 @@ Menu menu ""
 		Item /save "Save" image=hui:save
 		Item /save_as "Save as..." image=hui:save-as
 		Item export_selection "Export selection..." image=hui:save-as
+		Item quick_export "Quick export" image=hui:save-as
 		Separator
 		Item song_properties "Properties" image=hui:properties
 		Separator

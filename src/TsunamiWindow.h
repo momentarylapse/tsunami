@@ -43,6 +43,7 @@ public:
 	void on_paste_as_samples();
 	void on_delete();
 	void on_export();
+	void on_quick_export();
 	void on_undo();
 	void on_redo();
 	void on_add_audio_track_mono();

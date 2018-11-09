@@ -17,7 +17,7 @@ class SettingsDialog: public hui::Window
 public:
 	SettingsDialog(AudioView *view, hui::Window *parent);
 
-	void loadData();
+	void load_data();
 	void applyData();
 
 	void on_language();
@@ -28,6 +28,7 @@ public:
 	void on_audio_api();
 	void on_midi_api();
 	void on_cpu_meter();
+	void on_qed_find();
 
 
 private:

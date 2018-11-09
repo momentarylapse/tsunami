@@ -93,6 +93,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("delete", hui::KEY_DELETE, "hui:delete");
 	event("export_selection", std::bind(&TsunamiWindow::on_export, this));
 	set_key_code("export_selection", hui::KEY_X + hui::KEY_CONTROL, "");
+	event("quick_export", std::bind(&TsunamiWindow::on_quick_export, this));
+	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT, "");
 	event("undo", std::bind(&TsunamiWindow::on_undo, this));
 	set_key_code("undo", hui::KEY_Z + hui::KEY_CONTROL, "hui:undo");
 	event("redo", std::bind(&TsunamiWindow::on_redo, this));
@@ -1016,6 +1018,12 @@ void TsunamiWindow::on_export()
 		renderer.allow_tracks(view->get_selected_tracks());
 		session->storage->save_via_renderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags);
 	}
+}
+
+void TsunamiWindow::on_quick_export()
+{
+	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory);
+	session->storage->save(song, dir + _suggest_filename(song, dir));
 }
 
 int pref_bar_index(AudioView *view)

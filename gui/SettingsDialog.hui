@@ -5,6 +5,11 @@ Dialog settings_dialog "Einstellungen" width=300 height=200
 				Text pdt_defaultartist "Default artist"
 				Edit default_artist "" "tooltip=will create an artist=... tag in new files" expandx
 				---|
+				Text t_quick_export_dir "Quick export"
+				Grid ? ""
+					Edit quick_export_dir "" expandx disabled
+					Button quick_export_dir_find "" image=hui:find
+				---|
 				Text pdt_oggrate "OGG bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
 		Group grp_interface "User interface"

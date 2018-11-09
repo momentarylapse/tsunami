@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-583
+585
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1752,8 +1752,14 @@ Saite setzen
 midi_editor/apply_hand_position
 Hand setzen
 (TAB Modus) Positionen auf dem Griffbrett für die markierten Noten finden
+menu/quick_export
+Export (schnell)
+
+settings_dialog/t_quick_export_dir
+Schnellexport
+
 // Num Language Strings
-208
+210
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2171,3 +2177,7 @@ can not delete the only version of a track
 eine Version kann nicht gelöscht werden, wenn es sonst keine anderen Versionen mehr gibt
 big!!!
 groß!!!
+explode
+ausklappen
+implode
+einklappen

@@ -870,7 +870,7 @@ menu_file
 
 0
 0
-10
+11
 Item
 new
 image=hui:new
@@ -907,28 +907,34 @@ image=hui:save-as
 5
 0
 0
+Item
+quick_export
+image=hui:save-as
+6
+0
+0
 Separator
 
 
-6
+7
 0
 0
 Item
 song_properties
 image=hui:properties
-7
+8
 0
 0
 Separator
 
 
-8
+9
 0
 0
 Item
 exit
 image=hui:quit
-9
+10
 0
 0
 Menu
@@ -3808,7 +3814,7 @@ Grid
 
 0
 0
-4
+6
 Text
 pdt_defaultartist
 
@@ -3822,16 +3828,40 @@ expandx
 0
 0
 Text
-pdt_oggrate
+t_quick_export_dir
 
 0
 1
+0
+Grid
+?
+
+1
+1
+2
+Edit
+quick_export_dir
+expandx,disabled
+0
+0
+0
+Button
+quick_export_dir_find
+image=hui:find
+1
+0
+0
+Text
+pdt_oggrate
+
+0
+2
 0
 ComboBox
 ogg_bitrate
 
 1
-1
+2
 0
 Group
 grp_interface
@@ -4529,7 +4559,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-456
+458
 // Text
 /cancel
 Cancel
@@ -4941,6 +4971,9 @@ On audio buffer
 
 menu/plugin_on_midi
 On midi
+
+menu/quick_export
+Quick export
 
 menu/record
 Record
@@ -5794,6 +5827,9 @@ Audio library
 settings_dialog/t_midi_api
 Midi library
 
+settings_dialog/t_quick_export_dir
+Quick export
+
 settings_dialog/t_scroll_speed
 Scroll speed
 
@@ -5905,7 +5941,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-582
+584
 // Text
 /bpm
 Bpm
@@ -6476,6 +6512,9 @@ Auf Audiopuffer
 
 menu/plugin_on_midi
 Auf Midi
+
+menu/quick_export
+Export (schnell)
 
 menu/record
 Aufnehmen
@@ -7521,6 +7560,9 @@ Audio Bibliothek
 settings_dialog/t_midi_api
 Midi Bibliothek
 
+settings_dialog/t_quick_export_dir
+Schnellexport
+
 settings_dialog/t_scroll_speed
 Scroll Geschwindigkeit
 
@@ -7654,7 +7696,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-208
+210
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8002,6 +8044,8 @@ enter new name
 neuen Namen eingeben
 enter note length (1-9, A-F)    cancel (Esc)
 Noten Länge eingeben (1-9, A-F)    abbrechen (Esc)
+explode
+ausklappen
 exporting
 exportiere 
 exporting 
@@ -8012,6 +8056,8 @@ found old recording:
 alte Aufnahmedaten gefunden: 
 i'm now going to clean up...
 i'm now going to clean up...
+implode
+einklappen
 import
 importieren
 input: 

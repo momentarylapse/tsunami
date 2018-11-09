@@ -39,11 +39,15 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	event("cpu_meter", std::bind(&SettingsDialog::on_cpu_meter, this));
 	event("audio_api", std::bind(&SettingsDialog::on_audio_api, this));
 	event("midi_api", std::bind(&SettingsDialog::on_midi_api, this));
+	event("quick_export_dir_find", std::bind(&SettingsDialog::on_qed_find, this));
 	event("hui:close", std::bind(&SettingsDialog::destroy, this));
 	event("close", std::bind(&SettingsDialog::destroy, this));
 
 	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	set_options("default_artist", "placeholder=" + AppName);
+
+
+	set_options("quick_export_dir", "placeholder=" + hui::Application::directory);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -57,11 +61,11 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	ogg_quality.add(OggQuality(0.9f, 320));
 	ogg_quality.add(OggQuality(1.0f, 500));
 
-	loadData();
+	load_data();
 
 }
 
-void SettingsDialog::loadData()
+void SettingsDialog::load_data()
 {
 	// language
 	Array<string> lang = hui::GetLanguages();
@@ -86,6 +90,8 @@ void SettingsDialog::loadData()
 	set_decimals(1);
 
 	set_string("default_artist", hui::Config.get_str("DefaultArtist", ""));
+
+	set_string("quick_export_dir", hui::Config.get_str("QuickExportDir", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
@@ -185,4 +191,12 @@ void SettingsDialog::on_cpu_meter()
 	bool show = is_checked("");
 	hui::Config.set_bool("CpuDisplay", show);
 	view->win->mini_bar->cpu_display->panel->hide_control(view->win->mini_bar->cpu_display->id, !show);
+}
+
+void SettingsDialog::on_qed_find()
+{
+	if (hui::FileDialogDir(this, _("Quick export directory"), "")){
+		hui::Config.set_str("QuickExportDir", hui::Filename);
+		set_string("quick_export_dir", hui::Filename);
+	}
 }

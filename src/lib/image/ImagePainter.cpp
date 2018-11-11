@@ -73,7 +73,7 @@ void ImagePainter::set_clip(const rect& r)
 
 void ImagePainter::draw_point(float x, float y)
 {
-	image->drawPixel(x, y, _color);
+	image->draw_pixel(x, y, _color);
 }
 
 void ImagePainter::draw_line(float x1, float y1, float x2, float y2)
@@ -106,7 +106,7 @@ void ImagePainter::draw_line(float x1, float y1, float x2, float y2)
 				if (alpha < 0.5f)
 					continue;
 			}
-			image->drawPixel(x, y, cc);
+			image->draw_pixel(x, y, cc);
 		}
 }
 
@@ -130,7 +130,7 @@ void ImagePainter::draw_rect(float xx, float yy, float w, float h)
 
 	for (int x=x0; x<x1; x++)
 		for (int y=y0; y<y1; y++)
-			image->drawPixel(x, y, _color);
+			image->draw_pixel(x, y, _color);
 }
 
 void ImagePainter::draw_rect(const rect& r)
@@ -158,7 +158,7 @@ void ImagePainter::draw_circle(float cx, float cy, float radius)
 					if (alpha < 0.5f)
 						continue;
 				}
-				image->drawPixel(x, y, cc);
+				image->draw_pixel(x, y, cc);
 			}
 	}else{
 		for (int x=x0; x<x1; x++)
@@ -171,7 +171,7 @@ void ImagePainter::draw_circle(float cx, float cy, float radius)
 					if (alpha < 0.5f)
 						continue;
 				}
-				image->drawPixel(x, y, cc);
+				image->draw_pixel(x, y, cc);
 			}
 	}
 }
@@ -194,7 +194,7 @@ void ImagePainter::draw_image(float dx, float dy, const Image& im)
 
 	for (int x=_x0; x<_x1; x++)
 		for (int y=_y0; y<_y1; y++)
-			image->drawPixel(x, y, im.getPixel(x - dx, y - dy));
+			image->draw_pixel(x, y, im.get_pixel(x - dx, y - dy));
 }
 
 void ImagePainter::draw_mask_image(float x, float y, const Image& image)

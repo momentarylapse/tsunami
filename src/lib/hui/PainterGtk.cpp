@@ -242,7 +242,7 @@ void Painter::draw_image(float x, float y, const Image &image)
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
-	image.setMode(Image::ModeBGRA);
+	image.set_mode(Image::ModeBGRA);
 	cairo_pattern_t *p = cairo_get_source(cr);
 	cairo_pattern_reference(p);
 	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,
@@ -264,7 +264,7 @@ void Painter::draw_mask_image(float x, float y, const Image &image)
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
-	image.setMode(Image::ModeBGRA);
+	image.set_mode(Image::ModeBGRA);
 	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,
                                                          CAIRO_FORMAT_ARGB32,
                                                          image.width,
@@ -333,7 +333,7 @@ void Painter::set_fill(bool fill)
 
 Painter *start_image_paint(Image &im)
 {
-	im.setMode(Image::ModeBGRA);
+	im.set_mode(Image::ModeBGRA);
 
 	Painter *p = new Painter;
 	p->target_surface = cairo_image_surface_create_for_data((unsigned char*)im.data.data, CAIRO_FORMAT_ARGB32, im.width, im.height, im.width*4);

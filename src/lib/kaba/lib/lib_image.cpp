@@ -30,7 +30,7 @@ extern Class *TypeIntList;
 
 #ifdef _X_USE_IMAGE_
 void amd64_image_get_pixel(color &r, Image &i, int x, int y)
-{	r = i.getPixel(x, y);	}
+{	r = i.get_pixel(x, y);	}
 #define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 #else
 #define amd64_wrap(orig, wrap)	NULL
@@ -70,11 +70,11 @@ void SIAddPackageImage()
 		class_add_func("scale",			TypeImageP,	image_p(mf(&Image::scale)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
-		class_add_func("set_pixel",		TypeVoid,	image_p(mf(&Image::setPixel)));
+		class_add_func("set_pixel",		TypeVoid,	image_p(mf(&Image::set_pixel)));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func("get_pixel",		TypeColor,	amd64_wrap(mf(&Image::getPixel), &amd64_image_get_pixel));
+		class_add_func("get_pixel",		TypeColor,	amd64_wrap(mf(&Image::get_pixel), &amd64_image_get_pixel));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 		class_add_func("clear",			TypeVoid,	image_p(mf(&Image::clear)));

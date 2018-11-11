@@ -143,7 +143,7 @@ void image_load_png(const string &filename, Image &image)
 			float a = 1;
 			if (bytes_per_pixel > 3)
 				a = l_cur[i ++] / 255.0f;
-			image.setPixel(x, image.height - y - 1, color(a, r, g, b));
+			image.set_pixel(x, image.height - y - 1, color(a, r, g, b));
 		}
 	}
 	FileClose(f);

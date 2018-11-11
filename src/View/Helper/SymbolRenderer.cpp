@@ -45,7 +45,7 @@ struct Symbol
 		int xmax = 0, ymax = 0;
 		for (int x=0; x<im.width; x++)
 			for (int y=0; y<im.height; y++)
-				if (im.getPixel(x, y).r > 0){
+				if (im.get_pixel(x, y).r > 0){
 					if (x > xmax)
 						xmax = x;
 					if (y > ymax)
@@ -62,7 +62,7 @@ struct Symbol
 		im.create(xmax, ymax, Black);
 		for (int x=0; x<xmax; x++)
 			for (int y=0; y<ymax; y++)
-				im.setPixel(x, y, _im.getPixel(x,y));
+				im.set_pixel(x, y, _im.get_pixel(x,y));
 	}
 };
 

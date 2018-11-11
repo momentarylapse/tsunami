@@ -40,21 +40,21 @@ class Image
 
 	void _cdecl __assign__(const Image &other){ *this = other; }
 
-	bool _cdecl isEmpty(){	return (data.num == 0);	}
+	bool _cdecl is_empty(){	return (data.num == 0);	}
 
 	void _cdecl load(const string &filename);
-	void _cdecl loadFlipped(const string &filename);
+	void _cdecl load_flipped(const string &filename);
 	void _cdecl create(int width, int height, const color &c);
 	void _cdecl save(const string &filename) const;
 	void _cdecl clear();
 
 	Image* _cdecl scale(int width, int height) const;
-	void _cdecl flipV();
-	void _cdecl setMode(int mode) const;
-	void _cdecl setPixel(int x, int y, const color &c);
-	void _cdecl drawPixel(int x, int y, const color &c);
-	color _cdecl getPixel(int x, int y) const;
-	color _cdecl getPixelInterpolated(float x, float y) const;
+	void _cdecl flip_v();
+	void _cdecl set_mode(int mode) const;
+	void _cdecl set_pixel(int x, int y, const color &c);
+	void _cdecl draw_pixel(int x, int y, const color &c);
+	color _cdecl get_pixel(int x, int y) const;
+	color _cdecl get_pixel_interpolated(float x, float y) const;
 };
 
 // windows.h hack...

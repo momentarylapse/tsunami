@@ -42,7 +42,7 @@ void Image::__delete__()
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
-void Image::loadFlipped(const string &filename)
+void Image::load_flipped(const string &filename)
 {
 	// reset image
 	width = 0;
@@ -74,8 +74,8 @@ void Image::loadFlipped(const string &filename)
 
 void Image::load(const string &filename)
 {
-	loadFlipped(filename);
-	flipV();
+	load_flipped(filename);
+	flip_v();
 }
 
 inline unsigned int image_color_rgba(const color &c)
@@ -152,7 +152,7 @@ Image* Image::scale(int _width, int _height) const
 	return r;
 }
 
-void Image::flipV()
+void Image::flip_v()
 {
 	unsigned int t;
 	unsigned int *d = &data[0];
@@ -188,7 +188,7 @@ inline void col_conv_bgra_to_rgba(unsigned int &c)
 	c = (c & 0xff00ff00) + r + (b << 16);
 }
 
-void Image::setMode(int _mode) const
+void Image::set_mode(int _mode) const
 {
 	if (_mode == mode)
 		return;
@@ -209,7 +209,7 @@ void Image::setMode(int _mode) const
 }
 
 
-void Image::setPixel(int x, int y, const color &c)
+void Image::set_pixel(int x, int y, const color &c)
 {
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
 		if (mode == ModeBGRA)
@@ -219,18 +219,18 @@ void Image::setPixel(int x, int y, const color &c)
 	}
 }
 
-void Image::drawPixel(int x, int y, const color &c)
+void Image::draw_pixel(int x, int y, const color &c)
 {
 	if (c.a >= 1){
-		setPixel(x, y, c);
+		set_pixel(x, y, c);
 	}else if (c.a <= 0){
 	}else{
-		color c0 = getPixel(x, y);
-		setPixel(x, y, ColorInterpolate(c0, c, c.a));
+		color c0 = get_pixel(x, y);
+		set_pixel(x, y, ColorInterpolate(c0, c, c.a));
 	}
 }
 
-color Image::getPixel(int x, int y) const
+color Image::get_pixel(int x, int y) const
 {
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
 		if (mode == ModeBGRA)
@@ -245,7 +245,7 @@ color Image::getPixel(int x, int y) const
 //  x repeats in [0..width)
 //  y repeats in [0..height)
 //  each pixel has its maximum at offset (0.5, 0.5)
-color Image::getPixelInterpolated(float x, float y) const
+color Image::get_pixel_interpolated(float x, float y) const
 {
 	x = loopf(x, 0, (float)width);
 	y = loopf(y, 0, (float)height);
@@ -253,10 +253,10 @@ color Image::getPixelInterpolated(float x, float y) const
 	int x1 = (x0 < width - 1) ? (x0 + 1) : 0;
 	int y0 = (y >= 0.5f) ? (int)(y - 0.5f) : (height - 1);
 	int y1 = (y0 < height- 1) ? (y0 + 1) : 0;
-	color c00 = getPixel(x0, y0);
-	color c01 = getPixel(x0, y1);
-	color c10 = getPixel(x1, y0);
-	color c11 = getPixel(x1, y1);
+	color c00 = get_pixel(x0, y0);
+	color c01 = get_pixel(x0, y1);
+	color c10 = get_pixel(x1, y0);
+	color c11 = get_pixel(x1, y1);
 	float sx = loopf(x + 0.5f, 0, 1);
 	float sy = loopf(y + 0.5f, 0, 1);
 	// bilinear interpolation

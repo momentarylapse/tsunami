@@ -156,13 +156,13 @@ Image *ExpandImageMask(Image *im, float d)
 					float dd = sqrt(pow(i-x, 2) + pow(j-y, 2));
 					if (dd > d+0.5f)
 						continue;
-					float aa = im->getPixel(i, j).a;
+					float aa = im->get_pixel(i, j).a;
 					if (dd > d-0.5f)
 						aa *= (d + 0.5f - dd);
 					if (aa > a)
 						a = aa;
 				}
-			r->setPixel(x, y, color(a, 0, 0, 0));
+			r->set_pixel(x, y, color(a, 0, 0, 0));
 		}
 	return r;
 }

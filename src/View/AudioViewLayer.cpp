@@ -553,47 +553,76 @@ struct NoteData{
 	color col;
 };
 
+const float NOTE_NECK_LENGTH = 35.0f;
+const float NOTE_BAR_DISTANCE = 10.0f;
+const float NOTE_BAR_WIDTH = 5.0f;
+const float NOTE_NECK_WIDTH = 2.0f;
+const float NOTE_FLAG_DX = 10.0f;
+const float NOTE_FLAG_DY = 15.0f;
+
 void draw_single_ndata(Painter *c, NoteData &d)
 {
+	int base_length = d.length;
+	bool punctured = ((base_length % 9) == 0);
+	if (punctured)
+		base_length = (base_length / 3) * 2;
+	bool tripplets = ((base_length == 2) or (base_length == 4) or (base_length == 8));
+	if (tripplets)
+		base_length = (base_length / 2) * 3;
+
 	c->set_color(d.col);
-	if (d.length == 3){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
-		c->set_line_width(5);
-		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
-		c->draw_line(d.x, d.y - 20, d.x + 10, d.y - 5);
-	}else if (d.length == 6){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
-		c->set_line_width(5);
-		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
-	}else if (d.length == 12){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
+	if (base_length == 3){
+		// 1/16
+		c->set_line_width(NOTE_NECK_WIDTH);
+		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
+		c->set_line_width(NOTE_BAR_WIDTH);
+		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_FLAG_DY);
+		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH + NOTE_BAR_DISTANCE, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_BAR_DISTANCE + NOTE_FLAG_DY);
+	}else if (base_length == 6){
+		// 1/8
+		c->set_line_width(NOTE_NECK_WIDTH);
+		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
+		c->set_line_width(NOTE_BAR_WIDTH);
+		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_FLAG_DY);
+	}else if (base_length == 12){
+		// 1/4
+		c->set_line_width(NOTE_NECK_WIDTH);
+		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
 	}
+
+	if (punctured)
+		c->draw_circle(d.x + 8, d.y + 5, 2);
+	if (tripplets)
+		c->draw_str(d.x, d.y - NOTE_NECK_LENGTH - 15, "3");
 }
 
 void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 {
-	int length = d[0].length;
-	float x0 = d[0].x, y0 = d[0].y-35;
-	float x1 = d.back().x, y1 = d.back().y-35;
+	int base_length = d[0].length;
+	bool tripplets = ((base_length == 2) or (base_length == 4) or (base_length == 8));
+	if (tripplets)
+		base_length = (base_length / 2) * 3;
+
+	float x0 = d[0].x, y0 = d[0].y-NOTE_NECK_LENGTH;
+	float x1 = d.back().x, y1 = d.back().y-NOTE_NECK_LENGTH;
 	float m = (y1 - y0) / (x1 - x0);
 
-	c->set_line_width(2);
+	c->set_line_width(NOTE_NECK_WIDTH);
 	for (auto &dd: d){
 		c->set_color(dd.col);
 		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
 	}
-	c->set_line_width(5);
+	c->set_line_width(NOTE_BAR_WIDTH);
 	for (int i=0; i<d.num; i++){
 		float t0 = (float)i     / (float)d.num;
 		float t1 = (float)(i+1) / (float)d.num;
 		c->set_color(d[i].col);
 		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
-		if (length == 3)
-			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0+10, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1+10);
+		if (base_length == 3)
+			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 + NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 + NOTE_BAR_DISTANCE);
 	}
+	if (tripplets)
+		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 17, "3");
 }
 
 void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi, const Range &range, int shift, bool as_reference, std::function<float(MidiNote*)> y_func)
@@ -620,7 +649,7 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 			d.n = n;
 			d.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);
 			d.length = int((float)(r.end() - b->range().offset) / spu + 0.5f) - d.offset;
-			if (d.length == 0)
+			if (d.length == 0 or d.offset < 0)
 				continue;
 			d.end = d.offset + d.length;
 
@@ -630,17 +659,29 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 
 			color col_shadow;
 			get_col(d.col, col_shadow, n, note_state(n, as_reference, view), view, vlayer->is_playable());
+
+			// prevent double notes
+			if (ndata.num > 0)
+				if (ndata.back().offset == d.offset){
+					// use higher note...
+					if (d.n->pitch > ndata.back().n->pitch)
+						ndata[ndata.num - 1] = d;
+					continue;
+				}
+
 			ndata.add(d);
 		}
 
-		int offset = 0;
+		//int offset = 0;
 		for (int i=0; i<ndata.num; i++){
 			NoteData &d = ndata[i];
 
-			if ((d.length == 6 or d.length == 3) and ((offset % d.length) == 0)){
+			if ((d.length == 6 or d.length == 3 or d.length == 4) and ((d.offset % BEAT_PARTITION) == 0)){ //((d.offset % (d.length * 2)) == 0)){
 				int max_group_length = 2;
-				if (d.length == 3 and ((offset % 12) == 0))
+				if (d.length == 3 and ((d.offset % 12) == 0))
 					max_group_length = 4;
+				if (d.length == 4)
+					max_group_length = 3;
 				Array<NoteData> group = d;
 				for (int j=i+1; j<min(ndata.num, i+max_group_length); j++){
 					if (ndata[j].length == d.length and ndata[j].offset == ndata[j-1].end){
@@ -650,14 +691,12 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 				}
 				if (group.num > 1){
 					draw_group_ndata(c, group);
-					offset = group.back().end;
 					i += group.num - 1;
 					continue;
 				}
 			}
 
 			draw_single_ndata(c, d);
-			offset = d.end;
 		}
 
 	}
@@ -765,7 +804,7 @@ void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 
 void AudioViewLayer::draw_midi_note_tab(Painter *c, const MidiNote *n, int shift, MidiNoteState state)
 {
-	float r = min(clef_dy/2, 15.0f);
+	float r = min(clef_dy/2, 13.0f);
 
 	float x1, x2;
 	view->cam.range2screen(n->range + shift, x1, x2);
@@ -822,7 +861,7 @@ int AudioViewLayer::screen_to_string(float y)
 
 void AudioViewLayer::draw_midi_note_classical(Painter *c, const MidiNote *n, int shift, MidiNoteState state, const Clef &clef)
 {
-	float r = clef_dy/2;
+	float r = min(clef_dy/2, 10.0f);
 
 	float x1, x2;
 	view->cam.range2screen(n->range + shift, x1, x2);

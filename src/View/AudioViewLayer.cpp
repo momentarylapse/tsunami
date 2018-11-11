@@ -534,6 +534,135 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, AudioViewLayer::M
 	col_shadow = ColorInterpolate(col, view->colors.background_track, 0.3f);
 }
 
+inline AudioViewLayer::MidiNoteState note_state(MidiNote *n, bool as_reference, AudioView *view)
+{
+	AudioViewLayer::MidiNoteState s = AudioViewLayer::STATE_DEFAULT;
+	if (view->sel.has(n))
+		s = AudioViewLayer::STATE_SELECTED;
+	if (as_reference)
+		return (AudioViewLayer::MidiNoteState)(AudioViewLayer::STATE_REFERENCE | s);
+	if ((view->hover.type == Selection::Type::MIDI_NOTE) and (n == view->hover.note))
+		return (AudioViewLayer::MidiNoteState)(AudioViewLayer::STATE_HOVER | s);
+	return s;
+}
+
+struct NoteData{
+	float x, y;
+	int offset, length, end;
+	MidiNote *n;
+	color col;
+};
+
+void draw_single_ndata(Painter *c, NoteData &d)
+{
+	c->set_color(d.col);
+	if (d.length == 3){
+		c->set_line_width(2);
+		c->draw_line(d.x, d.y, d.x, d.y - 30);
+		c->set_line_width(5);
+		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
+		c->draw_line(d.x, d.y - 20, d.x + 10, d.y - 5);
+	}else if (d.length == 6){
+		c->set_line_width(2);
+		c->draw_line(d.x, d.y, d.x, d.y - 30);
+		c->set_line_width(5);
+		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
+	}else if (d.length == 12){
+		c->set_line_width(2);
+		c->draw_line(d.x, d.y, d.x, d.y - 30);
+	}
+}
+
+void draw_group_ndata(Painter *c, const Array<NoteData> &d)
+{
+	int length = d[0].length;
+	float x0 = d[0].x, y0 = d[0].y-35;
+	float x1 = d.back().x, y1 = d.back().y-35;
+	float m = (y1 - y0) / (x1 - x0);
+
+	c->set_line_width(2);
+	for (auto &dd: d){
+		c->set_color(dd.col);
+		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
+	}
+	c->set_line_width(5);
+	for (int i=0; i<d.num; i++){
+		float t0 = (float)i     / (float)d.num;
+		float t1 = (float)(i+1) / (float)d.num;
+		c->set_color(d[i].col);
+		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
+		if (length == 3)
+			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0+10, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1+10);
+	}
+}
+
+void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi, const Range &range, int shift, bool as_reference, std::function<float(MidiNote*)> y_func)
+{
+	Song *song = vlayer->layer->song();
+	AudioView *view = vlayer->view;
+	if (view->cam.scale * song->sample_rate < 20)
+		return;
+
+	auto bars = song->bars.get_bars(range);
+	for (auto *b: bars){
+		const int BEAT_PARTITION = 12;
+
+		// samples per 16th / 3
+		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
+
+		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
+		//c->set_color(view->colors.text_soft3);
+
+		Array<NoteData> ndata;
+		for (MidiNote *n: bnotes){
+			Range r = n->range and b->range();
+			NoteData d;
+			d.n = n;
+			d.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);
+			d.length = int((float)(r.end() - b->range().offset) / spu + 0.5f) - d.offset;
+			if (d.length == 0)
+				continue;
+			d.end = d.offset + d.length;
+
+			d.x = view->cam.sample2screen(n->range.offset + shift);
+			d.y = y_func(n);
+
+
+			color col_shadow;
+			get_col(d.col, col_shadow, n, note_state(n, as_reference, view), view, vlayer->is_playable());
+			ndata.add(d);
+		}
+
+		int offset = 0;
+		for (int i=0; i<ndata.num; i++){
+			NoteData &d = ndata[i];
+
+			if ((d.length == 6 or d.length == 3) and ((offset % d.length) == 0)){
+				int max_group_length = 2;
+				if (d.length == 3 and ((offset % 12) == 0))
+					max_group_length = 4;
+				Array<NoteData> group = d;
+				for (int j=i+1; j<min(ndata.num, i+max_group_length); j++){
+					if (ndata[j].length == d.length and ndata[j].offset == ndata[j-1].end){
+						group.add(ndata[j]);
+					}else
+						break;
+				}
+				if (group.num > 1){
+					draw_group_ndata(c, group);
+					offset = group.back().end;
+					i += group.num - 1;
+					continue;
+				}
+			}
+
+			draw_single_ndata(c, d);
+			offset = d.end;
+		}
+
+	}
+}
+
 void AudioViewLayer::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r)
 {
 	if (state & AudioViewLayer::STATE_SELECTED){
@@ -561,18 +690,6 @@ void AudioViewLayer::draw_midi_note_linear(Painter *c, const MidiNote &n, int sh
 	float r = max((y2 - y1) / 2.3f, 2.0f);
 
 	draw_complex_note(c, &n, state, x1, x2, y, r);
-}
-
-inline AudioViewLayer::MidiNoteState note_state(MidiNote *n, bool as_reference, AudioView *view)
-{
-	AudioViewLayer::MidiNoteState s = AudioViewLayer::STATE_DEFAULT;
-	if (view->sel.has(n))
-		s = AudioViewLayer::STATE_SELECTED;
-	if (as_reference)
-		return (AudioViewLayer::MidiNoteState)(AudioViewLayer::STATE_REFERENCE | s);
-	if ((view->hover.type == Selection::Type::MIDI_NOTE) and (n == view->hover.note))
-		return (AudioViewLayer::MidiNoteState)(AudioViewLayer::STATE_HOVER | s);
-	return s;
 }
 
 void AudioViewLayer::draw_midi_linear(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
@@ -617,7 +734,7 @@ void AudioViewLayer::draw_simple_note(Painter *c, float x1, float x2, float y, f
 void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 {
 	if (is_playable())
-		c->set_color(view->colors.text);
+		c->set_color(view->colors.text_soft1);
 	else
 		c->set_color(view->colors.text_soft3);
 
@@ -634,6 +751,12 @@ void AudioViewLayer::draw_midi_clef_tab(Painter *c)
 		c->draw_line(area.x1, y, area.x2, y);
 	}
 	c->set_antialiasing(true);
+
+
+	if (is_playable())
+		c->set_color(view->colors.text);
+	else
+		c->set_color(view->colors.text_soft3);
 
 	c->set_font_size(h / 6);
 	c->draw_str(10, area.y1 + area.height() / 2 - h * 0.37f, "T\nA\nB");
@@ -666,6 +789,9 @@ void AudioViewLayer::draw_midi_tab(Painter *c, const MidiNoteBuffer &midi, bool 
 	Range range = view->cam.range() - shift;
 	midi.update_meta(layer->track, view->midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(range);
+
+
+	draw_rhythm(c, this, midi, range, shift, as_reference, [&](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	for (MidiNote *n: notes)
 		draw_midi_note_tab(c,  n,  shift,  note_state(n, as_reference, view));
@@ -743,7 +869,7 @@ void AudioViewLayer::draw_midi_clef_classical(Painter *c, const Clef &clef, cons
 	clef_dy = dy;
 
 	if (is_playable())
-		c->set_color(view->colors.text);
+		c->set_color(view->colors.text_soft1);
 	else
 		c->set_color(view->colors.text_soft3);
 
@@ -751,6 +877,11 @@ void AudioViewLayer::draw_midi_clef_classical(Painter *c, const Clef &clef, cons
 		float y = clef_pos_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
+
+	if (is_playable())
+		c->set_color(view->colors.text);
+	else
+		c->set_color(view->colors.text_soft3);
 
 	// clef symbol
 	c->set_font_size(dy*4);
@@ -763,55 +894,7 @@ void AudioViewLayer::draw_midi_clef_classical(Painter *c, const Clef &clef, cons
 	c->set_font_size(view->FONT_SIZE);
 }
 
-struct NoteData{
-	float x, y;
-	int offset, length, end;
-	MidiNote *n;
-	color col;
-};
 
-void draw_single_ndata(Painter *c, NoteData &d)
-{
-	c->set_color(d.col);
-	if (d.length == 3){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
-		c->set_line_width(5);
-		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
-		c->draw_line(d.x, d.y - 20, d.x + 10, d.y - 5);
-	}else if (d.length == 6){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
-		c->set_line_width(5);
-		c->draw_line(d.x, d.y - 30, d.x + 10, d.y - 15);
-	}else if (d.length == 12){
-		c->set_line_width(2);
-		c->draw_line(d.x, d.y, d.x, d.y - 30);
-	}
-}
-
-void draw_group_ndata(Painter *c, const Array<NoteData> &d)
-{
-	int length = d[0].length;
-	float x0 = d[0].x, y0 = d[0].y-35;
-	float x1 = d.back().x, y1 = d.back().y-35;
-	float m = (y1 - y0) / (x1 - x0);
-
-	c->set_line_width(2);
-	for (auto &dd: d){
-		c->set_color(dd.col);
-		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
-	}
-	c->set_line_width(5);
-	for (int i=0; i<d.num; i++){
-		float t0 = (float)i     / (float)d.num;
-		float t1 = (float)(i+1) / (float)d.num;
-		c->set_color(d[i].col);
-		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
-		if (length == 3)
-			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0+10, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1+10);
-	}
-}
 
 void AudioViewLayer::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
@@ -826,67 +909,7 @@ void AudioViewLayer::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi,
 
 
 
-
-	auto bars = layer->song()->bars.get_bars(range);
-	for (auto *b: bars){
-		const int BEAT_PARTITION = 12;
-
-		// samples per 16th / 3
-		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
-
-		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
-		c->set_color(view->colors.text_soft3);
-
-		Array<NoteData> ndata;
-		for (MidiNote *n: bnotes){
-			Range r = n->range and b->range();
-			NoteData d;
-			d.n = n;
-			d.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);
-			d.length = int((float)(r.end() - b->range().offset) / spu + 0.5f) - d.offset;
-			if (d.length == 0)
-				continue;
-			d.end = d.offset + d.length;
-
-			d.x = view->cam.sample2screen(n->range.offset + shift);
-			d.y = clef_pos_to_screen(n->clef_position);
-
-
-			color col_shadow;
-			get_col(d.col, col_shadow, n, note_state(n, as_reference, view), view, is_playable());
-			ndata.add(d);
-		}
-
-		int offset = 0;
-		for (int i=0; i<ndata.num; i++){
-			NoteData &d = ndata[i];
-
-			if ((d.length == 6 or d.length == 3) and ((offset % d.length) == 0)){
-				int max_group_length = 2;
-				if (d.length == 3 and ((offset % 12) == 0))
-					max_group_length = 4;
-				Array<NoteData> group = d;
-				for (int j=i+1; j<min(ndata.num, i+max_group_length); j++){
-					if (ndata[j].length == d.length and ndata[j].offset == ndata[j-1].end){
-						group.add(ndata[j]);
-					}else
-						break;
-				}
-				if (group.num > 1){
-					draw_group_ndata(c, group);
-					offset = group.back().end;
-					i += group.num - 1;
-					continue;
-				}
-			}
-
-			draw_single_ndata(c, d);
-			offset = d.end;
-		}
-
-	}
-
-
+	draw_rhythm(c, this, midi, range, shift, as_reference, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	for (MidiNote *n: notes)
 		draw_midi_note_classical(c, n, shift, note_state(n, as_reference, view), clef);

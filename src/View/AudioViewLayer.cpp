@@ -613,13 +613,26 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
 	}
 	c->set_line_width(NOTE_BAR_WIDTH);
+	float t0 = 0;
 	for (int i=0; i<d.num; i++){
-		float t0 = (float)i     / (float)d.num;
-		float t1 = (float)(i+1) / (float)d.num;
+		float xx = d[i].x;
+		if (i+1 < d.num){
+			if (d[i+1].length == d[i].length)
+				xx = (d[i+1].x + d[i].x)/2;
+				//xx = (d[i+1].x * d[i].length + d[i].x * d[i+1].length)/(d[i].length + d[i+1].length);
+			if (d[i+1].length < d[i].length)
+				xx = d[i+1].x;
+		}
+		if (xx == x0)
+			xx = (x0*2 + d[1].x) / 3;
+		if (xx == x1 and (i+1 < d.num))
+			xx = (x1*4 + d[1-1].x) / 5;
+		float t1 = (xx - x0) / (x1 - x0);
 		c->set_color(d[i].col);
 		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
-		if (base_length == 3)
+		if (d[i].length == 3)
 			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 + NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 + NOTE_BAR_DISTANCE);
+		t0 = t1;
 	}
 	if (tripplets)
 		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 17, "3");
@@ -631,6 +644,11 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 	AudioView *view = vlayer->view;
 	if (view->cam.scale * song->sample_rate < 20)
 		return;
+
+	/*if (vlayer->is_playable())
+		c->set_color(view->colors.text_soft1);
+	else
+		c->set_color(view->colors.text_soft3);*/
 
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars){
@@ -644,11 +662,13 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 
 		Array<NoteData> ndata;
 		for (MidiNote *n: bnotes){
-			Range r = n->range and b->range();
+			Range r = n->range - b->offset;
+			if (r.offset < 0)
+				continue;
 			NoteData d;
 			d.n = n;
-			d.offset = int((float)(r.offset - b->range().offset) / spu + 0.5f);
-			d.length = int((float)(r.end() - b->range().offset) / spu + 0.5f) - d.offset;
+			d.offset = int((float)r.offset / spu + 0.5f);
+			d.length = int((float)r.end() / spu + 0.5f) - d.offset;
 			if (d.length == 0 or d.offset < 0)
 				continue;
 			d.end = d.offset + d.length;
@@ -676,23 +696,37 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 		for (int i=0; i<ndata.num; i++){
 			NoteData &d = ndata[i];
 
-			if ((d.length == 6 or d.length == 3 or d.length == 4) and ((d.offset % BEAT_PARTITION) == 0)){ //((d.offset % (d.length * 2)) == 0)){
-				int max_group_length = 2;
-				if (d.length == 3 and ((d.offset % 12) == 0))
-					max_group_length = 4;
-				if (d.length == 4)
-					max_group_length = 3;
-				Array<NoteData> group = d;
-				for (int j=i+1; j<min(ndata.num, i+max_group_length); j++){
-					if (ndata[j].length == d.length and ndata[j].offset == ndata[j-1].end){
+			// group start?
+			if ((d.offset % BEAT_PARTITION) == 0){ // only on start of beat
+				if ((d.length == 6 or d.length == 3 or d.length == 4)){
+					bool triplet = (d.length == 4);
+
+
+					Array<NoteData> group = d;
+					for (int j=i+1; j<ndata.num; j++){
+						// non-continguous?
+						if (ndata[j].offset != ndata[j-1].end)
+							break;
+						// size mismatch?
+						if (triplet){
+							if (ndata[j].length != 4)
+								break;
+						}else{
+							if ((ndata[j].length != 6) and (ndata[j].length != 3))
+								break;
+						}
+						// beat finished?
+						if (ndata[j].end > d.offset + BEAT_PARTITION)
+							break;
 						group.add(ndata[j]);
-					}else
-						break;
-				}
-				if (group.num > 1){
-					draw_group_ndata(c, group);
-					i += group.num - 1;
-					continue;
+					}
+					if (group.num > 1){
+						if (group.back().end - d.offset == BEAT_PARTITION){
+							draw_group_ndata(c, group);
+							i += group.num - 1;
+							continue;
+						}
+					}
 				}
 			}
 

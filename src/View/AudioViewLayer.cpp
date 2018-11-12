@@ -630,7 +630,7 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 		float t1 = (xx - x0) / (x1 - x0);
 		c->set_color(d[i].col);
 		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
-		if (d[i].length == 3)
+		if (d[i].length <= 3)
 			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 + NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 + NOTE_BAR_DISTANCE);
 		t0 = t1;
 	}
@@ -698,8 +698,8 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 
 			// group start?
 			if ((d.offset % BEAT_PARTITION) == 0){ // only on start of beat
-				if ((d.length == 6 or d.length == 3 or d.length == 4)){
-					bool triplet = (d.length == 4);
+				if ((d.length == 6 or d.length == 3 or d.length == 4 or d.length == 2)){
+					bool triplet = (d.length == 4) or (d.length == 2);
 
 
 					Array<NoteData> group = d;
@@ -709,7 +709,7 @@ void draw_rhythm(Painter *c, AudioViewLayer *vlayer, const MidiNoteBuffer &midi,
 							break;
 						// size mismatch?
 						if (triplet){
-							if (ndata[j].length != 4)
+							if (ndata[j].length != 4 and ndata[j].length != 2)
 								break;
 						}else{
 							if ((ndata[j].length != 6) and (ndata[j].length != 3))

@@ -36,6 +36,7 @@ MidiPainter::MidiPainter(AudioView *_view)
 	clef_y0 = 0;
 	string_dy = 0;
 	string_y0 = 0;
+	mode = MidiMode::LINEAR;
 }
 
 
@@ -370,7 +371,7 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 }
 
 
-void MidiPainter::draw_midi_note_linear(Painter *c, const MidiNote &n, MidiNoteState state)
+void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state)
 {
 	float x1, x2;
 	view->cam.range2screen(n.range, x1, x2);
@@ -384,7 +385,7 @@ void MidiPainter::draw_midi_note_linear(Painter *c, const MidiNote &n, MidiNoteS
 	draw_complex_note(c, &n, state, x1, x2, y, r);
 }
 
-void MidiPainter::draw_midi_linear(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
 {
 	Range range = view->cam.range() - shift;
 	MidiNoteBufferRef notes = midi.get_notes(range);
@@ -402,7 +403,7 @@ void MidiPainter::draw_midi_linear(Painter *c, const MidiNoteBuffer &midi)
 	for (MidiNote *n: midi){
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
-		draw_midi_note_linear(c, *n, note_state(n, as_reference, view));
+		draw_note_linear(c, *n, note_state(n, as_reference, view));
 	}
 }
 
@@ -423,7 +424,7 @@ void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, floa
 		c->draw_rect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
 }
 
-void MidiPainter::draw_midi_clef_tab(Painter *c)
+void MidiPainter::draw_clef_tab(Painter *c)
 {
 	if (is_playable)
 		c->set_color(view->colors.text_soft1);
@@ -449,7 +450,7 @@ void MidiPainter::draw_midi_clef_tab(Painter *c)
 	c->set_font_size(view->FONT_SIZE);
 }
 
-void MidiPainter::draw_midi_note_tab(Painter *c, const MidiNote *n, MidiNoteState state)
+void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state)
 {
 	float r = min(string_dy/2, 13.0f);
 
@@ -470,7 +471,7 @@ void MidiPainter::draw_midi_note_tab(Painter *c, const MidiNote *n, MidiNoteStat
 	}
 }
 
-void MidiPainter::draw_midi_tab(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &midi)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(*instrument, view->midi_scale);
@@ -480,13 +481,13 @@ void MidiPainter::draw_midi_tab(Painter *c, const MidiNoteBuffer &midi)
 	draw_rhythm(c, midi, range, [&](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	for (MidiNote *n: notes)
-		draw_midi_note_tab(c,  n,  note_state(n, as_reference, view));
+		draw_note_tab(c,  n,  note_state(n, as_reference, view));
 
 	c->set_antialiasing(false);
 	c->set_font_size(view->FONT_SIZE);
 }
 
-void MidiPainter::draw_midi_note_classical(Painter *c, const MidiNote *n, MidiNoteState state)
+void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state)
 {
 	float r = min(clef_dy/2, 10.0f);
 
@@ -523,7 +524,7 @@ void MidiPainter::draw_midi_note_classical(Painter *c, const MidiNote *n, MidiNo
 	}
 }
 
-void MidiPainter::draw_midi_clef_classical(Painter *c)
+void MidiPainter::draw_clef_classical(Painter *c)
 {
 	// clef lines
 
@@ -555,7 +556,7 @@ void MidiPainter::draw_midi_clef_classical(Painter *c)
 
 
 
-void MidiPainter::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
 {
 	Range range = view->cam.range() - shift;
 	midi.update_meta(*instrument, view->midi_scale);
@@ -568,13 +569,32 @@ void MidiPainter::draw_midi_classical(Painter *c, const MidiNoteBuffer &midi)
 	draw_rhythm(c, midi, range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	for (MidiNote *n: notes)
-		draw_midi_note_classical(c, n, note_state(n, as_reference, view));
+		draw_note_classical(c, n, note_state(n, as_reference, view));
 
 	c->set_font_size(view->FONT_SIZE);
 	c->set_antialiasing(false);
 }
 
-void MidiPainter::context(const rect& _area, const Instrument& i, const Scale &s, bool _is_playable, int _pitch_min, int _pitch_max, int _shift)
+void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)
+{
+	if (mode == MidiMode::LINEAR)
+		draw_linear(c, midi);
+	else if (mode == MidiMode::TAB)
+		draw_tab(c, midi);
+	else // if (mode == MidiMode::CLASSICAL)
+		draw_classical(c, midi);
+}
+
+void MidiPainter::draw_background(Painter *c)
+{
+	if (mode == MidiMode::CLASSICAL){
+		draw_clef_classical(c);
+	}else if (mode == MidiMode::TAB){
+		draw_clef_tab(c);
+	}
+}
+
+void MidiPainter::set_context(const rect& _area, const Instrument& i, const Scale &s, bool _is_playable, MidiMode _mode)
 {
 	area = _area;
 	instrument = &i;
@@ -591,8 +611,21 @@ void MidiPainter::context(const rect& _area, const Instrument& i, const Scale &s
 	clef_y0 = area.y2 - area.height() / 2 + 2 * clef_dy;
 
 	is_playable = _is_playable;
+	as_reference = false;
+	shift = 0;
+	mode = _mode;
+
+	pitch_min = PITCH_MIN_DEFAULT;
+	pitch_max = PITCH_MAX_DEFAULT;
+}
+
+void MidiPainter::set_linear_range(int _pitch_min, int _pitch_max)
+{
 	pitch_min = _pitch_min;
 	pitch_max = _pitch_max;
+}
+
+void MidiPainter::set_shift(int _shift)
+{
 	shift = _shift;
-	as_reference = false;
 }

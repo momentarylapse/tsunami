@@ -12,7 +12,6 @@
 #include "../ViewPort.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
-#include "../../Module/Audio/SongRenderer.h"
 
 
 color col_inter(const color a, const color &b, float t);
@@ -27,7 +26,7 @@ GridPainter::GridPainter(AudioView *_view)
 }
 
 
-void GridPainter::draw_grid_time(Painter *c, const rect &r, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, bool show_time)
+void GridPainter::draw_time(Painter *c)
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam->scale; // >= 10 pixel
 	double dt = dl / song->sample_rate;
@@ -43,12 +42,12 @@ void GridPainter::draw_grid_time(Painter *c, const rect &r, const color &fg, con
 	dt = pow(10, exp_s) / factor;
 	dl = dt * song->sample_rate;
 //	double dw = dl * a->view_zoom;
-	int nx0 = ceil(cam->screen2sample(r.x1) / dl);
-	int nx1 = ceil(cam->screen2sample(r.x2) / dl);
-	color c1 = col_inter(bg, fg, exp_s_mod * 0.8f);
-	color c2 = col_inter(bg, fg, 0.8f);
-	color c1s = col_inter(bg_sel, fg, exp_s_mod * 0.8f);
-	color c2s = col_inter(bg_sel, fg_sel, 0.8f);
+	int nx0 = ceil(cam->screen2sample(area.x1) / dl);
+	int nx1 = ceil(cam->screen2sample(area.x2) / dl);
+	color c1 = col_inter(colors.bg, colors.fg, exp_s_mod * 0.8f);
+	color c2 = col_inter(colors.bg, colors.fg, 0.8f);
+	color c1s = col_inter(colors.bg_sel, colors.fg, exp_s_mod * 0.8f);
+	color c2s = col_inter(colors.bg_sel, colors.fg_sel, 0.8f);
 
 	for (int n=nx0; n<nx1; n++){
 		double sample = n * dl;
@@ -57,33 +56,43 @@ void GridPainter::draw_grid_time(Painter *c, const rect &r, const color &fg, con
 		else
 			c->set_color(((n % 10) == 0) ? c2 : c1);
 		int xx = cam->sample2screen(sample);
-		c->draw_line(xx, r.y1, xx, r.y2);
+		c->draw_line(xx, area.y1, xx, area.y2);
 	}
+}
 
-	if (show_time){
-		if (view->is_playback_active()){
-			color cc = AudioView::colors.preview_marker;
-			cc.a = 0.25f;
-			c->set_color(cc);
-			float x0, x1;
-			cam->range2screen(view->renderer->range(), x0, x1);
-			c->draw_rect(x0, r.y1, x1 - x0, r.y1 + AudioView::TIME_SCALE_HEIGHT);
-		}
-		c->set_color(AudioView::colors.grid);
-		for (int n=nx0; n<nx1; n++){
-			if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25){
-				if (n % 5 == 0)
-					c->draw_str(cam->sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 5));
-			}else{
-				if ((n % 10) == 0)
-					c->draw_str(cam->sample2screen(n * dl) + 2, r.y1, song->get_time_str_fuzzy((double)n * dl, dt * 10));
-			}
+void GridPainter::draw_time_numbers(Painter *c)
+{
+	double dl = AudioViewTrack::MIN_GRID_DIST / cam->scale; // >= 10 pixel
+	double dt = dl / song->sample_rate;
+	double ldt = log10(dt);
+	double factor = 1;
+	if (ldt > 1.5)
+		factor = 1.0/0.6/0.60000001;
+	else if (ldt > 0)
+		factor = 1.0/0.600000001;
+	ldt += log10(factor);
+	double exp_s = ceil(ldt);
+	double exp_s_mod = exp_s - ldt;
+	dt = pow(10, exp_s) / factor;
+	dl = dt * song->sample_rate;
+//	double dw = dl * a->view_zoom;
+	int nx0 = ceil(cam->screen2sample(area.x1) / dl);
+	int nx1 = ceil(cam->screen2sample(area.x2) / dl);
+
+	c->set_color(AudioView::colors.grid);
+	for (int n=nx0; n<nx1; n++){
+		if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25){
+			if (n % 5 == 0)
+				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1, song->get_time_str_fuzzy((double)n * dl, dt * 5));
+		}else{
+			if ((n % 10) == 0)
+				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1, song->get_time_str_fuzzy((double)n * dl, dt * 10));
 		}
 	}
 }
 
 
-void GridPainter::draw_grid_bars(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel, int beat_partition)
+void GridPainter::draw_bars(Painter *c, int beat_partition)
 {
 	if (song->bars.num == 0)
 		return;
@@ -114,22 +123,22 @@ void GridPainter::draw_grid_bars(Painter *c, const rect &area, const color &fg, 
 
 		if (f1 >= 0.1f){
 			if (view->sel.range.is_inside(b->range().offset))
-				c->set_color(col_inter(bg_sel, fg_sel, f1));
+				c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
 			else
-				c->set_color(col_inter(bg, fg, f1));
+				c->set_color(col_inter(colors.bg, colors.fg, f1));
 //			c->setLineDash(no_dash, area.y1);
 			c->draw_line(xx, area.y1, xx, area.y2);
 		}
 
 		if (f2 >= 0.1f){
-			color c1 = col_inter(bg, fg, f2*0.5f);
-			color c1s = col_inter(bg_sel, fg_sel, f2*0.5f);
+			color c1 = col_inter(colors.bg, colors.fg, f2*0.5f);
+			color c1s = col_inter(colors.bg_sel, colors.fg_sel, f2*0.5f);
 			float beat_length = (float)b->range().length / (float)b->num_beats;
 //			c->setLineDash(dash, area.y1);
 			for (int i=0; i<b->num_beats; i++){
 				float beat_offset = b->range().offset + (float)i * beat_length;
-				color c2 = col_inter(bg, c1, 0.6f);
-				color c2s = col_inter(bg_sel, c1s, 0.6f);
+				color c2 = col_inter(colors.bg, c1, 0.6f);
+				color c2s = col_inter(colors.bg_sel, c1s, 0.6f);
 				//c->setColor(c2);
 				for (int j=1; j<beat_partition; j++){
 					double sample = beat_offset + beat_length * j / beat_partition;
@@ -147,7 +156,7 @@ void GridPainter::draw_grid_bars(Painter *c, const rect &area, const color &fg, 
 	}
 }
 
-void GridPainter::draw_bar_numbers(Painter *c, const rect &area, const color &fg, const color &fg_sel, const color &bg, const color &bg_sel)
+void GridPainter::draw_bar_numbers(Painter *c)
 {
 	if (song->bars.num == 0)
 		return;
@@ -190,4 +199,16 @@ void GridPainter::draw_bar_numbers(Painter *c, const rect &area, const color &fg
 	c->set_line_width(AudioView::LINE_WIDTH);
 }
 
+void GridPainter::draw_whatever(Painter *c, int beat_partition)
+{
+	if (song->bars.num > 0)
+		draw_bars(c, beat_partition);
+	else
+		draw_time(c);
+}
 
+void GridPainter::set_context(const rect& _area, const GridColors& c)
+{
+	area = _area;
+	colors = c;
+}

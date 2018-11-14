@@ -9,6 +9,7 @@
 #include "AudioView.h"
 #include "Mode/ViewMode.h"
 #include "Mode/ViewModeMidi.h"
+#include "Painter/GridPainter.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
@@ -618,6 +619,18 @@ void AudioViewLayer::draw(Painter *c)
 
 	if (layer->track->layers.num > 1)
 		draw_version_header(c);
+}
+
+
+
+GridColors AudioViewLayer::grid_colors()
+{
+	GridColors g;
+	g.bg = background_color();
+	g.bg_sel = background_selection_color();
+	g.fg = view->colors.grid;
+	g.fg_sel = (view->sel.has(layer)) ? view->colors.grid_selected : view->colors.grid;
+	return g;
 }
 
 bool AudioViewLayer::on_screen()

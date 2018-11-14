@@ -24,6 +24,7 @@ class TrackMarker;
 class Clef;
 class Scale;
 class Range;
+class GridColors;
 enum class NoteModifier;
 enum class MidiMode;
 
@@ -52,6 +53,8 @@ public:
 	virtual void draw(Painter *c);
 
 	bool on_screen();
+
+	GridColors grid_colors();
 
 	TrackLayer *layer;
 	rect area;

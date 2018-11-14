@@ -33,7 +33,6 @@ public:
 	float layer_min_height(AudioViewLayer *l) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
 
-
 	void draw_imploded_track_background(Painter *c, AudioViewTrack *t) override;
 	void draw_imploded_track_data(Painter *c, AudioViewTrack *t) override;
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;

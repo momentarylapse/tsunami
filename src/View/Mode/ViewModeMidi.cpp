@@ -37,7 +37,8 @@ MidiPainter* midi_context(ViewModeMidi *vm)
 {
 	auto *mp = vm->view->midi_painter;
 	auto *l = vm->view->cur_vlayer;
-	mp->context(l->area, l->layer->track->instrument, vm->view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, 0);
+	mp->set_context(l->area, l->layer->track->instrument, vm->view->midi_scale, l->is_playable(), l->midi_mode);
+	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
 	return mp;
 }
 
@@ -493,14 +494,8 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 	if (editing(l)){
 		l->draw_blank_background(c);
 
-		color cc = l->background_color();
-		color cc_sel = l->background_selection_color();
-		color fg = view->colors.grid;
-		color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
-		if (song->bars.num > 0)
-			view->grid_painter->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, beat_partition);
-		else
-			view->grid_painter->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
+		view->grid_painter->set_context(l->area, l->grid_colors());
+		view->grid_painter->draw_whatever(c, beat_partition);
 
 		if (l->layer->type == SignalType::MIDI){
 			auto *mp = midi_context(this);
@@ -509,9 +504,9 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 				mp->draw_pitch_grid(c, l->layer->track->synth);
 
 			if (mode == MidiMode::CLASSICAL){
-				mp->draw_midi_clef_classical(c);
+				mp->draw_clef_classical(c);
 			}else if (mode == MidiMode::TAB){
-				mp->draw_midi_clef_tab(c);
+				mp->draw_clef_tab(c);
 			}
 		}
 	}else
@@ -620,20 +615,21 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 	// midi
 	if (editing(l)){
 
+		auto mode = l->midi_mode;
+
 		/*for (int n: t->reference_tracks)
 			if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))
 				drawMidi(c, t, song->tracks[n]->midi, true, 0);*/
 
-		draw_midi(c, l, l->layer->midi, false, 0);
-
-		auto mode = l->midi_mode;
+		auto *mp = midi_context(this);
+		mp->draw(c, l->layer->midi);
 
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 
 			// current creation
 			if ((hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
 				auto notes = get_creation_notes(hover, view->msp.start_pos);
-				draw_midi(c, l, notes, false, 0);
+				mp->draw(c, notes);
 				//c->setFontSize(view->FONT_SIZE);
 			}
 
@@ -641,7 +637,7 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 			// creation preview
 			if ((!hui::GetEvent()->lbut) and (hover->type == Selection::Type::MIDI_PITCH)){
 				auto notes = get_creation_notes(hover, hover->pos);
-				draw_midi(c, l, notes, false, 0);
+				mp->draw(c, notes);
 			}
 		}
 

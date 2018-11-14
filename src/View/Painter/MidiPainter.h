@@ -24,6 +24,7 @@ class color;
 class Instrument;
 class Synthesizer;
 enum class NoteModifier;
+enum class MidiMode;
 
 class MidiPainter
 {
@@ -49,19 +50,24 @@ public:
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
 
-	void draw_midi_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
-	void draw_midi_linear(Painter *c, const MidiNoteBuffer &midi);
-	void draw_midi_clef_tab(Painter *c);
-	void draw_midi_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_midi_tab(Painter *c, const MidiNoteBuffer &midi);
-	void draw_midi_note_classical(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_midi_clef_classical(Painter *c);
-	void draw_midi_classical(Painter *c, const MidiNoteBuffer &midi);
+	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
+	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
+	void draw_clef_tab(Painter *c);
+	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
+	void draw_tab(Painter *c, const MidiNoteBuffer &midi);
+	void draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state);
+	void draw_clef_classical(Painter *c);
+	void draw_classical(Painter *c, const MidiNoteBuffer &midi);
+
+	void draw(Painter *c, const MidiNoteBuffer &midi);
+	void draw_background(Painter *c);
 
 	AudioView *view;
 	Song *song;
 
-	void context(const rect &area, const Instrument &i, const Scale &s, bool playable, int pitch_min, int pitch_max, int shift);
+	void set_context(const rect &area, const Instrument &i, const Scale &s, bool playable, MidiMode mode);
+	void set_shift(int shift);
+	void set_linear_range(int pitch_min, int pitch_max);
 	rect area;
 	const Instrument *instrument;
 	const Clef *clef;
@@ -76,6 +82,7 @@ public:
 
 	float string_dy;
 	float string_y0;
+	MidiMode mode;
 
 
 	float clef_pos_to_screen(int pos);

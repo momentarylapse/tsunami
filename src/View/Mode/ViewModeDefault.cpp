@@ -429,40 +429,22 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 
 void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
-	view->midi_painter->context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, shift);
-
-	auto mode = l->midi_mode;
-	if (mode == MidiMode::LINEAR)
-		view->midi_painter->draw_midi_linear(c, midi);
-	else if (mode == MidiMode::TAB)
-		view->midi_painter->draw_midi_tab(c, midi);
-	else // if (mode == MidiMode::CLASSICAL)
-		view->midi_painter->draw_midi_classical(c, midi);
+	view->midi_painter->set_context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), l->midi_mode);
+	view->midi_painter->set_shift(shift);
+	view->midi_painter->draw(c, midi);
 }
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
 	l->draw_blank_background(c);
 
-	color cc = l->background_color();
-	color cc_sel = l->background_selection_color();
-	color fg = view->colors.grid;
-	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
-	if (song->bars.num > 0)
-		view->grid_painter->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, 0);
-	else
-		view->grid_painter->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
+	view->grid_painter->set_context(l->area, l->grid_colors());
+	view->grid_painter->draw_whatever(c, 0);
 
 
 	if (l->layer->type == SignalType::MIDI){
-
-		view->midi_painter->context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, 0);
-		auto mode = l->midi_mode;
-		if (mode == MidiMode::CLASSICAL){
-			view->midi_painter->draw_midi_clef_classical(c);
-		}else if (mode == MidiMode::TAB){
-			view->midi_painter->draw_midi_clef_tab(c);
-		}
+		view->midi_painter->set_context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), l->midi_mode);
+		view->midi_painter->draw_background(c);
 	}
 
 
@@ -616,12 +598,9 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 
 
 	if (l->layer->type == SignalType::BEATS){
-		color cc = l->background_color();
-		color cc_sel = l->background_selection_color();
-		color fg = view->colors.grid;
-		color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
+		view->grid_painter->set_context(l->area, l->grid_colors());
 		if (song->bars.num > 0)
-			view->grid_painter->draw_bar_numbers(c, l->area, fg, fg_sel, cc, cc_sel);
+			view->grid_painter->draw_bar_numbers(c);
 	}
 
 

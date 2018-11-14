@@ -1033,11 +1033,15 @@ void AudioView::draw_background(Painter *c)
 	if (yy < song_area.y2){
 		c->set_color(colors.background);
 		rect rr = rect(song_area.x1, song_area.x2, yy, song_area.y2);
+		GridColors g;
+		g.bg = g.bg_sel = colors.background;
+		g.fg = g.fg_sel = colors.grid;
 		c->draw_rect(rr);
+		grid_painter->set_context(rr, g);
 		if (song->bars.num > 0)
-			grid_painter->draw_grid_bars(c, rr, colors.grid, colors.grid, colors.background, colors.background, 0);
+			grid_painter->draw_bars(c, 0);
 		else
-			grid_painter->draw_grid_time(c, rr, colors.grid, colors.grid, colors.background, colors.background, false);
+			grid_painter->draw_time(c);
 	}
 
 	// lines between tracks
@@ -1051,9 +1055,25 @@ void AudioView::draw_background(Painter *c)
 
 void AudioView::draw_time_scale(Painter *c)
 {
+	rect r = rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT);
+	GridColors g;
+	g.bg = g.bg_sel = colors.background_track;
+	g.fg = g.fg_sel = colors.grid;
 	c->set_color(colors.background_track);
-	c->draw_rect(clip.x1, clip.y1, clip.width(), TIME_SCALE_HEIGHT);
-	grid_painter->draw_grid_time(c, rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT), colors.grid, colors.grid, colors.background_track, colors.background_track, true);
+	c->draw_rect(r);
+
+	grid_painter->set_context(r, g);
+	grid_painter->draw_time(c);
+
+	if (is_playback_active()){
+		color cc = AudioView::colors.preview_marker;
+		cc.a = 0.25f;
+		c->set_color(cc);
+		float x0, x1;
+		cam.range2screen(renderer->range(), x0, x1);
+		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+	}
+	grid_painter->draw_time_numbers(c);
 }
 
 void AudioView::draw_selection(Painter *c)

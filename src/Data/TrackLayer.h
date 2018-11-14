@@ -19,6 +19,7 @@ class AudioBuffer;
 class Song;
 class SampleRef;
 class Sample;
+class Track;
 enum class SignalType;
 
 

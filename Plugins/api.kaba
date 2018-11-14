@@ -408,6 +408,9 @@ class Song
 	extern void delete_bar(int index, bool affect_midi)
 	extern Sample* add_sample(string name, AudioBuffer buf)
 	extern void delete_sample(Sample* sample)
+	
+	extern void begin_action_group()
+	extern void end_action_group()
 
 class SongSelection
 	Range range

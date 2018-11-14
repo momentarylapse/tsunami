@@ -7,8 +7,6 @@
 
 #include "MidiData.h"
 #include "Instrument.h"
-#include "../Track.h"
-#include "../TrackMarker.h"
 #include "../SongSelection.h"
 #include "../../lib/hui/hui.h"
 #include <math.h>
@@ -533,10 +531,10 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch)
 }
 
 
-void MidiNoteBuffer::update_meta(Track *t, const Scale& scale) const
+void MidiNoteBuffer::update_meta(const Instrument &instrument, const Scale& scale) const
 {
 	for (MidiNote *n: *this)
-		n->update_meta(t->instrument, scale);
+		n->update_meta(instrument, scale);
 }
 
 void MidiNoteBuffer::clear_meta() const

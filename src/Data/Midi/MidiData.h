@@ -20,7 +20,6 @@ class MidiEffect;
 class Instrument;
 class Clef;
 class Scale;
-class Track;
 class SongSelection;
 
 
@@ -70,7 +69,7 @@ public:
 	void operator=(const MidiNoteBufferRef &midi);
 
 	//void update_meta(const Instrument &i, const Scale &s) const;
-	void update_meta(Track *t, const Scale &s) const;
+	void update_meta(const Instrument &instrument, const Scale &s) const;
 	void clear_meta() const;
 };
 

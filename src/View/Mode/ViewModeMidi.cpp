@@ -25,10 +25,21 @@
 #include "../AudioViewLayer.h"
 #include "../Helper/MidiPreview.h"
 #include "../Helper/ScrollBar.h"
+#include "../Painter/GridPainter.h"
+#include "../Painter/MidiPainter.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
 const int EDIT_PITCH_SHOW_COUNT = 30;
+
+
+MidiPainter* midi_context(ViewModeMidi *vm)
+{
+	auto *mp = vm->view->midi_painter;
+	auto *l = vm->view->cur_vlayer;
+	mp->context(l->area, l->layer->track->instrument, vm->view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, 0);
+	return mp;
+}
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
@@ -479,71 +490,32 @@ void ViewModeMidi::set_note_length(int length)
 
 void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
-	l->draw_blank_background(c);
+	if (editing(l)){
+		l->draw_blank_background(c);
 
-	color cc = l->background_color();
-	color cc_sel = l->background_selection_color();
-	color fg = view->colors.grid;
-	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
-	if (song->bars.num > 0)
-		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, beat_partition);
-	else
-		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
+		color cc = l->background_color();
+		color cc_sel = l->background_selection_color();
+		color fg = view->colors.grid;
+		color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
+		if (song->bars.num > 0)
+			view->grid_painter->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, beat_partition);
+		else
+			view->grid_painter->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
-	if (l->layer->type == SignalType::MIDI){
-		auto mode = l->midi_mode;
-		if (l == view->cur_vlayer){
+		if (l->layer->type == SignalType::MIDI){
+			auto *mp = midi_context(this);
+			auto mode = l->midi_mode;
 			if (mode == MidiMode::LINEAR)
-				draw_layer_pitch_grid(c, l);
+				mp->draw_pitch_grid(c, l->layer->track->synth);
+
+			if (mode == MidiMode::CLASSICAL){
+				mp->draw_midi_clef_classical(c);
+			}else if (mode == MidiMode::TAB){
+				mp->draw_midi_clef_tab(c);
+			}
 		}
-
-		if (mode == MidiMode::CLASSICAL){
-			const Clef& clef = l->layer->track->instrument.get_clef();
-			l->draw_midi_clef_classical(c, clef, view->midi_scale);
-		}else if (mode == MidiMode::TAB){
-			l->draw_midi_clef_tab(c);
-		}
-	}
-}
-
-void ViewModeMidi::draw_layer_pitch_grid(Painter *c, AudioViewLayer *l)
-{
-	// pitch grid
-	c->set_color(color(0.25f, 0, 0, 0));
-	for (int i=l->pitch_min; i<l->pitch_max; i++){
-		float y0 = l->pitch2y_linear(i + 1);
-		float y1 = l->pitch2y_linear(i);
-		if (!view->midi_scale.contains(i)){
-			c->set_color(color(0.2f, 0, 0, 0));
-			c->draw_rect(l->area.x1, y0, l->area.width(), y1 - y0);
-		}
-	}
-
-
-	// pitch names
-	color cc = view->colors.text;
-	cc.a = 0.4f;
-	Array<SampleRef*> *p = nullptr;
-	if ((l->layer->track->synth) and (l->layer->track->synth->module_subtype == "Sample")){
-		auto *c = l->layer->track->synth->get_config();
-		p = (Array<SampleRef*> *)&c[1];
-	}
-	bool is_drum = (l->layer->track->instrument.type == Instrument::Type::DRUMS);
-	for (int i=l->pitch_min; i<l->pitch_max; i++){
-		c->set_color(cc);
-		if (((hover->type == Selection::Type::MIDI_PITCH) or (hover->type == Selection::Type::MIDI_NOTE)) and (i == hover->pitch))
-			c->set_color(view->colors.text);
-
-		string name = pitch_name(i);
-		if (is_drum){
-			name = drum_pitch_name(i);
-		}else if (p){
-			if (i < p->num)
-				if ((*p)[i])
-					name = (*p)[i]->origin->name;
-		}
-		c->draw_str(20, l->area.y1 + l->area.height() * (l->pitch_max - i - 1) / EDIT_PITCH_SHOW_COUNT, name);
-	}
+	}else
+		ViewModeDefault::draw_layer_background(c, l);
 }
 
 inline bool hover_note_classical(const MidiNote &n, Selection &s, ViewModeMidi *vmm)
@@ -577,8 +549,10 @@ Selection ViewModeMidi::get_hover()
 	int my = view->my;
 
 	// midi
-	if ((s.layer) and (s.layer->type == SignalType::MIDI) and (s.vlayer == view->cur_vlayer)){
+	if (s.layer and editing(s.vlayer)){
 		auto mode = s.vlayer->midi_mode;
+
+		auto *mp = midi_context(this);
 
 		// scroll bar
 		if ((mode == MidiMode::LINEAR) and (scroll->area.inside(view->mx, view->my))){
@@ -588,8 +562,8 @@ Selection ViewModeMidi::get_hover()
 
 		/*if (creation_mode != CreationMode::SELECT)*/{
 			if ((mode == MidiMode::CLASSICAL)){
-				s.pitch = cur_vlayer()->y2pitch_classical(my, modifier);
-				s.clef_position = cur_vlayer()->screen_to_clef_pos(my);
+				s.pitch = mp->y2pitch_classical(my, modifier);
+				s.clef_position = mp->screen_to_clef_pos(my);
 				s.modifier = modifier;
 				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -603,7 +577,7 @@ Selection ViewModeMidi::get_hover()
 					}
 			}else if ((mode == MidiMode::TAB)){
 				//s.pitch = cur_track->y2pitch_classical(my, modifier);
-				s.clef_position = cur_vlayer()->screen_to_string(my);
+				s.clef_position = mp->screen_to_string(my);
 				s.modifier = modifier;
 				s.type = Selection::Type::CLEF_POSITION;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -616,8 +590,8 @@ Selection ViewModeMidi::get_hover()
 						return s;
 					}
 			}else if (mode == MidiMode::LINEAR){
-				s.pitch = cur_vlayer()->y2pitch_linear(my);
-				s.clef_position = cur_vlayer()->y2clef_linear(my, s.modifier);
+				s.pitch = mp->y2pitch_linear(my);
+				s.clef_position = mp->y2clef_linear(my, s.modifier);
 				//s.modifier = modifier;
 				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
@@ -677,7 +651,7 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 		}else if (mode == MidiMode::LINEAR){
 
 			// scrollbar
-			scroll->offset = 127 - cur_vlayer()->pitch_max;
+			scroll->offset = 127 - cur_vlayer()->edit_pitch_max;
 			scroll->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
 			scroll->draw(c, hover->type == Selection::Type::SCROLLBAR_MIDI);
 		}
@@ -709,6 +683,13 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 
 void ViewModeMidi::draw_track_data(Painter *c, AudioViewTrack *t)
 {
+	ViewModeDefault::draw_track_data(c, t);
+}
+
+
+void ViewModeMidi::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
+{
+	ViewModeDefault::draw_imploded_track_data(c, t);
 }
 
 void ViewModeMidi::draw_post(Painter *c)
@@ -721,23 +702,25 @@ void ViewModeMidi::draw_post(Painter *c)
 	float x1, x2;
 	view->cam.range2screen(r, x1, x2);
 
+	auto *mp = midi_context(this);
+
 	c->set_color(view->colors.selection_internal);
 	if (mode == MidiMode::TAB){
-		int y = l->string_to_screen(string_no);
-		int y1 = y - l->clef_dy/2;
-		int y2 = y + l->clef_dy/2;
+		int y = mp->string_to_screen(string_no);
+		int y1 = y - mp->clef_dy/2;
+		int y2 = y + mp->clef_dy/2;
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::CLASSICAL){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = l->pitch2y_classical(p2);
-		int y2 = l->pitch2y_classical(p1);
+		int y1 = mp->pitch2y_classical(p2);
+		int y2 = mp->pitch2y_classical(p1);
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}else if (mode == MidiMode::LINEAR){
 		int p1 = pitch_from_octave_and_rel(0, octave);
 		int p2 = pitch_from_octave_and_rel(0, octave+1);
-		int y1 = l->pitch2y_linear(p2);
-		int y2 = l->pitch2y_linear(p1);
+		int y1 = mp->pitch2y_linear(p2);
+		int y2 = mp->pitch2y_linear(p1);
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
 
@@ -762,7 +745,7 @@ Range ViewModeMidi::get_midi_edit_range()
 		b = song->bars.get_next_sub_beat(b, beat_partition);
 	for (int i=1; i<note_length; i++)
 		b = song->bars.get_next_sub_beat(b, beat_partition);
-	return Range(a, b - a);
+	return RangeTo(a, b);
 }
 
 void ViewModeMidi::start_selection()

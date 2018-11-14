@@ -26,6 +26,8 @@
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../Helper/ScrollBar.h"
+#include "../Painter/GridPainter.h"
+#include "../Painter/MidiPainter.h"
 #include "../../lib/hui/Controls/Control.h"
 
 ViewModeDefault::ViewModeDefault(AudioView *view) :
@@ -404,6 +406,8 @@ void ViewModeDefault::on_key_up(int k)
 
 float ViewModeDefault::layer_min_height(AudioViewLayer *l)
 {
+	if (l->layer->type == SignalType::MIDI)
+		return view->TIME_SCALE_HEIGHT * 3;
 	return view->TIME_SCALE_HEIGHT * 2;
 }
 
@@ -425,19 +429,19 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 
 void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
+	view->midi_painter->context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, shift);
+
 	auto mode = l->midi_mode;
 	if (mode == MidiMode::LINEAR)
-		l->draw_midi_linear(c, midi, as_reference, shift);
+		view->midi_painter->draw_midi_linear(c, midi);
 	else if (mode == MidiMode::TAB)
-		l->draw_midi_tab(c, midi, as_reference, shift);
+		view->midi_painter->draw_midi_tab(c, midi);
 	else // if (mode == MidiMode::CLASSICAL)
-		l->draw_midi_classical(c, midi, as_reference, shift);
+		view->midi_painter->draw_midi_classical(c, midi);
 }
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
-	if (!l->on_screen())
-		return;
 	l->draw_blank_background(c);
 
 	color cc = l->background_color();
@@ -445,18 +449,19 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	color fg = view->colors.grid;
 	color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 	if (song->bars.num > 0)
-		view->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, 0);
+		view->grid_painter->draw_grid_bars(c, l->area, fg, fg_sel, cc, cc_sel, 0);
 	else
-		view->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
+		view->grid_painter->draw_grid_time(c, l->area, fg, fg_sel, cc, cc_sel, false);
 
 
 	if (l->layer->type == SignalType::MIDI){
+
+		view->midi_painter->context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), MidiPainter::PITCH_MIN_DEFAULT, MidiPainter::PITCH_MAX_DEFAULT, 0);
 		auto mode = l->midi_mode;
 		if (mode == MidiMode::CLASSICAL){
-			const Clef& clef = l->layer->track->instrument.get_clef();
-			l->draw_midi_clef_classical(c, clef, view->midi_scale);
+			view->midi_painter->draw_midi_clef_classical(c);
 		}else if (mode == MidiMode::TAB){
-			l->draw_midi_clef_tab(c);
+			view->midi_painter->draw_midi_clef_tab(c);
 		}
 	}
 
@@ -616,7 +621,7 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 		color fg = view->colors.grid;
 		color fg_sel = (view->sel.has(l->layer)) ? view->colors.grid_selected : view->colors.grid;
 		if (song->bars.num > 0)
-			view->draw_bar_numbers(c, l->area, fg, fg_sel, cc, cc_sel);
+			view->grid_painter->draw_bar_numbers(c, l->area, fg, fg_sel, cc, cc_sel);
 	}
 
 

@@ -22,12 +22,21 @@ class VolumeChecker extends SongPlugin
 			float _max = max(buf.r.max(), buf.l.max())
 			float _min = min(buf.r.min(), buf.l.min())
 			vol_max = max(vol_max, max(abs(_max), abs(_min)))
-			print(vol_max)
 			done += n
-			p.set("", i2f(done) / i2f(range.length))
+			p.set("checking", i2f(done) / i2f(range.length))
 
 		if !p.is_cancelled()
-			HuiInfoBox(session.win, "maximum volume", (vol_max * 100.0).str2(1) + "%")
+			string q = "Song reaches a peak volume of " + (vol_max * 100.0).str2(1) + "%\n"
+			if vol_max < 0
+				q += "increase each track's volume to reach 100%?"
+			else
+				q += "decrease each track's volume to stay below 100%?"
+			string a = HuiQuestionBox(session.win, "Question", q, true)
+			if a == "hui:yes"
+				session.song.begin_action_group()
+				for t in session.song.tracks
+					t.set_volume(t.volume / vol_max * 0.999)
+				session.song.end_action_group()
 
 		delete p
 		delete renderer

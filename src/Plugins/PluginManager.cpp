@@ -447,6 +447,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Song.add_sample", Kaba::mf(&Song::add_sample));
 	Kaba::LinkExternal("Song.delete_sample", Kaba::mf(&Song::delete_sample));
 	Kaba::LinkExternal("Song.time_track", Kaba::mf(&Song::time_track));
+	Kaba::LinkExternal("Song.begin_action_group", Kaba::mf(&Song::begin_action_group));
+	Kaba::LinkExternal("Song.end_action_group", Kaba::mf(&Song::end_action_group));
 
 	AudioPort aport("");
 	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));

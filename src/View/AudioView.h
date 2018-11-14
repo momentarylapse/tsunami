@@ -43,6 +43,9 @@ class ViewModeCurve;
 class ViewModeCapture;
 class ScrollBar;
 class Session;
+class MidiPainter;
+class BufferPainter;
+class GridPainter;
 
 
 enum class MidiMode{
@@ -99,9 +102,6 @@ public:
 	void zoom_out();
 
 	void draw_time_scale(Painter *c);
-	void draw_grid_time(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, bool show_text);
-	void draw_grid_bars(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel, int beat_partition);
-	void draw_bar_numbers(Painter *c, const rect &r, const color &col, const color &col_sel, const color &bg, const color &bg_sel);
 	void draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time = false);
 	void draw_selection(Painter *c);
 	void draw_background(Painter *c);
@@ -253,6 +253,11 @@ public:
 	ViewPort cam;
 
 	ScrollBar *scroll;
+
+
+	MidiPainter *midi_painter;
+	BufferPainter *buffer_painter;
+	GridPainter *grid_painter;
 
 	Array<AudioViewTrack*> vtrack;
 	Array<AudioViewLayer*> vlayer;

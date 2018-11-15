@@ -20,6 +20,22 @@
 #include "../../Module/Synth/Synthesizer.h"
 
 
+// rhythm quantization
+static const int BEAT_PARTITION = 12;
+static const int QUARTER = BEAT_PARTITION;
+static const int EIGHTH = BEAT_PARTITION / 2;
+static const int SIXTEENTH = BEAT_PARTITION / 4;
+static const int TRIPLET_EIGHTH = BEAT_PARTITION / 3;
+static const int TRIPLET_SIXTEENTH = BEAT_PARTITION / 6;
+
+const float NOTE_NECK_LENGTH = 35.0f;
+const float NOTE_BAR_DISTANCE = 10.0f;
+const float NOTE_BAR_WIDTH = 5.0f;
+const float NOTE_NECK_WIDTH = 2.0f;
+const float NOTE_FLAG_DX = 10.0f;
+const float NOTE_FLAG_DY = 15.0f;
+
+
 MidiPainter::MidiPainter(AudioView *_view)
 {
 	view = _view;
@@ -132,65 +148,66 @@ int MidiPainter::y2clef_linear(float y, NoteModifier &mod)
 	return clef->pitch_to_position(pitch, view->midi_scale, mod);
 }
 
-struct NoteData{
+struct NoteData
+{
+	NoteData(){}
+	NoteData(MidiNote *note, const Range &r, float spu)
+	{
+		n = note;
+		offset = int((float)r.offset / spu + 0.5f);
+		end = int((float)r.end() / spu + 0.5f);
+		length = end - offset;
+		base_length = length;
+		x = y = 0;
+		col = White;
+		triplet = (length == 2) or (length == 4) or (length == 8);
+		punctured = (length == 9) or (length == 18) or (length == 36);
+		if (triplet)
+			base_length = (base_length / 2) * 3;
+		if (punctured)
+			base_length = (base_length * 3) / 2;
+		up = true;
+	}
 	float x, y;
 	int offset, length, end;
 	MidiNote *n;
 	color col;
+	bool triplet, punctured;
+	int base_length; // drawing without triplet/punctured
+	bool up;
 };
-
-const float NOTE_NECK_LENGTH = 35.0f;
-const float NOTE_BAR_DISTANCE = 10.0f;
-const float NOTE_BAR_WIDTH = 5.0f;
-const float NOTE_NECK_WIDTH = 2.0f;
-const float NOTE_FLAG_DX = 10.0f;
-const float NOTE_FLAG_DY = 15.0f;
 
 void draw_single_ndata(Painter *c, NoteData &d)
 {
-	int base_length = d.length;
-	bool punctured = ((base_length % 9) == 0);
-	if (punctured)
-		base_length = (base_length / 3) * 2;
-	bool triplets = ((base_length == 2) or (base_length == 4) or (base_length == 8));
-	if (triplets)
-		base_length = (base_length / 2) * 3;
-
 	c->set_color(d.col);
-	if (base_length == 3){
-		// 1/16
+	float e = d.up ? -1 : 1;
+	if (d.base_length == SIXTEENTH){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
 		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_FLAG_DY);
-		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH + NOTE_BAR_DISTANCE, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_BAR_DISTANCE + NOTE_FLAG_DY);
-	}else if (base_length == 6){
-		// 1/8
+		c->draw_line(d.x, d.y + e * NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_FLAG_DY));
+		c->draw_line(d.x, d.y + e * (NOTE_NECK_LENGTH - NOTE_BAR_DISTANCE), d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_BAR_DISTANCE - NOTE_FLAG_DY));
+	}else if (d.base_length == EIGHTH){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
 		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line(d.x, d.y - NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y - NOTE_NECK_LENGTH + NOTE_FLAG_DY);
-	}else if (base_length == 12){
-		// 1/4
+		c->draw_line(d.x, d.y + e * NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_FLAG_DY));
+	}else if (d.base_length == QUARTER){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y - NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
 	}
 
-	if (punctured)
+	if (d.punctured)
 		c->draw_circle(d.x + 8, d.y + 5, 2);
-	if (triplets)
+	if (d.triplet)
 		c->draw_str(d.x, d.y - NOTE_NECK_LENGTH - 15, "3");
 }
 
 void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 {
-	int base_length = d[0].length;
-	bool triplets = ((base_length == 2) or (base_length == 4) or (base_length == 8));
-	if (triplets)
-		base_length = (base_length / 2) * 3;
-
-	float x0 = d[0].x, y0 = d[0].y-NOTE_NECK_LENGTH;
-	float x1 = d.back().x, y1 = d.back().y-NOTE_NECK_LENGTH;
+	float e = d[0].up ? -1 : 1;
+	float x0 = d[0].x, y0 = d[0].y + e * NOTE_NECK_LENGTH;
+	float x1 = d.back().x, y1 = d.back().y + e * NOTE_NECK_LENGTH;
 	float m = (y1 - y0) / (x1 - x0);
 
 	c->set_line_width(NOTE_NECK_WIDTH);
@@ -216,12 +233,52 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 		float t1 = (xx - x0) / (x1 - x0);
 		c->set_color(d[i].col);
 		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
-		if (d[i].length <= 3)
-			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 + NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 + NOTE_BAR_DISTANCE);
+		if (d[i].length <= SIXTEENTH)
+			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 - e*NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 - e*NOTE_BAR_DISTANCE);
+		if (d[i].punctured)
+			c->draw_circle(d[i].x + 8, d[i].y + 5, 2);
 		t0 = t1;
 	}
-	if (triplets)
-		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 17, "3");
+	if (d[0].triplet)
+		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 8 + e*8, "3");
+}
+
+
+bool find_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group)
+{
+	group = d;
+	for (int j=i+1; j<ndata.num; j++){
+		// non-continguous?
+		if (ndata[j].offset != ndata[j-1].end)
+			break;
+		if (ndata[j].triplet != d.triplet)
+			break;
+		// size mismatch?
+		if ((ndata[j].length != 4) and (ndata[j].length != 2) and (ndata[j].length != 9) and (ndata[j].length != 6) and (ndata[j].length != 3))
+			break;
+		// beat finished?
+		if (ndata[j].end > d.offset + BEAT_PARTITION)
+			break;
+		group.add(ndata[j]);
+	}
+	return (group.back().end - d.offset) == BEAT_PARTITION;
+}
+
+bool find_long_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group)
+{
+	if (ndata.num < i + 4)
+		return false;
+	group = d;
+	for (int j=i+1; j<i+4; j++){
+		// non-continguous?
+		if (ndata[j].offset != ndata[j-1].end)
+			return false;
+		// size mismatch?
+		if (ndata[j].length != EIGHTH)
+			return false;
+		group.add(ndata[j]);
+	}
+	return true;
 }
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func)
@@ -234,9 +291,10 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	else
 		c->set_color(view->colors.text_soft3);*/
 
+	float y_mid = (area.y1 + area.y2) / 2;
+
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars){
-		const int BEAT_PARTITION = 12;
 
 		// samples per 16th / 3
 		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
@@ -249,16 +307,13 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 			Range r = n->range - b->offset;
 			if (r.offset < 0)
 				continue;
-			NoteData d;
-			d.n = n;
-			d.offset = int((float)r.offset / spu + 0.5f);
-			d.length = int((float)r.end() / spu + 0.5f) - d.offset;
+			NoteData d = NoteData(n, r, spu);
 			if (d.length == 0 or d.offset < 0)
 				continue;
-			d.end = d.offset + d.length;
 
 			d.x = view->cam.sample2screen(n->range.offset + shift);
 			d.y = y_func(n);
+			d.up = (d.y >= y_mid);
 
 
 			color col_shadow;
@@ -282,34 +337,21 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 			// group start?
 			if ((d.offset % BEAT_PARTITION) == 0){ // only on start of beat
-				if ((d.length == 6 or d.length == 3 or d.length == 4 or d.length == 2)){
-					bool triplet = (d.length == 4) or (d.length == 2);
+				if ((d.length == 9 or d.length == 6 or d.length == 3 or d.length == 4 or d.length == 2)){
 
+					Array<NoteData> group;
+					bool ok = false;
+					bool allow_long_group = ((d.offset % (BEAT_PARTITION*2)) == 0) and (d.length == EIGHTH);
+					if (allow_long_group)
+						ok = find_long_group(ndata, d, i, group);
+					if (!ok)
+						ok = find_group(ndata, d, i, group);
 
-					Array<NoteData> group = d;
-					for (int j=i+1; j<ndata.num; j++){
-						// non-continguous?
-						if (ndata[j].offset != ndata[j-1].end)
-							break;
-						// size mismatch?
-						if (triplet){
-							if (ndata[j].length != 4 and ndata[j].length != 2)
-								break;
-						}else{
-							if ((ndata[j].length != 6) and (ndata[j].length != 3))
-								break;
-						}
-						// beat finished?
-						if (ndata[j].end > d.offset + BEAT_PARTITION)
-							break;
-						group.add(ndata[j]);
-					}
-					if (group.num > 1){
-						if (group.back().end - d.offset == BEAT_PARTITION){
-							draw_group_ndata(c, group);
-							i += group.num - 1;
-							continue;
-						}
+					// draw
+					if (ok){
+						draw_group_ndata(c, group);
+						i += group.num - 1;
+						continue;
 					}
 				}
 			}

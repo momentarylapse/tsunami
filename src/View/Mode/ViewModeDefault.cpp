@@ -514,12 +514,11 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 
 	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
 	if (t->track->has_version_selection()){
-		Range r = Range(0, 0);
+		Range r = Range(t->track->range().start(), 0);
 		int index = 0;
 		for (auto &f: t->track->fades){
 			r = RangeTo(r.end(), f.position);
 			view->buffer_painter->set_clip(r);
-
 
 			for (AudioBuffer &b: t->track->layers[index]->buffers){
 				view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
@@ -528,14 +527,13 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 
 			index = f.target;
 		}
-		/*Array<Range> rr = version_ranges(layer);
-		for (AudioBuffer &b: layer->buffers){
-			foreachi(Range &r, rr, i){
-				float x0, x1;
-				view->cam.range2screen_clip(r, area, x0, x1);
-				draw_buffer(c, b, view_pos_rel, (i % 2) ? view->colors.text_soft3 : view->colors.text, x0, x1);
-			}
-		}*/
+
+		r = RangeTo(r.end(), t->track->range().end());
+		view->buffer_painter->set_clip(r);
+		for (AudioBuffer &b: t->track->layers[index]->buffers){
+			view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
+			view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+		}
 	}else{
 		view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
 		for (auto *layer: t->track->layers)

@@ -35,6 +35,20 @@ const float NOTE_NECK_WIDTH = 2.0f;
 const float NOTE_FLAG_DX = 10.0f;
 const float NOTE_FLAG_DY = 15.0f;
 
+static const color PITCH_COLORS[12] = {
+	color(1, 1.000000, 0.400000, 0.400000), // C
+	color(1, 0.900000, 0.700000, 0.400000),
+	color(1, 0.800000, 0.800000, 0.400000), // D
+	color(1, 0.700000, 0.900000, 0.400000),
+	color(1, 0.400000, 0.900000, 0.400000), // E
+	color(1, 0.400000, 0.900000, 0.700000), // F
+	color(1, 0.400000, 0.900000, 1.000000),
+	color(1, 0.400000, 0.700000, 1.000000), // G
+	color(1, 0.400000, 0.400000, 1.000000),
+	color(1, 0.700000, 0.400000, 1.000000), // A
+	color(1, 1.000000, 0.400000, 1.000000),
+	color(1, 1.000000, 0.400000, 0.700000)  // B
+};
 
 MidiPainter::MidiPainter(AudioView *_view)
 {
@@ -58,7 +72,8 @@ MidiPainter::MidiPainter(AudioView *_view)
 
 color MidiPainter::pitch_color(int pitch)
 {
-	return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
+	return PITCH_COLORS[pitch % 12];
+	//return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
 }
 
 

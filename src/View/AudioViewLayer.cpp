@@ -405,6 +405,6 @@ GridColors AudioViewLayer::grid_colors()
 bool AudioViewLayer::on_screen()
 {
 	if (hidden)
-		return true;
+		return false;
 	return (area.y1 < view->song_area.y2) and (area.y2 > view->song_area.y1);
 }

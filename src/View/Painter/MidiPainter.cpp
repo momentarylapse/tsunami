@@ -40,19 +40,25 @@ MidiPainter::MidiPainter(AudioView *_view)
 }
 
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, AudioView *view, bool playable)
+color MidiPainter::pitch_color(int pitch)
+{
+	return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
+}
+
+
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, bool playable)
 {
 	if (playable)
-		col = ColorInterpolate(AudioViewLayer::pitch_color(n->pitch), view->colors.text, 0.2f);
+		col = ColorInterpolate(MidiPainter::pitch_color(n->pitch), AudioView::colors.text, 0.2f);
 	else
-		col = view->colors.text_soft3;
+		col = AudioView::colors.text_soft3;
 
 	if (state & MidiPainter::STATE_HOVER){
-		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+		col = ColorInterpolate(col, AudioView::colors.hover, 0.333f);
 	}else if (state & MidiPainter::STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
+		col = ColorInterpolate(col, AudioView::colors.background_track, 0.65f);
 	}
-	col_shadow = ColorInterpolate(col, view->colors.background_track, 0.3f);
+	col_shadow = ColorInterpolate(col, AudioView::colors.background_track, 0.3f);
 }
 
 
@@ -256,7 +262,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 
 			color col_shadow;
-			get_col(d.col, col_shadow, n, note_state(n, as_reference, view), view, is_playable);
+			get_col(d.col, col_shadow, n, note_state(n, as_reference, view), is_playable);
 
 			// prevent double notes
 			if (ndata.num > 0)
@@ -364,7 +370,7 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 	}
 
 	color col, col_shadow;
-	get_col(col, col_shadow, n, state, view, is_playable);
+	get_col(col, col_shadow, n, state, is_playable);
 
 	draw_simple_note(c, x1, x2, y, r, 0, col, col_shadow, false);
 

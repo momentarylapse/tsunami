@@ -26,6 +26,7 @@
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
 #include "../Helper/ScrollBar.h"
+#include "../Painter/BufferPainter.h"
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"
 #include "../../lib/hui/Controls/Control.h"
@@ -508,6 +509,7 @@ void ViewModeDefault::draw_imploded_track_background(Painter *c, AudioViewTrack 
 void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 {
 	auto *l = view->get_layer(t->track->layers[0]);
+	view->buffer_painter->set_context(l->area);
 
 
 	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
@@ -515,14 +517,13 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 		Range r = Range(0, 0);
 		int index = 0;
 		for (auto &f: t->track->fades){
-			r.set_start(r.end());
-			r.set_end(f.position);
+			r = RangeTo(r.end(), f.position);
+			view->buffer_painter->set_clip(r);
 
 
 			for (AudioBuffer &b: t->track->layers[index]->buffers){
-				float x0, x1;
-				view->cam.range2screen_clip(r, t->area, x0, x1);
-				l->draw_buffer(c, b, view_pos_rel, t->is_playable() ? view->colors.text : view->colors.text_soft3, x0, x1);
+				view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
+				view->buffer_painter->draw_buffer(c, b, view_pos_rel);
 			}
 
 			index = f.target;
@@ -536,10 +537,10 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 			}
 		}*/
 	}else{
-		color col = t->is_playable() ? view->colors.text : view->colors.text_soft3;
+		view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
 		for (auto *layer: t->track->layers)
 			for (AudioBuffer &b: layer->buffers)
-				l->draw_buffer(c, b, view_pos_rel, col, t->area.x1, t->area.x2);
+				view->buffer_painter->draw_buffer(c, b, view_pos_rel);
 
 	}
 

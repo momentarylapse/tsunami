@@ -43,6 +43,8 @@ public:
 		STATE_REFERENCE = 4,
 	};
 
+	static color pitch_color(int pitch);
+
 	void draw_pitch_grid(Painter *c, Synthesizer *synth);
 
 	void draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func);

@@ -41,8 +41,6 @@ public:
 	void draw_blank_background(Painter *c);
 
 	void draw_track_buffers(Painter *c);
-	void draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, float x0, float x1);
-	void draw_buffer_selection(Painter *c, AudioBuffer &b, double view_pos_rel, const color &col, const Range &r);
 
 	void draw_sample_frame(Painter *c, SampleRef *s, const color &col, int delay);
 	void draw_sample(Painter *c, SampleRef *s);
@@ -67,7 +65,6 @@ public:
 	MidiMode midi_mode;
 
 
-	static color pitch_color(int pitch);
 	static color marker_color(const TrackMarker *m);
 
 	void set_edit_pitch_min_max(int pitch_min, int pitch_max);

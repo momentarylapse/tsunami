@@ -8,6 +8,7 @@
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
 #include "../AudioViewLayer.h"
+#include "../Painter/BufferPainter.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Device/InputStreamAudio.h"
@@ -50,7 +51,9 @@ void ViewModeCapture::draw_post(Painter *c)
 				AudioBuffer &buf = ((AudioSucker*)d.sucker)->buf;
 				view->update_peaks_now(buf);
 				auto *l = view->get_layer(d.target->layers[0]);
-				l->draw_buffer(c, buf, view_pos_rel - view->sel.range.offset, view->colors.capture_marker, l->area.x1, l->area.x2);
+				view->buffer_painter->set_context(l->area);
+				view->buffer_painter->set_color(view->colors.capture_marker);
+				view->buffer_painter->draw_buffer(c, buf, view_pos_rel - view->sel.range.offset);
 				view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 			}
 		}else if (d.type() == SignalType::MIDI){

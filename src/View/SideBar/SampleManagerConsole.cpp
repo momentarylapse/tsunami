@@ -8,6 +8,7 @@
 #include "../../Storage/Storage.h"
 #include "../AudioView.h"
 #include "../AudioViewLayer.h"
+#include "../Painter/MidiPainter.h"
 #include "../../Device/OutputStream.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
@@ -26,6 +27,7 @@
 #include "../../Module/Audio/SongRenderer.h"
 
 
+// TODO: use BufferPainter / MidiPainter
 void render_bufbox(Image &im, AudioBuffer &b, AudioView *view)
 {
 	int w = im.width;
@@ -51,7 +53,7 @@ void render_midi(Image &im, MidiNoteBuffer &m)
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);
 		float x1 = w * clampf((float)n->range.end() / (float)r.length, 0, 1);
-		color c = AudioViewLayer::pitch_color(n->pitch);
+		color c = MidiPainter::pitch_color(n->pitch);
 		for (int x=x0; x<=x1; x++)
 			im.set_pixel(x, y, c);
 	}

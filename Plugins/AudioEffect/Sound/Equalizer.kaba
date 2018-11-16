@@ -98,6 +98,38 @@ class EqCurve extends Curve
 				r += f.gain(freq)//p.dgain(pitch)
 		return r
 
+class SpectrumCurve extends Curve
+	float[] spec
+	float sample_rate
+	RingBuffer *ring
+	int N
+	override void __init__()
+		ring = new RingBuffer(65536)
+		N = 4096*2
+		sample_rate = DEFAULT_SAMPLE_RATE
+		col = colors.text_soft2
+	override void __delete__()
+		delete ring
+	void set(AudioBuffer buf, float _sample_rate)
+		sample_rate = _sample_rate
+		ring.write(buf)
+	
+		AudioBuffer b
+		while ring.available() >= N
+			ring.read_ref(b, N)
+			complex[] zr, zl
+			N = buf.length
+			b.get_spectrum(zr, zl, N)
+			spec.resize(zr.num)
+			for z,i in zr
+				spec[i] = log(z.abs())
+			ring.read_ref_done(b)
+	override float get(float freq)
+		int i = freq * N / sample_rate
+		if i >= spec.num-2
+			return 0
+		return spec[i]*10
+
 class Config extends PluginData
 	float gain
 	Peak[] peaks
@@ -114,8 +146,13 @@ const int MAX_PEAKS = 32
 
 class Equalizer extends AudioEffect
 
+	EqualizerGrid *grid
+
 	Config config
 	float[2][MAX_PEAKS+1][2] overlap
+	
+	override void __init__()
+		grid = nil
 	
 	override void reset_state()
 		for c in 0:2
@@ -149,6 +186,8 @@ class Equalizer extends AudioEffect
 		equalize(buf.r, 0)
 		if buf.channels > 1
 			equalize(buf.l, 1)
+		if grid
+			grid.set_buffer(buf)
 
 	override ConfigPanel *create_panel()
 		return new EqualizerPanel(self)
@@ -159,10 +198,15 @@ class EqualizerGrid extends Grid
 	EqualizerPanel *cp
 	float sample_rate
 	int hover, selected
+	SpectrumCurve spectrum
+	
+	
 	override void __init__()
 		hover = -1
 		selected = -1
 	override void on_draw(Painter *p)
+		draw_curve_c(p, spectrum, false)
+	
 		// curve + area below
 		EqCurve curve
 		curve.set(*c, sample_rate)
@@ -258,11 +302,17 @@ class EqualizerGrid extends Grid
 				hover = -1
 				redraw()
 
+	void set_buffer(AudioBuffer buf)
+		spectrum.set(buf, sample_rate)
+		redraw()
+
 class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	int num_peaks
-	override void __init__(Equalizer *e)
-		super.__init__(e)
+	Equalizer *eq
+	override void __init__(Equalizer *_eq)
+		super.__init__(_eq)
+		eq = _eq
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
 		add_drawing_area("!grabfocus,height=250", 0, 0, "drawing")
@@ -280,11 +330,16 @@ class EqualizerPanel extends ConfigPanel
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
 		grid.cp = self
-		grid.c = &e.config
-		grid.sample_rate = e.session.sample_rate()
+		grid.c = &eq.config
+		grid.sample_rate = eq.session.sample_rate()
 		num_peaks = 0
 		
+		eq.grid = &grid
+		
 		event("*", &on_ui_change)
+	
+	override void __delete__()
+		eq.grid = nil
 		
 	void on_ui_change()
 		string id = HuiGetEvent().id

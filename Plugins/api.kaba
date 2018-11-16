@@ -161,6 +161,7 @@ class AudioBuffer
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 
 class RingBuffer
+	extern void __init__(int size)
 	extern int available()
 	extern void read(AudioBuffer b)
 	extern void write(AudioBuffer b)

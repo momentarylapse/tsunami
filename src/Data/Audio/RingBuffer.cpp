@@ -25,6 +25,16 @@ RingBuffer::~RingBuffer()
 {
 }
 
+void RingBuffer::__init__(int size)
+{
+	new(this) RingBuffer(size);
+}
+
+void RingBuffer::__delete__()
+{
+	this->RingBuffer::~RingBuffer();
+}
+
 void RingBuffer::clear()
 {
 	std::unique_lock<std::shared_timed_mutex> lock(buf.mtx);

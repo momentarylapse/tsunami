@@ -138,7 +138,7 @@ void SongConsole::on_edit_samples()
 
 void SongConsole::on_edit_fx()
 {
-	//bar()->open(SideBar::GLOBAL_FX_CONSOLE);
+	bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
 void SongConsole::on_update()

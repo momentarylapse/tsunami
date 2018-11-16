@@ -47,7 +47,7 @@ SideBar::SideBar(Session *session)
 
 	song_console = new SongConsole(session);
 	sample_manager = new SampleManagerConsole(session);
-	//global_fx_console = new FxConsole(session);
+	global_fx_console = new GlobalFxConsole(session);
 	track_console = new TrackConsole(session);
 	midi_editor_console = new MidiEditorConsole(session);
 	fx_console = new FxConsole(session);
@@ -60,7 +60,7 @@ SideBar::SideBar(Session *session)
 
 	add_console(song_console);
 	add_console(sample_manager);
-	//add_console(global_fx_console);
+	add_console(global_fx_console);
 	add_console(track_console);
 	add_console(midi_editor_console);
 	add_console(fx_console);

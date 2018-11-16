@@ -2,6 +2,10 @@ use "tone.kaba"
 use "api.kaba"
 
 class Curve
+	color col, col_below
+	void __init__()
+		col = colors.text_soft1
+		col_below = color(0.3, 0.3, 0.3, 1)
 	virtual float get(float x)
 	virtual float[] get_list(float[] xx)
 		float[] r
@@ -293,11 +297,11 @@ class GridData
 		if fill_below
 			pp.add(complex(x + w, y + h))
 			pp.add(complex(x, y + h))
-			c.set_color(color(0.3, 0.3, 0.3, 1))
+			c.set_color(curve.col_below)
 			c.draw_polygon(pp)
 			pp.resize(pp.num - 2)
 		c.set_line_width(2)
-		c.set_color(col_line)
+		c.set_color(curve.col)
 		c.draw_lines(pp)
 	
 	void draw_curve_b(Painter *c, complex[] _p, bool fill_below, color col)

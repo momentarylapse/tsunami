@@ -7696,7 +7696,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-210
+212
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7880,6 +7880,8 @@ Midi Fx
 Midi Fx
 Minor
 Moll
+Mixer
+Mischpult
 Mixing console
 Mischpult
 Mixolydian
@@ -7926,6 +7928,8 @@ Program was compiled without network support...
 Anwendung wurde ohne Netzerk-Unterstützung compiliert...
 Question
 Frage
+Quick export directory
+Verzeichnis für schnelles Exportieren
 Recording
 Aufnahme
 Recording Midi

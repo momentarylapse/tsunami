@@ -28,16 +28,6 @@ class SpecGrid extends Grid
 	
 	void set(AudioBuffer buf, int sample_rate)
 		complex[] fr, fl
-		
-		ffr.clear()
-		ffl.clear()
-	
-		int len2 = buf.r.num / 2 + 1
-		fr.resize(len2)
-		fl.resize(len2)
-		//ff.clear()
-		//fft_r2c(buf.r, fr)
-		//fft_r2c(buf.l, fl)
 		buf.get_spectrum(fr, fl, 4096)
 	
 		float ww = i2f(buf.length) / sample_rate
@@ -46,8 +36,8 @@ class SpecGrid extends Grid
 			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
 			int j0 = fmin * ww
 			int j1 = fmax * ww + 1
-			j0 = clamp(j0, 0, len2)
-			j1 = clamp(j1, 0, len2)
+			j0 = clamp(j0, 0, fr.num)
+			j1 = clamp(j1, 0, fr.num)
 			float bmaxr = 0
 			float bmaxl = 0
 			for j in j0:j1

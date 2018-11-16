@@ -1759,7 +1759,7 @@ settings_dialog/t_quick_export_dir
 Schnellexport
 
 // Num Language Strings
-210
+212
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2181,3 +2181,7 @@ explode
 ausklappen
 implode
 einklappen
+Mixer
+Mischpult
+Quick export directory
+Verzeichnis für schnelles Exportieren

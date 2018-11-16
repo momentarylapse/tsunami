@@ -238,7 +238,8 @@ void PluginManager::link_app_script_data()
 
 
 	Kaba::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
-	//Kaba::LinkExternal("RingBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&RingBuffer::__init__));
+	Kaba::LinkExternal("RingBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&RingBuffer::__init__));
+	Kaba::LinkExternal("RingBuffer." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&RingBuffer::__delete__));
 	Kaba::LinkExternal("RingBuffer.available", Kaba::mf(&RingBuffer::available));
 	Kaba::LinkExternal("RingBuffer.read", Kaba::mf(&RingBuffer::read));
 	Kaba::LinkExternal("RingBuffer.write", Kaba::mf(&RingBuffer::write));

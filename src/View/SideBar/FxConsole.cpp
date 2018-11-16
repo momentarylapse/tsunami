@@ -17,7 +17,7 @@
 class SingleFxPanel : public hui::Panel
 {
 public:
-	SingleFxPanel(Session *_session, FxConsole *_console, Track *t, AudioEffect *_fx, int _index)
+	SingleFxPanel(Session *_session, BaseFxConsole *_console, Track *t, AudioEffect *_fx, int _index)
 	{
 		session = _session;
 		console = _console;
@@ -41,23 +41,23 @@ public:
 			hide_control("save_favorite", true);
 		}
 
-		event("enabled", std::bind(&SingleFxPanel::onEnabled, this));
-		event("delete", std::bind(&SingleFxPanel::onDelete, this));
-		event("load_favorite", std::bind(&SingleFxPanel::onLoad, this));
-		event("save_favorite", std::bind(&SingleFxPanel::onSave, this));
+		event("enabled", std::bind(&SingleFxPanel::on_enabled, this));
+		event("delete", std::bind(&SingleFxPanel::on_delete, this));
+		event("load_favorite", std::bind(&SingleFxPanel::on_load, this));
+		event("save_favorite", std::bind(&SingleFxPanel::on_save, this));
 		event("show_large", std::bind(&SingleFxPanel::on_large, this));
 
 		check("enabled", fx->enabled);
 
 		old_param = fx->config_to_string();
-		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChange, this), fx->MESSAGE_CHANGE);
-		fx->subscribe(this, std::bind(&SingleFxPanel::onfxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, std::bind(&SingleFxPanel::on_fx_change, this), fx->MESSAGE_CHANGE);
+		fx->subscribe(this, std::bind(&SingleFxPanel::on_fx_change_by_action, this), fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{
 		fx->unsubscribe(this);
 	}
-	void onLoad()
+	void on_load()
 	{
 		string name = session->plugin_manager->select_favorite_name(win, fx, false);
 		if (name.num == 0)
@@ -69,21 +69,21 @@ public:
 			song->edit_effect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
-	void onSave()
+	void on_save()
 	{
 		string name = session->plugin_manager->select_favorite_name(win, fx, true);
 		if (name.num == 0)
 			return;
 		session->plugin_manager->save_favorite(fx, name);
 	}
-	void onEnabled()
+	void on_enabled()
 	{
 		if (track)
 			track->enable_effect(fx, is_checked(""));
 		else
 			song->enable_effect(fx, is_checked(""));
 	}
-	void onDelete()
+	void on_delete()
 	{
 		hui::RunLater(0, [&]{
 			if (track)
@@ -97,7 +97,7 @@ public:
 		console->set_exclusive(this);
 
 	}
-	void onfxChange()
+	void on_fx_change()
 	{
 		if (track)
 			track->edit_effect(fx, old_param);
@@ -109,7 +109,7 @@ public:
 		old_param = fx->config_to_string();
 
 	}
-	void onfxChangeByAction()
+	void on_fx_change_by_action()
 	{
 		check("enabled", fx->enabled);
 		if (p)
@@ -123,18 +123,63 @@ public:
 	string old_param;
 	ConfigPanel *p;
 	int index;
-	FxConsole *console;
+	BaseFxConsole *console;
 };
 
+BaseFxConsole::BaseFxConsole(const string &title, Session *session) :
+	SideBarConsole(title, session)
+{
+	exclusive = nullptr;
+}
+
+BaseFxConsole::~BaseFxConsole(){}
+
+void BaseFxConsole::on_enter()
+{
+	set_exclusive(nullptr);
+}
+
+void BaseFxConsole::on_leave()
+{
+	set_exclusive(nullptr);
+}
+
+void BaseFxConsole::on_set_large(bool large)
+{
+	if (!large){
+		set_exclusive(nullptr);
+	}
+}
+
+void BaseFxConsole::set_exclusive(hui::Panel *ex)
+{
+	exclusive = ex;
+	bar()->set_large(exclusive);
+	for (auto *p: panels){
+		SingleFxPanel *pp = (SingleFxPanel*)p;
+		pp->hide_control("content", !allow_show(pp));
+		if (pp->p)
+			pp->p->set_large(exclusive == pp);
+	}
+}
+
+bool BaseFxConsole::allow_show(hui::Panel *p)
+{
+	if (exclusive)
+		return p == exclusive;
+	return true;
+}
+
+
+
 FxConsole::FxConsole(Session *session) :
-	SideBarConsole(_("Effects"), session)
+	BaseFxConsole(_("Effects"), session)
 {
 	id_inner = "fx_inner_table";
 
 	from_resource("fx_editor");
 
 	track = nullptr;
-	exclusive = nullptr;
 	//Enable("add", false);
 
 	if (!view)
@@ -160,33 +205,13 @@ FxConsole::~FxConsole()
 	song->unsubscribe(this);
 }
 
-void FxConsole::on_enter()
-{
-	set_exclusive(nullptr);
-}
-
-void FxConsole::on_leave()
-{
-	set_exclusive(nullptr);
-}
-
-void FxConsole::on_set_large(bool large)
-{
-	if (!large){
-		set_exclusive(nullptr);
-	}
-}
-
 void FxConsole::on_add()
 {
 	string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_EFFECT);
 	if (name == "")
 		return;
 	AudioEffect *effect = CreateAudioEffect(session, name);
-	if (track)
-		track->add_effect(effect);
-	else
-		song->add_effect(effect);
+	track->add_effect(effect);
 }
 
 void FxConsole::on_edit_song()
@@ -221,42 +246,18 @@ void FxConsole::set_track(Track *t)
 		track->subscribe(this, std::bind(&FxConsole::on_track_delete, this), track->MESSAGE_DELETE);
 		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_ADD_EFFECT);
 		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_DELETE_EFFECT);
+
+		Array<AudioEffect*> fx = track->fx;
+		foreachi(AudioEffect *e, fx, i){
+			auto *p = new SingleFxPanel(session, this, track, e, i);
+			p->hide_control("content", !allow_show(p));
+			panels.add(p);
+			embed(panels.back(), id_inner, 0, i*2);
+			add_separator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
+		}
+		hide_control("comment_no_fx", fx.num > 0);
+		//Enable("add", track);
 	}
-
-
-	Array<AudioEffect*> fx;
-	if (track)
-		fx = track->fx;
-	else
-		fx = song->fx;
-	foreachi(AudioEffect *e, fx, i){
-		auto *p = new SingleFxPanel(session, this, track, e, i);
-		p->hide_control("content", !allow_show(p));
-		panels.add(p);
-		embed(panels.back(), id_inner, 0, i*2);
-		add_separator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
-	}
-	hide_control("comment_no_fx", fx.num > 0);
-	//Enable("add", track);
-}
-
-void FxConsole::set_exclusive(hui::Panel *ex)
-{
-	exclusive = ex;
-	bar()->set_large(exclusive);
-	for (auto *p: panels){
-		SingleFxPanel *pp = (SingleFxPanel*)p;
-		pp->hide_control("content", !allow_show(pp));
-		if (pp->p)
-			pp->p->set_large(exclusive == pp);
-	}
-}
-
-bool FxConsole::allow_show(hui::Panel *p)
-{
-	if (exclusive)
-		return p == exclusive;
-	return true;
 }
 
 void FxConsole::on_track_delete()
@@ -271,5 +272,83 @@ void FxConsole::on_view_cur_track_change()
 void FxConsole::on_update()
 {
 	set_track(track);
+}
+
+
+
+
+
+GlobalFxConsole::GlobalFxConsole(Session *session) :
+	BaseFxConsole(_("Mastering"), session)
+{
+	id_inner = "fx_inner_table";
+
+	from_resource("fx_editor");
+
+	//Enable("add", false);
+
+	if (!view)
+		hide_control("edit_track", true);
+
+	event("add", std::bind(&GlobalFxConsole::on_add, this));
+
+	event("edit_song", std::bind(&GlobalFxConsole::on_edit_song, this));
+
+	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_NEW);
+	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_DELETE_EFFECT);
+}
+
+GlobalFxConsole::~GlobalFxConsole()
+{
+	clear();
+	song->unsubscribe(this);
+}
+
+void GlobalFxConsole::on_add()
+{
+	string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_EFFECT);
+	if (name == "")
+		return;
+	AudioEffect *effect = CreateAudioEffect(session, name);
+	song->add_effect(effect);
+}
+
+void GlobalFxConsole::on_edit_song()
+{
+	bar()->open(SideBar::SONG_CONSOLE);
+}
+
+void GlobalFxConsole::clear()
+{
+	foreachi(hui::Panel *p, panels, i){
+		delete(p);
+		remove_control("separator_" + i2s(i));
+	}
+	panels.clear();
+	//Enable("add", false);
+}
+
+void GlobalFxConsole::update()
+{
+	clear();
+	set_exclusive(nullptr);
+
+
+	Array<AudioEffect*> fx = song->fx;
+	foreachi(AudioEffect *e, fx, i){
+		auto *p = new SingleFxPanel(session, this, nullptr, e, i);
+		p->hide_control("content", !allow_show(p));
+		panels.add(p);
+		embed(panels.back(), id_inner, 0, i*2);
+		add_separator("!horizontal", 0, i*2 + 1, "separator_" + i2s(i));
+	}
+	hide_control("comment_no_fx", fx.num > 0);
+	//Enable("add", track);
+}
+
+void GlobalFxConsole::on_update()
+{
+	update();
 }
 

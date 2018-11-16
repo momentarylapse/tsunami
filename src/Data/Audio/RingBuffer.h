@@ -14,7 +14,10 @@
 class RingBuffer {
 public:
 	RingBuffer(int size);
-	virtual ~RingBuffer();
+	~RingBuffer();
+
+	void _cdecl __init__(int size);
+	void _cdecl __delete__();
 
 	// internal
 	void _move_read_pos(int delta);

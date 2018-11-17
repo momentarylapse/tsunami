@@ -41,6 +41,7 @@ public:
 	void on_copy();
 	void on_paste();
 	void on_paste_as_samples();
+	void on_paste_time();
 	void on_delete();
 	void on_export();
 	void on_quick_export();

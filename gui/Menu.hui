@@ -38,6 +38,8 @@ Menu menu ""
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add
 		Separator
+		Item paste_time "Paste" image=hui:paste
+		Separator
 		Item bars_label "Bars" disabled
 		Item add_bars "Add bars..." flat image=hui:add
 		Item add_pause "Add pause..." image=hui:add

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-585
+588
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1758,8 +1758,17 @@ Export (schnell)
 settings_dialog/t_quick_export_dir
 Schnellexport
 
+menu/copy_bars
+Takte kopieren
+
+menu/copy_time
+Kopieren
+
+menu/paste_time
+Einfügen
+
 // Num Language Strings
-212
+213
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2185,3 +2194,5 @@ Mixer
 Mischpult
 Quick export directory
 Verzeichnis für schnelles Exportieren
+Mastering
+Mastering

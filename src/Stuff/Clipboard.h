@@ -22,7 +22,8 @@ public:
 
 	void copy(AudioView *view);
 	void paste(AudioView *view);
-	void pasteAsSamples(AudioView *view);
+	void paste_as_samples(AudioView *view);
+	void paste_with_time(AudioView *view);
 
 	bool test_compatibility(AudioView *view);
 
@@ -30,8 +31,8 @@ public:
 	void append_track(TrackLayer *l, AudioView *view, int offset);
 	void paste_track(int source_index, TrackLayer *target, AudioView *view);
 	void paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view);
-	bool hasData();
-	bool canCopy(AudioView *view);
+	bool has_data();
+	bool can_copy(AudioView *view);
 
 private:
 	Song *temp;

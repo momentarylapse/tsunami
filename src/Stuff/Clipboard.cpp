@@ -75,9 +75,11 @@ static int find_offset(AudioView *view)
 	return offset;
 }
 
+#include "../Data/Rhythm/Bar.h"
+
 void Clipboard::copy(AudioView *view)
 {
-	if (!canCopy(view))
+	if (!can_copy(view))
 		return;
 	clear();
 
@@ -86,6 +88,13 @@ void Clipboard::copy(AudioView *view)
 	temp->sample_rate = s->sample_rate;
 
 	int offset = find_offset(view);
+
+	for (Bar *b: s->bars)
+		if (view->sel.has(b)){
+			if (temp->bars.num == 0 and b->offset > offset)
+				temp->bars.add(new Bar(b->offset - offset, 0, 0));
+			temp->bars.add(new Bar(b->length, b->num_beats, b->num_sub_beats));
+		}
 
 	for (Track *t: s->tracks)
 		for (TrackLayer *l: t->layers)
@@ -166,7 +175,7 @@ bool Clipboard::test_compatibility(AudioView *view)
 
 void Clipboard::paste(AudioView *view)
 {
-	if (!hasData())
+	if (!has_data())
 		return;
 	Song *s = view->song;
 
@@ -191,9 +200,9 @@ void Clipboard::paste(AudioView *view)
 	s->end_action_group();
 }
 
-void Clipboard::pasteAsSamples(AudioView *view)
+void Clipboard::paste_as_samples(AudioView *view)
 {
-	if (!hasData())
+	if (!has_data())
 		return;
 	Song *s = view->song;
 
@@ -218,12 +227,36 @@ void Clipboard::pasteAsSamples(AudioView *view)
 	s->end_action_group();
 }
 
-bool Clipboard::hasData()
+void Clipboard::paste_with_time(AudioView *view)
 {
-	return (temp->tracks.num > 0);
+	if (!has_data())
+		return;
+	Song *s = view->song;
+	s->begin_action_group();
+
+	int offset = view->sel.range.offset;
+	int index = 0;
+	foreachi (Bar *b, s->bars, i)
+		if (b->offset >= offset){
+			index = i;
+			break;
+		}
+
+	//if (temp->bars.num )
+	for (Bar *b: temp->bars)
+		s->add_bar(index ++, b->bpm(s->sample_rate), b->num_beats, b->num_sub_beats, Bar::EditMode::INSERT_SILENCE);
+
+	paste(view);
+
+	s->end_action_group();
 }
 
-bool Clipboard::canCopy(AudioView *view)
+bool Clipboard::has_data()
+{
+	return (temp->tracks.num > 0) or (temp->bars.num > 0);
+}
+
+bool Clipboard::can_copy(AudioView *view)
 {
 	if (!view->sel.range.empty())
 		return true;

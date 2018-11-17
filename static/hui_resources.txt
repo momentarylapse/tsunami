@@ -1080,7 +1080,7 @@ menu_time
 
 3
 0
-9
+11
 Item
 delete_time
 image=hui:delete
@@ -1100,39 +1100,51 @@ Separator
 0
 0
 Item
+paste_time
+image=hui:paste
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
 bars_label
 disabled
-3
+5
 0
 0
 Item
 add_bars
 flat,image=hui:add
-4
+6
 0
 0
 Item
 add_pause
 image=hui:add
-5
+7
 0
 0
 Item
 edit_bars
 image=hui:edit
-6
+8
 0
 0
 Item
 scale_bars
 image=hui:zoom-in
-7
+9
 0
 0
 Item
 delete_bars
 flat,image=hui:delete
-8
+10
 0
 0
 Menu
@@ -4559,7 +4571,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-458
+459
 // Text
 /cancel
 Cancel
@@ -4956,6 +4968,9 @@ View
 
 menu/menu_view_midi
 Midi
+
+menu/paste_time
+Paste
 
 menu/pause
 Pause
@@ -5941,7 +5956,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-584
+587
 // Text
 /bpm
 Bpm
@@ -6360,6 +6375,12 @@ Takte
 menu/bars_manager
 Verwalten...
 
+menu/copy_bars
+Takte kopieren
+
+menu/copy_time
+Kopieren
+
 menu/delete_bar
 Takte löschen
 
@@ -6497,6 +6518,9 @@ Midi
 
 menu/menu_view_peaks
 Peaks
+
+menu/paste_time
+Einfügen
 
 menu/pause
 Pause
@@ -7696,7 +7720,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-212
+213
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -7870,6 +7894,8 @@ Lydian
 Lydisch
 Major
 Dur
+Mastering
+Mastering
 Messages
 Nachrichten
 Metronome

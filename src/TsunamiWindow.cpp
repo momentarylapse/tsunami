@@ -89,6 +89,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL, "hui:paste");
 	event("paste_as_samples", std::bind(&TsunamiWindow::on_paste_as_samples, this));
 	set_key_code("paste_as_samples", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT, "hui:paste");
+	event("paste_time", std::bind(&TsunamiWindow::on_paste_time, this));
 	event("delete", std::bind(&TsunamiWindow::on_delete, this));
 	set_key_code("delete", hui::KEY_DELETE, "hui:delete");
 	event("export_selection", std::bind(&TsunamiWindow::on_export, this));
@@ -183,6 +184,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("select_all", hui::KEY_A + hui::KEY_CONTROL, "");
 	event("select_nothing", std::bind(&TsunamiWindow::on_select_none, this));
 	event("select_expand", std::bind(&TsunamiWindow::on_select_expand, this));
+	set_key_code("select_expand", hui::KEY_TAB + hui::KEY_SHIFT, "");
 	event("view_midi_default", std::bind(&TsunamiWindow::on_view_midi_default, this));
 	event("view_midi_tab", std::bind(&TsunamiWindow::on_view_midi_tab, this));
 	event("view_midi_score", std::bind(&TsunamiWindow::on_view_midi_score, this));
@@ -598,7 +600,12 @@ void TsunamiWindow::on_paste()
 
 void TsunamiWindow::on_paste_as_samples()
 {
-	app->clipboard->pasteAsSamples(view);
+	app->clipboard->paste_as_samples(view);
+}
+
+void TsunamiWindow::on_paste_time()
+{
+	app->clipboard->paste_with_time(view);
 }
 
 void TsunamiWindow::on_menu_execute_audio_effect()
@@ -877,8 +884,8 @@ void TsunamiWindow::update_menu()
 	// edit
 	enable("undo", song->action_manager->undoable());
 	enable("redo", song->action_manager->redoable());
-	enable("copy", app->clipboard->canCopy(view));
-	enable("paste", app->clipboard->hasData());
+	enable("copy", app->clipboard->can_copy(view));
+	enable("paste", app->clipboard->has_data());
 	enable("delete", !view->sel.is_empty());
 	// file
 	//Enable("export_selection", true);

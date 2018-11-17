@@ -1344,6 +1344,10 @@ void AudioView::select_expand()
 			if (!sel.has(t))
 				continue;
 
+			if (t->type == SignalType::BEATS)
+				for (Bar* b: song->bars)
+					test_range(b->range(), r, update);
+
 			// midi
 			for (TrackLayer *l: t->layers)
 				if (sel.has(l))

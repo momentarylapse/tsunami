@@ -53,7 +53,7 @@ static float module_port_out_y(Module *m, int index)
 	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
-static string module_header(Module *m)
+string module_header(Module *m)
 {
 	if (m->module_subtype.num > 0)
 		return m->module_subtype;
@@ -586,6 +586,8 @@ SignalEditor::SignalEditor(Session *session) :
 	add_grid("", 0, 0, grid_id);
 	set_target(grid_id);
 	add_tab_control("!left\\aaa", 0, 0, "selector");
+	add_revealer("!slide=left", 1, 0, "revealer");
+	set_target("revealer");
 	add_grid("!width=380,noexpandx", 1, 0, config_grid_id);
 	set_target(config_grid_id);
 	add_label("!bold,center,big,expandx", 0, 0, "config-label");
@@ -672,6 +674,7 @@ void SignalEditor::show_config(Module *m)
 		set_string("message", _("no module selected"));
 		hide_control("message", false);
 	}
+	reveal("revealer", m);
 }
 
 void SignalEditor::delete_chain(SignalChain *c)

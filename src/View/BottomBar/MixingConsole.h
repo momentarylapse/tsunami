@@ -11,10 +11,14 @@
 
 #include "BottomBar.h"
 
+enum class MixerMode;
+
 class PeakMeterDisplay;
 class DeviceManager;
 
 class TrackMixer;
+class ConfigPanel;
+class Module;
 
 class MixingConsole: public BottomBar::Console
 {
@@ -38,6 +42,13 @@ public:
 
 	string id_inner;
 	Array<TrackMixer*> mixer;
+
+	void set_mode(MixerMode mode);
+	MixerMode mode;
+
+	void select_module(Module *m);
+	Module *selected_module;
+	ConfigPanel *config_panel;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

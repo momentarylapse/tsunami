@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-53
+54
 // Resource
 Menu
 menu_fake
@@ -1864,7 +1864,7 @@ Grid
 
 0
 0
-4
+5
 Grid
 ?
 vertical
@@ -1907,10 +1907,64 @@ inner-grid
 0
 0
 0
-CheckBox
-link-volumes
-
+Grid
+?
+vertical
 3
+0
+4
+ToggleButton
+show-vol
+flat
+0
+0
+0
+ToggleButton
+show-fx
+flat
+1
+0
+0
+Label
+?
+expandy
+2
+0
+0
+ToggleButton
+link-volumes
+flat
+3
+0
+0
+Revealer
+config-revealer
+slide=right
+4
+0
+1
+Grid
+?
+width=380
+0
+0
+1
+Grid
+config-panel-grid
+
+0
+0
+2
+Label
+config-label
+bold,center,big
+0
+0
+0
+Label
+config-message
+bold,center
+1
 0
 0
 // Resource
@@ -4531,6 +4585,91 @@ flat,height=20,expandx,padding=1
 0
 // Resource
 Dialog
+track-mixer2
+
+0
+0
+1
+Grid
+?
+vertical,width=100,noexpandx
+0
+0
+4
+Text
+name
+center,bold,marginbottom=5
+0
+0
+0
+Grid
+grid-volume
+expandy,vertical
+1
+0
+2
+Slider
+panning
+range=-1:1:0.01,expandx,origin=no
+0
+0
+0
+Slider
+volume
+range=0:1:0.001,vertical,expandy
+1
+0
+0
+Grid
+grid-fx
+expandy,vertical
+2
+0
+2
+ListView
+fx
+format=Ct,nobar,expandy
+0
+0
+0
+Grid
+?
+
+1
+0
+2
+Button
+add-fx
+image=hui:add,flat
+0
+0
+0
+Button
+delete-fx
+image=hui:delete,flat
+1
+0
+0
+Grid
+?
+
+3
+0
+2
+ToggleButton
+mute
+flat,height=20,expandx,padding=1
+0
+0
+0
+ToggleButton
+solo
+flat,height=20,expandx,padding=1
+1
+0
+0
+// Resource
+Dialog
 tuning_dialog
 width=120,height=50
 0
@@ -4571,7 +4710,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-459
+466
 // Text
 /cancel
 Cancel
@@ -5159,14 +5298,20 @@ mini_bar/volume
 0\\-10000\\10\\0.1
 Output volume
 mixing-console/link-volumes
-couple
-change the sliders of all tracks simultaniously
+🔗
+link and change the sliders of all tracks simultaneously
 mixing-console/output-peaks
 
 Output level
 mixing-console/output-volume
 
 Output volume
+mixing-console/show-fx
+fx
+Effects
+mixing-console/show-vol
+vol
+Volume
 mixing-console/t_output
 Output
 
@@ -5905,6 +6050,21 @@ Solo
 track-mixer/volume
 0
 Volume in dB
+track-mixer2/fx
+enabled\\name
+
+track-mixer2/mute
+M
+Mute
+track-mixer2/panning
+0
+Balance
+track-mixer2/solo
+S
+Solo
+track-mixer2/volume
+0
+Volume in dB
 track_dialog/_edit_synth
 
 Configure synthesizer
@@ -5956,7 +6116,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-587
+595
 // Text
 /bpm
 Bpm
@@ -6769,7 +6929,7 @@ mini_bar/volume
 0
 Ausgabelautstärke
 mixing-console/link-volumes
-koppeln
+🔗
 die Regler aller Spuren gemeinsam ändern
 mixing-console/output-peaks
 
@@ -6777,6 +6937,12 @@ Ausgabepegel
 mixing-console/output-volume
 
 Ausgabelautstärke
+mixing-console/show-fx
+fx
+Effekte
+mixing-console/show-vol
+vol
+Lautstärke
 mixing-console/t_output
 Ausgabe
 
@@ -7645,6 +7811,24 @@ track-mixer/solo
 S
 Solo
 track-mixer/volume
+0
+Lautstärke in dB
+track-mixer2/fx
+enabled\\name
+
+track-mixer2/mute
+M
+Stumm
+track-mixer2/panning
+ß
+Balance
+track-mixer2/solo
+S
+Solo
+track-mixer2/tab
+a\\b
+
+track-mixer2/volume
 0
 Lautstärke in dB
 track_dialog/_edit_fx

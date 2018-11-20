@@ -1,0 +1,15 @@
+Dialog track-mixer2 ""
+	Grid ? "" vertical width=100 noexpandx
+		Text name "" center bold marginbottom=5
+		Grid grid-volume "" expandy vertical
+			Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance"
+			Slider volume "0" range=0:1:0.001 vertical expandy "tooltip=Volume in dB"
+		Grid grid-fx "" expandy vertical
+			ListView fx "enabled\\name" format=Ct nobar expandy
+			Grid ? ""
+				Button add-fx "" image=hui:add flat
+				Button delete-fx "" image=hui:delete flat
+		Grid ? ""
+			ToggleButton mute "M" "tooltip=Mute" flat height=20 expandx padding=1
+			ToggleButton solo "S" "tooltip=Solo" flat height=20 expandx padding=1
+

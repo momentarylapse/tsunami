@@ -40,6 +40,10 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 
 	if (track){
 		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_CHANGE);
+		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, [&]{ on_track_change(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
 		track->subscribe(this, [&]{ track = NULL; }, track->MESSAGE_DELETE);
 	}
 }

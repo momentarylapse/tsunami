@@ -14,20 +14,36 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Module/Audio/AudioEffect.h"
+#include "../../Module/ConfigPanel.h"
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 
+string module_header(Module *m);
+
+enum class MixerMode
+{
+	VOLUME,
+	EFFECTS,
+	MIDI_EFFECTS
+};
+
 class TrackMixer: public hui::Panel
 {
 public:
-	TrackMixer(AudioViewTrack *t)
+	TrackMixer(AudioViewTrack *t, MixingConsole *c)
 	{
-		from_resource("track-mixer");
+		set_border_width(0);
+		from_resource("track-mixer2");
 
 		track = nullptr;
 		vtrack = nullptr;
 		editing = false;
+		console = c;
+
+		reveal("revealer-volume", true);
+		hide_control("grid-fx", true);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -49,6 +65,7 @@ public:
 		event(pan_slider_id, std::bind(&TrackMixer::on_panning, this));
 		event(mute_id, std::bind(&TrackMixer::on_mute, this));
 		event("solo", std::bind(&TrackMixer::on_solo, this));
+		event_x("fx", "hui:select", [&]{ on_fx_select(); });
 
 		vtrack = t;
 		track = t->track;
@@ -104,6 +121,21 @@ public:
 		clear_track();
 
 	}
+	void set_mode(MixerMode mode)
+	{
+		hide_control("grid-volume", mode != MixerMode::VOLUME);
+		hide_control("grid-fx", mode != MixerMode::EFFECTS);
+		reveal("revealer-volume", mode == MixerMode::VOLUME);
+		reveal("revealer-fx", mode == MixerMode::EFFECTS);
+	}
+	void on_fx_select()
+	{
+		int n = get_int("");
+		if (n >= 0)
+			console->select_module(track->fx[n]);
+		else
+			console->select_module(nullptr);
+	}
 	void update()
 	{
 		if (!vtrack)
@@ -120,6 +152,10 @@ public:
 			set_string(id_name, track->nice_name());
 		else
 			set_string(id_name, "<s>" + track->nice_name() + "</s>");
+
+		reset("fx");
+		for (auto *fx: vtrack->track->fx)
+			add_string("fx", "true\\" + fx->module_subtype);
 	}
 
 
@@ -156,6 +192,7 @@ public:
 	string id_separator;
 	AudioView *view;
 	bool editing;
+	MixingConsole *console;
 };
 
 
@@ -167,16 +204,25 @@ MixingConsole::MixingConsole(Session *session) :
 	device_manager = session->device_manager;
 	id_inner = "inner-grid";
 
+	set_border_width(2);
 	from_resource("mixing-console");
+
+	config_panel = nullptr;
+	selected_module = nullptr;
+	select_module(nullptr);
 
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter);
 	set_float("output-volume", device_manager->get_output_volume());
 
 	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));
+	event("show-vol", [&]{ set_mode(MixerMode::VOLUME); });
+	event("show-fx", [&]{ set_mode(MixerMode::EFFECTS); });
 
 	view->subscribe(this, std::bind(&MixingConsole::on_tracks_change, this), session->view->MESSAGE_VTRACK_CHANGE);
 	view->subscribe(this, [&]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
 	song->subscribe(this, [&]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
+
+	set_mode(MixerMode::VOLUME);
 
 	//song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
 	device_manager->subscribe(this, std::bind(&MixingConsole::on_update_device_manager, this));
@@ -188,14 +234,25 @@ MixingConsole::~MixingConsole()
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
 	device_manager->unsubscribe(this);
+	select_module(nullptr);
 	for (TrackMixer *m: mixer)
-		delete(m);
-	delete(peak_meter);
+		delete m;
+	delete peak_meter;
 }
 
 void MixingConsole::on_output_volume()
 {
 	device_manager->set_output_volume(get_float(""));
+}
+
+void MixingConsole::set_mode(MixerMode _mode)
+{
+	mode = _mode;
+	for (auto *m: mixer)
+		m->set_mode(mode);
+	check("show-vol", mode == MixerMode::VOLUME);
+	check("show-fx", mode == MixerMode::EFFECTS);
+
 }
 
 void MixingConsole::load_data()
@@ -222,7 +279,7 @@ void MixingConsole::load_data()
 	// add new
 	foreachi(AudioViewTrack *t, view->vtrack, i){
 		if (i >= n_ok){
-			TrackMixer *m = new TrackMixer(t);
+			TrackMixer *m = new TrackMixer(t, this);
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
 			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
@@ -240,6 +297,47 @@ void MixingConsole::on_update_device_manager()
 void MixingConsole::on_tracks_change()
 {
 	load_data();
+}
+
+void MixingConsole::select_module(Module *m)
+{
+	selected_module = m;
+	ConfigPanel *p = nullptr;
+	if (selected_module)
+		p = selected_module->create_panel();
+
+	if (config_panel)
+		delete config_panel;
+	config_panel = p;
+
+	string config_grid_id = "config-panel-grid";
+
+	if (selected_module){
+		set_string("config-label", module_header(m));
+		config_panel = m->create_panel();
+		if (config_panel){
+			embed(config_panel, config_grid_id, 0, 2);
+			config_panel->set_large(false);
+			//setOptions(config_grid_id, "width=330,noexpandx");
+			hide_control("config-message", true);
+		}else{
+			set_string("config-message", _("module not configurable"));
+			hide_control("config-message", false);
+		}
+	}else{
+		set_string("config-label", "");
+		set_string("config-message", _("no module selected"));
+		hide_control("config-message", false);
+	}
+
+	reveal("config-revealer", m);
+
+
+	for (auto *m: mixer){
+		if (m->track->fx.find((AudioEffect*)selected_module) < 0)
+			m->set_int("fx", -1);
+	}
+
 }
 
 void MixingConsole::update_all()

@@ -131,6 +131,8 @@ void ControlTabControl::__set_option(const string &op, const string &value)
 	}else if (op == "right"){
 		gtk_notebook_set_tab_pos(GTK_NOTEBOOK(widget), GTK_POS_RIGHT);
 		gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), false);
+	}else if (op == "noframe"){
+		gtk_notebook_set_show_border(GTK_NOTEBOOK(widget), false);
 	}
 }
 

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-588
+596
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -700,7 +700,7 @@ mini_bar/volume
 0
 Ausgabelautstärke
 mixing-console/link-volumes
-koppeln
+🔗
 die Regler aller Spuren gemeinsam ändern
 mixing-console/output-peaks
 
@@ -1767,6 +1767,30 @@ Kopieren
 menu/paste_time
 Einfügen
 
+track-mixer2/tab
+a\\b
+
+mixing-console/show-fx
+fx
+Effekte
+mixing-console/show-vol
+vol
+Lautstärke
+track-mixer2/mute
+M
+Stumm
+track-mixer2/solo
+S
+Solo
+track-mixer2/fx
+enabled\\name
+
+track-mixer2/panning
+ß
+Balance
+track-mixer2/volume
+0
+Lautstärke in dB
 // Num Language Strings
 213
 // Data (ID,Text)

@@ -11,7 +11,14 @@
 
 #include "BottomBar.h"
 
-enum class MixerMode;
+
+
+enum class MixerMode
+{
+	VOLUME,
+	EFFECTS,
+	MIDI_EFFECTS
+};
 
 class PeakMeterDisplay;
 class DeviceManager;

@@ -23,13 +23,6 @@
 
 string module_header(Module *m);
 
-enum class MixerMode
-{
-	VOLUME,
-	EFFECTS,
-	MIDI_EFFECTS
-};
-
 class TrackMixer: public hui::Panel
 {
 public:
@@ -63,11 +56,13 @@ public:
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 		add_string(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
-		event(vol_slider_id, std::bind(&TrackMixer::on_volume, this));
-		event(pan_slider_id, std::bind(&TrackMixer::on_panning, this));
-		event(mute_id, std::bind(&TrackMixer::on_mute, this));
-		event("solo", std::bind(&TrackMixer::on_solo, this));
+		event(vol_slider_id, [&]{ on_volume(); });
+		event(pan_slider_id, [&]{ on_panning(); });
+		event(mute_id, [&]{ on_mute(); });
+		event("solo", [&]{ on_solo(); });
 		event_x("fx", "hui:select", [&]{ on_fx_select(); });
+		event_x("fx", "hui:change", [&]{ on_fx_edit(); });
+		event_x("fx", "hui:move", [&]{ on_fx_move(); });
 		event("add-fx", [&]{ on_add_fx(); });
 		event("delete-fx", [&]{ on_delete_fx(); });
 
@@ -141,6 +136,18 @@ public:
 			console->select_module(nullptr);
 		enable("delete-fx", n >= 0);
 	}
+	void on_fx_edit()
+	{
+		int n = hui::GetEvent()->row;
+		if (n >= 0)
+			track->enable_effect(track->fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
+	}
+	void on_fx_move()
+	{
+		int s = hui::GetEvent()->row;
+		int t = hui::GetEvent()->row_target;
+		track->move_effect(s, t);
+	}
 	void on_add_fx()
 	{
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
@@ -171,9 +178,11 @@ public:
 		else
 			set_string(id_name, "<s>" + track->nice_name() + "</s>");
 
+		// fx list
 		reset("fx");
 		for (auto *fx: vtrack->track->fx)
-			add_string("fx", "true\\" + fx->module_subtype);
+			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
+		set_int("fx", vtrack->track->fx.find((AudioEffect*)console->selected_module));
 	}
 
 

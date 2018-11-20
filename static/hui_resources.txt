@@ -666,17 +666,11 @@ Grid
 
 0
 0
-2
+1
 Button
 edit_song
 link
 0
-0
-0
-Button
-edit_track
-link
-1
 0
 0
 // Resource
@@ -4610,7 +4604,7 @@ expandy,vertical
 2
 ListView
 fx
-format=Ct,nobar,expandy
+format=Ct,reorderable,nobar,expandy
 0
 0
 0
@@ -4686,7 +4680,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-466
+467
 // Text
 /cancel
 Cancel
@@ -6026,6 +6020,9 @@ Solo
 track-mixer/volume
 0
 Volume in dB
+track-mixer2/add-fx
+
+Add new effect
 track-mixer2/fx
 enabled\\name
 
@@ -6092,7 +6089,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-595
+596
 // Text
 /bpm
 Bpm
@@ -7789,6 +7786,9 @@ Solo
 track-mixer/volume
 0
 Lautstärke in dB
+track-mixer2/add-fx
+
+Einen neuen Effekt hinzufügen
 track-mixer2/fx
 enabled\\name
 

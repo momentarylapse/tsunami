@@ -128,6 +128,11 @@ void BottomBar::open(BottomBar::Console *console)
 
 void BottomBar::open(int console_index)
 {
+	if (console_index == FAKE_FX_CONSOLE){
+		open(mixing_console);
+		mixing_console->set_mode(MixerMode::EFFECTS);
+		return;
+	}
 	open(consoles[console_index]);
 }
 

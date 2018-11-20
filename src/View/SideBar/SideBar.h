@@ -85,6 +85,8 @@ public:
 
 	Array<SideBarConsole*> consoles;
 	void add_console(SideBarConsole *c);
+
+	Session *session;
 };
 
 

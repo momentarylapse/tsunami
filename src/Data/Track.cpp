@@ -33,6 +33,7 @@
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
+#include "../Action/Track/Effect/ActionTrackMoveAudioEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Action/Track/Marker/ActionTrackAddMarker.h"
 #include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
@@ -195,6 +196,12 @@ void Track::delete_effect(AudioEffect *effect)
 		if (f == effect)
 			song->execute(new ActionTrackDeleteEffect(this, index));
 	}
+}
+
+void Track::move_effect(int source, int target)
+{
+	if (source != target)
+		song->execute(new ActionTrackMoveAudioEffect(this, source, target));
 }
 
 void Track::add_midi_effect(MidiEffect *effect)

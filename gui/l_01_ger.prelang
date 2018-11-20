@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-596
+597
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1791,6 +1791,9 @@ Balance
 track-mixer2/volume
 0
 Lautstärke in dB
+track-mixer2/add-fx
+
+Einen neuen Effekt hinzufügen
 // Num Language Strings
 213
 // Data (ID,Text)

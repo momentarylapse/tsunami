@@ -19,12 +19,15 @@
 #include "CaptureConsole.h"
 #include "ModuleConsole.h"
 #include "../../Session.h"
+#include "../../TsunamiWindow.h"
+#include "../BottomBar/BottomBar.h"
 
 const int SideBar::WIDTH_DEFAULT = 380;
 const int SideBar::WIDTH_LARGE = 750;
 
-SideBar::SideBar(Session *session)
+SideBar::SideBar(Session *_session)
 {
+	session = _session;
 	add_revealer("!slide=left", 0, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandx,width=380,expandy", 0, 0, "root_grid0");
@@ -161,6 +164,10 @@ void SideBar::choose(int console)
 
 void SideBar::open(int console)
 {
+	if (console == FX_CONSOLE){
+		session->win->bottom_bar->open(BottomBar::FAKE_FX_CONSOLE);
+		return;
+	}
 	choose(console);
 
 	if (!visible)

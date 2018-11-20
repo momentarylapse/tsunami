@@ -61,10 +61,12 @@ public:
 	void _cdecl delete_effect(AudioEffect *effect);
 	void _cdecl edit_effect(AudioEffect *effect, const string &param_old);
 	void _cdecl enable_effect(AudioEffect *effect, bool enabled);
+	void _cdecl move_effect(int source, int target);
 	void _cdecl add_midi_effect(MidiEffect *effect);
 	void _cdecl delete_midi_effect(MidiEffect *effect);
 	void _cdecl edit_midi_effect(MidiEffect *effect, const string &param_old);
 	void _cdecl enable_midi_effect(MidiEffect *effect, bool enabled);
+	void _cdecl move_midi_effect(int source, int target);
 	void _cdecl set_synthesizer(Synthesizer *synth);
 	void _cdecl edit_synthesizer(const string &param_old);
 	void _cdecl detune_synthesizer(int pitch, float dpitch, bool all_octaves);

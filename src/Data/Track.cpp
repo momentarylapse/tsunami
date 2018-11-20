@@ -191,9 +191,10 @@ void Track::enable_effect(AudioEffect *effect, bool enabled)
 
 void Track::delete_effect(AudioEffect *effect)
 {
-	foreachi(AudioEffect *f, fx, index)
+	foreachi(AudioEffect *f, fx, index){
 		if (f == effect)
 			song->execute(new ActionTrackDeleteEffect(this, index));
+	}
 }
 
 void Track::add_midi_effect(MidiEffect *effect)

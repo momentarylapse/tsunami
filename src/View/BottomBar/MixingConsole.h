@@ -17,8 +17,8 @@ class PeakMeterDisplay;
 class DeviceManager;
 
 class TrackMixer;
-class ConfigPanel;
 class Module;
+class FxPanel;
 
 class MixingConsole: public BottomBar::Console
 {
@@ -48,7 +48,7 @@ public:
 
 	void select_module(Module *m);
 	Module *selected_module;
-	ConfigPanel *config_panel;
+	FxPanel *config_panel;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

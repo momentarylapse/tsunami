@@ -17,6 +17,7 @@
 #include "../../Module/Audio/AudioEffect.h"
 #include "../../Module/ConfigPanel.h"
 #include "../../Session.h"
+#include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 
@@ -44,6 +45,7 @@ public:
 
 		reveal("revealer-volume", true);
 		hide_control("grid-fx", true);
+		enable("delete-fx", false);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -66,6 +68,8 @@ public:
 		event(mute_id, std::bind(&TrackMixer::on_mute, this));
 		event("solo", std::bind(&TrackMixer::on_solo, this));
 		event_x("fx", "hui:select", [&]{ on_fx_select(); });
+		event("add-fx", [&]{ on_add_fx(); });
+		event("delete-fx", [&]{ on_delete_fx(); });
 
 		vtrack = t;
 		track = t->track;
@@ -135,6 +139,20 @@ public:
 			console->select_module(track->fx[n]);
 		else
 			console->select_module(nullptr);
+		enable("delete-fx", n >= 0);
+	}
+	void on_add_fx()
+	{
+		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
+		if (name == "")
+			return;
+		AudioEffect *effect = CreateAudioEffect(console->session, name);
+		track->add_effect(effect);
+
+	}
+	void on_delete_fx()
+	{
+
 	}
 	void update()
 	{
@@ -195,6 +213,107 @@ public:
 	MixingConsole *console;
 };
 
+
+
+
+class FxPanel : public hui::Panel
+{
+public:
+	FxPanel(Session *_session, MixingConsole *_console, AudioEffect *_fx, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit)
+	{
+		session = _session;
+		console = _console;
+		fx = _fx;
+
+		func_enable = _func_enable;
+		func_delete = _func_delete;
+		func_edit = _func_edit;
+
+		from_resource("fx_panel");
+
+		set_string("name", fx->module_subtype);
+
+		p = fx->create_panel();
+		if (p){
+			embed(p, "content", 0, 0);
+			p->update();
+		}else{
+			set_target("content");
+			add_label(_("not configurable"), 0, 1, "");
+			hide_control("load_favorite", true);
+			hide_control("save_favorite", true);
+		}
+
+		event("enabled", std::bind(&FxPanel::on_enabled, this));
+		event("delete", std::bind(&FxPanel::on_delete, this));
+		event("load_favorite", std::bind(&FxPanel::on_load, this));
+		event("save_favorite", std::bind(&FxPanel::on_save, this));
+		event("show_large", std::bind(&FxPanel::on_large, this));
+
+		check("enabled", fx->enabled);
+
+		old_param = fx->config_to_string();
+		fx->subscribe(this, std::bind(&FxPanel::on_fx_change, this), fx->MESSAGE_CHANGE);
+		fx->subscribe(this, std::bind(&FxPanel::on_fx_change_by_action, this), fx->MESSAGE_CHANGE_BY_ACTION);
+	}
+	virtual ~FxPanel()
+	{
+		fx->unsubscribe(this);
+	}
+	void on_load()
+	{
+		string name = session->plugin_manager->select_favorite_name(win, fx, false);
+		if (name.num == 0)
+			return;
+		session->plugin_manager->apply_favorite(fx, name);
+		func_edit(old_param);
+		old_param = fx->config_to_string();
+	}
+	void on_save()
+	{
+		string name = session->plugin_manager->select_favorite_name(win, fx, true);
+		if (name.num == 0)
+			return;
+		session->plugin_manager->save_favorite(fx, name);
+	}
+	void on_enabled()
+	{
+		func_enable(is_checked(""));
+	}
+	void on_delete()
+	{
+		hui::RunLater(0, func_delete);
+	}
+	void on_large()
+	{
+		//console->set_exclusive(this);
+
+	}
+	void on_fx_change()
+	{
+		func_edit(old_param);
+		check("enabled", fx->enabled);
+		if (p)
+			p->update();
+		old_param = fx->config_to_string();
+
+	}
+	void on_fx_change_by_action()
+	{
+		check("enabled", fx->enabled);
+		if (p)
+			p->update();
+		old_param = fx->config_to_string();
+	}
+	std::function<void(bool)> func_enable;
+	std::function<void(const string&)> func_edit;
+	std::function<void()> func_delete;
+	Session *session;
+	AudioEffect *fx;
+	string old_param;
+	ConfigPanel *p;
+	MixingConsole *console;
+};
 
 
 
@@ -301,43 +420,44 @@ void MixingConsole::on_tracks_change()
 
 void MixingConsole::select_module(Module *m)
 {
-	selected_module = m;
-	ConfigPanel *p = nullptr;
 	if (selected_module)
-		p = selected_module->create_panel();
+		selected_module->unsubscribe(this);
 
 	if (config_panel)
 		delete config_panel;
-	config_panel = p;
+	config_panel = nullptr;
+
+	selected_module = m;
 
 	string config_grid_id = "config-panel-grid";
 
+	Track *track = nullptr;
+
 	if (selected_module){
-		set_string("config-label", module_header(m));
-		config_panel = m->create_panel();
-		if (config_panel){
-			embed(config_panel, config_grid_id, 0, 2);
-			config_panel->set_large(false);
-			//setOptions(config_grid_id, "width=330,noexpandx");
-			hide_control("config-message", true);
-		}else{
-			set_string("config-message", _("module not configurable"));
-			hide_control("config-message", false);
-		}
-	}else{
-		set_string("config-label", "");
-		set_string("config-message", _("no module selected"));
-		hide_control("config-message", false);
+		for (auto *mm: mixer)
+			if (mm->track->fx.find((AudioEffect*)selected_module) >= 0)
+				track = mm->track;
+
+		AudioEffect *fx = (AudioEffect*)m;
+		config_panel = new FxPanel(session, this, fx,
+				[track,fx](bool enabled){ track->enable_effect(fx, enabled); },
+				[track,fx]{ track->delete_effect(fx); },
+				[track,fx](const string &old_param){ track->edit_effect(fx, old_param); });
+		embed(config_panel, config_grid_id, 0, 0);
+
+		m->subscribe(this, [&]{ select_module(nullptr); }, m->MESSAGE_DELETE);
 	}
 
 	reveal("config-revealer", m);
 
 
+	// make sure only 1 item is selected in lists
 	for (auto *m: mixer){
-		if (m->track->fx.find((AudioEffect*)selected_module) < 0)
+		if (m->track != track){
 			m->set_int("fx", -1);
+			m->enable("delete-fx", false);
+		}
 	}
-
 }
 
 void MixingConsole::update_all()

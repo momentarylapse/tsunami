@@ -7,8 +7,7 @@ Dialog track-mixer2 ""
 		Grid grid-fx "" expandy vertical
 			ListView fx "enabled\\name" format=Ct nobar expandy
 			Grid ? ""
-				Button add-fx "" image=hui:add flat
-				Button delete-fx "" image=hui:delete flat
+				Button add-fx "" image=hui:add flat expandx
 		Grid ? ""
 			ToggleButton mute "M" "tooltip=Mute" flat height=20 expandx padding=1
 			ToggleButton solo "S" "tooltip=Solo" flat height=20 expandx padding=1

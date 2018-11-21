@@ -108,13 +108,13 @@ void AudioViewLayer::draw_track_buffers(Painter *c)
 			foreachi(Range &r, rr, i){
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->set_color((i % 2) ? view->colors.text_soft3 : view->colors.text);
-				view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
 		}
 	}else{
 		view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
 		for (AudioBuffer &b: layer->buffers)
-			view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+			view->buffer_painter->draw_buffer(c, b, b.offset);
 
 	}
 
@@ -123,7 +123,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c)
 		view->buffer_painter->set_color(view->colors.selection_boundary);
 		view->buffer_painter->set_clip(view->sel.range);
 		for (AudioBuffer &b: layer->buffers)
-			view->buffer_painter->draw_buffer_selection(c, b, view_pos_rel);
+			view->buffer_painter->draw_buffer_selection(c, b, b.offset);
 	}
 }
 
@@ -165,7 +165,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 	// buffer
 	if (s->type() == SignalType::AUDIO){
 		view->buffer_painter->set_color(col);
-		view->buffer_painter->draw_buffer(c, *s->buf, view->cam.pos - (double)s->pos);
+		view->buffer_painter->draw_buffer(c, *s->buf, s->pos);
 	}else if (s->type() == SignalType::MIDI){
 		view->mode->draw_midi(c, this, *s->midi, true, s->pos);
 	}

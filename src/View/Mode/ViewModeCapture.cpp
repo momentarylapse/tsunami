@@ -42,8 +42,6 @@ void ViewModeCapture::draw_post(Painter *c)
 {
 	// capturing preview
 
-	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
-
 	for (auto &d: data){
 		if (d.type() == SignalType::AUDIO){
 			InputStreamAudio *input_audio = (InputStreamAudio*)d.input;
@@ -53,7 +51,7 @@ void ViewModeCapture::draw_post(Painter *c)
 				auto *l = view->get_layer(d.target->layers[0]);
 				view->buffer_painter->set_context(l->area);
 				view->buffer_painter->set_color(view->colors.capture_marker);
-				view->buffer_painter->draw_buffer(c, buf, view_pos_rel - view->sel.range.offset);
+				view->buffer_painter->draw_buffer(c, buf, view->sel.range.offset);
 				view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 			}
 		}else if (d.type() == SignalType::MIDI){

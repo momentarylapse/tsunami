@@ -38,7 +38,6 @@ public:
 
 		reveal("revealer-volume", true);
 		hide_control("grid-fx", true);
-		enable("delete-fx", false);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -64,7 +63,6 @@ public:
 		event_x("fx", "hui:change", [&]{ on_fx_edit(); });
 		event_x("fx", "hui:move", [&]{ on_fx_move(); });
 		event("add-fx", [&]{ on_add_fx(); });
-		event("delete-fx", [&]{ on_delete_fx(); });
 
 		vtrack = t;
 		track = t->track;
@@ -134,7 +132,6 @@ public:
 			console->select_module(track->fx[n]);
 		else
 			console->select_module(nullptr);
-		enable("delete-fx", n >= 0);
 	}
 	void on_fx_edit()
 	{
@@ -155,10 +152,6 @@ public:
 			return;
 		AudioEffect *effect = CreateAudioEffect(console->session, name);
 		track->add_effect(effect);
-
-	}
-	void on_delete_fx()
-	{
 
 	}
 	void update()
@@ -296,6 +289,7 @@ public:
 	void on_large()
 	{
 		//console->set_exclusive(this);
+		p->set_large(true);
 
 	}
 	void on_fx_change()
@@ -461,12 +455,9 @@ void MixingConsole::select_module(Module *m)
 
 
 	// make sure only 1 item is selected in lists
-	for (auto *m: mixer){
-		if (m->track != track){
+	for (auto *m: mixer)
+		if (m->track != track)
 			m->set_int("fx", -1);
-			m->enable("delete-fx", false);
-		}
-	}
 }
 
 void MixingConsole::update_all()

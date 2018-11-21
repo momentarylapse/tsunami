@@ -512,7 +512,6 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 	view->buffer_painter->set_context(l->area);
 
 
-	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
 	if (t->track->has_version_selection()){
 		Range r = Range(t->track->range().start(), 0);
 		int index = 0;
@@ -522,7 +521,7 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 
 			for (AudioBuffer &b: t->track->layers[index]->buffers){
 				view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
-				view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
 
 			index = f.target;
@@ -532,13 +531,13 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 		view->buffer_painter->set_clip(r);
 		for (AudioBuffer &b: t->track->layers[index]->buffers){
 			view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
-			view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+			view->buffer_painter->draw_buffer(c, b, b.offset);
 		}
 	}else{
 		view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
 		for (auto *layer: t->track->layers)
 			for (AudioBuffer &b: layer->buffers)
-				view->buffer_painter->draw_buffer(c, b, view_pos_rel);
+				view->buffer_painter->draw_buffer(c, b, b.offset);
 
 	}
 

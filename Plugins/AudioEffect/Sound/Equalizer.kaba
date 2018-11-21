@@ -363,6 +363,7 @@ class EqualizerPanel extends ConfigPanel
 			set_target("peak-" + i)
 			add_check_box("" + (i+1), 0, 0, "enabled-" + i)
 			add_combo_box("Peak\\Low pass\\High pass\\Low shelf\\High shelf", 0, 1, "mode-" + i)
+		//	add_combo_box("⎰⎱\\⎫\\⎧\\⎰\\⎱", 0, 1, "mode-" + i)
 			/*add_spin_button("!range=::0.1", 0, 2, "freq-" + i)
 			add_spin_button("!range=::0.1", 0, 2, "gain-" + i)
 			add_spin_button("!range=::0.001", 0, 2, "q-" + i)*/
@@ -385,9 +386,9 @@ class EqualizerPanel extends ConfigPanel
 
 	override void set_large(bool large)
 		if large
-			set_options("drawing", "height=380")
+			set_options("drawing", "height=380,width=500")
 		else
-			set_options("drawing", "height=250")
+			set_options("drawing", "height=250,width=380")
 		hide_control("stuff", !large)
 		hide_control("peaks", !large)
 

@@ -134,8 +134,10 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 	c->draw_polygon(tt);
 }
 
-void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel)
+void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 {
+	double view_pos_rel = view->cam.screen2sample(0) - offset;
+
 	//float w = area.width();
 	float h = area.height();
 	float hf = h / (2 * b.channels);
@@ -157,7 +159,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel)
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
 			c->set_color(ColorInterpolate(col, Red, 0.3f));
-			c->draw_rect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			return;
 		}
 
@@ -168,13 +170,13 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel)
 		cc.a *= 0.3f;
 		c->set_color(cc);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], b.offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
 
 
 		// mean square
 		c->set_color(col);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], b.offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.scale, bzf, hf, x0, x1, y0[ci], b.peaks[l+2+ci], offset);
 
 
 		// invalid peaks...
@@ -183,8 +185,8 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel)
 			for (int i=0; i<nn; i++){
 				if (b._peaks_chunk_needs_update(i)){
 					c->set_color(ColorInterpolate(col, Red, 0.3f));
-					float xx0 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), x0);
-					float xx1 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
+					float xx0 = max((float)view->cam.sample2screen(offset + i*b.PEAK_CHUNK_SIZE), x0);
+					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
 					c->draw_rect(xx0, area.y1, xx1 - xx0, h);
 				}
 			}
@@ -193,12 +195,14 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel)
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], b.offset);
+			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
 }
 
-void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, double view_pos_rel)
+void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset)
 {
+	double view_pos_rel = view->cam.screen2sample(0) - offset;
+
 	float h = area.height();
 	float hf = h / (2 * b.channels);
 
@@ -222,7 +226,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, double vie
 		// no peaks yet? -> show dummy
 		if (b.peaks.num <= l){
 			c->set_color(ColorInterpolate(col, Red, 0.3f));
-			c->draw_rect((b.offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
 			return;
 		}
 
@@ -236,12 +240,12 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, double vie
 			_bzf *= 2;
 		}*/
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], b.offset);
+			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.scale, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
 	}else{
 
 		// directly show every sample
 		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer_sel(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], b.offset);
+			draw_line_buffer_sel(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
 }
 

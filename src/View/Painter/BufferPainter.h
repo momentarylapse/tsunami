@@ -24,8 +24,8 @@ public:
 	BufferPainter(AudioView *view);
 
 
-	void draw_buffer(Painter *c, AudioBuffer &b, double view_pos_rel);
-	void draw_buffer_selection(Painter *c, AudioBuffer &b, double view_pos_rel);
+	void draw_buffer(Painter *c, AudioBuffer &b, int offset);
+	void draw_buffer_selection(Painter *c, AudioBuffer &b, int offset);
 
 	void set_context(const rect &area);
 	void set_color(const color &col);

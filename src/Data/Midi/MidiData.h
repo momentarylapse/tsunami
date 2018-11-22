@@ -151,6 +151,8 @@ enum class NoteModifier
 
 string modifier_symbol(NoteModifier mod);
 
+int modifier_shift(NoteModifier mod);
+NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod);
 
 int modifier_apply(int pitch, NoteModifier mod);
 int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod);

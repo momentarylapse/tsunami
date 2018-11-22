@@ -32,11 +32,19 @@ public:
 
 	Scale(Type type, int root);
 	bool contains(int pitch) const;
-	int transform_out(int x, NoteModifier modifier) const;
+	int transform_out(int upos, NoteModifier modifier) const;
+
+	NoteModifier get_modifier(int upos) const;
 
 	static string get_type_name(Type type);
 	string type_name() const;
 };
+
+
+int uniclef_get_rel(int upos);
+int uniclef_get_octave(int upos);
+int uniclef_to_pitch(int upos);
+int uniclef_to_pitch(int upos, NoteModifier mod);
 
 
 

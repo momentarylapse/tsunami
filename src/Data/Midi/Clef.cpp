@@ -97,5 +97,10 @@ int Clef::position_to_pitch(int pos, const Scale &s, NoteModifier mod) const
 				return DrumClefPositions[i].pitch;
 		return 70;//DrumPitch::BASS;
 	}
-	return s.transform_out(pos + offset, mod);
+	return s.transform_out(position_to_uniclef(pos), mod);
+}
+
+int Clef::position_to_uniclef(int pos) const
+{
+	return pos + offset;
 }

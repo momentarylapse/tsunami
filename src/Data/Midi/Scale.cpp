@@ -90,15 +90,42 @@ bool Scale::contains(int pitch) const
 	return _contains[pitch % 12];
 }
 
-// x in major scale notation
-int Scale::transform_out(int x, NoteModifier mod) const
+int uniclef_get_rel(int upos)
+{
+	return upos % 7;
+}
+
+int uniclef_get_octave(int upos)
+{
+	return upos / 7;
+}
+
+// "major scale notation"
+int uniclef_to_pitch(int upos)
 {
 	const int pp[7] = {0,2,4,5,7,9,11};
 
-	int octave = x / 7;
-	int rel = x % 7;
+	int octave = uniclef_get_octave(upos);
+	int rel = uniclef_get_rel(upos);
+	return pitch_from_octave_and_rel(pp[rel], octave);
+}
 
-	return modifier_apply(pitch_from_octave_and_rel(pp[rel], octave), mod, modifiers[rel]);
+int uniclef_to_pitch(int upos, NoteModifier mod)
+{
+	return uniclef_to_pitch(upos) + modifier_shift(mod);
+}
+
+// upos in major scale notation
+int Scale::transform_out(int upos, NoteModifier mod) const
+{
+	int pitch = uniclef_to_pitch(upos);
+	return modifier_apply(pitch, mod, get_modifier(upos));
+}
+
+NoteModifier Scale::get_modifier(int upos) const
+{
+	int rel = uniclef_get_rel(upos);
+	return modifiers[rel];
 }
 
 

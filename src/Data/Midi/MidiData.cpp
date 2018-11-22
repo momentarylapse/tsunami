@@ -180,18 +180,33 @@ string modifier_symbol(NoteModifier mod)
 
 int modifier_apply(int pitch, NoteModifier mod)
 {
-	if (mod == NoteModifier::SHARP)
-		return pitch + 1;
-	if (mod == NoteModifier::FLAT)
-		return pitch - 1;
-	return pitch;
+	return pitch + modifier_shift(mod);
 }
 
 int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod)
 {
+	return pitch + modifier_shift(combine_note_modifiers(mod, scale_mod));
+}
+
+int modifier_shift(NoteModifier mod)
+{
+	if (mod == NoteModifier::SHARP)
+		return 1;
+	if (mod == NoteModifier::FLAT)
+		return -1;
+	return 0;
+}
+
+NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod)
+{
 	if (mod == NoteModifier::NATURAL)
-		return pitch;
-	return modifier_apply(modifier_apply(pitch, scale_mod), mod);
+		return NoteModifier::NONE;
+	int shift = modifier_shift(mod) + modifier_shift(scale_mod);
+	if (shift > 0)
+		return NoteModifier::SHARP;
+	if (shift < 0)
+		return NoteModifier::FLAT;
+	return NoteModifier::NONE;
 }
 
 

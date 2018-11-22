@@ -38,6 +38,8 @@ public:
 
 	int pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) const;
 	int position_to_pitch(int position, const Scale &s, NoteModifier modifier) const;
+
+	int position_to_uniclef(int pos) const;
 };
 
 #endif /* SRC_DATA_MIDI_CLEF_H_ */

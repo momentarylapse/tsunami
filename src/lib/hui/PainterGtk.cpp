@@ -169,6 +169,7 @@ void Painter::draw_polygon(const Array<complex> &p)
 		cairo_stroke(cr);
 }
 
+// y = (typically) top of text
 void Painter::draw_str(float x, float y, const string &str)
 {
 	if (!cr)

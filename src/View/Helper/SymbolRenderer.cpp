@@ -48,8 +48,8 @@ struct Symbol
 				if (im.get_pixel(x, y).r > 0){
 					if (x > xmax)
 						xmax = x;
-					if (y > ymax)
-						ymax = y;
+					if (y+1 > ymax)
+						ymax = y+1;
 				}
 
 		// how much unused area?

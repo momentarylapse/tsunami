@@ -28,7 +28,7 @@ static const int SIXTEENTH = BEAT_PARTITION / 4;
 static const int TRIPLET_EIGHTH = BEAT_PARTITION / 3;
 static const int TRIPLET_SIXTEENTH = BEAT_PARTITION / 6;
 
-const float NOTE_NECK_LENGTH = 35.0f;
+const float NOTE_NECK_LENGTH = 30.0f;
 const float NOTE_BAR_DISTANCE = 10.0f;
 const float NOTE_BAR_WIDTH = 5.0f;
 const float NOTE_NECK_WIDTH = 2.0f;
@@ -67,6 +67,7 @@ MidiPainter::MidiPainter(AudioView *_view)
 	string_dy = 0;
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
+	rr = 5;
 }
 
 
@@ -192,37 +193,39 @@ struct NoteData
 	bool up;
 };
 
-void draw_single_ndata(Painter *c, NoteData &d)
+void draw_single_ndata(Painter *c, NoteData &d, float rr)
 {
+	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
 	if (d.base_length == SIXTEENTH){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line(d.x, d.y + e * NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_FLAG_DY));
-		c->draw_line(d.x, d.y + e * (NOTE_NECK_LENGTH - NOTE_BAR_DISTANCE), d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_BAR_DISTANCE - NOTE_FLAG_DY));
+		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
+		c->draw_line(d.x, d.y + e * (neck_length - NOTE_BAR_DISTANCE), d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_BAR_DISTANCE - NOTE_FLAG_DY));
 	}else if (d.base_length == EIGHTH){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
-		c->draw_line(d.x, d.y + e * NOTE_NECK_LENGTH, d.x + NOTE_FLAG_DX, d.y + e * (NOTE_NECK_LENGTH - NOTE_FLAG_DY));
+		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
 	}else if (d.base_length == QUARTER){
 		c->set_line_width(NOTE_NECK_WIDTH);
-		c->draw_line(d.x, d.y, d.x, d.y + e * NOTE_NECK_LENGTH);
+		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 	}
 
 	if (d.punctured)
-		c->draw_circle(d.x + 8, d.y + 5, 2);
+		c->draw_circle(d.x + rr, d.y + rr, 2);
 	if (d.triplet)
-		c->draw_str(d.x, d.y + e*NOTE_NECK_LENGTH + e * 9 - 4, "3");
+		c->draw_str(d.x, d.y + e*neck_length + e * 9 - 4, "3");
 }
 
-void draw_group_ndata(Painter *c, const Array<NoteData> &d)
+void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 {
+	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
 	float e = d[0].up ? -1 : 1;
-	float x0 = d[0].x, y0 = d[0].y + e * NOTE_NECK_LENGTH;
-	float x1 = d.back().x, y1 = d.back().y + e * NOTE_NECK_LENGTH;
+	float x0 = d[0].x, y0 = d[0].y + e * neck_length;
+	float x1 = d.back().x, y1 = d.back().y + e * neck_length;
 	float m = (y1 - y0) / (x1 - x0);
 
 	c->set_line_width(NOTE_NECK_WIDTH);
@@ -251,7 +254,7 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 		if (d[i].length <= SIXTEENTH)
 			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 - e*NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 - e*NOTE_BAR_DISTANCE);
 		if (d[i].punctured)
-			c->draw_circle(d[i].x + 8, d[i].y + 5, 2);
+			c->draw_circle(d[i].x + rr, d[i].y + rr, 2);
 		t0 = t1;
 	}
 	if (d[0].triplet)
@@ -364,17 +367,18 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 					// draw
 					if (ok){
-						draw_group_ndata(c, group);
+						draw_group_ndata(c, group, rr);
 						i += group.num - 1;
 						continue;
 					}
 				}
 			}
 
-			draw_single_ndata(c, d);
+			draw_single_ndata(c, d, rr);
 		}
 
 	}
+	c->set_line_width(1);
 }
 
 
@@ -419,17 +423,17 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 	}
 }
 
-void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r)
+void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y)
 {
 	if (state & MidiPainter::STATE_SELECTED){
 		color col1 = view->colors.selection;
-		draw_simple_note(c, x1, x2, y, r, 2, col1, col1, false);
+		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
 	}
 
 	color col, col_shadow;
 	get_col(col, col_shadow, n, state, is_playable);
 
-	draw_simple_note(c, x1, x2, y, r, 0, col, col_shadow, false);
+	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 
 }
 
@@ -443,9 +447,8 @@ void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState 
 
 	float y = (y1 + y2) / 2;
 	n.y = y;
-	float r = max((y2 - y1) / 2.3f, 2.0f);
 
-	draw_complex_note(c, &n, state, x1, x2, y, r);
+	draw_complex_note(c, &n, state, x1, x2, y);
 }
 
 void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
@@ -470,21 +473,21 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
 	}
 }
 
-void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
+void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle)
 {
 	//x1 += r;
 	// "shadow" to indicate length
-	if (x2 - x1 > r*1.5f){
+	if (x2 - x1 > rr*1.5f){
 		c->set_color(col_shadow);
-		c->draw_rect(x1, y - r*0.7f - rx, x2 - x1 + rx, r*2*0.7f + rx*2);
+		c->draw_rect(x1, y - rr*0.7f - rx, x2 - x1 + rx, rr*2*0.7f + rx*2);
 	}
 
 	// the note circle
 	c->set_color(col);
 	if ((x2 - x1 > 6) or force_circle)
-		c->draw_circle(x1, y, r+rx);
+		c->draw_circle(x1, y, rr+rx);
 	else
-		c->draw_rect(x1 - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
+		c->draw_rect(x1 - rr*0.8f - rx, y - rr*0.8f - rx, rr*1.6f + rx*2, rr*1.6f + rx*2);
 }
 
 void MidiPainter::draw_clef_tab(Painter *c)
@@ -515,8 +518,6 @@ void MidiPainter::draw_clef_tab(Painter *c)
 
 void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state)
 {
-	float r = min(string_dy/2, 13.0f);
-
 	float x1, x2;
 	view->cam.range2screen(n->range + shift, x1, x2);
 
@@ -525,12 +526,12 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	float y = string_to_screen(p);
 	n->y = y;
 
-	draw_complex_note(c, n, state, x1, x2, y, r);
+	draw_complex_note(c, n, state, x1, x2, y);
 
-	if (x2 - x1 > r/4 and r > 5){
-		float font_size = r * 1.2f;
+	if (x2 - x1 > rr/4 and rr > 5){
+		float font_size = rr * 1.2f;
 		c->set_color(view->colors.high_contrast_b);//text);
-		SymbolRenderer::draw(c, x1, y - font_size*0.75f, font_size, i2s(n->pitch - instrument->string_pitch[n->stringno]), 0);
+		SymbolRenderer::draw(c, x1, y - font_size/2, font_size, i2s(n->pitch - instrument->string_pitch[n->stringno]), 0);
 	}
 }
 
@@ -552,8 +553,6 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &midi)
 
 void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state)
 {
-	float r = min(clef_dy/2, 10.0f);
-
 	float x1, x2;
 	view->cam.range2screen(n->range + shift, x1, x2);
 
@@ -577,13 +576,13 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 
-	draw_complex_note(c, n, state, x1, x2, y, r);
+	draw_complex_note(c, n, state, x1, x2, y);
 
-	if ((n->modifier != NoteModifier::NONE) and (r >= 3)){
+	if ((n->modifier != NoteModifier::NONE) and (rr >= 3)){
 		c->set_color(view->colors.text);
 		//c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
-		float size = r*2.8f;
-		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.8f , size, modifier_symbol(n->modifier));
+		float size = rr*2.8f;
+		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.5f , size, modifier_symbol(n->modifier));
 	}
 }
 
@@ -608,12 +607,12 @@ void MidiPainter::draw_clef_classical(Painter *c)
 
 	// clef symbol
 	c->set_font_size(clef_dy*4);
-	c->draw_str(area.x1 + 10, clef_pos_to_screen(10), clef->symbol);
+	c->draw_str(area.x1 + 10, clef_pos_to_screen(8), clef->symbol);
 	c->set_font_size(clef_dy);
 
 	for (int i=0; i<7; i++)
 		if (scale->modifiers[i] != NoteModifier::NONE)
-			c->draw_str(area.x1 + 18 + clef_dy*3.0f + clef_dy*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - clef_dy*0.8f, modifier_symbol(scale->modifiers[i]));
+			c->draw_str(area.x1 + 18 + clef_dy*3.0f + clef_dy*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - clef_dy*0.5f, modifier_symbol(scale->modifiers[i]));
 	c->set_font_size(view->FONT_SIZE);
 }
 
@@ -680,6 +679,13 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, const Scal
 
 	pitch_min = PITCH_MIN_DEFAULT;
 	pitch_max = PITCH_MAX_DEFAULT;
+
+	if (mode == MidiMode::CLASSICAL)
+		rr = min(clef_dy/2, 10.0f);
+	if (mode == MidiMode::LINEAR)
+		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 2.3f, 2.0f);
+	if (mode == MidiMode::TAB)
+		rr = min(string_dy/2, 13.0f);
 }
 
 void MidiPainter::set_linear_range(int _pitch_min, int _pitch_max)

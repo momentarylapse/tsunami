@@ -49,8 +49,8 @@ public:
 
 	void draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func);
 
-	void draw_simple_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
-	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y, float r);
+	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
+	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
 
 	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
 	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
@@ -85,6 +85,7 @@ public:
 	float string_dy;
 	float string_y0;
 	MidiMode mode;
+	float rr;
 
 
 	float clef_pos_to_screen(int pos);

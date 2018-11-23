@@ -83,7 +83,7 @@ ViewModeMidi::~ViewModeMidi()
 void ViewModeMidi::set_modifier(NoteModifier mod)
 {
 	modifier = mod;
-	view->set_message(modifier_symbol(mod));
+	view->set_message(modifier_symbol(mod), 4);
 	notify();
 }
 

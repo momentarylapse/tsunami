@@ -406,6 +406,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 		p = (Array<SampleRef*> *)&c[1];
 	}
 	bool is_drum = (instrument->type == Instrument::Type::DRUMS);
+	float dy = ((pitch2y_linear(0) - pitch2y_linear(1)) - c->font_size) / 2;
 	for (int i=pitch_min; i<pitch_max; i++){
 		c->set_color(cc);
 		if (((view->hover.type == Selection::Type::MIDI_PITCH) or (view->hover.type == Selection::Type::MIDI_NOTE)) and (i == view->hover.pitch))
@@ -419,7 +420,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->draw_str(20, area.y1 + area.height() * (pitch_max - i - 1) / (pitch_max - pitch_min), name);
+		c->draw_str(20, pitch2y_linear(i+1)+dy, name);
 	}
 }
 

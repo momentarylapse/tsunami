@@ -436,7 +436,7 @@ float ViewModeMidi::layer_min_height(AudioViewLayer *l)
 		if (mode == MidiMode::LINEAR)
 			return 500;
 		else if (mode == MidiMode::CLASSICAL)
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 6;
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 		else // TAB
 			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 	}
@@ -451,7 +451,7 @@ float ViewModeMidi::layer_suggested_height(AudioViewLayer *l)
 		if (mode == MidiMode::LINEAR)
 			return 5000;
 		else if (mode == MidiMode::CLASSICAL)
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 6;
+			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 		else // TAB
 			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 	}
@@ -780,7 +780,7 @@ void ViewModeMidi::draw_post(Painter *c)
 		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
 		message += "    " + _("octave (↑,↓)    modifiers (#,3,0)    add note (A-G)");
-	message += "\n" + _("𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)");
+	message += "    " + _("𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)");
 	if (input_mode == InputMode::NOTE_LENGTH)
 		message = _("enter note length (1-9, A-F)    cancel (Esc)");
 	else if (input_mode == InputMode::BEAT_PARTITION)

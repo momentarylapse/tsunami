@@ -143,11 +143,11 @@ void FormatMidi::load_song(StorageOperationData *od)
 			string track_name;
 			int last_status = 0;
 
-			int offset = 0;
+			int moffset = 0;
 			while(f->get_pos() < pos0 + tsize){
 				int v = read_var(f);
-				int dt = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
-				offset += dt;
+				moffset += v;
+				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
 				while (offset > last_bar){
 					od->song->add_bar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
 					last_bar = od->song->bars.range().end();
@@ -301,14 +301,13 @@ void FormatMidi::save_song(StorageOperationData* od)
 			}
 			MidiEventBuffer events = t->layers[0]->midi.get_events(Range::ALL);
 			events.sort();
-			int offset = 0;
+			int moffset = 0;
 			for (MidiEvent& e: events) {
-				int dt = e.pos - offset;
-				int v = (int) (((double) (dt) / (double) (mpqn) * 1000000.0
+				int v = (int) (((double) (e.pos) / (double) (mpqn) * 1000000.0
 						/ (double) (od->song->sample_rate)
 						* (double) (ticks_per_beat)));
-				write_var(f, v);
-				offset = e.pos;
+				write_var(f, v - moffset);
+				moffset = v;
 				if (e.volume > 0) {
 					// on
 					f->write_byte(0x90);

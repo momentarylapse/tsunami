@@ -62,6 +62,10 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	string_no = 0;
 	octave = 3;
 
+	rep_key_runner = -1;
+	rep_key = -1;
+	rep_key_num = 0;
+
 	scroll = new ScrollBar;
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);
 
@@ -278,8 +282,39 @@ void ViewModeMidi::jump_octave(int delta)
 	view->force_redraw();
 }
 
+void ViewModeMidi::set_rep_key(int k)
+{
+	if (rep_key_runner >= 0)
+		hui::CancelRunner(rep_key_runner);
+	rep_key_runner = hui::RunLater(0.8f, [&]{ rep_key_runner = -1; rep_key_num = -1; rep_key = -1; });
+
+	if (k == rep_key)
+		rep_key_num ++;
+	else
+		rep_key_num = 1;
+	rep_key = k;
+}
+
+void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
+{
+	if ((m->beat_partition % p) == 0){
+		m->set_note_length(m->beat_partition / p * n);
+	}else{
+		m->set_note_length(l * n);
+		m->set_beat_partition(p);
+	}
+	/*string t = text;
+	if (n > 1)
+		t += " x" + i2s(n);*/
+	string t;
+	for (int i=0; i<n; i++)
+		t += text;
+	m->view->set_message(t, 6);
+}
+
 void ViewModeMidi::on_key_down(int k)
 {
+	set_rep_key(k);
 	auto mode = cur_vlayer()->midi_mode;
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 		if (input_mode == InputMode::DEFAULT){
@@ -361,34 +396,19 @@ void ViewModeMidi::on_key_down(int k)
 
 	if (k == hui::KEY_Q){
 		// quarter
-		set_note_length(beat_partition);
-		view->set_message("𝅘𝅥  ", 6);
+		set_note_lengthx(this, 1, 1, rep_key_num, "𝅘𝅥  ");
 	}
 	if (k == hui::KEY_W){
 		// 8th
-		if ((beat_partition % 2) == 0)
-			set_note_length(beat_partition / 2);
-		else{
-			set_note_length(2);
-			set_beat_partition(4);
-		}
-		view->set_message("𝅘𝅥𝅮  ", 6);
+		set_note_lengthx(this, 1, 2, rep_key_num, "𝅘𝅥𝅮  ");
 	}
 	if (k == hui::KEY_S){
 		// 16th
-		if ((beat_partition % 4) == 0)
-			set_note_length(beat_partition / 4);
-		else{
-			set_note_length(1);
-			set_beat_partition(4);
-		}
-		view->set_message("𝅘𝅥𝅯  ", 6);
+		set_note_lengthx(this, 1, 4, rep_key_num, "𝅘𝅥𝅯  ");
 	}
 
 	if (k == hui::KEY_T){
-		set_note_length(1);
-		set_beat_partition(3);
-		view->set_message("triplet", 2);
+		set_note_lengthx(this, 1, 3, rep_key_num, "⅓");
 	}
 
 

@@ -104,6 +104,11 @@ public:
 	int mouse_pre_moving_pos;
 	int string_no;
 	int octave;
+
+	void set_rep_key(int k);
+	int rep_key_runner;
+	int rep_key;
+	int rep_key_num;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

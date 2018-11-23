@@ -23,6 +23,16 @@ float rect::height() const
 	return y2 - y1;
 }
 
+float rect::mx() const
+{
+	return (x1 + x2) / 2;
+}
+
+float rect::my() const
+{
+	return (y1 + y2) / 2;
+}
+
 float rect::area() const
 {
 	return (x2 - x1) * (y2 - y1);

@@ -959,8 +959,8 @@ void TsunamiWindow::on_open()
 {
 	if (session->storage->ask_open(this)){
 		if (song->is_empty()){
-			session->storage->load(song, hui::Filename);
-			BackupManager::set_save_state(session);
+			if (session->storage->load(song, hui::Filename))
+				BackupManager::set_save_state(session);
 		}else{
 			Session *s = tsunami->create_session();
 			s->win->show();
@@ -972,11 +972,13 @@ void TsunamiWindow::on_open()
 
 void TsunamiWindow::on_save()
 {
-	if (song->filename == "")
+	if (song->filename == ""){
 		on_save_as();
-	else{
-		session->storage->save(song, song->filename);
-		BackupManager::set_save_state(session);
+	}else{
+		if (session->storage->save(song, song->filename)){
+			view->set_message(_("file saved"));
+			BackupManager::set_save_state(session);
+		}
 	}
 }
 
@@ -1011,8 +1013,10 @@ void TsunamiWindow::on_save_as()
 	if (song->filename == "")
 		hui::file_dialog_default = _suggest_filename(song, session->storage->current_directory);
 
-	if (session->storage->ask_save(this))
-		session->storage->save(song, hui::Filename);
+	if (session->storage->ask_save(this)){
+		if (session->storage->save(song, hui::Filename))
+			view->set_message(_("file saved"));
+	}
 
 	hui::file_dialog_default = "";
 }
@@ -1023,14 +1027,16 @@ void TsunamiWindow::on_export()
 		SongRenderer renderer(song);
 		renderer.prepare(view->get_playback_selection(false), false);
 		renderer.allow_tracks(view->get_selected_tracks());
-		session->storage->save_via_renderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags);
+		if (session->storage->save_via_renderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags))
+			view->set_message(_("file exported"));
 	}
 }
 
 void TsunamiWindow::on_quick_export()
 {
 	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory);
-	session->storage->save(song, dir + _suggest_filename(song, dir));
+	if (session->storage->save(song, dir + _suggest_filename(song, dir)))
+		view->set_message(_("file saved"));
 }
 
 int pref_bar_index(AudioView *view)

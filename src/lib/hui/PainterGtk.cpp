@@ -28,8 +28,8 @@ Painter::Painter()
 	mode_fill = true;
 	cur_font_bold = false;
 	cur_font_italic = false;
-	cur_font_size = -1;
 	cur_font = "";
+	font_size = 16;
 	corner_radius = 0;
 }
 
@@ -285,7 +285,7 @@ void Painter::set_font(const string &font, float size, bool bold, bool italic)
 	if (font.num > 0)
 		cur_font = font;
 	if (size > 0)
-		cur_font_size = (int)size;
+		font_size = size;
 	cur_font_bold = bold;
 	cur_font_italic = italic;
 
@@ -296,7 +296,7 @@ void Painter::set_font(const string &font, float size, bool bold, bool italic)
 		f += " Bold";
 	if (cur_font_italic)
 		f += " Italic";
-	f += " " + i2s(cur_font_size);
+	f += " " + i2s((int)font_size);
 	if (font_desc)
 		pango_font_description_free(font_desc);
 	font_desc = pango_font_description_from_string(f.c_str());

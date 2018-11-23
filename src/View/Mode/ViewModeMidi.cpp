@@ -79,6 +79,7 @@ ViewModeMidi::~ViewModeMidi()
 void ViewModeMidi::set_modifier(NoteModifier mod)
 {
 	modifier = mod;
+	view->set_message(modifier_symbol(mod));
 	notify();
 }
 
@@ -361,6 +362,7 @@ void ViewModeMidi::on_key_down(int k)
 	if (k == hui::KEY_Q){
 		// quarter
 		set_note_length(beat_partition);
+		view->set_message("𝅘𝅥  ", 6);
 	}
 	if (k == hui::KEY_W){
 		// 8th
@@ -370,6 +372,7 @@ void ViewModeMidi::on_key_down(int k)
 			set_note_length(2);
 			set_beat_partition(4);
 		}
+		view->set_message("𝅘𝅥𝅮  ", 6);
 	}
 	if (k == hui::KEY_S){
 		// 16th
@@ -379,11 +382,13 @@ void ViewModeMidi::on_key_down(int k)
 			set_note_length(1);
 			set_beat_partition(4);
 		}
+		view->set_message("𝅘𝅥𝅯  ", 6);
 	}
 
 	if (k == hui::KEY_T){
 		set_note_length(1);
 		set_beat_partition(3);
+		view->set_message("triplet", 2);
 	}
 
 

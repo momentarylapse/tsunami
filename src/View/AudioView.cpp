@@ -314,6 +314,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	hover_before_leave = hover = Selection();
 
+	message.ttl = -1;
 
 
 	// events
@@ -945,7 +946,7 @@ void AudioView::update_tracks()
 rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str)
 {
 	float w = c->get_str_width(str);
-	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + FONT_SIZE + CORNER_RADIUS);
+	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + c->font_size + CORNER_RADIUS);
 }
 
 void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align)
@@ -960,7 +961,7 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 	c->draw_rect(r);
 	c->set_roundness(0);
 	c->set_color(col_text);
-	c->draw_str(x + dx, y - FONT_SIZE/3, str);
+	c->draw_str(x + dx, y - c->font_size/3, str);
 }
 
 
@@ -977,6 +978,20 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float
 void AudioView::draw_cursor_hover(Painter *c, const string &msg)
 {
 	draw_cursor_hover(c, msg, mx, my, song_area);
+}
+
+void draw_message(Painter *c, AudioView *view, AudioView::Message &m)
+{
+	float xm = view->area.mx();
+	float ym = view->area.my();
+	float a = min(m.ttl*8, 1.0f);
+	a = pow(a, 0.4f);
+	color c1 = AudioView::colors.high_contrast_a;
+	color c2 = AudioView::colors.high_contrast_b;
+	c1.a = c2.a = a;
+	c->set_font_size(AudioView::FONT_SIZE * m.size * a);
+	view->draw_boxed_str(c, xm, ym, m.text, c1, c2, 0);
+	c->set_font_size(AudioView::FONT_SIZE);
 }
 
 void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time)
@@ -1208,6 +1223,12 @@ void AudioView::draw_song(Painter *c)
 		draw_time_line(c, playback_pos(), (int)Selection::Type::PLAYBACK, colors.preview_marker, true);
 
 	mode->draw_post(c);
+
+	if (message.ttl > 0){
+		draw_message(c, this, message);
+		message.ttl -= 0.03f;
+		animating = true;
+	}
 
 	if (peak_thread and !peak_thread->is_done())
 		slow_repeat = true;
@@ -1551,4 +1572,12 @@ Set<TrackLayer*> AudioView::get_playable_layers()
 				layers.add(l->layer);
 	}
 	return layers;
+}
+
+void AudioView::set_message(const string& text, float size)
+{
+	message.text = text;
+	message.ttl = 0.8f;
+	message.size = size;
+	force_redraw();
 }

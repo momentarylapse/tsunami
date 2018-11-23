@@ -277,6 +277,15 @@ public:
 	double buffer_zoom_factor;
 	void update_buffer_zoom();
 
+	struct Message
+	{
+		string text;
+		float ttl;
+		float size;
+	};
+	Message message;
+	void set_message(const string &text, float size=1.0f);
+
 	PeakThread *peak_thread;
 
 	struct ImageData

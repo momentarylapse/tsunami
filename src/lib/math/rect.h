@@ -13,6 +13,8 @@ public:
 	float _cdecl width() const;
 	float _cdecl height() const;
 	float _cdecl area() const;
+	float _cdecl mx() const;
+	float _cdecl my() const;
 	bool _cdecl inside(float x, float y) const;
 	bool _cdecl covers(const rect &r) const;
 	bool _cdecl overlaps(const rect &r) const;

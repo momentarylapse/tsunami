@@ -169,7 +169,7 @@ Grid ? '' vertical
 			fs *= 0.8
 			p.set_color(colors.text_soft2)
 		p.set_font_size(fs)
-		p.draw_str(x0-fs*0.4, y0-fs*0.75, cur_beat + 1)
+		p.draw_str(x0-fs*0.4, y0-fs/2, cur_beat + 1)
 		
 		draw_part_info(p, cur_bar)
 		
@@ -212,7 +212,7 @@ Grid ? '' vertical
 				change += "  " + next_bpm.str2(0) + " bpm"
 		if change.num > 0
 			p.set_color(colors.text)
-			p.draw_str(20, 5 + fs*1.4, "> " + change)
+			p.draw_str(20, 5 + fs*1.2 + 5, "> " + change)
 				
 	
 	void on_area_right_button_down()

@@ -34,9 +34,6 @@
 #include "Helper/SymbolRenderer.h"
 
 
-void draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow);
-
-
 const int PITCH_SHOW_COUNT = 30;
 
 
@@ -145,6 +142,7 @@ void AudioViewLayer::draw_sample_frame(Painter *c, SampleRef *s, const color &co
 	c->draw_rect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);
 
 	c->set_color(col);
+	c->set_line_width(2);
 	c->draw_line(asx, area.y1, asx, area.y2);
 	c->draw_line(aex, area.y1, aex, area.y2);
 	c->draw_line(asx, area.y1, aex, area.y1);
@@ -168,11 +166,6 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 		view->buffer_painter->draw_buffer(c, *s->buf, s->pos);
 	}else if (s->type() == SignalType::MIDI){
 		view->mode->draw_midi(c, this, *s->midi, true, s->pos);
-	}
-
-	if (view->sel.has(s)){
-		int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
-		draw_str_with_shadow(c, asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name, view->colors.text, view->colors.background_track_selected);
 	}
 }
 
@@ -322,7 +315,7 @@ void AudioViewLayer::draw_version_header(Painter *c)
 	}
 	if (solo)
 		title += " (solo)";
-	c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 3, title);
+	c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 5, title);
 
 	c->set_font("", -1, false, false);
 
@@ -361,12 +354,12 @@ void AudioViewLayer::draw_version_header(Painter *c)
 			c->set_color(col_but);
 			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_EXPLODE))
 				c->set_color(col_but_hover);
-			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22-2, "+");
+			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22, "+");
 		}else{
 			c->set_color(col_but);
 			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_IMPLODE))
 				c->set_color(col_but_hover);
-			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22-2, "-");
+			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22, "-");
 		}
 	}
 }

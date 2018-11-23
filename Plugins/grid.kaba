@@ -218,7 +218,7 @@ class GridData
 			if t.label.num > 0
 				c.set_color(col_line)
 				c.draw_line(x, yy, x + 6, yy)
-				c.draw_str(x0 + 2, yy - 6, t.label)
+				c.draw_str(x0 + 2, yy - 3, t.label)
 	
 	void draw_axis_x(Painter *c, GridPartition part)
 		for t in part.tick
@@ -230,7 +230,7 @@ class GridData
 			if t.label.num > 0
 				c.set_color(col_line)
 				c.draw_line(xx, y + h - 6, xx, y + h)
-				c.draw_str(xx - 8, y + h + 5, t.label)
+				c.draw_str(xx - 8, y + h + 8, t.label)
 	
 	rect get_plot_region(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)

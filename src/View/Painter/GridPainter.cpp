@@ -83,10 +83,10 @@ void GridPainter::draw_time_numbers(Painter *c)
 	for (int n=nx0; n<nx1; n++){
 		if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25){
 			if (n % 5 == 0)
-				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1, song->get_time_str_fuzzy((double)n * dl, dt * 5));
+				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1 + 4, song->get_time_str_fuzzy((double)n * dl, dt * 5));
 		}else{
 			if ((n % 10) == 0)
-				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1, song->get_time_str_fuzzy((double)n * dl, dt * 10));
+				c->draw_str(cam->sample2screen(n * dl) + 2, area.y1 + 4, song->get_time_str_fuzzy((double)n * dl, dt * 10));
 		}
 	}
 }
@@ -179,7 +179,7 @@ void GridPainter::draw_bar_numbers(Painter *c)
 			f1 = 1;
 		if (f1 > 0.9f){
 			c->set_color(AudioView::colors.text_soft1);
-			c->draw_str(xx + 4, area.y1, i2s(b->index_text + 1));
+			c->draw_str(xx + 4, area.y1+5, i2s(b->index_text + 1));
 		}
 		float bpm = b->bpm(song->sample_rate);
 		string s;

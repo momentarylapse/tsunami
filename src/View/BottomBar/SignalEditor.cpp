@@ -251,7 +251,7 @@ public:
 		}
 		string type = module_header(m);
 		float ww = p->get_str_width(type);
-		p->draw_str(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 4, type);
+		p->draw_str(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 6, type);
 		p->set_font("", 12, false, false);
 	}
 

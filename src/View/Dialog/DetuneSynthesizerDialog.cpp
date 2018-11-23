@@ -113,8 +113,8 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 
 	if (hover >= 0){
 		p->set_color(view->colors.text);
-		p->draw_str(20, 20, pitch_name(hover));
-		p->draw_str(70, 20, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
+		p->draw_str(20, 17, pitch_name(hover));
+		p->draw_str(70, 17, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}
 }
 

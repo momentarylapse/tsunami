@@ -173,9 +173,10 @@ void Painter::draw_str(float x, float y, const string &str)
 {
 	if (!cr)
 		return;
-	cairo_move_to(cr, x, y);// + cur_font_size);
 	pango_cairo_update_layout(cr, layout);
 	pango_layout_set_text(layout, (char*)str.data, str.num);
+	float dy = (float)pango_layout_get_baseline(layout) / 1000.0f;
+	cairo_move_to(cr, x, y - dy + font_size);
 
 	if (mode_fill){
 		pango_cairo_show_layout(cr, layout);
@@ -192,7 +193,7 @@ float Painter::get_str_width(const string &str)
 	if (!cr)
 		return 0;
 	pango_cairo_update_layout(cr, layout);
-	pango_layout_set_text(layout, (char*)str.data, str.num);//.c_str(), -1);
+	pango_layout_set_text(layout, (char*)str.data, str.num);
 	int w, h;
 	pango_layout_get_size(layout, &w, &h);
 

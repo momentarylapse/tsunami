@@ -215,7 +215,7 @@ void draw_single_ndata(Painter *c, NoteData &d)
 	if (d.punctured)
 		c->draw_circle(d.x + 8, d.y + 5, 2);
 	if (d.triplet)
-		c->draw_str(d.x, d.y - NOTE_NECK_LENGTH - 15, "3");
+		c->draw_str(d.x, d.y + e*NOTE_NECK_LENGTH + e * 9 - 4, "3");
 }
 
 void draw_group_ndata(Painter *c, const Array<NoteData> &d)
@@ -255,7 +255,7 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d)
 		t0 = t1;
 	}
 	if (d[0].triplet)
-		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 8 + e*8, "3");
+		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 4 + e*9, "3");
 }
 
 

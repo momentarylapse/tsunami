@@ -172,7 +172,7 @@ Image *ExpandImageMask(Image *im, float d)
 
 
 
-void draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow)
+void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_shadow)
 {
 	c->set_fill(false);
 	c->set_line_width(3);
@@ -961,7 +961,7 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 	c->draw_rect(r);
 	c->set_roundness(0);
 	c->set_color(col_text);
-	c->draw_str(x + dx, y - c->font_size/3, str);
+	c->draw_str(x + dx, y, str);
 }
 
 

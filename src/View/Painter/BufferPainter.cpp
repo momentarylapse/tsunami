@@ -136,7 +136,7 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 
 void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 {
-	double view_pos_rel = view->cam.screen2sample(0) - offset;
+	double view_pos_rel = view->cam.screen2sample(0);
 
 	//float w = area.width();
 	float h = area.height();

@@ -97,7 +97,6 @@ Array<Range> version_ranges(TrackLayer *l)
 
 void AudioViewLayer::draw_track_buffers(Painter *c)
 {
-	double view_pos_rel = view->cam.pos - view->song_area.x1 / view->cam.scale;
 	view->buffer_painter->set_context(area);
 	if (is_playable() and layer->track->has_version_selection()){
 		Array<Range> rr = version_ranges(layer);

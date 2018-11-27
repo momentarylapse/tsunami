@@ -84,7 +84,8 @@ void TuningDialog::on_delete()
 	string id = hui::GetEvent()->id;
 	int n = id.substr(7+6, -1)._int();
 	tuning.erase(n);
-	update();
+
+	hui::RunLater(0.001f, [&]{ update(); });
 }
 
 void TuningDialog::on_add()
@@ -92,12 +93,14 @@ void TuningDialog::on_add()
 	string id = hui::GetEvent()->id;
 	int n = id.substr(4+6, -1)._int();
 	tuning.insert(tuning[n], n);
-	update();
+
+	hui::RunLater(0.001f, [&]{ update(); });
 }
 
 void TuningDialog::on_add_first()
 {
 	tuning.add(69);
-	update();
+
+	hui::RunLater(0.001f, [&]{ update(); });
 }
 

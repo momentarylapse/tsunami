@@ -201,7 +201,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset)
 {
-	double view_pos_rel = view->cam.screen2sample(0) - offset;
+	double view_pos_rel = view->cam.screen2sample(0);
 
 	float h = area.height();
 	float hf = h / (2 * b.channels);

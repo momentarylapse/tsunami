@@ -15,6 +15,7 @@ class ViewPort;
 class Painter;
 class Range;
 class PdfConfigData;
+class ColorScheme;
 
 class FormatPdf : public Format
 {
@@ -27,10 +28,10 @@ public:
 
 	MidiPainter *mp;
 	ViewPort *cam;
+	ColorScheme *colors;
 
 	double pdf_bpm;
 
-	float clef_pos_to_pdf(float y0, float line_dy, int i);
 	int good_samples(const Range &r0);
 	int render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
 	int render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);

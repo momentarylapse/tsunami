@@ -16,6 +16,8 @@
 namespace SymbolRenderer
 {
 
+static bool enabled = ENABLED;
+
 struct Symbol
 {
 	float size;
@@ -94,24 +96,29 @@ Symbol *get_symbol(float size, const string &s)
 
 void draw(Painter *p, float x, float y, float size, const string &s, int align)
 {
-#if ENABLED
-	Symbol *sym = get_symbol(size, s);
-	float dx = 0;
-	if (align == 0)
-		dx = - sym->size / 2;
-	if (align == -1)
-		dx = - sym->size;
-	//p->drawImage(x + dx, y, sym->im);
-	p->draw_mask_image(x + dx, y, sym->im);
-#else
-	p->setFontSize(size);
-	float dx = 0;
-	if (align == 0)
-		dx = - p->getStrWidth(s) / 2;
-	if (align == -1)
-		dx = - p->getStrWidth(s);
-	p->drawStr(x + dx, y, s);
-#endif
+	if (enabled){
+		Symbol *sym = get_symbol(size, s);
+		float dx = 0;
+		if (align == 0)
+			dx = - sym->size / 2;
+		if (align == -1)
+			dx = - sym->size;
+		//p->drawImage(x + dx, y, sym->im);
+		p->draw_mask_image(x + dx, y, sym->im);
+	}else{
+		p->set_font_size(size);
+		float dx = 0;
+		if (align == 0)
+			dx = - p->get_str_width(s) / 2;
+		if (align == -1)
+			dx = - p->get_str_width(s);
+		p->draw_str(x + dx, y, s);
+	}
+}
+
+void enable(bool _enabled)
+{
+	enabled = _enabled;
 }
 
 };

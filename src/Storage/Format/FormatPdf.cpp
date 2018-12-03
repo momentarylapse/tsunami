@@ -21,6 +21,8 @@
 #include "../../View/ViewPort.h"
 #include "../../View/Painter/MidiPainter.h"
 #include "../../View/Selection.h"
+#include "../../View/ColorScheme.h"
+#include "../../View/Helper/SymbolRenderer.h"
 #include <math.h>
 
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
@@ -31,9 +33,16 @@ FormatDescriptorPdf::FormatDescriptorPdf() :
 {
 }
 
-float FormatPdf::clef_pos_to_pdf(float y0, float line_dy, int i)
+ColorScheme create_pdf_color_scheme()
 {
-	return y0 + (12-i) * line_dy / 2;
+	ColorSchemeBasic bright;
+	bright.background = White;
+	bright.text = Black;//color(1, 0.3f, 0.3f, 0.1f);
+	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
+	bright.hover = White;
+	bright.gamma = 1.0f;
+	bright.name = "pdf";
+	return bright.create(true);
 }
 
 int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
@@ -48,12 +57,11 @@ int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, c
 	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, Scale(Scale::Type::MAJOR, 0), true, MidiMode::CLASSICAL);
 
 	auto clef = t->instrument.get_clef();
-	auto midi = t->layers[0]->midi.get_notes(r_inside);
 
 	// clef lines
-	p->set_color(Gray);
+	p->set_color(colors->text_soft2);
 	for (int i=0; i<10; i+=2){
-		float y = mp->clef_pos_to_screen(i);//clef_pos_to_pdf(y0, line_dy, i);
+		float y = mp->clef_pos_to_screen(i);
 		p->draw_line(x0, y, x0 + w, y);
 	}
 	//p->draw_str(x0, y0, clef.symbol);
@@ -69,14 +77,14 @@ int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, c
 				double bpm = 60.0 * (double)song->sample_rate / (double)b.range.length;
 				if (fabs(bpm - pdf_bpm) > 0.2){
 					pdf_bpm = bpm;
-					p->set_color(color(1, 0.3f, 0.3f, 0.3f));
-					p->draw_str(x, ya-15, format("%.1f bpm", bpm));
+					p->set_color(colors->text_soft1);
+					p->draw_str(x, ya-15, format("%.0f bpm", bpm));
 				}
 			}
-			p->set_color(color(1, 0.5f, 0.5f, 0.5f));
+			p->set_color(colors->text_soft2);
 			p->set_line_width(2);
 		}else{
-			p->set_color(color(1, 0.8f, 0.8f, 0.8f));
+			p->set_color(colors->text_soft3);
 			p->set_line_width(1);
 		}
 		p->draw_line(x, ya, x, yb);
@@ -84,67 +92,53 @@ int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, c
 	p->set_line_width(1);
 
 	// midi
-	auto midi2 = t->layers[0]->midi.get_notes(r_inside);
-	mp->draw(p, midi2);
+	auto midi = t->layers[0]->midi.get_notes(r_inside);
+	mp->draw(p, midi);
 
-	return y0 + 140;
+	return y0 + 100;
 }
 
 int FormatPdf::render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
 {
-	float string_dy = 16;
-	float rr = string_dy/2;
-	Song *song = t->song;
+	float string_dy = 26;
 
-	int slack = t->song->sample_rate / 30;
+	int slack = song->sample_rate / 30;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	auto midi = t->layers[0]->midi.get_notes(r_inside);
-	int mm = 0;
-	for (auto n: midi){
-		mm = max(mm, n->range.offset);
-		float x1 = x0 + (n->range.offset - r.offset) * scale;
-		float x2 = x0 + (n->range.end() - r.offset) * scale;
-		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 1) * string_dy;
-		p->set_color(color(1, 0.9f, 0.9f, 0.9f));
-		p->draw_rect(rect(x1 + rr, x2, y, y + string_dy));
-	}
+	int n = t->instrument.string_pitch.num;
+
+	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, Scale(Scale::Type::MAJOR, 0), true, MidiMode::TAB);
+
+	float sy0 = mp->string_to_screen(n - 1);
+	float sy1 = mp->string_to_screen(0);
 
 	// string lines
-	p->set_color(Gray);
-	for (int i=0; i<t->instrument.string_pitch.num; i++)
-		p->draw_line(x0, y0 + i*string_dy + string_dy/2, x0 + w, y0 + i*string_dy + string_dy/2);
+	p->set_color(colors->text_soft2);
+	for (int i=0; i<t->instrument.string_pitch.num; i++){
+		float y = mp->string_to_screen(i);
+		p->draw_line(x0, y, x0 + w, y);
+	}
 
 	// beats
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
 	for (auto b: beats){
 		if (b.level == 0){
-			p->set_color(color(1, 0.5f, 0.5f, 0.5f));
+			p->set_color(colors->text_soft2);
 			p->set_line_width(2);
 		}else{
-			p->set_color(color(1, 0.8f, 0.8f, 0.8f));
+			p->set_color(colors->text_soft3);
 			p->set_line_width(1);
 		}
 		float x = x0 + (b.range.offset - r.offset) * scale;
-		p->draw_line(x, y0, x, y0 + string_dy * t->instrument.string_pitch.num);
+		p->draw_line(x, sy0 - string_dy/2, x, sy1 + string_dy/2);
 	}
 	p->set_line_width(1);
 
 	// midi
-	float fs = 12;
-	p->set_font_size(fs);
-	auto midi2 = t->layers[0]->midi.get_notes(r_inside);
-	for (auto n: midi2){
-		float x1 = x0 + (n->range.offset - r.offset) * scale;
-		float y = y0 + (t->instrument.string_pitch.num - n->stringno - 0.5f) * string_dy;
-		p->set_color(NOTE_COLOR_TAB);
-		p->draw_circle(x1 + rr, y, rr);
-		p->set_color(Black);
-		string hand = i2s(n->pitch - t->instrument.string_pitch[n->stringno]);
-		p->draw_str(x1 + rr - hand.num * fs*0.35f, y-fs/2, hand);
-	}
+	auto midi = t->layers[0]->midi.get_notes(r_inside);
+	mp->draw(p, midi);
 
-	return y0 + string_dy * t->instrument.string_pitch.num;
+	return y0 + string_dy * n;
 }
 
 int FormatPdf::render_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data)
@@ -156,7 +150,7 @@ int FormatPdf::render_line(Painter *p, float x0, float w, float y0, const Range 
 
 
 	auto bars = song->bars.get_bars(r + 1000);
-	p->set_color(SetColorHSB(1, 0, 0, 0.4f));
+	p->set_color(colors->text_soft2);
 	p->set_font_size(12);
 	if (bars.num > 0)
 		p->draw_str(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
@@ -213,7 +207,11 @@ void FormatPdf::save_song(StorageOperationData* od)
 	cam = new ViewPort(song, area);
 	SongSelection sel;
 	Selection hover;
-	mp = new MidiPainter(song, cam, &sel, &hover);
+	ColorScheme _colors = create_pdf_color_scheme();
+	colors = &_colors;
+	mp = new MidiPainter(song, cam, &sel, &hover, _colors);
+
+	SymbolRenderer::enable(false);
 
 	float x0 = border;
 	float w = page_width - 2*border;
@@ -232,11 +230,14 @@ void FormatPdf::save_song(StorageOperationData* od)
 	auto p = parser->add_page(page_width, page_height);
 
 	if (first_page){
+		p->set_color(colors->text);
 		p->set_font_size(40);
 		p->draw_str(200, 50, od->song->get_tag("title"));
-		p->set_font_size(15);
-		p->set_color(SetColorHSB(1, 0, 0, 0.4f));
-		p->draw_str(p->width - 300, 100, "by " + od->song->get_tag("artist"));
+		if (od->song->get_tag("artist").num > 0){
+			p->set_font_size(15);
+			p->set_color(colors->text_soft2);
+			p->draw_str(p->width - 300, 50, "by " + od->song->get_tag("artist"));
+		}
 		first_page = false;
 	}
 

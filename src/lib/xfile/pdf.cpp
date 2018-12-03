@@ -137,12 +137,20 @@ void PagePainter::draw_circle(float x, float y, float radius)
 		page->content += "     S\n";
 }
 
+static string _pdf_str_filter(const string &str)
+{
+	string x = str.replace("\u266f", "#").replace("\u266d", "b");
+	x = x.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss");
+	x = x.replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue");
+	return x;
+}
+
 void PagePainter::draw_str(float x, float y, const string& str)
 {
 	y = height - y - font_size*0.8f;
 	float dx = x - text_x;
 	float dy = y - text_y;
-	page->content += format("     /F1 %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", font_size, dx, dy, str.c_str());
+	page->content += format("     /F1 %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", font_size, dx, dy, _pdf_str_filter(str).c_str());
 
 	text_x = x;
 	text_y = y;

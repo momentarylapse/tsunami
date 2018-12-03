@@ -27,6 +27,7 @@ class Range;
 class color;
 class Instrument;
 class Synthesizer;
+class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 
@@ -34,7 +35,7 @@ class MidiPainter
 {
 public:
 	MidiPainter(AudioView *view);
-	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, Selection *hover);
+	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, Selection *hover, ColorScheme &colors);
 
 
 	static const int PITCH_MIN_DEFAULT = 25;
@@ -74,6 +75,7 @@ public:
 	SongSelection *sel;
 	Selection *hover;
 	Song *song;
+	ColorScheme &colors;
 
 	void set_context(const rect &area, const Instrument &i, const Scale &s, bool playable, MidiMode mode);
 	void set_shift(int shift);

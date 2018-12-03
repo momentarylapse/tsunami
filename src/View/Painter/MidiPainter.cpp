@@ -8,6 +8,7 @@
 #include "MidiPainter.h"
 #include "../AudioView.h"
 #include "../ViewPort.h"
+#include "../ColorScheme.h"
 #include "../AudioViewLayer.h" // argh
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
@@ -51,7 +52,8 @@ static const color PITCH_COLORS[12] = {
 };
 
 MidiPainter::MidiPainter(AudioView *view) :
-	midi_scale(view->midi_scale)
+	midi_scale(view->midi_scale),
+	colors(view->colors)
 {
 	//view = _view;
 	cam = &view->cam;
@@ -74,8 +76,9 @@ MidiPainter::MidiPainter(AudioView *view) :
 	rr = 5;
 }
 
-MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover) :
-	midi_scale(Scale(Scale::Type::MAJOR, 0))
+MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
+	midi_scale(Scale(Scale::Type::MAJOR, 0)),
+	colors(_colors)
 {
 	song = _song;
 	cam = _cam;
@@ -105,19 +108,19 @@ color MidiPainter::pitch_color(int pitch)
 }
 
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, bool playable)
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::MidiNoteState state, bool playable, ColorScheme &colors)
 {
 	if (playable)
-		col = ColorInterpolate(MidiPainter::pitch_color(n->pitch), AudioView::colors.text, 0.2f);
+		col = ColorInterpolate(MidiPainter::pitch_color(n->pitch), colors.text, 0.2f);
 	else
-		col = AudioView::colors.text_soft3;
+		col = colors.text_soft3;
 
 	if (state & MidiPainter::STATE_HOVER){
-		col = ColorInterpolate(col, AudioView::colors.hover, 0.333f);
+		col = ColorInterpolate(col, colors.hover, 0.333f);
 	}else if (state & MidiPainter::STATE_REFERENCE){
-		col = ColorInterpolate(col, AudioView::colors.background_track, 0.65f);
+		col = ColorInterpolate(col, colors.background_track, 0.65f);
 	}
-	col_shadow = ColorInterpolate(col, AudioView::colors.background_track, 0.3f);
+	col_shadow = ColorInterpolate(col, colors.background_track, 0.3f);
 }
 
 
@@ -332,9 +335,9 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		return;
 
 	/*if (vlayer->is_playable())
-		c->set_color(AudioView::colors.text_soft1);
+		c->set_color(colors.text_soft1);
 	else
-		c->set_color(AudioView::colors.text_soft3);*/
+		c->set_color(colors.text_soft3);*/
 
 	float y_mid = (area.y1 + area.y2) / 2;
 
@@ -345,7 +348,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
 		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
-		//c->set_color(AudioView::colors.text_soft3);
+		//c->set_color(colors.text_soft3);
 
 		Array<NoteData> ndata;
 		for (MidiNote *n: bnotes){
@@ -362,7 +365,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 
 			color col_shadow;
-			get_col(d.col, col_shadow, n, note_state(n, as_reference, sel, hover), is_playable);
+			get_col(d.col, col_shadow, n, note_state(n, as_reference, sel, hover), is_playable, colors);
 
 			// prevent double notes
 			if (ndata.num > 0)
@@ -425,7 +428,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 
 
 	// pitch names
-	color cc = AudioView::colors.text;
+	color cc = colors.text;
 	cc.a = 0.4f;
 	Array<SampleRef*> *p = nullptr;
 	if ((synth) and (synth->module_subtype == "Sample")){
@@ -437,7 +440,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 	for (int i=pitch_min; i<pitch_max; i++){
 		c->set_color(cc);
 		if (((hover->type == Selection::Type::MIDI_PITCH) or (hover->type == Selection::Type::MIDI_NOTE)) and (i == hover->pitch))
-			c->set_color(AudioView::colors.text);
+			c->set_color(colors.text);
 
 		string name = pitch_name(i);
 		if (is_drum){
@@ -454,12 +457,12 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y)
 {
 	if (state & MidiPainter::STATE_SELECTED){
-		color col1 = AudioView::colors.selection;
+		color col1 = colors.selection;
 		draw_simple_note(c, x1, x2, y, 2, col1, col1, false);
 	}
 
 	color col, col_shadow;
-	get_col(col, col_shadow, n, state, is_playable);
+	get_col(col, col_shadow, n, state, is_playable, colors);
 
 	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 
@@ -521,9 +524,9 @@ void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, floa
 void MidiPainter::draw_clef_tab(Painter *c)
 {
 	if (is_playable)
-		c->set_color(AudioView::colors.text_soft1);
+		c->set_color(colors.text_soft1);
 	else
-		c->set_color(AudioView::colors.text_soft3);
+		c->set_color(colors.text_soft3);
 
 	// clef lines
 	float h = string_dy * instrument->string_pitch.num;
@@ -535,9 +538,9 @@ void MidiPainter::draw_clef_tab(Painter *c)
 
 
 	if (is_playable)
-		c->set_color(AudioView::colors.text);
+		c->set_color(colors.text);
 	else
-		c->set_color(AudioView::colors.text_soft3);
+		c->set_color(colors.text_soft3);
 
 	c->set_font_size(h / 6);
 	c->draw_str(10, area.y1 + area.height() / 2 - h * 0.37f, "T\nA\nB");
@@ -558,7 +561,7 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 	if (x2 - x1 > rr/4 and rr > 5){
 		float font_size = rr * 1.2f;
-		c->set_color(AudioView::colors.high_contrast_b);//text);
+		c->set_color(colors.high_contrast_b);//text);
 		SymbolRenderer::draw(c, x1, y - font_size/2, font_size, i2s(n->pitch - instrument->string_pitch[n->stringno]), 0);
 	}
 }
@@ -594,12 +597,12 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2){
-		c->set_color(AudioView::colors.text_soft2);
+		c->set_color(colors.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
 	for (int i=-2; i>=p; i-=2){
-		c->set_color(AudioView::colors.text_soft2);
+		c->set_color(colors.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->draw_line(x1 - clef_dy, y, x1 + clef_dy, y);
 	}
@@ -607,8 +610,8 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	draw_complex_note(c, n, state, x1, x2, y);
 
 	if ((n->modifier != NoteModifier::NONE) and (rr >= 3)){
-		c->set_color(AudioView::colors.text);
-		//c->setColor(ColorInterpolate(col, AudioView::colors.text, 0.5f));
+		c->set_color(colors.text);
+		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
 		float size = rr*2.8f;
 		SymbolRenderer::draw(c, x1 - size*0.7f, y - size*0.5f , size, modifier_symbol(n->modifier));
 	}
@@ -619,9 +622,9 @@ void MidiPainter::draw_clef_classical(Painter *c)
 	// clef lines
 
 	if (is_playable)
-		c->set_color(AudioView::colors.text_soft1);
+		c->set_color(colors.text_soft1);
 	else
-		c->set_color(AudioView::colors.text_soft3);
+		c->set_color(colors.text_soft3);
 
 	for (int i=0; i<10; i+=2){
 		float y = clef_pos_to_screen(i);
@@ -629,9 +632,9 @@ void MidiPainter::draw_clef_classical(Painter *c)
 	}
 
 	if (is_playable)
-		c->set_color(AudioView::colors.text);
+		c->set_color(colors.text);
 	else
-		c->set_color(AudioView::colors.text_soft3);
+		c->set_color(colors.text_soft3);
 
 	// clef symbol
 	c->set_font_size(clef_dy*4);

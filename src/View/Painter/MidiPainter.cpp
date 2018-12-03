@@ -181,7 +181,7 @@ struct NoteData
 		if (triplet)
 			base_length = (base_length / 2) * 3;
 		if (punctured)
-			base_length = (base_length * 3) / 2;
+			base_length = (base_length / 3) * 2;
 		up = true;
 	}
 	float x, y;

@@ -1323,12 +1323,12 @@ void AudioView::set_midi_view_mode(MidiMode mode)
 
 void AudioView::zoom_in()
 {
-	cam.zoom(2.0f);
+	cam.zoom(2.0f, mx);
 }
 
 void AudioView::zoom_out()
 {
-	cam.zoom(0.5f);
+	cam.zoom(0.5f, mx);
 }
 
 void AudioView::select_all()

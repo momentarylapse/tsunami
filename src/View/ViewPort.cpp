@@ -12,9 +12,24 @@
 const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
-ViewPort::ViewPort(AudioView *v)
+ViewPort::ViewPort(AudioView *v) :
+	area(v->song_area)
 {
+	song = v->song;
 	view = v;
+	scale = 1.0f;
+	pos = 0;
+	pos_target = 0;
+	pos_pre_animation = 0;
+	animation_time = -1;
+	animation_non_linearity = 0;
+}
+
+ViewPort::ViewPort(Song *_song, rect &_area) :
+	area(_area)
+{
+	song = _song;
+	view = nullptr;
 	scale = 1.0f;
 	pos = 0;
 	pos_target = 0;
@@ -26,12 +41,12 @@ ViewPort::ViewPort(AudioView *v)
 
 double ViewPort::screen2sample(double _x)
 {
-	return (_x - view->song_area.x1) / scale + pos;
+	return (_x - area.x1) / scale + pos;
 }
 
 double ViewPort::sample2screen(double s)
 {
-	return view->song_area.x1 + (s - pos) * scale;
+	return area.x1 + (s - pos) * scale;
 }
 
 double ViewPort::dsample2screen(double ds)
@@ -57,16 +72,18 @@ void ViewPort::range2screen_clip(const Range &r, const rect &area, float &x1, fl
 	x2 = clampf(x2, area.x1, area.x2);
 }
 
-void ViewPort::zoom(float f)
+void ViewPort::zoom(float f, float mx)
 {
 	// max zoom: 20 pixel per sample
 	double scale_new = clampf(scale * f, 0.000001, 20.0);
 
-	pos += (view->mx - view->song_area.x1) * (1.0/scale - 1.0/scale_new);
+	pos += (mx - area.x1) * (1.0/scale - 1.0/scale_new);
 	pos_target = pos_pre_animation = pos;
 	scale = scale_new;
-	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->force_redraw();
+	if (view){
+		view->notify(view->MESSAGE_VIEW_CHANGE);
+		view->force_redraw();
+	}
 }
 
 void ViewPort::move(float dpos)
@@ -85,8 +102,10 @@ void ViewPort::set_target(float target, float nonlin)
 	pos_target = target;
 	animation_time = 0;
 	animation_non_linearity = nonlin;
-	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->force_redraw();
+	if (view){
+		view->notify(view->MESSAGE_VIEW_CHANGE);
+		view->force_redraw();
+	}
 }
 
 void ViewPort::update(float dt)
@@ -103,8 +122,10 @@ void ViewPort::update(float dt)
 		t = s*(-2*t*t*t + 3*t*t) + (1-s) * t;
 		pos = t * pos_target + (1-t) * pos_pre_animation;
 	}
-	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->force_redraw();
+	if (view){
+		view->notify(view->MESSAGE_VIEW_CHANGE);
+		view->force_redraw();
+	}
 }
 
 bool ViewPort::needs_update()
@@ -114,7 +135,7 @@ bool ViewPort::needs_update()
 
 Range ViewPort::range()
 {
-	return Range(pos, view->song_area.width() / scale);
+	return Range(pos, area.width() / scale);
 }
 
 void ViewPort::make_sample_visible(int sample, int samples_ahead)
@@ -123,18 +144,18 @@ void ViewPort::make_sample_visible(int sample, int samples_ahead)
 	float border = 0;
 	if (view->is_playback_active())
 		border = dsample2screen(samples_ahead);
-	float dx = view->song_area.width() * BORDER_FACTOR;
-	float dxr = min(view->song_area.width() * BORDER_FACTOR_RIGHT, dx + border);
+	float dx = area.width() * BORDER_FACTOR;
+	float dxr = min(area.width() * BORDER_FACTOR_RIGHT, dx + border);
 
 	if (samples_ahead > 0){
 		// playback: always jump until the cursor is on the left border
-		if ((x > view->song_area.x2 - dxr) or (x < view->song_area.x1 + dx))
+		if ((x > area.x2 - dxr) or (x < area.x1 + dx))
 			set_target(sample - dscreen2sample(dx), 0.7f);
 	}else{
 		// no playback: minimal jump until the cursor is between the borders
-		if (x > view->song_area.x2 - dxr)
-			set_target(sample - dscreen2sample(view->song_area.width() - dxr), 0.7f);
-		else if (x < view->song_area.x1 + dx)
+		if (x > area.x2 - dxr)
+			set_target(sample - dscreen2sample(area.width() - dxr), 0.7f);
+		else if (x < area.x1 + dx)
 			set_target(sample - dscreen2sample(dx), 0.7f);
 	}
 }
@@ -142,14 +163,14 @@ void ViewPort::make_sample_visible(int sample, int samples_ahead)
 rect ViewPort::nice_mapping_area()
 {
 	// mapping target area
-	float x0 = view->song_area.x1;
-	float x1 = view->song_area.x2;
+	float x0 = area.x1;
+	float x1 = area.x2;
 	if (x1 - x0 > 800)
-		x0 += view->TRACK_HANDLE_WIDTH;
+		x0 += AudioView::TRACK_HANDLE_WIDTH;
 	float w = x1 - x0;
 	x0 += w * BORDER_FACTOR;
 	x1 -= w * BORDER_FACTOR;
-	return rect(x0, x1, view->song_area.y1, view->song_area.y2);
+	return rect(x0, x1, area.y1, area.y2);
 }
 
 void ViewPort::show(Range &r)
@@ -158,10 +179,12 @@ void ViewPort::show(Range &r)
 
 	// map r into (x0,x1)
 	scale = mr.width() / (double)r.length;
-	pos = (double)r.start() - (mr.x1 - view->song_area.x1) / scale;
+	pos = (double)r.start() - (mr.x1 - area.x1) / scale;
 	pos_pre_animation = pos;
 	pos_target = pos;
-	view->notify(view->MESSAGE_VIEW_CHANGE);
-	view->force_redraw();
+	if (view){
+		view->notify(view->MESSAGE_VIEW_CHANGE);
+		view->force_redraw();
+	}
 }
 

@@ -11,8 +11,12 @@
 #include <functional>
 #include "../../lib/base/base.h"
 #include "../../lib/math/math.h"
+#include "../../Data/Midi/Scale.h"
 
 class AudioView;
+class ViewPort;
+class SongSelection;
+class Selection;
 class Painter;
 class MidiNote;
 class MidiNoteBuffer;
@@ -30,6 +34,7 @@ class MidiPainter
 {
 public:
 	MidiPainter(AudioView *view);
+	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, Selection *hover);
 
 
 	static const int PITCH_MIN_DEFAULT = 25;
@@ -64,7 +69,10 @@ public:
 	void draw(Painter *c, const MidiNoteBuffer &midi);
 	void draw_background(Painter *c);
 
-	AudioView *view;
+	ViewPort *cam;
+	Scale midi_scale;
+	SongSelection *sel;
+	Selection *hover;
 	Song *song;
 
 	void set_context(const rect &area, const Instrument &i, const Scale &s, bool playable, MidiMode mode);

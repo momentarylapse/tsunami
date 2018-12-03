@@ -13,10 +13,14 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/Clef.h"
+#include "../../Data/SongSelection.h"
 #include "../../lib/xfile/pdf.h"
 #include "../../lib/image/Painter.h"
 #include "../../lib/math/rect.h"
 #include "../Dialog/PdfConfigDialog.h"
+#include "../../View/ViewPort.h"
+#include "../../View/Painter/MidiPainter.h"
+#include "../../View/Selection.h"
 #include <math.h>
 
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
@@ -27,14 +31,12 @@ FormatDescriptorPdf::FormatDescriptorPdf() :
 {
 }
 
-static float clef_pos_to_pdf(float y0, float line_dy, int i)
+float FormatPdf::clef_pos_to_pdf(float y0, float line_dy, int i)
 {
 	return y0 + (12-i) * line_dy / 2;
 }
 
-static double pdf_bpm;
-
-static int render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
+int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
 {
 	float line_dy = 16;
 	float rr = line_dy/2;
@@ -109,7 +111,7 @@ static int render_track_classical(Painter *p, float x0, float w, float y0, const
 	return y0 + line_dy * 7;
 }
 
-static int render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
+int FormatPdf::render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
 {
 	float string_dy = 16;
 	float rr = string_dy/2;
@@ -166,7 +168,7 @@ static int render_track_tab(Painter *p, float x0, float w, float y0, const Range
 	return y0 + string_dy * t->instrument.string_pitch.num;
 }
 
-static int render_line(Painter *p, float x0, float w, float y0, const Range &r, Song *song, float scale, PdfConfigData *data)
+int FormatPdf::render_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data)
 {
 	float track_space = 20;
 
@@ -192,7 +194,7 @@ static int render_line(Painter *p, float x0, float w, float y0, const Range &r, 
 	return y0;
 }
 
-static int good_samples(Song *song, const Range &r0)
+int FormatPdf::good_samples(const Range &r0)
 {
 	auto bars = song->bars.get_bars(Range(r0.offset, r0.length * 2));
 	int best_pos = -1;
@@ -212,12 +214,19 @@ static int good_samples(Song *song, const Range &r0)
 void FormatPdf::save_song(StorageOperationData* od)
 {
 	PdfConfigData data;
+	song = od->song;
 	auto *dlg = new PdfConfigDialog(&data, od->song, od->win);
 	dlg->run();
 	delete dlg;
 
 	float page_width = 1200;
 	float page_height = 2000;
+
+	rect area = rect(0, page_width, 0, page_height);
+	cam = new ViewPort(song, area);
+	SongSelection sel;
+	Selection hover;
+	mp = new MidiPainter(song, cam, &sel, &hover);
 
 	auto parser = pdf::save(od->filename);
 
@@ -252,12 +261,12 @@ void FormatPdf::save_song(StorageOperationData* od)
 
 	int offset = 0;
 	while (offset < samples){
-		int line_samples = good_samples(od->song, Range(offset, avg_samples_per_line));
+		int line_samples = good_samples(Range(offset, avg_samples_per_line));
 		float scale = w / line_samples;
 		Range r = Range(offset, line_samples);
 
 		float y_prev = y0;
-		y0 = render_line(p, x0, w, y0, r, od->song, scale, &data) + line_space;
+		y0 = render_line(p, x0, w, y0, r, scale, &data) + line_space;
 
 		offset += line_samples;
 
@@ -270,6 +279,8 @@ void FormatPdf::save_song(StorageOperationData* od)
 		}
 	}
 
+	delete cam;
+	delete mp;
 	delete p;
 	delete parser;
 }

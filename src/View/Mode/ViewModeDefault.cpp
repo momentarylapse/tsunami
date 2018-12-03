@@ -333,7 +333,7 @@ void ViewModeDefault::on_mouse_wheel()
 	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f){
 		if (win->get_key(hui::KEY_CONTROL))
-			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f));
+			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);
 		else
 			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
 	}
@@ -371,9 +371,9 @@ void ViewModeDefault::on_key_down(int k)
 
 	// zoom
 	if (k == hui::KEY_ADD)
-		cam->zoom(exp(  view->ZoomSpeed));
+		cam->zoom(exp(  view->ZoomSpeed), view->mx);
 	if (k == hui::KEY_SUBTRACT)
-		cam->zoom(exp(- view->ZoomSpeed));
+		cam->zoom(exp(- view->ZoomSpeed), view->mx);
 
 	if (k == hui::KEY_SPACE){
 		if (view->is_playback_active()){

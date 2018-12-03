@@ -11,16 +11,20 @@
 class AudioView;
 class Range;
 class rect;
+class Song;
 
 class ViewPort
 {
 public:
 	ViewPort(AudioView *v);
+	ViewPort(Song *song, rect &area);
 
 	static const float BORDER_FACTOR;
 	static const float BORDER_FACTOR_RIGHT;
 
 	AudioView *view;
+	Song *song;
+	rect &area;
 
 	double pos;
 	double pos_pre_animation;
@@ -40,7 +44,7 @@ public:
 	void range2screen(const Range &r, float &x1, float &x2);
 	void range2screen_clip(const Range &r, const rect &area, float &x1, float &x2);
 
-	void zoom(float f);
+	void zoom(float f, float mx);
 	void move(float dpos);
 	void set_target(float pos, float nonlin);
 

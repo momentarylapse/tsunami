@@ -46,14 +46,9 @@ class Session;
 class MidiPainter;
 class BufferPainter;
 class GridPainter;
+enum class MidiMode;
 
 
-enum class MidiMode{
-	LINEAR,
-	TAB,
-	CLASSICAL,
-	DRUM
-};
 
 
 class AudioView : public Observable<VirtualBase>

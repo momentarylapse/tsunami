@@ -38,41 +38,32 @@ float FormatPdf::clef_pos_to_pdf(float y0, float line_dy, int i)
 
 int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
 {
-	float line_dy = 16;
-	float rr = line_dy/2;
-	Song *song = t->song;
+	//float line_dy = 16;
+	//float rr = line_dy/2;
 
-	int slack = t->song->sample_rate / 30;
+	int slack = song->sample_rate / 30;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	auto clef = t->instrument.get_clef();
 
+	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, Scale(Scale::Type::MAJOR, 0), true, MidiMode::CLASSICAL);
+
+	auto clef = t->instrument.get_clef();
 	auto midi = t->layers[0]->midi.get_notes(r_inside);
-	int mm = 0;
-	for (auto n: midi){
-		mm = max(mm, n->range.offset);
-		float x1 = x0 + (n->range.offset - r.offset) * scale;
-		float x2 = x0 + (n->range.end() - r.offset) * scale;
-		int pos = n->clef_position;
-		float y = clef_pos_to_pdf(y0, line_dy, pos);
-		p->set_color(color(1, 0.9f, 0.9f, 0.9f));
-		p->draw_rect(rect(x1 + rr, x2, y-rr, y + rr));
-	}
 
 	// clef lines
 	p->set_color(Gray);
 	for (int i=0; i<10; i+=2){
-		float y = clef_pos_to_pdf(y0, line_dy, i);
+		float y = mp->clef_pos_to_screen(i);//clef_pos_to_pdf(y0, line_dy, i);
 		p->draw_line(x0, y, x0 + w, y);
 	}
 	//p->draw_str(x0, y0, clef.symbol);
 
 	// beats
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
+	float ya = mp->clef_pos_to_screen(8);
+	float yb = mp->clef_pos_to_screen(0);
 	for (auto b: beats){
 		float x = x0 + (b.range.offset - r.offset) * scale;
-		float ya = clef_pos_to_pdf(y0, line_dy, 8);
-		float yb = clef_pos_to_pdf(y0, line_dy, 0);
 		if (b.level == 0){
 			if (b.bar_no >= 0){
 				double bpm = 60.0 * (double)song->sample_rate / (double)b.range.length;
@@ -93,22 +84,10 @@ int FormatPdf::render_track_classical(Painter *p, float x0, float w, float y0, c
 	p->set_line_width(1);
 
 	// midi
-	float fs = 18;
-	p->set_font_size(fs);
 	auto midi2 = t->layers[0]->midi.get_notes(r_inside);
-	for (auto n: midi2){
-		float x1 = x0 + (n->range.offset - r.offset) * scale;
-		int pos = n->clef_position;
-		float y = clef_pos_to_pdf(y0, line_dy, pos);
-		p->set_color(NOTE_COLOR);
-		p->draw_circle(x1 + rr, y, rr);
-		if (n->modifier == NoteModifier::FLAT)
-			p->draw_str(x1 - rr, y-fs/2, "b");
-		else if (n->modifier == NoteModifier::SHARP)
-			p->draw_str(x1 - rr, y-fs/2, "#");
-	}
+	mp->draw(p, midi2);
 
-	return y0 + line_dy * 7;
+	return y0 + 140;
 }
 
 int FormatPdf::render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
@@ -172,6 +151,10 @@ int FormatPdf::render_line(Painter *p, float x0, float w, float y0, const Range 
 {
 	float track_space = 20;
 
+	cam->pos = r.offset;
+	cam->scale = (double)cam->area.width() / (double)r.length;
+
+
 	auto bars = song->bars.get_bars(r + 1000);
 	p->set_color(SetColorHSB(1, 0, 0, 0.4f));
 	p->set_font_size(12);
@@ -222,15 +205,15 @@ void FormatPdf::save_song(StorageOperationData* od)
 	float page_width = 1200;
 	float page_height = 2000;
 
-	rect area = rect(0, page_width, 0, page_height);
+	auto parser = pdf::save(od->filename);
+
+	float border = 50;
+
+	rect area = rect(border, page_width - border, 0, page_height);
 	cam = new ViewPort(song, area);
 	SongSelection sel;
 	Selection hover;
 	mp = new MidiPainter(song, cam, &sel, &hover);
-
-	auto parser = pdf::save(od->filename);
-
-	float border = 50;
 
 	float x0 = border;
 	float w = page_width - 2*border;

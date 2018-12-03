@@ -22,6 +22,13 @@ class Clef;
 class Scale;
 class SongSelection;
 
+enum class MidiMode{
+	LINEAR,
+	TAB,
+	CLASSICAL,
+	DRUM
+};
+
 
 class MidiEventBuffer : public Array<MidiEvent>
 {

@@ -34,11 +34,11 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 		if (t->type != SignalType::MIDI)
 			continue;
 		add_label(t->nice_name(), 0, i, "");
-		add_check_box("Classical", 1, i, format("classical-%d"));
-		add_check_box("TAB", 2, i, format("tab-%d"));
-		check(format("classical-%d"), true);
-		check(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
-		enable(format("tab-%d"), t->instrument.string_pitch.allocated > 0);
+		add_check_box("Classical", 1, i, format("classical-%d", i));
+		add_check_box("TAB", 2, i, format("tab-%d", i));
+		check(format("classical-%d", i), true);
+		check(format("tab-%d", i), t->instrument.string_pitch.allocated > 0);
+		enable(format("tab-%d", i), t->instrument.string_pitch.allocated > 0);
 	}
 	set_float("scale", 100.0f);
 
@@ -63,8 +63,8 @@ void PdfConfigDialog::on_ok()
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		bool classical = is_checked(format("classical-%d"));
-		bool tab = is_checked(format("tab-%d"));
+		bool classical = is_checked(format("classical-%d", i));
+		bool tab = is_checked(format("tab-%d", i));
 		data->track_mode[i] = (classical ? 1 : 0) + (tab ? 2 : 0);
 	}
 	data->horizontal_scale = get_float("scale") / 100;

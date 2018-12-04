@@ -63,6 +63,7 @@ public:
 
 	color *col;
 	float font_size;
+	string font_name;
 	float line_width;
 	bool filling;
 
@@ -79,6 +80,9 @@ public:
 
 	File *f;
 	Array<Page*> pages;
+	Array<string> font_names;
+
+	int font_id(const string &name);
 };
 
 Parser *save(const string &filename);

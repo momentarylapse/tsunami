@@ -53,7 +53,7 @@ public:
 	Format();
 	virtual ~Format(){}
 
-	void importData(TrackLayer *l, void *data, int channels, SampleFormat format, int samples, int offset);
+	void import_data(TrackLayer *l, void *data, int channels, SampleFormat format, int samples, int offset);
 
 	virtual void load_track(StorageOperationData *od) = 0;
 	virtual void save_via_renderer(StorageOperationData *od) = 0;

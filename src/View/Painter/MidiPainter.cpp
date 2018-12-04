@@ -226,21 +226,22 @@ struct NoteData
 void draw_single_ndata(Painter *c, NoteData &d, float rr)
 {
 	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
+	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
 	c->set_color(d.col);
 	float e = d.up ? -1 : 1;
 	if (d.base_length == SIXTEENTH){
-		c->set_line_width(NOTE_NECK_WIDTH);
+		c->set_line_width(neck_width);
 		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
 		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
 		c->draw_line(d.x, d.y + e * (neck_length - NOTE_BAR_DISTANCE), d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_BAR_DISTANCE - NOTE_FLAG_DY));
 	}else if (d.base_length == EIGHTH){
-		c->set_line_width(NOTE_NECK_WIDTH);
+		c->set_line_width(neck_width);
 		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 		c->set_line_width(NOTE_BAR_WIDTH);
 		c->draw_line(d.x, d.y + e * neck_length, d.x + NOTE_FLAG_DX, d.y + e * (neck_length - NOTE_FLAG_DY));
 	}else if (d.base_length == QUARTER){
-		c->set_line_width(NOTE_NECK_WIDTH);
+		c->set_line_width(neck_width);
 		c->draw_line(d.x, d.y, d.x, d.y + e * neck_length);
 	}
 
@@ -253,12 +254,13 @@ void draw_single_ndata(Painter *c, NoteData &d, float rr)
 void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 {
 	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
+	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
 	float e = d[0].up ? -1 : 1;
 	float x0 = d[0].x, y0 = d[0].y + e * neck_length;
 	float x1 = d.back().x, y1 = d.back().y + e * neck_length;
 	float m = (y1 - y0) / (x1 - x0);
 
-	c->set_line_width(NOTE_NECK_WIDTH);
+	c->set_line_width(neck_width);
 	for (auto &dd: d){
 		c->set_color(dd.col);
 		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));

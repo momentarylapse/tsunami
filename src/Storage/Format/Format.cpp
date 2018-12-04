@@ -66,7 +66,7 @@ Format::Format()
 	f = nullptr;
 }
 
-void Format::importData(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)
+void Format::import_data(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)
 {
 	AudioBuffer buf;
 	layer->get_buffers(buf, Range(offset, samples));

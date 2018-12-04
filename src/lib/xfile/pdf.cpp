@@ -26,6 +26,7 @@ PagePainter::PagePainter(Parser* _parser, Page *_page)
 	col = new color(1,0,0,0);
 	line_width = 1;
 	font_size = 12;
+	font_name = "Helvetica";
 	filling = true;
 	text_x = text_y = 0;
 	set_color(Black);
@@ -47,6 +48,7 @@ void PagePainter::set_color(const color& c)
 
 void PagePainter::set_font(const string& font, float size, bool bold, bool italic)
 {
+	font_name = font;
 	font_size = size;
 }
 
@@ -150,7 +152,8 @@ void PagePainter::draw_str(float x, float y, const string& str)
 	y = height - y - font_size*0.8f;
 	float dx = x - text_x;
 	float dy = y - text_y;
-	page->content += format("     /F1 %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", font_size, dx, dy, _pdf_str_filter(str).c_str());
+	int fid = parser->font_id(font_name);
+	page->content += format("     /F%d %.1f Tf\n     %.2f %.2f Td\n     (%s) Tj\n", fid+1, font_size, dx, dy, _pdf_str_filter(str).c_str());
 
 	text_x = x;
 	text_y = y;
@@ -200,6 +203,15 @@ Painter* Parser::add_page(float w, float h)
 	return new PagePainter(this, page);
 }
 
+int Parser::font_id(const string &name)
+{
+	for (int i=0; i<font_names.num; i++)
+		if (name == font_names[i])
+			return i;
+	font_names.add(name);
+	return font_names.num - 1;
+}
+
 void Parser::end()
 {
 	Array<int> pos;
@@ -210,8 +222,8 @@ void Parser::end()
 	for (int i=0; i<pages.num; i++)
 		stream_id.add(4 + pages.num + i);
 	int proc_id = 4 + pages.num * 2;
-	int font_id = proc_id + 1;
-	int xref_id = font_id + 1;
+	int font0_id = proc_id + 1;
+	int xref_id = font0_id + font_names.num;
 
 
 	f->write_buffer("%PDF-1.4\n");
@@ -251,7 +263,10 @@ void Parser::end()
 		f->write_buffer(format("     /MediaBox [0 0 %d %d]\n", p->width, p->height));
 		f->write_buffer(format("     /Contents %d 0 R\n", stream_id[i]));
 		f->write_buffer(format("     /Resources << /ProcSet %d 0 R\n", proc_id));
-		f->write_buffer(format("                   /Font << /F1 %d 0 R >>\n", font_id));
+		string fff;
+		for (int i=0; i<font_names.num; i++)
+			fff += format("/F%d %d 0 R ", i+1, font0_id + i);
+		f->write_buffer("                   /Font << " + fff + ">>\n");
 		f->write_buffer("                >>\n");
 		f->write_buffer("  >>\n");
 	}
@@ -275,16 +290,18 @@ void Parser::end()
 	f->write_buffer("  [/PDF]\n");
 	f->write_buffer("endobj\n");
 
-	// font
-	pos.add(f->get_pos());
-	f->write_buffer(format("%d 0 obj\n", font_id));
-	f->write_buffer("  << /Type /Font\n");
-	f->write_buffer("     /Subtype /Type1\n");
-	f->write_buffer("     /Name /F1\n");
-	f->write_buffer("     /BaseFont /Helvetica\n");
-	f->write_buffer("     /Encoding /MacRomanEncoding\n");
-	f->write_buffer("  >>\n");
-	f->write_buffer("endobj\n");
+	// fonts
+	foreachi(string &font, font_names, i){
+		pos.add(f->get_pos());
+		f->write_buffer(format("%d 0 obj\n", font0_id + i));
+		f->write_buffer("  << /Type /Font\n");
+		f->write_buffer("     /Subtype /Type1\n");
+		f->write_buffer(format("     /Name /F%d\n", i+1));
+		f->write_buffer("     /BaseFont /" + font + "\n");
+		f->write_buffer("     /Encoding /MacRomanEncoding\n");
+		f->write_buffer("  >>\n");
+		f->write_buffer("endobj\n");
+	}
 
 	int xref_pos = f->get_pos();
 	f->write_buffer("xref\n");

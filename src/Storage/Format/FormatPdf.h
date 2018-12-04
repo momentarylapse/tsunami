@@ -32,10 +32,21 @@ public:
 
 	double pdf_bpm;
 
+	struct LineData
+	{
+		LineData(){}
+		LineData(Track *t, float y0, float y1);
+		float y0, y1;
+		Track *track;
+	};
+	Array<LineData> line_data;
+
 	int good_samples(const Range &r0);
-	int render_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
-	int render_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
-	int render_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data);
+	int draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
+	int draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale);
+	int draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data);
+
+	void draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r);
 };
 
 class FormatDescriptorPdf : public FormatDescriptor

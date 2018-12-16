@@ -32,6 +32,7 @@
 #include "../Data/TrackLayer.h"
 #include "../Data/Song.h"
 #include "../Data/Audio/AudioBuffer.h"
+#include "../Data/SongSelection.h"
 
 Storage::Storage(Session *_session)
 {
@@ -191,7 +192,7 @@ bool Storage::save(Song *a, const string &filename)
 
 bool Storage::save_via_renderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags)
 {
-	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return false;
 
@@ -206,6 +207,14 @@ bool Storage::save_via_renderer(AudioPort *r, const string &filename, int num_sa
 	f->save_via_renderer(&od);
 	delete(f);
 	return true;
+}
+
+bool Storage::render_export_selection(Song *song, SongSelection *sel, const string &filename)
+{
+	SongRenderer renderer(song);
+	renderer.prepare(sel->range, false);
+	renderer.allow_tracks(sel->tracks);
+	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
 }
 
 bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags)

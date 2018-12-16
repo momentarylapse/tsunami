@@ -216,7 +216,7 @@ void SongRenderer::render(const Range &range, AudioBuffer &buf)
 	read(buf);
 }
 
-void SongRenderer::allow_tracks(const Set<Track*> &_allowed_tracks)
+void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks)
 {
 	// reset previously unused tracks
 	for (auto *tr: tracks)
@@ -228,7 +228,7 @@ void SongRenderer::allow_tracks(const Set<Track*> &_allowed_tracks)
 	//_seek(pos);
 }
 
-void SongRenderer::allow_layers(const Set<TrackLayer*> &_allowed_layers)
+void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers)
 {
 	allowed_layers = _allowed_layers;
 	_seek(pos);

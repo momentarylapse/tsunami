@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-597
+599
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1794,8 +1794,14 @@ Lautstärke in dB
 track-mixer2/add-fx
 
 Einen neuen Effekt hinzufügen
+menu/render_export_selection
+Auswahl rendern und exportieren...
+
+menu/menu_export
+Exportieren
+
 // Num Language Strings
-213
+216
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2223,3 +2229,9 @@ Quick export directory
 Verzeichnis für schnelles Exportieren
 Mastering
 Mastering
+file exported
+Datei exportiert
+file saved
+Datei gespeichert
+𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)
+𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)

@@ -19,6 +19,7 @@ class Track;
 class TrackLayer;
 class AudioBuffer;
 class AudioPort;
+class SongSelection;
 class StorageOperationData;
 class Tag;
 class Session;
@@ -34,6 +35,7 @@ public:
 	bool load_track(TrackLayer *t, const string &filename, int offset = 0);
 	bool load_buffer(Song *a, AudioBuffer *buf, const string &filename);
 	bool save_via_renderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags);
+	bool render_export_selection(Song *a, SongSelection *sel, const string &filename);
 	bool save(Song *a, const string &filename);
 
 	bool ask_by_flags(hui::Window *win, const string &title, int flags);

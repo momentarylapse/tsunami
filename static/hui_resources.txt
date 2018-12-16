@@ -864,7 +864,7 @@ menu_file
 
 0
 0
-11
+10
 Item
 new
 image=hui:new
@@ -895,40 +895,46 @@ image=hui:save-as
 4
 0
 0
-Item
-export_selection
-image=hui:save-as
+Menu
+menu_export
+
 5
+0
+2
+Item
+render_export_selection
+image=hui:save-as
+0
 0
 0
 Item
 quick_export
 image=hui:save-as
-6
+1
 0
 0
 Separator
 
 
-7
+6
 0
 0
 Item
 song_properties
 image=hui:properties
-8
+7
 0
 0
 Separator
 
 
-9
+8
 0
 0
 Item
 exit
 image=hui:quit
-10
+9
 0
 0
 Menu
@@ -4680,7 +4686,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-467
+468
 // Text
 /cancel
 Cancel
@@ -4997,9 +5003,6 @@ Delete selected interval
 menu/edit_bars
 Edit...
 
-menu/export_selection
-Export selection...
-
 menu/help
 Help
 
@@ -5011,6 +5014,9 @@ Insert silence...
 
 menu/menu_edit
 Edit
+
+menu/menu_export
+Export
 
 menu/menu_file
 File
@@ -5101,6 +5107,9 @@ Quick export
 
 menu/record
 Record
+
+menu/render_export_selection
+Render selection...
 
 menu/sample_from_selection
 Cut out from selection
@@ -6089,7 +6098,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-596
+598
 // Text
 /bpm
 Bpm
@@ -6568,6 +6577,9 @@ Takte
 menu/menu_edit
 Bearbeiten
 
+menu/menu_export
+Exportieren
+
 menu/menu_file
 Datei
 
@@ -6681,6 +6693,9 @@ Midi aufnehmen
 
 menu/remove_sample
 Löschen
+
+menu/render_export_selection
+Auswahl rendern und exportieren...
 
 menu/run_plugin
 Script ausführen...
@@ -7880,7 +7895,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-213
+216
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8240,8 +8255,12 @@ exporting
 exportiere 
 exporting 
 exportiere 
+file exported
+Datei exportiert
 file format is incompatible for this action: 
 inkompatibles Dateiformat für diese Aktion: 
+file saved
+Datei gespeichert
 found old recording: 
 alte Aufnahmedaten gefunden: 
 i'm now going to clean up...
@@ -8308,3 +8327,5 @@ unknown file extension:
 unbekannte Dateiendung: 
 unknown synthesizer: 
 unbekannter Synthesizer: 
+𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)
+𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)

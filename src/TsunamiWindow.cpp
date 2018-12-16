@@ -92,8 +92,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("paste_time", std::bind(&TsunamiWindow::on_paste_time, this));
 	event("delete", std::bind(&TsunamiWindow::on_delete, this));
 	set_key_code("delete", hui::KEY_DELETE, "hui:delete");
-	event("export_selection", std::bind(&TsunamiWindow::on_export, this));
-	set_key_code("export_selection", hui::KEY_X + hui::KEY_CONTROL, "");
+	event("render_export_selection", std::bind(&TsunamiWindow::on_render_export_selection, this));
+	set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL, "");
 	event("quick_export", std::bind(&TsunamiWindow::on_quick_export, this));
 	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT, "");
 	event("undo", std::bind(&TsunamiWindow::on_undo, this));
@@ -377,7 +377,7 @@ void TsunamiWindow::on_track_render()
 
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
-	renderer.allow_tracks(view->get_selected_tracks());
+	renderer.allow_tracks(view->sel.tracks);
 	renderer.allow_layers(view->get_playable_layers());
 
 	int chunk_size = 1<<12;
@@ -1021,13 +1021,10 @@ void TsunamiWindow::on_save_as()
 	hui::file_dialog_default = "";
 }
 
-void TsunamiWindow::on_export()
+void TsunamiWindow::on_render_export_selection()
 {
 	if (session->storage->ask_save_export(this)){
-		SongRenderer renderer(song);
-		renderer.prepare(view->get_playback_selection(false), false);
-		renderer.allow_tracks(view->get_selected_tracks());
-		if (session->storage->save_via_renderer(renderer.out, hui::Filename, renderer.get_num_samples(), song->tags))
+		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}
 }

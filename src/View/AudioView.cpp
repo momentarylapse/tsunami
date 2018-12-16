@@ -1530,23 +1530,14 @@ bool AudioView::has_any_solo_track()
 	return false;
 }
 
-Set<Track*> AudioView::get_playable_tracks()
+Set<const Track*> AudioView::get_playable_tracks()
 {
-	Set<Track*> tracks;
+	Set<const Track*> tracks;
 	Set<Track*> prevented = mode->prevent_playback();
 	bool any_solo = has_any_solo_track();
 	for (auto *t: vtrack)
 		if (!t->track->muted and (t->solo or !any_solo) and !prevented.contains(t->track))
 			tracks.add(t->track);
-	return tracks;
-}
-
-Set<Track*> AudioView::get_selected_tracks()
-{
-	Set<Track*> tracks;
-	for (Track* t: song->tracks)
-		if (sel.has(t))
-			tracks.add(t);
 	return tracks;
 }
 
@@ -1558,11 +1549,11 @@ bool AudioView::has_any_solo_layer(Track *t)
 	return false;
 }
 
-Set<TrackLayer*> AudioView::get_playable_layers()
+Set<const TrackLayer*> AudioView::get_playable_layers()
 {
 	auto tracks = get_playable_tracks();
 
-	Set<TrackLayer*> layers;
+	Set<const TrackLayer*> layers;
 	for (Track* t: song->tracks){
 		if (!tracks.contains(t))
 			continue;

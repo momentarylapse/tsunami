@@ -213,7 +213,7 @@ void SampleManagerConsole::on_export()
 	if (session->storage->ask_save_export(win)){
 		if (sel[0]->type == SignalType::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
-			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf.length, Array<Tag>());
+			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf.length, {});
 		}
 	}
 }

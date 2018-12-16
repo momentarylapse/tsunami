@@ -218,10 +218,9 @@ public:
 	bool is_playback_active();
 	bool is_paused();
 	int playback_pos();
-	Set<Track*> get_playable_tracks();
-	Set<Track*> get_selected_tracks();
+	Set<const Track*> get_playable_tracks();
 	bool has_any_solo_track();
-	Set<TrackLayer*> get_playable_layers();
+	Set<const TrackLayer*> get_playable_layers();
 	bool has_any_solo_layer(Track *t);
 
 	void set_cur_sample(SampleRef *s);

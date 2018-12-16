@@ -41,8 +41,8 @@ public:
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
-	void _cdecl allow_tracks(const Set<Track*> &allowed_tracks);
-	void _cdecl allow_layers(const Set<TrackLayer*> &allowed_layers);
+	void _cdecl allow_tracks(const Set<const Track*> &allowed_tracks);
+	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
 
 	void _cdecl seek(int pos);
 
@@ -66,8 +66,8 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
-	Set<Track*> allowed_tracks;
-	Set<TrackLayer*> allowed_layers;
+	Set<const Track*> allowed_tracks;
+	Set<const TrackLayer*> allowed_layers;
 	bool direct_mode;
 
 	Array<TrackRenderer*> tracks;

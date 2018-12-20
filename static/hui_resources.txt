@@ -900,7 +900,7 @@ menu_export
 
 5
 0
-2
+3
 Item
 render_export_selection
 image=hui:save-as
@@ -908,9 +908,15 @@ image=hui:save-as
 0
 0
 Item
+export_selection
+image=hui:save-as,disabled
+1
+0
+0
+Item
 quick_export
 image=hui:save-as
-1
+2
 0
 0
 Separator
@@ -4686,7 +4692,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-468
+469
 // Text
 /cancel
 Cancel
@@ -5002,6 +5008,9 @@ Delete selected interval
 
 menu/edit_bars
 Edit...
+
+menu/export_selection
+Save selection...
 
 menu/help
 Help
@@ -6545,7 +6554,7 @@ menu/edit_selected_bars
 Ausgewählte Takte bearbeiten
 
 menu/export_selection
-Auswahl Exportieren...
+Auswahl Speichern...
 
 menu/help
 Hilfe
@@ -6695,7 +6704,7 @@ menu/remove_sample
 Löschen
 
 menu/render_export_selection
-Auswahl rendern und exportieren...
+Auswahl Rendern...
 
 menu/run_plugin
 Script ausführen...

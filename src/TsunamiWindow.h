@@ -44,6 +44,7 @@ public:
 	void on_paste_time();
 	void on_delete();
 	void on_render_export_selection();
+	void on_export_selection();
 	void on_quick_export();
 	void on_undo();
 	void on_redo();

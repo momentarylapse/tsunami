@@ -94,6 +94,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("delete", hui::KEY_DELETE, "hui:delete");
 	event("render_export_selection", std::bind(&TsunamiWindow::on_render_export_selection, this));
 	set_key_code("render_export_selection", hui::KEY_X + hui::KEY_CONTROL, "");
+	event("export_selection", std::bind(&TsunamiWindow::on_export_selection, this));
 	event("quick_export", std::bind(&TsunamiWindow::on_quick_export, this));
 	set_key_code("quick_export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT, "");
 	event("undo", std::bind(&TsunamiWindow::on_undo, this));
@@ -1023,7 +1024,16 @@ void TsunamiWindow::on_save_as()
 
 void TsunamiWindow::on_render_export_selection()
 {
-	if (session->storage->ask_save_export(this)){
+	if (session->storage->ask_save_render_export(this)){
+		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
+			view->set_message(_("file exported"));
+	}
+}
+
+void TsunamiWindow::on_export_selection()
+{
+	// TODO
+	if (session->storage->ask_save(this)){
 		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}

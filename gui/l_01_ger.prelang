@@ -382,7 +382,7 @@ menu/edit_selected_bars
 Ausgewählte Takte bearbeiten
 
 menu/export_selection
-Auswahl Exportieren...
+Auswahl Speichern...
 
 menu/help
 Hilfe
@@ -1795,7 +1795,7 @@ track-mixer2/add-fx
 
 Einen neuen Effekt hinzufügen
 menu/render_export_selection
-Auswahl rendern und exportieren...
+Auswahl Rendern...
 
 menu/menu_export
 Exportieren

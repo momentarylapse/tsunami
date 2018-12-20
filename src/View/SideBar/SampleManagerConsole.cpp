@@ -197,7 +197,7 @@ void SampleManagerConsole::on_import()
 {
 	if (session->storage->ask_open_import(win)){
 		AudioBuffer buf;
-		session->storage->load_buffer(song, &buf, hui::Filename);
+		session->storage->load_buffer(&buf, hui::Filename);
 		song->add_sample(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		on_list_select();
@@ -210,7 +210,7 @@ void SampleManagerConsole::on_export()
 	if (sel.num != 1)
 		return;
 
-	if (session->storage->ask_save_export(win)){
+	if (session->storage->ask_save_render_export(win)){
 		if (sel[0]->type == SignalType::AUDIO){
 			BufferStreamer rr(&sel[0]->buf);
 			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf.length, {});
@@ -425,7 +425,7 @@ public:
 	{
 		if (session->storage->ask_open_import(win)){
 			AudioBuffer buf;
-			session->storage->load_buffer(song, &buf, hui::Filename);
+			session->storage->load_buffer(&buf, hui::Filename);
 			song->add_sample(hui::Filename.basename(), buf);
 			fill_list();
 		}

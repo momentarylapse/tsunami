@@ -49,7 +49,7 @@ Tsunami::Tsunami() :
 	set_property("version", AppVersion + " \"" + AppNickname + "\"");
 	set_property("comment", _("Editor for audio files"));
 	set_property("website", "http://michi.is-a-geek.org/software");
-	set_property("copyright", "© 2007-2018 by Michael Ankele");
+	set_property("copyright", "© 2007-2019 by Michael Ankele");
 	set_property("author", "Michael Ankele <michi@lupina.de>");
 }
 

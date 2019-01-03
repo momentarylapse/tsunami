@@ -150,9 +150,8 @@ void Window::_init_(const string &title, int width, int height, Window *root, bo
 
 	// icon
 	string logo = Application::get_property("logo");
-	msg_write(logo);
 	if (logo.num > 0)
-		msg_write(gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), nullptr));
+		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), nullptr);
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&on_gtk_window_close), this);

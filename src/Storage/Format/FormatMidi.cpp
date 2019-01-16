@@ -298,7 +298,7 @@ void FormatMidi::save_song(StorageOperationData* od)
 				f->write_byte(0xff);
 				f->write_byte(88);
 				write_var(f, 0);
-				f->write_byte(b->num_beats);
+				f->write_byte(b->beats.num);
 				f->write_byte(2); // 1/4
 				f->write_byte(0);
 				f->write_byte(0);

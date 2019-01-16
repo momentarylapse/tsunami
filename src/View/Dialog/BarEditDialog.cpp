@@ -24,16 +24,16 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	}
 
 	Bar *b = song->bars[sel[0]];
-	new_bar = new BarPattern(*b);
+	new_bar = new Bar(*b);
 
 	set_int("number", sel.num);
-	set_int("beats", new_bar->num_beats);
-	set_int("sub_beats", new_bar->num_sub_beats);
+	set_int("beats", new_bar->beats.num);
+	set_int("sub_beats", new_bar->divisor);
 	set_string("pattern", new_bar->pat_str());
 	check("complex", !new_bar->is_uniform());
 	hide_control("beats", !new_bar->is_uniform());
 	hide_control("pattern", new_bar->is_uniform());
-	set_float("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
+	set_float("bpm", b->bpm(song->sample_rate));
 	check("shift-data", true);
 	check("scale-audio", false);
 
@@ -70,7 +70,7 @@ void BarEditDialog::on_ok()
 
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];
-			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
+			b.length = song->sample_rate * 60.0f * b.beats.num / bpm / b.divisor;
 			song->edit_bar(i, b, bmode);
 		}
 
@@ -107,24 +107,21 @@ void BarEditDialog::on_close()
 
 void BarEditDialog::on_beats()
 {
-	*new_bar = BarPattern(0, get_int(""), new_bar->num_sub_beats);
+	*new_bar = Bar(1000, get_int(""), new_bar->divisor);
 	set_string("pattern", new_bar->pat_str());
 	update_result_bpm();
 }
 
 void BarEditDialog::on_sub_beats()
 {
-	new_bar->num_sub_beats = get_int("");
-	new_bar->update_total();
-
-	if (is_checked("complex")){
-		//*new_bar = BarPattern(0, )
-	}
+	new_bar->divisor = get_int("");
+	update_result_bpm();
 }
 
 void BarEditDialog::on_pattern()
 {
 	set_bar_pattern(*new_bar, get_string("pattern"));
+	update_result_bpm();
 }
 
 void BarEditDialog::on_complex()
@@ -151,10 +148,10 @@ void BarEditDialog::on_number()
 
 void BarEditDialog::update_result_bpm()
 {
-	float t = (float)duration / (float)song->sample_rate;
+	/*float t = (float)duration / (float)song->sample_rate;
 	int number = get_int("number");
 	int beats = new_bar->num_beats;
-	set_float("result_bpm", 60.0f * (float)(number * beats) / t);
+	set_float("result_bpm", new_bar->bpm(song->sample)60.0f * (float)(number * beats) / t);*/
 }
 
 void BarEditDialog::on_shift_data()

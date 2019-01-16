@@ -21,8 +21,8 @@ public:
 	void build(Data *d) override;
 
 	int index;
-	int length, num_beats, num_sub_beats;
-	Array<int> pattern;
+	int length, divisor;
+	Array<int> beats;
 	int mode;
 };
 

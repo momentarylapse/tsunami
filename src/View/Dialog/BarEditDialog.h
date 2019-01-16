@@ -12,14 +12,14 @@
 
 class Song;
 class Range;
-class BarPattern;
+class Bar;
 
 class BarEditDialog : public hui::Dialog
 {
 public:
 	Song *song;
 	Array<int> sel;
-	BarPattern *new_bar;
+	Bar *new_bar;
 
 	int duration;
 

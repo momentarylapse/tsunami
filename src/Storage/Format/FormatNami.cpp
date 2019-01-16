@@ -945,26 +945,23 @@ public:
 	virtual void create(){ me = nullptr; }
 	virtual void read(File *f)
 	{
-		BarPattern b;
 		int type = f->read_int();
-		b.length = f->read_int();
-		b.num_beats = f->read_int();
+		int length = f->read_int();
+		int num_beats = f->read_int();
 		if (type == BarPattern::Type::PAUSE)
-			b.num_beats = 0;
+			num_beats = 0;
 		int count = f->read_int();
-		b.num_sub_beats = f->read_int();
-		if (b.num_sub_beats <= 0)
-			b.num_sub_beats = 1;
+		int divisor = f->read_int();
+		if (divisor <= 0)
+			divisor = 1;
+		BarPattern b = BarPattern(length, num_beats, divisor);
 
 		// pattern
 		if (type >= 42){
-			for (int i=0; i<b.num_beats; i++)
-				b.pattern.add(f->read_int());
-		}else{
-			for (int i=0; i<b.num_beats; i++)
-				b.pattern.add(b.num_sub_beats);
+			for (int i=0; i<num_beats; i++)
+				b.beats[i] = f->read_int();
+			b.update_total();
 		}
-		b.update_total();
 
 		for (int i=0; i<count; i++){
 			parent->bars.add(new Bar(b));
@@ -979,11 +976,11 @@ public:
 		else
 			f->write_int(BarPattern::Type::BAR + 42);
 		f->write_int(me->length);
-		f->write_int(me->num_beats);
+		f->write_int(me->beats.num);
 		f->write_int(1);
-		f->write_int(me->num_sub_beats);
+		f->write_int(me->divisor);
 		if (!me->is_uniform())
-			for (int b: me->pattern)
+			for (int b: me->beats)
 				f->write_int(b);
 	}
 };

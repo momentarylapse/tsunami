@@ -271,8 +271,8 @@ class TrackMarker
 	AudioEffect*[] fx
 	
 class Bar
-	int num_beats
-	int num_sub_beats
+	int[] beats
+	int divisor
 	int index
 	int index_text
 	int length

@@ -339,8 +339,8 @@ struct QuantizedBar
 	QuantizedBar(Bar *b)
 	{
 		int off = 0;
-		for (int i=0; i<b->num_beats; i++){
-			int d = b->pattern[i] * QUARTER_PARTITION / b->num_sub_beats;
+		for (int bb: b->beats){
+			int d = bb * QUARTER_PARTITION / b->divisor;
 			beat_length.add(d);
 			beat_offset.add(off);
 			off += d;
@@ -386,7 +386,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		// samples per 16th / 3
 		float sub_beat_length = (float)b->range().length / (float)b->total_sub_beats;
-		float quarter_length = sub_beat_length * b->num_sub_beats;
+		float quarter_length = sub_beat_length * b->divisor;
 		float spu = quarter_length / (float)QUARTER_PARTITION;
 //		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
@@ -423,7 +423,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 		}
 
 		QuantizedBar qbar(b);
-		bool bar_allows_long_groups = b->is_uniform() and (b->pattern[0] == b->num_sub_beats) and (b->num_beats % 2 == 0);
+		bool bar_allows_long_groups = b->is_uniform() and (b->beats[0] == b->divisor) and (b->beats.num % 2 == 0);
 
 		//int offset = 0;
 		for (int i=0; i<ndata.num; i++){

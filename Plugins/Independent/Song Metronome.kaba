@@ -204,8 +204,8 @@ Grid ? '' vertical
 		if next_part and next_part != cur_part
 			change = next_part.text
 		if next_bar
-			if next_bar.num_beats != cur_bar.num_beats
-				change += "  " + next_bar.num_beats + "/₄"
+			if next_bar.beats.num != cur_bar.beats.num
+				change += "  " + next_bar.beats.num + "/₄"
 			float cur_bpm = cur_bar.bpm(song.sample_rate)
 			float next_bpm = next_bar.bpm(song.sample_rate)
 			if abs(cur_bpm - next_bpm) > 2

@@ -23,9 +23,8 @@ ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, int _mode)
 {
 	index = _index;
 	length = b.length;
-	num_beats = b.num_beats;
-	num_sub_beats = b.num_sub_beats;
-	pattern = b.pattern;
+	divisor = b.divisor;
+	beats = b.beats;
 	mode = _mode;
 }
 
@@ -36,7 +35,7 @@ void ActionBarEdit::build(Data *d)
 
 	float scale_factor = (float)length / (float)r.length;
 
-	add_sub_action(new ActionBar__Edit(index, length, num_beats, num_sub_beats, pattern), d);
+	add_sub_action(new ActionBar__Edit(index, length, beats, divisor), d);
 	if (mode != Bar::EditMode::IGNORE){
 		bool scale_audio = (mode == Bar::EditMode::STRETCH_AND_SCALE_AUDIO);
 

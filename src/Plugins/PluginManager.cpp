@@ -118,8 +118,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Range", "length", _offsetof(Range, length));
 
 	Kaba::DeclareClassSize("Bar", sizeof(Bar));
-	Kaba::DeclareClassOffset("Bar", "num_beats", _offsetof(Bar, num_beats));
-	Kaba::DeclareClassOffset("Bar", "num_sub_beats", _offsetof(Bar, num_sub_beats));
+	Kaba::DeclareClassOffset("Bar", "beats", _offsetof(Bar, beats));
+	Kaba::DeclareClassOffset("Bar", "divisor", _offsetof(Bar, divisor));
 	Kaba::DeclareClassOffset("Bar", "length", _offsetof(Bar, length));
 	Kaba::DeclareClassOffset("Bar", "index", _offsetof(Bar, index));
 	Kaba::DeclareClassOffset("Bar", "index_text", _offsetof(Bar, index_text));
@@ -335,7 +335,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("EnvelopeADSR", "just_killed", _offsetof(EnvelopeADSR, just_killed));
 
 	Kaba::DeclareClassSize("BarPattern", sizeof(BarPattern));
-	Kaba::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
+	Kaba::DeclareClassOffset("BarPattern", "beats", _offsetof(BarPattern, beats));
+	Kaba::DeclareClassOffset("BarPattern", "divisor", _offsetof(BarPattern, divisor));
 	Kaba::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
 	//Kaba::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
 	//Kaba::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));

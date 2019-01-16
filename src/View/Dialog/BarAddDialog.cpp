@@ -21,21 +21,22 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 
 
 	set_int("count", 1);
-	int beats = 4;
-	int sub_beats = 1;
+	Array<int> beats = {1,1,1,1};
+	int divisor = 1;
 	float bpm = 90.0f;
 
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(Bar *b, song->bars, i)
 			if ((i <= index) and (!b->is_pause())){
-				beats = b->num_beats;
-				sub_beats = b->num_sub_beats;
-				bpm = song->sample_rate * 60.0f / (b->length / b->num_beats);
+				beats = b->beats;
+				divisor = b->divisor;
+				bpm = b->bpm(song->sample_rate);
 			}
 	}
-	set_int("beats", beats);
-	set_int("sub_beats", sub_beats);
+	set_int("beats", beats.num);
+	set_int("sub_beats", divisor);
+	set_string("pattern", "...");
 	set_float("bpm", bpm);
 	check("shift-data", true);
 
@@ -47,26 +48,21 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 void set_bar_pattern(BarPattern &b, const string &pat)
 {
 	auto xx = pat.replace(",", " ").replace(":", " ").explode(" ");
-	b.num_beats = xx.num;
-	b.pattern.resize(b.num_beats);
-	for (int i=0; i<b.num_beats; i++){
-		b.pattern[i] = b.num_sub_beats;
-		if (i < xx.num)
-			b.pattern[i] = xx[i]._int();
-	}
+	b.beats.clear();
+	for (string &x: xx)
+		b.beats.add(x._int());
 	b.update_total();
 }
 
 void BarAddDialog::on_ok()
 {
-	BarPattern b;
+	BarPattern b = BarPattern(0, get_int("beats"), get_int("sub_beats"));
 	int count = get_int("count");
-	b.num_beats = get_int("beats");
-	b.num_sub_beats = get_int("sub_beats");
 	float bpm = get_float("bpm");
 	bool move_data = is_checked("shift-data");
-	set_bar_pattern(b, get_string("pattern"));
-	b.length = (int)((float)b.num_beats * (float)song->sample_rate * 60.0f / bpm);
+	//set_bar_pattern(b, get_string("pattern"));
+	b.update_total();
+	b.length = (int)((float)b.total_sub_beats / b.divisor * (float)song->sample_rate * 60.0f / bpm);
 
 	song->begin_action_group();
 

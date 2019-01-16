@@ -21,11 +21,10 @@ class BarPattern
 {
 public:
 	BarPattern();
-	BarPattern(int length, int num_beats, int num_sub_beats);
+	BarPattern(int length, int num_beats, int divisor);
 	int length;
-	int num_beats;
-	int num_sub_beats;
-	Array<int> pattern;
+	int divisor;
+	Array<int> beats;
 	void set_pattern(const Array<int> &p);
 	int total_sub_beats;
 	bool is_uniform() const;
@@ -45,7 +44,7 @@ class Bar : public BarPattern
 public:
 	Bar(){}
 	Bar(const BarPattern &b);
-	Bar(int length, int num_beats, int num_sub_beats);
+	Bar(int length, int num_beats, int divisor);
 	bool is_pause();
 	float bpm(float sample_rate);
 

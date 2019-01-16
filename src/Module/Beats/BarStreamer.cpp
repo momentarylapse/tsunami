@@ -41,7 +41,7 @@ int BarStreamer::beats_per_bar()
 {
 	auto beats = bars.get_beats(Range(0, offset), false, false);
 	if (beats.num > 0)
-		return bars[beats.back().bar_index]->num_beats;
+		return bars[beats.back().bar_index]->beats.num;
 	return 4;
 }
 

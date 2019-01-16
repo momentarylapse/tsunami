@@ -141,18 +141,6 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 	p->set_line_width(1);
 }
 
-
-
-bool pat_eq(const Array<int> &a, const Array<int> &b)
-{
-	if (a.num != b.num)
-		return false;
-	for (int i=0; i<a.num; i++)
-		if (a[i] != b[i])
-			return false;
-	return true;
-}
-
 void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r)
 {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
@@ -160,8 +148,8 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 		float x = cam->sample2screen(b->offset);
 		double bpm = b->bpm(song->sample_rate);
 		string s;
-		if (!pat_eq(b->pattern, pdf_pattern)){
-			pdf_pattern = b->pattern;
+		if (b->beats != pdf_pattern){
+			pdf_pattern = b->beats;
 			s += b->format_beats(false) + "   ";
 		}
 		if (fabs(bpm - pdf_bpm) > 0.2){

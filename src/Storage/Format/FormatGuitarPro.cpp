@@ -462,7 +462,7 @@ void FormatGuitarPro::read_measure_header()
 void FormatGuitarPro::write_measure_header(Bar *b)
 {
 	f->write_byte(0x03);
-	f->write_byte(b->num_beats);
+	f->write_byte(b->beats.num);
 	f->write_byte(4);
 	if (version >= 500){
 		//if ((flags & 0x03) != 0)
@@ -648,7 +648,7 @@ Array<int> decompose_time(int length)
 Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 {
 	// samples per 16th / 3
-	float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
+	float spu = (float)b->range().length / (float)b->beats.num / (float)BEAT_PARTITION;
 
 	MidiNoteBufferRef notes = t->t->layers[0]->midi.get_notes(b->range());
 	Array<GuitarNote> gnotes;
@@ -661,7 +661,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 		gn.pitch.add(n->pitch);
 		if (gn.length == 0)
 			continue;
-		if (gn.offset < b->num_beats * BEAT_PARTITION)
+		if (gn.offset < b->beats.num * BEAT_PARTITION)
 			gnotes.add(gn);
 	}
 
@@ -726,7 +726,7 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar *b)
 		GuitarNote g;
 		g.length = BEAT_PARTITION;
 		while (true){
-			if (g.length * 2 > BEAT_PARTITION * b->num_beats)
+			if (g.length * 2 > BEAT_PARTITION * b->beats.num)
 				break;
 			g.length *= 2;
 		}

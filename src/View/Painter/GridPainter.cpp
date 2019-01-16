@@ -113,7 +113,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition)
 		int xx = cam->sample2screen(b->range().offset);
 
 		float dx_bar = cam->dsample2screen(b->range().length);
-		float dx_beat = dx_bar / b->num_beats;
+		float dx_beat = dx_bar / b->beats.num;
 		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b->index_text % 5) == 0)
 			f1 = 1;
@@ -165,7 +165,7 @@ void GridPainter::draw_bar_numbers(Painter *c)
 		int xx = cam->sample2screen(b->range().offset);
 
 		float dx_bar = cam->dsample2screen(b->range().length);
-		float dx_beat = dx_bar / b->num_beats;
+		float dx_beat = dx_bar / b->beats.num;
 		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b->index_text % 5) == 0)
 			f1 = 1;

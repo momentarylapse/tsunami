@@ -60,7 +60,6 @@ namespace hui{
 	extern string file_dialog_default;
 }
 
-
 hui::Timer debug_timer;
 
 TsunamiWindow::TsunamiWindow(Session *_session) :

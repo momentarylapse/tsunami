@@ -41,7 +41,6 @@
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
 
-string i2s_small(int i); // -> MidiData.cpp
 color col_inter(const color a, const color &b, float t); // -> ColorScheme.cpp
 
 const int AudioView::FONT_SIZE = 10;
@@ -500,7 +499,7 @@ void AudioView::snap_to_grid(int &pos)
 
 	int sub_beats = 1;
 	if (mode == mode_midi)
-		sub_beats = mode_midi->beat_partition;
+		sub_beats = mode_midi->sub_beat_partition;
 
 	// time bar...
 	Array<Beat> beats = song->bars.get_beats(cam.range(), true, true, sub_beats);
@@ -555,7 +554,7 @@ void AudioView::on_left_button_down()
 
 void align_to_beats(Song *s, Range &r, int beat_partition)
 {
-	Array<Beat> beats = s->bars.get_beats(Range::ALL);//audio->getRange());
+	Array<Beat> beats = s->bars.get_beats(Range::ALL, true, beat_partition);//audio->getRange());
 	for (Beat &b : beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);
@@ -563,12 +562,10 @@ void align_to_beats(Song *s, Range &r, int beat_partition)
 				r = r or sr;
 		}*/
 		if (b.range.is_inside(r.start())){
-			int dl = b.range.length / beat_partition;
-			r.set_start(b.range.offset + dl * ((r.start() - b.range.offset) / dl));
+			r.set_start(b.range.start());
 		}
 		if (b.range.is_inside(r.end())){
-			int dl = b.range.length / beat_partition;
-			r.set_end(b.range.offset + dl * ((r.end() - b.range.offset) / dl + 1));
+			r.set_end(b.range.end());
 			break;
 		}
 	}

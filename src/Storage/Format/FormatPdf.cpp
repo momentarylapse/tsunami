@@ -113,8 +113,6 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	return y0 + string_dy * n;
 }
 
-bool pat_eq(const Array<int> &a, const Array<int> &b);
-
 TrackMarker* get_bar_part(Song *s, int offset)
 {
 	auto *t = s->time_track();
@@ -144,6 +142,17 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 }
 
 
+
+bool pat_eq(const Array<int> &a, const Array<int> &b)
+{
+	if (a.num != b.num)
+		return false;
+	for (int i=0; i<a.num; i++)
+		if (a[i] != b[i])
+			return false;
+	return true;
+}
+
 void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r)
 {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
@@ -153,10 +162,7 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 		string s;
 		if (!pat_eq(b->pattern, pdf_pattern)){
 			pdf_pattern = b->pattern;
-			if (b->is_uniform())
-				s += format("%d/4 ", b->num_beats);
-			else
-				s += "(" + b->pat_str().replace(" ", ",") + ")/4 ";
+			s += b->format_beats(false);
 		}
 		if (fabs(bpm - pdf_bpm) > 0.2){
 			pdf_bpm = bpm;

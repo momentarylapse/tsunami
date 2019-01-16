@@ -39,6 +39,12 @@ public:
 	public:
 		Failure(const string &s) : Exception(s){}
 	};
+	/*template<class T>
+	static void assert_equal(const T &a, const T&b, const string &text)
+	{
+		if (a != b)
+			throw Failure(text);
+	}*/
 
 	static void run_all(const string &filter);
 

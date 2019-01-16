@@ -46,9 +46,9 @@ MidiPainter* midi_context(ViewModeMidi *vm)
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
-	beat_partition = 4;
+	sub_beat_partition = 4;
 	note_length = 1;
-	win->set_int("beat_partition", beat_partition);
+	win->set_int("beat_partition", sub_beat_partition);
 	win->set_int("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
 	creation_mode = CreationMode::NOTE;
@@ -262,7 +262,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 
 void ViewModeMidi::edit_backspace()
 {
-	int a = song->bars.get_prev_sub_beat(view->sel.range.offset-1, beat_partition);
+	int a = song->bars.get_prev_sub_beat(view->sel.range.offset-1, sub_beat_partition);
 	Range r = Range(a, view->sel.range.offset-a);
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
 	view->song->delete_selection(s);
@@ -297,11 +297,11 @@ void ViewModeMidi::set_rep_key(int k)
 
 void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
 {
-	if ((m->beat_partition % p) == 0){
-		m->set_note_length(m->beat_partition / p * n);
+	if ((m->sub_beat_partition % p) == 0){
+		m->set_note_length(m->sub_beat_partition / p * n);
 	}else{
 		m->set_note_length(l * n);
-		m->set_beat_partition(p);
+		m->set_sub_beat_partition(p);
 	}
 	/*string t = text;
 	if (n > 1)
@@ -389,7 +389,7 @@ void ViewModeMidi::on_key_down(int k)
 			int number = (k - hui::KEY_0);
 			if (k >= hui::KEY_A)
 				number = 10 + (k - hui::KEY_A);
-			set_beat_partition(number);
+			set_sub_beat_partition(number);
 			set_input_mode(InputMode::DEFAULT);
 		}
 	}
@@ -507,11 +507,11 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(Selection *sel, int pos0)
 {
 	int start = min(pos0, sel->pos);
 	int end = max(pos0, sel->pos);
-	Range r = Range(start, end - start);
+	Range r = RangeTo(start, end);
 
 	// align to beats
 	if (song->bars.num > 0)
-		align_to_beats(song, r, beat_partition);
+		align_to_beats(song, r, sub_beat_partition);
 
 	Array<int> pitch = get_creation_pitch(sel->pitch);
 
@@ -531,9 +531,9 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(Selection *sel, int pos0)
 	return notes;
 }
 
-void ViewModeMidi::set_beat_partition(int partition)
+void ViewModeMidi::set_sub_beat_partition(int partition)
 {
-	beat_partition = partition;
+	sub_beat_partition = partition;
 	view->force_redraw();
 	notify();
 }
@@ -551,7 +551,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 		l->draw_blank_background(c);
 
 		view->grid_painter->set_context(l->area, l->grid_colors());
-		view->grid_painter->draw_whatever(c, beat_partition);
+		view->grid_painter->draw_whatever(c, sub_beat_partition);
 
 		if (l->layer->type == SignalType::MIDI){
 			auto *mp = midi_context(this);
@@ -791,12 +791,12 @@ void ViewModeMidi::draw_post(Painter *c)
 
 Range ViewModeMidi::get_midi_edit_range()
 {
-	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, beat_partition);
-	int b = song->bars.get_next_sub_beat(view->sel.range.end()-1, beat_partition);
+	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, sub_beat_partition);
+	int b = song->bars.get_next_sub_beat(view->sel.range.end()-1, sub_beat_partition);
 	if (a == b)
-		b = song->bars.get_next_sub_beat(b, beat_partition);
+		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
 	for (int i=1; i<note_length; i++)
-		b = song->bars.get_next_sub_beat(b, beat_partition);
+		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
 	return RangeTo(a, b);
 }
 

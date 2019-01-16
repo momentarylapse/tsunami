@@ -164,6 +164,20 @@ class Array : public DynamicArray
 			return s;
 		}
 
+		bool operator == (const Array<T> &o) const
+		{
+			if (num != o.num)
+				return false;
+			for (int i=0; i<num; i++)
+				if ((*this)[i] != o[i])
+					return false;
+			return true;
+		}
+		bool operator != (const Array<T> &o) const
+		{
+			return !(*this == o);
+		}
+
 		// copy assignment
 		void operator = (const Array<T> &a)
 		{

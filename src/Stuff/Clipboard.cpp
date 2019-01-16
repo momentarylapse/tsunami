@@ -93,7 +93,7 @@ void Clipboard::copy(AudioView *view)
 		if (view->sel.has(b)){
 			if (temp->bars.num == 0 and b->offset > offset)
 				temp->bars.add(new Bar(b->offset - offset, 0, 0));
-			temp->bars.add(new Bar(b->length, b->num_beats, b->num_sub_beats));
+			temp->bars.add(new Bar(*b));
 		}
 
 	for (Track *t: s->tracks)

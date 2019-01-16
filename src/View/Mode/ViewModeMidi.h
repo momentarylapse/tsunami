@@ -46,7 +46,7 @@ public:
 	void start_selection() override;
 
 	MidiNoteBuffer get_creation_notes(Selection *sel, int pos0);
-	void set_beat_partition(int partition);
+	void set_sub_beat_partition(int partition);
 	void set_note_length(int length);
 
 	Array<int> get_creation_pitch(int base_pitch);
@@ -60,7 +60,7 @@ public:
 	void jump_string(int delta);
 	void jump_octave(int delta);
 
-	int beat_partition;
+	int sub_beat_partition;
 	int note_length;
 	ChordType chord_type;
 	int chord_inversion;

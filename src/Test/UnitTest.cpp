@@ -24,8 +24,12 @@ void UnitTest::run()
 	msg_write("<<<<<<<<<<<<<<<<<<<<  " + name + "  >>>>>>>>>>>>>>>>>>>>");
 	for (auto &t: tests()){
 		msg_write("== " + t.name + " ==");
-		t.f();
-		msg_write("  ok");
+		try{
+			t.f();
+			msg_write("  ok");
+		}catch(Failure &e){
+			msg_error(e.message());
+		}
 	}
 }
 
@@ -39,6 +43,7 @@ void UnitTest::sleep(float t)
 }
 
 #include "TestAudioBuffer.h"
+#include "TestRhythm.h"
 #include "TestStreams.h"
 #include "TestThreads.h"
 #include "TestMidiPreview.h"
@@ -48,6 +53,7 @@ void UnitTest::run_all(const string &filter)
 {
 	Array<UnitTest*> tests;
 	tests.add(new TestAudioBuffer);
+	tests.add(new TestRhythm);
 	tests.add(new TestThreads);
 	tests.add(new TestStreams);
 	tests.add(new TestMidiPreview);

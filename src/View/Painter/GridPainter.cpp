@@ -12,6 +12,7 @@
 #include "../ViewPort.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Rhythm/Beat.h"
 
 
 color col_inter(const color a, const color &b, float t);
@@ -96,8 +97,6 @@ void GridPainter::draw_bars(Painter *c, int beat_partition)
 {
 	if (song->bars.num == 0)
 		return;
-	int prev_num_beats = 0;
-	float prev_bpm = 0;
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
 	//c->SetLineWidth(2.0f);
@@ -107,7 +106,6 @@ void GridPainter::draw_bars(Painter *c, int beat_partition)
 	//color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
 	//color c2 = colors.grid;
 
-	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	Array<Bar*> bars = song->bars.get_bars(RangeTo(s0, s1));
 	for (Bar *b: bars){
 		if (b->is_pause())
@@ -126,55 +124,36 @@ void GridPainter::draw_bars(Painter *c, int beat_partition)
 				c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
 			else
 				c->set_color(col_inter(colors.bg, colors.fg, f1));
-//			c->setLineDash(no_dash, area.y1);
 			c->draw_line(xx, area.y1, xx, area.y2);
 		}
 
 		if (f2 >= 0.1f){
 			color c1 = col_inter(colors.bg, colors.fg, f2*0.5f);
 			color c1s = col_inter(colors.bg_sel, colors.fg_sel, f2*0.5f);
-			float sub_beat_length = (float)b->range().length / (float)b->total_sub_beats;
-//			c->setLineDash(dash, area.y1);
-			float beat_offset = b->range().offset;
-			for (int i=0; i<b->num_beats; i++){
-				int beat_length = sub_beat_length * b->pattern[i];
-				color c2 = col_inter(colors.bg, c1, 0.6f);
-				color c2s = col_inter(colors.bg_sel, c1s, 0.6f);
-				//c->setColor(c2);
-				for (int j=1; j<beat_partition; j++){
-					double sample = beat_offset + beat_length * j / beat_partition;
-					int x = cam->sample2screen(sample);
-					c->set_color(view->sel.range.is_inside(sample) ? c2s : c2);
-					c->draw_line(x, area.y1, x, area.y2);
-				}
-				if (i != 0){
-					c->set_color(view->sel.range.is_inside(beat_offset) ? c1s : c1);
-					int x = cam->sample2screen(beat_offset);
-					c->draw_line(x, area.y1, x, area.y2);
-				}
-				beat_offset += beat_length;
+			color c2 = col_inter(colors.bg, c1, 0.6f);
+			color c2s = col_inter(colors.bg_sel, c1s, 0.6f);
+
+			auto beats = b->get_beats(b->offset, beat_partition > 0, beat_partition);
+			for (Beat &bb: beats){
+				if (bb.level == 0)
+					continue;
+				int x = cam->sample2screen(bb.range.offset);
+				if (bb.level > 1)
+					c->set_color(view->sel.range.is_inside(bb.range.offset) ? c2s : c2);
+				else
+					c->set_color(view->sel.range.is_inside(bb.range.offset) ? c1s : c1);
+				c->draw_line(x, area.y1, x, area.y2);
 			}
 		}
 	}
-}
-
-bool pat_eq(const Array<int> &a, const Array<int> &b)
-{
-	if (a.num != b.num)
-		return false;
-	for (int i=0; i<a.num; i++)
-		if (a[i] != b[i])
-			return false;
-	return true;
 }
 
 void GridPainter::draw_bar_numbers(Painter *c)
 {
 	if (song->bars.num == 0)
 		return;
-	int prev_num_beats = 0;
+	BarPattern prev;
 	float prev_bpm = 0;
-	Array<int> prev_pattern;
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
 	Array<Bar*> bars = song->bars.get_bars(RangeTo(s0, s1));
@@ -196,20 +175,15 @@ void GridPainter::draw_bar_numbers(Painter *c)
 		}
 		float bpm = b->bpm(song->sample_rate);
 		string s;
-		if (prev_num_beats != b->num_beats or !pat_eq(prev_pattern, b->pattern)){
-			if (b->is_uniform())
-				s = i2s(b->num_beats) + "/" + i2s_small(4);
-			else
-				s = b->pat_str();
-		}
+		if (prev != *b)
+			s = b->format_beats();
 		if (fabs(prev_bpm - bpm) > 0.5f)
 			s += format(" \u2669=%.0f", bpm);
 		if (s.num > 0){
 			c->set_color(AudioView::colors.text_soft1);
 			c->draw_str(max(xx + 4, 20), area.y2 - 16, s);
 		}
-		prev_num_beats = b->num_beats;
-		prev_pattern = b->pattern;
+		prev = *b;
 		prev_bpm = bpm;
 	}
 	c->set_font("", AudioView::FONT_SIZE, false, false);

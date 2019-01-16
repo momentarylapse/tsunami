@@ -15,6 +15,7 @@
 #endif
 
 class BarCollection;
+class Beat;
 
 class BarPattern
 {
@@ -25,10 +26,13 @@ public:
 	int num_beats;
 	int num_sub_beats;
 	Array<int> pattern;
+	void set_pattern(const Array<int> &p);
 	int total_sub_beats;
 	bool is_uniform() const;
 	void update_total();
 	string pat_str() const;
+	bool operator==(const BarPattern &o) const;
+	bool operator!=(const BarPattern &o) const;
 
 	enum Type{
 		BAR,
@@ -44,6 +48,11 @@ public:
 	Bar(int length, int num_beats, int num_sub_beats);
 	bool is_pause();
 	float bpm(float sample_rate);
+
+	string format_beats(bool fancy=true) const;
+	string format_bpm(float sample_rate) const;
+
+	Array<Beat> get_beats(int offset, bool include_sub_beats = false, int sub_beat_partition = 1) const;
 
 
 	// filled by BarCollection.getBars()

@@ -118,7 +118,7 @@ void MidiEditorConsole::update()
 
 	set_int("midi_edit_mode", (int)view->mode_midi->creation_mode);
 
-	set_int("beat_partition", view->mode_midi->beat_partition);
+	set_int("beat_partition", view->mode_midi->sub_beat_partition);
 	set_int("note_length", view->mode_midi->note_length);
 
 
@@ -166,7 +166,7 @@ void MidiEditorConsole::on_scale()
 
 void MidiEditorConsole::on_beat_partition()
 {
-	view->mode_midi->set_beat_partition(get_int(""));
+	view->mode_midi->set_sub_beat_partition(get_int(""));
 }
 
 void MidiEditorConsole::on_note_length()
@@ -300,7 +300,7 @@ int align_to_beats(int pos, Array<Beat> &beats)
 
 void MidiEditorConsole::on_quantize()
 {
-	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->beat_partition);
+	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->sub_beat_partition);
 
 	song->action_manager->group_begin();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);

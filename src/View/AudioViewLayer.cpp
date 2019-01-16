@@ -171,8 +171,6 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover)
 {
 	string text = marker->text;
-	if (text.match(":pos *:"))
-		text = "🖐 " + text.substr(5, -2);
 	if (marker->fx.num > 0)
 		text += format(" (%d fx)", marker->fx.num);
 

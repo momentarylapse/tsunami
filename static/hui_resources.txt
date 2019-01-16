@@ -244,9 +244,9 @@ Grid
 
 1
 0
-10
-CheckBox
-edit_number
+9
+Label
+t_number
 
 0
 0
@@ -257,53 +257,59 @@ range=1:1000:1,expandx
 1
 0
 0
-CheckBox
-edit_beats
+Label
+t_beats
 
 0
 1
 0
+Grid
+?
+
+1
+1
+2
 SpinButton
 beats
-range=1:1000:1
-1
-1
+range=1:1000:1,expandx
 0
-CheckBox
-edit_pattern
-
 0
-2
 0
 Edit
 pattern
-
+expandx,hidden
 1
-2
 0
-CheckBox
-edit_sub_beats
+0
+ToggleButton
+complex
+image=hui:find
+2
+1
+0
+Label
+t_sub_beats
 
 0
-3
+2
 0
 SpinButton
 sub_beats
 range=1:24:1
 1
-3
+2
 0
 Label
 t_result_bpm
 
 0
-4
+3
 0
-SpinButton
+Label
 result_bpm
-range=0:1000:0.1,expandx,disabled
+disabled
 1
-4
+3
 0
 Grid
 ?
@@ -4716,7 +4722,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-471
+470
 // Text
 /cancel
 Cancel
@@ -4862,26 +4868,14 @@ bar_edit_dialog/beats
 bar_edit_dialog/bpm
 0
 
-bar_edit_dialog/edit_beats
-Beats
+bar_edit_dialog/complex
 
-bar_edit_dialog/edit_number
-Number
-
-bar_edit_dialog/edit_pattern
-Pattern
-
-bar_edit_dialog/edit_sub_beats
-Sub beats
-
+complex beat pattern
 bar_edit_dialog/mode
 Speed\\Replace
 
 bar_edit_dialog/number
 1
-
-bar_edit_dialog/result_bpm
-0
 
 bar_edit_dialog/scale-audio
 Scale audio
@@ -4892,14 +4886,23 @@ Move data accordingly
 bar_edit_dialog/sub_beats
 1
 
+bar_edit_dialog/t_beats
+Beats
+
 bar_edit_dialog/t_bpm
 Bpm
 
 bar_edit_dialog/t_info
 Keeping the overall duration
 
+bar_edit_dialog/t_number
+Number
+
 bar_edit_dialog/t_result_bpm
 => Bpm
+
+bar_edit_dialog/t_sub_beats
+Sub beats
 
 configurable-selection-dialog/configurable-selection-dialog
 Auswahl
@@ -6137,7 +6140,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-600
+604
 // Text
 /bpm
 Bpm
@@ -6307,6 +6310,9 @@ bar_edit_dialog/beats
 bar_edit_dialog/bpm
 0
 
+bar_edit_dialog/complex
+
+komplexes Schlagmuster
 bar_edit_dialog/edit_beats
 Schläge
 
@@ -6340,14 +6346,23 @@ Daten entsprechend verschieben
 bar_edit_dialog/sub_beats
 1
 
+bar_edit_dialog/t_beats
+Schläge
+
 bar_edit_dialog/t_bpm
 Bpm
 
 bar_edit_dialog/t_info
 Die Gesamtdauer konstant lassen
 
+bar_edit_dialog/t_number
+Anzahl
+
 bar_edit_dialog/t_result_bpm
 => Bpm
+
+bar_edit_dialog/t_sub_beats
+Teilschläge
 
 bars_dialog/add_bar
 Takt

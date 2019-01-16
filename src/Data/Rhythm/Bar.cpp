@@ -97,7 +97,7 @@ string Bar::format_beats(bool fancy) const
 	if (is_uniform())
 		return i2s(total_sub_beats) + "/" + div;
 	else
-		return pat_str() + "/" + div;
+		return "(" + pat_str() + ")/" + div;
 }
 
 Array<Beat> Bar::get_beats(int offset, bool include_sub_beats, int sub_beat_partition) const

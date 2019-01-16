@@ -22,12 +22,12 @@
 
 
 // rhythm quantization
-static const int BEAT_PARTITION = 12;
-static const int QUARTER = BEAT_PARTITION;
-static const int EIGHTH = BEAT_PARTITION / 2;
-static const int SIXTEENTH = BEAT_PARTITION / 4;
-static const int TRIPLET_EIGHTH = BEAT_PARTITION / 3;
-static const int TRIPLET_SIXTEENTH = BEAT_PARTITION / 6;
+static const int QUARTER_PARTITION = 12;
+static const int QUARTER = QUARTER_PARTITION;
+static const int EIGHTH = QUARTER_PARTITION / 2;
+static const int SIXTEENTH = QUARTER_PARTITION / 4;
+static const int TRIPLET_EIGHTH = QUARTER_PARTITION / 3;
+static const int TRIPLET_SIXTEENTH = QUARTER_PARTITION / 6;
 
 const float NOTE_NECK_LENGTH = 30.0f;
 const float NOTE_BAR_DISTANCE = 10.0f;
@@ -197,11 +197,11 @@ int MidiPainter::y2clef_linear(float y, NoteModifier &mod)
 struct NoteData
 {
 	NoteData(){}
-	NoteData(MidiNote *note, const Range &r, float spu, int beat_offset)
+	NoteData(MidiNote *note, const Range &r, float spu)
 	{
 		n = note;
-		offset = int((float)(r.offset - beat_offset) / spu + 0.5f) + beat_offset * BEAT_PARTITION;
-		end = int((float)(r.end() - beat_offset) / spu + 0.5f) + beat_offset * BEAT_PARTITION;
+		offset = int((float)r.offset / spu + 0.5f);
+		end = int((float)r.end() / spu + 0.5f);
 		length = end - offset;
 		base_length = length;
 		x = y = 0;
@@ -294,7 +294,7 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 }
 
 
-bool find_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group)
+bool find_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group, int beat_length)
 {
 	group = d;
 	for (int j=i+1; j<ndata.num; j++){
@@ -307,13 +307,14 @@ bool find_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &gro
 		if ((ndata[j].length != 4) and (ndata[j].length != 2) and (ndata[j].length != 9) and (ndata[j].length != 6) and (ndata[j].length != 3))
 			break;
 		// beat finished?
-		if (ndata[j].end > d.offset + BEAT_PARTITION)
+		if (ndata[j].end > d.offset + beat_length)
 			break;
 		group.add(ndata[j]);
 	}
-	return (group.back().end - d.offset) == BEAT_PARTITION;
+	return (group.back().end - d.offset) == beat_length;
 }
 
+// currently only for 4x 8th notes
 bool find_long_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group)
 {
 	if (ndata.num < i + 4)
@@ -330,6 +331,43 @@ bool find_long_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData>
 	}
 	return true;
 }
+
+struct QuantizedBar
+{
+	Array<int> beat_offset;
+	Array<int> beat_length;
+	QuantizedBar(Bar *b)
+	{
+		int off = 0;
+		for (int i=0; i<b->num_beats; i++){
+			int d = b->pattern[i] * QUARTER_PARTITION / b->num_sub_beats;
+			beat_length.add(d);
+			beat_offset.add(off);
+			off += d;
+		}
+	}
+	int get_beat(int offset)
+	{
+		int _bo = 0;
+		for (int i=0; i<beat_offset.num; i++){
+			if (offset < beat_offset[i] + beat_length[i]){
+				return i;
+			}
+		}
+		return -1;
+	}
+	int get_rel(int offset, int beat)
+	{
+		if (beat < 0)
+			return -1;
+		return offset - beat_offset[beat];
+	}
+	bool start_of_beat(int offset, int beat)
+	{
+		return get_rel(offset, beat) == 0;
+	}
+};
+
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func)
 {
@@ -348,15 +386,8 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 		// samples per 16th / 3
 		float sub_beat_length = (float)b->range().length / (float)b->total_sub_beats;
-		Array<float> spu;
-		Array<int> beat_offset;
-		int _off = 0;
-		for (int bb: b->pattern){
-			int beat_length = sub_beat_length * bb;
-			spu.add((float)beat_length / (float)BEAT_PARTITION);
-			beat_offset.add(_off);
-			_off += beat_length;
-		}
+		float quarter_length = sub_beat_length * b->num_sub_beats;
+		float spu = quarter_length / (float)QUARTER_PARTITION;
 //		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
 		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
@@ -367,11 +398,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 			Range r = n->range - b->offset;
 			if (r.offset < 0)
 				continue;
-			int first_index = 0;
-			for (int i=0; i<spu.num; i++)
-				if (r.offset > beat_offset[i] - 50)
-					first_index = i;
-			NoteData d = NoteData(n, r, spu[first_index], beat_offset[first_index]);
+			NoteData d = NoteData(n, r, spu);
 			if (d.length == 0 or d.offset < 0)
 				continue;
 
@@ -395,21 +422,27 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 			ndata.add(d);
 		}
 
+		QuantizedBar qbar(b);
+		bool bar_allows_long_groups = b->is_uniform() and (b->pattern[0] == b->num_sub_beats) and (b->num_beats % 2 == 0);
+
 		//int offset = 0;
 		for (int i=0; i<ndata.num; i++){
 			NoteData &d = ndata[i];
 
 			// group start?
-			if ((d.offset % BEAT_PARTITION) == 0){ // only on start of beat
+			int beat_index = qbar.get_beat(d.offset);
+			if (qbar.start_of_beat(d.offset, beat_index)){
 				if ((d.length == 9 or d.length == 6 or d.length == 3 or d.length == 4 or d.length == 2)){
 
 					Array<NoteData> group;
 					bool ok = false;
-					bool allow_long_group = ((d.offset % (BEAT_PARTITION*2)) == 0) and (d.length == EIGHTH);
+					bool allow_long_group = false;
+					if (bar_allows_long_groups)
+						allow_long_group = ((d.offset % (QUARTER_PARTITION*2)) == 0) and (d.length == EIGHTH);
 					if (allow_long_group)
 						ok = find_long_group(ndata, d, i, group);
 					if (!ok)
-						ok = find_group(ndata, d, i, group);
+						ok = find_group(ndata, d, i, group, qbar.beat_length[beat_index]);
 
 					// draw
 					if (ok){

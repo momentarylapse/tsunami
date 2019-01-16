@@ -11,20 +11,20 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 			Grid ? "" vertical
 				Label t_info "Keeping the overall duration"
 				Grid ? ""
-					CheckBox edit_number "Number"
+					Label t_number "Number"
 					SpinButton number "1" range=1:1000:1 expandx
 					---|
-					CheckBox edit_beats "Beats"
-					SpinButton beats "1" range=1:1000:1
+					Label t_beats "Beats"
+					Grid ? ""
+						SpinButton beats "1" range=1:1000:1 expandx
+						Edit pattern "" expandx hidden
+					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:find
 					---|
-					CheckBox edit_pattern "Pattern"
-					Edit pattern ""
-					---|
-					CheckBox edit_sub_beats "Sub beats"
+					Label t_sub_beats "Sub beats"
 					SpinButton sub_beats "1" range=1:24:1
 					---|
 					Label t_result_bpm "=> Bpm"
-					SpinButton result_bpm "0" range=0:1000:0.1 expandx disabled
+					Label result_bpm "" disabled
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			DefButton /ok "OK" image=hui:ok

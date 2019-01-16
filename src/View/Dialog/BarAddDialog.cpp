@@ -46,8 +46,9 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 
 void set_bar_pattern(BarPattern &b, const string &pat)
 {
-	b.pattern.resize(b.num_beats);
 	auto xx = pat.replace(",", " ").replace(":", " ").explode(" ");
+	b.num_beats = xx.num;
+	b.pattern.resize(b.num_beats);
 	for (int i=0; i<b.num_beats; i++){
 		b.pattern[i] = b.num_sub_beats;
 		if (i < xx.num)

@@ -789,6 +789,7 @@ void ViewModeMidi::draw_post(Painter *c)
 
 }
 
+// seems fine
 Range ViewModeMidi::get_midi_edit_range()
 {
 	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, sub_beat_partition);

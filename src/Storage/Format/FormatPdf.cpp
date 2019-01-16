@@ -162,7 +162,7 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 		string s;
 		if (!pat_eq(b->pattern, pdf_pattern)){
 			pdf_pattern = b->pattern;
-			s += b->format_beats(false);
+			s += b->format_beats(false) + "   ";
 		}
 		if (fabs(bpm - pdf_bpm) > 0.2){
 			pdf_bpm = bpm;
@@ -174,7 +174,10 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
 			p->set_font_size(15);
-			p->draw_str(x + 20, y-5, s);
+			float dx = 20;
+			if (b == bars[0])
+				dx += 30;
+			p->draw_str(x + dx, y-5, s);
 		}
 
 		// part?
@@ -243,11 +246,20 @@ int FormatPdf::good_samples(const Range &r0)
 {
 	auto bars = song->bars.get_bars(Range(r0.offset, r0.length * 2));
 	int best_pos = -1;
+	float best_penalty = 100000;
 	for (auto b: bars){
 		if (b->range().offset <= r0.offset)
 			continue;
-		if (abs(b->range().offset - r0.end()) < abs(best_pos - r0.end())){
+		// close to rough guess?
+		float penalty = abs(b->range().offset - r0.end());
+
+		// part start/end?
+		if (get_bar_part(song, b->range().offset))
+			penalty -= song->sample_rate * 8;
+
+		if (penalty < best_penalty){
 			best_pos = b->range().offset;
+			best_penalty = penalty;
 		}
 	}
 

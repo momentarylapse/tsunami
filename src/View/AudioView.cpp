@@ -552,10 +552,11 @@ void AudioView::on_left_button_down()
 	update_menu();
 }
 
+// extend to beats
 void align_to_beats(Song *s, Range &r, int beat_partition)
 {
-	Array<Beat> beats = s->bars.get_beats(Range::ALL, true, beat_partition);//audio->getRange());
-	for (Beat &b : beats){
+	Array<Beat> beats = s->bars.get_beats(Range::ALL, true, beat_partition > 0, beat_partition);//audio->getRange());
+	for (Beat &b: beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);
 			if (sr.overlaps(sr))

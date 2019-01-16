@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-601
+605
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1805,6 +1805,18 @@ Muster
 
 bar_edit_dialog/edit_pattern
 Muster
+
+bar_edit_dialog/complex
+
+komplexes Schlagmuster
+bar_edit_dialog/t_beats
+Schläge
+
+bar_edit_dialog/t_number
+Anzahl
+
+bar_edit_dialog/t_sub_beats
+Teilschläge
 
 // Num Language Strings
 216

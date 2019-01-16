@@ -24,10 +24,15 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	}
 
 	Bar *b = song->bars[sel[0]];
+	new_bar = new BarPattern(*b);
+
 	set_int("number", sel.num);
-	set_int("beats", b->num_beats);
-	set_int("sub_beats", b->num_sub_beats);
-	set_string("pattern", b->pat_str());
+	set_int("beats", new_bar->num_beats);
+	set_int("sub_beats", new_bar->num_sub_beats);
+	set_string("pattern", new_bar->pat_str());
+	check("complex", !new_bar->is_uniform());
+	hide_control("beats", !new_bar->is_uniform());
+	hide_control("pattern", new_bar->is_uniform());
 	set_float("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
 	check("shift-data", true);
 	check("scale-audio", false);
@@ -39,8 +44,10 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	event("hui:close", std::bind(&BarEditDialog::on_close, this));
 	event("beats", std::bind(&BarEditDialog::on_beats, this));
 	event("sub_beats", std::bind(&BarEditDialog::on_sub_beats, this));
+	event("pattern", std::bind(&BarEditDialog::on_pattern, this));
 	event("bpm", std::bind(&BarEditDialog::on_bpm, this));
 	event("number", std::bind(&BarEditDialog::on_number, this));
+	event("complex", std::bind(&BarEditDialog::on_complex, this));
 	event("mode", std::bind(&BarEditDialog::on_mode, this));
 	event("shift-data", std::bind(&BarEditDialog::on_shift_data, this));
 }
@@ -69,32 +76,24 @@ void BarEditDialog::on_ok()
 
 	}else{
 		int number = get_int("number");
-		int beats = get_int("beats");
-		int sub_beats = get_int("sub_beats");
-		bool edit_number = is_checked("edit_number");
-		bool edit_beats = is_checked("edit_beats");
-		bool edit_sub_beats = is_checked("edit_sub_beats");
 
-		if (edit_number){
+		//if (number != sel.num){
 			foreachb(int i, sel)
 				song->delete_bar(i, false);
-			int length = duration / number;
-			BarPattern b = BarPattern(length, beats, sub_beats);
-			set_bar_pattern(b, get_string("pattern"));
+			new_bar->length = duration / number;
 			for (int i=0; i<number; i++)
-				song->add_bar(sel[0], b, Bar::EditMode::IGNORE);
-		}else{
+				song->add_bar(sel[0], *new_bar, Bar::EditMode::IGNORE);
+		/*}else{
 			foreachb(int i, sel){
 				BarPattern b = *song->bars[i];
-				if (edit_beats)
-					b.num_beats = beats;
-				set_bar_pattern(b, get_string("pattern"));
-				if (edit_sub_beats)
-					b.num_sub_beats = sub_beats;
+				b.num_beats = new_bar->num_beats;
+				b.num_sub_beats = new_bar->num_sub_beats;
+				//set_bar_pattern(b, get_string("pattern"));
+				b.set_pattern(new_bar->pattern);
 				b.length = duration / number;
 				song->edit_bar(i, b, Bar::EditMode::IGNORE);
 			}
-		}
+		}*/
 	}
 	song->end_action_group();
 
@@ -108,13 +107,31 @@ void BarEditDialog::on_close()
 
 void BarEditDialog::on_beats()
 {
-	check("edit_beats", true);
+	*new_bar = BarPattern(0, get_int(""), new_bar->num_sub_beats);
+	set_string("pattern", new_bar->pat_str());
 	update_result_bpm();
 }
 
 void BarEditDialog::on_sub_beats()
 {
-	check("edit_sub_beats", true);
+	new_bar->num_sub_beats = get_int("");
+	new_bar->update_total();
+
+	if (is_checked("complex")){
+		//*new_bar = BarPattern(0, )
+	}
+}
+
+void BarEditDialog::on_pattern()
+{
+	set_bar_pattern(*new_bar, get_string("pattern"));
+}
+
+void BarEditDialog::on_complex()
+{
+	bool complex = is_checked("complex");
+	hide_control("beats", complex);
+	hide_control("pattern", !complex);
 }
 
 void BarEditDialog::on_bpm()
@@ -129,7 +146,6 @@ void BarEditDialog::on_mode()
 
 void BarEditDialog::on_number()
 {
-	check("edit_number", true);
 	update_result_bpm();
 }
 
@@ -137,7 +153,7 @@ void BarEditDialog::update_result_bpm()
 {
 	float t = (float)duration / (float)song->sample_rate;
 	int number = get_int("number");
-	int beats = get_int("beats");
+	int beats = new_bar->num_beats;
 	set_float("result_bpm", 60.0f * (float)(number * beats) / t);
 }
 

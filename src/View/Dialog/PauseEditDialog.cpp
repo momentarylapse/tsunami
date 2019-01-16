@@ -32,7 +32,7 @@ void PauseEditDialog::on_ok()
 	float duration = get_float("duration");
 	BarPattern b = *song->bars[index];
 	b.length = (float)song->sample_rate * duration;
-	song->edit_bar(index, b.length, b.num_beats, b.num_sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	song->edit_bar(index, b, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 
 	destroy();
 }

@@ -38,7 +38,7 @@ Grid
 
 0
 0
-8
+10
 Text
 bad_t_count
 
@@ -59,33 +59,45 @@ bad_t_beats
 0
 SpinButton
 beats
-range=1:1000:1,expandx
+range=1:1000:1
 1
 1
+0
+Text
+t_pattern
+
+0
+2
+0
+Edit
+pattern
+
+1
+2
 0
 Text
 t_sub_beats
 
 0
-2
+3
 0
 SpinButton
 sub_beats
-range=1:24:1,expandx
+range=1:24:1
 1
-2
+3
 0
 Text
 bad_t_bpm
 
 0
-3
+4
 0
 SpinButton
 bpm
-range=0:1000:0.1,expandx
+range=0:1000:0.1
 1
-3
+4
 0
 CheckBox
 shift-data
@@ -232,7 +244,7 @@ Grid
 
 1
 0
-8
+10
 CheckBox
 edit_number
 
@@ -253,33 +265,45 @@ edit_beats
 0
 SpinButton
 beats
-range=1:1000:1,expandx
+range=1:1000:1
 1
 1
+0
+CheckBox
+edit_pattern
+
+0
+2
+0
+Edit
+pattern
+
+1
+2
 0
 CheckBox
 edit_sub_beats
 
 0
-2
+3
 0
 SpinButton
 sub_beats
-range=1:24:1,expandx
+range=1:24:1
 1
-2
+3
 0
 Label
 t_result_bpm
 
 0
-3
+4
 0
 SpinButton
 result_bpm
 range=0:1000:0.1,expandx,disabled
 1
-3
+4
 0
 Grid
 ?
@@ -4692,7 +4716,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-469
+471
 // Text
 /cancel
 Cancel
@@ -4814,6 +4838,9 @@ Move data accordingly
 bar_add_dialog/sub_beats
 1
 
+bar_add_dialog/t_pattern
+Pattern
+
 bar_add_dialog/t_sub_beats
 Sub beats
 
@@ -4840,6 +4867,9 @@ Beats
 
 bar_edit_dialog/edit_number
 Number
+
+bar_edit_dialog/edit_pattern
+Pattern
 
 bar_edit_dialog/edit_sub_beats
 Sub beats
@@ -6107,7 +6137,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-598
+600
 // Text
 /bpm
 Bpm
@@ -6250,6 +6280,9 @@ Daten entsprechend verschieben
 bar_add_dialog/sub_beats
 1
 
+bar_add_dialog/t_pattern
+Muster
+
 bar_add_dialog/t_sub_beats
 Teil-Schläge
 
@@ -6282,6 +6315,9 @@ Bpm
 
 bar_edit_dialog/edit_number
 Anzahl
+
+bar_edit_dialog/edit_pattern
+Muster
 
 bar_edit_dialog/edit_sub_beats
 Teil-Schläge

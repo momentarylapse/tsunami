@@ -15,10 +15,13 @@ Dialog bar_edit_dialog "Edit bars" width=350 height=80
 					SpinButton number "1" range=1:1000:1 expandx
 					---|
 					CheckBox edit_beats "Beats"
-					SpinButton beats "1" range=1:1000:1 expandx
+					SpinButton beats "1" range=1:1000:1
+					---|
+					CheckBox edit_pattern "Pattern"
+					Edit pattern ""
 					---|
 					CheckBox edit_sub_beats "Sub beats"
-					SpinButton sub_beats "1" range=1:24:1 expandx
+					SpinButton sub_beats "1" range=1:24:1
 					---|
 					Label t_result_bpm "=> Bpm"
 					SpinButton result_bpm "0" range=0:1000:0.1 expandx disabled

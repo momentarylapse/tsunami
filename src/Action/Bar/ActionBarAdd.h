@@ -10,12 +10,13 @@
 
 #include "../ActionGroup.h"
 
+class BarPattern;
 class Bar;
 
 class ActionBarAdd : public ActionGroup
 {
 public:
-	ActionBarAdd(int index, int length, int num_beats, int num_sub_beats, int mode);
+	ActionBarAdd(int index, const BarPattern &bar, int mode);
 	~ActionBarAdd();
 
 	virtual void build(Data *d);

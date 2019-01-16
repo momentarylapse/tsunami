@@ -13,13 +13,14 @@
 class ActionBar__Edit : public Action
 {
 public:
-	ActionBar__Edit(int index, int length, int num_beats, int num_sub_beats);
+	ActionBar__Edit(int index, int length, int num_beats, int num_sub_beats, Array<int> &pattern);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
 	int length, num_beats, num_sub_beats;
+	Array<int> pattern;
 	int index;
 };
 

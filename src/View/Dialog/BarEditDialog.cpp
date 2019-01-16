@@ -10,6 +10,8 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 
+void set_bar_pattern(BarPattern &b, const string &pat);
+
 BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
@@ -25,6 +27,7 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 	set_int("number", sel.num);
 	set_int("beats", b->num_beats);
 	set_int("sub_beats", b->num_sub_beats);
+	set_string("pattern", b->pat_str());
 	set_float("bpm", song->sample_rate * 60.0f / (b->length / b->num_beats));
 	check("shift-data", true);
 	check("scale-audio", false);
@@ -61,7 +64,7 @@ void BarEditDialog::on_ok()
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
-			song->edit_bar(i, b.length, b.num_beats, b.num_sub_beats, bmode);
+			song->edit_bar(i, b, bmode);
 		}
 
 	}else{
@@ -75,20 +78,21 @@ void BarEditDialog::on_ok()
 		if (edit_number){
 			foreachb(int i, sel)
 				song->delete_bar(i, false);
-			float t = (float)duration / (float)song->sample_rate;
-			float bpm = 60.0f * (float)(number * beats) / t;
-			for (int i=0; i<number; i++){
-				song->add_bar(sel[0], bpm, beats, sub_beats, Bar::EditMode::IGNORE);
-			}
+			int length = duration / number;
+			BarPattern b = BarPattern(length, beats, sub_beats);
+			set_bar_pattern(b, get_string("pattern"));
+			for (int i=0; i<number; i++)
+				song->add_bar(sel[0], b, Bar::EditMode::IGNORE);
 		}else{
 			foreachb(int i, sel){
 				BarPattern b = *song->bars[i];
 				if (edit_beats)
 					b.num_beats = beats;
+				set_bar_pattern(b, get_string("pattern"));
 				if (edit_sub_beats)
 					b.num_sub_beats = sub_beats;
 				b.length = duration / number;
-				song->edit_bar(i, b.length, b.num_beats, b.num_sub_beats, Bar::EditMode::IGNORE);
+				song->edit_bar(i, b, Bar::EditMode::IGNORE);
 			}
 		}
 	}

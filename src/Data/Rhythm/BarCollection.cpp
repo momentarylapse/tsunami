@@ -25,30 +25,39 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 	for (Bar *b: *this){
 		if (!b->is_pause()){
 			// bar
-			int beat_length = b->length / b->num_beats;
+			//int beat_length = b->length / b->num_beats;
+			int sub_beat_length = b->length / b->total_sub_beats;
 			int level = 0;
-			for (int i=0; i<b->num_beats; i++){
+			int pos_beat = pos_bar;
+			foreachi (int bb, b->pattern, beat_index){
+			//for (int i=0; i<b->num_beats; i++){
 				// beat
-				int pos_beat = pos_bar + i * beat_length;
+				//int pos_beat = pos_bar + i * beat_length;
+				int beat_length = sub_beat_length * bb;
 
 				if (include_sub_beats){
 
-					int sub_beats = (overwrite_sub_beats > 0) ? overwrite_sub_beats : b->num_sub_beats;
-					int sub_beat_length = beat_length / sub_beats;
+					int sub_beats = bb;
+					if (overwrite_sub_beats > 0){
+						//sub_beats = overwrite_sub_beats;
+						//sub_beat_length = b->length /
+						// TODO!!!!
+					}
 
 					for (int k=0; k<sub_beats; k++){
-						// sub beat
 						int pos_sub_beat = pos_beat + k * sub_beat_length;
+						// sub beat
 						if (r.is_inside(pos_sub_beat))
-							beats.add(Beat(Range(pos_sub_beat, sub_beat_length), i, level, bar_index, bar_no));
+							beats.add(Beat(Range(pos_sub_beat, sub_beat_length), beat_index, level, bar_index, bar_no));
 						level = 2;
 					}
 
 				}else{
 
 					if (r.is_inside(pos_beat))
-						beats.add(Beat(Range(pos_beat, beat_length), i, level, bar_index, bar_no));
+						beats.add(Beat(Range(pos_beat, beat_length), beat_index, level, bar_index, bar_no));
 				}
+				pos_beat += beat_length;
 				level = 1;
 			}
 			pos_bar += b->length;

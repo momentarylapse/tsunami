@@ -147,9 +147,13 @@ void FormatMidi::load_song(StorageOperationData *od)
 			while(f->get_pos() < pos0 + tsize){
 				int v = read_var(f);
 				moffset += v;
-				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+				int length = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+				BarPattern b = BarPattern(length, numerator, 1);
+//				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+				int offset = 0;
+				throw "ahhhhhhhhhhh";
 				while (offset > last_bar){
-					od->song->add_bar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
+					od->song->add_bar(-1, b, false);
 					last_bar = od->song->bars.range().end();
 				}
 				int c0 = f->read_byte();

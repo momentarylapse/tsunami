@@ -14,12 +14,13 @@
 #include "../../Data/Song.h"
 
 
-ActionBar__Edit::ActionBar__Edit(int _index, int _length, int _num_beats, int _num_sub_beats)
+ActionBar__Edit::ActionBar__Edit(int _index, int _length, int _num_beats, int _num_sub_beats, Array<int> &_pattern)
 {
 	index = _index;
 	length = _length;
 	num_beats = _num_beats;
 	num_sub_beats = _num_sub_beats;
+	pattern = _pattern;
 }
 
 void *ActionBar__Edit::execute(Data *d)
@@ -33,6 +34,8 @@ void *ActionBar__Edit::execute(Data *d)
 	std::swap(length, bar->length);
 	std::swap(num_beats, bar->num_beats);
 	std::swap(num_sub_beats, bar->num_sub_beats);
+	std::swap(pattern, bar->pattern);
+	bar->update_total();
 
 	s->notify(s->MESSAGE_EDIT_BARS);
 

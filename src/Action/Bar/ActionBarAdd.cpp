@@ -21,10 +21,11 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, int length, int num_beats, int num_sub_beats, int _mode)
+ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode)
 {
 	index = _index;
-	bar = new Bar(length, num_beats, num_sub_beats);
+	bar = new Bar;
+	*(BarPattern*)bar = _bar;
 	mode = _mode;
 }
 

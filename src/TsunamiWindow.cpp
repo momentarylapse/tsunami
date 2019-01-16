@@ -320,7 +320,7 @@ void TsunamiWindow::on_add_time_track()
 		song->add_track(SignalType::BEATS, 0);
 		// some default data
 		for (int i=0; i<10; i++)
-			song->add_bar(-1, 90, 4, 1, false);
+			song->add_bar(-1, BarPattern(int(song->sample_rate / 60.0f / 90.0f), 4, 1), false);
 	}catch(Song::Exception &e){
 		session->e(e.message);
 	}

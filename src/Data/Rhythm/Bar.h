@@ -24,6 +24,11 @@ public:
 	int length;
 	int num_beats;
 	int num_sub_beats;
+	Array<int> pattern;
+	int total_sub_beats;
+	bool is_uniform() const;
+	void update_total();
+	string pat_str() const;
 
 	enum Type{
 		BAR,
@@ -35,6 +40,7 @@ class Bar : public BarPattern
 {
 public:
 	Bar(){}
+	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int num_sub_beats);
 	bool is_pause();
 	float bpm(float sample_rate);

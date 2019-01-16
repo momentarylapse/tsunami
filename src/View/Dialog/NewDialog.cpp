@@ -8,6 +8,7 @@
 #include "NewDialog.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
+#include "../../Data/Rhythm/Bar.h"
 #include "../../Action/ActionManager.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
@@ -51,8 +52,12 @@ void NewDialog::on_ok()
 	if (is_checked("metronome")){
 		Track *t = song->add_track(SignalType::BEATS, 0);
 		int count = get_int("num_bars");
+		int beats = get_int("beats_per_bar");
+		float bpm = get_float("beats_per_minute");
+		int length = (int)((float)beats * (float)song->sample_rate * 60.0f / bpm);
+		BarPattern b = BarPattern(length, beats, get_int("sub_beats"));
 		for (int i=0; i<count; i++)
-			song->add_bar(-1, get_float("beats_per_minute"), get_int("beats_per_bar"), get_int("sub_beats"), false);
+			song->add_bar(-1, b, false);
 	}
 	song->add_track(type);
 

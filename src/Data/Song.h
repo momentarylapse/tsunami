@@ -24,6 +24,7 @@ class Synthesizer;
 class Curve;
 class SongSelection;
 class AudioBuffer;
+class BarPattern;
 enum class SampleFormat;
 enum class SignalType;
 
@@ -110,9 +111,9 @@ public:
 	void _cdecl delete_sample(Sample *s);
 	void _cdecl edit_sample_name(Sample *s, const string &name);
 	void _cdecl scale_sample(Sample *s, int new_size, int method);
-	void _cdecl add_bar(int index, float bpm, int beats, int sub_beats, int mode);
+	void _cdecl add_bar(int index, const BarPattern &bar, int mode);
 	void _cdecl add_pause(int index, int length, int mode);
-	void _cdecl edit_bar(int index, int length, int num_beats, int num_sub_beats, int mode);
+	void _cdecl edit_bar(int index, const BarPattern &bar, int mode);
 	void _cdecl delete_bar(int index, bool affect_midi);
 	void _cdecl delete_time_interval(int index, const Range &range);
 	void _cdecl insert_selected_samples(const SongSelection &sel);

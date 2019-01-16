@@ -197,11 +197,11 @@ int MidiPainter::y2clef_linear(float y, NoteModifier &mod)
 struct NoteData
 {
 	NoteData(){}
-	NoteData(MidiNote *note, const Range &r, float spu)
+	NoteData(MidiNote *note, const Range &r, float spu, int beat_offset)
 	{
 		n = note;
-		offset = int((float)r.offset / spu + 0.5f);
-		end = int((float)r.end() / spu + 0.5f);
+		offset = int((float)(r.offset - beat_offset) / spu + 0.5f) + beat_offset * BEAT_PARTITION;
+		end = int((float)(r.end() - beat_offset) / spu + 0.5f) + beat_offset * BEAT_PARTITION;
 		length = end - offset;
 		base_length = length;
 		x = y = 0;
@@ -347,7 +347,17 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	for (auto *b: bars){
 
 		// samples per 16th / 3
-		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
+		float sub_beat_length = (float)b->range().length / (float)b->total_sub_beats;
+		Array<float> spu;
+		Array<int> beat_offset;
+		int _off = 0;
+		for (int bb: b->pattern){
+			int beat_length = sub_beat_length * bb;
+			spu.add((float)beat_length / (float)BEAT_PARTITION);
+			beat_offset.add(_off);
+			_off += beat_length;
+		}
+//		float spu = (float)b->range().length / (float)b->num_beats / (float)BEAT_PARTITION;
 
 		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
 		//c->set_color(colors.text_soft3);
@@ -357,7 +367,11 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 			Range r = n->range - b->offset;
 			if (r.offset < 0)
 				continue;
-			NoteData d = NoteData(n, r, spu);
+			int first_index = 0;
+			for (int i=0; i<spu.num; i++)
+				if (r.offset > beat_offset[i] - 50)
+					first_index = i;
+			NoteData d = NoteData(n, r, spu[first_index], beat_offset[first_index]);
 			if (d.length == 0 or d.offset < 0)
 				continue;
 

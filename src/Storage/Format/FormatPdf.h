@@ -31,6 +31,7 @@ public:
 	ColorScheme *colors;
 
 	double pdf_bpm;
+	Array<int> pdf_pattern;
 
 	struct LineData
 	{
@@ -47,6 +48,7 @@ public:
 	int draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data);
 
 	void draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r);
+	void draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r);
 };
 
 class FormatDescriptorPdf : public FormatDescriptor

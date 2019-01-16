@@ -11,16 +11,18 @@
 #include "../ActionGroup.h"
 
 class Song;
+class BarPattern;
 
 class ActionBarEdit: public ActionGroup
 {
 public:
-	ActionBarEdit(int index, int length, int num_beats, int num_sub_beats, int mode);
+	ActionBarEdit(int index, const BarPattern &bar, int mode);
 
 	void build(Data *d) override;
 
 	int index;
 	int length, num_beats, num_sub_beats;
+	Array<int> pattern;
 	int mode;
 };
 

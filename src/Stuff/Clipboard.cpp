@@ -244,7 +244,7 @@ void Clipboard::paste_with_time(AudioView *view)
 
 	//if (temp->bars.num )
 	for (Bar *b: temp->bars)
-		s->add_bar(index ++, b->bpm(s->sample_rate), b->num_beats, b->num_sub_beats, Bar::EditMode::INSERT_SILENCE);
+		s->add_bar(index ++, *b, Bar::EditMode::INSERT_SILENCE);
 
 	paste(view);
 

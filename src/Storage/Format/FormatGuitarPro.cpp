@@ -254,8 +254,10 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 				read_measure(measures[i], tracks[j], offset);
 			if (measures[i].marker.num > 0)
 				a->tracks[0]->add_marker(Range(offset, 0), measures[i].marker);
-			offset += (int)(a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator);
-			a->add_bar(-1, tempo, measures[i].numerator, 1, false);
+			int length = (int)(a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator);
+			offset += length;
+			BarPattern b = BarPattern(length, measures[i].numerator, 1);
+			a->add_bar(-1, b, false);
 		}
 
 	}catch(Exception &e){

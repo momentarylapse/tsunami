@@ -77,9 +77,9 @@ void ViewModeScaleBars::perform_scale()
 
 	song->begin_action_group();
 	foreachb(int i, scaling_sel){
-		Bar *b = song->bars[i];
-		int length = (int)((float)b->length * factor);
-		song->edit_bar(i, length, b->num_beats, b->num_sub_beats, Bar::EditMode::STRETCH);
+		BarPattern bb = *song->bars[i];
+		bb.length = (int)((float)bb.length * factor);
+		song->edit_bar(i, bb, Bar::EditMode::STRETCH);
 	}
 	song->end_action_group();
 

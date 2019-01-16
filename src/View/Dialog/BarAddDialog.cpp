@@ -44,13 +44,28 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 	event("hui:close", std::bind(&BarAddDialog::on_close, this));
 }
 
+void set_bar_pattern(BarPattern &b, const string &pat)
+{
+	b.pattern.resize(b.num_beats);
+	auto xx = pat.replace(",", " ").replace(":", " ").explode(" ");
+	for (int i=0; i<b.num_beats; i++){
+		b.pattern[i] = b.num_sub_beats;
+		if (i < xx.num)
+			b.pattern[i] = xx[i]._int();
+	}
+	b.update_total();
+}
+
 void BarAddDialog::on_ok()
 {
+	BarPattern b;
 	int count = get_int("count");
-	int beats = get_int("beats");
-	int sub_beats = get_int("sub_beats");
+	b.num_beats = get_int("beats");
+	b.num_sub_beats = get_int("sub_beats");
 	float bpm = get_float("bpm");
 	bool move_data = is_checked("shift-data");
+	set_bar_pattern(b, get_string("pattern"));
+	b.length = (int)((float)b.num_beats * (float)song->sample_rate * 60.0f / bpm);
 
 	song->begin_action_group();
 
@@ -58,7 +73,7 @@ void BarAddDialog::on_ok()
 		song->add_track(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
-		song->add_bar(index, bpm, beats, sub_beats, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+		song->add_bar(index, b, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
 	destroy();

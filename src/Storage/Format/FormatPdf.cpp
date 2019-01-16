@@ -10,6 +10,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/Clef.h"
@@ -112,21 +113,25 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	return y0 + string_dy * n;
 }
 
+bool pat_eq(const Array<int> &a, const Array<int> &b);
+
+TrackMarker* get_bar_part(Song *s, int offset)
+{
+	auto *t = s->time_track();
+	if (!t)
+		return nullptr;
+	for (TrackMarker *m: t->markers)
+		if (abs(m->range.offset - offset) < 1000)
+			return m;
+	return nullptr;
+}
+
 void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r)
 {
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
 	for (auto b: beats){
 		float x = cam->sample2screen(b.range.offset);
 		if (b.level == 0){
-			if (b.bar_no >= 0){
-				double bpm = 60.0 * (double)song->sample_rate / (double)b.range.length;
-				if (fabs(bpm - pdf_bpm) > 0.2){
-					pdf_bpm = bpm;
-					p->set_color(colors->text_soft2);
-					p->set_font_size(15);
-					p->draw_str(x + 15, y-20, format("%.0f bpm", bpm));
-				}
-			}
 			p->set_color(colors->text_soft1);
 			p->set_line_width(2);
 		}else{
@@ -136,6 +141,47 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 		p->draw_line(x, y, x, y + h);
 	}
 	p->set_line_width(1);
+}
+
+
+void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r)
+{
+	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
+	for (auto b: bars){
+		float x = cam->sample2screen(b->offset);
+		double bpm = b->bpm(song->sample_rate);
+		string s;
+		if (!pat_eq(b->pattern, pdf_pattern)){
+			pdf_pattern = b->pattern;
+			if (b->is_uniform())
+				s += format("%d/4 ", b->num_beats);
+			else
+				s += "(" + b->pat_str().replace(" ", ",") + ")/4 ";
+		}
+		if (fabs(bpm - pdf_bpm) > 0.2){
+			pdf_bpm = bpm;
+			s += format("%.0f bpm ", bpm);
+		}
+
+		if (s != ""){
+			p->set_color(colors->text_soft2);
+			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
+			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
+			p->set_font_size(15);
+			p->draw_str(x + 20, y-5, s);
+		}
+
+		// part?
+		auto *m = get_bar_part(song, b->offset);
+		if (m){
+			p->set_color(colors->text);
+			p->draw_line(x - 20, y - 65, x - 20, y - 35);
+			p->draw_line(x - 20, y - 65, x + 20, y - 65);
+			p->draw_line(x - 20, y - 35, x + 20, y - 35);
+			p->set_font_size(20);
+			p->draw_str(x - 15, y-60, m->text);
+		}
+	}
 }
 
 int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data)
@@ -154,6 +200,8 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	}
 
 	line_data.clear();
+
+	draw_bar_markers(p, x0, w, y0, 100, r);
 
 	foreachi (Track* t, song->tracks, ti){
 		if (t->type != SignalType::MIDI)

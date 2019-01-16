@@ -404,26 +404,25 @@ void Song::create_samples_from_selection(const SongSelection &sel, bool auto_del
 		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 
-void Song::add_bar(int index, float bpm, int beats, int sub_beats, int mode)
+void Song::add_bar(int index, const BarPattern &b, int mode)
 {
-	int length = (int)((float)beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionBarAdd(index, length, beats, sub_beats, mode));
+		execute(new ActionBarAdd(index, b, mode));
 	else
-		execute(new ActionBarAdd(bars.num, length, beats, sub_beats, mode));
+		execute(new ActionBarAdd(bars.num, b, mode));
 }
 
 void Song::add_pause(int index, int length, int mode)
 {
 	if (index >= 0)
-		execute(new ActionBarAdd(index, length, 0, 0, mode));
+		execute(new ActionBarAdd(index, BarPattern(length, 0, 0), mode));
 	else
-		execute(new ActionBarAdd(bars.num, length, 0, 0, mode));
+		execute(new ActionBarAdd(bars.num, BarPattern(length, 0, 0), mode));
 }
 
-void Song::edit_bar(int index, int length, int beats, int sub_beats, int mode)
+void Song::edit_bar(int index, const BarPattern &b, int mode)
 {
-	execute(new ActionBarEdit(index, length, beats, sub_beats, mode));
+	execute(new ActionBarEdit(index, b, mode));
 }
 
 void Song::delete_bar(int index, bool affect_midi)

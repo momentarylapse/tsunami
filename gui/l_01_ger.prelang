@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-599
+601
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1799,6 +1799,12 @@ Auswahl Rendern...
 
 menu/menu_export
 Exportieren
+
+bar_add_dialog/t_pattern
+Muster
+
+bar_edit_dialog/edit_pattern
+Muster
 
 // Num Language Strings
 216

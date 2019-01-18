@@ -21,28 +21,33 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 
 
 	set_int("count", 1);
-	Array<int> beats = {1,1,1,1};
-	int divisor = 1;
-	float bpm = 90.0f;
+	new_bar = new Bar(100, 4, 1);
+	new_bar->set_bpm(90, song->sample_rate);
 
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(Bar *b, song->bars, i)
 			if ((i <= index) and (!b->is_pause())){
-				beats = b->beats;
-				divisor = b->divisor;
-				bpm = b->bpm(song->sample_rate);
+				*new_bar = *b;
 			}
 	}
-	set_int("beats", beats.num);
-	set_int("sub_beats", divisor);
-	set_string("pattern", "...");
-	set_float("bpm", bpm);
+	set_int("beats", new_bar->beats.num);
+	set_int("divisor", 0);
+	if (new_bar->divisor == 2)
+		set_int("divisor", 1);
+	if (new_bar->divisor == 4)
+		set_int("divisor", 2);
+	set_string("pattern", new_bar->pat_str());
+	set_float("bpm", new_bar->bpm(song->sample_rate));
 	check("shift-data", true);
 
-	event("ok", std::bind(&BarAddDialog::on_ok, this));
-	event("cancel", std::bind(&BarAddDialog::on_close, this));
-	event("hui:close", std::bind(&BarAddDialog::on_close, this));
+	event("beats", [&]{ on_beats(); });
+	event("complex", [&]{ on_complex(); });
+	event("pattern", [&]{ on_pattern(); });
+	event("divisor", [&]{ on_divisor(); });
+	event("ok", [&]{ on_ok(); });
+	event("cancel", [&]{ on_close(); });
+	event("hui:close", [&]{ on_close(); });
 }
 
 void set_bar_pattern(BarPattern &b, const string &pat)
@@ -54,15 +59,36 @@ void set_bar_pattern(BarPattern &b, const string &pat)
 	b.update_total();
 }
 
+void BarAddDialog::on_beats()
+{
+	*new_bar = Bar(100, get_int(""), new_bar->divisor);
+	set_string("pattern", new_bar->pat_str());
+}
+
+void BarAddDialog::on_divisor()
+{
+	new_bar->divisor = 1 << get_int("");
+}
+
+void BarAddDialog::on_pattern()
+{
+	set_bar_pattern(*new_bar, get_string("pattern"));
+	set_int("beats", new_bar->beats.num);
+}
+
+void BarAddDialog::on_complex()
+{
+	bool complex = is_checked("complex");
+	hide_control("beats", complex);
+	hide_control("pattern", !complex);
+}
+
 void BarAddDialog::on_ok()
 {
-	BarPattern b = BarPattern(0, get_int("beats"), get_int("sub_beats"));
 	int count = get_int("count");
 	float bpm = get_float("bpm");
 	bool move_data = is_checked("shift-data");
-	//set_bar_pattern(b, get_string("pattern"));
-	b.update_total();
-	b.length = (int)((float)b.total_sub_beats / b.divisor * (float)song->sample_rate * 60.0f / bpm);
+	new_bar->set_bpm(bpm, song->sample_rate);
 
 	song->begin_action_group();
 
@@ -70,7 +96,7 @@ void BarAddDialog::on_ok()
 		song->add_track(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
-		song->add_bar(index, b, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+		song->add_bar(index, *new_bar, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
 	destroy();

@@ -57,6 +57,20 @@ bool BarPattern::is_uniform() const
 	return true;
 }
 
+// well... quarters per minute!!!
+float BarPattern::bpm(float sample_rate)
+{
+	float quarter_length = (float)length / (float)total_sub_beats * (float)divisor;
+	return 60.0f * sample_rate / quarter_length;
+}
+
+// well... quarters per minute!!!
+void BarPattern::set_bpm(float bpm, float sample_rate)
+{
+	float quarter_length = 60.0f * sample_rate / bpm;
+	length = (int)(quarter_length * (float)total_sub_beats / (float)divisor);
+}
+
 bool BarPattern::operator ==(const BarPattern &o) const
 {
 	if (length != o.length or beats != o.beats or divisor != o.divisor)
@@ -78,13 +92,6 @@ Bar::Bar(const BarPattern &b) : BarPattern(b)
 
 Bar::Bar(int _length, int _num_beats, int _num_sub_beats) : Bar(BarPattern(_length, _num_beats, _num_sub_beats))
 {}
-
-// well... quarters per minute!!!
-float Bar::bpm(float sample_rate)
-{
-	float quarter_length = (float)length / (float)total_sub_beats * (float)divisor;
-	return 60.0f * sample_rate / quarter_length;
-}
 
 string Bar::format_beats(bool fancy) const
 {

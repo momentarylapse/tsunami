@@ -27,6 +27,10 @@ public:
 	Array<int> beats;
 	void set_pattern(const Array<int> &p);
 	int total_sub_beats;
+
+	float bpm(float sample_rate);
+	void set_bpm(float bpm, float sample_rate);
+
 	bool is_uniform() const;
 	void update_total();
 	string pat_str() const;
@@ -46,7 +50,6 @@ public:
 	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int divisor);
 	bool is_pause();
-	float bpm(float sample_rate);
 
 	string format_beats(bool fancy=true) const;
 	string format_bpm(float sample_rate) const;

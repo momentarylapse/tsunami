@@ -27,7 +27,7 @@ public:
 	void on_ok();
 	void on_close();
 	void on_beats();
-	void on_sub_beats();
+	void on_divisor();
 	void on_bpm();
 	void on_number();
 	void on_complex();

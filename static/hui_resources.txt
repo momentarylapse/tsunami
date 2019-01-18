@@ -38,7 +38,7 @@ Grid
 
 0
 0
-10
+8
 Text
 bad_t_count
 
@@ -57,47 +57,47 @@ bad_t_beats
 0
 1
 0
+Grid
+?
+
+1
+1
+2
 SpinButton
 beats
-range=1:1000:1
-1
-1
+range=1:1000:1,expandx
 0
-Text
-t_pattern
-
 0
-2
 0
 Edit
 pattern
-
+expandx,hidden
 1
+0
+0
+ToggleButton
+complex
+image=hui:find
 2
-0
-Text
-t_sub_beats
-
-0
-3
-0
-SpinButton
-sub_beats
-range=1:24:1
 1
+0
+ComboBox
+divisor
+
 3
+1
 0
 Text
 bad_t_bpm
 
 0
-4
+2
 0
 SpinButton
 bpm
 range=0:1000:0.1
 1
-4
+2
 0
 CheckBox
 shift-data
@@ -244,7 +244,7 @@ Grid
 
 1
 0
-9
+8
 Label
 t_number
 
@@ -287,29 +287,23 @@ image=hui:find
 2
 1
 0
-Label
-t_sub_beats
+ComboBox
+divisor
 
-0
-2
-0
-SpinButton
-sub_beats
-range=1:24:1
+3
 1
-2
 0
 Label
 t_result_bpm
 
 0
-3
+2
 0
 Label
 result_bpm
 disabled
 1
-3
+2
 0
 Grid
 ?
@@ -2191,23 +2185,35 @@ nd_t_beats
 0
 2
 0
-SpinButton
-beats_per_bar
-range=1:99
+Grid
+?
+
 1
 2
-0
-Text
-t_sub_beats
-
-0
-3
-0
+2
 SpinButton
-sub_beats
-range=1:24
+beats
+range=1:1000:1,expandx
+0
+0
+0
+Edit
+pattern
+expandx,hidden
 1
+0
+0
+ToggleButton
+complex
+image=hui:find
+2
+2
+0
+ComboBox
+divisor
+
 3
+2
 0
 Grid
 ?
@@ -4722,7 +4728,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-470
+471
 // Text
 /cancel
 Cancel
@@ -4831,24 +4837,24 @@ New bars
 
 bar_add_dialog/beats
 1
-
+beats per bar
 bar_add_dialog/bpm
 0
 
+bar_add_dialog/complex
+
+complex beat pattern
 bar_add_dialog/count
 1
 
+bar_add_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
+bar_add_dialog/pattern
+
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
 bar_add_dialog/shift-data
 Move data accordingly
-
-bar_add_dialog/sub_beats
-1
-
-bar_add_dialog/t_pattern
-Pattern
-
-bar_add_dialog/t_sub_beats
-Sub beats
 
 bar_delete_dialog/bar_delete_dialog
 Delete bars
@@ -4864,27 +4870,30 @@ Edit bars
 
 bar_edit_dialog/beats
 1
-
+beats per bar
 bar_edit_dialog/bpm
 0
 
 bar_edit_dialog/complex
 
 complex beat pattern
+bar_edit_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 bar_edit_dialog/mode
 Speed\\Replace
 
 bar_edit_dialog/number
 1
 
+bar_edit_dialog/pattern
+
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
 bar_edit_dialog/scale-audio
 Scale audio
 
 bar_edit_dialog/shift-data
 Move data accordingly
-
-bar_edit_dialog/sub_beats
-1
 
 bar_edit_dialog/t_beats
 Beats
@@ -4900,9 +4909,6 @@ Number
 
 bar_edit_dialog/t_result_bpm
 => Bpm
-
-bar_edit_dialog/t_sub_beats
-Sub beats
 
 configurable-selection-dialog/configurable-selection-dialog
 Auswahl
@@ -5348,12 +5354,18 @@ Category
 module_console/t_sub_category
 Sub type
 
-new_dialog/beats_per_bar
-4
-
+new_dialog/beats
+1
+beats per bar
 new_dialog/beats_per_minute
 90
 
+new_dialog/complex
+
+complex beat pattern
+new_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats
 new_dialog/metronome
 add
 
@@ -5370,7 +5382,7 @@ new_dialog/nd_t_bars
 Bars
 
 new_dialog/nd_t_beats
-Beats per bar
+Beats
 
 new_dialog/nd_t_bpm
 Speed
@@ -5390,12 +5402,9 @@ Midi
 new_dialog/num_bars
 10
 
-new_dialog/sub_beats
-4
+new_dialog/pattern
 
-new_dialog/t_sub_beats
-Sub beats per beat
-
+example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units
 pause_add_dialog/duration
 1.0
 
@@ -6140,7 +6149,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-604
+613
 // Text
 /bpm
 Bpm
@@ -6264,19 +6273,28 @@ neue Takte
 
 bar_add_dialog/beats
 1
-
+Schläge pro Takt
 bar_add_dialog/bpm
 0
 
+bar_add_dialog/complex
+
+komplexes Schlagmuster
 bar_add_dialog/count
 1
 
+bar_add_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
 bar_add_dialog/insert:after
 danach
 
 bar_add_dialog/insert:before
 davor
 
+bar_add_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
 bar_add_dialog/shift-data
 Daten entsprechend verschieben
 
@@ -6306,13 +6324,16 @@ Takte bearbeiten
 
 bar_edit_dialog/beats
 1
-
+Schläge pro Takt
 bar_edit_dialog/bpm
 0
 
 bar_edit_dialog/complex
 
 komplexes Schlagmuster
+bar_edit_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
 bar_edit_dialog/edit_beats
 Schläge
 
@@ -6334,6 +6355,9 @@ Geschwindigkeit\\Ersetzen
 bar_edit_dialog/number
 1
 
+bar_edit_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
 bar_edit_dialog/result_bpm
 0
 
@@ -7006,12 +7030,21 @@ Kategorie
 module_console/t_sub_category
 Untertyp
 
+new_dialog/beats
+
+Schläge pro Takt
 new_dialog/beats_per_bar
 4
 
 new_dialog/beats_per_minute
 90
 
+new_dialog/complex
+
+komplexe Schlagmuster
+new_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
 new_dialog/metronome
 einfügen
 
@@ -7051,6 +7084,9 @@ Midi
 new_dialog/num_bars
 10
 
+new_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
 new_dialog/sub_beats
 4
 

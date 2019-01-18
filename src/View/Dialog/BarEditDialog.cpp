@@ -28,7 +28,11 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 
 	set_int("number", sel.num);
 	set_int("beats", new_bar->beats.num);
-	set_int("sub_beats", new_bar->divisor);
+	set_int("divisor", 0);
+	if (new_bar->divisor == 2)
+		set_int("divisor", 1);
+	if (new_bar->divisor == 4)
+		set_int("divisor", 2);
 	set_string("pattern", new_bar->pat_str());
 	check("complex", !new_bar->is_uniform());
 	hide_control("beats", !new_bar->is_uniform());
@@ -39,17 +43,17 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 
 	update_result_bpm();
 
-	event("ok", std::bind(&BarEditDialog::on_ok, this));
-	event("cancel", std::bind(&BarEditDialog::on_close, this));
-	event("hui:close", std::bind(&BarEditDialog::on_close, this));
-	event("beats", std::bind(&BarEditDialog::on_beats, this));
-	event("sub_beats", std::bind(&BarEditDialog::on_sub_beats, this));
-	event("pattern", std::bind(&BarEditDialog::on_pattern, this));
-	event("bpm", std::bind(&BarEditDialog::on_bpm, this));
-	event("number", std::bind(&BarEditDialog::on_number, this));
-	event("complex", std::bind(&BarEditDialog::on_complex, this));
-	event("mode", std::bind(&BarEditDialog::on_mode, this));
-	event("shift-data", std::bind(&BarEditDialog::on_shift_data, this));
+	event("ok", [&]{ on_ok(); });
+	event("cancel", [&]{ on_close(); });
+	event("hui:close", [&]{ on_close(); });
+	event("beats", [&]{ on_beats(); });
+	event("divisor", [&]{ on_divisor(); });
+	event("pattern", [&]{ on_pattern(); });
+	event("bpm", [&]{ on_bpm(); });
+	event("number", [&]{ on_number(); });
+	event("complex", [&]{ on_complex(); });
+	event("mode", [&]{ on_mode(); });
+	event("shift-data", [&]{ on_shift_data(); });
 }
 
 void BarEditDialog::on_ok()
@@ -70,7 +74,7 @@ void BarEditDialog::on_ok()
 
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];
-			b.length = song->sample_rate * 60.0f * b.beats.num / bpm / b.divisor;
+			b.set_bpm(bpm, song->sample_rate);
 			song->edit_bar(i, b, bmode);
 		}
 
@@ -112,15 +116,16 @@ void BarEditDialog::on_beats()
 	update_result_bpm();
 }
 
-void BarEditDialog::on_sub_beats()
+void BarEditDialog::on_divisor()
 {
-	new_bar->divisor = get_int("");
+	new_bar->divisor = 1 << get_int("");
 	update_result_bpm();
 }
 
 void BarEditDialog::on_pattern()
 {
 	set_bar_pattern(*new_bar, get_string("pattern"));
+	set_int("beats", new_bar->beats.num);
 	update_result_bpm();
 }
 
@@ -148,10 +153,9 @@ void BarEditDialog::on_number()
 
 void BarEditDialog::update_result_bpm()
 {
-	/*float t = (float)duration / (float)song->sample_rate;
 	int number = get_int("number");
-	int beats = new_bar->num_beats;
-	set_float("result_bpm", new_bar->bpm(song->sample)60.0f * (float)(number * beats) / t);*/
+	new_bar->length = duration / number;
+	set_float("result_bpm", new_bar->bpm(song->sample_rate));
 }
 
 void BarEditDialog::on_shift_data()

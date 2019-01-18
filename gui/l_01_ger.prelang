@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-605
+614
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -119,7 +119,7 @@ neue Takte
 
 bar_add_dialog/beats
 1
-
+Schläge pro Takt
 bar_add_dialog/bpm
 0
 
@@ -143,7 +143,7 @@ Takte bearbeiten
 
 bar_edit_dialog/beats
 1
-
+Schläge pro Takt
 bar_edit_dialog/bpm
 0
 
@@ -1818,6 +1818,33 @@ Anzahl
 bar_edit_dialog/t_sub_beats
 Teilschläge
 
+bar_edit_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
+bar_add_dialog/complex
+
+komplexes Schlagmuster
+bar_add_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
+new_dialog/beats
+
+Schläge pro Takt
+new_dialog/complex
+
+komplexe Schlagmuster
+new_dialog/divisor
+𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
+Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
+bar_add_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
+bar_edit_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
+new_dialog/pattern
+
+Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
 // Num Language Strings
 216
 // Data (ID,Text)

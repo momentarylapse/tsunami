@@ -5,13 +5,11 @@ Dialog bar_add_dialog "New bars" width=250 height=80
 			SpinButton count "1" range=1:10000:1 expandx
 			---|
 			Text bad_t_beats "Beats"
-			SpinButton beats "1" range=1:1000:1
-			---|
-			Text t_pattern "Pattern"
-			Edit pattern ""
-			---|
-			Text t_sub_beats "Sub beats"
-			SpinButton sub_beats "1" range=1:24:1
+			Grid ? ""
+				SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
+				Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
+			ToggleButton complex "" "tooltip=complex beat pattern" image=hui:find
+			ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 			---|
 			Text bad_t_bpm "Bpm"
 			SpinButton bpm "0" range=0:1000:0.1

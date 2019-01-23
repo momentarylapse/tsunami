@@ -770,6 +770,12 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 
 string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
 {
+	Array<string> names = session->plugin_manager->find_module_sub_types(type);
+	if (names.num == 1)
+		return names[0];
+	if (names.num == 0)
+		return "";
+
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, type, session, old_name);
 	dlg->run();
 	string name = dlg->_return;

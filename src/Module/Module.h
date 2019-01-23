@@ -59,6 +59,8 @@ enum class ModuleType
 	AUDIO_SUCKER,
 	// recursion!
 	SIGNAL_CHAIN,
+	PORT_IN,
+	PORT_OUT,
 	// plug-in (not really Modules)
 	SONG_PLUGIN,
 	TSUNAMI_PLUGIN,
@@ -76,6 +78,7 @@ public:
 	void set_session_etc(Session *session, const string &sub_type, Plugin *plugin);
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
+	static const string MESSAGE_STATE_CHANGE;
 
 	void _cdecl reset_config();
 	virtual void _cdecl reset_state(){}

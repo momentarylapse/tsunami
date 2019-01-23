@@ -256,7 +256,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	selection_mode = SelectionMode::NONE;
 	hide_selection = false;
-	song->subscribe(this, std::bind(&AudioView::on_song_update, this));
+	song->subscribe(this, [&]{ on_song_update(); });
 
 	// modes
 	mode = nullptr;
@@ -302,11 +302,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
-	playback_active = false;
 	stream = session->output_stream;
-	stream->subscribe(this, std::bind(&AudioView::on_stream_update, this), stream->MESSAGE_UPDATE);
-	stream->subscribe(this, std::bind(&AudioView::on_stream_state_change, this), stream->MESSAGE_STATE_CHANGE);
-	stream->subscribe(this, std::bind(&AudioView::on_stream_end_of_stream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
+	stream->subscribe(this, [&]{ on_stream_update(); }, stream->MESSAGE_UPDATE);
+	session->signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+	stream->subscribe(this, [&]{ on_stream_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mx = my = 0;
 	msp.stop();
@@ -318,18 +317,18 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	// events
 	win->event_xp(id, "hui:draw", std::bind(&AudioView::on_draw, this, std::placeholders::_1));
-	win->event_x(id, "hui:mouse-move", std::bind(&AudioView::on_mouse_move, this));
-	win->event_x(id, "hui:left-button-down", std::bind(&AudioView::on_left_button_down, this));
-	win->event_x(id, "hui:left-double-click", std::bind(&AudioView::on_left_double_click, this));
-	win->event_x(id, "hui:left-button-up", std::bind(&AudioView::on_left_button_up, this));
-	win->event_x(id, "hui:middle-button-down", std::bind(&AudioView::on_middle_button_down, this));
-	win->event_x(id, "hui:middle-button-up", std::bind(&AudioView::on_middle_button_up, this));
-	win->event_x(id, "hui:right-button-down", std::bind(&AudioView::on_right_button_down, this));
-	win->event_x(id, "hui:right-button-up", std::bind(&AudioView::on_right_button_up, this));
-	win->event_x(id, "hui:mouse-leave", std::bind(&AudioView::on_mouse_leave, this));
-	win->event_x(id, "hui:key-down", std::bind(&AudioView::on_key_down, this));
-	win->event_x(id, "hui:key-up", std::bind(&AudioView::on_key_up, this));
-	win->event_x(id, "hui:mouse-wheel", std::bind(&AudioView::on_mouse_wheel, this));
+	win->event_x(id, "hui:mouse-move", [&]{ on_mouse_move(); });
+	win->event_x(id, "hui:left-button-down", [&]{ on_left_button_down(); });
+	win->event_x(id, "hui:left-double-click", [&]{ on_left_double_click(); });
+	win->event_x(id, "hui:left-button-up", [&]{ on_left_button_up(); });
+	win->event_x(id, "hui:middle-button-down", [&]{ on_middle_button_down(); });
+	win->event_x(id, "hui:middle-button-up", [&]{ on_middle_button_up(); });
+	win->event_x(id, "hui:right-button-down", [&]{ on_right_button_down(); });
+	win->event_x(id, "hui:right-button-up", [&]{ on_right_button_up(); });
+	win->event_x(id, "hui:mouse-leave", [&]{ on_mouse_leave(); });
+	win->event_x(id, "hui:key-down", [&]{ on_key_down(); });
+	win->event_x(id, "hui:key-up", [&]{ on_key_up(); });
+	win->event_x(id, "hui:mouse-wheel", [&]{ on_mouse_wheel(); });
 
 	win->activate(id);
 
@@ -760,7 +759,7 @@ void AudioView::on_song_update()
 			if (t->track->layers.num > 2)
 				implode_track(t->track);
 		optimize_view();
-		hui::RunLater(0.5f, std::bind(&AudioView::optimize_view, this));
+		hui::RunLater(0.5f, [&]{ optimize_view(); });
 	}else{
 		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
 			update_tracks();
@@ -786,13 +785,14 @@ void AudioView::on_stream_update()
 void AudioView::on_stream_state_change()
 {
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
+	force_redraw();
 }
 
 void AudioView::on_stream_end_of_stream()
 {
 	stream->stop();
 	// stop... but wait for other handlers of this message before deleting stream
-	hui::RunLater(0.01f,  std::bind(&AudioView::stop, this));
+	hui::RunLater(0.01f,  [&]{ stop(); });
 	//stop();
 }
 
@@ -1235,7 +1235,7 @@ void AudioView::draw_song(Painter *c)
 		animating = true;
 
 	if (animating or slow_repeat)
-		hui::RunLater(animating ? 0.03f : 0.2f, std::bind(&AudioView::force_redraw, this));
+		hui::RunLater(animating ? 0.03f : 0.2f, [&]{ force_redraw(); });
 }
 
 int frame = 0;
@@ -1464,55 +1464,42 @@ void AudioView::enable(bool _enabled)
 	if (enabled and !_enabled)
 		song->unsubscribe(this);
 	else if (!enabled and _enabled)
-		song->subscribe(this, std::bind(&AudioView::on_song_update, this));
+		song->subscribe(this, [&]{ on_song_update(); });
 	enabled = _enabled;
 }
 
 
 void AudioView::play(const Range &range, bool allow_loop)
 {
-	if (playback_active)
+	if (session->signal_chain->is_playback_active())
 		stop();
 
 	renderer->prepare(range, allow_loop);
 	renderer->allow_tracks(get_playable_tracks());
 	renderer->allow_layers(get_playable_layers());
-	playback_active = true;
-	notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	//stream->play();
+
 	session->signal_chain->start();
-	force_redraw();
 }
 
 void AudioView::stop()
 {
-	if (!playback_active)
-		return;
 	session->signal_chain->stop();
-	//stream->stop();
-	playback_active = false;
-	notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	force_redraw();
 }
 
 void AudioView::pause(bool _pause)
 {
-	if (playback_active){
-		stream->pause(_pause);
-		notify(MESSAGE_OUTPUT_STATE_CHANGE);
-	}
-
+	session->signal_chain->pause(_pause);
+	//stream->pause(_pause);
 }
+
 bool AudioView::is_playback_active()
 {
-	return playback_active;
+	return session->signal_chain->is_playback_active();
 }
 
 bool AudioView::is_paused()
 {
-	if (playback_active)
-		return stream->is_paused();
-	return false;
+	return session->signal_chain->is_paused();
 }
 
 int AudioView::playback_pos()

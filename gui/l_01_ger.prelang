@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-614
+615
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1828,7 +1828,7 @@ bar_add_dialog/divisor
 𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   
 Basiseinheit der Schläge - in einfachen Takten ist das die Dauer jedes einzelnen Schlages - in komplexen Takten werden mehrere hiervon zu Schlägen gruppiert
 new_dialog/beats
-
+1
 Schläge pro Takt
 new_dialog/complex
 
@@ -1845,6 +1845,9 @@ Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einh
 new_dialog/pattern
 
 Beispiel: 3,3,2,2 um jedem Takt 4 Schläge zu geben, der erste Schlag ist 3 Einheiten lang etc. Der Takt hat insgesamt 3+3+2+2 = 10 Einheiten
+popup_signal_chain_menu/signal_chain_add_audio_output
+AudioOutputStream
+
 // Num Language Strings
 216
 // Data (ID,Text)

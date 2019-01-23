@@ -22,6 +22,7 @@
 #include "../Data/Song.h"
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+const string Module::MESSAGE_STATE_CHANGE = "StateChange";
 
 
 void ModuleConfiguration::__init__()

@@ -209,7 +209,6 @@ public:
 	Song *song;
 
 	OutputStream *stream;
-	bool playback_active;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
 	void play(const Range &range, bool allow_loop);

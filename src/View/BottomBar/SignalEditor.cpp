@@ -70,43 +70,44 @@ public:
 		set_target("grid");
 		add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
 
-		event_xp("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
-		event_x("area", "hui:mouse-move", std::bind(&SignalEditorTab::on_mouse_move, this));
-		event_x("area", "hui:left-button-down", std::bind(&SignalEditorTab::on_left_button_down, this));
-		event_x("area", "hui:left-button-up", std::bind(&SignalEditorTab::on_left_button_up, this));
-		event_x("area", "hui:right-button-down", std::bind(&SignalEditorTab::on_right_button_down, this));
-		event_x("area", "hui:key-down", std::bind(&SignalEditorTab::on_key_down, this));
-
-
-		event("signal_chain_add_audio_source", std::bind(&SignalEditorTab::on_add_audio_source, this));
-		event("signal_chain_add_audio_effect", std::bind(&SignalEditorTab::on_add_audio_effect, this));
-		event("signal_chain_add_audio_input", std::bind(&SignalEditorTab::on_add_audio_input_stream, this));
-		event("signal_chain_add_audio_joiner", std::bind(&SignalEditorTab::on_add_audio_joiner, this));
-		event("signal_chain_add_audio_sucker", std::bind(&SignalEditorTab::on_add_audio_sucker, this));
-		event("signal_chain_add_audio_visualizer", std::bind(&SignalEditorTab::on_add_audio_visualizer, this));
-		event("signal_chain_add_midi_source", std::bind(&SignalEditorTab::on_add_midi_source, this));
-		event("signal_chain_add_midi_effect", std::bind(&SignalEditorTab::on_add_midi_effect, this));
-		event("signal_chain_add_midi_input", std::bind(&SignalEditorTab::on_add_midi_input_stream, this));
-		event("signal_chain_add_synthesizer", std::bind(&SignalEditorTab::on_add_synthesizer, this));
-		event("signal_chain_add_pitch_detector", std::bind(&SignalEditorTab::on_add_pitch_detector, this));
-		event("signal_chain_add_beat_source", std::bind(&SignalEditorTab::on_add_beat_source, this));
-		event("signal_chain_add_beat_midifier", std::bind(&SignalEditorTab::on_add_beat_midifier, this));
-		event("signal_chain_reset", std::bind(&SignalEditorTab::on_reset, this));
-		event("signal_chain_activate", std::bind(&SignalEditorTab::on_activate, this));
-		event("signal_chain_delete", std::bind(&SignalEditorTab::on_delete, this));
-		event("signal_chain_save", std::bind(&SignalEditorTab::on_save, this));
-		event("signal_module_delete", std::bind(&SignalEditorTab::on_module_delete, this));
-		event("signal_module_configure", std::bind(&SignalEditorTab::on_module_configure, this));
-
-		event("signal_chain_new", std::bind(&SignalEditor::on_new, ed));
-		event("signal_chain_load", std::bind(&SignalEditor::on_load, ed));
-
 		editor = ed;
 		view = ed->view;
 		session = ed->session;
 
+		event_xp("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
+		event_x("area", "hui:mouse-move", [&]{ on_mouse_move(); });
+		event_x("area", "hui:left-button-down", [&]{ on_left_button_down(); });
+		event_x("area", "hui:left-button-up", [&]{ on_left_button_up(); });
+		event_x("area", "hui:right-button-down", [&]{ on_right_button_down(); });
+		event_x("area", "hui:key-down", [&]{ on_key_down(); });
+
+
+		event("signal_chain_add_audio_source", [&]{ on_add(ModuleType::AUDIO_SOURCE); });
+		event("signal_chain_add_audio_effect", [&]{ on_add(ModuleType::AUDIO_EFFECT); });
+		event("signal_chain_add_audio_input", [&]{ on_add(ModuleType::INPUT_STREAM_AUDIO); });
+		event("signal_chain_add_audio_output", [&]{ on_add(ModuleType::OUTPUT_STREAM_AUDIO); });
+		event("signal_chain_add_audio_joiner", [&]{ on_add(ModuleType::AUDIO_JOINER); });
+		event("signal_chain_add_audio_sucker", [&]{ on_add(ModuleType::AUDIO_SUCKER); });
+		event("signal_chain_add_audio_visualizer", [&]{ on_add(ModuleType::AUDIO_VISUALIZER); });
+		event("signal_chain_add_midi_source", [&]{ on_add(ModuleType::MIDI_SOURCE); });
+		event("signal_chain_add_midi_effect", [&]{ on_add(ModuleType::MIDI_EFFECT); });
+		event("signal_chain_add_midi_input", [&]{ on_add(ModuleType::INPUT_STREAM_MIDI); });
+		event("signal_chain_add_synthesizer", [&]{ on_add(ModuleType::SYNTHESIZER); });
+		event("signal_chain_add_pitch_detector", [&]{ on_add(ModuleType::PITCH_DETECTOR); });
+		event("signal_chain_add_beat_source", [&]{ on_add(ModuleType::BEAT_SOURCE); });
+		event("signal_chain_add_beat_midifier", [&]{ on_add(ModuleType::BEAT_MIDIFIER); });
+		event("signal_chain_reset", [&]{ on_reset(); });
+		event("signal_chain_activate", [&]{ on_activate(); });
+		event("signal_chain_delete", [&]{ on_delete(); });
+		event("signal_chain_save", [&]{ on_save(); });
+		event("signal_module_delete", [&]{ on_module_delete(); });
+		event("signal_module_configure", [&]{ on_module_configure(); });
+
+		event("signal_chain_new", [&]{ editor->on_new(); });
+		event("signal_chain_load", [&]{ editor->on_load(); });
+
 		chain = _chain;
-		chain->subscribe(this, std::bind(&SignalEditorTab::on_chain_update, this));
+		chain->subscribe(this, [&]{ on_chain_update(); });
 	}
 	virtual ~SignalEditorTab()
 	{
@@ -117,6 +118,7 @@ public:
 	Session *session;
 	AudioView *view;
 	SignalChain *chain;
+	rect area_play;
 
 	struct Selection
 	{
@@ -139,6 +141,7 @@ public:
 			TYPE_MODULE,
 			TYPE_PORT_IN,
 			TYPE_PORT_OUT,
+			TYPE_BUTTON_PLAY,
 		};
 		Module *target_module;
 		int target_port;
@@ -152,6 +155,10 @@ public:
 		Selection s;
 		s.dx = mx;
 		s.dy = my;
+		if (area_play.inside(mx, my)){
+			s.type = Selection::TYPE_BUTTON_PLAY;
+			return s;
+		}
 		for (auto *m: chain->modules){
 			rect r = module_rect(m);
 			if (r.inside(mx, my)){
@@ -315,6 +322,12 @@ public:
 			AudioView::draw_cursor_hover(p, _("input: ") + signal_type_name(hh.port_type), mx, my, p->area());
 		if (hh.type == hover.TYPE_PORT_OUT)
 			AudioView::draw_cursor_hover(p, _("output: ") + signal_type_name(hh.port_type), mx, my, p->area());
+
+		area_play = rect(10, 30, p->height - 30, p->height - 10);
+		p->set_color(view->colors.text);
+		if (hover.type == hover.TYPE_BUTTON_PLAY)
+			p->set_color(view->colors.hover);
+		p->draw_str(area_play.x1, area_play.y1, chain->is_playback_active() ? "⏹" : "▶️");
 	}
 
 	void on_chain_update()
@@ -333,6 +346,11 @@ public:
 			chain->disconnect_target(sel.module, sel.port);
 		}else if (sel.type == sel.TYPE_PORT_OUT){
 			chain->disconnect_source(sel.module, sel.port);
+		}else if (sel.type == sel.TYPE_BUTTON_PLAY){
+			if (chain->is_playback_active())
+				chain->stop();
+			else
+				chain->start();
 		}
 		redraw("area");
 	}
@@ -426,117 +444,21 @@ public:
 	}
 
 
-
-	void on_add_audio_source()
+	void on_add(ModuleType type)
 	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_SOURCE);
-		if (name.num > 0){
-			auto *m = chain->addAudioSource(name);
+		Array<string> names = session->plugin_manager->find_module_sub_types(type);
+		if (names.num > 1){
+			string name = session->plugin_manager->choose_module(win, session, type);
+			if (name.num > 0){
+				auto *m = chain->add(type, name);
+				m->module_x = sel.dx;
+				m->module_y = sel.dy;
+			}
+		}else{
+			auto *m = chain->add(type);
 			m->module_x = sel.dx;
 			m->module_y = sel.dy;
 		}
-	}
-
-	void on_add_audio_effect()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_EFFECT);
-		if (name.num > 0){
-			auto *m = chain->addAudioEffect(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_audio_visualizer()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::AUDIO_VISUALIZER);
-		if (name.num > 0){
-			auto *m = chain->addAudioVisualizer(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_audio_joiner()
-	{
-		auto *m = chain->addAudioJoiner();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
-	}
-
-	void on_add_audio_sucker()
-	{
-		auto *m = chain->addAudioSucker();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
-	}
-
-	void on_add_audio_input_stream()
-	{
-		auto *m = chain->addAudioInputStream();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
-	}
-
-	void on_add_midi_source()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_SOURCE);
-		if (name.num > 0){
-			auto *m = chain->addMidiSource(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_midi_effect()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::MIDI_EFFECT);
-		if (name.num > 0){
-			auto *m = chain->addMidiEffect(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_synthesizer()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::SYNTHESIZER);
-		if (name.num > 0){
-			auto *m = chain->addSynthesizer(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_midi_input_stream()
-	{
-		auto *m = chain->addMidiInputStream();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
-	}
-
-	void on_add_pitch_detector()
-	{
-		auto *m = chain->addPitchDetector();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
-	}
-
-	void on_add_beat_source()
-	{
-		string name = session->plugin_manager->choose_module(win, session, ModuleType::BEAT_SOURCE);
-		if (name.num > 0){
-			auto *m = chain->addBeatSource(name);
-			m->module_x = sel.dx;
-			m->module_y = sel.dy;
-		}
-	}
-
-	void on_add_beat_midifier()
-	{
-		auto *m = chain->addBeatMidifier();
-		m->module_x = sel.dx;
-		m->module_y = sel.dy;
 	}
 
 	void on_reset()

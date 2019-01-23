@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>new</name>
+	</head>
+	<modules>
+		<module>
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>430</x>
+				<y>112</y>
+			</position>
+		</module>
+		<module>
+			<category>AudioSource</category>
+			<class>Noise</class>
+			<position>
+				<x>180</x>
+				<y>93</y>
+			</position>
+			<config>(0.179688 0)</config>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="1" port="0" />
+			<target id="0" port="0" />
+		</cable>
+	</cables>
+</chain>

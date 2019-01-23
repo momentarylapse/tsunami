@@ -11,6 +11,7 @@
 #include "Port/MidiPort.h"
 #include "../Session.h"
 #include "../Plugins/PluginManager.h"
+#include "../Device/OutputStream.h"
 #include "../lib/file/file.h"
 #include "../lib/xfile/xml.h"
 
@@ -25,6 +26,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 {
 	session = s;
 	name = _name;
+	playback_active = false;
 }
 
 SignalChain::~SignalChain()
@@ -40,9 +42,9 @@ SignalChain *SignalChain::create_default(Session *session)
 {
 	SignalChain *chain = new SignalChain(session, "playback");
 
-	auto *mod_renderer = chain->addAudioSource("SongRenderer");
-	auto *mod_peak = chain->addAudioVisualizer("PeakMeter");
-	auto *mod_out = chain->addAudioOutputStream();
+	auto *mod_renderer = chain->add(ModuleType::AUDIO_SOURCE, "SongRenderer");
+	auto *mod_peak = chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	auto *mod_out = chain->add(ModuleType::OUTPUT_STREAM_AUDIO);
 
 	chain->connect(mod_renderer, 0, mod_peak, 0);
 	chain->connect(mod_peak, 0, mod_out, 0);
@@ -50,7 +52,7 @@ SignalChain *SignalChain::create_default(Session *session)
 	return chain;
 }
 
-Module *SignalChain::add(Module *m)
+Module *SignalChain::_add(Module *m)
 {
 	int i = modules.num;
 	m->module_x = 50 + (i % 5) * 230;
@@ -225,7 +227,7 @@ void SignalChain::load(const string& filename)
 				auto itype = Module::type_from_name(type);
 				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
-				m = add(ModuleFactory::create(session, itype, sub_type));
+				m = _add(ModuleFactory::create(session, itype, sub_type));
 			}
 			m->config_from_string(e.value("config"));
 			m->module_x = e.find("position")->value("x")._float();
@@ -276,77 +278,7 @@ void SignalChain::reset()
 
 Module* SignalChain::add(ModuleType type, const string &sub_type)
 {
-	return add(ModuleFactory::create(session, type, sub_type));
-}
-
-Module* SignalChain::addAudioSource(const string &name)
-{
-	return add(ModuleType::AUDIO_SOURCE, name);
-}
-
-Module* SignalChain::addMidiSource(const string &name)
-{
-	return add(ModuleType::MIDI_SOURCE, name);
-}
-
-Module* SignalChain::addAudioEffect(const string &name)
-{
-	return add(ModuleType::AUDIO_EFFECT, name);
-}
-
-Module* SignalChain::addAudioJoiner()
-{
-	return add(ModuleType::AUDIO_JOINER, "");
-}
-
-Module* SignalChain::addAudioSucker()
-{
-	return add(ModuleType::AUDIO_SUCKER, "");
-}
-
-Module* SignalChain::addPitchDetector()
-{
-	return add(ModuleType::PITCH_DETECTOR, "");
-}
-
-Module* SignalChain::addAudioVisualizer(const string &name)
-{
-	return add(ModuleType::AUDIO_VISUALIZER, name);
-}
-
-Module* SignalChain::addAudioInputStream()
-{
-	return add(ModuleType::INPUT_STREAM_AUDIO, "");
-}
-
-Module* SignalChain::addAudioOutputStream()
-{
-	return add(ModuleType::OUTPUT_STREAM_AUDIO, "");
-}
-
-Module* SignalChain::addMidiEffect(const string &name)
-{
-	return add(ModuleType::MIDI_EFFECT, name);
-}
-
-Module* SignalChain::addSynthesizer(const string &name)
-{
-	return add(ModuleType::SYNTHESIZER, name);
-}
-
-Module* SignalChain::addMidiInputStream()
-{
-	return add(ModuleType::INPUT_STREAM_MIDI, "");
-}
-
-Module* SignalChain::addBeatMidifier()
-{
-	return add(ModuleType::BEAT_MIDIFIER, "");
-}
-
-Module* SignalChain::addBeatSource(const string &name)
-{
-	return add(ModuleType::BEAT_SOURCE, name);
+	return _add(ModuleFactory::create(session, type, sub_type));
 }
 
 void SignalChain::reset_state()
@@ -357,20 +289,48 @@ void SignalChain::reset_state()
 
 void SignalChain::start()
 {
+	if (is_playback_active())
+		return;
+
 	reset_state();
 	for (auto *m: modules)
 		m->module_start();
+	playback_active = true;
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 void SignalChain::stop()
 {
+	if (!is_playback_active())
+		return;
+
 	for (auto *m: modules)
 		m->module_stop();
+	playback_active = false;
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 void SignalChain::pause(bool paused)
 {
+	if (!playback_active)
+		return;
 	for (auto *m: modules)
 		m->module_pause(paused);
+	notify(MESSAGE_STATE_CHANGE);
+}
+
+
+bool SignalChain::is_paused()
+{
+	if (playback_active)
+		for (auto *m: modules)
+			if (m->module_type == ModuleType::OUTPUT_STREAM_AUDIO)
+				return ((OutputStream*)m)->is_paused();
+	return false;
+}
+
+bool SignalChain::is_playback_active()
+{
+	return playback_active;
 }
 

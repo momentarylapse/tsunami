@@ -39,22 +39,8 @@ public:
 	string name;
 
 	Array<Module*> modules;
-	Module* add(Module *m);
-	Module* add(ModuleType type, const string &sub_type);
-	Module* addAudioSource(const string &name);
-	Module* addMidiSource(const string &name);
-	Module* addAudioEffect(const string &name);
-	Module* addPitchDetector();
-	Module* addAudioJoiner();
-	Module* addAudioSucker();
-	Module* addAudioVisualizer(const string &name);
-	Module* addAudioInputStream();
-	Module* addAudioOutputStream();
-	Module* addMidiEffect(const string &name);
-	Module* addSynthesizer(const string &name);
-	Module* addMidiInputStream();
-	Module* addBeatMidifier();
-	Module* addBeatSource(const string &name);
+	Module* _add(Module *m);
+	Module* add(ModuleType type, const string &sub_type = "");
 	void remove(Module *m);
 	int module_index(Module *m);
 
@@ -83,6 +69,10 @@ public:
 	void start();
 	void pause(bool paused);
 	void stop();
+
+	bool playback_active;
+	bool is_paused();
+	bool is_playback_active();
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

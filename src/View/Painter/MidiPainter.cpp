@@ -256,15 +256,29 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 	float neck_length = max(NOTE_NECK_LENGTH, rr*5);
 	float neck_width = max(NOTE_NECK_WIDTH, rr/3);
 	float e = d[0].up ? -1 : 1;
-	float x0 = d[0].x, y0 = d[0].y + e * neck_length;
-	float x1 = d.back().x, y1 = d.back().y + e * neck_length;
-	float m = (y1 - y0) / (x1 - x0);
+	float x0 = d[0].x;
+	float y0 = d[0].y;
+	float x1 = d.back().x;
+	float y1 = d.back().y;
+	float dx = x1 - x0;
+	float dy = y1 - y0;
+	float m = dy / dx;
 
+	// optimize neck length
+	float dy0min = 0;
+	for (auto &dd: d)
+		dy0min = max(dy0min, e * (dd.y - (y0 + m * (dd.x - x0))));
+	y0 += e * max(neck_length, dy0min + neck_length * 0.6f);
+
+	// draw necks
 	c->set_line_width(neck_width);
 	for (auto &dd: d){
 		c->set_color(dd.col);
 		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
 	}
+
+
+	// bar
 	c->set_line_width(NOTE_BAR_WIDTH);
 	float t0 = 0;
 	for (int i=0; i<d.num; i++){
@@ -280,17 +294,18 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 			xx = (x0*2 + d[1].x) / 3;
 		if (xx == x1 and (i+1 < d.num))
 			xx = (x1*4 + d[1-1].x) / 5;
-		float t1 = (xx - x0) / (x1 - x0);
+		float t1 = (xx - x0) / dx;
 		c->set_color(d[i].col);
-		c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1);
+		c->draw_line(x0 + dx*t0, y0 + dy*t0, x0 + dx*t1, y0 + dy*t1);
 		if (d[i].length <= SIXTEENTH)
-			c->draw_line(x0 + (x1-x0)*t0, y0 + (y1-y0)*t0 - e*NOTE_BAR_DISTANCE, x0 + (x1-x0)*t1, y0 + (y1-y0)*t1 - e*NOTE_BAR_DISTANCE);
+			c->draw_line(x0 + dx*t0, y0 + dy*t0 - e*NOTE_BAR_DISTANCE, x0 + dx*t1, y0 + dy*t1 - e*NOTE_BAR_DISTANCE);
 		if (d[i].punctured)
 			c->draw_circle(d[i].x + rr, d[i].y + rr, 2);
 		t0 = t1;
 	}
 	if (d[0].triplet)
-		c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 4 + e*9, "3");
+		//c->draw_str((x0 + x1)/2, (y0 + y1)/2 - 4 + e*9, "3");
+		c->draw_str(x0 + dx/2, y0 + dy/2 + c->font_size * (e*1.3f - 0.5f), "3");
 }
 
 

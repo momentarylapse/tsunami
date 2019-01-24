@@ -25,6 +25,7 @@ class Curve;
 class SongSelection;
 class AudioBuffer;
 class BarPattern;
+class TrackMarker;
 enum class SampleFormat;
 enum class SignalType;
 
@@ -90,6 +91,8 @@ public:
 	int _cdecl bar_offset(int index);
 
 	string _cdecl get_tag(const string &key);
+
+	Array<TrackMarker*> get_parts();
 
 	// action
 	void _cdecl add_tag(const string &key, const string &value);

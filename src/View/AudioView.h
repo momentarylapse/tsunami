@@ -144,6 +144,12 @@ public:
 		FAKE,
 	};
 	SelectionMode selection_mode;
+	enum class SelectionSnapMode{
+		NONE,
+		BAR,
+		PART,
+	};
+	SelectionSnapMode selection_snap_mode;
 	bool hide_selection;
 
 

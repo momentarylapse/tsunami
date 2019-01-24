@@ -756,7 +756,7 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	}
 
 	// selection boundaries?
-	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->get_key(hui::KEY_SHIFT))){
+	if ((my >= view->area.y2-20) or (view->win->get_key(hui::KEY_SHIFT))){
 		if (view->mouse_over_time(view->sel.range.end())){
 			s.type = Selection::Type::SELECTION_END;
 			return s;
@@ -765,6 +765,8 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 			s.type = Selection::Type::SELECTION_START;
 			return s;
 		}
+	}
+	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->get_key(hui::KEY_SHIFT))){
 		if (view->is_playback_active()){
 			if (view->mouse_over_time(view->playback_pos())){
 				s.type = Selection::Type::PLAYBACK;

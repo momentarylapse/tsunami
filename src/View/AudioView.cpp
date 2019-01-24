@@ -255,6 +255,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
 	selection_mode = SelectionMode::NONE;
+	selection_snap_mode = SelectionSnapMode::NONE;
 	hide_selection = false;
 	song->subscribe(this, [&]{ on_song_update(); });
 
@@ -996,15 +997,18 @@ void draw_message(Painter *c, AudioView *view, AudioView::Message &m)
 
 void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time)
 {
-	int p = cam.sample2screen(pos);
-	if ((p >= song_area.x1) and (p <= song_area.x2)){
+	float x = cam.sample2screen(pos);
+	if ((x >= song_area.x1) and (x <= song_area.x2)){
 		color cc = (type == (int)hover.type) ? colors.selection_boundary_hover : col;
 		c->set_color(cc);
 		c->set_line_width(2.0f);
-		c->draw_line(p, area.y1, p, area.y2);
+		c->draw_line(x, area.y1, x, area.y2);
 		if (show_time)
-			draw_boxed_str(c,  p, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
+			draw_boxed_str(c,  x, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
 		c->set_line_width(1.0f);
+		if ((type == (int)Selection::Type::SELECTION_START) or (type == (int)Selection::Type::SELECTION_END)){
+			c->draw_circle(x, area.y2, 8);
+		}
 	}
 }
 

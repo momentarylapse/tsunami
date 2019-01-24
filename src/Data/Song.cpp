@@ -523,6 +523,14 @@ Track *Song::time_track()
 	return nullptr;
 }
 
+Array<TrackMarker*> Song::get_parts()
+{
+	Track *t = time_track();
+	if (t)
+		return t->markers;
+	return {};
+}
+
 string Song::get_tag(const string &key)
 {
 	for (Tag &t: tags)

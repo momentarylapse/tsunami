@@ -38,6 +38,7 @@ public:
 	color selection_bars;
 	color selection_bars_hover;
 	color preview_marker;
+	color preview_marker_internal;
 	color capture_marker;
 	color text_soft1;
 	color text_soft2;

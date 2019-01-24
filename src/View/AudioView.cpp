@@ -41,8 +41,6 @@
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
 
-color col_inter(const color a, const color &b, float t); // -> ColorScheme.cpp
-
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
 const float AudioView::LINE_WIDTH = 1.0f;
@@ -1083,9 +1081,7 @@ void AudioView::draw_time_scale(Painter *c)
 	grid_painter->draw_time(c);
 
 	if (is_playback_active()){
-		color cc = AudioView::colors.preview_marker;
-		cc.a = 0.25f;
-		c->set_color(cc);
+		c->set_color(AudioView::colors.preview_marker_internal);
 		float x0, x1;
 		cam.range2screen(renderer->range(), x0, x1);
 		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);

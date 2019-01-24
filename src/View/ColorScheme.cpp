@@ -57,6 +57,7 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.selection_boundary = c.selection;
 	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
 	c.preview_marker = color(1, 0, 0.7f, 0);
+	c.preview_marker_internal = color(0.25f, 0, 0.7f, 0);
 	c.capture_marker = color(1, 0.7f, 0, 0);
 	c.text_soft1 = col_inter(background, c.text, 0.72f);
 	c.text_soft3 = col_inter(background, col_inter(c.text, c.selection, 0.3f), 0.3f);

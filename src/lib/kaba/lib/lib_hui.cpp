@@ -20,7 +20,9 @@ namespace Kaba{
 
 #ifdef _X_USE_HUI_
 	static hui::Event *_event;
+	static hui::Panel *_panel;
 	static hui::Painter *_painter;
+	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
 	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
 	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
 	#define GetDAPainter(x)	int_p(&_painter->x)-int_p(_painter)
@@ -129,6 +131,7 @@ void SIAddPackageHui()
 				func_add_param("source", TypeString);
 
 		add_class(TypeHuiPanel);
+			class_add_element("win", TypeHuiWindowP, GetDAPanel(win));
 			class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&hui::Panel::__init__));
 			class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&hui::Panel::__delete__));
 			class_add_func("set_border_width",			TypeVoid,		mf(&hui::Panel::set_border_width));

@@ -24,8 +24,7 @@
 ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode)
 {
 	index = _index;
-	bar = new Bar;
-	*(BarPattern*)bar = _bar;
+	bar = new Bar(_bar);
 	mode = _mode;
 }
 

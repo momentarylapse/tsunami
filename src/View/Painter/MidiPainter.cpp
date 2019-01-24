@@ -398,6 +398,8 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars){
+		if (b->is_pause())
+			continue;
 
 		// samples per 16th / 3
 		float sub_beat_length = (float)b->range().length / (float)b->total_sub_beats;

@@ -724,6 +724,12 @@ void ViewModeDefault::draw_post(Painter *c)
 		{}//view->draw_cursor_hover(c, _("bar gap"));
 	else if (hover->type == Selection::Type::PLAYBACK_LOCK)
 		view->draw_cursor_hover(c, _("lock playback range"));
+
+	if (view->selection_mode != view->SelectionMode::NONE){
+		if (view->sel.bars.num > 0)
+			view->draw_cursor_hover(c, format(_("%d bars"), view->sel.bars.num));
+	}
+
 }
 
 Selection ViewModeDefault::get_hover_basic(bool editable)

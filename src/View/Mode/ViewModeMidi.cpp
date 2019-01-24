@@ -303,12 +303,14 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
 		m->set_note_length(l * n);
 		m->set_sub_beat_partition(p);
 	}
-	/*string t = text;
-	if (n > 1)
-		t += " x" + i2s(n);*/
+
 	string t;
-	for (int i=0; i<n; i++)
-		t += text;
+	if (n > 4){
+		t = text + " x " + i2s(n);
+	}else{
+		for (int i=0; i<n; i++)
+			t += text;
+	}
 	m->view->set_message(t, 6);
 }
 
@@ -755,7 +757,8 @@ void ViewModeMidi::draw_post(Painter *c)
 
 	auto *mp = midi_context(this);
 
-	c->set_color(view->colors.selection_internal);
+	c->set_color(view->colors.text_soft1);
+	c->set_fill(false);
 	if (mode == MidiMode::TAB){
 		int y = mp->string_to_screen(string_no);
 		int y1 = y - mp->clef_dy/2;
@@ -774,6 +777,7 @@ void ViewModeMidi::draw_post(Painter *c)
 		int y2 = mp->pitch2y_linear(p1);
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
+	c->set_fill(true);
 
 	string message = _("add pause (.)    delete (⟵)    note length (L)    beat partition (P)");
 	if (mode == MidiMode::TAB)

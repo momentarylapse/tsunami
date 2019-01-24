@@ -460,13 +460,13 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	auto *tt = l->layer->song()->time_track();
 	if (tt){
 		c->set_line_width(2.0f);
-	for (auto *m: tt->markers){
-		color col = l->marker_color(m);
-		//col.a = 0.5f;
-		float x1 = (float)view->cam.sample2screen(m->range.start());
-		c->set_color(col);
-		c->draw_line(x1, l->area.y1, x1, l->area.y2);
-	}
+		for (auto *m: tt->markers){
+			color col = l->marker_color(m);
+			col.a = 0.5f;
+			float x1 = (float)view->cam.sample2screen(m->range.start());
+			c->set_color(col);
+			c->draw_line(x1, l->area.y1, x1, l->area.y2);
+		}
 	}
 }
 

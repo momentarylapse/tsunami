@@ -183,7 +183,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 	float x0, x1;
 	view->cam.range2screen(marker->range, x0, x1);
 	float y0 = area.y1;
-	float y1 = y0 + 15;
+	float y1 = y0 + 5;
 
 	w = max(w, x1 - x0);
 
@@ -200,9 +200,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 		col2 = ColorInterpolate(col2, view->colors.hover, 0.3f);
 	}
 
-	color col_bg2 = col2;
-	col_bg2.a = 0.65f;
-	c->set_color(col_bg2);
+	c->set_color(col2);
 	c->draw_rect(x0, y0, x1-x0, y1-y0);
 	c->set_color(col2);
 	c->set_line_width(2.0f);
@@ -211,7 +209,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 	c->set_line_width(1.0f);
 	view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 
-	marker_areas[index] = rect(x0, x0 + w, y0, y1);
+	marker_areas[index] = rect(x0, x0 + w, y0, y0 + 15);
 	marker_label_areas[index] = view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
 
 	c->set_font("", -1, false, false);

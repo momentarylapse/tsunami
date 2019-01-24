@@ -243,6 +243,10 @@ public:
 	rect clip;
 	TrackHeightManager thm;
 
+	rect playback_lock_button;
+	bool playback_range_locked;
+	Range playback_lock_range;
+
 	ViewPort cam;
 
 	ScrollBar *scroll;

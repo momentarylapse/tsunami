@@ -106,6 +106,13 @@ void ViewModeDefault::on_left_button_down()
 		view->msp.start(hover->pos, hover->y0);
 	}else if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
 		view->scroll->drag_start(view->mx, view->my);
+	}else if (view->hover.type == Selection::Type::PLAYBACK_LOCK){
+		if (view->playback_range_locked){
+			view->playback_range_locked = false;
+		}else{
+			view->playback_lock_range = view->sel.range;
+			view->playback_range_locked = true;
+		}
 	}
 }
 
@@ -711,6 +718,8 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
 	else if (hover->type == Selection::Type::BAR_GAP)
 		{}//view->draw_cursor_hover(c, _("bar gap"));
+	else if (hover->type == Selection::Type::PLAYBACK_LOCK)
+		view->draw_cursor_hover(c, _("lock playback range"));
 }
 
 Selection ViewModeDefault::get_hover_basic(bool editable)
@@ -762,6 +771,10 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 				return s;
 			}
 		}
+	}
+	if (view->playback_lock_button.inside(mx, my)){
+		s.type = Selection::Type::PLAYBACK_LOCK;
+		return s;
 	}
 
 	// time scale

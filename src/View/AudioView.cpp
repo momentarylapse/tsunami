@@ -250,6 +250,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cur_vlayer = nullptr;
 	_prev_cur_track = nullptr;
 
+	playback_range_locked = false;
+
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
@@ -479,6 +481,8 @@ bool AudioView::mouse_over_time(int pos)
 
 Range AudioView::get_playback_selection(bool for_recording)
 {
+	if (playback_range_locked)
+		return playback_lock_range;
 	if (sel.range.empty()){
 		if (for_recording)
 			return Range(sel.range.start(), 0x70000000);
@@ -1087,6 +1091,23 @@ void AudioView::draw_time_scale(Painter *c)
 		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 	}
 	grid_painter->draw_time_numbers(c);
+
+	if (playback_range_locked){
+		c->set_color(AudioView::colors.preview_marker);
+		float x0, x1;
+		cam.range2screen_clip(playback_lock_range, area, x0, x1);
+		c->draw_rect(x0, area.y1, x1-x0, 5);
+	}
+
+	// playback lock
+	playback_lock_button = rect(0,0,0,0);
+	if (playback_range_locked or !sel.range.empty()){
+		float x = cam.sample2screen(get_playback_selection(false).end());
+		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + TIME_SCALE_HEIGHT);
+
+		c->set_color((hover.type == Selection::Type::PLAYBACK_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, "L");
+	}
 }
 
 void AudioView::draw_selection(Painter *c)

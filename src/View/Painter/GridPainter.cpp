@@ -160,19 +160,37 @@ void GridPainter::draw_bar_numbers(Painter *c)
 
 	c->set_font("", AudioView::FONT_SIZE, true, false);
 	for (Bar *b: bars){
+		float xx = cam->sample2screen(b->range().offset);
+
+		color halo_col = color(0,0,0,0);
+		if (view->hover.type == Selection::Type::BAR and view->hover.bar == b){
+			halo_col = AudioView::colors.hover;
+		}else if (view->sel.has(b)){
+			halo_col = AudioView::colors.selection;
+		}
+
+		string label = " ";
+		if (!b->is_pause())
+			label = i2s(b->index_text + 1);
+
+		if (halo_col.a > 0){
+			halo_col.a = 0.5f;
+			view->draw_boxed_str(c, xx + 4, area.y1+5, label, AudioView::colors.text, halo_col);
+		}else{
+			float dx_bar = cam->dsample2screen(b->range().length);
+			float f1 = min(1.0f, dx_bar / 40.0f);
+			if ((b->index_text % 5) == 0)
+				f1 = 1;
+			if (f1 > 0.9f or halo_col.a > 0){
+				c->set_color(AudioView::colors.text_soft1);
+				c->draw_str(xx + 4, area.y1+5, label);
+			}
+		}
+
 		if (b->is_pause())
 			continue;
-		int xx = cam->sample2screen(b->range().offset);
 
-		float dx_bar = cam->dsample2screen(b->range().length);
-		float dx_beat = dx_bar / b->beats.num;
-		float f1 = min(1.0f, dx_bar / 40.0f);
-		if ((b->index_text % 5) == 0)
-			f1 = 1;
-		if (f1 > 0.9f){
-			c->set_color(AudioView::colors.text_soft1);
-			c->draw_str(xx + 4, area.y1+5, i2s(b->index_text + 1));
-		}
+		// info label (betas, bpm)
 		float bpm = b->bpm(song->sample_rate);
 		string s;
 		if (prev != *b)
@@ -181,7 +199,7 @@ void GridPainter::draw_bar_numbers(Painter *c)
 			s += format(" \u2669=%.0f", bpm);
 		if (s.num > 0){
 			c->set_color(AudioView::colors.text_soft1);
-			c->draw_str(max(xx + 4, 20), area.y2 - 16, s);
+			c->draw_str(max(xx + 4, 20.0f), area.y2 - 16, s);
 		}
 		prev = *b;
 		prev_bpm = bpm;

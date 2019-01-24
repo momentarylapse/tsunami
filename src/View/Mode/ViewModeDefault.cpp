@@ -509,8 +509,8 @@ void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
 void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
 {
 
-	if (t->track->type == SignalType::BEATS)
-		draw_bar_selection(c, t, view);
+	//if (t->track->type == SignalType::BEATS)
+	//	draw_bar_selection(c, t, view);
 }
 
 void ViewModeDefault::draw_imploded_track_background(Painter *c, AudioViewTrack *t)

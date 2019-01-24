@@ -26,12 +26,14 @@ public:
 
 	void on_show_bottom_bar();
 	void on_volume();
+	void on_selection_snap_mode();
 
 	void _cdecl on_show() override;
 	void _cdecl on_hide() override;
 
 	void on_bottom_bar_update();
 	void on_volume_change();
+	void on_view_settings_change();
 
 	//OutputStream *stream;
 	Session *session;

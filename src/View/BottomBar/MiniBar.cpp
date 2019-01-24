@@ -28,15 +28,20 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	cpu_display = new CpuDisplay(this, "cpu", session);
 
-	event("show_bottom_bar", std::bind(&MiniBar::on_show_bottom_bar, this));
-	event("volume", std::bind(&MiniBar::on_volume, this));
+	set_int("selection_snap_mode", (int)view->selection_snap_mode);
 
-	bottom_bar->subscribe(this, std::bind(&MiniBar::on_bottom_bar_update, this));
-	dev_manager->subscribe(this, std::bind(&MiniBar::on_volume_change, this));
+	event("show_bottom_bar", [&]{ on_show_bottom_bar(); });
+	event("volume", [&]{ on_volume(); });
+	event("selection_snap_mode", [&]{ on_selection_snap_mode(); });
+
+	bottom_bar->subscribe(this, [&]{ on_bottom_bar_update(); });
+	dev_manager->subscribe(this, [&]{ on_volume_change(); });
+	view->subscribe(this, [&]{ on_view_settings_change(); });
 }
 
 MiniBar::~MiniBar()
 {
+	view->unsubscribe(this);
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
 	delete(peak_meter);
@@ -52,6 +57,11 @@ void MiniBar::on_show_bottom_bar()
 void MiniBar::on_volume()
 {
 	dev_manager->set_output_volume(get_float(""));
+}
+
+void MiniBar::on_selection_snap_mode()
+{
+	view->set_selection_snap_mode((AudioView::SelectionSnapMode)get_int(""));
 }
 
 void MiniBar::on_show()
@@ -78,3 +88,7 @@ void MiniBar::on_volume_change()
 }
 
 
+void MiniBar::on_view_settings_change()
+{
+	set_int("selection_snap_mode", (int)view->selection_snap_mode);
+}

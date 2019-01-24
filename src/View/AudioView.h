@@ -150,6 +150,7 @@ public:
 		PART,
 	};
 	SelectionSnapMode selection_snap_mode;
+	void set_selection_snap_mode(SelectionSnapMode mode);
 	bool hide_selection;
 
 

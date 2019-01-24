@@ -1857,7 +1857,7 @@ Grid
 expandx,border=8
 0
 1
-4
+5
 Button
 show_bottom_bar
 flat,image=hui:up
@@ -1876,10 +1876,16 @@ width=100,noexpandx,noexpandy
 2
 0
 0
+ComboBox
+selection_snap_mode
+width=100
+3
+0
+0
 DrawingArea
 cpu
 width=100,noexpandx,noexpandy
-3
+4
 0
 0
 // Resource
@@ -4734,7 +4740,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-472
+473
 // Text
 /cancel
 Cancel
@@ -5324,6 +5330,9 @@ Midi Fx
 mini_bar/peaks
 
 Output level
+mini_bar/selection_snap_mode
+Free\\Bars\\Parts
+Selection snap mode
 mini_bar/show_bottom_bar
 
 Expand
@@ -6158,7 +6167,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-614
+615
 // Text
 /bpm
 Bpm
@@ -7003,6 +7012,9 @@ Midi Fx
 mini_bar/peaks
 
 Ausgabepegel
+mini_bar/selection_snap_mode
+Frei\\Takte\\Teile
+Auswahl Modus
 mini_bar/show_bottom_bar
 
 Leiste aufklappen
@@ -8003,7 +8015,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-216
+217
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8385,6 +8397,8 @@ loading buffer
 lade Audiopuffer 
 loading track 
 Lade Spur 
+lock playback range
+Abspielbereich festhalten
 marker 
 Marker 
 midi library selected: 

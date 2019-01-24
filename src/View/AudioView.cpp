@@ -20,6 +20,7 @@
 #include "../Data/base.h"
 #include "../Data/Track.h"
 #include "../Data/TrackLayer.h"
+#include "../Data/TrackMarker.h"
 #include "../Data/Song.h"
 #include "../Data/Sample.h"
 #include "../Data/Rhythm/Bar.h"
@@ -493,25 +494,54 @@ Range AudioView::get_playback_selection(bool for_recording)
 	return sel.range;
 }
 
+void AudioView::set_selection_snap_mode(SelectionSnapMode mode)
+{
+	selection_snap_mode = mode;
+	notify(MESSAGE_SETTINGS_CHANGE);
+}
+
+void _update_find_min(int &new_pos, bool &found, float &dmin, int pos, int trial_pos)
+{
+	float dist = fabs(trial_pos - pos);
+	if (dist < dmin){
+		//msg_write(format("barrier:  %d  ->  %d", pos, b));
+		new_pos = trial_pos;
+		found = true;
+		dmin = dist;
+	}
+
+}
+
 void AudioView::snap_to_grid(int &pos)
 {
-	int dmin = SNAPPING_DIST;
 	bool found = false;
 	int new_pos;
 
-	int sub_beats = 1;
-	if (mode == mode_midi)
-		sub_beats = mode_midi->sub_beat_partition;
+	if (selection_snap_mode == SelectionSnapMode::NONE){
+		float dmin = cam.dscreen2sample(SNAPPING_DIST);
 
-	// time bar...
-	Array<Beat> beats = song->bars.get_beats(cam.range(), true, true, sub_beats);
-	for (Beat &b: beats){
-		int dist = fabs(cam.sample2screen(b.range.offset) - cam.sample2screen(pos));
-		if (dist < dmin){
-			//msg_write(format("barrier:  %d  ->  %d", pos, b));
-			new_pos = b.range.offset;
-			found = true;
-			dmin = dist;
+		int sub_beats = 0;
+		if (mode == mode_midi)
+			sub_beats = mode_midi->sub_beat_partition;
+
+		// time bar...
+		auto beats = song->bars.get_beats(cam.range(), true, sub_beats>0, sub_beats);
+		for (Beat &b: beats)
+			_update_find_min(new_pos, found, dmin, pos, b.range.offset);
+
+	}else if (selection_snap_mode == SelectionSnapMode::BAR){
+		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
+		auto bars = song->bars.get_bars(cam.range());
+		for (Bar *b: bars){
+			_update_find_min(new_pos, found, dmin, pos, b->range().start());
+			_update_find_min(new_pos, found, dmin, pos, b->range().end());
+		}
+	}else if (selection_snap_mode == SelectionSnapMode::PART){
+		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
+		auto parts = song->get_parts();
+		for (auto *p: parts){
+			_update_find_min(new_pos, found, dmin, pos, p->range.start());
+			_update_find_min(new_pos, found, dmin, pos, p->range.end());
 		}
 	}
 

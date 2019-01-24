@@ -6,4 +6,5 @@ Dialog mini_bar "" width=400 height=40
 			Button show_bottom_bar "" flat image=hui:up "tooltip=Expand"
 			DrawingArea peaks "" width=100 noexpandx noexpandy "tooltip=Output level"
 			Slider volume "0\\-10000\\10\\0.1" width=100 noexpandx noexpandy "tooltip=Output volume"
+			ComboBox selection_snap_mode "Free\\Bars\\Parts" "tooltip=Selection snap mode" width=100
 			DrawingArea cpu "" width=100 noexpandx noexpandy

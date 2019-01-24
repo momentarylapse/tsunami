@@ -457,17 +457,21 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 
 
-	auto *tt = l->layer->song()->time_track();
-	if (tt){
-		c->set_line_width(2.0f);
-		for (auto *m: tt->markers){
-			color col = l->marker_color(m);
-			col.a = 0.5f;
-			float x1 = (float)view->cam.sample2screen(m->range.start());
-			c->set_color(col);
-			c->draw_line(x1, l->area.y1, x1, l->area.y2);
-		}
+	// parts
+	c->set_line_width(2.0f);
+	string prev_part = "";
+	for (auto *m: l->layer->song()->get_parts()){
+		color col = l->marker_color(m);
+		col.a = 0.75f;
+		float x0, x1;
+		view->cam.range2screen(m->range, x0, x1);
+		if (m->text == prev_part)
+			col.a *= clampf((x1 - x0) / 200, 0.25f, 1.0f);
+		c->set_color(col);
+		c->draw_line(x0, l->area.y1, x0, l->area.y2);
+		prev_part = m->text;
 	}
+	c->set_line_width(1.0f);
 }
 
 void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)

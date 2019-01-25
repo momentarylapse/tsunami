@@ -77,7 +77,7 @@ expandx,hidden
 0
 ToggleButton
 complex
-image=hui:find
+image=hui:edit
 2
 1
 0
@@ -283,7 +283,7 @@ expandx,hidden
 0
 ToggleButton
 complex
-image=hui:find
+image=hui:edit
 2
 1
 0
@@ -2211,7 +2211,7 @@ expandx,hidden
 0
 ToggleButton
 complex
-image=hui:find
+image=hui:edit
 2
 2
 0

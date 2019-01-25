@@ -25,7 +25,7 @@ Dialog new_dialog "New file" width=250 height=80
 					Grid ? ""
 						SpinButton beats "1" range=1:1000:1 "tooltip=beats per bar" expandx
 						Edit pattern "" "tooltip=example: 3,3,2,2 to give each bar 4 beats, with the first of length 3 units etc. Overall a bar will have 3+3+2+2 = 10 units" expandx hidden
-					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:find
+					ToggleButton complex "" "tooltip=complex beat pattern" image=hui:edit
 					ComboBox divisor "𝅘𝅥   \\𝅘𝅥𝅮   \\𝅘𝅥𝅯   " "tooltip=basic unit of beats - in simple bars this is the length of each beat - in complex bars these get grouped to form beats"
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel

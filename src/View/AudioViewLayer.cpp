@@ -242,6 +242,8 @@ color AudioViewLayer::background_color()
 
 color AudioViewLayer::background_selection_color()
 {
+	if (view->selection_mode == view->SelectionMode::RECT)
+		return background_color(); // complex selection rect as overlay...
 	return (view->sel.has(layer)) ? view->colors.background_track_selection : view->colors.background_track;
 }
 

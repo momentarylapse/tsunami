@@ -1077,8 +1077,12 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 			s.set(sr, s.range.overlaps(sr->range()));
 
 		// midi
+
+		auto *mp = view->midi_painter;
+		mp->set_context(vl->area, l->track->instrument, view->midi_scale, vl->is_playable(), vl->midi_mode);
+		float r = mp->rr;
 		for (MidiNote *n: l->midi)
-			if ((n->y >= y0) and (n->y <= y1))
+			if ((n->y + r >= y0) and (n->y - r <= y1))
 				//s.set(n, s.range.is_inside(n->range.center()));
 				s.set(n, s.range.overlaps(n->range));
 	}

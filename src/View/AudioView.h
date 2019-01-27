@@ -122,7 +122,7 @@ public:
 	static const int TIME_SCALE_HEIGHT;
 	static const float LINE_WIDTH;
 	static const float CORNER_RADIUS;
-	static const int FONT_SIZE;
+	static const float FONT_SIZE;
 	static const int MAX_TRACK_CHANNEL_HEIGHT;
 	static const int TRACK_HANDLE_WIDTH;
 	static const int LAYER_HANDLE_WIDTH;

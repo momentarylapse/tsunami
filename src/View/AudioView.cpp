@@ -42,7 +42,7 @@
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
 
-const int AudioView::FONT_SIZE = 10;
+const float AudioView::FONT_SIZE = 10.0f;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
 const float AudioView::LINE_WIDTH = 1.0f;
 const float AudioView::CORNER_RADIUS = 8.0f;
@@ -1136,7 +1136,9 @@ void AudioView::draw_time_scale(Painter *c)
 		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + TIME_SCALE_HEIGHT);
 
 		c->set_color((hover.type == Selection::Type::PLAYBACK_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, "L");
+		c->set_font_size(FONT_SIZE * 0.7f);
+		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, playback_range_locked ? "🔒" : "🔓");
+		c->set_font_size(FONT_SIZE);
 	}
 }
 
@@ -1152,6 +1154,8 @@ void AudioView::draw_selection(Painter *c)
 
 	if (!hide_selection){
 		if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
+			// drawn as background...
+
 			/*c->setColor(colors.selection_internal);
 			for (AudioViewLayer *l: vlayer)
 				if (sel.has(l->layer))

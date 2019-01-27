@@ -444,9 +444,8 @@ void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuf
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
-	l->draw_blank_background(c);
-
 	view->grid_painter->set_context(l->area, l->grid_colors());
+	view->grid_painter->draw_empty_background(c);
 	view->grid_painter->draw_whatever(c, 0);
 
 

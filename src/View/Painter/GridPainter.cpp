@@ -27,6 +27,24 @@ GridPainter::GridPainter(AudioView *_view)
 }
 
 
+
+void GridPainter::draw_empty_background(Painter *c)
+{
+	if (view->sel.range.length > 0){
+		c->set_color(colors.bg);
+		c->draw_rect(area);
+
+		float x1, x2;
+		view->cam.range2screen_clip(view->sel.range, area, x1, x2);
+		c->set_color(colors.bg_sel);
+		c->draw_rect(x1, area.y1, x2-x1, area.height());
+
+	}else{
+		c->set_color(colors.bg);
+		c->draw_rect(area);
+	}
+}
+
 void GridPainter::draw_time(Painter *c)
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / cam->scale; // >= 10 pixel

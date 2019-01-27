@@ -30,6 +30,7 @@ class GridPainter
 {
 public:
 	GridPainter(AudioView *view);
+	void draw_empty_background(Painter *c);
 	void draw_time(Painter *c);
 	void draw_time_numbers(Painter *c);
 	void draw_bars(Painter *c, int beat_partition = 0);

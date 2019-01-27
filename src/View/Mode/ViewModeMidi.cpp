@@ -550,9 +550,8 @@ void ViewModeMidi::set_note_length(int length)
 void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
 	if (editing(l)){
-		l->draw_blank_background(c);
-
 		view->grid_painter->set_context(l->area, l->grid_colors());
+		view->grid_painter->draw_empty_background(c);
 		view->grid_painter->draw_whatever(c, sub_beat_partition);
 
 		if (l->layer->type == SignalType::MIDI){

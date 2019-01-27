@@ -1106,12 +1106,12 @@ void AudioView::draw_time_scale(Painter *c)
 {
 	rect r = rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT);
 	GridColors g;
-	g.bg = g.bg_sel = colors.background_track;
+	g.bg = colors.background_track;
+	g.bg_sel = colors.background_track_selection;
 	g.fg = g.fg_sel = colors.grid;
-	c->set_color(colors.background_track);
-	c->draw_rect(r);
 
 	grid_painter->set_context(r, g);
+	grid_painter->draw_empty_background(c);
 	grid_painter->draw_time(c);
 
 	if (is_playback_active()){
@@ -1122,6 +1122,7 @@ void AudioView::draw_time_scale(Painter *c)
 	}
 	grid_painter->draw_time_numbers(c);
 
+	// playback lock range
 	if (playback_range_locked){
 		c->set_color(AudioView::colors.preview_marker);
 		float x0, x1;
@@ -1129,7 +1130,7 @@ void AudioView::draw_time_scale(Painter *c)
 		c->draw_rect(x0, area.y1, x1-x0, 5);
 	}
 
-	// playback lock
+	// playback lock symbol
 	playback_lock_button = rect(0,0,0,0);
 	if (playback_range_locked or !sel.range.empty()){
 		float x = cam.sample2screen(get_playback_selection(false).end());
@@ -1147,8 +1148,8 @@ void AudioView::draw_selection(Painter *c)
 	// time selection
 	float x1, x2;
 	cam.range2screen_clip(sel.range, song_area, x1, x2);
-	c->set_color(colors.selection_internal);
-	c->draw_rect(rect(x1, x2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
+	//c->set_color(colors.selection_internal);
+	//c->draw_rect(rect(x1, x2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
 	draw_time_line(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
 	draw_time_line(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
 

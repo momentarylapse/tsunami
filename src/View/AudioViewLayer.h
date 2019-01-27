@@ -38,7 +38,6 @@ public:
 
 	color background_color();
 	color background_selection_color();
-	void draw_blank_background(Painter *c);
 
 	void draw_track_buffers(Painter *c);
 

@@ -247,25 +247,6 @@ color AudioViewLayer::background_selection_color()
 	return (view->sel.has(layer)) ? view->colors.background_track_selection : view->colors.background_track;
 }
 
-void AudioViewLayer::draw_blank_background(Painter *c)
-{
-	color cc = background_color();
-	if ((view->sel.range.length > 0) and (view->sel.has(layer))){
-		c->set_color(cc);
-		c->draw_rect(area);
-
-		color cs = background_selection_color();
-		float x1, x2;
-		view->cam.range2screen_clip(view->sel.range, area, x1, x2);
-		c->set_color(cs);
-		c->draw_rect(x1, area.y1, x2-x1, area.height());
-
-	}else{
-		c->set_color(cc);
-		c->draw_rect(area);
-	}
-}
-
 bool AudioView::editing_layer(AudioViewLayer *l)
 {
 	if (cur_vlayer != l)

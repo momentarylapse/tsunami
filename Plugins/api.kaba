@@ -216,18 +216,22 @@ class Synthesizer extends Module
 	float[MAX_PITCH] freq
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
+	bool auto_generate_stereo
 	MidiEventBuffer events
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
+	extern virtual bool render_pitch(AudioBuffer buf, int pitch)
+	extern virtual void handle_event(MidiEvent event)
 	extern void set_sample_rate(int sample_rate)
 //	extern void feed(MidiEventBuffer midi)
-	extern void enable_pitch(int pitch, bool enable)
 
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	//extern overwrite void __delete__()
 	extern override void render(AudioBuffer buf)
+	extern override bool render_pitch(AudioBuffer buf, int pitch)
+	extern override void handle_event(MidiEvent event)
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)

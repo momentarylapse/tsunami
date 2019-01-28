@@ -10,28 +10,25 @@ class RectangularSynthesizer extends Synthesizer
 	
 	PitchState[MAX_PITCH] pitches
 	override void reset_state()
+		auto_generate_stereo = true
 		for p in pitches
 			p.volume = 0
 			p.phase = 0
 
-	override void render(AudioBuffer buf)
+	override void handle_event(MidiEvent e)
+		int pp = e.pitch
+		pitches[pp].volume = e.volume
+
+	override bool render_pitch(AudioBuffer buf, int p)
+		PitchState *ps = &pitches[p]
 		for i in 0:buf.length
-			for e in events
-				if e.pos == i
-					int pp = e.pitch
-					pitches[pp].volume = e.volume
-					enable_pitch(pp, e.volume > 0)
-			
-			for ip in active_pitch
-				PitchState *p = &pitches[ip]
-				float d = sin(p.phase)
-				if d > 0
-					buf.r[i] += p.volume
-					buf.l[i] += p.volume
-				else
-					buf.r[i] -= p.volume
-					buf.l[i] -= p.volume
-				p.phase += delta_phi[ip]
-				if p.phase > 2*pi
-					p.phase -= 2*pi
+			float d = sin(ps.phase)
+			if d > 0
+				buf.r[i] += ps.volume
+			else
+				buf.r[i] -= ps.volume
+			ps.phase += delta_phi[p]
+			if ps.phase > 2*pi
+				ps.phase -= 2*pi
+		return pitches[p].volume > 0
 

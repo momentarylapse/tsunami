@@ -37,24 +37,28 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	virtual void _cdecl render(AudioBuffer &buf){}
+	virtual void _cdecl render(AudioBuffer &buf);
+	virtual bool _cdecl render_pitch(AudioBuffer &buf, int pitch){ return false; }
+	virtual void _cdecl handle_event(MidiEvent &event){}
 
 	int sample_rate;
-	void _cdecl setSampleRate(int sample_rate);
+	void _cdecl set_sample_rate(int sample_rate);
 
 	void _cdecl update_delta_phi();
 
-	void _cdecl setInstrument(Instrument &i);
+	void _cdecl set_instrument(Instrument &i);
 
 	int keep_notes;
+	bool auto_generate_stereo;
+
 
 	void _cdecl reset();
 
-	bool hasRunOutOfData();
+	bool has_run_out_of_data();
 
 	bool source_run_out;
 
-	bool isDefault();
+	bool is_default();
 
 	class Output : public AudioPort
 	{
@@ -75,9 +79,8 @@ protected:
 
 	MidiEventBuffer events;
 
-	Set<int> active_pitch;
-	Array<int> delete_me;
-	void enablePitch(int pitch, bool enable);
+	Set<int> active_pitch; // delayed end
+	void _render_part(AudioBuffer &buf, int pitch, int offset, int end);
 
 public:
 	struct Tuning

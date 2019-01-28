@@ -92,8 +92,8 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 		synth = t->synth;
 	else
 		synth = (Synthesizer*)t->synth->copy();
-	synth->setSampleRate(t->song->sample_rate);
-	synth->setInstrument(t->instrument);
+	synth->set_sample_rate(t->song->sample_rate);
+	synth->set_instrument(t->instrument);
 	midi_streamer = nullptr;
 
 	if (direct_mode){
@@ -170,8 +170,8 @@ void TrackRenderer::on_track_replace_synth()
 		delete synth;
 
 		synth = (Synthesizer*)track->synth->copy();
-		synth->setSampleRate(track->song->sample_rate);
-		synth->setInstrument(track->instrument);
+		synth->set_sample_rate(track->song->sample_rate);
+		synth->set_instrument(track->instrument);
 	}
 
 	if (track->type == SignalType::MIDI){

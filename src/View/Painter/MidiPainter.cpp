@@ -116,7 +116,9 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 		col = colors.text_soft3;
 
 	if (state & MidiPainter::STATE_HOVER){
-		col = ColorInterpolate(col, colors.hover, 0.333f);
+		col = ColorInterpolate(col, colors.hover, 0.5f);
+	}else if (state & MidiPainter::STATE_SELECTED){
+		col = ColorInterpolate(col, colors.selection, 0.5f);
 	}else if (state & MidiPainter::STATE_REFERENCE){
 		col = ColorInterpolate(col, colors.background_track, 0.65f);
 	}

@@ -198,6 +198,7 @@ class FMSynthesizer extends Synthesizer
 				o.phi = 0
 				o.env.reset()
 	override void __init__()
+		auto_generate_stereo = true
 		reset_state()
 
 	override ConfigPanel *create_panel()
@@ -210,71 +211,53 @@ class FMSynthesizer extends Synthesizer
 				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
 				o.env.set2(c.initial, c.peak)
 
-	override void render(AudioBuffer buf)
+	override void handle_event(MidiEvent e)
+		int pp = e.pitch + 0.4
+		PitchState *s = &spitch[pp]
+		if e.volume == 0
+			for o,oi in s.osc
+				o.env.end()
+		else
+			s.num_osc_active = NUM_OSCILLATORS
+			for o,oi in s.osc
+				// TODO: e.volume should only effect "output" oscs
+				o.env.start(e.volume * config.osc[oi].amplitude)
+
+	override bool render_pitch(AudioBuffer buf, int p)
+		PitchState *s = &spitch[p]
 
 		for i in 0:buf.length
 
-			// current events?
-			for e in events
-				if e.pos == i
-					int pp = e.pitch + 0.4
-					PitchState *s = &spitch[pp]
-					if e.volume == 0
-						for o,oi in s.osc
-							o.env.end()
-					else
-						s.num_osc_active = NUM_OSCILLATORS
-						for o,oi in s.osc
-							// TODO: e.volume should only effect "output" oscs
-							o.env.start(e.volume * config.osc[oi].amplitude)
-						enable_pitch(pp, true)
-
-			int[] del_me
-			del_me.clear()
-			for p in active_pitch
-				PitchState *s = &spitch[p]
-				for o,oi in s.osc
-					o.volume = o.env.get()
-					if o.env.just_killed
-						s.num_osc_active --
-						if s.num_osc_active == 0
-							del_me.add(p)
+			for o,oi in s.osc
+				o.volume = o.env.get()
+				if o.env.just_killed
+					s.num_osc_active --
+					if s.num_osc_active == 0
+						return false
 					
-					OscillatorConfig *co = &config.osc[oi]
-					o.phi += delta_phi[p] * (1 + o.input) * co.factor
-					if co.type == TYPE_SINE
-						o.output = sin(o.phi) * o.volume
-					else if co.type == TYPE_SQUARE
-						if sin(o.phi) > 0
-							o.output = o.volume
-						else
-							o.output = -o.volume
-					else if co.type == TYPE_SAW
-						o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
-					o.input = 0
-					if o.phi > 8*pi
-						o.phi = loop(o.phi, 0, 8*pi)
-			
-				// transport
-				for o,oi in s.osc
-					OscillatorConfig *co = &config.osc[oi]
-					if co.target_out
-						buf.r[i] += o.output
-					for t,j in co.target
-						if t
-							s.osc[j].input += o.output
-				/*for l in config.link
-					if l.dest >= 0
-						s.osc[l.dest].input += s.osc[l.source].output
+				OscillatorConfig *co = &config.osc[oi]
+				o.phi += delta_phi[p] * (1 + o.input) * co.factor
+				if co.type == TYPE_SINE
+					o.output = sin(o.phi) * o.volume
+				else if co.type == TYPE_SQUARE
+					if sin(o.phi) > 0
+						o.output = o.volume
 					else
-						// output
-						float d = s.osc[l.source].output
-						buf.r[i] += d
-						buf.l[i] += d*/
-			if buf.channels > 1
-				buf.l = buf.r
-				
-			for p in del_me
-				enable_pitch(p, false)
+						o.output = -o.volume
+				else if co.type == TYPE_SAW
+					o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
+				o.input = 0
+				if o.phi > 8*pi
+					o.phi = loop(o.phi, 0, 8*pi)
+			
+			// transport
+			for o,oi in s.osc
+				OscillatorConfig *co = &config.osc[oi]
+				if co.target_out
+					buf.r[i] += o.output
+				for t,j in co.target
+					if t
+						s.osc[j].input += o.output
+		return true
 			
 	

@@ -41,6 +41,7 @@ class PADSynthesizer extends Synthesizer
 	PitchState[MAX_PITCH] pitches
 	
 	override void __init__()
+		auto_generate_stereo = true
 		for p in pitches
 			p.buf.__init__()
 	override void reset_state()
@@ -83,35 +84,29 @@ class PADSynthesizer extends Synthesizer
 			m = max(b, m)
 		p.buf /= (m * 1.2)
 
-	override void render(AudioBuffer buf)
+	override void handle_event(MidiEvent e)
+		int pp = e.pitch + 0.4
+		PitchState *ps = &pitches[pp]
+		if e.volume > 0
+			ps.env.start(e.volume)
+		else
+			ps.env.end()
+
+	override bool render_pitch(AudioBuffer buf, int p)
+		PitchState *ps = &pitches[p]
+		if ps.buf.num == 0
+			create(p)
 			
 		for i in 0:buf.length
-			for e in events
-				if e.pos == i
-					int pp = e.pitch + 0.4
-					PitchState *ps = &pitches[pp]
-					if e.volume > 0
-						ps.env.start(e.volume)
-						enable_pitch(pp, true)
-					else
-						ps.env.end()
-			int[] to_del
-			for ip in active_pitch
-				PitchState *p = &pitches[ip]
+			float d = ps.buf[ps.pos] * ps.env.get()
+			if ps.env.just_killed
+				return false
 				
-				if p.buf.num == 0
-					create(ip)
-				
-				float d = p.buf[p.pos] * p.env.get()
-				buf.r[i] += d
-				buf.l[i] += d
-				if p.env.just_killed
-					to_del.add(ip)
-				p.pos ++
-				if p.pos >= N
-					p.pos = 0
-			for ip in to_del
-				enable_pitch(ip, false)
+			buf.r[i] += d
+			ps.pos ++
+			if ps.pos >= N
+				ps.pos = 0
+		return true
 	
 	override ConfigPanel *create_panel()
 		return new PADPanel(self)

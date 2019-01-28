@@ -1152,7 +1152,7 @@ public:
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("marker", me->markers);
 		if ((me->type == SignalType::BEATS) or (me->type == SignalType::MIDI))
-			if (!me->synth->isDefault())
+			if (!me->synth->is_default())
 				write_sub("synth", me->synth);
 		if (me->layers[0]->midi.num > 0)
 			write_sub("midi", &me->layers[0]->midi);

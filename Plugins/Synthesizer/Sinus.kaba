@@ -9,22 +9,20 @@ class SinusSynthesizer extends Synthesizer
 	float[MAX_PITCH] phase
 	
 	override void reset_state()
+		auto_generate_stereo = true
 		for p in 0:MAX_PITCH
 			volume[p] = 0
 			phase[p] = 0
 
-	override void render(AudioBuffer buf)
+	override void handle_event(MidiEvent e)
+		int pp = e.pitch
+		volume[pp] = e.volume
+
+	override bool render_pitch(AudioBuffer buf, int p)
 		for i in 0:buf.length
-			for e in events
-				if e.pos == i
-					int pp = e.pitch
-					volume[pp] = e.volume
-					enable_pitch(pp, e.volume > 0)
-			
-			for p in active_pitch
-				float d = sin(phase[p]) * volume[p]
-				buf.r[i] += d
-				buf.l[i] += d
-				phase[p] += delta_phi[p]
-				if phase[p] > 2*pi
-					phase[p] -= 2*pi
+			float d = sin(phase[p]) * volume[p]
+			buf.r[i] += d
+			phase[p] += delta_phi[p]
+			if phase[p] > 2*pi
+				phase[p] -= 2*pi
+		return volume[p] > 0

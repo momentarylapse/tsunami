@@ -50,7 +50,7 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 	}
 
 	//printf("  %d  %d\n", synth->active_pitch.num, n);
-	if (synth->hasRunOutOfData()){
+	if (synth->has_run_out_of_data()){
 //		printf(" eos\n");
 		return END_OF_STREAM;
 	}
@@ -58,6 +58,9 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 //	printf("...%d  %d  ok\n", n, buf.length);
 	buf.scale(0);
 	synth->render(buf);
+
+	if (synth->auto_generate_stereo)
+		buf.c[1] = buf.c[0];
 
 	synth->events.clear();
 
@@ -76,10 +79,11 @@ Synthesizer::Synthesizer() :
 	instrument = Instrument(Instrument::Type::PIANO);
 	source = nullptr;
 	source_run_out = false;
+	auto_generate_stereo = false;
 
 	tuning.set_default();
 
-	setSampleRate(DEFAULT_SAMPLE_RATE);
+	set_sample_rate(DEFAULT_SAMPLE_RATE);
 }
 
 void Synthesizer::__init__()
@@ -106,7 +110,7 @@ bool Synthesizer::Tuning::is_default()
 	return true;
 }
 
-void Synthesizer::setSampleRate(int _sample_rate)
+void Synthesizer::set_sample_rate(int _sample_rate)
 {
 	//if (_sample_rate == sample_rate)
 	//	return;
@@ -122,25 +126,93 @@ void Synthesizer::update_delta_phi()
 		delta_phi[p] = tuning.freq[p] * 2.0f * pi / sample_rate;
 }
 
-void Synthesizer::setInstrument(Instrument &i)
+void Synthesizer::set_instrument(Instrument &i)
 {
 	instrument = i;
 	on_config();
 }
 
-void Synthesizer::enablePitch(int pitch, bool enable)
-{
-	if (enable)
-		active_pitch.add(pitch);
-	else
-		active_pitch.erase(pitch);
-		// delayed deletion (makes things easier in the render() function)
-		//delete_me.add(pitch);
-}
-
-bool Synthesizer::hasRunOutOfData()
+bool Synthesizer::has_run_out_of_data()
 {
 	return (active_pitch.num == 0) and source_run_out;
+}
+
+void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
+{
+	AudioBuffer part;
+	part.set_as_ref(buf, offset, end - offset);
+	if (!render_pitch(part, pitch))
+		active_pitch.erase(pitch);
+}
+
+void Synthesizer::render(AudioBuffer& buf)
+{
+	Set<int> pitch_involved = active_pitch;
+	for (MidiEvent &e: events)
+		pitch_involved.add(e.pitch);
+
+	for (int p: pitch_involved){
+		int offset = 0;
+
+		for (MidiEvent &e: events)
+			if (e.pitch == p){
+				// render before
+				if (active_pitch.contains(p))
+					_render_part(buf, p, offset, e.pos);
+
+				offset = e.pos;
+				handle_event(e);
+				if (e.volume > 0)
+					active_pitch.add(p);
+			}
+
+		if (active_pitch.contains(p))
+			_render_part(buf, p, offset, buf.length);
+	}
+
+#if 0
+
+
+	for (int i=0; i<buf.length; i++){
+
+		// current events?
+		for (MidiEvent &e: events)
+			if (e.pos == i){
+				int p = e.pitch;
+				PitchState &s = pitch[p];
+				if (e.volume == 0){
+					s.env.end();
+				}else{
+					s.env.start(e.volume);
+					enable_pitch(p, true);
+				}
+			}
+
+		Array<int> del_me;
+		for (int ip=0; ip<active_pitch.num; ip++){
+			int p = active_pitch[ip];
+			PitchState &s = pitch[p];
+
+			s.volume = s.env.get();
+
+			if (s.volume == 0)
+				del_me.add(p);
+
+			float d = sin(s.phi) * s.volume;
+			buf.c[0][i] += d;
+
+			s.phi += delta_phi[p];
+			if (s.phi > 8*pi)
+				s.phi = loopf(s.phi, 0, 2*pi);
+		}
+
+		for (int p: del_me)
+			enable_pitch(p, false);
+
+		if (buf.channels > 1)
+			buf.c[1][i] = buf.c[0][i];
+	}
+#endif
 }
 
 void Synthesizer::reset()
@@ -150,7 +222,7 @@ void Synthesizer::reset()
 	source_run_out = false;
 }
 
-bool Synthesizer::isDefault()
+bool Synthesizer::is_default()
 {
 	return (module_subtype == "Dummy") and (tuning.is_default());
 }

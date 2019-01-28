@@ -101,38 +101,34 @@ class HarmonicSynthesizer extends Synthesizer
 	override void on_config()
 		for p in pitch
 			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
-		
-	override void render(AudioBuffer buf)
+
+	override void handle_event(MidiEvent e)
+		int pp = e.pitch+0.4
+		PitchState *s = &pitch[pp]
+		if e.volume == 0
+			s.env.end()
+		else
+			s.env.start(e.volume)
+
+	override bool render_pitch(AudioBuffer buf, int p)
+		PitchState *s = &pitch[p]
+	
 		for i in 0:buf.length
+			s.volume = s.env.get()
 
-			// current events?
-			for e in events
-				if e.pos == i
-					int pp = e.pitch+0.4
-					PitchState *s = &pitch[pp]
-					if e.volume == 0
-						s.env.end()
-					else
-						s.env.start(e.volume)
-						enable_pitch(pp, true)
+			if s.volume == 0
+				continue
 
-			for p in active_pitch
-				PitchState *s = &pitch[p]
+			float d = 0
+			for j in 0:NUM_HARMONICS
+				d += sin(s.phi * (j+1)) * config.intensity[j]
+			buf.r[i] += d * s.volume
 
-				s.volume = s.env.get()
-
-				if s.volume == 0
-					enable_pitch(p, false)
-					continue
-
-				float d = 0
-				for j in 0:NUM_HARMONICS
-					d += sin(s.phi * (j+1)) * config.intensity[j]
-				buf.r[i] += d * s.volume
-
-				s.phi += delta_phi[p]
-				if s.phi > 8*pi
-					s.phi = loop(s.phi, 0, 2*pi)
+			s.phi += delta_phi[p]
+			if s.phi > 8*pi
+				s.phi = loop(s.phi, 0, 2*pi)
 		
 		if buf.channels > 1
 			buf.l = buf.r
+
+		return s.volume > 0

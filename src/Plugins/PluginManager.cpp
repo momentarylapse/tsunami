@@ -311,11 +311,13 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
 	Kaba::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
 	Kaba::DeclareClassOffset("Synthesizer", "out", _offsetof(Synthesizer, out));
+	Kaba::DeclareClassOffset("Synthesizer", "auto_generate_stereo", _offsetof(Synthesizer, auto_generate_stereo));
 	Kaba::LinkExternal("Synthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Synthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Synthesizer::__delete__), &synth);
-	Kaba::LinkExternal("Synthesizer.enable_pitch", Kaba::mf(&Synthesizer::enablePitch));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
-	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::setSampleRate));
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "render_pitch", Kaba::mf(&Synthesizer::render_pitch), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "handle_event", Kaba::mf(&Synthesizer::handle_event), &synth);
+	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::set_sample_rate));
 
 
 	DummySynthesizer dsynth;
@@ -323,6 +325,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("DummySynthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&DummySynthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&DummySynthesizer::__delete__), &dsynth);
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "render", Kaba::mf(&DummySynthesizer::render), &dsynth);
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "render_pitch", Kaba::mf(&DummySynthesizer::render_pitch), &dsynth);
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "handle_event", Kaba::mf(&DummySynthesizer::handle_event), &dsynth);
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "on_config", Kaba::mf(&DummySynthesizer::on_config), &dsynth);
 
 	Kaba::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));

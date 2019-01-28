@@ -376,12 +376,13 @@ void TsunamiWindow::on_track_render()
 
 	auto *p = new ProgressCancelable(_(""), this);
 	song->begin_action_group();
-	Track *t = song->add_track(SignalType::AUDIO);
 
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
 	renderer.allow_tracks(view->sel.tracks);
 	renderer.allow_layers(view->get_playable_layers());
+
+	Track *t = song->add_track(SignalType::AUDIO);
 
 	int chunk_size = 1<<12;
 	int offset = range.offset;

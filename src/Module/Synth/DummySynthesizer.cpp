@@ -15,15 +15,16 @@
 void DummySynthesizer::reset_state()
 {
 	for (int i=0; i<MAX_PITCH; i++){
-		pitch[i].phi = 0;
-		pitch[i].volume = 0;
-		pitch[i].env.reset();
+		pitch_state[i].phi = 0;
+		pitch_state[i].volume = 0;
+		pitch_state[i].env.reset();
 	}
 }
 
 DummySynthesizer::DummySynthesizer()
 {
 	module_subtype = "Dummy";
+	auto_generate_stereo = true;
 	reset_state();
 	on_config();
 }
@@ -40,8 +41,8 @@ void DummySynthesizer::__init__()
 
 void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack, float release)
 {
-	pitch[no].env.set(attack, release, 0.00001f, 0.05f, sample_rate);
-	pitch[no].env.set2(0, volume);
+	pitch_state[no].env.set(attack, release, 0.00001f, 0.05f, sample_rate);
+	pitch_state[no].env.set2(0, volume);
 	delta_phi[no] = freq * 2.0f * pi / sample_rate;
 }
 
@@ -51,8 +52,8 @@ void DummySynthesizer::on_config()
 	if (instrument.type == Instrument::Type::DRUMS){
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			pitch[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
-			pitch[i].env.set2(0, 0.45f);
+			pitch_state[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
+			pitch_state[i].env.set2(0, 0.45f);
 			delta_phi[i] = 100.0f * 2.0f * pi / sample_rate;
 		}
 
@@ -96,48 +97,40 @@ void DummySynthesizer::on_config()
 	}else{
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			pitch[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
-			pitch[i].env.set2(0, 0.45f);
+			pitch_state[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
+			pitch_state[i].env.set2(0, 0.45f);
 		}
 	}
 }
 
-void DummySynthesizer::render(AudioBuffer& buf)
+bool DummySynthesizer::render_pitch(AudioBuffer &buf, int p)
 {
+	PitchState &s = pitch_state[p];
+
 	for (int i=0; i<buf.length; i++){
+		s.volume = s.env.get();
 
-		// current events?
-		for (MidiEvent &e : events)
-			if (e.pos == i){
-				int p = e.pitch;
-				PitchState &s = pitch[p];
-				if (e.volume == 0){
-					s.env.end();
-				}else{
-					s.env.start(e.volume);
-					enablePitch(p, true);
-				}
-			}
+		if (s.volume == 0)
+			return false;
 
-		for (int ip=0; ip<active_pitch.num; ip++){
-			int p = active_pitch[ip];
-			PitchState &s = pitch[p];
+		float d = sin(s.phi) * s.volume;
+		buf.c[0][i] += d;
 
-			s.volume = s.env.get();
+		s.phi += delta_phi[p];
+		if (s.phi > 8*pi)
+			s.phi = loopf(s.phi, 0, 2*pi);
+	}
+	return true;
 
-			if (s.volume == 0){
-				enablePitch(p, false);
-				continue;
-			}
+}
 
-			float d = sin(s.phi) * s.volume;
-			buf.c[0][i] += d;
-
-			s.phi += delta_phi[p];
-			if (s.phi > 8*pi)
-				s.phi = loopf(s.phi, 0, 2*pi);
-		}
-		if (buf.channels > 1)
-			buf.c[1][i] = buf.c[0][i];
+void DummySynthesizer::handle_event(MidiEvent &event)
+{
+	int p = event.pitch;
+	PitchState &s = pitch_state[p];
+	if (event.volume == 0){
+		s.env.end();
+	}else{
+		s.env.start(event.volume);
 	}
 }

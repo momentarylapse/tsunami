@@ -602,7 +602,6 @@ void MidiPainter::draw_clef_tab(Painter *c)
 		float y = string_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
-	c->set_antialiasing(true);
 
 
 	if (is_playable)
@@ -646,7 +645,6 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &midi)
 	for (MidiNote *n: notes)
 		draw_note_tab(c,  n,  note_state(n, as_reference, sel, hover));
 
-	c->set_antialiasing(false);
 	c->set_font_size(AudioView::FONT_SIZE);
 }
 
@@ -723,8 +721,6 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
 	midi.update_meta(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(range);
 
-	c->set_antialiasing(true);
-
 
 
 	draw_rhythm(c, midi, range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
@@ -733,7 +729,6 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
 		draw_note_classical(c, n, note_state(n, as_reference, sel, hover));
 
 	c->set_font_size(AudioView::FONT_SIZE);
-	c->set_antialiasing(false);
 }
 
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)

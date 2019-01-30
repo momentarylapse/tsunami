@@ -216,8 +216,10 @@ void GridPainter::draw_bar_numbers(Painter *c)
 		if (fabs(prev_bpm - bpm) > 0.5f)
 			s += format(" \u2669=%.0f", bpm);
 		if (s.num > 0){
+			c->set_font("", AudioView::FONT_SIZE * 0.9f, false, false);
 			c->set_color(AudioView::colors.text_soft1);
 			c->draw_str(max(xx + 4, 20.0f), area.y2 - 16, s);
+			c->set_font("", AudioView::FONT_SIZE, true, false);
 		}
 		prev = *b;
 		prev_bpm = bpm;

@@ -82,7 +82,6 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 	if (curve){
 
 		// lines
-		c->set_antialiasing(true);
 		c->set_line_width(1.0f);
 		c->set_color(view->colors.text);
 		Array<complex> pp;

@@ -285,7 +285,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
 	ZoomSpeed = hui::Config.get_float("View.ZoomSpeed", 0.1f);
 	mouse_wheel_speed = hui::Config.get_float("View.MouseWheelSpeed", 1.0f);
-	antialiasing = hui::Config.get_bool("View.Antialiasing", false);
+	antialiasing = hui::Config.get_bool("View.Antialiasing", true);
 
 	images.speaker = LoadImage(tsunami->directory_static + "volume.tga");
 	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
@@ -1176,7 +1176,6 @@ void AudioView::draw_selection(Painter *c)
 	if (sel.bar_gap >= 0){
 		x1 = cam.sample2screen(song->bar_offset(sel.bar_gap));
 		x2 = x1;
-		c->set_antialiasing(true);
 		c->set_color(colors.text_soft1);
 		c->set_line_width(2.5f);
 		for (AudioViewLayer *t: vlayer)
@@ -1190,12 +1189,10 @@ void AudioView::draw_selection(Painter *c)
 				c->draw_line(x1 - 2, t->area.y2-dy*0.3f, x1 - 5, t->area.y2);
 		}
 		c->set_line_width(1.0f);
-		c->set_antialiasing(false);
 	}
 	if (hover.type == Selection::Type::BAR_GAP){
 		x1 = cam.sample2screen(song->bar_offset(hover.index));
 		x2 = x1;
-		c->set_antialiasing(true);
 		c->set_color(colors.hover);
 		c->set_line_width(2.5f);
 		for (AudioViewLayer *t: vlayer)
@@ -1209,7 +1206,6 @@ void AudioView::draw_selection(Painter *c)
 				c->draw_line(x1 - 2, t->area.y2-dy*0.3f, x1 - 5, t->area.y2);
 		}
 		c->set_line_width(1.0f);
-		c->set_antialiasing(false);
 	}
 }
 
@@ -1308,7 +1304,6 @@ void AudioView::on_draw(Painter *c)
 	c->set_font_size(FONT_SIZE);
 	c->set_line_width(LINE_WIDTH);
 	c->set_antialiasing(antialiasing);
-	//c->set_color(ColorWaveCur);
 
 	if (enabled)
 		draw_song(c);

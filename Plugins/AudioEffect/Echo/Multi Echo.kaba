@@ -83,21 +83,44 @@ class MultiEchoGrid extends Grid
 		hover = -1
 		selected = -1
 
+	void draw_hull_curve(Painter *c, Reflector r)
+		float v = r.volume
+		float t = r.delay
+		complex p0
+		c.set_line_width(3)
+		float dt = 0.05
+		float dv = pow(r.feedback, dt/r.delay)
+		int n = min(100, x_axis.val_max/dt + 1)
+		for i in 0:n
+			complex p = project2(complex(t, v))
+			v *= dv
+			t += dt
+			if i > 0
+				c.set_color(color(sqrt(v), 1,0,0))
+				c.draw_line(p0.x, p0.y, p.x, p.y)
+			p0 = p
+	
+	void draw_peaks(Painter *c, Reflector r)
+		float v = r.volume
+		float t = r.delay
+		int n = min(100, x_axis.val_max/r.delay)
+		c.set_line_width(1)
+		for i in 0:n
+			complex p = project2(complex(t, v))
+			if i == 0
+				c.set_color(colors.text_soft1)
+			else
+				c.set_color(colors.text_soft2)
+			c.draw_line(p.x, c.height, p.x, p.y)
+			v *= r.feedback
+			t += r.delay
+
 	override void on_draw(Painter *c)
 	
 		c.set_line_width(1)
 		for r in config.refl
-			c.set_color(colors.text_soft1)
-			float v = r.volume
-			float t = r.delay
-			for i in 0:20
-				float x = x_axis.project(t)
-				float y = y_axis.project(v)
-				c.draw_line(x, c.height, x, y)
-				v *= r.feedback
-				t += r.delay
-				c.set_color(colors.text_soft2)
-			
+			draw_hull_curve(c, r)
+			draw_peaks(c, r)
 	
 		// points
 		for r,i in config.refl
@@ -111,7 +134,7 @@ class MultiEchoGrid extends Grid
 			
 	void draw_details(Painter* p, Reflector r)
 		p.set_font_size(8)
-		p.set_color(col_hover)
+		p.set_color(colors.text_soft2)
 		float x = x_axis.project(r.delay)
 		float y = y_axis.project(r.volume)
 		

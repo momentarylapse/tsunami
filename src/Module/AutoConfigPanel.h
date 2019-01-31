@@ -20,7 +20,7 @@ public:
 	Array<AutoConfigData*> aa;
 	AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c);
 	~AutoConfigPanel();
-	void onChange();
+	void on_change();
 	virtual void _cdecl update();
 };
 

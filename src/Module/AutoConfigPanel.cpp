@@ -102,13 +102,13 @@ struct AutoConfigDataFloat : public AutoConfigData
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
-		p->add_grid("", 1, i, "grid-" + i);
-		p->set_target("grid-" + i);
-		p->add_slider("!width=150,expandx", 0, 0, "slider-" + i);
-		p->add_spin_button(f2s(*value, 6), 1, 0, "spin-" + i);
-		p->set_options("spin-" + i, format("range=%f:%f:%f", min*factor, max*factor, step));
+		p->add_grid("", 1, i, "grid-" + i2s(i));
+		p->set_target("grid-" + i2s(i));
+		p->add_slider("!width=150,expandx", 0, 0, "slider-" + i2s(i));
+		p->add_spin_button(f2s(*value, 6), 1, 0, "spin-" + i2s(i));
+		p->set_options("spin-" + i2s(i), format("range=%f:%f:%f", min*factor, max*factor, step));
 		//p->addLabel(unit, 2, 0, "");
-		slider = new Slider(p, "slider-" + i, "spin-" + i, min, max, factor, callback, *value);
+		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), min, max, factor, callback, *value);
 	}
 	void get_value() override
 	{
@@ -135,7 +135,7 @@ struct AutoConfigDataBool : public AutoConfigData
 	void parse(const string &s) override {};
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
-		id = "check-" + i;
+		id = "check-" + i2s(i);
 		panel = p;
 		p->add_check_box("!width=150,expandx", 1, i, id);
 		p->event(id, callback);
@@ -176,7 +176,7 @@ struct AutoConfigDataInt : public AutoConfigData
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
-		id = "spin-" + i;
+		id = "spin-" + i2s(i);
 		panel = p;
 		p->add_spin_button("!width=150,expandx\\" + i2s(*value), 1, i, id);
 		p->set_options(id, format("range=%d:%d", min, max));
@@ -207,7 +207,7 @@ struct AutoConfigDataPitch : public AutoConfigData
 	{}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
-		id = "pitch-" + i;
+		id = "pitch-" + i2s(i);
 		panel = p;
 		p->add_combo_box("!width=150,expandx", 1, i, id);
 		for (int j=0; j<MAX_PITCH; j++)
@@ -240,7 +240,7 @@ struct AutoConfigDataString : public AutoConfigData
 	{}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
 	{
-		id = "edit-" + i;
+		id = "edit-" + i2s(i);
 		panel = p;
 		p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
 		p->event(id, callback);
@@ -273,7 +273,7 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 	{}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &_callback) override
 	{
-		id = "sample-" + i;
+		id = "sample-" + i2s(i);
 		panel = p;
 		p->add_button("!expandx", 1, i, id);
 		set_value();
@@ -363,7 +363,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 		set_target("grid");
 		add_label(a->label, 0, i, "");
 		add_label(a->unit, 2, i, "");
-		a->add_gui(this, i, std::bind(&AutoConfigPanel::onChange, this));
+		a->add_gui(this, i, [&]{ on_change(); });
 	}
 }
 
@@ -372,7 +372,7 @@ AutoConfigPanel::~AutoConfigPanel()
 	for (auto a: aa)
 		delete a;
 }
-void AutoConfigPanel::onChange()
+void AutoConfigPanel::on_change()
 {
 	for (auto a: aa)
 		a->get_value();

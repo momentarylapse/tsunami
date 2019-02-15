@@ -29,7 +29,8 @@ public:
 	PluginManager();
 	virtual ~PluginManager();
 
-	string plugin_dir();
+	string plugin_dir_static();
+	string plugin_dir_local();
 
 	void link_app_script_data();
 	void find_plugins();
@@ -42,7 +43,6 @@ public:
 	void save_favorite(Module *c, const string &name);
 	string select_favorite_name(hui::Window *win, Module *c, bool save);
 
-	Array<string> find_audio_effects();
 	Array<string> find_module_sub_types(ModuleType type);
 
 	string choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");

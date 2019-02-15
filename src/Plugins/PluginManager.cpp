@@ -597,17 +597,24 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	}catch(...){}
 }
 
-void find_plugins_in_dir(const string &dir, ModuleType type, PluginManager *pm)
+void find_plugins_in_dir_absolute(const string &dir, ModuleType type, PluginManager *pm)
 {
-	Array<DirEntry> list = dir_search(pm->plugin_dir() + dir, "*.kaba", false);
+	Array<DirEntry> list = dir_search(dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
-		pf.filename = pm->plugin_dir() + dir + e.name;
+		pf.filename = dir + e.name;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);
 	}
+}
+
+void find_plugins_in_dir(const string &subdir, ModuleType type, PluginManager *pm)
+{
+	find_plugins_in_dir_absolute(pm->plugin_dir_static() + subdir, type, pm);
+	if (pm->plugin_dir_local() != pm->plugin_dir_static())
+		find_plugins_in_dir_absolute(pm->plugin_dir_local() + subdir, type, pm);
 }
 
 void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
@@ -732,32 +739,23 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleType type, const strin
 	return nullptr;
 }
 
-string PluginManager::plugin_dir()
+string PluginManager::plugin_dir_static()
 {
 	if (tsunami->installed)
 		return tsunami->directory_static + "Plugins/";
 	return "Plugins/";
 }
 
-Array<string> PluginManager::find_audio_effects()
+string PluginManager::plugin_dir_local()
 {
-	Array<string> names;
-	string prefix = plugin_dir() + "AudioEffect/";
-	for (auto &pf: plugin_files){
-		if (pf.filename.match(prefix + "*")){
-			string g = pf.filename.substr(prefix.num, -1).explode("/")[0];
-			names.add(g + "/" + pf.name);
-		}
-	}
-	return names;
+	if (tsunami->installed)
+		return tsunami->directory + "Plugins/";
+	return "Plugins/";
 }
 
 
 Array<string> PluginManager::find_module_sub_types(ModuleType type)
 {
-	if (type == ModuleType::AUDIO_EFFECT)
-		return find_audio_effects();
-
 	Array<string> names;
 	for (auto &pf: plugin_files)
 		if (pf.type == type)

@@ -24,7 +24,7 @@ TestPlugins::TestPlugins() : UnitTest("plugins")
 Array<UnitTest::Test> TestPlugins::tests()
 {
 	Array<Test> list;
-	auto names = Session::GLOBAL->plugin_manager->find_audio_effects();
+	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
 	for (auto &xxx: names){
 		if (xxx == "Echo/Folding")
 			continue;

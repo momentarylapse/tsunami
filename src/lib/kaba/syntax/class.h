@@ -82,7 +82,7 @@ public:
 	bool needs_constructor() const;
 	bool needs_destructor() const;
 	bool is_derived_from(const Class *root) const;
-	bool is_derived_from(const string &root) const;
+	bool is_derived_from_s(const string &root) const;
 	bool derive_from(const Class *root, bool increase_size);
 	Class *get_pointer() const;
 	Class *get_root() const;

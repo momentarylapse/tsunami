@@ -73,7 +73,7 @@ void *Plugin::create_instance(Session *session, const string &root_type)
 		return nullptr;
 
 	for (auto *t : s->syntax->classes){
-		if (t->is_derived_from(root_type))
+		if (t->is_derived_from_s(root_type))
 			return t->create_instance();
 	}
 	session->e(format(_("Script file \"%s\" does not define a class derived from %s"), filename.c_str(), root_type.c_str()));

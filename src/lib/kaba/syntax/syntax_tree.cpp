@@ -162,6 +162,14 @@ Node *SyntaxTree::cp_node(Node *c)
 Node *SyntaxTree::ref_node(Node *sub, Class *override_type)
 {
 	Class *t = override_type ? override_type : sub->type->get_pointer();
+
+	if (sub->kind == KIND_TYPE){
+		// Class pointer
+		int nc = AddConstant(TypeClassP);
+		constants[nc]->as_int64() = (long long)(long)sub->as_class();
+		return add_node_const(nc);
+	}
+
 	Node *c = AddNode(KIND_REFERENCE, 0, t);
 	c->set_num_params(1);
 	c->set_param(0, sub);
@@ -578,6 +586,11 @@ Block *Node::as_block() const
 Function *Node::as_func() const
 {
 	return script->syntax->functions[link_no];
+}
+
+Class *Node::as_class() const
+{
+	return script->syntax->classes[link_no];
 }
 
 Constant *Node::as_const() const

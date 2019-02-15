@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.16.7.0";
+string LibVersion = "0.16.8.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -1091,6 +1091,14 @@ void SIAddPackageBase()
 	TypeIntDict     = add_type_d("int{}",     TypeInt);
 	TypeFloatDict   = add_type_d("float{}",   TypeFloat);
 	TypeStringDict  = add_type_d("string{}",  TypeString);
+
+
+	add_class(TypeClass);
+		class_add_element("name", TypeString, offsetof(Class, name));
+		class_add_element("size", TypeInt, offsetof(Class, size));
+		class_add_element("parent", TypeClassP, offsetof(Class, parent));
+		class_add_func("is_derived_from", TypeBool, mf(&Class::is_derived_from));
+			func_add_param("c", TypeClassP);
 
 
 	//	add_func_special("f2i",			TypeInt,	(void*)&_Float2Int);

@@ -466,6 +466,7 @@ Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node> &links, Bloc
 	if (Exp.cur_exp >= 2)
 	if ((Exp.get_name(Exp.cur_exp - 2) == "&") and (Exp.cur != "(")){
 		if (links[0].kind == KIND_FUNCTION){
+			// can't be const because the function might not be compiled yet!
 			Node *c = AddNode(KIND_VAR_FUNCTION, links[0].link_no, get_func_type(this, links[0].as_func()));
 			c->script = links[0].script;
 			return c;

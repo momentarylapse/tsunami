@@ -180,6 +180,7 @@ struct Node
 	Node(int kind, int64 link_no, Script *script, Class *type);
 	Block *as_block() const;
 	Function *as_func() const;
+	Class *as_class() const;
 	Constant *as_const() const;
 	void set_num_params(int n);
 	void set_param(int index, Node *p);

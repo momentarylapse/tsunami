@@ -241,7 +241,7 @@ bool Class::is_derived_from(const Class *root) const
 	return parent->is_derived_from(root);
 }
 
-bool Class::is_derived_from(const string &root) const
+bool Class::is_derived_from_s(const string &root) const
 {
 	if (name == root)
 		return true;
@@ -249,7 +249,7 @@ bool Class::is_derived_from(const string &root) const
 		return false;
 	if (!parent)
 		return false;
-	return parent->is_derived_from(root);
+	return parent->is_derived_from_s(root);
 }
 
 ClassFunction *Class::get_func(const string &_name, const Class *return_type, int num_params, const Class *param0) const

@@ -210,6 +210,17 @@ class MidiSource extends Module
 	MidiEventBuffer* bh_midi
 	//extern void set_beat_source(BeatPort *source)
 
+
+class PitchRenderer
+	extern void __init__(Synthesizer *synth, int pitch)
+	extern virtual void __delete__()
+	extern virtual bool render(AudioBuffer buf)
+	extern virtual void on_event(MidiEvent e)
+	extern virtual void on_config()
+	int pitch
+	float delta_phi
+	Synthesizer *synth
+
 class Synthesizer extends Module
 	int sample_rate
 	int keep_notes
@@ -221,17 +232,15 @@ class Synthesizer extends Module
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
-	extern virtual bool render_pitch(AudioBuffer buf, int pitch)
-	extern virtual void handle_event(MidiEvent event)
+	extern override void on_config()
+	extern virtual PitchRenderer *create_pitch_renderer(int pitch)
 	extern void set_sample_rate(int sample_rate)
-//	extern void feed(MidiEventBuffer midi)
 
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	//extern overwrite void __delete__()
 	extern override void render(AudioBuffer buf)
-	extern override bool render_pitch(AudioBuffer buf, int pitch)
-	extern override void handle_event(MidiEvent event)
+	extern override PitchRenderer *create_pitch_renderer(int pitch)
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)

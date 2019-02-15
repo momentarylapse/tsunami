@@ -12,13 +12,52 @@
 #include "../../lib/math/math.h"
 
 
+class DummyPitchRenderer : public PitchRenderer
+{
+public:
+	DummyPitchRenderer(Synthesizer *synth, int pitch) : PitchRenderer(synth, pitch)
+	{
+		volume = 0;
+		phi = 0;
+		env = ((DummySynthesizer*)synth)->env[pitch];
+	}
+	bool _cdecl render(AudioBuffer &buf) override
+	{
+		for (int i=0; i<buf.length; i++){
+			volume = env.get();
+
+			if (volume == 0)
+				return false;
+
+			float d = sin(phi) * volume;
+			buf.c[0][i] += d;
+
+			phi += delta_phi;
+			if (phi > 8*pi)
+				phi = loopf(phi, 0, 2*pi);
+		}
+		return true;
+	}
+	void on_event(const MidiEvent &e) override
+	{
+		if (e.volume == 0){
+			env.end();
+		}else{
+			env.start(e.volume);
+		}
+	}
+	void on_config() override
+	{
+		env = ((DummySynthesizer*)synth)->env[pitch];
+	}
+	float volume;
+	float phi;
+	EnvelopeADSR env;
+};
+
+
 void DummySynthesizer::reset_state()
 {
-	for (int i=0; i<MAX_PITCH; i++){
-		pitch_state[i].phi = 0;
-		pitch_state[i].volume = 0;
-		pitch_state[i].env.reset();
-	}
 }
 
 DummySynthesizer::DummySynthesizer()
@@ -38,11 +77,15 @@ void DummySynthesizer::__init__()
 	new(this) DummySynthesizer;
 }
 
+PitchRenderer *DummySynthesizer::create_pitch_renderer(int pitch)
+{
+	return new DummyPitchRenderer(this, pitch);
+}
 
 void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack, float release)
 {
-	pitch_state[no].env.set(attack, release, 0.00001f, 0.05f, sample_rate);
-	pitch_state[no].env.set2(0, volume);
+	env[no].set(attack, release, 0.00001f, 0.05f, sample_rate);
+	env[no].set2(0, volume);
 	delta_phi[no] = freq * 2.0f * pi / sample_rate;
 }
 
@@ -52,8 +95,8 @@ void DummySynthesizer::on_config()
 	if (instrument.type == Instrument::Type::DRUMS){
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			pitch_state[i].env.set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
-			pitch_state[i].env.set2(0, 0.45f);
+			env[i].set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
+			env[i].set2(0, 0.45f);
 			delta_phi[i] = 100.0f * 2.0f * pi / sample_rate;
 		}
 
@@ -97,40 +140,8 @@ void DummySynthesizer::on_config()
 	}else{
 		for (int i=0; i<MAX_PITCH; i++){
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-			pitch_state[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
-			pitch_state[i].env.set2(0, 0.45f);
+			env[i].set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
+			env[i].set2(0, 0.45f);
 		}
-	}
-}
-
-bool DummySynthesizer::render_pitch(AudioBuffer &buf, int p)
-{
-	PitchState &s = pitch_state[p];
-
-	for (int i=0; i<buf.length; i++){
-		s.volume = s.env.get();
-
-		if (s.volume == 0)
-			return false;
-
-		float d = sin(s.phi) * s.volume;
-		buf.c[0][i] += d;
-
-		s.phi += delta_phi[p];
-		if (s.phi > 8*pi)
-			s.phi = loopf(s.phi, 0, 2*pi);
-	}
-	return true;
-
-}
-
-void DummySynthesizer::handle_event(MidiEvent &event)
-{
-	int p = event.pitch;
-	PitchState &s = pitch_state[p];
-	if (event.volume == 0){
-		s.env.end();
-	}else{
-		s.env.start(event.volume);
 	}
 }

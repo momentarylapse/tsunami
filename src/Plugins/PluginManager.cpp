@@ -315,9 +315,20 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Synthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Synthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("Synthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Synthesizer::__delete__), &synth);
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
-	Kaba::DeclareClassVirtualIndex("Synthesizer", "render_pitch", Kaba::mf(&Synthesizer::render_pitch), &synth);
-	Kaba::DeclareClassVirtualIndex("Synthesizer", "handle_event", Kaba::mf(&Synthesizer::handle_event), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "create_pitch_renderer", Kaba::mf(&Synthesizer::create_pitch_renderer), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "on_config", Kaba::mf(&Synthesizer::on_config), &synth);
 	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::set_sample_rate));
+
+	PitchRenderer pren(&synth, 0);
+	Kaba::DeclareClassSize("PitchRenderer", sizeof(PitchRenderer));
+	Kaba::DeclareClassOffset("PitchRenderer", "synth", _offsetof(PitchRenderer, synth));
+	Kaba::DeclareClassOffset("PitchRenderer", "pitch", _offsetof(PitchRenderer, pitch));
+	Kaba::DeclareClassOffset("PitchRenderer", "delta_phi", _offsetof(PitchRenderer, delta_phi));
+	Kaba::LinkExternal("PitchRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&PitchRenderer::__init__));
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&PitchRenderer::__delete__), &pren);
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", "render", Kaba::mf(&PitchRenderer::render), &pren);
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_event", Kaba::mf(&PitchRenderer::on_event), &pren);
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_config", Kaba::mf(&PitchRenderer::on_config), &pren);
 
 
 	DummySynthesizer dsynth;
@@ -325,8 +336,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("DummySynthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&DummySynthesizer::__init__));
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&DummySynthesizer::__delete__), &dsynth);
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "render", Kaba::mf(&DummySynthesizer::render), &dsynth);
-	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "render_pitch", Kaba::mf(&DummySynthesizer::render_pitch), &dsynth);
-	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "handle_event", Kaba::mf(&DummySynthesizer::handle_event), &dsynth);
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "create_pitch_renderer", Kaba::mf(&DummySynthesizer::create_pitch_renderer), &dsynth);
 	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "on_config", Kaba::mf(&DummySynthesizer::on_config), &dsynth);
 
 	Kaba::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));

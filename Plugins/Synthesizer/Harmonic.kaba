@@ -4,10 +4,6 @@ use "../grid.kaba"
 
 const int NUM_HARMONICS = 10
 
-class PitchState
-	float volume
-	float phi
-	EnvelopeADSR env
 
 class HarmonicConfig extends PluginData
 	float[NUM_HARMONICS] intensity
@@ -83,52 +79,54 @@ class HarmonicPanel extends ConfigPanel
 	override void update()
 		redraw("drawing")
 		set_float("release", hc.release * 1000)
-		
 
-class HarmonicSynthesizer extends Synthesizer
-	HarmonicConfig config
-	
-	PitchState[MAX_PITCH] pitch
-	override void reset_state()
-		for p in pitch
-			p.volume = 0
-			p.phi = 0
-			p.env.reset()
 
-	override ConfigPanel *create_panel()
-		return new HarmonicPanel(self)
-	
+class HarmonicPitchRenderer extends PitchRenderer
+	float volume
+	float phi
+	EnvelopeADSR env
+	override HarmonicSynthesizer *synth
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		volume = 0
+		phi = 0
+		env.reset()
 	override void on_config()
-		for p in pitch
-			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
+		env.set(0.01, 0.01, 0.7, synth.config.release, synth.sample_rate)
 
-	override void handle_event(MidiEvent e)
-		int pp = e.pitch+0.4
-		PitchState *s = &pitch[pp]
+	override void on_event(MidiEvent e)
 		if e.volume == 0
-			s.env.end()
+			env.end()
 		else
-			s.env.start(e.volume)
+			env.start(e.volume)
 
-	override bool render_pitch(AudioBuffer buf, int p)
-		PitchState *s = &pitch[p]
-	
+	override bool render(AudioBuffer buf)
 		for i in 0:buf.length
-			s.volume = s.env.get()
+			volume = env.get()
 
-			if s.volume == 0
+			if volume == 0
 				continue
 
 			float d = 0
 			for j in 0:NUM_HARMONICS
-				d += sin(s.phi * (j+1)) * config.intensity[j]
-			buf.r[i] += d * s.volume
+				d += sin(phi * (j+1)) * synth.config.intensity[j]
+			buf.r[i] += d * volume
 
-			s.phi += delta_phi[p]
-			if s.phi > 8*pi
-				s.phi = loop(s.phi, 0, 2*pi)
+			phi += delta_phi
+			if phi > 8*pi
+				phi = loop(phi, 0, 2*pi)
 		
 		if buf.channels > 1
 			buf.l = buf.r
 
-		return s.volume > 0
+		return volume > 0
+
+class HarmonicSynthesizer extends Synthesizer
+	HarmonicConfig config
+
+
+	override ConfigPanel *create_panel()
+		return new HarmonicPanel(self)
+	
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new HarmonicPitchRenderer(self, pitch)

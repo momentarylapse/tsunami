@@ -5,16 +5,17 @@ const int NUM_OSCILLATORS = 6
 
 
 
-class PitchOscillatorState
+class OscillatorState
 	float input, output
 	float volume
 	float phi
 	EnvelopeADSR env
-
-class PitchState
-	PitchOscillatorState[NUM_OSCILLATORS] osc
-	float volume
-	int num_osc_active
+	void __init__()
+		volume = 0
+		input = 0
+		output = 0
+		phi = 0
+		env.reset()
 
 enum
 	TYPE_SINE
@@ -181,62 +182,49 @@ class FMPanel extends ConfigPanel
 					check("link_out", true)
 				else
 					check("link_" + l.dest, true)*/
-		
 
-class FMSynthesizer extends Synthesizer
-	FMConfig config
-	
-	
-	PitchState[MAX_PITCH] spitch
-	override void reset_state()
-		for p in spitch
-			p.num_osc_active = 0
-			for o in p.osc
-				o.volume = 0
-				o.input = 0
-				o.output = 0
-				o.phi = 0
-				o.env.reset()
-	override void __init__()
-		auto_generate_stereo = true
-		reset_state()
 
-	override ConfigPanel *create_panel()
-		return new FMPanel(self)
-	
-	override void on_config()
-		for p in spitch
-			for o,i in p.osc
-				OscillatorConfig *c = &config.osc[i]
-				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
-				o.env.set2(c.initial, c.peak)
 
-	override void handle_event(MidiEvent e)
-		int pp = e.pitch + 0.4
-		PitchState *s = &spitch[pp]
+class FMPitchRenderer extends PitchRenderer
+	OscillatorState[NUM_OSCILLATORS] osc
+	OscillatorConfig[NUM_OSCILLATORS] conf
+	float volume
+	int num_osc_active
+	override FMSynthesizer *synth
+	
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		num_osc_active = 0
+
+	override void on_event(MidiEvent e)
 		if e.volume == 0
-			for o,oi in s.osc
+			for o,oi in osc
 				o.env.end()
 		else
-			s.num_osc_active = NUM_OSCILLATORS
-			for o,oi in s.osc
+			num_osc_active = NUM_OSCILLATORS
+			for o,oi in osc
 				// TODO: e.volume should only effect "output" oscs
-				o.env.start(e.volume * config.osc[oi].amplitude)
+				o.env.start(e.volume * conf[oi].amplitude)
 
-	override bool render_pitch(AudioBuffer buf, int p)
-		PitchState *s = &spitch[p]
+	override void on_config()
+		for o,i in osc
+			conf[i] = synth.config.osc[i]
+			OscillatorConfig* c = &conf[i]
+			o.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
+			o.env.set2(c.initial, c.peak)
 
+	override bool render(AudioBuffer buf)
 		for i in 0:buf.length
 
-			for o,oi in s.osc
+			for o,oi in osc
 				o.volume = o.env.get()
 				if o.env.just_killed
-					s.num_osc_active --
-					if s.num_osc_active == 0
+					num_osc_active --
+					if num_osc_active == 0
 						return false
 					
-				OscillatorConfig *co = &config.osc[oi]
-				o.phi += delta_phi[p] * (1 + o.input) * co.factor
+				OscillatorConfig *co = &conf[oi]
+				o.phi += delta_phi * (1 + o.input) * co.factor
 				if co.type == TYPE_SINE
 					o.output = sin(o.phi) * o.volume
 				else if co.type == TYPE_SQUARE
@@ -251,13 +239,27 @@ class FMSynthesizer extends Synthesizer
 					o.phi = loop(o.phi, 0, 8*pi)
 			
 			// transport
-			for o,oi in s.osc
-				OscillatorConfig *co = &config.osc[oi]
+			for o,oi in osc
+				OscillatorConfig *co = &conf[oi]
 				if co.target_out
 					buf.r[i] += o.output
 				for t,j in co.target
 					if t
-						s.osc[j].input += o.output
+						osc[j].input += o.output
 		return true
+
+class FMSynthesizer extends Synthesizer
+	FMConfig config
+	
+	override void __init__()
+		auto_generate_stereo = true
+		reset_state()
+
+	override ConfigPanel *create_panel()
+		return new FMPanel(self)
+
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new FMPitchRenderer(self, pitch)
+
 			
 	

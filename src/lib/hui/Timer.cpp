@@ -76,15 +76,18 @@ float Timer::get()
 	return elapsed;
 }
 
-
+static bool _sleep_complained_ = false;
 
 // don't call in main thread!!!!!
 void Sleep(float duration)
 {
 	if (duration <= 0)
 		return;
-	if (main_thread_id == std::this_thread::get_id())
-		msg_error("don't call hui::Sleep() in main thread!!!");
+	if (main_thread_id == std::this_thread::get_id()){
+		if (!_sleep_complained_)
+			msg_error("don't call hui::Sleep() in main thread!!!");
+		_sleep_complained_ = true;
+	}
 
 #ifdef OS_WINDOWS
 	Sleep((DWORD)(duration * 1000.0f));

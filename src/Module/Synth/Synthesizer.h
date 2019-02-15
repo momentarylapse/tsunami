@@ -23,6 +23,28 @@ class ActionTrackDetuneSynthesizer;
 class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
 class Session;
+class Synthesizer;
+namespace Kaba{
+class Class;
+}
+
+class PitchRenderer : public VirtualBase
+{
+public:
+	PitchRenderer(Synthesizer *synth, int pitch);
+	virtual ~PitchRenderer(){}
+
+	void _cdecl __init__(Synthesizer *synth, int pitch);
+	void _cdecl __delete__() override;
+
+	virtual bool _cdecl render(AudioBuffer &buf){ return false; }
+	virtual void on_event(const MidiEvent &e){}
+	virtual void on_config(){}
+
+	int pitch;
+	float delta_phi;
+	Synthesizer *synth;
+};
 
 class Synthesizer : public Module
 {
@@ -31,6 +53,7 @@ class Synthesizer : public Module
 	friend class ActionTrackDetuneSynthesizer;
 	friend class FileChunkSynthesizer;
 	friend class FileChunkSynthesizerTuning;
+	friend class PitchRenderer;
 public:
 	Synthesizer();
 
@@ -38,8 +61,7 @@ public:
 	void _cdecl __delete__() override;
 
 	virtual void _cdecl render(AudioBuffer &buf);
-	virtual bool _cdecl render_pitch(AudioBuffer &buf, int pitch){ return false; }
-	virtual void _cdecl handle_event(MidiEvent &event){}
+	void on_config() override;
 
 	int sample_rate;
 	void _cdecl set_sample_rate(int sample_rate);
@@ -79,8 +101,13 @@ protected:
 
 	MidiEventBuffer events;
 
+	Kaba::Class* pitch_renderer_class;
+	Array<PitchRenderer*> pitch_renderer;
+	PitchRenderer *get_pitch_renderer(int pitch);
+	virtual PitchRenderer *create_pitch_renderer(int pitch);
 	Set<int> active_pitch; // delayed end
 	void _render_part(AudioBuffer &buf, int pitch, int offset, int end);
+	void _handle_event(const MidiEvent &e);
 
 public:
 	struct Tuning

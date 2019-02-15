@@ -15,6 +15,23 @@
 #include "../../lib/math/math.h"
 #include "../Port/MidiPort.h"
 
+PitchRenderer::PitchRenderer(Synthesizer *s, int p)
+{
+	synth = s;
+	pitch = p;
+	delta_phi = synth->delta_phi[pitch];
+}
+
+void PitchRenderer::__init__(Synthesizer *s, int p)
+{
+	new(this) PitchRenderer(s, p);
+}
+
+void PitchRenderer::__delete__()
+{
+	this->PitchRenderer::~PitchRenderer();
+}
+
 Synthesizer::Output::Output(Synthesizer *s) : AudioPort("out")
 {
 	synth = s;
@@ -137,12 +154,41 @@ bool Synthesizer::has_run_out_of_data()
 	return (active_pitch.num == 0) and source_run_out;
 }
 
+PitchRenderer *Synthesizer::create_pitch_renderer(int pitch)
+{
+	return nullptr;
+}
+
+PitchRenderer *Synthesizer::get_pitch_renderer(int pitch)
+{
+	for (auto *p: pitch_renderer)
+		if (p->pitch == pitch)
+			return p;
+	auto *p = create_pitch_renderer(pitch);
+	if (p){
+		p->on_config();
+		pitch_renderer.add(p);
+	}
+	return p;
+}
+
 void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
 {
 	AudioBuffer part;
 	part.set_as_ref(buf, offset, end - offset);
-	if (!render_pitch(part, pitch))
+	PitchRenderer *pr = get_pitch_renderer(pitch);
+	if (!pr)
+		return;
+	if (!pr->render(part))
 		active_pitch.erase(pitch);
+}
+
+void Synthesizer::_handle_event(const MidiEvent &e)
+{
+	PitchRenderer *pr = get_pitch_renderer(e.pitch);
+	if (!pr)
+		return;
+	pr->on_event(e);
 }
 
 void Synthesizer::render(AudioBuffer& buf)
@@ -161,7 +207,7 @@ void Synthesizer::render(AudioBuffer& buf)
 					_render_part(buf, p, offset, e.pos);
 
 				offset = e.pos;
-				handle_event(e);
+				_handle_event(e);
 				if (e.volume > 0)
 					active_pitch.add(p);
 			}
@@ -169,55 +215,20 @@ void Synthesizer::render(AudioBuffer& buf)
 		if (active_pitch.contains(p))
 			_render_part(buf, p, offset, buf.length);
 	}
+}
 
-#if 0
-
-
-	for (int i=0; i<buf.length; i++){
-
-		// current events?
-		for (MidiEvent &e: events)
-			if (e.pos == i){
-				int p = e.pitch;
-				PitchState &s = pitch[p];
-				if (e.volume == 0){
-					s.env.end();
-				}else{
-					s.env.start(e.volume);
-					enable_pitch(p, true);
-				}
-			}
-
-		Array<int> del_me;
-		for (int ip=0; ip<active_pitch.num; ip++){
-			int p = active_pitch[ip];
-			PitchState &s = pitch[p];
-
-			s.volume = s.env.get();
-
-			if (s.volume == 0)
-				del_me.add(p);
-
-			float d = sin(s.phi) * s.volume;
-			buf.c[0][i] += d;
-
-			s.phi += delta_phi[p];
-			if (s.phi > 8*pi)
-				s.phi = loopf(s.phi, 0, 2*pi);
-		}
-
-		for (int p: del_me)
-			enable_pitch(p, false);
-
-		if (buf.channels > 1)
-			buf.c[1][i] = buf.c[0][i];
-	}
-#endif
+void Synthesizer::on_config()
+{
+	for (auto *p: pitch_renderer)
+		p->on_config();
 }
 
 void Synthesizer::reset()
 {
 	reset_state();
+	for (auto *p: pitch_renderer)
+		delete p;
+	pitch_renderer.clear();
 	active_pitch.clear();
 	source_run_out = false;
 }

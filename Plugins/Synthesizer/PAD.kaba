@@ -4,11 +4,6 @@ use "../grid.kaba"
 
 const int N = 4096*16
 
-class PitchState
-	int pos
-	float[] buf
-	EnvelopeADSR env
-
 
 class PADConfig extends PluginData
 	float[] A
@@ -35,38 +30,30 @@ float gauss(float f, float bw)
 	float x = f / bw
 	return exp(- x*x) / bw
 
-class PADSynthesizer extends Synthesizer
-	PADConfig config
-	
-	PitchState[MAX_PITCH] pitches
-	
-	override void __init__()
-		auto_generate_stereo = true
-		for p in pitches
-			p.buf.__init__()
-	override void reset_state()
-		for p in pitches
-			p.buf.clear()
-			p.pos = 0
-	
-	override void on_config()
-		reset_state()
-		for p in pitches
-			p.env.set(0.02, 0.02, 0.7, 0.5, sample_rate)
+
+class PADRenderer extends PitchRenderer
+	int pos
+	float[] prebuf
+	EnvelopeADSR env
+	override PADSynthesizer *synth
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		pos = 0
 		
-	void create(int pitch)
+	void create()
 		float freq = pitch_to_freq(pitch)
-		PitchState *p = &pitches[pitch]
 	
 		complex[] c
 		float[] amp
 		c.resize(N / 2 + 1)
 		amp.resize(N / 2 + 1)
+		
+		float sample_rate = synth.sample_rate
 	
-		for a,n0 in config.A
+		for a,n0 in synth.config.A
 			int n = n0 + 1
-			float nn = n + config.detune * n0 * n0
-			float bwHz = (pow(2, config.bw / 12.0) - 1.0) * freq * pow(nn, config.bwscale)
+			float nn = n + synth.config.detune * n0 * n0
+			float bwHz = (pow(2, synth.config.bw / 12.0) - 1.0) * freq * pow(nn, synth.config.bwscale)
 			float bwi = bwHz / (2.0 * sample_rate)
 			float fi = freq * n / sample_rate
 			for i in 0:amp.num
@@ -76,40 +63,48 @@ class PADSynthesizer extends Synthesizer
 			float phi = rand(2 * pi)
 			c[i] = complex(cos(phi), sin(phi)) * amp[i]
 		
-		p.buf.resize(N)
-		fft_c2r_inv(c, p.buf)
+		prebuf.resize(N)
+		fft_c2r_inv(c, prebuf)
 	
 		float m = 0
-		for b in p.buf
+		for b in prebuf
 			m = max(b, m)
-		p.buf /= (m * 1.2)
+		prebuf /= (m * 1.2)
+	
+	override void on_config()
+		env.set(0.02, 0.02, 0.7, 0.5, synth.sample_rate)
+		create()
 
-	override void handle_event(MidiEvent e)
-		int pp = e.pitch + 0.4
-		PitchState *ps = &pitches[pp]
+	override void on_event(MidiEvent e)
 		if e.volume > 0
-			ps.env.start(e.volume)
+			env.start(e.volume)
 		else
-			ps.env.end()
+			env.end()
 
-	override bool render_pitch(AudioBuffer buf, int p)
-		PitchState *ps = &pitches[p]
-		if ps.buf.num == 0
-			create(p)
-			
+	override bool render(AudioBuffer buf)
 		for i in 0:buf.length
-			float d = ps.buf[ps.pos] * ps.env.get()
-			if ps.env.just_killed
+			float d = prebuf[pos] * env.get()
+			if env.just_killed
 				return false
 				
 			buf.r[i] += d
-			ps.pos ++
-			if ps.pos >= N
-				ps.pos = 0
+			pos ++
+			if pos >= N
+				pos = 0
 		return true
+	
+
+class PADSynthesizer extends Synthesizer
+	PADConfig config
+	
+	override void __init__()
+		auto_generate_stereo = true
 	
 	override ConfigPanel *create_panel()
 		return new PADPanel(self)
+
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new PADRenderer(self, pitch)
 
 class PADGrid extends Grid
 	PADConfig *pc

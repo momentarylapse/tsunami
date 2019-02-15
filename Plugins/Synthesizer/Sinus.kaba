@@ -1,28 +1,31 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-class SinusState extends PluginData
 
+class SinusRenderer extends PitchRenderer
+	float volume
+	float phase
+	override SinusSynthesizer *synth
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		volume = 0
+		phase = 0
+
+	override void on_event(MidiEvent e)
+		volume = e.volume
+
+	override bool render(AudioBuffer buf)
+		for i in 0:buf.length
+			buf.r[i] += sin(phase) * volume
+			phase += delta_phi
+			if phase > 2*pi
+				phase -= 2*pi
+		return volume > 0
 
 class SinusSynthesizer extends Synthesizer
-	float[MAX_PITCH] volume
-	float[MAX_PITCH] phase
 	
-	override void reset_state()
+	override void __init__()
 		auto_generate_stereo = true
-		for p in 0:MAX_PITCH
-			volume[p] = 0
-			phase[p] = 0
 
-	override void handle_event(MidiEvent e)
-		int pp = e.pitch
-		volume[pp] = e.volume
-
-	override bool render_pitch(AudioBuffer buf, int p)
-		for i in 0:buf.length
-			float d = sin(phase[p]) * volume[p]
-			buf.r[i] += d
-			phase[p] += delta_phi[p]
-			if phase[p] > 2*pi
-				phase[p] -= 2*pi
-		return volume[p] > 0
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new SinusRenderer(self, pitch)

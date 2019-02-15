@@ -1,34 +1,35 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-class PitchState
+class RectangleRenderer extends PitchRenderer
 	float volume
 	float phase
+	override RectangularSynthesizer *synth
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		volume = 0
+		phase = 0
 
+	override void on_event(MidiEvent e)
+		volume = e.volume
+
+	override bool render(AudioBuffer buf)
+		for i in 0:buf.length
+			float d = sin(phase)
+			if d > 0
+				buf.r[i] += volume
+			else
+				buf.r[i] -= volume
+			phase += delta_phi
+			if phase > 2*pi
+				phase -= 2*pi
+		return volume > 0
 
 class RectangularSynthesizer extends Synthesizer
 	
-	PitchState[MAX_PITCH] pitches
-	override void reset_state()
+	override void __init__()
 		auto_generate_stereo = true
-		for p in pitches
-			p.volume = 0
-			p.phase = 0
 
-	override void handle_event(MidiEvent e)
-		int pp = e.pitch
-		pitches[pp].volume = e.volume
-
-	override bool render_pitch(AudioBuffer buf, int p)
-		PitchState *ps = &pitches[p]
-		for i in 0:buf.length
-			float d = sin(ps.phase)
-			if d > 0
-				buf.r[i] += ps.volume
-			else
-				buf.r[i] -= ps.volume
-			ps.phase += delta_phi[p]
-			if ps.phase > 2*pi
-				ps.phase -= 2*pi
-		return pitches[p].volume > 0
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new RectangleRenderer(self, pitch)
 

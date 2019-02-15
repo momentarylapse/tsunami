@@ -2,20 +2,33 @@ use "../api.kaba"
 use "../tone.kaba"
 
 
+class ClickRenderer extends PitchRenderer
+	float volume
+	float phase
+	float scale
+	override ClickSynthesizer *synth
+	override void __init__(Synthesizer *s, int pitch)
+		super.__init__(s, pitch)
+		volume = 0
+		phase = 0
+		scale = 0.9995
+
+	override void on_event(MidiEvent e)
+		volume = max(e.volume, volume)
+
+	override bool render(AudioBuffer buf)
+		for i in 0:buf.length
+			buf.r[i] += sin(phase) * volume
+			phase += delta_phi
+			if phase > 2*pi
+				phase -= 2*pi
+			volume *= scale
+		return volume > 0.001
+
 class ClickSynthesizer extends Synthesizer
-	override void renderNote(AudioBuffer buf, Range r, float pitch, float volume)
-		float freq = pitch_to_freq(pitch)
-		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
-		float sm_d = 0.02 * sample_rate
-		keep_notes = sm_d * 8
+	
+	override void __init__()
+		auto_generate_stereo = true
 
-		int i0 = max(r.offset, 0)
-		int i1 = min(r.offset + sm_d * 8, buf.num)
-
-		for i in i0:i1
-			float tt = (i - r.offset) * f_w
-			float d = sin(tt) * volume
-			float fi = (i - r.offset) / sm_d
-			d *= exp(-fi)
-			buf.r[i] += d
-			buf.l[i] += d
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new ClickRenderer(self, pitch)

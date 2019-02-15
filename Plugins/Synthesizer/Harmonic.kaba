@@ -81,7 +81,7 @@ class HarmonicPanel extends ConfigPanel
 		set_float("release", hc.release * 1000)
 
 
-class HarmonicPitchRenderer extends PitchRenderer
+class HarmonicRenderer extends PitchRenderer
 	float volume
 	float phi
 	EnvelopeADSR env
@@ -129,4 +129,4 @@ class HarmonicSynthesizer extends Synthesizer
 		return new HarmonicPanel(self)
 	
 	override PitchRenderer* create_pitch_renderer(int pitch)
-		return new HarmonicPitchRenderer(self, pitch)
+		return new HarmonicRenderer(self, pitch)

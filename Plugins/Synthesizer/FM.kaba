@@ -185,7 +185,7 @@ class FMPanel extends ConfigPanel
 
 
 
-class FMPitchRenderer extends PitchRenderer
+class FMRenderer extends PitchRenderer
 	OscillatorState[NUM_OSCILLATORS] osc
 	OscillatorConfig[NUM_OSCILLATORS] conf
 	float volume
@@ -259,7 +259,7 @@ class FMSynthesizer extends Synthesizer
 		return new FMPanel(self)
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
-		return new FMPitchRenderer(self, pitch)
+		return new FMRenderer(self, pitch)
 
 			
 	

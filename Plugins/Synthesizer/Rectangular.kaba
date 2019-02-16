@@ -6,7 +6,6 @@ class RectangleRenderer extends PitchRenderer
 	float phase
 	override RectangularSynthesizer *synth
 	override void __init__(Synthesizer *s, int pitch)
-		super.__init__(s, pitch)
 		volume = 0
 		phase = 0
 

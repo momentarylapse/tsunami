@@ -144,9 +144,7 @@ bool Class::is_simple_class() const
 	if (parent)
 		if (!parent->is_simple_class())
 			return false;
-	if (get_default_constructor())
-		return false;
-	if (get_complex_constructors().num > 0)
+	if (get_constructors().num > 0)
 		return false;
 	if (get_destructor())
 		return false;
@@ -284,11 +282,11 @@ ClassFunction *Class::get_default_constructor() const
 	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
 }
 
-Array<ClassFunction*> Class::get_complex_constructors() const
+Array<ClassFunction*> Class::get_constructors() const
 {
 	Array<ClassFunction*> c;
 	for (ClassFunction &f: functions)
-		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_types.num > 0))
+		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid))
 			c.add(&f);
 	return c;
 }

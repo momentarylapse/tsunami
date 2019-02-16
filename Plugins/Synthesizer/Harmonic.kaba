@@ -53,7 +53,7 @@ class HarmonicPanel extends ConfigPanel
 	override HarmonicSynthesizer *c
 	HarmonicConfig *hc
 	HarmonicGrid grid
-	override void __init__(HarmonicSynthesizer *_s)
+	override void __init__(Module *_s)
 		super.__init__(_s)
 		add_grid("", 0, 0, "main_table")
 		set_target("main_table")
@@ -87,7 +87,6 @@ class HarmonicRenderer extends PitchRenderer
 	EnvelopeADSR env
 	override HarmonicSynthesizer *synth
 	override void __init__(Synthesizer *s, int pitch)
-		super.__init__(s, pitch)
 		volume = 0
 		phi = 0
 		env.reset()

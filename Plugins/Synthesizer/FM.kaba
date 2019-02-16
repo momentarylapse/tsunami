@@ -87,7 +87,7 @@ class FMPanel extends ConfigPanel
 	FMConfig *fc
 	int chosen
 	override FMSynthesizer *c
-	override void __init__(FMSynthesizer *_s)
+	override void __init__(Module *_s)
 		super.__init__(_s)
 		fc = &c.config
 		add_grid("", 0, 0, "outer_table")
@@ -102,7 +102,7 @@ class FMPanel extends ConfigPanel
 			add_spin_button("!range=0:32:0.001\\0", 0, j + 1, "factor_" + j)
 			add_spin_button("!range=0:1:0.001\\0", 1, j + 1, "amplitude_" + j)
 			add_radio_button("", 2, j+1, "chosen:osc_" + j)
-			event("chosen:osc_" + j, &onChosen)
+			event("chosen:osc_" + j, &on_chosen)
 		set_target("osc_table")
 		add_label("Initial", 0, 1, "")
 		add_label("Peak", 0, 2, "")
@@ -120,14 +120,14 @@ class FMPanel extends ConfigPanel
 			add_check_box("" + j, 2, j+1, "link_" + j)
 		add_check_box("out", 2, NUM_OSCILLATORS + 1, "link_out")
 		add_combo_box("sine\\square\\saw", 3, 1, "type")
-		event("*", &onChange)
+		event("*", &on_change)
 		chosen = 0
 	
-	void onChosen()
+	void on_chosen()
 		chosen = HuiGetEvent().id.substr(11, -1).int()
 		update()
 	
-	void onChange()
+	void on_change()
 		if HuiGetEvent().id.substr(0, 6) == "chosen"
 			return
 		for o,j in fc.osc
@@ -193,7 +193,6 @@ class FMRenderer extends PitchRenderer
 	override FMSynthesizer *synth
 	
 	override void __init__(Synthesizer *s, int pitch)
-		super.__init__(s, pitch)
 		num_osc_active = 0
 
 	override void on_event(MidiEvent e)

@@ -36,7 +36,7 @@ class Metronome extends AudioEffect
 		source.config.volume = config.volume
 		source.set_beats(config.beats_per_measure, 1)
 		source.set_bpm(config.beats_per_minute)
-		synth.out.read(buf)
+		synth.render(buf)
 		
 	override ConfigPanel *create_panel()
 		// how to deal with configuration/string exports...
@@ -50,8 +50,7 @@ class Metronome extends AudioEffect
 	
 class MetronomePanel extends ConfigPanel
 	override Metronome *c
-	override void __init__(Metronome *_m)
-		super.__init__(_m)
+	override void __init__(Module *_m)
 		add_grid("!width=300", 0, 0, "table2")
 		set_target("table2")
 		add_label("Geschwindigkeit:", 0, 0, "")

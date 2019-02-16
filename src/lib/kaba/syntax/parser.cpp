@@ -1783,7 +1783,7 @@ void SyntaxTree::ParseClass()
 	_class->size = ProcessClassSize(_class->name, _offset);
 
 
-	AddFunctionHeadersForClass(_class);
+	AddMissingFunctionHeadersForClass(_class);
 
 	_class->fully_parsed = true;
 
@@ -1888,7 +1888,7 @@ bool SyntaxTree::ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_
 	return true;
 }
 
-void Function::Update(Class *class_type)
+void Function::update(Class *class_type)
 {
 	// save "original" param types (Var[].Type gets altered for call by reference)
 	for (int i=literal_param_type.num;i<num_params;i++)
@@ -2002,7 +2002,7 @@ Function *SyntaxTree::ParseFunctionHeader(Class *class_type, bool as_extern)
 	if (!Exp.end_of_line())
 		DoError("newline expected after parameter list");
 
-	f->Update(class_type);
+	f->update(class_type);
 
 	f->is_extern = as_extern;
 	cur_func = nullptr;
@@ -2028,13 +2028,13 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 	bool more_to_parse = true;
 
 	// auto implement constructor?
-	if (f->name.tail(9) == "." + IDENTIFIER_FUNC_INIT){
+	if (f->name.tail(IDENTIFIER_FUNC_INIT.num + 1) == "." + IDENTIFIER_FUNC_INIT){
 		if (peek_commands_super(Exp)){
 			more_to_parse = ParseFunctionCommand(f, this_line);
 
-			AutoImplementDefaultConstructor(f, f->_class, false);
+			AutoImplementConstructor(f, f->_class, false);
 		}else
-			AutoImplementDefaultConstructor(f, f->_class, true);
+			AutoImplementConstructor(f, f->_class, true);
 	}
 
 	parser_loop_depth = 0;
@@ -2045,7 +2045,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 	}
 
 	// auto implement destructor?
-	if (f->name.tail(11) == "." + IDENTIFIER_FUNC_DELETE)
+	if (f->name.tail(IDENTIFIER_FUNC_DELETE.num + 1) == "." + IDENTIFIER_FUNC_DELETE)
 		AutoImplementDestructor(f, f->_class);
 	cur_func = nullptr;
 

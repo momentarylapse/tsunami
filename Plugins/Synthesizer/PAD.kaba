@@ -37,7 +37,6 @@ class PADRenderer extends PitchRenderer
 	EnvelopeADSR env
 	override PADSynthesizer *synth
 	override void __init__(Synthesizer *s, int pitch)
-		super.__init__(s, pitch)
 		pos = 0
 		
 	void create()
@@ -151,8 +150,7 @@ class PADPanel extends ConfigPanel
 	PADConfig *pc
 	PADGrid grid
 	override PADSynthesizer* c
-	override void __init__(PADSynthesizer* _s)
-		super.__init__(_s)
+	override void __init__(Module* _s)
 		pc = &c.config
 		from_source("
 Grid ? ''

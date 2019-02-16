@@ -65,8 +65,7 @@ class Equalizer15 extends AudioEffect
 class Equalizer15Panel extends ConfigPanel
 	override Equalizer15 *c
 
-	override void __init__(Equalizer15 *_eq)
-		super.__init__(_eq)
+	override void __init__(Module *_eq)
 		add_grid("", 0, 1, "grid")
 		set_target("grid")
 		for i in 0:NUM_BANDS

@@ -39,8 +39,7 @@ class Volume extends AudioEffect
 class VolumePanel extends ConfigPanel
 	override Volume *c
 	Slider *slider
-	override void __init__(Volume *_v)
-		super.__init__(_v)
+	override void __init__(Module *_v)
 		add_grid("!width=400", 0, 0, "table1")
 		set_target("table1")
 		add_check_box("Maximieren", 0, 1, "max")

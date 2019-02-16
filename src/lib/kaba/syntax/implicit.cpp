@@ -32,7 +32,7 @@ void SyntaxTree::AutoImplementAddChildConstructors(Node *self, Function *f, Clas
 	}
 }
 
-void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool allow_parent_constructor)
+void SyntaxTree::AutoImplementConstructor(Function *f, Class *t, bool allow_parent_constructor)
 {
 	if (!f)
 		return;
@@ -54,14 +54,24 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool all
 
 		// parent constructor
 		if (t->parent and allow_parent_constructor){
-			ClassFunction *ff = t->parent->get_default_constructor();
-			if (ff){
-				Node *c = add_node_classfunc(ff, cp_node(self));
+			ClassFunction *pc_same = t->parent->get_same_func(IDENTIFIER_FUNC_INIT, f);
+			ClassFunction *pc_def = t->parent->get_default_constructor();
+			if (pc_same){
+				// first, try same signature
+				Node *c = add_node_classfunc(pc_same, cp_node(self));
+				for (int i=0;i<pc_same->param_types.num;i++)
+					c->set_param(i, add_node_local_var(i, pc_same->param_types[i]));
 				f->block->nodes.add(c);
+			}else if (pc_def){
+				// then, try default constructor
+				Node *c = add_node_classfunc(pc_def, cp_node(self));
+				f->block->nodes.add(c);
+			}else if (t->parent->needs_constructor()){
+				DoError("can't find a constructor in the parent class with matching signature or a default constructor");
 			}
 		}
 
-		// call child constructors
+		// call child constructors for elements
 		AutoImplementAddChildConstructors(self, f, t);
 
 		// add vtable reference
@@ -70,37 +80,6 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Class *t, bool all
 			AutoImplementAddVirtualTable(self, f, t);
 	}
 }
-
-void SyntaxTree::AutoImplementComplexConstructor(Function *f, Class *t)
-{
-	if (!f)
-		return;
-	if (!f->auto_implement)
-		return;
-
-	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF), t->get_pointer());
-
-	if (t->parent){
-		ClassFunction *pcc = t->parent->get_same_func(IDENTIFIER_FUNC_INIT, f);
-		if (pcc){
-			// parent constructor
-			Node *c = add_node_classfunc(pcc, cp_node(self));
-			for (int i=0;i<pcc->param_types.num;i++)
-				c->set_param(i, add_node_local_var(i, pcc->param_types[i]));
-			f->block->nodes.add(c);
-		}else
-			msg_error("internal error: parent constructor????");
-	}
-
-	// call child constructors
-	AutoImplementAddChildConstructors(self, f, t);
-
-	// add vtable reference
-	// after child constructor (otherwise would get overwritten)
-	if (t->vtable.num > 0)
-		AutoImplementAddVirtualTable(self, f, t);
-}
-
 
 void SyntaxTree::AutoImplementDestructor(Function *f, Class *t)
 {
@@ -485,26 +464,18 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Class *t)
 	b->nodes.add(cmd_assign);
 }
 
-void add_func_headerx(SyntaxTree *s, Class *t, const string &name, Class *return_type, const Array<Class*> &param_types, const Array<string> &param_names, ClassFunction *cf = nullptr)
+void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, const Array<Class*> &param_types, const Array<string> &param_names, ClassFunction *cf = nullptr)
 {
 	Function *f = s->AddFunction(name, return_type);
-	f->auto_implement = true;
+	f->auto_declared = true;
 	foreachi (auto &p, param_types, i){
 		f->literal_param_type.add(p);
 		f->block->add_var(param_names[i], p);
 		f->num_params ++;
 	}
-	f->Update(t);
+	f->update(t);
 	bool override = cf;
 	t->add_function(s, s->functions.num - 1, false, override);
-}
-
-void add_func_header(SyntaxTree *s, Class *t, const string &name, Class *return_type, Class *param_type, const string &param_name, ClassFunction *cf = nullptr)
-{
-	Array<Class*> types;
-	if (param_type != TypeVoid)
-		types.add(param_type);
-	add_func_headerx(s, t, name, return_type, types, param_name, cf);
 }
 
 bool needs_new(ClassFunction *f)
@@ -523,7 +494,7 @@ Array<string> class_func_param_names(ClassFunction *cf)
 	return names;
 }
 
-void SyntaxTree::AddFunctionHeadersForClass(Class *t)
+void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t)
 {
 	if (t->owner != this)
 		return;
@@ -531,45 +502,45 @@ void SyntaxTree::AddFunctionHeadersForClass(Class *t)
 		return;
 
 	if (t->is_super_array()){
-		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, TypeVoid, "");
-		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, TypeVoid, "");
-		add_func_header(this, t, "clear", TypeVoid, TypeVoid, "");
-		add_func_header(this, t, "resize", TypeVoid, TypeInt, "num");
-		add_func_header(this, t, "add", TypeVoid, t->parent, "x");
-		add_func_header(this, t, "remove", TypeVoid, TypeInt, "index");
-		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other");
+		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
+		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
+		add_func_header(this, t, "clear", TypeVoid, {}, {});
+		add_func_header(this, t, "resize", TypeVoid, {TypeInt}, {"num"});
+		add_func_header(this, t, "add", TypeVoid, {t->parent}, {"x"});
+		add_func_header(this, t, "remove", TypeVoid, {TypeInt}, {"index"});
+		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	}else if (t->is_array()){
-		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other");
+		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	}else if (t->is_dict()){
 		msg_write("add dict...");
-		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, TypeVoid, "");
-		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, TypeVoid, "");
-		add_func_header(this, t, "clear", TypeVoid, TypeVoid, "");
-		add_func_headerx(this, t, "add", TypeVoid, {TypeString, t->parent}, {"key", "x"});
-		add_func_header(this, t, "__get__", t->parent, TypeString, "key");
-		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other");
+		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
+		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
+		add_func_header(this, t, "clear", TypeVoid, {}, {});
+		add_func_header(this, t, "add", TypeVoid, {TypeString, t->parent}, {"key", "x"});
+		add_func_header(this, t, "__get__", t->parent, {TypeString}, {"key"});
+		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
 	}else if (!t->is_simple_class()){//needs_init){
-		if (needs_new(t->get_default_constructor()))
-			add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, TypeVoid, "", t->get_default_constructor());
+		if (t->parent){
+			// only auto-implement matching constructors
+			for (auto *pcc: t->parent->get_constructors()){
+				auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc->func());
+				if (needs_new(c))
+					add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
+			}
+		}else{
+			if (t->needs_constructor() and needs_new(t->get_default_constructor()))
+				add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
+		}
 		if (needs_new(t->get_destructor()))
-			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, TypeVoid, "", t->get_destructor());
+			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
 		if (needs_new(t->get_assign())){
 			//add_func_header(this, t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
 			// implement only if parent has also done so
 			if (t->parent){
 				if (t->parent->get_assign())
-					add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->get_assign());
+					add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}else{
-				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, t, "other", t->get_assign());
-			}
-		}
-		for (auto *c: t->get_complex_constructors()){
-			if (needs_new(c)){
-				if (t->parent){
-					auto pcc = t->parent->get_same_func(IDENTIFIER_FUNC_INIT, c->func());
-					if (pcc)
-						add_func_headerx(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
-				}
+				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}
 		}
 	}
@@ -580,7 +551,7 @@ Function* class_get_func(Class *t, const string &name, Class *return_type, int n
 	ClassFunction *cf = t->get_func(name, return_type, num_params);
 	if (cf){
 		Function *f = cf->func();
-		if (f->auto_implement){
+		if (f->auto_declared){
 			cf->needs_overriding = false; // we're about to implement....
 			return f;
 		}
@@ -595,7 +566,7 @@ Function* prepare_auto_impl(Class *t, ClassFunction *cf)
 	if (!cf)
 		return nullptr;
 	Function *f = cf->func();
-	if (f->auto_implement){
+	if (f->auto_declared){
 		cf->needs_overriding = false; // we're about to implement....
 		return f;
 	}
@@ -604,6 +575,7 @@ Function* prepare_auto_impl(Class *t, ClassFunction *cf)
 	return f;
 }
 
+// completely create and implement
 void SyntaxTree::AutoImplementFunctions(Class *t)
 {
 	if (t->owner != this)
@@ -612,7 +584,7 @@ void SyntaxTree::AutoImplementFunctions(Class *t)
 		return;
 
 	if (t->is_super_array()){
-		AutoImplementDefaultConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
+		AutoImplementConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 		AutoImplementDestructor(prepare_auto_impl(t, t->get_destructor()), t);
 		AutoImplementArrayClear(prepare_auto_impl(t, t->get_func("clear", TypeVoid, 0)), t);
 		AutoImplementArrayResize(prepare_auto_impl(t, t->get_func("resize", TypeVoid, 1, TypeInt)), t);
@@ -622,15 +594,15 @@ void SyntaxTree::AutoImplementFunctions(Class *t)
 	}else if (t->is_array()){
 		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
 	}else if (t->is_dict()){
-		AutoImplementDefaultConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
+		AutoImplementConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 	}else if (!t->is_simple_class()){
-		if (t->needs_constructor())
-			AutoImplementDefaultConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
+		for (auto *cf: t->get_constructors())
+			AutoImplementConstructor(prepare_auto_impl(t, cf), t, true);
+		//if (t->needs_constructor())
+		//	AutoImplementConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 		if (t->needs_destructor())
 			AutoImplementDestructor(prepare_auto_impl(t, t->get_destructor()), t);
 		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
-		for (ClassFunction *cf: t->get_complex_constructors())
-			AutoImplementComplexConstructor(prepare_auto_impl(t, cf), t);
 	}
 }
 

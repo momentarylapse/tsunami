@@ -8,7 +8,6 @@ class ClickRenderer extends PitchRenderer
 	float scale
 	override ClickSynthesizer *synth
 	override void __init__(Synthesizer *s, int pitch)
-		super.__init__(s, pitch)
 		volume = 0
 		phase = 0
 		scale = 0.9995

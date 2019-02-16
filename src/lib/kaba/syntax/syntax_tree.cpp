@@ -526,7 +526,7 @@ Function::Function(SyntaxTree *_tree, const string &_name, Class *_return_type)
 	literal_return_type = _return_type;
 	_class = nullptr;
 	is_extern = false;
-	auto_implement = false;
+	auto_declared = false;
 	is_pure = false;
 	_param_size = 0;
 	_var_size = 0;
@@ -871,9 +871,9 @@ Class *SyntaxTree::CreateNewClass(const string &name, Class::Type type, int size
 		Class *parent = t->parent;
 		t->derive_from(TypeDynamicArray, false);
 		t->parent = parent;
-		AddFunctionHeadersForClass(t);
+		AddMissingFunctionHeadersForClass(t);
 	}else if (t->is_array()){
-		AddFunctionHeadersForClass(t);
+		AddMissingFunctionHeadersForClass(t);
 	}
 	return t;
 }

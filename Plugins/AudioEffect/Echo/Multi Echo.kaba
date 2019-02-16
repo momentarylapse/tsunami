@@ -191,14 +191,14 @@ class MultiEchoGrid extends Grid
 			cp.changed()
 
 class MultiEchoPanel extends ConfigPanel
+	override MultiEcho* c
 	MultiEchoGrid grid
-	override void __init__(MultiEcho *_h)
-		super.__init__(_h)
+	override void __init__(Module *_h)
 		from_source("
 Grid ? ''
 	DrawingArea drawing '' grabfocus height=250")
 	
-		grid.config = &_h.config
+		grid.config = &c.config
 		grid.cp = self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "s")

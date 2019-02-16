@@ -309,10 +309,9 @@ class EqualizerGrid extends Grid
 class EqualizerPanel extends ConfigPanel
 	EqualizerGrid grid
 	int num_peaks
-	Equalizer *eq
-	override void __init__(Equalizer *_eq)
+	override Equalizer *c
+	override void __init__(Module *_eq)
 		super.__init__(_eq)
-		eq = _eq
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
 		add_drawing_area("!grabfocus,height=250", 0, 0, "drawing")
@@ -330,16 +329,16 @@ class EqualizerPanel extends ConfigPanel
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 		
 		grid.cp = self
-		grid.c = &eq.config
-		grid.sample_rate = eq.session.sample_rate()
+		grid.c = &c.config
+		grid.sample_rate = c.session.sample_rate()
 		num_peaks = 0
 		
-		eq.grid = &grid
+		c.grid = &grid
 		
 		event("*", &on_ui_change)
 	
 	override void __delete__()
-		eq.grid = nil
+		c.grid = nil
 		
 	void on_ui_change()
 		string id = HuiGetEvent().id

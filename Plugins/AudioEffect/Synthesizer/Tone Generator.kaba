@@ -35,8 +35,7 @@ class ToneGenerator extends AudioEffect
 class TonePanel extends ConfigPanel
 	override ToneGenerator *c
 	Slider *vol_slider
-	override void __init__(ToneGenerator *_t)
-		super.__init__(_t)
+	override void __init__(Module *_t)
 		addGrid("!width=350", 0, 0, "table2")
 		setTarget("table2")
 		addRadioButton("Ton", 0, 0, "type:pitch")

@@ -154,9 +154,9 @@ class CompressorGrid extends Grid
 			redraw()
 
 class CompressorPanel extends ConfigPanel
+	override Compressor *c
 	CompressorGrid grid
-	override void __init__(Compressor *_fx)
-		super.__init__(_fx)
+	override void __init__(Module *_fx)
 		add_grid("", 0, 0, "table1")
 		set_target("table1")
 		add_drawing_area("!grabfocus,height=250\\", 0, 0, "drawing_area")
@@ -169,7 +169,7 @@ class CompressorPanel extends ConfigPanel
 		add_spin_button("!range=0:1000:0.1\\", 4, 0, "release")
 		add_label("ms", 5, 0, "")
 		
-		grid.config = &_fx.config
+		grid.config = &c.config
 		grid.cp = self
 		
 		event("attack", &on_edit)

@@ -149,7 +149,7 @@ struct Function
 	Class *_class;
 	Class *return_type;
 	Class *literal_return_type;
-	bool is_extern, auto_implement;
+	bool is_extern, auto_declared;
 	bool is_pure;
 	bool throws_exceptions; // for external
 	int inline_no;
@@ -159,7 +159,7 @@ struct Function
 	int _exp_no;
 	Function(SyntaxTree *tree, const string &name, Class *return_type);
 	int __get_var(const string &name) const;
-	void Update(Class *class_type);
+	void update(Class *class_type);
 	string signature(bool include_class = false) const;
 };
 
@@ -254,8 +254,7 @@ public:
 	void HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
 	void AutoImplementAddVirtualTable(Node *self, Function *f, Class *t);
 	void AutoImplementAddChildConstructors(Node *self, Function *f, Class *t);
-	void AutoImplementDefaultConstructor(Function *f, Class *t, bool allow_parent_constructor);
-	void AutoImplementComplexConstructor(Function *f, Class *t);
+	void AutoImplementConstructor(Function *f, Class *t, bool allow_parent_constructor);
 	void AutoImplementDestructor(Function *f, Class *t);
 	void AutoImplementAssign(Function *f, Class *t);
 	void AutoImplementArrayClear(Function *f, Class *t);
@@ -263,7 +262,7 @@ public:
 	void AutoImplementArrayAdd(Function *f, Class *t);
 	void AutoImplementArrayRemove(Function *f, Class *t);
 	void AutoImplementFunctions(Class *t);
-	void AddFunctionHeadersForClass(Class *t);
+	void AddMissingFunctionHeadersForClass(Class *t);
 
 	// syntax analysis
 	Class *GetConstantType(const string &str);

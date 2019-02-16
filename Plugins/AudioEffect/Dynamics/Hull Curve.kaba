@@ -121,8 +121,8 @@ class HullGrid extends Grid
 
 class HullCurvePanel extends ConfigPanel
 	HullGrid grid
-	override void __init__(HullCurve *_h)
-		super.__init__(_h)
+	override HullCurve* c
+	override void __init__(Module *_h)
 		from_source("
 Grid ? '' vertical
 	DrawingArea drawing '' grabfocus height=250
@@ -132,7 +132,7 @@ Grid ? '' vertical
 	
 		//EventMX("drawing", "hui:draw", self, &OnDraw)
 	
-		grid.config = &_h.config
+		grid.config = &c.config
 		grid.cp = self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")

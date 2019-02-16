@@ -90,7 +90,7 @@ public:
 	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = nullptr) const;
 	ClassFunction *get_same_func(const string &name, Function *f) const;
 	ClassFunction *get_default_constructor() const;
-	Array<ClassFunction*> get_complex_constructors() const;
+	Array<ClassFunction*> get_constructors() const;
 	ClassFunction *get_destructor() const;
 	ClassFunction *get_assign() const;
 	ClassFunction *get_virtual_function(int virtual_index) const;

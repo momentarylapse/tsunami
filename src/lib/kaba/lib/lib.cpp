@@ -1255,8 +1255,8 @@ void SIAddPackageBase()
 	add_class(TypeException);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&KabaException::__init__));
 			func_add_param("message", TypeString);
-			class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&KabaException::__delete__));
-			class_add_func_virtual("message", TypeString, mf(&KabaException::message));
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&KabaException::__delete__));
+		class_add_func_virtual("message", TypeString, mf(&KabaException::message));
 		class_add_element("text", TypeString, config.pointer_size);
 		class_set_vtable(KabaException);
 

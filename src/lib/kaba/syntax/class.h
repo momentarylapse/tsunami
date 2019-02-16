@@ -129,6 +129,7 @@ extern Class *TypeQuaternion;
 extern Class *TypeException;
 extern Class *TypeExceptionP;
 
+extern Class *TypeClass;
 extern Class *TypeClassP;
 
 };

@@ -25,6 +25,7 @@ extern string LibVersion;
 class SyntaxTree;
 class Class;
 struct Value;
+class Function;
 
 
 void script_make_super_array(Class *t, SyntaxTree *ps = nullptr);
@@ -360,6 +361,11 @@ struct CompilerConfiguration
 
 	string directory;
 	bool verbose;
+	string verbose_func_filter;
+	string verbose_stage_filter;
+	bool allow_output(Function *f, const string &stage);
+	bool allow_output_func(Function *f);
+	bool allow_output_stage(const string &stage);
 	bool compile_silently;
 	bool show_compiler_stats;
 	bool use_const_as_global_var;

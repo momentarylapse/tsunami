@@ -4,6 +4,7 @@
 
 #include "class.h"
 #include "lexical.h"
+#include <functional>
 
 
 class complex;
@@ -93,6 +94,7 @@ enum
 	// special
 	KIND_TYPE,
 	KIND_ARRAY_BUILDER,
+	KIND_CONSTRUCTOR_AS_FUNCTION,
 	// compilation
 	KIND_VAR_TEMP,
 	KIND_DEREF_VAR_TEMP,
@@ -111,7 +113,8 @@ struct Node;
 // {...}-block
 struct Block
 {
-	int index;
+	Block(Function *f, Block *parent);
+	~Block();
 	Array<Node*> nodes;
 	Array<int> vars;
 	Function *function;
@@ -127,10 +130,12 @@ struct Block
 
 struct Variable
 {
+	Variable(const string &name, Class *type);
 	Class *type; // for creating instances
 	string name;
 	int64 _offset; // for compilation
 	bool is_extern;
+	bool dont_add_constructor;
 };
 
 // user defined functions
@@ -144,7 +149,7 @@ struct Function
 	// block of code
 	Block *block;
 	// local variables
-	Array<Variable> var;
+	Array<Variable*> var;
 	Array<Class*> literal_param_type;
 	Class *_class;
 	Class *return_type;
@@ -153,14 +158,18 @@ struct Function
 	bool is_pure;
 	bool throws_exceptions; // for external
 	int inline_no;
+	int num_slightly_hidden_vars;
 	// for compilation...
 	int64 _var_size, _param_size;
 	int _logical_line_no;
 	int _exp_no;
 	Function(SyntaxTree *tree, const string &name, Class *return_type);
+	~Function();
 	int __get_var(const string &name) const;
+	string create_slightly_hidden_name();
 	void update(Class *class_type);
 	string signature(bool include_class = false) const;
+	Array<Block*> all_blocks();
 };
 
 // single operand/command
@@ -176,7 +185,6 @@ struct Node
 	Node *instance;
 	// return value
 	Class *type;
-	Node();
 	Node(int kind, int64 link_no, Script *script, Class *type);
 	Block *as_block() const;
 	Function *as_func() const;
@@ -186,6 +194,7 @@ struct Node
 	void set_param(int index, Node *p);
 	void set_instance(Node *p);
 };
+void clear_nodes(Array<Node*> &nodes);
 
 
 struct Operator
@@ -272,8 +281,8 @@ public:
 	Class *CreateNewClass(const string &name, Class::Type type, int size, int array_size, Class *sub);
 	Class *CreateArrayClass(Class *element_type, int num_elements);
 	Class *CreateDictClass(Class *element_type);
-	Array<Node> GetExistence(const string &name, Block *block);
-	Array<Node> GetExistenceShared(const string &name);
+	Array<Node*> GetExistence(const string &name, Block *block);
+	Array<Node*> GetExistenceShared(const string &name);
 	void LinkMostImportantOperator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);
 	Node *LinkOperator(int op_no, Node *param1, Node *param2);
 	Node *GetOperandExtension(Node *operand, Block *block);
@@ -281,14 +290,15 @@ public:
 	Node *GetOperandExtensionArray(Node *operand, Block *block);
 	Node *GetCommand(Block *block);
 	void ParseCompleteCommand(Block *block);
+	Block *ParseBlock(Block *block);
 	Node *GetOperand(Block *block);
 	Node *GetPrimitiveOperator(Block *block);
 	Array<Node*> FindFunctionParameters(Block *block);
 	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Node *cmd);
-	Array<Class*> GetFunctionWantedParams(Node &link);
-	Node *GetFunctionCall(const string &f_name, Array<Node> &links, Block *block);
+	Array<Class*> GetFunctionWantedParams(Node *link);
+	Node *GetFunctionCall(const string &f_name, Array<Node*> &links, Block *block);
 	Node *DoClassFunction(Node *ob, Array<ClassFunction> &cfs, Block *block);
-	Node *GetSpecialFunctionCall(const string &f_name, Node &link, Block *block);
+	Node *GetSpecialFunctionCall(const string &f_name, Node *link, Block *block);
 	Node *CheckParamLink(Node *link, Class *type, const string &f_name = "", int param_no = -1);
 	void ParseStatement(Block *block);
 	void ParseStatementFor(Block *block);
@@ -311,9 +321,12 @@ public:
 	Node *BreakDownComplicatedCommand(Node *c);
 	void MapLocalVariablesToStack();
 
+	void transform(std::function<Node*(Node*)> F);
+	static void transform_block(Block *block, std::function<Node*(Node*)> F);
+	static Node* transform_node(Node *n, std::function<Node*(Node*)> F);
+
 	// data creation
 	int AddConstant(Class *type);
-	Block *AddBlock(Function *f, Block *parent);
 	Function *AddFunction(const string &name, Class *type);
 
 	// nodes
@@ -343,9 +356,9 @@ public:
 
 	// debug displaying
 	void ShowNode(Node *c, Function *f);
-	void ShowFunction(Function *f);
+	void ShowFunction(Function *f, const string &stage = "");
 	void ShowBlock(Block *b);
-	void Show();
+	void Show(const string &stage);
 
 // data
 
@@ -362,7 +375,6 @@ public:
 	Array<AsmBlock> asm_blocks;
 	Array<Constant*> constants;
 	Array<Operator> operators;
-	Array<Block*> blocks;
 	Array<Function*> functions;
 	Array<Node*> nodes;
 

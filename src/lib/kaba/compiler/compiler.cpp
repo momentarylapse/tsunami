@@ -77,9 +77,9 @@ void try_init_global_var(Class *type, char* g_var)
 
 void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
 {
-	foreachi(Variable &v, ps->root_of_all_evil.var, i)
-		if (!v.is_extern)
-			try_init_global_var(v.type, g_var[i]);
+	foreachi(Variable *v, ps->root_of_all_evil.var, i)
+		if (!v->is_extern)
+			try_init_global_var(v->type, g_var[i]);
 }
 
 static int64 _opcode_rand_state_ = 10000;
@@ -141,8 +141,8 @@ void Script::AllocateMemory()
 	// get memory size needed
 	memory_size = 0;
 	for (int i=0;i<syntax->root_of_all_evil.var.num;i++)
-		if (!syntax->root_of_all_evil.var[i].is_extern)
-			memory_size += mem_align(syntax->root_of_all_evil.var[i].type->size, 4);
+		if (!syntax->root_of_all_evil.var[i]->is_extern)
+			memory_size += mem_align(syntax->root_of_all_evil.var[i]->type->size, 4);
 
 	// constants
 	foreachi(Constant *c, syntax->constants, i)
@@ -207,17 +207,17 @@ void Script::MapGlobalVariablesToMemory()
 {
 	// global variables -> into Memory
 	g_var.resize(syntax->root_of_all_evil.var.num);
-	foreachi(Variable &v, syntax->root_of_all_evil.var, i){
-		if (v.is_extern){
-			g_var[i] = (char*)GetExternalLink(v.name);
+	foreachi(Variable *v, syntax->root_of_all_evil.var, i){
+		if (v->is_extern){
+			g_var[i] = (char*)GetExternalLink(v->name);
 			if (!g_var[i])
-				DoErrorLink("external variable " + v.name + " was not linked");
+				DoErrorLink("external variable " + v->name + " was not linked");
 		}else{
 			if (config.override_variables_offset)
 				g_var[i] = (char*)(int_p)(memory_size + config.variables_offset);
 			else
 				g_var[i] = &memory[memory_size];
-			memory_size += mem_align(v.type->size, 4);
+			memory_size += mem_align(v->type->size, 4);
 		}
 	}
 	memset(memory, 0, memory_size); // reset all global variables to 0
@@ -650,7 +650,7 @@ void Script::Compiler()
 	syntax->PreProcessor();
 
 	if (config.verbose)
-		syntax->Show();
+		syntax->Show("comp:a");
 
 	AllocateMemory();
 	AllocateStack();
@@ -677,7 +677,7 @@ void Script::Compiler()
 	syntax->PreProcessorAddresses();
 
 	if (config.verbose)
-		syntax->Show();
+		syntax->Show("comp:b");
 
 
 // compile functions into Opcode

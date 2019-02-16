@@ -123,9 +123,12 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 	ebd.except_block = nullptr;
 	ebd.except = nullptr;
 
-	foreachb (Block *b, s->syntax->blocks)
-		if ((b->_start <= rip) and (b->_end >= rip))
-			ebd.blocks.add(b);
+	if (f){
+		auto blocks = f->all_blocks();
+		foreachb (Block *b, blocks)
+			if ((b->_start <= rip) and (b->_end >= rip))
+				ebd.blocks.add(b);
+	}
 	ebd.needs_killing = ebd.blocks;
 
 	Array<int> node_index;
@@ -134,7 +137,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 			continue;
 		int index = -1;
 		foreachi (Node *n, b->nodes, ni){
-			if (n->kind == KIND_BLOCK and n->link_no == ebd.blocks[bi-1]->index){
+			if (n->kind == KIND_BLOCK and n->as_block() == ebd.blocks[bi-1]){
 				node_index.add(ni);
 				index = ni;
 			}
@@ -152,7 +155,7 @@ ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
 				ebd.needs_killing = ebd.blocks.sub(0, bi);
 				//msg_write(b->nodes[index + 2]->link_no);
 				ebd.except = ee;
-				ebd.except_block = s->syntax->blocks[b->nodes[index + 2]->link_no];
+				ebd.except_block = b->nodes[index + 2]->as_block();
 			}
 	}
 	//msg_write(ia2s(node_index));
@@ -275,13 +278,13 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 
 		for (Block *b: ebd.needs_killing){
 			if (_verbose_exception_)
-				msg_write("  block " + i2s(b->index));
+				msg_write("  block " + p2s(b));
 			for (int i: b->vars){
-				auto v = r.f->var[i];
-				char *p = (char*)r.rbp + v._offset;
+				auto *v = r.f->var[i];
+				char *p = (char*)r.rbp + v->_offset;
 				if (_verbose_exception_)
-					msg_write("   " + v.type->name + " " + v.name + "  " + p2s(p));
-				auto cf = v.type->get_destructor();
+					msg_write("   " + v->type->name + " " + v->name + "  " + p2s(p));
+				auto cf = v->type->get_destructor();
 				if (cf){
 					typedef void con_func(void *);
 					con_func * f = (con_func*)cf->script->func[cf->nr];
@@ -293,11 +296,11 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 		}
 		if (ebd.except_block){
 			if (_verbose_exception_)
-				msg_write("except_block block: " + i2s(ebd.except_block->index));
+				msg_write("except_block block: " + p2s(ebd.except_block));
 
 			if (ebd.except->params.num > 0){
 				auto v = r.f->var[ebd.except_block->vars[0]];
-				void **p = (void**)((int_p)r.rbp + v._offset);
+				void **p = (void**)((int_p)r.rbp + v->_offset);
 				*p = kaba_exception;
 			}
 

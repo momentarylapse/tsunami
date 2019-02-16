@@ -211,10 +211,10 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			}
 			break;
 		case STATEMENT_NEW:{
-			Array<Node> links = syntax_tree->GetExistence("@malloc", nullptr);
+			Array<Node*> links = syntax_tree->GetExistence("@malloc", nullptr);
 			if (links.num == 0)
 				DoError("@malloc not found????");
-			AddFunctionCall(links[0].script, links[0].link_no, p_none, param_const(TypeInt, ret.type->parent->size), ret);
+			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param_const(TypeInt, ret.type->parent->size), ret);
 			if (com->params.num > 0){
 				// copy + edit command
 				Node sub = *com->params[0];
@@ -223,13 +223,15 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 				SerializeNode(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
+			clear_nodes(links);
 			break;}
 		case STATEMENT_DELETE:{
 			add_cmd_destructor(param[0], false);
-			Array<Node> links = syntax_tree->GetExistence("@free", nullptr);
+			Array<Node*> links = syntax_tree->GetExistence("@free", nullptr);
 			if (links.num == 0)
 				DoError("@free not found????");
-			AddFunctionCall(links[0].script, links[0].link_no, p_none, param[0], p_none);
+			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param[0], p_none);
+			clear_nodes(links);
 			break;}
 		case STATEMENT_ASM:
 			add_cmd(INST_ASM);
@@ -425,10 +427,10 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		return param_lookup(p.type, add_global_ref((void*)link->link_no));
 	}else if (link->kind == KIND_VAR_GLOBAL){
 		if (!link->script->g_var[link->link_no])
-			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no].name);
+			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no]->name);
 		return param_deref_lookup(p.type, add_global_ref(link->script->g_var[link->link_no]));
 	}else if (link->kind == KIND_VAR_LOCAL){
-		p.p = cur_func->var[link->link_no]._offset;
+		p.p = cur_func->var[link->link_no]->_offset;
 	}else if (link->kind == KIND_LOCAL_MEMORY){
 		p.p = link->link_no;
 		p.kind = KIND_VAR_LOCAL;
@@ -715,17 +717,17 @@ void SerializerARM::CorrectUnallowedParamCombis()
 void SerializerARM::AddFunctionIntro(Function *f)
 {
 	// return, instance, params
-	Array<Variable> param;
+	Array<Variable*> param;
 	if (f->return_type->uses_return_by_memory()){
-		for (Variable &v: f->var)
-			if (v.name == IDENTIFIER_RETURN_VAR){
+		for (Variable *v: f->var)
+			if (v->name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		for (Variable &v: f->var)
-			if (v.name == IDENTIFIER_SELF){
+		for (Variable *v: f->var)
+			if (v->name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
 			}
@@ -734,17 +736,17 @@ void SerializerARM::AddFunctionIntro(Function *f)
 		param.add(f->var[i]);
 
 	// map params...
-	Array<Variable> reg_param;
-	Array<Variable> stack_param;
-	Array<Variable> xmm_param;
-	for (Variable &p: param){
-		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
+	Array<Variable*> reg_param;
+	Array<Variable*> stack_param;
+	Array<Variable*> xmm_param;
+	for (Variable *p: param){
+		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_pointer()){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
-		}else if (p.type == TypeFloat32){
+		}else if (p->type == TypeFloat32){
 			DoError("arm float param");
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
@@ -752,25 +754,25 @@ void SerializerARM::AddFunctionIntro(Function *f)
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p.type->name);
+			DoError("parameter type currently not supported: " + p->type->name);
 	}
 
 	// xmm0-7
 	/*foreachib(Variable &p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
-		add_cmd(Asm::inst_movss, param_local(p.type, p._offset), param_reg(p.type, reg));
+		add_cmd(Asm::inst_movss, param_local(p->type, p->_offset), param_reg(p->type, reg));
 	}*/
 
 	// rdi, rsi,rdx, rcx, r8, r9
 	int param_regs[4] = {Asm::REG_R0, Asm::REG_R1, Asm::REG_R2, Asm::REG_R3};
-	foreachib(Variable &p, reg_param, i){
+	foreachib(Variable *p, reg_param, i){
 		int reg = add_virtual_reg(param_regs[i]);
-		add_cmd(Asm::INST_MOV, param_local(p.type, p._offset), param_vreg(p.type, reg));
+		add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, reg));
 		set_virtual_reg(reg, cmd.num - 1, cmd.num - 1);
 	}
 
 	// get parameters from stack
-	foreachb(Variable &p, stack_param){
+	foreachb(Variable *p, stack_param){
 		DoError("func with stack...");
 		/*int s = 8;
 		add_cmd(Asm::inst_push, p);
@@ -787,12 +789,12 @@ void SerializerARM::AddFunctionOutro(Function *f)
 
 void SerializerARM::DoMapping()
 {
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:a"))
 		cmd_list_out("aaa");
 
 	MapReferencedTempVarsToStack();
 
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:a"))
 		cmd_list_out("post ref map");
 
 	ProcessDereferences();
@@ -806,17 +808,17 @@ void SerializerARM::DoMapping()
 
 	//ResolveDerefTempAndLocal();
 
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:b"))
 		cmd_list_out("pre global");
 
 	ConvertGlobalLookups();
 
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:c"))
 		cmd_list_out("post global");
 
 	CorrectUnallowedParamCombis();
 
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:d"))
 		cmd_list_out("post unallowed");
 
 	for (int i=0; i<cmd.num; i++)
@@ -824,7 +826,7 @@ void SerializerARM::DoMapping()
 
 	ConvertGlobalRefs();
 
-	if (config.verbose)
+	if (config.verbose and config.allow_output(cur_func, "map:e"))
 		cmd_list_out("end");
 }
 

@@ -428,7 +428,7 @@ void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool overr
 	cf.script = s->script;
 	cf.return_type = f->return_type;
 	for (int i=0; i<f->num_params; i++)
-		cf.param_types.add(f->var[i].type);
+		cf.param_types.add(f->var[i]->type);
 	if (as_virtual){
 		cf.virtual_index = ProcessClassOffset(name, cf.name, max(vtable.num, 2));
 		if (vtable.num <= cf.virtual_index)

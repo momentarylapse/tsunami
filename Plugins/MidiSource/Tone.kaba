@@ -21,7 +21,7 @@ class ToneSource extends MidiSource
 		
 	override int read(MidiEventBuffer midi)
 		if !started
-			midi.add(_MidiEvent(0, config.pitch, config.volume))
+			midi.add(MidiEvent(0, config.pitch, config.volume))
 			started = true
 		return midi.samples
 	

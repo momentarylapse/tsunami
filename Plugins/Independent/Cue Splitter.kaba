@@ -63,13 +63,13 @@ class CueSplitter extends TsunamiPlugin
 			print("-----")
 			Tag[] tags
 			if artist != ""
-				tags.add(_Tag("artist", artist))
+				tags.add(Tag("artist", artist))
 			if album != ""
-				tags.add(_Tag("album", album))
+				tags.add(Tag("album", album))
 			if year != ""
-				tags.add(_Tag("year", year))
-			tags.add(_Tag("title", p.title))
-			tags.add(_Tag("tracknumber", i+1))
+				tags.add(Tag("year", year))
+			tags.add(Tag("title", p.title))
+			tags.add(Tag("tracknumber", i+1))
 			int offset = p.foffset * session.song.sample_rate
 			int end = session.song.range().length
 			if i < parts.num-1
@@ -81,7 +81,7 @@ class CueSplitter extends TsunamiPlugin
 				end = fend
 				print(end)
 			print("  " + offset + " : " + end)
-			r.prepare(_Range(offset, end - offset), false)
+			r.prepare(RangeTo(offset, end), false)
 			string _fn = i+1
 			if _fn.num < 2
 				_fn = "0" + _fn

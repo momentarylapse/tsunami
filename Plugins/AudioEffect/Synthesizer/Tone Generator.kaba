@@ -21,9 +21,9 @@ class ToneGenerator extends AudioEffect
 	override void process(AudioBuffer buf)
 		synth.set_sample_rate(session.sample_rate())
 		
-		Range r = _Range(0, buf.length)
+		Range r = Range(0, buf.length)
 		MidiEventBuffer midi
-		midi.add_note(_MidiNote(r, freq_to_pitch(config.Frequency), config.Volume))
+		midi.add_note(MidiNote(r, freq_to_pitch(config.Frequency), config.Volume))
 		synth.feed(midi)
 		
 		synth.read(buf)

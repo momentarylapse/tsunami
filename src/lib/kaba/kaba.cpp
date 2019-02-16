@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.16.9.0";
+string Version = "0.17.-1.0";
 
 //#define ScriptDebug
 
@@ -175,7 +175,8 @@ void Script::Load(const string &_filename, bool _just_analyse)
 			pre_script->Show();*/
 		if ((!just_analyse) and (config.verbose)){
 			msg_write(format("Opcode: %d bytes", opcode_size));
-			msg_write(Asm::Disassemble(opcode, opcode_size));
+			if (config.allow_output_stage("dasm"))
+				msg_write(Asm::Disassemble(opcode, opcode_size));
 		}
 
 	}catch(FileError &e){
@@ -207,11 +208,11 @@ void Script::SetVariable(const string &name, void *data)
 {
 	//msg_write(name);
 	for (int i=0; i<syntax->root_of_all_evil.var.num; i++)
-		if (syntax->root_of_all_evil.var[i].name == name){
+		if (syntax->root_of_all_evil.var[i]->name == name){
 			/*msg_write("var");
 			msg_write(pre_script->RootOfAllEvil.Var[i].Type->Size);
 			msg_write((int)g_var[i]);*/
-			memcpy(g_var[i], data, syntax->root_of_all_evil.var[i].type->size);
+			memcpy(g_var[i], data, syntax->root_of_all_evil.var[i]->type->size);
 			return;
 		}
 	msg_error("CScript.SetVariable: variable " + name + " not found");
@@ -400,8 +401,8 @@ void print_var(void *p, const string &name, Class *t)
 
 void Script::ShowVars(bool include_consts)
 {
-	foreachi(Variable &v, syntax->root_of_all_evil.var, i)
-		print_var((void*)g_var[i], v.name, v.type);
+	foreachi(Variable *v, syntax->root_of_all_evil.var, i)
+		print_var((void*)g_var[i], v->name, v->type);
 	/*if (include_consts)
 		foreachi(LocalVariable &c, pre_script->Constant, i)
 			print_var((void*)g_var[i], c.name, c.type);*/

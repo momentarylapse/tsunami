@@ -25,17 +25,15 @@ const int MAX_PITCH = 128
 
 class Range
 	int offset, length
+	void __init__(int _offset, int _length)
+		offset = _offset
+		length = _length
 	int end()
 		return offset + length
 	bool inside(int pos)
 		return pos >= offset and pos < offset + length
 	string str()
 		return "(" + offset + ":" + end() + ")"
-Range _Range(int offset, int length)
-	Range r
-	r.offset = offset
-	r.length = length
-	return r
 Range RangeTo(int start, int end)
 	Range r
 	r.offset = start
@@ -48,26 +46,22 @@ class MidiNote
 	float pitch
 	float volume
 	int stringno, clef_position, modifier
-MidiNote _MidiNote(Range r, float pitch, float volume)
-	MidiNote n
-	n.range = r
-	n.pitch = pitch
-	n.volume = volume
-	n.stringno = -1
-	n.clef_position = -1
-	n.modifier = 0
-	return n
+	void __init__(Range r, float _pitch, float _volume)
+		range = r
+		pitch = _pitch
+		volume = _volume
+		stringno = -1
+		clef_position = -1
+		modifier = 0
 
 class MidiEvent
 	int pos
 	float pitch
 	float volume
-MidiEvent _MidiEvent(int pos, float pitch, float volume)
-	MidiEvent e
-	e.pos = pos
-	e.pitch = pitch
-	e.volume = volume
-	return e
+	void __init__(int _pos, float _pitch, float _volume)
+		pos = _pos
+		pitch = _pitch
+		volume = _volume
 
 class MidiEventBuffer extends MidiEvent[]
 	int samples
@@ -76,8 +70,8 @@ class MidiEventBuffer extends MidiEvent[]
 	extern MidiEvent[] get_events(Range r)
 	extern Range get_range()
 	void add_note(MidiNote n)
-		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
-		add(_MidiEvent(n.range.end(), n.pitch, 0))
+		add(MidiEvent(n.range.offset, n.pitch, n.volume))
+		add(MidiEvent(n.range.end(), n.pitch, 0))
 	extern void add_metronome_click(int pos, int level, float volume)
 
 class MidiNoteBuffer extends MidiNote*[]
@@ -301,13 +295,11 @@ class Beat
 	int beat_no
 	int level
 
-Beat _Beat(int offset, int level)
-	Beat b
-	b.range = _Range(offset, 0)
-	b.level = level
-	b.bar_no = 0
-	b.beat_no = 0
-	return b
+	void __init__(int _offset, int _level)
+		range = Range(_offset, 0)
+		level = _level
+		bar_no = 0
+		beat_no = 0
 
 enum
 	TRACK_TYPE_AUDIO
@@ -389,11 +381,9 @@ class Track
 
 class Tag
 	string key, value
-Tag _Tag(string key, string value)
-	Tag t
-	t.key = key
-	t.value = value
-	return t
+	void __init__(string _key, string _value)
+		key = _key
+		value = _value
 
 class Song
 	string filename

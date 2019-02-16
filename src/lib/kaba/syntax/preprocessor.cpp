@@ -133,18 +133,6 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 
 Node *SyntaxTree::PreProcessNode(Node *c)
 {
-	// recursion
-	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->nodes.num;i++)
-			c->as_block()->nodes[i] = PreProcessNode(c->as_block()->nodes[i]);
-	}
-	for (int i=0;i<c->params.num;i++)
-		c->set_param(i, PreProcessNode(c->params[i]));
-	if (c->instance)
-		c->set_instance(PreProcessNode(c->instance));
-	
-
-	// process...
 	if (c->kind == KIND_OPERATOR){
 		Operator *o = &operators[c->link_no];
 		/*if (c->link_nr == OperatorIntAdd){
@@ -294,24 +282,6 @@ string LinkNr2Str(SyntaxTree *s, int kind, int64 nr);
 // may not use AddConstant()!!!
 Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 {
-	/*msg_write(Kind2Str(c->Kind));
-	if (c->script)
-		msg_write(LinkNr2Str(c->script->pre_script, c->Kind, c->LinkNr));
-	else if (s)
-		msg_write(LinkNr2Str(s->pre_script, c->Kind, c->LinkNr));*/
-
-	// recursion
-	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->nodes.num;i++)
-			c->as_block()->set(i, PreProcessNodeAddresses(c->as_block()->nodes[i]));
-	}
-	for (int i=0;i<c->params.num;i++)
-		c->set_param(i, PreProcessNodeAddresses(c->params[i]));
-	if (c->instance)
-		c->set_instance(PreProcessNodeAddresses(c->instance));
-	
-
-	// process...
 	if (c->kind == KIND_OPERATOR){
 		Operator *o = &operators[c->link_no];
 		if (o->func){
@@ -352,7 +322,7 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 				if (c->params[0]->kind == KIND_VAR_GLOBAL){
 					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->g_var[c->params[0]->link_no], c->type, c->params[0]->script);
 				}else if (c->params[0]->kind == KIND_VAR_LOCAL){
-					return AddNode(KIND_LOCAL_ADDRESS, (int_p)cur_func->var[c->params[0]->link_no]._offset, c->type);
+					return AddNode(KIND_LOCAL_ADDRESS, (int_p)cur_func->var[c->params[0]->link_no]->_offset, c->type);
 				}else /*if (c->param[0]->kind == KindConstant)*/{
 					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->cnst[c->params[0]->link_no], c->type, c->params[0]->script);
 				}
@@ -372,21 +342,13 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 
 void SyntaxTree::PreProcessor()
 {
-	for (Function *f: functions){
-		cur_func = f;
-		foreachi(Node *c, f->block->nodes, i)
-			f->block->nodes[i] = PreProcessNode(c);
-	}
+	transform([&](Node *n){ return PreProcessNode(n); });
 	//Show();
 }
 
 void SyntaxTree::PreProcessorAddresses()
 {
-	for (Function *f: functions){
-		cur_func = f;
-		foreachi(Node *c, f->block->nodes, i)
-			f->block->nodes[i] = PreProcessNodeAddresses(c);
-	}
+	transform([&](Node *n){ return PreProcessNodeAddresses(n); });
 	//Show();
 }
 

@@ -8,7 +8,5 @@ class Delay extends MidiEffect
 		for i in 0:num
 			int start = randi(length)
 			int _length = randi(20000)
-			Range r = _Range(start, _length)
-			MidiNote *n = new MidiNote
-			*n = _MidiNote(r, 20+randi(80), 0.1*pow(rand(1), 6))
-			midi.add(n)
+			Range r = Range(start, _length)
+			midi.add(new MidiNote(r, 20+randi(80), 0.1*pow(rand(1), 6)))

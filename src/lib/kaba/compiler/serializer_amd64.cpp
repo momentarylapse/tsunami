@@ -179,17 +179,17 @@ void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialN
 void SerializerAMD64::AddFunctionIntro(Function *f)
 {
 	// return, instance, params
-	Array<Variable> param;
+	Array<Variable*> param;
 	if (f->return_type->uses_return_by_memory()){
-		for (Variable &v: f->var)
-			if (v.name == IDENTIFIER_RETURN_VAR){
+		for (Variable *v: f->var)
+			if (v->name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		for (Variable &v: f->var)
-			if (v.name == IDENTIFIER_SELF){
+		for (Variable *v: f->var)
+			if (v->name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
 			}
@@ -198,54 +198,54 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 		param.add(f->var[i]);
 
 	// map params...
-	Array<Variable> reg_param;
-	Array<Variable> stack_param;
-	Array<Variable> xmm_param;
-	for (Variable &p: param){
-		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_pointer()){
+	Array<Variable*> reg_param;
+	Array<Variable*> stack_param;
+	Array<Variable*> xmm_param;
+	for (Variable *p: param){
+		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_pointer()){
 			if (reg_param.num < 6){
 				reg_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
-		}else if (p.type == TypeFloat32){
+		}else if (p->type == TypeFloat32){
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p.type->name);
+			DoError("parameter type currently not supported: " + p->type->name);
 	}
 
 	// xmm0-7
-	foreachib(Variable &p, xmm_param, i){
+	foreachib(Variable *p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
-		add_cmd(Asm::INST_MOVSS, param_local(p.type, p._offset), param_preg(p.type, reg));
+		add_cmd(Asm::INST_MOVSS, param_local(p->type, p->_offset), param_preg(p->type, reg));
 	}
 
 	// rdi, rsi,rdx, rcx, r8, r9
 	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
-	foreachib(Variable &p, reg_param, i){
+	foreachib(Variable *p, reg_param, i){
 		int root = param_regs_root[i];
-		int preg = get_reg(root, p.type->size);
+		int preg = get_reg(root, p->type->size);
 		if (preg >= 0){
 			int v = add_virtual_reg(preg);
-			add_cmd(Asm::INST_MOV, param_local(p.type, p._offset), param_vreg(p.type, v));
+			add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, v));
 			set_virtual_reg(v, cmd.num - 1, cmd.num - 1);
 		}else{
 			// some registers are not 8bit'able
 			int v = add_virtual_reg(get_reg(root, 4));
 			int va = add_virtual_reg(Asm::REG_EAX);
 			add_cmd(Asm::INST_MOV, param_vreg(TypeReg32, va), param_vreg(TypeReg32, v));
-			add_cmd(Asm::INST_MOV, param_local(p.type, p._offset), param_vreg(p.type, va, get_reg(0, p.type->size)));
+			add_cmd(Asm::INST_MOV, param_local(p->type, p->_offset), param_vreg(p->type, va, get_reg(0, p->type->size)));
 			set_virtual_reg(v, cmd.num - 2, cmd.num - 2);
 			set_virtual_reg(va, cmd.num - 2, cmd.num - 1);
 		}
 	}
 		
 	// get parameters from stack
-	foreachb(Variable &p, stack_param){
+	foreachb(Variable *p, stack_param){
 		DoError("func with stack...");
 		/*int s = 8;
 		add_cmd(Asm::inst_push, p);

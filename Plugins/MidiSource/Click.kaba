@@ -6,8 +6,8 @@ class ClickSource extends MidiSource
 		emit_click = false
 	override int read(MidiEventBuffer midi)
 		if emit_click
-			midi.add(_MidiEvent(0, 80, 1))
-			midi.add(_MidiEvent(1, 80, 0))
+			midi.add(MidiEvent(0, 80, 1))
+			midi.add(MidiEvent(1, 80, 0))
 			emit_click = false
 		return midi.samples
 	void click()

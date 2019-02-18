@@ -128,14 +128,14 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 	p.shift = 0;
 
 	if (link->kind == KIND_VAR_FUNCTION){
-		p.p = (int_p)link->script->func[link->link_no];
+		p.p = (int_p)link->as_func_p();
 		p.kind = KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
 				p.p = link->link_no + 0xefef0000;
 				script->function_vars_to_link.add(link->link_no);
 			}else
-				DoErrorLink("could not link function as variable: " + link->script->syntax->functions[link->link_no]->name);
+				DoErrorLink("could not link function as variable: " + link->as_func()->name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}
@@ -146,11 +146,11 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		p.p = (int_p)&link->link_no;
 		p.kind = KIND_REF_TO_CONST;
 	}else if (link->kind == KIND_VAR_GLOBAL){
-		p.p = (int_p)link->script->g_var[link->link_no];
+		p.p = (int_p)link->as_global_p();
 		if (!p.p)
-			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no]->name);
+			script->DoErrorLink("variable is not linkable: " + link->as_global()->name);
 	}else if (link->kind == KIND_VAR_LOCAL){
-		p.p = cur_func->var[link->link_no]->_offset;
+		p.p = link->as_local(cur_func)->_offset;
 	}else if (link->kind == KIND_LOCAL_MEMORY){
 		p.p = link->link_no;
 		p.kind = KIND_VAR_LOCAL;
@@ -162,7 +162,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 			p.kind = KIND_VAR_GLOBAL;
 		else
 			p.kind = KIND_REF_TO_CONST;
-		p.p = (int_p)link->script->cnst[link->link_no];
+		p.p = (int_p)link->as_const_p();
 	}else if ((link->kind == KIND_OPERATOR) or (link->kind == KIND_FUNCTION) or (link->kind == KIND_INLINE_FUNCTION) or (link->kind == KIND_VIRTUAL_FUNCTION) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
 		p = SerializeNode(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
@@ -182,7 +182,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		// only used by <new> operator
 		p.p = link->link_no;
 	}else{
-		DoError("unexpected type of parameter: " + Kind2Str(link->kind));
+		DoError("unexpected type of parameter: " + kind2str(link->kind));
 	}
 	return p;
 }
@@ -333,112 +333,10 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 	}
 }
 
-// DEPRECATED!
-enum{
-	COMMAND_WAIT = 10000,
-	COMMAND_WAIT_RT,
-	COMMAND_WAIT_ONE_FRAME
-};
-
 void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret)
 {
 	int index = com->as_func()->inline_no;
 	switch(index){
-		case COMMAND_WAIT:
-		case COMMAND_WAIT_RT:
-		case COMMAND_WAIT_ONE_FRAME:{
-			DoError("wait commands are deprecated");
-			// set waiting state
-				// GlobalWaitingMode = mode
-				// GlobalWaitingTime = time
-				SerialNodeParam p_mode = param_global(TypeInt, &GlobalWaitingMode);
-				SerialNodeParam p_ttw = param_global(TypeFloat32, &GlobalTimeToWait);
-				if (index == COMMAND_WAIT_ONE_FRAME){
-					add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_RT));
-					add_cmd(Asm::INST_MOV, p_ttw, param_const(TypeFloat32, 0));
-				}else if (index == COMMAND_WAIT){
-					add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_GT));
-					add_cmd(Asm::INST_MOV, p_ttw, param[0]);
-				}else if (index == COMMAND_WAIT_RT){
-					add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_RT));
-					add_cmd(Asm::INST_MOV, p_ttw, param[0]);
-				}
-				if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
-					SerialNodeParam p_deref_rax;
-					p_deref_rax.kind = KIND_DEREF_REGISTER;
-					p_deref_rax.p = Asm::REG_RAX;
-					p_deref_rax.type = TypePointer;
-					p_deref_rax.shift = 0;
-
-			// save script state
-				// stack[-16] = rbp
-				// stack[-24] = rsp
-				// stack[-32] = rip
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-16]));
-				add_cmd(Asm::INST_MOV, p_deref_rax, param_preg(TypeReg64, Asm::REG_RBP));
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
-				add_cmd(Asm::INST_MOV, p_deref_rax, param_preg(TypeReg64, Asm::REG_RSP));
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
-				add_cmd(Asm::INST_CALL, param_const(TypePointer, 0)); // push rip
-			// load return
-				// mov rsp, &stack[-8]
-				// pop rsp
-				// mov rbp, rsp
-				// leave
-				// ret
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8])); // start of the script stack
-				add_cmd(Asm::INST_POP, param_preg(TypeReg64, Asm::REG_RSP)); // old stackpointer (real program)
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RBP), param_preg(TypeReg64, Asm::REG_RSP));
-				add_cmd(Asm::INST_LEAVE);
-				add_cmd(Asm::INST_RET);
-			// here comes the "waiting"...
-
-			// reload script state (rip already loaded)
-				// rbp = &stack[-16]
-				// rsp = &stack[-24]
-				// GlobalWaitingMode = WaitingModeNone
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-16]));
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RBP), p_deref_rax);
-				add_cmd(Asm::INST_MOV, p_rax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-24]));
-				add_cmd(Asm::INST_MOV, param_preg(TypeReg64, Asm::REG_RSP), p_deref_rax);
-				add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_NONE));
-
-				}else{
-
-					// save script state
-						// stack[ -8] = ebp
-						// stack[-12] = esp
-						// stack[-16] = eip
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8]));
-						add_cmd(Asm::INST_MOV, p_deref_eax, param_preg(TypeReg32, Asm::REG_EBP));
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
-						add_cmd(Asm::INST_MOV, p_deref_eax, param_preg(TypeReg32, Asm::REG_ESP));
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
-						add_cmd(Asm::INST_CALL, param_const(TypePointer, 0)); // push eip
-					// load return
-						// mov esp, &stack[-4]
-						// pop esp
-						// mov ebp, esp
-						// leave
-						// ret
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), param_const(TypePointer, (int_p)&script->__stack[config.stack_size-4])); // start of the script stack
-						add_cmd(Asm::INST_POP, param_preg(TypeReg32, Asm::REG_ESP)); // old stackpointer (real program)
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_EBP), param_preg(TypeReg32, Asm::REG_ESP));
-						add_cmd(Asm::INST_LEAVE);
-						add_cmd(Asm::INST_RET);
-					// here comes the "waiting"...
-
-					// reload script state (eip already loaded)
-						// ebp = &stack[-8]
-						// esp = &stack[-12]
-						// GlobalWaitingMode = WaitingModeNone
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-8]));
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_EBP), p_deref_eax);
-						add_cmd(Asm::INST_MOV, p_eax, param_const(TypePointer, (int_p)&script->__stack[config.stack_size-12]));
-						add_cmd(Asm::INST_MOV, param_preg(TypeReg32, Asm::REG_ESP), p_deref_eax);
-						add_cmd(Asm::INST_MOV, p_mode, param_const(TypeInt, WAITING_MODE_NONE));
-				}
-				}break;
 		case INLINE_INT_TO_FLOAT:
 			add_cmd(Asm::INST_CVTSI2SS, p_xmm0, param[0]);
 			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
@@ -466,6 +364,7 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 			break;
 		case INLINE_RECT_SET:
 			add_cmd(Asm::INST_MOV, param_shift(ret, 12, TypeFloat32), param[3]);
+			/* fall through */
 		case INLINE_VECTOR_SET:
 			add_cmd(Asm::INST_MOV, param_shift(ret, 8, TypeFloat32), param[2]);
 		case INLINE_COMPLEX_SET:

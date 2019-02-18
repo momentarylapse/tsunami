@@ -140,6 +140,8 @@ Constant::Constant(Class *_type)
 {
 	init(_type);
 	name = "-none-";
+	used = false;
+	address = nullptr;
 }
 
 string Constant::str() const
@@ -322,7 +324,7 @@ void SyntaxTree::ParseBuffer(const string &buffer, bool just_analyse)
 		Show("par:b");
 }
 
-string Kind2Str(int kind)
+string kind2str(int kind)
 {
 	if (kind == KIND_VAR_LOCAL)			return "local variable";
 	if (kind == KIND_VAR_GLOBAL)			return "global variable";
@@ -366,36 +368,43 @@ string Kind2Str(int kind)
 }
 
 
-string op_to_str(const Operator &op)
+string op_sig(const Operator *op)
 {
-	return "(" + op.param_type_1->name + ") " + PrimitiveOperators[op.primitive_id].name + " (" + op.param_type_2->name + ")";
+	return "(" + op->param_type_1->name + ") " + PrimitiveOperators[op->primitive_id].name + " (" + op->param_type_2->name + ")";
 }
 
-string LinkNr2Str(SyntaxTree *s, Function *f, int kind, long long nr)
+string node_sig(SyntaxTree *s, Function *f, Node *n)
 {
-	if (kind == KIND_VAR_LOCAL)			return /*"#" + i2s(nr) + ": " +*/ f->var[nr]->name;
-	if (kind == KIND_VAR_GLOBAL)			return s->root_of_all_evil.var[nr]->name;
-	if (kind == KIND_VAR_FUNCTION)		return s->functions[nr]->name;
-	if (kind == KIND_CONSTANT)			return /*"#" + i2s(nr) + ": " +*/ s->constants[nr]->str();
-	if (kind == KIND_FUNCTION)			return s->functions[nr]->name;
-	if (kind == KIND_VIRTUAL_FUNCTION)	return i2s(nr);//s->Functions[nr]->name;
-	if (kind == KIND_STATEMENT)	return Statements[nr].name;
-	if (kind == KIND_OPERATOR)			return op_to_str(s->operators[nr]);
-	if (kind == KIND_PRIMITIVE_OPERATOR)	return PrimitiveOperators[nr].name;
-	if (kind == KIND_BLOCK)				return i2s(nr);
-	if (kind == KIND_ADDRESS_SHIFT)		return i2s(nr);
-	if (kind == KIND_ARRAY)				return "(no LinkNr)";
-	if (kind == KIND_POINTER_AS_ARRAY)		return "(no LinkNr)";
-	if (kind == KIND_REFERENCE)			return "(no LinkNr)";
-	if (kind == KIND_DEREFERENCE)		return "(no LinkNr)";
-	if (kind == KIND_DEREF_ADDRESS_SHIFT)	return i2s(nr);
-	if (kind == KIND_TYPE)				return s->classes[nr]->name;
-	if (kind == KIND_REGISTER)			return Asm::GetRegName(nr);
-	if (kind == KIND_ADDRESS)			return d2h(&nr, config.pointer_size);
-	if (kind == KIND_MEMORY)				return d2h(&nr, config.pointer_size);
-	if (kind == KIND_LOCAL_ADDRESS)		return d2h(&nr, config.pointer_size);
-	if (kind == KIND_LOCAL_MEMORY)		return d2h(&nr, config.pointer_size);
-	return i2s(nr);
+	string t = n->type->name + " ";
+	if (n->kind == KIND_VAR_LOCAL)			return t + n->as_local(f)->name;
+	if (n->kind == KIND_VAR_GLOBAL)			return t + n->as_global()->name;
+	if (n->kind == KIND_VAR_FUNCTION)		return t + n->as_func()->name;
+	if (n->kind == KIND_CONSTANT)			return t + n->as_const()->str();
+	if (n->kind == KIND_FUNCTION)			return n->as_func()->signature();
+	if (n->kind == KIND_INLINE_FUNCTION)	return n->as_func()->signature();
+	if (n->kind == KIND_VIRTUAL_FUNCTION)	return t + i2s(n->link_no);//s->Functions[nr]->name;
+	if (n->kind == KIND_STATEMENT)	return t + Statements[n->link_no].name;
+	if (n->kind == KIND_OPERATOR)			return op_sig(n->as_op());
+	if (n->kind == KIND_PRIMITIVE_OPERATOR)	return PrimitiveOperators[n->link_no].name;
+	if (n->kind == KIND_BLOCK)				return p2s(n->as_block());
+	if (n->kind == KIND_ADDRESS_SHIFT)		return t + i2s(n->link_no);
+	if (n->kind == KIND_ARRAY)				return t;
+	if (n->kind == KIND_POINTER_AS_ARRAY)		return t;
+	if (n->kind == KIND_REFERENCE)			return t;
+	if (n->kind == KIND_DEREFERENCE)		return t;
+	if (n->kind == KIND_DEREF_ADDRESS_SHIFT)	return t + i2s(n->link_no);
+	if (n->kind == KIND_TYPE)				return n->as_class()->name;
+	if (n->kind == KIND_REGISTER)			return t + Asm::GetRegName(n->link_no);
+	if (n->kind == KIND_ADDRESS)			return t + d2h(&n->link_no, config.pointer_size);
+	if (n->kind == KIND_MEMORY)				return t + d2h(&n->link_no, config.pointer_size);
+	if (n->kind == KIND_LOCAL_ADDRESS)		return t + d2h(&n->link_no, config.pointer_size);
+	if (n->kind == KIND_LOCAL_MEMORY)		return t + d2h(&n->link_no, config.pointer_size);
+	return t + i2s(n->link_no);
+}
+
+string node2str(SyntaxTree *s, Function *f, Node *n)
+{
+	return "[" + kind2str(n->kind) + "]  " + node_sig(s, f, n);
 }
 
 // override_line is logical! not physical
@@ -433,7 +442,7 @@ void SyntaxTree::CreateAsmMetaInfo()
 		Asm::GlobalVar v;
 		v.name = root_of_all_evil.var[i]->name;
 		v.size = root_of_all_evil.var[i]->type->size;
-		v.pos = script->g_var[i];
+		v.pos = root_of_all_evil.var[i]->memory;
 		asm_meta_info->global_var.add(v);
 	}
 }
@@ -460,9 +469,11 @@ Block::Block(Function *f, Block *_parent)
 
 Block::~Block()
 {
-	for (Node *n: nodes)
+	for (Node *n: nodes){
 		if (n->kind == KIND_BLOCK)
 			delete (n->as_block());
+		//delete n;
+	}
 }
 
 
@@ -474,7 +485,7 @@ inline void set_command(Node *&a, Node *b)
 		a->ref_count --;
 	if (b){
 		if (b->ref_count > 0){
-			//msg_write(">> " + Kind2Str(b->kind));
+			//msg_write(">> " + kindsStr(b->kind));
 		}
 		b->ref_count ++;
 	}
@@ -500,6 +511,14 @@ Variable::Variable(const string &_name, Class *_type)
 	_offset = 0;
 	is_extern = false;
 	dont_add_constructor = false;
+	memory = nullptr;
+	memory_owner = false;
+}
+
+Variable::~Variable()
+{
+	if (memory_owner)
+		free(memory);
 }
 
 int Block::add_var(const string &name, Class *type)
@@ -615,6 +634,16 @@ Node::Node(int _kind, long long _link_no, Script *_script, Class *_type)
 	ref_count = 0;
 }
 
+Node::~Node()
+{
+	/*if (instance)
+		delete instance;
+	for (auto &p: params)
+		if (p)
+			delete p;*/
+	// TODO later
+}
+
 Block *Node::as_block() const
 {
 	return (Block*)(int_p)link_no;
@@ -633,6 +662,37 @@ Class *Node::as_class() const
 Constant *Node::as_const() const
 {
 	return script->syntax->constants[link_no];
+}
+
+Operator *Node::as_op() const
+{
+	return &script->syntax->operators[link_no];
+}
+void *Node::as_func_p() const
+{
+	return (void*)script->func[link_no];
+}
+
+// will be the address at runtime...(not the current location...)
+void *Node::as_const_p() const
+{
+	return as_const()->address;
+	//return script->cnst[link_no];
+}
+
+void *Node::as_global_p() const
+{
+	return script->syntax->root_of_all_evil.var[link_no]->memory;
+}
+
+Variable *Node::as_global() const
+{
+	return script->syntax->root_of_all_evil.var[link_no];
+}
+
+Variable *Node::as_local(Function *f) const
+{
+	return f->var[link_no];
 }
 
 void Node::set_instance(Node *p)
@@ -869,26 +929,6 @@ Class *SyntaxTree::CreateDictClass(Class *element_type)
 {
 	return CreateNewClass(element_type->name + "{}",
 			Class::Type::DICT, config.super_array_size, 0, element_type);
-}
-
-void SyntaxTree::ConvertInline()
-{
-	for (auto com: nodes)
-		if (com->kind == KIND_FUNCTION){
-			// inline function?
-			int index = com->script->syntax->functions[com->link_no]->inline_no;
-			if (index >= 0){
-				msg_write(" >>>>>>>>>>>>>>>>> inline ....");
-				com->kind = KIND_INLINE_FUNCTION;
-
-				/*if (com->instance){
-					msg_write("   INST");
-					// dirty quick move
-					com->param.insert(com->instance, 0);
-					com->instance = NULL;
-				}*/
-			}
-		}
 }
 
 Node *conv_cbr(SyntaxTree *ps, Node *c, int var)
@@ -1239,6 +1279,33 @@ void SyntaxTree::BreakDownComplicatedCommands()
 		Show("break:b");
 }
 
+Node* conv_func_inline(SyntaxTree *ps, Node *n)
+{
+	if (n->kind == KIND_FUNCTION){
+		if (n->as_func()->inline_no > 0){
+			n->kind = KIND_INLINE_FUNCTION;
+			return n;
+		}
+	}
+	if (n->kind == KIND_OPERATOR){
+		Operator *op = n->as_op();
+		n->kind = KIND_INLINE_FUNCTION;
+		n->link_no = op->func_index;
+		n->script = op->owner->script;
+		return n;
+	}
+	return n;
+}
+
+void SyntaxTree::MakeFunctionsInline()
+{
+	transform([&](Node* n){ return conv_func_inline(this, n); });
+	if (config.verbose)
+		Show("break:c");
+}
+
+
+
 void MapLVSX86Return(Function *f)
 {
 	if (f->return_type->uses_return_by_memory()){
@@ -1330,13 +1397,13 @@ SyntaxTree::~SyntaxTree()
 	if (asm_meta_info)
 		delete(asm_meta_info);
 
-	for (Node *c: nodes)
-		delete(c);
-	
-	for (Function *f: functions)
+	for (auto *f: functions)
 		delete(f);
 
-	for (Constant *c: constants)
+	//for (Node *c: nodes)
+	//	delete(c);
+
+	for (auto *c: constants)
 		delete(c);
 }
 
@@ -1345,7 +1412,7 @@ void SyntaxTree::ShowNode(Node *c, Function *f)
 	string orig;
 	if (c->script->syntax != this)
 		orig = " << " + c->script->filename;
-	msg_write("[" + Kind2Str(c->kind) + "] " + c->type->name + " " + LinkNr2Str(c->script->syntax, f, c->kind, c->link_no) + orig);
+	msg_write(node2str(this, f, c) + orig);
 	msg_right();
 	if (c->instance)
 		ShowNode(c->instance, f);

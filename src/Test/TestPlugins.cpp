@@ -25,27 +25,24 @@ Array<UnitTest::Test> TestPlugins::tests()
 {
 	Array<Test> list;
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
-	for (auto &xxx: names){
-		if (xxx == "Echo/Folding")
-			continue;
-		string name = xxx.explode("/")[1];
-		list.add(Test("audio-effect:" + name, std::bind(TestPlugins::test_audio_effect, name)));
-	}
+	for (auto &name: names)
+		if (name != "Folding" and name != "Equalizer 31")
+			list.add(Test("audio-effect:" + name, [name]{ test_audio_effect(name); }));
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_SOURCE);
 	for (auto &name: names)
-		list.add(Test("audio-source:" + name, std::bind(TestPlugins::test_audio_source, name)));
+		list.add(Test("audio-source:" + name, [name]{ test_audio_source(name); }));
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_EFFECT);
 	for (auto &name: names)
-		list.add(Test("midi-effect:" + name, std::bind(TestPlugins::test_midi_effect, name)));
+		list.add(Test("midi-effect:" + name, [name]{ test_midi_effect(name); }));
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_SOURCE);
 	for (auto &name: names)
-		list.add(Test("midi-source:" + name, std::bind(TestPlugins::test_midi_source, name)));
+		list.add(Test("midi-source:" + name, [name]{ test_midi_source(name); }));
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::SYNTHESIZER);
 	for (auto &name: names)
-		list.add(Test("synthesizer:" + name, std::bind(TestPlugins::test_synthesizer, name)));
+		list.add(Test("synthesizer:" + name, [name]{ test_synthesizer(name); }));
 
 	//list.add(Test("tsunami-plugins", TestPlugins::test_tsunami_plugin));
 	return list;

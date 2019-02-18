@@ -240,7 +240,7 @@ string SerialNodeParam::str() const
 			n = Asm::GetRegName(p);
 		else if ((kind == KIND_VAR_LOCAL) or (kind == KIND_VAR_GLOBAL) or (kind == KIND_VAR_TEMP) or (kind == KIND_DEREF_VAR_TEMP) or (kind == KIND_MARKER))
 			n = i2s(p);
-		str = "  (" + type->name + ") " + Kind2Str(kind) + " " + n;
+		str = "  (" + type->name + ") " + kind2str(kind) + " " + n;
 		if (shift > 0)
 			str += format(" + shift %d", shift);
 	}
@@ -595,6 +595,17 @@ int Serializer::add_global_ref(void *p)
 	return global_refs.num - 1;
 }
 
+bool node_is_assign_mem(Node *n)
+{
+	if (n->kind == KIND_INLINE_FUNCTION){
+		return (n->as_func()->inline_no == INLINE_CHUNK_ASSIGN);
+	}
+	if (n->kind == KIND_FUNCTION){
+		return n->as_func()->name == "__assign__";
+	}
+	return false;
+}
+
 
 SerialNodeParam Serializer::SerializeNode(Node *com, Block *block, int index)
 {
@@ -603,9 +614,32 @@ SerialNodeParam Serializer::SerializeNode(Node *com, Block *block, int index)
 	if ((com->kind == KIND_STATEMENT) and ((com->link_no == STATEMENT_WHILE) or (com->link_no == STATEMENT_FOR)))
 		marker_before_params = add_marker();
 
+
+	// EXPERIMENTAL DIRTY HACK !!!!!!!!!!!
+	//syntax_tree->ShowNode(com, cur_func);
+	Node *override_ret = nullptr;
+#if 1
+	if (node_is_assign_mem(com)){
+		if (com->params[1]->kind == KIND_FUNCTION or com->params[1]->kind == KIND_INLINE_FUNCTION){
+			if (com->params[0]->kind == KIND_VAR_LOCAL or com->params[0]->kind == KIND_VAR_GLOBAL){
+				//msg_write("OPT...");
+				override_ret = com->params[0];
+				com = com->params[1];
+
+			}
+		}
+	}
+#endif
+
+
 	// return value
-	bool create_constructor_for_return = ((com->kind != KIND_STATEMENT) and (com->kind != KIND_FUNCTION) and (com->kind != KIND_VIRTUAL_FUNCTION));
-	SerialNodeParam ret = add_temp(com->type, create_constructor_for_return);
+	SerialNodeParam ret;
+	if (override_ret){
+		ret = SerializeParameter(override_ret, block, index);
+	}else{
+		bool create_constructor_for_return = ((com->kind != KIND_STATEMENT) and (com->kind != KIND_FUNCTION) and (com->kind != KIND_VIRTUAL_FUNCTION));
+		ret = add_temp(com->type, create_constructor_for_return);
+	}
 
 
 	Array<SerialNodeParam> params;
@@ -630,30 +664,16 @@ SerialNodeParam Serializer::SerializeNode(Node *com, Block *block, int index)
 	}
 
 
-	if (com->kind == KIND_OPERATOR){
-		Node c = *com;
-		c.kind = KIND_INLINE_FUNCTION;
-		Operator &op = com->script->syntax->operators[com->link_no];
-		c.link_no = op.func_index;
-		c.script = op.owner->script;
-		SerializeInlineFunction(&c, params, ret);
+	if (com->kind == KIND_FUNCTION){
 
-	}else if (com->kind == KIND_FUNCTION){
-		// inline function?
-		if (com->script->syntax->functions[com->link_no]->inline_no >= 0){
-			Node c = *com;
-			c.kind = KIND_INLINE_FUNCTION;
-
-			SerializeInlineFunction(&c, params, ret);
-			return ret;
-		}
-
-		
 		AddFunctionCall(com->script, com->link_no, instance, params, ret);
 
 	}else if (com->kind == KIND_VIRTUAL_FUNCTION){
 
 		AddClassFunctionCall(instance.type->parent->get_virtual_function(com->link_no), instance, params, ret);
+
+	}else if (com->kind == KIND_INLINE_FUNCTION){
+		SerializeInlineFunction(com, params, ret);
 
 	}else if (com->kind == KIND_STATEMENT){
 		SerializeStatement(com, params, ret, block, index, marker_before_params);
@@ -667,8 +687,10 @@ SerialNodeParam Serializer::SerializeNode(Node *com, Block *block, int index)
 		}
 	}else if (com->kind == KIND_BLOCK){
 		SerializeBlock(com->as_block());
+	}else if (com->kind == KIND_CONSTANT){
+		// sometimes "nil" is used as pass etc...
 	}else{
-		//DoError(string("type of command is unimplemented (call Michi!): ",Kind2Str(com->Kind)));
+		//DoError("type of command is unimplemented: " + Kind2Str(com->kind));
 	}
 
 	return ret;
@@ -1911,7 +1933,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 	}else if (p.kind == KIND_IMMEDIATE){
 		return Asm::param_imm(p.p, p.type->size);
 	}else
-		script->DoErrorInternal("get_param: unexpected param..." + Kind2Str(p.kind));
+		script->DoErrorInternal("get_param: unexpected param..." + kind2str(p.kind));
 	return Asm::param_none;
 }
 

@@ -409,14 +409,14 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 	p.shift = 0;
 
 	if (link->kind == KIND_VAR_FUNCTION){
-		p.p = (int_p)link->script->func[link->link_no];
+		p.p = (int_p)link->as_func_p();
 		p.kind = KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
 				p.p = link->link_no + 0xefef0000;
 				script->function_vars_to_link.add(link->link_no);
 			}else
-				DoErrorLink("could not link function as variable: " + link->script->syntax->functions[link->link_no]->name);
+				DoErrorLink("could not link function as variable: " + link->as_func()->name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}
@@ -426,11 +426,11 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 	}else if (link->kind == KIND_ADDRESS){
 		return param_lookup(p.type, add_global_ref((void*)link->link_no));
 	}else if (link->kind == KIND_VAR_GLOBAL){
-		if (!link->script->g_var[link->link_no])
-			script->DoErrorLink("variable is not linkable: " + link->script->syntax->root_of_all_evil.var[link->link_no]->name);
-		return param_deref_lookup(p.type, add_global_ref(link->script->g_var[link->link_no]));
+		if (!link->as_global_p())
+			script->DoErrorLink("variable is not linkable: " + link->as_global()->name);
+		return param_deref_lookup(p.type, add_global_ref(link->as_global_p()));
 	}else if (link->kind == KIND_VAR_LOCAL){
-		p.p = cur_func->var[link->link_no]->_offset;
+		p.p = link->as_local(cur_func)->_offset;
 	}else if (link->kind == KIND_LOCAL_MEMORY){
 		p.p = link->link_no;
 		p.kind = KIND_VAR_LOCAL;
@@ -438,7 +438,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		SerialNodeParam param = param_local(TypePointer, link->link_no);
 		return AddReference(param, link->type);
 	}else if (link->kind == KIND_CONSTANT){
-		void *pp = link->script->cnst[link->link_no];
+		void *pp = link->as_const_p();
 		int c = *(int*)pp;
 		if (const_is_arm_representable(c)){
 			p.p = c;
@@ -465,7 +465,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		// only used by <new> operator
 		p.p = link->link_no;
 	}else{
-		DoError("unexpected type of parameter: " + Kind2Str(link->kind));
+		DoError("unexpected type of parameter: " + kind2str(link->kind));
 	}
 	return p;
 }

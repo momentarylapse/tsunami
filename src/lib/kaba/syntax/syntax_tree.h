@@ -17,6 +17,7 @@ namespace Kaba{
 
 class Script;
 class SyntaxTree;
+class Operator;
 
 #define MAX_STRING_CONST_LENGTH	2048
 
@@ -59,6 +60,8 @@ struct Constant : Value
 	Constant(Class *type);
 	string name;
 	string str() const;
+	void *address; // either p() or overriden for OS
+	bool used;
 };
 
 enum
@@ -131,9 +134,12 @@ struct Block
 struct Variable
 {
 	Variable(const string &name, Class *type);
+	~Variable();
 	Class *type; // for creating instances
 	string name;
 	int64 _offset; // for compilation
+	void *memory;
+	bool memory_owner;
 	bool is_extern;
 	bool dont_add_constructor;
 };
@@ -186,15 +192,23 @@ struct Node
 	// return value
 	Class *type;
 	Node(int kind, int64 link_no, Script *script, Class *type);
+	~Node();
 	Block *as_block() const;
 	Function *as_func() const;
 	Class *as_class() const;
 	Constant *as_const() const;
+	Operator *as_op() const;
+	void *as_func_p() const;
+	void *as_const_p() const;
+	void *as_global_p() const;
+	Variable *as_global() const;
+	Variable *as_local(Function *f) const;
 	void set_num_params(int n);
 	void set_param(int index, Node *p);
 	void set_instance(Node *p);
 };
 void clear_nodes(Array<Node*> &nodes);
+void clear_nodes(Array<Node*> &nodes, Node *keep);
 
 
 struct Operator
@@ -316,9 +330,9 @@ public:
 
 	// neccessary conversions
 	void ConvertCallByReference();
-	void ConvertInline();
 	void BreakDownComplicatedCommands();
 	Node *BreakDownComplicatedCommand(Node *c);
+	void MakeFunctionsInline();
 	void MapLocalVariablesToStack();
 
 	void transform(std::function<Node*(Node*)> F);
@@ -387,8 +401,8 @@ public:
 	int parser_loop_depth;
 };
 
-string Kind2Str(int kind);
-string LinkNr2Str(SyntaxTree *s, Function *f, int kind, int64 nr);
+string kind2str(int kind);
+string node2str(SyntaxTree *s, Function *f, Node *n);
 
 
 

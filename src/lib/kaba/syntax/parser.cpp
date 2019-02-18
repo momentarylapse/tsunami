@@ -301,6 +301,13 @@ void clear_nodes(Array<Node*> &nodes)
 		delete n;
 }
 
+void clear_nodes(Array<Node*> &nodes, Node *keep)
+{
+	for (auto *n: nodes)
+		if (n != keep)
+			delete n;
+}
+
 Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node *link, Block *block)
 {
 	// sizeof
@@ -308,6 +315,7 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node *link, Block
 		DoError("evil special function");
 
 	if (link->link_no == STATEMENT_SIZEOF){
+		delete link;
 
 		Exp.next();
 		Node *c = add_node_const(AddConstant(TypeInt));
@@ -331,9 +339,9 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node *link, Block
 		if (Exp.cur != ")")
 			DoError("\")\" expected after parameter list");
 		Exp.next();
-		delete link;
 		return c;
 	}else if (link->link_no == STATEMENT_TYPE){
+		delete link;
 
 		Exp.next();
 		Node *c = add_node_const(AddConstant(TypeClassP));
@@ -358,9 +366,9 @@ Node *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Node *link, Block
 			DoError("\")\" expected after parameter list");
 		Exp.next();
 		return c;
-	}else
-		DoError("evil special function");
+	}
 
+	DoError("evil special function");
 	return nullptr;
 }
 
@@ -467,6 +475,48 @@ Class *get_func_type(SyntaxTree *syntax, Function *f)
 	return TypePointer;
 }
 
+bool direct_param_match(SyntaxTree *ps, Node *operand, Array<Node*> &params)
+{
+	Array<Class*> wanted_types = ps->GetFunctionWantedParams(operand);
+	if (wanted_types.num != params.num)
+		return false;
+	for (int p=0; p<params.num; p++)
+		if (!type_match(params[p]->type, wanted_types[p]))
+			return false;
+	return true;
+}
+
+bool param_match_with_cast(SyntaxTree *ps, Node *operand, Array<Node*> &params, Array<int> &casts)
+{
+	Array<Class*> wanted_types = ps->GetFunctionWantedParams(operand);
+	if (wanted_types.num != params.num)
+		return false;
+	casts.resize(params.num);
+	for (int p=0; p<params.num; p++){
+		int penalty;
+		if (!type_match_with_cast(params[p]->type, false, false, wanted_types[p], penalty, casts[p]))
+			return false;
+	}
+	return true;
+}
+
+Node *apply_params_direct(SyntaxTree *ps, Node *operand, Array<Node*> &params)
+{
+	for (int p=0; p<params.num; p++)
+		operand->set_param(p, params[p]);
+	return operand;
+}
+
+Node *apply_params_with_cast(SyntaxTree *ps, Node *operand, Array<Node*> &params, Array<int> &casts)
+{
+	for (int p=0; p<params.num; p++){
+		if (casts[p] >= 0)
+			params[p] = apply_type_cast(ps, casts[p], params[p]);
+		operand->set_param(p, params[p]);
+	}
+	return operand;
+}
+
 // creates <Operand> to be the function call
 //  on entry <Operand> only contains information from GetExistence (Kind, Nr, Type, NumParams)
 Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node*> &links, Block *block)
@@ -476,8 +526,8 @@ Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node*> &links, Blo
 	if ((Exp.get_name(Exp.cur_exp - 2) == "&") and (Exp.cur != "(")){
 		if (links[0]->kind == KIND_FUNCTION){
 			// can't be const because the function might not be compiled yet!
-			Node *c = AddNode(KIND_VAR_FUNCTION, links[0]->link_no, get_func_type(this, links[0]->as_func()));
-			c->script = links[0]->script;
+			Node *c = new Node(KIND_VAR_FUNCTION, links[0]->link_no, links[0]->script, get_func_type(this, links[0]->as_func()));
+			clear_nodes(links);
 			return c;
 		}else{
 			Exp.rewind();
@@ -509,52 +559,23 @@ Node *SyntaxTree::GetFunctionCall(const string &f_name, Array<Node*> &links, Blo
 	}*/
 
 	// direct match...
-	for (Node *link: links){
-		Array<Class*> wanted_types = GetFunctionWantedParams(link);
-		if (wanted_types.num != params.num)
-			continue;
-		bool ok = true;
-		for (int p=0; p<params.num; p++){
-			if (!type_match(params[p]->type, wanted_types[p])){
-				ok = false;
-				break;
-			}
-		}
-		if (!ok)
+	for (Node *operand: links){
+		if (!direct_param_match(this, operand, params))
 			continue;
 
-	    Node *operand = link;
-		for (int p=0; p<params.num; p++)
-			operand->set_param(p, params[p]);
-		return operand;
+		clear_nodes(links, operand);
+		return apply_params_direct(this, operand, params);
 	}
 
 
 	// advanced match...
-	for (Node *link: links){
-		Array<Class*> wanted_types = GetFunctionWantedParams(link);
-		if (wanted_types.num != params.num)
-			continue;
-		bool ok = true;
+	for (Node *operand: links){
 		Array<int> casts;
-		casts.resize(params.num);
-		for (int p=0; p<params.num; p++){
-			int penalty;
-			if (!type_match_with_cast(params[p]->type, false, false, wanted_types[p], penalty, casts[p])){
-				ok = false;
-				break;
-			}
-		}
-		if (!ok)
+		if (!param_match_with_cast(this, operand, params, casts))
 			continue;
 
-	    Node *operand = link;
-		for (int p=0; p<params.num; p++){
-			if (casts[p] >= 0)
-				params[p] = apply_type_cast(this, casts[p], params[p]);
-			operand->set_param(p, params[p]);
-		}
-		return operand;
+		clear_nodes(links, operand);
+		return apply_params_with_cast(this, operand, params, casts);
 	}
 
 
@@ -690,6 +711,7 @@ Node *SyntaxTree::GetOperand(Block *block)
 			}else if (links[0]->kind == KIND_TYPE){
 				if (Exp.cur == "("){
 					Class *t = links[0]->as_class();
+					clear_nodes(links);
 					int nv = block->add_var(block->function->create_slightly_hidden_name(), t);
 					block->function->var[nv]->dont_add_constructor = true;
 					Node *dummy = add_node_local_var(nv, t);
@@ -704,12 +726,14 @@ Node *SyntaxTree::GetOperand(Block *block)
 					//DoError("type as function");
 				}else{
 					// just the type...
-					operand = links[0];
+					operand = links.pop();
+					clear_nodes(links);
 				}
 			}else if (links[0]->kind == KIND_PRIMITIVE_OPERATOR){
 				// unary operator
 				int _ie=Exp.cur_exp-1;
 				int po = links[0]->link_no, o=-1;
+				clear_nodes(links);
 				Node *sub_command = GetOperand(block);
 				//Class *r = TypeVoid;
 				Class *p2 = sub_command->type;
@@ -755,7 +779,8 @@ Node *SyntaxTree::GetOperand(Block *block)
 			}else{
 
 				// variables etc...
-				operand = links[0];
+				operand = links.pop();
+				clear_nodes(links);
 			}
 		}else{
 			Class *t = GetConstantType(Exp.cur);
@@ -855,7 +880,7 @@ Node *LinkSpecialOperatorIs(SyntaxTree *tree, Node *param1, Node *param2)
 {
 	if (param2->kind != KIND_TYPE)
 		tree->DoError("class name expexted after 'is'");
-	Class *t2 = param2->script->syntax->classes[param2->link_no];
+	Class *t2 = param2->as_class();
 	if (t2->vtable.num == 0)
 		tree->DoError("class after 'is' needs to have virtual functions: '" + t2->name + "'");
 
@@ -1113,7 +1138,7 @@ void SyntaxTree::ParseStatementFor(Block *block)
 
 	// <for_var> declared internally?
 	// -> force it out of scope...
-	block->function->var[for_var->link_no]->name = "-out-of-scope-";
+	for_var->as_local(block->function)->name = "-out-of-scope-";
 	// TODO  FIXME
 }
 
@@ -1213,8 +1238,8 @@ void SyntaxTree::ParseStatementForall(Block *block)
 	transform_block(loop_block, [&](Node *n){ return conv_cbr(this, n, var_no); });
 
 	// force for_var out of scope...
-	block->function->var[for_var->link_no]->name = "-out-of-scope-";
-	block->function->var[for_index->link_no]->name = "-out-of-scope-";
+	for_var->as_local(block->function)->name = "-out-of-scope-";
+	for_index->as_local(block->function)->name = "-out-of-scope-";
 }
 
 void SyntaxTree::ParseStatementWhile(Block *block)

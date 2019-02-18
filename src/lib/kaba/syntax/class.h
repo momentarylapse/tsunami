@@ -24,7 +24,7 @@ struct ClassElement{
 struct ClassFunction{
 	string name;
 	Script *script;
-	int nr; // index in functions[]
+	int nr; // index in SyntaxTree.functions[]
 	// _func_(x)  ->  p.func(x)
 	Array<Class*> param_types; // literal!
 	Class *return_type; // literal!

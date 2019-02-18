@@ -134,7 +134,7 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 Node *SyntaxTree::PreProcessNode(Node *c)
 {
 	if (c->kind == KIND_OPERATOR){
-		Operator *o = &operators[c->link_no];
+		Operator *o = c->as_op();
 		/*if (c->link_nr == OperatorIntAdd){
 			if (c->param[1]->kind == KindConstant){
 				int v = *(int*)Constants[c->param[1]->link_nr].data;
@@ -188,7 +188,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			return c;
 		if (f->return_type->get_default_constructor()) // TODO
 			return c;
-		void *ff = (void*)c->script->func[c->link_no];
+		void *ff = (void*)c->as_func_p();
 		if (!ff)
 			return c;
 		bool all_const = true;
@@ -283,7 +283,7 @@ string LinkNr2Str(SyntaxTree *s, int kind, int64 nr);
 Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 {
 	if (c->kind == KIND_OPERATOR){
-		Operator *o = &operators[c->link_no];
+		Operator *o = c->as_op();
 		if (o->func){
 			bool all_const = true;
 			bool is_address = false;
@@ -317,24 +317,26 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 		}
 	}else if (c->kind == KIND_REFERENCE){
 		if (c->script){
-			if ((c->params[0]->kind == KIND_VAR_GLOBAL) or (c->params[0]->kind == KIND_VAR_LOCAL) or (c->params[0]->kind == KIND_CONSTANT)){
+			Node *p0 = c->params[0];
+			if ((p0->kind == KIND_VAR_GLOBAL) or (p0->kind == KIND_VAR_LOCAL) or (p0->kind == KIND_CONSTANT)){
 				// pre process ref var
-				if (c->params[0]->kind == KIND_VAR_GLOBAL){
-					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->g_var[c->params[0]->link_no], c->type, c->params[0]->script);
-				}else if (c->params[0]->kind == KIND_VAR_LOCAL){
-					return AddNode(KIND_LOCAL_ADDRESS, (int_p)cur_func->var[c->params[0]->link_no]->_offset, c->type);
+				if (p0->kind == KIND_VAR_GLOBAL){
+					return AddNode(KIND_ADDRESS, (int_p)p0->as_global_p(), c->type, p0->script);
+				}else if (p0->kind == KIND_VAR_LOCAL){
+					return AddNode(KIND_LOCAL_ADDRESS, (int_p)p0->as_local(cur_func)->_offset, c->type);
 				}else /*if (c->param[0]->kind == KindConstant)*/{
-					return AddNode(KIND_ADDRESS, (int_p)c->params[0]->script->cnst[c->params[0]->link_no], c->type, c->params[0]->script);
+					return AddNode(KIND_ADDRESS, (int_p)p0->as_const_p(), c->type, p0->script);
 				}
 			}
 		}
 	}else if (c->kind == KIND_DEREFERENCE){
-		if (c->params[0]->kind == KIND_ADDRESS){
+		Node *p0 = c->params[0];
+		if (p0->kind == KIND_ADDRESS){
 			// pre process deref address
-			return AddNode(KIND_MEMORY, c->params[0]->link_no, c->type);
-		}else if (c->params[0]->kind == KIND_LOCAL_ADDRESS){
+			return AddNode(KIND_MEMORY, p0->link_no, c->type);
+		}else if (p0->kind == KIND_LOCAL_ADDRESS){
 			// pre process deref local address
-			return AddNode(KIND_LOCAL_MEMORY, c->params[0]->link_no, c->type);
+			return AddNode(KIND_LOCAL_MEMORY, p0->link_no, c->type);
 		}
 	}
 	return c;

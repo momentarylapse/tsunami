@@ -75,11 +75,11 @@ void try_init_global_var(Class *type, char* g_var)
 		ff(g_var);
 }
 
-void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
+void init_all_global_objects(SyntaxTree *ps)
 {
 	foreachi(Variable *v, ps->root_of_all_evil.var, i)
 		if (!v->is_extern)
-			try_init_global_var(v->type, g_var[i]);
+			try_init_global_var(v->type, (char*)v->memory);
 }
 
 static int64 _opcode_rand_state_ = 10000;
@@ -136,44 +136,6 @@ void* get_nice_memory(long size, bool executable)
 	return mem;
 }
 
-void Script::AllocateMemory()
-{
-	// get memory size needed
-	memory_size = 0;
-	for (int i=0;i<syntax->root_of_all_evil.var.num;i++)
-		if (!syntax->root_of_all_evil.var[i]->is_extern)
-			memory_size += mem_align(syntax->root_of_all_evil.var[i]->type->size, 4);
-
-	// constants
-	foreachi(Constant *c, syntax->constants, i)
-		memory_size += mem_align(c->mapping_size(), 4);
-
-	// vtables
-	for (Class *t: syntax->classes)
-		if (t->vtable.num > 0)
-			memory_size += config.pointer_size;
-
-	// allocate
-	if (memory_size > 0){
-		memory = (char*)get_nice_memory(memory_size, false);
-		if (config.verbose)
-			msg_write("memory:  " + p2s(memory));
-	}
-}
-
-void Script::AllocateStack()
-{
-	// use your own stack if needed
-	//   wait() used -> needs to switch stacks ("tasks")
-	__stack = nullptr;
-	/*for (Command *cmd: syntax->commands){
-		if (cmd->kind == KIND_COMPILER_FUNCTION)
-			if ((cmd->link_no == COMMAND_WAIT) or (cmd->link_no == COMMAND_WAIT_RT) or (cmd->link_no == COMMAND_WAIT_ONE_FRAME)){
-				__stack = new char[config.stack_size];
-				break;
-			}
-	}*/
-}
 
 void Script::AllocateOpcode()
 {
@@ -192,35 +154,33 @@ void Script::AllocateOpcode()
 	opcode_size = 0;
 }
 
-void Script::MapConstantsToMemory()
+void Script::UpdateConstantLocations()
 {
-	// constants -> Memory
-	cnst.resize(syntax->constants.num);
-	foreachi(Constant *c, syntax->constants, i){
-		cnst[i] = &memory[memory_size];
-		c->map_into(cnst[i], cnst[i]);
-		memory_size += mem_align(c->mapping_size(), 4);
-	}
+	for (Constant *c: syntax->constants)
+		c->address = c->p();
 }
 
 void Script::MapGlobalVariablesToMemory()
 {
 	// global variables -> into Memory
-	g_var.resize(syntax->root_of_all_evil.var.num);
+	int override_offset = 0;
 	foreachi(Variable *v, syntax->root_of_all_evil.var, i){
 		if (v->is_extern){
-			g_var[i] = (char*)GetExternalLink(v->name);
-			if (!g_var[i])
+			v->memory = GetExternalLink(v->name);
+			if (!v->memory)
 				DoErrorLink("external variable " + v->name + " was not linked");
 		}else{
-			if (config.override_variables_offset)
-				g_var[i] = (char*)(int_p)(memory_size + config.variables_offset);
-			else
-				g_var[i] = &memory[memory_size];
-			memory_size += mem_align(v->type->size, 4);
+			int size_aligned = mem_align(v->type->size, 4);
+			if (config.override_variables_offset){
+				v->memory = (char*)(int_p)(config.variables_offset + override_offset);
+				override_offset += size_aligned;
+			}else{
+				v->memory = malloc(size_aligned);
+				v->memory_owner = true;
+			}
 		}
+		memset(v->memory, 0, v->type->size); // reset all global variables to 0
 	}
-	memset(memory, 0, memory_size); // reset all global variables to 0
 }
 
 void Script::AlignOpcode()
@@ -246,25 +206,18 @@ void Script::CompileOsEntryPoint()
 	AlignOpcode();
 }
 
-void apply_recursive(Node *n, std::function<void(Node*)> f)
+Node *check_const_used(Node *n, Script *me)
 {
-	f(n);
-
-	for (Node *p: n->params)
-		apply_recursive(p, f);
-
-	if (n->instance)
-		apply_recursive(n->instance, f);
-
-	if (n->kind == KIND_BLOCK)
-		for (Node *child: n->as_block()->nodes)
-			apply_recursive(child, f);
+	if (n->kind == KIND_CONSTANT){
+		n->as_const()->used = true;
+		if (n->script != me)
+			msg_error("evil const " + n->as_const()->name);
+	}
+	return n;
 }
 
 void Script::MapConstantsToOpcode()
 {
-	cnst.resize(syntax->constants.num);
-
 	// vtables -> no data yet...
 	for (Class *t: syntax->classes)
 		if (t->vtable.num > 0){
@@ -276,11 +229,7 @@ void Script::MapConstantsToOpcode()
 					memcpy(c->value.data, &t->_vtable_location_target_, config.pointer_size);
 		}
 
-	Array<bool> used;
-	used.resize(syntax->constants.num);
-	for (Function *f: syntax->functions)
-		for (Node *n: f->block->nodes)
-			apply_recursive(n, [&](Node *n){ if (n->kind == KIND_CONSTANT){ used[n->link_no] = true; if (n->script != syntax->script) msg_error("evil const " + n->as_const()->name); } });
+	syntax->transform([&](Node* n){ return check_const_used(n, this); });
 
 	/*int n = 0;
 	for (bool b: used)
@@ -299,9 +248,9 @@ void Script::MapConstantsToOpcode()
 
 
 	foreachi(Constant *c, syntax->constants, i)
-		if (used[i]){
-			cnst[i] = (char*)(syntax->asm_meta_info->code_origin + opcode_size);
-			c->map_into(&opcode[opcode_size], cnst[i]);
+		if (c->used){
+			c->address = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
+			c->map_into(&opcode[opcode_size], (char*)c->address);
 			opcode_size += mem_align(c->mapping_size(), 4);
 		}
 
@@ -338,74 +287,6 @@ void Script::LinkOsEntryPoint()
 	}
 }
 
-void Script::CompileTaskEntryPoint()
-{
-	// "stack" usage for waiting:
-	//  -4| -8 - ebp (before execution)
-	//  -8|-16 - ebp (script continue)
-	// -12|-24 - esp (script continue)
-	// -16|-32 - eip (script continue)
-	// -20|-40 - script stack...
-
-	// call
-	void *_main_ = MatchFunction("main", "void", 0);
-
-	if ((!__stack) or (!_main_)){
-		__first_execution = (t_func*)_main_;
-		__continue_execution = nullptr;
-		return;
-	}
-
-	Asm::InstructionWithParamsList *list = new Asm::InstructionWithParamsList(0);
-
-	int label_first = list->add_label("_first_execution");
-
-	__first_execution = (t_func*)&__thread_opcode[__thread_opcode_size];
-	// intro
-	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the actual program
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((int_p)&__stack[config.stack_size], 4)); // start of the script stack
-	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // address of the old stack
-	AddEspAdd(list, -12); // space for wait() task data
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(WAITING_MODE_NONE, 4)); // "reset"
-	list->add2(Asm::INST_MOV, Asm::param_deref_imm((int_p)&__waiting_mode, 4), Asm::param_reg(Asm::REG_EAX));
-
-	// call main()
-	list->add2(Asm::INST_CALL, Asm::param_imm((int_p)_main_, 4));
-
-	// outro
-	AddEspAdd(list, 12); // make space for wait() task data
-	list->add2(Asm::INST_POP, Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_LEAVE);
-	list->add2(Asm::INST_RET);
-
-	// "task" for execution after some wait()
-	int label_cont = list->add_label("_continue_execution");
-
-	// Intro
-	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the external program
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
-	list->add2(Asm::INST_MOV, Asm::param_deref_imm((int_p)&__stack[config.stack_size - 4], 4), Asm::param_reg(Asm::REG_EBP)); // save the external ebp
-	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((int_p)&__stack[config.stack_size - 16], 4)); // to the eIP of the script
-	list->add2(Asm::INST_POP, Asm::param_reg(Asm::REG_EAX));
-	list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(AfterWaitOCSize, 4));
-	list->add2(Asm::INST_JMP, Asm::param_reg(Asm::REG_EAX));
-	//list->add2(Asm::inst_leave);
-	//list->add2(Asm::inst_ret);
-	/*OCAddChar(0x90);
-	OCAddChar(0x90);
-	OCAddChar(0x90);*/
-
-	list->Compile(__thread_opcode, __thread_opcode_size);
-
-	__first_execution = (t_func*)(int_p)list->label[label_first].value;
-	__continue_execution = (t_func*)(int_p)list->label[label_cont].value;
-
-	delete(list);
-}
-
 bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert)
 {
 	for (int i=0;i<opcode_size - size;i++){
@@ -432,30 +313,35 @@ struct IncludeTranslationData
 	Script *source;
 };
 
+Node *conv_relink_calls(Node *c, Script *s, Script *target, IncludeTranslationData &d)
+{
+
+	// keep commands... just redirect var/const/func
+	if (c->script != d.source)
+		return c;
+
+	if (c->kind != KIND_CONSTANT)
+		if (c->script->filename.find(".kaba") < 0)
+			return c;
+
+	//msg_write(p2s(c->script));
+	if (c->kind == KIND_VAR_GLOBAL){
+		c->link_no += d.var_off;
+		c->script = target;
+	}else if (c->kind == KIND_CONSTANT){
+		c->link_no += d.const_off;
+		c->script = target;
+	}else if ((c->kind == KIND_FUNCTION) or (c->kind == KIND_VAR_FUNCTION)){
+		c->link_no += d.func_off;
+		c->script = target;
+	}
+	return c;
+}
+
 void relink_calls(Script *s, Script *target, IncludeTranslationData &d)
 {
 	//msg_write("relink ----" + s->filename + " : " + d.source->filename + " -> " + target->filename + "  ---------");
-	for (Node *c: s->syntax->nodes){
-		// keep commands... just redirect var/const/func
-		if (c->script != d.source)
-			continue;
-
-		if (c->kind != KIND_CONSTANT)
-			if (c->script->filename.find(".kaba") < 0)
-				continue;
-
-		//msg_write(p2s(c->script));
-		if (c->kind == KIND_VAR_GLOBAL){
-			c->link_no += d.var_off;
-			c->script = target;
-		}else if (c->kind == KIND_CONSTANT){
-			c->link_no += d.const_off;
-			c->script = target;
-		}else if ((c->kind == KIND_FUNCTION) or (c->kind == KIND_VAR_FUNCTION)){
-			c->link_no += d.func_off;
-			c->script = target;
-		}
-	}
+	s->syntax->transform([&](Node *n){ return conv_relink_calls(n, s, target, d); });
 
 	// we might need some constructors later on...
 	for (Class *t: s->syntax->classes)
@@ -476,12 +362,8 @@ IncludeTranslationData import_deep(SyntaxTree *dest, SyntaxTree *source)
 	d.func_off = dest->functions.num;
 	d.source = source->script;
 
-	for (Constant *c: source->constants){
-		Constant *cc = new Constant(c->type);
-		cc->name = c->name;
-		cc->set(*c);
-		dest->constants.add(cc);
-	}
+	dest->constants.append(source->constants);
+	source->constants.clear();
 
 	// don't fully include internal libraries
 	if (source->script->filename.find(".kaba") < 0)
@@ -517,6 +399,7 @@ void find_all_includes_rec(Script *s, Set<Script*> &includes)
 // only for "os"
 void import_includes(Script *s)
 {
+	s->DoErrorInternal("deep import is currently not supported, can't compile OS... sorry. Complain to Michi");
 	Set<Script*> includes;
 	find_all_includes_rec(s, includes);
 	Array<IncludeTranslationData> da;
@@ -626,6 +509,16 @@ void parse_magic_linker_string(SyntaxTree *s)
 
 }
 
+int memory_size(Script *s)
+{
+	int size = 0;
+	for (auto *v: s->syntax->root_of_all_evil.var)
+		size += v->type->size;
+	for (auto *c: s->syntax->constants)
+		size += c->mapping_size();
+	return size;
+}
+
 // generate opcode
 void Script::Compiler()
 {
@@ -639,26 +532,19 @@ void Script::Compiler()
 	syntax->MapLocalVariablesToStack();
 
 	syntax->BreakDownComplicatedCommands();
-#ifdef ScriptDebug
-	syntax->Show();
-#endif
-
 
 	syntax->SimplifyRefDeref();
 	syntax->SimplifyShiftDeref();
 
 	syntax->PreProcessor();
+	syntax->MakeFunctionsInline();
 
 	if (config.verbose)
 		syntax->Show("comp:a");
 
-	AllocateMemory();
-	AllocateStack();
-
-	memory_size = 0;
 	MapGlobalVariablesToMemory();
 	if (!config.compile_os)
-		MapConstantsToMemory();
+		UpdateConstantLocations();
 
 	AllocateOpcode();
 
@@ -687,10 +573,6 @@ void Script::Compiler()
 	LinkFunctions();
 
 
-// "task" for the first execution of main() -> ThreadOpcode
-	if (!config.compile_os)
-		CompileTaskEntryPoint();
-
 
 
 
@@ -700,18 +582,13 @@ void Script::Compiler()
 
 	// initialize global objects
 	if (!config.compile_os)
-		init_all_global_objects(syntax, g_var);
+		init_all_global_objects(syntax);
 
 	//_expand(Opcode,OpcodeSize);
 
-	if (__first_execution)
-		__waiting_mode = WAITING_MODE_FIRST;
-	else
-		__waiting_mode = WAITING_MODE_NONE;
-
 	if (show_compiler_stats){
 		msg_write("--------------------------------");
-		msg_write(format("Opcode: %db, Memory: %db",opcode_size,memory_size));
+		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size(this)));
 	}
 }
 

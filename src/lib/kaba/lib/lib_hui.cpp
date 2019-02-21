@@ -51,33 +51,33 @@ namespace Kaba{
 #endif
 
 
-extern Class *TypeIntList;
-extern Class *TypeIntPs;
-extern Class *TypeFloatList;
-extern Class *TypeComplexList;
-extern Class *TypeImage;
-Class *TypeHuiWindowP;
+extern const Class *TypeIntList;
+extern const Class *TypeIntPs;
+extern const Class *TypeFloatList;
+extern const Class *TypeComplexList;
+extern const Class *TypeImage;
+const Class *TypeHuiWindowP;
 
 void SIAddPackageHui()
 {
 	add_package("hui", false);
 	
-	Class *TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
-	Class *TypeHuiMenuP = add_type_p("Menu*", TypeHuiMenu);
-	Class *TypeHuiToolbar = add_type("Toolbar",  sizeof(hui::Toolbar));
-	Class *TypeHuiToolbarP = add_type_p("Toolbar*", TypeHuiToolbar);
-	Class *TypeHuiPanel = add_type("Panel", sizeof(hui::Panel));
-	Class *TypeHuiPanelP = add_type_p("Panel*", TypeHuiPanel);
-	Class *TypeHuiWindow = add_type("Window", sizeof(hui::Window));
+	const Class *TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
+	const Class *TypeHuiMenuP = add_type_p("Menu*", TypeHuiMenu);
+	const Class *TypeHuiToolbar = add_type("Toolbar",  sizeof(hui::Toolbar));
+	const Class *TypeHuiToolbarP = add_type_p("Toolbar*", TypeHuiToolbar);
+	const Class *TypeHuiPanel = add_type("Panel", sizeof(hui::Panel));
+	const Class *TypeHuiPanelP = add_type_p("Panel*", TypeHuiPanel);
+	const Class *TypeHuiWindow = add_type("Window", sizeof(hui::Window));
 	TypeHuiWindowP = add_type_p("Window*", TypeHuiWindow);
-	Class *TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
-	Class *TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
-	Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
-	Class *TypeHuiEventP = add_type_p("Event*", TypeHuiEvent);
-	Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
-	Class *TypeHuiPainterP = add_type_p("Painter*", TypeHuiPainter);
-	Class *TypeHuiTimer = add_type("Timer", sizeof(hui::Timer));
-	Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
+	const Class *TypeHuiNixWindow = add_type("NixWindow", sizeof(hui::Window));
+	const Class *TypeHuiDialog = add_type("Dialog", sizeof(hui::Window));
+	const Class *TypeHuiEvent = add_type("Event", sizeof(hui::Event));
+	const Class *TypeHuiEventP = add_type_p("Event*", TypeHuiEvent);
+	const Class *TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
+	const Class *TypeHuiPainterP = add_type_p("Painter*", TypeHuiPainter);
+	const Class *TypeHuiTimer = add_type("Timer", sizeof(hui::Timer));
+	const Class *TypeHuiConfiguration = add_type("Configuration", sizeof(hui::Configuration));
 
 	
 	add_func("GetKeyName", TypeString, hui_p(&hui::GetKeyName));
@@ -331,8 +331,7 @@ void SIAddPackageHui()
 
 
 	add_class(TypeHuiWindow);
-		TypeHuiWindow->derive_from(TypeHuiPanel, false);
-		TypeHuiWindow->vtable = TypeHuiPanel->vtable;
+		class_derive_from(TypeHuiPanel, false, true);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::Window::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);
@@ -393,8 +392,7 @@ void SIAddPackageHui()
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiNixWindow);
-		TypeHuiNixWindow->derive_from(TypeHuiWindow, false);
-		TypeHuiNixWindow->vtable = TypeHuiWindow->vtable;
+		class_derive_from(TypeHuiWindow, false, true);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::NixWindow::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);
@@ -403,8 +401,7 @@ void SIAddPackageHui()
 		class_set_vtable(hui::Window);
 
 	add_class(TypeHuiDialog);
-		TypeHuiDialog->derive_from(TypeHuiWindow, false);
-		TypeHuiDialog->vtable = TypeHuiWindow->vtable;
+		class_derive_from(TypeHuiWindow, false, true);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&hui::Dialog::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title", TypeString);
 			func_add_param("width", TypeInt);

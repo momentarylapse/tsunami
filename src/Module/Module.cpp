@@ -12,6 +12,7 @@
 #include "Synth/DummySynthesizer.h"
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
+#include "../lib/kaba/syntax/Class.h"
 #include "../Plugins/PluginManager.h"
 #include "../Plugins/Plugin.h"
 #include "../View/Helper/Progress.h"
@@ -36,7 +37,7 @@ void ModuleConfiguration::__delete__()
 }
 
 
-Array<Kaba::ClassElement> get_unique_elements(Kaba::Class *c)
+Array<Kaba::ClassElement> get_unique_elements(const Kaba::Class *c)
 {
 	Array<Kaba::ClassElement> r;
 	for (auto &e: c->elements)
@@ -45,7 +46,7 @@ Array<Kaba::ClassElement> get_unique_elements(Kaba::Class *c)
 	return r;
 }
 
-string var_to_string(Kaba::Class *c, char *v)
+string var_to_string(const Kaba::Class *c, char *v)
 {
 	string r;
 	if (c == Kaba::TypeInt){
@@ -116,7 +117,7 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song *song)
+void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos, Song *song)
 {
 	if (pos >= s.num)
 		return;
@@ -221,7 +222,7 @@ void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *
 
 ModuleConfiguration *Module::get_config() const
 {
-	Kaba::Class *c = Kaba::GetDynamicType(this);
+	const Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c)
 		return nullptr;
 	for (auto &e: c->elements)
@@ -436,7 +437,7 @@ void Module::changed()
 
 Module *Module::copy() const
 {
-	Kaba::Class *c = Kaba::GetDynamicType(this);
+	const Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c){
 		if (this->module_type == ModuleType::SYNTHESIZER)
 			return new DummySynthesizer;

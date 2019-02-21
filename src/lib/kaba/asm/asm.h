@@ -448,6 +448,14 @@ struct InstructionWithParamsList : public Array<InstructionWithParams>
 	void add2(int inst, const InstructionParam &p1 = param_none, const InstructionParam &p2 = param_none);
 	void add_arm(int cond, int inst, const InstructionParam &p1, const InstructionParam &p2 = param_none, const InstructionParam &p3 = param_none);
 
+
+	// new label system
+	int create_label(const string &name);
+	int _find_label(const string &name);
+	void insert_label(int index);
+	int64 _label_value(int index);
+
+
 	int add_label(const string &name);
 	int get_label(const string &name);
 	void *get_label_value(const string &name);

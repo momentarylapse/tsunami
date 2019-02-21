@@ -61,7 +61,7 @@ inline void func_from_rip_test_script(StackFrameInfo &r, Script *s, void *rip, b
 	foreachi (Function *f, s->syntax->functions, i){
 		if (from_package and !f->throws_exceptions)
 			continue;
-		void *frip = (void*)s->func[i];
+		void *frip = f->address;
 		if (frip >= rip)
 			continue;
 		int_p offset = (int_p)rip - (int_p)frip;
@@ -108,7 +108,7 @@ struct ExceptionBlockData
 	Node *except;
 };
 
-inline bool ex_type_match(Class *ex_type, Class *catch_type)
+inline bool ex_type_match(const Class *ex_type, const Class *catch_type)
 {
 	if (ex_type == TypeUnknown)
 		return true;
@@ -117,48 +117,54 @@ inline bool ex_type_match(Class *ex_type, Class *catch_type)
 	return ex_type->is_derived_from(catch_type);
 }
 
-ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, Class *ex_type)
+ExceptionBlockData get_blocks(Script *s, Function *f, void* rip, const Class *ex_type)
 {
 	ExceptionBlockData ebd;
 	ebd.except_block = nullptr;
 	ebd.except = nullptr;
 
 	if (f){
+		// which blocks are we in?
 		auto blocks = f->all_blocks();
-		foreachb (Block *b, blocks)
-			if ((b->_start <= rip) and (b->_end >= rip))
+		//printf("%d blocks\n", blocks.num);
+		foreachb (Block *b, blocks){
+			//printf("-block  %p    %p-%p\n", b, b->_start, b->_end);
+			if ((b->_start <= rip) and (b->_end >= rip)){
+//				printf("   inside\n");
 				ebd.blocks.add(b);
+			}
+		}
 	}
-	ebd.needs_killing = ebd.blocks;
 
+
+	// walk through the blocks from inside to outside
 	Array<int> node_index;
 	foreachi (Block *b, ebd.blocks, bi){
-		if (bi == 0)
+		ebd.needs_killing.add(b);
+
+		if (!b->parent)
 			continue;
-		int index = -1;
-		foreachi (Node *n, b->nodes, ni){
-			if (n->kind == KIND_BLOCK and n->as_block() == ebd.blocks[bi-1]){
-				node_index.add(ni);
-				index = ni;
+
+		// are we in a try block?
+		for (Node *n: b->parent->params){
+			if (n->kind == KIND_STATEMENT and n->link_no == STATEMENT_TRY){
+				if (n->params[0]->as_block() == b){
+					if (_verbose_exception_)
+						msg_write("found try block");
+					auto ee = n->params[1];
+					if (_verbose_exception_)
+						msg_write(ee->type->name);
+					if (!ex_type_match(ex_type, ee->type))
+						continue;
+					if (_verbose_exception_)
+						msg_write("match");
+					ebd.except = ee;
+					ebd.except_block = n->params[2]->as_block();
+					return ebd;
+				}
 			}
 		}
-		if (index < 0){
-			msg_error("block link error...");
-			return ebd;
-		}
-		if (index > 0)
-			if ((b->nodes[index - 1]->kind == KIND_STATEMENT) and (b->nodes[index - 1]->link_no == STATEMENT_TRY)){
-				auto ee = b->nodes[index + 1];
-				if (!ex_type_match(ex_type, ee->type))
-					continue;
-				//msg_write("try...");
-				ebd.needs_killing = ebd.blocks.sub(0, bi);
-				//msg_write(b->nodes[index + 2]->link_no);
-				ebd.except = ee;
-				ebd.except_block = b->nodes[index + 2]->as_block();
-			}
 	}
-	//msg_write(ia2s(node_index));
 	return ebd;
 }
 
@@ -184,7 +190,7 @@ void relink_return(void *rip, void *rbp, void *rsp)
 	exit(0);
 }
 
-Class* get_type(void *p)
+const Class* get_type(void *p)
 {
 	if (!p)
 		return TypeUnknown;
@@ -193,7 +199,7 @@ Class* get_type(void *p)
 	for (auto p: Packages)
 		scripts.add(p.script);
 	for (Script* s: scripts)
-		for (Class *c: s->syntax->classes)
+		for (auto *c: s->syntax->classes)
 			if (c->_vtable_location_compiler_)
 				if ((c->_vtable_location_target_ == vtable) or (c->_vtable_location_external_ == vtable))
 					return c;
@@ -268,7 +274,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 
 	auto trace = get_stack_trace(rbp);
 
-	Class *ex_type = get_type(kaba_exception);
+	const Class *ex_type = get_type(kaba_exception);
 
 	for (auto r: trace){
 
@@ -279,15 +285,14 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 		for (Block *b: ebd.needs_killing){
 			if (_verbose_exception_)
 				msg_write("  block " + p2s(b));
-			for (int i: b->vars){
-				auto *v = r.f->var[i];
+			for (Variable *v: b->vars){
 				char *p = (char*)r.rbp + v->_offset;
 				if (_verbose_exception_)
 					msg_write("   " + v->type->name + " " + v->name + "  " + p2s(p));
 				auto cf = v->type->get_destructor();
 				if (cf){
 					typedef void con_func(void *);
-					con_func * f = (con_func*)cf->script->func[cf->nr];
+					con_func * f = (con_func*)cf->func->address;
 					if (f){
 						f(p);
 					}
@@ -299,7 +304,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 				msg_write("except_block block: " + p2s(ebd.except_block));
 
 			if (ebd.except->params.num > 0){
-				auto v = r.f->var[ebd.except_block->vars[0]];
+				auto v = ebd.except_block->vars[0];
 				void **p = (void**)((int_p)r.rbp + v->_offset);
 				*p = kaba_exception;
 			}

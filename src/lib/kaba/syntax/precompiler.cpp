@@ -58,8 +58,8 @@ void SyntaxTree::AddIncludeData(Script *s)
 			Constants.add(c);*/
 	// TODO... ownership of "big" constants
 
-	for (Operator &op: ps->operators)
-		if (op.owner == ps)
+	for (Operator *op: ps->operators)
+		if (op->owner == ps)
 			operators.add(op);
 }
 
@@ -102,19 +102,19 @@ void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool j
 			// special defines?
 			if ((d.source.num > 4) && (d.source.head(2) == "__") && (d.source.tail(2) == "__")){
 				if (d.source == "__OS__"){
-					DoError("#define __OS__ deprecated");
+					do_error("#define __OS__ deprecated");
 				}else if (d.source == "__STRING_CONST_AS_CSTRING__"){
 					flag_string_const_as_cstring = true;
 				}else if (d.source == "__NO_FUNCTION_FRAME__"){
-					DoError("#define __NO_FUNCTION_FRAME__ deprecated");
+					do_error("#define __NO_FUNCTION_FRAME__ deprecated");
 				}else if (d.source == "__ADD_ENTRY_POINT__"){
-					DoError("#define __ADD_ENTRY_POINT__ deprecated");
+					do_error("#define __ADD_ENTRY_POINT__ deprecated");
 				}else if (d.source == "__VARIABLE_OFFSET__"){
-					DoError("#define __VARIABLE_OFFSET__ deprecated");
+					do_error("#define __VARIABLE_OFFSET__ deprecated");
 				}else if (d.source == "__CODE_ORIGIN__"){
-					DoError("#define __CODE_ORIGING__ deprecated");
+					do_error("#define __CODE_ORIGING__ deprecated");
 				}else
-					DoError("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
+					do_error("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
 			}else
 				// normal define
 				defines.add(d);
@@ -124,7 +124,7 @@ void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool j
 			//FlagImmortal=true;
 			break;
 		default:
-			DoError("unknown makro after \"#\"");
+			do_error("unknown makro after \"#\"");
 			break;
 	}
 
@@ -145,7 +145,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 		if (Exp.cur[0] == '#'){
 			HandleMacro(i, NumIfDefs, IfDefed, just_analyse);
 		}else if (Exp.line[i].exp[0].name == IDENTIFIER_USE){
-			ParseImport();
+			parse_import();
 			Exp.line.erase(i);
 			i --;
 		}else{
@@ -165,7 +165,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 						Exp.set(Exp.cur_exp - d.dest.num);
 						num_defs_inserted ++;
 						if (num_defs_inserted > MAX_DEFINE_RECURSIONS)
-							DoError("recursion in #define macros");
+							do_error("recursion in #define macros");
 						break;
 					}
 				}

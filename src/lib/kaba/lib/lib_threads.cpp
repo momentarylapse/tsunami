@@ -26,10 +26,10 @@ void SIAddPackageThread()
 {
 	add_package("thread", false);
 
-	Class *TypeThread       = add_type  ("Thread",       sizeof(Thread));
-	Class *TypeThreadP      = add_type_p("Thread*",      TypeThread);
-	Class *TypeMutex        = add_type  ("Mutex",        sizeof(Mutex));
-	Class *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
+	const Class *TypeThread       = add_type  ("Thread",       sizeof(Thread));
+	const Class *TypeThreadP      = add_type_p("Thread*",      TypeThread);
+	const Class *TypeMutex        = add_type  ("Mutex",        sizeof(Mutex));
+	const Class *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
 		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,	thread_p(mf(&Thread::__init__)));

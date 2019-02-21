@@ -46,7 +46,7 @@ public:
 		static Array<Target> enumerate(Song *a);
 		static void enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 		static void enumerateModule(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
-		static void enumerateType(char *p, Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static void enumerateType(char *p, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 	};
 
 	string name;

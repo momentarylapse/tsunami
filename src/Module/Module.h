@@ -30,7 +30,7 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 	virtual void _cdecl reset(){}
-	Kaba::Class *_class;
+	const Kaba::Class *_class;
 };
 
 class ConfigPanel;

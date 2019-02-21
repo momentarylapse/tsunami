@@ -10,11 +10,12 @@ namespace Asm{
 
 namespace Kaba{
 
+int func_index(Function *f);
 
 
 int SerializerARM::fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &_params, const SerialNodeParam &ret)
 {
-	Class *type = ret.type;
+	const Class *type = ret.type;
 	if (!type)
 		type = TypeVoid;
 
@@ -52,7 +53,7 @@ int SerializerARM::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p.type->name);
+			do_error("parameter type currently not supported: " + p.type->name);
 	}
 
 	// push parameters onto stack
@@ -91,7 +92,7 @@ int SerializerARM::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 void SerializerARM::fc_end(int push_size, const SerialNodeParam &ret)
 {
-	Class *type = ret.type;
+	const Class *type = ret.type;
 	if (!type)
 		return;
 
@@ -113,19 +114,17 @@ void SerializerARM::fc_end(int push_size, const SerialNodeParam &ret)
 	}
 }
 
-void SerializerARM::add_function_call(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
+void SerializerARM::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((script == this->script) and (!script->syntax->functions[func_no]->is_extern)){
-		add_cmd(Asm::INST_CALL, param_marker(list->get_label("_kaba_func_" + i2s(func_no))));
+	if ((f->tree->script == this->script) and (!f->is_extern)){
+		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
-		void *func = (void*)script->func[func_no];
-
-		if (!func)
-			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
-		if (abs((int_p)func - (int_p)this->script->opcode) < 30000000){
-			add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)func)); // the actual call
+		if (!f->address)
+			do_error_link("could not link function " + f->name);
+		if (abs((int_p)f->address - (int_p)this->script->opcode) < 30000000){
+			add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...
 		}else{
 
@@ -133,7 +132,7 @@ void SerializerARM::add_function_call(Script *script, int func_no, const SerialN
 			// really find a usable register...
 
 			int v = add_virtual_reg(Asm::REG_R4);//find_unused_reg(cmd.num-1, cmd.num-1, 4);
-			add_cmd(Asm::INST_MOV, param_vreg(TypePointer, v), param_lookup(TypePointer, add_global_ref(func)));
+			add_cmd(Asm::INST_MOV, param_vreg(TypePointer, v), param_lookup(TypePointer, add_global_ref(f->address)));
 			add_cmd(Asm::INST_CALL, param_vreg(TypePointer, v));
 			set_virtual_reg(v, cmd.num-2, cmd.num-1);
 		}
@@ -142,10 +141,20 @@ void SerializerARM::add_function_call(Script *script, int func_no, const SerialN
 	fc_end(push_size, ret);
 }
 
-void SerializerARM::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret){}
-
-void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index, int marker_before_params)
+void SerializerARM::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret)
 {
+	do_error("virtual call");
+}
+
+
+void SerializerARM::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &param, const SerialNodeParam &ret)
+{
+	do_error("pointer call");
+}
+
+void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index)
+{
+#if 0
 	switch(com->link_no){
 		case STATEMENT_IF:{
 			// cmp;  jz m;  -block-  m;
@@ -174,7 +183,7 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			if (com->link_no == STATEMENT_FOR){
 				// NextCommand is a block!
 				if (next_node->kind != KIND_BLOCK)
-					DoError("command block in \"for\" loop missing");
+					do_error("command block in \"for\" loop missing");
 				marker_continue = add_marker_after_command(block->level + 1, next_node->as_block()->nodes.num - 2);
 			}
 			LoopData l = {marker_continue, marker_after_while, block->level, index};
@@ -201,7 +210,7 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 						add_cmd(Asm::INST_MOV, param_vreg(cur_func->return_type, v), param[0]);
 						set_virtual_reg(v, cmd.num-1, cmd.num);
 					}else{
-						DoError("return != int");
+						do_error("return != int");
 					}
 					AddFunctionOutro(cur_func);
 				}
@@ -213,14 +222,14 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 		case STATEMENT_NEW:{
 			Array<Node*> links = syntax_tree->GetExistence("@malloc", nullptr);
 			if (links.num == 0)
-				DoError("@malloc not found????");
+				do_error("@malloc not found????");
 			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param_const(TypeInt, ret.type->parent->size), ret);
 			if (com->params.num > 0){
 				// copy + edit command
 				Node sub = *com->params[0];
 				Node c_ret(KIND_VAR_TEMP, ret.p, script, ret.type);
 				sub.instance = &c_ret;
-				SerializeNode(&sub, block, index);
+				serialize_node(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
 			clear_nodes(links);
@@ -229,7 +238,7 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			add_cmd_destructor(param[0], false);
 			Array<Node*> links = syntax_tree->GetExistence("@free", nullptr);
 			if (links.num == 0)
-				DoError("@free not found????");
+				do_error("@free not found????");
 			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param[0], p_none);
 			clear_nodes(links);
 			break;}
@@ -237,8 +246,10 @@ void SerializerARM::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			add_cmd(INST_ASM);
 			break;
 		default:
-			DoError("statement unimplemented: " + Statements[com->link_no].name);
+			do_error("statement unimplemented: " + Statements[com->link_no].name);
 	}
+#endif
+	do_error("statement ksdjhksdjfhjksdhf");
 }
 
 void SerializerARM::SerializeInlineFunction(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret)
@@ -384,7 +395,7 @@ void SerializerARM::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 			add_cmd(Asm::INST_SUB, ret, ret, param[0]);
 			break;
 		default:
-			DoError("unimplemented inline function: #" + i2s(index));
+			do_error("unimplemented inline function: #" + i2s(index));
 	}
 }
 
@@ -408,15 +419,16 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 	p.p = 0;
 	p.shift = 0;
 
-	if (link->kind == KIND_VAR_FUNCTION){
+	if (link->kind == KIND_FUNCTION_POINTER){
 		p.p = (int_p)link->as_func_p();
 		p.kind = KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
-				p.p = link->link_no + 0xefef0000;
-				script->function_vars_to_link.add(link->link_no);
+				int index = func_index(link->as_func());
+				p.p = index + 0xefef0000;
+				script->function_vars_to_link.add(index);
 			}else
-				DoErrorLink("could not link function as variable: " + link->as_func()->name);
+				do_error_link("could not link function as variable: " + link->as_func()->name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}
@@ -427,10 +439,10 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		return param_lookup(p.type, add_global_ref((void*)link->link_no));
 	}else if (link->kind == KIND_VAR_GLOBAL){
 		if (!link->as_global_p())
-			script->DoErrorLink("variable is not linkable: " + link->as_global()->name);
+			script->do_error_link("variable is not linkable: " + link->as_global()->name);
 		return param_deref_lookup(p.type, add_global_ref(link->as_global_p()));
 	}else if (link->kind == KIND_VAR_LOCAL){
-		p.p = link->as_local(cur_func)->_offset;
+		p.p = link->as_local()->_offset;
 	}else if (link->kind == KIND_LOCAL_MEMORY){
 		p.p = link->link_no;
 		p.kind = KIND_VAR_LOCAL;
@@ -446,8 +458,8 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		}else{
 			return param_lookup(p.type, add_global_ref(*(int**)pp));
 		}
-	}else if ((link->kind==KIND_OPERATOR) or (link->kind==KIND_FUNCTION) or (link->kind==KIND_VIRTUAL_FUNCTION) or (link->kind==KIND_INLINE_FUNCTION) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
-		return SerializeNode(link, block, index);
+	}else if ((link->kind==KIND_OPERATOR) or (link->kind==KIND_FUNCTION_CALL) or (link->kind==KIND_VIRTUAL_CALL) or (link->kind==KIND_INLINE_CALL) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
+		return serialize_node(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
 		SerialNodeParam param = SerializeParameter(link->params[0], block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
@@ -465,7 +477,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		// only used by <new> operator
 		p.p = link->link_no;
 	}else{
-		DoError("unexpected type of parameter: " + kind2str(link->kind));
+		do_error("unexpected type of parameter: " + kind2str(link->kind));
 	}
 	return p;
 }
@@ -486,7 +498,7 @@ void SerializerARM::ProcessReferences()
 				add_cmd(Asm::INST_MOV, p0, param_vreg(TypePointer, r));
 				set_virtual_reg(r, i, i+1);
 			}else{
-				DoError("reference in ARM: " + cmd[i].p[1].str());
+				do_error("reference in ARM: " + cmd[i].p[1].str(this));
 			}
 		}
 }
@@ -550,7 +562,7 @@ void SerializerARM::gr_transfer_by_reg_in(SerialNode &c, int &i, int pno)
 {
 	SerialNodeParam p = c.p[pno];
 	if (config.verbose)
-		msg_write("in " + c.str());
+		msg_write("in " + c.str(this));
 	if (p.kind == KIND_DEREF_GLOBAL_LOOKUP){
 		// cmd ..., [global ref]
 
@@ -595,7 +607,7 @@ void SerializerARM::gr_transfer_by_reg_out(SerialNode &c, int &i, int pno)
 {
 	SerialNodeParam p = c.p[pno];
 	if (config.verbose)
-		msg_write("out " + c.str());
+		msg_write("out " + c.str(this));
 	if (p.kind == KIND_DEREF_GLOBAL_LOOKUP){
 		// cmd [global ref], ...
 
@@ -747,14 +759,14 @@ void SerializerARM::AddFunctionIntro(Function *f)
 				stack_param.add(p);
 			}
 		}else if (p->type == TypeFloat32){
-			DoError("arm float param");
+			do_error("arm float param");
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p->type->name);
+			do_error("parameter type currently not supported: " + p->type->name);
 	}
 
 	// xmm0-7
@@ -773,7 +785,7 @@ void SerializerARM::AddFunctionIntro(Function *f)
 
 	// get parameters from stack
 	foreachb(Variable *p, stack_param){
-		DoError("func with stack...");
+		do_error("func with stack...");
 		/*int s = 8;
 		add_cmd(Asm::inst_push, p);
 		push_size += s;*/

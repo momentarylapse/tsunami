@@ -41,21 +41,21 @@ nix::Texture* __LoadTexture(const string &filename)
 
 
 
-extern Class *TypeMatrix;
-extern Class *TypeImage;
-extern Class *TypeFloatArrayP;
-extern Class *TypeVectorArray;
-extern Class *TypeVectorArrayP;
-Class *TypeVertexBuffer;
-Class *TypeVertexBufferP;
-Class *TypeTexture;
-Class *TypeTextureP;
-Class *TypeTexturePList;
-Class *TypeDynamicTexture;
-Class *TypeDepthTexture;
-Class *TypeCubeMap;
-Class *TypeShader;
-Class *TypeShaderP;
+extern const Class *TypeMatrix;
+extern const Class *TypeImage;
+extern const Class *TypeFloatArrayP;
+extern const Class *TypeVectorArray;
+extern const Class *TypeVectorArrayP;
+const Class *TypeVertexBuffer;
+const Class *TypeVertexBufferP;
+const Class *TypeTexture;
+const Class *TypeTextureP;
+const Class *TypeTexturePList;
+const Class *TypeDynamicTexture;
+const Class *TypeDepthTexture;
+const Class *TypeCubeMap;
+const Class *TypeShader;
+const Class *TypeShaderP;
 
 void SIAddPackageNix()
 {
@@ -106,19 +106,19 @@ void SIAddPackageNix()
 			func_add_param("image", TypeImage);
 
 	add_class(TypeDynamicTexture);
-		TypeDynamicTexture->derive_from(TypeTexture, false);
+		class_derive_from(TypeTexture, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::DynamicTexture::__init__)));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
 	add_class(TypeDepthTexture);
-		TypeDepthTexture->derive_from(TypeTexture, false);
+		class_derive_from(TypeTexture, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::DepthTexture::__init__)));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
 	add_class(TypeCubeMap);
-		TypeCubeMap->derive_from(TypeTexture, false);
+		class_derive_from(TypeTexture, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&nix::CubeMap::__init__)));
 			func_add_param("size", TypeInt);
 

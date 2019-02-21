@@ -16,7 +16,7 @@ class Script;
 #include "../base/base.h"
 #include "asm/asm.h"
 #include "lib/lib.h"
-#include "syntax/syntax_tree.h"
+#include "syntax/SyntaxTree.h"
 
 namespace Kaba{
 
@@ -46,22 +46,22 @@ public:
 	void Load(const string &filename, bool just_analyse = false);
 
 	// building operational code
-	void Compiler();
-	void UpdateConstantLocations();
-	void MapConstantsToOpcode();
-	void MapGlobalVariablesToMemory();
-	void AllocateOpcode();
-	void AlignOpcode();
-	void AssembleFunction(int index, Function *f, Asm::InstructionWithParamsList *list);
-	void CompileFunctions(char *oc, int &ocs);
+	void compile();
+	void update_constant_locations();
+	void map_constants_to_opcode();
+	void map_global_variables_to_memory();
+	void allocate_opcode();
+	void align_opcode();
+	void assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list);
+	void compile_functions(char *oc, int &ocs);
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();
-	void LinkFunctions();
+	void link_functions();
 
 	// error messages
-	void DoError(const string &msg, int override_line = -1);
-	void DoErrorLink(const string &msg);
-	void DoErrorInternal(const string &msg);
+	void do_error(const string &msg, int override_line = -1);
+	void do_error_link(const string &msg);
+	void do_error_internal(const string &msg);
 
 	// execution
 	void *MatchFunction(const string &name, const string &return_type, int num_params, ...);
@@ -81,7 +81,6 @@ public:
 	char *opcode; // executable code
 	int opcode_size;
 
-	Array<t_func*> func;
 	Array<Asm::WantedLabel> functions_to_link;
 	Array<int> function_vars_to_link;
 
@@ -96,7 +95,7 @@ void ExecutePublicScripts();
 void DeleteAllScripts(bool even_immortal = false, bool force = false);
 void ExecuteSingleScriptCommand(const string &cmd);
 
-Class *GetDynamicType(const void *p);
+const Class *GetDynamicType(const void *p);
 
 };
 

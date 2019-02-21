@@ -9,7 +9,7 @@ namespace Kaba{
 
 int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &_params, const SerialNodeParam &ret)
 {
-	Class *type = ret.get_type_save();
+	const Class *type = ret.get_type_save();
 
 	// return data too big... push address
 	SerialNodeParam ret_ref;
@@ -55,7 +55,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p.type->name);
+			do_error("parameter type currently not supported: " + p.type->name);
 	}
 	
 	// push parameters onto stack
@@ -109,7 +109,7 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 
 void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
-	Class *type = ret.get_type_save();
+	const Class *type = ret.get_type_save();
 
 	// return > 4b already got copied to [ret] by the function!
 	if ((type != TypeVoid) and (!type->uses_return_by_memory())){
@@ -133,26 +133,25 @@ void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, con
 	}
 }
 
-void SerializerAMD64::add_function_call(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
+void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((script == this->script) and (!script->syntax->functions[func_no]->is_extern)){
-		add_cmd(Asm::INST_CALL, param_marker(list->get_label("_kaba_func_" + i2s(func_no))));
+	if ((f->tree->script == this->script) and (!f->is_extern)){
+		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
-		void *func = (void*)script->func[func_no];
-		if (!func)
-			DoErrorLink("could not link function " + script->syntax->functions[func_no]->signature(true));
-		int_p d = (int_p)func - (int_p)this->script->opcode;
+		if (!f->address)
+			do_error_link("could not link function " + f->signature(true));
+		int_p d = (int_p)f->address - (int_p)this->script->opcode;
 		if (d < 0)
 			d = -d;
 		if (d < 0x70000000){
 			// 32bit call distance
-			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (int_p)func)); // the actual call
+			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
 		}else{
 			// 64bit call distance
-			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (int_p)func));
+			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (int_p)f->address));
 			add_cmd(Asm::INST_CALL, p_rax);
 		}
 	}
@@ -162,17 +161,25 @@ void SerializerAMD64::add_function_call(Script *script, int func_no, const Seria
 
 void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
-	//DoError("virtual function call on amd64 not yet implemented!");
-
 	int push_size = fc_begin(instance, params, ret);
 
-	add_cmd(Asm::INST_MOV, p_rax, instance);
-	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax);
-	add_cmd(Asm::INST_ADD, p_rax, param_const(TypeInt, 8 * virtual_index));
-	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax);
+	add_cmd(Asm::INST_MOV, p_rax, instance); // self
+	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable
+	add_cmd(Asm::INST_ADD, p_rax, param_const(TypeInt, 8 * virtual_index)); // vtable + n
+	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable[n]
 	add_cmd(Asm::INST_CALL, p_rax); // the actual call
 
 	fc_end(push_size, instance, params, ret);
+}
+
+void SerializerAMD64::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
+{
+	int push_size = fc_begin(p_none, params, ret);
+
+	add_cmd(Asm::INST_MOV, p_rax, pointer);
+	add_cmd(Asm::INST_CALL, p_rax); // the actual call
+
+	fc_end(push_size, p_none, params, ret);
 }
 
 
@@ -215,7 +222,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 				stack_param.add(p);
 			}
 		}else
-			DoError("parameter type currently not supported: " + p->type->name);
+			do_error("parameter type currently not supported: " + p->type->name);
 	}
 
 	// xmm0-7
@@ -246,7 +253,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 		
 	// get parameters from stack
 	foreachb(Variable *p, stack_param){
-		DoError("func with stack...");
+		do_error("func with stack...");
 		/*int s = 8;
 		add_cmd(Asm::inst_push, p);
 		push_size += s;*/

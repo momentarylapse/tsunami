@@ -58,7 +58,7 @@ static string get_obs_name(VirtualBase *o)
 	string pp;
 	if (MESSAGE_DEBUG_LEVEL >= 4)
 		pp = "(" + p2s(o) + ")";
-	Kaba::Class *c = Kaba::GetDynamicType(o);
+	const Kaba::Class *c = Kaba::GetDynamicType(o);
 	if (c)
 		return "<kaba:" + c->name + ">" + pp;
 	return printify(typeid(*o).name()) + pp;

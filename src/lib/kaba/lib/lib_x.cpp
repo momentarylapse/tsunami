@@ -75,71 +75,71 @@ Model* __CreateObject(const string &filename, const vector &pos)
 extern int _class_override_num_params;
 
 
-Class *TypeBone;
-Class *TypeBoneList;
-Class *TypeModel;
-Class *TypeModelP;
-Class *TypeModelPPs;
-Class *TypeModelPList;
-Class *TypeModelPListPs;
-Class *TypeText;
-Class *TypeTextP;
-Class *TypePicture;
-Class *TypePicture3D;
-Class *TypeLayer;
-Class *TypeLayerP;
-Class *TypeFont;
-Class *TypeFontP;
-Class *TypeParticle;
-Class *TypeParticleRot;
-Class *TypeBeam;
-Class *TypeEffect;
-Class *TypeCamera;
-Class *TypeCameraP;
-Class *TypeController;
-Class *TypeSkin;
-Class *TypeSkinP;
-Class *TypeSkinPArray;
-Class *TypeSubSkin;
-Class *TypeSubSkinList;
-Class *TypeMaterial;
-Class *TypeMaterialP;
-Class *TypeMaterialPList;
-Class *TypeFog;
-Class *TypeLight;
-Class *TypeLightP;
-Class *TypeTraceData;
-Class *TypeTerrain;
-Class *TypeTerrainP;
-Class *TypeTerrainPList;
-Class *TypeLink;
-Class *TypeLinkSpring;
-Class *TypeLinkBall;
-Class *TypeLinkSlider;
-Class *TypeLinkHinge;
-Class *TypeLinkHinge2;
-Class *TypeLinkUniversal;
-Class *TypeEngineData;
-Class *TypeWorldData;
-Class *TypeNetworkData;
-Class *TypeHostData;
-Class *TypeHostDataList;
+const Class *TypeBone;
+const Class *TypeBoneList;
+const Class *TypeModel;
+const Class *TypeModelP;
+const Class *TypeModelPPs;
+const Class *TypeModelPList;
+const Class *TypeModelPListPs;
+const Class *TypeText;
+const Class *TypeTextP;
+const Class *TypePicture;
+const Class *TypePicture3D;
+const Class *TypeLayer;
+const Class *TypeLayerP;
+const Class *TypeFont;
+const Class *TypeFontP;
+const Class *TypeParticle;
+const Class *TypeParticleRot;
+const Class *TypeBeam;
+const Class *TypeEffect;
+const Class *TypeCamera;
+const Class *TypeCameraP;
+const Class *TypeController;
+const Class *TypeSkin;
+const Class *TypeSkinP;
+const Class *TypeSkinPArray;
+const Class *TypeSubSkin;
+const Class *TypeSubSkinList;
+const Class *TypeMaterial;
+const Class *TypeMaterialP;
+const Class *TypeMaterialPList;
+const Class *TypeFog;
+const Class *TypeLight;
+const Class *TypeLightP;
+const Class *TypeTraceData;
+const Class *TypeTerrain;
+const Class *TypeTerrainP;
+const Class *TypeTerrainPList;
+const Class *TypeLink;
+const Class *TypeLinkSpring;
+const Class *TypeLinkBall;
+const Class *TypeLinkSlider;
+const Class *TypeLinkHinge;
+const Class *TypeLinkHinge2;
+const Class *TypeLinkUniversal;
+const Class *TypeEngineData;
+const Class *TypeWorldData;
+const Class *TypeNetworkData;
+const Class *TypeHostData;
+const Class *TypeHostDataList;
 
-extern Class *TypeMatrix;
-extern Class *TypeMatrix3;
-extern Class *TypeFloatList;
-extern Class *TypeIntList;
-extern Class *TypeVectorList;
-extern Class *TypeVectorArray;
-extern Class *TypeFloatArray;
-extern Class *TypeFloatPs;
-extern Class *TypePlaneList;
-extern Class *TypeSocketP;
-extern Class *TypeSocketPList;
+extern const Class *TypeMatrix;
+extern const Class *TypeMatrix3;
+extern const Class *TypeFloatList;
+extern const Class *TypeIntList;
+extern const Class *TypeVectorList;
+extern const Class *TypeVectorArray;
+extern const Class *TypeFloatArray;
+extern const Class *TypeFloatPs;
+extern const Class *TypePlaneList;
+extern const Class *TypeSocketP;
+extern const Class *TypeSocketPList;
 //extern Type *TypeVertexBufferP; // -> script_data_nix.cpp
-extern Class *TypeTextureP; // -> script_data_nix.cpp
-extern Class *TypeTexturePList;
-extern Class *TypeShaderP;
+extern const Class *TypeTextureP; // -> script_data_nix.cpp
+extern const Class *TypeTexturePList;
+extern const Class *TypeShaderP;
 
 
 #ifdef _X_ALLOW_X_
@@ -357,7 +357,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Layer);
 
 	add_class(TypePicture);
-		TypePicture->derive_from(TypeLayer, false);
+		class_derive_from(TypeLayer, false, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAPicture(enabled));
 	//	class_add_element("pos",			TypeVector,		GetDAPicture(pos));
 	//	class_add_element("color",			TypeColor,		GetDAPicture(_color));
@@ -391,7 +391,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Picture);
 	
 	add_class(TypePicture3D);
-		TypePicture3D->derive_from(TypeLayer, false);
+		class_derive_from(TypeLayer, false, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAPicture3D(enabled));
 		class_add_element("lighting",		TypeBool,		GetDAPicture3D(lighting));
 		class_add_element("world_3d",		TypeBool,		GetDAPicture3D(world_3d));
@@ -421,7 +421,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Picture3d);
 	
 	add_class(TypeText);
-		TypeText->derive_from(TypeLayer, false);
+		class_derive_from(TypeLayer, false, false);
 	//	class_add_element("enabled",		TypeBool,		GetDAText(enabled));
 	//	class_add_element("pos",			TypeVector,		GetDAText(pos));
 	//	class_add_element("color",			TypeColor,		GetDAText(_color));
@@ -481,7 +481,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Particle);
 
 	add_class(TypeParticleRot);
-		TypeParticleRot->derive_from(TypeParticle, false);
+		class_derive_from(TypeParticle, false, false);
 		class_add_element("ang", TypeVector, GetDAParticle(parameter));
 		_class_override_num_params = 999;
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&ParticleRot::__init_ext__)));
@@ -500,7 +500,7 @@ void SIAddPackageX()
 		class_set_vtable_x(ParticleRot);
 
 	add_class(TypeBeam);
-		TypeBeam->derive_from(TypeParticle, false);
+		class_derive_from(TypeParticle, false, false);
 		class_add_element("length",			TypeVector,		GetDAParticle(parameter));
 		_class_override_num_params = 999;
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Beam::__init_ext__)));
@@ -810,7 +810,7 @@ void SIAddPackageX()
 			func_add_param("axis", TypeInt);
 
 	add_class(TypeLinkSpring);
-		TypeLinkSpring->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_spring__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -820,14 +820,14 @@ void SIAddPackageX()
 			func_add_param("k",			TypeFloat32);
 
 	add_class(TypeLinkBall);
-		TypeLinkBall->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_ball__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
 			func_add_param("p",			TypeVector);
 
 	add_class(TypeLinkHinge);
-		TypeLinkHinge->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_hinge__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -835,7 +835,7 @@ void SIAddPackageX()
 			func_add_param("ax",		TypeVector);
 
 	add_class(TypeLinkHinge2);
-		TypeLinkHinge2->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_hinge2__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -844,7 +844,7 @@ void SIAddPackageX()
 			func_add_param("ax2",		TypeVector);
 
 	add_class(TypeLinkSlider);
-		TypeLinkSlider->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_slider__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);
@@ -852,7 +852,7 @@ void SIAddPackageX()
 
 
 	add_class(TypeLinkUniversal);
-		TypeLinkUniversal->derive_from(TypeLink, false);
+		class_derive_from(TypeLink, false, false);
 		class_add_func(IDENTIFIER_FUNC_INIT,							TypeVoid,	x_p(mf(&Link::__init_universal__)));
 			func_add_param("o1",		TypeModelP);
 			func_add_param("o2",		TypeModelP);

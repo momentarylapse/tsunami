@@ -81,10 +81,10 @@ Script *CreateForSource(const string &buffer, bool just_analyse)
 	Script *s = new Script;
 	s->just_analyse = just_analyse;
 	try{
-		s->syntax->ParseBuffer(buffer, just_analyse);
+		s->syntax->parse_buffer(buffer, just_analyse);
 
 		if (!just_analyse)
-			s->Compiler();
+			s->compile();
 	}catch(const Exception &e){
 		delete(s);
 		throw e;
@@ -140,11 +140,11 @@ void DeleteAllScripts(bool even_immortal, bool force)
 }
 
 
-Class *GetDynamicType(const void *p)
+const Class *GetDynamicType(const void *p)
 {
 	VirtualTable *pp = *(VirtualTable**)p;
 	for (Script *s: _public_scripts_){
-		for (Class *t: s->syntax->classes){
+		for (auto *t: s->syntax->classes){
 			if (t->vtable.data == pp)
 				return t;
 		}
@@ -164,11 +164,11 @@ void Script::Load(const string &_filename, bool _just_analyse)
 
 	// read file
 		string buffer = FileReadText(config.directory + filename);
-		syntax->ParseBuffer(buffer, just_analyse);
+		syntax->parse_buffer(buffer, just_analyse);
 
 
 		if (!just_analyse)
-			Compiler();
+			compile();
 		/*if (pre_script->FlagShow)
 			pre_script->Show();*/
 		if ((!just_analyse) and (config.verbose)){
@@ -179,7 +179,7 @@ void Script::Load(const string &_filename, bool _just_analyse)
 
 	}catch(FileError &e){
 		loading_script_stack.pop();
-		DoError("script file not loadable: " + filename);
+		do_error("script file not loadable: " + filename);
 	}catch(Exception &e){
 		loading_script_stack.pop();
 		throw e;
@@ -187,19 +187,19 @@ void Script::Load(const string &_filename, bool _just_analyse)
 	loading_script_stack.pop();
 }
 
-void Script::DoError(const string &str, int override_line)
+void Script::do_error(const string &str, int override_line)
 {
-	syntax->DoError(str, 0, override_line);
+	syntax->do_error(str, 0, override_line);
 }
 
-void Script::DoErrorInternal(const string &str)
+void Script::do_error_internal(const string &str)
 {
-	DoError("internal compiler error: " + str, 0);
+	do_error("internal compiler error: " + str, 0);
 }
 
-void Script::DoErrorLink(const string &str)
+void Script::do_error_link(const string &str)
 {
-	DoError(str, 0);
+	do_error(str, 0);
 }
 
 void Script::SetVariable(const string &name, void *data)
@@ -268,18 +268,18 @@ void ExecuteSingleScriptCommand(const string &cmd)
 // analyse syntax
 
 	// create a main() function
-	Function *func = ps->AddFunction("--command-func--", TypeVoid);
+	Function *func = ps->add_function("--command-func--", TypeVoid);
 	func->_var_size = 0; // set to -1...
 
 	// parse
 	ps->Exp.reset_parser();
-	ps->ParseCompleteCommand(func->block);
+	ps->parse_complete_command(func->block);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
 
 	ps->ConvertCallByReference();
 
 // compile
-	s->Compiler();
+	s->compile();
 
 	/*if (true){
 		printf("%s\n\n", Opcode2Asm(s->ThreadOpcode,s->ThreadOpcodeSize));
@@ -310,7 +310,7 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 	va_end(marker);
 
 	// match
-	foreachi(Function *f, syntax->functions, i)
+	for (Function *f: syntax->functions)
 		if (((f->name == name) or (name == "*")) and (f->literal_return_type->name == return_type) and (num_params == f->num_params)){
 
 			bool params_ok = true;
@@ -322,7 +322,7 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 				if (just_analyse)
 					return (void*)0xdeadbeaf;
 				else
-					return (void*)func[i];
+					return f->address;
 			}
 		}
 
@@ -339,12 +339,12 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 		param_type.add(string(va_arg(marker, char*)));
 	va_end(marker);
 
-	Class *root_type = syntax->FindType(_class);
+	const Class *root_type = syntax->find_type_by_name(_class);
 	if (!root_type)
 		return nullptr;
 
 	// match
-	foreachi(Function *f, syntax->functions, i){
+	for (Function *f: syntax->functions){
 		if (!f->_class)
 			continue;
 		if (!f->_class->is_derived_from(root_type))
@@ -360,7 +360,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 				if (just_analyse)
 					return (void*)0xdeadbeaf;
 				else
-					return (void*)func[i];
+					return f->address;
 			}
 		}
 	}
@@ -368,7 +368,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 	return nullptr;
 }
 
-void print_var(void *p, const string &name, Class *t)
+void print_var(void *p, const string &name, const Class *t)
 {
 	msg_write(t->name + " " + name + " = " + t->var2str(p));
 }

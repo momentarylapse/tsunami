@@ -35,15 +35,15 @@ namespace Kaba{
 // we're always using math types
 #define type_p(p)			(void*)p
 
-extern Class *TypeComplexList;
-extern Class *TypeFloatList;
-extern Class *TypeVectorList;
-extern Class *TypeMatrix;
-extern Class *TypePlane;
-extern Class *TypePlaneList;
-extern Class *TypeMatrix3;
-extern Class *TypeIntList;
-extern Class *TypeFloatPs;
+extern const Class *TypeComplexList;
+extern const Class *TypeFloatList;
+extern const Class *TypeVectorList;
+extern const Class *TypeMatrix;
+extern const Class *TypePlane;
+extern const Class *TypePlaneList;
+extern const Class *TypeMatrix3;
+extern const Class *TypeIntList;
+extern const Class *TypeFloatPs;
 
 
 float _cdecl f_sqr(float f){	return f*f;	}
@@ -389,18 +389,18 @@ void SIAddPackageMath()
 	TypePlaneList = add_type_a("plane[]", TypePlane, -1);
 	TypeColor = add_type("color", sizeof(color));
 	TypeMatrix3 = add_type("matrix3", sizeof(matrix3));
-	Class *TypeFloatArray3 = add_type_a("float[3]", TypeFloat32, 3);
-	Class *TypeFloatArray4 = add_type_a("float[4]", TypeFloat32, 4);
-	Class *TypeFloatArray4x4 = add_type_a("float[4][4]", TypeFloatArray4, 4);
-	Class *TypeFloatArray16 = add_type_a("float[16]", TypeFloat32, 16);
-	Class *TypeFloatArray3x3 = add_type_a("float[3][3]", TypeFloatArray3, 3);
-	Class *TypeFloatArray9 = add_type_a("float[9]", TypeFloat32, 9);
-	Class *TypeVli = add_type("vli", sizeof(vli));
-	Class *TypeCrypto = add_type("Crypto", sizeof(Crypto));
-	Class *TypeAny = add_type("any", sizeof(Any));
-	Class *TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
-	Class *TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
-	Class *TypeRandom = add_type("Random", sizeof(Random));
+	const Class *TypeFloatArray3 = add_type_a("float[3]", TypeFloat32, 3);
+	const Class *TypeFloatArray4 = add_type_a("float[4]", TypeFloat32, 4);
+	const Class *TypeFloatArray4x4 = add_type_a("float[4][4]", TypeFloatArray4, 4);
+	const Class *TypeFloatArray16 = add_type_a("float[16]", TypeFloat32, 16);
+	const Class *TypeFloatArray3x3 = add_type_a("float[3][3]", TypeFloatArray3, 3);
+	const Class *TypeFloatArray9 = add_type_a("float[9]", TypeFloat32, 9);
+	const Class *TypeVli = add_type("vli", sizeof(vli));
+	const Class *TypeCrypto = add_type("Crypto", sizeof(Crypto));
+	const Class *TypeAny = add_type("any", sizeof(Any));
+	const Class *TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
+	const Class *TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
+	const Class *TypeRandom = add_type("Random", sizeof(Random));
 	
 	
 	add_class(TypeIntList);

@@ -1,8 +1,8 @@
 #include "../../base/base.h"
 #include "../../file/file.h"
 #include "lexical.h"
-#include "syntax_tree.h"
 #include <stdio.h>
+#include "SyntaxTree.h"
 
 namespace Kaba{
 
@@ -249,7 +249,7 @@ bool ExpressionBuffer::DoMultiLineComment(const char *source, int &pos)
 				return false;
 			}
 		}else if (source[pos] == 0){
-			syntax->DoError("comment exceeds end of file");
+			syntax->do_error("comment exceeds end of file");
 		}
 		pos ++;
 	}
@@ -265,7 +265,7 @@ void ExpressionBuffer::DoAsmBlock(const char *source, int &pos, int &line_no)
 		if (source[pos] == '{')
 			break;
 		if ((source[pos] != ' ') and (source[pos] != '\t') and (source[pos] != '\n'))
-			syntax->DoError("'{' expected after \"asm\"");
+			syntax->do_error("'{' expected after \"asm\"");
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -278,7 +278,7 @@ void ExpressionBuffer::DoAsmBlock(const char *source, int &pos, int &line_no)
 		if (source[pos] == '}')
 			break;
 		if (source[pos] == 0)
-			syntax->DoError("'}' expected to end \"asm\"");
+			syntax->do_error("'}' expected to end \"asm\"");
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -349,7 +349,7 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 			if ((c == '\"') and (i > 0)){
 				break;
 			}else if (c == 0){
-				syntax->DoError("string exceeds file");
+				syntax->do_error("string exceeds file");
 			}else if (c == '\n'){
 				line_no ++;
 				//syntax->DoError("string exceeds line");
@@ -369,7 +369,7 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 					else if (source[pos] == '0')
 						Temp[TempLength - 1] = '\0';
 					else
-						syntax->DoError("unknown escape in string");
+						syntax->do_error("unknown escape in string");
 					pos ++;
 				}
 				continue;
@@ -392,7 +392,7 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 		Temp[TempLength ++] = source[pos ++];
 		Temp[TempLength ++] = source[pos ++];
 		if (Temp[TempLength - 1] != '\'')
-			syntax->DoError("character constant should end with '''");
+			syntax->do_error("character constant should end with '''");
 
 	// word
 	}else if (ExpKind == ExpKindLetter){

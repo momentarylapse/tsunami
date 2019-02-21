@@ -181,12 +181,12 @@ void SIAddPackageFile()
 {
 	add_package("file", false);
 
-	Class *TypeFile = add_type("File", 0);
-	Class *TypeFileP = add_type_p("File*", TypeFile);
-	Class *TypeDate = add_type("Date", sizeof(Date));
-	Class *TypeDirEntry = add_type("DirEntry", sizeof(DirEntry));
-	Class *TypeDirEntryList = add_type_a("DirEntry[]", TypeDirEntry, -1);
-	Class *TypeFileError = add_type("FileError", sizeof(KabaFileError));
+	const Class *TypeFile = add_type("File", 0);
+	const Class *TypeFileP = add_type_p("File*", TypeFile);
+	const Class *TypeDate = add_type("Date", sizeof(Date));
+	const Class *TypeDirEntry = add_type("DirEntry", sizeof(DirEntry));
+	const Class *TypeDirEntryList = add_type_a("DirEntry[]", TypeDirEntry, -1);
+	const Class *TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));
 
@@ -260,7 +260,7 @@ void SIAddPackageFile()
 		class_add_func("str", TypeString, mf(&DirEntryList::str));
 
 	add_class(TypeFileError);
-		TypeFileError->derive_from(TypeException, false);
+		class_derive_from(TypeException, false, false);
 		class_set_vtable(KabaFileError);
 
 	// file access

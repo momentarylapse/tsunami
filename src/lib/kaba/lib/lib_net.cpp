@@ -25,15 +25,15 @@ namespace Kaba{
 	#define x_p(p)		NULL
 #endif
 
-extern Class *TypeIntPs;
-extern Class *TypeFloatPs;
-extern Class *TypeBoolPs;
-extern Class *TypeCharPs;
+extern const Class *TypeIntPs;
+extern const Class *TypeFloatPs;
+extern const Class *TypeBoolPs;
+extern const Class *TypeCharPs;
 
-Class *TypeNetAddress;
-Class *TypeSocket;
-Class *TypeSocketP;
-Class *TypeSocketPList;
+const Class *TypeNetAddress;
+const Class *TypeSocket;
+const Class *TypeSocketP;
+const Class *TypeSocketPList;
 
 void SIAddPackageNet()
 {

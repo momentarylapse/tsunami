@@ -1,7 +1,7 @@
 #include "../../base/base.h"
 #include "../kaba.h"
 #include "../../file/file.h"
-#include "class.h"
+#include "Class.h"
 
 namespace Kaba{
 
@@ -22,37 +22,31 @@ string ClassElement::signature(bool include_class) const
 
 ClassFunction::ClassFunction()
 {
-	nr = -1;
+	func = nullptr;
 	virtual_index = -1;
 	needs_overriding = false;
 	return_type = nullptr;
 	script = nullptr;
 }
 
-ClassFunction::ClassFunction(const string &_name, Class *_return_type, Script *s, int no)
+ClassFunction::ClassFunction(const string &_name, const Class *_return_type, Script *s, Function *_f)
 {
 	name = _name;
 	return_type = _return_type;
 	script = s;
-	nr = no;
+	func = _f;
 	virtual_index = -1;
 	needs_overriding = false;
 }
 
-Function* ClassFunction::func() const
-{
-	return script->syntax->functions[nr];
-}
-
 string ClassFunction::signature(bool include_class) const
 {
-	Function* f = func();
 	if (needs_overriding)
-		return f->signature(include_class) + " [NEEDS OVERRIDING]";
-	return f->signature(include_class);
+		return func->signature(include_class) + " [NEEDS OVERRIDING]";
+	return func->signature(include_class);
 }
 
-bool type_match(Class *given, Class *wanted)
+bool type_match(const Class *given, const Class *wanted)
 {
 	// exact match?
 	if (given == wanted)
@@ -75,7 +69,7 @@ bool type_match(Class *given, Class *wanted)
 
 
 // allow same classes... TODO deprecate...
-bool _type_match(Class *given, bool same_chunk, Class *wanted)
+bool _type_match(const Class *given, bool same_chunk, const Class *wanted)
 {
 	if ((same_chunk) and (wanted == TypeChunk))
 		return true;
@@ -83,7 +77,7 @@ bool _type_match(Class *given, bool same_chunk, Class *wanted)
 	return type_match(given, wanted);
 }
 
-Class::Class(const string &_name, int _size, SyntaxTree *_owner, Class *_parent)
+Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent)
 {
 	name = _name;
 	owner = _owner;
@@ -167,7 +161,7 @@ bool Class::usable_as_super_array() const
 	return false;
 }
 
-Class *Class::get_array_element() const
+const Class *Class::get_array_element() const
 {
 	if (is_array() or is_super_array() or is_dict())
 		return parent;
@@ -341,12 +335,12 @@ void Class::link_virtual_table()
 	// link virtual functions into vtable
 	for (ClassFunction &cf: functions){
 		if (cf.virtual_index >= 0){
-			if (cf.nr >= 0){
+			if (cf.func){
 				//msg_write(i2s(cf.virtual_index) + ": " + cf.GetFunc()->name);
 				if (cf.virtual_index >= vtable.num)
-					owner->DoError("LinkVirtualTable");
+					owner->do_error("LinkVirtualTable");
 					//vtable.resize(cf.virtual_index + 1);
-				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
+				vtable[cf.virtual_index] = cf.func->address;
 			}
 		}
 		if (cf.needs_overriding){
@@ -363,8 +357,8 @@ void Class::link_external_virtual_table(void *p)
 	int max_vindex = 1;
 	for (ClassFunction &cf: functions)
 		if (cf.virtual_index >= 0){
-			if (cf.nr >= 0)
-				cf.script->func[cf.nr] = (t_func*)t[cf.virtual_index];
+			if (cf.func)
+				cf.func->address = t[cf.virtual_index];
 			if (cf.virtual_index >= vtable.num)
 				max_vindex = max(max_vindex, cf.virtual_index);
 		}
@@ -398,14 +392,14 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 }
 
 
-Class *Class::get_pointer() const
+const Class *Class::get_pointer() const
 {
-	return owner->CreateNewClass(name + "*", Class::Type::POINTER, config.pointer_size, 0, const_cast<Class*>(this));
+	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, this);
 }
 
-Class *Class::get_root() const
+const Class *Class::get_root() const
 {
-	Class *r = const_cast<Class*>(this);
+	const Class *r = this;
 	while (r->parent)
 		r = r->parent;
 	return r;
@@ -414,17 +408,16 @@ Class *Class::get_root() const
 void class_func_out(Class *c, ClassFunction *f)
 {
 	string ps;
-	for (Class *p: f->param_types)
+	for (auto *p: f->param_types)
 		ps += "  " + p->name;
 	msg_write(c->name + "." + f->name + ps);
 }
 
-void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool override)
+void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool override)
 {
-	Function *f = s->functions[func_no];
 	ClassFunction cf;
 	cf.name = f->name.substr(name.num + 1, -1);
-	cf.nr = func_no;
+	cf.func = f;
 	cf.script = s->script;
 	cf.return_type = f->return_type;
 	for (int i=0; i<f->num_params; i++)
@@ -443,15 +436,15 @@ void Class::add_function(SyntaxTree *s, int func_no, bool as_virtual, bool overr
 		if (class_func_match(cf, ocf))
 			orig = &ocf;
 	if (override and !orig)
-		s->DoError(format("can not override function %s, no previous definition", f->signature(true).c_str()), f->_exp_no, f->_logical_line_no);
+		s->do_error(format("can not override function %s, no previous definition", f->signature(true).c_str()), f->_exp_no, f->_logical_line_no);
 	if (!override and orig){
 		msg_write(f->signature(true));
 		msg_write(orig->signature(true));
-		s->DoError(format("function %s is already defined, use '%s'", f->signature(true).c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
+		s->do_error(format("function %s is already defined, use '%s'", f->signature(true).c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
 	}
 	if (override){
 		orig->script = cf.script;
-		orig->nr = cf.nr;
+		orig->func = cf.func;
 		orig->needs_overriding = false;
 		orig->param_types = cf.param_types;
 	}else
@@ -492,7 +485,7 @@ void *Class::create_instance() const
 	ClassFunction *c = get_default_constructor();
 	if (c){
 		typedef void con_func(void *);
-		con_func * f = (con_func*)c->script->func[c->nr];
+		con_func * f = (con_func*)c->func->address;
 		if (f)
 			f(p);
 	}

@@ -81,7 +81,7 @@ void Curve::Target::enumerateModule(Module *c, Array<Target> &list, const string
 		enumerateType((char*)pd, pd->_class, list, prefix, prefix_nice);
 }
 
-void Curve::Target::enumerateType(char *pp, Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerateType(char *pp, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
 	if (t->name == "float"){
 		list.add(Target((float*)pp, prefix, prefix_nice));

@@ -8,13 +8,10 @@
 namespace Kaba{
 
 
-extern int GlobalWaitingMode;
-extern float GlobalTimeToWait;
-
 
 int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
-	Class *type = ret.get_type_save();
+	const Class *type = ret.get_type_save();
 
 	// return data too big... push address
 	SerialNodeParam ret_ref;
@@ -61,7 +58,7 @@ int SerializerX86::fc_begin(const SerialNodeParam &instance, const Array<SerialN
 
 void SerializerX86::fc_end(int push_size, const SerialNodeParam &ret)
 {
-	Class *type = ret.get_type_save();
+	const Class *type = ret.get_type_save();
 
 	if (push_size > 127)
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_ESP), param_const(TypeInt, push_size));
@@ -87,17 +84,16 @@ void SerializerX86::fc_end(int push_size, const SerialNodeParam &ret)
 	}
 }
 
-void SerializerX86::add_function_call(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
+void SerializerX86::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((script == this->script) and (!script->syntax->functions[func_no]->is_extern)){
-		add_cmd(Asm::INST_CALL, param_marker(list->get_label("_kaba_func_" + i2s(func_no))));
+	if ((f->tree->script == this->script) and (!f->is_extern)){
+		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
-		void *func = (void*)script->func[func_no];
-		if (!func)
-			DoErrorLink("could not link function " + script->syntax->functions[func_no]->signature(true));
-		add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)func)); // the actual call
+		if (!f->address)
+			do_error_link("could not link function " + f->signature(true));
+		add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)f->address)); // the actual call
 		// function pointer will be shifted later...
 	}
 
@@ -117,6 +113,19 @@ void SerializerX86::add_virtual_function_call(int virtual_index, const SerialNod
 	fc_end(push_size, ret);
 }
 
+void SerializerX86::add_pointer_call(const SerialNodeParam &pointer, const Array<SerialNodeParam> &param, const SerialNodeParam &ret)
+{
+	do_error("pointer call");
+}
+
+int func_index(Function *f)
+{
+	foreachi(Function *ff, f->tree->functions, i)
+		if (ff == f)
+			return i;
+	return -1;
+}
+
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
 SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int index)
@@ -127,15 +136,16 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 	p.p = 0;
 	p.shift = 0;
 
-	if (link->kind == KIND_VAR_FUNCTION){
+	if (link->kind == KIND_FUNCTION_POINTER){
 		p.p = (int_p)link->as_func_p();
-		p.kind = KIND_VAR_GLOBAL;
+		p.kind = KIND_IMMEDIATE;//KIND_VAR_GLOBAL;
 		if (!p.p){
 			if (link->script == script){
-				p.p = link->link_no + 0xefef0000;
-				script->function_vars_to_link.add(link->link_no);
+				int index = func_index(link->as_func());
+				p.p = index + 0xefef0000;
+				script->function_vars_to_link.add(index);
 			}else
-				DoErrorLink("could not link function as variable: " + link->as_func()->name);
+				do_error_link("could not link function as variable: " + link->as_func()->name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}
@@ -148,9 +158,9 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 	}else if (link->kind == KIND_VAR_GLOBAL){
 		p.p = (int_p)link->as_global_p();
 		if (!p.p)
-			script->DoErrorLink("variable is not linkable: " + link->as_global()->name);
+			script->do_error_link("variable is not linkable: " + link->as_global()->name);
 	}else if (link->kind == KIND_VAR_LOCAL){
-		p.p = link->as_local(cur_func)->_offset;
+		p.p = link->as_local()->_offset;
 	}else if (link->kind == KIND_LOCAL_MEMORY){
 		p.p = link->link_no;
 		p.kind = KIND_VAR_LOCAL;
@@ -163,8 +173,8 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		else
 			p.kind = KIND_REF_TO_CONST;
 		p.p = (int_p)link->as_const_p();
-	}else if ((link->kind == KIND_OPERATOR) or (link->kind == KIND_FUNCTION) or (link->kind == KIND_INLINE_FUNCTION) or (link->kind == KIND_VIRTUAL_FUNCTION) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
-		p = SerializeNode(link, block, index);
+	}else if ((link->kind == KIND_OPERATOR) or (link->kind == KIND_FUNCTION_CALL) or (link->kind == KIND_INLINE_CALL) or (link->kind == KIND_VIRTUAL_CALL) or (link->kind == KIND_STATEMENT) or (link->kind==KIND_ARRAY_BUILDER)){
+		p = serialize_node(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
 		SerialNodeParam param = SerializeParameter(link->params[0], block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
@@ -182,46 +192,79 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		// only used by <new> operator
 		p.p = link->link_no;
 	}else{
-		DoError("unexpected type of parameter: " + kind2str(link->kind));
+		do_error("unexpected type of parameter: " + kind2str(link->kind));
 	}
 	return p;
 }
 
-void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index, int marker_before_params)
+void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index)
 {
 	switch(com->link_no){
 		case STATEMENT_IF:{
+			int m_after_true = list->create_label("_IF_AFTER_" + i2s(num_markers ++));
+			param[0] = SerializeParameter(com->params[0], block, index); // if
 			// cmp;  jz m;  -block-  m;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::INST_JZ, param_marker(m_after_true));
+			serialize_block(com->params[1]->as_block());
+			add_marker(m_after_true);
 			}break;
 		case STATEMENT_IF_ELSE:{
+			int m_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_markers ++));
+			int m_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_markers ++));
+			param[0] = SerializeParameter(com->params[0], block, index); // if
 			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(block->level, index + 1);
-			int m_after_false = add_marker_after_command(block->level, index + 2);
 			add_cmd(Asm::INST_JZ, param_marker(m_after_true)); // jz ...
-			add_jump_after_command(block->level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
+			serialize_block(com->params[1]->as_block());
+			add_cmd(Asm::INST_JMP, param_marker(m_after_false));
+			add_marker(m_after_true);
+			serialize_block(com->params[2]->as_block());
+			add_marker(m_after_false);
 			}break;
-		case STATEMENT_WHILE:
-		case STATEMENT_FOR:{
+		case STATEMENT_WHILE:{
+			int marker_before_while = list->create_label("_WHILE_BEFORE_" + i2s(num_markers ++));
+			int marker_after_while = list->create_label("_WHILE_AFTER_" + i2s(num_markers ++));
+			add_marker(marker_before_while);
+			param[0] = SerializeParameter(com->params[0], block, index); // while
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int marker_after_while = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::INST_JZ, param_marker(marker_after_while));
-			add_jump_after_command(block->level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
 
-			int marker_continue = marker_before_params;
-			if (com->link_no == STATEMENT_FOR){
-				// NextCommand is a block!
-				if (next_node->kind != KIND_BLOCK)
-					DoError("command block in \"for\" loop missing");
-				marker_continue = add_marker_after_command(block->level + 1, next_node->as_block()->nodes.num - 2);
-			}
-			LoopData l = {marker_continue, marker_after_while, block->level, index};
+			// body of loop
+			LoopData l = {marker_before_while, marker_after_while, block->level, index};
 			loop.add(l);
+			serialize_block(com->params[1]->as_block());
+			loop.pop();
+
+			add_cmd(Asm::INST_JMP, param_marker(marker_before_while));
+			add_marker(marker_after_while);
+			}break;
+		case STATEMENT_FOR:{
+			int marker_before_for = list->create_label("_FOR_BEFORE_" + i2s(num_markers ++));
+			int marker_after_for = list->create_label("_FOR_AFTER_" + i2s(num_markers ++));
+			int marker_continue = list->create_label("_FOR_CONTINUE_" + i2s(num_markers ++));
+			serialize_node(com->params[0], block, index); // i=0
+			add_marker(marker_before_for);
+			param[1] = SerializeParameter(com->params[1], block, index); // for
+			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
+			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
+			add_cmd(Asm::INST_CMP, param[1], param_const(TypeBool, 0x0));
+			add_cmd(Asm::INST_JZ, param_marker(marker_after_for));
+
+			// body of loop
+			LoopData l = {marker_continue, marker_after_for, block->level, index};
+			loop.add(l);
+			serialize_block(com->params[2]->as_block());
+			loop.pop();
+
+			// "i++"
+			add_marker(marker_continue);
+			serialize_node(com->params[3], block, index);
+
+			add_cmd(Asm::INST_JMP, param_marker(marker_before_for));
+			add_marker(marker_after_for);
 			}break;
 		case STATEMENT_BREAK:
 			add_cmd(Asm::INST_JMP, param_marker(loop.back().marker_break));
@@ -231,6 +274,7 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			break;
 		case STATEMENT_RETURN:
 			if (com->params.num > 0){
+				param[0] = SerializeParameter(com->params[0], block, index); // operand
 				if (cur_func->return_type->uses_return_by_memory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
 					FillInDestructorsBlock(block, true);
 					// internally handled...
@@ -292,36 +336,38 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			}
 			break;
 		case STATEMENT_NEW:{
-			Array<Node*> links = syntax_tree->GetExistence("@malloc", nullptr);
+			Array<Node*> links = syntax_tree->get_existence("@malloc", nullptr);
 			if (links.num == 0)
-				DoError("@malloc not found????");
-			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param_const(TypeInt, ret.type->parent->size), ret);
+				do_error("@malloc not found????");
+			AddFunctionCall(links[0]->as_func(), p_none, param_const(TypeInt, ret.type->parent->size), ret);
 			if (com->params.num > 0){
 				// copy + edit command
 				Node sub = *com->params[0];
 				Node c_ret(KIND_VAR_TEMP, ret.p, script, ret.type);
 				sub.instance = &c_ret;
-				SerializeNode(&sub, block, index);
+				serialize_node(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
 			clear_nodes(links);
 			break;}
 		case STATEMENT_DELETE:{
+			param[0] = SerializeParameter(com->params[0], block, index); // operand
 			add_cmd_destructor(param[0], false);
-			Array<Node*> links = syntax_tree->GetExistence("@free", nullptr);
+			Array<Node*> links = syntax_tree->get_existence("@free", nullptr);
 			if (links.num == 0)
-				DoError("@free not found????");
-			AddFunctionCall(links[0]->script, links[0]->link_no, p_none, param[0], p_none);
+				do_error("@free not found????");
+			AddFunctionCall(links[0]->as_func(), p_none, param[0], p_none);
 			clear_nodes(links);
 			break;}
 		case STATEMENT_RAISE:
 			//AddFunctionCall();
 			break;
-		case STATEMENT_TRY:
-			break;
-		case STATEMENT_EXCEPT:{
-			int m_after_block = add_marker_after_command(block->level, index + 1);
-			add_cmd(Asm::INST_JMP, param_marker(m_after_block));
+		case STATEMENT_TRY:{
+			int marker_finish = list->create_label("_TRY_AFTER_" + i2s(num_markers ++));
+			serialize_block(com->params[0]->as_block());
+			add_cmd(Asm::INST_JMP, param_marker(marker_finish));
+			serialize_block(com->params[2]->as_block());
+			add_marker(marker_finish);
 			}break;
 		case STATEMENT_ASM:
 			add_cmd(INST_ASM);
@@ -329,7 +375,7 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 		case STATEMENT_PASS:
 			break;
 		default:
-			DoError("statement unimplemented: " + Statements[com->link_no].name);
+			do_error("statement unimplemented: " + Statements[com->link_no].name);
 	}
 }
 
@@ -923,7 +969,7 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 			}
 			break;
 		default:
-			DoError("inline function unimplemented: #" + i2s(index));
+			do_error("inline function unimplemented: #" + i2s(index));
 	}
 }
 
@@ -1048,7 +1094,7 @@ void SerializerX86::ProcessReferences()
 					set_virtual_reg(r, i, i+1);
 				}
 			}else{
-				DoError("reference in x86: " + cmd[i].p[1].str());
+				do_error("reference in x86: " + cmd[i].p[1].str(this));
 			}
 		}
 }
@@ -1070,7 +1116,7 @@ void SerializerX86::DoMapping()
 	if (config.verbose and config.allow_output(cur_func, "map:b"))
 		cmd_list_out("post temp -> stack");
 
-	ResolveDerefTempAndLocal();
+	resolve_deref_temp_and_local();
 
 	if (config.verbose and config.allow_output(cur_func, "map:c"))
 		cmd_list_out("post deref t&l");

@@ -13,7 +13,7 @@ struct Function;
 
 struct ClassElement{
 	string name;
-	Class *type;
+	const Class *type;
 	long long offset;
 	bool hidden;
 	ClassElement();
@@ -24,15 +24,14 @@ struct ClassElement{
 struct ClassFunction{
 	string name;
 	Script *script;
-	int nr; // index in SyntaxTree.functions[]
+	Function *func;
 	// _func_(x)  ->  p.func(x)
-	Array<Class*> param_types; // literal!
-	Class *return_type; // literal!
+	Array<const Class*> param_types; // literal!
+	const Class *return_type; // literal!
 	int virtual_index;
 	bool needs_overriding;
 	ClassFunction();
-	ClassFunction(const string &name, Class *return_type, Script *s, int no);
-	Function *func() const;
+	ClassFunction(const string &name, const Class *return_type, Script *s, Function *f);
 	string signature(bool include_class) const;
 };
 
@@ -41,7 +40,7 @@ typedef void *VirtualTable;
 class Class{
 public:
 	//Class();
-	Class(const string &name, int size, SyntaxTree *owner, Class *parent = nullptr);
+	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr);
 	~Class();
 	string name;
 	long long size; // complete size of type
@@ -65,7 +64,7 @@ public:
 	bool fully_parsed;
 	Array<ClassElement> elements;
 	Array<ClassFunction> functions;
-	Class *parent;
+	const Class *parent;
 	SyntaxTree *owner; // to share and be able to delete...
 	Array<void*> vtable;
 	void *_vtable_location_compiler_; // may point to const/opcode
@@ -77,16 +76,16 @@ public:
 	bool uses_return_by_memory() const;
 	bool is_simple_class() const;
 	bool is_size_known() const;
-	Class *get_array_element() const;
+	const Class *get_array_element() const;
 	bool usable_as_super_array() const;
 	bool needs_constructor() const;
 	bool needs_destructor() const;
 	bool is_derived_from(const Class *root) const;
 	bool is_derived_from_s(const string &root) const;
 	bool derive_from(const Class *root, bool increase_size);
-	Class *get_pointer() const;
-	Class *get_root() const;
-	void add_function(SyntaxTree *s, int func_no, bool as_virtual = false, bool override = false);
+	const Class *get_pointer() const;
+	const Class *get_root() const;
+	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
 	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = nullptr) const;
 	ClassFunction *get_same_func(const string &name, Function *f) const;
 	ClassFunction *get_default_constructor() const;
@@ -100,37 +99,37 @@ public:
 	void *create_instance() const;
 	string var2str(void *p) const;
 };
-extern Class *TypeUnknown;
-extern Class *TypeReg128; // dummy for compilation
-extern Class *TypeReg64; // dummy for compilation
-extern Class *TypeReg32; // dummy for compilation
-extern Class *TypeReg16; // dummy for compilation
-extern Class *TypeReg8; // dummy for compilation
-extern Class *TypeVoid;
-extern Class *TypePointer;
-extern Class *TypeChunk;
-extern Class *TypeFunction;
-extern Class *TypeFunctionP;
-extern Class *TypeBool;
-extern Class *TypeInt;
-extern Class *TypeInt64;
-extern Class *TypeFloat32;
-extern Class *TypeFloat64;
-extern Class *TypeChar;
-extern Class *TypeCString;
-extern Class *TypeString;
+extern const Class *TypeUnknown;
+extern const Class *TypeReg128; // dummy for compilation
+extern const Class *TypeReg64; // dummy for compilation
+extern const Class *TypeReg32; // dummy for compilation
+extern const Class *TypeReg16; // dummy for compilation
+extern const Class *TypeReg8; // dummy for compilation
+extern const Class *TypeVoid;
+extern const Class *TypePointer;
+extern const Class *TypeChunk;
+extern const Class *TypeFunction;
+extern const Class *TypeFunctionP;
+extern const Class *TypeBool;
+extern const Class *TypeInt;
+extern const Class *TypeInt64;
+extern const Class *TypeFloat32;
+extern const Class *TypeFloat64;
+extern const Class *TypeChar;
+extern const Class *TypeCString;
+extern const Class *TypeString;
 
-extern Class *TypeComplex;
-extern Class *TypeVector;
-extern Class *TypeRect;
-extern Class *TypeColor;
-extern Class *TypeQuaternion;
+extern const Class *TypeComplex;
+extern const Class *TypeVector;
+extern const Class *TypeRect;
+extern const Class *TypeColor;
+extern const Class *TypeQuaternion;
 
-extern Class *TypeException;
-extern Class *TypeExceptionP;
+extern const Class *TypeException;
+extern const Class *TypeExceptionP;
 
-extern Class *TypeClass;
-extern Class *TypeClassP;
+extern const Class *TypeClass;
+extern const Class *TypeClassP;
 
 };
 

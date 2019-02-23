@@ -34,6 +34,8 @@ const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
 const string IDENTIFIER_FUNC_DELETE = "__delete__";
 const string IDENTIFIER_FUNC_ASSIGN = "__assign__";
+const string IDENTIFIER_FUNC_GET = "__get__";
+const string IDENTIFIER_FUNC_SUBARRAY = "__subarray__";
 const string IDENTIFIER_SUPER = "super";
 const string IDENTIFIER_SELF = "self";
 const string IDENTIFIER_EXTENDS = "extends";
@@ -342,7 +344,8 @@ void _class_add_func_virtual(const string &tname, const string &name, const Clas
 {
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
-	add_func(tname + "." + name + "[virtual]", return_type, nullptr, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
+	add_func(name, return_type, nullptr, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
+	cur_func->long_name = tname + "." + name + "[virtual]";
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cur_func), flag);
 	cur_class_func->virtual_index = index;
@@ -360,7 +363,8 @@ void class_add_func(const string &name, const Class *return_type, void *func, Sc
 			if (t->is_pointer() and (t->parent == cur_class))
 				tname = t->name;
 	}
-	add_func(tname + "." + name, return_type, func, ScriptFlag(flag | FLAG_CLASS));
+	add_func(name, return_type, func, ScriptFlag(flag | FLAG_CLASS));
+	cur_func->long_name = tname + "." + name;
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cur_func), flag);
 }
@@ -642,7 +646,7 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	t->parent = parent;
 	add_class(t);
 
-	ClassFunction *sub = t->get_func("subarray", TypeDynamicArray, 2);
+	ClassFunction *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
 	sub->return_type = t;
 
 		// FIXME  wrong for complicated classes
@@ -892,7 +896,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	c.func_no = -1;
 	if (c.func_no < 0)
 	for (int i=0;i<cur_package_script->syntax->functions.num;i++)
-		if (cur_package_script->syntax->functions[i]->name == cmd){
+		if (cur_package_script->syntax->functions[i]->long_name == cmd){
 			c.func_no = i;
 			c.script = cur_package_script;
 			break;
@@ -980,22 +984,6 @@ int xop_int_add(int a, int b)
 }
 
 
-DynamicArray __ref_subarray__(DynamicArray *a, int start, int end)
-{
-	DynamicArray s;
-	s.init(a->element_size);
-	if (start < 0)
-		start += a->num;
-	if (start < 0)
-		start = 0;
-	if (end < 0)
-		end = a->num;
-	if (end > a->num)
-		end = a->num;
-	s.num = max(end - start, 0);
-	s.data = &((char*)a->data)[a->element_size * start];
-	return s;
-}
 
 void SIAddPackageBase()
 {
@@ -1042,13 +1030,7 @@ void SIAddPackageBase()
 		class_add_func("swap", TypeVoid, mf(&DynamicArray::swap));
 			func_add_param("i1", TypeInt);
 			func_add_param("i2", TypeInt);
-		/*class_add_func("iterate", TypeBool, mf(&DynamicArray::iterate));
-			func_add_param("pointer", TypePointerPs);
-		class_add_func("iterate_back", TypeBool, mf(&DynamicArray::iterate_back));
-			func_add_param("pointer", TypePointerPs);
-		class_add_func("index", TypeInt, mf(&DynamicArray::index));
-			func_add_param("pointer", TypePointer);*/
-		class_add_func("subarray", TypeDynamicArray, (void*)&__ref_subarray__);
+		class_add_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, mf(&DynamicArray::ref_subarray));
 			func_add_param("start", TypeInt);
 			func_add_param("end", TypeInt);
 		// low level operations
@@ -1103,6 +1085,8 @@ void SIAddPackageBase()
 
 	add_class(TypeFunction);
 		class_add_element("name", TypeString, offsetof(Function, name));
+		class_add_element("long_name", TypeString, offsetof(Function, long_name));
+		class_add_element("class", TypeClassP, offsetof(Function, _class));
 
 
 	//	add_func_special("f2i",			TypeInt,	(void*)&_Float2Int);

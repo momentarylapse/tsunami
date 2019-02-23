@@ -27,7 +27,7 @@ class DrumList
 				return i
 		return -1
 		
-	string[] getNames()
+	string[] get_names()
 		string[] list
 		for s in sets
 			list.add(s.name)
@@ -100,11 +100,11 @@ class DrumsetPanel extends ConfigPanel
 		set_target("grid")
 		add_label("Set", 0 ,0, "")
 		add_combo_box("", 1, 0, "sets")
-		event("sets", &onSelect)
+		event("sets", &on_select)
 
 	override void update()
 		reset("sets")
-		string[] sets = drumlist.getNames()
+		string[] sets = drumlist.get_names()
 		set_string("sets", "  - Default -")
 		set_int("sets", 0)
 		for s,i in sets
@@ -112,7 +112,7 @@ class DrumsetPanel extends ConfigPanel
 			if s == sc.name
 				set_int("sets", i+1)
 		
-	void onSelect()
+	void on_select()
 		int n = get_int("")
 		sc.name = ""
 		if n > 0

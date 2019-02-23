@@ -332,6 +332,20 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 		c[i].set_ref(source.c[i].sub(_offset, _length));
 }
 
+
+AudioBuffer AudioBuffer::ref(int start, int end)
+{
+	AudioBuffer r;
+	if (start < 0)
+		start += length;
+	if (start < 0)
+		start = 0;
+	if (end < 0)
+		end = length;
+	r.set_as_ref(*this, start, end - start);
+	return r;
+}
+
 #if 0
 void AudioBuffer::set_16bit(const void *b, int offset, int length)
 {

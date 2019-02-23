@@ -196,7 +196,7 @@ void Script::CompileOsEntryPoint()
 {
 	int nf=-1;
 	foreachi(Function *ff, syntax->functions, index)
-		if (ff->name == "main")
+		if (ff->long_name == "main")
 			nf = index;
 	// call
 	if (nf>=0)
@@ -277,7 +277,7 @@ void Script::LinkOsEntryPoint()
 {
 	Function *f = nullptr;
 	for (Function *ff: syntax->functions)
-		if (ff->name == "main")
+		if (ff->long_name == "main")
 			f = ff;
 	if (f){
 		int lll = (int_p)f->address - syntax->asm_meta_info->code_origin - TaskReturnOffset;
@@ -353,6 +353,7 @@ void relink_calls(Script *s, Script *target, IncludeTranslationData &d)
 
 IncludeTranslationData import_deep(SyntaxTree *dest, SyntaxTree *source)
 {
+	// ksdjfhksjdhfkjsdhfj
 	IncludeTranslationData d;
 	d.const_off = dest->constants.num;
 	d.var_off = dest->root_of_all_evil.var.num;
@@ -431,7 +432,7 @@ void Script::link_functions()
 		int64 p = (n + 0xefef0000);
 		int64 q = (int_p)syntax->functions[n]->address;
 		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
-			do_error_link("could not link function as variable: " + syntax->functions[n]->name);
+			do_error_link("could not link function as variable: " + syntax->functions[n]->signature());
 	}
 
 

@@ -12,35 +12,36 @@ class SampleConfig extends PluginData
 				delete s
 		samples.clear()
 
+
+class SampleRenderer extends PitchRenderer
+	SampleRef* sample
+	MidiEventBuffer events
+	override SampleSynthesizer *synth
+	override void on_config()
+		sample = nil
+		if synth.config.samples.num >= pitch
+			sample = synth.config.samples[pitch]
+	override void on_start(float volume)
+		events.add(MidiEvent(0, 0, volume))
+	override bool render(AudioBuffer buf)
+		if !sample or events.num == 0
+			return false
+		int[] del
+		for e,i in events
+			buf.add(*sample.buf, e.pos, e.volume, 0)
+			e.pos -= buf.length
+			if e.pos + sample.buf.length < 0
+				del.add(i)
+		for i in 0:del.num
+			events.remove(del[del.num-1-i])
+		return events.num > 0
+	
+
 class SampleSynthesizer extends Synthesizer
 	SampleConfig config
 	
-	MidiEvent[] _events
-	
-	override void render(AudioBuffer buf)
-		for e in events
-			if e.volume > 0
-				_events.add(e)
-		
-		for e in _events
-			int n = e.pitch + 0.4
-			if n < 0 or n >= config.samples.num
-				e.pitch = -1
-				continue
-			SampleRef *s = config.samples[n]
-			if !s
-				e.pitch = -1
-				continue
-			buf.add(*s.buf, e.pos, e.volume, 0)
-			e.pos -= buf.length
-			if e.pos < -s.buf.length
-				e.pitch = -1
-			
-		for e,i in _events
-			if e.pitch < 0
-				_events.remove(i)
-				i --
-			
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new SampleRenderer(self, pitch)
 	
 	override ConfigPanel *create_panel()
 		return new SamplePanel(self)

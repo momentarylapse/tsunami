@@ -174,6 +174,9 @@ PitchRenderer *Synthesizer::get_pitch_renderer(int pitch)
 
 void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
 {
+	if (offset == end)
+		return;
+
 	AudioBuffer part;
 	part.set_as_ref(buf, offset, end - offset);
 	PitchRenderer *pr = get_pitch_renderer(pitch);
@@ -188,7 +191,11 @@ void Synthesizer::_handle_event(const MidiEvent &e)
 	PitchRenderer *pr = get_pitch_renderer(e.pitch);
 	if (!pr)
 		return;
-	pr->on_event(e);
+	if (e.volume > 0){
+		pr->on_start(e.volume);
+	}else{
+		pr->on_end();
+	}
 }
 
 void Synthesizer::render(AudioBuffer& buf)

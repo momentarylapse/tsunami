@@ -244,14 +244,18 @@ bool Class::is_derived_from_s(const string &root) const
 	return parent->is_derived_from_s(root);
 }
 
-ClassFunction *Class::get_func(const string &_name, const Class *return_type, int num_params, const Class *param0) const
+ClassFunction *Class::get_func(const string &_name, const Class *return_type, const Array<const Class*> &params) const
 {
-	for(ClassFunction &f: functions)
-		if ((f.name == _name) and (f.return_type == return_type) and (f.param_types.num == num_params)){
-			if ((param0) and (num_params > 0)){
-				if (f.param_types[0] == param0)
-					return &f;
-			}else
+	for (auto &f: functions)
+		if ((f.name == _name) and (f.return_type == return_type) and (f.param_types.num == params.num)){
+			bool match = true;
+			for (int i=0; i<params.num; i++){
+				if (params[i] and (f.param_types[i] != params[i])){
+					match = false;
+					break;
+				}
+			}
+			if (match)
 				return &f;
 		}
 	return nullptr;
@@ -259,27 +263,18 @@ ClassFunction *Class::get_func(const string &_name, const Class *return_type, in
 
 ClassFunction *Class::get_same_func(const string &_name, Function *ff) const
 {
-	for (ClassFunction &f: functions)
-		if ((f.name == _name) and (f.return_type == ff->literal_return_type) and (f.param_types.num == ff->num_params)){
-			bool match = true;
-			for (int i=0; i<ff->num_params; i++)
-				if (f.param_types[i] != ff->literal_param_type[i])
-					match = false;
-			if (match)
-				return &f;
-		}
-	return nullptr;
+	return get_func(_name, ff->literal_return_type, ff->literal_param_type);
 }
 
 ClassFunction *Class::get_default_constructor() const
 {
-	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
+	return get_func(IDENTIFIER_FUNC_INIT, TypeVoid, {});
 }
 
 Array<ClassFunction*> Class::get_constructors() const
 {
 	Array<ClassFunction*> c;
-	for (ClassFunction &f: functions)
+	for (auto &f: functions)
 		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid))
 			c.add(&f);
 	return c;
@@ -287,12 +282,12 @@ Array<ClassFunction*> Class::get_constructors() const
 
 ClassFunction *Class::get_destructor() const
 {
-	return get_func(IDENTIFIER_FUNC_DELETE, TypeVoid, 0);
+	return get_func(IDENTIFIER_FUNC_DELETE, TypeVoid, {});
 }
 
 ClassFunction *Class::get_assign() const
 {
-	return get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1, this);
+	return get_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, {this});
 }
 
 ClassFunction *Class::get_get(const Class *index) const
@@ -416,7 +411,7 @@ void class_func_out(Class *c, ClassFunction *f)
 void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool override)
 {
 	ClassFunction cf;
-	cf.name = f->name.substr(name.num + 1, -1);
+	cf.name = f->name;
 	cf.func = f;
 	cf.script = s->script;
 	cf.return_type = f->return_type;

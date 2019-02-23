@@ -74,11 +74,10 @@ class PADRenderer extends PitchRenderer
 		env.set(0.02, 0.02, 0.7, 0.5, synth.sample_rate)
 		create()
 
-	override void on_event(MidiEvent e)
-		if e.volume > 0
-			env.start(e.volume)
-		else
-			env.end()
+	override void on_start(float volume)
+		env.start(volume)
+	override void on_end()
+		env.end()
 
 	override bool render(AudioBuffer buf)
 		for i in 0:buf.length

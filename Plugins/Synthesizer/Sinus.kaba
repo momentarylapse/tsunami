@@ -10,8 +10,10 @@ class SinusRenderer extends PitchRenderer
 		volume = 0
 		phase = 0
 
-	override void on_event(MidiEvent e)
-		volume = e.volume
+	override void on_start(float v)
+		volume = v
+	override void on_end()
+		volume = 0
 
 	override bool render(AudioBuffer buf)
 		for i in 0:buf.length

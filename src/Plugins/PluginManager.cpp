@@ -234,6 +234,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("AudioBuffer.add", Kaba::mf(&AudioBuffer::add));
 	Kaba::LinkExternal("AudioBuffer.set", Kaba::mf(&AudioBuffer::set));
 	Kaba::LinkExternal("AudioBuffer.set_as_ref", Kaba::mf(&AudioBuffer::set_as_ref));
+	Kaba::LinkExternal("AudioBuffer." + Kaba::IDENTIFIER_FUNC_SUBARRAY, Kaba::mf(&AudioBuffer::ref));
 	Kaba::LinkExternal("AudioBuffer.get_spectrum", Kaba::mf(&ExtendedAudioBuffer::get_spectrum));
 
 
@@ -327,7 +328,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("PitchRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&PitchRenderer::__init__));
 	Kaba::DeclareClassVirtualIndex("PitchRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&PitchRenderer::__delete__), &pren);
 	Kaba::DeclareClassVirtualIndex("PitchRenderer", "render", Kaba::mf(&PitchRenderer::render), &pren);
-	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_event", Kaba::mf(&PitchRenderer::on_event), &pren);
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_start", Kaba::mf(&PitchRenderer::on_start), &pren);
+	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_end", Kaba::mf(&PitchRenderer::on_end), &pren);
 	Kaba::DeclareClassVirtualIndex("PitchRenderer", "on_config", Kaba::mf(&PitchRenderer::on_config), &pren);
 
 

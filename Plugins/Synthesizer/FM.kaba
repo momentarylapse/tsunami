@@ -188,22 +188,21 @@ class FMPanel extends ConfigPanel
 class FMRenderer extends PitchRenderer
 	OscillatorState[NUM_OSCILLATORS] osc
 	OscillatorConfig[NUM_OSCILLATORS] conf
-	float volume
+	//float volume
 	int num_osc_active
 	override FMSynthesizer *synth
 	
 	override void __init__(Synthesizer *s, int pitch)
 		num_osc_active = 0
 
-	override void on_event(MidiEvent e)
-		if e.volume == 0
-			for o,oi in osc
-				o.env.end()
-		else
-			num_osc_active = NUM_OSCILLATORS
-			for o,oi in osc
-				// TODO: e.volume should only effect "output" oscs
-				o.env.start(e.volume * conf[oi].amplitude)
+	override void on_end()
+		for o,oi in osc
+			o.env.end()
+	override void on_start(float _volume)
+		num_osc_active = NUM_OSCILLATORS
+		for o,oi in osc
+			// TODO: volume should only effect "output" oscs
+			o.env.start(_volume * conf[oi].amplitude)
 
 	override void on_config()
 		for o,i in osc

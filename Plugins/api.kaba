@@ -62,6 +62,8 @@ class MidiEvent
 		pos = _pos
 		pitch = _pitch
 		volume = _volume
+	string str()
+		return "(" + pos + ", " + pitch + ", " + volume + ")"
 
 class MidiEventBuffer extends MidiEvent[]
 	int samples
@@ -73,6 +75,11 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	extern void add_metronome_click(int pos, int level, float volume)
+	string str()
+		string s
+		for e in *self
+			s += e.str()
+		return "[" + s + "]"
 
 class MidiNoteBuffer extends MidiNote*[]
 	int samples
@@ -152,6 +159,7 @@ class AudioBuffer
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume, float panning)
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
+	extern AudioBuffer __subarray__(int start, int end)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 
 class RingBuffer
@@ -208,8 +216,10 @@ class MidiSource extends Module
 class PitchRenderer
 	extern void __init__(Synthesizer *synth, int pitch)
 	extern virtual void __delete__()
-	extern virtual bool render(AudioBuffer buf)
-	extern virtual void on_event(MidiEvent e)
+	extern virtual bool render(AudioBuffer buf) // return: keep alive
+	//extern virtual void on_event(MidiEvent e)
+	extern virtual void on_start(float volume)
+	extern virtual void on_end()
 	extern virtual void on_config()
 	int pitch
 	float delta_phi

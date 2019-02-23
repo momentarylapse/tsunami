@@ -128,7 +128,7 @@ string _cdecl f642s(double f, int dez);
 string _cdecl f2sf(float f);
 string _cdecl f642sf(double f);
 string _cdecl b2s(bool b);
-string _cdecl p2s(void *p);
+string _cdecl p2s(const void *p);
 string _cdecl ia2s(const Array<int> &a);
 string _cdecl fa2s(const Array<float> &a);
 string _cdecl ba2s(const Array<bool> &a);
@@ -152,7 +152,7 @@ string _cdecl str_escape(const string &str);
 string _cdecl str_m_to_utf8(const string &str);
 string _cdecl str_utf8_to_m(const string &str);
 
-bool _cdecl sa_contains(Array<string> &a, const string &s);
+bool _cdecl sa_contains(const Array<string> &a, const string &s);
 
 //--------------------------------------------------------------
 // regular expressions

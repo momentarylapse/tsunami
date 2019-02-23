@@ -93,11 +93,10 @@ class HarmonicRenderer extends PitchRenderer
 	override void on_config()
 		env.set(0.01, 0.01, 0.7, synth.config.release, synth.sample_rate)
 
-	override void on_event(MidiEvent e)
-		if e.volume == 0
-			env.end()
-		else
-			env.start(e.volume)
+	override void on_end()
+		env.end()
+	override void on_start(float volume)
+		env.start(volume)
 
 	override bool render(AudioBuffer buf)
 		for i in 0:buf.length

@@ -270,15 +270,20 @@ int DynamicArray::index(const void *p)
 {	return ((int_p)p - (int_p)data) / element_size;	}
 
 
-DynamicArray DynamicArray::ref_subarray(int start, int num_elements)
+DynamicArray DynamicArray::ref_subarray(int start, int end)
 {
 	DynamicArray s;
 	s.init(element_size);
-	if (num_elements < 0)
-		num_elements = num - start;
-	if (num_elements > num - start)
-		num_elements = num - start;
-	s.num = num_elements;
+
+	if (start < 0)
+		start += num;
+	if (start < 0)
+		start = 0;
+	if (end < 0)
+		end = num;
+	if (end > num)
+		end = num;
+	s.num = max(end - start, 0);
 	s.data = &((char*)data)[element_size * start];
 	return s;
 }

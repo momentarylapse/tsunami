@@ -12,8 +12,8 @@ class ClickRenderer extends PitchRenderer
 		phase = 0
 		scale = 0.9995
 
-	override void on_event(MidiEvent e)
-		volume = max(e.volume, volume)
+	override void on_start(float v)
+		volume = max(v, volume)
 
 	override bool render(AudioBuffer buf)
 		for i in 0:buf.length

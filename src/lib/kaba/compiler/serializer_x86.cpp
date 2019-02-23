@@ -145,7 +145,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 				p.p = index + 0xefef0000;
 				script->function_vars_to_link.add(index);
 			}else
-				do_error_link("could not link function as variable: " + link->as_func()->name);
+				do_error_link("could not link function as variable: " + link->as_func()->long_name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}

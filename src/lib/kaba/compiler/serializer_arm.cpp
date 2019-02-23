@@ -122,7 +122,7 @@ void SerializerARM::add_function_call(Function *f, const SerialNodeParam &instan
 		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
 		if (!f->address)
-			do_error_link("could not link function " + f->name);
+			do_error_link("could not link function " + f->long_name);
 		if (abs((int_p)f->address - (int_p)this->script->opcode) < 30000000){
 			add_cmd(Asm::INST_CALL, param_const(TypePointer, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...
@@ -428,7 +428,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 				p.p = index + 0xefef0000;
 				script->function_vars_to_link.add(index);
 			}else
-				do_error_link("could not link function as variable: " + link->as_func()->name);
+				do_error_link("could not link function as variable: " + link->as_func()->long_name);
 			//p.kind = Asm::PKLabel;
 			//p.p = (char*)(long)list->add_label("_kaba_func_" + link->script->syntax->Functions[link->link_no]->name, false);
 		}

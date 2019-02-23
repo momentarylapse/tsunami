@@ -64,8 +64,8 @@ string Node::sig() const
 	string t = type->name + " ";
 	if (kind == KIND_VAR_LOCAL)			return t + as_local()->name;
 	if (kind == KIND_VAR_GLOBAL)			return t + as_global()->name;
-	if (kind == KIND_FUNCTION_POINTER)		return t + as_func()->name;
-	if (kind == KIND_FUNCTION_NAME)		return t + as_func()->name;
+	if (kind == KIND_FUNCTION_POINTER)		return t + as_func()->long_name;
+	if (kind == KIND_FUNCTION_NAME)		return t + as_func()->long_name;
 	if (kind == KIND_CONSTANT)			return t + as_const()->str();
 	if (kind == KIND_FUNCTION_CALL)			return as_func()->signature();
 	if (kind == KIND_POINTER_CALL)			return "";

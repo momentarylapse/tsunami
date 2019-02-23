@@ -34,6 +34,7 @@ Function::Function(SyntaxTree *_tree, const string &_name, const Class *_return_
 {
 	tree = _tree;
 	name = _name;
+	long_name = name;
 	block = nullptr;
 	num_params = 0;
 	return_type = _return_type;
@@ -65,7 +66,7 @@ void Function::show(const string &stage) const
 {
 	if (!config.allow_output(this, stage))
 		return;
-	msg_write("[function] " + return_type->name + " " + name);
+	msg_write("[function] " + return_type->name + " " + long_name);
 	block->show();
 }
 
@@ -82,8 +83,8 @@ Variable *Function::__get_var(const string &name) const
 string Function::signature(bool include_class) const
 {
 	string r = literal_return_type->name + " ";
-	if ((name.find(".") >= 0) and !include_class)
-		r += name.explode(".").back() + "(";
+	if (include_class)
+		r += long_name + "(";
 	else
 		r += name + "(";
 	for (int i=0; i<num_params; i++){

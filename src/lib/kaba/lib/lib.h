@@ -36,6 +36,8 @@ extern const string IDENTIFIER_CLASS;
 extern const string IDENTIFIER_FUNC_INIT;
 extern const string IDENTIFIER_FUNC_DELETE;
 extern const string IDENTIFIER_FUNC_ASSIGN;
+extern const string IDENTIFIER_FUNC_GET;
+extern const string IDENTIFIER_FUNC_SUBARRAY;
 extern const string IDENTIFIER_SUPER;
 extern const string IDENTIFIER_SELF;
 extern const string IDENTIFIER_EXTENDS;

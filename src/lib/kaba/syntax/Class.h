@@ -86,7 +86,7 @@ public:
 	const Class *get_pointer() const;
 	const Class *get_root() const;
 	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
-	ClassFunction *get_func(const string &name, const Class *return_type, int num_params, const Class *param0 = nullptr) const;
+	ClassFunction *get_func(const string &name, const Class *return_type, const Array<const Class*> &params) const;
 	ClassFunction *get_same_func(const string &name, Function *f) const;
 	ClassFunction *get_default_constructor() const;
 	Array<ClassFunction*> get_constructors() const;

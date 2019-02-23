@@ -57,8 +57,10 @@ public:
 	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume);
 	void _cdecl add(const AudioBuffer &b, int offset, float volume, float panning);
 	void _cdecl set_as_ref(const AudioBuffer &b, int offset, int length);
-	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
+	AudioBuffer _cdecl ref(int start, int end);
+
+	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;
 	bool _cdecl exports(string &data, int channels, SampleFormat format) const;
 	void _cdecl interleave(float *p, float volume) const;

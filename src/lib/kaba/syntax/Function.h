@@ -36,6 +36,7 @@ struct Function
 	SyntaxTree *tree;
 
 	string name;
+	string long_name; // "Class.Function"
 	// parameters (linked to intern variables)
 	int num_params;
 	// block of code

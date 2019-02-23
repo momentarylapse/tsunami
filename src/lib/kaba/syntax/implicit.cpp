@@ -41,13 +41,13 @@ void SyntaxTree::AutoImplementConstructor(Function *f, const Class *t, bool allo
 	if (t->is_super_array()){
 		Node *c_el_size = add_node_const(add_constant(TypeInt));
 		c_el_size->as_const()->as_int() = t->parent->size;
-		Node *c = add_node_member_call(t->get_func("__mem_init__", TypeVoid, 1, TypeInt), self);
+		Node *c = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), self);
 		c->set_param(0, c_el_size);
 		f->block->add(c);
 	}else if (t->is_dict()){
 		Node *c_el_size = add_node_const(add_constant(TypeInt));
 		c_el_size->as_const()->as_int() = t->parent->size + TypeString->size;
-		Node *c = add_node_member_call(t->get_func("__mem_init__", TypeVoid, 1, TypeInt), self);
+		Node *c = add_node_member_call(t->get_func("__mem_init__", TypeVoid, {TypeInt}), self);
 		c->set_param(0, c_el_size);
 		f->block->add(c);
 	}else{
@@ -88,7 +88,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, const Class *t)
 	Node *self = add_node_local_var(f->__get_var(IDENTIFIER_SELF));
 
 	if (t->is_super_array() or t->is_dict()){
-		ClassFunction *f_clear = t->get_func("clear", TypeVoid, 0);
+		ClassFunction *f_clear = t->get_func("clear", TypeVoid, {});
 		if (f_clear){
 			Node *c = add_node_member_call(f_clear, self);
 			f->block->add(c);
@@ -128,7 +128,7 @@ void SyntaxTree::AutoImplementAssign(Function *f, const Class *t)
 
 	if (t->is_super_array()){
 
-		ClassFunction *f_resize = t->get_func("resize", TypeVoid, 1, TypeInt);
+		ClassFunction *f_resize = t->get_func("resize", TypeVoid, {TypeInt});
 		if (!f_resize)
 			do_error(format("%s.__assign__(): no %s.resize(int) found", t->name.c_str(), t->name.c_str()));
 
@@ -301,7 +301,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, const Class *t)
 	}
 
 	// clear
-	Node *cmd_clear = add_node_member_call(t->get_func("__mem_clear__", TypeVoid, 0), self);
+	Node *cmd_clear = add_node_member_call(t->get_func("__mem_clear__", TypeVoid, {}), self);
 	f->block->add(cmd_clear);
 }
 
@@ -360,7 +360,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, const Class *t)
 	}
 
 	// resize
-	Node *c_resize = add_node_member_call(t->get_func("__mem_resize__", TypeVoid, 1, TypeInt), self);
+	Node *c_resize = add_node_member_call(t->get_func("__mem_resize__", TypeVoid, {TypeInt}), self);
 	c_resize->set_param(0, num);
 	f->block->add(c_resize);
 
@@ -420,7 +420,7 @@ void SyntaxTree::AutoImplementArrayRemove(Function *f, const Class *t)
 	}
 
 	// resize
-	Node *c_remove = add_node_member_call(t->get_func("__mem_remove__", TypeVoid, 1, TypeInt), self);
+	Node *c_remove = add_node_member_call(t->get_func("__mem_remove__", TypeVoid, {TypeInt}), self);
 	c_remove->set_param(0, index);
 	f->block->params.add(c_remove);
 }
@@ -441,7 +441,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, const Class *t)
 	Node *cmd_1 = add_node_const(add_constant(TypeInt));
 	cmd_1->as_const()->as_int() = 1;
 	Node *cmd_add = add_node_operator_by_inline(self_num, cmd_1, INLINE_INT_ADD);
-	Node *cmd_resize = add_node_member_call(t->get_func("resize", TypeVoid, 1, TypeInt), self);
+	Node *cmd_resize = add_node_member_call(t->get_func("resize", TypeVoid, {TypeInt}), self);
 	cmd_resize->set_param(0, cmd_add);
 	b->add(cmd_resize);
 
@@ -541,9 +541,9 @@ void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t)
 	}
 }
 
-Function* class_get_func(const Class *t, const string &name, const Class *return_type, int num_params)
+Function* class_get_func(const Class *t, const string &name, const Class *return_type, const Array<const Class*> &params)
 {
-	ClassFunction *cf = t->get_func(name, return_type, num_params);
+	ClassFunction *cf = t->get_func(name, return_type, params);
 	if (cf){
 		Function *f = cf->func;
 		if (f->auto_declared){
@@ -581,10 +581,10 @@ void SyntaxTree::AutoImplementFunctions(const Class *t)
 	if (t->is_super_array()){
 		AutoImplementConstructor(prepare_auto_impl(t, t->get_default_constructor()), t, true);
 		AutoImplementDestructor(prepare_auto_impl(t, t->get_destructor()), t);
-		AutoImplementArrayClear(prepare_auto_impl(t, t->get_func("clear", TypeVoid, 0)), t);
-		AutoImplementArrayResize(prepare_auto_impl(t, t->get_func("resize", TypeVoid, 1, TypeInt)), t);
-		AutoImplementArrayRemove(prepare_auto_impl(t, t->get_func("remove", TypeVoid, 1, TypeInt)), t);
-		AutoImplementArrayAdd(class_get_func(t, "add", TypeVoid, 1), t);
+		AutoImplementArrayClear(prepare_auto_impl(t, t->get_func("clear", TypeVoid, {})), t);
+		AutoImplementArrayResize(prepare_auto_impl(t, t->get_func("resize", TypeVoid, {TypeInt})), t);
+		AutoImplementArrayRemove(prepare_auto_impl(t, t->get_func("remove", TypeVoid, {TypeInt})), t);
+		AutoImplementArrayAdd(class_get_func(t, "add", TypeVoid, {nullptr}), t);
 		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);
 	}else if (t->is_array()){
 		AutoImplementAssign(prepare_auto_impl(t, t->get_assign()), t);

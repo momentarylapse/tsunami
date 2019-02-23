@@ -251,7 +251,7 @@ string guess_constant(int64 c)
 	for (auto &p: Packages)
 		for (auto *f: p.script->syntax->functions)
 			if (c == (int_p)f->address)
-				return "FUNC:" + f->name;
+				return "FUNC:" + f->long_name;
 
 	return "C:"+p2s((void*)c);
 }
@@ -474,7 +474,7 @@ void Serializer::move_param(SerialNodeParam &p, int from, int to)
 			}
 		if (!found){
 			msg_error(format("move_param: no RegChannel...  reg_root=%d  from=%d", r, from));
-			msg_write(script->filename + " : " + cur_func->name);
+			msg_write(script->filename + " : " + cur_func->long_name);
 		}
 	}
 }
@@ -621,9 +621,13 @@ bool node_is_assign_mem(Node *n)
 	if (n->kind == KIND_INLINE_CALL){
 		return (n->as_func()->inline_no == INLINE_CHUNK_ASSIGN);
 	}
-	if (n->kind == KIND_FUNCTION_CALL){
+	// nope...
+	/*if (n->kind == KIND_FUNCTION_CALL){
+		msg_error("test 2");
+		msg_write(n->as_func()->name);
+		msg_write(n->as_func()->long_name);
 		return n->as_func()->name == "__assign__";
-	}
+	}*/
 	return false;
 }
 
@@ -637,13 +641,21 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 	// EXPERIMENTAL DIRTY HACK !!!!!!!!!!!
 	//syntax_tree->ShowNode(com, cur_func);
 	Node *override_ret = nullptr;
-#if 0
+#if 1
 	if (node_is_assign_mem(com)){
-		if (com->params[1]->kind == KIND_FUNCTION_CALL or com->params[1]->kind == KIND_INLINE_CALL){
-			if (com->params[0]->kind == KIND_VAR_LOCAL or com->params[0]->kind == KIND_VAR_GLOBAL){
-				//msg_write("OPT...");
-				override_ret = com->params[0];
-				com = com->params[1];
+		Node *dst, *src;
+		if (com->instance){
+			// nope---
+			dst = com->instance;
+			src = com->params[0];
+		}else{
+			dst = com->params[0];
+			src = com->params[1];
+		}
+		if (src->kind == KIND_FUNCTION_CALL or src->kind == KIND_INLINE_CALL){
+			if (dst->kind == KIND_VAR_LOCAL or dst->kind == KIND_VAR_GLOBAL or dst->kind == KIND_LOCAL_ADDRESS){
+				override_ret = dst;
+				com = src;
 
 			}
 		}
@@ -698,9 +710,9 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 	}else if (com->kind == KIND_STATEMENT){
 		SerializeStatement(com, params, ret, block, index);
 	}else if (com->kind == KIND_ARRAY_BUILDER){
-		ClassFunction *cf = com->type->get_func("add", TypeVoid, 1);
+		ClassFunction *cf = com->type->get_func("add", TypeVoid, {com->type->parent});
 		if (!cf)
-			do_error(format("[..]: can not find %s.add() function???", com->type->name.c_str()));
+			do_error(format("[..]: can not find %s.add(%s) function???", com->type->name.c_str(), com->type->parent->name.c_str()));
 		instance = AddReference(ret, com->type->get_pointer());
 		for (int i=0; i<com->params.num; i++){
 			AddFunctionCall(cf->func, instance, params[i], p_none);
@@ -762,8 +774,7 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, int modus)
 		instance = AddReference(param);
 	}
 
-	Array<SerialNodeParam> params;
-	AddClassFunctionCall(f, instance, params, p_none);
+	AddClassFunctionCall(f, instance, {}, p_none);
 }
 
 void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref)
@@ -2059,7 +2070,7 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list)
 void Script::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list)
 {
 	if (config.verbose and config.allow_output(cur_func, "asm"))
-		msg_write("serializing " + f->name + " -------------------");
+		msg_write("serializing " + f->long_name + " -------------------");
 	f->show("asm");
 
 	cur_func = f;
@@ -2088,11 +2099,11 @@ void Script::compile_functions(char *oc, int &ocs)
 	int func_no = 0;
 	for (Function *f: syntax->functions)
 		if (f->is_extern){
-			f->address = GetExternalLink(f->name + ":" + i2s(f->num_params));
+			f->address = GetExternalLink(f->long_name + ":" + i2s(f->num_params));
 			if (!f->address)
-				f->address = GetExternalLink(f->name);
+				f->address = GetExternalLink(f->long_name);
 			if (!f->address)
-				do_error_link("external function " + f->name + " not linkable");
+				do_error_link("external function " + f->long_name + " not linkable");
 		}else{
 			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
 		}

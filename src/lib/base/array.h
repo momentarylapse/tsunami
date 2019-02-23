@@ -36,7 +36,7 @@ class DynamicArray
 	void _cdecl swap(int i1, int i2);
 	void _cdecl move(int source, int target);
 	void _cdecl reverse();
-	DynamicArray _cdecl ref_subarray(int start, int num_elements);
+	DynamicArray _cdecl ref_subarray(int start, int end);
 	int _cdecl index(const void *p);
 	void _cdecl clear();
 	void *data;

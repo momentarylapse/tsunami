@@ -38,7 +38,8 @@ public:
 	void _cdecl __delete__() override;
 
 	virtual bool _cdecl render(AudioBuffer &buf){ return false; }
-	virtual void on_event(const MidiEvent &e){}
+	virtual void on_start(float volume){}
+	virtual void on_end(){}
 	virtual void on_config(){}
 
 	int pitch;

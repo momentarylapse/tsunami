@@ -38,13 +38,13 @@ public:
 		}
 		return true;
 	}
-	void on_event(const MidiEvent &e) override
+	void on_end() override
 	{
-		if (e.volume == 0){
-			env.end();
-		}else{
-			env.start(e.volume);
-		}
+		env.end();
+	}
+	void on_start(float volume) override
+	{
+		env.start(volume);
 	}
 	void on_config() override
 	{

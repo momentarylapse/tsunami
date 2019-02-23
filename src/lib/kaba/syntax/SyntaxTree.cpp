@@ -376,7 +376,7 @@ Array<Node*> SyntaxTree::get_existence_shared(const string &name)
 
 	// then the (real) functions
 	for (Function *f: functions)
-		if (f->name == name)
+		if (f->name == name and !f->_class)
 			links.add(new Node(KIND_FUNCTION_NAME, (int_p)f, script, TypeFunction));//f->literal_return_type);
 	if (links.num > 0)
 		return links;
@@ -616,7 +616,7 @@ Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f)
 	Node *ret = ps->deref_node(p_ret);
 	Node *cmd_assign = ps->link_operator(OPERATOR_ASSIGN, ret, n->params[0]);
 	if (!cmd_assign)
-		ps->do_error("no = operator for return from function found: " + f->name);
+		ps->do_error("no = operator for return from function found: " + f->long_name);
 	_transform_insert_before_ = cmd_assign;
 
 	n->set_num_params(0);

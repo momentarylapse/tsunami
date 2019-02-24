@@ -247,6 +247,7 @@ class DummySynthesizer extends Synthesizer
 	extern override PitchRenderer *create_pitch_renderer(int pitch)
 
 class EnvelopeADSR
+	//extern void __init__()
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
 	extern void set2(float initial, float peak)
 	extern void reset()

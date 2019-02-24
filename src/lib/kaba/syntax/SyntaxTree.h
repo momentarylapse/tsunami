@@ -152,6 +152,8 @@ public:
 	Node *parse_statement_delete(Block *block);
 	Node *parse_statement_sizeof(Block *block);
 	Node *parse_statement_type(Block *block);
+	Node *parse_statement_str(Block *block);
+	Node *parse_statement_len(Block *block);
 
 	void CreateAsmMetaInfo();
 

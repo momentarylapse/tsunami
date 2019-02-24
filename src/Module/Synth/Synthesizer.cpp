@@ -162,8 +162,9 @@ PitchRenderer *Synthesizer::create_pitch_renderer(int pitch)
 PitchRenderer *Synthesizer::get_pitch_renderer(int pitch)
 {
 	for (auto *p: pitch_renderer)
-		if (p->pitch == pitch)
+		if (p->pitch == pitch){
 			return p;
+		}
 	auto *p = create_pitch_renderer(pitch);
 	if (p){
 		p->on_config();

@@ -11,6 +11,9 @@
 class EnvelopeADSR {
 public:
 
+	EnvelopeADSR();
+	void __init__();
+
 	void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate);
 	void set2(float initial, float peak);
 	void reset();

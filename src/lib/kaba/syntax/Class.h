@@ -97,7 +97,7 @@ public:
 	void link_virtual_table();
 	void link_external_virtual_table(void *p);
 	void *create_instance() const;
-	string var2str(void *p) const;
+	string var2str(const void *p) const;
 };
 extern const Class *TypeUnknown;
 extern const Class *TypeReg128; // dummy for compilation

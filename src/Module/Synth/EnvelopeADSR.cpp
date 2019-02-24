@@ -9,6 +9,16 @@
 #include "../../lib/file/file.h"
 #include "../../lib/math/math.h"
 
+EnvelopeADSR::EnvelopeADSR()
+{
+	set(0, 0, 0, 0, 0);
+}
+
+void EnvelopeADSR::__init__()
+{
+	new(this) EnvelopeADSR();
+}
+
 void EnvelopeADSR::set(float t_attack, float t_decay, float _sustain, float t_release, int sample_rate)
 {
 	ttl_attack = t_attack * sample_rate;

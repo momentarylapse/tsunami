@@ -178,6 +178,8 @@ bool Class::needs_constructor() const
 		return false;
 	if (is_super_array() or is_dict())
 		return true;
+	if (is_array())
+		return parent->get_default_constructor();
 	if (vtable.num > 0)
 		return true;
 	if (parent)
@@ -207,6 +209,8 @@ bool Class::needs_destructor() const
 		return false;
 	if (is_super_array() or is_dict())
 		return true;
+	if (is_array())
+		return parent->get_destructor();
 	if (parent){
 		if (parent->get_destructor())
 			return true;
@@ -487,8 +491,9 @@ void *Class::create_instance() const
 	return p;
 }
 
-string Class::var2str(void *p) const
+string Class::var2str(const void *p) const
 {
+	msg_write(name);
 	if (this == TypeInt){
 		return i2s(*(int*)p);
 	}else if (this == TypeFloat32){
@@ -514,8 +519,8 @@ string Class::var2str(void *p) const
 		return "{...}";
 	}else if (elements.num > 0){
 		string s;
-		foreachi(ClassElement &e, elements, i){
-			if (i > 0)
+		for (auto &e: elements){
+			if (s.num > 0)
 				s += ", ";
 			s += e.type->var2str(((char*)p) + e.offset);
 		}
@@ -530,7 +535,7 @@ string Class::var2str(void *p) const
 			}
 			return "[" + s + "]";
 		}
-	return string((char*)p, size).hex();
+	return d2h(p, size, false);
 }
 
 }

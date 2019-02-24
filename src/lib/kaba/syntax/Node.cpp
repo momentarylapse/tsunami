@@ -67,9 +67,9 @@ string Node::sig() const
 	if (kind == KIND_FUNCTION_POINTER)		return t + as_func()->long_name;
 	if (kind == KIND_FUNCTION_NAME)		return t + as_func()->long_name;
 	if (kind == KIND_CONSTANT)			return t + as_const()->str();
-	if (kind == KIND_FUNCTION_CALL)			return as_func()->signature();
+	if (kind == KIND_FUNCTION_CALL)			return as_func()->signature(true);
 	if (kind == KIND_POINTER_CALL)			return "";
-	if (kind == KIND_INLINE_CALL)	return as_func()->signature();
+	if (kind == KIND_INLINE_CALL)	return as_func()->signature(true);
 	if (kind == KIND_VIRTUAL_CALL)	return t + i2s(link_no);//s->Functions[nr]->name;
 	if (kind == KIND_STATEMENT)			return t + as_statement()->name;
 	if (kind == KIND_OPERATOR)			return as_op()->sig();

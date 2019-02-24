@@ -27,9 +27,24 @@ class OscillatorConfig
 	float amplitude
 	float initial, peak, sustain
 	float attack, decay, release
-	int type
+	int _type
 	bool[NUM_OSCILLATORS] target
 	bool target_out
+	void __init__()
+		reset()
+	void reset()
+		factor = 1
+		amplitude = 0
+		initial = 0.01
+		peak = 1
+		sustain = 0.6
+		attack = 0.01
+		decay = 0.4
+		release = 0.4
+		_type = TYPE_SINE
+		for t in target
+			t = false
+		target_out = false
 
 class OscillatorLink
 	int source, dest
@@ -40,18 +55,7 @@ class FMConfig extends PluginData
 	override void reset()
 		//link.clear()
 		for o in osc
-			o.type = TYPE_SINE
-			o.factor = 1
-			o.amplitude = 0
-			o.attack = 0.01
-			o.decay = 0.4
-			o.release = 0.4
-			o.initial = 0.01
-			o.peak = 1
-			o.sustain = 0.6
-			for t in o.target
-				t = false
-			o.target_out = false
+			o.reset()
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		/*osc[1].factor = 1.9881
@@ -81,14 +85,14 @@ class FMConfig extends PluginData
 		link.add(l)*/
 	override void __init__()
 		reset()
-	void __assign__(FMConfig o)
+	//void __assign__(FMConfig o)
 
 class FMPanel extends ConfigPanel
 	FMConfig *fc
 	int chosen
 	override FMSynthesizer *c
 	override void __init__(Module *_s)
-		super.__init__(_s)
+		//super.__init__(_s)
 		fc = &c.config
 		add_grid("", 0, 0, "outer_table")
 		set_target("outer_table")
@@ -141,7 +145,7 @@ class FMPanel extends ConfigPanel
 		o.attack = get_float("attack") / 1000
 		o.decay = get_float("decay") / 1000
 		o.release = get_float("release") / 1000
-		o.type = get_int("type")
+		o._type = get_int("type")
 		
 		/*for l,i in fc.link
 			if l.source == chosen
@@ -172,7 +176,7 @@ class FMPanel extends ConfigPanel
 		set_float("attack", o.attack * 1000)
 		set_float("decay", o.decay * 1000)
 		set_float("release", o.release * 1000)
-		set_int("type", o.type)
+		set_int("type", o._type)
 		for j in 0:NUM_OSCILLATORS
 			check("link_" + j, o.target[j])
 		check("link_out", o.target_out)
@@ -188,11 +192,11 @@ class FMPanel extends ConfigPanel
 class FMRenderer extends PitchRenderer
 	OscillatorState[NUM_OSCILLATORS] osc
 	OscillatorConfig[NUM_OSCILLATORS] conf
-	//float volume
 	int num_osc_active
 	override FMSynthesizer *synth
 	
-	override void __init__(Synthesizer *s, int pitch)
+	override void __init__(Synthesizer *s, int _pitch)
+		//super.__init__(s, _pitch)
 		num_osc_active = 0
 
 	override void on_end()
@@ -212,7 +216,7 @@ class FMRenderer extends PitchRenderer
 			o.env.set2(c.initial, c.peak)
 
 	override bool render(AudioBuffer buf)
-		for i in 0:buf.length
+		for i in 0:len(buf)
 
 			for o,oi in osc
 				o.volume = o.env.get()
@@ -223,14 +227,14 @@ class FMRenderer extends PitchRenderer
 					
 				OscillatorConfig *co = &conf[oi]
 				o.phi += delta_phi * (1 + o.input) * co.factor
-				if co.type == TYPE_SINE
+				if co._type == TYPE_SINE
 					o.output = sin(o.phi) * o.volume
-				else if co.type == TYPE_SQUARE
+				else if co._type == TYPE_SQUARE
 					if sin(o.phi) > 0
 						o.output = o.volume
 					else
 						o.output = -o.volume
-				else if co.type == TYPE_SAW
+				else if co._type == TYPE_SAW
 					o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
 				o.input = 0
 				if o.phi > 8*pi

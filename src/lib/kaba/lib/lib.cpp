@@ -42,6 +42,10 @@ const string IDENTIFIER_EXTENDS = "extends";
 const string IDENTIFIER_STATIC = "static";
 const string IDENTIFIER_NEW = "new";
 const string IDENTIFIER_DELETE = "delete";
+const string IDENTIFIER_SIZEOF = "sizeof";
+const string IDENTIFIER_TYPE = "type";
+const string IDENTIFIER_STR = "str";
+const string IDENTIFIER_LEN = "len";
 const string IDENTIFIER_NAMESPACE = "namespace";
 const string IDENTIFIER_RETURN_VAR = "-return-";
 const string IDENTIFIER_VTABLE_VAR = "-vtable-";
@@ -582,6 +586,11 @@ void _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
 	}
 }
 
+string _cdecl var2str(const void *var, const Class *type)
+{
+	return type->var2str(var);
+}
+
 string _cdecl kaba_shell_execute(const string &cmd)
 {
 	try{
@@ -1082,6 +1091,8 @@ void SIAddPackageBase()
 		class_add_element("parent", TypeClassP, offsetof(Class, parent));
 		class_add_func("is_derived_from", TypeBool, mf(&Class::is_derived_from));
 			func_add_param("c", TypeClassP);
+		class_add_func("var2str", TypeString, mf(&Class::var2str));
+			func_add_param("var", TypePointer);
 
 	add_class(TypeFunction);
 		class_add_element("name", TypeString, offsetof(Function, name));
@@ -1265,8 +1276,10 @@ void SIAddBasicCommands()
 	add_statement(IDENTIFIER_CONTINUE, STATEMENT_CONTINUE);
 	add_statement(IDENTIFIER_NEW, STATEMENT_NEW);
 	add_statement(IDENTIFIER_DELETE, STATEMENT_DELETE, 1);
-	add_statement("sizeof", STATEMENT_SIZEOF, 1);
-	add_statement("type", STATEMENT_TYPE, 1);
+	add_statement(IDENTIFIER_SIZEOF, STATEMENT_SIZEOF, 1);
+	add_statement(IDENTIFIER_TYPE, STATEMENT_TYPE, 1);
+	add_statement(IDENTIFIER_STR, STATEMENT_STR, 1);
+	add_statement(IDENTIFIER_LEN, STATEMENT_LEN, 1);
 	add_statement(IDENTIFIER_ASM, STATEMENT_ASM);
 	add_statement(IDENTIFIER_TRY, STATEMENT_TRY); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_EXCEPT, STATEMENT_EXCEPT); // return: ParamType will be defined by the parser!
@@ -1517,6 +1530,9 @@ void SIAddCommands()
 		func_add_param("list",	TypePointer);
 		func_add_param("class",	TypeClassP);
 		func_add_param("by",	TypeString);
+	add_func("var2str", TypeString, (void*)var2str, FLAG_RAISES_EXCEPTIONS);
+		func_add_param("var", TypePointer);
+		func_add_param("class", TypeClassP);
 
 
 // add_func("ExecuteScript",	TypeVoid);

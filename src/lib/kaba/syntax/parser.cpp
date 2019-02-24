@@ -1453,6 +1453,55 @@ Node *SyntaxTree::parse_statement_type(Block *block)
 	return c;
 }
 
+Node *SyntaxTree::parse_statement_len(Block *block)
+{
+	Exp.next();
+	Node *sub = parse_command(block);
+
+	// array?
+	if (sub->type->is_array()){
+		auto *c = add_constant(TypeInt);
+		c->as_int() = sub->type->array_length;
+		return add_node_const(c);
+	}
+
+	// element "int num/length"?
+	for (auto &e: sub->type->elements)
+		if (e.type == TypeInt and (e.name == "length" or e.name == "num")){
+			return shift_node(sub, false, e.offset, e.type);
+		}
+
+
+	do_error("don't know how to get the length of class " + sub->type->name);
+	return nullptr;
+}
+
+Node *SyntaxTree::parse_statement_str(Block *block)
+{
+	Exp.next();
+	Node *sub = parse_command(block);
+
+	// direct/type cast?
+	int ie = Exp.cur_exp;
+	try{
+		return check_param_link(sub, TypeString, "", 0);
+	}catch(...){
+	}
+	Exp.set(ie);
+
+	// "universal" var2str
+	auto *c = add_constant(TypeClassP);
+	c->as_int64() = (int64)sub->type;
+
+	Array<Node*> links = get_existence("var2str", nullptr);
+	Function *f = links[0]->as_func();
+
+	Node *cmd = add_node_call(f, TypeString);
+	cmd->set_param(0, ref_node(sub));
+	cmd->set_param(1, add_node_const(c));
+	return cmd;
+}
+
 Node *SyntaxTree::parse_statement(Block *block)
 {
 	if (Exp.cur == IDENTIFIER_FOR){
@@ -1484,10 +1533,14 @@ Node *SyntaxTree::parse_statement(Block *block)
 		return parse_statement_new(block);
 	}else if (Exp.cur == IDENTIFIER_DELETE){
 		return parse_statement_delete(block);
-	}else if (Exp.cur == "sizeof"){
+	}else if (Exp.cur == IDENTIFIER_SIZEOF){
 		return parse_statement_sizeof(block);
-	}else if (Exp.cur == "type"){
+	}else if (Exp.cur == IDENTIFIER_TYPE){
 		return parse_statement_type(block);
+	}else if (Exp.cur == IDENTIFIER_STR){
+		return parse_statement_str(block);
+	}else if (Exp.cur == IDENTIFIER_LEN){
+		return parse_statement_len(block);
 	}
 	return nullptr;
 }

@@ -22,7 +22,11 @@ class SampleRenderer extends PitchRenderer
 		if synth.config.samples.num >= pitch
 			sample = synth.config.samples[pitch]
 	override void on_start(float volume)
-		events.add(MidiEvent(0, 0, volume))
+		MidiEvent e
+		e.pos = 0
+		e.volume = volume
+		e.pitch = 0
+		events.add(e)//MidiEvent(0, 0, volume))
 	override bool render(AudioBuffer buf)
 		if !sample or events.num == 0
 			return false
@@ -50,7 +54,7 @@ class SamplePanel extends ConfigPanel
 	SampleConfig *sc
 	override SampleSynthesizer *c
 	override void __init__(Module *_s)
-		super.__init__(_s)
+		//super.__init__(_s)
 		sc = &c.config
 		add_list_view("!width=300\\Note\\Sample", 0, 0, "list")
 		event("list", &on_select)

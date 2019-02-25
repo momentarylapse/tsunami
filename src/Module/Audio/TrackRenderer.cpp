@@ -118,6 +118,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	track->subscribe(this, [&]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
 	track->subscribe(this, [&]{ on_track_add_or_delete_fx(); }, track->MESSAGE_DELETE_EFFECT);
 	track->subscribe(this, [&]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
+	track->subscribe(this, [&]{ track = nullptr; }, track->MESSAGE_DELETE);
 
 	/*for (TrackLayer *l: track->layers){
 		l->subscribe(this, [&]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
@@ -127,7 +128,8 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 
 TrackRenderer::~TrackRenderer()
 {
-	track->unsubscribe(this);
+	if (track)
+		track->unsubscribe(this);
 	if (midi_streamer)
 		delete midi_streamer;
 	if (!direct_mode){
@@ -139,6 +141,8 @@ TrackRenderer::~TrackRenderer()
 
 void TrackRenderer::fill_midi_streamer()
 {
+	if (!track)
+		return;
 	MidiNoteBuffer _midi = track->layers[0]->midi;
 	for (TrackLayer *l: track->layers)
 		for (auto c: l->samples)
@@ -157,6 +161,8 @@ void TrackRenderer::fill_midi_streamer()
 
 void TrackRenderer::on_track_add_or_delete_fx()
 {
+	if (!track)
+		return;
 	if (direct_mode){
 		fx = track->fx;
 	}
@@ -164,6 +170,8 @@ void TrackRenderer::on_track_add_or_delete_fx()
 
 void TrackRenderer::on_track_replace_synth()
 {
+	if (!track)
+		return;
 	if (direct_mode){
 		synth = track->synth;
 	}else{
@@ -198,6 +206,8 @@ void TrackRenderer::on_track_add_layer()
 
 void TrackRenderer::seek(int pos)
 {
+	if (!track)
+		return;
 	offset = pos;
 	if (midi_streamer)
 		midi_streamer->seek(pos);
@@ -333,6 +343,8 @@ void TrackRenderer::render_midi(AudioBuffer &buf)
 
 void TrackRenderer::render(AudioBuffer &buf)
 {
+	if (!track)
+		return;
 	if (track->type == SignalType::AUDIO)
 		render_audio(buf);
 	else if (track->type == SignalType::BEATS)

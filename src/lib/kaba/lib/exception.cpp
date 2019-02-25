@@ -16,7 +16,7 @@
 namespace Kaba{
 
 
-bool _verbose_exception_ = false;
+bool _verbose_exception_ = true;
 
 
 KabaException::KabaException(const string &message)
@@ -212,19 +212,21 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 	Array<StackFrameInfo> trace;
 
 	void **rsp = nullptr;
-//	msg_write("stack trace");
-//	printf("rbp=%p     ...%p\n", rbp, &rsp);
+	msg_write("stack trace");
+	printf("rbp=%p     ...%p\n", rbp, &rsp);
+
+	int n_unknown = 0;
 
 	while (true){
 		rsp = rbp;
 		rbp = (void**)*rsp;
 		rsp ++;
-		//printf("-- rsp: %p\n", rsp);
-		//printf("-- rbp: %p\n", rbp);
+		printf("-- rsp: %p\n", rsp);
+		printf("-- rbp: %p\n", rbp);
 		void *rip = *rsp;
-		//printf("-- rip: %p\n", rip);
+		printf("-- rip: %p\n", rip);
 		rsp ++;
-//		printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
+		printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
 		auto r = get_func_from_rip(rip);
 		if (r.f){
 			r.rsp = rsp;
@@ -232,11 +234,14 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 			trace.add(r);
 			if (_verbose_exception_)
 				msg_write(">>  " + r.s->filename + " : " + r.f->long_name + format("()  +%d", r.offset));
+			msg_write(r.f->_var_size);
 
 		}else{
-			//if (_verbose_exception_)
-			//	msg_write("unknown function...: " + p2s(rip));
-			break;
+			if (_verbose_exception_)
+				msg_write("unknown function...: " + p2s(rip));
+			n_unknown ++;
+			if (n_unknown > 10)
+				break;
 		}
 	}
 	return trace;

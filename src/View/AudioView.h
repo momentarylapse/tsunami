@@ -101,6 +101,7 @@ public:
 	void draw_selection(Painter *c);
 	void draw_background(Painter *c);
 	void draw_song(Painter *c);
+	int draw_runner_id;
 
 	static rect get_boxed_str_rect(Painter *c, float x, float y, const string &str);
 	static void draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align=1);

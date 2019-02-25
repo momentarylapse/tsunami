@@ -38,9 +38,9 @@ public:
 	void _cdecl __delete__() override;
 
 	virtual bool _cdecl render(AudioBuffer &buf){ return false; }
-	virtual void on_start(float volume){}
-	virtual void on_end(){}
-	virtual void on_config(){}
+	virtual void _cdecl on_start(float volume){}
+	virtual void _cdecl on_end(){}
+	virtual void _cdecl on_config(){}
 
 	int pitch;
 	float delta_phi;

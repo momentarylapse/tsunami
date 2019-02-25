@@ -85,6 +85,10 @@ class DrumsetSynthesizer extends Synthesizer
 			return
 		s.events = events
 		s.render(buf)
+	
+	override void reset_state()
+		if s
+			s.reset_state()
 
 	
 	override ConfigPanel *create_panel()

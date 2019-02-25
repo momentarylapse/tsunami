@@ -28,16 +28,29 @@ class SampleRenderer extends PitchRenderer
 		e.pitch = 0
 		events.add(e)//MidiEvent(0, 0, volume))
 	override bool render(AudioBuffer buf)
+		print("RR")
 		if !sample or events.num == 0
+			print("/RR 0")
 			return false
+		print("a")
+		print(str(events))
 		int[] del
 		for e,i in events
+			print(i)
+			print(str(e))
+			print(len buf)
+			print(len *sample.buf)
+			raise(new Exception("xxx"))
 			buf.add(*sample.buf, e.pos, e.volume, 0)
+			print("ok")
 			e.pos -= buf.length
 			if e.pos + sample.buf.length < 0
 				del.add(i)
+			print("x")
+		print("y")
 		for i in 0:del.num
 			events.remove(del[del.num-1-i])
+		print("/RR")
 		return events.num > 0
 	
 

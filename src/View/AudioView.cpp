@@ -301,6 +301,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
 	peak_thread = nullptr;
+	draw_runner_id = -1;
 
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
@@ -349,6 +350,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 AudioView::~AudioView()
 {
+	if (draw_runner_id >= 0)
+		hui::CancelRunner(draw_runner_id);
 	stream->unsubscribe(this);
 
 	song->unsubscribe(this);
@@ -1287,7 +1290,7 @@ void AudioView::draw_song(Painter *c)
 		animating = true;
 
 	if (animating or slow_repeat)
-		hui::RunLater(animating ? 0.03f : 0.2f, [&]{ force_redraw(); });
+		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [&]{ force_redraw(); });
 }
 
 int frame = 0;

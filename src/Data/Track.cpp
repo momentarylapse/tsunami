@@ -80,6 +80,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 
 Track::~Track()
 {
+	notify(MESSAGE_DELETE);
 	for (TrackLayer *l: layers)
 		delete(l);
 	layers.clear();

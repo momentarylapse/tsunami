@@ -1767,7 +1767,7 @@ bool CompilerConfiguration::allow_output_func(const Function *f)
 		return true;
 	Array<string> filters = verbose_func_filter.explode(",");
 	for (auto &fil: filters)
-		if (f->name.match(fil))
+		if (f->long_name.match(fil))
 			return true;
 	return false;
 }

@@ -246,10 +246,10 @@ string signed_hex(int64 i)
 }
 
 
-string guess_constant(int64 c)
+string guess_constant(int64 c, Serializer *ser)
 {
-	for (auto &p: Packages)
-		for (auto *f: p.script->syntax->functions)
+	for (auto *s: ser->syntax_tree->includes)
+		for (auto *f: s->syntax->functions)
 			if (c == (int_p)f->address)
 				return "FUNC:" + f->long_name;
 
@@ -272,7 +272,7 @@ string SerialNodeParam::str(Serializer *ser) const
 		else if (kind == KIND_VAR_GLOBAL)
 			n = d2h(&p, config.pointer_size);
 		else if ((kind == KIND_CONSTANT) or (kind == KIND_IMMEDIATE))
-			n = guess_constant(p);
+			n = guess_constant(p, ser);
 		str = "  (" + type->name + ") " + kind2str(kind) + " " + n;
 		if (shift > 0)
 			str += format(" + shift %d", shift);

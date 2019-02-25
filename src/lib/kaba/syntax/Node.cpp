@@ -103,8 +103,6 @@ void Node::show() const
 	msg_right();
 	if (instance)
 		instance->show();
-	if (params.num > 10)
-		return;
 	for (Node *p: params)
 		if (p)
 			p->show();

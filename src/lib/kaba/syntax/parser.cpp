@@ -1125,7 +1125,7 @@ Node *SyntaxTree::parse_statement_for_array(Block *block)
 	}
 
 	// while(for_index < val1)
-	Node *cmd_cmp = add_node_operator_by_inline(for_index, val1, INLINE_INT_SMALLER);
+	Node *cmd_cmp = add_node_operator_by_inline(cp_node(for_index), val1, INLINE_INT_SMALLER);
 	cmd_for->set_param(1, cmd_cmp);
 	expect_new_line();
 	// ...block
@@ -1137,7 +1137,7 @@ Node *SyntaxTree::parse_statement_for_array(Block *block)
 	parser_loop_depth --;
 
 	// ...for_index += 1
-	Node *cmd_inc = add_node_operator_by_inline(for_index, val1 /*dummy*/, INLINE_INT_INCREASE);
+	Node *cmd_inc = add_node_operator_by_inline(cp_node(for_index), val1 /*dummy*/, INLINE_INT_INCREASE);
 	cmd_for->set_param(3, cmd_inc);
 
 	// &for_var
@@ -1146,26 +1146,42 @@ Node *SyntaxTree::parse_statement_for_array(Block *block)
 	Node *array_el;
 	if (for_array->type->usable_as_super_array()){
 		// &array.data[for_index]
-		array_el = add_node_parray(shift_node(cp_node(for_array), false, 0, var_type->get_pointer()),
-	                                       	   for_index, var_type);
+		array_el = add_node_parray(shift_node(cp_node(for_array), false, 0, var_type->get_pointer()), for_index, var_type);
 	}else{
 		// &array[for_index]
-		array_el = add_node_parray(ref_node(for_array),
-	                                       	   for_index, var_type);
+		array_el = add_node_parray(ref_node(for_array), cp_node(for_index), var_type);
 	}
-	Node *array_el_ref = ref_node(array_el);
 
 	// &for_var = &array[for_index]
-	Node *cmd_var_assign = add_node_operator_by_inline(for_var_ref, array_el_ref, INLINE_POINTER_ASSIGN);
-	loop_block->as_block()->params.insert(cmd_var_assign, 0);
+	Node *cmd_var_assign = add_node_operator_by_inline(for_var_ref, ref_node(array_el), INLINE_POINTER_ASSIGN);
+
+	if (block->function->long_name == "SampleRenderer.render"){
+		msg_write("for.... BBBB");
+		cmd_for->show();
+	}
+
+	loop_block->params.insert(cmd_var_assign, 0);
+
+
+	if (block->function->long_name == "SampleRenderer.render"){
+		msg_write("for....CCCC");
+		cmd_for->show();
+	}
 
 	// ref...
 	var->type = var_type->get_pointer();
 	transform_node(loop_block, [&](Node *n){ return conv_cbr(this, n, var); });
 
+
+	if (block->function->long_name == "SampleRenderer.render"){
+		msg_write("for.... post");
+		cmd_for->show();
+	}
+
 	// force for_var out of scope...
 	for_var->as_local()->name = "-out-of-scope-";
 	for_index->as_local()->name = "-out-of-scope-";
+
 
 	return cmd_for;
 }

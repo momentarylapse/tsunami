@@ -493,7 +493,6 @@ void *Class::create_instance() const
 
 string Class::var2str(const void *p) const
 {
-	msg_write(name);
 	if (this == TypeInt){
 		return i2s(*(int*)p);
 	}else if (this == TypeFloat32){

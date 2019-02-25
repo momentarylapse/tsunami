@@ -633,6 +633,8 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, cons
 void PluginManager::find_plugins()
 {
 	Kaba::Init();
+	Kaba::config.verbose = true;
+	Kaba::config.verbose_func_filter = "SampleRenderer.render";
 
 	// "AudioSource"
 	find_plugins_in_dir("AudioSource/", ModuleType::AUDIO_SOURCE, this);

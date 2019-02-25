@@ -1,0 +1,54 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+class ZeroRenderer extends PitchRenderer
+	float phase
+	float volume
+	bool fade_out
+	
+	// gets called when creating the renderer
+	override void __init__(Synthesizer *s, int pitch)
+		// dark magic...gave up
+		super.__init__(s, pitch)
+		phase = 0
+		volume = 0
+		fade_out = false
+	
+	// use += ... otherwise would overwrite previous notes...!!!!
+	override bool render(AudioBuffer buf)
+		//print(buf.length)
+		
+//		float freq = pitch_to_freq(pitch)
+//		float dt = 1.0 / synth.sample_rate
+//		...delta_phi = freq * dt * 2 * pi
+		
+		if fade_out
+			for i in 0:buf.length
+				volume *= 0.999
+				buf.r[i] += sin(phase) * volume
+				phase += delta_phi
+		else
+			for i in 0:buf.length
+				buf.r[i] += sin(phase) * volume
+				phase += delta_phi
+				
+		// keep alive?
+		return volume > 0.001
+		
+	override void on_event(MidiEvent e)
+		print("MIDI EVENT " + e.volume)
+		if e.volume > 0
+			volume = e.volume * 0.3
+			fade_out = false
+		else
+			fade_out = true
+
+class Zero extends Synthesizer
+	
+	override void __init__()
+		// VERY UGNLY HACK.....
+		auto_generate_stereo = true
+	
+	// messy :P
+	override PitchRenderer* create_pitch_renderer(int pitch)
+		return new ZeroRenderer(self, pitch)

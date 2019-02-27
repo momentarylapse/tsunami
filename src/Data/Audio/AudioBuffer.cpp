@@ -242,7 +242,6 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, floa
 {
 	/*if (source.channels > channels)
 		printf("AudioBuffer.add: channels\n");*/
-	msg_write("n1");
 
 	// relative to b
 	int i0 = max(0, -_offset);
@@ -270,9 +269,7 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, floa
 				c[tc][i + _offset] += source.c[sc][i] * f[tc];
 		}
 	}
-	msg_write("n2");
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
-	msg_write("n3");
 }
 
 inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length)

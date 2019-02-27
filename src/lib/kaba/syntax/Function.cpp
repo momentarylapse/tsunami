@@ -21,6 +21,7 @@ Variable::Variable(const string &_name, const Class *_type)
 	dont_add_constructor = false;
 	memory = nullptr;
 	memory_owner = false;
+	_label = -1;
 }
 
 Variable::~Variable()

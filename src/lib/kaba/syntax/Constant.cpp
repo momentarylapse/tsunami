@@ -100,8 +100,11 @@ DynamicArray& Value::as_array() const
 
 int Value::mapping_size() const
 {
-	if (type->is_super_array())
+	if (type->is_super_array()){
+		if (type->parent->is_super_array())
+			throw Exception("mapping const[][]... TODO", "", 0, 0, nullptr);
 		return config.super_array_size + (as_array().num * type->parent->size);
+	}
 	if (type == TypeCString)
 		return strlen((char*)p()) + 1;
 
@@ -112,6 +115,8 @@ int Value::mapping_size() const
 void Value::map_into(char *memory, char *addr) const
 {
 	if (type->is_super_array()){
+		if (type->parent->is_super_array())
+			throw Exception("mapping const[][]... TODO", "", 0, 0, nullptr);
 		// const string -> variable length
 		int size = as_array().element_size * as_array().num;
 		int data_offset = config.super_array_size;

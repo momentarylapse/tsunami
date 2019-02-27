@@ -56,6 +56,7 @@ enum{
 	INST_DD,
 	INST_DS,
 	INST_DZ,
+	INST_ALIGN_OPCODE,
 
 	INST_ADD,
 	INST_ADC,	   // add with carry

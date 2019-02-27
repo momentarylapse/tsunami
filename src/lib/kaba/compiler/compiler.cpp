@@ -95,6 +95,8 @@ void* get_nice_random_addr()
 
 void* get_nice_memory(long size, bool executable)
 {
+	if (size == 0)
+		return nullptr;
 	void *mem = nullptr;
 	size = mem_align(size, 4096);
 	if (config.verbose)
@@ -104,11 +106,16 @@ void* get_nice_memory(long size, bool executable)
 	mem = (char*)VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 #else
 
+	int prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+	if (executable)
+		flags |= MAP_EXECUTABLE;
+
 	// try in 32bit distance from current opcode
 	for (int i=0; i<100; i++){
 		void *addr0 = get_nice_random_addr();
 		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
-		mem = (char*)mmap(addr0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
+		mem = (char*)mmap(addr0, size, prot, flags, -1, 0);
 		if (config.verbose)
 			printf("%d  %p  ->  %p\n", i, addr0, mem);
 		if ((int_p)mem != -1){
@@ -122,7 +129,7 @@ void* get_nice_memory(long size, bool executable)
 	}
 
 	// no?...ok, try anywhere
-	mem = (char*)mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
+	mem = (char*)mmap(nullptr, size, prot, flags, -1, 0);
 	if ((int_p)mem == -1)
 		mem = nullptr;
 #endif
@@ -154,6 +161,23 @@ void Script::allocate_opcode()
 	opcode_size = 0;
 }
 
+void Script::allocate_memory()
+{
+	memory_size = 0;
+	for (auto *t: syntax->classes)
+		if (t->vtable.num > 0)
+			memory_size += config.pointer_size * t->vtable.num;
+	for (auto *v: syntax->root_of_all_evil.var)
+		memory_size += mem_align(v->type->size, 4);
+	for (auto *c: syntax->constants)
+		memory_size += c->mapping_size();
+
+	memory = (char*)get_nice_memory(memory_size, false);
+	if (config.verbose)
+		msg_write("memory:  " + p2s(memory));
+	memory_size = 0;
+}
+
 void Script::update_constant_locations()
 {
 	for (auto *c: syntax->constants)
@@ -175,11 +199,12 @@ void Script::map_global_variables_to_memory()
 				v->memory = (char*)(int_p)(config.variables_offset + override_offset);
 				override_offset += size_aligned;
 			}else{
-				v->memory = malloc(size_aligned);
-				v->memory_owner = true;
+				v->memory = &memory[memory_size];
+				memory_size += size_aligned;
+				//v->memory_owner = true;
 			}
+			//memset(v->memory, 0, v->type->size); // reset all global variables to 0
 		}
-		memset(v->memory, 0, v->type->size); // reset all global variables to 0
 	}
 }
 
@@ -216,21 +241,31 @@ Node *check_const_used(Node *n, Script *me)
 	return n;
 }
 
-void Script::map_constants_to_opcode()
+void remap_virtual_tables(Script *s, char *mem, int &offset)
 {
 	// vtables -> no data yet...
-	for (auto *ct: syntax->classes)
+	for (auto *ct: s->syntax->classes)
 		if (ct->vtable.num > 0){
 			Class *t = const_cast<Class*>(ct);
-			t->_vtable_location_compiler_ = &opcode[opcode_size];
-			t->_vtable_location_target_ = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
-			opcode_size += config.pointer_size * t->vtable.num;
-			for (Constant *c: syntax->constants)
-				if ((c->type == TypePointer) and (*(int*)c->value.data == (int)(int_p)t->vtable.data))
-					memcpy(c->value.data, &t->_vtable_location_target_, config.pointer_size);
+			t->_vtable_location_compiler_ = &mem[offset];
+			t->_vtable_location_target_ = &mem[offset];//(void*)(s->syntax->asm_meta_info->code_origin + opcode_size);
+			offset += config.pointer_size * t->vtable.num;
+			for (Constant *c: s->syntax->constants)
+				if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data)){
+					c->as_int64() = (int_p)t->_vtable_location_target_;
+				}
 		}
+}
 
-	syntax->transform([&](Node* n){ return check_const_used(n, this); });
+void Script::map_constants_to_memory(char *mem, int &offset)
+{
+	//update_constant_locations();
+	//return;
+
+	remap_virtual_tables(this, mem, offset);
+
+
+//	syntax->transform([&](Node* n){ return check_const_used(n, this); });
 
 	/*int n = 0;
 	for (bool b: used)
@@ -248,11 +283,12 @@ void Script::map_constants_to_opcode()
 	opcode_size = size0;*/
 
 
-	foreachi(Constant *c, syntax->constants, i)
-		if (c->used){
-			c->address = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
-			c->map_into(&opcode[opcode_size], (char*)c->address);
-			opcode_size += mem_align(c->mapping_size(), 4);
+	for (Constant *c: syntax->constants)
+		if (/*c->used*/ true){
+//			c->address = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
+			c->address = &mem[offset];
+			c->map_into(&mem[offset], (char*)c->address);
+			offset += mem_align(c->mapping_size(), 4);
 		}
 
 	/*foreachi(Constant *c, syntax->constants, i)
@@ -269,7 +305,11 @@ void Script::map_constants_to_opcode()
 		}*/
 
 	//msg_write(format("    compressed:  %d  ->  %d", uncompressed, opcode_size - size0));
+}
 
+void Script::map_constants_to_opcode()
+{
+	map_constants_to_memory(opcode, opcode_size);
 	align_opcode();
 }
 
@@ -441,7 +481,7 @@ void Script::link_functions()
 		Class *t = const_cast<Class*>(ct);
 		t->link_virtual_table();
 
-		if (config.compile_os){
+		/*if (config.compile_os)*/{
 			for (int i=0; i<t->vtable.num; i++)
 				memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
 		}
@@ -508,16 +548,6 @@ void parse_magic_linker_string(SyntaxTree *s)
 
 }
 
-int memory_size(Script *s)
-{
-	int size = 0;
-	for (auto *v: s->syntax->root_of_all_evil.var)
-		size += v->type->size;
-	for (auto *c: s->syntax->constants)
-		size += c->mapping_size();
-	return size;
-}
-
 // generate opcode
 void Script::compile()
 {
@@ -541,9 +571,10 @@ void Script::compile()
 	if (config.verbose)
 		syntax->Show("comp:a");
 
+	allocate_memory();
 	map_global_variables_to_memory();
 	if (!config.compile_os)
-		update_constant_locations();
+		map_constants_to_memory(memory, memory_size);
 
 	allocate_opcode();
 
@@ -587,7 +618,7 @@ void Script::compile()
 
 	if (show_compiler_stats){
 		msg_write("--------------------------------");
-		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size(this)));
+		msg_write(format("Opcode: %db, Memory: %db", opcode_size, memory_size));
 	}
 }
 

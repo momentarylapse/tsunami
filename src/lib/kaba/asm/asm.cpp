@@ -187,6 +187,7 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_DD,		"dd"},
 	{INST_DS,		"ds"},
 	{INST_DZ,		"dz"},
+	{INST_ALIGN_OPCODE,	":align:"},
 
 	{INST_ADD,		"add",		3, 1},
 	{INST_ADC,		"adc",		3, 1},
@@ -3121,10 +3122,13 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 			//---msg_write("deref....");
 			size = state.addr_size; // inst.has_big_addr
 			if (InstructionSet.set == INSTRUCTION_SET_AMD64){
-				if (inst.has_modrm)
+				if (inst.has_modrm){
 					value -= (int_p)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
-				else
+					if ((value >= 0x80000000) or (-value >= 0x80000000))
+						SetError(format("RIP relative more than 32 bit   %p  %lx", &oc[ocs], value));
+				}else{
 					size = SIZE_64; // Ov/Mv...
+				}
 			}
 		}
 	//}else if (p.type == ParamTImmediateExt){
@@ -3590,12 +3594,28 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 	OpcodeAddImmideate(oc, ocs, p2, inst, list, 0);
 }
 
+static void align_opcode(char *oc, int &ocs, int granularity)
+{
+	int mask = granularity - 1;
+	if ((ocs & mask) == 0)
+		return;
+	int ocs_new = (ocs | mask) + 1;
+	for (int i=ocs; i<ocs_new; i++)
+		oc[i] = 0x90;
+	ocs = ocs_new;
+}
+
 void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 {
 	int ocs0 = ocs;
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
 	state.reset(this);
+
+	if (iwp.inst == INST_ALIGN_OPCODE){
+		align_opcode(oc, ocs, 16);
+		return;
+	}
 
 	// test if any instruction matches our wishes
 	int ninst = -1;

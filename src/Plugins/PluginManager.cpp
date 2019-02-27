@@ -90,6 +90,7 @@ void __stop__(Session *s)
 	//s->signal_chain->stop();
 }
 
+
 void PluginManager::link_app_script_data()
 {
 	Kaba::config.directory = "";
@@ -624,8 +625,8 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, cons
 	for (PluginManager::PluginFile &f: pm->plugin_files){
 		if (f.filename.find(dir) >= 0){
 			string id = "execute-" + name_space + "--" + f.name;
-            m->add_with_image(f.name, f.image, id);
-            win->event(id, std::bind(function, win));
+			m->add_with_image(f.name, f.image, id);
+			win->event(id, std::bind(function, win));
 		}
 	}
 }
@@ -633,8 +634,6 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, cons
 void PluginManager::find_plugins()
 {
 	Kaba::Init();
-	Kaba::config.verbose = true;
-	Kaba::config.verbose_func_filter = "SampleRenderer.render";
 
 	// "AudioSource"
 	find_plugins_in_dir("AudioSource/", ModuleType::AUDIO_SOURCE, this);

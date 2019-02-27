@@ -28,6 +28,7 @@ struct Variable
 	bool memory_owner;
 	bool is_extern;
 	bool dont_add_constructor;
+	int _label;
 };
 
 // user defined functions

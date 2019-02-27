@@ -1154,34 +1154,15 @@ Node *SyntaxTree::parse_statement_for_array(Block *block)
 
 	// &for_var = &array[for_index]
 	Node *cmd_var_assign = add_node_operator_by_inline(for_var_ref, ref_node(array_el), INLINE_POINTER_ASSIGN);
-
-	if (block->function->long_name == "SampleRenderer.render"){
-		msg_write("for.... BBBB");
-		cmd_for->show();
-	}
-
 	loop_block->params.insert(cmd_var_assign, 0);
-
-
-	if (block->function->long_name == "SampleRenderer.render"){
-		msg_write("for....CCCC");
-		cmd_for->show();
-	}
 
 	// ref...
 	var->type = var_type->get_pointer();
 	transform_node(loop_block, [&](Node *n){ return conv_cbr(this, n, var); });
 
-
-	if (block->function->long_name == "SampleRenderer.render"){
-		msg_write("for.... post");
-		cmd_for->show();
-	}
-
 	// force for_var out of scope...
 	for_var->as_local()->name = "-out-of-scope-";
 	for_index->as_local()->name = "-out-of-scope-";
-
 
 	return cmd_for;
 }

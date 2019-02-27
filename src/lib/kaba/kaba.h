@@ -33,8 +33,6 @@ struct LinkerException : Exception{};
 struct LinkerException : Exception{};*/
 
 
-#define WaitingModeFinished		WaitingModeNone
-
 // executable (compiled) data
 class Script
 {
@@ -43,15 +41,17 @@ public:
 	Script();
 	~Script();
 
-	void Load(const string &filename, bool just_analyse = false);
+	void load(const string &filename, bool just_analyse = false);
 
 	// building operational code
 	void compile();
 	void update_constant_locations();
 	void map_constants_to_opcode();
 	void map_global_variables_to_memory();
+	void map_constants_to_memory(char *mem, int &offset);
 	void allocate_opcode();
 	void align_opcode();
+	void allocate_memory();
 	void assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list);
 	void compile_functions(char *oc, int &ocs);
 	void CompileOsEntryPoint();
@@ -64,12 +64,12 @@ public:
 	void do_error_internal(const string &msg);
 
 	// execution
-	void *MatchFunction(const string &name, const string &return_type, int num_params, ...);
-	void *MatchClassFunction(const string &_class, bool allow_derived, const string &name, const string &return_type, int num_params, ...);
-	void SetVariable(const string &name, void *data);
+	void *match_function(const string &name, const string &return_type, const Array<string> &param_types);
+	void *match_class_function(const string &_class, bool allow_derived, const string &name, const string &return_type, const Array<string> &param_types);
+	void set_variable(const string &name, void *data);
 
 	//debug displaying
-	void ShowVars(bool include_consts=false);
+	void show_vars(bool include_consts=false);
 
 // data
 
@@ -80,6 +80,9 @@ public:
 
 	char *opcode; // executable code
 	int opcode_size;
+
+	char *memory;
+	int memory_size;
 
 	Array<Asm::WantedLabel> functions_to_link;
 	Array<int> function_vars_to_link;
@@ -95,7 +98,7 @@ void ExecutePublicScripts();
 void DeleteAllScripts(bool even_immortal = false, bool force = false);
 void ExecuteSingleScriptCommand(const string &cmd);
 
-const Class *GetDynamicType(const void *p);
+const Class *GetDynamicType(const VirtualBase *p);
 
 };
 

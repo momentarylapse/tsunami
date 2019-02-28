@@ -49,11 +49,12 @@ struct Value
 // for any type of constant used in the script
 struct Constant : Value
 {
-	Constant(const Class *type);
+	Constant(const Class *type, SyntaxTree *owner);
 	string name;
 	string str() const;
 	void *address; // either p() or overriden for OS
 	bool used;
+	SyntaxTree *owner;
 };
 
 

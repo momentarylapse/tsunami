@@ -34,7 +34,7 @@ struct Variable
 // user defined functions
 struct Function
 {
-	SyntaxTree *tree;
+	SyntaxTree *owner;
 
 	string name;
 	string long_name; // "Class.Function"
@@ -59,7 +59,7 @@ struct Function
 	int _exp_no;
 	void *address;
 	int _label;
-	Function(SyntaxTree *tree, const string &name, const Class *return_type);
+	Function(const string &name, const Class *return_type, SyntaxTree *owner);
 	~Function();
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();

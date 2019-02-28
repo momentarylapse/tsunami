@@ -106,10 +106,12 @@ void* get_nice_memory(long size, bool executable)
 	mem = (char*)VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 #else
 
-	int prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+	int prot = PROT_READ | PROT_WRITE;
 	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-	if (executable)
+	if (executable){
+		prot |= PROT_EXEC;
 		flags |= MAP_EXECUTABLE;
+	}
 
 	// try in 32bit distance from current opcode
 	for (int i=0; i<100; i++){
@@ -235,7 +237,7 @@ Node *check_const_used(Node *n, Script *me)
 {
 	if (n->kind == KIND_CONSTANT){
 		n->as_const()->used = true;
-		if (n->script != me)
+		if (n->as_const()->owner != me->syntax)
 			msg_error("evil const " + n->as_const()->name);
 	}
 	return n;
@@ -357,6 +359,7 @@ struct IncludeTranslationData
 Node *conv_relink_calls(Node *c, Script *s, Script *target, IncludeTranslationData &d)
 {
 
+#if 0
 	// keep commands... just redirect var/const/func
 	if (c->script != d.source)
 		return c;
@@ -373,6 +376,7 @@ Node *conv_relink_calls(Node *c, Script *s, Script *target, IncludeTranslationDa
 	}else if ((c->kind == KIND_FUNCTION_CALL) or (c->kind == KIND_FUNCTION_POINTER)){
 		c->script = target;
 	}
+#endif
 	return c;
 }
 

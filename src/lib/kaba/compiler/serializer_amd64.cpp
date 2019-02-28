@@ -137,7 +137,7 @@ void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &inst
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((f->tree->script == this->script) and (!f->is_extern)){
+	if ((f->owner->script == this->script) and (!f->is_extern)){
 		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
 		if (!f->address)

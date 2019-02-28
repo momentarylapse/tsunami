@@ -51,8 +51,6 @@ string kind2str(int kind)
 	if (kind == KIND_GLOBAL_LOOKUP)		return "global lookup";
 	if (kind == KIND_DEREF_GLOBAL_LOOKUP)	return "deref global lookup";
 	if (kind == KIND_IMMEDIATE)			return "immediate";
-	if (kind == KIND_REF_TO_LOCAL)			return "ref to local";
-	if (kind == KIND_REF_TO_GLOBAL)		return "ref to global";
 	if (kind == KIND_REF_TO_CONST)			return "ref to const";
 	if (kind == KIND_DEREF_VAR_LOCAL)		return "deref local";
 	return format("UNKNOWN KIND: %d", kind);
@@ -115,7 +113,7 @@ void Node::show() const
 
 
 Block::Block(Function *f, Block *_parent) :
-	Node(KIND_BLOCK, (int_p)this, f->tree->script, TypeVoid)
+	Node(KIND_BLOCK, (int_p)this, TypeVoid)
 {
 	level = 0;
 	function = f;
@@ -128,26 +126,11 @@ Block::Block(Function *f, Block *_parent) :
 
 Block::~Block()
 {
-	/*for (Node *n: params){
-		if (n->kind == KIND_BLOCK)
-			delete (n->as_block());
-		//delete n;
-	}*/
 }
 
 
 inline void set_command(Node *&a, Node *b)
 {
-	if (a == b)
-		return;
-	if (a)
-		a->ref_count --;
-	if (b){
-		if (b->ref_count > 0){
-			//msg_write(">> " + kindsStr(b->kind));
-		}
-		b->ref_count ++;
-	}
 	a = b;
 }
 
@@ -155,19 +138,18 @@ void Block::add(Node *c)
 {
 	if (c){
 		params.add(c);
-		c->ref_count ++;
 	}
 }
 
 void Block::set(int index, Node *c)
 {
-	set_command(params[index], c);
+	params[index] = c;
 }
 
 Variable *Block::add_var(const string &name, const Class *type)
 {
 	if (get_var(name))
-		function->tree->do_error(format("variable '%s' already declared in this context", name.c_str()));
+		function->owner->do_error(format("variable '%s' already declared in this context", name.c_str()));
 	Variable *v = new Variable(name, type);
 	v->is_extern = next_extern;
 	function->var.add(v);
@@ -186,24 +168,21 @@ Variable *Block::get_var(const string &name)
 }
 
 
-Node::Node(int _kind, long long _link_no, Script *_script, const Class *_type)
+Node::Node(int _kind, int64 _link_no, const Class *_type)
 {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
 	instance = nullptr;
-	script = _script;
-	ref_count = 0;
 }
 
 Node::~Node()
 {
-	/*if (instance)
+	if (instance)
 		delete instance;
 	for (auto &p: params)
 		if (p)
-			delete p;*/
-	// TODO later
+			delete p;
 }
 
 Block *Node::as_block() const
@@ -278,10 +257,10 @@ void Node::set_num_params(int n)
 
 void Node::set_param(int index, Node *p)
 {
-	if ((index < 0) or (index >= params.num)){
+	/*if ((index < 0) or (index >= params.num)){
 		show();
-		script->do_error_internal(format("Command.set_param...  %d %d", index, params.num));
-	}
+		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);
+	}*/
 	set_command(params[index], p);
 }
 

@@ -138,10 +138,11 @@ string Value::str() const
 	return type->var2str(value.data);
 }
 
-Constant::Constant(const Class *_type)
+Constant::Constant(const Class *_type, SyntaxTree *_owner)
 {
 	init(_type);
 	name = "-none-";
+	owner = _owner;
 	used = false;
 	address = nullptr;
 }

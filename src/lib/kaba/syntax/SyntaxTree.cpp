@@ -27,7 +27,7 @@ string Operator::sig() const
 
 Node *SyntaxTree::cp_node(Node *c)
 {
-	Node *cmd = AddNode(c->kind, c->link_no, c->type, c->script);
+	Node *cmd = new Node(c->kind, c->link_no, c->type);
 	cmd->set_num_params(c->params.num);
 	for (int i=0;i<c->params.num;i++)
 		if (c->params[i])
@@ -62,11 +62,11 @@ Node *SyntaxTree::ref_node(Node *sub, const Class *override_type)
 		return add_node_const(c);
 	}else if (sub->kind == KIND_FUNCTION_NAME){
 		// can't be const because the function might not be compiled yet!
-		return new Node(KIND_FUNCTION_POINTER, sub->link_no, sub->script, make_class_func(sub->as_func()));
+		return new Node(KIND_FUNCTION_POINTER, sub->link_no, make_class_func(sub->as_func()));
 		// could also happen later via transform()
 	}
 
-	Node *c = AddNode(KIND_REFERENCE, 0, t);
+	Node *c = new Node(KIND_REFERENCE, 0, t);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
@@ -74,7 +74,7 @@ Node *SyntaxTree::ref_node(Node *sub, const Class *override_type)
 
 Node *SyntaxTree::deref_node(Node *sub, const Class *override_type)
 {
-	Node *c = AddNode(KIND_UNKNOWN, 0, TypeVoid);
+	Node *c = new Node(KIND_UNKNOWN, 0, TypeVoid);
 	c->kind = KIND_DEREFERENCE;
 	c->set_num_params(1);
 	c->set_param(0, sub);
@@ -87,7 +87,7 @@ Node *SyntaxTree::deref_node(Node *sub, const Class *override_type)
 
 Node *SyntaxTree::shift_node(Node *sub, bool deref, int shift, const Class *type)
 {
-	Node *c= AddNode(deref ? KIND_DEREF_ADDRESS_SHIFT : KIND_ADDRESS_SHIFT, shift, type);
+	Node *c = new Node(deref ? KIND_DEREF_ADDRESS_SHIFT : KIND_ADDRESS_SHIFT, shift, type);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
@@ -95,9 +95,8 @@ Node *SyntaxTree::shift_node(Node *sub, bool deref, int shift, const Class *type
 
 Node *SyntaxTree::add_node_statement(int index)
 {
-	Node *c = AddNode(KIND_STATEMENT, index, TypeVoid);
+	Node *c = new Node(KIND_STATEMENT, index, TypeVoid);
 
-	c->script = Packages[0].script;
 	c->instance = nullptr;
 	c->set_num_params(Statements[index].num_params);
 
@@ -109,35 +108,34 @@ Node *SyntaxTree::add_node_member_call(ClassFunction *f, Node *inst, bool force_
 {
 	Node *c;
 	if ((f->virtual_index >= 0) and (!force_non_virtual)){
-		c = AddNode(KIND_VIRTUAL_CALL, f->virtual_index, f->return_type);
-		c->script = f->script;
+		c = new Node(KIND_VIRTUAL_CALL, f->virtual_index, f->return_type);
 	}else{
-		c = add_node_call(f->func, f->return_type);
+		c = add_node_call(f->func);
+
+		// some classes share a function (for example @DynamicArray.__subarray__)
+		c->type = f->return_type;
 	}
 	c->set_instance(inst);
 	c->set_num_params(f->param_types.num);
 	return c;
 }
 
-Node *SyntaxTree::add_node_call(Function *f, const Class *return_type)
+Node *SyntaxTree::add_node_call(Function *f)
 {
-	Node *c = AddNode(KIND_FUNCTION_CALL, (int_p)f, return_type);
-	c->script = f->tree->script;
+	Node *c = new Node(KIND_FUNCTION_CALL, (int_p)f, f->return_type);
 	c->set_num_params(f->num_params);
 	return c;
 }
 
 Node *SyntaxTree::add_node_func_name(Function *f)
 {
-	Node *c = AddNode(KIND_FUNCTION_NAME, (int_p)f, TypeFunction);
-	c->script = f->tree->script;
-	return c;
+	return new Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunction);
 }
 
 
 Node *SyntaxTree::add_node_operator(Node *p1, Node *p2, Operator *op)
 {
-	Node *cmd = AddNode(KIND_OPERATOR, (int_p)op, op->return_type);
+	Node *cmd = new Node(KIND_OPERATOR, (int_p)op, op->return_type);
 	bool unitary = ((op->param_type_1 == TypeVoid) or (op->param_type_2 == TypeVoid));
 	cmd->set_num_params( unitary ? 1 : 2); // unary / binary
 	cmd->set_param(0, p1);
@@ -161,12 +159,12 @@ Node *SyntaxTree::add_node_local_var(Variable *v)
 {
 	if (!v)
 		script->do_error_internal("var = nil");
-	return AddNode(KIND_VAR_LOCAL, (int_p)v, v->type);
+	return new Node(KIND_VAR_LOCAL, (int_p)v, v->type);
 }
 
 Node *SyntaxTree::add_node_parray(Node *p, Node *index, const Class *type)
 {
-	Node *cmd_el = AddNode(KIND_POINTER_AS_ARRAY, 0, type);
+	Node *cmd_el = new Node(KIND_POINTER_AS_ARRAY, 0, type);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, p);
 	cmd_el->set_param(1, index);
@@ -175,11 +173,11 @@ Node *SyntaxTree::add_node_parray(Node *p, Node *index, const Class *type)
 
 /*Node *SyntaxTree::add_node_block(Block *b)
 {
-	return AddNode(KIND_BLOCK, (long long)(int_p)b, TypeVoid);
+	return new Node(KIND_BLOCK, (long long)(int_p)b, TypeVoid);
 }*/
 
 SyntaxTree::SyntaxTree(Script *_script) :
-	root_of_all_evil(this, "RootOfAllEvil", TypeVoid)
+	root_of_all_evil("RootOfAllEvil", TypeVoid, this)
 {
 	root_of_all_evil.block = new Block(&root_of_all_evil, nullptr);
 
@@ -271,7 +269,7 @@ void SyntaxTree::CreateAsmMetaInfo()
 
 Constant *SyntaxTree::add_constant(const Class *type)
 {
-	auto *c = new Constant(type);
+	auto *c = new Constant(type, this);
 	constants.add(c);
 	return c;
 }
@@ -280,30 +278,17 @@ Constant *SyntaxTree::add_constant(const Class *type)
 
 Function *SyntaxTree::add_function(const string &name, const Class *type)
 {
-	Function *f = new Function(this, name, type);
+	Function *f = new Function(name, type, this);
 	functions.add(f);
 	f->block = new Block(f, nullptr);
 	return f;
 }
 
-Node *SyntaxTree::AddNode(int kind, long long link_no, const Class *type)
-{
-	Node *c = new Node(kind, link_no, script, type);
-	nodes.add(c);
-	return c;
-}
-
-Node *SyntaxTree::AddNode(int kind, long long link_no, const Class *type, Script *s)
-{
-	Node *c = new Node(kind, link_no, s, type);
-	nodes.add(c);
-	return c;
-}
 
 
 Node *SyntaxTree::add_node_const(Constant *c)
 {
-	return AddNode(KIND_CONSTANT, (int_p)c, c->type);
+	return new Node(KIND_CONSTANT, (int_p)c, c->type);
 }
 
 int SyntaxTree::which_primitive_operator(const string &name)
@@ -334,13 +319,13 @@ int SyntaxTree::which_statement(const string &name)
 // xxxxx FIXME
 Node *exlink_make_var_local(SyntaxTree *ps, const Class *t, Variable *v)
 {
-	return new Node(KIND_VAR_LOCAL, (int_p)v, ps->script, t);
+	return new Node(KIND_VAR_LOCAL, (int_p)v, t);
 }
 
 Node *exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
 	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF));
-	Node *link = new Node(KIND_DEREF_ADDRESS_SHIFT, e.offset, ps->script, e.type);
+	Node *link = new Node(KIND_DEREF_ADDRESS_SHIFT, e.offset, e.type);
 	link->set_num_params(1);
 	link->params[0] = self;
 	return link;
@@ -348,7 +333,7 @@ Node *exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 
 Node *exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
-	Node *link = new Node(KIND_FUNCTION_NAME, (int_p)cf.func, cf.script, TypeFunction);
+	Node *link = new Node(KIND_FUNCTION_NAME, (int_p)cf.func, TypeFunction);
 	/*if (cf.virtual_index >= 0){
 		link = new Node(KIND_VIRTUAL_CALL, cf.virtual_index, cf.script, cf.return_type);
 	}else{
@@ -367,24 +352,24 @@ Array<Node*> SyntaxTree::get_existence_shared(const string &name)
 	// global variables (=local variables in "RootOfAllEvil")
 	for (Variable *v: root_of_all_evil.var)
 		if (v->name == name)
-			return new Node(KIND_VAR_GLOBAL, (int_p)v, script, v->type);
+			return new Node(KIND_VAR_GLOBAL, (int_p)v, v->type);
 
 	// named constants
 	for (Constant *c: constants)
 		if (name == c->name)
-			return new Node(KIND_CONSTANT, (int_p)c, script, c->type);
+			return new Node(KIND_CONSTANT, (int_p)c, c->type);
 
 	// then the (real) functions
 	for (Function *f: functions)
 		if (f->name == name and !f->_class)
-			links.add(new Node(KIND_FUNCTION_NAME, (int_p)f, script, TypeFunction));//f->literal_return_type);
+			links.add(new Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunction));//f->literal_return_type);
 	if (links.num > 0)
 		return links;
 
 	// types
 	auto *c = which_owned_class(name);
 	if (c)
-		return new Node(KIND_CLASS, (int_p)c, script, TypeClass);
+		return new Node(KIND_CLASS, (int_p)c, TypeClass);
 
 	// ...unknown
 	return {};
@@ -422,7 +407,7 @@ Array<Node*> SyntaxTree::get_existence(const string &name, Block *block)
 	// then the statements
 	int w = which_statement(name);
 	if (w >= 0){
-		Node *n = new Node(KIND_STATEMENT, w, script, TypeVoid);
+		Node *n = new Node(KIND_STATEMENT, w, TypeVoid);
 		n->set_num_params(Statements[w].num_params);
 		return n;
 	}
@@ -430,7 +415,7 @@ Array<Node*> SyntaxTree::get_existence(const string &name, Block *block)
 	// operators
 	w = which_primitive_operator(name);
 	if (w >= 0)
-		return new Node(KIND_PRIMITIVE_OPERATOR, w, script, TypeUnknown);
+		return new Node(KIND_PRIMITIVE_OPERATOR, w, TypeUnknown);
 
 	// in include files (only global)...
 	for (Script *i: includes)
@@ -864,7 +849,6 @@ Node* conv_func_inline(SyntaxTree *ps, Node *n)
 		Operator *op = n->as_op();
 		n->kind = KIND_INLINE_CALL; // FIXME
 		n->link_no = (int_p)op->f;
-		n->script = op->owner->script;
 		return n;
 	}
 	return n;

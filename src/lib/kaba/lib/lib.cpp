@@ -442,7 +442,7 @@ void class_link_vtable(void *p)
 
 void add_const(const string &name, const Class *type, void *value)
 {
-	Constant *c = new Constant(type);
+	Constant *c = new Constant(type, cur_package_script->syntax);
 	c->name = name;
 	c->address = c->p();
 
@@ -608,7 +608,7 @@ Array<Statement> Statements;
 
 int add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag)
 {
-	Function *f = new Function(cur_package_script->syntax, name, return_type);
+	Function *f = new Function(name, return_type, cur_package_script->syntax);
 	f->is_pure = ((flag & FLAG_PURE) > 0);
 	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
 	cur_package_script->syntax->functions.add(f);
@@ -902,15 +902,13 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 {
 	TypeCast c;
 	c.penalty = penalty;
-	c.func_no = -1;
-	if (c.func_no < 0)
-	for (int i=0;i<cur_package_script->syntax->functions.num;i++)
-		if (cur_package_script->syntax->functions[i]->long_name == cmd){
-			c.func_no = i;
-			c.script = cur_package_script;
+	c.f = nullptr;
+	for (auto *f: cur_package_script->syntax->functions)
+		if (f->long_name == cmd){
+			c.f = f;
 			break;
 		}
-	if (c.func_no < 0){
+	if (!c.f){
 #ifdef _X_USE_HUI_
 		hui::ErrorBox(nullptr, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
 		hui::RaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");

@@ -335,8 +335,7 @@ struct TypeCast
 {
 	int penalty;
 	const Class *source, *dest;
-	int func_no;
-	Script *script;
+	Function *f;
 	t_cast_func *func;
 };
 extern Array<TypeCast> TypeCasts;

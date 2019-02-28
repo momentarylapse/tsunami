@@ -88,7 +88,7 @@ void SerializerX86::add_function_call(Function *f, const SerialNodeParam &instan
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((f->tree->script == this->script) and (!f->is_extern)){
+	if ((f->owner->script == this->script) and (!f->is_extern)){
 		add_cmd(Asm::INST_CALL, param_marker(f->_label));
 	}else{
 		if (!f->address)
@@ -120,7 +120,7 @@ void SerializerX86::add_pointer_call(const SerialNodeParam &pointer, const Array
 
 int func_index(Function *f)
 {
-	foreachi(Function *ff, f->tree->functions, i)
+	foreachi(Function *ff, f->owner->functions, i)
 		if (ff == f)
 			return i;
 	return -1;
@@ -140,7 +140,7 @@ SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int 
 		p.p = (int_p)link->as_func_p();
 		p.kind = KIND_IMMEDIATE;//KIND_VAR_GLOBAL;
 		if (!p.p){
-			if (link->script == script){
+			if (link->as_func()->owner == syntax_tree){
 				int index = func_index(link->as_func());
 				p.p = index + 0xefef0000;
 				script->function_vars_to_link.add(index);
@@ -336,23 +336,29 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			}
 			break;
 		case STATEMENT_NEW:{
+			// malloc()
 			Array<Node*> links = syntax_tree->get_existence("@malloc", nullptr);
 			if (links.num == 0)
 				do_error("@malloc not found????");
-			AddFunctionCall(links[0]->as_func(), p_none, param_const(TypeInt, ret.type->parent->size), ret);
+			AddFunctionCall(links[0]->as_func(), p_none, {param_const(TypeInt, ret.type->parent->size)}, ret);
+			clear_nodes(links);
+
+			// __init__()
 			if (com->params.num > 0){
-				// copy + edit command
-				Node sub = *com->params[0];
-				Node c_ret(KIND_VAR_TEMP, ret.p, script, ret.type);
-				sub.instance = &c_ret;
-				serialize_node(&sub, block, index);
+				Node *sub = com->params[0];
+				Node *c_ret = new Node(KIND_VAR_TEMP, ret.p, ret.type);
+				sub->instance = c_ret;
+				serialize_node(sub, block, index);
+				//delete sub;
 			}else
 				add_cmd_constructor(ret, -1);
-			clear_nodes(links);
 			break;}
 		case STATEMENT_DELETE:{
+			// __delete__()
 			param[0] = SerializeParameter(com->params[0], block, index); // operand
 			add_cmd_destructor(param[0], false);
+
+			// free()
 			Array<Node*> links = syntax_tree->get_existence("@free", nullptr);
 			if (links.num == 0)
 				do_error("@free not found????");

@@ -604,24 +604,28 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	}catch(...){}
 }
 
-void find_plugins_in_dir_absolute(const string &dir, ModuleType type, PluginManager *pm)
+void find_plugins_in_dir_absolute(const string &_dir, const string &group, ModuleType type, PluginManager *pm)
 {
+	string dir = _dir;
+	if (group.num > 0)
+		dir += group + "/";
 	Array<DirEntry> list = dir_search(dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
 		pf.filename = dir + e.name;
+		pf.group = group;
 		get_plugin_file_data(pf);
 		pm->plugin_files.add(pf);
 	}
 }
 
-void find_plugins_in_dir(const string &subdir, ModuleType type, PluginManager *pm)
+void find_plugins_in_dir(const string &rel, const string &group, ModuleType type, PluginManager *pm)
 {
-	find_plugins_in_dir_absolute(pm->plugin_dir_static() + subdir, type, pm);
+	find_plugins_in_dir_absolute(pm->plugin_dir_static() + rel, group, type, pm);
 	if (pm->plugin_dir_local() != pm->plugin_dir_static())
-		find_plugins_in_dir_absolute(pm->plugin_dir_local() + subdir, type, pm);
+		find_plugins_in_dir_absolute(pm->plugin_dir_local() + rel, group, type, pm);
 }
 
 void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
@@ -640,37 +644,37 @@ void PluginManager::find_plugins()
 	Kaba::Init();
 
 	// "AudioSource"
-	find_plugins_in_dir("AudioSource/", ModuleType::AUDIO_SOURCE, this);
+	find_plugins_in_dir("AudioSource/", "", ModuleType::AUDIO_SOURCE, this);
 
 	// "AudioEffect"
-	find_plugins_in_dir("AudioEffect/Channels/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Dynamics/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Echo/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Pitch/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Repair/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Sound/", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/Synthesizer/", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Channels", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Dynamics", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Echo", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Pitch", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Repair", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Sound", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Synthesizer", ModuleType::AUDIO_EFFECT, this);
 
 	// "AudioVisualizer"
-	find_plugins_in_dir("AudioVisualizer/", ModuleType::AUDIO_VISUALIZER, this);
+	find_plugins_in_dir("AudioVisualizer/", "", ModuleType::AUDIO_VISUALIZER, this);
 
 	// "MidiSource"
-	find_plugins_in_dir("MidiSource/", ModuleType::MIDI_SOURCE, this);
+	find_plugins_in_dir("MidiSource/", "", ModuleType::MIDI_SOURCE, this);
 
 	// "MidiEffect"
-	find_plugins_in_dir("MidiEffect/", ModuleType::MIDI_EFFECT, this);
+	find_plugins_in_dir("MidiEffect/", "", ModuleType::MIDI_EFFECT, this);
 
 	// "BeatSource"
-	find_plugins_in_dir("BeatSource/", ModuleType::BEAT_SOURCE, this);
+	find_plugins_in_dir("BeatSource/", "", ModuleType::BEAT_SOURCE, this);
 
 	// "All"
-	find_plugins_in_dir("All/", ModuleType::SONG_PLUGIN, this);
+	find_plugins_in_dir("All/", "", ModuleType::SONG_PLUGIN, this);
 
 	// rest
-	find_plugins_in_dir("Independent/", ModuleType::TSUNAMI_PLUGIN, this);
+	find_plugins_in_dir("Independent/", "", ModuleType::TSUNAMI_PLUGIN, this);
 
 	// "Synthesizer"
-	find_plugins_in_dir("Synthesizer/", ModuleType::SYNTHESIZER, this);
+	find_plugins_in_dir("Synthesizer/", "", ModuleType::SYNTHESIZER, this);
 }
 
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win)
@@ -786,6 +790,17 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 	return names;
 }
 
+Array<string> PluginManager::find_module_sub_types_grouped(ModuleType type)
+{
+	if (type == ModuleType::AUDIO_EFFECT){
+		Array<string> names;
+		for (auto &pf: plugin_files)
+			if (pf.type == type)
+				names.add(pf.group + "/" + pf.name);
+		return names;
+	}
+	return find_module_sub_types(type);
+}
 
 string PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name)
 {

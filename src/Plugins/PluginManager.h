@@ -44,6 +44,7 @@ public:
 	string select_favorite_name(hui::Window *win, Module *c, bool save);
 
 	Array<string> find_module_sub_types(ModuleType type);
+	Array<string> find_module_sub_types_grouped(ModuleType type);
 
 	string choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
 
@@ -52,6 +53,7 @@ public:
 	struct PluginFile
 	{
 		string name;
+		string group;
 		string filename;
 		string image;
 		ModuleType type;

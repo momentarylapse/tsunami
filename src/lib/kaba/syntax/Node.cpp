@@ -15,44 +15,80 @@ extern bool next_extern;
 
 string kind2str(int kind)
 {
-	if (kind == KIND_VAR_LOCAL)			return "local";
-	if (kind == KIND_VAR_GLOBAL)			return "global";
-	if (kind == KIND_FUNCTION_NAME)		return "function name";
-	if (kind == KIND_FUNCTION_POINTER)		return "function pointer";
-	if (kind == KIND_CONSTANT)			return "constant";
-	if (kind == KIND_REF_TO_CONST)			return "reference to const";
-	if (kind == KIND_FUNCTION_CALL)			return "call";
-	if (kind == KIND_POINTER_CALL)			return "pointer call";
-	if (kind == KIND_INLINE_CALL)			return "inline";
-	if (kind == KIND_VIRTUAL_CALL)	return "virtual call";
-	if (kind == KIND_STATEMENT)			return "statement";
-	if (kind == KIND_OPERATOR)			return "operator";
-	if (kind == KIND_PRIMITIVE_OPERATOR)	return "PRIMITIVE operator";
-	if (kind == KIND_BLOCK)				return "block";
-	if (kind == KIND_ADDRESS_SHIFT)		return "address shift";
-	if (kind == KIND_ARRAY)				return "array element";
-	if (kind == KIND_POINTER_AS_ARRAY)		return "pointer as array element";
-	if (kind == KIND_REFERENCE)			return "address operator";
-	if (kind == KIND_DEREFERENCE)		return "dereferencing";
-	if (kind == KIND_DEREF_ADDRESS_SHIFT)	return "deref address shift";
-	if (kind == KIND_CLASS)				return "class";
-	if (kind == KIND_ARRAY_BUILDER)		return "array builder";
-	if (kind == KIND_CONSTRUCTOR_AS_FUNCTION)		return "constructor function";
-	if (kind == KIND_VAR_TEMP)			return "temp";
-	if (kind == KIND_DEREF_VAR_TEMP)		return "deref temp";
-	if (kind == KIND_REGISTER)			return "register";
-	if (kind == KIND_ADDRESS)			return "address";
-	if (kind == KIND_MEMORY)				return "memory";
-	if (kind == KIND_LOCAL_ADDRESS)		return "local address";
-	if (kind == KIND_LOCAL_MEMORY)		return "local memory";
-	if (kind == KIND_DEREF_REGISTER)		return "deref register";
-	if (kind == KIND_MARKER)				return "marker";
-	if (kind == KIND_DEREF_MARKER)		return "deref marker";
-	if (kind == KIND_GLOBAL_LOOKUP)		return "global lookup";
-	if (kind == KIND_DEREF_GLOBAL_LOOKUP)	return "deref global lookup";
-	if (kind == KIND_IMMEDIATE)			return "immediate";
-	if (kind == KIND_REF_TO_CONST)			return "ref to const";
-	if (kind == KIND_DEREF_VAR_LOCAL)		return "deref local";
+	if (kind == KIND_VAR_LOCAL)
+		return "local";
+	if (kind == KIND_VAR_GLOBAL)
+		return "global";
+	if (kind == KIND_FUNCTION_NAME)
+		return "function name";
+	if (kind == KIND_FUNCTION_POINTER)
+		return "function pointer";
+	if (kind == KIND_CONSTANT)
+		return "constant";
+	if (kind == KIND_CONSTANT_BY_ADDRESS)
+		return "constant by addr";
+	if (kind == KIND_FUNCTION_CALL)
+		return "call";
+	if (kind == KIND_POINTER_CALL)
+		return "pointer call";
+	if (kind == KIND_INLINE_CALL)
+		return "inline";
+	if (kind == KIND_VIRTUAL_CALL)
+		return "virtual call";
+	if (kind == KIND_STATEMENT)
+		return "statement";
+	if (kind == KIND_OPERATOR)
+		return "operator";
+	if (kind == KIND_PRIMITIVE_OPERATOR)
+		return "PRIMITIVE operator";
+	if (kind == KIND_BLOCK)
+		return "block";
+	if (kind == KIND_ADDRESS_SHIFT)
+		return "address shift";
+	if (kind == KIND_ARRAY)
+		return "array element";
+	if (kind == KIND_POINTER_AS_ARRAY)
+		return "pointer as array element";
+	if (kind == KIND_REFERENCE)
+		return "address operator";
+	if (kind == KIND_DEREFERENCE)
+		return "dereferencing";
+	if (kind == KIND_DEREF_ADDRESS_SHIFT)
+		return "deref address shift";
+	if (kind == KIND_CLASS)
+		return "class";
+	if (kind == KIND_ARRAY_BUILDER)
+		return "array builder";
+	if (kind == KIND_CONSTRUCTOR_AS_FUNCTION)
+		return "constructor function";
+	if (kind == KIND_VAR_TEMP)
+		return "temp";
+	if (kind == KIND_DEREF_VAR_TEMP)
+		return "deref temp";
+	if (kind == KIND_REGISTER)
+		return "register";
+	if (kind == KIND_ADDRESS)
+		return "address";
+	if (kind == KIND_MEMORY)
+		return "memory";
+	if (kind == KIND_LOCAL_ADDRESS)
+		return "local address";
+	if (kind == KIND_LOCAL_MEMORY)
+		return "local memory";
+	if (kind == KIND_DEREF_REGISTER)
+		return "deref register";
+	if (kind == KIND_MARKER)
+		return "marker";
+	if (kind == KIND_DEREF_MARKER)
+		return "deref marker";
+	if (kind == KIND_GLOBAL_LOOKUP)
+		return "global lookup";
+	if (kind == KIND_DEREF_GLOBAL_LOOKUP)
+		return "deref global lookup";
+	if (kind == KIND_IMMEDIATE)
+		return "immediate";
+	if (kind == KIND_DEREF_LOCAL_MEMORY)
+		return "deref local";
 	return format("UNKNOWN KIND: %d", kind);
 }
 
@@ -60,31 +96,56 @@ string kind2str(int kind)
 string Node::sig() const
 {
 	string t = type->name + " ";
-	if (kind == KIND_VAR_LOCAL)			return t + as_local()->name;
-	if (kind == KIND_VAR_GLOBAL)			return t + as_global()->name;
-	if (kind == KIND_FUNCTION_POINTER)		return t + as_func()->long_name;
-	if (kind == KIND_FUNCTION_NAME)		return t + as_func()->long_name;
-	if (kind == KIND_CONSTANT)			return t + as_const()->str();
-	if (kind == KIND_FUNCTION_CALL)			return as_func()->signature(true);
-	if (kind == KIND_POINTER_CALL)			return "";
-	if (kind == KIND_INLINE_CALL)	return as_func()->signature(true);
-	if (kind == KIND_VIRTUAL_CALL)	return t + i2s(link_no);//s->Functions[nr]->name;
-	if (kind == KIND_STATEMENT)			return t + as_statement()->name;
-	if (kind == KIND_OPERATOR)			return as_op()->sig();
-	if (kind == KIND_PRIMITIVE_OPERATOR)	return as_prim_op()->name;
-	if (kind == KIND_BLOCK)				return "";//p2s(as_block());
-	if (kind == KIND_ADDRESS_SHIFT)		return t + i2s(link_no);
-	if (kind == KIND_ARRAY)				return t;
-	if (kind == KIND_POINTER_AS_ARRAY)		return t;
-	if (kind == KIND_REFERENCE)			return t;
-	if (kind == KIND_DEREFERENCE)		return t;
-	if (kind == KIND_DEREF_ADDRESS_SHIFT)	return t + i2s(link_no);
-	if (kind == KIND_CLASS)				return as_class()->name;
-	if (kind == KIND_REGISTER)			return t + Asm::GetRegName(link_no);
-	if (kind == KIND_ADDRESS)			return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_MEMORY)				return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_LOCAL_ADDRESS)		return t + d2h(&link_no, config.pointer_size);
-	if (kind == KIND_LOCAL_MEMORY)		return t + d2h(&link_no, config.pointer_size);
+	if (kind == KIND_VAR_LOCAL)
+		return t + as_local()->name;
+	if (kind == KIND_VAR_GLOBAL)
+		return t + as_global()->name;
+	if (kind == KIND_FUNCTION_POINTER)
+		return t + as_func()->long_name;
+	if (kind == KIND_FUNCTION_NAME)
+		return t + as_func()->long_name;
+	if (kind == KIND_CONSTANT)
+		return t + as_const()->str();
+	if (kind == KIND_FUNCTION_CALL)
+		return as_func()->signature(true);
+	if (kind == KIND_POINTER_CALL)
+		return "";
+	if (kind == KIND_INLINE_CALL)
+		return as_func()->signature(true);
+	if (kind == KIND_VIRTUAL_CALL)
+		return t + i2s(link_no);//s->Functions[nr]->name;
+	if (kind == KIND_STATEMENT)
+		return t + as_statement()->name;
+	if (kind == KIND_OPERATOR)
+		return as_op()->sig();
+	if (kind == KIND_PRIMITIVE_OPERATOR)
+		return as_prim_op()->name;
+	if (kind == KIND_BLOCK)
+		return "";//p2s(as_block());
+	if (kind == KIND_ADDRESS_SHIFT)
+		return t + i2s(link_no);
+	if (kind == KIND_ARRAY)
+		return t;
+	if (kind == KIND_POINTER_AS_ARRAY)
+		return t;
+	if (kind == KIND_REFERENCE)
+		return t;
+	if (kind == KIND_DEREFERENCE)
+		return t;
+	if (kind == KIND_DEREF_ADDRESS_SHIFT)
+		return t + i2s(link_no);
+	if (kind == KIND_CLASS)
+		return as_class()->name;
+	if (kind == KIND_REGISTER)
+		return t + Asm::GetRegName(link_no);
+	if (kind == KIND_ADDRESS)
+		return t + d2h(&link_no, config.pointer_size);
+	if (kind == KIND_MEMORY)
+		return t + d2h(&link_no, config.pointer_size);
+	if (kind == KIND_LOCAL_ADDRESS)
+		return t + d2h(&link_no, config.pointer_size);
+	if (kind == KIND_LOCAL_MEMORY)
+		return t + d2h(&link_no, config.pointer_size);
 	return t + i2s(link_no);
 }
 

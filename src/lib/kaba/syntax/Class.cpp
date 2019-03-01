@@ -499,6 +499,11 @@ string Class::var2str(const void *p) const
 		return f2s(*(float*)p, 3);
 	}else if (this == TypeBool){
 		return b2s(*(bool*)p);
+	}else if (this == TypeClass){
+		return ((Class*)p)->name;
+	}else if (this == TypeClassP){
+		if (p)
+			return "&" + (*(Class**)p)->name;
 	}else if (is_pointer()){
 		return p2s(*(void**)p);
 	}else if (this == TypeString){

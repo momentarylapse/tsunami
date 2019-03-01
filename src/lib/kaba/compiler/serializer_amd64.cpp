@@ -61,9 +61,9 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 	// push parameters onto stack
 	push_size = 8 * stack_param.num;
 	if (push_size > 127)
-		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeInt, push_size));
+		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeInt, push_size));
 	else if (push_size > 0)
-		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeChar, push_size));
+		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_imm(TypeChar, push_size));
 	foreachb(SerialNodeParam &p, stack_param){
 		add_cmd(Asm::INST_MOV, p_rax, p);
 		add_cmd(Asm::INST_PUSH, p_rax);
@@ -133,27 +133,34 @@ void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, con
 	}
 }
 
+bool dist_fits_32bit(void *a, void *b)
+{
+	int_p d = (int_p)a - (int_p)b;
+	if (d < 0)
+		d = -d;
+	return (d < 0x70000000);
+}
+
 void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((f->owner->script == this->script) and (!f->is_extern)){
-		add_cmd(Asm::INST_CALL, param_marker(f->_label));
-	}else{
-		if (!f->address)
-			do_error_link("could not link function " + f->signature(true));
-		int_p d = (int_p)f->address - (int_p)this->script->opcode;
-		if (d < 0)
-			d = -d;
-		if (d < 0x70000000){
+	if (f->address){
+		if (dist_fits_32bit(f->address, script->opcode)){
 			// 32bit call distance
-			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (int_p)f->address)); // the actual call
+			add_cmd(Asm::INST_CALL, param_imm(TypeReg32, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
 		}else{
 			// 64bit call distance
-			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (int_p)f->address));
+			add_cmd(Asm::INST_MOV, p_rax, param_imm(TypeReg64, (int_p)f->address));
 			add_cmd(Asm::INST_CALL, p_rax);
 		}
+	}else if (f->_label >= 0){
+		// 64bit call distance
+		add_cmd(Asm::INST_MOV, p_rax, param_marker(TypePointer, f->_label));
+		add_cmd(Asm::INST_CALL, p_rax);
+	}else{
+		do_error_link("could not link function " + f->signature(true));
 	}
 
 	fc_end(push_size, instance, params, ret);
@@ -165,7 +172,7 @@ void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialN
 
 	add_cmd(Asm::INST_MOV, p_rax, instance); // self
 	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable
-	add_cmd(Asm::INST_ADD, p_rax, param_const(TypeInt, 8 * virtual_index)); // vtable + n
+	add_cmd(Asm::INST_ADD, p_rax, param_imm(TypeInt, 8 * virtual_index)); // vtable + n
 	add_cmd(Asm::INST_MOV, p_rax, p_deref_eax); // vtable[n]
 	add_cmd(Asm::INST_CALL, p_rax); // the actual call
 
@@ -280,7 +287,7 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
 	// evil hack to allow inconsistent param types (in address shifts)
 	if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
 		if ((c.inst == Asm::INST_ADD) or (c.inst == Asm::INST_MOV)){
-			if ((c.p[0].kind == KIND_REGISTER) and (c.p[1].kind == KIND_REF_TO_CONST)){
+			if ((c.p[0].kind == KIND_REGISTER) and (c.p[1].kind == KIND_CONSTANT_BY_ADDRESS)){
 				// TODO: should become an optimization if value fits into 32 bit...
 				/*if (c.p[0].type->is_pointer){
 #ifdef debug_evil_corrections

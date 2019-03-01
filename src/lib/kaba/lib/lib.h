@@ -375,7 +375,6 @@ struct CompilerConfiguration
 	bool allow_output_stage(const string &stage);
 	bool compile_silently;
 	bool show_compiler_stats;
-	bool use_const_as_global_var;
 
 	bool compile_os;
 	bool no_function_frame;

@@ -114,7 +114,7 @@ SerialNodeParam Serializer::param_global(const Class *type, void *v)
 {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = KIND_VAR_GLOBAL;
+	p.kind = KIND_MEMORY;
 	p.p = (int_p)v;
 	p.shift = 0;
 	return p;
@@ -124,30 +124,35 @@ SerialNodeParam Serializer::param_local(const Class *type, int offset)
 {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = KIND_VAR_LOCAL;
+	p.kind = KIND_LOCAL_MEMORY;
 	p.p = offset;
 	p.shift = 0;
 	return p;
 }
 
-SerialNodeParam Serializer::param_const(const Class *type, int64 c)
+SerialNodeParam Serializer::param_imm(const Class *type, int64 c)
 {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = KIND_CONSTANT;
+	p.kind = KIND_IMMEDIATE;
 	p.p = c;
 	p.shift = 0;
 	return p;
 }
 
-SerialNodeParam Serializer::param_marker(int m)
+SerialNodeParam Serializer::param_marker(const Class *type, int m)
 {
 	SerialNodeParam p;
-	p.type = TypeInt;
+	p.type = type;
 	p.kind = KIND_MARKER;
 	p.p = m;
 	p.shift = 0;
 	return p;
+}
+
+SerialNodeParam Serializer::param_marker32(int m)
+{
+	return param_marker(TypeInt, m);
 }
 
 SerialNodeParam Serializer::param_deref_marker(const Class *type, int m)
@@ -267,11 +272,11 @@ string SerialNodeParam::str(Serializer *ser) const
 			n = "#" + i2s(p);
 		else if (kind == KIND_MARKER)
 			return ser->list->label[p].name;
-		else if (kind == KIND_VAR_LOCAL)
+		else if (kind == KIND_LOCAL_MEMORY)
 			n = signed_hex(p);
-		else if (kind == KIND_VAR_GLOBAL)
+		else if (kind == KIND_MEMORY)
 			n = d2h(&p, config.pointer_size);
-		else if ((kind == KIND_CONSTANT) or (kind == KIND_IMMEDIATE))
+		else if (kind == KIND_IMMEDIATE)
 			n = guess_constant(p, ser);
 		str = "  (" + type->name + ") " + kind2str(kind) + " " + n;
 		if (shift > 0)
@@ -530,11 +535,11 @@ SerialNodeParam Serializer::AddReference(const SerialNodeParam &param, const Cla
 		type = param.type->get_pointer();
 	ret.type = type;
 	ret.shift = 0;
-	if (param.kind == KIND_REF_TO_CONST){
-		ret.kind = KIND_CONSTANT;
+	if (param.kind == KIND_CONSTANT_BY_ADDRESS){
+		ret.kind = KIND_IMMEDIATE;
 		ret.p = param.p;
-	}else if ((param.kind == KIND_CONSTANT) or (param.kind == KIND_VAR_GLOBAL)){
-		ret.kind = KIND_CONSTANT;
+	}else if ((param.kind == KIND_IMMEDIATE) or (param.kind == KIND_MEMORY)){
+		ret.kind = KIND_IMMEDIATE;
 		ret.p = param.p;
 	}else if (param.kind == KIND_DEREF_VAR_TEMP){
 		ret = param;
@@ -587,9 +592,9 @@ SerialNodeParam Serializer::AddDereference(const SerialNodeParam &param, const C
 		ret.shift = 0;
 	}else{
 		if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
-			if (param.kind == KIND_VAR_LOCAL){
+			if (param.kind == KIND_LOCAL_ADDRESS){
 				ret = param;
-				ret.kind = KIND_DEREF_VAR_LOCAL;
+				ret.kind = KIND_DEREF_LOCAL_MEMORY;
 			}else{
 				do_error("arm deref...");
 			}
@@ -864,11 +869,11 @@ inline bool param_combi_allowed(int inst, SerialNodeParam &p1, SerialNodeParam &
 		return false;
 	bool r1, w1, r2, w2;
 	Asm::GetInstructionParamFlags(inst, r1, w1, r2, w2);
-	if ((w1) and (p1.kind == KIND_CONSTANT))
+	if ((w1) and (p1.kind == KIND_IMMEDIATE))
 		return false;
-	if ((w2) and (p2.kind == KIND_CONSTANT))
+	if ((w2) and (p2.kind == KIND_IMMEDIATE))
 		return false;
-	if ((p1.kind == KIND_CONSTANT) or (p2.kind == KIND_CONSTANT))
+	if ((p1.kind == KIND_IMMEDIATE) or (p2.kind == KIND_IMMEDIATE))
 		if (!Asm::GetInstructionAllowConst(inst))
 			return false;
 	return true;
@@ -919,7 +924,7 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 	const Class *type_pointer = is_local ? TypePointer : temp_var[p.p].type;
 	const Class *type_data = p.type;
 	
-	p.kind = is_local ? KIND_VAR_LOCAL : KIND_VAR_TEMP;
+	p.kind = is_local ? KIND_LOCAL_MEMORY : KIND_VAR_TEMP;
 	p.shift = 0;
 	p.type = type_pointer;
 
@@ -936,7 +941,7 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 	if (shift > 0){
 		// solve_deref_temp_local
 		next_cmd_target(c + 1);
-		add_cmd(Asm::INST_ADD, p_reg, param_const(TypeInt, shift));
+		add_cmd(Asm::INST_ADD, p_reg, param_imm(TypeInt, shift));
 		set_virtual_reg(reg, c, c+2);
 	}else
 		set_virtual_reg(reg, c, c+1);
@@ -948,8 +953,8 @@ void ResolveDerefLocal()
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst >= Asm::inst_marker)
 			continue;
-		bool dl1 = (cmd[i].p[0].kind == KIND_DEREF_VAR_LOCAL);
-		bool dl2 = (cmd[i].p[1].kind == KIND_DEREF_VAR_LOCAL);
+		bool dl1 = (cmd[i].p[0].kind == KIND_DEREF_LOCAL_MEMORY);
+		bool dl2 = (cmd[i].p[1].kind == KIND_DEREF_LOCAL_MEMORY);
 		if (!(dl1 or dl2))
 			continue;
 		
@@ -1018,13 +1023,13 @@ void Serializer::resolve_deref_temp_and_local()
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst >= INST_MARKER)
 			continue;
-		bool dl1 = ((cmd[i].p[0].kind == KIND_DEREF_VAR_LOCAL) or (cmd[i].p[0].kind == KIND_DEREF_VAR_TEMP));
-		bool dl2 = ((cmd[i].p[1].kind == KIND_DEREF_VAR_LOCAL) or (cmd[i].p[1].kind == KIND_DEREF_VAR_TEMP));
+		bool dl1 = ((cmd[i].p[0].kind == KIND_DEREF_LOCAL_MEMORY) or (cmd[i].p[0].kind == KIND_DEREF_VAR_TEMP));
+		bool dl2 = ((cmd[i].p[1].kind == KIND_DEREF_LOCAL_MEMORY) or (cmd[i].p[1].kind == KIND_DEREF_VAR_TEMP));
 		if (!(dl1 or dl2))
 			continue;
 
-		bool is_local1 = (cmd[i].p[0].kind == KIND_DEREF_VAR_LOCAL);
-		bool is_local2 = (cmd[i].p[1].kind == KIND_DEREF_VAR_LOCAL);
+		bool is_local1 = (cmd[i].p[0].kind == KIND_DEREF_LOCAL_MEMORY);
+		bool is_local2 = (cmd[i].p[1].kind == KIND_DEREF_LOCAL_MEMORY);
 		
 		//msg_write(format("deref temp/local... cmd=%d", i));
 		if (!dl2){
@@ -1065,8 +1070,8 @@ void Serializer::resolve_deref_temp_and_local()
 			int shift2 = p2.shift;
 			p1.shift = p2.shift = 0;
 			
-			p1.kind = is_local1 ? KIND_VAR_LOCAL : KIND_VAR_TEMP;
-			p2.kind = is_local2 ? KIND_VAR_LOCAL : KIND_VAR_TEMP;
+			p1.kind = is_local1 ? KIND_LOCAL_MEMORY : KIND_VAR_TEMP;
+			p2.kind = is_local2 ? KIND_LOCAL_MEMORY : KIND_VAR_TEMP;
 			p1.type = type_pointer;
 			p2.type = type_pointer;
 			set_cmd_param(cmd[i], 0, p_deref_reg2);
@@ -1080,7 +1085,7 @@ void Serializer::resolve_deref_temp_and_local()
 			if (shift2 > 0){
 				// resolve deref temp&loc 2
 				next_cmd_target(cmd_pos ++);
-				add_cmd(Asm::INST_ADD, p_reg2, param_const(TypeInt, shift2));
+				add_cmd(Asm::INST_ADD, p_reg2, param_imm(TypeInt, shift2));
 			}
 
 			int r1_first = cmd_pos;
@@ -1093,7 +1098,7 @@ void Serializer::resolve_deref_temp_and_local()
 			if (shift1 > 0){
 				// resolve deref temp&loc 1
 				next_cmd_target(cmd_pos ++);
-				add_cmd(Asm::INST_ADD, p_reg2, param_const(TypeInt, shift1));
+				add_cmd(Asm::INST_ADD, p_reg2, param_imm(TypeInt, shift1));
 			}
 
 			set_virtual_reg(reg, r1_first, cmd_pos);
@@ -1191,7 +1196,7 @@ void Serializer::SimplifyFPUStack()
 			continue;
 		// moved into fstore'able?
 		int kind = cmd[v.last].p[0].kind;
-		if ((kind != KIND_VAR_LOCAL) and (kind != KIND_VAR_GLOBAL) and (kind != KIND_VAR_TEMP) and (kind != KIND_DEREF_VAR_TEMP) and (kind != KIND_DEREF_REGISTER))
+		if ((kind != KIND_LOCAL_MEMORY) and (kind != KIND_MEMORY) and (kind != KIND_VAR_TEMP) and (kind != KIND_DEREF_VAR_TEMP) and (kind != KIND_DEREF_REGISTER))
 		    continue;
 
 		// check, if mov target is used in between
@@ -1444,7 +1449,7 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p)
 
 	v.mapped = true;
 
-	p.kind = KIND_VAR_LOCAL;
+	p.kind = KIND_LOCAL_MEMORY;
 	p.p = v.stack_offset;
 	p.type = v.type;
 	p.shift = 0;
@@ -1475,7 +1480,7 @@ void Serializer::MapTempVarToStack(int vi)
 		}
 		bool deref = (r > 3);
 
-		p_own->kind = deref ? KIND_DEREF_VAR_LOCAL : KIND_VAR_LOCAL;
+		p_own->kind = deref ? KIND_DEREF_LOCAL_MEMORY : KIND_LOCAL_MEMORY;
 		p_own->p = p.p;
 		
 #if 0
@@ -1528,7 +1533,7 @@ void Serializer::MapTempVarToStack(int vi)
 				add_cmd(Asm::INST_MOV, p_eax, p);
 				move_last_cmd(i);
 				if (shift > 0){
-					add_cmd(Asm::INST_ADD, p_eax, param_const(TypeInt, (void*)shift));
+					add_cmd(Asm::INST_ADD, p_eax, param_imm(TypeInt, (void*)shift));
 					move_last_cmd(i + 1);
 					add_reg_channel(REG_EAX, i, i + 2);
 				}else
@@ -1546,7 +1551,7 @@ void Serializer::MapTempVarToStack(int vi)
 			add_cmd(Asm::INST_MOV, p_eax, p);
 			move_last_cmd(i);
 			if ((deref) and (shift > 0)){
-				add_cmd(Asm::INST_ADD, p_eax, param_const(TypeInt, (void*)shift));
+				add_cmd(Asm::INST_ADD, p_eax, param_imm(TypeInt, (void*)shift));
 				move_last_cmd(i + 1);
 				add_reg_channel(REG_EAX, i, i + 2);
 			}else
@@ -1618,10 +1623,10 @@ void Serializer::MapTempVars()
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar)
 {
 	if ((p.kind == KIND_VAR_TEMP) and (p.p == v)){
-		p.kind = KIND_VAR_LOCAL;//stackvar.kind;
+		p.kind = KIND_LOCAL_MEMORY;//stackvar.kind;
 		p.p = stackvar.p;
 	}else if ((p.kind == KIND_DEREF_VAR_TEMP) and (p.p == v)){
-		p.kind = KIND_DEREF_VAR_LOCAL;
+		p.kind = KIND_DEREF_LOCAL_MEMORY;
 		p.p = stackvar.p;
 	}
 }
@@ -1679,9 +1684,9 @@ void Serializer::_resolve_deref_reg_shift_(SerialNodeParam &p, int i)
 	int v = p.virt;
 	int preg = reg_resize(p.p, 4);
 	next_cmd_target(i);
-	add_cmd(Asm::INST_ADD, param_vreg(TypeReg32, v, preg), param_const(TypeInt, s));
+	add_cmd(Asm::INST_ADD, param_vreg(TypeReg32, v, preg), param_imm(TypeInt, s));
 	next_cmd_target(i + 2);
-	add_cmd(Asm::INST_SUB, param_vreg(TypeReg32, v, preg), param_const(TypeInt, s));
+	add_cmd(Asm::INST_SUB, param_vreg(TypeReg32, v, preg), param_imm(TypeInt, s));
 	use_virtual_reg(v, i, i+2);
 }
 
@@ -1890,7 +1895,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 	if (p.kind < 0){
 		return Asm::param_none;
 	}else if (p.kind == KIND_MARKER){
-		return Asm::param_label(p.p, 4);
+		return Asm::param_label(p.p, p.type->size);
 	}else if (p.kind == KIND_DEREF_MARKER){
 		return Asm::param_deref_label(p.p, p.type->size);
 	}else if (p.kind == KIND_REGISTER){
@@ -1903,13 +1908,13 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 			return Asm::param_deref_reg_shift(p.p, p.shift, p.type->size);
 		else
 			return Asm::param_deref_reg(p.p, p.type->size);
-	}else if (p.kind == KIND_VAR_GLOBAL){
+	}else if (p.kind == KIND_MEMORY){
 		int size = p.type->size;
 		// compiler self-test
 		if ((size != 1) and (size != 2) and (size != 4) and (size != 8))
 			script->do_error_internal("get_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
-	}else if (p.kind == KIND_VAR_LOCAL){
+	}else if (p.kind == KIND_LOCAL_MEMORY){
 		if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
 			return Asm::param_deref_reg_shift(Asm::REG_R13, p.p + p.shift, p.type->size);
 		}else{
@@ -1918,7 +1923,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
 		//	param_size = -1; // lea doesn't need size...
 			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
-	}else if (p.kind == KIND_REF_TO_CONST){
+	}else if (p.kind == KIND_CONSTANT_BY_ADDRESS){
 		bool imm_allowed = Asm::GetInstructionAllowConst(inst);
 		if ((imm_allowed) and (p.type->is_pointer())){
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
@@ -1927,11 +1932,9 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialNodeParam &p)
 		}else{
 			return Asm::param_deref_imm(p.p + p.shift, p.type->size);
 		}
-	}else if (p.kind == KIND_CONSTANT){
-		if (p.shift > 0)
-			script->do_error_internal("get_param: const + shift");
-		return Asm::param_imm(p.p, p.type->size);
 	}else if (p.kind == KIND_IMMEDIATE){
+		if (p.shift > 0)
+			script->do_error_internal("get_param: immediate + shift");
 		return Asm::param_imm(p.p, p.type->size);
 	}else
 		script->do_error_internal("get_param: unexpected param..." + kind2str(p.kind));
@@ -1992,10 +1995,10 @@ void Serializer::assemble()
 	if (!config.no_function_frame){
 		if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
 			next_cmd_target(0);
-			add_cmd(Asm::INST_STMDB, param_preg(TypePointer, Asm::REG_R13), param_const(TypeInt, 0x4ff0));
+			add_cmd(Asm::INST_STMDB, param_preg(TypePointer, Asm::REG_R13), param_imm(TypeInt, 0x4ff0));
 			if (stack_max_size > 0){
 				next_cmd_target(1);
-				add_cmd(Asm::INST_SUB, param_preg(TypePointer, Asm::REG_R13), param_preg(TypePointer, Asm::REG_R13), param_const(TypeInt, stack_max_size));
+				add_cmd(Asm::INST_SUB, param_preg(TypePointer, Asm::REG_R13), param_preg(TypePointer, Asm::REG_R13), param_imm(TypeInt, stack_max_size));
 			}
 		}else{
 			list->add_func_intro(stack_max_size);

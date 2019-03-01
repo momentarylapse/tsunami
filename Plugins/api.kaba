@@ -126,9 +126,11 @@ class Module
 
 class AudioEffect extends Module
 	AudioPort *out
+	AudioPort *source
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
+	extern virtual int read(AudioBuffer buf)
 
 class MidiEffect extends Module
 	MidiPort *out
@@ -161,6 +163,8 @@ class AudioBuffer
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
 	extern AudioBuffer __subarray__(int start, int end)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
+
+extern void interpolate_buffer(AudioBuffer in, AudioBuffer out, int method)
 
 class RingBuffer
 	extern void __init__(int size)

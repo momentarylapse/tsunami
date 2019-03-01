@@ -22,13 +22,7 @@ AudioEffect::Output::Output(AudioEffect *_fx) : AudioPort("out")
 
 int AudioEffect::Output::read(AudioBuffer &buf)
 {
-	if (!fx->source)
-		return buf.length;
-	fx->sample_rate = fx->session->sample_rate();
-	int samples = fx->source->read(buf);
-	if (samples > 0)
-		fx->process(buf);
-	return samples;
+	return fx->read(buf);
 }
 
 void AudioEffect::Output::reset()
@@ -63,6 +57,17 @@ void AudioEffect::__init__()
 void AudioEffect::__delete__()
 {
 	this->AudioEffect::~AudioEffect();
+}
+
+int AudioEffect::read(AudioBuffer &buf)
+{
+	if (!source)
+		return buf.length;
+	sample_rate = session->sample_rate();
+	int samples = source->read(buf);
+	if (samples > 0)
+		process(buf);
+	return samples;
 }
 
 void AudioEffect::do_process_track(TrackLayer *l, const Range &r)

@@ -20,6 +20,7 @@
 #include "../Data/Sample.h"
 #include "../Data/SampleRef.h"
 #include "../Data/Audio/AudioBuffer.h"
+#include "../Data/Audio/BufferInterpolator.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Module/ConfigPanel.h"
 #include "../Device/InputStreamAudio.h"
@@ -113,6 +114,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
+	Kaba::LinkExternal("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 
 	Kaba::DeclareClassSize("Range", sizeof(Range));
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
@@ -197,9 +199,11 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassSize("AudioEffect", sizeof(AudioEffect));
 	Kaba::DeclareClassOffset("AudioEffect", "sample_rate", _offsetof(AudioEffect, sample_rate));
 	Kaba::DeclareClassOffset("AudioEffect", "out", _offsetof(AudioEffect, out));
+	Kaba::DeclareClassOffset("AudioEffect", "source", _offsetof(AudioEffect, source));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioEffect::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioEffect::__delete__), &aeffect);
 	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&AudioEffect::process), &aeffect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "read", Kaba::mf(&AudioEffect::read), &aeffect);
 
 	MidiEffect meffect;
 	Kaba::DeclareClassSize("MidiEffect", sizeof(MidiEffect));

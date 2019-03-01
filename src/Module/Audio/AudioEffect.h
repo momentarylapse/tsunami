@@ -48,6 +48,7 @@ public:
 	AudioPort *source;
 
 	virtual void _cdecl process(AudioBuffer &buf){};
+	virtual int _cdecl read(AudioBuffer &buf);
 
 	void do_process_track(TrackLayer *l, const Range &r);
 };

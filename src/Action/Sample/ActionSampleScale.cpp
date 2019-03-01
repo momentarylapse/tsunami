@@ -30,7 +30,9 @@ void *ActionSampleScale::execute(Data *d)
 
 	if (!buf){
 		buf = new AudioBuffer;
-		BufferInterpolator::interpolate(sample->buf, *buf, new_size, (BufferInterpolator::Method)method);
+		buf->resize(new_size);
+		buf->offset = sample->buf.offset;
+		BufferInterpolator::interpolate(sample->buf, *buf, (BufferInterpolator::Method)method);
 	}
 
 	sample->buf.swap_ref(*buf);

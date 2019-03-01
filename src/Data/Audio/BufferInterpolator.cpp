@@ -48,10 +48,9 @@ static void interpolate_channel(Array<float> &in, Array<float> &out, BufferInter
 	}
 }
 
-void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, int new_size, Method method)
+void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, Method method)
 {
-	out.resize(new_size);
 	for (int i=0; i<in.channels; i++)
 		interpolate_channel(in.c[i], out.c[i], method);
-	out.offset = in.offset;
+	//out.offset = in.offset;
 }

@@ -23,7 +23,7 @@ public:
 		METHOD_FOURIER,
 	};
 
-	static void interpolate(AudioBuffer &in, AudioBuffer &out, int new_size, Method method);
+	static void interpolate(AudioBuffer &in, AudioBuffer &out, Method method);
 };
 
 #endif /* SRC_DATA_AUDIO_BUFFERINTERPOLATOR_H_ */

@@ -127,6 +127,7 @@ public:
 	Node *parse_operand_extension_array(Node *operand, Block *block);
 	Node *parse_operand_extension_call(Array<Node*> operands, Block *block);
 	Node *parse_command(Block *block);
+	Node *parse_single_func_param(Block *block);
 	void parse_complete_command(Block *block);
 	void parse_local_definition(Block *block);
 	Node *parse_block(Block *parent, Block *block = nullptr);

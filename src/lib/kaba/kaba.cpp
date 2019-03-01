@@ -23,7 +23,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.-1.7";
+string Version = "0.17.-1.8";
 
 //#define ScriptDebug
 
@@ -247,7 +247,7 @@ Script::~Script()
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(memory, 0, MEM_RELEASE);
 		#else
-			int r = munmap(memory, MAX_OPCODE);
+			int r = munmap(memory, memory_size);
 		#endif
 	}
 	//msg_write(string2("-----------            Memory:         %p",Memory));

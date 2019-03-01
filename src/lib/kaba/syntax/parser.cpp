@@ -1427,12 +1427,26 @@ Node *SyntaxTree::parse_statement_delete(Block *block)
 	return cmd;
 }
 
+Node *SyntaxTree::parse_single_func_param(Block *block)
+{
+	string func_name = Exp.cur_line->exp[Exp.cur_exp-1].name;
+	if (Exp.cur != "(")
+		do_error("'(' expected after '" + func_name + "'");
+	Exp.next(); // "("
+	Node *n = parse_command(block);
+	if (Exp.cur != ")")
+		do_error("')' expected after parameter of '" + func_name + "'");
+	Exp.next(); // ")"
+	return n;
+}
+
 Node *SyntaxTree::parse_statement_sizeof(Block *block)
 {
-	Exp.next();
+	Exp.next(); // sizeof
+	Node* sub = parse_single_func_param(block);
+
 	Node *c = add_node_const(add_constant(TypeInt));
 
-	Node* sub = parse_command(block);
 	if (sub->kind == KIND_CLASS){
 		c->as_const()->as_int() = sub->as_class()->size;
 	}else{
@@ -1445,10 +1459,11 @@ Node *SyntaxTree::parse_statement_sizeof(Block *block)
 
 Node *SyntaxTree::parse_statement_type(Block *block)
 {
-	Exp.next();
+	Exp.next(); // type
+	Node* sub = parse_single_func_param(block);
+
 	Node *c = add_node_const(add_constant(TypeClassP));
 
-	Node* sub = parse_command(block);
 	if (sub->kind == KIND_CLASS){
 		c->as_const()->as_int64() = (int_p)sub->as_class();
 	}else{
@@ -1460,8 +1475,8 @@ Node *SyntaxTree::parse_statement_type(Block *block)
 
 Node *SyntaxTree::parse_statement_len(Block *block)
 {
-	Exp.next();
-	Node *sub = parse_command(block);
+	Exp.next(); // len
+	Node *sub = parse_single_func_param(block);
 
 	// array?
 	if (sub->type->is_array()){
@@ -1483,8 +1498,8 @@ Node *SyntaxTree::parse_statement_len(Block *block)
 
 Node *SyntaxTree::parse_statement_str(Block *block)
 {
-	Exp.next();
-	Node *sub = parse_command(block);
+	Exp.next(); // str
+	Node *sub = parse_single_func_param(block);
 
 	// direct/type cast?
 	int ie = Exp.cur_exp;
@@ -1622,18 +1637,8 @@ void SyntaxTree::parse_complete_command(Block *block)
 
 	}else{
 
-
-	// commands (the actual code!)
-		//if (WhichStatement(Exp.cur) >= 0){
-		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or /*(Exp.cur == IDENTIFIER_RAISE) or*/ (Exp.cur == IDENTIFIER_TRY) or (Exp.cur == IDENTIFIER_IF) or (Exp.cur == IDENTIFIER_PASS)){
-			block->add(parse_statement(block));
-			// new/delete/sizeof/type... are operands...
-
-		}else{
-
-			// normal commands
-			block->add(parse_command(block));
-		}
+		// commands (the actual code!)
+		block->add(parse_command(block));
 	}
 
 	expect_new_line();

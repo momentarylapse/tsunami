@@ -957,9 +957,6 @@ SyntaxTree::~SyntaxTree()
 	for (auto *f: functions)
 		delete(f);
 
-	//for (Node *c: nodes)
-	//	delete(c);
-
 	for (auto *c: constants)
 		delete(c);
 }

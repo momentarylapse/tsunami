@@ -13,6 +13,7 @@ Tsunami.sdf
 Tsunami.opensdf
 Test/ringbuffer
 gui/TRANS
+static/Midi Fonts/*
 *.exe
 *.dll
 *.nami

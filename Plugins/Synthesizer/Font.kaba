@@ -1,7 +1,7 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-class Drumset
+class MidiFont
 	string name
 	Song *a
 	Session* sub
@@ -12,52 +12,52 @@ class Drumset
 		sub = session.create_child()
 		a = new Song(sub, DEFAULT_SAMPLE_RATE)
 		sub.song = a
-		sub.storage.load(a, AppDirectoryStatic + "Drumsets/" + name + ".nami")
+		sub.storage.load(a, AppDirectoryStatic + "Midi Fonts/" + name + ".nami")
 
-class DrumList
-	Drumset[] sets
+class FontList
+	MidiFont[] fonts
 	
 	int find(string name)
-		if name == "" and sets.num > 0
+		if name == "" and fonts.num > 0
 			return 0
-		for s,i in sets
-			if s.name == name
+		for f,i in fonts
+			if f.name == name
 				return i
 		return -1
 		
 	string[] get_names()
 		string[] list
-		for s in sets
+		for s in fonts
 			list.add(s.name)
 		return list
 
 	//string[] find_drumsets()
 	void update()
-		DirEntry[] list = DirSearch(AppDirectoryStatic + "Drumsets", "*.nami", false)
+		DirEntry[] list = DirSearch(AppDirectoryStatic + "Midi Fonts", "*.nami", false)
 		for e in list
 			string name = e.name.substr(0, -6)
 			if find(name) >= 0
 				continue
-			Drumset s
-			s.name = name
-			s.a = nil
-			sets.add(s)
+			MidiFont f
+			f.name = name
+			f.a = nil
+			fonts.add(f)
 	
 	Song *get(Session* session, string name)
 		update()
 		int n = find(name)
 		if n < 0
-			if sets.num > 0
+			if len(fonts) > 0
 				n = 0
-				session.w("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
+				session.w("midi font not found: '" + name + "', using '" + fonts[0].name + "' instead")
 			else
-				session.e("Drumset not found: '" + name + "' (none found)")
+				session.e("midi font not found: '" + name + "' (none found)")
 				return nil
-		Drumset *s = &sets[n]
-		s.load(session)
-		return s.a
+		MidiFont *f = &fonts[n]
+		f.load(session)
+		return f.a
 
-DrumList drumlist
+FontList font_list
 
 class DrumsetConfig extends PluginData
 	string name
@@ -76,7 +76,7 @@ class DrumsetSynthesizer extends Synthesizer
 			//delete s
 			s = nil
 
-		a = drumlist.get(session, config.name)
+		a = font_list.get(session, config.name)
 		if a
 			s = a.tracks[0].synth.copy()
 		if s
@@ -110,17 +110,20 @@ class DrumsetPanel extends ConfigPanel
 
 	override void update()
 		reset("sets")
-		string[] sets = drumlist.get_names()
-		set_string("sets", "  - Default -")
-		set_int("sets", 0)
+		string[] sets = font_list.get_names()
+		enable("sets", true)
 		for s,i in sets
 			set_string("sets", s)
 			if s == sc.name
-				set_int("sets", i+1)
+				set_int("sets", i)
+		if len(sets) == 0
+			enable("sets", false)
+			set_string("sets", "  - no fonts found -")
+			set_int("sets", 0)
 		
 	void on_select()
 		int n = get_int("")
 		sc.name = ""
-		if n > 0
-			sc.name = drumlist.sets[n-1].name
+		if n >= 0 and n < len(font_list.fonts)
+			sc.name = font_list.fonts[n].name
 		changed()

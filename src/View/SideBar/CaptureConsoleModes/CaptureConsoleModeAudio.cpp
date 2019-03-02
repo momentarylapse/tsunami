@@ -107,7 +107,7 @@ void CaptureConsoleModeAudio::enter()
 	sucker = CreateAudioSucker(session);
 	sucker->plug(0, peak_meter, 0);
 	sucker->start();
-	view->mode_capture->set_data({{target,input,sucker}});
+	view->mode_capture->set_data({CaptureTrackData(target,input,sucker)});
 }
 
 void CaptureConsoleModeAudio::leave()

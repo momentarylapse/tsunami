@@ -15,6 +15,13 @@
 #include "../../Device/InputStreamMidi.h"
 #include "../../Module/Audio/AudioSucker.h"
 
+CaptureTrackData::CaptureTrackData(){}
+CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_sucker)
+{
+	target = _target;
+	input = _input;
+	sucker = _sucker;
+}
 
 SignalType CaptureTrackData::type()
 {

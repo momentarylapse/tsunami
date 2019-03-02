@@ -1,34 +1,39 @@
 use "../api.kaba"
 use "../Synthesizer/Sample.kaba"
-use "../Buffer/Pitch/Pitch Shift.kaba"
+//use "../Buffer/Pitch/Pitch Shift.kaba"
 
 class XXX extends SongPlugin
-	override void apply(Song* song)
+	override void apply()
 		print("aaaa1")
-		Track *track = song.addTrack(TYPE_MIDI, 0)
+		Track *track = song.add_track(TYPE_MIDI, 0)
 		print("aaaa2")
-		track.synth = CreateSynthesizer("Sample")
+		track.synth = CreateSynthesizer(session, "Sample")
 		print("aaaa3")
 		SampleSynthesizer* synth = track.synth
+		track.set_synthesizer(synth)
 		print("aaaa")
 		for s in song.samples
-			int pitch = s.getValue("pitch").int()
+			print(s.get_value("pitch"))
+			if s.get_value("pitch") == ""
+				continue
+			int pitch = s.get_value("pitch").int()
+			print(pitch)
 			if pitch >= synth.config.samples.num
 				synth.config.samples.resize(pitch+1)
 			if synth.config.samples[pitch] == nil
-				synth.config.samples[pitch] = s.createRef()
+				synth.config.samples[pitch] = s.create_ref()
 
 		print("aaaa")
-		for s,i in synth.config.samples
+		/*for s,i in synth.config.samples
 			if s
 				for d in 1:8
 					if !synth.config.samples[i-d]
 						shift(song, synth, i, i-d)
 					else
 						break
-		print("aaaa")
+		print("aaaa")*/
 	
-	void shift(Song* song, SampleSynthesizer* synth, int from, int to)
+	/*void shift(Song* song, SampleSynthesizer* synth, int from, int to)
 		print("shift " + from + " -> " + to)
 		SampleRef* source = synth.config.samples[from]
 		Sample* t = song.addSample("new", *source.buf)
@@ -39,5 +44,5 @@ class XXX extends SongPlugin
 		
 		synth.config.samples[to] = t.createRef()
 		
-		delete ps
+		delete ps*/
 		

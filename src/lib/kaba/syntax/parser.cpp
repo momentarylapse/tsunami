@@ -194,8 +194,8 @@ Node *SyntaxTree::parse_operand_extension_array(Node *operand, Block *block)
 		Exp.next();
 		if (Exp.cur == "]"){
 			index2 = add_node_const(add_constant(TypeInt));
-			index2->as_const()->as_int() = -1;
-
+			index2->as_const()->as_int() = 0x81234567;
+			// magic value (-_-)'
 		}else{
 			index2 = parse_command(block);
 		}

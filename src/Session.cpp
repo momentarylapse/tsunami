@@ -68,6 +68,12 @@ void Session::set_win(TsunamiWindow *_win)
 	_kaba_win = dynamic_cast<hui::Window*>(win);
 }
 
+Session *Session::create_child()
+{
+	Session *child = new Session(log, device_manager, plugin_manager, perf_mon);
+	return child;
+}
+
 void Session::i(const string &message)
 {
 	log->info(this, message);

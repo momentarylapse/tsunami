@@ -1,0 +1,26 @@
+// Image = hui:cut
+use "../api.kaba"
+
+
+class ImportNKI extends TsunamiPlugin
+	
+	override void on_start()
+		if HuiFileDialogOpen(session.win, "", "", "*.nki", "*.nki")
+			load_nki(HuiFilename)
+		stop()
+	void load_nki(string filename)
+		print(filename)
+		string dir = filename[:-4] + " Samples"
+		print(dir)
+		
+		DirEntry[] list = DirSearch(dir, "*.wav", false)
+		for e in list
+		
+			AudioBuffer buf
+			session.storage.load_buffer(buf, dir + "/" + e.name)
+			Sample* s = session.song.add_sample(e.name, buf)
+			if e.name[-5:] != "r.wav"
+				print(e.name[:2].int())
+				s.set_value("pitch", e.name[:2].int() + 10 + 12)
+		
+	

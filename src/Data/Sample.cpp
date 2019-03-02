@@ -73,12 +73,22 @@ SampleRef *Sample::create_ref()
 	return new SampleRef(this);
 }
 
-string Sample::getValue(const string &key) const
+string Sample::get_value(const string &key) const
 {
 	for (Tag &t: tags)
 		if (t.key == key)
 			return t.value;
 	return "";
+}
+
+void Sample::set_value(const string &key, const string &value)
+{
+	for (Tag &t: tags)
+		if (t.key == key){
+			t.value = value;
+			return;
+		}
+	tags.add(Tag(key, value));
 }
 
 

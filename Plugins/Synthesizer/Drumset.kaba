@@ -4,17 +4,15 @@ use "../tone.kaba"
 class Drumset
 	string name
 	Song *a
+	Session* sub
 	
 	void load(Session* session)
 		if a
 			return
-		a = new Song(session, DEFAULT_SAMPLE_RATE)
-		Song *owner = session.song
-		session.song = a
-		string temp = session.storage.current_directory
-		session.storage.load(a, AppDirectoryStatic + "Drumsets/" + name + ".nami")
-		session.storage.current_directory = temp
-		session.song = owner
+		sub = session.create_child()
+		a = new Song(sub, DEFAULT_SAMPLE_RATE)
+		sub.song = a
+		sub.storage.load(a, AppDirectoryStatic + "Drumsets/" + name + ".nami")
 
 class DrumList
 	Drumset[] sets
@@ -72,11 +70,15 @@ class DrumsetSynthesizer extends Synthesizer
 	Synthesizer *s
 	override void __init__()
 		a = nil
-	override void on_config()
-		a = drumlist.get(session, config.name)
 		s = nil
+	override void on_config()
+		if s
+			//delete s
+			s = nil
+
+		a = drumlist.get(session, config.name)
 		if a
-			s = a.tracks[0].synth
+			s = a.tracks[0].synth.copy()
 		if s
 			s.set_sample_rate(sample_rate)
 			s.on_config()

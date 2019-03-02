@@ -138,13 +138,13 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
 	Kaba::DeclareClassOffset("Session", "song_renderer", _offsetof(Session, song_renderer));
 	Kaba::DeclareClassOffset("Session", "output_stream", _offsetof(Session, output_stream));
-
 	Kaba::LinkExternal("Session.sample_rate", Kaba::mf(&Session::sample_rate));
 	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
 	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
 	Kaba::LinkExternal("Session.play", (void*)&__play__);
 	Kaba::LinkExternal("Session.stop", (void*)&__stop__);
+	Kaba::LinkExternal("Session.create_child", Kaba::mf(&Session::create_child));
 
 
 	Module module(ModuleType::AUDIO_EFFECT);
@@ -169,6 +169,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Module.unplug", Kaba::mf(&Module::unplug));
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
+	Kaba::LinkExternal("Module.copy", Kaba::mf(&Module::copy));
 
 
 	ModuleConfiguration plugin_data;
@@ -267,7 +268,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
 	Kaba::DeclareClassOffset("Sample", "tags", _offsetof(Sample, tags));
 	Kaba::LinkExternal("Sample.create_ref", Kaba::mf(&Sample::create_ref));
-	Kaba::LinkExternal("Sample.get_value", Kaba::mf(&Sample::getValue));
+	Kaba::LinkExternal("Sample.get_value", Kaba::mf(&Sample::get_value));
+	Kaba::LinkExternal("Sample.set_value", Kaba::mf(&Sample::set_value));
 
 	Sample sample(SignalType::AUDIO);
 	sample._pointer_ref(); // stack allocated... don't auto-delete!
@@ -551,6 +553,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
 	Kaba::LinkExternal("Storage.save_via_renderer", Kaba::mf(&Storage::save_via_renderer));
+	Kaba::LinkExternal("Storage.load_buffer", Kaba::mf(&Storage::load_buffer));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 

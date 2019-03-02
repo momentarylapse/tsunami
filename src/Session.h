@@ -42,6 +42,8 @@ public:
 
 	void set_win(TsunamiWindow *win);
 
+	Session *create_child();
+
 	int id;
 	TsunamiWindow *win;
 	hui::Window *_kaba_win;

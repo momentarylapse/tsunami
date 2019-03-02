@@ -123,6 +123,7 @@ class Module
 	extern void unplug(int in_port)
 	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
+	extern Module* copy()
 
 class AudioEffect extends Module
 	AudioPort *out
@@ -348,6 +349,7 @@ class Sample // TODO
 	Tag[] tags
 	extern SampleRef *create_ref()
 	extern string get_value(string key)
+	extern void set_value(string key, string value)
 
 class SampleRef // TODO
 	Sample *origin
@@ -516,6 +518,7 @@ class Storage
 	extern bool load(Song *s, string filename)
 	extern bool save(Song *s, string filename)
 	extern bool save_via_renderer(AudioPort *source, string filename, int num_samples, Tag[] tags)
+	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 
 class Session
@@ -532,6 +535,8 @@ class Session
 	
 	//DeviceManager* device_manager
 	//PluginManager* plugin_manager
+	
+	extern Session* create_child()
 
 	// logging
 	extern void i(string msg)

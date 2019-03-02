@@ -275,12 +275,16 @@ DynamicArray DynamicArray::ref_subarray(int start, int end)
 	DynamicArray s;
 	s.init(element_size);
 
+	// magic value (-_-)'
+	if (end == 0x81234567)
+		end = num;
+
 	if (start < 0)
 		start += num;
 	if (start < 0)
 		start = 0;
 	if (end < 0)
-		end = num;
+		end += num;
 	if (end > num)
 		end = num;
 	s.num = max(end - start, 0);

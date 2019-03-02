@@ -117,7 +117,7 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos, Song *song)
+void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos, Session *session)
 {
 	if (pos >= s.num)
 		return;
@@ -136,7 +136,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 		for (int i=0;i<type->array_length;i++){
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(type->parent, &v[i * type->parent->size], s, pos, song);
+			var_from_string(type->parent, &v[i * type->parent->size], s, pos, session);
 		}
 		pos ++; // ']'
 	}else if (type->is_super_array()){
@@ -149,16 +149,16 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 			if (a->num > 0)
 				pos ++; // ' '
 			a->resize(a->num + 1);
-			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos, song);
+			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos, session);
 		}
 		pos ++; // ']'
 	}else if (type->name == "SampleRef*"){
 		string ss = get_next(s, pos);
 		*(SampleRef**)v = nullptr;
-		if ((ss != "nil") and song){
+		if ((ss != "nil") and session->song){
 			int n = ss._int();
-			if ((n >= 0) and (n < song->samples.num)){
-				*(SampleRef**)v = new SampleRef(song->samples[n]);
+			if ((n >= 0) and (n < session->song->samples.num)){
+				*(SampleRef**)v = new SampleRef(session->song->samples[n]);
 			}
 		}
 	}else{
@@ -167,7 +167,7 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 		for (int i=0; i<e.num; i++){
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(e[i].type, &v[e[i].offset], s, pos, song);
+			var_from_string(e[i].type, &v[e[i].offset], s, pos, session);
 		}
 		pos ++; // ')'
 	}
@@ -252,7 +252,7 @@ void Module::config_from_string(const string &param)
 
 	config->reset();
 	int pos = 0;
-	var_from_string(config->_class, (char*)config, param, pos, session->song);
+	var_from_string(config->_class, (char*)config, param, pos, session);
 	on_config();
 }
 

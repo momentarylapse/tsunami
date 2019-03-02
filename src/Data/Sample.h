@@ -52,7 +52,8 @@ public:
 	void _pointer_unref();
 
 	Array<Tag> tags;
-	string _cdecl getValue(const string &key) const;
+	string _cdecl get_value(const string &key) const;
+	void _cdecl set_value(const string &key, const string &value);
 
 	void _cdecl ref();
 	void _cdecl unref();

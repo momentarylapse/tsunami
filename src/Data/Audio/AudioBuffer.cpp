@@ -337,6 +337,8 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 
 AudioBuffer AudioBuffer::ref(int start, int end)
 {
+	if (end == 0x81234567) // magical value (-_-)'
+		end = length;
 	AudioBuffer r;
 	if (start < 0)
 		start += length;

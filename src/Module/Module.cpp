@@ -24,6 +24,9 @@
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Module::MESSAGE_STATE_CHANGE = "StateChange";
+const string Module::MESSAGE_UPDATE = "Update";
+const string Module::MESSAGE_READ_END_OF_STREAM = "ReadEndOfStream";
+const string Module::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
 
 
 void ModuleConfiguration::__init__()

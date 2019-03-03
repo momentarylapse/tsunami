@@ -69,11 +69,6 @@ PluginManager::~PluginManager()
 }
 
 
-bool GlobalAllowTermination()
-{
-	return tsunami->allow_termination();
-}
-
 
 void GlobalSetTempBackupFilename(const string &filename)
 {
@@ -110,7 +105,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("CreateMidiSource", (void*)&CreateMidiSource);
 	Kaba::LinkExternal("CreateBeatMidifier", (void*)&CreateBeatMidifier);
 	Kaba::LinkExternal("CreateBeatSource", (void*)&CreateBeatSource);
-	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
@@ -136,6 +130,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Session", "win", _offsetof(Session, _kaba_win));
 	Kaba::DeclareClassOffset("Session", "view", _offsetof(Session, view));
 	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
+	Kaba::DeclareClassOffset("Session", "signal_chain", _offsetof(Session, signal_chain));
 	Kaba::DeclareClassOffset("Session", "song_renderer", _offsetof(Session, song_renderer));
 	Kaba::DeclareClassOffset("Session", "output_stream", _offsetof(Session, output_stream));
 	Kaba::LinkExternal("Session.sample_rate", Kaba::mf(&Session::sample_rate));

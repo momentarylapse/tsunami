@@ -28,7 +28,6 @@
 float InputStreamAudio::playback_delay_const;
 
 
-const string InputStreamAudio::MESSAGE_CAPTURE = "Capture";
 static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
@@ -493,7 +492,7 @@ void InputStreamAudio::_stop_update()
 void InputStreamAudio::update()
 {
 	if (do_capturing() > 0)
-		Observable<VirtualBase>::notify(MESSAGE_CAPTURE);
+		Observable<VirtualBase>::notify(MESSAGE_UPDATE);
 
 	running = is_capturing();
 }

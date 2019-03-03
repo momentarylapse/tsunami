@@ -40,8 +40,6 @@ public:
 	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
 
-	static const string MESSAGE_CAPTURE;
-
 	void _start_update();
 	void _stop_update();
 	void update();

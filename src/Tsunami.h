@@ -39,7 +39,7 @@ public:
 	bool handle_arguments(Array<string> &arg);
 	void load_key_codes();
 
-	Session* create_session();
+	Session* create_session(const string &chain_filename = "");
 	bool allow_termination();
 
 	Array<Session*> sessions;

@@ -19,7 +19,6 @@
 #include <alsa/asoundlib.h>
 #endif
 
-const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
 static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 

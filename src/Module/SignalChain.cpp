@@ -38,18 +38,22 @@ SignalChain::~SignalChain()
 		delete c;
 }
 
-SignalChain *SignalChain::create_default(Session *session)
+void SignalChain::create_default_modules()
 {
-	SignalChain *chain = new SignalChain(session, "playback");
+	auto *renderer = get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
+	if (!renderer)
+		renderer = add(ModuleType::AUDIO_SOURCE, "SongRenderer");
+	auto *peak = get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	if (!peak)
+		peak = add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	auto *output = get_by_type(ModuleType::OUTPUT_STREAM_AUDIO, "");
+	if (!output)
+		output = add(ModuleType::OUTPUT_STREAM_AUDIO);
 
-	auto *mod_renderer = chain->add(ModuleType::AUDIO_SOURCE, "SongRenderer");
-	auto *mod_peak = chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	auto *mod_out = chain->add(ModuleType::OUTPUT_STREAM_AUDIO);
-
-	chain->connect(mod_renderer, 0, mod_peak, 0);
-	chain->connect(mod_peak, 0, mod_out, 0);
-
-	return chain;
+	if (!from_source(renderer, 0) and !to_target(peak, 0))
+		connect(renderer, 0, peak, 0);
+	if (!from_source(peak, 0) and !to_target(output, 0))
+		connect(peak, 0, output, 0);
 }
 
 Module *SignalChain::_add(Module *m)
@@ -72,12 +76,31 @@ int SignalChain::module_index(Module *m)
 	return -1;
 }
 
+bool is_system_module(Module *m)
+{
+	if (m == (Module*)m->session->output_stream)
+		return true;
+	if (m == (Module*)m->session->peak_meter)
+		return true;
+	if (m == (Module*)m->session->song_renderer)
+		return true;
+	return false;
+}
+
+Module *SignalChain::get_by_type(ModuleType type, const string &sub_type)
+{
+	for (Module *m: modules)
+		if (m->module_type == type and m->module_subtype == sub_type)
+			return m;
+	return nullptr;
+}
+
 void SignalChain::remove(Module *m)
 {
 	int index = module_index(m);
 	if (index < 0)
 		return;
-	if ((index < 3) and (this == session->signal_chain)){
+	if (is_system_module(m)){
 		session->e(_("not allowed to delete system modules"));
 		return;
 	}
@@ -117,6 +140,8 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 
 void SignalChain::disconnect(SignalChain::Cable *c)
 {
+	if (!c)
+		return;
 	foreachi(Cable *cc, cables, i)
 		if (cc == c){
 			c->target->unplug(c->target_port);
@@ -128,33 +153,30 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 		}
 }
 
-void SignalChain::disconnect_source(Module *source, int source_port)
+SignalChain::Cable *SignalChain::from_source(Module *source, int port)
 {
 	for (Cable *c: cables)
-		if (c->source == source and c->source_port == source_port){
-			disconnect(c);
-			break;
-		}
+		if (c->source == source and c->source_port == port)
+			return c;
+	return nullptr;
 }
 
-void SignalChain::disconnect_target(Module *target, int target_port)
+SignalChain::Cable *SignalChain::to_target(Module *target, int port)
 {
 	for (Cable *c: cables)
-		if (c->target == target and c->target_port == target_port){
-			disconnect(c);
-			break;
-		}
+		if (c->target == target and c->target_port == port)
+			return c;
+	return nullptr;
 }
 
-bool is_system_module(Module *m)
+void SignalChain::disconnect_source(Module *source, int port)
 {
-	if (m == (Module*)m->session->output_stream)
-		return true;
-	if (m == (Module*)m->session->peak_meter)
-		return true;
-	if (m == (Module*)m->session->song_renderer)
-		return true;
-	return false;
+	disconnect(from_source(source, port));
+}
+
+void SignalChain::disconnect_target(Module *target, int port)
+{
+	disconnect(to_target(target, port));
 }
 
 void SignalChain::save(const string& filename)
@@ -193,14 +215,9 @@ void SignalChain::save(const string& filename)
 	p.save(filename);
 }
 
-void SignalChain::load(const string& filename)
+SignalChain *SignalChain::load(Session *session, const string& filename)
 {
-	for (int i=modules.num-1; i>=3; i--)
-		remove(modules[i]);
-	for (auto *c: cables)
-		disconnect(c);
-
-
+	auto *chain = new SignalChain(session, "new");
 
 	try{
 
@@ -212,7 +229,7 @@ void SignalChain::load(const string& filename)
 		if (root.tag != "chain")
 			throw Exception("root element is not called 'chain', but: " + root.tag);
 		auto *head = root.find("head");
-		name = head->value("name");
+		chain->name = head->value("name");
 
 		auto *mm = root.find("modules");
 		for (auto &e: mm->elements){
@@ -227,7 +244,7 @@ void SignalChain::load(const string& filename)
 				auto itype = Module::type_from_name(type);
 				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
-				m = _add(ModuleFactory::create(session, itype, sub_type));
+				m = chain->_add(ModuleFactory::create(session, itype, sub_type));
 			}
 			m->config_from_string(e.value("config"));
 			m->module_x = e.find("position")->value("x")._float();
@@ -240,7 +257,7 @@ void SignalChain::load(const string& filename)
 			int sp = e.find("source")->value("port")._int();
 			int t = e.find("target")->value("id")._int();
 			int tp = e.find("target")->value("port")._int();
-			connect(modules[s], sp, modules[t], tp);
+			chain->connect(chain->modules[s], sp, chain->modules[t], tp);
 		}
 
 		auto *pp = root.find("ports");
@@ -248,13 +265,14 @@ void SignalChain::load(const string& filename)
 			PortX p;
 			int m = e.value("module")._int();
 			p.port = e.value("port")._int();
-			p.module = modules[m];
-			_ports_out.add(p);
+			p.module = chain->modules[m];
+			chain->_ports_out.add(p);
 		}
-		update_ports();
+		chain->update_ports();
 	}catch(Exception &e){
 		session->e(e.message());
 	}
+	return chain;
 }
 
 void SignalChain::update_ports()

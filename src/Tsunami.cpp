@@ -185,9 +185,8 @@ bool Tsunami::handle_arguments(Array<string> &args)
 			return true;
 		}
 		if (session == Session::GLOBAL)
-			session = create_session();
+			session = create_session(args[i+1]);
 		session->win->show();
-		session->signal_chain->load(args[i+1]);
 		i ++;
 	}else if (args[i] == "--slow"){
 		ugly_hack_slow = true;
@@ -210,16 +209,20 @@ bool Tsunami::handle_arguments(Array<string> &args)
 	return false;
 }
 
-Session* Tsunami::create_session()
+Session* Tsunami::create_session(const string &chain_filename)
 {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
-	session->signal_chain = SignalChain::create_default(session);
-	session->song_renderer = dynamic_cast<SongRenderer*>(session->signal_chain->modules[0]);
-	session->peak_meter = dynamic_cast<PeakMeter*>(session->signal_chain->modules[1]);
-	session->output_stream = dynamic_cast<OutputStream*>(session->signal_chain->modules[2]);
+	if (chain_filename.num > 0)
+		session->signal_chain = SignalChain::load(session, chain_filename);
+	else
+		session->signal_chain = new SignalChain(session, "playback");
+	session->signal_chain->create_default_modules();
+	session->song_renderer = (SongRenderer*)session->signal_chain->get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
+	session->peak_meter = (PeakMeter*)session->signal_chain->get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	session->output_stream = (OutputStream*)session->signal_chain->get_by_type(ModuleType::OUTPUT_STREAM_AUDIO, "");
 
 	session->set_win(new TsunamiWindow(session));
 	session->win->auto_delete = true;

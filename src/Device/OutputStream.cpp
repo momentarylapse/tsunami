@@ -31,10 +31,6 @@ const int DEFAULT_BUFFER_SIZE = 4096;
 const float DEFAULT_UPDATE_DT = 0.050f;
 
 
-const string OutputStream::MESSAGE_UPDATE = "Update";
-const string OutputStream::MESSAGE_READ_END_OF_STREAM = "ReadEndOfStream";
-const string OutputStream::MESSAGE_PLAY_END_OF_STREAM = "PlayEndOfStream";
-
 
 #if HAS_LIB_PULSEAUDIO
 

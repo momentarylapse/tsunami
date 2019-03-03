@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chain>
+	<head>
+		<version>1.0</version>
+		<system>false</system>
+		<name>playback</name>
+	</head>
+	<modules>
+		<module system="true">
+			<category>AudioSource</category>
+			<class>SongRenderer</class>
+			<position>
+				<x>50</x>
+				<y>50</y>
+			</position>
+		</module>
+		<module system="true">
+			<category>AudioVisualizer</category>
+			<class>PeakMeter</class>
+			<position>
+				<x>280</x>
+				<y>80</y>
+			</position>
+		</module>
+		<module system="true">
+			<category>OutputStream</category>
+			<class />
+			<position>
+				<x>510</x>
+				<y>50</y>
+			</position>
+		</module>
+		<module>
+			<category>AudioEffect</category>
+			<class>Slow</class>
+			<position>
+				<x>487</x>
+				<y>168</y>
+			</position>
+		</module>
+	</modules>
+	<cables>
+		<cable>
+			<source id="0" port="0" />
+			<target id="1" port="0" />
+		</cable>
+		<cable>
+			<source id="1" port="0" />
+			<target id="3" port="0" />
+		</cable>
+		<cable>
+			<source id="3" port="0" />
+			<target id="2" port="0" />
+		</cable>
+	</cables>
+</chain>

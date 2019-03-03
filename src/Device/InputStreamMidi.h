@@ -33,8 +33,6 @@ public:
 
 	void _cdecl init();
 
-	static const string MESSAGE_CAPTURE;
-
 	bool _cdecl start();
 	void _cdecl stop();
 

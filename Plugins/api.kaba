@@ -521,13 +521,16 @@ class Storage
 	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 
+class SignalChain extends Module
+
 class Session
 	int id
 	//TsunamiWindow* win
 	Window* win
 	Song* song
-	SongRenderer *song_renderer
-	OutputStream *output_stream
+	SignalChain* signal_chain
+	SongRenderer* song_renderer
+	OutputStream* output_stream
 	AudioView* view
 	Storage* storage
 	
@@ -594,7 +597,6 @@ extern void fft_c2c(complex[] in, complex[] out, bool inverse)
 extern void fft_r2c(float[] in, complex[] out)
 extern void fft_c2r_inv(complex[] in, float[] out)
 
-extern bool AllowTermination()
 extern Synthesizer* CreateSynthesizer(Session* session, string name)
 extern AudioSource* CreateAudioSource(Session* session, string name)
 extern AudioEffect* CreateAudioEffect(Session* session, string name)

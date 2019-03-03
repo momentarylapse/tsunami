@@ -32,9 +32,9 @@ public:
 
 	void reset();
 	void save(const string &filename);
-	void load(const string &filename);
+	static SignalChain *load(Session *session, const string &filename);
 
-	static SignalChain *create_default(Session *session);
+	void create_default_modules();
 
 	string name;
 
@@ -43,6 +43,8 @@ public:
 	Module* add(ModuleType type, const string &sub_type = "");
 	void remove(Module *m);
 	int module_index(Module *m);
+
+	Module *get_by_type(ModuleType type, const string &sub_type);
 
 	struct Cable
 	{
@@ -60,8 +62,10 @@ public:
 	void update_ports();
 
 	void connect(Module *source, int source_port, Module *target, int target_port);
-	void disconnect_source(Module *source, int source_port);
-	void disconnect_target(Module *target, int target_port);
+	Cable *from_source(Module *source, int port);
+	Cable *to_target(Module *target, int port);
+	void disconnect_source(Module *source, int port);
+	void disconnect_target(Module *target, int port);
 	void disconnect(Cable *c);
 
 	void reset_state();

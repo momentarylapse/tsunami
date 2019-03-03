@@ -556,8 +556,7 @@ void SignalEditor::on_load()
 {
 	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
 		session->storage->current_chain_directory = hui::Filename.dirname();
-		auto *c = new SignalChain(session, "new");
-		c->load(hui::Filename);
+		auto *c = SignalChain::load(session, hui::Filename);
 		add_chain(c);
 	}
 }

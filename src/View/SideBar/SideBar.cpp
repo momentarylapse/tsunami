@@ -17,7 +17,6 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
-#include "ModuleConsole.h"
 #include "../../Session.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/BottomBar.h"
@@ -59,7 +58,6 @@ SideBar::SideBar(Session *_session)
 	midi_fx_console = new MidiFxConsole(session);
 	sample_ref_console = new SampleRefConsole(session);
 	capture_console = new CaptureConsole(session);
-	module_console = new ModuleConsole(session);
 
 	add_console(song_console);
 	add_console(sample_manager);
@@ -72,7 +70,6 @@ SideBar::SideBar(Session *_session)
 	add_console(midi_fx_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);
-	add_console(module_console);
 
 	event("close", std::bind(&SideBar::on_close, this));
 	event("large", std::bind(&SideBar::on_large, this));

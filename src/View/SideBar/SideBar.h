@@ -23,7 +23,6 @@ class CurveConsole;
 class SynthConsole;
 class MidiFxConsole;
 class CaptureConsole;
-class ModuleConsole;
 class AudioView;
 class SideBarConsole;
 class Session;
@@ -60,7 +59,6 @@ public:
 		MIDI_FX_CONCOLE,
 		SAMPLEREF_CONSOLE,
 		CAPTURE_CONSOLE,
-		MODULE_CONSOLE,
 		NUM_CONSOLES
 	};
 
@@ -81,7 +79,6 @@ public:
 	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;
-	ModuleConsole *module_console;
 
 	Array<SideBarConsole*> consoles;
 	void add_console(SideBarConsole *c);

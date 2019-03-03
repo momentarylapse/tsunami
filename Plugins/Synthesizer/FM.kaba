@@ -132,7 +132,7 @@ class FMPanel extends ConfigPanel
 		update()
 	
 	void on_change()
-		if HuiGetEvent().id.substr(0, 6) == "chosen"
+		if HuiGetEvent().id[:6] == "chosen"
 			return
 		for o,j in fc.osc
 			o.factor = get_float("factor_" + j)

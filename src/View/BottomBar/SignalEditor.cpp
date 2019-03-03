@@ -18,8 +18,6 @@
 #include "../../Data/base.h"
 #include "../../Module/SignalChain.h"
 #include "../../TsunamiWindow.h"
-#include "../SideBar/SideBar.h"
-#include "../SideBar/ModuleConsole.h"
 #include "../../lib/math/interpolation.h"
 //template class Interpolator<complex>;
 
@@ -430,7 +428,6 @@ public:
 
 	void apply_sel()
 	{
-		session->win->side_bar->module_console->set_module(sel.module);
 		editor->show_config(sel.module);
 	}
 
@@ -494,7 +491,6 @@ public:
 	void on_module_configure()
 	{
 		apply_sel();
-		session->win->side_bar->open(SideBar::MODULE_CONSOLE);
 	}
 
 };
@@ -583,6 +579,7 @@ void SignalEditor::show_config(Module *m)
 		set_string("config-label", module_header(m));
 		config_panel = m->create_panel();
 		if (config_panel){
+			config_panel->update();
 			embed(config_panel, config_grid_id, 0, 2);
 			config_panel->set_large(false);
 			//setOptions(config_grid_id, "width=330,noexpandx");

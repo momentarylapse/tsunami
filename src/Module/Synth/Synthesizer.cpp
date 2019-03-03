@@ -53,7 +53,6 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 	// get from source...
 	synth->events.samples = buf.length;
 	int n = synth->source->read(synth->events);
-//	printf("sr  %d", n);
 	if (n == synth->source->NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;

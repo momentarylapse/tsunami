@@ -48,6 +48,7 @@ void ModuleConsole::set_module(Module* m)
 	module = m;
 
 	if (module){
+		msg_error("ModuleConsole.set");
 		module->subscribe(this, std::bind(&ModuleConsole::on_module_delete, this), Module::MESSAGE_DELETE);
 		set_string("category", Module::type_to_name(module->module_type));
 		set_string("sub_category", m->module_subtype);

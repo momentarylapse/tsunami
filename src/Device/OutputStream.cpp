@@ -447,7 +447,6 @@ void OutputStream::_read_stream()
 {
 	if (!source)
 		return;
-	//printf("read stream\n");
 
 	int size = 0;
 	AudioBuffer b;

@@ -193,9 +193,12 @@ void InputStreamMidi::clear_input_queue()
 
 bool InputStreamMidi::start()
 {
+	session->i(_("capture midi start"));
 #if HAS_LIB_ALSA
-	if (!device_manager->alsa_midi_handle)
+	if (!device_manager->alsa_midi_handle){
+		session->e(_("no alsa midi handler"));
 		return false;
+	}
 #endif
 
 	accumulating = false;
@@ -213,6 +216,7 @@ bool InputStreamMidi::start()
 
 void InputStreamMidi::stop()
 {
+	session->i(_("capture midi stop"));
 	_stop_update();
 	capturing = false;
 

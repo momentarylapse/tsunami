@@ -1269,7 +1269,7 @@ void check_empty_subs(Song *a)
 
 void FormatNami::make_consistent(Song *a)
 {
-	for (Sample *s : a->samples){
+	for (auto *s : a->samples){
 		if (s->type == SignalType::MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
 				s->midi.samples = s->midi.back()->range.end();
@@ -1277,20 +1277,21 @@ void FormatNami::make_consistent(Song *a)
 		}
 	}
 
-	for (Track *t: a->tracks){
+	for (auto *t: a->tracks){
 		int n[3] = {0,0,0};
-		for (TrackLayer *l: t->layers)
-			for (AudioBuffer &b: l->buffers)
+		for (auto *l: t->layers)
+			for (auto &b: l->buffers)
 				n[b.channels] ++;
 
 		for (int i=t->layers.num-1; i>=1; i--)
 			if ((t->layers[i]->buffers.num == 0) and (t->layers[i]->midi.num == 0))
 				t->layers.erase(i);
 
-		if (n[2] > 0 and n[1] == 0){
-			t->channels = 2;
-			for (TrackLayer *l: t->layers)
-				l->channels = 2;
+		// only mono buffers?
+		if (n[1] > 0 and n[2] == 0){
+			t->channels = 1;
+			for (auto *l: t->layers)
+				l->channels = 1;
 		}
 
 		// sort markers

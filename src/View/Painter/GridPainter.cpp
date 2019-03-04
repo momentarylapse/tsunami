@@ -211,18 +211,20 @@ void GridPainter::draw_bar_numbers(Painter *c)
 		// info label (betas, bpm)
 		float bpm = b->bpm(song->sample_rate);
 		string s;
-		if (prev != *b)
+		if ((prev.beats != b->beats) or (prev.divisor != b->divisor)){
 			s = b->format_beats();
-		if (fabs(prev_bpm - bpm) > 0.5f)
+			prev = *b;
+		}
+		if (fabs(prev_bpm - bpm) > 1.5f){
 			s += format(" \u2669=%.0f", bpm);
+			prev_bpm = bpm;
+		}
 		if (s.num > 0){
 			c->set_font("", AudioView::FONT_SIZE * 0.9f, false, false);
 			c->set_color(AudioView::colors.text_soft1);
 			c->draw_str(max(xx + 4, 20.0f), area.y2 - 16, s);
 			c->set_font("", AudioView::FONT_SIZE, true, false);
 		}
-		prev = *b;
-		prev_bpm = bpm;
 	}
 	c->set_font("", AudioView::FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);

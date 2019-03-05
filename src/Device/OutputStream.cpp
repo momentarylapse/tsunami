@@ -28,8 +28,6 @@
 //const int DEFAULT_BUFFER_SIZE = 16384;
 const int DEFAULT_BUFFER_SIZE = 4096;
 
-const float DEFAULT_UPDATE_DT = 0.050f;
-
 
 
 #if HAS_LIB_PULSEAUDIO
@@ -75,7 +73,7 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, [&]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -158,7 +156,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, std::bind(&OutputStream::on_played_end_of_stream, stream)); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, [&]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 		//printf("/XXX end of data...\n");
 	}
 	return 0;
@@ -201,7 +199,6 @@ public:
 	}
 };
 
-extern bool ugly_hack_slow;
 
 OutputStream::OutputStream(Session *_session) :
 	Module(ModuleType::OUTPUT_STREAM_AUDIO),
@@ -217,16 +214,12 @@ OutputStream::OutputStream(Session *_session) :
 	fully_initialized = false;
 	paused = false;
 	volume = 1;
-	hui_runner_id = -1;
 
 	device_manager = session->device_manager;
 	device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	update_dt = DEFAULT_UPDATE_DT;
-	if (ugly_hack_slow)
-		update_dt *= 10;
 	killed = false;
 	thread = nullptr;
 #if HAS_LIB_PULSEAUDIO
@@ -247,11 +240,6 @@ OutputStream::OutputStream(Session *_session) :
 
 OutputStream::~OutputStream()
 {
-	if (hui_runner_id >= 0){
-		hui::CancelRunner(hui_runner_id);
-		hui_runner_id = -1;
-	}
-
 	_kill_dev();
 
 	device_manager->remove_stream(this);
@@ -370,8 +358,6 @@ void OutputStream::_pause()
 		return;
 //	printf("pause...");
 
-	hui::CancelRunner(hui_runner_id);
-	hui_runner_id = -1;
 	paused = true;
 
 #if HAS_LIB_PULSEAUDIO
@@ -389,7 +375,7 @@ void OutputStream::_pause()
 #endif
 //	printf("ok\n");
 
-	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 void OutputStream::_unpause()
@@ -424,8 +410,7 @@ void OutputStream::_unpause()
 #endif
 //	printf("ok\n");
 
-	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
-	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 void OutputStream::pause(bool __pause)
@@ -461,7 +446,7 @@ void OutputStream::_read_stream()
 	if (size == source->END_OF_STREAM){
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		hui::RunLater(0.001f,  std::bind(&OutputStream::on_read_end_of_stream, this));
+		hui::RunLater(0.001f,  [&]{ on_read_end_of_stream(); });
 		return;
 	}
 
@@ -475,11 +460,6 @@ void OutputStream::_read_stream()
 void OutputStream::set_device(Device *d)
 {
 	device = d;
-}
-
-void OutputStream::set_update_dt(float dt)
-{
-	update_dt = dt;
 }
 
 void OutputStream::play()
@@ -558,9 +538,8 @@ void OutputStream::_start_first_time()
 #endif
 
 	fully_initialized = true;
-	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&OutputStream::update, this));
 
-	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 bool OutputStream::is_paused()
@@ -583,7 +562,7 @@ float OutputStream::get_volume()
 void OutputStream::set_volume(float _volume)
 {
 	volume = _volume;
-	Observable<VirtualBase>::notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_STATE_CHANGE);
 }
 
 #if HAS_LIB_PULSEAUDIO
@@ -609,20 +588,12 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 }
 #endif
 
-void OutputStream::update()
-{
-//	testError("idle");
-
-	if (!paused)
-		Observable<VirtualBase>::notify(MESSAGE_UPDATE);
-}
-
 void OutputStream::on_played_end_of_stream()
 {
 	//printf("---------ON PLAY END OF STREAM\n");
 	//pause(true);
 
-	Observable<VirtualBase>::notify(MESSAGE_PLAY_END_OF_STREAM);
+	notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
 void OutputStream::on_read_end_of_stream()
@@ -637,7 +608,7 @@ void OutputStream::on_read_end_of_stream()
 #endif*/
 	// should drain...and use pa_stream_set_state_callback for notification
 
-	Observable<VirtualBase>::notify(MESSAGE_READ_END_OF_STREAM);
+	notify(MESSAGE_READ_END_OF_STREAM);
 }
 
 void OutputStream::clear_buffer()

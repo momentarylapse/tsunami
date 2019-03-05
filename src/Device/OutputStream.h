@@ -51,7 +51,6 @@ public:
 	void _cdecl stop();
 	void _cdecl play();
 	void _cdecl pause(bool pause);
-	void _cdecl update();
 
 	bool fully_initialized;
 	bool buffer_is_cleared;
@@ -70,16 +69,12 @@ public:
 
 	void _cdecl set_buffer_size(int _size){ buffer_size = _size; }
 
-	void _cdecl set_update_dt(float dt);
-
 private:
 	void _read_stream();
 
 	float volume;
 	bool paused;
 	int buffer_size;
-	float update_dt;
-	int hui_runner_id;
 
 	AudioPort *source;
 	RingBuffer ring_buf;

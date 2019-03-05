@@ -9,6 +9,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Module/SignalChain.h"
 #include "../AudioView.h"
 #include "../Mode/ViewModeCapture.h"
 #include "CaptureConsoleModes/CaptureConsoleMode.h"
@@ -39,13 +40,13 @@ CaptureConsole::CaptureConsole(Session *session):
 	peak_meter = new PeakMeterDisplay(this, "level", nullptr);
 
 
-	event("cancel", std::bind(&CaptureConsole::on_cancel, this));
-	//event("hui:close", std::bind(&CaptureConsole::onClose, this));
-	event("ok", std::bind(&CaptureConsole::on_ok, this));
-	event("start", std::bind(&CaptureConsole::on_start, this));
-	event("dump", std::bind(&CaptureConsole::on_dump, this));
-	event("pause", std::bind(&CaptureConsole::on_pause, this));
-	event("new_version", std::bind(&CaptureConsole::on_new_version, this));
+	event("cancel", [&]{ on_cancel(); });
+	//event("hui:close", [&]{ onClose(); });
+	event("ok", [&]{ on_ok(); });
+	event("start", [&]{ on_start(); });
+	event("dump", [&]{ on_dump(); });
+	event("pause", [&]{ on_pause(); });
+	event("new_version", [&]{ on_new_version(); });
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);
@@ -120,8 +121,8 @@ void CaptureConsole::on_start()
 		mode->dump();
 		view->play(view->get_playback_selection(true), false);
 	}
-	view->stream->subscribe(this, std::bind(&CaptureConsole::on_putput_update, this), view->stream->MESSAGE_UPDATE);
-	view->stream->subscribe(this, std::bind(&CaptureConsole::on_output_end_of_stream, this), view->stream->MESSAGE_PLAY_END_OF_STREAM);
+	session->signal_chain->subscribe(this, [&]{ on_putput_update(); }, Module::MESSAGE_UPDATE);
+	view->stream->subscribe(this, [&]{ on_output_end_of_stream(); }, view->stream->MESSAGE_PLAY_END_OF_STREAM);
 
 	mode->start();
 	enable("start", false);
@@ -133,6 +134,7 @@ void CaptureConsole::on_start()
 void CaptureConsole::on_dump()
 {
 	if (view->is_playback_active()){
+		session->signal_chain->unsubscribe(this);
 		view->stream->unsubscribe(this);
 		view->stop();
 	}

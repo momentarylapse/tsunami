@@ -521,9 +521,11 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
 	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
-	Kaba::LinkExternal("OutputStream.set_update_dt", Kaba::mf(&OutputStream::set_update_dt));
 //	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
 	}
+
+	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
+	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_update_dt));
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));

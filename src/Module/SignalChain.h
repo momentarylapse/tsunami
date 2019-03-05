@@ -70,6 +70,9 @@ public:
 
 	void reset_state();
 
+	int hui_runner;
+	float update_dt;
+	void _cdecl set_update_dt(float dt);
 	void start();
 	void pause(bool paused);
 	void stop();

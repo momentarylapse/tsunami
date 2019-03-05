@@ -306,9 +306,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
 	stream = session->output_stream;
-	stream->subscribe(this, [&]{ on_stream_update(); }, stream->MESSAGE_UPDATE);
+	session->signal_chain->subscribe(this, [&]{ on_stream_update(); }, Module::MESSAGE_UPDATE);
 	session->signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
-	stream->subscribe(this, [&]{ on_stream_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM);
+	stream->subscribe(this, [&]{ on_stream_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM); // TODO automatic in SignalChain?
 
 	mx = my = 0;
 	msp.stop();

@@ -160,7 +160,7 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 	if (!stream){
 		stream = new OutputStream(session);
 		stream->plug(0, synth, 0);
-		stream->subscribe(this, std::bind(&MidiPreview::on_end_of_stream, this), stream->MESSAGE_PLAY_END_OF_STREAM);
+		stream->subscribe(this, [&]{ on_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM);
 	}
 	stream->set_volume(volume);
 

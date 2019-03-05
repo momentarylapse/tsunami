@@ -17,6 +17,7 @@ class BufferStreamer;
 class SampleManagerItem;
 class Progress;
 class Session;
+class SignalChain;
 
 class SampleManagerConsole : public SideBarConsole
 {
@@ -54,6 +55,7 @@ public:
 
 	void set_selection(const Array<Sample*> &samples);
 
+	SignalChain *preview_chain;
 	OutputStream *preview_stream;
 	BufferStreamer *preview_renderer;
 	Sample *preview_sample;

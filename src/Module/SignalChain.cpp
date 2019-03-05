@@ -21,12 +21,20 @@ const string SignalChain::MESSAGE_DELETE_MODULE = "DeleteModule";
 const string SignalChain::MESSAGE_ADD_CABLE = "AddCable";
 const string SignalChain::MESSAGE_DELETE_CABLE = "DeleteCable";
 
+
+const float DEFAULT_UPDATE_DT = 0.050f;
+extern bool ugly_hack_slow;
+
 SignalChain::SignalChain(Session *s, const string &_name) :
 	Module(ModuleType::SIGNAL_CHAIN)
 {
 	session = s;
 	name = _name;
 	playback_active = false;
+	hui_runner = -1;
+	update_dt = DEFAULT_UPDATE_DT;
+	if (ugly_hack_slow)
+		update_dt *= 10;
 }
 
 SignalChain::~SignalChain()
@@ -36,6 +44,10 @@ SignalChain::~SignalChain()
 		delete m;
 	for (Cable *c: cables)
 		delete c;
+}
+void SignalChain::set_update_dt(float dt)
+{
+	update_dt = dt;
 }
 
 void SignalChain::create_default_modules()
@@ -315,6 +327,7 @@ void SignalChain::start()
 		m->module_start();
 	playback_active = true;
 	notify(MESSAGE_STATE_CHANGE);
+	hui_runner = hui::RunRepeated(update_dt, [&]{ notify(MESSAGE_UPDATE); });
 }
 
 void SignalChain::stop()
@@ -322,6 +335,7 @@ void SignalChain::stop()
 	if (!is_playback_active())
 		return;
 
+	hui::CancelRunner(hui_runner);
 	for (auto *m: modules)
 		m->module_stop();
 	playback_active = false;

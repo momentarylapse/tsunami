@@ -23,6 +23,7 @@
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
+#include "../../Module/SignalChain.h"
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
 
@@ -132,6 +133,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 
 	event("edit_song", std::bind(&SampleManagerConsole::on_edit_song, this));
 
+	preview_chain = nullptr;
 	preview_renderer = nullptr;
 	preview_stream = nullptr;
 	preview_sample = nullptr;
@@ -147,7 +149,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 
 SampleManagerConsole::~SampleManagerConsole()
 {
-	for (SampleManagerItem *si: items)
+	for (auto *si: items)
 		delete(si);
 	items.clear();
 
@@ -156,7 +158,7 @@ SampleManagerConsole::~SampleManagerConsole()
 
 int SampleManagerConsole::get_index(Sample *s)
 {
-	foreachi(SampleManagerItem *si, items, i)
+	foreachi(auto *si, items, i)
 		if (si->s == s)
 			return i;
 	return -1;
@@ -264,7 +266,7 @@ void SampleManagerConsole::add(SampleManagerItem *item)
 
 void SampleManagerConsole::remove(SampleManagerItem *item)
 {
-	foreachi(SampleManagerItem *si, items, i)
+	foreachi(auto *si, items, i)
 		if (si == item){
 			items.erase(i);
 			remove_string("sample_list", i);
@@ -326,28 +328,31 @@ void SampleManagerConsole::on_preview()
 		end_preview();
 	int sel = get_int("sample_list");
 	preview_sample = items[sel]->s;
+	preview_chain = new SignalChain(session, "sample-preview");
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
 	preview_stream = new OutputStream(session);
-	preview_stream->plug(0, preview_renderer, 0);
+	preview_chain->_add(preview_renderer);
+	preview_chain->_add(preview_stream);
+	preview_chain->connect(preview_renderer, 0, preview_stream, 0);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this, std::bind(&SampleManagerConsole::on_progress_cancel, this));
-	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::on_preview_stream_update, this));
-	preview_stream->subscribe(this, std::bind(&SampleManagerConsole::on_preview_stream_end, this), preview_stream->MESSAGE_PLAY_END_OF_STREAM);
-	preview_stream->play();
+	progress->subscribe(this, [&]{ on_progress_cancel(); });
+	preview_chain->subscribe(this, [&]{ on_preview_stream_update(); });
+	preview_stream->subscribe(this, [&]{ on_preview_stream_end(); }, preview_stream->MESSAGE_PLAY_END_OF_STREAM);
+	preview_chain->start();
 }
 
 void SampleManagerConsole::end_preview()
 {
 	if (progress){
 		progress->unsubscribe(this);
-		delete(progress);
+		delete progress;
 		progress = nullptr;
 	}
+	preview_chain->unsubscribe(this);
 	preview_stream->unsubscribe(this);
-	preview_stream->stop();
-	delete(preview_stream);
-	delete(preview_renderer);
+	preview_chain->stop();
+	delete preview_chain;
 	preview_sample = nullptr;
 }
 

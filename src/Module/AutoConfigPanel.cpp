@@ -16,6 +16,8 @@
 #include "../Data/Midi/MidiData.h"
 #include "../lib/kaba/kaba.h"
 #include "../Session.h"
+#include "../Device/Device.h"
+#include "../Device/DeviceManager.h"
 
 
 string to_camel_case(const string &s)
@@ -46,6 +48,7 @@ struct AutoConfigData
 		STRING,
 		PITCH,
 		SAMPLE_REF,
+		DEVICE,
 	};
 	string name, label, unit;
 	Type type;
@@ -160,7 +163,7 @@ struct AutoConfigDataInt : public AutoConfigData
 		AutoConfigData(Type::INT, _name)
 	{
 		min = 0;
-		max = 1000;
+		max = 1000000;
 		value = nullptr;
 		panel = nullptr;
 	}
@@ -308,6 +311,62 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 	}
 };
 
+struct AutoConfigDataDevice: public AutoConfigData
+{
+	Device **value;
+	string id;
+	ConfigPanel *panel;
+	DeviceType type;
+	Session *session;
+	Array<Device*> list;
+	AutoConfigDataDevice(const string &_name, Session *_session) :
+		AutoConfigData(Type::DEVICE, _name)
+	{
+		session = _session;
+		value = nullptr;
+		panel = nullptr;
+		type = DeviceType::AUDIO_OUTPUT;
+	}
+	void parse(const string &s) override
+	{
+		type = DeviceType::AUDIO_OUTPUT;
+		if (s == "audio:input")
+			type = DeviceType::AUDIO_INPUT;
+		if (s == "midi:input")
+			type = DeviceType::MIDI_INPUT;
+		update_list();
+	}
+	void update_list()
+	{
+		list = session->device_manager->device_list(type);
+		if (panel){
+			panel->reset(id);
+			for (auto *d: list)
+				panel->add_string(id, d->name);
+			panel->set_int(id, list.find(*value));
+		}
+	}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
+	{
+		id = "device-" + i2s(i);
+		panel = p;
+		p->add_combo_box("!width=150,expandx", 1, i, id);
+		p->event(id, callback);
+		update_list();
+	}
+	void get_value() override
+	{
+		*value = session->device_manager->choose_device(type);
+		int n = panel->get_int(id);
+		if (n >= 0)
+			*value = list[n];
+	}
+	void set_value() override
+	{
+		panel->set_int(id, list.find(*value));
+	}
+};
+
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session)
 {
 	Kaba::SyntaxTree *ps = config->_class->owner;
@@ -338,6 +397,10 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 		}else if (e.type->name == "SampleRef*"){
 			AutoConfigDataSampleRef *a = new AutoConfigDataSampleRef(e.name, session);
 			a->value = (SampleRef**)((char*)config + e.offset);
+			r.add(a);
+		}else if (e.type->name == "Device*"){
+			AutoConfigDataDevice *a = new AutoConfigDataDevice(e.name, session);
+			a->value = (Device**)((char*)config + e.offset);
 			r.add(a);
 		}
 	}

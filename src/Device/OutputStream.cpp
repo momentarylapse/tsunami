@@ -616,3 +616,17 @@ void OutputStream::clear_buffer()
 	ring_buf.clear();
 	buffer_is_cleared = true;
 }
+
+void OutputStream::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		play();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+	else if (cmd == ModuleCommand::PAUSE)
+		pause(true);
+	else if (cmd == ModuleCommand::UNPAUSE)
+		pause(false);
+	else if (cmd == ModuleCommand::RESET_BUFFER)
+		clear_buffer();
+}

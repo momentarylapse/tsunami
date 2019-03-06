@@ -66,6 +66,15 @@ enum class ModuleType
 	TSUNAMI_PLUGIN,
 };
 
+enum class ModuleCommand
+{
+	START,
+	STOP,
+	PAUSE,
+	UNPAUSE,
+	RESET_BUFFER
+};
+
 class Module : public Observable<VirtualBase>
 {
 public:
@@ -102,9 +111,7 @@ public:
 	Session *session;
 
 	float module_x, module_y;
-	virtual void module_start(){}
-	virtual void module_stop(){}
-	virtual void module_pause(bool paused);
+	virtual void command(ModuleCommand cmd){}
 
 	bool allow_config_in_chain;
 

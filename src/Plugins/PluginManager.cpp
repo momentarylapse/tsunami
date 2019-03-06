@@ -157,9 +157,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("Module", "config_to_string", Kaba::mf(&Module::config_to_string), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "config_from_string", Kaba::mf(&Module::config_from_string), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "module_start", Kaba::mf(&Module::module_start), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "module_stop", Kaba::mf(&Module::module_stop), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "module_pause", Kaba::mf(&Module::module_pause), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
 	Kaba::LinkExternal("Module.plug", Kaba::mf(&Module::plug));
 	Kaba::LinkExternal("Module.unplug", Kaba::mf(&Module::unplug));
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));

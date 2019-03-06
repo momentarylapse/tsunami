@@ -9,9 +9,7 @@
 #include "AudioView.h"
 #include "Mode/ViewMode.h"
 #include "Mode/ViewModeMidi.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
-#include "SideBar/SideBar.h"
+#include "../Session.h"
 #include "../Data/base.h"
 #include "../Data/Song.h"
 #include "../Data/Track.h"
@@ -64,17 +62,17 @@ bool AudioView::editing_track(Track *t)
 {
 	if (cur_track() != t)
 		return false;
-	if (win->side_bar->is_active(SideBar::TRACK_CONSOLE))
+	if (session->in_mode("default/track"))
 		return true;
-	if (win->side_bar->is_active(SideBar::FX_CONSOLE))
+	if (session->in_mode("default/fx"))
 		return true;
-	if (win->side_bar->is_active(SideBar::MIDI_FX_CONCOLE))
+	if (session->in_mode("default/midi-fx"))
 		return true;
-	if (win->side_bar->is_active(SideBar::SYNTH_CONSOLE))
+	if (session->in_mode("default/synth"))
 		return true;
-	if (win->side_bar->is_active(SideBar::MIDI_EDITOR_CONSOLE))
+	if (session->in_mode("midi"))
 		return true;
-	if (win->side_bar->is_active(SideBar::CAPTURE_CONSOLE))
+	if (session->in_mode("capture"))
 		return true;
 	return false;
 }

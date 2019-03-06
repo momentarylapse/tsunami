@@ -112,6 +112,14 @@ void AudioSucker::stop()
 	running = false;
 }
 
+void AudioSucker::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		start();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+}
+
 int AudioSucker::update()
 {
 	AudioBuffer temp;

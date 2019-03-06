@@ -560,7 +560,7 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allow_termination()
 {
-	if (view->mode == view->mode_capture){
+	if (session->in_mode("capture")){
 		if (side_bar->capture_console->is_capturing()){
 			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
@@ -764,24 +764,26 @@ void TsunamiWindow::on_play_loop()
 
 void TsunamiWindow::on_play()
 {
-	if (view->mode == (ViewMode*)view->mode_capture)
+	if (session->in_mode("capture"))
 		return;
-	if (view->is_paused())
+	if (view->is_paused()){
 		view->pause(false);
-	else
-		view->play(view->get_playback_selection(false), true);
+	}else{
+		view->prepare_playback(view->get_playback_selection(false), true);
+		view->play();
+	}
 }
 
 void TsunamiWindow::on_pause()
 {
-	if (view->mode == (ViewMode*)view->mode_capture)
+	if (session->in_mode("capture"))
 		return;
 	view->pause(true);
 }
 
 void TsunamiWindow::on_stop()
 {
-	if (view->mode == (ViewMode*)view->mode_capture){
+	if (session->in_mode("capture")){
 		session->set_mode("default");
 	}else
 		view->stop();
@@ -897,15 +899,15 @@ void TsunamiWindow::update_menu()
 	enable("remove_sample", view->sel.num_samples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
-	enable("play", view->mode != view->mode_capture);
-	enable("stop", view->is_playback_active() or (view->mode == view->mode_capture));
+	enable("play", !session->in_mode("capture"));
+	enable("stop", view->is_playback_active() or session->in_mode("capture"));
 	enable("pause", view->is_playback_active() and !view->is_paused());
 	check("play_loop", view->renderer->loop_if_allowed);
-	enable("record", view->mode != view->mode_capture);
+	enable("record", !session->in_mode("capture"));
 	// view
 	check("show_mixing_console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
-	check("show_fx_console", side_bar->is_active(SideBar::FX_CONSOLE));
-	check("sample_manager", side_bar->is_active(SideBar::SAMPLE_CONSOLE));
+	check("show_fx_console", session->in_mode("default/fx"));
+	check("sample_manager", session->in_mode("default/samples"));
 
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->is_save())

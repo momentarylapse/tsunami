@@ -77,9 +77,7 @@ public:
 	void _cdecl set_backup_mode(int mode);
 	int backup_mode;
 
-	void _cdecl set_chunk_size(int size);
 	void _cdecl set_update_dt(float dt);
-	int chunk_size;
 	float update_dt;
 
 	int _sample_rate;
@@ -105,8 +103,7 @@ private:
 	int hui_runner_id;
 
 public:
-	virtual void module_start(){ start(); }
-	virtual void module_stop(){ stop(); }
+	void command(ModuleCommand cmd) override;
 };
 
 #endif /* INPUTSTREAMMIDI_H_ */

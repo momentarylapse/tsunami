@@ -476,7 +476,7 @@ void InputStreamAudio::_start_update()
 {
 	if (running)
 		return;
-	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&InputStreamAudio::update, this));
+	hui_runner_id = hui::RunRepeated(update_dt, [&]{ update(); });
 	running = true;
 }
 
@@ -492,7 +492,19 @@ void InputStreamAudio::_stop_update()
 void InputStreamAudio::update()
 {
 	if (do_capturing() > 0)
-		Observable<VirtualBase>::notify(MESSAGE_UPDATE);
+		notify(MESSAGE_UPDATE);
 
 	running = is_capturing();
+}
+
+void InputStreamAudio::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		start();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+	else if (cmd == ModuleCommand::PAUSE)
+		stop();
+	else if (cmd == ModuleCommand::UNPAUSE)
+		start();
 }

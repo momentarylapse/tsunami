@@ -124,9 +124,7 @@ private:
 
 
 public:
-	virtual void module_start(){ play(); }
-	virtual void module_stop(){ stop(); }
-	virtual void module_pause(bool paused){ pause(paused); }
+	void command(ModuleCommand cmd) override;
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

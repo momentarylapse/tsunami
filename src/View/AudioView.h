@@ -219,9 +219,10 @@ public:
 	OutputStream *stream;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
-	void play(const Range &range, bool allow_loop);
+	void play();
 	void stop();
 	void pause(bool pause);
+	void prepare_playback(const Range &range, bool allow_loop);
 	bool is_playback_active();
 	bool is_paused();
 	int playback_pos();

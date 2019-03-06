@@ -1547,7 +1547,15 @@ void AudioView::enable(bool _enabled)
 }
 
 
-void AudioView::play(const Range &range, bool allow_loop)
+void AudioView::play()
+{
+	if (session->signal_chain->is_playback_active())
+		stop();
+
+	session->signal_chain->start();
+}
+
+void AudioView::prepare_playback(const Range &range, bool allow_loop)
 {
 	if (session->signal_chain->is_playback_active())
 		stop();

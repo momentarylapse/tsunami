@@ -13,8 +13,7 @@
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
 #include "../Tsunami.h"
-#include "../TsunamiWindow.h"
-#include "SideBar/SideBar.h"
+#include "../Session.h"
 #include "../Data/base.h"
 #include "../Data/Song.h"
 #include "../Data/Track.h"
@@ -254,9 +253,9 @@ bool AudioView::editing_layer(AudioViewLayer *l)
 {
 	if (cur_vlayer != l)
 		return false;
-	if (win->side_bar->is_active(SideBar::MIDI_EDITOR_CONSOLE))
+	if (session->in_mode("midi"))
 		return true;
-	if (win->side_bar->is_active(SideBar::CAPTURE_CONSOLE))
+	if (session->in_mode("capture"))
 		return true;
 	return false;
 }

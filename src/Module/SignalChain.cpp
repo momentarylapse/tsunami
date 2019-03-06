@@ -324,7 +324,7 @@ void SignalChain::start()
 
 	reset_state();
 	for (auto *m: modules)
-		m->module_start();
+		m->command(ModuleCommand::START);
 	playback_active = true;
 	notify(MESSAGE_STATE_CHANGE);
 	hui_runner = hui::RunRepeated(update_dt, [&]{ notify(MESSAGE_UPDATE); });
@@ -337,7 +337,7 @@ void SignalChain::stop()
 
 	hui::CancelRunner(hui_runner);
 	for (auto *m: modules)
-		m->module_stop();
+		m->command(ModuleCommand::STOP);
 	playback_active = false;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -347,7 +347,7 @@ void SignalChain::pause(bool paused)
 	if (!playback_active)
 		return;
 	for (auto *m: modules)
-		m->module_pause(paused);
+		m->command(paused ? ModuleCommand::PAUSE : ModuleCommand::UNPAUSE);
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -359,6 +359,18 @@ bool SignalChain::is_paused()
 			if (m->module_type == ModuleType::OUTPUT_STREAM_AUDIO)
 				return ((OutputStream*)m)->is_paused();
 	return false;
+}
+
+void SignalChain::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		start();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+	else if (cmd == ModuleCommand::PAUSE)
+		pause(true);
+	else if (cmd == ModuleCommand::UNPAUSE)
+		pause(false);
 }
 
 bool SignalChain::is_playback_active()

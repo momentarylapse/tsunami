@@ -19,7 +19,6 @@
 #include <alsa/asoundlib.h>
 #endif
 
-static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
 InputStreamMidi::Output::Output(InputStreamMidi *_input) : MidiPort("out")
@@ -70,13 +69,10 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	_sample_rate = session->sample_rate();
 	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
-	chunk_size = DEFAULT_CHUNK_SIZE;
 
 #if HAS_LIB_ALSA
 	subs = nullptr;
 #endif
-
-	chunk_size = 512;
 
 	running = false;
 
@@ -280,7 +276,7 @@ void InputStreamMidi::_start_update()
 {
 	if (running)
 		return;
-	hui_runner_id = hui::RunRepeated(update_dt, std::bind(&InputStreamMidi::update, this));
+	hui_runner_id = hui::RunRepeated(update_dt, [&]{ update(); });
 	running = true;
 }
 
@@ -306,19 +302,23 @@ void InputStreamMidi::set_backup_mode(int mode)
 	backup_mode = mode;
 }
 
-void InputStreamMidi::set_chunk_size(int size)
-{
-	if (size > 0)
-		chunk_size = size;
-	else
-		chunk_size = DEFAULT_CHUNK_SIZE;
-}
-
 void InputStreamMidi::set_update_dt(float dt)
 {
 	if (dt > 0)
 		update_dt = dt;
 	else
 		update_dt = DEFAULT_UPDATE_TIME;
+}
+
+void InputStreamMidi::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		start();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+	else if (cmd == ModuleCommand::PAUSE)
+		stop();
+	else if (cmd == ModuleCommand::UNPAUSE)
+		start();
 }
 

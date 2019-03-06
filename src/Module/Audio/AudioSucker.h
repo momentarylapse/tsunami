@@ -29,7 +29,6 @@ public:
 	void stop();
 
 	int update();
-	void wait();
 
 	static const int DEFAULT_BUFFER_SIZE;
 	static const string MESSAGE_UPDATE;
@@ -42,8 +41,7 @@ public:
 	float no_data_wait;
 
 	AudioSuckerThread *thread;
-	void module_start() override { start(); }
-	void module_stop() override { stop(); }
+	void command(ModuleCommand cmd) override;
 };
 
 AudioSucker *CreateAudioSucker(Session *session);

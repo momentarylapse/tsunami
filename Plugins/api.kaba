@@ -101,6 +101,13 @@ class ConfigPanel extends Panel
 	extern void changed()
 	Module *c
 
+enum
+	COMMAND_START
+	COMMAND_STOP
+	COMMAND_PAUSE
+	COMMAND_UNPAUSE
+	COMMAND_RESET_BUFFER
+
 
 class Module
 	string name
@@ -116,9 +123,7 @@ class Module
 	extern virtual PluginData* get_config()
 	extern virtual string config_to_string()
 	extern virtual void config_from_string(string s)
-	extern virtual void module_start()
-	extern virtual void module_stop()
-	extern virtual void module_pause(bool paused)
+	extern virtual void command(int cmd)
 	extern void plug(int in_port, Module* source, int out_port)
 	extern void unplug(int in_port)
 	extern void subscribe(void* handler, func* f, string message)

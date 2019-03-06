@@ -97,7 +97,6 @@ void CaptureConsoleModeMidi::enter()
 
 
 	input = new InputStreamMidi(session);
-	input->set_chunk_size(512);
 	input->set_update_dt(0.005f);
 	cc->peak_meter->set_source(nullptr);//input);
 

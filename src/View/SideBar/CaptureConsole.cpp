@@ -41,7 +41,6 @@ CaptureConsole::CaptureConsole(Session *session):
 
 
 	event("cancel", [&]{ on_cancel(); });
-	//event("hui:close", [&]{ onClose(); });
 	event("ok", [&]{ on_ok(); });
 	event("start", [&]{ on_start(); });
 	event("dump", [&]{ on_dump(); });
@@ -115,7 +114,8 @@ void CaptureConsole::on_start()
 		view->pause(false);
 	}else{
 		mode->dump();
-		view->play(view->get_playback_selection(true), false);
+		view->prepare_playback(view->get_playback_selection(true), false);
+		view->play();
 	}
 	session->signal_chain->subscribe(this, [&]{ on_putput_update(); }, Module::MESSAGE_UPDATE);
 	view->stream->subscribe(this, [&]{ on_output_end_of_stream(); }, view->stream->MESSAGE_PLAY_END_OF_STREAM);

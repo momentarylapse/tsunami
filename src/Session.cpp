@@ -179,5 +179,12 @@ void Session::set_mode(const string &mode)
 		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	}else{
 		e("unknown mode: " + mode);
+		return;
 	}
+	this->mode = mode;
+}
+
+bool Session::in_mode(const string &m)
+{
+	return mode == m;
 }

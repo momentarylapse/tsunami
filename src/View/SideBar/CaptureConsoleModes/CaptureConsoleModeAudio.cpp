@@ -88,7 +88,7 @@ void CaptureConsoleModeAudio::enter()
 	input = new InputStreamAudio(session);
 	input->set_backup_mode(BACKUP_MODE_TEMP);
 	input->set_chunk_size(4096);
-	input->set_update_dt(0.03f);
+	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
 	peak_meter->plug(0, input, 0);
 	cc->peak_meter->set_source(peak_meter);

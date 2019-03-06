@@ -40,21 +40,14 @@ public:
 	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
 
-	void _start_update();
-	void _stop_update();
-	void update();
-
 	void _cdecl set_device(Device *device);
 	Device* _cdecl get_device();
 
 	bool _cdecl start();
 	void _cdecl stop();
-	void _stop();
 
 	int _cdecl get_delay();
 	void _cdecl reset_sync();
-
-	int do_capturing();
 
 
 	bool _cdecl is_capturing();
@@ -84,9 +77,7 @@ public:
 	File *backup_file;
 
 	void _cdecl set_chunk_size(int size);
-	void _cdecl set_update_dt(float dt);
 	int chunk_size;
-	float update_dt;
 
 	int _sample_rate;
 
@@ -94,11 +85,7 @@ private:
 
 	DeviceManager *dev_man;
 
-	//bool accumulating;
 	bool capturing;
-
-	bool running;
-	int hui_runner_id;
 
 	int num_channels;
 

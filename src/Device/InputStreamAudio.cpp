@@ -29,7 +29,6 @@ float InputStreamAudio::playback_delay_const;
 
 
 static const int DEFAULT_CHUNK_SIZE = 512;
-static const float DEFAULT_UPDATE_TIME = 0.005f;
 
 
 #if HAS_LIB_PULSEAUDIO
@@ -190,13 +189,8 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 //	printf("input new\n");
 	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
-	chunk_size = -1;
-	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 0;
-
-	if (ugly_hack_slow)
-		update_dt *= 50;
 
 	capturing = false;
 #if HAS_LIB_PULSEAUDIO
@@ -218,9 +212,6 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	}
 	backup_file = nullptr;
 	backup_mode = BACKUP_MODE_NONE;
-
-	running = false;
-	hui_runner_id = -1;
 }
 
 InputStreamAudio::~InputStreamAudio()
@@ -252,16 +243,6 @@ void InputStreamAudio::set_chunk_size(int size)
 		chunk_size = DEFAULT_CHUNK_SIZE;
 }
 
-void InputStreamAudio::set_update_dt(float dt)
-{
-	if (dt > 0)
-		update_dt = dt;
-	else
-		update_dt = DEFAULT_UPDATE_TIME;
-	if (ugly_hack_slow)
-		update_dt *= 10;
-}
-
 Device *InputStreamAudio::get_device()
 {
 	return device;
@@ -282,16 +263,9 @@ void InputStreamAudio::set_device(Device *_device)
 
 void InputStreamAudio::stop()
 {
-//	printf("input stop\n");
-	_stop();
-}
-
-void InputStreamAudio::_stop()
-{
 	if (!capturing)
 		return;
 	session->i(_("capture audio stop"));
-	_stop_update();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE){
@@ -333,9 +307,8 @@ void InputStreamAudio::_stop()
 
 bool InputStreamAudio::start()
 {
-//	printf("input start\n");
 	if (capturing)
-		_stop();
+		stop();
 
 	session->i(_("capture audio start"));
 
@@ -407,8 +380,6 @@ bool InputStreamAudio::start()
 	if (backup_mode != BACKUP_MODE_NONE)
 		backup_file = BackupManager::create_file("raw", session);
 
-	_start_update();
-
 	reset_sync();
 	return capturing;
 }
@@ -446,17 +417,6 @@ void InputStreamAudio::set_playback_delay_const(float f)
 	hui::Config.set_float("Input.PlaybackDelay", playback_delay_const);
 }
 
-int InputStreamAudio::do_capturing()
-{
-	if (!capturing)
-		return 0;
-
-	int avail = buffer.available();
-	sync.add(avail);
-
-	return avail;
-}
-
 void InputStreamAudio::reset_sync()
 {
 	sync.reset();
@@ -470,31 +430,6 @@ bool InputStreamAudio::is_capturing()
 int InputStreamAudio::get_delay()
 {
 	return sync.get_delay() - playback_delay_const * (float)_sample_rate / 1000.0f;
-}
-
-void InputStreamAudio::_start_update()
-{
-	if (running)
-		return;
-	hui_runner_id = hui::RunRepeated(update_dt, [&]{ update(); });
-	running = true;
-}
-
-void InputStreamAudio::_stop_update()
-{
-	if (!running)
-		return;
-	hui::CancelRunner(hui_runner_id);
-	hui_runner_id = -1;
-	running = false;
-}
-
-void InputStreamAudio::update()
-{
-	if (do_capturing() > 0)
-		notify(MESSAGE_UPDATE);
-
-	running = is_capturing();
 }
 
 void InputStreamAudio::command(ModuleCommand cmd)

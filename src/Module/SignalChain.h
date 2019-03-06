@@ -68,11 +68,13 @@ public:
 	void disconnect_target(Module *target, int port);
 	void disconnect(Cable *c);
 
+	void on_module_play_end_of_stream();
+
 	void reset_state();
 
 	int hui_runner;
-	float update_dt;
-	void _cdecl set_update_dt(float dt);
+	float tick_dt;
+	void _cdecl set_tick_dt(float dt);
 	void command(ModuleCommand cmd) override;
 	void start();
 	void pause(bool paused);

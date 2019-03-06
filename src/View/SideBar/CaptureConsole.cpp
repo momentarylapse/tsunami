@@ -117,8 +117,8 @@ void CaptureConsole::on_start()
 		view->prepare_playback(view->get_playback_selection(true), false);
 		view->play();
 	}
-	session->signal_chain->subscribe(this, [&]{ on_putput_update(); }, Module::MESSAGE_UPDATE);
-	view->stream->subscribe(this, [&]{ on_output_end_of_stream(); }, view->stream->MESSAGE_PLAY_END_OF_STREAM);
+	session->signal_chain->subscribe(this, [&]{ on_putput_tick(); }, Module::MESSAGE_TICK);
+	session->signal_chain->subscribe(this, [&]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 
 	mode->start();
 	enable("start", false);
@@ -193,7 +193,7 @@ void CaptureConsole::on_output_end_of_stream()
 	enable("dump", true);
 }
 
-void CaptureConsole::on_putput_update()
+void CaptureConsole::on_putput_tick()
 {
 	update_time();
 }

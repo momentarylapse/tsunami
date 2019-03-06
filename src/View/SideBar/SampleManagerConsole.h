@@ -41,7 +41,7 @@ public:
 
 	void on_progress_cancel();
 	void on_song_update();
-	void on_preview_stream_update();
+	void on_preview_tick();
 	void on_preview_stream_end();
 
 	void end_preview();

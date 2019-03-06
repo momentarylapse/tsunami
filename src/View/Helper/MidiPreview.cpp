@@ -10,6 +10,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
 #include "../../Device/OutputStream.h"
+#include "../../Module/SignalChain.h"
 
 
 class MidiPreviewSource : public MidiSource
@@ -101,13 +102,14 @@ public:
 	float volume;
 
 
-	void start(const Array<int> &_pitch, int _ttl)
+	void start(const Array<int> &_pitch, int _ttl, float _volume)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		o("START");
 
 		pitch_queued = _pitch;
 		ttl = _ttl;
+		volume = _volume;
 
 		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)){
 			set_mode(Mode::START_NOTES);
@@ -138,15 +140,13 @@ MidiPreview::MidiPreview(Session *s)
 	source = new MidiPreviewSource;
 	stream = nullptr;
 	synth = nullptr;
+	chain = new SignalChain(session, "midi-preview");
+	chain->_add(source);
 }
 
 MidiPreview::~MidiPreview()
 {
-	if (stream)
-		delete stream;
-	if (synth)
-		delete synth;
-	delete source;
+	delete chain;
 }
 
 void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl)
@@ -155,17 +155,18 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 	if (!synth){
 		synth = (Synthesizer*)s->copy();
 //		synth->setInstrument(view->cur_track->instrument);
-		synth->plug(0, source, 0);
+		chain->_add(synth);
+		chain->connect(source, 0, synth, 0);
 	}
 	if (!stream){
 		stream = new OutputStream(session);
-		stream->plug(0, synth, 0);
-		stream->subscribe(this, [&]{ on_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM);
+		chain->_add(stream);
+		chain->connect(synth, 0, stream, 0);
+		chain->subscribe(this, [&]{ on_end_of_stream(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
 	}
-	stream->set_volume(volume);
 
-	source->start(pitch, session->sample_rate() * ttl);
-	stream->play();
+	source->start(pitch, session->sample_rate() * ttl, volume);
+	chain->start();
 }
 
 void MidiPreview::end()
@@ -176,20 +177,7 @@ void MidiPreview::end()
 void MidiPreview::on_end_of_stream()
 {
 	//msg_write("preview: end of stream");
-	stream->stop();
-	//hui::RunLater(0.001f,  std::bind(&ViewModeMidi::kill_preview, this));
-}
-
-void MidiPreview::kill()
-{
-	//msg_write("kill");
-	if (stream){
-		stream->stop();
-		delete stream;
-	}
-	stream = nullptr;
-	if (synth)
-		delete synth;
-	synth = nullptr;
+	// ...well happens automatic these days...
+	chain->stop();
 }
 

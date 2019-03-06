@@ -90,7 +90,7 @@ public:
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_READ_END_OF_STREAM;
 	static const string MESSAGE_PLAY_END_OF_STREAM;
-	static const string MESSAGE_UPDATE;
+	static const string MESSAGE_TICK;
 
 	void _cdecl reset_config();
 	virtual void _cdecl reset_state(){}

@@ -77,9 +77,8 @@ public:
 	void on_command(const string &id);
 
 	void on_song_update();
-	void on_stream_update();
+	void on_stream_tick();
 	void on_stream_state_change();
-	void on_stream_end_of_stream();
 	void on_update();
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;

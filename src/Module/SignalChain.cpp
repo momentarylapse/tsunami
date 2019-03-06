@@ -32,22 +32,24 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	name = _name;
 	playback_active = false;
 	hui_runner = -1;
-	update_dt = DEFAULT_UPDATE_DT;
+	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
-		update_dt *= 10;
+		tick_dt *= 10;
 }
 
 SignalChain::~SignalChain()
 {
 	stop();
 	for (Module *m: modules)
+		m->unsubscribe(this);
+	for (Module *m: modules)
 		delete m;
 	for (Cable *c: cables)
 		delete c;
 }
-void SignalChain::set_update_dt(float dt)
+void SignalChain::set_tick_dt(float dt)
 {
-	update_dt = dt;
+	tick_dt = dt;
 }
 
 void SignalChain::create_default_modules()
@@ -77,6 +79,7 @@ Module *SignalChain::_add(Module *m)
 	m->reset_state();
 	modules.add(m);
 	notify(MESSAGE_ADD_MODULE);
+	m->subscribe(this, [&]{ on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	return m;
 }
 
@@ -117,6 +120,7 @@ void SignalChain::remove(Module *m)
 		return;
 	}
 
+	m->unsubscribe(this);
 
 	bool more = true;
 	while (more){
@@ -327,7 +331,7 @@ void SignalChain::start()
 		m->command(ModuleCommand::START);
 	playback_active = true;
 	notify(MESSAGE_STATE_CHANGE);
-	hui_runner = hui::RunRepeated(update_dt, [&]{ notify(MESSAGE_UPDATE); });
+	hui_runner = hui::RunRepeated(tick_dt, [&]{ notify(MESSAGE_TICK); });
 }
 
 void SignalChain::stop()
@@ -376,5 +380,11 @@ void SignalChain::command(ModuleCommand cmd)
 bool SignalChain::is_playback_active()
 {
 	return playback_active;
+}
+
+void SignalChain::on_module_play_end_of_stream()
+{
+	notify(MESSAGE_PLAY_END_OF_STREAM);
+	stop();
 }
 

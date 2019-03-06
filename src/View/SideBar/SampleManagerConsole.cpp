@@ -310,7 +310,7 @@ void SampleManagerConsole::on_song_update()
 	update_list();
 }
 
-void SampleManagerConsole::on_preview_stream_update()
+void SampleManagerConsole::on_preview_tick()
 {
 	int pos = preview_stream->get_pos();
 	Range r = preview_sample->range();
@@ -337,8 +337,8 @@ void SampleManagerConsole::on_preview()
 
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, [&]{ on_progress_cancel(); });
-	preview_chain->subscribe(this, [&]{ on_preview_stream_update(); });
-	preview_stream->subscribe(this, [&]{ on_preview_stream_end(); }, preview_stream->MESSAGE_PLAY_END_OF_STREAM);
+	preview_chain->subscribe(this, [&]{ on_preview_tick(); });
+	preview_chain->subscribe(this, [&]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	preview_chain->start();
 }
 

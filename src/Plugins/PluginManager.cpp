@@ -523,7 +523,7 @@ void PluginManager::link_app_script_data()
 	}
 
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
-	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_update_dt));
+	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));

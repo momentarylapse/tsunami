@@ -40,7 +40,7 @@ public:
 
 	void update_time();
 
-	void on_putput_update();
+	void on_putput_tick();
 	void on_output_end_of_stream();
 
 	bool is_capturing();

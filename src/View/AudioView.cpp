@@ -307,9 +307,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
 	stream = session->output_stream;
-	session->signal_chain->subscribe(this, [&]{ on_stream_update(); }, Module::MESSAGE_UPDATE);
+	session->signal_chain->subscribe(this, [&]{ on_stream_tick(); }, Module::MESSAGE_TICK);
 	session->signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
-	stream->subscribe(this, [&]{ on_stream_end_of_stream(); }, stream->MESSAGE_PLAY_END_OF_STREAM); // TODO automatic in SignalChain?
 
 	mx = my = 0;
 	msp.stop();
@@ -320,7 +319,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
-	win->event_xp(id, "hui:draw", std::bind(&AudioView::on_draw, this, std::placeholders::_1));
+	win->event_xp(id, "hui:draw", [&](Painter *p){ on_draw(p); });
 	win->event_x(id, "hui:mouse-move", [&]{ on_mouse_move(); });
 	win->event_x(id, "hui:left-button-down", [&]{ on_left_button_down(); });
 	win->event_x(id, "hui:left-double-click", [&]{ on_left_double_click(); });
@@ -836,7 +835,7 @@ void AudioView::on_song_update()
 			update_peaks();
 }
 
-void AudioView::on_stream_update()
+void AudioView::on_stream_tick()
 {
 	cam.make_sample_visible(playback_pos(), session->sample_rate() * 2);
 	force_redraw();
@@ -846,14 +845,6 @@ void AudioView::on_stream_state_change()
 {
 	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	force_redraw();
-}
-
-void AudioView::on_stream_end_of_stream()
-{
-	stream->stop();
-	// stop... but wait for other handlers of this message before deleting stream
-	hui::RunLater(0.01f,  [&]{ stop(); });
-	//stop();
 }
 
 void AudioView::on_update()

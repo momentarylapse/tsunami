@@ -24,6 +24,8 @@
 #include "View/SideBar/SideBar.h"
 #include "View/SideBar/CaptureConsole.h"
 #include "View/Mode/ViewModeDefault.h"
+#include "View/Mode/ViewModeMidi.h"
+#include "View/Mode/ViewModeCapture.h"
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
@@ -422,18 +424,12 @@ void TsunamiWindow::on_delete_track()
 
 void TsunamiWindow::on_track_edit_midi()
 {
-	if (view->cur_track())
-		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
-	else
-		session->e(_("No track selected"));
+	session->set_mode("midi");
 }
 
 void TsunamiWindow::on_track_edit_fx()
 {
-	if (view->cur_track())
-		side_bar->open(SideBar::FX_CONSOLE);
-	else
-		session->e(_("No track selected"));
+	session->set_mode("default/fx");
 }
 
 void TsunamiWindow::on_track_add_marker()
@@ -501,21 +497,18 @@ void TsunamiWindow::on_layer_midi_mode_classical()
 
 void TsunamiWindow::on_song_properties()
 {
-	side_bar->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void TsunamiWindow::on_track_properties()
 {
-	if (view->cur_track())
-		side_bar->open(SideBar::TRACK_CONSOLE);
-	else
-		session->e(_("No track selected"));
+	session->set_mode("default/track");
 }
 
 void TsunamiWindow::on_sample_properties()
 {
 	if (view->cur_sample)
-		side_bar->open(SideBar::SAMPLEREF_CONSOLE);
+		session->set_mode("default/sample-ref");
 	else
 		session->e(_("No sample selected"));
 }
@@ -567,13 +560,13 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allow_termination()
 {
-	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE)){
+	if (view->mode == view->mode_capture){
 		if (side_bar->capture_console->is_capturing()){
 			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
 			if (answer != "hui:yes")
 				return false;
 			side_bar->capture_console->on_dump();
-			side_bar->_hide();
+			session->set_mode("default");
 		}
 	}
 
@@ -722,7 +715,7 @@ void TsunamiWindow::on_delete()
 
 void TsunamiWindow::on_sample_manager()
 {
-	side_bar->open(SideBar::SAMPLE_CONSOLE);
+	session->set_mode("default/samples");
 }
 
 void TsunamiWindow::on_mixing_console()
@@ -732,7 +725,7 @@ void TsunamiWindow::on_mixing_console()
 
 void TsunamiWindow::on_fx_console()
 {
-	side_bar->open(SideBar::FX_CONSOLE);
+	session->set_mode("default/fx");
 }
 
 void TsunamiWindow::on_sample_import()
@@ -771,7 +764,7 @@ void TsunamiWindow::on_play_loop()
 
 void TsunamiWindow::on_play()
 {
-	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
+	if (view->mode == (ViewMode*)view->mode_capture)
 		return;
 	if (view->is_paused())
 		view->pause(false);
@@ -781,16 +774,16 @@ void TsunamiWindow::on_play()
 
 void TsunamiWindow::on_pause()
 {
-	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
+	if (view->mode == (ViewMode*)view->mode_capture)
 		return;
 	view->pause(true);
 }
 
 void TsunamiWindow::on_stop()
 {
-	if (side_bar->is_active(SideBar::CAPTURE_CONSOLE))
-		side_bar->_hide();
-	else
+	if (view->mode == (ViewMode*)view->mode_capture){
+		session->set_mode("default");
+	}else
 		view->stop();
 }
 
@@ -801,7 +794,7 @@ void TsunamiWindow::on_insert_sample()
 
 void TsunamiWindow::on_record()
 {
-	side_bar->open(SideBar::CAPTURE_CONSOLE);
+	session->set_mode("capture");
 }
 
 void TsunamiWindow::on_add_layer()
@@ -904,11 +897,11 @@ void TsunamiWindow::update_menu()
 	enable("remove_sample", view->sel.num_samples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
-	enable("play", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
-	enable("stop", view->is_playback_active() or side_bar->is_active(SideBar::CAPTURE_CONSOLE));
+	enable("play", view->mode != view->mode_capture);
+	enable("stop", view->is_playback_active() or (view->mode == view->mode_capture));
 	enable("pause", view->is_playback_active() and !view->is_paused());
 	check("play_loop", view->renderer->loop_if_allowed);
-	enable("record", !side_bar->is_active(SideBar::CAPTURE_CONSOLE));
+	enable("record", view->mode != view->mode_capture);
 	// view
 	check("show_mixing_console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
 	check("show_fx_console", side_bar->is_active(SideBar::FX_CONSOLE));
@@ -1130,7 +1123,7 @@ void TsunamiWindow::on_edit_bars()
 
 void TsunamiWindow::on_scale_bars()
 {
-	view->set_mode(view->mode_scale_bars);
+	session->set_mode("scale-bars");
 	Set<int> s;
 	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
 		s.add(i);

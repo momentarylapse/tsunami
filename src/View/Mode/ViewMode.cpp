@@ -11,10 +11,12 @@
 ViewMode::ViewMode(AudioView *_view)
 {
 	view = _view;
+	session = view->session;
 	cam = &view->cam;
 	hover = &view->hover;
 	win = view->win;
 	song = view->song;
+	side_bar_console = -1;
 }
 
 ViewMode::~ViewMode()

@@ -11,6 +11,7 @@
 #include "../Mode/ViewModeDefault.h"
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
+#include "../../Session.h"
 
 class CurveTargetDialog : public hui::Window
 {
@@ -96,12 +97,10 @@ void CurveConsole::on_update()
 
 void CurveConsole::on_enter()
 {
-	view->set_mode(view->mode_curve);
 }
 
 void CurveConsole::on_leave()
 {
-	view->set_mode(view->mode_default);
 }
 
 void CurveConsole::update_list()
@@ -183,17 +182,17 @@ void CurveConsole::on_list_edit()
 
 void CurveConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void CurveConsole::on_edit_track()
 {
-	bar()->open(SideBar::TRACK_CONSOLE);
+	session->set_mode("default/track");
 }
 
 void CurveConsole::on_edit_fx()
 {
-	bar()->open(SideBar::FX_CONSOLE);
+	session->set_mode("default/fx");
 }
 
 Curve* CurveConsole::curve()

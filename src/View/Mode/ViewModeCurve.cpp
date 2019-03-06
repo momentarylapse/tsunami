@@ -13,12 +13,14 @@
 #include "../../Device/OutputStream.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../SideBar/SideBar.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
 	curve = nullptr;
 	cur_track = nullptr;
+	side_bar_console = SideBar::CURVE_CONSOLE;
 }
 
 ViewModeCurve::~ViewModeCurve()

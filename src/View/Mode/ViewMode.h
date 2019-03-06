@@ -25,12 +25,16 @@ class Painter;
 class rect;
 class color;
 class Range;
+class Session;
 
 class ViewMode : public Observable<VirtualBase>
 {
 public:
 	ViewMode(AudioView *view);
 	virtual ~ViewMode();
+
+	virtual void on_start(){}
+	virtual void on_end(){}
 
 	virtual void on_left_button_down(){}
 	virtual void on_left_button_up(){}
@@ -67,10 +71,13 @@ public:
 	virtual Set<Track*> prevent_playback(){ return {}; }
 
 	AudioView *view;
+	Session *session;
 	ViewPort *cam;
 	Selection *hover;
 	TsunamiWindow *win;
 	Song *song;
+
+	int side_bar_console;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODE_H_ */

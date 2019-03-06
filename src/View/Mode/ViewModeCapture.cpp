@@ -14,6 +14,7 @@
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
 #include "../../Module/Audio/AudioSucker.h"
+#include "../SideBar/SideBar.h"
 
 CaptureTrackData::CaptureTrackData(){}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_sucker)
@@ -32,12 +33,21 @@ SignalType CaptureTrackData::type()
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
+	side_bar_console = SideBar::CAPTURE_CONSOLE;
 	//console_mode = NULL;
 }
 
 ViewModeCapture::~ViewModeCapture()
 {
 	set_data({});
+}
+
+void ViewModeCapture::on_start()
+{
+}
+
+void ViewModeCapture::on_end()
+{
 }
 
 Selection ViewModeCapture::get_hover()

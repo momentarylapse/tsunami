@@ -86,8 +86,6 @@ void CaptureConsole::on_enter()
 	mode_midi->enter_parent();
 	mode_multi->enter_parent();
 
-	view->set_mode(view->mode_capture);
-
 	mode->enter();
 
 	// automatically start
@@ -108,8 +106,6 @@ void CaptureConsole::on_leave()
 	mode_audio->leave_parent();
 	mode_midi->leave_parent();
 	mode_multi->leave_parent();
-
-	view->set_mode(view->mode_default);
 }
 
 
@@ -162,19 +158,14 @@ void CaptureConsole::on_ok()
 	view->stream->unsubscribe(this);
 	mode->stop();
 	if (mode->insert())
-		bar()->_hide();
+		session->set_mode("default");
 }
 
 void CaptureConsole::on_cancel()
 {
 	view->stream->unsubscribe(this);
 	mode->stop();
-	bar()->_hide();
-}
-
-void CaptureConsole::on_close()
-{
-	bar()->_hide();
+	session->set_mode("default");
 }
 
 void CaptureConsole::on_new_version()

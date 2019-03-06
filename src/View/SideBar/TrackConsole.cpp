@@ -30,21 +30,21 @@ TrackConsole::TrackConsole(Session *session) :
 		set_string("instrument", i.name());
 
 	load_data();
-	view->subscribe(this, std::bind(&TrackConsole::on_view_cur_track_change, this), view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, [&]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 
-	event("name", std::bind(&TrackConsole::on_name, this));
-	event("volume", std::bind(&TrackConsole::on_volume, this));
-	event("panning", std::bind(&TrackConsole::on_panning, this));
-	event("instrument", std::bind(&TrackConsole::on_instrument, this));
-	event("edit_tuning", std::bind(&TrackConsole::on_edit_tuning, this));
-	event("select_synth", std::bind(&TrackConsole::on_select_synth, this));
+	event("name", [&]{ on_name(); });
+	event("volume", [&]{ on_volume(); });
+	event("panning", [&]{ on_panning(); });
+	event("instrument", [&]{ on_instrument(); });
+	event("edit_tuning", [&]{ on_edit_tuning(); });
+	event("select_synth", [&]{ on_select_synth(); });
 
-	event("edit_song", std::bind(&TrackConsole::on_edit_song, this));
-	event("edit_fx", std::bind(&TrackConsole::on_edit_fx, this));
-	event("edit_curves", std::bind(&TrackConsole::on_edit_curves, this));
-	event("edit_midi", std::bind(&TrackConsole::on_edit_midi, this));
-	event("edit_midi_fx", std::bind(&TrackConsole::on_edit_midi_fx, this));
-	event("_edit_synth", std::bind(&TrackConsole::on_edit_synth, this));
+	event("edit_song", [&]{ on_edit_song(); });
+	event("edit_fx", [&]{ on_edit_fx(); });
+	event("edit_curves", [&]{ on_edit_curves(); });
+	event("edit_midi", [&]{ on_edit_midi(); });
+	event("edit_midi_fx", [&]{ on_edit_midi_fx(); });
+	event("_edit_synth", [&]{ on_edit_synth(); });
 }
 
 TrackConsole::~TrackConsole()
@@ -106,7 +106,7 @@ void TrackConsole::set_track(Track *t)
 	track = t;
 	load_data();
 	if (track)
-		track->subscribe(this, std::bind(&TrackConsole::on_update, this));
+		track->subscribe(this, [&]{ on_update(); });
 }
 
 void TrackConsole::on_name()
@@ -159,32 +159,32 @@ void TrackConsole::on_select_synth()
 
 void TrackConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void TrackConsole::on_edit_fx()
 {
-	bar()->open(SideBar::FX_CONSOLE);
+	session->set_mode("default/fx");
 }
 
 void TrackConsole::on_edit_curves()
 {
-	bar()->open(SideBar::CURVE_CONSOLE);
+	session->set_mode("curves");
 }
 
 void TrackConsole::on_edit_midi()
 {
-	bar()->open(SideBar::MIDI_EDITOR_CONSOLE);
+	session->set_mode("midi");
 }
 
 void TrackConsole::on_edit_midi_fx()
 {
-	bar()->open(SideBar::MIDI_FX_CONCOLE);
+	session->set_mode("default/midi-fx");
 }
 
 void TrackConsole::on_edit_synth()
 {
-	bar()->open(SideBar::SYNTH_CONSOLE);
+	session->set_mode("default/synth");
 }
 
 void TrackConsole::on_view_cur_track_change()

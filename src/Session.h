@@ -68,6 +68,8 @@ public:
 
 	int sample_rate();
 
+	void set_mode(const string &mode);
+
 	// global
 	Log *log;
 	DeviceManager *device_manager;

@@ -9,8 +9,8 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../AudioViewLayer.h"
-#include "../SideBar/SideBar.h"
 #include "../../TsunamiWindow.h"
+#include "../../Session.h"
 #include "../../Device/OutputStream.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
@@ -85,11 +85,11 @@ void ViewModeDefault::on_left_button_down()
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO){
 		hover->vtrack->set_solo(!hover->vtrack->solo);
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT){
-		view->win->side_bar->open(SideBar::TRACK_CONSOLE);
+		session->set_mode("default/track");
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_FX){
-		view->win->side_bar->open(SideBar::FX_CONSOLE);
+		session->set_mode("default/fx");
 	}else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE){
-		view->win->side_bar->open(SideBar::CURVE_CONSOLE);
+		session->set_mode("curves");
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT){
 
 	}else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO){

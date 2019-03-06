@@ -58,29 +58,29 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("beat_partition", std::bind(&MidiEditorConsole::on_beat_partition, this));
-	event("note_length", std::bind(&MidiEditorConsole::on_note_length, this));
-	event("scale_root", std::bind(&MidiEditorConsole::on_scale, this));
-	event("scale_type", std::bind(&MidiEditorConsole::on_scale, this));
-	event("midi_edit_mode", std::bind(&MidiEditorConsole::on_creation_mode, this));
-	event("interval", std::bind(&MidiEditorConsole::on_interval, this));
-	event("chord_type", std::bind(&MidiEditorConsole::on_chord_type, this));
-	event("chord_inversion", std::bind(&MidiEditorConsole::on_chord_inversion, this));
-	event_x("reference_tracks", "hui:select", std::bind(&MidiEditorConsole::on_reference_tracks, this));
-	event("modifier:none", std::bind(&MidiEditorConsole::on_modifier_none, this));
-	event("modifier:sharp", std::bind(&MidiEditorConsole::on_modifier_sharp, this));
-	event("modifier:flat", std::bind(&MidiEditorConsole::on_modifier_flat, this));
-	event("modifier:natural", std::bind(&MidiEditorConsole::on_modifier_natural, this));
-	event("quantize", std::bind(&MidiEditorConsole::on_quantize, this));
-	event("apply_string", std::bind(&MidiEditorConsole::on_apply_string, this));
-	event("apply_hand_position", std::bind(&MidiEditorConsole::on_apply_hand_position, this));
-	event("edit_track", std::bind(&MidiEditorConsole::on_edit_track, this));
-	event("edit_midi_fx", std::bind(&MidiEditorConsole::on_edit_midi_fx, this));
-	event("edit_song", std::bind(&MidiEditorConsole::on_edit_song, this));
+	event("beat_partition", [&]{ on_beat_partition(); });
+	event("note_length", [&]{ on_note_length(); });
+	event("scale_root", [&]{ on_scale(); });
+	event("scale_type", [&]{ on_scale(); });
+	event("midi_edit_mode", [&]{ on_creation_mode(); });
+	event("interval", [&]{ on_interval(); });
+	event("chord_type", [&]{ on_chord_type(); });
+	event("chord_inversion", [&]{ on_chord_inversion(); });
+	event_x("reference_tracks", "hui:select", [&]{ on_reference_tracks(); });
+	event("modifier:none", [&]{ on_modifier_none(); });
+	event("modifier:sharp", [&]{ on_modifier_sharp(); });
+	event("modifier:flat", [&]{ on_modifier_flat(); });
+	event("modifier:natural", [&]{ on_modifier_natural(); });
+	event("quantize", [&]{ on_quantize(); });
+	event("apply_string", [&]{ on_apply_string(); });
+	event("apply_hand_position", [&]{ on_apply_hand_position(); });
+	event("edit_track", [&]{ on_edit_track(); });
+	event("edit_midi_fx", [&]{ on_edit_midi_fx(); });
+	event("edit_song", [&]{ on_edit_song(); });
 
-	view->subscribe(this, std::bind(&MidiEditorConsole::on_view_cur_layer_change, this), view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, std::bind(&MidiEditorConsole::on_view_vtrack_change, this), view->MESSAGE_VTRACK_CHANGE);
-	view->mode_midi->subscribe(this, std::bind(&MidiEditorConsole::on_settings_change, this));
+	view->subscribe(this, [&]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [&]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
+	view->mode_midi->subscribe(this, [&]{ on_settings_change(); });
 	update();
 }
 
@@ -255,12 +255,10 @@ void MidiEditorConsole::clear()
 
 void MidiEditorConsole::on_enter()
 {
-	view->set_mode(view->mode_midi);
 }
 
 void MidiEditorConsole::on_leave()
 {
-	view->set_mode(view->mode_default);
 }
 
 void MidiEditorConsole::set_layer(TrackLayer *l)
@@ -269,7 +267,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l)
 
 	layer = l;
 	if (layer){
-		layer->subscribe(this, std::bind(&MidiEditorConsole::on_layer_delete, this), layer->MESSAGE_DELETE);
+		layer->subscribe(this, [&]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
 
 		/*auto v = view->get_layer(layer);
 		if (v)

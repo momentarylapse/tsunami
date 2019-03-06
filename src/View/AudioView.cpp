@@ -41,6 +41,7 @@
 #include "Painter/BufferPainter.h"
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
+#include "SideBar/SideBar.h"
 
 const float AudioView::FONT_SIZE = 10.0f;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 74;
@@ -411,9 +412,32 @@ void AudioView::set_color_scheme(const string &name)
 	force_redraw();
 }
 
+string mode_name(ViewMode *m, AudioView *v)
+{
+	if (m == v->mode_default)
+		return "default";
+	if (m == v->mode_curve)
+		return "curves";
+	if (m == v->mode_midi)
+		return "midi";
+	if (m == v->mode_capture)
+		return "capture";
+	return "??";
+}
+
 void AudioView::set_mode(ViewMode *m)
 {
+	if (m == mode)
+		return;
+	if (mode){
+		//msg_write("end mode " + mode_name(mode, this));
+		mode->on_end();
+	}
 	mode = m;
+	if (mode){
+		//msg_write("start mode " + mode_name(mode, this));
+		mode->on_start();
+	}
 	thm.dirty = true;
 	force_redraw();
 }

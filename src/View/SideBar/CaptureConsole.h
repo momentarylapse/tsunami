@@ -36,7 +36,6 @@ public:
 	void on_pause();
 	void on_ok();
 	void on_cancel();
-	void on_close();
 	void on_new_version();
 
 	void update_time();

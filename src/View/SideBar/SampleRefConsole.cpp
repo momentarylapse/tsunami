@@ -118,7 +118,7 @@ void SampleRefConsole::on_view_cur_sample_change()
 	layer = view->cur_layer();
 	sample = view->cur_sample;
 	if (sample)
-		sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
+		sample->subscribe(this, [&]{ on_update(); });
 	load_data();
 }
 

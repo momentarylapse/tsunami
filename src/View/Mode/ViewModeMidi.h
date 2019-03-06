@@ -28,6 +28,9 @@ public:
 	ViewModeMidi(AudioView *view);
 	virtual ~ViewModeMidi();
 
+	void on_start() override;
+	void on_end() override;
+
 	void on_left_button_down() override;
 	void on_left_button_up() override;
 	void on_mouse_move() override;

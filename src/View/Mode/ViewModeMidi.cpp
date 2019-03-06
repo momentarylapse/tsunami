@@ -28,6 +28,7 @@
 #include "../Helper/ScrollBar.h"
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"
+#include "../SideBar/SideBar.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
@@ -72,6 +73,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	preview = new MidiPreview(view->session);
 
 	mouse_pre_moving_pos = -1;
+
+	side_bar_console = SideBar::MIDI_EDITOR_CONSOLE;
 }
 
 ViewModeMidi::~ViewModeMidi()
@@ -134,6 +137,14 @@ AudioViewLayer* ViewModeMidi::cur_vlayer()
 void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl)
 {
 	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
+}
+
+void ViewModeMidi::on_start()
+{
+}
+
+void ViewModeMidi::on_end()
+{
 }
 
 void ViewModeMidi::on_left_button_down()

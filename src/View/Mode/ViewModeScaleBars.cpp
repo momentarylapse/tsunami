@@ -11,6 +11,7 @@
 #include "ViewModeScaleBars.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
+#include "../../Session.h"
 
 ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 	ViewModeDefault(view)
@@ -55,7 +56,7 @@ void ViewModeScaleBars::on_left_button_up()
 
 void ViewModeScaleBars::on_right_button_down()
 {
-	view->set_mode(view->mode_default);
+	session->set_mode("default");
 }
 
 void ViewModeScaleBars::on_mouse_move()
@@ -68,7 +69,7 @@ void ViewModeScaleBars::on_mouse_move()
 void ViewModeScaleBars::on_key_down(int k)
 {
 	if (k == hui::KEY_ESCAPE)
-		view->set_mode(view->mode_default);
+		session->set_mode("default");
 }
 
 void ViewModeScaleBars::perform_scale()
@@ -83,6 +84,6 @@ void ViewModeScaleBars::perform_scale()
 	}
 	song->end_action_group();
 
-	view->set_mode(view->mode_default);
+	session->set_mode("default");
 }
 

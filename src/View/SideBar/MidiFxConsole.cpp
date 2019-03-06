@@ -43,22 +43,22 @@ public:
 			hide_control("save_favorite", true);
 		}
 
-		event("enabled", std::bind(&SingleMidiFxPanel::onEnabled, this));
-		event("delete", std::bind(&SingleMidiFxPanel::onDelete, this));
-		event("load_favorite", std::bind(&SingleMidiFxPanel::onLoad, this));
-		event("save_favorite", std::bind(&SingleMidiFxPanel::onSave, this));
+		event("enabled", [&]{ on_enabled(); });
+		event("delete", [&]{ on_delete(); });
+		event("load_favorite", [&]{ on_load(); });
+		event("save_favorite", [&]{ on_save(); });
 
 		check("enabled", fx->enabled);
 
 		old_param = fx->config_to_string();
-		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChange, this), fx->MESSAGE_CHANGE);
-		fx->subscribe(this, std::bind(&SingleMidiFxPanel::onFxChangeByAction, this), fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, [&]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, [&]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
 		fx->unsubscribe(this);
 	}
-	void onLoad()
+	void on_load()
 	{
 		string name = session->plugin_manager->select_favorite_name(win, fx, false);
 		if (name.num == 0)
@@ -68,24 +68,24 @@ public:
 			track->edit_midi_effect(fx, old_param);
 		old_param = fx->config_to_string();
 	}
-	void onSave()
+	void on_save()
 	{
 		string name = session->plugin_manager->select_favorite_name(win, fx, true);
 		if (name.num == 0)
 			return;
 		session->plugin_manager->save_favorite(fx, name);
 	}
-	void onEnabled()
+	void on_enabled()
 	{
 		if (track)
 			track->enable_midi_effect(fx, is_checked(""));
 	}
-	void onDelete()
+	void on_delete()
 	{
 		if (track)
 			track->delete_midi_effect(fx);
 	}
-	void onFxChange()
+	void on_fx_change()
 	{
 		if (track)
 			track->edit_midi_effect(fx, old_param);
@@ -93,7 +93,7 @@ public:
 		p->update();
 		old_param = fx->config_to_string();
 	}
-	void onFxChangeByAction()
+	void on_fx_change_by_action()
 	{
 		check("enabled", fx->enabled);
 		p->update();
@@ -183,17 +183,17 @@ void MidiFxConsole::clear()
 
 void MidiFxConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void MidiFxConsole::on_edit_track()
 {
-	bar()->open(SideBar::TRACK_CONSOLE);
+	session->set_mode("default/track");
 }
 
 void MidiFxConsole::on_edit_midi()
 {
-	bar()->open(SideBar::MIDI_EDITOR_CONSOLE);
+	session->set_mode("midi");
 }
 
 void MidiFxConsole::set_track(Track *t)
@@ -201,9 +201,9 @@ void MidiFxConsole::set_track(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe(this, std::bind(&MidiFxConsole::on_track_delete, this), track->MESSAGE_DELETE);
-		track->subscribe(this, std::bind(&MidiFxConsole::on_update, this), track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, std::bind(&MidiFxConsole::on_update, this), track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, [&]{ on_track_delete(); }, track->MESSAGE_DELETE);
+		track->subscribe(this, [&]{ on_update(); }, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, [&]{ on_update(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

@@ -33,6 +33,9 @@ public:
 	ViewModeCapture(AudioView *view);
 	virtual ~ViewModeCapture();
 
+	void on_start() override;
+	void on_end() override;
+
 	Selection get_hover() override;
 	void on_left_button_down() override {}
 	void on_left_double_click() override {}

@@ -71,14 +71,14 @@ SideBar::SideBar(Session *_session)
 	add_console(sample_ref_console);
 	add_console(capture_console);
 
-	event("close", std::bind(&SideBar::on_close, this));
-	event("large", std::bind(&SideBar::on_large, this));
+	event("close", [&]{ on_close(); });
+	event("large", [&]{ on_large(); });
 
 	reveal("revealer", false);
 	visible = false;
 	active_console = -1;
 
-	subscribe(session->view, std::bind(&AudioView::on_update, session->view)); // EVIL HACK?!?
+	subscribe(session->view, [&]{ session->view->on_update(); }); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()
@@ -94,7 +94,8 @@ void SideBar::add_console(SideBarConsole *c)
 
 void SideBar::on_close()
 {
-	_hide();
+	session->set_mode("default");
+	//_hide();
 }
 
 void SideBar::on_large()
@@ -130,6 +131,7 @@ void SideBar::_show()
 	notify();
 }
 
+// FIXME: this is the official closing function...
 void SideBar::_hide()
 {
 	if ((visible) and (active_console >= 0))

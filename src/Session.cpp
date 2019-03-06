@@ -14,6 +14,13 @@
 #include "Data/Song.h"
 #include "lib/hui/hui.h"
 #include "Module/SignalChain.h"
+#include "View/AudioView.h"
+#include "View/Mode/ViewModeDefault.h"
+#include "View/Mode/ViewModeCapture.h"
+#include "View/Mode/ViewModeCurve.h"
+#include "View/Mode/ViewModeMidi.h"
+#include "View/Mode/ViewModeScaleBars.h"
+#include "View/SideBar/SideBar.h"
 
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
@@ -129,4 +136,48 @@ void Session::on_plugin_stop_request(VirtualBase *o)
 	if (die_on_plugin_stop)
 		//tsunami->end();//
 		hui::RunLater(0.01f, std::bind(&TsunamiWindow::destroy, win));*/
+}
+
+void Session::set_mode(const string &mode)
+{
+	//msg_write(" >> " + mode);
+	if (mode == "default"){
+		view->set_mode(view->mode_default);
+		win->side_bar->_hide();
+	}else if (mode == "capture"){
+		view->set_mode(view->mode_capture);
+		win->side_bar->open(SideBar::CAPTURE_CONSOLE);
+	}else if (mode == "midi"){
+		view->set_mode(view->mode_midi);
+		win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
+	}else if (mode == "scale-bars"){
+		view->set_mode(view->mode_scale_bars);
+		win->side_bar->_hide();
+	}else if (mode == "curves"){
+		view->set_mode(view->mode_curve);
+		win->side_bar->open(SideBar::CURVE_CONSOLE);
+	}else if (mode == "default/track"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::TRACK_CONSOLE);
+	}else if (mode == "default/song"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::SONG_CONSOLE);
+	}else if (mode == "default/samples"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::SAMPLE_CONSOLE);
+	}else if (mode == "default/fx"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::FX_CONSOLE); // ...
+	}else if (mode == "default/midi-fx"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::MIDI_FX_CONCOLE);
+	}else if (mode == "default/synth"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::SYNTH_CONSOLE);
+	}else if (mode == "default/sample-ref"){
+		view->set_mode(view->mode_default);
+		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
+	}else{
+		e("unknown mode: " + mode);
+	}
 }

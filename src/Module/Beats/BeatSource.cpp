@@ -27,19 +27,14 @@ void BeatSource::__delete__()
 	this->BeatSource::~BeatSource();
 }
 
-BeatSource::Output::Output(BeatSource* s) : BeatPort("out")
+BeatSource::Output::Output(BeatSource* s) : Port(SignalType::BEATS, "out")
 {
 	source = s;
 }
 
-int BeatSource::Output::read(Array<Beat> &beats, int samples)
+int BeatSource::Output::read_beats(Array<Beat> &beats, int samples)
 {
 	return source->read(beats, samples);
-}
-
-void BeatSource::Output::reset()
-{
-	source->reset();
 }
 
 

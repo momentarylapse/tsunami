@@ -10,9 +10,6 @@
 
 #include "Module.h"
 
-class AudioPort;
-class MidiPort;
-class BeatPort;
 class ConfigPanel;
 class Module;
 class Session;

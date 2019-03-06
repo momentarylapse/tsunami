@@ -13,7 +13,7 @@
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
 #include "../../lib/math/math.h"
-#include "../Port/MidiPort.h"
+#include "../Port/Port.h"
 
 PitchRenderer::PitchRenderer(Synthesizer *s, int p)
 {
@@ -32,19 +32,12 @@ void PitchRenderer::__delete__()
 	this->PitchRenderer::~PitchRenderer();
 }
 
-Synthesizer::Output::Output(Synthesizer *s) : AudioPort("out")
+Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out")
 {
 	synth = s;
 }
 
-void Synthesizer::Output::reset()
-{
-	synth->reset();
-	if (synth->source)
-		synth->source->reset();
-}
-
-int Synthesizer::Output::read(AudioBuffer &buf)
+int Synthesizer::Output::read_audio(AudioBuffer &buf)
 {
 	if (!synth->source)
 		return 0;
@@ -52,7 +45,7 @@ int Synthesizer::Output::read(AudioBuffer &buf)
 	synth->source_run_out = false;
 	// get from source...
 	synth->events.samples = buf.length;
-	int n = synth->source->read(synth->events);
+	int n = synth->source->read_midi(synth->events);
 	if (n == synth->source->NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;

@@ -15,7 +15,6 @@
 #include "../Module/Module.h"
 #include <atomic>
 
-class AudioPort;
 class DeviceManager;
 class Device;
 class Thread;
@@ -76,7 +75,7 @@ private:
 	bool paused;
 	int buffer_size;
 
-	AudioPort *source;
+	Port *source;
 	RingBuffer ring_buf;
 
 	std::atomic<bool> read_end_of_stream;

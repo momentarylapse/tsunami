@@ -30,17 +30,15 @@
 #include "../Module/SignalChain.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Synth/DummySynthesizer.h"
-#include "../Module/Port/AudioPort.h"
+#include "../Module/Port/Port.h"
 #include "../Module/Audio/AudioSource.h"
 #include "../Module/Audio/SongRenderer.h"
 #include "../Module/Audio/AudioVisualizer.h"
-#include "../Module/Port/MidiPort.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Beats/BeatSource.h"
 #include "../Module/Beats/BeatMidifier.h"
 #include "../Module/Midi/MidiEffect.h"
-#include "../Module/Port/BeatPort.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../View/AudioView.h"
@@ -158,6 +156,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("Module", "config_from_string", Kaba::mf(&Module::config_from_string), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "get_pos", Kaba::mf(&Module::get_pos), &module);
+	Kaba::DeclareClassVirtualIndex("Module", "set_pos", Kaba::mf(&Module::set_pos), &module);
 	Kaba::LinkExternal("Module.plug", Kaba::mf(&Module::plug));
 	Kaba::LinkExternal("Module.unplug", Kaba::mf(&Module::unplug));
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
@@ -276,12 +276,15 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SampleRef." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SampleRef::__init__));
 	Kaba::DeclareClassVirtualIndex("SampleRef", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SampleRef::__delete__), &sampleref);
 
-	MidiPort mport("");
-	Kaba::DeclareClassSize("MidiPort", sizeof(MidiPort));
-	Kaba::LinkExternal("MidiPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiPort::__init__));
-	Kaba::DeclareClassVirtualIndex("MidiPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiPort::__delete__), &mport);
-	Kaba::DeclareClassVirtualIndex("MidiPort", "read", Kaba::mf(&MidiPort::read), &mport);
-	Kaba::DeclareClassVirtualIndex("MidiPort", "reset", Kaba::mf(&MidiPort::reset), &mport);
+
+
+	Port port(SignalType::AUDIO, "");
+	Kaba::DeclareClassSize("Port", sizeof(Port));
+	Kaba::LinkExternal("Port." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Port::__init__));
+	Kaba::DeclareClassVirtualIndex("Port", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Port::__delete__), &port);
+	Kaba::DeclareClassVirtualIndex("Port", "read_audio", Kaba::mf(&Port::read_audio), &port);
+	Kaba::DeclareClassVirtualIndex("Port", "read_midi", Kaba::mf(&Port::read_midi), &port);
+	Kaba::DeclareClassVirtualIndex("Port", "read_beats", Kaba::mf(&Port::read_beats), &port);
 
 	MidiSource msource;
 	Kaba::DeclareClassSize("MidiSource", sizeof(MidiSource));
@@ -383,13 +386,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("MidiNoteBuffer.get_notes", Kaba::mf(&MidiNoteBuffer::get_notes));
 	Kaba::LinkExternal("MidiNoteBuffer.get_range", Kaba::mf(&MidiNoteBuffer::range));
 
-	BeatPort bport("");
-	Kaba::DeclareClassSize("BeatPort", sizeof(BeatPort));
-	Kaba::LinkExternal("BeatPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatPort::__init__));
-	Kaba::DeclareClassVirtualIndex("BeatPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BeatPort::__delete__), &bport);
-	Kaba::DeclareClassVirtualIndex("BeatPort", "read", Kaba::mf(&BeatPort::read), &bport);
-	Kaba::DeclareClassVirtualIndex("BeatPort", "reset", Kaba::mf(&BeatPort::reset), &bport);
-
 	BeatSource bsource;
 	Kaba::DeclareClassSize("BeatSource", sizeof(BeatSource));
 	Kaba::LinkExternal("BeatSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BeatSource::__init__));
@@ -473,14 +469,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Song.begin_action_group", Kaba::mf(&Song::begin_action_group));
 	Kaba::LinkExternal("Song.end_action_group", Kaba::mf(&Song::end_action_group));
 
-	AudioPort aport("");
-	Kaba::DeclareClassSize("AudioPort", sizeof(AudioPort));
-	Kaba::LinkExternal("AudioPort." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioPort::__init__));
-	Kaba::DeclareClassVirtualIndex("AudioPort", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioPort::__delete__), &aport);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "read", Kaba::mf(&AudioPort::read), &aport);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "reset", Kaba::mf(&AudioPort::reset), &aport);
-	Kaba::DeclareClassVirtualIndex("AudioPort", "get_pos", Kaba::mf(&AudioPort::get_pos), &aport);
-
 	SongRenderer sr(&af);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Kaba::LinkExternal("SongRenderer.prepare", Kaba::mf(&SongRenderer::prepare));
@@ -527,9 +515,11 @@ void PluginManager::link_app_script_data()
 //	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
 	}
 
+	SignalChain chain(Session::GLOBAL, "");
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
-	Kaba::LinkExternal("SignalChain.get_pos", Kaba::mf(&SignalChain::get_pos));
+	Kaba::DeclareClassVirtualIndex("SignalChain", "set_pos", Kaba::mf(&SignalChain::set_pos), &chain);
+	Kaba::DeclareClassVirtualIndex("SignalChain", "get_pos", Kaba::mf(&SignalChain::get_pos), &chain);
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));

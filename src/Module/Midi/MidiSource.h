@@ -9,9 +9,8 @@
 #define SRC_MODULE_MIDI_MIDISOURCE_H_
 
 #include "../Module.h"
-#include "../Port/MidiPort.h"
+#include "../Port/Port.h"
 
-class BeatPort;
 class Song;
 
 class MidiSource : public Module
@@ -22,20 +21,16 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public MidiPort
+	class Output : public Port
 	{
 	public:
 		Output(MidiSource *s);
-		~Output() override {}
-		int _cdecl read(MidiEventBuffer &midi) override;
-		void _cdecl reset() override;
+		int read_midi(MidiEventBuffer &midi) override;
 		MidiSource *source;
 	};
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
-	virtual void _cdecl set_pos(int pos){}
-	virtual int _cdecl get_pos(){ return 0; }
 
 
 	int bh_offset;

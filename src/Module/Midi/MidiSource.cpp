@@ -13,20 +13,15 @@
 #include "../../Data/Midi/MidiData.h"
 
 
-MidiSource::Output::Output(MidiSource *s) : MidiPort("out")
+MidiSource::Output::Output(MidiSource *s) : Port(SignalType::MIDI, "out")
 {
 	source = s;
 }
 
-int MidiSource::Output::read(MidiEventBuffer &midi)
+int MidiSource::Output::read_midi(MidiEventBuffer &midi)
 {
 	int r = source->read(midi);
 	return r;
-}
-
-void  MidiSource::Output::reset()
-{
-	source->reset();
 }
 
 MidiSource::MidiSource() :

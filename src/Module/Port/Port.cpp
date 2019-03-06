@@ -22,3 +22,13 @@ InPortDescription::InPortDescription(SignalType _type, Port** _port, const strin
 	port = _port;
 	name = _name;
 }
+
+void Port::__init__(SignalType _type, const string &_name)
+{
+	new(this) Port(_type, _name);
+}
+
+void Port::__delete__()
+{
+	this->Port::~Port();
+}

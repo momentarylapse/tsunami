@@ -157,12 +157,12 @@ int InputStreamAudio::SyncData::get_delay()
 }
 
 InputStreamAudio::Output::Output(InputStreamAudio *s) :
-	AudioPort("out")
+	Port(SignalType::AUDIO, "out")
 {
 	stream = s;
 }
 
-int InputStreamAudio::Output::read(AudioBuffer &buf)
+int InputStreamAudio::Output::read_audio(AudioBuffer &buf)
 {
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
 	if (stream->buffer.available() < buf.length)

@@ -27,24 +27,14 @@ void AudioSource::__delete__()
 	this->AudioSource::~AudioSource();
 }
 
-AudioSource::Output::Output(AudioSource *s) : AudioPort("out")
+AudioSource::Output::Output(AudioSource *s) : Port(SignalType::AUDIO, "out")
 {
 	source = s;
 }
 
-int AudioSource::Output::read(AudioBuffer& buf)
+int AudioSource::Output::read_audio(AudioBuffer& buf)
 {
 	return source->read(buf);
-}
-
-void AudioSource::Output::reset()
-{
-	source->reset();
-}
-
-int AudioSource::Output::get_pos(int delta)
-{
-	return source->get_pos(delta);
 }
 
 AudioSource *CreateAudioSource(Session *session, const string &name)

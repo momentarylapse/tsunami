@@ -11,7 +11,7 @@
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
-class AudioPort;
+class Port;
 class Format;
 class Song;
 class File;

@@ -16,29 +16,23 @@
 #include "../../Data/SongSelection.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-MidiEffect::Output::Output(MidiEffect *_fx) : MidiPort("out")
+MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::AUDIO, "out")
 {
 	fx = _fx;
 }
 
-int MidiEffect::Output::read(MidiEventBuffer &buf)
+int MidiEffect::Output::read_midi(MidiEventBuffer &buf)
 {
 	if (!fx->source)
 		return buf.samples;
-	return fx->source->read(buf);
-}
-
-void MidiEffect::Output::reset()
-{
-	if (fx->source)
-		fx->source->reset();
+	return fx->source->read_midi(buf);
 }
 
 MidiEffect::MidiEffect() :
 	Module(ModuleType::MIDI_EFFECT)
 {
 	port_out.add(new Output(this));
-	port_in.add(InPortDescription(SignalType::MIDI, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::MIDI, &source, "in"));
 	source = nullptr;
 	only_on_selection = false;
 }

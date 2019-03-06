@@ -12,17 +12,29 @@
 
 enum class SignalType;
 
+class AudioBuffer;
+class MidiEventBuffer;
+class Beat;
+
 class Port : public VirtualBase
 {
 public:
 	Port(SignalType type, const string &name);
 	virtual ~Port(){}
 
+	void _cdecl __init__(SignalType type, const string &name);
+	void _cdecl __delete__() override;
+
 	SignalType type;
 	string name;
 
 	static const int END_OF_STREAM;
 	static const int NOT_ENOUGH_DATA;
+
+
+	virtual int _cdecl read_audio(AudioBuffer &buf){ return 0; }
+	virtual int _cdecl read_midi(MidiEventBuffer &midi){ return 0; };
+	virtual int _cdecl read_beats(Array<Beat> &beats, int samples){ return 0; };
 };
 
 class InPortDescription

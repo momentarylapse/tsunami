@@ -9,7 +9,6 @@
 #define SRC_MODULE_AUDIO_PEAKMETER_H_
 
 #include "AudioVisualizer.h"
-#include "../Port/AudioPort.h"
 
 class PeakMeterDisplay;
 class AudioBuffer;

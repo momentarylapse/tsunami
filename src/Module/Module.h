@@ -112,6 +112,8 @@ public:
 
 	float module_x, module_y;
 	virtual void command(ModuleCommand cmd){}
+	virtual void set_pos(int pos){}
+	virtual int get_pos(){ return 0; }
 
 	bool allow_config_in_chain;
 

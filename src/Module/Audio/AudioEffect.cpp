@@ -15,28 +15,14 @@
 #include "../../Data/TrackLayer.h"
 
 
-AudioEffect::Output::Output(AudioEffect *_fx) : AudioPort("out")
+AudioEffect::Output::Output(AudioEffect *_fx) : Port(SignalType::AUDIO, "out")
 {
 	fx = _fx;
 }
 
-int AudioEffect::Output::read(AudioBuffer &buf)
+int AudioEffect::Output::read_audio(AudioBuffer &buf)
 {
 	return fx->read(buf);
-}
-
-void AudioEffect::Output::reset()
-{
-	fx->reset_state();
-	if (fx->source)
-		fx->source->reset();
-}
-
-int AudioEffect::Output::get_pos(int delta)
-{
-	if (!fx->source)
-		return -1;
-	return fx->source->get_pos(delta);
 }
 
 AudioEffect::AudioEffect() :
@@ -45,7 +31,7 @@ AudioEffect::AudioEffect() :
 	source = nullptr;
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
@@ -64,7 +50,7 @@ int AudioEffect::read(AudioBuffer &buf)
 	if (!source)
 		return buf.length;
 	sample_rate = session->sample_rate();
-	int samples = source->read(buf);
+	int samples = source->read_audio(buf);
 	if (samples > 0)
 		process(buf);
 	return samples;

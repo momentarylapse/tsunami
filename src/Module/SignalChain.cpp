@@ -8,7 +8,7 @@
 #include "SignalChain.h"
 #include "Module.h"
 #include "ModuleFactory.h"
-#include "Port/MidiPort.h"
+#include "Port/Port.h"
 #include "Audio/AudioSource.h"
 #include "Midi/MidiSource.h"
 #include "Beats/BeatSource.h"
@@ -404,7 +404,7 @@ int SignalChain::get_pos()
 				delta = - ((OutputStream*)m)->get_available();
 		for (auto *m: modules)
 			if (m->module_type == ModuleType::AUDIO_SOURCE)
-				return ((AudioSource*)m)->get_pos(delta);
+				return ((AudioSource*)m)->get_pos() + delta;
 	}
 	return 0;
 }

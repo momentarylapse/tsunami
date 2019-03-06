@@ -18,10 +18,10 @@ public:
 	void _cdecl __init__(AudioBuffer *buf);
 	void _cdecl __delete__() override;
 
-	int _cdecl read(AudioBuffer &buf) override;
-	void _cdecl reset() override;
-	int _cdecl get_pos(int delta) override { return offset + delta; }
-	//void _cdecl seek(int pos);
+	int read(AudioBuffer &buf) override;
+	void reset() override;
+	int get_pos() override { return offset; }
+	void set_pos(int pos) override { offset = pos; }
 
 	AudioBuffer *buf;
 	int offset;

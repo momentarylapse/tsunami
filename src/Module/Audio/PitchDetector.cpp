@@ -6,7 +6,7 @@
  */
 
 #include "PitchDetector.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 #include "../../Data/base.h"
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Midi/MidiData.h"
@@ -32,7 +32,7 @@ int freq_to_index(float f)
 PitchDetector::PitchDetector()
 {
 	module_type = ModuleType::PITCH_DETECTOR;
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
 	loud_enough = false;
 	volume = 0;
@@ -98,7 +98,7 @@ int PitchDetector::read(MidiEventBuffer& midi)
 {
 	AudioBuffer buf;
 	buf.resize(midi.samples);
-	int l = source->read(buf);
+	int l = source->read_audio(buf);
 	if (l <= 0)
 		return l;
 

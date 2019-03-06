@@ -333,12 +333,12 @@ void TrackRenderer::render_audio(AudioBuffer &buf)
 
 void TrackRenderer::render_time(AudioBuffer &buf)
 {
-	synth->out->read(buf);
+	synth->out->read_audio(buf);
 }
 
 void TrackRenderer::render_midi(AudioBuffer &buf)
 {
-	synth->out->read(buf);
+	synth->out->read_audio(buf);
 }
 
 void TrackRenderer::render(AudioBuffer &buf)

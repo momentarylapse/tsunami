@@ -12,11 +12,10 @@
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Midi/Instrument.h"
 #include "../Module.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 
 class Range;
 class AudioBuffer;
-class MidiPort;
 class PluginManager;
 class DetuneSynthesizerDialog;
 class ActionTrackDetuneSynthesizer;
@@ -83,18 +82,17 @@ public:
 
 	bool is_default();
 
-	class Output : public AudioPort
+	class Output : public Port
 	{
 	public:
 		Output(Synthesizer *synth);
 		Synthesizer *synth;
-		int _cdecl read(AudioBuffer &buf) override;
-		void _cdecl reset() override;
+		int read_audio(AudioBuffer &buf) override;
 
 	};
 	Output *out;
 
-	MidiPort *source;
+	Port *source;
 
 protected:
 

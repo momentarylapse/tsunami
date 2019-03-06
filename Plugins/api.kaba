@@ -124,6 +124,8 @@ class Module
 	extern virtual string config_to_string()
 	extern virtual void config_from_string(string s)
 	extern virtual void command(int cmd)
+	extern virtual void set_pos(int pos)
+	extern virtual int get_pos()
 	extern void plug(int in_port, Module* source, int out_port)
 	extern void unplug(int in_port)
 	extern void subscribe(void* handler, func* f, string message)
@@ -131,21 +133,21 @@ class Module
 	extern Module* copy()
 
 class AudioEffect extends Module
-	AudioPort *out
-	AudioPort *source
+	Port *out
+	Port *source
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
 	extern virtual int read(AudioBuffer buf)
 
 class MidiEffect extends Module
-	MidiPort *out
+	Port *out
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)
 
 class AudioVisualizer extends Module
-	AudioPort *out
+	Port *out
 	int chunk_size
 	extern override void __init__()
 	extern override void __delete__()
@@ -187,28 +189,23 @@ class RingBuffer
 	extern void clear()
 	void __assign__(RingBuffer o)
 
+
 // general "interface"
-class AudioPort
+class Port
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual int read(AudioBuffer buf)
-	extern virtual void reset()
-	extern virtual int get_pos(int delta)
+	extern virtual int read_audio(AudioBuffer buf)
+	extern virtual int read_midi(MidiEventBuffer midi)
+	extern virtual int read_beats(Beat[] beats, int samples)
 
 class AudioSource extends Module
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
 	extern virtual void reset()
-	extern virtual int get_pos()
-	extern virtual void set_pos(int pos)
-	AudioPort *out
-
-class MidiPort
-	extern void __init__()
-	extern virtual void __delete__()
-	extern virtual int read(MidiEventBuffer midi)
-	extern virtual void reset()
+	extern override int get_pos()
+	extern override void set_pos(int pos)
+	Port *out
 
 class MidiSource extends Module
 	extern override void __init__()
@@ -222,8 +219,8 @@ class MidiSource extends Module
 	extern void skip_x(int beats, int sub_beats, int beat_partition)
 	MidiEventBuffer* bh_midi
 	//extern void set_beat_source(BeatPort *source)
-	extern virtual int get_pos()
-	extern virtual void set_pos(int pos)
+	extern override int get_pos()
+	extern override void set_pos(int pos)
 
 
 class PitchRenderer
@@ -270,12 +267,6 @@ class EnvelopeADSR
 	bool just_killed
 
 
-class BeatPort
-	extern void __init__()
-	extern virtual void __delete__()
-	extern virtual int read(Beat[] beats, int samples)
-	extern virtual void reset()
-
 class BeatSource extends Module
 	extern override void __init__()
 	extern override void __delete__()
@@ -285,8 +276,6 @@ class BeatSource extends Module
 	extern virtual int cur_beat()
 	extern virtual int cur_bar()
 	extern virtual float beat_fraction()
-	extern virtual int get_pos()
-	extern virtual void set_pos(int pos)
 
 class BeatMidifier extends MidiSource
 	extern override void __init__()
@@ -522,13 +511,14 @@ class InputStreamAudio extends Module
 class Storage
 	extern bool load(Song *s, string filename)
 	extern bool save(Song *s, string filename)
-	extern bool save_via_renderer(AudioPort *source, string filename, int num_samples, Tag[] tags)
+	extern bool save_via_renderer(Port *source, string filename, int num_samples, Tag[] tags)
 	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 
 class SignalChain extends Module
 	extern void set_update_dt(float dt)
-	extern int get_pos()
+	extern override int get_pos()
+	extern override void set_pos(int pos)
 
 class Session
 	int id

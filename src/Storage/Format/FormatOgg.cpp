@@ -9,7 +9,7 @@
 
 #include "FormatOgg.h"
 
-#include "../../Module/Port/AudioPort.h"
+#include "../../Module/Port/Port.h"
 #include "../../Session.h"
 #include "../../lib/hui/hui.h"
 #include "../../Data/base.h"
@@ -60,7 +60,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 
 void FormatOgg::save_via_renderer(StorageOperationData *od)
 {
-	AudioPort *r = od->renderer;
+	Port *r = od->renderer;
 
 	float OggQuality = hui::Config.get_float("OggQuality", 0.5f);
 
@@ -136,7 +136,7 @@ void FormatOgg::save_via_renderer(StorageOperationData *od)
 	while(!eos){
 		//msg_write(written);
 
-		int samples_read = r->read(buf);
+		int samples_read = r->read_audio(buf);
 		if (samples_read <= 0)
 			break;
 

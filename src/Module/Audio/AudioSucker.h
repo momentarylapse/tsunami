@@ -11,7 +11,7 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../Module.h"
 
-class AudioPort;
+class Port;
 class AudioSuckerThread;
 
 class AudioSucker : public Module
@@ -33,7 +33,7 @@ public:
 	static const int DEFAULT_BUFFER_SIZE;
 	static const string MESSAGE_UPDATE;
 
-	AudioPort *source;
+	Port *source;
 	AudioBuffer buf;
 	bool accumulating;
 	bool running;

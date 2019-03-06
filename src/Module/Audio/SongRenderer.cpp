@@ -184,7 +184,7 @@ int SongRenderer::read(AudioBuffer &buf)
 
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
-		return AudioPort::END_OF_STREAM;
+		return Port::END_OF_STREAM;
 
 
 	bar_streamer->bars = song->bars;
@@ -321,8 +321,9 @@ void SongRenderer::_set_pos(int _pos)
 		tr->set_pos(pos);
 }
 
-int SongRenderer::get_pos(int delta)
+int SongRenderer::get_pos()
 {
+	int delta = 0;
 	Range r = range();
 	return loopi(pos + delta, r.start(), r.end());
 }

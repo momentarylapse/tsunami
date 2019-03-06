@@ -11,7 +11,6 @@
 #include "../../Data/Range.h"
 #include "AudioSource.h"
 
-class MidiPort;
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
@@ -37,7 +36,7 @@ public:
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
 	void reset() override;
-	int get_pos(int delta) override;
+	int get_pos() override;
 	void set_pos(int pos) override;
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);

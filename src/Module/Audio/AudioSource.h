@@ -9,7 +9,7 @@
 #define SRC_MODULE_AUDIO_AUDIOSOURCE_H_
 
 #include "../Module.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 
 class BeatSource;
 
@@ -21,21 +21,17 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public AudioPort
+	class Output : public Port
 	{
 	public:
 		Output(AudioSource *s);
-		int _cdecl read(AudioBuffer &buf) override;
-		void _cdecl reset() override;
-		int _cdecl get_pos(int delta) override;
+		int read_audio(AudioBuffer &buf) override;
 		AudioSource *source;
 	};
 	Output *out;
 
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
 	virtual void _cdecl reset(){}
-	virtual int _cdecl get_pos(int delta){ return 0; }
-	virtual void _cdecl set_pos(int pos){}
 };
 
 AudioSource *_cdecl CreateAudioSource(Session *session, const string &name);

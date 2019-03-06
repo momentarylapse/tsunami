@@ -9,7 +9,7 @@
 #define SRC_MODULE_AUDIO_AUDIOVISUALIZER_H_
 
 #include "../Module.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 
 class AudioBuffer;
 class RingBuffer;
@@ -24,22 +24,21 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	AudioPort *source;
+	Port *source;
 
-	class Output : public AudioPort
+	class Output : public Port
 	{
 	public:
 		Output(AudioVisualizer *v);
-		~Output() override {}
-		int _cdecl read(AudioBuffer &buf) override;
-		int _cdecl get_pos(int delta) override;
-		void _cdecl reset() override;
+		int read_audio(AudioBuffer &buf) override;
 		AudioVisualizer *visualizer;
 	};
 
 	RingBuffer *buffer;
 	int chunk_size;
 	void set_chunk_size(int chunk_size);
+
+	void command(ModuleCommand cmd) override;
 
 	virtual _cdecl void process(AudioBuffer &buf){}
 	virtual _cdecl void reset(){}

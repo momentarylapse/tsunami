@@ -8,7 +8,7 @@
 #ifndef SRC_MODULE_BEATS_BEATSOURCE_H_
 #define SRC_MODULE_BEATS_BEATSOURCE_H_
 
-#include "../Port/BeatPort.h"
+#include "../Port/Port.h"
 #include "../Module.h"
 
 class DummyBeatSource;
@@ -21,13 +21,11 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public BeatPort
+	class Output : public Port
 	{
 	public:
 		Output(BeatSource *s);
-		virtual ~Output() override {}
-		int _cdecl read(Array<Beat> &beats, int samples) override;
-		void _cdecl reset() override;
+		int read_beats(Array<Beat> &beats, int samples) override;
 		BeatSource *source;
 	};
 	Output *out;

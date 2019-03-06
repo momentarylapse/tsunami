@@ -9,7 +9,7 @@
 
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/Synth/Synthesizer.h"
-#include "../../Module/Port/MidiPort.h"
+#include "../../Module/Port/Port.h"
 #include "../../Device/OutputStream.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"

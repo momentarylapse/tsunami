@@ -12,8 +12,7 @@
 #include "DeviceManager.h"
 #include "Device.h"
 #include "OutputStream.h"
-
-#include "../Module/Port/AudioPort.h"
+#include "../Module/Port/Port.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -344,9 +343,6 @@ void OutputStream::stop()
 		thread = nullptr;
 	}
 
-	if (source)
-		source->reset();
-
 	clear_buffer();
 }
 
@@ -434,7 +430,7 @@ void OutputStream::_read_stream()
 	ring_buf.write_ref(b, buffer_size);
 
 	// read data
-	size = source->read(b);
+	size = source->read_audio(b);
 
 	if (size == source->NOT_ENOUGH_DATA){
 		//printf(" -> no data\n");

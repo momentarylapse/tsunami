@@ -7,7 +7,7 @@
 
 #include "FormatWave.h"
 
-#include "../../Module/Port/AudioPort.h"
+#include "../../Module/Port/Port.h"
 #include "../../Session.h"
 #include "../../lib/file/file.h"
 #include "../../Data/base.h"
@@ -25,7 +25,7 @@ FormatDescriptorWave::FormatDescriptorWave() :
 
 void FormatWave::save_via_renderer(StorageOperationData *od)
 {
-	AudioPort *r = od->renderer;
+	Port *r = od->renderer;
 
 	SampleFormat format = SampleFormat::SAMPLE_FORMAT_16;
 	if (od->song)
@@ -56,7 +56,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od)
 	AudioBuffer buf(CHUNK_SIZE, channels);
 	int done = 0;
 	int samples_read;
-	while ((samples_read = r->read(buf)) > 0){
+	while ((samples_read = r->read_audio(buf)) > 0){
 		buf.resize(samples_read);
 		string data;
 		if (!buf.exports(data, channels, SampleFormat::SAMPLE_FORMAT_16))

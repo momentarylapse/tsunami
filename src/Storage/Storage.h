@@ -18,7 +18,7 @@ class Song;
 class Track;
 class TrackLayer;
 class AudioBuffer;
-class AudioPort;
+class Port;
 class SongSelection;
 class StorageOperationData;
 class Tag;
@@ -34,7 +34,7 @@ public:
 	bool load_ex(Song *song, const string &filename, bool only_metadata);
 	bool load_track(TrackLayer *t, const string &filename, int offset = 0);
 	bool load_buffer(AudioBuffer *buf, const string &filename);
-	bool save_via_renderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags);
+	bool save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags);
 	bool render_export_selection(Song *song, SongSelection *sel, const string &filename);
 	bool save(Song *song, const string &filename);
 

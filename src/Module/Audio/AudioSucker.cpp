@@ -9,7 +9,7 @@
 #include "../../lib/threads/Thread.h"
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/PerformanceMonitor.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
 
@@ -43,9 +43,9 @@ public:
 				PerformanceMonitor::start_busy(perf_channel);
 				int r = sucker->update();
 				PerformanceMonitor::end_busy(perf_channel);
-				if (r == AudioPort::END_OF_STREAM)
+				if (r == Port::END_OF_STREAM)
 					break;
-				if (r == AudioPort::NOT_ENOUGH_DATA){
+				if (r == Port::NOT_ENOUGH_DATA){
 					hui::Sleep(sucker->no_data_wait);
 					continue;
 				}
@@ -61,7 +61,7 @@ public:
 AudioSucker::AudioSucker() :
 	Module(ModuleType::AUDIO_SUCKER)
 {
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
 	accumulating = false;
 	running = false;
@@ -118,13 +118,15 @@ void AudioSucker::command(ModuleCommand cmd)
 		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
+	else if (cmd == ModuleCommand::RESET_BUFFER)
+		reset_accumulation();
 }
 
 int AudioSucker::update()
 {
 	AudioBuffer temp;
 	temp.resize(buffer_size);
-	int r = source->read(temp);
+	int r = source->read_audio(temp);
 	if (r == source->NOT_ENOUGH_DATA)
 		return r;
 	if (r == source->END_OF_STREAM)

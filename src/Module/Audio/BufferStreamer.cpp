@@ -32,10 +32,10 @@ int BufferStreamer::read(AudioBuffer& _buf)
 	int available = buf->length - offset;
 	int n = min(_buf.length, available);
 	if (n <= 0)
-		return AudioPort::END_OF_STREAM;
+		return Port::END_OF_STREAM;
 	if (!CHEAT){
 		if (n < _buf.length)
-			return AudioPort::NOT_ENOUGH_DATA;
+			return Port::NOT_ENOUGH_DATA;
 	}
 	_buf.set(*buf, -offset, 1);
 	offset += n;

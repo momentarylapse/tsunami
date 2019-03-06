@@ -12,7 +12,7 @@
 #include "../../lib/base/base.h"
 #include "../../Data/Range.h"
 #include "../Module.h"
-#include "../Port/MidiPort.h"
+#include "../Port/Port.h"
 
 class Plugin;
 class Track;
@@ -32,7 +32,7 @@ public:
 	bool only_on_selection;
 	Range range;
 
-	MidiPort *source;
+	Port *source;
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
@@ -41,12 +41,11 @@ public:
 	void prepare();
 	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);
 
-	class Output : public MidiPort
+	class Output : public Port
 	{
 	public:
 		Output(MidiEffect *fx);
-		int _cdecl read(MidiEventBuffer &midi) override;
-		void _cdecl reset() override;
+		int read_midi(MidiEventBuffer &midi) override;
 
 		MidiEffect *fx;
 	};

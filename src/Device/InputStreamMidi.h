@@ -9,7 +9,7 @@
 #define INPUTSTREAMMIDI_H_
 
 #include "../Data/Midi/MidiData.h"
-#include "../Module/Port/MidiPort.h"
+#include "../Module/Port/Port.h"
 #include "../Module/Module.h"
 
 class Device;
@@ -59,14 +59,14 @@ public:
 	MidiEventBuffer midi;
 	MidiEventBuffer current_midi;
 
-	class Output : public MidiPort
+	class Output : public Port
 	{
 	public:
 		Output(InputStreamMidi *input);
 		virtual ~Output();
 
-		virtual int _cdecl read(MidiEventBuffer &midi);
-		void _cdecl feed(const MidiEventBuffer &midi);
+		int read_midi(MidiEventBuffer &midi) override;
+		void feed(const MidiEventBuffer &midi);
 
 		MidiEventBuffer events;
 		InputStreamMidi *input;

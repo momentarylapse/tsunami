@@ -12,16 +12,16 @@
 #include "../../Data/Audio/RingBuffer.h"
 #include "../../Data/base.h"
 
-AudioVisualizer::Output::Output(AudioVisualizer *v) : AudioPort("out")
+AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "out")
 {
 	visualizer = v;
 }
 
-int AudioVisualizer::Output::read(AudioBuffer& buf)
+int AudioVisualizer::Output::read_audio(AudioBuffer& buf)
 {
 	if (!visualizer->source)
 		return 0;
-	int r = visualizer->source->read(buf);
+	int r = visualizer->source->read_audio(buf);
 	if (r <= 0)
 		return r;
 
@@ -34,20 +34,6 @@ int AudioVisualizer::Output::read(AudioBuffer& buf)
 		visualizer->buffer->read_ref_done(b);
 	}
 	return r;
-}
-
-int AudioVisualizer::Output::get_pos(int delta)
-{
-	if (!visualizer->source)
-		return 0;
-	return visualizer->source->get_pos(delta);
-}
-
-void AudioVisualizer::Output::reset()
-{
-	if (visualizer->source)
-		visualizer->source->reset();
-	visualizer->reset();
 }
 
 AudioVisualizer::AudioVisualizer() :
@@ -78,6 +64,12 @@ void AudioVisualizer::__delete__()
 void AudioVisualizer::set_chunk_size(int _chunk_size)
 {
 	chunk_size = _chunk_size;
+}
+
+void AudioVisualizer::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::RESET_BUFFER)
+		reset();
 }
 
 // TODO: move to PluginManager?

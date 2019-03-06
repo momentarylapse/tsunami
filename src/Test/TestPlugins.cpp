@@ -107,7 +107,7 @@ void TestPlugins::test_synthesizer(const string &name)
 	buf.resize(1 << 12);
 
 	for (int i=0; i<16; i++)
-		synth->out->read(buf);
+		synth->out->read_audio(buf);
 
 	delete synth;
 	delete source;

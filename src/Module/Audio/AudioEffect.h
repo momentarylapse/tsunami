@@ -11,7 +11,7 @@
 #include "../../lib/base/base.h"
 #include "../../Data/Range.h"
 #include "../Module.h"
-#include "../Port/AudioPort.h"
+#include "../Port/Port.h"
 
 class Plugin;
 class Track;
@@ -34,18 +34,16 @@ public:
 
 	int sample_rate;
 
-	class Output : public AudioPort
+	class Output : public Port
 	{
 	public:
 		Output(AudioEffect *fx);
-		int _cdecl read(AudioBuffer &buf) override;
-		void _cdecl reset() override;
-		int _cdecl get_pos(int delta) override;
+		int read_audio(AudioBuffer &buf) override;
 		AudioEffect *fx;
 	};
 	Output *out;
 
-	AudioPort *source;
+	Port *source;
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 	virtual int _cdecl read(AudioBuffer &buf);

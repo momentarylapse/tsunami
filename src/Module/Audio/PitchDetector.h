@@ -10,7 +10,7 @@
 
 #include "../Midi/MidiSource.h"
 
-class AudioPort;
+class Port;
 class AudioBuffer;
 
 class PitchDetector : public MidiSource
@@ -26,7 +26,7 @@ public:
 
 	void process(MidiEventBuffer &midi, AudioBuffer &buf);
 
-	AudioPort *source;
+	Port *source;
 
 	float frequency, volume;
 	bool loud_enough;

@@ -43,7 +43,7 @@ RawConfigData GetRawConfigData(Session *session)
 void FormatRaw::save_via_renderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->session);
-	AudioPort *r = od->renderer;
+	Port *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
 
@@ -55,7 +55,7 @@ void FormatRaw::save_via_renderer(StorageOperationData *od)
 	int samples = od->num_samples;
 	int done = 0;
 	int samples_read;
-	while ((samples_read = r->read(buf)) > 0){
+	while ((samples_read = r->read_audio(buf)) > 0){
 		string data;
 		buf.resize(samples_read);
 		if (!buf.exports(data, config.channels, config.format))

@@ -8,7 +8,7 @@
 #include "FormatFlac.h"
 #include <math.h>
 
-#include "../../Module/Port/AudioPort.h"
+#include "../../Module/Port/Port.h"
 #include "../../Session.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
@@ -166,7 +166,7 @@ void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 byt
 
 void FormatFlac::save_via_renderer(StorageOperationData *od)
 {
-	AudioPort *r = od->renderer;
+	Port *r = od->renderer;
 
 	FLAC__StreamEncoder *encoder = nullptr;
 	FLAC__StreamMetadata *metadata = nullptr;
@@ -225,7 +225,7 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 		float scale = (float)(1 << (bits-1));
 		AudioBuffer buf(CHUNK_SAMPLES, channels);
 		int samples_read;
-		while ((samples_read = r->read(buf)) > 0){
+		while ((samples_read = r->read_audio(buf)) > 0){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 			FLAC__int32 *pp = flac_pcm;
 			for (int i=0;i<samples_read;i++){

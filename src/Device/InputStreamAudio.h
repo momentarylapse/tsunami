@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../Data/Audio/RingBuffer.h"
-#include "../Module/Port/AudioPort.h"
+#include "../Module/Port/Port.h"
 #include "../Module/Module.h"
 
 class PluginManager;
@@ -61,12 +61,12 @@ public:
 
 	RingBuffer buffer;
 
-	class Output : public AudioPort
+	class Output : public Port
 	{
 	public:
 		Output(InputStreamAudio *s);
 		virtual ~Output(){}
-		virtual int _cdecl read(AudioBuffer &buf);
+		int read_audio(AudioBuffer &buf) override;
 
 		InputStreamAudio *stream;
 	};

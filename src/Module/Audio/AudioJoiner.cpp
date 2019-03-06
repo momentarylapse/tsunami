@@ -20,44 +20,27 @@ AudioJoiner::AudioJoiner() :
 	b = nullptr;
 }
 
-int AudioJoiner::Output::read(AudioBuffer& buf)
+int AudioJoiner::Output::read_audio(AudioBuffer& buf)
 {
 	if (joiner->a and joiner->b){
-		int ra = joiner->a->read(buf);
+		int ra = joiner->a->read_audio(buf);
 		if (ra <= 0)
 			return ra;
 		// hmmm needs buffering if a has data, but b has none yet (input stream)
 		AudioBuffer buf_b;
 		buf_b.resize(buf.length);
-		int rb = joiner->b->read(buf_b);
+		int rb = joiner->b->read_audio(buf_b);
 		buf.add(buf_b, 0, 1, 0);
 		return max(ra, rb);
 	}else if (joiner->a){
-		return joiner->a->read(buf);
+		return joiner->a->read_audio(buf);
 	}else if (joiner->b){
-		return joiner->b->read(buf);
+		return joiner->b->read_audio(buf);
 	}
 	return buf.length;
 }
 
-AudioJoiner::Output::Output(AudioJoiner *j) : AudioPort("out")
+AudioJoiner::Output::Output(AudioJoiner *j) : Port(SignalType::AUDIO, "out")
 {
 	joiner = j;
-}
-
-void AudioJoiner::Output::reset()
-{
-	if (joiner->a)
-		joiner->a->reset();
-	if (joiner->b)
-		joiner->b->reset();
-}
-
-int AudioJoiner::Output::get_pos(int delta)
-{
-	if (joiner->a)
-		return joiner->a->get_pos(delta);
-	if (joiner->b)
-		return joiner->b->get_pos(delta);
-	return 0;
 }

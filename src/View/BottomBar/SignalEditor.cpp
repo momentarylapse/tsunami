@@ -7,7 +7,7 @@
 
 #include "SignalEditor.h"
 
-#include "../../Module/Port/MidiPort.h"
+#include "../../Module/Port/Port.h"
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Storage/Storage.h"
@@ -72,7 +72,7 @@ public:
 		view = ed->view;
 		session = ed->session;
 
-		event_xp("area", "hui:draw", std::bind(&SignalEditorTab::on_draw, this, std::placeholders::_1));
+		event_xp("area", "hui:draw", [&](Painter *p){ on_draw(p); });
 		event_x("area", "hui:mouse-move", [&]{ on_mouse_move(); });
 		event_x("area", "hui:left-button-down", [&]{ on_left_button_down(); });
 		event_x("area", "hui:left-button-up", [&]{ on_left_button_up(); });

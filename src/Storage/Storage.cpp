@@ -175,7 +175,7 @@ bool Storage::save(Song *song, const string &filename)
 	return true;
 }
 
-bool Storage::save_via_renderer(AudioPort *r, const string &filename, int num_samples, const Array<Tag> &tags)
+bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags)
 {
 	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)

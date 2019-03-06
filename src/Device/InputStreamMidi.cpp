@@ -11,7 +11,7 @@
 #include "DeviceManager.h"
 
 #include "OutputStream.h"
-#include "../Module/Port/MidiPort.h"
+#include "../Module/Port/Port.h"
 #include "../Stuff/BackupManager.h"
 #include "../Data/base.h"
 
@@ -21,7 +21,7 @@
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 
-InputStreamMidi::Output::Output(InputStreamMidi *_input) : MidiPort("out")
+InputStreamMidi::Output::Output(InputStreamMidi *_input) : Port(SignalType::MIDI, "out")
 {
 	input = _input;
 	real_time_mode = true;
@@ -29,7 +29,7 @@ InputStreamMidi::Output::Output(InputStreamMidi *_input) : MidiPort("out")
 
 InputStreamMidi::Output::~Output(){}
 
-int InputStreamMidi::Output::read(MidiEventBuffer &midi)
+int InputStreamMidi::Output::read_midi(MidiEventBuffer &midi)
 {
 	if (real_time_mode){
 		for (auto &e: events){

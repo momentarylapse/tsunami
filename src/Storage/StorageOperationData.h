@@ -20,7 +20,7 @@ class Track;
 class TrackLayer;
 class Storage;
 class Format;
-class AudioPort;
+class Port;
 class Tag;
 class Storage;
 class Session;
@@ -60,7 +60,7 @@ public:
 	bool allow_channels_change;
 	Track *track;
 	TrackLayer *layer;
-	AudioPort *renderer;
+	Port *renderer;
 	Array<Tag> tags;
 	int num_samples;
 	int offset;

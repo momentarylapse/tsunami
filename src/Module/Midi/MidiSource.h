@@ -34,6 +34,8 @@ public:
 
 	virtual int _cdecl read(MidiEventBuffer &midi){ return 0; };
 	virtual void _cdecl reset(){}
+	virtual void _cdecl set_pos(int pos){}
+	virtual int _cdecl get_pos(){ return 0; }
 
 
 	int bh_offset;

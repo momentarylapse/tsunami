@@ -29,7 +29,7 @@ void ActionTrackLayerMerge::build(Data *d)
 
 	Range r = track->range();
 	TrackRenderer *tr = new TrackRenderer(track, nullptr);
-	tr->seek(r.start());
+	tr->set_pos(r.start());
 
 	AudioBuffer buf;
 	//lnew->getBuffers(buf, r);

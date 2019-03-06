@@ -10,6 +10,8 @@
 #include "ModuleFactory.h"
 #include "Port/MidiPort.h"
 #include "Audio/AudioSource.h"
+#include "Midi/MidiSource.h"
+#include "Beats/BeatSource.h"
 #include "../Session.h"
 #include "../Plugins/PluginManager.h"
 #include "../Device/OutputStream.h"
@@ -368,14 +370,18 @@ bool SignalChain::is_paused()
 
 void SignalChain::command(ModuleCommand cmd)
 {
-	if (cmd == ModuleCommand::START)
+	if (cmd == ModuleCommand::START){
 		start();
-	else if (cmd == ModuleCommand::STOP)
+	}else if (cmd == ModuleCommand::STOP){
 		stop();
-	else if (cmd == ModuleCommand::PAUSE)
+	}else if (cmd == ModuleCommand::PAUSE){
 		pause(true);
-	else if (cmd == ModuleCommand::UNPAUSE)
+	}else if (cmd == ModuleCommand::UNPAUSE){
 		pause(false);
+	}else{
+		for (Module *m: modules)
+			m->command(cmd);
+	}
 }
 
 bool SignalChain::is_playback_active()
@@ -401,5 +407,18 @@ int SignalChain::get_pos()
 				return ((AudioSource*)m)->get_pos(delta);
 	}
 	return 0;
+}
+
+void SignalChain::set_pos(int pos)
+{
+	for (auto *m: modules){
+		if (m->module_type == ModuleType::AUDIO_SOURCE)
+			((AudioSource*)m)->set_pos(pos);
+		else if (m->module_type == ModuleType::MIDI_SOURCE)
+			((MidiSource*)m)->set_pos(pos);
+		else if (m->module_type == ModuleType::BEAT_SOURCE)
+			((BeatSource*)m)->set_pos(pos);
+	}
+	command(ModuleCommand::RESET_BUFFER);
 }
 

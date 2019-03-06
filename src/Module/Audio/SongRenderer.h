@@ -35,16 +35,15 @@ public:
 	void _cdecl __delete__() override;
 
 	// from AudioSource
-	int _cdecl read(AudioBuffer &buf) override;
-	void _cdecl reset() override;
-	int _cdecl get_pos(int delta) override;
+	int read(AudioBuffer &buf) override;
+	void reset() override;
+	int get_pos(int delta) override;
+	void set_pos(int pos) override;
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);
 	void _cdecl allow_tracks(const Set<const Track*> &allowed_tracks);
 	void _cdecl allow_layers(const Set<const TrackLayer*> &allowed_layers);
-
-	void _cdecl seek(int pos);
 
 	void _cdecl set_range(const Range &r){ _range = r; }
 	Range _cdecl range(){ return _range; }
@@ -81,7 +80,7 @@ private:
 	void clear_data();
 	void reset_state();
 	void build_data();
-	void _seek(int pos);
+	void _set_pos(int pos);
 
 	int channels;
 

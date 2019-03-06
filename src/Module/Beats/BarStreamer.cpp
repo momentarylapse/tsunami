@@ -27,9 +27,14 @@ int BarStreamer::read(Array<Beat> &beats, int samples)
 	return samples;
 }
 
-void BarStreamer::seek(int pos)
+void BarStreamer::set_pos(int pos)
 {
 	offset = pos;
+}
+
+int BarStreamer::get_pos()
+{
+	return offset;
 }
 
 void BarStreamer::reset()

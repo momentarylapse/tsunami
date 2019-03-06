@@ -15,14 +15,15 @@ class BarStreamer : public BeatSource
 {
 public:
 	BarStreamer(BarCollection &bars);
-	int _cdecl read(Array<Beat> &beats, int samples) override;
-	void _cdecl reset() override;
-	void seek(int pos);
+	int read(Array<Beat> &beats, int samples) override;
+	void reset() override;
+	void set_pos(int pos) override;
+	int get_pos() override;
 
-	int _cdecl beats_per_bar() override;
-	int _cdecl cur_beat() override;
-	int _cdecl cur_bar() override;
-	float _cdecl beat_fraction() override;
+	int beats_per_bar() override;
+	int cur_beat() override;
+	int cur_bar() override;
+	float beat_fraction() override;
 
 	BarCollection bars;
 	int offset;

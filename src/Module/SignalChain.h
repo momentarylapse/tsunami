@@ -85,6 +85,7 @@ public:
 	bool is_playback_active();
 
 	int get_pos();
+	void set_pos(int pos);
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

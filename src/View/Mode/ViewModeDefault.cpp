@@ -15,6 +15,7 @@
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../Module/SignalChain.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
@@ -312,7 +313,7 @@ void ViewModeDefault::on_mouse_move()
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
 	}else if (hover->type == Selection::Type::PLAYBACK){
-		view->renderer->seek(hover->pos);
+		view->renderer->set_pos(hover->pos);
 		_force_redraw_ = true;
 	}else if (hover->type == Selection::Type::SAMPLE){
 		/*view->applyBarriers(hover->pos);
@@ -353,8 +354,7 @@ void playback_seek_relative(AudioView *view, float dt)
 	int pos = view->playback_pos();
 	pos += dt * view->song->sample_rate;
 	pos = max(pos, view->renderer->range().offset);
-	view->renderer->seek(pos);
-	view->stream->clear_buffer();
+	view->session->signal_chain->command(ModuleCommand::RESET_BUFFER);
 }
 
 void ViewModeDefault::on_key_down(int k)
@@ -924,8 +924,7 @@ void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 {
 	if (view->is_playback_active()){
 		if (view->renderer->range().is_inside(pos)){
-			view->renderer->seek(pos);
-			view->stream->clear_buffer();
+			session->signal_chain->set_pos(pos);
 			hover->type = Selection::Type::PLAYBACK;
 			view->force_redraw();
 			return;

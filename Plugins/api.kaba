@@ -200,7 +200,8 @@ class AudioSource extends Module
 	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
 	extern virtual void reset()
-	extern virtual int get_pos(int delta)
+	extern virtual int get_pos()
+	extern virtual void set_pos(int pos)
 	AudioPort *out
 
 class MidiPort
@@ -221,6 +222,8 @@ class MidiSource extends Module
 	extern void skip_x(int beats, int sub_beats, int beat_partition)
 	MidiEventBuffer* bh_midi
 	//extern void set_beat_source(BeatPort *source)
+	extern virtual int get_pos()
+	extern virtual void set_pos(int pos)
 
 
 class PitchRenderer
@@ -282,6 +285,8 @@ class BeatSource extends Module
 	extern virtual int cur_beat()
 	extern virtual int cur_bar()
 	extern virtual float beat_fraction()
+	extern virtual int get_pos()
+	extern virtual void set_pos(int pos)
 
 class BeatMidifier extends MidiSource
 	extern override void __init__()
@@ -468,10 +473,8 @@ class SongRenderer extends AudioSource
 	extern void render(Range r, AudioBuffer buf)
 	extern void prepare(Range r, bool allow_loop)
 	extern override int read(AudioBuffer b)
-	extern override int get_pos(int delta)
 	extern override void reset()
 	extern Range range()
-	extern int seek()
 	extern BeatSource* get_beat_source()
 
 

@@ -204,17 +204,17 @@ void TrackRenderer::on_track_add_layer()
 {
 }
 
-void TrackRenderer::seek(int pos)
+void TrackRenderer::set_pos(int pos)
 {
 	if (!track)
 		return;
 	offset = pos;
 	if (midi_streamer)
-		midi_streamer->seek(pos);
+		midi_streamer->set_pos(pos);
 	for (auto *f: fx)
 		f->reset_state();
 	if (track->type == SignalType::BEATS)
-		song_renderer->bar_streamer->seek(pos);
+		song_renderer->bar_streamer->set_pos(pos);
 }
 
 static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur)

@@ -42,7 +42,6 @@ void BeatMidifier::reset()
 }
 
 
-
 BeatMidifier *CreateBeatMidifier(Session *session)
 {
 	return (BeatMidifier*)ModuleFactory::create(session, ModuleType::BEAT_MIDIFIER, "");

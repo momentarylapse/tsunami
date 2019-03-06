@@ -22,7 +22,8 @@ public:
 
 	void _cdecl set_data(const MidiEventBuffer &midi);
 
-	void _cdecl seek(int pos);
+	void set_pos(int pos) override;
+	int get_pos() override;
 
 	MidiEventBuffer midi;
 	int offset;

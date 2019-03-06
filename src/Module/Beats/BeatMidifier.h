@@ -16,8 +16,8 @@ class BeatMidifier : public MidiSource
 {
 public:
 	BeatMidifier();
-	int _cdecl read(MidiEventBuffer &midi) override;
-	void _cdecl reset() override;
+	int read(MidiEventBuffer &midi) override;
+	void reset() override;
 
 	BeatPort *beat_source;
 	float volume;

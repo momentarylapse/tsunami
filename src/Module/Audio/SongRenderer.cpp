@@ -189,7 +189,7 @@ int SongRenderer::read(AudioBuffer &buf)
 
 	bar_streamer->bars = song->bars;
 	// in case, the metronome track is muted
-	bar_streamer->seek(pos);
+	bar_streamer->set_pos(pos);
 
 	buf.offset = pos;
 
@@ -204,7 +204,7 @@ int SongRenderer::read(AudioBuffer &buf)
 		read_basic(buf);
 
 	if ((pos >= _range.end()) and allow_loop and loop_if_allowed)
-		seek(_range.offset);
+		set_pos(_range.offset);
 	return size;
 }
 
@@ -222,7 +222,7 @@ void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks)
 	for (auto *tr: tracks)
 		if (!allowed_tracks.contains(tr->track)){
 			tr->reset_state();
-			tr->seek(pos);
+			tr->set_pos(pos);
 		}
 	allowed_tracks = _allowed_tracks;
 	//_seek(pos);
@@ -231,7 +231,7 @@ void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks)
 void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers)
 {
 	allowed_layers = _allowed_layers;
-	_seek(pos);
+	_set_pos(pos);
 }
 
 void SongRenderer::clear_data()
@@ -260,7 +260,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 	//clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;
-	_seek(_range.offset);
+	_set_pos(_range.offset);
 
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);
@@ -293,7 +293,7 @@ void SongRenderer::build_data()
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));
 
-	seek(0);
+	set_pos(0);
 }
 
 void SongRenderer::reset()
@@ -308,17 +308,17 @@ int SongRenderer::get_num_samples()
 	return _range.length;
 }
 
-void SongRenderer::seek(int _pos)
+void SongRenderer::set_pos(int _pos)
 {
 	reset_state();
-	_seek(_pos);
+	_set_pos(_pos);
 }
 
-void SongRenderer::_seek(int _pos)
+void SongRenderer::_set_pos(int _pos)
 {
 	pos = _pos;
 	for (auto &tr: tracks)
-		tr->seek(pos);
+		tr->set_pos(pos);
 }
 
 int SongRenderer::get_pos(int delta)

@@ -9,6 +9,7 @@
 #include "Track.h"
 #include "Song.h"
 #include "../Module/Module.h"
+#include "../Module/ModuleConfiguration.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
@@ -48,7 +49,7 @@ string Curve::Target::niceStr(Song *a)
 	return "";
 }
 
-void Curve::Target::fromString(const string &str, Song *s)
+void Curve::Target::from_string(const string &str, Song *s)
 {
 	auto targets = enumerate(s);
 	p = nullptr;
@@ -63,41 +64,41 @@ Array<Curve::Target> Curve::Target::enumerate(Song *s)
 {
 	Array<Target> list;
 	foreachi(Track *t, s->tracks, i)
-		enumerateTrack(t, list, format("t:%d", i), format("track[%d]", i));
+		enumerate_track(t, list, format("t:%d", i), format("track[%d]", i));
 	return list;
 }
-void Curve::Target::enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerate_track(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
 	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
 	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
 	foreachi(AudioEffect *fx, t->fx, i)
-		enumerateModule(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
-	enumerateModule(t->synth, list, prefix + ":s", prefix_nice + ".synth");
+		enumerate_module(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
+	enumerate_module(t->synth, list, prefix + ":s", prefix_nice + ".synth");
 }
-void Curve::Target::enumerateModule(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerate_module(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
 	ModuleConfiguration *pd = c->get_config();
 	if (pd)
-		enumerateType((char*)pd, pd->_class, list, prefix, prefix_nice);
+		enumerate_type((char*)pd, pd->_class, list, prefix, prefix_nice);
 }
 
-void Curve::Target::enumerateType(char *pp, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerate_type(char *pp, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
 	if (t->name == "float"){
 		list.add(Target((float*)pp, prefix, prefix_nice));
 	}else if (t->is_array()){
 		for (int i=0; i<t->array_length; i++){
-			enumerateType(pp + t->parent->size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+			enumerate_type(pp + t->parent->size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
 		}
 	}else if (t->is_super_array()){
 		DynamicArray *da = (DynamicArray*)pp;
 		for (int i=0; i<da->num; i++){
-			enumerateType(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+			enumerate_type(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
 		}
 	}else{
 		for (auto &e : t->elements)
 			if (!e.hidden)
-				enumerateType(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
+				enumerate_type(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
 	}
 }
 
@@ -146,7 +147,7 @@ void Curve::unapply()
 	}
 }
 
-string Curve::getTargets(Song *a)
+string Curve::get_targets(Song *a)
 {
 	string tt;
 	foreachi(Target &t, targets, i){

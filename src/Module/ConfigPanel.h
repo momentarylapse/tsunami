@@ -28,4 +28,7 @@ public:
 	Module *c;
 };
 
+
+bool configure_module(hui::Window *win, Module *m);
+
 #endif /* SRC_PLUGINS_CONFIGPANEL_H_ */

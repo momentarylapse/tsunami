@@ -185,7 +185,7 @@ public:
 		int n = f->read_int();
 		for (int i=0; i<n; i++){
 			Curve::Target t;
-			t.fromString(f->read_str(), parent);
+			t.from_string(f->read_str(), parent);
 			me->targets.add(t);
 		}
 		me->min = f->read_float();

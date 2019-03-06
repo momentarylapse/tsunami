@@ -52,6 +52,7 @@
 #include "Module/Audio/AudioSource.h"
 #include "Module/Midi/MidiEffect.h"
 #include "Module/Midi/MidiSource.h"
+#include "Module/ConfigPanel.h"
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
@@ -507,10 +508,7 @@ void TsunamiWindow::on_track_properties()
 
 void TsunamiWindow::on_sample_properties()
 {
-	if (view->cur_sample)
-		session->set_mode("default/sample-ref");
-	else
-		session->e(_("No sample selected"));
+	session->set_mode("default/sample-ref");
 }
 
 void TsunamiWindow::on_delete_marker()
@@ -612,7 +610,7 @@ void TsunamiWindow::on_menu_execute_audio_effect()
 	AudioEffect *fx = CreateAudioEffect(session, name);
 
 	fx->reset_config();
-	if (fx->configure(this)){
+	if (configure_module(this, fx)){
 		song->begin_action_group();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
@@ -632,7 +630,7 @@ void TsunamiWindow::on_menu_execute_audio_source()
 	AudioSource *s = CreateAudioSource(session, name);
 
 	s->reset_config();
-	if (s->configure(this)){
+	if (configure_module(this, s)){
 		song->begin_action_group();
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
@@ -654,7 +652,7 @@ void TsunamiWindow::on_menu_execute_midi_effect()
 	MidiEffect *fx = CreateMidiEffect(session, name);
 
 	fx->reset_config();
-	if (fx->configure(this)){
+	if (configure_module(this, fx)){
 		song->action_manager->group_begin();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
@@ -674,7 +672,7 @@ void TsunamiWindow::on_menu_execute_midi_source()
 	MidiSource *s = CreateMidiSource(session, name);
 
 	s->reset_config();
-	if (s->configure(this)){
+	if (configure_module(this, s)){
 		song->begin_action_group();
 		for (Track *t : song->tracks)
 			for (TrackLayer *l : t->layers)
@@ -950,7 +948,6 @@ void TsunamiWindow::on_new()
 	NewDialog *dlg = new NewDialog(this);
 	dlg->run();
 	delete dlg;
-	//BackupManager::set_save_state();
 }
 
 

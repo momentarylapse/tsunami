@@ -107,7 +107,7 @@ void CurveConsole::update_list()
 {
 	reset(id_list);
 	foreachi(Curve *c, song->curves, i){
-		add_string(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
+		add_string(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->get_targets(song));
 		if (c == curve())
 			set_int(id_list, i);
 	}

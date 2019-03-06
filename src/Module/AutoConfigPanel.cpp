@@ -8,6 +8,7 @@
 
 #include "AutoConfigPanel.h"
 #include "Module.h"
+#include "ModuleConfiguration.h"
 #include "../View/Helper/Slider.h"
 #include "../View/SideBar/SampleManagerConsole.h"
 #include "../Data/Song.h"

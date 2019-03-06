@@ -363,7 +363,7 @@ bool SignalChain::is_paused()
 {
 	if (playback_active)
 		for (auto *m: modules)
-			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "OutputStream"))
+			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
 				return ((OutputStream*)m)->is_paused();
 	return false;
 }
@@ -398,15 +398,16 @@ void SignalChain::on_module_play_end_of_stream()
 int SignalChain::get_pos()
 {
 	int delta = 0;
+	int pos;
 	if (playback_active){
 		for (auto *m: modules)
-			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "OutputStream"))
+			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
 				delta = - ((OutputStream*)m)->get_available();
 		for (auto *m: modules)
 			if (m->module_type == ModuleType::AUDIO_SOURCE)
-				return ((AudioSource*)m)->get_pos() + delta;
+				pos = ((AudioSource*)m)->get_pos(); // + delta;
 	}
-	return 0;
+	return pos + delta;
 }
 
 void SignalChain::set_pos(int pos)

@@ -19,6 +19,7 @@
 #include "../../Data/Sample.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/ModuleConfiguration.h"
 
 
 // rhythm quantization

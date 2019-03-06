@@ -28,6 +28,7 @@
 #include "../Device/OutputStream.h"
 #include "../Device/DeviceManager.h"
 #include "../Module/SignalChain.h"
+#include "../Module/ModuleConfiguration.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Port/Port.h"

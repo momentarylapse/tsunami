@@ -14,7 +14,6 @@
 
 namespace Kaba{
 	class Script;
-	class Class;
 };
 
 namespace hui{
@@ -22,17 +21,7 @@ namespace hui{
 }
 
 
-class ModuleConfiguration : public VirtualBase
-{
-public:
-	ModuleConfiguration(){ _class = nullptr; }
-	virtual ~ModuleConfiguration(){}
-	void _cdecl __init__();
-	virtual void _cdecl __delete__();
-	virtual void _cdecl reset(){}
-	const Kaba::Class *_class;
-};
-
+class ModuleConfiguration;
 class ConfigPanel;
 class Session;
 class Plugin;
@@ -88,9 +77,26 @@ public:
 	static const string MESSAGE_PLAY_END_OF_STREAM;
 	static const string MESSAGE_TICK;
 
+
+	// basic
+	ModuleType module_type;
+	string module_subtype;
+	Session *session;
+	float module_x, module_y;
+
+	Module *copy() const;
+
+
+	Plugin *plugin;
+	bool usable;
+	bool enabled;
+	string get_error();
+
+
+
+	// config data
+	bool allow_config_in_chain;
 	void _cdecl reset_config();
-	virtual void _cdecl reset_state(){}
-	bool configure(hui::Window *win);
 	virtual ConfigPanel *_cdecl create_panel();
 	void _cdecl changed();
 	virtual void _cdecl on_config(){}
@@ -100,29 +106,25 @@ public:
 	virtual string config_to_string() const;
 	virtual void config_from_string(const string &options);
 
-	Module *copy() const;
 
-	ModuleType module_type;
-	string module_subtype;
-	Session *session;
 
-	float module_x, module_y;
+	virtual void _cdecl reset_state(){}
+
+
 	virtual void command(ModuleCommand cmd){}
 	virtual void set_pos(int pos){}
 	virtual int get_pos(){ return 0; }
 
-	bool allow_config_in_chain;
 
 
-	Plugin *plugin;
-	bool usable;
-	bool enabled;
-	string get_error();
-
+	// ports
 	Array<InPortDescription> port_in;
 	Array<Port*> port_out;
 	void plug(int in_port, Module *source, int out_port);
 	void unplug(int in_port);
+
+
+
 
 	static string type_to_name(ModuleType type);
 	static ModuleType type_from_name(const string &name);

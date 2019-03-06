@@ -304,11 +304,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	peak_thread = nullptr;
 	draw_runner_id = -1;
 
+	signal_chain = session->signal_chain;
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
-	stream = session->output_stream;
-	session->signal_chain->subscribe(this, [&]{ on_stream_tick(); }, Module::MESSAGE_TICK);
-	session->signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+	signal_chain->subscribe(this, [&]{ on_stream_tick(); }, Module::MESSAGE_TICK);
+	signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
 
 	mx = my = 0;
 	msp.stop();
@@ -352,8 +352,8 @@ AudioView::~AudioView()
 {
 	if (draw_runner_id >= 0)
 		hui::CancelRunner(draw_runner_id);
-	stream->unsubscribe(this);
 
+	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
 	delete(scroll);
@@ -1540,48 +1540,48 @@ void AudioView::enable(bool _enabled)
 
 void AudioView::play()
 {
-	if (session->signal_chain->is_playback_active())
+	if (signal_chain->is_playback_active())
 		stop();
 
-	session->signal_chain->start();
+	signal_chain->start();
 }
 
 void AudioView::prepare_playback(const Range &range, bool allow_loop)
 {
-	if (session->signal_chain->is_playback_active())
+	if (signal_chain->is_playback_active())
 		stop();
 
 	renderer->prepare(range, allow_loop);
 	renderer->allow_tracks(get_playable_tracks());
 	renderer->allow_layers(get_playable_layers());
 
-	session->signal_chain->start();
+	signal_chain->start();
 }
 
 void AudioView::stop()
 {
-	session->signal_chain->stop();
+	signal_chain->stop();
 }
 
 void AudioView::pause(bool _pause)
 {
-	session->signal_chain->pause(_pause);
+	signal_chain->pause(_pause);
 	//stream->pause(_pause);
 }
 
 bool AudioView::is_playback_active()
 {
-	return session->signal_chain->is_playback_active();
+	return signal_chain->is_playback_active();
 }
 
 bool AudioView::is_paused()
 {
-	return session->signal_chain->is_paused();
+	return signal_chain->is_paused();
 }
 
 int AudioView::playback_pos()
 {
-	return session->signal_chain->get_pos();
+	return signal_chain->get_pos();
 }
 
 bool AudioView::has_any_solo_track()

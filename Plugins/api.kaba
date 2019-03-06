@@ -461,7 +461,6 @@ class ColorScheme
 
 class AudioView
 	SongSelection sel
-	OutputStream* stream
 	SongRenderer* renderer
 	//InputStreamAny* input
 	extern void subscribe(void* handler, func* f, string message)

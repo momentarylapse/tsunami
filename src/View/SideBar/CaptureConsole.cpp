@@ -96,7 +96,7 @@ void CaptureConsole::on_leave()
 {
 	if (mode->is_capturing())
 		mode->insert();
-	view->stream->unsubscribe(this);
+	session->signal_chain->unsubscribe(this);
 
 	view->stop();
 
@@ -131,7 +131,6 @@ void CaptureConsole::on_dump()
 {
 	if (view->is_playback_active()){
 		session->signal_chain->unsubscribe(this);
-		view->stream->unsubscribe(this);
 		view->stop();
 	}
 	mode->dump();
@@ -155,7 +154,7 @@ void CaptureConsole::on_pause()
 
 void CaptureConsole::on_ok()
 {
-	view->stream->unsubscribe(this);
+	session->signal_chain->unsubscribe(this);
 	mode->stop();
 	if (mode->insert())
 		session->set_mode("default");
@@ -163,7 +162,7 @@ void CaptureConsole::on_ok()
 
 void CaptureConsole::on_cancel()
 {
-	view->stream->unsubscribe(this);
+	session->signal_chain->unsubscribe(this);
 	mode->stop();
 	session->set_mode("default");
 }
@@ -171,7 +170,7 @@ void CaptureConsole::on_cancel()
 void CaptureConsole::on_new_version()
 {
 	if (view->is_playback_active()){
-		view->stream->unsubscribe(this);
+		session->signal_chain->unsubscribe(this);
 		view->stop();
 	}
 	mode->insert();
@@ -185,7 +184,7 @@ void CaptureConsole::update_time()
 
 void CaptureConsole::on_output_end_of_stream()
 {
-	view->stream->unsubscribe(this);
+	session->signal_chain->unsubscribe(this);
 	view->stop();
 	mode->pause();
 	enable("start", true);

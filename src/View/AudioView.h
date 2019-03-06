@@ -31,6 +31,7 @@ class DeviceManager;
 class OutputStream;
 class SongRenderer;
 class PeakMeter;
+class SignalChain;
 class TsunamiWindow;
 class AudioViewTrack;
 class AudioViewLayer;
@@ -215,7 +216,7 @@ public:
 
 	Song *song;
 
-	OutputStream *stream;
+	SignalChain *signal_chain;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
 	void play();

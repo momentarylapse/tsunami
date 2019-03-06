@@ -19,7 +19,7 @@ public:
 	void _cdecl __delete__() override;
 
 	int read(AudioBuffer &buf) override;
-	void reset() override;
+	void reset_state() override;
 	int get_pos() override { return offset; }
 	void set_pos(int pos) override { offset = pos; }
 

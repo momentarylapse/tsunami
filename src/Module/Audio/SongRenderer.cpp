@@ -296,11 +296,6 @@ void SongRenderer::build_data()
 	set_pos(0);
 }
 
-void SongRenderer::reset()
-{
-	reset_state();
-}
-
 int SongRenderer::get_num_samples()
 {
 	if (allow_loop and loop_if_allowed)

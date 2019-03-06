@@ -31,8 +31,8 @@ public:
 	PeakMeter();
 	~PeakMeter() override;
 
-	_cdecl void process(AudioBuffer &buf) override;
-	_cdecl void reset() override;
+	void process(AudioBuffer &buf) override;
+	void reset_state() override;
 
 	enum class Mode{
 		PEAKS,

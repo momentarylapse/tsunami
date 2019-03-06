@@ -119,7 +119,7 @@ void PeakMeter::process(AudioBuffer& buf)
 	notify();
 }
 
-void PeakMeter::reset()
+void PeakMeter::reset_state()
 {
 	clear_data();
 	notify();

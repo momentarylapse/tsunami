@@ -30,8 +30,8 @@ public:
 	};
 	Output *out;
 
+	// to be implemented by plugins
 	virtual int _cdecl read(AudioBuffer &buf){ return 0; }
-	virtual void _cdecl reset(){}
 };
 
 AudioSource *_cdecl CreateAudioSource(Session *session, const string &name);

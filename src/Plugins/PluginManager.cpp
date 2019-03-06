@@ -193,7 +193,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("AudioSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioSource::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioSource::__delete__), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &asource);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "reset", Kaba::mf(&AudioSource::reset), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "get_pos", Kaba::mf(&AudioSource::get_pos), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "set_pos", Kaba::mf(&AudioSource::set_pos), &asource);
 
@@ -221,7 +220,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("AudioVisualizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioVisualizer::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioVisualizer::__delete__), &avis);
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "process", Kaba::mf(&AudioVisualizer::process), &avis);
-	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "reset", Kaba::mf(&AudioVisualizer::reset), &avis);
 	Kaba::LinkExternal("AudioVisualizer.set_chunk_size", Kaba::mf(&AudioVisualizer::set_chunk_size));
 
 	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
@@ -483,7 +481,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SongRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongRenderer::__init__));
 	Kaba::DeclareClassVirtualIndex("SongRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongRenderer::__delete__), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "read", Kaba::mf(&SongRenderer::read), &sr);
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset_state), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "set_pos", Kaba::mf(&SongRenderer::set_pos), &sr);

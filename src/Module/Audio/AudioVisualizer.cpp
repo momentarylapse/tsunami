@@ -69,7 +69,7 @@ void AudioVisualizer::set_chunk_size(int _chunk_size)
 void AudioVisualizer::command(ModuleCommand cmd)
 {
 	if (cmd == ModuleCommand::RESET_BUFFER)
-		reset();
+		reset_state();
 }
 
 // TODO: move to PluginManager?

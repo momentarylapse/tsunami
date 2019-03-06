@@ -266,7 +266,7 @@ class Metronome extends TsunamiPlugin
 	
 	override void on_start()
 		
-		session.output_stream.set_update_dt(UPDATE_DT)
+		session.signal_chain.set_update_dt(UPDATE_DT)
 		session.output_stream.set_buffer_size(1024)
 			
 	override ConfigPanel* create_panel()

@@ -41,7 +41,6 @@ public:
 	void command(ModuleCommand cmd) override;
 
 	virtual _cdecl void process(AudioBuffer &buf){}
-	virtual _cdecl void reset(){}
 };
 
 AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name);

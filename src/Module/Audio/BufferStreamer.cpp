@@ -42,7 +42,7 @@ int BufferStreamer::read(AudioBuffer& _buf)
 	return _buf.length;
 }
 
-void BufferStreamer::reset()
+void BufferStreamer::reset_state()
 {
 	offset = 0;
 }

@@ -44,6 +44,4 @@ public:
 	void command(ModuleCommand cmd) override;
 };
 
-AudioSucker *CreateAudioSucker(Session *session);
-
 #endif /* SRC_MODULE_AUDIO_AUDIOSUCKER_H_ */

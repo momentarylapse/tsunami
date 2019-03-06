@@ -37,10 +37,10 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf)
 }
 
 AudioVisualizer::AudioVisualizer() :
-	Module(ModuleType::AUDIO_VISUALIZER)
+	Module(ModuleType::AUDIO_VISUALIZER, "")
 {
 	port_out.add(new Output(this));
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;

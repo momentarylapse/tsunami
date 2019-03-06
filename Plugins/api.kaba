@@ -113,7 +113,7 @@ class Module
 	string name
 	Session* session
 	bool usable
-	extern void __init__()
+	extern void __init__(int type, string sub_type)
 	extern virtual void __delete__()
 	extern void reset_config()
 	extern virtual void reset_state()

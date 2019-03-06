@@ -11,7 +11,7 @@
 #include "../../Data/base.h"
 
 BeatSource::BeatSource() :
-	Module(ModuleType::BEAT_SOURCE)
+	Module(ModuleType::BEAT_SOURCE, "")
 {
 	out = new Output(this);
 	port_out.add(out);

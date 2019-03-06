@@ -84,6 +84,11 @@ void __stop__(Session *s)
 	//s->signal_chain->stop();
 }
 
+Module *_CreateBeatMidifier(Session *s)
+{
+	return new BeatMidifier();
+}
+
 
 void PluginManager::link_app_script_data()
 {
@@ -96,13 +101,14 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
+//	Kaba::LinkExternal("CreateModule", (void*)&ModuleFactory::create);
 	Kaba::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateAudioEffect);
 	Kaba::LinkExternal("CreateAudioSource", (void*)&CreateAudioSource);
 	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Kaba::LinkExternal("CreateMidiSource", (void*)&CreateMidiSource);
-	Kaba::LinkExternal("CreateBeatMidifier", (void*)&CreateBeatMidifier);
 	Kaba::LinkExternal("CreateBeatSource", (void*)&CreateBeatSource);
+	Kaba::LinkExternal("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
@@ -140,7 +146,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Session.create_child", Kaba::mf(&Session::create_child));
 
 
-	Module module(ModuleType::AUDIO_EFFECT);
+	Module module(ModuleType::AUDIO_EFFECT, "");
 	Kaba::DeclareClassSize("Module", sizeof(Module));
 	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, module_subtype));
 	Kaba::DeclareClassOffset("Module", "usable", _offsetof(Module, usable));
@@ -768,17 +774,24 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 	if (type == ModuleType::AUDIO_SOURCE){
 		names.add("SongRenderer");
 		//names.add("BufferStreamer");
-	}
-	if (type == ModuleType::MIDI_EFFECT)
+	}else if (type == ModuleType::MIDI_EFFECT){
 		names.add("Dummy");
-	if (type == ModuleType::BEAT_SOURCE){
+	}else if (type == ModuleType::BEAT_SOURCE){
 		//names.add("BarStreamer");
-	}
-	if (type == ModuleType::AUDIO_VISUALIZER)
+	}else if (type == ModuleType::AUDIO_VISUALIZER){
 		names.add("PeakMeter");
-	if (type == ModuleType::SYNTHESIZER){
+	}else if (type == ModuleType::SYNTHESIZER){
 		names.add("Dummy");
 		//names.add("Sample");
+	}else if (type == ModuleType::STREAM){
+		names.add("AudioOutput");
+		names.add("AudioInput");
+		names.add("MidiInput");
+	}else if (type == ModuleType::PLUMBING){
+		names.add("AudioJoiner");
+		names.add("BeatMidifier");
+		names.add("AudioSucker");
+		names.add("AudioBackup");
 	}
 	return names;
 }

@@ -200,7 +200,7 @@ public:
 
 
 OutputStream::OutputStream(Session *_session) :
-	Module(ModuleType::OUTPUT_STREAM_AUDIO),
+	Module(ModuleType::STREAM, "AudioOutput"),
 	ring_buf(1048576)
 {
 //	printf("output new\n");

@@ -11,7 +11,7 @@
 
 
 AudioSource::AudioSource() :
-	Module(ModuleType::AUDIO_SOURCE)
+	Module(ModuleType::AUDIO_SOURCE, "")
 {
 	out = new Output(this);
 	port_out.add(out);

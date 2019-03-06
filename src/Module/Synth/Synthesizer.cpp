@@ -78,11 +78,11 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf)
 
 
 Synthesizer::Synthesizer() :
-	Module(ModuleType::SYNTHESIZER)
+	Module(ModuleType::SYNTHESIZER, "")
 {
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::MIDI, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::MIDI, &source, "in"));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);

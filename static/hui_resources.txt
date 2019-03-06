@@ -2810,7 +2810,7 @@ add
 
 2
 0
-14
+10
 Item
 signal_chain_add_audio_source
 
@@ -2824,75 +2824,51 @@ signal_chain_add_audio_effect
 0
 0
 Item
-signal_chain_add_audio_joiner
+signal_chain_add_audio_visualizer
 
 2
 0
 0
 Item
-signal_chain_add_audio_visualizer
+signal_chain_add_midi_source
 
 3
 0
 0
 Item
-signal_chain_add_audio_sucker
+signal_chain_add_midi_effect
 
 4
 0
 0
 Item
-signal_chain_add_audio_input
+signal_chain_add_synthesizer
 
 5
 0
 0
 Item
-signal_chain_add_audio_output
+signal_chain_add_pitch_detector
 
 6
 0
 0
 Item
-signal_chain_add_midi_source
+signal_chain_add_beat_source
 
 7
 0
 0
 Item
-signal_chain_add_midi_effect
+signal_chain_add_plumbing
 
 8
 0
 0
 Item
-signal_chain_add_synthesizer
+signal_chain_add_stream
 
 9
-0
-0
-Item
-signal_chain_add_pitch_detector
-
-10
-0
-0
-Item
-signal_chain_add_midi_input
-
-11
-0
-0
-Item
-signal_chain_add_beat_source
-
-12
-0
-0
-Item
-signal_chain_add_beat_midifier
-
-13
 0
 0
 Separator
@@ -2937,7 +2913,7 @@ popup_signal_module_menu
 
 0
 0
-4
+3
 Item
 header
 disabled
@@ -2951,15 +2927,9 @@ Separator
 0
 0
 Item
-signal_module_configure
-
-2
-0
-0
-Item
 signal_module_delete
 
-3
+2
 0
 0
 // Resource
@@ -4740,7 +4710,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-473
+468
 // Text
 /cancel
 Cancel
@@ -5648,26 +5618,11 @@ Activate
 popup_signal_chain_menu/signal_chain_add_audio_effect
 AudioEffect
 
-popup_signal_chain_menu/signal_chain_add_audio_input
-AudioInputStream
-
-popup_signal_chain_menu/signal_chain_add_audio_joiner
-Audiojoiner
-
-popup_signal_chain_menu/signal_chain_add_audio_output
-AudioOutputStream
-
 popup_signal_chain_menu/signal_chain_add_audio_source
 AudioSource
 
-popup_signal_chain_menu/signal_chain_add_audio_sucker
-AudioSucker
-
 popup_signal_chain_menu/signal_chain_add_audio_visualizer
 AudioVisualizer
-
-popup_signal_chain_menu/signal_chain_add_beat_midifier
-BeatMidifier
 
 popup_signal_chain_menu/signal_chain_add_beat_source
 BeatSource
@@ -5675,14 +5630,17 @@ BeatSource
 popup_signal_chain_menu/signal_chain_add_midi_effect
 MidiEffect
 
-popup_signal_chain_menu/signal_chain_add_midi_input
-MidiInputStream
-
 popup_signal_chain_menu/signal_chain_add_midi_source
 MidiSource
 
 popup_signal_chain_menu/signal_chain_add_pitch_detector
 PitchDetector
+
+popup_signal_chain_menu/signal_chain_add_plumbing
+Plumbing
+
+popup_signal_chain_menu/signal_chain_add_stream
+Stream
 
 popup_signal_chain_menu/signal_chain_add_synthesizer
 Synthesizer
@@ -5701,9 +5659,6 @@ Save...
 
 popup_signal_module_menu/header
 Module
-
-popup_signal_module_menu/signal_module_configure
-Configure
 
 popup_signal_module_menu/signal_module_delete
 Delete
@@ -6167,7 +6122,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-615
+617
 // Text
 /bpm
 Bpm
@@ -7404,6 +7359,12 @@ MidiSource
 
 popup_signal_chain_menu/signal_chain_add_pitch_detector
 PitchDetector
+
+popup_signal_chain_menu/signal_chain_add_plumbing
+Plumbing
+
+popup_signal_chain_menu/signal_chain_add_stream
+Stream
 
 popup_signal_chain_menu/signal_chain_add_synthesizer
 Synthesizer

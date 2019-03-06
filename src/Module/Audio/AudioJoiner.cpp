@@ -10,7 +10,7 @@
 #include "../../Data/base.h"
 
 AudioJoiner::AudioJoiner() :
-	Module(ModuleType::AUDIO_JOINER)
+	Module(ModuleType::PLUMBING, "AudioJoiner")
 {
 	out = new Output(this);
 	port_out.add(out);

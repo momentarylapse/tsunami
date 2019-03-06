@@ -95,22 +95,19 @@ void CaptureConsoleModeAudio::enter()
 	chain->_add(input);
 
 	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
-	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
-	chain->_add(peak_meter);
+	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	chain->connect(input, 0, peak_meter, 0);
 	cc->peak_meter->set_source(peak_meter);
 
-	auto *backup = new AudioBackup(session);
+	auto *backup = (AudioBackup*)chain->add(ModuleType::PLUMBING, "AudioBackup");
 	backup->set_backup_mode(BACKUP_MODE_TEMP);
-	chain->_add(backup);
 	chain->connect(peak_meter, 0, backup, 0);
 
 	input->set_device(chosen_device);
 
 	//enable("capture_audio_source", false);
 
-	sucker = CreateAudioSucker(session);
-	chain->_add(sucker);
+	sucker = (AudioSucker*)chain->add(ModuleType::PLUMBING, "AudioSucker");
 	chain->connect(backup, 0, sucker, 0);
 	//chain->connect(peak_meter, 0, sucker, 0);
 

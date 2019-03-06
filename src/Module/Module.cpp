@@ -176,9 +176,10 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 	}
 }
 
-Module::Module(ModuleType type)
+Module::Module(ModuleType type, const string &sub_type)
 {
 	module_type = type;
+	module_subtype = sub_type;
 	session = Session::GLOBAL;
 	usable = true;
 	plugin = nullptr;
@@ -200,9 +201,9 @@ Module::~Module()
 		delete p;
 }
 
-void Module::__init__(ModuleType type)
+void Module::__init__(ModuleType type, const string &sub_type)
 {
-	new(this) Module(type);
+	new(this) Module(type, sub_type);
 }
 
 void Module::__delete__()
@@ -314,33 +315,33 @@ public:
 		if (c->module_type != ModuleType::AUDIO_EFFECT)
 			hide_control("preview", true);
 
-		event("load_favorite", std::bind(&ConfigurationDialog::onLoad, this));
-		event("save_favorite", std::bind(&ConfigurationDialog::onSave, this));
-		event("ok", std::bind(&ConfigurationDialog::onOk, this));
-		event("preview", std::bind(&ConfigurationDialog::onPreview, this));
-		event("cancel", std::bind(&ConfigurationDialog::onClose, this));
-		event("hui:close", std::bind(&ConfigurationDialog::onClose, this));
+		event("load_favorite", [&]{ on_load(); });
+		event("save_favorite", [&]{ on_save(); });
+		event("ok", [&]{ on_ok(); });
+		event("preview", [&]{ on_preview(); });
+		event("cancel", [&]{ on_close(); });
+		event("hui:close", [&]{ on_close(); });
 
-		config->subscribe(this, std::bind(&ConfigurationDialog::onConfigChange, this), config->MESSAGE_CHANGE);
+		config->subscribe(this, [&]{ on_config_change(); }, config->MESSAGE_CHANGE);
 	}
 	~ConfigurationDialog()
 	{
 		config->unsubscribe(this);
 	}
-	void onOk()
+	void on_ok()
 	{
 		ok = true;
 		destroy();
 	}
-	void onClose()
+	void on_close()
 	{
 		destroy();
 	}
-	void onPreview()
+	void on_preview()
 	{
-		previewStart();
+		preview_start();
 	}
-	void onLoad()
+	void on_load()
 	{
 		string name = config->session->plugin_manager->select_favorite_name(this, config, false);
 		if (name.num == 0)
@@ -348,7 +349,7 @@ public:
 		config->session->plugin_manager->apply_favorite(config, name);
 		panel->update();
 	}
-	void onSave()
+	void on_save()
 	{
 		string name = config->session->plugin_manager->select_favorite_name(this, config, true);
 		if (name.num == 0)
@@ -356,12 +357,12 @@ public:
 		config->session->plugin_manager->save_favorite(config, name);
 	}
 
-	void onConfigChange()
+	void on_config_change()
 	{
 		panel->update();
 	}
 
-	void previewStart()
+	void preview_start()
 	{
 		/*if (progress)
 			previewEnd();
@@ -370,19 +371,19 @@ public:
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->subscribe(this, std::bind(&ConfigurationDialog::onProgressCancel, this), progress->MESSAGE_CANCEL);
+		progress->subscribe(this, [&]{ onProgressCancel(); }, progress->MESSAGE_CANCEL);
 
-		tsunami->win->view->stream->subscribe(this, std::bind(&ConfigurationDialog::onUpdateStream, this));
+		tsunami->win->view->stream->subscribe(this, [&]{ onUpdateStream(); });
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();*/
 	}
 
-	void onProgressCancel()
+	void on_progress_cancel()
 	{
-		previewEnd();
+		preview_end();
 	}
 
-	void onUpdateStream()
+	void on_update_stream()
 	{
 		/*if (progress){
 			int pos = tsunami->win->view->stream->getPos(0); // TODO
@@ -393,7 +394,7 @@ public:
 		}*/
 	}
 
-	void previewEnd()
+	void preview_end()
 	{
 		/*if (!progress)
 			return;
@@ -473,24 +474,10 @@ string Module::type_to_name(ModuleType type)
 		return "AudioVisualizer";
 	if (type == ModuleType::PITCH_DETECTOR)
 		return "PitchDetector";
-	if (type == ModuleType::OUTPUT_STREAM_AUDIO)
-		return "OutputStream";
-	if (type == ModuleType::INPUT_STREAM_AUDIO)
-		return "InputStreamAudio";
-	if (type == ModuleType::INPUT_STREAM_MIDI)
-		return "InputStreamMidi";
-	if (type == ModuleType::AUDIO_SUCKER)
-		return "AudioSucker";
-	if (type == ModuleType::MIDI_SUCKER)
-		return "MidiSucker";
-	if (type == ModuleType::AUDIO_BACKUP)
-		return "AudioBackup";
-	if (type == ModuleType::MIDI_BACKUP)
-		return "MidiBackup";
-	if (type == ModuleType::AUDIO_JOINER)
-		return "AudioJoiner";
-	if (type == ModuleType::BEAT_MIDIFIER)
-		return "BeatMidifier";
+	if (type == ModuleType::STREAM)
+		return "Stream";
+	if (type == ModuleType::PLUMBING)
+		return "Plumbing";
 	if (type == ModuleType::TSUNAMI_PLUGIN)
 		return "TsunamiPlugin";
 	return "???";
@@ -500,16 +487,10 @@ ModuleType Module::type_from_name(const string &str)
 {
 	if (str == "AudioSource")
 		return ModuleType::AUDIO_SOURCE;
-	if (str == "AudioSucker")
-		return ModuleType::AUDIO_SUCKER;
-	if (str == "MidiSucker")
-		return ModuleType::MIDI_SUCKER;
-	if (str == "AudioBackup")
-		return ModuleType::AUDIO_BACKUP;
-	if (str == "MidiBackup")
-		return ModuleType::MIDI_BACKUP;
-	if (str == "AudioJoiner")
-		return ModuleType::AUDIO_JOINER;
+	if (str == "Plumbing")
+		return ModuleType::PLUMBING;
+	if (str == "Stream")
+		return ModuleType::STREAM;
 	if (str == "AudioEffect" or str == "Effect")
 		return ModuleType::AUDIO_EFFECT;
 	if (str == "Synthesizer" or str == "Synth")
@@ -520,18 +501,10 @@ ModuleType Module::type_from_name(const string &str)
 		return ModuleType::MIDI_SOURCE;
 	if (str == "BeatSource")
 		return ModuleType::BEAT_SOURCE;
-	if (str == "BeatMidifier")
-		return ModuleType::BEAT_MIDIFIER;
 	if (str == "PitchDetector")
 		return ModuleType::PITCH_DETECTOR;
 	if (str == "AudioVisualizer")
 		return ModuleType::AUDIO_VISUALIZER;
-	if (str == "AudioInputStream" or str == "InputStreamAudio")
-		return ModuleType::INPUT_STREAM_AUDIO;
-	if (str == "MidiInputStream" or str == "InputStreamMidi")
-		return ModuleType::INPUT_STREAM_MIDI;
-	if (str == "OutputStream" or str == "OutputStreamAudio")
-		return ModuleType::OUTPUT_STREAM_AUDIO;
 	return (ModuleType)-1;
 }
 

@@ -82,18 +82,14 @@ public:
 
 		event("signal_chain_add_audio_source", [&]{ on_add(ModuleType::AUDIO_SOURCE); });
 		event("signal_chain_add_audio_effect", [&]{ on_add(ModuleType::AUDIO_EFFECT); });
-		event("signal_chain_add_audio_input", [&]{ on_add(ModuleType::INPUT_STREAM_AUDIO); });
-		event("signal_chain_add_audio_output", [&]{ on_add(ModuleType::OUTPUT_STREAM_AUDIO); });
-		event("signal_chain_add_audio_joiner", [&]{ on_add(ModuleType::AUDIO_JOINER); });
-		event("signal_chain_add_audio_sucker", [&]{ on_add(ModuleType::AUDIO_SUCKER); });
+		event("signal_chain_add_stream", [&]{ on_add(ModuleType::STREAM); });
+		event("signal_chain_add_plumbing", [&]{ on_add(ModuleType::PLUMBING); });
 		event("signal_chain_add_audio_visualizer", [&]{ on_add(ModuleType::AUDIO_VISUALIZER); });
 		event("signal_chain_add_midi_source", [&]{ on_add(ModuleType::MIDI_SOURCE); });
 		event("signal_chain_add_midi_effect", [&]{ on_add(ModuleType::MIDI_EFFECT); });
-		event("signal_chain_add_midi_input", [&]{ on_add(ModuleType::INPUT_STREAM_MIDI); });
 		event("signal_chain_add_synthesizer", [&]{ on_add(ModuleType::SYNTHESIZER); });
 		event("signal_chain_add_pitch_detector", [&]{ on_add(ModuleType::PITCH_DETECTOR); });
 		event("signal_chain_add_beat_source", [&]{ on_add(ModuleType::BEAT_SOURCE); });
-		event("signal_chain_add_beat_midifier", [&]{ on_add(ModuleType::BEAT_MIDIFIER); });
 		event("signal_chain_reset", [&]{ on_reset(); });
 		event("signal_chain_activate", [&]{ on_activate(); });
 		event("signal_chain_delete", [&]{ on_delete(); });

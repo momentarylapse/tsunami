@@ -29,7 +29,7 @@ int MidiEffect::Output::read_midi(MidiEventBuffer &buf)
 }
 
 MidiEffect::MidiEffect() :
-	Module(ModuleType::MIDI_EFFECT)
+	Module(ModuleType::MIDI_EFFECT, "")
 {
 	port_out.add(new Output(this));
 	port_in.add(InPortDescription(SignalType::MIDI, &source, "in"));

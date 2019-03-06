@@ -10,7 +10,7 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Stuff/BackupManager.h"
 
-AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::AUDIO_BACKUP)
+AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::PLUMBING, "AudioBackup")
 {
 	session = _session;
 	out = new Output(this);

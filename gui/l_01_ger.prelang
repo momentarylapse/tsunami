@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-616
+618
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1851,6 +1851,12 @@ AudioOutputStream
 mini_bar/selection_snap_mode
 Frei\\Takte\\Teile
 Auswahl Modus
+popup_signal_chain_menu/signal_chain_add_plumbing
+Plumbing
+
+popup_signal_chain_menu/signal_chain_add_stream
+Stream
+
 // Num Language Strings
 217
 // Data (ID,Text)

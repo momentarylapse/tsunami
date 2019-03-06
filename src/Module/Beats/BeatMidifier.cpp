@@ -14,7 +14,8 @@
 
 BeatMidifier::BeatMidifier()
 {
-	module_type = ModuleType::BEAT_MIDIFIER;
+	module_type = ModuleType::PLUMBING;
+	module_subtype = "BeatMidifier";
 	beat_source = nullptr;
 	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 
@@ -33,10 +34,4 @@ int BeatMidifier::read(MidiEventBuffer &midi)
 		midi.add_metronome_click(b.range.offset, b.level, volume);
 
 	return r;
-}
-
-
-BeatMidifier *CreateBeatMidifier(Session *session)
-{
-	return (BeatMidifier*)ModuleFactory::create(session, ModuleType::BEAT_MIDIFIER, "");
 }

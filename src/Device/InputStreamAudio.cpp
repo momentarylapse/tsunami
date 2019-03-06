@@ -176,7 +176,7 @@ int InputStreamAudio::Output::read_audio(AudioBuffer &buf)
 extern bool ugly_hack_slow;
 
 InputStreamAudio::InputStreamAudio(Session *_session) :
-	Module(ModuleType::INPUT_STREAM_AUDIO),
+	Module(ModuleType::STREAM, "AudioInput"),
 	buffer(1048576)
 {
 //	printf("input new\n");

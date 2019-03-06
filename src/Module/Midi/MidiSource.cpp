@@ -25,7 +25,7 @@ int MidiSource::Output::read_midi(MidiEventBuffer &midi)
 }
 
 MidiSource::MidiSource() :
-	Module(ModuleType::MIDI_SOURCE)
+	Module(ModuleType::MIDI_SOURCE, "")
 {
 	port_out.add(new Output(this));
 

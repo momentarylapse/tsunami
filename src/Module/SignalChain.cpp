@@ -29,7 +29,7 @@ const float DEFAULT_UPDATE_DT = 0.050f;
 extern bool ugly_hack_slow;
 
 SignalChain::SignalChain(Session *s, const string &_name) :
-	Module(ModuleType::SIGNAL_CHAIN)
+	Module(ModuleType::SIGNAL_CHAIN, "")
 {
 	session = s;
 	name = _name;
@@ -63,9 +63,9 @@ void SignalChain::create_default_modules()
 	auto *peak = get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	if (!peak)
 		peak = add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	auto *output = get_by_type(ModuleType::OUTPUT_STREAM_AUDIO, "");
+	auto *output = get_by_type(ModuleType::STREAM, "AudioOutput");
 	if (!output)
-		output = add(ModuleType::OUTPUT_STREAM_AUDIO);
+		output = add(ModuleType::STREAM, "AudioOutput");
 
 	if (!from_source(renderer, 0) and !to_target(peak, 0))
 		connect(renderer, 0, peak, 0);
@@ -363,7 +363,7 @@ bool SignalChain::is_paused()
 {
 	if (playback_active)
 		for (auto *m: modules)
-			if (m->module_type == ModuleType::OUTPUT_STREAM_AUDIO)
+			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "OutputStream"))
 				return ((OutputStream*)m)->is_paused();
 	return false;
 }
@@ -400,7 +400,7 @@ int SignalChain::get_pos()
 	int delta = 0;
 	if (playback_active){
 		for (auto *m: modules)
-			if (m->module_type == ModuleType::OUTPUT_STREAM_AUDIO)
+			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "OutputStream"))
 				delta = - ((OutputStream*)m)->get_available();
 		for (auto *m: modules)
 			if (m->module_type == ModuleType::AUDIO_SOURCE)

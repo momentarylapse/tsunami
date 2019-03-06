@@ -31,14 +31,15 @@
 
 Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type)
 {
-	if (type == ModuleType::BEAT_MIDIFIER){
-		return new BeatMidifier;
-	}else if (type == ModuleType::AUDIO_JOINER){
-		return new AudioJoiner;
-	}else if (type == ModuleType::AUDIO_SUCKER){
-		return new AudioSucker;
-	}else if (type == ModuleType::AUDIO_BACKUP){
-		return new AudioBackup(session);
+	if (type == ModuleType::PLUMBING){
+		if (sub_type == "BeatMidifier")
+			return new BeatMidifier;
+		if (sub_type == "AudioJoiner")
+			return new AudioJoiner;
+		if (sub_type == "AudioSucker")
+			return new AudioSucker;
+		if (sub_type == "AudioBackup")
+			return new AudioBackup(session);
 	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song, true);
@@ -61,12 +62,13 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 	}else if (type == ModuleType::AUDIO_VISUALIZER){
 		if (sub_type == "PeakMeter")
 			return new PeakMeter;
-	}else if (type == ModuleType::OUTPUT_STREAM_AUDIO){
-		return new OutputStream(session);
-	}else if (type == ModuleType::INPUT_STREAM_AUDIO){
-		return new InputStreamAudio(session);
-	}else if (type == ModuleType::INPUT_STREAM_MIDI){
-		return new InputStreamMidi(session);
+	}else if (type == ModuleType::STREAM){
+		if (sub_type == "AudioOutput")
+			return new OutputStream(session);
+		if (sub_type == "AudioInput")
+			return new InputStreamAudio(session);
+		if (sub_type == "MidiInput")
+			new InputStreamMidi(session);
 	}
 	return nullptr;
 }

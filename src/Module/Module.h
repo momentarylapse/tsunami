@@ -48,18 +48,11 @@ enum class ModuleType
 	MIDI_EFFECT,
 	SYNTHESIZER,
 	BEAT_SOURCE,
-	OUTPUT_STREAM_AUDIO,
-	INPUT_STREAM_AUDIO,
-	INPUT_STREAM_MIDI,
 	AUDIO_VISUALIZER,
 	// other
+	STREAM,
 	PITCH_DETECTOR,
-	AUDIO_JOINER,
-	BEAT_MIDIFIER,
-	AUDIO_SUCKER,
-	MIDI_SUCKER,
-	AUDIO_BACKUP,
-	MIDI_BACKUP,
+	PLUMBING,
 	// recursion!
 	SIGNAL_CHAIN,
 	PORT_IN,
@@ -82,9 +75,9 @@ class Module : public Observable<VirtualBase>
 {
 public:
 
-	Module(ModuleType type);
+	Module(ModuleType type, const string &sub_type);
 	virtual ~Module();
-	void _cdecl __init__(ModuleType type);
+	void _cdecl __init__(ModuleType type, const string &sub_type);
 	virtual void _cdecl __delete__();
 
 	void set_session_etc(Session *session, const string &sub_type, Plugin *plugin);

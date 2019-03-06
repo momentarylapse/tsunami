@@ -20,6 +20,7 @@
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/ModuleFactory.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -76,7 +77,7 @@ void CaptureConsoleModeMulti::enter()
 
 		if (t->type == SignalType::AUDIO){
 			c.peak_meter->plug(0, c.input_audio, 0);
-			c.sucker = CreateAudioSucker(session);
+			c.sucker = (AudioSucker*)ModuleFactory::create(session, ModuleType::PLUMBING, "AudioSucker");
 			c.sucker->plug(0, c.peak_meter, 0);
 		}
 

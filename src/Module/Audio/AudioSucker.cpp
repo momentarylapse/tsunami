@@ -59,7 +59,7 @@ public:
 };
 
 AudioSucker::AudioSucker() :
-	Module(ModuleType::AUDIO_SUCKER)
+	Module(ModuleType::PLUMBING, "AudioSucker")
 {
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
@@ -139,8 +139,3 @@ int AudioSucker::update()
 	return r;
 }
 
-
-AudioSucker *CreateAudioSucker(Session *session)
-{
-	return (AudioSucker*)ModuleFactory::create(session, ModuleType::AUDIO_SUCKER, "");
-}

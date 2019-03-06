@@ -26,7 +26,7 @@ int AudioEffect::Output::read_audio(AudioBuffer &buf)
 }
 
 AudioEffect::AudioEffect() :
-	Module(ModuleType::AUDIO_EFFECT)
+	Module(ModuleType::AUDIO_EFFECT, "")
 {
 	source = nullptr;
 	out = new Output(this);

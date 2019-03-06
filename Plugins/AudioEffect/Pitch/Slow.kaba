@@ -20,7 +20,7 @@ class Slow extends AudioEffect
 
 		AudioBuffer rbuf
 		rbuf.resize(n_in)
-		int r = source.read(rbuf)
+		int r = source.read_audio(rbuf)
 		if r <= 0
 			return r
 		interpolate_buffer(rbuf, buf, 0)

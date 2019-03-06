@@ -172,7 +172,7 @@ void Script::allocate_memory()
 	for (auto *v: syntax->root_of_all_evil.var)
 		memory_size += mem_align(v->type->size, 4);
 	for (auto *c: syntax->constants)
-		memory_size += c->mapping_size();
+		memory_size += mem_align(c->mapping_size(), 4);
 
 	memory = (char*)get_nice_memory(memory_size, false);
 	if (config.verbose)

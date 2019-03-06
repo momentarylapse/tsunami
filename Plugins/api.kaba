@@ -506,7 +506,7 @@ class InputStreamAudio extends Module
 	extern void stop()
 	extern bool is_capturing()
 	extern int sample_rate()
-	extern void set_backup_mode(int mode)
+	//extern void set_backup_mode(int mode)
 
 class Storage
 	extern bool load(Song *s, string filename)

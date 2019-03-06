@@ -1,0 +1,85 @@
+/*
+ * AudioBackup.cpp
+ *
+ *  Created on: 06.03.2019
+ *      Author: michi
+ */
+
+#include "AudioBackup.h"
+#include "../../Data/base.h"
+#include "../../Data/Audio/AudioBuffer.h"
+#include "../../Stuff/BackupManager.h"
+
+AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::AUDIO_BACKUP)
+{
+	session = _session;
+	out = new Output(this);
+	port_out.add(out);
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
+	source = nullptr;
+
+	backup_file = nullptr;
+	backup_mode = BACKUP_MODE_TEMP;
+}
+
+AudioBackup::~AudioBackup()
+{
+}
+
+int AudioBackup::Output::read_audio(AudioBuffer& buf)
+{
+	if (!backup->source)
+		return buf.length;
+
+	int r = backup->source->read_audio(buf);
+
+	backup->save_chunk(buf);
+
+	return r;
+}
+
+AudioBackup::Output::Output(AudioBackup *b) : Port(SignalType::AUDIO, "out")
+{
+	backup = b;
+}
+
+void AudioBackup::set_backup_mode(int mode)
+{
+	backup_mode = mode;
+}
+
+void AudioBackup::save_chunk(AudioBuffer &buf)
+{
+	if (backup_file){
+		// write to file
+		string data;
+		buf.exports(data, 2, SampleFormat::SAMPLE_FORMAT_32_FLOAT);
+		backup_file->write_buffer(data);
+	}
+}
+
+void AudioBackup::start()
+{
+	if (backup_file)
+		stop();
+	if (backup_mode != BACKUP_MODE_NONE)
+		backup_file = BackupManager::create_file("raw", session);
+}
+
+void AudioBackup::stop()
+{
+	if (backup_file){
+		BackupManager::done(backup_file);
+		backup_file = nullptr;
+		//if (backup_mode != BACKUP_MODE_KEEP)
+		//	file_delete(cur_backup_filename);
+	}
+}
+
+void AudioBackup::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::START)
+		start();
+	else if (cmd == ModuleCommand::STOP)
+		stop();
+}

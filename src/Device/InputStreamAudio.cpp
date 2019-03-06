@@ -170,13 +170,6 @@ int InputStreamAudio::Output::read_audio(AudioBuffer &buf)
 
 	int r = stream->buffer.read(buf);
 
-	if (stream->backup_file){
-		// write to file
-		string data;
-		buf.exports(data, 2, SampleFormat::SAMPLE_FORMAT_32_FLOAT);
-		stream->backup_file->write_buffer(data);
-	}
-
 	return r;
 }
 
@@ -210,8 +203,6 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 		playback_delay_const = device->latency;
 		num_channels = device->channels;
 	}
-	backup_file = nullptr;
-	backup_mode = BACKUP_MODE_NONE;
 }
 
 InputStreamAudio::~InputStreamAudio()
@@ -228,11 +219,6 @@ void InputStreamAudio::__init__(Session *session)
 void InputStreamAudio::__delete__()
 {
 	this->InputStreamAudio::~InputStreamAudio();
-}
-
-void InputStreamAudio::set_backup_mode(int mode)
-{
-	backup_mode = mode;
 }
 
 void InputStreamAudio::set_chunk_size(int size)
@@ -297,12 +283,6 @@ void InputStreamAudio::stop()
 
 	capturing = false;
 	buffer.clear();
-	if (backup_file){
-		BackupManager::done(backup_file);
-		backup_file = nullptr;
-		//if (backup_mode != BACKUP_MODE_KEEP)
-		//	file_delete(cur_backup_filename);
-	}
 }
 
 bool InputStreamAudio::start()
@@ -376,9 +356,6 @@ bool InputStreamAudio::start()
 #endif
 
 	capturing = true;
-
-	if (backup_mode != BACKUP_MODE_NONE)
-		backup_file = BackupManager::create_file("raw", session);
 
 	reset_sync();
 	return capturing;

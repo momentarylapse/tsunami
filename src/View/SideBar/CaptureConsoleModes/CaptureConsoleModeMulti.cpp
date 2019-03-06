@@ -58,7 +58,7 @@ void CaptureConsoleModeMulti::enter()
 		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO){
 			c.input_audio = new InputStreamAudio(session);
-			c.input_audio->set_backup_mode(BACKUP_MODE_TEMP);
+			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->add_string(c.id_source, d->get_name());

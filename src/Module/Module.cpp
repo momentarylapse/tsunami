@@ -481,6 +481,12 @@ string Module::type_to_name(ModuleType type)
 		return "InputStreamMidi";
 	if (type == ModuleType::AUDIO_SUCKER)
 		return "AudioSucker";
+	if (type == ModuleType::MIDI_SUCKER)
+		return "MidiSucker";
+	if (type == ModuleType::AUDIO_BACKUP)
+		return "AudioBackup";
+	if (type == ModuleType::MIDI_BACKUP)
+		return "MidiBackup";
 	if (type == ModuleType::AUDIO_JOINER)
 		return "AudioJoiner";
 	if (type == ModuleType::BEAT_MIDIFIER)
@@ -496,6 +502,12 @@ ModuleType Module::type_from_name(const string &str)
 		return ModuleType::AUDIO_SOURCE;
 	if (str == "AudioSucker")
 		return ModuleType::AUDIO_SUCKER;
+	if (str == "MidiSucker")
+		return ModuleType::MIDI_SUCKER;
+	if (str == "AudioBackup")
+		return ModuleType::AUDIO_BACKUP;
+	if (str == "MidiBackup")
+		return ModuleType::MIDI_BACKUP;
 	if (str == "AudioJoiner")
 		return ModuleType::AUDIO_JOINER;
 	if (str == "AudioEffect" or str == "Effect")

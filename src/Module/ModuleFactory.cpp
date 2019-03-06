@@ -8,6 +8,7 @@
 #include "ModuleFactory.h"
 #include "Module.h"
 #include "Audio/SongRenderer.h"
+#include "Audio/AudioBackup.h"
 #include "Audio/AudioJoiner.h"
 #include "Audio/AudioEffect.h"
 #include "Audio/AudioVisualizer.h"
@@ -36,6 +37,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		return new AudioJoiner;
 	}else if (type == ModuleType::AUDIO_SUCKER){
 		return new AudioSucker;
+	}else if (type == ModuleType::AUDIO_BACKUP){
+		return new AudioBackup(session);
 	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song, true);

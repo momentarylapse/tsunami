@@ -72,10 +72,6 @@ public:
 	};
 	Output *out;
 
-	void _cdecl set_backup_mode(int mode);
-	int backup_mode;
-	File *backup_file;
-
 	void _cdecl set_chunk_size(int size);
 	int chunk_size;
 

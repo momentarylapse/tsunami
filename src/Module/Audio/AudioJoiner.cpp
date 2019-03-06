@@ -14,8 +14,8 @@ AudioJoiner::AudioJoiner() :
 {
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&a, "a"));
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&b, "b"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &a, "a"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &b, "b"));
 	a = nullptr;
 	b = nullptr;
 }

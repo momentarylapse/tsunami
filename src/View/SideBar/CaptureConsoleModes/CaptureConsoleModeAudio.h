@@ -16,9 +16,11 @@ class AudioSucker;
 class PeakMeter;
 class Device;
 class Track;
+class SignalChain;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
+	SignalChain *chain;
 	InputStreamAudio *input;
 	PeakMeter *peak_meter;
 	AudioSucker *sucker;

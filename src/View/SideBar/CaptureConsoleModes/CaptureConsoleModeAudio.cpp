@@ -23,6 +23,8 @@
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/Audio/AudioBackup.h"
+#include "../../../Module/SignalChain.h"
 
 
 
@@ -34,6 +36,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	peak_meter = nullptr;
 	target = nullptr;
 	sucker = nullptr;
+	chain = nullptr;
 
 	cc->event("source", [&]{ on_source(); });
 }
@@ -85,39 +88,43 @@ void CaptureConsoleModeAudio::enter()
 		if (t->type == SignalType::AUDIO)
 			set_target((Track*)t);
 
+	chain = new SignalChain(session, "capture");
+
 	input = new InputStreamAudio(session);
-	input->set_backup_mode(BACKUP_MODE_TEMP);
 	input->set_chunk_size(4096);
+	chain->_add(input);
+
 	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
-	peak_meter->plug(0, input, 0);
+	chain->_add(peak_meter);
+	chain->connect(input, 0, peak_meter, 0);
 	cc->peak_meter->set_source(peak_meter);
+
+	auto *backup = new AudioBackup(session);
+	backup->set_backup_mode(BACKUP_MODE_TEMP);
+	chain->_add(backup);
+	chain->connect(peak_meter, 0, backup, 0);
 
 	input->set_device(chosen_device);
 
 	//enable("capture_audio_source", false);
 
-	if (!input->start()){
-		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
-		CapturingByDialog = false;
-		msg_db_l(1);
-		return;*/
-	}
-
 	sucker = CreateAudioSucker(session);
-	sucker->plug(0, peak_meter, 0);
-	sucker->start();
+	chain->_add(sucker);
+	chain->connect(backup, 0, sucker, 0);
+	//chain->connect(peak_meter, 0, sucker, 0);
+
+	chain->start();
 	view->mode_capture->set_data({CaptureTrackData(target,input,sucker)});
 }
 
 void CaptureConsoleModeAudio::leave()
 {
 	view->mode_capture->set_data({});
-	delete sucker;
+	chain->stop();
 	cc->peak_meter->set_source(nullptr);
-	delete peak_meter;
-	delete input;
-	input = nullptr;
+	delete chain;
+	chain = nullptr;
 }
 
 void CaptureConsoleModeAudio::pause()
@@ -134,7 +141,7 @@ void CaptureConsoleModeAudio::start()
 
 void CaptureConsoleModeAudio::stop()
 {
-	input->stop();
+	chain->stop();
 }
 
 void CaptureConsoleModeAudio::dump()

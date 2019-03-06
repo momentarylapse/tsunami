@@ -312,7 +312,7 @@ void SampleManagerConsole::on_song_update()
 
 void SampleManagerConsole::on_preview_tick()
 {
-	int pos = preview_stream->get_pos();
+	int pos = preview_chain->get_pos();
 	Range r = preview_sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 }

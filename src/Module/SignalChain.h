@@ -83,6 +83,8 @@ public:
 	bool playback_active;
 	bool is_paused();
 	bool is_playback_active();
+
+	int get_pos();
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

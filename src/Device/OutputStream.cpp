@@ -547,11 +547,9 @@ bool OutputStream::is_paused()
 	return paused;
 }
 
-int OutputStream::get_pos()
+int OutputStream::get_available()
 {
-	if (!source)
-		return 0;
-	return source->get_pos(- ring_buf.available());
+	return ring_buf.available();
 }
 
 float OutputStream::get_volume()

@@ -482,7 +482,6 @@ class OutputStream extends Module
 	extern void play()
 	extern void pause(bool pause)
 	//extern void setSource(AudioSource *r)
-	extern int get_pos()
 	extern float get_volume()
 	extern void set_volume(float volume)
 	extern void set_buffer_size(int size)
@@ -527,6 +526,7 @@ class Storage
 
 class SignalChain extends Module
 	extern void set_update_dt(float dt)
+	extern int get_pos()
 
 class Session
 	int id

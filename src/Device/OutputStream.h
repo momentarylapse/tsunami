@@ -60,7 +60,7 @@ public:
 
 	bool _cdecl is_paused();
 	void _cdecl set_device(Device *d);
-	int _cdecl get_pos();
+	int _cdecl get_available();
 
 	void _cdecl clear_buffer();
 

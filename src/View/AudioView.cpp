@@ -1581,7 +1581,7 @@ bool AudioView::is_paused()
 
 int AudioView::playback_pos()
 {
-	return stream->get_pos();
+	return session->signal_chain->get_pos();
 }
 
 bool AudioView::has_any_solo_track()

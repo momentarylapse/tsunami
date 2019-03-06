@@ -514,7 +514,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
 	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
 	Kaba::LinkExternal("OutputStream.is_paused", Kaba::mf(&OutputStream::is_paused));
-	Kaba::LinkExternal("OutputStream.get_pos", Kaba::mf(&OutputStream::get_pos));
 	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
@@ -524,6 +523,7 @@ void PluginManager::link_app_script_data()
 
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
+	Kaba::LinkExternal("SignalChain.get_pos", Kaba::mf(&SignalChain::get_pos));
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));

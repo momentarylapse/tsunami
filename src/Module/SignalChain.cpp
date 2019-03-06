@@ -9,6 +9,7 @@
 #include "Module.h"
 #include "ModuleFactory.h"
 #include "Port/MidiPort.h"
+#include "Audio/AudioSource.h"
 #include "../Session.h"
 #include "../Plugins/PluginManager.h"
 #include "../Device/OutputStream.h"
@@ -386,5 +387,19 @@ void SignalChain::on_module_play_end_of_stream()
 {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 	stop();
+}
+
+int SignalChain::get_pos()
+{
+	int delta = 0;
+	if (playback_active){
+		for (auto *m: modules)
+			if (m->module_type == ModuleType::OUTPUT_STREAM_AUDIO)
+				delta = - ((OutputStream*)m)->get_available();
+		for (auto *m: modules)
+			if (m->module_type == ModuleType::AUDIO_SOURCE)
+				return ((AudioSource*)m)->get_pos(delta);
+	}
+	return 0;
 }
 

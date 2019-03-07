@@ -316,9 +316,5 @@ void InputStreamMidi::command(ModuleCommand cmd)
 		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
-	else if (cmd == ModuleCommand::PAUSE)
-		stop();
-	else if (cmd == ModuleCommand::UNPAUSE)
-		start();
 }
 

@@ -144,7 +144,7 @@ void CaptureConsoleModeAudio::stop()
 void CaptureConsoleModeAudio::dump()
 {
 	sucker->accumulate(false);
-	sucker->reset_accumulation();
+	sucker->reset_state();
 	cc->enable("source", true);
 }
 
@@ -154,7 +154,7 @@ bool CaptureConsoleModeAudio::insert()
 	int dpos = input->get_delay();
 
 	bool ok = cc->insert_audio(target, sucker->buf, dpos);
-	sucker->reset_accumulation();
+	sucker->reset_state();
 	return ok;
 
 }

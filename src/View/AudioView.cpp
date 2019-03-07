@@ -1560,13 +1560,15 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop)
 
 void AudioView::stop()
 {
-	signal_chain->stop();
+	signal_chain->stop_hard();
 }
 
 void AudioView::pause(bool _pause)
 {
-	signal_chain->pause(_pause);
-	//stream->pause(_pause);
+	if (_pause)
+		signal_chain->stop();
+	else
+		signal_chain->start();
 }
 
 bool AudioView::is_playback_active()

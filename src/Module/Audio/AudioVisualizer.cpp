@@ -66,12 +66,6 @@ void AudioVisualizer::set_chunk_size(int _chunk_size)
 	chunk_size = _chunk_size;
 }
 
-void AudioVisualizer::command(ModuleCommand cmd)
-{
-	if (cmd == ModuleCommand::RESET_BUFFER)
-		reset_state();
-}
-
 // TODO: move to PluginManager?
 AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name)
 {

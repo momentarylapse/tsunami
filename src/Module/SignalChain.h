@@ -74,10 +74,16 @@ public:
 	void _cdecl set_tick_dt(float dt);
 	void command(ModuleCommand cmd) override;
 	void start();
-	void pause(bool paused);
 	void stop();
+	void stop_hard();
 
-	bool playback_active;
+	enum class State
+	{
+		STOPPED,
+		ACTIVE,
+		PAUSED
+	};
+	State state;
 	bool is_paused();
 	bool is_playback_active();
 

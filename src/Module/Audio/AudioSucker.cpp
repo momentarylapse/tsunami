@@ -14,7 +14,6 @@
 #include "../../Data/base.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
-const string AudioSucker::MESSAGE_UPDATE = "Update";
 
 
 class AudioSuckerThread : public Thread
@@ -87,7 +86,7 @@ void AudioSucker::accumulate(bool enable)
 	accumulating = enable;
 }
 
-void AudioSucker::reset_accumulation()
+void AudioSucker::reset_state()
 {
 	buf.clear();
 }
@@ -118,8 +117,6 @@ void AudioSucker::command(ModuleCommand cmd)
 		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
-	else if (cmd == ModuleCommand::RESET_BUFFER)
-		reset_accumulation();
 }
 
 int AudioSucker::update()
@@ -135,7 +132,6 @@ int AudioSucker::update()
 		temp.resize(r);
 		buf.append(temp);
 	}
-	Observable::notify(MESSAGE_UPDATE);
 	return r;
 }
 

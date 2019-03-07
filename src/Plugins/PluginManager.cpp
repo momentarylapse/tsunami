@@ -509,15 +509,13 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
 	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);
 	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
-	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::play));
+	Kaba::LinkExternal("OutputStream.start", Kaba::mf(&OutputStream::start));
 	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
-	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
-	Kaba::LinkExternal("OutputStream.is_paused", Kaba::mf(&OutputStream::is_paused));
 	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
 	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
-//	Kaba::DeclareClassVirtualIndex("OutputStream", "", Kaba::mf(&OutputStream::__delete__), &stream);
+	Kaba::DeclareClassVirtualIndex("OutputStream", "reset_state", Kaba::mf(&OutputStream::reset_state), &stream);
 	}
 
 	SignalChain chain(Session::GLOBAL, "");

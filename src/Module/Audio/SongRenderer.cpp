@@ -260,15 +260,13 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 	//clear_data();
 	_range = __range;
 	allow_loop = _allow_loop;
-	_set_pos(_range.offset);
 
 	for (Track* t: song->tracks)
 		allowed_tracks.add(t);
 	for (TrackLayer* l: song->layers())
 		allowed_layers.add(l);
 
-	reset_state();
-	//build_data();
+	set_pos(_range.offset);
 }
 
 void SongRenderer::reset_state()

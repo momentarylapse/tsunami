@@ -38,8 +38,6 @@ public:
 	int chunk_size;
 	void set_chunk_size(int chunk_size);
 
-	void command(ModuleCommand cmd) override;
-
 	virtual _cdecl void process(AudioBuffer &buf){}
 };
 

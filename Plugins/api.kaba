@@ -465,13 +465,11 @@ class OutputStream extends Module
 	extern void __init__(Session *session)
 	extern override void __delete__()
 	extern void stop()
-	extern void play()
-	extern void pause(bool pause)
+	extern void start()
 	//extern void setSource(AudioSource *r)
 	extern float get_volume()
 	extern void set_volume(float volume)
 	extern void set_buffer_size(int size)
-	extern bool is_paused()
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer

@@ -33,7 +33,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 {
 	session = s;
 	name = _name;
-	playback_active = false;
+	state = State::STOPPED;
 	hui_runner = -1;
 	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
@@ -326,46 +326,40 @@ void SignalChain::reset_state()
 
 void SignalChain::start()
 {
-	if (is_playback_active())
+	if (state == State::ACTIVE)
 		return;
 
-	reset_state();
 	for (auto *m: modules)
 		m->command(ModuleCommand::START);
-	playback_active = true;
+	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
 	hui_runner = hui::RunRepeated(tick_dt, [&]{ notify(MESSAGE_TICK); });
 }
 
 void SignalChain::stop()
 {
-	if (!is_playback_active())
+	if (state != State::ACTIVE)
 		return;
 
 	hui::CancelRunner(hui_runner);
 	for (auto *m: modules)
 		m->command(ModuleCommand::STOP);
-	playback_active = false;
+	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void SignalChain::pause(bool paused)
+void SignalChain::stop_hard()
 {
-	if (!playback_active)
-		return;
-	for (auto *m: modules)
-		m->command(paused ? ModuleCommand::PAUSE : ModuleCommand::UNPAUSE);
+	stop();
+	reset_state();
+	state = State::STOPPED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
 
 bool SignalChain::is_paused()
 {
-	if (playback_active)
-		for (auto *m: modules)
-			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
-				return ((OutputStream*)m)->is_paused();
-	return false;
+	return state == State::PAUSED;
 }
 
 void SignalChain::command(ModuleCommand cmd)
@@ -374,10 +368,6 @@ void SignalChain::command(ModuleCommand cmd)
 		start();
 	}else if (cmd == ModuleCommand::STOP){
 		stop();
-	}else if (cmd == ModuleCommand::PAUSE){
-		pause(true);
-	}else if (cmd == ModuleCommand::UNPAUSE){
-		pause(false);
 	}else{
 		for (Module *m: modules)
 			m->command(cmd);
@@ -386,20 +376,20 @@ void SignalChain::command(ModuleCommand cmd)
 
 bool SignalChain::is_playback_active()
 {
-	return playback_active;
+	return (state == State::ACTIVE) or (state == State::PAUSED);
 }
 
 void SignalChain::on_module_play_end_of_stream()
 {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
-	stop();
+	stop_hard();
 }
 
 int SignalChain::get_pos()
 {
 	int delta = 0;
 	int pos;
-	if (playback_active){
+	if (is_playback_active()){
 		for (auto *m: modules)
 			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
 				delta = - ((OutputStream*)m)->get_available();
@@ -412,14 +402,7 @@ int SignalChain::get_pos()
 
 void SignalChain::set_pos(int pos)
 {
-	for (auto *m: modules){
-		if (m->module_type == ModuleType::AUDIO_SOURCE)
-			((AudioSource*)m)->set_pos(pos);
-		else if (m->module_type == ModuleType::MIDI_SOURCE)
-			((MidiSource*)m)->set_pos(pos);
-		else if (m->module_type == ModuleType::BEAT_SOURCE)
-			((BeatSource*)m)->set_pos(pos);
-	}
-	command(ModuleCommand::RESET_BUFFER);
+	for (auto *m: modules)
+		m->set_pos(pos);
 }
 

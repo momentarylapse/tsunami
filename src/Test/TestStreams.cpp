@@ -55,13 +55,13 @@ void TestStreams::test_output_stream()
 	stream->plug(0, source, 0);
 
 	msg_write("play");
-	stream->play();
+	stream->start();
 	sleep(1);
 	msg_write("stop");
 	stream->stop();
 	sleep(1);
 	msg_write("play");
-	stream->play();
+	stream->start();
 	sleep(1);
 	msg_write("stop");
 	stream->stop();

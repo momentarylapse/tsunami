@@ -22,8 +22,9 @@ public:
 	~AudioSucker() override;
 
 	void accumulate(bool enable);
-	void reset_accumulation();
 	void set_buffer_size(int size);
+
+	void reset_state() override;
 
 	void start();
 	void stop();
@@ -31,7 +32,6 @@ public:
 	int update();
 
 	static const int DEFAULT_BUFFER_SIZE;
-	static const string MESSAGE_UPDATE;
 
 	Port *source;
 	AudioBuffer buf;

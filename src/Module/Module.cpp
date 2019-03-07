@@ -10,7 +10,8 @@
 #include "ConfigPanel.h"
 #include "AutoConfigPanel.h"
 #include "ModuleConfiguration.h"
-#include "Synth/DummySynthesizer.h"
+#include "ModuleFactory.h"
+#include "Port/Port.h"
 #include "../Session.h"
 #include "../lib/kaba/kaba.h"
 #include "../lib/kaba/syntax/Class.h"
@@ -51,6 +52,7 @@ Module::~Module()
 		delete p;
 }
 
+
 void Module::__init__(ModuleType type, const string &sub_type)
 {
 	new(this) Module(type, sub_type);
@@ -62,6 +64,7 @@ void Module::__delete__()
 }
 
 
+// internal use for creation
 void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *_plugin)
 {
 	session = _session;
@@ -74,6 +77,9 @@ void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *
 	reset_state();
 }
 
+
+// default version:
+//   look for a Module.config in the plugin class
 ModuleConfiguration *Module::get_config() const
 {
 	const Kaba::Class *c = Kaba::GetDynamicType(this);
@@ -88,6 +94,7 @@ ModuleConfiguration *Module::get_config() const
 	return nullptr;
 }
 
+
 string Module::config_to_string() const
 {
 	ModuleConfiguration *config = get_config();
@@ -97,6 +104,7 @@ string Module::config_to_string() const
 	string s = var_to_string(config->_class, (char*)config);
 	return s;
 }
+
 
 void Module::config_from_string(const string &param)
 {
@@ -111,7 +119,7 @@ void Module::config_from_string(const string &param)
 }
 
 
-// default version of ResetConfig()
+// default version
 //   try to execute   Module.config.reset()
 void Module::reset_config()
 {
@@ -121,7 +129,9 @@ void Module::reset_config()
 	on_config();
 }
 
-// default handler...
+
+// default version
+//   try to create an AutoConfigPanel
 ConfigPanel *Module::create_panel()
 {
 	ModuleConfiguration *config = get_config();
@@ -133,6 +143,7 @@ ConfigPanel *Module::create_panel()
 	return new AutoConfigPanel(aa, this);
 }
 
+
 string Module::get_error()
 {
 	if (plugin)
@@ -141,32 +152,18 @@ string Module::get_error()
 }
 
 
-/*void Module::updateDialog()
-{
-	if (_auto_panel_){
-		_auto_panel_->update();
-	}
-}*/
-
+// called by the ConfigPanel to signal a config change
 void Module::changed()
 {
 	on_config();
-	Observable::notify();
+	notify();
 }
+
 
 Module *Module::copy() const
 {
-	const Kaba::Class *c = Kaba::GetDynamicType(this);
-	if (!c){
-		if (this->module_type == ModuleType::SYNTHESIZER)
-			return new DummySynthesizer;
-		return nullptr;
-	}
-	Module *clone = (Module*)c->create_instance();
-
-	clone->set_session_etc(session, module_subtype, plugin);
+	Module *clone = ModuleFactory::create(session, module_type, module_subtype);
 	clone->config_from_string(config_to_string());
-
 	return clone;
 }
 
@@ -198,6 +195,7 @@ string Module::type_to_name(ModuleType type)
 	return "???";
 }
 
+
 ModuleType Module::type_from_name(const string &str)
 {
 	if (str == "AudioSource")
@@ -223,6 +221,7 @@ ModuleType Module::type_from_name(const string &str)
 	return (ModuleType)-1;
 }
 
+
 void Module::plug(int in_port, Module* source, int out_port)
 {
 	if (in_port < 0 or in_port >= port_in.num)
@@ -238,6 +237,7 @@ void Module::plug(int in_port, Module* source, int out_port)
 	*port_in[in_port].port = nullptr;
 	*port_in[in_port].port = p;
 }
+
 
 void Module::unplug(int in_port)
 {

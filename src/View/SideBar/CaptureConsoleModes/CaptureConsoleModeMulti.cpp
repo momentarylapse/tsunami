@@ -119,7 +119,7 @@ bool CaptureConsoleModeMulti::insert()
 		if (c.track->type == SignalType::AUDIO){
 			int dpos = c.input_audio->get_delay();
 			ok &= cc->insert_audio(c.track, c.sucker->buf, dpos);
-			c.sucker->reset_accumulation();
+			c.sucker->reset_state();
 		}else if (c.track->type == SignalType::MIDI){
 			int dpos = c.input_midi->get_delay();
 			ok &= cc->insert_midi(c.track, c.input_midi->midi, dpos);
@@ -215,7 +215,7 @@ void CaptureConsoleModeMulti::dump()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			c.sucker->accumulate(false);
-			c.sucker->reset_accumulation();
+			c.sucker->reset_state();
 		}else if (c.track->type == SignalType::MIDI){
 			c.input_midi->accumulate(true);
 		}

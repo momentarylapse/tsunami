@@ -354,7 +354,7 @@ void playback_seek_relative(AudioView *view, float dt)
 	int pos = view->playback_pos();
 	pos += dt * view->song->sample_rate;
 	pos = max(pos, view->renderer->range().offset);
-	view->signal_chain->command(ModuleCommand::RESET_BUFFER);
+	view->signal_chain->set_pos(pos);
 }
 
 void ViewModeDefault::on_key_down(int k)

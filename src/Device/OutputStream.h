@@ -46,22 +46,21 @@ public:
 	void _create_dev();
 	void _kill_dev();
 
+	void reset_state() override;
+
 
 	void _cdecl stop();
-	void _cdecl play();
-	void _cdecl pause(bool pause);
+	void _cdecl start();
+
+	void _pause();
+	void _unpause();
 
 	bool fully_initialized;
 	bool buffer_is_cleared;
 	void _start_first_time();
-	void _unpause();
-	void _pause();
 
-	bool _cdecl is_paused();
 	void _cdecl set_device(Device *d);
 	int _cdecl get_available();
-
-	void _cdecl clear_buffer();
 
 	float _cdecl get_volume();
 	void _cdecl set_volume(float _volume);
@@ -72,7 +71,6 @@ private:
 	void _read_stream();
 
 	float volume;
-	bool paused;
 	int buffer_size;
 
 	Port *source;
@@ -98,6 +96,7 @@ private:
 	DeviceManager *device_manager;
 	Device *device;
 	bool killed;
+	bool paused;
 
 	StreamThread *thread;
 	int perf_channel;

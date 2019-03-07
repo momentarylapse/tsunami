@@ -211,7 +211,6 @@ OutputStream::OutputStream(Session *_session) :
 	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 
 	fully_initialized = false;
-	paused = false;
 	volume = 1;
 
 	device_manager = session->device_manager;
@@ -220,6 +219,7 @@ OutputStream::OutputStream(Session *_session) :
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	killed = false;
+	paused = false;
 	thread = nullptr;
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
@@ -307,7 +307,6 @@ void OutputStream::_create_dev()
 
 void OutputStream::_kill_dev()
 {
-//	printf("output kill dev\n");
 	if (!paused)
 		_pause();
 
@@ -336,23 +335,14 @@ void OutputStream::_kill_dev()
 void OutputStream::stop()
 {
 	_pause();
-	if (thread){
-		thread->keep_running = false;
-		thread->join();
-		delete thread;
-		thread = nullptr;
-	}
-
-	clear_buffer();
 }
 
 void OutputStream::_pause()
 {
 	if (!fully_initialized)
 		return;
-	if (is_paused())
+	if (paused)
 		return;
-//	printf("pause...");
 
 	paused = true;
 
@@ -369,7 +359,14 @@ void OutputStream::_pause()
 		_portaudio_test_error(err, "Pa_StopStream");
 	}
 #endif
-//	printf("ok\n");
+
+
+	if (thread){
+		thread->keep_running = false;
+		thread->join();
+		delete thread;
+		thread = nullptr;
+	}
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -378,9 +375,8 @@ void OutputStream::_unpause()
 {
 	if (!fully_initialized)
 		return;
-	if (!is_paused())
+	if (!paused)
 		return;
-//	printf("unpause...");
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
@@ -404,20 +400,8 @@ void OutputStream::_unpause()
 		_portaudio_test_error(err, "Pa_StartStream");
 	}
 #endif
-//	printf("ok\n");
 
 	notify(MESSAGE_STATE_CHANGE);
-}
-
-void OutputStream::pause(bool __pause)
-{
-	if (paused == __pause)
-		return;
-
-	if (__pause)
-		_pause();
-	else
-		_unpause();
 }
 
 void OutputStream::_read_stream()
@@ -458,7 +442,7 @@ void OutputStream::set_device(Device *d)
 	device = d;
 }
 
-void OutputStream::play()
+void OutputStream::start()
 {
 	if (fully_initialized)
 		_unpause();
@@ -468,7 +452,6 @@ void OutputStream::play()
 
 void OutputStream::_start_first_time()
 {
-//	printf("stream start first\n");
 	read_end_of_stream = false;
 	played_end_of_stream = false;
 
@@ -501,7 +484,7 @@ void OutputStream::_start_first_time()
 
 
 		if (!pa_wait_stream_ready(pulse_stream)){
-			msg_write("retry");
+			session->w("retry");
 
 			// retry with default device
 			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, (pa_stream_flags)0, nullptr, nullptr);
@@ -509,7 +492,6 @@ void OutputStream::_start_first_time()
 
 			if (!pa_wait_stream_ready(pulse_stream)){
 				// still no luck... give up
-				msg_write("aaaaa");
 				session->e("pa_wait_for_stream_ready");
 				stop();
 				return;
@@ -536,11 +518,6 @@ void OutputStream::_start_first_time()
 	fully_initialized = true;
 
 	notify(MESSAGE_STATE_CHANGE);
-}
-
-bool OutputStream::is_paused()
-{
-	return paused;
 }
 
 int OutputStream::get_available()
@@ -585,7 +562,6 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 void OutputStream::on_played_end_of_stream()
 {
 	//printf("---------ON PLAY END OF STREAM\n");
-	//pause(true);
 
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 }
@@ -605,22 +581,23 @@ void OutputStream::on_read_end_of_stream()
 	notify(MESSAGE_READ_END_OF_STREAM);
 }
 
-void OutputStream::clear_buffer()
+void OutputStream::reset_state()
 {
 	ring_buf.clear();
 	buffer_is_cleared = true;
+
+/*#if HAS_LIB_PULSEAUDIO
+	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
+		if (pulse_stream)
+			pa_stream_flush(pulse_stream, nullptr, nullptr);
+	}
+#endif*/
 }
 
 void OutputStream::command(ModuleCommand cmd)
 {
 	if (cmd == ModuleCommand::START)
-		play();
+		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
-	else if (cmd == ModuleCommand::PAUSE)
-		pause(true);
-	else if (cmd == ModuleCommand::UNPAUSE)
-		pause(false);
-	else if (cmd == ModuleCommand::RESET_BUFFER)
-		clear_buffer();
 }

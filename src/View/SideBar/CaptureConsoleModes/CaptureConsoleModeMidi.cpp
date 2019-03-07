@@ -65,7 +65,7 @@ void CaptureConsoleModeMidi::set_target(Track *t)
 	preview_stream = new OutputStream(session);
 	preview_stream->plug(0, peak_meter, 0);
 	preview_stream->set_buffer_size(512);
-	preview_stream->play();
+	preview_stream->start();
 
 
 	bool ok = (target->type == SignalType::MIDI);

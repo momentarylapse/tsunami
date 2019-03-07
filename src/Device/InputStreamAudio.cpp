@@ -179,7 +179,6 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	Module(ModuleType::STREAM, "AudioInput"),
 	buffer(1048576)
 {
-//	printf("input new\n");
 	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
 	chunk_size = DEFAULT_CHUNK_SIZE;
@@ -207,7 +206,6 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 
 InputStreamAudio::~InputStreamAudio()
 {
-//	printf("input del\n");
 	stop();
 }
 
@@ -415,8 +413,4 @@ void InputStreamAudio::command(ModuleCommand cmd)
 		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
-	else if (cmd == ModuleCommand::PAUSE)
-		stop();
-	else if (cmd == ModuleCommand::UNPAUSE)
-		start();
 }

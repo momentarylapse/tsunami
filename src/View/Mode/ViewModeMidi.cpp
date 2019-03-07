@@ -7,10 +7,8 @@
 
 #include "ViewModeMidi.h"
 
-#include "../../Module/Audio/SongRenderer.h"
-#include "../../Module/Synth/Synthesizer.h"
-#include "../../Module/Port/Port.h"
-#include "../../Device/OutputStream.h"
+#include "../../Module/SignalChain.h"
+#include "../../Device/InputStreamMidi.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -18,7 +16,6 @@
 #include "../../Data/Sample.h"
 #include "../../Data/Midi/Clef.h"
 #include "../../Data/SongSelection.h"
-#include "../../Data/SampleRef.h"
 #include "../../Data/Midi/Clef.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
@@ -42,6 +39,15 @@ MidiPainter* midi_context(ViewModeMidi *vm)
 	mp->set_context(l->area, l->layer->track->instrument, vm->view->midi_scale, l->is_playable(), l->midi_mode);
 	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
 	return mp;
+}
+
+
+MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, float volume = 1.0f)
+{
+	auto *n = new MidiNote(r, pitch, volume);
+	n->modifier = mod;
+	n->clef_position = clef_pos;
+	return n;
 }
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
@@ -71,6 +77,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);
 
 	preview = new MidiPreview(view->session);
+	input_chain = nullptr;
+	input = nullptr;
 
 	mouse_pre_moving_pos = -1;
 
@@ -139,12 +147,57 @@ void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl)
 	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
 }
 
+static hui::Timer ri_timer;
+static MidiEventBuffer ri_keys;
+
+void ri_insert(ViewModeMidi *me)
+{
+	if (ri_keys.num == 0)
+		return;
+	Range r = me->get_midi_edit_range();
+	for (auto &e: ri_keys){
+		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, e.volume));
+		me->start_midi_preview(e.pitch, 0.1f);
+	}
+	ri_keys.clear();
+	me->set_cursor_pos(r.end() + 1, true);
+	ri_timer.get();
+
+}
+
+void on_midi_input(ViewModeMidi *me)
+{
+	MidiEventBuffer buf;
+	buf.samples = 1024;
+	me->input->out->read_midi(buf);
+	for (auto &e: buf){
+		if (e.volume > 0){
+			if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
+				ri_insert(me);
+			ri_keys.add(e);
+			ri_timer.get();
+		}else{
+			ri_insert(me);
+		}
+	}
+
+}
+
 void ViewModeMidi::on_start()
 {
+	input_chain = new SignalChain(session, "midi-input");
+	input = (InputStreamMidi*)input_chain->add(ModuleType::STREAM, "MidiInput");
+	input_chain->subscribe(this, [&]{ on_midi_input(this); }, Module::MESSAGE_TICK);
+	input_chain->start();
 }
 
 void ViewModeMidi::on_end()
 {
+	input_chain->unsubscribe(this);
+	input_chain->stop();
+	delete input_chain;
+	input_chain= nullptr;
+	input = nullptr;
 }
 
 void ViewModeMidi::on_left_button_down()
@@ -230,14 +283,6 @@ void ViewModeMidi::on_mouse_move()
 			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
 		}
 	}
-}
-
-MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, float volume = 1.0f)
-{
-	auto *n = new MidiNote(r, pitch, volume);
-	n->modifier = mod;
-	n->clef_position = clef_pos;
-	return n;
 }
 
 void ViewModeMidi::edit_add_pause()

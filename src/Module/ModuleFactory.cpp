@@ -71,7 +71,7 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 		if (sub_type == "AudioInput")
 			return new InputStreamAudio(session);
 		if (sub_type == "MidiInput")
-			new InputStreamMidi(session);
+			return new InputStreamMidi(session);
 	}
 	return nullptr;
 }

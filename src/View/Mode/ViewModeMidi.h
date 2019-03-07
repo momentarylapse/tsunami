@@ -19,6 +19,8 @@ class Synthesizer;
 class MidiPreview;
 class TrackLayer;
 class ScrollBar;
+class InputStreamMidi;
+class SignalChain;
 enum class NoteModifier;
 enum class ChordType;
 
@@ -95,6 +97,9 @@ public:
 	InputMode input_mode;
 
 	MidiPreview *preview;
+
+	SignalChain *input_chain;
+	InputStreamMidi *input;
 
 	AudioViewLayer *cur_vlayer();
 	TrackLayer *cur_layer();

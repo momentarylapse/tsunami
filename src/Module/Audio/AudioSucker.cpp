@@ -12,6 +12,7 @@
 #include "../Port/Port.h"
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
+#include "../../Data/Audio/AudioBuffer.h"
 
 const int AudioSucker::DEFAULT_BUFFER_SIZE = 1024;
 
@@ -62,7 +63,6 @@ AudioSucker::AudioSucker() :
 {
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
-	accumulating = false;
 	running = false;
 	thread = nullptr;//new AudioSuckerThread(this);
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -79,16 +79,6 @@ AudioSucker::~AudioSucker()
 		delete(thread);
 		thread = nullptr;
 	}
-}
-
-void AudioSucker::accumulate(bool enable)
-{
-	accumulating = enable;
-}
-
-void AudioSucker::reset_state()
-{
-	buf.clear();
 }
 
 void AudioSucker::start()
@@ -128,10 +118,6 @@ int AudioSucker::update()
 		return r;
 	if (r == source->END_OF_STREAM)
 		return r;
-	if (accumulating){
-		temp.resize(r);
-		buf.append(temp);
-	}
 	return r;
 }
 

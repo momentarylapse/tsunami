@@ -10,6 +10,7 @@
 #include "Audio/SongRenderer.h"
 #include "Audio/AudioBackup.h"
 #include "Audio/AudioJoiner.h"
+#include "Audio/AudioRecorder.h"
 #include "Audio/AudioEffect.h"
 #include "Audio/AudioVisualizer.h"
 #include "Audio/PeakMeter.h"
@@ -40,6 +41,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new AudioSucker;
 		if (sub_type == "AudioBackup")
 			return new AudioBackup(session);
+		if (sub_type == "AudioRecorder")
+			return new AudioRecorder;
 	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song, true);

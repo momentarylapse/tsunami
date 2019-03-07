@@ -21,9 +21,9 @@ struct CaptureTrackData
 {
 	Track *target;
 	Module *input;
-	Module *sucker;
+	Module *recorder;
 	CaptureTrackData();
-	CaptureTrackData(Track *target, Module *input, Module *sucker = nullptr);
+	CaptureTrackData(Track *target, Module *input, Module *recorder = nullptr);
 	SignalType type();
 };
 

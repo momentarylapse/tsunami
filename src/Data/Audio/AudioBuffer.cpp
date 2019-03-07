@@ -182,7 +182,7 @@ void AudioBuffer::swap_ref(AudioBuffer &b)
 	b.channels = t;
 }
 
-void AudioBuffer::append(AudioBuffer &b)
+void AudioBuffer::append(const AudioBuffer &b)
 {
 	int num0 = length;
 	resize(length + b.length);

@@ -52,7 +52,7 @@ public:
 	void _cdecl scale(float volume, float panning = 0);
 	void _cdecl swap_ref(AudioBuffer &b);
 	void _cdecl swap_value(AudioBuffer &b);
-	void _cdecl append(AudioBuffer &b);
+	void _cdecl append(const AudioBuffer &b);
 	void _cdecl set(const AudioBuffer &b, int offset, float volume);
 	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume);
 	void _cdecl add(const AudioBuffer &b, int offset, float volume, float panning);

@@ -13,15 +13,15 @@
 #include "../../Data/Track.h"
 #include "../../Device/InputStreamAudio.h"
 #include "../../Device/InputStreamMidi.h"
-#include "../../Module/Audio/AudioSucker.h"
+#include "../../Module/Audio/AudioRecorder.h"
 #include "../SideBar/SideBar.h"
 
 CaptureTrackData::CaptureTrackData(){}
-CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_sucker)
+CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_recorder)
 {
 	target = _target;
 	input = _input;
-	sucker = _sucker;
+	recorder = _recorder;
 }
 
 SignalType CaptureTrackData::type()
@@ -63,7 +63,7 @@ void ViewModeCapture::draw_post(Painter *c)
 		if (d.type() == SignalType::AUDIO){
 			InputStreamAudio *input_audio = (InputStreamAudio*)d.input;
 			if (input_audio and input_audio->is_capturing()){
-				AudioBuffer &buf = ((AudioSucker*)d.sucker)->buf;
+				AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
 				view->update_peaks_now(buf);
 				auto *l = view->get_layer(d.target->layers[0]);
 				view->buffer_painter->set_context(l->area);

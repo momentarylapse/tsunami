@@ -19,6 +19,7 @@
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Module/Audio/AudioSucker.h"
+#include "../../../Module/Audio/AudioRecorder.h"
 #include "../../../Module/Audio/PeakMeter.h"
 #include "../../../Module/ModuleFactory.h"
 
@@ -102,7 +103,7 @@ void CaptureConsoleModeMulti::pause()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			c.sucker->accumulate(false);
+			c.recorder->accumulate(false);
 		}else if (c.track->type == SignalType::MIDI){
 			c.input_midi->accumulate(false);
 		}
@@ -118,7 +119,7 @@ bool CaptureConsoleModeMulti::insert()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			int dpos = c.input_audio->get_delay();
-			ok &= cc->insert_audio(c.track, c.sucker->buf, dpos);
+			ok &= cc->insert_audio(c.track, c.recorder->buf, dpos);
 			c.sucker->reset_state();
 		}else if (c.track->type == SignalType::MIDI){
 			int dpos = c.input_midi->get_delay();
@@ -187,7 +188,7 @@ void CaptureConsoleModeMulti::start()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			c.input_audio->reset_sync();
-			c.sucker->accumulate(true);
+			c.recorder->accumulate(true);
 			data.add({c.track, c.input_audio, c.sucker});
 		}else if (c.track->type == SignalType::MIDI){
 			c.input_midi->accumulate(true);
@@ -214,8 +215,8 @@ void CaptureConsoleModeMulti::dump()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			c.sucker->accumulate(false);
-			c.sucker->reset_state();
+			c.recorder->accumulate(false);
+			c.recorder->reset_state();
 		}else if (c.track->type == SignalType::MIDI){
 			c.input_midi->accumulate(true);
 		}
@@ -227,7 +228,7 @@ int CaptureConsoleModeMulti::get_sample_count()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			return c.sucker->buf.length;
+			return c.recorder->buf.length;
 		}else if (c.track->type == SignalType::MIDI){
 			return c.input_midi->get_sample_count();
 		}

@@ -21,7 +21,7 @@
 #include "../../../Stuff/BackupManager.h"
 #include "../../../Action/ActionManager.h"
 #include "../../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../../Module/Audio/AudioSucker.h"
+#include "../../../Module/Audio/AudioRecorder.h"
 #include "../../../Module/Audio/PeakMeter.h"
 #include "../../../Module/Audio/AudioBackup.h"
 #include "../../../Module/SignalChain.h"
@@ -35,7 +35,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	input = nullptr;
 	peak_meter = nullptr;
 	target = nullptr;
-	sucker = nullptr;
+	recorder = nullptr;
 	chain = nullptr;
 
 	cc->event("source", [&]{ on_source(); });
@@ -53,8 +53,6 @@ void CaptureConsoleModeAudio::on_source()
 void CaptureConsoleModeAudio::set_target(Track *t)
 {
 	target = t;
-	// FIXME ...
-	//view->setCurTrack(target);
 
 	bool ok = (target->type == SignalType::AUDIO);
 	cc->set_string("message", "");
@@ -90,9 +88,8 @@ void CaptureConsoleModeAudio::enter()
 
 	chain = new SignalChain(session, "capture");
 
-	input = new InputStreamAudio(session);
+	input = (InputStreamAudio*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->set_chunk_size(4096);
-	chain->_add(input);
 
 	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
@@ -103,16 +100,19 @@ void CaptureConsoleModeAudio::enter()
 	backup->set_backup_mode(BACKUP_MODE_TEMP);
 	chain->connect(peak_meter, 0, backup, 0);
 
+	recorder = (AudioRecorder*)chain->add(ModuleType::PLUMBING, "AudioRecorder");
+	chain->connect(backup, 0, recorder, 0);
+
 	input->set_device(chosen_device);
 
 	//enable("capture_audio_source", false);
 
-	sucker = (AudioSucker*)chain->add(ModuleType::PLUMBING, "AudioSucker");
-	chain->connect(backup, 0, sucker, 0);
+	auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+	chain->connect(recorder, 0, sucker, 0);
 	//chain->connect(peak_meter, 0, sucker, 0);
 
 	chain->start();
-	view->mode_capture->set_data({CaptureTrackData(target,input,sucker)});
+	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
 }
 
 void CaptureConsoleModeAudio::leave()
@@ -126,13 +126,13 @@ void CaptureConsoleModeAudio::leave()
 
 void CaptureConsoleModeAudio::pause()
 {
-	sucker->accumulate(false);
+	recorder->accumulate(false);
 }
 
 void CaptureConsoleModeAudio::start()
 {
 	input->reset_sync();
-	sucker->accumulate(true);
+	recorder->accumulate(true);
 	cc->enable("source", false);
 }
 
@@ -143,8 +143,8 @@ void CaptureConsoleModeAudio::stop()
 
 void CaptureConsoleModeAudio::dump()
 {
-	sucker->accumulate(false);
-	sucker->reset_state();
+	recorder->accumulate(false);
+	recorder->reset_state();
 	cc->enable("source", true);
 }
 
@@ -153,15 +153,15 @@ bool CaptureConsoleModeAudio::insert()
 	// insert recorded data with some delay
 	int dpos = input->get_delay();
 
-	bool ok = cc->insert_audio(target, sucker->buf, dpos);
-	sucker->reset_state();
+	bool ok = cc->insert_audio(target, recorder->buf, dpos);
+	recorder->reset_state();
 	return ok;
 
 }
 
 int CaptureConsoleModeAudio::get_sample_count()
 {
-	return sucker->buf.length;
+	return recorder->buf.length;
 }
 
 bool CaptureConsoleModeAudio::is_capturing()

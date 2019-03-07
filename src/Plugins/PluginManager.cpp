@@ -781,14 +781,15 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 		names.add("Dummy");
 		//names.add("Sample");
 	}else if (type == ModuleType::STREAM){
-		names.add("AudioOutput");
 		names.add("AudioInput");
+		names.add("AudioOutput");
 		names.add("MidiInput");
 	}else if (type == ModuleType::PLUMBING){
-		names.add("AudioJoiner");
-		names.add("BeatMidifier");
-		names.add("AudioSucker");
 		names.add("AudioBackup");
+		names.add("AudioJoiner");
+		names.add("AudioRecorder");
+		names.add("AudioSucker");
+		names.add("BeatMidifier");
 	}
 	return names;
 }

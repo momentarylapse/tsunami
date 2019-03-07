@@ -12,8 +12,8 @@
 #include "../../../lib/base/base.h"
 
 class InputStreamAudio;
-class AudioSucker;
 class PeakMeter;
+class AudioRecorder;
 class Device;
 class Track;
 class SignalChain;
@@ -23,7 +23,7 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 	SignalChain *chain;
 	InputStreamAudio *input;
 	PeakMeter *peak_meter;
-	AudioSucker *sucker;
+	AudioRecorder *recorder;
 	Array<Device*> sources;
 	Device *chosen_device;
 	Track *target;

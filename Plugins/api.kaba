@@ -466,6 +466,7 @@ class OutputStream extends Module
 	extern override void __delete__()
 	extern void stop()
 	extern void start()
+	extern bool is_playing()
 	//extern void setSource(AudioSource *r)
 	extern float get_volume()
 	extern void set_volume(float volume)

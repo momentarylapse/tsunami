@@ -511,6 +511,7 @@ void PluginManager::link_app_script_data()
 	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
 	Kaba::LinkExternal("OutputStream.start", Kaba::mf(&OutputStream::start));
 	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
+	Kaba::LinkExternal("OutputStream.is_playing", Kaba::mf(&OutputStream::is_playing));
 	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));

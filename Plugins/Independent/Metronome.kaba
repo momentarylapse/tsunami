@@ -173,7 +173,7 @@ Grid ? '' vertical
 			fs *= (1 + pow(closeness,5) * 0.2)
 		bool paused = false
 		if stream
-			paused = stream.is_paused()
+			paused = !stream.is_playing()
 		if paused
 			p.set_font_size(fs)
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
@@ -191,7 +191,10 @@ Grid ? '' vertical
 	
 	void on_area_left_button_down()
 		if stream
-			stream.pause(!stream.is_paused())
+			if stream.is_playing()
+				stream.stop()
+			else
+				stream.start()
 		redraw("area")
 	
 	void on_area_right_button_down()
@@ -261,7 +264,7 @@ class Metronome extends TsunamiPlugin
 		stream.plug(0, synth, 0)
 		stream.set_buffer_size(1024)
 		//stream.set_update_dt(UPDATE_DT)
-		stream.play()
+		stream.start()
 			
 	override ConfigPanel* create_panel()
 		return new MetronomePanel(session, source, stream, self)

@@ -601,3 +601,10 @@ void OutputStream::command(ModuleCommand cmd)
 	else if (cmd == ModuleCommand::STOP)
 		stop();
 }
+
+bool OutputStream::is_playing()
+{
+	if (!fully_initialized)
+		return false;
+	return !paused;
+}

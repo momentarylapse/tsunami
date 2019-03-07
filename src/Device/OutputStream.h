@@ -55,6 +55,8 @@ public:
 	void _pause();
 	void _unpause();
 
+	bool _cdecl is_playing();
+
 	bool fully_initialized;
 	bool buffer_is_cleared;
 	void _start_first_time();

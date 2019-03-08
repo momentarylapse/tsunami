@@ -1,7 +1,8 @@
 // Image = hui:find
-// Title[Deutsch] = Spektrum zeigen
+// Title[Deutsch] = Midi in Spektrum malen
 use "../api.kaba"
 use "../grid.kaba"
+use "../tone.kaba"
 
 //#show
 //#disasm
@@ -18,6 +19,14 @@ float[NF][NT] sg
 Image im0
 
 class SpecGrid extends Grid
+	DrawMidiInSpectrogram *plugin
+	float x_offset, x_scale
+	int x_to_sample(float x)
+		return x_scale * x
+	float sample_to_x(int s)
+		return s / x_scale
+	int create_pitch
+	float create_x
 	override void on_draw(Painter *c)
 		rect r = plot_rect
 		int w = r.width()
@@ -40,17 +49,58 @@ class SpecGrid extends Grid
 		/*Image *im = im0.scale(r.width(), r.height())
 		c.DrawImage(r.x1, r.y1, *im)
 		delete(im)*/
+		
+		c.set_line_width(3)
+		complex z = get_mouse2()
+		int mouse_pitch = freq_to_pitch(z.y+0.5)
+		for n in plugin.midi
+			float y = pitch_to_freq(n.pitch)
+			draw_line2(c, complex(sample_to_x(n.range.offset), y), complex(sample_to_x(n.range.end()), y), false, false)
+		if create_pitch >= 0
+			float y = pitch_to_freq(create_pitch)
+			draw_line2(c, complex(create_x, y), complex(z.x, y), false, true)
+			mouse_pitch = create_pitch
+		else
+			float y = pitch_to_freq(mouse_pitch)
+			draw_point2(c, complex(z.x, y), false, false)
+		
+		c.set_color(colors.text)
+		c.draw_str(120, 20, pitch_name(mouse_pitch))
+		c.set_line_width(1)
+		
+			
+			
+			
+	
+	override void on_left_button_down()
+		complex z = get_mouse2()
+		create_x = z.x
+		create_pitch = freq_to_pitch(z.y+0.5)
+		redraw()
+	override void on_left_button_up()
+		complex z = get_mouse2()
+		plugin.midi.add(new MidiNote(RangeTo(x_to_sample(create_x), x_to_sample(z.x)), create_pitch, 1.0))
+		create_pitch = -1
+		redraw()
+	override void on_mouse_move()
+		redraw()
+		
 
 class SpectrumDialog extends Dialog
 	SpecGrid grid
-	void __init__(ShowSpectrogram* plugin, Song* song)
+	Song* song
+	Track*[] tracks
+	DrawMidiInSpectrogram* dmis
+	void __init__(SongPlugin* plugin, Song* song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		from_source("
 Grid ? ''
 	DrawingArea drawing_area ''
 	---|
 	Grid ? '' buttonbar
-		Button close 'Close' image=hui:close")
+		ComboBox target ''
+		Button export 'Export' image=hui:save
+		DefButton close 'Close' image=hui:close")
 		
 		AudioView* view = plugin.session.view
 		
@@ -58,10 +108,32 @@ Grid ? ''
 		grid.x_axis.set(view.sel.range.offset / i2f(song.sample_rate), view.sel.range.end() / i2f(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
+		grid.plugin = plugin
+		grid.create_pitch = -1
+		grid.x_offset = view.sel.range.offset
+		grid.x_scale = song.sample_rate
+		
+		dmis = plugin
+		song = plugin.session.song
+		for t in song.tracks
+			if t.type == TRACK_TYPE_MIDI
+				tracks.add(t)
+				set_string("target", t.nice_name())
+		set_int("target", 0)
 	
 		event("close", &on_close)
+		event("export", &on_export)
 
 	void on_close()
+		destroy()
+		
+	void on_export()
+		int n = get_int("target")
+		if n < 0
+			return
+		Track* t = tracks[n]
+		t.layers[0].insert_midi_data(0, dmis.midi)
+		
 		destroy()
 
 color f2col(float f)
@@ -72,9 +144,10 @@ color f2col(float f)
 		return color(1, f * 3 - 1, 0, 2 - f * 3)
 	return color(1, 1, f * 3 - 2, 0)
 
-class ShowSpectrogram extends SongPlugin
+class DrawMidiInSpectrogram extends SongPlugin
 
 	SpectrumDialog *dlg
+	MidiNoteBuffer midi
 
 	void show_spec(Song *song)
 		dlg = new SpectrumDialog(self, song)
@@ -135,4 +208,4 @@ class ShowSpectrogram extends SongPlugin
 		if session.view.sel.range.length > 0
 			show_spec(song)
 		else
-			session.e("'Show Spectrogram.kaba': Needs some selection!")
+			session.e("'Draw Midi In Spectrogram.kaba': Needs some selection!")

@@ -435,6 +435,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
 	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
+	Kaba::LinkExternal("Track.nice_name", Kaba::mf(&Track::nice_name));
 	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::set_name));
 	Kaba::LinkExternal("Track.set_muted", Kaba::mf(&Track::set_muted));
 	Kaba::LinkExternal("Track.set_volume", Kaba::mf(&Track::set_volume));

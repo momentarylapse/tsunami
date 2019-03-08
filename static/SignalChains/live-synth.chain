@@ -7,8 +7,8 @@
 	</head>
 	<modules>
 		<module>
-			<category>InputStreamMidi</category>
-			<class />
+			<category>Stream</category>
+			<class>MidiInput</class>
 			<position>
 				<x>96</x>
 				<y>83</y>
@@ -32,8 +32,8 @@
 			</position>
 		</module>
 		<module>
-			<category>OutputStream</category>
-			<class />
+			<category>Stream</category>
+			<class>AudioOutput</class>
 			<position>
 				<x>545</x>
 				<y>156</y>

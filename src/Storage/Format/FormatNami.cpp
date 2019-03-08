@@ -754,6 +754,14 @@ public:
 	}
 };
 
+static bool note_buffer_has_flags(MidiNoteBuffer &buf)
+{
+	for (auto *n: buf)
+		if (n->flags > 0)
+			return true;
+	return false;
+}
+
 class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteBuffer>
 {
 public:
@@ -784,19 +792,22 @@ public:
 				n->stringno = f->read_int();
 			if (meta & 2)
 				n->clef_position = f->read_int();
+			if (meta & 4)
+				n->flags = f->read_int();
 			me->add(n);
 		}
 		f->read_int(); // reserved
 	}
 	virtual void write(File *f)
 	{
+		bool has_flags = note_buffer_has_flags(*me);
 		f->write_str("");
 		f->write_str("");
 		f->write_str("");
 		f->write_int(1); // version
 
 		f->write_int(me->num);
-		f->write_int(3); // stringno + clef_position
+		f->write_int(has_flags ? 7 : 3); // stringno + clef_position (+ flags)
 		for (MidiNote *n : *me){
 			f->write_int(n->range.offset);
 			f->write_int(n->range.length);
@@ -804,6 +815,8 @@ public:
 			f->write_float(n->volume);
 			f->write_int(n->stringno);
 			f->write_int(n->clef_position);
+			if (has_flags)
+				f->write_int(n->flags);
 		}
 		f->write_int(0); // reserved
 	}

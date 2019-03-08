@@ -470,8 +470,21 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
 {
 	MidiEventBuffer r;
 	for (MidiNote *n: notes){
-		r.add(MidiEvent(n->range.offset, n->pitch, n->volume));
-		r.add(MidiEvent(n->range.end()-1, n->pitch, 0));
+		Range rr = n->range;
+		if (n->is(NOTE_FLAG_STACCATO))
+			rr = Range(rr.offset, rr.length/2);
+		/*if (n->is(NOTE_FLAG_TRILL)){
+			int l = rr.length;
+			r.add(MidiEvent(rr.offset, n->pitch, n->volume));
+			r.add(MidiEvent(rr.offset + l/4, n->pitch, 0));
+			r.add(MidiEvent(rr.offset + l/4, n->pitch+1, n->volume));
+			r.add(MidiEvent(rr.offset + l/2, n->pitch+1, 0));
+			r.add(MidiEvent(rr.offset + l/2, n->pitch, n->volume));
+			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
+		}else*/{
+			r.add(MidiEvent(rr.offset, n->pitch, n->volume));
+			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
+		}
 	}
 	r.samples = notes.samples;
 	return r;

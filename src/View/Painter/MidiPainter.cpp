@@ -12,6 +12,7 @@
 #include "../AudioViewLayer.h" // argh
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
+#include "../../Data/Midi/MidiNote.h"
 #include "../../Data/Midi/Clef.h"
 #include "../../Data/Midi/Instrument.h"
 #include "../../Data/Rhythm/Bar.h"
@@ -534,6 +535,18 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 	get_col(col, col_shadow, n, state, is_playable, colors);
 
 	draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
+
+	if (n->flags > 0){
+		if (n->is(NOTE_FLAG_TRILL))
+			c->draw_str(x1, y - rr*3, "tr~");
+		if (n->is(NOTE_FLAG_STACCATO))
+			c->draw_circle(x1+rr, y + rr*2, 2);
+		if (n->is(NOTE_FLAG_TENUTO)){
+			c->set_line_width(3);
+			c->draw_line(x1, y + rr*2, x1+20, y + rr*2);
+			c->set_line_width(1);
+		}
+	}
 
 }
 

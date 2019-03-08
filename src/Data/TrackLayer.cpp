@@ -167,12 +167,17 @@ void TrackLayer::add_midi_notes(const MidiNoteBuffer &notes)
 
 void TrackLayer::edit_midi_note(MidiNote *note, const Range &range, float pitch, float volume)
 {
-	track->song->execute(new ActionTrackEditMidiNote(note, range, pitch, volume, note->stringno));
+	track->song->execute(new ActionTrackEditMidiNote(note, range, pitch, volume, note->stringno, note->flags));
 }
 
 void TrackLayer::midi_note_set_string(MidiNote *note, int stringno)
 {
-	track->song->execute(new ActionTrackEditMidiNote(note, note->range, note->pitch, note->volume, stringno));
+	track->song->execute(new ActionTrackEditMidiNote(note, note->range, note->pitch, note->volume, stringno, note->flags));
+}
+
+void TrackLayer::midi_note_set_flags(MidiNote *note, int flags)
+{
+	track->song->execute(new ActionTrackEditMidiNote(note, note->range, note->pitch, note->volume, note->stringno, flags));
 }
 
 void TrackLayer::delete_midi_note(const MidiNote *note)

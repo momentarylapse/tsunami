@@ -36,10 +36,6 @@ class Range
 		return "(" + offset + ":" + end() + ")"
 Range RangeTo(int start, int end)
 	return Range(start, end - start)
-	/*Range r
-	r.offset = start
-	r.length = end - start
-	return r*/
 
 
 class MidiNote
@@ -47,6 +43,7 @@ class MidiNote
 	float pitch
 	float volume
 	int stringno, clef_position, modifier
+	int flags
 	void __init__(Range r, float _pitch, float _volume)
 		range = r
 		pitch = _pitch
@@ -54,6 +51,8 @@ class MidiNote
 		stringno = -1
 		clef_position = -1
 		modifier = 0
+	extern void set(int mask)
+	extern bool is(int mask)
 
 class MidiEvent
 	int pos

@@ -17,7 +17,7 @@ class Range;
 class ActionTrackEditMidiNote : public Action
 {
 public:
-	ActionTrackEditMidiNote(MidiNote *n, const Range &range, float pitch, float volume, int stringno);
+	ActionTrackEditMidiNote(MidiNote *n, const Range &range, float pitch, float volume, int stringno, int flags);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
@@ -27,6 +27,7 @@ private:
 	int offset, length;
 	float pitch, volume;
 	int stringno;
+	int flags;
 };
 
 #endif /* SRC_ACTION_TRACK_MIDI_ACTIONTRACKEDITMIDINOTE_H_ */

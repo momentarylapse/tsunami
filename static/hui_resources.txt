@@ -1675,7 +1675,7 @@ Grid
 vertical
 0
 0
-3
+4
 Button
 quantize
 expandx
@@ -1716,6 +1716,42 @@ SpinButton
 fret_no
 range=0:99
 1
+0
+0
+Grid
+?
+
+3
+0
+5
+Text
+t_flags
+
+0
+0
+0
+Button
+flag_none
+
+1
+0
+0
+Button
+flag_trill
+
+2
+0
+0
+Button
+flag_staccato
+
+3
+0
+0
+Button
+flag_tenuto
+
+4
 0
 0
 Text
@@ -4710,7 +4746,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-468
+473
 // Text
 /cancel
 Cancel
@@ -5216,6 +5252,18 @@ Apply string
 midi_editor/beat_partition
 4
 
+midi_editor/flag_none
+x
+clear flags
+midi_editor/flag_staccato
+.
+set staccato flag
+midi_editor/flag_tenuto
+_
+set tenuto flag
+midi_editor/flag_trill
+tr
+set trill flag
 midi_editor/grp_operations
 Operations
 
@@ -5279,6 +5327,9 @@ midi_editor/note_length
 midi_editor/quantize
 Quantize
 Align selected notes to grid of sub beats
+midi_editor/t_flags
+Flags
+
 midi_editor/t_note_length
 Length
 
@@ -6122,7 +6173,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-617
+621
 // Text
 /bpm
 Bpm
@@ -6858,6 +6909,18 @@ Saite setzen
 (TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern
 midi_editor/beat_partition
 4
+
+midi_editor/flag_none
+x
+alle Flags entfernen
+midi_editor/flag_staccato
+.
+
+midi_editor/flag_tenuto
+_
+
+midi_editor/flag_trill
+tr
 
 midi_editor/grp_operations
 Operationen

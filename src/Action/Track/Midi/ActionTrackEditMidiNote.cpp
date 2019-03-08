@@ -8,7 +8,7 @@
 #include "ActionTrackEditMidiNote.h"
 #include "../../../Data/Track.h"
 
-ActionTrackEditMidiNote::ActionTrackEditMidiNote(MidiNote *n, const Range &range, float _pitch, float _volume, int _stringno)
+ActionTrackEditMidiNote::ActionTrackEditMidiNote(MidiNote *n, const Range &range, float _pitch, float _volume, int _stringno, int _flags)
 {
 	note = n;
 	offset = range.offset;
@@ -16,6 +16,7 @@ ActionTrackEditMidiNote::ActionTrackEditMidiNote(MidiNote *n, const Range &range
 	volume = _volume;
 	pitch = _pitch;
 	stringno = _stringno;
+	flags = _flags;
 }
 
 void* ActionTrackEditMidiNote::execute(Data* d)
@@ -25,6 +26,7 @@ void* ActionTrackEditMidiNote::execute(Data* d)
 	std::swap(note->range.offset, offset);
 	std::swap(note->range.length, length);
 	std::swap(note->stringno, stringno);
+	std::swap(note->flags, flags);
 
 	return nullptr;
 }

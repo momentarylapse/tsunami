@@ -45,6 +45,7 @@ public:
 	void _cdecl add_midi_notes(const MidiNoteBuffer &notes);
 	void _cdecl edit_midi_note(MidiNote *n, const Range &range, float pitch, float volume);
 	void _cdecl midi_note_set_string(MidiNote *n, int stringno);
+	void _cdecl midi_note_set_flags(MidiNote *n, int flags);
 	void _cdecl delete_midi_note(const MidiNote *note);
 
 	SampleRef *_cdecl add_sample_ref(int pos, Sample* sample);

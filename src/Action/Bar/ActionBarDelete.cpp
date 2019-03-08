@@ -65,13 +65,13 @@ void ActionBarDelete::build(Data *d)
 						add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);
 					}else if (r.is_inside(m->range.start())){
 						// cover start
-						add_sub_action(new ActionTrackEditMidiNote(m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume, m->stringno), d);
+						add_sub_action(new ActionTrackEditMidiNote(m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume, m->stringno, m->flags), d);
 					}else if (r.is_inside(m->range.end())){
 						// cover end
-						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume, m->stringno), d);
+						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume, m->stringno, m->flags), d);
 					}else if (m->range.covers(r)){
 						// cut out part
-						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume, m->stringno), d);
+						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume, m->stringno, m->flags), d);
 					}
 				}
 		}

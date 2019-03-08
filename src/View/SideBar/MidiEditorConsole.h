@@ -44,6 +44,7 @@ public:
 	void on_quantize();
 	void on_apply_string();
 	void on_apply_hand_position();
+	void on_apply_flags(int mask);
 
 	void on_edit_track();
 	void on_edit_midi_fx();

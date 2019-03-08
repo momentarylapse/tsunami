@@ -47,6 +47,12 @@ Dialog midi_editor "Midi" width=380 height=516
 					Grid ? ""
 						Button apply_hand_position "Apply hand" "tooltip=(TAB mode) Find positions on the fretboard for the selected notes" expandx
 						SpinButton fret_no "" range=0:99
+					Grid ? ""
+						Text t_flags "Flags"
+						Button flag_none "x" "tooltip=clear flags"
+						Button flag_trill "tr" "tooltip=set trill flag"
+						Button flag_staccato "." "tooltip=set staccato flag"
+						Button flag_tenuto "_" "tooltip=set tenuto flag"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

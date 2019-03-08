@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-618
+622
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1856,6 +1856,18 @@ Plumbing
 
 popup_signal_chain_menu/signal_chain_add_stream
 Stream
+
+midi_editor/flag_none
+x
+alle Flags entfernen
+midi_editor/flag_staccato
+.
+
+midi_editor/flag_tenuto
+_
+
+midi_editor/flag_trill
+tr
 
 // Num Language Strings
 217

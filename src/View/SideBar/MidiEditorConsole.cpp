@@ -74,6 +74,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("quantize", [&]{ on_quantize(); });
 	event("apply_string", [&]{ on_apply_string(); });
 	event("apply_hand_position", [&]{ on_apply_hand_position(); });
+	event("flag_none", [&]{ on_apply_flags(0); });
+	event("flag_trill", [&]{ on_apply_flags(NOTE_FLAG_TRILL); });
+	event("flag_staccato", [&]{ on_apply_flags(NOTE_FLAG_STACCATO); });
+	event("flag_tenuto", [&]{ on_apply_flags(NOTE_FLAG_TENUTO); });
 	event("edit_track", [&]{ on_edit_track(); });
 	event("edit_midi_fx", [&]{ on_edit_midi_fx(); });
 	event("edit_song", [&]{ on_edit_song(); });
@@ -125,7 +129,7 @@ void MidiEditorConsole::update()
 	if (layer->track->instrument.type == Instrument::Type::DRUMS){
 		// select a nicer pitch range in linear mode for drums
 //		view->get_layer(layer->track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
-		msg_write("todo");
+		// TODO
 	}
 }
 
@@ -273,9 +277,12 @@ void MidiEditorConsole::set_layer(TrackLayer *l)
 		if (v)
 			setSelection("reference_tracks", v->reference_tracks);*/
 
-		enable("apply_string", layer->track->instrument.string_pitch.num);
-		enable("string_no", layer->track->instrument.string_pitch.num);
-		set_options("string_no", format("range=1:%d", layer->track->instrument.string_pitch.num));
+		int strings = layer->track->instrument.string_pitch.num;
+		enable("apply_string", strings > 0);
+		enable("string_no", strings > 0);
+		set_options("string_no", format("range=1:%d", strings));
+		enable("apply_hand_position", strings > 0);
+		enable("fret_no", strings > 0);
 
 		update();
 	}
@@ -340,5 +347,21 @@ void MidiEditorConsole::on_apply_hand_position()
  			}
 		layer->midi_note_set_string(n, stringno);
 	}
+	song->action_manager->group_end();
+}
+
+void MidiEditorConsole::on_apply_flags(int mask)
+{
+	song->action_manager->group_begin();
+	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
+	if (mask == 0){
+		for (auto *n: ref)
+			layer->midi_note_set_flags(n, 0);
+	}else{
+		for (auto *n: ref)
+			layer->midi_note_set_flags(n, n->flags | mask);
+
+	}
+
 	song->action_manager->group_end();
 }

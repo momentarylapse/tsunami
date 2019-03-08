@@ -851,6 +851,10 @@ void ViewModeMidi::draw_post(Painter *c)
 // seems fine
 Range ViewModeMidi::get_midi_edit_range()
 {
+	// manual selestion has priority
+	if (view->sel.range.length > 0)
+		return view->sel.range;
+
 	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, sub_beat_partition);
 	int b = song->bars.get_next_sub_beat(view->sel.range.end()-1, sub_beat_partition);
 	if (a == b)

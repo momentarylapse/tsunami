@@ -17,6 +17,8 @@
 #include "Audio/AudioSucker.h"
 #include "Midi/MidiEffect.h"
 #include "Midi/MidiSource.h"
+#include "Midi/MidiRecorder.h"
+#include "Midi/MidiSucker.h"
 #include "Audio/PitchDetector.h"
 #include "Beats/BeatMidifier.h"
 #include "Synth/Synthesizer.h"
@@ -43,6 +45,10 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new AudioBackup(session);
 		if (sub_type == "AudioRecorder")
 			return new AudioRecorder;
+		if (sub_type == "MidiRecorder")
+			return new MidiRecorder;
+		if (sub_type == "MidiSucker")
+			return new MidiSucker;
 	}else if (type == ModuleType::AUDIO_SOURCE){
 		if (sub_type == "SongRenderer")
 			return new SongRenderer(session->song, true);

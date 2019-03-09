@@ -17,6 +17,9 @@
 #include "../Device/OutputStream.h"
 #include "../lib/file/file.h"
 #include "../lib/xfile/xml.h"
+#include "../lib/threads/Thread.h"
+#include "../lib/hui/hui.h"
+#include "../Stuff/PerformanceMonitor.h"
 
 
 const string SignalChain::MESSAGE_ADD_MODULE = "AddModule";
@@ -28,6 +31,52 @@ const string SignalChain::MESSAGE_DELETE_CABLE = "DeleteCable";
 const float DEFAULT_UPDATE_DT = 0.050f;
 extern bool ugly_hack_slow;
 
+
+const int SignalChain::DEFAULT_BUFFER_SIZE = 1024;
+
+
+class SuckerThread : public Thread
+{
+public:
+	SignalChain *sucker;
+	int perf_channel;
+	bool keep_running = true;
+
+	SuckerThread(SignalChain *s)
+	{
+		perf_channel = PerformanceMonitor::create_channel("suck");
+		sucker = s;
+	}
+	~SuckerThread()
+	{
+		PerformanceMonitor::delete_channel(perf_channel);
+	}
+
+	void on_run() override
+	{
+		//msg_write("thread run");
+		while(keep_running){
+			//msg_write(".");
+			if (sucker->sucking){
+				PerformanceMonitor::start_busy(perf_channel);
+				int r = sucker->do_suck();
+				PerformanceMonitor::end_busy(perf_channel);
+				if (r == Port::END_OF_STREAM)
+					break;
+				if (r == Port::NOT_ENOUGH_DATA){
+					hui::Sleep(sucker->no_data_wait);
+					continue;
+				}
+			}else{
+				hui::Sleep(0.200f);
+			}
+			Thread::cancelation_point();
+		}
+		//msg_write("thread done...");
+	}
+};
+
+
 SignalChain::SignalChain(Session *s, const string &_name) :
 	Module(ModuleType::SIGNAL_CHAIN, "")
 {
@@ -38,10 +87,22 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
 		tick_dt *= 10;
+
+	sucking = false;
+	thread = nullptr;//new AudioSuckerThread(this);
+	buffer_size = DEFAULT_BUFFER_SIZE;
+	no_data_wait = 0.005f;
 }
 
 SignalChain::~SignalChain()
 {
+	if (thread){
+		thread->keep_running = false;
+		thread->join();
+		//thread->kill();
+		delete(thread);
+		thread = nullptr;
+	}
 	stop();
 	for (Module *m: modules)
 		m->unsubscribe(this);
@@ -320,23 +381,32 @@ Module* SignalChain::add(ModuleType type, const string &sub_type)
 
 void SignalChain::reset_state()
 {
+	session->debug("chain", "reset");
 	for (auto *m: modules)
 		m->reset_state();
 }
 
 void SignalChain::prepare_start()
 {
+	session->debug("chain", "prepare");
+	if (!sucking)
+		_start_sucking();
 	for (auto *m: modules)
-		m->command(ModuleCommand::PREPARE_START);
+		m->command(ModuleCommand::PREPARE_START, 0);
 }
 
 void SignalChain::start()
 {
 	if (state == State::ACTIVE)
 		return;
+	session->debug("chain", "start");
+
+	if (state == State::STOPPED)
+		prepare_start();
+
 
 	for (auto *m: modules)
-		m->command(ModuleCommand::START);
+		m->command(ModuleCommand::START, 0);
 	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
 	hui_runner = hui::RunRepeated(tick_dt, [&]{ notify(MESSAGE_TICK); });
@@ -346,17 +416,20 @@ void SignalChain::stop()
 {
 	if (state != State::ACTIVE)
 		return;
+	session->debug("chain", "stop");
 
 	hui::CancelRunner(hui_runner);
 	for (auto *m: modules)
-		m->command(ModuleCommand::STOP);
+		m->command(ModuleCommand::STOP, 0);
 	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
 void SignalChain::stop_hard()
 {
+	session->debug("chain", "stop HARD");
 	stop();
+	_stop_sucking();
 	reset_state();
 	state = State::STOPPED;
 	notify(MESSAGE_STATE_CHANGE);
@@ -368,16 +441,23 @@ bool SignalChain::is_paused()
 	return state == State::PAUSED;
 }
 
-void SignalChain::command(ModuleCommand cmd)
+int SignalChain::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();
+		return 0;
 	}else if (cmd == ModuleCommand::STOP){
 		stop();
+		return 0;
+	}else if (cmd == ModuleCommand::PREPARE_START){
+		prepare_start();
+		return 0;
 	}else{
 		for (Module *m: modules)
-			m->command(cmd);
+			m->command(cmd, param);
+		return 0;
 	}
+	return Module::COMMAND_NOT_HANDLED;
 }
 
 bool SignalChain::is_playback_active()
@@ -412,3 +492,36 @@ void SignalChain::set_pos(int pos)
 		m->set_pos(pos);
 }
 
+
+
+void SignalChain::_start_sucking()
+{
+	if (sucking)
+		return;
+	session->debug("chain", "start suck");
+	thread = new SuckerThread(this);
+	thread->run();
+	sucking = true;
+}
+
+void SignalChain::_stop_sucking()
+{
+	if (thread){
+		session->debug("chain", "stop suck");
+		thread->keep_running = false;
+		thread->join();
+		delete thread;
+		thread = nullptr;
+	}
+	sucking = false;
+}
+
+int SignalChain::do_suck()
+{
+	int s = Port::END_OF_STREAM;
+	for (auto *m: modules){
+		int r = m->command(ModuleCommand::SUCK, buffer_size);
+		s = max(s, r);
+	}
+	return s;
+}

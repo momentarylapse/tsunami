@@ -10,9 +10,8 @@
 #include "../lib/math/math.h"
 #include "../Data/base.h"
 #include "../Device/OutputStream.h"
-#include "../Device/InputStreamAudio.h"
 #include "../Module/Audio/AudioSource.h"
-#include "../Module/Audio/AudioSucker.h"
+#include "../Module/SignalChain.h"
 #include "../Session.h"
 
 TestStreams::TestStreams() : UnitTest("streams")
@@ -72,20 +71,17 @@ void TestStreams::test_output_stream()
 
 void TestStreams::test_input_stream()
 {
-	auto *stream = new InputStreamAudio(Session::GLOBAL);
-	auto *sucker = new AudioSucker;
-
-	sucker->plug(0, stream, 0);
+	auto *chain = new SignalChain(Session::GLOBAL, "test");
+	auto *a = chain->add(ModuleType::STREAM, "AudioInput");
+	auto *b = chain->add(ModuleType::PLUMBING, "AudioSucker");
+	chain->connect(a, 0, b, 0);
 
 	msg_write("capture");
-	stream->start();
-	sucker->start();
+	chain->start();
 	sleep(2);
 	msg_write("stop");
-	sucker->stop();
-	stream->stop();
-	delete(sucker);
-	delete(stream);
+	chain->stop();
+	delete chain;
 
 }
 

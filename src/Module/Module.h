@@ -58,6 +58,8 @@ enum class ModuleCommand
 	PREPARE_START,
 	ACCUMULATION_START,
 	ACCUMULATION_STOP,
+	ACCUMULATION_CLEAR,
+	SUCK,
 };
 
 class Module : public Observable<VirtualBase>
@@ -111,7 +113,8 @@ public:
 	virtual void _cdecl reset_state(){}
 
 
-	virtual void command(ModuleCommand cmd){}
+	static const int COMMAND_NOT_HANDLED;
+	virtual int command(ModuleCommand cmd, int param){ return COMMAND_NOT_HANDLED; }
 	virtual void set_pos(int pos){}
 	virtual int get_pos(){ return 0; }
 

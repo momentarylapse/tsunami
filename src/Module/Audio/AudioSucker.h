@@ -11,31 +11,18 @@
 #include "../Module.h"
 
 class Port;
-class AudioSuckerThread;
 
 class AudioSucker : public Module
 {
-	friend class AudioSuckerThread;
 public:
 	AudioSucker();
 	~AudioSucker() override;
 
-	void set_buffer_size(int size);
-
-	void start();
-	void stop();
-
-	int update();
-
-	static const int DEFAULT_BUFFER_SIZE;
+	int do_suck(int buffer_size);
 
 	Port *source;
-	bool running;
-	int buffer_size;
-	float no_data_wait;
 
-	AudioSuckerThread *thread;
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOSUCKER_H_ */

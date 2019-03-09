@@ -29,7 +29,7 @@ public:
 	void accumulate(bool enable);
 
 	void reset_state() override;
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 
 	Port *source;
 	MidiEventBuffer buffer;

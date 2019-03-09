@@ -21,7 +21,10 @@
 #include "../../../Module/Audio/AudioSucker.h"
 #include "../../../Module/Audio/AudioRecorder.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/Midi/MidiSucker.h"
+#include "../../../Module/Midi/MidiRecorder.h"
 #include "../../../Module/ModuleFactory.h"
+#include "../../../Module/SignalChain.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -38,6 +41,8 @@ void CaptureConsoleModeMulti::enter()
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
+	chain = new SignalChain(session, "capture-multi");
+
 	// target list multi
 	for (Track *t: song->tracks){
 		if ((t->type != SignalType::AUDIO) and (t->type != SignalType::MIDI))
@@ -46,9 +51,10 @@ void CaptureConsoleModeMulti::enter()
 			continue;
 		CaptureItem c;
 		int i = items.num;
-		c.sucker = nullptr;
 		c.input_audio = nullptr;
 		c.input_midi = nullptr;
+		c.recorder_audio = nullptr;
+		c.recorder_midi = nullptr;
 		c.track = t;
 		c.device = nullptr;
 		c.id_target = "target-" + i2s(i);
@@ -59,13 +65,13 @@ void CaptureConsoleModeMulti::enter()
 		cc->add_label(t->nice_name(), 0, i*2+1, c.id_target);
 		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
 		if (t->type == SignalType::AUDIO){
-			c.input_audio = new InputStreamAudio(session);
+			c.input_audio = (InputStreamAudio*)chain->add(ModuleType::STREAM, "AudioInput");
 			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->add_string(c.id_source, d->get_name());
 		}else if (t->type == SignalType::MIDI){
-			c.input_midi = new InputStreamMidi(session);
+			c.input_midi = (InputStreamMidi*)chain->add(ModuleType::STREAM, "MidiInput");
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_midi)
 				cc->add_string(c.id_source, d->get_name());
@@ -73,13 +79,21 @@ void CaptureConsoleModeMulti::enter()
 			cc->addLabel(_("        - none -"), 2, i*2+1, c.id_source);*/
 		}
 		cc->add_drawing_area("!height=30,noexpandy", 2, i*2+2, c.id_peaks);
-		c.peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
+		c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, c.peak_meter);
 
 		if (t->type == SignalType::AUDIO){
-			c.peak_meter->plug(0, c.input_audio, 0);
-			c.sucker = (AudioSucker*)ModuleFactory::create(session, ModuleType::PLUMBING, "AudioSucker");
-			c.sucker->plug(0, c.peak_meter, 0);
+			c.recorder_audio = (AudioRecorder*)chain->add(ModuleType::PLUMBING, "AudioRecorder");
+			auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+			chain->connect(c.input_audio, 0, c.peak_meter, 0);
+			chain->connect(c.peak_meter, 0, c.recorder_audio, 0);
+			chain->connect(c.recorder_audio, 0, sucker, 0);
+		}else if (t->type == SignalType::MIDI){
+			c.recorder_midi = (MidiRecorder*)chain->add(ModuleType::PLUMBING, "MidiRecorder");
+			auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
+			chain->connect(c.input_audio, 0, c.peak_meter, 0);
+			chain->connect(c.peak_meter, 0, c.recorder_midi, 0);
+			chain->connect(c.recorder_midi, 0, sucker, 0);
 		}
 
 		items.add(c);
@@ -101,13 +115,7 @@ bool CaptureConsoleModeMulti::is_capturing()
 
 void CaptureConsoleModeMulti::pause()
 {
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			c.recorder->accumulate(false);
-		}else if (c.track->type == SignalType::MIDI){
-			c.input_midi->accumulate(false);
-		}
-	}
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 }
 
 bool CaptureConsoleModeMulti::insert()
@@ -119,15 +127,14 @@ bool CaptureConsoleModeMulti::insert()
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
 			int dpos = c.input_audio->get_delay();
-			ok &= cc->insert_audio(c.track, c.recorder->buf, dpos);
-			c.sucker->reset_state();
+			ok &= cc->insert_audio(c.track, c.recorder_audio->buf, dpos);
 		}else if (c.track->type == SignalType::MIDI){
 			int dpos = c.input_midi->get_delay();
 			ok &= cc->insert_midi(c.track, c.input_midi->midi, dpos);
-			c.input_midi->reset_accumulation();
 		}
 	}
 	song->end_action_group();
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	return ok;
 }
 
@@ -141,13 +148,10 @@ void CaptureConsoleModeMulti::on_source()
 	if (c.track->type == SignalType::AUDIO){
 		if (n > 0){
 			c.input_audio->set_device(sources_audio[n - 1]);
-			c.input_audio->start();
-			c.sucker->start();
 		}
 	}else if (c.track->type == SignalType::MIDI){
 		if (n > 0){
 			c.input_midi->set_device(sources_midi[n - 1]);
-			c.input_midi->start();
 		}
 	}
 	/*if ((n >= 0) and (n < sources.num)){
@@ -163,22 +167,14 @@ void CaptureConsoleModeMulti::leave()
 		c.peak_meter_display->set_source(nullptr);
 		c.peak_meter->unplug(0);
 
-		if (c.track->type == SignalType::AUDIO){
-			delete c.sucker;
-			delete c.input_audio;
-		}else if (c.track->type == SignalType::MIDI){
-			c.peak_meter->unplug(0);
-			delete c.input_midi;
-		}
-
 		delete c.peak_meter_display;
-		delete c.peak_meter;
 		cc->remove_control(c.id_target);
 		cc->remove_control(c.id_type);
 		cc->remove_control(c.id_source);
 		cc->remove_control(c.id_peaks);
 	}
 	items.clear();
+	delete chain;
 }
 
 
@@ -187,51 +183,38 @@ void CaptureConsoleModeMulti::start()
 	Array<CaptureTrackData> data;
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			c.input_audio->reset_sync();
-			c.recorder->accumulate(true);
-			data.add({c.track, c.input_audio, c.sucker});
+			data.add({c.track, c.input_audio, c.recorder_audio});
 		}else if (c.track->type == SignalType::MIDI){
-			c.input_midi->accumulate(true);
-			data.add({c.track, c.input_midi, nullptr});
+			data.add({c.track, c.input_midi, c.recorder_midi});
 		}
 		cc->enable(c.id_source, false);
 	}
+	chain->start();
 	view->mode_capture->set_data(data);
 }
 
 void CaptureConsoleModeMulti::stop()
 {
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			c.sucker->stop();
-			c.input_audio->stop();
-		}else if (c.track->type == SignalType::MIDI){
-			c.input_midi->stop();
-		}
-	}
+	chain->stop();
+	for (auto &c: items)
+		cc->enable(c.id_source, true);
 }
 
 void CaptureConsoleModeMulti::dump()
 {
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			c.recorder->accumulate(false);
-			c.recorder->reset_state();
-		}else if (c.track->type == SignalType::MIDI){
-			c.input_midi->accumulate(true);
-		}
-		cc->enable(c.id_source, true);
-	}
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 }
 
 int CaptureConsoleModeMulti::get_sample_count()
 {
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			return c.recorder->buf.length;
+			return c.recorder_audio->buf.length;
 		}else if (c.track->type == SignalType::MIDI){
 			return c.input_midi->get_sample_count();
 		}
 	}
 	return 0;
 }
+

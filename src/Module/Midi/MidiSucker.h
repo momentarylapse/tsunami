@@ -35,7 +35,7 @@ public:
 	float no_data_wait;
 
 	MidiSuckerThread *thread;
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* SRC_MODULE_MIDI_MIDISUCKER_H_ */

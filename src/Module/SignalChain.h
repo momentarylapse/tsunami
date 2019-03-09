@@ -15,9 +15,11 @@ class Module;
 class Session;
 enum class SignalType;
 enum class ModuleType;
+class SuckerThread;
 
 class SignalChain : public Module
 {
+	friend class SuckerThread;
 public:
 	SignalChain(Session *session, const string &name);
 	virtual ~SignalChain();
@@ -72,14 +74,13 @@ public:
 	int hui_runner;
 	float tick_dt;
 	void _cdecl set_tick_dt(float dt);
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 	void prepare_start();
 	void start();
 	void stop();
 	void stop_hard();
 
-	enum class State
-	{
+	enum class State {
 		STOPPED,
 		ACTIVE,
 		PAUSED
@@ -90,6 +91,17 @@ public:
 
 	int get_pos();
 	void set_pos(int pos);
+
+
+	void set_buffer_size(int size);
+	static const int DEFAULT_BUFFER_SIZE;
+	bool sucking;
+	int buffer_size;
+	float no_data_wait;
+	SuckerThread *thread;
+	int do_suck();
+	void _start_sucking();
+	void _stop_sucking();
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

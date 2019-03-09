@@ -12,6 +12,7 @@ class CaptureConsole;
 class Song;
 class AudioView;
 class Session;
+class SignalChain;
 
 class CaptureConsoleMode
 {
@@ -34,6 +35,7 @@ public:
 	Session *session;
 	Song *song;
 	AudioView *view;
+	SignalChain *chain;
 };
 
 

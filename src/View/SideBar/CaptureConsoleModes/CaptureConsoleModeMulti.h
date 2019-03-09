@@ -15,8 +15,8 @@ class Device;
 class Track;
 class InputStreamAudio;
 class InputStreamMidi;
-class AudioSucker;
 class AudioRecorder;
+class MidiRecorder;
 class PeakMeter;
 class PeakMeterDisplay;
 
@@ -29,8 +29,8 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 	{
 		Track *track;
 		InputStreamAudio *input_audio;
-		AudioSucker *sucker;
-		AudioRecorder *recorder;
+		AudioRecorder *recorder_audio;
+		MidiRecorder *recorder_midi;
 		InputStreamMidi *input_midi;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;

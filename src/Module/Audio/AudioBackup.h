@@ -36,7 +36,7 @@ public:
 
 	void start();
 	void stop();
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOBACKUP_H_ */

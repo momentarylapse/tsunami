@@ -1577,7 +1577,7 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop)
 	renderer->allow_tracks(get_playable_tracks());
 	renderer->allow_layers(get_playable_layers());
 
-	signal_chain->command(ModuleCommand::PREPARE_START);
+	signal_chain->command(ModuleCommand::PREPARE_START, 0);
 }
 
 void AudioView::stop()

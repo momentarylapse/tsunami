@@ -130,7 +130,7 @@ private:
 
 
 public:
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

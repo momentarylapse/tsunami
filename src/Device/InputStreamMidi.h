@@ -74,9 +74,6 @@ public:
 	};
 	Output *out;
 
-	void _cdecl set_backup_mode(int mode);
-	int backup_mode;
-
 	void _cdecl set_update_dt(float dt);
 	float update_dt;
 
@@ -103,7 +100,7 @@ private:
 	int hui_runner_id;
 
 public:
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 };
 
 #endif /* INPUTSTREAMMIDI_H_ */

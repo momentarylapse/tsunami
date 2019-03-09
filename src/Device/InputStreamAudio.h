@@ -132,7 +132,7 @@ private:
 #endif
 
 public:
-	void command(ModuleCommand cmd) override;
+	int command(ModuleCommand cmd, int param) override;
 
 };
 

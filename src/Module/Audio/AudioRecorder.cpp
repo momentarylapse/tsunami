@@ -43,15 +43,17 @@ void AudioRecorder::accumulate(bool enable)
 	accumulating = enable;
 }
 
-void AudioRecorder::reset_state()
+int AudioRecorder::command(ModuleCommand cmd, int param)
 {
-	buf.clear();
-}
-
-void AudioRecorder::command(ModuleCommand cmd)
-{
-	if (cmd == ModuleCommand::ACCUMULATION_START)
+	if (cmd == ModuleCommand::ACCUMULATION_START){
 		accumulate(true);
-	else if (cmd == ModuleCommand::ACCUMULATION_STOP)
+		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_STOP){
 		accumulate(false);
+		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_CLEAR){
+		buf.clear();
+		return 0;
+	}
+	return COMMAND_NOT_HANDLED;
 }

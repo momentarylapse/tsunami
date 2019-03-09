@@ -102,12 +102,16 @@ void MidiSucker::stop()
 	running = false;
 }
 
-void MidiSucker::command(ModuleCommand cmd)
+int MidiSucker::command(ModuleCommand cmd, int param)
 {
-	if (cmd == ModuleCommand::START)
+	if (cmd == ModuleCommand::START){
 		start();
-	else if (cmd == ModuleCommand::STOP)
+		return 0;
+	}else if (cmd == ModuleCommand::STOP){
 		stop();
+		return 0;
+	}
+	return COMMAND_NOT_HANDLED;
 }
 
 int MidiSucker::update()

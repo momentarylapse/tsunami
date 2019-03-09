@@ -126,14 +126,14 @@ void CaptureConsoleModeAudio::leave()
 
 void CaptureConsoleModeAudio::pause()
 {
-	chain->command(ModuleCommand::ACCUMULATION_STOP);
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	cc->enable("source", true);
 }
 
 void CaptureConsoleModeAudio::start()
 {
 	input->reset_sync();
-	chain->command(ModuleCommand::ACCUMULATION_START);
+	chain->command(ModuleCommand::ACCUMULATION_START, 0);
 	cc->enable("source", false);
 }
 
@@ -145,8 +145,8 @@ void CaptureConsoleModeAudio::stop()
 
 void CaptureConsoleModeAudio::dump()
 {
-	chain->command(ModuleCommand::ACCUMULATION_STOP);
-	recorder->reset_state();
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 }
 
 bool CaptureConsoleModeAudio::insert()
@@ -155,7 +155,7 @@ bool CaptureConsoleModeAudio::insert()
 	int dpos = input->get_delay();
 
 	bool ok = cc->insert_audio(target, recorder->buf, dpos);
-	recorder->reset_state();
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	return ok;
 
 }

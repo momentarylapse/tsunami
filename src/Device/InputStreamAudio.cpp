@@ -473,7 +473,7 @@ int InputStreamAudio::get_delay()
 	return sync.get_delay() - playback_delay_const * (float)_sample_rate / 1000.0f;
 }
 
-void InputStreamAudio::command(ModuleCommand cmd)
+int InputStreamAudio::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();
@@ -483,4 +483,5 @@ void InputStreamAudio::command(ModuleCommand cmd)
 		if (state == State::NO_DEVICE)
 			_create_dev();
 	}
+	return 0;
 }

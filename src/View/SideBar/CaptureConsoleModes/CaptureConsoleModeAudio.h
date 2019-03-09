@@ -20,7 +20,6 @@ class SignalChain;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
-	SignalChain *chain;
 	InputStreamAudio *input;
 	PeakMeter *peak_meter;
 	AudioRecorder *recorder;

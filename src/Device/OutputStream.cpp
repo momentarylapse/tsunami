@@ -615,7 +615,7 @@ void OutputStream::reset_state()
 	played_end_of_stream = false;
 }
 
-void OutputStream::command(ModuleCommand cmd)
+int OutputStream::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();
@@ -626,6 +626,7 @@ void OutputStream::command(ModuleCommand cmd)
 			_create_dev();
 		_fill_prebuffer();
 	}
+	return 0;
 }
 
 bool OutputStream::is_playing()

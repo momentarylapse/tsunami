@@ -49,10 +49,14 @@ void MidiRecorder::reset_state()
 	buffer.clear();
 }
 
-void MidiRecorder::command(ModuleCommand cmd)
+int MidiRecorder::command(ModuleCommand cmd, int param)
 {
-	if (cmd == ModuleCommand::ACCUMULATION_START)
+	if (cmd == ModuleCommand::ACCUMULATION_START){
 		accumulate(true);
-	else if (cmd == ModuleCommand::ACCUMULATION_STOP)
+		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_STOP){
 		accumulate(false);
+		return 0;
+	}
+	return COMMAND_NOT_HANDLED;
 }

@@ -67,7 +67,6 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 {
 	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
-	backup_mode = BACKUP_MODE_NONE;
 	update_dt = DEFAULT_UPDATE_TIME;
 
 #if HAS_LIB_ALSA
@@ -297,11 +296,6 @@ void InputStreamMidi::update()
 	running = is_capturing();
 }
 
-void InputStreamMidi::set_backup_mode(int mode)
-{
-	backup_mode = mode;
-}
-
 void InputStreamMidi::set_update_dt(float dt)
 {
 	if (dt > 0)
@@ -310,11 +304,12 @@ void InputStreamMidi::set_update_dt(float dt)
 		update_dt = DEFAULT_UPDATE_TIME;
 }
 
-void InputStreamMidi::command(ModuleCommand cmd)
+int InputStreamMidi::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START)
 		start();
 	else if (cmd == ModuleCommand::STOP)
 		stop();
+	return COMMAND_NOT_HANDLED;
 }
 

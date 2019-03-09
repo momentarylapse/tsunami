@@ -127,6 +127,7 @@ void CaptureConsoleModeAudio::leave()
 void CaptureConsoleModeAudio::pause()
 {
 	chain->command(ModuleCommand::ACCUMULATION_STOP);
+	cc->enable("source", true);
 }
 
 void CaptureConsoleModeAudio::start()
@@ -139,13 +140,13 @@ void CaptureConsoleModeAudio::start()
 void CaptureConsoleModeAudio::stop()
 {
 	chain->stop();
+	cc->enable("source", true);
 }
 
 void CaptureConsoleModeAudio::dump()
 {
 	chain->command(ModuleCommand::ACCUMULATION_STOP);
 	recorder->reset_state();
-	cc->enable("source", true);
 }
 
 bool CaptureConsoleModeAudio::insert()

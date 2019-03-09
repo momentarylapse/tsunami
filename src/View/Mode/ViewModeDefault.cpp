@@ -726,8 +726,12 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("lock playback range"));
 
 	if (view->selection_mode != view->SelectionMode::NONE){
-		if (view->sel.bars.num > 0)
-			view->draw_cursor_hover(c, format(_("%d bars"), view->sel.bars.num));
+		if (view->sel.range.length > 0){
+			string s = view->song->get_time_str_long(view->sel.range.length);
+			if (view->sel.bars.num > 0)
+				s = format(_("%d bars"), view->sel.bars.num) + ", " + s;
+			view->draw_cursor_hover(c, s);
+		}
 	}
 
 }

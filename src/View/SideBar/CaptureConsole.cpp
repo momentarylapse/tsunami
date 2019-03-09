@@ -138,6 +138,7 @@ void CaptureConsole::on_start()
 void CaptureConsole::on_dump()
 {
 	view->stop();
+	mode->pause();
 	mode->dump();
 	enable("start", true);
 	enable("pause", false);
@@ -160,14 +161,17 @@ void CaptureConsole::on_pause()
 
 void CaptureConsole::on_ok()
 {
-	mode->stop();
+	view->stop();
+	mode->pause();
 	if (mode->insert())
 		session->set_mode("default");
 }
 
 void CaptureConsole::on_cancel()
 {
-	mode->stop();
+	view->stop();
+	mode->pause();
+	mode->dump();
 	session->set_mode("default");
 }
 

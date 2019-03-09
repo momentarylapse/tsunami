@@ -279,14 +279,18 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	grid_painter = new GridPainter(this);
 	midi_painter = new MidiPainter(this);
 
-	detail_steps = hui::Config.get_int("View.DetailSteps", 1);
 	msp.min_move_to_select = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
 	ZoomSpeed = hui::Config.get_float("View.ZoomSpeed", 0.1f);
-	mouse_wheel_speed = hui::Config.get_float("View.MouseWheelSpeed", 1.0f);
-	antialiasing = hui::Config.get_bool("View.Antialiasing", true);
+	set_mouse_wheel_speed(hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
+	set_antialiasing(hui::Config.get_bool("View.Antialiasing", true));
+	set_high_details(hui::Config.get_bool("View.HighDetails", true));
+	hui::Config.set_int("View.MouseMinMoveToSelect", msp.min_move_to_select);
+	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
+	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
+	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
 
 	images.speaker = LoadImage(tsunami->directory_static + "volume.tga");
 	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
@@ -388,22 +392,38 @@ AudioView::~AudioView()
 	delete(images.track_time);
 	delete(images.track_time_bg);
 
-	hui::Config.set_int("View.DetailSteps", detail_steps);
-	hui::Config.set_int("View.MouseMinMoveToSelect", msp.min_move_to_select);
-	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
-	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
-	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
-	hui::Config.set_bool("View.Antialiasing", antialiasing);
-	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
-
 	PerformanceMonitor::delete_channel(perf_channel);
+}
+
+void AudioView::set_antialiasing(bool set)
+{
+	antialiasing = set;
+	hui::Config.set_bool("View.Antialiasing", antialiasing);
+	force_redraw();
+	notify(MESSAGE_SETTINGS_CHANGE);
+}
+
+void AudioView::set_high_details(bool set)
+{
+	high_details = set;
+	detail_steps = high_details ? 1 : 3;
+	hui::Config.set_bool("View.HighDetails", high_details);
+	force_redraw();
+	notify(MESSAGE_SETTINGS_CHANGE);
+}
+
+void AudioView::set_mouse_wheel_speed(float speed)
+{
+	mouse_wheel_speed = speed;
+	hui::Config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
+	notify(MESSAGE_SETTINGS_CHANGE);
 }
 
 void AudioView::set_color_scheme(const string &name)
 {
 	hui::Config.set_str("View.ColorScheme", name);
 	basic_colors = basic_schemes[0];
-	for (ColorSchemeBasic &b: basic_schemes)
+	for (auto &b: basic_schemes)
 		if (b.name == name)
 			basic_colors = b;
 
@@ -1381,6 +1401,7 @@ void AudioView::update_peaks()
 void AudioView::set_midi_view_mode(MidiMode mode)
 {
 	midi_view_mode = mode;
+	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
 	for (auto *l: vlayer)
 		l->set_midi_mode(mode);
 	//forceRedraw();

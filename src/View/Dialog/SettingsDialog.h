@@ -28,6 +28,8 @@ public:
 	void on_audio_api();
 	void on_midi_api();
 	void on_cpu_meter();
+	void on_antialiasing();
+	void on_high_details();
 	void on_qed_find();
 
 

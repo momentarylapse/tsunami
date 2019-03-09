@@ -31,17 +31,19 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	hui::Window("settings_dialog", _parent)
 {
 	view = _view;
-	event("language", std::bind(&SettingsDialog::on_language, this));
-	event("color_scheme", std::bind(&SettingsDialog::on_color_scheme, this));
-	event("ogg_bitrate", std::bind(&SettingsDialog::on_ogg_bitrate, this));
-	event("default_artist", std::bind(&SettingsDialog::on_default_artist, this));
-	event("scroll_speed", std::bind(&SettingsDialog::on_scroll_speed, this));
-	event("cpu_meter", std::bind(&SettingsDialog::on_cpu_meter, this));
-	event("audio_api", std::bind(&SettingsDialog::on_audio_api, this));
-	event("midi_api", std::bind(&SettingsDialog::on_midi_api, this));
-	event("quick_export_dir_find", std::bind(&SettingsDialog::on_qed_find, this));
-	event("hui:close", std::bind(&SettingsDialog::destroy, this));
-	event("close", std::bind(&SettingsDialog::destroy, this));
+	event("language", [&]{ on_language(); });
+	event("color_scheme", [&]{ on_color_scheme(); });
+	event("ogg_bitrate", [&]{ on_ogg_bitrate(); });
+	event("default_artist", [&]{ on_default_artist(); });
+	event("scroll_speed", [&]{ on_scroll_speed(); });
+	event("cpu_meter", [&]{ on_cpu_meter(); });
+	event("antialiasing", [&]{ on_antialiasing(); });
+	event("high_details", [&]{ on_high_details(); });
+	event("audio_api", [&]{ on_audio_api(); });
+	event("midi_api", [&]{ on_midi_api(); });
+	event("quick_export_dir_find", [&]{ on_qed_find(); });
+	event("hui:close", [&]{ destroy(); });
+	event("close", [&]{ destroy(); });
 
 	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	set_options("default_artist", "placeholder=" + AppName);
@@ -76,7 +78,7 @@ void SettingsDialog::load_data()
 	}
 
 	// color scheme
-	foreachi(ColorSchemeBasic &b, view->basic_schemes, i){
+	foreachi(auto &b, view->basic_schemes, i){
 		add_string("color_scheme", b.name);
 		if (b.name == view->colors.name)
 			set_int("color_scheme", i);
@@ -93,11 +95,10 @@ void SettingsDialog::load_data()
 
 	set_string("quick_export_dir", hui::Config.get_str("QuickExportDir", ""));
 
-	//SetInt("preview_sleep", PreviewSleepTime);
-
 	check("cpu_meter", hui::Config.get_bool("CpuDisplay", false));
-	set_float("scroll_speed", hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
-	//enable("scroll_speed", false);
+	check("antialiasing", view->antialiasing);
+	check("high_details", view->high_details);
+	set_float("scroll_speed", view->mouse_wheel_speed);
 
 	int n_audio = 0, n_midi = 0;
 	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
@@ -150,8 +151,7 @@ void SettingsDialog::on_default_artist()
 
 void SettingsDialog::on_scroll_speed()
 {
-	view->mouse_wheel_speed = get_float("");
-	hui::Config.set_float("View.MouseWheelSpeed", get_float(""));
+	view->set_mouse_wheel_speed(get_float(""));
 }
 
 void SettingsDialog::on_audio_api()
@@ -191,6 +191,16 @@ void SettingsDialog::on_cpu_meter()
 	bool show = is_checked("");
 	hui::Config.set_bool("CpuDisplay", show);
 	view->win->mini_bar->cpu_display->panel->hide_control(view->win->mini_bar->cpu_display->id, !show);
+}
+
+void SettingsDialog::on_antialiasing()
+{
+	view->set_antialiasing(is_checked(""));
+}
+
+void SettingsDialog::on_high_details()
+{
+	view->set_high_details(is_checked(""));
 }
 
 void SettingsDialog::on_qed_find()

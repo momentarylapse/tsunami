@@ -76,6 +76,7 @@ MidiPainter::MidiPainter(AudioView *view) :
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
 	rr = 5;
+	set_quality(1.0f);
 }
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
@@ -100,6 +101,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selec
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
 	rr = 5;
+	set_quality(1.0f);
 }
 
 
@@ -390,7 +392,7 @@ struct QuantizedBar
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func)
 {
-	if (cam->scale * song->sample_rate < 20)
+	if (cam->scale * song->sample_rate < quality.dx_min)
 		return;
 
 	/*if (vlayer->is_playable())
@@ -590,14 +592,14 @@ void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, floa
 {
 	//x1 += r;
 	// "shadow" to indicate length
-	if (x2 - x1 > rr*1.5f){
+	if (x2 - x1 > quality.shadow_threshold){
 		c->set_color(col_shadow);
 		c->draw_rect(x1, y - rr*0.7f - rx, x2 - x1 + rx, rr*2*0.7f + rx*2);
 	}
 
 	// the note circle
 	c->set_color(col);
-	if ((x2 - x1 > 6) or force_circle)
+	if ((x2 - x1 > quality.note_circle_threshold) or force_circle)
 		c->draw_circle(x1, y, rr+rx);
 	else
 		c->draw_rect(x1 - rr*0.8f - rx, y - rr*0.8f - rx, rr*1.6f + rx*2, rr*1.6f + rx*2);
@@ -640,7 +642,7 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 	draw_complex_note(c, n, state, x1, x2, y);
 
-	if (x2 - x1 > rr/4 and rr > 5){
+	if (x2 - x1 > quality.tab_text_threshold and rr > 5){
 		float font_size = rr * 1.2f;
 		c->set_color(colors.high_contrast_b);//text);
 		SymbolRenderer::draw(c, x1, y - font_size/2, font_size, i2s(n->pitch - instrument->string_pitch[n->stringno]), 0);
@@ -805,4 +807,12 @@ void MidiPainter::set_linear_range(int _pitch_min, int _pitch_max)
 void MidiPainter::set_shift(int _shift)
 {
 	shift = _shift;
+}
+
+void MidiPainter::set_quality(float q)
+{
+	quality.dx_min = 20 / q;
+	quality.shadow_threshold = rr*1.5f / q;
+	quality.note_circle_threshold = 6 / q;
+	quality.tab_text_threshold = rr/4 / q;
 }

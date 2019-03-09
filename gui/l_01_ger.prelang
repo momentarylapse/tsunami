@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-622
+628
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1862,15 +1862,33 @@ x
 alle Flags entfernen
 midi_editor/flag_staccato
 .
-
+Staccato Flag setzen
 midi_editor/flag_tenuto
 _
-
+Tenuto Flag setzen
 midi_editor/flag_trill
 tr
+Triller Flag setzen
+midi_editor/t_flags
+Flags
+
+settings_dialog/antialiasing
+antialiasing
+
+settings_dialog/high_details
+hohe Details
+
+settings_dialog/t_debug
+Debug
+
+settings_dialog/t_quality
+Qualität
+
+settings_dialog/tab
+Generell\\Oberfläche\\Geräte\\Sonstiges
 
 // Num Language Strings
-217
+219
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2306,3 +2324,7 @@ Datei gespeichert
 𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)
 lock playback range
 Abspielbereich festhalten
+%d bars
+%d Takte
+no alsa midi handler
+kein Alsa Midi Handler

@@ -166,6 +166,7 @@ public:
 	float ScrollSpeedFast;
 	float ZoomSpeed;
 	float mouse_wheel_speed;
+	void set_mouse_wheel_speed(float speed);
 
 	int mx, my;
 
@@ -198,6 +199,9 @@ public:
 	int detail_steps;
 	int preview_sleep_time;
 	bool antialiasing;
+	bool high_details;
+	void set_antialiasing(bool set);
+	void set_high_details(bool set);
 
 
 	void set_midi_view_mode(MidiMode mode);

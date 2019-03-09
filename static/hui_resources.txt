@@ -3901,7 +3901,7 @@ ok
 // Resource
 Dialog
 settings_dialog
-width=300,height=200
+width=400,height=300
 0
 0
 1
@@ -3910,79 +3910,19 @@ Grid
 vertical
 0
 0
-4
-Group
-pdp_general
+2
+TabControl
+tab
 
 0
 0
-1
+4
 Grid
 ?
 
 0
 0
 6
-Text
-pdt_defaultartist
-
-0
-0
-0
-Edit
-default_artist
-expandx
-1
-0
-0
-Text
-t_quick_export_dir
-
-0
-1
-0
-Grid
-?
-
-1
-1
-2
-Edit
-quick_export_dir
-expandx,disabled
-0
-0
-0
-Button
-quick_export_dir_find
-image=hui:find
-1
-0
-0
-Text
-pdt_oggrate
-
-0
-2
-0
-ComboBox
-ogg_bitrate
-
-1
-2
-0
-Group
-grp_interface
-
-1
-0
-1
-Grid
-?
-
-0
-0
-7
 Text
 pdp_language
 
@@ -3996,28 +3936,100 @@ expandx
 0
 0
 Text
-pdp_colorscheme
+pdt_defaultartist
 
 0
 1
+0
+Edit
+default_artist
+
+1
+1
+0
+Text
+t_quick_export_dir
+
+0
+2
+0
+Grid
+?
+
+1
+2
+2
+Edit
+quick_export_dir
+expandx,disabled
+0
+0
+0
+Button
+quick_export_dir_find
+image=hui:find
+1
+0
+0
+Grid
+?
+
+1
+0
+8
+Text
+pdp_colorscheme
+
+0
+0
 0
 ComboBox
 color_scheme
 expandx
 1
-1
+0
 0
 Text
 t_scroll_speed
 
 0
-2
+1
 0
 SpinButton
 scroll_speed
 --range=0.1:20:0.1
 1
+1
+0
+Text
+t_quality
+
+0
 2
+0
+Grid
+?
+
+1
+2
+2
+CheckBox
+antialiasing
+
+0
+0
+0
+CheckBox
+high_details
+
+1
+0
+0
+Text
+t_debug
+
+0
+3
 0
 CheckBox
 cpu_meter
@@ -4025,16 +4037,10 @@ cpu_meter
 1
 3
 0
-Group
-grp_devices
-
-2
-0
-1
 Grid
 ?
 
-0
+2
 0
 4
 Text
@@ -4063,8 +4069,26 @@ expandx
 0
 Grid
 ?
-buttonbar
+
 3
+0
+2
+Text
+pdt_oggrate
+
+0
+0
+0
+ComboBox
+ogg_bitrate
+expandx
+1
+0
+0
+Grid
+?
+buttonbar
+1
 0
 1
 DefButton
@@ -4746,7 +4770,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-473
+475
 // Text
 /cancel
 Cancel
@@ -5996,6 +6020,9 @@ Sample wählen
 sample_selection_dialog/sample_selection_list
 Preview\\Duration\\Name
 
+settings_dialog/antialiasing
+antialiasing
+
 settings_dialog/audio_api
 
 a program restart is required to apply
@@ -6005,11 +6032,8 @@ CPU meter
 settings_dialog/default_artist
 
 will create an artist=... tag in new files
-settings_dialog/grp_devices
-Devices
-
-settings_dialog/grp_interface
-User interface
+settings_dialog/high_details
+high details
 
 settings_dialog/midi_api
 
@@ -6019,9 +6043,6 @@ settings_dialog/ogg_bitrate
 
 settings_dialog/pdp_colorscheme
 Color scheme
-
-settings_dialog/pdp_general
-General
 
 settings_dialog/pdp_language
 Language
@@ -6038,14 +6059,23 @@ Einstellungen
 settings_dialog/t_audio_api
 Audio library
 
+settings_dialog/t_debug
+Debug
+
 settings_dialog/t_midi_api
 Midi library
+
+settings_dialog/t_quality
+Quality
 
 settings_dialog/t_quick_export_dir
 Quick export
 
 settings_dialog/t_scroll_speed
 Scroll speed
+
+settings_dialog/tab
+General\\User Interface\\Devices\\Other
 
 song_dialog/ad_t_data
 Data
@@ -6173,7 +6203,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-621
+627
 // Text
 /bpm
 Bpm
@@ -6915,13 +6945,13 @@ x
 alle Flags entfernen
 midi_editor/flag_staccato
 .
-
+Staccato Flag setzen
 midi_editor/flag_tenuto
 _
-
+Tenuto Flag setzen
 midi_editor/flag_trill
 tr
-
+Triller Flag setzen
 midi_editor/grp_operations
 Operationen
 
@@ -7009,6 +7039,9 @@ midi_editor/note_length
 midi_editor/quantize
 Quantisieren
 Markierte Noten am Gitter der Teilschläge ausrichten
+midi_editor/t_flags
+Flags
+
 midi_editor/t_note_length
 Länge
 
@@ -7825,6 +7858,9 @@ Sample wählen
 sample_selection_dialog/sample_selection_list
 Vorschau\\Dauer\\Name
 
+settings_dialog/antialiasing
+antialiasing
+
 settings_dialog/audio_api
 
 erfordert einen Neustart des Programms
@@ -7842,6 +7878,9 @@ Geräte
 
 settings_dialog/grp_interface
 Graphische Oberfläche
+
+settings_dialog/high_details
+hohe Details
 
 settings_dialog/midi_api
 
@@ -7879,14 +7918,23 @@ CPU-Meter
 settings_dialog/t_audio_api
 Audio Bibliothek
 
+settings_dialog/t_debug
+Debug
+
 settings_dialog/t_midi_api
 Midi Bibliothek
+
+settings_dialog/t_quality
+Qualität
 
 settings_dialog/t_quick_export_dir
 Schnellexport
 
 settings_dialog/t_scroll_speed
 Scroll Geschwindigkeit
+
+settings_dialog/tab
+Generell\\Oberfläche\\Geräte\\Sonstiges
 
 song_dialog/ad_t_data
 Daten
@@ -8039,7 +8087,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-217
+219
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8063,6 +8111,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
  - leer -
  has crashed.\t\tThe last lines of the file message.txt:
  ist abgestürtzt.\t\tDie letzten Zeilen der Datei message.txt:
+%d bars
+%d Takte
 %d strings: 
 %d Saiten: 
 %d times
@@ -8431,6 +8481,8 @@ module not configurable
 Modul nicht konfigurierbar
 move selection to scale
 Selektierung ziehen zum Skalieren
+no alsa midi handler
+kein Alsa Midi Handler
 no module selected
 kein Modul ausgewählt
 no plugins yet

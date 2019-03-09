@@ -1,37 +1,40 @@
-Dialog settings_dialog "Einstellungen" width=300 height=200
+Dialog settings_dialog "Einstellungen" width=400 height=300
 	Grid ? "" vertical
-		Group pdp_general "General"
+		TabControl tab "General\\User Interface\\Devices\\Other"
 			Grid ? ""
+				Text pdp_language "Language"
+				ComboBox language "" expandx
+				---|
 				Text pdt_defaultartist "Default artist"
-				Edit default_artist "" "tooltip=will create an artist=... tag in new files" expandx
+				Edit default_artist "" "tooltip=will create an artist=... tag in new files"
 				---|
 				Text t_quick_export_dir "Quick export"
 				Grid ? ""
 					Edit quick_export_dir "" expandx disabled
 					Button quick_export_dir_find "" image=hui:find
-				---|
-				Text pdt_oggrate "OGG bitrate"
-				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
-		Group grp_interface "User interface"
 			Grid ? ""
-				Text pdp_language "Language"
-				ComboBox language "" expandx
-				---|
 				Text pdp_colorscheme "Color scheme"
 				ComboBox color_scheme "" expandx
 				---|
 				Text t_scroll_speed "Scroll speed"
 				SpinButton scroll_speed "" --range=0.1:20:0.1
 				---|
-				.
+				Text t_quality "Quality"
+				Grid ? ""
+					CheckBox antialiasing "antialiasing"
+					CheckBox high_details "high details"
+				---|
+				Text t_debug "Debug"
 				CheckBox cpu_meter "CPU meter"
-		Group grp_devices "Devices"
 			Grid ? ""
 				Text t_audio_api "Audio library"
 				ComboBox audio_api "" expandx "tooltip=a program restart is required to apply"
 				---|
 				Text t_midi_api "Midi library"
 				ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
+			Grid ? ""
+				Text pdt_oggrate "OGG bitrate"
+				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx
 		Grid ? "" buttonbar
 			DefButton /close "Close" image=hui:close
 

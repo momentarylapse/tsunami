@@ -80,6 +80,7 @@ public:
 	void set_context(const rect &area, const Instrument &i, const Scale &s, bool playable, MidiMode mode);
 	void set_shift(int shift);
 	void set_linear_range(int pitch_min, int pitch_max);
+	void set_quality(float quality);
 	rect area;
 	const Instrument *instrument;
 	const Clef *clef;
@@ -88,6 +89,13 @@ public:
 	int pitch_min, pitch_max;
 	int shift;
 	bool as_reference;
+
+	struct{
+		float dx_min;
+		float shadow_threshold;
+		float note_circle_threshold;
+		float tab_text_threshold;
+	}quality;
 
 	float clef_dy;
 	float clef_y0;

@@ -1268,6 +1268,8 @@ void AudioView::draw_song(Painter *c)
 		song_area.x1 += SCROLLBAR_WIDTH;
 	bool animating = thm.update(this, song, song_area);
 
+	c->set_antialiasing(false);
+
 	cam.update(0.1f);
 
 	update_buffer_zoom();
@@ -1341,7 +1343,6 @@ void AudioView::on_draw(Painter *c)
 
 	c->set_font_size(FONT_SIZE);
 	c->set_line_width(LINE_WIDTH);
-	c->set_antialiasing(antialiasing);
 
 	if (enabled)
 		draw_song(c);

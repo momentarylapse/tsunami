@@ -137,6 +137,7 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 {
 	double view_pos_rel = view->cam.screen2sample(0);
+	c->set_antialiasing(view->antialiasing);
 
 	//float w = area.width();
 	float h = area.height();
@@ -160,6 +161,7 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 		if (b.peaks.num <= l){
 			c->set_color(ColorInterpolate(col, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->set_antialiasing(false);
 			return;
 		}
 
@@ -197,11 +199,13 @@ void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset)
 		for (int ci=0; ci<b.channels; ci++)
 			draw_line_buffer(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
+	c->set_antialiasing(false);
 }
 
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset)
 {
 	double view_pos_rel = view->cam.screen2sample(0);
+	c->set_antialiasing(view->antialiasing);
 
 	float h = area.height();
 	float hf = h / (2 * b.channels);
@@ -227,6 +231,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 		if (b.peaks.num <= l){
 			c->set_color(ColorInterpolate(col, Red, 0.3f));
 			c->draw_rect((offset - view_pos_rel) * view->cam.scale, area.y1, b.length * view->cam.scale, h);
+			c->set_antialiasing(false);
 			return;
 		}
 
@@ -247,6 +252,7 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 		for (int ci=0; ci<b.channels; ci++)
 			draw_line_buffer_sel(c, view_pos_rel, view->cam.scale, hf, x0, x1, y0[ci], b.c[ci], offset);
 	}
+	c->set_antialiasing(false);
 }
 
 void BufferPainter::set_context(const rect &_area)

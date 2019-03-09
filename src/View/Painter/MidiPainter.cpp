@@ -76,7 +76,7 @@ MidiPainter::MidiPainter(AudioView *view) :
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
 	rr = 5;
-	set_quality(1.0f);
+	set_quality(1.0f, true);
 }
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
@@ -101,7 +101,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selec
 	string_y0 = 0;
 	mode = MidiMode::LINEAR;
 	rr = 5;
-	set_quality(1.0f);
+	set_quality(1.0f, true);
 }
 
 
@@ -395,6 +395,9 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	if (cam->scale * song->sample_rate < quality.dx_min)
 		return;
 
+
+	c->set_antialiasing(quality.antialiasing);
+
 	/*if (vlayer->is_playable())
 		c->set_color(colors.text_soft1);
 	else
@@ -481,6 +484,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 
 	}
 	c->set_line_width(1);
+	c->set_antialiasing(false);
 }
 
 
@@ -581,11 +585,13 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
 	}*/
 
 	// draw notes
+	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: midi){
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		draw_note_linear(c, *n, note_state(n, as_reference, sel, hover));
 	}
+	c->set_antialiasing(false);
 }
 
 void MidiPainter::draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle)
@@ -658,8 +664,10 @@ void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &midi)
 
 	draw_rhythm(c, midi, range, [&](MidiNote *n){ return string_to_screen(n->stringno); });
 
+	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)
 		draw_note_tab(c,  n,  note_state(n, as_reference, sel, hover));
+	c->set_antialiasing(false);
 
 	c->set_font_size(AudioView::FONT_SIZE);
 }
@@ -741,8 +749,10 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
 
 	draw_rhythm(c, midi, range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
+	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)
 		draw_note_classical(c, n, note_state(n, as_reference, sel, hover));
+	c->set_antialiasing(false);
 
 	c->set_font_size(AudioView::FONT_SIZE);
 }
@@ -809,10 +819,11 @@ void MidiPainter::set_shift(int _shift)
 	shift = _shift;
 }
 
-void MidiPainter::set_quality(float q)
+void MidiPainter::set_quality(float q, bool antialiasing)
 {
 	quality.dx_min = 20 / q;
 	quality.shadow_threshold = rr*1.5f / q;
 	quality.note_circle_threshold = 6 / q;
 	quality.tab_text_threshold = rr/4 / q;
+	quality.antialiasing = antialiasing;
 }

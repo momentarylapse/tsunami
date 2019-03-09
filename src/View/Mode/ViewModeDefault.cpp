@@ -438,7 +438,7 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
 {
 	view->midi_painter->set_context(l->area, l->layer->track->instrument, view->midi_scale, l->is_playable(), l->midi_mode);
-	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f);
+	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
 	view->midi_painter->set_shift(shift);
 	view->midi_painter->draw(c, midi);
 }

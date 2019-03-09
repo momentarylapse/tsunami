@@ -205,6 +205,7 @@ OutputStream::OutputStream(Session *_session) :
 {
 //	printf("output new\n");
 	perf_channel = PerformanceMonitor::create_channel("out");
+	state = State::NO_DEVICE;
 	set_session_etc(_session, "", nullptr);
 	source = nullptr;
 
@@ -217,7 +218,6 @@ OutputStream::OutputStream(Session *_session) :
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	state = State::NO_DEVICE;
 	thread = nullptr;
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
@@ -386,8 +386,9 @@ void OutputStream::_pause()
 #endif
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream){
-		PaError err = Pa_StopStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_StopStream");
+		//Pa_AbortStream Pa_StopStream
+		PaError err = Pa_AbortStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_AbortStream");
 	}
 #endif
 
@@ -507,9 +508,13 @@ void OutputStream::_fill_prebuffer()
 
 		//stream_request_callback(_stream, ring_buf.available(), this);
 
-		pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
+		/*pa_operation *op = pa_stream_prebuf(s, cb, userdata)(pulse_stream, &pulse_stream_success_callback, nullptr);
+				_pulse_test_error("pa_stream_trigger");
+				pa_wait_op(session, op);*/
+
+		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");
-		pa_wait_op(session, op);
+		pa_wait_op(session, op);*/
 	}
 #endif
 
@@ -517,8 +522,8 @@ void OutputStream::_fill_prebuffer()
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO){
 		if (!portaudio_stream)
 			return;
-		PaError err = Pa_StartStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_StartStream");
+		//PaError err = Pa_StartStream(portaudio_stream);
+		//_portaudio_test_error(err, "Pa_StartStream");
 	}
 #endif
 
@@ -589,6 +594,8 @@ void OutputStream::on_read_end_of_stream()
 
 void OutputStream::reset_state()
 {
+	if (state == State::NO_DEVICE)
+		return;
 	if (state == State::PLAYING)
 		_pause();
 	if (state == State::PAUSED){

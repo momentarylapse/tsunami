@@ -296,7 +296,7 @@ void InputStreamAudio::_pause()
 {
 	if (state != State::CAPTURING)
 		return;
-	session->debug("input", "unpause");
+	session->debug("input", "pause");
 
 
 #if HAS_LIB_PULSEAUDIO
@@ -308,6 +308,7 @@ void InputStreamAudio::_pause()
 #endif
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream){
+		// often crashes here... might be a bug in the libraries...?!?
 		PaError err = Pa_StopStream(portaudio_stream);
 		_portaudio_test_error(err, "Pa_StopStream");
 	}
@@ -323,7 +324,6 @@ void InputStreamAudio::_create_dev()
 		return;
 
 	session->debug("input", "create device");
-	session->i(_("capture audio start"));
 
 	num_channels = 2;
 
@@ -382,9 +382,6 @@ void InputStreamAudio::_create_dev()
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}
-
-		PaError err = Pa_StartStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_StartStream");
 	}
 #endif
 

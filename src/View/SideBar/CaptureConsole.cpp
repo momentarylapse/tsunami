@@ -121,7 +121,6 @@ void CaptureConsole::on_leave()
 
 void CaptureConsole::on_start()
 {
-	msg_write("cc on start------");
 	if (state == State::PAUSED){
 	}else{
 		view->prepare_playback(view->get_playback_selection(true), false);

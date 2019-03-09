@@ -67,7 +67,6 @@ void CaptureConsoleModeAudio::enter_parent()
 
 void CaptureConsoleModeAudio::enter()
 {
-	msg_write("ccma enter");
 	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	cc->hide_control("single_grid", false);
@@ -132,7 +131,6 @@ void CaptureConsoleModeAudio::pause()
 
 void CaptureConsoleModeAudio::start()
 {
-	msg_write("ccma start");
 	input->reset_sync();
 	chain->command(ModuleCommand::ACCUMULATION_START);
 	cc->enable("source", false);

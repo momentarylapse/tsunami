@@ -53,6 +53,7 @@
 #include "Module/Midi/MidiEffect.h"
 #include "Module/Midi/MidiSource.h"
 #include "Module/ConfigPanel.h"
+#include "Module/SignalChain.h"
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
@@ -242,6 +243,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	embed(mini_bar, "main_table", 0, 2);
 
 	view->subscribe(this, [&]{ on_update(); });
+	view->signal_chain->subscribe(this, [&]{ on_update(); });
 	song->action_manager->subscribe(this, [&]{ on_update(); });
 	app->clipboard->subscribe(this, [&]{ on_update(); });
 	bottom_bar->subscribe(this, [&]{ on_bottom_bar_update(); });
@@ -284,6 +286,7 @@ void TsunamiWindow::on_destroy()
 	hui::Config.set_bool("Window.Maximized", is_maximized());
 
 	view->unsubscribe(this);
+	view->signal_chain->unsubscribe(this);
 	song->action_manager->unsubscribe(this);
 	app->clipboard->unsubscribe(this);
 	bottom_bar->unsubscribe(this);

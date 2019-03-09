@@ -497,7 +497,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
 	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(InputStreamAudio, out));
-	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
+//	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
 	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAudio::__delete__), &input);
 	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));

@@ -43,6 +43,11 @@ public:
 	void _cdecl set_device(Device *device);
 	Device* _cdecl get_device();
 
+	void _create_dev();
+	void _kill_dev();
+	void _pause();
+	void _unpause();
+
 	bool _cdecl start();
 	void _cdecl stop();
 
@@ -81,7 +86,11 @@ private:
 
 	DeviceManager *dev_man;
 
-	bool capturing;
+	enum class State{
+		NO_DEVICE,
+		CAPTURING,
+		PAUSED,
+	} state;
 
 	int num_channels;
 

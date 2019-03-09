@@ -86,6 +86,11 @@ void Session::i(const string &message)
 	log->info(this, message);
 }
 
+void Session::debug(const string &cat, const string &message)
+{
+	log->info(this, cat + " : " + message);
+}
+
 void Session::w(const string &message)
 {
 	log->warn(this, message);

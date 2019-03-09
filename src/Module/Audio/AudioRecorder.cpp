@@ -35,7 +35,7 @@ AudioRecorder::AudioRecorder() :
 	port_out.add(new Output(this));
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
-	accumulating = true;
+	accumulating = false;
 }
 
 void AudioRecorder::accumulate(bool enable)
@@ -46,4 +46,12 @@ void AudioRecorder::accumulate(bool enable)
 void AudioRecorder::reset_state()
 {
 	buf.clear();
+}
+
+void AudioRecorder::command(ModuleCommand cmd)
+{
+	if (cmd == ModuleCommand::ACCUMULATION_START)
+		accumulate(true);
+	else if (cmd == ModuleCommand::ACCUMULATION_STOP)
+		accumulate(false);
 }

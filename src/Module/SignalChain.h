@@ -73,6 +73,7 @@ public:
 	float tick_dt;
 	void _cdecl set_tick_dt(float dt);
 	void command(ModuleCommand cmd) override;
+	void prepare_start();
 	void start();
 	void stop();
 	void stop_hard();

@@ -45,6 +45,12 @@ public:
 
 	bool is_capturing();
 
+	enum class State{
+		EMPTY,
+		CAPTURING,
+		PAUSED
+	} state;
+
 	PeakMeterDisplay *peak_meter;
 	CaptureConsoleMode *mode;
 

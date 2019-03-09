@@ -29,6 +29,7 @@ CaptureConsole::CaptureConsole(Session *session):
 	SideBarConsole(_("Recording"), session)
 {
 	mode = nullptr;
+	state = State::EMPTY;
 
 
 	// dialog
@@ -62,8 +63,15 @@ CaptureConsole::~CaptureConsole()
 
 void CaptureConsole::on_enter()
 {
+	msg_write("cc on enter.....");
 	hide_control("single_grid", true);
 	hide_control("multi_grid", true);
+
+	state = State::EMPTY;
+	enable("start", true);
+	enable("pause", false);
+	enable("dump", false);
+	enable("ok", false);
 
 	int num_audio = 0, num_midi = 0;
 	for (const Track *t: view->sel.tracks){
@@ -87,6 +95,9 @@ void CaptureConsole::on_enter()
 
 	mode->enter();
 
+	session->signal_chain->subscribe(this, [&]{ on_putput_tick(); }, Module::MESSAGE_TICK);
+	session->signal_chain->subscribe(this, [&]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+
 	// automatically start
 	if (num_audio + num_midi == 1)
 		on_start();
@@ -94,7 +105,7 @@ void CaptureConsole::on_enter()
 
 void CaptureConsole::on_leave()
 {
-	if (mode->is_capturing())
+	if (state != State::EMPTY)
 		mode->insert();
 	session->signal_chain->unsubscribe(this);
 
@@ -110,51 +121,46 @@ void CaptureConsole::on_leave()
 
 void CaptureConsole::on_start()
 {
-	if (view->is_playback_active()){
-		view->pause(false);
+	msg_write("cc on start------");
+	if (state == State::PAUSED){
 	}else{
-		mode->dump();
 		view->prepare_playback(view->get_playback_selection(true), false);
-		view->play();
 	}
-	session->signal_chain->subscribe(this, [&]{ on_putput_tick(); }, Module::MESSAGE_TICK);
-	session->signal_chain->subscribe(this, [&]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 
+	view->signal_chain->start();
 	mode->start();
 	enable("start", false);
 	enable("pause", true);
 	enable("dump", true);
 	enable("ok", true);
+	state = State::CAPTURING;
 }
 
 void CaptureConsole::on_dump()
 {
-	if (view->is_playback_active()){
-		session->signal_chain->unsubscribe(this);
-		view->stop();
-	}
+	view->stop();
 	mode->dump();
 	enable("start", true);
 	enable("pause", false);
 	enable("dump", false);
 	enable("ok", false);
 	update_time();
+	state = State::EMPTY;
 }
 
 void CaptureConsole::on_pause()
 {
 	// TODO...
-	//view->stream->unsubscribe(this);
-	view->pause(true);
+	view->signal_chain->stop();
 	mode->pause();
 	enable("start", true);
 	enable("pause", false);
+	state = State::PAUSED;
 }
 
 
 void CaptureConsole::on_ok()
 {
-	session->signal_chain->unsubscribe(this);
 	mode->stop();
 	if (mode->insert())
 		session->set_mode("default");
@@ -162,18 +168,17 @@ void CaptureConsole::on_ok()
 
 void CaptureConsole::on_cancel()
 {
-	session->signal_chain->unsubscribe(this);
 	mode->stop();
 	session->set_mode("default");
 }
 
 void CaptureConsole::on_new_version()
 {
-	if (view->is_playback_active()){
-		session->signal_chain->unsubscribe(this);
+	if (state != State::EMPTY){
 		view->stop();
+		mode->insert();
+		on_dump();
 	}
-	mode->insert();
 	on_start();
 }
 
@@ -184,12 +189,12 @@ void CaptureConsole::update_time()
 
 void CaptureConsole::on_output_end_of_stream()
 {
-	session->signal_chain->unsubscribe(this);
 	view->stop();
 	mode->pause();
 	enable("start", true);
 	enable("pause", false);
 	enable("dump", true);
+	state = State::PAUSED;
 }
 
 void CaptureConsole::on_putput_tick()

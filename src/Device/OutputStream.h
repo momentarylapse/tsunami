@@ -57,9 +57,8 @@ public:
 
 	bool _cdecl is_playing();
 
-	bool fully_initialized;
 	bool buffer_is_cleared;
-	void _start_first_time();
+	void _fill_prebuffer();
 
 	void _cdecl set_device(Device *d);
 	int _cdecl get_available();
@@ -97,8 +96,15 @@ private:
 
 	DeviceManager *device_manager;
 	Device *device;
-	bool killed;
-	bool paused;
+	/*bool killed;
+	bool paused;*/
+
+	enum class State{
+		NO_DEVICE,
+		DEVICE_WITHOUT_DATA,
+		PAUSED,
+		PLAYING,
+	} state;
 
 	StreamThread *thread;
 	int perf_channel;

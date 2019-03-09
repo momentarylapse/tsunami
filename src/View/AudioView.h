@@ -88,8 +88,6 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
-	static const string MESSAGE_INPUT_CHANGE;
-	static const string MESSAGE_OUTPUT_STATE_CHANGE;
 	static const string MESSAGE_SOLO_CHANGE;
 
 	void update_peaks();

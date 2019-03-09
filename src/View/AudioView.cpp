@@ -66,8 +66,6 @@ const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
-const string AudioView::MESSAGE_INPUT_CHANGE = "InputChange";
-const string AudioView::MESSAGE_OUTPUT_STATE_CHANGE = "OutputStateChange";
 const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
 
 
@@ -863,7 +861,6 @@ void AudioView::on_stream_tick()
 
 void AudioView::on_stream_state_change()
 {
-	notify(MESSAGE_OUTPUT_STATE_CHANGE);
 	force_redraw();
 }
 
@@ -1562,9 +1559,12 @@ void AudioView::enable(bool _enabled)
 
 void AudioView::play()
 {
-	if (signal_chain->is_playback_active())
-		stop();
+	if (signal_chain->is_paused()){
+		signal_chain->start();
+		return;
+	}
 
+	prepare_playback(get_playback_selection(false), true);
 	signal_chain->start();
 }
 
@@ -1577,7 +1577,7 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop)
 	renderer->allow_tracks(get_playable_tracks());
 	renderer->allow_layers(get_playable_layers());
 
-	signal_chain->start();
+	signal_chain->command(ModuleCommand::PREPARE_START);
 }
 
 void AudioView::stop()

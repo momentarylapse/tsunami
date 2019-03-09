@@ -29,6 +29,7 @@ public:
 	void accumulate(bool enable);
 
 	void reset_state() override;
+	void command(ModuleCommand cmd) override;
 
 	Port *source;
 	AudioBuffer buf;

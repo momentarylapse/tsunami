@@ -47,8 +47,6 @@ public:
 
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
-
-	void on_input_update();
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

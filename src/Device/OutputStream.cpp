@@ -41,7 +41,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 		//pa_mainloop_iterate(m, 1, NULL);
 		hui::Sleep(0.01f);
 		n ++;
-		if (n >= 200)
+		if (n >= 1000)
 			return false;
 		if (pa_stream_get_state(s) == PA_STREAM_FAILED)
 			return false;
@@ -92,7 +92,7 @@ void OutputStream::pulse_stream_underflow_callback(pa_stream *s, void *userdata)
 
 bool OutputStream::feed_stream_output(int frames_request, float *out)
 {
-	if (paused){
+	if (state != State::PLAYING){
 		// output silence...
 		memset(out, 0, frames_request * 8);
 		return false;
@@ -210,7 +210,6 @@ OutputStream::OutputStream(Session *_session) :
 
 	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
 
-	fully_initialized = false;
 	volume = 1;
 
 	device_manager = session->device_manager;
@@ -218,8 +217,7 @@ OutputStream::OutputStream(Session *_session) :
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	killed = false;
-	paused = false;
+	state = State::NO_DEVICE;
 	thread = nullptr;
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
@@ -239,10 +237,10 @@ OutputStream::OutputStream(Session *_session) :
 
 OutputStream::~OutputStream()
 {
+	_pause();
 	_kill_dev();
 
 	device_manager->remove_stream(this);
-	killed = true;
 
 	if (thread){
 		thread->keep_running = false;
@@ -265,6 +263,9 @@ void OutputStream::__delete__()
 
 void OutputStream::_create_dev()
 {
+	if (state != State::NO_DEVICE)
+		return;
+	session->debug("out", "create device");
 	dev_sample_rate = session->sample_rate();
 
 #if HAS_LIB_PULSEAUDIO
@@ -279,6 +280,37 @@ void OutputStream::_create_dev()
 
 		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
 		pa_stream_set_underflow_callback(pulse_stream, &pulse_stream_underflow_callback, this);
+
+
+
+		pa_buffer_attr attr_out;
+		attr_out.fragsize = 1024;//-1;//512;
+		attr_out.maxlength = 4096;
+		attr_out.minreq = -1;
+		attr_out.tlength = -1;
+		attr_out.prebuf = -1;
+
+		const char *dev = nullptr;
+		if (!device->is_default())
+			dev = device->internal_name.c_str();
+		pa_stream_connect_playback(pulse_stream, dev, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
+		_pulse_test_error("pa_stream_connect_playback");
+
+
+		if (!pa_wait_stream_ready(pulse_stream)){
+			session->w("retry");
+
+			// retry with default device
+			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
+			_pulse_test_error("pa_stream_connect_playback");
+
+			if (!pa_wait_stream_ready(pulse_stream)){
+				// still no luck... give up
+				session->e("pa_wait_for_stream_ready");
+				stop();
+				return;
+			}
+		}
 	}
 #endif
 
@@ -303,13 +335,14 @@ void OutputStream::_create_dev()
 		}
 	}
 #endif
+	state = State::DEVICE_WITHOUT_DATA;
 }
 
 void OutputStream::_kill_dev()
 {
-	if (!paused)
-		_pause();
-
+	if (state != State::DEVICE_WITHOUT_DATA and state != State::PAUSED)
+		return;
+	session->debug("out", "kill device");
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream){
 		pa_stream_disconnect(pulse_stream);
@@ -327,6 +360,7 @@ void OutputStream::_kill_dev()
 		portaudio_stream = nullptr;
 	}
 #endif
+	state = State::NO_DEVICE;
 }
 
 
@@ -339,12 +373,9 @@ void OutputStream::stop()
 
 void OutputStream::_pause()
 {
-	if (!fully_initialized)
+	if (state != State::PLAYING)
 		return;
-	if (paused)
-		return;
-
-	paused = true;
+	session->debug("out", "pause");
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream){
@@ -368,19 +399,18 @@ void OutputStream::_pause()
 		thread = nullptr;
 	}
 
+	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
 void OutputStream::_unpause()
 {
-	if (!fully_initialized)
+	if (state != State::PAUSED)
 		return;
-	if (!paused)
-		return;
+	session->debug("out", "unpause");
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
-	paused = false;
 
 	if (!thread){
 		thread = new StreamThread(this);
@@ -401,6 +431,7 @@ void OutputStream::_unpause()
 	}
 #endif
 
+	state = State::PLAYING;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -444,59 +475,35 @@ void OutputStream::set_device(Device *d)
 
 void OutputStream::start()
 {
-	if (fully_initialized)
-		_unpause();
-	else
-		_start_first_time();
+	if (state == State::NO_DEVICE)
+		_create_dev();
+
+	if (state == State::DEVICE_WITHOUT_DATA)
+		_fill_prebuffer();
+
+	_unpause();
 }
 
-void OutputStream::_start_first_time()
+void OutputStream::_fill_prebuffer()
 {
-	read_end_of_stream = false;
-	played_end_of_stream = false;
+	if (state != State::DEVICE_WITHOUT_DATA)
+		return;
+	session->debug("out", "prebuf");
 
 	// we need some data in the buffer...
 	_read_stream();
 
+	if (!thread){
+		thread = new StreamThread(this);
+		thread->run();
+	}
 
-	thread = new StreamThread(this);
-	thread->run();
-
-	_create_dev();
+	//_create_dev();
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
 		if (!pulse_stream)
 			return;
-
-		pa_buffer_attr attr_out;
-		attr_out.fragsize = 1024;//-1;//512;
-		attr_out.maxlength = 4096;
-		attr_out.minreq = -1;
-		attr_out.tlength = -1;
-		attr_out.prebuf = -1;
-
-		const char *dev = nullptr;
-		if (!device->is_default())
-			dev = device->internal_name.c_str();
-		pa_stream_connect_playback(pulse_stream, dev, &attr_out, (pa_stream_flags)0, nullptr, nullptr);
-		_pulse_test_error("pa_stream_connect_playback");
-
-
-		if (!pa_wait_stream_ready(pulse_stream)){
-			session->w("retry");
-
-			// retry with default device
-			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, (pa_stream_flags)0, nullptr, nullptr);
-			_pulse_test_error("pa_stream_connect_playback");
-
-			if (!pa_wait_stream_ready(pulse_stream)){
-				// still no luck... give up
-				session->e("pa_wait_for_stream_ready");
-				stop();
-				return;
-			}
-		}
 
 		//stream_request_callback(_stream, ring_buf.available(), this);
 
@@ -515,8 +522,7 @@ void OutputStream::_start_first_time()
 	}
 #endif
 
-	fully_initialized = true;
-
+	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -583,28 +589,39 @@ void OutputStream::on_read_end_of_stream()
 
 void OutputStream::reset_state()
 {
+	if (state == State::PLAYING)
+		_pause();
+	if (state == State::PAUSED){
+#if HAS_LIB_PULSEAUDIO
+		if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
+			session->debug("out", "flush");
+			if (pulse_stream)
+				pa_stream_flush(pulse_stream, nullptr, nullptr);
+		}
+#endif
+		state = State::DEVICE_WITHOUT_DATA;
+	}
+
 	ring_buf.clear();
 	buffer_is_cleared = true;
-
-/*#if HAS_LIB_PULSEAUDIO
-	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
-		if (pulse_stream)
-			pa_stream_flush(pulse_stream, nullptr, nullptr);
-	}
-#endif*/
+	read_end_of_stream = false;
+	played_end_of_stream = false;
 }
 
 void OutputStream::command(ModuleCommand cmd)
 {
-	if (cmd == ModuleCommand::START)
+	if (cmd == ModuleCommand::START){
 		start();
-	else if (cmd == ModuleCommand::STOP)
+	}else if (cmd == ModuleCommand::STOP){
 		stop();
+	}else if (cmd == ModuleCommand::PREPARE_START){
+		if (state == State::NO_DEVICE)
+			_create_dev();
+		_fill_prebuffer();
+	}
 }
 
 bool OutputStream::is_playing()
 {
-	if (!fully_initialized)
-		return false;
-	return !paused;
+	return (state == State::PLAYING) or (state == State::PAUSED);
 }

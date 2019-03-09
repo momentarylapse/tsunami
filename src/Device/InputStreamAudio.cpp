@@ -184,7 +184,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 0;
 
-	capturing = false;
+	state = State::NO_DEVICE;
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
 #endif
@@ -206,7 +206,10 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 
 InputStreamAudio::~InputStreamAudio()
 {
-	stop();
+	if (state == State::CAPTURING)
+		_pause();
+	if (state == State::PAUSED)
+		_kill_dev();
 }
 
 void InputStreamAudio::__init__(Session *session)
@@ -234,40 +237,42 @@ Device *InputStreamAudio::get_device()
 
 void InputStreamAudio::set_device(Device *_device)
 {
+	auto old_state = state;
+	if (state == State::CAPTURING)
+		_pause();
+	if (state == State::PAUSED)
+		_kill_dev();
+
 	device = _device;
 	playback_delay_const = device->latency;
 
-	if (capturing){
-		stop();
+	if (old_state == State::CAPTURING)
 		start();
-	}
+
 
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
-void InputStreamAudio::stop()
+void InputStreamAudio::_kill_dev()
 {
-	if (!capturing)
+	if (state != State::PAUSED)
 		return;
-	session->i(_("capture audio stop"));
+	session->debug("input", "kill device");
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE){
-	//	printf("disconnect\n");
 		pa_stream_disconnect(pulse_stream);
-		_pulse_test_error("disconnect");
+		_pulse_test_error("pa_stream_disconnect");
 
 		for (int i=0; i<1000; i++){
 			if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED){
-	//			printf("terminated\n");
 				break;
 			}
 			hui::Sleep(0.001f);
 		}
-	//	printf("unref\n");
 
 		pa_stream_unref(pulse_stream);
-		_pulse_test_error("unref");
+		_pulse_test_error("pa_stream_unref");
 	}
 #endif
 
@@ -278,16 +283,46 @@ void InputStreamAudio::stop()
 		portaudio_stream = nullptr;
 	}
 #endif
-
-	capturing = false;
-	buffer.clear();
+	state = State::NO_DEVICE;
 }
 
-bool InputStreamAudio::start()
+void InputStreamAudio::stop()
 {
-	if (capturing)
-		stop();
+	session->i(_("capture audio stop"));
+	_pause();
+}
 
+void InputStreamAudio::_pause()
+{
+	if (state != State::CAPTURING)
+		return;
+	session->debug("input", "unpause");
+
+
+#if HAS_LIB_PULSEAUDIO
+	if (pulse_stream){
+		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
+		_pulse_test_error("pa_stream_cork");
+		pa_wait_op(session, op);
+	}
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (portaudio_stream){
+		PaError err = Pa_StopStream(portaudio_stream);
+		_portaudio_test_error(err, "Pa_StopStream");
+	}
+#endif
+
+	state = State::PAUSED;
+	//buffer.clear();
+}
+
+void InputStreamAudio::_create_dev()
+{
+	if (state != State::NO_DEVICE)
+		return;
+
+	session->debug("input", "create device");
 	session->i(_("capture audio start"));
 
 	num_channels = 2;
@@ -322,7 +357,7 @@ bool InputStreamAudio::start()
 		if (!pa_wait_stream_ready(pulse_stream)){
 
 			session->e("pa_wait_for_stream_ready");
-			return false;
+			return;
 		}
 	}
 #endif
@@ -353,10 +388,44 @@ bool InputStreamAudio::start()
 	}
 #endif
 
-	capturing = true;
+	state = State::PAUSED;
+}
 
-	reset_sync();
-	return capturing;
+void InputStreamAudio::_unpause()
+{
+	if (state != State::PAUSED)
+		return;
+	session->debug("input", "unpause");
+
+#if HAS_LIB_PULSEAUDIO
+	if (dev_man->audio_api == DeviceManager::ApiType::PULSE){
+		if (pulse_stream){
+			pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
+			_pulse_test_error("pa_stream_cork");
+			pa_wait_op(session, op);
+		}
+	}
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO){
+		if (portaudio_stream){
+			PaError err = Pa_StartStream(portaudio_stream);
+			_portaudio_test_error(err, "Pa_StartStream");
+		}
+	}
+#endif
+
+	state = State::CAPTURING;
+}
+
+bool InputStreamAudio::start()
+{
+	session->i(_("capture audio start"));
+	if (state == State::NO_DEVICE)
+		_create_dev();
+
+	_unpause();
+	return state == State::CAPTURING;
 }
 
 bool InputStreamAudio::_pulse_test_error(const string &msg)
@@ -399,7 +468,7 @@ void InputStreamAudio::reset_sync()
 
 bool InputStreamAudio::is_capturing()
 {
-	return capturing;
+	return state == State::CAPTURING;
 }
 
 int InputStreamAudio::get_delay()
@@ -409,8 +478,12 @@ int InputStreamAudio::get_delay()
 
 void InputStreamAudio::command(ModuleCommand cmd)
 {
-	if (cmd == ModuleCommand::START)
+	if (cmd == ModuleCommand::START){
 		start();
-	else if (cmd == ModuleCommand::STOP)
+	}else if (cmd == ModuleCommand::STOP){
 		stop();
+	}else if (cmd == ModuleCommand::PREPARE_START){
+		if (state == State::NO_DEVICE)
+			_create_dev();
+	}
 }

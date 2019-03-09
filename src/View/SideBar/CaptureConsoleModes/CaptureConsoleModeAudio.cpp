@@ -67,6 +67,7 @@ void CaptureConsoleModeAudio::enter_parent()
 
 void CaptureConsoleModeAudio::enter()
 {
+	msg_write("ccma enter");
 	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	cc->hide_control("single_grid", false);
@@ -111,7 +112,7 @@ void CaptureConsoleModeAudio::enter()
 	chain->connect(recorder, 0, sucker, 0);
 	//chain->connect(peak_meter, 0, sucker, 0);
 
-	chain->start();
+	chain->start(); // for preview
 	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
 }
 
@@ -126,13 +127,14 @@ void CaptureConsoleModeAudio::leave()
 
 void CaptureConsoleModeAudio::pause()
 {
-	recorder->accumulate(false);
+	chain->command(ModuleCommand::ACCUMULATION_STOP);
 }
 
 void CaptureConsoleModeAudio::start()
 {
+	msg_write("ccma start");
 	input->reset_sync();
-	recorder->accumulate(true);
+	chain->command(ModuleCommand::ACCUMULATION_START);
 	cc->enable("source", false);
 }
 
@@ -143,7 +145,7 @@ void CaptureConsoleModeAudio::stop()
 
 void CaptureConsoleModeAudio::dump()
 {
-	recorder->accumulate(false);
+	chain->command(ModuleCommand::ACCUMULATION_STOP);
 	recorder->reset_state();
 	cc->enable("source", true);
 }

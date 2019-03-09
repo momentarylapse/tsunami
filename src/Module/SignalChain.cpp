@@ -324,6 +324,12 @@ void SignalChain::reset_state()
 		m->reset_state();
 }
 
+void SignalChain::prepare_start()
+{
+	for (auto *m: modules)
+		m->command(ModuleCommand::PREPARE_START);
+}
+
 void SignalChain::start()
 {
 	if (state == State::ACTIVE)

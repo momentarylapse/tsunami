@@ -764,12 +764,7 @@ void TsunamiWindow::on_play()
 {
 	if (session->in_mode("capture"))
 		return;
-	if (view->is_paused()){
-		view->pause(false);
-	}else{
-		view->prepare_playback(view->get_playback_selection(false), true);
-		view->play();
-	}
+	view->play();
 }
 
 void TsunamiWindow::on_pause()

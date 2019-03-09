@@ -55,9 +55,9 @@ enum class ModuleCommand
 {
 	START,
 	STOP,
-	/*PAUSE,
-	UNPAUSE,
-	RESET_BUFFER*/
+	PREPARE_START,
+	ACCUMULATION_START,
+	ACCUMULATION_STOP,
 };
 
 class Module : public Observable<VirtualBase>

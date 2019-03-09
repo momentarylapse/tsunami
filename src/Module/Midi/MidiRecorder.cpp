@@ -18,6 +18,7 @@ int MidiRecorder::Output::read_midi(MidiEventBuffer& buf)
 
 	int r = rec->source->read_midi(buf);
 
+	msg_write(r);
 	if (rec->accumulating and (r > 0)){
 		rec->buffer.append(buf);
 	}
@@ -39,24 +40,24 @@ MidiRecorder::MidiRecorder() :
 	accumulating = false;
 }
 
-void MidiRecorder::accumulate(bool enable)
+void MidiRecorder::_accumulate(bool enable)
 {
 	accumulating = enable;
-}
-
-void MidiRecorder::reset_state()
-{
-	buffer.clear();
 }
 
 int MidiRecorder::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::ACCUMULATION_START){
-		accumulate(true);
+		_accumulate(true);
 		return 0;
 	}else if (cmd == ModuleCommand::ACCUMULATION_STOP){
-		accumulate(false);
+		_accumulate(false);
 		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_CLEAR){
+		buffer.clear();
+		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE){
+		return buffer.samples;
 	}
 	return COMMAND_NOT_HANDLED;
 }

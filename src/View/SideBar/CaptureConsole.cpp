@@ -207,7 +207,7 @@ void CaptureConsole::on_putput_tick()
 
 bool CaptureConsole::is_capturing()
 {
-	return mode->is_capturing();
+	return state == State::CAPTURING;
 }
 
 

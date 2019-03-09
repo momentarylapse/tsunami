@@ -53,7 +53,6 @@ public:
 	void dump() override;
 	bool insert() override;
 	int get_sample_count() override;
-	bool is_capturing() override;
 
 	void on_source();
 };

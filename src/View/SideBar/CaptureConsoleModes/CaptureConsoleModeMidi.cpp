@@ -18,6 +18,7 @@
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/SignalChain.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
@@ -48,6 +49,8 @@ void CaptureConsoleModeMidi::on_source()
 
 void CaptureConsoleModeMidi::set_target(Track *t)
 {
+	target = t;
+#if 0
 	if (preview_stream)
 		delete preview_stream;
 	if (peak_meter)
@@ -73,6 +76,7 @@ void CaptureConsoleModeMidi::set_target(Track *t)
 	if (!ok)
 		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::MIDI).c_str()));
 	cc->enable("start", ok);
+#endif
 }
 
 void CaptureConsoleModeMidi::enter_parent()
@@ -85,6 +89,8 @@ void CaptureConsoleModeMidi::enter()
 	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	cc->hide_control("single_grid", false);
 
+	chain = new SignalChain(session, "capture");
+
 	// add all
 	cc->reset("source");
 	for (Device *d: sources)
@@ -96,56 +102,55 @@ void CaptureConsoleModeMidi::enter()
 			cc->set_int("source", i);
 
 
-	input = new InputStreamMidi(session);
+	input = (InputStreamMidi*)chain->add(ModuleType::STREAM, "MidiInput");
 	input->set_update_dt(0.005f);
 	cc->peak_meter->set_source(nullptr);//input);
 
 	input->set_device(chosen_device);
+	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
+	auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
+	chain->connect(input, 0, recorder, 0);
+	chain->connect(recorder, 0, sucker, 0);
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == SignalType::MIDI)
 			set_target((Track*)t);
 
-	if (!input->start()){
-		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
-		CapturingByDialog = false;
-		msg_db_l(1);
-		return;*/
-	}
-	view->mode_capture->set_data({CaptureTrackData(target,input)});
+	chain->start();
+	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
 }
 
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->set_source(nullptr);
 	view->mode_capture->set_data({});
-	delete(input);
-	input = nullptr;
+	delete chain;
+	chain = nullptr;
 }
 
 void CaptureConsoleModeMidi::pause()
 {
-	input->accumulate(false);
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	cc->enable("source", true);
 }
 
 void CaptureConsoleModeMidi::start()
 {
 	input->reset_sync();
-	input->accumulate(true);
+	chain->command(ModuleCommand::ACCUMULATION_START, 0);
 	cc->enable("source", false);
 }
 
 void CaptureConsoleModeMidi::stop()
 {
 	preview_stream->stop();
-	input->stop();
+	chain->stop();
 }
 
 void CaptureConsoleModeMidi::dump()
 {
-	input->accumulate(false);
-	input->reset_accumulation();
-	cc->enable("source", true);
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 }
 
 bool CaptureConsoleModeMidi::insert()
@@ -154,18 +159,13 @@ bool CaptureConsoleModeMidi::insert()
 	int dpos = input->get_delay();
 	bool ok = cc->insert_midi(target, input->midi, dpos);
 
-	input->reset_accumulation();
+	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	return ok;
 }
 
 int CaptureConsoleModeMidi::get_sample_count()
 {
-	return input->get_sample_count();
-}
-
-bool CaptureConsoleModeMidi::is_capturing()
-{
-	return input->is_capturing();
+	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 }
 
 

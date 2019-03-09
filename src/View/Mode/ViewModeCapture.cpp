@@ -72,11 +72,11 @@ void ViewModeCapture::draw_post(Painter *c)
 				view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 			}
 		}else if (d.type() == SignalType::MIDI){
-			InputStreamMidi *input_midi = (InputStreamMidi*)d.input;
+			/*InputStreamMidi *input_midi = (InputStreamMidi*)d.input;
 			if (input_midi and input_midi->is_capturing()){
 				draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(input_midi->midi), true, view->sel.range.start());
 				view->draw_time_line(c, view->sel.range.start() + input_midi->get_sample_count(), (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
-			}
+			}*/
 		}
 	}
 }

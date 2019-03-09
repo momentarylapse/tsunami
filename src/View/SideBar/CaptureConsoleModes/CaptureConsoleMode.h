@@ -29,7 +29,6 @@ public:
 	virtual void pause() = 0;
 	virtual void dump() = 0;
 	virtual int get_sample_count() = 0;
-	virtual bool is_capturing() = 0;
 
 	CaptureConsole *cc;
 	Session *session;

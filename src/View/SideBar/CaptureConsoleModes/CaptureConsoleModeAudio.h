@@ -40,7 +40,6 @@ public:
 	void dump() override;
 	bool insert() override;
 	int get_sample_count() override;
-	bool is_capturing() override;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

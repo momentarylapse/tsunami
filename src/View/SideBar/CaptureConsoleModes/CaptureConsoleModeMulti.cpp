@@ -101,18 +101,6 @@ void CaptureConsoleModeMulti::enter()
 	}
 }
 
-bool CaptureConsoleModeMulti::is_capturing()
-{
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			return c.input_audio->is_capturing();
-		}else if (c.track->type == SignalType::MIDI){
-				return c.input_midi->is_capturing();
-		}
-	}
-	return false;
-}
-
 void CaptureConsoleModeMulti::pause()
 {
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
@@ -208,13 +196,6 @@ void CaptureConsoleModeMulti::dump()
 
 int CaptureConsoleModeMulti::get_sample_count()
 {
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			return c.recorder_audio->buf.length;
-		}else if (c.track->type == SignalType::MIDI){
-			return c.input_midi->get_sample_count();
-		}
-	}
-	return 0;
+	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 }
 

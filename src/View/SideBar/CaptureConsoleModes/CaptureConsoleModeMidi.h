@@ -44,7 +44,6 @@ public:
 	virtual void dump() override;
 	virtual bool insert() override;
 	virtual int get_sample_count() override;
-	virtual bool is_capturing() override;
 };
 
 

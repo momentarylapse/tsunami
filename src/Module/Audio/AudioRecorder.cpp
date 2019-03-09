@@ -38,7 +38,7 @@ AudioRecorder::AudioRecorder() :
 	accumulating = false;
 }
 
-void AudioRecorder::accumulate(bool enable)
+void AudioRecorder::_accumulate(bool enable)
 {
 	accumulating = enable;
 }
@@ -46,14 +46,16 @@ void AudioRecorder::accumulate(bool enable)
 int AudioRecorder::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::ACCUMULATION_START){
-		accumulate(true);
+		_accumulate(true);
 		return 0;
 	}else if (cmd == ModuleCommand::ACCUMULATION_STOP){
-		accumulate(false);
+		_accumulate(false);
 		return 0;
 	}else if (cmd == ModuleCommand::ACCUMULATION_CLEAR){
 		buf.clear();
 		return 0;
+	}else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE){
+		return buf.length;
 	}
 	return COMMAND_NOT_HANDLED;
 }

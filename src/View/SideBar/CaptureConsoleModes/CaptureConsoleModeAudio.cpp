@@ -162,10 +162,5 @@ bool CaptureConsoleModeAudio::insert()
 
 int CaptureConsoleModeAudio::get_sample_count()
 {
-	return recorder->buf.length;
-}
-
-bool CaptureConsoleModeAudio::is_capturing()
-{
-	return input->is_capturing();
+	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 }

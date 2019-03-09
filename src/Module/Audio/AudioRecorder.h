@@ -26,7 +26,7 @@ public:
 		AudioRecorder *rec;
 	};
 
-	void accumulate(bool enable);
+	void _accumulate(bool enable);
 
 	int command(ModuleCommand cmd, int param) override;
 

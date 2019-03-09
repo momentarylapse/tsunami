@@ -26,9 +26,8 @@ public:
 		MidiRecorder *rec;
 	};
 
-	void accumulate(bool enable);
+	void _accumulate(bool enable);
 
-	void reset_state() override;
 	int command(ModuleCommand cmd, int param) override;
 
 	Port *source;

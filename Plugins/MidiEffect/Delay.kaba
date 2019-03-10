@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-const string AutoConfigdelay = "-2:2:1:1000:ms"
+const string AUTO_CONFIG_DELAY = "-2:2:1:1000:ms"
 
 class Config extends PluginData
 	float delay

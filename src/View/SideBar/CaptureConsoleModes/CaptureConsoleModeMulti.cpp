@@ -31,10 +31,6 @@ CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 {
 }
 
-CaptureConsoleModeMulti::~CaptureConsoleModeMulti()
-{
-}
-
 void CaptureConsoleModeMulti::enter()
 {
 	cc->hide_control("multi_grid", false);
@@ -142,7 +138,6 @@ void CaptureConsoleModeMulti::on_source()
 
 void CaptureConsoleModeMulti::leave()
 {
-	view->mode_capture->set_data({});
 	for (auto c: items){
 		c.peak_meter_display->set_source(nullptr);
 		c.peak_meter->unplug(0);

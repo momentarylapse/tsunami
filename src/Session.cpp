@@ -184,6 +184,7 @@ void Session::set_mode(const string &mode)
 		e("unknown mode: " + mode);
 		return;
 	}
+	hui::RunLater(0.1f, [&]{ win->update_menu(); });
 	this->mode = mode;
 }
 

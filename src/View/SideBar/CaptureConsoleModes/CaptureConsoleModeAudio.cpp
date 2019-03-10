@@ -118,7 +118,6 @@ void CaptureConsoleModeAudio::allow_change_device(bool allow)
 
 void CaptureConsoleModeAudio::leave()
 {
-	view->mode_capture->set_data({});
 	chain->stop();
 	cc->peak_meter->set_source(nullptr);
 	delete chain;

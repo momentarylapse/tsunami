@@ -46,7 +46,7 @@ public:
 	void on_putput_tick();
 	void on_output_end_of_stream();
 
-	bool is_capturing();
+	bool has_data();
 
 	enum class State{
 		EMPTY,

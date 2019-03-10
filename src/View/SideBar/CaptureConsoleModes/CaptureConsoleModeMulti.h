@@ -42,7 +42,6 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 
 public:
 	CaptureConsoleModeMulti(CaptureConsole *cc);
-	virtual ~CaptureConsoleModeMulti();
 	void enter() override;
 	void leave() override;
 	void allow_change_device(bool allow) override;

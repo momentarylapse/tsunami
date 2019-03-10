@@ -111,7 +111,6 @@ void CaptureConsoleModeMidi::allow_change_device(bool allow)
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->set_source(nullptr);
-	view->mode_capture->set_data({});
 	delete chain;
 	chain = nullptr;
 }

@@ -114,7 +114,7 @@ void CaptureConsole::on_leave()
 
 bool CaptureConsole::allow_close()
 {
-	if (!is_capturing())
+	if (!has_data())
 		return true;
 
 	string answer = hui::QuestionBox(win, _("Question"), _("Cancel recording?"), true);
@@ -169,7 +169,7 @@ void CaptureConsole::on_ok()
 {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	if (state != State::EMPTY)
+	if (has_data())
 		view->mode_capture->insert();
 	session->set_mode("default");
 }
@@ -182,7 +182,7 @@ void CaptureConsole::on_cancel()
 
 void CaptureConsole::on_new_version()
 {
-	if (state != State::EMPTY){
+	if (has_data()){
 		view->stop();
 		chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 		view->mode_capture->insert();
@@ -214,8 +214,8 @@ void CaptureConsole::on_putput_tick()
 	update_time();
 }
 
-bool CaptureConsole::is_capturing()
+bool CaptureConsole::has_data()
 {
-	return state == State::CAPTURING;
+	return state != State::EMPTY;
 }
 

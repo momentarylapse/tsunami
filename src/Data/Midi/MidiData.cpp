@@ -475,14 +475,14 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
 			rr = Range(rr.offset, rr.length/2);
 		/*if (n->is(NOTE_FLAG_TRILL)){
 			int l = rr.length;
-			r.add(MidiEvent(rr.offset, n->pitch, n->volume));
+			r.add(MidiEvent(n));
 			r.add(MidiEvent(rr.offset + l/4, n->pitch, 0));
 			r.add(MidiEvent(rr.offset + l/4, n->pitch+1, n->volume));
 			r.add(MidiEvent(rr.offset + l/2, n->pitch+1, 0));
 			r.add(MidiEvent(rr.offset + l/2, n->pitch, n->volume));
 			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
 		}else*/{
-			r.add(MidiEvent(rr.offset, n->pitch, n->volume));
+			r.add(MidiEvent(n));
 			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
 		}
 	}
@@ -493,23 +493,26 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
 MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events)
 {
 	MidiNoteBuffer a;
-	MidiEventBuffer b;
+	MidiEventBuffer start_events;
 	for (MidiEvent &e: events){
 		if (e.volume > 0){
 			bool exists = false;
-			for (MidiEvent &bb: b)
+			for (MidiEvent &bb: start_events)
 				if ((int)bb.pitch == (int)e.pitch){
 					exists = true;
 					break;
 				}
 			if (!exists)
-				b.add(e);
+				start_events.add(e);
 		}else{
-			foreachi(MidiEvent &bb, b, i)
+			foreachi(MidiEvent &bb, start_events, i)
 				if ((int)bb.pitch == (int)e.pitch){
-					MidiNote *n = new MidiNote(Range(bb.pos, e.pos - bb.pos), bb.pitch, bb.volume);
+					MidiNote *n = new MidiNote(RangeTo(bb.pos, e.pos), bb.pitch, bb.volume);
+					n->flags = bb.flags;
+					n->stringno = bb.stringno;
+					n->clef_position = bb.clef_position;
 					a.add(n);
-					b.erase(i);
+					start_events.erase(i);
 					break;
 				}
 		}

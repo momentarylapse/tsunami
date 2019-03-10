@@ -58,10 +58,15 @@ class MidiEvent
 	int pos
 	float pitch
 	float volume
+	int flags
+	int stringno, clef_position
 	void __init__(int _pos, float _pitch, float _volume)
 		pos = _pos
 		pitch = _pitch
 		volume = _volume
+		flags = 0
+		stringno = -1
+		clef_position = -1
 	string str()
 		return "(" + pos + ", " + pitch + ", " + volume + ")"
 

@@ -378,6 +378,14 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("MidiNote", "flags", _offsetof(MidiNote, flags));
 	Kaba::LinkExternal("MidiNote.is", Kaba::mf(&MidiNote::is));
 	Kaba::LinkExternal("MidiNote.set", Kaba::mf(&MidiNote::set));
+	
+	Kaba::DeclareClassSize("MidiEvent", sizeof(MidiEvent));
+	Kaba::DeclareClassOffset("MidiEvent", "pos", _offsetof(MidiEvent, pos));
+	Kaba::DeclareClassOffset("MidiEvent", "pitch", _offsetof(MidiEvent, pitch));
+	Kaba::DeclareClassOffset("MidiEvent", "volume", _offsetof(MidiEvent, volume));
+	Kaba::DeclareClassOffset("MidiEvent", "stringno", _offsetof(MidiEvent, stringno));
+	Kaba::DeclareClassOffset("MidiEvent", "clef_position", _offsetof(MidiEvent, clef_position));
+	Kaba::DeclareClassOffset("MidiEvent", "flags", _offsetof(MidiEvent, flags));
 
 	Kaba::DeclareClassSize("MidiEventBuffer", sizeof(MidiEventBuffer));
 	Kaba::DeclareClassOffset("MidiEventBuffer", "samples", _offsetof(MidiEventBuffer, samples));

@@ -72,7 +72,7 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, [&]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 	}
 }
 
@@ -155,7 +155,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream){
 		//printf("XXX end of data...\n");
 		stream->played_end_of_stream = true;
-		hui::RunLater(0.001f, [&]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+		hui::RunLater(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 		//printf("/XXX end of data...\n");
 	}
 	return 0;
@@ -458,7 +458,7 @@ void OutputStream::_read_stream()
 	if (size == source->END_OF_STREAM){
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		hui::RunLater(0.001f,  [&]{ on_read_end_of_stream(); });
+		hui::RunLater(0.001f,  [this]{ on_read_end_of_stream(); });
 		return;
 	}
 

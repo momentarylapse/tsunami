@@ -188,7 +188,7 @@ DeviceManager::DeviceManager()
 
 	// only updating alsa makes sense...
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
-	hui_rep_id = hui::RunRepeated(2.0f, [&]{ _update_devices_midi_alsa(); });
+	hui_rep_id = hui::RunRepeated(2.0f, [this]{ _update_devices_midi_alsa(); });
 }
 
 DeviceManager::~DeviceManager()

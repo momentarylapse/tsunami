@@ -45,10 +45,7 @@ public:
 	virtual ~CaptureConsoleModeMulti();
 	void enter() override;
 	void leave() override;
-	void pause() override;
-	void start() override;
-	void stop() override;
-	bool insert() override;
+	void allow_change_device(bool allow) override;
 
 	void on_source();
 };

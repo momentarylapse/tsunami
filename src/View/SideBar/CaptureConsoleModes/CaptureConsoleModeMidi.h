@@ -37,12 +37,9 @@ public:
 	void on_source();
 	void on_target();
 	void set_target(const Track *t);
-	virtual void enter() override;
-	virtual void leave() override;
-	virtual void pause() override;
-	virtual void start() override;
-	virtual void stop() override;
-	virtual bool insert() override;
+	void enter() override;
+	void leave() override;
+	void allow_change_device(bool allow) override;
 };
 
 

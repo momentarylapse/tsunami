@@ -99,31 +99,23 @@ void CaptureConsoleModeMulti::enter()
 		items.add(c);
 		cc->event(c.id_source, [&]{ on_source(); });
 	}
-}
-
-void CaptureConsoleModeMulti::pause()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-}
-
-bool CaptureConsoleModeMulti::insert()
-{
-	bool ok = true;
-
-	song->begin_action_group();
-
+	
+	Array<CaptureTrackData> data;
 	for (auto &c: items){
 		if (c.track->type == SignalType::AUDIO){
-			int dpos = c.input_audio->get_delay();
-			ok &= cc->insert_audio(c.track, c.recorder_audio->buf, dpos);
+			data.add({c.track, c.input_audio, c.recorder_audio});
 		}else if (c.track->type == SignalType::MIDI){
-			int dpos = c.input_midi->get_delay();
-			ok &= cc->insert_midi(c.track, c.input_midi->midi, dpos);
+			data.add({c.track, c.input_midi, c.recorder_midi});
 		}
 	}
-	song->end_action_group();
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-	return ok;
+	chain->start();
+	view->mode_capture->set_data(data);
+}
+
+void CaptureConsoleModeMulti::allow_change_device(bool allow)
+{
+	for (auto &c: items)
+		cc->enable(c.id_source, allow);
 }
 
 void CaptureConsoleModeMulti::on_source()
@@ -165,26 +157,4 @@ void CaptureConsoleModeMulti::leave()
 	delete chain;
 }
 
-
-void CaptureConsoleModeMulti::start()
-{
-	Array<CaptureTrackData> data;
-	for (auto &c: items){
-		if (c.track->type == SignalType::AUDIO){
-			data.add({c.track, c.input_audio, c.recorder_audio});
-		}else if (c.track->type == SignalType::MIDI){
-			data.add({c.track, c.input_midi, c.recorder_midi});
-		}
-		cc->enable(c.id_source, false);
-	}
-	chain->start();
-	view->mode_capture->set_data(data);
-}
-
-void CaptureConsoleModeMulti::stop()
-{
-	chain->stop();
-	for (auto &c: items)
-		cc->enable(c.id_source, true);
-}
 

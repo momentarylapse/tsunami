@@ -103,41 +103,17 @@ void CaptureConsoleModeMidi::enter()
 	view->mode_capture->set_data({CaptureTrackData((Track*)target, input, recorder)});
 }
 
+void CaptureConsoleModeMidi::allow_change_device(bool allow)
+{
+	cc->enable("source", allow);
+}
+
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->set_source(nullptr);
 	view->mode_capture->set_data({});
 	delete chain;
 	chain = nullptr;
-}
-
-void CaptureConsoleModeMidi::pause()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	cc->enable("source", true);
-}
-
-void CaptureConsoleModeMidi::start()
-{
-	input->reset_sync();
-	chain->command(ModuleCommand::ACCUMULATION_START, 0);
-	cc->enable("source", false);
-}
-
-void CaptureConsoleModeMidi::stop()
-{
-	preview_stream->stop();
-	chain->stop();
-}
-
-bool CaptureConsoleModeMidi::insert()
-{
-	// insert recorded data with some delay
-	int dpos = input->get_delay();
-	bool ok = cc->insert_midi((Track*)target, recorder->buffer, dpos);
-
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-	return ok;
 }
 
 

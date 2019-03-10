@@ -17,6 +17,9 @@ class InputStreamMidi;
 class Module;
 class SignalChain;
 enum class SignalType;
+class Track;
+class AudioBuffer;
+class MidiEventBuffer;
 
 struct CaptureTrackData
 {
@@ -49,6 +52,10 @@ public:
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;
+	
+	bool insert();
+	bool insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
+	bool insert_audio(Track *target, AudioBuffer &buf, int delay);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

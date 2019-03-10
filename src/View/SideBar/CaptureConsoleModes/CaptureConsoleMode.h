@@ -19,14 +19,10 @@ class CaptureConsoleMode
 public:
 	CaptureConsoleMode(CaptureConsole *cc);
 	virtual ~CaptureConsoleMode(){};
-	virtual void start() = 0;
-	virtual void stop() = 0;
 	virtual void enter() = 0;
 	virtual void leave() = 0;
-	virtual bool insert() = 0;
-	virtual void pause() = 0;
-	void dump();
-	int get_sample_count();
+	
+	virtual void allow_change_device(bool allow) = 0;
 
 	CaptureConsole *cc;
 	Session *session;

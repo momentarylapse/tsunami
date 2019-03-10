@@ -111,6 +111,11 @@ void CaptureConsoleModeAudio::enter()
 	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
 }
 
+void CaptureConsoleModeAudio::allow_change_device(bool allow)
+{
+	cc->enable("source", allow);
+}
+
 void CaptureConsoleModeAudio::leave()
 {
 	view->mode_capture->set_data({});
@@ -118,33 +123,4 @@ void CaptureConsoleModeAudio::leave()
 	cc->peak_meter->set_source(nullptr);
 	delete chain;
 	chain = nullptr;
-}
-
-void CaptureConsoleModeAudio::pause()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	cc->enable("source", true);
-}
-
-void CaptureConsoleModeAudio::start()
-{
-	input->reset_sync();
-	chain->command(ModuleCommand::ACCUMULATION_START, 0);
-	cc->enable("source", false);
-}
-
-void CaptureConsoleModeAudio::stop()
-{
-	chain->stop();
-	cc->enable("source", true);
-}
-
-bool CaptureConsoleModeAudio::insert()
-{
-	// insert recorded data with some delay
-	int dpos = input->get_delay();
-
-	bool ok = cc->insert_audio(target, recorder->buf, dpos);
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-	return ok;
 }

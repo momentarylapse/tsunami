@@ -154,13 +154,13 @@ void ri_insert(ViewModeMidi *me)
 {
 	if (ri_keys.num == 0)
 		return;
-	Range r = me->get_midi_edit_range();
+	Range r = me->get_edit_range();
 	for (auto &e: ri_keys){
 		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, e.volume));
 		me->start_midi_preview(e.pitch, 0.1f);
 	}
 	ri_keys.clear();
-	me->set_cursor_pos(r.end() + 1, true);
+	me->set_cursor_pos(r.end(), true);
 	ri_timer.get();
 
 }
@@ -254,7 +254,7 @@ void ViewModeMidi::on_left_button_up()
 		if (hover->type == Selection::Type::MIDI_PITCH){
 			auto notes = get_creation_notes(hover, view->msp.start_pos);
 			if (notes.num > 0){
-				set_cursor_pos(notes[0]->range.end() + 1, true);
+				set_cursor_pos(notes[0]->range.end(), true);
 				octave = pitch_get_octave(hover->pitch);
 				view->cur_layer()->add_midi_notes(notes);
 				notes.clear(); // all notes owned by track now
@@ -287,13 +287,13 @@ void ViewModeMidi::on_mouse_move()
 
 void ViewModeMidi::edit_add_pause()
 {
-	Range r = get_midi_edit_range();
-	set_cursor_pos(r.end() + 1, true);
+	Range r = get_edit_range();
+	set_cursor_pos(r.end(), true);
 }
 
 void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 {
-	Range r = get_midi_edit_range();
+	Range r = get_edit_range();
 	int upos = octave * 7 + urelative;
 	const Clef& clef = view->cur_track()->instrument.get_clef();
 	int clef_pos = upos - clef.offset;
@@ -301,35 +301,33 @@ void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 	int pitch = uniclef_to_pitch(upos);
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
-	set_cursor_pos(r.end() + 1, true);
+	set_cursor_pos(r.end(), true);
 	start_midi_preview(pitch, 0.1f);
 }
 
 void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 {
-	Range r = get_midi_edit_range();
+	Range r = get_edit_range();
 	int pitch = cur_layer()->track->instrument.string_pitch[string_no] + hand_pos;
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
 	n->stringno = string_no;
 	cur_layer()->add_midi_note(n);
-	set_cursor_pos(r.end() + 1, true);
+	set_cursor_pos(r.end(), true);
 	start_midi_preview(pitch, 0.1f);
 }
 
 void ViewModeMidi::edit_backspace()
 {
-	int a = song->bars.get_prev_sub_beat(view->sel.range.offset-1, sub_beat_partition);
-	Range r = Range(a, view->sel.range.offset-a);
+	Range r = get_backwards_range();
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
 	view->song->delete_selection(s);
-	set_cursor_pos(a, true);
+	set_cursor_pos(r.offset, true);
 }
 
 void ViewModeMidi::jump_string(int delta)
 {
 	string_no = max(min(string_no + delta, cur_layer()->track->instrument.string_pitch.num - 1), 0);
 	view->force_redraw();
-
 }
 
 void ViewModeMidi::jump_octave(int delta)
@@ -433,6 +431,16 @@ void ViewModeMidi::on_key_down(int k)
 		if (k == hui::KEY_DOWN)
 			jump_string(-1);
 	}
+	
+	if (k == hui::KEY_LEFT){
+		Range r = get_backwards_range();
+		set_cursor_pos(r.offset, true);
+		return;
+	}
+	if (k == hui::KEY_RIGHT){
+		edit_add_pause();
+		return;
+	}
 
 	if (input_mode == InputMode::NOTE_LENGTH){
 		if (((k >= hui::KEY_1) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){
@@ -481,8 +489,7 @@ void ViewModeMidi::on_key_down(int k)
 	}
 
 	//if (k == hui::KEY_ESCAPE)
-		//tsunami->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
-		//view->setMode(view->mode_default);
+	//	session->set_mode("default");
 
 	ViewModeDefault::on_key_down(k);
 }
@@ -806,7 +813,7 @@ void ViewModeMidi::draw_post(Painter *c)
 
 	auto *l = cur_vlayer();
 	auto mode = l->midi_mode;
-	Range r = get_midi_edit_range();
+	Range r = get_edit_range();
 	float x1, x2;
 	view->cam.range2screen(r, x1, x2);
 
@@ -849,18 +856,36 @@ void ViewModeMidi::draw_post(Painter *c)
 }
 
 // seems fine
-Range ViewModeMidi::get_midi_edit_range()
+Range ViewModeMidi::get_edit_range()
 {
-	// manual selestion has priority
+	// manual selection has priority
 	if (view->sel.range.length > 0)
 		return view->sel.range;
 
-	int a = song->bars.get_prev_sub_beat(view->sel.range.offset+1, sub_beat_partition);
-	int b = song->bars.get_next_sub_beat(view->sel.range.end()-1, sub_beat_partition);
-	if (a == b)
+	int pos = view->sel.range.offset;
+	int a = song->bars.get_prev_sub_beat(pos+1, sub_beat_partition);
+	int b = song->bars.get_next_sub_beat(pos-1, sub_beat_partition);
+	if (a == b) // on a sub beat
 		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
 	for (int i=1; i<note_length; i++)
 		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
+	return RangeTo(a, b);
+}
+
+
+Range ViewModeMidi::get_backwards_range()
+{
+	// manual selection has priority
+	if (view->sel.range.length > 0)
+		return view->sel.range;
+
+	int pos = view->sel.range.offset;
+	int a = song->bars.get_prev_sub_beat(pos+1, sub_beat_partition);
+	int b = song->bars.get_next_sub_beat(pos-1, sub_beat_partition);
+	if (a == b) // on a sub beat
+		a = song->bars.get_prev_sub_beat(a, sub_beat_partition);
+	for (int i=1; i<note_length; i++)
+		a = song->bars.get_prev_sub_beat(a, sub_beat_partition);
 	return RangeTo(a, b);
 }
 

@@ -561,15 +561,8 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allow_termination()
 {
-	if (session->in_mode("capture")){
-		if (side_bar->capture_console->is_capturing()){
-			string answer = hui::QuestionBox(this, _("Question"), _("Cancel recording?"), true);
-			if (answer != "hui:yes")
-				return false;
-			side_bar->capture_console->on_dump();
-			session->set_mode("default");
-		}
-	}
+	if (!side_bar->allow_close())
+		return false;
 
 	if (song->action_manager->is_save())
 		return true;

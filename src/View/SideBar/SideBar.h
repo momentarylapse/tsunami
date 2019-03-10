@@ -68,6 +68,8 @@ public:
 	int active_console;
 	bool visible;
 
+	bool allow_close();
+
 	SongConsole *song_console;
 	GlobalFxConsole *global_fx_console;
 	TrackConsole *track_console;
@@ -100,6 +102,7 @@ public:
 	virtual void on_enter(){}
 	virtual void on_leave(){}
 	virtual void on_set_large(bool large){}
+	virtual bool allow_close(){ return true; }
 };
 
 #endif /* BOTTOMBAR_H_ */

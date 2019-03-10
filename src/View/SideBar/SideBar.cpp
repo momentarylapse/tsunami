@@ -94,7 +94,8 @@ void SideBar::add_console(SideBarConsole *c)
 
 void SideBar::on_close()
 {
-	session->set_mode("default");
+	if (allow_close())
+		session->set_mode("default");
 	//_hide();
 }
 
@@ -179,6 +180,12 @@ bool SideBar::is_active(int console)
 	return (active_console == console) and visible;
 }
 
+bool SideBar::allow_close()
+{
+	if (!visible or active_console < 0)
+		return true;
+	return consoles[active_console]->allow_close();
+}
 
 
 SideBarConsole::SideBarConsole(const string &_title, Session *_session)

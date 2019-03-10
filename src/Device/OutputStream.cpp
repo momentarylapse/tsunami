@@ -604,6 +604,7 @@ void OutputStream::reset_state()
 			session->debug("out", "flush");
 			if (pulse_stream)
 				pa_stream_flush(pulse_stream, nullptr, nullptr);
+			session->debug("out", "/flush");
 		}
 #endif
 		state = State::DEVICE_WITHOUT_DATA;

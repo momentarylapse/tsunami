@@ -64,7 +64,7 @@ public:
 
 
 	void execute_tsunami_plugin(const string &name);
-	void on_plugin_stop_request(VirtualBase *o);
+	void on_plugin_stop_request(TsunamiPlugin *p);
 
 	int sample_rate();
 

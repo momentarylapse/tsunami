@@ -113,7 +113,7 @@ void Session::execute_tsunami_plugin(const string& name)
 		return;
 
 	plugins.add(p);
-	p->subscribe3(this, std::bind(&Session::on_plugin_stop_request, this, std::placeholders::_1), p->MESSAGE_STOP_REQUEST);
+	p->subscribe3(this, [&](VirtualBase *o){ on_plugin_stop_request((TsunamiPlugin*)o); }, p->MESSAGE_STOP_REQUEST);
 
 	p->on_start();
 
@@ -122,10 +122,8 @@ void Session::execute_tsunami_plugin(const string& name)
 }
 
 
-void Session::on_plugin_stop_request(VirtualBase *o)
+void Session::on_plugin_stop_request(TsunamiPlugin *p)
 {
-	TsunamiPlugin *p = (TsunamiPlugin*)o;
-
 	hui::RunLater(0.001f, [this,p]{
 		last_plugin = p;
 		notify(MESSAGE_REMOVE_PLUGIN);
@@ -145,7 +143,7 @@ void Session::on_plugin_stop_request(VirtualBase *o)
 
 void Session::set_mode(const string &mode)
 {
-	//msg_write(" >> " + mode);
+	debug("mode", ">> " + mode);
 	if (mode == "default"){
 		view->set_mode(view->mode_default);
 		win->side_bar->_hide();

@@ -44,7 +44,7 @@ public:
 	Array<Message> all(Session *session);
 
 private:
-	void addMessage(Session *session, Type type, const string &message, const Array<string> &responses);
+	void add_message(Session *session, Type type, const string &message, const Array<string> &responses);
 	Array<Message> messages;
 };
 

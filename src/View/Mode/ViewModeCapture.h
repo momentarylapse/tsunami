@@ -53,9 +53,9 @@ public:
 	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;
 	
-	bool insert();
-	bool insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
-	bool insert_audio(Track *target, AudioBuffer &buf, int delay);
+	void insert();
+	void insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
+	void insert_audio(Track *target, const AudioBuffer &buf, int delay);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

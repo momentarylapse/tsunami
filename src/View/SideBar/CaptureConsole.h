@@ -32,6 +32,8 @@ public:
 	void on_enter() override;
 	void on_leave() override;
 
+	bool allow_close() override;
+
 	void on_start();
 	void on_dump();
 	void on_pause();

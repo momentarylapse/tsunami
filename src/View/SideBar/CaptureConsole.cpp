@@ -102,8 +102,6 @@ void CaptureConsole::on_enter()
 
 void CaptureConsole::on_leave()
 {
-	if (state != State::EMPTY)
-		view->mode_capture->insert();
 	view->mode_capture->set_data({});
 	chain = nullptr;
 	view->mode_capture->chain = nullptr;
@@ -112,6 +110,15 @@ void CaptureConsole::on_leave()
 	view->stop();
 
 	mode->leave();
+}
+
+bool CaptureConsole::allow_close()
+{
+	if (!is_capturing())
+		return true;
+
+	string answer = hui::QuestionBox(win, _("Question"), _("Cancel recording?"), true);
+	return (answer == "hui:yes");
 }
 
 
@@ -162,13 +169,14 @@ void CaptureConsole::on_ok()
 {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	if (view->mode_capture->insert())
-		session->set_mode("default");
+	if (state != State::EMPTY)
+		view->mode_capture->insert();
+	session->set_mode("default");
 }
 
 void CaptureConsole::on_cancel()
 {
-	on_dump();
+	//on_dump();
 	session->set_mode("default");
 }
 
@@ -176,6 +184,7 @@ void CaptureConsole::on_new_version()
 {
 	if (state != State::EMPTY){
 		view->stop();
+		chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 		view->mode_capture->insert();
 		on_dump();
 	}

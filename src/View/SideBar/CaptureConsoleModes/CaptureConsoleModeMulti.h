@@ -43,16 +43,12 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 public:
 	CaptureConsoleModeMulti(CaptureConsole *cc);
 	virtual ~CaptureConsoleModeMulti();
-	//virtual void enter_parent();
-	//virtual void leave_parent();
 	void enter() override;
 	void leave() override;
 	void pause() override;
 	void start() override;
 	void stop() override;
-	void dump() override;
 	bool insert() override;
-	int get_sample_count() override;
 
 	void on_source();
 };

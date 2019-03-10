@@ -31,15 +31,12 @@ public:
 	CaptureConsoleModeAudio(CaptureConsole *_cc);
 	void on_source();
 	void set_target(Track *t);
-	void enter_parent() override;
 	void enter() override;
 	void leave() override;
 	void pause() override;
 	void start() override;
 	void stop() override;
-	void dump() override;
 	bool insert() override;
-	int get_sample_count() override;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

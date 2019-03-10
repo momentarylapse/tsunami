@@ -18,6 +18,7 @@ class Session;
 
 class InputStreamAudio;
 class AudioSucker;
+class SignalChain;
 class MidiEventBuffer;
 
 class CaptureConsole : public SideBarConsole
@@ -57,6 +58,7 @@ public:
 	CaptureConsoleMode *mode_audio;
 	CaptureConsoleMode *mode_midi;
 	CaptureConsoleMode *mode_multi;
+	SignalChain *chain;
 
 
 	bool insert_audio(Track *target, AudioBuffer &buf, int delay);

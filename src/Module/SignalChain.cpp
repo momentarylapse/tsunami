@@ -453,9 +453,10 @@ int SignalChain::command(ModuleCommand cmd, int param)
 		prepare_start();
 		return 0;
 	}else{
+		int r = COMMAND_NOT_HANDLED;
 		for (Module *m: modules)
-			m->command(cmd, param);
-		return 0;
+			r = max(r, m->command(cmd, param));
+		return r;
 	}
 	return Module::COMMAND_NOT_HANDLED;
 }

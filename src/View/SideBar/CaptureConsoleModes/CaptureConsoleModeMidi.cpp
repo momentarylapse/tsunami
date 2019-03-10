@@ -18,6 +18,7 @@
 #include "../../../Data/SongSelection.h"
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/Audio/PeakMeter.h"
+#include "../../../Module/Midi/MidiRecorder.h"
 #include "../../../Module/SignalChain.h"
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
@@ -47,40 +48,13 @@ void CaptureConsoleModeMidi::on_source()
 }
 
 
-void CaptureConsoleModeMidi::set_target(Track *t)
+void CaptureConsoleModeMidi::set_target(const Track *t)
 {
 	target = t;
-#if 0
-	if (preview_stream)
-		delete preview_stream;
-	if (peak_meter)
-		delete peak_meter;
-	if (preview_synth)
-		delete preview_synth;
-
-	target = t;
-	// FIXME ...
-	//view->setCurTrack(target);
 	preview_synth = (Synthesizer*)t->synth->copy();
-	preview_synth->plug(0, input, 0);
-	peak_meter = (PeakMeter*)CreateAudioVisualizer(session, "PeakMeter");
-	peak_meter->plug(0, preview_synth, 0);
-	preview_stream = new OutputStream(session);
-	preview_stream->plug(0, peak_meter, 0);
-	preview_stream->set_buffer_size(512);
-	preview_stream->start();
+	chain->_add(preview_synth);
 
-
-	bool ok = (target->type == SignalType::MIDI);
-	cc->set_string("message", "");
-	if (!ok)
-		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::MIDI).c_str()));
-	cc->enable("start", ok);
-#endif
-}
-
-void CaptureConsoleModeMidi::enter_parent()
-{
+	//cc->enable("start", true);
 }
 
 void CaptureConsoleModeMidi::enter()
@@ -107,17 +81,26 @@ void CaptureConsoleModeMidi::enter()
 	cc->peak_meter->set_source(nullptr);//input);
 
 	input->set_device(chosen_device);
-	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
-	auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
-	chain->connect(input, 0, recorder, 0);
-	chain->connect(recorder, 0, sucker, 0);
+	recorder = (MidiRecorder*)chain->add(ModuleType::PLUMBING, "MidiRecorder");
+	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
 	for (const Track *t: view->sel.tracks)
 		if (t->type == SignalType::MIDI)
-			set_target((Track*)t);
+			set_target(t);
+			
+	//preview_synth->plug(0, input, 0);
+	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	preview_stream = (OutputStream*)chain->add(ModuleType::STREAM, "AudioOutput");
+	preview_stream->set_buffer_size(512);
+	
+	
+	chain->connect(input, 0, recorder, 0);
+	chain->connect(recorder, 0, preview_synth, 0);
+	chain->connect(preview_synth, 0, peak_meter, 0);
+	chain->connect(peak_meter, 0, preview_stream, 0);
 
 	chain->start();
-	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
+	view->mode_capture->set_data({CaptureTrackData((Track*)target, input, recorder)});
 }
 
 void CaptureConsoleModeMidi::leave()
@@ -147,25 +130,14 @@ void CaptureConsoleModeMidi::stop()
 	chain->stop();
 }
 
-void CaptureConsoleModeMidi::dump()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-}
-
 bool CaptureConsoleModeMidi::insert()
 {
 	// insert recorded data with some delay
 	int dpos = input->get_delay();
-	bool ok = cc->insert_midi(target, input->midi, dpos);
+	bool ok = cc->insert_midi((Track*)target, recorder->buffer, dpos);
 
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	return ok;
-}
-
-int CaptureConsoleModeMidi::get_sample_count()
-{
-	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 }
 
 

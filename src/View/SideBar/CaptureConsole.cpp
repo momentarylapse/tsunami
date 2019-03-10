@@ -30,6 +30,7 @@ CaptureConsole::CaptureConsole(Session *session):
 {
 	mode = nullptr;
 	state = State::EMPTY;
+	chain = nullptr;
 
 
 	// dialog
@@ -63,7 +64,6 @@ CaptureConsole::~CaptureConsole()
 
 void CaptureConsole::on_enter()
 {
-	msg_write("cc on enter.....");
 	hide_control("single_grid", true);
 	hide_control("multi_grid", true);
 
@@ -89,11 +89,8 @@ void CaptureConsole::on_enter()
 		mode = mode_multi;
 	}
 
-	mode_audio->enter_parent();
-	mode_midi->enter_parent();
-	mode_multi->enter_parent();
-
 	mode->enter();
+	view->mode_capture->chain = mode->chain;
 
 	session->signal_chain->subscribe(this, [&]{ on_putput_tick(); }, Module::MESSAGE_TICK);
 	session->signal_chain->subscribe(this, [&]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
@@ -107,15 +104,13 @@ void CaptureConsole::on_leave()
 {
 	if (state != State::EMPTY)
 		mode->insert();
+	chain = nullptr;
+	view->mode_capture->chain = nullptr;
 	session->signal_chain->unsubscribe(this);
 
 	view->stop();
 
 	mode->leave();
-
-	mode_audio->leave_parent();
-	mode_midi->leave_parent();
-	mode_multi->leave_parent();
 }
 
 
@@ -169,9 +164,7 @@ void CaptureConsole::on_ok()
 
 void CaptureConsole::on_cancel()
 {
-	view->stop();
-	mode->pause();
-	mode->dump();
+	on_dump();
 	session->set_mode("default");
 }
 

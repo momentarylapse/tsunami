@@ -17,16 +17,18 @@ class Track;
 class Synthesizer;
 class OutputStream;
 class PeakMeter;
+class MidiRecorder;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode
 {
 	InputStreamMidi *input;
 	Array<Device*> sources;
 	Device *chosen_device;
-	Track *target;
+	const Track *target;
 	Synthesizer *preview_synth;
 	PeakMeter *peak_meter;
 	OutputStream *preview_stream;
+	MidiRecorder *recorder;
 
 
 
@@ -34,16 +36,13 @@ public:
 	CaptureConsoleModeMidi(CaptureConsole *cc);
 	void on_source();
 	void on_target();
-	void set_target(Track *t);
-	virtual void enter_parent() override;
+	void set_target(const Track *t);
 	virtual void enter() override;
 	virtual void leave() override;
 	virtual void pause() override;
 	virtual void start() override;
 	virtual void stop() override;
-	virtual void dump() override;
 	virtual bool insert() override;
-	virtual int get_sample_count() override;
 };
 
 

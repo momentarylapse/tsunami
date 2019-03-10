@@ -18,7 +18,6 @@ int MidiRecorder::Output::read_midi(MidiEventBuffer& buf)
 
 	int r = rec->source->read_midi(buf);
 
-	msg_write(r);
 	if (rec->accumulating and (r > 0)){
 		rec->buffer.append(buf);
 	}

@@ -188,14 +188,3 @@ void CaptureConsoleModeMulti::stop()
 		cc->enable(c.id_source, true);
 }
 
-void CaptureConsoleModeMulti::dump()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-}
-
-int CaptureConsoleModeMulti::get_sample_count()
-{
-	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-}
-

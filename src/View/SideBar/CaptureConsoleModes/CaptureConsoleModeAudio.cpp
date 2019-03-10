@@ -61,10 +61,6 @@ void CaptureConsoleModeAudio::set_target(Track *t)
 	cc->enable("start", ok);
 }
 
-void CaptureConsoleModeAudio::enter_parent()
-{
-}
-
 void CaptureConsoleModeAudio::enter()
 {
 	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
@@ -143,12 +139,6 @@ void CaptureConsoleModeAudio::stop()
 	cc->enable("source", true);
 }
 
-void CaptureConsoleModeAudio::dump()
-{
-	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
-}
-
 bool CaptureConsoleModeAudio::insert()
 {
 	// insert recorded data with some delay
@@ -157,10 +147,4 @@ bool CaptureConsoleModeAudio::insert()
 	bool ok = cc->insert_audio(target, recorder->buf, dpos);
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	return ok;
-
-}
-
-int CaptureConsoleModeAudio::get_sample_count()
-{
-	return chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 }

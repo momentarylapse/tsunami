@@ -15,6 +15,7 @@
 class InputStreamAudio;
 class InputStreamMidi;
 class Module;
+class SignalChain;
 enum class SignalType;
 
 struct CaptureTrackData
@@ -47,6 +48,7 @@ public:
 
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
+	SignalChain *chain;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

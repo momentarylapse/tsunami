@@ -390,7 +390,7 @@ struct QuantizedBar
 };
 
 
-void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func)
+void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const Range &range, std::function<float(MidiNote*)> y_func)
 {
 	if (cam->scale * song->sample_rate < quality.dx_min)
 		return;
@@ -570,10 +570,8 @@ void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState 
 	draw_complex_note(c, &n, state, x1, x2, y);
 }
 
-void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_linear(Painter *c, const MidiNoteBufferRef &notes)
 {
-	Range range = cam->range() - shift;
-	MidiNoteBufferRef notes = midi.get_notes(range);
 	//c->setLineWidth(3.0f);
 
 /*	if (view->mode_midi->editing(this)){
@@ -586,7 +584,7 @@ void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &midi)
 
 	// draw notes
 	c->set_antialiasing(quality.antialiasing);
-	for (MidiNote *n: midi){
+	for (MidiNote *n: notes){
 		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		draw_note_linear(c, *n, note_state(n, as_reference, sel, hover));
@@ -655,14 +653,9 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	}
 }
 
-void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_tab(Painter *c, const MidiNoteBufferRef &notes)
 {
-	Range range = cam->range() - shift;
-	midi.update_meta(*instrument, midi_scale);
-	MidiNoteBufferRef notes = midi.get_notes(range);
-
-
-	draw_rhythm(c, midi, range, [&](MidiNote *n){ return string_to_screen(n->stringno); });
+	draw_rhythm(c, notes, cur_range, [&](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)
@@ -739,15 +732,9 @@ void MidiPainter::draw_clef_classical(Painter *c)
 
 
 
-void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
+void MidiPainter::draw_classical(Painter *c, const MidiNoteBufferRef &notes)
 {
-	Range range = cam->range() - shift;
-	midi.update_meta(*instrument, midi_scale);
-	MidiNoteBufferRef notes = midi.get_notes(range);
-
-
-
-	draw_rhythm(c, midi, range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
+	draw_rhythm(c, notes, cur_range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)
@@ -757,14 +744,46 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &midi)
 	c->set_font_size(AudioView::FONT_SIZE);
 }
 
+void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &notes)
+{
+	auto bars = song->bars.get_bars(cur_range);
+	for (auto *b: bars){
+		float x0, x1;
+		cam->range2screen(b->range(), x0, x1);
+		MidiNoteBufferRef bnotes = notes.get_notes(b->range());
+		int count[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+		for (MidiNote *n: bnotes)
+			count[pitch_to_rel(n->pitch)] ++;
+		for (int i=0; i<12; i++){
+			if (count[i] == 0)
+				continue;
+			color col = pitch_color(i);
+			col.a = (float)count[i] / (float)bnotes.num;
+			c->set_color(col);
+			float y0 = area.y1 + i*area.height()/12;
+			float y1 = area.y1 + (i+1)*area.height()/12;
+			c->draw_rect(rect(x0, x1, y0, y1));
+		}
+	}
+}
+
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)
 {
+	cur_range = cam->range() - shift;
+	midi.update_meta(*instrument, midi_scale);
+	MidiNoteBufferRef notes = midi.get_notes(cur_range);
+
+	if (notes.num > quality.note_count_threshold){
+		draw_low_detail_dummy(c, notes);
+		return;
+	}
+	
 	if (mode == MidiMode::LINEAR)
-		draw_linear(c, midi);
+		draw_linear(c, notes);
 	else if (mode == MidiMode::TAB)
-		draw_tab(c, midi);
+		draw_tab(c, notes);
 	else // if (mode == MidiMode::CLASSICAL)
-		draw_classical(c, midi);
+		draw_classical(c, notes);
 }
 
 void MidiPainter::draw_background(Painter *c)
@@ -826,4 +845,5 @@ void MidiPainter::set_quality(float q, bool antialiasing)
 	quality.note_circle_threshold = 6 / q;
 	quality.tab_text_threshold = rr/4 / q;
 	quality.antialiasing = antialiasing;
+	quality.note_count_threshold = area.width() * 0.4f * q;
 }

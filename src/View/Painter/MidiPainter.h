@@ -11,6 +11,7 @@
 #include <functional>
 #include "../../lib/base/base.h"
 #include "../../lib/math/math.h"
+#include "../../Data/Range.h"
 #include "../../Data/Midi/Scale.h"
 
 class AudioView;
@@ -20,6 +21,7 @@ class Selection;
 class Painter;
 class MidiNote;
 class MidiNoteBuffer;
+class MidiNoteBufferRef;
 class Clef;
 class Scale;
 class Song;
@@ -53,20 +55,24 @@ public:
 
 	void draw_pitch_grid(Painter *c, Synthesizer *synth);
 
-	void draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func);
+private:
+	void draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const Range &range, std::function<float(MidiNote*)> y_func);
 
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
 
 	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
-	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
-	void draw_clef_tab(Painter *c);
+	void draw_linear(Painter *c, const MidiNoteBufferRef &midi);
 	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_tab(Painter *c, const MidiNoteBuffer &midi);
+	void draw_tab(Painter *c, const MidiNoteBufferRef &midi);
 	void draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_clef_classical(Painter *c);
-	void draw_classical(Painter *c, const MidiNoteBuffer &midi);
+	void draw_classical(Painter *c, const MidiNoteBufferRef &midi);
+	
+	void draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &midi);
 
+public:
+	void draw_clef_tab(Painter *c);
+	void draw_clef_classical(Painter *c);
 	void draw(Painter *c, const MidiNoteBuffer &midi);
 	void draw_background(Painter *c);
 
@@ -96,6 +102,7 @@ public:
 		float shadow_threshold;
 		float note_circle_threshold;
 		float tab_text_threshold;
+		int note_count_threshold;
 	}quality;
 
 	float clef_dy;
@@ -105,6 +112,7 @@ public:
 	float string_y0;
 	MidiMode mode;
 	float rr;
+	Range cur_range;
 
 
 	float clef_pos_to_screen(int pos);

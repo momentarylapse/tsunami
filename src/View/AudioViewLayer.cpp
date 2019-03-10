@@ -181,6 +181,9 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 	float w = c->get_str_width(text) + view->CORNER_RADIUS * 2;
 	float x0, x1;
 	view->cam.range2screen(marker->range, x0, x1);
+	float w_threshold = view->high_details ? 20 : 40;
+	if (x1 - x0 < w_threshold)
+		return;
 	float y0 = area.y1;
 	float y1 = y0 + 5;
 

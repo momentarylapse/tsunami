@@ -32,7 +32,7 @@ public:
 	int backup_mode;
 	File *backup_file;
 
-	void save_chunk(AudioBuffer &buf);
+	void save_chunk(const AudioBuffer &buf);
 
 	void start();
 	void stop();

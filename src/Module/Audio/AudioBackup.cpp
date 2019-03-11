@@ -33,7 +33,8 @@ int AudioBackup::Output::read_audio(AudioBuffer& buf)
 
 	int r = backup->source->read_audio(buf);
 
-	backup->save_chunk(buf);
+	if (r > 0)
+		backup->save_chunk(buf.ref(0, r));
 
 	return r;
 }
@@ -48,7 +49,7 @@ void AudioBackup::set_backup_mode(int mode)
 	backup_mode = mode;
 }
 
-void AudioBackup::save_chunk(AudioBuffer &buf)
+void AudioBackup::save_chunk(const AudioBuffer &buf)
 {
 	if (backup_file){
 		// write to file

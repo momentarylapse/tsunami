@@ -405,6 +405,7 @@ void MixingConsole::load_data()
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
 			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
+			m->set_mode(mode);
 		}
 	}
 

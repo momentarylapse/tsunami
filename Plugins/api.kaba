@@ -587,6 +587,9 @@ class ProgressX
 extern ColorScheme colors
 //extern InputStreamAudio* view_input
 
+extern float db2amp(float db)
+extern float amp2db(float amp)
+
 
 extern void fft_c2c(complex[] in, complex[] out, bool inverse)
 extern void fft_r2c(float[] in, complex[] out)

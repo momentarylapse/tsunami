@@ -32,8 +32,8 @@ static const int DEFAULT_CHUNK_SIZE = 512;
 
 
 #if HAS_LIB_PULSEAUDIO
-extern void pa_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
-extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
+extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
+extern bool pulse_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 
 
 void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
@@ -303,7 +303,7 @@ void InputStreamAudio::_pause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pa_wait_op(session, op);
+		pulse_wait_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -354,9 +354,9 @@ void InputStreamAudio::_create_dev()
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 		_pulse_test_error("pa_stream_connect_record");
 
-		if (!pa_wait_stream_ready(pulse_stream)){
+		if (!pulse_wait_stream_ready(pulse_stream)){
 
-			session->e("pa_wait_for_stream_ready");
+			session->e("pulse_wait_stream_ready");
 			return;
 		}
 	}
@@ -399,7 +399,7 @@ void InputStreamAudio::_unpause()
 		if (pulse_stream){
 			pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
 			_pulse_test_error("pa_stream_cork");
-			pa_wait_op(session, op);
+			pulse_wait_op(session, op);
 		}
 	}
 #endif

@@ -99,6 +99,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("colors", &AudioView::colors);
 	//Kaba::LinkExternal("view_input", &export_view_input);
+	Kaba::LinkExternal("db2amp", (void*)&db2amplitude);
+	Kaba::LinkExternal("amp2db", (void*)&amplitude2db);
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -651,6 +653,8 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, hui::Menu *m, cons
 void PluginManager::find_plugins()
 {
 	Kaba::Init();
+	Kaba::config.show_compiler_stats = false;
+	Kaba::config.compile_silently = true;
 
 	// "AudioSource"
 	find_plugins_in_dir("AudioSource/", "", ModuleType::AUDIO_SOURCE, this);

@@ -400,14 +400,6 @@ void ViewModeMidi::on_key_down(int k)
 			}
 		}
 
-		// add break
-		if (k == hui::KEY_DOT)
-			edit_add_pause();
-
-		// remove
-		if (k == hui::KEY_BACKSPACE)
-			edit_backspace();
-
 		// select octave
 		if (k == hui::KEY_UP)
 			jump_octave(1);
@@ -425,14 +417,6 @@ void ViewModeMidi::on_key_down(int k)
 			}
 		}
 
-		// add break
-		if (k == hui::KEY_DOT)
-			edit_add_pause();
-
-		// remove
-		if (k == hui::KEY_BACKSPACE)
-			edit_backspace();
-
 		// select string
 		if (k == hui::KEY_UP)
 			jump_string(1);
@@ -440,6 +424,8 @@ void ViewModeMidi::on_key_down(int k)
 			jump_string(-1);
 	}
 	
+	
+	// cursor
 	if (k == hui::KEY_LEFT){
 		Range r = get_backwards_range();
 		set_cursor_pos(r.offset, true);
@@ -450,6 +436,10 @@ void ViewModeMidi::on_key_down(int k)
 		edit_add_pause();
 		return;
 	}
+
+	// remove
+	if (k == hui::KEY_BACKSPACE)
+		edit_backspace();
 
 	if (input_mode == InputMode::NOTE_LENGTH){
 		if (((k >= hui::KEY_1) and (k <= hui::KEY_9)) or ((k >= hui::KEY_A) and (k <= hui::KEY_F))){

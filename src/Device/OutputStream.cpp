@@ -31,9 +31,9 @@ const int DEFAULT_BUFFER_SIZE = 4096;
 
 #if HAS_LIB_PULSEAUDIO
 
-extern void pa_wait_op(Session*, pa_operation*); // -> AudioOutput.cpp
+extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 
-bool pa_wait_stream_ready(pa_stream *s)
+bool pulse_wait_stream_ready(pa_stream *s)
 {
 	//msg_write("wait stream ready");
 	int n = 0;
@@ -297,16 +297,16 @@ void OutputStream::_create_dev()
 		_pulse_test_error("pa_stream_connect_playback");
 
 
-		if (!pa_wait_stream_ready(pulse_stream)){
+		if (!pulse_wait_stream_ready(pulse_stream)){
 			session->w("retry");
 
 			// retry with default device
 			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
 			_pulse_test_error("pa_stream_connect_playback");
 
-			if (!pa_wait_stream_ready(pulse_stream)){
+			if (!pulse_wait_stream_ready(pulse_stream)){
 				// still no luck... give up
-				session->e("pa_wait_for_stream_ready");
+				session->e("pulse_wait_stream_ready");
 				stop();
 				return;
 			}
@@ -381,7 +381,7 @@ void OutputStream::_pause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pa_wait_op(session, op);
+		pulse_wait_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -422,7 +422,7 @@ void OutputStream::_unpause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pa_wait_op(session, op);
+		pulse_wait_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO

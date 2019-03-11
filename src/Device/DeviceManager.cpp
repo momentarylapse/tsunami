@@ -48,10 +48,10 @@ ApiDescription api_descriptions[] = {
 
 #if HAS_LIB_PULSEAUDIO
 
-void pa_wait_op(Session *session, pa_operation *op)
+void pulse_wait_op(Session *session, pa_operation *op)
 {
 	if (!op){
-		session->e("pa_wait_op:  op=nil");
+		session->e("pulse_wait_op:  op=nil");
 		return;
 	}
 //	printf("-w-");
@@ -70,7 +70,7 @@ void pa_wait_op(Session *session, pa_operation *op)
 	}
 	auto status = pa_operation_get_state(op);
 	if (status != PA_OPERATION_DONE){
-		session->e("pa_wait_op() failed:");
+		session->e("pulse_wait_op() failed:");
 		if (status == PA_OPERATION_RUNNING)
 			session->e("still running");
 		if (status == PA_OPERATION_CANCELLED)
@@ -81,7 +81,7 @@ void pa_wait_op(Session *session, pa_operation *op)
 //	printf("-o-");
 }
 
-void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
+void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
 {
 	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
 
@@ -95,7 +95,7 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 }
 
 
-bool pa_wait_context_ready(pa_context *c)
+bool pulse_wait_context_ready(pa_context *c)
 {
 	//msg_write("wait stream ready");
 	int n = 0;
@@ -113,7 +113,7 @@ bool pa_wait_context_ready(pa_context *c)
 }
 
 
-void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
+void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
 {
 	if (eol > 0 or !i or !userdata)
 		return;
@@ -128,7 +128,7 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 	dm->set_device_config(d);
 }
 
-void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
+void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
 {
 	if (eol > 0 or !i or !userdata)
 		return;
@@ -272,9 +272,9 @@ void DeviceManager::_update_devices_audio_pulse()
 	def->default_by_lib = true;
 	def->present = true;
 
-	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pa_sink_info_callback, this);
+	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pulse_sink_info_callback, this);
 	if (!_pulse_test_error(session, "pa_context_get_sink_info_list"))
-		pa_wait_op(session, op);
+		pulse_wait_op(session, op);
 
 	// system default
 	def = get_device_create(DeviceType::AUDIO_INPUT, "");
@@ -282,9 +282,9 @@ void DeviceManager::_update_devices_audio_pulse()
 	def->default_by_lib = true;
 	def->present = true;
 
-	op = pa_context_get_source_info_list(pulse_context, pa_source_info_callback, this);
+	op = pa_context_get_source_info_list(pulse_context, pulse_source_info_callback, this);
 	if (!_pulse_test_error(session, "pa_context_get_source_info_list"))
-		pa_wait_op(session, op);
+		pulse_wait_op(session, op);
 
 
 #endif
@@ -467,12 +467,12 @@ void DeviceManager::_init_audio_pulse()
 	if (_pulse_test_error(session, "pa_threaded_mainloop_start"))
 		return;
 
-	if (!pa_wait_context_ready(pulse_context)){
+	if (!pulse_wait_context_ready(pulse_context)){
 		session->e("pulse audio context does not turn 'ready'");
 		return;
 	}
 
-	pa_context_set_subscribe_callback(pulse_context, &pa_subscription_callback, this);
+	pa_context_set_subscribe_callback(pulse_context, &pulse_subscription_callback, this);
 	_pulse_test_error(session, "pa_context_set_subscribe_callback");
 	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), nullptr, this);
 	_pulse_test_error(session, "pa_context_subscribe");

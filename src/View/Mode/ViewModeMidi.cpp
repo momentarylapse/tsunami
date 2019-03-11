@@ -161,6 +161,7 @@ void ri_insert(ViewModeMidi *me)
 	}
 	ri_keys.clear();
 	me->set_cursor_pos(r.end(), true);
+	me->select_in_edit_cursor();
 	ri_timer.get();
 
 }
@@ -212,6 +213,7 @@ void ViewModeMidi::on_left_button_down()
 
 	if (creation_mode == CreationMode::SELECT and !over_sel_note){
 		set_cursor_pos(hover->pos, true);
+		select_in_edit_cursor();
 		view->msp.start(hover->pos, hover->y0);
 
 	}else{
@@ -256,6 +258,7 @@ void ViewModeMidi::on_left_button_up()
 			if (notes.num > 0){
 				set_cursor_pos(notes[0]->range.end(), true);
 				octave = pitch_get_octave(hover->pitch);
+				select_in_edit_cursor();
 				view->cur_layer()->add_midi_notes(notes);
 				notes.clear(); // all notes owned by track now
 			}
@@ -289,6 +292,7 @@ void ViewModeMidi::edit_add_pause()
 {
 	Range r = get_edit_range();
 	set_cursor_pos(r.end(), true);
+	select_in_edit_cursor();
 }
 
 void ViewModeMidi::edit_add_note_by_urelative(int urelative)
@@ -302,6 +306,7 @@ void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
 	set_cursor_pos(r.end(), true);
+	select_in_edit_cursor();
 	start_midi_preview(pitch, 0.1f);
 }
 
@@ -313,26 +318,29 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 	n->stringno = string_no;
 	cur_layer()->add_midi_note(n);
 	set_cursor_pos(r.end(), true);
+	select_in_edit_cursor();
 	start_midi_preview(pitch, 0.1f);
 }
 
 void ViewModeMidi::edit_backspace()
 {
 	Range r = get_backwards_range();
-	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
-	view->song->delete_selection(s);
 	set_cursor_pos(r.offset, true);
+	SongSelection s = get_select_in_edit_cursor();
+	view->song->delete_selection(s);
 }
 
 void ViewModeMidi::jump_string(int delta)
 {
 	string_no = max(min(string_no + delta, cur_layer()->track->instrument.string_pitch.num - 1), 0);
+	select_in_edit_cursor();
 	view->force_redraw();
 }
 
 void ViewModeMidi::jump_octave(int delta)
 {
 	octave = max(min(octave + delta, 7), 0);
+	select_in_edit_cursor();
 	view->force_redraw();
 }
 
@@ -435,6 +443,7 @@ void ViewModeMidi::on_key_down(int k)
 	if (k == hui::KEY_LEFT){
 		Range r = get_backwards_range();
 		set_cursor_pos(r.offset, true);
+		select_in_edit_cursor();
 		return;
 	}
 	if (k == hui::KEY_RIGHT){
@@ -887,6 +896,30 @@ Range ViewModeMidi::get_backwards_range()
 	for (int i=1; i<note_length; i++)
 		a = song->bars.get_prev_sub_beat(a, sub_beat_partition);
 	return RangeTo(a, b);
+}
+
+SongSelection ViewModeMidi::get_select_in_edit_cursor()
+{
+	Range r = get_edit_range();
+	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
+	auto mode = cur_vlayer()->midi_mode;
+	if (mode == MidiMode::TAB){
+		for (auto *n: s.notes)
+			if (n->stringno != string_no)
+				s.set(n, false);
+	}else if (mode == MidiMode::CLASSICAL){
+		for (auto *n: s.notes){
+			if (pitch_get_octave(n->pitch) != octave)
+				s.set(n, false);
+		}
+	}
+	return s;
+}
+
+void ViewModeMidi::select_in_edit_cursor()
+{
+	view->sel.notes = get_select_in_edit_cursor().notes;
+	view->update_selection();
 }
 
 void ViewModeMidi::start_selection()

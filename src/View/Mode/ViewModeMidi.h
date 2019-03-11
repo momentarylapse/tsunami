@@ -50,6 +50,9 @@ public:
 	Selection get_hover() override;
 	void start_selection() override;
 
+	SongSelection get_select_in_edit_cursor();
+	void select_in_edit_cursor();
+
 	MidiNoteBuffer get_creation_notes(Selection *sel, int pos0);
 	void set_sub_beat_partition(int partition);
 	void set_note_length(int length);

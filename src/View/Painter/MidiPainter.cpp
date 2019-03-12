@@ -202,7 +202,7 @@ int MidiPainter::y2clef_linear(float y, NoteModifier &mod)
 
 struct NoteData
 {
-	NoteData(){}
+	NoteData(){ n = nullptr; }
 	NoteData(MidiNote *note, const Range &r, float spu)
 	{
 		n = note;
@@ -278,10 +278,11 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 
 	// draw necks
 	c->set_line_width(neck_width);
-	for (auto &dd: d){
-		c->set_color(dd.col);
-		c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
-	}
+	for (auto &dd: d)
+		if (dd.n){
+			c->set_color(dd.col);
+			c->draw_line(dd.x, dd.y, dd.x, y0 + m * (dd.x - x0));
+		}
 
 
 	// bar
@@ -301,12 +302,14 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 		if (xx == x1 and (i+1 < d.num))
 			xx = (x1*4 + d[1-1].x) / 5;
 		float t1 = (xx - x0) / dx;
-		c->set_color(d[i].col);
-		c->draw_line(x0 + dx*t0, y0 + dy*t0, x0 + dx*t1, y0 + dy*t1);
-		if (d[i].length <= SIXTEENTH)
-			c->draw_line(x0 + dx*t0, y0 + dy*t0 - e*NOTE_BAR_DISTANCE, x0 + dx*t1, y0 + dy*t1 - e*NOTE_BAR_DISTANCE);
-		if (d[i].punctured)
-			c->draw_circle(d[i].x + rr, d[i].y + rr, 2);
+		if (d[i].n){
+			c->set_color(d[i].col);
+			c->draw_line(x0 + dx*t0, y0 + dy*t0, x0 + dx*t1, y0 + dy*t1);
+			if (d[i].length <= SIXTEENTH)
+				c->draw_line(x0 + dx*t0, y0 + dy*t0 - e*NOTE_BAR_DISTANCE, x0 + dx*t1, y0 + dy*t1 - e*NOTE_BAR_DISTANCE);
+			if (d[i].punctured)
+				c->draw_circle(d[i].x + rr, d[i].y + rr, 2);
+		}
 		t0 = t1;
 	}
 	if (d[0].triplet)

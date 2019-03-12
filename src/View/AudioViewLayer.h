@@ -25,6 +25,7 @@ class Clef;
 class Scale;
 class Range;
 class GridColors;
+class Selection;
 enum class NoteModifier;
 enum class MidiMode;
 
@@ -44,7 +45,11 @@ public:
 	void draw_sample_frame(Painter *c, SampleRef *s, const color &col, int delay);
 	void draw_sample(Painter *c, SampleRef *s);
 
-	void draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover);
+	void draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover, const Range &group_range, bool first, bool last);
+	void draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
+	void draw_markers(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
+
+	void draw_fades(Painter *c);
 
 	void draw_version_header(Painter *c);
 	virtual void draw(Painter *c);
@@ -57,8 +62,8 @@ public:
 	rect area;
 	rect area_last, area_target;
 	int height_wish, height_min;
-	Array<rect> marker_areas;
-	Array<rect> marker_label_areas;
+	Map<const TrackMarker*, rect> marker_areas;
+	Map<const TrackMarker*, rect> marker_label_areas;
 	AudioView *view;
 	void set_midi_mode(MidiMode wanted);
 	MidiMode midi_mode;

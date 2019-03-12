@@ -133,6 +133,18 @@ void Track::invalidate_all_peaks()
 			b.peaks.clear();
 }
 
+
+
+Array<TrackMarker*> Track::markers_sorted() const
+{
+	Array<TrackMarker*> sorted = markers;
+	for (int i=0; i<sorted.num; i++)
+		for (int j=i+1; j<sorted.num; j++)
+			if (sorted[i]->range.offset > sorted[j]->range.offset)
+				sorted.swap(i, j);
+	return sorted;
+}
+
 bool Track::has_version_selection()
 {
 	return fades.num > 0;

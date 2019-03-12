@@ -1306,12 +1306,6 @@ void FormatNami::make_consistent(Song *a)
 			for (auto *l: t->layers)
 				l->channels = 1;
 		}
-
-		// sort markers
-		for (int i=0; i<t->markers.num; i++)
-			for (int j=0; j<t->markers.num; j++)
-				if (t->markers[i]->range.offset > t->markers[j]->range.offset)
-					t->markers.swap(i, j);
 	}
 }
 

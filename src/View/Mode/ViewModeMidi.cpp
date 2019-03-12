@@ -598,6 +598,7 @@ MidiNoteBuffer ViewModeMidi::get_creation_notes(Selection *sel, int pos0)
 void ViewModeMidi::set_sub_beat_partition(int partition)
 {
 	sub_beat_partition = partition;
+	select_in_edit_cursor();
 	view->force_redraw();
 	notify();
 }
@@ -605,6 +606,7 @@ void ViewModeMidi::set_sub_beat_partition(int partition)
 void ViewModeMidi::set_note_length(int length)
 {
 	note_length = length;
+	select_in_edit_cursor();
 	view->force_redraw();
 	notify();
 }
@@ -779,20 +781,12 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 
 
 	// samples
-	for (SampleRef *s: l->layer->samples)
+	for (auto *s: l->layer->samples)
 		l->draw_sample(c, s);
 
 
-	if (l->layer->is_main()){
-
-		Track *t = l->layer->track;
-
-		// marker
-		l->marker_areas.resize(t->markers.num);
-		l->marker_label_areas.resize(t->markers.num);
-		foreachi(TrackMarker *m, t->markers, i)
-			l->draw_marker(c, m, i, (view->hover.type == Selection::Type::MARKER) and (view->hover.track == t) and (view->hover.index == i));
-	}
+	if (l->layer->is_main())
+		l->draw_markers(c, l->layer->track->markers_sorted(), *hover);
 }
 
 void ViewModeMidi::draw_track_data(Painter *c, AudioViewTrack *t)
@@ -893,12 +887,13 @@ SongSelection ViewModeMidi::get_select_in_edit_cursor()
 	Range r = get_edit_range();
 	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
 	auto mode = cur_vlayer()->midi_mode;
+	auto notes = s.notes;
 	if (mode == MidiMode::TAB){
-		for (auto *n: s.notes)
+		for (auto *n: notes)
 			if (n->stringno != string_no)
 				s.set(n, false);
-	}else if (mode == MidiMode::CLASSICAL){
-		for (auto *n: s.notes){
+	}else if (mode == MidiMode::CLASSICAL or mode == MidiMode::LINEAR){
+		for (auto *n: notes){
 			if (pitch_get_octave(n->pitch) != octave)
 				s.set(n, false);
 		}

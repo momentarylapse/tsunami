@@ -32,6 +32,9 @@
 #include "../Painter/MidiPainter.h"
 #include "../../lib/hui/Controls/Control.h"
 
+float marker_alpha_factor(float w, float w_group, bool border);
+Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);
+
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
@@ -443,6 +446,7 @@ void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuf
 	view->midi_painter->draw(c, midi);
 }
 
+
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
 	view->grid_painter->set_context(l->area, l->grid_colors());
@@ -458,18 +462,20 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 
 	// parts
+	auto groups = group_markers(l->layer->song()->get_parts());
 	c->set_line_width(2.0f);
-	string prev_part = "";
-	for (auto *m: l->layer->song()->get_parts()){
-		color col = l->marker_color(m);
-		col.a = 0.75f;
-		float x0, x1;
-		view->cam.range2screen(m->range, x0, x1);
-		if (m->text == prev_part)
-			col.a *= clampf((x1 - x0) / 200, 0.25f, 1.0f);
-		c->set_color(col);
-		c->draw_line(x0, l->area.y1, x0, l->area.y2);
-		prev_part = m->text;
+	for (auto &g: groups){
+		float gx0, gx1;
+		view->cam.range2screen(RangeTo(g[0]->range.start(), g.back()->range.end()), gx0, gx1);
+		for (auto *m: g){
+			color col = l->marker_color(m);
+			col.a = 0.75f;
+			float x0, x1;
+			view->cam.range2screen(m->range, x0, x1);
+			col.a *= marker_alpha_factor(x1 - x0, (x1-x0)*2, m == g[0]);
+			c->set_color(col);
+			c->draw_line(x0, l->area.y1, x0, l->area.y2);
+		}
 	}
 	c->set_line_width(1.0f);
 }
@@ -564,42 +570,6 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 	view->draw_boxed_str(c, t->area.x2 - 200, t->area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
 }
 
-Range dominant_range(Track *t, int index)
-{
-	if (index == -1){
-		return t->fades[0].range();
-	}
-	int start = t->fades[index].position;
-	if (index + 1 < t->fades.num)
-		return RangeTo(start, t->fades[index + 1].position + t->fades[index + 1].samples);
-	return Range(start, t->fades[index].samples);
-}
-
-void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
-{
-	Range r = dominant_range(l->layer->track, i);
-	color cs = color(0.2f, 0,0.7f,0);
-	float xx1, xx2;
-	view->cam.range2screen(r, xx1, xx2);
-	if (i == l->layer->track->fades.num - 1)
-		xx2 += 50;
-	if (i == -1)
-		xx1 -= 50;
-	float x1 = max(xx1, l->area.x1);
-	float x2 = min(xx2, l->area.x2);
-	c->set_color(cs);
-	c->draw_rect(x1, l->area.y1, x2-x1, l->area.height());
-	if (i == l->layer->track->fades.num - 1){
-		cs.a *= 0.5f;
-		c->set_color(cs);
-		c->draw_rect(xx2, l->area.y1, 50, l->area.height());
-	}else if (i == -1){
-		cs.a *= 0.5f;
-		c->set_color(cs);
-		c->draw_rect(xx1 - 50, l->area.y1, 50, l->area.height());
-	}
-}
-
 void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 {
 	Track *t = l->layer->track;
@@ -621,42 +591,13 @@ void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
 	l->draw_track_buffers(c);
 
 	// samples
-	for (SampleRef *s: l->layer->samples)
+	for (auto *s: l->layer->samples)
 		l->draw_sample(c, s);
 
-	if (l->layer->is_main()){
+	if (l->layer->is_main())
+		l->draw_markers(c, t->markers_sorted(), *hover);
 
-		// marker
-		l->marker_areas.resize(t->markers.num);
-		l->marker_label_areas.resize(t->markers.num);
-		foreachi(TrackMarker *m, l->layer->track->markers, i)
-			l->draw_marker(c, m, i, (hover->type == Selection::Type::MARKER) and (hover->track == t) and (hover->index == i));
-	}
-
-	c->set_line_width(1.0f);
-
-	int index_before = 0;
-	int index_own = l->layer->version_number();
-
-	/*if (index_own == 0 and l->layer->track->has_version_selection()){
-		draw_fade_bg(c, l, view, -1);
-	}*/
-
-	c->set_line_width(2);
-	foreachi (auto &f, l->layer->track->fades, i){
-		/*if (f.target == index_own){
-			draw_fade_bg(c, l, view, i);
-		}*/
-		if (f.target == index_own or index_before == index_own){
-			float x1, x2;
-			view->cam.range2screen(f.range(), x1, x2);
-			c->set_color(color(1,0,0.7f,0));
-			c->draw_line(x1, l->area.y1, x1, l->area.y2);
-			c->draw_line(x2, l->area.y1, x2, l->area.y2);
-		}
-		index_before = f.target;
-	}
-	c->set_line_width(1);
+	l->draw_fades(c);
 }
 
 int ViewModeDefault::get_track_move_target(bool visual)
@@ -875,8 +816,10 @@ Selection ViewModeDefault::get_hover()
 		// markers
 		if (s.layer->is_main()){
 			for (int i=0; i<min(s.track->markers.num, s.vlayer->marker_areas.num); i++){
-				if (s.vlayer->marker_areas[i].inside(mx, my) or s.vlayer->marker_label_areas[i].inside(mx, my)){
-					s.marker = s.track->markers[i];
+				auto *m = s.track->markers[i];
+				if (s.vlayer->marker_areas.contains(m) and s.vlayer->marker_label_areas.contains(m))
+				if (s.vlayer->marker_areas[m].inside(mx, my) or s.vlayer->marker_label_areas[m].inside(mx, my)){
+					s.marker = m;
 					s.type = Selection::Type::MARKER;
 					s.index = i;
 					return s;

@@ -526,9 +526,9 @@ Track *Song::time_track()
 Array<TrackMarker*> Song::get_parts()
 {
 	Track *t = time_track();
-	if (t)
-		return t->markers;
-	return {};
+	if (!t)
+		return {};
+	return t->markers_sorted();
 }
 
 string Song::get_tag(const string &key)

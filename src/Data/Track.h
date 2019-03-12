@@ -93,6 +93,7 @@ public:
 	Synthesizer *synth;
 
 	Array<TrackMarker*> markers;
+	Array<TrackMarker*> markers_sorted() const;
 
 	Array<CrossFade> fades;
 	bool has_version_selection();

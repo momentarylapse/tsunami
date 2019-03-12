@@ -167,7 +167,62 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 	}
 }
 
-void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover)
+bool can_merge(TrackMarker *a, TrackMarker *b)
+{
+	if (!a)
+		return false;
+	if (abs(a->range.end() - b->range.start()) > 100)
+		return false;
+	return a->text == b->text;
+}
+
+Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers)
+{
+	if (markers.num == 0)
+		return {};
+	Array<Array<TrackMarker*>> groups;
+	Array<TrackMarker*> group;
+	for (auto *m: markers){
+		if (group.num > 0){
+			if (can_merge(group.back(), m)){
+				group.add(m);
+			}else{
+				groups.add(group);
+				group = m; // new group
+			}
+		}else{
+			group.add(m);
+		}
+	}
+	groups.add(group);
+	return groups;
+}
+
+void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers, Selection &hover)
+{
+	marker_areas.clear();
+	marker_label_areas.clear();
+	auto groups = group_markers(markers);
+	for (auto &g: groups)
+		draw_marker_group(c, g, hover);
+}
+
+void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, Selection &hover)
+{
+	Range group_range = RangeTo(markers[0]->range.start(), markers.back()->range.end());
+	foreachi(auto *m, markers, i)
+			draw_marker(c, m, i, (hover.type == Selection::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
+}
+
+float marker_alpha_factor(float w, float w_group, bool border)
+{
+	if (border)
+		return clampf((w_group - 30) / 100, 0, 1.0f);
+	return clampf((w - 40) / 80, 0, 1.0f);
+}
+
+
+void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover, const Range &group_range, bool first, bool last)
 {
 	string text = marker->text;
 	if (marker->fx.num > 0)
@@ -179,11 +234,13 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 		c->set_font("", -1, true, false);
 
 	float w = c->get_str_width(text) + view->CORNER_RADIUS * 2;
-	float x0, x1;
+	float x0, x1, gx0, gx1;
+	view->cam.range2screen(group_range, gx0, gx1);
+	float w_threshold = view->high_details ? 30 : 50;
+	//if (gx1 - gx0 < w_threshold)
+	//	return;
 	view->cam.range2screen(marker->range, x0, x1);
-	float w_threshold = view->high_details ? 20 : 40;
-	if (x1 - x0 < w_threshold)
-		return;
+	bool merged = (x1 - x0 < w_threshold);
 	float y0 = area.y1;
 	float y1 = y0 + 5;
 
@@ -205,21 +262,98 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 		col_bg.a = 0.5f;
 	}
 
-	view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
-	c->set_color(col2);
-	c->draw_rect(x0, y0, x1-x0, y1-y0);
-	c->set_color(col2);
+	if ((!merged or first) and (gx1-gx0) > 40){
+		view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
+	}
+
+
 	c->set_line_width(2.0f);
-	c->draw_line(x0, area.y1, x0, area.y2);
+
+	// left line
+	if (first){
+		color cl = col2;
+		cl.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, true);
+		c->set_color(cl);
+		c->draw_line(x0, area.y1, x0, area.y2);
+	}
+	// right line
+	color cr = col2;
+	cr.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, last);
+	c->set_color(cr);
 	c->draw_line(x1, area.y1, x1, area.y2);
 	c->set_line_width(1.0f);
 
-	marker_areas[index] = rect(x0, x0 + w, y0, y0 + 15);
-	marker_label_areas[index] = view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text);
+	// top
+	c->set_color(col2);
+	c->draw_rect(x0, y0, x1-x0, y1-y0);
+
+	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + 15));
+	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text));
 
 	c->set_font("", view->FONT_SIZE, false, false);
 }
 
+Range dominant_range(Track *t, int index)
+{
+	if (index == -1){
+		return t->fades[0].range();
+	}
+	int start = t->fades[index].position;
+	if (index + 1 < t->fades.num)
+		return RangeTo(start, t->fades[index + 1].position + t->fades[index + 1].samples);
+	return Range(start, t->fades[index].samples);
+}
+
+void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
+{
+	Range r = dominant_range(l->layer->track, i);
+	color cs = color(0.2f, 0,0.7f,0);
+	float xx1, xx2;
+	view->cam.range2screen(r, xx1, xx2);
+	if (i == l->layer->track->fades.num - 1)
+		xx2 += 50;
+	if (i == -1)
+		xx1 -= 50;
+	float x1 = max(xx1, l->area.x1);
+	float x2 = min(xx2, l->area.x2);
+	c->set_color(cs);
+	c->draw_rect(x1, l->area.y1, x2-x1, l->area.height());
+	if (i == l->layer->track->fades.num - 1){
+		cs.a *= 0.5f;
+		c->set_color(cs);
+		c->draw_rect(xx2, l->area.y1, 50, l->area.height());
+	}else if (i == -1){
+		cs.a *= 0.5f;
+		c->set_color(cs);
+		c->draw_rect(xx1 - 50, l->area.y1, 50, l->area.height());
+	}
+}
+
+void AudioViewLayer::draw_fades(Painter *c)
+{
+	int index_before = 0;
+	int index_own = layer->version_number();
+
+	/*if (index_own == 0 and l->layer->track->has_version_selection()){
+		draw_fade_bg(c, l, view, -1);
+	}*/
+
+	c->set_line_width(2);
+	foreachi (auto &f, layer->track->fades, i){
+		/*if (f.target == index_own){
+			draw_fade_bg(c, l, view, i);
+		}*/
+		if (f.target == index_own or index_before == index_own){
+			float x1, x2;
+			view->cam.range2screen(f.range(), x1, x2);
+			c->set_color(color(1,0,0.7f,0));
+			c->draw_line(x1, area.y1, x1, area.y2);
+			c->draw_line(x2, area.y1, x2, area.y2);
+		}
+		index_before = f.target;
+	}
+	c->set_line_width(1);
+}
 
 
 void AudioViewLayer::set_edit_pitch_min_max(int _min, int _max)

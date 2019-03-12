@@ -21,9 +21,9 @@ PauseEditDialog::PauseEditDialog(hui::Window *root, Song *_song, int _index):
 	set_float("duration", (float)b->length / (float)song->sample_rate);
 	check("shift-data", true);
 
-	event("ok", std::bind(&PauseEditDialog::on_ok, this));
-	event("cancel", std::bind(&PauseEditDialog::destroy, this));
-	event("hui:close", std::bind(&PauseEditDialog::destroy, this));
+	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ destroy(); });
+	event("hui:close", [=]{ destroy(); });
 }
 
 void PauseEditDialog::on_ok()

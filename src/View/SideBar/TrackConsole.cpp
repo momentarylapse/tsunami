@@ -30,21 +30,21 @@ TrackConsole::TrackConsole(Session *session) :
 		set_string("instrument", i.name());
 
 	load_data();
-	view->subscribe(this, [&]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	view->subscribe(this, [=]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
 
-	event("name", [&]{ on_name(); });
-	event("volume", [&]{ on_volume(); });
-	event("panning", [&]{ on_panning(); });
-	event("instrument", [&]{ on_instrument(); });
-	event("edit_tuning", [&]{ on_edit_tuning(); });
-	event("select_synth", [&]{ on_select_synth(); });
+	event("name", [=]{ on_name(); });
+	event("volume", [=]{ on_volume(); });
+	event("panning", [=]{ on_panning(); });
+	event("instrument", [=]{ on_instrument(); });
+	event("edit_tuning", [=]{ on_edit_tuning(); });
+	event("select_synth", [=]{ on_select_synth(); });
 
-	event("edit_song", [&]{ on_edit_song(); });
-	event("edit_fx", [&]{ on_edit_fx(); });
-	event("edit_curves", [&]{ on_edit_curves(); });
-	event("edit_midi", [&]{ on_edit_midi(); });
-	event("edit_midi_fx", [&]{ on_edit_midi_fx(); });
-	event("_edit_synth", [&]{ on_edit_synth(); });
+	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_fx", [=]{ on_edit_fx(); });
+	event("edit_curves", [=]{ on_edit_curves(); });
+	event("edit_midi", [=]{ on_edit_midi(); });
+	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
+	event("_edit_synth", [=]{ on_edit_synth(); });
 }
 
 TrackConsole::~TrackConsole()
@@ -106,7 +106,7 @@ void TrackConsole::set_track(Track *t)
 	track = t;
 	load_data();
 	if (track)
-		track->subscribe(this, [&]{ on_update(); });
+		track->subscribe(this, [=]{ on_update(); });
 }
 
 void TrackConsole::on_name()

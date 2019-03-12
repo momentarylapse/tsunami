@@ -43,17 +43,17 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars)
 
 	update_result_bpm();
 
-	event("ok", [&]{ on_ok(); });
-	event("cancel", [&]{ on_close(); });
-	event("hui:close", [&]{ on_close(); });
-	event("beats", [&]{ on_beats(); });
-	event("divisor", [&]{ on_divisor(); });
-	event("pattern", [&]{ on_pattern(); });
-	event("bpm", [&]{ on_bpm(); });
-	event("number", [&]{ on_number(); });
-	event("complex", [&]{ on_complex(); });
-	event("mode", [&]{ on_mode(); });
-	event("shift-data", [&]{ on_shift_data(); });
+	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ on_close(); });
+	event("hui:close", [=]{ on_close(); });
+	event("beats", [=]{ on_beats(); });
+	event("divisor", [=]{ on_divisor(); });
+	event("pattern", [=]{ on_pattern(); });
+	event("bpm", [=]{ on_bpm(); });
+	event("number", [=]{ on_number(); });
+	event("complex", [=]{ on_complex(); });
+	event("mode", [=]{ on_mode(); });
+	event("shift-data", [=]{ on_shift_data(); });
 }
 
 void BarEditDialog::on_ok()

@@ -47,11 +47,11 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(hui::Window* _parent, Mod
 			set_int("list", n);
 	}
 
-	event("hui:close", std::bind(&ConfigurableSelectorDialog::on_close, this));
-	event_x("list", "hui:select", std::bind(&ConfigurableSelectorDialog::on_list_select, this));
-	event("list", std::bind(&ConfigurableSelectorDialog::on_select, this));
-	event("cancel", std::bind(&ConfigurableSelectorDialog::on_cancel, this));
-	event("ok", std::bind(&ConfigurableSelectorDialog::on_ok, this));
+	event("hui:close", [=]{ on_close(); });
+	event_x("list", "hui:select", [=]{ on_list_select(); });
+	event("list", [=]{ on_select(); });
+	event("cancel", [=]{ on_cancel(); });
+	event("ok", [=]{ on_ok(); });
 	enable("ok", false);
 }
 

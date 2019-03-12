@@ -162,7 +162,7 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 		stream = new OutputStream(session);
 		chain->_add(stream);
 		chain->connect(synth, 0, stream, 0);
-		chain->subscribe(this, [&]{ on_end_of_stream(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
+		chain->subscribe(this, [=]{ on_end_of_stream(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
 	}
 
 	source->start(pitch, session->sample_rate() * ttl, volume);

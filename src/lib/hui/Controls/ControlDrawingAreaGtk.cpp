@@ -330,7 +330,7 @@ ControlDrawingArea::~ControlDrawingArea()
 #endif
 
 	// clean-up list later
-	hui::RunLater(10, [this]{ _recently_deleted_areas.erase(this); });
+	hui::RunLater(10, [=]{ _recently_deleted_areas.erase(this); });
 }
 
 void ControlDrawingArea::make_current()
@@ -350,7 +350,7 @@ void ControlDrawingArea::redraw()
 	// non
 	if (std::this_thread::get_id() != main_thread_id){
 		//printf("readraw from other thread...redirect\n");
-		hui::RunLater(0, [this]{ redraw(); });
+		hui::RunLater(0, [=]{ redraw(); });
 		return;
 	}
 

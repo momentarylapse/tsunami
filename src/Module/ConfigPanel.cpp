@@ -62,14 +62,14 @@ public:
 		if (c->module_type != ModuleType::AUDIO_EFFECT)
 			hide_control("preview", true);
 
-		event("load_favorite", [&]{ on_load(); });
-		event("save_favorite", [&]{ on_save(); });
-		event("ok", [&]{ on_ok(); });
-		event("preview", [&]{ on_preview(); });
-		event("cancel", [&]{ on_close(); });
-		event("hui:close", [&]{ on_close(); });
+		event("load_favorite", [=]{ on_load(); });
+		event("save_favorite", [=]{ on_save(); });
+		event("ok", [=]{ on_ok(); });
+		event("preview", [=]{ on_preview(); });
+		event("cancel", [=]{ on_close(); });
+		event("hui:close", [=]{ on_close(); });
 
-		config->subscribe(this, [&]{ on_config_change(); }, config->MESSAGE_CHANGE);
+		config->subscribe(this, [=]{ on_config_change(); }, config->MESSAGE_CHANGE);
 	}
 	~ConfigurationDialog()
 	{
@@ -118,9 +118,9 @@ public:
 
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->subscribe(this, [&]{ onProgressCancel(); }, progress->MESSAGE_CANCEL);
+		progress->subscribe(this, [=]{ onProgressCancel(); }, progress->MESSAGE_CANCEL);
 
-		tsunami->win->view->stream->subscribe(this, [&]{ onUpdateStream(); });
+		tsunami->win->view->stream->subscribe(this, [=]{ onUpdateStream(); });
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();*/
 	}

@@ -43,8 +43,8 @@ BottomBar::BottomBar(Session *session)
 	add_console(plugin_console, "");
 	add_console(log_console, "");
 
-	event("choose", std::bind(&BottomBar::on_choose, this));
-	event("close", std::bind(&BottomBar::on_close, this));
+	event("choose", [=]{ on_choose(); });
+	event("close", [=]{ on_close(); });
 
 	reveal("revealer", false);
 	visible = false;

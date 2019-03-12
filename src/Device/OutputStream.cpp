@@ -209,7 +209,7 @@ OutputStream::OutputStream(Session *_session) :
 	set_session_etc(_session, "", nullptr);
 	source = nullptr;
 
-	port_in.add(InPortDescription(SignalType::AUDIO, (Port**)&source, "in"));
+	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
 	volume = 1;
 
@@ -451,6 +451,7 @@ void OutputStream::_read_stream()
 	if (size == source->NOT_ENOUGH_DATA){
 		//printf(" -> no data\n");
 		// keep trying...
+		ring_buf.write_ref_cancel(b);
 		return;
 	}
 
@@ -458,7 +459,8 @@ void OutputStream::_read_stream()
 	if (size == source->END_OF_STREAM){
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
-		hui::RunLater(0.001f,  [this]{ on_read_end_of_stream(); });
+		hui::RunLater(0.001f,  [=]{ on_read_end_of_stream(); });
+		ring_buf.write_ref_cancel(b);
 		return;
 	}
 
@@ -499,18 +501,14 @@ void OutputStream::_fill_prebuffer()
 		thread->run();
 	}
 
-	//_create_dev();
-
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
 		if (!pulse_stream)
 			return;
 
-		//stream_request_callback(_stream, ring_buf.available(), this);
-
-		/*pa_operation *op = pa_stream_prebuf(s, cb, userdata)(pulse_stream, &pulse_stream_success_callback, nullptr);
-				_pulse_test_error("pa_stream_trigger");
-				pa_wait_op(session, op);*/
+		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, nullptr);
+		_pulse_test_error("pa_stream_prebuf");
+		pulse_wait_op(session, op);
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");
@@ -573,22 +571,12 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 void OutputStream::on_played_end_of_stream()
 {
 	//printf("---------ON PLAY END OF STREAM\n");
-
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
 void OutputStream::on_read_end_of_stream()
 {
 	//printf("---------ON READ END OF STREAM\n");
-	read_end_of_stream = true;
-
-/*#ifdef DEVICE_PULSEAUDIO
-	pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
-	testError("pa_stream_drain");
-	pa_wait_op(op);
-#endif*/
-	// should drain...and use pa_stream_set_state_callback for notification
-
 	notify(MESSAGE_READ_END_OF_STREAM);
 }
 

@@ -28,8 +28,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	factor = _factor;
 	func = _func;
 
-	event_handler_id[0] = panel->event(id_slider, std::bind(&Slider::onSlide, this));
-	event_handler_id[1] = panel->event(id_edit, std::bind(&Slider::onEdit, this));
+	event_handler_id[0] = panel->event(id_slider, [=]{ on_slide(); });
+	event_handler_id[1] = panel->event(id_edit, [=]{ on_edit(); });
 
 	set(_value);
 }
@@ -46,8 +46,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	factor = _factor;
 	func = std::bind(_func, panel);
 
-	event_handler_id[0] = panel->event(id_slider, std::bind(&Slider::onSlide, this));
-	event_handler_id[1] = panel->event(id_edit, std::bind(&Slider::onEdit, this));
+	event_handler_id[0] = panel->event(id_slider, [=]{ on_slide(); });
+	event_handler_id[1] = panel->event(id_edit, [=]{ on_edit(); });
 
 	set(_value);
 }
@@ -92,14 +92,14 @@ void Slider::enable(bool enabled)
 }
 
 
-void Slider::onSlide()
+void Slider::on_slide()
 {
 	float value = value_min + panel->get_float(id_slider) * (value_max - value_min);
 	panel->set_float(id_edit, value * factor);
 	func();
 }
 
-void Slider::onEdit()
+void Slider::on_edit()
 {
 	float value = panel->get_float(id_edit) / factor;
 	panel->set_float(id_slider, (value - value_min) / (value_max - value_min));

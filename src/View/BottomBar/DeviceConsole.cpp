@@ -18,18 +18,18 @@ DeviceConsole::DeviceConsole(Session *session) :
 
 	from_resource("device-manager");
 
-	event_x("output-list", "hui:change", std::bind(&DeviceConsole::on_output_edit, this));
-	event_x("input-list", "hui:change", std::bind(&DeviceConsole::on_input_edit, this));
-	event_x("midi-input-list", "hui:change", std::bind(&DeviceConsole::on_midi_input_edit, this));
-	event_x("output-list", "hui:move", std::bind(&DeviceConsole::on_output_move, this));
-	event_x("input-list", "hui:move", std::bind(&DeviceConsole::on_input_move, this));
-	event_x("midi-input-list", "hui:move", std::bind(&DeviceConsole::on_midi_input_move, this));
-	event("top-priority", std::bind(&DeviceConsole::on_top_priority, this));
-	event("erase", std::bind(&DeviceConsole::on_erase, this));
+	event_x("output-list", "hui:change", [=]{ on_output_edit(); });
+	event_x("input-list", "hui:change", [=]{ on_input_edit(); });
+	event_x("midi-input-list", "hui:change", [=]{ on_midi_input_edit(); });
+	event_x("output-list", "hui:move", [=]{ on_output_move(); });
+	event_x("input-list", "hui:move", [=]{ on_input_move(); });
+	event_x("midi-input-list", "hui:move", [=]{ on_midi_input_move(); });
+	event("top-priority", [=]{ on_top_priority(); });
+	event("erase", [=]{ on_erase(); });
 
-	device_manager->subscribe(this, std::bind(&DeviceConsole::add_device, this), device_manager->MESSAGE_ADD_DEVICE);
-	device_manager->subscribe(this, std::bind(&DeviceConsole::update_full, this), device_manager->MESSAGE_REMOVE_DEVICE);
-	device_manager->subscribe(this, std::bind(&DeviceConsole::change_data, this), device_manager->MESSAGE_CHANGE);
+	device_manager->subscribe(this, [=]{ add_device(); }, device_manager->MESSAGE_ADD_DEVICE);
+	device_manager->subscribe(this, [=]{ update_full(); }, device_manager->MESSAGE_REMOVE_DEVICE);
+	device_manager->subscribe(this, [=]{ change_data(); }, device_manager->MESSAGE_CHANGE);
 
 	update_full();
 }

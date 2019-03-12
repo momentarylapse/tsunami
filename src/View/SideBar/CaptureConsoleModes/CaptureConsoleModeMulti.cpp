@@ -93,7 +93,7 @@ void CaptureConsoleModeMulti::enter()
 		}
 
 		items.add(c);
-		cc->event(c.id_source, [&]{ on_source(); });
+		cc->event(c.id_source, [=]{ on_source(); });
 	}
 	
 	Array<CaptureTrackData> data;

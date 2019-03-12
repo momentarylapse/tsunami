@@ -58,33 +58,33 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("beat_partition", [&]{ on_beat_partition(); });
-	event("note_length", [&]{ on_note_length(); });
-	event("scale_root", [&]{ on_scale(); });
-	event("scale_type", [&]{ on_scale(); });
-	event("midi_edit_mode", [&]{ on_creation_mode(); });
-	event("interval", [&]{ on_interval(); });
-	event("chord_type", [&]{ on_chord_type(); });
-	event("chord_inversion", [&]{ on_chord_inversion(); });
-	event_x("reference_tracks", "hui:select", [&]{ on_reference_tracks(); });
-	event("modifier:none", [&]{ on_modifier_none(); });
-	event("modifier:sharp", [&]{ on_modifier_sharp(); });
-	event("modifier:flat", [&]{ on_modifier_flat(); });
-	event("modifier:natural", [&]{ on_modifier_natural(); });
-	event("quantize", [&]{ on_quantize(); });
-	event("apply_string", [&]{ on_apply_string(); });
-	event("apply_hand_position", [&]{ on_apply_hand_position(); });
-	event("flag_none", [&]{ on_apply_flags(0); });
-	event("flag_trill", [&]{ on_apply_flags(NOTE_FLAG_TRILL); });
-	event("flag_staccato", [&]{ on_apply_flags(NOTE_FLAG_STACCATO); });
-	event("flag_tenuto", [&]{ on_apply_flags(NOTE_FLAG_TENUTO); });
-	event("edit_track", [&]{ on_edit_track(); });
-	event("edit_midi_fx", [&]{ on_edit_midi_fx(); });
-	event("edit_song", [&]{ on_edit_song(); });
+	event("beat_partition", [=]{ on_beat_partition(); });
+	event("note_length", [=]{ on_note_length(); });
+	event("scale_root", [=]{ on_scale(); });
+	event("scale_type", [=]{ on_scale(); });
+	event("midi_edit_mode", [=]{ on_creation_mode(); });
+	event("interval", [=]{ on_interval(); });
+	event("chord_type", [=]{ on_chord_type(); });
+	event("chord_inversion", [=]{ on_chord_inversion(); });
+	event_x("reference_tracks", "hui:select", [=]{ on_reference_tracks(); });
+	event("modifier:none", [=]{ on_modifier_none(); });
+	event("modifier:sharp", [=]{ on_modifier_sharp(); });
+	event("modifier:flat", [=]{ on_modifier_flat(); });
+	event("modifier:natural", [=]{ on_modifier_natural(); });
+	event("quantize", [=]{ on_quantize(); });
+	event("apply_string", [=]{ on_apply_string(); });
+	event("apply_hand_position", [=]{ on_apply_hand_position(); });
+	event("flag_none", [=]{ on_apply_flags(0); });
+	event("flag_trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
+	event("flag_staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
+	event("flag_tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
+	event("edit_track", [=]{ on_edit_track(); });
+	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
+	event("edit_song", [=]{ on_edit_song(); });
 
-	view->subscribe(this, [&]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
-	view->subscribe(this, [&]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
-	view->mode_midi->subscribe(this, [&]{ on_settings_change(); });
+	view->subscribe(this, [=]{ on_view_cur_layer_change(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [=]{ on_view_vtrack_change(); }, view->MESSAGE_VTRACK_CHANGE);
+	view->mode_midi->subscribe(this, [=]{ on_settings_change(); });
 	update();
 }
 
@@ -271,7 +271,7 @@ void MidiEditorConsole::set_layer(TrackLayer *l)
 
 	layer = l;
 	if (layer){
-		layer->subscribe(this, [&]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
+		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
 
 		/*auto v = view->get_layer(layer);
 		if (v)

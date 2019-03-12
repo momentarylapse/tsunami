@@ -156,3 +156,7 @@ void RingBuffer::write_ref_done(AudioBuffer &b)
 {
 	_move_write_pos(b.length);
 }
+
+// not needed... just to make code more readable
+void RingBuffer::write_ref_cancel(AudioBuffer &b){}
+void RingBuffer::read_ref_cancel(AudioBuffer &b){}

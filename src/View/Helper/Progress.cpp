@@ -110,8 +110,8 @@ ProgressCancelable::ProgressCancelable(const string &str, hui::Window *parent) :
 		dlg->set_string("progress_bar", str);
 		dlg->set_float("progress_bar", 0);
 		dlg->show();
-		dlg->event("hui:close", std::bind(&Progress::cancel, this));
-		dlg->event("cancel", std::bind(&Progress::cancel, this));
+		dlg->event("hui:close", [=]{ cancel(); });
+		dlg->event("cancel", [=]{ cancel(); });
 		hui::Application::do_single_main_loop();
 	}
 }

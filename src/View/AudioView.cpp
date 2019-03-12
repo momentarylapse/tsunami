@@ -257,7 +257,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	selection_mode = SelectionMode::NONE;
 	selection_snap_mode = SelectionSnapMode::NONE;
 	hide_selection = false;
-	song->subscribe(this, [&]{ on_song_update(); });
+	song->subscribe(this, [=]{ on_song_update(); });
 
 	// modes
 	mode = nullptr;
@@ -309,8 +309,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	signal_chain = session->signal_chain;
 	renderer = session->song_renderer;
 	peak_meter = session->peak_meter;
-	signal_chain->subscribe(this, [&]{ on_stream_tick(); }, Module::MESSAGE_TICK);
-	signal_chain->subscribe(this, [&]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
+	signal_chain->subscribe(this, [=]{ on_stream_tick(); }, Module::MESSAGE_TICK);
+	signal_chain->subscribe(this, [=]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
 
 	mx = my = 0;
 	msp.stop();
@@ -321,19 +321,19 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
-	win->event_xp(id, "hui:draw", [&](Painter *p){ on_draw(p); });
-	win->event_x(id, "hui:mouse-move", [&]{ on_mouse_move(); });
-	win->event_x(id, "hui:left-button-down", [&]{ on_left_button_down(); });
-	win->event_x(id, "hui:left-double-click", [&]{ on_left_double_click(); });
-	win->event_x(id, "hui:left-button-up", [&]{ on_left_button_up(); });
-	win->event_x(id, "hui:middle-button-down", [&]{ on_middle_button_down(); });
-	win->event_x(id, "hui:middle-button-up", [&]{ on_middle_button_up(); });
-	win->event_x(id, "hui:right-button-down", [&]{ on_right_button_down(); });
-	win->event_x(id, "hui:right-button-up", [&]{ on_right_button_up(); });
-	win->event_x(id, "hui:mouse-leave", [&]{ on_mouse_leave(); });
-	win->event_x(id, "hui:key-down", [&]{ on_key_down(); });
-	win->event_x(id, "hui:key-up", [&]{ on_key_up(); });
-	win->event_x(id, "hui:mouse-wheel", [&]{ on_mouse_wheel(); });
+	win->event_xp(id, "hui:draw", [=](Painter *p){ on_draw(p); });
+	win->event_x(id, "hui:mouse-move", [=]{ on_mouse_move(); });
+	win->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
+	win->event_x(id, "hui:left-double-click", [=]{ on_left_double_click(); });
+	win->event_x(id, "hui:left-button-up", [=]{ on_left_button_up(); });
+	win->event_x(id, "hui:middle-button-down", [=]{ on_middle_button_down(); });
+	win->event_x(id, "hui:middle-button-up", [=]{ on_middle_button_up(); });
+	win->event_x(id, "hui:right-button-down", [=]{ on_right_button_down(); });
+	win->event_x(id, "hui:right-button-up", [=]{ on_right_button_up(); });
+	win->event_x(id, "hui:mouse-leave", [=]{ on_mouse_leave(); });
+	win->event_x(id, "hui:key-down", [=]{ on_key_down(); });
+	win->event_x(id, "hui:key-up", [=]{ on_key_up(); });
+	win->event_x(id, "hui:mouse-wheel", [=]{ on_mouse_wheel(); });
 
 	win->activate(id);
 
@@ -836,7 +836,7 @@ void AudioView::on_song_update()
 			if (t->track->layers.num > 2)
 				implode_track(t->track);
 		optimize_view();
-		hui::RunLater(0.5f, [&]{ optimize_view(); });
+		hui::RunLater(0.5f, [=]{ optimize_view(); });
 	}else{
 		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
 			update_tracks();
@@ -1324,7 +1324,7 @@ void AudioView::draw_song(Painter *c)
 		animating = true;
 
 	if (animating or slow_repeat)
-		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [&]{ force_redraw(); });
+		draw_runner_id = hui::RunLater(animating ? 0.03f : 0.2f, [=]{ force_redraw(); });
 }
 
 int frame = 0;
@@ -1552,7 +1552,7 @@ void AudioView::enable(bool _enabled)
 	if (enabled and !_enabled)
 		song->unsubscribe(this);
 	else if (!enabled and _enabled)
-		song->subscribe(this, [&]{ on_song_update(); });
+		song->subscribe(this, [=]{ on_song_update(); });
 	enabled = _enabled;
 }
 

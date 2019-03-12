@@ -502,7 +502,7 @@ void Panel::set_string(const string &_id, const string &str)
 {
 	if (win and (id == _id))
 		win->set_title(str);
-	apply_foreach(_id, [&](Control *c){ c->set_string(str); });
+	apply_foreach(_id, [=](Control *c){ c->set_string(str); });
 }
 
 // replace all the text with a numerical value (int)
@@ -511,24 +511,24 @@ void Panel::set_string(const string &_id, const string &str)
 //    for ComboBox, TabControl, ListView?
 void Panel::set_int(const string &_id, int n)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_int(n); });
+	apply_foreach(_id, [=](Control *c){ c->set_int(n); });
 }
 
 // replace all the text with a float
 //    for all
 void Panel::set_float(const string &_id, float f)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_float(f); });
+	apply_foreach(_id, [=](Control *c){ c->set_float(f); });
 }
 
 void Panel::set_image(const string &_id, const string &image)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_image(image); });
+	apply_foreach(_id, [=](Control *c){ c->set_image(image); });
 }
 
 void Panel::set_tooltip(const string &_id, const string &tip)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_tooltip(tip); });
+	apply_foreach(_id, [=](Control *c){ c->set_tooltip(tip); });
 }
 
 
@@ -536,28 +536,28 @@ void Panel::set_tooltip(const string &_id, const string &tip)
 //    for ComboBox, ListView, ListViewTree, ListViewIcons
 void Panel::add_string(const string &_id, const string &str)
 {
-	apply_foreach(_id, [&](Control *c){ c->add_string(str); });
+	apply_foreach(_id, [=](Control *c){ c->add_string(str); });
 }
 
 // add a single line as a child in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::add_child_string(const string &_id, int parent_row, const string &str)
 {
-	apply_foreach(_id, [&](Control *c){ c->add_child_string(parent_row, str); });
+	apply_foreach(_id, [=](Control *c){ c->add_child_string(parent_row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::change_string(const string &_id, int row, const string &str)
 {
-	apply_foreach(_id, [&](Control *c){ c->change_string(row, str); });
+	apply_foreach(_id, [=](Control *c){ c->change_string(row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
 void Panel::remove_string(const string &_id, int row)
 {
-	apply_foreach(_id, [&](Control *c){ c->remove_string(row); });
+	apply_foreach(_id, [=](Control *c){ c->remove_string(row); });
 }
 
 // listview / treeview
@@ -571,12 +571,12 @@ string Panel::get_cell(const string &_id, int row, int column)
 // listview / treeview
 void Panel::set_cell(const string &_id, int row, int column, const string &str)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_cell(row, column, str); });
+	apply_foreach(_id, [=](Control *c){ c->set_cell(row, column, str); });
 }
 
 void Panel::set_color(const string &_id, const color &col)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_color(col); });
+	apply_foreach(_id, [=](Control *c){ c->set_color(col); });
 }
 
 // retrieve the text
@@ -619,21 +619,21 @@ color Panel::get_color(const string &_id)
 //    for all
 void Panel::enable(const string &_id,bool enabled)
 {
-	apply_foreach(_id, [&](Control *c){ c->enable(enabled); });
+	apply_foreach(_id, [=](Control *c){ c->enable(enabled); });
 }
 
 // show/hide control
 //    for all
 void Panel::hide_control(const string &_id,bool hide)
 {
-	apply_foreach(_id, [&](Control *c){ c->hide(hide); });
+	apply_foreach(_id, [=](Control *c){ c->hide(hide); });
 }
 
 // mark as "checked"
 //    for CheckBox, ToolBarItemCheckable
 void Panel::check(const string &_id,bool checked)
 {
-	apply_foreach(_id, [&](Control *c){ c->check(checked); });
+	apply_foreach(_id, [=](Control *c){ c->check(checked); });
 }
 
 // is marked as "checked"?
@@ -656,28 +656,28 @@ Array<int> Panel::get_selection(const string &_id)
 
 void Panel::set_selection(const string &_id, const Array<int> &sel)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_selection(sel); });
+	apply_foreach(_id, [=](Control *c){ c->set_selection(sel); });
 }
 
 // delete all the content
 //    for ComboBox, ListView
 void Panel::reset(const string &_id)
 {
-	apply_foreach(_id, [&](Control *c){ c->reset(); });
+	apply_foreach(_id, [=](Control *c){ c->reset(); });
 }
 
 // expand a single row
 //    for TreeView
 void Panel::expand(const string &_id, int row, bool expand)
 {
-	apply_foreach(_id, [&](Control *c){ c->expand(row, expand); });
+	apply_foreach(_id, [=](Control *c){ c->expand(row, expand); });
 }
 
 // expand all rows
 //    for TreeView
 void Panel::expand_all(const string &_id, bool expand)
 {
-	apply_foreach(_id, [&](Control *c){ c->expand_all(expand); });
+	apply_foreach(_id, [=](Control *c){ c->expand_all(expand); });
 }
 
 // is column in tree expanded?
@@ -692,7 +692,7 @@ bool Panel::is_expanded(const string &_id, int row)
 //    for Revealer
 void Panel::reveal(const string &_id, bool reveal)
 {
-	apply_foreach(_id, [&](Control *c){ c->reveal(reveal); });
+	apply_foreach(_id, [=](Control *c){ c->reveal(reveal); });
 }
 
 //    for Revealer
@@ -705,12 +705,12 @@ bool Panel::is_revealed(const string &_id)
 
 void Panel::delete_control(const string &_id)
 {
-	apply_foreach(_id, [&](Control *c){ delete c; });
+	apply_foreach(_id, [=](Control *c){ delete c; });
 }
 
 void Panel::set_options(const string &_id, const string &options)
 {
-	apply_foreach(_id, [&](Control *c){ c->set_options(options); });
+	apply_foreach(_id, [=](Control *c){ c->set_options(options); });
 }
 
 };

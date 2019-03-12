@@ -25,8 +25,8 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	r->reset();
 	l->reset();
 
-	handler_id_draw = panel->event_xp(id, "hui:draw", std::bind(&PeakMeterDisplay::on_draw, this, std::placeholders::_1));
-	handler_id_lbut = panel->event_x(id, "hui:left-button-down", std::bind(&PeakMeterDisplay::on_left_button_down, this));
+	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){ on_draw(p); });
+	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
 
 	set_source(_source);
 	enable(true);
@@ -49,14 +49,14 @@ void PeakMeterDisplay::set_source(PeakMeter *_source)
 	source = _source;
 
 	if (source and enabled)
-		source->subscribe(this, std::bind(&PeakMeterDisplay::on_update, this));
+		source->subscribe(this, [=]{ on_update(); });
 }
 
 void PeakMeterDisplay::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			source->subscribe(this, std::bind(&PeakMeterDisplay::on_update, this));
+			source->subscribe(this, [=]{ on_update(); });
 		if (enabled and !_enabled)
 			source->unsubscribe(this);
 	}

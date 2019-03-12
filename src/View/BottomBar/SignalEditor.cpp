@@ -72,36 +72,36 @@ public:
 		view = ed->view;
 		session = ed->session;
 
-		event_xp("area", "hui:draw", [&](Painter *p){ on_draw(p); });
-		event_x("area", "hui:mouse-move", [&]{ on_mouse_move(); });
-		event_x("area", "hui:left-button-down", [&]{ on_left_button_down(); });
-		event_x("area", "hui:left-button-up", [&]{ on_left_button_up(); });
-		event_x("area", "hui:right-button-down", [&]{ on_right_button_down(); });
-		event_x("area", "hui:key-down", [&]{ on_key_down(); });
+		event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
+		event_x("area", "hui:mouse-move", [=]{ on_mouse_move(); });
+		event_x("area", "hui:left-button-down", [=]{ on_left_button_down(); });
+		event_x("area", "hui:left-button-up", [=]{ on_left_button_up(); });
+		event_x("area", "hui:right-button-down", [=]{ on_right_button_down(); });
+		event_x("area", "hui:key-down", [=]{ on_key_down(); });
 
 
-		event("signal_chain_add_audio_source", [&]{ on_add(ModuleType::AUDIO_SOURCE); });
-		event("signal_chain_add_audio_effect", [&]{ on_add(ModuleType::AUDIO_EFFECT); });
-		event("signal_chain_add_stream", [&]{ on_add(ModuleType::STREAM); });
-		event("signal_chain_add_plumbing", [&]{ on_add(ModuleType::PLUMBING); });
-		event("signal_chain_add_audio_visualizer", [&]{ on_add(ModuleType::AUDIO_VISUALIZER); });
-		event("signal_chain_add_midi_source", [&]{ on_add(ModuleType::MIDI_SOURCE); });
-		event("signal_chain_add_midi_effect", [&]{ on_add(ModuleType::MIDI_EFFECT); });
-		event("signal_chain_add_synthesizer", [&]{ on_add(ModuleType::SYNTHESIZER); });
-		event("signal_chain_add_pitch_detector", [&]{ on_add(ModuleType::PITCH_DETECTOR); });
-		event("signal_chain_add_beat_source", [&]{ on_add(ModuleType::BEAT_SOURCE); });
-		event("signal_chain_reset", [&]{ on_reset(); });
-		event("signal_chain_activate", [&]{ on_activate(); });
-		event("signal_chain_delete", [&]{ on_delete(); });
-		event("signal_chain_save", [&]{ on_save(); });
-		event("signal_module_delete", [&]{ on_module_delete(); });
-		event("signal_module_configure", [&]{ on_module_configure(); });
+		event("signal_chain_add_audio_source", [=]{ on_add(ModuleType::AUDIO_SOURCE); });
+		event("signal_chain_add_audio_effect", [=]{ on_add(ModuleType::AUDIO_EFFECT); });
+		event("signal_chain_add_stream", [=]{ on_add(ModuleType::STREAM); });
+		event("signal_chain_add_plumbing", [=]{ on_add(ModuleType::PLUMBING); });
+		event("signal_chain_add_audio_visualizer", [=]{ on_add(ModuleType::AUDIO_VISUALIZER); });
+		event("signal_chain_add_midi_source", [=]{ on_add(ModuleType::MIDI_SOURCE); });
+		event("signal_chain_add_midi_effect", [=]{ on_add(ModuleType::MIDI_EFFECT); });
+		event("signal_chain_add_synthesizer", [=]{ on_add(ModuleType::SYNTHESIZER); });
+		event("signal_chain_add_pitch_detector", [=]{ on_add(ModuleType::PITCH_DETECTOR); });
+		event("signal_chain_add_beat_source", [=]{ on_add(ModuleType::BEAT_SOURCE); });
+		event("signal_chain_reset", [=]{ on_reset(); });
+		event("signal_chain_activate", [=]{ on_activate(); });
+		event("signal_chain_delete", [=]{ on_delete(); });
+		event("signal_chain_save", [=]{ on_save(); });
+		event("signal_module_delete", [=]{ on_module_delete(); });
+		event("signal_module_configure", [=]{ on_module_configure(); });
 
-		event("signal_chain_new", [&]{ editor->on_new(); });
-		event("signal_chain_load", [&]{ editor->on_load(); });
+		event("signal_chain_new", [=]{ editor->on_new(); });
+		event("signal_chain_load", [=]{ editor->on_load(); });
 
 		chain = _chain;
-		chain->subscribe(this, [&]{ on_chain_update(); });
+		chain->subscribe(this, [=]{ on_chain_update(); });
 	}
 	virtual ~SignalEditorTab()
 	{
@@ -433,7 +433,7 @@ public:
 
 	void on_delete()
 	{
-		hui::RunLater(0.001f, [&](){ editor->delete_chain(chain); });
+		hui::RunLater(0.001f, [=](){ editor->delete_chain(chain); });
 	}
 
 
@@ -513,7 +513,7 @@ SignalEditor::SignalEditor(Session *session) :
 	config_module = nullptr;
 	config_panel = nullptr;
 
-	event("selector", [&]{ on_chain_switch(); });
+	event("selector", [=]{ on_chain_switch(); });
 
 	add_chain(session->signal_chain);
 	show_config(nullptr);

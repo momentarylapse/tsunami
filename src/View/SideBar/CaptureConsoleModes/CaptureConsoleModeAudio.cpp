@@ -38,7 +38,7 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	recorder = nullptr;
 	chain = nullptr;
 
-	cc->event("source", [&]{ on_source(); });
+	cc->event("source", [=]{ on_source(); });
 }
 
 void CaptureConsoleModeAudio::on_source()

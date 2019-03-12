@@ -25,8 +25,8 @@ public:
 	float _cdecl get();
 	void _cdecl enable(bool enabled);
 
-	void onSlide();
-	void onEdit();
+	void on_slide();
+	void on_edit();
 
 private:
 	string id_slider, id_edit;

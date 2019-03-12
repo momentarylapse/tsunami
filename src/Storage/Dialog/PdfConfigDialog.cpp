@@ -42,9 +42,9 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 	}
 	set_float("scale", 100.0f);
 
-	event("hui:close", [&]{ on_close(); });
-	event("cancel", [&]{ on_close(); });
-	event("ok", [&]{ on_ok(); });
+	event("hui:close", [=]{ on_close(); });
+	event("cancel", [=]{ on_close(); });
+	event("ok", [=]{ on_ok(); });
 }
 
 PdfConfigDialog::~PdfConfigDialog()

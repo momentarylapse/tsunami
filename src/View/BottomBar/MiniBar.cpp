@@ -30,13 +30,13 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	set_int("selection_snap_mode", (int)view->selection_snap_mode);
 
-	event("show_bottom_bar", [&]{ on_show_bottom_bar(); });
-	event("volume", [&]{ on_volume(); });
-	event("selection_snap_mode", [&]{ on_selection_snap_mode(); });
+	event("show_bottom_bar", [=]{ on_show_bottom_bar(); });
+	event("volume", [=]{ on_volume(); });
+	event("selection_snap_mode", [=]{ on_selection_snap_mode(); });
 
-	bottom_bar->subscribe(this, [&]{ on_bottom_bar_update(); });
-	dev_manager->subscribe(this, [&]{ on_volume_change(); });
-	view->subscribe(this, [&]{ on_view_settings_change(); });
+	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
+	dev_manager->subscribe(this, [=]{ on_volume_change(); });
+	view->subscribe(this, [=]{ on_view_settings_change(); });
 }
 
 MiniBar::~MiniBar()

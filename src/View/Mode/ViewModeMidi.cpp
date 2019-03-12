@@ -188,7 +188,7 @@ void ViewModeMidi::on_start()
 {
 	input_chain = new SignalChain(session, "midi-input");
 	input = (InputStreamMidi*)input_chain->add(ModuleType::STREAM, "MidiInput");
-	input_chain->subscribe(this, [&]{ on_midi_input(this); }, Module::MESSAGE_TICK);
+	input_chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	input_chain->start();
 }
 
@@ -348,7 +348,7 @@ void ViewModeMidi::set_rep_key(int k)
 {
 	if (rep_key_runner >= 0)
 		hui::CancelRunner(rep_key_runner);
-	rep_key_runner = hui::RunLater(0.8f, [&]{ rep_key_runner = -1; rep_key_num = -1; rep_key = -1; });
+	rep_key_runner = hui::RunLater(0.8f, [=]{ rep_key_runner = -1; rep_key_num = -1; rep_key = -1; });
 
 	if (k == rep_key)
 		rep_key_num ++;

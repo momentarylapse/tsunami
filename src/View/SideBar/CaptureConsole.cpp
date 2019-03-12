@@ -41,12 +41,12 @@ CaptureConsole::CaptureConsole(Session *session):
 	peak_meter = new PeakMeterDisplay(this, "level", nullptr);
 
 
-	event("cancel", [&]{ on_cancel(); });
-	event("ok", [&]{ on_ok(); });
-	event("start", [&]{ on_start(); });
-	event("dump", [&]{ on_dump(); });
-	event("pause", [&]{ on_pause(); });
-	event("new_version", [&]{ on_new_version(); });
+	event("cancel", [=]{ on_cancel(); });
+	event("ok", [=]{ on_ok(); });
+	event("start", [=]{ on_start(); });
+	event("dump", [=]{ on_dump(); });
+	event("pause", [=]{ on_pause(); });
+	event("new_version", [=]{ on_new_version(); });
 
 	mode_audio = new CaptureConsoleModeAudio(this);
 	mode_midi = new CaptureConsoleModeMidi(this);
@@ -92,8 +92,8 @@ void CaptureConsole::on_enter()
 	chain = mode->chain;
 	view->mode_capture->chain = mode->chain;
 
-	session->signal_chain->subscribe(this, [&]{ on_putput_tick(); }, Module::MESSAGE_TICK);
-	session->signal_chain->subscribe(this, [&]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	session->signal_chain->subscribe(this, [=]{ on_putput_tick(); }, Module::MESSAGE_TICK);
+	session->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 
 	// automatically start
 	if (num_audio + num_midi == 1)

@@ -43,16 +43,16 @@ public:
 			hide_control("save_favorite", true);
 		}
 
-		event("enabled", [&]{ on_enabled(); });
-		event("delete", [&]{ on_delete(); });
-		event("load_favorite", [&]{ on_load(); });
-		event("save_favorite", [&]{ on_save(); });
+		event("enabled", [=]{ on_enabled(); });
+		event("delete", [=]{ on_delete(); });
+		event("load_favorite", [=]{ on_load(); });
+		event("save_favorite", [=]{ on_save(); });
 
 		check("enabled", fx->enabled);
 
 		old_param = fx->config_to_string();
-		fx->subscribe(this, [&]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
-		fx->subscribe(this, [&]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, [=]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, [=]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
@@ -201,9 +201,9 @@ void MidiFxConsole::set_track(Track *t)
 	clear();
 	track = t;
 	if (track){
-		track->subscribe(this, [&]{ on_track_delete(); }, track->MESSAGE_DELETE);
-		track->subscribe(this, [&]{ on_update(); }, track->MESSAGE_ADD_MIDI_EFFECT);
-		track->subscribe(this, [&]{ on_update(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
+		track->subscribe(this, [=]{ on_track_delete(); }, track->MESSAGE_DELETE);
+		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_ADD_MIDI_EFFECT);
+		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

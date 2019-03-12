@@ -31,19 +31,19 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	hui::Window("settings_dialog", _parent)
 {
 	view = _view;
-	event("language", [&]{ on_language(); });
-	event("color_scheme", [&]{ on_color_scheme(); });
-	event("ogg_bitrate", [&]{ on_ogg_bitrate(); });
-	event("default_artist", [&]{ on_default_artist(); });
-	event("scroll_speed", [&]{ on_scroll_speed(); });
-	event("cpu_meter", [&]{ on_cpu_meter(); });
-	event("antialiasing", [&]{ on_antialiasing(); });
-	event("high_details", [&]{ on_high_details(); });
-	event("audio_api", [&]{ on_audio_api(); });
-	event("midi_api", [&]{ on_midi_api(); });
-	event("quick_export_dir_find", [&]{ on_qed_find(); });
-	event("hui:close", [&]{ destroy(); });
-	event("close", [&]{ destroy(); });
+	event("language", [=]{ on_language(); });
+	event("color_scheme", [=]{ on_color_scheme(); });
+	event("ogg_bitrate", [=]{ on_ogg_bitrate(); });
+	event("default_artist", [=]{ on_default_artist(); });
+	event("scroll_speed", [=]{ on_scroll_speed(); });
+	event("cpu_meter", [=]{ on_cpu_meter(); });
+	event("antialiasing", [=]{ on_antialiasing(); });
+	event("high_details", [=]{ on_high_details(); });
+	event("audio_api", [=]{ on_audio_api(); });
+	event("midi_api", [=]{ on_midi_api(); });
+	event("quick_export_dir_find", [=]{ on_qed_find(); });
+	event("hui:close", [=]{ destroy(); });
+	event("close", [=]{ destroy(); });
 
 	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	set_options("default_artist", "placeholder=" + AppName);

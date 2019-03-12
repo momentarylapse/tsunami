@@ -113,7 +113,7 @@ void Session::execute_tsunami_plugin(const string& name)
 		return;
 
 	plugins.add(p);
-	p->subscribe3(this, [&](VirtualBase *o){ on_plugin_stop_request((TsunamiPlugin*)o); }, p->MESSAGE_STOP_REQUEST);
+	p->subscribe3(this, [=](VirtualBase *o){ on_plugin_stop_request((TsunamiPlugin*)o); }, p->MESSAGE_STOP_REQUEST);
 
 	p->on_start();
 
@@ -184,7 +184,7 @@ void Session::set_mode(const string &mode)
 		e("unknown mode: " + mode);
 		return;
 	}
-	hui::RunLater(0.1f, [&]{ win->update_menu(); });
+	hui::RunLater(0.1f, [=]{ win->update_menu(); });
 	this->mode = mode;
 }
 

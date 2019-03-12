@@ -568,7 +568,7 @@ void Panel::activate(const string &control_id)
 	gtk_widget_grab_focus(win->window);
 	gtk_window_present(GTK_WINDOW(win->window));
 	if (control_id.num > 0)
-		apply_foreach(control_id, [&](Control *c){ c->focus(); });
+		apply_foreach(control_id, [=](Control *c){ c->focus(); });
 }
 
 bool Panel::is_active(const string &control_id)

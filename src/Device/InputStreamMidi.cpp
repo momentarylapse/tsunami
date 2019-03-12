@@ -275,7 +275,7 @@ void InputStreamMidi::_start_update()
 {
 	if (running)
 		return;
-	hui_runner_id = hui::RunRepeated(update_dt, [this]{ update(); });
+	hui_runner_id = hui::RunRepeated(update_dt, [=]{ update(); });
 	running = true;
 }
 

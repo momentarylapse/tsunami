@@ -41,17 +41,17 @@ public:
 			hide_control("save_favorite", true);
 		}
 
-		event("enabled", std::bind(&SingleFxPanel::on_enabled, this));
-		event("delete", std::bind(&SingleFxPanel::on_delete, this));
-		event("load_favorite", std::bind(&SingleFxPanel::on_load, this));
-		event("save_favorite", std::bind(&SingleFxPanel::on_save, this));
-		event("show_large", std::bind(&SingleFxPanel::on_large, this));
+		event("enabled", [=]{ on_enabled(); });
+		event("delete", [=]{ on_delete(); });
+		event("load_favorite", [=]{ on_load(); });
+		event("save_favorite", [=]{ on_save(); });
+		event("show_large", [=]{ on_large(); });
 
 		check("enabled", fx->enabled);
 
 		old_param = fx->config_to_string();
-		fx->subscribe(this, std::bind(&SingleFxPanel::on_fx_change, this), fx->MESSAGE_CHANGE);
-		fx->subscribe(this, std::bind(&SingleFxPanel::on_fx_change_by_action, this), fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, [=]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, [=]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{
@@ -85,7 +85,7 @@ public:
 	}
 	void on_delete()
 	{
-		hui::RunLater(0, [&]{
+		hui::RunLater(0, [=]{
 			if (track)
 				track->delete_effect(fx);
 			else
@@ -185,16 +185,16 @@ FxConsole::FxConsole(Session *session) :
 	if (!view)
 		hide_control("edit_track", true);
 
-	event("add", std::bind(&FxConsole::on_add, this));
+	event("add", [=]{ on_add(); });
 
-	event("edit_song", std::bind(&FxConsole::on_edit_song, this));
-	event("edit_track", std::bind(&FxConsole::on_edit_track, this));
+	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_track", [=]{ on_edit_track(); });
 
 	if (view)
-		view->subscribe(this, std::bind(&FxConsole::on_view_cur_track_change, this), view->MESSAGE_CUR_TRACK_CHANGE);
-	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_NEW);
-	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_ADD_EFFECT);
-	song->subscribe(this, std::bind(&FxConsole::on_update, this), song->MESSAGE_DELETE_EFFECT);
+		view->subscribe(this, [=]{ on_view_cur_track_change(); }, view->MESSAGE_CUR_TRACK_CHANGE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
@@ -243,9 +243,9 @@ void FxConsole::set_track(Track *t)
 	set_exclusive(nullptr);
 	track = t;
 	if (track){
-		track->subscribe(this, std::bind(&FxConsole::on_track_delete, this), track->MESSAGE_DELETE);
-		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_ADD_EFFECT);
-		track->subscribe(this, std::bind(&FxConsole::on_update, this), track->MESSAGE_DELETE_EFFECT);
+		track->subscribe(this, [=]{ on_track_delete(); }, track->MESSAGE_DELETE);
+		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_ADD_EFFECT);
+		track->subscribe(this, [=]{ on_update(); }, track->MESSAGE_DELETE_EFFECT);
 
 		Array<AudioEffect*> fx = track->fx;
 		foreachi(AudioEffect *e, fx, i){
@@ -290,13 +290,13 @@ GlobalFxConsole::GlobalFxConsole(Session *session) :
 	if (!view)
 		hide_control("edit_track", true);
 
-	event("add", std::bind(&GlobalFxConsole::on_add, this));
+	event("add", [=]{ on_add(); });
 
-	event("edit_song", std::bind(&GlobalFxConsole::on_edit_song, this));
+	event("edit_song", [=]{ on_edit_song(); });
 
-	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_NEW);
-	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_ADD_EFFECT);
-	song->subscribe(this, std::bind(&GlobalFxConsole::on_update, this), song->MESSAGE_DELETE_EFFECT);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ADD_EFFECT);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_DELETE_EFFECT);
 }
 
 GlobalFxConsole::~GlobalFxConsole()

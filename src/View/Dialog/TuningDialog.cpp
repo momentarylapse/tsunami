@@ -18,10 +18,10 @@ TuningDialog::TuningDialog(hui::Window *_parent, Track *t) :
 
 	update();
 
-	event("ok", std::bind(&TuningDialog::on_ok, this));
-	event("cancel", std::bind(&TuningDialog::destroy, this));
-	event("hui:close", std::bind(&TuningDialog::destroy, this));
-	event("add_first", std::bind(&TuningDialog::on_add_first, this));
+	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ destroy(); });
+	event("hui:close", [=]{ destroy(); });
+	event("add_first", [=]{ on_add_first(); });
 }
 
 void TuningDialog::update()
@@ -45,9 +45,9 @@ void TuningDialog::update()
 			set_image("delete_" + id, "hui:delete");
 			add_button("", 3, 100 - i, "add_" + id);
 			set_image("add_" + id, "hui:add");
-			event(id, std::bind(&TuningDialog::on_edit, this));
-			event("delete_" + id, std::bind(&TuningDialog::on_delete, this));
-			event("add_" + id, std::bind(&TuningDialog::on_add, this));
+			event(id, [=]{ on_edit(); });
+			event("delete_" + id, [=]{ on_delete(); });
+			event("add_" + id, [=]{ on_add(); });
 
 			// reverse order list... nicer gui
 			for (int p=MAX_PITCH-1; p>=0; p--)
@@ -85,7 +85,7 @@ void TuningDialog::on_delete()
 	int n = id.substr(7+6, -1)._int();
 	tuning.erase(n);
 
-	hui::RunLater(0.001f, [&]{ update(); });
+	hui::RunLater(0.001f, [=]{ update(); });
 }
 
 void TuningDialog::on_add()
@@ -94,13 +94,13 @@ void TuningDialog::on_add()
 	int n = id.substr(4+6, -1)._int();
 	tuning.insert(tuning[n], n);
 
-	hui::RunLater(0.001f, [&]{ update(); });
+	hui::RunLater(0.001f, [=]{ update(); });
 }
 
 void TuningDialog::on_add_first()
 {
 	tuning.add(69);
 
-	hui::RunLater(0.001f, [&]{ update(); });
+	hui::RunLater(0.001f, [=]{ update(); });
 }
 

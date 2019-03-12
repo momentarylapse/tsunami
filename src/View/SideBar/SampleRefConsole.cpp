@@ -23,15 +23,15 @@ SampleRefConsole::SampleRefConsole(Session *session):
 	layer = nullptr;
 	sample = nullptr;
 
-	event("volume", std::bind(&SampleRefConsole::on_volume, this));
-	event("mute", std::bind(&SampleRefConsole::on_mute, this));
-	event("track", std::bind(&SampleRefConsole::on_track, this));
+	event("volume", [=]{ on_volume(); });
+	event("mute", [=]{ on_mute(); });
+	event("track", [=]{ on_track(); });
 
-	event("edit_song", std::bind(&SampleRefConsole::on_edit_song, this));
-	event("edit_track", std::bind(&SampleRefConsole::on_edit_track, this));
-	event("edit_sample", std::bind(&SampleRefConsole::on_edit_sample, this));
+	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_track", [=]{ on_edit_track(); });
+	event("edit_sample", [=]{ on_edit_sample(); });
 
-	view->subscribe(this, std::bind(&SampleRefConsole::on_view_cur_sample_change, this), view->MESSAGE_CUR_SAMPLE_CHANGE);
+	view->subscribe(this, [=]{ on_view_cur_sample_change(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SampleRefConsole::~SampleRefConsole()
@@ -55,7 +55,7 @@ void SampleRefConsole::on_mute()
 	layer->edit_sample_ref(sample, sample->volume, is_checked(""));
 
 	enable("volume", !sample->muted);
-	sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
+	sample->subscribe(this, [=]{ on_update(); });
 }
 
 void SampleRefConsole::on_track()
@@ -69,7 +69,7 @@ void SampleRefConsole::on_volume()
 		return;
 	sample->unsubscribe(this);
 	layer->edit_sample_ref(sample, db2amplitude(get_float("")), sample->muted);
-	sample->subscribe(this, std::bind(&SampleRefConsole::on_update, this));
+	sample->subscribe(this, [=]{ on_update(); });
 }
 
 void SampleRefConsole::on_edit_song()
@@ -118,7 +118,7 @@ void SampleRefConsole::on_view_cur_sample_change()
 	layer = view->cur_layer();
 	sample = view->cur_sample;
 	if (sample)
-		sample->subscribe(this, [&]{ on_update(); });
+		sample->subscribe(this, [=]{ on_update(); });
 	load_data();
 }
 

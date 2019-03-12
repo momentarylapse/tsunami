@@ -23,10 +23,10 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, hui::Window *parent) :
 		add_string("format", format_name((SampleFormat)i));
 	set_int("format", 0);
 
-	event("hui:close", std::bind(&RawConfigDialog::on_close, this));
-	event("close", std::bind(&RawConfigDialog::on_close, this));
-	event("cancel", std::bind(&RawConfigDialog::on_close, this));
-	event("ok", std::bind(&RawConfigDialog::on_ok, this));
+	event("hui:close", [=]{ on_close(); });
+	event("close", [=]{ on_close(); });
+	event("cancel", [=]{ on_close(); });
+	event("ok", [=]{ on_ok(); });
 }
 
 RawConfigDialog::~RawConfigDialog()

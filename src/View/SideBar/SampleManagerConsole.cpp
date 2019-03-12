@@ -336,9 +336,9 @@ void SampleManagerConsole::on_preview()
 	preview_chain->connect(preview_renderer, 0, preview_stream, 0);
 
 	progress = new ProgressCancelable(_("Preview"), win);
-	progress->subscribe(this, [&]{ on_progress_cancel(); });
-	preview_chain->subscribe(this, [&]{ on_preview_tick(); });
-	preview_chain->subscribe(this, [&]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	progress->subscribe(this, [=]{ on_progress_cancel(); });
+	preview_chain->subscribe(this, [=]{ on_preview_tick(); });
+	preview_chain->subscribe(this, [=]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	preview_chain->start();
 }
 

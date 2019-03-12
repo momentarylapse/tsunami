@@ -23,13 +23,13 @@ SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
 	new_size = sample->buf.length;
 	update();
 
-	event("factor", std::bind(&SampleScaleDialog::on_factor, this));
-	event("samples_new", std::bind(&SampleScaleDialog::on_samples, this));
-	event("rate_new", std::bind(&SampleScaleDialog::on_sample_rate, this));
-	event("rate_inv_orig", std::bind(&SampleScaleDialog::on_sample_rate_inv, this));
-	event("ok", std::bind(&SampleScaleDialog::on_ok, this));
-	event("cancel", std::bind(&SampleScaleDialog::on_close, this));
-	event("hui:close", std::bind(&SampleScaleDialog::on_close, this));
+	event("factor", [=]{ on_factor(); });
+	event("samples_new", [=]{ on_samples(); });
+	event("rate_new", [=]{ on_sample_rate(); });
+	event("rate_inv_orig", [=]{ on_sample_rate_inv(); });
+	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ on_close(); });
+	event("hui:close", [=]{ on_close(); });
 }
 
 SampleScaleDialog::~SampleScaleDialog()

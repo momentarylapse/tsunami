@@ -25,10 +25,10 @@ MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range,
 		enable("ok", false);
 	}
 
-	event("text", std::bind(&MarkerDialog::on_edit, this));
-	event("cancel", std::bind(&MarkerDialog::on_close, this));
-	event("hui:close", std::bind(&MarkerDialog::on_close, this));
-	event("ok", std::bind(&MarkerDialog::on_ok, this));
+	event("text", [=]{ on_edit(); });
+	event("cancel", [=]{ on_close(); });
+	event("hui:close", [=]{ on_close(); });
+	event("ok", [=]{ on_ok(); });
 }
 
 MarkerDialog::~MarkerDialog()

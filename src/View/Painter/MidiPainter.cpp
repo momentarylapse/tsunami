@@ -655,7 +655,7 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 
 void MidiPainter::draw_tab(Painter *c, const MidiNoteBufferRef &notes)
 {
-	draw_rhythm(c, notes, cur_range, [&](MidiNote *n){ return string_to_screen(n->stringno); });
+	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)
@@ -734,7 +734,7 @@ void MidiPainter::draw_clef_classical(Painter *c)
 
 void MidiPainter::draw_classical(Painter *c, const MidiNoteBufferRef &notes)
 {
-	draw_rhythm(c, notes, cur_range, [&](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
+	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	c->set_antialiasing(quality.antialiasing);
 	for (MidiNote *n: notes)

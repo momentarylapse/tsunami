@@ -22,9 +22,9 @@ PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
 	set_float("duration", 1.0f);
 	check("shift-data", true);
 
-	event("ok", std::bind(&PauseAddDialog::on_ok, this));
-	event("cancel", std::bind(&PauseAddDialog::on_close, this));
-	event("hui:close", std::bind(&PauseAddDialog::on_close, this));
+	event("ok", [=]{ on_ok(); });
+	event("cancel", [=]{ on_close(); });
+	event("hui:close", [=]{ on_close(); });
 }
 
 void PauseAddDialog::on_ok()

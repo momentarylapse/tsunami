@@ -143,7 +143,7 @@ Module *SignalChain::_add(Module *m)
 	m->reset_state();
 	modules.add(m);
 	notify(MESSAGE_ADD_MODULE);
-	m->subscribe(this, [&]{ on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	m->subscribe(this, [=]{ on_module_play_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 	return m;
 }
 
@@ -409,7 +409,7 @@ void SignalChain::start()
 		m->command(ModuleCommand::START, 0);
 	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
-	hui_runner = hui::RunRepeated(tick_dt, [&]{ notify(MESSAGE_TICK); });
+	hui_runner = hui::RunRepeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
 }
 
 void SignalChain::stop()

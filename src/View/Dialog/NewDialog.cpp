@@ -34,15 +34,15 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_string("pattern", new_bar->pat_str());
 	set_int("divisor", 0);
 
-	event("cancel", [&]{ destroy(); });
-	event("hui:close", [&]{ destroy(); });
-	event("ok", [&]{ on_ok(); });
-	event("metronome", [&]{ on_metronome(); });
-	event("new_track_type:midi", [&]{ on_type_midi(); });
-	event("beats", [&]{ on_beats(); });
-	event("divisor", [&]{ on_divisor(); });
-	event("pattern", [&]{ on_pattern(); });
-	event("complex", [&]{ on_complex(); });
+	event("cancel", [=]{ destroy(); });
+	event("hui:close", [=]{ destroy(); });
+	event("ok", [=]{ on_ok(); });
+	event("metronome", [=]{ on_metronome(); });
+	event("new_track_type:midi", [=]{ on_type_midi(); });
+	event("beats", [=]{ on_beats(); });
+	event("divisor", [=]{ on_divisor(); });
+	event("pattern", [=]{ on_pattern(); });
+	event("complex", [=]{ on_complex(); });
 }
 
 void NewDialog::on_ok()

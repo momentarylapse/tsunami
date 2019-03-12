@@ -35,7 +35,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	preview_synth = nullptr;
 	preview_stream = nullptr;
 
-	cc->event("source", [&]{ on_source(); });
+	cc->event("source", [=]{ on_source(); });
 }
 
 void CaptureConsoleModeMidi::on_source()

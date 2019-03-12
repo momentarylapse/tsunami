@@ -84,9 +84,9 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode)
 	if (song){
 		build_data();
 		prepare(song->range(), false);
-		song->subscribe(this, [&]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
-		song->subscribe(this, [&]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
-		song->subscribe(this, [&]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+		song->subscribe(this, [=]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
+		song->subscribe(this, [=]{ on_song_delete_track(); }, song->MESSAGE_DELETE_TRACK);
+		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
 	}
 }
 

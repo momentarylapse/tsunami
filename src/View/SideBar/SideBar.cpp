@@ -71,14 +71,14 @@ SideBar::SideBar(Session *_session)
 	add_console(sample_ref_console);
 	add_console(capture_console);
 
-	event("close", [&]{ on_close(); });
-	event("large", [&]{ on_large(); });
+	event("close", [=]{ on_close(); });
+	event("large", [=]{ on_large(); });
 
 	reveal("revealer", false);
 	visible = false;
 	active_console = -1;
 
-	subscribe(session->view, [&]{ session->view->on_update(); }); // EVIL HACK?!?
+	subscribe(session->view, [=]{ session->view->on_update(); }); // EVIL HACK?!?
 }
 
 SideBar::~SideBar()

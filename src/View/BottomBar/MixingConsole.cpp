@@ -55,19 +55,19 @@ public:
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 		add_string(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
-		event(vol_slider_id, [&]{ on_volume(); });
-		event(pan_slider_id, [&]{ on_panning(); });
-		event(mute_id, [&]{ on_mute(); });
-		event("solo", [&]{ on_solo(); });
-		event_x("fx", "hui:select", [&]{ on_fx_select(); });
-		event_x("fx", "hui:change", [&]{ on_fx_edit(); });
-		event_x("fx", "hui:move", [&]{ on_fx_move(); });
-		event("add-fx", [&]{ on_add_fx(); });
+		event(vol_slider_id, [=]{ on_volume(); });
+		event(pan_slider_id, [=]{ on_panning(); });
+		event(mute_id, [=]{ on_mute(); });
+		event("solo", [=]{ on_solo(); });
+		event_x("fx", "hui:select", [=]{ on_fx_select(); });
+		event_x("fx", "hui:change", [=]{ on_fx_edit(); });
+		event_x("fx", "hui:move", [=]{ on_fx_move(); });
+		event("add-fx", [=]{ on_add_fx(); });
 
 		vtrack = t;
 		track = t->track;
-		vtrack->subscribe(this, [&]{ update(); }, vtrack->MESSAGE_CHANGE);
-		vtrack->subscribe(this, [&]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
+		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
+		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
 		update();
 	}
 	~TrackMixer()
@@ -246,17 +246,17 @@ public:
 			hide_control("save_favorite", true);
 		}
 
-		event("enabled", std::bind(&FxPanel::on_enabled, this));
-		event("delete", std::bind(&FxPanel::on_delete, this));
-		event("load_favorite", std::bind(&FxPanel::on_load, this));
-		event("save_favorite", std::bind(&FxPanel::on_save, this));
-		event("show_large", std::bind(&FxPanel::on_large, this));
+		event("enabled", [=]{ on_enabled(); });
+		event("delete", [=]{ on_delete(); });
+		event("load_favorite", [=]{ on_load(); });
+		event("save_favorite", [=]{ on_save(); });
+		event("show_large", [=]{ on_large(); });
 
 		check("enabled", fx->enabled);
 
 		old_param = fx->config_to_string();
-		fx->subscribe(this, std::bind(&FxPanel::on_fx_change, this), fx->MESSAGE_CHANGE);
-		fx->subscribe(this, std::bind(&FxPanel::on_fx_change_by_action, this), fx->MESSAGE_CHANGE_BY_ACTION);
+		fx->subscribe(this, [=]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
+		fx->subscribe(this, [=]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~FxPanel()
 	{
@@ -336,18 +336,17 @@ MixingConsole::MixingConsole(Session *session) :
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter);
 	set_float("output-volume", device_manager->get_output_volume());
 
-	event("output-volume", std::bind(&MixingConsole::on_output_volume, this));
-	event("show-vol", [&]{ set_mode(MixerMode::VOLUME); });
-	event("show-fx", [&]{ set_mode(MixerMode::EFFECTS); });
+	event("output-volume", [=]{ on_output_volume(); });
+	event("show-vol", [=]{ set_mode(MixerMode::VOLUME); });
+	event("show-fx", [=]{ set_mode(MixerMode::EFFECTS); });
 
-	view->subscribe(this, std::bind(&MixingConsole::on_tracks_change, this), session->view->MESSAGE_VTRACK_CHANGE);
-	view->subscribe(this, [&]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
-	song->subscribe(this, [&]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
+	view->subscribe(this, [=]{ on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
+	view->subscribe(this, [=]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
+	song->subscribe(this, [=]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
 
 	set_mode(MixerMode::VOLUME);
 
-	//song->subscribe(this, std::bind(&MixingConsole::onUpdateSong, this));
-	device_manager->subscribe(this, std::bind(&MixingConsole::on_update_device_manager, this));
+	device_manager->subscribe(this, [=]{ on_update_device_manager(); });
 	load_data();
 }
 
@@ -449,7 +448,7 @@ void MixingConsole::select_module(Module *m)
 				[track,fx](const string &old_param){ track->edit_effect(fx, old_param); });
 		embed(config_panel, config_grid_id, 0, 0);
 
-		m->subscribe(this, [&]{ select_module(nullptr); }, m->MESSAGE_DELETE);
+		m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);
 	}
 
 	reveal("config-revealer", m);

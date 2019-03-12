@@ -281,7 +281,7 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 		panel = p;
 		p->add_button("!expandx", 1, i, id);
 		set_value();
-		p->event(id, [&]{ on_button(); });
+		p->event(id, [=]{ on_button(); });
 		callback = _callback;
 	}
 	void on_button()
@@ -427,7 +427,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 		set_target("grid");
 		add_label(a->label, 0, i, "");
 		add_label(a->unit, 2, i, "");
-		a->add_gui(this, i, [&]{ on_change(); });
+		a->add_gui(this, i, [=]{ on_change(); });
 	}
 }
 

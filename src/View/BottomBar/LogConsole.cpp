@@ -19,7 +19,7 @@ LogConsole::LogConsole(Session *session) :
 	from_resource("log_console");
 
 	// only start after this->win is set
-	hui::RunLater(0.01f, [&]{ reload(); });
+	hui::RunLater(0.01f, [=]{ reload(); });
 }
 
 LogConsole::~LogConsole()

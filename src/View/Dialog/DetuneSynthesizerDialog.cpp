@@ -31,9 +31,9 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 	check("all_octaves", true);
 	check("relative", mode_relative);
 
-	event("close", std::bind(&DetuneSynthesizerDialog::on_close, this));
-	event("hui:close", std::bind(&DetuneSynthesizerDialog::on_close, this));
-	event("relative", std::bind(&DetuneSynthesizerDialog::on_relative, this));
+	event("close", [=]{ on_close(); });
+	event("hui:close", [=]{ on_close(); });
+	event("relative", [=]{ on_relative(); });
 }
 
 DetuneSynthesizerDialog::~DetuneSynthesizerDialog()

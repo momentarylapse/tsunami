@@ -34,8 +34,8 @@ public:
 			embed(config_panel, "grid", 0, 1);
 		hide_control("big", !config_panel);
 
-		event("close", [&]{ plugin->stop_request(); });
-		event("big", [&]{ on_big(); });
+		event("close", [=]{ plugin->stop_request(); });
+		event("big", [=]{ on_big(); });
 	}
 
 	~PluginPanel()
@@ -58,7 +58,7 @@ public:
 		dlg->embed(plugin->create_panel(), "root", 0, 0);
 		dlg->show();
 
-		dlg->event("hui:close", [this]{ hui::RunLater(0.001f, [this]{ close_dialog(); }); });
+		dlg->event("hui:close", [=]{ hui::RunLater(0.001f, [=]{ close_dialog(); }); });
 	}
 
 	void close_dialog()
@@ -91,10 +91,10 @@ PluginConsole::PluginConsole(Session *s) :
 	add_grid("", 0, 0, "panel-grid");
 	next_x = 0;
 
-	event("add", [&]{ on_add_button(); });
+	event("add", [=]{ on_add_button(); });
 
-	session->subscribe(this, [&]{ on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
-	session->subscribe(this, [&]{ on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
+	session->subscribe(this, [=]{ on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
+	session->subscribe(this, [=]{ on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
 }
 
 PluginConsole::~PluginConsole()

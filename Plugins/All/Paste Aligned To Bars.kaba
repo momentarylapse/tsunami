@@ -1,0 +1,59 @@
+use "../api.kaba"
+
+void update_bars(Bar*[] bars)
+	int offset = 0
+	for b in bars
+		b.offset = offset
+		offset += b.length
+
+class XXX extends SongPlugin
+	override void apply()
+		if !clipboard.has_data()
+			session.e("clipboard is empty")
+			return
+		for t in clipboard.temp.tracks
+			if t.type != TRACK_TYPE_MIDI
+				session.e("can only paste midi")
+				return
+		if len(clipboard.temp.bars) == 0
+			session.e("clipboard doesn't contain any bars")
+			return
+		if len(song.bars) == 0
+			session.e("song doesn't contain any bars")
+			return
+			
+		TrackLayer*[] source_layers
+		TrackLayer*[] target_layers
+		if !clipboard.prepare_layer_map(session.view, source_layers, target_layers)
+			return
+			
+		update_bars(clipboard.temp.bars)
+
+		song.begin_action_group()
+		for ls,i in source_layers
+			paste(session.view.sel.range.offset, ls, target_layers[i])
+		song.end_action_group()
+	
+	void paste(int offset, TrackLayer* source, TrackLayer* dest)
+		int b0 = first_bar(offset)
+		for b,i in clipboard.temp.bars
+			if b0+i < len(song.bars)
+				paste_bar(source, dest, b.range(), song.bars[b0+i].range())
+	
+	int remap(Range rs, Range rd, int x)
+		return rd.offset + i2f(x - rs.offset) * i2f(rd.length) / i2f(rs.length)
+	
+	void paste_bar(TrackLayer* source, TrackLayer* dest, Range rs, Range rd)
+		print("paste bar..." + str(rs) + " -> " + str(rd))
+		MidiNote*[] midi = source.midi.get_notes(rs)
+		for n in midi
+			MidiNote* c = n.copy()
+			c.range = RangeTo(remap(rs, rd, n.range.offset), remap(rs, rd, n.range.end()))
+			dest.add_midi_note(c)
+		
+		
+	int first_bar(int offset)
+		for b,i in song.bars
+			if b.offset >= offset -100
+				return i
+		return -1

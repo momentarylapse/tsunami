@@ -53,6 +53,7 @@ class MidiNote
 		modifier = 0
 	extern void set(int mask)
 	extern bool is(int mask)
+	extern MidiNote* copy()
 
 class MidiEvent
 	int pos
@@ -418,6 +419,7 @@ class Song
 	
 	extern Range range()
 	extern Track* time_track()
+	extern TrackLayer*[] layers()
 	
 	extern Track* add_track(int type, int index)
 	extern void delete_track(int index)
@@ -583,9 +585,16 @@ class ProgressX
 	extern void cancel()
 	extern bool is_cancelled()
 
+class Clipboard
+	Song* temp
+	extern bool has_data()
+	extern bool prepare_layer_map(AudioView *view, TrackLayer*[] sources, TrackLayer*[] targets)
+
 //extern PluginContext plugin_context
 extern ColorScheme colors
 //extern InputStreamAudio* view_input
+
+extern Clipboard* clipboard
 
 extern float db2amp(float db)
 extern float amp2db(float amp)

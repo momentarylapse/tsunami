@@ -13,9 +13,11 @@ class Song;
 class Track;
 class TrackLayer;
 class AudioView;
+class PluginManager;
 
 class Clipboard : public Observable<VirtualBase>
 {
+	friend class PluginManager;
 public:
 	Clipboard();
 	virtual ~Clipboard();
@@ -25,12 +27,12 @@ public:
 	void paste_as_samples(AudioView *view);
 	void paste_with_time(AudioView *view);
 
-	bool test_compatibility(AudioView *view);
+	bool prepare_layer_map(AudioView *view, Array<TrackLayer*> &source, Array<TrackLayer*> &target);
 
 	void clear();
 	void append_track(TrackLayer *l, AudioView *view, int offset);
-	void paste_track(int source_index, TrackLayer *target, AudioView *view);
-	void paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view);
+	void paste_track(TrackLayer *source, TrackLayer *target, AudioView *view);
+	void paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, AudioView *view);
 	bool has_data();
 	bool can_copy(AudioView *view);
 

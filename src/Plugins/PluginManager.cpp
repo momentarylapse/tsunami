@@ -42,6 +42,7 @@
 #include "../Module/Midi/MidiEffect.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
+#include "../Stuff/Clipboard.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "../View/SideBar/SampleManagerConsole.h"
@@ -98,6 +99,7 @@ void PluginManager::link_app_script_data()
 	// api definition
 	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
 	Kaba::LinkExternal("colors", &AudioView::colors);
+	Kaba::LinkExternal("clipboard", &tsunami->clipboard);
 	//Kaba::LinkExternal("view_input", &export_view_input);
 	Kaba::LinkExternal("db2amp", (void*)&db2amplitude);
 	Kaba::LinkExternal("amp2db", (void*)&amplitude2db);
@@ -116,6 +118,12 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
 	Kaba::LinkExternal("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
+
+
+	Kaba::DeclareClassSize("Clipboard", sizeof(Clipboard));
+	Kaba::DeclareClassOffset("Clipboard", "temp", _offsetof(Clipboard, temp));
+	Kaba::LinkExternal("Clipboard.has_data", Kaba::mf(&Clipboard::has_data));
+	Kaba::LinkExternal("Clipboard.prepare_layer_map", Kaba::mf(&Clipboard::prepare_layer_map));
 
 	Kaba::DeclareClassSize("Range", sizeof(Range));
 	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
@@ -378,6 +386,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("MidiNote", "clef_position", _offsetof(MidiNote, clef_position));
 	Kaba::DeclareClassOffset("MidiNote", "modifier", _offsetof(MidiNote, modifier));
 	Kaba::DeclareClassOffset("MidiNote", "flags", _offsetof(MidiNote, flags));
+	Kaba::LinkExternal("MidiNote.copy", Kaba::mf(&MidiNote::copy));
 	Kaba::LinkExternal("MidiNote.is", Kaba::mf(&MidiNote::is));
 	Kaba::LinkExternal("MidiNote.set", Kaba::mf(&MidiNote::set));
 	
@@ -478,6 +487,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Song.add_track", Kaba::mf(&Song::add_track));
 	Kaba::LinkExternal("Song.delete_track", Kaba::mf(&Song::delete_track));
 	Kaba::LinkExternal("Song.range", Kaba::mf(&Song::range));
+	Kaba::LinkExternal("Song.layers", Kaba::mf(&Song::layers));
 	Kaba::LinkExternal("Song.add_bar", Kaba::mf(&Song::add_bar));
 	Kaba::LinkExternal("Song.add_pause", Kaba::mf(&Song::add_pause));
 	Kaba::LinkExternal("Song.edit_bar", Kaba::mf(&Song::edit_bar));

@@ -104,10 +104,9 @@ void Clipboard::copy(AudioView *view)
 	notify();
 }
 
-void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *view)
+void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, AudioView *view)
 {
 	Song *s = target->track->song;
-	TrackLayer *source = temp->tracks[source_index]->layers[0];
 
 	if (target->type == SignalType::AUDIO){
 		Range r = Range(view->sel.range.start(), source->buffers[0].length);
@@ -125,26 +124,26 @@ void Clipboard::paste_track(int source_index, TrackLayer *target, AudioView *vie
 	}
 }
 
-void Clipboard::paste_track_as_samples(int source_index, TrackLayer *target, AudioView *view)
+void Clipboard::paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, AudioView *view)
 {
 	Song *s = target->track->song;
-	Track *source = temp->tracks[source_index];
+	//Track *source = temp->tracks[source_index];
 
 	Sample* ref = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref){
 		target->add_sample_ref(view->sel.range.start(), ref);
 	}else{
 		if (target->type == SignalType::AUDIO){MidiNoteBuffer midi;
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->buffers[0], true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->buffers[0], true));
 			ref_uid[source_index] = sample->uid;
 		}else if (target->type == SignalType::MIDI){
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0]->midi, true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi, true));
 			ref_uid[source_index] = sample->uid;
 		}
 	}
 }
 
-bool Clipboard::test_compatibility(AudioView *view)
+bool Clipboard::prepare_layer_map(AudioView *view, Array<TrackLayer*> &source_list, Array<TrackLayer*> &target_list)
 {
 	Array<string> temp_type, dest_type;
 	for (Track *t: view->song->tracks){
@@ -153,12 +152,15 @@ bool Clipboard::test_compatibility(AudioView *view)
 				continue;
 			if (l->type == SignalType::BEATS)
 				continue;
+			target_list.add(l);
 			dest_type.add(signal_type_name(l->type));
 		}
 	}
 
-	for (Track *t: temp->tracks)
+	for (Track *t: temp->tracks){
+		source_list.add(t->layers[0]);
 		temp_type.add(signal_type_name(t->type));
+	}
 
 	if (dest_type.num != temp->tracks.num){
 		view->session->e(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
@@ -179,24 +181,16 @@ void Clipboard::paste(AudioView *view)
 		return;
 	Song *s = view->song;
 
-	if (!test_compatibility(view))
+	Array<TrackLayer*> source_list, target_list;
+	if (!prepare_layer_map(view, source_list, target_list))
 		return;
 
 
 	s->begin_action_group();
 
-	int ti = 0;
-	for (Track *t: s->tracks){
-		for (TrackLayer *l: t->layers){
-			if (!view->sel.has(l))
-				continue;
-			if (t->type == SignalType::BEATS)
-				continue;
+	foreachi(auto *ls, source_list, i)
+		paste_track(ls, target_list[i], view);
 
-			paste_track(ti, l, view);
-			ti ++;
-		}
-	}
 	s->end_action_group();
 }
 
@@ -206,24 +200,16 @@ void Clipboard::paste_as_samples(AudioView *view)
 		return;
 	Song *s = view->song;
 
-	if (!test_compatibility(view))
+	Array<TrackLayer*> source_list, target_list;
+	if (!prepare_layer_map(view, source_list, target_list))
 		return;
 
 
 	s->begin_action_group();
 
-	int ti = 0;
-	for (Track *t: s->tracks){
-		for (TrackLayer *l: t->layers){
-			if (!view->sel.has(l))
-				continue;
-			if (t->type == SignalType::BEATS)
-				continue;
+	foreachi(auto *ls, source_list, i)
+		paste_track_as_samples(ls, i, target_list[i], view);
 
-			paste_track_as_samples(ti, l, view);
-			ti ++;
-		}
-	}
 	s->end_action_group();
 }
 

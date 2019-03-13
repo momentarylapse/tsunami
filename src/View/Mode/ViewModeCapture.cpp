@@ -23,10 +23,9 @@
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 CaptureTrackData::CaptureTrackData(){}
-CaptureTrackData::CaptureTrackData(Track *_target, Module *_input, Module *_recorder)
+CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder)
 {
 	target = _target;
-	input = _input;
 	recorder = _recorder;
 }
 
@@ -70,18 +69,15 @@ void ViewModeCapture::draw_post(Painter *c)
 
 	for (auto &d: data){
 		if (d.type() == SignalType::AUDIO){
-			InputStreamAudio *input_audio = (InputStreamAudio*)d.input;
-				AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
-				view->update_peaks_now(buf);
-				auto *l = view->get_layer(d.target->layers[0]);
-				view->buffer_painter->set_context(l->area);
-				view->buffer_painter->set_color(view->colors.capture_marker);
-				view->buffer_painter->draw_buffer(c, buf, view->sel.range.offset);
-				//view->draw_time_line(c, view->sel.range.start() + buf.length, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+			AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
+			view->update_peaks_now(buf);
+			auto *l = view->get_layer(d.target->layers[0]);
+			view->buffer_painter->set_context(l->area);
+			view->buffer_painter->set_color(view->colors.capture_marker);
+			view->buffer_painter->draw_buffer(c, buf, view->sel.range.offset);
 		}else if (d.type() == SignalType::MIDI){
-				auto *rec = (MidiRecorder*)d.recorder;
-				draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(rec->buffer), true, view->sel.range.start());
-				//view->draw_time_line(c, view->sel.range.start() + rec->buffer.samples, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+			auto *rec = (MidiRecorder*)d.recorder;
+			draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(rec->buffer), true, view->sel.range.start());
 		}
 	}
 	

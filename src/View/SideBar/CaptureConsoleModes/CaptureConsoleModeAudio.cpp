@@ -108,7 +108,7 @@ void CaptureConsoleModeAudio::enter()
 	//chain->connect(peak_meter, 0, sucker, 0);
 
 	chain->start(); // for preview
-	view->mode_capture->set_data({CaptureTrackData(target, input, recorder)});
+	view->mode_capture->set_data({CaptureTrackData(target, recorder)});
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow)

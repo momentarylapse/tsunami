@@ -100,7 +100,7 @@ void CaptureConsoleModeMidi::enter()
 	chain->connect(peak_meter, 0, preview_stream, 0);
 
 	chain->start();
-	view->mode_capture->set_data({CaptureTrackData((Track*)target, input, recorder)});
+	view->mode_capture->set_data({CaptureTrackData((Track*)target, recorder)});
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow)

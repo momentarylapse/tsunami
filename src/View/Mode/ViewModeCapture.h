@@ -24,10 +24,9 @@ class MidiEventBuffer;
 struct CaptureTrackData
 {
 	Track *target;
-	Module *input;
 	Module *recorder;
 	CaptureTrackData();
-	CaptureTrackData(Track *target, Module *input, Module *recorder = nullptr);
+	CaptureTrackData(Track *target, Module *recorder);
 	SignalType type();
 };
 

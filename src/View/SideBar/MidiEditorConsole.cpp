@@ -18,10 +18,7 @@
 #include "../AudioView.h"
 #include "../AudioViewLayer.h"
 #include "../Mode/ViewModeMidi.h"
-#include "../../Plugins/PluginManager.h"
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
-#include "../BottomBar/BottomBar.h"
+#include "../../Session.h"
 #include "MidiEditorConsole.h"
 
 #include "../../Module/Midi/MidiEffect.h"
@@ -216,17 +213,17 @@ void MidiEditorConsole::on_reference_tracks()
 
 void MidiEditorConsole::on_edit_track()
 {
-	bar()->open(SideBar::TRACK_CONSOLE);
+	session->set_mode("default/track");
 }
 
 void MidiEditorConsole::on_edit_midi_fx()
 {
-	bar()->open(SideBar::MIDI_FX_CONCOLE);
+	session->set_mode("default/midi-fx");
 }
 
 void MidiEditorConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void MidiEditorConsole::on_modifier_none()

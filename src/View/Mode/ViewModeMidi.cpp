@@ -365,6 +365,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
 		m->set_note_length(l * n);
 		m->set_sub_beat_partition(p);
 	}
+	m->set_cursor_pos(m->view->sel.range.offset, true);
 
 	string t;
 	if (n > 4){

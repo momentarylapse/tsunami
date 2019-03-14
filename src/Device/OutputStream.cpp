@@ -22,9 +22,6 @@
 #include <portaudio.h>
 #endif
 
-//const int DEFAULT_BUFFER_SIZE = 131072;
-//const int DEFAULT_BUFFER_SIZE = 32768;
-//const int DEFAULT_BUFFER_SIZE = 16384;
 const int DEFAULT_BUFFER_SIZE = 4096;
 
 

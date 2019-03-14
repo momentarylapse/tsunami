@@ -1,18 +1,49 @@
 == data ==
 
-* mostly pointer arrays
-	* addresses as UUIDs
+-- basics --
+
+ * mostly pointer arrays
+	* can use addresses as UUIDs
+
+-- ownership --
+
+ * 
+
+-- audio buffers --
+
+ * buffers can be slices (references to other buffers)
+ 
 
 
 
 == actions ==
 
-* keep instances (don't delete/new)
+ * keep instances (don't delete/new)
 
 
 
 
 == signal chains ==
+
+-- signals --
+
+ * sucking protocol (data is always read)
+    * the consumer owns the buffer and sends a reference to the producer to fill
+    * the producer returns the number of samples really written
+    * can return END_OF_STREAM ...
+
+-- modules --
+
+module commands
+ * reset_state
+	reset internal data/buffers (not affecting accum)
+ * start
+ * stop
+	"unpause/pause" mostly for streams
+ * prepare_start
+	mostly for OutputStream... prebuf
+ * accumulation_start/stop/reset
+	mostly for recorders
 
 
 
@@ -29,7 +60,7 @@
 
 == threads ==
 
-=== layout ===
+-- layout --
 
 * GUI thread
 	* editing (Actions)
@@ -40,7 +71,7 @@
 
 * Observer messages from other threads must be forwarded via hui::RunLater()
 
-=== safety ===
+-- safety --
 
 ???
 Song.StructureReader
@@ -48,7 +79,7 @@ Song.StructureReader
 RingBuffer
  * safe for single consumer + single producer
 
-=== false positives ===
+-- false positives --
 
 OutputStream.paused
 AudioSucker.running

@@ -57,16 +57,14 @@ void pulse_wait_op(Session *session, pa_operation *op)
 //	printf("-w-");
 	int n = 0;
 	//msg_write("wait op " + p2s(op));
-	while (pa_operation_get_state(op) != PA_OPERATION_DONE){
+	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING){
 //		printf(".");
 		// PA_OPERATION_RUNNING
 		//pa_mainloop_iterate(m, 1, NULL);
-		if (pa_operation_get_state(op) == PA_OPERATION_CANCELLED)
-			break;
 		n ++;
 		if (n > 1000)
 			break;
-		hui::Sleep(0.005f);
+		hui::Sleep(0.003f);
 	}
 	auto status = pa_operation_get_state(op);
 	if (status != PA_OPERATION_DONE){

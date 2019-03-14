@@ -835,7 +835,7 @@ void ViewModeMidi::draw_post(Painter *c)
 	}
 	c->set_fill(true);
 
-	string message = _("add pause (.)    delete (⟵)    note length (L)    beat partition (P)");
+	string message = _("cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)");
 	if (mode == MidiMode::TAB)
 		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
@@ -921,4 +921,18 @@ void ViewModeMidi::start_selection()
 		view->selection_mode = view->SelectionMode::RECT;
 	}
 	view->set_selection(get_selection(hover->range));
+}
+
+SongSelection ViewModeMidi::get_selection_for_rect(const Range &r, int y0, int y1)
+{
+	auto sel = ViewModeDefault::get_selection_for_rect(r, y0, y1);
+	sel.markers = {};
+	return sel;
+}
+
+SongSelection ViewModeMidi::get_selection_for_range(const Range &r)
+{
+	auto sel = ViewModeDefault::get_selection_for_range(r);
+	sel.markers = {};
+	return sel;
 }

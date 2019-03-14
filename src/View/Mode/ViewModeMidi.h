@@ -49,6 +49,8 @@ public:
 
 	Selection get_hover() override;
 	void start_selection() override;
+	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;
+	SongSelection get_selection_for_range(const Range &r) override;
 
 	SongSelection get_select_in_edit_cursor();
 	void select_in_edit_cursor();

@@ -29,6 +29,8 @@ const int DEFAULT_BUFFER_SIZE = 4096;
 #if HAS_LIB_PULSEAUDIO
 
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
+extern void pulse_ignore_op(Session*, pa_operation*);
+extern void require_main_thread(const string &msg); // hui
 
 bool pulse_wait_stream_ready(pa_stream *s)
 {
@@ -365,6 +367,7 @@ void OutputStream::_kill_dev()
 
 void OutputStream::stop()
 {
+	require_main_thread("out.stop");
 	_pause();
 }
 
@@ -378,7 +381,7 @@ void OutputStream::_pause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pulse_wait_op(session, op);
+		pulse_ignore_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -419,7 +422,7 @@ void OutputStream::_unpause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pulse_wait_op(session, op);
+		pulse_ignore_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -475,6 +478,7 @@ void OutputStream::set_device(Device *d)
 
 void OutputStream::start()
 {
+	require_main_thread("out.start");
 	if (state == State::NO_DEVICE)
 		_create_dev();
 
@@ -583,6 +587,7 @@ void OutputStream::reset_state()
 		return;
 	if (state == State::PLAYING)
 		_pause();
+	require_main_thread("out.reset");
 	if (state == State::PAUSED){
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE){

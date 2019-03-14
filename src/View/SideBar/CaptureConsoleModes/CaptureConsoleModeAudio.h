@@ -13,7 +13,6 @@
 
 class InputStreamAudio;
 class PeakMeter;
-class AudioRecorder;
 class Device;
 class Track;
 class SignalChain;
@@ -22,7 +21,6 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
 	InputStreamAudio *input;
 	PeakMeter *peak_meter;
-	AudioRecorder *recorder;
 	Array<Device*> sources;
 	Device *chosen_device;
 	Track *target;

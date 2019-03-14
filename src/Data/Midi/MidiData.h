@@ -35,6 +35,7 @@ class MidiEventBuffer : public Array<MidiEvent>
 public:
 	MidiEventBuffer();
 	void _cdecl __init__();
+	void clear();
 	MidiEventBuffer get_events(const Range &r) const;
 	int read(MidiEventBuffer &data, const Range &r) const;
 	Array<MidiNote> get_notes(const Range &r) const;
@@ -59,6 +60,7 @@ public:
 	~MidiNoteBuffer();
 	void _cdecl __init__();
 	void _cdecl __delete__();
+	void clear();
 	void deep_clear();
 	MidiEventBuffer get_events(const Range &r) const;
 	MidiNoteBufferRef get_notes(const Range &r) const;

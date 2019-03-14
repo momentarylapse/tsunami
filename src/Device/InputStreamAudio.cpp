@@ -34,6 +34,7 @@ static const int DEFAULT_CHUNK_SIZE = 512;
 #if HAS_LIB_PULSEAUDIO
 extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
 extern bool pulse_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
+extern void require_main_thread(const string&);
 
 
 void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
@@ -288,6 +289,7 @@ void InputStreamAudio::_kill_dev()
 
 void InputStreamAudio::stop()
 {
+	require_main_thread("in.stop");
 	session->i(_("capture audio stop"));
 	_pause();
 }
@@ -417,6 +419,7 @@ void InputStreamAudio::_unpause()
 
 bool InputStreamAudio::start()
 {
+	require_main_thread("in.start");
 	session->i(_("capture audio start"));
 	if (state == State::NO_DEVICE)
 		_create_dev();

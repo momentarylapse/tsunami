@@ -99,7 +99,6 @@ public:
 #if HAS_LIB_ALSA
 	_snd_seq *alsa_midi_handle;
 #endif
-	int portid;
 
 	float output_volume;
 

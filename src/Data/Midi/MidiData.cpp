@@ -220,6 +220,12 @@ void MidiEventBuffer::__init__()
 	new(this) MidiEventBuffer;
 }
 
+void MidiEventBuffer::clear()
+{
+	Array<MidiEvent>::clear();
+	samples = 0;
+}
+
 MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const
 {
 	MidiEventBuffer a;
@@ -366,6 +372,12 @@ void MidiNoteBuffer::__delete__()
 	this->MidiNoteBuffer::~MidiNoteBuffer();
 }
 
+void MidiNoteBuffer::clear()
+{
+	Array<MidiNote*>::clear();
+	samples = 0;
+}
+
 void MidiNoteBuffer::deep_clear()
 {
 	for (MidiNote *n: *this)
@@ -441,7 +453,7 @@ Range MidiNoteBuffer::range(int elongation) const
 		return Range::EMPTY;
 	int i0 = (*this)[0]->range.offset;
 	int i1 = back()->range.end(); // FIXME...
-	return Range(i0, i1 - i0 + elongation);
+	return RangeTo(i0, i1 + elongation);
 }
 
 void MidiNoteBuffer::sort()

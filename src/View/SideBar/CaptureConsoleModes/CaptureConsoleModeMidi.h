@@ -17,7 +17,6 @@ class Track;
 class Synthesizer;
 class OutputStream;
 class PeakMeter;
-class MidiRecorder;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode
 {
@@ -28,7 +27,6 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode
 	Synthesizer *preview_synth;
 	PeakMeter *peak_meter;
 	OutputStream *preview_stream;
-	MidiRecorder *recorder;
 
 
 

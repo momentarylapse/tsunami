@@ -31,6 +31,15 @@ public:
 	InputStreamMidi(Session *session);
 	virtual ~InputStreamMidi();
 
+	void _create_dev();
+	void _kill_dev();
+
+	enum class State{
+		NO_DEVICE,
+		CAPTURING,
+		PAUSED,
+	} state;
+
 	void _cdecl init();
 
 	bool _cdecl start();
@@ -46,24 +55,18 @@ public:
 	int _cdecl get_delay();
 	void _cdecl reset_sync();
 
-	void _cdecl accumulate(bool enable);
-	void _cdecl reset_accumulation();
-	int _cdecl get_sample_count();
-
 	int _cdecl sample_rate(){ return _sample_rate; }
 
 	bool _cdecl unconnect();
 	void _cdecl set_device(Device *d);
 	Device *_cdecl get_device();
 
-	MidiEventBuffer midi;
 	MidiEventBuffer current_midi;
 
 	class Output : public Port
 	{
 	public:
 		Output(InputStreamMidi *input);
-		virtual ~Output();
 
 		int read_midi(MidiEventBuffer &midi) override;
 		void feed(const MidiEventBuffer &midi);
@@ -86,6 +89,7 @@ private:
 #if HAS_LIB_ALSA
 	_snd_seq_port_subscribe *subs;
 #endif
+	int portid;
 
 	DeviceManager *device_manager;
 	Device *device;
@@ -93,8 +97,6 @@ private:
 	struct pollfd *pfd;
 	hui::Timer *timer;
 	double offset;
-	bool capturing;
-	bool accumulating;
 
 	bool running;
 	int hui_runner_id;

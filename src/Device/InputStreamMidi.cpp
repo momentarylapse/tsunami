@@ -27,8 +27,6 @@ InputStreamMidi::Output::Output(InputStreamMidi *_input) : Port(SignalType::MIDI
 	real_time_mode = true;
 }
 
-InputStreamMidi::Output::~Output(){}
-
 int InputStreamMidi::Output::read_midi(MidiEventBuffer &midi)
 {
 	if (real_time_mode){
@@ -68,6 +66,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
 	update_dt = DEFAULT_UPDATE_TIME;
+	state = State::NO_DEVICE;
 
 #if HAS_LIB_ALSA
 	subs = nullptr;
@@ -89,12 +88,37 @@ InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	unconnect();
+	_kill_dev();
 	delete timer;
 }
 
 void InputStreamMidi::init()
 {
 	set_device(device_manager->choose_device(DeviceType::MIDI_INPUT));
+}
+
+void InputStreamMidi::_create_dev()
+{
+	if (state != State::NO_DEVICE)
+		return;
+
+	portid = snd_seq_create_simple_port(device_manager->alsa_midi_handle, "Tsunami MIDI in",
+				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
+				SND_SEQ_PORT_TYPE_APPLICATION);
+	if (portid < 0){
+		session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
+		return;
+	}
+
+	state = State::PAUSED;
+}
+
+void InputStreamMidi::_kill_dev()
+{
+	if (state == State::NO_DEVICE)
+		return;
+	snd_seq_delete_simple_port(device_manager->alsa_midi_handle, portid);
+	state = State::NO_DEVICE;
 }
 
 bool InputStreamMidi::unconnect()
@@ -114,6 +138,9 @@ bool InputStreamMidi::unconnect()
 
 void InputStreamMidi::set_device(Device *d)
 {
+	if (state == State::NO_DEVICE)
+		_create_dev();
+
 	unconnect();
 
 	device = d;
@@ -129,7 +156,7 @@ void InputStreamMidi::set_device(Device *d)
 	sender.client = device->client;
 	sender.port = device->port;
 	dest.client = snd_seq_client_id(device_manager->alsa_midi_handle);
-	dest.port = device_manager->portid;
+	dest.port = portid;
 
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
@@ -155,23 +182,6 @@ Device *InputStreamMidi::get_device()
 	return device;
 }
 
-void InputStreamMidi::accumulate(bool enable)
-{
-	accumulating = enable;
-}
-
-void InputStreamMidi::reset_accumulation()
-{
-	midi.clear();
-	midi.samples = 0;
-	offset = 0;
-}
-
-int InputStreamMidi::get_sample_count()
-{
-	return midi.samples;
-}
-
 void InputStreamMidi::clear_input_queue()
 {
 #if HAS_LIB_ALSA
@@ -187,6 +197,10 @@ void InputStreamMidi::clear_input_queue()
 
 bool InputStreamMidi::start()
 {
+	if (state == State::NO_DEVICE)
+		_create_dev();
+	if (state != State::PAUSED)
+		return false;
 	session->i(_("capture midi start"));
 #if HAS_LIB_ALSA
 	if (!device_manager->alsa_midi_handle){
@@ -195,28 +209,30 @@ bool InputStreamMidi::start()
 	}
 #endif
 
-	accumulating = false;
 	offset = 0;
-	reset_accumulation();
 
 	clear_input_queue();
 
 	timer->reset();
 
 	_start_update();
-	capturing = true;
+	state = State::CAPTURING;
 	return true;
 }
 
 void InputStreamMidi::stop()
 {
+	if (state != State::CAPTURING)
+		return;
 	session->i(_("capture midi stop"));
 	_stop_update();
-	capturing = false;
 
-	midi.sanify(Range(0, midi.samples));
+	//midi.sanify(Range(0, midi.samples));
+	state = State::PAUSED;
 }
 
+// TODO: allow multiple streams/ports
+//  need to buffer events for other ports
 int InputStreamMidi::do_capturing()
 {
 	double dt = timer->get();
@@ -250,15 +266,12 @@ int InputStreamMidi::do_capturing()
 	if (current_midi.samples > 0)
 		out->feed(current_midi);
 
-	if (accumulating)
-		midi.append(current_midi);
-
 	return current_midi.samples;
 }
 
 bool InputStreamMidi::is_capturing()
 {
-	return capturing;
+	return state == State::CAPTURING;
 }
 
 

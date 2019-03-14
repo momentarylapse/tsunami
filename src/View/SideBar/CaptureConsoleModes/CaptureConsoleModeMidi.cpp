@@ -77,11 +77,8 @@ void CaptureConsoleModeMidi::enter()
 
 
 	input = (InputStreamMidi*)chain->add(ModuleType::STREAM, "MidiInput");
-	input->set_update_dt(0.005f);
-	cc->peak_meter->set_source(nullptr);//input);
-
 	input->set_device(chosen_device);
-	recorder = (MidiRecorder*)chain->add(ModuleType::PLUMBING, "MidiRecorder");
+	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
 	for (const Track *t: view->sel.tracks)
@@ -98,6 +95,8 @@ void CaptureConsoleModeMidi::enter()
 	chain->connect(recorder, 0, preview_synth, 0);
 	chain->connect(preview_synth, 0, peak_meter, 0);
 	chain->connect(peak_meter, 0, preview_stream, 0);
+
+	cc->peak_meter->set_source(peak_meter);
 
 	chain->start();
 	view->mode_capture->set_data({CaptureTrackData((Track*)target, recorder)});

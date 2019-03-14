@@ -8,6 +8,13 @@
 #include "Timer.h"
 #include <thread>
 static std::thread::id main_thread_id = std::this_thread::get_id();
+void require_main_thread(const string &msg)
+{
+	if (main_thread_id != std::this_thread::get_id()){
+		msg_error("called from non-main thread: " + msg);
+	}
+
+}
 
 
 #ifdef OS_WINDOWS

@@ -79,6 +79,15 @@ void pulse_wait_op(Session *session, pa_operation *op)
 //	printf("-o-");
 }
 
+void pulse_ignore_op(Session *session, pa_operation *op)
+{
+	if (!op){
+		session->e("pulse_ignore_op:  op=nil");
+		return;
+	}
+	pa_operation_unref(op);
+}
+
 void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
 {
 	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
@@ -497,17 +506,10 @@ void DeviceManager::_init_midi_alsa()
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
-		//return;
-	}else{
-		snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
-		portid = snd_seq_create_simple_port(alsa_midi_handle, "Tsunami MIDI in",
-					SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-					SND_SEQ_PORT_TYPE_APPLICATION);
-		if (portid < 0){
-			session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
-			//return;
-		}
+		return;
 	}
+
+	snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
 #endif
 }
 

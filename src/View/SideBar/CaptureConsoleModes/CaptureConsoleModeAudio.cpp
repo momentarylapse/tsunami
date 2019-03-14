@@ -35,7 +35,6 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	input = nullptr;
 	peak_meter = nullptr;
 	target = nullptr;
-	recorder = nullptr;
 	chain = nullptr;
 
 	cc->event("source", [=]{ on_source(); });
@@ -86,26 +85,23 @@ void CaptureConsoleModeAudio::enter()
 
 	input = (InputStreamAudio*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->set_chunk_size(4096);
+	input->set_device(chosen_device);
 
 	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	chain->connect(input, 0, peak_meter, 0);
-	cc->peak_meter->set_source(peak_meter);
 
 	auto *backup = (AudioBackup*)chain->add(ModuleType::PLUMBING, "AudioBackup");
 	backup->set_backup_mode(BACKUP_MODE_TEMP);
-	chain->connect(peak_meter, 0, backup, 0);
 
-	recorder = (AudioRecorder*)chain->add(ModuleType::PLUMBING, "AudioRecorder");
-	chain->connect(backup, 0, recorder, 0);
-
-	input->set_device(chosen_device);
-
-	//enable("capture_audio_source", false);
-
+	auto *recorder = chain->add(ModuleType::PLUMBING, "AudioRecorder");
 	auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+
+	chain->connect(input, 0, peak_meter, 0);
+	chain->connect(peak_meter, 0, backup, 0);
+	chain->connect(backup, 0, recorder, 0);
 	chain->connect(recorder, 0, sucker, 0);
-	//chain->connect(peak_meter, 0, sucker, 0);
+
+	cc->peak_meter->set_source(peak_meter);
 
 	chain->start(); // for preview
 	view->mode_capture->set_data({CaptureTrackData(target, recorder)});

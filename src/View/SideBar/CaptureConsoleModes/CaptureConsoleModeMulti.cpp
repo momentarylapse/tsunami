@@ -115,6 +115,7 @@ void CaptureConsoleModeMulti::on_source()
 	if (index < 0 or index >= items.num)
 		return;
 	int n = cc->get_int("");
+	printf("%d  %d\n", index, n);
 	auto &c = items[index];
 	if (c.track->type == SignalType::AUDIO){
 		if (n > 0){
@@ -123,6 +124,8 @@ void CaptureConsoleModeMulti::on_source()
 	}else if (c.track->type == SignalType::MIDI){
 		if (n > 0){
 			c.input_midi->set_device(sources_midi[n - 1]);
+		}else{
+			c.input_midi->unconnect();
 		}
 	}
 	/*if ((n >= 0) and (n < sources.num)){

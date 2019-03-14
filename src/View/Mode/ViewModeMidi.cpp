@@ -58,7 +58,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	win->set_int("beat_partition", sub_beat_partition);
 	win->set_int("note_length", note_length);
 	mode_wanted = MidiMode::CLASSICAL;
-	creation_mode = CreationMode::NOTE;
+	creation_mode = CreationMode::SELECT;
 	input_mode = InputMode::DEFAULT;
 	midi_interval = 3;
 	chord_type = ChordType::MINOR;
@@ -211,14 +211,16 @@ void ViewModeMidi::on_left_button_down()
 		over_sel_note = view->sel.has(hover->note);
 
 
-	if (creation_mode == CreationMode::SELECT and !over_sel_note){
-		set_cursor_pos(hover->pos, true);
-		select_in_edit_cursor();
-		view->msp.start(hover->pos, hover->y0);
+	if (hover->is_in(hover->Type::LAYER_BODY)){
+		if (creation_mode == CreationMode::SELECT and !over_sel_note){
+			set_cursor_pos(hover->pos, true);
+			select_in_edit_cursor();
+			view->msp.start(hover->pos, hover->y0);
 
-	}else{
-		//view->msp.start(hover->pos, hover->y0);
-		view->hide_selection = true;
+		}else{
+			//view->msp.start(hover->pos, hover->y0);
+			view->hide_selection = true;
+		}
 	}
 
 	if (hover->type == Selection::Type::MIDI_NOTE){

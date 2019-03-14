@@ -23,6 +23,8 @@ bool Selection::is_in(Type _type) const
 {
 	if (type == _type)
 		return true;
+	if (_type == Type::LAYER_BODY)
+		return layer and !is_in(Type::TRACK_HEADER) and !is_in(Type::LAYER_HEADER);
 	if (_type == Type::TRACK_HEADER)
 		return (type == Type::TRACK_BUTTON_MUTE) or (type == Type::TRACK_BUTTON_SOLO) or (type == Type::TRACK_BUTTON_EDIT) or (type == Type::TRACK_BUTTON_CURVE) or (type == Type::TRACK_BUTTON_FX);
 	if (_type == Type::LAYER_HEADER)

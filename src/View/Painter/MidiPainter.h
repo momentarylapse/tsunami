@@ -103,6 +103,7 @@ public:
 		float note_circle_threshold;
 		float tab_text_threshold;
 		int note_count_threshold;
+		float factor;
 	}quality;
 
 	float clef_dy;

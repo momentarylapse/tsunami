@@ -761,10 +761,12 @@ void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &not
 			if (count[i] == 0)
 				continue;
 			color col = pitch_color(i);
+			if (!is_playable)
+				col = ColorInterpolate(col, colors.text_soft3, 0.8f);
 			col.a = (float)count[i] / (float)bnotes.num;
 			c->set_color(col);
-			float y0 = area.y1 + i*area.height()/12;
-			float y1 = area.y1 + (i+1)*area.height()/12;
+			float y0 = area.y2 - i*area.height()/12;
+			float y1 = area.y2 - (i+1)*area.height()/12;
 			c->draw_rect(rect(x0, x1, y0, y1));
 		}
 	}
@@ -776,7 +778,8 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)
 	midi.update_meta(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 
-	if (notes.num > quality.note_count_threshold){
+	float w_1min = cam->dsample2screen(song->sample_rate * 60);
+	if (notes.num > quality.note_count_threshold or (w_1min < 1000/quality.factor)){
 		draw_low_detail_dummy(c, notes);
 		return;
 	}
@@ -843,6 +846,7 @@ void MidiPainter::set_shift(int _shift)
 
 void MidiPainter::set_quality(float q, bool antialiasing)
 {
+	quality.factor = q;
 	quality.dx_min = 20 / q;
 	quality.shadow_threshold = rr*1.5f / q;
 	quality.note_circle_threshold = 6 / q;

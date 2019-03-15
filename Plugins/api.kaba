@@ -247,6 +247,7 @@ class Synthesizer extends Module
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
 	extern override void on_config()
+	extern override void reset_state()
 	extern virtual PitchRenderer *create_pitch_renderer(int pitch)
 	extern void set_sample_rate(int sample_rate)
 

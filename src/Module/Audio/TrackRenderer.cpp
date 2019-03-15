@@ -79,7 +79,7 @@ void TrackRenderer::reset_state()
 
 	for (AudioEffect *fx: fx)
 		fx->reset_state();
-	synth->reset();
+	synth->reset_state();
 }
 
 TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)

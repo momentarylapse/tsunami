@@ -74,7 +74,8 @@ public:
 	bool auto_generate_stereo;
 
 
-	void _cdecl reset();
+	void _cdecl reset_default();
+	void reset_state() override;
 
 	bool has_run_out_of_data();
 

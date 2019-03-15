@@ -339,6 +339,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "create_pitch_renderer", Kaba::mf(&Synthesizer::create_pitch_renderer), &synth);
 	Kaba::DeclareClassVirtualIndex("Synthesizer", "on_config", Kaba::mf(&Synthesizer::on_config), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "reset_state", Kaba::mf(&Synthesizer::reset_state), &synth);
 	Kaba::LinkExternal("Synthesizer.set_sample_rate", Kaba::mf(&Synthesizer::set_sample_rate));
 
 	PitchRenderer pren(&synth, 0);

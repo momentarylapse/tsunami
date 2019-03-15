@@ -493,7 +493,7 @@ bool AudioOutput::_pulse_test_error(const string &msg)
 {
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0){
-		session->e("OutputStream: " + msg + ": " + pa_strerror(e));
+		session->e("AudioOutput: " + msg + ": " + pa_strerror(e));
 		return true;
 	}
 	return false;
@@ -504,7 +504,7 @@ bool AudioOutput::_pulse_test_error(const string &msg)
 bool AudioOutput::_portaudio_test_error(PaError err, const string &msg)
 {
 	if (err != paNoError){
-		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
+		session->e("AudioOutput: " + msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 	return false;

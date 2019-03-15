@@ -391,10 +391,10 @@ void SignalChain::prepare_start()
 	if (state != State::UNPREPARED)
 		return;
 	session->debug("chain", "prepare");
-	if (!sucking)
-		_start_sucking();
 	for (auto *m: modules)
 		m->command(ModuleCommand::PREPARE_START, 0);
+	if (!sucking)
+		_start_sucking();
 	state = State::PAUSED;
 }
 

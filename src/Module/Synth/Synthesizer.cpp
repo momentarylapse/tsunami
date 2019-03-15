@@ -223,14 +223,19 @@ void Synthesizer::on_config()
 		p->on_config();
 }
 
-void Synthesizer::reset()
+void Synthesizer::reset_default()
 {
-	reset_state();
 	for (auto *p: pitch_renderer)
 		delete p;
+	events.clear();
 	pitch_renderer.clear();
 	active_pitch.clear();
 	source_run_out = false;
+}
+
+void Synthesizer::reset_state()
+{
+	reset_default();
 }
 
 bool Synthesizer::is_default()

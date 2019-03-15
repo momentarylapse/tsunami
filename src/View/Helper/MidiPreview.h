@@ -13,6 +13,7 @@
 class AudioOutput;
 class Synthesizer;
 class MidiPreviewSource;
+class Module;
 class SignalChain;
 class Session;
 
@@ -24,16 +25,14 @@ public:
 	virtual ~MidiPreview();
 
 	SignalChain *chain;
-	Synthesizer *synth;
-	AudioOutput *stream;
+	Module *synth;
+	Module *out;
 	MidiPreviewSource *source;
 	Session *session;
 
 
 	void start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl);
 	void end();
-
-	void on_end_of_stream();
 };
 
 #endif /* SRC_VIEW_HELPER_MIDIPREVIEW_H_ */

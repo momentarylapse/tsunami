@@ -10,7 +10,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
 #include "../../Module/SignalChain.h"
-#include "../../Stream/AudioOutput.h"
+#include <mutex>
 
 
 class MidiPreviewSource : public MidiSource
@@ -18,6 +18,7 @@ class MidiPreviewSource : public MidiSource
 public:
 	MidiPreviewSource()
 	{
+		module_subtype = "MidiPreviewSource";
 		mode = Mode::WAITING;
 		ttl = -1;
 		volume = 1.0f;
@@ -138,10 +139,10 @@ MidiPreview::MidiPreview(Session *s)
 {
 	session = s;
 	source = new MidiPreviewSource;
-	stream = nullptr;
 	synth = nullptr;
 	chain = new SignalChain(session, "midi-preview");
 	chain->_add(source);
+	out = chain->add(ModuleType::STREAM, "AudioOutput");
 }
 
 MidiPreview::~MidiPreview()
@@ -153,16 +154,11 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 {
 	//kill_preview();
 	if (!synth){
-		synth = (Synthesizer*)s->copy();
+		synth = s->copy();
 //		synth->setInstrument(view->cur_track->instrument);
 		chain->_add(synth);
 		chain->connect(source, 0, synth, 0);
-	}
-	if (!stream){
-		stream = new AudioOutput(session);
-		chain->_add(stream);
-		chain->connect(synth, 0, stream, 0);
-		chain->subscribe(this, [=]{ on_end_of_stream(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
+		chain->connect(synth, 0, out, 0);
 	}
 
 	source->start(pitch, session->sample_rate() * ttl, volume);
@@ -172,12 +168,5 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 void MidiPreview::end()
 {
 	source->end();
-}
-
-void MidiPreview::on_end_of_stream()
-{
-	//msg_write("preview: end of stream");
-	// ...well happens automatic these days...
-	chain->stop();
 }
 

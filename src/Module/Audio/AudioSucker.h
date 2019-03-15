@@ -16,7 +16,6 @@ class AudioSucker : public Module
 {
 public:
 	AudioSucker();
-	~AudioSucker() override;
 
 	int do_suck(int buffer_size);
 

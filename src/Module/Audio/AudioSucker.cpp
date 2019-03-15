@@ -17,23 +17,13 @@ AudioSucker::AudioSucker() :
 {
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 	source = nullptr;
-
-}
-
-AudioSucker::~AudioSucker()
-{
 }
 
 int AudioSucker::do_suck(int buffer_size)
 {
 	AudioBuffer temp;
 	temp.resize(buffer_size);
-	int r = source->read_audio(temp);
-	if (r == source->NOT_ENOUGH_DATA)
-		return r;
-	if (r == source->END_OF_STREAM)
-		return r;
-	return r;
+	return source->read_audio(temp);
 }
 
 int AudioSucker::command(ModuleCommand cmd, int param)

@@ -81,7 +81,7 @@ public:
 	void stop_hard();
 
 	enum class State {
-		STOPPED,
+		UNPREPARED,
 		ACTIVE,
 		PAUSED
 	};

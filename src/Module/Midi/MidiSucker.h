@@ -11,30 +11,16 @@
 #include "../Module.h"
 
 class Port;
-class MidiSuckerThread;
 
 class MidiSucker : public Module
 {
-	friend class MidiSuckerThread;
 public:
 	MidiSucker();
-	~MidiSucker() override;
 
-	void set_buffer_size(int size);
-
-	void start();
-	void stop();
-
-	int update();
-
-	static const int DEFAULT_BUFFER_SIZE;
+	int update(int buffer_size);
 
 	Port *source;
-	bool running;
-	int buffer_size;
-	float no_data_wait;
 
-	MidiSuckerThread *thread;
 	int command(ModuleCommand cmd, int param) override;
 };
 

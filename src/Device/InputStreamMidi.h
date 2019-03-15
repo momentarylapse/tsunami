@@ -40,14 +40,11 @@ public:
 		PAUSED,
 	} state;
 
-	void _cdecl init();
+	void init();
 
 	bool _cdecl start();
 	void _cdecl stop();
 
-	void _start_update();
-	void _stop_update();
-	void update();
 	int do_capturing();
 
 	bool _cdecl is_capturing();
@@ -77,9 +74,6 @@ public:
 	};
 	Output *out;
 
-	void _cdecl set_update_dt(float dt);
-	float update_dt;
-
 	int _sample_rate;
 
 private:
@@ -97,9 +91,6 @@ private:
 	struct pollfd *pfd;
 	hui::Timer *timer;
 	double offset;
-
-	bool running;
-	int hui_runner_id;
 
 public:
 	int command(ModuleCommand cmd, int param) override;

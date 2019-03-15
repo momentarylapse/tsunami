@@ -82,7 +82,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 {
 	session = s;
 	name = _name;
-	state = State::STOPPED;
+	state = State::UNPREPARED;
 	hui_runner = -1;
 	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
@@ -388,11 +388,14 @@ void SignalChain::reset_state()
 
 void SignalChain::prepare_start()
 {
+	if (state != State::UNPREPARED)
+		return;
 	session->debug("chain", "prepare");
 	if (!sucking)
 		_start_sucking();
 	for (auto *m: modules)
 		m->command(ModuleCommand::PREPARE_START, 0);
+	state = State::PAUSED;
 }
 
 void SignalChain::start()
@@ -401,7 +404,7 @@ void SignalChain::start()
 		return;
 	session->debug("chain", "start");
 
-	if (state == State::STOPPED)
+	if (state == State::UNPREPARED)
 		prepare_start();
 
 
@@ -431,7 +434,7 @@ void SignalChain::stop_hard()
 	stop();
 	_stop_sucking();
 	reset_state();
-	state = State::STOPPED;
+	state = State::UNPREPARED;
 	notify(MESSAGE_STATE_CHANGE);
 }
 

@@ -480,11 +480,14 @@ int InputStreamAudio::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();
+		return 0;
 	}else if (cmd == ModuleCommand::STOP){
 		stop();
+		return 0;
 	}else if (cmd == ModuleCommand::PREPARE_START){
 		if (state == State::NO_DEVICE)
 			_create_dev();
+		return 0;
 	}
-	return 0;
+	return COMMAND_NOT_HANDLED;
 }

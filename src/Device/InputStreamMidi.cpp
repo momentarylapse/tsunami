@@ -12,7 +12,6 @@
 
 #include "OutputStream.h"
 #include "../Module/Port/Port.h"
-#include "../Stuff/BackupManager.h"
 #include "../Data/base.h"
 
 #if HAS_LIB_ALSA
@@ -65,14 +64,11 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 {
 	set_session_etc(_session, "", nullptr);
 	_sample_rate = session->sample_rate();
-	update_dt = DEFAULT_UPDATE_TIME;
 	state = State::NO_DEVICE;
 
 #if HAS_LIB_ALSA
 	subs = nullptr;
 #endif
-
-	running = false;
 
 	device_manager = session->device_manager;
 
@@ -215,7 +211,6 @@ bool InputStreamMidi::start()
 
 	timer->reset();
 
-	_start_update();
 	state = State::CAPTURING;
 	return true;
 }
@@ -225,7 +220,6 @@ void InputStreamMidi::stop()
 	if (state != State::CAPTURING)
 		return;
 	session->i(_("capture midi stop"));
-	_stop_update();
 
 	//midi.sanify(Range(0, midi.samples));
 	state = State::PAUSED;
@@ -284,45 +278,17 @@ void InputStreamMidi::reset_sync()
 {
 }
 
-void InputStreamMidi::_start_update()
-{
-	if (running)
-		return;
-	hui_runner_id = hui::RunRepeated(update_dt, [=]{ update(); });
-	running = true;
-}
-
-void InputStreamMidi::_stop_update()
-{
-	if (!running)
-		return;
-	hui::CancelRunner(hui_runner_id);
-	hui_runner_id = -1;
-	running = false;
-}
-
-void InputStreamMidi::update()
-{
-	if (do_capturing() > 0)
-	{}//	notify(MESSAGE_CAPTURE);
-
-	running = is_capturing();
-}
-
-void InputStreamMidi::set_update_dt(float dt)
-{
-	if (dt > 0)
-		update_dt = dt;
-	else
-		update_dt = DEFAULT_UPDATE_TIME;
-}
-
 int InputStreamMidi::command(ModuleCommand cmd, int param)
 {
-	if (cmd == ModuleCommand::START)
+	if (cmd == ModuleCommand::START){
 		start();
-	else if (cmd == ModuleCommand::STOP)
+		return 0;
+	}else if (cmd == ModuleCommand::STOP){
 		stop();
+		return 0;
+	}else if (cmd == ModuleCommand::SUCK){
+		return do_capturing();
+	}
 	return COMMAND_NOT_HANDLED;
 }
 

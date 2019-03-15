@@ -88,9 +88,9 @@ void CaptureConsoleModeMidi::enter()
 	//preview_synth->plug(0, input, 0);
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	preview_stream = (OutputStream*)chain->add(ModuleType::STREAM, "AudioOutput");
-	preview_stream->set_buffer_size(512);
 	
-	
+
+	chain->set_buffer_size(512);
 	chain->connect(input, 0, recorder, 0);
 	chain->connect(recorder, 0, preview_synth, 0);
 	chain->connect(preview_synth, 0, peak_meter, 0);

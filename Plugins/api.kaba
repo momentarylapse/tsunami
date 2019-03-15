@@ -476,7 +476,6 @@ class OutputStream extends Module
 	//extern void setSource(AudioSource *r)
 	extern float get_volume()
 	extern void set_volume(float volume)
-	extern void set_buffer_size(int size)
 
 /*class AudioInput //: Observable
 	RingBuffer current_buffer
@@ -519,6 +518,7 @@ class SignalChain extends Module
 	extern void set_update_dt(float dt)
 	extern override int get_pos()
 	extern override void set_pos(int pos)
+	extern void set_buffer_size(int size)
 
 class Session
 	int id

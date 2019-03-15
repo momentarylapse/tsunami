@@ -496,6 +496,11 @@ void SignalChain::set_pos(int pos)
 		m->set_pos(pos);
 }
 
+void SignalChain::set_buffer_size(int size)
+{
+	buffer_size = size;
+}
+
 
 
 void SignalChain::_start_sucking()

@@ -539,13 +539,13 @@ void PluginManager::link_app_script_data()
 	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
 	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
 	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
-	Kaba::LinkExternal("OutputStream.set_buffer_size", Kaba::mf(&OutputStream::set_buffer_size));
 	Kaba::DeclareClassVirtualIndex("OutputStream", "reset_state", Kaba::mf(&OutputStream::reset_state), &stream);
 	}
 
 	SignalChain chain(Session::GLOBAL, "");
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
+	Kaba::LinkExternal("SignalChain.set_buffer_size", Kaba::mf(&SignalChain::set_buffer_size));
 	Kaba::DeclareClassVirtualIndex("SignalChain", "set_pos", Kaba::mf(&SignalChain::set_pos), &chain);
 	Kaba::DeclareClassVirtualIndex("SignalChain", "get_pos", Kaba::mf(&SignalChain::get_pos), &chain);
 

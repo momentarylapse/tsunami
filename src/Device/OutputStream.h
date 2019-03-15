@@ -17,8 +17,6 @@
 
 class DeviceManager;
 class Device;
-class Thread;
-class StreamThread;
 class Session;
 
 #if HAS_LIB_PULSEAUDIO
@@ -34,9 +32,7 @@ typedef int PaError;
 
 class OutputStream : public Module
 {
-	friend StreamThread;
 public:
-	//AudioStream();
 	OutputStream(Session *session);
 	virtual ~OutputStream();
 
@@ -64,23 +60,22 @@ public:
 	int _cdecl get_available();
 
 	float _cdecl get_volume();
-	void _cdecl set_volume(float _volume);
+	void _cdecl set_volume(float volume);
 
-	void _cdecl set_buffer_size(int _size){ buffer_size = _size; }
+	void _cdecl set_prebuffer_size(int size);
 
 private:
-	void _read_stream();
+	int _read_stream(int buffer_size);
 
 	float volume;
-	int buffer_size;
 
 	Port *source;
 	RingBuffer ring_buf;
 
+	int prebuffer_size;
+
 	std::atomic<bool> read_end_of_stream;
 	std::atomic<bool> played_end_of_stream;
-
-	int data_samples;
 
 #if HAS_LIB_PULSEAUDIO
 	pa_stream *pulse_stream;
@@ -96,8 +91,6 @@ private:
 
 	DeviceManager *device_manager;
 	Device *device;
-	/*bool killed;
-	bool paused;*/
 
 	enum class State{
 		NO_DEVICE,
@@ -106,8 +99,6 @@ private:
 		PLAYING,
 	} state;
 
-	StreamThread *thread;
-	int perf_channel;
 
 	bool feed_stream_output(int frames, float *out);
 

@@ -6,8 +6,6 @@
  */
 
 #include "../Session.h"
-#include "../Stuff/PerformanceMonitor.h"
-#include "../lib/threads/Thread.h"
 #include "../Data/base.h"
 #include "DeviceManager.h"
 #include "Device.h"
@@ -22,7 +20,7 @@
 #include <portaudio.h>
 #endif
 
-const int DEFAULT_BUFFER_SIZE = 4096;
+const int DEFAULT_PREBUFFER_SIZE = 4096;
 
 
 
@@ -162,48 +160,12 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 
 #endif
 
-class StreamThread : public Thread
-{
-public:
-	OutputStream *stream;
-	int perf_channel;
-	bool keep_running = true;
-
-	StreamThread(OutputStream *s)
-	{
-		stream = s;
-		perf_channel = stream->perf_channel;
-	}
-
-	void on_run() override
-	{
-		//printf("thread start\n");
-		while(keep_running){
-			if (stream->read_end_of_stream){
-				hui::Sleep(0.010f);
-			}else{
-				if (stream->ring_buf.available() <= stream->buffer_size){
-					PerformanceMonitor::start_busy(perf_channel);
-				//	printf("READ\n");
-					stream->_read_stream();
-					PerformanceMonitor::end_busy(perf_channel);
-				}else{
-					hui::Sleep(0.002f);
-				}
-			}
-			Thread::cancelation_point();
-		}
-		//printf("thread end\n");
-	}
-};
 
 
 OutputStream::OutputStream(Session *_session) :
 	Module(ModuleType::STREAM, "AudioOutput"),
 	ring_buf(1048576)
 {
-//	printf("output new\n");
-	perf_channel = PerformanceMonitor::create_channel("out");
 	state = State::NO_DEVICE;
 	set_session_etc(_session, "", nullptr);
 	source = nullptr;
@@ -211,13 +173,11 @@ OutputStream::OutputStream(Session *_session) :
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
 	volume = 1;
+	prebuffer_size = DEFAULT_PREBUFFER_SIZE;
 
 	device_manager = session->device_manager;
 	device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
 
-	data_samples = 0;
-	buffer_size = DEFAULT_BUFFER_SIZE;
-	thread = nullptr;
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
 #endif
@@ -240,14 +200,6 @@ OutputStream::~OutputStream()
 	_kill_dev();
 
 	device_manager->remove_stream(this);
-
-	if (thread){
-		thread->keep_running = false;
-		thread->join();
-		delete(thread); // automatic cancel
-		thread = nullptr;
-	}
-	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void OutputStream::__init__(Session *s)
@@ -393,13 +345,6 @@ void OutputStream::_pause()
 #endif
 
 
-	if (thread){
-		thread->keep_running = false;
-		thread->join();
-		delete thread;
-		thread = nullptr;
-	}
-
 	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -412,11 +357,6 @@ void OutputStream::_unpause()
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
-
-	if (!thread){
-		thread = new StreamThread(this);
-		thread->run();
-	}
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream){
@@ -436,10 +376,10 @@ void OutputStream::_unpause()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void OutputStream::_read_stream()
+int OutputStream::_read_stream(int buffer_size)
 {
 	if (!source)
-		return;
+		return 0;
 
 	int size = 0;
 	AudioBuffer b;
@@ -452,7 +392,7 @@ void OutputStream::_read_stream()
 		//printf(" -> no data\n");
 		// keep trying...
 		ring_buf.write_ref_cancel(b);
-		return;
+		return size;
 	}
 
 	// out of data?
@@ -461,7 +401,7 @@ void OutputStream::_read_stream()
 		read_end_of_stream = true;
 		hui::RunLater(0.001f,  [=]{ on_read_end_of_stream(); });
 		ring_buf.write_ref_cancel(b);
-		return;
+		return size;
 	}
 
 	// add to queue
@@ -469,6 +409,7 @@ void OutputStream::_read_stream()
 	ring_buf.write_ref_done(b);
 	buffer_is_cleared = false;
 //	printf(" -> %d of %d\n", size, buffer_size);
+	return size;
 }
 
 void OutputStream::set_device(Device *d)
@@ -495,12 +436,7 @@ void OutputStream::_fill_prebuffer()
 	session->debug("out", "prebuf");
 
 	// we need some data in the buffer...
-	_read_stream();
-
-	if (!thread){
-		thread = new StreamThread(this);
-		thread->run();
-	}
+	_read_stream(prebuffer_size);
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
@@ -544,6 +480,11 @@ void OutputStream::set_volume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
+}
+
+void OutputStream::set_prebuffer_size(int size)
+{
+	prebuffer_size = size;
 }
 
 #if HAS_LIB_PULSEAUDIO
@@ -619,6 +560,10 @@ int OutputStream::command(ModuleCommand cmd, int param)
 			_create_dev();
 		_fill_prebuffer();
 		return 0;
+	}else if (cmd == ModuleCommand::SUCK){
+		if (ring_buf.available() >= prebuffer_size)
+			return 0;
+		return _read_stream(param);
 	}
 	return COMMAND_NOT_HANDLED;
 }

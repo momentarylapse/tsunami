@@ -7,10 +7,6 @@
 
 #include "CaptureConsoleModeMidi.h"
 #include "../CaptureConsole.h"
-#include "../../../Device/InputStreamMidi.h"
-#include "../../../Device/OutputStream.h"
-#include "../../../Device/DeviceManager.h"
-#include "../../../Device/Device.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
@@ -23,6 +19,10 @@
 #include "../../AudioView.h"
 #include "../../Mode/ViewModeCapture.h"
 #include "../../../Session.h"
+#include "../../../Device/Device.h"
+#include "../../../Device/DeviceManager.h"
+#include "../../../Stream/AudioOutput.h"
+#include "../../../Stream/MidiInput.h"
 
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -76,7 +76,7 @@ void CaptureConsoleModeMidi::enter()
 			cc->set_int("source", i);
 
 
-	input = (InputStreamMidi*)chain->add(ModuleType::STREAM, "MidiInput");
+	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
 	input->set_device(chosen_device);
 	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
@@ -87,7 +87,7 @@ void CaptureConsoleModeMidi::enter()
 			
 	//preview_synth->plug(0, input, 0);
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	preview_stream = (OutputStream*)chain->add(ModuleType::STREAM, "AudioOutput");
+	preview_stream = (AudioOutput*)chain->add(ModuleType::STREAM, "AudioOutput");
 	
 
 	chain->set_buffer_size(512);

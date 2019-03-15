@@ -8,7 +8,6 @@
 #include "ViewModeMidi.h"
 
 #include "../../Module/SignalChain.h"
-#include "../../Device/InputStreamMidi.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -19,6 +18,7 @@
 #include "../../Data/Midi/Clef.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
+#include "../../Stream/MidiInput.h"
 #include "../AudioView.h"
 #include "../AudioViewLayer.h"
 #include "../Helper/MidiPreview.h"
@@ -187,7 +187,7 @@ void on_midi_input(ViewModeMidi *me)
 void ViewModeMidi::on_start()
 {
 	input_chain = new SignalChain(session, "midi-input");
-	input = (InputStreamMidi*)input_chain->add(ModuleType::STREAM, "MidiInput");
+	input = (MidiInput*)input_chain->add(ModuleType::STREAM, "MidiInput");
 	input_chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	input_chain->start();
 }

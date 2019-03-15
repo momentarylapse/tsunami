@@ -7,8 +7,8 @@
 
 #include "DeviceConsole.h"
 #include "../../Session.h"
-#include "../../Device/DeviceManager.h"
 #include "../../Device/Device.h"
+#include "../../Device/DeviceManager.h"
 
 DeviceConsole::DeviceConsole(Session *session) :
 	BottomBar::Console(_("Devices"), session)

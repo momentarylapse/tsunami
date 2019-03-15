@@ -13,14 +13,14 @@
 #include "../../Data/Track.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
-#include "../../Device/InputStreamAudio.h"
-#include "../../Device/InputStreamMidi.h"
 #include "../../Module/Audio/AudioRecorder.h"
 #include "../../Module/Midi/MidiRecorder.h"
 #include "../../Module/SignalChain.h"
 #include "../SideBar/SideBar.h"
 #include "../../Session.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../Stream/AudioInput.h"
+#include "../../Stream/MidiInput.h"
 
 CaptureTrackData::CaptureTrackData(){}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder)

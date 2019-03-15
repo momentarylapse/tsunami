@@ -1,12 +1,12 @@
 /*
- * OutputStream.h
+ * AudioOutput.h
  *
  *  Created on: 01.11.2014
  *      Author: michi
  */
 
-#ifndef SRC_DEVICE_OUTPUTSTREAM_H_
-#define SRC_DEVICE_OUTPUTSTREAM_H_
+#ifndef SRC_STREAM_AUDIOOUTPUT_H_
+#define SRC_STREAM_AUDIOOUTPUT_H_
 
 
 
@@ -30,11 +30,11 @@ typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 #endif
 
-class OutputStream : public Module
+class AudioOutput : public Module
 {
 public:
-	OutputStream(Session *session);
-	virtual ~OutputStream();
+	AudioOutput(Session *session);
+	virtual ~AudioOutput();
 
 	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
@@ -124,4 +124,4 @@ public:
 	int command(ModuleCommand cmd, int param) override;
 };
 
-#endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */
+#endif /* SRC_STREAM_AUDIOOUTPUT_H_ */

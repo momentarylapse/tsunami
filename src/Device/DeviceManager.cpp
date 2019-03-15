@@ -5,12 +5,13 @@
  *      Author: michi
  */
 
+#include "DeviceManager.h"
+
 #include "../Session.h"
+#include "../Module/Module.h"
+#include "Device.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
-#include "Device.h"
-#include "DeviceManager.h"
-#include "OutputStream.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -518,8 +519,8 @@ void DeviceManager::kill()
 	if (!initialized)
 		return;
 
-	Array<OutputStream*> to_del = streams;
-	for (OutputStream *s: to_del)
+	Array<Module*> to_del = streams;
+	for (Module *s: to_del)
 		delete s;
 
 	// audio
@@ -558,19 +559,19 @@ void DeviceManager::set_output_volume(float _volume)
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::add_stream(OutputStream* s)
+void DeviceManager::add_stream(Module *s)
 {
 	streams.add(s);
 }
 
-void DeviceManager::remove_stream(OutputStream* s)
+void DeviceManager::remove_stream(Module *s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
 			streams.erase(i);
 }
 
-bool DeviceManager::stream_exists(OutputStream* s)
+bool DeviceManager::stream_exists(Module *s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)

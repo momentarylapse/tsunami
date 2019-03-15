@@ -7,11 +7,12 @@
 
 #include "BottomBar.h"
 #include "../Helper/CpuDisplay.h"
-#include "../../Device/OutputStream.h"
-#include "../../Device/DeviceManager.h"
 #include "../../Session.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
+
+#include "../../Device/DeviceManager.h"
+#include "../../Stream/AudioOutput.h"
 #include "../Helper/PeakMeterDisplay.h"
 
 MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)

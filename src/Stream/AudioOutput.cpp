@@ -1,16 +1,17 @@
 /*
- * OutputStream.cpp
+ * AudioOutput.cpp
  *
  *  Created on: 01.11.2014
  *      Author: michi
  */
 
+#include "AudioOutput.h"
+
 #include "../Session.h"
 #include "../Data/base.h"
-#include "DeviceManager.h"
-#include "Device.h"
-#include "OutputStream.h"
 #include "../Module/Port/Port.h"
+#include "../Device/Device.h"
+#include "../Device/DeviceManager.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -48,10 +49,10 @@ bool pulse_wait_stream_ready(pa_stream *s)
 }
 
 
-void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 //	printf("output request %d\n", (int)nbytes);
-	OutputStream *stream = (OutputStream*)userdata;
+	AudioOutput *stream = (AudioOutput*)userdata;
 
 	void *data;
 	int r = pa_stream_begin_write(p, &data, &nbytes);
@@ -73,21 +74,21 @@ void OutputStream::pulse_stream_request_callback(pa_stream *p, size_t nbytes, vo
 	}
 }
 
-void OutputStream::pulse_stream_success_callback(pa_stream *s, int success, void *userdata)
+void AudioOutput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata)
 {
 	//msg_write("--success");
 }
 
-void OutputStream::pulse_stream_underflow_callback(pa_stream *s, void *userdata)
+void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata)
 {
-	OutputStream *stream = (OutputStream*)userdata;
+	AudioOutput *stream = (AudioOutput*)userdata;
 	//stream->session->w("pulse: underflow\n");
 	printf("pulse: underflow\n");
 }
 
 #endif
 
-bool OutputStream::feed_stream_output(int frames_request, float *out)
+bool AudioOutput::feed_stream_output(int frames_request, float *out)
 {
 	if (state != State::PLAYING){
 		// output silence...
@@ -135,14 +136,14 @@ bool OutputStream::feed_stream_output(int frames_request, float *out)
 
 #if HAS_LIB_PORTAUDIO
 
-int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
+int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
                                                     unsigned long frames,
                                                     const PaStreamCallbackTimeInfo* timeInfo,
                                                     PaStreamCallbackFlags statusFlags,
                                                     void *userData)
 {
 //	printf("request %d\n", (int)frames);
-	OutputStream *stream = (OutputStream*)userData;
+	AudioOutput *stream = (AudioOutput*)userData;
 
 	float *out = (float*)outputBuffer;
 	(void) inputBuffer; /* Prevent unused variable warning. */
@@ -162,7 +163,7 @@ int OutputStream::portaudio_stream_request_callback(const void *inputBuffer, voi
 
 
 
-OutputStream::OutputStream(Session *_session) :
+AudioOutput::AudioOutput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioOutput"),
 	ring_buf(1048576)
 {
@@ -194,7 +195,7 @@ OutputStream::OutputStream(Session *_session) :
 	device_manager->add_stream(this);
 }
 
-OutputStream::~OutputStream()
+AudioOutput::~AudioOutput()
 {
 	_pause();
 	_kill_dev();
@@ -202,17 +203,17 @@ OutputStream::~OutputStream()
 	device_manager->remove_stream(this);
 }
 
-void OutputStream::__init__(Session *s)
+void AudioOutput::__init__(Session *s)
 {
-	new(this) OutputStream(s);
+	new(this) AudioOutput(s);
 }
 
-void OutputStream::__delete__()
+void AudioOutput::__delete__()
 {
-	this->OutputStream::~OutputStream();
+	this->AudioOutput::~AudioOutput();
 }
 
-void OutputStream::_create_dev()
+void AudioOutput::_create_dev()
 {
 	if (state != State::NO_DEVICE)
 		return;
@@ -289,7 +290,7 @@ void OutputStream::_create_dev()
 	state = State::DEVICE_WITHOUT_DATA;
 }
 
-void OutputStream::_kill_dev()
+void AudioOutput::_kill_dev()
 {
 	if (state != State::DEVICE_WITHOUT_DATA and state != State::PAUSED)
 		return;
@@ -317,13 +318,13 @@ void OutputStream::_kill_dev()
 
 
 
-void OutputStream::stop()
+void AudioOutput::stop()
 {
 	require_main_thread("out.stop");
 	_pause();
 }
 
-void OutputStream::_pause()
+void AudioOutput::_pause()
 {
 	if (state != State::PLAYING)
 		return;
@@ -349,7 +350,7 @@ void OutputStream::_pause()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void OutputStream::_unpause()
+void AudioOutput::_unpause()
 {
 	if (state != State::PAUSED)
 		return;
@@ -376,7 +377,7 @@ void OutputStream::_unpause()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-int OutputStream::_read_stream(int buffer_size)
+int AudioOutput::_read_stream(int buffer_size)
 {
 	if (!source)
 		return 0;
@@ -412,12 +413,12 @@ int OutputStream::_read_stream(int buffer_size)
 	return size;
 }
 
-void OutputStream::set_device(Device *d)
+void AudioOutput::set_device(Device *d)
 {
 	device = d;
 }
 
-void OutputStream::start()
+void AudioOutput::start()
 {
 	require_main_thread("out.start");
 	if (state == State::NO_DEVICE)
@@ -429,7 +430,7 @@ void OutputStream::start()
 	_unpause();
 }
 
-void OutputStream::_fill_prebuffer()
+void AudioOutput::_fill_prebuffer()
 {
 	if (state != State::DEVICE_WITHOUT_DATA)
 		return;
@@ -466,29 +467,29 @@ void OutputStream::_fill_prebuffer()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-int OutputStream::get_available()
+int AudioOutput::get_available()
 {
 	return ring_buf.available();
 }
 
-float OutputStream::get_volume()
+float AudioOutput::get_volume()
 {
 	return volume;
 }
 
-void OutputStream::set_volume(float _volume)
+void AudioOutput::set_volume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void OutputStream::set_prebuffer_size(int size)
+void AudioOutput::set_prebuffer_size(int size)
 {
 	prebuffer_size = size;
 }
 
 #if HAS_LIB_PULSEAUDIO
-bool OutputStream::_pulse_test_error(const string &msg)
+bool AudioOutput::_pulse_test_error(const string &msg)
 {
 	int e = pa_context_errno(device_manager->pulse_context);
 	if (e != 0){
@@ -500,7 +501,7 @@ bool OutputStream::_pulse_test_error(const string &msg)
 #endif
 
 #if HAS_LIB_PORTAUDIO
-bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
+bool AudioOutput::_portaudio_test_error(PaError err, const string &msg)
 {
 	if (err != paNoError){
 		session->e("OutputStream: " + msg + ": " + Pa_GetErrorText(err));
@@ -510,19 +511,19 @@ bool OutputStream::_portaudio_test_error(PaError err, const string &msg)
 }
 #endif
 
-void OutputStream::on_played_end_of_stream()
+void AudioOutput::on_played_end_of_stream()
 {
 	//printf("---------ON PLAY END OF STREAM\n");
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 }
 
-void OutputStream::on_read_end_of_stream()
+void AudioOutput::on_read_end_of_stream()
 {
 	//printf("---------ON READ END OF STREAM\n");
 	notify(MESSAGE_READ_END_OF_STREAM);
 }
 
-void OutputStream::reset_state()
+void AudioOutput::reset_state()
 {
 	if (state == State::NO_DEVICE)
 		return;
@@ -547,7 +548,7 @@ void OutputStream::reset_state()
 	played_end_of_stream = false;
 }
 
-int OutputStream::command(ModuleCommand cmd, int param)
+int AudioOutput::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();
@@ -568,7 +569,7 @@ int OutputStream::command(ModuleCommand cmd, int param)
 	return COMMAND_NOT_HANDLED;
 }
 
-bool OutputStream::is_playing()
+bool AudioOutput::is_playing()
 {
 	return (state == State::PLAYING) or (state == State::PAUSED);
 }

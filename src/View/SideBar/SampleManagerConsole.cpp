@@ -9,7 +9,6 @@
 #include "../AudioView.h"
 #include "../AudioViewLayer.h"
 #include "../Painter/MidiPainter.h"
-#include "../../Device/OutputStream.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"
 #include "../../Session.h"
@@ -26,6 +25,7 @@
 #include "../../Module/SignalChain.h"
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../Stream/AudioOutput.h"
 
 
 // TODO: use BufferPainter / MidiPainter
@@ -330,7 +330,7 @@ void SampleManagerConsole::on_preview()
 	preview_sample = items[sel]->s;
 	preview_chain = new SignalChain(session, "sample-preview");
 	preview_renderer = new BufferStreamer(&preview_sample->buf);
-	preview_stream = new OutputStream(session);
+	preview_stream = new AudioOutput(session);
 	preview_chain->_add(preview_renderer);
 	preview_chain->_add(preview_stream);
 	preview_chain->connect(preview_renderer, 0, preview_stream, 0);

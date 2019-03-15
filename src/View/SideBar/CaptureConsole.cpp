@@ -5,7 +5,6 @@
  *      Author: michi
  */
 
-#include "../../Device/OutputStream.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
@@ -19,6 +18,7 @@
 
 #include "CaptureConsole.h"
 #include "../../Session.h"
+#include "../../Stream/AudioOutput.h"
 
 
 

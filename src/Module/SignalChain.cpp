@@ -14,11 +14,11 @@
 #include "Beats/BeatSource.h"
 #include "../Session.h"
 #include "../Plugins/PluginManager.h"
-#include "../Device/OutputStream.h"
 #include "../lib/file/file.h"
 #include "../lib/xfile/xml.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
+#include "../Stream/AudioOutput.h"
 #include "../Stuff/PerformanceMonitor.h"
 
 
@@ -482,7 +482,7 @@ int SignalChain::get_pos()
 	if (is_playback_active()){
 		for (auto *m: modules)
 			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
-				delta = - ((OutputStream*)m)->get_available();
+				delta = - ((AudioOutput*)m)->get_available();
 		for (auto *m: modules)
 			if (m->module_type == ModuleType::AUDIO_SOURCE)
 				pos = ((AudioSource*)m)->get_pos(); // + delta;

@@ -12,7 +12,7 @@
 
 class PeakMeterDisplay;
 class CpuDisplay;
-class OutputStream;
+class AudioOutput;
 class DeviceManager;
 class BottomBar;
 class AudioView;

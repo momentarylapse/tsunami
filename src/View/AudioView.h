@@ -28,7 +28,7 @@ class Sample;
 class SampleRef;
 class AudioBuffer;
 class DeviceManager;
-class OutputStream;
+class AudioOutput;
 class SongRenderer;
 class PeakMeter;
 class SignalChain;

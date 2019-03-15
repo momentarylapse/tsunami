@@ -1,12 +1,12 @@
 /*
- * InputStreamAudio.h
+ * AudioInput.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef SRC_DEVICE_INPUTSTREAMAUDIO_H_
-#define SRC_DEVICE_INPUTSTREAMAUDIO_H_
+#ifndef SRC_STREAM_AUDIOINPUT_H_
+#define SRC_STREAM_AUDIOINPUT_H_
 
 #include "../lib/base/base.h"
 #include "../Data/Audio/RingBuffer.h"
@@ -30,12 +30,12 @@ typedef int PaError;
 #endif
 
 
-class InputStreamAudio : public Module
+class AudioInput : public Module
 {
 	friend class PluginManager;
 public:
-	InputStreamAudio(Session *session);
-	virtual ~InputStreamAudio();
+	AudioInput(Session *session);
+	virtual ~AudioInput();
 
 	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
@@ -69,11 +69,11 @@ public:
 	class Output : public Port
 	{
 	public:
-		Output(InputStreamAudio *s);
+		Output(AudioInput *s);
 		virtual ~Output(){}
 		int read_audio(AudioBuffer &buf) override;
 
-		InputStreamAudio *stream;
+		AudioInput *stream;
 	};
 	Output *out;
 
@@ -136,4 +136,4 @@ public:
 
 };
 
-#endif /* SRC_DEVICE_INPUTSTREAMAUDIO_H_ */
+#endif /* SRC_STREAM_AUDIOINPUT_H_ */

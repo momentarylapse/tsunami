@@ -8,11 +8,10 @@
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
+#include "../../Device/DeviceManager.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/MiniBar.h"
 #include "../Helper/CpuDisplay.h"
-#include "../../Device/InputStreamAudio.h"
-#include "../../Device/DeviceManager.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
@@ -45,7 +44,6 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	event("hui:close", [=]{ destroy(); });
 	event("close", [=]{ destroy(); });
 
-	//setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	set_options("default_artist", "placeholder=" + AppName);
 
 

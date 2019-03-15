@@ -1,12 +1,12 @@
 /*
- * InputStreamMidi.h
+ * MidiInput.h
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#ifndef INPUTSTREAMMIDI_H_
-#define INPUTSTREAMMIDI_H_
+#ifndef SRC_STREAM_MIDIINPUT_H_
+#define SRC_STREAM_MIDIINPUT_H_
 
 #include "../Data/Midi/MidiData.h"
 #include "../Module/Port/Port.h"
@@ -24,12 +24,12 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class InputStreamMidi : public Module
+class MidiInput : public Module
 {
 public:
 
-	InputStreamMidi(Session *session);
-	virtual ~InputStreamMidi();
+	MidiInput(Session *session);
+	virtual ~MidiInput();
 
 	void _create_dev();
 	void _kill_dev();
@@ -63,13 +63,13 @@ public:
 	class Output : public Port
 	{
 	public:
-		Output(InputStreamMidi *input);
+		Output(MidiInput *input);
 
 		int read_midi(MidiEventBuffer &midi) override;
 		void feed(const MidiEventBuffer &midi);
 
 		MidiEventBuffer events;
-		InputStreamMidi *input;
+		MidiInput *input;
 		bool real_time_mode;
 	};
 	Output *out;
@@ -96,4 +96,4 @@ public:
 	int command(ModuleCommand cmd, int param) override;
 };
 
-#endif /* INPUTSTREAMMIDI_H_ */
+#endif /* SRC_STREAM_MIDIINPUT_H_ */

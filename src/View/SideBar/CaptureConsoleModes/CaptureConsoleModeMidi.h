@@ -11,22 +11,22 @@
 #include "CaptureConsoleMode.h"
 #include "../../../lib/base/base.h"
 
-class InputStreamMidi;
+class MidiInput;
 class Device;
 class Track;
 class Synthesizer;
-class OutputStream;
+class AudioOutput;
 class PeakMeter;
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode
 {
-	InputStreamMidi *input;
+	MidiInput *input;
 	Array<Device*> sources;
 	Device *chosen_device;
 	const Track *target;
 	Synthesizer *preview_synth;
 	PeakMeter *peak_meter;
-	OutputStream *preview_stream;
+	AudioOutput *preview_stream;
 
 
 

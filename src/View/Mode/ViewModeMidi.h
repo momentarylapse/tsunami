@@ -14,12 +14,12 @@
 class MidiNoteBuffer;
 class MidiNote;
 class MidiEvent;
-class OutputStream;
+class AudioOutput;
 class Synthesizer;
 class MidiPreview;
 class TrackLayer;
 class ScrollBar;
-class InputStreamMidi;
+class MidiInput;
 class SignalChain;
 enum class NoteModifier;
 enum class ChordType;
@@ -105,7 +105,7 @@ public:
 	MidiPreview *preview;
 
 	SignalChain *input_chain;
-	InputStreamMidi *input;
+	MidiInput *input;
 
 	AudioViewLayer *cur_vlayer();
 	TrackLayer *cur_layer();

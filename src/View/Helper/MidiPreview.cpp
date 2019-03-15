@@ -9,8 +9,8 @@
 #include "../../Session.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
-#include "../../Device/OutputStream.h"
 #include "../../Module/SignalChain.h"
+#include "../../Stream/AudioOutput.h"
 
 
 class MidiPreviewSource : public MidiSource
@@ -159,7 +159,7 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 		chain->connect(source, 0, synth, 0);
 	}
 	if (!stream){
-		stream = new OutputStream(session);
+		stream = new AudioOutput(session);
 		chain->_add(stream);
 		chain->connect(synth, 0, stream, 0);
 		chain->subscribe(this, [=]{ on_end_of_stream(); }, chain->MESSAGE_PLAY_END_OF_STREAM);

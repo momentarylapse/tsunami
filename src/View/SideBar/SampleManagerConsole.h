@@ -12,7 +12,7 @@
 
 class Song;
 class Sample;
-class OutputStream;
+class AudioOutput;
 class BufferStreamer;
 class SampleManagerItem;
 class Progress;
@@ -56,7 +56,7 @@ public:
 	void set_selection(const Array<Sample*> &samples);
 
 	SignalChain *preview_chain;
-	OutputStream *preview_stream;
+	AudioOutput *preview_stream;
 	BufferStreamer *preview_renderer;
 	Sample *preview_sample;
 

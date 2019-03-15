@@ -11,8 +11,6 @@
 #include "Data/Song.h"
 #include "Data/Track.h"
 #include "Data/TrackLayer.h"
-#include "Device/DeviceManager.h"
-#include "Device/OutputStream.h"
 #include "Module/SignalChain.h"
 #include "Module/Audio/SongRenderer.h"
 #include "Module/Audio/PeakMeter.h"
@@ -25,6 +23,8 @@
 #include "Stuff/BackupManager.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
+#include "Device/DeviceManager.h"
+#include "Stream/AudioOutput.h"
 #include "Test/TestAudioBuffer.h"
 
 
@@ -222,7 +222,7 @@ Session* Tsunami::create_session(const string &chain_filename)
 	session->signal_chain->create_default_modules();
 	session->song_renderer = (SongRenderer*)session->signal_chain->get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
 	session->peak_meter = (PeakMeter*)session->signal_chain->get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	session->output_stream = (OutputStream*)session->signal_chain->get_by_type(ModuleType::STREAM, "AudioOutput");
+	session->output_stream = (AudioOutput*)session->signal_chain->get_by_type(ModuleType::STREAM, "AudioOutput");
 
 	session->set_win(new TsunamiWindow(session));
 	session->win->auto_delete = true;

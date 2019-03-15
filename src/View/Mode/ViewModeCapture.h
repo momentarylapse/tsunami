@@ -12,8 +12,8 @@
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
-class InputStreamAudio;
-class InputStreamMidi;
+class AudioInput;
+class MidiInput;
 class Module;
 class SignalChain;
 enum class SignalType;

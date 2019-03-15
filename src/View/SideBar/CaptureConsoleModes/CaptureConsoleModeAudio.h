@@ -11,7 +11,7 @@
 #include "CaptureConsoleMode.h"
 #include "../../../lib/base/base.h"
 
-class InputStreamAudio;
+class AudioInput;
 class PeakMeter;
 class Device;
 class Track;
@@ -19,7 +19,7 @@ class SignalChain;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode
 {
-	InputStreamAudio *input;
+	AudioInput *input;
 	PeakMeter *peak_meter;
 	Array<Device*> sources;
 	Device *chosen_device;

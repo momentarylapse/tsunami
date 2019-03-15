@@ -23,7 +23,7 @@ class PerformanceMonitor;
 class SignalChain;
 class SongRenderer;
 class PeakMeter;
-class OutputStream;
+class AudioOutput;
 namespace hui{
 	class Window;
 }
@@ -56,7 +56,7 @@ public:
 	SignalChain *signal_chain;
 	SongRenderer *song_renderer;
 	PeakMeter *peak_meter;
-	OutputStream *output_stream;
+	AudioOutput *output_stream;
 
 	Array<TsunamiPlugin*> plugins;
 	TsunamiPlugin *last_plugin;

@@ -23,10 +23,6 @@
 #include "../Data/Audio/BufferInterpolator.h"
 #include "../Data/Rhythm/Bar.h"
 #include "../Module/ConfigPanel.h"
-#include "../Device/InputStreamAudio.h"
-#include "../Device/InputStreamMidi.h"
-#include "../Device/OutputStream.h"
-#include "../Device/DeviceManager.h"
 #include "../Module/SignalChain.h"
 #include "../Module/ModuleConfiguration.h"
 #include "../Module/Synth/Synthesizer.h"
@@ -42,6 +38,10 @@
 #include "../Module/Midi/MidiEffect.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
+#include "../Device/DeviceManager.h"
+#include "../Stream/AudioInput.h"
+#include "../Stream/AudioOutput.h"
+#include "../Stream/MidiInput.h"
 #include "../Stuff/Clipboard.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
@@ -513,33 +513,33 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SongRenderer.get_beat_source", Kaba::mf(&SongRenderer::get_beat_source));
 
 	{
-	InputStreamAudio input(Session::GLOBAL);
-	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
-	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, buffer));
-	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(InputStreamAudio, out));
+	AudioInput input(Session::GLOBAL);
+	Kaba::DeclareClassSize("InputStreamAudio", sizeof(AudioInput));
+	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(AudioInput, buffer));
+	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(AudioInput, out));
 //	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
-	Kaba::LinkExternal("InputStreamAudio.__init__", Kaba::mf(&InputStreamAudio::__init__));
-	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "__delete__", Kaba::mf(&InputStreamAudio::__delete__), &input);
-	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));
-	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&InputStreamAudio::stop));
-	Kaba::LinkExternal("InputStreamAudio.is_capturing", Kaba::mf(&InputStreamAudio::is_capturing));
-	Kaba::LinkExternal("InputStreamAudio.sample_rate", Kaba::mf(&InputStreamAudio::sample_rate));
+	Kaba::LinkExternal("InputStreamAudio.__init__", Kaba::mf(&AudioInput::__init__));
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "__delete__", Kaba::mf(&AudioInput::__delete__), &input);
+	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&AudioInput::start));
+	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&AudioInput::stop));
+	Kaba::LinkExternal("InputStreamAudio.is_capturing", Kaba::mf(&AudioInput::is_capturing));
+	Kaba::LinkExternal("InputStreamAudio.sample_rate", Kaba::mf(&AudioInput::sample_rate));
 	//Kaba::LinkExternal("InputStreamAudio.set_backup_mode", Kaba::mf(&InputStreamAudio::set_backup_mode));
 	}
 
 	{
-	OutputStream stream(Session::GLOBAL);
-	Kaba::DeclareClassSize("OutputStream", sizeof(OutputStream));
-	Kaba::LinkExternal("OutputStream.__init__", Kaba::mf(&OutputStream::__init__));
-	Kaba::DeclareClassVirtualIndex("OutputStream", "__delete__", Kaba::mf(&OutputStream::__delete__), &stream);
+	AudioOutput stream(Session::GLOBAL);
+	Kaba::DeclareClassSize("OutputStream", sizeof(AudioOutput));
+	Kaba::LinkExternal("OutputStream.__init__", Kaba::mf(&AudioOutput::__init__));
+	Kaba::DeclareClassVirtualIndex("OutputStream", "__delete__", Kaba::mf(&AudioOutput::__delete__), &stream);
 	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
-	Kaba::LinkExternal("OutputStream.start", Kaba::mf(&OutputStream::start));
-	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
-	Kaba::LinkExternal("OutputStream.is_playing", Kaba::mf(&OutputStream::is_playing));
+	Kaba::LinkExternal("OutputStream.start", Kaba::mf(&AudioOutput::start));
+	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&AudioOutput::stop));
+	Kaba::LinkExternal("OutputStream.is_playing", Kaba::mf(&AudioOutput::is_playing));
 	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
-	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&OutputStream::get_volume));
-	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&OutputStream::set_volume));
-	Kaba::DeclareClassVirtualIndex("OutputStream", "reset_state", Kaba::mf(&OutputStream::reset_state), &stream);
+	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&AudioOutput::get_volume));
+	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&AudioOutput::set_volume));
+	Kaba::DeclareClassVirtualIndex("OutputStream", "reset_state", Kaba::mf(&AudioOutput::reset_state), &stream);
 	}
 
 	SignalChain chain(Session::GLOBAL, "");

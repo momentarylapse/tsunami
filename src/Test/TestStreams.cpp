@@ -9,10 +9,10 @@
 #include "../lib/file/msg.h"
 #include "../lib/math/math.h"
 #include "../Data/base.h"
-#include "../Device/OutputStream.h"
 #include "../Module/Audio/AudioSource.h"
 #include "../Module/SignalChain.h"
 #include "../Session.h"
+#include "../Stream/AudioOutput.h"
 
 TestStreams::TestStreams() : UnitTest("streams")
 {
@@ -50,7 +50,7 @@ public:
 void TestStreams::test_output_stream()
 {
 	auto *source = new DebugAudioSource;
-	auto *stream = new OutputStream(Session::GLOBAL);
+	auto *stream = new AudioOutput(Session::GLOBAL);
 	stream->plug(0, source, 0);
 
 	msg_write("play");

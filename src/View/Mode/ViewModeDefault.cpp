@@ -11,7 +11,6 @@
 #include "../AudioViewLayer.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
-#include "../../Device/OutputStream.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
 #include "../../Module/Audio/SongRenderer.h"
@@ -31,6 +30,7 @@
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"
 #include "../../lib/hui/Controls/Control.h"
+#include "../../Stream/AudioOutput.h"
 
 float marker_alpha_factor(float w, float w_group, bool border);
 Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);

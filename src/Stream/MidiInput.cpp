@@ -1,32 +1,29 @@
 /*
- * InputStreamMidi.cpp
+ * MidiInput.cpp
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#include "InputStreamMidi.h"
-#include "../Session.h"
-#include "Device.h"
-#include "DeviceManager.h"
+#include "MidiInput.h"
 
-#include "OutputStream.h"
+#include "../Session.h"
 #include "../Module/Port/Port.h"
 #include "../Data/base.h"
+#include "../Device/Device.h"
+#include "../Device/DeviceManager.h"
 
 #if HAS_LIB_ALSA
 #include <alsa/asoundlib.h>
 #endif
 
-static const float DEFAULT_UPDATE_TIME = 0.005f;
-
-InputStreamMidi::Output::Output(InputStreamMidi *_input) : Port(SignalType::MIDI, "out")
+MidiInput::Output::Output(MidiInput *_input) : Port(SignalType::MIDI, "out")
 {
 	input = _input;
 	real_time_mode = true;
 }
 
-int InputStreamMidi::Output::read_midi(MidiEventBuffer &midi)
+int MidiInput::Output::read_midi(MidiEventBuffer &midi)
 {
 	if (real_time_mode){
 		for (auto &e: events){
@@ -54,12 +51,12 @@ int InputStreamMidi::Output::read_midi(MidiEventBuffer &midi)
 	}
 }
 
-void InputStreamMidi::Output::feed(const MidiEventBuffer &midi)
+void MidiInput::Output::feed(const MidiEventBuffer &midi)
 {
 	events.append(midi);
 }
 
-InputStreamMidi::InputStreamMidi(Session *_session) :
+MidiInput::MidiInput(Session *_session) :
 	Module(ModuleType::STREAM, "MidiInput")
 {
 	set_session_etc(_session, "", nullptr);
@@ -80,7 +77,7 @@ InputStreamMidi::InputStreamMidi(Session *_session) :
 	init();
 }
 
-InputStreamMidi::~InputStreamMidi()
+MidiInput::~MidiInput()
 {
 	stop();
 	unconnect();
@@ -88,12 +85,12 @@ InputStreamMidi::~InputStreamMidi()
 	delete timer;
 }
 
-void InputStreamMidi::init()
+void MidiInput::init()
 {
 	set_device(device_manager->choose_device(DeviceType::MIDI_INPUT));
 }
 
-void InputStreamMidi::_create_dev()
+void MidiInput::_create_dev()
 {
 	if (state != State::NO_DEVICE)
 		return;
@@ -109,7 +106,7 @@ void InputStreamMidi::_create_dev()
 	state = State::PAUSED;
 }
 
-void InputStreamMidi::_kill_dev()
+void MidiInput::_kill_dev()
 {
 	if (state == State::NO_DEVICE)
 		return;
@@ -117,7 +114,7 @@ void InputStreamMidi::_kill_dev()
 	state = State::NO_DEVICE;
 }
 
-bool InputStreamMidi::unconnect()
+bool MidiInput::unconnect()
 {
 #if HAS_LIB_ALSA
 	if (!subs)
@@ -132,7 +129,7 @@ bool InputStreamMidi::unconnect()
 	return true;
 }
 
-void InputStreamMidi::set_device(Device *d)
+void MidiInput::set_device(Device *d)
 {
 	if (state == State::NO_DEVICE)
 		_create_dev();
@@ -173,12 +170,12 @@ void InputStreamMidi::set_device(Device *d)
 #endif
 }
 
-Device *InputStreamMidi::get_device()
+Device *MidiInput::get_device()
 {
 	return device;
 }
 
-void InputStreamMidi::clear_input_queue()
+void MidiInput::clear_input_queue()
 {
 #if HAS_LIB_ALSA
 	while (true){
@@ -191,7 +188,7 @@ void InputStreamMidi::clear_input_queue()
 #endif
 }
 
-bool InputStreamMidi::start()
+bool MidiInput::start()
 {
 	if (state == State::NO_DEVICE)
 		_create_dev();
@@ -215,7 +212,7 @@ bool InputStreamMidi::start()
 	return true;
 }
 
-void InputStreamMidi::stop()
+void MidiInput::stop()
 {
 	if (state != State::CAPTURING)
 		return;
@@ -227,7 +224,7 @@ void InputStreamMidi::stop()
 
 // TODO: allow multiple streams/ports
 //  need to buffer events for other ports
-int InputStreamMidi::do_capturing()
+int MidiInput::do_capturing()
 {
 	double dt = timer->get();
 	double offset_new = offset + dt;
@@ -263,22 +260,22 @@ int InputStreamMidi::do_capturing()
 	return current_midi.samples;
 }
 
-bool InputStreamMidi::is_capturing()
+bool MidiInput::is_capturing()
 {
 	return state == State::CAPTURING;
 }
 
 
-int InputStreamMidi::get_delay()
+int MidiInput::get_delay()
 {
 	return 0;
 }
 
-void InputStreamMidi::reset_sync()
+void MidiInput::reset_sync()
 {
 }
 
-int InputStreamMidi::command(ModuleCommand cmd, int param)
+int MidiInput::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();

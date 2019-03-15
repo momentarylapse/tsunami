@@ -16,7 +16,7 @@
 class CaptureConsoleMode;
 class Session;
 
-class InputStreamAudio;
+class AudioInput;
 class AudioSucker;
 class SignalChain;
 class MidiEventBuffer;

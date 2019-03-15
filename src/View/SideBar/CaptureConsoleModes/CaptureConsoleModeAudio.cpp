@@ -7,10 +7,6 @@
 
 #include "CaptureConsoleModeAudio.h"
 #include "../CaptureConsole.h"
-#include "../../../Device/InputStreamAudio.h"
-#include "../../../Device/OutputStream.h"
-#include "../../../Device/DeviceManager.h"
-#include "../../../Device/Device.h"
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
@@ -25,6 +21,10 @@
 #include "../../../Module/Audio/PeakMeter.h"
 #include "../../../Module/Audio/AudioBackup.h"
 #include "../../../Module/SignalChain.h"
+#include "../../../Device/Device.h"
+#include "../../../Device/DeviceManager.h"
+#include "../../../Stream/AudioInput.h"
+#include "../../../Stream/AudioOutput.h"
 
 
 
@@ -83,7 +83,7 @@ void CaptureConsoleModeAudio::enter()
 
 	chain = new SignalChain(session, "capture");
 
-	input = (InputStreamAudio*)chain->add(ModuleType::STREAM, "AudioInput");
+	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->set_chunk_size(4096);
 	input->set_device(chosen_device);
 

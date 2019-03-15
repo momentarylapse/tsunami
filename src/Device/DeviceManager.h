@@ -5,16 +5,18 @@
  *      Author: michi
  */
 
-#ifndef DEVICEMANAGER_H_
-#define DEVICEMANAGER_H_
+#ifndef SRC_DEVICE_DEVICEMANAGER_H_
+#define SRC_DEVICE_DEVICEMANAGER_H_
 
 #include "../Stuff/Observable.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 
 
-class OutputStream;
-class InputStreamAudio;
+class AudioOutput;
+class AudioInput;
+class MidiInput;
+class Module;
 class Device;
 enum class DeviceType;
 class Session;
@@ -35,9 +37,9 @@ struct _snd_seq;
 class DeviceManager : public Observable<VirtualBase>
 {
 public:
-	friend class OutputStream;
-	friend class InputStreamAudio;
-	friend class InputStreamMidi;
+	friend class AudioOutput;
+	friend class AudioInput;
+	friend class MidiInput;
 
 	static const string MESSAGE_ADD_DEVICE;
 	static const string MESSAGE_REMOVE_DEVICE;
@@ -66,9 +68,9 @@ public:
 	float get_output_volume();
 	void set_output_volume(float volume);
 
-	void add_stream(OutputStream *s);
-	void remove_stream(OutputStream *s);
-	bool stream_exists(OutputStream *s);
+	void add_stream(Module *s);
+	void remove_stream(Module *s);
+	bool stream_exists(Module *s);
 
 	void remove_device(DeviceType type, int index);
 
@@ -102,7 +104,7 @@ public:
 
 	float output_volume;
 
-	Array<OutputStream*> streams;
+	Array<Module*> streams;
 
 	void update_devices(bool serious);
 	void _update_devices_midi_alsa();
@@ -121,4 +123,4 @@ public:
 	int msg_index;
 };
 
-#endif /* DEVICEMANAGER_H_ */
+#endif /* SRC_DEVICE_DEVICEMANAGER_H_ */

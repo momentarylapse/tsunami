@@ -7,10 +7,6 @@
 
 #include "CaptureConsoleModeMulti.h"
 #include "../CaptureConsole.h"
-#include "../../../Device/DeviceManager.h"
-#include "../../../Device/InputStreamAudio.h"
-#include "../../../Device/InputStreamMidi.h"
-#include "../../../Device/Device.h"
 #include "../../../Data/base.h"
 #include "../../../Data/Track.h"
 #include "../../../Data/Song.h"
@@ -24,6 +20,10 @@
 #include "../../../Module/Synth/Synthesizer.h"
 #include "../../../Module/ModuleFactory.h"
 #include "../../../Module/SignalChain.h"
+#include "../../../Device/Device.h"
+#include "../../../Device/DeviceManager.h"
+#include "../../../Stream/AudioInput.h"
+#include "../../../Stream/MidiInput.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
@@ -71,7 +71,7 @@ void CaptureConsoleModeMulti::enter()
 		}
 
 		if (t->type == SignalType::AUDIO){
-			c.input_audio = (InputStreamAudio*)chain->add(ModuleType::STREAM, "AudioInput");
+			c.input_audio = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 			c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 			auto *recorder_audio = chain->add(ModuleType::PLUMBING, "AudioRecorder");
 			auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
@@ -80,7 +80,7 @@ void CaptureConsoleModeMulti::enter()
 			chain->connect(recorder_audio, 0, sucker, 0);
 			data.add({c.track, recorder_audio});
 		}else if (t->type == SignalType::MIDI){
-			c.input_midi = (InputStreamMidi*)chain->add(ModuleType::STREAM, "MidiInput");
+			c.input_midi = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
 			auto *recorder_midi = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 			auto *synth = chain->_add(t->synth->copy());
 			c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");

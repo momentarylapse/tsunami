@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_DEVICE_H_
-#define SRC_AUDIO_DEVICE_H_
+#ifndef SRC_DEVICE_DEVICE_H_
+#define SRC_DEVICE_DEVICE_H_
 
 #include "../lib/base/base.h"
 
@@ -44,4 +44,4 @@ public:
 	bool present_old;
 };
 
-#endif /* SRC_AUDIO_DEVICE_H_ */
+#endif /* SRC_DEVICE_DEVICE_H_ */

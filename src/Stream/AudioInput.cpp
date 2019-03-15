@@ -1,20 +1,20 @@
 /*
- * InputStreamAudio.cpp
+ * AudioInput.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
+#include "AudioInput.h"
+
 #include "../lib/hui/hui.h"
 #include "../Session.h"
 #include "../View/AudioView.h"
 
-#include "DeviceManager.h"
-#include "Device.h"
-#include "InputStreamAudio.h"
-#include "OutputStream.h"
 #include "../Stuff/BackupManager.h"
 #include "../Data/base.h"
+#include "../Device/Device.h"
+#include "../Device/DeviceManager.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -25,7 +25,7 @@
 #endif
 
 
-float InputStreamAudio::playback_delay_const;
+float AudioInput::playback_delay_const;
 
 
 static const int DEFAULT_CHUNK_SIZE = 512;
@@ -37,10 +37,10 @@ extern bool pulse_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 extern void require_main_thread(const string&);
 
 
-void InputStreamAudio::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 	//printf("input request %d\n", (int)nbytes);
-	InputStreamAudio *input = (InputStreamAudio*)userdata;
+	AudioInput *input = (AudioInput*)userdata;
 
 	const void *data;
 	pa_stream_peek(p, &data, &nbytes);
@@ -93,14 +93,14 @@ void input_success_callback(pa_stream *s, int success, void *userdata)
 
 #if HAS_LIB_PORTAUDIO
 
-int InputStreamAudio::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
+int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
                                                     unsigned long frames,
                                                     const PaStreamCallbackTimeInfo* timeInfo,
                                                     PaStreamCallbackFlags statusFlags,
                                                     void *userData)
 {
 	//printf("request %d\n", (int)frames);
-	InputStreamAudio *input = (InputStreamAudio*)userData;
+	AudioInput *input = (AudioInput*)userData;
 
 	(void)outputBuffer; /* Prevent unused variable warning. */
 	float *in = (float*) inputBuffer;
@@ -130,7 +130,7 @@ int InputStreamAudio::portaudio_stream_request_callback(const void *inputBuffer,
 
 
 
-void InputStreamAudio::SyncData::reset()
+void AudioInput::SyncData::reset()
 {
 	num_points = 0;
 	delay_sum = 0;
@@ -139,7 +139,7 @@ void InputStreamAudio::SyncData::reset()
 		offset_out = tsunami->output->GetRange().offset;*/ // TODO
 }
 
-void InputStreamAudio::SyncData::add(int samples)
+void AudioInput::SyncData::add(int samples)
 {
 #if 0
 	if (tsunami->win->view->isPlaying()){
@@ -150,20 +150,20 @@ void InputStreamAudio::SyncData::add(int samples)
 #endif
 }
 
-int InputStreamAudio::SyncData::get_delay()
+int AudioInput::SyncData::get_delay()
 {
 	if (num_points > 0)
 		return (delay_sum / num_points);
 	return 0;
 }
 
-InputStreamAudio::Output::Output(InputStreamAudio *s) :
+AudioInput::Output::Output(AudioInput *s) :
 	Port(SignalType::AUDIO, "out")
 {
 	stream = s;
 }
 
-int InputStreamAudio::Output::read_audio(AudioBuffer &buf)
+int AudioInput::Output::read_audio(AudioBuffer &buf)
 {
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
 	if (stream->buffer.available() < buf.length)
@@ -176,7 +176,7 @@ int InputStreamAudio::Output::read_audio(AudioBuffer &buf)
 
 extern bool ugly_hack_slow;
 
-InputStreamAudio::InputStreamAudio(Session *_session) :
+AudioInput::AudioInput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioInput"),
 	buffer(1048576)
 {
@@ -205,7 +205,7 @@ InputStreamAudio::InputStreamAudio(Session *_session) :
 	}
 }
 
-InputStreamAudio::~InputStreamAudio()
+AudioInput::~AudioInput()
 {
 	if (state == State::CAPTURING)
 		_pause();
@@ -213,17 +213,17 @@ InputStreamAudio::~InputStreamAudio()
 		_kill_dev();
 }
 
-void InputStreamAudio::__init__(Session *session)
+void AudioInput::__init__(Session *session)
 {
-	new(this) InputStreamAudio(session);
+	new(this) AudioInput(session);
 }
 
-void InputStreamAudio::__delete__()
+void AudioInput::__delete__()
 {
-	this->InputStreamAudio::~InputStreamAudio();
+	this->AudioInput::~AudioInput();
 }
 
-void InputStreamAudio::set_chunk_size(int size)
+void AudioInput::set_chunk_size(int size)
 {
 	if (size > 0)
 		chunk_size = size;
@@ -231,12 +231,12 @@ void InputStreamAudio::set_chunk_size(int size)
 		chunk_size = DEFAULT_CHUNK_SIZE;
 }
 
-Device *InputStreamAudio::get_device()
+Device *AudioInput::get_device()
 {
 	return device;
 }
 
-void InputStreamAudio::set_device(Device *_device)
+void AudioInput::set_device(Device *_device)
 {
 	auto old_state = state;
 	if (state == State::CAPTURING)
@@ -254,7 +254,7 @@ void InputStreamAudio::set_device(Device *_device)
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
-void InputStreamAudio::_kill_dev()
+void AudioInput::_kill_dev()
 {
 	if (state != State::PAUSED)
 		return;
@@ -287,14 +287,14 @@ void InputStreamAudio::_kill_dev()
 	state = State::NO_DEVICE;
 }
 
-void InputStreamAudio::stop()
+void AudioInput::stop()
 {
 	require_main_thread("in.stop");
 	session->i(_("capture audio stop"));
 	_pause();
 }
 
-void InputStreamAudio::_pause()
+void AudioInput::_pause()
 {
 	if (state != State::CAPTURING)
 		return;
@@ -320,7 +320,7 @@ void InputStreamAudio::_pause()
 	//buffer.clear();
 }
 
-void InputStreamAudio::_create_dev()
+void AudioInput::_create_dev()
 {
 	if (state != State::NO_DEVICE)
 		return;
@@ -390,7 +390,7 @@ void InputStreamAudio::_create_dev()
 	state = State::PAUSED;
 }
 
-void InputStreamAudio::_unpause()
+void AudioInput::_unpause()
 {
 	if (state != State::PAUSED)
 		return;
@@ -417,7 +417,7 @@ void InputStreamAudio::_unpause()
 	state = State::CAPTURING;
 }
 
-bool InputStreamAudio::start()
+bool AudioInput::start()
 {
 	require_main_thread("in.start");
 	session->i(_("capture audio start"));
@@ -428,7 +428,7 @@ bool InputStreamAudio::start()
 	return state == State::CAPTURING;
 }
 
-bool InputStreamAudio::_pulse_test_error(const string &msg)
+bool AudioInput::_pulse_test_error(const string &msg)
 {
 #if HAS_LIB_PULSEAUDIO
 	int e = pa_context_errno(session->device_manager->pulse_context);
@@ -440,7 +440,7 @@ bool InputStreamAudio::_pulse_test_error(const string &msg)
 }
 
 #if HAS_LIB_PORTAUDIO
-bool InputStreamAudio::_portaudio_test_error(PaError err, const string &msg)
+bool AudioInput::_portaudio_test_error(PaError err, const string &msg)
 {
 	if (err != paNoError){
 		session->e(msg + ": (input): " + Pa_GetErrorText(err));
@@ -450,33 +450,33 @@ bool InputStreamAudio::_portaudio_test_error(PaError err, const string &msg)
 }
 #endif
 
-float InputStreamAudio::get_playback_delay_const()
+float AudioInput::get_playback_delay_const()
 {
 	return playback_delay_const;
 }
 
-void InputStreamAudio::set_playback_delay_const(float f)
+void AudioInput::set_playback_delay_const(float f)
 {
 	playback_delay_const = f;
 	hui::Config.set_float("Input.PlaybackDelay", playback_delay_const);
 }
 
-void InputStreamAudio::reset_sync()
+void AudioInput::reset_sync()
 {
 	sync.reset();
 }
 
-bool InputStreamAudio::is_capturing()
+bool AudioInput::is_capturing()
 {
 	return state == State::CAPTURING;
 }
 
-int InputStreamAudio::get_delay()
+int AudioInput::get_delay()
 {
 	return sync.get_delay() - playback_delay_const * (float)_sample_rate / 1000.0f;
 }
 
-int InputStreamAudio::command(ModuleCommand cmd, int param)
+int AudioInput::command(ModuleCommand cmd, int param)
 {
 	if (cmd == ModuleCommand::START){
 		start();

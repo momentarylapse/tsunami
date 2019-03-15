@@ -39,7 +39,6 @@
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
 #include "Stuff/BackupManager.h"
-#include "Device/DeviceManager.h"
 #include "Data/base.h"
 #include "Data/Track.h"
 #include "Data/TrackLayer.h"
@@ -57,6 +56,7 @@
 #include "Plugins/FastFourierTransform.h"
 #include "View/Helper/PeakMeterDisplay.h"
 #include "lib/hui/hui.h"
+#include "Device/DeviceManager.h"
 
 extern const string AppName;
 

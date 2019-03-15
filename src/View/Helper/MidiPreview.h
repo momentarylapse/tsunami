@@ -10,7 +10,7 @@
 
 #include "../../lib/base/base.h"
 
-class OutputStream;
+class AudioOutput;
 class Synthesizer;
 class MidiPreviewSource;
 class SignalChain;
@@ -25,7 +25,7 @@ public:
 
 	SignalChain *chain;
 	Synthesizer *synth;
-	OutputStream *stream;
+	AudioOutput *stream;
 	MidiPreviewSource *source;
 	Session *session;
 

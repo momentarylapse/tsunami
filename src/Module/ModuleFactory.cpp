@@ -24,12 +24,12 @@
 #include "Synth/Synthesizer.h"
 #include "Synth/DummySynthesizer.h"
 #include "Synth/SampleSynthesizer.h"
-#include "../Device/OutputStream.h"
-#include "../Device/InputStreamAudio.h"
-#include "../Device/InputStreamMidi.h"
 #include "../Plugins/Plugin.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
+#include "../Stream/AudioInput.h"
+#include "../Stream/AudioOutput.h"
+#include "../Stream/MidiInput.h"
 
 
 Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type)
@@ -73,11 +73,11 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new PeakMeter;
 	}else if (type == ModuleType::STREAM){
 		if (sub_type == "AudioOutput")
-			return new OutputStream(session);
+			return new AudioOutput(session);
 		if (sub_type == "AudioInput")
-			return new InputStreamAudio(session);
+			return new AudioInput(session);
 		if (sub_type == "MidiInput")
-			return new InputStreamMidi(session);
+			return new MidiInput(session);
 	}
 	return nullptr;
 }

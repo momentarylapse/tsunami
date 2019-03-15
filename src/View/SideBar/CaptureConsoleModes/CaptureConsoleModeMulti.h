@@ -13,8 +13,8 @@
 
 class Device;
 class Track;
-class InputStreamAudio;
-class InputStreamMidi;
+class AudioInput;
+class MidiInput;
 class AudioRecorder;
 class MidiRecorder;
 class PeakMeter;
@@ -28,8 +28,8 @@ class CaptureConsoleModeMulti: public CaptureConsoleMode
 	struct CaptureItem
 	{
 		Track *track;
-		InputStreamAudio *input_audio;
-		InputStreamMidi *input_midi;
+		AudioInput *input_audio;
+		MidiInput *input_midi;
 		PeakMeterDisplay *peak_meter_display;
 		PeakMeter *peak_meter;
 		Device *device;

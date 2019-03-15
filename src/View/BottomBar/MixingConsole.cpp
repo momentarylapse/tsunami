@@ -6,11 +6,9 @@
  */
 
 #include "MixingConsole.h"
-#include "../../Device/OutputStream.h"
 #include "../Helper/PeakMeterDisplay.h"
 #include <math.h>
 
-#include "../../Device/DeviceManager.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -18,6 +16,8 @@
 #include "../../Module/ConfigPanel.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Stream/AudioOutput.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 

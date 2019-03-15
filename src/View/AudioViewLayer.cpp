@@ -160,6 +160,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 
 	// buffer
 	if (s->type() == SignalType::AUDIO){
+		view->buffer_painter->set_context(area);
 		view->buffer_painter->set_color(col);
 		view->buffer_painter->draw_buffer(c, *s->buf, s->pos);
 	}else if (s->type() == SignalType::MIDI){

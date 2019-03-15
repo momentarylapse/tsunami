@@ -79,8 +79,6 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 			l->delete_midi_note(l->midi[i]);
 
 	process(&midi);
-	for (MidiNote *n: midi)
-		n->reset_meta();
 
 	l->insert_midi_data(0, midi);
 	l->song()->end_action_group();

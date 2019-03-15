@@ -50,14 +50,13 @@ void MidiNote::update_meta(const Instrument &instrument, const Scale& scale) con
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}
 
-	// worst case fret positions...
-	if (stringno < 0){
-		stringno = 0;
-		for (int i=0; i<instrument.string_pitch.num; i++)
-			if (pitch >= instrument.string_pitch[i]){
-				stringno = i;
-			}
-	}
+	int highest_possible_string = 0;
+	for (int i=0; i<instrument.string_pitch.num; i++)
+		if (pitch >= instrument.string_pitch[i])
+			highest_possible_string = i;
+
+	if (stringno < 0 or stringno > highest_possible_string)
+		stringno = highest_possible_string;
 }
 
 bool MidiNote::is(int mask) const

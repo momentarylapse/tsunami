@@ -442,7 +442,7 @@ void TsunamiWindow::on_track_add_marker()
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, nullptr);
+		MarkerDialog *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, "");
 		dlg->run();
 		delete dlg;
 	}else{
@@ -525,7 +525,7 @@ void TsunamiWindow::on_delete_marker()
 void TsunamiWindow::on_edit_marker()
 {
 	if (view->hover_before_leave.type == Selection::Type::MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), Range::EMPTY, view->hover_before_leave.marker);
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
 		dlg->run();
 		delete dlg;
 	}else

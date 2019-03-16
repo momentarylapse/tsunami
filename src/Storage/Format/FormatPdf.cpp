@@ -58,7 +58,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	int slack = song->sample_rate / 30;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
-	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, Scale(Scale::Type::MAJOR, 0), true, MidiMode::CLASSICAL);
+	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, Scale::C_MAJOR, true, MidiMode::CLASSICAL);
 	mp->set_quality(2, true);
 
 	float ya = mp->clef_pos_to_screen(8);
@@ -92,7 +92,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 
 	int n = t->instrument.string_pitch.num;
 
-	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, Scale(Scale::Type::MAJOR, 0), true, MidiMode::TAB);
+	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, Scale::C_MAJOR, true, MidiMode::TAB);
 	mp->set_quality(2, true);
 
 	float sy0 = mp->string_to_screen(n - 1) - string_dy/2;

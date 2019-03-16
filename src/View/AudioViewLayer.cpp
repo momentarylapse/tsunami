@@ -212,18 +212,20 @@ void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &ma
 {
 	Range group_range = RangeTo(markers[0]->range.start(), markers.back()->range.end());
 	foreachi(auto *m, markers, i)
-			draw_marker(c, m, i, (hover.type == Selection::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
+		draw_marker(c, m, (hover.type == Selection::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
 }
 
 float marker_alpha_factor(float w, float w_group, bool border)
 {
+	if (w == 0)
+		return 0.5f;
 	if (border)
 		return clampf((w_group - 30) / 100, 0, 1.0f);
 	return clampf((w - 40) / 80, 0, 1.0f);
 }
 
 
-void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover, const Range &group_range, bool first, bool last)
+void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hover, const Range &group_range, bool first, bool last)
 {
 	string text = marker->text;
 	if (marker->fx.num > 0)
@@ -263,7 +265,10 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, int inde
 		col_bg.a = 0.5f;
 	}
 
-	if ((!merged or first) and (gx1-gx0) > 40){
+	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
+	if (marker->range.empty())
+		allow_label = (view->cam.dsample2screen(2000) > 1);
+	if (allow_label){
 		view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
 	}
 

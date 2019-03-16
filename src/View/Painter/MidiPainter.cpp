@@ -80,7 +80,7 @@ MidiPainter::MidiPainter(AudioView *view) :
 }
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
-	midi_scale(Scale(Scale::Type::MAJOR, 0)),
+	midi_scale(Scale::C_MAJOR),
 	colors(_colors)
 {
 	song = _song;

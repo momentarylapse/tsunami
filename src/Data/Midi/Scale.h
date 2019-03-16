@@ -36,8 +36,13 @@ public:
 
 	NoteModifier get_modifier(int upos) const;
 
-	static string get_type_name(Type type);
 	string type_name() const;
+	string encode() const;
+
+	static string get_type_name_canonical(Type type);
+	static string get_type_name(Type type);
+	static Scale parse(const string &text);
+	static const Scale C_MAJOR;
 };
 
 

@@ -9,7 +9,7 @@
 #include "Scale.h"
 #include "MidiData.h"
 
-
+const Scale Scale::C_MAJOR = Scale(Scale::Type::MAJOR, 0);
 
 static const NoteModifier scale_major_modifiers[12][7] = {
 	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // C
@@ -61,6 +61,26 @@ Scale::Scale(Type _type, int _root)
 	}
 }
 
+// can be parsed
+string Scale::get_type_name_canonical(Type type)
+{
+	if (type == Type::MAJOR)
+		return "major";
+	if (type == Type::DORIAN)
+		return "dorian";
+	if (type == Type::PHRYGIAN)
+		return "phrygian";
+	if (type == Type::LYDIAN)
+		return "lydian";
+	if (type == Type::MIXOLYDIAN)
+		return "mixolydian";
+	if (type == Type::MINOR)
+		return "minor";
+	if (type == Type::LOCRIAN)
+		return "locrian";
+	return "???";
+}
+
 string Scale::get_type_name(Type type)
 {
 	if (type == Type::MAJOR)
@@ -83,6 +103,24 @@ string Scale::get_type_name(Type type)
 string Scale::type_name() const
 {
 	return get_type_name(type);
+}
+
+string Scale::encode() const
+{
+	return rel_pitch_name_canonical(root) + "-" + get_type_name_canonical(type);
+}
+
+Scale Scale::parse(const string &text)
+{
+	auto ss = text.explode("-");
+	if (ss.num != 2)
+		return Scale::C_MAJOR;
+	int root = max(parse_rel_pitch(ss[0]), 0);
+	Type type = Type::MAJOR;
+	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
+		if (ss[1] == Scale::get_type_name_canonical((Scale::Type)i))
+			type = (Scale::Type)i;
+	return Scale(type, root);
 }
 
 bool Scale::contains(int pitch) const

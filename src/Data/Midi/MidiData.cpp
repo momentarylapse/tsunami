@@ -40,33 +40,29 @@ int pitch_to_rel(int pitch)
 	return pitch % 12;
 }
 
+static string REL_PITCH_NAME[12] = {"C", "C\u266F", "D", "D\u266F", "E", "F", "F\u266F", "G", "G\u266F", "A", "A\u266F", "B"};
+static string REL_PITCH_NAME_CANONICAL[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+
 string rel_pitch_name(int pitch_rel)
 {
-	if (pitch_rel == 0)
-		return "C";
-	if (pitch_rel == 1)
-		return "C\u266F";
-	if (pitch_rel == 2)
-		return "D";
-	if (pitch_rel == 3)
-		return "D\u266F";
-	if (pitch_rel == 4)
-		return "E";
-	if (pitch_rel == 5)
-		return "F";
-	if (pitch_rel == 6)
-		return "F\u266F";
-	if (pitch_rel == 7)
-		return "G";
-	if (pitch_rel == 8)
-		return "G\u266F";
-	if (pitch_rel == 9)
-		return "A";
-	if (pitch_rel == 10)
-		return "A\u266F";
-	if (pitch_rel == 11)
-		return "B";
-	return "???";
+	if (pitch_rel < 0 or pitch_rel >= 12)
+		return "???";
+	return REL_PITCH_NAME[pitch_rel];
+}
+
+string rel_pitch_name_canonical(int pitch_rel)
+{
+	if (pitch_rel < 0 or pitch_rel >= 12)
+		return "???";
+	return REL_PITCH_NAME_CANONICAL[pitch_rel];
+}
+
+int parse_rel_pitch(const string &name)
+{
+	for (int i=0; i<12; i++)
+		if (name == REL_PITCH_NAME_CANONICAL[i])
+			return i;
+	return -1;
 }
 
 // convert an integer to a string

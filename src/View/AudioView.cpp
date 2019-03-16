@@ -212,7 +212,7 @@ void AudioView::MouseSelectionPlanner::stop()
 }
 
 AudioView::AudioView(Session *_session, const string &_id) :
-	midi_scale(Scale::Type::MAJOR, 0),
+	midi_scale(Scale::C_MAJOR),
 	cam(this)
 {
 	id = _id;

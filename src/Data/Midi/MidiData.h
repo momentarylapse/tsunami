@@ -99,6 +99,8 @@ int pitch_get_octave(int pitch);
 int pitch_from_octave_and_rel(int rel, int octave);
 int pitch_to_rel(int pitch);
 string rel_pitch_name(int pitch_rel);
+string rel_pitch_name_canonical(int pitch_rel);
+int parse_rel_pitch(const string &name);
 string pitch_name(int pitch);
 string drum_pitch_name(int pitch);
 

@@ -45,7 +45,7 @@ public:
 	void draw_sample_frame(Painter *c, SampleRef *s, const color &col, int delay);
 	void draw_sample(Painter *c, SampleRef *s);
 
-	void draw_marker(Painter *c, const TrackMarker *marker, int index, bool hover, const Range &group_range, bool first, bool last);
+	void draw_marker(Painter *c, const TrackMarker *marker, bool hover, const Range &group_range, bool first, bool last);
 	void draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
 	void draw_markers(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
 

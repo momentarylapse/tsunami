@@ -96,10 +96,10 @@ string string::substr(int start, int length) const
 }
 
 string string::head(int size) const
-{	return substr(0, size);	}
+{ size = min(size, num); return substr(0, size); }
 
 string string::tail(int size) const
-{	return substr(num - size, size);	}
+{ size = min(size, num); return substr(num - size, size); }
 
 int string::find(const string &s, int start) const
 {

@@ -534,8 +534,11 @@ void AudioOutput::reset_state()
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE){
 			session->debug("out", "flush");
-			if (pulse_stream)
-				pa_stream_flush(pulse_stream, nullptr, nullptr);
+			if (pulse_stream){
+				pa_operation *op = pa_stream_flush(pulse_stream, nullptr, nullptr);
+				_pulse_test_error("pa_stream_flush");
+				pulse_ignore_op(session, op);
+			}
 			session->debug("out", "/flush");
 		}
 #endif

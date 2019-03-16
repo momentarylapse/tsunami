@@ -11,6 +11,7 @@
 #include "../Range.h"
 
 class Scale;
+class Clef;
 class Instrument;
 enum class NoteModifier;
 
@@ -34,15 +35,18 @@ public:
 	float pitch;
 	float volume;
 	int flags;
-	mutable int stringno, clef_position;
+	int stringno;
+
+	// temporary meta data
+	mutable int clef_position;
 	mutable NoteModifier modifier;
 	mutable int y;
 
 	bool is(int mask) const;
 	void set(int mask);
 
-	void reset_meta();
-	void update_meta(const Instrument &i, const Scale &s) const;
+	void reset_clef();
+	void update_clef_pos(const Clef &clef, const Instrument &instrument, const Scale &s) const;
 };
 
 

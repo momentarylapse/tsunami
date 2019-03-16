@@ -57,6 +57,7 @@ static std::mutex runner_mutex;
 		for (auto *r: _hui_runners_)
 			if (r->hui_id == id)
 				return r;
+		return nullptr;
 	}
 	/*void _hui_runner_delete_(int id)
 	{

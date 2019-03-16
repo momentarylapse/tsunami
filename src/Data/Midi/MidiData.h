@@ -77,9 +77,8 @@ public:
 	void operator=(const MidiNoteBuffer &midi);
 	void operator=(const MidiNoteBufferRef &midi);
 
-	//void update_meta(const Instrument &i, const Scale &s) const;
-	void update_meta(const Instrument &instrument, const Scale &s) const;
-	void clear_meta() const;
+	void update_clef_pos(const Instrument &instrument, const Scale &s) const;
+	void reset_clef() const;
 };
 
 class MidiNoteBufferRef : public MidiNoteBuffer

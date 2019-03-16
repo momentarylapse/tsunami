@@ -36,10 +36,9 @@ public:
 
 	virtual void _cdecl process(MidiNoteBuffer *midi){};
 
-	void process_layer(TrackLayer *l, const SongSelection &sel);
+	void process_layer(TrackLayer *l, SongSelection &sel);
 
 	void prepare();
-	void apply(MidiNoteBuffer &midi, Track *t, bool log_error);
 
 	class Output : public Port
 	{

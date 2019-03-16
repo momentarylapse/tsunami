@@ -574,18 +574,15 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch)
 }
 
 
-void MidiNoteBuffer::update_meta(const Instrument &instrument, const Scale& scale) const
+void MidiNoteBuffer::update_clef_pos(const Instrument &instrument, const Scale& scale) const
 {
+	const Clef& clef = instrument.get_clef();
 	for (MidiNote *n: *this)
-		n->update_meta(instrument, scale);
+		n->update_clef_pos(clef, instrument, scale);
 }
 
-void MidiNoteBuffer::clear_meta() const
+void MidiNoteBuffer::reset_clef() const
 {
 	for (MidiNote *n: *this)
-		n->stringno = -1;
-	for (MidiNote *n: *this){
-		n->clef_position = -1;
-		n->modifier = NoteModifier::UNKNOWN;
-	}
+		n->reset_clef();
 }

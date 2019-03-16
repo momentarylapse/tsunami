@@ -187,7 +187,32 @@ const Clef& Instrument::get_clef() const
 	return Clef::_TREBLE;
 }
 
+bool Instrument::has_strings() const
+{
+	return string_pitch.num > 0;
+}
+
 bool Instrument::operator==(const Instrument &i) const
 {
 	return type == i.type;
+}
+
+int Instrument::highest_usable_string(int pitch) const
+{
+	if (!has_strings())
+		return -1;
+	int n = 0;
+	for (int i=0; i<string_pitch.num; i++)
+		if (pitch >= string_pitch[i])
+			n = i;
+	return n;
+}
+int Instrument::make_string_valid(int pitch, int stringno) const
+{
+	if (!has_strings())
+		return -1;
+	int hus = highest_usable_string(pitch);
+	if (stringno < 0 or stringno >= hus)
+		return hus;
+	return stringno;
 }

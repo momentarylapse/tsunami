@@ -55,8 +55,12 @@ public:
 	void set_midi_no(int no);
 
 	const Clef& get_clef() const;
+	bool has_strings() const;
 
 	static Array<Instrument> enumerate();
+
+	int highest_usable_string(int pitch) const;
+	int make_string_valid(int pitch, int string) const;
 };
 
 #endif /* SRC_DATA_MIDI_INSTRUMENT_H_ */

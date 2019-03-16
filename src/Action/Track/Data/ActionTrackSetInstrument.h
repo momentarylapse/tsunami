@@ -11,6 +11,7 @@
 #include "../../ActionMergable.h"
 #include "../../../Data/Midi/Instrument.h"
 class Track;
+class MidiNote;
 
 class ActionTrackSetInstrument: public ActionMergable<Instrument>
 {
@@ -26,6 +27,13 @@ public:
 
 private:
 	Track *track;
+
+	struct StringChange
+	{
+		MidiNote* note;
+		int from, to;
+	};
+	Array<StringChange> string_change;
 };
 
 #endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_ */

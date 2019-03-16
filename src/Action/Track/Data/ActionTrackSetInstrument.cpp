@@ -14,13 +14,27 @@ ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &i
 	track = t;
 	old_value = t->instrument;
 	new_value = instrument;
+
+	for (auto *l: track->layers)
+		for (auto *n: l->midi){
+			StringChange c;
+			c.note = n;
+			c.from = n->stringno;
+			c.to = instrument.make_string_valid(n->pitch, n->stringno);
+			if (c.from != c.to)
+				string_change.add(c);
+		}
+
 }
 
 void* ActionTrackSetInstrument::execute(Data* d)
 {
 	track->instrument = new_value;
-	for (TrackLayer *l: track->layers)
-		l->midi.clear_meta();
+	for (auto *l: track->layers)
+		l->midi.reset_clef();
+
+	for (auto &c: string_change)
+		c.note->stringno = c.to;
 
 	track->notify();
 
@@ -30,8 +44,11 @@ void* ActionTrackSetInstrument::execute(Data* d)
 void ActionTrackSetInstrument::undo(Data* d)
 {
 	track->instrument = old_value;
-	for (TrackLayer *l: track->layers)
-		l->midi.clear_meta();
+	for (auto *l: track->layers)
+		l->midi.reset_clef();
+
+	for (auto &c: string_change)
+		c.note->stringno = c.from;
 
 	track->notify();
 }
@@ -50,5 +67,6 @@ bool ActionTrackSetInstrument::absorb(ActionMergableBase* a)
 		return false;
 	ActionTrackSetInstrument* aa = dynamic_cast<ActionTrackSetInstrument*>(a);
 	new_value = aa->new_value;
+	string_change.append(aa->string_change);
 	return true;
 }

@@ -775,7 +775,7 @@ void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &not
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)
 {
 	cur_range = cam->range() - shift;
-	midi.update_meta(*instrument, midi_scale);
+	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 
 	float w_1min = cam->dsample2screen(song->sample_rate * 60);

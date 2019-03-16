@@ -54,21 +54,8 @@ void MidiEffect::prepare()
 		session->e(get_error());
 }
 
-void MidiEffect::apply(MidiNoteBuffer &midi, Track *t, bool log_error)
-{
-	// run
-	process(&midi);
 
-	if (!usable){
-		msg_error("not usable... apply");
-		if (log_error)
-			session->e(_("While applying a midi effect: ") + get_error());
-	}
-}
-
-
-
-void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
+void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel)
 {
 	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
@@ -82,6 +69,10 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel)
 
 	l->insert_midi_data(0, midi);
 	l->song()->end_action_group();
+
+	// select new notes
+	for (auto *n: midi)
+		sel.set(n, true);
 }
 
 

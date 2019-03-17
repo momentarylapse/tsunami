@@ -56,7 +56,8 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 
 	if (layer){
 		set_midi_mode(view->midi_view_mode);
-		layer->track->subscribe(this, [=]{ on_track_change(); });
+		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
+		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
 	}
 }
 
@@ -68,7 +69,8 @@ AudioViewLayer::~AudioViewLayer()
 
 void AudioViewLayer::on_track_change()
 {
-	update_midi_key_changes();
+	if (layer)
+		update_midi_key_changes();
 
 	//notify(MESSAGE_CHANGE);
 }
@@ -88,7 +90,8 @@ Array<MidiKeyChange> get_key_changes(const Track *t)
 
 void AudioViewLayer::update_midi_key_changes()
 {
-	midi_key_changes = get_key_changes(layer->track);
+	if (layer)
+		midi_key_changes = get_key_changes(layer->track);
 }
 
 void AudioViewLayer::set_midi_mode(MidiMode wanted)

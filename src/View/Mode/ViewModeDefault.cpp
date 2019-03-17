@@ -642,7 +642,7 @@ void ViewModeDefault::draw_post(Painter *c)
 	if (hover->type == Selection::Type::SAMPLE)
 		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
 	else if (hover->type == Selection::Type::MARKER)
-		view->draw_cursor_hover(c, _("marker ") + hover->marker->text);
+		view->draw_cursor_hover(c, _("marker ") + hover->marker->nice_text());
 	else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
 		view->draw_cursor_hover(c, _("edit track properties"));
 	else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)

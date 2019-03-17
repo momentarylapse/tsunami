@@ -11,6 +11,7 @@
 #include "Range.h"
 
 class AudioEffect;
+class Scale;
 
 
 class TrackMarker
@@ -19,7 +20,13 @@ public:
 	Range range;
 	string text;
 	Array<AudioEffect*> fx;
+
+	string nice_text() const;
 };
+
+
+bool marker_is_key(const string &text);
+Scale parse_marker_key(const string &text);
 
 
 

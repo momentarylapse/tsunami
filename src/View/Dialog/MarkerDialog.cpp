@@ -10,19 +10,6 @@
 #include "../../Data/TrackMarker.h"
 #include "../../Data/Midi/Scale.h"
 
-bool marker_is_key(const string &text)
-{
-	return text.match("::key=*::");
-}
-
-Scale parse_marker_key(const string &text)
-{
-	Scale scale = Scale::C_MAJOR;
-	if (!marker_is_key(text))
-		return scale;
-	return Scale::parse(text.substr(6, -3));
-}
-
 string encode_key(const Scale &key)
 {
 	return "::key=" + key.encode() + "::";

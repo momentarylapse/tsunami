@@ -34,9 +34,6 @@
 #include "Painter/MidiPainter.h"
 
 
-bool marker_is_key(const string &text);
-Scale parse_marker_key(const string &text);
-
 
 const int PITCH_SHOW_COUNT = 30;
 
@@ -265,7 +262,7 @@ float marker_alpha_factor(float w, float w_group, bool border)
 
 void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hover, const Range &group_range, bool first, bool last)
 {
-	string text = marker->text;
+	string text = marker->nice_text();
 	if (marker->fx.num > 0)
 		text += format(" (%d fx)", marker->fx.num);
 

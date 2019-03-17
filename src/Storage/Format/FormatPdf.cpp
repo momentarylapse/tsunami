@@ -182,7 +182,7 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 			p->draw_line(x - 20, y - 65, x + 20, y - 65);
 			p->draw_line(x - 20, y - 35, x + 20, y - 35);
 			p->set_font_size(20);
-			p->draw_str(x - 15, y-60, m->text);
+			p->draw_str(x - 15, y-60, m->nice_text());
 		}
 	}
 }

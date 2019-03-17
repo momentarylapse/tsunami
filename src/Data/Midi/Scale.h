@@ -36,6 +36,7 @@ public:
 
 	NoteModifier get_modifier(int upos) const;
 
+	string nice_name() const;
 	string type_name() const;
 	string encode() const;
 

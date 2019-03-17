@@ -100,6 +100,11 @@ string Scale::get_type_name(Type type)
 	return "???";
 }
 
+string Scale::nice_name() const
+{
+	return rel_pitch_name(root) + " " + type_name();
+}
+
 string Scale::type_name() const
 {
 	return get_type_name(type);

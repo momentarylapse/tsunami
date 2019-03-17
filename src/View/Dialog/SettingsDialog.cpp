@@ -15,6 +15,8 @@
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
+#include "../../Module/SignalChain.h"
+#include "../../Stream/AudioOutput.h"
 
 
 struct ApiDescription
@@ -40,6 +42,8 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 	event("high_details", [=]{ on_high_details(); });
 	event("audio_api", [=]{ on_audio_api(); });
 	event("midi_api", [=]{ on_midi_api(); });
+	event("prebuffer_size", [=]{ on_prebuffer(); });
+	event("suck_size", [=]{ on_suck_buffer(); });
 	event("quick_export_dir_find", [=]{ on_qed_find(); });
 	event("hui:close", [=]{ destroy(); });
 	event("close", [=]{ destroy(); });
@@ -116,6 +120,8 @@ void SettingsDialog::load_data()
 			n_midi ++;
 		}
 	}
+	set_int("prebuffer_size", hui::Config.get_int("Output.BufferSize", AudioOutput::DEFAULT_PREBUFFER_SIZE));
+	set_int("suck_size", hui::Config.get_int("SignalChain.BufferSize", SignalChain::DEFAULT_BUFFER_SIZE));
 }
 
 void SettingsDialog::applyData()
@@ -182,6 +188,20 @@ void SettingsDialog::on_midi_api()
 			n_midi ++;
 		}
 	}
+}
+
+void SettingsDialog::on_prebuffer()
+{
+	int n = get_int("");
+	hui::Config.set_int("Output.BufferSize", n);
+	view->session->output_stream->set_prebuffer_size(n);
+}
+
+void SettingsDialog::on_suck_buffer()
+{
+	int n = get_int("");
+	hui::Config.set_int("SignalChain.BufferSize", n);
+	view->signal_chain->set_buffer_size(n);
 }
 
 void SettingsDialog::on_cpu_meter()

@@ -38,6 +38,8 @@ public:
 
 	void _cdecl __init__(Session *session);
 	virtual void _cdecl __delete__();
+	
+	static const int DEFAULT_PREBUFFER_SIZE;
 
 	void _create_dev();
 	void _kill_dev();

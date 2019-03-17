@@ -21,7 +21,7 @@
 #include <portaudio.h>
 #endif
 
-const int DEFAULT_PREBUFFER_SIZE = 4096;
+const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 
 
 
@@ -174,7 +174,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
 	volume = 1;
-	prebuffer_size = DEFAULT_PREBUFFER_SIZE;
+	prebuffer_size = hui::Config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 
 	device_manager = session->device_manager;
 	device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);

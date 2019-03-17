@@ -27,6 +27,8 @@ public:
 	void on_scroll_speed();
 	void on_audio_api();
 	void on_midi_api();
+	void on_prebuffer();
+	void on_suck_buffer();
 	void on_cpu_meter();
 	void on_antialiasing();
 	void on_high_details();

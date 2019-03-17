@@ -32,7 +32,7 @@ const float DEFAULT_UPDATE_DT = 0.050f;
 extern bool ugly_hack_slow;
 
 
-const int SignalChain::DEFAULT_BUFFER_SIZE = 1024;
+const int SignalChain::DEFAULT_BUFFER_SIZE = 2048;
 
 
 class SuckerThread : public Thread
@@ -90,7 +90,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 
 	sucking = false;
 	thread = nullptr;//new AudioSuckerThread(this);
-	buffer_size = DEFAULT_BUFFER_SIZE;
+	buffer_size = hui::Config.get_int("SignalChain.BufferSize", DEFAULT_BUFFER_SIZE);
 	no_data_wait = 0.005f;
 }
 

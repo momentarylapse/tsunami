@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-629
+633
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1890,6 +1890,18 @@ Generell\\Oberfläche\\Geräte\\Sonstiges
 midi_editor/add_key_change
 Tonart...
 Einen Tonartwechsel am Cursor einfügen
+settings_dialog/t_prebuffer_size
+Prebuffer
+
+settings_dialog/t_suck_size
+Suck Buffer
+
+settings_dialog/prebuffer_size
+
+so viele Samples werden für Ausgabestreams versucht im Ringpuffer zu behalten
+settings_dialog/suck_size
+
+die Blockgröße mit der Daten duch Signalketten \"gesaugt\" werden
 // Num Language Strings
 220
 // Data (ID,Text)

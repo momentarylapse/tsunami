@@ -1,6 +1,6 @@
-Dialog settings_dialog "Einstellungen" width=400 height=300
+Dialog settings_dialog "Einstellungen" width=580 height=350
 	Grid ? "" vertical
-		TabControl tab "General\\User Interface\\Devices\\Other"
+		TabControl tab "General\\User Interface\\Devices\\Other" expandy
 			Grid ? ""
 				Text pdp_language "Language"
 				ComboBox language "" expandx
@@ -32,6 +32,12 @@ Dialog settings_dialog "Einstellungen" width=400 height=300
 				---|
 				Text t_midi_api "Midi library"
 				ComboBox midi_api "" expandx "tooltip=a program restart is required to apply"
+				---|
+				Text t_prebuffer_size "Prebuffer"
+				SpinButton prebuffer_size "" --range=0:1000000:1 "tooltip=will try to keep so many samples in the ringbuffer for an output stream"
+				---|
+				Text t_suck_size "Suck buffer"
+				SpinButton suck_size "" --range=0:1000000:1 "tooltip=the chunk size for updating buffers (sucking data through signal chains)"
 			Grid ? ""
 				Text pdt_oggrate "OGG bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500" expandx

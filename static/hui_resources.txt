@@ -3913,7 +3913,7 @@ ok
 // Resource
 Dialog
 settings_dialog
-width=400,height=300
+width=580,height=350
 0
 0
 1
@@ -3925,7 +3925,7 @@ vertical
 2
 TabControl
 tab
-
+expandy
 0
 0
 4
@@ -4054,7 +4054,7 @@ Grid
 
 2
 0
-4
+8
 Text
 t_audio_api
 
@@ -4078,6 +4078,30 @@ midi_api
 expandx
 1
 1
+0
+Text
+t_prebuffer_size
+
+0
+2
+0
+SpinButton
+prebuffer_size
+--range=0:1000000:1
+1
+2
+0
+Text
+t_suck_size
+
+0
+3
+0
+SpinButton
+suck_size
+--range=0:1000000:1
+1
+3
 0
 Grid
 ?
@@ -4782,7 +4806,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-475
+479
 // Text
 /cancel
 Cancel
@@ -6065,9 +6089,15 @@ Default artist
 settings_dialog/pdt_oggrate
 OGG bitrate
 
+settings_dialog/prebuffer_size
+
+will try to keep so many samples in the ringbuffer for an output stream
 settings_dialog/settings_dialog
 Einstellungen
 
+settings_dialog/suck_size
+
+the chunk size for updating buffers (sucking data through signal chains)
 settings_dialog/t_audio_api
 Audio library
 
@@ -6077,6 +6107,9 @@ Debug
 settings_dialog/t_midi_api
 Midi library
 
+settings_dialog/t_prebuffer_size
+Prebuffer
+
 settings_dialog/t_quality
 Quality
 
@@ -6085,6 +6118,9 @@ Quick export
 
 settings_dialog/t_scroll_speed
 Scroll speed
+
+settings_dialog/t_suck_size
+Suck buffer
 
 settings_dialog/tab
 General\\User Interface\\Devices\\Other
@@ -6215,7 +6251,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-628
+632
 // Text
 /bpm
 Bpm
@@ -7924,12 +7960,18 @@ wird als Tag artist=... in neue Dateien eingetragen
 settings_dialog/pdt_oggrate
 OGG-Bitrate
 
+settings_dialog/prebuffer_size
+
+so viele Samples werden für Ausgabestreams versucht im Ringpuffer zu behalten
 settings_dialog/settings_dialog
 Einstellungen
 
 settings_dialog/show_cpu
 CPU-Meter
 
+settings_dialog/suck_size
+
+die Blockgröße mit der Daten duch Signalketten \"gesaugt\" werden
 settings_dialog/t_audio_api
 Audio Bibliothek
 
@@ -7939,6 +7981,9 @@ Debug
 settings_dialog/t_midi_api
 Midi Bibliothek
 
+settings_dialog/t_prebuffer_size
+Prebuffer
+
 settings_dialog/t_quality
 Qualität
 
@@ -7947,6 +7992,9 @@ Schnellexport
 
 settings_dialog/t_scroll_speed
 Scroll Geschwindigkeit
+
+settings_dialog/t_suck_size
+Suck Buffer
 
 settings_dialog/tab
 Generell\\Oberfläche\\Geräte\\Sonstiges

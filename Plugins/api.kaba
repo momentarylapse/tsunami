@@ -110,7 +110,25 @@ class ConfigPanel extends Panel
 enum
 	COMMAND_START
 	COMMAND_STOP
+	COMMAND_PREPARE_START
+	COMMAND_ACCUMULATION_START
+	COMMAND_ACCUMULATION_STOP
+	COMMAND_ACCUMULATION_CLEAR
+	COMMAND_ACCUMULATION_GET_SIZE
+	COMMAND_SUCK
 
+enum
+	MODULE_AUDIO_SOURCE
+	MODULE_AUDIO_EFFECT
+	MODULE_MIDI_SOURCE
+	MODULE_MIDI_EFFECT
+	MODULE_SYNTHESIZER
+	MODULE_BEAT_SOURCE
+	MODULE_AUDIO_VISUALIZER
+	MODULE_STREAM
+	MODULE_PITCH_DETECTOR
+	MODULE_PLUMBING
+	MODULE_SIGNAL_CHAIN
 
 class Module
 	string name
@@ -126,7 +144,7 @@ class Module
 	extern virtual PluginData* get_config()
 	extern virtual string config_to_string()
 	extern virtual void config_from_string(string s)
-	extern virtual void command(int cmd)
+	extern virtual int command(int cmd, int param)
 	extern virtual void set_pos(int pos)
 	extern virtual int get_pos()
 	extern void plug(int in_port, Module* source, int out_port)
@@ -516,6 +534,16 @@ class Storage
 	string current_directory
 
 class SignalChain extends Module
+	extern void __init__(Session* session, string name)
+	extern override void __delete__()
+	extern override int command(int cmd, int param)
+	extern override void reset_state()
+	extern Module* add(int type, string name)
+	extern Module* _add(Module* m)
+	extern void remove(Module* m)
+	extern void connect(Module* source, int source_port, Module* target, int target_port)
+	extern void start()
+	extern void stop()
 	extern void set_update_dt(float dt)
 	extern override int get_pos()
 	extern override void set_pos(int pos)
@@ -605,6 +633,7 @@ extern void fft_c2c(complex[] in, complex[] out, bool inverse)
 extern void fft_r2c(float[] in, complex[] out)
 extern void fft_c2r_inv(complex[] in, float[] out)
 
+extern Module* CreateModule(Session* session, int type, string name)
 extern Synthesizer* CreateSynthesizer(Session* session, string name)
 extern AudioSource* CreateAudioSource(Session* session, string name)
 extern AudioEffect* CreateAudioEffect(Session* session, string name)
@@ -614,5 +643,7 @@ extern BeatMidifier* CreateBeatMidifier(Session* session)
 extern BeatSource* CreateBeatSource(Session* session, string name)
 extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
 //extern void SetTempBackupFilename(string filename)
+
+extern string ChooseModule(Panel* parent, Session* session, int type, string old_name)
 
 extern void draw_boxed_str(Painter *c, float x, float y, string str, color col_text, color col_bg)

@@ -59,13 +59,13 @@ class FontList
 
 FontList font_list
 
-class DrumsetConfig extends PluginData
+class FontConfig extends PluginData
 	string name
 	override void reset()
 		name = ""
 
-class DrumsetSynthesizer extends Synthesizer
-	DrumsetConfig config
+class FontSynthesizer extends Synthesizer
+	FontConfig config
 	Song *a
 	Synthesizer *s
 	override void __init__()
@@ -94,11 +94,11 @@ class DrumsetSynthesizer extends Synthesizer
 
 	
 	override ConfigPanel *create_panel()
-		return new DrumsetPanel(self)
+		return new FontPanel(self)
 
-class DrumsetPanel extends ConfigPanel
-	DrumsetConfig *sc
-	override DrumsetSynthesizer *c
+class FontPanel extends ConfigPanel
+	FontConfig *sc
+	override FontSynthesizer *c
 	override void __init__(Module *_s)
 		//super.__init__(_s)
 		sc = &c.config

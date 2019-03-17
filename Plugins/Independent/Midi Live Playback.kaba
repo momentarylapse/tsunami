@@ -1,0 +1,58 @@
+use "../api.kaba"
+
+class MLPPanel extends ConfigPanel
+	MidiLivePlayback* mlp
+	Session* session
+	ConfigPanel* synth_panel
+	void __init__(Session* _session, MidiLivePlayback* _mlp)
+		mlp = _mlp
+		session = _session
+		from_source("Grid grid ''
+	Button select-synth 'select synthesizer...' expandx image=hui:open")
+		event("select-synth", &on_select_synth)
+		
+		synth_panel = nil
+		
+	
+	void on_select_synth()
+		if synth_panel
+			delete synth_panel
+		string name = ChooseModule(self, session, MODULE_SYNTHESIZER, mlp.synth.name)
+		mlp.set_synth(name)
+		set_string("select-synth", name)
+		
+		synth_panel = mlp.synth.create_panel()
+		if synth_panel
+			embed(synth_panel, "grid", 0, 1)
+			synth_panel.update()
+		
+
+class MidiLivePlayback extends TsunamiPlugin
+	Module* m_in, m_out
+	Synthesizer* synth
+	SignalChain* chain
+	override void on_start()
+		chain = new SignalChain(session, "")
+		m_in = chain.add(MODULE_STREAM, "MidiInput")
+		m_out = chain.add(MODULE_STREAM, "AudioOutput")
+		synth = chain.add(MODULE_SYNTHESIZER, "")
+		chain.connect(m_in, 0, synth, 0)
+		chain.connect(synth, 0, m_out, 0)
+		chain.start()
+	
+	void set_synth(string name)
+		chain.stop()
+		chain.reset_state()
+		chain.remove(synth)
+		
+		synth = chain.add(MODULE_SYNTHESIZER, name)
+		chain.connect(m_in, 0, synth, 0)
+		chain.connect(synth, 0, m_out, 0)
+		
+		chain.start()
+		
+	override void on_stop()
+		delete chain
+	
+	override ConfigPanel* create_panel()
+		return new MLPPanel(session, self)

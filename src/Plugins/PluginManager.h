@@ -46,7 +46,7 @@ public:
 	Array<string> find_module_sub_types(ModuleType type);
 	Array<string> find_module_sub_types_grouped(ModuleType type);
 
-	string choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
+	static string choose_module(hui::Panel *parent, Session *session, ModuleType type, const string &old_name = "");
 
 
 	// not compiled yet

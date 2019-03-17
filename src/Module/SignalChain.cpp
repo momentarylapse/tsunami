@@ -111,6 +111,17 @@ SignalChain::~SignalChain()
 	for (Cable *c: cables)
 		delete c;
 }
+
+void SignalChain::__init__(Session *s, const string &_name)
+{
+	new(this) SignalChain(s, _name);
+}
+
+void SignalChain::__delete__()
+{
+	this->SignalChain::~SignalChain();
+}
+
 void SignalChain::set_tick_dt(float dt)
 {
 	tick_dt = dt;

@@ -22,6 +22,7 @@
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/Audio/BufferInterpolator.h"
 #include "../Data/Rhythm/Bar.h"
+#include "../Module/ModuleFactory.h"
 #include "../Module/ConfigPanel.h"
 #include "../Module/SignalChain.h"
 #include "../Module/ModuleConfiguration.h"
@@ -106,7 +107,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-//	Kaba::LinkExternal("CreateModule", (void*)&ModuleFactory::create);
+	Kaba::LinkExternal("CreateModule", (void*)&ModuleFactory::create);
 	Kaba::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateAudioEffect);
 	Kaba::LinkExternal("CreateAudioSource", (void*)&CreateAudioSource);
@@ -116,6 +117,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
 	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
+	Kaba::LinkExternal("ChooseModule", (void*)&choose_module);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
 	Kaba::LinkExternal("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 
@@ -545,6 +547,16 @@ void PluginManager::link_app_script_data()
 
 	SignalChain chain(Session::GLOBAL, "");
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));
+	Kaba::LinkExternal("SignalChain.__init__", Kaba::mf(&SignalChain::__init__));
+	Kaba::DeclareClassVirtualIndex("SignalChain", "__delete__", Kaba::mf(&SignalChain::__delete__), &chain);
+	Kaba::DeclareClassVirtualIndex("SignalChain", "reset_state", Kaba::mf(&SignalChain::reset_state), &chain);
+	Kaba::DeclareClassVirtualIndex("SignalChain", "command", Kaba::mf(&SignalChain::command), &chain);
+	Kaba::LinkExternal("SignalChain.start", Kaba::mf(&SignalChain::start));
+	Kaba::LinkExternal("SignalChain.stop", Kaba::mf(&SignalChain::stop));
+	Kaba::LinkExternal("SignalChain.add", Kaba::mf(&SignalChain::add));
+	Kaba::LinkExternal("SignalChain._add", Kaba::mf(&SignalChain::_add));
+	Kaba::LinkExternal("SignalChain.remove", Kaba::mf(&SignalChain::remove));
+	Kaba::LinkExternal("SignalChain.connect", Kaba::mf(&SignalChain::connect));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
 	Kaba::LinkExternal("SignalChain.set_buffer_size", Kaba::mf(&SignalChain::set_buffer_size));
 	Kaba::DeclareClassVirtualIndex("SignalChain", "set_pos", Kaba::mf(&SignalChain::set_pos), &chain);

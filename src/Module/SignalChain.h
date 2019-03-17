@@ -24,6 +24,9 @@ public:
 	SignalChain(Session *session, const string &name);
 	virtual ~SignalChain();
 
+	void _cdecl __init__(Session *session, const string &name);
+	void _cdecl __delete__();
+
 	static const string MESSAGE_ADD_MODULE;
 	static const string MESSAGE_DELETE_MODULE;
 	static const string MESSAGE_ADD_CABLE;
@@ -69,7 +72,7 @@ public:
 
 	void on_module_play_end_of_stream();
 
-	void reset_state();
+	void reset_state() override;
 
 	int hui_runner;
 	float tick_dt;

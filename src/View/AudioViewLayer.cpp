@@ -31,6 +31,11 @@
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Audio/SongRenderer.h"
 #include "Helper/SymbolRenderer.h"
+#include "Painter/MidiPainter.h"
+
+
+bool marker_is_key(const string &text);
+Scale parse_marker_key(const string &text);
 
 
 const int PITCH_SHOW_COUNT = 30;
@@ -52,8 +57,41 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
 	hidden = false;
 	represents_imploded = false;
 
-	if (layer)
+	if (layer){
 		set_midi_mode(view->midi_view_mode);
+		layer->track->subscribe(this, [=]{ on_track_change(); });
+	}
+}
+
+AudioViewLayer::~AudioViewLayer()
+{
+	if (layer)
+		layer->track->unsubscribe(this);
+}
+
+void AudioViewLayer::on_track_change()
+{
+	update_midi_key_changes();
+
+	//notify(MESSAGE_CHANGE);
+}
+
+Array<MidiKeyChange> get_key_changes(const Track *t)
+{
+	Array<MidiKeyChange> key_changes;
+	for (auto *m: t->markers_sorted())
+		if (marker_is_key(m->text)){
+			MidiKeyChange c;
+			c.pos = m->range.offset;
+			c.key = parse_marker_key(m->text);
+			key_changes.add(c);
+		}
+	return key_changes;
+}
+
+void AudioViewLayer::update_midi_key_changes()
+{
+	midi_key_changes = get_key_changes(layer->track);
 }
 
 void AudioViewLayer::set_midi_mode(MidiMode wanted)

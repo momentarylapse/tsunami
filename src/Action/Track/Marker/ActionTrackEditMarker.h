@@ -17,13 +17,13 @@ class TrackMarker;
 class ActionTrackEditMarker: public Action
 {
 public:
-	ActionTrackEditMarker(TrackMarker *m, const Range &range, const string &text);
-	virtual ~ActionTrackEditMarker(){}
+	ActionTrackEditMarker(const Track *t, TrackMarker *m, const Range &range, const string &text);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
+	const Track *track;
 	TrackMarker *marker;
 	Range range;
 	string text;

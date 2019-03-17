@@ -50,6 +50,7 @@ private:
 		int pos_old;
 	};
 	Array<MarkerSaveData> markers;
+	Array<const Track*> tracks;
 	int param;
 };
 

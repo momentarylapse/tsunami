@@ -14,6 +14,7 @@
 class Track;
 class Painter;
 class AudioView;
+class MidiKeyChange;
 
 
 class AudioViewTrack : public Observable<VirtualBase>
@@ -42,7 +43,6 @@ public:
 	bool is_playable();
 
 
-	//Array<AudioViewLayer*> layers;
 	bool imploded;
 };
 

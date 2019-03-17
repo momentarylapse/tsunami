@@ -23,11 +23,11 @@ public:
 	ObservableData();
 	~ObservableData();
 
-	void notifyBegin();
+	void notify_begin();
 	void notify(const string &message);
-	void notifyEnd();
-	void notifyEnqueue(const string &message);
-	void notifySend();
+	void notify_end();
+	void notify_enqueue(const string &message);
+	void notify_send();
 
 	typedef std::function<void()> Callback;
 	typedef std::function<void(VirtualBase*)> CallbackP;
@@ -90,17 +90,17 @@ public:
 		subscribe(handler, std::bind(function, handler), message);
 	}
 
-	void notifyBegin()
+	void notify_begin() const
 	{
-		observable_data.notifyBegin();
+		observable_data.notify_begin();
 	}
-	void notify(const string &message = MESSAGE_CHANGE)
+	void notify(const string &message = MESSAGE_CHANGE) const
 	{
 		observable_data.notify(message);
 	}
-	void notifyEnd()
+	void notify_end() const
 	{
-		observable_data.notifyEnd();
+		observable_data.notify_end();
 	}
 	const string& cur_message() const
 	{
@@ -108,7 +108,7 @@ public:
 	}
 private:
 
-	ObservableData observable_data;
+	mutable ObservableData observable_data;
 };
 
 

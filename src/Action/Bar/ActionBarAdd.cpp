@@ -55,7 +55,7 @@ void ActionBarAdd::build(Data *d)
 			foreachi (TrackMarker *m, t->markers, i){
 				if (m->range.is_inside(pos0)){
 					// stretch
-					add_sub_action(new ActionTrackEditMarker(m, Range(m->range.offset, m->range.length + r.length), m->text), d);
+					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, m->range.length + r.length), m->text), d);
 				}
 			}
 

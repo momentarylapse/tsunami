@@ -48,13 +48,13 @@ void ActionBarDelete::build(Data *d)
 					add_sub_action(new ActionTrackDeleteMarker(t, i), d);
 				}else if (r.is_inside(m->range.start())){
 					// cover start
-					add_sub_action(new ActionTrackEditMarker(m, Range(r.offset, m->range.end() - r.end()), m->text), d);
+					add_sub_action(new ActionTrackEditMarker(t, m, Range(r.offset, m->range.end() - r.end()), m->text), d);
 				}else if (r.is_inside(m->range.end())){
 					// cover end
-					add_sub_action(new ActionTrackEditMarker(m, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
+					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
 				}else if (m->range.covers(r)){
 					// cut out part
-					add_sub_action(new ActionTrackEditMarker(m, Range(m->range.offset, m->range.length - r.length), m->text), d);
+					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, m->range.length - r.length), m->text), d);
 				}
 			}
 

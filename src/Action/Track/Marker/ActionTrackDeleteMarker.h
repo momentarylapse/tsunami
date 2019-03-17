@@ -16,10 +16,9 @@ class ActionTrackDeleteMarker: public Action
 {
 public:
 	ActionTrackDeleteMarker(Track *t, int index);
-	virtual ~ActionTrackDeleteMarker(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	int index;

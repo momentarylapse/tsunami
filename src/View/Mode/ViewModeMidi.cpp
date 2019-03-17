@@ -36,7 +36,8 @@ MidiPainter* midi_context(ViewModeMidi *vm)
 {
 	auto *mp = vm->view->midi_painter;
 	auto *l = vm->view->cur_vlayer;
-	mp->set_context(l->area, l->layer->track->instrument, vm->view->midi_scale, l->is_playable(), l->midi_mode);
+	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
+	mp->set_key_changes(l->midi_key_changes);
 	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
 	return mp;
 }

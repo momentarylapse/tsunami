@@ -24,11 +24,13 @@ void *ActionTrackDeleteMarker::execute(Data *d)
 	marker = track->markers[index];
 	track->markers.erase(index);
 
+	track->notify();
 	return nullptr;
 }
 
 void ActionTrackDeleteMarker::undo(Data *d)
 {
 	track->markers.insert(marker, index);
+	track->notify();
 }
 

@@ -20,12 +20,13 @@ ActionTrackAddMarker::ActionTrackAddMarker(Track *t, const Range &range, const s
 void *ActionTrackAddMarker::execute(Data *d)
 {
 	track->markers.add(marker);
-
+	track->notify();
 	return marker;
 }
 
 void ActionTrackAddMarker::undo(Data *d)
 {
 	track->markers.pop();
+	track->notify();
 }
 

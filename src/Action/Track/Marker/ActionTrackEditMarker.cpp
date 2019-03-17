@@ -10,8 +10,9 @@
 #include "../../../Data/TrackMarker.h"
 #include <assert.h>
 
-ActionTrackEditMarker::ActionTrackEditMarker(TrackMarker *m, const Range &_range, const string &_text)
+ActionTrackEditMarker::ActionTrackEditMarker(const Track *t, TrackMarker *m, const Range &_range, const string &_text)
 {
+	track = t;
 	marker = m;
 	range = _range;
 	text = _text;
@@ -27,6 +28,7 @@ void *ActionTrackEditMarker::execute(Data *d)
 	range = marker->range;
 	marker->range = r;
 
+	track->notify();
 	return nullptr;
 }
 

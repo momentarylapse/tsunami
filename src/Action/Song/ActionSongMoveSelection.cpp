@@ -17,6 +17,8 @@
 ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &sel)
 {
 	for (Track *t: a->tracks){
+		if (sel.has(t))
+			tracks.add(t);
 		for (TrackMarker *m: t->markers)
 			if (sel.has(m)){
 				MarkerSaveData d;
@@ -51,12 +53,14 @@ ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &s
 
 void *ActionSongMoveSelection::execute(Data *d)
 {
-	for (SampleSaveData &d: samples)
+	for (auto &d: samples)
 		d.sample->pos = d.pos_old + param;
-	for (NoteSaveData &d: notes)
+	for (auto &d: notes)
 		d.note->range.offset = d.pos_old + param;
-	for (MarkerSaveData &d: markers)
+	for (auto &d: markers)
 		d.marker->range.offset = d.pos_old + param;
+	for (auto *t: tracks)
+		t->notify();
 	return nullptr;
 }
 
@@ -71,12 +75,14 @@ void ActionSongMoveSelection::abort(Data *d)
 
 void ActionSongMoveSelection::undo(Data *d)
 {
-	for (SampleSaveData &d: samples)
+	for (auto &d: samples)
 		d.sample->pos = d.pos_old;
-	for (NoteSaveData &d: notes)
+	for (auto &d: notes)
 		d.note->range.offset = d.pos_old;
-	for (MarkerSaveData &d: markers)
+	for (auto &d: markers)
 		d.marker->range.offset = d.pos_old;
+	for (auto *t: tracks)
+		t->notify();
 }
 
 

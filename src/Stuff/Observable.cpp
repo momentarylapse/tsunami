@@ -131,7 +131,7 @@ void ObservableData::unsubscribe(VirtualBase *observer)
 		}
 }
 
-void ObservableData::notifySend()
+void ObservableData::notify_send()
 {
 	if (!me){
 		message_queue.clear();
@@ -165,7 +165,7 @@ void ObservableData::notifySend()
 }
 
 
-void ObservableData::notifyEnqueue(const string &message)
+void ObservableData::notify_enqueue(const string &message)
 {
 	// already enqueued?
 	for (const string *m: message_queue)
@@ -176,23 +176,23 @@ void ObservableData::notifyEnqueue(const string &message)
 	message_queue.add(&message);
 }
 
-void ObservableData::notifyBegin()
+void ObservableData::notify_begin()
 {
 	notify_level ++;
 }
 
-void ObservableData::notifyEnd()
+void ObservableData::notify_end()
 {
 	notify_level --;
 	if (notify_level == 0)
-		notifySend();
+		notify_send();
 }
 
 
 void ObservableData::notify(const string &message)
 {
-	notifyEnqueue(message);
+	notify_enqueue(message);
 	if (notify_level == 0)
-		notifySend();
+		notify_send();
 }
 

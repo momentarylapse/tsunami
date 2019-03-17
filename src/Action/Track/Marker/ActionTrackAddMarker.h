@@ -17,10 +17,9 @@ class ActionTrackAddMarker: public Action
 {
 public:
 	ActionTrackAddMarker(Track *t, const Range &range, const string &text);
-	virtual ~ActionTrackAddMarker(){}
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	TrackMarker *marker;

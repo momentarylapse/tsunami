@@ -28,13 +28,16 @@ class GridColors;
 class Selection;
 enum class NoteModifier;
 enum class MidiMode;
+class MidiKeyChange;
 
 
 class AudioViewLayer : public Observable<VirtualBase>
 {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
-	virtual ~AudioViewLayer(){}
+	virtual ~AudioViewLayer();
+
+	void on_track_change();
 
 
 	color background_color();
@@ -75,6 +78,9 @@ public:
 	int edit_pitch_min, edit_pitch_max;
 
 	virtual bool is_playable();
+
+	void update_midi_key_changes();
+	Array<MidiKeyChange> midi_key_changes;
 
 
 	void set_solo(bool solo);

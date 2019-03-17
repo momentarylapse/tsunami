@@ -53,31 +53,12 @@ static const color PITCH_COLORS[12] = {
 	color(1, 1.000000, 0.400000, 0.700000)  // B
 };
 
-MidiPainter::MidiPainter(AudioView *view) :
-	midi_scale(view->midi_scale),
-	colors(view->colors)
-{
-	//view = _view;
-	cam = &view->cam;
-	song = view->song;
-	sel = &view->sel;
-	hover = &view->hover;
-	instrument = nullptr;
-	scale = nullptr;
-	clef = nullptr;
-	is_playable = true;
-	as_reference = false;
-	pitch_min = PITCH_MIN_DEFAULT;
-	pitch_max = PITCH_MAX_DEFAULT;
-	shift = 0;
-	clef_dy = 0;
-	clef_y0 = 0;
-	string_dy = 0;
-	string_y0 = 0;
-	mode = MidiMode::LINEAR;
-	rr = 5;
-	set_quality(1.0f, true);
-}
+MidiKeyChange::MidiKeyChange(int _pos, const Scale &_key) : pos(_pos), key(_key) {}
+
+MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
+
+MidiPainter::MidiPainter(AudioView *view) : MidiPainter(view->song, &view->cam, &view->sel, &view->hover, view->colors)
+{}
 
 MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
@@ -88,7 +69,6 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selec
 	sel = _sel;
 	hover = _hover;
 	instrument = nullptr;
-	scale = nullptr;
 	clef = nullptr;
 	is_playable = true;
 	as_reference = false;
@@ -703,6 +683,21 @@ void MidiPainter::draw_note_classical(Painter *c, const MidiNote *n, MidiNoteSta
 	}
 }
 
+void MidiPainter::draw_key_symbol(Painter *c, const MidiKeyChange &kc)
+{
+	float x = cam->sample2screen(kc.pos);
+
+	c->set_font_size(clef_dy*4);
+	c->draw_str(x + 10, clef_pos_to_screen(8), clef->symbol);
+	c->set_font_size(clef_dy);
+
+	for (int i=0; i<7; i++){
+		if (kc.key.modifiers[i] != NoteModifier::NONE)
+			c->draw_str(x + 18 + clef_dy*3.0f + clef_dy*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - clef_dy*0.5f, modifier_symbol(kc.key.modifiers[i]));
+	}
+	c->set_font_size(AudioView::FONT_SIZE);
+}
+
 void MidiPainter::draw_clef_classical(Painter *c)
 {
 	// clef lines
@@ -723,13 +718,16 @@ void MidiPainter::draw_clef_classical(Painter *c)
 		c->set_color(colors.text_soft3);
 
 	// clef symbol
-	c->set_font_size(clef_dy*4);
-	c->draw_str(area.x1 + 10, clef_pos_to_screen(8), clef->symbol);
-	c->set_font_size(clef_dy);
 
-	for (int i=0; i<7; i++)
-		if (scale->modifiers[i] != NoteModifier::NONE)
-			c->draw_str(area.x1 + 18 + clef_dy*3.0f + clef_dy*0.6f*(i % 3), clef_pos_to_screen((i - clef->offset + 7*20) % 7) - clef_dy*0.5f, modifier_symbol(scale->modifiers[i]));
+	Scale key_prev = Scale::C_MAJOR;
+	for (auto &kc: key_changes)
+		if (kc.pos < cam->range().offset)
+			key_prev = kc.key;
+	draw_key_symbol(c, MidiKeyChange(cam->range().offset, key_prev));
+
+	for (auto &kc: key_changes)
+		draw_key_symbol(c, kc);
+
 	c->set_font_size(AudioView::FONT_SIZE);
 }
 
@@ -801,12 +799,11 @@ void MidiPainter::draw_background(Painter *c)
 	}
 }
 
-void MidiPainter::set_context(const rect& _area, const Instrument& i, const Scale &s, bool _is_playable, MidiMode _mode)
+void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_playable, MidiMode _mode)
 {
 	area = _area;
 	instrument = &i;
 	clef = &i.get_clef();
-	scale = &s;
 
 	// TAB
 	string_dy = min((area.height() * 0.7f) / instrument->string_pitch.num, 40.0f);
@@ -831,6 +828,11 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, const Scal
 		rr = max((pitch2y_linear(0) - pitch2y_linear(1)) / 2.3f, 2.0f);
 	if (mode == MidiMode::TAB)
 		rr = min(string_dy/2, 13.0f);
+}
+
+void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes)
+{
+	key_changes = changes;
 }
 
 void MidiPainter::set_linear_range(int _pitch_min, int _pitch_max)

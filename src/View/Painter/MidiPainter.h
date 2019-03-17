@@ -33,6 +33,14 @@ class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 
+struct MidiKeyChange
+{
+	MidiKeyChange();
+	MidiKeyChange(int pos, const Scale &key);
+	int pos;
+	Scale key;
+};
+
 class MidiPainter
 {
 public:
@@ -73,6 +81,7 @@ private:
 public:
 	void draw_clef_tab(Painter *c);
 	void draw_clef_classical(Painter *c);
+	void draw_key_symbol(Painter *c, const MidiKeyChange &kc);
 	void draw(Painter *c, const MidiNoteBuffer &midi);
 	void draw_background(Painter *c);
 
@@ -83,18 +92,19 @@ public:
 	Song *song;
 	ColorScheme &colors;
 
-	void set_context(const rect &area, const Instrument &i, const Scale &s, bool playable, MidiMode mode);
+	void set_context(const rect &area, const Instrument &i, bool playable, MidiMode mode);
 	void set_shift(int shift);
 	void set_linear_range(int pitch_min, int pitch_max);
 	void set_quality(float quality, bool antialiasing);
 	rect area;
 	const Instrument *instrument;
 	const Clef *clef;
-	const Scale *scale;
 	bool is_playable;
 	int pitch_min, pitch_max;
 	int shift;
 	bool as_reference;
+	Array<MidiKeyChange> key_changes;
+	void set_key_changes(const Array<MidiKeyChange> &changes);
 
 	struct{
 		bool antialiasing;

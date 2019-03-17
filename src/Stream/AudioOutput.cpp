@@ -446,7 +446,7 @@ void AudioOutput::_fill_prebuffer()
 
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_prebuf");
-		pulse_wait_op(session, op);
+		pulse_ignore_op(session, op);
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");

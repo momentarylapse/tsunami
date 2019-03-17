@@ -271,7 +271,7 @@ void Track::delete_marker(const TrackMarker *marker)
 
 void Track::edit_marker(const TrackMarker *marker, const Range &range, const string &text)
 {
-	song->execute(new ActionTrackEditMarker((TrackMarker*)marker, range, text));
+	song->execute(new ActionTrackEditMarker(this, (TrackMarker*)marker, range, text));
 }
 
 TrackLayer *Track::add_layer()

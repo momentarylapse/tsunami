@@ -19,7 +19,7 @@ public:
 	ActionBarAdd(int index, const BarPattern &bar, int mode);
 	~ActionBarAdd();
 
-	virtual void build(Data *d);
+	void build(Data *d) override;
 
 	int index;
 	Bar *bar;

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-628
+629
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1887,8 +1887,11 @@ Qualität
 settings_dialog/tab
 Generell\\Oberfläche\\Geräte\\Sonstiges
 
+midi_editor/add_key_change
+Tonart...
+Einen Tonartwechsel am Cursor einfügen
 // Num Language Strings
-219
+220
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2328,3 +2331,5 @@ Abspielbereich festhalten
 %d Takte
 no alsa midi handler
 kein Alsa Midi Handler
+cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)
+Cursor (←,→)    löschen (⟵)    Notenlänge (L)    Schlagteiler (P)

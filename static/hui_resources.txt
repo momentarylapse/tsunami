@@ -1675,7 +1675,7 @@ Grid
 vertical
 0
 0
-4
+5
 Button
 quantize
 expandx
@@ -1752,6 +1752,18 @@ Button
 flag_tenuto
 
 4
+0
+0
+Grid
+?
+
+4
+0
+1
+Button
+add_key_change
+
+0
 0
 0
 Text
@@ -4770,7 +4782,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-474
+475
 // Text
 /cancel
 Cancel
@@ -5267,6 +5279,9 @@ Play
 menu_fake/stop
 Stop
 
+midi_editor/add_key_change
+key change...
+Add a key change at the cursor position
 midi_editor/apply_hand_position
 Apply hand
 (TAB mode) Find positions on the fretboard for the selected notes
@@ -6200,7 +6215,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-627
+628
 // Text
 /bpm
 Bpm
@@ -6928,6 +6943,9 @@ Abspielen
 menu_fake/stop
 Stopp
 
+midi_editor/add_key_change
+Tonart...
+Einen Tonartwechsel am Cursor einfügen
 midi_editor/apply_hand_position
 Hand setzen
 (TAB Modus) Positionen auf dem Griffbrett für die markierten Noten finden
@@ -8084,7 +8102,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-219
+220
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -8422,6 +8440,8 @@ compiling script:
 kompiliere Script: 
 creating backup: 
 Erstelle Backup: 
+cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)
+Cursor (←,→)    löschen (⟵)    Notenlänge (L)    Schlagteiler (P)
 data loss when saving in this format!
 Datenverlust beim Speichern in diesem Format!
 delete

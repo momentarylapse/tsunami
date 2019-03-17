@@ -48,6 +48,8 @@ Dialog midi_editor "Midi" width=380 height=516
 						Button flag_trill "tr" "tooltip=set trill flag"
 						Button flag_staccato "." "tooltip=set staccato flag"
 						Button flag_tenuto "_" "tooltip=set tenuto flag"
+					Grid ? ""
+						Button add_key_change "key change..." "tooltip=Add a key change at the cursor position"
 		Text ? "" expandy
 		Group me_group_edit "Edit"
 			Grid ? ""

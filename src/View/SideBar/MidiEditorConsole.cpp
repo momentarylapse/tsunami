@@ -12,7 +12,6 @@
 #include "../../Data/Rhythm/BarCollection.h"
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/Midi/MidiData.h"
-#include "../../Action/ActionManager.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
@@ -20,8 +19,7 @@
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
 #include "MidiEditorConsole.h"
-
-#include "../../Module/Midi/MidiEffect.h"
+#include "../Dialog/MarkerDialog.h"
 
 int get_track_index_save(Song *song, Track *t);
 
@@ -71,6 +69,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("flag_trill", [=]{ on_apply_flags(NOTE_FLAG_TRILL); });
 	event("flag_staccato", [=]{ on_apply_flags(NOTE_FLAG_STACCATO); });
 	event("flag_tenuto", [=]{ on_apply_flags(NOTE_FLAG_TENUTO); });
+	event("add_key_change", [=]{ on_add_key_change(); });
 	event("edit_track", [=]{ on_edit_track(); });
 	event("edit_midi_fx", [=]{ on_edit_midi_fx(); });
 	event("edit_song", [=]{ on_edit_song(); });
@@ -295,7 +294,7 @@ void MidiEditorConsole::on_quantize()
 {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->sub_beat_partition);
 
-	song->action_manager->group_begin();
+	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref){
 		view->sel.set(n, false);
@@ -306,18 +305,18 @@ void MidiEditorConsole::on_quantize()
 		layer->add_midi_note(nn);
 		view->sel.add(nn);
 	}
-	song->action_manager->group_end();
+	song->end_action_group();
 }
 
 void MidiEditorConsole::on_apply_string()
 {
 	int string_no = get_int("string_no") - 1;
 
-	song->action_manager->group_begin();
+	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref)
 		layer->midi_note_set_string(n, string_no);
-	song->action_manager->group_end();
+	song->end_action_group();
 }
 
 void MidiEditorConsole::on_apply_hand_position()
@@ -325,7 +324,7 @@ void MidiEditorConsole::on_apply_hand_position()
 	int hand_position = get_int("fret_no");
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
-	song->action_manager->group_begin();
+	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
 	for (auto *n: ref){
  		int stringno = 0;
@@ -335,12 +334,12 @@ void MidiEditorConsole::on_apply_hand_position()
  			}
 		layer->midi_note_set_string(n, stringno);
 	}
-	song->action_manager->group_end();
+	song->end_action_group();
 }
 
 void MidiEditorConsole::on_apply_flags(int mask)
 {
-	song->action_manager->group_begin();
+	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
 	if (mask == 0){
 		for (auto *n: ref)
@@ -350,6 +349,12 @@ void MidiEditorConsole::on_apply_flags(int mask)
 			layer->midi_note_set_flags(n, n->flags | mask);
 
 	}
+	song->end_action_group();
+}
 
-	song->action_manager->group_end();
+void MidiEditorConsole::on_add_key_change()
+{
+	auto *dlg = new MarkerDialog(win, layer->track, Range(view->sel.range.offset, 0), "::key=c-major::");
+	dlg->run();
+	delete dlg;
 }

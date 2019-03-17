@@ -30,14 +30,14 @@ void TestMidiPreview::test_preview()
 	Synthesizer *synth = CreateSynthesizer(Session::GLOBAL, "");
 	MidiPreview *preview = new MidiPreview(Session::GLOBAL);
 	msg_write("start");
-	preview->start(synth, 64, 1.0f, 1.0f);
+	preview->start(synth, {64}, 1.0f, 1.0f);
 	sleep(2.0f);
 
 	msg_write("start");
-	preview->start(synth, 64, 1.0f, 1.0f);
+	preview->start(synth, {64}, 1.0f, 1.0f);
 	sleep(0.3f);
 	msg_write("start");
-	preview->start(synth, 68, 1.0f, 1.0f);
+	preview->start(synth, {68}, 1.0f, 1.0f);
 	sleep(0.3f);
 	msg_write("end");
 	preview->end();

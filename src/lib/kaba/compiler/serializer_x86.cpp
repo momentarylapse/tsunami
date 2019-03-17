@@ -352,7 +352,7 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			Array<Node*> links = syntax_tree->get_existence("@free", nullptr);
 			if (links.num == 0)
 				do_error("@free not found????");
-			AddFunctionCall(links[0]->as_func(), p_none, param[0], p_none);
+			AddFunctionCall(links[0]->as_func(), p_none, {param[0]}, p_none);
 			clear_nodes(links);
 			break;}
 		case STATEMENT_RAISE:

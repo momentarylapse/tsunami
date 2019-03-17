@@ -245,10 +245,6 @@ public:
 	bool editing_track(Track *t);
 	bool editing_layer(AudioViewLayer *l);
 
-
-	void set_scale(const Scale &s);
-	Scale midi_scale;
-
 	rect area;
 	rect song_area;
 	rect clip;

@@ -28,7 +28,6 @@ public:
 	void on_settings_change();
 	void update();
 
-	void on_scale();
 	void on_beat_partition();
 	void on_note_length();
 	void on_creation_mode();

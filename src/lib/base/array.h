@@ -74,13 +74,6 @@ class Array : public DynamicArray
 
 		}
 
-		// convenience
-		Array(const T &item)
-		{
-			init(sizeof(T));
-			add(item);
-		}
-
 		// kaba
 		void _cdecl __init__()
 		{

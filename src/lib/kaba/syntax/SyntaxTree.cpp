@@ -352,12 +352,12 @@ Array<Node*> SyntaxTree::get_existence_shared(const string &name)
 	// global variables (=local variables in "RootOfAllEvil")
 	for (Variable *v: root_of_all_evil.var)
 		if (v->name == name)
-			return new Node(KIND_VAR_GLOBAL, (int_p)v, v->type);
+			return {new Node(KIND_VAR_GLOBAL, (int_p)v, v->type)};
 
 	// named constants
 	for (Constant *c: constants)
 		if (name == c->name)
-			return new Node(KIND_CONSTANT, (int_p)c, c->type);
+			return {new Node(KIND_CONSTANT, (int_p)c, c->type)};
 
 	// then the (real) functions
 	for (Function *f: functions)
@@ -369,7 +369,7 @@ Array<Node*> SyntaxTree::get_existence_shared(const string &name)
 	// types
 	auto *c = which_owned_class(name);
 	if (c)
-		return new Node(KIND_CLASS, (int_p)c, TypeClass);
+		return {new Node(KIND_CLASS, (int_p)c, TypeClass)};
 
 	// ...unknown
 	return {};
@@ -385,17 +385,17 @@ Array<Node*> SyntaxTree::get_existence(const string &name, Block *block)
 		// first test local variables
 		auto *v = block->get_var(name);
 		if (v)
-			return exlink_make_var_local(this, v->type, v);
+			return {exlink_make_var_local(this, v->type, v)};
 		if (f->_class){
 			if ((name == IDENTIFIER_SUPER) and (f->_class->parent))
-				return exlink_make_var_local(this, f->_class->parent->get_pointer(), f->__get_var(IDENTIFIER_SELF));
+				return {exlink_make_var_local(this, f->_class->parent->get_pointer(), f->__get_var(IDENTIFIER_SELF))};
 			// class elements (within a class function)
 			for (ClassElement &e: f->_class->elements)
 				if (e.name == name)
-					return exlink_make_var_element(this, f, e);
+					return {exlink_make_var_element(this, f, e)};
 			for (ClassFunction &cf: f->_class->functions)
 				if (cf.name == name)
-					return exlink_make_func_class(this, f, cf);
+					return {exlink_make_func_class(this, f, cf)};
 		}
 	}
 
@@ -409,13 +409,13 @@ Array<Node*> SyntaxTree::get_existence(const string &name, Block *block)
 	if (w >= 0){
 		Node *n = new Node(KIND_STATEMENT, w, TypeVoid);
 		n->set_num_params(Statements[w].num_params);
-		return n;
+		return {n};
 	}
 
 	// operators
 	w = which_primitive_operator(name);
 	if (w >= 0)
-		return new Node(KIND_PRIMITIVE_OPERATOR, w, TypeUnknown);
+		return {new Node(KIND_PRIMITIVE_OPERATOR, w, TypeUnknown)};
 
 	// in include files (only global)...
 	for (Script *i: includes)

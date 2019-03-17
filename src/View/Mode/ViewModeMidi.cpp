@@ -158,7 +158,7 @@ void ri_insert(ViewModeMidi *me)
 	Range r = me->get_edit_range();
 	for (auto &e: ri_keys){
 		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, e.volume));
-		me->start_midi_preview(e.pitch, 0.1f);
+		me->start_midi_preview({(int)e.pitch}, 0.1f);
 	}
 	ri_keys.clear();
 	me->set_cursor_pos(r.end(), true);
@@ -298,19 +298,30 @@ void ViewModeMidi::edit_add_pause()
 	select_in_edit_cursor();
 }
 
+Array<MidiKeyChange> get_key_changes(const Track *t);
+
+Scale ViewModeMidi::cur_scale()
+{
+	Scale scale = Scale::C_MAJOR;
+	for (auto &kc: get_key_changes(view->cur_track()))
+		if (kc.pos < get_edit_range().offset)
+			scale = kc.key;
+	return scale;
+}
+
 void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 {
 	Range r = get_edit_range();
 	int upos = octave * 7 + urelative;
 	const Clef& clef = view->cur_track()->instrument.get_clef();
 	int clef_pos = upos - clef.offset;
-	NoteModifier mod = combine_note_modifiers(modifier, view->midi_scale.get_modifier(upos));
+	NoteModifier mod = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
 	int pitch = uniclef_to_pitch(upos);
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
 	set_cursor_pos(r.end(), true);
 	select_in_edit_cursor();
-	start_midi_preview(pitch, 0.1f);
+	start_midi_preview({pitch}, 0.1f);
 }
 
 void ViewModeMidi::edit_add_note_on_string(int hand_pos)
@@ -322,7 +333,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 	cur_layer()->add_midi_note(n);
 	set_cursor_pos(r.end(), true);
 	select_in_edit_cursor();
-	start_midi_preview(pitch, 0.1f);
+	start_midi_preview({pitch}, 0.1f);
 }
 
 void ViewModeMidi::edit_backspace()
@@ -684,7 +695,7 @@ Selection ViewModeMidi::get_hover()
 			if ((mode == MidiMode::CLASSICAL)){
 				s.clef_position = mp->screen_to_clef_pos(my);
 				int upos = s.track->instrument.get_clef().position_to_uniclef(s.clef_position);
-				s.modifier = combine_note_modifiers(modifier, view->midi_scale.get_modifier(upos));
+				s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
 				s.pitch = uniclef_to_pitch(upos, s.modifier);
 				s.type = Selection::Type::MIDI_PITCH;
 				s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves

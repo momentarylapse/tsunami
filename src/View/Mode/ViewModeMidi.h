@@ -21,6 +21,7 @@ class TrackLayer;
 class ScrollBar;
 class MidiInput;
 class SignalChain;
+class Scale;
 enum class NoteModifier;
 enum class ChordType;
 
@@ -63,6 +64,7 @@ public:
 	Range get_edit_range();
 	Range get_backwards_range();
 	void start_midi_preview(const Array<int> &pitch, float ttl);
+	Scale cur_scale();
 
 	void edit_add_pause();
 	void edit_add_note_on_string(int hand_pos);

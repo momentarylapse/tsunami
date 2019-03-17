@@ -1519,7 +1519,7 @@ Grid
 
 0
 0
-4
+2
 Text
 me_t_partition
 
@@ -1529,30 +1529,6 @@ me_t_partition
 SpinButton
 beat_partition
 range=1:256,expandx
-1
-0
-0
-Text
-me_t_scale
-
-0
-1
-0
-Grid
-?
-
-1
-1
-2
-ComboBox
-scale_root
-expandx
-0
-0
-0
-ComboBox
-scale_type
-expandx
 1
 0
 0
@@ -4794,7 +4770,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-475
+474
 // Text
 /cancel
 Cancel
@@ -5347,9 +5323,6 @@ Modifier:
 
 midi_editor/me_t_partition
 Sub beats
-
-midi_editor/me_t_scale
-Scale
 
 midi_editor/midi_edit_mode
 Select\\Single tone\\Interval\\Chord

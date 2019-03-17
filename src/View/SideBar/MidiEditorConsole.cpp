@@ -47,8 +47,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 		add_string("scale_root", rel_pitch_name(11 - i));
 	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
 		add_string("scale_type", Scale::get_type_name((Scale::Type)i));
-	set_int("scale_root", 11 - view->midi_scale.root);
-	set_int("scale_type", (int)view->midi_scale.type);
 
 
 	layer = nullptr;
@@ -57,8 +55,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 
 	event("beat_partition", [=]{ on_beat_partition(); });
 	event("note_length", [=]{ on_note_length(); });
-	event("scale_root", [=]{ on_scale(); });
-	event("scale_type", [=]{ on_scale(); });
 	event("midi_edit_mode", [=]{ on_creation_mode(); });
 	event("interval", [=]{ on_interval(); });
 	event("chord_type", [=]{ on_chord_type(); });
@@ -158,11 +154,6 @@ void MidiEditorConsole::on_view_vtrack_change()
 void MidiEditorConsole::on_settings_change()
 {
 	update();
-}
-
-void MidiEditorConsole::on_scale()
-{
-	view->set_scale(Scale((Scale::Type)get_int("scale_type"), 11 - get_int("scale_root")));
 }
 
 void MidiEditorConsole::on_beat_partition()

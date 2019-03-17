@@ -11,7 +11,7 @@ class Set : public Array<T>
 		using DynamicArray::num;
 
 		Set() : Array<T>(){}
-		Set(const T &item) : Array<T>(item){}
+		Set(const T &item) : Array<T>({item}){}
 
 		int _cdecl add(const T &item)
 		{

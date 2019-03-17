@@ -7,11 +7,6 @@ Dialog midi_editor "Midi" width=380 height=516
 				Grid ? ""
 					Text me_t_partition "Sub beats"
 					SpinButton beat_partition "4" range=1:256 expandx
-					---|
-					Text me_t_scale "Scale"
-					Grid ? ""
-						ComboBox scale_root "" expandx
-						ComboBox scale_type "" expandx
 			Group me_group_creation "Creation"
 				Grid ? "" vertical
 					TabControl midi_edit_mode "Select\\Single tone\\Interval\\Chord" left

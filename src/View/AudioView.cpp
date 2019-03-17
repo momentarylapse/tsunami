@@ -212,7 +212,6 @@ void AudioView::MouseSelectionPlanner::stop()
 }
 
 AudioView::AudioView(Session *_session, const string &_id) :
-	midi_scale(Scale::C_MAJOR),
 	cam(this)
 {
 	id = _id;
@@ -456,13 +455,6 @@ void AudioView::set_mode(ViewMode *m)
 		mode->on_start();
 	}
 	thm.dirty = true;
-	force_redraw();
-}
-
-void AudioView::set_scale(const Scale &s)
-{
-	midi_scale = s;
-	notify(MESSAGE_SETTINGS_CHANGE);
 	force_redraw();
 }
 

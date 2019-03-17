@@ -139,9 +139,9 @@ Array<Node*> SyntaxTree::parse_operand_extension_element(Node *operand, Block *b
 		Exp.next();
 		if (deref){
 			operand->type = type->parent->get_pointer();
-			return operand;
+			return {operand};
 		}
-		return ref_node(operand, type->parent->get_pointer());
+		return {ref_node(operand, type->parent->get_pointer())};
 	}
 
 
@@ -150,7 +150,7 @@ Array<Node*> SyntaxTree::parse_operand_extension_element(Node *operand, Block *b
 		for (auto &e: type->elements)
 			if (Exp.cur == e.name){
 				Exp.next();
-				return shift_node(operand, deref, e.offset, e.type);
+				return {shift_node(operand, deref, e.offset, e.type)};
 			}
 	}
 
@@ -320,7 +320,7 @@ Node *SyntaxTree::parse_operand_extension_call(Array<Node*> links, Block *block)
 			Node *c = new Node(KIND_POINTER_CALL, 0, TypeVoid);
 			c->set_num_params(1);
 			c->set_param(0, p);
-			links = c;
+			links = {c};
 			//do_error("calling pointer...");
 		}else{
 			do_error("can't call " + kind2str(l->kind));
@@ -403,12 +403,12 @@ Node *SyntaxTree::parse_operand_extension(Array<Node*> operands, Block *block)
 			do_error("left side of '[' is ambiguous");
 		// array?
 
-		operands = parse_operand_extension_array(operands[0], block);
+		operands = {parse_operand_extension_array(operands[0], block)};
 
 	}else if (Exp.cur == "("){
 		// array?
 
-		operands = parse_operand_extension_call(operands, block);
+		operands = {parse_operand_extension_call(operands, block)};
 
 
 	}else if (op_no >= 0){
@@ -649,13 +649,13 @@ Node *SyntaxTree::parse_operand(Block *block)
 	// ( -> one level down and combine commands
 	if (Exp.cur == "("){
 		Exp.next();
-		operands = parse_command(block);
+		operands = {parse_command(block)};
 		if (Exp.cur != ")")
 			do_error("\")\" expected");
 		Exp.next();
 	}else if (Exp.cur == "&"){ // & -> address operator
 		Exp.next();
-		operands = ref_node(parse_operand(block));
+		operands = {ref_node(parse_operand(block))};
 	}else if (Exp.cur == "*"){ // * -> dereference
 		Exp.next();
 		Node *sub = parse_operand(block);
@@ -663,7 +663,7 @@ Node *SyntaxTree::parse_operand(Block *block)
 			Exp.rewind();
 			do_error("only pointers can be dereferenced using \"*\"");
 		}
-		operands = deref_node(sub);
+		operands = {deref_node(sub)};
 	}else if (Exp.cur == "["){
 		Exp.next();
 		Array<Node*> el;
@@ -675,7 +675,7 @@ Node *SyntaxTree::parse_operand(Block *block)
 				break;
 			Exp.next();
 		}
-		operands = build_list(this, el);
+		operands = {build_list(this, el)};
 		Exp.next();
 	}else{
 		// direct operand
@@ -683,7 +683,7 @@ Node *SyntaxTree::parse_operand(Block *block)
 		if (operands.num > 0){
 
 			if (operands[0]->kind == KIND_STATEMENT){
-				operands = parse_statement(block);
+				operands = {parse_statement(block)};
 
 			}else if (operands[0]->kind == KIND_PRIMITIVE_OPERATOR){
 				// unary operator
@@ -695,7 +695,7 @@ Node *SyntaxTree::parse_operand(Block *block)
 			}else if (operands[0]->kind == KIND_CLASS){
 				clear_nodes(operands);
 				const Class *t = parse_type();
-				operands = new Node(KIND_CLASS, (int_p)t, TypeClass);
+				operands = {new Node(KIND_CLASS, (int_p)t, TypeClass)};
 			}else{
 				Exp.next();
 				// direct operand!
@@ -706,7 +706,7 @@ Node *SyntaxTree::parse_operand(Block *block)
 			if (t == TypeUnknown)
 				do_error("unknown operand");
 
-			operands = add_node_const(add_constant(t));
+			operands = {add_node_const(add_constant(t))};
 			// constant for parameter (via variable)
 			get_constant_value(Exp.cur, *operands[0]->as_const());
 			Exp.next();
@@ -1905,7 +1905,7 @@ void SyntaxTree::parse_class()
 		}
 	}
 
-	for (ClassElement &e: _class->elements)
+	for (auto &e: _class->elements)
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
 	_class->size = ProcessClassSize(_class->name, _offset);

@@ -300,7 +300,7 @@ void draw_group_ndata(Painter *c, const Array<NoteData> &d, float rr)
 
 bool find_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData> &group, int beat_length)
 {
-	group = d;
+	group = {d};
 	for (int j=i+1; j<ndata.num; j++){
 		// non-continguous?
 		if (ndata[j].offset != ndata[j-1].end)
@@ -323,7 +323,7 @@ bool find_long_group(Array<NoteData> &ndata, NoteData &d, int i, Array<NoteData>
 {
 	if (ndata.num < i + 4)
 		return false;
-	group = d;
+	group = {d};
 	for (int j=i+1; j<i+4; j++){
 		// non-continguous?
 		if (ndata[j].offset != ndata[j-1].end)

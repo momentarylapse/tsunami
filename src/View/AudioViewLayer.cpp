@@ -227,7 +227,7 @@ Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers)
 				group.add(m);
 			}else{
 				groups.add(group);
-				group = m; // new group
+				group = {m}; // new group
 			}
 		}else{
 			group.add(m);

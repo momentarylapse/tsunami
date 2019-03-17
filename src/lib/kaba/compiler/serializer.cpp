@@ -720,7 +720,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 			do_error(format("[..]: can not find %s.add(%s) function???", com->type->name.c_str(), com->type->parent->name.c_str()));
 		instance = AddReference(ret, com->type->get_pointer());
 		for (int i=0; i<com->params.num; i++){
-			AddFunctionCall(cf->func, instance, params[i], p_none);
+			AddFunctionCall(cf->func, instance, {params[i]}, p_none);
 		}
 	}else if (com->kind == KIND_BLOCK){
 		serialize_block(com->as_block());

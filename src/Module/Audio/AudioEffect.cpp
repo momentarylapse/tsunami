@@ -56,16 +56,6 @@ int AudioEffect::read(AudioBuffer &buf)
 	return samples;
 }
 
-void AudioEffect::do_process_track(TrackLayer *l, const Range &r)
-{
-	sample_rate = l->song()->sample_rate;
-	AudioBuffer buf;
-	l->get_buffers(buf, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);
-	process(buf);
-	session->song->execute(a);
-}
-
 
 AudioEffect *CreateAudioEffect(Session *session, const string &name)
 {

@@ -599,6 +599,30 @@ void TsunamiWindow::on_paste_time()
 	app->clipboard->paste_with_time(view);
 }
 
+void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win)
+{
+	auto *p = new Progress(_("applying effect"), win);
+	fx->sample_rate = l->song()->sample_rate;
+	fx->reset_state();
+
+	AudioBuffer buf;
+	l->get_buffers(buf, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);
+
+	int chunk_size = 2048;
+	int done = 0;
+	while (done < r.length){
+		p->set((float)done / (float)r.length);
+
+		auto ref = buf.ref(done, done + chunk_size);
+		fx->process(ref);
+		done += chunk_size;
+	}
+
+	l->song()->execute(a);
+	delete p;
+}
+
 void TsunamiWindow::on_menu_execute_audio_effect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
@@ -611,8 +635,7 @@ void TsunamiWindow::on_menu_execute_audio_effect()
 		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
 				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
-					fx->reset_state();
-					fx->do_process_track(l, view->sel.range);
+					fx_process_layer(l, view->sel.range, fx, this);
 				}
 		song->end_action_group();
 	}

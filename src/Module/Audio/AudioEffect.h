@@ -47,8 +47,6 @@ public:
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 	virtual int _cdecl read(AudioBuffer &buf);
-
-	void do_process_track(TrackLayer *l, const Range &r);
 };
 
 AudioEffect *_cdecl CreateAudioEffect(Session *session, const string &name);

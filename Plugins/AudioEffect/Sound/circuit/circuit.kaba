@@ -1,0 +1,344 @@
+use "linalg.kaba"
+
+
+class Node
+	float phi
+	complex pos
+	void __init__(complex p)
+		phi = 0
+		pos = p
+	string tell()
+		return "phi=" + phi
+
+enum
+	TYPE_CABLE
+	TYPE_RESISTOR
+	TYPE_CAPACITOR
+	TYPE_INDUCTOR
+	TYPE_DIODE
+
+string edge_name(int t)
+	if t == TYPE_CABLE
+		return "Cable"
+	if t == TYPE_RESISTOR
+		return "Resistor"
+	if t == TYPE_CAPACITOR
+		return "Capacitor"
+	if t == TYPE_INDUCTOR
+		return "Inductor"
+	if t == TYPE_DIODE
+		return "Diode"
+	return "???"
+
+class Edge
+	int type
+	int a, b
+	float I, U
+	void __init__(int _type, int[] n)
+		type = _type
+		a = n[0]
+		b = n[1]
+	virtual float g(float dt)
+		return 0.0
+	virtual float I_off(float dt)
+		return 0.0
+	virtual void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	virtual void iterate(float dt)
+		pass
+	virtual string tell()
+		return "???"
+	virtual void reset_state()
+
+class Cable extends Edge
+	float R
+	void __init__(int[] n)
+		super.__init__(TYPE_CABLE, n)
+	override float g(float dt)
+		return 1000
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	override string tell()
+		return "| U=" + U + " I=" + I
+
+class Resistor extends Edge
+	float R
+	void __init__(int[] n, float _r)
+		super.__init__(TYPE_RESISTOR, n)
+		R = _r
+	override float g(float dt)
+		return 1/R
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	override string tell()
+		return "R=" + R + " U=" + U + " I=" + I
+
+class Capacitor extends Edge
+	float C, U_prev
+	void __init__(int[] n, float _c)
+		super.__init__(TYPE_CAPACITOR, n)
+		C = _c
+		U_prev = 0
+	override float g(float dt)
+		return C/dt
+	override float I_off(float dt)
+		return -U_prev * C / dt
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = (U - U_prev) * g(dt)
+	override void iterate(float dt)
+		U_prev = U
+	override string tell()
+		return "C=" + C + " U=" + U + " I=" + I + " U_prev=" + U_prev + " Q=" + C*U
+	override void reset_state()
+		U_prev = 0
+
+class Inductor extends Edge
+	float L, I_prev
+	void __init__(int[] n, float _l)
+		super.__init__(TYPE_INDUCTOR, n)
+		L = _l
+		I_prev = 0
+	override float g(float dt)
+		return dt/L
+	override float I_off(float dt)
+		return I_prev
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = I_prev + U * g(dt)
+	override void iterate(float dt)
+		I_prev = I
+	override string tell()
+		return "L=" + L + " U=" + U + " I=" + I + " I_prev=" + I_prev
+	override void reset_state()
+		I_prev = 0
+
+class Diode extends Edge
+	float VT, IS, q
+	float u_low, u_high
+	float i_low, i_high
+	float g_low, g_high
+	void __init__(int[] n)
+		super.__init__(TYPE_DIODE, n)
+		VT = 0.02585
+		IS = 0.0000000001
+		q = 1.5
+		U = VT
+		u_low = -0.5
+		u_high = 1
+		g_high = (I_sch(u_high+0.01) - I_sch(u_high)) / 0.01
+		g_low = (I_sch(u_low+0.1) - I_sch(u_low)) / 0.1
+		//0.000001
+		i_high = I_sch(u_high) - u_high*g_high
+		i_low = I_sch(u_low) - u_low*g_low
+	float I_sch(float u)
+		return IS * (exp(u / q / VT) - 1)
+	float I_id(float u)
+		if u > u_high
+			return u*g_high + i_high
+		if u < u_low
+			return u*g_low + i_low
+		return IS * (exp(u / q / VT) - 1)
+	override float g(float dt)
+		if U > u_high
+			return g_high
+		if U < u_low
+			return g_low
+		return IS * exp(U / q / VT) / (q*VT)
+	override float I_off(float dt)
+		if U > u_high
+			return i_high
+		if U < u_low
+			return i_low
+		//print("Ioff=" + (I_id(U) - g(dt) * U))
+		return (I_id(U) - g(dt) * U)
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = I_id(U)
+		//print("=> I=" + I + "   U=" + U)
+	override string tell()
+		return "D U=" + U + " I=" + I
+
+class SimResult
+	float[][] U, I
+	float[][] phi
+	void clear()
+		U.clear()
+		I.clear()
+		phi.clear()
+
+class Circuit
+	Node[] nodes
+	Edge*[] edges
+	int out
+	
+	void __init__()
+		reset()
+	
+	void reset()
+		nodes.clear()
+		nodes.add(Node(complex(0.2, 0.3)))
+		nodes.add(Node(complex(0.2, 0.7)))
+		out = 1
+		for e in edges
+			delete e
+		edges.clear()
+	
+	void reset1()
+		nodes.clear()
+		nodes.add(Node(complex(0.1, 0.1)))
+		nodes.add(Node(complex(0.1, 0.4)))
+		nodes.add(Node(complex(0.9, 0.4)))
+		out = 2
+		
+		edges.add(new Resistor([0, 1], 100))
+		edges.add(new Resistor([0, 2], 100))
+		edges.add(new Resistor([0, 2], 100))
+		edges.add(new Resistor([1, 2], 100))
+	
+	void reset_state()
+		for e in edges
+			e.reset_state()
+	
+	void tell()
+		print("---------------------------")
+		for n in nodes
+			print(n.tell())
+		for e,i in edges
+			print(e.tell())
+		print("---------------------------")
+	
+	void quick_out()
+		string s
+		for e in edges
+			s += "" + e.U + "\t" + e.I + "\t"
+		print(s)
+
+	void create_G(Matrix G, float dt)
+		int n = len(nodes)-1
+		G.clear(n,n)
+		for e in edges
+			int a = e.a-1
+			int b = e.b-1
+			float g = e.g(dt)
+			if a >= 0 and b >= 0
+				G.add(a, b, -g)
+				G.add(b, a, -g)
+			if a >= 0
+				G.add(a, a, g)
+			if b >= 0
+				G.add(b, b, g)
+	
+	void create_I(float[] I, float I_in, float dt)
+		int n = nodes.num-1
+		I = [I_in]
+		I.resize(n)
+		for e in edges
+			int a = e.a-1
+			int b = e.b-1
+			float I_off = e.I_off(dt)
+			if a >= 0
+				I[a] += I_off
+			if b >= 0
+				I[b] -= I_off
+
+	void optimizer_step(float I_in, float dt)
+		int n = nodes.num-1
+		Matrix G
+		create_G(G, dt)
+		//print("G")
+		//print(G)
+		
+		
+		float[] I
+		create_I(I, I_in, dt)
+		//print("I " + I)
+	
+		// U = R * I
+		// I = G * U
+		float[] u = G.solve(I)
+		//print("u " + u)
+		
+		// update potentials
+		for i in 0:n
+			nodes[i+1].phi = u[i]
+		// update edges
+		for e in edges
+			e.update(nodes, dt)
+	
+	void time_step(float I_in, float dt)
+		
+		//print("-----")
+		for i in 0:15
+			optimizer_step(I_in, dt)
+		
+		// update edges
+		for e in edges
+			e.iterate(dt)
+	
+	float get_xxxx()
+		float Uin = nodes[1].phi
+		float Uout = nodes[out].phi
+		float factor = Uout / Uin
+		//print(factor)
+		return factor
+	
+	void simulate(float t_max, float dt, float amp, float omega, int type, SimResult res)
+		for t in 0:t_max:dt
+		
+			// input
+			float input = amp
+			if type == 1
+				input = amp * sin(t * omega)
+			else if type == 2
+				if sin(t * omega) < 0
+					input = 0
+			else if type == 3
+				input = amp * loop(t*omega/2/pi, -1, 1)
+			
+			
+			time_step(input, dt)
+			
+			// result
+			float[] I, U, phi
+			for e in edges
+				I.add(e.I)
+				U.add(e.U)
+			for n in nodes
+				phi.add(n.phi)
+			res.U.add(U)
+			res.I.add(I)
+			res.phi.add(phi)
+	
+	void save(string filename)
+		File* f = FileCreateText(filename)
+		for n in nodes
+			f << "Node"
+			f << n.pos.x
+			f << n.pos.y
+		for e in edges
+			f << edge_name(e.type)
+			f << e.a
+			f << e.b
+		delete f
+
+void _main()
+	Circuit c
+	//c.nodes.add(Node(complex(0,0)))
+	//c.edges.add(new Diode([0, 2]))
+	//c.edges.add(new Resistor([2,1], 1))
+	c.edges.add(new Diode([0, 1]))
+	SimResult res
+	c.simulate(1, 1, 0.1, 1, 0, res)
+
+void __main()
+	Diode* d = new Diode([0,0])
+	return
+	for f in 0.5:1.5:0.01
+	//	print(f)
+		d.U = f
+		print(d.I_id(f))
+	

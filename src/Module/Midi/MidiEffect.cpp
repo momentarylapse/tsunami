@@ -14,7 +14,6 @@
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
 #include "../../Data/SongSelection.h"
-#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::AUDIO, "out")
 {

@@ -254,6 +254,9 @@ void SIAddPackageHui()
 			class_add_func("set_string", TypeVoid, mf(&hui::Panel::set_string));
 				func_add_param("id", TypeString);
 				func_add_param("s", TypeString);
+			class_add_func("add_string", TypeVoid, mf(&hui::Panel::add_string));
+				func_add_param("id", TypeString);
+				func_add_param("s", TypeString);
 			class_add_func("get_string", TypeString, mf(&hui::Panel::get_string));
 				func_add_param("id", TypeString);
 			class_add_func("set_float", TypeVoid, mf(&hui::Panel::set_float));

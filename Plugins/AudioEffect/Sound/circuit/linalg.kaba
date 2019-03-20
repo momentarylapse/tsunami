@@ -1,0 +1,75 @@
+
+class Matrix
+	float[] e
+	int n, m
+	void __init__()
+		n = 0
+		m = 0
+	void __init__(float[][] el)
+		n = len(el) // rows
+		m = len(el[0]) // columns
+		e.resize(n*m)
+		for i in 0:n
+			for j in 0:m
+				e[i*m + j] = el[i][j]
+	void clear(int _n, int _m)
+		n = _n
+		m = _m
+		e.clear()
+		e.resize(n*m)
+	void add(int i, int j, float f)
+		e[i * m + j] += f
+	float get(int i, int j)
+		return e[i * m + j]
+	string str()
+		string[] s
+		for i in 0:n
+			s.add(e[i*m:(i+1)*m])
+		return s.join("\n")
+	void diagonalize(float[] b)
+		for i in 0:n
+			float f = get(i,i)
+			if f == 0
+				f = 0.0000001
+			//print f
+			for j in i:m
+				e[i * m + j] /= f
+			b[i] /= f
+			
+			for ii in i+1:n
+				float g = get(ii, i)
+				for j in i:m
+					e[ii * m + j] -= e[i * m + j] * g
+				b[ii] -= b[i] * g
+	float[] solve(float[] b)
+		if n != m or b.num != n
+			raise(new Exception("size mismatch"))
+		Matrix mm = *self
+		float[] x
+		x.resize(m)
+		float[] bb = b
+		mm.diagonalize(bb)
+		
+		int i = n-1
+		while i >= 0
+			float s = 0
+			for j in i+1:n
+				s += mm.get(i, j) * x[j]
+			float f = mm.get(i, i)
+			if abs(f) > 0.00001
+				x[i] = (bb[i] - s) // / f
+			else
+				x[i] = 0
+			i --
+		return x
+
+
+
+// ok
+void _test_solve()
+	Matrix mm = Matrix([[2.,1.],[-1.,2.]])
+	print(mm)
+	float[] x = mm.solve([1.0,1.0])
+	print("-------")
+	print(x)
+

@@ -1,0 +1,26 @@
+use "../api.kaba"
+
+const string AUTO_CONFIG_FREQ = "0:10000:0.1:1:Hz"
+const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+
+class Config extends PluginData
+	float freq
+	float volume
+	override void __init__()
+		reset()
+	override void reset()
+		freq = 880
+		volume = 0.8
+
+class SineSource extends AudioSource
+	Config config
+	int offset
+	override void reset_state()
+		offset = 0
+	override int read(AudioBuffer buf)
+		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * config.freq * 2.0 * pi
+		for i in 0:buf.length
+			buf.r[i] = sin((i + offset) * w_f) * config.volume
+			buf.l[i] = sin((i + offset) * w_f) * config.volume
+		offset += buf.length
+		return buf.length

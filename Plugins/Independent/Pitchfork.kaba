@@ -1,56 +1,40 @@
 // Image = hui:media-play
 // Title[Deutsch] = Stimmgabel
 use "../api.kaba"
+use "../AudioSource/Sine.kaba"
 
 
-class ForkRenderer extends AudioSource
-	int offset
-	float freq
-	float volume
-	override void __init__()
-		offset = 0
-		freq = 880
-		volume = 0.8
-	override int read(AudioBuffer buf)
-		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * freq * 2.0 * pi
-		for i in 0:buf.length
-			buf.r[i] = sin((i + offset) * w_f) * volume
-			buf.l[i] = sin((i + offset) * w_f) * volume
-		offset += buf.length
-		return buf.length
 
 class PitchForkDialog extends ConfigPanel
-	PitchFork *fork
+	override PitchFork* c
 	
-	override void __init__(PitchFork *pf)
+	override void __init__(Module *pf)
 		add_grid("", 0, 0, "table")
 		set_target("table")
 		add_spin_button("!expandx", 0, 0, "frequency")
 		add_label("Hz", 1, 0, "")
-		
-		fork = pf
 	
-		event("frequency", &onFrequency)
+		event("frequency", &on_frequency)
 	
-		set_float("frequency", fork.renderer.freq)
+		set_float("frequency", c.source.config.freq)
 
-	void onFrequency()
-		fork.renderer.freq = get_float("")
+	void on_frequency()
+		c.source.config.freq = get_float("")
 
 class PitchFork extends TsunamiPlugin
-	OutputStream *stream
-	ForkRenderer *renderer
+	SignalChain* chain
+	SineSource* source
 	override void on_start()
 	
-		renderer = new ForkRenderer
-		stream = new OutputStream(session)
-		stream.plug(0, renderer, 0)
+		chain = new SignalChain(session, "pitch-fork")
+		source = chain.add(MODULE_AUDIO_SOURCE, "Sine")
+		Module* out = chain.add(MODULE_STREAM, "AudioOutput")
+		chain.connect(source, 0, out, 0)
 		
-		stream.play()
+		chain.start()
 	
 	override ConfigPanel* create_panel()
 		return new PitchForkDialog(self)
 
 	override void on_stop()
-		delete stream
-		delete renderer
+		delete chain

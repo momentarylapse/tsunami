@@ -40,9 +40,9 @@ class BlurredDot
 			p.draw_circle(pos.x, pos.y, r)
 
 class MetronomePanel extends ConfigPanel
-	BeatSource *source
-	OutputStream *stream
-	Metronome *metro
+	BeatSource* source
+	SignalChain* chain
+	Metronome* metro
 	float fraction_prev
 	
 	bool fullscreen
@@ -53,7 +53,7 @@ class MetronomePanel extends ConfigPanel
 	
 	BlurredDot dot
 	
-	void __init__(Session *session, BeatSource *_source, OutputStream *_stream, Metronome *_metro)
+	void __init__(Session* session, BeatSource* _source, SignalChain* _chain, Metronome* _metro)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
@@ -61,7 +61,7 @@ Grid ? '' vertical
 
 		metro = _metro		
 		source = _source
-		stream = _stream
+		chain = _chain
 		fraction_prev = 0
 		
 		embed(source.create_panel(), "config", 0, 0)
@@ -172,8 +172,8 @@ Grid ? '' vertical
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
 		bool paused = false
-		if stream
-			paused = !stream.is_playing()
+		if chain
+			paused = chain.is_paused()
 		if paused
 			p.set_font_size(fs)
 			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
@@ -190,11 +190,11 @@ Grid ? '' vertical
 		fraction_prev = beat_fraction
 	
 	void on_area_left_button_down()
-		if stream
-			if stream.is_playing()
-				stream.stop()
+		if chain
+			if chain.is_paused()
+				chain.start()
 			else
-				stream.start()
+				chain.stop()
 		redraw("area")
 	
 	void on_area_right_button_down()
@@ -248,28 +248,27 @@ Grid ? '' vertical
 		//show_control()*/
 
 class Metronome extends TsunamiPlugin
-	BeatMidifier *beat_midifier
-	OutputStream *stream
+	SignalChain* chain
 	BeatSource *source
-	Synthesizer *synth
 	
 	override void on_start()
-		source = CreateBeatSource(session, "Metronome")
-		beat_midifier = CreateBeatMidifier(session)
-		beat_midifier.plug(0, source, 0)
-		synth = CreateSynthesizer(session, "")
-		synth.plug(0, beat_midifier, 0)
-	
-		stream = new OutputStream(session)
-		stream.plug(0, synth, 0)
-		stream.set_buffer_size(1024)
-		//stream.set_update_dt(UPDATE_DT)
-		stream.start()
-			
+		chain = new SignalChain(session, "metronome")
+		source = chain._add(CreateBeatSource(session, "Metronome"))
+		
+		Module *beat_midifier = chain.add(MODULE_PLUMBING, "BeatMidifier")
+		Module *synth = chain.add(MODULE_SYNTHESIZER, "")
+		Module *out = chain.add(MODULE_STREAM, "AudioOutput")
+		
+		chain.connect(source, 0, beat_midifier, 0)
+		chain.connect(beat_midifier, 0, synth, 0)
+		chain.connect(synth, 0, out, 0)
+		
+		chain.set_buffer_size(1024)
+		//chain.set_update_dt(UPDATE_DT)
+		chain.start()
+
 	override ConfigPanel* create_panel()
-		return new MetronomePanel(session, source, stream, self)
+		return new MetronomePanel(session, source, chain, self)
 		
 	override void on_stop()
-		delete stream
-		delete synth
-		delete source
+		delete chain

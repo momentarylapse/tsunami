@@ -559,6 +559,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SignalChain.connect", Kaba::mf(&SignalChain::connect));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
 	Kaba::LinkExternal("SignalChain.set_buffer_size", Kaba::mf(&SignalChain::set_buffer_size));
+	Kaba::LinkExternal("SignalChain.is_paused", Kaba::mf(&SignalChain::is_paused));
+	Kaba::LinkExternal("SignalChain.is_active", Kaba::mf(&SignalChain::is_playback_active));
 	Kaba::DeclareClassVirtualIndex("SignalChain", "set_pos", Kaba::mf(&SignalChain::set_pos), &chain);
 	Kaba::DeclareClassVirtualIndex("SignalChain", "get_pos", Kaba::mf(&SignalChain::get_pos), &chain);
 

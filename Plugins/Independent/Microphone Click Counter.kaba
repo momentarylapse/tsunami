@@ -9,8 +9,8 @@ const float THRESHOLD2 = 0.15
 const float RECOVER_TIME = 0.40
 
 class ClickCounterDialog extends ConfigPanel
-	MicrophoneClickCounter *counter
-	override void __init__(MicrophoneClickCounter *_counter)
+	override MicrophoneClickCounter* c
+	override void __init__(Module *_c)
 		//super.__init__("Click Counter", 300, 175, _counter.session.win, false)
 		add_grid("", 0, 0, "grid")
 		set_target("grid")
@@ -19,8 +19,6 @@ class ClickCounterDialog extends ConfigPanel
 		set_target("grid2")
 		add_button("+", 0, 0, "inc")
 		add_button("-", 1, 0, "dec")
-		
-		counter = _counter
 	
 		event_x("drawing", "hui:draw", &on_draw)
 		event("inc", &on_increase)
@@ -36,31 +34,31 @@ class ClickCounterDialog extends ConfigPanel
 	
 
 
-	void draw_volume(Painter *c)
-		c.set_color(colors.text_soft3)
+	void draw_volume(Painter *p)
+		p.set_color(colors.text_soft3)
 		float y0 = 30
-		float y1 = c.height - 5
+		float y1 = p.height - 5
 		float h = y1 - y0
-		c.draw_rect(5, y0 + h * (1 - counter.Volume), 5, h)
-		c.set_color(colors.text_soft2)
-		c.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		p.draw_rect(5, y0 + h * (1 - c.Volume), 5, h)
+		p.set_color(colors.text_soft2)
+		p.draw_line(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	void on_draw(Painter *c)
-		c.set_color(colors.background)
-		c.set_font_size(12)
-		c.draw_rect(0, 0, c.width, c.height)
+	void on_draw(Painter *p)
+		p.set_color(colors.background)
+		p.set_font_size(12)
+		p.draw_rect(0, 0, p.width, p.height)
 	
-		draw_volume(c)
+		draw_volume(p)
 	
-		c.set_color(colors.text)
-		c.draw_str(100, 100, counter.counter.str())
+		p.set_color(colors.text)
+		p.draw_str(100, 100, c.counter.str())
 
 	void on_increase()
-		counter.counter ++
+		c.counter ++
 		redraw("drawing")
 
 	void on_decrease()
-		counter.counter --
+		c.counter --
 		redraw("drawing")
 
 class MicrophoneClickCounter extends TsunamiPlugin
@@ -75,6 +73,8 @@ class MicrophoneClickCounter extends TsunamiPlugin
 
 	bool active
 	int active_ttl
+	
+	ARGH.... need AudioRecorder exported
 	
 	override void on_start()
 

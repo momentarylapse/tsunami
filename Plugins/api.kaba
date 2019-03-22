@@ -496,21 +496,6 @@ class OutputStream extends Module
 	extern float get_volume()
 	extern void set_volume(float volume)
 
-/*class AudioInput //: Observable
-	RingBuffer current_buffer
-	AudioBuffer buffer
-	MidiNoteBuffer midi
-	extern void start(int type, int sample_rate)
-	extern void stop()
-	extern bool isCapturing()
-	extern void resetSync()
-	extern int getDelay()
-	extern int getSampleCount()
-	extern void accumulate(bool enable)
-	extern void resetAccumulation()
-	extern void addObserver(void *handler, void *func)
-	extern void removeObserver(void *handler)*/
-
 class _MidiPort
 	int client, port
 	string client_name, port_name
@@ -524,7 +509,6 @@ class InputStreamAudio extends Module
 	extern void stop()
 	extern bool is_capturing()
 	extern int sample_rate()
-	//extern void set_backup_mode(int mode)
 
 class Storage
 	extern bool load(Song *s, string filename)
@@ -544,6 +528,8 @@ class SignalChain extends Module
 	extern void connect(Module* source, int source_port, Module* target, int target_port)
 	extern void start()
 	extern void stop()
+	extern bool is_paused()
+	extern bool is_active()
 	extern void set_update_dt(float dt)
 	extern override int get_pos()
 	extern override void set_pos(int pos)

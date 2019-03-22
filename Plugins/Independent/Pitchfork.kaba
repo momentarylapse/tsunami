@@ -1,29 +1,10 @@
 // Image = hui:media-play
 // Title[Deutsch] = Stimmgabel
 use "../api.kaba"
-use "../AudioSource/Sine.kaba"
-
-
-
-class PitchForkDialog extends ConfigPanel
-	override PitchFork* c
-	
-	override void __init__(Module *pf)
-		add_grid("", 0, 0, "table")
-		set_target("table")
-		add_spin_button("!expandx", 0, 0, "frequency")
-		add_label("Hz", 1, 0, "")
-	
-		event("frequency", &on_frequency)
-	
-		set_float("frequency", c.source.config.freq)
-
-	void on_frequency()
-		c.source.config.freq = get_float("")
 
 class PitchFork extends TsunamiPlugin
 	SignalChain* chain
-	SineSource* source
+	Module* source
 	override void on_start()
 	
 		chain = new SignalChain(session, "pitch-fork")
@@ -34,7 +15,7 @@ class PitchFork extends TsunamiPlugin
 		chain.start()
 	
 	override ConfigPanel* create_panel()
-		return new PitchForkDialog(self)
+		return source.create_panel()
 
 	override void on_stop()
 		delete chain

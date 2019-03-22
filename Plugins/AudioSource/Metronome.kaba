@@ -1,8 +1,8 @@
 // Image = hui:add
 // Title[Deutsch] = Metronom
 
-use "../../api.kaba"
-use "../../MidiSource/Metronome.kaba"
+use "../api.kaba"
+use "../MidiSource/Metronome.kaba"
 
 class MetroConfig extends PluginData
 	float beats_per_minute
@@ -15,7 +15,7 @@ class MetroConfig extends PluginData
 
 
 
-class Metronome extends AudioEffect
+class Metronome extends AudioSource
 	MetroConfig config
 	Synthesizer *synth
 	MetronomeSource *source
@@ -29,18 +29,19 @@ class Metronome extends AudioEffect
 		delete source
 		delete synth
 
-	override void process(AudioBuffer buf)
+	override int read(AudioBuffer buf)
 		float sample_rate = session.sample_rate()
 		synth.set_sample_rate(sample_rate)
 		source.sample_rate = sample_rate
 		source.config.volume = config.volume
 		source.set_beats(config.beats_per_measure, 1)
 		source.set_bpm(config.beats_per_minute)
-		synth.render(buf)
+		return synth.out.read_audio(buf)
 		
 	override ConfigPanel *create_panel()
-		// how to deal with configuration/string exports...
 		//return source.create_panel()
+		// how to deal with configuration/string exports...
+		
 		return new MetronomePanel(self)
 	
 	override void reset_state()
@@ -62,9 +63,9 @@ class MetronomePanel extends ConfigPanel
 		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
 		add_label("%", 2, 2, "")
 	
-		event("beats_per_minute", &onMetroBeats)
-		event("beats_per_measure", &onMetroMeasure)
-		event("volume", &onMetroVolume)
+		event("beats_per_minute", &on_bpm)
+		event("beats_per_measure", &on_beats)
+		event("volume", &on_volume)
 	
 		update()
 
@@ -74,15 +75,15 @@ class MetronomePanel extends ConfigPanel
 		set_float("volume", c.config.volume * 100)
 		//SliderSet(self, "volume", c.config.volume)
 
-	void onMetroBeats()
+	void on_bpm()
 		c.config.beats_per_minute = get_float("")
 		changed()
 
-	void onMetroMeasure()
+	void on_beats()
 		c.config.beats_per_measure = get_int("")
 		changed()
 
-	void onMetroVolume()
+	void on_volume()
 		c.config.volume = get_float("") / 100
 		//m.config.volume = SliderGet(self, "volume")
 		changed()

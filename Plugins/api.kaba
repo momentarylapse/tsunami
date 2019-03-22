@@ -261,6 +261,7 @@ class Synthesizer extends Module
 	int[] active_pitch
 	bool auto_generate_stereo
 	MidiEventBuffer events
+	Port *out
 	extern override void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)

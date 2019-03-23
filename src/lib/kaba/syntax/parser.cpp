@@ -1522,6 +1522,23 @@ Node *SyntaxTree::parse_statement_str(Block *block)
 	return cmd;
 }
 
+// local (variable) definitions...
+Node *SyntaxTree::parse_statement_let(Block *block)
+{
+	Exp.next(); // "let"
+	string name = Exp.cur;
+	Exp.next();
+
+	if (Exp.cur != "=")
+		do_error("'=' required after 'let' declaration");
+	Exp.next();
+
+	auto* rhs = parse_command(block);
+	auto *var = block->add_var(name, rhs->type);
+	int op_no = which_primitive_operator("=");
+	return link_operator(op_no, add_node_local_var(var), rhs);
+}
+
 Node *SyntaxTree::parse_statement(Block *block)
 {
 	if (Exp.cur == IDENTIFIER_FOR){
@@ -1561,6 +1578,8 @@ Node *SyntaxTree::parse_statement(Block *block)
 		return parse_statement_str(block);
 	}else if (Exp.cur == IDENTIFIER_LEN){
 		return parse_statement_len(block);
+	}else if (Exp.cur == IDENTIFIER_LET){
+		return parse_statement_let(block);
 	}
 	return nullptr;
 }

@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.-1.2";
+string LibVersion = "0.17.0.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -46,6 +46,7 @@ const string IDENTIFIER_SIZEOF = "sizeof";
 const string IDENTIFIER_TYPE = "type";
 const string IDENTIFIER_STR = "str";
 const string IDENTIFIER_LEN = "len";
+const string IDENTIFIER_LET = "let";
 const string IDENTIFIER_NAMESPACE = "namespace";
 const string IDENTIFIER_RETURN_VAR = "-return-";
 const string IDENTIFIER_VTABLE_VAR = "-vtable-";
@@ -1276,6 +1277,7 @@ void SIAddBasicCommands()
 	add_statement(IDENTIFIER_TYPE, STATEMENT_TYPE, 1);
 	add_statement(IDENTIFIER_STR, STATEMENT_STR, 1);
 	add_statement(IDENTIFIER_LEN, STATEMENT_LEN, 1);
+	add_statement(IDENTIFIER_LET, STATEMENT_LET);
 	add_statement(IDENTIFIER_ASM, STATEMENT_ASM);
 	add_statement(IDENTIFIER_TRY, STATEMENT_TRY); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_EXCEPT, STATEMENT_EXCEPT); // return: ParamType will be defined by the parser!

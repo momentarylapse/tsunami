@@ -48,6 +48,7 @@ extern const string IDENTIFIER_SIZEOF;
 extern const string IDENTIFIER_TYPE;
 extern const string IDENTIFIER_STR;
 extern const string IDENTIFIER_LEN;
+extern const string IDENTIFIER_LET;
 extern const string IDENTIFIER_NAMESPACE;
 extern const string IDENTIFIER_RETURN_VAR;
 extern const string IDENTIFIER_VTABLE_VAR;
@@ -157,6 +158,7 @@ enum
 	STATEMENT_PASS,
 	STATEMENT_STR,
 	STATEMENT_LEN,
+	STATEMENT_LET,
 	NUM_STATEMENTS
 };
 

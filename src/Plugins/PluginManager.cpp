@@ -32,6 +32,7 @@
 #include "../Module/Audio/AudioSource.h"
 #include "../Module/Audio/SongRenderer.h"
 #include "../Module/Audio/AudioVisualizer.h"
+#include "../Module/Audio/PitchDetector.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Beats/BeatSource.h"
@@ -233,6 +234,12 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "__delete__", Kaba::mf(&AudioVisualizer::__delete__), &avis);
 	Kaba::DeclareClassVirtualIndex("AudioVisualizer", "process", Kaba::mf(&AudioVisualizer::process), &avis);
 	Kaba::LinkExternal("AudioVisualizer.set_chunk_size", Kaba::mf(&AudioVisualizer::set_chunk_size));
+
+	//PitchDetector pd;
+	Kaba::DeclareClassSize("PitchDetector", sizeof(PitchDetector));
+	Kaba::DeclareClassOffset("PitchDetector", "frequency", _offsetof(PitchDetector, frequency));
+	Kaba::DeclareClassOffset("PitchDetector", "volume", _offsetof(PitchDetector, volume));
+	Kaba::DeclareClassOffset("PitchDetector", "loud_enough", _offsetof(PitchDetector, loud_enough));
 
 	Kaba::DeclareClassSize("AudioBuffer", sizeof(AudioBuffer));
 	Kaba::DeclareClassOffset("AudioBuffer", "offset", _offsetof(AudioBuffer, offset));

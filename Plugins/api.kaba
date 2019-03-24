@@ -240,6 +240,9 @@ class MidiSource extends Module
 	extern override int get_pos()
 	extern override void set_pos(int pos)
 
+class PitchDetector extends MidiSource
+	float frequency, volume
+	bool loud_enough
 
 class PitchRenderer
 	extern void __init__(Synthesizer *synth, int pitch)

@@ -200,32 +200,76 @@ struct AutoConfigDataPitch : public AutoConfigData
 {
 	float *value;
 	string id;
+	string id_freq;
+	string id_mode;
+	string id_hz;
 	ConfigPanel *panel;
+	hui::Callback callback;
 	AutoConfigDataPitch(const string &_name) :
 		AutoConfigData(Type::PITCH, _name)
 	{
 		value = nullptr;
 		panel = nullptr;
+		callback = nullptr;
 	}
 	void parse(const string &s) override
 	{}
-	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &cb) override
 	{
+		callback = cb;
 		id = "pitch-" + i2s(i);
+		id_freq = "freq-" + i2s(i);
+		id_hz = "hz-" + i2s(i);
+		id_mode = "mode-" + i2s(i);
+		string id_grid = "grid-" + i2s(i);
 		panel = p;
-		p->add_combo_box("!width=150,expandx", 1, i, id);
+		p->add_grid("", 1, i, id_grid);
+		p->add_toggle_button("f", 2, i, id_mode);
+		p->set_tooltip(id_mode, _("mode: frequency/pitch"));
+		p->set_target(id_grid);
+		p->add_combo_box("!width=150,expandx", 0, 0, id);
 		for (int j=0; j<MAX_PITCH; j++)
 			p->add_string(id, pitch_name(j));
+		p->add_spin_button("!range=0:10000:0.1,expandx", 1, 0, id_freq);
+		p->add_label("Hz", 2, 0, id_hz);
+		on_mode();
 		p->set_int(id, *value);
-		p->event(id, callback);
+		p->set_float(id_freq, pitch_to_freq(*value));
+		p->event(id, [=]{ on_pitch(); });
+		p->event(id_freq, [=]{ on_freq(); });
+		p->event(id_mode, [=]{ on_mode(); });
 	}
 	void get_value() override
 	{
-		*value = panel->get_int(id);
+		bool m = panel->is_checked(id_mode);
+		if (m)
+			*value = freq_to_pitch(panel->get_float(id_freq));
+		else
+			*value = panel->get_int(id);
 	}
 	void set_value() override
 	{
 		panel->set_int(id, *value);
+		panel->set_float(id_freq, pitch_to_freq(*value));
+	}
+	void on_pitch()
+	{
+		float p = panel->get_float(id);
+		panel->set_float(id_freq, pitch_to_freq(p));
+		callback();
+	}
+	void on_freq()
+	{
+		float f = panel->get_float(id_freq);
+		panel->set_int(id, freq_to_pitch(f));
+		callback();
+	}
+	void on_mode()
+	{
+		bool m = panel->is_checked(id_mode);
+		panel->hide_control(id, m);
+		panel->hide_control(id_freq, !m);
+		panel->hide_control(id_hz, !m);
 	}
 };
 

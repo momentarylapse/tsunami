@@ -1,13 +1,14 @@
 use "../api.kaba"
+use "../tone.kaba"
 
-const string AUTO_CONFIG_FREQUENCY = "0:10000:0.1:1:Hz"
+const string AUTO_CONFIG_PITCH = "" //"0:10000:0.1:1:Hz"
 const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
 
 class Config extends PluginData
-	float frequency
+	float pitch
 	float volume
 	override void reset()
-		frequency = 880
+		pitch = 64
 		volume = 0.8
 
 class SineSource extends AudioSource
@@ -16,7 +17,8 @@ class SineSource extends AudioSource
 	override void reset_state()
 		offset = 0
 	override int read(AudioBuffer buf)
-		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * config.frequency * 2.0 * pi
+		let f = pitch_to_freq(config.pitch)
+		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * f * 2.0 * pi
 		for i in 0:buf.length
 			buf.r[i] = sin((i + offset) * w_f) * config.volume
 			buf.l[i] = sin((i + offset) * w_f) * config.volume

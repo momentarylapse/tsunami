@@ -118,7 +118,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 			tt.midi_instrument = t->instrument.midi_no();
 			tt.tuning = t->instrument.string_pitch;
 			if (tt.tuning.num == 0)
-				tt.tuning = Instrument(Instrument::Type::ELECTRIC_GUITAR).string_pitch;
+				tt.tuning = {0,0,0,0,0,0};
 			tt.t = t;
 			tracks.add(tt);
 		}
@@ -462,8 +462,8 @@ void FormatGuitarPro::read_measure_header()
 void FormatGuitarPro::write_measure_header(Bar *b)
 {
 	f->write_byte(0x03);
-	f->write_byte(b->beats.num);
-	f->write_byte(4);
+	f->write_byte(b->total_sub_beats);
+	f->write_byte(4 * b->divisor);
 	if (version >= 500){
 		//if ((flags & 0x03) != 0)
 			f->write_int(0); // beam 8 notes
@@ -648,7 +648,7 @@ Array<int> decompose_time(int length)
 Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 {
 	// samples per 16th / 3
-	float spu = (float)b->range().length / (float)b->beats.num / (float)BEAT_PARTITION;
+	float spu = (float)b->range().length / (float)b->total_sub_beats * (float)b->divisor / (float)BEAT_PARTITION;
 
 	MidiNoteBufferRef notes = t->t->layers[0]->midi.get_notes(b->range());
 	Array<GuitarNote> gnotes;
@@ -661,7 +661,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar *b)
 		gn.pitch.add(n->pitch);
 		if (gn.length == 0)
 			continue;
-		if (gn.offset < b->beats.num * BEAT_PARTITION)
+		if (gn.offset < b->total_sub_beats * BEAT_PARTITION)
 			gnotes.add(gn);
 	}
 
@@ -726,7 +726,7 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar *b)
 		GuitarNote g;
 		g.length = BEAT_PARTITION;
 		while (true){
-			if (g.length * 2 > BEAT_PARTITION * b->beats.num)
+			if (g.length * 2 > BEAT_PARTITION * b->total_sub_beats)
 				break;
 			g.length *= 2;
 		}
@@ -804,17 +804,19 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 	if (is_pause)
 		f->write_byte(0x02);
 
-	if (length == 1)
+	if (length == 1){
 		f->write_byte(2);
-	else if (length == 2)
+	}else if (length == 2){
 		f->write_byte(1);
-	else if (length == 4)
+	}else if (length == 4){
 		f->write_byte(0);
-	else if (length == 8)
+	}else if (length == 8){
 		f->write_byte(255);
-	else if (length == 16)
+	}else if (length == 16){
 		f->write_byte(254);
-	else{
+	}else if (length == 32){
+		f->write_byte(253);
+	}else{
 		f->write_byte(0);
 		od->error(format("invalid gp length: %d", length));
 	}

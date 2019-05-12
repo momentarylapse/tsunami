@@ -91,7 +91,7 @@ static string read_str41(File *f)
 void FormatGuitarPro::save_song(StorageOperationData *_od)
 {
 	od = _od;
-	a = od->song;
+	song = od->song;
 	char data[16];
 
 	f = FileCreate(od->filename);
@@ -111,7 +111,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
 
 	//Array<Track*> tracks;
-	for (Track *t : a->tracks)
+	for (Track *t : song->tracks)
 		if (t->type == SignalType::MIDI){
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
@@ -122,10 +122,10 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 			tt.t = t;
 			tracks.add(tt);
 		}
-	Array<Bar*> bars = a->bars.get_bars(Range::ALL);
+	Array<Bar*> bars = song->bars.get_bars(Range::ALL);
 	tempo = 90;
 	if (bars.num > 0)
-		tempo = (bars[0]->bpm(a->sample_rate) + 0.5f);
+		tempo = (bars[0]->bpm(song->sample_rate) + 0.5f);
 
 
 	write_info();
@@ -180,7 +180,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 void FormatGuitarPro::load_song(StorageOperationData *_od)
 {
 	od = _od;
-	a = od->song;
+	song = od->song;
 	char data[16];
 	tracks.clear();
 	measures.clear();
@@ -241,7 +241,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 		msg_write(format("measures: %d   tracks: %d", num_measures, num_tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header();
-		a->add_track(SignalType::BEATS);
+		song->add_track(SignalType::BEATS);
 		for (int i=0; i<num_tracks; i++)
 			read_track();
 
@@ -253,11 +253,11 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 			for (int j = 0; j < num_tracks; j++)
 				read_measure(measures[i], tracks[j], offset);
 			if (measures[i].marker.num > 0)
-				a->tracks[0]->add_marker(Range(offset, 0), measures[i].marker);
-			int length = (int)(a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator);
+				song->tracks[0]->add_marker(Range(offset, 0), measures[i].marker);
+			int length = (int)(song->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator);
 			offset += length;
 			BarPattern b = BarPattern(length, measures[i].numerator, 1);
-			a->add_bar(-1, b, false);
+			song->add_bar(-1, b, false);
 		}
 
 	}catch(Exception &e){
@@ -273,28 +273,28 @@ void FormatGuitarPro::read_info()
 	string s;
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("title", s);
+		song->add_tag("title", s);
 	read_str41(f);
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("artist", s);
+		song->add_tag("artist", s);
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("album", s);
+		song->add_tag("album", s);
 	if (version >= 500){
 		s = read_str41(f);
 		if (s.num > 0)
-			a->add_tag("lyricist", s);
+			song->add_tag("lyricist", s);
 	}
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("author", s);
+		song->add_tag("author", s);
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("copyright", s);
+		song->add_tag("copyright", s);
 	s = read_str41(f);
 	if (s.num > 0)
-		a->add_tag("writer", s);
+		song->add_tag("writer", s);
 	read_str41(f);
 	int n = f->read_int();
 	for (int i=0; i<n; i++)
@@ -303,15 +303,15 @@ void FormatGuitarPro::read_info()
 
 void FormatGuitarPro::write_info()
 {
-	write_str41(f, a->get_tag("title"));
+	write_str41(f, song->get_tag("title"));
 	write_str41(f, "");
-	write_str41(f, a->get_tag("artist"));
-	write_str41(f, a->get_tag("album"));
+	write_str41(f, song->get_tag("artist"));
+	write_str41(f, song->get_tag("album"));
 	if (version >= 500)
-		write_str41(f, a->get_tag("lyricist"));
-	write_str41(f, a->get_tag("author"));
-	write_str41(f, a->get_tag("copy"));
-	write_str41(f, a->get_tag("writer"));
+		write_str41(f, song->get_tag("lyricist"));
+	write_str41(f, song->get_tag("author"));
+	write_str41(f, song->get_tag("copy"));
+	write_str41(f, song->get_tag("writer"));
 	write_str41(f, "");
 	f->write_int(0); // #comments
 }
@@ -459,11 +459,27 @@ void FormatGuitarPro::read_measure_header()
 	measures.add(m);
 }
 
+#include "../../Data/TrackMarker.h"
+
 void FormatGuitarPro::write_measure_header(Bar *b)
 {
-	f->write_byte(0x03);
+	// part?
+	auto parts = song->get_parts();
+	TrackMarker *mm = nullptr;
+	for (auto *p: parts)
+		if (abs(b->range().offset - p->range.offset) < 100)
+			mm = p;
+
+	unsigned char flags = 0x03; // divisor + denominator
+	if (mm)
+		flags |= 0x20;
+	f->write_byte(flags);
 	f->write_byte(b->total_sub_beats);
 	f->write_byte(4 * b->divisor);
+	if (mm){
+		write_str41(f, mm->text);
+		f->write_int(0xbb0000); // color
+	}
 	if (version >= 500){
 		//if ((flags & 0x03) != 0)
 			f->write_int(0); // beam 8 notes
@@ -478,7 +494,7 @@ void FormatGuitarPro::read_track()
 {
 	f->read_byte();
 	GpTrack tt;
-	tt.t = a->add_track(SignalType::MIDI);
+	tt.t = song->add_track(SignalType::MIDI);
 	tt.t->set_name(read_str1c(f, 40));
 	int stringCount = f->read_int();
 	for (int i=0; i<7; i++){
@@ -1005,7 +1021,7 @@ int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 			od->error(format("unknown beat division: %d", divisionType));
 		}
 	}
-	return a->sample_rate * value * 60.0f / (float)tempo;
+	return song->sample_rate * value * 60.0f / (float)tempo;
 }
 
 void FormatGuitarPro::read_mix_change()

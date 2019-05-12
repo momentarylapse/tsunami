@@ -49,7 +49,6 @@ public:
 	};
 	GpChannel channels[64];
 
-	Song *a;
 	File *f;
 	StorageOperationData *od;
 

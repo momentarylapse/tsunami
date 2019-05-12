@@ -35,9 +35,9 @@ inline void draw_line_buffer(Painter *c, double view_pos, double zoom, float hf,
 
 	for (int i=i0; i<i1; i++){
 
-		double p = x0 + ((double)(i + offset) + 0.5 - view_pos) * zoom;
+		double p = ((double)(i + offset) + 0.5 - view_pos) * zoom;
 		tt[nl].x = (float)p;
-		tt[nl].y = y0 + buf[i] * hf;
+		tt[nl].y = y0 - buf[i] * hf;
 		if (zoom > 5)
 			c->draw_circle(p, tt[nl].y, 2);
 		nl ++;
@@ -49,7 +49,7 @@ inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float
 {
 	int nl = 0;
 	int i0 = max((double)x0 / zoom + view_pos - offset    , 0.0);
-	int i1 = min((double)x1 / zoom + view_pos - offset + 2, (double)buf.num);
+	int i1 = min((double)x1 / zoom + view_pos - offset + 1, (double)buf.num);
 	if (i1 < i0)
 		return;
 
@@ -58,9 +58,9 @@ inline void draw_line_buffer_sel(Painter *c, double view_pos, double zoom, float
 
 	for (int i=i0; i<i1; i++){
 
-		double p = x0 + ((double)(i + offset) + 0.5 - view_pos) * zoom;
+		double p = ((double)(i + offset) + 0.5 - view_pos) * zoom;
 		tt[nl].x = (float)p;
-		tt[nl].y = y0 + buf[i] * hf;
+		tt[nl].y = y0 - buf[i] * hf;
 		if (zoom > 5)
 			c->draw_circle(p, tt[nl].y, 4);
 		nl ++;

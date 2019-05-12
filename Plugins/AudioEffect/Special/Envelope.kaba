@@ -1,0 +1,47 @@
+use "../../api.kaba"
+
+const string AUTO_CONFIG_A = "0:1:0.0001:1:"
+const string AUTO_CONFIG_B = "0:1:0.0001:1:"
+const string AUTO_CONFIG_C = "0:1:0.0001:1:"
+
+class EnvConfig extends PluginData
+	float a, b, c
+	override void reset()
+		a = 0.1
+		b = 0.01
+		c = 0.0
+
+class Envelope extends AudioEffect
+	EnvConfig config
+	float[2] value
+	float[2] dvalue
+	
+	override void reset_state()
+		for i in 0:2
+			value[i] = 0
+			dvalue[i] = 0
+
+	void do(float[] buf, int c)
+		
+		float v = value[c]
+		float dv = dvalue[c]
+		for i in 0:len(buf)
+			float x = abs(buf[i])
+			
+			if x > v
+				// go up
+				v += (x - v) * config.a
+				dv = 0
+			else
+				// go down
+				dv -= config.c
+				v += (x - v) * config.b + dv
+
+			buf[i] = v
+		value[c] = v
+		dvalue[c] = dv
+			
+	override void process(AudioBuffer buf)
+		do(buf.r, 0)
+		if buf.channels > 1
+			do(buf.l, 1)

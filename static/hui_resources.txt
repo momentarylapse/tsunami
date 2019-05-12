@@ -1350,7 +1350,7 @@ menu_plugins
 
 7
 0
-16
+17
 Item
 plugin_on_file
 disabled
@@ -1376,75 +1376,81 @@ menu_plugins_echo
 0
 0
 Menu
-menu_plugins_pitch
+menu_plugins_filter
 
 4
 0
 0
 Menu
-menu_plugins_repair
+menu_plugins_pitch
 
 5
 0
 0
 Menu
-menu_plugins_sound
+menu_plugins_repair
 
 6
 0
 0
 Menu
-menu_plugins_synthesizer
+menu_plugins_sound
 
 7
 0
 0
 Menu
-menu_plugins_audio_source
+menu_plugins_synthesizer
 
 8
+0
+0
+Menu
+menu_plugins_audio_source
+
+9
 0
 0
 Separator
 
 
-9
+10
 0
 0
 Item
 plugin_on_midi
 disabled
-10
+11
 0
 0
 Menu
 menu_plugins_midi_effects
 
-11
+12
 0
 0
 Menu
 menu_plugins_midi_source
 
-12
+13
 0
 0
 Separator
 
 
-13
+14
 0
 0
 Menu
 menu_plugins_on_all
 
-14
+15
 0
 0
 Menu
 menu_plugins_other
 
-15
+16
 0
 0
 Menu
@@ -2029,7 +2035,7 @@ slide=right
 1
 Grid
 config-panel-grid
-width=380
+width=300,noexpandx
 0
 0
 0
@@ -4806,7 +4812,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-479
+480
 // Text
 /cancel
 Cancel
@@ -5164,6 +5170,9 @@ Dynamics
 
 menu/menu_plugins_echo
 Echo
+
+menu/menu_plugins_filter
+Filter
 
 menu/menu_plugins_midi_effects
 Effects
@@ -6251,7 +6260,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-632
+633
 // Text
 /bpm
 Bpm
@@ -6792,6 +6801,9 @@ Dynamik
 
 menu/menu_plugins_echo
 Echo
+
+menu/menu_plugins_filter
+Filter
 
 menu/menu_plugins_midi_effects
 Effekte

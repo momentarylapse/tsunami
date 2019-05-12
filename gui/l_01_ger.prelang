@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-633
+634
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1902,6 +1902,9 @@ so viele Samples werden für Ausgabestreams versucht im Ringpuffer zu behalten
 settings_dialog/suck_size
 
 die Blockgröße mit der Daten duch Signalketten \"gesaugt\" werden
+menu/menu_plugins_filter
+Filter
+
 // Num Language Strings
 220
 // Data (ID,Text)

@@ -695,10 +695,13 @@ void PluginManager::find_plugins()
 	find_plugins_in_dir("AudioEffect/", "Channels", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Dynamics", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Echo", ModuleType::AUDIO_EFFECT, this);
+	find_plugins_in_dir("AudioEffect/", "Filter", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Pitch", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Repair", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Sound", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Synthesizer", ModuleType::AUDIO_EFFECT, this);
+	// hidden...
+	find_plugins_in_dir("AudioEffect/", "Special", ModuleType::AUDIO_EFFECT, this);
 
 	// "AudioVisualizer"
 	find_plugins_in_dir("AudioVisualizer/", "", ModuleType::AUDIO_VISUALIZER, this);
@@ -730,6 +733,7 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win)
 	add_plugins_in_dir("AudioEffect/Channels/", this, m->get_sub_menu_by_id("menu_plugins_channels"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Dynamics/", this, m->get_sub_menu_by_id("menu_plugins_dynamics"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Echo/", this, m->get_sub_menu_by_id("menu_plugins_echo"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
+	add_plugins_in_dir("AudioEffect/Filter/", this, m->get_sub_menu_by_id("menu_plugins_filter"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Pitch/", this, m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Repair/", this, m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Sound/", this, m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);

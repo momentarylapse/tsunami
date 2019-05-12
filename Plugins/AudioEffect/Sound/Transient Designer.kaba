@@ -1,0 +1,66 @@
+use "../../api.kaba"
+use "../Special/Envelope.kaba"
+
+const string AUTO_CONFIG_ATTACK = "-1:10:1:100:%"
+const string AUTO_CONFIG_SUSTAIN = "-1:10:1:100:%"
+const string AUTO_CONFIG_MIX = "0:1:1:100:%"
+
+class Config extends PluginData
+	float attack
+	float sustain
+	float mix
+	override void reset()
+		attack = 2
+		sustain = 0.2
+		mix = 1.0
+
+class TransientDesigner extends AudioEffect
+	Config config
+	
+	AudioBuffer buf_fast, buf_att, buf_sus
+	Envelope env_fast, env_att, env_sus
+	
+	override void on_config()
+		env_fast.session = session
+		env_fast.config_from_string("0.2, 0, 0.0001")
+		env_att.session = session
+		env_att.config_from_string("0.02, 0, 0.0001")
+		env_sus.session = session
+		env_sus.config_from_string("0.2, 0, 0.00000002") // ~100ms release
+	
+	override void reset_state()
+		env_fast.reset_state()
+		env_att.reset_state()
+		env_sus.reset_state()
+
+	void do(float[] buf, int c, float[] h_fast, float[] h_att, float[] h_sus)
+		
+		for i in 0:len(buf)
+			// gain?
+			float gain = 0
+			float hf = h_fast[i]
+			float ha = h_att[i]
+			float hs = h_sus[i]
+			if hf > ha
+				// attack
+				gain += config.attack * (hf - ha)
+			if hf < hs
+				// sustain
+				gain += config.sustain * (hs - hf)
+			
+			// apply gain and mix
+			buf[i] = (config.mix * gain + 1) * buf[i]
+			//buf[i] = gain*2
+			//buf[i] = hs
+			
+	override void process(AudioBuffer buf)
+		buf_fast = buf
+		env_fast.process(buf_fast)
+		buf_att = buf
+		env_att.process(buf_att)
+		buf_sus = buf
+		env_sus.process(buf_sus)
+		
+		do(buf.r, 0, buf_fast.r, buf_att.r, buf_sus.r)
+		if buf.channels > 1
+			do(buf.l, 1, buf_fast.l, buf_att.l, buf_sus.l)

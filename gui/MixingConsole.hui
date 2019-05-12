@@ -13,4 +13,4 @@ Dialog mixing-console "" width=300 height=200
 			Label ? "" expandy
 			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat
 		Revealer config-revealer "" slide=right
-			Grid config-panel-grid "" width=380
+			Grid config-panel-grid "" width=300 noexpandx

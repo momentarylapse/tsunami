@@ -45,17 +45,18 @@ public:
 	Range _cdecl range0() const;
 
 	void _cdecl clear();
-	void _cdecl clear_x(int channels);
+	void _cdecl set_zero();
+	void _cdecl set_channels(int channels);
 	void _cdecl resize(int length);
 	bool _cdecl is_ref() const;
 	void _cdecl make_own();
-	void _cdecl scale(float volume, float panning = 0);
+	void _cdecl mix_stereo(float volume, float panning = 0);
 	void _cdecl swap_ref(AudioBuffer &b);
 	void _cdecl swap_value(AudioBuffer &b);
 	void _cdecl append(const AudioBuffer &b);
-	void _cdecl set(const AudioBuffer &b, int offset, float volume);
-	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume);
-	void _cdecl add(const AudioBuffer &b, int offset, float volume, float panning);
+	void _cdecl set(const AudioBuffer &b, int offset, float volume = 1.0f);
+	void _cdecl set_x(const AudioBuffer &b, int offset, int length, float volume = 1.0f);
+	void _cdecl add(const AudioBuffer &b, int offset, float volume = 1.0f);
 	void _cdecl set_as_ref(const AudioBuffer &b, int offset, int length);
 
 	AudioBuffer _cdecl ref(int start, int end);

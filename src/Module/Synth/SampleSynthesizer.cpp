@@ -37,5 +37,5 @@ void SampleSynthesizer::renderNote(AudioBuffer& buf, const Range& range, float p
 	SampleRef *s = samples[pitch];
 	if (!s)
 		return;
-	buf.add(*s->buf, range.start(), volume, 0);
+	buf.add(*s->buf, range.start(), volume);
 }

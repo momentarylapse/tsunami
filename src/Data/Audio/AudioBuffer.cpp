@@ -11,7 +11,12 @@
 #include "../../lib/math/math.h"
 //#include <math.h>
 #include <assert.h>
+#include "../../lib/file/msg.h"
 
+
+// mono/stereo:
+//   always have 2 channels existing and correctly sized
+//   but ignore data in mono
 
 
 // peaks:
@@ -24,12 +29,14 @@ const int AudioBuffer::PEAK_OFFSET_EXP = 3;
 const int AudioBuffer::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
 const int AudioBuffer::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 
+const int MAX_CHANNELS = 2;
+
 
 AudioBuffer::AudioBuffer()
 {
 	offset = 0;
 	length = 0;
-	channels = 2;
+	channels = MAX_CHANNELS;
 }
 
 AudioBuffer::AudioBuffer(int _length, int _channels)
@@ -46,7 +53,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b)
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i] = b.c[i];
 }
 
@@ -56,7 +63,7 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b)
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i] = std::move(b.c[i]);
 }
 
@@ -75,7 +82,7 @@ void AudioBuffer::operator=(const AudioBuffer &b)
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i] = b.c[i];
 	peaks = b.peaks;
 }
@@ -85,7 +92,7 @@ void AudioBuffer::operator=(AudioBuffer &&b)
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i] = std::move(b.c[i]);
 	peaks = std::move(b.peaks);
 }
@@ -96,19 +103,23 @@ AudioBuffer::~AudioBuffer()
 
 void AudioBuffer::clear()
 {
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].clear();
 	length = 0;
 	peaks.clear();
 }
 
-void AudioBuffer::clear_x(int _channels)
+void AudioBuffer::set_zero()
 {
-	for (int i=0; i<channels; i++)
-		c[i].clear();
-	length = 0;
+	for (int i=0; i<MAX_CHANNELS; i++)
+		memset(&c[i][0], 0, sizeof(float) * length);
 	peaks.clear();
+}
+
+void AudioBuffer::set_channels(int _channels)
+{
 	channels = _channels;
+	peaks.clear();
 }
 
 void AudioBuffer::_truncate_peaks(int _length)
@@ -131,7 +142,7 @@ void AudioBuffer::resize(int _length)
 
 	if (_length < length)
 		_truncate_peaks(_length);
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].resize(_length);
 	length = _length;
 }
@@ -152,7 +163,7 @@ void AudioBuffer::make_own()
 {
 	if (is_ref()){
 		//msg_write("bb::make_own!");
-		for (int i=0; i<channels; i++)
+		for (int i=0; i<MAX_CHANNELS; i++)
 			fa_make_own(c[i]);
 	}
 }
@@ -160,7 +171,7 @@ void AudioBuffer::make_own()
 void AudioBuffer::swap_ref(AudioBuffer &b)
 {
 	// buffer
-	for (int i=0; i<2; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].exchange(b.c[i]);
 
 	// peaks
@@ -202,43 +213,56 @@ void AudioBuffer::swap_value(AudioBuffer &b)
 {
 	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
 }
 
-void AudioBuffer::scale(float volume, float panning)
+// mixing a mono track will scale by (1,1) in the center
+// and by (0,sqrt(2)) on left/right (OVERDRIVE)!
+void AudioBuffer::mix_stereo(float volume, float panning)
 {
-	if ((volume == 1.0f) and (panning == 0))
+	if ((volume == 1.0f) and (panning == 0) and (channels == 2))
 		return;
 
-	if (volume == 0.0f){
-		for (int i=0; i<channels; i++)
-			memset(&c[i][0], 0, sizeof(float)*length);
-		peaks.clear();
-		return;
-	}
 
 	float f[2];
 	if (channels == 2){
+		f[0] = volume;
+		f[1] = volume;
+		if (panning > 0)
+			f[1] *= (1 - panning);
+		else
+			f[0] *= (1 + panning);
+	}else{
 		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
 		f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
-	}else{
-		f[0] = volume;
 	}
 
 	// scale
-	for (int j=0; j<channels; j++)
-		for (int i=0;i<length;i++)
-			c[j][i] *= f[j];
+	if (channels == 2){
+		// stereo -> stereo
+		for (int i=0;i<length;i++){
+			c[0][i] *= f[0];
+			c[1][i] *= f[1];
+		}
+	}else{
+		set_channels(2);
+		// mono -> stereo
+		for (int i=0;i<length;i++){
+			float v = c[0][i];
+			c[0][i] *= f[0];
+			c[1][i] = v * f[1];
+		}
+
+	}
 
 	peaks.clear();
 }
 
-#include "../../lib/file/msg.h"
 
-void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, float panning)
+void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume)
 {
 	/*if (source.channels > channels)
 		printf("AudioBuffer.add: channels\n");*/
@@ -248,25 +272,17 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume, floa
 	int i1 = min(source.length, length - _offset);
 
 	// add buffers
-	if ((volume == 1.0f) and (panning == 0.0f)){
+	if (volume == 1.0f){
 		for (int tc=0; tc<channels; tc++){
 			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
 				c[tc][i + _offset] += source.c[sc][i];
 		}
 	}else{
-		float f[2];
-		if (channels == 2){
-			// for source.channels = 1,2
-			f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
-			f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
-		}else{
-			f[0] = volume;
-		}
 		for (int tc=0; tc<channels; tc++){
 			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
-				c[tc][i + _offset] += source.c[sc][i] * f[tc];
+				c[tc][i + _offset] += source.c[sc][i] * volume;
 		}
 	}
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
@@ -330,7 +346,7 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 	length = _length;
 	offset = _offset + source.offset;
 	channels = source.channels;
-	for (int i=0; i<channels; i++)
+	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].set_ref(source.c[i].sub(_offset, _length));
 }
 

@@ -65,7 +65,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf)
 	}
 
 //	printf("...%d  %d  ok\n", n, buf.length);
-	buf.scale(0);
+	buf.set_zero();
 	synth->render(buf);
 
 	if (synth->auto_generate_stereo)

@@ -81,7 +81,8 @@ int TrackLayer::version_number() const
 
 void TrackLayer::read_buffers(AudioBuffer &buf, const Range &r, bool allow_ref)
 {
-	buf.clear_x(channels);
+	buf.clear();
+	buf.set_channels(channels);
 
 	// is <r> inside a buffer?
 	if (allow_ref){

@@ -122,12 +122,12 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 	int i0 = get_first_usable_track();
 	if (i0 < 0){
 		// no -> return silence
-		buf.scale(0);
+		buf.set_zero();
 	}else{
 
 		// first (un-muted) track
 		tracks[i0]->render_fx(buf);
-		buf.scale(tracks[i0]->track->volume, tracks[i0]->track->panning);
+		buf.mix_stereo(tracks[i0]->track->volume, tracks[i0]->track->panning);
 
 		// other tracks
 		for (int i=i0+1;i<tracks.num;i++){
@@ -139,10 +139,11 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
 			tracks[i]->render_fx(tbuf);
-			buf.add(tbuf, 0, t->volume, t->panning);
+			tbuf.mix_stereo(t->volume, t->panning);
+			buf.add(tbuf, 0, 1);
 		}
 
-		buf.scale(song->volume);
+		buf.mix_stereo(song->volume);
 	}
 }
 
@@ -166,7 +167,7 @@ void SongRenderer::read_basic(AudioBuffer &buf)
 	apply_curves(song, pos);
 
 	// render without fx
-	buf.scale(0);
+	buf.set_zero();
 	render_song_no_fx(buf);
 
 	// apply global fx

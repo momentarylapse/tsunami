@@ -46,6 +46,8 @@ public:
 			throw Failure(text);
 	}*/
 
+	static void assert_equal(const Array<float> &a, const Array<float> &b, float epsilon = 0.001f);
+
 	static void run_all(const string &filter);
 
 	static void sleep(float t);

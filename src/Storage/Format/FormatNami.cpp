@@ -488,7 +488,7 @@ public:
 		int channels = f->read_int(); // channels (2)
 		int bits = f->read_int(); // bit (16)
 
-		me->clear_x(channels);
+		me->set_channels(channels);
 		me->resize(num);
 
 		string data;

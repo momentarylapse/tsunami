@@ -9,6 +9,7 @@
 #include "../lib/file/msg.h"
 #include "../lib/hui/hui.h"
 #include <unistd.h>
+#include <math.h>
 
 UnitTest::UnitTest(const string &_name)
 {
@@ -42,18 +43,29 @@ void UnitTest::sleep(float t)
 	}
 }
 
+void UnitTest::assert_equal(const Array<float> &a, const Array<float> &b, float epsilon)
+{
+	if (a.num != b.num)
+		throw Failure(format("a.num (%d) != b.num (%d)", a.num, b.num));
+	for (int i=0; i<a.num; i++)
+		if (fabs(a[i] - b[i]) > epsilon)
+			throw Failure("a!=b\na: " + fa2s(a) + "\nb: " + fa2s(b));
+}
+
 #include "TestAudioBuffer.h"
 #include "TestRhythm.h"
 #include "TestStreams.h"
 #include "TestThreads.h"
 #include "TestMidiPreview.h"
 #include "TestPlugins.h"
+#include "TestMixer.h"
 
 void UnitTest::run_all(const string &filter)
 {
 	Array<UnitTest*> tests;
 	tests.add(new TestAudioBuffer);
 	tests.add(new TestRhythm);
+	tests.add(new TestMixer);
 	tests.add(new TestThreads);
 	tests.add(new TestStreams);
 	tests.add(new TestMidiPreview);

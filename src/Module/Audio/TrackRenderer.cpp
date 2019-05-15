@@ -66,7 +66,7 @@ static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
 			continue;
 
 		bpos = s->pos - range_cur.start();
-		buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
+		buf.add(*s->buf, bpos, s->volume * s->origin->volume);
 	}
 }
 
@@ -248,7 +248,7 @@ static void apply_fade(TrackLayer *l1, TrackLayer *l2, const Range &r, AudioBuff
 			tbuf2.c[c][i - r1.start()] *= a;
 	}
 
-	tbuf1.add(tbuf2, 0, 1, 0);
+	tbuf1.add(tbuf2, 0);
 }
 
 void TrackRenderer::render_audio_versioned(AudioBuffer &buf)
@@ -299,7 +299,7 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf)
 	int i0 = get_first_usable_layer();
 	if (i0 < 0){
 		// no -> return silence
-		buf.scale(0);
+		buf.set_zero();
 	}else{
 
 		// first (un-muted) layer
@@ -317,9 +317,12 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf)
 			//	continue;
 			track->layers[i]->read_buffers(tbuf, cur, true);
 			add_samples(track->layers[i], cur, tbuf);
-			buf.add(tbuf, 0, 1.0f, 0.0f);
+			buf.add(tbuf, 0);
 		}
 	}
+
+	// mono?
+	buf.channels = track->channels;
 }
 
 void TrackRenderer::render_audio(AudioBuffer &buf)

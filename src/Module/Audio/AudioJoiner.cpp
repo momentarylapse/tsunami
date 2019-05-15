@@ -30,7 +30,7 @@ int AudioJoiner::Output::read_audio(AudioBuffer& buf)
 		AudioBuffer buf_b;
 		buf_b.resize(buf.length);
 		int rb = joiner->b->read_audio(buf_b);
-		buf.add(buf_b, 0, 1, 0);
+		buf.add(buf_b, 0, 1);
 		return max(ra, rb);
 	}else if (joiner->a){
 		return joiner->a->read_audio(buf);

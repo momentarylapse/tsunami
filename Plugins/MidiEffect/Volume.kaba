@@ -1,0 +1,16 @@
+use "../api.kaba"
+
+const string AUTO_CONFIG_VOLUME = "0:1:1:100:%"
+
+class Config extends PluginData
+	float volume
+	
+	override void reset()
+		volume = 1
+
+class PitchShift extends MidiEffect
+	Config config
+	
+	override void process(MidiNoteBuffer midi)
+		for n in midi
+			n.volume = config.volume

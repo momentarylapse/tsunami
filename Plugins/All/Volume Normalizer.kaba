@@ -1,7 +1,9 @@
 use "../api.kaba"
 
 class VolumeChecker extends SongPlugin
-	override void apply()
+
+	float vol_max
+	bool check()
 		SongRenderer *renderer = new SongRenderer(song)
 		
 		ProgressX *p = new ProgressX("checking", self.session.win)
@@ -12,7 +14,7 @@ class VolumeChecker extends SongPlugin
 		
 		buf.resize(1024*16)
 		
-		float vol_max = 0
+		vol_max = 0
 		int done = 0
 		while !p.is_cancelled()
 			int n = renderer.read(buf)
@@ -25,19 +27,29 @@ class VolumeChecker extends SongPlugin
 			done += n
 			p.set("checking", i2f(done) / i2f(range.length))
 
-		if !p.is_cancelled()
-			string q = "Song reaches a peak volume of " + (vol_max * 100.0).str2(1) + "% (" + (amp2db(vol_max)).str2(1) + "dB)\n"
-			if vol_max < 0
-				q += "increase each track's volume by " + (amp2db(1/vol_max)).str2(1) + "dB to reach 100%?"
-			else
-				q += "decrease each track's volume by " + (amp2db(1/vol_max)).str2(1) + "dB to stay below 100%?"
-			string a = HuiQuestionBox(session.win, "Question", q, true)
-			if a == "hui:yes"
-				session.song.begin_action_group()
-				for t in session.song.tracks
-					t.set_volume(t.volume / vol_max * 0.999)
-				session.song.end_action_group()
+		bool cancelled = p.is_cancelled()
 
 		delete p
 		delete renderer
+		return !cancelled
+		
+	void ask()
+		string q = "Song reaches a peak volume of " + (vol_max * 100.0).str2(1) + "% (" + (amp2db(vol_max)).str2(1) + "dB)\n"
+		if vol_max > 0.95 and vol_max < 1.0
+			HuiInfoBox(session.win, "Info", q + "seems fine...")
+			return
+		if vol_max < 1
+			q += "increase each track's volume by " + (amp2db(1/vol_max)).str2(1) + "dB to reach 100%?"
+		else
+			q += "decrease each track's volume by " + (-amp2db(1/vol_max)).str2(1) + "dB to stay below 100%?"
+		string a = HuiQuestionBox(session.win, "Question", q, true)
+		if a == "hui:yes"
+			session.song.begin_action_group()
+			for t in session.song.tracks
+				t.set_volume(t.volume / vol_max * 0.999)
+			session.song.end_action_group()
+
+	override void apply()
+		if check()
+			ask()
 		

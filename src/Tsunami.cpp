@@ -133,15 +133,18 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		session->i(AppName + " " + AppVersion);
 		session->i("--help");
 		session->i("--info <FILE>");
-		session->i("--export <FILE_IN> <FILE_OUT>");
-		session->i("--execute <PLUGIN_NAME> [ARGUMENTS]");
-		session->i("--chain <SIGNAL_CHAIN_FILE>");
+		session->i("--export <FILE-IN> <FILE-OUT>");
+		session->i("--execute <PLUGIN-NAME> [ARGUMENTS]");
+		session->i("--chain <SIGNAL-CHAIN-FILE>");
+#ifndef NDEBUG
+		session->i("--run-tests <FILTER>");
+#endif
 		return true;
 	}else if (args[i] == "--info"){
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (args.num < i+2){
-			session->e(_("call: tsunami --info <File>"));
+			session->e(_("call: tsunami --info <FILE>"));
 		}else if (session->storage->load_ex(song, args[i+1], true)){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->range().length));
@@ -161,7 +164,7 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (args.num < i + 3){
-			session->e(_("call: tsunami --export <File> <Exportfile>"));
+			session->e(_("call: tsunami --export <FILE-IN> <FILE-OUT>"));
 		}else if (session->storage->load(song, args[i+1])){
 			session->storage->save(song, args[i+2]);
 		}
@@ -169,7 +172,7 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		return true;
 	}else if (args[1] == "--execute"){
 		if (args.num < i + 2){
-			session->e(_("call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]"));
+			session->e(_("call: tsunami --execute <PLUGIN-NAME> [ARGUMENTS]"));
 			return true;
 		}
 		if (session == Session::GLOBAL)
@@ -181,7 +184,7 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		//return false;
 	}else if (args[i] == "--chain"){
 		if (args.num < i + 2){
-			session->e(_("call: tsunami --chain <SIGNAL_CHAIN>"));
+			session->e(_("call: tsunami --chain <SIGNAL-CHAIN>"));
 			return true;
 		}
 		if (session == Session::GLOBAL)
@@ -190,12 +193,14 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		i ++;
 	}else if (args[i] == "--slow"){
 		ugly_hack_slow = true;
+#ifndef NDEBUG
 	}else if (args[i] == "--run-tests"){
 		if (args.num > i + 1)
 			UnitTest::run_all(args[i+1]);
 		else
-			UnitTest::run_all("");
+			UnitTest::print_all_names();
 		return true;
+#endif
 	}else if (args[i].head(2) == "--"){
 		session->e(_("unknown command: ") + args[i]);
 		return true;

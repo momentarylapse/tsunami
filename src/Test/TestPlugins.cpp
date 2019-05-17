@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#ifndef NDEBUG
+
 #include "TestPlugins.h"
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Module/Audio/AudioEffect.h"
@@ -116,3 +118,5 @@ void TestPlugins::test_synthesizer(const string &name)
 void TestPlugins::test_tsunami_plugin(const string &name)
 {
 }
+
+#endif

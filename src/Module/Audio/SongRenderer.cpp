@@ -19,52 +19,6 @@
 #include "../../lib/math/math.h"
 
 
-// preserve: rbp, rbx, r12-r15
-
-#define REGISTER_PRE \
-long long temp_rbx; \
-long long temp_rbp; \
-long long temp_r12; \
-long long temp_r13; \
-long long temp_r14; \
-long long temp_r15; \
-asm volatile("movq %%rbx, %0\n\t" \
-		"movq %%rbp, %1\n\t" \
-		"movq %%r12, %2\n\t" \
-		"movq %%r13, %3\n\t" \
-		"movq %%r14, %4\n\t" \
-		"movq %%r15, %5\n\t" \
-	: "=r" (temp_rbx), "=r" (temp_rbp), "=r" (temp_r12), "=r" (temp_r13), "=r" (temp_r14), "=r" (temp_r15) : : );
-
-
-#define REGISTER_POST \
-long long temp2_rbx; \
-long long temp2_rbp; \
-long long temp2_r12; \
-long long temp2_r13; \
-long long temp2_r14; \
-long long temp2_r15; \
-asm volatile("movq %%rbx, %0\n\t" \
-		"movq %%rbp, %1\n\t" \
-		"movq %%r12, %2\n\t" \
-		"movq %%r13, %3\n\t" \
-		"movq %%r14, %4\n\t" \
-		"movq %%r15, %5\n\t" \
-	: "=r" (temp2_rbx), "=r" (temp2_rbp), "=r" (temp2_r12), "=r" (temp2_r13), "=r" (temp2_r14), "=r" (temp2_r15) : : ); \
-if (temp_rbx != temp2_rbx) \
-	msg_error("rbx"); \
-if (temp_rbp != temp2_rbp) \
-	msg_error("rbp"); \
-if (temp_r12 != temp2_r12) \
-	msg_error("r12"); \
-if (temp_r13 != temp2_r13) \
-	msg_error("r13"); \
-if (temp_r14 != temp2_r14) \
-	msg_error("r14"); \
-if (temp_r15 != temp2_r15) \
-	msg_error("r15");
-
-
 
 
 SongRenderer::SongRenderer(Song *s, bool _direct_mode)
@@ -181,6 +135,8 @@ void SongRenderer::read_basic(AudioBuffer &buf)
 
 int SongRenderer::read(AudioBuffer &buf)
 {
+	if (!song)
+		return 0;
 	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
 
 	int size = min(buf.length, _range.end() - pos);

@@ -5,8 +5,7 @@
  *      Author: michi
  */
 
-//#include "TestMixer.h"
-
+#ifndef NDEBUG
 
 #include "TestMixer.h"
 #include "../Session.h"
@@ -186,3 +185,4 @@ void TestMixer::test_mix_mono_1track_panning_left()
 	delete s;
 }
 
+#endif

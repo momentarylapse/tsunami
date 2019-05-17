@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#ifndef NDEBUG
+
 #include "TestAudioBuffer.h"
 #include "../Data/Audio/RingBuffer.h"
 #include "../lib/file/msg.h"
@@ -19,7 +21,7 @@ TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer")
 Array<UnitTest::Test> TestAudioBuffer::tests()
 {
 	Array<Test> list;
-	list.add(Test("thread-safety", TestAudioBuffer::test_ring_buffer_thread_safety));
+	list.add(Test("ring-buffer-thread-safety", TestAudioBuffer::test_ring_buffer_thread_safety));
 	return list;
 }
 
@@ -44,9 +46,9 @@ void TestAudioBuffer::test_ring_buffer_thread_safety()
 			ring.write_ref_done(b);
 		}
 	});
+	int total_samples = 0;
+	int errors = 0;
 	std::thread consumer([&]{
-		int x = 0;
-		int errors = 0;
 		for (int i=0; i<count; i++){
 			//printf("ra %d\n", ring.available());
 			while (ring.available() < chunk_size){}
@@ -54,7 +56,7 @@ void TestAudioBuffer::test_ring_buffer_thread_safety()
 			//printf("r %d\n", i);
 			ring.read_ref(b, chunk_size);
 			for (float &f: b.c[0])
-				if (f != sin((float)x ++))
+				if (f != sin((float)total_samples ++))
 					errors ++;
 			ring.read_ref_done(b);
 			read_count ++;
@@ -63,10 +65,13 @@ void TestAudioBuffer::test_ring_buffer_thread_safety()
 				return;
 			}
 		}
-		printf("%d errors after %d samples\n", errors, x);
 	});
 
 	consumer.join();
 	producer.join();
+
+	if (errors > 0)
+		throw Failure(format("%d errors after %d samples", errors, total_samples));
 }
 
+#endif

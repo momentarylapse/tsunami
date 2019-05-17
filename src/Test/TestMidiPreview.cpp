@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#ifndef NDEBUG
+
 #include "TestMidiPreview.h"
 #include "../lib/file/msg.h"
 #include "../View/Helper/MidiPreview.h"
@@ -45,3 +47,5 @@ void TestMidiPreview::test_preview()
 	delete preview;
 	delete synth;
 }
+
+#endif

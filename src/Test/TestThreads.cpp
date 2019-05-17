@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#ifndef NDEBUG
+
 #include "TestThreads.h"
 #include "../lib/file/msg.h"
 #include "../lib/hui/hui.h"
@@ -44,3 +46,4 @@ void TestThreads::test_thread_safety()
 
 }
 
+#endif

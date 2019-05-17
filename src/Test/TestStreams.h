@@ -5,6 +5,8 @@
  *      Author: michi
  */
 
+#ifndef NDEBUG
+
 #ifndef SRC_TEST_TESTSTREAMS_H_
 #define SRC_TEST_TESTSTREAMS_H_
 
@@ -22,3 +24,5 @@ public:
 };
 
 #endif /* SRC_TEST_TESTSTREAMS_H_ */
+
+#endif

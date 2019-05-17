@@ -700,7 +700,7 @@ link
 // Resource
 Dialog
 fx_panel
-width=200,height=200
+width=300,height=200
 0
 0
 1

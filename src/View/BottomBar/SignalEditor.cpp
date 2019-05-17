@@ -25,6 +25,7 @@
 
 const float MODULE_WIDTH = 160;
 const float MODULE_HEIGHT = 25;
+extern const int CONFIG_PANEL_WIDTH = 380;
 
 static rect module_rect(Module *m)
 {
@@ -491,7 +492,6 @@ public:
 
 };
 
-
 SignalEditor::SignalEditor(Session *session) :
 	BottomBar::Console(_("Signal Chain"), session)
 {
@@ -502,7 +502,7 @@ SignalEditor::SignalEditor(Session *session) :
 	add_tab_control("!left\\aaa", 0, 0, "selector");
 	add_revealer("!slide=left", 1, 0, "revealer");
 	set_target("revealer");
-	add_grid("!width=380,noexpandx", 1, 0, config_grid_id);
+	add_grid(format("!width=%d,noexpandx", CONFIG_PANEL_WIDTH), 1, 0, config_grid_id);
 	set_target(config_grid_id);
 	add_label("!bold,center,big,expandx", 0, 0, "config-label");
 	add_label("!bold,center,expandx", 0, 1, "message");

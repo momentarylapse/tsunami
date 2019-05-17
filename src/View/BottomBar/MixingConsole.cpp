@@ -21,7 +21,9 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 
-string module_header(Module *m);
+//string module_header(Module *m);
+
+extern const int CONFIG_PANEL_WIDTH;
 
 class TrackMixer: public hui::Panel
 {
@@ -245,6 +247,7 @@ public:
 			hide_control("load_favorite", true);
 			hide_control("save_favorite", true);
 		}
+		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
 
 		event("enabled", [=]{ on_enabled(); });
 		event("delete", [=]{ on_delete(); });

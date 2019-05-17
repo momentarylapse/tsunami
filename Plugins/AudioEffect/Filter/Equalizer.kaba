@@ -403,9 +403,9 @@ class EqualizerPanel extends ConfigPanel
 	override void update()
 		grid.redraw()
 
-	override void set_large(bool large)
+	/*override void set_large(bool large)
 		if large
 			set_options("drawing", "height=380,width=500")
 		else
-			set_options("drawing", "height=250,width=380")
+			set_options("drawing", "height=250,width=380")*/
 

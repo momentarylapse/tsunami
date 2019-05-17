@@ -1,4 +1,4 @@
-Dialog fx_panel "" width=200 height=200
+Dialog fx_panel "" width=300 height=200
 	Grid grid "" expandx noexpandy vertical
 		Grid ? ""
 			MenuButton menu "" image=hui:preferences flat menu=popup_fx_menu

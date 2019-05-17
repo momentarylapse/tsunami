@@ -66,6 +66,7 @@ int RingBuffer::writable_size()
 	return read_pos - write_pos - 1;*/
 }
 
+// use with care!
 void RingBuffer::_move_read_pos(int delta)
 {
 	read_pos += delta;
@@ -74,6 +75,8 @@ void RingBuffer::_move_read_pos(int delta)
 	available_read -= delta;
 	available_write += delta;
 }
+
+// use with care!
 void RingBuffer::_move_write_pos(int delta)
 {
 	write_pos += delta;
@@ -88,7 +91,7 @@ int RingBuffer::read(AudioBuffer& b)
 	AudioBuffer ref;
 	read_ref(ref, b.length);
 	int samples_a = ref.length;
-	b.set_x(ref, 0, ref.length, 1.0f);
+	b.set(ref, 0, 1.0f);
 	read_ref_done(ref);
 
 	int samples_b = b.length - samples_a;
@@ -96,19 +99,27 @@ int RingBuffer::read(AudioBuffer& b)
 		return samples_a;
 
 	read_ref(ref, samples_b);
-	b.set_x(ref, samples_a, ref.length, 1.0f);
+	b.set(ref, samples_a, 1.0f);
 	read_ref_done(ref);
-	return samples_a + samples_b;
+	return samples_a + ref.length;
 }
 
-int RingBuffer::write(AudioBuffer& b)
+int RingBuffer::write(const AudioBuffer& b)
 {
 	AudioBuffer ref;
 	write_ref(ref, b.length);
 	int samples_a = ref.length;
-	ref.set_x(b, 0, samples_a, 1.0f);
+	ref.set(b, 0, 1.0f);
 	write_ref_done(ref);
-	return samples_a;
+
+	int samples_b = b.length - samples_a;
+	if (samples_b == 0)
+		return samples_a;
+
+	write_ref(ref, samples_b);
+	ref.set(((AudioBuffer&)b).ref(samples_a, b.length), 0);
+	write_ref_done(ref);
+	return samples_a + ref.length;
 
 	/*int samples_b = b.length - samples_a;
 	if (samples_b == 0)
@@ -148,7 +159,16 @@ void RingBuffer::read_ref_done(AudioBuffer &b)
 // get a reference of the internal buffer to write into (later)
 void RingBuffer::write_ref(AudioBuffer &b, int size)
 {
-	size = min(size, buf.length - write_pos);
+	// directly writable size?
+	if (read_pos == 0){
+		// if we write to the end, we jump to write_pos=0
+		// ...and that would mean, we're empty...
+		size = min(size, buf.length - write_pos - 1);
+	}else{
+		size = min(size, buf.length - write_pos);
+		if (read_pos > write_pos)
+			size = min(size, read_pos - write_pos);
+	}
 	b.set_as_ref(buf, write_pos, size);
 }
 

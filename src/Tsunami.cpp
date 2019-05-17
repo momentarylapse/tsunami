@@ -25,7 +25,7 @@
 #include "Plugins/TsunamiPlugin.h"
 #include "Device/DeviceManager.h"
 #include "Stream/AudioOutput.h"
-#include "Test/TestAudioBuffer.h"
+#include "Test/TestRingBuffer.h"
 
 
 const string AppName = "Tsunami";

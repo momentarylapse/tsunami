@@ -1,7 +1,7 @@
 /*
  * TestAudioBuffer.h
  *
- *  Created on: 22.07.2018
+ *  Created on: 18.05.2019
  *      Author: michi
  */
 
@@ -19,7 +19,12 @@ public:
 
 	Array<Test> tests() override;
 
-	static void test_ring_buffer_thread_safety();
+	static void test_resize();
+	static void test_append();
+	static void test_set();
+	static void test_scale();
+	static void test_ref();
+	static void test_ref_write();
 };
 
 #endif /* SRC_TEST_TESTAUDIOBUFFER_H_ */

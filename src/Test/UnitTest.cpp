@@ -10,10 +10,12 @@
 #include "UnitTest.h"
 #include "../lib/file/msg.h"
 #include "../lib/hui/hui.h"
+#include "../Data/Audio/AudioBuffer.h"
 #include <unistd.h>
 #include <math.h>
 
 #include "TestAudioBuffer.h"
+#include "TestRingBuffer.h"
 #include "TestRhythm.h"
 #include "TestStreams.h"
 #include "TestThreads.h"
@@ -77,6 +79,17 @@ void UnitTest::sleep(float t)
 	}
 }
 
+AudioBuffer UnitTest::make_buf(const Array<float> &r, const Array<float> &l)
+{
+	AudioBuffer buf;
+	buf.resize(r.num);
+	buf.c[0] = r;
+	buf.c[1] = l;
+	if (l.num != r.num)
+		throw Failure("INTERNAL: make_buf() r.len != l.len");
+	return buf;
+}
+
 void UnitTest::assert_equal(const Array<int> &a, const Array<int> &b)
 {
 	if (a.num != b.num)
@@ -95,10 +108,24 @@ void UnitTest::assert_equal(const Array<float> &a, const Array<float> &b, float 
 			throw Failure("a!=b\na: " + fa2s(a) + "\nb: " + fa2s(b));
 }
 
+void UnitTest::assert_equal(const AudioBuffer &a, const AudioBuffer &b, float epsilon)
+{
+	if (a.length != b.length)
+		throw Failure(format("a.length (%d) != b.length (%d)", a.length, b.length));
+	if (a.channels != b.channels)
+		throw Failure(format("a.channels (%d) != b.channels(%d)", a.channels, b.channels));
+	for (int ci=0; ci<a.channels; ci++)
+		for (int i=0; i<a.length; i++)
+			if (fabs(a.c[ci][i] - b.c[ci][i]) > epsilon)
+				throw Failure("a!=b (channel " + i2s(ci) + "\na: " + fa2s(a.c[ci]) + "\nb: " + fa2s(b.c[ci]));
+
+}
+
 Array<UnitTest*> UnitTest::all()
 {
 	Array<UnitTest*> tests;
 	tests.add(new TestAudioBuffer);
+	tests.add(new TestRingBuffer);
 	tests.add(new TestRhythm);
 	tests.add(new TestMixer);
 	tests.add(new TestThreads);

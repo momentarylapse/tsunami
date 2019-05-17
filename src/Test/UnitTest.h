@@ -13,6 +13,8 @@
 #include "../lib/base/base.h"
 #include <functional>
 
+class AudioBuffer;
+
 class UnitTest
 {
 public:
@@ -56,8 +58,11 @@ public:
 			throw Failure(text);
 	}*/
 
+	static AudioBuffer make_buf(const Array<float> &r, const Array<float> &l);
+
 	static void assert_equal(const Array<int> &a, const Array<int> &b);
 	static void assert_equal(const Array<float> &a, const Array<float> &b, float epsilon = 0.001f);
+	static void assert_equal(const AudioBuffer &a, const AudioBuffer &b, float epsilon = 0.001f);
 
 	static Array<UnitTest*> all();
 	static void run_all(const string &filter);

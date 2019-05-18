@@ -1060,7 +1060,7 @@ int pref_bar_index(AudioView *view)
 	if (view->sel.bar_gap >= 0)
 		return view->sel.bar_gap;
 	if (!view->sel.bar_indices.empty())
-		return view->sel.bar_indices.end() + 1;
+		return view->sel.bar_indices.end();
 	if (view->hover_before_leave.pos > 0)
 		return view->song->bars.num;
 	return 0;

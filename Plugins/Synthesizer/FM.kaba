@@ -244,7 +244,7 @@ class FMRenderer extends PitchRenderer
 			for o,oi in osc
 				OscillatorConfig *co = &conf[oi]
 				if co.target_out
-					buf.r[i] += o.output
+					buf.l[i] += o.output
 				for t,j in co.target
 					if t
 						osc[j].input += o.output

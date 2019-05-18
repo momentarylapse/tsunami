@@ -16,8 +16,8 @@ class SinusRenderer extends PitchRenderer
 		volume = 0
 
 	override bool render(AudioBuffer buf)
-		for i in 0:buf.length
-			buf.r[i] += sin(phase) * volume
+		for i in 0:len(buf)
+			buf.l[i] += sin(phase) * volume
 			phase += delta_phi
 			if phase > 2*pi
 				phase -= 2*pi

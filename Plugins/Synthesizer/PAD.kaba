@@ -85,7 +85,7 @@ class PADRenderer extends PitchRenderer
 			if env.just_killed
 				return false
 				
-			buf.r[i] += d
+			buf.l[i] += d
 			pos ++
 			if pos >= N
 				pos = 0

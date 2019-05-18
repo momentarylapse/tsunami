@@ -227,33 +227,33 @@ void AudioBuffer::mix_stereo(float volume, float panning)
 		return;
 
 
-	float f[2];
+	float fl, fr;
 	if (channels == 2){
-		f[0] = volume;
-		f[1] = volume;
+		fl = volume;
+		fr = volume;
 		if (panning > 0)
-			f[1] *= (1 - panning);
+			fl *= (1 - panning);
 		else
-			f[0] *= (1 + panning);
+			fr *= (1 + panning);
 	}else{
-		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
-		f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
+		fl = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
+		fr = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
 	}
 
 	// scale
 	if (channels == 2){
 		// stereo -> stereo
 		for (int i=0;i<length;i++){
-			c[0][i] *= f[0];
-			c[1][i] *= f[1];
+			c[0][i] *= fl;
+			c[1][i] *= fr;
 		}
 	}else{
 		set_channels(2);
 		// mono -> stereo
 		for (int i=0;i<length;i++){
 			float v = c[0][i];
-			c[0][i] *= f[0];
-			c[1][i] = v * f[1];
+			c[0][i] *= fl;
+			c[1][i] = v * fr;
 		}
 
 	}
@@ -561,17 +561,17 @@ inline float _clamp_(float f)
 // always outputting stereo... (for OutputStreams)
 void AudioBuffer::interleave(float *p, float volume) const
 {
-	float *pr = &c[0][0];
-	float *pl = &c[1][0];
+	float *pl = &c[0][0];
+	float *pr = &c[1][0];
 	if (volume == 1.0f){
 		if (channels == 2){
 			for (int i=0; i<length; i++){
-				*p ++ = _clamp_(*pr ++);
 				*p ++ = _clamp_(*pl ++);
+				*p ++ = _clamp_(*pr ++);
 			}
 		}else{
 			for (int i=0; i<length; i++){
-				float ff = _clamp_(*pr ++);
+				float ff = _clamp_(*pl ++);
 				*p ++ = ff;
 				*p ++ = ff;
 			}
@@ -579,12 +579,12 @@ void AudioBuffer::interleave(float *p, float volume) const
 	}else{
 		if (channels == 2){
 			for (int i=0; i<length; i++){
-				*p ++ = _clamp_((*pr ++) * volume);
 				*p ++ = _clamp_((*pl ++) * volume);
+				*p ++ = _clamp_((*pr ++) * volume);
 			}
 		}else{
 			for (int i=0; i<length; i++){
-				float ff = _clamp_((*pr ++) * volume);
+				float ff = _clamp_((*pl ++) * volume);
 				*p ++ = ff;
 				*p ++ = ff;
 			}
@@ -594,26 +594,26 @@ void AudioBuffer::interleave(float *p, float volume) const
 
 void AudioBuffer::deinterleave(float *p, int num_channels)
 {
-	float *pr = &c[0][0];
-	float *pl = &c[1][0];
+	float *pl = &c[0][0];
+	float *pr = &c[1][0];
 	if (num_channels == 1){
 		if (channels == 2){
 			for (int i=0; i<length; i++){
-				*pr ++ = *p;
-				*pl ++ = *p ++;
+				*pl ++ = *p;
+				*pr ++ = *p ++;
 			}
 		}else{
-			memcpy(pr, p, length * sizeof(float));
+			memcpy(pl, p, length * sizeof(float));
 		}
 	}else if (num_channels == 2){
 		if (channels == 2){
 			for (int i=0; i<length; i++){
-				*pr ++ = *p ++;
 				*pl ++ = *p ++;
+				*pr ++ = *p ++;
 			}
 		}else{
 			for (int i=0; i<length; i++){
-				*pr ++ = *p ++;
+				*pl ++ = *p ++;
 				p ++;
 			}
 		}

@@ -178,7 +178,7 @@ class AudioVisualizer extends Module
 class AudioBuffer
 	int offset, length
 	int channels
-	float[] r, l
+	float[] l, r
 	string[] peaks
 	extern void __init__()
 	extern void __delete__()

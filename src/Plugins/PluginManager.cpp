@@ -246,8 +246,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("AudioBuffer", "length", _offsetof(AudioBuffer, length));
 	Kaba::DeclareClassOffset("AudioBuffer", "channels", _offsetof(AudioBuffer, channels));
 	Kaba::DeclareClassOffset("AudioBuffer", "c", _offsetof(AudioBuffer, c));
-	Kaba::DeclareClassOffset("AudioBuffer", "r", _offsetof(AudioBuffer, c[0]));
-	Kaba::DeclareClassOffset("AudioBuffer", "l", _offsetof(AudioBuffer, c[1]));
+	Kaba::DeclareClassOffset("AudioBuffer", "l", _offsetof(AudioBuffer, c[0]));
+	Kaba::DeclareClassOffset("AudioBuffer", "r", _offsetof(AudioBuffer, c[1]));
 	Kaba::DeclareClassOffset("AudioBuffer", "peaks", _offsetof(AudioBuffer, peaks));
 	Kaba::LinkExternal("AudioBuffer.__init__", Kaba::mf(&AudioBuffer::__init__));
 	Kaba::LinkExternal("AudioBuffer.__delete__", Kaba::mf(&AudioBuffer::__delete__));

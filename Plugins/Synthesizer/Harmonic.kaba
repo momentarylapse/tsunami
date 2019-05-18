@@ -108,14 +108,14 @@ class HarmonicRenderer extends PitchRenderer
 			float d = 0
 			for j in 0:NUM_HARMONICS
 				d += sin(phi * (j+1)) * synth.config.intensity[j]
-			buf.r[i] += d * volume
+			buf.l[i] += d * volume
 
 			phi += delta_phi
 			if phi > 8*pi
 				phi = loop(phi, 0, 2*pi)
 		
 		if buf.channels > 1
-			buf.l = buf.r
+			buf.r = buf.l
 
 		return volume > 0
 

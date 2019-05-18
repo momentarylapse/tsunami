@@ -6,13 +6,15 @@ const string AUTO_CONFIG_PANNING = "-1:1:1:100:%"
 const string AUTO_CONFIG_DISTANCE = "-2:2:0.1:100:cm"
 const string AUTO_CONFIG_INVERT = ""
 
+const float SPEED_OF_SOUND = 320.0 // m/s
+
 class Config extends PluginData
 	float panning
 	bool invert
 	float distance
 	
 	override void reset()
-		panning = 0
+		panning = 0 // INVERTED.... for historic reasons...
 		distance = 0
 		invert = false
 	
@@ -21,40 +23,42 @@ class Monofier extends AudioEffect
 	Config config
 	float[] temp
 	int offset
-	
+
 	override void reset_state()
 		offset = 0
-	
+
 	override void process(AudioBuffer buf)
 		if buf.channels == 1
 			return
-		
-		int n = (session.sample_rate() * abs(config.distance) / 320.0)
+
+		int n = (session.sample_rate() * abs(config.distance) / SPEED_OF_SOUND)
 		temp.resize(n)
-			
-		float a = (config.panning / 2) + 0.5
-		float b = (-config.panning / 2) + 0.5
+
+		float sl = (1 + config.panning) / 2
+		float sr = (1 - config.panning) / 2
 		if config.invert
-			b = -b
+			sl = -sl
 		
 		if config.distance == 0
-			for i in 0:buf.length
-				float x = a * buf.r[i] + b * buf.l[i]
+			for i in 0:len(buf)
+				float x = sl * buf.l[i] + sr * buf.r[i]
 				buf.l[i] = x
 				buf.r[i] = x
 		else if config.distance > 0
-			for i in 0:buf.length
-				float x = a * buf.r[i] + b * temp[offset]
-				temp[offset] = buf.l[i]
+			// delay right channel
+			for i in 0:len(buf)
+				float x = sl * buf.l[i] + sr * temp[offset]
+				temp[offset] = buf.r[i]
 				offset ++
 				if offset >= n
 					offset = 0
 				buf.l[i] = x
 				buf.r[i] = x
 		else if config.distance < 0
-			for i in 0:buf.length
-				float x = a * temp[offset] + b * buf.l[i]
-				temp[offset] = buf.r[i]
+			// delay left channel
+			for i in 0:len(buf)
+				float x = sl * temp[offset] + sr * buf.r[i]
+				temp[offset] = buf.l[i]
 				offset ++
 				if offset >= n
 					offset = 0

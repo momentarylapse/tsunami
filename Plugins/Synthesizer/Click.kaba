@@ -17,7 +17,7 @@ class ClickRenderer extends PitchRenderer
 
 	override bool render(AudioBuffer buf)
 		for i in 0:buf.length
-			buf.r[i] += sin(phase) * volume
+			buf.l[i] += sin(phase) * volume
 			phase += delta_phi
 			if phase > 2*pi
 				phase -= 2*pi

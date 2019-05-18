@@ -25,23 +25,23 @@ class ZeroRenderer extends PitchRenderer
 		if fade_out
 			for i in 0:buf.length
 				volume *= 0.999
-				buf.r[i] += sin(phase) * volume
+				buf.l[i] += sin(phase) * volume
 				phase += delta_phi
 		else
 			for i in 0:buf.length
-				buf.r[i] += sin(phase) * volume
+				buf.l[i] += sin(phase) * volume
 				phase += delta_phi
 				
 		// keep alive?
 		return volume > 0.001
 		
-	override void on_event(MidiEvent e)
-		print("MIDI EVENT " + e.volume)
-		if e.volume > 0
-			volume = e.volume * 0.3
-			fade_out = false
-		else
-			fade_out = true
+	override void on_start(float _volume)
+		print("MIDI START " + _volume)
+		volume = _volume * 0.3
+		fade_out = false
+	override void on_end()
+		print("MIDI END")
+		fade_out = true
 
 class Zero extends Synthesizer
 	

@@ -16,7 +16,7 @@ class Session;
 class Log : public Observable<VirtualBase>
 {
 public:
-	Log(){}
+	Log();
 	virtual ~Log(){}
 
 	static const string MESSAGE_ADD;
@@ -24,13 +24,15 @@ public:
 	void error(Session *session, const string &message);
 	void warn(Session *session, const string &message);
 	void info(Session *session, const string &message);
+	void debug(Session *session, const string &message);
 	void question(Session *session, const string &message, const Array<string> &responses);
 
 	enum class Type{
 		ERROR,
 		WARNING,
 		QUESTION,
-		INFO
+		INFO,
+		DEBUG
 	};
 
 	struct Message
@@ -42,6 +44,8 @@ public:
 	};
 
 	Array<Message> all(Session *session);
+
+	bool allow_debug;
 
 private:
 	void add_message(Session *session, Type type, const string &message, const Array<string> &responses);

@@ -88,7 +88,7 @@ void Session::i(const string &message)
 
 void Session::debug(const string &cat, const string &message)
 {
-	log->info(this, cat + ": " + message);
+	log->debug(this, cat + ": " + message);
 }
 
 void Session::w(const string &message)

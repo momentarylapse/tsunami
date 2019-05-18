@@ -11,6 +11,11 @@
 
 const string Log::MESSAGE_ADD = "Add";
 
+Log::Log()
+{
+	allow_debug = hui::Config.get_bool("Log.Debug", false);
+}
+
 
 void Log::error(Session *session, const string &message)
 {
@@ -27,6 +32,13 @@ void Log::warn(Session *session, const string &message)
 void Log::info(Session *session, const string &message)
 {
 	add_message(session, Type::INFO, message, {});
+}
+
+
+void Log::debug(Session *session, const string &message)
+{
+	if (allow_debug)
+		add_message(session, Type::DEBUG, message, {});
 }
 
 
@@ -61,11 +73,13 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 		msg_write(message);
 	}else if (type == Type::QUESTION){
 		msg_write(message);
+	}else if (type == Type::DEBUG){
+		msg_write(message);
 	}else{
 		msg_write(message);
 	}
 
 	// make sure messages are handled in the gui thread...
-	hui::RunLater(0.01f, std::bind(&Log::notify, this, MESSAGE_ADD));
+	hui::RunLater(0.01f, [=]{ notify(MESSAGE_ADD); });
 	//notify(MESSAGE_ADD);
 }

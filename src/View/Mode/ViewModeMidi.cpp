@@ -16,6 +16,8 @@
 #include "../../Data/Midi/Clef.h"
 #include "../../Data/SongSelection.h"
 #include "../../Data/Midi/Clef.h"
+#include "../../Device/Device.h"
+#include "../../Device/DeviceManager.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../Stream/MidiInput.h"
@@ -80,6 +82,9 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	preview = new MidiPreview(view->session);
 	input_chain = nullptr;
 	input = nullptr;
+	input_wanted_active = false;
+	input_device = view->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+	maximize_input_volume = false;
 
 	mouse_pre_moving_pos = -1;
 
@@ -157,8 +162,11 @@ void ri_insert(ViewModeMidi *me)
 		return;
 	Range r = me->get_edit_range();
 	for (auto &e: ri_keys){
-		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, e.volume));
-		me->start_midi_preview({(int)e.pitch}, 0.1f);
+		float vol = e.volume;
+		if (me->maximize_input_volume)
+			vol = 1;
+		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, vol));
+		me->start_midi_preview({(int)e.pitch}, 0.5f * vol);
 	}
 	ri_keys.clear();
 	me->set_cursor_pos(r.end(), true);
@@ -185,7 +193,22 @@ void on_midi_input(ViewModeMidi *me)
 
 }
 
-void ViewModeMidi::on_start()
+bool ViewModeMidi::is_input_active()
+{
+	return input_wanted_active;
+}
+
+void ViewModeMidi::activate_input(bool active)
+{
+	input_wanted_active = active;
+	if (active and !input){
+		_start_input();
+	}else if (!active and input){
+		_stop_input();
+	}
+}
+
+void ViewModeMidi::_start_input()
 {
 	input_chain = new SignalChain(session, "midi-input");
 	input = (MidiInput*)input_chain->add(ModuleType::STREAM, "MidiInput");
@@ -193,13 +216,32 @@ void ViewModeMidi::on_start()
 	input_chain->start();
 }
 
-void ViewModeMidi::on_end()
+void ViewModeMidi::_stop_input()
 {
 	input_chain->unsubscribe(this);
 	input_chain->stop();
 	delete input_chain;
 	input_chain= nullptr;
 	input = nullptr;
+}
+
+void ViewModeMidi::set_input_device(Device *d)
+{
+	input_device = d;
+	if (input)
+		input->set_device(d);
+}
+
+void ViewModeMidi::on_start()
+{
+	if (input_wanted_active)
+		_start_input();
+}
+
+void ViewModeMidi::on_end()
+{
+	if (input)
+		_stop_input();
 }
 
 void ViewModeMidi::on_left_button_down()

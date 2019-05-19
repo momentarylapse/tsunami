@@ -11,6 +11,7 @@
 #include "SideBar.h"
 
 class TrackLayer;
+class Device;
 enum class MidiMode;
 
 class MidiEditorConsole : public SideBarConsole
@@ -39,6 +40,11 @@ public:
 	void on_modifier_sharp();
 	void on_modifier_flat();
 	void on_modifier_natural();
+
+	void on_input_active();
+	void on_input_source();
+	void on_input_volume(int mode);
+	Array<Device*> input_sources;
 
 	void on_quantize();
 	void on_apply_string();

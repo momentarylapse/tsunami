@@ -18,10 +18,12 @@
 #include "../AudioViewLayer.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Device/Device.h"
 #include "MidiEditorConsole.h"
 #include "../Dialog/MarkerDialog.h"
 
-int get_track_index_save(Song *song, Track *t);
+//int get_track_index_save(Song *song, Track *t);
 
 
 MidiEditorConsole::MidiEditorConsole(Session *session) :
@@ -62,6 +64,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("modifier:sharp", [=]{ on_modifier_sharp(); });
 	event("modifier:flat", [=]{ on_modifier_flat(); });
 	event("modifier:natural", [=]{ on_modifier_natural(); });
+	event("input_active", [=]{ on_input_active(); });
+	event("input", [=]{ on_input_source(); });
+	event("input_volume:key", [=]{ on_input_volume(0); });
+	event("input_volume:max", [=]{ on_input_volume(1); });
 	event("quantize", [=]{ on_quantize(); });
 	event("apply_string", [=]{ on_apply_string(); });
 	event("apply_hand_position", [=]{ on_apply_hand_position(); });
@@ -116,6 +122,24 @@ void MidiEditorConsole::update()
 
 	set_int("beat_partition", view->mode_midi->sub_beat_partition);
 	set_int("note_length", view->mode_midi->note_length);
+
+	check("input_active", view->mode_midi->is_input_active());
+	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
+	reset("input");
+	for (auto *d: input_sources)
+		set_string("input", d->get_name());
+
+	foreachi(auto *d, input_sources, i)
+		if (d == view->mode_midi->input_device)
+			set_int("input", i);
+	enable("input", view->mode_midi->is_input_active());
+
+	if (view->mode_midi->maximize_input_volume)
+		check("input_volume:max", true);
+	else
+		check("input_volume:key", true);
+	enable("input_volume:key", view->mode_midi->is_input_active());
+	enable("input_volume:max", view->mode_midi->is_input_active());
 
 
 	if (layer->track->instrument.type == Instrument::Type::DRUMS){
@@ -234,6 +258,27 @@ void MidiEditorConsole::on_modifier_flat()
 void MidiEditorConsole::on_modifier_natural()
 {
 	view->mode_midi->modifier = NoteModifier::NATURAL;
+}
+
+void MidiEditorConsole::on_input_active()
+{
+	bool a = is_checked("");
+	view->mode_midi->activate_input(a);
+	enable("input", a);
+	enable("input_volume:key", a);
+	enable("input_volume:max", a);
+}
+
+void MidiEditorConsole::on_input_source()
+{
+	int n = get_int("");
+	if (n >= 0 and n < input_sources.num)
+		view->mode_midi->set_input_device(input_sources[n]);
+}
+
+void MidiEditorConsole::on_input_volume(int mode)
+{
+	view->mode_midi->maximize_input_volume = (mode == 1);
 }
 
 void MidiEditorConsole::clear()

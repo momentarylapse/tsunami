@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-634
+642
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -596,7 +596,7 @@ Stopp
 
 midi_editor/beat_partition
 4
-
+Schlagunterteilung, `Teilschläge`
 midi_editor/interval
 0
 
@@ -665,16 +665,16 @@ Tab
 
 midi_editor/modifier:flat
 ♭
-
+Be
 midi_editor/modifier:natural
 ♮
-
+Auflösungszeichen
 midi_editor/modifier:none
 nichts
 
 midi_editor/modifier:sharp
 ♯
-
+Kreuz
 midi_fx_editor/add
 
 neuen Effekt hinzufügen
@@ -1904,6 +1904,30 @@ settings_dialog/suck_size
 die Blockgröße mit der Daten duch Signalketten \"gesaugt\" werden
 menu/menu_plugins_filter
 Filter
+
+midi_editor/grp_input
+Keyboard Eingabe
+
+midi_editor/input_volume:key
+Druck
+Die Stärke des Tastendrucks benutzen
+midi_editor/input_volume:max
+maximal
+Stärke des Tastendrucks ignorieren und Lautstärke immer auf 100% setzen
+midi_editor/t_div
+/
+
+midi_editor/t_input
+Quelle
+
+midi_editor/t_input_volume
+Lautstärke
+
+midi_editor/t_op_add
+Neu
+
+midi_editor/input_active
+Aktiv
 
 // Num Language Strings
 220

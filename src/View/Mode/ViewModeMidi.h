@@ -20,6 +20,7 @@ class MidiPreview;
 class TrackLayer;
 class ScrollBar;
 class MidiInput;
+class Device;
 class SignalChain;
 class Scale;
 enum class NoteModifier;
@@ -108,6 +109,14 @@ public:
 
 	SignalChain *input_chain;
 	MidiInput *input;
+	Device *input_device;
+	bool input_wanted_active;
+	bool is_input_active();
+	void activate_input(bool active);
+	void _start_input();
+	void _stop_input();
+	void set_input_device(Device *d);
+	bool maximize_input_volume;
 
 	AudioViewLayer *cur_vlayer();
 	TrackLayer *cur_layer();

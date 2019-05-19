@@ -1515,33 +1515,9 @@ vertical
 0
 4
 Group
-me_group_view
-
-0
-0
-1
-Grid
-?
-
-0
-0
-2
-Text
-me_t_partition
-
-0
-0
-0
-SpinButton
-beat_partition
-range=1:256,expandx
-1
-0
-0
-Group
 me_group_creation
 
-1
+0
 0
 1
 Grid
@@ -1652,11 +1628,83 @@ t_note_length
 0
 1
 0
+Grid
+?
+
+1
+1
+3
 SpinButton
 note_length
-range=1:16
+range=1:16,expandx
+0
+0
+0
+Text
+t_div
+
+1
+0
+0
+SpinButton
+beat_partition
+range=1:256,expandx
+2
+0
+0
+Expander
+grp_input
+
+1
+0
+1
+Grid
+?
+
+0
+0
+5
+CheckBox
+input_active
+
+1
+0
+0
+Text
+t_input
+
+0
+1
+0
+ComboBox
+input
+expandx
 1
 1
+0
+Text
+t_input_volume
+
+0
+2
+0
+Grid
+?
+
+1
+2
+2
+RadioButton
+input_volume:key
+
+0
+0
+0
+RadioButton
+input_volume:max
+
+1
+0
 0
 Expander
 me_group_reference
@@ -1670,7 +1718,7 @@ height=200,noexpandy,nobar,select-multi
 0
 0
 0
-Group
+Expander
 grp_operations
 
 3
@@ -1765,11 +1813,17 @@ Grid
 
 4
 0
-1
+2
+Text
+t_op_add
+
+0
+0
+0
 Button
 add_key_change
 
-0
+1
 0
 0
 Text
@@ -4812,7 +4866,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-480
+486
 // Text
 /cancel
 Cancel
@@ -5323,7 +5377,7 @@ Apply string
 (TAB mode) Assign selected notes to this string and find the correct fret position without changing the pitch
 midi_editor/beat_partition
 4
-
+Beat partition, `sub beats`
 midi_editor/flag_none
 x
 clear flags
@@ -5336,9 +5390,21 @@ set tenuto flag
 midi_editor/flag_trill
 tr
 set trill flag
+midi_editor/grp_input
+Keyboard input
+
 midi_editor/grp_operations
 Operations
 
+midi_editor/input_active
+Active
+
+midi_editor/input_volume:key
+key speed
+Use the key pressure of the input device
+midi_editor/input_volume:max
+maximum
+Ignore key pressure and always use 100% volume
 midi_editor/interval
 0
 
@@ -5363,14 +5429,8 @@ Edit
 midi_editor/me_group_reference
 Reference tracks
 
-midi_editor/me_group_view
-View
-
 midi_editor/me_t_modifier
-Modifier:
-
-midi_editor/me_t_partition
-Sub beats
+Modifier
 
 midi_editor/midi_edit_mode
 Select\\Single tone\\Interval\\Chord
@@ -5380,27 +5440,39 @@ Midi
 
 midi_editor/modifier:flat
 ♭
-
+flat
 midi_editor/modifier:natural
 ♮
-
+natural
 midi_editor/modifier:none
 none
 
 midi_editor/modifier:sharp
 ♯
-
+sharp
 midi_editor/note_length
 1
 
 midi_editor/quantize
 Quantize
 Align selected notes to grid of sub beats
+midi_editor/t_div
+/
+
 midi_editor/t_flags
 Flags
 
+midi_editor/t_input
+Source
+
+midi_editor/t_input_volume
+Volume
+
 midi_editor/t_note_length
 Length
+
+midi_editor/t_op_add
+Add
 
 midi_fx_editor/add
 
@@ -6260,7 +6332,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-633
+641
 // Text
 /bpm
 Bpm
@@ -7002,7 +7074,7 @@ Saite setzen
 (TAB Modus) Die markierten Noten auf diese Saite setzen und die entsprechenden Bundpositionen finden, ohne die Tonhöhen zu ändern
 midi_editor/beat_partition
 4
-
+Schlagunterteilung, `Teilschläge`
 midi_editor/flag_none
 x
 alle Flags entfernen
@@ -7015,9 +7087,21 @@ Tenuto Flag setzen
 midi_editor/flag_trill
 tr
 Triller Flag setzen
+midi_editor/grp_input
+Keyboard Eingabe
+
 midi_editor/grp_operations
 Operationen
 
+midi_editor/input_active
+Aktiv
+
+midi_editor/input_volume:key
+Druck
+Die Stärke des Tastendrucks benutzen
+midi_editor/input_volume:max
+maximal
+Stärke des Tastendrucks ignorieren und Lautstärke immer auf 100% setzen
 midi_editor/interval
 0
 
@@ -7086,27 +7170,39 @@ Tab
 
 midi_editor/modifier:flat
 ♭
-
+Be
 midi_editor/modifier:natural
 ♮
-
+Auflösungszeichen
 midi_editor/modifier:none
 nichts
 
 midi_editor/modifier:sharp
 ♯
-
+Kreuz
 midi_editor/note_length
 1
 
 midi_editor/quantize
 Quantisieren
 Markierte Noten am Gitter der Teilschläge ausrichten
+midi_editor/t_div
+/
+
 midi_editor/t_flags
 Flags
 
+midi_editor/t_input
+Quelle
+
+midi_editor/t_input_volume
+Lautstärke
+
 midi_editor/t_note_length
 Länge
+
+midi_editor/t_op_add
+Neu
 
 midi_fx_editor/add
 

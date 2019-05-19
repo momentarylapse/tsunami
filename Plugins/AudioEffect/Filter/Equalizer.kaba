@@ -192,9 +192,9 @@ class Equalizer extends AudioEffect
 			overlap[channel][num_stages][i] = buf[buf.num - 2 + i]
 
 	override void process(AudioBuffer buf)
-		equalize(buf.r, 0)
+		equalize(buf.l, 0)
 		if buf.channels > 1
-			equalize(buf.l, 1)
+			equalize(buf.r, 1)
 		if grid
 			grid.set_buffer(buf)
 

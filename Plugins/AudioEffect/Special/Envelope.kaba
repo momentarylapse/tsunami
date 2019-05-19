@@ -42,6 +42,6 @@ class Envelope extends AudioEffect
 		dvalue[c] = dv
 			
 	override void process(AudioBuffer buf)
-		do(buf.r, 0)
+		do(buf.l, 0)
 		if buf.channels > 1
-			do(buf.l, 1)
+			do(buf.r, 1)

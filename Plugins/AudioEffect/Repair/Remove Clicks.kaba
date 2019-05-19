@@ -49,5 +49,5 @@ class RemoveClicks extends AudioEffect
 			unclick(b, clicks[i], clicks[i+1])
 
 	override void process(AudioBuffer buf)
-		repair(buf.r)
 		repair(buf.l)
+		repair(buf.r)

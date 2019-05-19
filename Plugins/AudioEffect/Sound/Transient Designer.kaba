@@ -61,6 +61,6 @@ class TransientDesigner extends AudioEffect
 		buf_sus = buf
 		env_sus.process(buf_sus)
 		
-		do(buf.r, 0, buf_fast.r, buf_att.r, buf_sus.r)
+		do(buf.l, 0, buf_fast.l, buf_att.l, buf_sus.l)
 		if buf.channels > 1
-			do(buf.l, 1, buf_fast.l, buf_att.l, buf_sus.l)
+			do(buf.r, 1, buf_fast.r, buf_att.r, buf_sus.r)

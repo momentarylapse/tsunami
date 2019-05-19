@@ -29,6 +29,6 @@ class Tremolo extends AudioEffect
 			bb *= f
 	
 	override void process(AudioBuffer buf)
-		doTremolo(buf.r)
+		doTremolo(buf.l)
 		if buf.channels > 1
-			doTremolo(buf.l)
+			doTremolo(buf.r)

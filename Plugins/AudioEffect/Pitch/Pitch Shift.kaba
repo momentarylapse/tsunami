@@ -34,9 +34,9 @@ class PitchShift extends AudioEffect
 		fft_c2r_inv(buf2, b)
 
 	override void process(AudioBuffer buf)
-		shift_buf(buf.r)
+		shift_buf(buf.l)
 		if buf.channels > 1
-			shift_buf(buf.l)
+			shift_buf(buf.r)
 		buf1.clear()
 		buf2.clear()
 

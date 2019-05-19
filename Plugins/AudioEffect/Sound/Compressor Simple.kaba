@@ -90,6 +90,6 @@ class Compressor extends AudioEffect
 		dgain_attack = 10 / (config.attack * session.sample_rate())
 		dgain_release = 10 / (config.release * session.sample_rate())
 		
-		compress(buf.r, squares_r, &gain_r)
+		compress(buf.l, squares_l, &gain_l)
 		if buf.channels > 1
-			compress(buf.l, squares_l, &gain_l)
+			compress(buf.r, squares_r, &gain_r)

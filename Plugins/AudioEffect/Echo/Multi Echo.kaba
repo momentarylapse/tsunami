@@ -55,14 +55,14 @@ class MultiEcho extends AudioEffect
 		refl.resize(n)
 		for r,i in refl
 			int delay_samples = session.sample_rate() * config.refl[i].delay
-			r.buf_r.resize(delay_samples)
 			r.buf_l.resize(delay_samples)
+			r.buf_r.resize(delay_samples)
 	
-			do_delay(buf.r, r.buf_r, r, config.refl[i])
+			do_delay(buf.l, r.buf_l, r, config.refl[i])
 			if buf.channels > 1
-				do_delay(buf.l, r.buf_l, r, config.refl[i])
+				do_delay(buf.r, r.buf_r, r, config.refl[i])
 	
-			r.offset += buf.length
+			r.offset += len(buf)
 	
 	override void reset_state()
 		refl.clear()

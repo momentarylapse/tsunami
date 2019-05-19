@@ -36,10 +36,7 @@ public:
 	void on_chord_type();
 	void on_chord_inversion();
 	void on_reference_tracks();
-	void on_modifier_none();
-	void on_modifier_sharp();
-	void on_modifier_flat();
-	void on_modifier_natural();
+	void on_modifier(NoteModifier m);
 
 	void on_input_active();
 	void on_input_source();

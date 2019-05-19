@@ -43,11 +43,6 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	add_string("chord_inversion", _("2nd inversion"));
 	set_int("chord_inversion", 0);
 
-	for (int i=0; i<12; i++)
-		add_string("scale_root", rel_pitch_name(11 - i));
-	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
-		add_string("scale_type", Scale::get_type_name((Scale::Type)i));
-
 
 	layer = nullptr;
 	//Enable("add", false);
@@ -60,10 +55,10 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("chord_type", [=]{ on_chord_type(); });
 	event("chord_inversion", [=]{ on_chord_inversion(); });
 	event_x("reference_tracks", "hui:select", [=]{ on_reference_tracks(); });
-	event("modifier:none", [=]{ on_modifier_none(); });
-	event("modifier:sharp", [=]{ on_modifier_sharp(); });
-	event("modifier:flat", [=]{ on_modifier_flat(); });
-	event("modifier:natural", [=]{ on_modifier_natural(); });
+	event("modifier:none", [=]{ on_modifier(NoteModifier::NONE); });
+	event("modifier:sharp", [=]{ on_modifier(NoteModifier::SHARP); });
+	event("modifier:flat", [=]{ on_modifier(NoteModifier::FLAT); });
+	event("modifier:natural", [=]{ on_modifier(NoteModifier::NATURAL); });
 	event("input_active", [=]{ on_input_active(); });
 	event("input", [=]{ on_input_source(); });
 	event("input_volume:key", [=]{ on_input_volume(0); });
@@ -240,24 +235,9 @@ void MidiEditorConsole::on_edit_song()
 	session->set_mode("default/song");
 }
 
-void MidiEditorConsole::on_modifier_none()
+void MidiEditorConsole::on_modifier(NoteModifier m)
 {
-	view->mode_midi->modifier = NoteModifier::NONE;
-}
-
-void MidiEditorConsole::on_modifier_sharp()
-{
-	view->mode_midi->modifier = NoteModifier::SHARP;
-}
-
-void MidiEditorConsole::on_modifier_flat()
-{
-	view->mode_midi->modifier = NoteModifier::FLAT;
-}
-
-void MidiEditorConsole::on_modifier_natural()
-{
-	view->mode_midi->modifier = NoteModifier::NATURAL;
+	view->mode_midi->modifier = m;
 }
 
 void MidiEditorConsole::on_input_active()

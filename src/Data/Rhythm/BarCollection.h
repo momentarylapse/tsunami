@@ -23,9 +23,10 @@ public:
 	Array<Bar*> get_bars(const Range &r);
 	int get_next_beat(int pos);
 	int get_prev_beat(int pos);
-	int get_next_sub_beat(int pos, int beat_partition);
-	int get_prev_sub_beat(int pos, int beat_partition);
-	Range expand(const Range &r, int beat_partition);
+	int get_next_sub_beat(int pos, int sub_beat_partition);
+	int get_prev_sub_beat(int pos, int sub_beat_partition);
+	Range get_sub_beats(int pos, int sub_beat_partition, int num_sub_beats);
+	Range expand(const Range &r, int sub_beat_partition);
 	Range range();
 	Range sub_range(const Range &indices);
 };

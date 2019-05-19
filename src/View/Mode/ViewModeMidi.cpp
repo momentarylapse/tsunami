@@ -913,13 +913,12 @@ Range ViewModeMidi::get_edit_range()
 		return view->sel.range;
 
 	int pos = view->sel.range.offset;
-	int a = song->bars.get_prev_sub_beat(pos+1, sub_beat_partition);
-	int b = song->bars.get_next_sub_beat(pos-1, sub_beat_partition);
-	if (a == b) // on a sub beat
-		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
-	for (int i=1; i<note_length; i++)
-		b = song->bars.get_next_sub_beat(b, sub_beat_partition);
-	return RangeTo(a, b);
+	Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, note_length);
+	if (rr.length > 0)
+		return rr;
+
+	// in case we ran out of bars
+	return RangeTo(pos, pos + note_length * session->sample_rate() / sub_beat_partition);
 }
 
 
@@ -930,13 +929,12 @@ Range ViewModeMidi::get_backwards_range()
 		return view->sel.range;
 
 	int pos = view->sel.range.offset;
-	int a = song->bars.get_prev_sub_beat(pos+1, sub_beat_partition);
-	int b = song->bars.get_next_sub_beat(pos-1, sub_beat_partition);
-	if (a == b) // on a sub beat
-		a = song->bars.get_prev_sub_beat(a, sub_beat_partition);
-	for (int i=1; i<note_length; i++)
-		a = song->bars.get_prev_sub_beat(a, sub_beat_partition);
-	return RangeTo(a, b);
+	Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, -note_length);
+		if (rr.length > 0)
+			return rr;
+
+		// in case we ran out of bars
+	return RangeTo(pos - note_length * session->sample_rate() / sub_beat_partition, pos);
 }
 
 SongSelection ViewModeMidi::get_select_in_edit_cursor()

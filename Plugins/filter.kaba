@@ -14,6 +14,8 @@ enum
 	FILTER_HIGH_PASS
 	FILTER_LOW_SHELF
 	FILTER_HIGH_SHELF
+	FILTER_LOW_PASS_LINEAR
+	FILTER_HIGH_PASS_LINEAR
 
 string filter_name(int t)
 	if t == FILTER_PEAK
@@ -33,6 +35,8 @@ string filter_name(int t)
 class BasicFilter
 	float[3] a, b
 	float sample_rate
+	
+	// requires &x != &y...
 	void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
 		// overlap
 		y[0] = b[0] * x[0] + b[1] * prev_x[1] + b[2] * prev_x[0] - a[1] * prev_y[1] - a[2] * prev_y[0]
@@ -40,6 +44,10 @@ class BasicFilter
 		// main chunk
 		for i in 2:x.num
 			y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2] - a[1] * y[i-1] - a[2] * y[i-2]
+		// save overlap
+		for i in 0:2
+			prev_x[i] = x[x.num - 2 + i]
+			prev_y[i] = y[y.num - 2 + i]
 	void __init__()
 		a[0] = 0
 		a[1] = 0
@@ -73,6 +81,10 @@ class BasicFilter
 			create_low_shelf(freq, q, gain)
 		else if mode == FILTER_HIGH_SHELF
 			create_high_shelf(freq, q, gain)
+		else if mode == FILTER_LOW_PASS_LINEAR
+			create_low_pass_linear(freq)
+		else if mode == FILTER_HIGH_PASS_LINEAR
+			create_high_pass_linear(freq)
 
 	void create_peak(float f_res, float Q, float gain)
 		float g = db_to_factor(gain)
@@ -171,10 +183,27 @@ class BasicFilter
 			b[2] = (1 - sqrt(2)*c + c*c) / a0
 			a[1] = 2*(c*c - V) / a0
 			a[2] = (V - sqrt(2*V)*c + c*c) / a0
+		
+		
+	// y[i] := α * (y[i-1] + x[i] - x[i-1])
+	void create_high_pass_linear(float f_res)
+		float RC = 1 / (2 * pi * f_res)
+		float dt = 1.0 / sample_rate
+		float α = RC / (RC + dt)
+		b[0] = α
+		b[1] = -α
+		a[1] = -α
 
+	// y[i] := α * x[i] + (1-α) * y[i-1]
+	void create_low_pass_linear(float f_res)
+		float RC = 1 / (2 * pi * f_res)
+		float dt = 1.0 / sample_rate
+		float α = dt / (RC + dt)
+		b[0] = α
+		a[1] = α - 1
 
 // filter with a state
-class Filter
+class Filter//Biquad
 	BasicFilter f
 	float[2] prev_xl, prev_xr
 	float[2] prev_yl, prev_yr

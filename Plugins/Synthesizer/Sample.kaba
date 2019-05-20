@@ -28,7 +28,7 @@ class SampleRenderer extends PitchRenderer
 			return false
 		int[] del
 		for e,i in events
-			buf.add(*sample.buf, e.pos, e.volume, 0)
+			buf.add(*sample.buf, e.pos, e.volume)
 			e.pos -= buf.length
 			if e.pos + (len(*sample.buf)) < 0
 				del.add(i)

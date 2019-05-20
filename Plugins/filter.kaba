@@ -1,4 +1,4 @@
-
+use "api.kaba"
 
 float db_to_factor(float db)
 	return pow(10, db/20)
@@ -7,7 +7,30 @@ float factor_to_db(float f)
 	return log(f) / log(10) * 20
 
 
-class Filter
+enum
+	FILTER_PEAK
+	//FILTER_NOTCH
+	FILTER_LOW_PASS
+	FILTER_HIGH_PASS
+	FILTER_LOW_SHELF
+	FILTER_HIGH_SHELF
+
+string filter_name(int t)
+	if t == FILTER_PEAK
+		return "Peak"
+	if t == FILTER_LOW_PASS
+		return "Low pass"
+	if t == FILTER_HIGH_PASS
+		return "High pass"
+	if t == FILTER_LOW_SHELF
+		return "Low shelf"
+	if t == FILTER_HIGH_SHELF
+		return "High shelf"
+	return "???"
+
+
+// mostly config parameters
+class BasicFilter
 	float[3] a, b
 	float sample_rate
 	void apply(float[] x, float[] y, float[2] prev_x, float[2] prev_y)
@@ -24,7 +47,8 @@ class Filter
 		b[0] = 1
 		b[1] = 0
 		b[2] = 0
-	void __assign__(Filter o)
+	void __assign__(BasicFilter o)
+		pass
 	float gain(float f)
 		complex z
 		z.x = cos(2*pi*f/sample_rate)
@@ -34,6 +58,21 @@ class Filter
 		
 		float fac = H.abs() / y.abs()
 		return factor_to_db(fac)
+	
+	void create(int mode, float freq, float q, float gain, float _sample_rate)
+		sample_rate = _sample_rate
+		if mode == FILTER_LOW_PASS
+			create_low_pass(freq, q)
+		else if mode == FILTER_HIGH_PASS
+			create_high_pass(freq, q)
+		else if mode == FILTER_PEAK
+			create_peak(freq, q, gain)
+		/*else if mode == FILTER_NOTCH
+			create_notch(freq, q, gain)*/
+		else if mode == FILTER_LOW_SHELF
+			create_low_shelf(freq, q, gain)
+		else if mode == FILTER_HIGH_SHELF
+			create_high_shelf(freq, q, gain)
 
 	void create_peak(float f_res, float Q, float gain)
 		float g = db_to_factor(gain)
@@ -132,3 +171,28 @@ class Filter
 			b[2] = (1 - sqrt(2)*c + c*c) / a0
 			a[1] = 2*(c*c - V) / a0
 			a[2] = (V - sqrt(2*V)*c + c*c) / a0
+
+
+// filter with a state
+class Filter
+	BasicFilter f
+	float[2] prev_xl, prev_xr
+	float[2] prev_yl, prev_yr
+	void __init__()
+		reset()
+	void __assign__(Filter o)
+		pass
+	void reset()
+		for i in 0:2
+			prev_xr[i] = 0
+			prev_xl[i] = 0
+			prev_yr[i] = 0
+			prev_yl[i] = 0
+	void apply(AudioBuffer buf)
+		float[] input = buf.l
+		f.apply(input, buf.l, prev_xl, prev_yl)
+		
+		if buf.channels > 1
+			input = buf.r
+			f.apply(input, buf.r, prev_xr, prev_yr)
+

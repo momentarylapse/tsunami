@@ -81,7 +81,6 @@ Menu menu ""
 		Menu menu_plugins_pitch "Pitch"
 		Menu menu_plugins_repair "Repair"
 		Menu menu_plugins_sound "Sound"
-		Menu menu_plugins_synthesizer "Synthesizer"
 		Menu menu_plugins_audio_source "From source"
 		Separator
 		Item plugin_on_midi "On midi" disabled

@@ -1,0 +1,39 @@
+use "../api.kaba"
+use "../tone.kaba"
+//use "../MidiSource/Tone.kaba"
+
+// hopefully, soon, we will have recursive modules... then this will become obsolete!!!
+
+const string AUTO_CONFIG_PITCH = "" //"0:10000:0.1:1:Hz"
+const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
+
+class Config extends PluginData
+	float pitch
+	float volume
+	override void reset()
+		pitch = 64
+		volume = 0.8
+
+class SineSource extends AudioSource
+	Config config
+	int offset
+	Synthesizer* synth
+	MidiSource* source
+	override void __init__()
+		synth = nil
+		source = nil
+	override void __delete__()
+		if synth
+			delete synth
+			delete source
+	override void reset_state()
+		offset = 0
+		if synth
+			delete synth
+			delete source
+		source = CreateMidiSource(session, "Tone")
+		synth = CreateSynthesizer(session, "")
+		synth.config_from_string("" + config.pitch + "," + config.volume)
+		synth.plug(0, source, 0)
+	override int read(AudioBuffer buf)
+		return synth.out.read_audio(buf)

@@ -699,7 +699,6 @@ void PluginManager::find_plugins()
 	find_plugins_in_dir("AudioEffect/", "Pitch", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Repair", ModuleType::AUDIO_EFFECT, this);
 	find_plugins_in_dir("AudioEffect/", "Sound", ModuleType::AUDIO_EFFECT, this);
-	find_plugins_in_dir("AudioEffect/", "Synthesizer", ModuleType::AUDIO_EFFECT, this);
 	// hidden...
 	find_plugins_in_dir("AudioEffect/", "Special", ModuleType::AUDIO_EFFECT, this);
 
@@ -737,7 +736,6 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win)
 	add_plugins_in_dir("AudioEffect/Pitch/", this, m->get_sub_menu_by_id("menu_plugins_pitch"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Repair/", this, m->get_sub_menu_by_id("menu_plugins_repair"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 	add_plugins_in_dir("AudioEffect/Sound/", this, m->get_sub_menu_by_id("menu_plugins_sound"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
-	add_plugins_in_dir("AudioEffect/Synthesizer/", this, m->get_sub_menu_by_id("menu_plugins_synthesizer"), "audio-effect", win, &TsunamiWindow::on_menu_execute_audio_effect);
 
 	add_plugins_in_dir("AudioSource/", this, m->get_sub_menu_by_id("menu_plugins_audio_source"), "source", win, &TsunamiWindow::on_menu_execute_audio_source);
 

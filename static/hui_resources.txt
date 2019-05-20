@@ -1350,7 +1350,7 @@ menu_plugins
 
 7
 0
-17
+16
 Item
 plugin_on_file
 disabled
@@ -1400,57 +1400,51 @@ menu_plugins_sound
 0
 0
 Menu
-menu_plugins_synthesizer
-
-8
-0
-0
-Menu
 menu_plugins_audio_source
 
-9
+8
 0
 0
 Separator
 
 
-10
+9
 0
 0
 Item
 plugin_on_midi
 disabled
-11
+10
 0
 0
 Menu
 menu_plugins_midi_effects
 
-12
+11
 0
 0
 Menu
 menu_plugins_midi_source
 
-13
+12
 0
 0
 Separator
 
 
-14
+13
 0
 0
 Menu
 menu_plugins_on_all
 
-15
+14
 0
 0
 Menu
 menu_plugins_other
 
-16
+15
 0
 0
 Menu
@@ -4866,7 +4860,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-486
+485
 // Text
 /cancel
 Cancel
@@ -5248,9 +5242,6 @@ Repair
 
 menu/menu_plugins_sound
 Sound
-
-menu/menu_plugins_synthesizer
-Synthesizer
 
 menu/menu_sound
 Sound

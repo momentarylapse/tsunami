@@ -844,18 +844,24 @@ Selection ViewModeDefault::get_hover()
 
 		// bars
 		if (s.track->type == SignalType::BEATS){
-			int offset = 0;
-			for (int i=0; i<view->song->bars.num+1; i++){
-				float x = view->cam.sample2screen(offset);
-				if (fabs(x - mx) < view->SNAPPING_DIST){
-					s.index = i;
-					s.type = Selection::Type::BAR_GAP;
-					s.pos = offset;
-					return s;
+
+			// bar gaps
+			if (view->cam.dsample2screen(session->sample_rate()) > 20){
+				int offset = 0;
+				for (int i=0; i<view->song->bars.num+1; i++){
+					float x = view->cam.sample2screen(offset);
+					if (fabs(x - mx) < view->SNAPPING_DIST){
+						s.index = i;
+						s.type = Selection::Type::BAR_GAP;
+						s.pos = offset;
+						return s;
+					}
+					if (i < view->song->bars.num)
+						offset += view->song->bars[i]->length;
 				}
-				if (i < view->song->bars.num)
-					offset += view->song->bars[i]->length;
 			}
+
+			// bars
 			auto bars = view->song->bars.get_bars(Range(s.pos, 0));
 			for (auto *b: bars){
 				//b.range.

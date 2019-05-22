@@ -1,11 +1,8 @@
-Menu popup_bar_menu ""
-	Item bar_menu_header "Bar" disabled
+Menu popup_buffer_menu ""
+	Item buffer_menu_header "Audio buffer" disabled
 	Separator
-	Item delete_bars "Delete"
-	Item edit_bars "Edit..."
-	Item scale_bars "Scale" image=hui:zoom-in
-	Item add_bars "Add bars..." flat image=hui:add
-	Item add_pause "Add pause..." image=hui:add
+	Item make_buffer_movable "Make movable"
+	Item delete_buffer "Delete"
 	Separator
 	Menu menu_track "Track"
 		Item delete_track "Delete"
@@ -16,10 +13,6 @@ Menu popup_bar_menu ""
 		Item track_edit_fx "Edit effects"
 		Item track_edit_midi "Edit midi"
 	Item track_add_marker "Add marker"
-	Menu menu_midi_mode "Midi mode"
-		Item layer_midi_mode_linear "Linear" checkable
-		Item layer_midi_mode_tab "Tabulature" checkable
-		Item layer_midi_mode_classical "Score" checkable
 	Menu menu_version "Version"
 		Item layer_add "Add version"
 		Item layer_mark_dominant "Mark selection as dominant"

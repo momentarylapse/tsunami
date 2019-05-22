@@ -1,0 +1,19 @@
+Menu popup_marker_menu ""
+	Item marker_menu_header "Marker" disabled
+	Separator
+	Item edit_marker "Edit"
+	Item delete_marker "Delete"
+	Separator
+	Menu menu_track "Track"
+		Item delete_track "Delete"
+		Item track_properties "Properties"
+		Menu convert_menu "Convert"
+			Item track_convert_mono "Mono"
+			Item track_convert_stereo "Stereo"
+		Item track_edit_fx "Edit effects"
+		Item track_edit_midi "Edit midi"
+	Menu menu_version "Version"
+		Item layer_add "Add version"
+		Item layer_mark_dominant "Mark selection as dominant"
+		Item layer_merge "Merge..."
+		Item delete_layer "Delete"

@@ -2,14 +2,15 @@ Menu popup_track_menu ""
 	Item track_menu_header "Track" disabled
 	Separator
 	Item delete_track "Delete"
+	Item track_properties "Properties"
+	Separator
 	Item track_add_marker "Add marker"
+	Item track_edit_fx "Edit effects"
+	Item track_edit_midi "Edit midi"
 	Menu menu_midi_mode "Midi mode"
 		Item layer_midi_mode_linear "Linear" checkable
 		Item layer_midi_mode_tab "Tabulature" checkable
 		Item layer_midi_mode_classical "Score" checkable
-	Menu menu_buffer "Audio buffer"
-		Item make_buffer_movable "Make movable"
-		Item delete_buffer "Delete"
 	Menu menu_version "Version"
 		Item layer_add "Add version"
 		Item layer_mark_dominant "Mark selection as dominant"
@@ -18,6 +19,3 @@ Menu popup_track_menu ""
 	Menu convert_menu "Convert"
 		Item track_convert_mono "Mono"
 		Item track_convert_stereo "Stereo"
-	Item track_edit_fx "Edit effects"
-	Item track_edit_midi "Edit midi"
-	Item track_properties "Properties"

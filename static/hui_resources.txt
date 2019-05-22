@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-54
+55
 // Resource
 Menu
 menu_fake
@@ -2465,37 +2465,6 @@ image=hui:ok
 0
 // Resource
 Menu
-popup_marker_menu
-
-0
-0
-4
-Item
-marker_menu_header
-disabled
-0
-0
-0
-Separator
-
-
-1
-0
-0
-Item
-edit_marker
-
-2
-0
-0
-Item
-delete_marker
-
-3
-0
-0
-// Resource
-Menu
 popup_all_menu
 
 0
@@ -2741,7 +2710,7 @@ popup_bar_menu
 
 0
 0
-6
+12
 Item
 bar_menu_header
 disabled
@@ -2761,21 +2730,262 @@ delete_bars
 0
 0
 Item
-track_add_marker
+edit_bars
 
 3
 0
 0
 Item
-edit_bars
+scale_bars
+image=hui:zoom-in
+4
+0
+0
+Item
+add_bars
+flat,image=hui:add
+5
+0
+0
+Item
+add_pause
+image=hui:add
+6
+0
+0
+Separator
+
+
+7
+0
+0
+Menu
+menu_track
+
+8
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Item
+track_properties
+
+1
+0
+0
+Menu
+convert_menu
+
+2
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+3
+0
+0
+Item
+track_edit_midi
 
 4
 0
 0
 Item
-scale_bars
-image=hui:zoom-in
+track_add_marker
+
+9
+0
+0
+Menu
+menu_midi_mode
+
+10
+0
+3
+Item
+layer_midi_mode_linear
+checkable
+0
+0
+0
+Item
+layer_midi_mode_tab
+checkable
+1
+0
+0
+Item
+layer_midi_mode_classical
+checkable
+2
+0
+0
+Menu
+menu_version
+
+11
+0
+4
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_mark_dominant
+
+1
+0
+0
+Item
+layer_merge
+
+2
+0
+0
+Item
+delete_layer
+
+3
+0
+0
+// Resource
+Menu
+popup_buffer_menu
+
+0
+0
+8
+Item
+buffer_menu_header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+make_buffer_movable
+
+2
+0
+0
+Item
+delete_buffer
+
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Menu
+menu_track
+
 5
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Item
+track_properties
+
+1
+0
+0
+Menu
+convert_menu
+
+2
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+3
+0
+0
+Item
+track_edit_midi
+
+4
+0
+0
+Item
+track_add_marker
+
+6
+0
+0
+Menu
+menu_version
+
+7
+0
+4
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_mark_dominant
+
+1
+0
+0
+Item
+layer_merge
+
+2
+0
+0
+Item
+delete_layer
+
+3
 0
 0
 // Resource
@@ -2886,6 +3096,248 @@ Item
 delete_layer
 
 6
+0
+0
+// Resource
+Menu
+popup_marker_menu
+
+0
+0
+7
+Item
+marker_menu_header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+edit_marker
+
+2
+0
+0
+Item
+delete_marker
+
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Menu
+menu_track
+
+5
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Item
+track_properties
+
+1
+0
+0
+Menu
+convert_menu
+
+2
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+3
+0
+0
+Item
+track_edit_midi
+
+4
+0
+0
+Menu
+menu_version
+
+6
+0
+4
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_mark_dominant
+
+1
+0
+0
+Item
+layer_merge
+
+2
+0
+0
+Item
+delete_layer
+
+3
+0
+0
+// Resource
+Menu
+popup_sample_menu
+
+0
+0
+9
+Item
+sample_menu_header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+insert_sample
+
+2
+0
+0
+Item
+remove_sample
+
+3
+0
+0
+Item
+sample_properties
+
+4
+0
+0
+Separator
+
+
+5
+0
+0
+Menu
+menu_track
+
+6
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Item
+track_properties
+
+1
+0
+0
+Menu
+convert_menu
+
+2
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+3
+0
+0
+Item
+track_edit_midi
+
+4
+0
+0
+Item
+track_add_marker
+
+7
+0
+0
+Menu
+menu_version
+
+8
+0
+4
+Item
+layer_add
+
+0
+0
+0
+Item
+layer_mark_dominant
+
+1
+0
+0
+Item
+layer_merge
+
+2
+0
+0
+Item
+delete_layer
+
+3
 0
 0
 // Resource
@@ -3200,15 +3652,39 @@ delete_track
 0
 0
 Item
-track_add_marker
+track_properties
 
 3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
+track_add_marker
+
+5
+0
+0
+Item
+track_edit_fx
+
+6
+0
+0
+Item
+track_edit_midi
+
+7
 0
 0
 Menu
 menu_midi_mode
 
-4
+8
 0
 3
 Item
@@ -3230,27 +3706,9 @@ checkable
 0
 0
 Menu
-menu_buffer
-
-5
-0
-2
-Item
-make_buffer_movable
-
-0
-0
-0
-Item
-delete_buffer
-
-1
-0
-0
-Menu
 menu_version
 
-6
+9
 0
 4
 Item
@@ -3280,7 +3738,7 @@ delete_layer
 Menu
 convert_menu
 
-7
+10
 0
 2
 Item
@@ -3293,61 +3751,6 @@ Item
 track_convert_stereo
 
 1
-0
-0
-Item
-track_edit_fx
-
-8
-0
-0
-Item
-track_edit_midi
-
-9
-0
-0
-Item
-track_properties
-
-10
-0
-0
-// Resource
-Menu
-popup_sample_menu
-
-0
-0
-5
-Item
-sample_menu_header
-disabled
-0
-0
-0
-Separator
-
-
-1
-0
-0
-Item
-insert_sample
-
-2
-0
-0
-Item
-remove_sample
-
-3
-0
-0
-Item
-sample_properties
-
-4
 0
 0
 // Resource
@@ -4860,7 +5263,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-485
+545
 // Text
 /cancel
 Cancel
@@ -5714,20 +6117,128 @@ Edit midi
 popup_all_menu/track_properties
 Properties
 
+popup_bar_menu/add_bars
+Add bars...
+
+popup_bar_menu/add_pause
+Add pause...
+
 popup_bar_menu/bar_menu_header
 Bar
+
+popup_bar_menu/convert_menu
+Convert
 
 popup_bar_menu/delete_bars
 Delete
 
+popup_bar_menu/delete_layer
+Delete
+
+popup_bar_menu/delete_track
+Delete
+
 popup_bar_menu/edit_bars
 Edit...
+
+popup_bar_menu/layer_add
+Add version
+
+popup_bar_menu/layer_mark_dominant
+Mark selection as dominant
+
+popup_bar_menu/layer_merge
+Merge...
+
+popup_bar_menu/layer_midi_mode_classical
+Score
+
+popup_bar_menu/layer_midi_mode_linear
+Linear
+
+popup_bar_menu/layer_midi_mode_tab
+Tabulature
+
+popup_bar_menu/menu_midi_mode
+Midi mode
+
+popup_bar_menu/menu_track
+Track
+
+popup_bar_menu/menu_version
+Version
 
 popup_bar_menu/scale_bars
 Scale
 
 popup_bar_menu/track_add_marker
 Add marker
+
+popup_bar_menu/track_convert_mono
+Mono
+
+popup_bar_menu/track_convert_stereo
+Stereo
+
+popup_bar_menu/track_edit_fx
+Edit effects
+
+popup_bar_menu/track_edit_midi
+Edit midi
+
+popup_bar_menu/track_properties
+Properties
+
+popup_buffer_menu/buffer_menu_header
+Audio buffer
+
+popup_buffer_menu/convert_menu
+Convert
+
+popup_buffer_menu/delete_buffer
+Delete
+
+popup_buffer_menu/delete_layer
+Delete
+
+popup_buffer_menu/delete_track
+Delete
+
+popup_buffer_menu/layer_add
+Add version
+
+popup_buffer_menu/layer_mark_dominant
+Mark selection as dominant
+
+popup_buffer_menu/layer_merge
+Merge...
+
+popup_buffer_menu/make_buffer_movable
+Make movable
+
+popup_buffer_menu/menu_track
+Track
+
+popup_buffer_menu/menu_version
+Version
+
+popup_buffer_menu/track_add_marker
+Add marker
+
+popup_buffer_menu/track_convert_mono
+Mono
+
+popup_buffer_menu/track_convert_stereo
+Stereo
+
+popup_buffer_menu/track_edit_fx
+Edit effects
+
+popup_buffer_menu/track_edit_midi
+Edit midi
+
+popup_buffer_menu/track_properties
+Properties
 
 popup_fx_menu/delete
 Delete
@@ -5768,17 +6279,80 @@ Midi mode
 popup_layer_menu/track_edit_midi
 Edit midi
 
+popup_marker_menu/convert_menu
+Convert
+
+popup_marker_menu/delete_layer
+Delete
+
 popup_marker_menu/delete_marker
+Delete
+
+popup_marker_menu/delete_track
 Delete
 
 popup_marker_menu/edit_marker
 Edit
 
+popup_marker_menu/layer_add
+Add version
+
+popup_marker_menu/layer_mark_dominant
+Mark selection as dominant
+
+popup_marker_menu/layer_merge
+Merge...
+
 popup_marker_menu/marker_menu_header
 Marker
 
+popup_marker_menu/menu_track
+Track
+
+popup_marker_menu/menu_version
+Version
+
+popup_marker_menu/track_convert_mono
+Mono
+
+popup_marker_menu/track_convert_stereo
+Stereo
+
+popup_marker_menu/track_edit_fx
+Edit effects
+
+popup_marker_menu/track_edit_midi
+Edit midi
+
+popup_marker_menu/track_properties
+Properties
+
+popup_sample_menu/convert_menu
+Convert
+
+popup_sample_menu/delete_layer
+Delete
+
+popup_sample_menu/delete_track
+Delete
+
 popup_sample_menu/insert_sample
 Insert statically
+
+popup_sample_menu/layer_add
+Add version
+
+popup_sample_menu/layer_mark_dominant
+Mark selection as dominant
+
+popup_sample_menu/layer_merge
+Merge...
+
+popup_sample_menu/menu_track
+Track
+
+popup_sample_menu/menu_version
+Version
 
 popup_sample_menu/remove_sample
 Delete
@@ -5787,6 +6361,24 @@ popup_sample_menu/sample_menu_header
 Samples
 
 popup_sample_menu/sample_properties
+Properties
+
+popup_sample_menu/track_add_marker
+Add marker
+
+popup_sample_menu/track_convert_mono
+Mono
+
+popup_sample_menu/track_convert_stereo
+Stereo
+
+popup_sample_menu/track_edit_fx
+Edit effects
+
+popup_sample_menu/track_edit_midi
+Edit midi
+
+popup_sample_menu/track_properties
 Properties
 
 popup_signal_chain_menu/add
@@ -5906,9 +6498,6 @@ Properties
 popup_track_menu/convert_menu
 Convert
 
-popup_track_menu/delete_buffer
-Delete
-
 popup_track_menu/delete_layer
 Delete
 
@@ -5932,12 +6521,6 @@ Linear
 
 popup_track_menu/layer_midi_mode_tab
 Tabulature
-
-popup_track_menu/make_buffer_movable
-Make movable
-
-popup_track_menu/menu_buffer
-Audio buffer
 
 popup_track_menu/menu_midi_mode
 Midi mode
@@ -6323,7 +6906,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-641
+704
 // Text
 /bpm
 Bpm
@@ -7465,20 +8048,128 @@ Midi bearbeiten
 popup_all_menu/track_properties
 Eigenschaften
 
+popup_bar_menu/add_bars
+Takte hinzufügen...
+
+popup_bar_menu/add_pause
+Pause hinzufügen...
+
 popup_bar_menu/bar_menu_header
 Takt
+
+popup_bar_menu/convert_menu
+Konvertieren
 
 popup_bar_menu/delete_bars
 Löschen
 
+popup_bar_menu/delete_layer
+Löschen
+
+popup_bar_menu/delete_track
+Löschen
+
 popup_bar_menu/edit_bars
 Bearbeiten...
+
+popup_bar_menu/layer_add
+Version hinzufügen
+
+popup_bar_menu/layer_mark_dominant
+Auswahl als dominant markieren
+
+popup_bar_menu/layer_merge
+Zusammenfügen...
+
+popup_bar_menu/layer_midi_mode_classical
+Klassisch
+
+popup_bar_menu/layer_midi_mode_linear
+Linear
+
+popup_bar_menu/layer_midi_mode_tab
+Tabulatur
+
+popup_bar_menu/menu_midi_mode
+Midi Modus
+
+popup_bar_menu/menu_track
+Spur
+
+popup_bar_menu/menu_version
+Version
 
 popup_bar_menu/scale_bars
 Skalieren
 
 popup_bar_menu/track_add_marker
 Marker hinzufügen
+
+popup_bar_menu/track_convert_mono
+Mono
+
+popup_bar_menu/track_convert_stereo
+Stereo
+
+popup_bar_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_bar_menu/track_edit_midi
+Midi bearbeiten
+
+popup_bar_menu/track_properties
+Eigenschaften
+
+popup_buffer_menu/buffer_menu_header
+Audio Puffer
+
+popup_buffer_menu/convert_menu
+Konvertieren
+
+popup_buffer_menu/delete_buffer
+Löschen
+
+popup_buffer_menu/delete_layer
+Löschen
+
+popup_buffer_menu/delete_track
+Löschen
+
+popup_buffer_menu/layer_add
+Version hinzufügen
+
+popup_buffer_menu/layer_mark_dominant
+Auswahl als dominant markieren
+
+popup_buffer_menu/layer_merge
+Zusammenfügen...
+
+popup_buffer_menu/make_buffer_movable
+Beweglich machen
+
+popup_buffer_menu/menu_track
+Spur
+
+popup_buffer_menu/menu_version
+Version
+
+popup_buffer_menu/track_add_marker
+Marker hinzufügen
+
+popup_buffer_menu/track_convert_mono
+Mono
+
+popup_buffer_menu/track_convert_stereo
+Stereo
+
+popup_buffer_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_buffer_menu/track_edit_midi
+Midi bearbeiten
+
+popup_buffer_menu/track_properties
+Eigenschaften
 
 popup_fx_menu/delete
 Löschen
@@ -7519,14 +8210,53 @@ Midi Modus
 popup_layer_menu/track_edit_midi
 Midi bearbeiten
 
+popup_marker_menu/convert_menu
+Konvertieren
+
+popup_marker_menu/delete_layer
+Löschen
+
 popup_marker_menu/delete_marker
+Löschen
+
+popup_marker_menu/delete_track
 Löschen
 
 popup_marker_menu/edit_marker
 Bearbeiten
 
+popup_marker_menu/layer_add
+Version hinzufügen
+
+popup_marker_menu/layer_mark_dominant
+Auswahl als dominant markieren
+
+popup_marker_menu/layer_merge
+Zusammenfügen...
+
 popup_marker_menu/marker_menu_header
 Marker
+
+popup_marker_menu/menu_track
+Spur
+
+popup_marker_menu/menu_version
+Version
+
+popup_marker_menu/track_convert_mono
+Mono
+
+popup_marker_menu/track_convert_stereo
+Stereo
+
+popup_marker_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_marker_menu/track_edit_midi
+Midi bearbeiten
+
+popup_marker_menu/track_properties
+Eigenschaften
 
 popup_pause_menu/delete_bars
 Löschen
@@ -7543,8 +8273,32 @@ Skalieren
 popup_pause_menu/track_add_marker
 Marker hinzufügen
 
+popup_sample_menu/convert_menu
+Konvertieren
+
+popup_sample_menu/delete_layer
+Löschen
+
+popup_sample_menu/delete_track
+Löschen
+
 popup_sample_menu/insert_sample
 Fest einfügen
+
+popup_sample_menu/layer_add
+Version hinzufügen
+
+popup_sample_menu/layer_mark_dominant
+Auswahl als dominant markieren
+
+popup_sample_menu/layer_merge
+Zusammenfügen...
+
+popup_sample_menu/menu_track
+Spur
+
+popup_sample_menu/menu_version
+Version
 
 popup_sample_menu/remove_sample
 Löschen
@@ -7553,6 +8307,24 @@ popup_sample_menu/sample_menu_header
 Sample
 
 popup_sample_menu/sample_properties
+Eigenschaften
+
+popup_sample_menu/track_add_marker
+Marker hinzufügen
+
+popup_sample_menu/track_convert_mono
+Mono
+
+popup_sample_menu/track_convert_stereo
+Stereo
+
+popup_sample_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_sample_menu/track_edit_midi
+Midi bearbeiten
+
+popup_sample_menu/track_properties
 Eigenschaften
 
 popup_signal_chain_menu/add

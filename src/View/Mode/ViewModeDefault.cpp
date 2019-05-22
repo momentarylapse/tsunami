@@ -195,6 +195,30 @@ void ViewModeDefault::on_left_double_click()
 	}
 }
 
+void prepare_menu(hui::Menu *menu, Selection* hover)
+{
+	// midi mode
+	menu->enable("menu_midi_mode", hover->track->type == SignalType::MIDI);
+	menu->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
+	menu->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+	menu->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+	menu->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+
+	menu->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
+	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
+
+	// convert
+	menu->enable("convert_menu", hover->track->type == SignalType::AUDIO);
+	menu->enable("track_convert_stereo", hover->track->channels == 1);
+	menu->enable("track_convert_mono", hover->track->channels == 2);
+
+	menu->enable("layer_merge", hover->layer->track->layers.num > 1);
+	menu->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
+	//menu->enable("delete_layer", !hover->layer->is_main());
+	menu->enable("menu_buffer", hover_buffer(hover) >= 0);
+
+}
+
 void ViewModeDefault::on_right_button_down()
 {
 	bool track_hover_sel = view->sel.has(hover->track);
@@ -214,46 +238,31 @@ void ViewModeDefault::on_right_button_down()
 	view->update_menu();
 
 	if (hover->type == Selection::Type::SAMPLE){
+		prepare_menu(view->menu_sample, hover);
 		view->menu_sample->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR){
-		view->menu_time_track->enable("delete_bars", true);
-		view->menu_time_track->enable("edit_bars", true);
-		view->menu_time_track->enable("scale_bars", true);
-		view->menu_time_track->open_popup(view->win);
-		//view->menu_bar->open_popup(view->win);
+		prepare_menu(view->menu_bar, hover);
+		view->menu_bar->enable("delete_bars", true);
+		view->menu_bar->enable("edit_bars", true);
+		view->menu_bar->enable("scale_bars", true);
+		view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::MARKER){
+		prepare_menu(view->menu_marker, hover);
 		view->menu_marker->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		view->menu_time_track->enable("delete_bars", false);
-		view->menu_time_track->enable("edit_bars", false);
-		view->menu_time_track->enable("scale_bars", false);
-		view->menu_time_track->open_popup(view->win);
-	}else if ((hover->type == Selection::Type::LAYER) and (hover->track->type == SignalType::BEATS)){
-		view->menu_time_track->enable("delete_bars", false);
-		view->menu_time_track->enable("edit_bars", false);
-		view->menu_time_track->enable("scale_bars", false);
-		view->menu_time_track->open_popup(view->win);
+		prepare_menu(view->menu_bar, hover);
+		view->menu_bar->enable("delete_bars", false);
+		view->menu_bar->enable("edit_bars", false);
+		view->menu_bar->enable("scale_bars", false);
+		view->menu_bar->open_popup(view->win);
+	}else if (hover_buffer(hover) >= 0){
+		prepare_menu(view->menu_buffer, hover);
+		view->menu_buffer->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
-		view->menu_layer->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
-		view->menu_layer->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-		view->menu_layer->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-		view->menu_layer->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+		prepare_menu(view->menu_layer, hover);
 		view->menu_layer->open_popup(view->win);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER)){
-		view->menu_track->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
-		view->menu_track->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-		view->menu_track->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-		view->menu_track->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
-
-		view->menu_track->enable("menu_midi_mode", hover->track->type == SignalType::MIDI);
-		view->menu_track->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
-		view->menu_track->enable("track_add_marker", hover->type == Selection::Type::LAYER);
-		view->menu_track->enable("track_convert_stereo", hover->track->channels == 1);
-		view->menu_track->enable("track_convert_mono", hover->track->channels == 2);
-		view->menu_track->enable("layer_merge", hover->layer->track->layers.num > 1);
-		view->menu_track->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
-		//view->menu_track->enable("delete_layer", !hover->layer->is_main());
-		view->menu_track->enable("menu_buffer", hover_buffer(hover) >= 0);
+		prepare_menu(view->menu_track, hover);
 		view->menu_track->open_popup(view->win);
 	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 	}else if (!hover->track){

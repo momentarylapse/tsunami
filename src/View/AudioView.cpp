@@ -344,6 +344,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_sample = hui::CreateResourceMenu("popup_sample_menu");
 	menu_marker = hui::CreateResourceMenu("popup_marker_menu");
 	menu_bar = hui::CreateResourceMenu("popup_bar_menu");
+	menu_buffer = hui::CreateResourceMenu("popup_buffer_menu");
 
 	//ForceRedraw();
 	update_menu();

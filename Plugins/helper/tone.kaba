@@ -1,4 +1,4 @@
-use "api.kaba"
+use "../api.kaba"
 
 // pitch is in MIDI notation (69 = A4 = 440Hz)
 

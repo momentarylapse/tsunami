@@ -1,58 +1,58 @@
-// Image = hui:copy
-// Title[Deutsch] = Phaser
-
 use "../../api.kaba"
+use "../../helper/filter.kaba"
 
+const string AUTO_CONFIG_FMIN = "0:10000:1:1:Hz"
+const string AUTO_CONFIG_FMAX = "0:10000:1:1:Hz"
+const string AUTO_CONFIG_LFO = "0:5:0.1:1:Hz"
+const string AUTO_CONFIG_Q = "0:20:0.1:1:"
+const string AUTO_CONFIG_MIX = "0:1:1:100:%"
 
-const string AUTO_CONFIG_ANGLE = "-3.1415:3.1415:1:57.2958:°" // -pi : pi : 180/pi
-const string AUTO_CONFIG_SPEED = "0:2:0.01:1:Hz"
-const string AUTO_CONFIG_DEPTH = "0:1:0.1:100:%"
-
-
-class PluginConfig extends PluginData
-	float angle
-	float speed
-	float depth
+class Config extends PluginData
+	float f_min
+	float f_max
+	float lfo
+	float q
+	float mix
 	override void reset()
-		depth = 0.5
-		speed = 0.3
-		angle = pi / 2
+		f_min = 60
+		f_max = 5000
+		lfo = 1
+		q = 1
+		mix = 0.5
 
-class PhaserChannelParams
-	float x1, x2, y1, y2
-	void reset()
-		x1 = 0
-		x2 = 0
-		y1 = 0
-		y2 = 0
+class LowPassFilter extends AudioEffect
+	Config config
+	DynamicFilter filter1, filter2
+	float phase
 
-class PluginState extends PluginData
-
-class Phaser extends AudioEffect
-	PluginConfig config
-	
-	PhaserChannelParams r, l
 	override void reset_state()
-		r.reset()
-		l.reset()
+		filter1.reset()
+		filter2.reset()
 
-	void do_phaser(float[] b, PhaserChannelParams p, int sample_rate)
-	
-		float ll = -0.51//sqr(config.Angle / sample_rate)
-		float r2 = 0.0
-	
-		for i in 0:b.num
-	
-			float x = b[i]
-			float y = p.x2 - r2 * p.x1 + ll * x + r2 * p.y1 - ll*p.y2
-			p.y2 = p.y1
-			p.y1 = y
-			p.x2 = p.x1
-			p.x1 = x
-			
-			b[i] = y
-	
+	override void on_config()
+		pass
+		
 	override void process(AudioBuffer buf)
-		do_phaser(buf.r, r, session.sample_rate())
-		do_phaser(buf.l, l, session.sample_rate())
-	
+		float[] f1, f2, q, gain
+		f1.resize(len(buf))
+		f2.resize(len(buf))
+		q.resize(len(buf))
+		gain.resize(len(buf))
+		
+		q = config.q
+		
+		float dphi = config.lfo * 2 * pi / session.sample_rate() / 2
+		for i in 0:len(buf)
+			phase += dphi
+			if phase > 2 * pi
+				phase -= 2 * pi
+			float x = sqr(cos(phase))
+			f1[i] = exp(log(config.f_min) + (log(config.f_max) - log(config.f_min)) * x)
+			f2[i] = f1[i] * 1.4
+		filter1.create(FILTER_ALL_PASS, f1, q, gain, session.sample_rate())
+		filter2.create(FILTER_ALL_PASS, f2, q, gain, session.sample_rate())
+		AudioBuffer bb = buf
+		filter1.apply(bb)
+		filter2.apply(bb)
+		buf.scale(1 - config.mix)
+		buf.add(bb, 0, config.mix)

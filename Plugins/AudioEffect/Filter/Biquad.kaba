@@ -1,0 +1,140 @@
+use "../../api.kaba"
+use "../../helper/grid.kaba"
+use "../../helper/tone.kaba"
+use "../../helper/filter.kaba"
+use "../../helper/curves.kaba"
+
+
+
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
+const int MIN_VOL = 0-55
+const int MAX_VOL = 35
+
+
+
+class Config extends PluginData
+	float a1, a2
+	float b0, b1, b2
+
+	override void reset()
+		a1 = 0
+		a2 = 0
+		b0 = 1
+		b1 = 0
+		b2 = 0
+	
+	void create_filter(Filter f, float sample_rate)
+		f.l.f.sample_rate = sample_rate
+		f.l.f.a[1] = a1
+		f.l.f.a[2] = a2
+		f.l.f.b[0] = b0
+		f.l.f.b[1] = b1
+		f.l.f.b[2] = b2
+		//f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
+
+class Biquad extends AudioEffect
+
+	BiquadGrid *grid
+
+	Config config
+
+	Filter filter // state
+	
+	override void __init__()
+		grid = nil
+	
+	override void on_config()
+		config.create_filter(filter, session.sample_rate())
+	
+	override void reset_state()
+		filter.reset()
+
+	override void process(AudioBuffer buf)
+		filter.apply(buf)
+
+	override ConfigPanel *create_panel()
+		return new BiquadPanel(self)
+
+
+class BiquadGrid extends Grid
+	Config *c
+	BiquadPanel *cp
+	float sample_rate
+	SpectrumCurve spectrum
+	
+	
+	override void __init__()
+	override void __delete__()
+
+	override void on_draw(Painter *p)
+		draw_curve_c(p, spectrum, false)
+	
+		// curve + area below
+		FilterGainCurve gain
+		c.create_filter(gain.f, sample_rate)
+		draw_curve_c(p, gain, true)
+	
+		// curve + area below
+		FilterPhaseShiftCurve phase
+		c.create_filter(phase.f, sample_rate)
+		draw_curve_c(p, phase, false)
+
+
+	void set_buffer(AudioBuffer buf)
+		spectrum.set(buf, sample_rate)
+		redraw()
+
+class BiquadPanel extends ConfigPanel
+	BiquadGrid grid
+	override Biquad *c
+	override void __init__(Module *_biquad)
+		super.__init__(_biquad)
+		from_source("
+Grid ? '' vertical
+	DrawingArea drawing '' grabfocus height=250
+	Grid ? ''
+		Label ? 'a'
+		.
+		SpinButton a1 '' range=-100:100:0.01
+		SpinButton a2 '' range=-100:100:0.01
+		---|
+		Label ? 'b'
+		SpinButton b0 '' range=-100:100:0.01
+		SpinButton b1 '' range=-100:100:0.01
+		SpinButton b2 '' range=-100:100:0.01")
+	
+		grid.init(self, "drawing")
+		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
+		
+		grid.cp = self
+		grid.c = &c.config
+		grid.sample_rate = c.session.sample_rate()
+		
+		c.grid = &grid
+		set_float("a1", c.config.a1)
+		set_float("a2", c.config.a2)
+		set_float("b0", c.config.b0)
+		set_float("b1", c.config.b1)
+		set_float("b2", c.config.b2)
+		
+		let ids = ["a1", "a2", "b0", "b1", "b2"]
+		for id in ids
+			event(id, &on_change)
+	
+	override void __delete__()
+		c.grid = nil
+		
+	override void update()
+		grid.redraw()
+	
+	void on_change()
+		c.config.a1 = get_float("a1")
+		c.config.a2 = get_float("a2")
+		c.config.b0 = get_float("b0")
+		c.config.b1 = get_float("b1")
+		c.config.b2 = get_float("b2")
+		c.changed()
+
+

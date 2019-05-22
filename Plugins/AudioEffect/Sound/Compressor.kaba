@@ -2,7 +2,7 @@
 // Title[Deutsch] = Kompressor
 
 use "../../api.kaba"
-use "../../grid.kaba"
+use "../../helper/grid.kaba"
 
 const float MIN_DB = 0.0 - 60.0
 

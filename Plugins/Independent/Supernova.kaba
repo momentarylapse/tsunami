@@ -1,7 +1,7 @@
 // Image = hui:find
 // Title[Deutsch] = Supernova
 use "../api.kaba"
-use "../tone.kaba"
+use "../helper/tone.kaba"
 
 //const int freq = 44100
 const int f_min = 50

@@ -2,7 +2,7 @@
 // Title[Deutsch] = Echo
 
 use "../../api.kaba"
-use "../../grid.kaba"
+use "../../helper/grid.kaba"
 
 
 class Reflector

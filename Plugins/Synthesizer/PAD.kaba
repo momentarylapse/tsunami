@@ -1,6 +1,6 @@
 use "../api.kaba"
-use "../tone.kaba"
-use "../grid.kaba"
+use "../helper/tone.kaba"
+use "../helper/grid.kaba"
 
 const int N = 4096*16
 

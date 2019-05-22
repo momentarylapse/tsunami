@@ -1,4 +1,4 @@
-use "api.kaba"
+use "../api.kaba"
 
 float db_to_factor(float db)
 	return pow(10, db/20)
@@ -16,6 +16,7 @@ enum
 	FILTER_HIGH_SHELF
 	FILTER_LOW_PASS_LINEAR
 	FILTER_HIGH_PASS_LINEAR
+	FILTER_ALL_PASS
 
 string filter_name(int t)
 	if t == FILTER_PEAK
@@ -66,6 +67,14 @@ class BasicFilter
 		
 		float fac = H.abs() / y.abs()
 		return factor_to_db(fac)
+	float phase_shift(float f)
+		complex z
+		z.x = cos(2*pi*f/sample_rate)
+		z.y = sin(2*pi*f/sample_rate)
+		complex H = complex(b[0], 0) + b[1]*z + b[2]*z*z
+		complex y = complex(1,0) + a[1]*z + a[2]*z*z
+		complex zz = H * y.bar()
+		return atan2(zz.y, zz.x) * 10
 	
 	void create(int mode, float freq, float q, float gain, float _sample_rate)
 		sample_rate = _sample_rate
@@ -85,6 +94,8 @@ class BasicFilter
 			create_low_pass_linear(freq)
 		else if mode == FILTER_HIGH_PASS_LINEAR
 			create_high_pass_linear(freq)
+		else if mode == FILTER_ALL_PASS
+			create_all_pass(freq, q)
 
 	void create_peak(float f_res, float Q, float gain)
 		float g = db_to_factor(gain)
@@ -192,7 +203,9 @@ class BasicFilter
 		float α = RC / (RC + dt)
 		b[0] = α
 		b[1] = -α
+		b[2] = 0
 		a[1] = -α
+		a[2] = 0
 
 	// y[i] := α * x[i] + (1-α) * y[i-1]
 	void create_low_pass_linear(float f_res)
@@ -200,28 +213,98 @@ class BasicFilter
 		float dt = 1.0 / sample_rate
 		float α = dt / (RC + dt)
 		b[0] = α
+		b[1] = 0
+		b[2] = 0
 		a[1] = α - 1
+		a[2] = 0
+	
+	void create_all_pass(float freq, float q)
+		float phi = 2 * pi * freq / sample_rate
+		float l = 1 - phi / q
+		create_all_pass_z(l * complex(cos(phi), sin(phi)))
+		
+	void create_all_pass_z(complex z)
+		float l = z.abs()
+		b[0] = l*l
+		b[1] = - 2 * z.x
+		b[2] = 1
+		a[1] = - 2 * z.x
+		a[2] = l*l
+
+// filter with a state
+class ChannelFilter//Biquad
+	BasicFilter f
+	float[2] prev_x, prev_y
+	void __init__()
+		reset()
+	void __assign__(ChannelFilter o)
+		pass
+	void reset()
+		for i in 0:2
+			prev_x[i] = 0
+			prev_y[i] = 0
+	void create(int mode, float freq, float q, float gain, float _sample_rate)
+		f.create(mode, freq, q, gain, _sample_rate)
+	void apply(float[] buf)
+		let input = buf
+		f.apply(input, buf, prev_x, prev_y)
 
 // filter with a state
 class Filter//Biquad
-	BasicFilter f
-	float[2] prev_xl, prev_xr
-	float[2] prev_yl, prev_yr
+	ChannelFilter l, r
 	void __init__()
 		reset()
 	void __assign__(Filter o)
 		pass
 	void reset()
-		for i in 0:2
-			prev_xr[i] = 0
-			prev_xl[i] = 0
-			prev_yr[i] = 0
-			prev_yl[i] = 0
+		l.reset()
+		r.reset()
+	void create(int mode, float freq, float q, float gain, float _sample_rate)
+		l.create(mode, freq, q, gain, _sample_rate)
+		r.create(mode, freq, q, gain, _sample_rate)
 	void apply(AudioBuffer buf)
-		float[] input = buf.l
-		f.apply(input, buf.l, prev_xl, prev_yl)
-		
+		l.apply(buf.l)
 		if buf.channels > 1
-			input = buf.r
-			f.apply(input, buf.r, prev_xr, prev_yr)
+			r.apply(buf.r)
 
+
+// filter with a state
+class DynamicChannelFilter//Biquad
+	BasicFilter[] f
+	float[2] prev_x, prev_y
+	void __init__()
+		reset()
+	void __assign__(DynamicChannelFilter o)
+		pass
+	void reset()
+		for i in 0:2
+			prev_x[i] = 0
+			prev_y[i] = 0
+	void create(int mode, float[] freq, float[] q, float[] gain, float _sample_rate)
+		//print("create..." + len(freq) + " " + len(q) + " " + len(gain))
+		f.resize(len(freq))
+		for i in 0:len(freq):2
+			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)
+	void apply(float[] buf)
+		//print("apply " + len(buf))
+		let input = buf
+		for i in 0:len(buf)-1:2
+			f[i].apply(input[i:i+2], buf[i:i+2], prev_x, prev_y)
+
+// filter with a state
+class DynamicFilter//Biquad
+	DynamicChannelFilter l, r
+	void __init__()
+		reset()
+	void __assign__(DynamicFilter o)
+		pass
+	void reset()
+		l.reset()
+		r.reset()
+	void create(int mode, float[] freq, float[] q, float[] gain, float _sample_rate)
+		l.create(mode, freq, q, gain, _sample_rate)
+		r.create(mode, freq, q, gain, _sample_rate)
+	void apply(AudioBuffer buf)
+		l.apply(buf.l)
+		if buf.channels > 1
+			r.apply(buf.r)

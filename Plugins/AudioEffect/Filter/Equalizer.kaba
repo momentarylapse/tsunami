@@ -2,9 +2,10 @@
 // Title[Deutsch] = Equalizer
 
 use "../../api.kaba"
-use "../../grid.kaba"
-use "../../tone.kaba"
-use "../../filter.kaba"
+use "../../helper/grid.kaba"
+use "../../helper/tone.kaba"
+use "../../helper/filter.kaba"
+use "../../helper/curves.kaba"
 
 
 
@@ -36,11 +37,10 @@ class Peak
 		// ~ (f1 - f0) / f0 = f1/f0 - 1
 	//	return pow(2, width/12) - 1
 	
-	void create_filter(BasicFilter f, float sample_rate)
+	void create_filter(Filter f, float sample_rate)
 		float freq = pitch_to_freq(pitch)
 		f.create(mode, freq, q, gain, sample_rate)
 
-				
 
 class EqCurve extends Curve
 	float gain
@@ -55,42 +55,11 @@ class EqCurve extends Curve
 		float r = gain
 		for p in peaks
 			if p.enabled
-				BasicFilter f
+				Filter f
 				p.create_filter(f, sample_rate)
-				r += f.gain(freq)//p.dgain(pitch)
+				r += f.l.f.gain(freq)//p.dgain(pitch)
 		return r
 
-class SpectrumCurve extends Curve
-	float[] spec
-	float sample_rate
-	RingBuffer *ring
-	int N
-	override void __init__()
-		ring = new RingBuffer(65536)
-		N = 4096*2
-		sample_rate = DEFAULT_SAMPLE_RATE
-		col = colors.text_soft2
-	override void __delete__()
-		delete ring
-	void set(AudioBuffer buf, float _sample_rate)
-		sample_rate = _sample_rate
-		ring.write(buf)
-	
-		AudioBuffer b
-		while ring.available() >= N
-			ring.read_ref(b, N)
-			complex[] zr, zl
-			N = buf.length
-			b.get_spectrum(zr, zl, N)
-			spec.resize(zr.num)
-			for z,i in zr
-				spec[i] = log(z.abs())
-			ring.read_ref_done(b)
-	override float get(float freq)
-		int i = freq * N / sample_rate
-		if i >= spec.num-2
-			return 0
-		return spec[i]*10
 
 class Config extends PluginData
 	float gain
@@ -117,7 +86,7 @@ class Equalizer extends AudioEffect
 		filter.clear()
 		filter.resize(len(config.peaks))
 		for p,stage in config.peaks
-			p.create_filter(filter[stage].f, session.sample_rate())
+			p.create_filter(filter[stage], session.sample_rate())
 	
 	override void reset_state()
 		for f in filter

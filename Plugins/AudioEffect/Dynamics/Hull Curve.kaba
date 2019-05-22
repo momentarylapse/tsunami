@@ -2,7 +2,7 @@
 // Title[Deutsch] = Hüllkurve
 
 use "../../api.kaba"
-use "../../grid.kaba"
+use "../../helper/grid.kaba"
 
 
 

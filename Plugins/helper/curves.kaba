@@ -1,0 +1,47 @@
+use "../api.kaba"
+use "grid.kaba"
+use "filter.kaba"
+
+
+class FilterGainCurve extends Curve
+	Filter f
+	override float get(float freq)
+		return f.l.f.gain(freq)
+
+class FilterPhaseShiftCurve extends Curve
+	Filter f
+	override float get(float freq)
+		return f.l.f.phase_shift(freq)
+
+
+class SpectrumCurve extends Curve
+	float[] spec
+	float sample_rate
+	RingBuffer *ring
+	int N
+	override void __init__()
+		ring = new RingBuffer(65536)
+		N = 4096*2
+		sample_rate = DEFAULT_SAMPLE_RATE
+		col = colors.text_soft2
+	override void __delete__()
+		delete ring
+	void set(AudioBuffer buf, float _sample_rate)
+		sample_rate = _sample_rate
+		ring.write(buf)
+	
+		AudioBuffer b
+		while ring.available() >= N
+			ring.read_ref(b, N)
+			complex[] zr, zl
+			N = buf.length
+			b.get_spectrum(zr, zl, N)
+			spec.resize(zr.num)
+			for z,i in zr
+				spec[i] = log(z.abs())
+			ring.read_ref_done(b)
+	override float get(float freq)
+		int i = freq * N / sample_rate
+		if i >= spec.num-2
+			return 0
+		return spec[i]*10

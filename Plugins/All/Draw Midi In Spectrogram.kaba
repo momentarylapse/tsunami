@@ -1,8 +1,8 @@
 // Image = hui:find
 // Title[Deutsch] = Midi in Spektrum malen
 use "../api.kaba"
-use "../grid.kaba"
-use "../tone.kaba"
+use "../helper/grid.kaba"
+use "../helper/tone.kaba"
 
 //#show
 //#disasm

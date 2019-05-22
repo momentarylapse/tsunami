@@ -1,5 +1,5 @@
 use "../api.kaba"
-use "../tone.kaba"
+use "../helper/tone.kaba"
 
 const int NUM_OSCILLATORS = 6
 

@@ -770,9 +770,21 @@ void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &not
 	}
 }
 
+Range extend_range_to_bars(const Range &r, const BarCollection &bars)
+{
+	Range rr = r;
+	for (auto &b: bars){
+		if (b->range().is_more_inside(rr.start()))
+			rr.set_start(b->range().start());
+		if (b->range().is_more_inside(rr.end()))
+			rr.set_end(b->range().end());
+	}
+	return rr;
+}
+
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi)
 {
-	cur_range = cam->range() - shift;
+	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 

@@ -2710,7 +2710,7 @@ popup_bar_menu
 
 0
 0
-12
+13
 Item
 bar_menu_header
 disabled
@@ -2759,64 +2759,16 @@ Separator
 7
 0
 0
-Menu
-menu_track
-
-8
-0
-5
-Item
-delete_track
-
-0
-0
-0
-Item
-track_properties
-
-1
-0
-0
-Menu
-convert_menu
-
-2
-0
-2
-Item
-track_convert_mono
-
-0
-0
-0
-Item
-track_convert_stereo
-
-1
-0
-0
-Item
-track_edit_fx
-
-3
-0
-0
-Item
-track_edit_midi
-
-4
-0
-0
 Item
 track_add_marker
 
-9
+8
 0
 0
 Menu
 menu_midi_mode
 
-10
+9
 0
 3
 Item
@@ -2840,7 +2792,7 @@ checkable
 Menu
 menu_version
 
-11
+10
 0
 4
 Item
@@ -2867,13 +2819,121 @@ delete_layer
 3
 0
 0
+Menu
+menu_track
+
+11
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Menu
+convert_menu
+
+1
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
+Item
+track_properties
+
+4
+0
+0
+Menu
+song_menu
+
+12
+0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
+0
+0
 // Resource
 Menu
 popup_buffer_menu
 
 0
 0
-8
+9
 Item
 buffer_menu_header
 disabled
@@ -2904,64 +2964,16 @@ Separator
 4
 0
 0
-Menu
-menu_track
-
-5
-0
-5
-Item
-delete_track
-
-0
-0
-0
-Item
-track_properties
-
-1
-0
-0
-Menu
-convert_menu
-
-2
-0
-2
-Item
-track_convert_mono
-
-0
-0
-0
-Item
-track_convert_stereo
-
-1
-0
-0
-Item
-track_edit_fx
-
-3
-0
-0
-Item
-track_edit_midi
-
-4
-0
-0
 Item
 track_add_marker
 
-6
+5
 0
 0
 Menu
 menu_version
 
-7
+6
 0
 4
 Item
@@ -2986,6 +2998,114 @@ Item
 delete_layer
 
 3
+0
+0
+Menu
+menu_track
+
+7
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Menu
+convert_menu
+
+1
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
+Item
+track_properties
+
+4
+0
+0
+Menu
+song_menu
+
+8
+0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
 0
 0
 // Resource
@@ -3037,7 +3157,7 @@ popup_layer_menu
 
 0
 0
-7
+10
 Item
 header
 disabled
@@ -3098,13 +3218,127 @@ delete_layer
 6
 0
 0
+Separator
+
+
+7
+0
+0
+Menu
+menu_track
+
+8
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Menu
+convert_menu
+
+1
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
+Item
+track_properties
+
+4
+0
+0
+Menu
+song_menu
+
+9
+0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
+0
+0
 // Resource
 Menu
 popup_marker_menu
 
 0
 0
-7
+8
 Item
 marker_menu_header
 disabled
@@ -3136,57 +3370,9 @@ Separator
 0
 0
 Menu
-menu_track
-
-5
-0
-5
-Item
-delete_track
-
-0
-0
-0
-Item
-track_properties
-
-1
-0
-0
-Menu
-convert_menu
-
-2
-0
-2
-Item
-track_convert_mono
-
-0
-0
-0
-Item
-track_convert_stereo
-
-1
-0
-0
-Item
-track_edit_fx
-
-3
-0
-0
-Item
-track_edit_midi
-
-4
-0
-0
-Menu
 menu_version
 
-6
+5
 0
 4
 Item
@@ -3213,13 +3399,121 @@ delete_layer
 3
 0
 0
+Menu
+menu_track
+
+6
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Menu
+convert_menu
+
+1
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
+Item
+track_properties
+
+4
+0
+0
+Menu
+song_menu
+
+7
+0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
+0
+0
 // Resource
 Menu
 popup_sample_menu
 
 0
 0
-9
+10
 Item
 sample_menu_header
 disabled
@@ -3256,64 +3550,16 @@ Separator
 5
 0
 0
-Menu
-menu_track
-
-6
-0
-5
-Item
-delete_track
-
-0
-0
-0
-Item
-track_properties
-
-1
-0
-0
-Menu
-convert_menu
-
-2
-0
-2
-Item
-track_convert_mono
-
-0
-0
-0
-Item
-track_convert_stereo
-
-1
-0
-0
-Item
-track_edit_fx
-
-3
-0
-0
-Item
-track_edit_midi
-
-4
-0
-0
 Item
 track_add_marker
 
-7
+6
 0
 0
 Menu
 menu_version
 
-8
+7
 0
 4
 Item
@@ -3338,6 +3584,114 @@ Item
 delete_layer
 
 3
+0
+0
+Menu
+menu_track
+
+8
+0
+5
+Item
+delete_track
+
+0
+0
+0
+Menu
+convert_menu
+
+1
+0
+2
+Item
+track_convert_mono
+
+0
+0
+0
+Item
+track_convert_stereo
+
+1
+0
+0
+Item
+track_edit_fx
+
+2
+0
+0
+Item
+track_edit_midi
+
+3
+0
+0
+Item
+track_properties
+
+4
+0
+0
+Menu
+song_menu
+
+9
+0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
+2
+0
+0
+Item
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
+
+1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
 0
 0
 // Resource
@@ -3492,7 +3846,7 @@ popup_song_menu
 
 0
 0
-5
+7
 Item
 song_menu_header
 disabled
@@ -3542,9 +3896,21 @@ song_edit_samples
 0
 0
 Item
-song_properties
+show_mixing_console
 
 4
+0
+0
+Item
+show_mastering_console
+
+5
+0
+0
+Item
+song_properties
+
+6
 0
 0
 // Resource
@@ -3632,7 +3998,7 @@ popup_track_menu
 
 0
 0
-11
+12
 Item
 track_menu_header
 disabled
@@ -3651,40 +4017,58 @@ delete_track
 2
 0
 0
-Item
-track_properties
+Menu
+convert_menu
 
 3
 0
+2
+Item
+track_convert_mono
+
 0
-Separator
-
-
-4
 0
 0
 Item
-track_add_marker
+track_convert_stereo
 
-5
+1
 0
 0
 Item
 track_edit_fx
 
-6
+4
 0
 0
 Item
 track_edit_midi
 
+5
+0
+0
+Item
+track_properties
+
+6
+0
+0
+Separator
+
+
 7
+0
+0
+Item
+track_add_marker
+
+8
 0
 0
 Menu
 menu_midi_mode
 
-8
+9
 0
 3
 Item
@@ -3708,7 +4092,7 @@ checkable
 Menu
 menu_version
 
-9
+10
 0
 4
 Item
@@ -3736,21 +4120,63 @@ delete_layer
 0
 0
 Menu
-convert_menu
+song_menu
 
-10
+11
 0
+5
+Menu
+menu_track_new
+
+0
+0
+4
+Item
+add_audio_track_mono
+image=hui:add
+0
+0
+0
+Item
+add_audio_track_stereo
+image=hui:add
+1
+0
+0
+Item
+add_midi_track
+image=hui:add
 2
-Item
-track_convert_mono
-
-0
 0
 0
 Item
-track_convert_stereo
+add_time_track
+image=hui:add
+3
+0
+0
+Item
+song_edit_samples
 
 1
+0
+0
+Item
+show_mixing_console
+
+2
+0
+0
+Item
+show_mastering_console
+
+3
+0
+0
+Item
+song_properties
+
+4
 0
 0
 // Resource
@@ -5263,7 +5689,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-545
+614
 // Text
 /cancel
 Cancel
@@ -6117,11 +6543,23 @@ Edit midi
 popup_all_menu/track_properties
 Properties
 
+popup_bar_menu/add_audio_track_mono
+Audio (mono)
+
+popup_bar_menu/add_audio_track_stereo
+Audio (stereo)
+
 popup_bar_menu/add_bars
 Add bars...
 
+popup_bar_menu/add_midi_track
+Midi
+
 popup_bar_menu/add_pause
 Add pause...
+
+popup_bar_menu/add_time_track
+Rhythm
 
 popup_bar_menu/bar_menu_header
 Bar
@@ -6165,11 +6603,29 @@ Midi mode
 popup_bar_menu/menu_track
 Track
 
+popup_bar_menu/menu_track_new
+Add new track
+
 popup_bar_menu/menu_version
 Version
 
 popup_bar_menu/scale_bars
 Scale
+
+popup_bar_menu/show_mastering_console
+Mastering
+
+popup_bar_menu/show_mixing_console
+Mixing
+
+popup_bar_menu/song_edit_samples
+Manage samples
+
+popup_bar_menu/song_menu
+File
+
+popup_bar_menu/song_properties
+Properties
 
 popup_bar_menu/track_add_marker
 Add marker
@@ -6188,6 +6644,18 @@ Edit midi
 
 popup_bar_menu/track_properties
 Properties
+
+popup_buffer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_buffer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_buffer_menu/add_midi_track
+Midi
+
+popup_buffer_menu/add_time_track
+Rhythm
 
 popup_buffer_menu/buffer_menu_header
 Audio buffer
@@ -6219,8 +6687,26 @@ Make movable
 popup_buffer_menu/menu_track
 Track
 
+popup_buffer_menu/menu_track_new
+Add new track
+
 popup_buffer_menu/menu_version
 Version
+
+popup_buffer_menu/show_mastering_console
+Mastering
+
+popup_buffer_menu/show_mixing_console
+Mixing
+
+popup_buffer_menu/song_edit_samples
+Manage samples
+
+popup_buffer_menu/song_menu
+File
+
+popup_buffer_menu/song_properties
+Properties
 
 popup_buffer_menu/track_add_marker
 Add marker
@@ -6252,7 +6738,25 @@ Save parameters
 popup_fx_menu/show_large
 Show large
 
+popup_layer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_layer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_layer_menu/add_midi_track
+Midi
+
+popup_layer_menu/add_time_track
+Rhythm
+
+popup_layer_menu/convert_menu
+Convert
+
 popup_layer_menu/delete_layer
+Delete
+
+popup_layer_menu/delete_track
 Delete
 
 popup_layer_menu/header
@@ -6276,8 +6780,53 @@ Tabulature
 popup_layer_menu/menu_midi_mode
 Midi mode
 
+popup_layer_menu/menu_track
+Track
+
+popup_layer_menu/menu_track_new
+Add new track
+
+popup_layer_menu/show_mastering_console
+Mastering
+
+popup_layer_menu/show_mixing_console
+Mixing
+
+popup_layer_menu/song_edit_samples
+Manage samples
+
+popup_layer_menu/song_menu
+File
+
+popup_layer_menu/song_properties
+Properties
+
+popup_layer_menu/track_convert_mono
+Mono
+
+popup_layer_menu/track_convert_stereo
+Stereo
+
+popup_layer_menu/track_edit_fx
+Edit effects
+
 popup_layer_menu/track_edit_midi
 Edit midi
+
+popup_layer_menu/track_properties
+Properties
+
+popup_marker_menu/add_audio_track_mono
+Audio (mono)
+
+popup_marker_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_marker_menu/add_midi_track
+Midi
+
+popup_marker_menu/add_time_track
+Rhythm
 
 popup_marker_menu/convert_menu
 Convert
@@ -6309,8 +6858,26 @@ Marker
 popup_marker_menu/menu_track
 Track
 
+popup_marker_menu/menu_track_new
+Add new track
+
 popup_marker_menu/menu_version
 Version
+
+popup_marker_menu/show_mastering_console
+Mastering
+
+popup_marker_menu/show_mixing_console
+Mixing
+
+popup_marker_menu/song_edit_samples
+Manage samples
+
+popup_marker_menu/song_menu
+File
+
+popup_marker_menu/song_properties
+Properties
 
 popup_marker_menu/track_convert_mono
 Mono
@@ -6326,6 +6893,18 @@ Edit midi
 
 popup_marker_menu/track_properties
 Properties
+
+popup_sample_menu/add_audio_track_mono
+Audio (mono)
+
+popup_sample_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_sample_menu/add_midi_track
+Midi
+
+popup_sample_menu/add_time_track
+Rhythm
 
 popup_sample_menu/convert_menu
 Convert
@@ -6351,6 +6930,9 @@ Merge...
 popup_sample_menu/menu_track
 Track
 
+popup_sample_menu/menu_track_new
+Add new track
+
 popup_sample_menu/menu_version
 Version
 
@@ -6361,6 +6943,21 @@ popup_sample_menu/sample_menu_header
 Samples
 
 popup_sample_menu/sample_properties
+Properties
+
+popup_sample_menu/show_mastering_console
+Mastering
+
+popup_sample_menu/show_mixing_console
+Mixing
+
+popup_sample_menu/song_edit_samples
+Manage samples
+
+popup_sample_menu/song_menu
+File
+
+popup_sample_menu/song_properties
 Properties
 
 popup_sample_menu/track_add_marker
@@ -6453,6 +7050,12 @@ Rhythm
 popup_song_menu/menu_track_new
 Add new track
 
+popup_song_menu/show_mastering_console
+Mastering
+
+popup_song_menu/show_mixing_console
+Mixing
+
 popup_song_menu/song_edit_samples
 Manage samples
 
@@ -6495,6 +7098,18 @@ Edit effects
 popup_time_track_menu/track_properties
 Properties
 
+popup_track_menu/add_audio_track_mono
+Audio (mono)
+
+popup_track_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_track_menu/add_midi_track
+Midi
+
+popup_track_menu/add_time_track
+Rhythm
+
 popup_track_menu/convert_menu
 Convert
 
@@ -6525,8 +7140,26 @@ Tabulature
 popup_track_menu/menu_midi_mode
 Midi mode
 
+popup_track_menu/menu_track_new
+Add new track
+
 popup_track_menu/menu_version
 Version
+
+popup_track_menu/show_mastering_console
+Mastering
+
+popup_track_menu/show_mixing_console
+Mixing
+
+popup_track_menu/song_edit_samples
+Manage samples
+
+popup_track_menu/song_menu
+File
+
+popup_track_menu/song_properties
+Properties
 
 popup_track_menu/track_add_marker
 Add marker
@@ -6906,7 +7539,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-704
+773
 // Text
 /bpm
 Bpm
@@ -8048,11 +8681,23 @@ Midi bearbeiten
 popup_all_menu/track_properties
 Eigenschaften
 
+popup_bar_menu/add_audio_track_mono
+Audio (mono)
+
+popup_bar_menu/add_audio_track_stereo
+Audio (stereo)
+
 popup_bar_menu/add_bars
 Takte hinzufügen...
 
+popup_bar_menu/add_midi_track
+Midi
+
 popup_bar_menu/add_pause
 Pause hinzufügen...
+
+popup_bar_menu/add_time_track
+Metronom
 
 popup_bar_menu/bar_menu_header
 Takt
@@ -8096,11 +8741,29 @@ Midi Modus
 popup_bar_menu/menu_track
 Spur
 
+popup_bar_menu/menu_track_new
+Neue Spur
+
 popup_bar_menu/menu_version
 Version
 
 popup_bar_menu/scale_bars
 Skalieren
+
+popup_bar_menu/show_mastering_console
+Mastering
+
+popup_bar_menu/show_mixing_console
+Mischpult
+
+popup_bar_menu/song_edit_samples
+Samples verwalten
+
+popup_bar_menu/song_menu
+Datei
+
+popup_bar_menu/song_properties
+Eigenschaften
 
 popup_bar_menu/track_add_marker
 Marker hinzufügen
@@ -8119,6 +8782,18 @@ Midi bearbeiten
 
 popup_bar_menu/track_properties
 Eigenschaften
+
+popup_buffer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_buffer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_buffer_menu/add_midi_track
+Midi
+
+popup_buffer_menu/add_time_track
+Metronom
 
 popup_buffer_menu/buffer_menu_header
 Audio Puffer
@@ -8150,8 +8825,26 @@ Beweglich machen
 popup_buffer_menu/menu_track
 Spur
 
+popup_buffer_menu/menu_track_new
+Neue Spur
+
 popup_buffer_menu/menu_version
 Version
+
+popup_buffer_menu/show_mastering_console
+Mastering
+
+popup_buffer_menu/show_mixing_console
+Mischpult
+
+popup_buffer_menu/song_edit_samples
+Samples verwalten
+
+popup_buffer_menu/song_menu
+Datei
+
+popup_buffer_menu/song_properties
+Eigenschaften
 
 popup_buffer_menu/track_add_marker
 Marker hinzufügen
@@ -8183,7 +8876,25 @@ Parameter speichern
 popup_fx_menu/show_large
 Groß...
 
+popup_layer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_layer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_layer_menu/add_midi_track
+Midi
+
+popup_layer_menu/add_time_track
+Metronom
+
+popup_layer_menu/convert_menu
+Konvertieren
+
 popup_layer_menu/delete_layer
+Löschen
+
+popup_layer_menu/delete_track
 Löschen
 
 popup_layer_menu/header
@@ -8207,8 +8918,53 @@ Tabulatur
 popup_layer_menu/menu_midi_mode
 Midi Modus
 
+popup_layer_menu/menu_track
+Spur
+
+popup_layer_menu/menu_track_new
+Neue Spur
+
+popup_layer_menu/show_mastering_console
+Mastering
+
+popup_layer_menu/show_mixing_console
+Mischpult
+
+popup_layer_menu/song_edit_samples
+Samples Verwalten
+
+popup_layer_menu/song_menu
+Datei
+
+popup_layer_menu/song_properties
+Eigenschaften
+
+popup_layer_menu/track_convert_mono
+Mono
+
+popup_layer_menu/track_convert_stereo
+Stereo
+
+popup_layer_menu/track_edit_fx
+Effekte bearbeiten
+
 popup_layer_menu/track_edit_midi
 Midi bearbeiten
+
+popup_layer_menu/track_properties
+Eigenschaften
+
+popup_marker_menu/add_audio_track_mono
+Audio (mono)
+
+popup_marker_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_marker_menu/add_midi_track
+Midi
+
+popup_marker_menu/add_time_track
+Metronom
 
 popup_marker_menu/convert_menu
 Konvertieren
@@ -8240,8 +8996,26 @@ Marker
 popup_marker_menu/menu_track
 Spur
 
+popup_marker_menu/menu_track_new
+Neue Spur
+
 popup_marker_menu/menu_version
 Version
+
+popup_marker_menu/show_mastering_console
+Mastering
+
+popup_marker_menu/show_mixing_console
+Mischpult
+
+popup_marker_menu/song_edit_samples
+Samples verwalten
+
+popup_marker_menu/song_menu
+Datei
+
+popup_marker_menu/song_properties
+Eigenschaften
 
 popup_marker_menu/track_convert_mono
 Mono
@@ -8273,6 +9047,18 @@ Skalieren
 popup_pause_menu/track_add_marker
 Marker hinzufügen
 
+popup_sample_menu/add_audio_track_mono
+Audio (mono)
+
+popup_sample_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_sample_menu/add_midi_track
+Midi
+
+popup_sample_menu/add_time_track
+Metronom
+
 popup_sample_menu/convert_menu
 Konvertieren
 
@@ -8297,6 +9083,9 @@ Zusammenfügen...
 popup_sample_menu/menu_track
 Spur
 
+popup_sample_menu/menu_track_new
+Neue Spur
+
 popup_sample_menu/menu_version
 Version
 
@@ -8307,6 +9096,21 @@ popup_sample_menu/sample_menu_header
 Sample
 
 popup_sample_menu/sample_properties
+Eigenschaften
+
+popup_sample_menu/show_mastering_console
+Mastering
+
+popup_sample_menu/show_mixing_console
+Mischpult
+
+popup_sample_menu/song_edit_samples
+Samples verwalten
+
+popup_sample_menu/song_menu
+Datei
+
+popup_sample_menu/song_properties
 Eigenschaften
 
 popup_sample_menu/track_add_marker
@@ -8429,6 +9233,12 @@ Leere Spur hinzufügen
 popup_song_menu/menu_track_new
 Neue Spur hinzufügen
 
+popup_song_menu/show_mastering_console
+Mastering
+
+popup_song_menu/show_mixing_console
+Mischpult
+
 popup_song_menu/song_edit_bars
 Takte bearbeiten
 
@@ -8474,6 +9284,18 @@ Effekte bearbeiten
 popup_time_track_menu/track_properties
 Eigenschaften
 
+popup_track_menu/add_audio_track_mono
+Audio (mono)
+
+popup_track_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_track_menu/add_midi_track
+Midi
+
+popup_track_menu/add_time_track
+Metronom
+
 popup_track_menu/convert_menu
 Konvertieren
 
@@ -8513,11 +9335,29 @@ Audiopuffer
 popup_track_menu/menu_midi_mode
 Midi Modus
 
+popup_track_menu/menu_track_new
+Neue Spur
+
 popup_track_menu/menu_version
 Version
 
+popup_track_menu/show_mastering_console
+Mastering
+
+popup_track_menu/show_mixing_console
+Mischpult
+
 popup_track_menu/song_edit_bars
 Takte bearbeiten
+
+popup_track_menu/song_edit_samples
+Samples verwalten
+
+popup_track_menu/song_menu
+Datei
+
+popup_track_menu/song_properties
+Eigenschaften
 
 popup_track_menu/track_add_marker
 Marker setzen

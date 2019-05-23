@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-705
+774
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2117,6 +2117,213 @@ Midi bearbeiten
 
 popup_sample_menu/track_properties
 Eigenschaften
+
+popup_bar_menu/add_audio_track_mono
+Audio (mono)
+
+popup_bar_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_bar_menu/add_midi_track
+Midi
+
+popup_bar_menu/add_time_track
+Metronom
+
+popup_bar_menu/menu_track_new
+Neue Spur
+
+popup_bar_menu/song_edit_samples
+Samples verwalten
+
+popup_bar_menu/song_menu
+Datei
+
+popup_bar_menu/song_properties
+Eigenschaften
+
+popup_buffer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_buffer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_buffer_menu/add_midi_track
+Midi
+
+popup_buffer_menu/add_time_track
+Metronom
+
+popup_buffer_menu/menu_track_new
+Neue Spur
+
+popup_buffer_menu/song_edit_samples
+Samples verwalten
+
+popup_buffer_menu/song_menu
+Datei
+
+popup_buffer_menu/song_properties
+Eigenschaften
+
+popup_layer_menu/add_audio_track_mono
+Audio (mono)
+
+popup_layer_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_layer_menu/add_midi_track
+Midi
+
+popup_layer_menu/add_time_track
+Metronom
+
+popup_layer_menu/menu_track_new
+Neue Spur
+
+popup_layer_menu/song_edit_samples
+Samples Verwalten
+
+popup_layer_menu/song_menu
+Datei
+
+popup_layer_menu/song_properties
+Eigenschaften
+
+popup_marker_menu/add_audio_track_mono
+Audio (mono)
+
+popup_marker_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_marker_menu/add_midi_track
+Midi
+
+popup_marker_menu/add_time_track
+Metronom
+
+popup_marker_menu/menu_track_new
+Neue Spur
+
+popup_marker_menu/song_edit_samples
+Samples verwalten
+
+popup_marker_menu/song_menu
+Datei
+
+popup_marker_menu/song_properties
+Eigenschaften
+
+popup_sample_menu/add_audio_track_mono
+Audio (mono)
+
+popup_sample_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_sample_menu/add_midi_track
+Midi
+
+popup_sample_menu/add_time_track
+Metronom
+
+popup_sample_menu/menu_track_new
+Neue Spur
+
+popup_sample_menu/song_edit_samples
+Samples verwalten
+
+popup_sample_menu/song_menu
+Datei
+
+popup_sample_menu/song_properties
+Eigenschaften
+
+popup_track_menu/add_audio_track_mono
+Audio (mono)
+
+popup_track_menu/add_audio_track_stereo
+Audio (stereo)
+
+popup_track_menu/add_midi_track
+Midi
+
+popup_track_menu/add_time_track
+Metronom
+
+popup_track_menu/menu_track_new
+Neue Spur
+
+popup_track_menu/song_edit_samples
+Samples verwalten
+
+popup_track_menu/song_menu
+Datei
+
+popup_track_menu/song_properties
+Eigenschaften
+
+popup_layer_menu/convert_menu
+Konvertieren
+
+popup_layer_menu/delete_track
+Löschen
+
+popup_layer_menu/menu_track
+Spur
+
+popup_layer_menu/track_convert_mono
+Mono
+
+popup_layer_menu/track_convert_stereo
+Stereo
+
+popup_layer_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_layer_menu/track_properties
+Eigenschaften
+
+popup_bar_menu/show_mastering_console
+Mastering
+
+popup_bar_menu/show_mixing_console
+Mischpult
+
+popup_buffer_menu/show_mastering_console
+Mastering
+
+popup_buffer_menu/show_mixing_console
+Mischpult
+
+popup_layer_menu/show_mastering_console
+Mastering
+
+popup_layer_menu/show_mixing_console
+Mischpult
+
+popup_marker_menu/show_mastering_console
+Mastering
+
+popup_marker_menu/show_mixing_console
+Mischpult
+
+popup_sample_menu/show_mastering_console
+Mastering
+
+popup_sample_menu/show_mixing_console
+Mischpult
+
+popup_song_menu/show_mastering_console
+Mastering
+
+popup_song_menu/show_mixing_console
+Mischpult
+
+popup_track_menu/show_mastering_console
+Mastering
+
+popup_track_menu/show_mixing_console
+Mischpult
 
 // Num Language Strings
 220

@@ -9,3 +9,22 @@ Menu popup_layer_menu ""
 	Item layer_make_track "Turn into track"
 	Item layer_merge "Merge..."
 	Item delete_layer "Delete"
+	Separator
+	Menu menu_track "Track"
+		Item delete_track "Delete"
+		Menu convert_menu "Convert"
+			Item track_convert_mono "Mono"
+			Item track_convert_stereo "Stereo"
+		Item track_edit_fx "Edit effects"
+		Item track_edit_midi "Edit midi"
+		Item track_properties "Properties"
+	Menu song_menu "File"
+		Menu menu_track_new "Add new track"
+			Item add_audio_track_mono "Audio (mono)" image=hui:add
+			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
+			Item add_midi_track "Midi" image=hui:add
+			Item add_time_track "Rhythm" image=hui:add
+		Item song_edit_samples "Manage samples"
+		Item show_mixing_console "Mixing"
+		Item show_mastering_console "Mastering"
+		Item song_properties "Properties"

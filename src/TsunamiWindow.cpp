@@ -155,6 +155,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("sample_manager", [=]{ on_sample_manager(); });
 	event("song_edit_samples", [=]{ on_sample_manager(); });
 	event("show_mixing_console", [=]{ on_mixing_console(); });
+	event("show_mastering_console", [=]{ on_mastering_console(); });
 	event("show_fx_console", [=]{ on_fx_console(); });
 	event("sample_from_selection", [=]{ on_sample_from_selection(); });
 	set_key_code("sample_from_selection", -1, "hui:cut");
@@ -743,6 +744,11 @@ void TsunamiWindow::on_mixing_console()
 void TsunamiWindow::on_fx_console()
 {
 	session->set_mode("default/fx");
+}
+
+void TsunamiWindow::on_mastering_console()
+{
+	session->set_mode("default/mastering");
 }
 
 void TsunamiWindow::on_sample_import()

@@ -630,6 +630,17 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 		case INLINE_INT64_DECREASE:
 			add_cmd(Asm::INST_SUB, param[0], param_imm(TypeInt64, 0x1));
 			break;
+		case INLINE_INT64_TO_INT:{
+			int vrax = add_virtual_reg(Asm::REG_RAX);
+			add_cmd(Asm::INST_MOV, param_vreg(TypeInt64, vrax), param[0]);
+			add_cmd(Asm::INST_MOV, ret, param_vreg(TypeInt, vrax, Asm::REG_EAX));
+			}break;
+		case INLINE_INT_TO_INT64:{
+			int vrax = add_virtual_reg(Asm::REG_RAX);
+			add_cmd(Asm::INST_XOR, param_vreg(TypeInt64, vrax), param_vreg(TypeInt64, vrax));
+			add_cmd(Asm::INST_MOV, param_vreg(TypeInt, vrax, Asm::REG_EAX), param[0]);
+			add_cmd(Asm::INST_MOV, ret, param_vreg(TypeInt64, vrax));
+			}break;
 // float
 		case INLINE_FLOAT_ADD_ASSIGN:
 		case INLINE_FLOAT_SUBTRACT_ASSIGN:
@@ -950,6 +961,16 @@ void SerializerX86::SerializeInlineFunction(Node *com, const Array<SerialNodePar
 				add_cmd(Asm::INST_MULSS, p_xmm0, param_shift(param[1], i * 4, TypeFloat32));
 				add_cmd(Asm::INST_MOVSS, param_shift(ret, i * 4, TypeFloat32), p_xmm0);
 			}
+			break;
+		case INLINE_VECTOR_MULTIPLY_VV:
+			add_cmd(Asm::INST_MOVSS, p_xmm0, param_shift(param[0], 0 * 4, TypeFloat32));
+			add_cmd(Asm::INST_MULSS, p_xmm0, param_shift(param[1], 0 * 4, TypeFloat32));
+			for (int i=1;i<3;i++){
+				add_cmd(Asm::INST_MOVSS, p_xmm1, param_shift(param[0], i * 4, TypeFloat32));
+				add_cmd(Asm::INST_MULSS, p_xmm1, param_shift(param[1], i * 4, TypeFloat32));
+				add_cmd(Asm::INST_ADDSS, p_xmm0, p_xmm1);
+			}
+			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
 			break;
 		case INLINE_VECTOR_DIVIDE_VF:
 			for (int i=0;i<3;i++){

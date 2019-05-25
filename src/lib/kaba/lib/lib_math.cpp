@@ -308,12 +308,16 @@ void amd64_vec_ang2dir(vector &r, vector &v)
 {	r = v.ang2dir();	}
 void amd64_vec_rotate(vector &r, vector &v, vector &a)
 {	r = v.rotate(a);	}
-void amd64_vec_transform(vector &r, vector &v, matrix &m)
+void amd64_mat_transform(vector &r, matrix &m, vector &v)
 {	r = v.transform(m);	}
-void amd64_vec_transform_normal(vector &r, vector &v, matrix &m)
+void amd64_mat_transform_normal(vector &r, matrix &m, vector &v)
 {	r = v.transform_normal(m);	}
-void amd64_vec_untransform(vector &r, vector &v, matrix &m)
+void amd64_mat_untransform(vector &r, matrix &m, vector &v)
 {	r = v.untransform(m);	}
+void amd64_mat_project(vector &r, matrix &m, vector &v)
+{	r = m.project(v);	}
+void amd64_mat_unproject(vector &r, matrix &m, vector &v)
+{	r = m.unproject(v);	}
 void amd64_vec_ortho(vector &r, vector &v)
 {	r = v.ortho();	}
 void amd64_quat_get_angles(vector &r, quaternion &q)
@@ -523,14 +527,8 @@ void SIAddPackageMath()
 		class_add_func("ang2dir", TypeVector, amd64_wrap(mf(&vector::ang2dir), &amd64_vec_ang2dir), FLAG_PURE);
 		class_add_func("rotate", TypeVector, amd64_wrap(mf(&vector::rotate), &amd64_vec_rotate), FLAG_PURE);
 			func_add_param("ang", TypeVector);
-		class_add_func("transform", TypeVector, amd64_wrap(mf(&vector::transform), &amd64_vec_transform), FLAG_PURE);
-			func_add_param("m", TypeMatrix);
-		class_add_func("transform_normal", TypeVector, amd64_wrap(mf(&vector::transform_normal), &amd64_vec_transform_normal), FLAG_PURE);
-			func_add_param("m", TypeMatrix);
-		class_add_func("untransform", TypeVector, amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform), FLAG_PURE);
-			func_add_param("m", TypeMatrix);
-		class_add_func("__div__", TypeVector, amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform), FLAG_PURE);
-			func_add_param("m", TypeMatrix);
+//		class_add_func("__div__", TypeVector, amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform), FLAG_PURE);
+//			func_add_param("m", TypeMatrix);
 		class_add_func("ortho", TypeVector, amd64_wrap(mf(&vector::ortho), &amd64_vec_ortho), FLAG_PURE);
 		class_add_func("str", TypeString, mf(&vector::str), FLAG_PURE);
 	
@@ -624,6 +622,14 @@ void SIAddPackageMath()
 		class_add_func("__mul__", TypeVector, amd64_wrap(mf(&matrix::mul_v), &amd64_mat_vec_mul), FLAG_PURE);
 			func_add_param("other", TypeVector);
 		class_add_func("str", TypeString, mf(&matrix::str), FLAG_PURE);
+		class_add_func("transform", TypeVector, /*amd64_wrap(mf(&m::transform),*/ (void*)&amd64_mat_transform/*)*/, FLAG_PURE);
+			func_add_param("v", TypeVector);
+		class_add_func("transform_normal", TypeVector, /*amd64_wrap(mf(&vector::transform_normal),*/ (void*)&amd64_mat_transform_normal/*)*/, FLAG_PURE);
+			func_add_param("v", TypeVector);
+		class_add_func("untransform", TypeVector, /*amd64_wrap(mf(&vector::untransform),*/ (void*)&amd64_mat_untransform/*)*/, FLAG_PURE);
+			func_add_param("v", TypeVector);
+		class_add_func("project", TypeVector, amd64_wrap(mf(&matrix::project), &amd64_mat_project), FLAG_PURE);
+			func_add_param("v", TypeVector);
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11", TypeFloat32, 0);
@@ -933,6 +939,11 @@ void SIAddPackageMath()
 		func_add_param("s_x", TypeFloat32);
 		func_add_param("s_y", TypeFloat32);
 		func_add_param("s_z", TypeFloat32);
+	add_func("MatrixPerspective", TypeMatrix, (void*)&MatrixPerspective, FLAG_PURE);
+		func_add_param("fovy", TypeFloat32);
+		func_add_param("aspect", TypeFloat32);
+		func_add_param("z_near", TypeFloat32);
+		func_add_param("z_far", TypeFloat32);
 	add_func("MatrixMultiply", TypeMatrix, (void*)&MatrixMultiply, FLAG_PURE);
 		func_add_param("m2", TypeMatrix);
 		func_add_param("m1", TypeMatrix);

@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.0.0";
+string LibVersion = "0.17.0.1";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -850,6 +850,11 @@ void CastInt2Int64(Value &r, Value &s)
 	r.init(TypeInt64);
 	r.as_int64() = (int64)s.as_int();
 }
+void CastInt642Int(Value &r, Value &s)
+{
+	r.init(TypeInt);
+	r.as_int() = s.as_int();
+}
 void CastInt2Char(Value &r, Value &s)
 {
 	r.init(TypeChar);
@@ -1621,6 +1626,7 @@ void Init(int instruction_set, int abi, bool allow_std_lib)
 
 	add_type_cast(10, TypeInt, TypeFloat32, "i2f", (void*)&CastInt2Float);
 	add_type_cast(10, TypeInt, TypeInt64, "i2i64", (void*)&CastInt2Int64);
+	add_type_cast(15, TypeInt64, TypeInt, "i642i", (void*)&CastInt642Int);
 	add_type_cast(10, TypeFloat32, TypeFloat64,"f2f64", (void*)&CastFloat2Float64);
 	add_type_cast(20, TypeFloat32, TypeInt, "f2i", (void*)&CastFloat2Int);
 	add_type_cast(10, TypeInt, TypeChar, "i2c", (void*)&CastInt2Char);

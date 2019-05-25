@@ -1672,7 +1672,10 @@ void SyntaxTree::parse_import()
 	string name = Exp.cur;
 	if (name.find(".kaba") >= 0){
 
-		string filename = script->filename.dirname() + name.substr(1, name.num - 2); // remove ""
+		string base_name = name.substr(1, name.num - 2); // remove ""
+		string filename = script->filename.dirname() + base_name;
+		if (base_name.head(2) == "@/")
+			filename = "/usr/share/kaba/lib/" + base_name.substr(2, -1); // TODO...
 		filename = filename.no_recursion();
 
 

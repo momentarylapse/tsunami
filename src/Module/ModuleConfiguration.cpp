@@ -162,4 +162,15 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 	}
 }
 
+string ModuleConfiguration::to_string() const
+{
+	return var_to_string(_class, (char*)this);
+}
+
+void ModuleConfiguration::from_string(const string &s, Session *session)
+{
+	reset();
+	int pos = 0;
+	var_from_string(_class, (char*)this, s, pos, session);
+}
 

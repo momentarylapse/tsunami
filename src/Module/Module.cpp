@@ -102,8 +102,7 @@ string Module::config_to_string() const
 	if (!config)
 		return "";
 
-	string s = var_to_string(config->_class, (char*)config);
-	return s;
+	return config->to_string();
 }
 
 
@@ -113,9 +112,7 @@ void Module::config_from_string(const string &param)
 	if (!config)
 		return;
 
-	config->reset();
-	int pos = 0;
-	var_from_string(config->_class, (char*)config, param, pos, session);
+	config->from_string(param, session);
 	on_config();
 }
 

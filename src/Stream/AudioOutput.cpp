@@ -12,6 +12,7 @@
 #include "../Module/Port/Port.h"
 #include "../Device/Device.h"
 #include "../Device/DeviceManager.h"
+#include "../lib/kaba/syntax/Class.h"
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -110,7 +111,7 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out)
 	for (int n=0; (n<2) and (done < (int)frames); n++){
 		AudioBuffer b;
 		ring_buf.read_ref(b, frames - done);
-		b.interleave(out, device_manager->get_output_volume() * volume);
+		b.interleave(out, device_manager->get_output_volume() * config.volume);
 		ring_buf.read_ref_done(b);
 		out += b.length * 2;
 		done += b.length;
@@ -162,6 +163,12 @@ int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void
 #endif
 
 
+void AudioOutput::Config::reset()
+{
+	device = nullptr;
+	volume = 1;
+}
+
 
 AudioOutput::AudioOutput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioOutput"),
@@ -173,11 +180,15 @@ AudioOutput::AudioOutput(Session *_session) :
 
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
-	volume = 1;
+	config.volume = 1;
 	prebuffer_size = hui::Config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 
 	device_manager = session->device_manager;
-	device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
+	config.device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
+	auto _class = new Kaba::Class("Config", sizeof(config), nullptr, nullptr);
+	_class->elements.add(Kaba::ClassElement("volume", Kaba::TypeFloat32, offsetof(Config, volume)));
+	_class->elements.add(Kaba::ClassElement("device", Kaba::TypePointer, offsetof(Config, device)));
+	config._class = _class;
 
 #if HAS_LIB_PULSEAUDIO
 	pulse_stream = nullptr;
@@ -243,8 +254,8 @@ void AudioOutput::_create_dev()
 		attr_out.prebuf = -1;
 
 		const char *dev = nullptr;
-		if (!device->is_default())
-			dev = device->internal_name.c_str();
+		if (!config.device->is_default())
+			dev = config.device->internal_name.c_str();
 		pa_stream_connect_playback(pulse_stream, dev, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
 		_pulse_test_error("pa_stream_connect_playback");
 
@@ -270,7 +281,7 @@ void AudioOutput::_create_dev()
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO){
 
 
-		if (device->is_default()){
+		if (config.device->is_default()){
 			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, paFramesPerBufferUnspecified,//256,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
@@ -278,7 +289,7 @@ void AudioOutput::_create_dev()
 			PaStreamParameters params;
 			params.channelCount = 2;
 			params.sampleFormat = paFloat32;
-			params.device = device->index_in_lib;
+			params.device = config.device->index_in_lib;
 			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
 			PaError err = Pa_OpenStream(&portaudio_stream, nullptr, &params, dev_sample_rate, paFramesPerBufferUnspecified,//256,
@@ -415,7 +426,7 @@ int AudioOutput::_read_stream(int buffer_size)
 
 void AudioOutput::set_device(Device *d)
 {
-	device = d;
+	config.device = d;
 }
 
 void AudioOutput::start()
@@ -474,12 +485,12 @@ int AudioOutput::get_available()
 
 float AudioOutput::get_volume()
 {
-	return volume;
+	return config.volume;
 }
 
 void AudioOutput::set_volume(float _volume)
 {
-	volume = _volume;
+	config.volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -575,4 +586,9 @@ int AudioOutput::command(ModuleCommand cmd, int param)
 bool AudioOutput::is_playing()
 {
 	return (state == State::PLAYING) or (state == State::PAUSED);
+}
+
+ModuleConfiguration *AudioOutput::get_config() const
+{
+	return (ModuleConfiguration*)&config;
 }

@@ -1849,9 +1849,7 @@ void SyntaxTree::parse_class()
 		while(!Exp.end_of_line()){
 			//int indent = Exp.cur_line->indent;
 
-			ClassElement el;
-			el.type = type;
-			el.name = Exp.cur;
+			auto el = ClassElement(Exp.cur, type, 0);
 			Exp.next();
 
 			// is a function?
@@ -1867,7 +1865,7 @@ void SyntaxTree::parse_class()
 
 			// override?
 			ClassElement *orig = nullptr;
-			for (ClassElement &e: _class->elements)
+			for (auto &e: _class->elements)
 				if (e.name == el.name) //and e.type->is_pointer and el.type->is_pointer)
 					orig = &e;
 			if (override and ! orig)
@@ -1917,10 +1915,7 @@ void SyntaxTree::parse_class()
 			for (ClassElement &e: _class->elements)
 				e.offset = ProcessClassOffset(_class->name, e.name, e.offset + config.pointer_size);
 
-			ClassElement el;
-			el.name = IDENTIFIER_VTABLE_VAR;
-			el.type = TypePointer;
-			el.offset = 0;
+			auto el = ClassElement(IDENTIFIER_VTABLE_VAR, TypePointer, 0);
 			el.hidden = true;
 			_class->elements.insert(el, 0);
 			_offset += config.pointer_size;

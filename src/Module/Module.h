@@ -106,8 +106,8 @@ public:
 
 	virtual ModuleConfiguration *get_config() const;
 
-	virtual string config_to_string() const;
-	virtual void config_from_string(const string &options);
+	string config_to_string() const;
+	void config_from_string(const string &options);
 
 
 

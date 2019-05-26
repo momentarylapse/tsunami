@@ -303,10 +303,7 @@ void add_class(const Class *root_type)//, PreScript *ps = NULL)
 
 void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag)
 {
-	ClassElement e;
-	e.name = name;
-	e.type = type;
-	e.offset = offset;
+	auto e = ClassElement(name, type, offset);
 	e.hidden = ((flag & FLAG_HIDDEN) > 0);
 	cur_class->elements.add(e);
 }

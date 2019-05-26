@@ -79,9 +79,9 @@ struct AutoConfigDataFloat : public AutoConfigData
 	AutoConfigDataFloat(const string &_name) :
 		AutoConfigData(Type::FLOAT, _name)
 	{
-		min = -100000000;
-		max = 100000000;
-		step = 1;
+		min = -1000000;
+		max = 1000000;
+		step = 0.001f;
 		factor = 1;
 		value = nullptr;
 		slider = nullptr;
@@ -92,7 +92,7 @@ struct AutoConfigDataFloat : public AutoConfigData
 	}
 	void parse(const string &s) override
 	{
-		Array<string> p = s.explode(":");
+		auto p = s.explode(":");
 		if (p.num == 5){
 			min = p[0]._float();
 			max = p[1]._float();
@@ -170,7 +170,7 @@ struct AutoConfigDataInt : public AutoConfigData
 	}
 	void parse(const string &s) override
 	{
-		Array<string> p = s.explode(":");
+		auto p = s.explode(":");
 		if (p.num == 2){
 			min = p[0]._int();
 			max = p[1]._int();
@@ -414,47 +414,49 @@ struct AutoConfigDataDevice: public AutoConfigData
 
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session)
 {
-	Kaba::SyntaxTree *ps = config->_class->owner;
+	auto *ps = config->_class->owner;
 	Array<AutoConfigData*> r;
 	for (auto &e: config->_class->elements){
 		if (e.type == Kaba::TypeFloat32){
 			if (e.name == "pitch"){
-				AutoConfigDataPitch *a = new AutoConfigDataPitch(e.name);
+				auto *a = new AutoConfigDataPitch(e.name);
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			}else{
-				AutoConfigDataFloat *a = new AutoConfigDataFloat(e.name);
+				auto *a = new AutoConfigDataFloat(e.name);
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			}
 		}else if (e.type == Kaba::TypeInt){
-			AutoConfigDataInt *a = new AutoConfigDataInt(e.name);
+			auto *a = new AutoConfigDataInt(e.name);
 			a->value = (int*)((char*)config + e.offset);
 			r.add(a);
 		}else if (e.type == Kaba::TypeBool){
-			AutoConfigDataBool *a = new AutoConfigDataBool(e.name);
+			auto *a = new AutoConfigDataBool(e.name);
 			a->value = (bool*)((char*)config + e.offset);
 			r.add(a);
 		}else if (e.type == Kaba::TypeString){
-			AutoConfigDataString *a = new AutoConfigDataString(e.name);
+			auto *a = new AutoConfigDataString(e.name);
 			a->value = (string*)((char*)config + e.offset);
 			r.add(a);
 		}else if (e.type->name == "SampleRef*"){
-			AutoConfigDataSampleRef *a = new AutoConfigDataSampleRef(e.name, session);
+			auto *a = new AutoConfigDataSampleRef(e.name, session);
 			a->value = (SampleRef**)((char*)config + e.offset);
 			r.add(a);
 		}else if (e.type->name == "Device*"){
-			AutoConfigDataDevice *a = new AutoConfigDataDevice(e.name, session);
+			auto *a = new AutoConfigDataDevice(e.name, session);
 			a->value = (Device**)((char*)config + e.offset);
 			r.add(a);
 		}
 	}
 
-	for (auto a: r){
-		for (auto c: ps->constants){
-			if (c->type == Kaba::TypeString)
-				if (a->name_match(c->name))
-					a->parse(c->as_string());
+	if (ps){
+		for (auto a: r){
+			for (auto c: ps->constants){
+				if (c->type == Kaba::TypeString)
+					if (a->name_match(c->name))
+						a->parse(c->as_string());
+			}
 		}
 	}
 
@@ -467,7 +469,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	aa = _aa;
 	add_grid("", 0, 0, "grid");
 	set_target("grid");
-	foreachi(AutoConfigData *a, aa, i){
+	foreachi(auto *a, aa, i){
 		set_target("grid");
 		add_label(a->label, 0, i, "");
 		add_label(a->unit, 2, i, "");

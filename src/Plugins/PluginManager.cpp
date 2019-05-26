@@ -172,8 +172,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("Module", "reset_state", Kaba::mf(&Module::reset_state), &module);
 	Kaba::LinkExternal("Module.changed", Kaba::mf(&Module::changed));
 	Kaba::DeclareClassVirtualIndex("Module", "get_config", Kaba::mf(&Module::get_config), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "config_to_string", Kaba::mf(&Module::config_to_string), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "config_from_string", Kaba::mf(&Module::config_from_string), &module);
+	Kaba::LinkExternal("Module.config_to_string", Kaba::mf(&Module::config_to_string));
+	Kaba::LinkExternal("Module.config_from_string", Kaba::mf(&Module::config_from_string));
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "get_pos", Kaba::mf(&Module::get_pos), &module);
@@ -190,6 +190,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("PluginData.__init__", Kaba::mf(&ModuleConfiguration::__init__));
 	Kaba::DeclareClassVirtualIndex("PluginData", "__delete__", Kaba::mf(&ModuleConfiguration::__delete__), &plugin_data);
 	Kaba::DeclareClassVirtualIndex("PluginData", "reset", Kaba::mf(&ModuleConfiguration::reset), &plugin_data);
+	Kaba::DeclareClassVirtualIndex("PluginData", "from_string", Kaba::mf(&ModuleConfiguration::from_string), &plugin_data);
+	Kaba::DeclareClassVirtualIndex("PluginData", "to_string", Kaba::mf(&ModuleConfiguration::to_string), &plugin_data);
 
 
 	ConfigPanel config_panel;

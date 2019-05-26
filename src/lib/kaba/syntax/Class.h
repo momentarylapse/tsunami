@@ -11,12 +11,14 @@ class Class;
 struct Function;
 
 
-struct ClassElement{
+struct ClassElement
+{
 	string name;
 	const Class *type;
 	long long offset;
 	bool hidden;
 	ClassElement();
+	ClassElement(const string &name, const Class *type, int offset);
 	string signature(bool include_class) const;
 };
 

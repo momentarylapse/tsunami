@@ -7,9 +7,17 @@ namespace Kaba{
 
 ClassElement::ClassElement()
 {
-	hidden = false;
 	offset = 0;
 	type = nullptr;
+	hidden = false;
+}
+
+ClassElement::ClassElement(const string &_name, const Class *_type, int _offset)
+{
+	name = _name;
+	offset = _offset;
+	type = _type;
+	hidden = false;
 }
 
 string ClassElement::signature(bool include_class) const

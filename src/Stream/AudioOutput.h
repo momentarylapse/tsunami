@@ -13,6 +13,7 @@
 #include "../lib/base/base.h"
 #include "../Data/Audio/RingBuffer.h"
 #include "../Module/Module.h"
+#include "../Module/ModuleConfiguration.h"
 #include <atomic>
 
 class DeviceManager;
@@ -69,8 +70,6 @@ public:
 private:
 	int _read_stream(int buffer_size);
 
-	float volume;
-
 	Port *source;
 	RingBuffer ring_buf;
 
@@ -92,7 +91,17 @@ private:
 	int dev_sample_rate;
 
 	DeviceManager *device_manager;
-	Device *device;
+
+
+	class Config : public ModuleConfiguration
+	{
+	public:
+		Device *device;
+		float volume;
+		void reset() override;
+	} config;
+
+	ModuleConfiguration* get_config() const override;
 
 	enum class State{
 		NO_DEVICE,

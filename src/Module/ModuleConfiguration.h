@@ -26,6 +26,8 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 	virtual void _cdecl reset(){}
+	virtual string to_string() const;
+	virtual void from_string(const string &s, Session *session);
 	const Kaba::Class *_class;
 };
 

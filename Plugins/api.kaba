@@ -98,6 +98,8 @@ class PluginData
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void reset()
+	extern virtual string to_string()
+	extern virtual void from_string(string s, Session* session)
 
 class ConfigPanel extends Panel
 	extern void __init__(Module *c)
@@ -142,8 +144,8 @@ class Module
 	extern void changed()
 	extern virtual void on_config()
 	extern virtual PluginData* get_config()
-	extern virtual string config_to_string()
-	extern virtual void config_from_string(string s)
+	extern string config_to_string()
+	extern void config_from_string(string s)
 	extern virtual int command(int cmd, int param)
 	extern virtual void set_pos(int pos)
 	extern virtual int get_pos()

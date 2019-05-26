@@ -73,6 +73,14 @@ void Range::invert()
 	length = - length;
 }
 
+Range Range::canonical() const
+{
+	auto r = *this;
+	if (r.length < 0)
+		r.invert();
+	return r;
+}
+
 
 
 int Range::start() const

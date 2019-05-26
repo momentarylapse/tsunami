@@ -32,6 +32,7 @@ public:
 	void set_end(int end);
 
 	void invert();
+	Range canonical() const;
 
 	int offset, length;
 	int start() const;

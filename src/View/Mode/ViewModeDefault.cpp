@@ -1009,9 +1009,7 @@ SongSelection ViewModeDefault::get_selection_for_range(const Range &r)
 SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1)
 {
 	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
+	s.range = r.canonical();
 	if (y0 > y1){
 		int t = y0;
 		y0 = y1;

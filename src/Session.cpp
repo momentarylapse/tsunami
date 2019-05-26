@@ -20,6 +20,7 @@
 #include "View/Mode/ViewModeCurve.h"
 #include "View/Mode/ViewModeMidi.h"
 #include "View/Mode/ViewModeScaleBars.h"
+#include "View/Mode/ViewModeScaleMarker.h"
 #include "View/SideBar/SideBar.h"
 
 int Session::next_id = 0;
@@ -155,6 +156,9 @@ void Session::set_mode(const string &mode)
 		win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	}else if (mode == "scale-bars"){
 		view->set_mode(view->mode_scale_bars);
+		win->side_bar->_hide();
+	}else if (mode == "scale-marker"){
+		view->set_mode(view->mode_scale_marker);
 		win->side_bar->_hide();
 	}else if (mode == "curves"){
 		view->set_mode(view->mode_curve);

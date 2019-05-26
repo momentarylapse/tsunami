@@ -14,6 +14,7 @@
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
 #include "Mode/ViewModeScaleBars.h"
+#include "Mode/ViewModeScaleMarker.h"
 #include "../Session.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -263,6 +264,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_default = new ViewModeDefault(this);
 	mode_midi = new ViewModeMidi(this);
 	mode_scale_bars = new ViewModeScaleBars(this);
+	mode_scale_marker = new ViewModeScaleMarker(this);
 	mode_curve = new ViewModeCurve(this);
 	mode_capture = new ViewModeCapture(this);
 	set_mode(mode_default);
@@ -358,37 +360,38 @@ AudioView::~AudioView()
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
-	delete(scroll);
+	delete scroll;
 
 	delete buffer_painter;
 	delete grid_painter;
 	delete midi_painter;
 
-	delete(mode_curve);
-	delete(mode_scale_bars);
-	delete(mode_midi);
-	delete(mode_capture);
-	delete(mode_default);
+	delete mode_curve;
+	delete mode_scale_bars;
+	delete mode_scale_marker;
+	delete mode_midi;
+	delete mode_capture;
+	delete mode_default;
 
 	if (peak_thread)
-		delete(peak_thread);
+		delete peak_thread;
 
-	delete(dummy_vtrack);
-	delete(dummy_vlayer);
-	delete(metronome_overlay_vlayer);
+	delete dummy_vtrack;
+	delete dummy_vlayer;
+	delete metronome_overlay_vlayer;
 
-	delete(images.speaker);
-	delete(images.speaker_bg);
-	delete(images.x);
-	delete(images.x_bg);
-	delete(images.solo);
-	delete(images.solo_bg);
-	delete(images.track_audio);
-	delete(images.track_audio_bg);
-	delete(images.track_midi);
-	delete(images.track_midi_bg);
-	delete(images.track_time);
-	delete(images.track_time_bg);
+	delete images.speaker;
+	delete images.speaker_bg;
+	delete images.x;
+	delete images.x_bg;
+	delete images.solo;
+	delete images.solo_bg;
+	delete images.track_audio;
+	delete images.track_audio_bg;
+	delete images.track_midi;
+	delete images.track_midi_bg;
+	delete images.track_time;
+	delete images.track_time_bg;
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
@@ -484,8 +487,7 @@ void AudioView::selection_update_pos(Selection &s)
 
 void AudioView::update_selection()
 {
-	if (sel.range.length < 0)
-		sel.range.invert();
+	sel.range = sel.range.canonical();
 
 
 	renderer->set_range(get_playback_selection(false));
@@ -955,12 +957,12 @@ void AudioView::update_tracks()
 	// delete deleted
 	for (AudioViewTrack *v: vtrack)
 		if (v){
-			delete(v);
+			delete v;
 			changed = true;
 		}
 	for (AudioViewLayer *v: vlayer)
 		if (v){
-			delete(v);
+			delete v;
 			changed = true;
 		}
 	vtrack = vtrack2;
@@ -1374,7 +1376,7 @@ void AudioView::update_peaks()
 		//msg_error("   already updating peaks...");
 		peak_thread->allow_running = false;
 		peak_thread->join();
-		delete(peak_thread);
+		delete peak_thread;
 	}
 
 	peak_thread = new PeakThread(this);

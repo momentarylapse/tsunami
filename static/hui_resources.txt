@@ -3338,7 +3338,7 @@ popup_marker_menu
 
 0
 0
-8
+9
 Item
 marker_menu_header
 disabled
@@ -3358,21 +3358,27 @@ edit_marker
 0
 0
 Item
-delete_marker
+marker_resize
 
 3
+0
+0
+Item
+delete_marker
+
+4
 0
 0
 Separator
 
 
-4
+5
 0
 0
 Menu
 menu_version
 
-5
+6
 0
 4
 Item
@@ -3402,7 +3408,7 @@ delete_layer
 Menu
 menu_track
 
-6
+7
 0
 5
 Item
@@ -3450,7 +3456,7 @@ track_properties
 Menu
 song_menu
 
-7
+8
 0
 5
 Menu
@@ -5689,7 +5695,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-614
+615
 // Text
 /cancel
 Cancel
@@ -6855,6 +6861,9 @@ Merge...
 popup_marker_menu/marker_menu_header
 Marker
 
+popup_marker_menu/marker_resize
+Resize
+
 popup_marker_menu/menu_track
 Track
 
@@ -7539,7 +7548,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-773
+774
 // Text
 /bpm
 Bpm
@@ -8992,6 +9001,9 @@ Zusammenfügen...
 
 popup_marker_menu/marker_menu_header
 Marker
+
+popup_marker_menu/marker_resize
+Größe ändern
 
 popup_marker_menu/menu_track
 Spur

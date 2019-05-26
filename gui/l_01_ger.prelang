@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-774
+775
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2324,6 +2324,9 @@ Mastering
 
 popup_track_menu/show_mixing_console
 Mischpult
+
+popup_marker_menu/marker_resize
+Größe ändern
 
 // Num Language Strings
 220

@@ -164,6 +164,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("remove_sample", [=]{ on_remove_sample(); });
 	event("delete_marker", [=]{ on_delete_marker(); });
 	event("edit_marker", [=]{ on_edit_marker(); });
+	event("marker_resize", [=]{ on_marker_resize(); });
 	event("track_import", [=]{ on_track_import(); });
 	event("sub_import", [=]{ on_sample_import(); });
 	event("song_properties", [=]{ on_song_properties(); });
@@ -531,6 +532,11 @@ void TsunamiWindow::on_edit_marker()
 		delete dlg;
 	}else
 		session->e(_("No marker selected"));
+}
+
+void TsunamiWindow::on_marker_resize()
+{
+	session->set_mode("scale-marker");
 }
 
 void TsunamiWindow::on_show_log()
@@ -1143,8 +1149,4 @@ void TsunamiWindow::on_edit_bars()
 void TsunamiWindow::on_scale_bars()
 {
 	session->set_mode("scale-bars");
-	Set<int> s;
-	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
-		s.add(i);
-	view->mode_scale_bars->start_scaling(s);
 }

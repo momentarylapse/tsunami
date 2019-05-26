@@ -2,6 +2,7 @@ Menu popup_marker_menu ""
 	Item marker_menu_header "Marker" disabled
 	Separator
 	Item edit_marker "Edit"
+	Item marker_resize "Resize"
 	Item delete_marker "Delete"
 	Separator
 	Menu menu_version "Version"

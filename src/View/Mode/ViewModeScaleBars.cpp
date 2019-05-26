@@ -16,12 +16,14 @@
 ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 	ViewModeDefault(view)
 {
-
-	scaling_change = false;
 }
 
-ViewModeScaleBars::~ViewModeScaleBars()
+void ViewModeScaleBars::on_start()
 {
+	Set<int> s;
+	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
+		s.add(i);
+	start_scaling(s);
 }
 
 void ViewModeScaleBars::draw_post(Painter *c)
@@ -40,7 +42,6 @@ void ViewModeScaleBars::draw_post(Painter *c)
 
 void ViewModeScaleBars::start_scaling(const Array<int> &sel)
 {
-	scaling_change = false;
 	scaling_sel = sel;
 	scaling_range_orig = song->bars.sub_range(view->sel.bar_indices);
 	view->sel.range = song->bars.sub_range(view->sel.bar_indices);
@@ -62,8 +63,6 @@ void ViewModeScaleBars::on_right_button_down()
 void ViewModeScaleBars::on_mouse_move()
 {
 	ViewModeDefault::on_mouse_move();
-
-	scaling_change = true;
 }
 
 void ViewModeScaleBars::on_key_down(int k)

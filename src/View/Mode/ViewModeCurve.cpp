@@ -23,10 +23,6 @@ ViewModeCurve::ViewModeCurve(AudioView* view) :
 	side_bar_console = SideBar::CURVE_CONSOLE;
 }
 
-ViewModeCurve::~ViewModeCurve()
-{
-}
-
 void ViewModeCurve::on_left_button_down()
 {
 	ViewModeDefault::on_left_button_down();

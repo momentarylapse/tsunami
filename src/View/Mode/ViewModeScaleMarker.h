@@ -1,21 +1,25 @@
 /*
- * ViewModeScaleBars.h
+ * ViewModeScaleMarker.h
  *
- *  Created on: 13.11.2015
+ *  Created on: 26.05.2019
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_MODE_VIEWMODESCALEBARS_H_
-#define SRC_VIEW_MODE_VIEWMODESCALEBARS_H_
+#ifndef SRC_VIEW_MODE_VIEWMODESCALEMARKER_H_
+#define SRC_VIEW_MODE_VIEWMODESCALEMARKER_H_
+
 
 #include "ViewModeDefault.h"
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
-class ViewModeScaleBars : public ViewModeDefault
+class TrackMarker;
+class Track;
+
+class ViewModeScaleMarker : public ViewModeDefault
 {
 public:
-	ViewModeScaleBars(AudioView *view);
+	ViewModeScaleMarker(AudioView *view);
 
 	void on_start() override;
 
@@ -26,11 +30,12 @@ public:
 
 	void draw_post(Painter *c) override;
 
-	void start_scaling(const Array<int> &sel);
 	void perform_scale();
 
-	Array<int> scaling_sel;
-	Range scaling_range_orig;
+	bool scaling;
+	Track *track;
+	TrackMarker *marker;
 };
 
-#endif /* SRC_VIEW_MODE_VIEWMODESCALEBARS_H_ */
+
+#endif /* SRC_VIEW_MODE_VIEWMODESCALEMARKER_H_ */

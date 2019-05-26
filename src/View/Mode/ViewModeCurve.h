@@ -16,16 +16,15 @@ class ViewModeCurve : public ViewModeDefault
 {
 public:
 	ViewModeCurve(AudioView *view);
-	virtual ~ViewModeCurve();
 
-	virtual void on_left_button_down();
-	virtual void on_left_button_up();
-	virtual void on_mouse_move();
-	virtual void on_key_down(int k);
+	void on_left_button_down() override;
+	void on_left_button_up() override;
+	void on_mouse_move() override;
+	void on_key_down(int k) override;
 
-	virtual void draw_track_data(Painter *c, AudioViewTrack *t);
+	void draw_track_data(Painter *c, AudioViewTrack *t) override;
 
-	virtual Selection get_hover();
+	Selection get_hover() override;
 
 
 	float value2screen(float value);

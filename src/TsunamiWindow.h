@@ -82,6 +82,7 @@ public:
 	void on_track_properties();
 	void on_sample_properties();
 	void on_edit_marker();
+	void on_marker_resize();
 	void on_delete_marker();
 	void on_settings();
 	void on_play();

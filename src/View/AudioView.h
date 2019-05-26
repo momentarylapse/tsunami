@@ -42,6 +42,7 @@ class ViewModeMidi;
 class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
+class ViewModeScaleMarker;
 class ScrollBar;
 class Session;
 class MidiPainter;
@@ -212,6 +213,7 @@ public:
 	ViewModeScaleBars *mode_scale_bars;
 	ViewModeCurve *mode_curve;
 	ViewModeCapture *mode_capture;
+	ViewModeScaleMarker *mode_scale_marker;
 
 	Session *session;
 	TsunamiWindow *win;

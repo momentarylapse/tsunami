@@ -9,6 +9,7 @@
 //#include "../lib/kaba/kaba.h"
 #include "ModuleConfiguration.h"
 #include "../lib/kaba/syntax/Class.h"
+#include "../lib/kaba/syntax/SyntaxTree.h"
 #include "../Data/SampleRef.h"
 #include "../Data/Sample.h"
 #include "../Data/Song.h"
@@ -174,3 +175,22 @@ void ModuleConfiguration::from_string(const string &s, Session *session)
 	var_from_string(_class, (char*)this, s, pos, session);
 }
 
+bool ac_name_match(const string &const_name, const string &var_name)
+{
+	return (("AUTO_CONFIG_" + var_name).upper().replace("_", "") == const_name.upper().replace("_", ""));
+}
+
+string ModuleConfiguration::auto_conf(const string &name) const
+{
+	if (!_class)
+		return "";
+	auto *ps = _class->owner;
+	if (!ps)
+		return "";
+	for (auto c: ps->constants){
+		if (c->type == Kaba::TypeString)
+			if (ac_name_match(c->name, name))
+				return c->as_string();
+	}
+	return "";
+}

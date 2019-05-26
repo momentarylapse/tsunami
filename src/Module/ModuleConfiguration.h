@@ -28,6 +28,7 @@ public:
 	virtual void _cdecl reset(){}
 	virtual string to_string() const;
 	virtual void from_string(const string &s, Session *session);
+	virtual string auto_conf(const string &name) const;
 	const Kaba::Class *_class;
 };
 

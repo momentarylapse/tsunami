@@ -192,6 +192,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("PluginData", "reset", Kaba::mf(&ModuleConfiguration::reset), &plugin_data);
 	Kaba::DeclareClassVirtualIndex("PluginData", "from_string", Kaba::mf(&ModuleConfiguration::from_string), &plugin_data);
 	Kaba::DeclareClassVirtualIndex("PluginData", "to_string", Kaba::mf(&ModuleConfiguration::to_string), &plugin_data);
+	Kaba::DeclareClassVirtualIndex("PluginData", "auto_conf", Kaba::mf(&ModuleConfiguration::auto_conf), &plugin_data);
 
 
 	ConfigPanel config_panel;

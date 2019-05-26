@@ -451,13 +451,8 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 	}
 
 	if (ps){
-		for (auto a: r){
-			for (auto c: ps->constants){
-				if (c->type == Kaba::TypeString)
-					if (a->name_match(c->name))
-						a->parse(c->as_string());
-			}
-		}
+		for (auto a: r)
+			a->parse(config->auto_conf(a->name));
 	}
 
 	return r;

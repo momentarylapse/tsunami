@@ -169,6 +169,19 @@ void AudioOutput::Config::reset()
 	volume = 1;
 }
 
+static Kaba::Class* __type_device = nullptr;
+static Kaba::Class* __type_device_p = nullptr;
+
+Kaba::Class* device_pointer_class()
+{
+	if (!__type_device_p){
+		__type_device = new Kaba::Class("Device", 0, nullptr, nullptr);
+		__type_device_p = new Kaba::Class("Device*", sizeof(void*), nullptr, __type_device);
+		__type_device_p->type = Kaba::Class::Type::POINTER;
+	}
+	return __type_device_p;
+}
+
 
 AudioOutput::AudioOutput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioOutput"),
@@ -187,7 +200,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	config.device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
 	auto _class = new Kaba::Class("Config", sizeof(config), nullptr, nullptr);
 	_class->elements.add(Kaba::ClassElement("volume", Kaba::TypeFloat32, offsetof(Config, volume)));
-	_class->elements.add(Kaba::ClassElement("device", Kaba::TypePointer, offsetof(Config, device)));
+	_class->elements.add(Kaba::ClassElement("device", device_pointer_class(), offsetof(Config, device)));
 	config._class = _class;
 
 #if HAS_LIB_PULSEAUDIO

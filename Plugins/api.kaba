@@ -100,6 +100,7 @@ class PluginData
 	extern virtual void reset()
 	extern virtual string to_string()
 	extern virtual void from_string(string s, Session* session)
+	extern virtual string auto_conf(string name)
 
 class ConfigPanel extends Panel
 	extern void __init__(Module *c)

@@ -26,8 +26,8 @@ ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 void ViewModeScaleMarker::on_start()
 {
 	scaling = false;
-	track = view->hover.track;
-	marker = view->hover.marker;
+	track = view->hover_before_leave.track;
+	marker = view->hover_before_leave.marker;
 
 	if (marker){
 		view->sel.range = marker->range;

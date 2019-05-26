@@ -22,6 +22,8 @@
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Mode/ViewModeScaleMarker.h"
 #include "View/SideBar/SideBar.h"
+#include "View/BottomBar/BottomBar.h"
+#include "View/BottomBar/MixingConsole.h"
 
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
@@ -175,12 +177,18 @@ void Session::set_mode(const string &mode)
 	}else if (mode == "default/samples"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLE_CONSOLE);
+	}else if (mode == "default/mixing"){
+		view->set_mode(view->mode_default);
+		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+		win->bottom_bar->mixing_console->set_mode(MixerMode::VOLUME);
 	}else if (mode == "default/fx"){
 		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::FX_CONSOLE); // ...
+		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+		win->bottom_bar->mixing_console->set_mode(MixerMode::EFFECTS);
 	}else if (mode == "default/midi-fx"){
 		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::MIDI_FX_CONCOLE);
+		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
+		win->bottom_bar->mixing_console->set_mode(MixerMode::MIDI_EFFECTS);
 	}else if (mode == "default/synth"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SYNTH_CONSOLE);

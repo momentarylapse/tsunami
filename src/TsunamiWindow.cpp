@@ -744,7 +744,7 @@ void TsunamiWindow::on_sample_manager()
 
 void TsunamiWindow::on_mixing_console()
 {
-	bottom_bar->open(BottomBar::MIXING_CONSOLE);
+	session->set_mode("default/mixing");
 }
 
 void TsunamiWindow::on_fx_console()

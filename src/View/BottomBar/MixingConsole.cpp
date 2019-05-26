@@ -13,6 +13,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Module/Audio/AudioEffect.h"
+#include "../../Module/Midi/MidiEffect.h"
 #include "../../Module/ConfigPanel.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
@@ -40,6 +41,7 @@ public:
 
 		reveal("revealer-volume", true);
 		hide_control("grid-fx", true);
+		hide_control("grid-midi-fx", true);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -65,6 +67,10 @@ public:
 		event_x("fx", "hui:change", [=]{ on_fx_edit(); });
 		event_x("fx", "hui:move", [=]{ on_fx_move(); });
 		event("add-fx", [=]{ on_add_fx(); });
+		event_x("midi-fx", "hui:select", [=]{ on_midi_fx_select(); });
+		event_x("midi-fx", "hui:change", [=]{ on_midi_fx_edit(); });
+		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
+		event("add-midi-fx", [=]{ on_add_midi_fx(); });
 
 		vtrack = t;
 		track = t->track;
@@ -124,8 +130,10 @@ public:
 	{
 		hide_control("grid-volume", mode != MixerMode::VOLUME);
 		hide_control("grid-fx", mode != MixerMode::EFFECTS);
+		hide_control("grid-midi-fx", mode != MixerMode::MIDI_EFFECTS);
 		reveal("revealer-volume", mode == MixerMode::VOLUME);
 		reveal("revealer-fx", mode == MixerMode::EFFECTS);
+		reveal("revealer-midi-fx", mode == MixerMode::MIDI_EFFECTS);
 	}
 	void on_fx_select()
 	{
@@ -152,8 +160,36 @@ public:
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
 		if (name == "")
 			return;
-		AudioEffect *effect = CreateAudioEffect(console->session, name);
+		auto *effect = CreateAudioEffect(console->session, name);
 		track->add_effect(effect);
+	}
+	void on_midi_fx_select()
+	{
+		int n = get_int("");
+		if (n >= 0)
+			console->select_module(track->midi_fx[n]);
+		else
+			console->select_module(nullptr);
+	}
+	void on_midi_fx_edit()
+	{
+		int n = hui::GetEvent()->row;
+		if (n >= 0)
+			track->enable_midi_effect(track->midi_fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
+	}
+	void on_midi_fx_move()
+	{
+		int s = hui::GetEvent()->row;
+		int t = hui::GetEvent()->row_target;
+		track->move_midi_effect(s, t);
+	}
+	void on_add_midi_fx()
+	{
+		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::MIDI_EFFECT);
+		if (name == "")
+			return;
+		auto *effect = CreateMidiEffect(console->session, name);
+		track->add_midi_effect(effect);
 
 	}
 	void update()
@@ -178,6 +214,12 @@ public:
 		for (auto *fx: vtrack->track->fx)
 			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
 		set_int("fx", vtrack->track->fx.find((AudioEffect*)console->selected_module));
+
+		// midi fx list
+		reset("midi-fx");
+		for (auto *fx: vtrack->track->midi_fx)
+			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
+		set_int("midi-fx", vtrack->track->midi_fx.find((MidiEffect*)console->selected_module));
 	}
 
 
@@ -342,6 +384,7 @@ MixingConsole::MixingConsole(Session *session) :
 	event("output-volume", [=]{ on_output_volume(); });
 	event("show-vol", [=]{ set_mode(MixerMode::VOLUME); });
 	event("show-fx", [=]{ set_mode(MixerMode::EFFECTS); });
+	event("show-midi-fx", [=]{ set_mode(MixerMode::MIDI_EFFECTS); });
 
 	view->subscribe(this, [=]{ on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
 	view->subscribe(this, [=]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
@@ -376,7 +419,7 @@ void MixingConsole::set_mode(MixerMode _mode)
 		m->set_mode(mode);
 	check("show-vol", mode == MixerMode::VOLUME);
 	check("show-fx", mode == MixerMode::EFFECTS);
-
+	check("show-midi-fx", mode == MixerMode::MIDI_EFFECTS);
 }
 
 void MixingConsole::load_data()

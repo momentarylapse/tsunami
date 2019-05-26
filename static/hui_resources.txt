@@ -2008,6 +2008,42 @@ Grid
 vertical
 0
 0
+5
+ToggleButton
+show-vol
+flat
+0
+0
+0
+ToggleButton
+show-fx
+flat
+1
+0
+0
+ToggleButton
+show-midi-fx
+flat
+2
+0
+0
+Label
+?
+expandy
+3
+0
+0
+ToggleButton
+link-volumes
+flat
+4
+0
+0
+Grid
+?
+vertical
+1
+0
 3
 Text
 t_output
@@ -2030,49 +2066,19 @@ vertical,expandy
 Separator
 
 
-1
+2
 0
 0
 Scroller
 ?
 expandx,scrolly=no
-2
+3
 0
 1
 Grid
 inner-grid
 
 0
-0
-0
-Grid
-?
-vertical
-3
-0
-4
-ToggleButton
-show-vol
-flat
-0
-0
-0
-ToggleButton
-show-fx
-flat
-1
-0
-0
-Label
-?
-expandy
-2
-0
-0
-ToggleButton
-link-volumes
-flat
-3
 0
 0
 Revealer
@@ -5586,7 +5592,7 @@ Grid
 vertical,width=100,noexpandx
 0
 0
-4
+5
 Text
 name
 center,bold,marginbottom=5
@@ -5636,9 +5642,33 @@ image=hui:add,flat,expandx
 0
 0
 Grid
+grid-midi-fx
+expandy,vertical
+3
+0
+2
+ListView
+midi-fx
+format=Ct,reorderable,nobar,expandy
+0
+0
+0
+Grid
 ?
 
-3
+1
+0
+1
+Button
+add-midi-fx
+image=hui:add,flat,expandx
+0
+0
+0
+Grid
+?
+
+4
 0
 2
 ToggleButton
@@ -5695,7 +5725,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-615
+618
 // Text
 /cancel
 Cancel
@@ -6339,6 +6369,9 @@ Output volume
 mixing-console/show-fx
 fx
 Effects
+mixing-console/show-midi-fx
+mfx
+Midi Effects
 mixing-console/show-vol
 vol
 Volume
@@ -7482,7 +7515,13 @@ Volume in dB
 track-mixer2/add-fx
 
 Add new effect
+track-mixer2/add-midi-fx
+
+Add new midi effect
 track-mixer2/fx
+enabled\\name
+
+track-mixer2/midi-fx
 enabled\\name
 
 track-mixer2/mute
@@ -7548,7 +7587,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-774
+777
 // Text
 /bpm
 Bpm
@@ -8459,6 +8498,9 @@ Ausgabelautstärke
 mixing-console/show-fx
 fx
 Effekte
+mixing-console/show-midi-fx
+mfx
+Midi Effekte
 mixing-console/show-vol
 vol
 Lautstärke
@@ -9782,7 +9824,13 @@ Lautstärke in dB
 track-mixer2/add-fx
 
 Einen neuen Effekt hinzufügen
+track-mixer2/add-midi-fx
+
+Neuen Midi Effekt hinzufügen
 track-mixer2/fx
+enabled\\name
+
+track-mixer2/midi-fx
 enabled\\name
 
 track-mixer2/mute

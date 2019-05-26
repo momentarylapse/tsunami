@@ -25,6 +25,7 @@
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackEditMidiEffect.h"
+#include "../Action/Track/Midi/ActionTrackMoveMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.h"
 #include "../Action/Track/ActionTrackMove.h"
 #include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
@@ -239,6 +240,12 @@ void Track::delete_midi_effect(MidiEffect *effect)
 	foreachi(MidiEffect *f, midi_fx, index)
 		if (f == effect)
 			song->execute(new ActionTrackDeleteMidiEffect(this, index));
+}
+
+void Track::move_midi_effect(int source, int target)
+{
+	if (source != target)
+		song->execute(new ActionTrackMoveMidiEffect(this, source, target));
 }
 
 void Track::set_synthesizer(Synthesizer *_synth)

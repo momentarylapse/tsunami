@@ -8,6 +8,10 @@ Dialog track-mixer2 ""
 			ListView fx "enabled\\name" format=Ct reorderable nobar expandy
 			Grid ? ""
 				Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx
+		Grid grid-midi-fx "" expandy vertical
+			ListView midi-fx "enabled\\name" format=Ct reorderable nobar expandy
+			Grid ? ""
+				Button add-midi-fx "" "tooltip=Add new midi effect" image=hui:add flat expandx
 		Grid ? ""
 			ToggleButton mute "M" "tooltip=Mute" flat height=20 expandx padding=1
 			ToggleButton solo "S" "tooltip=Solo" flat height=20 expandx padding=1

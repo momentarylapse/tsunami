@@ -168,6 +168,10 @@ void SideBar::open(int console)
 		session->win->bottom_bar->open(BottomBar::FAKE_FX_CONSOLE);
 		return;
 	}
+	if (console == MIDI_FX_CONSOLE){
+		session->win->bottom_bar->open(BottomBar::FAKE_MIDI_FX_CONSOLE);
+		return;
+	}
 	choose(console);
 
 	if (!visible)

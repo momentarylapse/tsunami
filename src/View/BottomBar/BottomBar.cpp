@@ -133,6 +133,11 @@ void BottomBar::open(int console_index)
 		mixing_console->set_mode(MixerMode::EFFECTS);
 		return;
 	}
+	if (console_index == FAKE_MIDI_FX_CONSOLE){
+		open(mixing_console);
+		mixing_console->set_mode(MixerMode::MIDI_EFFECTS);
+		return;
+	}
 	open(consoles[console_index]);
 }
 

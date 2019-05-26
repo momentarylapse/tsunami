@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-775
+778
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2327,6 +2327,15 @@ Mischpult
 
 popup_marker_menu/marker_resize
 Größe ändern
+
+mixing-console/show-midi-fx
+mfx
+Midi Effekte
+track-mixer2/add-midi-fx
+
+Neuen Midi Effekt hinzufügen
+track-mixer2/midi-fx
+enabled\\name
 
 // Num Language Strings
 220

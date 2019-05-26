@@ -1,16 +1,17 @@
 Dialog mixing-console "" width=300 height=200
 	Grid ? ""
 		Grid ? "" vertical
+			ToggleButton show-vol "vol" "tooltip=Volume" flat
+			ToggleButton show-fx "fx" "tooltip=Effects" flat
+			ToggleButton show-midi-fx "mfx" "tooltip=Midi Effects" flat
+			Label ? "" expandy
+			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat
+		Grid ? "" vertical
 			Text t_output "Output" bold center
 			DrawingArea output-peaks "" width=80 height=30 noexpandx noexpandy "tooltip=Output level"
 			Slider output-volume "" vertical expandy "tooltip=Output volume"
 		Separator ? "" vertical
 		Scroller ? "" expandx scrolly=no
 			Grid inner-grid ""
-		Grid ? "" vertical
-			ToggleButton show-vol "vol" "tooltip=Volume" flat
-			ToggleButton show-fx "fx" "tooltip=Effects" flat
-			Label ? "" expandy
-			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat
 		Revealer config-revealer "" slide=right
 			Grid config-panel-grid "" width=300 noexpandx

@@ -35,27 +35,6 @@ public:
 	Array<hui::Panel*> panels;
 };
 
-class FxConsole : public BaseFxConsole
-{
-public:
-	FxConsole(Session *session);
-	virtual ~FxConsole();
-
-	void clear();
-	void set_track(Track *t);
-
-	void on_add();
-
-	void on_edit_song();
-	void on_edit_track();
-
-	void on_track_delete();
-	void on_view_cur_track_change();
-	void on_update();
-
-	Track *track;
-};
-
 class GlobalFxConsole : public BaseFxConsole
 {
 public:

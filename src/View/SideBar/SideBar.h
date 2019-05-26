@@ -17,11 +17,9 @@ class TrackConsole;
 class MidiEditorConsole;
 class SampleRefConsole;
 class SampleManagerConsole;
-class FxConsole;
 class GlobalFxConsole;
 class CurveConsole;
 class SynthConsole;
-class MidiFxConsole;
 class CaptureConsole;
 class AudioView;
 class SideBarConsole;
@@ -53,10 +51,8 @@ public:
 		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
-		FX_CONSOLE,
 		CURVE_CONSOLE,
 		SYNTH_CONSOLE,
-		MIDI_FX_CONSOLE,
 		SAMPLEREF_CONSOLE,
 		CAPTURE_CONSOLE,
 		NUM_CONSOLES
@@ -74,10 +70,8 @@ public:
 	GlobalFxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditorConsole *midi_editor_console;
-	FxConsole *fx_console;
 	CurveConsole *curve_console;
 	SynthConsole *synth_console;
-	MidiFxConsole *midi_fx_console;
 	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;
 	CaptureConsole *capture_console;

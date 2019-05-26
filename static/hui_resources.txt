@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-55
+54
 // Resource
 Menu
 menu_fake
@@ -1263,13 +1263,13 @@ checkable
 0
 Item
 show_mixing_console
-checkable
+
 1
 0
 0
 Item
 show_fx_console
-checkable
+
 2
 0
 0
@@ -1852,85 +1852,6 @@ link
 0
 Button
 edit_midi_fx
-link
-2
-0
-0
-// Resource
-Dialog
-midi_fx_editor
-width=380,height=516
-0
-0
-1
-Grid
-?
-expandy
-0
-0
-4
-Grid
-me_grid_no
-
-0
-0
-1
-Text
-mfx_t_no_midi
-expandx,center,italic
-0
-0
-0
-Grid
-midi_fx_inner_table
-
-0
-1
-2
-Text
-comment_no_fx
-center,italic
-0
-0
-0
-Button
-add
-expandx,flat,image=hui:add
-0
-26
-0
-Text
-?
-expandy
-0
-2
-0
-Group
-mfe_g_edit
-
-0
-3
-1
-Grid
-?
-
-0
-0
-3
-Button
-edit_song
-link
-0
-0
-0
-Button
-edit_track
-link
-1
-0
-0
-Button
-edit_midi
 link
 2
 0
@@ -5725,7 +5646,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-618
+613
 // Text
 /cancel
 Cancel
@@ -6329,21 +6250,6 @@ Length
 
 midi_editor/t_op_add
 Add
-
-midi_fx_editor/add
-
-add new effect
-midi_fx_editor/comment_no_fx
-- no effects active here (yet) -
-
-midi_fx_editor/mfe_g_edit
-Edit
-
-midi_fx_editor/mfx_t_no_midi
-no midi track selected
-
-midi_fx_editor/midi_fx_editor
-Midi Fx
 
 mini_bar/peaks
 

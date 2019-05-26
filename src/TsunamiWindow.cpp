@@ -929,8 +929,6 @@ void TsunamiWindow::update_menu()
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !session->in_mode("capture"));
 	// view
-	check("show_mixing_console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
-	check("show_fx_console", session->in_mode("default/fx"));
 	check("sample_manager", session->in_mode("default/samples"));
 
 	string title = title_filename(song->filename) + " - " + AppName;

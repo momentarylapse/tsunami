@@ -10,7 +10,6 @@
 #include "FxConsole.h"
 #include "CurveConsole.h"
 #include "SynthConsole.h"
-#include "MidiFxConsole.h"
 #include "../AudioView.h"
 #include "MidiEditorConsole.h"
 #include "SampleManagerConsole.h"
@@ -52,10 +51,8 @@ SideBar::SideBar(Session *_session)
 	global_fx_console = new GlobalFxConsole(session);
 	track_console = new TrackConsole(session);
 	midi_editor_console = new MidiEditorConsole(session);
-	fx_console = new FxConsole(session);
 	curve_console = new CurveConsole(session);
 	synth_console = new SynthConsole(session);
-	midi_fx_console = new MidiFxConsole(session);
 	sample_ref_console = new SampleRefConsole(session);
 	capture_console = new CaptureConsole(session);
 
@@ -64,10 +61,8 @@ SideBar::SideBar(Session *_session)
 	add_console(global_fx_console);
 	add_console(track_console);
 	add_console(midi_editor_console);
-	add_console(fx_console);
 	add_console(curve_console);
 	add_console(synth_console);
-	add_console(midi_fx_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);
 
@@ -164,14 +159,6 @@ void SideBar::choose(int console)
 
 void SideBar::open(int console)
 {
-	if (console == FX_CONSOLE){
-		session->win->bottom_bar->open(BottomBar::FAKE_FX_CONSOLE);
-		return;
-	}
-	if (console == MIDI_FX_CONSOLE){
-		session->win->bottom_bar->open(BottomBar::FAKE_MIDI_FX_CONSOLE);
-		return;
-	}
 	choose(console);
 
 	if (!visible)

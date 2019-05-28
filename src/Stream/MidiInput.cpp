@@ -59,7 +59,7 @@ void MidiInput::Output::feed(const MidiEventBuffer &midi)
 MidiInput::MidiInput(Session *_session) :
 	Module(ModuleType::STREAM, "MidiInput")
 {
-	set_session_etc(_session, "", nullptr);
+	set_session_etc(_session, "MidiInput");
 	_sample_rate = session->sample_rate();
 	state = State::NO_DEVICE;
 

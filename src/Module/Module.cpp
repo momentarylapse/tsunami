@@ -33,11 +33,10 @@ Module::Module(ModuleType type, const string &sub_type)
 	module_type = type;
 	module_subtype = sub_type;
 	session = Session::GLOBAL;
-	usable = true;
-	plugin = nullptr;
 	enabled = true;
 	module_x = module_y = 0;
 	allow_config_in_chain = false;
+	_class = nullptr;
 }
 
 Module::~Module()
@@ -66,13 +65,19 @@ void Module::__delete__()
 
 
 // internal use for creation
-void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *_plugin)
+void Module::set_session_etc(Session *_session, const string &sub_type)
 {
 	session = _session;
 	module_subtype = sub_type;
-	plugin = _plugin;
-	if (plugin)
-		usable = plugin->usable(session);
+	auto *c = get_config();
+	if (c){
+		c->_module = this;
+		c->_class = Kaba::GetDynamicType(c);
+		/*msg_write("config class: " + p2s(c->_class) + "  " + sub_type);
+		if (c->_class)
+			msg_write(c->_class->name);*/
+	}
+	_class = Kaba::GetDynamicType(this);
 
 	reset_config();
 	reset_state();
@@ -83,12 +88,11 @@ void Module::set_session_etc(Session *_session, const string &sub_type, Plugin *
 //   look for a Module.config in the plugin class
 ModuleConfiguration *Module::get_config() const
 {
-	const Kaba::Class *c = Kaba::GetDynamicType(this);
-	if (!c)
+	if (!_class)
 		return nullptr;
-	for (auto &e: c->elements)
+	for (auto &e: _class->elements)
 		if ((e.name == "config") and (e.type->get_root()->name == "PluginData")){
-			ModuleConfiguration *config = (ModuleConfiguration*)((char*)this + e.offset);
+			auto *config = (ModuleConfiguration*)((char*)this + e.offset);
 			config->_class = e.type;
 			return config;
 		}
@@ -98,7 +102,7 @@ ModuleConfiguration *Module::get_config() const
 
 string Module::config_to_string() const
 {
-	ModuleConfiguration *config = get_config();
+	auto *config = get_config();
 	if (!config)
 		return "";
 
@@ -108,7 +112,7 @@ string Module::config_to_string() const
 
 void Module::config_from_string(const string &param)
 {
-	ModuleConfiguration *config = get_config();
+	auto *config = get_config();
 	if (!config)
 		return;
 
@@ -121,7 +125,7 @@ void Module::config_from_string(const string &param)
 //   try to execute   Module.config.reset()
 void Module::reset_config()
 {
-	ModuleConfiguration *config = get_config();
+	auto *config = get_config();
 	if (config)
 		config->reset();
 	on_config();
@@ -132,7 +136,7 @@ void Module::reset_config()
 //   try to create an AutoConfigPanel
 ConfigPanel *Module::create_panel()
 {
-	ModuleConfiguration *config = get_config();
+	auto *config = get_config();
 	if (!config)
 		return nullptr;
 	auto aa = get_auto_conf(config, session);
@@ -140,15 +144,6 @@ ConfigPanel *Module::create_panel()
 		return nullptr;
 	return new AutoConfigPanel(aa, this);
 }
-
-
-string Module::get_error()
-{
-	if (plugin)
-		return plugin->get_error();
-	return format(_("Can't load %s: \"%s\""), type_to_name(module_type).c_str(), module_subtype.c_str());
-}
-
 
 // called by the ConfigPanel to signal a config change
 void Module::changed()

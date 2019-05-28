@@ -16,18 +16,16 @@ class ClickRenderer extends PitchRenderer
 		volume = max(v, volume)
 
 	override bool render(AudioBuffer buf)
-		for i in 0:buf.length
+		for i in 0:len(buf)
 			buf.l[i] += sin(phase) * volume
 			phase += delta_phi
 			if phase > 2*pi
 				phase -= 2*pi
 			volume *= scale
+		buf.auto_generate_channels()
 		return volume > 0.001
 
 class ClickSynthesizer extends Synthesizer
-	
-	override void __init__()
-		auto_generate_stereo = true
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new ClickRenderer(self, pitch)

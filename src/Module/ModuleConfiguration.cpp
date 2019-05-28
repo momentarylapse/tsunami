@@ -8,6 +8,7 @@
 
 //#include "../lib/kaba/kaba.h"
 #include "ModuleConfiguration.h"
+#include "Module.h"
 #include "../lib/kaba/syntax/Class.h"
 #include "../lib/kaba/syntax/SyntaxTree.h"
 #include "../Data/SampleRef.h"
@@ -193,4 +194,10 @@ string ModuleConfiguration::auto_conf(const string &name) const
 				return c->as_string();
 	}
 	return "";
+}
+
+void ModuleConfiguration::changed()
+{
+	if (_module)
+		_module->changed();
 }

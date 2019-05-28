@@ -16,12 +16,13 @@ namespace Kaba{
 	class Class;
 };
 class Session;
+class Module;
 
 
 class ModuleConfiguration : public VirtualBase
 {
 public:
-	ModuleConfiguration(){ _class = nullptr; }
+	ModuleConfiguration(){ _module = nullptr; _class = nullptr; }
 	virtual ~ModuleConfiguration(){}
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -29,6 +30,8 @@ public:
 	virtual string to_string() const;
 	virtual void from_string(const string &s, Session *session);
 	virtual string auto_conf(const string &name) const;
+	void changed();
+	Module *_module;
 	const Kaba::Class *_class;
 };
 

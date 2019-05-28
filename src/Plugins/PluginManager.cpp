@@ -55,6 +55,10 @@
 #include "TsunamiPlugin.h"
 #include "FavoriteManager.h"
 
+namespace Kaba{
+	extern Array<Script*> _public_scripts_;
+};
+
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager()
@@ -62,6 +66,16 @@ PluginManager::PluginManager()
 	favorites = new FavoriteManager;
 
 	find_plugins();
+
+	package.name = "-tsunami-internal-";
+	package.script = new Kaba::Script;
+	package.script->filename = package.name;
+	package.used_by_default = false;
+	Kaba::Packages.add(package);
+	Kaba::_public_scripts_.add(package.script);
+
+	auto *type_dev = package.script->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr);
+	package.script->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, type_dev);
 }
 
 PluginManager::~PluginManager()
@@ -163,7 +177,6 @@ void PluginManager::link_app_script_data()
 	Module module(ModuleType::AUDIO_EFFECT, "");
 	Kaba::DeclareClassSize("Module", sizeof(Module));
 	Kaba::DeclareClassOffset("Module", "name", _offsetof(Module, module_subtype));
-	Kaba::DeclareClassOffset("Module", "usable", _offsetof(Module, usable));
 	Kaba::DeclareClassOffset("Module", "session", _offsetof(Module, session));
 	Kaba::LinkExternal("Module.__init__", Kaba::mf(&Module::__init__));
 	Kaba::DeclareClassVirtualIndex("Module", "__delete__", Kaba::mf(&Module::__delete__), &module);
@@ -637,6 +650,11 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternalClassFunc("ProgressX.set", &ProgressCancelable::set_kaba);
 	Kaba::LinkExternalClassFunc("ProgressX.cancel", &ProgressCancelable::cancel);
 	Kaba::LinkExternalClassFunc("ProgressX.is_cancelled", &ProgressCancelable::is_cancelled);
+}
+
+Kaba::Class* PluginManager::get_class(const string &name)
+{
+	return (Kaba::Class*)package.script->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)

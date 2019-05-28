@@ -402,7 +402,7 @@ void TsunamiWindow::on_track_render()
 		Range r = Range(offset, min(chunk_size, range.end() - offset));
 		t->layers[0]->get_buffers(buf, r);
 
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t->layers[0], r);
+		auto *a = new ActionTrackEditBuffer(t->layers[0], r);
 		renderer.read(buf);
 		song->execute(a);
 
@@ -444,7 +444,7 @@ void TsunamiWindow::on_track_add_marker()
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
-		MarkerDialog *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, "");
+		auto *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, "");
 		dlg->run();
 		delete dlg;
 	}else{
@@ -469,18 +469,18 @@ void TsunamiWindow::on_track_convert_stereo()
 }
 void TsunamiWindow::on_buffer_delete()
 {
-	foreachi (AudioBuffer &buf, view->cur_layer()->buffers, i)
+	foreachi (auto &buf, view->cur_layer()->buffers, i)
 		if (buf.range().is_inside(view->hover_before_leave.pos)){
-			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			auto s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
 			song->delete_selection(s);
 		}
 }
 
 void TsunamiWindow::on_buffer_make_movable()
 {
-	for (AudioBuffer &buf: view->cur_layer()->buffers){
+	for (auto &buf: view->cur_layer()->buffers){
 		if (buf.range().is_inside(view->hover_before_leave.pos)){
-			SongSelection s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			auto s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
 			song->create_samples_from_selection(s, true);
 		}
 	}
@@ -527,7 +527,7 @@ void TsunamiWindow::on_delete_marker()
 void TsunamiWindow::on_edit_marker()
 {
 	if (view->hover_before_leave.type == Selection::Type::MARKER){
-		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
+		auto *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
 		dlg->run();
 		delete dlg;
 	}else
@@ -614,7 +614,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 
 	AudioBuffer buf;
 	l->get_buffers(buf, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(l, r);
+	auto *a = new ActionTrackEditBuffer(l, r);
 
 	int chunk_size = 2048;
 	int done = 0;
@@ -634,13 +634,13 @@ void TsunamiWindow::on_menu_execute_audio_effect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	AudioEffect *fx = CreateAudioEffect(session, name);
+	auto *fx = CreateAudioEffect(session, name);
 
 	fx->reset_config();
 	if (configure_module(this, fx)){
 		song->begin_action_group();
 		for (Track *t: song->tracks)
-			for (TrackLayer *l: t->layers)
+			for (auto *l: t->layers)
 				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
 					fx_process_layer(l, view->sel.range, fx, this);
 				}
@@ -653,13 +653,13 @@ void TsunamiWindow::on_menu_execute_audio_source()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	AudioSource *s = CreateAudioSource(session, name);
+	auto *s = CreateAudioSource(session, name);
 
 	s->reset_config();
 	if (configure_module(this, s)){
 		song->begin_action_group();
 		for (Track *t: song->tracks)
-			for (TrackLayer *l: t->layers)
+			for (auto *l: t->layers)
 				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
 					s->reset_state();
 					AudioBuffer buf;
@@ -675,13 +675,13 @@ void TsunamiWindow::on_menu_execute_midi_effect()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	MidiEffect *fx = CreateMidiEffect(session, name);
+	auto *fx = CreateMidiEffect(session, name);
 
 	fx->reset_config();
 	if (configure_module(this, fx)){
 		song->action_manager->group_begin();
 		for (Track *t : song->tracks)
-			for (TrackLayer *l : t->layers)
+			for (auto *l : t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
 				fx->reset_state();
 				fx->process_layer(l, view->sel);
@@ -695,13 +695,13 @@ void TsunamiWindow::on_menu_execute_midi_source()
 {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	MidiSource *s = CreateMidiSource(session, name);
+	auto *s = CreateMidiSource(session, name);
 
 	s->reset_config();
 	if (configure_module(this, s)){
 		song->begin_action_group();
 		for (Track *t : song->tracks)
-			for (TrackLayer *l : t->layers)
+			for (auto *l : t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
 				s->reset_state();
 				MidiEventBuffer buf;
@@ -767,7 +767,7 @@ void TsunamiWindow::on_command(const string & id)
 
 void TsunamiWindow::on_settings()
 {
-	SettingsDialog *dlg = new SettingsDialog(view, this);
+	auto *dlg = new SettingsDialog(view, this);
 	dlg->run();
 	delete dlg;
 }
@@ -969,7 +969,7 @@ void TsunamiWindow::on_exit()
 
 void TsunamiWindow::on_new()
 {
-	NewDialog *dlg = new NewDialog(this);
+	auto *dlg = new NewDialog(this);
 	dlg->run();
 	delete dlg;
 }
@@ -982,7 +982,7 @@ void TsunamiWindow::on_open()
 			if (session->storage->load(song, hui::Filename))
 				BackupManager::set_save_state(session);
 		}else{
-			Session *s = tsunami->create_session();
+			auto *s = tsunami->create_session();
 			s->win->show();
 			s->storage->load(s->song, hui::Filename);
 		}
@@ -1132,11 +1132,11 @@ void TsunamiWindow::on_edit_bars()
 		else
 			num_bars ++;
 	if (num_bars > 0 and num_pauses == 0){
-		hui::Dialog *dlg = new BarEditDialog(win, song, view->sel.bar_indices);
+		auto *dlg = new BarEditDialog(win, song, view->sel.bar_indices);
 		dlg->run();
 		delete dlg;
 	}else if (num_bars == 0 and num_pauses == 1){
-		hui::Dialog *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start());
+		auto *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start());
 		dlg->run();
 		delete dlg;
 	}else{

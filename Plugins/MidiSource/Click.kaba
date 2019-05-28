@@ -2,7 +2,7 @@ use "../api.kaba"
 
 class ClickSource extends MidiSource
 	bool emit_click
-	override void __init__()
+	override void reset_state()
 		emit_click = false
 	override int read(MidiEventBuffer midi)
 		if emit_click

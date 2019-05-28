@@ -13,6 +13,11 @@
 #include "../Device/Device.h"
 #include "../Device/DeviceManager.h"
 #include "../lib/kaba/syntax/Class.h"
+#include "../Plugins/PluginManager.h"
+
+namespace Kaba{
+	VirtualTable* get_vtable(const VirtualBase *p);
+}
 
 #if HAS_LIB_PULSEAUDIO
 #include <pulse/pulseaudio.h>
@@ -165,21 +170,17 @@ int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void
 
 void AudioOutput::Config::reset()
 {
-	device = nullptr;
+	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
 	volume = 1;
 }
 
-static Kaba::Class* __type_device = nullptr;
-static Kaba::Class* __type_device_p = nullptr;
-
-Kaba::Class* device_pointer_class()
+string AudioOutput::Config::auto_conf(const string &name) const
 {
-	if (!__type_device_p){
-		__type_device = new Kaba::Class("Device", 0, nullptr, nullptr);
-		__type_device_p = new Kaba::Class("Device*", sizeof(void*), nullptr, __type_device);
-		__type_device_p->type = Kaba::Class::Type::POINTER;
-	}
-	return __type_device_p;
+	if (name == "volume")
+		return "0:1:0.1:100:%";
+	if (name == "device")
+		return "audio:output";
+	return "";
 }
 
 
@@ -188,7 +189,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	ring_buf(1048576)
 {
 	state = State::NO_DEVICE;
-	set_session_etc(_session, "", nullptr);
+	set_session_etc(_session, "AudioOutput");
 	source = nullptr;
 
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
@@ -196,11 +197,14 @@ AudioOutput::AudioOutput(Session *_session) :
 	config.volume = 1;
 	prebuffer_size = hui::Config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 
+	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	device_manager = session->device_manager;
-	config.device = device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
-	auto _class = new Kaba::Class("Config", sizeof(config), nullptr, nullptr);
-	_class->elements.add(Kaba::ClassElement("volume", Kaba::TypeFloat32, offsetof(Config, volume)));
-	_class->elements.add(Kaba::ClassElement("device", device_pointer_class(), offsetof(Config, device)));
+	auto _class = session->plugin_manager->get_class("AudioOutputConfig");//new Kaba::Class("Config", sizeof(config), nullptr, nullptr);
+	if (_class->elements.num == 0){
+		_class->elements.add(Kaba::ClassElement("volume", Kaba::TypeFloat32, offsetof(Config, volume)));
+		_class->elements.add(Kaba::ClassElement("device", device_pointer_class, offsetof(Config, device)));
+		_class->_vtable_location_target_ = Kaba::get_vtable(&config);
+	}
 	config._class = _class;
 
 #if HAS_LIB_PULSEAUDIO

@@ -248,14 +248,11 @@ class FMRenderer extends PitchRenderer
 				for t,j in co.target
 					if t
 						osc[j].input += o.output
+		buf.auto_generate_channels()
 		return true
 
 class FMSynthesizer extends Synthesizer
 	FMConfig config
-	
-	override void __init__()
-		auto_generate_stereo = true
-		reset_state()
 
 	override ConfigPanel *create_panel()
 		return new FMPanel(self)

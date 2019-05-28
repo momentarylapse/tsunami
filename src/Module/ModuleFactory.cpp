@@ -124,7 +124,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& s
 		m = _create_dummy(type);
 
 	if (m)
-		m->set_session_etc(session, sub_type, p);
+		m->set_session_etc(session, sub_type);
 
 	// type specific initialization
 	if (m and type == ModuleType::SYNTHESIZER)

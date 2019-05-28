@@ -22,6 +22,11 @@ namespace hui{
 	class Window;
 	class Panel;
 }
+namespace Kaba{
+	class Script;
+	class Class;
+	class Package;
+}
 
 class PluginManager
 {
@@ -67,6 +72,10 @@ public:
 	Array<Plugin*> plugins;
 
 	FavoriteManager *favorites;
+
+
+	Kaba::Package package;
+	Kaba::Class *get_class(const string &name);
 };
 
 #endif /* PLUGINMANAGER_H_ */

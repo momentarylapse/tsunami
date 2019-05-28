@@ -80,7 +80,7 @@ class PADRenderer extends PitchRenderer
 		env.end()
 
 	override bool render(AudioBuffer buf)
-		for i in 0:buf.length
+		for i in 0:len(buf)
 			float d = prebuf[pos] * env.get()
 			if env.just_killed
 				return false
@@ -89,14 +89,12 @@ class PADRenderer extends PitchRenderer
 			pos ++
 			if pos >= N
 				pos = 0
+		buf.auto_generate_channels()
 		return true
 	
 
 class PADSynthesizer extends Synthesizer
 	PADConfig config
-	
-	override void __init__()
-		auto_generate_stereo = true
 	
 	override ConfigPanel *create_panel()
 		return new PADPanel(self)
@@ -107,11 +105,11 @@ class PADSynthesizer extends Synthesizer
 class PADGrid extends Grid
 	PADConfig *pc
 	ConfigPanel *p
-	int Selected, Hover
+	int selected, hover
 	
 	override void __init__()
-		Selected = -1
-		Hover = -1
+		selected = -1
+		hover = -1
 
 	override void on_draw(Painter *c)
 		pc.A.resize(8)
@@ -124,25 +122,25 @@ class PADGrid extends Grid
 	
 		// points
 		for a,i in pc.A
-			draw_point2(c, complex(i+1, a), i == Selected, i == Hover)
+			draw_point2(c, complex(i+1, a), i == selected, i == hover)
 			
 	// left button down -> select
 	override void on_left_button_down()
-		Selected = Hover
+		selected = hover
 		redraw()
 
 	override void on_mouse_move()
 		// move
-		if HuiGetEvent().button_l and (Selected >= 0)
-			pc.A[Selected] = clamp(get_mouse2().y, 0, 1)
+		if HuiGetEvent().button_l and (selected >= 0)
+			pc.A[selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
 		// hover?
-			Hover = -1
+			hover = -1
 			for a,i in pc.A
 				complex p = project2(complex(i+1, a))
 				if (mx > p.x - 10) and (mx < p.x + 10)
-					Hover = i
+					hover = i
 		redraw()
 
 class PADPanel extends ConfigPanel

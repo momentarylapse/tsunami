@@ -387,7 +387,7 @@ struct AutoConfigDataDevice: public AutoConfigData
 		if (panel){
 			panel->reset(id);
 			for (auto *d: list)
-				panel->add_string(id, d->name);
+				panel->add_string(id, d->get_name());
 			panel->set_int(id, list.find(*value));
 		}
 	}

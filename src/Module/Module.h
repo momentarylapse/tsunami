@@ -14,6 +14,7 @@
 
 namespace Kaba{
 	class Script;
+	class Class;
 };
 
 namespace hui{
@@ -72,7 +73,7 @@ public:
 	void _cdecl __init__(ModuleType type, const string &sub_type);
 	virtual void _cdecl __delete__();
 
-	void set_session_etc(Session *session, const string &sub_type, Plugin *plugin);
+	void set_session_etc(Session *session, const string &sub_type);
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 	static const string MESSAGE_STATE_CHANGE;
@@ -86,14 +87,11 @@ public:
 	string module_subtype;
 	Session *session;
 	float module_x, module_y;
+	const Kaba::Class *_class;
 
 	Module *copy() const;
 
-
-	Plugin *plugin;
-	bool usable;
 	bool enabled;
-	string get_error();
 
 
 

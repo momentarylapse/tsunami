@@ -149,7 +149,7 @@ void TrackRenderer::fill_midi_streamer()
 			if (c->type() == SignalType::MIDI)
 			_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
 	for (MidiEffect *fx: track->midi_fx){
-		fx->prepare();
+		fx->reset_state();
 		fx->process(&_midi);
 	}
 

@@ -16,10 +16,6 @@ class LowPassFilter extends AudioEffect
 	float[2] _in, _out
 	bool[2] used
 	
-	override void __init__()
-		used[0] = false
-		used[1] = false
-	
 	override void reset_state()
 		used[0] = false
 		used[1] = false

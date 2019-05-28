@@ -21,12 +21,10 @@ class SinusRenderer extends PitchRenderer
 			phase += delta_phi
 			if phase > 2*pi
 				phase -= 2*pi
+		buf.auto_generate_channels()
 		return volume > 0
 
 class SinusSynthesizer extends Synthesizer
-	
-	override void __init__()
-		auto_generate_stereo = true
 
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new SinusRenderer(self, pitch)

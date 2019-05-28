@@ -46,13 +46,6 @@ void MidiEffect::__delete__()
 	this->MidiEffect::~MidiEffect();
 }
 
-void MidiEffect::prepare()
-{
-	reset_state();
-	if (!usable)
-		session->e(get_error());
-}
-
 
 void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel)
 {

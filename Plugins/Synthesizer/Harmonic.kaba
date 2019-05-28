@@ -99,7 +99,7 @@ class HarmonicRenderer extends PitchRenderer
 		env.start(volume)
 
 	override bool render(AudioBuffer buf)
-		for i in 0:buf.length
+		for i in 0:len(buf)
 			volume = env.get()
 
 			if volume == 0
@@ -113,9 +113,7 @@ class HarmonicRenderer extends PitchRenderer
 			phi += delta_phi
 			if phi > 8*pi
 				phi = loop(phi, 0, 2*pi)
-		
-		if buf.channels > 1
-			buf.r = buf.l
+		buf.auto_generate_channels()
 
 		return volume > 0
 

@@ -136,7 +136,6 @@ enum
 class Module
 	string name
 	Session* session
-	bool usable
 	extern void __init__(int type, string sub_type)
 	extern virtual void __delete__()
 	extern void reset_config()
@@ -199,6 +198,9 @@ class AudioBuffer
 		l *= factor
 		if channels > 1
 			r *= factor
+	void auto_generate_channels()
+		if channels > 1
+			r = l
 
 extern void interpolate_buffer(AudioBuffer in, AudioBuffer out, int method)
 

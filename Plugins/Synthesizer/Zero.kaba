@@ -23,14 +23,16 @@ class ZeroRenderer extends PitchRenderer
 //		...delta_phi = freq * dt * 2 * pi
 		
 		if fade_out
-			for i in 0:buf.length
+			for i in 0:len(buf)
 				volume *= 0.999
 				buf.l[i] += sin(phase) * volume
 				phase += delta_phi
 		else
-			for i in 0:buf.length
+			for i in 0:len(buf)
 				buf.l[i] += sin(phase) * volume
 				phase += delta_phi
+	
+		buf.auto_generate_channels()
 				
 		// keep alive?
 		return volume > 0.001
@@ -44,11 +46,7 @@ class ZeroRenderer extends PitchRenderer
 		fade_out = true
 
 class Zero extends Synthesizer
-	
-	override void __init__()
-		// VERY UGNLY HACK.....
-		auto_generate_stereo = true
-	
+
 	// messy :P
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new ZeroRenderer(self, pitch)

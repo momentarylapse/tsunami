@@ -3,7 +3,7 @@ use "../api.kaba"
 class ChaosSource extends BeatSource
 	int offset
 	
-	override void __init__()
+	override void reset_state()
 		offset = 0
 		
 	override int read(Beat[] beats, int samples)

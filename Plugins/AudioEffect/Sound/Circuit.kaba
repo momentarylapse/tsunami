@@ -14,7 +14,8 @@ class CircuitEffect extends AudioEffect
 	Config config
 	Circuit c
 	
-	override void __init__()
+	override void reset_state()
+		c.nodes.clear()
 		c.nodes.add(Node(complex(0,0)))
 		c.nodes.add(Node(complex(0,0)))
 		c.edges.add(new Resistor([0,1], 100))
@@ -27,5 +28,5 @@ class CircuitEffect extends AudioEffect
 			float I_in = f / 40
 			c.time_step(I_in, dt)
 			f = c.nodes[1].phi / 2
-		buf.r = buf.l
+		buf.auto_generate_channels()
 		

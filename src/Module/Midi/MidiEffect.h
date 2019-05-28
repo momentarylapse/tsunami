@@ -38,8 +38,6 @@ public:
 
 	void process_layer(TrackLayer *l, SongSelection &sel);
 
-	void prepare();
-
 	class Output : public Port
 	{
 	public:

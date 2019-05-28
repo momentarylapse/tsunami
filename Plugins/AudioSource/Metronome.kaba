@@ -21,21 +21,20 @@ class Metronome extends AudioSource
 	MetronomeSource *source
 	
 	override void __init__()
-		synth = new DummySynthesizer
-		source = new MetronomeSource
+		synth = nil
+		source = nil
+	
+	void create_stuff()
+		synth = CreateSynthesizer(session, "")
+		source = CreateMidiSource(session, "Metronome")
 		synth.plug(0, source, 0)
 	
 	override void __delete__()
-		delete source
-		delete synth
+		if source
+			delete source
+			delete synth
 
 	override int read(AudioBuffer buf)
-		float sample_rate = session.sample_rate()
-		synth.set_sample_rate(sample_rate)
-		source.sample_rate = sample_rate
-		source.config.volume = config.volume
-		source.set_beats(config.beats_per_measure, 1)
-		source.set_bpm(config.beats_per_minute)
 		return synth.out.read_audio(buf)
 		
 	override ConfigPanel *create_panel()
@@ -44,7 +43,16 @@ class Metronome extends AudioSource
 		
 		return new MetronomePanel(self)
 	
+	override void on_config()
+		if !source
+			create_stuff()
+		source.config.volume = config.volume
+		source.set_beats(config.beats_per_measure, 1)
+		source.set_bpm(config.beats_per_minute)
+	
 	override void reset_state()
+		if !source
+			create_stuff()
 		synth.reset_state()
 		source.reset_state()
 

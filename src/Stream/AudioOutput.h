@@ -99,6 +99,7 @@ private:
 		Device *device;
 		float volume;
 		void reset() override;
+		string auto_conf(const string &name) const override;
 	} config;
 
 	ModuleConfiguration* get_config() const override;

@@ -174,13 +174,11 @@ int AudioInput::Output::read_audio(AudioBuffer &buf)
 	return r;
 }
 
-extern bool ugly_hack_slow;
-
 AudioInput::AudioInput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioInput"),
 	buffer(1048576)
 {
-	set_session_etc(_session, "", nullptr);
+	set_session_etc(_session, "AudioInput");
 	_sample_rate = session->sample_rate();
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 0;

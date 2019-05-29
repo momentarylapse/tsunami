@@ -21,49 +21,22 @@ class SpecGrid extends Grid
 	int type
 	complex[] pr, pl
 	float[] ffr, ffl
-	float peak_max
 	
 	override void __init__()
 		set_type(TYPE_LOGARITHM)
 	
-	void set(AudioBuffer buf, int sample_rate)
-		complex[] fr, fl
-		buf.get_spectrum(fr, fl, 4096)
-	
-		float ww = i2f(buf.length) / sample_rate
-		for i in 0:N
-			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
-			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
-			int j0 = fmin * ww
-			int j1 = fmax * ww + 1
-			j0 = clamp(j0, 0, fr.num)
-			j1 = clamp(j1, 0, fr.num)
-			float bmaxr = 0
-			float bmaxl = 0
-			for j in j0:j1
-				float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
-				if bmaxr < amp
-					bmaxr = amp
-				amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
-				if bmaxl < amp
-					bmaxl = amp
-			ffr.add(bmaxr)
-			ffl.add(bmaxl)
-
-		float mmax = sqr(buf.length) / 4
-		if mmax > 0
-			ffr /= mmax
-			ffl /= mmax
-		peak_max = max(ffr.max(), ffl.max())
-		peak_max = 0.01
+	void set(float[] _ffl, float[] _ffr)
+		ffl = _ffl
+		ffr = _ffr
 		
 		create_lines()
+		//print(str(pr))
 		
 
 	void create_lines()
 		pr.resize(ffr.num)
 		pl.resize(ffl.num)
-		for i in 0:ffr.num
+		for i in 0:len(ffr)
 			float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
 			pr[i].x = x
 			pl[i].x = x
@@ -97,25 +70,64 @@ class SpectrumPanel extends ConfigPanel
 		from_source("
 DrawingArea area '' height=200")
 		
-		c.panel = self
+		c.panels.add(self)
 		
 		grid.init(self, "area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
 	override void __delete__()
-		c.panel = nil
+		for p,i in c.panels
+			if p == self
+				c.panels.remove(i)
 
 class Spectrum extends AudioVisualizer
-	SpectrumPanel *panel
+	SpectrumPanel*[] panels
+	
+	float[] ffr, ffl
+	float peak_max
 	
 	override void __init__()
 		set_chunk_size(NUM_SAMPLES)
-		panel = nil
+		
+	
+	void do(AudioBuffer buf)
+		complex[] fl, fr
+		buf.get_spectrum(fl, fr, 4096)
+		ffl.clear()
+		ffr.clear()
+	
+		float ww = i2f(len(buf)) / session.sample_rate()
+		for i in 0:N
+			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
+			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
+			int j0 = fmin * ww
+			int j1 = fmax * ww + 1
+			j0 = clamp(j0, 0, fr.num)
+			j1 = clamp(j1, 0, fr.num)
+			float bmaxr = 0
+			float bmaxl = 0
+			for j in j0:j1
+				float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
+				if bmaxr < amp
+					bmaxr = amp
+				amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
+				if bmaxl < amp
+					bmaxl = amp
+			ffl.add(bmaxl)
+			ffr.add(bmaxr)
+
+		float mmax = sqr(len(buf)) / 4
+		if mmax > 0
+			ffl /= mmax
+			ffr /= mmax
+		peak_max = max(ffr.max(), ffl.max())
+		peak_max = 0.01
 	
 	override void process(AudioBuffer buf)
-		if panel
-			panel.grid.set(buf, session.sample_rate())
-			panel.redraw("area")
+		do(buf)
+		for p in panels
+			p.grid.set(ffl, ffr)
+			p.redraw("area")
 		
 	override ConfigPanel* create_panel()
 		return new SpectrumPanel(self)

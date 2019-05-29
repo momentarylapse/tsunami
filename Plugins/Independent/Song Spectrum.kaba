@@ -1,0 +1,14 @@
+use "../api.kaba"
+
+class SongSpectrum extends TsunamiPlugin
+	Module* spec
+	override void on_start()
+		// very crappy topology :P
+		spec = session.signal_chain.add(MODULE_AUDIO_VISUALIZER, "Spectrum")
+		session.signal_chain.connect(session.song_renderer, 0, spec, 0)
+		session.signal_chain.connect(spec, 0, session.output_stream, 0)
+	override void on_stop()
+		session.signal_chain.remove(spec)
+		session.signal_chain.connect(session.song_renderer, 0, session.output_stream, 0)
+	override ConfigPanel* create_panel()
+		return spec.create_panel()

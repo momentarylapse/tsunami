@@ -67,6 +67,7 @@ void ViewModeCapture::draw_post(Painter *c)
 	if (!chain)
 		return;
 
+	int offset = view->get_playback_selection(true).offset;
 	for (auto &d: data){
 		if (d.type() == SignalType::AUDIO){
 			AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
@@ -74,15 +75,15 @@ void ViewModeCapture::draw_post(Painter *c)
 			auto *l = view->get_layer(d.target->layers[0]);
 			view->buffer_painter->set_context(l->area);
 			view->buffer_painter->set_color(view->colors.capture_marker);
-			view->buffer_painter->draw_buffer(c, buf, view->sel.range.offset);
+			view->buffer_painter->draw_buffer(c, buf, offset);
 		}else if (d.type() == SignalType::MIDI){
 			auto *rec = (MidiRecorder*)d.recorder;
-			draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(rec->buffer), true, view->sel.range.start());
+			draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(rec->buffer), true, offset);
 		}
 	}
 	
 	int l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	view->draw_time_line(c, view->sel.range.start() + l, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+	view->draw_time_line(c, offset + l, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
 }
 
 Set<Track*> ViewModeCapture::prevent_playback()
@@ -109,7 +110,7 @@ bool layer_available(TrackLayer *l, const Range &r)
 
 void ViewModeCapture::insert_midi(Track *target, const MidiEventBuffer &midi, int delay)
 {
-	int s_start = view->sel.range.start();
+	int s_start = view->get_playback_selection(true).start();
 
 	int i0 = s_start + delay;
 
@@ -122,7 +123,7 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 {
 	Song *song = target->song;
 
-	int s_start = view->sel.range.start();
+	int s_start = view->get_playback_selection(true).start();
 	int i0 = s_start + delay;
 
 	// insert data
@@ -140,7 +141,7 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 
 	AudioBuffer tbuf;
 	layer->get_buffers(tbuf, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(layer, r);
+	auto *a = new ActionTrackEditBuffer(layer, r);
 
 	/*if (hui::Config.getInt("Input.Mode", 0) == 1)
 		tbuf.add(buf, 0, 1.0f, 0);

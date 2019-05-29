@@ -26,7 +26,7 @@ NewDialog::NewDialog(hui::Window *_parent):
 	set_int("sample_rate", 1);
 	hide_control("nd_g_metronome_params", true);
 
-	check("new_track_type:audio-stereo", true);
+	check("new_track_type:audio-mono", true);
 
 	new_bar = new Bar(1000, 4, 1);
 	set_int("num_bars", 32);

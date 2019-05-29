@@ -106,7 +106,7 @@ bool Tsunami::on_startup(const Array<string> &_arg)
 	// create a window and load file
 	if (sessions.num == 0){
 		Session *session = create_session();
-		session->song->add_track(SignalType::AUDIO_STEREO);
+		session->song->add_track(SignalType::AUDIO_MONO);
 
 		// default tags
 		session->song->add_tag("title", _("New Audio File"));

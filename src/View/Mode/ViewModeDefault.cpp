@@ -50,31 +50,40 @@ ViewModeDefault::~ViewModeDefault()
 	delete dnd_selection;
 }
 
+void normal_click(ViewModeDefault *m, bool keep_track_selection, bool layer_hover_sel)
+{
+	if (layer_hover_sel){
+		m->set_cursor_pos(m->hover->pos, keep_track_selection);//track_hover_sel);
+	}else{
+		m->view->sel.clear_data();
+		//if (!keep_track_selection)
+		//	view->sel.tracks = view->cur_track();
+		m->view->set_selection(m->get_selection_for_range(m->view->sel.range));
+
+	}
+	m->view->msp.start(m->hover->pos, m->hover->y0);
+}
 
 void ViewModeDefault::on_left_button_down()
 {
-	//bool track_hover_sel = view->sel.has(hover->track);
-	select_under_mouse();
+	*hover = get_hover();
+	bool layer_hover_sel = view->sel.has(hover->layer);
+	select_hover();
 
 	view->snap_to_grid(hover->pos);
 
 	// selection:
 	//   start after lb down and moving
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::CLEF_POSITION)){
-		set_cursor_pos(hover->pos, true);//track_hover_sel);
-		view->msp.start(hover->pos, hover->y0);
+		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::BAR){
-		set_cursor_pos(hover->pos, true);
-		view->msp.start(hover->pos, hover->y0);
+		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::TIME){
-		set_cursor_pos(hover->pos, true);
-		view->msp.start(hover->pos, hover->y0);
+		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		set_cursor_pos(hover->pos, true);
-		view->msp.start(hover->pos, hover->y0);
+		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::BACKGROUND){
-		set_cursor_pos(hover->pos, false);
-		view->msp.start(hover->pos, hover->y0);
+		normal_click(this, false, layer_hover_sel);
 	}else if (hover->type == Selection::Type::SELECTION_END){
 		hover->range = view->sel.range;
 		view->selection_mode = view->SelectionMode::TIME;
@@ -176,7 +185,8 @@ void ViewModeDefault::on_left_double_click()
 	if (view->selection_mode != view->SelectionMode::NONE)
 		return;
 
-	select_under_mouse();
+	*hover = get_hover();
+	select_hover();
 
 	int buffer_index = hover_buffer(hover);
 
@@ -221,9 +231,10 @@ void prepare_menu(hui::Menu *menu, Selection* hover)
 
 void ViewModeDefault::on_right_button_down()
 {
+	*hover = get_hover();
 	bool track_hover_sel = view->sel.has(hover->track);
 
-	select_under_mouse();
+	select_hover();
 
 	// click outside sel.range -> select new position
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
@@ -940,10 +951,9 @@ void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 	m->view->set_selection(m->view->mode->get_selection_for_range(sel.range));
 }
 
-void ViewModeDefault::select_under_mouse()
+void ViewModeDefault::select_hover()
 {
 	view->sel_temp = view->sel;
-	*hover = get_hover();
 	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
 	bool control = win->get_key(hui::KEY_CONTROL);

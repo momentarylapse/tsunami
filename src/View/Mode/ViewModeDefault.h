@@ -48,7 +48,7 @@ public:
 	SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1) override;
 	void start_selection() override;
 
-	void select_under_mouse();
+	void select_hover();
 	void set_cursor_pos(int pos, bool keep_track_selection);
 	Selection get_hover() override;
 	Selection get_hover_basic(bool editable);

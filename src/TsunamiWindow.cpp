@@ -155,6 +155,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("sample_manager", [=]{ on_sample_manager(); });
 	event("song_edit_samples", [=]{ on_sample_manager(); });
 	event("show_mixing_console", [=]{ on_mixing_console(); });
+	set_key_code("show_mixing_console", hui::KEY_CONTROL + hui::KEY_M, "");
+	event("show_devices", [=]{ bottom_bar->toggle(BottomBar::DEVICE_CONSOLE); });
+	event("show_signal_chain", [=]{ bottom_bar->toggle(BottomBar::SIGNAL_EDITOR); });
 	event("show_mastering_console", [=]{ on_mastering_console(); });
 	event("show_fx_console", [=]{ on_fx_console(); });
 	event("sample_from_selection", [=]{ on_sample_from_selection(); });
@@ -744,7 +747,7 @@ void TsunamiWindow::on_sample_manager()
 
 void TsunamiWindow::on_mixing_console()
 {
-	session->set_mode("default/mixing");
+	bottom_bar->toggle(BottomBar::MIXING_CONSOLE);
 }
 
 void TsunamiWindow::on_fx_console()
@@ -929,6 +932,9 @@ void TsunamiWindow::update_menu()
 	check("play_loop", view->renderer->loop_if_allowed);
 	enable("record", !session->in_mode("capture"));
 	// view
+	check("show_mixing_console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
+	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_EDITOR));
+	check("show_devices", bottom_bar->is_active(BottomBar::DEVICE_CONSOLE));
 	check("sample_manager", session->in_mode("default/samples"));
 
 	string title = title_filename(song->filename) + " - " + AppName;

@@ -141,6 +141,15 @@ void BottomBar::open(int console_index)
 	open(consoles[console_index]);
 }
 
+void BottomBar::toggle(int console_index)
+{
+	if (is_active(console_index)){
+		_hide();
+	}else{
+		open(console_index);
+	}
+}
+
 bool BottomBar::is_active(int console_index)
 {
 	return (active_console == consoles[console_index]) and visible;

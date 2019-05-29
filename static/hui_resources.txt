@@ -1236,7 +1236,7 @@ menu_view
 
 5
 0
-8
+10
 Menu
 menu_view_midi
 
@@ -1263,44 +1263,56 @@ checkable
 0
 Item
 show_mixing_console
-
+checkable
 1
+0
+0
+Item
+show_signal_chain
+checkable
+2
+0
+0
+Item
+show_devices
+checkable
+3
 0
 0
 Item
 show_fx_console
 
-2
+4
 0
 0
 Separator
 
 
-3
+5
 0
 0
 Item
 zoom_in
 image=hui:zoom-in
-4
+6
 0
 0
 Item
 zoom_out
 image=hui:zoom-out
-5
+7
 0
 0
 Item
 view_optimal
 image=hui:zoom-fit
-6
+8
 0
 0
 Item
 view_samples
 image=hui:zoom-one
-7
+9
 0
 0
 Menu
@@ -5658,7 +5670,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-613
+615
 // Text
 /cancel
 Cancel
@@ -6107,6 +6119,9 @@ Expand selection
 menu/select_nothing
 Clear selection
 
+menu/show_devices
+Devices
+
 menu/show_fx_console
 Effects
 
@@ -6115,6 +6130,9 @@ Messages
 
 menu/show_mixing_console
 Mixing
+
+menu/show_signal_chain
+Signal chain
 
 menu/song_properties
 Properties
@@ -7505,7 +7523,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-777
+779
 // Text
 /bpm
 Bpm
@@ -8170,6 +8188,9 @@ Auswahl ausbreiten
 menu/select_nothing
 Nichts auswählen
 
+menu/show_devices
+Geräte
+
 menu/show_fx_console
 Effekte
 
@@ -8178,6 +8199,9 @@ Meldungen
 
 menu/show_mixing_console
 Mischpult
+
+menu/show_signal_chain
+Signalkette
 
 menu/song_properties
 Eigenschaften

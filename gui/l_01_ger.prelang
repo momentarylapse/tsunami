@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-778
+780
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2336,6 +2336,12 @@ track-mixer2/add-midi-fx
 Neuen Midi Effekt hinzufügen
 track-mixer2/midi-fx
 enabled\\name
+
+menu/show_devices
+Geräte
+
+menu/show_signal_chain
+Signalkette
 
 // Num Language Strings
 220

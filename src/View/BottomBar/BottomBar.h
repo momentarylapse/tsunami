@@ -66,6 +66,7 @@ public:
 	void choose(Console *console);
 	void open(Console *console);
 	void open(int console_index);
+	void toggle(int console_index);
 	bool is_active(int console_index);
 	Console *active_console;
 	bool visible;

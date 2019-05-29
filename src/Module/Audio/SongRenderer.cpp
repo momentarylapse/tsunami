@@ -316,3 +316,20 @@ void SongRenderer::update_tracks()
 	}
 }
 
+float SongRenderer::get_peak(Track *t)
+{
+	for (auto *tr: tracks)
+		if (tr->track == t){
+			float r = tr->peak;
+			tr->peak = 0;
+			return r;
+		}
+	return 0;
+}
+
+void SongRenderer::clear_peaks()
+{
+	for (auto *tr: tracks)
+		tr->peak = 0;
+}
+

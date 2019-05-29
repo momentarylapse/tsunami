@@ -3,7 +3,9 @@ Dialog track-mixer2 ""
 		Text name "" center bold marginbottom=5
 		Grid grid-volume "" expandy vertical
 			Slider panning "0" range=-1:1:0.01 expandx origin=no "tooltip=Balance"
-			Slider volume "0" range=0:1:0.001 vertical expandy "tooltip=Volume in dB"
+			Grid ? ""
+				Slider volume "0" range=0:1:0.001 vertical width=80 expandy "tooltip=Volume in dB"
+				DrawingArea peaks "" width=5 noexpandx
 		Grid grid-fx "" expandy vertical
 			ListView fx "enabled\\name" format=Ct reorderable nobar expandy
 			Grid ? ""

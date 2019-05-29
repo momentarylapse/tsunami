@@ -32,6 +32,8 @@ public:
 	bool direct_mode;
 	int offset;
 
+	float peak;
+
 	void set_pos(int pos);
 
 	void render_audio_versioned(AudioBuffer &buf);

@@ -40,6 +40,7 @@ public:
 	void on_tracks_change();
 	void update_all();
 	void on_update_device_manager();
+	void on_chain_state_change();
 
 	void _cdecl on_show() override;
 	void _cdecl on_hide() override;
@@ -49,6 +50,8 @@ public:
 
 	string id_inner;
 	Array<TrackMixer*> mixer;
+
+	int peak_runner_id;
 
 	void set_mode(MixerMode mode);
 	MixerMode mode;

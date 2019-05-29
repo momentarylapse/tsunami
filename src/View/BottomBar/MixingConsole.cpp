@@ -13,8 +13,10 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Module/Audio/AudioEffect.h"
+#include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/Midi/MidiEffect.h"
 #include "../../Module/ConfigPanel.h"
+#include "../../Module/SignalChain.h"
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Device/DeviceManager.h"
@@ -71,6 +73,7 @@ public:
 		event_x("midi-fx", "hui:change", [=]{ on_midi_fx_edit(); });
 		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
 		event("add-midi-fx", [=]{ on_add_midi_fx(); });
+		event_xp("peaks", "hui:draw", [=](Painter* p){ on_peak_draw(p); });
 
 		vtrack = t;
 		track = t->track;
@@ -190,7 +193,16 @@ public:
 			return;
 		auto *effect = CreateMidiEffect(console->session, name);
 		track->add_midi_effect(effect);
-
+	}
+	void on_peak_draw(Painter* p)
+	{
+		int w = p->width;
+		int h = p->height;
+		p->set_color(AudioView::colors.background);
+		p->draw_rect(0,0,w,h);
+		p->set_color(AudioView::colors.text);
+		float f = sqrt(console->session->song_renderer->get_peak(track));
+		p->draw_rect(0,h * (1-f),w,h*f);
 	}
 	void update()
 	{
@@ -394,10 +406,17 @@ MixingConsole::MixingConsole(Session *session) :
 
 	device_manager->subscribe(this, [=]{ on_update_device_manager(); });
 	load_data();
+
+
+	peak_runner_id = -1;
+	session->signal_chain->subscribe(this, [=]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
 }
 
 MixingConsole::~MixingConsole()
 {
+	session->signal_chain->unsubscribe(this);
+	if (peak_runner_id >= 0)
+		hui::CancelRunner(peak_runner_id);
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
 	device_manager->unsubscribe(this);
@@ -405,6 +424,20 @@ MixingConsole::~MixingConsole()
 	for (TrackMixer *m: mixer)
 		delete m;
 	delete peak_meter;
+}
+
+void MixingConsole::on_chain_state_change()
+{
+	if (peak_runner_id and !session->signal_chain->is_playback_active()){
+		hui::CancelRunner(peak_runner_id);
+		peak_runner_id = -1;
+		// clear
+		session->song_renderer->clear_peaks();
+		for (auto *m: mixer)
+			m->redraw("peaks");
+	}else if (peak_runner_id == -1 and session->signal_chain->is_playback_active()){
+		peak_runner_id = hui::RunRepeated(0.1f, [=]{ for (auto *m: mixer) m->redraw("peaks"); });
+	}
 }
 
 void MixingConsole::on_output_volume()

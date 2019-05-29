@@ -89,6 +89,9 @@ public:
 	AudioEffect *preview_effect;
 	bool allow_loop;
 	bool loop_if_allowed;
+
+	float get_peak(Track *track);
+	void clear_peaks();
 };
 
 #endif /* SRC_MODULE_AUDIO_SONGRENDERER_H_ */

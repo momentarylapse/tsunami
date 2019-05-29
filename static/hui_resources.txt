@@ -1104,7 +1104,7 @@ menu_track_new
 
 3
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -1127,6 +1127,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Menu
@@ -1236,7 +1242,7 @@ menu_view
 
 5
 0
-10
+11
 Menu
 menu_view_midi
 
@@ -1285,34 +1291,40 @@ show_fx_console
 4
 0
 0
+Item
+edit-track-groups
+
+5
+0
+0
 Separator
 
 
-5
+6
 0
 0
 Item
 zoom_in
 image=hui:zoom-in
-6
+7
 0
 0
 Item
 zoom_out
 image=hui:zoom-out
-7
+8
 0
 0
 Item
 view_optimal
 image=hui:zoom-fit
-8
+9
 0
 0
 Item
 view_samples
 image=hui:zoom-one
-9
+10
 0
 0
 Menu
@@ -2829,7 +2841,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -2852,6 +2864,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -3010,7 +3028,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -3033,6 +3051,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -3234,7 +3258,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -3257,6 +3281,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -3415,7 +3445,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -3438,6 +3468,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -3602,7 +3638,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -3625,6 +3661,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -3821,7 +3863,7 @@ menu_track_new
 
 2
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -3844,6 +3886,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -4087,7 +4135,7 @@ menu_track_new
 
 0
 0
-4
+5
 Item
 add_audio_track_mono
 image=hui:add
@@ -4110,6 +4158,12 @@ Item
 add_time_track
 image=hui:add
 3
+0
+0
+Item
+add_group_track
+image=hui:add
+4
 0
 0
 Item
@@ -5682,7 +5736,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-616
+625
 // Text
 /cancel
 Cancel
@@ -5981,6 +6035,9 @@ Audio (stereo)
 menu/add_bars
 Add bars...
 
+menu/add_group_track
+Group
+
 menu/add_midi_track
 Midi
 
@@ -5998,6 +6055,9 @@ Löschen
 
 menu/delete_time
 Delete selected interval
+
+menu/edit-track-groups
+Edit track groups
 
 menu/edit_bars
 Edit...
@@ -6542,6 +6602,9 @@ Audio (stereo)
 popup_bar_menu/add_bars
 Add bars...
 
+popup_bar_menu/add_group_track
+Group
+
 popup_bar_menu/add_midi_track
 Midi
 
@@ -6641,6 +6704,9 @@ Audio (mono)
 popup_buffer_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_buffer_menu/add_group_track
+Group
+
 popup_buffer_menu/add_midi_track
 Midi
 
@@ -6734,6 +6800,9 @@ Audio (mono)
 popup_layer_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_layer_menu/add_group_track
+Group
+
 popup_layer_menu/add_midi_track
 Midi
 
@@ -6811,6 +6880,9 @@ Audio (mono)
 
 popup_marker_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_marker_menu/add_group_track
+Group
 
 popup_marker_menu/add_midi_track
 Midi
@@ -6892,6 +6964,9 @@ Audio (mono)
 
 popup_sample_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_sample_menu/add_group_track
+Group
 
 popup_sample_menu/add_midi_track
 Midi
@@ -7034,6 +7109,9 @@ Audio (mono)
 popup_song_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_song_menu/add_group_track
+Group
+
 popup_song_menu/add_midi_track
 Midi
 
@@ -7096,6 +7174,9 @@ Audio (mono)
 
 popup_track_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_track_menu/add_group_track
+Group
 
 popup_track_menu/add_midi_track
 Midi
@@ -7538,7 +7619,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-780
+789
 // Text
 /bpm
 Bpm
@@ -7969,6 +8050,9 @@ Pause einfügen
 menu/add_bars
 Neue Takte einfügen
 
+menu/add_group_track
+Gruppe
+
 menu/add_midi_track
 Midi Spur hinzufügen
 
@@ -8007,6 +8091,9 @@ Ausgewähltes Interval löschen
 
 menu/delete_track
 Löschen
+
+menu/edit-track-groups
+Spur Gruppen bearbeiten...
 
 menu/edit_bars
 Bearbeiten
@@ -8701,6 +8788,9 @@ Audio (stereo)
 popup_bar_menu/add_bars
 Takte hinzufügen...
 
+popup_bar_menu/add_group_track
+Gruppe
+
 popup_bar_menu/add_midi_track
 Midi
 
@@ -8800,6 +8890,9 @@ Audio (mono)
 popup_buffer_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_buffer_menu/add_group_track
+Gruppe
+
 popup_buffer_menu/add_midi_track
 Midi
 
@@ -8893,6 +8986,9 @@ Audio (mono)
 popup_layer_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_layer_menu/add_group_track
+Gruppe
+
 popup_layer_menu/add_midi_track
 Midi
 
@@ -8970,6 +9066,9 @@ Audio (mono)
 
 popup_marker_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_marker_menu/add_group_track
+Gruppe
 
 popup_marker_menu/add_midi_track
 Midi
@@ -9066,6 +9165,9 @@ Audio (mono)
 
 popup_sample_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_sample_menu/add_group_track
+Gruppe
 
 popup_sample_menu/add_midi_track
 Midi
@@ -9235,6 +9337,9 @@ Audio (mono)
 popup_song_menu/add_audio_track_stereo
 Audio (stereo)
 
+popup_song_menu/add_group_track
+Gruppe
+
 popup_song_menu/add_midi_track
 Midi Spur hinzufügen
 
@@ -9303,6 +9408,9 @@ Audio (mono)
 
 popup_track_menu/add_audio_track_stereo
 Audio (stereo)
+
+popup_track_menu/add_group_track
+Gruppe
 
 popup_track_menu/add_midi_track
 Midi

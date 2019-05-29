@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-781
+790
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2346,6 +2346,33 @@ Signalkette
 mixing-console/output-spectrum
 
 Ausgabe Spektrum
+popup_song_menu/add_group_track
+Gruppe
+
+popup_track_menu/add_group_track
+Gruppe
+
+menu/add_group_track
+Gruppe
+
+popup_bar_menu/add_group_track
+Gruppe
+
+popup_buffer_menu/add_group_track
+Gruppe
+
+popup_layer_menu/add_group_track
+Gruppe
+
+popup_marker_menu/add_group_track
+Gruppe
+
+popup_sample_menu/add_group_track
+Gruppe
+
+menu/edit-track-groups
+Spur Gruppen bearbeiten...
+
 // Num Language Strings
 220
 // Data (ID,Text)

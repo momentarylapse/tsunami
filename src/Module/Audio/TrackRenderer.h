@@ -41,6 +41,7 @@ public:
 	void render_audio(AudioBuffer &buf);
 	void render_time(AudioBuffer &buf);
 	void render_midi(AudioBuffer &buf);
+	void render_group(AudioBuffer &buf);
 	void render_no_fx(AudioBuffer &buf);
 	void render(AudioBuffer &buf);
 

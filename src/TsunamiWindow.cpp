@@ -64,7 +64,44 @@ namespace hui{
 	extern string file_dialog_default;
 }
 
-hui::Timer debug_timer;
+class TrackGroupEditor : public hui::Dialog
+{
+public:
+	TrackGroupEditor(hui::Window *parent, Song *_song):
+		hui::Dialog("", 300, 50, parent, false)
+	{
+		from_source("Grid ? '' vertical\n\tLabel ? '...this is highly experimental...don`t complain!' height=40\n\tGrid list ''\n\t\tLabel ? 'Track' bold\n\t\tLabel ? 'Target' bold\n\tGrid ? '' buttonbar\n\t\tButton ok 'Ok'");
+		song = _song;
+		for (Track *t: song->tracks)
+			if (t->type == SignalType::GROUP)
+				groups.add(t);
+
+		foreachi (Track *t, song->tracks, i){
+			set_target("list");
+			add_label(t->nice_name(), 0, i+1, "");
+			add_combo_box("!expandx\\- direct out -", 1, i+1, "target-" + i2s(i));
+			foreachi (Track *g, groups, j){
+				add_string("target-" + i2s(i), g->nice_name());
+				if (t->send_target == g)
+					set_int("target-" + i2s(i), j + 1);
+			}
+			event("target-" + i2s(i), [=]{ on_target(i); });
+		}
+		event("ok", [=]{ destroy(); });
+	}
+	void on_target(int i)
+	{
+		int j = get_int("");
+		if (j >= 1)
+			song->tracks[i]->set_send_target(groups[j - 1]);
+		else
+			song->tracks[i]->set_send_target(nullptr);
+
+	}
+	Array<Track*> groups;
+	Song *song;
+
+};
 
 TsunamiWindow::TsunamiWindow(Session *_session) :
 	hui::Window(AppName, 800, 600)
@@ -109,6 +146,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("add_audio_track_mono", -1, "hui:add");
 	event("add_audio_track_stereo", [=]{ on_add_audio_track_stereo(); });
 	set_key_code("add_audio_track_stereo", -1, "hui:add");
+	event("add_group_track", [=]{ song->add_track(SignalType::GROUP); });
 	event("add_time_track", [=]{ on_add_time_track(); });
 	set_key_code("add_time_track", -1, "hui:add");
 	event("add_midi_track", [=]{ on_add_midi_track(); });
@@ -126,6 +164,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("delete_buffer", [=]{ on_buffer_delete(); });
 	event("make_buffer_movable", [=]{ on_buffer_make_movable(); });
 
+
+	event("edit-track-groups", [=]{ auto *dlg = new TrackGroupEditor(this, song); dlg->run(); delete dlg; });
+	set_key_code("edit-track-groups", hui::KEY_G + hui::KEY_CONTROL, "");
 
 	event("layer_midi_mode_linear", [=]{ on_layer_midi_mode_linear(); });
 	event("layer_midi_mode_tab", [=]{ on_layer_midi_mode_tab(); });

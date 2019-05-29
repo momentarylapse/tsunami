@@ -68,6 +68,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 	muted = false;
 	volume = 1;
 	panning = 0;
+	send_target = nullptr;
 	song = nullptr;
 
 	volume = 1;
@@ -174,6 +175,11 @@ void Track::set_volume(float volume)
 void Track::set_panning(float panning)
 {
 	song->execute(new ActionTrackEditPanning(this, panning));
+}
+
+void Track::set_send_target(Track *t)
+{
+	send_target = t;
 }
 
 void Track::move(int target)

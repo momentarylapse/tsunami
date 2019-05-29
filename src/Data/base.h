@@ -43,8 +43,10 @@ enum class SignalType
 	BEATS,
 	MIDI,
 
+	// special
 	AUDIO_MONO,
-	AUDIO_STEREO
+	AUDIO_STEREO,
+	GROUP
 };
 
 string signal_type_name(SignalType type);

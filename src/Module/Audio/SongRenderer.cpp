@@ -62,18 +62,18 @@ void SongRenderer::__delete__()
 	this->SongRenderer::~SongRenderer();
 }
 
-int SongRenderer::get_first_usable_track()
+int SongRenderer::get_first_usable_track(Track *target)
 {
 	foreachi(auto *tr, tracks, i)
-		if (!tr->track->muted and allowed_tracks.contains(tr->track))
+		if (!tr->track->muted and allowed_tracks.contains(tr->track) and (tr->track->send_target == target))
 			return i;
 	return -1;
 }
 
-void SongRenderer::render_song_no_fx(AudioBuffer &buf)
+void SongRenderer::render_send_target(AudioBuffer &buf, Track* target)
 {
 	// any un-muted track?
-	int i0 = get_first_usable_track();
+	int i0 = get_first_usable_track(target);
 	if (i0 < 0){
 		// no -> return silence
 		buf.set_zero();
@@ -89,14 +89,21 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 				continue;
 			if (t->muted)
 				continue;
+			if (t->send_target != target)
+				continue;
 			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
 			tracks[i]->render(tbuf);
 			buf.add(tbuf, 0, 1);
 		}
 
-		buf.mix_stereo(song->volume);
+		//buf.mix_stereo(song->volume);
 	}
+}
+
+void SongRenderer::render_song_no_fx(AudioBuffer &buf)
+{
+	render_send_target(buf, nullptr);
 }
 
 void apply_curves(Song *audio, int pos)

@@ -68,11 +68,11 @@ void TrackConsole::load_data()
 		set_float("panning", track->panning * 100.0f);
 		hide_control("edit_midi", track->type != SignalType::MIDI);
 		hide_control("edit_midi_fx", track->type != SignalType::MIDI);
-		enable("_edit_synth", track->type != SignalType::AUDIO);
-		enable("select_synth", track->type != SignalType::AUDIO);
+		enable("_edit_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
+		enable("select_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
 
-		Array<Instrument> instruments = Instrument::enumerate();
-		foreachi(Instrument &ii, instruments, i){
+		auto instruments = Instrument::enumerate();
+		foreachi(auto &ii, instruments, i){
 			if (track->instrument == ii)
 				set_int("instrument", i);
 		}
@@ -135,7 +135,7 @@ void TrackConsole::on_instrument()
 	editing = true;
 	int n = get_int("");
 	Array<int> tuning;
-	Array<Instrument> instruments = Instrument::enumerate();
+	auto instruments = Instrument::enumerate();
 	track->set_instrument(instruments[n]);
 	update_strings();
 	editing = false;
@@ -143,7 +143,7 @@ void TrackConsole::on_instrument()
 
 void TrackConsole::on_edit_tuning()
 {
-	TuningDialog *dlg = new TuningDialog(win, track);
+	auto *dlg = new TuningDialog(win, track);
 	dlg->run();
 	delete(dlg);
 }

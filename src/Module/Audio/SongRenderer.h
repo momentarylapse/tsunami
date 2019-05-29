@@ -56,6 +56,7 @@ public:
 
 private:
 	void read_basic(AudioBuffer &buf);
+	void render_send_target(AudioBuffer &buf, Track *target);
 	void render_song_no_fx(AudioBuffer &buf);
 
 	void on_song_add_track();
@@ -74,7 +75,7 @@ private:
 	Array<TrackRenderer*> tracks;
 
 
-	int get_first_usable_track();
+	int get_first_usable_track(Track *target);
 
 	BarStreamer *bar_streamer;
 	BeatMidifier *beat_midifier;

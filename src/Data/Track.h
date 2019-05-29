@@ -51,6 +51,7 @@ public:
 	void _cdecl set_muted(bool muted);
 	void _cdecl set_volume(float volume);
 	void _cdecl set_panning(float panning);
+	void _cdecl set_send_target(Track *t);
 	TrackLayer _cdecl *add_layer();
 	void _cdecl delete_layer(TrackLayer *layer);
 	void _cdecl merge_layers();
@@ -86,6 +87,8 @@ public:
 
 	float volume, panning;
 	bool muted;
+
+	Track *send_target;
 
 	Array<AudioEffect*> fx;
 	Array<MidiEffect*> midi_fx;

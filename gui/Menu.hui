@@ -36,6 +36,7 @@ Menu menu ""
 			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
 			Item add_midi_track "Midi" image=hui:add
 			Item add_time_track "Rhythm" image=hui:add
+			Item add_group_track "Group" image=hui:add
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add
@@ -62,6 +63,7 @@ Menu menu ""
 		Item show_signal_chain "Signal chain" checkable
 		Item show_devices "Devices" checkable
 		Item show_fx_console "Effects"
+		Item edit-track-groups "Edit track groups"
 		Separator
 		Item zoom_in "Zoon in" image=hui:zoom-in
 		Item zoom_out "Zoom out" image=hui:zoom-out

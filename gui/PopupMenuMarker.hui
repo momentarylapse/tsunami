@@ -24,6 +24,7 @@ Menu popup_marker_menu ""
 			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
 			Item add_midi_track "Midi" image=hui:add
 			Item add_time_track "Rhythm" image=hui:add
+			Item add_group_track "Group" image=hui:add
 		Item song_edit_samples "Manage samples"
 		Item show_mixing_console "Mixing"
 		Item show_mastering_console "Mastering"

@@ -345,6 +345,11 @@ void TrackRenderer::render_midi(AudioBuffer &buf)
 	synth->out->read_audio(buf);
 }
 
+void TrackRenderer::render_group(AudioBuffer &buf)
+{
+	song_renderer->render_send_target(buf, track);
+}
+
 void TrackRenderer::render_no_fx(AudioBuffer &buf)
 {
 	if (!track)
@@ -355,6 +360,8 @@ void TrackRenderer::render_no_fx(AudioBuffer &buf)
 		render_time(buf);
 	else if (track->type == SignalType::MIDI)
 		render_midi(buf);
+	else if (track->type == SignalType::GROUP)
+		render_group(buf);
 	offset += buf.length;
 }
 

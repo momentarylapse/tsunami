@@ -70,7 +70,7 @@ public:
 	TrackGroupEditor(hui::Window *parent, Song *_song):
 		hui::Dialog("", 300, 50, parent, false)
 	{
-		from_source("Grid ? '' vertical\n\tLabel ? '...this is highly experimental...don`t complain!' height=40\n\tGrid list ''\n\t\tLabel ? 'Track' bold\n\t\tLabel ? 'Target' bold\n\tGrid ? '' buttonbar\n\t\tButton ok 'Ok'");
+		from_source("Grid ? '' vertical\n\tLabel ? '...this is highly experimental...don`t complain!' height=40\n\tGrid list ''\n\t\tLabel ? 'Track' bold\n\t\tLabel ? 'Target' bold\n\tGrid ? '' buttonbar\n\t\tButton close 'Close'");
 		song = _song;
 		for (Track *t: song->tracks)
 			if (t->type == SignalType::GROUP)
@@ -87,7 +87,7 @@ public:
 			}
 			event("target-" + i2s(i), [=]{ on_target(i); });
 		}
-		event("ok", [=]{ destroy(); });
+		event("close", [=]{ destroy(); });
 	}
 	void on_target(int i)
 	{

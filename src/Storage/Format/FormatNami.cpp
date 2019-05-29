@@ -112,6 +112,28 @@ public:
 	}
 };
 
+class FileChunkSend : public FileChunk<Song,Song>
+{
+public:
+	FileChunkSend() : FileChunk<Song,Song>("send"){}
+	virtual void create(){ me = parent; }
+	virtual void read(File *f)
+	{
+		f->read_int();
+		for (Track *t: me->tracks){
+			int i = f->read_int();
+			if (i >= 0 and i < me->tracks.num)
+				t->send_target = me->tracks[i];
+		}
+	}
+	virtual void write(File *f)
+	{
+		f->write_int(0);
+		for (Track *t: me->tracks)
+			f->write_int(get_track_index(t->send_target));
+	}
+};
+
 class FileChunkEffect : public FileChunk<Track,AudioEffect>
 {
 public:
@@ -1188,6 +1210,7 @@ public:
 		add_child(new FileChunkTrack);
 		add_child(new FileChunkGlobalEffect);
 		add_child(new FileChunkCurve);
+		add_child(new FileChunkSend);
 	}
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
@@ -1208,6 +1231,12 @@ public:
 		write_sub_parray("track", me->tracks);
 		write_sub_parray("effect", me->fx);
 		write_sub_parray("curve", me->curves);
+		bool needs_send = false;
+		for (Track *t: me->tracks)
+			if (t->send_target)
+				needs_send = true;
+		if (needs_send)
+			write_sub("send", me);
 	}
 };
 

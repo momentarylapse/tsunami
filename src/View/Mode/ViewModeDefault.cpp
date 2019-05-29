@@ -267,9 +267,6 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_bar->enable("edit_bars", false);
 		view->menu_bar->enable("scale_bars", false);
 		view->menu_bar->open_popup(view->win);
-	}else if (hover_buffer(hover) >= 0){
-		prepare_menu(view->menu_buffer, hover);
-		view->menu_buffer->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		prepare_menu(view->menu_layer, hover);
 		view->menu_layer->open_popup(view->win);
@@ -277,6 +274,9 @@ void ViewModeDefault::on_right_button_down()
 		prepare_menu(view->menu_track, hover);
 		view->menu_track->open_popup(view->win);
 	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
+	}else if (hover_buffer(hover) >= 0){
+		prepare_menu(view->menu_buffer, hover);
+		view->menu_buffer->open_popup(view->win);
 	}else if (!hover->track){
 		view->menu_song->open_popup(view->win);
 	}

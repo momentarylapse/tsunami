@@ -344,7 +344,7 @@ void TrackRenderer::render_midi(AudioBuffer &buf)
 	synth->out->read_audio(buf);
 }
 
-void TrackRenderer::render(AudioBuffer &buf)
+void TrackRenderer::render_no_fx(AudioBuffer &buf)
 {
 	if (!track)
 		return;
@@ -366,13 +366,15 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list)
 		}
 }
 
-void TrackRenderer::render_fx(AudioBuffer &buf)
+void TrackRenderer::render(AudioBuffer &buf)
 {
-	render(buf);
+	render_no_fx(buf);
 
-	Array<AudioEffect*> _fx = fx;
+	auto _fx = fx;
 	if (song_renderer and song_renderer->preview_effect)
 		_fx.add(song_renderer->preview_effect);
 	if (_fx.num > 0)
 		apply_fx(buf, _fx);
+
+	buf.mix_stereo(track->volume, track->panning);
 }

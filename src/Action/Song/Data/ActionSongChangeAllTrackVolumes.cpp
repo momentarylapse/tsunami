@@ -22,8 +22,6 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d)
 {
 	Song *s = dynamic_cast<Song*>(d);
 
-	s->volume = new_value;
-
 	float factor = new_value / old_value;
 
 	foreachi(Track *tt, s->tracks, i){
@@ -47,7 +45,7 @@ void ActionSongChangeAllTrackVolumes::undo(Data *d)
 
 bool ActionSongChangeAllTrackVolumes::mergable(Action *a)
 {
-	ActionSongChangeAllTrackVolumes *aa = dynamic_cast<ActionSongChangeAllTrackVolumes*>(a);
+	auto *aa = dynamic_cast<ActionSongChangeAllTrackVolumes*>(a);
 	if (aa->track_no != track_no)
 		return false;
 	return aa;

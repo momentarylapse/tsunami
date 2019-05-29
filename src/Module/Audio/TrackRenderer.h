@@ -39,8 +39,8 @@ public:
 	void render_audio(AudioBuffer &buf);
 	void render_time(AudioBuffer &buf);
 	void render_midi(AudioBuffer &buf);
+	void render_no_fx(AudioBuffer &buf);
 	void render(AudioBuffer &buf);
-	void render_fx(AudioBuffer &buf);
 
 	void fill_midi_streamer();
 	int get_first_usable_layer();

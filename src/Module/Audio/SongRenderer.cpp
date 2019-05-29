@@ -80,8 +80,7 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 	}else{
 
 		// first (un-muted) track
-		tracks[i0]->render_fx(buf);
-		buf.mix_stereo(tracks[i0]->track->volume, tracks[i0]->track->panning);
+		tracks[i0]->render(buf);
 
 		// other tracks
 		for (int i=i0+1;i<tracks.num;i++){
@@ -92,8 +91,7 @@ void SongRenderer::render_song_no_fx(AudioBuffer &buf)
 				continue;
 			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
-			tracks[i]->render_fx(tbuf);
-			tbuf.mix_stereo(t->volume, t->panning);
+			tracks[i]->render(tbuf);
 			buf.add(tbuf, 0, 1);
 		}
 

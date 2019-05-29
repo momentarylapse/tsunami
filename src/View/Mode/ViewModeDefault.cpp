@@ -77,9 +77,10 @@ void ViewModeDefault::on_left_button_down()
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::CLEF_POSITION)){
 		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::BAR){
-		normal_click(this, true, layer_hover_sel);
+		//normal_click(this, true, layer_hover_sel);
+		view->msp.start(hover->pos, hover->y0);
 	}else if (hover->type == Selection::Type::TIME){
-		normal_click(this, true, layer_hover_sel);
+		normal_click(this, true, true);
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		normal_click(this, true, layer_hover_sel);
 	}else if (hover->type == Selection::Type::BACKGROUND){
@@ -882,13 +883,17 @@ Selection ViewModeDefault::get_hover()
 			}
 
 			// bars
-			auto bars = view->song->bars.get_bars(Range(s.pos, 0));
+			auto bars = view->song->bars.get_bars(Range(s.pos, 1000000));
 			for (auto *b: bars){
-				//b.range.
-				s.bar = b;
-				s.index = b->index;
-				s.type = Selection::Type::BAR;
-				return s;
+				float x = view->cam.sample2screen(b->range().offset);
+				// test for label area...
+				if ((mx >= x) and (mx < x + 36) and (my < s.vlayer->area.y1 + 20)){
+					//b.range.
+					s.bar = b;
+					s.index = b->index;
+					s.type = Selection::Type::BAR;
+					return s;
+				}
 			}
 		}
 	}

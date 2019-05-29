@@ -40,18 +40,17 @@ SongConsole::SongConsole(Session *session) :
 
 	load_data();
 
-	event("samplerate", std::bind(&SongConsole::on_samplerate, this));
-	event("format", std::bind(&SongConsole::on_format, this));
-	event("compress", std::bind(&SongConsole::on_compression, this));
-	event_x("tags", "hui:select", std::bind(&SongConsole::on_tags_select, this));
-	event_x("tags", "hui:change", std::bind(&SongConsole::on_tags_edit, this));
-	event("add_tag", std::bind(&SongConsole::on_add_tag, this));
-	event("delete_tag", std::bind(&SongConsole::on_delete_tag, this));
+	event("samplerate", [=]{ on_samplerate(); });
+	event("format", [=]{ on_format(); });
+	event("compress", [=]{ on_compression(); });
+	event_x("tags", "hui:select", [=]{ on_tags_select(); });
+	event_x("tags", "hui:change", [=]{ on_tags_edit(); });
+	event("add_tag", [=]{ on_add_tag(); });
+	event("delete_tag", [=]{ on_delete_tag(); });
 
-	event("edit_samples", std::bind(&SongConsole::on_edit_samples, this));
-	event("edit_fx", std::bind(&SongConsole::on_edit_fx, this));
+	event("edit_samples", [=]{ on_edit_samples(); });
 
-	song->subscribe(this, std::bind(&SongConsole::on_update, this));
+	song->subscribe(this, [=]{ on_update(); });
 }
 
 SongConsole::~SongConsole()
@@ -134,11 +133,6 @@ void SongConsole::on_delete_tag()
 void SongConsole::on_edit_samples()
 {
 	bar()->open(SideBar::SAMPLE_CONSOLE);
-}
-
-void SongConsole::on_edit_fx()
-{
-	bar()->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
 void SongConsole::on_update()

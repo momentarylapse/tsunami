@@ -17,7 +17,6 @@ class TrackConsole;
 class MidiEditorConsole;
 class SampleRefConsole;
 class SampleManagerConsole;
-class GlobalFxConsole;
 class CurveConsole;
 class SynthConsole;
 class CaptureConsole;
@@ -48,7 +47,6 @@ public:
 	{
 		SONG_CONSOLE,
 		SAMPLE_CONSOLE,
-		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
 		MIDI_EDITOR_CONSOLE,
 		CURVE_CONSOLE,
@@ -67,7 +65,6 @@ public:
 	bool allow_close();
 
 	SongConsole *song_console;
-	GlobalFxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditorConsole *midi_editor_console;
 	CurveConsole *curve_console;

@@ -171,9 +171,6 @@ void Session::set_mode(const string &mode)
 	}else if (mode == "default/song"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SONG_CONSOLE);
-	}else if (mode == "default/mastering"){
-		view->set_mode(view->mode_default);
-		win->side_bar->open(SideBar::GLOBAL_FX_CONSOLE);
 	}else if (mode == "default/samples"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLE_CONSOLE);

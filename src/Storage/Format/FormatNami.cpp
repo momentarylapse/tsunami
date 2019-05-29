@@ -163,6 +163,7 @@ public:
 	}
 };
 
+// DEPRECATED
 class FileChunkGlobalEffect : public FileChunk<Song,AudioEffect>
 {
 public:
@@ -179,7 +180,7 @@ public:
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
-		parent->fx.add(me);
+		parent->__fx.add(me);
 	}
 	virtual void write(File *f)
 	{
@@ -1229,7 +1230,6 @@ public:
 		write_sub_parray("bar", me->bars);
 		write_sub_parray("sample", me->samples);
 		write_sub_parray("track", me->tracks);
-		write_sub_parray("effect", me->fx);
 		write_sub_parray("curve", me->curves);
 		bool needs_send = false;
 		for (Track *t: me->tracks)
@@ -1335,6 +1335,18 @@ void FormatNami::make_consistent(Song *a)
 			for (auto *l: t->layers)
 				l->channels = 1;
 		}
+	}
+
+	if (a->__fx.num > 0){
+		od->session->w(_("file contains global fx. Will add a mastering track instead"));
+		auto *tm = a->add_track(SignalType::GROUP);
+		tm->name = "Master";
+		tm->fx = a->__fx;
+		for (Track *t: a->tracks)
+			if (t != tm){
+				t->set_send_target(tm);
+			}
+		a->__fx.clear();
 	}
 }
 

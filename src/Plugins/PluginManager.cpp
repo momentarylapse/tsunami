@@ -502,8 +502,6 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
 	Kaba::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
 	Kaba::DeclareClassOffset("Song", "sample_rate", _offsetof(Song, sample_rate));
-	Kaba::DeclareClassOffset("Song", "volume", _offsetof(Song, volume));
-	Kaba::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
 	Kaba::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
 	Kaba::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
 //	Kaba::DeclareClassOffset("Song", "layers", _offsetof(Song, layers));

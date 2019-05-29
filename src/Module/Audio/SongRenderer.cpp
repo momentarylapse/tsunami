@@ -129,10 +129,6 @@ void SongRenderer::read_basic(AudioBuffer &buf)
 	buf.set_zero();
 	render_song_no_fx(buf);
 
-	// apply global fx
-	if (song->fx.num > 0)
-		TrackRenderer::apply_fx(buf, song->fx);
-
 	unapply_curves(song);
 
 	pos += buf.length;
@@ -235,8 +231,6 @@ void SongRenderer::reset_state()
 {
 	if (!song)
 		return;
-	for (AudioEffect *fx: song->fx)
-		fx->reset_state();
 	if (preview_effect)
 		preview_effect->reset_state();
 
@@ -311,7 +305,7 @@ void SongRenderer::update_tracks()
 			tracks.add(new TrackRenderer(t, this));
 	}
 
-	foreachi (TrackRenderer *tr, tracks, ti){
+	foreachi (auto *tr, tracks, ti){
 		bool found = false;
 		for (Track *t: song->tracks)
 			if (t == tr->track)

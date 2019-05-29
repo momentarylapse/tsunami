@@ -98,11 +98,6 @@ public:
 	void _cdecl add_tag(const string &key, const string &value);
 	void _cdecl edit_tag(int index, const string &key, const string &value);
 	void _cdecl delete_tag(int index);
-	void _cdecl add_effect(AudioEffect *effect);
-	void _cdecl delete_effect(AudioEffect *effect);
-	void _cdecl edit_effect(AudioEffect *effect, const string &param_old);
-	void _cdecl enable_effect(AudioEffect *effect, bool enabled);
-	void _cdecl set_volume(float volume);
 	void _cdecl change_all_track_volumes(Track *t, float volume);
 	void _cdecl set_sample_rate(int sample_rate);
 	void _cdecl set_default_format(SampleFormat format);
@@ -133,8 +128,6 @@ public:
 
 	// helper
 	Sample* _cdecl get_sample_by_uid(int uid);
-	AudioEffect *_cdecl get_fx(Track *track, int index);
-	MidiEffect *_cdecl get_midi_fx(Track *track, int index);
 
 // data
 	string filename;
@@ -143,9 +136,7 @@ public:
 	SampleFormat default_format;
 	int compression;
 
-	float volume;
-
-	Array<AudioEffect*> fx;
+	Array<AudioEffect*> __fx;
 	Array<Track*> tracks;
 	Array<Sample*> samples;
 	Array<Curve*> curves;

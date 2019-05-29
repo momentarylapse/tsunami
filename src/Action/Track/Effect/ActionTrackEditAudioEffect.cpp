@@ -34,7 +34,7 @@ void ActionTrackEditEffect::undo(Data *d)
 
 bool ActionTrackEditEffect::mergable(Action *a)
 {
-	ActionTrackEditEffect *aa = dynamic_cast<ActionTrackEditEffect*>(a);
+	auto *aa = dynamic_cast<ActionTrackEditEffect*>(a);
 	if (!aa)
 		return false;
 	return (aa->fx == fx);

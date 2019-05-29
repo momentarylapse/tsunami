@@ -31,7 +31,6 @@
 #include "../Action/Song/Data/ActionSongChangeAllTrackVolumes.h"
 #include "../Action/Song/Data/ActionSongSetDefaultFormat.h"
 #include "../Action/Song/Data/ActionSongSetSampleRate.h"
-#include "../Action/Song/Data/ActionSongSetVolume.h"
 #include "../Action/Tag/ActionTagAdd.h"
 #include "../Action/Tag/ActionTagDelete.h"
 #include "../Action/Tag/ActionTagEdit.h"
@@ -39,10 +38,6 @@
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
-#include "../Action/Track/Effect/ActionTrackAddEffect.h"
-#include "../Action/Track/Effect/ActionTrackEditEffect.h"
-#include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
-#include "../Action/Track/Effect/ActionTrackDeleteAudioEffect.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Stuff/Log.h"
@@ -68,7 +63,6 @@ Song::Song(Session *session, int _sample_rate) :
 	sample_rate = _sample_rate;
 	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
-	volume = 1;
 }
 
 void Song::__init__(Session *session, int _sample_rate)
@@ -115,35 +109,6 @@ void Song::delete_tag(int index)
 	execute(new ActionTagDelete(index));
 }
 
-void Song::add_effect(AudioEffect *effect)
-{
-	execute(new ActionTrackAddEffect(nullptr, effect));
-}
-
-// execute after editing...
-void Song::edit_effect(AudioEffect *effect, const string &param_old)
-{
-	execute(new ActionTrackEditEffect(effect, param_old));
-}
-
-void Song::enable_effect(AudioEffect *effect, bool enabled)
-{
-	if (effect->enabled != enabled)
-		execute(new ActionTrackToggleEffectEnabled(effect));
-}
-
-void Song::delete_effect(AudioEffect *effect)
-{
-	foreachi (AudioEffect *f, fx, index)
-		if (f == effect)
-			execute(new ActionTrackDeleteEffect(nullptr, index));
-}
-
-void Song::set_volume(float volume)
-{
-	execute(new ActionSongSetVolume(this, volume));
-}
-
 void Song::change_all_track_volumes(Track *t, float volume)
 {
 	execute(new ActionSongChangeAllTrackVolumes(this, t, volume));
@@ -173,14 +138,9 @@ void Song::reset()
 	filename = "";
 	tags.clear();
 	bars.clear();
-	volume = 1;
 	default_format = SampleFormat::SAMPLE_FORMAT_16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
-
-	for (AudioEffect *f: fx)
-		delete(f);
-	fx.clear();
 
 	for (Track *t: tracks)
 		delete(t);
@@ -490,29 +450,6 @@ Sample* Song::get_sample_by_uid(int uid)
 		if (s->uid == uid)
 			return s;
 	return nullptr;
-}
-
-AudioEffect *Song::get_fx(Track *track, int index)
-{
-	assert(index >= 0);
-	if (track >= 0){
-		assert(index < track->fx.num);
-
-		return track->fx[index];
-	}else{
-		assert(index < fx.num);
-
-		return fx[index];
-	}
-}
-
-// unused...
-MidiEffect *Song::get_midi_fx(Track *track, int index)
-{
-	assert(index >= 0);
-	assert(index < track->midi_fx.num);
-
-	return track->midi_fx[index];
 }
 
 Track *Song::time_track()

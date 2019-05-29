@@ -30,7 +30,6 @@ public:
 	void on_delete_tag();
 
 	void on_edit_samples();
-	void on_edit_fx();
 
 	void on_update();
 };

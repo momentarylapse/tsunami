@@ -23,4 +23,3 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_samples "Samples" link
-				Button /edit_fx "Fx" link

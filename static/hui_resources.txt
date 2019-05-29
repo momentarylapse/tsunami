@@ -2835,7 +2835,7 @@ song_menu
 
 12
 0
-5
+4
 Menu
 menu_track_new
 
@@ -2885,15 +2885,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -3022,7 +3016,7 @@ song_menu
 
 8
 0
-5
+4
 Menu
 menu_track_new
 
@@ -3072,15 +3066,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -3252,7 +3240,7 @@ song_menu
 
 9
 0
-5
+4
 Menu
 menu_track_new
 
@@ -3302,15 +3290,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -3439,7 +3421,7 @@ song_menu
 
 8
 0
-5
+4
 Menu
 menu_track_new
 
@@ -3489,15 +3471,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -3632,7 +3608,7 @@ song_menu
 
 9
 0
-5
+4
 Menu
 menu_track_new
 
@@ -3682,15 +3658,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -3845,7 +3815,7 @@ popup_song_menu
 
 0
 0
-7
+6
 Item
 song_menu_header
 disabled
@@ -3907,15 +3877,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-5
-0
-0
-Item
 song_properties
 
-6
+5
 0
 0
 // Resource
@@ -4129,7 +4093,7 @@ song_menu
 
 11
 0
-5
+4
 Menu
 menu_track_new
 
@@ -4179,15 +4143,9 @@ show_mixing_console
 0
 0
 Item
-show_mastering_console
-
-3
-0
-0
-Item
 song_properties
 
-4
+3
 0
 0
 // Resource
@@ -5141,17 +5099,11 @@ Grid
 
 0
 0
-2
+1
 Button
 edit_samples
 link
 0
-0
-0
-Button
-edit_fx
-link
-1
 0
 0
 // Resource
@@ -5736,7 +5688,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-625
+618
 // Text
 /cancel
 Cancel
@@ -6665,9 +6617,6 @@ Version
 popup_bar_menu/scale_bars
 Scale
 
-popup_bar_menu/show_mastering_console
-Mastering
-
 popup_bar_menu/show_mixing_console
 Mixing
 
@@ -6748,9 +6697,6 @@ Add new track
 
 popup_buffer_menu/menu_version
 Version
-
-popup_buffer_menu/show_mastering_console
-Mastering
 
 popup_buffer_menu/show_mixing_console
 Mixing
@@ -6845,9 +6791,6 @@ Track
 popup_layer_menu/menu_track_new
 Add new track
 
-popup_layer_menu/show_mastering_console
-Mastering
-
 popup_layer_menu/show_mixing_console
 Mixing
 
@@ -6929,9 +6872,6 @@ Add new track
 popup_marker_menu/menu_version
 Version
 
-popup_marker_menu/show_mastering_console
-Mastering
-
 popup_marker_menu/show_mixing_console
 Mixing
 
@@ -7012,9 +6952,6 @@ Samples
 
 popup_sample_menu/sample_properties
 Properties
-
-popup_sample_menu/show_mastering_console
-Mastering
 
 popup_sample_menu/show_mixing_console
 Mixing
@@ -7121,9 +7058,6 @@ Rhythm
 popup_song_menu/menu_track_new
 Add new track
 
-popup_song_menu/show_mastering_console
-Mastering
-
 popup_song_menu/show_mixing_console
 Mixing
 
@@ -7219,9 +7153,6 @@ Add new track
 
 popup_track_menu/menu_version
 Version
-
-popup_track_menu/show_mastering_console
-Mastering
 
 popup_track_menu/show_mixing_console
 Mixing

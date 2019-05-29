@@ -27,5 +27,4 @@ Menu popup_buffer_menu ""
 			Item add_group_track "Group" image=hui:add
 		Item song_edit_samples "Manage samples"
 		Item show_mixing_console "Mixing"
-		Item show_mastering_console "Mastering"
 		Item song_properties "Properties"

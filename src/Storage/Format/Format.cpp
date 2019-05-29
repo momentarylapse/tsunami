@@ -33,7 +33,7 @@ bool FormatDescriptor::can_handle(const string & _extension)
 bool FormatDescriptor::test_compatibility(Song *a)
 {
 	int num_subs = a->samples.num;
-	int num_fx = a->fx.num;
+	int num_fx = 0;
 	int num_audio = 0;
 	int num_midi = 0;
 	for (Track *t : a->tracks){

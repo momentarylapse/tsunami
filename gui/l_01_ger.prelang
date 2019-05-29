@@ -2374,7 +2374,7 @@ menu/edit-track-groups
 Spur Gruppen bearbeiten...
 
 // Num Language Strings
-220
+227
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2816,3 +2816,17 @@ no alsa midi handler
 kein Alsa Midi Handler
 cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)
 Cursor (←,→)    löschen (⟵)    Notenlänge (L)    Schlagteiler (P)
+applying effect
+wende Effekt an
+bar gap
+Taktzwischenraum
+capture midi start
+Midiaufnahme start
+capture midi stop
+Midiaufnahme stop
+file contains global fx. Will add a mastering track instead
+Datei enthält globale Effekte. Werde stattdessen eine Master Spur anlegen
+make main version
+zur Hauptversion ernennen
+mode: frequency/pitch
+Modus: Frequenz/Pitch

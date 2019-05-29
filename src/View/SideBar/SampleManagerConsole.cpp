@@ -108,7 +108,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->owner->get_time_str_long(s->range().length) + "\\" + s->name + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + s->name + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;

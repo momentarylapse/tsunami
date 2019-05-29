@@ -4425,43 +4425,43 @@ Grid
 7
 Button
 import_from_file
-flat,image=hui:open
+flat,image=hui:open,padding=1
 0
 0
 0
 Button
 export_sample
-flat,image=hui:save
+flat,image=hui:save,padding=1
 1
 0
 0
 Button
 delete_sample
-flat,image=hui:delete
+flat,image=hui:delete,padding=1
 2
 0
 0
 Button
 preview_sample
-flat,image=hui:media-play
+flat,image=hui:media-play,padding=1
 3
 0
 0
 Button
 paste_sample
-flat,image=hui:paste
+flat,image=hui:paste,padding=1
 4
 0
 0
 Button
 create_from_selection
-flat,image=hui:copy
+flat,image=hui:copy,padding=1
 5
 0
 0
 Button
 scale_sample
-flat,image=hui:zoom-in
+flat,image=hui:zoom-in,padding=1
 6
 0
 0
@@ -7257,7 +7257,7 @@ sample_manager_dialog/preview_sample
 
 preview
 sample_manager_dialog/sample_list
-Preview\\Name\\Duration\\Usage\\Temporary
+Preview\\Duration\\Name\\Usage\\Temporary
 
 sample_manager_dialog/sample_manager_dialog
 Sample Manager
@@ -9920,7 +9920,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-220
+227
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10228,6 +10228,8 @@ all files
 alle Dateien
 all known files
 alles mögliche
+applying effect
+wende Effekt an
 audio library selected: 
 Audiobibliothek gewählt: 
 backup done: 
@@ -10236,6 +10238,8 @@ bar
 Takt 
 bar %d/\\u2084 \\u2669=%.1f
 Takt %d/\\u2084 \\u2669=%.1f
+bar gap
+Taktzwischenraum
 base
 base
 big!!!
@@ -10254,6 +10258,10 @@ capture audio start
 Audioaufnahme start
 capture audio stop
 Audioaufnahme stopp
+capture midi start
+Midiaufnahme start
+capture midi stop
+Midiaufnahme stop
 compiling script: 
 kompiliere Script: 
 creating backup: 
@@ -10284,6 +10292,8 @@ exporting
 exportiere 
 exporting 
 exportiere 
+file contains global fx. Will add a mastering track instead
+Datei enthält globale Effekte. Werde stattdessen eine Master Spur anlegen
 file exported
 Datei exportiert
 file format is incompatible for this action: 
@@ -10308,10 +10318,14 @@ loading track
 Lade Spur 
 lock playback range
 Abspielbereich festhalten
+make main version
+zur Hauptversion ernennen
 marker 
 Marker 
 midi library selected: 
 Midibibliothek gewählt: 
+mode: frequency/pitch
+Modus: Frequenz/Pitch
 module not configurable
 Modul nicht konfigurierbar
 move selection to scale

@@ -215,9 +215,16 @@ void SignalChain::remove(Module *m)
 
 void SignalChain::connect(Module *source, int source_port, Module *target, int target_port)
 {
+	// already connected?
+	auto *cc1 = this->from_source(source, source_port);
+	if (cc1)
+		disconnect(cc1);
+	auto *cc2 = this->to_target(target, target_port);
+	if (cc2)
+		disconnect(cc2);
+
 	target->plug(target_port, source, source_port);
 
-	// TODO: check ports in use
 	Cable *c = new Cable;
 	c->type = source->port_out[source_port]->type;
 	c->source = source;

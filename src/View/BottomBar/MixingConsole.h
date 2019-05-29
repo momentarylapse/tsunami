@@ -47,6 +47,7 @@ public:
 
 	DeviceManager *device_manager;
 	PeakMeterDisplay *peak_meter;
+	PeakMeterDisplay *spectrum_meter;
 
 	string id_inner;
 	Array<TrackMixer*> mixer;

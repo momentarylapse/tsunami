@@ -8,8 +8,10 @@ Dialog mixing-console "" width=300 height=200
 			ToggleButton link-volumes "🔗" "tooltip=link and change the sliders of all tracks simultaneously" flat
 		Grid ? "" vertical
 			Text t_output "Output" bold center
-			DrawingArea output-peaks "" width=80 height=30 noexpandx noexpandy "tooltip=Output level"
-			Slider output-volume "" vertical expandy "tooltip=Output volume"
+			DrawingArea output-spectrum "" width=80 height=30 noexpandx noexpandy "tooltip=Output spectrum"
+			Grid ? ""
+				Slider output-volume "" vertical width=50 expandy "tooltip=Output volume"
+				DrawingArea output-peaks "" width=18 noexpandx noexpandy "tooltip=Output level"
 		Separator ? "" vertical
 		Scroller ? "" expandx scrolly=no
 			Grid inner-grid ""

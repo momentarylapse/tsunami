@@ -49,9 +49,9 @@ void PeakMeterData::update(Array<float> &buf, float dt)
 PeakMeter::PeakMeter()
 {
 	module_subtype = "PeakMeter";
-	mode = Mode::PEAKS;
-	r.reset();
+	spectrum_requests = 0;
 	l.reset();
+	r.reset();
 }
 
 PeakMeter::~PeakMeter()
@@ -66,22 +66,27 @@ inline float nice_peak(float p)
 void PeakMeter::find_peaks(AudioBuffer &buf)
 {
 	float dt = (float)buf.length / (float)session->sample_rate();
-	r.update(buf.c[0], dt);
-	l.update(buf.c[1], dt);
+	l.update(buf.c[0], dt);
+	r.update(buf.c[1], dt);
 }
 
 void PeakMeter::clear_data()
 {
-	r.reset();
 	l.reset();
+	r.reset();
 }
 
 inline float PeakMeter::i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
-void PeakMeter::set_mode(Mode _mode)
+void PeakMeter::request_spectrum()
 {
-	mode = _mode;
+	spectrum_requests ++;
+}
+
+void PeakMeter::unrequest_spectrum()
+{
+	spectrum_requests --;
 }
 
 void PeakMeter::find_spectrum(AudioBuffer &buf)
@@ -89,8 +94,8 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 	Array<complex> cr, cl;
 	cr.resize(buf.length / 2 + 1);
 	cl.resize(buf.length / 2 + 1);
-	FastFourierTransform::fft_r2c(buf.c[0], cr);
-	FastFourierTransform::fft_r2c(buf.c[1], cl);
+	FastFourierTransform::fft_r2c(buf.c[0], cl);
+	FastFourierTransform::fft_r2c(buf.c[1], cr);
 	r.spec.resize(SPECTRUM_SIZE);
 	l.spec.resize(SPECTRUM_SIZE);
 	float sample_rate = (float)session->sample_rate();
@@ -112,9 +117,8 @@ void PeakMeter::find_spectrum(AudioBuffer &buf)
 void PeakMeter::process(AudioBuffer& buf)
 {
 	clear_data();
-	if (mode == Mode::PEAKS)
-		find_peaks(buf);
-	else if (mode == Mode::SPECTRUM)
+	find_peaks(buf);
+	if (spectrum_requests > 0)
 		find_spectrum(buf);
 	notify();
 }

@@ -19,7 +19,13 @@ namespace hui{
 class PeakMeterDisplay : public VirtualBase
 {
 public:
-	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source);
+
+	enum class Mode{
+		PEAKS,
+		SPECTRUM,
+		BOTH
+	};
+	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
 	virtual ~PeakMeterDisplay();
 
 	void set_source(PeakMeter *source);
@@ -32,12 +38,17 @@ public:
 
 private:
 
+	void connect();
+	void unconnect();
+
 	PeakMeterData *r, *l;
 
 	hui::Panel *panel;
 	string id;
 	PeakMeter *source;
 	int handler_id_draw, handler_id_lbut;
+	Mode mode;
+	Mode mode_constraint;
 
 	bool enabled;
 };

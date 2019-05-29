@@ -14,7 +14,7 @@
 #include "../../Module/Audio/PeakMeter.h"
 
 
-PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMeter *_source)
+PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMeter *_source, Mode constraint)
 {
 	panel = _panel;
 	id = _id;
@@ -24,6 +24,11 @@ PeakMeterDisplay::PeakMeterDisplay(hui::Panel *_panel, const string &_id, PeakMe
 	l = new PeakMeterData;
 	r->reset();
 	l->reset();
+
+	mode_constraint = constraint;
+	mode = Mode::PEAKS;
+	if (mode_constraint == Mode::SPECTRUM)
+		mode = Mode::SPECTRUM;
 
 	handler_id_draw = panel->event_xp(id, "hui:draw", [=](Painter *p){ on_draw(p); });
 	handler_id_lbut = panel->event_x(id, "hui:left-button-down", [=]{ on_left_button_down(); });
@@ -44,24 +49,38 @@ PeakMeterDisplay::~PeakMeterDisplay()
 void PeakMeterDisplay::set_source(PeakMeter *_source)
 {
 	if (source and enabled)
-		source->unsubscribe(this);
+		unconnect();
 
 	source = _source;
 
 	if (source and enabled)
-		source->subscribe(this, [=]{ on_update(); });
+		connect();
 }
 
 void PeakMeterDisplay::enable(bool _enabled)
 {
 	if (source){
 		if (!enabled and _enabled)
-			source->subscribe(this, [=]{ on_update(); });
+			connect();
 		if (enabled and !_enabled)
-			source->unsubscribe(this);
+			unconnect();
 	}
 
 	enabled = _enabled;
+}
+
+void PeakMeterDisplay::connect()
+{
+	source->subscribe(this, [=]{ on_update(); });
+	if (mode == Mode::SPECTRUM)
+		source->request_spectrum();
+}
+
+void PeakMeterDisplay::unconnect()
+{
+	source->unsubscribe(this);
+	if (mode == Mode::SPECTRUM)
+		source->unrequest_spectrum();
 }
 
 color peak_color(float peak, float a = 1)
@@ -82,10 +101,10 @@ inline float nice_peak(float p)
 	return min((float)pow(p, 0.8f), 1.0f);
 }
 
-void drawPeak(Painter *c, const rect &r, PeakMeterData &d)
+void draw_peak(Painter *c, const rect &r, PeakMeterData &d)
 {
-	int w = r.width();
-	int h = r.height();
+	float w = r.width();
+	float h = r.height();
 	float sp = d.get_sp();
 
 	c->set_color(AudioView::colors.background);
@@ -94,43 +113,69 @@ void drawPeak(Painter *c, const rect &r, PeakMeterData &d)
 	c->draw_rect(r);
 
 	c->set_color(peak_color(sp, 0.4f));
-	c->draw_rect(r.x1, r.y1,       (float)w * nice_peak(sp), h);
+	if (w > h)
+		c->draw_rect(rect(r.x1, r.x1 + w * nice_peak(sp), r.y1, r.y2));
+	else
+		c->draw_rect(rect(r.x1, r.x2, r.y2 - h  * nice_peak(sp), r.y2));
 
 	c->set_color(peak_color(d.peak));
-	c->draw_rect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
+	if (w > h)
+		c->draw_rect(rect(r.x1, r.x1 + w * nice_peak(d.peak), r.y1, r.y2));
+	else
+		c->draw_rect(rect(r.x1, r.x2, r.y2 - h  * nice_peak(d.peak), r.y2));
 
 	c->set_color(AudioView::colors.text);
-	if (sp > 0)
-		c->draw_rect(w * nice_peak(sp), r.y1, 2, h);
+	if (sp > 0){
+		if (w > h)
+			c->draw_rect(w * nice_peak(sp), r.y1, 2, h);
+		else
+			c->draw_rect(r.x1, r.y2 - h * nice_peak(sp), w, 2);
+	}
 }
 
 void PeakMeterDisplay::on_draw(Painter *c)
 {
 	if (!source)
 		return;
-	int w = c->width;
-	int h = c->height;
-	if (source->mode == PeakMeter::Mode::PEAKS){
+	float w = c->width;
+	float h = c->height;
+	float boundary = 2;
+	if (mode == Mode::PEAKS){
 
-		drawPeak(c, rect(2, w-2, 2, h/2-1), *r);
-		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), *l);
+		float bb = 1;
+		if (w > h){
+			draw_peak(c, rect(boundary, w-boundary, boundary, h/2-bb), *l);
+			draw_peak(c, rect(boundary, w-boundary, h/2+bb, h-boundary), *r);
+		}else if (h > w){
+			draw_peak(c, rect(boundary, w/2-bb, boundary, h-boundary), *l);
+			draw_peak(c, rect(w/2+bb, w-boundary, boundary, h-boundary), *r);
+		}
 	}else{
 		c->set_color(AudioView::colors.background);
-		c->draw_rect(2, 2, w - 4, h - 4);
+		c->draw_rect(boundary, boundary, w - 2*boundary, h - 2*boundary);
 		c->set_color(AudioView::colors.text);
-		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
+		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2*boundary);
 		for (int i=0;i<100;i++){
-			float x0 = 2 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2);
-			float hh = (h - 4) * r->spec[i];
-			c->draw_rect(x0, h - 2 - hh, dx, hh);
+			float x0 = boundary + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2*boundary);
+			float hh = (h - 2*boundary) * l->spec[i];
+			c->draw_rect(x0, h - boundary - hh, dx, hh);
 		}
 	}
 }
 
 void PeakMeterDisplay::on_left_button_down()
 {
-	if (source)
-		source->set_mode((source->mode == PeakMeter::Mode::PEAKS) ? PeakMeter::Mode::SPECTRUM : PeakMeter::Mode::PEAKS);
+	if (mode_constraint != Mode::BOTH)
+		return;
+	if (mode == Mode::SPECTRUM){
+		if (source)
+			source->unrequest_spectrum();
+		mode = Mode::PEAKS;
+	}else{
+		mode = Mode::SPECTRUM;
+		if (source)
+			source->request_spectrum();
+	}
 }
 
 void PeakMeterDisplay::on_right_button_down()
@@ -141,8 +186,8 @@ void PeakMeterDisplay::on_right_button_down()
 void PeakMeterDisplay::on_update()
 {
 	if (source){
-		*r = source->r;
 		*l = source->l;
+		*r = source->r;
 	}
 	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	panel->redraw(id);

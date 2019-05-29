@@ -34,11 +34,9 @@ public:
 	void process(AudioBuffer &buf) override;
 	void reset_state() override;
 
-	enum class Mode{
-		PEAKS,
-		SPECTRUM
-	};
-	void set_mode(Mode mode);
+	int spectrum_requests;
+	void request_spectrum();
+	void unrequest_spectrum();
 
 //private:
 	void clear_data();
@@ -46,8 +44,6 @@ public:
 	void find_spectrum(AudioBuffer &buf);
 
 	float i_to_freq(int i);
-
-	Mode mode;
 
 	PeakMeterData r, l;
 

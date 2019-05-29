@@ -1985,15 +1985,27 @@ bold,center
 0
 0
 DrawingArea
-output-peaks
+output-spectrum
 width=80,height=30,noexpandx,noexpandy
 1
 0
 0
+Grid
+?
+
+2
+0
+2
 Slider
 output-volume
-vertical,expandy
-2
+vertical,width=50,expandy
+0
+0
+0
+DrawingArea
+output-peaks
+width=18,noexpandx,noexpandy
+1
 0
 0
 Separator
@@ -5670,7 +5682,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-615
+616
 // Text
 /cancel
 Cancel
@@ -6299,6 +6311,9 @@ link and change the sliders of all tracks simultaneously
 mixing-console/output-peaks
 
 Output level
+mixing-console/output-spectrum
+
+Output spectrum
 mixing-console/output-volume
 
 Output volume
@@ -7523,7 +7538,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-779
+780
 // Text
 /bpm
 Bpm
@@ -8434,6 +8449,9 @@ die Regler aller Spuren gemeinsam ändern
 mixing-console/output-peaks
 
 Ausgabepegel
+mixing-console/output-spectrum
+
+Ausgabe Spektrum
 mixing-console/output-volume
 
 Ausgabelautstärke

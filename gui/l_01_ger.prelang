@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-780
+781
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2343,6 +2343,9 @@ Geräte
 menu/show_signal_chain
 Signalkette
 
+mixing-console/output-spectrum
+
+Ausgabe Spektrum
 // Num Language Strings
 220
 // Data (ID,Text)

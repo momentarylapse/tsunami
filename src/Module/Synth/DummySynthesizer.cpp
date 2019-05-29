@@ -56,20 +56,10 @@ public:
 };
 
 
-void DummySynthesizer::reset_state()
-{
-}
-
 DummySynthesizer::DummySynthesizer()
 {
 	module_subtype = "Dummy";
 	auto_generate_stereo = true;
-	reset_state();
-	on_config();
-}
-
-DummySynthesizer::~DummySynthesizer()
-{
 }
 
 void DummySynthesizer::__init__()

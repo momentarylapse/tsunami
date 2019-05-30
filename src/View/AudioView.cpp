@@ -1207,21 +1207,17 @@ void AudioView::draw_selection(Painter *c)
 		}
 	}
 
-	// bar selection
+	// bar gap selection
 	if (sel.bar_gap >= 0){
 		x1 = cam.sample2screen(song->bar_offset(sel.bar_gap));
 		x2 = x1;
 		c->set_color(colors.text_soft1);
 		c->set_line_width(2.5f);
-		for (AudioViewLayer *t: vlayer)
+		for (auto *t: vlayer)
 			if (t->layer->type == SignalType::BEATS){
-				float dy = t->area.height();
-				c->draw_line(x2 + 5, t->area.y1, x2 + 2, t->area.y1 + dy*0.3f);
-				c->draw_line(x2 + 2, t->area.y1 + dy*0.3f, x2 + 2, t->area.y2-dy*0.3f);
-				c->draw_line(x2 + 2, t->area.y2-dy*0.3f, x2 + 5, t->area.y2);
-				c->draw_line(x1 - 5, t->area.y1, x1 - 2, t->area.y1 + dy*0.3f);
-				c->draw_line(x1 - 2, t->area.y1 + dy*0.3f, x1 - 2, t->area.y2-dy*0.3f);
-				c->draw_line(x1 - 2, t->area.y2-dy*0.3f, x1 - 5, t->area.y2);
+				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
+				c->draw_line(x2, t->area.y1, x2, t->area.y2);
+				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
 		}
 		c->set_line_width(1.0f);
 	}
@@ -1230,15 +1226,11 @@ void AudioView::draw_selection(Painter *c)
 		x2 = x1;
 		c->set_color(colors.hover);
 		c->set_line_width(2.5f);
-		for (AudioViewLayer *t: vlayer)
+		for (auto *t: vlayer)
 			if (t->layer->type == SignalType::BEATS){
-				float dy = t->area.height();
-				c->draw_line(x2 + 5, t->area.y1, x2 + 2, t->area.y1 + dy*0.3f);
-				c->draw_line(x2 + 2, t->area.y1 + dy*0.3f, x2 + 2, t->area.y2-dy*0.3f);
-				c->draw_line(x2 + 2, t->area.y2-dy*0.3f, x2 + 5, t->area.y2);
-				c->draw_line(x1 - 5, t->area.y1, x1 - 2, t->area.y1 + dy*0.3f);
-				c->draw_line(x1 - 2, t->area.y1 + dy*0.3f, x1 - 2, t->area.y2-dy*0.3f);
-				c->draw_line(x1 - 2, t->area.y2-dy*0.3f, x1 - 5, t->area.y2);
+				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
+				c->draw_line(x2, t->area.y1, x2, t->area.y2);
+				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
 		}
 		c->set_line_width(1.0f);
 	}

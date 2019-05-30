@@ -685,7 +685,7 @@ void ViewModeDefault::draw_post(Painter *c)
 	else if (hover->type == Selection::Type::BAR)
 		view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
 	else if (hover->type == Selection::Type::BAR_GAP)
-		{}//view->draw_cursor_hover(c, _("bar gap"));
+		view->draw_cursor_hover(c, _("bar gap"));
 	else if (hover->type == Selection::Type::PLAYBACK_LOCK)
 		view->draw_cursor_hover(c, _("lock playback range"));
 

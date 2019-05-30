@@ -1,7 +1,7 @@
 // Image = hui:properties
 // Title[Deutsch] = Hochpass Filter
 use "../../api.kaba"
-use "../../filter.kaba"
+use "../../helper/filter.kaba"
 
 const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
 
@@ -18,8 +18,8 @@ class LowPassFilter extends AudioEffect
 		filter.reset()
 
 	override void on_config()
-		//filter.f.create(FILTER_HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
-		filter.f.create(FILTER_HIGH_PASS, config.frequency, 1, 0, session.sample_rate())
+		//filter.create(FILTER_HIGH_PASS_LINEAR, config.frequency, 0, 0, session.sample_rate())
+		filter.create(FILTER_HIGH_PASS, config.frequency, 1, 0, session.sample_rate())
 		
 	override void process(AudioBuffer buf)
 		filter.apply(buf)

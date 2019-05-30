@@ -63,8 +63,7 @@ void TestMixer::test_mix_stereo_1track_simple()
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
-	assert_equal(buf.c[0], {1.0f, 1.0f, 1.0f, 1.0f});
-	assert_equal(buf.c[1], {1.0f, 0.0f, 1.0f, 0.0f});
+	assert_equal(buf, make_buf({1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f, 0.0f}));
 	delete sr;
 	delete s;
 }
@@ -94,7 +93,7 @@ void TestMixer::test_mix_stereo_1track_balance_right()
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
-	assert_equal(buf, make_buf({1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}));
+	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 1.0f, 0.0f}));
 
 	delete sr;
 	delete s;
@@ -110,7 +109,7 @@ void TestMixer::test_mix_stereo_1track_balance_left()
 	AudioBuffer buf;
 	buf.resize(4);
 	sr->read(buf);
-	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 1.0f, 0.0f}));
+	assert_equal(buf, make_buf({1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}));
 
 	delete sr;
 	delete s;
@@ -157,7 +156,7 @@ void TestMixer::test_mix_mono_1track_panning_right()
 	sr->read(buf);
 
 	// overdriving... by design
-	assert_equal(buf, make_buf({sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}, {0.0f, 0.0f, 0.0f, 0.0f}));
+	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}));
 	delete sr;
 	delete s;
 }
@@ -174,7 +173,7 @@ void TestMixer::test_mix_mono_1track_panning_left()
 	sr->read(buf);
 
 	// overdriving... by design
-	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}));
+	assert_equal(buf, make_buf({sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}, {0.0f, 0.0f, 0.0f, 0.0f}));
 	delete sr;
 	delete s;
 }

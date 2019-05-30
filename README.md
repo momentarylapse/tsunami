@@ -42,17 +42,23 @@ It is also recommended to install additional fonts for some "exotic" (musical) c
 ### Installing
 
 The usual
-* `cd src`
-* `make`
-* `sudo make install`
+```
+cd src
+make
+sudo make install
+```
+
+Alternatively, you can use **meson** to compile:
+```
+mkdir build
+meson buil
+cd build
+ninja
+```
 
 ## Running tests
 
-Well
-`tsunami --run-tests`
-will show you available tests and
-`tsunami --run-tests all`
-will run all test.
+Well `tsunami --run-tests` will show you available tests and `tsunami --run-tests all` will run all test.
 
 
 ## Authors

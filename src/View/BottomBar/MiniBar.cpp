@@ -29,11 +29,13 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	cpu_display = new CpuDisplay(this, "cpu", session);
 
-	set_int("selection_snap_mode", (int)view->selection_snap_mode);
+	on_selection_snap_mode(view->selection_snap_mode);
 
 	event("show_bottom_bar", [=]{ on_show_bottom_bar(); });
 	event("volume", [=]{ on_volume(); });
-	event("selection_snap_mode", [=]{ on_selection_snap_mode(); });
+	event("select-snap-mode-free", [=]{ on_selection_snap_mode(SelectionSnapMode::NONE); });
+	event("select-snap-mode-bars", [=]{ on_selection_snap_mode(SelectionSnapMode::BAR); });
+	event("select-snap-mode-parts", [=]{ on_selection_snap_mode(SelectionSnapMode::PART); });
 
 	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
 	dev_manager->subscribe(this, [=]{ on_volume_change(); });
@@ -60,9 +62,12 @@ void MiniBar::on_volume()
 	dev_manager->set_output_volume(get_float(""));
 }
 
-void MiniBar::on_selection_snap_mode()
+void MiniBar::on_selection_snap_mode(SelectionSnapMode mode)
 {
-	view->set_selection_snap_mode((AudioView::SelectionSnapMode)get_int(""));
+	view->set_selection_snap_mode(mode);
+	check("select-snap-mode-free", mode == SelectionSnapMode::NONE);
+	check("select-snap-mode-bars", mode == SelectionSnapMode::BAR);
+	check("select-snap-mode-parts", mode == SelectionSnapMode::PART);
 }
 
 void MiniBar::on_show()

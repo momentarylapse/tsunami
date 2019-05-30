@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-790
+793
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2373,6 +2373,15 @@ Gruppe
 menu/edit-track-groups
 Spur Gruppen bearbeiten...
 
+mini_bar/select-snap-mode-bars
+B
+Auswahl einrasten: Takte
+mini_bar/select-snap-mode-free
+F
+Auswahl einrasten: frei
+mini_bar/select-snap-mode-parts
+P
+Auswahl einrasten: Teile
 // Num Language Strings
 227
 // Data (ID,Text)

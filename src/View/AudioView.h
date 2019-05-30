@@ -51,6 +51,11 @@ class GridPainter;
 enum class MidiMode;
 
 
+enum class SelectionSnapMode{
+	NONE,
+	BAR,
+	PART,
+};
 
 
 class AudioView : public Observable<VirtualBase>
@@ -144,11 +149,6 @@ public:
 		FAKE,
 	};
 	SelectionMode selection_mode;
-	enum class SelectionSnapMode{
-		NONE,
-		BAR,
-		PART,
-	};
 	SelectionSnapMode selection_snap_mode;
 	void set_selection_snap_mode(SelectionSnapMode mode);
 	bool hide_selection;

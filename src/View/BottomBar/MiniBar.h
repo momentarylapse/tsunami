@@ -17,6 +17,7 @@ class DeviceManager;
 class BottomBar;
 class AudioView;
 class Session;
+enum class SelectionSnapMode;
 
 class MiniBar : public hui::Panel
 {
@@ -26,7 +27,7 @@ public:
 
 	void on_show_bottom_bar();
 	void on_volume();
-	void on_selection_snap_mode();
+	void on_selection_snap_mode(SelectionSnapMode mode);
 
 	void _cdecl on_show() override;
 	void _cdecl on_hide() override;

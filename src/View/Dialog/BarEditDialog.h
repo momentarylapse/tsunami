@@ -23,7 +23,7 @@ public:
 
 	int duration;
 
-	BarEditDialog(hui::Window *root, Song *song, const Range &bars);
+	BarEditDialog(hui::Window *root, Song *song, const Array<int> &bars);
 	void on_ok();
 	void on_close();
 	void on_beats();

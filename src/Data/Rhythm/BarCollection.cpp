@@ -148,14 +148,3 @@ Range BarCollection::range()
 	return Range(0, pos0);
 }
 
-Range BarCollection::sub_range(const Range &indices)
-{
-	int offset = 0;
-	for (int i=0; i<indices.offset; i++)
-		offset += (*this)[i]->length;
-	int pos0 = offset;
-	for (int i=indices.offset; i<indices.end(); i++)
-		pos0 += (*this)[i]->length;
-	return Range(offset, pos0 - offset);
-}
-

@@ -1116,8 +1116,8 @@ int pref_bar_index(AudioView *view)
 {
 	if (view->sel.bar_gap >= 0)
 		return view->sel.bar_gap;
-	if (!view->sel.bar_indices.empty())
-		return view->sel.bar_indices.end();
+	if (view->sel.bar_indices(view->song).num > 0)
+		return view->sel.bar_indices(view->song).back();
 	if (view->hover_before_leave.pos > 0)
 		return view->song->bars.num;
 	return 0;
@@ -1139,7 +1139,7 @@ void TsunamiWindow::on_add_pause()
 
 void TsunamiWindow::on_delete_bars()
 {
-	auto *dlg = new BarDeleteDialog(win, song, view->sel.bar_indices);
+	auto *dlg = new BarDeleteDialog(win, song, view->sel.bar_indices(song));
 	dlg->run();
 	delete dlg;
 }
@@ -1173,17 +1173,18 @@ void TsunamiWindow::on_edit_bars()
 	}
 	int num_bars = 0;
 	int num_pauses = 0;
-	for (int i=view->sel.bar_indices.offset; i<view->sel.bar_indices.end(); i++)
+	for (int i: view->sel.bar_indices(song)){
 		if (song->bars[i]->is_pause())
 			num_pauses ++;
 		else
 			num_bars ++;
+	}
 	if (num_bars > 0 and num_pauses == 0){
-		auto *dlg = new BarEditDialog(win, song, view->sel.bar_indices);
+		auto *dlg = new BarEditDialog(win, song, view->sel.bar_indices(song));
 		dlg->run();
 		delete dlg;
 	}else if (num_bars == 0 and num_pauses == 1){
-		auto *dlg = new PauseEditDialog(win, song, view->sel.bar_indices.start());
+		auto *dlg = new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]);
 		dlg->run();
 		delete dlg;
 	}else{

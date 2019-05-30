@@ -19,7 +19,7 @@ public:
 	Song *song;
 	Array<int> sel;
 
-	BarDeleteDialog(hui::Window *root, Song *s, const Range &bars);
+	BarDeleteDialog(hui::Window *root, Song *s, const Array<int> &bars);
 	void on_ok();
 	void on_close();
 	void on_replace_by_pause();

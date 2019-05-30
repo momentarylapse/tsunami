@@ -52,7 +52,6 @@ public:
 	Set<const TrackMarker*> markers;
 	Set<const MidiNote*> notes;
 	Set<const Bar*> bars;
-	Range bar_indices;
 	int bar_gap;
 
 	void add(const Track *t);
@@ -87,6 +86,7 @@ public:
 
 	int num_samples() const;
 	bool is_empty() const;
+	Array<int> bar_indices(Song *song) const;
 
 	SongSelection restrict_to_track(Track *t) const;
 	SongSelection operator||(const SongSelection &s) const;

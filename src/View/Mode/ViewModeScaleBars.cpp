@@ -20,10 +20,7 @@ ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 
 void ViewModeScaleBars::on_start()
 {
-	Set<int> s;
-	for (int i=view->sel.bar_indices.start(); i<view->sel.bar_indices.end(); i++)
-		s.add(i);
-	start_scaling(s);
+	start_scaling(view->sel.bar_indices(view->song));
 }
 
 void ViewModeScaleBars::draw_post(Painter *c)
@@ -42,9 +39,11 @@ void ViewModeScaleBars::draw_post(Painter *c)
 
 void ViewModeScaleBars::start_scaling(const Array<int> &sel)
 {
-	scaling_sel = sel;
-	scaling_range_orig = song->bars.sub_range(view->sel.bar_indices);
-	view->sel.range = song->bars.sub_range(view->sel.bar_indices);
+	scaling_sel = {};
+	for (int i=sel[0]; i<=sel.back(); i++)
+		scaling_sel.add(i);
+	scaling_range_orig = RangeTo(song->bars[sel[0]]->range().start(), song->bars[sel.back()]->range().end());
+	view->sel.range = scaling_range_orig;
 	view->update_selection();
 }
 

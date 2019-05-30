@@ -12,16 +12,15 @@
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
-BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Range &_bars):
+BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Array<int> &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
 	from_resource("bar_edit_dialog");
 	song = _song;
 	duration = 0;
-	for (int i=_bars.start(); i<_bars.end(); i++){
-		sel.add(i);
+	sel = _bars;
+	for (int i: sel)
 		duration += song->bars[i]->length;
-	}
 
 	Bar *b = song->bars[sel[0]];
 	new_bar = new Bar(*b);

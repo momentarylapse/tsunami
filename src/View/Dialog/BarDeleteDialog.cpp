@@ -12,13 +12,12 @@
 #include "../../Data/base.h"
 #include "../AudioView.h"
 
-BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Range &_bars):
+BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Array<int> &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
 	from_resource("bar_delete_dialog");
 	song = s;
-	for (int i=_bars.start(); i<_bars.end(); i++)
-		sel.add(i);
+	sel = _bars;
 
 	check("shift-data", true);
 	//enable("replace-by-pause", false);

@@ -218,13 +218,14 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("settings", [=]{ on_settings(); });
 	event("play", [=]{ on_play(); });
 	set_key_code("play", -1, "hui:media-play");
-	event("play_loop", [=]{ on_play_loop(); });
+	event("play-loop", [=]{ on_play_loop(); });
 	event("pause", [=]{ on_pause(); });
 	set_key_code("pause", -1, "hui:media-pause");
 	event("stop", [=]{ on_stop(); });
 	set_key_code("stop", hui::KEY_CONTROL + hui::KEY_T, "hui:media-stop");
 	event("record", [=]{ on_record(); });
 	set_key_code("record", hui::KEY_CONTROL + hui::KEY_R, "hui:media-record");
+	event("playback-range-lock", [=]{ view->set_playback_range_locked(!view->playback_range_locked); });
 	event("show_log", [=]{ on_show_log(); });
 	event("about", [=]{ on_about(); });
 	set_key_code("run_plugin", hui::KEY_RETURN + hui::KEY_SHIFT, "hui:execute");

@@ -255,6 +255,7 @@ public:
 	rect playback_lock_button;
 	bool playback_range_locked;
 	Range playback_wish_range;
+	void set_playback_range_locked(bool locked);
 
 	ViewPort cam;
 

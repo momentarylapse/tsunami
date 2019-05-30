@@ -1,0 +1,18 @@
+Menu popup-menu-playback-range ""
+	Item header "Playback range" disabled
+	Separator
+	Item /playback-range-lock "Lock" checkable
+	Item /play "Play" image=hui:media-play
+	Item /play-loop "Loop" checkable
+	Item /record "Record" image=hui:media-record
+	Separator
+	Menu /menu-song "File"
+		Menu /menu-track-new "Add new track"
+			Item /track-add-audio-mono "Audio (mono)" image=hui:add
+			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
+			Item /track-add-midi "Midi" image=hui:add
+			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-group "Group" image=hui:add
+		Item /song-edit-samples "Manage samples"
+		Item /show-mixing-console "Mixing"
+		Item /song-properties "Properties"

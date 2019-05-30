@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-54
+55
 // Resource
 Menu
 menu_fake
@@ -1352,7 +1352,7 @@ image=hui:media-stop
 0
 0
 Item
-play_loop
+play-loop
 checkable
 3
 0
@@ -3743,6 +3743,115 @@ song-properties
 0
 // Resource
 Menu
+popup-menu-playback-range
+
+0
+0
+8
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+playback-range-lock
+checkable
+2
+0
+0
+Item
+play
+image=hui:media-play
+3
+0
+0
+Item
+play-loop
+checkable
+4
+0
+0
+Item
+record
+image=hui:media-record
+5
+0
+0
+Separator
+
+
+6
+0
+0
+Menu
+menu-song
+
+7
+0
+4
+Menu
+menu-track-new
+
+0
+0
+5
+Item
+track-add-audio-mono
+image=hui:add
+0
+0
+0
+Item
+track-add-audio-stereo
+image=hui:add
+1
+0
+0
+Item
+track-add-midi
+image=hui:add
+2
+0
+0
+Item
+track-add-beats
+image=hui:add
+3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
+0
+0
+Item
+song-edit-samples
+
+1
+0
+0
+Item
+show-mixing-console
+
+2
+0
+0
+Item
+song-properties
+
+3
+0
+0
+// Resource
+Menu
 popup-menu-sample
 
 0
@@ -5898,7 +6007,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-465
+463
 // Text
 /bars-add
 Add bars...
@@ -6046,6 +6155,12 @@ Pause
 
 /play
 Play
+
+/play-loop
+Loop
+
+/playback-range-lock
+Lock
 
 /record
 Record
@@ -6404,15 +6519,6 @@ Midi
 menu/paste_time
 Paste
 
-menu/pause
-Pause
-
-menu/play
-Play
-
-menu/play_loop
-Loop
-
 menu/plugin_on_file
 On audio buffer
 
@@ -6421,9 +6527,6 @@ On midi
 
 menu/quick_export
 Quick export
-
-menu/record
-Record
 
 menu/render_export_selection
 Render selection...
@@ -6454,9 +6557,6 @@ Messages
 
 menu/show_signal_chain
 Signal chain
-
-menu/stop
-Stop
 
 menu/track_import
 Import from file...
@@ -6745,6 +6845,9 @@ Version
 
 popup-menu-marker/header
 Marker
+
+popup-menu-playback-range/header
+Playback range
 
 popup-menu-sample/header
 Sample
@@ -7301,7 +7404,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-851
+855
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7471,6 +7574,9 @@ Als Samples einfügen
 /pause
 Pause
 
+/pay
+Abspielen
+
 /per_minute
 /min
 
@@ -7482,6 +7588,12 @@ Pause
 
 /play
 Abspielen
+
+/play-loop
+Schleife
+
+/playback-range-lock
+Festhalten
 
 /record
 Aufnehmen
@@ -8523,6 +8635,9 @@ Version
 
 popup-menu-marker/header
 Markierung
+
+popup-menu-playback-range/header
+Abspielbereich
 
 popup-menu-sample/header
 Sample

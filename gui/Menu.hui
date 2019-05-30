@@ -70,12 +70,12 @@ Menu menu ""
 		Item view_optimal "Optimal" image=hui:zoom-fit
 		Item view_samples "Samples" image=hui:zoom-one
 	Menu menu_sound "Sound"
-		Item play "Play" image=hui:media-play
-		Item pause "Pause" image=hui:media-pause
-		Item stop "Stop" image=hui:media-stop
-		Item play_loop "Loop" checkable
+		Item /play "Play" image=hui:media-play
+		Item /pause "Pause" image=hui:media-pause
+		Item /stop "Stop" image=hui:media-stop
+		Item /play-loop "Loop" checkable
 		Separator
-		Item record "Record" image=hui:media-record
+		Item /record "Record" image=hui:media-record
 	Menu menu_plugins "Plugins"
 		Item plugin_on_file "On audio buffer" disabled
 		Menu menu_plugins_channels "Channels"

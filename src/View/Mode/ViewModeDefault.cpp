@@ -121,12 +121,7 @@ void ViewModeDefault::on_left_button_down()
 	}else if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
 		view->scroll->drag_start(view->mx, view->my);
 	}else if (view->hover.type == Selection::Type::PLAYBACK_LOCK){
-		if (view->playback_range_locked){
-			view->playback_range_locked = false;
-			view->playback_wish_range = view->sel.range;
-		}else{
-			view->playback_range_locked = true;
-		}
+		view->set_playback_range_locked(!view->playback_range_locked);
 	}
 }
 
@@ -175,7 +170,7 @@ int hover_buffer(Selection *hover)
 {
 	if (!hover->layer)
 		return -1;
-	foreachi (AudioBuffer &b, hover->layer->buffers, i)
+	foreachi (auto &b, hover->layer->buffers, i)
 		if (b.range().is_inside(hover->pos))
 			return i;
 	return -1;
@@ -206,27 +201,38 @@ void ViewModeDefault::on_left_double_click()
 	}
 }
 
-void prepare_menu(hui::Menu *menu, Selection* hover)
+void prepare_menu(hui::Menu *menu, ViewModeDefault *me)
 {
 	// midi mode
-	menu->enable("menu-midi-mode", hover->track->type == SignalType::MIDI);
-	menu->enable("layer-midi-mode-tab", hover->track->instrument.string_pitch.num > 0);
-	menu->check("layer-midi-mode-linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-	menu->check("layer-midi-mode-classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-	menu->check("layer-midi-mode-tab", hover->vlayer->midi_mode == MidiMode::TAB);
+	if (me->hover->track){
+		menu->enable("menu-midi-mode", me->hover->track->type == SignalType::MIDI);
+		menu->enable("layer-midi-mode-tab", me->hover->track->instrument.string_pitch.num > 0);
+	}
+	if (me->hover->vlayer){
+		menu->check("layer-midi-mode-linear", me->hover->vlayer->midi_mode == MidiMode::LINEAR);
+		menu->check("layer-midi-mode-classical", me->hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+		menu->check("layer-midi-mode-tab", me->hover->vlayer->midi_mode == MidiMode::TAB);
+	}
 
-	menu->enable("track-edit-midi", hover->track->type == SignalType::MIDI);
-	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
+	if (me->hover->track){
+		menu->enable("track-edit-midi", me->hover->track->type == SignalType::MIDI);
+		menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
+	}
 
 	// convert
-	menu->enable("menu-convert", hover->track->type == SignalType::AUDIO);
-	menu->enable("track-convert-stereo", hover->track->channels == 1);
-	menu->enable("track-convert-mono", hover->track->channels == 2);
+	if (me->hover->track){
+		menu->enable("menu-convert", me->hover->track->type == SignalType::AUDIO);
+		menu->enable("track-convert-stereo", me->hover->track->channels == 1);
+		menu->enable("track-convert-mono", me->hover->track->channels == 2);
+	}
+	if (me->hover->layer){
+		menu->enable("layer-merge", me->hover->layer->track->layers.num > 1);
+		menu->enable("layer-mark-dominant", me->hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
+		//menu->enable("layer-delete", !hover->layer->is_main());
+	}
 
-	menu->enable("layer-merge", hover->layer->track->layers.num > 1);
-	menu->enable("layer-mark-dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
-	//menu->enable("layer-delete", !hover->layer->is_main());
-	menu->enable("menu-buffer", hover_buffer(hover) >= 0);
+	menu->check("play-loop", me->view->renderer->loop_if_allowed);
+	menu->check("playback-range-lock", me->view->playback_range_locked);
 
 }
 
@@ -250,27 +256,30 @@ void ViewModeDefault::on_right_button_down()
 	view->update_menu();
 
 	if (hover->type == Selection::Type::SAMPLE){
-		prepare_menu(view->menu_sample, hover);
+		prepare_menu(view->menu_sample, this);
 		view->menu_sample->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR){
-		prepare_menu(view->menu_bar, hover);
+		prepare_menu(view->menu_bar, this);
 		view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::MARKER){
-		prepare_menu(view->menu_marker, hover);
+		prepare_menu(view->menu_marker, this);
 		view->menu_marker->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		prepare_menu(view->menu_bar_gap, hover);
+		prepare_menu(view->menu_bar_gap, this);
 		view->menu_bar_gap->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
-		prepare_menu(view->menu_layer, hover);
+		prepare_menu(view->menu_layer, this);
 		view->menu_layer->open_popup(view->win);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER)){
-		prepare_menu(view->menu_track, hover);
+		prepare_menu(view->menu_track, this);
 		view->menu_track->open_popup(view->win);
 	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
 	}else if (hover_buffer(hover) >= 0){
-		prepare_menu(view->menu_buffer, hover);
+		prepare_menu(view->menu_buffer, this);
 		view->menu_buffer->open_popup(view->win);
+	}else if (hover->type == Selection::Type::PLAYBACK_RANGE){
+		prepare_menu(view->menu_playback_range, this);
+		view->menu_playback_range->open_popup(view->win);
 	}else if (!hover->track){
 		view->menu_song->open_popup(view->win);
 	}

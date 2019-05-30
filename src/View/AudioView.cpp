@@ -342,8 +342,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_song = hui::CreateResourceMenu("popup-menu-song");
 	menu_track = hui::CreateResourceMenu("popup-menu-track");
 	menu_layer = hui::CreateResourceMenu("popup-menu-layer");
-	//menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
-	menu_playback_range = nullptr;
+	menu_playback_range = hui::CreateResourceMenu("popup-menu-playback-range");
 	menu_sample = hui::CreateResourceMenu("popup-menu-sample");
 	menu_marker = hui::CreateResourceMenu("popup-menu-marker");
 	menu_bar = hui::CreateResourceMenu("popup-menu-bar");
@@ -1651,4 +1650,13 @@ void AudioView::set_message(const string& text, float size)
 	message.ttl = 0.8f;
 	message.size = size;
 	force_redraw();
+}
+
+void AudioView::set_playback_range_locked(bool locked)
+{
+	playback_range_locked = locked;
+	if (!locked)
+		playback_wish_range = sel.range;
+	force_redraw();
+	//notify();
 }

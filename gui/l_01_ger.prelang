@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-852
+856
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2558,6 +2558,18 @@ Spur
 
 popup-menu-bar-gap/header
 Taktzwischenraum
+
+/pay
+Abspielen
+
+/playback-range-lock
+Festhalten
+
+popup-menu-playback-range/header
+Abspielbereich
+
+/play-loop
+Schleife
 
 // Num Language Strings
 228

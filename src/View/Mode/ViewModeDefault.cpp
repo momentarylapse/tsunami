@@ -209,11 +209,11 @@ void ViewModeDefault::on_left_double_click()
 void prepare_menu(hui::Menu *menu, Selection* hover)
 {
 	// midi mode
-	menu->enable("menu_midi_mode", hover->track->type == SignalType::MIDI);
-	menu->enable("layer_midi_mode_tab", hover->track->instrument.string_pitch.num > 0);
-	menu->check("layer_midi_mode_linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
-	menu->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-	menu->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
+	menu->enable("menu-midi-mode", hover->track->type == SignalType::MIDI);
+	menu->enable("layer-midi-mode-tab", hover->track->instrument.string_pitch.num > 0);
+	menu->check("layer-midi-mode-linear", hover->vlayer->midi_mode == MidiMode::LINEAR);
+	menu->check("layer-midi-mode-classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
+	menu->check("layer-midi-mode-tab", hover->vlayer->midi_mode == MidiMode::TAB);
 
 	menu->enable("track-edit-midi", hover->track->type == SignalType::MIDI);
 	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
@@ -223,10 +223,10 @@ void prepare_menu(hui::Menu *menu, Selection* hover)
 	menu->enable("track-convert-stereo", hover->track->channels == 1);
 	menu->enable("track-convert-mono", hover->track->channels == 2);
 
-	menu->enable("layer_merge", hover->layer->track->layers.num > 1);
-	menu->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
-	//menu->enable("delete_layer", !hover->layer->is_main());
-	menu->enable("menu_buffer", hover_buffer(hover) >= 0);
+	menu->enable("layer-merge", hover->layer->track->layers.num > 1);
+	menu->enable("layer-mark-dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
+	//menu->enable("layer-delete", !hover->layer->is_main());
+	menu->enable("menu-buffer", hover_buffer(hover) >= 0);
 
 }
 
@@ -254,18 +254,18 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_sample->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR){
 		prepare_menu(view->menu_bar, hover);
-		view->menu_bar->enable("delete_bars", true);
-		view->menu_bar->enable("edit_bars", true);
-		view->menu_bar->enable("scale_bars", true);
+		view->menu_bar->enable("delete", true);
+		view->menu_bar->enable("bars-edit", true);
+		view->menu_bar->enable("bars-scale", true);
 		view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::MARKER){
 		prepare_menu(view->menu_marker, hover);
 		view->menu_marker->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		prepare_menu(view->menu_bar, hover);
-		view->menu_bar->enable("delete_bars", false);
-		view->menu_bar->enable("edit_bars", false);
-		view->menu_bar->enable("scale_bars", false);
+		view->menu_bar->enable("delete", false);
+		view->menu_bar->enable("bars-edit", false);
+		view->menu_bar->enable("bars-scale", false);
 		view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		prepare_menu(view->menu_layer, hover);

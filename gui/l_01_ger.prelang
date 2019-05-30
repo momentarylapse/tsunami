@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-811
+851
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2435,6 +2435,126 @@ Midi bearbeiten
 
 /track-properties
 Eigenschaften
+
+/bars-add
+Takte hinzufügen...
+
+/bars-add-pause
+Pause hinzufügen...
+
+/bars-delete
+Löschen
+
+/bars-edit
+Bearbeiten...
+
+/bars-scale
+Skalieren
+markierte Takte skalieren (durch Ziehen der linken Markierung)
+/buffer-delete
+Löschen
+
+/buffer-make-movable
+Beweglich machen
+
+/layer-add
+Neue Version
+
+/layer-delete
+Löschen
+
+/layer-edit-midi
+Midi bearbeiten
+
+/layer-make-track
+In Spur umwandeln
+
+/layer-mark_dominant
+Auswahl als dominant markieren
+
+/layer-merge
+Zusammenfügen..
+
+/layer-midi-mode-classical
+Klassisch
+
+/layer-midi-mode-linear
+Linear
+
+/layer-midi-mode-tab
+Tabulatur
+
+/marker-delete
+Löschen
+
+/marker-edit
+Bearbeiten
+
+/marker-resize
+Größe ändern
+
+/menu-file
+Dateu
+
+/menu-midi-mode
+Midi Modus
+
+/menu-version
+Version
+
+/sample-delete
+Löschen
+
+/sample-insert
+Statisch einfügen
+
+/sample-properties
+Eigenschaften
+
+/track-add-audio-mono
+Audio (mono)
+
+/track-add-audio-stereo
+Audio (stereo)
+
+/track-add-beats
+Metronom
+
+/track-add-group
+Gruppe
+
+/track-add-marker
+Markierung hinzufügen
+
+/track-add-midi
+Midi
+
+/track-delete
+Löschen
+
+popu-menu-track/header
+Spur
+
+popup-menu-bar/header
+Takt
+
+popup-menu-buffer/header
+Audiopuffer
+
+popup-menu-layer/header
+Version
+
+popup-menu-marker/header
+Markierung
+
+popup-menu-sample/header
+Sample
+
+popup-menu-song/header
+Datei
+
+popup-menu-track/header
+Spur
 
 // Num Language Strings
 228

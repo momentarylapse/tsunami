@@ -1,5 +1,5 @@
 Menu menu ""
-	Menu menu_file "File"
+	Menu /menu-file "File"
 		Item /new "New..." image=hui:new
 		Item /open "Open..." image=hui:open
 		Separator
@@ -32,11 +32,11 @@ Menu menu ""
 		Item track_render "Render from selection"
 		Separator
 		Menu /menu-track-new "Add new track"
-			Item /add-track-audio-mono "Audio (mono)" image=hui:add
-			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
-			Item /add-track-midi "Midi" image=hui:add
-			Item /add-track-beats "Metronome" image=hui:add
-			Item /add-track-group "Group" image=hui:add
+			Item /track-add-audio-mono "Audio (mono)" image=hui:add
+			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
+			Item /track-add-midi "Midi" image=hui:add
+			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-group "Group" image=hui:add
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add
@@ -44,16 +44,16 @@ Menu menu ""
 		Item paste_time "Paste" image=hui:paste
 		Separator
 		Item bars_label "Bars" disabled
-		Item add_bars "Add bars..." flat image=hui:add
-		Item add_pause "Add pause..." image=hui:add
-		Item edit_bars "Edit..." image=hui:edit
-		Item scale_bars "Scale" image=hui:zoom-in "tooltip=scale selected bars (by moving the selection on the left)"
-		Item delete_bars "Löschen" flat image=hui:delete
+		Item /bars-add "Add bars..." flat image=hui:add
+		Item /bars-add-pause "Add pause..." image=hui:add
+		Item /bars-edit "Edit..." image=hui:edit
+		Item /bars-scale "Scale" image=hui:zoom-in "tooltip=scale selected bars (by moving the selection on the left)"
+		Item /bars-delete "Delete" flat image=hui:delete
 	Menu menu_sub "Samples"
 		Item sample_manager "Manage..." image=hui:properties
 		Separator
 		Item sample_from_selection "Cut out from selection" image=hui:cut
-		Item insert_sample "Insert statically" image=hui:add
+		Item /sample-insert "Insert statically" image=hui:add
 	Menu menu_view "View"
 		Menu menu_view_midi "Midi"
 			Item view_midi_default "Default" checkable

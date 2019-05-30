@@ -339,14 +339,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	win->activate(id);
 
 
-	menu_song = hui::CreateResourceMenu("popup_song_menu");
-	menu_track = hui::CreateResourceMenu("popup_track_menu");
-	menu_layer = hui::CreateResourceMenu("popup_layer_menu");
-	menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
-	menu_sample = hui::CreateResourceMenu("popup_sample_menu");
-	menu_marker = hui::CreateResourceMenu("popup_marker_menu");
-	menu_bar = hui::CreateResourceMenu("popup_bar_menu");
-	menu_buffer = hui::CreateResourceMenu("popup_buffer_menu");
+	menu_song = hui::CreateResourceMenu("popup-menu-song");
+	menu_track = hui::CreateResourceMenu("popup-menu-track");
+	menu_layer = hui::CreateResourceMenu("popup-menu-layer");
+	//menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
+	menu_sample = hui::CreateResourceMenu("popup-menu-sample");
+	menu_marker = hui::CreateResourceMenu("popup-menu-marker");
+	menu_bar = hui::CreateResourceMenu("popup-menu-bar");
+	menu_buffer = hui::CreateResourceMenu("popup-menu-buffer");
 
 	//ForceRedraw();
 	update_menu();

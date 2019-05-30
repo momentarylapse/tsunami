@@ -908,7 +908,7 @@ menu
 0
 9
 Menu
-menu_file
+menu-file
 
 0
 0
@@ -1106,31 +1106,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -1178,31 +1178,31 @@ disabled
 0
 0
 Item
-add_bars
+bars-add
 flat,image=hui:add
 6
 0
 0
 Item
-add_pause
+bars-add-pause
 image=hui:add
 7
 0
 0
 Item
-edit_bars
+bars-edit
 image=hui:edit
 8
 0
 0
 Item
-scale_bars
+bars-scale
 image=hui:zoom-in
 9
 0
 0
 Item
-delete_bars
+bars-delete
 flat,image=hui:delete
 10
 0
@@ -1232,7 +1232,7 @@ image=hui:cut
 0
 0
 Item
-insert_sample
+sample-insert
 image=hui:add
 3
 0
@@ -2681,13 +2681,13 @@ song_properties
 0
 // Resource
 Menu
-popup_bar_menu
+popup-menu-bar
 
 0
 0
-13
+12
 Item
-bar_menu_header
+header
 disabled
 0
 0
@@ -2699,31 +2699,31 @@ Separator
 0
 0
 Item
-delete_bars
+bars-delete
 
 2
 0
 0
 Item
-edit_bars
+bars-edit
 
 3
 0
 0
 Item
-scale_bars
+bars-scale
 image=hui:zoom-in
 4
 0
 0
 Item
-add_bars
+bars-add
 flat,image=hui:add
 5
 0
 0
 Item
-add_pause
+bars-add-pause
 image=hui:add
 6
 0
@@ -2735,117 +2735,117 @@ Separator
 0
 0
 Item
-track_add_marker
+track-add-marker
 
 8
 0
 0
 Menu
-menu_midi_mode
+menu-version
 
 9
 0
+5
+Item
+layer-add
+
+0
+0
+0
+Item
+layer-mark_dominant
+
+1
+0
+0
+Item
+layer-merge
+
+2
+0
+0
+Item
+layer-delete
+
+3
+0
+0
+Menu
+menu-midi-mode
+
+4
+0
 3
 Item
-layer_midi_mode_linear
+layer-midi-mode-linear
 checkable
 0
 0
 0
 Item
-layer_midi_mode_tab
+layer-midi-mode-tab
 checkable
 1
 0
 0
 Item
-layer_midi_mode_classical
+layer-midi-mode-classical
 checkable
 2
 0
 0
 Menu
-menu_version
+menu-track
 
 10
 0
-4
-Item
-layer_add
-
-0
-0
-0
-Item
-layer_mark_dominant
-
-1
-0
-0
-Item
-layer_merge
-
-2
-0
-0
-Item
-delete_layer
-
-3
-0
-0
-Menu
-menu_track
-
-11
-0
 5
 Item
-delete_track
+track-delete
 
 0
 0
 0
 Menu
-convert_menu
+menu-convert
 
 1
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 2
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 3
 0
 0
 Item
-track_properties
+track-properties
 
 4
 0
 0
 Menu
-song_menu
+menu-song
 
-12
+11
 0
 4
 Menu
@@ -2855,62 +2855,62 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
 0
 // Resource
 Menu
-popup_buffer_menu
+popup-menu-buffer
 
 0
 0
 9
 Item
-buffer_menu_header
+header
 disabled
 0
 0
@@ -2922,13 +2922,13 @@ Separator
 0
 0
 Item
-make_buffer_movable
+buffer-make-movable
 
 2
 0
 0
 Item
-delete_buffer
+buffer-delete
 
 3
 0
@@ -2940,39 +2940,63 @@ Separator
 0
 0
 Item
-track_add_marker
+track-add-marker
 
 5
 0
 0
 Menu
-menu_version
+menu-version
 
 6
 0
-4
+5
 Item
-layer_add
+layer-add
 
 0
 0
 0
 Item
-layer_mark_dominant
+layer-mark_dominant
 
 1
 0
 0
 Item
-layer_merge
+layer-merge
 
 2
 0
 0
 Item
-delete_layer
+layer-delete
 
 3
+0
+0
+Menu
+menu-midi-mode
+
+4
+0
+3
+Item
+layer-midi-mode-linear
+checkable
+0
+0
+0
+Item
+layer-midi-mode-tab
+checkable
+1
+0
+0
+Item
+layer-midi-mode-classical
+checkable
+2
 0
 0
 Menu
@@ -2982,7 +3006,7 @@ menu-track
 0
 5
 Item
-delete-track
+track-delete
 
 0
 0
@@ -3036,31 +3060,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -3128,7 +3152,7 @@ image=hui:delete
 0
 // Resource
 Menu
-popup_layer_menu
+popup-menu-layer
 
 0
 0
@@ -3146,49 +3170,49 @@ Separator
 0
 0
 Menu
-menu_midi_mode
+menu-midi-mode
 
 2
 0
 3
 Item
-layer_midi_mode_linear
+layer-midi-mode-linear
 checkable
 0
 0
 0
 Item
-layer_midi_mode_tab
+layer-midi-mode-tab
 checkable
 1
 0
 0
 Item
-layer_midi_mode_classical
+layer-midi-mode-classical
 checkable
 2
 0
 0
 Item
-track_edit_midi
+layer-edit-midi
 
 3
 0
 0
 Item
-layer_make_track
+layer-make-track
 
 4
 0
 0
 Item
-layer_merge
+layer-merge
 
 5
 0
 0
 Item
-delete_layer
+layer-delete
 
 6
 0
@@ -3206,7 +3230,7 @@ menu-track
 0
 5
 Item
-delete-track
+track-delete
 
 0
 0
@@ -3260,31 +3284,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -3309,13 +3333,13 @@ song-properties
 0
 // Resource
 Menu
-popup_marker_menu
+popup-menu-marker
 
 0
 0
 9
 Item
-marker_menu_header
+header
 disabled
 0
 0
@@ -3327,19 +3351,19 @@ Separator
 0
 0
 Item
-edit_marker
+marker-edit
 
 2
 0
 0
 Item
-marker_resize
+marker-resize
 
 3
 0
 0
 Item
-delete_marker
+marker-delete
 
 4
 0
@@ -3351,33 +3375,57 @@ Separator
 0
 0
 Menu
-menu_version
+menu-version
 
 6
 0
-4
+5
 Item
-layer_add
+layer-add
 
 0
 0
 0
 Item
-layer_mark_dominant
+layer-mark_dominant
 
 1
 0
 0
 Item
-layer_merge
+layer-merge
 
 2
 0
 0
 Item
-delete_layer
+layer-delete
 
 3
+0
+0
+Menu
+menu-midi-mode
+
+4
+0
+3
+Item
+layer-midi-mode-linear
+checkable
+0
+0
+0
+Item
+layer-midi-mode-tab
+checkable
+1
+0
+0
+Item
+layer-midi-mode-classical
+checkable
+2
 0
 0
 Menu
@@ -3387,7 +3435,7 @@ menu-track
 0
 5
 Item
-delete-track
+track-delete
 
 0
 0
@@ -3441,31 +3489,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -3490,13 +3538,13 @@ song-properties
 0
 // Resource
 Menu
-popup_sample_menu
+popup-menu-sample
 
 0
 0
 10
 Item
-sample_menu_header
+header
 disabled
 0
 0
@@ -3508,19 +3556,19 @@ Separator
 0
 0
 Item
-insert_sample
+sample-insert
 
 2
 0
 0
 Item
-remove_sample
+sample-delete
 
 3
 0
 0
 Item
-sample_properties
+sample-properties
 
 4
 0
@@ -3532,39 +3580,63 @@ Separator
 0
 0
 Item
-track_add_marker
+track-add-marker
 
 6
 0
 0
 Menu
-menu_version
+menu-version
 
 7
 0
-4
+5
 Item
-layer_add
+layer-add
 
 0
 0
 0
 Item
-layer_mark_dominant
+layer-mark_dominant
 
 1
 0
 0
 Item
-layer_merge
+layer-merge
 
 2
 0
 0
 Item
-delete_layer
+layer-delete
 
 3
+0
+0
+Menu
+menu-midi-mode
+
+4
+0
+3
+Item
+layer-midi-mode-linear
+checkable
+0
+0
+0
+Item
+layer-midi-mode-tab
+checkable
+1
+0
+0
+Item
+layer-midi-mode-classical
+checkable
+2
 0
 0
 Menu
@@ -3574,7 +3646,7 @@ menu-track
 0
 5
 Item
-delete-track
+track-delete
 
 0
 0
@@ -3628,31 +3700,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -3823,13 +3895,13 @@ signal_module_delete
 0
 // Resource
 Menu
-popup_song_menu
+popup-menu-song
 
 0
 0
 6
 Item
-song_menu_header
+header
 disabled
 0
 0
@@ -3847,31 +3919,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -3975,13 +4047,13 @@ track_properties
 0
 // Resource
 Menu
-popup_track_menu
+popup-menu-track
 
 0
 0
-12
+11
 Item
-track_menu_header
+header
 disabled
 0
 0
@@ -3993,7 +4065,7 @@ Separator
 0
 0
 Item
-delete-track
+track-delete
 
 2
 0
@@ -4041,69 +4113,69 @@ Separator
 0
 0
 Item
-track_add_marker
+track-add-marker
 
 8
 0
 0
 Menu
-menu_midi_mode
+menu-version
 
 9
 0
-3
+5
 Item
-layer_midi_mode_linear
-checkable
+layer-add
+
 0
 0
 0
 Item
-layer_midi_mode_tab
-checkable
+layer-mark_dominant
+
 1
 0
 0
 Item
-layer_midi_mode_classical
-checkable
+layer-merge
+
 2
+0
+0
+Item
+layer-delete
+
+3
 0
 0
 Menu
-menu_version
+menu-midi-mode
 
-10
-0
 4
+0
+3
 Item
-layer_add
-
+layer-midi-mode-linear
+checkable
 0
 0
 0
 Item
-layer_mark_dominant
-
+layer-midi-mode-tab
+checkable
 1
 0
 0
 Item
-layer_merge
-
+layer-midi-mode-classical
+checkable
 2
-0
-0
-Item
-delete_layer
-
-3
 0
 0
 Menu
 menu-song
 
-11
+10
 0
 4
 Menu
@@ -4113,31 +4185,31 @@ menu-track-new
 0
 5
 Item
-add-track-audio-mono
+track-add-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add-track-audio-stereo
+track-add-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add-track-midi
+track-add-midi
 image=hui:add
 2
 0
 0
 Item
-add-track-beats
+track-add-beats
 image=hui:add
 3
 0
 0
 Item
-add-track-group
+track-add-group
 image=hui:add
 4
 0
@@ -5700,22 +5772,28 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-526
+475
 // Text
-/add-track-audio-mono
-Audio (mono)
+/bars-add
+Add bars...
 
-/add-track-audio-stereo
-Audio (stereo)
+/bars-add-pause
+Add pause...
 
-/add-track-beats
-Metronome
+/bars-delete
+Delete
 
-/add-track-group
-Group
+/bars-edit
+Edit...
 
-/add-track-midi
-Midi
+/bars-scale
+Scale
+scale selected bars (by moving the selection on the left)
+/buffer-delete
+Delete
+
+/buffer-make-movable
+Make movable
 
 /cancel
 Cancel
@@ -5730,9 +5808,6 @@ Copy
 dB
 
 /delete
-Delete
-
-/delete-track
 Delete
 
 /edit_curves
@@ -5759,8 +5834,50 @@ Track
 /exit
 Exit
 
+/layer-add
+Add version
+
+/layer-delete
+Delete
+
+/layer-edit-midi
+Edit midi
+
+/layer-make-track
+Turn into track
+
+/layer-mark_dominant
+Mark selection as dominant
+
+/layer-merge
+Merge...
+
+/layer-midi-mode-classical
+Score
+
+/layer-midi-mode-linear
+Linear
+
+/layer-midi-mode-tab
+Tabulature
+
+/marker-delete
+Delete
+
+/marker-edit
+Edit
+
+/marker-resize
+Resize
+
 /menu-convert
 Convert
+
+/menu-file
+File
+
+/menu-midi-mode
+Midi mode
 
 /menu-song
 File
@@ -5770,6 +5887,9 @@ Track
 
 /menu-track-new
 Add new track
+
+/menu-version
+Version
 
 /new
 New...
@@ -5810,6 +5930,15 @@ Redo
 /s
 s
 
+/sample-delete
+Delete
+
+/sample-insert
+Insert statically
+
+/sample-properties
+Properties
+
 /save
 Save
 
@@ -5831,11 +5960,32 @@ Properties
 /stop
 Stop
 
+/track-add-audio-mono
+Audio (mono)
+
+/track-add-audio-stereo
+Audio (stereo)
+
+/track-add-beats
+Metronome
+
+/track-add-group
+Group
+
+/track-add-marker
+Add marker
+
+/track-add-midi
+Midi
+
 /track-convert-mono
 Mono
 
 /track-convert-stereo
 Stereo
+
+/track-delete
+Delete
 
 /track-edit-fx
 Edit effects
@@ -6044,17 +6194,8 @@ Marker
 menu/about
 About
 
-menu/add_bars
-Add bars...
-
-menu/add_pause
-Add pause...
-
 menu/bars_label
 Bars
-
-menu/delete_bars
-Löschen
 
 menu/delete_time
 Delete selected interval
@@ -6062,17 +6203,11 @@ Delete selected interval
 menu/edit-track-groups
 Edit track groups
 
-menu/edit_bars
-Edit...
-
 menu/export_selection
 Save selection...
 
 menu/help
 Help
-
-menu/insert_sample
-Insert statically
 
 menu/insert_time
 Insert silence...
@@ -6082,9 +6217,6 @@ Edit
 
 menu/menu_export
 Export
-
-menu/menu_file
-File
 
 menu/menu_help
 ?
@@ -6176,9 +6308,6 @@ Cut out from selection
 menu/sample_manager
 Manage...
 
-menu/scale_bars
-Scale
-scale selected bars (by moving the selection on the left)
 menu/select_all
 Select all
 
@@ -6476,6 +6605,27 @@ Move data accordingly
 pause_edit_dialog/t_duration
 Duration
 
+popup-menu-bar/header
+Bar
+
+popup-menu-buffer/header
+Audio buffer
+
+popup-menu-layer/header
+Version
+
+popup-menu-marker/header
+Marker
+
+popup-menu-sample/header
+Sample
+
+popup-menu-song/header
+File
+
+popup-menu-track/header
+Track
+
 popup_all_menu/add_audio_track_mono
 Audio (mono)
 
@@ -6590,117 +6740,6 @@ Edit midi
 popup_all_menu/track_properties
 Properties
 
-popup_bar_menu/add_bars
-Add bars...
-
-popup_bar_menu/add_pause
-Add pause...
-
-popup_bar_menu/bar_menu_header
-Bar
-
-popup_bar_menu/convert_menu
-Convert
-
-popup_bar_menu/delete_bars
-Delete
-
-popup_bar_menu/delete_layer
-Delete
-
-popup_bar_menu/delete_track
-Delete
-
-popup_bar_menu/edit_bars
-Edit...
-
-popup_bar_menu/layer_add
-Add version
-
-popup_bar_menu/layer_mark_dominant
-Mark selection as dominant
-
-popup_bar_menu/layer_merge
-Merge...
-
-popup_bar_menu/layer_midi_mode_classical
-Score
-
-popup_bar_menu/layer_midi_mode_linear
-Linear
-
-popup_bar_menu/layer_midi_mode_tab
-Tabulature
-
-popup_bar_menu/menu_midi_mode
-Midi mode
-
-popup_bar_menu/menu_track
-Track
-
-popup_bar_menu/menu_version
-Version
-
-popup_bar_menu/scale_bars
-Scale
-
-popup_bar_menu/show_mixing_console
-Mixing
-
-popup_bar_menu/song_edit_samples
-Manage samples
-
-popup_bar_menu/song_menu
-File
-
-popup_bar_menu/song_properties
-Properties
-
-popup_bar_menu/track_add_marker
-Add marker
-
-popup_bar_menu/track_convert_mono
-Mono
-
-popup_bar_menu/track_convert_stereo
-Stereo
-
-popup_bar_menu/track_edit_fx
-Edit effects
-
-popup_bar_menu/track_edit_midi
-Edit midi
-
-popup_bar_menu/track_properties
-Properties
-
-popup_buffer_menu/buffer_menu_header
-Audio buffer
-
-popup_buffer_menu/delete_buffer
-Delete
-
-popup_buffer_menu/delete_layer
-Delete
-
-popup_buffer_menu/layer_add
-Add version
-
-popup_buffer_menu/layer_mark_dominant
-Mark selection as dominant
-
-popup_buffer_menu/layer_merge
-Merge...
-
-popup_buffer_menu/make_buffer_movable
-Make movable
-
-popup_buffer_menu/menu_version
-Version
-
-popup_buffer_menu/track_add_marker
-Add marker
-
 popup_fx_menu/delete
 Delete
 
@@ -6712,90 +6751,6 @@ Save parameters
 
 popup_fx_menu/show_large
 Show large
-
-popup_layer_menu/delete_layer
-Delete
-
-popup_layer_menu/header
-Version
-
-popup_layer_menu/layer_make_track
-Turn into track
-
-popup_layer_menu/layer_merge
-Merge...
-
-popup_layer_menu/layer_midi_mode_classical
-Score
-
-popup_layer_menu/layer_midi_mode_linear
-Linear
-
-popup_layer_menu/layer_midi_mode_tab
-Tabulature
-
-popup_layer_menu/menu_midi_mode
-Midi mode
-
-popup_layer_menu/track_edit_midi
-Edit midi
-
-popup_marker_menu/delete_layer
-Delete
-
-popup_marker_menu/delete_marker
-Delete
-
-popup_marker_menu/edit_marker
-Edit
-
-popup_marker_menu/layer_add
-Add version
-
-popup_marker_menu/layer_mark_dominant
-Mark selection as dominant
-
-popup_marker_menu/layer_merge
-Merge...
-
-popup_marker_menu/marker_menu_header
-Marker
-
-popup_marker_menu/marker_resize
-Resize
-
-popup_marker_menu/menu_version
-Version
-
-popup_sample_menu/delete_layer
-Delete
-
-popup_sample_menu/insert_sample
-Insert statically
-
-popup_sample_menu/layer_add
-Add version
-
-popup_sample_menu/layer_mark_dominant
-Mark selection as dominant
-
-popup_sample_menu/layer_merge
-Merge...
-
-popup_sample_menu/menu_version
-Version
-
-popup_sample_menu/remove_sample
-Delete
-
-popup_sample_menu/sample_menu_header
-Samples
-
-popup_sample_menu/sample_properties
-Properties
-
-popup_sample_menu/track_add_marker
-Add marker
 
 popup_signal_chain_menu/add
 Add Module
@@ -6854,9 +6809,6 @@ Module
 popup_signal_module_menu/signal_module_delete
 Delete
 
-popup_song_menu/song_menu_header
-File
-
 popup_time_track_menu/add_bars
 Add bars...
 
@@ -6889,39 +6841,6 @@ Edit effects
 
 popup_time_track_menu/track_properties
 Properties
-
-popup_track_menu/delete_layer
-Delete
-
-popup_track_menu/layer_add
-Add version
-
-popup_track_menu/layer_mark_dominant
-Mark selection as dominant
-
-popup_track_menu/layer_merge
-Merge...
-
-popup_track_menu/layer_midi_mode_classical
-Score
-
-popup_track_menu/layer_midi_mode_linear
-Linear
-
-popup_track_menu/layer_midi_mode_tab
-Tabulature
-
-popup_track_menu/menu_midi_mode
-Midi mode
-
-popup_track_menu/menu_version
-Version
-
-popup_track_menu/track_add_marker
-Add marker
-
-popup_track_menu/track_menu_header
-Track
 
 progress_cancelable_dialog/progress_cancelable_dialog
 in Arbeit
@@ -7286,7 +7205,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-810
+850
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7303,8 +7222,29 @@ Gruppe
 /add-track-midi
 Midi
 
+/bars-add
+Takte hinzufügen...
+
+/bars-add-pause
+Pause hinzufügen...
+
+/bars-delete
+Löschen
+
+/bars-edit
+Bearbeiten...
+
+/bars-scale
+Skalieren
+markierte Takte skalieren (durch Ziehen der linken Markierung)
 /bpm
 Bpm
+
+/buffer-delete
+Löschen
+
+/buffer-make-movable
+Beweglich machen
 
 /cancel
 Abbrechen
@@ -7357,8 +7297,50 @@ Spur
 /exit
 Beenden
 
+/layer-add
+Neue Version
+
+/layer-delete
+Löschen
+
+/layer-edit-midi
+Midi bearbeiten
+
+/layer-make-track
+In Spur umwandeln
+
+/layer-mark_dominant
+Auswahl als dominant markieren
+
+/layer-merge
+Zusammenfügen..
+
+/layer-midi-mode-classical
+Klassisch
+
+/layer-midi-mode-linear
+Linear
+
+/layer-midi-mode-tab
+Tabulatur
+
+/marker-delete
+Löschen
+
+/marker-edit
+Bearbeiten
+
+/marker-resize
+Größe ändern
+
 /menu-convert
 Konvertieren
+
+/menu-file
+Dateu
+
+/menu-midi-mode
+Midi Modus
 
 /menu-song
 Datei
@@ -7368,6 +7350,9 @@ Spur
 
 /menu-track-new
 Neue Spur
+
+/menu-version
+Version
 
 /ms
 ms
@@ -7411,6 +7396,15 @@ Wiederherstellen
 /s
 s
 
+/sample-delete
+Löschen
+
+/sample-insert
+Statisch einfügen
+
+/sample-properties
+Eigenschaften
+
 /save
 Speichern
 
@@ -7432,11 +7426,32 @@ Eigenschaften
 /stop
 Stopp
 
+/track-add-audio-mono
+Audio (mono)
+
+/track-add-audio-stereo
+Audio (stereo)
+
+/track-add-beats
+Metronom
+
+/track-add-group
+Gruppe
+
+/track-add-marker
+Markierung hinzufügen
+
+/track-add-midi
+Midi
+
 /track-convert-mono
 Mono
 
 /track-convert-stereo
 Stereo
+
+/track-delete
+Löschen
 
 /track-edit-fx
 Effekte bearbeiten
@@ -8394,6 +8409,30 @@ Dauer
 
 pause_edit_dialog/t_s
 s
+
+popu-menu-track/header
+Spur
+
+popup-menu-bar/header
+Takt
+
+popup-menu-buffer/header
+Audiopuffer
+
+popup-menu-layer/header
+Version
+
+popup-menu-marker/header
+Markierung
+
+popup-menu-sample/header
+Sample
+
+popup-menu-song/header
+Datei
+
+popup-menu-track/header
+Spur
 
 popup_all_menu/add_audio_track_mono
 Audio (mono)

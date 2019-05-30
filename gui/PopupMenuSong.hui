@@ -1,12 +1,12 @@
-Menu popup_song_menu ""
-	Item song_menu_header "File" disabled
+Menu popup-menu-song ""
+	Item header "File" disabled
 	Separator
 	Menu /menu-track-new "Add new track"
-		Item /add-track-audio-mono "Audio (mono)" image=hui:add
-		Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
-		Item /add-track-midi "Midi" image=hui:add
-		Item /add-track-beats "Metronome" image=hui:add
-		Item /add-track-group "Group" image=hui:add
+		Item /track-add-audio-mono "Audio (mono)" image=hui:add
+		Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
+		Item /track-add-midi "Midi" image=hui:add
+		Item /track-add-beats "Metronome" image=hui:add
+		Item /track-add-group "Group" image=hui:add
 	Item /song-edit-samples "Manage samples"
 	Item /show-mixing-console "Mixing"
 	Item /song-properties "Properties"

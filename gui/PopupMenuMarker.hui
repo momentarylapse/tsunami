@@ -1,17 +1,21 @@
-Menu popup_marker_menu ""
-	Item marker_menu_header "Marker" disabled
+Menu popup-menu-marker ""
+	Item header "Marker" disabled
 	Separator
-	Item edit_marker "Edit"
-	Item marker_resize "Resize"
-	Item delete_marker "Delete"
+	Item /marker-edit "Edit"
+	Item /marker-resize "Resize"
+	Item /marker-delete "Delete"
 	Separator
-	Menu menu_version "Version"
-		Item layer_add "Add version"
-		Item layer_mark_dominant "Mark selection as dominant"
-		Item layer_merge "Merge..."
-		Item delete_layer "Delete"
+	Menu /menu-version "Version"
+		Item /layer-add "Add version"
+		Item /layer-mark_dominant "Mark selection as dominant"
+		Item /layer-merge "Merge..."
+		Item /layer-delete "Delete"
+		Menu /menu-midi-mode "Midi mode"
+			Item /layer-midi-mode-linear "Linear" checkable
+			Item /layer-midi-mode-tab "Tabulature" checkable
+			Item /layer-midi-mode-classical "Score" checkable
 	Menu /menu-track "Track"
-		Item /delete-track "Delete"
+		Item /track-delete "Delete"
 		Menu /menu-convert "Convert"
 			Item /track-convert-mono "Mono"
 			Item /track-convert-stereo "Stereo"
@@ -20,11 +24,11 @@ Menu popup_marker_menu ""
 		Item /track-properties "Properties"
 	Menu /menu-song "File"
 		Menu /menu-track-new "Add new track"
-			Item /add-track-audio-mono "Audio (mono)" image=hui:add
-			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
-			Item /add-track-midi "Midi" image=hui:add
-			Item /add-track-beats "Metronome" image=hui:add
-			Item /add-track-group "Group" image=hui:add
+			Item /track-add-audio-mono "Audio (mono)" image=hui:add
+			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
+			Item /track-add-midi "Midi" image=hui:add
+			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-group "Group" image=hui:add
 		Item /song-edit-samples "Manage samples"
 		Item /show-mixing-console "Mixing"
 		Item /song-properties "Properties"

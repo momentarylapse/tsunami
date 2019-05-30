@@ -1,37 +1,37 @@
-Menu popup_bar_menu ""
-	Item bar_menu_header "Bar" disabled
+Menu popup-menu-bar ""
+	Item header "Bar" disabled
 	Separator
-	Item delete_bars "Delete"
-	Item edit_bars "Edit..."
-	Item scale_bars "Scale" image=hui:zoom-in
-	Item add_bars "Add bars..." flat image=hui:add
-	Item add_pause "Add pause..." image=hui:add
+	Item /bars-delete "Delete"
+	Item /bars-edit "Edit..."
+	Item /bars-scale "Scale" image=hui:zoom-in
+	Item /bars-add "Add bars..." flat image=hui:add
+	Item /bars-add-pause "Add pause..." image=hui:add
 	Separator
-	Item track_add_marker "Add marker"
-	Menu menu_midi_mode "Midi mode"
-		Item layer_midi_mode_linear "Linear" checkable
-		Item layer_midi_mode_tab "Tabulature" checkable
-		Item layer_midi_mode_classical "Score" checkable
-	Menu menu_version "Version"
-		Item layer_add "Add version"
-		Item layer_mark_dominant "Mark selection as dominant"
-		Item layer_merge "Merge..."
-		Item delete_layer "Delete"
-	Menu menu_track "Track"
-		Item delete_track "Delete"
-		Menu convert_menu "Convert"
-			Item track_convert_mono "Mono"
-			Item track_convert_stereo "Stereo"
-		Item track_edit_fx "Edit effects"
-		Item track_edit_midi "Edit midi"
-		Item track_properties "Properties"
-	Menu song_menu "File"
+	Item /track-add-marker "Add marker"
+	Menu /menu-version "Version"
+		Item /layer-add "Add version"
+		Item /layer-mark_dominant "Mark selection as dominant"
+		Item /layer-merge "Merge..."
+		Item /layer-delete "Delete"
+		Menu /menu-midi-mode "Midi mode"
+			Item /layer-midi-mode-linear "Linear" checkable
+			Item /layer-midi-mode-tab "Tabulature" checkable
+			Item /layer-midi-mode-classical "Score" checkable
+	Menu /menu-track "Track"
+		Item /track-delete "Delete"
+		Menu /menu-convert "Convert"
+			Item /track-convert-mono "Mono"
+			Item /track-convert-stereo "Stereo"
+		Item /track-edit-fx "Edit effects"
+		Item /track-edit-midi "Edit midi"
+		Item /track-properties "Properties"
+	Menu /menu-song "File"
 		Menu /menu-track-new "Add new track"
-			Item /add-track-audio-mono "Audio (mono)" image=hui:add
-			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
-			Item /add-track-midi "Midi" image=hui:add
-			Item /add-track-beats "Metronome" image=hui:add
-			Item /add-track-group "Group" image=hui:add
-		Item song_edit_samples "Manage samples"
-		Item show_mixing_console "Mixing"
-		Item song_properties "Properties"
+			Item /track-add-audio-mono "Audio (mono)" image=hui:add
+			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
+			Item /track-add-midi "Midi" image=hui:add
+			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-group "Group" image=hui:add
+		Item /song-edit-samples "Manage samples"
+		Item /show-mixing-console "Mixing"
+		Item /song-properties "Properties"

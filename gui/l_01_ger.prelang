@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-793
+811
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2382,8 +2382,62 @@ Auswahl einrasten: frei
 mini_bar/select-snap-mode-parts
 P
 Auswahl einrasten: Teile
+/add-track-audio-mono
+Audio (mono)
+
+/add-track-audio-stereo
+Audio (stereo)
+
+/add-track-beats
+Metronom
+
+/add-track-group
+Gruppe
+
+/add-track-midi
+Midi
+
+/menu-track-new
+Neue Spur
+
+/menu-song
+Datei
+
+/show-mixing-console
+Mischpult
+
+/song-edit-samples
+Samples verwalten
+
+/song-properties
+Eigenschaften
+
+/delete-track
+Löschen
+
+/menu-convert
+Konvertieren
+
+/menu-track
+Spur
+
+/track-convert-mono
+Mono
+
+/track-convert-stereo
+Stereo
+
+/track-edit-fx
+Effekte bearbeiten
+
+/track-edit-midi
+Midi bearbeiten
+
+/track-properties
+Eigenschaften
+
 // Num Language Strings
-227
+228
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -2839,3 +2893,5 @@ make main version
 zur Hauptversion ernennen
 mode: frequency/pitch
 Modus: Frequenz/Pitch
+playback range
+Abspielbereich

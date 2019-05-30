@@ -83,7 +83,7 @@ void ViewModeCapture::draw_post(Painter *c)
 	}
 	
 	int l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	view->draw_time_line(c, offset + l, (int)Selection::Type::PLAYBACK, view->colors.capture_marker, true);
+	view->draw_time_line(c, offset + l, (int)Selection::Type::PLAYBACK_CURSOR, view->colors.capture_marker, true);
 }
 
 Set<Track*> ViewModeCapture::prevent_playback()

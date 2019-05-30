@@ -26,12 +26,12 @@ Menu popup_bar_menu ""
 		Item track_edit_midi "Edit midi"
 		Item track_properties "Properties"
 	Menu song_menu "File"
-		Menu menu_track_new "Add new track"
-			Item add_audio_track_mono "Audio (mono)" image=hui:add
-			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
-			Item add_midi_track "Midi" image=hui:add
-			Item add_time_track "Rhythm" image=hui:add
-			Item add_group_track "Group" image=hui:add
+		Menu /menu-track-new "Add new track"
+			Item /add-track-audio-mono "Audio (mono)" image=hui:add
+			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
+			Item /add-track-midi "Midi" image=hui:add
+			Item /add-track-beats "Metronome" image=hui:add
+			Item /add-track-group "Group" image=hui:add
 		Item song_edit_samples "Manage samples"
 		Item show_mixing_console "Mixing"
 		Item song_properties "Properties"

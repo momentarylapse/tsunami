@@ -11,21 +11,21 @@ Menu popup_sample_menu ""
 		Item layer_mark_dominant "Mark selection as dominant"
 		Item layer_merge "Merge..."
 		Item delete_layer "Delete"
-	Menu menu_track "Track"
-		Item delete_track "Delete"
-		Menu convert_menu "Convert"
-			Item track_convert_mono "Mono"
-			Item track_convert_stereo "Stereo"
-		Item track_edit_fx "Edit effects"
-		Item track_edit_midi "Edit midi"
-		Item track_properties "Properties"
-	Menu song_menu "File"
-		Menu menu_track_new "Add new track"
-			Item add_audio_track_mono "Audio (mono)" image=hui:add
-			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
-			Item add_midi_track "Midi" image=hui:add
-			Item add_time_track "Rhythm" image=hui:add
-			Item add_group_track "Group" image=hui:add
-		Item song_edit_samples "Manage samples"
-		Item show_mixing_console "Mixing"
-		Item song_properties "Properties"
+	Menu /menu-track "Track"
+		Item /delete-track "Delete"
+		Menu /menu-convert "Convert"
+			Item /track-convert-mono "Mono"
+			Item /track-convert-stereo "Stereo"
+		Item /track-edit-fx "Edit effects"
+		Item /track-edit-midi "Edit midi"
+		Item /track-properties "Properties"
+	Menu /menu-song "File"
+		Menu /menu-track-new "Add new track"
+			Item /add-track-audio-mono "Audio (mono)" image=hui:add
+			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
+			Item /add-track-midi "Midi" image=hui:add
+			Item /add-track-beats "Metronome" image=hui:add
+			Item /add-track-group "Group" image=hui:add
+		Item /song-edit-samples "Manage samples"
+		Item /show-mixing-console "Mixing"
+		Item /song-properties "Properties"

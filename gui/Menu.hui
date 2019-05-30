@@ -10,7 +10,7 @@ Menu menu ""
 			Item export_selection "Save selection..." image=hui:save-as disabled
 			Item quick_export "Quick export" image=hui:save-as
 		Separator
-		Item song_properties "Properties" image=hui:properties
+		Item /song-properties "Properties" image=hui:properties
 		Separator
 		Item /exit "Exit" image=hui:quit
 	Menu menu_edit "Edit"
@@ -27,16 +27,16 @@ Menu menu ""
 		Item /delete "Delete" image=hui:delete
 		Separator
 		Item /settings "Settings..." image=hui:preferences
-	Menu menu_track "Track"
+	Menu /menu-track "Track"
 		Item track_import "Import from file..." image=hui:open
 		Item track_render "Render from selection"
 		Separator
-		Menu menu_track_new "Add new track"
-			Item add_audio_track_mono "Audio (mono)" image=hui:add
-			Item add_audio_track_stereo "Audio (stereo)" image=hui:add
-			Item add_midi_track "Midi" image=hui:add
-			Item add_time_track "Rhythm" image=hui:add
-			Item add_group_track "Group" image=hui:add
+		Menu /menu-track-new "Add new track"
+			Item /add-track-audio-mono "Audio (mono)" image=hui:add
+			Item /add-track-audio-stereo "Audio (stereo)" image=hui:add
+			Item /add-track-midi "Midi" image=hui:add
+			Item /add-track-beats "Metronome" image=hui:add
+			Item /add-track-group "Group" image=hui:add
 	Menu menu_time "Time"
 		Item delete_time "Delete selected interval" image=hui:delete
 		Item insert_time "Insert silence..." image=hui:add
@@ -59,7 +59,7 @@ Menu menu ""
 			Item view_midi_default "Default" checkable
 			Item view_midi_tab "Tabulature" checkable
 			Item view_midi_score "Score" checkable
-		Item show_mixing_console "Mixing" checkable
+		Item /show-mixing-console "Mixing" checkable
 		Item show_signal_chain "Signal chain" checkable
 		Item show_devices "Devices" checkable
 		Item show_fx_console "Effects"

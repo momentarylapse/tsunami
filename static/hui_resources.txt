@@ -974,7 +974,7 @@ Separator
 0
 0
 Item
-song_properties
+song-properties
 image=hui:properties
 7
 0
@@ -1076,7 +1076,7 @@ image=hui:preferences
 0
 0
 Menu
-menu_track
+menu-track
 
 2
 0
@@ -1100,37 +1100,37 @@ Separator
 0
 0
 Menu
-menu_track_new
+menu-track-new
 
 3
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
@@ -1268,7 +1268,7 @@ checkable
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 checkable
 1
 0
@@ -2849,37 +2849,37 @@ song_menu
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
@@ -2976,109 +2976,109 @@ delete_layer
 0
 0
 Menu
-menu_track
+menu-track
 
 7
 0
 5
 Item
-delete_track
+delete-track
 
 0
 0
 0
 Menu
-convert_menu
+menu-convert
 
 1
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 2
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 3
 0
 0
 Item
-track_properties
+track-properties
 
 4
 0
 0
 Menu
-song_menu
+menu-song
 
 8
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
@@ -3200,109 +3200,109 @@ Separator
 0
 0
 Menu
-menu_track
+menu-track
 
 8
 0
 5
 Item
-delete_track
+delete-track
 
 0
 0
 0
 Menu
-convert_menu
+menu-convert
 
 1
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 2
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 3
 0
 0
 Item
-track_properties
+track-properties
 
 4
 0
 0
 Menu
-song_menu
+menu-song
 
 9
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
@@ -3381,109 +3381,109 @@ delete_layer
 0
 0
 Menu
-menu_track
+menu-track
 
 7
 0
 5
 Item
-delete_track
+delete-track
 
 0
 0
 0
 Menu
-convert_menu
+menu-convert
 
 1
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 2
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 3
 0
 0
 Item
-track_properties
+track-properties
 
 4
 0
 0
 Menu
-song_menu
+menu-song
 
 8
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
@@ -3568,109 +3568,109 @@ delete_layer
 0
 0
 Menu
-menu_track
+menu-track
 
 8
 0
 5
 Item
-delete_track
+delete-track
 
 0
 0
 0
 Menu
-convert_menu
+menu-convert
 
 1
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 2
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 3
 0
 0
 Item
-track_properties
+track-properties
 
 4
 0
 0
 Menu
-song_menu
+menu-song
 
 9
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
@@ -3841,55 +3841,55 @@ Separator
 0
 0
 Menu
-menu_track_new
+menu-track-new
 
 2
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 3
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 4
 0
 0
 Item
-song_properties
+song-properties
 
 5
 0
@@ -3993,43 +3993,43 @@ Separator
 0
 0
 Item
-delete_track
+delete-track
 
 2
 0
 0
 Menu
-convert_menu
+menu-convert
 
 3
 0
 2
 Item
-track_convert_mono
+track-convert-mono
 
 0
 0
 0
 Item
-track_convert_stereo
+track-convert-stereo
 
 1
 0
 0
 Item
-track_edit_fx
+track-edit-fx
 
 4
 0
 0
 Item
-track_edit_midi
+track-edit-midi
 
 5
 0
 0
 Item
-track_properties
+track-properties
 
 6
 0
@@ -4101,61 +4101,61 @@ delete_layer
 0
 0
 Menu
-song_menu
+menu-song
 
 11
 0
 4
 Menu
-menu_track_new
+menu-track-new
 
 0
 0
 5
 Item
-add_audio_track_mono
+add-track-audio-mono
 image=hui:add
 0
 0
 0
 Item
-add_audio_track_stereo
+add-track-audio-stereo
 image=hui:add
 1
 0
 0
 Item
-add_midi_track
+add-track-midi
 image=hui:add
 2
 0
 0
 Item
-add_time_track
+add-track-beats
 image=hui:add
 3
 0
 0
 Item
-add_group_track
+add-track-group
 image=hui:add
 4
 0
 0
 Item
-song_edit_samples
+song-edit-samples
 
 1
 0
 0
 Item
-show_mixing_console
+show-mixing-console
 
 2
 0
 0
 Item
-song_properties
+song-properties
 
 3
 0
@@ -5700,8 +5700,23 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-620
+526
 // Text
+/add-track-audio-mono
+Audio (mono)
+
+/add-track-audio-stereo
+Audio (stereo)
+
+/add-track-beats
+Metronome
+
+/add-track-group
+Group
+
+/add-track-midi
+Midi
+
 /cancel
 Cancel
 
@@ -5715,6 +5730,9 @@ Copy
 dB
 
 /delete
+Delete
+
+/delete-track
 Delete
 
 /edit_curves
@@ -5740,6 +5758,18 @@ Track
 
 /exit
 Exit
+
+/menu-convert
+Convert
+
+/menu-song
+File
+
+/menu-track
+Track
+
+/menu-track-new
+Add new track
 
 /new
 New...
@@ -5789,8 +5819,32 @@ Save as...
 /settings
 Settings...
 
+/show-mixing-console
+Mixing
+
+/song-edit-samples
+Manage samples
+
+/song-properties
+Properties
+
 /stop
 Stop
+
+/track-convert-mono
+Mono
+
+/track-convert-stereo
+Stereo
+
+/track-edit-fx
+Edit effects
+
+/track-edit-midi
+Edit midi
+
+/track-properties
+Properties
 
 /undo
 Undo
@@ -5990,26 +6044,11 @@ Marker
 menu/about
 About
 
-menu/add_audio_track_mono
-Audio (mono)
-
-menu/add_audio_track_stereo
-Audio (stereo)
-
 menu/add_bars
 Add bars...
 
-menu/add_group_track
-Group
-
-menu/add_midi_track
-Midi
-
 menu/add_pause
 Add pause...
-
-menu/add_time_track
-Rhythm
 
 menu/bars_label
 Bars
@@ -6098,12 +6137,6 @@ Samples
 menu/menu_time
 Time
 
-menu/menu_track
-Track
-
-menu/menu_track_new
-Add new track
-
 menu/menu_view
 View
 
@@ -6164,14 +6197,8 @@ Effects
 menu/show_log
 Messages
 
-menu/show_mixing_console
-Mixing
-
 menu/show_signal_chain
 Signal chain
-
-menu/song_properties
-Properties
 
 menu/stop
 Stop
@@ -6563,26 +6590,11 @@ Edit midi
 popup_all_menu/track_properties
 Properties
 
-popup_bar_menu/add_audio_track_mono
-Audio (mono)
-
-popup_bar_menu/add_audio_track_stereo
-Audio (stereo)
-
 popup_bar_menu/add_bars
 Add bars...
 
-popup_bar_menu/add_group_track
-Group
-
-popup_bar_menu/add_midi_track
-Midi
-
 popup_bar_menu/add_pause
 Add pause...
-
-popup_bar_menu/add_time_track
-Rhythm
 
 popup_bar_menu/bar_menu_header
 Bar
@@ -6626,9 +6638,6 @@ Midi mode
 popup_bar_menu/menu_track
 Track
 
-popup_bar_menu/menu_track_new
-Add new track
-
 popup_bar_menu/menu_version
 Version
 
@@ -6665,34 +6674,13 @@ Edit midi
 popup_bar_menu/track_properties
 Properties
 
-popup_buffer_menu/add_audio_track_mono
-Audio (mono)
-
-popup_buffer_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_buffer_menu/add_group_track
-Group
-
-popup_buffer_menu/add_midi_track
-Midi
-
-popup_buffer_menu/add_time_track
-Rhythm
-
 popup_buffer_menu/buffer_menu_header
 Audio buffer
-
-popup_buffer_menu/convert_menu
-Convert
 
 popup_buffer_menu/delete_buffer
 Delete
 
 popup_buffer_menu/delete_layer
-Delete
-
-popup_buffer_menu/delete_track
 Delete
 
 popup_buffer_menu/layer_add
@@ -6707,44 +6695,11 @@ Merge...
 popup_buffer_menu/make_buffer_movable
 Make movable
 
-popup_buffer_menu/menu_track
-Track
-
-popup_buffer_menu/menu_track_new
-Add new track
-
 popup_buffer_menu/menu_version
 Version
 
-popup_buffer_menu/show_mixing_console
-Mixing
-
-popup_buffer_menu/song_edit_samples
-Manage samples
-
-popup_buffer_menu/song_menu
-File
-
-popup_buffer_menu/song_properties
-Properties
-
 popup_buffer_menu/track_add_marker
 Add marker
-
-popup_buffer_menu/track_convert_mono
-Mono
-
-popup_buffer_menu/track_convert_stereo
-Stereo
-
-popup_buffer_menu/track_edit_fx
-Edit effects
-
-popup_buffer_menu/track_edit_midi
-Edit midi
-
-popup_buffer_menu/track_properties
-Properties
 
 popup_fx_menu/delete
 Delete
@@ -6758,28 +6713,7 @@ Save parameters
 popup_fx_menu/show_large
 Show large
 
-popup_layer_menu/add_audio_track_mono
-Audio (mono)
-
-popup_layer_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_layer_menu/add_group_track
-Group
-
-popup_layer_menu/add_midi_track
-Midi
-
-popup_layer_menu/add_time_track
-Rhythm
-
-popup_layer_menu/convert_menu
-Convert
-
 popup_layer_menu/delete_layer
-Delete
-
-popup_layer_menu/delete_track
 Delete
 
 popup_layer_menu/header
@@ -6803,64 +6737,13 @@ Tabulature
 popup_layer_menu/menu_midi_mode
 Midi mode
 
-popup_layer_menu/menu_track
-Track
-
-popup_layer_menu/menu_track_new
-Add new track
-
-popup_layer_menu/show_mixing_console
-Mixing
-
-popup_layer_menu/song_edit_samples
-Manage samples
-
-popup_layer_menu/song_menu
-File
-
-popup_layer_menu/song_properties
-Properties
-
-popup_layer_menu/track_convert_mono
-Mono
-
-popup_layer_menu/track_convert_stereo
-Stereo
-
-popup_layer_menu/track_edit_fx
-Edit effects
-
 popup_layer_menu/track_edit_midi
 Edit midi
-
-popup_layer_menu/track_properties
-Properties
-
-popup_marker_menu/add_audio_track_mono
-Audio (mono)
-
-popup_marker_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_marker_menu/add_group_track
-Group
-
-popup_marker_menu/add_midi_track
-Midi
-
-popup_marker_menu/add_time_track
-Rhythm
-
-popup_marker_menu/convert_menu
-Convert
 
 popup_marker_menu/delete_layer
 Delete
 
 popup_marker_menu/delete_marker
-Delete
-
-popup_marker_menu/delete_track
 Delete
 
 popup_marker_menu/edit_marker
@@ -6881,64 +6764,10 @@ Marker
 popup_marker_menu/marker_resize
 Resize
 
-popup_marker_menu/menu_track
-Track
-
-popup_marker_menu/menu_track_new
-Add new track
-
 popup_marker_menu/menu_version
 Version
 
-popup_marker_menu/show_mixing_console
-Mixing
-
-popup_marker_menu/song_edit_samples
-Manage samples
-
-popup_marker_menu/song_menu
-File
-
-popup_marker_menu/song_properties
-Properties
-
-popup_marker_menu/track_convert_mono
-Mono
-
-popup_marker_menu/track_convert_stereo
-Stereo
-
-popup_marker_menu/track_edit_fx
-Edit effects
-
-popup_marker_menu/track_edit_midi
-Edit midi
-
-popup_marker_menu/track_properties
-Properties
-
-popup_sample_menu/add_audio_track_mono
-Audio (mono)
-
-popup_sample_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_sample_menu/add_group_track
-Group
-
-popup_sample_menu/add_midi_track
-Midi
-
-popup_sample_menu/add_time_track
-Rhythm
-
-popup_sample_menu/convert_menu
-Convert
-
 popup_sample_menu/delete_layer
-Delete
-
-popup_sample_menu/delete_track
 Delete
 
 popup_sample_menu/insert_sample
@@ -6953,12 +6782,6 @@ Mark selection as dominant
 popup_sample_menu/layer_merge
 Merge...
 
-popup_sample_menu/menu_track
-Track
-
-popup_sample_menu/menu_track_new
-Add new track
-
 popup_sample_menu/menu_version
 Version
 
@@ -6971,35 +6794,8 @@ Samples
 popup_sample_menu/sample_properties
 Properties
 
-popup_sample_menu/show_mixing_console
-Mixing
-
-popup_sample_menu/song_edit_samples
-Manage samples
-
-popup_sample_menu/song_menu
-File
-
-popup_sample_menu/song_properties
-Properties
-
 popup_sample_menu/track_add_marker
 Add marker
-
-popup_sample_menu/track_convert_mono
-Mono
-
-popup_sample_menu/track_convert_stereo
-Stereo
-
-popup_sample_menu/track_edit_fx
-Edit effects
-
-popup_sample_menu/track_edit_midi
-Edit midi
-
-popup_sample_menu/track_properties
-Properties
 
 popup_signal_chain_menu/add
 Add Module
@@ -7058,35 +6854,8 @@ Module
 popup_signal_module_menu/signal_module_delete
 Delete
 
-popup_song_menu/add_audio_track_mono
-Audio (mono)
-
-popup_song_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_song_menu/add_group_track
-Group
-
-popup_song_menu/add_midi_track
-Midi
-
-popup_song_menu/add_time_track
-Rhythm
-
-popup_song_menu/menu_track_new
-Add new track
-
-popup_song_menu/show_mixing_console
-Mixing
-
-popup_song_menu/song_edit_samples
-Manage samples
-
 popup_song_menu/song_menu_header
 File
-
-popup_song_menu/song_properties
-Properties
 
 popup_time_track_menu/add_bars
 Add bars...
@@ -7121,28 +6890,7 @@ Edit effects
 popup_time_track_menu/track_properties
 Properties
 
-popup_track_menu/add_audio_track_mono
-Audio (mono)
-
-popup_track_menu/add_audio_track_stereo
-Audio (stereo)
-
-popup_track_menu/add_group_track
-Group
-
-popup_track_menu/add_midi_track
-Midi
-
-popup_track_menu/add_time_track
-Rhythm
-
-popup_track_menu/convert_menu
-Convert
-
 popup_track_menu/delete_layer
-Delete
-
-popup_track_menu/delete_track
 Delete
 
 popup_track_menu/layer_add
@@ -7166,44 +6914,14 @@ Tabulature
 popup_track_menu/menu_midi_mode
 Midi mode
 
-popup_track_menu/menu_track_new
-Add new track
-
 popup_track_menu/menu_version
 Version
-
-popup_track_menu/show_mixing_console
-Mixing
-
-popup_track_menu/song_edit_samples
-Manage samples
-
-popup_track_menu/song_menu
-File
-
-popup_track_menu/song_properties
-Properties
 
 popup_track_menu/track_add_marker
 Add marker
 
-popup_track_menu/track_convert_mono
-Mono
-
-popup_track_menu/track_convert_stereo
-Stereo
-
-popup_track_menu/track_edit_fx
-Edit effects
-
-popup_track_menu/track_edit_midi
-Edit midi
-
 popup_track_menu/track_menu_header
 Track
-
-popup_track_menu/track_properties
-Properties
 
 progress_cancelable_dialog/progress_cancelable_dialog
 in Arbeit
@@ -7568,8 +7286,23 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-792
+810
 // Text
+/add-track-audio-mono
+Audio (mono)
+
+/add-track-audio-stereo
+Audio (stereo)
+
+/add-track-beats
+Metronom
+
+/add-track-group
+Gruppe
+
+/add-track-midi
+Midi
+
 /bpm
 Bpm
 
@@ -7586,6 +7319,9 @@ Kopieren
 dB
 
 /delete
+Löschen
+
+/delete-track
 Löschen
 
 /edit_bars
@@ -7620,6 +7356,18 @@ Spur
 
 /exit
 Beenden
+
+/menu-convert
+Konvertieren
+
+/menu-song
+Datei
+
+/menu-track
+Spur
+
+/menu-track-new
+Neue Spur
 
 /ms
 ms
@@ -7672,8 +7420,32 @@ Speichern unter...
 /settings
 Einstellungen
 
+/show-mixing-console
+Mischpult
+
+/song-edit-samples
+Samples verwalten
+
+/song-properties
+Eigenschaften
+
 /stop
 Stopp
+
+/track-convert-mono
+Mono
+
+/track-convert-stereo
+Stereo
+
+/track-edit-fx
+Effekte bearbeiten
+
+/track-edit-midi
+Midi bearbeiten
+
+/track-properties
+Eigenschaften
 
 /undo
 Rückgängig
@@ -9947,7 +9719,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-227
+228
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10377,6 +10149,8 @@ open message.txt
 message.txt öffnen
 output: 
 Ausgang: 
+playback range
+Abspielbereich
 please note, that portaudio does not support refreshing the device list after program launch
 Geräte, die nach Programmstart angeschlossen werden, können von Portaudio leider nicht erkannt werden!
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m

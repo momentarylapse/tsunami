@@ -1299,7 +1299,7 @@ void AudioView::draw_song(Painter *c)
 
 	// playing/capturing position
 	if (is_playback_active())
-		draw_time_line(c, playback_pos(), (int)Selection::Type::PLAYBACK, colors.preview_marker, true);
+		draw_time_line(c, playback_pos(), (int)Selection::Type::PLAYBACK_CURSOR, colors.preview_marker, true);
 
 	mode->draw_post(c);
 

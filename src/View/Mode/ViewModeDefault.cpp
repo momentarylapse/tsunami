@@ -215,13 +215,13 @@ void prepare_menu(hui::Menu *menu, Selection* hover)
 	menu->check("layer_midi_mode_classical", hover->vlayer->midi_mode == MidiMode::CLASSICAL);
 	menu->check("layer_midi_mode_tab", hover->vlayer->midi_mode == MidiMode::TAB);
 
-	menu->enable("track_edit_midi", hover->track->type == SignalType::MIDI);
+	menu->enable("track-edit-midi", hover->track->type == SignalType::MIDI);
 	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
 
 	// convert
-	menu->enable("convert_menu", hover->track->type == SignalType::AUDIO);
-	menu->enable("track_convert_stereo", hover->track->channels == 1);
-	menu->enable("track_convert_mono", hover->track->channels == 2);
+	menu->enable("menu-convert", hover->track->type == SignalType::AUDIO);
+	menu->enable("track-convert-stereo", hover->track->channels == 1);
+	menu->enable("track-convert-mono", hover->track->channels == 2);
 
 	menu->enable("layer_merge", hover->layer->track->layers.num > 1);
 	menu->enable("layer_mark_dominant", hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
@@ -336,7 +336,7 @@ void ViewModeDefault::on_mouse_move()
 			w = - e->dx - 2*r;
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
-	}else if (hover->type == Selection::Type::PLAYBACK){
+	}else if (hover->type == Selection::Type::PLAYBACK_CURSOR){
 		view->renderer->set_pos(hover->pos);
 		_force_redraw_ = true;
 	}else if (hover->type == Selection::Type::SAMPLE){
@@ -688,6 +688,8 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("bar gap"));
 	else if (hover->type == Selection::Type::PLAYBACK_LOCK)
 		view->draw_cursor_hover(c, _("lock playback range"));
+	else if (hover->type == Selection::Type::PLAYBACK_RANGE)
+		view->draw_cursor_hover(c, _("playback range"));
 
 	if (view->selection_mode != view->SelectionMode::NONE){
 		if (view->sel.range.length > 0){
@@ -747,7 +749,7 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->get_key(hui::KEY_SHIFT))){
 		if (view->is_playback_active()){
 			if (view->mouse_over_time(view->playback_pos())){
-				s.type = Selection::Type::PLAYBACK;
+				s.type = Selection::Type::PLAYBACK_CURSOR;
 				return s;
 			}
 		}
@@ -759,13 +761,16 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
-		s.type = Selection::Type::TIME;
+		if (view->playback_wish_range.is_inside(s.pos))
+			s.type = Selection::Type::PLAYBACK_RANGE;
+		else
+			s.type = Selection::Type::TIME;
 		return s;
 	}
 
 	// track header buttons?
 	if (s.track){
-		AudioViewTrack *t = s.vtrack;
+		auto *t = s.vtrack;
 		int x = 5;
 		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = Selection::Type::TRACK_BUTTON_MUTE;
@@ -906,7 +911,7 @@ void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 	if (view->is_playback_active()){
 		if (view->renderer->range().is_inside(pos)){
 			session->signal_chain->set_pos(pos);
-			hover->type = Selection::Type::PLAYBACK;
+			hover->type = Selection::Type::PLAYBACK_CURSOR;
 			view->force_redraw();
 			return;
 		}else{

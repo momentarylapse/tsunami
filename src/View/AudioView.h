@@ -254,7 +254,7 @@ public:
 
 	rect playback_lock_button;
 	bool playback_range_locked;
-	Range playback_lock_range;
+	Range playback_wish_range;
 
 	ViewPort cam;
 

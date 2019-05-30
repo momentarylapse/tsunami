@@ -489,6 +489,10 @@ void AudioView::update_selection()
 {
 	sel.range = sel.range.canonical();
 
+	if (!playback_range_locked){
+		playback_wish_range = sel.range;
+	}
+
 
 	renderer->set_range(get_playback_selection(false));
 	if (is_playback_active()){
@@ -520,8 +524,8 @@ bool AudioView::mouse_over_time(int pos)
 
 Range AudioView::get_playback_selection(bool for_recording)
 {
-	if (playback_range_locked)
-		return playback_lock_range;
+	if (playback_wish_range.length > 0)
+		return playback_wish_range;
 	if (sel.range.empty()){
 		if (for_recording)
 			return Range(sel.range.start(), 0x70000000);
@@ -1154,10 +1158,10 @@ void AudioView::draw_time_scale(Painter *c)
 	grid_painter->draw_time_numbers(c);
 
 	// playback lock range
-	if (playback_range_locked){
+	if (playback_wish_range.length > 0){
 		c->set_color(AudioView::colors.preview_marker);
 		float x0, x1;
-		cam.range2screen_clip(playback_lock_range, area, x0, x1);
+		cam.range2screen_clip(playback_wish_range, area, x0, x1);
 		c->draw_rect(x0, area.y1, x1-x0, 5);
 	}
 

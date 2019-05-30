@@ -123,8 +123,8 @@ void ViewModeDefault::on_left_button_down()
 	}else if (view->hover.type == Selection::Type::PLAYBACK_LOCK){
 		if (view->playback_range_locked){
 			view->playback_range_locked = false;
+			view->playback_wish_range = view->sel.range;
 		}else{
-			view->playback_lock_range = view->sel.range;
 			view->playback_range_locked = true;
 		}
 	}

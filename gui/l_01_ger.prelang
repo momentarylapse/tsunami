@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-851
+852
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2555,6 +2555,9 @@ Datei
 
 popup-menu-track/header
 Spur
+
+popup-menu-bar-gap/header
+Taktzwischenraum
 
 // Num Language Strings
 228

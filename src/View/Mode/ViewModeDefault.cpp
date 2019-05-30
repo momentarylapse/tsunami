@@ -254,19 +254,13 @@ void ViewModeDefault::on_right_button_down()
 		view->menu_sample->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR){
 		prepare_menu(view->menu_bar, hover);
-		view->menu_bar->enable("delete", true);
-		view->menu_bar->enable("bars-edit", true);
-		view->menu_bar->enable("bars-scale", true);
 		view->menu_bar->open_popup(view->win);
 	}else if (hover->type == Selection::Type::MARKER){
 		prepare_menu(view->menu_marker, hover);
 		view->menu_marker->open_popup(view->win);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		prepare_menu(view->menu_bar, hover);
-		view->menu_bar->enable("delete", false);
-		view->menu_bar->enable("bars-edit", false);
-		view->menu_bar->enable("bars-scale", false);
-		view->menu_bar->open_popup(view->win);
+		prepare_menu(view->menu_bar_gap, hover);
+		view->menu_bar_gap->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		prepare_menu(view->menu_layer, hover);
 		view->menu_layer->open_popup(view->win);

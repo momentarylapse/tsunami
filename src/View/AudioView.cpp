@@ -343,9 +343,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_track = hui::CreateResourceMenu("popup-menu-track");
 	menu_layer = hui::CreateResourceMenu("popup-menu-layer");
 	//menu_time_track = hui::CreateResourceMenu("popup_time_track_menu");
+	menu_playback_range = nullptr;
 	menu_sample = hui::CreateResourceMenu("popup-menu-sample");
 	menu_marker = hui::CreateResourceMenu("popup-menu-marker");
 	menu_bar = hui::CreateResourceMenu("popup-menu-bar");
+	menu_bar_gap = hui::CreateResourceMenu("popup-menu-bar-gap");
 	menu_buffer = hui::CreateResourceMenu("popup-menu-buffer");
 
 	//ForceRedraw();

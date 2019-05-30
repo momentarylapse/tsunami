@@ -617,7 +617,8 @@ void AudioView::on_mouse_move()
 void AudioView::on_left_button_down()
 {
 	set_mouse();
-	mode->on_left_button_down();
+	if (!hui::GetEvent()->just_focused)
+		mode->on_left_button_down();
 
 	force_redraw();
 	update_menu();

@@ -107,6 +107,7 @@ void win_set_input(Window *win, T *event)
 	}else{
 		win->input.inside_smart = win->input.inside;
 	}
+	win->input.just_focused = false;
 }
 
 gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
@@ -154,7 +155,6 @@ gboolean OnGtkAreaMouseLeave(GtkWidget *widget, GdkEventCrossing *event, gpointe
 {
 	Control *c = reinterpret_cast<Control*>(user_data);
 	win_set_input(c->panel->win, event);
-
 	c->notify("hui:mouse-leave", false);
 	return false;
 }
@@ -179,8 +179,19 @@ gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 	else
 		msg += "-button-up";
 
-	gtk_widget_grab_focus(widget);
+	if (!gtk_widget_has_focus(widget)){
+		gtk_widget_grab_focus(widget);
+		c->panel->win->input.just_focused = true;
+	}
 	c->notify(msg, false);
+	return false;
+}
+
+gboolean OnGtkAreaFocusIn(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	Control *c = reinterpret_cast<Control*>(user_data);
+	win_set_input(c->panel->win, event);
+	c->notify("hui:focus-in", false);
 	return false;
 }
 
@@ -301,12 +312,12 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButton), this);
 	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButton), this);
 	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&OnGtkAreaMouseWheel), this);
-	//g_signal_connect(G_OBJECT(w), "focus-in-event", G_CALLBACK(&focus_in_event), this);
+//	g_signal_connect(G_OBJECT(da), "focus-in-event", G_CALLBACK(&OnGtkAreaFocusIn), this);
 	//int mask;
 	//g_object_get(G_OBJECT(da), "events", &mask, NULL);
 	gtk_widget_add_events(da, GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
 	gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-	gtk_widget_add_events(da, GDK_POINTER_MOTION_MASK);// | GDK_POINTER_MOTION_HINT_MASK); // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
+	gtk_widget_add_events(da, GDK_POINTER_MOTION_MASK);// | GDK_FOCUS_CHANGE_MASK);// | GDK_POINTER_MOTION_HINT_MASK); // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
 	gtk_widget_add_events(da, GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
 	gtk_widget_add_events(da, GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK);
 	gtk_widget_add_events(da, GDK_SMOOTH_SCROLL_MASK);// | GDK_TOUCHPAD_GESTURE_MASK;

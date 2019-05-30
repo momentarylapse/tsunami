@@ -65,6 +65,7 @@ Event::Event(const string &_id, const string &_message)
 	row = row_target = 0;
 	rbut = mbut = lbut = false;
 	column = 0;
+	just_focused = false;
 }
 
 bool Event::match(const string &_id, const string &_message) const

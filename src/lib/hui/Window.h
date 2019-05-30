@@ -43,6 +43,7 @@ struct InputData
 	bool inside, inside_smart;
 	bool lb, mb, rb; // buttons
 	int row, column, row_target;
+	bool just_focused;
 	// keyboard
 	bool key[256];
 	int key_code;

@@ -45,6 +45,7 @@ void InputData::reset()
 	memset(key, 0, sizeof(key));
 	key_buffer.clear();
 	key_code = 0;
+	just_focused = false;
 }
 
 Window::Window()

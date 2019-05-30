@@ -188,6 +188,7 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed)
 	e->row = win->input.row;
 	e->row_target = win->input.row_target;
 	e->column = win->input.column;
+	e->just_focused = win->input.just_focused;
 	_hui_event_ = *e;
 	if (e->id.num > 0)
 		_set_cur_id_(e->id);

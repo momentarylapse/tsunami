@@ -39,6 +39,7 @@ class Event
 	int width, height;
 	bool lbut, mbut, rbut;
 	int row, column, row_target;
+	bool just_focused;
 	Event(){}
 	Event(const string &id, const string &message);
 

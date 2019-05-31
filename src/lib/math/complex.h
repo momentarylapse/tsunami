@@ -32,9 +32,11 @@ public:
 	float _cdecl abs_sqr() const;
 	complex _cdecl bar() const;
 	string _cdecl str() const;
+
+	static const complex ZERO;
+	static const complex ONE;
+	static const complex I;
 };
 
-// complex
-const complex c_i = complex(0, 1);
 
 #endif

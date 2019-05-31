@@ -20,6 +20,9 @@
 //------------------------------------------------------------------------------------------------//
 
 
+const float f_m_id[16] = { 1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1 };
+const matrix matrix::ID = matrix(f_m_id);
+
 matrix::matrix(const float f[16])
 {
 	for (int i=0;i<16;i++)
@@ -151,7 +154,7 @@ matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 // identity (no transformation: m*v=v)
 void MatrixIdentity(matrix &m)
 {
-	m = m_id;
+	m = matrix::ID;
 	/*
 	m._00=1;	m._01=0;	m._02=0;	m._03=0;
 	m._10=0;	m._11=1;	m._12=0;	m._13=0;

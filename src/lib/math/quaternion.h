@@ -35,6 +35,8 @@ public:
 	// kaba
 	void _cdecl imul(const quaternion &q);
 	quaternion _cdecl mul(const quaternion &q) const;
+
+	static const quaternion ID;
 };
 // qaternions
 void _cdecl QuaternionRotationA(quaternion &q, const vector &axis, float w);
@@ -45,7 +47,5 @@ void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const qua
 void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const quaternion &q2, const quaternion &q3, const quaternion &q4, float t);
 void _cdecl QuaternionScale(quaternion &q, float f);
 void _cdecl QuaternionDrag(quaternion &q, const vector &up, const vector &dang, bool reset_z);
-
-const quaternion q_id = quaternion(1, v_0);
 
 #endif

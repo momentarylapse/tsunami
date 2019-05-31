@@ -6,6 +6,8 @@
 //------------------------------------------------------------------------------------------------//
 
 
+const quaternion quaternion::ID = quaternion(1, v_0);
+
 quaternion::quaternion(const float w, const vector &v)
 {
 	this->w = w;
@@ -307,7 +309,7 @@ void QuaternionDrag(quaternion &q, const vector &up, const vector &dang, bool re
 	quaternion T, TT;
 	bool is_not_z = (up.x != 0) || (up.y != 0) || (up.z < 0);
 	if (is_not_z){
-		vector ax = e_z ^ up;
+		vector ax = vector::EZ ^ up;
 		ax.normalize();
 		vector up2 = up;
 		up2.normalize();

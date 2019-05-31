@@ -21,9 +21,9 @@ public:
 
 	bool _cdecl operator==(const rect &r) const;
 	bool _cdecl operator!=(const rect &r) const;
-};
 
-// rects
-const rect r_id = rect(0, 1, 0, 1);
+	static const rect ID;
+	static const rect EMPTY;
+};
 
 #endif

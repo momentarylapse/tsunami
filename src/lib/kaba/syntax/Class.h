@@ -11,8 +11,9 @@ class Class;
 class Function;
 
 
-struct ClassElement
+class ClassElement
 {
+public:
 	string name;
 	const Class *type;
 	long long offset;
@@ -23,7 +24,9 @@ struct ClassElement
 };
 
 // TODO: use Function instead!
-struct ClassFunction{
+class ClassFunction
+{
+public:
 	string name;
 	Script *script;
 	Function *func;
@@ -39,7 +42,8 @@ struct ClassFunction{
 
 typedef void *VirtualTable;
 
-class Class{
+class Class
+{
 public:
 	//Class();
 	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr);

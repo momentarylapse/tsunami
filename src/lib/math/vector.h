@@ -52,6 +52,8 @@ public:
 	bool _cdecl between(const vector &a, const vector &b) const;
 	float _cdecl factor_between(const vector &a, const vector &b) const;
 	bool _cdecl bounding_cube(const vector &a, float r) const;
+
+	static const vector ZERO, EX, EY, EZ;
 };
 // vectors
 float _cdecl VecDotProduct(const vector &v1, const vector &v2);
@@ -61,10 +63,8 @@ vector _cdecl VecAngInterpolate(const vector &ang1, const vector &ang2, float t)
 float _cdecl VecLineDistance(const vector &p, const vector &l1, const vector &l2);
 vector _cdecl VecLineNearestPoint(const vector &p, const vector &l1, const vector &l2);
 
+
 const vector v_0 = vector(0, 0, 0);
-const vector e_x = vector(1, 0, 0);
-const vector e_y = vector(0, 1, 0);
-const vector e_z = vector(0, 0, 1);
 
 
 float _vec_length_(const vector &v);

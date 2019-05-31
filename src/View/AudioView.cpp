@@ -1168,7 +1168,7 @@ void AudioView::draw_time_scale(Painter *c)
 	}
 
 	// playback lock symbol
-	playback_lock_button = rect(0,0,0,0);
+	playback_lock_button = rect::EMPTY;
 	if (playback_range_locked){
 		float x = cam.sample2screen(get_playback_selection(false).end());
 		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + TIME_SCALE_HEIGHT);
@@ -1180,7 +1180,7 @@ void AudioView::draw_time_scale(Painter *c)
 	}
 
 	// playback loop symbol
-	playback_loop_button = rect(0,0,0,0);
+	playback_loop_button = rect::EMPTY;
 	if (playback_loop){
 		float x = cam.sample2screen(get_playback_selection(false).end());
 		playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + TIME_SCALE_HEIGHT);

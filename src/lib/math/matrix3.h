@@ -40,6 +40,9 @@ public:
 	void _cdecl imul(const matrix3 &m);
 	matrix3 _cdecl mul(const matrix3 &m) const;
 	vector _cdecl mul_v(const vector &v) const;
+
+
+	static const matrix3 ID;
 };
 
 // matrix3s
@@ -49,9 +52,6 @@ void _cdecl Matrix3Transpose(matrix3 &mo, const matrix3 &mi);
 void _cdecl Matrix3Rotation(matrix3 &m, const vector &ang);
 void _cdecl Matrix3RotationQ(matrix3 &m, const quaternion &q);
 
-
-const float f_m3_id[9] = { 1,0,0 , 0,1,0 , 0,0,1 };
-const matrix m3_id = matrix(f_m3_id);
 
 
 #endif

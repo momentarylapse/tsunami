@@ -47,6 +47,8 @@ public:
 	void _cdecl imul(const matrix &m);
 	matrix _cdecl mul(const matrix &m) const;
 	vector _cdecl mul_v(const vector &v) const;
+
+	static const matrix ID;
 };
 // matrices
 void _cdecl MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1);
@@ -67,8 +69,6 @@ void _cdecl MatrixPerspective(matrix &m, float fovy, float aspect, float z_near,
 matrix _cdecl MatrixMultiply2(const matrix &m2,const matrix &m1);
 matrix _cdecl MatrixRotation2(const vector &ang);
 
-const float f_m_id[16] = { 1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1 };
-const matrix m_id = matrix(f_m_id);
 
 
 inline vector *_matrix_get_translation_(const matrix &m)

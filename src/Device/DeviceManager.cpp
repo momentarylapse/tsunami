@@ -19,7 +19,6 @@
 
 #if HAS_LIB_PORTAUDIO
 #include <portaudio.h>
-#pragma comment(lib,"portaudio_x86.lib")
 #endif
 
 #if HAS_LIB_ALSA

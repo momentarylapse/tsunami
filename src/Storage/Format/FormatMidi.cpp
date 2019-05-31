@@ -114,7 +114,7 @@ void FormatMidi::load_song(StorageOperationData *od)
 		if (hsize > 6)
 			f->seek(hsize - 6);
 
-		int ticks_per_beat;
+		int ticks_per_beat = 4;
 
 		if ((time_division & 0x8000) > 0){
 

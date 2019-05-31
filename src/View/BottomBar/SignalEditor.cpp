@@ -217,7 +217,7 @@ public:
 
 		p->set_color(signal_color(c->type));
 
-		complex qq;
+		complex qq = complex::ZERO;
 		for (float t=0; t<1.0f; t+=0.025f){
 			complex q = inter.get(t);
 			if (t > 0)
@@ -227,7 +227,7 @@ public:
 		complex m = inter.get(0.5f);
 		complex d = inter.getTang(0.5);
 		d /= d.abs();
-		complex e = d * c_i;
+		complex e = d * complex::I;
 		Array<complex> pp;
 		float arrow_length = min(length / 7, 18.0f);
 		pp.add(m + d * arrow_length);

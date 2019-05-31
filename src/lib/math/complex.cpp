@@ -1,6 +1,10 @@
 #include "math.h"
 
 
+const complex complex::ZERO = complex(0, 0);
+const complex complex::ONE = complex(1, 0);
+const complex complex::I = complex(0, 1);
+
 complex::complex(float x, float y)
 {
 	this->x = x;

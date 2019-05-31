@@ -20,7 +20,7 @@ TrackHeightManager::TrackHeightManager()
 	animating = false;
 	t = 0;
 	dirty = true;
-	render_area = r_id;
+	render_area = rect::ID;
 }
 
 

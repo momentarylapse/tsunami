@@ -5,6 +5,11 @@
 //------------------------------------------------------------------------------------------------//
 
 
+const vector vector::ZERO = vector(0, 0, 0);
+const vector vector::EX = vector(1, 0, 0);
+const vector vector::EY = vector(0, 1, 0);
+const vector vector::EZ = vector(0, 0, 1);
+
 vector::vector(float x, float y, float z)
 {
 	this->x = x;
@@ -171,7 +176,7 @@ void vector::normalize()
 	if (l > 0)
 		*this /= l;
 	else
-		*this = e_z;
+		*this = vector::EZ;
 }
 
 // cos( Winkel zwischen Vektoren) * Laenge1 * Laenge2

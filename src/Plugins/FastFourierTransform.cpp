@@ -26,9 +26,9 @@ inline void fft_c2c_4(complex *in, complex *out, int stride)
 	complex o0 = in[stride] + in[stride*3];
 	complex o1 = in[stride] - in[stride*3];
 	out[0] = e0 + o0;
-	out[1] = e1 - o1 * c_i;
+	out[1] = e1 - o1 * complex::I;
 	out[2] = e0 - o0;
-	out[3] = e1 + o1 * c_i;
+	out[3] = e1 + o1 * complex::I;
 }
 
 inline void fft_c2c_inv_4(complex *in, complex *out, int stride)
@@ -38,9 +38,9 @@ inline void fft_c2c_inv_4(complex *in, complex *out, int stride)
 	complex o0 = in[stride] + in[stride*3];
 	complex o1 = in[stride] - in[stride*3];
 	out[0] = e0 + o0;
-	out[1] = e1 + o1 * c_i;
+	out[1] = e1 + o1 * complex::I;
 	out[2] = e0 - o0;
-	out[3] = e1 - o1 * c_i;
+	out[3] = e1 - o1 * complex::I;
 }
 
 static const complex exp_8[4] = {

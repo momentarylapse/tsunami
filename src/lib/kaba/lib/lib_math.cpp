@@ -1018,17 +1018,17 @@ void SIAddPackageMath()
 	// float
 	add_const("pi",  TypeFloat32, *(void**)&pi);
 	// complex
-	add_const("c_i", TypeComplex, (void**)&c_i);
+	add_const("c_i", TypeComplex, (void**)&complex::I);
 	// vector
-	add_const("v_0", TypeVector, (void*)&v_0);
-	add_const("e_x", TypeVector, (void*)&e_x);
-	add_const("e_y", TypeVector, (void*)&e_y);
-	add_const("e_z", TypeVector, (void*)&e_z);
+	add_const("v_0", TypeVector, (void*)&vector::ZERO);
+	add_const("e_x", TypeVector, (void*)&vector::EX);
+	add_const("e_y", TypeVector, (void*)&vector::EY);
+	add_const("e_z", TypeVector, (void*)&vector::EZ);
 	// matrix
-	add_const("m_id", TypeMatrix, (void*)&m_id);
-	add_const("m3_id", TypeMatrix3, (void*)&m3_id);
+	add_const("m_id", TypeMatrix, (void*)&matrix::ID);
+	add_const("m3_id", TypeMatrix3, (void*)&matrix3::ID);
 	// quaternion
-	add_const("q_id", TypeQuaternion, (void*)&q_id);
+	add_const("q_id", TypeQuaternion, (void*)&quaternion::ID);
 	// color
 	add_const("White",  TypeColor, (void*)&White);
 	add_const("Black",  TypeColor, (void*)&Black);
@@ -1039,7 +1039,7 @@ void SIAddPackageMath()
 	add_const("Yellow", TypeColor, (void*)&Yellow);
 	add_const("Orange", TypeColor, (void*)&Orange);
 	// rect
-	add_const("r_id", TypeRect, (void*)&r_id);
+	add_const("r_id", TypeRect, (void*)&rect::ID);
 
 
 

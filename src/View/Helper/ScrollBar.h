@@ -19,7 +19,7 @@ public:
 	float offset = 0;
 	float page_size = 0;
 	float content_size = 0;
-	rect area = r_id;
+	rect area = rect::EMPTY;
 	float mouse_offset = 0;
 	void drag_start(float mx, float my);
 	void drag_update(float mx, float my);

@@ -107,6 +107,6 @@ enum{
 	MENU_ITEM_SEPARATOR,
 };
 
-};
+}
 
 #endif

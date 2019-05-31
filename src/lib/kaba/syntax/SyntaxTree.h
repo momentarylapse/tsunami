@@ -37,8 +37,9 @@ struct Define
 };
 
 
-struct Operator
+class Operator
 {
+public:
 	int primitive_id;
 	const Class *return_type, *param_type_1, *param_type_2;
 

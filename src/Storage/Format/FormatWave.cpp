@@ -123,9 +123,9 @@ void FormatWave::load_track(StorageOperationData *od)
 		throw Exception("\"WAVE\" expected in wave file");
 
 
-	int format_code, channels, freq, block_align, bits, byte_per_sample;
+	int format_code, channels = 2, freq, block_align = 0, bits = 16, byte_per_sample = 4;
 	bool fmt_chunk_read = false;
-	SampleFormat format;
+	auto format = SampleFormat::SAMPLE_FORMAT_16;
 
 	// read chunks
 	while (f->get_pos() < real_file_size - 8){

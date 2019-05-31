@@ -104,5 +104,5 @@ vector Random::dir()
 	float l = v.length();
 	if (l != 0)
 		return v / l;
-	return e_z;
+	return vector::EZ;
 }

@@ -249,6 +249,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	_prev_cur_track = nullptr;
 
 	playback_range_locked = false;
+	playback_loop = false;
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -1168,13 +1169,25 @@ void AudioView::draw_time_scale(Painter *c)
 
 	// playback lock symbol
 	playback_lock_button = rect(0,0,0,0);
-	if (playback_range_locked or !sel.range.empty()){
+	if (playback_range_locked){
 		float x = cam.sample2screen(get_playback_selection(false).end());
 		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + TIME_SCALE_HEIGHT);
 
-		c->set_color((hover.type == Selection::Type::PLAYBACK_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		c->set_color((hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
 		c->set_font_size(FONT_SIZE * 0.7f);
-		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, playback_range_locked ? "🔒" : "🔓");
+		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, "🔒");
+		c->set_font_size(FONT_SIZE);
+	}
+
+	// playback loop symbol
+	playback_loop_button = rect(0,0,0,0);
+	if (playback_loop){
+		float x = cam.sample2screen(get_playback_selection(false).end());
+		playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + TIME_SCALE_HEIGHT);
+
+		c->set_color((hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		//c->set_font_size(FONT_SIZE * 0.7f);
+		c->draw_str(playback_loop_button.x1 + 5, playback_loop_button.y1 + 3, "⏎");
 		c->set_font_size(FONT_SIZE);
 	}
 }
@@ -1571,6 +1584,14 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop)
 	renderer->allow_layers(get_playable_layers());
 
 	signal_chain->command(ModuleCommand::PREPARE_START, 0);
+}
+
+void AudioView::set_playback_loop(bool loop)
+{
+	playback_loop = loop;
+	renderer->loop_if_allowed = playback_loop;
+	force_redraw();
+	notify(MESSAGE_SELECTION_CHANGE);
 }
 
 void AudioView::stop()

@@ -223,6 +223,8 @@ public:
 	SignalChain *signal_chain;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
+	bool playback_loop;
+	void set_playback_loop(bool loop);
 	void play();
 	void stop();
 	void pause(bool pause);
@@ -253,6 +255,7 @@ public:
 	TrackHeightManager thm;
 
 	rect playback_lock_button;
+	rect playback_loop_button;
 	bool playback_range_locked;
 	Range playback_wish_range;
 	void set_playback_range_locked(bool locked);

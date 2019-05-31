@@ -832,8 +832,7 @@ void TsunamiWindow::on_remove_sample()
 
 void TsunamiWindow::on_play_loop()
 {
-	view->renderer->loop_if_allowed = !view->renderer->loop_if_allowed;
-	update_menu();
+	view->set_playback_loop(!view->playback_loop);
 }
 
 void TsunamiWindow::on_play()
@@ -971,7 +970,7 @@ void TsunamiWindow::update_menu()
 	enable("play", !session->in_mode("capture"));
 	enable("stop", view->is_playback_active() or session->in_mode("capture"));
 	enable("pause", view->is_playback_active() and !view->is_paused());
-	check("play_loop", view->renderer->loop_if_allowed);
+	check("play-loop", view->playback_loop);
 	enable("record", !session->in_mode("capture"));
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));

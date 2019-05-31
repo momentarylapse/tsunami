@@ -120,8 +120,6 @@ void ViewModeDefault::on_left_button_down()
 		view->msp.start(hover->pos, hover->y0);
 	}else if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
 		view->scroll->drag_start(view->mx, view->my);
-	}else if (view->hover.type == Selection::Type::PLAYBACK_LOCK){
-		view->set_playback_range_locked(!view->playback_range_locked);
 	}
 }
 
@@ -231,7 +229,7 @@ void prepare_menu(hui::Menu *menu, ViewModeDefault *me)
 		//menu->enable("layer-delete", !hover->layer->is_main());
 	}
 
-	menu->check("play-loop", me->view->renderer->loop_if_allowed);
+	menu->check("play-loop", me->view->playback_loop);
 	menu->check("playback-range-lock", me->view->playback_range_locked);
 
 }
@@ -277,7 +275,7 @@ void ViewModeDefault::on_right_button_down()
 	}else if (hover_buffer(hover) >= 0){
 		prepare_menu(view->menu_buffer, this);
 		view->menu_buffer->open_popup(view->win);
-	}else if (hover->type == Selection::Type::PLAYBACK_RANGE){
+	}else if (hover->type == Selection::Type::PLAYBACK_RANGE or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP){
 		prepare_menu(view->menu_playback_range, this);
 		view->menu_playback_range->open_popup(view->win);
 	}else if (!hover->track){
@@ -689,8 +687,10 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
 	else if (hover->type == Selection::Type::BAR_GAP)
 		view->draw_cursor_hover(c, _("bar gap"));
-	else if (hover->type == Selection::Type::PLAYBACK_LOCK)
-		view->draw_cursor_hover(c, _("lock playback range"));
+	else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK)
+		view->draw_cursor_hover(c, _("locked"));
+	else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP)
+		view->draw_cursor_hover(c, _("looping"));
 	else if (hover->type == Selection::Type::PLAYBACK_RANGE)
 		view->draw_cursor_hover(c, _("playback range"));
 
@@ -758,7 +758,11 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 		}
 	}
 	if (view->playback_lock_button.inside(mx, my)){
-		s.type = Selection::Type::PLAYBACK_LOCK;
+		s.type = Selection::Type::PLAYBACK_SYMBOL_LOCK;
+		return s;
+	}
+	if (view->playback_loop_button.inside(mx, my)){
+		s.type = Selection::Type::PLAYBACK_SYMBOL_LOOP;
 		return s;
 	}
 

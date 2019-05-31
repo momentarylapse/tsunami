@@ -91,13 +91,13 @@ void win_set_input(Window *win, T *event)
 	}else if (event->type == GDK_LEAVE_NOTIFY){
 		win->input.inside = false;
 	}
-	win->input.dx = event->x - win->input.x;
-	win->input.dy = event->y - win->input.y;
+	win->input.dx = (float)event->x - win->input.x;
+	win->input.dy = (float)event->y - win->input.y;
 	//msg_write(format("%.1f\t%.1f\t->\t%.1f\t%.1f\t(%.1f\t%.1f)", win->input.x, win->input.y, event->x, event->y, win->input.dx, win->input.dy));
 	win->input.scroll_x = 0;
 	win->input.scroll_y = 0;
-	win->input.x = event->x;
-	win->input.y = event->y;
+	win->input.x = (float)event->x;
+	win->input.y = (float)event->y;
 	int mod = event->state;
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
 	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
@@ -208,8 +208,8 @@ gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer 
 		else if (event->direction == GDK_SCROLL_RIGHT)
 			c->panel->win->input.scroll_x = -1;
 		else if (event->direction == GDK_SCROLL_SMOOTH){
-			c->panel->win->input.scroll_x = event->delta_x;
-			c->panel->win->input.scroll_y = event->delta_y;
+			c->panel->win->input.scroll_x = (float)event->delta_x;
+			c->panel->win->input.scroll_y = (float)event->delta_y;
 		}
 		c->notify("hui:mouse-wheel", false);
 	}
@@ -441,7 +441,7 @@ void ControlDrawingArea::redraw_partial(const rect &r)
 		return;
 	}
 
-	gtk_widget_queue_draw_area(widget, r.x1, r.y1, r.width(), r.height());
+	gtk_widget_queue_draw_area(widget, (int)r.x1, (int)r.y1, (int)r.width(), (int)r.height());
 #endif
 }
 

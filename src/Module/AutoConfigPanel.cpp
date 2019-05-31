@@ -40,8 +40,9 @@ string to_camel_case(const string &s)
 	return r;
 }
 
-struct AutoConfigData
+class AutoConfigData
 {
+public:
 	enum class Type{
 		FLOAT,
 		INT,
@@ -71,8 +72,9 @@ struct AutoConfigData
 	virtual void set_value() = 0;
 };
 
-struct AutoConfigDataFloat : public AutoConfigData
+class AutoConfigDataFloat : public AutoConfigData
 {
+public:
 	float min, max, step, factor;
 	float *value;
 	Slider *slider;
@@ -124,8 +126,9 @@ struct AutoConfigDataFloat : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataBool : public AutoConfigData
+class AutoConfigDataBool : public AutoConfigData
 {
+public:
 	bool *value;
 	ConfigPanel *panel;
 	string id;
@@ -154,8 +157,9 @@ struct AutoConfigDataBool : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataInt : public AutoConfigData
+class AutoConfigDataInt : public AutoConfigData
 {
+public:
 	int min, max;
 	int *value;
 	ConfigPanel *panel;
@@ -196,8 +200,9 @@ struct AutoConfigDataInt : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataPitch : public AutoConfigData
+class AutoConfigDataPitch : public AutoConfigData
 {
+public:
 	float *value;
 	string id;
 	string id_freq;
@@ -233,7 +238,7 @@ struct AutoConfigDataPitch : public AutoConfigData
 		p->add_spin_button("!range=0:10000:0.1,expandx", 1, 0, id_freq);
 		p->add_label("Hz", 2, 0, id_hz);
 		on_mode();
-		p->set_int(id, *value);
+		p->set_int(id, (int)*value);
 		p->set_float(id_freq, pitch_to_freq(*value));
 		p->event(id, [=]{ on_pitch(); });
 		p->event(id_freq, [=]{ on_freq(); });
@@ -245,11 +250,11 @@ struct AutoConfigDataPitch : public AutoConfigData
 		if (m)
 			*value = freq_to_pitch(panel->get_float(id_freq));
 		else
-			*value = panel->get_int(id);
+			*value = (float)panel->get_int(id);
 	}
 	void set_value() override
 	{
-		panel->set_int(id, *value);
+		panel->set_int(id, (int)*value);
 		panel->set_float(id_freq, pitch_to_freq(*value));
 	}
 	void on_pitch()
@@ -261,7 +266,7 @@ struct AutoConfigDataPitch : public AutoConfigData
 	void on_freq()
 	{
 		float f = panel->get_float(id_freq);
-		panel->set_int(id, freq_to_pitch(f));
+		panel->set_int(id, (int)freq_to_pitch(f));
 		callback();
 	}
 	void on_mode()
@@ -273,8 +278,9 @@ struct AutoConfigDataPitch : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataString : public AutoConfigData
+class AutoConfigDataString : public AutoConfigData
 {
+public:
 	string *value;
 	string id;
 	ConfigPanel *panel;
@@ -303,8 +309,9 @@ struct AutoConfigDataString : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataSampleRef : public AutoConfigData
+class AutoConfigDataSampleRef : public AutoConfigData
 {
+public:
 	SampleRef **value;
 	string id;
 	ConfigPanel *panel;
@@ -356,8 +363,9 @@ struct AutoConfigDataSampleRef : public AutoConfigData
 	}
 };
 
-struct AutoConfigDataDevice: public AutoConfigData
+class AutoConfigDataDevice: public AutoConfigData
 {
+public:
 	Device **value;
 	string id;
 	ConfigPanel *panel;

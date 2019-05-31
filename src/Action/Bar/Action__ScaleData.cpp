@@ -47,7 +47,7 @@ int __shift_data_shift(const Range &source, int new_length, int pos)
 		// inside source
 		if (source.length == 0)
 			return pos - new_length;
-		return source.offset + (float)(pos - source.offset) * (float)new_length / (float)source.length;
+		return source.offset + (int)((float)(pos - source.offset) * (float)new_length / (float)source.length);
 	}
 	return pos;
 }

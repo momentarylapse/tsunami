@@ -200,9 +200,9 @@ const Class *add_type(const string &name, int size, ScriptFlag flag)
 const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag)
 {
 	Class *t = new Class(name, config.pointer_size, cur_package_script->syntax);
-	t->type = t->Type::POINTER;
+	t->type = Class::Type::POINTER;
 	if ((flag & FLAG_SILENT) > 0)
-		t->type = t->Type::POINTER_SILENT;
+		t->type = Class::Type::POINTER_SILENT;
 	t->parent = sub_type;
 	cur_package_script->syntax->classes.add(t);
 	return t;
@@ -213,12 +213,12 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 	if (array_length < 0){
 		// super array
 		t->size = config.super_array_size;
-		t->type = t->Type::SUPER_ARRAY;
+		t->type = Class::Type::SUPER_ARRAY;
 		script_make_super_array(t);
 	}else{
 		// standard array
 		t->size = sub_type->size * array_length;
-		t->type = t->Type::ARRAY;
+		t->type = Class::Type::ARRAY;
 		t->array_length = array_length;
 	}
 	cur_package_script->syntax->classes.add(t);
@@ -228,7 +228,7 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 const Class *add_type_d(const string &name, const Class *sub_type)
 {
 	Class *t = new Class(name, config.super_array_size, cur_package_script->syntax, sub_type);
-	t->type = t->Type::DICT;
+	t->type = Class::Type::DICT;
 	script_make_dict(t);
 	cur_package_script->syntax->classes.add(t);
 	return t;

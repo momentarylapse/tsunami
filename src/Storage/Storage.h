@@ -30,20 +30,20 @@ public:
 	Storage(Session *session);
 	virtual ~Storage();
 
-	bool load(Song *song, const string &filename);
-	bool load_ex(Song *song, const string &filename, bool only_metadata);
-	bool load_track(TrackLayer *t, const string &filename, int offset = 0);
-	bool load_buffer(AudioBuffer *buf, const string &filename);
-	bool save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags);
-	bool render_export_selection(Song *song, SongSelection *sel, const string &filename);
-	bool save(Song *song, const string &filename);
+	bool _cdecl load(Song *song, const string &filename);
+	bool _cdecl load_ex(Song *song, const string &filename, bool only_metadata);
+	bool _cdecl load_track(TrackLayer *t, const string &filename, int offset = 0);
+	bool _cdecl load_buffer(AudioBuffer *buf, const string &filename);
+	bool _cdecl save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags);
+	bool _cdecl render_export_selection(Song *song, SongSelection *sel, const string &filename);
+	bool _cdecl save(Song *song, const string &filename);
 
-	bool ask_by_flags(hui::Window *win, const string &title, int flags);
+	bool _cdecl ask_by_flags(hui::Window *win, const string &title, int flags);
 
-	bool ask_open(hui::Window *win);
-	bool ask_save(hui::Window *win);
-	bool ask_open_import(hui::Window *win);
-	bool ask_save_render_export(hui::Window *win);
+	bool _cdecl ask_open(hui::Window *win);
+	bool _cdecl ask_save(hui::Window *win);
+	bool _cdecl ask_open_import(hui::Window *win);
+	bool _cdecl ask_save_render_export(hui::Window *win);
 
 	FormatDescriptor *get_format(const string &ext, int flags);
 

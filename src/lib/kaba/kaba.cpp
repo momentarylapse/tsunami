@@ -322,7 +322,7 @@ void *Script::match_function(const string &name, const string &return_type, cons
 					params_ok = false;
 			if (params_ok){
 				if (just_analyse)
-					return (void*)0xdeadbeaf;
+					return (void*)(int_p)0xdeadbeaf;
 				else
 					return f->address;
 			}
@@ -352,7 +352,7 @@ void *Script::match_class_function(const string &_class, bool allow_derived, con
 					params_ok = false;
 			if (params_ok){
 				if (just_analyse)
-					return (void*)0xdeadbeaf;
+					return (void*)(int_p)0xdeadbeaf;
 				else
 					return f->address;
 			}

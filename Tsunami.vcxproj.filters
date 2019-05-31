@@ -13,263 +13,17 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Source Files\hui">
+      <UniqueIdentifier>{3eebda93-827c-428e-aa0f-62b5c3eb42a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Action">
+      <UniqueIdentifier>{607cac73-279b-4957-b3ff-c19e5635fe2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\kaba">
+      <UniqueIdentifier>{8067d5b8-24a6-4c32-82ca-96c2948bf92b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Action\Action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\ActionGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\ActionManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\ActionMergable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBarAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBarDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBarEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBar__Add.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBar__Delete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\ActionBar__Edit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\Action__ScaleData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Bar\Action__ShiftData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveAddPoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveDeletePoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Curve\ActionCurveEditPoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Sample\ActionSampleAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Sample\ActionSampleDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Sample\ActionSampleEditName.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Sample\ActionSampleScale.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Song\ActionSongDeleteSelection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Song\ActionSongMoveSelection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Song\Data\ActionSongChangeAllTrackVolumes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Song\Data\ActionSongSetDefaultFormat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Song\Data\ActionSongSetSampleRate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Tag\ActionTagAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Tag\ActionTagDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Tag\ActionTagEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\ActionTrackAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\ActionTrackDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\ActionTrackMove.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\ActionTrack__DeleteEmpty.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrackCreateBuffers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrackEditBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrackSetChannels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__AbsorbBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__AddBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__BufferSetChannels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__DeleteBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__GrowBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__ShrinkBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__SplitBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Data\ActionTrackEditMuted.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Data\ActionTrackEditName.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Data\ActionTrackEditPanning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Data\ActionTrackEditVolume.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Data\ActionTrackSetInstrument.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Effect\ActionTrackAddAudioEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Effect\ActionTrackDeleteEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Effect\ActionTrackEditAudioEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Effect\ActionTrackMoveAudioEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Effect\ActionTrackToggleAudioEffectEnabled.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackFadeAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackFadeDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerAdd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerDelete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMakeTrack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMarkDominant.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMerge.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMove.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayer__Delete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Marker\ActionTrackAddMarker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Marker\ActionTrackDeleteMarker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Marker\ActionTrackEditMarker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackAddMidiEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackAddMidiNote.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackDeleteMidiEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackDeleteMidiNote.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackEditMidiEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackEditMidiNote.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackInsertMidi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackMoveMidiEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Midi\ActionTrackToggleMidiEffectEnabled.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackAddSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackDeleteSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackEditSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackPasteAsSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Sample\ActionTrackSampleFromSelection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackDetuneSynthesizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackEditSynthesizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackSetSynthesizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Data\Audio\AudioBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -366,214 +120,10 @@
     <ClCompile Include="src\lib\hui\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\hui\Callback.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Clipboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\common_dlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\common_dlg_gtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\common_dlg_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\hui\Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\Control.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlColorButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlComboBoxGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlDrawingAreaGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlEditGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlMultilineEditGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlPanedGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlProgressBarGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSeparatorGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSliderGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSpinButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlTabControlGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlToggleButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlTreeViewGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemToggleGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemToggleWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\MenuItemWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemButtonWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Event.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\hui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\language.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\main_gtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\main_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Menu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\MenuGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\MenuWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\PainterGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Panel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Resource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Toolbar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\ToolbarGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\ToolbarWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\WindowGtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\WindowWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\window_control.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\window_control_gtk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\window_control_win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\image\color.cpp">
@@ -600,88 +150,13 @@
     <ClCompile Include="src\lib\kaba\asm\asm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\mapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_amd64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_arm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\compiler\serializer_x86.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\kaba.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\exception.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_file.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_hui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_net.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_nix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_sound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_threads.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\lib_x.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\Class.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\Constant.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\Function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\precompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\math\complex.cpp">
@@ -1074,9 +549,6 @@
     <ClCompile Include="src\View\Painter\BufferPainter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\View\Painter\GridPainter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\View\Painter\MidiPainter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1127,6 +599,546 @@
     </ClCompile>
     <ClCompile Include="src\View\ViewPort.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Action.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\Action__ScaleData.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\Action__ShiftData.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBar__Add.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBar__Delete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBar__Edit.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBarAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBarDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Bar\ActionBarEdit.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveAddPoint.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveDeletePoint.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveEdit.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Curve\ActionCurveEditPoint.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\ActionGroup.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\ActionManager.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\ActionMergable.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Sample\ActionSampleAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Sample\ActionSampleDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Sample\ActionSampleEditName.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Sample\ActionSampleScale.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Song\Data\ActionSongChangeAllTrackVolumes.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Song\ActionSongDeleteSelection.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Song\ActionSongMoveSelection.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Song\Data\ActionSongSetDefaultFormat.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Song\Data\ActionSongSetSampleRate.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Tag\ActionTagAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Tag\ActionTagDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Tag\ActionTagEdit.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__AbsorbBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__AddBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__BufferSetChannels.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__DeleteBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\ActionTrack__DeleteEmpty.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__GrowBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__ShrinkBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrack__SplitBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\ActionTrackAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Effect\ActionTrackAddAudioEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Marker\ActionTrackAddMarker.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackAddMidiEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackAddMidiNote.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackAddSample.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrackCreateBuffers.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\ActionTrackDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Effect\ActionTrackDeleteEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Marker\ActionTrackDeleteMarker.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackDeleteMidiEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackDeleteMidiNote.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackDeleteSample.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackDetuneSynthesizer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Effect\ActionTrackEditAudioEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrackEditBuffer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Marker\ActionTrackEditMarker.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackEditMidiEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackEditMidiNote.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Data\ActionTrackEditMuted.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Data\ActionTrackEditName.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Data\ActionTrackEditPanning.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackEditSample.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackEditSynthesizer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Data\ActionTrackEditVolume.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackFadeAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackFadeDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackInsertMidi.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSample.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackInsertSelectedSamples.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayer__Delete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerAdd.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerDelete.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMakeTrack.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMarkDominant.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMerge.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Layer\ActionTrackLayerMove.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\ActionTrackMove.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Effect\ActionTrackMoveAudioEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackMoveMidiEffect.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackPasteAsSample.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Sample\ActionTrackSampleFromSelection.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Buffer\ActionTrackSetChannels.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Data\ActionTrackSetInstrument.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Synthesizer\ActionTrackSetSynthesizer.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Effect\ActionTrackToggleAudioEffectEnabled.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action\Track\Midi\ActionTrackToggleMidiEffectEnabled.cpp">
+      <Filter>Source Files\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Clipboard.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\common_dlg.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\common_dlg_gtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\common_dlg_win.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Callback.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemToggleGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemToggleWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\MenuItemWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\MenuWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\MenuGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Menu.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\language.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Painter\GridPainter.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlColorButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlComboBoxGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlEditGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlDrawingAreaGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlMultilineEditGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlPanedGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlProgressBarGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSeparatorGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSliderGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlTabControlGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSpinButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlTreeViewGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlToggleButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\kaba.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_file.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_hui.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_image.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_math.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_net.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_nix.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_sound.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_threads.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\lib_x.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\hui.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Event.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\error.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\main_win.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\main_gtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Resource.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Panel.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\PainterGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Timer.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\WindowWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\WindowGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\window_control_win.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\window_control_gtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\window_control.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Window.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Toolbar.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\ToolbarGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\ToolbarWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemButtonWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonGtk.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonWin.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\utility.cpp">
+      <Filter>Source Files\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\compiler.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Class.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Constant.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Function.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\mapper.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\precompiler.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\parser.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\serializer.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\serializer_amd64.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\serializer_arm.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\compiler\serializer_x86.cpp">
+      <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Dialog\HelpDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp">
+      <Filter>Source Files\kaba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

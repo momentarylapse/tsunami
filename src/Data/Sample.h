@@ -16,7 +16,7 @@
 class Song;
 class Track;
 class SampleRef;
-struct Tag;
+class Tag;
 enum class SignalType;
 
 class Sample : public Observable<VirtualBase>

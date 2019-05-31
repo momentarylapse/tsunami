@@ -114,7 +114,7 @@ void Synthesizer::Tuning::set_default()
 bool Synthesizer::Tuning::is_default()
 {
 	for (int p=0; p<MAX_PITCH; p++)
-		if (fabs(freq[p] - pitch_to_freq(p)) > 0.01f)
+		if (fabs(freq[p] - pitch_to_freq((float)p)) > 0.01f)
 			return false;
 	return true;
 }
@@ -181,7 +181,7 @@ void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
 
 void Synthesizer::_handle_event(const MidiEvent &e)
 {
-	PitchRenderer *pr = get_pitch_renderer(e.pitch);
+	PitchRenderer *pr = get_pitch_renderer((int)e.pitch);
 	if (!pr)
 		return;
 	if (e.volume > 0){
@@ -195,7 +195,7 @@ void Synthesizer::render(AudioBuffer& buf)
 {
 	Set<int> pitch_involved = active_pitch;
 	for (MidiEvent &e: events)
-		pitch_involved.add(e.pitch);
+		pitch_involved.add((int)e.pitch);
 
 	for (int p: pitch_involved){
 		int offset = 0;

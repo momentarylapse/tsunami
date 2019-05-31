@@ -350,6 +350,7 @@
     <ClCompile Include="src\View\Dialog\BarEditDialog.cpp" />
     <ClCompile Include="src\View\Dialog\ConfigurableSelectorDialog.cpp" />
     <ClCompile Include="src\View\Dialog\DetuneSynthesizerDialog.cpp" />
+    <ClCompile Include="src\View\Dialog\HelpDialog.cpp" />
     <ClCompile Include="src\View\Dialog\MarkerDialog.cpp" />
     <ClCompile Include="src\View\Dialog\NewDialog.cpp" />
     <ClCompile Include="src\View\Dialog\PauseAddDialog.cpp" />
@@ -791,6 +792,12 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\msys64\home\michi\vcpkg\installed\x64-windows\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>C:\msys64\home\michi\vcpkg\installed\x64-windows\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>C:\msys64\home\michi\vcpkg\installed\x64-windows\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_ALSA=0;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1</PreprocessorDefinitions>
@@ -825,12 +832,20 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN64;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_ALSA=0;HAS_LIB_UNWIND=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_DL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;FLAC.lib;ogg.lib;vorbis.lib;vorbisfile.lib;vorbisenc.lib;gtk-3.0.lib;fftw3f.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN64;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_ALSA=0;HAS_LIB_UNWIND=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_DL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;FLAC.lib;ogg.lib;vorbis.lib;vorbisfile.lib;vorbisenc.lib;gtk-3.0.lib;fftw3f.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

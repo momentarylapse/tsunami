@@ -15,7 +15,7 @@ ImagePainter::ImagePainter(Image *im)
 	image = im;
 	width = image->width;
 	height = image->height;
-	set_clip(rect(0, width, 0, height));
+	set_clip(rect(0, (float)width, 0, (float)height));
 	_color = Black;
 	dash_offset = 0;
 	line_width = 1.0f;
@@ -86,10 +86,10 @@ void ImagePainter::draw_line(float x1, float y1, float x2, float y2)
 
 	complex e = complex(dir.y, -dir.x);
 
-	int _x0 = max(min(x1, x2) - line_width/2 - 1, _clip.x1);
-	int _x1 = min(max(x1, x2) + line_width/2 + 1, _clip.x2);
-	int _y0 = max(min(y1, y2) - line_width/2 - 1, _clip.y1);
-	int _y1 = min(max(y1, y2) + line_width/2 + 1, _clip.y2);
+	int _x0 = (int)max(min(x1, x2) - line_width/2 - 1, _clip.x1);
+	int _x1 = (int)min(max(x1, x2) + line_width/2 + 1, _clip.x2);
+	int _y0 = (int)max(min(y1, y2) - line_width/2 - 1, _clip.y1);
+	int _y1 = (int)min(max(y1, y2) + line_width/2 + 1, _clip.y2);
 
 	color cc = _color;
 
@@ -98,7 +98,7 @@ void ImagePainter::draw_line(float x1, float y1, float x2, float y2)
 			float d2 = (x - x1) * dir.x + (y - y1) * dir.y;
 			float alpha2 = min(d2, length - d2);
 			float d1 = (x - x1) * e.x + (y - y1) * e.y;
-			float alpha1 = line_width/2 + 0.5f - fabs(d1);
+			float alpha1 = line_width/2 + 0.5f - (float)fabs(d1);
 			float alpha = min(alpha1, alpha2);
 			if (anti_aliasing){
 				cc.a = _color.a * alpha;
@@ -123,10 +123,10 @@ void ImagePainter::draw_polygon(const Array<complex>& p)
 
 void ImagePainter::draw_rect(float xx, float yy, float w, float h)
 {
-	int x0 = max(xx, _clip.x1);
-	int x1 = min(xx + w, _clip.x2);
-	int y0 = max(yy, _clip.y1);
-	int y1 = min(yy + h, _clip.y2);
+	int x0 = (int)max(xx, _clip.x1);
+	int x1 = (int)min(xx + w, _clip.x2);
+	int y0 = (int)max(yy, _clip.y1);
+	int y1 = (int)min(yy + h, _clip.y2);
 
 	for (int x=x0; x<x1; x++)
 		for (int y=y0; y<y1; y++)
@@ -140,17 +140,17 @@ void ImagePainter::draw_rect(const rect& r)
 
 void ImagePainter::draw_circle(float cx, float cy, float radius)
 {
-	int x0 = max(cx - radius - line_width/2 - 1, _clip.x1);
-	int x1 = min(cx + radius + line_width/2 + 1, _clip.x2);
-	int y0 = max(cy - radius - line_width/2 - 1, _clip.y1);
-	int y1 = min(cy + radius + line_width/2 + 1, _clip.y2);
+	int x0 = (int)max(cx - radius - line_width/2 - 1, _clip.x1);
+	int x1 = (int)min(cx + radius + line_width/2 + 1, _clip.x2);
+	int y0 = (int)max(cy - radius - line_width/2 - 1, _clip.y1);
+	int y1 = (int)min(cy + radius + line_width/2 + 1, _clip.y2);
 
 	color cc = _color;
 
 	if (fill){
 		for (int x=x0; x<x1; x++)
 			for (int y=y0; y<y1; y++){
-				float r = sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+				float r = (float)sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
 				float alpha = radius - r;
 				if (anti_aliasing){
 					cc.a = _color.a * alpha;
@@ -163,8 +163,8 @@ void ImagePainter::draw_circle(float cx, float cy, float radius)
 	}else{
 		for (int x=x0; x<x1; x++)
 			for (int y=y0; y<y1; y++){
-				float r = sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
-				float alpha = line_width/2 + 0.5f - fabs(radius - r);
+				float r = (float)sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+				float alpha = line_width/2 + 0.5f - (float)fabs(radius - r);
 				if (anti_aliasing){
 					cc.a = _color.a * alpha;
 				}else{
@@ -187,14 +187,14 @@ float ImagePainter::get_str_width(const string& str)
 
 void ImagePainter::draw_image(float dx, float dy, const Image& im)
 {
-	int _x0 = max(dx, _clip.x1);
-	int _x1 = min(dx + im.width, _clip.x2);
-	int _y0 = max(dy, _clip.y1);
-	int _y1 = min(dy + im.height, _clip.y2);
+	int _x0 = (int)max(dx, _clip.x1);
+	int _x1 = (int)min(dx + im.width, _clip.x2);
+	int _y0 = (int)max(dy, _clip.y1);
+	int _y1 = (int)min(dy + im.height, _clip.y2);
 
 	for (int x=_x0; x<_x1; x++)
 		for (int y=_y0; y<_y1; y++)
-			image->draw_pixel(x, y, im.get_pixel(x - dx, y - dy));
+			image->draw_pixel(x, y, im.get_pixel(x - (int)dx, y - (int)dy));
 }
 
 void ImagePainter::draw_mask_image(float x, float y, const Image& image)

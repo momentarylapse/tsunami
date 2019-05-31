@@ -29,8 +29,9 @@ class TrackMarker;
 enum class SampleFormat;
 enum class SignalType;
 
-struct Tag
+class Tag
 {
+public:
 	string key, value;
 	Tag(){}
 	Tag(const string &_key, const string &_value)

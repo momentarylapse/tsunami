@@ -4,19 +4,20 @@
 #include "common.h"
 #include "exception.h"
 
-namespace Kaba{
-
 class vector;
 
-extern Class *TypeIntPs;
-extern Class *TypeFloatPs;
-extern Class *TypeBoolPs;
+
+namespace Kaba{
+
+
+extern const Class *TypeIntPs;
+extern const Class *TypeFloatPs;
+extern const Class *TypeBoolPs;
 
 static Date *_date;
 #define	GetDADate(x)			int_p(&_date->x)-int_p(_date)
 static DirEntry *_dir_entry;
 #define	GetDADirEntry(x)			int_p(&_dir_entry->x)-int_p(_dir_entry)
-
 
 
 

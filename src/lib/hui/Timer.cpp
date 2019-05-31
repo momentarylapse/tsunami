@@ -97,7 +97,7 @@ void Sleep(float duration)
 	}*/
 
 #ifdef OS_WINDOWS
-	Sleep((DWORD)(duration * 1000.0f));
+	::Sleep((DWORD)(duration * 1000.0f));
 #endif
 #ifdef OS_LINUX
 	usleep(duration * 1000000);

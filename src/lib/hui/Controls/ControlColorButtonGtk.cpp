@@ -49,10 +49,10 @@ color ControlColorButton::get_color()
 	color col;
 	GdkRGBA gcol;
 	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
-	col.r = gcol.red;
-	col.g = gcol.green;
-	col.b = gcol.blue;
-	col.a = gcol.alpha;
+	col.r = (float)gcol.red;
+	col.g = (float)gcol.green;
+	col.b = (float)gcol.blue;
+	col.a = (float)gcol.alpha;
 	return col;
 }
 

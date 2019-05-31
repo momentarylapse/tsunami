@@ -115,12 +115,12 @@ rect Painter::clip()
 		return rect::EMPTY;
 	double x1, x2, y1, y2;
 	cairo_clip_extents(cr, &x1, &y1, &x2, &y2);
-	return rect(x1, x2, y1, y2);
+	return rect((float)x1, (float)x2, (float)y1, (float)y2);
 }
 
 rect Painter::area()
 {
-	return rect(0, width, 0, height);
+	return rect(0, (float)width, 0, (float)height);
 }
 
 void Painter::draw_point(float x, float y)

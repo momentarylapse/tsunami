@@ -1,0 +1,17 @@
+/*
+ * HelpDialog.cpp
+ *
+ *  Created on: 31.05.2019
+ *      Author: michi
+ */
+
+#include "HelpDialog.h"
+
+HelpDialog::HelpDialog(hui::Window *_parent) :
+	hui::Window("help-dialog", _parent)
+{
+	if (hui::Config.get_bool("FirstStart", true))
+		hide_control("first-time-message", false);
+	event("close", [=]{ destroy(); });
+}
+

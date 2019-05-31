@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-55
+56
 // Resource
 Menu
 menu_fake
@@ -736,6 +736,265 @@ enabled
 0
 Grid
 content
+
+1
+0
+0
+// Resource
+Dialog
+help-dialog
+width=400,height=300
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+TabControl
+tab
+expandx,expandy
+0
+0
+1
+Grid
+?
+
+0
+0
+2
+Grid
+?
+vertical
+0
+0
+2
+Group
+g_navigation
+
+0
+0
+1
+Grid
+?
+
+0
+0
+12
+Label
+mouse-move
+
+0
+0
+0
+Label
+l-move
+
+1
+0
+0
+Label
+key-move
+
+0
+1
+0
+Label
+l-move
+
+1
+1
+0
+Label
+key-move-fast
+
+0
+2
+0
+Label
+l-move-fast
+
+1
+2
+0
+Label
+mouse-zoom
+
+0
+3
+0
+Label
+l-zoom
+
+1
+3
+0
+Label
+key-zoom
+
+0
+4
+0
+Label
+l-zoom
+
+1
+4
+0
+Label
+key-start
+
+0
+5
+0
+Label
+l-start
+
+1
+5
+0
+Group
+g_sound
+
+1
+0
+1
+Grid
+?
+
+0
+0
+6
+Label
+key-play
+
+0
+0
+0
+Label
+l-play
+
+1
+0
+0
+Label
+key-loop
+
+0
+1
+0
+Label
+l-loop
+
+1
+1
+0
+Label
+key-record
+
+0
+2
+0
+Label
+l-record
+
+1
+2
+0
+Grid
+?
+vertical
+1
+0
+1
+Group
+g_editing
+
+0
+0
+1
+Grid
+?
+
+0
+0
+10
+Label
+key-open
+
+0
+0
+0
+Label
+l-open
+
+1
+0
+0
+Label
+key-copy
+
+0
+1
+0
+Label
+l-copy
+
+1
+1
+0
+Label
+key-undo
+
+0
+2
+0
+Label
+l-undo
+
+1
+2
+0
+Label
+key-delete
+
+0
+3
+0
+Label
+l-delete
+
+1
+3
+0
+Label
+key-mixer
+
+0
+4
+0
+Label
+l-mixer
+
+1
+4
+0
+Grid
+?
+buttonbar
+1
+0
+2
+Label
+first-time-message
+hidden
+0
+0
+0
+Button
+close
 
 1
 0
@@ -6007,7 +6266,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-463
+495
 // Text
 /bars-add
 Add bars...
@@ -6399,6 +6658,102 @@ Effects
 fx_panel/enabled
 
 active?
+help-dialog/first-time-message
+This dialog can be found in the menu ?/Help
+
+help-dialog/g_editing
+Editing
+
+help-dialog/g_navigation
+Navigation
+
+help-dialog/g_sound
+Sound
+
+help-dialog/help-dialog
+Help
+
+help-dialog/key-copy
+Ctrl+C / V
+
+help-dialog/key-delete
+Delete
+
+help-dialog/key-loop
+Ctrl+L
+
+help-dialog/key-mixer
+Ctrl+M
+
+help-dialog/key-move
+← / →
+
+help-dialog/key-move-fast
+Pg-up / down
+
+help-dialog/key-open
+Ctrl+O / S
+
+help-dialog/key-play
+Space
+
+help-dialog/key-record
+Ctrl+R
+
+help-dialog/key-start
+Home / End
+
+help-dialog/key-undo
+Ctrl+Z / Y
+
+help-dialog/key-zoom
++ / -
+
+help-dialog/l-copy
+Copy / Paste
+
+help-dialog/l-delete
+Delete selection
+
+help-dialog/l-loop
+Loop
+
+help-dialog/l-mixer
+Mixer
+
+help-dialog/l-move
+Move
+
+help-dialog/l-move-fast
+Move fast
+
+help-dialog/l-open
+Open / Save
+
+help-dialog/l-play
+Play / Pause
+
+help-dialog/l-record
+Record
+
+help-dialog/l-start
+Jump to start / end
+
+help-dialog/l-undo
+Undo / Redo
+
+help-dialog/l-zoom
+Zoom
+
+help-dialog/mouse-move
+scroll
+
+help-dialog/mouse-zoom
+Ctrl+scroll
+
+help-dialog/tab
+Basics\\Recording
+
 layer_dialog/add_layer
 
 Add a new empty layer at the top
@@ -7404,7 +7759,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-855
+889
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7536,7 +7891,7 @@ Größe ändern
 Konvertieren
 
 /menu-file
-Dateu
+Datei
 
 /menu-midi-mode
 Midi Modus
@@ -7940,6 +8295,108 @@ Parameter laden
 fx_panel/save_favorite
 
 Parameter speichern
+help-dialog/first-time-message
+Dieser Dialog kann im Menü ?/Hilfe gefunden werden
+
+help-dialog/g_editing
+Bearbeiten
+
+help-dialog/g_navigation
+Navigation
+
+help-dialog/g_sound
+Sound
+
+help-dialog/help-dialog
+Hilfe
+
+help-dialog/key-copy
+Strg+C / V
+
+help-dialog/key-delete
+Löschen
+
+help-dialog/key-loop
+Strg+L
+
+help-dialog/key-mixer
+Strg+M
+
+help-dialog/key-move
+← / →
+
+help-dialog/key-move-fast
+Bild ↑ / ↓
+
+help-dialog/key-open
+Strg+O / S
+
+help-dialog/key-play
+Leertaste
+
+help-dialog/key-record
+Strg+R
+
+help-dialog/key-start
+Pos1 / Ende
+
+help-dialog/key-stop
+Strg+T
+
+help-dialog/key-undo
+Strg+Z / Y
+
+help-dialog/key-zoom
++ / -
+
+help-dialog/l-copy
+Kopieren / Einfügen
+
+help-dialog/l-delete
+Auswahl löschen
+
+help-dialog/l-loop
+Schleife
+
+help-dialog/l-mixer
+Mischpult
+
+help-dialog/l-move
+Bewegen
+
+help-dialog/l-move-fast
+Schnell bewegen
+
+help-dialog/l-open
+Öffnen / Speichern
+
+help-dialog/l-play
+Abspielen / Pause
+
+help-dialog/l-record
+Aufnehmen
+
+help-dialog/l-start
+Zum Anfang / Ende springen
+
+help-dialog/l-stop
+Stop
+
+help-dialog/l-undo
+Rückgängig / Wiederherstellen
+
+help-dialog/l-zoom
+Zoom
+
+help-dialog/mouse-move
+Mausrad
+
+help-dialog/mouse-zoom
+Strg+Mausrad
+
+help-dialog/tab
+Grundlagen\\Aufnehmen
+
 layer_dialog/add_layer
 
 Eine neue Ebene hinzufügen
@@ -9972,7 +10429,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-228
+230
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10370,6 +10827,10 @@ loading track
 Lade Spur 
 lock playback range
 Abspielbereich festhalten
+locked
+festgehalten
+looping
+Schleife
 make main version
 zur Hauptversion ernennen
 marker 

@@ -407,15 +407,6 @@ void ViewModeDefault::on_key_down(int k)
 	if (k == hui::KEY_SUBTRACT)
 		cam->zoom(exp(- view->ZoomSpeed), view->mx);
 
-	if (k == hui::KEY_SPACE){
-		if (view->is_playback_active()){
-			view->pause(!view->is_paused());
-		}else{
-			win->on_play();
-			//view->play(); unsafe for recording...
-		}
-	}
-
 	// playback
 	if (view->is_playback_active()){
 		if (k == hui::KEY_CONTROL + hui::KEY_RIGHT)

@@ -25,6 +25,7 @@ public:
 	virtual ~TsunamiWindow();
 	virtual void on_destroy();
 
+	void on_help();
 	void on_about();
 	void on_send_bug_report();
 

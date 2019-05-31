@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-856
+890
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2494,7 +2494,7 @@ Bearbeiten
 Größe ändern
 
 /menu-file
-Dateu
+Datei
 
 /menu-midi-mode
 Midi Modus
@@ -2571,8 +2571,110 @@ Abspielbereich
 /play-loop
 Schleife
 
+help-dialog/first-time-message
+Dieser Dialog kann im Menü ?/Hilfe gefunden werden
+
+help-dialog/g_navigation
+Navigation
+
+help-dialog/g_sound
+Sound
+
+help-dialog/help-dialog
+Hilfe
+
+help-dialog/key-copy
+Strg+C / V
+
+help-dialog/key-delete
+Löschen
+
+help-dialog/key-loop
+Strg+L
+
+help-dialog/key-mixer
+Strg+M
+
+help-dialog/key-move
+← / →
+
+help-dialog/key-open
+Strg+O / S
+
+help-dialog/key-play
+Leertaste
+
+help-dialog/key-record
+Strg+R
+
+help-dialog/key-stop
+Strg+T
+
+help-dialog/key-undo
+Strg+Z / Y
+
+help-dialog/key-zoom
++ / -
+
+help-dialog/l-copy
+Kopieren / Einfügen
+
+help-dialog/l-delete
+Auswahl löschen
+
+help-dialog/l-loop
+Schleife
+
+help-dialog/l-mixer
+Mischpult
+
+help-dialog/l-move
+Bewegen
+
+help-dialog/l-move-fast
+Schnell bewegen
+
+help-dialog/l-open
+Öffnen / Speichern
+
+help-dialog/l-play
+Abspielen / Pause
+
+help-dialog/l-record
+Aufnehmen
+
+help-dialog/l-start
+Zum Anfang / Ende springen
+
+help-dialog/l-stop
+Stop
+
+help-dialog/l-undo
+Rückgängig / Wiederherstellen
+
+help-dialog/l-zoom
+Zoom
+
+help-dialog/mouse-move
+Mausrad
+
+help-dialog/mouse-zoom
+Strg+Mausrad
+
+help-dialog/tab
+Grundlagen\\Aufnehmen
+
+help-dialog/key-move-fast
+Bild ↑ / ↓
+
+help-dialog/key-start
+Pos1 / Ende
+
+help-dialog/g_editing
+Bearbeiten
+
 // Num Language Strings
-228
+230
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3030,3 +3132,7 @@ mode: frequency/pitch
 Modus: Frequenz/Pitch
 playback range
 Abspielbereich
+locked
+festgehalten
+looping
+Schleife

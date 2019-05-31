@@ -1,0 +1,54 @@
+Dialog help-dialog "Help" width=400 height=300
+	Grid ? "" vertical
+		TabControl tab "Basics\\Recording" expandx expandy
+			Grid ? ""
+				Grid ? "" vertical
+					Group g_navigation "Navigation"
+						Grid ? ""
+							Label mouse-move "scroll"
+							Label l-move "Move"
+							---|
+							Label key-move "← / →"
+							Label l-move "Move"
+							---|
+							Label key-move-fast "Pg-up / down"
+							Label l-move-fast "Move fast"
+							---|
+							Label mouse-zoom "Ctrl+scroll"
+							Label l-zoom "Zoom"
+							---|
+							Label key-zoom "+ / -"
+							Label l-zoom "Zoom"
+							---|
+							Label key-start "Home / End"
+							Label l-start "Jump to start / end"
+					Group g_sound "Sound"
+						Grid ? ""
+							Label key-play "Space"
+							Label l-play "Play / Pause"
+							---|
+							Label key-loop "Ctrl+L"
+							Label l-loop "Loop"
+							---|
+							Label key-record "Ctrl+R"
+							Label l-record "Record"
+				Grid ? "" vertical
+					Group g_editing "Editing"
+						Grid ? ""
+							Label key-open "Ctrl+O / S"
+							Label l-open "Open / Save"
+							---|
+							Label key-copy "Ctrl+C / V"
+							Label l-copy "Copy / Paste"
+							---|
+							Label key-undo "Ctrl+Z / Y"
+							Label l-undo "Undo / Redo"
+							---|
+							Label key-delete "Delete"
+							Label l-delete "Delete selection"
+							---|
+							Label key-mixer "Ctrl+M"
+							Label l-mixer "Mixer"
+		Grid ? "" buttonbar
+			Label first-time-message "This dialog can be found in the menu ?/Help" hidden
+			Button /close "Close"

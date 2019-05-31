@@ -17,8 +17,9 @@ class Block;
 class SyntaxTree;
 
 
-struct Variable
+class Variable
 {
+public:
 	Variable(const string &name, const Class *type);
 	~Variable();
 	const Class *type; // for creating instances
@@ -32,8 +33,9 @@ struct Variable
 };
 
 // user defined functions
-struct Function
+class Function
 {
+public:
 	SyntaxTree *owner;
 
 	string name;

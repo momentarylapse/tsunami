@@ -88,7 +88,7 @@ void Thread::__delete__()
 static DWORD WINAPI thread_start_func(LPVOID p)
 {
 	Thread *t = (Thread*)p;
-	t->onRun();
+	t->run();
 	t->running = false;
 	return 0;
 }
@@ -126,12 +126,12 @@ void Thread::exit()
 	ExitThread(0);
 }
 
-void Thread::cancelationPoint()
+void Thread::cancelation_point()
 {
 	// ARGH
 }
 
-Thread *Thread::getSelf()
+Thread *Thread::get_self()
 {
 	HANDLE h = GetCurrentThread();
 	for (Thread *t : _Thread_List_)

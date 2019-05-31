@@ -30,12 +30,12 @@ namespace Kaba{
 const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 
 
+extern void require_main_thread(const string &msg); // hui
 
 #if HAS_LIB_PULSEAUDIO
 
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 extern void pulse_ignore_op(Session*, pa_operation*);
-extern void require_main_thread(const string &msg); // hui
 
 bool pulse_wait_stream_ready(pa_stream *s)
 {

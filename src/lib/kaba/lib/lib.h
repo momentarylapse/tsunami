@@ -112,8 +112,9 @@ enum
 	NUM_PRIMITIVE_OPERATORS
 };
 
-struct PrimitiveOperator
+class PrimitiveOperator
 {
+public:
 	string name;
 	int id;
 	bool left_modifiable;
@@ -129,8 +130,9 @@ extern PrimitiveOperator PrimitiveOperators[];
 //--------------------------------------------------------------------------------------------------
 // commands
 
-struct Statement
+class Statement
 {
+public:
 	string name;
 	int num_params;
 };

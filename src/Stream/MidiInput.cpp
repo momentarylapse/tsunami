@@ -94,7 +94,7 @@ void MidiInput::_create_dev()
 {
 	if (state != State::NO_DEVICE)
 		return;
-
+#if HAS_LIB_ALSA
 	portid = snd_seq_create_simple_port(device_manager->alsa_midi_handle, "Tsunami MIDI in",
 				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 				SND_SEQ_PORT_TYPE_APPLICATION);
@@ -102,6 +102,7 @@ void MidiInput::_create_dev()
 		session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
 		return;
 	}
+#endif
 
 	state = State::PAUSED;
 }
@@ -110,7 +111,9 @@ void MidiInput::_kill_dev()
 {
 	if (state == State::NO_DEVICE)
 		return;
+#if HAS_LIB_ALSA
 	snd_seq_delete_simple_port(device_manager->alsa_midi_handle, portid);
+#endif
 	state = State::NO_DEVICE;
 }
 

@@ -4,6 +4,7 @@
 #include <new>
 #include <string.h>
 #include <initializer_list>
+#include <ciso646>
 
 // dynamic arrays
 

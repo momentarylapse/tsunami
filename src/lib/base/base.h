@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "array.h"
 #include "strings.h"
+#include <ciso646>
 
 #ifdef max
 #undef max

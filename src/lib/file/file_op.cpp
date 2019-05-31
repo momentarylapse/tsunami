@@ -163,6 +163,7 @@ string file_hash(const string &filename, const string &type)
 
 string shell_execute(const string &cmd)
 {
+#ifdef OS_LINUX
 	FILE *f = popen(cmd.c_str(), "r");
 	string buffer;
 
@@ -178,6 +179,9 @@ string shell_execute(const string &cmd)
 	if (r != 0)
 		throw Exception("failed to run shell command");
 	return buffer;
+#else
+	return "";
+#endif
 }
 
 

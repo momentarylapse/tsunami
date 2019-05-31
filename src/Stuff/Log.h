@@ -11,6 +11,10 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
 class Session;
 
 class Log : public Observable<VirtualBase>

@@ -8,7 +8,7 @@ namespace Kaba{
 class Script;
 class SyntaxTree;
 class Class;
-struct Function;
+class Function;
 
 
 struct ClassElement

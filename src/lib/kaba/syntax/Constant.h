@@ -20,8 +20,9 @@ class Block;
 class SyntaxTree;
 
 
-struct Value
+class Value
 {
+public:
 	string value;
 	const Class *type;
 
@@ -47,8 +48,9 @@ struct Value
 };
 
 // for any type of constant used in the script
-struct Constant : Value
+class Constant : public Value
 {
+public:
 	Constant(const Class *type, SyntaxTree *owner);
 	string name;
 	string str() const;

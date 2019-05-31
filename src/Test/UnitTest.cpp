@@ -11,7 +11,6 @@
 #include "../lib/file/msg.h"
 #include "../lib/hui/hui.h"
 #include "../Data/Audio/AudioBuffer.h"
-#include <unistd.h>
 #include <math.h>
 
 #include "TestAudioBuffer.h"
@@ -75,7 +74,7 @@ void UnitTest::sleep(float t)
 	hui::Timer timer;
 	while (timer.peek() < t){
 		hui::Application::do_single_main_loop();
-		usleep(1000);
+		hui::Sleep(0.001f);
 	}
 }
 

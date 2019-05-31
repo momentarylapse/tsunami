@@ -30,11 +30,11 @@ float AudioInput::playback_delay_const;
 
 static const int DEFAULT_CHUNK_SIZE = 512;
 
+extern void require_main_thread(const string&);
 
 #if HAS_LIB_PULSEAUDIO
 extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
 extern bool pulse_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
-extern void require_main_thread(const string&);
 
 
 void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)

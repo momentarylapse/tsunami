@@ -145,7 +145,7 @@ File::~File()
 
 bool File::eof()
 {
-#ifdef OS_WINDOW
+#ifdef OS_WINDOWS
 	return _eof(handle);
 #endif
 #if defined(OS_LINUX) or defined(OS_MINGW)

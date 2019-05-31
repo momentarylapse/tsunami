@@ -173,6 +173,7 @@ void* rbp2 = nullptr;
 
 void relink_return(void *rip, void *rbp, void *rsp)
 {
+#ifdef OS_LINUX
 	if (_verbose_exception_)
 		printf("relink to rip=%p, rbp=%p  rsp=%p\n", rip, rbp, rsp);
 	// ARGH....
@@ -186,6 +187,7 @@ void relink_return(void *rip, void *rbp, void *rsp)
 		: "%rsp");
 
 //	printf("rbp=%p\n", rbp2);
+#endif
 
 	exit(0);
 }
@@ -251,6 +253,7 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 {
+#ifdef OS_LINUX
 	// get stack frame base pointer rbp
 	void **rbp = nullptr;
 	void **rsp = nullptr;
@@ -325,6 +328,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
 	for (auto r: trace)
 		msg_write(">>  " + r.s->filename + " : " + r.f->long_name + format("()  + 0x%x", r.offset));
+#endif
 	exit(1);
 }
 #pragma GCC pop_options

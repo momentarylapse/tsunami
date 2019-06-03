@@ -716,7 +716,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 
 	for (int j=0; j<channels; j++){
 		for (int i=i0; i<i1; i++)
-			peaks[j][i] = (unsigned char)fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254;
+			peaks[j][i] = (unsigned char)(fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
 	}
 	memcpy(&peaks[2][i0], &peaks[0][i0], n);
 	memcpy(&peaks[3][i0], &peaks[1][i0], n);

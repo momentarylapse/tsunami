@@ -134,7 +134,9 @@ void LoadResource(const string &filename)
 			_languages_.add(hl);
 		}
 		FileClose(f);
-	}catch(...){}
+	}catch(Exception &e){
+		msg_error(e.message());
+	}
 }
 
 Resource *GetResource(const string &id)

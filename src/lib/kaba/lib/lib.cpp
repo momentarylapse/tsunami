@@ -1714,6 +1714,9 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 
 void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance)
 {
+#ifdef OS_WINDOWS
+	return;
+#endif
 	VirtualTable *v = *(VirtualTable**)instance;
 
 	ClassOffsetData d;

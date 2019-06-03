@@ -22,6 +22,9 @@
     <Filter Include="Source Files\kaba">
       <UniqueIdentifier>{8067d5b8-24a6-4c32-82ca-96c2948bf92b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hui\Control">
+      <UniqueIdentifier>{86fbb7f0-7ccd-40ab-9ca1-02074b48124b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Data\Audio\AudioBuffer.cpp">
@@ -115,9 +118,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\file\msg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Config.cpp">
@@ -909,78 +909,6 @@
     <ClCompile Include="src\View\Painter\GridPainter.cpp">
       <Filter>Source Files\hui</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlColorButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlComboBoxGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlEditGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlDrawingAreaGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlMultilineEditGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlPanedGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlProgressBarGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSeparatorGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSliderGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlTabControlGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlSpinButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlTreeViewGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\ControlToggleButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\kaba\kaba.cpp">
       <Filter>Source Files\kaba</Filter>
     </ClCompile>
@@ -1139,6 +1067,81 @@
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp">
       <Filter>Source Files\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlColorButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlComboBoxGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlDrawingAreaGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlEditGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlMultilineEditGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlPanedGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlProgressBarGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSeparatorGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSliderGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlSpinButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlTabControlGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlToggleButtonGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\ControlTreeViewGtk.cpp">
+      <Filter>Source Files\hui\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Application.cpp">
+      <Filter>Source Files\hui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

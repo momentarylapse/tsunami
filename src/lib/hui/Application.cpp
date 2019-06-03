@@ -66,8 +66,9 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		directory = directory.replace("\\Release\\", "\\");
 		directory = directory.replace("\\Debug\\", "\\");
 		directory = directory.replace("\\Unoptimized\\", "\\");
+		directory = directory.replace("\\x64\\", "\\");
 		hui_win_instance = (HINSTANCE)GetModuleHandle(nullptr);
-		directory_static = directory;
+		directory_static = directory + "static\\";
 	#endif
 
 	if (!msg_inited){

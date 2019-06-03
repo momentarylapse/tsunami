@@ -33,8 +33,9 @@ class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 
-struct MidiKeyChange
+class MidiKeyChange
 {
+public:
 	MidiKeyChange();
 	MidiKeyChange(int pos, const Scale &key);
 	int pos;

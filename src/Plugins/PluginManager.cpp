@@ -522,7 +522,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Song.begin_action_group", Kaba::mf(&Song::begin_action_group));
 	Kaba::LinkExternal("Song.end_action_group", Kaba::mf(&Song::end_action_group));
 
-	SongRenderer sr(&af);
+	SongRenderer sr(nullptr);
 	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Kaba::LinkExternal("SongRenderer.prepare", Kaba::mf(&SongRenderer::prepare));
 	Kaba::LinkExternal("SongRenderer.render", Kaba::mf(&SongRenderer::render));
@@ -708,6 +708,7 @@ void PluginManager::find_plugins()
 	Kaba::config.compile_silently = true;
 
 	// "AudioSource"
+#ifndef OS_WINDOWS
 	find_plugins_in_dir("AudioSource/", "", ModuleType::AUDIO_SOURCE, this);
 
 	// "AudioEffect"
@@ -741,6 +742,7 @@ void PluginManager::find_plugins()
 
 	// "Synthesizer"
 	find_plugins_in_dir("Synthesizer/", "", ModuleType::SYNTHESIZER, this);
+#endif
 }
 
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win)

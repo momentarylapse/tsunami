@@ -17,12 +17,12 @@ void require_main_thread(const string &msg)
 }
 
 
-#ifdef OS_WINDOWS
+#if defined(OS_WINDOWS)
 	#include <direct.h>
 	#include <tchar.h>
 	#include <signal.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MINGW)
 	#include <sys/time.h>
 	#include <unistd.h>
 #endif
@@ -62,14 +62,14 @@ void Timer::reset()
 float Timer::peek()
 {
 	float elapsed = 0;
-	#ifdef OS_WINDOWS
+	#if defined(OS_WINDOWS)
 		if (HuiTimerPerfFlag)
 			QueryPerformanceCounter((LARGE_INTEGER *)&cur_time);
 		else
 			cur_time = timeGetTime();
 		elapsed = (float)(cur_time - last_time) * HuitTimerScal;
 	#endif
-	#ifdef OS_LINUX
+	#if defined(OS_LINUX) || defined(OS_MINGW)
 		gettimeofday(&cur_time, nullptr);
 		elapsed = float(cur_time.tv_sec - last_time.tv_sec) + float(cur_time.tv_usec - last_time.tv_usec) * 0.000001f;
 	#endif
@@ -96,10 +96,10 @@ void Sleep(float duration)
 		_sleep_complained_ = true;
 	}*/
 
-#ifdef OS_WINDOWS
-	::Sleep((DWORD)(duration * 1000.0f));
+#if defined(OS_WINDOWS)
+	::Sleep((int)(duration * 1000.0f));
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MINGW)
 	usleep(duration * 1000000);
 #endif
 }

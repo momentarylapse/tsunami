@@ -44,8 +44,6 @@ extern Configuration Config;
 
 
 
-void _cdecl RegisterFileType(const string &ending, const string &description, const string &icon_path, const string &open_with, const string &command_name, bool set_default);
-
 };
 
 #endif /* HUICONFIG_H_ */

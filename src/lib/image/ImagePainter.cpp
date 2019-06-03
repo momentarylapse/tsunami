@@ -37,9 +37,9 @@ void ImagePainter::set_color(const color& c)
 	_color = c;
 }
 
-void ImagePainter::set_font(const string& font, float size, bool bold, bool italic)
+/*void ImagePainter::set_font(const string& font, float size, bool bold, bool italic)
 {
-}
+}*/
 
 void ImagePainter::set_font_size(float size)
 {

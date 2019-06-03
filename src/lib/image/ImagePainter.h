@@ -23,7 +23,7 @@ public:
 
 	void _cdecl end();
 	void _cdecl set_color(const color &c) override;
-	void _cdecl set_font(const string &font, float size, bool bold, bool italic) override;
+//	void _cdecl set_font(const string &font, float size, bool bold, bool italic) override;
 	void _cdecl set_font_size(float size) override;
 	void _cdecl set_antialiasing(bool enabled) override;
 	void _cdecl set_line_width(float w) override;

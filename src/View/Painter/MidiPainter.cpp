@@ -842,7 +842,7 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 		rr = min(string_dy/2, 13.0f);
 }
 
-void __cdecl MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes)
+void MidiPainter::set_key_changes(const Array<MidiKeyChange> &changes)
 {
 	key_changes = changes;
 }

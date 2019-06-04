@@ -155,7 +155,8 @@ void PeakMeterDisplay::on_draw(Painter *c)
 		c->draw_rect(boundary, boundary, w - 2*boundary, h - 2*boundary);
 		c->set_color(AudioView::colors.text);
 		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * (w - 2*boundary);
-		for (int i=0;i<100;i++){
+		int n = max(100, l->spec.num);
+		for (int i=0;i<n;i++){
 			float x0 = boundary + (float)i / (float)PeakMeter::SPECTRUM_SIZE * (w - 2*boundary);
 			float hh = (h - 2*boundary) * l->spec[i];
 			c->draw_rect(x0, h - boundary - hh, dx, hh);

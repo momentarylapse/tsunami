@@ -296,49 +296,49 @@ DynamicArray DynamicArray::ref_subarray(int start, int end)
 
 // Array<char>
 template <> void Array<char>::add(const char item)
-{	((DynamicArray*)this)->append_1_single(item);	}
+{	DynamicArray::append_1_single(item);	}
 template <> void Array<char>::erase(int index)
-{	((DynamicArray*)this)->delete_single(index);	}
+{	DynamicArray::delete_single(index);	}
 template <> void Array<char>::operator = (const Array<char> &a)
-{	((DynamicArray*)this)->assign(&a);	}
+{	DynamicArray::assign(&a);	}
 template <> void Array<char>::operator += (const Array<char> &a)
-{	((DynamicArray*)this)->append(&a);	}
+{	DynamicArray::append(&a);	}
 
 // Array<bool>
 template <> void Array<bool>::add(const bool item)
-{	((DynamicArray*)this)->append_1_single(item);	}
+{	DynamicArray::append_1_single(item);	}
 template <> void Array<bool>::erase(int index)
-{	((DynamicArray*)this)->delete_single(index);	}
+{	DynamicArray::delete_single(index);	}
 template <> void Array<bool>::operator = (const Array<bool> &a)
-{	((DynamicArray*)this)->assign(&a);	}
+{	DynamicArray::assign(&a);	}
 template <> void Array<bool>::operator += (const Array<bool> &a)
-{	((DynamicArray*)this)->append(&a);	}
+{	DynamicArray::append(&a);	}
 
 // Array<int>
 template <> void Array<int>::add(const int item)
-{	((DynamicArray*)this)->append_4_single(item);	}
+{	DynamicArray::append_4_single(item);	}
 template <> void Array<int>::erase(int index)
-{	((DynamicArray*)this)->delete_single(index);	}
+{	DynamicArray::delete_single(index);	}
 template <> void Array<int>::operator = (const Array<int> &a)
-{	((DynamicArray*)this)->assign(&a);	}
+{	DynamicArray::assign(&a);	}
 template <> void Array<int>::operator += (const Array<int> &a)
-{	((DynamicArray*)this)->append(&a);	}
+{	DynamicArray::append(&a);	}
 
 // Array<float>
 template <> void Array<float>::add(const float item)
-{	((DynamicArray*)this)->append_4_single(*(int*)&item);	}
+{	DynamicArray::append_4_single(*(int*)&item);	}
 template <> void Array<float>::erase(int index)
-{	((DynamicArray*)this)->delete_single(index);	}
+{	DynamicArray::delete_single(index);	}
 template <> void Array<float>::operator = (const Array<float> &a)
-{	((DynamicArray*)this)->assign(&a);	}
+{	DynamicArray::assign(&a);	}
 template <> void Array<float>::operator += (const Array<float> &a)
-{	((DynamicArray*)this)->append(&a);	}
+{	DynamicArray::append(&a);	}
 
 
 
 /*template <> void Array<char>::insert(char c, int pos)
 {
-	((DynamicArray*)this)->resize(((DynamicArray*)this)->num + 1);
+	DynamicArray::resize(((DynamicArray*)this)->num + 1);
 	for (int i=((DynamicArray*)this)->num-2;i>=pos;i--)
 		(*this)[i+1] = (*this)[i];
 	(*this)[pos] = c;

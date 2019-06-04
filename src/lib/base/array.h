@@ -47,247 +47,251 @@ class DynamicArray
 template <class T>
 class Array : public DynamicArray
 {
-	public:
-		Array()
-		{	init(sizeof(T));	}
+public:
+	Array()
+	{	init(sizeof(T));	}
 
-		// copy constructor
-		Array(const Array &a)
-		{
-			init(sizeof(T));
-			(*this) = a;
+	// copy constructor
+	Array(const Array &a)
+	{
+		init(sizeof(T));
+		(*this) = a;
+	}
+
+	// move constructor
+	Array(Array &&a)
+	{
+		init(sizeof(T));
+		exchange(a);
+	}
+
+	Array(std::initializer_list<T> il)
+	{
+		init(sizeof(T));
+		resize(il.size());
+		auto it = il.begin();
+		for (int i=0; i<num; i++)
+			(*this)[i] = *(it++);
+
+	}
+
+	// kaba
+	void _cdecl __init__()
+	{
+		init(sizeof(T));
+	}
+
+	~Array()
+	{	clear();	}
+	void _cdecl clear()
+	{
+		if (allocated > 0){
+			for (int i=0; i<num; i++)
+				(*this)[i].~T();
 		}
+		DynamicArray::clear();
+	}
+	void _cdecl add(const T item)
+	{
+		resize(num + 1);
+		(*this)[num - 1] = item;
+	}
+	T _cdecl pop()
+	{
+		T r;
+		if (num > 0){
+			//memcpy(&r, &back(), element_size);
+			//DynamicArray::resize(num - 1);
+			r = back();
+			resize(num - 1);
+		}
+		return r;
+	}
+	void _cdecl append(const Array<T> &a)
+	{
+		int num0 = num;
+		resize(num + a.num);
+		for (int i=0; i<a.num; i++)
+			(*this)[num0 + i] = a[i];
+	}
+	void _cdecl erase(int index)
+	{
+		if ((index >= 0) and (index < num)){
+			for (int i=index; i<num-1; i++)
+				(*this)[i] = (*this)[i+1];
+			resize(num - 1);
+		}
+	}
+	void _cdecl insert(const T item, int index)
+	{
+		resize(num + 1);
+		for (int i=num-1; i>index; i--)
+			(*this)[i] = (*this)[i-1];
+		(*this)[index] = item;
+	}
+	void _cdecl resize(int size)
+	{
+		if (size < num){
+			// shrink -> destruct
+			for (int i=size; i<num; i++)
+				(*this)[i].~T();
+		}
+		if (size > num){
+			reserve(size);
+			// grow -> construct
+			memset((char*)data + num * element_size, 0, (size - num) * element_size);
+			for (int i=num; i<size; i++)
+				new(&(*this)[i]) T;
+		}
+		num = size;
+	}
+	int find(const T item) const
+	{
+		for (int i=0; i<num; i++)
+			if ((*this)[i] == item)
+				return i;
+		return -1;
+	}
+	Array<T> _cdecl sub(int start, int num_elements) const
+	{
+		Array<T> s;
+		if ((num_elements < 0) or (num_elements > num - start))
+			num_elements = num - start;
+		s.num = num_elements;
+		s.data = ((T*)this->data) + start;
+		return s;
+	}
 
-		// move constructor
-		Array(Array &&a)
-		{
-			init(sizeof(T));
+	bool operator == (const Array<T> &o) const
+	{
+		if (num != o.num)
+			return false;
+		for (int i=0; i<num; i++)
+			if ((*this)[i] != o[i])
+				return false;
+		return true;
+	}
+	bool operator != (const Array<T> &o) const
+	{
+		return !(*this == o);
+	}
+
+	// copy assignment
+	void operator = (const Array<T> &a)
+	{
+		if (this != &a){
+			resize(a.num);
+			for (int i=0; i<num; i++)
+				(*this)[i] = a[i];
+		}
+	}
+
+	// move assignment
+	void operator = (Array<T> &&a)
+	{
+		if (this != &a){
+			clear();
 			exchange(a);
 		}
+	}
+	void operator += (const Array<T> &a)
+	{	append(a);	}
+	Array<T> operator + (const Array<T> &a) const
+	{
+		Array<T> r = *this;
+		r.append(a);
+		return r;
+	}
+	T &operator[] (int index) const
+	{	return ((T*)data)[index];	}
+	T &back()
+	{	return ((T*)data)[num - 1];	}
+	const T &_cdecl back() const
+	{	return ((T*)data)[num - 1];	}
 
-		Array(std::initializer_list<T> il)
-		{
-			init(sizeof(T));
-			resize(il.size());
-			auto it = il.begin();
-			for (int i=0; i<num; i++)
-				(*this)[i] = *(it++);
-
-		}
-
-		// kaba
-		void _cdecl __init__()
-		{
-			init(sizeof(T));
-		}
-
-		~Array()
-		{	clear();	}
-		void _cdecl clear()
-		{
-			if (allocated > 0){
-				for (int i=0; i<num; i++)
-					(*this)[i].~T();
-			}
-			DynamicArray::clear();
-		}
-		void _cdecl add(const T item)
-		{
-			resize(num + 1);
-			(*this)[num - 1] = item;
-		}
-		T _cdecl pop()
-		{
-			T r;
-			if (num > 0){
-				//memcpy(&r, &back(), element_size);
-				//DynamicArray::resize(num - 1);
-				r = back();
-				resize(num - 1);
-			}
-			return r;
-		}
-		void _cdecl append(const Array<T> &a)
-		{
-			int num0 = num;
-			resize(num + a.num);
-			for (int i=0;i<a.num;i++)
-				(*this)[num0 + i] = a[i];
-		}
-		void _cdecl erase(int index)
-		{
-			(*this)[index].~T();
-			delete_single(index);
-		}
-		void _cdecl insert(const T item, int index)
-		{
-			insert_blank(index);
-			new(&(*this)[index]) T;
-			(*this)[index] = item;
-		}
-		void _cdecl resize(int size)
-		{
-			if (size < num){
-				// shrink -> destruct
-				for (int i=size;i<num;i++)
-					(*this)[i].~T();
-			}
-			if (size > num){
-				reserve(size);
-				// grow -> construct
-				memset((char*)data + num * element_size, 0, (size - num) * element_size);
-				for (int i=num; i<size; i++)
-					new(&(*this)[i]) T;
-			}
-			num = size;
-		}
-		int find(const T item) const
-		{
-			for (int i=0; i<num; i++)
-				if ((*this)[i] == item)
-					return i;
-			return -1;
-		}
-		Array<T> _cdecl sub(int start, int num_elements) const
-		{
-			Array<T> s;
-			if ((num_elements < 0) or (num_elements > num - start))
-				num_elements = num - start;
-			s.num = num_elements;
-			s.data = ((T*)this->data) + start;
-			return s;
-		}
-
-		bool operator == (const Array<T> &o) const
-		{
-			if (num != o.num)
-				return false;
-			for (int i=0; i<num; i++)
-				if ((*this)[i] != o[i])
-					return false;
-			return true;
-		}
-		bool operator != (const Array<T> &o) const
-		{
-			return !(*this == o);
-		}
-
-		// copy assignment
-		void operator = (const Array<T> &a)
-		{
-			if (this != &a){
-				resize(a.num);
-				for (int i=0; i<num; i++)
-					(*this)[i] = a[i];
-			}
-		}
-
-		// move assignment
-		void operator = (Array<T> &&a)
-		{
-			if (this != &a){
-				clear();
-				exchange(a);
-			}
-		}
-		void operator += (const Array<T> &a)
-		{	append(a);	}
-		Array<T> operator + (const Array<T> &a) const
-		{
-			Array<T> r = *this;
-			r.append(a);
-			return r;
-		}
-		T &operator[] (int index) const
-		{	return ((T*)data)[index];	}
-		T &back()
-		{	return ((T*)data)[num - 1];	}
-		const T &_cdecl back() const
-		{	return ((T*)data)[num - 1];	}
-
-		// reference arrays
-		void _cdecl set_ref(const Array<T> &a)
-		{
-			if (this != &a){
-				clear();
-				num = a.num;
-				data = a.data;
-				element_size = a.element_size;
-				allocated = 0;
-			}
-		}
-		void _cdecl forget()
-		{
-			data = nullptr;
+	// reference arrays
+	void _cdecl set_ref(const Array<T> &a)
+	{
+		if (this != &a){
+			clear();
+			num = a.num;
+			data = a.data;
+			element_size = a.element_size;
 			allocated = 0;
-			num = 0;
 		}
-		void _cdecl make_own()
-		{
-			if (!is_ref())
-				return;
-			T *dd = (T*)data;
-			int n = num;
-			forget();
-			resize(n);
-			for (int i=0; i<num; i++)
-				(*this)[i] = dd[i];
-		}
-		bool _cdecl is_ref() const
-		{
-			return (num > 0) and (allocated == 0);
-		}
+	}
+	void _cdecl forget()
+	{
+		data = nullptr;
+		allocated = 0;
+		num = 0;
+	}
+	void _cdecl make_own()
+	{
+		if (!is_ref())
+			return;
+		T *dd = (T*)data;
+		int n = num;
+		forget();
+		resize(n);
+		for (int i=0; i<num; i++)
+			(*this)[i] = dd[i];
+	}
+	bool _cdecl is_ref() const
+	{
+		return (num > 0) and (allocated == 0);
+	}
 
-		// iterators
-		class Iterator
+	// iterators
+	class Iterator
+	{
+	public:
+		void operator ++()
+		{	index ++;	p ++;	}
+		void operator ++(int) // postfix
+		{	index ++;	p ++;	}
+		void operator --()
+		{	index --;	p --;	}
+		void operator --(int)
+		{	index --;	p --;	}
+		bool operator == (const Iterator &i) const
+		{	return p == i.p;	}
+		bool operator != (const Iterator &i) const
+		{	return p != i.p;	}
+		T &operator *()
+		{	return *p;	}
+		T *operator ->()
+		{	return p;	}
+		bool valid() const
+		{	return index < num;	}
+		bool valid_down() const
+		{	return index >= 0;	}
+		int get_index() const
+		{	return index;	}
+		void update()
+		{	p = &array[index];	}
+		operator bool() const
+		{	return false;	}
+	//private:
+		Iterator(const Array<T> &a, int n) : array(a), num(a.num)
 		{
-		public:
-			void operator ++()
-			{	index ++;	p ++;	}
-			void operator ++(int) // postfix
-			{	index ++;	p ++;	}
-			void operator --()
-			{	index --;	p --;	}
-			void operator --(int)
-			{	index --;	p --;	}
-			bool operator == (const Iterator &i) const
-			{	return p == i.p;	}
-			bool operator != (const Iterator &i) const
-			{	return p != i.p;	}
-			T &operator *()
-			{	return *p;	}
-			T *operator ->()
-			{	return p;	}
-			bool valid() const
-			{	return index < num;	}
-			bool valid_down() const
-			{	return index >= 0;	}
-			int get_index() const
-			{	return index;	}
-			void update()
-			{	p = &array[index];	}
-			operator bool() const
-		    {	return false;	}
-		//private:
-			Iterator(const Array<T> &a, int n) : array(a), num(a.num)
-			{
-				p = &array[n];
-				index = n;
-			}
-		private:
-			const Array<T> &array;
-			T *p;
-			int index;
-			const int &num;
-		};
-		Iterator begin() const
-		{	return Iterator(*this, 0);	}
-		Iterator end() const
-		{	return Iterator(*this, num);	}
-		Iterator begin_down() const
-		{	return Iterator(*this, num - 1);	}
-		/*void erase(Iterator &it)
-		{	erase(it.get_index());	}*/
+			p = &array[n];
+			index = n;
+		}
+	private:
+		const Array<T> &array;
+		T *p;
+		int index;
+		const int &num;
+	};
+	Iterator begin() const
+	{	return Iterator(*this, 0);	}
+	Iterator end() const
+	{	return Iterator(*this, num);	}
+	Iterator begin_down() const
+	{	return Iterator(*this, num - 1);	}
+	/*void erase(Iterator &it)
+	{	erase(it.get_index());	}*/
 };
 
 // foreach loop

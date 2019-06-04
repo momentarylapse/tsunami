@@ -133,7 +133,7 @@ void AudioViewTrack::draw_header(Painter *c)
 		c->set_color(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_EDIT))
 			c->set_color(col_but_hover);
-		c->draw_str(area.x1 + 5 + 17*2, area.y1 + 22, "\U0001f527"); // U+1F527 "🔧"
+		c->draw_str(area.x1 + 5 + 17*2, area.y1 + 22, u8"\U0001f527"); // U+1F527 "🔧"
 
 		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))

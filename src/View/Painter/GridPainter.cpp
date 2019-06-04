@@ -216,7 +216,7 @@ void GridPainter::draw_bar_numbers(Painter *c)
 			prev = *b;
 		}
 		if (fabs(prev_bpm - bpm) > 1.5f){
-			s += format(" \u2669=%.0f", bpm);
+			s += format(u8" \u2669=%.0f", bpm);
 			prev_bpm = bpm;
 		}
 		if (s.num > 0){

@@ -141,9 +141,9 @@ void PagePainter::draw_circle(float x, float y, float radius)
 
 static string _pdf_str_filter(const string &str)
 {
-	string x = str.replace("\u266f", "#").replace("\u266d", "b");
-	x = x.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss");
-	x = x.replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue");
+	string x = str.replace(u8"\u266f", "#").replace(u8"\u266d", "b");
+	x = x.replace(u8"ä", "ae").replace(u8"ö", "oe").replace(u8"ü", "ue").replace(u8"ß", "ss");
+	x = x.replace(u8"Ä", "Ae").replace(u8"Ö", "Oe").replace(u8"Ü", "Ue");
 	return x;
 }
 

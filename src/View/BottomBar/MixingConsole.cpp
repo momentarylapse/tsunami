@@ -59,7 +59,7 @@ public:
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
 		add_string(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
-		add_string(vol_slider_id, format("%f\\-\u221e", db2slider(DB_MIN))); // \u221e
+		add_string(vol_slider_id, format(u8"%f\\-\u221e", db2slider(DB_MIN))); // \u221e
 
 		event(vol_slider_id, [=]{ on_volume(); });
 		event(pan_slider_id, [=]{ on_panning(); });

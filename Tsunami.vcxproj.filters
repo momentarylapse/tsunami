@@ -13,30 +13,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="Source Files\hui">
-      <UniqueIdentifier>{3eebda93-827c-428e-aa0f-62b5c3eb42a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Action">
       <UniqueIdentifier>{607cac73-279b-4957-b3ff-c19e5635fe2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\kaba">
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{db8fa23d-d26d-4ca0-a17d-29da407e911f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\hui">
+      <UniqueIdentifier>{3eebda93-827c-428e-aa0f-62b5c3eb42a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\hui\Control">
+      <UniqueIdentifier>{86fbb7f0-7ccd-40ab-9ca1-02074b48124b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\kaba">
       <UniqueIdentifier>{8067d5b8-24a6-4c32-82ca-96c2948bf92b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\hui\Control">
-      <UniqueIdentifier>{86fbb7f0-7ccd-40ab-9ca1-02074b48124b}</UniqueIdentifier>
+    <Filter Include="Source Files\Module">
+      <UniqueIdentifier>{c7ef6250-aac3-4f91-bbc4-7827bfb800f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Device">
+      <UniqueIdentifier>{2b4b2bb0-2935-4259-b06c-1b57dff4b037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Data">
+      <UniqueIdentifier>{666e53c9-d613-4b1d-b94d-774f8319d96b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\View">
+      <UniqueIdentifier>{7d63f309-1fd3-4db0-9b0c-b602c917fe75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Data\Audio\AudioBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Data\Audio\BufferInterpolator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Audio\RingBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\CrossFade.cpp">
@@ -46,9 +55,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Midi\Clef.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Midi\Instrument.cpp">
@@ -67,15 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Range.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Rhythm\Bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Rhythm\BarCollection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Rhythm\Beat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Sample.cpp">
@@ -105,94 +102,13 @@
     <ClCompile Include="src\Device\DeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\base\array.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\base\strings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\file\file.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\file\file_op.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\file\msg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\hui\Config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\hui\Controls\Control.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\ImagePainter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\image_bmp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\image_jpg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\image_png.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\image\image_tga.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\asm\asm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\lib\exception.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\complex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\math\interpolation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\math\math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\matrix3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\plane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\quaternion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\ray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\math\rect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\math\vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\net\net.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\threads\Mutex.cpp">
@@ -204,34 +120,7 @@
     <ClCompile Include="src\lib\threads\ThreadedWork.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\xfile\chunked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\xfile\pdf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\xfile\xml.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioBackup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioJoiner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioRecorder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioSucker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Audio\AudioVisualizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Module\Audio\BufferStreamer.cpp">
@@ -247,18 +136,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Module\Audio\TrackRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\AutoConfigPanel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Beats\BarStreamer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Beats\BeatMidifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Module\Beats\BeatSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Module\ConfigPanel.cpp">
@@ -378,12 +255,6 @@
     <ClCompile Include="src\Storage\StorageOperationData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Stream\AudioInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Stream\AudioOutput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Stream\MidiInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -435,18 +306,6 @@
     <ClCompile Include="src\TsunamiWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\View\AudioView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\AudioViewLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\AudioViewTrack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\BottomBar\BottomBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\View\BottomBar\DeviceConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -466,15 +325,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\View\ColorScheme.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Dialog\BarAddDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Dialog\BarDeleteDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Dialog\BarEditDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\View\Dialog\ConfigurableSelectorDialog.cpp">
@@ -856,292 +706,457 @@
       <Filter>Source Files\Action</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Clipboard.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\common_dlg.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\common_dlg_gtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\common_dlg_win.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Callback.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemSeparatorWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemSubmenuWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemToggleGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemToggleWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\MenuItemWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\MenuWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\MenuGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Menu.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\language.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\View\Painter\GridPainter.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\kaba.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\lexical.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_file.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_hui.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_image.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_math.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_net.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_nix.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_sound.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_threads.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\lib\lib_x.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\hui.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Event.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\error.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\main_win.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\main_gtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Resource.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Panel.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\PainterGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Timer.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\WindowWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\WindowGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\window_control_win.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\window_control_gtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\window_control.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Window.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Toolbar.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\ToolbarGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\ToolbarWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemButtonWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemMenuButtonWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemSeparatorWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonGtk.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ToolItemToggleButtonWin.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\utility.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\compiler.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Class.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Constant.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\Function.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\mapper.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\precompiler.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\preprocessor.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\parser.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\serializer.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\serializer_amd64.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\serializer_arm.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\compiler\serializer_x86.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\View\Dialog\HelpDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\kaba\syntax\SyntaxTree.cpp">
-      <Filter>Source Files\kaba</Filter>
+      <Filter>Source Files\lib\kaba</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlCheckBoxGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlColorButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlComboBoxGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlDrawingAreaGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlEditGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlExpanderGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlGridGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlGroupGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlLabelGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlListViewGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlMenuButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlMultilineEditGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlPanedGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlProgressBarGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlRadioButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlRevealerGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlScrollerGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlSeparatorGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlSliderGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlSpinButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlTabControlGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlToggleButtonGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Controls\ControlTreeViewGtk.cpp">
-      <Filter>Source Files\hui\Control</Filter>
+      <Filter>Source Files\lib\hui\Control</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\hui\Application.cpp">
-      <Filter>Source Files\hui</Filter>
+      <Filter>Source Files\lib\hui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\asm\asm.cpp">
+      <Filter>Source Files\lib\kaba</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\base\array.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioBackup.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioEffect.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioJoiner.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioRecorder.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Audio\AudioBuffer.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Stream\AudioInput.cpp">
+      <Filter>Source Files\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Stream\AudioOutput.cpp">
+      <Filter>Source Files\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioSource.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioSucker.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Audio\AudioVisualizer.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\AutoConfigPanel.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Beats\BarStreamer.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Beats\BeatMidifier.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Module\Beats\BeatSource.cpp">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioView.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioViewLayer.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\AudioViewTrack.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Rhythm\Bar.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Rhythm\Beat.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\xfile\chunked.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\color.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\complex.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\hui\Controls\Control.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\lib\exception.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\file\file.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\file\file_op.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\image_tga.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\ImagePainter.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\implicit.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\image_jpg.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\image.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\image_bmp.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\image\image_png.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\math.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\matrix.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\matrix3.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\net\net.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\file\msg.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\xfile\pdf.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\plane.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\quaternion.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\random.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\ray.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\math\rect.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\kaba\syntax\Node.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\base\strings.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\base.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Midi\Clef.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Rhythm\BarCollection.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Dialog\BarAddDialog.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Dialog\BarDeleteDialog.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Dialog\BarEditDialog.cpp">
+      <Filter>Source Files\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\BottomBar\BottomBar.cpp">
+      <Filter>Source Files\View</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

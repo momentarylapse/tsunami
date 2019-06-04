@@ -40,7 +40,7 @@ int pitch_to_rel(int pitch)
 	return pitch % 12;
 }
 
-static string REL_PITCH_NAME[12] = {"C", "C\u266F", "D", "D\u266F", "E", "F", "F\u266F", "G", "G\u266F", "A", "A\u266F", "B"};
+static string REL_PITCH_NAME[12] = {"C", u8"C\u266F", "D", u8"D\u266F", "E", "F", u8"F\u266F", "G", u8"G\u266F", "A", u8"A\u266F", "B"};
 static string REL_PITCH_NAME_CANONICAL[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
 
 string rel_pitch_name(int pitch_rel)
@@ -166,11 +166,11 @@ string modifier_symbol(NoteModifier mod)
 	if (mod == NoteModifier::NONE)
 		return "";
 	if (mod == NoteModifier::SHARP)
-		return "\u266f";
+		return u8"\u266f";
 	if (mod == NoteModifier::FLAT)
-		return "\u266d";
+		return u8"\u266d";
 	if (mod == NoteModifier::NATURAL)
-		return "\u266e";
+		return u8"\u266e";
 	return "?";
 }
 

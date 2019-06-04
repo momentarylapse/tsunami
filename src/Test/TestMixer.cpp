@@ -18,6 +18,8 @@
 #include "../lib/file/msg.h"
 #include <math.h>
 
+const float sqrt2 = (float)sqrt(2.0);
+
 TestMixer::TestMixer() : UnitTest("mixer")
 {
 }
@@ -156,7 +158,7 @@ void TestMixer::test_mix_mono_1track_panning_right()
 	sr->read(buf);
 
 	// overdriving... by design
-	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}));
+	assert_equal(buf, make_buf({0.0f, 0.0f, 0.0f, 0.0f}, {sqrt2, sqrt2, sqrt2, sqrt2}));
 	delete sr;
 	delete s;
 }
@@ -173,7 +175,7 @@ void TestMixer::test_mix_mono_1track_panning_left()
 	sr->read(buf);
 
 	// overdriving... by design
-	assert_equal(buf, make_buf({sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f)}, {0.0f, 0.0f, 0.0f, 0.0f}));
+	assert_equal(buf, make_buf({sqrt2, sqrt2, sqrt2, sqrt2}, {0.0f, 0.0f, 0.0f, 0.0f}));
 	delete sr;
 	delete s;
 }

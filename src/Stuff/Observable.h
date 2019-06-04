@@ -33,8 +33,9 @@ public:
 	typedef std::function<void(VirtualBase*)> CallbackP;
 
 	// observers
-	struct Subscription
+	class Subscription
 	{
+	public:
 		Subscription();
 		Subscription(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
 		VirtualBase* observer;
@@ -46,8 +47,9 @@ public:
 	void subscribe(VirtualBase *me, VirtualBase *observer, const Callback &callback, const CallbackP &callback_p, const string &message);
 	void unsubscribe(VirtualBase *observer);
 
-	struct Notification : Subscription
+	class Notification : public Subscription
 	{
+	public:
 		Notification();
 		Notification(VirtualBase *o, const string *message, const Callback &callback, const CallbackP &callback_p);
 	};

@@ -39,6 +39,7 @@ public:
 	void on_modifier(NoteModifier m);
 
 	void on_input_active();
+	void on_input_capture();
 	void on_input_source();
 	void on_input_volume(int mode);
 	Array<Device*> input_sources;

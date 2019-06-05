@@ -83,6 +83,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	input_chain = nullptr;
 	input = nullptr;
 	input_wanted_active = false;
+	input_capture = true;
 	input_device = view->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 	maximize_input_volume = false;
 
@@ -180,15 +181,30 @@ void on_midi_input(ViewModeMidi *me)
 	MidiEventBuffer buf;
 	buf.samples = 1024;
 	me->input->out->read_midi(buf);
-	for (auto &e: buf){
-		if (e.volume > 0){
-			if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
+
+	// capture or just playback?
+	if (me->input_capture) {
+
+		// insert
+		for (auto &e: buf){
+			if (e.volume > 0){
+				if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
+					ri_insert(me);
+				ri_keys.add(e);
+				ri_timer.get();
+			}else{
 				ri_insert(me);
-			ri_keys.add(e);
-			ri_timer.get();
-		}else{
-			ri_insert(me);
+			}
 		}
+	} else {
+
+		// playback
+		for (auto &e: buf)
+			if (e.volume > 0){
+				me->start_midi_preview({(int)e.pitch}, 0.5f);
+			}else{
+				me->preview->end();
+			}
 	}
 
 }
@@ -206,6 +222,12 @@ void ViewModeMidi::activate_input(bool active)
 	}else if (!active and input){
 		_stop_input();
 	}
+}
+
+void ViewModeMidi::set_input_capture(bool capture)
+{
+	input_capture = capture;
+	notify();
 }
 
 void ViewModeMidi::_start_input()

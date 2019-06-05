@@ -1763,7 +1763,7 @@ image=hui:about
 // Resource
 Dialog
 midi_editor
-width=380,height=516
+width=300,height=516
 0
 0
 1
@@ -1941,8 +1941,20 @@ Grid
 0
 0
 5
+Grid
+?
+
+1
+0
+2
 CheckBox
 input_active
+
+0
+0
+0
+CheckBox
+input_capture
 
 1
 0
@@ -6266,7 +6278,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-495
+496
 // Text
 /bars-add
 Add bars...
@@ -6978,6 +6990,9 @@ Operations
 
 midi_editor/input_active
 Active
+
+midi_editor/input_capture
+Capture
 
 midi_editor/input_volume:key
 key speed
@@ -7759,7 +7774,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-889
+890
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8795,6 +8810,9 @@ Operationen
 
 midi_editor/input_active
 Aktiv
+
+midi_editor/input_capture
+Aufnehmen
 
 midi_editor/input_volume:key
 Druck

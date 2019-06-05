@@ -60,6 +60,7 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	event("modifier:flat", [=]{ on_modifier(NoteModifier::FLAT); });
 	event("modifier:natural", [=]{ on_modifier(NoteModifier::NATURAL); });
 	event("input_active", [=]{ on_input_active(); });
+	event("input_capture", [=]{ on_input_capture(); });
 	event("input", [=]{ on_input_source(); });
 	event("input_volume:key", [=]{ on_input_volume(0); });
 	event("input_volume:max", [=]{ on_input_volume(1); });
@@ -119,6 +120,8 @@ void MidiEditorConsole::update()
 	set_int("note_length", view->mode_midi->note_length);
 
 	check("input_active", view->mode_midi->is_input_active());
+	enable("input_capture", view->mode_midi->is_input_active());
+	check("input_capture", view->mode_midi->input_capture);
 	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	reset("input");
 	for (auto *d: input_sources)
@@ -247,6 +250,13 @@ void MidiEditorConsole::on_input_active()
 	enable("input", a);
 	enable("input_volume:key", a);
 	enable("input_volume:max", a);
+	enable("input_capture", a);
+}
+
+void MidiEditorConsole::on_input_capture()
+{
+	bool a = is_checked("");
+	view->mode_midi->set_input_capture(a);
 }
 
 void MidiEditorConsole::on_input_source()

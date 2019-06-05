@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-890
+891
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2672,6 +2672,9 @@ Pos1 / Ende
 
 help-dialog/g_editing
 Bearbeiten
+
+midi_editor/input_capture
+Aufnehmen
 
 // Num Language Strings
 230

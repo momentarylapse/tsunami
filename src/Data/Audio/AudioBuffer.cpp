@@ -142,11 +142,8 @@ void AudioBuffer::resize(int _length)
 
 	if (_length < length)
 		_truncate_peaks(_length);
-	for (int i = 0; i < MAX_CHANNELS; i++) {
+	for (int i = 0; i < MAX_CHANNELS; i++)
 		c[i].resize(_length);
-		if (_length > length)
-			memset(&c[i][length], 0, sizeof(float) * (_length - length));
-	}
 	length = _length;
 }
 

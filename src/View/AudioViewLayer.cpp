@@ -373,6 +373,28 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 	}
 }
 
+void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards, float flare_w)
+{
+	int N = 7;
+	float a1, a2;
+	if (inwards){
+		a1 = 0.3f;
+		a2 = 0.05f;
+		x2 += flare_w;
+	}else{
+		a1 = 0.05f;
+		a2 = 0.3f;
+		x1 -= flare_w;
+	}
+	for (int j=0; j<N; j++){
+		float t1 = (float)j / (float)N;
+		float t2 = (float)(j+1) / (float)N;
+		c->set_color(color(a1 + (a2-a1) * (t1+t2)/2,0,0.7f,0));
+		c->draw_rect(rect(x1 + (x2-x1)*t1, x1 + (x2-x1)*t2, y1, y2));
+	}
+
+}
+
 void AudioViewLayer::draw_fades(Painter *c)
 {
 	int index_before = 0;
@@ -393,6 +415,8 @@ void AudioViewLayer::draw_fades(Painter *c)
 			c->set_color(color(1,0,0.7f,0));
 			c->draw_line(x1, area.y1, x1, area.y2);
 			c->draw_line(x2, area.y1, x2, area.y2);
+
+			draw_flare(c, x1, x2, area.y1, area.y2, f.target == index_own, 20);
 		}
 		index_before = f.target;
 	}

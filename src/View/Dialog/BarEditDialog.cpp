@@ -10,6 +10,9 @@
 #include "../../Data/Rhythm/Bar.h"
 #include "../../Data/Song.h"
 
+extern bool bar_dialog_move_data;
+static bool bar_dialog_scale_audio = false;
+
 void set_bar_pattern(BarPattern &b, const string &pat);
 
 BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Array<int> &_bars):
@@ -37,8 +40,9 @@ BarEditDialog::BarEditDialog(hui::Window *root, Song *_song, const Array<int> &_
 	hide_control("beats", !new_bar->is_uniform());
 	hide_control("pattern", new_bar->is_uniform());
 	set_float("bpm", b->bpm(song->sample_rate));
-	check("shift-data", true);
-	check("scale-audio", false);
+	check("shift-data", bar_dialog_move_data);
+	check("scale-audio", bar_dialog_scale_audio);
+	enable("scale-audio", bar_dialog_move_data);
 
 	update_result_bpm();
 
@@ -61,13 +65,13 @@ void BarEditDialog::on_ok()
 	int mode = get_int("mode");
 	if (mode == 0){
 		float bpm = get_float("bpm");
-		bool move_data = is_checked("shift-data");
-		bool scale_audio = is_checked("scale-audio");
+		bar_dialog_move_data = is_checked("shift-data");
+		bar_dialog_scale_audio = is_checked("scale-audio");
 
 		int bmode = Bar::EditMode::IGNORE;
-		if (move_data){
+		if (bar_dialog_move_data){
 			bmode = Bar::EditMode::STRETCH;
-			if (scale_audio)
+			if (bar_dialog_scale_audio)
 				bmode = Bar::EditMode::STRETCH_AND_SCALE_AUDIO;
 		}
 

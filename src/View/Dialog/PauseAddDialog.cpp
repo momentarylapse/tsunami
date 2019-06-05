@@ -12,6 +12,8 @@
 #include "../../Data/base.h"
 #include "../AudioView.h"
 
+extern bool bar_dialog_move_data;
+
 PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
@@ -20,7 +22,7 @@ PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
 	index = _index;
 
 	set_float("duration", 1.0f);
-	check("shift-data", true);
+	check("shift-data", bar_dialog_move_data);
 
 	event("ok", [=]{ on_ok(); });
 	event("cancel", [=]{ on_close(); });
@@ -29,7 +31,7 @@ PauseAddDialog::PauseAddDialog(hui::Window *root, Song *s, int _index):
 
 void PauseAddDialog::on_ok()
 {
-	bool move_data = is_checked("shift-data");
+	bar_dialog_move_data = is_checked("shift-data");
 	float duration = get_float("duration");
 	song->begin_action_group();
 
@@ -37,7 +39,7 @@ void PauseAddDialog::on_ok()
 		song->add_track(SignalType::BEATS, 0);
 
 	int length = (int)(duration * (float)song->sample_rate);
-	song->add_pause(index, length, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	song->add_pause(index, length, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
 	destroy();

@@ -12,6 +12,9 @@
 #include "../../Data/base.h"
 #include "../AudioView.h"
 
+extern bool bar_dialog_move_data;
+static bool bar_dialog_replace_by_pause = false;
+
 BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Array<int> &_bars):
 	hui::Dialog("", 100, 100, root, false)
 {
@@ -19,8 +22,10 @@ BarDeleteDialog::BarDeleteDialog(hui::Window *root, Song *s, const Array<int> &_
 	song = s;
 	sel = _bars;
 
-	check("shift-data", true);
-	//enable("replace-by-pause", false);
+	check("shift-data", bar_dialog_move_data);
+	check("replace-by-pause", bar_dialog_replace_by_pause);
+	enable("shift-data", !bar_dialog_replace_by_pause);
+	//enable("replace-by-pause", !bar_dialog_move_data);
 
 	event("ok", [=]{ on_ok(); });
 	event("cancel", [=]{ on_close(); });
@@ -35,12 +40,12 @@ void BarDeleteDialog::on_replace_by_pause()
 
 void BarDeleteDialog::on_ok()
 {
-	bool move_data = is_checked("shift-data");
-	bool replace_by_pause = is_checked("replace-by-pause");
+	bar_dialog_move_data = is_checked("shift-data");
+	bar_dialog_replace_by_pause = is_checked("replace-by-pause");
 
 	song->begin_action_group();
 
-	if (replace_by_pause){
+	if (bar_dialog_replace_by_pause){
 		int length = 0;
 		foreachb(int i, sel){
 			length += song->bars[i]->length;
@@ -50,7 +55,7 @@ void BarDeleteDialog::on_ok()
 	}else{
 
 		foreachb(int i, sel)
-			song->delete_bar(i, move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+			song->delete_bar(i, bar_dialog_move_data);// ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	}
 
 	song->end_action_group();

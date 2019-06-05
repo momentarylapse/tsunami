@@ -12,6 +12,8 @@
 #include "../../Data/base.h"
 #include "../AudioView.h"
 
+bool bar_dialog_move_data = true;
+
 BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 	hui::Dialog("", 100, 100, root, false)
 {
@@ -39,7 +41,7 @@ BarAddDialog::BarAddDialog(hui::Window *root, Song *s, int _index):
 		set_int("divisor", 2);
 	set_string("pattern", new_bar->pat_str());
 	set_float("bpm", new_bar->bpm(song->sample_rate));
-	check("shift-data", true);
+	check("shift-data", bar_dialog_move_data);
 
 	event("beats", [=]{ on_beats(); });
 	event("complex", [=]{ on_complex(); });
@@ -87,7 +89,7 @@ void BarAddDialog::on_ok()
 {
 	int count = get_int("count");
 	float bpm = get_float("bpm");
-	bool move_data = is_checked("shift-data");
+	bar_dialog_move_data = is_checked("shift-data");
 	new_bar->set_bpm(bpm, song->sample_rate);
 
 	song->begin_action_group();
@@ -96,7 +98,7 @@ void BarAddDialog::on_ok()
 		song->add_track(SignalType::BEATS, 0);
 
 	for (int i=0; i<count; i++)
-		song->add_bar(index, *new_bar, move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+		song->add_bar(index, *new_bar, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
 	song->end_action_group();
 
 	destroy();

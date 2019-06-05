@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-891
+892
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2675,6 +2675,9 @@ Bearbeiten
 
 midi_editor/input_capture
 Aufnehmen
+
+/layer-mark-dominant
+Auswahl dominant setzen
 
 // Num Language Strings
 230

@@ -3024,7 +3024,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -3229,7 +3229,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -3434,7 +3434,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -3632,7 +3632,7 @@ popup-menu-layer
 
 0
 0
-10
+11
 Item
 header
 disabled
@@ -3682,27 +3682,33 @@ layer-make-track
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 5
 0
 0
 Item
-layer-delete
+layer-merge
 
 6
+0
+0
+Item
+layer-delete
+
+7
 0
 0
 Separator
 
 
-7
+8
 0
 0
 Menu
 menu-track
 
-8
+9
 0
 5
 Item
@@ -3750,7 +3756,7 @@ track-properties
 Menu
 menu-song
 
-9
+10
 0
 4
 Menu
@@ -3863,7 +3869,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -4183,7 +4189,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -4637,7 +4643,7 @@ layer-add
 0
 0
 Item
-layer-mark_dominant
+layer-mark-dominant
 
 1
 0
@@ -6352,7 +6358,7 @@ Edit midi
 /layer-make-track
 Turn into track
 
-/layer-mark_dominant
+/layer-mark-dominant
 Mark selection as dominant
 
 /layer-merge
@@ -7774,7 +7780,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-890
+891
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7877,6 +7883,9 @@ Midi bearbeiten
 
 /layer-make-track
 In Spur umwandeln
+
+/layer-mark-dominant
+Auswahl dominant setzen
 
 /layer-mark_dominant
 Auswahl als dominant markieren

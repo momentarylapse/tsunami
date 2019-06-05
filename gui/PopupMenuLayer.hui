@@ -7,6 +7,7 @@ Menu popup-menu-layer ""
 		Item /layer-midi-mode-classical "Score" checkable
 	Item /layer-edit-midi "Edit midi"
 	Item /layer-make-track "Turn into track"
+	Item /layer-mark-dominant "Mark selection as dominant"
 	Item /layer-merge "Merge..."
 	Item /layer-delete "Delete"
 	Separator

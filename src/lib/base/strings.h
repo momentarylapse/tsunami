@@ -71,11 +71,11 @@ class string : public Array<char>
 	// operators
 	void _cdecl operator = (const string &s)
 	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
-	{	assign(&s);	}
+	{	simple_assign(&s);	}
 	void _cdecl operator = (string &&s)
 	{	exchange(s);	}
 	void _cdecl operator += (const string &s)
-	{	DynamicArray::append(&s);	}
+	{	simple_append(&s);	}
 	string _cdecl operator + (const string &s) const
 	{	string r = *this;	r += s;	return r;	}
 	friend string _cdecl operator + (const char *s1, const string &s2)

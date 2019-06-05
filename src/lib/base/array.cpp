@@ -5,12 +5,6 @@
 #endif
 //#include <stdio.h>
 
-#ifdef OS_WINDOWS
-	#define ALIGNMENT		0
-#else
-	#define ALIGNMENT		16
-#endif
-
 
 void DynamicArray::init(int _element_size_)
 {
@@ -21,27 +15,17 @@ void DynamicArray::init(int _element_size_)
 //	printf("init %d\n", element_size);
 }
 
-void DynamicArray::reserve(int size)
+void DynamicArray::simple_reserve(int size)
 {
 //	printf("        reserve  %d\n", size);
 	if (allocated == 0){
 		if (size > 0){
 			allocated = size;
-/*#if ALIGNMENT > 0
-	#if defined(OS_LINUX)
-			posix_memalign(&data, ALIGNMENT, (size_t)allocated * (size_t)element_size);
-	#elif defined(OS_WINDOWS)
-			data = _aligned_malloc(ALIGNMENT, (size_t)allocated * (size_t)element_size);
-	#else // defined(OS_MINGW)
 			data = malloc((size_t)allocated * (size_t)element_size);
-	#endif
-#else*/
-			data = malloc((size_t)allocated * (size_t)element_size);
-//#endif
 //			printf("          new  %p  ", data);
 		}
 	}else if (size > allocated){
-		if (size > 10000)
+		if (size > 1000)
 			allocated = size + size / 2;
 		else
 			allocated = size * 2;
@@ -49,31 +33,25 @@ void DynamicArray::reserve(int size)
 		data = realloc(data, (size_t)allocated * (size_t)element_size);
 //		printf("          %p  ->  %p ", data0, data);
 	}else if (size == 0)
-		clear();
+		simple_clear();
 //	printf("        /r  %d\n", allocated);
 }
 
-void DynamicArray::resize(int size)
+void DynamicArray::simple_resize(int size)
 {
 //	printf("        resize %d\n", size);
 //	printf("        .\n");
 	if (size > num){
-		reserve(size);
+		simple_reserve(size);
 		memset((char*)data + num * element_size, 0, (size - num) * element_size);
 	}
 	num = size;
 //	printf("        /resize\n");
 }
 
-void DynamicArray::ensure_size(int size)
-{
-	if (size > num)
-		resize(size);
-}
-
 void DynamicArray::insert_blank(int pos)
 {
-	resize(num + 1);
+	simple_resize(num + 1);
 	if (num > pos + 1)
 		memmove((char*)data + (pos + 1) * element_size,
 		        (char*)data +  pos      * element_size,
@@ -81,14 +59,14 @@ void DynamicArray::insert_blank(int pos)
 	memset((char*)data + pos * element_size, 0, element_size);
 }
 
-void DynamicArray::append(const DynamicArray *a)
+void DynamicArray::simple_append(const DynamicArray *a)
 {
 	if (a->num > 0){
 //		printf("        append %d %d %d   - %d %d %d\n", num, element_size, allocated, a->num, a->element_size, a->allocated);
 		int num_old = num;
 		int num_a_old = a->num; // in case (this = a)
 //		printf("        a\n");
-		resize(num + a->num);
+		simple_resize(num + a->num);
 //		printf("        b\n");
 		memcpy(&((char*)data)[num_old * element_size], a->data, num_a_old * element_size);
 //		printf("        /append\n");
@@ -97,37 +75,37 @@ void DynamicArray::append(const DynamicArray *a)
 
 void DynamicArray::append_p_single(void *p)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	((void**)data)[num ++] = p;
 }
 
 void DynamicArray::append_4_single(int x)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	((int*)data)[num ++] = x;
 }
 
 void DynamicArray::append_f_single(float x)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	((float*)data)[num ++] = x;
 }
 
 void DynamicArray::append_d_single(double x)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	((double*)data)[num ++] = x;
 }
 
 void DynamicArray::append_1_single(char x)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	((char*)data)[num ++] = x;
 }
 
 void DynamicArray::append_single(const void *d)
 {
-	reserve(num + 1);
+	simple_reserve(num + 1);
 	memcpy(&((char*)data)[num * element_size], d, element_size);
 	num ++;
 }
@@ -168,7 +146,7 @@ void DynamicArray::insert_single(const void *d, int index)
 	memcpy(&((char*)data)[index * element_size], d, element_size);
 }
 
-void DynamicArray::swap(int i1, int i2)
+void DynamicArray::simple_swap(int i1, int i2)
 {
 	if ((i1 < 0) or (i1 >= num))
 		return;
@@ -200,14 +178,14 @@ void DynamicArray::swap(int i1, int i2)
 	}
 }
 
-void DynamicArray::move(int source, int target)
+void DynamicArray::simple_move(int source, int target)
 {
 	if (source > target){
 		for (int i=source; i>target; i--)
-			swap(i, i-1);
+			simple_swap(i, i-1);
 	}else{
 		for (int i=source; i<target; i++)
-			swap(i, i+1);
+			simple_swap(i, i+1);
 	}
 }
 
@@ -215,15 +193,15 @@ void DynamicArray::reverse()
 {
 	int n = num / 2;
 	for (int i=0;i<n;i++)
-		swap(i, num - i - 1);
+		simple_swap(i, num - i - 1);
 }
 
-void DynamicArray::assign(const DynamicArray *a)
+void DynamicArray::simple_assign(const DynamicArray *a)
 {
 	if (a != this){
 //		printf("assign\n");
 		element_size = a->element_size;
-		resize(a->num);
+		simple_resize(a->num);
 		if (num > 0)
 			memcpy(data, a->data, num * element_size);
 //		printf("/assign\n");
@@ -243,7 +221,7 @@ void DynamicArray::exchange(DynamicArray &a)
 	a.allocated = tall;
 }
 
-void DynamicArray::clear()
+void DynamicArray::simple_clear()
 {
 	if (allocated > 0){
 //		printf("        ~   %p %d  %d\n", data, element_size, num);
@@ -295,44 +273,44 @@ DynamicArray DynamicArray::ref_subarray(int start, int end)
 
 
 // Array<char>
-template <> void Array<char>::add(const char item)
+template <> void Array<char>::add(const char &item)
 {	DynamicArray::append_1_single(item);	}
 template <> void Array<char>::erase(int index)
 {	DynamicArray::delete_single(index);	}
 template <> void Array<char>::operator = (const Array<char> &a)
-{	DynamicArray::assign(&a);	}
+{	DynamicArray::simple_assign(&a);	}
 template <> void Array<char>::operator += (const Array<char> &a)
-{	DynamicArray::append(&a);	}
+{	DynamicArray::simple_append(&a);	}
 
 // Array<bool>
-template <> void Array<bool>::add(const bool item)
+template <> void Array<bool>::add(const bool &item)
 {	DynamicArray::append_1_single(item);	}
 template <> void Array<bool>::erase(int index)
 {	DynamicArray::delete_single(index);	}
 template <> void Array<bool>::operator = (const Array<bool> &a)
-{	DynamicArray::assign(&a);	}
+{	DynamicArray::simple_assign(&a);	}
 template <> void Array<bool>::operator += (const Array<bool> &a)
-{	DynamicArray::append(&a);	}
+{	DynamicArray::simple_append(&a);	}
 
 // Array<int>
-template <> void Array<int>::add(const int item)
+template <> void Array<int>::add(const int &item)
 {	DynamicArray::append_4_single(item);	}
 template <> void Array<int>::erase(int index)
 {	DynamicArray::delete_single(index);	}
 template <> void Array<int>::operator = (const Array<int> &a)
-{	DynamicArray::assign(&a);	}
+{	DynamicArray::simple_assign(&a);	}
 template <> void Array<int>::operator += (const Array<int> &a)
-{	DynamicArray::append(&a);	}
+{	DynamicArray::simple_append(&a);	}
 
 // Array<float>
-template <> void Array<float>::add(const float item)
+template <> void Array<float>::add(const float &item)
 {	DynamicArray::append_4_single(*(int*)&item);	}
 template <> void Array<float>::erase(int index)
 {	DynamicArray::delete_single(index);	}
 template <> void Array<float>::operator = (const Array<float> &a)
-{	DynamicArray::assign(&a);	}
+{	DynamicArray::simple_assign(&a);	}
 template <> void Array<float>::operator += (const Array<float> &a)
-{	DynamicArray::append(&a);	}
+{	DynamicArray::simple_append(&a);	}
 
 
 

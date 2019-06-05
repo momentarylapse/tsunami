@@ -512,7 +512,7 @@ void _ultra_sort(DynamicArray &array, int offset_by)
 		T *q = (T*)((char*)p + array.element_size);
 		for (int j=i+1; j<array.num; j++){
 			if (*p > *q)
-				array.swap(i, j);
+				array.simple_swap(i, j);
 			q = (T*)((char*)q + array.element_size);
 		}
 		p = (T*)((char*)p + array.element_size);
@@ -529,7 +529,7 @@ void _ultra_sort_p(DynamicArray &array, int offset_by)
 		for (int j=i+1; j<array.num; j++){
 			T *qq = (T*)(*q + offset_by);
 			if (*pp > *qq){
-				array.swap(i, j);
+				array.simple_swap(i, j);
 				pp = (T*)(*p + offset_by);
 			}
 			q ++;
@@ -701,13 +701,13 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 					func_add_param("x", t->parent);
 					func_add_param("index", TypeInt);
 			}
-			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&DynamicArray::clear));
-			class_add_func("clear", TypeVoid, mf(&DynamicArray::clear));
-			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&DynamicArray::assign));
+			class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&DynamicArray::simple_clear));
+			class_add_func("clear", TypeVoid, mf(&DynamicArray::simple_clear));
+			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&DynamicArray::simple_assign));
 				func_add_param("other", t);
 			class_add_func("remove", TypeVoid, mf(&DynamicArray::delete_single));
 				func_add_param("index", TypeInt);
-			class_add_func("resize", TypeVoid, mf(&DynamicArray::resize));
+			class_add_func("resize", TypeVoid, mf(&DynamicArray::simple_resize));
 				func_add_param("num", TypeInt);
 		}
 }
@@ -1035,7 +1035,7 @@ void SIAddPackageBase()
 
 	add_class(TypeDynamicArray);
 		class_add_element("num", TypeInt, config.pointer_size);
-		class_add_func("swap", TypeVoid, mf(&DynamicArray::swap));
+		class_add_func("swap", TypeVoid, mf(&DynamicArray::simple_swap));
 			func_add_param("i1", TypeInt);
 			func_add_param("i2", TypeInt);
 		class_add_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, mf(&DynamicArray::ref_subarray));
@@ -1044,8 +1044,8 @@ void SIAddPackageBase()
 		// low level operations
 		class_add_func("__mem_init__", TypeVoid, mf(&DynamicArray::init));
 			func_add_param("element_size", TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::resize));
+		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::simple_clear));
+		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::simple_resize));
 			func_add_param("size", TypeInt);
 		class_add_func("__mem_remove__", TypeVoid, mf(&DynamicArray::delete_single));
 			func_add_param("index", TypeInt);
@@ -1055,8 +1055,8 @@ void SIAddPackageBase()
 		// low level operations
 		class_add_func("__mem_init__", TypeVoid, mf(&DynamicArray::init));
 			func_add_param("element_size", TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::resize));
+		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::simple_clear));
+		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::simple_resize));
 			func_add_param("size", TypeInt);
 		class_add_func("__mem_remove__", TypeVoid, mf(&DynamicArray::delete_single));
 			func_add_param("index", TypeInt);

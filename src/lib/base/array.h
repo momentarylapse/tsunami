@@ -4,6 +4,7 @@
 #include <new>
 #include <string.h>
 #include <initializer_list>
+#include <stdlib.h>
 #include <ciso646>
 
 // dynamic arrays
@@ -14,12 +15,11 @@ class DynamicArray
 {
 	public:
 	void _cdecl init(int _element_size_);
-	void _cdecl reserve(int size);
-	void _cdecl resize(int size);
-	void _cdecl ensure_size(int size);
+	void _cdecl simple_reserve(int size);
+	void _cdecl simple_resize(int size);
 	void _cdecl insert_blank(int pos);
-	void _cdecl append(const DynamicArray *a);
-	void _cdecl assign(const DynamicArray *a);
+	void _cdecl simple_append(const DynamicArray *a);
+	void _cdecl simple_assign(const DynamicArray *a);
 	void _cdecl exchange(DynamicArray &a);
 	void _cdecl append_p_single(void *p);
 	void _cdecl append_4_single(int x);
@@ -34,12 +34,12 @@ class DynamicArray
 	void _cdecl insert_1_single(char x, int index);
 	void _cdecl insert_single(const void *d, int index);
 	void _cdecl delete_single(int index);
-	void _cdecl swap(int i1, int i2);
-	void _cdecl move(int source, int target);
+	void _cdecl simple_swap(int i1, int i2);
+	void _cdecl simple_move(int source, int target);
 	void _cdecl reverse();
 	DynamicArray _cdecl ref_subarray(int start, int end);
 	int _cdecl index(const void *p);
-	void _cdecl clear();
+	void _cdecl simple_clear();
 	void *data;
 	int num, allocated, element_size;
 };
@@ -89,9 +89,9 @@ public:
 			for (int i=0; i<num; i++)
 				(*this)[i].~T();
 		}
-		DynamicArray::clear();
+		simple_clear();
 	}
-	void _cdecl add(const T item)
+	void _cdecl add(const T &item)
 	{
 		resize(num + 1);
 		(*this)[num - 1] = item;
@@ -129,21 +129,65 @@ public:
 			(*this)[i] = (*this)[i-1];
 		(*this)[index] = item;
 	}
+
+
+	void __reserve(int size)
+	{
+		if (size > allocated) {
+			int new_allocated = size * 2;
+			if (size > 1000)
+				new_allocated = size + size / 2;
+			T *new_data = (T*)malloc((size_t)new_allocated * (size_t)element_size);
+			for (int i = 0; i < num; i++) {
+				new(&new_data[i]) T;
+				new_data[i] = ((T*)data)[i];
+			}
+			if (allocated > 0)
+				free(data);
+			data = new_data;
+			allocated = new_allocated;
+		} else if (size == 0) {
+			clear();
+		}
+	}
 	void _cdecl resize(int size)
 	{
-		if (size < num){
+		if (size < num) {
 			// shrink -> destruct
 			for (int i=size; i<num; i++)
 				(*this)[i].~T();
-		}
-		if (size > num){
-			reserve(size);
+		} else if (size > num) {
+			__reserve(size);
 			// grow -> construct
-			memset((char*)data + num * element_size, 0, (size - num) * element_size);
 			for (int i=num; i<size; i++)
 				new(&(*this)[i]) T;
 		}
 		num = size;
+	}
+
+	void swap(int i1, int i2)
+	{
+		if ((i1 < 0) or (i1 >= num))
+			return;
+		if ((i2 < 0) or (i2 >= num))
+			return;
+		if (i1 == i2)
+			return;
+		T t = (*this)[i1];
+		(*this)[i1] = (*this)[i2];
+		(*this)[i2] = t;
+	}
+
+	void move(int source, int target)
+	{
+		if (source > target) {
+			for (int i = source; i > target; i--)
+				swap(i, i - 1);
+		}
+		else {
+			for (int i = source; i < target; i++)
+				swap(i, i + 1);
+		}
 	}
 	int find(const T item) const
 	{
@@ -179,7 +223,7 @@ public:
 	// copy assignment
 	void operator = (const Array<T> &a)
 	{
-		if (this != &a){
+		if (this != &a) {
 			resize(a.num);
 			for (int i=0; i<num; i++)
 				(*this)[i] = a[i];
@@ -189,7 +233,7 @@ public:
 	// move assignment
 	void operator = (Array<T> &&a)
 	{
-		if (this != &a){
+		if (this != &a) {
 			clear();
 			exchange(a);
 		}
@@ -212,7 +256,7 @@ public:
 	// reference arrays
 	void _cdecl set_ref(const Array<T> &a)
 	{
-		if (this != &a){
+		if (this != &a) {
 			clear();
 			num = a.num;
 			data = a.data;

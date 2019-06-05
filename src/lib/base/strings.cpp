@@ -53,7 +53,7 @@ string::string(const void *str, int l)
 string::string(const string &s)
 {
 	init(sizeof(unsigned char));
-	assign(&s);
+	simple_assign(&s);
 }
 
 string::string(string &&s)

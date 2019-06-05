@@ -235,7 +235,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			int el_size = c->type->parent->size;
 			DynamicArray *da = &c_array->as_const()->as_array();
 			da->init(el_size);
-			da->resize(c->params.num);
+			da->simple_resize(c->params.num);
 			for (int i=0; i<c->params.num; i++)
 				memcpy((char*)da->data + el_size * i, c->params[i]->as_const()->p(), el_size);
 			return c_array;

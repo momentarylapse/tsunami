@@ -133,13 +133,13 @@ void var_from_string(const Kaba::Class *type, char *v, const string &s, int &pos
 	}else if (type->is_super_array()){
 		pos ++; // '['
 		DynamicArray *a = (DynamicArray*)v;
-		a->clear(); // todo...
+		a->simple_clear(); // todo...
 		while (true){
 			if ((s[pos] == ']') or (pos >= s.num))
 				break;
 			if (a->num > 0)
 				pos ++; // ' '
-			a->resize(a->num + 1);
+			a->simple_resize(a->num + 1);
 			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos, session);
 		}
 		pos ++; // ']'

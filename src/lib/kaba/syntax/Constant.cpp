@@ -39,7 +39,7 @@ void Value::init(const Class *_type)
 void Value::clear()
 {
 	if (type->is_super_array())
-		as_array().clear();
+		as_array().simple_clear();
 
 	value.clear();
 	type = TypeVoid;
@@ -49,7 +49,7 @@ void Value::set(const Value &v)
 {
 	init(v.type);
 	if (type->is_super_array()){
-		as_array().resize(v.as_array().num);
+		as_array().simple_resize(v.as_array().num);
 		memcpy(as_array().data, v.as_array().data, as_array().num * type->parent->size);
 
 	}else{

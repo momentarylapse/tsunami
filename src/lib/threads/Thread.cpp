@@ -15,9 +15,15 @@ struct ThreadInternal
 {
 #ifdef OS_WINDOWS
 	HANDLE thread;
+	ThreadInternal()
+	{	thread = nullptr;	}
 #endif
 #if defined(OS_LINUX) || defined(OS_MINGW)
 	pthread_t thread;
+	ThreadInternal()
+	{
+		thread = 0;
+	}
 #endif
 };
 
@@ -88,7 +94,7 @@ void Thread::__delete__()
 static DWORD WINAPI thread_start_func(LPVOID p)
 {
 	Thread *t = (Thread*)p;
-	t->run();
+	t->on_run();
 	t->running = false;
 	return 0;
 }

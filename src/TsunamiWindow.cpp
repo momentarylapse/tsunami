@@ -200,7 +200,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("sample-properties", [=]{ on_sample_properties(); });
 	event("settings", [=]{ on_settings(); });
 	event("play", [=]{ on_play(); });
-	set_key_code("play", hui::KEY_SPACE);
+	event("play-toggle", [=]{ on_play_toggle(); });
+	set_key_code("play-toggle", hui::KEY_SPACE);
 	event("play-loop", [=]{ on_play_loop(); });
 	set_key_code("play-loop", hui::KEY_CONTROL + hui::KEY_L);
 	event("pause", [=]{ on_pause(); });
@@ -835,6 +836,14 @@ void TsunamiWindow::on_play_loop()
 }
 
 void TsunamiWindow::on_play()
+{
+	if (session->in_mode("capture"))
+		return;
+
+	view->play();
+}
+
+void TsunamiWindow::on_play_toggle()
 {
 	if (session->in_mode("capture"))
 		return;

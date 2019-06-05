@@ -70,7 +70,7 @@ Menu menu ""
 		Item view_optimal "Optimal" image=hui:zoom-fit
 		Item view_samples "Samples" image=hui:zoom-one
 	Menu menu_sound "Sound"
-		Item /play "Play" image=hui:media-play
+		Item /play-toggle "Play" image=hui:media-play
 		Item /pause "Pause" image=hui:media-pause
 		Item /stop "Stop" image=hui:media-stop
 		Item /play-loop "Loop" checkable

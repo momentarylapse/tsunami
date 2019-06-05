@@ -87,6 +87,7 @@ public:
 	void on_delete_marker();
 	void on_settings();
 	void on_play();
+	void on_play_toggle();
 	void on_play_loop();
 	void on_pause();
 	void on_stop();

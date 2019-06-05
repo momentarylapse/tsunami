@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-892
+893
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2678,6 +2678,9 @@ Aufnehmen
 
 /layer-mark-dominant
 Auswahl dominant setzen
+
+/play-toggle
+Abspielen
 
 // Num Language Strings
 230

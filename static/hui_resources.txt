@@ -1593,7 +1593,7 @@ menu_sound
 0
 6
 Item
-play
+play-toggle
 image=hui:media-play
 0
 0
@@ -6284,7 +6284,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-496
+497
 // Text
 /bars-add
 Add bars...
@@ -6435,6 +6435,9 @@ Play
 
 /play-loop
 Loop
+
+/play-toggle
+Play
 
 /playback-range-lock
 Lock
@@ -7780,7 +7783,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-891
+892
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7970,6 +7973,9 @@ Abspielen
 
 /play-loop
 Schleife
+
+/play-toggle
+Abspielen
 
 /playback-range-lock
 Festhalten

@@ -15,6 +15,7 @@
 
 #include "TestAudioBuffer.h"
 #include "TestRingBuffer.h"
+#include "TestInterpolator.h"
 #include "TestRhythm.h"
 #include "TestStreams.h"
 #include "TestThreads.h"
@@ -89,6 +90,12 @@ AudioBuffer UnitTest::make_buf(const Array<float> &r, const Array<float> &l)
 	return buf;
 }
 
+void UnitTest::assert_equal(float a, float b, float epsilon)
+{
+	if (fabs(a - b) > epsilon)
+		throw Failure("a!=b\na: " + f2s(a, 6) + "\nb: " + f2s(b, 6));
+}
+
 void UnitTest::assert_equal(const Array<int> &a, const Array<int> &b)
 {
 	if (a.num != b.num)
@@ -125,6 +132,7 @@ Array<UnitTest*> UnitTest::all()
 	Array<UnitTest*> tests;
 	tests.add(new TestAudioBuffer);
 	tests.add(new TestRingBuffer);
+	tests.add(new TestInterpolator);
 	tests.add(new TestRhythm);
 	tests.add(new TestMixer);
 	tests.add(new TestThreads);

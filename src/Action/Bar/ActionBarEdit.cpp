@@ -68,7 +68,7 @@ void ActionBarEdit::build(Data *d)
 							// stretch and insert
 							AudioBuffer b_stretch_out; // use ref...
 							b_stretch_out.resize(new_stretch_size);
-							BufferInterpolator::interpolate(b_stretch_in, b_stretch_out, BufferInterpolator::METHOD_LINEAR);
+							BufferInterpolator::interpolate(b_stretch_in, b_stretch_out, BufferInterpolator::Method::LINEAR);
 							b.set(b_stretch_out, stretch_offset, 1.0f);
 
 							// re-insert after stretch

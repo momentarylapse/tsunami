@@ -77,15 +77,15 @@ void SampleScaleDialog::on_factor()
 
 void SampleScaleDialog::on_ok()
 {
-	BufferInterpolator::Method method = BufferInterpolator::METHOD_LINEAR;
+	BufferInterpolator::Method method = BufferInterpolator::Method::LINEAR;
 	if (get_int("method") == 1)
-		method = BufferInterpolator::METHOD_CUBIC;
+		method = BufferInterpolator::Method::CUBIC;
 	else if (get_int("method") == 2)
-		method = BufferInterpolator::METHOD_SINC;
+		method = BufferInterpolator::Method::SINC;
 	else if (get_int("method") == 3)
-		method = BufferInterpolator::METHOD_FOURIER;
+		method = BufferInterpolator::Method::FOURIER;
 
-	sample->owner->scale_sample(sample, new_size, method);
+	sample->owner->scale_sample(sample, new_size, (int)method);
 	destroy();
 }
 

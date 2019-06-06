@@ -70,7 +70,6 @@ void Tsunami::on_end()
 	}
 }
 
-
 bool Tsunami::on_startup(const Array<string> &_arg)
 {
 	Array<string> arg = _arg;

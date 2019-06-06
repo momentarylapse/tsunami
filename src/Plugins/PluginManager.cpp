@@ -310,8 +310,8 @@ void PluginManager::link_app_script_data()
 	//sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
 	Kaba::DeclareClassSize("SampleRef", sizeof(SampleRef));
-	Kaba::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
-	Kaba::DeclareClassOffset("SampleRef", "midi", _offsetof(SampleRef, midi));
+	Kaba::LinkExternal("SampleRef.buf", Kaba::mf(&SampleRef::buf));
+	Kaba::LinkExternal("SampleRef.midi", Kaba::mf(&SampleRef::midi));
 	Kaba::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
 	Kaba::LinkExternal("SampleRef.__init__", Kaba::mf(&SampleRef::__init__));
 	Kaba::DeclareClassVirtualIndex("SampleRef", "__delete__", Kaba::mf(&SampleRef::__delete__), &sampleref);

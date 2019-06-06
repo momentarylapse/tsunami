@@ -15,8 +15,8 @@
 ActionSampleAdd::ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete)
 {
 	sample = new Sample(SignalType::AUDIO);
-	sample->buf = buf;
-	sample->buf.offset = 0;
+	*sample->buf = buf;
+	sample->buf->offset = 0;
 	sample->name = name;
 	sample->auto_delete = auto_delete;
 	sample->_pointer_ref();

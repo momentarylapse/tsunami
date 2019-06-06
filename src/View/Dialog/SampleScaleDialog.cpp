@@ -16,11 +16,11 @@ SampleScaleDialog::SampleScaleDialog(hui::Window *root, Sample *s):
 	from_resource("sample_scale_dialog");
 	sample = s;
 
-	set_int("samples_orig", sample->buf.length);
+	set_int("samples_orig", sample->buf->length);
 	set_int("rate_orig", sample->owner->sample_rate);
 	set_int("rate_inv_new", sample->owner->sample_rate);
 
-	new_size = sample->buf.length;
+	new_size = sample->buf->length;
 	update();
 
 	event("factor", [=]{ on_factor(); });
@@ -38,7 +38,7 @@ SampleScaleDialog::~SampleScaleDialog()
 
 void SampleScaleDialog::update(int mode)
 {
-	float factor = (float)new_size / (float)sample->buf.length;
+	float factor = (float)new_size / (float)sample->buf->length;
 	float new_rate = (float)sample->owner->sample_rate * factor;
 	float orig_rate_inv = (float)sample->owner->sample_rate / factor;
 	if (mode != 0)
@@ -59,25 +59,25 @@ void SampleScaleDialog::on_samples()
 
 void SampleScaleDialog::on_sample_rate()
 {
-	new_size = (double)sample->buf.length * (double)get_int("") / (double)sample->owner->sample_rate;
+	new_size = (double)sample->buf->length * (double)get_int("") / (double)sample->owner->sample_rate;
 	update(1);
 }
 
 void SampleScaleDialog::on_sample_rate_inv()
 {
-	new_size = (double)sample->buf.length / (double)get_int("") * (double)sample->owner->sample_rate;
+	new_size = (double)sample->buf->length / (double)get_int("") * (double)sample->owner->sample_rate;
 	update(2);
 }
 
 void SampleScaleDialog::on_factor()
 {
-	new_size = sample->buf.length * get_float("") / 100.0f;
+	new_size = sample->buf->length * get_float("") / 100.0f;
 	update(3);
 }
 
 void SampleScaleDialog::on_ok()
 {
-	BufferInterpolator::Method method = BufferInterpolator::Method::LINEAR;
+	auto method = BufferInterpolator::Method::LINEAR;
 	if (get_int("method") == 1)
 		method = BufferInterpolator::Method::CUBIC;
 	else if (get_int("method") == 2)
@@ -85,7 +85,11 @@ void SampleScaleDialog::on_ok()
 	else if (get_int("method") == 3)
 		method = BufferInterpolator::Method::FOURIER;
 
-	sample->owner->scale_sample(sample, new_size, (int)method);
+	auto *buf = new AudioBuffer;
+	buf->resize(new_size);
+	BufferInterpolator::interpolate(*sample->buf, *buf, method);
+
+	sample->owner->sample_replace_buffer(sample, buf);
 	destroy();
 }
 

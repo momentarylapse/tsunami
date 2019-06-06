@@ -16,10 +16,6 @@ ActionSampleEditName::ActionSampleEditName(Sample *s, const string &name)
 	old_value = s->name;
 }
 
-ActionSampleEditName::~ActionSampleEditName()
-{
-}
-
 void *ActionSampleEditName::execute(Data *d)
 {
 	sample->name = new_value;
@@ -37,7 +33,7 @@ void ActionSampleEditName::undo(Data *d)
 
 bool ActionSampleEditName::mergable(Action *a)
 {
-	ActionSampleEditName *aa = dynamic_cast<ActionSampleEditName*>(a);
+	auto *aa = dynamic_cast<ActionSampleEditName*>(a);
 	if (!aa)
 		return false;
 	return (aa->sample == sample);

@@ -85,6 +85,8 @@ void BufferInterpolator::interpolate_channel(Array<float> &in, Array<float> &out
 
 void BufferInterpolator::interpolate(AudioBuffer &in, AudioBuffer &out, Method method)
 {
+	out.set_channels(in.channels);
+	out.offset = in.offset;
 	for (int i=0; i<in.channels; i++)
 		interpolate_channel(in.c[i], out.c[i], method);
 }

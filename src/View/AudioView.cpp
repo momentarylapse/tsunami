@@ -141,7 +141,7 @@ public:
 		for (Track *t: song->tracks)
 			update_track(t);
 		for (Sample *s: song->samples)
-			update_buffer(s->buf);
+			update_buffer(*s->buf);
 	}
 };
 
@@ -906,8 +906,6 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer)
 
 void AudioView::update_tracks()
 {
-	bool changed = false;
-
 	Array<AudioViewTrack*> vtrack2;
 	Array<AudioViewLayer*> vlayer2;
 	vtrack2.resize(song->tracks.num);
@@ -917,7 +915,7 @@ void AudioView::update_tracks()
 		bool found = false;
 
 		// find existing
-		foreachi(AudioViewTrack *v, vtrack, vi)
+		foreachi(auto *v, vtrack, vi)
 			if (v){
 				if (v->track == t){
 					vtrack2[ti] = v;
@@ -930,7 +928,6 @@ void AudioView::update_tracks()
 		// new track
 		if (!found){
 			vtrack2[ti] = new AudioViewTrack(this, t);
-			changed = true;
 			sel.add(t);
 		}
 	}
@@ -941,7 +938,7 @@ void AudioView::update_tracks()
 		bool found = false;
 
 		// find existing
-		foreachi(AudioViewLayer *v, vlayer, vi)
+		foreachi(auto *v, vlayer, vi)
 			if (v){
 				if (v->layer == l){
 					vlayer2[li] = v;
@@ -954,7 +951,6 @@ void AudioView::update_tracks()
 		// new layer
 		if (!found){
 			vlayer2[li] = new AudioViewLayer(this, l);
-			changed = true;
 			sel.add(l);
 		}
 
@@ -962,16 +958,12 @@ void AudioView::update_tracks()
 	}
 
 	// delete deleted
-	for (AudioViewTrack *v: vtrack)
-		if (v){
+	for (auto *v: vtrack)
+		if (v)
 			delete v;
-			changed = true;
-		}
-	for (AudioViewLayer *v: vlayer)
-		if (v){
+	for (auto *v: vlayer)
+		if (v)
 			delete v;
-			changed = true;
-		}
 	vtrack = vtrack2;
 	vlayer = vlayer2;
 	thm.dirty = true;
@@ -1003,11 +995,8 @@ void AudioView::update_tracks()
 	}
 
 	// TODO: detect order change
-
-	/*if (changed)*/{
-		check_consistency();
-		notify(MESSAGE_VTRACK_CHANGE);
-	}
+	check_consistency();
+	notify(MESSAGE_VTRACK_CHANGE);
 }
 
 

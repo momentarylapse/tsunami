@@ -502,7 +502,7 @@ public:
 	FileChunkSampleBufferBox() : FileChunk<Sample,AudioBuffer>("bufbox"){}
 	virtual void create()
 	{
-		me = &parent->buf;
+		me = parent->buf;
 	}
 	virtual void read(File *f)
 	{

@@ -30,7 +30,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
 	int i0 = max(s->pos, r.start());
-	int i1 = min(s->pos + s->buf->length, r.end());
+	int i1 = min(s->pos + s->buf().length, r.end());
 
 	// beginning of the intervall (relative to sub)
 	ir.offset = i0 - s->pos;
@@ -66,7 +66,7 @@ static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
 			continue;
 
 		bpos = s->pos - range_cur.start();
-		buf.add(*s->buf, bpos, s->volume * s->origin->volume);
+		buf.add(s->buf(), bpos, s->volume * s->origin->volume);
 	}
 }
 
@@ -148,7 +148,7 @@ void TrackRenderer::fill_midi_streamer()
 	for (TrackLayer *l: track->layers)
 		for (auto c: l->samples)
 			if (c->type() == SignalType::MIDI)
-			_midi.append(*c->midi, c->pos); // TODO: mute/solo....argh
+			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
 	for (MidiEffect *fx: track->midi_fx){
 		fx->reset_state();
 		fx->process(&_midi);

@@ -38,7 +38,7 @@ public:
 
 	string name;
 	SignalType type;
-	AudioBuffer buf;
+	AudioBuffer *buf;
 	MidiNoteBuffer midi;
 	float volume;
 	int offset;

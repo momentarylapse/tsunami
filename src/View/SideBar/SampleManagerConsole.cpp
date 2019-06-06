@@ -65,7 +65,7 @@ string render_sample(Sample *s, AudioView *view)
 	Image im;
 	im.create(120, 32, color(0, 0, 0, 0));
 	if (s->type == SignalType::AUDIO)
-		render_bufbox(im, s->buf, view);
+		render_bufbox(im, *s->buf, view);
 	else if (s->type == SignalType::MIDI)
 		render_midi(im, s->midi);
 	return hui::SetImage(im);
@@ -214,8 +214,8 @@ void SampleManagerConsole::on_export()
 
 	if (session->storage->ask_save_render_export(win)){
 		if (sel[0]->type == SignalType::AUDIO){
-			BufferStreamer rr(&sel[0]->buf);
-			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf.length, {});
+			BufferStreamer rr(sel[0]->buf);
+			session->storage->save_via_renderer(rr.out, hui::Filename, sel[0]->buf->length, {});
 		}
 	}
 }
@@ -329,7 +329,7 @@ void SampleManagerConsole::on_preview()
 	int sel = get_int("sample_list");
 	preview_sample = items[sel]->s;
 	preview_chain = new SignalChain(session, "sample-preview");
-	preview_renderer = new BufferStreamer(&preview_sample->buf);
+	preview_renderer = new BufferStreamer(preview_sample->buf);
 	preview_stream = new AudioOutput(session);
 	preview_chain->_add(preview_renderer);
 	preview_chain->_add(preview_stream);
@@ -399,7 +399,7 @@ public:
 		set_int(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
 			icon_names.add(render_sample(s, session->view));
-			set_string(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf.length) + "\\" + s->name);
+			set_string(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf->length) + "\\" + s->name);
 			if (s == selected)
 				set_int(list_id, i + 1);
 		}

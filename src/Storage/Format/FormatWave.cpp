@@ -167,7 +167,7 @@ void FormatWave::load_track(StorageOperationData *od)
 				chunk_size = real_file_size - f->get_pos();
 			}
 
-			int samples = chunk_size / byte_per_sample;
+		//	int samples = chunk_size / byte_per_sample;
 			od->set(0.1f);
 
 			int read = 0;

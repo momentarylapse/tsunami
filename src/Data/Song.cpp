@@ -26,7 +26,7 @@
 #include "../Action/Sample/ActionSampleAdd.h"
 #include "../Action/Sample/ActionSampleDelete.h"
 #include "../Action/Sample/ActionSampleEditName.h"
-#include "../Action/Sample/ActionSampleScale.h"
+#include "../Action/Sample/ActionSampleReplaceBuffer.h"
 #include "../Action/Song/ActionSongDeleteSelection.h"
 #include "../Action/Song/Data/ActionSongChangeAllTrackVolumes.h"
 #include "../Action/Song/Data/ActionSongSetDefaultFormat.h"
@@ -348,9 +348,9 @@ void Song::edit_sample_name(Sample *s, const string &name)
 	execute(new ActionSampleEditName(s, name));
 }
 
-void Song::scale_sample(Sample *s, int new_size, int method)
+void Song::sample_replace_buffer(Sample *s, AudioBuffer *buf)
 {
-	execute(new ActionSampleScale(s, new_size, method));
+	execute(new ActionSampleReplaceBuffer(s, buf));
 }
 
 void Song::delete_selection(const SongSelection &sel)
@@ -440,7 +440,8 @@ void Song::invalidate_all_peaks()
 	for (Track *t: tracks)
 		t->invalidate_all_peaks();
 	for (Sample *s: samples)
-		s->buf.peaks.clear();
+		if (s->buf)
+			s->buf->peaks.clear();
 }
 
 

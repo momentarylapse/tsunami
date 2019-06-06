@@ -36,11 +36,12 @@ void ActionTrackInsertSample::build(Data *d)
 		layer->read_buffers(buf, r, true);
 
 		// insert sub (ignore muted)
-		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(layer, r);
-		buf.set(*ref->buf, 0, ref->volume);
+		auto *action = new ActionTrackEditBuffer(layer, r);
+		buf.set(ref->buf(), 0, ref->volume);
 		add_sub_action(action, d);
 	}else if (layer->type == SignalType::MIDI){
-		for (MidiNote *n : *ref->midi){
+		auto midi = ref->midi();
+		for (MidiNote *n : midi){
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;
 			add_sub_action(new ActionTrackAddMidiNote(layer, nn), d);

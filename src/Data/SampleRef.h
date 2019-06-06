@@ -36,8 +36,8 @@ public:
 
 	int pos;
 	Sample *origin;
-	AudioBuffer *buf;
-	MidiNoteBuffer *midi;
+	AudioBuffer &buf() const;
+	MidiNoteBuffer &midi() const;
 	bool muted;
 	float volume;
 

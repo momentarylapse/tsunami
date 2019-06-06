@@ -19,10 +19,10 @@ class ActionSampleAdd : public Action
 public:
 	ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete);
 	ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete);
-	virtual ~ActionSampleAdd();
+	~ActionSampleAdd() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	Sample *sample;

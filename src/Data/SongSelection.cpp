@@ -123,13 +123,11 @@ void SongSelection::_update_bars(Song* s)
 	}
 
 	int pos = 0;
-	bool first = true;
 	foreachi(Bar *b, s->bars, i){
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
 		if (r.overlaps(range)){
 			bars.add(b);
-			first = false;
 		}else if (range.length == 0 and (range.offset == pos)){
 			bar_gap = i;
 		}

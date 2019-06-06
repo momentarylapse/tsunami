@@ -17,8 +17,6 @@ const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 SampleRef::SampleRef(Sample *sample)
 {
-	buf = &sample->buf;
-	midi = &sample->midi;
 	origin = sample;
 	origin->ref();
 	origin->_pointer_ref();
@@ -69,4 +67,14 @@ Range SampleRef::range() const
 SignalType SampleRef::type() const
 {
 	return origin->type;
+}
+
+AudioBuffer& SampleRef::buf() const
+{
+	return *origin->buf;
+}
+
+MidiNoteBuffer& SampleRef::midi() const
+{
+	return origin->midi;
 }

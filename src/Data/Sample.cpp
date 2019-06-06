@@ -29,6 +29,9 @@ Sample::Sample(SignalType _type)
 
 	uid = randi(0x7fffffff);
 
+	buf = nullptr;
+	if (_type == SignalType::AUDIO)
+		buf = new AudioBuffer;
 
 	_pointer_ref_count = 0;
 }
@@ -36,6 +39,8 @@ Sample::Sample(SignalType _type)
 Sample::~Sample()
 {
 	notify(MESSAGE_DELETE);
+	if (buf)
+		delete buf;
 }
 
 
@@ -53,7 +58,7 @@ Range Sample::range() const
 {
 	if (type == SignalType::MIDI)
 		return Range(0, midi.samples);
-	return buf.range0();
+	return buf->range0();
 }
 
 void Sample::ref()

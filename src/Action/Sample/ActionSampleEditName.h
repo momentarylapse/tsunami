@@ -16,12 +16,11 @@ class ActionSampleEditName: public ActionMergable<string>
 {
 public:
 	ActionSampleEditName(Sample *s, const string &name);
-	virtual ~ActionSampleEditName();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
-	virtual bool mergable(Action *a);
+	bool mergable(Action *a) override;
 
 private:
 	Sample *sample;

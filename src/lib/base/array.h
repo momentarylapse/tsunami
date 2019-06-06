@@ -158,7 +158,7 @@ public:
 				(*this)[i].~T();
 		} else if (size > num) {
 			__reserve(size);
-			memset(&(*this)[num], 0, element_size * (size - num));
+			memset((char*)data + element_size * num, 0, element_size * (size - num));
 			// grow -> construct
 			for (int i=num; i<size; i++)
 				new(&(*this)[i]) T;

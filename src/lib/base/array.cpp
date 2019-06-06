@@ -254,7 +254,7 @@ DynamicArray DynamicArray::ref_subarray(int start, int end)
 	s.init(element_size);
 
 	// magic value (-_-)'
-	if (end == 0x81234567)
+	if ((unsigned)end == 0x81234567)
 		end = num;
 
 	if (start < 0)

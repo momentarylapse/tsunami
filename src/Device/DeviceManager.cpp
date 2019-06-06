@@ -54,25 +54,27 @@ void pulse_wait_op(Session *session, pa_operation *op)
 		session->e("pulse_wait_op:  op=nil");
 		return;
 	}
-//	printf("-w-");
+	//printf("-w-");
 	int n = 0;
 	//msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING){
-//		printf(".");
+		//printf(".");
 		// PA_OPERATION_RUNNING
 		//pa_mainloop_iterate(m, 1, NULL);
 		n ++;
-		if (n > 1000)
+		if (n > 300)
 			break;
-		hui::Sleep(0.003f);
+		hui::Sleep(0.010f);
 	}
 	auto status = pa_operation_get_state(op);
+	//printf("%d\n", status);
 	if (status != PA_OPERATION_DONE){
-		session->e("pulse_wait_op() failed:");
 		if (status == PA_OPERATION_RUNNING)
-			session->e("still running");
-		if (status == PA_OPERATION_CANCELLED)
-			session->e("cancelled");
+			session->e("pulse_wait_op() failed: still running");
+		else if (status == PA_OPERATION_CANCELLED)
+			session->e("pulse_wait_op() failed: cancelled");
+		else
+			session->e("pulse_wait_op() failed: ???");
 	}
 	pa_operation_unref(op);
 	//msg_write(" ok");

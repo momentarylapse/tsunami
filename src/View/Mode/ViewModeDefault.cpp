@@ -265,6 +265,9 @@ void ViewModeDefault::on_right_button_down()
 	}else if (hover->type == Selection::Type::BAR_GAP){
 		prepare_menu(view->menu_bar_gap, this);
 		view->menu_bar_gap->open_popup(view->win);
+	}else if (hover_buffer(hover) >= 0){
+		prepare_menu(view->menu_buffer, this);
+		view->menu_buffer->open_popup(view->win);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
 		prepare_menu(view->menu_layer, this);
 		view->menu_layer->open_popup(view->win);
@@ -272,9 +275,6 @@ void ViewModeDefault::on_right_button_down()
 		prepare_menu(view->menu_track, this);
 		view->menu_track->open_popup(view->win);
 	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
-	}else if (hover_buffer(hover) >= 0){
-		prepare_menu(view->menu_buffer, this);
-		view->menu_buffer->open_popup(view->win);
 	}else if (hover->type == Selection::Type::PLAYBACK_RANGE or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP){
 		prepare_menu(view->menu_playback_range, this);
 		view->menu_playback_range->open_popup(view->win);

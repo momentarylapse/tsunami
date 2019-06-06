@@ -9,6 +9,7 @@
 #define SRC_MODULE_SIGNALCHAIN_H_
 
 #include "Module.h"
+#include <mutex>
 
 class ConfigPanel;
 class Module;
@@ -105,6 +106,9 @@ public:
 	int do_suck();
 	void _start_sucking();
 	void _stop_sucking();
+
+	std::mutex mutex;
+	int perf_channel_suck;
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

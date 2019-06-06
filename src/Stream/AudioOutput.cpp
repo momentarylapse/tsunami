@@ -362,7 +362,8 @@ void AudioOutput::_pause()
 	if (pulse_stream){
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
 		_pulse_test_error("pa_stream_cork");
-		pulse_ignore_op(session, op);
+		pulse_wait_op(session, op);
+		//pulse_ignore_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO

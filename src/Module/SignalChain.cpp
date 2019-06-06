@@ -39,28 +39,18 @@ class SuckerThread : public Thread
 {
 public:
 	SignalChain *sucker;
-	int perf_channel;
 	bool keep_running = true;
 
 	SuckerThread(SignalChain *s)
 	{
-		perf_channel = PerformanceMonitor::create_channel("suck");
 		sucker = s;
-	}
-	~SuckerThread()
-	{
-		PerformanceMonitor::delete_channel(perf_channel);
 	}
 
 	void on_run() override
 	{
-		//msg_write("thread run");
 		while(keep_running){
-			//msg_write(".");
 			if (sucker->sucking){
-				PerformanceMonitor::start_busy(perf_channel);
 				int r = sucker->do_suck();
-				PerformanceMonitor::end_busy(perf_channel);
 				if (r == Port::END_OF_STREAM)
 					break;
 				if (r == Port::NOT_ENOUGH_DATA){
@@ -72,7 +62,6 @@ public:
 			}
 			Thread::cancelation_point();
 		}
-		//msg_write("thread done...");
 	}
 };
 
@@ -87,6 +76,8 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
 		tick_dt *= 10;
+
+	perf_channel_suck = PerformanceMonitor::create_channel("suck");
 
 	sucking = false;
 	thread = nullptr;//new AudioSuckerThread(this);
@@ -110,6 +101,7 @@ SignalChain::~SignalChain()
 		delete m;
 	for (Cable *c: cables)
 		delete c;
+	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
 
 void SignalChain::__init__(Session *s, const string &_name)
@@ -400,6 +392,8 @@ Module* SignalChain::add(ModuleType type, const string &sub_type)
 void SignalChain::reset_state()
 {
 	session->debug("chain", "reset");
+
+	std::lock_guard<std::mutex> lock(mutex);
 	for (auto *m: modules)
 		m->reset_state();
 }
@@ -409,8 +403,12 @@ void SignalChain::prepare_start()
 	if (state != State::UNPREPARED)
 		return;
 	session->debug("chain", "prepare");
-	for (auto *m: modules)
-		m->command(ModuleCommand::PREPARE_START, 0);
+
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		for (auto *m: modules)
+			m->command(ModuleCommand::PREPARE_START, 0);
+	}
 	if (!sucking)
 		_start_sucking();
 	state = State::PAUSED;
@@ -425,9 +423,12 @@ void SignalChain::start()
 	if (state == State::UNPREPARED)
 		prepare_start();
 
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		for (auto *m: modules)
+			m->command(ModuleCommand::START, 0);
+	}
 
-	for (auto *m: modules)
-		m->command(ModuleCommand::START, 0);
 	state = State::ACTIVE;
 	notify(MESSAGE_STATE_CHANGE);
 	hui_runner = hui::RunRepeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
@@ -440,8 +441,12 @@ void SignalChain::stop()
 	session->debug("chain", "stop");
 
 	hui::CancelRunner(hui_runner);
-	for (auto *m: modules)
-		m->command(ModuleCommand::STOP, 0);
+
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		for (auto *m: modules)
+			m->command(ModuleCommand::STOP, 0);
+	}
 	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -487,6 +492,7 @@ bool SignalChain::is_playback_active()
 	return (state == State::ACTIVE) or (state == State::PAUSED);
 }
 
+// running in gui thread!
 void SignalChain::on_module_play_end_of_stream()
 {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
@@ -545,10 +551,13 @@ void SignalChain::_stop_sucking()
 
 int SignalChain::do_suck()
 {
+	std::lock_guard<std::mutex> lock(mutex);
+	PerformanceMonitor::start_busy(perf_channel_suck);
 	int s = Port::END_OF_STREAM;
 	for (auto *m: modules){
 		int r = m->command(ModuleCommand::SUCK, buffer_size);
 		s = max(s, r);
 	}
+	PerformanceMonitor::end_busy(perf_channel_suck);
 	return s;
 }

@@ -325,6 +325,7 @@ void TsunamiWindow::on_destroy()
 	hui::Config.set_int("Window.Height", h);
 	hui::Config.set_bool("Window.Maximized", is_maximized());
 
+	session->signal_chain->stop_hard();
 	view->unsubscribe(this);
 	view->signal_chain->unsubscribe(this);
 	song->action_manager->unsubscribe(this);

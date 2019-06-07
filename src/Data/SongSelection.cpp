@@ -156,15 +156,17 @@ void SongSelection::make_consistent(Song *s)
 }
 
 
-#define IMPLEMENT_FUNC(TYPE, ARRAY)                   \
-void SongSelection::add(const TYPE* t)                \
-{ ARRAY.add(t); }                                     \
-void SongSelection::set(const TYPE* t, bool selected) \
-{ if (selected) ARRAY.add(t); else ARRAY.erase(t); }  \
-bool SongSelection::has(const TYPE* t) const          \
-{ return ARRAY.contains(t); }                         \
-void SongSelection::click(const TYPE* t, bool control)  \
-{ if (control){ set(t, !has(t)); }else{ if (!has(t)){ clear_data(); add(t); } } }
+#define IMPLEMENT_FUNC(TYPE, ARRAY)                    \
+void SongSelection::add(const TYPE* t)                 \
+{ ARRAY.add(t); }                                      \
+void SongSelection::set(const TYPE* t, bool selected)  \
+{ if (selected) ARRAY.add(t); else ARRAY.erase(t); }   \
+bool SongSelection::has(const TYPE* t) const           \
+{ return ARRAY.contains(t); }                          \
+void SongSelection::toggle(const TYPE* t)              \
+{ set(t, !has(t)); }                                   \
+void SongSelection::click(const TYPE* t, bool control) \
+{ if (control){ toggle(t); }else{ if (!has(t)){ clear_data(); add(t); } } }
 
 
 
@@ -236,5 +238,17 @@ SongSelection SongSelection::operator||(const SongSelection &s) const
 SongSelection SongSelection::minus(const SongSelection &s) const
 {
 	SongSelection r = *this;
+	for (auto t: s.tracks)
+		r.set(t, false);
+	for (auto l: s.track_layers)
+		r.set(l, false);
+	for (auto n: s.notes)
+		r.set(n, false);
+	for (auto m: s.markers)
+		r.set(m, false);
+	for (auto sr: s.samples)
+		r.set(sr, false);
+	for (auto b: s.bars)
+		r.set(b, false);
 	return r;
 }

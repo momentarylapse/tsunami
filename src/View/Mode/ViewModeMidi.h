@@ -35,7 +35,7 @@ public:
 	void on_start() override;
 	void on_end() override;
 
-	void on_left_button_down() override;
+	//void on_left_button_down() override;
 	void on_left_button_up() override;
 	void on_mouse_move() override;
 	void on_key_down(int k) override;
@@ -136,6 +136,11 @@ public:
 	int rep_key_runner;
 	int rep_key;
 	int rep_key_num;
+
+	bool left_click_handle_special() override;
+	//void left_click_handle() override;
+	void left_click_handle_void() override;
+	void left_click_handle_xor() override;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

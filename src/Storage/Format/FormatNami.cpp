@@ -511,6 +511,8 @@ public:
 		int channels = f->read_int(); // channels (2)
 		int bits = f->read_int(); // bit (16)
 
+		channels = 2;
+
 		me->set_channels(channels);
 		me->resize(num);
 
@@ -536,7 +538,15 @@ public:
 			uncompress_buffer(*me, data, this);
 
 		}else{
-			me->import(data.data, channels, format_for_bits(bits), num);
+			msg_write("------------");
+			msg_write(me->length);
+			msg_write(me->c[0].num);
+			msg_write(me->channels);
+			msg_write(channels);
+			msg_write(num);
+			msg_write(bytes);
+			if (bytes > 0)
+				me->import(data.data, channels, format_for_bits(bits), num);
 		}
 	}
 	virtual void write(File *f)

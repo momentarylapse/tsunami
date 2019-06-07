@@ -66,6 +66,22 @@ public:
 	void dnd_update();
 
 	Track* moving_track;
+
+	virtual bool left_click_handle_special();
+	virtual void left_click_handle();
+	virtual void left_click_handle_void();
+	virtual void left_click_handle_xor();
+
+	virtual void set_cursor_pos(int pos);
+	virtual void select_under_cursor();
+	virtual bool hover_any_object();
+	virtual bool hover_selected_object();
+	virtual void select_object();
+	virtual void toggle_object();
+	virtual void exclusively_select_object();
+	virtual void exclusively_select_layer();
+	virtual void toggle_select_layer();
+	virtual void toggle_select_layer_with_content_in_cursor();
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

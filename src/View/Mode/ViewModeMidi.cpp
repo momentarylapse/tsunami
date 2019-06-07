@@ -170,7 +170,7 @@ void ri_insert(ViewModeMidi *me)
 		me->start_midi_preview({(int)e.pitch}, 0.5f * vol);
 	}
 	ri_keys.clear();
-	me->set_cursor_pos(r.end(), true);
+	me->set_cursor_pos(r.end());
 	me->select_in_edit_cursor();
 	ri_timer.get();
 
@@ -266,64 +266,68 @@ void ViewModeMidi::on_end()
 		_stop_input();
 }
 
-void ViewModeMidi::on_left_button_down()
+bool ViewModeMidi::left_click_handle_special()
 {
-	ViewModeDefault::on_left_button_down();
+	if (ViewModeDefault::left_click_handle_special())
+		return true;
+	if (hover->type == Selection::Type::SCROLLBAR_MIDI){
+		scroll->drag_start(view->mx, view->my);
+		view->msp.stop();
+		return true;
+	}
+	return false;
+}
+
+// note clicking already handled by ViewModeDefault!
+void ViewModeMidi::left_click_handle_void() {
 	auto mode = cur_vlayer()->midi_mode;
 
-	bool over_sel_note = false;
-	if (hover->note)
-		over_sel_note = view->sel.has(hover->note);
+	if (creation_mode == CreationMode::SELECT ) {
+		view->snap_to_grid(hover->pos);
+		set_cursor_pos(hover->pos);
+		select_in_edit_cursor();
+		view->msp.start(hover->pos, hover->y0);
 
-
-	if (hover->is_in(hover->Type::LAYER_BODY)){
-		if (creation_mode == CreationMode::SELECT and !over_sel_note){
-			set_cursor_pos(hover->pos, true);
-			select_in_edit_cursor();
-			view->msp.start(hover->pos, hover->y0);
-
-		}else{
-			//view->msp.start(hover->pos, hover->y0);
-			view->hide_selection = true;
-		}
+	} else {
+		//view->msp.start(hover->pos, hover->y0);
+		view->hide_selection = true;
 	}
 
-	if (hover->type == Selection::Type::MIDI_NOTE){
-		view->sel.click(hover->note, win->get_key(hui::KEY_CONTROL));
-
-		dnd_start_soon(view->sel);
-	}else if (hover->type == Selection::Type::CLEF_POSITION){
-		/*if (creation_mode != CreationMode::SELECT){
+	if (hover->type == Selection::Type::CLEF_POSITION) {
+		/*if (creation_mode != CreationMode::SELECT) {
 			view->msp.stop();
 		}*/
 		view->msp.start_pos = hover->pos; // TODO ...bad
-		if (mode == MidiMode::TAB){
+		if (mode == MidiMode::TAB) {
 			string_no = clampi(hover->clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
 		}
 	}else if (hover->type == Selection::Type::MIDI_PITCH){
 		view->msp.start_pos = hover->pos; // TODO ...bad
-		if (mode == MidiMode::TAB){
-		}else{ // CLASSICAL/LINEAR
+		if (mode == MidiMode::CLASSICAL) {
+			octave = pitch_get_octave(hover->pitch);
+		}
+		if (mode == MidiMode::TAB) {
+		} else { // CLASSICAL/LINEAR
 			// create new note
 			start_midi_preview(get_creation_pitch(hover->pitch), 1.0f);
 		}
-	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
-		scroll->drag_start(view->mx, view->my);
-		view->msp.stop();
 	}
 }
 
-void ViewModeMidi::on_left_button_up()
-{
+void ViewModeMidi::left_click_handle_xor() {
+	ViewModeDefault::left_click_handle_xor();
+}
+
+void ViewModeMidi::on_left_button_up() {
 	ViewModeDefault::on_left_button_up();
 	view->hide_selection = false;
 
 	auto mode = cur_vlayer()->midi_mode;
-	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
-		if (hover->type == Selection::Type::MIDI_PITCH){
+	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
+		if (hover->type == Selection::Type::MIDI_PITCH) {
 			auto notes = get_creation_notes(hover, view->msp.start_pos);
-			if (notes.num > 0){
-				set_cursor_pos(notes[0]->range.end(), true);
+			if (notes.num > 0) {
+				set_cursor_pos(notes[0]->range.end());
 				octave = pitch_get_octave(hover->pitch);
 				select_in_edit_cursor();
 				view->cur_layer()->add_midi_notes(notes);
@@ -333,21 +337,20 @@ void ViewModeMidi::on_left_button_up()
 		}
 	}
 
-	if (moving){
+	if (moving) {
 		moving = false;
 	}
 }
 
-void ViewModeMidi::on_mouse_move()
-{
+void ViewModeMidi::on_mouse_move() {
 	ViewModeDefault::on_mouse_move();
 	auto e = hui::GetEvent();
 
-	if (hover->type == Selection::Type::MIDI_PITCH){
+	if (hover->type == Selection::Type::MIDI_PITCH) {
 		// creating notes
 		//view->forceRedraw();
-	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI){
-		if (e->lbut){
+	}else if (hover->type == Selection::Type::SCROLLBAR_MIDI) {
+		if (e->lbut) {
 			scroll->drag_update(view->mx, view->my);
 			int _pitch_max = 127 - scroll->offset;
 			cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
@@ -358,7 +361,7 @@ void ViewModeMidi::on_mouse_move()
 void ViewModeMidi::edit_add_pause()
 {
 	Range r = get_edit_range();
-	set_cursor_pos(r.end(), true);
+	set_cursor_pos(r.end());
 	select_in_edit_cursor();
 }
 
@@ -383,7 +386,7 @@ void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 	int pitch = uniclef_to_pitch(upos);
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
-	set_cursor_pos(r.end(), true);
+	set_cursor_pos(r.end());
 	select_in_edit_cursor();
 	start_midi_preview({pitch}, 0.1f);
 }
@@ -395,7 +398,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
 	n->stringno = string_no;
 	cur_layer()->add_midi_note(n);
-	set_cursor_pos(r.end(), true);
+	set_cursor_pos(r.end());
 	select_in_edit_cursor();
 	start_midi_preview({pitch}, 0.1f);
 }
@@ -403,7 +406,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 void ViewModeMidi::edit_backspace()
 {
 	Range r = get_backwards_range();
-	set_cursor_pos(r.offset, true);
+	set_cursor_pos(r.offset);
 	SongSelection s = get_select_in_edit_cursor();
 	view->song->delete_selection(s);
 }
@@ -443,7 +446,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
 		m->set_note_length(l * n);
 		m->set_sub_beat_partition(p);
 	}
-	m->set_cursor_pos(m->view->sel.range.offset, true);
+	m->set_cursor_pos(m->view->sel.range.offset);
 
 	string t;
 	if (n > 4){
@@ -507,7 +510,7 @@ void ViewModeMidi::on_key_down(int k)
 	// cursor
 	if (k == hui::KEY_LEFT){
 		Range r = get_backwards_range();
-		set_cursor_pos(r.offset, true);
+		set_cursor_pos(r.offset);
 		select_in_edit_cursor();
 		return;
 	}

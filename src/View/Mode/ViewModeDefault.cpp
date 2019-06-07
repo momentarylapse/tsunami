@@ -45,23 +45,8 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 	dnd_mouse_pos0 = 0;
 }
 
-ViewModeDefault::~ViewModeDefault()
-{
+ViewModeDefault::~ViewModeDefault() {
 	delete dnd_selection;
-}
-
-void normal_click(ViewModeDefault *m, bool keep_track_selection, bool layer_hover_sel)
-{
-	if (layer_hover_sel){
-		m->set_cursor_pos(m->hover->pos, keep_track_selection);//track_hover_sel);
-	}else{
-		m->view->sel.clear_data();
-		//if (!keep_track_selection)
-		//	view->sel.tracks = view->cur_track();
-		m->view->set_selection(m->get_selection_for_range(m->view->sel.range));
-
-	}
-	m->view->msp.start(m->hover->pos, m->hover->y0);
 }
 
 void ViewModeDefault::set_cursor_pos(int pos) {
@@ -1164,15 +1149,14 @@ void ViewModeDefault::select_hover()
 	view->sel_temp = view->sel;
 	TrackLayer *l = hover->layer;
 	SampleRef *s = hover->sample;
-	bool control = win->get_key(hui::KEY_CONTROL);
 
 	// track
 	if (hover->vlayer)
 		view->set_cur_layer(hover->vlayer);
 	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
-		selectLayer(this, l, control, false);
+		selectLayer(this, l, false, false);
 	if (hover->type == Selection::Type::TRACK_HEADER)
-		selectLayer(this, l, control, false);
+		selectLayer(this, l, false, false);
 
 	view->set_cur_sample(s);
 
@@ -1180,41 +1164,29 @@ void ViewModeDefault::select_hover()
 	if (hover->type == Selection::Type::BAR_GAP){
 		view->sel.clear_data();
 		view->sel.bar_gap = hover->index;
-		selectLayer(this, l, control, true);
+		selectLayer(this, l, false, true);
 	}else if (hover->type == Selection::Type::BAR){
 		auto b = hover->bar;
-		if (control){
-			view->sel.set(b, !view->sel.has(b));
+		if (view->sel.has(b)){
 		}else{
-			if (view->sel.has(b)){
-			}else{
-				selectLayer(this, l, control, true);
-				view->sel.clear_data();
-				view->sel.add(b);
-			}
+			selectLayer(this, l, false, true);
+			view->sel.clear_data();
+			view->sel.add(b);
 		}
 	}else if (hover->type == Selection::Type::MARKER){
 		auto m = hover->marker;
-		if (control){
-			view->sel.set(m, !view->sel.has(m));
+		if (view->sel.has(m)){
 		}else{
-			if (view->sel.has(m)){
-			}else{
-				selectLayer(this, l, control, true);
-				view->sel.clear_data();
-				view->sel.add(m);
-			}
+			selectLayer(this, l, false, true);
+			view->sel.clear_data();
+			view->sel.add(m);
 		}
 	}else if (hover->type == Selection::Type::SAMPLE){
-		if (control){
-			view->sel.set(s, !view->sel.has(s));
+		if (view->sel.has(s)){
 		}else{
-			if (view->sel.has(s)){
-			}else{
-				selectLayer(this, l, control, true);
-				view->sel.clear_data();
-				view->sel.add(s);
-			}
+			selectLayer(this, l, false, true);
+			view->sel.clear_data();
+			view->sel.add(s);
 		}
 	}
 }

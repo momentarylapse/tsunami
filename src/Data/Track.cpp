@@ -63,7 +63,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 		type = SignalType::AUDIO;
 		channels = 2;
 	}else if (type == SignalType::AUDIO){
-		channels = 2;
+		channels = 1;
 	}
 	muted = false;
 	volume = 1;

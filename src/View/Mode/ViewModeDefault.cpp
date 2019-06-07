@@ -837,38 +837,42 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, moving_track->nice_name());
 	}
 
-	if (hover->type == Selection::Type::SAMPLE)
+	if (hover->type == Selection::Type::SAMPLE) {
 		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
-	else if (hover->type == Selection::Type::MARKER)
+	} else if (hover->type == Selection::Type::MARKER) {
 		view->draw_cursor_hover(c, _("marker ") + hover->marker->nice_text());
-	else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT)
+	} else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT) {
 		view->draw_cursor_hover(c, _("edit track properties"));
-	else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE)
+	} else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE) {
 		view->draw_cursor_hover(c, _("toggle mute"));
-	else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO)
+	} else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO) {
 		view->draw_cursor_hover(c, _("toggle solo"));
-	else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE)
+	} else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE) {
 		view->draw_cursor_hover(c, _("edit curves"));
-	else if (hover->type == Selection::Type::TRACK_BUTTON_FX)
+	} else if (hover->type == Selection::Type::TRACK_BUTTON_FX) {
 		view->draw_cursor_hover(c, _("edit effects"));
-	else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT)
+	} else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT) {
 		view->draw_cursor_hover(c, _("make main version"));
-	else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO)
+	} else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO) {
 		view->draw_cursor_hover(c, _("toggle solo"));
-	else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE)
+	} else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE) {
 		view->draw_cursor_hover(c, _("implode"));
-	else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE)
+	} else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE) {
 		view->draw_cursor_hover(c, _("explode"));
-	else if (hover->type == Selection::Type::BAR)
-		view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(u8" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
-	else if (hover->type == Selection::Type::BAR_GAP)
+	} else if (hover->type == Selection::Type::BAR) {
+		if (hover->bar->is_pause())
+			view->draw_cursor_hover(c, _("pause ") + song->get_time_str_long(hover->bar->length));
+		else
+			view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(u8" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
+	} else if (hover->type == Selection::Type::BAR_GAP) {
 		view->draw_cursor_hover(c, _("bar gap"));
-	else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK)
+	} else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK) {
 		view->draw_cursor_hover(c, _("locked"));
-	else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP)
+	} else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP) {
 		view->draw_cursor_hover(c, _("looping"));
-	else if (hover->type == Selection::Type::PLAYBACK_RANGE)
+	} else if (hover->type == Selection::Type::PLAYBACK_RANGE) {
 		view->draw_cursor_hover(c, _("playback range"));
+	}
 
 	if (view->selection_mode != view->SelectionMode::NONE){
 		if (view->sel.range.length > 0){

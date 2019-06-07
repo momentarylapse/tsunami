@@ -10462,7 +10462,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-230
+231
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10896,6 +10896,8 @@ open message.txt
 message.txt öffnen
 output: 
 Ausgang: 
+pause 
+Pause 
 playback range
 Abspielbereich
 please note, that portaudio does not support refreshing the device list after program launch

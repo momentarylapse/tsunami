@@ -2683,7 +2683,7 @@ Auswahl dominant setzen
 Abspielen
 
 // Num Language Strings
-230
+231
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3145,3 +3145,5 @@ locked
 festgehalten
 looping
 Schleife
+pause 
+Pause 

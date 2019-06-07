@@ -511,8 +511,6 @@ public:
 		int channels = f->read_int(); // channels (2)
 		int bits = f->read_int(); // bit (16)
 
-		channels = 2;
-
 		me->set_channels(channels);
 		me->resize(num);
 
@@ -538,13 +536,6 @@ public:
 			uncompress_buffer(*me, data, this);
 
 		}else{
-			msg_write("------------");
-			msg_write(me->length);
-			msg_write(me->c[0].num);
-			msg_write(me->channels);
-			msg_write(channels);
-			msg_write(num);
-			msg_write(bytes);
 			if (bytes > 0)
 				me->import(data.data, channels, format_for_bits(bits), num);
 		}
@@ -892,7 +883,7 @@ public:
 	virtual void write_subs()
 	{
 		if (me->type == SignalType::AUDIO)
-			write_sub("bufbox", &me->buf);
+			write_sub("bufbox", me->buf);
 		else if (me->type == SignalType::MIDI)
 			write_sub("midi", &me->midi);
 	}
@@ -1335,15 +1326,15 @@ void FormatNami::make_consistent(Song *a)
 			for (auto &b: l->buffers)
 				n[b.channels] ++;
 
-		for (int i=t->layers.num-1; i>=1; i--)
+		/*for (int i=t->layers.num-1; i>=1; i--)
 			if ((t->layers[i]->buffers.num == 0) and (t->layers[i]->midi.num == 0))
-				t->layers.erase(i);
+				t->layers.erase(i);*/
 
-		// only mono buffers?
-		if (n[1] > 0 and n[2] == 0){
-			t->channels = 1;
+		// having stereo buffers?
+		if (n[2] > 0){
+			t->channels = 2;
 			for (auto *l: t->layers)
-				l->channels = 1;
+				l->channels = 2;
 		}
 	}
 

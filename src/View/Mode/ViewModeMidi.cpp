@@ -76,7 +76,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	rep_key = -1;
 	rep_key_num = 0;
 
-	scroll = new ScrollBar(view);//view->scene_graph);
+	scroll = new ScrollBar(view, nullptr);//view->scene_graph);
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);
 
 	preview = new MidiPreview(view->session);

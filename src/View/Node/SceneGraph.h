@@ -23,6 +23,8 @@ public:
 	void draw(Painter *p) override;
 
 	string get_tip() override;
+
+	ViewNode *mouse_owner = nullptr;
 };
 
 #endif /* SRC_VIEW_NODE_SCENEGRAPH_H_ */

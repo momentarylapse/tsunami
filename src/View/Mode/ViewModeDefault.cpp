@@ -138,10 +138,7 @@ void ViewModeDefault::exclusively_select_object() {
 bool ViewModeDefault::left_click_handle_special() {
 
 	// special actions
-	if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL) {
-		view->scroll->drag_start(view->mx, view->my);
-		return true;
-	}else if (hover->type == Selection::Type::SELECTION_END){
+	if (hover->type == Selection::Type::SELECTION_END){
 		hover->range = view->sel.range;
 		view->selection_mode = view->SelectionMode::TIME;
 		return true;
@@ -440,11 +437,6 @@ void ViewModeDefault::on_mouse_move()
 				cam->move(10 / cam->scale);
 		}
 
-		if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL){
-			view->scroll->drag_update(view->mx, view->my);
-			view->thm.update_immediately(view, view->song, view->song_area);
-		}
-
 		view->selection_update_pos(view->hover);
 	}else{
 		//Selection hover_old = *hover;
@@ -693,11 +685,6 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = my;
 	s.type = s.Type::BACKGROUND;
-
-	if (view->scroll->area.inside(mx, my)){
-		s.type = s.Type::SCROLLBAR_GLOBAL;
-		return s;
-	}
 
 	// layer?
 	foreachi(auto *l, view->vlayer, i){

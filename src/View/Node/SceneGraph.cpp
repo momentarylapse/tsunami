@@ -42,27 +42,43 @@ Array<ViewNode*> collect_children_down(ViewNode *n) {
 SceneGraph::SceneGraph(AudioView *view) : ViewNode(view) {}
 
 void SceneGraph::on_left_button_down() {
-	auto nodes = collect_children_up(this);
+	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover()) {
 			c->on_left_button_down();
+			if (!mouse_owner)
+				mouse_owner = c;
+		}
 }
 
 void SceneGraph::on_left_button_up() {
-	for (auto *c: children)
-		if (c->hover())
-			c->on_left_button_up();
+	if (mouse_owner) {
+		mouse_owner->on_left_button_up();
+	} else {
+		auto nodes = collect_children_down(this);
+		for (auto *c: nodes)
+			if (c->hover())
+				c->on_left_button_up();
+	}
+	mouse_owner = nullptr;
 }
 
 void SceneGraph::on_right_button_down() {
-	for (auto *c: children)
+	auto nodes = collect_children_down(this);
+	for (auto *c: nodes)
 		if (c->hover())
 			c->on_right_button_down();
 }
 
 void SceneGraph::on_mouse_move() {
-	for (auto *c: children)
-		c->on_mouse_move();
+	if (mouse_owner) {
+		mouse_owner->on_mouse_move();
+	} else {
+		auto nodes = collect_children_down(this);
+		for (auto *c: nodes)
+			if (c->hover())
+				c->on_mouse_move();
+	}
 }
 
 Selection SceneGraph::get_hover() {

@@ -42,6 +42,9 @@ public:
 	bool on_right_button_down() override;
 	bool on_mouse_move() override;
 
+	string get_tip() override;
+	Selection get_hover() override;
+
 	void on_track_change();
 
 

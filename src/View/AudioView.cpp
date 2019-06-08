@@ -517,7 +517,7 @@ void AudioView::on_mouse_move() {
 		snap_to_grid(hover.pos);
 		hover.range.set_end(hover.pos);
 		hover.y1 = my;
-		if (win->get_key(hui::KEY_CONTROL))
+		if (select_xor)
 			set_selection(sel_temp or mode->get_selection(hover.range));
 		else
 			set_selection(mode->get_selection(hover.range));
@@ -880,27 +880,59 @@ void AudioView::update_tracks()
 		}
 	}
 
-	update_scene_graph();
+	rebuild_scene_graph();
 
 	// TODO: detect order change
 	check_consistency();
 	notify(MESSAGE_VTRACK_CHANGE);
 }
 
-void AudioView::update_scene_graph() {
+void AudioView::rebuild_scene_graph() {
 	scene_graph->children.clear();
 	scene_graph->children.add(background);
 
-	for (auto *v: vlayer) {
+	for (auto *v: vlayer)
 		scene_graph->children.add(v);
-		v->update_header();
-	}
 	for (auto *v: vtrack)
 		scene_graph->children.add(v);
 
 	scene_graph->children.add(metronome_overlay_vlayer);
 	scene_graph->children.add(scroll);
 	scene_graph->children.add(time_scale);
+}
+
+bool need_metro_overlay(Song *song, AudioView *view) {
+	Track *tt = song->time_track();
+	if (!tt)
+		return false;
+	auto *vv = view->get_layer(tt->layers[0]);
+	if (!vv)
+		return false;
+	return !vv->on_screen();
+}
+
+bool AudioView::update_scene_graph() {
+	scene_graph->area = area;
+
+	song_area = area;
+	song_area.y1 += TIME_SCALE_HEIGHT;
+	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
+	if (scroll_bar_needed)
+		song_area.x1 += SCROLLBAR_WIDTH;
+	scroll->hidden = !scroll_bar_needed;
+	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
+	bool animating = thm.update(this, song, song_area);
+
+	for (auto *v: vlayer) {
+		v->update_header();
+	}
+
+	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
+	if (!metronome_overlay_vlayer->hidden) {
+		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
+		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
+	}
+	return animating;
 }
 
 
@@ -1027,26 +1059,9 @@ void AudioView::draw_selection(Painter *c)
 	}
 }
 
-bool need_metro_overlay(Song *song, AudioView *view) {
-	Track *tt = song->time_track();
-	if (!tt)
-		return false;
-	auto *vv = view->get_layer(tt->layers[0]);
-	if (!vv)
-		return false;
-	return !vv->on_screen();
-}
-
 void AudioView::draw_song(Painter *c) {
-	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
 	bool slow_repeat = false;
-	song_area = area;
-	song_area.y1 += TIME_SCALE_HEIGHT;
-	if (scroll_bar_needed)
-		song_area.x1 += SCROLLBAR_WIDTH;
-	scroll->hidden = !scroll_bar_needed;
-	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
-	bool animating = thm.update(this, song, song_area);
+	bool animating = update_scene_graph();
 
 	c->set_antialiasing(false);
 
@@ -1054,13 +1069,6 @@ void AudioView::draw_song(Painter *c) {
 
 	update_buffer_zoom();
 
-	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
-	if (!metronome_overlay_vlayer->hidden) {
-		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
-		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
-	}
-
-	scene_graph->area = area;
 	scene_graph->draw(c);
 
 

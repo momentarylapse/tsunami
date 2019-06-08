@@ -256,7 +256,8 @@ public:
 	rect clip;
 	TrackHeightManager thm;
 	SceneGraph *scene_graph;
-	void update_scene_graph();
+	bool update_scene_graph();
+	void rebuild_scene_graph();
 
 	bool playback_range_locked;
 	Range playback_wish_range;

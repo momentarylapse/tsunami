@@ -80,7 +80,7 @@ string TimeScale::get_tip() {
 		return _("looping");
 	if (view->hover.type == Selection::Type::PLAYBACK_RANGE)
 		return _("playback range");
-	return "";
+	return "time?";
 }
 
 Selection TimeScale::get_hover() {
@@ -88,8 +88,6 @@ Selection TimeScale::get_hover() {
 		return Selection();
 
 	Selection s = ViewNode::get_hover();
-	s.pos = view->cam.screen2sample(view->mx);
-	s.range = Range(s.pos, 0);
 	s.type = Selection::Type::TIME;
 
 	if (playback_lock_button.inside(view->mx, view->my))

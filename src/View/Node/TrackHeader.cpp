@@ -125,10 +125,10 @@ void TrackHeader::draw(Painter *c) {
 	if (_hover)
 		col = ColorInterpolate(col, view->colors.hover, 0.2f);
 	c->set_color(col);
-	node_height = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	update_area();
+	float h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	//update_area();
 	c->set_roundness(view->CORNER_RADIUS);
-	c->draw_rect(area);
+	c->draw_rect(rect(area.x1, area.x2, area.y1, area.y1 + h));
 	c->set_roundness(0);
 
 	// track title

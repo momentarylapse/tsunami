@@ -547,3 +547,34 @@ bool AudioViewLayer::on_mouse_move() {
 	view->mode->on_mouse_move();
 	return true;
 }
+
+string AudioViewLayer::get_tip() {
+	if (view->hover.type == Selection::Type::SAMPLE)
+		return _("sample ") + view->hover.sample->origin->name;
+	if (view->hover.type == Selection::Type::MARKER)
+		return  _("marker ") + view->hover.marker->nice_text();
+	if (view->hover.type == Selection::Type::BAR) {
+		if (view->hover.bar->is_pause())
+			return _("pause ") + view->song->get_time_str_long(view->hover.bar->length);
+		else
+			return _("bar ") + view->hover.bar->format_beats() + format(u8" \u2669=%.1f", view->hover.bar->bpm(view->song->sample_rate));
+	}
+	if (view->hover.type == Selection::Type::BAR_GAP)
+		return _("bar gap");
+	return "";
+}
+
+Selection AudioViewLayer::get_hover() {
+	if (!hover())
+		return Selection();
+	Selection s = ViewNode::get_hover();
+	s.vlayer = this;
+	foreachi(auto *l, view->vlayer, i)
+		if (this == l)
+			s.index = i;
+	s.layer = layer;
+	s.track = layer->track;
+	s.vtrack = view->get_track(s.track);
+	s.type = Selection::Type::LAYER;
+	return s;
+}

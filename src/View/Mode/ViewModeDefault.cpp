@@ -9,6 +9,7 @@
 #include "../AudioView.h"
 #include "../Node/AudioViewTrack.h"
 #include "../Node/AudioViewLayer.h"
+#include "../Node/SceneGraph.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
@@ -249,13 +250,8 @@ void ViewModeDefault::on_right_button_down()
 		view->open_popup(view->menu_bar_gap);
 	}else if (hover_buffer(hover) >= 0){
 		view->open_popup(view->menu_buffer);
-	}else if (hover->type == Selection::Type::LAYER_HEADER){
-		view->open_popup(view->menu_layer);
-	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER)){
+	}else if (hover->type == Selection::Type::LAYER){
 		view->open_popup(view->menu_track);
-	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
-	}else if (!hover->track){
-		view->menu_song->open_popup(view->win);
 	}
 }
 
@@ -484,19 +480,6 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, moving_track->nice_name());
 	}
 
-	if (hover->type == Selection::Type::SAMPLE) {
-		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
-	} else if (hover->type == Selection::Type::MARKER) {
-		view->draw_cursor_hover(c, _("marker ") + hover->marker->nice_text());
-	} else if (hover->type == Selection::Type::BAR) {
-		if (hover->bar->is_pause())
-			view->draw_cursor_hover(c, _("pause ") + song->get_time_str_long(hover->bar->length));
-		else
-			view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(u8" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
-	} else if (hover->type == Selection::Type::BAR_GAP) {
-		view->draw_cursor_hover(c, _("bar gap"));
-	}
-
 	if (view->selection_mode != view->SelectionMode::NONE){
 		if (view->sel.range.length > 0){
 			string s = view->song->get_time_str_long(view->sel.range.length);
@@ -510,31 +493,9 @@ void ViewModeDefault::draw_post(Painter *c)
 
 Selection ViewModeDefault::get_hover_basic(bool editable)
 {
-	Selection s;
+	Selection s = view->scene_graph->get_hover();
 	int mx = view->mx;
 	int my = view->my;
-	s.pos = view->cam.screen2sample(mx);
-	s.range = Range(s.pos, 0);
-	s.y0 = s.y1 = my;
-	s.type = s.Type::BACKGROUND;
-
-	// layer?
-	foreachi(auto *l, view->vlayer, i){
-		if (l->hover()){
-			s.vlayer = l;
-			s.index = i;
-			s.layer = l->layer;
-			s.track = l->layer->track;
-			s.vtrack = view->get_track(s.track);
-			s.type = Selection::Type::LAYER;
-			if (l->layer->is_main())
-				if ((view->mx < l->area.x1 + view->TRACK_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
-					s.type = Selection::Type::TRACK_HEADER;
-			if (l->layer->track->layers.num > 1)
-				if ((view->mx > l->area.x2 - view->LAYER_HANDLE_WIDTH) and (view->my < l->area.y1 + view->TRACK_HANDLE_HEIGHT))
-					s.type = Selection::Type::LAYER_HEADER;
-		}
-	}
 
 	// selection boundaries?
 	if ((my >= view->area.y2-20) or (view->win->get_key(hui::KEY_SHIFT))){
@@ -554,15 +515,6 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 				return s;
 			}
 		}
-	}
-
-	// time scale
-	if (my < view->TIME_SCALE_HEIGHT){
-		if (view->playback_wish_range.is_inside(s.pos))
-			s.type = Selection::Type::PLAYBACK_RANGE;
-		else
-			s.type = Selection::Type::TIME;
-		return s;
 	}
 
 	return s;
@@ -710,9 +662,7 @@ void ViewModeDefault::select_hover()
 	// track
 	if (hover->vlayer)
 		view->set_cur_layer(hover->vlayer);
-	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::LAYER_HEADER))
-		selectLayer(this, l, false, false);
-	if (hover->type == Selection::Type::TRACK_HEADER)
+	if (hover->type == Selection::Type::LAYER)
 		selectLayer(this, l, false, false);
 
 	view->set_cur_sample(s);

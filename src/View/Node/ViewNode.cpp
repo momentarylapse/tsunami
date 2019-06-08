@@ -48,6 +48,9 @@ Selection ViewNode::get_hover() {
 	Selection s;
 	s.type = Selection::Type::SOME_NODE;
 	s.node = this;
+	s.pos = view->cam.screen2sample(view->mx);
+	s.range = Range(s.pos, 0);
+	s.y0 = s.y1 = view->my;
 	return s;
 }
 

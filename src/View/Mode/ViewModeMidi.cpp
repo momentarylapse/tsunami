@@ -76,7 +76,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	rep_key = -1;
 	rep_key_num = 0;
 
-	scroll = new ScrollBar;
+	scroll = new ScrollBar(view);//view->scene_graph);
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);
 
 	preview = new MidiPreview(view->session);
@@ -854,7 +854,7 @@ void ViewModeMidi::draw_post(Painter *c)
 		// scrollbar
 		scroll->offset = 127 - cur_vlayer()->edit_pitch_max;
 		scroll->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
-		scroll->draw(c, hover->type == Selection::Type::SCROLLBAR_MIDI);
+		scroll->draw(c);
 	}
 
 

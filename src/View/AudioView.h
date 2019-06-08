@@ -49,6 +49,7 @@ class MidiPainter;
 class BufferPainter;
 class GridPainter;
 class SceneGraph;
+class TimeScale;
 enum class MidiMode;
 
 
@@ -101,7 +102,6 @@ public:
 	void zoom_in();
 	void zoom_out();
 
-	void draw_time_scale(Painter *c);
 	void draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time = false);
 	void draw_selection(Painter *c);
 	void draw_background(Painter *c);
@@ -265,6 +265,7 @@ public:
 	ViewPort cam;
 
 	ScrollBar *scroll;
+	TimeScale *time_scale;
 
 
 	MidiPainter *midi_painter;

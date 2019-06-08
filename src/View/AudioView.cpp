@@ -9,6 +9,7 @@
 
 #include "Node/AudioViewTrack.h"
 #include "Node/AudioViewLayer.h"
+#include "Node/TimeScale.h"
 #include "Node/SceneGraph.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
@@ -271,7 +272,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	area = rect(0, 1024, 0, 768);
 	song_area = area;
 	enabled = true;
-	scroll = new ScrollBar;
+	scroll = new ScrollBar(this);
+	time_scale = new TimeScale(this);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -1009,6 +1011,8 @@ void AudioView::update_scene_graph() {
 		scene_graph->children.add(v);
 
 	scene_graph->children.add(metronome_overlay_vlayer);
+	scene_graph->children.add(scroll);
+	scene_graph->children.add(time_scale);
 }
 
 
@@ -1135,59 +1139,6 @@ void AudioView::draw_background(Painter *c)
 	draw_layer_separator(c, prev, nullptr, this);
 }
 
-void AudioView::draw_time_scale(Painter *c)
-{
-	rect r = rect(clip.x1, clip.x2, area.y1, area.y1 + TIME_SCALE_HEIGHT);
-	GridColors g;
-	g.bg = colors.background_track;
-	g.bg_sel = colors.background_track_selection;
-	g.fg = g.fg_sel = colors.grid;
-
-	grid_painter->set_context(r, g);
-	grid_painter->draw_empty_background(c);
-	grid_painter->draw_time(c);
-
-	if (is_playback_active()){
-		c->set_color(AudioView::colors.preview_marker_internal);
-		float x0, x1;
-		cam.range2screen(renderer->range(), x0, x1);
-		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);
-	}
-	grid_painter->draw_time_numbers(c);
-
-	// playback lock range
-	if (playback_wish_range.length > 0){
-		c->set_color(AudioView::colors.preview_marker);
-		float x0, x1;
-		cam.range2screen_clip(playback_wish_range, area, x0, x1);
-		c->draw_rect(x0, area.y1, x1-x0, 5);
-	}
-
-	// playback lock symbol
-	playback_lock_button = rect::EMPTY;
-	if (playback_range_locked){
-		float x = cam.sample2screen(get_playback_selection(false).end());
-		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + TIME_SCALE_HEIGHT);
-
-		c->set_color((hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		c->set_font_size(FONT_SIZE * 0.7f);
-		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, "🔒");
-		c->set_font_size(FONT_SIZE);
-	}
-
-	// playback loop symbol
-	playback_loop_button = rect::EMPTY;
-	if (playback_loop){
-		float x = cam.sample2screen(get_playback_selection(false).end());
-		playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + TIME_SCALE_HEIGHT);
-
-		c->set_color((hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		//c->set_font_size(FONT_SIZE * 0.7f);
-		c->draw_str(playback_loop_button.x1 + 5, playback_loop_button.y1 + 3, "⏎");
-		c->set_font_size(FONT_SIZE);
-	}
-}
-
 void AudioView::draw_selection(Painter *c)
 {
 	// time selection
@@ -1265,6 +1216,8 @@ void AudioView::draw_song(Painter *c)
 	song_area.y1 += TIME_SCALE_HEIGHT;
 	if (scroll_bar_needed)
 		song_area.x1 += SCROLLBAR_WIDTH;
+	scroll->hidden = !scroll_bar_needed;
+	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
 	bool animating = thm.update(this, song, song_area);
 
 	c->set_antialiasing(false);
@@ -1272,10 +1225,6 @@ void AudioView::draw_song(Painter *c)
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-
-	draw_time_scale(c);
-
-	c->set_clip(song_area);
 
 	draw_background(c);
 
@@ -1288,32 +1237,9 @@ void AudioView::draw_song(Painter *c)
 	scene_graph->area = area;
 	scene_graph->draw(c);
 
-/*	// tracks
-	for (auto *t: vlayer)
-		if (t->on_screen())
-			t->draw_recursive(c);
-	for (auto *t: vtrack)
-		//if (t->on_screen())
-			t->draw_recursive(c);
-
-	if (need_metro_overlay(song, this)){
-		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
-		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
-		metronome_overlay_vlayer->draw(c);
-	}*/
-
-	c->set_clip(clip);
-
 
 	// selection
 	draw_selection(c);
-
-	if (scroll_bar_needed){
-		scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
-		scroll->draw(c, hover.type == hover.Type::SCROLLBAR_GLOBAL);
-	}else{
-		scroll->set_area(rect(-1,0,-1,0));
-	}
 
 
 	// playing/capturing position

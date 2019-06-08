@@ -8,22 +8,27 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
-void ScrollBar::drag_start(float mx, float my)
-{
+//ScrollBar::ScrollBar(ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {}
+ScrollBar::ScrollBar(AudioView *view) : ViewNode(view) {
+	node_width = AudioView::SCROLLBAR_WIDTH;
+	node_height = 100;
+	z = 20;
+}
+
+void ScrollBar::drag_start(float mx, float my) {
 	mouse_offset = (my - area.y1) * content_size / area.height() - offset;
 }
 
-void ScrollBar::drag_update(float mx, float my)
-{
+void ScrollBar::drag_update(float mx, float my) {
 	offset = (my - area.y1) * content_size / area.height() - mouse_offset;
 	offset = max(min(offset, content_size - page_size), 0.0f);
 }
 
-void ScrollBar::draw(Painter *c, bool hover)
-{
+void ScrollBar::draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
-	c->set_color(hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
+	bool _hover = hover();
+	c->set_color(_hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
 	float d = 5;
 	float f = min(page_size / content_size, 1.0f);
 	float h = area.height() - 2*d;
@@ -33,13 +38,11 @@ void ScrollBar::draw(Painter *c, bool hover)
 }
 
 
-void ScrollBar::set_area(const rect &r)
-{
+void ScrollBar::set_area(const rect &r) {
 	area = r;
 }
 
-void ScrollBar::update(float page, float content)
-{
+void ScrollBar::update(float page, float content) {
 	page_size = page;
 	content_size = content;
 	offset = max(min(offset, content_size - page_size), 0.0f);

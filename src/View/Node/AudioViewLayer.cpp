@@ -6,6 +6,7 @@
  */
 
 #include "AudioViewLayer.h"
+#include "LayerHeader.h"
 #include "../AudioView.h"
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
@@ -39,6 +40,7 @@ const int PITCH_SHOW_COUNT = 30;
 
 
 
+
 AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(_view)//_view->scene_graph, 0, 0, 0, 0)
 {
 	layer = _layer;
@@ -56,6 +58,8 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(
 		set_midi_mode(view->midi_view_mode);
 		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
+		header = new LayerHeader(this);
+		children.add(header);
 	}
 }
 
@@ -383,20 +387,19 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i)
 	}
 }
 
-void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards, float flare_w)
-{
+void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards, float flare_w) {
 	int N = 7;
 	float a1, a2;
-	if (inwards){
+	if (inwards) {
 		a1 = 0.3f;
 		a2 = 0.05f;
 		x2 += flare_w;
-	}else{
+	} else {
 		a1 = 0.05f;
 		a2 = 0.3f;
 		x1 -= flare_w;
 	}
-	for (int j=0; j<N; j++){
+	for (int j=0; j<N; j++) {
 		float t1 = (float)j / (float)N;
 		float t2 = (float)(j+1) / (float)N;
 		c->set_color(color(a1 + (a2-a1) * (t1+t2)/2,0,0.7f,0));
@@ -405,8 +408,7 @@ void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards
 
 }
 
-void AudioViewLayer::draw_fades(Painter *c)
-{
+void AudioViewLayer::draw_fades(Painter *c) {
 	int index_before = 0;
 	int index_own = layer->version_number();
 
@@ -415,11 +417,11 @@ void AudioViewLayer::draw_fades(Painter *c)
 	}*/
 
 	c->set_line_width(2);
-	foreachi (auto &f, layer->track->fades, i){
+	foreachi (auto &f, layer->track->fades, i) {
 		/*if (f.target == index_own){
 			draw_fade_bg(c, l, view, i);
 		}*/
-		if (f.target == index_own or index_before == index_own){
+		if (f.target == index_own or index_before == index_own) {
 			float x1, x2;
 			view->cam.range2screen(f.range(), x1, x2);
 			c->set_color(color(1,0,0.7f,0));
@@ -434,38 +436,28 @@ void AudioViewLayer::draw_fades(Painter *c)
 }
 
 
-void AudioViewLayer::set_edit_pitch_min_max(int _min, int _max)
-{
+void AudioViewLayer::set_edit_pitch_min_max(int _min, int _max) {
 	int diff = _max - _min;
 	edit_pitch_min = clampi(_min, 0, MAX_PITCH - 1 - diff);
 	edit_pitch_max = edit_pitch_min + diff;
 	view->force_redraw();
 }
 
-bool AudioViewLayer::mouse_over()
-{
-	return !hidden and area.inside(view->mx, view->my);
-}
-
-bool AudioViewLayer::is_playable()
-{
+bool AudioViewLayer::is_playable() {
 	return view->get_playable_layers().contains(layer);
 }
 
-color AudioViewLayer::background_color()
-{
+color AudioViewLayer::background_color() {
 	return (view->sel.has(layer)) ? view->colors.background_track_selected : view->colors.background_track;
 }
 
-color AudioViewLayer::background_selection_color()
-{
+color AudioViewLayer::background_selection_color() {
 	if (view->selection_mode == view->SelectionMode::RECT)
 		return background_color(); // complex selection rect as overlay...
 	return (view->sel.has(layer)) ? view->colors.background_track_selection : view->colors.background_track;
 }
 
-bool AudioView::editing_layer(AudioViewLayer *l)
-{
+bool AudioView::editing_layer(AudioViewLayer *l) {
 	if (cur_vlayer != l)
 		return false;
 	if (session->in_mode("midi"))
@@ -475,92 +467,7 @@ bool AudioView::editing_layer(AudioViewLayer *l)
 	return false;
 }
 
-
-void AudioViewLayer::draw_version_header(Painter *c)
-{
-	bool hover = (view->hover.layer == layer) and view->hover.is_in(Selection::Type::LAYER_HEADER);
-	bool visible = hover or view->editing_layer(this);
-	bool playable = view->get_playable_layers().contains(layer);
-
-	color col = view->colors.background_track_selected;
-	if (view->sel.has(layer))
-		col = ColorInterpolate(col, view->colors.selection, 0.2f);
-	if (hover)
-		col = ColorInterpolate(col, view->colors.hover, 0.2f);
-	c->set_color(col);
-	float h = visible ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	c->set_roundness(view->CORNER_RADIUS);
-	c->draw_rect(area.x2 - view->LAYER_HANDLE_WIDTH,  area.y1,  view->LAYER_HANDLE_WIDTH, h);
-	c->set_roundness(0);
-
-	// track title
-	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable, false);
-	if (playable)
-		c->set_color(view->colors.text);
-	else
-		c->set_color(view->colors.text_soft2);
-	string title;
-	if (layer->track->has_version_selection()){
-		if (layer->is_main())
-			title = _("base");
-		else
-			title = "v" + i2s(layer->version_number() + 1);
-	}else{
-		title = "l" + i2s(layer->version_number() + 1);
-	}
-	if (solo)
-		title += " (solo)";
-	c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 5, title);
-
-	c->set_font("", -1, false, false);
-
-	// icons
-	if (layer->type == SignalType::BEATS){
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	}else if (layer->type == SignalType::MIDI){
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
-	}else{
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
-	}
-
-	color col_but = ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
-	color col_but_hover = view->colors.text;
-
-	if (visible and !layer->track->has_version_selection()){
-		/*c->setColor(col_but);
-		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_DOMINANT))
-			c->setColor(col_but_hover);
-		//c->drawStr(area.x1 + 5, area.y1 + 22-2, "\U0001f50a"); // U+1F50A "🔊"
-		c->drawMaskImage(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 22, *view->images.speaker);*/
-
-
-		c->set_color(col_but);
-		if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_SOLO))
-			c->set_color(col_but_hover);
-		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 22, area.y1 + 22, *view->images.solo);
-	}
-
-	if (visible and layer->is_main()){
-		if (represents_imploded){
-			c->set_color(col_but);
-			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_EXPLODE))
-				c->set_color(col_but_hover);
-			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22, "+");
-		}else{
-			c->set_color(col_but);
-			if ((view->hover.layer == layer) and (view->hover.type == Selection::Type::LAYER_BUTTON_IMPLODE))
-				c->set_color(col_but_hover);
-			c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 22+17, area.y1 + 22, "-");
-		}
-	}
-}
-
-void AudioViewLayer::set_solo(bool _solo)
-{
+void AudioViewLayer::set_solo(bool _solo) {
 	solo = _solo;
 	view->renderer->allow_layers(view->get_playable_layers());
 	view->force_redraw();
@@ -569,45 +476,39 @@ void AudioViewLayer::set_solo(bool _solo)
 }
 
 
-void AudioViewLayer::draw(Painter *c)
-{
-	if (!represents_imploded){
-		Track *t = layer->track;
+void AudioViewLayer::draw(Painter *c) {
+	if (represents_imploded)
+		return;
 
+	Track *t = layer->track;
 
-
-		if (layer->type == SignalType::BEATS){
-			view->grid_painter->set_context(area, grid_colors());
-			if (t->song->bars.num > 0)
-				view->grid_painter->draw_bar_numbers(c);
-		}
-
-
-		// midi
-		if (layer->type == SignalType::MIDI)
-			draw_midi(c, layer->midi, false, 0);
-
-		// audio buffer
-		draw_track_buffers(c);
-
-		// samples
-		for (auto *s: layer->samples)
-			draw_sample(c, s);
-
-		if (layer->is_main())
-			draw_markers(c, t->markers_sorted(), view->hover);
-
-		draw_fades(c);
+	if (layer->type == SignalType::BEATS) {
+		view->grid_painter->set_context(area, grid_colors());
+		if (t->song->bars.num > 0)
+			view->grid_painter->draw_bar_numbers(c);
 	}
 
-	if (layer->track->layers.num > 1)
-		draw_version_header(c);
+
+	// midi
+	if (layer->type == SignalType::MIDI)
+		draw_midi(c, layer->midi, false, 0);
+
+	// audio buffer
+	draw_track_buffers(c);
+
+	// samples
+	for (auto *s: layer->samples)
+		draw_sample(c, s);
+
+	if (layer->is_main())
+		draw_markers(c, t->markers_sorted(), view->hover);
+
+	draw_fades(c);
 }
 
 
 
-GridColors AudioViewLayer::grid_colors()
-{
+GridColors AudioViewLayer::grid_colors() {
 	GridColors g;
 	g.bg = background_color();
 	g.bg_sel = background_selection_color();
@@ -616,9 +517,13 @@ GridColors AudioViewLayer::grid_colors()
 	return g;
 }
 
-bool AudioViewLayer::on_screen()
-{
+bool AudioViewLayer::on_screen() {
 	if (hidden)
 		return false;
 	return (area.y1 < view->song_area.y2) and (area.y2 > view->song_area.y1);
+}
+
+void AudioViewLayer::update_header() {
+	header->hidden = (layer->track->layers.num == 1);
+	//header->children[0]->hidden = layer->track->has_version_selection();
 }

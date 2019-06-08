@@ -28,6 +28,7 @@ class Selection;
 enum class NoteModifier;
 enum class MidiMode;
 class MidiKeyChange;
+class LayerHeader;
 
 
 class AudioViewLayer : public ViewNode
@@ -55,7 +56,6 @@ public:
 
 	void draw_fades(Painter *c);
 
-	void draw_version_header(Painter *c);
 	void draw(Painter *c) override;
 
 	bool on_screen();
@@ -85,10 +85,10 @@ public:
 	void set_solo(bool solo);
 	bool solo;
 
-
-	bool mouse_over();
-
 	bool represents_imploded;
+
+	LayerHeader *header;
+	void update_header();
 };
 
 #endif /* SRC_VIEW_NODE_AUDIOVIEWLAYER_H_ */

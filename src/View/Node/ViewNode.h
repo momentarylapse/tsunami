@@ -37,6 +37,8 @@ public:
 
 	AudioView *view;
 	ViewNode *parent;
+	bool node_align_right;
+	bool node_align_bottom;
 	float node_offset_x, node_offset_y;
 	float node_width, node_height;
 	Array<ViewNode*> children;

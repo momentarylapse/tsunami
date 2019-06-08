@@ -15,6 +15,8 @@ ViewNode::ViewNode(AudioView *_view) : ViewNode(nullptr, 0, 0, 0, 0) {
 
 ViewNode::ViewNode(ViewNode *_parent, float dx, float dy, float w, float h) {
 	view = nullptr;
+	node_align_right = false;
+	node_align_bottom = false;
 	node_offset_x = dx;
 	node_offset_y = dy;
 	node_width = w;
@@ -56,7 +58,11 @@ string ViewNode::get_tip() {
 void ViewNode::update_area() {
 	if (parent) {
 		float x = parent->area.x1 + node_offset_x;
+		if (node_align_right)
+			x = parent->area.x2 - node_width - node_offset_x;
 		float y = parent->area.y1 + node_offset_y;
+		if (node_align_bottom)
+			y = parent->area.y2 - node_height - node_offset_y;
 		area = rect(x, x + node_width, y, y + node_height);
 	}
 }

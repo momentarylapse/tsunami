@@ -859,26 +859,21 @@ void AudioView::on_song_update()
 			update_peaks();
 }
 
-void AudioView::on_stream_tick()
-{
+void AudioView::on_stream_tick() {
 	cam.make_sample_visible(playback_pos(), session->sample_rate() * 2);
 	force_redraw();
 }
 
-void AudioView::on_stream_state_change()
-{
+void AudioView::on_stream_state_change() {
 	force_redraw();
 }
 
-void AudioView::on_update()
-{
+void AudioView::on_update() {
 	check_consistency();
-
 	force_redraw();
 }
 
-void AudioView::update_peaks_now(AudioBuffer &buf)
-{
+void AudioView::update_peaks_now(AudioBuffer &buf) {
 	int n = buf._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
@@ -886,18 +881,16 @@ void AudioView::update_peaks_now(AudioBuffer &buf)
 			buf._update_peaks_chunk(i);
 }
 
-AudioViewTrack *AudioView::get_track(Track *track)
-{
-	for (auto t: vtrack){
+AudioViewTrack *AudioView::get_track(Track *track) {
+	for (auto t: vtrack) {
 		if (t->track == track)
 			return t;
 	}
 	return dummy_vtrack;
 }
 
-AudioViewLayer *AudioView::get_layer(TrackLayer *layer)
-{
-	for (auto l: vlayer){
+AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
+	for (auto l: vlayer) {
 		if (l->layer == layer)
 			return l;
 	}
@@ -998,29 +991,33 @@ void AudioView::update_tracks()
 		}
 	}
 
-
-	// update scene graph
-	scene_graph->children.clear();
-	for (auto *v: vlayer)
-		scene_graph->children.add(v);
-	for (auto *v: vtrack)
-		scene_graph->children.add(v);
-	scene_graph->children.add(metronome_overlay_vlayer);
+	update_scene_graph();
 
 	// TODO: detect order change
 	check_consistency();
 	notify(MESSAGE_VTRACK_CHANGE);
 }
 
+void AudioView::update_scene_graph() {
+	scene_graph->children.clear();
 
-rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str)
-{
+	for (auto *v: vlayer) {
+		scene_graph->children.add(v);
+		v->update_header();
+	}
+	for (auto *v: vtrack)
+		scene_graph->children.add(v);
+
+	scene_graph->children.add(metronome_overlay_vlayer);
+}
+
+
+rect AudioView::get_boxed_str_rect(Painter *c, float x, float y, const string &str) {
 	float w = c->get_str_width(str);
 	return rect(x-CORNER_RADIUS, x + w + CORNER_RADIUS, y-CORNER_RADIUS, y + c->font_size + CORNER_RADIUS);
 }
 
-void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align)
-{
+void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, const color &col_text, const color &col_bg, int align) {
 	rect r = get_boxed_str_rect(c, x, y, str);
 	float dx =r.width() / 2 - CORNER_RADIUS;
 	dx *= (align - 1);
@@ -1035,8 +1032,7 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 }
 
 
-void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area)
-{
+void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area) {
 	c->set_font("", -1, true, false);
 	float w = c->get_str_width(msg);
 	float x = min(max(mx - 20.0f, area.x1 + 2.0f), area.x2 - w);
@@ -1045,13 +1041,11 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float
 	c->set_font("", -1, false, false);
 }
 
-void AudioView::draw_cursor_hover(Painter *c, const string &msg)
-{
+void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
 	draw_cursor_hover(c, msg, mx, my, song_area);
 }
 
-void draw_message(Painter *c, AudioView *view, AudioView::Message &m)
-{
+void draw_message(Painter *c, AudioView *view, AudioView::Message &m) {
 	float xm = view->area.mx();
 	float ym = view->area.my();
 	float a = min(m.ttl*8, 1.0f);

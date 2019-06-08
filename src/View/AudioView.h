@@ -254,6 +254,7 @@ public:
 	rect clip;
 	TrackHeightManager thm;
 	SceneGraph *scene_graph;
+	void update_scene_graph();
 
 	rect playback_lock_button;
 	rect playback_loop_button;

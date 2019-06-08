@@ -141,25 +141,6 @@ bool ViewModeDefault::left_click_handle_special() {
 	if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL) {
 		view->scroll->drag_start(view->mx, view->my);
 		return true;
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT) {
-		exclusively_select_layer();
-		select_under_cursor();
-		return true;
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO) {
-		exclusively_select_layer();
-		select_under_cursor();
-		hover->vlayer->set_solo(!hover->vlayer->solo);
-		return true;
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE) {
-		exclusively_select_layer();
-		select_under_cursor();
-		view->implode_track(hover->track);
-		return true;
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE) {
-		exclusively_select_layer();
-		select_under_cursor();
-		view->explode_track(hover->track);
-		return true;
 	}else if (hover->type == Selection::Type::SELECTION_END){
 		hover->range = view->sel.range;
 		view->selection_mode = view->SelectionMode::TIME;
@@ -677,14 +658,6 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
 	} else if (hover->type == Selection::Type::MARKER) {
 		view->draw_cursor_hover(c, _("marker ") + hover->marker->nice_text());
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT) {
-		view->draw_cursor_hover(c, _("make main version"));
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO) {
-		view->draw_cursor_hover(c, _("toggle solo"));
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_IMPLODE) {
-		view->draw_cursor_hover(c, _("implode"));
-	} else if (hover->type == Selection::Type::LAYER_BUTTON_EXPLODE) {
-		view->draw_cursor_hover(c, _("explode"));
 	} else if (hover->type == Selection::Type::BAR) {
 		if (hover->bar->is_pause())
 			view->draw_cursor_hover(c, _("pause ") + song->get_time_str_long(hover->bar->length));
@@ -727,8 +700,8 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	}
 
 	// layer?
-	foreachi(AudioViewLayer *l, view->vlayer, i){
-		if (l->mouse_over()){
+	foreachi(auto *l, view->vlayer, i){
+		if (l->hover()){
 			s.vlayer = l;
 			s.index = i;
 			s.layer = l->layer;
@@ -779,33 +752,6 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 		else
 			s.type = Selection::Type::TIME;
 		return s;
-	}
-
-
-	// layer header buttons?
-	if (s.vlayer and (s.type == s.Type::LAYER_HEADER) and !s.track->has_version_selection()){
-		AudioViewLayer *l = s.vlayer;
-		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5;
-		/*if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
-			s.type = Selection::Type::LAYER_BUTTON_DOMINANT;
-			return s;
-		}*/
-		x += 17;
-		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
-			s.type = Selection::Type::LAYER_BUTTON_SOLO;
-			return s;
-		}
-	}
-	if (s.vlayer and (s.type == s.Type::LAYER_HEADER) and s.layer->is_main()){
-		AudioViewLayer *l = s.vlayer;
-		int x = l->area.width() - view->LAYER_HANDLE_WIDTH + 5 + 17 + 17;
-		if ((mx >= l->area.x1 + x) and (mx < l->area.x1 + x+12) and (my >= l->area.y1 + 22) and (my < l->area.y1 + 34)){
-			if (l->represents_imploded)
-				s.type = Selection::Type::LAYER_BUTTON_EXPLODE;
-			else
-				s.type = Selection::Type::LAYER_BUTTON_IMPLODE;
-			return s;
-		}
 	}
 
 	return s;

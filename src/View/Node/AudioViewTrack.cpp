@@ -6,6 +6,7 @@
  */
 
 #include "AudioViewTrack.h"
+#include "AudioViewLayer.h"
 #include "../AudioView.h"
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
@@ -13,9 +14,13 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../Data/Midi/MidiData.h"
+#include "../../Data/CrossFade.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../Helper/SymbolRenderer.h"
+#include "../Painter/BufferPainter.h"
 
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
@@ -180,20 +185,17 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode(_view
 	}
 }
 
-AudioViewTrack::~AudioViewTrack()
-{
+AudioViewTrack::~AudioViewTrack() {
 	if (track)
 		track->unsubscribe(this);
 }
 
-void AudioViewTrack::on_track_change()
-{
+void AudioViewTrack::on_track_change() {
 	notify(MESSAGE_CHANGE);
 }
 
 
-bool AudioView::editing_track(Track *t)
-{
+bool AudioView::editing_track(Track *t) {
 	if (cur_track() != t)
 		return false;
 	if (session->in_mode("default/track"))
@@ -211,8 +213,7 @@ bool AudioView::editing_track(Track *t)
 	return false;
 }
 
-void AudioViewTrack::set_muted(bool muted)
-{
+void AudioViewTrack::set_muted(bool muted) {
 	track->set_muted(muted);
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
@@ -221,8 +222,7 @@ void AudioViewTrack::set_muted(bool muted)
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
-void AudioViewTrack::set_solo(bool _solo)
-{
+void AudioViewTrack::set_solo(bool _solo) {
 	solo = _solo;
 	view->renderer->allow_tracks(view->get_playable_tracks());
 	view->renderer->allow_layers(view->get_playable_layers());
@@ -231,29 +231,71 @@ void AudioViewTrack::set_solo(bool _solo)
 	view->notify(view->MESSAGE_SOLO_CHANGE);
 }
 
-void AudioViewTrack::set_panning(float panning)
-{
+void AudioViewTrack::set_panning(float panning) {
 	track->set_panning(panning);
 }
 
-void AudioViewTrack::set_volume(float volume)
-{
+void AudioViewTrack::set_volume(float volume) {
 	track->set_volume(volume);
 }
 
 
-void AudioViewTrack::draw(Painter *c)
-{
-	if (imploded){
-		view->mode->draw_imploded_track_data(c, this);
+void AudioViewTrack::draw_imploded_data(Painter *c) {
+	auto *l = view->get_layer(track->layers[0]);
+	view->buffer_painter->set_context(l->area);
 
-	}else{
+
+	if (track->has_version_selection()) {
+		Range r = Range(track->range().start(), 0);
+		int index = 0;
+		for (auto &f: track->fades) {
+			r = RangeTo(r.end(), f.position);
+			view->buffer_painter->set_clip(r);
+
+			for (AudioBuffer &b: track->layers[index]->buffers) {
+				view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
+				view->buffer_painter->draw_buffer(c, b, b.offset);
+			}
+
+			index = f.target;
+		}
+
+		r = RangeTo(r.end(), track->range().end());
+		view->buffer_painter->set_clip(r);
+		for (AudioBuffer &b: track->layers[index]->buffers) {
+			view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
+			view->buffer_painter->draw_buffer(c, b, b.offset);
+		}
+	} else {
+		view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
+		for (auto *layer: track->layers)
+			for (AudioBuffer &b: layer->buffers)
+				view->buffer_painter->draw_buffer(c, b, b.offset);
+
+	}
+
+	/*if (view->sel.has(layer)){
+		// selection
+		for (AudioBuffer &b: layer->buffers){
+			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
+		}
+	}*/
+
+
+
+	view->draw_boxed_str(c, area.x2 - 200, area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
+}
+
+void AudioViewTrack::draw(Painter *c) {
+	if (imploded) {
+		draw_imploded_data(c);
+
+	} else {
 		view->mode->draw_track_data(c, this);
 	}
 }
 
-bool AudioViewTrack::is_playable()
-{
+bool AudioViewTrack::is_playable() {
 	return view->get_playable_tracks().contains(track);
 }
 

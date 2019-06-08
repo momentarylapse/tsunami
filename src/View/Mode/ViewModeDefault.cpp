@@ -636,53 +636,6 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	c->set_line_width(1.0f);
 }
 
-void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
-{
-	auto *l = view->get_layer(t->track->layers[0]);
-	view->buffer_painter->set_context(l->area);
-
-
-	if (t->track->has_version_selection()){
-		Range r = Range(t->track->range().start(), 0);
-		int index = 0;
-		for (auto &f: t->track->fades){
-			r = RangeTo(r.end(), f.position);
-			view->buffer_painter->set_clip(r);
-
-			for (AudioBuffer &b: t->track->layers[index]->buffers){
-				view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
-				view->buffer_painter->draw_buffer(c, b, b.offset);
-			}
-
-			index = f.target;
-		}
-
-		r = RangeTo(r.end(), t->track->range().end());
-		view->buffer_painter->set_clip(r);
-		for (AudioBuffer &b: t->track->layers[index]->buffers){
-			view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
-			view->buffer_painter->draw_buffer(c, b, b.offset);
-		}
-	}else{
-		view->buffer_painter->set_color(t->is_playable() ? view->colors.text : view->colors.text_soft3);
-		for (auto *layer: t->track->layers)
-			for (AudioBuffer &b: layer->buffers)
-				view->buffer_painter->draw_buffer(c, b, b.offset);
-
-	}
-
-	/*if (view->sel.has(layer)){
-		// selection
-		for (AudioBuffer &b: layer->buffers){
-			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
-		}
-	}*/
-
-
-
-	view->draw_boxed_str(c, t->area.x2 - 200, t->area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
-}
-
 int ViewModeDefault::get_track_move_target(bool visual)
 {
 	int orig = get_track_index(moving_track);

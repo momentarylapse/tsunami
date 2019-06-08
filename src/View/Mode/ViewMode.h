@@ -54,7 +54,6 @@ public:
 	virtual void draw_track_background(Painter *c, AudioViewTrack *t){}
 	virtual void draw_layer_background(Painter *c, AudioViewLayer *l){}
 	virtual void draw_track_data(Painter *c, AudioViewTrack *t){}
-	virtual void draw_imploded_track_data(Painter *c, AudioViewTrack *t){}
 	virtual void draw_post(Painter *c){}
 
 	virtual MidiMode which_midi_mode(Track *t) = 0;

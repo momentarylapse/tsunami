@@ -25,7 +25,6 @@
 #include "../../Data/CrossFade.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
-#include "../Helper/ScrollBar.h"
 #include "../Painter/BufferPainter.h"
 #include "../Painter/GridPainter.h"
 #include "../Painter/MidiPainter.h"

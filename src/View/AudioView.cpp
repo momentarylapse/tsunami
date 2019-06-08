@@ -44,6 +44,7 @@
 #include "Painter/BufferPainter.h"
 #include "Painter/GridPainter.h"
 #include "Painter/MidiPainter.h"
+#include "Helper/PeakThread.h"
 #include "SideBar/SideBar.h"
 
 
@@ -73,74 +74,6 @@ const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 const string AudioView::MESSAGE_SOLO_CHANGE = "SoloChange";
 
 
-class PeakThread : public Thread
-{
-public:
-	AudioView *view;
-	Song *song;
-	int perf_channel;
-	bool allow_running = true;
-	PeakThread(AudioView *_view) {
-		view = _view;
-		song = view->song;
-		perf_channel = PerformanceMonitor::create_channel("peak");
-	}
-	~PeakThread() {
-		PerformanceMonitor::delete_channel(perf_channel);
-	}
-	void _cdecl on_run() override {
-		try {
-			update_song();
-		} catch(...) {
-		}
-	}
-
-	void update_buffer(AudioBuffer &buf) {
-		song->lock();
-		if (!allow_running) {
-			song->unlock();
-			throw "";
-		}
-		int n = buf._update_peaks_prepare();
-		song->unlock();
-
-		Thread::cancelation_point();
-
-		if (!allow_running)
-			throw "";
-
-		for (int i=0; i<n; i++) {
-			if (buf._peaks_chunk_needs_update(i)) {
-				while (!song->try_lock()) {
-					Thread::cancelation_point();
-					hui::Sleep(0.01f);
-					if (!allow_running)
-						throw "";
-				}
-				PerformanceMonitor::start_busy(perf_channel);
-				buf._update_peaks_chunk(i);
-				PerformanceMonitor::end_busy(perf_channel);
-				song->unlock();
-				Thread::cancelation_point();
-			}
-			if (!allow_running)
-				throw "";
-		}
-	}
-
-	void update_track(Track *t) {
-		for (TrackLayer *l: t->layers)
-			for (AudioBuffer &b: l->buffers)
-				update_buffer(b);
-	}
-
-	void update_song() {
-		for (Track *t: song->tracks)
-			update_track(t);
-		for (Sample *s: song->samples)
-			update_buffer(*s->buf);
-	}
-};
 
 // make shadows thicker
 Image *ExpandImageMask(Image *im, float d) {
@@ -442,7 +375,7 @@ void AudioView::set_mode(ViewMode *m) {
 		mode->on_end();
 	}
 	mode = m;
-	if (mode){
+	if (mode) {
 		//msg_write("start mode " + mode_name(mode, this));
 		mode->on_start();
 	}

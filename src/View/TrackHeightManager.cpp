@@ -11,7 +11,7 @@
 #include "Node/AudioViewTrack.h"
 #include "Node/AudioViewLayer.h"
 #include "Mode/ViewMode.h"
-#include "Helper/ScrollBar.h"
+#include "Node/ScrollBar.h"
 #include "../Data/Track.h"
 #include "../Data/TrackLayer.h"
 
@@ -47,10 +47,10 @@ float smooth_parametrization(float t)
 
 void set_track_areas_from_layers(AudioView *view)
 {
-	for (AudioViewTrack *v: view->vtrack){
+	for (auto *v: view->vtrack){
 		bool first = true;
 
-		for (AudioViewLayer *l: view->vlayer){
+		for (auto *l: view->vlayer){
 			if (l->layer->track != v->track)
 				continue;
 
@@ -120,7 +120,7 @@ void TrackHeightManager::update_immediately(AudioView *view, Song *a, const rect
 	animating = false;
 	dirty = false;
 
-	for (AudioViewLayer *v : view->vlayer)
+	for (auto *v : view->vlayer)
 		v->area = v->area_target;
 
 	set_track_areas_from_layers(view);

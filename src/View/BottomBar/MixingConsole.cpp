@@ -22,7 +22,7 @@
 #include "../../Device/DeviceManager.h"
 #include "../../Stream/AudioOutput.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../Node/AudioViewTrack.h"
 
 //string module_header(Module *m);
 

@@ -37,6 +37,7 @@ bool Selection::is_in(Type _type) const
 void Selection::clear()
 {
 	type = Type::NONE;
+	node = nullptr;
 	track = nullptr;
 	vtrack = nullptr;
 	layer = nullptr;

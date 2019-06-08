@@ -22,7 +22,7 @@
 #include "../../Session.h"
 #include "../../Stream/MidiInput.h"
 #include "../AudioView.h"
-#include "../AudioViewLayer.h"
+#include "../Node/AudioViewLayer.h"
 #include "../Helper/MidiPreview.h"
 #include "../Helper/ScrollBar.h"
 #include "../Painter/GridPainter.h"
@@ -743,7 +743,7 @@ Selection ViewModeMidi::get_hover()
 	if (s.type != s.Type::LAYER)
 		return s;
 
-	int mx = view->mx;
+//	int mx = view->mx;
 	int my = view->my;
 
 	// midi

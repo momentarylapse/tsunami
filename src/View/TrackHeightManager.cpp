@@ -8,8 +8,8 @@
 #include "TrackHeightManager.h"
 
 #include "AudioView.h"
-#include "AudioViewTrack.h"
-#include "AudioViewLayer.h"
+#include "Node/AudioViewTrack.h"
+#include "Node/AudioViewLayer.h"
 #include "Mode/ViewMode.h"
 #include "Helper/ScrollBar.h"
 #include "../Data/Track.h"

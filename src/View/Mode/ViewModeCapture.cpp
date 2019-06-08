@@ -7,7 +7,7 @@
 
 #include "ViewModeCapture.h"
 #include "../AudioView.h"
-#include "../AudioViewLayer.h"
+#include "../Node/AudioViewLayer.h"
 #include "../Painter/BufferPainter.h"
 #include "../../Data/base.h"
 #include "../../Data/Track.h"

@@ -48,10 +48,11 @@ class Session;
 class MidiPainter;
 class BufferPainter;
 class GridPainter;
+class ViewNode;
 enum class MidiMode;
 
 
-enum class SelectionSnapMode{
+enum class SelectionSnapMode {
 	NONE,
 	BAR,
 	PART,
@@ -141,7 +142,7 @@ public:
 	SongSelection sel;
 	SongSelection sel_temp;
 
-	enum class SelectionMode{
+	enum class SelectionMode {
 		NONE,
 		TIME,
 		RECT,
@@ -169,8 +170,7 @@ public:
 
 	int mx, my;
 
-	struct MouseSelectionPlanner
-	{
+	struct MouseSelectionPlanner {
 		float dist;
 		int start_pos;
 		int start_y;
@@ -179,7 +179,7 @@ public:
 		bool step();
 		bool selecting();
 		void stop();
-	}msp;
+	} msp;
 
 	void select_none();
 	void select_all();
@@ -253,6 +253,7 @@ public:
 	rect song_area;
 	rect clip;
 	TrackHeightManager thm;
+	ViewNode *scene_graph;
 
 	rect playback_lock_button;
 	rect playback_loop_button;

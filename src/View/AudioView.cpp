@@ -7,8 +7,8 @@
 
 #include "AudioView.h"
 
-#include "AudioViewTrack.h"
-#include "AudioViewLayer.h"
+#include "Node/AudioViewTrack.h"
+#include "Node/AudioViewLayer.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
@@ -251,10 +251,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	playback_range_locked = false;
 	playback_loop = false;
 
-	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
-	dummy_vtrack = new AudioViewTrack(this, nullptr);
-	dummy_vlayer = new AudioViewLayer(this, nullptr);
-
 	selection_mode = SelectionMode::NONE;
 	selection_snap_mode = SelectionSnapMode::NONE;
 	hide_selection = false;
@@ -270,10 +266,15 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_capture = new ViewModeCapture(this);
 	set_mode(mode_default);
 
+	scene_graph = new ViewNode(this);
 	area = rect(0, 1024, 0, 768);
 	song_area = area;
 	enabled = true;
 	scroll = new ScrollBar;
+
+	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
+	dummy_vtrack = new AudioViewTrack(this, nullptr);
+	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(this);
@@ -969,7 +970,7 @@ void AudioView::update_tracks()
 	thm.dirty = true;
 
 	// guess where to create new tracks
-	foreachi(AudioViewTrack *v, vtrack, i){
+	foreachi(auto *v, vtrack, i){
 		if (v->area.height() == 0){
 			if (i > 0){
 				v->area = vtrack[i-1]->area;
@@ -982,7 +983,7 @@ void AudioView::update_tracks()
 	}
 
 	// guess where to create new tracks
-	foreachi(AudioViewLayer *v, vlayer, i){
+	foreachi(auto *v, vlayer, i){
 		if (v->area.height() == 0){
 			if (i > 0){
 				v->area = vlayer[i-1]->area;
@@ -993,6 +994,13 @@ void AudioView::update_tracks()
 			}
 		}
 	}
+
+	// update scene graph
+	scene_graph->children.clear();
+	for (auto *v: vtrack)
+		scene_graph->children.add(v);
+	for (auto *v: vlayer)
+		scene_graph->children.add(v);
 
 	// TODO: detect order change
 	check_consistency();
@@ -1272,19 +1280,27 @@ void AudioView::draw_song(Painter *c)
 
 	draw_background(c);
 
-	// tracks
-	for (AudioViewLayer *t: vlayer)
+	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
+	if (!metronome_overlay_vlayer->hidden) {
+		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
+		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
+	}
+
+	scene_graph->draw_recursive(c);
+
+/*	// tracks
+	for (auto *t: vlayer)
 		if (t->on_screen())
-			t->draw(c);
-	for (AudioViewTrack *t: vtrack)
+			t->draw_recursive(c);
+	for (auto *t: vtrack)
 		//if (t->on_screen())
-			t->draw(c);
+			t->draw_recursive(c);
 
 	if (need_metro_overlay(song, this)){
 		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
 		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
 		metronome_overlay_vlayer->draw(c);
-	}
+	}*/
 
 	c->set_clip(clip);
 

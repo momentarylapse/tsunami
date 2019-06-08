@@ -15,7 +15,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/ConfigPanel.h"
 #include "../AudioView.h"
-#include "../AudioViewLayer.h"
+#include "../Node/AudioViewLayer.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../../Session.h"
 #include "../../Device/DeviceManager.h"

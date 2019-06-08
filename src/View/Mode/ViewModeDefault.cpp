@@ -7,8 +7,8 @@
 
 #include "ViewModeDefault.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
-#include "../AudioViewLayer.h"
+#include "../Node/AudioViewTrack.h"
+#include "../Node/AudioViewLayer.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../Action/Song/ActionSongMoveSelection.h"
@@ -958,31 +958,17 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	// track header buttons?
 	if (s.track){
 		auto *t = s.vtrack;
-		int x = 5;
-		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+		auto *header = t->children[0];
+		if (header->children[0]->hover()) {
 			s.type = Selection::Type::TRACK_BUTTON_MUTE;
 			return s;
-		}
-		x += 17;
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+		} else if (header->children[1]->hover()) {
 			s.type = Selection::Type::TRACK_BUTTON_SOLO;
 			return s;
-		}
-		x += 17;
-		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34) and editable){
+		} else if (header->children[2]->hover()) {
 			s.type = Selection::Type::TRACK_BUTTON_EDIT;
 			return s;
 		}
-		/*x += 17;
-		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::Type::TRACK_BUTTON_FX;
-			return s;
-		}*/
-		/*x += 17;
-		if ((mx >= t->area.x1 + x) and (mx < t->area.x1 + x+12) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = Selection::Type::TRACK_BUTTON_CURVE;
-			return s;
-		}*/
 	}
 
 

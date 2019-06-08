@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
 
+class ViewNode;
 class AudioViewTrack;
 class AudioViewLayer;
 class Track;
@@ -25,6 +26,7 @@ enum class NoteModifier;
 class Selection
 {
 public:
+	ViewNode *node;
 	AudioViewLayer *vlayer;
 	TrackLayer *layer;
 	AudioViewTrack *vtrack;
@@ -45,6 +47,7 @@ public:
 	enum class Type
 	{
 		NONE,
+		SOME_NODE,
 		BACKGROUND,
 		SELECTION_START,
 		SELECTION_END,

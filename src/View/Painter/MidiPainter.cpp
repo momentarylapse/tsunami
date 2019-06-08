@@ -9,7 +9,7 @@
 #include "../AudioView.h"
 #include "../ViewPort.h"
 #include "../ColorScheme.h"
-#include "../AudioViewLayer.h" // argh
+#include "../Node/AudioViewLayer.h" // argh
 #include "../../Data/Song.h"
 #include "../../Data/Midi/MidiData.h"
 #include "../../Data/Midi/MidiNote.h"

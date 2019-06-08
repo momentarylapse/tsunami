@@ -5,11 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_AUDIOVIEWLAYER_H_
-#define SRC_VIEW_AUDIOVIEWLAYER_H_
+#ifndef SRC_VIEW_NODE_AUDIOVIEWLAYER_H_
+#define SRC_VIEW_NODE_AUDIOVIEWLAYER_H_
 
-#include "../lib/math/math.h"
-#include "../Stuff/Observable.h"
+#include "ViewNode.h"
 
 class Track;
 class TrackLayer;
@@ -31,11 +30,11 @@ enum class MidiMode;
 class MidiKeyChange;
 
 
-class AudioViewLayer : public Observable<VirtualBase>
+class AudioViewLayer : public ViewNode
 {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
-	virtual ~AudioViewLayer();
+	~AudioViewLayer() override;
 
 	void on_track_change();
 
@@ -55,19 +54,17 @@ public:
 	void draw_fades(Painter *c);
 
 	void draw_version_header(Painter *c);
-	virtual void draw(Painter *c);
+	void draw(Painter *c) override;
 
 	bool on_screen();
 
 	GridColors grid_colors();
 
 	TrackLayer *layer;
-	rect area;
 	rect area_last, area_target;
 	int height_wish, height_min;
 	Map<const TrackMarker*, rect> marker_areas;
 	Map<const TrackMarker*, rect> marker_label_areas;
-	AudioView *view;
 	void set_midi_mode(MidiMode wanted);
 	MidiMode midi_mode;
 
@@ -89,8 +86,7 @@ public:
 
 	bool mouse_over();
 
-	bool hidden;
 	bool represents_imploded;
 };
 
-#endif /* SRC_VIEW_AUDIOVIEWLAYER_H_ */
+#endif /* SRC_VIEW_NODE_AUDIOVIEWLAYER_H_ */

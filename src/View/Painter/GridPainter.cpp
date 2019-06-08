@@ -8,7 +8,7 @@
 #include "GridPainter.h"
 
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../Node/AudioViewTrack.h"
 #include "../ViewPort.h"
 #include "../../Data/Song.h"
 #include "../../Data/Rhythm/Bar.h"
@@ -91,7 +91,7 @@ void GridPainter::draw_time_numbers(Painter *c)
 		factor = 1.0/0.600000001;
 	ldt += log10(factor);
 	double exp_s = ceil(ldt);
-	double exp_s_mod = exp_s - ldt;
+//	double exp_s_mod = exp_s - ldt;
 	dt = pow(10, exp_s) / factor;
 	dl = dt * song->sample_rate;
 //	double dw = dl * a->view_zoom;

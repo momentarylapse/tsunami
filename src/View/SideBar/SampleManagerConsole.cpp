@@ -7,7 +7,7 @@
 
 #include "../../Storage/Storage.h"
 #include "../AudioView.h"
-#include "../AudioViewLayer.h"
+#include "../Node/AudioViewLayer.h"
 #include "../Painter/MidiPainter.h"
 #include "../Helper/Progress.h"
 #include "../Dialog/SampleScaleDialog.h"

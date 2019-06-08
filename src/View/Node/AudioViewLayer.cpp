@@ -6,32 +6,32 @@
  */
 
 #include "AudioViewLayer.h"
-#include "AudioView.h"
-#include "Mode/ViewMode.h"
-#include "Mode/ViewModeMidi.h"
-#include "Painter/BufferPainter.h"
-#include "Painter/GridPainter.h"
-#include "Painter/MidiPainter.h"
-#include "../Tsunami.h"
-#include "../Session.h"
-#include "../Data/base.h"
-#include "../Data/Song.h"
-#include "../Data/Track.h"
-#include "../Data/TrackLayer.h"
-#include "../Data/TrackMarker.h"
-#include "../Data/SampleRef.h"
-#include "../Data/Sample.h"
-#include "../Data/CrossFade.h"
-#include "../Data/Audio/AudioBuffer.h"
-#include "../Data/Rhythm/Bar.h"
-#include "../Data/Rhythm/Beat.h"
-#include "../Data/Rhythm/BarCollection.h"
-#include "../Data/Midi/MidiData.h"
-#include "../Data/Midi/Clef.h"
-#include "../Module/Synth/Synthesizer.h"
-#include "../Module/Audio/SongRenderer.h"
-#include "Helper/SymbolRenderer.h"
-#include "Painter/MidiPainter.h"
+#include "../AudioView.h"
+#include "../Mode/ViewMode.h"
+#include "../Mode/ViewModeMidi.h"
+#include "../Painter/BufferPainter.h"
+#include "../Painter/GridPainter.h"
+#include "../Painter/MidiPainter.h"
+#include "../../Tsunami.h"
+#include "../../Session.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
+#include "../../Data/TrackMarker.h"
+#include "../../Data/SampleRef.h"
+#include "../../Data/Sample.h"
+#include "../../Data/CrossFade.h"
+#include "../../Data/Audio/AudioBuffer.h"
+#include "../../Data/Rhythm/Bar.h"
+#include "../../Data/Rhythm/Beat.h"
+#include "../../Data/Rhythm/BarCollection.h"
+#include "../../Data/Midi/MidiData.h"
+#include "../../Data/Midi/Clef.h"
+#include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/Audio/SongRenderer.h"
+#include "../Helper/SymbolRenderer.h"
+#include "../Painter/MidiPainter.h"
 
 
 
@@ -39,19 +39,16 @@ const int PITCH_SHOW_COUNT = 30;
 
 
 
-AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer)
+AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(_view)//_view->scene_graph, 0, 0, 0, 0)
 {
-	view = _view;
 	layer = _layer;
 	solo = false;
 
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
 
-	area = rect(0, 0, 0, 0);
 	height_min = height_wish = 0;
 
-	hidden = false;
 	represents_imploded = false;
 
 	if (layer){

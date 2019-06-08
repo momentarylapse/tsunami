@@ -7,7 +7,7 @@
 
 #include "ViewModeCurve.h"
 #include "../AudioView.h"
-#include "../AudioViewTrack.h"
+#include "../Node/AudioViewTrack.h"
 #include "../../Data/Curve.h"
 #include "../../Data/Song.h"
 #include "../../TsunamiWindow.h"

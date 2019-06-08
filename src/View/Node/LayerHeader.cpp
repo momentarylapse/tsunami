@@ -38,7 +38,8 @@ public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
+		return true;
 	}
 	string get_tip() override {
 		return _("toggle mute");
@@ -54,8 +55,9 @@ public:
 		//c->drawStr(area.x1, area.y1, "S");
 		c->draw_mask_image(area.x1, area.y1, *view->images.solo);
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
 		vlayer->set_solo(!vlayer->solo);
+		return true;
 	}
 	string get_tip() override {
 		return _("toggle solo");
@@ -75,11 +77,12 @@ public:
 		else
 			c->draw_str(area.x1, area.y1, u8"\u2b71");
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
 		if (vlayer->represents_imploded)
 			view->explode_track(vlayer->layer->track);
 		else
 			view->implode_track(vlayer->layer->track);
+		return true;
 	}
 	string get_tip() override {
 		return vlayer->represents_imploded ? _("explode") : _("implode");

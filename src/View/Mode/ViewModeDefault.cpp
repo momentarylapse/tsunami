@@ -48,92 +48,6 @@ ViewModeDefault::~ViewModeDefault() {
 	delete dnd_selection;
 }
 
-void ViewModeDefault::set_cursor_pos(int pos) {
-	view->sel.range = Range(pos, 0);
-	view->set_selection(get_selection_for_range(view->sel.range));
-	//view->update_selection();
-}
-
-void ViewModeDefault::select_under_cursor() {
-	view->set_selection(get_selection_for_range(view->sel.range));
-}
-
-bool ViewModeDefault::hover_any_object() {
-	if (hover->type == Selection::Type::BAR_GAP)
-		return true;
-	if (hover->type == Selection::Type::BAR)
-		return true;
-	if (hover->type == Selection::Type::MARKER)
-		return true;
-	if (hover->type == Selection::Type::SAMPLE)
-		return true;
-	if (hover->type == Selection::Type::MIDI_NOTE)
-		return true;
-	return false;
-}
-
-bool ViewModeDefault::hover_selected_object() {
-	if (hover->type == Selection::Type::BAR_GAP)
-		return view->sel.bar_gap == hover->index;
-	if (hover->type == Selection::Type::BAR)
-		return view->sel.has(hover->bar);
-	if (hover->type == Selection::Type::MARKER)
-		return view->sel.has(hover->marker);
-	if (hover->type == Selection::Type::SAMPLE)
-		return view->sel.has(hover->sample);
-	if (hover->type == Selection::Type::MIDI_NOTE)
-		return view->sel.has(hover->note);
-	return false;
-}
-
-void ViewModeDefault::select_object() {
-	if (hover->type == Selection::Type::BAR_GAP) {
-		view->sel.bar_gap = hover->index;
-	} else if (hover->type == Selection::Type::BAR) {
-		view->sel.add(hover->bar);
-	} else if (hover->type == Selection::Type::MARKER) {
-		view->sel.add(hover->marker);
-	} else if (hover->type == Selection::Type::SAMPLE) {
-		view->sel.add(hover->sample);
-	} else if (hover->type == Selection::Type::MIDI_NOTE) {
-		view->sel.add(hover->note);
-	}
-	view->set_cur_sample(hover->sample);
-}
-
-void ViewModeDefault::toggle_object() {
-	if (hover->type == Selection::Type::BAR_GAP) {
-		view->sel.bar_gap = hover->index;
-	} else if (hover->type == Selection::Type::BAR) {
-		view->sel.toggle(hover->bar);
-	} else if (hover->type == Selection::Type::MARKER) {
-		view->sel.toggle(hover->marker);
-	} else if (hover->type == Selection::Type::SAMPLE) {
-		view->sel.toggle(hover->sample);
-	} else if (hover->type == Selection::Type::MIDI_NOTE) {
-		view->sel.toggle(hover->note);
-	}
-	view->set_cur_sample(hover->sample);
-}
-
-void ViewModeDefault::exclusively_select_layer() {
-	view->sel.track_layers.clear();
-	view->sel.add(hover->layer);
-	view->sel.make_consistent(view->song);
-	view->set_cur_layer(hover->vlayer);
-}
-
-void ViewModeDefault::toggle_select_layer() {
-	view->sel.toggle(hover->layer);
-	view->sel.make_consistent(view->song);
-	view->set_cur_layer(hover->vlayer);
-}
-
-void ViewModeDefault::exclusively_select_object() {
-	view->sel.clear_data();
-	select_object();
-}
-
 bool ViewModeDefault::left_click_handle_special() {
 
 	// special actions
@@ -155,12 +69,12 @@ bool ViewModeDefault::left_click_handle_special() {
 void ViewModeDefault::left_click_handle() {
 
 	if (hover->type == Selection::Type::TRACK_HEADER) {
-		exclusively_select_layer();
-		select_under_cursor();
+		view->exclusively_select_layer();
+		view->select_under_cursor();
 		view->msp.start(hover->pos, hover->y0);
 	} else if (hover->type == Selection::Type::LAYER_HEADER) {
-		exclusively_select_layer();
-		select_under_cursor();
+		view->exclusively_select_layer();
+		view->select_under_cursor();
 	} else if (view->is_playback_active()) {
 		if (view->renderer->range().is_inside(hover->pos)) {
 			session->signal_chain->set_pos(hover->pos);
@@ -170,9 +84,9 @@ void ViewModeDefault::left_click_handle() {
 		} else {
 			view->stop();
 		}
-	} else if (hover->type == Selection::Type::BACKGROUND or hover->type == Selection::Type::TIME or hover->type == Selection::Type::PLAYBACK_RANGE) {
+	} else if (hover->type == Selection::Type::BACKGROUND) {
 		view->snap_to_grid(hover->pos);
-		set_cursor_pos(hover->pos);
+		view->set_cursor_pos(hover->pos);
 		view->msp.start(hover->pos, hover->y0);
 	} else {
 		// "void"
@@ -186,36 +100,25 @@ void ViewModeDefault::left_click_handle_void() {
 	if (view->sel.has(hover->layer)) {
 		// set cursor only when clicking on selected layers
 		view->snap_to_grid(hover->pos);
-		set_cursor_pos(hover->pos);
+		view->set_cursor_pos(hover->pos);
 	}
 
-	exclusively_select_layer();
-	select_under_cursor();
+	view->exclusively_select_layer();
+	view->select_under_cursor();
 
 	// start drag'n'drop?
 	view->msp.start(hover->pos, hover->y0);
 
 }
 
-// hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
-void ViewModeDefault::toggle_select_layer_with_content_in_cursor() {
-	auto s = SongSelection::from_range(song, view->sel.range, {hover->track}, {hover->layer});
-	if (view->sel.has(hover->layer))
-		view->sel = view->sel.minus(s);
-	else
-		view->sel = view->sel || s;
-	view->sel.make_consistent(view->song);
-	//toggle_select_layer();
-}
-
 void ViewModeDefault::left_click_handle_xor() {
 	if (hover->type == Selection::Type::TRACK_HEADER) {
-		toggle_select_layer_with_content_in_cursor();
+		view->toggle_select_layer_with_content_in_cursor();
 		view->msp.start(hover->pos, hover->y0); // track drag'n'drop
 	} else if (hover->type == Selection::Type::LAYER_HEADER) {
-		toggle_select_layer_with_content_in_cursor();
+		view->toggle_select_layer_with_content_in_cursor();
 	} else {
-		toggle_select_layer_with_content_in_cursor();
+		view->toggle_select_layer_with_content_in_cursor();
 
 		// diff selection rectangle
 		view->msp.start(hover->pos, hover->y0);
@@ -235,19 +138,19 @@ void ViewModeDefault::on_left_button_down() {
 	if (control) {
 		// differential selection
 
-		if (hover_any_object()) {
-			toggle_object();
+		if (view->hover_any_object()) {
+			view->toggle_object();
 		} else {
 			left_click_handle_xor();
 		}
 	} else {
 		// normal click
 
-		if (hover_any_object()) {
+		if (view->hover_any_object()) {
 
-			exclusively_select_layer();
-			if (!hover_selected_object())
-				exclusively_select_object();
+			view->exclusively_select_layer();
+			if (!view->hover_selected_object())
+				view->exclusively_select_object();
 
 			// start drag'n'drop?
 			//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){
@@ -336,40 +239,6 @@ void ViewModeDefault::on_left_double_click()
 	}
 }
 
-void prepare_menu(hui::Menu *menu, ViewModeDefault *me)
-{
-	// midi mode
-	if (me->hover->track){
-		menu->enable("menu-midi-mode", me->hover->track->type == SignalType::MIDI);
-		menu->enable("layer-midi-mode-tab", me->hover->track->instrument.string_pitch.num > 0);
-	}
-	if (me->hover->vlayer){
-		menu->check("layer-midi-mode-linear", me->hover->vlayer->midi_mode == MidiMode::LINEAR);
-		menu->check("layer-midi-mode-classical", me->hover->vlayer->midi_mode == MidiMode::CLASSICAL);
-		menu->check("layer-midi-mode-tab", me->hover->vlayer->midi_mode == MidiMode::TAB);
-	}
-
-	if (me->hover->track){
-		menu->enable("track-edit-midi", me->hover->track->type == SignalType::MIDI);
-		menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
-	}
-
-	// convert
-	if (me->hover->track){
-		menu->enable("menu-convert", me->hover->track->type == SignalType::AUDIO);
-		menu->enable("track-convert-stereo", me->hover->track->channels == 1);
-		menu->enable("track-convert-mono", me->hover->track->channels == 2);
-	}
-	if (me->hover->layer){
-		menu->enable("layer-merge", me->hover->layer->track->layers.num > 1);
-		menu->enable("layer-mark-dominant", me->hover->layer->track->layers.num > 1);// and view->sel.layers.num == 1);
-		//menu->enable("layer-delete", !hover->layer->is_main());
-	}
-
-	menu->check("play-loop", me->view->playback_loop);
-	menu->check("playback-range-lock", me->view->playback_range_locked);
-
-}
 
 void ViewModeDefault::on_right_button_down()
 {
@@ -391,30 +260,20 @@ void ViewModeDefault::on_right_button_down()
 	view->update_menu();
 
 	if (hover->type == Selection::Type::SAMPLE){
-		prepare_menu(view->menu_sample, this);
-		view->menu_sample->open_popup(view->win);
+		view->open_popup(view->menu_sample);
 	}else if (hover->type == Selection::Type::BAR){
-		prepare_menu(view->menu_bar, this);
-		view->menu_bar->open_popup(view->win);
+		view->open_popup(view->menu_bar);
 	}else if (hover->type == Selection::Type::MARKER){
-		prepare_menu(view->menu_marker, this);
-		view->menu_marker->open_popup(view->win);
+		view->open_popup(view->menu_marker);
 	}else if (hover->type == Selection::Type::BAR_GAP){
-		prepare_menu(view->menu_bar_gap, this);
-		view->menu_bar_gap->open_popup(view->win);
+		view->open_popup(view->menu_bar_gap);
 	}else if (hover_buffer(hover) >= 0){
-		prepare_menu(view->menu_buffer, this);
-		view->menu_buffer->open_popup(view->win);
+		view->open_popup(view->menu_buffer);
 	}else if (hover->type == Selection::Type::LAYER_HEADER){
-		prepare_menu(view->menu_layer, this);
-		view->menu_layer->open_popup(view->win);
+		view->open_popup(view->menu_layer);
 	}else if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TRACK_HEADER)){
-		prepare_menu(view->menu_track, this);
-		view->menu_track->open_popup(view->win);
+		view->open_popup(view->menu_track);
 	}else  if ((hover->type == Selection::Type::SELECTION_START) or (hover->type == Selection::Type::SELECTION_END)){
-	}else if (hover->type == Selection::Type::PLAYBACK_RANGE or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK or hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP){
-		prepare_menu(view->menu_playback_range, this);
-		view->menu_playback_range->open_popup(view->win);
 	}else if (!hover->track){
 		view->menu_song->open_popup(view->win);
 	}
@@ -525,9 +384,9 @@ void ViewModeDefault::on_key_down(int k)
 	if (k == hui::KEY_PRIOR)
 		cam->move(- view->ScrollSpeedFast * dt / cam->scale);
 	if (k == hui::KEY_HOME)
-		set_cursor_pos(view->song->range_with_time().start());
+		view->set_cursor_pos(view->song->range_with_time().start());
 	if (k == hui::KEY_END)
-		set_cursor_pos(view->song->range_with_time().end());
+		view->set_cursor_pos(view->song->range_with_time().end());
 
 	// zoom
 	if (k == hui::KEY_ADD)
@@ -656,12 +515,6 @@ void ViewModeDefault::draw_post(Painter *c)
 			view->draw_cursor_hover(c, _("bar ") + hover->bar->format_beats() + format(u8" \u2669=%.1f", hover->bar->bpm(song->sample_rate)));
 	} else if (hover->type == Selection::Type::BAR_GAP) {
 		view->draw_cursor_hover(c, _("bar gap"));
-	} else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOCK) {
-		view->draw_cursor_hover(c, _("locked"));
-	} else if (hover->type == Selection::Type::PLAYBACK_SYMBOL_LOOP) {
-		view->draw_cursor_hover(c, _("looping"));
-	} else if (hover->type == Selection::Type::PLAYBACK_RANGE) {
-		view->draw_cursor_hover(c, _("playback range"));
 	}
 
 	if (view->selection_mode != view->SelectionMode::NONE){
@@ -721,14 +574,6 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 				return s;
 			}
 		}
-	}
-	if (view->playback_lock_button.inside(mx, my)){
-		s.type = Selection::Type::PLAYBACK_SYMBOL_LOCK;
-		return s;
-	}
-	if (view->playback_loop_button.inside(mx, my)){
-		s.type = Selection::Type::PLAYBACK_SYMBOL_LOOP;
-		return s;
 	}
 
 	// time scale

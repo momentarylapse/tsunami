@@ -22,10 +22,10 @@ public:
 	ViewNode(ViewNode *parent, float dx, float dy, float w, float h);
 	virtual ~ViewNode();
 
-	virtual void on_left_button_down() {}
-	virtual void on_left_button_up() {}
-	virtual void on_right_button_down() {}
-	virtual void on_mouse_move() {}
+	virtual bool on_left_button_down() { return false; }
+	virtual bool on_left_button_up() { return false; }
+	virtual bool on_right_button_down() { return false; }
+	virtual bool on_mouse_move() { return false; }
 
 	virtual bool hover();
 	virtual Selection get_hover();

@@ -48,8 +48,9 @@ public:
 		if (track->muted)
 			c->draw_image(area.x1, area.y1, *view->images.x);
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
 		vtrack->set_muted(!vtrack->track->muted);
+		return true;
 	}
 	string get_tip() override {
 		return _("toggle mute");
@@ -65,8 +66,9 @@ public:
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
 		c->draw_mask_image(area.x1, area.y1, *view->images.solo);
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
 		vtrack->set_solo(!vtrack->solo);
+		return true;
 	}
 	string get_tip() override {
 		return _("toggle solo");
@@ -91,9 +93,10 @@ public:
 			c->setColor(col_but_hover);
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
-	void on_left_button_down() override {
+	bool on_left_button_down() override {
 		view->set_cur_layer(view->get_layer(vtrack->track->layers[0]));
 		view->session->set_mode("default/track");
+		return true;
 	}
 	string get_tip() override {
 		return _("edit track properties");

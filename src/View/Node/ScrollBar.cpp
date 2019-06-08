@@ -52,15 +52,18 @@ void ScrollBar::update(float page, float content) {
 	offset = max(min(offset, content_size - page_size), 0.0f);
 }
 
-void ScrollBar::on_left_button_down() {
+bool ScrollBar::on_left_button_down() {
 	drag_start(view->mx, view->my);
+	return true;
 }
 
-void ScrollBar::on_left_button_up() {
+bool ScrollBar::on_left_button_up() {
 	scrolling = false;
+	return true;
 }
 
-void ScrollBar::on_mouse_move() {
+bool ScrollBar::on_mouse_move() {
 	if (scrolling)
 		drag_update(view->mx, view->my);
+	return scrolling;
 }

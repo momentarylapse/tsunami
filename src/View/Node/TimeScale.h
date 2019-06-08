@@ -14,6 +14,14 @@ class TimeScale : public ViewNode {
 public:
 	TimeScale(AudioView *view);
 	void draw(Painter *p) override;
+	string get_tip() override;
+	Selection get_hover() override;
+
+	bool on_left_button_down() override;
+	bool on_right_button_down() override;
+
+	rect playback_lock_button = rect::EMPTY;
+	rect playback_loop_button = rect::EMPTY;
 };
 
 #endif /* SRC_VIEW_NODE_TIMESCALE_H_ */

@@ -28,9 +28,9 @@ public:
 	void set_area(const rect &r);
 	void update(float page, float content);
 
-	void on_left_button_down() override;
-	void on_left_button_up() override;
-	void on_mouse_move() override;
+	bool on_left_button_down() override;
+	bool on_left_button_up() override;
+	bool on_mouse_move() override;
 
 	std::function<void()> callback;
 };

@@ -256,8 +256,6 @@ public:
 	SceneGraph *scene_graph;
 	void update_scene_graph();
 
-	rect playback_lock_button;
-	rect playback_loop_button;
 	bool playback_range_locked;
 	Range playback_wish_range;
 	void set_playback_range_locked(bool locked);
@@ -290,25 +288,22 @@ public:
 	double buffer_zoom_factor;
 	void update_buffer_zoom();
 
-	struct Message
-	{
+	struct Message {
 		string text;
 		float ttl;
 		float size;
-	};
-	Message message;
+	} message;
 	void set_message(const string &text, float size=1.0f);
+	void draw_message(Painter *c, Message &m);
 
 	PeakThread *peak_thread;
 
-	struct ImageData
-	{
+	struct ImageData {
 		Image *speaker, *x, *solo;
 		Image *speaker_bg, *x_bg, *solo_bg;
 		Image *track_audio, *track_time, *track_midi;
 		Image *track_audio_bg, *track_time_bg, *track_midi_bg;
-	};
-	ImageData images;
+	} images;
 
 	hui::Menu *menu_track;
 	hui::Menu *menu_playback_range;
@@ -319,8 +314,22 @@ public:
 	hui::Menu *menu_bar_gap;
 	hui::Menu *menu_buffer;
 	hui::Menu *menu_song;
+	void prepare_menu(hui::Menu *menu);
+	void open_popup(hui::Menu *menu);
 
 	int perf_channel;
+
+
+	void set_cursor_pos(int pos);
+	void select_under_cursor();
+	bool hover_any_object();
+	bool hover_selected_object();
+	void select_object();
+	void toggle_object();
+	void exclusively_select_object();
+	void exclusively_select_layer();
+	void toggle_select_layer();
+	void toggle_select_layer_with_content_in_cursor();
 };
 
 #endif /* AUDIOVIEW_H_ */

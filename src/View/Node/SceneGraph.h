@@ -14,10 +14,10 @@ class SceneGraph : public ViewNode {
 public:
 	SceneGraph(AudioView *view);
 
-	void on_left_button_down() override;
-	void on_left_button_up() override;
-	void on_right_button_down() override;
-	void on_mouse_move() override;
+	bool on_left_button_down() override;
+	bool on_left_button_up() override;
+	bool on_right_button_down() override;
+	bool on_mouse_move() override;
 
 	Selection get_hover() override;
 	void draw(Painter *p) override;

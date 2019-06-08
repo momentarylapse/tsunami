@@ -11,6 +11,7 @@
 #include "../Painter/GridPainter.h"
 #include "../../Module/Audio/SongRenderer.h"
 
+
 TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
 	node_width = 100;
 	node_height = AudioView::TIME_SCALE_HEIGHT;
@@ -48,26 +49,64 @@ void TimeScale::draw(Painter* c) {
 	}
 
 	// playback lock symbol
-	view->playback_lock_button = rect::EMPTY;
+	playback_lock_button = rect::EMPTY;
 	if (view->playback_range_locked){
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
-		view->playback_lock_button = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 
-		c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		//c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
 		c->set_font_size(AudioView::FONT_SIZE * 0.7f);
-		c->draw_str(view->playback_lock_button.x1 + 5, view->playback_lock_button.y1 + 3, u8"🔒");
+		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, u8"🔒");
 		c->set_font_size(AudioView::FONT_SIZE);
 	}
 
 	// playback loop symbol
-	view->playback_loop_button = rect::EMPTY;
+	playback_loop_button = rect::EMPTY;
 	if (view->playback_loop){
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
-		view->playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 
-		c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		//c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
 		//c->set_font_size(FONT_SIZE * 0.7f);
-		c->draw_str(view->playback_loop_button.x1 + 5, view->playback_loop_button.y1 + 3, u8"⏎");
+		c->draw_str(playback_loop_button.x1 + 5, playback_loop_button.y1 + 3, u8"⏎");
 		c->set_font_size(AudioView::FONT_SIZE);
 	}
+}
+
+string TimeScale::get_tip() {
+	if (view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK)
+		return _("locked");
+	if (view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP)
+		return _("looping");
+	if (view->hover.type == Selection::Type::PLAYBACK_RANGE)
+		return _("playback range");
+	return "";
+}
+
+Selection TimeScale::get_hover() {
+	if (!hover())
+		return Selection();
+
+	Selection s = ViewNode::get_hover();
+	s.type = Selection::Type::TIME;
+
+	if (playback_lock_button.inside(view->mx, view->my))
+		s.type = Selection::Type::PLAYBACK_SYMBOL_LOCK;
+	if (playback_loop_button.inside(view->mx, view->my))
+		s.type = Selection::Type::PLAYBACK_SYMBOL_LOOP;
+	if (view->playback_wish_range.is_inside(s.pos))
+		s.type = Selection::Type::PLAYBACK_RANGE;
+	return s;
+}
+
+bool TimeScale::on_left_button_down() {
+	view->snap_to_grid(view->hover.pos);
+	view->set_cursor_pos(view->hover.pos);
+	view->msp.start(view->hover.pos, view->hover.y0);
+	return true;
+}
+
+bool TimeScale::on_right_button_down() {
+	view->open_popup(view->menu_playback_range);
+	return true;
 }

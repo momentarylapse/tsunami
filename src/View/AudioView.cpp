@@ -505,8 +505,8 @@ void AudioView::snap_to_grid(int &pos) {
 
 void AudioView::on_mouse_move() {
 	set_mouse();
-	mode->on_mouse_move();
-	scene_graph->on_mouse_move();
+	if (!scene_graph->on_mouse_move())
+		mode->on_mouse_move();
 
 
 	if (selection_mode != SelectionMode::NONE) {
@@ -532,8 +532,8 @@ void AudioView::on_mouse_move() {
 void AudioView::on_left_button_down() {
 	set_mouse();
 	if (!hui::GetEvent()->just_focused) {
-		mode->on_left_button_down();
-		scene_graph->on_left_button_down();
+		if (!scene_graph->on_left_button_down())
+			mode->on_left_button_down();
 	}
 
 	force_redraw();
@@ -561,8 +561,8 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	mode->on_left_button_up();
 	scene_graph->on_left_button_up();
+	mode->on_left_button_up();
 
 	force_redraw();
 	update_menu();
@@ -581,8 +581,8 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	mode->on_right_button_down();
-	scene_graph->on_right_button_down();
+	if (!scene_graph->on_right_button_down())
+		mode->on_right_button_down();
 }
 
 void AudioView::on_right_button_up() {
@@ -936,16 +936,16 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
 	draw_cursor_hover(c, msg, mx, my, song_area);
 }
 
-void draw_message(Painter *c, AudioView *view, AudioView::Message &m) {
-	float xm = view->area.mx();
-	float ym = view->area.my();
+void AudioView::draw_message(Painter *c, Message &m) {
+	float xm = area.mx();
+	float ym = area.my();
 	float a = min(m.ttl*8, 1.0f);
 	a = pow(a, 0.4f);
 	color c1 = AudioView::colors.high_contrast_a;
 	color c2 = AudioView::colors.high_contrast_b;
 	c1.a = c2.a = a;
 	c->set_font_size(AudioView::FONT_SIZE * m.size * a);
-	view->draw_boxed_str(c, xm, ym, m.text, c1, c2, 0);
+	draw_boxed_str(c, xm, ym, m.text, c1, c2, 0);
 	c->set_font_size(AudioView::FONT_SIZE);
 }
 
@@ -1137,7 +1137,7 @@ void AudioView::draw_song(Painter *c) {
 
 
 	if (message.ttl > 0) {
-		draw_message(c, this, message);
+		draw_message(c, message);
 		message.ttl -= 0.03f;
 		animating = true;
 	}
@@ -1469,4 +1469,146 @@ void AudioView::set_playback_range_locked(bool locked) {
 		playback_wish_range = sel.range;
 	force_redraw();
 	//notify();
+}
+
+
+
+
+
+void AudioView::set_cursor_pos(int pos) {
+	sel.range = Range(pos, 0);
+	select_under_cursor();
+	//update_selection();
+}
+
+void AudioView::select_under_cursor() {
+	set_selection(mode->get_selection_for_range(sel.range));
+}
+
+bool AudioView::hover_any_object() {
+	if (hover.type == Selection::Type::BAR_GAP)
+		return true;
+	if (hover.type == Selection::Type::BAR)
+		return true;
+	if (hover.type == Selection::Type::MARKER)
+		return true;
+	if (hover.type == Selection::Type::SAMPLE)
+		return true;
+	if (hover.type == Selection::Type::MIDI_NOTE)
+		return true;
+	return false;
+}
+
+bool AudioView::hover_selected_object() {
+	if (hover.type == Selection::Type::BAR_GAP)
+		return sel.bar_gap == hover.index;
+	if (hover.type == Selection::Type::BAR)
+		return sel.has(hover.bar);
+	if (hover.type == Selection::Type::MARKER)
+		return sel.has(hover.marker);
+	if (hover.type == Selection::Type::SAMPLE)
+		return sel.has(hover.sample);
+	if (hover.type == Selection::Type::MIDI_NOTE)
+		return sel.has(hover.note);
+	return false;
+}
+
+void AudioView::select_object() {
+	if (hover.type == Selection::Type::BAR_GAP) {
+		sel.bar_gap = hover.index;
+	} else if (hover.type == Selection::Type::BAR) {
+		sel.add(hover.bar);
+	} else if (hover.type == Selection::Type::MARKER) {
+		sel.add(hover.marker);
+	} else if (hover.type == Selection::Type::SAMPLE) {
+		sel.add(hover.sample);
+	} else if (hover.type == Selection::Type::MIDI_NOTE) {
+		sel.add(hover.note);
+	}
+	set_cur_sample(hover.sample);
+}
+
+void AudioView::toggle_object() {
+	if (hover.type == Selection::Type::BAR_GAP) {
+		sel.bar_gap = hover.index;
+	} else if (hover.type == Selection::Type::BAR) {
+		sel.toggle(hover.bar);
+	} else if (hover.type == Selection::Type::MARKER) {
+		sel.toggle(hover.marker);
+	} else if (hover.type == Selection::Type::SAMPLE) {
+		sel.toggle(hover.sample);
+	} else if (hover.type == Selection::Type::MIDI_NOTE) {
+		sel.toggle(hover.note);
+	}
+	set_cur_sample(hover.sample);
+}
+
+void AudioView::exclusively_select_layer() {
+	sel.track_layers.clear();
+	sel.add(hover.layer);
+	sel.make_consistent(song);
+	set_cur_layer(hover.vlayer);
+}
+
+void AudioView::toggle_select_layer() {
+	sel.toggle(hover.layer);
+	sel.make_consistent(song);
+	set_cur_layer(hover.vlayer);
+}
+
+void AudioView::exclusively_select_object() {
+	sel.clear_data();
+	select_object();
+}
+
+
+// hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
+void AudioView::toggle_select_layer_with_content_in_cursor() {
+	auto s = SongSelection::from_range(song, sel.range, {hover.track}, {hover.layer});
+	if (sel.has(hover.layer))
+		sel = sel.minus(s);
+	else
+		sel = sel || s;
+	sel.make_consistent(song);
+	//toggle_select_layer();
+}
+
+void AudioView::prepare_menu(hui::Menu *menu)
+{
+	// midi mode
+	if (hover.track){
+		menu->enable("menu-midi-mode", hover.track->type == SignalType::MIDI);
+		menu->enable("layer-midi-mode-tab", hover.track->instrument.string_pitch.num > 0);
+	}
+	if (hover.vlayer){
+		menu->check("layer-midi-mode-linear", hover.vlayer->midi_mode == MidiMode::LINEAR);
+		menu->check("layer-midi-mode-classical", hover.vlayer->midi_mode == MidiMode::CLASSICAL);
+		menu->check("layer-midi-mode-tab", hover.vlayer->midi_mode == MidiMode::TAB);
+	}
+
+	if (hover.track){
+		menu->enable("track-edit-midi", hover.track->type == SignalType::MIDI);
+		menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
+	}
+
+	// convert
+	if (hover.track){
+		menu->enable("menu-convert", hover.track->type == SignalType::AUDIO);
+		menu->enable("track-convert-stereo", hover.track->channels == 1);
+		menu->enable("track-convert-mono", hover.track->channels == 2);
+	}
+	if (hover.layer){
+		menu->enable("layer-merge", hover.layer->track->layers.num > 1);
+		menu->enable("layer-mark-dominant", hover.layer->track->layers.num > 1);// and sel.layers.num == 1);
+		//menu->enable("layer-delete", !hover->layer->is_main());
+	}
+
+	menu->check("play-loop", playback_loop);
+	menu->check("playback-range-lock", playback_range_locked);
+
+}
+
+void AudioView::open_popup(hui::Menu* menu) {
+	prepare_menu(menu);
+	menu->open_popup(win);
 }

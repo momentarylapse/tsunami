@@ -170,7 +170,7 @@ void ri_insert(ViewModeMidi *me)
 		me->start_midi_preview({(int)e.pitch}, 0.5f * vol);
 	}
 	ri_keys.clear();
-	me->set_cursor_pos(r.end());
+	me->view->set_cursor_pos(r.end());
 	me->select_in_edit_cursor();
 	ri_timer.get();
 
@@ -284,7 +284,7 @@ void ViewModeMidi::left_click_handle_void() {
 
 	if (creation_mode == CreationMode::SELECT ) {
 		view->snap_to_grid(hover->pos);
-		set_cursor_pos(hover->pos);
+		view->set_cursor_pos(hover->pos);
 		select_in_edit_cursor();
 		view->msp.start(hover->pos, hover->y0);
 
@@ -327,7 +327,7 @@ void ViewModeMidi::on_left_button_up() {
 		if (hover->type == Selection::Type::MIDI_PITCH) {
 			auto notes = get_creation_notes(hover, view->msp.start_pos);
 			if (notes.num > 0) {
-				set_cursor_pos(notes[0]->range.end());
+				view->set_cursor_pos(notes[0]->range.end());
 				octave = pitch_get_octave(hover->pitch);
 				select_in_edit_cursor();
 				view->cur_layer()->add_midi_notes(notes);
@@ -358,10 +358,9 @@ void ViewModeMidi::on_mouse_move() {
 	}
 }
 
-void ViewModeMidi::edit_add_pause()
-{
+void ViewModeMidi::edit_add_pause() {
 	Range r = get_edit_range();
-	set_cursor_pos(r.end());
+	view->set_cursor_pos(r.end());
 	select_in_edit_cursor();
 }
 
@@ -386,7 +385,7 @@ void ViewModeMidi::edit_add_note_by_urelative(int urelative)
 	int pitch = uniclef_to_pitch(upos);
 	pitch = modifier_apply(pitch, mod);
 	view->cur_layer()->add_midi_note(make_note(r, pitch, clef_pos, mod));
-	set_cursor_pos(r.end());
+	view->set_cursor_pos(r.end());
 	select_in_edit_cursor();
 	start_midi_preview({pitch}, 0.1f);
 }
@@ -398,7 +397,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 	MidiNote *n = new MidiNote(r, pitch, 1.0f);
 	n->stringno = string_no;
 	cur_layer()->add_midi_note(n);
-	set_cursor_pos(r.end());
+	view->set_cursor_pos(r.end());
 	select_in_edit_cursor();
 	start_midi_preview({pitch}, 0.1f);
 }
@@ -406,7 +405,7 @@ void ViewModeMidi::edit_add_note_on_string(int hand_pos)
 void ViewModeMidi::edit_backspace()
 {
 	Range r = get_backwards_range();
-	set_cursor_pos(r.offset);
+	view->set_cursor_pos(r.offset);
 	SongSelection s = get_select_in_edit_cursor();
 	view->song->delete_selection(s);
 }
@@ -446,7 +445,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text)
 		m->set_note_length(l * n);
 		m->set_sub_beat_partition(p);
 	}
-	m->set_cursor_pos(m->view->sel.range.offset);
+	m->view->set_cursor_pos(m->view->sel.range.offset);
 
 	string t;
 	if (n > 4){
@@ -510,7 +509,7 @@ void ViewModeMidi::on_key_down(int k)
 	// cursor
 	if (k == hui::KEY_LEFT){
 		Range r = get_backwards_range();
-		set_cursor_pos(r.offset);
+		view->set_cursor_pos(r.offset);
 		select_in_edit_cursor();
 		return;
 	}

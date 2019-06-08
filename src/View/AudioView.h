@@ -51,6 +51,7 @@ class GridPainter;
 class SceneGraph;
 class ViewNode;
 class TimeScale;
+class Cursor;
 enum class MidiMode;
 
 
@@ -268,6 +269,7 @@ public:
 	ScrollBar *scroll;
 	TimeScale *time_scale;
 	ViewNode *background;
+	Cursor *cursor;
 
 
 	MidiPainter *midi_painter;

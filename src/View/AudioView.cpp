@@ -12,6 +12,7 @@
 #include "Node/TimeScale.h"
 #include "Node/SceneGraph.h"
 #include "Node/ScrollBar.h"
+#include "Node/Cursor.h"
 #include "Node/Background.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
@@ -199,6 +200,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	time_scale = new TimeScale(this);
 
 	background = new Background(this);
+	cursor = new Cursor(this);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -899,6 +901,7 @@ void AudioView::rebuild_scene_graph() {
 	scene_graph->children.add(metronome_overlay_vlayer);
 	scene_graph->children.add(scroll);
 	scene_graph->children.add(time_scale);
+	scene_graph->children.add(cursor);
 }
 
 bool need_metro_overlay(Song *song, AudioView *view) {
@@ -1001,62 +1004,7 @@ void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, 
 void AudioView::draw_background(Painter *c) {
 }
 
-void AudioView::draw_selection(Painter *c)
-{
-	// time selection
-	float x1, x2;
-	cam.range2screen_clip(sel.range, song_area, x1, x2);
-	//c->set_color(colors.selection_internal);
-	//c->draw_rect(rect(x1, x2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
-	draw_time_line(c, sel.range.start(), (int)Selection::Type::SELECTION_START, colors.selection_boundary);
-	draw_time_line(c, sel.range.end(), (int)Selection::Type::SELECTION_END, colors.selection_boundary);
-
-	if (!hide_selection){
-		if ((selection_mode == SelectionMode::TIME) or (selection_mode == SelectionMode::TRACK_RECT)){
-			// drawn as background...
-
-			/*c->setColor(colors.selection_internal);
-			for (AudioViewLayer *l: vlayer)
-				if (sel.has(l->layer))
-					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
-		}else if (selection_mode == SelectionMode::RECT){
-			float x1, x2;
-			cam.range2screen_clip(hover.range, clip, x1, x2);
-			c->set_color(colors.selection_internal);
-			c->set_fill(false);
-			c->draw_rect(rect(x1, x2, hover.y0, hover.y1));
-			c->set_fill(true);
-			c->draw_rect(rect(x1, x2, hover.y0, hover.y1));
-		}
-	}
-
-	// bar gap selection
-	if (sel.bar_gap >= 0){
-		x1 = cam.sample2screen(song->bar_offset(sel.bar_gap));
-		x2 = x1;
-		c->set_color(colors.text_soft1);
-		c->set_line_width(2.5f);
-		for (auto *t: vlayer)
-			if (t->layer->type == SignalType::BEATS){
-				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				c->draw_line(x2, t->area.y1, x2, t->area.y2);
-				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
-		}
-		c->set_line_width(1.0f);
-	}
-	if (hover.type == Selection::Type::BAR_GAP){
-		x1 = cam.sample2screen(song->bar_offset(hover.index));
-		x2 = x1;
-		c->set_color(colors.hover);
-		c->set_line_width(2.5f);
-		for (auto *t: vlayer)
-			if (t->layer->type == SignalType::BEATS){
-				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				c->draw_line(x2, t->area.y1, x2, t->area.y2);
-				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
-		}
-		c->set_line_width(1.0f);
-	}
+void AudioView::draw_selection(Painter *c) {
 }
 
 void AudioView::draw_song(Painter *c) {
@@ -1070,11 +1018,6 @@ void AudioView::draw_song(Painter *c) {
 	update_buffer_zoom();
 
 	scene_graph->draw(c);
-
-
-	// selection
-	draw_selection(c);
-
 
 	// playing/capturing position
 	if (is_playback_active())

@@ -43,6 +43,7 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(
 {
 	layer = _layer;
 	solo = false;
+	z = 1;
 
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
@@ -199,8 +200,20 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s)
 		view->buffer_painter->set_color(col);
 		view->buffer_painter->draw_buffer(c, s->buf(), s->pos);
 	}else if (s->type() == SignalType::MIDI){
-		view->mode->draw_midi(c, this, s->midi(), true, s->pos);
+		draw_midi(c, s->midi(), true, s->pos);
 	}
+}
+
+
+void AudioViewLayer::draw_midi(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift)
+{
+	view->midi_painter->set_context(area, layer->track->instrument, is_playable(), midi_mode);
+	view->midi_painter->set_key_changes(midi_key_changes);
+	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
+	view->midi_painter->set_shift(shift);
+	if (view->editing_layer(this))
+		view->midi_painter->set_linear_range(edit_pitch_min, edit_pitch_max);
+	view->midi_painter->draw(c, midi);
 }
 
 bool can_merge(TrackMarker *a, TrackMarker *b)
@@ -558,8 +571,34 @@ void AudioViewLayer::set_solo(bool _solo)
 
 void AudioViewLayer::draw(Painter *c)
 {
-	if (!represents_imploded)
-		view->mode->draw_layer_data(c, this);
+	if (!represents_imploded){
+		Track *t = layer->track;
+
+
+
+		if (layer->type == SignalType::BEATS){
+			view->grid_painter->set_context(area, grid_colors());
+			if (t->song->bars.num > 0)
+				view->grid_painter->draw_bar_numbers(c);
+		}
+
+
+		// midi
+		if (layer->type == SignalType::MIDI)
+			draw_midi(c, layer->midi, false, 0);
+
+		// audio buffer
+		draw_track_buffers(c);
+
+		// samples
+		for (auto *s: layer->samples)
+			draw_sample(c, s);
+
+		if (layer->is_main())
+			draw_markers(c, t->markers_sorted(), view->hover);
+
+		draw_fades(c);
+	}
 
 	if (layer->track->layers.num > 1)
 		draw_version_header(c);

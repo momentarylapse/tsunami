@@ -22,8 +22,11 @@ ViewNode::ViewNode(ViewNode *_parent, float dx, float dy, float w, float h) {
 	parent = _parent;
 	area = rect::EMPTY;
 	hidden = false;
-	if (parent)
+	z = 0;
+	if (parent) {
 		view = parent->view;
+		z = parent->z + 1;
+	}
 }
 
 ViewNode::~ViewNode() {
@@ -46,25 +49,7 @@ Selection ViewNode::get_hover() {
 	return s;
 }
 
-Selection ViewNode::get_hover_recursive() {
-	if (!hover())
-		return Selection();
-
-	for (auto *c: children)
-		if (c->hover())
-			return c->get_hover_recursive();
-
-	return get_hover();
-}
-
 string ViewNode::get_tip() {
-	return "";
-}
-
-string ViewNode::get_tip_recursive() {
-	auto s = get_hover_recursive();
-	if (s.node)
-		return s.node->get_tip();
 	return "";
 }
 
@@ -74,17 +59,5 @@ void ViewNode::update_area() {
 		float y = parent->area.y1 + node_offset_y;
 		area = rect(x, x + node_width, y, y + node_height);
 	}
-}
-
-void ViewNode::draw_recursive(Painter *p) {
-	if (hidden)
-		return;
-
-	update_area();
-	draw(p);
-
-	// recursion
-	for (auto *c: children)
-		c->draw_recursive(p);
 }
 

@@ -141,31 +141,6 @@ bool ViewModeDefault::left_click_handle_special() {
 	if (view->hover.type == Selection::Type::SCROLLBAR_GLOBAL) {
 		view->scroll->drag_start(view->mx, view->my);
 		return true;
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE) {
-		exclusively_select_layer();
-		select_under_cursor();
-		hover->vtrack->set_muted(!hover->track->muted);
-		return true;
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO) {
-		exclusively_select_layer();
-		select_under_cursor();
-		hover->vtrack->set_solo(!hover->vtrack->solo);
-		return true;
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT) {
-		exclusively_select_layer();
-		select_under_cursor();
-		session->set_mode("default/track");
-		return true;
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_FX) {
-		exclusively_select_layer();
-		select_under_cursor();
-		session->set_mode("default/fx");
-		return true;
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE) {
-		exclusively_select_layer();
-		select_under_cursor();
-		session->set_mode("curves");
-		return true;
 	} else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT) {
 		exclusively_select_layer();
 		select_under_cursor();
@@ -468,10 +443,6 @@ void ViewModeDefault::on_right_button_down()
 	}
 }
 
-void ViewModeDefault::on_right_button_up()
-{
-}
-
 void ViewModeDefault::on_mouse_move()
 {
 	bool _force_redraw_ = false;
@@ -609,10 +580,6 @@ void ViewModeDefault::on_key_down(int k)
 	view->update_menu();
 }
 
-void ViewModeDefault::on_key_up(int k)
-{
-}
-
 float ViewModeDefault::layer_min_height(AudioViewLayer *l)
 {
 	if (l->layer->type == SignalType::MIDI)
@@ -632,17 +599,6 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
 			return view->TIME_SCALE_HEIGHT * 2;
 	}
 	return view->TIME_SCALE_HEIGHT * 2;
-}
-
-
-
-void ViewModeDefault::draw_midi(Painter *c, AudioViewLayer *l, const MidiNoteBuffer &midi, bool as_reference, int shift)
-{
-	view->midi_painter->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
-	view->midi_painter->set_key_changes(l->midi_key_changes);
-	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
-	view->midi_painter->set_shift(shift);
-	view->midi_painter->draw(c, midi);
 }
 
 
@@ -678,49 +634,6 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 		}
 	}
 	c->set_line_width(1.0f);
-}
-
-void draw_bar_selection(Painter *c, AudioViewTrack *t, AudioView *view)
-{
-	float y1 = t->area.y1;
-	float y2 = t->area.y2;
-
-	float lw = 3;
-
-	c->set_line_width(lw*2);
-	c->set_color(view->colors.selection_bars);
-	c->set_fill(false);
-
-	auto bars = view->song->bars.get_bars(Range::ALL);
-	for (auto b: bars){
-		if ((view->sel.has(b)) or (b == view->hover.bar)){
-			color col = view->colors.hover;
-			col.a = 0.3f;
-			if (view->sel.has(b)){
-				col = view->colors.selection_bars;
-				if (b == view->hover.bar)
-					col = view->colors.selection_bars_hover;
-			}
-			c->set_color(col);
-			float x1, x2;
-			view->cam.range2screen(b->range(), x1, x2);
-			c->draw_rect(x1 + lw, y1 + lw, x2-x1 - 2*lw, y2-y1 - 2*lw);
-		}
-	}
-	c->set_fill(true);
-	c->set_line_width(1);
-
-}
-
-void ViewModeDefault::draw_track_data(Painter *c, AudioViewTrack *t)
-{
-
-	//if (t->track->type == SignalType::BEATS)
-	//	draw_bar_selection(c, t, view);
-}
-
-void ViewModeDefault::draw_imploded_track_background(Painter *c, AudioViewTrack *t)
-{
 }
 
 void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
@@ -770,36 +683,6 @@ void ViewModeDefault::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
 	view->draw_boxed_str(c, t->area.x2 - 200, t->area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
 }
 
-void ViewModeDefault::draw_layer_data(Painter *c, AudioViewLayer *l)
-{
-	Track *t = l->layer->track;
-
-
-
-	if (l->layer->type == SignalType::BEATS){
-		view->grid_painter->set_context(l->area, l->grid_colors());
-		if (song->bars.num > 0)
-			view->grid_painter->draw_bar_numbers(c);
-	}
-
-
-	// midi
-	if (l->layer->type == SignalType::MIDI)
-		draw_midi(c, l, l->layer->midi, false, 0);
-
-	// audio buffer
-	l->draw_track_buffers(c);
-
-	// samples
-	for (auto *s: l->layer->samples)
-		l->draw_sample(c, s);
-
-	if (l->layer->is_main())
-		l->draw_markers(c, t->markers_sorted(), *hover);
-
-	l->draw_fades(c);
-}
-
 int ViewModeDefault::get_track_move_target(bool visual)
 {
 	int orig = get_track_index(moving_track);
@@ -841,16 +724,6 @@ void ViewModeDefault::draw_post(Painter *c)
 		view->draw_cursor_hover(c, _("sample ") + hover->sample->origin->name);
 	} else if (hover->type == Selection::Type::MARKER) {
 		view->draw_cursor_hover(c, _("marker ") + hover->marker->nice_text());
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_EDIT) {
-		view->draw_cursor_hover(c, _("edit track properties"));
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_MUTE) {
-		view->draw_cursor_hover(c, _("toggle mute"));
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_SOLO) {
-		view->draw_cursor_hover(c, _("toggle solo"));
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_CURVE) {
-		view->draw_cursor_hover(c, _("edit curves"));
-	} else if (hover->type == Selection::Type::TRACK_BUTTON_FX) {
-		view->draw_cursor_hover(c, _("edit effects"));
 	} else if (hover->type == Selection::Type::LAYER_BUTTON_DOMINANT) {
 		view->draw_cursor_hover(c, _("make main version"));
 	} else if (hover->type == Selection::Type::LAYER_BUTTON_SOLO) {
@@ -953,22 +826,6 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 		else
 			s.type = Selection::Type::TIME;
 		return s;
-	}
-
-	// track header buttons?
-	if (s.track){
-		auto *t = s.vtrack;
-		auto *header = t->children[0];
-		if (header->children[0]->hover()) {
-			s.type = Selection::Type::TRACK_BUTTON_MUTE;
-			return s;
-		} else if (header->children[1]->hover()) {
-			s.type = Selection::Type::TRACK_BUTTON_SOLO;
-			return s;
-		} else if (header->children[2]->hover()) {
-			s.type = Selection::Type::TRACK_BUTTON_EDIT;
-			return s;
-		}
 	}
 
 

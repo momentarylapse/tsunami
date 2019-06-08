@@ -69,16 +69,16 @@ void ViewModeCapture::draw_post(Painter *c)
 
 	int offset = view->get_playback_selection(true).offset;
 	for (auto &d: data){
+		auto *l = view->get_layer(d.target->layers[0]);
 		if (d.type() == SignalType::AUDIO){
 			AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
 			view->update_peaks_now(buf);
-			auto *l = view->get_layer(d.target->layers[0]);
 			view->buffer_painter->set_context(l->area);
 			view->buffer_painter->set_color(view->colors.capture_marker);
 			view->buffer_painter->draw_buffer(c, buf, offset);
 		}else if (d.type() == SignalType::MIDI){
 			auto *rec = (MidiRecorder*)d.recorder;
-			draw_midi(c, view->get_layer(d.target->layers[0]), midi_events_to_notes(rec->buffer), true, offset);
+			l->draw_midi(c, midi_events_to_notes(rec->buffer), true, offset);
 		}
 	}
 	

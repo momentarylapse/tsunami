@@ -813,23 +813,21 @@ Selection ViewModeMidi::get_hover()
 	return s;
 }
 
-void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
+
+
+void ViewModeMidi::draw_post(Painter *c)
 {
-	if (!editing(l)){
-		// not editing -> just draw
-		ViewModeDefault::draw_layer_data(c, l);
-		return;
-	}
+	ViewModeDefault::draw_post(c);
 
-
+	auto *l = cur_vlayer();
 	auto mode = l->midi_mode;
-
-	/*for (int n: t->reference_tracks)
-		if ((n >= 0) and (n < song->tracks.num) and (song->tracks[n] != t->track))
-			drawMidi(c, t, song->tracks[n]->midi, true, 0);*/
+	Range r = get_edit_range();
+	float x1, x2;
+	view->cam.range2screen(r, x1, x2);
 
 	auto *mp = midi_context(this);
-	mp->draw(c, l->layer->midi);
+
+
 
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)){
 
@@ -860,39 +858,6 @@ void ViewModeMidi::draw_layer_data(Painter *c, AudioViewLayer *l)
 	}
 
 
-
-
-	// samples
-	for (auto *s: l->layer->samples)
-		l->draw_sample(c, s);
-
-
-	if (l->layer->is_main())
-		l->draw_markers(c, l->layer->track->markers_sorted(), *hover);
-}
-
-void ViewModeMidi::draw_track_data(Painter *c, AudioViewTrack *t)
-{
-	ViewModeDefault::draw_track_data(c, t);
-}
-
-
-void ViewModeMidi::draw_imploded_track_data(Painter *c, AudioViewTrack *t)
-{
-	ViewModeDefault::draw_imploded_track_data(c, t);
-}
-
-void ViewModeMidi::draw_post(Painter *c)
-{
-	ViewModeDefault::draw_post(c);
-
-	auto *l = cur_vlayer();
-	auto mode = l->midi_mode;
-	Range r = get_edit_range();
-	float x1, x2;
-	view->cam.range2screen(r, x1, x2);
-
-	auto *mp = midi_context(this);
 
 	c->set_color(view->colors.text_soft1);
 	c->set_fill(false);

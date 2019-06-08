@@ -9,6 +9,7 @@
 
 #include "Node/AudioViewTrack.h"
 #include "Node/AudioViewLayer.h"
+#include "Node/SceneGraph.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
@@ -266,7 +267,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_capture = new ViewModeCapture(this);
 	set_mode(mode_default);
 
-	scene_graph = new ViewNode(this);
+	scene_graph = new SceneGraph(this);
 	area = rect(0, 1024, 0, 768);
 	song_area = area;
 	enabled = true;
@@ -624,8 +625,10 @@ void AudioView::on_mouse_move()
 void AudioView::on_left_button_down()
 {
 	set_mouse();
-	if (!hui::GetEvent()->just_focused)
+	if (!hui::GetEvent()->just_focused) {
 		mode->on_left_button_down();
+		scene_graph->on_left_button_down();
+	}
 
 	force_redraw();
 	update_menu();
@@ -995,12 +998,14 @@ void AudioView::update_tracks()
 		}
 	}
 
+
 	// update scene graph
 	scene_graph->children.clear();
-	for (auto *v: vtrack)
-		scene_graph->children.add(v);
 	for (auto *v: vlayer)
 		scene_graph->children.add(v);
+	for (auto *v: vtrack)
+		scene_graph->children.add(v);
+	scene_graph->children.add(metronome_overlay_vlayer);
 
 	// TODO: detect order change
 	check_consistency();
@@ -1286,7 +1291,8 @@ void AudioView::draw_song(Painter *c)
 		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
 	}
 
-	scene_graph->draw_recursive(c);
+	scene_graph->area = area;
+	scene_graph->draw(c);
 
 /*	// tracks
 	for (auto *t: vlayer)
@@ -1321,6 +1327,12 @@ void AudioView::draw_song(Painter *c)
 		draw_time_line(c, playback_pos(), (int)Selection::Type::PLAYBACK_CURSOR, colors.preview_marker, true);
 
 	mode->draw_post(c);
+
+	// tool tip?
+	string tip = scene_graph->get_tip();
+	if (tip.num > 0)
+		draw_cursor_hover(c, tip);
+
 
 	if (message.ttl > 0){
 		draw_message(c, this, message);

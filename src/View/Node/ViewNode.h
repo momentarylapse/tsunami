@@ -32,10 +32,7 @@ public:
 	virtual void draw(Painter *p) {}
 
 	virtual string get_tip();
-	string get_tip_recursive();
 
-	void draw_recursive(Painter *p);
-	Selection get_hover_recursive();
 	void update_area();
 
 	AudioView *view;
@@ -44,6 +41,7 @@ public:
 	float node_width, node_height;
 	Array<ViewNode*> children;
 	rect area;
+	int z;
 	bool hidden;
 };
 

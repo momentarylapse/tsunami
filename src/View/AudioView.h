@@ -48,7 +48,7 @@ class Session;
 class MidiPainter;
 class BufferPainter;
 class GridPainter;
-class ViewNode;
+class SceneGraph;
 enum class MidiMode;
 
 
@@ -253,7 +253,7 @@ public:
 	rect song_area;
 	rect clip;
 	TrackHeightManager thm;
-	ViewNode *scene_graph;
+	SceneGraph *scene_graph;
 
 	rect playback_lock_button;
 	rect playback_loop_button;

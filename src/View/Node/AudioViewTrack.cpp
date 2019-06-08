@@ -19,12 +19,21 @@
 
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
+
+class TrackHeader : public ViewNode
+{
+public:
+	AudioViewTrack *vtrack;
+	TrackHeader(AudioViewTrack *t);
+	void draw(Painter *c) override;
+};
+
 class TrackHeaderButton : public ViewNode
 {
 public:
 	AudioViewTrack *vtrack;
-	TrackHeaderButton(AudioViewTrack *t, float dx, float dy) : ViewNode(t, dx, dy, 16, 16) {
-		vtrack = t;
+	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNode(th, dx, dy, 16, 16) {
+		vtrack = th->vtrack;
 	}
 	color get_color() {
 		if (hover())
@@ -36,7 +45,7 @@ public:
 class TrackButtonMute: public TrackHeaderButton
 {
 public:
-	TrackButtonMute(AudioViewTrack *t, float dx, float dy) : TrackHeaderButton(t, dx, dy) {}
+	TrackButtonMute(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		auto *track = vtrack->track;
 
@@ -57,7 +66,7 @@ public:
 class TrackButtonSolo: public TrackHeaderButton
 {
 public:
-	TrackButtonSolo(AudioViewTrack *t, float dx, float dy) : TrackHeaderButton(t, dx, dy) {}
+	TrackButtonSolo(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
@@ -74,7 +83,7 @@ public:
 class TrackButtonConfig: public TrackHeaderButton
 {
 public:
-	TrackButtonConfig(AudioViewTrack *t, float dx, float dy) : TrackHeaderButton(t, dx, dy) {}
+	TrackButtonConfig(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		c->draw_str(area.x1, area.y1, u8"\U0001f527"); // U+1F527 "🔧"
@@ -90,7 +99,7 @@ public:
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
 	void on_left_button_down() override {
-		//view->set_cur_layer(vtrack->track->layers[0]);
+		view->set_cur_layer(view->get_layer(vtrack->track->layers[0]));
 		view->session->set_mode("default/track");
 	}
 	string get_tip() override {
@@ -98,62 +107,59 @@ public:
 	}
 };
 
-class TrackHeader : public ViewNode
-{
-public:
-	AudioViewTrack *vtrack;
-	TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
-		vtrack = t;
-		float x0 = 5;
-		float dx = 17;
-		children.add(new TrackButtonMute(t, x0, 22));
-		children.add(new TrackButtonSolo(t, x0+dx, 22));
-		children.add(new TrackButtonConfig(t, x0+dx*2, 22));
-	}
-	void draw(Painter *c) override {
-		auto *track = vtrack->track;
-		bool hover = (view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
-		bool extended = hover or view->editing_track(track);
-		bool playable = view->get_playable_tracks().contains(track);
+TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+	z = 10;
+	vtrack = t;
+	float x0 = 5;
+	float dx = 17;
+	children.add(new TrackButtonMute(this, x0, 22));
+	children.add(new TrackButtonSolo(this, x0+dx, 22));
+	children.add(new TrackButtonConfig(this, x0+dx*2, 22));
+}
 
-		color col = view->colors.background_track_selected;
-		if (view->sel.has(track))
-			col = ColorInterpolate(col, view->colors.selection, 0.4f);
-		if (hover)
-			col = ColorInterpolate(col, view->colors.hover, 0.2f);
-		c->set_color(col);
-		node_height = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-		update_area();
-		c->set_roundness(view->CORNER_RADIUS);
-		c->draw_rect(area);
-		c->set_roundness(0);
+void TrackHeader::draw(Painter *c) {
+	auto *track = vtrack->track;
+	bool _hover = hover();//(view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
+	bool extended = _hover or view->editing_track(track);
+	bool playable = view->get_playable_tracks().contains(track);
 
-		// track title
-		c->set_font("", view->FONT_SIZE, view->sel.has(track) and playable, false);
-		if (playable)
-			c->set_color(view->colors.text);
-		else
-			c->set_color(view->colors.text_soft2);
-		c->draw_str(area.x1 + 23, area.y1 + 5, track->nice_name() + (vtrack->solo ? " (solo)" : ""));
+	color col = view->colors.background_track_selected;
+	if (view->sel.has(track))
+		col = ColorInterpolate(col, view->colors.selection, 0.4f);
+	if (_hover)
+		col = ColorInterpolate(col, view->colors.hover, 0.2f);
+	c->set_color(col);
+	node_height = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	update_area();
+	c->set_roundness(view->CORNER_RADIUS);
+	c->draw_rect(area);
+	c->set_roundness(0);
 
-		c->set_font("", -1, false, false);
-
-		// icons
-		auto *icon = view->images.track_audio;
-		if (track->type == SignalType::BEATS)
-			icon = view->images.track_time; // "⏱"
-		else if (track->type == SignalType::MIDI)
-			icon = view->images.track_midi; // "♫"
+	// track title
+	c->set_font("", view->FONT_SIZE, view->sel.has(track) and playable, false);
+	if (playable)
 		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x1 + 5, area.y1 + 5, *icon);
-	//	if (track->muted and !extended)
-	//		c->draw_image(area.x1 + 5, area.y1 + 5, *view->images.x);
+	else
+		c->set_color(view->colors.text_soft2);
+	c->draw_str(area.x1 + 23, area.y1 + 5, track->nice_name() + (vtrack->solo ? " (solo)" : ""));
 
-		for (auto *c: children)
-			c->hidden = !extended;
-		children[1]->hidden |= (view->song->tracks.num == 1);
-	}
-};
+	c->set_font("", -1, false, false);
+
+	// icons
+	auto *icon = view->images.track_audio;
+	if (track->type == SignalType::BEATS)
+		icon = view->images.track_time; // "⏱"
+	else if (track->type == SignalType::MIDI)
+		icon = view->images.track_midi; // "♫"
+	c->set_color(view->colors.text);
+	c->draw_mask_image(area.x1 + 5, area.y1 + 5, *icon);
+//	if (track->muted and !extended)
+//		c->draw_image(area.x1 + 5, area.y1 + 5, *view->images.x);
+
+	for (auto *c: children)
+		c->hidden = !extended;
+	children[1]->hidden |= (view->song->tracks.num == 1);
+}
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode(_view) { //_view->scene_graph, 0, 0, 0, 0) {
 	track = _track;

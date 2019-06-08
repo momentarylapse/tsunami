@@ -12,6 +12,7 @@
 #include "Node/TimeScale.h"
 #include "Node/SceneGraph.h"
 #include "Node/ScrollBar.h"
+#include "Node/Background.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
@@ -196,6 +197,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	enabled = true;
 	scroll = new ScrollBar(this, [=]{ thm.update_immediately(this, song, song_area); });
 	time_scale = new TimeScale(this);
+
+	background = new Background(this);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -386,6 +389,7 @@ void AudioView::set_mode(ViewMode *m) {
 void AudioView::set_mouse() {
 	mx = hui::GetEvent()->mx;
 	my = hui::GetEvent()->my;
+	select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
@@ -505,8 +509,7 @@ void AudioView::snap_to_grid(int &pos) {
 
 void AudioView::on_mouse_move() {
 	set_mouse();
-	if (!scene_graph->on_mouse_move())
-		mode->on_mouse_move();
+	scene_graph->on_mouse_move();
 
 
 	if (selection_mode != SelectionMode::NONE) {
@@ -532,8 +535,7 @@ void AudioView::on_mouse_move() {
 void AudioView::on_left_button_down() {
 	set_mouse();
 	if (!hui::GetEvent()->just_focused) {
-		if (!scene_graph->on_left_button_down())
-			mode->on_left_button_down();
+		scene_graph->on_left_button_down();
 	}
 
 	force_redraw();
@@ -562,7 +564,6 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 void AudioView::on_left_button_up() {
 	scene_graph->on_left_button_up();
-	mode->on_left_button_up();
 
 	force_redraw();
 	update_menu();
@@ -581,8 +582,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	if (!scene_graph->on_right_button_down())
-		mode->on_right_button_down();
+	scene_graph->on_right_button_down();
 }
 
 void AudioView::on_right_button_up() {
@@ -889,6 +889,7 @@ void AudioView::update_tracks()
 
 void AudioView::update_scene_graph() {
 	scene_graph->children.clear();
+	scene_graph->children.add(background);
 
 	for (auto *v: vlayer) {
 		scene_graph->children.add(v);
@@ -965,62 +966,7 @@ void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, 
 	}
 }
 
-void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, AudioView *view) {
-	float y = 0;
-	bool sel_any = false;
-	bool same_track = false;
-	if (l1) {
-		y = l1->area.y2;
-		sel_any |= view->sel.has(l1->layer);
-	}
-	if (l2) {
-		y = l2->area.y1;
-		sel_any |= view->sel.has(l2->layer);
-	}
-	if (l1 and l2) {
-		same_track = (l1->layer->track == l2->layer->track);
-	}
-	if (same_track)
-		c->set_line_dash({3,10}, 0);
-
-	c->set_color(AudioView::colors.grid);
-	c->draw_line(view->song_area.x1, y, view->song_area.x2, y);
-	c->set_line_dash({}, 0);
-
-}
-
 void AudioView::draw_background(Painter *c) {
-	int yy = song_area.y1;
-	if (vlayer.num > 0)
-		yy = vlayer.back()->area.y2;
-
-	// tracks
-	for (auto *l: vlayer)
-		if (l->on_screen())
-			mode->draw_layer_background(c, l);
-
-	// free space below tracks
-	if (yy < song_area.y2) {
-		c->set_color(colors.background);
-		rect rr = rect(song_area.x1, song_area.x2, yy, song_area.y2);
-		GridColors g;
-		g.bg = g.bg_sel = colors.background;
-		g.fg = g.fg_sel = colors.grid;
-		c->draw_rect(rr);
-		grid_painter->set_context(rr, g);
-		if (song->bars.num > 0)
-			grid_painter->draw_bars(c, 0);
-		else
-			grid_painter->draw_time(c);
-	}
-
-	// lines between tracks
-	AudioViewLayer *prev = nullptr;
-	for (auto *l: vlayer) {
-		draw_layer_separator(c, prev, l, this);
-		prev = l;
-	}
-	draw_layer_separator(c, prev, nullptr, this);
 }
 
 void AudioView::draw_selection(Painter *c)
@@ -1107,8 +1053,6 @@ void AudioView::draw_song(Painter *c) {
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-
-	draw_background(c);
 
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {

@@ -49,6 +49,7 @@ class MidiPainter;
 class BufferPainter;
 class GridPainter;
 class SceneGraph;
+class ViewNode;
 class TimeScale;
 enum class MidiMode;
 
@@ -169,6 +170,7 @@ public:
 	void set_mouse_wheel_speed(float speed);
 
 	int mx, my;
+	bool select_xor = false;
 
 	struct MouseSelectionPlanner {
 		float dist;
@@ -264,6 +266,7 @@ public:
 
 	ScrollBar *scroll;
 	TimeScale *time_scale;
+	ViewNode *background;
 
 
 	MidiPainter *midi_painter;

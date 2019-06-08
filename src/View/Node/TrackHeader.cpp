@@ -156,3 +156,19 @@ void TrackHeader::draw(Painter *c) {
 		c->hidden = !extended;
 	children[1]->hidden |= (view->song->tracks.num == 1);
 }
+
+bool TrackHeader::on_left_button_down() {
+	if (view->select_xor) {
+		view->toggle_select_layer_with_content_in_cursor();
+	} else {
+		view->exclusively_select_layer();
+		view->select_under_cursor();
+	}
+	view->msp.start(view->hover.pos, view->hover.y0); // track drag'n'drop
+	return true;
+}
+
+bool TrackHeader::on_right_button_down() {
+	view->open_popup(view->menu_track);
+	return true;
+}

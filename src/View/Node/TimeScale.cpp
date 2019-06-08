@@ -88,6 +88,8 @@ Selection TimeScale::get_hover() {
 		return Selection();
 
 	Selection s = ViewNode::get_hover();
+	s.pos = view->cam.screen2sample(view->mx);
+	s.range = Range(s.pos, 0);
 	s.type = Selection::Type::TIME;
 
 	if (playback_lock_button.inside(view->mx, view->my))
@@ -107,6 +109,10 @@ bool TimeScale::on_left_button_down() {
 }
 
 bool TimeScale::on_right_button_down() {
-	view->open_popup(view->menu_playback_range);
+	int pos = view->cam.screen2sample(view->mx);
+	if (view->playback_wish_range.is_inside(pos))
+		view->open_popup(view->menu_playback_range);
+	else
+		view->open_popup(view->menu_song);
 	return true;
 }

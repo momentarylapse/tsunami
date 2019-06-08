@@ -68,14 +68,7 @@ bool ViewModeDefault::left_click_handle_special() {
 
 void ViewModeDefault::left_click_handle() {
 
-	if (hover->type == Selection::Type::TRACK_HEADER) {
-		view->exclusively_select_layer();
-		view->select_under_cursor();
-		view->msp.start(hover->pos, hover->y0);
-	} else if (hover->type == Selection::Type::LAYER_HEADER) {
-		view->exclusively_select_layer();
-		view->select_under_cursor();
-	} else if (view->is_playback_active()) {
+	if (view->is_playback_active()) {
 		if (view->renderer->range().is_inside(hover->pos)) {
 			session->signal_chain->set_pos(hover->pos);
 			hover->type = Selection::Type::PLAYBACK_CURSOR;
@@ -84,10 +77,6 @@ void ViewModeDefault::left_click_handle() {
 		} else {
 			view->stop();
 		}
-	} else if (hover->type == Selection::Type::BACKGROUND) {
-		view->snap_to_grid(hover->pos);
-		view->set_cursor_pos(hover->pos);
-		view->msp.start(hover->pos, hover->y0);
 	} else {
 		// "void"
 		left_click_handle_void();
@@ -112,17 +101,10 @@ void ViewModeDefault::left_click_handle_void() {
 }
 
 void ViewModeDefault::left_click_handle_xor() {
-	if (hover->type == Selection::Type::TRACK_HEADER) {
-		view->toggle_select_layer_with_content_in_cursor();
-		view->msp.start(hover->pos, hover->y0); // track drag'n'drop
-	} else if (hover->type == Selection::Type::LAYER_HEADER) {
-		view->toggle_select_layer_with_content_in_cursor();
-	} else {
-		view->toggle_select_layer_with_content_in_cursor();
+	view->toggle_select_layer_with_content_in_cursor();
 
-		// diff selection rectangle
-		view->msp.start(hover->pos, hover->y0);
-	}
+	// diff selection rectangle
+	view->msp.start(hover->pos, hover->y0);
 }
 
 void ViewModeDefault::on_left_button_down() {
@@ -133,9 +115,7 @@ void ViewModeDefault::on_left_button_down() {
 		return;
 
 
-	bool control = win->get_key(hui::KEY_CONTROL);
-
-	if (control) {
+	if (view->select_xor) {
 		// differential selection
 
 		if (view->hover_any_object()) {

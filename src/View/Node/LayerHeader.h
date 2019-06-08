@@ -19,6 +19,9 @@ public:
 	AudioViewLayer *vlayer;
 	LayerHeader(AudioViewLayer *l);
 	void draw(Painter *c) override;
+
+	bool on_left_button_down() override;
+	bool on_right_button_down() override;
 };
 
 

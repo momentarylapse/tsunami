@@ -159,3 +159,17 @@ void LayerHeader::draw(Painter *c) {
 	children[2]->hidden |= !layer->is_main();
 }
 
+bool LayerHeader::on_left_button_down() {
+	if (view->select_xor) {
+		view->toggle_select_layer_with_content_in_cursor();
+	} else {
+		view->exclusively_select_layer();
+		view->select_under_cursor();
+	}
+	return true;
+}
+
+bool LayerHeader::on_right_button_down() {
+	view->open_popup(view->menu_layer);
+	return true;
+}

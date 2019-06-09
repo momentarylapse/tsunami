@@ -5,23 +5,24 @@
  *      Author: michi
  */
 
-#include "Selection.h"
+#include "HoverData.h"
+
 #include "../Data/Midi/MidiData.h"
 
 
-Selection::Selection()
+HoverData::HoverData()
 {
 	clear();
 }
 
-bool Selection::allow_auto_scroll() const
+bool HoverData::allow_auto_scroll() const
 {
-	return (type == Type::SELECTION_END) or (type == Type::SAMPLE) or (type == Type::PLAYBACK_CURSOR) or (type == Type::MIDI_PITCH) or (type == Type::CLEF_POSITION);
+	return (type == Type::SAMPLE) or (type == Type::PLAYBACK_CURSOR) or (type == Type::MIDI_PITCH) or (type == Type::CLEF_POSITION);
 }
 
-bool Selection::is_in(Type _type) const
+bool HoverData::is_in(Type _type) const
 {
-	if (type == _type)
+/*	if (type == _type)
 		return true;
 	if (_type == Type::LAYER_BODY)
 		return layer and !is_in(Type::TRACK_HEADER) and !is_in(Type::LAYER_HEADER);
@@ -30,11 +31,11 @@ bool Selection::is_in(Type _type) const
 	if (_type == Type::LAYER_HEADER)
 		return (type == Type::LAYER_BUTTON_DOMINANT) or (type == Type::LAYER_BUTTON_SOLO) or (type == Type::LAYER_BUTTON_IMPLODE) or (type == Type::LAYER_BUTTON_EXPLODE);
 	if (_type == Type::LAYER)
-		return (layer != nullptr);
+		return (layer != nullptr);*/
 	return false;
 }
 
-void Selection::clear()
+void HoverData::clear()
 {
 	type = Type::NONE;
 	node = nullptr;
@@ -55,7 +56,7 @@ void Selection::clear()
 	modifier = NoteModifier::UNKNOWN;
 }
 
-bool hover_changed(Selection &hover, Selection &hover_old)
+bool hover_changed(HoverData &hover, HoverData &hover_old)
 {
 	return (hover.type != hover_old.type)
 			or (hover.sample != hover_old.sample)

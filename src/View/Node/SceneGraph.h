@@ -19,7 +19,8 @@ public:
 	bool on_right_button_down() override;
 	bool on_mouse_move() override;
 
-	Selection get_hover() override;
+	ViewNode *get_hover();
+
 	void draw(Painter *p) override;
 
 	string get_tip() override;

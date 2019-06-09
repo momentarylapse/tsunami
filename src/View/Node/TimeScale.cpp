@@ -12,6 +12,8 @@
 #include "../../Module/Audio/SongRenderer.h"
 
 
+
+
 TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
 	node_width = 100;
 	node_height = AudioView::TIME_SCALE_HEIGHT;
@@ -74,41 +76,37 @@ void TimeScale::draw(Painter* c) {
 }
 
 string TimeScale::get_tip() {
-	if (view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK)
+	if (hover_lock_button())
 		return _("locked");
-	if (view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP)
+	if (hover_loop_button())
 		return _("looping");
-	if (view->hover.type == Selection::Type::PLAYBACK_RANGE)
+	if (hover_playback())
 		return _("playback range");
 	return "time?";
-}
-
-Selection TimeScale::get_hover() {
-	if (!hover())
-		return Selection();
-
-	Selection s = ViewNode::get_hover();
-	s.type = Selection::Type::TIME;
-
-	if (playback_lock_button.inside(view->mx, view->my))
-		s.type = Selection::Type::PLAYBACK_SYMBOL_LOCK;
-	if (playback_loop_button.inside(view->mx, view->my))
-		s.type = Selection::Type::PLAYBACK_SYMBOL_LOOP;
-	if (view->playback_wish_range.is_inside(s.pos))
-		s.type = Selection::Type::PLAYBACK_RANGE;
-	return s;
 }
 
 bool TimeScale::on_left_button_down() {
 	view->snap_to_grid(view->hover.pos);
 	view->set_cursor_pos(view->hover.pos);
-	view->msp.start(view->hover.pos, view->hover.y0);
+//	view->msp.start(view->hover.pos, view->hover.y0);
 	return true;
 }
 
-bool TimeScale::on_right_button_down() {
+bool TimeScale::hover_lock_button() {
+	return playback_lock_button.inside(view->mx, view->my);
+}
+
+bool TimeScale::hover_loop_button() {
+	return playback_loop_button.inside(view->mx, view->my);
+}
+
+bool TimeScale::hover_playback() {
 	int pos = view->cam.screen2sample(view->mx);
-	if (view->playback_wish_range.is_inside(pos))
+	return view->playback_wish_range.is_inside(pos);
+}
+
+bool TimeScale::on_right_button_down() {
+	if (hover_playback())
 		view->open_popup(view->menu_playback_range);
 	else
 		view->open_popup(view->menu_song);

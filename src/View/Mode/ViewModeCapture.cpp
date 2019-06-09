@@ -55,7 +55,7 @@ void ViewModeCapture::on_end()
 {
 }
 
-Selection ViewModeCapture::get_hover()
+HoverData ViewModeCapture::get_hover()
 {
 	return get_hover_basic(false);
 }
@@ -71,7 +71,7 @@ void ViewModeCapture::draw_post(Painter *c)
 	for (auto &d: data){
 		auto *l = view->get_layer(d.target->layers[0]);
 		if (d.type() == SignalType::AUDIO){
-			AudioBuffer &buf = ((AudioRecorder*)d.recorder)->buf;
+			auto &buf = ((AudioRecorder*)d.recorder)->buf;
 			view->update_peaks_now(buf);
 			view->buffer_painter->set_context(l->area);
 			view->buffer_painter->set_color(view->colors.capture_marker);
@@ -83,7 +83,7 @@ void ViewModeCapture::draw_post(Painter *c)
 	}
 	
 	int l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	view->draw_time_line(c, offset + l, (int)Selection::Type::PLAYBACK_CURSOR, view->colors.capture_marker, true);
+	view->draw_time_line(c, offset + l, view->colors.capture_marker, false, true);
 }
 
 Set<Track*> ViewModeCapture::prevent_playback()

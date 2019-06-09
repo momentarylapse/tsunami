@@ -11,16 +11,16 @@
 
 Cursor::Cursor(AudioView* view) : ViewNode(view) {
 	z = 50;
+	drag_range = Range::EMPTY;
 }
 
 void Cursor::draw(Painter* c) {
 	// time selection
+	view->draw_time_line(c, view->sel.range.start(), view->colors.selection_boundary, hover_start(), false, true);
+	view->draw_time_line(c, view->sel.range.end(), view->colors.selection_boundary, hover_end(), false, true);
+
 	float x1, x2;
 	view->cam.range2screen_clip(view->sel.range, view->song_area, x1, x2);
-	//c->set_color(colors.selection_internal);
-	//c->draw_rect(rect(x1, x2, area.y1, area.y1 + TIME_SCALE_HEIGHT));
-	view->draw_time_line(c, view->sel.range.start(), (int)Selection::Type::SELECTION_START, view->colors.selection_boundary);
-	view->draw_time_line(c, view->sel.range.end(), (int)Selection::Type::SELECTION_END, view->colors.selection_boundary);
 
 	if (!view->hide_selection){
 		if ((view->selection_mode == view->SelectionMode::TIME) or (view->selection_mode == view->SelectionMode::TRACK_RECT)){
@@ -71,14 +71,41 @@ void Cursor::draw(Painter* c) {
 	}*/
 }
 
-bool Cursor::hover() {
+bool Cursor::hover_start() {
 	if (view->my < view->area.y2 - 20)
 		return false;
-	float x1, x2;
-	view->cam.range2screen(view->sel.range, x1, x2);
-	return (fabs(x1 - view->mx) < 10) or (fabs(x2 - view->mx) < 10);
+	float x = view->cam.sample2screen(view->sel.range.start());
+	return (fabs(x - view->mx) < 10);
+}
+
+bool Cursor::hover_end() {
+	if (view->my < view->area.y2 - 20)
+		return false;
+	float x = view->cam.sample2screen(view->sel.range.end());
+	return (fabs(x - view->mx) < 10);
+}
+
+bool Cursor::hover() {
+	return hover_start() or hover_end();
 }
 
 string Cursor::get_tip() {
 	return "cursor";
+}
+
+bool Cursor::on_left_button_down() {
+	drag_range = view->sel.range;
+	if (hover_start())
+		drag_range.invert();
+
+	view->mdp.prepare([=]{
+	}, [=]{
+		drag_range.set_end(view->cam.screen2sample(view->mx));
+		view->sel.range = drag_range;
+		view->update_selection();
+		view->select_under_cursor();
+	}, [=]{
+
+	});
+	return true;
 }

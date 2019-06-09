@@ -24,7 +24,7 @@ public:
 
 	void draw_track_data(Painter *c, AudioViewTrack *t) override;
 
-	Selection get_hover() override;
+	HoverData get_hover() override;
 
 
 	float value2screen(float value);

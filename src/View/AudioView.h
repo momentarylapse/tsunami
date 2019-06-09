@@ -13,9 +13,9 @@
 #include "../Stuff/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
-#include "Selection.h"
 #include "ColorScheme.h"
 #include <atomic>
+#include "HoverData.h"
 
 namespace hui{
 	class Menu;
@@ -104,7 +104,7 @@ public:
 	void zoom_in();
 	void zoom_out();
 
-	void draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time = false);
+	void draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time = false, bool show_circle = false);
 	void draw_selection(Painter *c);
 	void draw_background(Painter *c);
 	void draw_song(Painter *c);
@@ -139,10 +139,12 @@ public:
 	static const int SCROLLBAR_WIDTH;
 	static const int SNAPPING_DIST;
 
-	Selection hover;
-	Selection hover_before_leave;
+	HoverData hover;
+	HoverData hover_before_leave;
 	SongSelection sel;
 	SongSelection sel_temp;
+
+	HoverData hover_time();
 
 	enum class SelectionMode {
 		NONE,
@@ -173,16 +175,18 @@ public:
 	int mx, my;
 	bool select_xor = false;
 
-	struct MouseSelectionPlanner {
-		float dist;
-		int start_pos;
-		int start_y;
-		int min_move_to_select;
-		void start(int pos, int y);
-		bool step();
-		bool selecting();
+	struct MouseDelayPlanner {
+		float dist = -1;
+		int pos0 = 0;
+		float x0 = 0, y0 = 0;
+		int min_move_to_start;
+		AudioView *view;
+		hui::Callback cb_start, cb_update, cb_end;
+		void prepare(hui::Callback cb_start, hui::Callback cb_update, hui::Callback cb_end);
+		void update();
+		bool active();
 		void stop();
-	} msp;
+	} mdp;
 
 	void select_none();
 	void select_all();
@@ -193,7 +197,7 @@ public:
 
 	void set_mouse();
 	int mouse_over_sample(SampleRef *s);
-	void selection_update_pos(Selection &s);
+	void selection_update_pos(HoverData &s);
 	bool mouse_over_time(int pos);
 
 	void select_sample(SampleRef *s, bool diff);
@@ -333,9 +337,9 @@ public:
 	void select_object();
 	void toggle_object();
 	void exclusively_select_object();
-	void exclusively_select_layer();
-	void toggle_select_layer();
-	void toggle_select_layer_with_content_in_cursor();
+	void exclusively_select_layer(AudioViewLayer *l);
+	void toggle_select_layer(AudioViewLayer *l);
+	void toggle_select_layer_with_content_in_cursor(AudioViewLayer *l);
 };
 
 #endif /* AUDIOVIEW_H_ */

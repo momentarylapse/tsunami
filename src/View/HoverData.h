@@ -1,12 +1,12 @@
 /*
- * Selection.h
+ * HoverData.h
  *
  *  Created on: 12.11.2015
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_SELECTION_H_
-#define SRC_VIEW_SELECTION_H_
+#ifndef SRC_VIEW_HOVERDATA_H_
+#define SRC_VIEW_HOVERDATA_H_
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
@@ -23,7 +23,7 @@ class Bar;
 class SongSelection;
 enum class NoteModifier;
 
-class Selection
+class HoverData
 {
 public:
 	ViewNode *node;
@@ -44,32 +44,14 @@ public:
 	NoteModifier modifier;
 	int index;
 
-	enum class Type
-	{
+	enum class Type {
 		NONE,
 		SOME_NODE,
 		BACKGROUND,
-		SELECTION_START,
-		SELECTION_END,
 		PLAYBACK_CURSOR,
 		PLAYBACK_RANGE,
-		PLAYBACK_SYMBOL_LOCK,
-		PLAYBACK_SYMBOL_LOOP,
 		TIME,
-		SCROLLBAR_GLOBAL,
-		//TRACK,
-		TRACK_HEADER,
-		TRACK_BUTTON_MUTE,
-		TRACK_BUTTON_SOLO,
-		TRACK_BUTTON_EDIT,
-		TRACK_BUTTON_CURVE,
-		TRACK_BUTTON_FX,
 		LAYER,
-		LAYER_HEADER,
-		LAYER_BUTTON_IMPLODE,
-		LAYER_BUTTON_EXPLODE,
-		LAYER_BUTTON_DOMINANT,
-		LAYER_BUTTON_SOLO,
 		LAYER_BODY, // dummy for is_in()
 		SAMPLE,
 		MIDI_NOTE,
@@ -84,7 +66,7 @@ public:
 	};
 	Type type;
 
-	Selection();
+	HoverData();
 	bool allow_auto_scroll() const;
 	bool is_in(Type type) const;
 	void clear();
@@ -92,6 +74,6 @@ public:
 	SongSelection to_song_sel() const;
 };
 
-bool hover_changed(Selection &hover, Selection &hover_old);
+bool hover_changed(HoverData &hover, HoverData &hover_old);
 
-#endif /* SRC_VIEW_SELECTION_H_ */
+#endif /* SRC_VIEW_HOVERDATA_H_ */

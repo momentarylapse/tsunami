@@ -46,7 +46,7 @@ public:
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 	void draw_post(Painter *c) override;
 
-	Selection get_hover() override;
+	HoverData get_hover() override;
 	void start_selection() override;
 	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;
 	SongSelection get_selection_for_range(const Range &r) override;
@@ -54,7 +54,7 @@ public:
 	SongSelection get_select_in_edit_cursor();
 	void select_in_edit_cursor();
 
-	MidiNoteBuffer get_creation_notes(Selection *sel, int pos0);
+	MidiNoteBuffer get_creation_notes(HoverData *sel, int pos0);
 	void set_sub_beat_partition(int partition);
 	void set_note_length(int length);
 

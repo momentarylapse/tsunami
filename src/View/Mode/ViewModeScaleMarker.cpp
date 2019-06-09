@@ -7,7 +7,6 @@
 
 #include "ViewModeScaleMarker.h"
 #include "../AudioView.h"
-#include "../Selection.h"
 #include "../../Session.h"
 #include "../../Data/TrackMarker.h"
 #include "../../Data/Track.h"

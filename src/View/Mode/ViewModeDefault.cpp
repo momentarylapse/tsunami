@@ -50,20 +50,6 @@ ViewModeDefault::~ViewModeDefault() {
 }
 
 bool ViewModeDefault::left_click_handle_special() {
-
-	// special actions
-	if (hover->type == Selection::Type::SELECTION_END){
-		hover->range = view->sel.range;
-		view->selection_mode = view->SelectionMode::TIME;
-		return true;
-	}else if (hover->type == Selection::Type::SELECTION_START){
-		// swap end / start
-		hover->type = Selection::Type::SELECTION_END;
-		hover->range = view->sel.range;
-		hover->range.invert();
-		view->selection_mode = view->SelectionMode::TIME;
-		return true;
-	}
 	return false;
 }
 
@@ -72,7 +58,7 @@ void ViewModeDefault::left_click_handle() {
 	if (view->is_playback_active()) {
 		if (view->renderer->range().is_inside(hover->pos)) {
 			session->signal_chain->set_pos(hover->pos);
-			hover->type = Selection::Type::PLAYBACK_CURSOR;
+			hover->type = HoverData::Type::PLAYBACK_CURSOR;
 			view->force_redraw();
 			return;
 		} else {
@@ -93,27 +79,24 @@ void ViewModeDefault::left_click_handle_void() {
 		view->set_cursor_pos(hover->pos);
 	}
 
-	view->exclusively_select_layer();
+	view->exclusively_select_layer(hover->vlayer);
 	view->select_under_cursor();
 
 	// start drag'n'drop?
-	view->msp.start(hover->pos, hover->y0);
+//	view->msp.start(hover->pos, hover->y0);
 
 }
 
 void ViewModeDefault::left_click_handle_xor() {
-	view->toggle_select_layer_with_content_in_cursor();
+	view->toggle_select_layer_with_content_in_cursor(hover->vlayer);
 
 	// diff selection rectangle
-	view->msp.start(hover->pos, hover->y0);
+//	view->msp.start(hover->pos, hover->y0);
 }
 
 void ViewModeDefault::on_left_button_down() {
 	*hover = get_hover();
 	view->sel_temp = view->sel; // for diff selection
-
-	if (left_click_handle_special())
-		return;
 
 
 	if (view->select_xor) {
@@ -129,7 +112,7 @@ void ViewModeDefault::on_left_button_down() {
 
 		if (view->hover_any_object()) {
 
-			view->exclusively_select_layer();
+			view->exclusively_select_layer(hover->vlayer);
 			if (!view->hover_selected_object())
 				view->exclusively_select_object();
 
@@ -143,7 +126,7 @@ void ViewModeDefault::on_left_button_down() {
 	}
 }
 
-int hover_reference_pos(Selection &s)
+int hover_reference_pos(HoverData &s)
 {
 	if (s.marker)
 		return s.marker->range.offset;
@@ -182,10 +165,10 @@ void ViewModeDefault::on_left_button_up()
 	}
 
 	view->selection_mode = view->SelectionMode::NONE;
-	view->msp.stop();
+	//view->msp.stop();
 }
 
-int hover_buffer(Selection *hover)
+int hover_buffer(HoverData *hover)
 {
 	if (!hover->layer)
 		return -1;
@@ -205,16 +188,16 @@ void ViewModeDefault::on_left_double_click()
 
 	int buffer_index = hover_buffer(hover);
 
-	if (hover->type == Selection::Type::SAMPLE){
+	if (hover->type == HoverData::Type::SAMPLE){
 		view->sel = get_selection_for_range(view->cur_sample->range());
 		view->update_selection();
-	}else if (hover->type == Selection::Type::MARKER){
+	}else if (hover->type == HoverData::Type::MARKER){
 		view->sel = get_selection_for_range(hover->marker->range);
 		view->update_selection();
-	}else if ((hover->type == Selection::Type::LAYER) and (buffer_index >= 0)){
+	}else if ((hover->type == HoverData::Type::LAYER) and (buffer_index >= 0)){
 		view->sel = get_selection_for_range(hover->layer->buffers[buffer_index].range());
 		view->update_selection();
-	}else if (hover->type == Selection::Type::BAR){
+	}else if (hover->type == HoverData::Type::BAR){
 		view->sel = get_selection_for_range(hover->bar->range());
 		view->update_selection();
 	}
@@ -229,7 +212,7 @@ void ViewModeDefault::on_right_button_down()
 	select_hover();
 
 	// click outside sel.range -> select new position
-	if ((hover->type == Selection::Type::LAYER) or (hover->type == Selection::Type::TIME) or (hover->type == Selection::Type::BACKGROUND)){
+	if ((hover->type == HoverData::Type::LAYER) or (hover->type == HoverData::Type::TIME) or (hover->type == HoverData::Type::BACKGROUND)){
 		if (!view->sel.range.is_inside(hover->pos)){
 			view->snap_to_grid(hover->pos);
 			set_cursor_pos(hover->pos, track_hover_sel);
@@ -240,17 +223,17 @@ void ViewModeDefault::on_right_button_down()
 	// pop up menu...
 	view->update_menu();
 
-	if (hover->type == Selection::Type::SAMPLE){
+	if (hover->type == HoverData::Type::SAMPLE){
 		view->open_popup(view->menu_sample);
-	}else if (hover->type == Selection::Type::BAR){
+	}else if (hover->type == HoverData::Type::BAR){
 		view->open_popup(view->menu_bar);
-	}else if (hover->type == Selection::Type::MARKER){
+	}else if (hover->type == HoverData::Type::MARKER){
 		view->open_popup(view->menu_marker);
-	}else if (hover->type == Selection::Type::BAR_GAP){
+	}else if (hover->type == HoverData::Type::BAR_GAP){
 		view->open_popup(view->menu_bar_gap);
 	}else if (hover_buffer(hover) >= 0){
 		view->open_popup(view->menu_buffer);
-	}else if (hover->type == Selection::Type::LAYER){
+	}else if (hover->type == HoverData::Type::LAYER){
 		view->open_popup(view->menu_track);
 	}
 }
@@ -300,10 +283,10 @@ void ViewModeDefault::on_mouse_move()
 			w = - e->dx - 2*r;
 		}
 		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
-	}else if (hover->type == Selection::Type::PLAYBACK_CURSOR){
+	}else if (hover->type == HoverData::Type::PLAYBACK_CURSOR){
 		view->renderer->set_pos(hover->pos);
 		_force_redraw_ = true;
-	}else if (hover->type == Selection::Type::SAMPLE){
+	}else if (hover->type == HoverData::Type::SAMPLE){
 		/*view->applyBarriers(hover->pos);
 		int dpos = (float)hover->pos - hover->sample_offset - hover->sample->pos;
 		if (cur_action)
@@ -491,8 +474,10 @@ void ViewModeDefault::draw_post(Painter *c)
 
 }
 
-Selection ViewModeDefault::get_hover_basic(bool editable)
+HoverData ViewModeDefault::get_hover_basic(bool editable)
 {
+	return HoverData();
+/*
 	Selection s = view->scene_graph->get_hover();
 	int mx = view->mx;
 	int my = view->my;
@@ -518,15 +503,14 @@ Selection ViewModeDefault::get_hover_basic(bool editable)
 	}
 
 	return s;
+*/
 }
 
-Selection ViewModeDefault::get_hover()
+HoverData ViewModeDefault::get_hover()
 {
-	Selection s = get_hover_basic(true);
+	return HoverData();
+	HoverData s = get_hover_basic(true);
 
-	// already found important stuff?
-	if ((s.type != Selection::Type::BACKGROUND) and (s.type != Selection::Type::LAYER) and (s.type != Selection::Type::TIME))
-		return s;
 
 	int mx = view->mx;
 	int my = view->my;
@@ -540,7 +524,7 @@ Selection ViewModeDefault::get_hover()
 				if (s.vlayer->marker_areas.contains(m) and s.vlayer->marker_label_areas.contains(m))
 				if (s.vlayer->marker_areas[m].inside(mx, my) or s.vlayer->marker_label_areas[m].inside(mx, my)){
 					s.marker = m;
-					s.type = Selection::Type::MARKER;
+					s.type = HoverData::Type::MARKER;
 					s.index = i;
 					return s;
 				}
@@ -552,7 +536,7 @@ Selection ViewModeDefault::get_hover()
 			int offset = view->mouse_over_sample(ss);
 			if (offset >= 0){
 				s.sample = ss;
-				s.type = Selection::Type::SAMPLE;
+				s.type = HoverData::Type::SAMPLE;
 				return s;
 			}
 		}
@@ -570,7 +554,7 @@ Selection ViewModeDefault::get_hover()
 					float x = view->cam.sample2screen(offset);
 					if (fabs(x - mx) < view->SNAPPING_DIST){
 						s.index = i;
-						s.type = Selection::Type::BAR_GAP;
+						s.type = HoverData::Type::BAR_GAP;
 						s.pos = offset;
 						return s;
 					}
@@ -588,7 +572,7 @@ Selection ViewModeDefault::get_hover()
 					//b.range.
 					s.bar = b;
 					s.index = b->index;
-					s.type = Selection::Type::BAR;
+					s.type = HoverData::Type::BAR;
 					return s;
 				}
 			}
@@ -603,7 +587,7 @@ void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 	if (view->is_playback_active()){
 		if (view->renderer->range().is_inside(pos)){
 			session->signal_chain->set_pos(pos);
-			hover->type = Selection::Type::PLAYBACK_CURSOR;
+			hover->type = HoverData::Type::PLAYBACK_CURSOR;
 			view->force_redraw();
 			return;
 		}else{
@@ -662,17 +646,17 @@ void ViewModeDefault::select_hover()
 	// track
 	if (hover->vlayer)
 		view->set_cur_layer(hover->vlayer);
-	if (hover->type == Selection::Type::LAYER)
+	if (hover->type == HoverData::Type::LAYER)
 		selectLayer(this, l, false, false);
 
 	view->set_cur_sample(s);
 
 
-	if (hover->type == Selection::Type::BAR_GAP){
+	if (hover->type == HoverData::Type::BAR_GAP){
 		view->sel.clear_data();
 		view->sel.bar_gap = hover->index;
 		selectLayer(this, l, false, true);
-	}else if (hover->type == Selection::Type::BAR){
+	}else if (hover->type == HoverData::Type::BAR){
 		auto b = hover->bar;
 		if (view->sel.has(b)){
 		}else{
@@ -680,7 +664,7 @@ void ViewModeDefault::select_hover()
 			view->sel.clear_data();
 			view->sel.add(b);
 		}
-	}else if (hover->type == Selection::Type::MARKER){
+	}else if (hover->type == HoverData::Type::MARKER){
 		auto m = hover->marker;
 		if (view->sel.has(m)){
 		}else{
@@ -688,7 +672,7 @@ void ViewModeDefault::select_hover()
 			view->sel.clear_data();
 			view->sel.add(m);
 		}
-	}else if (hover->type == Selection::Type::SAMPLE){
+	}else if (hover->type == HoverData::Type::SAMPLE){
 		if (view->sel.has(s)){
 		}else{
 			selectLayer(this, l, false, true);
@@ -769,6 +753,7 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 
 void ViewModeDefault::start_selection()
 {
+	/*
 	hover->range.set_start(view->msp.start_pos);
 	hover->range.set_end(hover->pos);
 	if (hover->type == Selection::Type::TRACK_HEADER){
@@ -782,6 +767,7 @@ void ViewModeDefault::start_selection()
 		view->selection_mode = view->SelectionMode::TRACK_RECT;
 	}
 	view->set_selection(get_selection(hover->range));
+	*/
 }
 
 MidiMode ViewModeDefault::which_midi_mode(Track *t)

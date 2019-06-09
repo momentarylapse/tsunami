@@ -7,7 +7,6 @@
 
 #include "ViewNode.h"
 #include "../AudioView.h"
-#include "../Selection.h"
 
 ViewNode::ViewNode(AudioView *_view) : ViewNode(nullptr, 0, 0, 0, 0) {
 	view = _view;
@@ -40,18 +39,6 @@ bool ViewNode::hover() {
 	if (hidden)
 		return false;
 	return area.inside(view->mx, view->my);
-}
-
-Selection ViewNode::get_hover() {
-	if (!hover())
-		return Selection();
-	Selection s;
-	s.type = Selection::Type::SOME_NODE;
-	s.node = this;
-	s.pos = view->cam.screen2sample(view->mx);
-	s.range = Range(s.pos, 0);
-	s.y0 = s.y1 = view->my;
-	return s;
 }
 
 string ViewNode::get_tip() {

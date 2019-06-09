@@ -564,7 +564,7 @@ void TsunamiWindow::on_sample_properties()
 
 void TsunamiWindow::on_delete_marker()
 {
-	if (view->hover_before_leave.type == Selection::Type::MARKER)
+	if (view->hover_before_leave.type == HoverData::Type::MARKER)
 		view->cur_track()->delete_marker(view->hover_before_leave.marker);
 	else
 		session->e(_("No marker selected"));
@@ -572,7 +572,7 @@ void TsunamiWindow::on_delete_marker()
 
 void TsunamiWindow::on_edit_marker()
 {
-	if (view->hover_before_leave.type == Selection::Type::MARKER){
+	if (view->hover_before_leave.type == HoverData::Type::MARKER){
 		auto *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
 		dlg->run();
 		delete dlg;

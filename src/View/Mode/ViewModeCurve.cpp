@@ -28,7 +28,7 @@ void ViewModeCurve::on_left_button_down()
 	ViewModeDefault::on_left_button_down();
 
 
-	if (curve and (hover->type == Selection::Type::CURVE_POINT_NONE)){
+	if (curve and (hover->type == HoverData::Type::CURVE_POINT_NONE)){
 		int pos = cam->screen2sample(view->mx);
 		float value = screen2value(view->my);
 		song->curve_add_point(curve, pos, value);
@@ -46,7 +46,7 @@ void ViewModeCurve::on_mouse_move()
 	ViewModeDefault::on_mouse_move();
 
 	if (hui::GetEvent()->lbut){
-		if (curve and (hover->type == Selection::Type::CURVE_POINT)){
+		if (curve and (hover->type == HoverData::Type::CURVE_POINT)){
 			int pos = cam->screen2sample(view->mx);
 			float value = clampf(screen2value(view->my), curve->min, curve->max);
 			song->curve_edit_point(curve, hover->index, pos, value);
@@ -59,7 +59,7 @@ void ViewModeCurve::on_key_down(int k)
 {
 	ViewModeDefault::on_key_down(k);
 
-	if (curve and (hover->type == Selection::Type::CURVE_POINT))
+	if (curve and (hover->type == HoverData::Type::CURVE_POINT))
 		if (k == hui::KEY_DELETE){
 			song->curve_delete_point(curve, hover->index);
 			hover->clear();
@@ -89,9 +89,9 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 
 		// points
 		foreachi(Curve::Point &p, curve->points, i){
-			if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
+			if ((hover->type == HoverData::Type::CURVE_POINT) and (i == hover->index))
 				c->set_color(view->colors.selection_boundary_hover);
-			else if ((hover->type == Selection::Type::CURVE_POINT) and (i == hover->index))
+			else if ((hover->type == HoverData::Type::CURVE_POINT) and (i == hover->index))
 				// TODO.... selected...
 				c->set_color(view->colors.selection_boundary);
 			else
@@ -101,9 +101,9 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 	}
 }
 
-Selection ViewModeCurve::get_hover()
+HoverData ViewModeCurve::get_hover()
 {
-	Selection s = ViewModeDefault::get_hover();
+	HoverData s = ViewModeDefault::get_hover();
 	int mx = view->mx;
 	int my = view->my;
 
@@ -113,14 +113,14 @@ Selection ViewModeCurve::get_hover()
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
 			if ((fabs(mx - x) < 10) and (fabs(my - y) < 10)){
-				s.type = Selection::Type::CURVE_POINT;
+				s.type = HoverData::Type::CURVE_POINT;
 				s.index = i;
 				return s;
 			}
 		}
 	}
 	if (s.type == s.Type::LAYER)
-		s.type = Selection::Type::CURVE_POINT_NONE;
+		s.type = HoverData::Type::CURVE_POINT_NONE;
 
 	return s;
 }

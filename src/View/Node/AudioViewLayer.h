@@ -24,7 +24,7 @@ class Clef;
 class Scale;
 class Range;
 class GridColors;
-class Selection;
+class HoverData;
 enum class NoteModifier;
 enum class MidiMode;
 class MidiKeyChange;
@@ -43,7 +43,7 @@ public:
 	bool on_mouse_move() override;
 
 	string get_tip() override;
-	Selection get_hover() override;
+	HoverData get_hover_basic();
 
 	void on_track_change();
 
@@ -59,8 +59,8 @@ public:
 	void draw_midi(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift);
 
 	void draw_marker(Painter *c, const TrackMarker *marker, bool hover, const Range &group_range, bool first, bool last);
-	void draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
-	void draw_markers(Painter *c, const Array<TrackMarker*> &markers, Selection &hover);
+	void draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover);
+	void draw_markers(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover);
 
 	void draw_fades(Painter *c);
 

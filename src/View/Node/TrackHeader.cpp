@@ -158,13 +158,14 @@ void TrackHeader::draw(Painter *c) {
 }
 
 bool TrackHeader::on_left_button_down() {
+	auto *l = view->get_layer(vtrack->track->layers[0]);
 	if (view->select_xor) {
-		view->toggle_select_layer_with_content_in_cursor();
+		view->toggle_select_layer_with_content_in_cursor(l);
 	} else {
-		view->exclusively_select_layer();
+		view->exclusively_select_layer(l);
 		view->select_under_cursor();
 	}
-	view->msp.start(view->hover.pos, view->hover.y0); // track drag'n'drop
+//	view->msp.start(view->hover.pos, view->hover.y0); // track drag'n'drop
 	return true;
 }
 

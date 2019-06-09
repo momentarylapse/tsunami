@@ -21,10 +21,10 @@
 #include "../Dialog/PdfConfigDialog.h"
 #include "../../View/ViewPort.h"
 #include "../../View/Painter/MidiPainter.h"
-#include "../../View/Selection.h"
 #include "../../View/ColorScheme.h"
 #include "../../View/Helper/SymbolRenderer.h"
 #include <math.h>
+#include "../../View/HoverData.h"
 
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
 static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
@@ -280,7 +280,7 @@ void FormatPdf::save_song(StorageOperationData* od)
 	rect area = rect(border, page_width - border, 0, page_height);
 	cam = new ViewPort(song, area);
 	SongSelection sel;
-	Selection hover;
+	HoverData hover;
 	ColorScheme _colors = create_pdf_color_scheme();
 	colors = &_colors;
 	mp = new MidiPainter(song, cam, &sel, &hover, _colors);

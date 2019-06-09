@@ -17,7 +17,7 @@
 class AudioView;
 class ViewPort;
 class SongSelection;
-class Selection;
+class HoverData;
 class Painter;
 class MidiNote;
 class MidiNoteBuffer;
@@ -46,7 +46,7 @@ class MidiPainter
 {
 public:
 	MidiPainter(AudioView *view);
-	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, Selection *hover, ColorScheme &colors);
+	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, ColorScheme &colors);
 
 
 	static const int PITCH_MIN_DEFAULT = 25;
@@ -89,7 +89,7 @@ public:
 	ViewPort *cam;
 	Scale midi_scale;
 	SongSelection *sel;
-	Selection *hover;
+	HoverData *hover;
 	Song *song;
 	ColorScheme &colors;
 

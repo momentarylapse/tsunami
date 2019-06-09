@@ -23,7 +23,7 @@ Background::Background(AudioView* view) : ViewNode(view) {
 bool Background::on_left_button_down() {
 	view->snap_to_grid(view->hover.pos);
 	view->set_cursor_pos(view->hover.pos);
-	view->msp.start(view->hover.pos, view->hover.y0);
+//	view->mdp.prepare(view->hover.pos, view->hover.y0);
 	return true;
 }
 

@@ -15,7 +15,10 @@ public:
 	TimeScale(AudioView *view);
 	void draw(Painter *p) override;
 	string get_tip() override;
-	Selection get_hover() override;
+
+	bool hover_lock_button();
+	bool hover_loop_button();
+	bool hover_playback();
 
 	bool on_left_button_down() override;
 	bool on_right_button_down() override;

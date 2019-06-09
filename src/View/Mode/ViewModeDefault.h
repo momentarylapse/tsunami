@@ -43,8 +43,8 @@ public:
 
 	void select_hover();
 	void set_cursor_pos(int pos, bool keep_track_selection);
-	Selection get_hover() override;
-	Selection get_hover_basic(bool editable);
+	HoverData get_hover() override;
+	HoverData get_hover_basic(bool editable);
 
 	int get_track_move_target(bool visual);
 

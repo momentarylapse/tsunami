@@ -125,12 +125,12 @@ void LayerHeader::draw(Painter *c) {
 	else
 		c->set_color(view->colors.text_soft2);
 	string title;
-	if (layer->track->has_version_selection()){
+	if (layer->track->has_version_selection()) {
 		if (layer->is_main())
 			title = _("base");
 		else
 			title = "v" + i2s(layer->version_number() + 1);
-	}else{
+	} else {
 		title = "l" + i2s(layer->version_number() + 1);
 	}
 	if (vlayer->solo)
@@ -140,13 +140,13 @@ void LayerHeader::draw(Painter *c) {
 	c->set_font("", -1, false, false);
 
 	// icons
-	if (layer->type == SignalType::BEATS){
+	if (layer->type == SignalType::BEATS) {
 		c->set_color(view->colors.text);
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	}else if (layer->type == SignalType::MIDI){
+	} else if (layer->type == SignalType::MIDI) {
 		c->set_color(view->colors.text);
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
-	}else{
+	} else {
 		c->set_color(view->colors.text);
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
 	}
@@ -161,9 +161,9 @@ void LayerHeader::draw(Painter *c) {
 
 bool LayerHeader::on_left_button_down() {
 	if (view->select_xor) {
-		view->toggle_select_layer_with_content_in_cursor();
+		view->toggle_select_layer_with_content_in_cursor(vlayer);
 	} else {
-		view->exclusively_select_layer();
+		view->exclusively_select_layer(vlayer);
 		view->select_under_cursor();
 	}
 	return true;

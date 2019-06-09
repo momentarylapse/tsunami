@@ -181,7 +181,7 @@ void GridPainter::draw_bar_numbers(Painter *c)
 		float xx = cam->sample2screen(b->range().offset);
 
 		color halo_col = color(0,0,0,0);
-		if (view->hover.type == Selection::Type::BAR and view->hover.bar == b){
+		if (view->hover.type == HoverData::Type::BAR and view->hover.bar == b){
 			halo_col = AudioView::colors.hover;
 		}else if (view->sel.has(b)){
 			halo_col = AudioView::colors.selection;

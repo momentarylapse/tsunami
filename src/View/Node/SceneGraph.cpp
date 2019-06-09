@@ -6,7 +6,8 @@
  */
 
 #include "SceneGraph.h"
-#include "../Selection.h"
+
+#include "../HoverData.h"
 
 
 
@@ -90,20 +91,22 @@ bool SceneGraph::on_mouse_move() {
 	return false;
 }
 
-Selection SceneGraph::get_hover() {
+ViewNode *SceneGraph::get_hover() {
 	auto nodes = collect_children_down(this);
 
 	for (auto *c: nodes)
 		if (c->hover())
-			return c->get_hover();
+			return c;
 
-	return Selection();
+	return nullptr;
 }
 
 string SceneGraph::get_tip() {
-	auto s = get_hover();
-	if (s.node)
-		return s.node->get_tip();
+	auto nodes = collect_children_down(this);
+
+	for (auto *c: nodes)
+		if (c->hover())
+			return c->get_tip();
 	return "";
 }
 

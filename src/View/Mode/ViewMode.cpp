@@ -23,9 +23,9 @@ ViewMode::~ViewMode()
 {
 }
 
-Selection ViewMode::get_hover()
+HoverData ViewMode::get_hover()
 {
-	return Selection();
+	return HoverData();
 }
 
 SongSelection ViewMode::get_selection(const Range &r)

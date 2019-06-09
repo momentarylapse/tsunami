@@ -60,7 +60,7 @@ MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 MidiPainter::MidiPainter(AudioView *view) : MidiPainter(view->song, &view->cam, &view->sel, &view->hover, view->colors)
 {}
 
-MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Selection *_hover, ColorScheme &_colors) :
+MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_colors) :
 	midi_scale(Scale::C_MAJOR),
 	colors(_colors)
 {
@@ -110,14 +110,14 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 }
 
 
-inline MidiPainter::MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, Selection *hover)
+inline MidiPainter::MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover)
 {
 	MidiPainter::MidiNoteState s = MidiPainter::STATE_DEFAULT;
 	if (sel->has(n))
 		s = MidiPainter::STATE_SELECTED;
 	if (as_reference)
 		return (MidiPainter::MidiNoteState)(MidiPainter::STATE_REFERENCE | s);
-	if ((hover->type == Selection::Type::MIDI_NOTE) and (n == hover->note))
+	if ((hover->type == HoverData::Type::MIDI_NOTE) and (n == hover->note))
 		return (MidiPainter::MidiNoteState)(MidiPainter::STATE_HOVER | s);
 	return s;
 }
@@ -498,7 +498,7 @@ void MidiPainter::draw_pitch_grid(Painter *c, Synthesizer *synth)
 	float dy = ((pitch2y_linear(0) - pitch2y_linear(1)) - c->font_size) / 2;
 	for (int i=pitch_min; i<pitch_max; i++){
 		c->set_color(cc);
-		if (((hover->type == Selection::Type::MIDI_PITCH) or (hover->type == Selection::Type::MIDI_NOTE)) and (i == hover->pitch))
+		if (((hover->type == HoverData::Type::MIDI_PITCH) or (hover->type == HoverData::Type::MIDI_NOTE)) and (i == hover->pitch))
 			c->set_color(colors.text);
 
 		string name = pitch_name(i);

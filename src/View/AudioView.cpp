@@ -116,25 +116,32 @@ void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, co
 
 
 
-void AudioView::MouseSelectionPlanner::start(int pos, int y) {
+void AudioView::MouseDelayPlanner::prepare(hui::Callback _a, hui::Callback _b, hui::Callback _c) {
 	dist = 0;
-	start_pos = pos;
-	start_y = y;
+	pos0 = view->cam.screen2sample(view->mx);
+	x0 = view->mx;
+	y0 = view->my;
+	cb_start = _a;
+	cb_update = _b;
+	cb_end = _c;
 }
 
-bool AudioView::MouseSelectionPlanner::step() {
-	if (dist < 0)
-		return false;
-	auto e = hui::GetEvent();
-	dist += fabs(e->dx) + fabs(e->dy);
-	return selecting();
+void AudioView::MouseDelayPlanner::update() {
+	if (active()) {
+		cb_update();
+	} else if (dist >= 0) {
+		auto e = hui::GetEvent();
+		dist += fabs(e->dx) + fabs(e->dy);
+	}
 }
 
-bool AudioView::MouseSelectionPlanner::selecting() {
-	return dist > min_move_to_select;
+bool AudioView::MouseDelayPlanner::active() {
+	return dist > min_move_to_start;
 }
 
-void AudioView::MouseSelectionPlanner::stop() {
+void AudioView::MouseDelayPlanner::stop() {
+	if (active())
+		cb_end();
 	dist = -1;
 }
 
@@ -182,6 +189,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	hide_selection = false;
 	song->subscribe(this, [=]{ on_song_update(); });
 
+	mdp.view = this;
+
 	// modes
 	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
@@ -210,7 +219,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	grid_painter = new GridPainter(this);
 	midi_painter = new MidiPainter(this);
 
-	msp.min_move_to_select = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
+	mdp.min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
@@ -218,7 +227,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	set_mouse_wheel_speed(hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
 	set_antialiasing(hui::Config.get_bool("View.Antialiasing", true));
 	set_high_details(hui::Config.get_bool("View.HighDetails", true));
-	hui::Config.set_int("View.MouseMinMoveToSelect", msp.min_move_to_select);
+	hui::Config.set_int("View.MouseMinMoveToSelect", mdp.min_move_to_start);
 	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
 	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
@@ -246,9 +255,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	signal_chain->subscribe(this, [=]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
 
 	mx = my = 0;
-	msp.stop();
 
-	hover_before_leave = hover = Selection();
+	hover_before_leave = hover = HoverData();
 
 	message.ttl = -1;
 
@@ -405,7 +413,7 @@ int AudioView::mouse_over_sample(SampleRef *s) {
 	return -1;
 }
 
-void AudioView::selection_update_pos(Selection &s) {
+void AudioView::selection_update_pos(HoverData &s) {
 	s.pos = cam.screen2sample(mx);
 }
 
@@ -511,9 +519,12 @@ void AudioView::snap_to_grid(int &pos) {
 
 void AudioView::on_mouse_move() {
 	set_mouse();
-	scene_graph->on_mouse_move();
 
+	mdp.update();
+	if (!mdp.active())
+		scene_graph->on_mouse_move();
 
+/*
 	if (selection_mode != SelectionMode::NONE) {
 
 		snap_to_grid(hover.pos);
@@ -530,7 +541,7 @@ void AudioView::on_mouse_move() {
 			mode->start_selection();
 			msp.stop();
 		}
-	}
+	}*/
 	force_redraw();
 }
 
@@ -566,6 +577,8 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 void AudioView::on_left_button_up() {
 	scene_graph->on_left_button_up();
+	if (mdp.active())
+		mdp.stop();
 
 	force_redraw();
 	update_menu();
@@ -977,27 +990,28 @@ void AudioView::draw_message(Painter *c, Message &m) {
 	float ym = area.my();
 	float a = min(m.ttl*8, 1.0f);
 	a = pow(a, 0.4f);
-	color c1 = AudioView::colors.high_contrast_a;
-	color c2 = AudioView::colors.high_contrast_b;
+	color c1 = colors.high_contrast_a;
+	color c2 = colors.high_contrast_b;
 	c1.a = c2.a = a;
-	c->set_font_size(AudioView::FONT_SIZE * m.size * a);
+	c->set_font_size(FONT_SIZE * m.size * a);
 	draw_boxed_str(c, xm, ym, m.text, c1, c2, 0);
-	c->set_font_size(AudioView::FONT_SIZE);
+	c->set_font_size(FONT_SIZE);
 }
 
-void AudioView::draw_time_line(Painter *c, int pos, int type, const color &col, bool show_time) {
+void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time, bool show_circle) {
 	float x = cam.sample2screen(pos);
 	if ((x >= song_area.x1) and (x <= song_area.x2)) {
-		color cc = (type == (int)hover.type) ? colors.selection_boundary_hover : col;
+		color cc = col;
+		if (hover)
+			cc = colors.selection_boundary_hover;
 		c->set_color(cc);
 		c->set_line_width(2.0f);
 		c->draw_line(x, area.y1, x, area.y2);
 		if (show_time)
 			draw_boxed_str(c,  x, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
 		c->set_line_width(1.0f);
-		if ((type == (int)Selection::Type::SELECTION_START) or (type == (int)Selection::Type::SELECTION_END)) {
+		if (show_circle)
 			c->draw_circle(x, area.y2, 8);
-		}
 	}
 }
 
@@ -1021,7 +1035,7 @@ void AudioView::draw_song(Painter *c) {
 
 	// playing/capturing position
 	if (is_playback_active())
-		draw_time_line(c, playback_pos(), (int)Selection::Type::PLAYBACK_CURSOR, colors.preview_marker, true);
+		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
 
 	mode->draw_post(c);
 
@@ -1381,74 +1395,74 @@ void AudioView::select_under_cursor() {
 }
 
 bool AudioView::hover_any_object() {
-	if (hover.type == Selection::Type::BAR_GAP)
+	if (hover.type == HoverData::Type::BAR_GAP)
 		return true;
-	if (hover.type == Selection::Type::BAR)
+	if (hover.type == HoverData::Type::BAR)
 		return true;
-	if (hover.type == Selection::Type::MARKER)
+	if (hover.type == HoverData::Type::MARKER)
 		return true;
-	if (hover.type == Selection::Type::SAMPLE)
+	if (hover.type == HoverData::Type::SAMPLE)
 		return true;
-	if (hover.type == Selection::Type::MIDI_NOTE)
+	if (hover.type == HoverData::Type::MIDI_NOTE)
 		return true;
 	return false;
 }
 
 bool AudioView::hover_selected_object() {
-	if (hover.type == Selection::Type::BAR_GAP)
+	if (hover.type == HoverData::Type::BAR_GAP)
 		return sel.bar_gap == hover.index;
-	if (hover.type == Selection::Type::BAR)
+	if (hover.type == HoverData::Type::BAR)
 		return sel.has(hover.bar);
-	if (hover.type == Selection::Type::MARKER)
+	if (hover.type == HoverData::Type::MARKER)
 		return sel.has(hover.marker);
-	if (hover.type == Selection::Type::SAMPLE)
+	if (hover.type == HoverData::Type::SAMPLE)
 		return sel.has(hover.sample);
-	if (hover.type == Selection::Type::MIDI_NOTE)
+	if (hover.type == HoverData::Type::MIDI_NOTE)
 		return sel.has(hover.note);
 	return false;
 }
 
 void AudioView::select_object() {
-	if (hover.type == Selection::Type::BAR_GAP) {
+	if (hover.type == HoverData::Type::BAR_GAP) {
 		sel.bar_gap = hover.index;
-	} else if (hover.type == Selection::Type::BAR) {
+	} else if (hover.type == HoverData::Type::BAR) {
 		sel.add(hover.bar);
-	} else if (hover.type == Selection::Type::MARKER) {
+	} else if (hover.type == HoverData::Type::MARKER) {
 		sel.add(hover.marker);
-	} else if (hover.type == Selection::Type::SAMPLE) {
+	} else if (hover.type == HoverData::Type::SAMPLE) {
 		sel.add(hover.sample);
-	} else if (hover.type == Selection::Type::MIDI_NOTE) {
+	} else if (hover.type == HoverData::Type::MIDI_NOTE) {
 		sel.add(hover.note);
 	}
 	set_cur_sample(hover.sample);
 }
 
 void AudioView::toggle_object() {
-	if (hover.type == Selection::Type::BAR_GAP) {
+	if (hover.type == HoverData::Type::BAR_GAP) {
 		sel.bar_gap = hover.index;
-	} else if (hover.type == Selection::Type::BAR) {
+	} else if (hover.type == HoverData::Type::BAR) {
 		sel.toggle(hover.bar);
-	} else if (hover.type == Selection::Type::MARKER) {
+	} else if (hover.type == HoverData::Type::MARKER) {
 		sel.toggle(hover.marker);
-	} else if (hover.type == Selection::Type::SAMPLE) {
+	} else if (hover.type == HoverData::Type::SAMPLE) {
 		sel.toggle(hover.sample);
-	} else if (hover.type == Selection::Type::MIDI_NOTE) {
+	} else if (hover.type == HoverData::Type::MIDI_NOTE) {
 		sel.toggle(hover.note);
 	}
 	set_cur_sample(hover.sample);
 }
 
-void AudioView::exclusively_select_layer() {
+void AudioView::exclusively_select_layer(AudioViewLayer *l) {
 	sel.track_layers.clear();
-	sel.add(hover.layer);
+	sel.add(l->layer);
 	sel.make_consistent(song);
-	set_cur_layer(hover.vlayer);
+	set_cur_layer(l);
 }
 
-void AudioView::toggle_select_layer() {
-	sel.toggle(hover.layer);
+void AudioView::toggle_select_layer(AudioViewLayer *l) {
+	sel.toggle(l->layer);
 	sel.make_consistent(song);
-	set_cur_layer(hover.vlayer);
+	set_cur_layer(l);
 }
 
 void AudioView::exclusively_select_object() {
@@ -1456,11 +1470,20 @@ void AudioView::exclusively_select_object() {
 	select_object();
 }
 
+HoverData AudioView::hover_time() {
+	HoverData s;
+	s.pos = cam.screen2sample(mx);
+	s.range = Range(s.pos, 0);
+	s.y0 = s.y1 = my;
+	s.type = HoverData::Type::TIME;
+	s.node = scene_graph->get_hover();
+	return s;
+}
 
 // hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
-void AudioView::toggle_select_layer_with_content_in_cursor() {
-	auto s = SongSelection::from_range(song, sel.range, {hover.track}, {hover.layer});
-	if (sel.has(hover.layer))
+void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
+	auto s = SongSelection::from_range(song, sel.range, {l->layer->track}, {l->layer});
+	if (sel.has(l->layer))
 		sel = sel.minus(s);
 	else
 		sel = sel || s;

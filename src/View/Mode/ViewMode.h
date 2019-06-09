@@ -14,7 +14,7 @@ enum class MidiMode;
 class AudioView;
 class AudioViewTrack;
 class AudioViewLayer;
-class Selection;
+class HoverData;
 class SongSelection;
 class Track;
 class ViewPort;
@@ -49,7 +49,7 @@ public:
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change(){}
 
-	virtual Selection get_hover();
+	virtual HoverData get_hover();
 
 	virtual void draw_track_background(Painter *c, AudioViewTrack *t){}
 	virtual void draw_layer_background(Painter *c, AudioViewLayer *l){}
@@ -69,7 +69,7 @@ public:
 	AudioView *view;
 	Session *session;
 	ViewPort *cam;
-	Selection *hover;
+	HoverData *hover;
 	TsunamiWindow *win;
 	Song *song;
 

@@ -251,7 +251,7 @@ Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers)
 	return groups;
 }
 
-void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers, Selection &hover)
+void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover)
 {
 	marker_areas.clear();
 	marker_label_areas.clear();
@@ -260,11 +260,11 @@ void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers
 		draw_marker_group(c, g, hover);
 }
 
-void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, Selection &hover)
+void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover)
 {
 	Range group_range = RangeTo(markers[0]->range.start(), markers.back()->range.end());
 	foreachi(auto *m, markers, i)
-		draw_marker(c, m, (hover.type == Selection::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
+		draw_marker(c, m, (hover.type == HoverData::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
 }
 
 float marker_alpha_factor(float w, float w_group, bool border)
@@ -549,25 +549,25 @@ bool AudioViewLayer::on_mouse_move() {
 }
 
 string AudioViewLayer::get_tip() {
-	if (view->hover.type == Selection::Type::SAMPLE)
+	if (view->hover.type == HoverData::Type::SAMPLE)
 		return _("sample ") + view->hover.sample->origin->name;
-	if (view->hover.type == Selection::Type::MARKER)
+	if (view->hover.type == HoverData::Type::MARKER)
 		return  _("marker ") + view->hover.marker->nice_text();
-	if (view->hover.type == Selection::Type::BAR) {
+	if (view->hover.type == HoverData::Type::BAR) {
 		if (view->hover.bar->is_pause())
 			return _("pause ") + view->song->get_time_str_long(view->hover.bar->length);
 		else
 			return _("bar ") + view->hover.bar->format_beats() + format(u8" \u2669=%.1f", view->hover.bar->bpm(view->song->sample_rate));
 	}
-	if (view->hover.type == Selection::Type::BAR_GAP)
+	if (view->hover.type == HoverData::Type::BAR_GAP)
 		return _("bar gap");
 	return "";
 }
 
-Selection AudioViewLayer::get_hover() {
+HoverData AudioViewLayer::get_hover_basic() {
 	if (!hover())
-		return Selection();
-	Selection s = ViewNode::get_hover();
+		return HoverData();
+	HoverData s = view->hover_time();
 	s.vlayer = this;
 	foreachi(auto *l, view->vlayer, i)
 		if (this == l)
@@ -575,6 +575,6 @@ Selection AudioViewLayer::get_hover() {
 	s.layer = layer;
 	s.track = layer->track;
 	s.vtrack = view->get_track(s.track);
-	s.type = Selection::Type::LAYER;
+	s.type = HoverData::Type::LAYER;
 	return s;
 }

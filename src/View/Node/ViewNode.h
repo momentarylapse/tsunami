@@ -13,7 +13,6 @@
 #include "../../Stuff/Observable.h"
 
 class Painter;
-class Selection;
 class AudioView;
 
 class ViewNode : public Observable<VirtualBase> {
@@ -28,12 +27,11 @@ public:
 	virtual bool on_mouse_move() { return false; }
 
 	virtual bool hover();
-	virtual Selection get_hover();
 	virtual void draw(Painter *p) {}
 
 	virtual string get_tip();
 
-	void update_area();
+	virtual void update_area();
 
 	AudioView *view;
 	ViewNode *parent;

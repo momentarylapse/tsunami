@@ -43,7 +43,7 @@ public:
 	bool on_mouse_move() override;
 
 	string get_tip() override;
-	HoverData get_hover_basic();
+	HoverData get_hover_data() override;
 
 	void on_track_change();
 

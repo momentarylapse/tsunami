@@ -8,6 +8,7 @@
 #include "AudioViewLayer.h"
 #include "LayerHeader.h"
 #include "../AudioView.h"
+#include "../MouseDelayPlanner.h"
 #include "../Mode/ViewMode.h"
 #include "../Mode/ViewModeMidi.h"
 #include "../Painter/BufferPainter.h"
@@ -31,6 +32,7 @@
 #include "../../Data/Midi/Clef.h"
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../Module/SignalChain.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Painter/MidiPainter.h"
 
@@ -529,7 +531,80 @@ void AudioViewLayer::update_header() {
 }
 
 bool AudioViewLayer::on_left_button_down() {
-	//view->mode->on_left_button_down();
+	view->sel_temp = view->sel; // for diff selection
+
+
+	if (view->select_xor) {
+		// differential selection
+
+		if (view->hover_any_object()) {
+			view->toggle_object();
+		} else {
+	//		view->mode->left_click_handle_xor();
+			view->toggle_select_layer_with_content_in_cursor(this);
+		}
+	} else {
+		// normal click
+
+		if (view->hover_any_object()) {
+
+			view->exclusively_select_layer(this);
+			if (!view->hover_selected_object())
+				view->exclusively_select_object();
+
+			// start drag'n'drop?
+			//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){
+//				dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES));
+				//}
+		} else {
+	//		view->mode->left_click_handle();
+
+			if (view->is_playback_active()) {
+				if (view->renderer->range().is_inside(view->hover.pos)) {
+					view->session->signal_chain->set_pos(view->hover.pos);
+					view->hover.type = HoverData::Type::PLAYBACK_CURSOR;
+					view->force_redraw();
+					return true;
+				} else {
+					view->stop();
+				}
+			} else {
+				// "void"
+			//	left_click_handle_void();
+
+				view->set_cur_sample(nullptr);
+
+				if (view->sel.has(layer)) {
+					// set cursor only when clicking on selected layers
+					view->set_cursor_pos(view->hover.pos_snap);
+				}
+
+				view->exclusively_select_layer(this);
+				view->select_under_cursor();
+
+				// start drag'n'drop?
+				view->mdp_prepare([=] {
+					view->hover.range.set_start(view->mdp->pos0);
+					view->hover.range.set_end(view->get_mouse_pos());
+					view->hover.y0 = view->mdp->y0;
+					view->hover.y1 = view->my;
+					view->selection_mode = view->SelectionMode::TRACK_RECT;
+					view->set_selection(view->mode->get_selection(view->hover.range));
+
+				}, [=] {
+					view->hover.range.set_end(view->get_mouse_pos_snap());
+					view->hover.y1 = view->my;
+					if (view->select_xor)
+						view->set_selection(view->sel_temp or view->mode->get_selection(view->hover.range));
+					else
+						view->set_selection(view->mode->get_selection(view->hover.range));
+
+				}, [=] {
+					view->selection_mode = view->SelectionMode::NONE;
+				});
+			}
+		}
+	}
 	return true;
 }
 
@@ -538,8 +613,35 @@ bool AudioViewLayer::on_left_button_up() {
 	return true;
 }
 
+int hover_buffer(HoverData &hover)
+{
+	if (!hover.layer)
+		return -1;
+	foreachi (auto &b, hover.layer->buffers, i)
+		if (b.range().is_inside(hover.pos))
+			return i;
+	return -1;
+}
+
 bool AudioViewLayer::on_right_button_down() {
-	//view->mode->on_right_button_down();
+	view->hover_before_leave = view->hover;
+
+	// pop up menu...
+	view->update_menu();
+
+	if (view->hover.sample) {
+		view->open_popup(view->menu_sample);
+	} else if (view->hover.bar) {
+		view->open_popup(view->menu_bar);
+	} else if (view->hover.marker) {
+		view->open_popup(view->menu_marker);
+	} else if (view->hover.type == HoverData::Type::BAR_GAP) {
+		view->open_popup(view->menu_bar_gap);
+	} else if (hover_buffer(view->hover) >= 0) {
+		view->open_popup(view->menu_buffer);
+	} else { // void
+		view->open_popup(view->menu_track);
+	}
 	return true;
 }
 
@@ -549,11 +651,11 @@ bool AudioViewLayer::on_mouse_move() {
 }
 
 string AudioViewLayer::get_tip() {
-	if (view->hover.type == HoverData::Type::SAMPLE)
+	if (view->hover.sample)
 		return _("sample ") + view->hover.sample->origin->name;
-	if (view->hover.type == HoverData::Type::MARKER)
+	if (view->hover.marker)
 		return  _("marker ") + view->hover.marker->nice_text();
-	if (view->hover.type == HoverData::Type::BAR) {
+	if (view->hover.bar) {
 		if (view->hover.bar->is_pause())
 			return _("pause ") + view->song->get_time_str_long(view->hover.bar->length);
 		else
@@ -564,10 +666,8 @@ string AudioViewLayer::get_tip() {
 	return "";
 }
 
-HoverData AudioViewLayer::get_hover_basic() {
-	if (!hover())
-		return HoverData();
-	HoverData s = view->hover_time();
+HoverData AudioViewLayer::get_hover_data() {
+	HoverData s = ViewNode::get_hover_data();
 	s.vlayer = this;
 	foreachi(auto *l, view->vlayer, i)
 		if (this == l)
@@ -576,5 +676,64 @@ HoverData AudioViewLayer::get_hover_basic() {
 	s.track = layer->track;
 	s.vtrack = view->get_track(s.track);
 	s.type = HoverData::Type::LAYER;
+
+	// markers
+	if (layer->is_main()){
+		for (int i=0; i<min(s.track->markers.num, marker_areas.num); i++){
+			auto *m = s.track->markers[i];
+			if (marker_areas.contains(m) and marker_label_areas.contains(m))
+			if (marker_areas[m].inside(view->mx, view->my) or marker_label_areas[m].inside(view->mx, view->my)){
+				s.marker = m;
+				s.type = HoverData::Type::MARKER;
+				s.index = i;
+				return s;
+			}
+		}
+	}
+
+	// TODO: prefer selected samples
+	for (auto *ss: layer->samples){
+		int offset = view->mouse_over_sample(ss);
+		if (offset >= 0){
+			s.sample = ss;
+			s.type = HoverData::Type::SAMPLE;
+			return s;
+		}
+	}
+
+	// bars
+	if (s.track->type == SignalType::BEATS){
+
+		// bar gaps
+		if (view->cam.dsample2screen(view->session->sample_rate()) > 20){
+			int offset = 0;
+			for (int i=0; i<view->song->bars.num+1; i++){
+				float x = view->cam.sample2screen(offset);
+				if (fabs(x - view->mx) < view->SNAPPING_DIST){
+					s.index = i;
+					s.type = HoverData::Type::BAR_GAP;
+					s.pos = offset;
+					return s;
+				}
+				if (i < view->song->bars.num)
+					offset += view->song->bars[i]->length;
+			}
+		}
+
+		// bars
+		auto bars = view->song->bars.get_bars(Range(s.pos, 1000000));
+		for (auto *b: bars){
+			float x = view->cam.sample2screen(b->range().offset);
+			// test for label area...
+			if ((view->mx >= x) and (view->mx < x + 36) and (view->my < area.y1 + 20)){
+				//b.range.
+				s.bar = b;
+				s.index = b->index;
+				s.type = HoverData::Type::BAR;
+				return s;
+			}
+		}
+	}
+
 	return s;
 }

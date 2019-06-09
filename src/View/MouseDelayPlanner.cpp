@@ -32,6 +32,8 @@ bool MouseDelayPlanner::update() {
 	} else if (has_focus()) {
 		auto e = hui::GetEvent();
 		dist += fabs(e->dx) + fabs(e->dy);
+		if (acting())
+			cb_start();
 	}
 	return has_focus();
 }

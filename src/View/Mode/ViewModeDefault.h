@@ -10,7 +10,6 @@
 
 #include "ViewMode.h"
 
-class ActionSongMoveSelection;
 class SongSelection;
 class Range;
 class Track;
@@ -45,16 +44,6 @@ public:
 	void set_cursor_pos(int pos, bool keep_track_selection);
 	HoverData get_hover() override;
 	HoverData get_hover_basic(bool editable);
-
-	// drag and drop
-	ActionSongMoveSelection *cur_action;
-	SongSelection *dnd_selection;
-	int dnd_ref_pos;
-	int dnd_mouse_pos0;
-	void dnd_start_soon(const SongSelection &sel);
-	void dnd_start();
-	void dnd_stop();
-	void dnd_update();
 
 
 	virtual bool left_click_handle_special();

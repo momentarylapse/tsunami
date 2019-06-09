@@ -33,6 +33,7 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/SignalChain.h"
+#include "../../Action/Song/ActionSongMoveSelection.h"
 #include "../Helper/SymbolRenderer.h"
 #include "../Painter/MidiPainter.h"
 
@@ -530,8 +531,7 @@ void AudioViewLayer::update_header() {
 	//header->children[0]->hidden = layer->track->has_version_selection();
 }
 
-class MouseDelaySelect : public MouseDelayAction
-{
+class MouseDelaySelect : public MouseDelayAction {
 public:
 	AudioViewLayer *layer;
 	AudioView *view;
@@ -552,8 +552,54 @@ public:
 		else
 			view->set_selection(view->mode->get_selection(view->hover.range));
 	}
-	void on_end() override {
+	void on_clean_up() override {
 		view->selection_mode = view->SelectionMode::NONE;
+	}
+};
+
+class MouseDelayObjectsDnD : public MouseDelayAction {
+public:
+	AudioViewLayer *layer;
+	AudioView *view;
+	SongSelection sel;
+	ActionSongMoveSelection *action = nullptr;
+	int mouse_pos0;
+	int ref_pos;
+	MouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s) {
+		layer = l;
+		view = layer->view;
+		sel = s;
+//		view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES);
+		mouse_pos0 = view->hover.pos;
+		ref_pos = hover_reference_pos(view->hover);
+	}
+	void on_start() override {
+		action = new ActionSongMoveSelection(view->song, sel);
+	}
+	void on_update() override {
+		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+		view->snap_to_grid(p);
+		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
+		action->set_param_and_notify(view->song, dpos);
+		view->force_redraw();
+	}
+	void on_finish() override {
+		view->song->execute(action);
+	}
+	void on_cancel() override {
+		delete action;
+	}
+
+	int hover_reference_pos(HoverData &s) {
+		if (s.marker)
+			return s.marker->range.offset;
+		if (s.note)
+			return s.note->range.offset;
+		if (s.sample)
+			return s.sample->pos;
+		if (s.note)
+			return s.note->range.offset;
+		return s.pos;
 	}
 };
 
@@ -581,7 +627,7 @@ bool AudioViewLayer::on_left_button_down() {
 
 			// start drag'n'drop?
 			//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){
-//				dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES));
+			view->mdp_prepare(new MouseDelayObjectsDnD(this, view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES)));
 				//}
 		} else {
 	//		view->mode->left_click_handle();

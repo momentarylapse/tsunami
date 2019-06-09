@@ -12,7 +12,6 @@
 #include "../Node/SceneGraph.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
-#include "../../Action/Song/ActionSongMoveSelection.h"
 #include "math.h"
 #include "../../Module/Audio/SongRenderer.h"
 #include "../../Module/SignalChain.h"
@@ -38,14 +37,9 @@ Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
-	cur_action = nullptr;
-	dnd_selection = new SongSelection;
-	dnd_ref_pos = 0;
-	dnd_mouse_pos0 = 0;
 }
 
 ViewModeDefault::~ViewModeDefault() {
-	delete dnd_selection;
 }
 
 bool ViewModeDefault::left_click_handle_special() {
@@ -115,50 +109,15 @@ void ViewModeDefault::on_left_button_down() {
 			if (!view->hover_selected_object())
 				view->exclusively_select_object();
 
-			// start drag'n'drop?
-			//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){
-				dnd_start_soon(view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES));
-				//}
 		} else {
 			left_click_handle();
 		}
 	}
 }
 
-int hover_reference_pos(HoverData &s)
-{
-	if (s.marker)
-		return s.marker->range.offset;
-	if (s.note)
-		return s.note->range.offset;
-	if (s.sample)
-		return s.sample->pos;
-	if (s.note)
-		return s.note->range.offset;
-	return s.pos;
-}
-
-void ViewModeDefault::dnd_start_soon(const SongSelection &sel)
-{
-	*dnd_selection = sel;
-	dnd_mouse_pos0 = view->hover.pos;
-	dnd_ref_pos = hover_reference_pos(view->hover);
-	cur_action = new ActionSongMoveSelection(view->song, sel);
-}
-
-void ViewModeDefault::dnd_stop()
-{
-	song->execute(cur_action);
-	cur_action = nullptr;
-}
-
 void ViewModeDefault::on_left_button_up()
 {
-	if (cur_action)
-		dnd_stop();
-
 	view->selection_mode = view->SelectionMode::NONE;
-	//view->msp.stop();
 }
 
 int hover_buffer(HoverData *hover)
@@ -258,42 +217,9 @@ void ViewModeDefault::on_mouse_move()
 
 
 	// drag & drop
-	if (view->selection_mode == view->SelectionMode::TIME){
-
-		/*Selection mo = getHover();
-		if (mo.track)
-			view->sel.add(mo.track);*/
-
-		//_force_redraw_ = true;
-		/*_force_redraw_ = false;
-		int x, w;
-		int r = 4;
-		if (e->dx < 0){
-			x = view->mx - r;
-			w = - e->dx + 2*r;
-		}else{
-			x = view->mx + r;
-			w = - e->dx - 2*r;
-		}
-		win->redrawRect("area", x, view->area.y1, w, view->area.height());*/
-	}else if (hover->type == HoverData::Type::PLAYBACK_CURSOR){
+	if (hover->type == HoverData::Type::PLAYBACK_CURSOR){
 		view->renderer->set_pos(hover->pos);
 		_force_redraw_ = true;
-	}else if (hover->type == HoverData::Type::SAMPLE){
-		/*view->applyBarriers(hover->pos);
-		int dpos = (float)hover->pos - hover->sample_offset - hover->sample->pos;
-		if (cur_action)
-			cur_action->set_param_and_notify(view->song, dpos);
-		_force_redraw_ = true;*/
-	}
-
-	if (cur_action){
-		int p = hover->pos + (dnd_ref_pos - dnd_mouse_pos0);
-		view->snap_to_grid(p);
-		int dpos = p - dnd_mouse_pos0 - (dnd_ref_pos - dnd_mouse_pos0);
-		cur_action->set_param_and_notify(view->song, dpos);
-		_force_redraw_ = true;
-
 	}
 
 	if (_force_redraw_)
@@ -352,12 +278,6 @@ void ViewModeDefault::on_key_down(int k)
 			playback_seek_relative(view, 5);
 		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
 			playback_seek_relative(view, -5);
-	}
-
-	// action
-	if (k == hui::KEY_ESCAPE){
-		if (cur_action)
-			dnd_stop();
 	}
 
 	view->update_menu();

@@ -19,7 +19,9 @@ public:
 	virtual ~MouseDelayAction() {}
 	virtual void on_start() {}
 	virtual void on_update() {}
-	virtual void on_end() {}
+	virtual void on_finish() {}
+	virtual void on_cancel() {}
+	virtual void on_clean_up() {}
 	virtual void on_draw_post(Painter *p) {}
 };
 
@@ -38,7 +40,8 @@ public:
 	bool update();
 	bool has_focus();
 	bool acting();
-	void stop();
+	void finish();
+	void cancel();
 	void draw_post(Painter *p);
 };
 

@@ -551,7 +551,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	mdp->stop();
+	mdp->finish();
 	hover = scene_graph->get_hover_data();
 	scene_graph->on_left_button_up();
 
@@ -604,6 +604,9 @@ void AudioView::on_command(const string & id) {
 
 void AudioView::on_key_down() {
 	int k = hui::GetEvent()->key_code;
+	if (k == hui::KEY_ESCAPE) {
+		mdp->cancel();
+	}
 	mode->on_key_down(k);
 }
 

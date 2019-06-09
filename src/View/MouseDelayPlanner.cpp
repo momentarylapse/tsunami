@@ -18,7 +18,7 @@ MouseDelayPlanner::MouseDelayPlanner(AudioView *_view) {
 
 void MouseDelayPlanner::prepare(MouseDelayAction *a) {
 	if (action)
-		stop();
+		cancel();
 	dist = 0;
 	pos0 = view->cam.screen2sample(view->mx);
 	x0 = view->mx;
@@ -46,9 +46,20 @@ bool MouseDelayPlanner::has_focus() {
 	return dist >= 0;
 }
 
-void MouseDelayPlanner::stop() {
+void MouseDelayPlanner::finish() {
 	if (acting()) {
-		action->on_end();
+		action->on_finish();
+		action->on_clean_up();
+		delete action;
+		action = nullptr;
+	}
+	dist = -1;
+}
+
+void MouseDelayPlanner::cancel() {
+	if (acting()) {
+		action->on_cancel();
+		action->on_clean_up();
 		delete action;
 		action = nullptr;
 	}

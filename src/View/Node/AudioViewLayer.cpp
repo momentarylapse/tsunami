@@ -530,6 +530,33 @@ void AudioViewLayer::update_header() {
 	//header->children[0]->hidden = layer->track->has_version_selection();
 }
 
+class MouseDelaySelect : public MouseDelayAction
+{
+public:
+	AudioViewLayer *layer;
+	AudioView *view;
+	MouseDelaySelect(AudioViewLayer *l) { layer = l; view = layer->view; }
+	void on_start() override {
+		view->hover.range.set_start(view->mdp->pos0);
+		view->hover.range.set_end(view->get_mouse_pos());
+		view->hover.y0 = view->mdp->y0;
+		view->hover.y1 = view->my;
+		view->selection_mode = view->SelectionMode::TRACK_RECT;
+		view->set_selection(view->mode->get_selection(view->hover.range));
+	}
+	void on_update() override {
+		view->hover.range.set_end(view->get_mouse_pos_snap());
+		view->hover.y1 = view->my;
+		if (view->select_xor)
+			view->set_selection(view->sel_temp or view->mode->get_selection(view->hover.range));
+		else
+			view->set_selection(view->mode->get_selection(view->hover.range));
+	}
+	void on_end() override {
+		view->selection_mode = view->SelectionMode::NONE;
+	}
+};
+
 bool AudioViewLayer::on_left_button_down() {
 	view->sel_temp = view->sel; // for diff selection
 
@@ -583,25 +610,7 @@ bool AudioViewLayer::on_left_button_down() {
 				view->select_under_cursor();
 
 				// start drag'n'drop?
-				view->mdp_prepare([=] {
-					view->hover.range.set_start(view->mdp->pos0);
-					view->hover.range.set_end(view->get_mouse_pos());
-					view->hover.y0 = view->mdp->y0;
-					view->hover.y1 = view->my;
-					view->selection_mode = view->SelectionMode::TRACK_RECT;
-					view->set_selection(view->mode->get_selection(view->hover.range));
-
-				}, [=] {
-					view->hover.range.set_end(view->get_mouse_pos_snap());
-					view->hover.y1 = view->my;
-					if (view->select_xor)
-						view->set_selection(view->sel_temp or view->mode->get_selection(view->hover.range));
-					else
-						view->set_selection(view->mode->get_selection(view->hover.range));
-
-				}, [=] {
-					view->selection_mode = view->SelectionMode::NONE;
-				});
+				view->mdp_prepare(new MouseDelaySelect(this));
 			}
 		}
 	}

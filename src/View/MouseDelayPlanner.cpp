@@ -16,24 +16,24 @@ MouseDelayPlanner::MouseDelayPlanner(AudioView *_view) {
 	hui::Config.set_int("View.MouseMinMoveToSelect", min_move_to_start);
 }
 
-void MouseDelayPlanner::prepare(hui::Callback _a, hui::Callback _b, hui::Callback _c) {
+void MouseDelayPlanner::prepare(MouseDelayAction *a) {
+	if (action)
+		stop();
 	dist = 0;
 	pos0 = view->cam.screen2sample(view->mx);
 	x0 = view->mx;
 	y0 = view->my;
-	cb_start = _a;
-	cb_update = _b;
-	cb_end = _c;
+	action = a;
 }
 
 bool MouseDelayPlanner::update() {
 	if (acting()) {
-		cb_update();
+		action->on_update();
 	} else if (has_focus()) {
 		auto e = hui::GetEvent();
 		dist += fabs(e->dx) + fabs(e->dy);
 		if (acting())
-			cb_start();
+			action->on_start();
 	}
 	return has_focus();
 }
@@ -47,8 +47,16 @@ bool MouseDelayPlanner::has_focus() {
 }
 
 void MouseDelayPlanner::stop() {
-	if (acting())
-		cb_end();
+	if (acting()) {
+		action->on_end();
+		delete action;
+		action = nullptr;
+	}
 	dist = -1;
+}
+
+void MouseDelayPlanner::draw_post(Painter *p) {
+	if (acting())
+		action->on_draw_post(p);
 }
 

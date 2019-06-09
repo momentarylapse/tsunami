@@ -46,8 +46,6 @@ public:
 	HoverData get_hover() override;
 	HoverData get_hover_basic(bool editable);
 
-	int get_track_move_target(bool visual);
-
 	// drag and drop
 	ActionSongMoveSelection *cur_action;
 	SongSelection *dnd_selection;
@@ -58,7 +56,6 @@ public:
 	void dnd_stop();
 	void dnd_update();
 
-	Track* moving_track;
 
 	virtual bool left_click_handle_special();
 	virtual void left_click_handle();

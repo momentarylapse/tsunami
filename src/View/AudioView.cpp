@@ -1015,6 +1015,9 @@ void AudioView::draw_song(Painter *c) {
 	if (is_playback_active())
 		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
 
+	if (mdp->acting())
+		mdp->action->on_draw_post(c);
+
 	mode->draw_post(c);
 
 	// tool tip?
@@ -1521,6 +1524,17 @@ void AudioView::open_popup(hui::Menu* menu) {
 	menu->open_popup(win);
 }
 
-void AudioView::mdp_prepare(hui::Callback start, hui::Callback update, hui::Callback end) {
-	mdp->prepare(start, update, end);
+void AudioView::mdp_prepare(MouseDelayAction *a) {
+	mdp->prepare(a);
+}
+
+class MouseDelayActionWrapper : public MouseDelayAction {
+public:
+	hui::Callback callback;
+	MouseDelayActionWrapper(hui::Callback c) { callback = c; }
+	void on_update() override { callback(); }
+};
+
+void AudioView::mdp_prepare(hui::Callback update) {
+	mdp->prepare(new MouseDelayActionWrapper(update));
 }

@@ -9,6 +9,7 @@
 #include "ViewNode.h"
 #include "AudioViewTrack.h"
 #include "../AudioView.h"
+#include "../MouseDelayPlanner.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -157,6 +158,51 @@ void TrackHeader::draw(Painter *c) {
 	children[1]->hidden |= (view->song->tracks.num == 1);
 }
 
+class MouseDelayDndTrack : public MouseDelayAction {
+public:
+	AudioViewTrack *track;
+	MouseDelayDndTrack(AudioViewTrack *t) { track = t; }
+	void on_draw_post(Painter *c) {
+		auto *view = track->view;
+		//int orig = get_track_index(moving_track);
+		int t = get_track_move_target(true);
+		int y = view->vtrack.back()->area.y2;
+		if (t < view->vtrack.num)
+			y = view->vtrack[t]->area.y1;
+
+		c->set_color(view->colors.selection_boundary);
+		c->set_line_width(2.0f);
+		c->draw_line(view->area.x1,  y,  view->area.x2,  y);
+		c->set_line_width(1.0f);
+
+		/*c->setColor(view->colors.selection_internal);
+		rect r = view->vtrack[orig]->area;
+		r.x2 = view->TRACK_HANDLE_WIDTH;
+		c->drawRect(r);*/
+
+		view->draw_cursor_hover(c, track->track->nice_name());
+	}
+	void on_end() {
+		int target = get_track_move_target(false);
+		track->track->move(target);
+	}
+
+	int get_track_move_target(bool visual) {
+		auto *view = track->view;
+		int orig = get_track_index(track->track);
+		foreachi(auto vt, view->vtrack, i) {
+			int y = (vt->area.y1 + vt->area.y2) / 2;
+			if (y > view->my) {
+				if (visual or (i <= orig))
+					return i;
+				else
+					return i - 1;
+			}
+		}
+		return visual ? view->song->tracks.num : (view->song->tracks.num-1);
+	}
+};
+
 bool TrackHeader::on_left_button_down() {
 	auto *l = view->get_layer(vtrack->track->layers[0]);
 	if (view->select_xor) {
@@ -165,7 +211,7 @@ bool TrackHeader::on_left_button_down() {
 		view->exclusively_select_layer(l);
 		view->select_under_cursor();
 	}
-//	view->msp.start(view->hover.pos, view->hover.y0); // track drag'n'drop
+	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
 	return true;
 }
 

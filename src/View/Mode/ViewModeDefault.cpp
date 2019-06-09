@@ -39,7 +39,6 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
 	cur_action = nullptr;
-	moving_track = nullptr;
 	dnd_selection = new SongSelection;
 	dnd_ref_pos = 0;
 	dnd_mouse_pos0 = 0;
@@ -157,12 +156,6 @@ void ViewModeDefault::on_left_button_up()
 {
 	if (cur_action)
 		dnd_stop();
-
-	if (moving_track){
-		int target = get_track_move_target(false);
-		moving_track->move(target);
-		moving_track = nullptr;
-	}
 
 	view->selection_mode = view->SelectionMode::NONE;
 	//view->msp.stop();
@@ -426,48 +419,14 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	c->set_line_width(1.0f);
 }
 
-int ViewModeDefault::get_track_move_target(bool visual)
-{
-	int orig = get_track_index(moving_track);
-	foreachi(auto vt, view->vtrack, i){
-		int y = (vt->area.y1 + vt->area.y2) / 2;
-		if (y > view->my){
-			if (visual or (i <= orig))
-				return i;
-			else
-				return i - 1;
-		}
-	}
-	return visual ? song->tracks.num : (song->tracks.num-1);
-}
-
 void ViewModeDefault::draw_post(Painter *c)
 {
-	if (moving_track){
-		//int orig = get_track_index(moving_track);
-		int t = get_track_move_target(true);
-		int y = view->vtrack.back()->area.y2;
-		if (t < view->vtrack.num)
-			y = view->vtrack[t]->area.y1;
-
-		c->set_color(view->colors.selection_boundary);
-		c->set_line_width(2.0f);
-		c->draw_line(view->area.x1,  y,  view->area.x2,  y);
-		c->set_line_width(1.0f);
-
-		/*c->setColor(view->colors.selection_internal);
-		rect r = view->vtrack[orig]->area;
-		r.x2 = view->TRACK_HANDLE_WIDTH;
-		c->drawRect(r);*/
-
-		view->draw_cursor_hover(c, moving_track->nice_name());
-	}
 
 	if (view->selection_mode != view->SelectionMode::NONE){
 		if (view->sel.range.length > 0){
 			string s = view->song->get_time_str_long(view->sel.range.length);
 			if (view->sel.bars.num > 0)
-				s = format(_("%d bars"), view->sel.bars.num) + ", " + s;
+				s = format("xxx---xxx " + _("%d bars"), view->sel.bars.num) + ", " + s;
 			view->draw_cursor_hover(c, s);
 		}
 	}

@@ -26,13 +26,10 @@ bool Background::on_left_button_down() {
 	view->hover.range = Range(pos, 0);
 
 	view->mdp_prepare([=]{
-	}, [=]{
 		view->hover.range.set_end(view->get_mouse_pos_snap());
 		view->sel.range = view->hover.range;
 		view->update_selection();
 		view->select_under_cursor();
-	}, [=]{
-
 	});
 	return true;
 }

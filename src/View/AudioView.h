@@ -54,6 +54,7 @@ class TimeScale;
 class Cursor;
 class SelectionMarker;
 class MouseDelayPlanner;
+class MouseDelayAction;
 enum class MidiMode;
 
 
@@ -164,7 +165,8 @@ public:
 
 
 	MouseDelayPlanner *mdp;
-	void mdp_prepare(hui::Callback start, hui::Callback update, hui::Callback end);
+	void mdp_prepare(MouseDelayAction *action);
+	void mdp_prepare(hui::Callback update);
 
 
 	void snap_to_grid(int &pos);

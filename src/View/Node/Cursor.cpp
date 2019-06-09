@@ -43,13 +43,10 @@ bool Cursor::on_left_button_down() {
 		drag_range.invert();
 
 	view->mdp_prepare([=]{
-	}, [=]{
 		drag_range.set_end(view->get_mouse_pos_snap());
 		view->sel.range = drag_range;
 		view->update_selection();
 		view->select_under_cursor();
-	}, [=]{
-
 	});
 	return true;
 }

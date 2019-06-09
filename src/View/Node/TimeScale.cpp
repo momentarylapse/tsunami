@@ -11,6 +11,8 @@
 #include "../../Module/Audio/SongRenderer.h"
 
 
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
+
 
 
 TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
@@ -89,12 +91,7 @@ bool TimeScale::on_left_button_down() {
 	view->set_cursor_pos(pos);
 	view->hover.range = Range(pos, 0);
 
-	view->mdp_prepare([=]{
-		view->hover.range.set_end(view->get_mouse_pos_snap());
-		view->sel.range = view->hover.range;
-		view->update_selection();
-		view->select_under_cursor();
-	});
+	view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
 	return true;
 }
 

@@ -538,28 +538,7 @@ void AudioViewLayer::update_header() {
 bool AudioViewLayer::on_left_button_down() {
 	view->sel_temp = view->sel; // for diff selection
 
-
-	if (view->select_xor) {
-		// differential selection
-
-		if (view->hover_any_object()) {
-			view->mode->left_click_handle_object_xor(this);
-		} else {
-			view->mode->left_click_handle_xor(this);
-		}
-	} else {
-		// normal click
-
-		if (view->hover_any_object()) {
-			view->mode->left_click_handle_object(this);
-		} else {
-			view->mode->left_click_handle(this);
-		}
-	}
-	return true;
-}
-
-bool AudioViewLayer::on_left_button_up() {
+	view->mode->left_click_handle(this);
 	return true;
 }
 
@@ -592,11 +571,6 @@ bool AudioViewLayer::on_right_button_down() {
 	} else { // void
 		view->open_popup(view->menu_track);
 	}
-	return true;
-}
-
-bool AudioViewLayer::on_mouse_move() {
-	//view->mode->on_mouse_move();
 	return true;
 }
 

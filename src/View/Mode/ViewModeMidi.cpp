@@ -313,7 +313,7 @@ public:
 		vlayer = l;
 		view = vlayer->view;
 		pitch = _pitch;
-		pos0 = vlayer->view->hover.pos_snap;
+		pos0 = vlayer->view->hover.pos;
 	}
 	void on_start() override {
 		view->mode_midi->start_midi_preview(pitch, 1.0f);
@@ -348,10 +348,9 @@ public:
 		// current creation
 		auto notes = get_creation_notes();
 		mp->draw(c, notes);
-			//c->setFontSize(view->FONT_SIZE);
 	}
 	MidiNoteBuffer get_creation_notes() {
-		Range r = RangeTo(pos0, view->get_mouse_pos_snap());
+		Range r = RangeTo(pos0, view->get_mouse_pos());
 		r = r.canonical();
 
 		// align to beats
@@ -405,7 +404,7 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 	if (creation_mode == CreationMode::SELECT ) {
 		view->set_cursor_pos(hover->pos_snap);
 		select_in_edit_cursor();
-		start_selection_rect(vlayer, SelectionMode::RECT);
+		start_selection_rect(SelectionMode::RECT);
 
 	} else {
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {

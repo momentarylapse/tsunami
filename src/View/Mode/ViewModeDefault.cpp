@@ -40,12 +40,10 @@ Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);
 
 class MouseDelaySelect : public MouseDelayAction {
 public:
-	AudioViewLayer *layer;
 	AudioView *view;
 	SelectionMode mode;
-	MouseDelaySelect(AudioViewLayer *l, SelectionMode _mode) {
-		layer = l;
-		view = layer->view;
+	MouseDelaySelect(AudioView *v, SelectionMode _mode) {
+		view = v;
 		mode = _mode;
 	}
 	void on_start() override {
@@ -135,8 +133,8 @@ public:
 MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s) {
 	return new MouseDelayObjectsDnD(l, s);
 }
-MouseDelayAction* CreateMouseDelaySelect(AudioViewLayer *l, SelectionMode mode) {
-	return new MouseDelaySelect(l, mode);
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode) {
+	return new MouseDelaySelect(v, mode);
 }
 
 
@@ -152,23 +150,45 @@ ViewModeDefault::~ViewModeDefault() {
 
 void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
-	if (view->is_playback_active()) {
-		if (view->renderer->range().is_inside(hover->pos)) {
-			session->signal_chain->set_pos(hover->pos);
-			hover->type = HoverData::Type::PLAYBACK_CURSOR;
-			view->force_redraw();
-			return;
+
+	if (view->select_xor) {
+		// differential selection
+
+		if (view->hover_any_object()) {
+			left_click_handle_object_xor(vlayer);
 		} else {
-			view->stop();
+			left_click_handle_void_xor(vlayer);
 		}
 	} else {
-		// "void"
-		left_click_handle_void(vlayer);
+		// normal click
+
+
+		if (view->is_playback_active()) {
+			if (view->renderer->range().is_inside(hover->pos)) {
+				session->signal_chain->set_pos(hover->pos);
+				hover->type = HoverData::Type::PLAYBACK_CURSOR;
+				view->force_redraw();
+				return;
+			} else {
+				view->stop();
+			}
+		} else {
+
+
+			// really normal click
+
+			if (view->hover_any_object()) {
+				left_click_handle_object(vlayer);
+			} else {
+				left_click_handle_void(vlayer);
+			}
+		}
+
 	}
 }
 
-void ViewModeDefault::start_selection_rect(AudioViewLayer *vlayer, SelectionMode mode) {
-	view->mdp_prepare(CreateMouseDelaySelect(vlayer, mode));
+void ViewModeDefault::start_selection_rect(SelectionMode mode) {
+	view->mdp_prepare(CreateMouseDelaySelect(view, mode));
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
@@ -182,7 +202,7 @@ void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
 	view->exclusively_select_layer(vlayer);
 	view->select_under_cursor();
 
-	start_selection_rect(vlayer, SelectionMode::TRACK_RECT);
+	start_selection_rect(SelectionMode::TRACK_RECT);
 }
 
 void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer) {
@@ -196,22 +216,17 @@ void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer) {
 		//}
 }
 
-void ViewModeDefault::left_click_handle_xor(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle_void_xor(AudioViewLayer *vlayer) {
 	view->toggle_select_layer_with_content_in_cursor(vlayer);
 
 	// diff selection rectangle
-	start_selection_rect(vlayer, SelectionMode::TRACK_RECT);
+	start_selection_rect(SelectionMode::TRACK_RECT);
 }
 
 void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
 	view->toggle_object();
 }
 
-void ViewModeDefault::on_left_button_down() {
-}
-
-void ViewModeDefault::on_left_button_up() {
-}
 
 int hover_buffer(HoverData *hover)
 {

@@ -69,9 +69,9 @@ public:
 
 	virtual void left_click_handle(AudioViewLayer *vlayer) {}
 	virtual void left_click_handle_object(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_void(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_xor(AudioViewLayer *vlayer) {}
 	virtual void left_click_handle_object_xor(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_void(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_void_xor(AudioViewLayer *vlayer) {}
 
 	AudioView *view;
 	Session *session;

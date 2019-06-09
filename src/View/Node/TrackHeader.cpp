@@ -162,7 +162,7 @@ class MouseDelayDndTrack : public MouseDelayAction {
 public:
 	AudioViewTrack *track;
 	MouseDelayDndTrack(AudioViewTrack *t) { track = t; }
-	void on_draw_post(Painter *c) {
+	void on_draw_post(Painter *c) override {
 		auto *view = track->view;
 		//int orig = get_track_index(moving_track);
 		int t = get_track_move_target(true);
@@ -182,7 +182,7 @@ public:
 
 		view->draw_cursor_hover(c, track->track->nice_name());
 	}
-	void on_end() {
+	void on_finish() override {
 		int target = get_track_move_target(false);
 		track->track->move(target);
 	}

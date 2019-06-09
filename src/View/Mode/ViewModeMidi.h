@@ -130,7 +130,6 @@ public:
 	int rep_key;
 	int rep_key_num;
 
-	//void left_click_handle(AudioViewLayer *vlayer) override;
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
 };
 

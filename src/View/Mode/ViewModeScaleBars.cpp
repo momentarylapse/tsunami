@@ -68,6 +68,8 @@ void ViewModeScaleBars::on_key_down(int k)
 {
 	if (k == hui::KEY_ESCAPE)
 		session->set_mode("default");
+	if (k == hui::KEY_RETURN)
+		perform_scale();
 }
 
 void ViewModeScaleBars::perform_scale()

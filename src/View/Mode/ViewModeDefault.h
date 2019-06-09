@@ -20,8 +20,6 @@ public:
 	ViewModeDefault(AudioView *view);
 	virtual ~ViewModeDefault();
 
-	void on_left_button_down() override;
-	void on_left_button_up() override;
 	void on_left_double_click() override;
 	void on_right_button_down() override;
 	void on_mouse_wheel() override;
@@ -47,11 +45,11 @@ public:
 
 	void left_click_handle(AudioViewLayer *vlayer) override;
 	void left_click_handle_object(AudioViewLayer *vlayer) override;
-	void left_click_handle_void(AudioViewLayer *vlayer) override;
-	void left_click_handle_xor(AudioViewLayer *vlayer) override;
 	void left_click_handle_object_xor(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_void_xor(AudioViewLayer *vlayer) override;
 
-	void start_selection_rect(AudioViewLayer *vlayer, SelectionMode mode);
+	void start_selection_rect(SelectionMode mode);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

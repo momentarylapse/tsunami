@@ -52,6 +52,6 @@ class AudioViewLayer;
 enum class SelectionMode;
 
 MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s);
-MouseDelayAction* CreateMouseDelaySelect(AudioViewLayer *l, SelectionMode mode);
+MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 #endif /* SRC_VIEW_MOUSEDELAYPLANNER_H_ */

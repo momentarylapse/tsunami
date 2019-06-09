@@ -52,6 +52,7 @@ class SceneGraph;
 class ViewNode;
 class TimeScale;
 class Cursor;
+class SelectionMarker;
 enum class MidiMode;
 
 
@@ -175,19 +176,6 @@ public:
 	int mx, my;
 	bool select_xor = false;
 
-	struct MouseDelayPlanner {
-		float dist = -1;
-		int pos0 = 0;
-		float x0 = 0, y0 = 0;
-		int min_move_to_start;
-		AudioView *view;
-		hui::Callback cb_start, cb_update, cb_end;
-		void prepare(hui::Callback cb_start, hui::Callback cb_update, hui::Callback cb_end);
-		void update();
-		bool active();
-		void stop();
-	} mdp;
-
 	void select_none();
 	void select_all();
 	void select_expand();
@@ -273,7 +261,8 @@ public:
 	ScrollBar *scroll;
 	TimeScale *time_scale;
 	ViewNode *background;
-	Cursor *cursor;
+	Cursor *cursor_start, *cursor_end;
+	SelectionMarker *selection_marker;
 
 
 	MidiPainter *midi_painter;

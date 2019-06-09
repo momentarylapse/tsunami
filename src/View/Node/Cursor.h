@@ -13,18 +13,26 @@
 
 class Cursor : public ViewNode {
 public:
-	Cursor(AudioView *view);
+	Cursor(AudioView *view, bool end);
 
 	void draw(Painter *p) override;
 	bool hover() override;
 	string get_tip() override;
 
-	bool hover_start();
-	bool hover_end();
+	int pos();
 
 	Range drag_range;
+	int is_end;
 
 	bool on_left_button_down() override;
+};
+
+class SelectionMarker : public ViewNode {
+public:
+	SelectionMarker(AudioView *view);
+	bool hover() override { return false; }
+
+	void draw(Painter *p) override;
 };
 
 #endif /* SRC_VIEW_NODE_CURSOR_H_ */

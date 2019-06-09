@@ -8,8 +8,39 @@
 #include "SceneGraph.h"
 
 #include "../HoverData.h"
+#include "../AudioView.h"
+#include "../ViewPort.h"
 
 
+
+void SceneGraph::MouseDelayPlanner::prepare(hui::Callback _a, hui::Callback _b, hui::Callback _c) {
+	dist = 0;
+	pos0 = view->cam.screen2sample(view->mx);
+	x0 = view->mx;
+	y0 = view->my;
+	cb_start = _a;
+	cb_update = _b;
+	cb_end = _c;
+}
+
+void SceneGraph::MouseDelayPlanner::update() {
+	if (active()) {
+		cb_update();
+	} else if (dist >= 0) {
+		auto e = hui::GetEvent();
+		dist += fabs(e->dx) + fabs(e->dy);
+	}
+}
+
+bool SceneGraph::MouseDelayPlanner::active() {
+	return dist > min_move_to_start;
+}
+
+void SceneGraph::MouseDelayPlanner::stop() {
+	if (active())
+		cb_end();
+	dist = -1;
+}
 
 Array<ViewNode*> collect_children(ViewNode *n) {
 	Array<ViewNode*> nodes;
@@ -40,36 +71,35 @@ Array<ViewNode*> collect_children_down(ViewNode *n) {
 }
 
 
-SceneGraph::SceneGraph(AudioView *view) : ViewNode(view) {}
+SceneGraph::SceneGraph(AudioView *view) : ViewNode(view) {
+	mdp.view = view;
+	mdp.min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
+	hui::Config.set_int("View.MouseMinMoveToSelect", mdp.min_move_to_start);
+}
 
 bool SceneGraph::on_left_button_down() {
+	hover_node = get_hover();
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover()) {
-			if (c->on_left_button_down()) {
-				mouse_owner = c;
+		if (c->hover())
+			if (c->on_left_button_down())
 				return true;
-			}
-		}
 	return false;
 }
 
 bool SceneGraph::on_left_button_up() {
-	if (mouse_owner) {
-		bool r = mouse_owner->on_left_button_up();
-		mouse_owner = nullptr;
-		return r;
-	} else {
-		auto nodes = collect_children_down(this);
-		for (auto *c: nodes)
-			if (c->hover())
-				if (c->on_left_button_up())
-					return true;
-	}
+	mdp.stop();
+	hover_node = get_hover();
+	auto nodes = collect_children_down(this);
+	for (auto *c: nodes)
+		if (c->hover())
+			if (c->on_left_button_up())
+				return true;
 	return false;
 }
 
 bool SceneGraph::on_right_button_down() {
+	hover_node = get_hover();
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
 		if (c->hover())
@@ -79,9 +109,11 @@ bool SceneGraph::on_right_button_down() {
 }
 
 bool SceneGraph::on_mouse_move() {
-	if (mouse_owner) {
-		return mouse_owner->on_mouse_move();
+	mdp.update();
+	if (mdp.active()) {
+		return true;
 	} else {
+		hover_node = get_hover();
 		auto nodes = collect_children_down(this);
 		for (auto *c: nodes)
 			if (c->hover())
@@ -102,11 +134,13 @@ ViewNode *SceneGraph::get_hover() {
 }
 
 string SceneGraph::get_tip() {
-	auto nodes = collect_children_down(this);
+	/*auto nodes = collect_children_down(this);
 
 	for (auto *c: nodes)
 		if (c->hover())
-			return c->get_tip();
+			return c->get_tip();*/
+	if (hover_node)
+		return hover_node->get_tip();
 	return "";
 }
 

@@ -116,35 +116,6 @@ void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, co
 
 
 
-void AudioView::MouseDelayPlanner::prepare(hui::Callback _a, hui::Callback _b, hui::Callback _c) {
-	dist = 0;
-	pos0 = view->cam.screen2sample(view->mx);
-	x0 = view->mx;
-	y0 = view->my;
-	cb_start = _a;
-	cb_update = _b;
-	cb_end = _c;
-}
-
-void AudioView::MouseDelayPlanner::update() {
-	if (active()) {
-		cb_update();
-	} else if (dist >= 0) {
-		auto e = hui::GetEvent();
-		dist += fabs(e->dx) + fabs(e->dy);
-	}
-}
-
-bool AudioView::MouseDelayPlanner::active() {
-	return dist > min_move_to_start;
-}
-
-void AudioView::MouseDelayPlanner::stop() {
-	if (active())
-		cb_end();
-	dist = -1;
-}
-
 AudioView::AudioView(Session *_session, const string &_id) :
 	cam(this)
 {
@@ -189,8 +160,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	hide_selection = false;
 	song->subscribe(this, [=]{ on_song_update(); });
 
-	mdp.view = this;
-
 	// modes
 	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
@@ -209,7 +178,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	time_scale = new TimeScale(this);
 
 	background = new Background(this);
-	cursor = new Cursor(this);
+	cursor_start = new Cursor(this, false);
+	cursor_end = new Cursor(this, true);
+	selection_marker = new SelectionMarker(this);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -219,7 +190,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	grid_painter = new GridPainter(this);
 	midi_painter = new MidiPainter(this);
 
-	mdp.min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
@@ -227,7 +197,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	set_mouse_wheel_speed(hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
 	set_antialiasing(hui::Config.get_bool("View.Antialiasing", true));
 	set_high_details(hui::Config.get_bool("View.HighDetails", true));
-	hui::Config.set_int("View.MouseMinMoveToSelect", mdp.min_move_to_start);
 	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
 	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
@@ -520,9 +489,7 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	mdp.update();
-	if (!mdp.active())
-		scene_graph->on_mouse_move();
+	scene_graph->on_mouse_move();
 
 /*
 	if (selection_mode != SelectionMode::NONE) {
@@ -577,8 +544,6 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 void AudioView::on_left_button_up() {
 	scene_graph->on_left_button_up();
-	if (mdp.active())
-		mdp.stop();
 
 	force_redraw();
 	update_menu();
@@ -914,7 +879,9 @@ void AudioView::rebuild_scene_graph() {
 	scene_graph->children.add(metronome_overlay_vlayer);
 	scene_graph->children.add(scroll);
 	scene_graph->children.add(time_scale);
-	scene_graph->children.add(cursor);
+	scene_graph->children.add(cursor_start);
+	scene_graph->children.add(cursor_end);
+	scene_graph->children.add(selection_marker);
 }
 
 bool need_metro_overlay(Song *song, AudioView *view) {

@@ -6,6 +6,7 @@
  */
 
 #include "TimeScale.h"
+#include "SceneGraph.h"
 #include "../AudioView.h"
 #include "../ViewPort.h"
 #include "../Painter/GridPainter.h"
@@ -82,13 +83,24 @@ string TimeScale::get_tip() {
 		return _("looping");
 	if (hover_playback())
 		return _("playback range");
-	return "time?";
+	return "";
 }
 
 bool TimeScale::on_left_button_down() {
-	view->snap_to_grid(view->hover.pos);
-	view->set_cursor_pos(view->hover.pos);
-//	view->msp.start(view->hover.pos, view->hover.y0);
+	int pos = view->cam.screen2sample(view->mx);
+	view->snap_to_grid(pos);
+	view->set_cursor_pos(pos);
+	view->hover.range = Range(pos, 0);
+
+	view->scene_graph->mdp.prepare([=]{
+	}, [=]{
+		view->hover.range.set_end(view->cam.screen2sample(view->mx));
+		view->sel.range = view->hover.range;
+		view->update_selection();
+		view->select_under_cursor();
+	}, [=]{
+
+	});
 	return true;
 }
 

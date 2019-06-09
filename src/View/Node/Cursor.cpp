@@ -7,18 +7,60 @@
 
 #include "Cursor.h"
 #include "../AudioView.h"
+#include "SceneGraph.h"
 
 
-Cursor::Cursor(AudioView* view) : ViewNode(view) {
+Cursor::Cursor(AudioView* view, bool end) : ViewNode(view) {
 	z = 50;
+	is_end = end;
 	drag_range = Range::EMPTY;
 }
 
 void Cursor::draw(Painter* c) {
-	// time selection
-	view->draw_time_line(c, view->sel.range.start(), view->colors.selection_boundary, hover_start(), false, true);
-	view->draw_time_line(c, view->sel.range.end(), view->colors.selection_boundary, hover_end(), false, true);
+	view->draw_time_line(c, pos(), view->colors.selection_boundary, hover(), false, true);
+}
 
+int Cursor::pos() {
+	if (is_end)
+		return view->sel.range.end();
+	else
+		return view->sel.range.start();
+}
+
+bool Cursor::hover() {
+	if (view->my < view->area.y2 - 20)
+		return false;
+	float x = view->cam.sample2screen(pos());
+	return (fabs(x - view->mx) < 10);
+}
+
+string Cursor::get_tip() {
+	return _("cursor");
+}
+
+bool Cursor::on_left_button_down() {
+	drag_range = view->sel.range;
+	if (!is_end)
+		drag_range.invert();
+
+	view->scene_graph->mdp.prepare([=]{
+	}, [=]{
+		drag_range.set_end(view->cam.screen2sample(view->mx));
+		view->sel.range = drag_range;
+		view->update_selection();
+		view->select_under_cursor();
+	}, [=]{
+
+	});
+	return true;
+}
+
+
+SelectionMarker::SelectionMarker(AudioView* view) : ViewNode(view) {
+	z = 49;
+}
+
+void SelectionMarker::draw(Painter* p) {
 	float x1, x2;
 	view->cam.range2screen_clip(view->sel.range, view->song_area, x1, x2);
 
@@ -33,11 +75,11 @@ void Cursor::draw(Painter* c) {
 		}else if (view->selection_mode == view->SelectionMode::RECT){
 			float x1, x2;
 			view->cam.range2screen_clip(view->hover.range, view->clip, x1, x2);
-			c->set_color(view->colors.selection_internal);
-			c->set_fill(false);
-			c->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
-			c->set_fill(true);
-			c->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
+			p->set_color(view->colors.selection_internal);
+			p->set_fill(false);
+			p->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
+			p->set_fill(true);
+			p->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
 		}
 	}
 
@@ -69,43 +111,4 @@ void Cursor::draw(Painter* c) {
 		}
 		c->set_line_width(1.0f);
 	}*/
-}
-
-bool Cursor::hover_start() {
-	if (view->my < view->area.y2 - 20)
-		return false;
-	float x = view->cam.sample2screen(view->sel.range.start());
-	return (fabs(x - view->mx) < 10);
-}
-
-bool Cursor::hover_end() {
-	if (view->my < view->area.y2 - 20)
-		return false;
-	float x = view->cam.sample2screen(view->sel.range.end());
-	return (fabs(x - view->mx) < 10);
-}
-
-bool Cursor::hover() {
-	return hover_start() or hover_end();
-}
-
-string Cursor::get_tip() {
-	return "cursor";
-}
-
-bool Cursor::on_left_button_down() {
-	drag_range = view->sel.range;
-	if (hover_start())
-		drag_range.invert();
-
-	view->mdp.prepare([=]{
-	}, [=]{
-		drag_range.set_end(view->cam.screen2sample(view->mx));
-		view->sel.range = drag_range;
-		view->update_selection();
-		view->select_under_cursor();
-	}, [=]{
-
-	});
-	return true;
 }

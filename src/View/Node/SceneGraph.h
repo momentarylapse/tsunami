@@ -25,7 +25,22 @@ public:
 
 	string get_tip() override;
 
-	ViewNode *mouse_owner = nullptr;
+	ViewNode *hover_node = nullptr;
+	//ViewNode *mouse_owner = nullptr;
+
+
+	struct MouseDelayPlanner {
+		float dist = -1;
+		int pos0 = 0;
+		float x0 = 0, y0 = 0;
+		int min_move_to_start;
+		AudioView *view;
+		hui::Callback cb_start, cb_update, cb_end;
+		void prepare(hui::Callback cb_start, hui::Callback cb_update, hui::Callback cb_end);
+		void update();
+		bool active();
+		void stop();
+	} mdp;
 };
 
 #endif /* SRC_VIEW_NODE_SCENEGRAPH_H_ */

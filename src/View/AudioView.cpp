@@ -174,13 +174,15 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	area = rect(0, 1024, 0, 768);
 	song_area = area;
 	enabled = true;
-	scroll = new ScrollBar(this, [=]{ thm.update_immediately(this, song, song_area); });
 	time_scale = new TimeScale(this);
 
 	background = new Background(this);
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
+	scroll = new ScrollBar(scene_graph);//background);
+	scroll->set_callback([=]{ thm.update_immediately(this, song, song_area); });
+	//background->children.add(background);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -884,6 +886,7 @@ void AudioView::update_tracks()
 void AudioView::rebuild_scene_graph() {
 	scene_graph->children.clear();
 	scene_graph->children.add(background);
+	scene_graph->children.add(scroll);
 
 	for (auto *v: vlayer)
 		scene_graph->children.add(v);
@@ -891,7 +894,6 @@ void AudioView::rebuild_scene_graph() {
 		scene_graph->children.add(v);
 
 	scene_graph->children.add(metronome_overlay_vlayer);
-	scene_graph->children.add(scroll);
 	scene_graph->children.add(time_scale);
 	scene_graph->children.add(cursor_start);
 	scene_graph->children.add(cursor_end);
@@ -911,13 +913,17 @@ bool need_metro_overlay(Song *song, AudioView *view) {
 bool AudioView::update_scene_graph() {
 	scene_graph->area = area;
 
+	background->area = area;
+
 	song_area = area;
 	song_area.y1 += TIME_SCALE_HEIGHT;
 	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
 	if (scroll_bar_needed)
 		song_area.x1 += SCROLLBAR_WIDTH;
 	scroll->hidden = !scroll_bar_needed;
-	scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
+	scroll->align.dy = song_area.y1;
+	scroll->align.h = song_area.height();
+	//scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
 	bool animating = thm.update(this, song, song_area);
 
 	for (auto *v: vlayer) {
@@ -1383,13 +1389,13 @@ void AudioView::select_under_cursor() {
 bool AudioView::hover_any_object() {
 	if (hover.type == HoverData::Type::BAR_GAP)
 		return true;
-	if (hover.type == HoverData::Type::BAR)
+	if (hover.bar)
 		return true;
-	if (hover.type == HoverData::Type::MARKER)
+	if (hover.marker)
 		return true;
-	if (hover.type == HoverData::Type::SAMPLE)
+	if (hover.sample)
 		return true;
-	if (hover.type == HoverData::Type::MIDI_NOTE)
+	if (hover.note)
 		return true;
 	return false;
 }
@@ -1397,13 +1403,13 @@ bool AudioView::hover_any_object() {
 bool AudioView::hover_selected_object() {
 	if (hover.type == HoverData::Type::BAR_GAP)
 		return sel.bar_gap == hover.index;
-	if (hover.type == HoverData::Type::BAR)
+	if (hover.bar)
 		return sel.has(hover.bar);
-	if (hover.type == HoverData::Type::MARKER)
+	if (hover.marker)
 		return sel.has(hover.marker);
-	if (hover.type == HoverData::Type::SAMPLE)
+	if (hover.sample)
 		return sel.has(hover.sample);
-	if (hover.type == HoverData::Type::MIDI_NOTE)
+	if (hover.note)
 		return sel.has(hover.note);
 	return false;
 }
@@ -1411,13 +1417,13 @@ bool AudioView::hover_selected_object() {
 void AudioView::select_object() {
 	if (hover.type == HoverData::Type::BAR_GAP) {
 		sel.bar_gap = hover.index;
-	} else if (hover.type == HoverData::Type::BAR) {
+	} else if (hover.bar) {
 		sel.add(hover.bar);
-	} else if (hover.type == HoverData::Type::MARKER) {
+	} else if (hover.marker) {
 		sel.add(hover.marker);
-	} else if (hover.type == HoverData::Type::SAMPLE) {
+	} else if (hover.sample) {
 		sel.add(hover.sample);
-	} else if (hover.type == HoverData::Type::MIDI_NOTE) {
+	} else if (hover.note) {
 		sel.add(hover.note);
 	}
 	set_cur_sample(hover.sample);
@@ -1426,13 +1432,13 @@ void AudioView::select_object() {
 void AudioView::toggle_object() {
 	if (hover.type == HoverData::Type::BAR_GAP) {
 		sel.bar_gap = hover.index;
-	} else if (hover.type == HoverData::Type::BAR) {
+	} else if (hover.bar) {
 		sel.toggle(hover.bar);
-	} else if (hover.type == HoverData::Type::MARKER) {
+	} else if (hover.marker) {
 		sel.toggle(hover.marker);
-	} else if (hover.type == HoverData::Type::SAMPLE) {
+	} else if (hover.sample) {
 		sel.toggle(hover.sample);
-	} else if (hover.type == HoverData::Type::MIDI_NOTE) {
+	} else if (hover.note) {
 		sel.toggle(hover.note);
 	}
 	set_cur_sample(hover.sample);
@@ -1529,6 +1535,11 @@ void AudioView::open_popup(hui::Menu* menu) {
 
 void AudioView::mdp_prepare(MouseDelayAction *a) {
 	mdp->prepare(a);
+}
+
+void AudioView::mdp_run(MouseDelayAction *a) {
+	mdp->prepare(a);
+	mdp->start_acting();
 }
 
 class MouseDelayActionWrapper : public MouseDelayAction {

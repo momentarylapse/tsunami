@@ -29,6 +29,7 @@ enum class NoteModifier;
 enum class MidiMode;
 class MidiKeyChange;
 class LayerHeader;
+class ScrollBar;
 
 
 class AudioViewLayer : public ViewNode
@@ -44,6 +45,7 @@ public:
 
 	string get_tip() override;
 	HoverData get_hover_data() override;
+	HoverData get_hover_data_default();
 
 	void on_track_change();
 
@@ -97,6 +99,8 @@ public:
 
 	LayerHeader *header;
 	void update_header();
+
+	ScrollBar *scroll_bar;
 };
 
 #endif /* SRC_VIEW_NODE_AUDIOVIEWLAYER_H_ */

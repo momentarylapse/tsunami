@@ -33,10 +33,12 @@ public:
 	int pos0 = 0;
 	float x0 = 0, y0 = 0;
 	int min_move_to_start;
+	bool _started_acting = false;
 	AudioView *view;
 	typedef std::function<void()> Callback;
 	MouseDelayAction *action = nullptr;
 	void prepare(MouseDelayAction *action);
+	void start_acting();
 	bool update();
 	bool has_focus();
 	bool acting();
@@ -44,5 +46,12 @@ public:
 	void cancel();
 	void draw_post(Painter *p);
 };
+
+class SongSelection;
+class AudioViewLayer;
+enum class SelectionMode;
+
+MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s);
+MouseDelayAction* CreateMouseDelaySelect(AudioViewLayer *l, SelectionMode mode);
 
 #endif /* SRC_VIEW_MOUSEDELAYPLANNER_H_ */

@@ -101,9 +101,9 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t)
 	}
 }
 
-HoverData ViewModeCurve::get_hover()
+HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer)
 {
-	HoverData s = ViewModeDefault::get_hover();
+	HoverData s = ViewModeDefault::get_hover_data(vlayer);
 	int mx = view->mx;
 	int my = view->my;
 

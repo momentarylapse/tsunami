@@ -39,7 +39,6 @@ public:
 	void on_start() override;
 	void on_end() override;
 
-	HoverData get_hover() override;
 	void on_left_button_down() override {}
 	void on_left_double_click() override {}
 

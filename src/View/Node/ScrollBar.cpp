@@ -8,29 +8,28 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
-//ScrollBar::ScrollBar(ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {}
-ScrollBar::ScrollBar(AudioView *view, std::function<void()> cb) : ViewNode(view) {
-	node_width = AudioView::SCROLLBAR_WIDTH;
-	node_height = 100;
-	z = 20;
-	callback = cb;
+ScrollBar::ScrollBar(ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
+//ScrollBar::ScrollBar(AudioView *view) : ViewNode(view) {
+	//node_width = AudioView::SCROLLBAR_WIDTH;
+	//node_height = 100;
+	//node_align_right = true;
+	z += 10;
 }
 
-void ScrollBar::drag_start(float mx, float my) {
-	mouse_offset = (my - area.y1) * content_size / area.height() - offset;
-	scrolling = true;
+void ScrollBar::set_callback(std::function<void()> cb) {
+	callback = cb;
 }
 
 void ScrollBar::drag_update(float mx, float my) {
 	offset = (my - area.y1) * content_size / area.height() - mouse_offset;
 	offset = max(min(offset, content_size - page_size), 0.0f);
-	callback();
+	if (callback)
+		callback();
 }
 
 void ScrollBar::draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
-	// FIXME ...
 	bool _hover = view_hover();
 	c->set_color(_hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
 	float d = 5;
@@ -53,17 +52,9 @@ void ScrollBar::update(float page, float content) {
 }
 
 bool ScrollBar::on_left_button_down() {
-	drag_start(view->mx, view->my);
-	return true;
-}
-
-bool ScrollBar::on_left_button_up() {
-	scrolling = false;
-	return true;
-}
-
-bool ScrollBar::on_mouse_move() {
-	if (scrolling)
+	mouse_offset = (view->my - area.y1) * content_size / area.height() - offset;
+	view->mdp_prepare([=]{
 		drag_update(view->mx, view->my);
-	return scrolling;
+	});
+	return true;
 }

@@ -35,9 +35,7 @@ public:
 	void on_start() override;
 	void on_end() override;
 
-	//void on_left_button_down() override;
 	void on_left_button_up() override;
-	void on_mouse_move() override;
 	void on_key_down(int k) override;
 	float layer_min_height(AudioViewLayer *l) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
@@ -46,7 +44,7 @@ public:
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 	void draw_post(Painter *c) override;
 
-	HoverData get_hover() override;
+	HoverData get_hover_data(AudioViewLayer *vlayer) override;
 	void start_selection() override;
 	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;
 	SongSelection get_selection_for_range(const Range &r) override;
@@ -121,8 +119,6 @@ public:
 	TrackLayer *cur_layer();
 	bool editing(AudioViewLayer *l);
 
-	ScrollBar *scroll;
-
 	bool moving;
 	Array<int> pre_moving_offsets;
 	int mouse_pre_moving_pos;
@@ -134,10 +130,8 @@ public:
 	int rep_key;
 	int rep_key_num;
 
-	bool left_click_handle_special() override;
-	//void left_click_handle() override;
-	void left_click_handle_void() override;
-	void left_click_handle_xor() override;
+	//void left_click_handle(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer) override;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

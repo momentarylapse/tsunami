@@ -42,14 +42,16 @@ public:
 
 	void select_hover();
 	void set_cursor_pos(int pos, bool keep_track_selection);
-	HoverData get_hover() override;
-	HoverData get_hover_basic(bool editable);
+	HoverData get_hover_data(AudioViewLayer *vlayer) override;
 
 
-	virtual bool left_click_handle_special();
-	virtual void left_click_handle();
-	virtual void left_click_handle_void();
-	virtual void left_click_handle_xor();
+	void left_click_handle(AudioViewLayer *vlayer) override;
+	void left_click_handle_object(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_xor(AudioViewLayer *vlayer) override;
+	void left_click_handle_object_xor(AudioViewLayer *vlayer) override;
+
+	void start_selection_rect(AudioViewLayer *vlayer, SelectionMode mode);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

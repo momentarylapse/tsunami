@@ -39,10 +39,12 @@ public:
 
 	AudioView *view;
 	ViewNode *parent;
-	bool node_align_right;
-	bool node_align_bottom;
-	float node_offset_x, node_offset_y;
-	float node_width, node_height;
+	struct AlignData {
+		bool align_right;
+		bool align_bottom;
+		float dx, dy;
+		float w, h;
+	} align;
 	Array<ViewNode*> children;
 	rect area;
 	int z;

@@ -11,6 +11,7 @@
 #include "../../Stuff/Observable.h"
 
 enum class MidiMode;
+enum class SelectionMode;
 class AudioView;
 class AudioViewTrack;
 class AudioViewLayer;
@@ -49,7 +50,7 @@ public:
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change(){}
 
-	virtual HoverData get_hover();
+	virtual HoverData get_hover_data(AudioViewLayer *vlayer);
 
 	virtual void draw_track_background(Painter *c, AudioViewTrack *t){}
 	virtual void draw_layer_background(Painter *c, AudioViewLayer *l){}
@@ -58,13 +59,19 @@ public:
 
 	virtual MidiMode which_midi_mode(Track *t) = 0;
 
-	SongSelection get_selection(const Range &r);
+	SongSelection get_selection(const Range &r, SelectionMode mode);
 	virtual SongSelection get_selection_for_range(const Range &r);
 	virtual SongSelection get_selection_for_rect(const Range &r, int y0, int y1);
 	virtual SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1);
 	virtual void start_selection(){}
 
 	virtual Set<Track*> prevent_playback(){ return {}; }
+
+	virtual void left_click_handle(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_object(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_void(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_xor(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle_object_xor(AudioViewLayer *vlayer) {}
 
 	AudioView *view;
 	Session *session;

@@ -14,14 +14,14 @@
 
 
 TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
-	node_width = 100;
-	node_height = AudioView::TIME_SCALE_HEIGHT;
+	align.w = 100;
+	align.h = AudioView::TIME_SCALE_HEIGHT;
 	z = 20;
 }
 
 void TimeScale::draw(Painter* c) {
 	area = view->area;
-	area.y2 = node_height;
+	area.y2 = align.h;
 
 	GridColors g;
 	g.bg = view->colors.background_track;

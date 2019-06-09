@@ -105,11 +105,7 @@ void SceneGraph::draw(Painter *p) {
 		return;
 
 	update_area();
-	/*draw(p);
 
-	// recursion
-	for (auto *c: children)
-		c->draw(p);*/
 	auto nodes = collect_children_up(this);
 	for (auto *n: nodes) {
 		n->update_area();

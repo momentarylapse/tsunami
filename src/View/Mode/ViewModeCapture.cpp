@@ -55,11 +55,6 @@ void ViewModeCapture::on_end()
 {
 }
 
-HoverData ViewModeCapture::get_hover()
-{
-	return get_hover_basic(false);
-}
-
 void ViewModeCapture::draw_post(Painter *c)
 {
 	// capturing preview

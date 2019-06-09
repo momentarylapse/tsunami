@@ -64,6 +64,13 @@ enum class SelectionSnapMode {
 	PART,
 };
 
+enum class SelectionMode {
+	NONE,
+	TIME,
+	RECT,
+	TRACK_RECT,
+	FAKE,
+};
 
 class AudioView : public Observable<VirtualBase>
 {
@@ -151,13 +158,6 @@ public:
 	int get_mouse_pos();
 	int get_mouse_pos_snap();
 
-	enum class SelectionMode {
-		NONE,
-		TIME,
-		RECT,
-		TRACK_RECT,
-		FAKE,
-	};
 	SelectionMode selection_mode;
 	SelectionSnapMode selection_snap_mode;
 	void set_selection_snap_mode(SelectionSnapMode mode);
@@ -166,6 +166,7 @@ public:
 
 	MouseDelayPlanner *mdp;
 	void mdp_prepare(MouseDelayAction *action);
+	void mdp_run(MouseDelayAction *action);
 	void mdp_prepare(hui::Callback update);
 
 

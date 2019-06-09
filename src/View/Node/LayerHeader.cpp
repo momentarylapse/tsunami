@@ -91,7 +91,7 @@ public:
 
 LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNode(l, 0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	z = 10;
-	node_align_right = true;
+	align.align_right = true;
 	vlayer = l;
 	float x0 = 5;
 	float dx = 17;

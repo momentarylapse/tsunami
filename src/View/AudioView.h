@@ -53,6 +53,7 @@ class ViewNode;
 class TimeScale;
 class Cursor;
 class SelectionMarker;
+class MouseDelayPlanner;
 enum class MidiMode;
 
 
@@ -146,6 +147,8 @@ public:
 	SongSelection sel_temp;
 
 	HoverData hover_time();
+	int get_mouse_pos();
+	int get_mouse_pos_snap();
 
 	enum class SelectionMode {
 		NONE,
@@ -158,6 +161,10 @@ public:
 	SelectionSnapMode selection_snap_mode;
 	void set_selection_snap_mode(SelectionSnapMode mode);
 	bool hide_selection;
+
+
+	MouseDelayPlanner *mdp;
+	void mdp_prepare(hui::Callback start, hui::Callback update, hui::Callback end);
 
 
 	void snap_to_grid(int &pos);

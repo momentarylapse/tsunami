@@ -529,22 +529,22 @@ void AudioViewLayer::update_header() {
 }
 
 bool AudioViewLayer::on_left_button_down() {
-	view->mode->on_left_button_down();
+	//view->mode->on_left_button_down();
 	return true;
 }
 
 bool AudioViewLayer::on_left_button_up() {
-	view->mode->on_left_button_up();
+	//view->mode->on_left_button_up();
 	return true;
 }
 
 bool AudioViewLayer::on_right_button_down() {
-	view->mode->on_right_button_down();
+	//view->mode->on_right_button_down();
 	return true;
 }
 
 bool AudioViewLayer::on_mouse_move() {
-	view->mode->on_mouse_move();
+	//view->mode->on_mouse_move();
 	return true;
 }
 

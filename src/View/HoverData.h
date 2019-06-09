@@ -36,6 +36,7 @@ public:
 	TrackMarker *marker;
 	Bar *bar;
 	int pos;
+	int pos_snap;
 	Range range;
 	int y0;
 	int y1;

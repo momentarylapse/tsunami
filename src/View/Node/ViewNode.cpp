@@ -41,6 +41,23 @@ bool ViewNode::hover() {
 	return area.inside(view->mx, view->my);
 }
 
+bool ViewNode::view_hover() {
+	for (auto *c: children)
+		if (c->view_hover())
+			return true;
+	return view->hover.node == this;
+}
+
+bool ViewNode::view_hover_non_recursive() {
+	return view->hover.node == this;
+}
+
+HoverData ViewNode::get_hover_data() {
+	HoverData h = view->hover_time();
+	h.node = this;
+	return h;
+}
+
 string ViewNode::get_tip() {
 	return "";
 }

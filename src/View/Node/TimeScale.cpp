@@ -6,9 +6,7 @@
  */
 
 #include "TimeScale.h"
-#include "SceneGraph.h"
 #include "../AudioView.h"
-#include "../ViewPort.h"
 #include "../Painter/GridPainter.h"
 #include "../../Module/Audio/SongRenderer.h"
 
@@ -87,14 +85,13 @@ string TimeScale::get_tip() {
 }
 
 bool TimeScale::on_left_button_down() {
-	int pos = view->cam.screen2sample(view->mx);
-	view->snap_to_grid(pos);
+	int pos = view->hover.pos_snap;
 	view->set_cursor_pos(pos);
 	view->hover.range = Range(pos, 0);
 
-	view->scene_graph->mdp.prepare([=]{
+	view->mdp_prepare([=]{
 	}, [=]{
-		view->hover.range.set_end(view->cam.screen2sample(view->mx));
+		view->hover.range.set_end(view->get_mouse_pos_snap());
 		view->sel.range = view->hover.range;
 		view->update_selection();
 		view->select_under_cursor();
@@ -113,8 +110,7 @@ bool TimeScale::hover_loop_button() {
 }
 
 bool TimeScale::hover_playback() {
-	int pos = view->cam.screen2sample(view->mx);
-	return view->playback_wish_range.is_inside(pos);
+	return view->playback_wish_range.is_inside(view->hover.pos);
 }
 
 bool TimeScale::on_right_button_down() {

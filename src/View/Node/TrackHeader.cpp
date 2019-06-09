@@ -29,7 +29,7 @@ public:
 		vtrack = th->vtrack;
 	}
 	color get_color() {
-		if (hover())
+		if (view_hover())
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
@@ -115,7 +115,7 @@ TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK
 
 void TrackHeader::draw(Painter *c) {
 	auto *track = vtrack->track;
-	bool _hover = hover();//(view->hover.track == track) and view->hover.is_in(Selection::Type::TRACK_HEADER);
+	bool _hover = view_hover();
 	bool extended = _hover or view->editing_track(track);
 	bool playable = view->get_playable_tracks().contains(track);
 

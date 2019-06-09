@@ -26,7 +26,7 @@ public:
 		vlayer = lh->vlayer;
 	}
 	color get_color() {
-		if (hover())
+		if (view_hover())
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
@@ -103,7 +103,7 @@ LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNode(l, 0, 0, AudioView::LAYER
 void LayerHeader::draw(Painter *c) {
 
 	auto *layer = vlayer->layer;
-	bool _hover = hover();
+	bool _hover = view_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
 	bool playable = view->get_playable_layers().contains(layer);
 

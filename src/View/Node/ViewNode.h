@@ -14,6 +14,7 @@
 
 class Painter;
 class AudioView;
+class HoverData;
 
 class ViewNode : public Observable<VirtualBase> {
 public:
@@ -28,6 +29,9 @@ public:
 
 	virtual bool hover();
 	virtual void draw(Painter *p) {}
+	bool view_hover();
+	bool view_hover_non_recursive();
+	virtual HoverData get_hover_data();
 
 	virtual string get_tip();
 

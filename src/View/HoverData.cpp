@@ -49,6 +49,7 @@ void HoverData::clear()
 	bar = nullptr;
 	index = 0;
 	pos = 0;
+	pos_snap = 0;
 	range = Range::EMPTY;
 	y0 = y1 = 0;
 	pitch = -1;

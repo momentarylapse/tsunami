@@ -6,7 +6,7 @@
  */
 
 #include "AudioView.h"
-
+#include "MouseDelayPlanner.h"
 #include "Node/AudioViewTrack.h"
 #include "Node/AudioViewLayer.h"
 #include "Node/TimeScale.h"
@@ -190,6 +190,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	grid_painter = new GridPainter(this);
 	midi_painter = new MidiPainter(this);
 
+	mdp = new MouseDelayPlanner(this);
+
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
 	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
@@ -268,6 +270,8 @@ AudioView::~AudioView() {
 
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
+
+	delete mdp;
 
 	delete scroll;
 
@@ -489,7 +493,10 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	scene_graph->on_mouse_move();
+	if (!mdp->update()) {
+		hover = scene_graph->get_hover_data();
+		scene_graph->on_mouse_move();
+	}
 
 /*
 	if (selection_mode != SelectionMode::NONE) {
@@ -515,6 +522,7 @@ void AudioView::on_mouse_move() {
 void AudioView::on_left_button_down() {
 	set_mouse();
 	if (!hui::GetEvent()->just_focused) {
+		hover = scene_graph->get_hover_data();
 		scene_graph->on_left_button_down();
 	}
 
@@ -543,6 +551,8 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
+	mdp->stop();
+	hover = scene_graph->get_hover_data();
 	scene_graph->on_left_button_up();
 
 	force_redraw();
@@ -562,6 +572,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
+	hover = scene_graph->get_hover_data();
 	scene_graph->on_right_button_down();
 }
 
@@ -1007,7 +1018,9 @@ void AudioView::draw_song(Painter *c) {
 	mode->draw_post(c);
 
 	// tool tip?
-	string tip = scene_graph->get_tip();
+	string tip;
+	if (hover.node)
+		tip = hover.node->get_tip();
 	if (tip.num > 0)
 		draw_cursor_hover(c, tip);
 
@@ -1437,13 +1450,23 @@ void AudioView::exclusively_select_object() {
 	select_object();
 }
 
+int AudioView::get_mouse_pos() {
+	return cam.screen2sample(mx);
+}
+
+int AudioView::get_mouse_pos_snap() {
+	int pos = get_mouse_pos();
+	snap_to_grid(pos);
+	return pos;
+}
+
 HoverData AudioView::hover_time() {
 	HoverData s;
-	s.pos = cam.screen2sample(mx);
+	s.pos = get_mouse_pos();
+	s.pos_snap = get_mouse_pos_snap();
 	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = my;
 	s.type = HoverData::Type::TIME;
-	s.node = scene_graph->get_hover();
 	return s;
 }
 
@@ -1496,4 +1519,8 @@ void AudioView::prepare_menu(hui::Menu *menu)
 void AudioView::open_popup(hui::Menu* menu) {
 	prepare_menu(menu);
 	menu->open_popup(win);
+}
+
+void AudioView::mdp_prepare(hui::Callback start, hui::Callback update, hui::Callback end) {
+	mdp->prepare(start, update, end);
 }

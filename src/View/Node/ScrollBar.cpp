@@ -31,7 +31,7 @@ void ScrollBar::draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
 	// FIXME ...
-	bool _hover = hover();//(view->hover.node == this);
+	bool _hover = view_hover();
 	c->set_color(_hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
 	float d = 5;
 	float f = min(page_size / content_size, 1.0f);

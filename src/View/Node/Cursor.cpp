@@ -7,7 +7,6 @@
 
 #include "Cursor.h"
 #include "../AudioView.h"
-#include "SceneGraph.h"
 
 
 Cursor::Cursor(AudioView* view, bool end) : ViewNode(view) {
@@ -17,7 +16,7 @@ Cursor::Cursor(AudioView* view, bool end) : ViewNode(view) {
 }
 
 void Cursor::draw(Painter* c) {
-	view->draw_time_line(c, pos(), view->colors.selection_boundary, hover(), false, true);
+	view->draw_time_line(c, pos(), view->colors.selection_boundary, view_hover(), false, true);
 }
 
 int Cursor::pos() {
@@ -43,9 +42,9 @@ bool Cursor::on_left_button_down() {
 	if (!is_end)
 		drag_range.invert();
 
-	view->scene_graph->mdp.prepare([=]{
+	view->mdp_prepare([=]{
 	}, [=]{
-		drag_range.set_end(view->cam.screen2sample(view->mx));
+		drag_range.set_end(view->get_mouse_pos_snap());
 		view->sel.range = drag_range;
 		view->update_selection();
 		view->select_under_cursor();

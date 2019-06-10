@@ -43,7 +43,7 @@ Song* make_example_song(int num_tracks, int channels)
 {
 	Song *s = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	for (int ti=0; ti<num_tracks; ti++){
-		Track *t1 = s->add_track((channels == 1) ? SignalType::AUDIO_MONO : SignalType::AUDIO);
+		Track *t1 = s->add_track((channels == 1) ? SignalType::AUDIO_MONO : SignalType::AUDIO_STEREO);
 		AudioBuffer buf;
 		t1->layers[0]->get_buffers(buf, Range(0, 4));
 		for (int i=0; i<4; i++)

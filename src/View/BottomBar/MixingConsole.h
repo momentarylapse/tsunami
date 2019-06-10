@@ -25,7 +25,7 @@ class DeviceManager;
 
 class TrackMixer;
 class Module;
-class FxPanel;
+class ModulePanel;
 
 class MixingConsole: public BottomBar::Console
 {
@@ -59,7 +59,7 @@ public:
 
 	void select_module(Module *m);
 	Module *selected_module;
-	FxPanel *config_panel;
+	ModulePanel *config_panel;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

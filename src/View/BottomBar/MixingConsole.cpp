@@ -274,14 +274,14 @@ public:
 
 
 
-class FxPanel : public hui::Panel
+class ModulePanel : public hui::Panel
 {
 public:
-	FxPanel(Session *_session, MixingConsole *_console, AudioEffect *_fx, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit)
+	ModulePanel(Session *_session, MixingConsole *_console, Module *_m, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit)
 	{
 		session = _session;
 		console = _console;
-		fx = _fx;
+		module = _m;
 
 		func_enable = _func_enable;
 		func_delete = _func_delete;
@@ -289,9 +289,9 @@ public:
 
 		from_resource("fx_panel");
 
-		set_string("name", fx->module_subtype);
+		set_string("name", module->module_subtype);
 
-		p = fx->create_panel();
+		p = module->create_panel();
 		if (p){
 			embed(p, "content", 0, 0);
 			p->update();
@@ -309,31 +309,31 @@ public:
 		event("save_favorite", [=]{ on_save(); });
 		event("show_large", [=]{ on_large(); });
 
-		check("enabled", fx->enabled);
+		check("enabled", module->enabled);
 
-		old_param = fx->config_to_string();
-		fx->subscribe(this, [=]{ on_fx_change(); }, fx->MESSAGE_CHANGE);
-		fx->subscribe(this, [=]{ on_fx_change_by_action(); }, fx->MESSAGE_CHANGE_BY_ACTION);
+		old_param = module->config_to_string();
+		module->subscribe(this, [=]{ on_fx_change(); }, module->MESSAGE_CHANGE);
+		module->subscribe(this, [=]{ on_fx_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
 	}
-	virtual ~FxPanel()
+	virtual ~ModulePanel()
 	{
-		fx->unsubscribe(this);
+		module->unsubscribe(this);
 	}
 	void on_load()
 	{
-		string name = session->plugin_manager->select_favorite_name(win, fx, false);
+		string name = session->plugin_manager->select_favorite_name(win, module, false);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->apply_favorite(fx, name);
+		session->plugin_manager->apply_favorite(module, name);
 		func_edit(old_param);
-		old_param = fx->config_to_string();
+		old_param = module->config_to_string();
 	}
 	void on_save()
 	{
-		string name = session->plugin_manager->select_favorite_name(win, fx, true);
+		string name = session->plugin_manager->select_favorite_name(win, module, true);
 		if (name.num == 0)
 			return;
-		session->plugin_manager->save_favorite(fx, name);
+		session->plugin_manager->save_favorite(module, name);
 	}
 	void on_enabled()
 	{
@@ -352,24 +352,24 @@ public:
 	void on_fx_change()
 	{
 		func_edit(old_param);
-		check("enabled", fx->enabled);
+		check("enabled", module->enabled);
 		if (p)
 			p->update();
-		old_param = fx->config_to_string();
+		old_param = module->config_to_string();
 
 	}
 	void on_fx_change_by_action()
 	{
-		check("enabled", fx->enabled);
+		check("enabled", module->enabled);
 		if (p)
 			p->update();
-		old_param = fx->config_to_string();
+		old_param = module->config_to_string();
 	}
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
 	std::function<void()> func_delete;
 	Session *session;
-	AudioEffect *fx;
+	Module *module;
 	string old_param;
 	ConfigPanel *p;
 	MixingConsole *console;
@@ -502,8 +502,7 @@ void MixingConsole::on_tracks_change()
 	load_data();
 }
 
-void MixingConsole::select_module(Module *m)
-{
+void MixingConsole::select_module(Module *m) {
 	if (selected_module)
 		selected_module->unsubscribe(this);
 
@@ -517,16 +516,27 @@ void MixingConsole::select_module(Module *m)
 
 	Track *track = nullptr;
 
-	if (selected_module){
-		for (auto *mm: mixer)
-			if (mm->track->fx.find((AudioEffect*)selected_module) >= 0)
-				track = mm->track;
+	if (selected_module) {
 
-		AudioEffect *fx = (AudioEffect*)m;
-		config_panel = new FxPanel(session, this, fx,
-				[track,fx](bool enabled){ track->enable_effect(fx, enabled); },
-				[track,fx]{ track->delete_effect(fx); },
-				[track,fx](const string &old_param){ track->edit_effect(fx, old_param); });
+		if (m->module_type == ModuleType::AUDIO_EFFECT) {
+			AudioEffect *fx = (AudioEffect*)m;
+			for (auto *mm: mixer)
+				if (mm->track->fx.find(fx) >= 0)
+					track = mm->track;
+			config_panel = new ModulePanel(session, this, m,
+					[=](bool enabled){ track->enable_effect(fx, enabled); },
+					[=]{ track->delete_effect(fx); },
+					[=](const string &old_param){ track->edit_effect(fx, old_param); });
+		} else { // MIDI_EFFECT
+			MidiEffect *fx = (MidiEffect*)m;
+			for (auto *mm: mixer)
+				if (mm->track->midi_fx.find(fx) >= 0)
+					track = mm->track;
+			config_panel = new ModulePanel(session, this, m,
+					[=](bool enabled){ track->enable_midi_effect(fx, enabled); },
+					[=]{ track->delete_midi_effect(fx); },
+					[=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
+		}
 		embed(config_panel, config_grid_id, 0, 0);
 
 		m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);

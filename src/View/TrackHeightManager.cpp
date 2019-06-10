@@ -149,11 +149,11 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 	if (h_wish > h_min)
 		f = clampf((float)(h_available - h_min) / (float)(h_wish - h_min), 0, 1);
 
-	v->scroll->update(h_available, h_min + (h_wish - h_min) * f);
+	v->scroll_bar_h->update(h_available, h_min + (h_wish - h_min) * f);
 
 
 	// distribute
-	float y0 = r.y1 - v->scroll->offset;
+	float y0 = r.y1 - v->scroll_bar_h->offset;
 	for (auto *l: v->vlayer){
 		float h = l->height_min + (l->height_wish - l->height_min) * f;
 		l->area_target = rect(r.x1, r.x2, y0, y0 + h);

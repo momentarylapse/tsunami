@@ -17,13 +17,12 @@ class ViewPort
 {
 public:
 	ViewPort(AudioView *v);
-	ViewPort(Song *song, rect &area);
+	ViewPort(rect &area);
 
 	static const float BORDER_FACTOR;
 	static const float BORDER_FACTOR_RIGHT;
 
 	AudioView *view;
-	Song *song;
 	rect &area;
 
 	double pos;

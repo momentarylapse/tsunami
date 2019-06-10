@@ -278,7 +278,7 @@ void FormatPdf::save_song(StorageOperationData* od)
 	float border = 50;
 
 	rect area = rect(border, page_width - border, 0, page_height);
-	cam = new ViewPort(song, area);
+	cam = new ViewPort(area);
 	SongSelection sel;
 	HoverData hover;
 	ColorScheme _colors = create_pdf_color_scheme();

@@ -180,8 +180,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll = new ScrollBar(scene_graph);//background);
-	scroll->set_callback([=]{ thm.update_immediately(this, song, song_area); });
+	scroll_bar_h = new ScrollBar(scene_graph);//background);
+	scroll_bar_h->set_callback([=]{ thm.update_immediately(this, song, song_area); });
+	scroll_bar_w = new ScrollBarHorizontal(scene_graph);//background);
+	scroll_bar_w->set_callback([=]{ cam.pos = song->range_with_time().start() + scroll_bar_w->offset; });
+	scroll_bar_w->constrained = false;
 	//background->children.add(background);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
@@ -273,7 +276,8 @@ AudioView::~AudioView() {
 
 	delete mdp;
 
-	delete scroll;
+	delete scroll_bar_h;
+	delete scroll_bar_w;
 
 	delete buffer_painter;
 	delete grid_painter;
@@ -885,7 +889,8 @@ void AudioView::update_tracks()
 void AudioView::rebuild_scene_graph() {
 	scene_graph->children.clear();
 	scene_graph->children.add(background);
-	scene_graph->children.add(scroll);
+	scene_graph->children.add(scroll_bar_h);
+	scene_graph->children.add(scroll_bar_w);
 
 	for (auto *v: vlayer)
 		scene_graph->children.add(v);
@@ -916,14 +921,22 @@ bool AudioView::update_scene_graph() {
 
 	song_area = area;
 	song_area.y1 += TIME_SCALE_HEIGHT;
-	bool scroll_bar_needed = scroll->page_size < scroll->content_size;
-	if (scroll_bar_needed)
+	bool scroll_bar_h_needed = scroll_bar_h->page_size < scroll_bar_h->content_size;
+	bool scroll_bar_w_needed = !cam.range().covers(song->range_with_time());
+	if (scroll_bar_h_needed)
 		song_area.x1 += SCROLLBAR_WIDTH;
-	scroll->hidden = !scroll_bar_needed;
-	scroll->align.dy = song_area.y1;
-	scroll->align.h = song_area.height();
+	if (scroll_bar_w_needed)
+		song_area.y2 -= SCROLLBAR_WIDTH;
+	scroll_bar_h->hidden = !scroll_bar_h_needed;
+	scroll_bar_h->align.dy = song_area.y1;
+	scroll_bar_h->align.h = song_area.height();
 	//scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
 	bool animating = thm.update(this, song, song_area);
+
+	scroll_bar_w->hidden = !scroll_bar_w_needed;
+	scroll_bar_w->align.dy = area.y2 - SCROLLBAR_WIDTH;
+	scroll_bar_w->align.w = area.width();
+	scroll_bar_w->update(cam.range().length, song->range_with_time().length);
 
 	for (auto *v: vlayer) {
 		v->update_header();
@@ -1494,6 +1507,13 @@ HoverData AudioView::hover_time() {
 	s.y0 = s.y1 = my;
 	s.type = HoverData::Type::TIME;
 	return s;
+}
+
+void AudioView::cam_changed() {
+	notify(MESSAGE_VIEW_CHANGE);
+	scroll_bar_w->update(cam.range().length, song->range_with_time().length);
+	scroll_bar_w->offset = cam.pos - song->range_with_time().start();
+	force_redraw();
 }
 
 // hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?

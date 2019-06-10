@@ -268,8 +268,10 @@ public:
 	void set_playback_range_locked(bool locked);
 
 	ViewPort cam;
+	void cam_changed();
 
-	ScrollBar *scroll;
+	ScrollBar *scroll_bar_h;
+	ScrollBar *scroll_bar_w;
 	TimeScale *time_scale;
 	ViewNode *background;
 	Cursor *cursor_start, *cursor_end;

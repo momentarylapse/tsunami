@@ -13,15 +13,16 @@
 
 class Painter;
 
-class ScrollBar : public ViewNode
-{
+class ScrollBar : public ViewNode {
 public:
 	ScrollBar(ViewNode *parent);
 	//ScrollBar(AudioView *view);
+	bool constrained = true;
 	float offset = 0;
 	float page_size = 0;
 	float content_size = 0;
 	float mouse_offset = 0;
+	bool horizontal = false;
 	void drag_update(float mx, float my);
 	void draw(Painter *c) override;
 	void set_area(const rect &r);
@@ -31,6 +32,11 @@ public:
 
 	std::function<void()> callback;
 	void set_callback(std::function<void()> callback);
+};
+
+class ScrollBarHorizontal : public ScrollBar {
+public:
+	ScrollBarHorizontal(ViewNode *parent);
 };
 
 #endif /* SRC_VIEW_NODE_SCROLLBAR_H_ */

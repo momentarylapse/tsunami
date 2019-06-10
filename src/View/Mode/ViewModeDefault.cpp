@@ -223,111 +223,10 @@ void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
 }
 
 
-void ViewModeDefault::on_left_double_click()
-{
-	/*
-	if (view->selection_mode != view->SelectionMode::NONE)
-		return;
 
-	*hover = get_hover();
-	select_hover();
-
-	int buffer_index = hover_buffer(hover);
-
-	if (hover->type == HoverData::Type::SAMPLE){
-		view->sel = get_selection_for_range(view->cur_sample->range());
-		view->update_selection();
-	}else if (hover->type == HoverData::Type::MARKER){
-		view->sel = get_selection_for_range(hover->marker->range);
-		view->update_selection();
-	}else if ((hover->type == HoverData::Type::LAYER) and (buffer_index >= 0)){
-		view->sel = get_selection_for_range(hover->layer->buffers[buffer_index].range());
-		view->update_selection();
-	}else if (hover->type == HoverData::Type::BAR){
-		view->sel = get_selection_for_range(hover->bar->range());
-		view->update_selection();
-	}*/
-}
-
-
-void ViewModeDefault::on_right_button_down()
-{
-	/*
-	*hover = get_hover();
-	bool track_hover_sel = view->sel.has(hover->track);
-
-	select_hover();
-
-	// click outside sel.range -> select new position
-	if ((hover->type == HoverData::Type::LAYER) or (hover->type == HoverData::Type::TIME) or (hover->type == HoverData::Type::BACKGROUND)){
-		if (!view->sel.range.is_inside(hover->pos)){
-			view->snap_to_grid(hover->pos);
-			set_cursor_pos(hover->pos, track_hover_sel);
-		}
-	}
-	view->hover_before_leave = *hover;
-
-	// pop up menu...
-	view->update_menu();
-
-	if (hover->type == HoverData::Type::SAMPLE){
-		view->open_popup(view->menu_sample);
-	}else if (hover->type == HoverData::Type::BAR){
-		view->open_popup(view->menu_bar);
-	}else if (hover->type == HoverData::Type::MARKER){
-		view->open_popup(view->menu_marker);
-	}else if (hover->type == HoverData::Type::BAR_GAP){
-		view->open_popup(view->menu_bar_gap);
-	}else if (hover_buffer(hover) >= 0){
-		view->open_popup(view->menu_buffer);
-	}else if (hover->type == HoverData::Type::LAYER){
-		view->open_popup(view->menu_track);
-	}
-	*/
-}
-
-void ViewModeDefault::on_mouse_move()
-{
-#if 0
-	bool _force_redraw_ = false;
-
+void ViewModeDefault::on_mouse_wheel() {
 	auto e = hui::GetEvent();
-
-	if (e->lbut){
-
-		// cheap auto scrolling
-		if (hover->allow_auto_scroll() or (view->selection_mode != view->SelectionMode::NONE)){
-			if (view->mx < 50)
-				cam->move(-10 / cam->scale);
-			if (view->mx > view->area.width() - 50)
-				cam->move(10 / cam->scale);
-		}
-
-		view->selection_update_pos(view->hover);
-	}else{
-		//Selection hover_old = *hover;
-		*hover = get_hover();
-		/*if (hover_changed(*hover, hover_old))
-			view->forceRedraw();*/
-		return;
-	}
-
-
-	// drag & drop
-	if (hover->type == HoverData::Type::PLAYBACK_CURSOR){
-		view->renderer->set_pos(hover->pos);
-		_force_redraw_ = true;
-	}
-
-	if (_force_redraw_)
-		view->force_redraw();
-#endif
-}
-
-void ViewModeDefault::on_mouse_wheel()
-{
-	auto e = hui::GetEvent();
-	if (fabs(e->scroll_y) > 0.1f){
+	if (fabs(e->scroll_y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL))
 			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);
 		else
@@ -337,16 +236,14 @@ void ViewModeDefault::on_mouse_wheel()
 		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
 }
 
-void playback_seek_relative(AudioView *view, float dt)
-{
+void playback_seek_relative(AudioView *view, float dt) {
 	int pos = view->playback_pos();
 	pos += dt * view->song->sample_rate;
 	pos = max(pos, view->renderer->range().offset);
 	view->signal_chain->set_pos(pos);
 }
 
-void ViewModeDefault::on_key_down(int k)
-{
+void ViewModeDefault::on_key_down(int k) {
 
 // view
 	// moving
@@ -371,7 +268,7 @@ void ViewModeDefault::on_key_down(int k)
 		cam->zoom(exp(- view->ZoomSpeed), view->mx);
 
 	// playback
-	if (view->is_playback_active()){
+	if (view->is_playback_active()) {
 		if (k == hui::KEY_CONTROL + hui::KEY_RIGHT)
 			playback_seek_relative(view, 5);
 		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
@@ -381,17 +278,15 @@ void ViewModeDefault::on_key_down(int k)
 	view->update_menu();
 }
 
-float ViewModeDefault::layer_min_height(AudioViewLayer *l)
-{
+float ViewModeDefault::layer_min_height(AudioViewLayer *l) {
 	if (l->layer->type == SignalType::MIDI)
 		return view->TIME_SCALE_HEIGHT * 3;
 	return view->TIME_SCALE_HEIGHT * 2;
 }
 
-float ViewModeDefault::layer_suggested_height(AudioViewLayer *l)
-{
+float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 	int n_ch = l->layer->channels;
-	if (l->layer->is_main()){
+	if (l->layer->is_main()) {
 		if (l->layer->type == SignalType::AUDIO)
 			return view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
 		else if (l->layer->type == SignalType::MIDI)
@@ -436,43 +331,6 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	}
 	c->set_line_width(1.0f);
 }
-
-void ViewModeDefault::draw_post(Painter *c)
-{
-
-}
-
-/*
-HoverData ViewModeDefault::get_hover_basic(bool editable)
-{
-	return HoverData();
-	Selection s = view->scene_graph->get_hover();
-	int mx = view->mx;
-	int my = view->my;
-
-	// selection boundaries?
-	if ((my >= view->area.y2-20) or (view->win->get_key(hui::KEY_SHIFT))){
-		if (view->mouse_over_time(view->sel.range.end())){
-			s.type = Selection::Type::SELECTION_END;
-			return s;
-		}
-		if (view->mouse_over_time(view->sel.range.start())){
-			s.type = Selection::Type::SELECTION_START;
-			return s;
-		}
-	}
-	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->get_key(hui::KEY_SHIFT))){
-		if (view->is_playback_active()){
-			if (view->mouse_over_time(view->playback_pos())){
-				s.type = Selection::Type::PLAYBACK_CURSOR;
-				return s;
-			}
-		}
-	}
-
-	return s;
-}
-*/
 
 HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer) {
 	return vlayer->get_hover_data_default();
@@ -578,8 +436,7 @@ void ViewModeDefault::select_hover()
 	}
 }
 
-SongSelection ViewModeDefault::get_selection_for_range(const Range &r)
-{
+SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
 	return SongSelection::from_range(song, r, view->sel.tracks, view->sel.track_layers);
 }
 

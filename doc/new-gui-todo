@@ -18,7 +18,7 @@ ModeMidi
 ModeMidi
 	* when adding notes, accept first click (focus)
 ModeCapture
-	* don't allow preview change
+	J don't allow preview change
 ModeCurve
 	...all
 ModeScaleBar

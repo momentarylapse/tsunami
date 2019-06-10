@@ -585,6 +585,7 @@ void AudioView::on_right_button_up() {
 }
 
 void AudioView::on_mouse_leave() {
+	// TODO check if necessary
 	if (!hui::GetEvent()->lbut and !hui::GetEvent()->rbut) {
 		hover.clear();
 		force_redraw();
@@ -1331,6 +1332,9 @@ int AudioView::playback_pos() {
 }
 
 void AudioView::playback_click() {
+	if (mode == mode_capture)
+		return;
+
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(hover.pos)) {
 			session->signal_chain->set_pos(hover.pos);
@@ -1351,7 +1355,7 @@ bool AudioView::has_any_solo_track() {
 
 Set<const Track*> AudioView::get_playable_tracks() {
 	Set<const Track*> tracks;
-	Set<Track*> prevented = mode->prevent_playback();
+	auto prevented = mode->prevent_playback();
 	bool any_solo = has_any_solo_track();
 	for (auto *t: vtrack)
 		if (!t->track->muted and (t->solo or !any_solo) and !prevented.contains(t->track))

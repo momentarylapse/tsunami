@@ -23,11 +23,15 @@ Background::Background(AudioView* view) : ViewNode(view) {
 }
 
 bool Background::on_left_button_down() {
-	int pos = view->hover.pos_snap;
-	view->set_cursor_pos(pos);
-	view->hover.range = Range(pos, 0);
+	if (view->is_playback_active()) {
+		view->playback_click();
+	} else {
+		int pos = view->hover.pos_snap;
+		view->set_cursor_pos(pos);
+		view->hover.range = Range(pos, 0);
 
-	view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
+		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
+	}
 	return true;
 }
 

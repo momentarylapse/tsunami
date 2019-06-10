@@ -72,8 +72,10 @@ public:
 	void on_draw_post(Painter *c) override {
 		if (view->sel.range.length > 0){
 			string s = view->song->get_time_str_long(view->sel.range.length);
+			if (view->sel.range.length < 1000)
+				s += format(_(" (%d samples)"), view->sel.range.length);
 			if (view->sel.bars.num > 0)
-				s = format("xxx---xxx " + _("%d bars"), view->sel.bars.num) + ", " + s;
+				s = format(_("%d bars"), view->sel.bars.num) + ", " + s;
 			view->draw_cursor_hover(c, s);
 		}
 	}
@@ -164,14 +166,7 @@ void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
 
 		if (view->is_playback_active()) {
-			if (view->renderer->range().is_inside(hover->pos)) {
-				session->signal_chain->set_pos(hover->pos);
-				hover->type = HoverData::Type::PLAYBACK_CURSOR;
-				view->force_redraw();
-				return;
-			} else {
-				view->stop();
-			}
+			view->playback_click();
 		} else {
 
 

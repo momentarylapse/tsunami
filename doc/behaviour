@@ -1,0 +1,5 @@
+Midi/AudioSource
+	read
+		if enought data -> return request_length
+		if not enough data -> return 0
+		if end of data -> return END_OF_STREAM

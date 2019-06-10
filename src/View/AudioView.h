@@ -235,6 +235,7 @@ public:
 	void pause(bool pause);
 	void prepare_playback(const Range &range, bool allow_loop);
 	bool is_playback_active();
+	void playback_click();
 	bool is_paused();
 	int playback_pos();
 	Set<const Track*> get_playable_tracks();

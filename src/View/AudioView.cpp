@@ -1317,6 +1317,18 @@ int AudioView::playback_pos() {
 	return signal_chain->get_pos();
 }
 
+void AudioView::playback_click() {
+	if (is_playback_active()) {
+		if (renderer->range().is_inside(hover.pos)) {
+			session->signal_chain->set_pos(hover.pos);
+			hover.type = HoverData::Type::PLAYBACK_CURSOR;
+			force_redraw();
+		} else {
+			stop();
+		}
+	}
+}
+
 bool AudioView::has_any_solo_track() {
 	for (auto *t: vtrack)
 		if (t->solo)

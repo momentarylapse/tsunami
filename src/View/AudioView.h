@@ -243,13 +243,14 @@ public:
 	Set<const TrackLayer*> get_playable_layers();
 	bool has_any_solo_layer(Track *t);
 
-	void set_cur_sample(SampleRef *s);
-	//void setCurTrack(Track *t);
-	void set_cur_layer(AudioViewLayer *l);
-	AudioViewLayer *cur_vlayer;
-	Track *_prev_cur_track;
+	void __set_cur_sample(SampleRef *s);
+	void __set_cur_layer(AudioViewLayer *l);
+	HoverData cur_selection;
+	HoverData _prev_selection;
+	void set_current(const HoverData &h);
+	AudioViewLayer *cur_vlayer();
 	Track *cur_track();
-	SampleRef *cur_sample;
+	SampleRef *cur_sample();
 	TrackLayer *cur_layer();
 
 	bool editing_track(Track *t);

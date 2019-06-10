@@ -116,7 +116,7 @@ void SampleRefConsole::on_view_cur_sample_change()
 	if (sample)
 		sample->unsubscribe(this);
 	layer = view->cur_layer();
-	sample = view->cur_sample;
+	sample = view->cur_sample();
 	if (sample)
 		sample->subscribe(this, [=]{ on_update(); });
 	load_data();

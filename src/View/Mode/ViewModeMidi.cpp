@@ -132,52 +132,45 @@ void ViewModeMidi::set_modifier(NoteModifier mod)
 	notify();
 }
 
-void ViewModeMidi::set_mode(MidiMode _mode)
-{
+void ViewModeMidi::set_mode(MidiMode _mode) {
 	mode_wanted = _mode;
 	view->thm.dirty = true;
 	view->force_redraw();
 	notify();
 }
 
-void ViewModeMidi::set_creation_mode(CreationMode _mode)
-{
+void ViewModeMidi::set_creation_mode(CreationMode _mode) {
 	creation_mode = _mode;
 	view->force_redraw();
 	notify();
 }
 
-void ViewModeMidi::set_input_mode(InputMode _mode)
-{
+void ViewModeMidi::set_input_mode(InputMode _mode) {
 	input_mode = _mode;
 	view->force_redraw();
 	notify();
 }
 
-bool ViewModeMidi::editing(AudioViewLayer *l)
-{
+bool ViewModeMidi::editing(AudioViewLayer *l) {
 	if (view->mode != this)
 		return false;
-	if (l != view->cur_vlayer)
+	if (l != view->cur_vlayer())
 		return false;
 	if (l->layer->type != SignalType::MIDI)
 		return false;
 	return true;
 }
 
-TrackLayer* ViewModeMidi::cur_layer()
-{
+TrackLayer* ViewModeMidi::cur_layer() {
 	return view->cur_layer();
 }
 
-AudioViewLayer* ViewModeMidi::cur_vlayer()
-{
-	return view->cur_vlayer;
+AudioViewLayer* ViewModeMidi::cur_vlayer() {
+	return view->cur_vlayer();
 }
 
 
-void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl)
-{
+void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
 	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
 }
 

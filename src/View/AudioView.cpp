@@ -148,10 +148,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	midi_view_mode = (MidiMode)hui::Config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
-	cur_sample = nullptr;
-	cur_vlayer = nullptr;
-	_prev_cur_track = nullptr;
-
 	playback_range_locked = false;
 	playback_loop = false;
 
@@ -642,14 +638,14 @@ void AudioView::update_buffer_zoom() {
 
 void _try_set_good_cur_layer(AudioView *v) {
 	for (auto *l: v->vlayer)
-		if (l->layer->track == v->_prev_cur_track){
+		if (l->layer->track == v->_prev_selection.track()){
 			//msg_write("  -> set by track");
-			v->set_cur_layer(l);
+			v->__set_cur_layer(l);
 			return;
 		}
 	if (v->vlayer.num > 0) {
 		//msg_write("  -> set first layer");
-		v->set_cur_layer(v->vlayer[0]);
+		v->__set_cur_layer(v->vlayer[0]);
 	} else {
 		//msg_error("....no vlayers");
 	}
@@ -658,15 +654,15 @@ void _try_set_good_cur_layer(AudioView *v) {
 void AudioView::check_consistency()
 {
 	// cur_vlayer = null
-	if (!cur_vlayer and (vlayer.num > 0)){
+	if (!cur_vlayer() and (vlayer.num > 0)){
 		//msg_error("cur_vlayer = nil");
 		//msg_write(msg_get_trace());
 		//msg_write("  -> setting first");
-		set_cur_layer(vlayer[0]);
+		__set_cur_layer(vlayer[0]);
 	}
 
 	// cur_vlayer illegal?
-	if (cur_vlayer and (vlayer.find(cur_vlayer) < 0)){
+	if (cur_vlayer() and (vlayer.find(cur_vlayer()) < 0)){
 		//msg_error("cur_vlayer illegal...");
 		//msg_write(msg_get_trace());
 		_try_set_good_cur_layer(this);
@@ -701,7 +697,7 @@ void AudioView::explode_track(Track *t) {
 void AudioView::on_song_update()
 {
 	if (song->cur_message() == song->MESSAGE_NEW){
-		set_cur_layer(nullptr);
+		__set_cur_layer(nullptr);
 		update_tracks();
 		sel.range = Range(0, 0);
 		sel.clear();
@@ -1142,7 +1138,7 @@ void AudioView::select_all() {
 void AudioView::select_none() {
 	// select all/none
 	set_selection(SongSelection());
-	set_cur_sample(nullptr);
+	__set_cur_sample(nullptr);
 }
 
 inline void test_range(const Range &r, Range &sel, bool &update) {
@@ -1206,52 +1202,63 @@ void AudioView::select_sample(SampleRef *s, bool diff) {
 	}
 }
 
-void AudioView::set_cur_sample(SampleRef *s) {
-	if (cur_sample == s)
-		return;
-	cur_sample = s;
-	force_redraw();
-	notify(MESSAGE_CUR_SAMPLE_CHANGE);
-}
+void AudioView::set_current(const HoverData &h) {
+	_prev_selection = cur_selection;
 
-Track *AudioView::cur_track() {
-	if (!cur_vlayer)
-		return nullptr;
-	if (!cur_vlayer->layer)
-		return nullptr;
-	//if (song->layers().find(cur_vlayer->layer) < 0)
-	//	return nullptr;
-	return cur_vlayer->layer->track;
-}
+	cur_selection = h;
 
-TrackLayer *AudioView::cur_layer() {
-	if (!cur_vlayer)
-		return nullptr;
-	//if (song->layers().find(cur_vlayer->layer) < 0)
-	//	return nullptr;
-	return cur_vlayer->layer;
-}
-
-// l must be from vlayer[] or null
-void AudioView::set_cur_layer(AudioViewLayer *l)
-{
-	auto *prev_track = _prev_cur_track;
-	auto *prev_vlayer = cur_vlayer;
-	cur_vlayer = l;
-	_prev_cur_track = cur_track();
-
-	if (!cur_vlayer){
+	if (!cur_vlayer()) {
 		//msg_write("   ...setting cur_vlayer = nil");
 		//msg_write(msg_get_trace());
 	}
-
-	if (cur_vlayer != prev_vlayer){
+	if (cur_sample() != _prev_selection.sample) {
+		notify(MESSAGE_CUR_SAMPLE_CHANGE);
+	}
+	if (cur_vlayer() != _prev_selection.vlayer) {
 		mode->on_cur_layer_change();
 		force_redraw();
 		notify(MESSAGE_CUR_LAYER_CHANGE);
 	}
-	if (cur_track() != prev_track)
+	if (cur_track() != _prev_selection.track()) {
 		notify(MESSAGE_CUR_TRACK_CHANGE);
+	}
+}
+
+Track *AudioView::cur_track() {
+	if (!cur_vlayer())
+		return nullptr;
+	if (!cur_vlayer()->layer)
+		return nullptr;
+	return cur_vlayer()->layer->track;
+}
+
+TrackLayer *AudioView::cur_layer() {
+	if (!cur_vlayer())
+		return nullptr;
+	//if (song->layers().find(cur_vlayer->layer) < 0)
+	//	return nullptr;
+	return cur_vlayer()->layer;
+}
+
+AudioViewLayer *AudioView::cur_vlayer() {
+	return cur_selection.vlayer;
+}
+
+SampleRef *AudioView::cur_sample() {
+	return cur_selection.sample;
+}
+
+// l must be from vlayer[] or null
+void AudioView::__set_cur_layer(AudioViewLayer *l) {
+	auto h = cur_selection;
+	h.vlayer = l;
+	set_current(h);
+}
+
+void AudioView::__set_cur_sample(SampleRef *s) {
+	auto h = cur_selection;
+	h.sample = s;
+	set_current(h);
 }
 
 
@@ -1441,7 +1448,7 @@ void AudioView::select_object() {
 	} else if (hover.note) {
 		sel.add(hover.note);
 	}
-	set_cur_sample(hover.sample);
+	__set_cur_sample(hover.sample);
 }
 
 void AudioView::toggle_object() {
@@ -1456,7 +1463,7 @@ void AudioView::toggle_object() {
 	} else if (hover.note) {
 		sel.toggle(hover.note);
 	}
-	set_cur_sample(hover.sample);
+	__set_cur_sample(hover.sample);
 }
 
 bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
@@ -1464,14 +1471,14 @@ bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
 	sel.track_layers.clear();
 	sel.add(l->layer);
 	sel.make_consistent(song);
-	set_cur_layer(l);
+	__set_cur_layer(l);
 	return had_sel;
 }
 
 void AudioView::toggle_select_layer(AudioViewLayer *l) {
 	sel.toggle(l->layer);
 	sel.make_consistent(song);
-	set_cur_layer(l);
+	__set_cur_layer(l);
 }
 
 void AudioView::exclusively_select_object() {
@@ -1520,7 +1527,6 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 void AudioView::prepare_menu(hui::Menu *menu) {
 	auto *vl = hover.vlayer;
 	auto *l = hover.layer();
-	auto *vt = hover.vtrack;
 	auto *t = hover.track();
 	// midi mode
 	if (t) {

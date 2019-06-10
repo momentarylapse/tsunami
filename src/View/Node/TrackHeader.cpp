@@ -102,7 +102,7 @@ public:
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
 	bool on_left_button_down() override {
-		view->set_cur_layer(view->get_layer(vtrack->track->layers[0]));
+		view->set_current(parent->get_hover_data());
 		view->session->set_mode("default/track");
 		return true;
 	}
@@ -228,7 +228,7 @@ bool TrackHeader::on_left_button_down() {
 	return true;
 }
 bool TrackHeader::on_left_double_click() {
-	view->set_cur_layer(view->get_layer(vtrack->track->layers[0]));
+	view->set_current(get_hover_data());
 	view->session->set_mode("default/track");
 	return true;
 }
@@ -237,6 +237,7 @@ bool TrackHeader::on_right_button_down() {
 	auto *l = vtrack->first_layer();
 	if (!view->exclusively_select_layer(l))
 		view->select_under_cursor();
+	view->set_current(view->hover);
 	view->open_popup(view->menu_track);
 	return true;
 }

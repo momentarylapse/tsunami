@@ -187,7 +187,8 @@ void ViewModeDefault::start_selection_rect(SelectionMode mode) {
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
-	view->set_cur_sample(nullptr);
+	//view->set_cur_sample(nullptr);
+	view->set_current(view->hover);
 
 	if (view->sel.has(vlayer->layer)) {
 		// set cursor only when clicking on selected layers
@@ -393,6 +394,7 @@ void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 
 void ViewModeDefault::select_hover()
 {
+#if 0
 	view->sel_temp = view->sel;
 	TrackLayer *l = hover->layer();
 	SampleRef *s = hover->sample;
@@ -434,6 +436,7 @@ void ViewModeDefault::select_hover()
 			view->sel.add(s);
 		}
 	}
+#endif
 }
 
 SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {

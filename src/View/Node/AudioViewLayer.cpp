@@ -474,7 +474,7 @@ color AudioViewLayer::background_selection_color() {
 }
 
 bool AudioView::editing_layer(AudioViewLayer *l) {
-	if (cur_vlayer != l)
+	if (cur_vlayer() != l)
 		return false;
 	if (session->in_mode("midi"))
 		return true;
@@ -588,6 +588,7 @@ bool AudioViewLayer::on_right_button_down() {
 
 	// pop up menu...
 	view->update_menu();
+	view->set_current(view->hover);
 
 	if (view->hover.sample) {
 		view->open_popup(view->menu_sample);
@@ -600,7 +601,10 @@ bool AudioViewLayer::on_right_button_down() {
 	} else if (hover_buffer(view->hover) >= 0) {
 		view->open_popup(view->menu_buffer);
 	} else { // void
-		view->open_popup(view->menu_track);
+		if (layer->is_main())
+			view->open_popup(view->menu_track);
+		else
+			view->open_popup(view->menu_layer);
 	}
 	return true;
 }

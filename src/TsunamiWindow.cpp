@@ -486,11 +486,11 @@ void TsunamiWindow::on_track_edit_fx()
 
 void TsunamiWindow::on_track_add_marker()
 {
-	if (view->hover_before_leave.track()){
+	if (view->cur_track()){
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
-		auto *dlg = new MarkerDialog(this, view->hover_before_leave.track(), range, "");
+		auto *dlg = new MarkerDialog(this, view->cur_track(), range, "");
 		dlg->run();
 		delete dlg;
 	}else{
@@ -534,17 +534,17 @@ void TsunamiWindow::on_buffer_make_movable()
 
 void TsunamiWindow::on_layer_midi_mode_linear()
 {
-	view->cur_vlayer->set_midi_mode(MidiMode::LINEAR);
+	view->cur_vlayer()->set_midi_mode(MidiMode::LINEAR);
 }
 
 void TsunamiWindow::on_layer_midi_mode_tab()
 {
-	view->cur_vlayer->set_midi_mode(MidiMode::TAB);
+	view->cur_vlayer()->set_midi_mode(MidiMode::TAB);
 }
 
 void TsunamiWindow::on_layer_midi_mode_classical()
 {
-	view->cur_vlayer->set_midi_mode(MidiMode::CLASSICAL);
+	view->cur_vlayer()->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void TsunamiWindow::on_song_properties()
@@ -979,7 +979,7 @@ void TsunamiWindow::update_menu()
 	enable("sample_from_selection", !view->sel.range.empty());
 	enable("sample-insert", view->sel.num_samples() > 0);
 	enable("sample-delete", view->sel.num_samples() > 0);
-	enable("sample-properties", view->cur_sample);
+	enable("sample-properties", view->cur_sample());
 	// sound
 	enable("play", !session->in_mode("capture"));
 	enable("stop", view->is_playback_active() or session->in_mode("capture"));

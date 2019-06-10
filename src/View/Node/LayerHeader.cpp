@@ -179,6 +179,7 @@ bool LayerHeader::on_left_button_down() {
 bool LayerHeader::on_right_button_down() {
 	if (!view->exclusively_select_layer(vlayer))
 		view->select_under_cursor();
+	view->set_current(view->hover);
 	view->open_popup(view->menu_layer);
 	return true;
 }

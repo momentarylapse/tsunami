@@ -592,6 +592,7 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
+	scene_graph->on_left_double_click();
 	mode->on_left_double_click();
 	force_redraw();
 	update_menu();
@@ -1380,6 +1381,7 @@ void AudioView::set_cursor_pos(int pos) {
 	sel.range = Range(pos, 0);
 	select_under_cursor();
 	//update_selection();
+	cam.make_sample_visible(pos, 0);
 }
 
 void AudioView::select_under_cursor() {
@@ -1444,11 +1446,13 @@ void AudioView::toggle_object() {
 	set_cur_sample(hover.sample);
 }
 
-void AudioView::exclusively_select_layer(AudioViewLayer *l) {
+bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
+	bool had_sel = sel.has(l->layer);
 	sel.track_layers.clear();
 	sel.add(l->layer);
 	sel.make_consistent(song);
 	set_cur_layer(l);
+	return had_sel;
 }
 
 void AudioView::toggle_select_layer(AudioViewLayer *l) {
@@ -1493,39 +1497,41 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 	//toggle_select_layer();
 }
 
-void AudioView::prepare_menu(hui::Menu *menu)
-{
+void AudioView::prepare_menu(hui::Menu *menu) {
+	auto *vl = hover.vlayer;
+	auto *l = hover.layer();
+	auto *vt = hover.vtrack;
+	auto *t = hover.track();
 	// midi mode
-	if (hover.track){
-		menu->enable("menu-midi-mode", hover.track->type == SignalType::MIDI);
-		menu->enable("layer-midi-mode-tab", hover.track->instrument.string_pitch.num > 0);
+	if (t) {
+		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
+		menu->enable("layer-midi-mode-tab", t->instrument.string_pitch.num > 0);
 	}
-	if (hover.vlayer){
-		menu->check("layer-midi-mode-linear", hover.vlayer->midi_mode == MidiMode::LINEAR);
-		menu->check("layer-midi-mode-classical", hover.vlayer->midi_mode == MidiMode::CLASSICAL);
-		menu->check("layer-midi-mode-tab", hover.vlayer->midi_mode == MidiMode::TAB);
+	if (vl) {
+		menu->check("layer-midi-mode-linear", vl->midi_mode == MidiMode::LINEAR);
+		menu->check("layer-midi-mode-classical", vl->midi_mode == MidiMode::CLASSICAL);
+		menu->check("layer-midi-mode-tab", vl->midi_mode == MidiMode::TAB);
 	}
 
-	if (hover.track){
-		menu->enable("track-edit-midi", hover.track->type == SignalType::MIDI);
+	if (t) {
+		menu->enable("track-edit-midi", t->type == SignalType::MIDI);
 		menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
 	}
 
 	// convert
-	if (hover.track){
-		menu->enable("menu-convert", hover.track->type == SignalType::AUDIO);
-		menu->enable("track-convert-stereo", hover.track->channels == 1);
-		menu->enable("track-convert-mono", hover.track->channels == 2);
+	if (t) {
+		menu->enable("menu-convert", t->type == SignalType::AUDIO);
+		menu->enable("track-convert-stereo", t->channels == 1);
+		menu->enable("track-convert-mono", t->channels == 2);
 	}
-	if (hover.layer){
-		menu->enable("layer-merge", hover.layer->track->layers.num > 1);
-		menu->enable("layer-mark-dominant", hover.layer->track->layers.num > 1);// and sel.layers.num == 1);
-		//menu->enable("layer-delete", !hover->layer->is_main());
+	if (l) {
+		menu->enable("layer-merge", t->layers.num > 1);
+		menu->enable("layer-mark-dominant", t->layers.num > 1);// and sel.layers.num == 1);
+		//menu->enable("layer-delete", !l->is_main());
 	}
 
 	menu->check("play-loop", playback_loop);
 	menu->check("playback-range-lock", playback_range_locked);
-
 }
 
 void AudioView::open_popup(hui::Menu* menu) {

@@ -228,16 +228,6 @@ void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
 }
 
 
-int hover_buffer(HoverData *hover)
-{
-	if (!hover->layer)
-		return -1;
-	foreachi (auto &b, hover->layer->buffers, i)
-		if (b.range().is_inside(hover->pos))
-			return i;
-	return -1;
-}
-
 void ViewModeDefault::on_left_double_click()
 {
 	/*
@@ -551,7 +541,7 @@ void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 void ViewModeDefault::select_hover()
 {
 	view->sel_temp = view->sel;
-	TrackLayer *l = hover->layer;
+	TrackLayer *l = hover->layer();
 	SampleRef *s = hover->sample;
 
 	// track

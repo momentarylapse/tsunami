@@ -486,11 +486,11 @@ void TsunamiWindow::on_track_edit_fx()
 
 void TsunamiWindow::on_track_add_marker()
 {
-	if (view->hover_before_leave.track){
+	if (view->hover_before_leave.track()){
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
-		auto *dlg = new MarkerDialog(this, view->hover_before_leave.track, range, "");
+		auto *dlg = new MarkerDialog(this, view->hover_before_leave.track(), range, "");
 		dlg->run();
 		delete dlg;
 	}else{

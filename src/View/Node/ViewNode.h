@@ -24,6 +24,7 @@ public:
 
 	virtual bool on_left_button_down() { return false; }
 	virtual bool on_left_button_up() { return false; }
+	virtual bool on_left_double_click() { return false; }
 	virtual bool on_right_button_down() { return false; }
 	virtual bool on_mouse_move() { return false; }
 

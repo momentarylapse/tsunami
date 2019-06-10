@@ -16,6 +16,7 @@ public:
 
 	bool on_left_button_down() override;
 	bool on_left_button_up() override;
+	bool on_left_double_click() override;
 	bool on_right_button_down() override;
 	bool on_mouse_move() override;
 

@@ -13,6 +13,7 @@
 class Track;
 class Painter;
 class AudioView;
+class AudioViewLayer;
 class MidiKeyChange;
 
 
@@ -33,6 +34,7 @@ public:
 	void on_track_change();
 
 	Track *track;
+	AudioViewLayer *first_layer();
 	Array<int> reference_tracks;
 	bool solo;
 	static const float MIN_GRID_DIST;

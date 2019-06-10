@@ -807,6 +807,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer)
 		return s;
 	if (!editing(vlayer))
 		return s;
+	auto *l = vlayer->layer;
 
 //	int mx = view->mx;
 	int my = view->my;
@@ -819,13 +820,13 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer)
 	/*if (creation_mode != CreationMode::SELECT)*/{
 		if ((mode == MidiMode::CLASSICAL)){
 			s.clef_position = mp->screen_to_clef_pos(my);
-			int upos = s.track->instrument.get_clef().position_to_uniclef(s.clef_position);
+			int upos = l->track->instrument.get_clef().position_to_uniclef(s.clef_position);
 			s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
 			s.pitch = uniclef_to_pitch(upos, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
 			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(MidiNote *n, s.layer->midi, i)
+			foreachi(auto *n, l->midi, i)
 				if (hover_note_classical(*n, s, this)){
 					s.note = n;
 					s.index = i;
@@ -839,7 +840,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer)
 			s.type = HoverData::Type::CLEF_POSITION;
 			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(MidiNote *n, s.layer->midi, i)
+			foreachi(auto *n, l->midi, i)
 				if (hover_note_tab(*n, s, this)){
 					s.note = n;
 					s.index = i;
@@ -852,7 +853,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer)
 			s.type = HoverData::Type::MIDI_PITCH;
 			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(MidiNote *n, s.layer->midi, i)
+			foreachi(auto *n, l->midi, i)
 				if (hover_note_linear(*n, s, this)){
 					s.note = n;
 					s.index = i;
@@ -861,11 +862,6 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer)
 				}
 		}
 	}
-	/*if (creation_mode == CreationMode::SELECT){
-		if ((s.type == Selection::Type::MIDI_PITCH) or (s.type == Selection::Type::CLEF_POSITION)){
-			s.type = Selection::Type::TRACK;
-		}
-	}*/
 
 	return s;
 }

@@ -22,8 +22,13 @@ class LayerHeaderButton : public ViewNode
 {
 public:
 	AudioViewLayer *vlayer;
+	LayerHeader *header;
 	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : ViewNode(lh, dx, dy, 16, 16) {
 		vlayer = lh->vlayer;
+		header = lh;
+	}
+	HoverData get_hover_data() override {
+		return header->get_hover_data();
 	}
 	color get_color() {
 		if (view_hover())
@@ -170,6 +175,14 @@ bool LayerHeader::on_left_button_down() {
 }
 
 bool LayerHeader::on_right_button_down() {
+	if (!view->exclusively_select_layer(vlayer))
+		view->select_under_cursor();
 	view->open_popup(view->menu_layer);
 	return true;
+}
+HoverData LayerHeader::get_hover_data() {
+	auto h = view->hover_time();
+	h.vtrack = view->get_track(vlayer->layer->track);
+	h.vlayer = vlayer;
+	return h;
 }

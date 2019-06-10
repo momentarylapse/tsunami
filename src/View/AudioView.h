@@ -336,7 +336,7 @@ public:
 	void select_object();
 	void toggle_object();
 	void exclusively_select_object();
-	void exclusively_select_layer(AudioViewLayer *l);
+	bool exclusively_select_layer(AudioViewLayer *l);
 	void toggle_select_layer(AudioViewLayer *l);
 	void toggle_select_layer_with_content_in_cursor(AudioViewLayer *l);
 };

@@ -26,8 +26,13 @@ class TrackHeaderButton : public ViewNode
 {
 public:
 	AudioViewTrack *vtrack;
+	TrackHeader *header;
 	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNode(th, dx, dy, 16, 16) {
 		vtrack = th->vtrack;
+		header = th;
+	}
+	HoverData get_hover_data() {
+		return header->get_hover_data();
 	}
 	color get_color() {
 		if (view_hover())
@@ -204,18 +209,39 @@ public:
 };
 
 bool TrackHeader::on_left_button_down() {
-	auto *l = view->get_layer(vtrack->track->layers[0]);
+	auto *l = vtrack->first_layer();
 	if (view->select_xor) {
 		view->toggle_select_layer_with_content_in_cursor(l);
 	} else {
+		// hmmm should we keep all selection, if already selected???
+
+		// or just keep selection of this track/layer...
+		//if (!view->exclusively_select_layer(l))
+		//	view->select_under_cursor();
+
 		view->exclusively_select_layer(l);
 		view->select_under_cursor();
 	}
 	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
 	return true;
 }
+bool TrackHeader::on_left_double_click() {
+	view->set_cur_layer(view->get_layer(vtrack->track->layers[0]));
+	view->session->set_mode("default/track");
+	return true;
+}
 
 bool TrackHeader::on_right_button_down() {
+	auto *l = vtrack->first_layer();
+	if (!view->exclusively_select_layer(l))
+		view->select_under_cursor();
 	view->open_popup(view->menu_track);
 	return true;
+}
+
+HoverData TrackHeader::get_hover_data() {
+	auto h = view->hover_time();
+	h.vtrack = vtrack;
+	h.vlayer = vtrack->first_layer();
+	return h;
 }

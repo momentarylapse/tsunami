@@ -42,6 +42,15 @@ const int PITCH_SHOW_COUNT = 30;
 
 
 
+int hover_buffer(HoverData &hover) {
+	if (!hover.layer())
+		return -1;
+	foreachi (auto &b, hover.layer()->buffers, i)
+		if (b.range().is_inside(hover.pos))
+			return i;
+	return -1;
+}
+
 
 AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(_view)//_view->scene_graph, 0, 0, 0, 0)
 {
@@ -542,14 +551,26 @@ bool AudioViewLayer::on_left_button_down() {
 	return true;
 }
 
-int hover_buffer(HoverData &hover)
-{
-	if (!hover.layer)
-		return -1;
-	foreachi (auto &b, hover.layer->buffers, i)
-		if (b.range().is_inside(hover.pos))
-			return i;
-	return -1;
+bool AudioViewLayer::on_left_double_click() {
+	//*hover = get_hover();
+	//select_hover();
+
+	int buffer_index = hover_buffer(view->hover);
+
+	if (view->hover.sample){
+		view->sel = view->mode->get_selection_for_range(view->hover.sample->range());
+		view->update_selection();
+	}else if (view->hover.marker){
+		view->sel = view->mode->get_selection_for_range(view->hover.marker->range);
+		view->update_selection();
+	}else if (buffer_index >= 0){
+		view->sel = view->mode->get_selection_for_range(layer->buffers[buffer_index].range());
+		view->update_selection();
+	}else if (view->hover.bar){
+		view->sel = view->mode->get_selection_for_range(view->hover.bar->range());
+		view->update_selection();
+	}
+	return true;
 }
 
 bool AudioViewLayer::on_right_button_down() {
@@ -600,15 +621,13 @@ HoverData AudioViewLayer::get_hover_data_default() {
 	foreachi(auto *l, view->vlayer, i)
 		if (this == l)
 			s.index = i;
-	s.layer = layer;
-	s.track = layer->track;
-	s.vtrack = view->get_track(s.track);
+	s.vtrack = view->get_track(layer->track);
 	s.type = HoverData::Type::LAYER;
 
 	// markers
 	if (layer->is_main()){
-		for (int i=0; i<min(s.track->markers.num, marker_areas.num); i++){
-			auto *m = s.track->markers[i];
+		for (int i=0; i<min(layer->track->markers.num, marker_areas.num); i++){
+			auto *m = layer->track->markers[i];
 			if (marker_areas.contains(m) and marker_label_areas.contains(m))
 			if (marker_areas[m].inside(view->mx, view->my) or marker_label_areas[m].inside(view->mx, view->my)){
 				s.marker = m;
@@ -630,7 +649,7 @@ HoverData AudioViewLayer::get_hover_data_default() {
 	}
 
 	// bars
-	if (s.track->type == SignalType::BEATS){
+	if (layer->track->type == SignalType::BEATS){
 
 		// bar gaps
 		if (view->cam.dsample2screen(view->session->sample_rate()) > 20){

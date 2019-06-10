@@ -8,6 +8,8 @@
 #include "HoverData.h"
 
 #include "../Data/Midi/MidiData.h"
+#include "Node/AudioViewLayer.h"
+#include "Node/AudioViewTrack.h"
 
 
 HoverData::HoverData()
@@ -18,6 +20,18 @@ HoverData::HoverData()
 bool HoverData::allow_auto_scroll() const
 {
 	return (type == Type::SAMPLE) or (type == Type::PLAYBACK_CURSOR) or (type == Type::MIDI_PITCH) or (type == Type::CLEF_POSITION);
+}
+
+Track *HoverData::track() const {
+	if (vtrack)
+		return vtrack->track;
+	return nullptr;
+}
+
+TrackLayer *HoverData::layer() const {
+	if (vlayer)
+		return vlayer->layer;
+	return nullptr;
 }
 
 bool HoverData::is_in(Type _type) const
@@ -39,9 +53,7 @@ void HoverData::clear()
 {
 	type = Type::NONE;
 	node = nullptr;
-	track = nullptr;
 	vtrack = nullptr;
-	layer = nullptr;
 	vlayer = nullptr;
 	sample = nullptr;
 	note = nullptr;

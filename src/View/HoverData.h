@@ -28,9 +28,9 @@ class HoverData
 public:
 	ViewNode *node;
 	AudioViewLayer *vlayer;
-	TrackLayer *layer;
+	TrackLayer *layer() const;
 	AudioViewTrack *vtrack;
-	Track *track;
+	Track *track() const;
 	SampleRef *sample;
 	MidiNote *note;
 	TrackMarker *marker;

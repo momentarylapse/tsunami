@@ -1,0 +1,21 @@
+J double click
+* right click
+	* select vlayer
+	* select stuff...
+J home/end keys don't move cam
+
+TrackHeader
+	* right click select
+LayerHeader
+	* right click select
+Background/TimeScale
+	* click during playback
+
+ModeMidi
+	* when adding notes, accept first click (focus)
+ModeCapture
+	* don't allow preview change
+ModeCurve
+	...all
+ModeScaleBar
+	* detect change

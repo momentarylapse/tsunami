@@ -39,6 +39,7 @@ public:
 	~AudioViewLayer() override;
 
 	bool on_left_button_down() override;
+	bool on_left_double_click() override;
 	bool on_right_button_down() override;
 
 	string get_tip() override;

@@ -20,6 +20,8 @@ public:
 	LayerHeader(AudioViewLayer *l);
 	void draw(Painter *c) override;
 
+	HoverData get_hover_data() override;
+
 	bool on_left_button_down() override;
 	bool on_right_button_down() override;
 };

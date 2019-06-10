@@ -63,6 +63,15 @@ bool SceneGraph::on_left_button_up() {
 	return false;
 }
 
+bool SceneGraph::on_left_double_click() {
+	auto nodes = collect_children_down(this);
+	for (auto *c: nodes)
+		if (c->hover())
+			if (c->on_left_double_click())
+				return true;
+	return false;
+}
+
 bool SceneGraph::on_right_button_down() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)

@@ -155,6 +155,10 @@ void AudioViewTrack::draw(Painter *c) {
 	}
 }
 
+AudioViewLayer* AudioViewTrack::first_layer() {
+	return view->get_layer(track->layers[0]);
+}
+
 bool AudioViewTrack::is_playable() {
 	return view->get_playable_tracks().contains(track);
 }

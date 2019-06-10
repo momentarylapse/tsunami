@@ -7,10 +7,10 @@ Menu popup-menu-sample ""
 	Separator
 	Item /track-add-marker "Add marker"
 	Menu /menu-version "Version"
+		Item /layer-delete "Delete"
 		Item /layer-add "Add version"
 		Item /layer-mark-dominant "Mark selection as dominant"
 		Item /layer-merge "Merge..."
-		Item /layer-delete "Delete"
 		Menu /menu-midi-mode "Midi mode"
 			Item /layer-midi-mode-linear "Linear" checkable
 			Item /layer-midi-mode-tab "Tabulature" checkable
@@ -29,7 +29,6 @@ Menu popup-menu-sample ""
 			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
 			Item /track-add-midi "Midi" image=hui:add
 			Item /track-add-beats "Metronome" image=hui:add
-			Item /track-add-group "Group" image=hui:add
 		Item /song-edit-samples "Manage samples"
 		Item /show-mixing-console "Mixing"
 		Item /song-properties "Properties"

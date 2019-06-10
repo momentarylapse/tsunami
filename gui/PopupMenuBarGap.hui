@@ -5,15 +5,6 @@ Menu popup-menu-bar-gap ""
 	Item /bars-add-pause "Add pause..." image=hui:add
 	Separator
 	Item /track-add-marker "Add marker"
-	Menu /menu-version "Version"
-		Item /layer-add "Add version"
-		Item /layer-mark-dominant "Mark selection as dominant"
-		Item /layer-merge "Merge..."
-		Item /layer-delete "Delete"
-		Menu /menu-midi-mode "Midi mode"
-			Item /layer-midi-mode-linear "Linear" checkable
-			Item /layer-midi-mode-tab "Tabulature" checkable
-			Item /layer-midi-mode-classical "Score" checkable
 	Menu /menu-track "Track"
 		Item /track-delete "Delete"
 		Menu /menu-convert "Convert"

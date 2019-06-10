@@ -2956,7 +2956,7 @@ popup-menu-bar
 
 0
 0
-12
+11
 Item
 header
 disabled
@@ -3012,63 +3012,9 @@ track-add-marker
 0
 0
 Menu
-menu-version
-
-9
-0
-5
-Item
-layer-add
-
-0
-0
-0
-Item
-layer-mark-dominant
-
-1
-0
-0
-Item
-layer-merge
-
-2
-0
-0
-Item
-layer-delete
-
-3
-0
-0
-Menu
-menu-midi-mode
-
-4
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-track
 
-10
+9
 0
 5
 Item
@@ -3116,7 +3062,7 @@ track-properties
 Menu
 menu-song
 
-11
+10
 0
 4
 Menu
@@ -3124,7 +3070,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -3147,12 +3093,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -3179,7 +3119,7 @@ popup-menu-bar-gap
 
 0
 0
-9
+8
 Item
 header
 disabled
@@ -3217,63 +3157,9 @@ track-add-marker
 0
 0
 Menu
-menu-version
-
-6
-0
-5
-Item
-layer-add
-
-0
-0
-0
-Item
-layer-mark-dominant
-
-1
-0
-0
-Item
-layer-merge
-
-2
-0
-0
-Item
-layer-delete
-
-3
-0
-0
-Menu
-menu-midi-mode
-
-4
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-track
 
-7
+6
 0
 5
 Item
@@ -3321,7 +3207,7 @@ track-properties
 Menu
 menu-song
 
-8
+7
 0
 4
 Menu
@@ -3428,25 +3314,25 @@ menu-version
 0
 5
 Item
-layer-add
+layer-delete
 
 0
 0
 0
 Item
-layer-mark-dominant
+layer-add
 
 1
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 2
 0
 0
 Item
-layer-delete
+layer-merge
 
 3
 0
@@ -3534,7 +3420,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -3557,12 +3443,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -3645,27 +3525,9 @@ Separator
 1
 0
 0
-Menu
-menu-midi-mode
+Item
+layer-delete
 
-2
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
 2
 0
 0
@@ -3693,10 +3555,28 @@ layer-merge
 6
 0
 0
-Item
-layer-delete
+Menu
+menu-midi-mode
 
 7
+0
+3
+Item
+layer-midi-mode-linear
+checkable
+0
+0
+0
+Item
+layer-midi-mode-tab
+checkable
+1
+0
+0
+Item
+layer-midi-mode-classical
+checkable
+2
 0
 0
 Separator
@@ -3863,25 +3743,25 @@ menu-version
 0
 5
 Item
-layer-add
+layer-delete
 
 0
 0
 0
 Item
-layer-mark-dominant
+layer-add
 
 1
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 2
 0
 0
 Item
-layer-delete
+layer-merge
 
 3
 0
@@ -3969,7 +3849,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -3992,12 +3872,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -4078,7 +3952,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -4101,12 +3975,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -4183,25 +4051,25 @@ menu-version
 0
 5
 Item
-layer-add
+layer-delete
 
 0
 0
 0
 Item
-layer-mark-dominant
+layer-add
 
 1
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 2
 0
 0
 Item
-layer-delete
+layer-merge
 
 3
 0
@@ -4289,7 +4157,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -4312,12 +4180,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -4508,7 +4370,7 @@ menu-track-new
 
 2
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -4531,12 +4393,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -4637,25 +4493,25 @@ menu-version
 0
 5
 Item
-layer-add
+layer-delete
 
 0
 0
 0
 Item
-layer-mark-dominant
+layer-add
 
 1
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 2
 0
 0
 Item
-layer-delete
+layer-merge
 
 3
 0
@@ -4695,7 +4551,7 @@ menu-track-new
 
 0
 0
-5
+4
 Item
 track-add-audio-mono
 image=hui:add
@@ -4718,12 +4574,6 @@ Item
 track-add-beats
 image=hui:add
 3
-0
-0
-Item
-track-add-group
-image=hui:add
-4
 0
 0
 Item
@@ -10547,7 +10397,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-233
+234
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10587,6 +10437,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 (Pause)\\-\\-\\%.3f
 (anonymous)
 (anonym)
+- direct out -
+- direkte Ausgabe -
 - none -
 - none -
 -Default  Parameters-

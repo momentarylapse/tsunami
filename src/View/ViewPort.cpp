@@ -165,3 +165,10 @@ void ViewPort::show(Range &r) {
 		view->cam_changed();
 }
 
+// for scroll bar override
+void ViewPort::dirty_jump(float _pos) {
+	pos = _pos;
+	pos_pre_animation = pos;
+	pos_target = pos;
+	animation_time = -1;
+}

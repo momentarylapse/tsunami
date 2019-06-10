@@ -46,6 +46,7 @@ public:
 	void zoom(float f, float mx);
 	void move(float dpos);
 	void set_target(float pos, float nonlin);
+	void dirty_jump(float pos);
 
 	void make_sample_visible(int sample, int samples_ahead);
 	rect nice_mapping_area();

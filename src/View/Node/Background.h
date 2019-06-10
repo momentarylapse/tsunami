@@ -16,6 +16,7 @@ public:
 
 	bool on_left_button_down() override;
 	bool on_right_button_down() override;
+	bool allow_handle_click_when_gaining_focus() override { return false; }
 
 	void draw(Painter *p) override;
 };

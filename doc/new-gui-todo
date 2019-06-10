@@ -12,11 +12,9 @@ TrackHeader
 LayerHeader
 	J right click select
 Background/TimeScale
-	* click during playback
+	J click during playback
 
 ModeMidi
-ModeMidi
-	* when adding notes, accept first click (focus)
 ModeCapture
 	J don't allow preview change
 ModeCurve
@@ -33,4 +31,4 @@ ModeScaleMarker
 * marker shown on layer... should be track
 
 ModeMidi
-	* when adding notes, accept first click (focus)
+	J when adding notes, accept first click (focus)

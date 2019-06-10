@@ -22,6 +22,8 @@ public:
 	ViewNode(ViewNode *parent, float dx, float dy, float w, float h);
 	virtual ~ViewNode();
 
+	virtual bool allow_handle_click_when_gaining_focus() { return true; }
+
 	virtual bool on_left_button_down() { return false; }
 	virtual bool on_left_button_up() { return false; }
 	virtual bool on_left_double_click() { return false; }

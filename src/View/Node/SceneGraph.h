@@ -19,10 +19,12 @@ public:
 	bool on_left_double_click() override;
 	bool on_right_button_down() override;
 	bool on_mouse_move() override;
+	bool allow_handle_click_when_gaining_focus() override;
 
 	//ViewNode *get_hover();
 	HoverData get_hover_data() override;
 
+	void update_area() override;
 	void draw(Painter *p) override;
 
 	string get_tip() override;

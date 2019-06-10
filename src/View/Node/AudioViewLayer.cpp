@@ -551,6 +551,17 @@ bool AudioViewLayer::on_left_button_down() {
 	return true;
 }
 
+// TODO put somewhere more reasonable
+bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
+	if (view->mode == view->mode_midi)
+		if (view->hover.type == HoverData::Type::MIDI_PITCH)
+			if (view->mode_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
+				return true;
+	if (view->hover_any_object())
+		return true;
+	return false;
+}
+
 bool AudioViewLayer::on_left_double_click() {
 	//*hover = get_hover();
 	//select_hover();

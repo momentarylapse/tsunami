@@ -15,10 +15,99 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 
 
+
+
+class PlaybackRange : public ViewNode {
+public:
+	PlaybackRange(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	void update_area() override {
+		area = parent->area;
+		view->cam.range2screen_clip(view->playback_wish_range, parent->area, area.x1, area.x2);
+		hidden = (view->playback_wish_range.length == 0);
+	}
+	void draw(Painter *p) override {
+		p->set_color(AudioView::colors.preview_marker);
+		p->draw_rect(area.x1, area.y1, area.width(), 5);
+	}
+	string get_tip() override {
+		return _("playback range");
+	}
+	bool on_left_button_down() override {
+		return parent->on_left_button_down();
+	}
+	bool on_right_button_down() override {
+		view->open_popup(view->menu_playback_range);
+		return true;
+	}
+};
+
+class PlaybackLockSymbol : public ViewNode {
+public:
+	PlaybackLockSymbol(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	void update_area() override {
+		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
+		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		hidden = !view->playback_range_locked;
+	}
+	void draw(Painter *p) override {
+		//p->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		p->set_font_size(AudioView::FONT_SIZE * 0.7f);
+		p->draw_str(area.x1 + 8, area.y1 + 3, u8"🔒");
+		p->set_font_size(AudioView::FONT_SIZE);
+	}
+	string get_tip() override {
+		return _("locked");
+	}
+	bool on_left_button_down() override {
+		view->set_playback_range_locked(false);
+		return true;
+	}
+	bool on_right_button_down() override {
+		view->open_popup(view->menu_playback_range);
+		return true;
+	}
+};
+
+class PlaybackLoopSymbol : public ViewNode {
+public:
+	PlaybackLoopSymbol(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	void update_area() override {
+		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
+		if (view->playback_range_locked)
+			x += 20;
+		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
+		hidden = !view->playback_loop;
+	}
+	void draw(Painter *p) override {
+		//p->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
+		//p->set_font_size(FONT_SIZE * 0.7f);
+		p->draw_str(area.x1 + 8, area.y1 + 3, u8"⏎");
+		p->set_font_size(AudioView::FONT_SIZE);
+	}
+	string get_tip() override {
+		return _("looping");
+	}
+	bool on_left_button_down() override {
+		view->set_playback_loop(false);
+		return true;
+	}
+	bool on_right_button_down() override {
+		view->open_popup(view->menu_playback_range);
+		return true;
+	}
+};
+
+
+
+
 TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
 	align.w = 100;
 	align.h = AudioView::TIME_SCALE_HEIGHT;
 	z = 20;
+
+	children.add(new PlaybackRange(this));
+	children.add(new PlaybackLockSymbol(this));
+	children.add(new PlaybackLoopSymbol(this));
 }
 
 void TimeScale::draw(Painter* c) {
@@ -42,81 +131,21 @@ void TimeScale::draw(Painter* c) {
 		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 	}
 	view->grid_painter->draw_time_numbers(c);
-
-	// playback lock range
-	if (view->playback_wish_range.length > 0){
-		c->set_color(AudioView::colors.preview_marker);
-		float x0, x1;
-		view->cam.range2screen_clip(view->playback_wish_range, area, x0, x1);
-		c->draw_rect(x0, area.y1, x1-x0, 5);
-	}
-
-	// playback lock symbol
-	playback_lock_button = rect::EMPTY;
-	if (view->playback_range_locked){
-		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
-		playback_lock_button = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
-
-		//c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		c->set_font_size(AudioView::FONT_SIZE * 0.7f);
-		c->draw_str(playback_lock_button.x1 + 5, playback_lock_button.y1 + 3, u8"🔒");
-		c->set_font_size(AudioView::FONT_SIZE);
-	}
-
-	// playback loop symbol
-	playback_loop_button = rect::EMPTY;
-	if (view->playback_loop){
-		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
-		playback_loop_button = rect(x + 20, x + 40, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
-
-		//c->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		//c->set_font_size(FONT_SIZE * 0.7f);
-		c->draw_str(playback_loop_button.x1 + 5, playback_loop_button.y1 + 3, u8"⏎");
-		c->set_font_size(AudioView::FONT_SIZE);
-	}
-}
-
-string TimeScale::get_tip() {
-	if (hover_lock_button())
-		return _("locked");
-	if (hover_loop_button())
-		return _("looping");
-	if (hover_playback())
-		return _("playback range");
-	return "";
 }
 
 bool TimeScale::on_left_button_down() {
-
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
-
 		int pos = view->hover.pos_snap;
 		view->set_cursor_pos(pos);
 		view->hover.range = Range(pos, 0);
-
 		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
 	}
 	return true;
 }
 
-bool TimeScale::hover_lock_button() {
-	return playback_lock_button.inside(view->mx, view->my);
-}
-
-bool TimeScale::hover_loop_button() {
-	return playback_loop_button.inside(view->mx, view->my);
-}
-
-bool TimeScale::hover_playback() {
-	return view->playback_wish_range.is_inside(view->hover.pos);
-}
-
 bool TimeScale::on_right_button_down() {
-	if (hover_playback())
-		view->open_popup(view->menu_playback_range);
-	else
-		view->open_popup(view->menu_song);
+	view->open_popup(view->menu_song);
 	return true;
 }

@@ -502,33 +502,19 @@ void AudioView::on_mouse_move() {
 		scene_graph->on_mouse_move();
 	}
 
-/*
-	if (selection_mode != SelectionMode::NONE) {
-
-		snap_to_grid(hover.pos);
-		hover.range.set_end(hover.pos);
-		hover.y1 = my;
-		if (select_xor)
-			set_selection(sel_temp or mode->get_selection(hover.range));
-		else
-			set_selection(mode->get_selection(hover.range));
-	} else {
-
-		// selection:
-		if (msp.step()) {
-			mode->start_selection();
-			msp.stop();
-		}
-	}*/
 	force_redraw();
 }
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	if (!hui::GetEvent()->just_focused) {
-		hover = scene_graph->get_hover_data();
+	hover = scene_graph->get_hover_data();
+
+	bool allow_handle = true;
+	if (hui::GetEvent()->just_focused)
+		allow_handle = scene_graph->allow_handle_click_when_gaining_focus();
+
+	if (allow_handle)
 		scene_graph->on_left_button_down();
-	}
 
 	force_redraw();
 	update_menu();

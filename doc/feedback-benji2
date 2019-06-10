@@ -1,0 +1,166 @@
+
+J def. mono
+  fx
+	* einzelne track fx panels neben track volume
+	* mastering fx neben master
+  metering
+	J vertikal
+	J alle tracks
+  sends
+	j track gruppen
+  metronom
+	* toggle mode
+* mehr shortcuts
+  punch in
+	J generell
+	* loop bereich
+  cursor
+	j~ ...
+J marken
+
+
+* BUGS
+	J punch in recording offset
+
+
+
+
+Den ersten Track würde ich Standardmäßig als Monospur anbieten. Ist 
+einfach üblicher. Außer du hast was dagegen und nutzt lieber Stereo 
+Spuren. Du bist ja der Hauptnutzer.
+
+
+FX:
+
+Die beiden Knöpfe fx & vol würde ich verlieren.
+
+Jeder Spur einen kleinen fx Knopf (...vielleicht unten zwischen M & 
+S...) geben. Der Knopf öfnet eine vertikale Effektansicht rechts der 
+Spur (aber links der nächsten Spur) und ein Klick auf den Effekt öffnet 
+die Konfiguration entweder ganz rechts außen oder zwischen der 
+vertikalen Ansicht und der nächsten Spur.
+
+Ein Klick auf fx dieser Spur schließt alles oder ein Klick auf fx einer 
+anderen Spur schließt alles und öffnet die vertikale Ansicht der neuen Spur.
+
+(Output) Master sollte auch (Mastering-) Effekte bekommen dürfen.
+
+
+METERING:
+
+Und die Pegelanzeigen des Masters würde ich in der Mixeransicht rechts 
+des Pegelreglers anzeigen. Außerdem täte jeder Spur eine vertikale 
+Pegelanzeige rechts neben dem jeweiligen Regler gut. Ebenso den Sends.
+
+
+SENDS:
+
+Bei jeder Spur sollte man den Output wählen können. Master oder ein Send 
+(die man dann auch umbenennen kann (Alle Schlagzeugspuren werden in den 
+Send Drums gerootet)).
+
+Normalerweise ist das so, dass die Sends nach allen Spuren im Mixer als 
+Spuren angezeigt werden. Ich fände es aber schön, wenn der Send vor den 
+Spuren, die er "zusammenfasst" erscheint (weil dein Master auch links 
+orientiert ist, was ich schön finde) und die "zusammengefassten" Spuren 
+können dann in den Send verkleinert werden. Das würde richtig gut 
+Übersichtlichkeit schaffen. Die Sendspuren dürfen natürlich auch Effekte 
+haben, sind ja einfach nur virtuelle Spuren mit mehreren Eingängen.
+
+Das gibt einem dann auch die Möglichkeit einer 
+Instrumenten-/Spurengruppe gemeinsame Effekte zu geben.
+
+
+METRONOM:
+
+Fände ich besser als Knopf bei Play, Pause, etc. Mit der Möglichkeit zu 
+toggeln, ob er gar nicht, nur bei der Aufnahme oder auch beim Abspielen 
+zu hören ist.
+
+
+SHORTCUTS:
+
+Ah, gibt es ja. Sind nur nicht im Menu ausgewiesen. Wäre schön für alles 
+welche zu haben und darüber Bescheid zu wissen.
+
+
+PUNCH-IN / -OUT:
+
+Eine Möglichkeit zu definieren bei welcher Spur ab und bis zu welchem 
+Zeitpunkt aufgenommen werden soll.
+
+Schön wäre dann hier, dass wenn man einen loop Bereich definiert, bei 
+jedem Durchgang eine neue "Version" angelegt wird. Die Versionen können 
+dann auch erhalten bleiben und man kann sich für eine dominante 
+entscheiden (oder sogar als Verhältnis zusammen mischen). So könnte man 
+zum Beispiel kompakt mehrstimmige(/einstimmig-mehrstimmige) Refrains 
+einsingen.
+
+
+
+Sehr hübsche blau unterlegte Fehlermeldungen...
+
+
+Hmm, jetzt hat die Aufnahme nicht geklappt. Bzw. die Aufnahme lief und 
+ich habe auch Pegeländerungen gesehen, aber nach der Aufnahme war die 
+Aufnahme leer. Außerdem lief dem grünen Balken ein roter Voraus. 
+Abgespielt, zum Beispiel das Metronom wurde an der grünen Linie. Die 
+Aufnahme erfolgte aber an der roten Linie. Ich hab mit dem Metronom 
+mitgeschnalzt, aber der Schnalz-Pegel war dann natürlich nach dem 
+Metronom-Klick.
+
+
+
+Das war erstmal alles was mir auf die Schnelle auf- und einfiel.
+
+
+
+
+
+
+
+CURSORBAR:
+
+Der Cursor (die Cursorleiste) sollte sich für mein Gefühl nur bewegen, 
+wenn ich oben in die Leiste klicke. Weil ich gerne Spuren auswähle, 
+indem ich einfach draufklicke statt vorn auf den Namen zu klicken.
+
+Genau das machen alle Videoschnittprogramme die ich kenne so wie du 
+bisher und ich kriege regelmäßig Mini-Wutanfälle, weil ich mir eine 
+Stelle sehr genau aussuche und dann zwischen den Spuren hin und her 
+springen will und schwupps hat sich der Cursor wieder "verstellt".
+
+Vielleicht auch über eine Taste, die gedrückt sein muss, um zusammen mit 
+einem Klick den Cursor zu verschieben oder eben Verschieben zu verhindern.
+
+
+MARKEN:
+
+Hmmnja, ich könnte Marken setzen, aber das werden dann immer immer mehr 
+und schnell unübersichtlich, weil man Marken dann doch nicht löscht, 
+wenn man sie nicht mehr braucht.
+
+Gibt es Marken? Wenn ja, dann würde ich mich über tooltipartige 
+Anmerkungen freuen, die ausgefüllt werden will, wenn sie gesetzt wird. 
+Dann vergisst man nicht mehr, warum man da eine Marke gesetzt hat.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

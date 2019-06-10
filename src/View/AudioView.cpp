@@ -229,8 +229,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	mx = my = 0;
 
-	hover_before_leave = hover = HoverData();
-
 	message.ttl = -1;
 
 
@@ -1536,6 +1534,7 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 
 void AudioView::open_popup(hui::Menu* menu) {
 	prepare_menu(menu);
+	hover_before_leave = hover;
 	menu->open_popup(win);
 }
 

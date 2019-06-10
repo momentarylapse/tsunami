@@ -15,16 +15,13 @@
 
 ViewModeScaleBars::ViewModeScaleBars(AudioView *view) :
 	ViewModeDefault(view)
-{
-}
+{}
 
-void ViewModeScaleBars::on_start()
-{
+void ViewModeScaleBars::on_start() {
 	start_scaling(view->sel.bar_indices(view->song));
 }
 
-void ViewModeScaleBars::draw_post(Painter *c)
-{
+void ViewModeScaleBars::draw_post(Painter *c) {
 	float x1, x2;
 	cam->range2screen_clip(view->sel.range, view->area, x1, x2);
 
@@ -37,8 +34,7 @@ void ViewModeScaleBars::draw_post(Painter *c)
 }
 
 
-void ViewModeScaleBars::start_scaling(const Array<int> &sel)
-{
+void ViewModeScaleBars::start_scaling(const Array<int> &sel) {
 	scaling_sel = {};
 	for (int i=sel[0]; i<=sel.back(); i++)
 		scaling_sel.add(i);
@@ -47,37 +43,28 @@ void ViewModeScaleBars::start_scaling(const Array<int> &sel)
 	view->update_selection();
 }
 
-void ViewModeScaleBars::on_left_button_up()
-{
+void ViewModeScaleBars::on_left_button_up() {
 	ViewModeDefault::on_left_button_up();
 
 	perform_scale();
 }
 
-void ViewModeScaleBars::on_right_button_down()
-{
+void ViewModeScaleBars::on_right_button_down() {
 	session->set_mode("default");
 }
 
-void ViewModeScaleBars::on_mouse_move()
-{
-	ViewModeDefault::on_mouse_move();
-}
-
-void ViewModeScaleBars::on_key_down(int k)
-{
+void ViewModeScaleBars::on_key_down(int k) {
 	if (k == hui::KEY_ESCAPE)
 		session->set_mode("default");
 	if (k == hui::KEY_RETURN)
 		perform_scale();
 }
 
-void ViewModeScaleBars::perform_scale()
-{
+void ViewModeScaleBars::perform_scale() {
 	float factor = (float)view->sel.range.length / (float)scaling_range_orig.length;
 
 	song->begin_action_group();
-	foreachb(int i, scaling_sel){
+	foreachb(int i, scaling_sel) {
 		BarPattern bb = *song->bars[i];
 		bb.length = (int)((float)bb.length * factor);
 		song->edit_bar(i, bb, Bar::EditMode::STRETCH);

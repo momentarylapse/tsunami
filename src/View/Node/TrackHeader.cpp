@@ -31,8 +31,10 @@ public:
 		vtrack = th->vtrack;
 		header = th;
 	}
-	HoverData get_hover_data() {
-		return header->get_hover_data();
+	HoverData get_hover_data() override {
+		auto h = header->get_hover_data();
+		h.node = this;
+		return h;
 	}
 	color get_color() {
 		if (view_hover())
@@ -240,7 +242,7 @@ bool TrackHeader::on_right_button_down() {
 }
 
 HoverData TrackHeader::get_hover_data() {
-	auto h = view->hover_time();
+	auto h = ViewNode::get_hover_data();
 	h.vtrack = vtrack;
 	h.vlayer = vtrack->first_layer();
 	return h;

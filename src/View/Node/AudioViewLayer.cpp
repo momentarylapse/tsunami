@@ -574,7 +574,6 @@ bool AudioViewLayer::on_left_double_click() {
 }
 
 bool AudioViewLayer::on_right_button_down() {
-	view->hover_before_leave = view->hover;
 
 	// pop up menu...
 	view->update_menu();

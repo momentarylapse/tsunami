@@ -1,16 +1,20 @@
+== bugs ==
+
 J double click
 * right click
 	* select vlayer
 	* select stuff...
-J home/end keys don't move cam
+J home/end keys should move cam
 
 TrackHeader
-	* right click select
+	J right click select
+	J right click add marker...
 LayerHeader
-	* right click select
+	J right click select
 Background/TimeScale
 	* click during playback
 
+ModeMidi
 ModeMidi
 	* when adding notes, accept first click (focus)
 ModeCapture
@@ -19,3 +23,14 @@ ModeCurve
 	...all
 ModeScaleBar
 	* detect change
+ModeScaleMarker
+	* detect change
+
+
+== quirks ==
+
+* track header right click add marker should be under cursor, not mouse
+* marker shown on layer... should be track
+
+ModeMidi
+	* when adding notes, accept first click (focus)

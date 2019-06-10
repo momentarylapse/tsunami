@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-893
+898
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2371,7 +2371,7 @@ popup_sample_menu/add_group_track
 Gruppe
 
 menu/edit-track-groups
-Spur Gruppen bearbeiten...
+Verkettung...
 
 mini_bar/select-snap-mode-bars
 B
@@ -2682,8 +2682,23 @@ Auswahl dominant setzen
 /play-toggle
 Abspielen
 
+track-routing-dialog/add-group
+Neue Gruppe
+
+track-routing-dialog/track-routing-dialog
+Spur Verkettungen
+
+track-routing-dialog/t-disclaimer
+...this is highly experimental...don`t complain!
+
+track-routing-dialog/t-target
+Ziel
+
+track-routing-dialog/t-track
+Spur
+
 // Num Language Strings
-231
+233
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3147,3 +3162,7 @@ looping
 Schleife
 pause 
 Pause 
+ (%d samples)
+ (%d Samples)
+cursor
+Cursor

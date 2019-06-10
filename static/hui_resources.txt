@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-56
+57
 // Resource
 Menu
 menu_fake
@@ -1339,7 +1339,7 @@ menu-track
 
 2
 0
-4
+5
 Item
 track_import
 image=hui:open
@@ -1352,16 +1352,22 @@ track_render
 1
 0
 0
+Item
+edit-track-groups
+
+2
+0
+0
 Separator
 
 
-2
+3
 0
 0
 Menu
 menu-track-new
 
-3
+4
 0
 5
 Item
@@ -1501,7 +1507,7 @@ menu_view
 
 5
 0
-11
+10
 Menu
 menu_view_midi
 
@@ -1550,40 +1556,34 @@ show_fx_console
 4
 0
 0
-Item
-edit-track-groups
-
-5
-0
-0
 Separator
 
 
-6
+5
 0
 0
 Item
 zoom_in
 image=hui:zoom-in
-7
+6
 0
 0
 Item
 zoom_out
 image=hui:zoom-out
-8
+7
 0
 0
 Item
 view_optimal
 image=hui:zoom-fit
-9
+8
 0
 0
 Item
 view_samples
 image=hui:zoom-one
-10
+9
 0
 0
 Menu
@@ -6244,6 +6244,61 @@ flat,height=20,expandx,padding=1
 0
 // Resource
 Dialog
+track-routing-dialog
+width=100,height=50
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
+Label
+t-disclaimer
+height=40
+0
+0
+0
+Grid
+list
+
+1
+0
+2
+Label
+t-track
+bold
+0
+0
+0
+Label
+t-target
+bold
+1
+0
+0
+Grid
+?
+buttonbar
+2
+0
+2
+Button
+add-group
+
+0
+0
+0
+Button
+close
+
+1
+0
+0
+// Resource
+Dialog
 tuning_dialog
 width=120,height=50
 0
@@ -6284,7 +6339,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-497
+502
 // Text
 /bars-add
 Add bars...
@@ -6818,7 +6873,7 @@ menu/delete_time
 Delete selected interval
 
 menu/edit-track-groups
-Edit track groups
+Routing...
 
 menu/export_selection
 Save selection...
@@ -7732,6 +7787,21 @@ Solo
 track-mixer2/volume
 0
 Volume in dB
+track-routing-dialog/add-group
+Add group
+
+track-routing-dialog/t-disclaimer
+...this is highly experimental...don`t complain!
+
+track-routing-dialog/t-target
+Target
+
+track-routing-dialog/t-track
+Track
+
+track-routing-dialog/track-routing-dialog
+Track routing
+
 track_dialog/_edit_synth
 
 Configure synthesizer
@@ -7783,7 +7853,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-892
+897
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8524,7 +8594,7 @@ menu/delete_track
 Löschen
 
 menu/edit-track-groups
-Spur Gruppen bearbeiten...
+Verkettung...
 
 menu/edit_bars
 Bearbeiten
@@ -10389,6 +10459,21 @@ a\\b
 track-mixer2/volume
 0
 Lautstärke in dB
+track-routing-dialog/add-group
+Neue Gruppe
+
+track-routing-dialog/t-disclaimer
+...this is highly experimental...don`t complain!
+
+track-routing-dialog/t-target
+Ziel
+
+track-routing-dialog/t-track
+Spur
+
+track-routing-dialog/track-routing-dialog
+Spur Verkettungen
+
 track_dialog/_edit_fx
 Bearbeiten
 
@@ -10462,7 +10547,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-231
+233
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10480,6 +10565,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
   - keins -
   ...don't worry. Everything will be fine!
   ...keine Sorge, das wird schon!
+ (%d samples)
+ (%d Samples)
  - no strings -
  - keine Saiten -
  - none -
@@ -10808,6 +10895,8 @@ compiling script:
 kompiliere Script: 
 creating backup: 
 Erstelle Backup: 
+cursor
+Cursor
 cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)
 Cursor (←,→)    löschen (⟵)    Notenlänge (L)    Schlagteiler (P)
 data loss when saving in this format!

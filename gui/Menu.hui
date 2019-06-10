@@ -30,6 +30,7 @@ Menu menu ""
 	Menu /menu-track "Track"
 		Item track_import "Import from file..." image=hui:open
 		Item track_render "Render from selection"
+		Item edit-track-groups "Routing..."
 		Separator
 		Menu /menu-track-new "Add new track"
 			Item /track-add-audio-mono "Audio (mono)" image=hui:add
@@ -63,7 +64,6 @@ Menu menu ""
 		Item show_signal_chain "Signal chain" checkable
 		Item show_devices "Devices" checkable
 		Item show_fx_console "Effects"
-		Item edit-track-groups "Edit track groups"
 		Separator
 		Item zoom_in "Zoon in" image=hui:zoom-in
 		Item zoom_out "Zoom out" image=hui:zoom-out

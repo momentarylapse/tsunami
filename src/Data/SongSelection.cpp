@@ -15,24 +15,19 @@
 #include "TrackMarker.h"
 #include "SampleRef.h"
 
-SongSelection::SongSelection()
-{
-	bar_gap = -1;
+SongSelection::SongSelection() {
 }
 
-void SongSelection::clear()
-{
+void SongSelection::clear() {
 	layers.clear();
 	clear_data();
 }
 
-void SongSelection::clear_data()
-{
+void SongSelection::clear_data() {
 	samples.clear();
 	markers.clear();
 	notes.clear();
 	bars.clear();
-	bar_gap = -1;
 }
 
 SongSelection SongSelection::all(Song* s) {
@@ -88,10 +83,8 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 			if (has(sr))
 				s.add(sr);
 
-		if (l->type == SignalType::BEATS) {
+		if (l->type == SignalType::BEATS)
 			s.bars = bars;
-			s.bar_gap = bar_gap;
-		}
 	}
 
 	return s;
@@ -114,27 +107,18 @@ SongSelection SongSelection::filter(int mask) const {
 
 void SongSelection::_update_bars(Song* s) {
 	bars.clear();
-	bar_gap = -1;
 
 
-	if (range.end() <= 0) {
-		bar_gap = 0;
+	if (range.end() <= 0)
 		return;
-	}
 
 	int pos = 0;
 	foreachi(Bar *b, s->bars, i) {
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
-		if (r.overlaps(range)) {
+		if (r.overlaps(range))
 			bars.add(b);
-		} else if (range.length == 0 and (range.offset == pos)) {
-			bar_gap = i;
-		}
 		pos += b->length;
-	}
-	if (range.start() >= pos) {
-		bar_gap = s->bars.num;
 	}
 }
 

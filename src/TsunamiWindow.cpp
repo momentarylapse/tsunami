@@ -1073,49 +1073,45 @@ void TsunamiWindow::on_render_export_selection()
 	}
 }
 
-void TsunamiWindow::on_export_selection()
-{
+void TsunamiWindow::on_export_selection() {
 	// TODO
-	if (session->storage->ask_save(this)){
+	if (session->storage->ask_save(this)) {
 		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}
 }
 
-void TsunamiWindow::on_quick_export()
-{
+void TsunamiWindow::on_quick_export() {
 	string dir = hui::Config.get_str("QuickExportDir", hui::Application::directory);
 	if (session->storage->save(song, dir + _suggest_filename(song, dir)))
 		view->set_message(_("file saved"));
 }
 
-int pref_bar_index(AudioView *view)
-{
-	if (view->sel.bar_gap >= 0)
-		return view->sel.bar_gap;
+int pref_bar_index(AudioView *view) {
+	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
+		return view->cur_selection.index;
+	/*if (view->cur_selection.type == HoverData::Type::BAR)
+		return view->cur_selection.index + 1;*/
 	if (view->sel.bar_indices(view->song).num > 0)
-		return view->sel.bar_indices(view->song).back();
+		return view->sel.bar_indices(view->song).back() + 1;
 	if (view->hover_before_leave.pos > 0)
 		return view->song->bars.num;
 	return 0;
 }
 
-void TsunamiWindow::on_add_bars()
-{
+void TsunamiWindow::on_add_bars() {
 	auto dlg = new BarAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
 	delete dlg;
 }
 
-void TsunamiWindow::on_add_pause()
-{
+void TsunamiWindow::on_add_pause() {
 	auto *dlg = new PauseAddDialog(win, song, pref_bar_index(view));
 	dlg->run();
 	delete dlg;
 }
 
-void TsunamiWindow::on_delete_bars()
-{
+void TsunamiWindow::on_delete_bars() {
 	auto *dlg = new BarDeleteDialog(win, song, view->sel.bar_indices(song));
 	dlg->run();
 	delete dlg;

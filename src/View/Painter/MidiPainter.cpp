@@ -300,23 +300,6 @@ bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<Quan
 	return group.back().end <= beat_end;
 }
 
-// currently only for 4x 8th notes
-bool find_long_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<QuantizedNote> &group) {
-	if (ndata.num < i + 4)
-		return false;
-	group = {d};
-	for (int j=i+1; j<i+4; j++) {
-		// non-continguous?
-		if (ndata[j].offset != ndata[j-1].end)
-			return false;
-		// size mismatch?
-		if (ndata[j].length != EIGHTH)
-			return false;
-		group.add(ndata[j]);
-	}
-	return true;
-}
-
 struct QuantizedBar {
 	Array<int> beat_offset;
 	Array<int> beat_length;

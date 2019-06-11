@@ -1412,8 +1412,6 @@ void AudioView::select_under_cursor() {
 }
 
 bool AudioView::hover_any_object() {
-	if (hover.type == HoverData::Type::BAR_GAP)
-		return true;
 	if (hover.bar)
 		return true;
 	if (hover.marker)
@@ -1426,8 +1424,6 @@ bool AudioView::hover_any_object() {
 }
 
 bool AudioView::hover_selected_object() {
-	if (hover.type == HoverData::Type::BAR_GAP)
-		return sel.bar_gap == hover.index;
 	if (hover.bar)
 		return sel.has(hover.bar);
 	if (hover.marker)
@@ -1440,9 +1436,7 @@ bool AudioView::hover_selected_object() {
 }
 
 void AudioView::select_object() {
-	if (hover.type == HoverData::Type::BAR_GAP) {
-		sel.bar_gap = hover.index;
-	} else if (hover.bar) {
+	if (hover.bar) {
 		sel.add(hover.bar);
 	} else if (hover.marker) {
 		sel.add(hover.marker);
@@ -1454,9 +1448,7 @@ void AudioView::select_object() {
 }
 
 void AudioView::toggle_object() {
-	if (hover.type == HoverData::Type::BAR_GAP) {
-		sel.bar_gap = hover.index;
-	} else if (hover.bar) {
+	if (hover.bar) {
 		sel.toggle(hover.bar);
 	} else if (hover.marker) {
 		sel.toggle(hover.marker);

@@ -52,6 +52,7 @@ public:
 		view->hover.y0 = view->mdp->y0;
 		view->hover.y1 = view->my;
 		view->selection_mode = mode;
+		view->hover.type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
 		view->set_selection(view->mode->get_selection(view->hover.range, mode));
 	}

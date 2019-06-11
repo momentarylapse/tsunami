@@ -6,7 +6,11 @@
  */
 
 #include "Cursor.h"
+#include "AudioViewLayer.h"
 #include "../AudioView.h"
+#include "../../Data/base.h"
+#include "../../Data/Song.h"
+#include "../../Data/TrackLayer.h"
 
 
 Cursor::Cursor(AudioView* view, bool end) : ViewNode(view) {
@@ -79,32 +83,30 @@ void SelectionMarker::draw(Painter* p) {
 		}
 	}
 
-	/*
+
 	// bar gap selection
-	if (sel.bar_gap >= 0){
-		x1 = cam.sample2screen(song->bar_offset(sel.bar_gap));
-		x2 = x1;
-		c->set_color(colors.text_soft1);
-		c->set_line_width(2.5f);
-		for (auto *t: vlayer)
+	if (view->cur_selection.type == HoverData::Type::BAR_GAP){
+		x2 = view->cam.sample2screen(view->song->bar_offset(view->cur_selection.index));
+		p->set_color(view->colors.text_soft1);
+		p->set_line_width(2.5f);
+		for (auto *t: view->vlayer)
 			if (t->layer->type == SignalType::BEATS){
-				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				c->draw_line(x2, t->area.y1, x2, t->area.y2);
-				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
+				p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
+				p->draw_line(x2, t->area.y1, x2, t->area.y2);
+				p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
 		}
-		c->set_line_width(1.0f);
+		p->set_line_width(1.0f);
 	}
-	if (view->hover.type == Selection::Type::BAR_GAP){
-		x1 = view->cam.sample2screen(song->bar_offset(hover.index));
-		x2 = x1;
-		c->set_color(colors.hover);
-		c->set_line_width(2.5f);
-		for (auto *t: vlayer)
+	if (view->hover.type == HoverData::Type::BAR_GAP){
+		x2 = view->cam.sample2screen(view->song->bar_offset(view->hover.index));
+		p->set_color(view->colors.hover);
+		p->set_line_width(2.5f);
+		for (auto *t: view->vlayer)
 			if (t->layer->type == SignalType::BEATS){
-				c->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				c->draw_line(x2, t->area.y1, x2, t->area.y2);
-				c->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
+				p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
+				p->draw_line(x2, t->area.y1, x2, t->area.y2);
+				p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
 		}
-		c->set_line_width(1.0f);
-	}*/
+		p->set_line_width(1.0f);
+	}
 }

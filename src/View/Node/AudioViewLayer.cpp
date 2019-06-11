@@ -584,22 +584,10 @@ bool AudioViewLayer::on_left_double_click() {
 	return true;
 }
 
-bool hover_object_selected(AudioView *view) {
-	if (view->hover.bar)
-		return view->sel.has(view->hover.bar);
-	if (view->hover.marker)
-		return view->sel.has(view->hover.marker);
-	if (view->hover.sample)
-		return view->sel.has(view->hover.sample);
-	if (view->hover.note)
-		return view->sel.has(view->hover.note);
-	return false;
-}
-
 bool AudioViewLayer::on_right_button_down() {
 
 	if (view->hover_any_object()) {
-		if (!hover_object_selected(view)) {
+		if (!view->hover_selected_object()) {
 			//select object exclusively
 			view->sel.clear_data();
 

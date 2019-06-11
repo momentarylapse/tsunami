@@ -48,7 +48,6 @@ public:
 	Set<const MidiNote*> notes;
 	Set<const Bar*> bars;
 	Set<const Track*> tracks() const;
-	int bar_gap;
 
 	bool has(const Track *t) const;
 

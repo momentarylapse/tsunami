@@ -339,6 +339,7 @@ HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer) {
 
 void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 {
+#if 0
 	if (view->is_playback_active()){
 		if (view->renderer->range().is_inside(pos)){
 			session->signal_chain->set_pos(pos);
@@ -357,11 +358,13 @@ void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
 	view->set_selection(get_selection_for_range(Range(pos, 0)));
 
 	view->cam.make_sample_visible(pos, 0);
+#endif
 }
 
 
 void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 {
+#if 0
 	if (!l)
 		return;
 	auto &sel = m->view->sel;
@@ -375,21 +378,20 @@ void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
 	}else if (soft){
 		if (sel.has(l))
 			return;
-		sel.track_layers.clear();
+		sel.layers.clear();
 		sel.add(l);
 		sel.tracks.clear();
 		sel.add(l->track);
 	}else{
-		sel.track_layers.clear();
+		sel.layers.clear();
 		sel.add(l);
 		sel.add(l->track);
 		sel.tracks.clear();
 	}
 
-	sel.make_consistent(m->song);
-
 	// TODO: what to do???
 	m->view->set_selection(m->view->mode->get_selection_for_range(sel.range));
+#endif
 }
 
 void ViewModeDefault::select_hover()
@@ -440,7 +442,7 @@ void ViewModeDefault::select_hover()
 }
 
 SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
-	return SongSelection::from_range(song, r, view->sel.tracks, view->sel.track_layers);
+	return SongSelection::from_range(song, r).filter(view->sel.layers);
 }
 
 SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1)
@@ -457,7 +459,6 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 		Track *t = vt->track;
 		if ((y1 < vt->area.y1) or (y0 > vt->area.y2))
 			continue;
-		s.add(t);
 
 		// markers
 		for (TrackMarker *m: t->markers)
@@ -494,17 +495,12 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 		y0 = y1;
 		y1 = t;
 	}
-	Set<const Track*> _tracks;
-	for (auto vt: view->vtrack){
-		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
-			_tracks.add(vt->track);
-	}
 	Set<const TrackLayer*> _layers;
 	for (auto vt: view->vlayer){
 		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
 			_layers.add(vt->layer);
 	}
-	return SongSelection::from_range(song, r, _tracks, _layers);
+	return SongSelection::from_range(song, r).filter(_layers);
 }
 
 void ViewModeDefault::start_selection()

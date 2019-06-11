@@ -73,12 +73,13 @@ void CaptureConsole::on_enter()
 	enable("ok", false);
 
 	int num_audio = 0, num_midi = 0;
-	for (const Track *t: view->sel.tracks){
-		if (t->type == SignalType::AUDIO)
-			num_audio ++;
-		if (t->type == SignalType::MIDI)
-			num_midi ++;
-	}
+	for (Track *t: view->song->tracks)
+		if (view->sel.has(t)) {
+			if (t->type == SignalType::AUDIO)
+				num_audio ++;
+			if (t->type == SignalType::MIDI)
+				num_midi ++;
+		}
 
 	if ((num_audio == 1) and (num_midi == 0)){
 		mode = mode_audio;

@@ -71,3 +71,171 @@ if hover object?
 elif hover buffer?
 	select range(buffer)
 
+
+
+
+
+
+
+
+
+
+
+
+== left click no control ==
+
+-- layer header --
+
+set current (hover)
+select layer exclusively
+if layer was unselected
+	select under cursor
+else
+	restrict selection to layer
+	
+
+-- track header --
+
+>>> layer[0]
+OR...INCLUDE ALL LAYERS....TODO
+
+-- header buttons --
+
+set current (hover)
+just action (no selection)
+
+-- layer object --
+
+set current (hover)
+select layer exclusively
+select object exclusively
+
+-- layer void --
+
+if playback
+	jump
+else
+	set current (hover)
+	select layer exclusively
+	if layer was unselected
+		set cursor (hover.pos_snap)
+	select under cursor
+
+-- background --
+
+if playback
+	jump
+else
+	set current (hover)
+	set cursor (hover.pos_snap)
+	select under cursor
+
+
+
+
+
+
+
+
+== left click + control ==
+
+
+-- layer header --
+
+set current (hover)
+toggle select layer
+if layer was unselected
+	select add under cursor(layer)
+else
+	unselect all layer objects
+	
+
+-- track header --
+
+>>> layer[0]
+OR...INCLUDE ALL LAYERS....TODO
+
+-- layer object --
+
+set current (hover)
+toggle select object
+
+-- layer void --
+
+set current (hover)
+toggle select layer
+if layer was unselected
+	select add under cursor(layer)
+else
+	unselect all layer objects
+
+-- background --
+
+?ignore?
+
+
+
+
+== right click ==
+
+-- layer header --
+
+set current (hover)
+if layer was unselected
+	select layer exclusively
+	select under cursor
+popup
+
+-- track header --
+
+>>> layer[0]
+OR...INCLUDE ALL LAYERS....TODO
+
+-- layer object --
+
+set current (hover)
+if object was unselected
+	select object exclusively
+if layer was unselected
+	select layer exclusively
+	(no other objects...)
+popup
+
+-- layer void --
+
+set current (hover)
+if layer was unselected
+	select layer exclusively
+unselect all objects
+popup
+
+-- background --
+
+set current (hover)
+popup
+
+
+
+
+
+
+
+
+== double click ==
+
+-- layer header --
+
+-- track header --
+
+open properties
+
+-- layer object --
+
+set cursor (object.range)
+
+-- layer void --
+
+-- background --
+
+
+

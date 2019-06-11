@@ -77,9 +77,9 @@ void CaptureConsoleModeAudio::enter()
 			cc->set_int("source", i);
 
 
-	for (const Track *t: view->sel.tracks)
-		if (t->type == SignalType::AUDIO)
-			set_target((Track*)t);
+	for (Track *t: view->song->tracks)
+		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
+			set_target(t);
 
 	chain = new SignalChain(session, "capture");
 

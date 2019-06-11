@@ -20,22 +20,17 @@ class TrackMarker;
 class MidiNote;
 class Bar;
 
-class SongSelection
-{
+class SongSelection {
 public:
 	SongSelection();
 
 	void clear();
 	void clear_data();
-	void all(Song *s);
 	void _update_bars(Song *s);
+	static SongSelection all(Song *s);
 	static SongSelection from_range(Song *s, const Range &r);
-	static SongSelection from_range(Song *s, const Range &r, Set<const Track*> tracks, Set<const TrackLayer*> layers);
 
-	void make_consistent(Song *s);
-	void _update_tracks_from_layers(Song *s);
-
-	enum Mask{
+	enum Mask {
 		SAMPLES = 1,
 		MARKERS = 2,
 		MIDI_NOTES = 4,
@@ -43,22 +38,19 @@ public:
 		ALL = -1
 	};
 	SongSelection filter(int mask) const;
+	SongSelection filter(const Array<const TrackLayer*> &layers) const;
 
 	Range range;
 
-	Set<const Track*> tracks;
-	Set<const TrackLayer*> track_layers;
+	Set<const TrackLayer*> layers;
 	Set<const SampleRef*> samples;
 	Set<const TrackMarker*> markers;
 	Set<const MidiNote*> notes;
 	Set<const Bar*> bars;
+	Set<const Track*> tracks() const;
 	int bar_gap;
 
-	void add(const Track *t);
-	void set(const Track *t, bool selected);
 	bool has(const Track *t) const;
-	void toggle(const Track *t);
-	void click(const Track *t, bool control_pressed);
 
 	void add(const TrackLayer *l);
 	void set(const TrackLayer *l, bool selected);
@@ -95,7 +87,9 @@ public:
 	Array<int> bar_indices(Song *song) const;
 
 	SongSelection restrict_to_track(Track *t) const;
+	SongSelection restrict_to_layer(TrackLayer *l) const;
 	SongSelection operator||(const SongSelection &s) const;
+	SongSelection operator&&(const SongSelection &s) const;
 	SongSelection minus(const SongSelection &s) const;
 };
 

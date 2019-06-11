@@ -198,7 +198,7 @@ bool Storage::render_export_selection(Song *song, SongSelection *sel, const stri
 {
 	SongRenderer renderer(song);
 	renderer.prepare(sel->range, false);
-	renderer.allow_tracks(sel->tracks);
+	renderer.allow_tracks(sel->tracks());
 	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
 }
 

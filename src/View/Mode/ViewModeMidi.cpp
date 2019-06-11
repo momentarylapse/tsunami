@@ -965,7 +965,7 @@ Range ViewModeMidi::get_backwards_range()
 SongSelection ViewModeMidi::get_select_in_edit_cursor()
 {
 	Range r = get_edit_range();
-	SongSelection s = SongSelection::from_range(view->song, r, view->cur_layer()->track, view->cur_layer()).filter(SongSelection::Mask::MIDI_NOTES);
+	auto s = SongSelection::from_range(view->song, r).filter({view->cur_layer()}).filter(SongSelection::Mask::MIDI_NOTES);
 	auto mode = cur_vlayer()->midi_mode;
 	auto notes = s.notes;
 	if (mode == MidiMode::TAB){

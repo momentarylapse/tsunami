@@ -215,29 +215,26 @@ bool TrackHeader::on_left_button_down() {
 	if (view->select_xor) {
 		view->toggle_select_layer_with_content_in_cursor(l);
 	} else {
-		// hmmm should we keep all selection, if already selected???
-
-		// or just keep selection of this track/layer...
-		//if (!view->exclusively_select_layer(l))
-		//	view->select_under_cursor();
-
-		view->exclusively_select_layer(l);
-		view->select_under_cursor();
+		if (view->sel.has(vtrack->track)) {
+			view->set_selection(view->sel.restrict_to_track(vtrack->track));
+		} else {
+			view->exclusively_select_layer(l);
+			view->select_under_cursor();
+		}
 	}
 	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
 	return true;
 }
 bool TrackHeader::on_left_double_click() {
-	view->set_current(get_hover_data());
 	view->session->set_mode("default/track");
 	return true;
 }
 
 bool TrackHeader::on_right_button_down() {
-	auto *l = vtrack->first_layer();
-	if (!view->exclusively_select_layer(l))
+	if (!view->sel.has(vtrack->track)) {
+		view->exclusively_select_layer(vtrack->first_layer());
 		view->select_under_cursor();
-	view->set_current(view->hover);
+	}
 	view->open_popup(view->menu_track);
 	return true;
 }

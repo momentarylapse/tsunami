@@ -399,6 +399,8 @@ void AudioView::update_selection() {
 
 
 	renderer->set_range(get_playback_selection(false));
+
+	// TODO ...check....
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(playback_pos()))
 			renderer->set_range(get_playback_selection(false));
@@ -509,8 +511,10 @@ void AudioView::on_left_button_down() {
 	if (hui::GetEvent()->just_focused)
 		allow_handle = scene_graph->allow_handle_click_when_gaining_focus();
 
-	if (allow_handle)
+	if (allow_handle) {
+		set_current(hover);
 		scene_graph->on_left_button_down();
+	}
 
 	force_redraw();
 	update_menu();
@@ -559,6 +563,7 @@ void AudioView::on_middle_button_up() {
 
 void AudioView::on_right_button_down() {
 	hover = scene_graph->get_hover_data();
+	set_current(hover);
 	scene_graph->on_right_button_down();
 }
 
@@ -577,6 +582,8 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
+	hover = scene_graph->get_hover_data();
+	set_current(hover);
 	scene_graph->on_left_double_click();
 	mode->on_left_double_click();
 	force_redraw();
@@ -701,11 +708,9 @@ void AudioView::on_song_update()
 		update_tracks();
 		sel.range = Range(0, 0);
 		sel.clear();
-		for (Track *t: song->tracks){
-			sel.add(t);
+		for (Track *t: song->tracks)
 			for (TrackLayer *l: t->layers)
 				sel.add(l);
-		}
 		check_consistency();
 		optimize_view();
 	}else if (song->cur_message() == song->MESSAGE_FINISHED_LOADING){
@@ -796,7 +801,6 @@ void AudioView::update_tracks()
 		// new track
 		if (!found){
 			vtrack2[ti] = new AudioViewTrack(this, t);
-			sel.add(t);
 		}
 	}
 
@@ -1138,7 +1142,6 @@ void AudioView::select_all() {
 void AudioView::select_none() {
 	// select all/none
 	set_selection(SongSelection());
-	__set_cur_sample(nullptr);
 }
 
 inline void test_range(const Range &r, Range &sel, bool &update) {
@@ -1448,7 +1451,6 @@ void AudioView::select_object() {
 	} else if (hover.note) {
 		sel.add(hover.note);
 	}
-	__set_cur_sample(hover.sample);
 }
 
 void AudioView::toggle_object() {
@@ -1463,22 +1465,17 @@ void AudioView::toggle_object() {
 	} else if (hover.note) {
 		sel.toggle(hover.note);
 	}
-	__set_cur_sample(hover.sample);
 }
 
 bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
 	bool had_sel = sel.has(l->layer);
-	sel.track_layers.clear();
+	sel.layers.clear();
 	sel.add(l->layer);
-	sel.make_consistent(song);
-	__set_cur_layer(l);
 	return had_sel;
 }
 
 void AudioView::toggle_select_layer(AudioViewLayer *l) {
 	sel.toggle(l->layer);
-	sel.make_consistent(song);
-	__set_cur_layer(l);
 }
 
 void AudioView::exclusively_select_object() {
@@ -1515,12 +1512,10 @@ void AudioView::cam_changed() {
 
 // hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
 void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
-	auto s = SongSelection::from_range(song, sel.range, {l->layer->track}, {l->layer});
 	if (sel.has(l->layer))
-		sel = sel.minus(s);
+		sel = sel.minus(SongSelection::all(song).filter({l->layer}));
 	else
-		sel = sel || s;
-	sel.make_consistent(song);
+		sel = sel || SongSelection::from_range(song, sel.range).filter({l->layer});
 	//toggle_select_layer();
 }
 

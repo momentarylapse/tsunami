@@ -22,8 +22,7 @@ SongSelection::SongSelection()
 
 void SongSelection::clear()
 {
-	tracks.clear();
-	track_layers.clear();
+	layers.clear();
 	clear_data();
 }
 
@@ -36,58 +35,32 @@ void SongSelection::clear_data()
 	bar_gap = -1;
 }
 
-void SongSelection::all(Song* s)
-{
-	from_range(s, s->range_with_time());
+SongSelection SongSelection::all(Song* s) {
+	return from_range(s, Range::ALL);
 }
 
-SongSelection SongSelection::from_range(Song *song, const Range &r)
-{
-	Set<const Track*> _tracks;
-	for (Track *t: song->tracks)
-		_tracks.add(t);
-	Set<const TrackLayer*> _layers;
-	for (Track *t: song->tracks)
-		for (TrackLayer *l: t->layers)
-			_layers.add(l);
-	return from_range(song, r, _tracks, _layers);
-}
-
-SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Track*> _tracks, Set<const TrackLayer*> _layers)
-{
+SongSelection SongSelection::from_range(Song *song, const Range &r) {
 	SongSelection s;
 	s.range = r;
 	if (s.range.length < 0)
 		s.range.invert();
 
+	s._update_bars(song);
 
-	for (const Track *t: song->tracks){
-		if (!_tracks.contains(t))
-			continue;
-		s.add(t);
+	for (Track *t: song->tracks) {
 
-		// markers
-		if (_layers.contains(t->layers[0]))
-		for (TrackMarker *m: t->markers)
+		for (auto *m: t->markers)
 			s.set(m, s.range.overlaps(m->range));
-
-		// bars
-		if (t->type == SignalType::BEATS)
-			s._update_bars(song);
 	}
 
-	for (const Track *t: song->tracks){
-		for (const TrackLayer *l: t->layers){
-			if (!_layers.contains(l))
-				continue;
+	for (Track *t: song->tracks) {
+		for (auto *l: t->layers) {
 			s.add(l);
 
-			// midi
-			for (MidiNote *n: l->midi)
+			for (auto *n: l->midi)
 				s.set(n, s.range.overlaps(n->range));
 
-			// samples
-			for (SampleRef *sr: l->samples)
+			for (auto *sr: l->samples)
 				s.set(sr, s.range.overlaps(sr->range()));
 		}
 	}
@@ -95,8 +68,36 @@ SongSelection SongSelection::from_range(Song *song, const Range &r, Set<const Tr
 	return s;
 }
 
-SongSelection SongSelection::filter(int mask) const
-{
+SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) const {
+	SongSelection s;
+	s.range = range;
+
+	for (auto *l: _layers) {
+		if (has(l))
+			s.add(l);
+
+		for (auto m: l->track->markers)
+			if (has(m))
+				s.add(m);
+
+		for (auto *n: l->midi)
+			if (has(n))
+				s.add(n);
+
+		for (auto *sr: l->samples)
+			if (has(sr))
+				s.add(sr);
+
+		if (l->type == SignalType::BEATS) {
+			s.bars = bars;
+			s.bar_gap = bar_gap;
+		}
+	}
+
+	return s;
+}
+
+SongSelection SongSelection::filter(int mask) const {
 	auto s = *this;
 
 	if ((mask & Mask::SAMPLES) == 0)
@@ -111,48 +112,44 @@ SongSelection SongSelection::filter(int mask) const
 	return s;
 }
 
-void SongSelection::_update_bars(Song* s)
-{
+void SongSelection::_update_bars(Song* s) {
 	bars.clear();
 	bar_gap = -1;
 
 
-	if (range.end() <= 0){
+	if (range.end() <= 0) {
 		bar_gap = 0;
 		return;
 	}
 
 	int pos = 0;
-	foreachi(Bar *b, s->bars, i){
+	foreachi(Bar *b, s->bars, i) {
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
-		if (r.overlaps(range)){
+		if (r.overlaps(range)) {
 			bars.add(b);
-		}else if (range.length == 0 and (range.offset == pos)){
+		} else if (range.length == 0 and (range.offset == pos)) {
 			bar_gap = i;
 		}
 		pos += b->length;
 	}
-	if (range.start() >= pos){
+	if (range.start() >= pos) {
 		bar_gap = s->bars.num;
 	}
 }
 
-
-// make sure a track is selected iff 1+ layers are selected
-void SongSelection::_update_tracks_from_layers(Song *s)
-{
-	for (Track *t: s->tracks){
-		bool any_layer_selected = false;
-		for (TrackLayer *l: t->layers)
-			any_layer_selected |= has(l);
-		set(t, any_layer_selected);
-	}
+bool SongSelection::has(const Track *t) const {
+	for (auto *l: t->layers)
+		if (has(l))
+			return true;
+	return false;
 }
 
-void SongSelection::make_consistent(Song *s)
-{
-	_update_tracks_from_layers(s);
+Set<const Track*> SongSelection::tracks() const {
+	Set<const Track*> tracks;
+	for (auto *l: layers)
+		tracks.add(l->track);
+	return tracks;
 }
 
 
@@ -170,28 +167,24 @@ void SongSelection::click(const TYPE* t, bool control) \
 
 
 
-IMPLEMENT_FUNC(Track, tracks)
-IMPLEMENT_FUNC(TrackLayer, track_layers)
+IMPLEMENT_FUNC(TrackLayer, layers)
 IMPLEMENT_FUNC(SampleRef, samples)
 IMPLEMENT_FUNC(TrackMarker, markers)
 IMPLEMENT_FUNC(MidiNote, notes)
 IMPLEMENT_FUNC(Bar, bars)
 
 
-int SongSelection::num_samples() const
-{
+int SongSelection::num_samples() const {
 	return samples.num;
 }
 
-bool SongSelection::is_empty() const
-{
+bool SongSelection::is_empty() const {
 	if (!range.empty())
 		return false;
 	return (samples.num == 0) and (markers.num == 0) and (notes.num == 0) and (bars.num == 0);
 }
 
-Array<int> SongSelection::bar_indices(Song *song) const
-{
+Array<int> SongSelection::bar_indices(Song *song) const {
 	Array<int> indices;
 	foreachi(Bar *b, song->bars, i)
 		if (has(b))
@@ -199,14 +192,22 @@ Array<int> SongSelection::bar_indices(Song *song) const
 	return indices;
 }
 
-SongSelection SongSelection::restrict_to_track(Track *t) const
-{
-	SongSelection sel;
+template<class T>
+Array<const T*> constify_array(const Array<T*> &array) {
+	Array<const T*> r;
+	for (auto *x: array)
+		r.add(x);
+	return r;
+}
+
+SongSelection SongSelection::restrict_to_track(Track *t) const {
+	return filter(constify_array(t->layers));
+	/*SongSelection sel;
 	sel.range = range;
-	sel.bars = bars;
-	sel.set(t, true);
-	for (auto *l: t->layers){
-		sel.set(l, true);
+	if (t->type == SignalType::BEATS)
+		sel.bars = bars;
+	for (auto *l: t->layers) {
+		sel.set(l, has(l));
 		for (auto n: l->midi)
 			sel.set(n, has(n));
 		for (auto r: l->samples)
@@ -214,15 +215,16 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 	}
 	for (auto m: t->markers)
 		sel.set(m, has(m));
-	return sel;
+	return sel;*/
 }
 
-SongSelection SongSelection::operator||(const SongSelection &s) const
-{
+SongSelection SongSelection::restrict_to_layer(TrackLayer *l) const {
+	return filter({l});
+}
+
+SongSelection SongSelection::operator||(const SongSelection &s) const {
 	SongSelection r = *this;
-	for (auto t: s.tracks)
-		r.add(t);
-	for (auto l: s.track_layers)
+	for (auto l: s.layers)
 		r.add(l);
 	for (auto n: s.notes)
 		r.add(n);
@@ -235,12 +237,29 @@ SongSelection SongSelection::operator||(const SongSelection &s) const
 	return r;
 }
 
-SongSelection SongSelection::minus(const SongSelection &s) const
-{
+SongSelection SongSelection::operator&&(const SongSelection &s) const {
+	SongSelection r;
+	for (auto l: s.layers)
+		if (has(l))
+			r.add(l);
+	for (auto n: s.notes)
+		if (has(n))
+			r.add(n);
+	for (auto m: s.markers)
+		if (has(m))
+			r.add(m);
+	for (auto sr: s.samples)
+		if (has(sr))
+			r.add(sr);
+	for (auto b: s.bars)
+		if (has(b))
+			r.add(b);
+	return r;
+}
+
+SongSelection SongSelection::minus(const SongSelection &s) const {
 	SongSelection r = *this;
-	for (auto t: s.tracks)
-		r.set(t, false);
-	for (auto l: s.track_layers)
+	for (auto l: s.layers)
 		r.set(l, false);
 	for (auto n: s.notes)
 		r.set(n, false);

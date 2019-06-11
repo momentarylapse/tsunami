@@ -170,16 +170,20 @@ bool LayerHeader::on_left_button_down() {
 	if (view->select_xor) {
 		view->toggle_select_layer_with_content_in_cursor(vlayer);
 	} else {
-		view->exclusively_select_layer(vlayer);
-		view->select_under_cursor();
+		if (view->exclusively_select_layer(vlayer)) {
+			view->set_selection(view->sel.restrict_to_layer(vlayer->layer));
+		} else {
+			view->select_under_cursor();
+		}
 	}
 	return true;
 }
 
 bool LayerHeader::on_right_button_down() {
-	if (!view->exclusively_select_layer(vlayer))
+	if (!view->sel.has(vlayer->layer)) {
+		view->exclusively_select_layer(vlayer);
 		view->select_under_cursor();
-	view->set_current(view->hover);
+	}
 	view->open_popup(view->menu_layer);
 	return true;
 }

@@ -396,7 +396,7 @@ void TsunamiWindow::on_track_render()
 
 	SongRenderer renderer(song);
 	renderer.prepare(range, false);
-	renderer.allow_tracks(view->sel.tracks);
+	renderer.allow_tracks(view->sel.tracks());
 	renderer.allow_layers(view->get_playable_layers());
 
 	Track *t = song->add_track(SignalType::AUDIO);
@@ -480,7 +480,7 @@ void TsunamiWindow::on_buffer_delete()
 {
 	foreachi (auto &buf, view->cur_layer()->buffers, i)
 		if (buf.range().is_inside(view->hover_before_leave.pos)){
-			auto s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			auto s = SongSelection::from_range(song, buf.range()).filter({view->cur_layer()}).filter(0);
 			song->delete_selection(s);
 		}
 }
@@ -489,7 +489,7 @@ void TsunamiWindow::on_buffer_make_movable()
 {
 	for (auto &buf: view->cur_layer()->buffers){
 		if (buf.range().is_inside(view->hover_before_leave.pos)){
-			auto s = SongSelection::from_range(song, buf.range(), {}, view->cur_layer()).filter(0);
+			auto s = SongSelection::from_range(song, buf.range()).filter({view->cur_layer()}).filter(0);
 			song->create_samples_from_selection(s, true);
 		}
 	}

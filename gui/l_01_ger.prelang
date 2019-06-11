@@ -2698,7 +2698,7 @@ track-routing-dialog/t-track
 Spur
 
 // Num Language Strings
-234
+236
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3168,3 +3168,7 @@ cursor
 Cursor
 - direct out -
 - direkte Ausgabe -
+Group %d
+Gruppe %d
+Master
+Master

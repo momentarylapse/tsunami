@@ -10397,7 +10397,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-234
+236
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10551,6 +10551,8 @@ File properties
 Datei Eigenschaften
 Flute
 Flöte
+Group %d
+Gruppe %d
 Guitar
 Gitarre
 Hapsichord
@@ -10577,6 +10579,8 @@ Lydian
 Lydisch
 Major
 Dur
+Master
+Master
 Mastering
 Mastering
 Messages

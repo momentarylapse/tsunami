@@ -17,7 +17,10 @@ class TrackRoutingDialog : public hui::Dialog {
 public:
 	TrackRoutingDialog(hui::Window *parent, Song *song);
 	void load();
+
 	void on_target(int i);
+	void on_add_group();
+
 	Array<Track*> groups;
 	Song *song;
 	int num_tracks;

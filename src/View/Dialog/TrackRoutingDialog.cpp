@@ -19,7 +19,7 @@ TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
 
 	load();
 	event("close", [=]{ destroy(); });
-	event("add-group", [=]{ song->add_track(SignalType::GROUP); load(); });
+	event("add-group", [=]{ on_add_group(); });
 }
 
 void TrackRoutingDialog::load() {
@@ -33,7 +33,10 @@ void TrackRoutingDialog::load() {
 		set_target("list");
 		string id = "target-" + i2s(i);
 		if (i >= num_tracks) {
-			add_label(t->nice_name(), 0, i+1, "");
+			if (t->type == SignalType::GROUP)
+				add_label("<i>" + t->nice_name() + "</i>", 0, i+1, "");
+			else
+				add_label(t->nice_name(), 0, i+1, "");
 			add_combo_box("!expandx", 1, i+1, id);
 			event(id, [=]{ on_target(i); });
 			num_tracks ++;
@@ -55,4 +58,26 @@ void TrackRoutingDialog::on_target(int i) {
 		song->tracks[i]->set_send_target(groups[j - 1]);
 	else
 		song->tracks[i]->set_send_target(nullptr);
+}
+
+bool has_track_name(Song *s, const string &name) {
+	for (auto *t: s->tracks)
+		if (t->name == name)
+			return true;
+	return false;
+}
+
+void TrackRoutingDialog::on_add_group() {
+	string name = _("Master");
+	for (int i=2; i<100; i++) {
+		if (!has_track_name(song, name))
+			break;
+		name = format(_("Group %d"), i);
+	}
+
+	song->begin_action_group();
+	auto *t = song->add_track(SignalType::GROUP);
+	t->set_name(name);
+	song->end_action_group();
+	load();
 }

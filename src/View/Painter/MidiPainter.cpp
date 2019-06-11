@@ -281,7 +281,7 @@ void draw_group_ndata(Painter *c, const Array<QuantizedNote> &d, float rr) {
 }
 
 
-bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<QuantizedNote> &group, int beat_length) {
+bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<QuantizedNote> &group, int beat_end) {
 	group = {d};
 	for (int j=i+1; j<ndata.num; j++) {
 		// non-continguous?
@@ -293,11 +293,11 @@ bool find_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array<Quan
 		if ((ndata[j].length != TRIPLET_EIGHTH) and (ndata[j].length != TRIPLET_SIXTEENTH) and (ndata[j].length != 3*SIXTEENTH) and (ndata[j].length != EIGHTH) and (ndata[j].length != SIXTEENTH))
 			break;
 		// beat finished?
-		if (ndata[j].end > d.offset + beat_length)
+		if (ndata[j].end > beat_end)
 			break;
 		group.add(ndata[j]);
 	}
-	return (group.back().end - d.offset) == beat_length;
+	return group.back().end <= beat_end;
 }
 
 // currently only for 4x 8th notes
@@ -320,7 +320,9 @@ bool find_long_group(Array<QuantizedNote> &ndata, QuantizedNote &d, int i, Array
 struct QuantizedBar {
 	Array<int> beat_offset;
 	Array<int> beat_length;
+	Bar *bar;
 	QuantizedBar(Bar *b) {
+		bar = b;
 		int off = 0;
 		for (int bb: b->beats) {
 			int d = bb * QUARTER_PARTITION / b->divisor;
@@ -330,7 +332,6 @@ struct QuantizedBar {
 		}
 	}
 	int get_beat(int offset) {
-		int _bo = 0;
 		for (int i=0; i<beat_offset.num; i++) {
 			if (offset < beat_offset[i] + beat_length[i]) {
 				return i;
@@ -346,7 +347,108 @@ struct QuantizedBar {
 	bool start_of_beat(int offset, int beat) {
 		return get_rel(offset, beat) == 0;
 	}
+	bool allows_long_groups() {
+		return bar->is_uniform() and (bar->beats[0] == bar->divisor) and (bar->beats.num % 2 == 0);
+	}
 };
+
+Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBufferRef &bnotes, Bar *b, MidiPainter *mp, float spu, std::function<float(MidiNote*)> y_func) {
+	Array<QuantizedNote> ndata;
+	float y_mid = (mp->area.y1 + mp->area.y2) / 2;
+
+	for (MidiNote *n: bnotes) {
+		Range r = n->range - b->offset;
+		if (r.offset < 0)
+			continue;
+		QuantizedNote d = QuantizedNote(n, r, spu);
+		if (d.length == 0 or d.offset < 0)
+			continue;
+
+		d.x = mp->cam->sample2screen(n->range.offset + mp->shift);
+		d.y = y_func(n);
+		d.up = (d.y >= y_mid);
+
+
+		color col_shadow;
+		get_col(d.col, col_shadow, n, note_state(n, mp->as_reference, mp->sel, mp->hover), mp->is_playable, mp->colors);
+
+		// prevent double notes
+		if (ndata.num > 0)
+			if (ndata.back().offset == d.offset) {
+				// use higher note...
+				if (d.n->pitch > ndata.back().n->pitch)
+					ndata[ndata.num - 1] = d;
+				continue;
+			}
+
+		ndata.add(d);
+	}
+	return ndata;
+}
+
+class QuantizedNoteGroup : public Array<QuantizedNote> {
+public:
+	bool starts_on_beat = false;
+	int homogeneous() {
+		int l = (*this)[0].length;
+		for (auto &d: *this)
+			if (d.length != l)
+				return -1;
+		return l;
+	}
+};
+
+Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, QuantizedBar &qbar) {
+	Array<QuantizedNoteGroup> groups;
+
+	bool bar_allows_long_groups = qbar.allows_long_groups();
+
+	//int offset = 0;
+	for (int i=0; i<ndata.num; i++) {
+		auto &d = ndata[i];
+
+		// group start?
+		int beat_index = qbar.get_beat(d.offset);
+		int beat_end = qbar.beat_offset[beat_index] + qbar.beat_length[beat_index];
+		if ((d.length == 3*SIXTEENTH or d.length == EIGHTH or d.length == SIXTEENTH or d.length == TRIPLET_EIGHTH or d.length == TRIPLET_SIXTEENTH)) {
+
+			QuantizedNoteGroup group;
+			group.starts_on_beat = qbar.start_of_beat(d.offset, beat_index);
+			if (find_group(ndata, d, i, group, beat_end)) {
+				groups.add(group);
+				i += group.num - 1;
+				continue;
+			}
+		}
+
+		QuantizedNoteGroup group;
+		group.add(d);
+		groups.add(group);
+	}
+
+
+
+	if (bar_allows_long_groups) {
+		for (int i=0; i<groups.num-1; i++) {
+			if (groups[i].starts_on_beat and groups[i+1].starts_on_beat) {
+				if (groups[i].homogeneous() != EIGHTH)
+					continue;
+				if (groups[i+1].homogeneous() != EIGHTH)
+					continue;
+				if (groups[i].back().end != groups[i+1][0].offset)
+					continue;
+				if ((groups[i][0].offset % (QUARTER_PARTITION*2)) != 0)
+					continue;
+
+				groups[i].append(groups[i+1]);
+				groups.erase(i+1);
+			}
+		}
+		//allow_long_group = ((d.offset % (QUARTER_PARTITION*2)) == 0) and (d.length == EIGHTH);
+	}
+
+	return groups;
+}
 
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
@@ -360,8 +462,6 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const R
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);*/
-
-	float y_mid = (area.y1 + area.y2) / 2;
 
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars) {
@@ -377,70 +477,17 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const R
 		MidiNoteBufferRef bnotes = midi.get_notes(b->range());
 		//c->set_color(colors.text_soft3);
 
-		Array<QuantizedNote> ndata;
-		for (MidiNote *n: bnotes) {
-			Range r = n->range - b->offset;
-			if (r.offset < 0)
-				continue;
-			QuantizedNote d = QuantizedNote(n, r, spu);
-			if (d.length == 0 or d.offset < 0)
-				continue;
-
-			d.x = cam->sample2screen(n->range.offset + shift);
-			d.y = y_func(n);
-			d.up = (d.y >= y_mid);
-
-
-			color col_shadow;
-			get_col(d.col, col_shadow, n, note_state(n, as_reference, sel, hover), is_playable, colors);
-
-			// prevent double notes
-			if (ndata.num > 0)
-				if (ndata.back().offset == d.offset) {
-					// use higher note...
-					if (d.n->pitch > ndata.back().n->pitch)
-						ndata[ndata.num - 1] = d;
-					continue;
-				}
-
-			ndata.add(d);
-		}
+		auto ndata = quantize_all_notes_in_bar(bnotes, b, this, spu, y_func);
 
 		QuantizedBar qbar(b);
-		bool bar_allows_long_groups = b->is_uniform() and (b->beats[0] == b->divisor) and (b->beats.num % 2 == 0);
 
-		//int offset = 0;
-		for (int i=0; i<ndata.num; i++) {
-			QuantizedNote &d = ndata[i];
+		auto groups = digest_note_groups(ndata, qbar);
 
-			// group start?
-			int beat_index = qbar.get_beat(d.offset);
-			if (qbar.start_of_beat(d.offset, beat_index)) {
-				if ((d.length == 3*SIXTEENTH or d.length == EIGHTH or d.length == SIXTEENTH or d.length == TRIPLET_EIGHTH or d.length == TRIPLET_SIXTEENTH)) {
-
-					Array<QuantizedNote> group;
-					bool ok = false;
-					bool allow_long_group = false;
-					if (bar_allows_long_groups)
-						allow_long_group = ((d.offset % (QUARTER_PARTITION*2)) == 0) and (d.length == EIGHTH);
-					if (allow_long_group)
-						ok = find_long_group(ndata, d, i, group);
-					if (!ok)
-						ok = find_group(ndata, d, i, group, qbar.beat_length[beat_index]);
-
-					// draw
-					if (ok) {
-						if (group.num == 1)
-							draw_single_ndata(c, group[0], rr);
-						else
-							draw_group_ndata(c, group, rr);
-						i += group.num - 1;
-						continue;
-					}
-				}
-			}
-
-			draw_single_ndata(c, d, rr);
+		for (auto &g: groups) {
+			if (g.num == 1)
+				draw_single_ndata(c, g[0], rr);
+			else
+				draw_group_ndata(c, g, rr);
 		}
 
 	}

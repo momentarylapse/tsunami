@@ -37,8 +37,8 @@ class MidiKeyChange
 {
 public:
 	MidiKeyChange();
-	MidiKeyChange(int pos, const Scale &key);
-	int pos;
+	MidiKeyChange(double pos, const Scale &key);
+	double pos;
 	Scale key;
 };
 

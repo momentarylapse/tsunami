@@ -47,7 +47,7 @@ public:
 		mode = _mode;
 	}
 	void on_start() override {
-		view->hover.range.set_start(view->mdp->pos0);
+		view->hover.range.set_start(view->cur_selection.pos_snap);
 		view->hover.range.set_end(view->get_mouse_pos());
 		view->hover.y0 = view->mdp->y0;
 		view->hover.y1 = view->my;

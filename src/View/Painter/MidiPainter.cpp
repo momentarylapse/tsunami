@@ -53,7 +53,7 @@ static const color PITCH_COLORS[12] = {
 	color(1, 1.000000, 0.400000, 0.700000)  // B
 };
 
-MidiKeyChange::MidiKeyChange(int _pos, const Scale &_key) : pos(_pos), key(_key) {}
+MidiKeyChange::MidiKeyChange(double _pos, const Scale &_key) : pos(_pos), key(_key) {}
 
 MidiKeyChange::MidiKeyChange() : MidiKeyChange(0, Scale::C_MAJOR) {}
 
@@ -712,7 +712,7 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 	for (auto &kc: key_changes)
 		if (kc.pos < cam->range().offset)
 			key_prev = kc.key;
-	draw_key_symbol(c, MidiKeyChange(cam->range().offset, key_prev));
+	draw_key_symbol(c, MidiKeyChange(cam->pos, key_prev));
 
 	for (auto &kc: key_changes)
 		draw_key_symbol(c, kc);

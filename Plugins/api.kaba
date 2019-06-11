@@ -372,19 +372,18 @@ class TrackLayer
 class Sample // TODO
 	string name
 	int type
-	AudioBuffer buf
+	AudioBuffer* buf
 	MidiNoteBuffer midi
 	float volume
 	int uid
 	Tag[] tags
-	extern SampleRef *create_ref()
+	extern SampleRef* create_ref()
 	extern string get_value(string key)
 	extern void set_value(string key, string value)
 
 class SampleRef // TODO
-	Sample *origin
-	AudioBuffer *buf
-	extern void __init__(Sample *sam)
+	Sample* origin
+	extern void __init__(Sample* sam)
 	extern virtual void __delete__()
 
 
@@ -392,6 +391,9 @@ enum
 	TYPE_AUDIO
 	TYPE_TIME
 	TYPE_MIDI
+	AUDIO_MONO
+	AUDIO_STEREO
+	GROUP
 
 class Track
 	int type

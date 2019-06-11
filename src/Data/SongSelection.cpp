@@ -202,20 +202,6 @@ Array<const T*> constify_array(const Array<T*> &array) {
 
 SongSelection SongSelection::restrict_to_track(Track *t) const {
 	return filter(constify_array(t->layers));
-	/*SongSelection sel;
-	sel.range = range;
-	if (t->type == SignalType::BEATS)
-		sel.bars = bars;
-	for (auto *l: t->layers) {
-		sel.set(l, has(l));
-		for (auto n: l->midi)
-			sel.set(n, has(n));
-		for (auto r: l->samples)
-			sel.set(r, has(r));
-	}
-	for (auto m: t->markers)
-		sel.set(m, has(m));
-	return sel;*/
 }
 
 SongSelection SongSelection::restrict_to_layer(TrackLayer *l) const {

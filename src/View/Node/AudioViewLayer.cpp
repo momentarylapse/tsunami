@@ -584,11 +584,38 @@ bool AudioViewLayer::on_left_double_click() {
 	return true;
 }
 
+bool hover_object_selected(AudioView *view) {
+	if (view->hover.bar)
+		return view->sel.has(view->hover.bar);
+	if (view->hover.marker)
+		return view->sel.has(view->hover.marker);
+	if (view->hover.sample)
+		return view->sel.has(view->hover.sample);
+	if (view->hover.note)
+		return view->sel.has(view->hover.note);
+	return false;
+}
+
 bool AudioViewLayer::on_right_button_down() {
 
-	// pop up menu...
-	view->update_menu();
-	view->set_current(view->hover);
+	if (view->hover_any_object()) {
+		if (!hover_object_selected(view)) {
+			//select object exclusively
+			view->sel.clear_data();
+
+		}
+		if (!view->sel.has(layer)) {
+			view->exclusively_select_layer(this);
+			view->sel.clear_data();
+		}
+		view->select_object();
+	} else { // void
+		if (!view->sel.has(layer))
+			view->exclusively_select_layer(this);
+		if (!view->sel.range.is_inside(view->hover.pos_snap))
+			view->set_cursor_pos(view->hover.pos_snap);
+		view->sel.clear_data();
+	}
 
 	if (view->hover.sample) {
 		view->open_popup(view->menu_sample);

@@ -3,84 +3,6 @@ objects: bar header, bar gap, sampleref, marker
 
 
 
-== left click ==
-
-unset current object
-
-
-if hover time scale or background?
-	snap to grid
-	set cursor
-	select objects under cursor/rect
-	start rect later
-
-
--- no control key --
-
-if hover track/layer header?
-	---
-elif hover object?
-	if not hover selected object
-		select object (exclusively)
-	set current object
-
-else
-	if hover selected layer?
-		snap to grid
-		move cursor
-	start rect later
-
-select hover layer (exclusively)
-set current layer
-
-if not hover object?
-	select objects under cursor/rect
-
-
--- control key --
-
-if hover object?
-	toggle select object
-	set current object
-else
-	toggle select layer
-	start rect later
-
-set current layer
-
-
-
-
-
-
-== right click ==
-
-
-
-
-
-
-
-
-== double click ==
-
--> left click
-
-if hover object?
-	select range(object)
-elif hover buffer?
-	select range(buffer)
-
-
-
-
-
-
-
-
-
-
-
 
 == left click no control ==
 
@@ -206,6 +128,8 @@ popup
 set current (hover)
 if layer was unselected
 	select layer exclusively
+if outside of sel.range
+	set cursor (hover.pos_snap)
 unselect all objects
 popup
 

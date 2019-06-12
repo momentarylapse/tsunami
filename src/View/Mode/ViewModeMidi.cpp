@@ -35,14 +35,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition);
 const int EDIT_PITCH_SHOW_COUNT = 30;
 
 
-MidiPainter* midi_context(AudioViewLayer *l)
-{
-	auto *mp = l->view->midi_painter;
-	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
-	mp->set_key_changes(l->midi_key_changes);
-	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
-	return mp;
-}
+MidiPainter* midi_context(AudioViewLayer *l);
 
 
 
@@ -166,6 +159,8 @@ TrackLayer* ViewModeMidi::cur_layer() {
 }
 
 AudioViewLayer* ViewModeMidi::cur_vlayer() {
+	//if (!view->cur_vlayer())
+	//	return view->dummy_vlayer;
 	return view->cur_vlayer();
 }
 
@@ -866,6 +861,8 @@ void ViewModeMidi::draw_post(Painter *c)
 	ViewModeDefault::draw_post(c);
 
 	auto *l = cur_vlayer();
+	if (!l)
+		return;
 	auto mode = l->midi_mode;
 	Range r = get_edit_range();
 	float x1, x2;
@@ -916,18 +913,24 @@ void ViewModeMidi::draw_post(Painter *c)
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
 	c->set_fill(true);
+}
 
+string ViewModeMidi::get_tip() {
+
+	if (input_mode == InputMode::NOTE_LENGTH)
+		return _("enter note length (1-9, A-F)    cancel (Esc)");
+	if (input_mode == InputMode::BEAT_PARTITION)
+		return _("enter beat partition (1-9, A-F)    cancel (Esc)");
 	string message = _("cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)");
+	if (!cur_vlayer())
+		return message;
+	auto mode = cur_vlayer()->midi_mode;
 	if (mode == MidiMode::TAB)
 		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
 		message += "    " + _("octave (↑,↓)    modifiers (#,3,0)    add note (A-G)");
 	message += "    " + _("𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)");
-	if (input_mode == InputMode::NOTE_LENGTH)
-		message = _("enter note length (1-9, A-F)    cancel (Esc)");
-	else if (input_mode == InputMode::BEAT_PARTITION)
-		message = _("enter beat partition (1-9, A-F)    cancel (Esc)");
-	view->draw_boxed_str(c, (view->song_area.x1 + view->song_area.x2)/2, view->area.y2 - 30, message, view->colors.text_soft1, view->colors.background_track_selected, 0);
+	return message;
 }
 
 // seems fine

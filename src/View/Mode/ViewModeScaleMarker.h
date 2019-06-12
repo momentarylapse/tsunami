@@ -29,6 +29,7 @@ public:
 	void on_key_down(int k) override;
 
 	void draw_post(Painter *c) override;
+	string get_tip() override;
 
 	void perform_scale();
 

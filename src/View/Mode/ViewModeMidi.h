@@ -131,6 +131,7 @@ public:
 	int rep_key_num;
 
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	string get_tip() override;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

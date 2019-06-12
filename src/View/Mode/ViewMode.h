@@ -73,6 +73,8 @@ public:
 	virtual void left_click_handle_void(AudioViewLayer *vlayer) {}
 	virtual void left_click_handle_void_xor(AudioViewLayer *vlayer) {}
 
+	virtual string get_tip() { return ""; }
+
 	AudioView *view;
 	Session *session;
 	ViewPort *cam;

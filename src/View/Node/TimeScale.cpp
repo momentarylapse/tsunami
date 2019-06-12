@@ -19,7 +19,9 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 class PlaybackRange : public ViewNode {
 public:
-	PlaybackRange(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	PlaybackRange(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {
+		align.fit_w = true;
+	}
 	void update_area() override {
 		area = parent->area;
 		view->cam.range2screen_clip(view->playback_wish_range, parent->area, area.x1, area.x2);

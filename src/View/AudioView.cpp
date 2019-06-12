@@ -1035,6 +1035,10 @@ void AudioView::draw_song(Painter *c) {
 	if (tip.num > 0)
 		draw_cursor_hover(c, tip);
 
+	tip = mode->get_tip();
+	if (tip.num > 0)
+		draw_boxed_str(c, song_area.mx(), area.y2 - 30, tip, colors.text_soft1, colors.background_track_selected, 0);
+
 
 	if (message.ttl > 0) {
 		draw_message(c, message);
@@ -1213,6 +1217,7 @@ void AudioView::set_current(const HoverData &h) {
 	if (!cur_vlayer()) {
 		//msg_write("   ...setting cur_vlayer = nil");
 		//msg_write(msg_get_trace());
+		cur_selection.vlayer = _prev_selection.vlayer;
 	}
 	if (cur_sample() != _prev_selection.sample) {
 		notify(MESSAGE_CUR_SAMPLE_CHANGE);

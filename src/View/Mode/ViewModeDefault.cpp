@@ -299,6 +299,14 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 	return view->TIME_SCALE_HEIGHT * 2;
 }
 
+MidiPainter* midi_context(AudioViewLayer *l)
+{
+	auto *mp = l->view->midi_painter;
+	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
+	mp->set_key_changes(l->midi_key_changes);
+	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
+	return mp;
+}
 
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 {
@@ -308,9 +316,8 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 
 
 	if (l->layer->type == SignalType::MIDI){
-		view->midi_painter->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
-		view->midi_painter->set_key_changes(l->midi_key_changes);
-		view->midi_painter->draw_background(c);
+		auto *mp = midi_context(l);
+		mp->draw_background(c);
 	}
 
 
@@ -478,8 +485,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 
 		// midi
 
-		auto *mp = view->midi_painter;
-		mp->set_context(vl->area, l->track->instrument, vl->is_playable(), vl->midi_mode);
+		auto *mp = midi_context(vl);
 		float r = mp->rr;
 		for (MidiNote *n: l->midi)
 			if ((n->y + r >= y0) and (n->y - r <= y1))

@@ -34,8 +34,7 @@
 #include "../Data/Audio/AudioBuffer.h"
 #include "../Data/SongSelection.h"
 
-Storage::Storage(Session *_session)
-{
+Storage::Storage(Session *_session) {
 	session = _session;
 	formats.add(new FormatDescriptorNami());
 	formats.add(new FormatDescriptorWave());
@@ -59,8 +58,7 @@ Storage::Storage(Session *_session)
 	current_chain_directory = hui::Application::directory_static + "SignalChains/";
 }
 
-Storage::~Storage()
-{
+Storage::~Storage() {
 	hui::Config.set_str("CurrentDirectory", current_directory);
 
 	for (auto *d: formats)
@@ -68,8 +66,7 @@ Storage::~Storage()
 	formats.clear();
 }
 
-bool Storage::load_ex(Song *song, const string &filename, bool only_metadata)
-{
+bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
 	current_directory = filename.dirname();
 	FormatDescriptor *d = get_format(filename.extension(), 0);
 	if (!d)
@@ -78,7 +75,7 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata)
 	session->i(_("loading ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, song, nullptr, filename, _("loading ") + d->description, session->win);
+	auto od = StorageOperationData(this, f, song, nullptr, filename, _("loading ") + d->description, session->win);
 	od.only_load_metadata = only_metadata;
 
 	song->reset();
@@ -95,21 +92,21 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata)
 	song->action_manager->reset();
 	song->notify(song->MESSAGE_NEW);
 	song->notify(song->MESSAGE_CHANGE);
+	for (Track *t: song->tracks)
+		t->notify();
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
 	delete(f);
 	return true;
 }
 
-bool Storage::load(Song *song, const string &filename)
-{
+bool Storage::load(Song *song, const string &filename) {
 	return load_ex(song, filename, false);
 }
 
-bool Storage::load_track(TrackLayer *layer, const string &filename, int offset)
-{
+bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) {
 	current_directory = filename.dirname();
-	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
 	if (!d)
 		return false;
 
@@ -117,7 +114,7 @@ bool Storage::load_track(TrackLayer *layer, const string &filename, int offset)
 
 	Format *f = d->create();
 	Song *a = layer->track->song;
-	StorageOperationData od = StorageOperationData(this, f, a, layer, filename, _("loading ") + d->description, session->win);
+	auto od = StorageOperationData(this, f, a, layer, filename, _("loading ") + d->description, session->win);
 	od.offset = offset;
 	od.layer = layer;
 
@@ -131,8 +128,7 @@ bool Storage::load_track(TrackLayer *layer, const string &filename, int offset)
 	return true;
 }
 
-bool Storage::load_buffer(AudioBuffer *buf, const string &filename)
-{
+bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
 	session->i(_("loading buffer ") + filename);
 
 	Song *aa = new Song(session, session->sample_rate());
@@ -147,8 +143,7 @@ bool Storage::load_buffer(AudioBuffer *buf, const string &filename)
 	return ok;
 }
 
-bool Storage::save(Song *song, const string &filename)
-{
+bool Storage::save(Song *song, const string &filename) {
 	current_directory = filename.dirname();
 
 	FormatDescriptor *d = get_format(filename.extension(), 0);
@@ -161,7 +156,7 @@ bool Storage::save(Song *song, const string &filename)
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, song, nullptr, filename, _("saving ") + d->description, session->win);
+	auto od = StorageOperationData(this, f, song, nullptr, filename, _("saving ") + d->description, session->win);
 
 	song->filename = filename;
 
@@ -175,8 +170,7 @@ bool Storage::save(Song *song, const string &filename)
 	return true;
 }
 
-bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags)
-{
+bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples, const Array<Tag> &tags) {
 	FormatDescriptor *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return false;
@@ -184,7 +178,7 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 	session->i(_("exporting ") + filename);
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, nullptr, nullptr, filename, _("exporting"), session->win);
+	auto od = StorageOperationData(this, f, nullptr, nullptr, filename, _("exporting"), session->win);
 
 	od.renderer = r;
 	od.tags = tags;
@@ -194,22 +188,20 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 	return true;
 }
 
-bool Storage::render_export_selection(Song *song, SongSelection *sel, const string &filename)
-{
+bool Storage::render_export_selection(Song *song, SongSelection *sel, const string &filename) {
 	SongRenderer renderer(song);
 	renderer.prepare(sel->range, false);
 	renderer.allow_tracks(sel->tracks());
 	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
 }
 
-bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags)
-{
+bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags) {
 	string filter, filter_show;
 	filter_show = _("all known files");
 	bool first = true;
 	for (auto *f: formats)
-		if ((f->flags & flags) == flags){
-			for (string &e: f->extensions){
+		if ((f->flags & flags) == flags) {
+			for (string &e: f->extensions) {
 				if (!first)
 					filter += ";";
 				filter += "*." + e;
@@ -225,8 +217,8 @@ bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags)
 		if ((f->flags & flags) == flags){
 			filter += "|";
 			filter_show += "|" + f->description + " (";
-			foreachi(string &e, f->extensions, i){
-				if (i > 0){
+			foreachi(string &e, f->extensions, i) {
+				if (i > 0) {
 					filter += ";";
 					filter_show += ", ";
 				}
@@ -241,32 +233,27 @@ bool Storage::ask_by_flags(hui::Window *win, const string &title, int flags)
 		return hui::FileDialogOpen(win, title, current_directory, filter_show, filter);
 }
 
-bool Storage::ask_open(hui::Window *win)
-{
+bool Storage::ask_open(hui::Window *win) {
 	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ);
 }
 
-bool Storage::ask_save(hui::Window *win)
-{
+bool Storage::ask_save(hui::Window *win) {
 	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE);
 }
 
-bool Storage::ask_open_import(hui::Window *win)
-{
+bool Storage::ask_open_import(hui::Window *win) {
 	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ);
 }
 
-bool Storage::ask_save_render_export(hui::Window *win)
-{
+bool Storage::ask_save_render_export(hui::Window *win) {
 	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 }
 
 
-FormatDescriptor *Storage::get_format(const string &ext, int flags)
-{
-	for (auto *d: formats){
-		if (d->can_handle(ext)){
-			if ((d->flags & flags) == flags){
+FormatDescriptor *Storage::get_format(const string &ext, int flags) {
+	for (auto *d: formats) {
+		if (d->can_handle(ext)) {
+			if ((d->flags & flags) == flags) {
 				return d;
 			}else{
 				session->e(_("file format is incompatible for this action: ") + ext);

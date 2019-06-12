@@ -43,8 +43,8 @@ public:
 	AudioView *view;
 	ViewNode *parent;
 	struct AlignData {
-		bool align_right;
-		bool align_bottom;
+		bool right, bottom;
+		bool fit_w, fit_h;
 		float dx, dy;
 		float w, h;
 	} align;

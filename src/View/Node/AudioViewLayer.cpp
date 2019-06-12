@@ -51,6 +51,22 @@ int hover_buffer(HoverData &hover) {
 	return -1;
 }
 
+class LayerScrollBar : public ScrollBar {
+public:
+	AudioViewLayer *vlayer;
+	LayerScrollBar(AudioViewLayer *l) : ScrollBar(l) {
+		vlayer = l;
+		align.right = true;
+		align.fit_h = true;
+		hidden = true;
+	}
+	HoverData get_hover_data() override {
+		auto h = ScrollBar::get_hover_data();
+		h.vlayer = vlayer;
+		return h;
+	}
+};
+
 
 AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(_view)//_view->scene_graph, 0, 0, 0, 0)
 {
@@ -69,12 +85,10 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(
 		set_midi_mode(view->midi_view_mode);
 		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
+		update_midi_key_changes();
 		header = new LayerHeader(this);
 		children.add(header);
-		scroll_bar = new ScrollBar(this);
-		scroll_bar->align.align_right = true;
-		scroll_bar->align.h = -1;
-		scroll_bar->hidden = true;
+		scroll_bar = new LayerScrollBar(this);
 		children.add(scroll_bar);
 	}
 }

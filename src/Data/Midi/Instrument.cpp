@@ -10,19 +10,16 @@
 #include "Clef.h"
 #include "../../lib/hui/hui.h"
 
-Instrument::Instrument()
-{
+Instrument::Instrument() {
 	type = Type::NONE;
 }
 
-Instrument::Instrument(Type _type)
-{
+Instrument::Instrument(Type _type) {
 	type = _type;
 	string_pitch = default_tuning();
 }
 
-Array<int> Instrument::default_tuning() const
-{
+Array<int> Instrument::default_tuning() const {
 	if ((type == Type::GUITAR) or (type == Type::ELECTRIC_GUITAR))
 		return {40,45,50,55,59,64};
 	if (type == Type::ELECTRIC_BASS)
@@ -36,8 +33,7 @@ Array<int> Instrument::default_tuning() const
 	return {};
 }
 
-string Instrument::name() const
-{
+string Instrument::name() const {
 	if (type == Type::NONE)
 		return _("  - none -");
 	if (type == Type::PIANO)
@@ -45,7 +41,7 @@ string Instrument::name() const
 	if (type == Type::ORGAN)
 		return _("Organ");
 	if (type == Type::HAPSICHORD)
-		return _("Hapsichord");
+		return _("Harpsichord");
 	if (type == Type::KEYBOARD)
 		return _("Keyboard");
 	if (type == Type::GUITAR)
@@ -77,12 +73,11 @@ string Instrument::name() const
 	if (type == Type::SAXOPHONE)
 		return _("Saxophone");
 	if (type == Type::CLARINET)
-		return _("Clarinette");
+		return _("Clarinet");
 	return "???";
 }
 
-int Instrument::midi_no() const
-{
+int Instrument::midi_no() const {
 	if (type == Type::PIANO)
 		return 1;
 	if (type == Type::HAPSICHORD)
@@ -118,8 +113,7 @@ int Instrument::midi_no() const
 	return 1;
 }
 
-bool Instrument::has_default_tuning() const
-{
+bool Instrument::has_default_tuning() const {
 	Array<int> def = default_tuning();
 	if (def.num != string_pitch.num)
 		return false;
@@ -129,8 +123,7 @@ bool Instrument::has_default_tuning() const
 	return true;
 }
 
-void Instrument::set_midi_no(int no)
-{
+void Instrument::set_midi_no(int no) {
 	if ((no >= 1) and (no <= 6))
 		type = Type::PIANO;
 	else if ((no >= 7) and (no <= 8))
@@ -166,16 +159,14 @@ void Instrument::set_midi_no(int no)
 	string_pitch = default_tuning();
 }
 
-Array<Instrument> Instrument::enumerate()
-{
+Array<Instrument> Instrument::enumerate() {
 	Array<Instrument> instruments;
 	for (int i=0; i<(int)Instrument::Type::NUM_TYPES; i++)
 		instruments.add(Instrument((Instrument::Type)i));
 	return instruments;
 }
 
-const Clef& Instrument::get_clef() const
-{
+const Clef& Instrument::get_clef() const {
 	if (type == Type::DRUMS)
 		return Clef::_DRUMS;
 	if ((type == Type::ELECTRIC_GUITAR) or (type == Type::GUITAR))
@@ -187,18 +178,15 @@ const Clef& Instrument::get_clef() const
 	return Clef::_TREBLE;
 }
 
-bool Instrument::has_strings() const
-{
+bool Instrument::has_strings() const {
 	return string_pitch.num > 0;
 }
 
-bool Instrument::operator==(const Instrument &i) const
-{
+bool Instrument::operator==(const Instrument &i) const {
 	return type == i.type;
 }
 
-int Instrument::highest_usable_string(int pitch) const
-{
+int Instrument::highest_usable_string(int pitch) const {
 	if (!has_strings())
 		return -1;
 	int n = 0;
@@ -207,8 +195,7 @@ int Instrument::highest_usable_string(int pitch) const
 			n = i;
 	return n;
 }
-int Instrument::make_string_valid(int pitch, int stringno) const
-{
+int Instrument::make_string_valid(int pitch, int stringno) const {
 	if (!has_strings())
 		return -1;
 	int hus = highest_usable_string(pitch);

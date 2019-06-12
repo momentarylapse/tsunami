@@ -2698,7 +2698,7 @@ track-routing-dialog/t-track
 Spur
 
 // Num Language Strings
-236
+238
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3172,3 +3172,7 @@ Group %d
 Gruppe %d
 Master
 Master
+Clarinet
+Klarinette
+Harpsichord
+Cembalo

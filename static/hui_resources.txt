@@ -10397,7 +10397,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-236
+238
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10503,6 +10503,8 @@ Cancel recording?
 Aufnahme abbrechen?
 Cello
 Cello
+Clarinet
+Klarinette
 Clarinette
 Klarinette
 Comment/what happened:
@@ -10557,6 +10559,8 @@ Guitar
 Gitarre
 Hapsichord
 Hapsichord
+Harpsichord
+Cembalo
 Horn
 Horn
 Import file

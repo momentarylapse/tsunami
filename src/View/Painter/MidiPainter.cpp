@@ -434,7 +434,7 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 }
 
 
-void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
+void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
 	if (cam->scale * song->sample_rate < quality.dx_min)
 		return;
 
@@ -558,7 +558,7 @@ void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState 
 	draw_complex_note(c, &n, state, x1, x2, y);
 }
 
-void MidiPainter::draw_linear(Painter *c, const MidiNoteBufferRef &notes) {
+void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
 	//c->setLineWidth(3.0f);
 
 	// draw notes
@@ -629,7 +629,7 @@ void MidiPainter::draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState sta
 	}
 }
 
-void MidiPainter::draw_tab(Painter *c, const MidiNoteBufferRef &notes) {
+void MidiPainter::draw_tab(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return string_to_screen(n->stringno); });
 
 	c->set_antialiasing(quality.antialiasing);
@@ -722,7 +722,7 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 
 
 
-void MidiPainter::draw_classical(Painter *c, const MidiNoteBufferRef &notes) {
+void MidiPainter::draw_classical(Painter *c, const MidiNoteBuffer &notes) {
 	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return clef_pos_to_screen(n->clef_position); });
 
 	c->set_antialiasing(quality.antialiasing);
@@ -733,27 +733,42 @@ void MidiPainter::draw_classical(Painter *c, const MidiNoteBufferRef &notes) {
 	c->set_font_size(AudioView::FONT_SIZE);
 }
 
-void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &notes) {
+void MidiPainter::draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &notes) {
 	auto bars = song->bars.get_bars(cur_range);
-	for (auto *b: bars) {
-		float x0, x1;
-		cam->range2screen(b->range(), x0, x1);
-		MidiNoteBufferRef bnotes = notes.get_notes(b->range());
-		int count[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
-		for (MidiNote *n: bnotes)
-			count[pitch_to_rel(n->pitch)] ++;
-		for (int i=0; i<12; i++) {
-			if (count[i] == 0)
-				continue;
-			color col = pitch_color(i);
-			if (!is_playable)
-				col = ColorInterpolate(col, colors.text_soft3, 0.8f);
-			col.a = (float)count[i] / (float)bnotes.num;
-			c->set_color(col);
-			float y0 = area.y2 - i*area.height()/12;
-			float y1 = area.y2 - (i+1)*area.height()/12;
-			c->draw_rect(rect(x0, x1, y0, y1));
-		}
+
+	// along bars
+	for (auto *b: bars)
+		draw_low_detail_dummy_part(c, b->range(), notes.get_notes(b->range()));
+
+	int dpos = song->sample_rate * 5; // 5s intervals
+
+	// before bars
+	for (int pos=song->bars.range().start()-dpos; pos>=cur_range.start()-dpos; pos-=dpos)
+		draw_low_detail_dummy_part(c, Range(pos, dpos), notes.get_notes(Range(pos, dpos)));
+	// after bars
+	for (int pos=song->bars.range().end(); pos<cur_range.end(); pos+=dpos)
+		draw_low_detail_dummy_part(c, Range(pos, dpos), notes.get_notes(Range(pos, dpos)));
+}
+
+void MidiPainter::draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &notes) {
+	if (notes.num == 0)
+		return;
+	float x0, x1;
+	cam->range2screen(r, x0, x1);
+	int count[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	for (MidiNote *n: notes)
+		count[pitch_to_rel(n->pitch)] ++;
+	for (int i=0; i<12; i++) {
+		if (count[i] == 0)
+			continue;
+		color col = pitch_color(i);
+		if (!is_playable)
+			col = ColorInterpolate(col, colors.text_soft3, 0.8f);
+		col.a = (float)count[i] / (float)notes.num;
+		c->set_color(col);
+		float y0 = area.y2 - i*area.height()/12;
+		float y1 = area.y2 - (i+1)*area.height()/12;
+		c->draw_rect(rect(x0, x1, y0, y1));
 	}
 }
 
@@ -768,23 +783,27 @@ Range extend_range_to_bars(const Range &r, const BarCollection &bars) {
 	return rr;
 }
 
+void MidiPainter::_draw_notes(Painter *p, const MidiNoteBuffer &notes) {
+
+	if (mode == MidiMode::LINEAR)
+		draw_linear(p, notes);
+	else if (mode == MidiMode::TAB)
+		draw_tab(p, notes);
+	else // if (mode == MidiMode::CLASSICAL)
+		draw_classical(p, notes);
+}
+
 void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	cur_range = extend_range_to_bars(cam->range() - shift, song->bars);
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 
 	float w_1min = cam->dsample2screen(song->sample_rate * 60);
-	if (notes.num > quality.note_count_threshold or (w_1min < 1000/quality.factor)) {
-		draw_low_detail_dummy(c, notes);
-		return;
+	if ((notes.num > quality.note_count_threshold) or (w_1min < 1000/quality.factor)) {
+		draw_low_detail_dummy(c, midi);
+	} else {
+		_draw_notes(c, notes);
 	}
-	
-	if (mode == MidiMode::LINEAR)
-		draw_linear(c, notes);
-	else if (mode == MidiMode::TAB)
-		draw_tab(c, notes);
-	else // if (mode == MidiMode::CLASSICAL)
-		draw_classical(c, notes);
 }
 
 void MidiPainter::draw_background(Painter *c) {

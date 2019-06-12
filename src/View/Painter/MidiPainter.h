@@ -21,7 +21,6 @@ class HoverData;
 class Painter;
 class MidiNote;
 class MidiNoteBuffer;
-class MidiNoteBufferRef;
 class Clef;
 class Scale;
 class Song;
@@ -65,24 +64,26 @@ public:
 	void draw_pitch_grid(Painter *c, Synthesizer *synth);
 
 private:
-	void draw_rhythm(Painter *c, const MidiNoteBufferRef &midi, const Range &range, std::function<float(MidiNote*)> y_func);
+	void draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func);
 
 	void draw_simple_note(Painter *c, float x1, float x2, float y, float rx, const color &col, const color &col_shadow, bool force_circle);
 	void draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState state, float x1, float x2, float y);
 
 	void draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state);
-	void draw_linear(Painter *c, const MidiNoteBufferRef &midi);
+	void draw_linear(Painter *c, const MidiNoteBuffer &midi);
 	void draw_note_tab(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_tab(Painter *c, const MidiNoteBufferRef &midi);
+	void draw_tab(Painter *c, const MidiNoteBuffer &midi);
 	void draw_note_classical(Painter *c, const MidiNote *n, MidiNoteState state);
-	void draw_classical(Painter *c, const MidiNoteBufferRef &midi);
-	
-	void draw_low_detail_dummy(Painter *c, const MidiNoteBufferRef &midi);
+	void draw_classical(Painter *c, const MidiNoteBuffer &midi);
+
+	void draw_low_detail_dummy(Painter *c, const MidiNoteBuffer &midi);
+	void draw_low_detail_dummy_part(Painter *c, const Range &r, const MidiNoteBuffer &midi);
 
 public:
 	void draw_clef_tab(Painter *c);
 	void draw_clef_classical(Painter *c);
 	void draw_key_symbol(Painter *c, const MidiKeyChange &kc);
+	void _draw_notes(Painter *p, const MidiNoteBuffer &notes);
 	void draw(Painter *c, const MidiNoteBuffer &midi);
 	void draw_background(Painter *c);
 

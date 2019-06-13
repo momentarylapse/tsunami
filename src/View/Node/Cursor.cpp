@@ -20,7 +20,7 @@ Cursor::Cursor(AudioView* view, bool end) : ViewNode(view) {
 }
 
 void Cursor::draw(Painter* c) {
-	view->draw_time_line(c, pos(), view->colors.selection_boundary, view_hover(), false, true);
+	view->draw_time_line(c, pos(), view->colors.selection_boundary, view_hover(view->hover), false, true);
 }
 
 int Cursor::pos() {
@@ -30,11 +30,11 @@ int Cursor::pos() {
 		return view->sel.range.start();
 }
 
-bool Cursor::hover() {
-	if (view->my < view->area.y2 - 20)
+bool Cursor::hover(float mx, float my) {
+	if (my < view->area.y2 - 20)
 		return false;
 	float x = view->cam.sample2screen(pos());
-	return (fabs(x - view->mx) < 10);
+	return (fabs(x - mx) < 10);
 }
 
 string Cursor::get_tip() {

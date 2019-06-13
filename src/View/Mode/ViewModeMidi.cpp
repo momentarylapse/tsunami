@@ -258,6 +258,7 @@ void ViewModeMidi::on_start() {
 
 void ViewModeMidi::on_end() {
 	delete preview;
+	preview = nullptr;
 
 	for (auto *v: view->vlayer)
 		v->scroll_bar->hidden = true;
@@ -684,16 +685,13 @@ inline bool hover_note_linear(const MidiNote &n, HoverData &s, ViewModeMidi *vmm
 	return n.range.is_inside(s.pos);
 }
 
-HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer) {
-	auto s = ViewModeDefault::get_hover_data(vlayer);
+HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
+	auto s = ViewModeDefault::get_hover_data(vlayer, mx, my);
 	if (s.type != s.Type::LAYER)
 		return s;
 	if (!editing(vlayer))
 		return s;
 	auto *l = vlayer->layer;
-
-//	int mx = view->mx;
-	int my = view->my;
 
 	// midi
 	auto mode = vlayer->midi_mode;

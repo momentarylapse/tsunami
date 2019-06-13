@@ -22,8 +22,7 @@
 
 
 
-class TrackHeaderButton : public ViewNode
-{
+class TrackHeaderButton : public ViewNode {
 public:
 	AudioViewTrack *vtrack;
 	TrackHeader *header;
@@ -31,20 +30,19 @@ public:
 		vtrack = th->vtrack;
 		header = th;
 	}
-	HoverData get_hover_data() override {
-		auto h = header->get_hover_data();
+	HoverData get_hover_data(float mx, float my) override {
+		auto h = header->get_hover_data(mx, my);
 		h.node = this;
 		return h;
 	}
 	color get_color() {
-		if (view_hover())
+		if (view_hover(view->hover))
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
 };
 
-class TrackButtonMute: public TrackHeaderButton
-{
+class TrackButtonMute: public TrackHeaderButton {
 public:
 	TrackButtonMute(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
@@ -65,8 +63,7 @@ public:
 	}
 };
 
-class TrackButtonSolo: public TrackHeaderButton
-{
+class TrackButtonSolo: public TrackHeaderButton {
 public:
 	TrackButtonSolo(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
@@ -83,8 +80,7 @@ public:
 	}
 };
 
-class TrackButtonConfig: public TrackHeaderButton
-{
+class TrackButtonConfig: public TrackHeaderButton {
 public:
 	TrackButtonConfig(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
@@ -102,7 +98,6 @@ public:
 		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
 	}
 	bool on_left_button_down() override {
-		view->set_current(parent->get_hover_data());
 		view->session->set_mode("default/track");
 		return true;
 	}
@@ -123,7 +118,7 @@ TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK
 
 void TrackHeader::draw(Painter *c) {
 	auto *track = vtrack->track;
-	bool _hover = view_hover();
+	bool _hover = view_hover(view->hover);
 	bool extended = _hover or view->editing_track(track);
 	bool playable = view->get_playable_tracks().contains(track);
 
@@ -239,8 +234,8 @@ bool TrackHeader::on_right_button_down() {
 	return true;
 }
 
-HoverData TrackHeader::get_hover_data() {
-	auto h = ViewNode::get_hover_data();
+HoverData TrackHeader::get_hover_data(float mx, float my) {
+	auto h = ViewNode::get_hover_data(mx, my);
 	h.vtrack = vtrack;
 	h.vlayer = vtrack->first_layer();
 	return h;

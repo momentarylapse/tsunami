@@ -30,11 +30,12 @@ public:
 	virtual bool on_right_button_down() { return false; }
 	virtual bool on_mouse_move() { return false; }
 
-	virtual bool hover();
+	virtual bool hover(float mx, float my);
 	virtual void draw(Painter *p) {}
-	bool view_hover();
-	bool view_hover_non_recursive();
-	virtual HoverData get_hover_data();
+	virtual HoverData get_hover_data(float mx, float my);
+
+	bool view_hover(const HoverData &h);
+	bool view_hover_non_recursive(const HoverData &h);
 
 	virtual string get_tip();
 

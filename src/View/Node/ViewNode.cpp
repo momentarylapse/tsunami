@@ -36,25 +36,25 @@ ViewNode::~ViewNode() {
 		delete c;
 }
 
-bool ViewNode::hover() {
+bool ViewNode::hover(float mx, float my) {
 	if (hidden)
 		return false;
-	return area.inside(view->mx, view->my);
+	return area.inside(mx, my);
 }
 
-bool ViewNode::view_hover() {
+bool ViewNode::view_hover(const HoverData &h) {
 	for (auto *c: children)
-		if (c->view_hover())
+		if (c->view_hover(h))
 			return true;
-	return view->hover.node == this;
+	return h.node == this;
 }
 
-bool ViewNode::view_hover_non_recursive() {
-	return view->hover.node == this;
+bool ViewNode::view_hover_non_recursive(const HoverData &h) {
+	return h.node == this;
 }
 
-HoverData ViewNode::get_hover_data() {
-	HoverData h = view->hover_time();
+HoverData ViewNode::get_hover_data(float mx, float my) {
+	auto h = view->hover_time(mx, my);
 	h.node = this;
 	return h;
 }

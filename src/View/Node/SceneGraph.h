@@ -22,7 +22,7 @@ public:
 	bool allow_handle_click_when_gaining_focus() override;
 
 	//ViewNode *get_hover();
-	HoverData get_hover_data() override;
+	HoverData get_hover_data(float mx, float my) override;
 
 	void update_area() override;
 	void draw(Painter *p) override;

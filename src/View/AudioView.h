@@ -154,7 +154,7 @@ public:
 	SongSelection sel;
 	SongSelection sel_temp;
 
-	HoverData hover_time();
+	HoverData hover_time(float mx, float my);
 	int get_mouse_pos();
 	int get_mouse_pos_snap();
 

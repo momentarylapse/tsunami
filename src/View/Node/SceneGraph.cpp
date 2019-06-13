@@ -48,7 +48,7 @@ SceneGraph::SceneGraph(AudioView *view) : ViewNode(view) {}
 bool SceneGraph::on_left_button_down() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			if (c->on_left_button_down())
 				return true;
 	return false;
@@ -57,7 +57,7 @@ bool SceneGraph::on_left_button_down() {
 bool SceneGraph::on_left_button_up() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			if (c->on_left_button_up())
 				return true;
 	return false;
@@ -66,7 +66,7 @@ bool SceneGraph::on_left_button_up() {
 bool SceneGraph::on_left_double_click() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			if (c->on_left_double_click())
 				return true;
 	return false;
@@ -75,7 +75,7 @@ bool SceneGraph::on_left_double_click() {
 bool SceneGraph::on_right_button_down() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			if (c->on_right_button_down())
 				return true;
 	return false;
@@ -84,7 +84,7 @@ bool SceneGraph::on_right_button_down() {
 bool SceneGraph::on_mouse_move() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			if (c->on_mouse_move())
 				return true;
 	return false;
@@ -93,17 +93,17 @@ bool SceneGraph::on_mouse_move() {
 bool SceneGraph::allow_handle_click_when_gaining_focus() {
 	auto nodes = collect_children_down(this);
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			return c->allow_handle_click_when_gaining_focus();
 	return false;
 }
 
-HoverData SceneGraph::get_hover_data() {
+HoverData SceneGraph::get_hover_data(float mx, float my) {
 	auto nodes = collect_children_down(this);
 
 	for (auto *c: nodes)
-		if (c->hover())
-			return c->get_hover_data();
+		if (c->hover(view->mx, view->my))
+			return c->get_hover_data(mx, my);
 
 	return HoverData();
 }
@@ -112,7 +112,7 @@ string SceneGraph::get_tip() {
 	auto nodes = collect_children_down(this);
 
 	for (auto *c: nodes)
-		if (c->hover())
+		if (c->hover(view->mx, view->my))
 			return c->get_tip();
 	return "";
 }

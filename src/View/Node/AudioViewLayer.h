@@ -45,8 +45,8 @@ public:
 	bool allow_handle_click_when_gaining_focus() override;
 
 	string get_tip() override;
-	HoverData get_hover_data() override;
-	HoverData get_hover_data_default();
+	HoverData get_hover_data(float mx, float my) override;
+	HoverData get_hover_data_default(float mx, float my);
 
 	void on_track_change();
 

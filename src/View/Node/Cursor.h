@@ -16,7 +16,7 @@ public:
 	Cursor(AudioView *view, bool end);
 
 	void draw(Painter *p) override;
-	bool hover() override;
+	bool hover(float mx, float my) override;
 	string get_tip() override;
 
 	int pos();
@@ -30,7 +30,7 @@ public:
 class SelectionMarker : public ViewNode {
 public:
 	SelectionMarker(AudioView *view);
-	bool hover() override { return false; }
+	bool hover(float mx, float my) override { return false; }
 
 	void draw(Painter *p) override;
 };

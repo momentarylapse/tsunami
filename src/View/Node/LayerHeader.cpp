@@ -27,13 +27,13 @@ public:
 		vlayer = lh->vlayer;
 		header = lh;
 	}
-	HoverData get_hover_data() override {
-		auto h = header->get_hover_data();
+	HoverData get_hover_data(float mx, float my) override {
+		auto h = header->get_hover_data(mx, my);
 		h.node = this;
 		return h;
 	}
 	color get_color() {
-		if (view_hover())
+		if (view_hover(view->hover))
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
@@ -110,7 +110,7 @@ LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNode(l, 0, 0, AudioView::LAYER
 void LayerHeader::draw(Painter *c) {
 
 	auto *layer = vlayer->layer;
-	bool _hover = view_hover();
+	bool _hover = view_hover(view->hover);
 	bool extended = _hover or view->editing_layer(vlayer);
 	bool playable = view->get_playable_layers().contains(layer);
 
@@ -187,8 +187,8 @@ bool LayerHeader::on_right_button_down() {
 	view->open_popup(view->menu_layer);
 	return true;
 }
-HoverData LayerHeader::get_hover_data() {
-	auto h = ViewNode::get_hover_data();
+HoverData LayerHeader::get_hover_data(float mx, float my) {
+	auto h = ViewNode::get_hover_data(mx, my);
 	h.vtrack = view->get_track(vlayer->layer->track);
 	h.vlayer = vlayer;
 	return h;

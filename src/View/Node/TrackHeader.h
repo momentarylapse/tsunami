@@ -20,7 +20,7 @@ public:
 	AudioViewTrack *vtrack;
 	TrackHeader(AudioViewTrack *t);
 	void draw(Painter *c) override;
-	HoverData get_hover_data() override;
+	HoverData get_hover_data(float mx, float my) override;
 
 	bool on_left_button_down() override;
 	bool on_left_double_click() override;

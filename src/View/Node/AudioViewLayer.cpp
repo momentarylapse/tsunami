@@ -60,8 +60,8 @@ public:
 		align.fit_h = true;
 		hidden = true;
 	}
-	HoverData get_hover_data() override {
-		auto h = ScrollBar::get_hover_data();
+	HoverData get_hover_data(float mx, float my) override {
+		auto h = ScrollBar::get_hover_data(mx, my);
 		h.vlayer = vlayer;
 		return h;
 	}
@@ -654,12 +654,12 @@ string AudioViewLayer::get_tip() {
 	return "";
 }
 
-HoverData AudioViewLayer::get_hover_data() {
-	return view->mode->get_hover_data(this);
+HoverData AudioViewLayer::get_hover_data(float mx, float my) {
+	return view->mode->get_hover_data(this, mx, my);
 }
 
-HoverData AudioViewLayer::get_hover_data_default() {
-	HoverData s = ViewNode::get_hover_data();
+HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
+	HoverData s = ViewNode::get_hover_data(mx, my);
 	s.vlayer = this;
 	foreachi(auto *l, view->vlayer, i)
 		if (this == l)
@@ -672,7 +672,7 @@ HoverData AudioViewLayer::get_hover_data_default() {
 		for (int i=0; i<min(layer->track->markers.num, marker_areas.num); i++){
 			auto *m = layer->track->markers[i];
 			if (marker_areas.contains(m) and marker_label_areas.contains(m))
-			if (marker_areas[m].inside(view->mx, view->my) or marker_label_areas[m].inside(view->mx, view->my)){
+			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)){
 				s.marker = m;
 				s.type = HoverData::Type::MARKER;
 				s.index = i;
@@ -699,7 +699,7 @@ HoverData AudioViewLayer::get_hover_data_default() {
 			int offset = 0;
 			for (int i=0; i<view->song->bars.num+1; i++){
 				float x = view->cam.sample2screen(offset);
-				if (fabs(x - view->mx) < view->SNAPPING_DIST){
+				if (fabs(x - mx) < view->SNAPPING_DIST){
 					s.index = i;
 					s.type = HoverData::Type::BAR_GAP;
 					s.pos = offset;
@@ -715,7 +715,7 @@ HoverData AudioViewLayer::get_hover_data_default() {
 		for (auto *b: bars){
 			float x = view->cam.sample2screen(b->range().offset);
 			// test for label area...
-			if ((view->mx >= x) and (view->mx < x + 36) and (view->my < area.y1 + 20)){
+			if ((mx >= x) and (mx < x + 36) and (my < area.y1 + 20)){
 				//b.range.
 				s.bar = b;
 				s.index = b->index;

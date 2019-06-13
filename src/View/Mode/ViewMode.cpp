@@ -21,7 +21,7 @@ ViewMode::ViewMode(AudioView *_view) {
 ViewMode::~ViewMode() {
 }
 
-HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer) {
+HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
 	return HoverData();
 }
 

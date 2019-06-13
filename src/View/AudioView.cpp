@@ -496,7 +496,7 @@ void AudioView::on_mouse_move() {
 	set_mouse();
 
 	if (!mdp->update()) {
-		hover = scene_graph->get_hover_data();
+		hover = scene_graph->get_hover_data(mx, my);
 		scene_graph->on_mouse_move();
 	}
 
@@ -505,7 +505,7 @@ void AudioView::on_mouse_move() {
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	hover = scene_graph->get_hover_data();
+	hover = scene_graph->get_hover_data(mx, my);
 
 	bool allow_handle = true;
 	if (hui::GetEvent()->just_focused)
@@ -542,7 +542,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 void AudioView::on_left_button_up() {
 	mdp->finish();
-	hover = scene_graph->get_hover_data();
+	hover = scene_graph->get_hover_data(mx, my);
 	scene_graph->on_left_button_up();
 
 	force_redraw();
@@ -562,7 +562,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	hover = scene_graph->get_hover_data();
+	hover = scene_graph->get_hover_data(mx, my);
 	set_current(hover);
 	scene_graph->on_right_button_down();
 }
@@ -582,7 +582,7 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
-	hover = scene_graph->get_hover_data();
+	hover = scene_graph->get_hover_data(mx, my);
 	set_current(hover);
 	scene_graph->on_left_double_click();
 	mode->on_left_double_click();
@@ -1490,7 +1490,7 @@ int AudioView::get_mouse_pos_snap() {
 	return pos;
 }
 
-HoverData AudioView::hover_time() {
+HoverData AudioView::hover_time(float mx, float my) {
 	HoverData s;
 	s.pos = get_mouse_pos();
 	s.pos_snap = get_mouse_pos_snap();

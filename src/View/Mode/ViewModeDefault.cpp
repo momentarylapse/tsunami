@@ -341,112 +341,8 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	c->set_line_width(1.0f);
 }
 
-HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer) {
-	return vlayer->get_hover_data_default();
-}
-
-void ViewModeDefault::set_cursor_pos(int pos, bool keep_track_selection)
-{
-#if 0
-	if (view->is_playback_active()){
-		if (view->renderer->range().is_inside(pos)){
-			session->signal_chain->set_pos(pos);
-			hover->type = HoverData::Type::PLAYBACK_CURSOR;
-			view->force_redraw();
-			return;
-		}else{
-			view->stop();
-		}
-	}
-	//view->msp.start(hover->pos, hover->y0);
-	view->sel.clear_data();
-	if (!keep_track_selection)
-		view->sel.tracks = view->cur_track();
-		//view->sel.all_tracks(view->song);
-	view->set_selection(get_selection_for_range(Range(pos, 0)));
-
-	view->cam.make_sample_visible(pos, 0);
-#endif
-}
-
-
-void selectLayer(ViewModeDefault *m, TrackLayer *l, bool diff, bool soft)
-{
-#if 0
-	if (!l)
-		return;
-	auto &sel = m->view->sel;
-	if (diff){
-		bool is_only_selected = true;
-		for (Track *tt: l->track->song->tracks)
-			for (TrackLayer *ll: tt->layers)
-				if (sel.has(ll) and (ll != l))
-					is_only_selected = false;
-		sel.set(l, !sel.has(l) or is_only_selected);
-	}else if (soft){
-		if (sel.has(l))
-			return;
-		sel.layers.clear();
-		sel.add(l);
-		sel.tracks.clear();
-		sel.add(l->track);
-	}else{
-		sel.layers.clear();
-		sel.add(l);
-		sel.add(l->track);
-		sel.tracks.clear();
-	}
-
-	// TODO: what to do???
-	m->view->set_selection(m->view->mode->get_selection_for_range(sel.range));
-#endif
-}
-
-void ViewModeDefault::select_hover()
-{
-#if 0
-	view->sel_temp = view->sel;
-	TrackLayer *l = hover->layer();
-	SampleRef *s = hover->sample;
-
-	// track
-	if (hover->vlayer)
-		view->set_cur_layer(hover->vlayer);
-	if (hover->type == HoverData::Type::LAYER)
-		selectLayer(this, l, false, false);
-
-	view->set_cur_sample(s);
-
-
-	if (hover->type == HoverData::Type::BAR_GAP){
-		view->sel.clear_data();
-		view->sel.bar_gap = hover->index;
-		selectLayer(this, l, false, true);
-	}else if (hover->type == HoverData::Type::BAR){
-		auto b = hover->bar;
-		if (view->sel.has(b)){
-		}else{
-			selectLayer(this, l, false, true);
-			view->sel.clear_data();
-			view->sel.add(b);
-		}
-	}else if (hover->type == HoverData::Type::MARKER){
-		auto m = hover->marker;
-		if (view->sel.has(m)){
-		}else{
-			selectLayer(this, l, false, true);
-			view->sel.clear_data();
-			view->sel.add(m);
-		}
-	}else if (hover->type == HoverData::Type::SAMPLE){
-		if (view->sel.has(s)){
-		}else{
-			selectLayer(this, l, false, true);
-			view->sel.clear_data();
-			view->sel.add(s);
-		}
-	}
-#endif
+HoverData ViewModeDefault::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
+	return vlayer->get_hover_data_default(mx, my);
 }
 
 SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
@@ -508,25 +404,6 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 			_layers.add(vt->layer);
 	}
 	return SongSelection::from_range(song, r).filter(_layers);
-}
-
-void ViewModeDefault::start_selection()
-{
-	/*
-	hover->range.set_start(view->msp.start_pos);
-	hover->range.set_end(hover->pos);
-	if (hover->type == Selection::Type::TRACK_HEADER){
-		moving_track = hover->track;
-	}else if (hover->type == Selection::Type::TIME){
-		hover->type = Selection::Type::SELECTION_END;
-		view->selection_mode = view->SelectionMode::TIME;
-	}else{
-		hover->y0 = view->msp.start_y;
-		hover->y1 = view->my;
-		view->selection_mode = view->SelectionMode::TRACK_RECT;
-	}
-	view->set_selection(get_selection(hover->range));
-	*/
 }
 
 MidiMode ViewModeDefault::which_midi_mode(Track *t)

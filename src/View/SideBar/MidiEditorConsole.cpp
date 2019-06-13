@@ -119,14 +119,14 @@ void MidiEditorConsole::update() {
 
 	check("input_active", view->mode_midi->is_input_active());
 	enable("input_capture", view->mode_midi->is_input_active());
-	check("input_capture", view->mode_midi->input_capture());
+	check("input_capture", view->mode_midi->input_capture);
 	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	reset("input");
 	for (auto *d: input_sources)
 		set_string("input", d->get_name());
 
 	foreachi(auto *d, input_sources, i)
-		if (d == view->mode_midi->input_device())
+		if (d == view->mode_midi->input_device)
 			set_int("input", i);
 	enable("input", view->mode_midi->is_input_active());
 

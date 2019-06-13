@@ -97,8 +97,9 @@ public:
 	InputMode input_mode;
 
 	MidiPreview *preview;
-	Device *input_device();
-	bool input_capture();
+	Device *input_device;
+	bool input_wanted_active;
+	bool input_capture;
 
 	bool is_input_active();
 	void activate_input(bool active);
@@ -107,6 +108,9 @@ public:
 	void _stop_input();
 	void set_input_device(Device *d);
 	bool maximize_input_volume;
+
+	void on_midi_input();
+	void ri_insert();
 
 	AudioViewLayer *cur_vlayer();
 	TrackLayer *cur_layer();

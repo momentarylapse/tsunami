@@ -34,14 +34,12 @@ public:
 	Session *session;
 
 	MidiInput *input;
-	Device *input_device;
-	bool input_wanted_active;
-	bool input_capture;
 
 
 	void _start_input();
 	void _stop_input();
 	void set_input_device(Device *d);
+	Device *input_device;
 
 	void start(const Array<int> &pitch, float volume, float ttl);
 	void end();

@@ -10,8 +10,6 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
 #include "../../Module/SignalChain.h"
-#include "../../Device/Device.h"
-#include "../../Device/DeviceManager.h"
 #include "../../Stream/MidiInput.h"
 #include <mutex>
 
@@ -142,9 +140,7 @@ MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	out = chain->add(ModuleType::STREAM, "AudioOutput");
 
 	input = nullptr;
-	input_wanted_active = false;
-	input_capture = true;
-	input_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+	input_device = nullptr;
 
 	chain->connect(source, 0, joiner, 0);
 	chain->connect(joiner, 0, synth, 0);
@@ -174,10 +170,12 @@ void MidiPreview::_start_input() {
 	chain->connect(input, 0, recorder, 0);
 	//chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	chain->start();
+	chain->command(ModuleCommand::ACCUMULATION_START, 0);
 }
 
 void MidiPreview::_stop_input() {
 	//chain->unsubscribe(this);
+	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	chain->stop();
 	chain->remove(input);
 	input = nullptr;

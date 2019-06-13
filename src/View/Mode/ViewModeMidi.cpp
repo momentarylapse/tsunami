@@ -9,6 +9,7 @@
 
 #include "../../Module/SignalChain.h"
 #include "../../Module/Synth/Synthesizer.h"
+#include "../../Module/Midi/MidiRecorder.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -88,6 +89,10 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	string_no = 0;
 	octave = 3;
 
+	input_wanted_active = false;
+	input_capture = true;
+	input_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+
 	rep_key_runner = -1;
 	rep_key = -1;
 	rep_key_num = 0;
@@ -165,81 +170,51 @@ void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
 static hui::Timer ri_timer;
 static MidiEventBuffer ri_keys;
 
-void ri_insert(ViewModeMidi *me) {
+void ViewModeMidi::ri_insert() {
 	if (ri_keys.num == 0)
 		return;
-	Range r = me->get_edit_range();
+	Range r = get_edit_range();
 	for (auto &e: ri_keys) {
 		float vol = e.volume;
-		if (me->maximize_input_volume)
+		if (maximize_input_volume)
 			vol = 1;
-		me->view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, vol));
-		me->start_midi_preview({(int)e.pitch}, 0.5f * vol);
+		view->cur_layer()->add_midi_note(make_note(r, e.pitch, -1, NoteModifier::UNKNOWN, vol));
 	}
 	ri_keys.clear();
-	me->view->set_cursor_pos(r.end());
-	me->select_in_edit_cursor();
+	view->set_cursor_pos(r.end());
+	select_in_edit_cursor();
 	ri_timer.get();
 
 }
 
-bool ViewModeMidi::input_capture() {
-	if (!preview)
-		return false;
-	return preview->input_capture;
-}
 
-Device* ViewModeMidi::input_device() {
-	if (!preview)
-		return nullptr;
-	return preview->input_device;
-}
+void ViewModeMidi::on_midi_input() {
+	auto rec = (MidiRecorder*)preview->recorder;
 
-#include "../../Module/Midi/MidiRecorder.h"
-
-void on_midi_input(ViewModeMidi *me) {
-	//MidiEventBuffer buf;
-	//buf.samples = 1024;
-	//me->preview->input->out->read_midi(buf);
-	auto rec = (MidiRecorder*)me->preview->recorder;
-	msg_write(rec->buffer.num);
-	return;
-
-	// capture or just playback?
-	if (me->input_capture()) {
+	if (input_capture) {
 
 		// insert
 		for (auto &e: rec->buffer) {
 			if (e.volume > 0) {
 				if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
-					ri_insert(me);
+					ri_insert();
+				e.pos = 0;
 				ri_keys.add(e);
 				ri_timer.get();
 			} else {
-				ri_insert(me);
+				ri_insert();
 			}
 		}
-	} else {
-/*
-		// playback
-		for (auto &e: buf)
-			if (e.volume > 0) {
-				me->start_midi_preview({(int)e.pitch}, 0.5f);
-			} else {
-				me->preview->end();
-			}*/
 	}
-
+	preview->chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 }
 
 bool ViewModeMidi::is_input_active() {
-	if (!preview)
-		return false;
-	return preview->input_wanted_active;
+	return input_wanted_active;
 }
 
 void ViewModeMidi::activate_input(bool active) {
-	preview->input_wanted_active = active;
+	input_wanted_active = active;
 	if (active and !preview->input) {
 		_start_input();
 	} else if (!active and preview->input) {
@@ -248,13 +223,13 @@ void ViewModeMidi::activate_input(bool active) {
 }
 
 void ViewModeMidi::set_input_capture(bool capture) {
-	preview->input_capture = capture;
+	input_capture = capture;
 	notify();
 }
 
 void ViewModeMidi::_start_input() {
 	preview->_start_input();
-	preview->chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
+	preview->chain->subscribe(this, [=]{ on_midi_input(); }, Module::MESSAGE_TICK);
 }
 
 void ViewModeMidi::_stop_input() {
@@ -263,12 +238,14 @@ void ViewModeMidi::_stop_input() {
 }
 
 void ViewModeMidi::set_input_device(Device *d) {
+	input_device = d;
 	preview->set_input_device(d);
 }
 
 void ViewModeMidi::on_start() {
 	preview = new MidiPreview(view->session, (Synthesizer*)cur_vlayer()->layer->track->synth->copy());
-	if (preview->input_wanted_active)
+	preview->set_input_device(input_device);
+	if (input_wanted_active)
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;
 	sb->hidden = false;

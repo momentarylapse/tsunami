@@ -36,7 +36,7 @@ void CaptureConsoleModeMulti::enter()
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 
-	chain = new SignalChain(session, "capture-multi");
+	chain = session->add_signal_chain_system("capture-multi");
 
 	Array<CaptureTrackData> data;
 
@@ -98,6 +98,7 @@ void CaptureConsoleModeMulti::enter()
 		items.add(c);
 		cc->event(c.id_source, [=]{ on_source(); });
 	}
+	chain->mark_all_modules_as_system();
 	
 	chain->start();
 	view->mode_capture->set_data(data);
@@ -147,7 +148,7 @@ void CaptureConsoleModeMulti::leave()
 		cc->remove_control(c.id_peaks);
 	}
 	items.clear();
-	delete chain;
+	session->remove_signal_chain(chain);
 }
 
 

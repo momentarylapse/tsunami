@@ -18,8 +18,7 @@ enum class SignalType;
 enum class ModuleType;
 class SuckerThread;
 
-class SignalChain : public Module
-{
+class SignalChain : public Module {
 	friend class SuckerThread;
 public:
 	SignalChain(Session *session, const string &name);
@@ -49,15 +48,13 @@ public:
 
 	Module *get_by_type(ModuleType type, const string &sub_type);
 
-	struct Cable
-	{
+	struct Cable {
 		SignalType type;
 		Module *source, *target;
 		int source_port, target_port;
 	};
 	Array<Cable*> cables;
-	struct PortX
-	{
+	struct PortX {
 		Module *module;
 		int port;
 	};
@@ -109,6 +106,8 @@ public:
 
 	std::mutex mutex;
 	int perf_channel_suck;
+
+	void mark_all_modules_as_system();
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

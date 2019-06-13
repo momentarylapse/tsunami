@@ -13,11 +13,9 @@
 #include <mutex>
 
 
-class MidiPreviewSource : public MidiSource
-{
+class MidiPreviewSource : public MidiSource {
 public:
-	MidiPreviewSource()
-	{
+	MidiPreviewSource() {
 		module_subtype = "MidiPreviewSource";
 		mode = Mode::WAITING;
 		ttl = -1;
@@ -26,32 +24,30 @@ public:
 	}
 
 	bool debug;
-	void o(const string &str)
-	{
+	void o(const string &str) {
 		if (debug)
 			msg_write(str);
 	}
 
-	int read(MidiEventBuffer &midi) override
-	{
+	int read(MidiEventBuffer &midi) override {
 		std::lock_guard<std::mutex> lock(mutex);
 
 		o("mps.read");
-		if (mode == Mode::END_OF_STREAM){
+		if (mode == Mode::END_OF_STREAM) {
 			o("  - end of stream");
 			return Port::END_OF_STREAM;
 		}
 
-		if (mode == Mode::START_NOTES){
+		if (mode == Mode::START_NOTES) {
 			for (int p: pitch_queued)
 				midi.add(MidiEvent(0, p, volume));
 			pitch_active = pitch_queued;
 			set_mode(Mode::ACTIVE_NOTES);
-		}else if (mode == Mode::END_NOTES){
+		} else if (mode == Mode::END_NOTES) {
 			for (int p: pitch_active)
 				midi.add(MidiEvent(0, p, 0));
 			set_mode(Mode::END_OF_STREAM);
-		}else if (mode == Mode::CHANGE_NOTES){
+		} else if (mode == Mode::CHANGE_NOTES) {
 			for (int p: pitch_active)
 				midi.add(MidiEvent(0, p, 0));
 			for (int p: pitch_queued)
@@ -59,7 +55,7 @@ public:
 			pitch_active = pitch_queued;
 			set_mode(Mode::ACTIVE_NOTES);
 		}
-		if (mode == Mode::ACTIVE_NOTES){
+		if (mode == Mode::ACTIVE_NOTES) {
 			ttl -= midi.samples;
 			if (ttl < 0)
 				set_mode(Mode::END_NOTES);
@@ -67,7 +63,7 @@ public:
 		return midi.samples;
 	}
 	int mode;
-	enum Mode{
+	enum Mode {
 		WAITING,
 		START_NOTES,
 		CHANGE_NOTES,
@@ -75,8 +71,7 @@ public:
 		END_NOTES,
 		END_OF_STREAM
 	};
-	string mode_str(int mode)
-	{
+	string mode_str(int mode) {
 		if (mode == Mode::WAITING)
 			return "wait";
 		if (mode == Mode::START_NOTES)
@@ -91,8 +86,7 @@ public:
 			return "eos";
 		return "???";
 	}
-	void set_mode(int new_mode)
-	{
+	void set_mode(int new_mode) {
 		o("    " + mode_str(mode) + " -> " + mode_str(new_mode));
 		mode = new_mode;
 	}
@@ -103,8 +97,7 @@ public:
 	float volume;
 
 
-	void start(const Array<int> &_pitch, int _ttl, float _volume)
-	{
+	void start(const Array<int> &_pitch, int _ttl, float _volume) {
 		std::lock_guard<std::mutex> lock(mutex);
 		o("START");
 
@@ -112,21 +105,20 @@ public:
 		ttl = _ttl;
 		volume = _volume;
 
-		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)){
+		if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM)) {
 			set_mode(Mode::START_NOTES);
-		}else if ((mode == Mode::END_NOTES) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
+		} else if ((mode == Mode::END_NOTES) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
 			set_mode(Mode::CHANGE_NOTES);
 		}
 	}
-	void end()
-	{
+	void end() {
 		o("END");
 		std::lock_guard<std::mutex> lock(mutex);
 
-		if (mode == Mode::START_NOTES){
+		if (mode == Mode::START_NOTES) {
 			// skip queue
 			set_mode(Mode::WAITING);
-		}else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)){
+		} else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
 			set_mode(Mode::END_NOTES);
 		}
 	}
@@ -135,25 +127,23 @@ private:
 	std::mutex mutex;
 };
 
-MidiPreview::MidiPreview(Session *s)
-{
+MidiPreview::MidiPreview(Session *s) {
 	session = s;
 	source = new MidiPreviewSource;
 	synth = nullptr;
-	chain = new SignalChain(session, "midi-preview");
+	chain = session->add_signal_chain_system("midi-preview");
 	chain->_add(source);
 	out = chain->add(ModuleType::STREAM, "AudioOutput");
+	chain->mark_all_modules_as_system();
 }
 
-MidiPreview::~MidiPreview()
-{
-	delete chain;
+MidiPreview::~MidiPreview() {
+	session->remove_signal_chain(chain);
 }
 
-void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl)
-{
+void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl) {
 	//kill_preview();
-	if (!synth){
+	if (!synth) {
 		synth = s->copy();
 //		synth->setInstrument(view->cur_track->instrument);
 		chain->_add(synth);
@@ -165,8 +155,7 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 	chain->start();
 }
 
-void MidiPreview::end()
-{
+void MidiPreview::end() {
 	source->end();
 }
 

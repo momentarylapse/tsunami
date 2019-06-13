@@ -81,7 +81,7 @@ void CaptureConsoleModeAudio::enter()
 		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
 			set_target(t);
 
-	chain = new SignalChain(session, "capture");
+	chain = session->add_signal_chain_system("capture");
 
 	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->set_chunk_size(4096);
@@ -95,6 +95,7 @@ void CaptureConsoleModeAudio::enter()
 
 	auto *recorder = chain->add(ModuleType::PLUMBING, "AudioRecorder");
 	auto *sucker = chain->add(ModuleType::PLUMBING, "AudioSucker");
+	chain->mark_all_modules_as_system();
 
 	chain->connect(input, 0, peak_meter, 0);
 	chain->connect(peak_meter, 0, backup, 0);
@@ -116,6 +117,6 @@ void CaptureConsoleModeAudio::leave()
 {
 	chain->stop();
 	cc->peak_meter->set_source(nullptr);
-	delete chain;
+	session->remove_signal_chain(chain);
 	chain = nullptr;
 }

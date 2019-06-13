@@ -39,12 +39,11 @@ MidiPainter* midi_context(AudioViewLayer *l);
 
 
 
-Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start)
-{
+Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start) {
 	Range allowed = Range::ALL;
-	for (MidiNote *n: l->midi){
+	for (MidiNote *n: l->midi) {
 		for (int p: pitch)
-			if (n->pitch == p){
+			if (n->pitch == p) {
 				if (n->range.is_inside(start))
 					return Range::EMPTY;
 			}
@@ -53,7 +52,7 @@ Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start)
 	MidiEventBuffer midi = midi_notes_to_events(l->midi);
 	for (MidiEvent &e: midi)
 		for (int p: pitch)
-			if (e.pitch == p){
+			if (e.pitch == p) {
 				if ((e.pos >= start) and (e.pos < allowed.end()))
 					allowed.set_end(e.pos);
 				if ((e.pos < start) and (e.pos >= allowed.start()))
@@ -62,8 +61,7 @@ Range get_allowed_midi_range(TrackLayer *l, const Array<int> &pitch, int start)
 	return allowed;
 }
 
-MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, float volume = 1.0f)
-{
+MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, float volume = 1.0f) {
 	auto *n = new MidiNote(r, pitch, volume);
 	n->modifier = mod;
 	n->clef_position = clef_pos;
@@ -99,7 +97,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	});//view->scene_graph);
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);*/
 
-	preview = new MidiPreview(view->session);
+	preview = nullptr;
 	input_chain = nullptr;
 	input = nullptr;
 	input_wanted_active = false;
@@ -112,14 +110,13 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	side_bar_console = SideBar::MIDI_EDITOR_CONSOLE;
 }
 
-ViewModeMidi::~ViewModeMidi()
-{
-	delete preview;
+ViewModeMidi::~ViewModeMidi() {
+	if (preview)
+		delete preview;
 }
 
 
-void ViewModeMidi::set_modifier(NoteModifier mod)
-{
+void ViewModeMidi::set_modifier(NoteModifier mod) {
 	modifier = mod;
 	view->set_message(modifier_symbol(mod), 4);
 	notify();
@@ -172,12 +169,11 @@ void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
 static hui::Timer ri_timer;
 static MidiEventBuffer ri_keys;
 
-void ri_insert(ViewModeMidi *me)
-{
+void ri_insert(ViewModeMidi *me) {
 	if (ri_keys.num == 0)
 		return;
 	Range r = me->get_edit_range();
-	for (auto &e: ri_keys){
+	for (auto &e: ri_keys) {
 		float vol = e.volume;
 		if (me->maximize_input_volume)
 			vol = 1;
@@ -191,8 +187,7 @@ void ri_insert(ViewModeMidi *me)
 
 }
 
-void on_midi_input(ViewModeMidi *me)
-{
+void on_midi_input(ViewModeMidi *me) {
 	MidiEventBuffer buf;
 	buf.samples = 1024;
 	me->input->out->read_midi(buf);
@@ -201,13 +196,13 @@ void on_midi_input(ViewModeMidi *me)
 	if (me->input_capture) {
 
 		// insert
-		for (auto &e: buf){
-			if (e.volume > 0){
+		for (auto &e: buf) {
+			if (e.volume > 0) {
 				if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
 					ri_insert(me);
 				ri_keys.add(e);
 				ri_timer.get();
-			}else{
+			} else {
 				ri_insert(me);
 			}
 		}
@@ -215,46 +210,41 @@ void on_midi_input(ViewModeMidi *me)
 
 		// playback
 		for (auto &e: buf)
-			if (e.volume > 0){
+			if (e.volume > 0) {
 				me->start_midi_preview({(int)e.pitch}, 0.5f);
-			}else{
+			} else {
 				me->preview->end();
 			}
 	}
 
 }
 
-bool ViewModeMidi::is_input_active()
-{
+bool ViewModeMidi::is_input_active() {
 	return input_wanted_active;
 }
 
-void ViewModeMidi::activate_input(bool active)
-{
+void ViewModeMidi::activate_input(bool active) {
 	input_wanted_active = active;
-	if (active and !input){
+	if (active and !input) {
 		_start_input();
-	}else if (!active and input){
+	} else if (!active and input) {
 		_stop_input();
 	}
 }
 
-void ViewModeMidi::set_input_capture(bool capture)
-{
+void ViewModeMidi::set_input_capture(bool capture) {
 	input_capture = capture;
 	notify();
 }
 
-void ViewModeMidi::_start_input()
-{
+void ViewModeMidi::_start_input() {
 	input_chain = new SignalChain(session, "midi-input");
 	input = (MidiInput*)input_chain->add(ModuleType::STREAM, "MidiInput");
 	input_chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 	input_chain->start();
 }
 
-void ViewModeMidi::_stop_input()
-{
+void ViewModeMidi::_stop_input() {
 	input_chain->unsubscribe(this);
 	input_chain->stop();
 	delete input_chain;
@@ -262,15 +252,14 @@ void ViewModeMidi::_stop_input()
 	input = nullptr;
 }
 
-void ViewModeMidi::set_input_device(Device *d)
-{
+void ViewModeMidi::set_input_device(Device *d) {
 	input_device = d;
 	if (input)
 		input->set_device(d);
 }
 
-void ViewModeMidi::on_start()
-{
+void ViewModeMidi::on_start() {
+	preview = new MidiPreview(view->session);
 	if (input_wanted_active)
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;
@@ -282,10 +271,11 @@ void ViewModeMidi::on_start()
 	sb->update(EDIT_PITCH_SHOW_COUNT, 128);
 }
 
-void ViewModeMidi::on_end()
-{
+void ViewModeMidi::on_end() {
 	if (input)
 		_stop_input();
+	delete preview;
+	preview = nullptr;
 
 	for (auto *v: view->vlayer)
 		v->scroll_bar->hidden = true;

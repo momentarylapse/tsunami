@@ -29,7 +29,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.90.2";
+const string AppVersion = "0.7.90.3";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -53,25 +53,22 @@ Tsunami::Tsunami() :
 	set_property("author", "Michael Ankele <michi@lupina.de>");
 }
 
-Tsunami::~Tsunami()
-{
-	delete(device_manager);
-	delete(plugin_manager);
-	delete(clipboard);
-	delete(log);
-	delete(perf_mon);
+Tsunami::~Tsunami() {
+	delete device_manager;
+	delete plugin_manager;
+	delete clipboard;
+	delete log;
+	delete perf_mon;
 }
 
-void Tsunami::on_end()
-{
-	while (sessions.num > 0){
+void Tsunami::on_end() {
+	while (sessions.num > 0) {
 		Session *s = sessions.pop();
 		delete s;
 	}
 }
 
-bool Tsunami::on_startup(const Array<string> &_arg)
-{
+bool Tsunami::on_startup(const Array<string> &_arg) {
 	Array<string> arg = _arg;
 	tsunami = this;
 
@@ -104,7 +101,7 @@ bool Tsunami::on_startup(const Array<string> &_arg)
 
 
 	// create a window and load file
-	if (sessions.num == 0){
+	if (sessions.num == 0) {
 		Session *session = create_session();
 		session->song->add_track(SignalType::AUDIO_MONO);
 
@@ -121,15 +118,14 @@ bool Tsunami::on_startup(const Array<string> &_arg)
 	return true;
 }
 
-bool Tsunami::handle_arguments(Array<string> &args)
-{
+bool Tsunami::handle_arguments(Array<string> &args) {
 	if (args.num < 2)
 		return false;
 	Session *session = Session::GLOBAL;
 
-	for (int i=1; i<args.num; i++){
+	for (int i=1; i<args.num; i++) {
 
-	if (args[i] == "--help"){
+	if (args[i] == "--help") {
 		session->i(AppName + " " + AppVersion);
 		session->i("--help");
 		session->i("--info <FILE>");
@@ -140,12 +136,12 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		session->i("--run-tests <FILTER>");
 #endif
 		return true;
-	}else if (args[i] == "--info"){
+	} else if (args[i] == "--info") {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		if (args.num < i+2){
 			session->e(_("call: tsunami --info <FILE>"));
-		}else if (session->storage->load_ex(song, args[i+1], true)){
+		} else if (session->storage->load_ex(song, args[i+1], true)) {
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->range().length));
 			msg_write("length: " + song->get_time_str(song->range().length));
@@ -158,20 +154,20 @@ bool Tsunami::handle_arguments(Array<string> &args)
 			for (Tag &t: song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
-		delete(song);
+		delete song;
 		return true;
-	}else if (args[i] == "--export"){
+	} else if (args[i] == "--export") {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (args.num < i + 3){
+		if (args.num < i + 3) {
 			session->e(_("call: tsunami --export <FILE-IN> <FILE-OUT>"));
-		}else if (session->storage->load(song, args[i+1])){
+		} else if (session->storage->load(song, args[i+1])) {
 			session->storage->save(song, args[i+2]);
 		}
-		delete(song);
+		delete song;
 		return true;
-	}else if (args[1] == "--execute"){
-		if (args.num < i + 2){
+	} else if (args[1] == "--execute") {
+		if (args.num < i + 2) {
 			session->e(_("call: tsunami --execute <PLUGIN-NAME> [ARGUMENTS]"));
 			return true;
 		}
@@ -182,8 +178,8 @@ bool Tsunami::handle_arguments(Array<string> &args)
 		session->execute_tsunami_plugin(args[i+1]);
 		i ++;
 		//return false;
-	}else if (args[i] == "--chain"){
-		if (args.num < i + 2){
+	} else if (args[i] == "--chain") {
+		if (args.num < i + 2) {
 			session->e(_("call: tsunami --chain <SIGNAL-CHAIN>"));
 			return true;
 		}
@@ -191,20 +187,20 @@ bool Tsunami::handle_arguments(Array<string> &args)
 			session = create_session(args[i+1]);
 		session->win->show();
 		i ++;
-	}else if (args[i] == "--slow"){
+	} else if (args[i] == "--slow") {
 		ugly_hack_slow = true;
 #ifndef NDEBUG
-	}else if (args[i] == "--run-tests"){
+	} else if (args[i] == "--run-tests") {
 		if (args.num > i + 1)
 			UnitTest::run_all(args[i+1]);
 		else
 			UnitTest::print_all_names();
 		return true;
 #endif
-	}else if (args[i].head(2) == "--"){
+	} else if (args[i].head(2) == "--") {
 		session->e(_("unknown command: ") + args[i]);
 		return true;
-	}else{
+	} else {
 		if (session == Session::GLOBAL)
 			session = create_session();
 		session->win->show();
@@ -214,20 +210,22 @@ bool Tsunami::handle_arguments(Array<string> &args)
 	return false;
 }
 
-Session* Tsunami::create_session(const string &chain_filename)
-{
+Session* Tsunami::create_session(const string &chain_filename) {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
-	if (chain_filename.num > 0)
+	if (chain_filename.num > 0) {
 		session->signal_chain = SignalChain::load(session, chain_filename);
-	else
-		session->signal_chain = new SignalChain(session, "playback");
+		session->all_signal_chains.add(session->signal_chain);
+	} else {
+		session->signal_chain = session->add_signal_chain_system("playback");
+	}
 	session->signal_chain->create_default_modules();
 	session->song_renderer = (SongRenderer*)session->signal_chain->get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
 	session->peak_meter = (PeakMeter*)session->signal_chain->get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	session->output_stream = (AudioOutput*)session->signal_chain->get_by_type(ModuleType::STREAM, "AudioOutput");
+	session->signal_chain->mark_all_modules_as_system();
 
 	session->set_win(new TsunamiWindow(session));
 	session->win->auto_delete = true;
@@ -237,12 +235,10 @@ Session* Tsunami::create_session(const string &chain_filename)
 	return session;
 }
 
-void Tsunami::load_key_codes()
-{
+void Tsunami::load_key_codes() {
 }
 
-bool Tsunami::allow_termination()
-{
+bool Tsunami::allow_termination() {
 	for (auto *s: sessions)
 		if (!s->win->allow_termination())
 			return false;

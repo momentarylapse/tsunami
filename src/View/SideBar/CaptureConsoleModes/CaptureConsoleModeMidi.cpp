@@ -63,7 +63,7 @@ void CaptureConsoleModeMidi::enter()
 	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	cc->hide_control("single_grid", false);
 
-	chain = new SignalChain(session, "capture");
+	chain = session->add_signal_chain_system("capture");
 
 	// add all
 	cc->reset("source");
@@ -88,6 +88,7 @@ void CaptureConsoleModeMidi::enter()
 	//preview_synth->plug(0, input, 0);
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 	preview_stream = (AudioOutput*)chain->add(ModuleType::STREAM, "AudioOutput");
+	chain->mark_all_modules_as_system();
 	
 
 	chain->set_buffer_size(512);
@@ -110,7 +111,7 @@ void CaptureConsoleModeMidi::allow_change_device(bool allow)
 void CaptureConsoleModeMidi::leave()
 {
 	cc->peak_meter->set_source(nullptr);
-	delete chain;
+	session->remove_signal_chain(chain);
 	chain = nullptr;
 }
 

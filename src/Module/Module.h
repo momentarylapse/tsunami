@@ -29,8 +29,7 @@ class Plugin;
 class Port;
 class InPortDescription;
 
-enum class ModuleType
-{
+enum class ModuleType {
 	// plug-ins
 	AUDIO_SOURCE,
 	AUDIO_EFFECT,
@@ -52,8 +51,7 @@ enum class ModuleType
 	TSUNAMI_PLUGIN,
 };
 
-enum class ModuleCommand
-{
+enum class ModuleCommand {
 	START,
 	STOP,
 	PREPARE_START,
@@ -64,8 +62,7 @@ enum class ModuleCommand
 	SUCK,
 };
 
-class Module : public Observable<VirtualBase>
-{
+class Module : public Observable<VirtualBase> {
 public:
 
 	Module(ModuleType type, const string &sub_type);
@@ -92,6 +89,7 @@ public:
 	Module *copy() const;
 
 	bool enabled;
+	bool belongs_to_system;
 
 
 

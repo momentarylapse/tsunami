@@ -27,44 +27,36 @@ const float MODULE_WIDTH = 160;
 const float MODULE_HEIGHT = 25;
 extern const int CONFIG_PANEL_WIDTH = 380;
 
-static rect module_rect(Module *m)
-{
+static rect module_rect(Module *m) {
 	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
 }
 
-static float module_port_in_x(Module *m)
-{
+static float module_port_in_x(Module *m) {
 	return m->module_x - 5;
 }
 
-static float module_port_in_y(Module *m, int index)
-{
+static float module_port_in_y(Module *m, int index) {
 	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
 }
 
-static float module_port_out_x(Module *m)
-{
+static float module_port_out_x(Module *m) {
 	return m->module_x + MODULE_WIDTH + 5;
 }
 
-static float module_port_out_y(Module *m, int index)
-{
+static float module_port_out_y(Module *m, int index) {
 	return m->module_y + MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
 }
 
-string module_header(Module *m)
-{
+string module_header(Module *m) {
 	if (m->module_subtype.num > 0)
 		return m->module_subtype;
 	return m->type_to_name(m->module_type);
 }
 
 
-class SignalEditorTab : public hui::Panel
-{
+class SignalEditorTab : public hui::Panel {
 public:
-	SignalEditorTab(SignalEditor *ed, SignalChain *_chain)
-	{
+	SignalEditorTab(SignalEditor *ed, SignalChain *_chain) {
 		add_grid("", 0, 0, "grid");
 		set_target("grid");
 		add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
@@ -102,10 +94,10 @@ public:
 		event("signal_chain_load", [=]{ editor->on_load(); });
 
 		chain = _chain;
+		chain->subscribe(this, [=]{ on_chain_delete(); }, chain->MESSAGE_DELETE);
 		chain->subscribe(this, [=]{ on_chain_update(); });
 	}
-	virtual ~SignalEditorTab()
-	{
+	virtual ~SignalEditorTab() {
 		chain->unsubscribe(this);
 	}
 
@@ -115,10 +107,8 @@ public:
 	SignalChain *chain;
 	rect area_play;
 
-	struct Selection
-	{
-		Selection()
-		{
+	struct Selection {
+		Selection() {
 			type = -1;
 			module = nullptr;
 			port = -1;
@@ -132,7 +122,7 @@ public:
 		int port;
 		SignalType port_type;
 		float dx, dy;
-		enum{
+		enum {
 			TYPE_MODULE,
 			TYPE_PORT_IN,
 			TYPE_PORT_OUT,
@@ -145,28 +135,27 @@ public:
 	Selection hover, sel;
 
 
-	Selection get_hover(float mx, float my)
-	{
+	Selection get_hover(float mx, float my) {
 		Selection s;
 		s.dx = mx;
 		s.dy = my;
-		if (area_play.inside(mx, my)){
+		if (area_play.inside(mx, my)) {
 			s.type = Selection::TYPE_BUTTON_PLAY;
 			return s;
 		}
 		for (auto *m: chain->modules){
 			rect r = module_rect(m);
-			if (r.inside(mx, my)){
+			if (r.inside(mx, my)) {
 				s.type = Selection::TYPE_MODULE;
 				s.module = m;
 				s.dx = m->module_x - mx;
 				s.dy = m->module_y - my;
 				return s;
 			}
-			for (int i=0; i<m->port_in.num; i++){
+			for (int i=0; i<m->port_in.num; i++) {
 				float y = module_port_in_y(m, i);
 				float x = module_port_in_x(m);
-				if (abs(x - mx) < 10 and abs(y - my) < 10){
+				if (abs(x - mx) < 10 and abs(y - my) < 10) {
 					s.type = Selection::TYPE_PORT_IN;
 					s.module = m;
 					s.port = i;
@@ -176,10 +165,10 @@ public:
 					return s;
 				}
 			}
-			for (int i=0; i<m->port_out.num; i++){
+			for (int i=0; i<m->port_out.num; i++) {
 				float y = module_port_out_y(m, i);
 				float x = module_port_out_x(m);
-				if (abs(x - mx) < 10 and abs(y - my) < 10){
+				if (abs(x - mx) < 10 and abs(y - my) < 10) {
 					s.type = Selection::TYPE_PORT_OUT;
 					s.module = m;
 					s.port = i;
@@ -194,8 +183,7 @@ public:
 	}
 
 
-	color signal_color(SignalType type, bool hover = false)
-	{
+	color signal_color(SignalType type, bool hover = false) {
 		if (type == SignalType::AUDIO)
 			return hover ? view->colors.red_hover : view->colors.red;
 		if (type == SignalType::MIDI)
@@ -205,8 +193,7 @@ public:
 		return hover ? view->colors.white_hover : view->colors.white;
 	}
 
-	void draw_cable(Painter *p, SignalChain::Cable *c)
-	{
+	void draw_cable(Painter *p, SignalChain::Cable *c) {
 		complex p0 = complex(module_port_out_x(c->source), module_port_out_y(c->source, c->source_port));
 		complex p1 = complex(module_port_in_x(c->target), module_port_in_y(c->target, c->target_port));
 
@@ -218,7 +205,7 @@ public:
 		p->set_color(signal_color(c->type));
 
 		complex qq = complex::ZERO;
-		for (float t=0; t<1.0f; t+=0.025f){
+		for (float t=0; t<1.0f; t+=0.025f) {
 			complex q = inter.get(t);
 			if (t > 0)
 				p->draw_line(qq.x, qq.y, q.x, q.y);
@@ -237,18 +224,17 @@ public:
 		//p->dr
 	}
 
-	void draw_module(Painter *p, Module *m)
-	{
+	void draw_module(Painter *p, Module *m) {
 		p->set_color(view->colors.background_track_selected);
 		if (hover.type == Selection::TYPE_MODULE and hover.module == m)
 			p->set_color(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
 		p->set_roundness(view->CORNER_RADIUS);
 		p->draw_rect(module_rect(m));
 		p->set_roundness(0);
-		if (sel.type == sel.TYPE_MODULE and sel.module == m){
+		if (sel.type == sel.TYPE_MODULE and sel.module == m) {
 			p->set_color(view->colors.text);
 			p->set_font("", 12, true, false);
-		}else{
+		} else {
 			p->set_color(view->colors.text_soft1);
 		}
 		string type = module_header(m);
@@ -257,15 +243,14 @@ public:
 		p->set_font("", 12, false, false);
 	}
 
-	void draw_ports(Painter *p, Module *m)
-	{
-		foreachi(auto &pd, m->port_in, i){
+	void draw_ports(Painter *p, Module *m) {
+		foreachi(auto &pd, m->port_in, i) {
 			bool hovering = (hover.type == Selection::TYPE_PORT_IN and hover.module == m and hover.port == i);
 			p->set_color(signal_color(pd.type, hovering));
 			float r = hovering ? 6 : 4;
 			p->draw_circle(module_port_in_x(m), module_port_in_y(m, i), r);
 		}
-		foreachi(auto *pd, m->port_out, i){
+		foreachi(auto *pd, m->port_out, i) {
 			bool hovering = (hover.type == Selection::TYPE_PORT_OUT and hover.module == m and hover.port == i);
 			p->set_color(signal_color(pd->type, hovering));
 			float r = hovering ? 6 : 4;
@@ -273,8 +258,7 @@ public:
 		}
 	}
 
-	void on_draw(Painter* p)
-	{
+	void on_draw(Painter* p) {
 		int w = p->width;
 		int h = p->height;
 		p->set_color(view->colors.background);
@@ -295,9 +279,9 @@ public:
 			p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
 		}
 
-		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
+		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 			p->set_color(White);
-			if (hover.target_module){
+			if (hover.target_module) {
 				p->set_line_width(5);
 				Module *t = hover.target_module;
 				if (hover.type == hover.TYPE_PORT_IN)
@@ -305,8 +289,9 @@ public:
 				else
 					p->draw_line(sel.dx, sel.dy, module_port_in_x(t), module_port_in_y(t, hover.target_port));
 				p->set_line_width(1);
-			}else
+			} else {
 				p->draw_line(sel.dx, sel.dy, hui::GetEvent()->mx, hui::GetEvent()->my);
+			}
 		}
 
 
@@ -325,23 +310,25 @@ public:
 		p->draw_str(area_play.x1, area_play.y1, chain->is_playback_active() ? "⏹" : "▶️");
 	}
 
-	void on_chain_update()
-	{
+	void on_chain_update() {
 		redraw("area");
 	}
 
-	void on_left_button_down()
-	{
+	void on_chain_delete() {
+		hui::RunLater(0.001f, [=](){ editor->remove_chain(chain); });
+	}
+
+	void on_left_button_down() {
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
 		hover = get_hover(mx, my);
 		sel = hover;
 		apply_sel();
-		if (sel.type == sel.TYPE_PORT_IN){
+		if (sel.type == sel.TYPE_PORT_IN) {
 			chain->disconnect_target(sel.module, sel.port);
-		}else if (sel.type == sel.TYPE_PORT_OUT){
+		} else if (sel.type == sel.TYPE_PORT_OUT) {
 			chain->disconnect_source(sel.module, sel.port);
-		}else if (sel.type == sel.TYPE_BUTTON_PLAY){
+		} else if (sel.type == sel.TYPE_BUTTON_PLAY) {
 			if (chain->is_playback_active())
 				chain->stop();
 			else
@@ -350,14 +337,13 @@ public:
 		redraw("area");
 	}
 
-	void on_left_button_up()
-	{
-		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
-			if (hover.target_module){
-				if (sel.type == sel.TYPE_PORT_IN){
+	void on_left_button_up() {
+		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
+			if (hover.target_module) {
+				if (sel.type == sel.TYPE_PORT_IN) {
 					chain->disconnect_source(hover.target_module, hover.target_port);
 					chain->connect(hover.target_module, hover.target_port, sel.module, sel.port);
-				}else if (sel.type == sel.TYPE_PORT_OUT){
+				} else if (sel.type == sel.TYPE_PORT_OUT) {
 					chain->disconnect_target(hover.target_module, hover.target_port);
 					chain->connect(sel.module, sel.port, hover.target_module, hover.target_port);
 				}
@@ -368,107 +354,101 @@ public:
 		redraw("area");
 	}
 
-	void on_mouse_move()
-	{
+	void on_mouse_move() {
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
-		if (hui::GetEvent()->lbut){
-			if (sel.type == sel.TYPE_MODULE){
+		if (hui::GetEvent()->lbut) {
+			if (sel.type == sel.TYPE_MODULE) {
 				auto *m = sel.module;
 				m->module_x = mx + sel.dx;
 				m->module_y = my + sel.dy;
-			}else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT){
+			} else if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 				hover.target_module = nullptr;
 				auto h = get_hover(mx, my);
-				if (h.module != sel.module and h.port_type == sel.port_type){
-					if (h.type == sel.TYPE_PORT_IN and sel.type == sel.TYPE_PORT_OUT){
+				if (h.module != sel.module and h.port_type == sel.port_type) {
+					if (h.type == sel.TYPE_PORT_IN and sel.type == sel.TYPE_PORT_OUT) {
 						hover.target_module = h.module;
 						hover.target_port = h.port;
 					}
-					if (h.type == sel.TYPE_PORT_OUT and sel.type == sel.TYPE_PORT_IN){
+					if (h.type == sel.TYPE_PORT_OUT and sel.type == sel.TYPE_PORT_IN) {
 						hover.target_module = h.module;
 						hover.target_port = h.port;
 					}
 				}
 			}
-		}else{
+		} else {
 			hover = get_hover(mx, my);
 		}
 		redraw("area");
 	}
 
-	void on_right_button_down()
-	{
+	void on_right_button_down() {
 		float mx = hui::GetEvent()->mx;
 		float my = hui::GetEvent()->my;
 		hover = get_hover(mx, my);
 		sel = hover;
 		apply_sel();
 
-		if (hover.type == hover.TYPE_MODULE){
+		if (hover.type == hover.TYPE_MODULE) {
 			editor->menu_module->open_popup(this);
-		}else if (hover.type < 0){
+		} else if (hover.type < 0) {
 			editor->menu_chain->open_popup(this);
 		}
 	}
 
-	void on_key_down()
-	{
+	void on_key_down() {
 		int key = hui::GetEvent()->key_code;
-		if (key == hui::KEY_DELETE){
-			if (sel.type == sel.TYPE_MODULE){
+		if (key == hui::KEY_DELETE) {
+			if (sel.type == sel.TYPE_MODULE) {
 				chain->remove(sel.module);
 				hover = sel = Selection();
 			}
 		}
 	}
 
-	void apply_sel()
-	{
+	void apply_sel() {
 		editor->show_config(sel.module);
 	}
 
-	void on_activate()
-	{
+	void on_activate() {
 	}
 
-	void on_delete()
-	{
-		hui::RunLater(0.001f, [=](){ editor->delete_chain(chain); });
+	void on_delete() {
+		if (chain->belongs_to_system) {
+			session->e(_("not allowed to delete the main signal chain"));
+			return;
+		}
+		hui::RunLater(0.001f, [=](){ delete chain;/*editor->delete_chain(chain);*/ });
 	}
 
 
-	void on_add(ModuleType type)
-	{
+	void on_add(ModuleType type) {
 		Array<string> names = session->plugin_manager->find_module_sub_types(type);
-		if (names.num > 1){
+		if (names.num > 1) {
 			string name = session->plugin_manager->choose_module(win, session, type);
-			if (name.num > 0){
+			if (name.num > 0) {
 				auto *m = chain->add(type, name);
 				m->module_x = sel.dx;
 				m->module_y = sel.dy;
 			}
-		}else{
+		} else {
 			auto *m = chain->add(type);
 			m->module_x = sel.dx;
 			m->module_y = sel.dy;
 		}
 	}
 
-	void on_reset()
-	{
+	void on_reset() {
 		chain->reset();
 	}
 
-	/*void on_load()
-	{
+	/*void on_load() {
 		if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain"))
 			chain->load(hui::Filename);
 	}*/
 
-	void on_save()
-	{
-		if (hui::FileDialogSave(win, _("Save the signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
+	void on_save() {
+		if (hui::FileDialogSave(win, _("Save the signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
 			session->storage->current_chain_directory = hui::Filename.dirname();
 			chain->save(hui::Filename);
 		}
@@ -476,17 +456,15 @@ public:
 
 
 
-	void on_module_delete()
-	{
-		if (sel.type == sel.TYPE_MODULE){
+	void on_module_delete() {
+		if (sel.type == sel.TYPE_MODULE) {
 			chain->remove(sel.module);
 			hover = sel = Selection();
 			apply_sel();
 		}
 	}
 
-	void on_module_configure()
-	{
+	void on_module_configure() {
 		apply_sel();
 	}
 
@@ -515,19 +493,21 @@ SignalEditor::SignalEditor(Session *session) :
 
 	event("selector", [=]{ on_chain_switch(); });
 
-	add_chain(session->signal_chain);
+	for (auto *c: session->all_signal_chains)
+		add_chain(c);
 	show_config(nullptr);
+
+	session->subscribe(this, [=] { add_chain(session->all_signal_chains.back()); }, session->MESSAGE_ADD_SIGNAL_CHAIN);
 }
 
-SignalEditor::~SignalEditor()
-{
+SignalEditor::~SignalEditor() {
+	session->unsubscribe(this);
 	show_config(nullptr);
 	delete menu_chain;
 	delete menu_module;
 }
 
-void SignalEditor::add_chain(SignalChain *c)
-{
+void SignalEditor::add_chain(SignalChain *c) {
 	auto *tab = new SignalEditorTab(this, c);
 	int index = tabs.num;
 	string grid_id = "grid-" + i2s(index);
@@ -543,9 +523,9 @@ void SignalEditor::add_chain(SignalChain *c)
 	set_int("selector", index);
 }
 
-void SignalEditor::on_new()
-{
-	add_chain(new SignalChain(session, "new"));
+void SignalEditor::on_new() {
+	session->add_signal_chain("new");
+	//add_chain();
 }
 
 void SignalEditor::on_load()
@@ -591,18 +571,25 @@ void SignalEditor::show_config(Module *m)
 	reveal("revealer", m);
 }
 
-void SignalEditor::delete_chain(SignalChain *c)
-{
+void SignalEditor::delete_chain(SignalChain *c) {
+	session->e("todo...");
+	return;
 	foreachi(auto *t, tabs, i)
-		if (t->chain == c){
-			if (i == 0){
-				session->e(_("not allowed to delete the main signal chain"));
-			}else{
-				delete t;
-				delete c;
-				tabs.erase(i);
-				remove_string("selector", i);
-				set_int("selector", 0);
-			}
+		if (t->chain == c) {
+			delete t;
+			delete c;
+			tabs.erase(i);
+			remove_string("selector", i);
+			set_int("selector", 0);
+		}
+}
+
+void SignalEditor::remove_chain(SignalChain *c) {
+	foreachi(auto *t, tabs, i)
+		if (t->chain == c) {
+			delete t;
+			tabs.erase(i);
+			remove_string("selector", i);
+			set_int("selector", 0);
 		}
 }

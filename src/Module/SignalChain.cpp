@@ -35,29 +35,26 @@ extern bool ugly_hack_slow;
 const int SignalChain::DEFAULT_BUFFER_SIZE = 2048;
 
 
-class SuckerThread : public Thread
-{
+class SuckerThread : public Thread {
 public:
 	SignalChain *sucker;
 	bool keep_running = true;
 
-	SuckerThread(SignalChain *s)
-	{
+	SuckerThread(SignalChain *s) {
 		sucker = s;
 	}
 
-	void on_run() override
-	{
-		while(keep_running){
-			if (sucker->sucking){
+	void on_run() override {
+		while(keep_running) {
+			if (sucker->sucking) {
 				int r = sucker->do_suck();
 				if (r == Port::END_OF_STREAM)
 					break;
-				if (r == Port::NOT_ENOUGH_DATA){
+				if (r == Port::NOT_ENOUGH_DATA) {
 					hui::Sleep(sucker->no_data_wait);
 					continue;
 				}
-			}else{
+			} else {
 				hui::Sleep(0.200f);
 			}
 			Thread::cancelation_point();
@@ -85,9 +82,8 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	no_data_wait = 0.005f;
 }
 
-SignalChain::~SignalChain()
-{
-	if (thread){
+SignalChain::~SignalChain() {
+	if (thread) {
 		thread->keep_running = false;
 		thread->join();
 		//thread->kill();
@@ -104,23 +100,19 @@ SignalChain::~SignalChain()
 	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
 
-void SignalChain::__init__(Session *s, const string &_name)
-{
+void SignalChain::__init__(Session *s, const string &_name) {
 	new(this) SignalChain(s, _name);
 }
 
-void SignalChain::__delete__()
-{
+void SignalChain::__delete__() {
 	this->SignalChain::~SignalChain();
 }
 
-void SignalChain::set_tick_dt(float dt)
-{
+void SignalChain::set_tick_dt(float dt) {
 	tick_dt = dt;
 }
 
-void SignalChain::create_default_modules()
-{
+void SignalChain::create_default_modules() {
 	auto *renderer = get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
 	if (!renderer)
 		renderer = add(ModuleType::AUDIO_SOURCE, "SongRenderer");
@@ -137,8 +129,7 @@ void SignalChain::create_default_modules()
 		connect(peak, 0, output, 0);
 }
 
-Module *SignalChain::_add(Module *m)
-{
+Module *SignalChain::_add(Module *m) {
 	int i = modules.num;
 	m->module_x = 50 + (i % 5) * 230;
 	m->module_y = 50 + (i % 2) * 30 + 150*(i / 5);
@@ -150,39 +141,29 @@ Module *SignalChain::_add(Module *m)
 	return m;
 }
 
-int SignalChain::module_index(Module *m)
-{
+int SignalChain::module_index(Module *m) {
 	foreachi(Module *mm, modules, i)
 		if (mm == m)
 			return i;
 	return -1;
 }
 
-bool is_system_module(Module *m)
-{
-	if (m == (Module*)m->session->output_stream)
-		return true;
-	if (m == (Module*)m->session->peak_meter)
-		return true;
-	if (m == (Module*)m->session->song_renderer)
-		return true;
-	return false;
+bool is_system_module(Module *m) {
+	return m->belongs_to_system;
 }
 
-Module *SignalChain::get_by_type(ModuleType type, const string &sub_type)
-{
+Module *SignalChain::get_by_type(ModuleType type, const string &sub_type) {
 	for (Module *m: modules)
 		if (m->module_type == type and m->module_subtype == sub_type)
 			return m;
 	return nullptr;
 }
 
-void SignalChain::remove(Module *m)
-{
+void SignalChain::remove(Module *m) {
 	int index = module_index(m);
 	if (index < 0)
 		return;
-	if (is_system_module(m)){
+	if (is_system_module(m)) {
 		session->e(_("not allowed to delete system modules"));
 		return;
 	}
@@ -190,10 +171,10 @@ void SignalChain::remove(Module *m)
 	m->unsubscribe(this);
 
 	bool more = true;
-	while (more){
+	while (more) {
 		more = false;
 		for (Cable *c: cables)
-			if (c->source == m or c->target == m){
+			if (c->source == m or c->target == m) {
 				disconnect(c);
 				more = true;
 				break;
@@ -205,8 +186,7 @@ void SignalChain::remove(Module *m)
 	notify(MESSAGE_DELETE_MODULE);
 }
 
-void SignalChain::connect(Module *source, int source_port, Module *target, int target_port)
-{
+void SignalChain::connect(Module *source, int source_port, Module *target, int target_port) {
 	// already connected?
 	auto *cc1 = this->from_source(source, source_port);
 	if (cc1)
@@ -228,12 +208,11 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 	notify(MESSAGE_ADD_CABLE);
 }
 
-void SignalChain::disconnect(SignalChain::Cable *c)
-{
+void SignalChain::disconnect(SignalChain::Cable *c) {
 	if (!c)
 		return;
 	foreachi(Cable *cc, cables, i)
-		if (cc == c){
+		if (cc == c) {
 			c->target->unplug(c->target_port);
 
 			delete(c);
@@ -243,34 +222,29 @@ void SignalChain::disconnect(SignalChain::Cable *c)
 		}
 }
 
-SignalChain::Cable *SignalChain::from_source(Module *source, int port)
-{
+SignalChain::Cable *SignalChain::from_source(Module *source, int port) {
 	for (Cable *c: cables)
 		if (c->source == source and c->source_port == port)
 			return c;
 	return nullptr;
 }
 
-SignalChain::Cable *SignalChain::to_target(Module *target, int port)
-{
+SignalChain::Cable *SignalChain::to_target(Module *target, int port) {
 	for (Cable *c: cables)
 		if (c->target == target and c->target_port == port)
 			return c;
 	return nullptr;
 }
 
-void SignalChain::disconnect_source(Module *source, int port)
-{
+void SignalChain::disconnect_source(Module *source, int port) {
 	disconnect(from_source(source, port));
 }
 
-void SignalChain::disconnect_target(Module *target, int port)
-{
+void SignalChain::disconnect_target(Module *target, int port) {
 	disconnect(to_target(target, port));
 }
 
-void SignalChain::save(const string& filename)
-{
+void SignalChain::save(const string& filename) {
 	xml::Parser p;
 	xml::Element root("chain");
 	xml::Element hh("head");
@@ -279,7 +253,7 @@ void SignalChain::save(const string& filename)
 	hh.add(xml::Element("name", name));
 	root.add(hh);
 	xml::Element mm("modules");
-	for (Module *m: modules){
+	for (Module *m: modules) {
 		xml::Element e("module");
 		e.add(xml::Element("category", m->type_to_name(m->module_type)));
 		e.add(xml::Element("class", m->module_subtype));
@@ -294,7 +268,7 @@ void SignalChain::save(const string& filename)
 	}
 	root.add(mm);
 	xml::Element cc("cables");
-	for (Cable *c: cables){
+	for (Cable *c: cables) {
 		xml::Element e("cable");
 		e.add(xml::Element("source").witha("id", i2s(module_index(c->source))).witha("port", i2s(c->source_port)));
 		e.add(xml::Element("target").witha("id", i2s(module_index(c->target))).witha("port", i2s(c->target_port)));
@@ -305,11 +279,10 @@ void SignalChain::save(const string& filename)
 	p.save(filename);
 }
 
-SignalChain *SignalChain::load(Session *session, const string& filename)
-{
+SignalChain *SignalChain::load(Session *session, const string& filename) {
 	auto *chain = new SignalChain(session, "new");
 
-	try{
+	try {
 
 		xml::Parser p;
 		p.load(filename);
@@ -322,15 +295,15 @@ SignalChain *SignalChain::load(Session *session, const string& filename)
 		chain->name = head->value("name");
 
 		auto *mm = root.find("modules");
-		for (auto &e: mm->elements){
+		for (auto &e: mm->elements) {
 			string type = e.value("category");
 			string sub_type = e.value("class");
 			string name = e.value("name");
 			string sys = e.value("system");
 			Module *m = nullptr;
-			/*if ((i < 3) and (this == session->signal_chain)){
+			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
-			}else*/{
+			} else*/ {
 				auto itype = Module::type_from_name(type);
 				if ((int)itype < 0)
 					throw Exception("unhandled module type: " + type);
@@ -342,7 +315,7 @@ SignalChain *SignalChain::load(Session *session, const string& filename)
 		}
 
 		auto *cc = root.find("cables");
-		for (auto &e: cc->elements){
+		for (auto &e: cc->elements) {
 			int s = e.find("source")->value("id")._int();
 			int sp = e.find("source")->value("port")._int();
 			int t = e.find("target")->value("id")._int();
@@ -351,7 +324,7 @@ SignalChain *SignalChain::load(Session *session, const string& filename)
 		}
 
 		auto *pp = root.find("ports");
-		for (auto &e: pp->elements){
+		for (auto &e: pp->elements) {
 			PortX p;
 			int m = e.value("module")._int();
 			p.port = e.value("port")._int();
@@ -359,14 +332,13 @@ SignalChain *SignalChain::load(Session *session, const string& filename)
 			chain->_ports_out.add(p);
 		}
 		chain->update_ports();
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		session->e(e.message());
 	}
 	return chain;
 }
 
-void SignalChain::update_ports()
-{
+void SignalChain::update_ports() {
 	port_out.clear();
 	for (auto &p: _ports_out)
 		port_out.add(p.module->port_out[p.port]);
@@ -560,4 +532,9 @@ int SignalChain::do_suck()
 	}
 	PerformanceMonitor::end_busy(perf_channel_suck);
 	return s;
+}
+
+void SignalChain::mark_all_modules_as_system() {
+	for (auto *m: modules)
+		m->belongs_to_system = true;
 }

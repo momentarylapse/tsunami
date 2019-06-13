@@ -24,19 +24,20 @@ class SignalChain;
 class SongRenderer;
 class PeakMeter;
 class AudioOutput;
-namespace hui{
+namespace hui {
 	class Window;
 }
 
 // representing one instance/window
-class Session : public Observable<VirtualBase>
-{
+class Session : public Observable<VirtualBase> {
 public:
 	Session(Log *log, DeviceManager *device_manager, PluginManager *plugin_manager, PerformanceMonitor *perf_mon);
 	virtual ~Session();
 
 	static const string MESSAGE_ADD_PLUGIN;
 	static const string MESSAGE_REMOVE_PLUGIN;
+	static const string MESSAGE_ADD_SIGNAL_CHAIN;
+	static const string MESSAGE_REMOVE_SIGNAL_CHAIN;
 
 	static int next_id;
 
@@ -57,6 +58,10 @@ public:
 	SongRenderer *song_renderer;
 	PeakMeter *peak_meter;
 	AudioOutput *output_stream;
+	Array<SignalChain*> all_signal_chains;
+	SignalChain* add_signal_chain(const string &name);
+	SignalChain* add_signal_chain_system(const string &name);
+	void remove_signal_chain(SignalChain *chain);
 
 	Array<TsunamiPlugin*> plugins;
 	TsunamiPlugin *last_plugin;

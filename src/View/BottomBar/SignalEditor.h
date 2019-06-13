@@ -30,6 +30,7 @@ public:
 
 	void on_new();
 	void on_load();
+	void remove_chain(SignalChain *c);
 	void delete_chain(SignalChain *c);
 
 	Array<SignalEditorTab*> tabs;

@@ -30,9 +30,10 @@ Session *Session::GLOBAL = nullptr;
 
 const string Session::MESSAGE_ADD_PLUGIN = "AddPlugin";
 const string Session::MESSAGE_REMOVE_PLUGIN = "RemovePlugin";
+const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "AddSignalChain";
+const string Session::MESSAGE_REMOVE_SIGNAL_CHAIN = "RemoveSignalChain";
 
-Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon)
-{
+Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon) {
 	win = nullptr;
 	view = nullptr;
 	_kaba_win = nullptr;
@@ -55,8 +56,7 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	die_on_plugin_stop = false;
 }
 
-Session::~Session()
-{
+Session::~Session() {
 	if (signal_chain)
 		delete(signal_chain);
 	if (song)
@@ -64,54 +64,45 @@ Session::~Session()
 	delete(storage);
 }
 
-int Session::sample_rate()
-{
+int Session::sample_rate() {
 	if (song)
 		return song->sample_rate;
 	return DEFAULT_SAMPLE_RATE;
 }
 
-void Session::set_win(TsunamiWindow *_win)
-{
+void Session::set_win(TsunamiWindow *_win) {
 	win = _win;
 	view = win->view;
 	_kaba_win = dynamic_cast<hui::Window*>(win);
 }
 
-Session *Session::create_child()
-{
-	Session *child = new Session(log, device_manager, plugin_manager, perf_mon);
+Session *Session::create_child() {
+	auto *child = new Session(log, device_manager, plugin_manager, perf_mon);
 	return child;
 }
 
-void Session::i(const string &message)
-{
+void Session::i(const string &message) {
 	log->info(this, message);
 }
 
-void Session::debug(const string &cat, const string &message)
-{
+void Session::debug(const string &cat, const string &message) {
 	log->debug(this, cat + ": " + message);
 }
 
-void Session::w(const string &message)
-{
+void Session::w(const string &message) {
 	log->warn(this, message);
 }
 
-void Session::e(const string &message)
-{
+void Session::e(const string &message) {
 	log->error(this, message);
 }
 
-void Session::q(const string &message, const Array<string> &responses)
-{
+void Session::q(const string &message, const Array<string> &responses) {
 	log->question(this, message, responses);
 }
 
-void Session::execute_tsunami_plugin(const string& name)
-{
-	TsunamiPlugin *p = CreateTsunamiPlugin(this, name);
+void Session::execute_tsunami_plugin(const string& name) {
+	auto *p = CreateTsunamiPlugin(this, name);
 	if (!p)
 		return;
 
@@ -125,8 +116,7 @@ void Session::execute_tsunami_plugin(const string& name)
 }
 
 
-void Session::on_plugin_stop_request(TsunamiPlugin *p)
-{
+void Session::on_plugin_stop_request(TsunamiPlugin *p) {
 	hui::RunLater(0.001f, [this,p]{
 		last_plugin = p;
 		notify(MESSAGE_REMOVE_PLUGIN);
@@ -144,55 +134,54 @@ void Session::on_plugin_stop_request(TsunamiPlugin *p)
 		hui::RunLater(0.01f, std::bind(&TsunamiWindow::destroy, win));*/
 }
 
-void Session::set_mode(const string &mode)
-{
+void Session::set_mode(const string &mode) {
 	debug("mode", ">> " + mode);
-	if (mode == "default"){
+	if (mode == "default") {
 		view->set_mode(view->mode_default);
 		win->side_bar->_hide();
-	}else if (mode == "capture"){
+	} else if (mode == "capture") {
 		view->set_mode(view->mode_capture);
 		win->side_bar->open(SideBar::CAPTURE_CONSOLE);
-	}else if (mode == "midi"){
+	} else if (mode == "midi") {
 		view->set_mode(view->mode_midi);
 		win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
-	}else if (mode == "scale-bars"){
+	} else if (mode == "scale-bars") {
 		view->set_mode(view->mode_scale_bars);
 		win->side_bar->_hide();
-	}else if (mode == "scale-marker"){
+	} else if (mode == "scale-marker") {
 		view->set_mode(view->mode_scale_marker);
 		win->side_bar->_hide();
-	}else if (mode == "curves"){
+	} else if (mode == "curves") {
 		view->set_mode(view->mode_curve);
 		win->side_bar->open(SideBar::CURVE_CONSOLE);
-	}else if (mode == "default/track"){
+	} else if (mode == "default/track") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::TRACK_CONSOLE);
-	}else if (mode == "default/song"){
+	} else if (mode == "default/song") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SONG_CONSOLE);
-	}else if (mode == "default/samples"){
+	} else if (mode == "default/samples") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLE_CONSOLE);
-	}else if (mode == "default/mixing"){
+	} else if (mode == "default/mixing") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
 		win->bottom_bar->mixing_console->set_mode(MixerMode::VOLUME);
-	}else if (mode == "default/fx"){
+	} else if (mode == "default/fx") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
 		win->bottom_bar->mixing_console->set_mode(MixerMode::EFFECTS);
-	}else if (mode == "default/midi-fx"){
+	} else if (mode == "default/midi-fx") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
 		win->bottom_bar->mixing_console->set_mode(MixerMode::MIDI_EFFECTS);
-	}else if (mode == "default/synth"){
+	} else if (mode == "default/synth"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SYNTH_CONSOLE);
-	}else if (mode == "default/sample-ref"){
+	} else if (mode == "default/sample-ref") {
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
-	}else{
+	} else {
 		e("unknown mode: " + mode);
 		return;
 	}
@@ -200,7 +189,28 @@ void Session::set_mode(const string &mode)
 	this->mode = mode;
 }
 
-bool Session::in_mode(const string &m)
-{
+bool Session::in_mode(const string &m) {
 	return mode == m;
+}
+
+SignalChain* Session::add_signal_chain(const string& name) {
+	auto *chain = new SignalChain(this, name);
+	all_signal_chains.add(chain);
+	notify(MESSAGE_ADD_SIGNAL_CHAIN);
+	return chain;
+}
+
+SignalChain* Session::add_signal_chain_system(const string& name) {
+	auto *chain = add_signal_chain(name);
+	chain->belongs_to_system = true;
+	return chain;
+}
+
+void Session::remove_signal_chain(SignalChain* chain) {
+	for (int i=0; i<all_signal_chains.num; i++)
+		if (chain == all_signal_chains[i]) {
+			delete all_signal_chains[i];
+			all_signal_chains.erase(i);
+			notify(MESSAGE_REMOVE_SIGNAL_CHAIN);
+		}
 }

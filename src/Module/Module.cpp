@@ -28,8 +28,7 @@ const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
 
 
 
-Module::Module(ModuleType type, const string &sub_type)
-{
+Module::Module(ModuleType type, const string &sub_type) {
 	module_type = type;
 	module_subtype = sub_type;
 	session = Session::GLOBAL;
@@ -37,10 +36,10 @@ Module::Module(ModuleType type, const string &sub_type)
 	module_x = module_y = 0;
 	allow_config_in_chain = false;
 	_class = nullptr;
+	belongs_to_system = false;
 }
 
-Module::~Module()
-{
+Module::~Module() {
 	// unlink sources
 	for (auto &pd: port_in)
 		*pd.port = nullptr;
@@ -53,24 +52,21 @@ Module::~Module()
 }
 
 
-void Module::__init__(ModuleType type, const string &sub_type)
-{
+void Module::__init__(ModuleType type, const string &sub_type) {
 	new(this) Module(type, sub_type);
 }
 
-void Module::__delete__()
-{
+void Module::__delete__() {
 	this->Module::~Module();
 }
 
 
 // internal use for creation
-void Module::set_session_etc(Session *_session, const string &sub_type)
-{
+void Module::set_session_etc(Session *_session, const string &sub_type) {
 	session = _session;
 	module_subtype = sub_type;
 	auto *c = get_config();
-	if (c){
+	if (c) {
 		c->_module = this;
 		c->_class = Kaba::GetDynamicType(c);
 		/*msg_write("config class: " + p2s(c->_class) + "  " + sub_type);
@@ -86,8 +82,7 @@ void Module::set_session_etc(Session *_session, const string &sub_type)
 
 // default version:
 //   look for a Module.config in the plugin class
-ModuleConfiguration *Module::get_config() const
-{
+ModuleConfiguration *Module::get_config() const {
 	if (!_class)
 		return nullptr;
 	for (auto &e: _class->elements)
@@ -100,8 +95,7 @@ ModuleConfiguration *Module::get_config() const
 }
 
 
-string Module::config_to_string() const
-{
+string Module::config_to_string() const {
 	auto *config = get_config();
 	if (!config)
 		return "";
@@ -110,8 +104,7 @@ string Module::config_to_string() const
 }
 
 
-void Module::config_from_string(const string &param)
-{
+void Module::config_from_string(const string &param) {
 	auto *config = get_config();
 	if (!config)
 		return;
@@ -123,8 +116,7 @@ void Module::config_from_string(const string &param)
 
 // default version
 //   try to execute   Module.config.reset()
-void Module::reset_config()
-{
+void Module::reset_config() {
 	auto *config = get_config();
 	if (config)
 		config->reset();
@@ -134,8 +126,7 @@ void Module::reset_config()
 
 // default version
 //   try to create an AutoConfigPanel
-ConfigPanel *Module::create_panel()
-{
+ConfigPanel *Module::create_panel() {
 	auto *config = get_config();
 	if (!config)
 		return nullptr;
@@ -146,23 +137,20 @@ ConfigPanel *Module::create_panel()
 }
 
 // called by the ConfigPanel to signal a config change
-void Module::changed()
-{
+void Module::changed() {
 	on_config();
 	notify();
 }
 
 
-Module *Module::copy() const
-{
+Module *Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_type, module_subtype);
 	clone->config_from_string(config_to_string());
 	return clone;
 }
 
 
-string Module::type_to_name(ModuleType type)
-{
+string Module::type_to_name(ModuleType type) {
 	if (type == ModuleType::AUDIO_SOURCE)
 		return "AudioSource";
 	if (type == ModuleType::AUDIO_EFFECT)
@@ -189,8 +177,7 @@ string Module::type_to_name(ModuleType type)
 }
 
 
-ModuleType Module::type_from_name(const string &str)
-{
+ModuleType Module::type_from_name(const string &str) {
 	if (str == "AudioSource")
 		return ModuleType::AUDIO_SOURCE;
 	if (str == "Plumbing")
@@ -215,8 +202,7 @@ ModuleType Module::type_from_name(const string &str)
 }
 
 
-void Module::plug(int in_port, Module* source, int out_port)
-{
+void Module::plug(int in_port, Module* source, int out_port) {
 	if (in_port < 0 or in_port >= port_in.num)
 		throw Exception("invalid in-port");
 	if (out_port < 0 or out_port >= source->port_out.num)
@@ -232,8 +218,7 @@ void Module::plug(int in_port, Module* source, int out_port)
 }
 
 
-void Module::unplug(int in_port)
-{
+void Module::unplug(int in_port) {
 	if (in_port < 0 or in_port >= port_in.num)
 		throw Exception("invalid in-port");
 	*port_in[in_port].port = nullptr;

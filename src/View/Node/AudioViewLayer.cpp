@@ -659,7 +659,7 @@ HoverData AudioViewLayer::get_hover_data(float mx, float my) {
 }
 
 HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
-	HoverData s = ViewNode::get_hover_data(mx, my);
+	auto s = view->hover_time(mx, my);
 	s.vlayer = this;
 	foreachi(auto *l, view->vlayer, i)
 		if (this == l)

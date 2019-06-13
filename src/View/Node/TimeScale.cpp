@@ -41,6 +41,16 @@ public:
 		view->open_popup(view->menu_playback_range);
 		return true;
 	}
+	bool on_left_double_click() override {
+		view->sel = SongSelection::from_range(view->song, view->playback_wish_range).filter(view->sel.layers);
+		view->update_selection();
+		return true;
+	}
+	HoverData get_hover_data(float mx, float my)  override {
+		auto h = view->hover_time(mx, my);
+		h.node = this;
+		return h;
+	}
 };
 
 class PlaybackLockSymbol : public ViewNode {
@@ -150,4 +160,10 @@ bool TimeScale::on_left_button_down() {
 bool TimeScale::on_right_button_down() {
 	view->open_popup(view->menu_song);
 	return true;
+}
+
+HoverData TimeScale::get_hover_data(float mx, float my) {
+	auto h = view->hover_time(mx, my);
+	h.node = this;
+	return h;
 }

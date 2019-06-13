@@ -54,7 +54,7 @@ bool ViewNode::view_hover_non_recursive(const HoverData &h) {
 }
 
 HoverData ViewNode::get_hover_data(float mx, float my) {
-	auto h = view->hover_time(mx, my);
+	HoverData h;
 	h.node = this;
 	return h;
 }

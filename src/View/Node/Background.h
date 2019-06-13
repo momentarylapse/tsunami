@@ -19,6 +19,8 @@ public:
 	bool allow_handle_click_when_gaining_focus() override { return false; }
 
 	void draw(Painter *p) override;
+
+	HoverData get_hover_data(float mx, float my) override;
 };
 
 #endif /* SRC_VIEW_NODE_BACKGROUND_H_ */

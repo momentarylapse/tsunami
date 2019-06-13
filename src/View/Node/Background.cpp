@@ -97,3 +97,9 @@ void Background::draw(Painter* c) {
 	}
 	draw_layer_separator(c, prev, nullptr, view);
 }
+
+HoverData Background::get_hover_data(float mx, float my) {
+	auto h = view->hover_time(mx, my);
+	h.node = this;
+	return h;
+}

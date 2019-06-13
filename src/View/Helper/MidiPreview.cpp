@@ -10,6 +10,9 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
 #include "../../Module/SignalChain.h"
+#include "../../Device/Device.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Stream/MidiInput.h"
 #include <mutex>
 
 
@@ -127,29 +130,36 @@ private:
 	std::mutex mutex;
 };
 
-MidiPreview::MidiPreview(Session *s) {
+MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	session = s;
 	source = new MidiPreviewSource;
-	synth = nullptr;
 	chain = session->add_signal_chain_system("midi-preview");
 	chain->_add(source);
+	joiner = chain->add(ModuleType::PLUMBING, "MidiJoiner");
+	recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
+//	synth->setInstrument(view->cur_track->instrument);
+	synth = chain->_add(_synth);
 	out = chain->add(ModuleType::STREAM, "AudioOutput");
+
+	input = nullptr;
+	input_wanted_active = false;
+	input_capture = true;
+	input_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+
+	chain->connect(source, 0, joiner, 0);
+	chain->connect(joiner, 0, synth, 0);
+	chain->connect(synth, 0, out, 0);
+	chain->connect(recorder, 0, joiner, 1);
+
 	chain->mark_all_modules_as_system();
 }
 
 MidiPreview::~MidiPreview() {
-	session->remove_signal_chain(chain);
+	delete chain;
 }
 
-void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl) {
+void MidiPreview::start(const Array<int> &pitch, float volume, float ttl) {
 	//kill_preview();
-	if (!synth) {
-		synth = s->copy();
-//		synth->setInstrument(view->cur_track->instrument);
-		chain->_add(synth);
-		chain->connect(source, 0, synth, 0);
-		chain->connect(synth, 0, out, 0);
-	}
 
 	source->start(pitch, session->sample_rate() * ttl, volume);
 	chain->start();
@@ -157,5 +167,25 @@ void MidiPreview::start(Synthesizer *s, const Array<int> &pitch, float volume, f
 
 void MidiPreview::end() {
 	source->end();
+}
+
+void MidiPreview::_start_input() {
+	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
+	chain->connect(input, 0, recorder, 0);
+	//chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
+	chain->start();
+}
+
+void MidiPreview::_stop_input() {
+	//chain->unsubscribe(this);
+	chain->stop();
+	chain->remove(input);
+	input = nullptr;
+}
+
+void MidiPreview::set_input_device(Device *d) {
+	input_device = d;
+	if (input)
+		input->set_device(d);
 }
 

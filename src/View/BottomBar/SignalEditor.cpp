@@ -315,7 +315,7 @@ public:
 	}
 
 	void on_chain_delete() {
-		hui::RunLater(0.001f, [=](){ editor->remove_chain(chain); });
+		editor->remove_tab(this);
 	}
 
 	void on_left_button_down() {
@@ -418,7 +418,7 @@ public:
 			session->e(_("not allowed to delete the main signal chain"));
 			return;
 		}
-		hui::RunLater(0.001f, [=](){ delete chain;/*editor->delete_chain(chain);*/ });
+		hui::RunLater(0.001f, [=](){ delete chain; });
 	}
 
 
@@ -528,42 +528,39 @@ void SignalEditor::on_new() {
 	//add_chain();
 }
 
-void SignalEditor::on_load()
-{
-	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")){
+void SignalEditor::on_load() {
+	if (hui::FileDialogOpen(win, _("Load a signal chain"), session->storage->current_chain_directory, "*.chain", "*.chain")) {
 		session->storage->current_chain_directory = hui::Filename.dirname();
 		auto *c = SignalChain::load(session, hui::Filename);
 		add_chain(c);
 	}
 }
 
-void SignalEditor::on_chain_switch()
-{
+void SignalEditor::on_chain_switch() {
 	//msg_write("switch");
 }
 
-void SignalEditor::show_config(Module *m)
-{
+void SignalEditor::show_config(Module *m) {
 	if (m and (m == config_module))
 		return;
 	if (config_panel)
 		delete config_panel;
 	config_panel = nullptr;
 	config_module = m;
-	if (m){
+	if (m) {
 		set_string("config-label", module_header(m));
 		config_panel = m->create_panel();
-		if (config_panel){
+		if (config_panel) {
 			config_panel->update();
 			embed(config_panel, config_grid_id, 0, 2);
 			config_panel->set_large(false);
 			//setOptions(config_grid_id, "width=330,noexpandx");
 			hide_control("message", true);
-		}else{
+		} else {
 			set_string("message", _("module not configurable"));
 			hide_control("message", false);
 		}
-	}else{
+	} else {
 		set_string("config-label", "");
 		set_string("message", _("no module selected"));
 		hide_control("message", false);
@@ -571,22 +568,9 @@ void SignalEditor::show_config(Module *m)
 	reveal("revealer", m);
 }
 
-void SignalEditor::delete_chain(SignalChain *c) {
-	session->e("todo...");
-	return;
-	foreachi(auto *t, tabs, i)
-		if (t->chain == c) {
-			delete t;
-			delete c;
-			tabs.erase(i);
-			remove_string("selector", i);
-			set_int("selector", 0);
-		}
-}
-
-void SignalEditor::remove_chain(SignalChain *c) {
-	foreachi(auto *t, tabs, i)
-		if (t->chain == c) {
+void SignalEditor::remove_tab(SignalEditorTab *t) {
+	foreachi(auto *tt, tabs, i)
+		if (tt == t) {
 			delete t;
 			tabs.erase(i);
 			remove_string("selector", i);

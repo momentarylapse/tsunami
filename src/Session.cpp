@@ -31,7 +31,6 @@ Session *Session::GLOBAL = nullptr;
 const string Session::MESSAGE_ADD_PLUGIN = "AddPlugin";
 const string Session::MESSAGE_REMOVE_PLUGIN = "RemovePlugin";
 const string Session::MESSAGE_ADD_SIGNAL_CHAIN = "AddSignalChain";
-const string Session::MESSAGE_REMOVE_SIGNAL_CHAIN = "RemoveSignalChain";
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, PerformanceMonitor *_perf_mon) {
 	win = nullptr;
@@ -197,6 +196,9 @@ SignalChain* Session::add_signal_chain(const string& name) {
 	auto *chain = new SignalChain(this, name);
 	all_signal_chains.add(chain);
 	notify(MESSAGE_ADD_SIGNAL_CHAIN);
+	chain->subscribe(this, [=]{
+		_remove_signal_chain(chain);
+	}, chain->MESSAGE_DELETE);
 	return chain;
 }
 
@@ -206,11 +208,8 @@ SignalChain* Session::add_signal_chain_system(const string& name) {
 	return chain;
 }
 
-void Session::remove_signal_chain(SignalChain* chain) {
+void Session::_remove_signal_chain(SignalChain* chain) {
 	for (int i=0; i<all_signal_chains.num; i++)
-		if (chain == all_signal_chains[i]) {
-			delete all_signal_chains[i];
+		if (chain == all_signal_chains[i])
 			all_signal_chains.erase(i);
-			notify(MESSAGE_REMOVE_SIGNAL_CHAIN);
-		}
 }

@@ -37,7 +37,6 @@ public:
 	static const string MESSAGE_ADD_PLUGIN;
 	static const string MESSAGE_REMOVE_PLUGIN;
 	static const string MESSAGE_ADD_SIGNAL_CHAIN;
-	static const string MESSAGE_REMOVE_SIGNAL_CHAIN;
 
 	static int next_id;
 
@@ -61,7 +60,7 @@ public:
 	Array<SignalChain*> all_signal_chains;
 	SignalChain* add_signal_chain(const string &name);
 	SignalChain* add_signal_chain_system(const string &name);
-	void remove_signal_chain(SignalChain *chain);
+	void _remove_signal_chain(SignalChain *chain);
 
 	Array<TsunamiPlugin*> plugins;
 	TsunamiPlugin *last_plugin;

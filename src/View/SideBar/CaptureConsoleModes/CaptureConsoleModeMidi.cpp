@@ -38,18 +38,16 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	cc->event("source", [=]{ on_source(); });
 }
 
-void CaptureConsoleModeMidi::on_source()
-{
+void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
-	if ((n >= 0) and (n < sources.num)){
+	if ((n >= 0) and (n < sources.num)) {
 		chosen_device = sources[n];
 		input->set_device(chosen_device);
 	}
 }
 
 
-void CaptureConsoleModeMidi::set_target(const Track *t)
-{
+void CaptureConsoleModeMidi::set_target(const Track *t) {
 	target = t;
 	preview_synth = (Synthesizer*)t->synth->copy();
 	chain->_add(preview_synth);
@@ -57,8 +55,7 @@ void CaptureConsoleModeMidi::set_target(const Track *t)
 	//cc->enable("start", true);
 }
 
-void CaptureConsoleModeMidi::enter()
-{
+void CaptureConsoleModeMidi::enter() {
 	chosen_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	cc->hide_control("single_grid", false);
@@ -103,15 +100,13 @@ void CaptureConsoleModeMidi::enter()
 	view->mode_capture->set_data({CaptureTrackData((Track*)target, recorder)});
 }
 
-void CaptureConsoleModeMidi::allow_change_device(bool allow)
-{
+void CaptureConsoleModeMidi::allow_change_device(bool allow) {
 	cc->enable("source", allow);
 }
 
-void CaptureConsoleModeMidi::leave()
-{
+void CaptureConsoleModeMidi::leave() {
 	cc->peak_meter->set_source(nullptr);
-	session->remove_signal_chain(chain);
+	delete chain;
 	chain = nullptr;
 }
 

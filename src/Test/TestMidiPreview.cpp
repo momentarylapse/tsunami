@@ -29,23 +29,22 @@ Array<UnitTest::Test> TestMidiPreview::tests()
 
 void TestMidiPreview::test_preview()
 {
-	Synthesizer *synth = CreateSynthesizer(Session::GLOBAL, "");
-	MidiPreview *preview = new MidiPreview(Session::GLOBAL);
+	auto *synth = CreateSynthesizer(Session::GLOBAL, "");
+	auto *preview = new MidiPreview(Session::GLOBAL, synth);
 	msg_write("start");
-	preview->start(synth, {64}, 1.0f, 1.0f);
+	preview->start({64}, 1.0f, 1.0f);
 	sleep(2.0f);
 
 	msg_write("start");
-	preview->start(synth, {64}, 1.0f, 1.0f);
+	preview->start({64}, 1.0f, 1.0f);
 	sleep(0.3f);
 	msg_write("start");
-	preview->start(synth, {68}, 1.0f, 1.0f);
+	preview->start({68}, 1.0f, 1.0f);
 	sleep(0.3f);
 	msg_write("end");
 	preview->end();
 	sleep(0.3f);
 	delete preview;
-	delete synth;
 }
 
 #endif

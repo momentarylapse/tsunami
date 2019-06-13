@@ -27,11 +27,9 @@
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
-{
-}
+{}
 
-void CaptureConsoleModeMulti::enter()
-{
+void CaptureConsoleModeMulti::enter() {
 	cc->hide_control("multi_grid", false);
 	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
@@ -41,7 +39,7 @@ void CaptureConsoleModeMulti::enter()
 	Array<CaptureTrackData> data;
 
 	// target list multi
-	for (Track *t: song->tracks){
+	for (Track *t: song->tracks) {
 		if ((t->type != SignalType::AUDIO) and (t->type != SignalType::MIDI))
 			continue;
 		if (!view->sel.has(t))
@@ -59,18 +57,18 @@ void CaptureConsoleModeMulti::enter()
 		cc->set_target("multi_grid");
 		cc->add_label(t->nice_name(), 0, i*2+1, c.id_target);
 		cc->add_label(signal_type_name(t->type), 1, i*2+1, c.id_type);
-		if (t->type == SignalType::AUDIO){
+		if (t->type == SignalType::AUDIO) {
 			//c.input_audio->set_backup_mode(BACKUP_MODE_TEMP); TODO
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_audio)
 				cc->add_string(c.id_source, d->get_name());
-		}else if (t->type == SignalType::MIDI){
+		} else if (t->type == SignalType::MIDI) {
 			cc->add_combo_box(_("        - none -"), 2, i*2+1, c.id_source);
 			for (Device *d: sources_midi)
 				cc->add_string(c.id_source, d->get_name());
 		}
 
-		if (t->type == SignalType::AUDIO){
+		if (t->type == SignalType::AUDIO) {
 			c.input_audio = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 			c.peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 			auto *recorder_audio = chain->add(ModuleType::PLUMBING, "AudioRecorder");
@@ -79,7 +77,7 @@ void CaptureConsoleModeMulti::enter()
 			chain->connect(c.peak_meter, 0, recorder_audio, 0);
 			chain->connect(recorder_audio, 0, sucker, 0);
 			data.add({c.track, recorder_audio});
-		}else if (t->type == SignalType::MIDI){
+		} else if (t->type == SignalType::MIDI) {
 			c.input_midi = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
 			auto *recorder_midi = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 			auto *synth = chain->_add(t->synth->copy());
@@ -104,40 +102,37 @@ void CaptureConsoleModeMulti::enter()
 	view->mode_capture->set_data(data);
 }
 
-void CaptureConsoleModeMulti::allow_change_device(bool allow)
-{
+void CaptureConsoleModeMulti::allow_change_device(bool allow) {
 	for (auto &c: items)
 		cc->enable(c.id_source, allow);
 }
 
-void CaptureConsoleModeMulti::on_source()
-{
+void CaptureConsoleModeMulti::on_source() {
 	int index = hui::GetEvent()->id.substr(7, -1)._int();
 	if (index < 0 or index >= items.num)
 		return;
 	int n = cc->get_int("");
 	printf("%d  %d\n", index, n);
 	auto &c = items[index];
-	if (c.track->type == SignalType::AUDIO){
-		if (n > 0){
+	if (c.track->type == SignalType::AUDIO) {
+		if (n > 0) {
 			c.input_audio->set_device(sources_audio[n - 1]);
 		}
-	}else if (c.track->type == SignalType::MIDI){
-		if (n > 0){
+	} else if (c.track->type == SignalType::MIDI) {
+		if (n > 0) {
 			c.input_midi->set_device(sources_midi[n - 1]);
-		}else{
+		} else {
 			c.input_midi->unconnect();
 		}
 	}
-	/*if ((n >= 0) and (n < sources.num)){
+	/*if ((n >= 0) and (n < sources.num)) {
 		chosen_device = sources[n];
 		input->set_device(chosen_device);
 	}*/
 }
 
-void CaptureConsoleModeMulti::leave()
-{
-	for (auto c: items){
+void CaptureConsoleModeMulti::leave() {
+	for (auto c: items) {
 		c.peak_meter_display->set_source(nullptr);
 		c.peak_meter->unplug(0);
 
@@ -148,7 +143,7 @@ void CaptureConsoleModeMulti::leave()
 		cc->remove_control(c.id_peaks);
 	}
 	items.clear();
-	session->remove_signal_chain(chain);
+	delete chain;
 }
 
 

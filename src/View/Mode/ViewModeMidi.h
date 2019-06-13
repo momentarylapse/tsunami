@@ -35,7 +35,6 @@ public:
 	void on_start() override;
 	void on_end() override;
 
-	void on_left_button_up() override;
 	void on_key_down(int k) override;
 	float layer_min_height(AudioViewLayer *l) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
@@ -80,8 +79,7 @@ public:
 	void set_mode(MidiMode mode);
 	MidiMode mode_wanted;
 
-	enum class CreationMode
-	{
+	enum class CreationMode {
 		SELECT,
 		NOTE,
 		INTERVAL,
@@ -90,8 +88,7 @@ public:
 	void set_creation_mode(CreationMode mode);
 	CreationMode creation_mode;
 
-	enum class InputMode
-	{
+	enum class InputMode {
 		DEFAULT,
 		NOTE_LENGTH,
 		BEAT_PARTITION
@@ -100,12 +97,9 @@ public:
 	InputMode input_mode;
 
 	MidiPreview *preview;
+	Device *input_device();
+	bool input_capture();
 
-	SignalChain *input_chain;
-	MidiInput *input;
-	Device *input_device;
-	bool input_wanted_active;
-	bool input_capture;
 	bool is_input_active();
 	void activate_input(bool active);
 	void set_input_capture(bool capture);

@@ -15,23 +15,35 @@ class Synthesizer;
 class MidiPreviewSource;
 class Module;
 class SignalChain;
+class MidiInput;
+class Device;
 class Session;
 
 
-class MidiPreview : public VirtualBase
-{
+class MidiPreview : public VirtualBase {
 public:
-	MidiPreview(Session *s);
+	MidiPreview(Session *s, Synthesizer *synth);
 	virtual ~MidiPreview();
 
 	SignalChain *chain;
 	Module *synth;
+	Module *joiner;
 	Module *out;
 	MidiPreviewSource *source;
+	Module *recorder;
 	Session *session;
 
+	MidiInput *input;
+	Device *input_device;
+	bool input_wanted_active;
+	bool input_capture;
 
-	void start(Synthesizer *s, const Array<int> &pitch, float volume, float ttl);
+
+	void _start_input();
+	void _stop_input();
+	void set_input_device(Device *d);
+
+	void start(const Array<int> &pitch, float volume, float ttl);
 	void end();
 };
 

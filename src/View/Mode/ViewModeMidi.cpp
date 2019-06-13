@@ -8,6 +8,7 @@
 #include "ViewModeMidi.h"
 
 #include "../../Module/SignalChain.h"
+#include "../../Module/Synth/Synthesizer.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
@@ -98,11 +99,6 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);*/
 
 	preview = nullptr;
-	input_chain = nullptr;
-	input = nullptr;
-	input_wanted_active = false;
-	input_capture = true;
-	input_device = view->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 	maximize_input_volume = false;
 
 	mouse_pre_moving_pos = -1;
@@ -163,7 +159,7 @@ AudioViewLayer* ViewModeMidi::cur_vlayer() {
 
 
 void ViewModeMidi::start_midi_preview(const Array<int> &pitch, float ttl) {
-	preview->start(view->cur_track()->synth, pitch, view->cur_track()->volume, ttl);
+	preview->start(pitch, view->cur_track()->volume, ttl);
 }
 
 static hui::Timer ri_timer;
@@ -187,16 +183,33 @@ void ri_insert(ViewModeMidi *me) {
 
 }
 
+bool ViewModeMidi::input_capture() {
+	if (!preview)
+		return false;
+	return preview->input_capture;
+}
+
+Device* ViewModeMidi::input_device() {
+	if (!preview)
+		return nullptr;
+	return preview->input_device;
+}
+
+#include "../../Module/Midi/MidiRecorder.h"
+
 void on_midi_input(ViewModeMidi *me) {
-	MidiEventBuffer buf;
-	buf.samples = 1024;
-	me->input->out->read_midi(buf);
+	//MidiEventBuffer buf;
+	//buf.samples = 1024;
+	//me->preview->input->out->read_midi(buf);
+	auto rec = (MidiRecorder*)me->preview->recorder;
+	msg_write(rec->buffer.num);
+	return;
 
 	// capture or just playback?
-	if (me->input_capture) {
+	if (me->input_capture()) {
 
 		// insert
-		for (auto &e: buf) {
+		for (auto &e: rec->buffer) {
 			if (e.volume > 0) {
 				if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
 					ri_insert(me);
@@ -207,60 +220,55 @@ void on_midi_input(ViewModeMidi *me) {
 			}
 		}
 	} else {
-
+/*
 		// playback
 		for (auto &e: buf)
 			if (e.volume > 0) {
 				me->start_midi_preview({(int)e.pitch}, 0.5f);
 			} else {
 				me->preview->end();
-			}
+			}*/
 	}
 
 }
 
 bool ViewModeMidi::is_input_active() {
-	return input_wanted_active;
+	if (!preview)
+		return false;
+	return preview->input_wanted_active;
 }
 
 void ViewModeMidi::activate_input(bool active) {
-	input_wanted_active = active;
-	if (active and !input) {
+	preview->input_wanted_active = active;
+	if (active and !preview->input) {
 		_start_input();
-	} else if (!active and input) {
+	} else if (!active and preview->input) {
 		_stop_input();
 	}
 }
 
 void ViewModeMidi::set_input_capture(bool capture) {
-	input_capture = capture;
+	preview->input_capture = capture;
 	notify();
 }
 
 void ViewModeMidi::_start_input() {
-	input_chain = new SignalChain(session, "midi-input");
-	input = (MidiInput*)input_chain->add(ModuleType::STREAM, "MidiInput");
-	input_chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
-	input_chain->start();
+	preview->_start_input();
+	preview->chain->subscribe(this, [=]{ on_midi_input(this); }, Module::MESSAGE_TICK);
 }
 
 void ViewModeMidi::_stop_input() {
-	input_chain->unsubscribe(this);
-	input_chain->stop();
-	delete input_chain;
-	input_chain= nullptr;
-	input = nullptr;
+	preview->chain->unsubscribe(this);
+	preview->_stop_input();
 }
 
 void ViewModeMidi::set_input_device(Device *d) {
-	input_device = d;
-	if (input)
-		input->set_device(d);
+	preview->set_input_device(d);
 }
 
 void ViewModeMidi::on_start() {
-	preview = new MidiPreview(view->session);
-	if (input_wanted_active)
+	preview = new MidiPreview(view->session, (Synthesizer*)cur_vlayer()->layer->track->synth->copy());
+	if (preview->input_wanted_active)
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;
 	sb->hidden = false;
@@ -272,10 +280,7 @@ void ViewModeMidi::on_start() {
 }
 
 void ViewModeMidi::on_end() {
-	if (input)
-		_stop_input();
 	delete preview;
-	preview = nullptr;
 
 	for (auto *v: view->vlayer)
 		v->scroll_bar->hidden = true;
@@ -371,9 +376,6 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 		}
 	}
-}
-
-void ViewModeMidi::on_left_button_up() {
 }
 
 void ViewModeMidi::edit_add_pause() {

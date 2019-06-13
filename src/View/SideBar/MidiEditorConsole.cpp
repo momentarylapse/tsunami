@@ -82,15 +82,13 @@ MidiEditorConsole::MidiEditorConsole(Session *session) :
 	update();
 }
 
-MidiEditorConsole::~MidiEditorConsole()
-{
+MidiEditorConsole::~MidiEditorConsole() {
 	clear();
 	view->mode_midi->unsubscribe(this);
 	view->unsubscribe(this);
 }
 
-void MidiEditorConsole::update()
-{
+void MidiEditorConsole::update() {
 	bool allow = false;
 	if (layer)
 		//if (get_track_index_save(view->song, view->cur_track) >= 0)
@@ -121,14 +119,14 @@ void MidiEditorConsole::update()
 
 	check("input_active", view->mode_midi->is_input_active());
 	enable("input_capture", view->mode_midi->is_input_active());
-	check("input_capture", view->mode_midi->input_capture);
+	check("input_capture", view->mode_midi->input_capture());
 	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	reset("input");
 	for (auto *d: input_sources)
 		set_string("input", d->get_name());
 
 	foreachi(auto *d, input_sources, i)
-		if (d == view->mode_midi->input_device)
+		if (d == view->mode_midi->input_device())
 			set_int("input", i);
 	enable("input", view->mode_midi->is_input_active());
 
@@ -140,111 +138,95 @@ void MidiEditorConsole::update()
 	enable("input_volume:max", view->mode_midi->is_input_active());
 
 
-	if (layer->track->instrument.type == Instrument::Type::DRUMS){
+	if (layer->track->instrument.type == Instrument::Type::DRUMS) {
 		// select a nicer pitch range in linear mode for drums
 //		view->get_layer(layer->track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
 		// TODO
 	}
 }
 
-void MidiEditorConsole::on_layer_delete()
-{
+void MidiEditorConsole::on_layer_delete() {
 	set_layer(nullptr);
 }
 
-void MidiEditorConsole::on_view_cur_layer_change()
-{
+void MidiEditorConsole::on_view_cur_layer_change() {
 	set_layer(view->cur_layer());
 }
 
-void MidiEditorConsole::on_view_vtrack_change()
-{
+void MidiEditorConsole::on_view_vtrack_change() {
 	/*update();
 
 	reset("reference_tracks");
-	if (song){
+	if (song) {
 		for (Track *t: song->tracks)
 			addString("reference_tracks", t->getNiceName());
 	}
 
-	if (layer){
+	if (layer) {
 		//setSelection("reference_tracks", view->get_layer(layer)->reference_tracks);
 	}*/
 }
 
-void MidiEditorConsole::on_settings_change()
-{
+void MidiEditorConsole::on_settings_change() {
 	update();
 }
 
-void MidiEditorConsole::on_beat_partition()
-{
+void MidiEditorConsole::on_beat_partition() {
 	view->mode_midi->set_sub_beat_partition(get_int(""));
 }
 
-void MidiEditorConsole::on_note_length()
-{
+void MidiEditorConsole::on_note_length() {
 	view->mode_midi->set_note_length(get_int(""));
 }
 
-void MidiEditorConsole::on_creation_mode()
-{
+void MidiEditorConsole::on_creation_mode() {
 	int n = get_int("midi_edit_mode");
-	if (n == 0){
+	if (n == 0) {
 		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::SELECT);
-	}else if (n == 1){
+	} else if (n == 1) {
 		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::NOTE);
-	}else if (n == 2){
+	} else if (n == 2) {
 		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::INTERVAL);
-	}else if (n == 3){
+	} else if (n == 3) {
 		view->mode_midi->set_creation_mode(ViewModeMidi::CreationMode::CHORD);
 	}
 }
 
-void MidiEditorConsole::on_interval()
-{
+void MidiEditorConsole::on_interval() {
 	view->mode_midi->midi_interval = get_int("");
 }
 
-void MidiEditorConsole::on_chord_type()
-{
+void MidiEditorConsole::on_chord_type() {
 	view->mode_midi->chord_type = (ChordType)get_int("");
 }
 
-void MidiEditorConsole::on_chord_inversion()
-{
+void MidiEditorConsole::on_chord_inversion() {
 	view->mode_midi->chord_inversion = get_int("");
 }
 
-void MidiEditorConsole::on_reference_tracks()
-{
+void MidiEditorConsole::on_reference_tracks() {
 	/*int tn = track->get_index();
 	view->vtrack[tn]->reference_tracks = getSelection("");
 	view->forceRedraw();*/
 }
 
-void MidiEditorConsole::on_edit_track()
-{
+void MidiEditorConsole::on_edit_track() {
 	session->set_mode("default/track");
 }
 
-void MidiEditorConsole::on_edit_midi_fx()
-{
+void MidiEditorConsole::on_edit_midi_fx() {
 	session->set_mode("default/midi-fx");
 }
 
-void MidiEditorConsole::on_edit_song()
-{
+void MidiEditorConsole::on_edit_song() {
 	session->set_mode("default/song");
 }
 
-void MidiEditorConsole::on_modifier(NoteModifier m)
-{
+void MidiEditorConsole::on_modifier(NoteModifier m) {
 	view->mode_midi->modifier = m;
 }
 
-void MidiEditorConsole::on_input_active()
-{
+void MidiEditorConsole::on_input_active() {
 	bool a = is_checked("");
 	view->mode_midi->activate_input(a);
 	enable("input", a);
@@ -253,46 +235,39 @@ void MidiEditorConsole::on_input_active()
 	enable("input_capture", a);
 }
 
-void MidiEditorConsole::on_input_capture()
-{
+void MidiEditorConsole::on_input_capture() {
 	bool a = is_checked("");
 	view->mode_midi->set_input_capture(a);
 }
 
-void MidiEditorConsole::on_input_source()
-{
+void MidiEditorConsole::on_input_source() {
 	int n = get_int("");
 	if (n >= 0 and n < input_sources.num)
 		view->mode_midi->set_input_device(input_sources[n]);
 }
 
-void MidiEditorConsole::on_input_volume(int mode)
-{
+void MidiEditorConsole::on_input_volume(int mode) {
 	view->mode_midi->maximize_input_volume = (mode == 1);
 }
 
-void MidiEditorConsole::clear()
-{
+void MidiEditorConsole::clear() {
 	if (layer)
 		layer->unsubscribe(this);
 	layer = nullptr;
 	set_selection("reference_tracks", {});
 }
 
-void MidiEditorConsole::on_enter()
-{
+void MidiEditorConsole::on_enter() {
 }
 
-void MidiEditorConsole::on_leave()
-{
+void MidiEditorConsole::on_leave() {
 }
 
-void MidiEditorConsole::set_layer(TrackLayer *l)
-{
+void MidiEditorConsole::set_layer(TrackLayer *l) {
 	clear();
 
 	layer = l;
-	if (layer){
+	if (layer) {
 		layer->subscribe(this, [=]{ on_layer_delete(); }, layer->MESSAGE_DELETE);
 
 		/*auto v = view->get_layer(layer);
@@ -311,13 +286,12 @@ void MidiEditorConsole::set_layer(TrackLayer *l)
 
 }
 
-int align_to_beats(int pos, Array<Beat> &beats)
-{
+int align_to_beats(int pos, Array<Beat> &beats) {
 	int best = pos;
 	int best_diff = 100000000;
-	for (auto &b: beats){
+	for (auto &b: beats) {
 		int d = abs(b.range.offset - pos);
-		if (d < best_diff){
+		if (d < best_diff) {
 			best_diff = d;
 			best = b.range.offset;
 		}
@@ -325,13 +299,12 @@ int align_to_beats(int pos, Array<Beat> &beats)
 	return best;
 }
 
-void MidiEditorConsole::on_quantize()
-{
+void MidiEditorConsole::on_quantize() {
 	auto beats = song->bars.get_beats(Range::ALL, true, true, view->mode_midi->sub_beat_partition);
 
 	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref){
+	for (auto *n: ref) {
 		view->sel.set(n, false);
 		MidiNote *nn = n->copy();
 		nn->range.set_start(align_to_beats(nn->range.start(), beats));
@@ -343,8 +316,7 @@ void MidiEditorConsole::on_quantize()
 	song->end_action_group();
 }
 
-void MidiEditorConsole::on_apply_string()
-{
+void MidiEditorConsole::on_apply_string() {
 	int string_no = get_int("string_no") - 1;
 
 	song->begin_action_group();
@@ -354,17 +326,16 @@ void MidiEditorConsole::on_apply_string()
 	song->end_action_group();
 }
 
-void MidiEditorConsole::on_apply_hand_position()
-{
+void MidiEditorConsole::on_apply_hand_position() {
 	int hand_position = get_int("fret_no");
 	auto &string_pitch = layer->track->instrument.string_pitch;
 
 	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
-	for (auto *n: ref){
+	for (auto *n: ref) {
  		int stringno = 0;
  		for (int i=0; i<string_pitch.num; i++)
-			if (n->pitch >= string_pitch[i] + hand_position){
+			if (n->pitch >= string_pitch[i] + hand_position) {
  				stringno = i;
  			}
 		layer->midi_note_set_string(n, stringno);
@@ -372,14 +343,13 @@ void MidiEditorConsole::on_apply_hand_position()
 	song->end_action_group();
 }
 
-void MidiEditorConsole::on_apply_flags(int mask)
-{
+void MidiEditorConsole::on_apply_flags(int mask) {
 	song->begin_action_group();
 	MidiNoteBufferRef ref = layer->midi.get_notes_by_selection(view->sel);
-	if (mask == 0){
+	if (mask == 0) {
 		for (auto *n: ref)
 			layer->midi_note_set_flags(n, 0);
-	}else{
+	} else {
 		for (auto *n: ref)
 			layer->midi_note_set_flags(n, n->flags | mask);
 
@@ -387,8 +357,7 @@ void MidiEditorConsole::on_apply_flags(int mask)
 	song->end_action_group();
 }
 
-void MidiEditorConsole::on_add_key_change()
-{
+void MidiEditorConsole::on_add_key_change() {
 	auto *dlg = new MarkerDialog(win, layer->track, Range(view->sel.range.offset, 0), "::key=c-major::");
 	dlg->run();
 	delete dlg;

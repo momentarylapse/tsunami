@@ -16,6 +16,7 @@
 #include "Audio/PeakMeter.h"
 #include "Audio/AudioSucker.h"
 #include "Midi/MidiEffect.h"
+#include "Midi/MidiJoiner.h"
 #include "Midi/MidiSource.h"
 #include "Midi/MidiRecorder.h"
 #include "Midi/MidiSucker.h"
@@ -45,6 +46,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleType type, const 
 			return new AudioBackup(session);
 		if (sub_type == "AudioRecorder")
 			return new AudioRecorder;
+		if (sub_type == "MidiJoiner")
+			return new MidiJoiner;
 		if (sub_type == "MidiRecorder")
 			return new MidiRecorder;
 		if (sub_type == "MidiSucker")

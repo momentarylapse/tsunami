@@ -862,6 +862,7 @@ Array<string> PluginManager::find_module_sub_types(ModuleType type)
 		names.add("AudioRecorder");
 		names.add("AudioSucker");
 		names.add("BeatMidifier");
+		names.add("MidiJoiner");
 		names.add("MidiRecorder");
 		names.add("MidiSucker");
 	}

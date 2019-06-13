@@ -20,9 +20,8 @@ AudioJoiner::AudioJoiner() :
 	b = nullptr;
 }
 
-int AudioJoiner::Output::read_audio(AudioBuffer& buf)
-{
-	if (joiner->a and joiner->b){
+int AudioJoiner::Output::read_audio(AudioBuffer& buf) {
+	if (joiner->a and joiner->b) {
 		int ra = joiner->a->read_audio(buf);
 		if (ra <= 0)
 			return ra;
@@ -32,15 +31,14 @@ int AudioJoiner::Output::read_audio(AudioBuffer& buf)
 		int rb = joiner->b->read_audio(buf_b);
 		buf.add(buf_b, 0, 1);
 		return max(ra, rb);
-	}else if (joiner->a){
+	} else if (joiner->a) {
 		return joiner->a->read_audio(buf);
-	}else if (joiner->b){
+	} else if (joiner->b) {
 		return joiner->b->read_audio(buf);
 	}
 	return buf.length;
 }
 
-AudioJoiner::Output::Output(AudioJoiner *j) : Port(SignalType::AUDIO, "out")
-{
+AudioJoiner::Output::Output(AudioJoiner *j) : Port(SignalType::AUDIO, "out") {
 	joiner = j;
 }

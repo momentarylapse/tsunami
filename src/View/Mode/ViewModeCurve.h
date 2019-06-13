@@ -17,12 +17,13 @@ class ViewModeCurve : public ViewModeDefault
 public:
 	ViewModeCurve(AudioView *view);
 
-	void on_left_button_down() override;
-	void on_left_button_up() override;
-	void on_mouse_move() override;
+	void left_click_handle_void(AudioViewLayer *vlayer) override;
 	void on_key_down(int k) override;
 
 	void draw_track_data(Painter *c, AudioViewTrack *t) override;
+	void draw_post(Painter *c) override;
+
+	string get_tip() override;
 
 	HoverData get_hover_data(AudioViewLayer *vlayer, float mx, float my) override;
 
@@ -31,8 +32,8 @@ public:
 	float screen2value(float y);
 
 	Curve *curve;
-	AudioViewTrack *cur_track;
-	void setCurve(Curve *c);
+	AudioViewTrack *cur_track();
+	void set_curve(Curve *c);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECURVE_H_ */

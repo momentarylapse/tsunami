@@ -249,6 +249,7 @@ public:
 	HoverData _prev_selection;
 	void set_current(const HoverData &h);
 	AudioViewLayer *cur_vlayer();
+	AudioViewTrack *cur_vtrack();
 	Track *cur_track();
 	SampleRef *cur_sample();
 	TrackLayer *cur_layer();

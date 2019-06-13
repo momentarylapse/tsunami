@@ -121,7 +121,7 @@ void CurveConsole::on_add()
 	delete(dlg);
 	if (targets.num > 0){
 		Curve *c = song->add_curve("new", targets);
-		view->mode_curve->setCurve(c);
+		view->mode_curve->set_curve(c);
 		update_list();
 	}
 }
@@ -131,7 +131,7 @@ void CurveConsole::on_delete()
 	int n = get_int(id_list);
 	if (n >= 0){
 		song->delete_curve(song->curves[n]);
-		view->mode_curve->setCurve(nullptr);
+		view->mode_curve->set_curve(nullptr);
 	}
 }
 
@@ -151,12 +151,12 @@ void CurveConsole::on_target()
 
 void CurveConsole::on_list_select()
 {
-	view->mode_curve->setCurve(nullptr);
+	view->mode_curve->set_curve(nullptr);
 	int n = get_int(id_list);
 	if (n >= 0){
-		view->mode_curve->setCurve(song->curves[n]);
+		view->mode_curve->set_curve(song->curves[n]);
 	}else{
-		view->mode_curve->setCurve(nullptr);
+		view->mode_curve->set_curve(nullptr);
 	}
 	view->force_redraw();
 }

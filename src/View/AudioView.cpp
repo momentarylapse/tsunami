@@ -1240,6 +1240,13 @@ Track *AudioView::cur_track() {
 	return cur_vlayer()->layer->track;
 }
 
+AudioViewTrack *AudioView::cur_vtrack() {
+	for (auto *t: vtrack)
+		if (t->track == cur_track())
+			return t;
+	return nullptr;
+}
+
 TrackLayer *AudioView::cur_layer() {
 	if (!cur_vlayer())
 		return nullptr;

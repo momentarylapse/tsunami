@@ -112,7 +112,6 @@ void CaptureConsoleModeMulti::on_source() {
 	if (index < 0 or index >= items.num)
 		return;
 	int n = cc->get_int("");
-	printf("%d  %d\n", index, n);
 	auto &c = items[index];
 	if (c.track->type == SignalType::AUDIO) {
 		if (n > 0) {
@@ -134,7 +133,6 @@ void CaptureConsoleModeMulti::on_source() {
 void CaptureConsoleModeMulti::leave() {
 	for (auto c: items) {
 		c.peak_meter_display->set_source(nullptr);
-		c.peak_meter->unplug(0);
 
 		delete c.peak_meter_display;
 		cc->remove_control(c.id_target);

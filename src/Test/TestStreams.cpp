@@ -16,24 +16,20 @@
 #include "../Session.h"
 #include "../Stream/AudioOutput.h"
 
-TestStreams::TestStreams() : UnitTest("streams")
-{
+TestStreams::TestStreams() : UnitTest("streams") {
 }
 
-Array<UnitTest::Test> TestStreams::tests()
-{
+Array<UnitTest::Test> TestStreams::tests() {
 	Array<Test> list;
 	list.add(Test("output", TestStreams::test_output_stream));
 	list.add(Test("input", TestStreams::test_input_stream));
 	return list;
 }
 
-class DebugAudioSource : public AudioSource
-{
+class DebugAudioSource : public AudioSource {
 public:
 	float phi, omega;
-	DebugAudioSource()
-	{
+	DebugAudioSource() {
 		omega = 2*pi * 440.0f / (float)DEFAULT_SAMPLE_RATE;
 		phi = 0;
 	}
@@ -46,33 +42,30 @@ public:
 		}
 		return buf.length;
 	}
-
 };
 
-void TestStreams::test_output_stream()
-{
-	auto *source = new DebugAudioSource;
-	auto *stream = new AudioOutput(Session::GLOBAL);
-	stream->plug(0, source, 0);
+void TestStreams::test_output_stream() {
+	auto *chain = new SignalChain(Session::GLOBAL, "test");
+	auto *source = chain->_add(new DebugAudioSource);
+	auto *stream = chain->add(ModuleType::STREAM, "AudioOutput");
+	chain->connect(source, 0, stream, 0);
 
 	msg_write("play");
-	stream->start();
+	chain->start();
 	sleep(1);
 	msg_write("stop");
-	stream->stop();
+	chain->stop();
 	sleep(1);
 	msg_write("play");
-	stream->start();
+	chain->start();
 	sleep(1);
 	msg_write("stop");
-	stream->stop();
-	delete(stream);
-	delete(source);
+	chain->stop();
+	delete chain;
 
 }
 
-void TestStreams::test_input_stream()
-{
+void TestStreams::test_input_stream() {
 	auto *chain = new SignalChain(Session::GLOBAL, "test");
 	auto *a = chain->add(ModuleType::STREAM, "AudioInput");
 	auto *b = chain->add(ModuleType::PLUMBING, "AudioSucker");

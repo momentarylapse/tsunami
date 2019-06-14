@@ -14,17 +14,16 @@
 #include "../Module/Midi/MidiEffect.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Synth/Synthesizer.h"
+#include "../Module/SignalChain.h"
 #include "../Plugins/TsunamiPlugin.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
 
-TestPlugins::TestPlugins() : UnitTest("plugins")
-{
+TestPlugins::TestPlugins() : UnitTest("plugins") {
 }
 
 
-Array<UnitTest::Test> TestPlugins::tests()
-{
+Array<UnitTest::Test> TestPlugins::tests() {
 	Array<Test> list;
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
 	for (auto &name: names)
@@ -50,8 +49,7 @@ Array<UnitTest::Test> TestPlugins::tests()
 	return list;
 }
 
-void TestPlugins::test_audio_effect(const string &name)
-{
+void TestPlugins::test_audio_effect(const string &name) {
 	auto *fx = CreateAudioEffect(Session::GLOBAL, name);
 
 	AudioBuffer buf;
@@ -62,8 +60,7 @@ void TestPlugins::test_audio_effect(const string &name)
 	delete fx;
 }
 
-void TestPlugins::test_audio_source(const string &name)
-{
+void TestPlugins::test_audio_source(const string &name) {
 	auto *source = CreateAudioSource(Session::GLOBAL, name);
 
 	AudioBuffer buf;
@@ -74,8 +71,7 @@ void TestPlugins::test_audio_source(const string &name)
 	delete source;
 }
 
-void TestPlugins::test_midi_effect(const string &name)
-{
+void TestPlugins::test_midi_effect(const string &name) {
 	auto *fx = CreateMidiEffect(Session::GLOBAL, name);
 
 	MidiNoteBuffer buf;
@@ -86,8 +82,7 @@ void TestPlugins::test_midi_effect(const string &name)
 	delete fx;
 }
 
-void TestPlugins::test_midi_source(const string &name)
-{
+void TestPlugins::test_midi_source(const string &name) {
 	auto *source = CreateMidiSource(Session::GLOBAL, name);
 
 	MidiEventBuffer buf;
@@ -98,25 +93,22 @@ void TestPlugins::test_midi_source(const string &name)
 	delete source;
 }
 
-void TestPlugins::test_synthesizer(const string &name)
-{
-	MidiSource *source = CreateMidiSource(Session::GLOBAL, "Metronome");
-
-	auto *synth = CreateSynthesizer(Session::GLOBAL, name);
-	synth->plug(0, source, 0);
+void TestPlugins::test_synthesizer(const string &name) {
+	auto *chain = new SignalChain(Session::GLOBAL, "chain");
+	auto *source = chain->add(ModuleType::MIDI_SOURCE, "Metronome");
+	auto *synth = chain->add(ModuleType::SYNTHESIZER, name);
+	chain->connect(source, 0, synth, 0);
 
 	AudioBuffer buf;
 	buf.resize(1 << 12);
 
 	for (int i=0; i<16; i++)
-		synth->out->read_audio(buf);
+		synth->port_out[0]->read_audio(buf);
 
-	delete synth;
-	delete source;
+	delete chain;
 }
 
-void TestPlugins::test_tsunami_plugin(const string &name)
-{
+void TestPlugins::test_tsunami_plugin(const string &name) {
 }
 
 #endif

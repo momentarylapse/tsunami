@@ -177,7 +177,7 @@ void MidiPreview::_stop_input() {
 	//chain->unsubscribe(this);
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	chain->stop();
-	chain->remove(input);
+	chain->delete_module(input);
 	input = nullptr;
 }
 

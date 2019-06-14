@@ -108,11 +108,11 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	if (t->type == SignalType::MIDI){
 		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer(raw);
-		synth->plug(0, midi_streamer, 0);
+		synth->_plug_in(0, midi_streamer, 0);
 		fill_midi_streamer();
 	}else if (t->type == SignalType::BEATS){
 
-		synth->plug(0, sr->beat_midifier, 0);
+		synth->_plug_in(0, sr->beat_midifier, 0);
 	}
 
 	track->subscribe(this, [=]{ on_track_replace_synth(); }, track->MESSAGE_REPLACE_SYNTHESIZER);
@@ -184,9 +184,9 @@ void TrackRenderer::on_track_replace_synth()
 	}
 
 	if (track->type == SignalType::MIDI){
-		synth->plug(0, midi_streamer, 0);
+		synth->_plug_in(0, midi_streamer, 0);
 	}else if (track->type == SignalType::BEATS){
-		synth->plug(0, song_renderer->beat_midifier, 0);
+		synth->_plug_in(0, song_renderer->beat_midifier, 0);
 	}
 }
 

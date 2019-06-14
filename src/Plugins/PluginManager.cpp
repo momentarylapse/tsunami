@@ -191,8 +191,6 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "get_pos", Kaba::mf(&Module::get_pos), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "set_pos", Kaba::mf(&Module::set_pos), &module);
-	Kaba::LinkExternal("Module.plug", Kaba::mf(&Module::plug));
-	Kaba::LinkExternal("Module.unplug", Kaba::mf(&Module::unplug));
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 	Kaba::LinkExternal("Module.copy", Kaba::mf(&Module::copy));
@@ -576,8 +574,9 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SignalChain.stop", Kaba::mf(&SignalChain::stop));
 	Kaba::LinkExternal("SignalChain.add", Kaba::mf(&SignalChain::add));
 	Kaba::LinkExternal("SignalChain._add", Kaba::mf(&SignalChain::_add));
-	Kaba::LinkExternal("SignalChain.remove", Kaba::mf(&SignalChain::remove));
+	Kaba::LinkExternal("SignalChain.delete", Kaba::mf(&SignalChain::delete_module));
 	Kaba::LinkExternal("SignalChain.connect", Kaba::mf(&SignalChain::connect));
+	Kaba::LinkExternal("SignalChain.disconnect", Kaba::mf(&SignalChain::disconnect));
 	Kaba::LinkExternal("SignalChain.set_update_dt", Kaba::mf(&SignalChain::set_tick_dt));
 	Kaba::LinkExternal("SignalChain.set_buffer_size", Kaba::mf(&SignalChain::set_buffer_size));
 	Kaba::LinkExternal("SignalChain.is_paused", Kaba::mf(&SignalChain::is_paused));

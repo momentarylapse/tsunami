@@ -21,8 +21,7 @@
 
 
 
-SongRenderer::SongRenderer(Song *s, bool _direct_mode)
-{
+SongRenderer::SongRenderer(Song *s, bool _direct_mode) {
 	module_subtype = "SongRenderer";
 	MidiEventBuffer no_midi;
 	song = s;
@@ -35,7 +34,7 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode)
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	if (song){
+	if (song) {
 		build_data();
 		prepare(song->range(), false);
 		song->subscribe(this, [=]{ on_song_add_track(); }, song->MESSAGE_ADD_TRACK);
@@ -44,40 +43,35 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode)
 	}
 }
 
-SongRenderer::~SongRenderer()
-{
-	if (song){
+SongRenderer::~SongRenderer() {
+	if (song) {
 		song->unsubscribe(this);
 		clear_data();
 	}
 }
 
-void SongRenderer::__init__(Song *s)
-{
+void SongRenderer::__init__(Song *s) {
 	new(this) SongRenderer(s);
 }
 
-void SongRenderer::__delete__()
-{
+void SongRenderer::__delete__() {
 	this->SongRenderer::~SongRenderer();
 }
 
-int SongRenderer::get_first_usable_track(Track *target)
-{
+int SongRenderer::get_first_usable_track(Track *target) {
 	foreachi(auto *tr, tracks, i)
 		if (!tr->track->muted and allowed_tracks.contains(tr->track) and (tr->track->send_target == target))
 			return i;
 	return -1;
 }
 
-void SongRenderer::render_send_target(AudioBuffer &buf, Track* target)
-{
+void SongRenderer::render_send_target(AudioBuffer &buf, Track* target) {
 	// any un-muted track?
 	int i0 = get_first_usable_track(target);
-	if (i0 < 0){
+	if (i0 < 0) {
 		// no -> return silence
 		buf.set_zero();
-	}else{
+	} else {
 
 		// first (un-muted) track
 		tracks[i0]->render(buf);
@@ -101,25 +95,21 @@ void SongRenderer::render_send_target(AudioBuffer &buf, Track* target)
 	}
 }
 
-void SongRenderer::render_song_no_fx(AudioBuffer &buf)
-{
+void SongRenderer::render_song_no_fx(AudioBuffer &buf) {
 	render_send_target(buf, nullptr);
 }
 
-void apply_curves(Song *audio, int pos)
-{
+void apply_curves(Song *audio, int pos) {
 	for (Curve *c: audio->curves)
 		c->apply(pos);
 }
 
-void unapply_curves(Song *audio)
-{
+void unapply_curves(Song *audio) {
 	for (Curve *c: audio->curves)
 		c->unapply();
 }
 
-void SongRenderer::read_basic(AudioBuffer &buf)
-{
+void SongRenderer::read_basic(AudioBuffer &buf) {
 	range_cur = Range(pos, buf.length);
 	channels = buf.channels;
 
@@ -134,8 +124,7 @@ void SongRenderer::read_basic(AudioBuffer &buf)
 	pos += buf.length;
 }
 
-int SongRenderer::read(AudioBuffer &buf)
-{
+int SongRenderer::read(AudioBuffer &buf) {
 	if (!song)
 		return 0;
 	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
@@ -151,34 +140,33 @@ int SongRenderer::read(AudioBuffer &buf)
 
 	buf.offset = pos;
 
-	if (song->curves.num >= 0){
+	if (song->curves.num >= 0) {
 		int chunk = 1024;
-		for (int d=0; d<size; d+=chunk){
+		for (int d=0; d<size; d+=chunk) {
 			AudioBuffer tbuf;
 			tbuf.set_as_ref(buf, d, min(size - d, chunk));
 			read_basic(tbuf);
 		}
-	}else
+	} else {
 		read_basic(buf);
+	}
 
 	if ((pos >= _range.end()) and allow_loop and loop_if_allowed)
 		set_pos(_range.offset);
 	return size;
 }
 
-void SongRenderer::render(const Range &range, AudioBuffer &buf)
-{
+void SongRenderer::render(const Range &range, AudioBuffer &buf) {
 	channels = buf.channels;
 	prepare(range, false);
 	buf.resize(range.length);
 	read(buf);
 }
 
-void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks)
-{
+void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks) {
 	// reset previously unused tracks
 	for (auto *tr: tracks)
-		if (!allowed_tracks.contains(tr->track)){
+		if (!allowed_tracks.contains(tr->track)) {
 			tr->reset_state();
 			tr->set_pos(pos);
 		}
@@ -186,24 +174,22 @@ void SongRenderer::allow_tracks(const Set<const Track*> &_allowed_tracks)
 	//_seek(pos);
 }
 
-void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers)
-{
+void SongRenderer::allow_layers(const Set<const TrackLayer*> &_allowed_layers) {
 	allowed_layers = _allowed_layers;
 	_set_pos(pos);
 }
 
-void SongRenderer::clear_data()
-{
+void SongRenderer::clear_data() {
 	for (auto *tr: tracks)
 		delete tr;
 	tracks.clear();
 
-	if (beat_midifier){
+	if (beat_midifier) {
 		delete beat_midifier;
 		beat_midifier = nullptr;
 	}
 
-	if (bar_streamer){
+	if (bar_streamer) {
 		delete bar_streamer;
 		bar_streamer = nullptr;
 	}
@@ -212,8 +198,7 @@ void SongRenderer::clear_data()
 	allowed_layers.clear();
 }
 
-void SongRenderer::prepare(const Range &__range, bool _allow_loop)
-{
+void SongRenderer::prepare(const Range &__range, bool _allow_loop) {
 	std::lock_guard<std::shared_timed_mutex> lck(song->mtx);
 	//clear_data();
 	_range = __range;
@@ -227,8 +212,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 	set_pos(_range.offset);
 }
 
-void SongRenderer::reset_state()
-{
+void SongRenderer::reset_state() {
 	if (!song)
 		return;
 	if (preview_effect)
@@ -238,11 +222,10 @@ void SongRenderer::reset_state()
 		t->reset_state();
 }
 
-void SongRenderer::build_data()
-{
+void SongRenderer::build_data() {
 	bar_streamer = new BarStreamer(song->bars);
 	beat_midifier = new BeatMidifier;
-	beat_midifier->plug(0, bar_streamer, 0);
+	beat_midifier->_plug_in(0, bar_streamer, 0);
 
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));
@@ -250,53 +233,45 @@ void SongRenderer::build_data()
 	set_pos(0);
 }
 
-int SongRenderer::get_num_samples()
-{
+int SongRenderer::get_num_samples() {
 	if (allow_loop and loop_if_allowed)
 		return -1;
 	return _range.length;
 }
 
-void SongRenderer::set_pos(int _pos)
-{
+void SongRenderer::set_pos(int _pos) {
 	reset_state();
 	_set_pos(_pos);
 }
 
-void SongRenderer::_set_pos(int _pos)
-{
+void SongRenderer::_set_pos(int _pos) {
 	pos = _pos;
 	for (auto &tr: tracks)
 		tr->set_pos(pos);
 }
 
-int SongRenderer::get_pos()
-{
+int SongRenderer::get_pos() {
 	int delta = 0;
 	Range r = range();
 	return loopi(pos + delta, r.start(), r.end());
 }
 
-void SongRenderer::on_song_add_track()
-{
+void SongRenderer::on_song_add_track() {
 	update_tracks();
 }
 
-void SongRenderer::on_song_delete_track()
-{
+void SongRenderer::on_song_delete_track() {
 	update_tracks();
 }
 
-void SongRenderer::on_song_finished_loading()
-{
+void SongRenderer::on_song_finished_loading() {
 	for (auto *tr: tracks)
 		tr->on_track_change_data();
 }
 
-void SongRenderer::update_tracks()
-{
+void SongRenderer::update_tracks() {
 	// new tracks
-	for (Track *t: song->tracks){
+	for (Track *t: song->tracks) {
 		bool found = false;
 		for (auto &tr: tracks)
 			if (tr->track == t)
@@ -305,22 +280,21 @@ void SongRenderer::update_tracks()
 			tracks.add(new TrackRenderer(t, this));
 	}
 
-	foreachi (auto *tr, tracks, ti){
+	foreachi (auto *tr, tracks, ti) {
 		bool found = false;
 		for (Track *t: song->tracks)
 			if (t == tr->track)
 				found = true;
-		if (!found){
+		if (!found) {
 			delete tr;
 			tracks.erase(ti);
 		}
 	}
 }
 
-float SongRenderer::get_peak(Track *t)
-{
+float SongRenderer::get_peak(Track *t) {
 	for (auto *tr: tracks)
-		if (tr->track == t){
+		if (tr->track == t) {
 			float r = tr->peak;
 			tr->peak = 0;
 			return r;
@@ -328,8 +302,7 @@ float SongRenderer::get_peak(Track *t)
 	return 0;
 }
 
-void SongRenderer::clear_peaks()
-{
+void SongRenderer::clear_peaks() {
 	for (auto *tr: tracks)
 		tr->peak = 0;
 }

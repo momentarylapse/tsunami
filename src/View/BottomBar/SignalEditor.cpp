@@ -193,16 +193,16 @@ public:
 		return hover ? view->colors.white_hover : view->colors.white;
 	}
 
-	void draw_cable(Painter *p, SignalChain::Cable *c) {
-		complex p0 = complex(module_port_out_x(c->source), module_port_out_y(c->source, c->source_port));
-		complex p1 = complex(module_port_in_x(c->target), module_port_in_y(c->target, c->target_port));
+	void draw_cable(Painter *p, SignalChain::Cable &c) {
+		complex p0 = complex(module_port_out_x(c.source), module_port_out_y(c.source, c.source_port));
+		complex p1 = complex(module_port_in_x(c.target), module_port_in_y(c.target, c.target_port));
 
 		float length = (p1 - p0).abs();
 		Interpolator<complex> inter(Interpolator<complex>::TYPE_CUBIC_SPLINE);
 		inter.add2(p0, complex(length,0));
 		inter.add2(p1, complex(length,0));
 
-		p->set_color(signal_color(c->type));
+		p->set_color(signal_color(c.type));
 
 		complex qq = complex::ZERO;
 		for (float t=0; t<1.0f; t+=0.025f) {
@@ -268,7 +268,7 @@ public:
 		for (auto *m: chain->modules)
 			draw_module(p, m);
 
-		for (auto *c: chain->cables)
+		for (auto &c: chain->cables())
 			draw_cable(p, c);
 
 		for (auto *m: chain->modules)
@@ -325,9 +325,9 @@ public:
 		sel = hover;
 		apply_sel();
 		if (sel.type == sel.TYPE_PORT_IN) {
-			chain->disconnect_target(sel.module, sel.port);
+			chain->disconnect_in(sel.module, sel.port);
 		} else if (sel.type == sel.TYPE_PORT_OUT) {
-			chain->disconnect_source(sel.module, sel.port);
+			chain->disconnect_out(sel.module, sel.port);
 		} else if (sel.type == sel.TYPE_BUTTON_PLAY) {
 			if (chain->is_playback_active())
 				chain->stop();
@@ -341,10 +341,10 @@ public:
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
 			if (hover.target_module) {
 				if (sel.type == sel.TYPE_PORT_IN) {
-					chain->disconnect_source(hover.target_module, hover.target_port);
+					chain->disconnect_out(hover.target_module, hover.target_port);
 					chain->connect(hover.target_module, hover.target_port, sel.module, sel.port);
 				} else if (sel.type == sel.TYPE_PORT_OUT) {
-					chain->disconnect_target(hover.target_module, hover.target_port);
+					chain->disconnect_in(hover.target_module, hover.target_port);
 					chain->connect(sel.module, sel.port, hover.target_module, hover.target_port);
 				}
 			}
@@ -400,7 +400,7 @@ public:
 		int key = hui::GetEvent()->key_code;
 		if (key == hui::KEY_DELETE) {
 			if (sel.type == sel.TYPE_MODULE) {
-				chain->remove(sel.module);
+				chain->delete_module(sel.module);
 				hover = sel = Selection();
 			}
 		}
@@ -458,7 +458,7 @@ public:
 
 	void on_module_delete() {
 		if (sel.type == sel.TYPE_MODULE) {
-			chain->remove(sel.module);
+			chain->delete_module(sel.module);
 			hover = sel = Selection();
 			apply_sel();
 		}

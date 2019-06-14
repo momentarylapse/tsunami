@@ -95,8 +95,6 @@ SignalChain::~SignalChain() {
 		m->unsubscribe(this);
 	for (Module *m: modules)
 		delete m;
-	for (Cable *c: cables)
-		delete c;
 	PerformanceMonitor::delete_channel(perf_channel_suck);
 }
 
@@ -123,9 +121,9 @@ void SignalChain::create_default_modules() {
 	if (!output)
 		output = add(ModuleType::STREAM, "AudioOutput");
 
-	if (!from_source(renderer, 0) and !to_target(peak, 0))
+//	if (!from_source(renderer, 0) and !to_target(peak, 0))
 		connect(renderer, 0, peak, 0);
-	if (!from_source(peak, 0) and !to_target(output, 0))
+//	if (!from_source(peak, 0) and !to_target(output, 0))
 		connect(peak, 0, output, 0);
 }
 
@@ -159,7 +157,7 @@ Module *SignalChain::get_by_type(ModuleType type, const string &sub_type) {
 	return nullptr;
 }
 
-void SignalChain::remove(Module *m) {
+void SignalChain::delete_module(Module *m) {
 	int index = module_index(m);
 	if (index < 0)
 		return;
@@ -170,78 +168,75 @@ void SignalChain::remove(Module *m) {
 
 	m->unsubscribe(this);
 
-	bool more = true;
-	while (more) {
-		more = false;
-		for (Cable *c: cables)
-			if (c->source == m or c->target == m) {
-				disconnect(c);
-				more = true;
-				break;
-			}
-	}
+	for (int i=0; i<m->port_in.num; i++)
+		disconnect_in(m, i);
+	for (int i=0; i<m->port_out.num; i++)
+		disconnect_out(m, i);
 
 	modules.erase(index);
 	delete m;
 	notify(MESSAGE_DELETE_MODULE);
 }
 
+Array<SignalChain::Cable> SignalChain::cables() {
+	Array<Cable> cables;
+	for (Module *target: modules) {
+		foreachi (auto tp, target->port_in, tpi) {
+			if (*tp.port) {
+				for (Module *source: modules) {
+					foreachi (auto sp, source->port_out, spi) {
+						if (*tp.port == sp) {
+							Cable c;
+							c.target = target;
+							c.target_port = tpi;
+							c.source = source;
+							c.source_port = spi;
+							c.type = tp.type;
+							cables.add(c);
+						}
+					}
+				}
+			}
+		}
+	}
+	return cables;
+}
+
+
 void SignalChain::connect(Module *source, int source_port, Module *target, int target_port) {
-	// already connected?
-	auto *cc1 = this->from_source(source, source_port);
-	if (cc1)
-		disconnect(cc1);
-	auto *cc2 = this->to_target(target, target_port);
-	if (cc2)
-		disconnect(cc2);
+	if (source_port < 0 or source_port >= source->port_out.num)
+		throw Exception("connect: invalid source port");
+	if (target_port < 0 or target_port >= target->port_in.num)
+		throw Exception("connect: invalid source port");
+	//msg_write("connect " + i2s(source->port_out[source_port].type) + " -> " + i2s(target->port_in[target_port].type));
 
-	target->plug(target_port, source, source_port);
+	disconnect_out(source, source_port);
+	disconnect_in(target, target_port);
 
-	Cable *c = new Cable;
-	c->type = source->port_out[source_port]->type;
-	c->source = source;
-	c->target = target;
-	c->source_port = source_port;
-	c->target_port = target_port;
-	cables.add(c);
-
+	target->_plug_in(target_port, source, source_port);
 	notify(MESSAGE_ADD_CABLE);
 }
 
-void SignalChain::disconnect(SignalChain::Cable *c) {
-	if (!c)
-		return;
-	foreachi(Cable *cc, cables, i)
-		if (cc == c) {
-			c->target->unplug(c->target_port);
+void SignalChain::disconnect(Module *source, int source_port, Module *target, int target_port) {
+	disconnect_in(target, target_port);
+}
 
-			delete(c);
-			cables.erase(i);
-			notify(MESSAGE_DELETE_CABLE);
-			break;
+void SignalChain::disconnect_out(Module *source, int source_port) {
+	Port *sp = source->port_out[source_port];
+
+	for (Module *target: modules)
+		for (auto &p: target->port_in) {
+			if ((*p.port) == sp) {
+				*p.port = nullptr;
+				notify(MESSAGE_DELETE_CABLE);
+			}
 		}
 }
 
-SignalChain::Cable *SignalChain::from_source(Module *source, int port) {
-	for (Cable *c: cables)
-		if (c->source == source and c->source_port == port)
-			return c;
-	return nullptr;
-}
-
-SignalChain::Cable *SignalChain::to_target(Module *target, int port) {
-	for (Cable *c: cables)
-		if (c->target == target and c->target_port == port)
-			return c;
-	return nullptr;
-}
-
-void SignalChain::disconnect_source(Module *source, int port) {
-	disconnect(from_source(source, port));
-}
-
-void SignalChain::disconnect_target(Module *target, int port) {
-	disconnect(to_target(target, port));
+void SignalChain::disconnect_in(Module *target, int target_port) {
+	auto tp = target->port_in[target_port];
+	*(tp.port) = nullptr;
+	notify(MESSAGE_DELETE_CABLE);
 }
 
 void SignalChain::save(const string& filename) {
@@ -268,10 +263,10 @@ void SignalChain::save(const string& filename) {
 	}
 	root.add(mm);
 	xml::Element cc("cables");
-	for (Cable *c: cables) {
+	for (Cable &c: cables()) {
 		xml::Element e("cable");
-		e.add(xml::Element("source").witha("id", i2s(module_index(c->source))).witha("port", i2s(c->source_port)));
-		e.add(xml::Element("target").witha("id", i2s(module_index(c->target))).witha("port", i2s(c->target_port)));
+		e.add(xml::Element("source").witha("id", i2s(module_index(c.source))).witha("port", i2s(c.source_port)));
+		e.add(xml::Element("target").witha("id", i2s(module_index(c.target))).witha("port", i2s(c.target_port)));
 		cc.add(e);
 	}
 	root.add(cc);
@@ -346,23 +341,19 @@ void SignalChain::update_ports() {
 
 void SignalChain::reset()
 {
+	msg_write("aaaargh  reset");
 	for (int i=modules.num-1; i>=3; i--)
-		remove(modules[i]);
-	Array<Cable*> _cables = cables;
-	for (auto *c: cables)
-		disconnect(c);
+		delete_module(modules[i]);
 
 	connect(modules[0], 0, modules[1], 0);
 	connect(modules[1], 0, modules[2], 0);
 }
 
-Module* SignalChain::add(ModuleType type, const string &sub_type)
-{
+Module* SignalChain::add(ModuleType type, const string &sub_type) {
 	return _add(ModuleFactory::create(session, type, sub_type));
 }
 
-void SignalChain::reset_state()
-{
+void SignalChain::reset_state() {
 	session->debug("chain", "reset");
 
 	std::lock_guard<std::mutex> lock(mutex);
@@ -370,8 +361,7 @@ void SignalChain::reset_state()
 		m->reset_state();
 }
 
-void SignalChain::prepare_start()
-{
+void SignalChain::prepare_start() {
 	if (state != State::UNPREPARED)
 		return;
 	session->debug("chain", "prepare");
@@ -386,8 +376,7 @@ void SignalChain::prepare_start()
 	state = State::PAUSED;
 }
 
-void SignalChain::start()
-{
+void SignalChain::start() {
 	if (state == State::ACTIVE)
 		return;
 	session->debug("chain", "start");
@@ -406,8 +395,7 @@ void SignalChain::start()
 	hui_runner = hui::RunRepeated(tick_dt, [=]{ notify(MESSAGE_TICK); });
 }
 
-void SignalChain::stop()
-{
+void SignalChain::stop() {
 	if (state != State::ACTIVE)
 		return;
 	session->debug("chain", "stop");
@@ -423,8 +411,7 @@ void SignalChain::stop()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void SignalChain::stop_hard()
-{
+void SignalChain::stop_hard() {
 	session->debug("chain", "stop HARD");
 	stop();
 	_stop_sucking();
@@ -434,23 +421,21 @@ void SignalChain::stop_hard()
 }
 
 
-bool SignalChain::is_paused()
-{
+bool SignalChain::is_paused() {
 	return state == State::PAUSED;
 }
 
-int SignalChain::command(ModuleCommand cmd, int param)
-{
-	if (cmd == ModuleCommand::START){
+int SignalChain::command(ModuleCommand cmd, int param) {
+	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
-	}else if (cmd == ModuleCommand::STOP){
+	} else if (cmd == ModuleCommand::STOP) {
 		stop();
 		return 0;
-	}else if (cmd == ModuleCommand::PREPARE_START){
+	} else if (cmd == ModuleCommand::PREPARE_START) {
 		prepare_start();
 		return 0;
-	}else{
+	} else {
 		int r = COMMAND_NOT_HANDLED;
 		for (Module *m: modules)
 			r = max(r, m->command(cmd, param));
@@ -459,23 +444,20 @@ int SignalChain::command(ModuleCommand cmd, int param)
 	return Module::COMMAND_NOT_HANDLED;
 }
 
-bool SignalChain::is_playback_active()
-{
+bool SignalChain::is_playback_active() {
 	return (state == State::ACTIVE) or (state == State::PAUSED);
 }
 
 // running in gui thread!
-void SignalChain::on_module_play_end_of_stream()
-{
+void SignalChain::on_module_play_end_of_stream() {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
 	stop_hard();
 }
 
-int SignalChain::get_pos()
-{
+int SignalChain::get_pos() {
 	int delta = 0;
-	int pos;
-	if (is_playback_active()){
+	int pos = 0;
+	if (is_playback_active()) {
 		for (auto *m: modules)
 			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
 				delta = - ((AudioOutput*)m)->get_available();
@@ -486,21 +468,18 @@ int SignalChain::get_pos()
 	return pos + delta;
 }
 
-void SignalChain::set_pos(int pos)
-{
+void SignalChain::set_pos(int pos) {
 	for (auto *m: modules)
 		m->set_pos(pos);
 }
 
-void SignalChain::set_buffer_size(int size)
-{
+void SignalChain::set_buffer_size(int size) {
 	buffer_size = size;
 }
 
 
 
-void SignalChain::_start_sucking()
-{
+void SignalChain::_start_sucking() {
 	if (sucking)
 		return;
 	session->debug("chain", "start suck");
@@ -509,9 +488,8 @@ void SignalChain::_start_sucking()
 	sucking = true;
 }
 
-void SignalChain::_stop_sucking()
-{
-	if (thread){
+void SignalChain::_stop_sucking() {
+	if (thread) {
 		session->debug("chain", "stop suck");
 		thread->keep_running = false;
 		thread->join();
@@ -521,12 +499,11 @@ void SignalChain::_stop_sucking()
 	sucking = false;
 }
 
-int SignalChain::do_suck()
-{
+int SignalChain::do_suck() {
 	std::lock_guard<std::mutex> lock(mutex);
 	PerformanceMonitor::start_busy(perf_channel_suck);
 	int s = Port::END_OF_STREAM;
-	for (auto *m: modules){
+	for (auto *m: modules) {
 		int r = m->command(ModuleCommand::SUCK, buffer_size);
 		s = max(s, r);
 	}

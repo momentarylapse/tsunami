@@ -201,25 +201,17 @@ ModuleType Module::type_from_name(const string &str) {
 	return (ModuleType)-1;
 }
 
+void Module::_plug_in(int in_port, Module *source, int source_port) {
+	Port *sp = source->port_out[source_port];
+	auto tp = port_in[in_port];
+	if (sp->type != tp.type)
+		throw Exception("connect: port type mismatch");
 
-void Module::plug(int in_port, Module* source, int out_port) {
-	if (in_port < 0 or in_port >= port_in.num)
-		throw Exception("invalid in-port");
-	if (out_port < 0 or out_port >= source->port_out.num)
-		throw Exception("invalid out-port");
-	//msg_write("connect " + i2s(source->port_out[source_port].type) + " -> " + i2s(target->port_in[target_port].type));
-	if (source->port_out[out_port]->type != port_in[in_port].type)
-		throw Exception("port type mismatch");
-	// TODO: check ports in use
-
-	Port *p = source->port_out[out_port];
-	*port_in[in_port].port = nullptr;
-	*port_in[in_port].port = p;
+	*tp.port = sp;
 }
 
-
-void Module::unplug(int in_port) {
-	if (in_port < 0 or in_port >= port_in.num)
-		throw Exception("invalid in-port");
-	*port_in[in_port].port = nullptr;
+void Module::_unplug_in(int in_port) {
+	auto tp = port_in[in_port];
+	*tp.port = nullptr;
 }
+

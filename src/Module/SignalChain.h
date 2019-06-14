@@ -43,7 +43,7 @@ public:
 	Array<Module*> modules;
 	Module* _add(Module *m);
 	Module* add(ModuleType type, const string &sub_type = "");
-	void remove(Module *m);
+	void delete_module(Module *m);
 	int module_index(Module *m);
 
 	Module *get_by_type(ModuleType type, const string &sub_type);
@@ -53,7 +53,7 @@ public:
 		Module *source, *target;
 		int source_port, target_port;
 	};
-	Array<Cable*> cables;
+	Array<Cable> cables();
 	struct PortX {
 		Module *module;
 		int port;
@@ -62,11 +62,10 @@ public:
 	void update_ports();
 
 	void connect(Module *source, int source_port, Module *target, int target_port);
-	Cable *from_source(Module *source, int port);
-	Cable *to_target(Module *target, int port);
-	void disconnect_source(Module *source, int port);
-	void disconnect_target(Module *target, int port);
-	void disconnect(Cable *c);
+	void disconnect(Module *source, int source_port, Module *target, int target_port);
+
+	void disconnect_out(Module *source, int port);
+	void disconnect_in(Module *target, int port);
 
 	void on_module_play_end_of_stream();
 

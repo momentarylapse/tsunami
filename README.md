@@ -51,7 +51,7 @@ sudo make install
 Alternatively, you can use **meson** to compile:
 ```
 mkdir build
-meson buil
+meson build
 cd build
 ninja
 ```

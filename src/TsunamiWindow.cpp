@@ -62,14 +62,12 @@
 
 extern const string AppName;
 
-namespace hui{
-	extern string file_dialog_default;
+namespace hui {
+extern string file_dialog_default;
 }
 
-
 TsunamiWindow::TsunamiWindow(Session *_session) :
-	hui::Window(AppName, 800, 600)
-{
+		hui::Window(AppName, 800, 600) {
 	session = _session;
 	session->set_win(this);
 	song = session->song;
@@ -119,7 +117,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-convert-stereo", [=]{ on_track_convert_stereo(); });
 	event("buffer-delete", [=]{ on_buffer_delete(); });
 	event("buffer-make-movable", [=]{ on_buffer_make_movable(); });
-
 
 	event("edit-track-groups", [=]{ auto *dlg = new TrackRoutingDialog(this, song); dlg->run(); delete dlg; });
 	set_key_code("edit-track-groups", hui::KEY_G + hui::KEY_CONTROL);
@@ -202,7 +199,6 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_target("main_table");
 	add_drawing_area("!grabfocus", 0, 0, "area");
 
-
 	toolbar[0]->set_by_id("toolbar");
 	//ToolbarConfigure(false, true);
 
@@ -210,19 +206,17 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	//ToolBarConfigure(true, true);
 	set_maximized(maximized);
 
-
 	app->plugin_manager->add_plugins_to_menu(this);
 
 	// events
 	event("hui:close", [=]{ on_exit(); });
 
-	for (int i=0; i<256; i++){
-		event("import-backup-"+i2s(i), [=]{ on_import_backup(); });
-		event("delete-backup-"+i2s(i), [=]{ on_delete_backup(); });
+	for (int i=0; i<256; i++) {
+		event("import-backup-" + i2s(i), [=]{ on_import_backup(); });
+		event("delete-backup-" + i2s(i), [=]{ on_delete_backup(); });
 	}
 
 	auto_delete = false;
-
 
 	view = new AudioView(session, "area");
 	session->view = view;
@@ -244,9 +238,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
 	side_bar->subscribe(this, [=]{ on_side_bar_update(); });
 
-
 	// firt time start?
-	if (hui::Config.get_bool("FirstStart", true)){
+	if (hui::Config.get_bool("FirstStart", true)) {
 		hui::RunLater(0.2f, [=]{
 			on_help();
 			hui::Config.set_bool("FirstStart", false);
@@ -256,39 +249,36 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	update_menu();
 }
 
-TsunamiWindow::~TsunamiWindow()
-{
+TsunamiWindow::~TsunamiWindow() {
 	// all done by onDestroy()
 }
 
-void TsunamiCleanUp()
-{
+void TsunamiCleanUp() {
 	bool again = false;
-	do{
+	do {
 		again = false;
 		foreachi(Session *s, tsunami->sessions, i)
-			if (s->win->got_destroyed() and s->win->auto_delete){
+			if (s->win->got_destroyed() and s->win->auto_delete) {
 				delete s->win;
 				delete s;
 				tsunami->sessions.erase(i);
 				again = true;
 				break;
 			}
-	}while(again);
+	} while (again);
 
 	if (tsunami->sessions.num == 0)
 		tsunami->end();
 }
 
-void TsunamiWindow::on_destroy()
-{
+void TsunamiWindow::on_destroy() {
 	int w, h;
 	get_size_desired(w, h);
 	hui::Config.set_int("Window.Width", w);
 	hui::Config.set_int("Window.Height", h);
 	hui::Config.set_bool("Window.Maximized", is_maximized());
 
-	session->signal_chain->stop_hard();
+	view->signal_chain->stop_hard();
 	view->unsubscribe(this);
 	view->signal_chain->unsubscribe(this);
 	song->action_manager->unsubscribe(this);
@@ -304,35 +294,27 @@ void TsunamiWindow::on_destroy()
 	hui::RunLater(0.010f, &TsunamiCleanUp);
 }
 
-
-void TsunamiWindow::on_about()
-{
+void TsunamiWindow::on_about() {
 	hui::AboutBox(this);
 }
 
-void TsunamiWindow::on_help()
-{
+void TsunamiWindow::on_help() {
 	auto *dlg = new HelpDialog(this);
 	dlg->run();
 	delete dlg;
 }
 
-
-
-void TsunamiWindow::on_add_audio_track_mono()
-{
+void TsunamiWindow::on_add_audio_track_mono() {
 	song->add_track(SignalType::AUDIO_MONO);
 }
 
-void TsunamiWindow::on_add_audio_track_stereo()
-{
+void TsunamiWindow::on_add_audio_track_stereo() {
 	song->add_track(SignalType::AUDIO_STEREO);
 }
 
-void TsunamiWindow::on_add_time_track()
-{
+void TsunamiWindow::on_add_time_track() {
 	song->begin_action_group();
-	try{
+	try {
 		song->add_track(SignalType::BEATS, 0);
 
 		// some default data
@@ -340,27 +322,25 @@ void TsunamiWindow::on_add_time_track()
 		b.set_bpm(90, song->sample_rate);
 		for (int i=0; i<10; i++)
 			song->add_bar(-1, b, false);
-	}catch(Song::Exception &e){
+	} catch (Song::Exception &e) {
 		session->e(e.message);
 	}
 	song->end_action_group();
 }
 
-void TsunamiWindow::on_import_backup()
-{
+void TsunamiWindow::on_import_backup() {
 	string id = hui::GetEvent()->id;
 	int uuid = id.explode(":").back()._int();
 	string filename = BackupManager::get_filename_for_uuid(uuid);
 	if (filename == "")
 		return;
 
-
-	if (song->is_empty()){
+	if (song->is_empty()) {
 		session->storage_options = "f32:2:44100";
 		session->storage->load(song, filename);
 		//BackupManager::set_save_state(session);
 		session->storage_options = "";
-	}else{
+	} else {
 		Session *s = tsunami->create_session();
 		s->storage_options = "f32:2:44100";
 		s->win->show();
@@ -371,22 +351,19 @@ void TsunamiWindow::on_import_backup()
 	//BackupManager::del
 }
 
-void TsunamiWindow::on_delete_backup()
-{
+void TsunamiWindow::on_delete_backup() {
 	string id = hui::GetEvent()->id;
 	int uuid = id.explode(":").back()._int();
 	BackupManager::delete_old(uuid);
 }
 
-void TsunamiWindow::on_add_midi_track()
-{
+void TsunamiWindow::on_add_midi_track() {
 	song->add_track(SignalType::MIDI);
 }
 
-void TsunamiWindow::on_track_render()
-{
+void TsunamiWindow::on_track_render() {
 	Range range = view->sel.range;
-	if (range.empty()){
+	if (range.empty()) {
 		session->e(_("Selection range is empty"));
 		return;
 	}
@@ -401,11 +378,11 @@ void TsunamiWindow::on_track_render()
 
 	Track *t = song->add_track(SignalType::AUDIO);
 
-	int chunk_size = 1<<12;
+	int chunk_size = 1 << 12;
 	int offset = range.offset;
 
-	while (offset < range.end()){
-		p->set((float)(offset - range.offset) / range.length);
+	while (offset < range.end()) {
+		p->set((float) (offset - range.offset) / range.length);
 
 		AudioBuffer buf;
 		Range r = Range(offset, min(chunk_size, range.end() - offset));
@@ -424,199 +401,170 @@ void TsunamiWindow::on_track_render()
 
 }
 
-void TsunamiWindow::on_delete_track()
-{
-	if (view->cur_track()){
-		try{
+void TsunamiWindow::on_delete_track() {
+	if (view->cur_track()) {
+		try {
 			song->delete_track(view->cur_track());
-		}catch(Song::Exception &e){
+		} catch (Song::Exception &e) {
 			session->e(e.message);
 		}
-	}else{
+	} else {
 		session->e(_("No track selected"));
 	}
 }
 
-void TsunamiWindow::on_track_edit_midi()
-{
+void TsunamiWindow::on_track_edit_midi() {
 	session->set_mode("midi");
 }
 
-void TsunamiWindow::on_track_edit_fx()
-{
+void TsunamiWindow::on_track_edit_fx() {
 	session->set_mode("default/fx");
 }
 
-void TsunamiWindow::on_track_add_marker()
-{
-	if (view->cur_track()){
+void TsunamiWindow::on_track_add_marker() {
+	if (view->cur_track()) {
 		Range range = view->sel.range;
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
 		auto *dlg = new MarkerDialog(this, view->cur_track(), range, "");
 		dlg->run();
 		delete dlg;
-	}else{
+	} else {
 		session->e(_("No track selected"));
 	}
 }
 
-void TsunamiWindow::on_track_convert_mono()
-{
+void TsunamiWindow::on_track_convert_mono() {
 	if (view->cur_track())
 		view->cur_track()->set_channels(1);
 	else
 		session->e(_("No track selected"));
 }
 
-void TsunamiWindow::on_track_convert_stereo()
-{
+void TsunamiWindow::on_track_convert_stereo() {
 	if (view->cur_track())
 		view->cur_track()->set_channels(2);
 	else
 		session->e(_("No track selected"));
 }
-void TsunamiWindow::on_buffer_delete()
-{
+void TsunamiWindow::on_buffer_delete() {
 	foreachi (auto &buf, view->cur_layer()->buffers, i)
-		if (buf.range().is_inside(view->hover_before_leave.pos)){
+		if (buf.range().is_inside(view->hover_before_leave.pos)) {
 			auto s = SongSelection::from_range(song, buf.range()).filter({view->cur_layer()}).filter(0);
 			song->delete_selection(s);
 		}
 }
 
-void TsunamiWindow::on_buffer_make_movable()
-{
-	for (auto &buf: view->cur_layer()->buffers){
-		if (buf.range().is_inside(view->hover_before_leave.pos)){
+void TsunamiWindow::on_buffer_make_movable() {
+	for (auto &buf: view->cur_layer()->buffers) {
+		if (buf.range().is_inside(view->hover_before_leave.pos)) {
 			auto s = SongSelection::from_range(song, buf.range()).filter({view->cur_layer()}).filter(0);
 			song->create_samples_from_selection(s, true);
 		}
 	}
 }
 
-void TsunamiWindow::on_layer_midi_mode_linear()
-{
+void TsunamiWindow::on_layer_midi_mode_linear() {
 	view->cur_vlayer()->set_midi_mode(MidiMode::LINEAR);
 }
 
-void TsunamiWindow::on_layer_midi_mode_tab()
-{
+void TsunamiWindow::on_layer_midi_mode_tab() {
 	view->cur_vlayer()->set_midi_mode(MidiMode::TAB);
 }
 
-void TsunamiWindow::on_layer_midi_mode_classical()
-{
+void TsunamiWindow::on_layer_midi_mode_classical() {
 	view->cur_vlayer()->set_midi_mode(MidiMode::CLASSICAL);
 }
 
-void TsunamiWindow::on_song_properties()
-{
+void TsunamiWindow::on_song_properties() {
 	session->set_mode("default/song");
 }
 
-void TsunamiWindow::on_track_properties()
-{
+void TsunamiWindow::on_track_properties() {
 	session->set_mode("default/track");
 }
 
-void TsunamiWindow::on_sample_properties()
-{
+void TsunamiWindow::on_sample_properties() {
 	session->set_mode("default/sample-ref");
 }
 
-void TsunamiWindow::on_delete_marker()
-{
+void TsunamiWindow::on_delete_marker() {
 	if (view->hover_before_leave.type == HoverData::Type::MARKER)
 		view->cur_track()->delete_marker(view->hover_before_leave.marker);
 	else
 		session->e(_("No marker selected"));
 }
 
-void TsunamiWindow::on_edit_marker()
-{
-	if (view->hover_before_leave.type == HoverData::Type::MARKER){
+void TsunamiWindow::on_edit_marker() {
+	if (view->hover_before_leave.type == HoverData::Type::MARKER) {
 		auto *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
 		dlg->run();
 		delete dlg;
-	}else
+	} else
 		session->e(_("No marker selected"));
 }
 
-void TsunamiWindow::on_marker_resize()
-{
+void TsunamiWindow::on_marker_resize() {
 	session->set_mode("scale-marker");
 }
 
-void TsunamiWindow::on_show_log()
-{
+void TsunamiWindow::on_show_log() {
 	bottom_bar->open(BottomBar::LOG_CONSOLE);
 }
 
-void TsunamiWindow::on_undo()
-{
+void TsunamiWindow::on_undo() {
 	song->undo();
 }
 
-void TsunamiWindow::on_redo()
-{
+void TsunamiWindow::on_redo() {
 	song->redo();
 }
 
-void TsunamiWindow::on_send_bug_report()
-{
+void TsunamiWindow::on_send_bug_report() {
 }
 
-
-string title_filename(const string &filename)
-{
+string title_filename(const string &filename) {
 	if (filename.num > 0)
-		return filename.basename();// + " (" + filename.dirname() + ")";
+		return filename.basename(); // + " (" + filename.dirname() + ")";
 	return _("No name");
 }
 
-bool TsunamiWindow::allow_termination()
-{
+bool TsunamiWindow::allow_termination() {
 	if (!side_bar->allow_close())
 		return false;
 
 	if (song->action_manager->is_save())
 		return true;
 	string answer = hui::QuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
-	if (answer == "hui:yes"){
+	if (answer == "hui:yes") {
 		/*if (!OnSave())
-			return false;*/
+		 return false;*/
 		on_save();
 		return true;
-	}else if (answer == "hui:no")
+	} else if (answer == "hui:no")
 		return true;
 
 	// cancel
 	return false;
 }
 
-void TsunamiWindow::on_copy()
-{
+void TsunamiWindow::on_copy() {
 	app->clipboard->copy(view);
 }
 
-void TsunamiWindow::on_paste()
-{
+void TsunamiWindow::on_paste() {
 	app->clipboard->paste(view);
 }
 
-void TsunamiWindow::on_paste_as_samples()
-{
+void TsunamiWindow::on_paste_as_samples() {
 	app->clipboard->paste_as_samples(view);
 }
 
-void TsunamiWindow::on_paste_time()
-{
+void TsunamiWindow::on_paste_time() {
 	app->clipboard->paste_with_time(view);
 }
 
-void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win)
-{
+void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win) {
 	auto *p = new Progress(_("applying effect"), win);
 	fx->sample_rate = l->song()->sample_rate;
 	fx->reset_state();
@@ -627,8 +575,8 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 
 	int chunk_size = 2048;
 	int done = 0;
-	while (done < r.length){
-		p->set((float)done / (float)r.length);
+	while (done < r.length) {
+		p->set((float) done / (float) r.length);
 
 		auto ref = buf.ref(done, done + chunk_size);
 		fx->process(ref);
@@ -639,18 +587,17 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	delete p;
 }
 
-void TsunamiWindow::on_menu_execute_audio_effect()
-{
+void TsunamiWindow::on_menu_execute_audio_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	auto *fx = CreateAudioEffect(session, name);
 
 	fx->reset_config();
-	if (configure_module(this, fx)){
+	if (configure_module(this, fx)) {
 		song->begin_action_group();
 		for (Track *t: song->tracks)
 			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
 					fx_process_layer(l, view->sel.range, fx, this);
 				}
 		song->end_action_group();
@@ -658,18 +605,17 @@ void TsunamiWindow::on_menu_execute_audio_effect()
 	delete fx;
 }
 
-void TsunamiWindow::on_menu_execute_audio_source()
-{
+void TsunamiWindow::on_menu_execute_audio_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	auto *s = CreateAudioSource(session, name);
 
 	s->reset_config();
-	if (configure_module(this, s)){
+	if (configure_module(this, s)) {
 		song->begin_action_group();
 		for (Track *t: song->tracks)
 			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)){
+				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
 					s->reset_state();
 					AudioBuffer buf;
 					l->get_buffers(buf, view->sel.range);
@@ -680,51 +626,48 @@ void TsunamiWindow::on_menu_execute_audio_source()
 	delete s;
 }
 
-void TsunamiWindow::on_menu_execute_midi_effect()
-{
+void TsunamiWindow::on_menu_execute_midi_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	auto *fx = CreateMidiEffect(session, name);
 
 	fx->reset_config();
-	if (configure_module(this, fx)){
+	if (configure_module(this, fx)) {
 		song->action_manager->group_begin();
-		for (Track *t : song->tracks)
-			for (auto *l : t->layers)
-			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
-				fx->reset_state();
-				fx->process_layer(l, view->sel);
-			}
+		for (Track *t: song->tracks)
+			for (auto *l: t->layers)
+				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+					fx->reset_state();
+					fx->process_layer(l, view->sel);
+				}
 		song->action_manager->group_end();
 	}
 	delete fx;
 }
 
-void TsunamiWindow::on_menu_execute_midi_source()
-{
+void TsunamiWindow::on_menu_execute_midi_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	auto *s = CreateMidiSource(session, name);
 
 	s->reset_config();
-	if (configure_module(this, s)){
+	if (configure_module(this, s)) {
 		song->begin_action_group();
-		for (Track *t : song->tracks)
-			for (auto *l : t->layers)
-			if (view->sel.has(l) and (t->type == SignalType::MIDI)){
-				s->reset_state();
-				MidiEventBuffer buf;
-				buf.samples = view->sel.range.length;
-				s->read(buf);
-				l->insert_midi_data(view->sel.range.offset, midi_events_to_notes(buf));
-			}
+		for (Track *t: song->tracks)
+			for (auto *l: t->layers)
+				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+					s->reset_state();
+					MidiEventBuffer buf;
+					buf.samples = view->sel.range.length;
+					s->read(buf);
+					l->insert_midi_data(view->sel.range.offset, midi_events_to_notes(buf));
+				}
 		song->end_action_group();
 	}
 	delete s;
 }
 
-void TsunamiWindow::on_menu_execute_song_plugin()
-{
+void TsunamiWindow::on_menu_execute_song_plugin() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	SongPlugin *p = CreateSongPlugin(session, name);
@@ -733,197 +676,163 @@ void TsunamiWindow::on_menu_execute_song_plugin()
 	delete p;
 }
 
-void TsunamiWindow::on_menu_execute_tsunami_plugin()
-{
+void TsunamiWindow::on_menu_execute_tsunami_plugin() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
 	session->execute_tsunami_plugin(name);
 }
 
-void TsunamiWindow::on_delete()
-{
+void TsunamiWindow::on_delete() {
 	if (!view->sel.is_empty())
 		song->delete_selection(view->sel);
 }
 
-void TsunamiWindow::on_sample_manager()
-{
+void TsunamiWindow::on_sample_manager() {
 	session->set_mode("default/samples");
 }
 
-void TsunamiWindow::on_mixing_console()
-{
+void TsunamiWindow::on_mixing_console() {
 	bottom_bar->toggle(BottomBar::MIXING_CONSOLE);
 }
 
-void TsunamiWindow::on_fx_console()
-{
+void TsunamiWindow::on_fx_console() {
 	session->set_mode("default/fx");
 }
 
-void TsunamiWindow::on_mastering_console()
-{
+void TsunamiWindow::on_mastering_console() {
 	session->set_mode("default/mastering");
 }
 
-void TsunamiWindow::on_sample_import()
-{
+void TsunamiWindow::on_sample_import() {
 }
 
-void TsunamiWindow::on_command(const string & id)
-{
+void TsunamiWindow::on_command(const string & id) {
 }
 
-void TsunamiWindow::on_settings()
-{
+void TsunamiWindow::on_settings() {
 	auto *dlg = new SettingsDialog(view, this);
 	dlg->run();
 	delete dlg;
 }
 
-void TsunamiWindow::on_track_import()
-{
-	if (session->storage->ask_open_import(this)){
+void TsunamiWindow::on_track_import() {
+	if (session->storage->ask_open_import(this)) {
 		Track *t = song->add_track(SignalType::AUDIO_STEREO);
 		session->storage->load_track(t->layers[0], hui::Filename, view->sel.range.start());
 	}
 }
 
-void TsunamiWindow::on_remove_sample()
-{
+void TsunamiWindow::on_remove_sample() {
 	song->delete_selected_samples(view->sel);
 }
 
-void TsunamiWindow::on_play_loop()
-{
+void TsunamiWindow::on_play_loop() {
 	view->set_playback_loop(!view->playback_loop);
 }
 
-void TsunamiWindow::on_play()
-{
+void TsunamiWindow::on_play() {
 	if (session->in_mode("capture"))
 		return;
 
 	view->play();
 }
 
-void TsunamiWindow::on_play_toggle()
-{
+void TsunamiWindow::on_play_toggle() {
 	if (session->in_mode("capture"))
 		return;
 
-	if (view->is_playback_active()){
+	if (view->is_playback_active()) {
 		view->pause(!view->is_paused());
-	}else{
+	} else {
 		view->play();
 	}
 }
 
-void TsunamiWindow::on_pause()
-{
+void TsunamiWindow::on_pause() {
 	if (session->in_mode("capture"))
 		return;
 	view->pause(true);
 }
 
-void TsunamiWindow::on_stop()
-{
-	if (session->in_mode("capture")){
+void TsunamiWindow::on_stop() {
+	if (session->in_mode("capture")) {
 		session->set_mode("default");
-	}else
+	} else
 		view->stop();
 }
 
-void TsunamiWindow::on_insert_sample()
-{
+void TsunamiWindow::on_insert_sample() {
 	song->insert_selected_samples(view->sel);
 }
 
-void TsunamiWindow::on_record()
-{
+void TsunamiWindow::on_record() {
 	session->set_mode("capture");
 }
 
-void TsunamiWindow::on_add_layer()
-{
+void TsunamiWindow::on_add_layer() {
 	view->cur_track()->add_layer();
 }
 
-void TsunamiWindow::on_delete_layer()
-{
+void TsunamiWindow::on_delete_layer() {
 	if (view->cur_track()->layers.num > 1)
 		view->cur_track()->delete_layer(view->cur_layer());
 	else
 		session->e(_("can not delete the only version of a track"));
 }
 
-void TsunamiWindow::on_layer_make_track()
-{
+void TsunamiWindow::on_layer_make_track() {
 	view->cur_layer()->make_own_track();
 }
 
-void TsunamiWindow::on_layer_merge()
-{
+void TsunamiWindow::on_layer_merge() {
 	view->cur_track()->merge_layers();
 }
 
-void TsunamiWindow::on_layer_mark_selection_dominant()
-{
+void TsunamiWindow::on_layer_mark_selection_dominant() {
 	view->cur_layer()->mark_dominant(view->sel.range);
 }
 
-void TsunamiWindow::on_sample_from_selection()
-{
+void TsunamiWindow::on_sample_from_selection() {
 	song->create_samples_from_selection(view->sel, false);
 }
 
-void TsunamiWindow::on_view_optimal()
-{
+void TsunamiWindow::on_view_optimal() {
 	view->optimize_view();
 }
 
-void TsunamiWindow::on_select_none()
-{
+void TsunamiWindow::on_select_none() {
 	view->select_none();
 }
 
-void TsunamiWindow::on_select_all()
-{
+void TsunamiWindow::on_select_all() {
 	view->select_all();
 }
 
-void TsunamiWindow::on_select_expand()
-{
+void TsunamiWindow::on_select_expand() {
 	view->select_expand();
 }
 
-void TsunamiWindow::on_view_midi_default()
-{
+void TsunamiWindow::on_view_midi_default() {
 	view->set_midi_view_mode(MidiMode::LINEAR);
 }
 
-void TsunamiWindow::on_view_midi_tab()
-{
+void TsunamiWindow::on_view_midi_tab() {
 	view->set_midi_view_mode(MidiMode::TAB);
 }
 
-void TsunamiWindow::on_view_midi_score()
-{
+void TsunamiWindow::on_view_midi_score() {
 	view->set_midi_view_mode(MidiMode::CLASSICAL);
 }
 
-void TsunamiWindow::on_zoom_in()
-{
+void TsunamiWindow::on_zoom_in() {
 	view->zoom_in();
 }
 
-void TsunamiWindow::on_zoom_out()
-{
+void TsunamiWindow::on_zoom_out() {
 	view->zoom_out();
 }
 
-void TsunamiWindow::update_menu()
-{
+void TsunamiWindow::update_menu() {
 // menu / toolbar
 	// edit
 	enable("undo", song->action_manager->undoable());
@@ -961,51 +870,42 @@ void TsunamiWindow::update_menu()
 	set_title(title);
 }
 
-void TsunamiWindow::on_side_bar_update()
-{
+void TsunamiWindow::on_side_bar_update() {
 	if (!side_bar->visible)
 		activate(view->id);
 	update_menu();
 }
 
-void TsunamiWindow::on_bottom_bar_update()
-{
+void TsunamiWindow::on_bottom_bar_update() {
 	if (!bottom_bar->visible)
 		activate(view->id);
 	update_menu();
 }
 
-void TsunamiWindow::on_update()
-{
+void TsunamiWindow::on_update() {
 	// "Clipboard", "AudioFile" or "AudioView"
 	update_menu();
 }
 
-
-void TsunamiWindow::on_exit()
-{
-	if (allow_termination()){
+void TsunamiWindow::on_exit() {
+	if (allow_termination()) {
 		BackupManager::set_save_state(session);
 		destroy();
 	}
 }
 
-
-void TsunamiWindow::on_new()
-{
+void TsunamiWindow::on_new() {
 	auto *dlg = new NewDialog(this);
 	dlg->run();
 	delete dlg;
 }
 
-
-void TsunamiWindow::on_open()
-{
-	if (session->storage->ask_open(this)){
-		if (song->is_empty()){
+void TsunamiWindow::on_open() {
+	if (session->storage->ask_open(this)) {
+		if (song->is_empty()) {
 			if (session->storage->load(song, hui::Filename))
 				BackupManager::set_save_state(session);
-		}else{
+		} else {
 			auto *s = tsunami->create_session();
 			s->win->show();
 			s->storage->load(s->song, hui::Filename);
@@ -1013,21 +913,18 @@ void TsunamiWindow::on_open()
 	}
 }
 
-
-void TsunamiWindow::on_save()
-{
-	if (song->filename == ""){
+void TsunamiWindow::on_save() {
+	if (song->filename == "") {
 		on_save_as();
-	}else{
-		if (session->storage->save(song, song->filename)){
+	} else {
+		if (session->storage->save(song, song->filename)) {
 			view->set_message(_("file saved"));
 			BackupManager::set_save_state(session);
 		}
 	}
 }
 
-string _suggest_filename(Song *s, const string &dir)
-{
+string _suggest_filename(Song *s, const string &dir) {
 	if (s->filename != "")
 		return s->filename.basename();
 	string base = get_current_date().format("%Y-%m-%d");
@@ -1042,7 +939,7 @@ string _suggest_filename(Song *s, const string &dir)
 	if (allow_midi)
 		ext = "midi";
 
-	for (int i=0; i<26; i++){
+	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
 		msg_write(dir + name);
@@ -1052,12 +949,11 @@ string _suggest_filename(Song *s, const string &dir)
 	return "";
 }
 
-void TsunamiWindow::on_save_as()
-{
+void TsunamiWindow::on_save_as() {
 	if (song->filename == "")
 		hui::file_dialog_default = _suggest_filename(song, session->storage->current_directory);
 
-	if (session->storage->ask_save(this)){
+	if (session->storage->ask_save(this)) {
 		if (session->storage->save(song, hui::Filename))
 			view->set_message(_("file saved"));
 	}
@@ -1065,9 +961,8 @@ void TsunamiWindow::on_save_as()
 	hui::file_dialog_default = "";
 }
 
-void TsunamiWindow::on_render_export_selection()
-{
-	if (session->storage->ask_save_render_export(this)){
+void TsunamiWindow::on_render_export_selection() {
+	if (session->storage->ask_save_render_export(this)) {
 		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
 			view->set_message(_("file exported"));
 	}
@@ -1091,7 +986,7 @@ int pref_bar_index(AudioView *view) {
 	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
 		return view->cur_selection.index;
 	/*if (view->cur_selection.type == HoverData::Type::BAR)
-		return view->cur_selection.index + 1;*/
+	 return view->cur_selection.index + 1;*/
 	if (view->sel.bar_indices(view->song).num > 0)
 		return view->sel.bar_indices(view->song).back() + 1;
 	if (view->hover_before_leave.pos > 0)
@@ -1117,55 +1012,51 @@ void TsunamiWindow::on_delete_bars() {
 	delete dlg;
 }
 
-void TsunamiWindow::on_delete_time_interval()
-{
+void TsunamiWindow::on_delete_time_interval() {
 	hui::ErrorBox(this, "todo", "todo");
 	/*song->action_manager->beginActionGroup();
 
 	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
-		song->deleteBar(i, view->bars_edit_data);
+	song->deleteBar(i, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();*/
 }
 
-void TsunamiWindow::on_insert_time_interval()
-{
+void TsunamiWindow::on_insert_time_interval() {
 	hui::ErrorBox(this, "todo", "todo");
 	/*song->action_manager->beginActionGroup();
 
 	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
-		song->deleteBar(i, view->bars_edit_data);
+	song->deleteBar(i, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();*/
 }
 
-void TsunamiWindow::on_edit_bars()
-{
-	if (view->sel.bars.num == 0){
+void TsunamiWindow::on_edit_bars() {
+	if (view->sel.bars.num == 0) {
 		return;
 	}
 	int num_bars = 0;
 	int num_pauses = 0;
-	for (int i: view->sel.bar_indices(song)){
+	for (int i: view->sel.bar_indices(song)) {
 		if (song->bars[i]->is_pause())
-			num_pauses ++;
+			num_pauses++;
 		else
-			num_bars ++;
+			num_bars++;
 	}
-	if (num_bars > 0 and num_pauses == 0){
+	if (num_bars > 0 and num_pauses == 0) {
 		auto *dlg = new BarEditDialog(win, song, view->sel.bar_indices(song));
 		dlg->run();
 		delete dlg;
-	}else if (num_bars == 0 and num_pauses == 1){
+	} else if (num_bars == 0 and num_pauses == 1) {
 		auto *dlg = new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]);
 		dlg->run();
 		delete dlg;
-	}else{
+	} else {
 		hui::ErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
 	}
 }
 
-void TsunamiWindow::on_scale_bars()
-{
+void TsunamiWindow::on_scale_bars() {
 	session->set_mode("scale-bars");
 }

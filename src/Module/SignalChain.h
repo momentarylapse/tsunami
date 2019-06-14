@@ -36,8 +36,6 @@ public:
 	void save(const string &filename);
 	static SignalChain *load(Session *session, const string &filename);
 
-	void create_default_modules();
-
 	string name;
 
 	Array<Module*> modules;

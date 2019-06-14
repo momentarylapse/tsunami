@@ -21,9 +21,6 @@ class DeviceManager;
 class PluginManager;
 class PerformanceMonitor;
 class SignalChain;
-class SongRenderer;
-class PeakMeter;
-class AudioOutput;
 namespace hui {
 	class Window;
 }
@@ -53,10 +50,6 @@ public:
 
 	string storage_options;
 
-	SignalChain *signal_chain;
-	SongRenderer *song_renderer;
-	PeakMeter *peak_meter;
-	AudioOutput *output_stream;
 	Array<SignalChain*> all_signal_chains;
 	SignalChain* add_signal_chain(const string &name);
 	SignalChain* add_signal_chain_system(const string &name);

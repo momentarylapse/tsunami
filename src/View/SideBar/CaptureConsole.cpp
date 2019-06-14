@@ -53,16 +53,14 @@ CaptureConsole::CaptureConsole(Session *session):
 	mode_multi = new CaptureConsoleModeMulti(this);
 }
 
-CaptureConsole::~CaptureConsole()
-{
-	delete(mode_audio);
-	delete(mode_midi);
-	delete(mode_multi);
-	delete(peak_meter);
+CaptureConsole::~CaptureConsole() {
+	delete mode_audio;
+	delete mode_midi;
+	delete mode_multi;
+	delete peak_meter;
 }
 
-void CaptureConsole::on_enter()
-{
+void CaptureConsole::on_enter() {
 	hide_control("single_grid", true);
 	hide_control("multi_grid", true);
 
@@ -81,11 +79,11 @@ void CaptureConsole::on_enter()
 				num_midi ++;
 		}
 
-	if ((num_audio == 1) and (num_midi == 0)){
+	if ((num_audio == 1) and (num_midi == 0)) {
 		mode = mode_audio;
-	}else if ((num_audio == 0) and (num_midi == 1)){
+	} else if ((num_audio == 0) and (num_midi == 1)) {
 		mode = mode_midi;
-	}else{ // TYPE_TIME
+	} else { // TYPE_TIME
 		mode = mode_multi;
 	}
 
@@ -93,28 +91,26 @@ void CaptureConsole::on_enter()
 	chain = mode->chain;
 	view->mode_capture->chain = mode->chain;
 
-	session->signal_chain->subscribe(this, [=]{ on_putput_tick(); }, Module::MESSAGE_TICK);
-	session->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	view->signal_chain->subscribe(this, [=]{ on_putput_tick(); }, Module::MESSAGE_TICK);
+	view->signal_chain->subscribe(this, [=]{ on_output_end_of_stream(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
 
 	// automatically start
 	if (num_audio + num_midi == 1)
 		on_start();
 }
 
-void CaptureConsole::on_leave()
-{
+void CaptureConsole::on_leave() {
 	view->mode_capture->set_data({});
 	chain = nullptr;
 	view->mode_capture->chain = nullptr;
-	session->signal_chain->unsubscribe(this);
+	view->signal_chain->unsubscribe(this);
 
 	view->stop();
 
 	mode->leave();
 }
 
-bool CaptureConsole::allow_close()
-{
+bool CaptureConsole::allow_close() {
 	if (!has_data())
 		return true;
 
@@ -123,10 +119,9 @@ bool CaptureConsole::allow_close()
 }
 
 
-void CaptureConsole::on_start()
-{
-	if (state == State::PAUSED){
-	}else{
+void CaptureConsole::on_start() {
+	if (state == State::PAUSED) {
+	} else {
 		view->prepare_playback(view->get_playback_selection(true), false);
 	}
 
@@ -140,8 +135,7 @@ void CaptureConsole::on_start()
 	state = State::CAPTURING;
 }
 
-void CaptureConsole::on_dump()
-{
+void CaptureConsole::on_dump() {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
@@ -154,8 +148,7 @@ void CaptureConsole::on_dump()
 	state = State::EMPTY;
 }
 
-void CaptureConsole::on_pause()
-{
+void CaptureConsole::on_pause() {
 	// TODO...
 	view->signal_chain->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
@@ -166,8 +159,7 @@ void CaptureConsole::on_pause()
 }
 
 
-void CaptureConsole::on_ok()
-{
+void CaptureConsole::on_ok() {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	if (has_data())
@@ -175,15 +167,13 @@ void CaptureConsole::on_ok()
 	session->set_mode("default");
 }
 
-void CaptureConsole::on_cancel()
-{
+void CaptureConsole::on_cancel() {
 	//on_dump();
 	session->set_mode("default");
 }
 
-void CaptureConsole::on_new_version()
-{
-	if (has_data()){
+void CaptureConsole::on_new_version() {
+	if (has_data()) {
 		view->stop();
 		chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 		view->mode_capture->insert();
@@ -192,16 +182,14 @@ void CaptureConsole::on_new_version()
 	on_start();
 }
 
-void CaptureConsole::update_time()
-{
+void CaptureConsole::update_time() {
 	if (!chain)
 		return;
 	int s = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
 	set_string("time", song->get_time_str_long(s));
 }
 
-void CaptureConsole::on_output_end_of_stream()
-{
+void CaptureConsole::on_output_end_of_stream() {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
 	enable("start", true);
@@ -210,13 +198,11 @@ void CaptureConsole::on_output_end_of_stream()
 	state = State::PAUSED;
 }
 
-void CaptureConsole::on_putput_tick()
-{
+void CaptureConsole::on_putput_tick() {
 	update_time();
 }
 
-bool CaptureConsole::has_data()
-{
+bool CaptureConsole::has_data() {
 	return state != State::EMPTY;
 }
 

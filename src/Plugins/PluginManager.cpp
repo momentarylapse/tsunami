@@ -162,9 +162,6 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("Session", "win", _offsetof(Session, _kaba_win));
 	Kaba::DeclareClassOffset("Session", "view", _offsetof(Session, view));
 	Kaba::DeclareClassOffset("Session", "song", _offsetof(Session, song));
-	Kaba::DeclareClassOffset("Session", "signal_chain", _offsetof(Session, signal_chain));
-	Kaba::DeclareClassOffset("Session", "song_renderer", _offsetof(Session, song_renderer));
-	Kaba::DeclareClassOffset("Session", "output_stream", _offsetof(Session, output_stream));
 	Kaba::LinkExternal("Session.sample_rate", Kaba::mf(&Session::sample_rate));
 	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
 	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
@@ -587,7 +584,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
 	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
-	//Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
+	Kaba::DeclareClassOffset("AudioView", "signal_chain", _offsetof(AudioView, signal_chain));
+	Kaba::DeclareClassOffset("AudioView", "output_stream", _offsetof(AudioView, output_stream));
 	Kaba::LinkExternal("AudioView.subscribe", Kaba::mf(&AudioView::subscribe_kaba));
 	Kaba::LinkExternal("AudioView.unsubscribe", Kaba::mf(&AudioView::unsubscribe));
 

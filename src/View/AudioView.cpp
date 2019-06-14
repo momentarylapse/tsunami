@@ -220,9 +220,15 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	peak_thread = nullptr;
 	draw_runner_id = -1;
 
-	signal_chain = session->signal_chain;
-	renderer = session->song_renderer;
-	peak_meter = session->peak_meter;
+
+	signal_chain = session->add_signal_chain_system("playback");
+	renderer = (SongRenderer*)signal_chain->add(ModuleType::AUDIO_SOURCE, "SongRenderer");
+	peak_meter = (PeakMeter*)signal_chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
+	output_stream = (AudioOutput*)signal_chain->add(ModuleType::STREAM, "AudioOutput");
+	signal_chain->connect(renderer, 0, peak_meter, 0);
+	signal_chain->connect(peak_meter, 0, output_stream, 0);
+	signal_chain->mark_all_modules_as_system();
+
 	signal_chain->subscribe(this, [=]{ on_stream_tick(); }, Module::MESSAGE_TICK);
 	signal_chain->subscribe(this, [=]{ on_stream_state_change(); }, Module::MESSAGE_STATE_CHANGE);
 
@@ -305,6 +311,8 @@ AudioView::~AudioView() {
 	delete images.track_midi_bg;
 	delete images.track_time;
 	delete images.track_time_bg;
+
+	delete signal_chain;
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
@@ -1345,7 +1353,7 @@ void AudioView::playback_click() {
 
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(hover.pos)) {
-			session->signal_chain->set_pos(hover.pos);
+			signal_chain->set_pos(hover.pos);
 			hover.type = HoverData::Type::PLAYBACK_CURSOR;
 			force_redraw();
 		} else {

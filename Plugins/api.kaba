@@ -487,6 +487,8 @@ class ColorScheme
 class AudioView
 	SongSelection sel
 	SongRenderer* renderer
+	SignalChain* signal_chain
+	OutputStream* output_stream
 	//InputStreamAny* input
 	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
@@ -557,9 +559,6 @@ class Session
 	//TsunamiWindow* win
 	Window* win
 	Song* song
-	SignalChain* signal_chain
-	SongRenderer* song_renderer
-	OutputStream* output_stream
 	AudioView* view
 	Storage* storage
 	

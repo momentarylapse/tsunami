@@ -28,11 +28,9 @@
 
 extern const int CONFIG_PANEL_WIDTH;
 
-class TrackMixer: public hui::Panel
-{
+class TrackMixer: public hui::Panel {
 public:
-	TrackMixer(AudioViewTrack *t, MixingConsole *c)
-	{
+	TrackMixer(AudioViewTrack *t, MixingConsole *c) {
 		set_border_width(0);
 		from_resource("track-mixer2");
 
@@ -81,15 +79,13 @@ public:
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
 		update();
 	}
-	~TrackMixer()
-	{
+	~TrackMixer() {
 		clear_track();
 	}
 
-	void on_volume()
-	{
+	void on_volume() {
 		editing = true;
-		if (track){
+		if (track) {
 			if (parent->is_checked("link-volumes"))
 				track->song->change_all_track_volumes(track, slider2vol(get_float("")));
 			else
@@ -99,38 +95,31 @@ public:
 	}
 
 	// allow update() for mute/solo!
-	void on_mute()
-	{
+	void on_mute() {
 		if (vtrack)
 			vtrack->set_muted(is_checked(""));
 	}
-	void on_solo()
-	{
+	void on_solo() {
 		if (vtrack)
 			vtrack->set_solo(is_checked(""));
 	}
 
-	void on_panning()
-	{
+	void on_panning() {
 		editing = true;
 		if (vtrack)
 			vtrack->set_panning(get_float(""));
 		editing = false;
 	}
-	void clear_track()
-	{
+	void clear_track() {
 		if (vtrack)
 			vtrack->unsubscribe(this);
 		vtrack = nullptr;
 		track = nullptr;
 	}
-	void on_vtrack_delete()
-	{
+	void on_vtrack_delete() {
 		clear_track();
-
 	}
-	void set_mode(MixerMode mode)
-	{
+	void set_mode(MixerMode mode) {
 		hide_control("grid-volume", mode != MixerMode::VOLUME);
 		hide_control("grid-fx", mode != MixerMode::EFFECTS);
 		hide_control("grid-midi-fx", mode != MixerMode::MIDI_EFFECTS);
@@ -138,74 +127,64 @@ public:
 		reveal("revealer-fx", mode == MixerMode::EFFECTS);
 		reveal("revealer-midi-fx", mode == MixerMode::MIDI_EFFECTS);
 	}
-	void on_fx_select()
-	{
+	void on_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
 			console->select_module(track->fx[n]);
 		else
 			console->select_module(nullptr);
 	}
-	void on_fx_edit()
-	{
+	void on_fx_edit() {
 		int n = hui::GetEvent()->row;
 		if (n >= 0)
 			track->enable_effect(track->fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
 	}
-	void on_fx_move()
-	{
+	void on_fx_move() {
 		int s = hui::GetEvent()->row;
 		int t = hui::GetEvent()->row_target;
 		track->move_effect(s, t);
 	}
-	void on_add_fx()
-	{
+	void on_add_fx() {
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
 		if (name == "")
 			return;
 		auto *effect = CreateAudioEffect(console->session, name);
 		track->add_effect(effect);
 	}
-	void on_midi_fx_select()
-	{
+	void on_midi_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
 			console->select_module(track->midi_fx[n]);
 		else
 			console->select_module(nullptr);
 	}
-	void on_midi_fx_edit()
-	{
+	void on_midi_fx_edit() {
 		int n = hui::GetEvent()->row;
 		if (n >= 0)
 			track->enable_midi_effect(track->midi_fx[n], get_cell("", n, hui::GetEvent()->column)._bool());
 	}
-	void on_midi_fx_move()
-	{
+	void on_midi_fx_move() {
 		int s = hui::GetEvent()->row;
 		int t = hui::GetEvent()->row_target;
 		track->move_midi_effect(s, t);
 	}
-	void on_add_midi_fx()
-	{
+	void on_add_midi_fx() {
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::MIDI_EFFECT);
 		if (name == "")
 			return;
 		auto *effect = CreateMidiEffect(console->session, name);
 		track->add_midi_effect(effect);
 	}
-	void on_peak_draw(Painter* p)
-	{
+	void on_peak_draw(Painter* p) {
 		int w = p->width;
 		int h = p->height;
 		p->set_color(AudioView::colors.background);
-		p->draw_rect(0,0,w,h);
+		p->draw_rect(0, 0, w, h);
 		p->set_color(AudioView::colors.text);
-		float f = sqrt(console->session->song_renderer->get_peak(track));
-		p->draw_rect(0,h * (1-f),w,h*f);
+		float f = sqrt(console->view->renderer->get_peak(track));
+		p->draw_rect(0, h * (1 - f), w, h * f);
 	}
-	void update()
-	{
+	void update() {
 		if (!vtrack)
 			return;
 		if (editing)
@@ -239,20 +218,16 @@ public:
 	static constexpr float DB_MAX = 10;
 	static constexpr float TAN_SCALE = 10.0f;
 
-	static float db2slider(float db)
-	{
+	static float db2slider(float db) {
 		return (atan(db / TAN_SCALE) - atan(DB_MIN / TAN_SCALE)) / (atan(DB_MAX / TAN_SCALE) - atan(DB_MIN / TAN_SCALE));
 	}
-	static float slider2db(float val)
-	{
+	static float slider2db(float val) {
 		return tan(atan(DB_MIN / TAN_SCALE) + val * (atan(DB_MAX / TAN_SCALE)- atan(DB_MIN / TAN_SCALE))) * TAN_SCALE;
 	}
-	static float vol2slider(float vol)
-	{
+	static float vol2slider(float vol) {
 		return db2slider(amplitude2db(vol));
 	}
-	static float slider2vol(float val)
-	{
+	static float slider2vol(float val) {
 		return db2amplitude(slider2db(val));
 	}
 
@@ -277,8 +252,7 @@ public:
 class ModulePanel : public hui::Panel
 {
 public:
-	ModulePanel(Session *_session, MixingConsole *_console, Module *_m, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit)
-	{
+	ModulePanel(Session *_session, MixingConsole *_console, Module *_m, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit) {
 		session = _session;
 		console = _console;
 		module = _m;
@@ -292,10 +266,10 @@ public:
 		set_string("name", module->module_subtype);
 
 		p = module->create_panel();
-		if (p){
+		if (p) {
 			embed(p, "content", 0, 0);
 			p->update();
-		}else{
+		} else {
 			set_target("content");
 			add_label(_("not configurable"), 0, 1, "");
 			hide_control("load_favorite", true);
@@ -315,12 +289,10 @@ public:
 		module->subscribe(this, [=]{ on_fx_change(); }, module->MESSAGE_CHANGE);
 		module->subscribe(this, [=]{ on_fx_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
 	}
-	virtual ~ModulePanel()
-	{
+	virtual ~ModulePanel() {
 		module->unsubscribe(this);
 	}
-	void on_load()
-	{
+	void on_load() {
 		string name = session->plugin_manager->select_favorite_name(win, module, false);
 		if (name.num == 0)
 			return;
@@ -328,29 +300,24 @@ public:
 		func_edit(old_param);
 		old_param = module->config_to_string();
 	}
-	void on_save()
-	{
+	void on_save() {
 		string name = session->plugin_manager->select_favorite_name(win, module, true);
 		if (name.num == 0)
 			return;
 		session->plugin_manager->save_favorite(module, name);
 	}
-	void on_enabled()
-	{
+	void on_enabled() {
 		func_enable(is_checked(""));
 	}
-	void on_delete()
-	{
+	void on_delete() {
 		hui::RunLater(0, func_delete);
 	}
-	void on_large()
-	{
+	void on_large() {
 		//console->set_exclusive(this);
 		p->set_large(true);
 
 	}
-	void on_fx_change()
-	{
+	void on_fx_change() {
 		func_edit(old_param);
 		check("enabled", module->enabled);
 		if (p)
@@ -358,8 +325,7 @@ public:
 		old_param = module->config_to_string();
 
 	}
-	void on_fx_change_by_action()
-	{
+	void on_fx_change_by_action() {
 		check("enabled", module->enabled);
 		if (p)
 			p->update();
@@ -410,12 +376,12 @@ MixingConsole::MixingConsole(Session *session) :
 
 
 	peak_runner_id = -1;
-	session->signal_chain->subscribe(this, [=]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
+	view->signal_chain->subscribe(this, [=]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
 }
 
 MixingConsole::~MixingConsole()
 {
-	session->signal_chain->unsubscribe(this);
+	view->signal_chain->unsubscribe(this);
 	if (peak_runner_id >= 0)
 		hui::CancelRunner(peak_runner_id);
 	//song->unsubscribe(this);
@@ -428,27 +394,24 @@ MixingConsole::~MixingConsole()
 	delete spectrum_meter;
 }
 
-void MixingConsole::on_chain_state_change()
-{
-	if (peak_runner_id and !session->signal_chain->is_playback_active()){
+void MixingConsole::on_chain_state_change() {
+	if (peak_runner_id and !view->signal_chain->is_playback_active()) {
 		hui::CancelRunner(peak_runner_id);
 		peak_runner_id = -1;
 		// clear
-		session->song_renderer->clear_peaks();
+		view->renderer->clear_peaks();
 		for (auto *m: mixer)
 			m->redraw("peaks");
-	}else if (peak_runner_id == -1 and session->signal_chain->is_playback_active()){
+	} else if (peak_runner_id == -1 and view->signal_chain->is_playback_active()) {
 		peak_runner_id = hui::RunRepeated(0.1f, [=]{ for (auto *m: mixer) m->redraw("peaks"); });
 	}
 }
 
-void MixingConsole::on_output_volume()
-{
+void MixingConsole::on_output_volume() {
 	device_manager->set_output_volume(get_float(""));
 }
 
-void MixingConsole::set_mode(MixerMode _mode)
-{
+void MixingConsole::set_mode(MixerMode _mode) {
 	mode = _mode;
 	for (auto *m: mixer)
 		m->set_mode(mode);
@@ -457,11 +420,10 @@ void MixingConsole::set_mode(MixerMode _mode)
 	check("show-midi-fx", mode == MixerMode::MIDI_EFFECTS);
 }
 
-void MixingConsole::load_data()
-{
+void MixingConsole::load_data() {
 	// how many TrackMixers still match?
 	int n_ok = 0;
-	foreachi (auto *m, mixer, i){
+	foreachi (auto *m, mixer, i) {
 		if (!m->vtrack)
 			break;
 		if (i >= view->vtrack.num)
@@ -472,15 +434,15 @@ void MixingConsole::load_data()
 	}
 
 	// delete non-matching
-	for (int i=n_ok; i<mixer.num; i++){
+	for (int i=n_ok; i<mixer.num; i++) {
 		delete mixer[i];
 		remove_control("separator-" + i2s(i));
 	}
 	mixer.resize(n_ok);
 
 	// add new
-	foreachi(AudioViewTrack *t, view->vtrack, i){
-		if (i >= n_ok){
+	foreachi(auto *t, view->vtrack, i) {
+		if (i >= n_ok) {
 			TrackMixer *m = new TrackMixer(t, this);
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
@@ -492,13 +454,11 @@ void MixingConsole::load_data()
 	hide_control("link-volumes", mixer.num <= 1);
 }
 
-void MixingConsole::on_update_device_manager()
-{
+void MixingConsole::on_update_device_manager() {
 	set_float("output-volume", device_manager->get_output_volume());
 }
 
-void MixingConsole::on_tracks_change()
-{
+void MixingConsole::on_tracks_change() {
 	load_data();
 }
 
@@ -551,20 +511,17 @@ void MixingConsole::select_module(Module *m) {
 			m->set_int("fx", -1);
 }
 
-void MixingConsole::update_all()
-{
+void MixingConsole::update_all() {
 	for (auto *m: mixer)
 		m->update();
 }
 
-void MixingConsole::on_show()
-{
+void MixingConsole::on_show() {
 	peak_meter->enable(true);
 	spectrum_meter->enable(true);
 }
 
-void MixingConsole::on_hide()
-{
+void MixingConsole::on_hide() {
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
 }

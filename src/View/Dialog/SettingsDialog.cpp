@@ -18,9 +18,7 @@
 #include "../../Module/SignalChain.h"
 #include "../../Stream/AudioOutput.h"
 
-
-struct ApiDescription
-{
+struct ApiDescription {
 	string name;
 	DeviceManager::ApiType type;
 	int mode;
@@ -28,9 +26,8 @@ struct ApiDescription
 };
 extern ApiDescription api_descriptions[];
 
-SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
-	hui::Window("settings_dialog", _parent)
-{
+SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
+		hui::Window("settings_dialog", _parent) {
 	view = _view;
 	event("language", [=]{ on_language(); });
 	event("color_scheme", [=]{ on_color_scheme(); });
@@ -50,7 +47,6 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 
 	set_options("default_artist", "placeholder=" + AppName);
 
-
 	set_options("quick_export_dir", "placeholder=" + hui::Application::directory);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
@@ -69,18 +65,17 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent):
 
 }
 
-void SettingsDialog::load_data()
-{
+void SettingsDialog::load_data() {
 	// language
 	Array<string> lang = hui::GetLanguages();
-	foreachi(string &l, lang, i){
+	foreachi(string &l, lang, i) {
 		add_string("language", l);
 		if (l == hui::GetCurLanguage())
 			set_int("language", i);
 	}
 
 	// color scheme
-	foreachi(auto &b, view->basic_schemes, i){
+	foreachi(auto &b, view->basic_schemes, i) {
 		add_string("color_scheme", b.name);
 		if (b.name == view->colors.name)
 			set_int("color_scheme", i);
@@ -103,127 +98,113 @@ void SettingsDialog::load_data()
 	set_float("scroll_speed", view->mouse_wheel_speed);
 
 	int n_audio = 0, n_midi = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;
-		if (a.mode & 1){
+		if (a.mode & 1) {
 			add_string("audio_api", a.name);
 			if (a.type == Session::GLOBAL->device_manager->audio_api)
 				set_int("audio_api", n_audio);
-			n_audio ++;
+			n_audio++;
 		}
-		if (a.mode & 2){
+		if (a.mode & 2) {
 			add_string("midi_api", a.name);
 			if (a.type == Session::GLOBAL->device_manager->midi_api)
 				set_int("midi_api", n_midi);
-			n_midi ++;
+			n_midi++;
 		}
 	}
 	set_int("prebuffer_size", hui::Config.get_int("Output.BufferSize", AudioOutput::DEFAULT_PREBUFFER_SIZE));
 	set_int("suck_size", hui::Config.get_int("SignalChain.BufferSize", SignalChain::DEFAULT_BUFFER_SIZE));
 }
 
-void SettingsDialog::applyData()
-{
+void SettingsDialog::applyData() {
 }
 
-void SettingsDialog::on_language()
-{
+void SettingsDialog::on_language() {
 	Array<string> lang = hui::GetLanguages();
 	int l = get_int("");
 	hui::SetLanguage(lang[l]);
 	hui::Config.set_str("Language", lang[l]);
 }
 
-void SettingsDialog::on_color_scheme()
-{
+void SettingsDialog::on_color_scheme() {
 	int i = get_int("");
 	if ((i >= 0) and (i < view->basic_schemes.num))
 		view->set_color_scheme(view->basic_schemes[i].name);
 }
 
-void SettingsDialog::on_ogg_bitrate()
-{
+void SettingsDialog::on_ogg_bitrate() {
 	hui::Config.set_float("OggQuality", ogg_quality[get_int("")].quality);
 }
 
-void SettingsDialog::on_default_artist()
-{
+void SettingsDialog::on_default_artist() {
 	hui::Config.set_str("DefaultArtist", get_string(""));
 }
 
-void SettingsDialog::on_scroll_speed()
-{
+void SettingsDialog::on_scroll_speed() {
 	view->set_mouse_wheel_speed(get_float(""));
 }
 
-void SettingsDialog::on_audio_api()
-{
+void SettingsDialog::on_audio_api() {
 	int n = get_int("");
 	int n_audio = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;
-		if (a.mode & 1){
+		if (a.mode & 1) {
 			if (n_audio == n)
 				hui::Config.set_str("AudioApi", a.name);
-			n_audio ++;
+			n_audio++;
 		}
 	}
 }
 
-void SettingsDialog::on_midi_api()
-{
+void SettingsDialog::on_midi_api() {
 	int n = get_int("");
 	int n_midi = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++){
+	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
 		auto &a = api_descriptions[i];
 		if (!a.available)
 			continue;
-		if (a.mode & 2){
+		if (a.mode & 2) {
 			if (n_midi == n)
 				hui::Config.set_str("MidiApi", a.name);
-			n_midi ++;
+			n_midi++;
 		}
 	}
 }
 
-void SettingsDialog::on_prebuffer()
-{
+void SettingsDialog::on_prebuffer() {
 	int n = get_int("");
 	hui::Config.set_int("Output.BufferSize", n);
-	view->session->output_stream->set_prebuffer_size(n);
+	view->output_stream->set_prebuffer_size(n);
 }
 
-void SettingsDialog::on_suck_buffer()
-{
+void SettingsDialog::on_suck_buffer() {
 	int n = get_int("");
 	hui::Config.set_int("SignalChain.BufferSize", n);
 	view->signal_chain->set_buffer_size(n);
 }
 
-void SettingsDialog::on_cpu_meter()
-{
+void SettingsDialog::on_cpu_meter() {
 	bool show = is_checked("");
 	hui::Config.set_bool("CpuDisplay", show);
 	view->win->mini_bar->cpu_display->panel->hide_control(view->win->mini_bar->cpu_display->id, !show);
 }
 
-void SettingsDialog::on_antialiasing()
-{
+void SettingsDialog::on_antialiasing() {
 	view->set_antialiasing(is_checked(""));
 }
 
-void SettingsDialog::on_high_details()
-{
+void SettingsDialog::on_high_details() {
 	view->set_high_details(is_checked(""));
 }
 
-void SettingsDialog::on_qed_find()
-{
-	if (hui::FileDialogDir(this, _("Quick export directory"), "")){
+void SettingsDialog::on_qed_find() {
+	if (hui::FileDialogDir(this, _("Quick export directory"), "")) {
 		hui::Config.set_str("QuickExportDir", hui::Filename);
 		set_string("quick_export_dir", hui::Filename);
 	}

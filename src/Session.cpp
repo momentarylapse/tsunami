@@ -39,11 +39,6 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	song = nullptr;
 	storage = new Storage(this);
 
-	signal_chain = nullptr;
-	song_renderer = nullptr;
-	peak_meter = nullptr;
-	output_stream = nullptr;
-
 	log = _log;
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
@@ -56,11 +51,9 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 }
 
 Session::~Session() {
-	if (signal_chain)
-		delete(signal_chain);
 	if (song)
-		delete(song);
-	delete(storage);
+		delete song;
+	delete storage;
 }
 
 int Session::sample_rate() {

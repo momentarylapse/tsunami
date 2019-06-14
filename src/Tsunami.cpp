@@ -29,7 +29,7 @@
 
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.91.0";
+const string AppVersion = "0.7.91.1";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *tsunami = nullptr;
@@ -184,7 +184,8 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 			return true;
 		}
 		if (session == Session::GLOBAL)
-			session = create_session(args[i+1]);
+			session = create_session();
+		//session->add_signal_chain(args[i+1]);
 		session->win->show();
 		i ++;
 	} else if (args[i] == "--slow") {
@@ -210,22 +211,10 @@ bool Tsunami::handle_arguments(Array<string> &args) {
 	return false;
 }
 
-Session* Tsunami::create_session(const string &chain_filename) {
+Session* Tsunami::create_session() {
 	Session *session = new Session(log, device_manager, plugin_manager, perf_mon);
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
-
-	if (chain_filename.num > 0) {
-		session->signal_chain = SignalChain::load(session, chain_filename);
-		session->all_signal_chains.add(session->signal_chain);
-	} else {
-		session->signal_chain = session->add_signal_chain_system("playback");
-	}
-	session->signal_chain->create_default_modules();
-	session->song_renderer = (SongRenderer*)session->signal_chain->get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
-	session->peak_meter = (PeakMeter*)session->signal_chain->get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	session->output_stream = (AudioOutput*)session->signal_chain->get_by_type(ModuleType::STREAM, "AudioOutput");
-	session->signal_chain->mark_all_modules_as_system();
 
 	session->set_win(new TsunamiWindow(session));
 	session->win->auto_delete = true;

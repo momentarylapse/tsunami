@@ -110,23 +110,6 @@ void SignalChain::set_tick_dt(float dt) {
 	tick_dt = dt;
 }
 
-void SignalChain::create_default_modules() {
-	auto *renderer = get_by_type(ModuleType::AUDIO_SOURCE, "SongRenderer");
-	if (!renderer)
-		renderer = add(ModuleType::AUDIO_SOURCE, "SongRenderer");
-	auto *peak = get_by_type(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	if (!peak)
-		peak = add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
-	auto *output = get_by_type(ModuleType::STREAM, "AudioOutput");
-	if (!output)
-		output = add(ModuleType::STREAM, "AudioOutput");
-
-//	if (!from_source(renderer, 0) and !to_target(peak, 0))
-		connect(renderer, 0, peak, 0);
-//	if (!from_source(peak, 0) and !to_target(output, 0))
-		connect(peak, 0, output, 0);
-}
-
 Module *SignalChain::_add(Module *m) {
 	int i = modules.num;
 	m->module_x = 50 + (i % 5) * 230;

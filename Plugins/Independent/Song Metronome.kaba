@@ -100,7 +100,7 @@ Grid ? '' vertical
 		float y0 = h / 2
 		float r = min(x0, y0) * 0.9
 		
-		BeatSource* source = metro.session.song_renderer.get_beat_source()
+		BeatSource* source = metro.session.view.renderer.get_beat_source()
 		if !source
 			return
 		
@@ -266,8 +266,8 @@ class Metronome extends TsunamiPlugin
 	
 	override void on_start()
 		
-		session.signal_chain.set_update_dt(UPDATE_DT)
-		session.signal_chain.set_buffer_size(1024)
+		session.view.signal_chain.set_update_dt(UPDATE_DT)
+		session.view.signal_chain.set_buffer_size(1024)
 			
 	override ConfigPanel* create_panel()
 		return new MetronomePanel(session, self)

@@ -228,6 +228,7 @@ public:
 	SignalChain *signal_chain;
 	SongRenderer *renderer;
 	PeakMeter *peak_meter;
+	AudioOutput *output_stream;
 	bool playback_loop;
 	void set_playback_loop(bool loop);
 	void play();

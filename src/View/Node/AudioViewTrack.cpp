@@ -26,7 +26,8 @@
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
-AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode(_view) { //_view->scene_graph, 0, 0, 0, 0) {
+AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode() { //_view->scene_graph, 0, 0, 0, 0) {
+	view = _view;
 	track = _track;
 	solo = false;
 

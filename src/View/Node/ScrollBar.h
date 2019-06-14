@@ -12,10 +12,11 @@
 #include "ViewNode.h"
 
 class Painter;
+class AudioView;
 
 class ScrollBar : public ViewNode {
 public:
-	ScrollBar(ViewNode *parent);
+	ScrollBar(AudioView *view, ViewNode *parent);
 	//ScrollBar(AudioView *view);
 	bool constrained = true;
 	float offset = 0;
@@ -30,13 +31,14 @@ public:
 
 	bool on_left_button_down() override;
 
+	AudioView *view;
 	std::function<void()> callback;
 	void set_callback(std::function<void()> callback);
 };
 
 class ScrollBarHorizontal : public ScrollBar {
 public:
-	ScrollBarHorizontal(ViewNode *parent);
+	ScrollBarHorizontal(AudioView *view, ViewNode *parent);
 };
 
 #endif /* SRC_VIEW_NODE_SCROLLBAR_H_ */

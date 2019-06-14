@@ -10,6 +10,8 @@
 
 #include "ViewNode.h"
 
+class AudioView;
+
 class SceneGraph : public ViewNode {
 public:
 	SceneGraph(AudioView *view);
@@ -28,6 +30,8 @@ public:
 	void draw(Painter *p) override;
 
 	string get_tip() override;
+
+	AudioView *view;
 };
 
 #endif /* SRC_VIEW_NODE_SCENEGRAPH_H_ */

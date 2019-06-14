@@ -32,8 +32,7 @@ class LayerHeader;
 class ScrollBar;
 
 
-class AudioViewLayer : public ViewNode
-{
+class AudioViewLayer : public ViewNode {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;
@@ -73,6 +72,7 @@ public:
 
 	GridColors grid_colors();
 
+	AudioView *view;
 	TrackLayer *layer;
 	rect area_last, area_target;
 	int height_wish, height_min;

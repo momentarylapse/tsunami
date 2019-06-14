@@ -10,6 +10,8 @@
 
 #include "ViewNode.h"
 
+class AudioView;
+
 class Background : public ViewNode {
 public:
 	Background(AudioView *view);
@@ -20,6 +22,7 @@ public:
 
 	void draw(Painter *p) override;
 
+	AudioView *view;
 	HoverData get_hover_data(float mx, float my) override;
 };
 

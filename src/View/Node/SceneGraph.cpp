@@ -43,7 +43,9 @@ Array<ViewNode*> collect_children_down(ViewNode *n) {
 }
 
 
-SceneGraph::SceneGraph(AudioView *view) : ViewNode(view) {}
+SceneGraph::SceneGraph(AudioView *_view) {
+	view = _view;
+}
 
 bool SceneGraph::on_left_button_down() {
 	auto nodes = collect_children_down(this);

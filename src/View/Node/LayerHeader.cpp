@@ -18,8 +18,7 @@
 
 
 
-class LayerHeaderButton : public ViewNode
-{
+class LayerHeaderButton : public ViewNode {
 public:
 	AudioViewLayer *vlayer;
 	LayerHeader *header;
@@ -33,14 +32,14 @@ public:
 		return h;
 	}
 	color get_color() {
+		auto *view = vlayer->view;
 		if (view_hover(view->hover))
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
 };
 
-class LayerButtonMute: public LayerHeaderButton
-{
+class LayerButtonMute: public LayerHeaderButton {
 public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
@@ -53,14 +52,13 @@ public:
 	}
 };
 
-class LayerButtonSolo: public LayerHeaderButton
-{
+class LayerButtonSolo: public LayerHeaderButton {
 public:
 	LayerButtonSolo(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1, area.y1, "S");
-		c->draw_mask_image(area.x1, area.y1, *view->images.solo);
+		c->draw_mask_image(area.x1, area.y1, *vlayer->view->images.solo);
 	}
 	bool on_left_button_down() override {
 		vlayer->set_solo(!vlayer->solo);
@@ -73,8 +71,7 @@ public:
 
 //_("make main version")...
 
-class LayerButtonExplode: public LayerHeaderButton
-{
+class LayerButtonExplode: public LayerHeaderButton {
 public:
 	LayerButtonExplode(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
@@ -86,9 +83,9 @@ public:
 	}
 	bool on_left_button_down() override {
 		if (vlayer->represents_imploded)
-			view->explode_track(vlayer->layer->track);
+			vlayer->view->explode_track(vlayer->layer->track);
 		else
-			view->implode_track(vlayer->layer->track);
+			vlayer->view->implode_track(vlayer->layer->track);
 		return true;
 	}
 	string get_tip() override {
@@ -109,6 +106,7 @@ LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNode(l, 0, 0, AudioView::LAYER
 
 void LayerHeader::draw(Painter *c) {
 
+	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
 	bool _hover = view_hover(view->hover);
 	bool extended = _hover or view->editing_layer(vlayer);
@@ -167,6 +165,7 @@ void LayerHeader::draw(Painter *c) {
 }
 
 bool LayerHeader::on_left_button_down() {
+	auto *view = vlayer->view;
 	if (view->select_xor) {
 		view->toggle_select_layer_with_content_in_cursor(vlayer);
 	} else {
@@ -180,6 +179,7 @@ bool LayerHeader::on_left_button_down() {
 }
 
 bool LayerHeader::on_right_button_down() {
+	auto *view = vlayer->view;
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);
 		view->select_under_cursor();
@@ -188,6 +188,7 @@ bool LayerHeader::on_right_button_down() {
 	return true;
 }
 HoverData LayerHeader::get_hover_data(float mx, float my) {
+	auto *view = vlayer->view;
 	auto h = ViewNode::get_hover_data(mx, my);
 	h.vtrack = view->get_track(vlayer->layer->track);
 	h.vlayer = vlayer;

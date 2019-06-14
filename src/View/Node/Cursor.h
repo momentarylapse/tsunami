@@ -11,6 +11,8 @@
 #include "ViewNode.h"
 #include "../../Data/Range.h"
 
+class AudioView;
+
 class Cursor : public ViewNode {
 public:
 	Cursor(AudioView *view, bool end);
@@ -21,6 +23,7 @@ public:
 
 	int pos();
 
+	AudioView *view;
 	Range drag_range;
 	int is_end;
 
@@ -32,6 +35,7 @@ public:
 	SelectionMarker(AudioView *view);
 	bool hover(float mx, float my) override { return false; }
 
+	AudioView *view;
 	void draw(Painter *p) override;
 };
 

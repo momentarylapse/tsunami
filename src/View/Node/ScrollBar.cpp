@@ -8,13 +8,14 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
-ScrollBar::ScrollBar(ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
+ScrollBar::ScrollBar(AudioView *_view, ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
 	//node_width = AudioView::SCROLLBAR_WIDTH;
 	//node_height = 100;
 	//node_align_right = true;
 	z += 10;
+	view = _view;
 }
-ScrollBarHorizontal::ScrollBarHorizontal(ViewNode *parent) : ScrollBar(parent) {
+ScrollBarHorizontal::ScrollBarHorizontal(AudioView *_view, ViewNode *parent) : ScrollBar(_view, parent) {
 	align.h = AudioView::SCROLLBAR_WIDTH;
 	align.w = 100;
 	//node_align_right = true;

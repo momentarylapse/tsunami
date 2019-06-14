@@ -19,7 +19,9 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 class PlaybackRange : public ViewNode {
 public:
-	PlaybackRange(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {
+	AudioView *view;
+	PlaybackRange(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+		view = time_scale->view;
 		align.fit_w = true;
 	}
 	void update_area() override {
@@ -55,7 +57,10 @@ public:
 
 class PlaybackLockSymbol : public ViewNode {
 public:
-	PlaybackLockSymbol(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	AudioView *view;
+	PlaybackLockSymbol(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+		view = time_scale->view;
+	}
 	void update_area() override {
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
 		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
@@ -82,7 +87,10 @@ public:
 
 class PlaybackLoopSymbol : public ViewNode {
 public:
-	PlaybackLoopSymbol(ViewNode *parent) : ViewNode(parent, 0, 0, 0, 0) {}
+	AudioView *view;
+	PlaybackLoopSymbol(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+		view = time_scale->view;
+	}
 	void update_area() override {
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
 		if (view->playback_range_locked)
@@ -112,10 +120,11 @@ public:
 
 
 
-TimeScale::TimeScale(AudioView* view) : ViewNode(view) {
+TimeScale::TimeScale(AudioView *_view) {
 	align.w = 100;
 	align.h = AudioView::TIME_SCALE_HEIGHT;
 	z = 20;
+	view = _view;
 
 	children.add(new PlaybackRange(this));
 	children.add(new PlaybackLockSymbol(this));

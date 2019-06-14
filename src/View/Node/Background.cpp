@@ -17,7 +17,8 @@
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
-Background::Background(AudioView* view) : ViewNode(view) {
+Background::Background(AudioView *_view) {
+	view = _view;
 	z = -1;
 	area = rect(0, 2000, 0, 2000);
 }

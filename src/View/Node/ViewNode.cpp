@@ -8,12 +8,10 @@
 #include "ViewNode.h"
 #include "../AudioView.h"
 
-ViewNode::ViewNode(AudioView *_view) : ViewNode(nullptr, 0, 0, 0, 0) {
-	view = _view;
+ViewNode::ViewNode() : ViewNode(nullptr, 0, 0, 0, 0) {
 }
 
 ViewNode::ViewNode(ViewNode *_parent, float dx, float dy, float w, float h) {
-	view = nullptr;
 	align.fit_h = align.fit_w = false;
 	align.right = false;
 	align.bottom = false;
@@ -25,10 +23,8 @@ ViewNode::ViewNode(ViewNode *_parent, float dx, float dy, float w, float h) {
 	area = rect::EMPTY;
 	hidden = false;
 	z = 0;
-	if (parent) {
-		view = parent->view;
+	if (parent)
 		z = parent->z + 1;
-	}
 }
 
 ViewNode::~ViewNode() {

@@ -176,9 +176,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll_bar_h = new ScrollBar(scene_graph);//background);
+	scroll_bar_h = new ScrollBar(this, scene_graph);//background);
 	scroll_bar_h->set_callback([=]{ thm.update_immediately(this, song, song_area); });
-	scroll_bar_w = new ScrollBarHorizontal(scene_graph);//background);
+	scroll_bar_w = new ScrollBarHorizontal(this, scene_graph);//background);
 	scroll_bar_w->set_callback([=]{ cam.dirty_jump(song->range_with_time().start() + scroll_bar_w->offset); });
 	scroll_bar_w->constrained = false;
 	//background->children.add(background);

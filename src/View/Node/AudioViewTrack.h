@@ -17,8 +17,7 @@ class AudioViewLayer;
 class MidiKeyChange;
 
 
-class AudioViewTrack : public ViewNode
-{
+class AudioViewTrack : public ViewNode {
 public:
 	AudioViewTrack(AudioView *view, Track *track);
 	~AudioViewTrack() override;
@@ -33,6 +32,7 @@ public:
 
 	void on_track_change();
 
+	AudioView *view;
 	Track *track;
 	AudioViewLayer *first_layer();
 	Array<int> reference_tracks;

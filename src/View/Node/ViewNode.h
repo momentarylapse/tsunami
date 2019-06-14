@@ -13,12 +13,11 @@
 #include "../../Stuff/Observable.h"
 
 class Painter;
-class AudioView;
 class HoverData;
 
 class ViewNode : public Observable<VirtualBase> {
 public:
-	ViewNode(AudioView *view);
+	ViewNode();
 	ViewNode(ViewNode *parent, float dx, float dy, float w, float h);
 	virtual ~ViewNode();
 
@@ -41,7 +40,6 @@ public:
 
 	virtual void update_area();
 
-	AudioView *view;
 	ViewNode *parent;
 	struct AlignData {
 		bool right, bottom;

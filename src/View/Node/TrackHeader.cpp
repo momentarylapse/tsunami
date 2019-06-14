@@ -24,11 +24,13 @@
 
 class TrackHeaderButton : public ViewNode {
 public:
+	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader *header;
 	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNode(th, dx, dy, 16, 16) {
 		vtrack = th->vtrack;
 		header = th;
+		view = th->view;
 	}
 	HoverData get_hover_data(float mx, float my) override {
 		auto h = header->get_hover_data(mx, my);
@@ -109,6 +111,7 @@ public:
 TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	z = 10;
 	vtrack = t;
+	view = vtrack->view;
 	float x0 = 5;
 	float dx = 17;
 	children.add(new TrackButtonMute(this, x0, 22));

@@ -489,15 +489,15 @@ void TsunamiWindow::on_sample_properties() {
 }
 
 void TsunamiWindow::on_delete_marker() {
-	if (view->hover_before_leave.type == HoverData::Type::MARKER)
-		view->cur_track()->delete_marker(view->hover_before_leave.marker);
+	if (view->cur_selection.marker)
+		view->cur_track()->delete_marker(view->cur_selection.marker);
 	else
 		session->e(_("No marker selected"));
 }
 
 void TsunamiWindow::on_edit_marker() {
-	if (view->hover_before_leave.type == HoverData::Type::MARKER) {
-		auto *dlg = new MarkerDialog(this, view->cur_track(), view->hover_before_leave.marker);
+	if (view->cur_selection.marker){
+		auto *dlg = new MarkerDialog(this, view->cur_track(), view->cur_selection.marker);
 		dlg->run();
 		delete dlg;
 	} else
@@ -985,8 +985,8 @@ void TsunamiWindow::on_quick_export() {
 int pref_bar_index(AudioView *view) {
 	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
 		return view->cur_selection.index;
-	/*if (view->cur_selection.type == HoverData::Type::BAR)
-	 return view->cur_selection.index + 1;*/
+	/*if (view->cur_selection.bar)
+		return view->cur_selection.index + 1;*/
 	if (view->sel.bar_indices(view->song).num > 0)
 		return view->sel.bar_indices(view->song).back() + 1;
 	if (view->hover_before_leave.pos > 0)

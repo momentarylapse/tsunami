@@ -11,12 +11,12 @@
 #include "ViewNode.h"
 
 class AudioViewTrack;
+class AudioView;
 
 
-
-class TrackHeader : public ViewNode
-{
+class TrackHeader : public ViewNode {
 public:
+	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader(AudioViewTrack *t);
 	void draw(Painter *c) override;

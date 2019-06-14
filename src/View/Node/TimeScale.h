@@ -10,6 +10,8 @@
 
 #include "ViewNode.h"
 
+class AudioView;
+
 class TimeScale : public ViewNode {
 public:
 	TimeScale(AudioView *view);
@@ -21,6 +23,8 @@ public:
 	bool on_right_button_down() override;
 
 	HoverData get_hover_data(float mx, float my) override;
+
+	AudioView *view;
 };
 
 #endif /* SRC_VIEW_NODE_TIMESCALE_H_ */

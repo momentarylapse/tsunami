@@ -12,53 +12,45 @@
 #include <math.h>
 
 
-float pitch_to_freq(float pitch)
-{
+float pitch_to_freq(float pitch) {
 	return 440.0f * pow(2, (pitch - 69.0f) / 12.0f);
 }
 
-float freq_to_pitch(float freq)
-{
+float freq_to_pitch(float freq) {
 	return log2(freq / 440.0f) * 12.0f + 69.0f;
 }
 
 
 // "scientific" notation
 //   naive MIDI octave is off by 1
-int pitch_get_octave(int pitch)
-{
+int pitch_get_octave(int pitch) {
 	return (pitch / 12) - 1;
 }
 
-int pitch_from_octave_and_rel(int rel, int octave)
-{
+int pitch_from_octave_and_rel(int rel, int octave) {
 	return rel + octave * 12 + 12;
 }
 
-int pitch_to_rel(int pitch)
-{
+int pitch_to_rel(int pitch) {
 	return pitch % 12;
 }
 
 static string REL_PITCH_NAME[12] = {"C", u8"C\u266F", "D", u8"D\u266F", "E", "F", u8"F\u266F", "G", u8"G\u266F", "A", u8"A\u266F", "B"};
 static string REL_PITCH_NAME_CANONICAL[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
 
-string rel_pitch_name(int pitch_rel)
-{
+string rel_pitch_name(int pitch_rel) {
 	if (pitch_rel < 0 or pitch_rel >= 12)
 		return "???";
 	return REL_PITCH_NAME[pitch_rel];
 }
 
-string rel_pitch_name_canonical(int pitch_rel)
-{
+string rel_pitch_name_canonical(int pitch_rel) {
 	if (pitch_rel < 0 or pitch_rel >= 12)
 		return "???";
 	return REL_PITCH_NAME_CANONICAL[pitch_rel];
 }
 
-int parse_rel_pitch(const string &name)
-{
+int parse_rel_pitch(const string &name) {
 	for (int i=0; i<12; i++)
 		if (name == REL_PITCH_NAME_CANONICAL[i])
 			return i;
@@ -66,17 +58,16 @@ int parse_rel_pitch(const string &name)
 }
 
 // convert an integer to a string
-string i2s_small(int i)
-{
+string i2s_small(int i) {
 	string r;
 	int l=0;
 	bool m=false;
-	if (i<0){
+	if (i<0) {
 		i=-i;
 		m=true;
 	}
 	char a[128];
-	while (1){
+	while (true) {
 		a[l]=(i%10)+0x80;
 		a[l+1]=0x82;
 		a[l+2]=0xe2;
@@ -85,7 +76,7 @@ string i2s_small(int i)
 		if (i==0)
 			break;
 	}
-	if (m){
+	if (m) {
 		a[l]=0x8b;
 		a[l+1]=0x82;
 		a[l+2]=0xe2;
@@ -97,13 +88,11 @@ string i2s_small(int i)
 	return r;
 }
 
-string pitch_name(int pitch)
-{
+string pitch_name(int pitch) {
 	return rel_pitch_name(pitch_to_rel(pitch)) + i2s_small(pitch_get_octave(pitch));
 }
 
-string drum_pitch_name(int pitch)
-{
+string drum_pitch_name(int pitch) {
 	if (pitch == DrumPitch::BASS_ACCOUSTIC)
 		return "bass      (akk)";
 	if (pitch == DrumPitch::BASS)
@@ -161,8 +150,7 @@ string drum_pitch_name(int pitch)
 	return pitch_name(pitch);
 }
 
-string modifier_symbol(NoteModifier mod)
-{
+string modifier_symbol(NoteModifier mod) {
 	if (mod == NoteModifier::NONE)
 		return "";
 	if (mod == NoteModifier::SHARP)
@@ -174,18 +162,15 @@ string modifier_symbol(NoteModifier mod)
 	return "?";
 }
 
-int modifier_apply(int pitch, NoteModifier mod)
-{
+int modifier_apply(int pitch, NoteModifier mod) {
 	return pitch + modifier_shift(mod);
 }
 
-int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod)
-{
+int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod) {
 	return pitch + modifier_shift(combine_note_modifiers(mod, scale_mod));
 }
 
-int modifier_shift(NoteModifier mod)
-{
+int modifier_shift(NoteModifier mod) {
 	if (mod == NoteModifier::SHARP)
 		return 1;
 	if (mod == NoteModifier::FLAT)
@@ -193,8 +178,7 @@ int modifier_shift(NoteModifier mod)
 	return 0;
 }
 
-NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod)
-{
+NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod) {
 	if (mod == NoteModifier::NATURAL)
 		return NoteModifier::NONE;
 	int shift = modifier_shift(mod) + modifier_shift(scale_mod);
@@ -206,24 +190,20 @@ NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod)
 }
 
 
-MidiEventBuffer::MidiEventBuffer()
-{
+MidiEventBuffer::MidiEventBuffer() {
 	samples = 0;
 }
 
-void MidiEventBuffer::__init__()
-{
+void MidiEventBuffer::__init__() {
 	new(this) MidiEventBuffer;
 }
 
-void MidiEventBuffer::clear()
-{
+void MidiEventBuffer::clear() {
 	Array<MidiEvent>::clear();
 	samples = 0;
 }
 
-MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const
-{
+MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const {
 	MidiEventBuffer a;
 	for (int i=0;i<num;i++)
 		if (r.is_inside((*this)[i].pos))
@@ -232,8 +212,7 @@ MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const
 }
 
 // needs to ignore the current this->samples... always set to r.length
-int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const
-{
+int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const {
 	data.samples = r.length;//min(r.length, samples - r.offset);
 	for (MidiEvent &e: *this)
 		if (r.is_inside(e.pos))
@@ -241,8 +220,7 @@ int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const
 	return data.samples;
 }
 
-Array<MidiNote> MidiEventBuffer::get_notes(const Range &r) const
-{
+Array<MidiNote> MidiEventBuffer::get_notes(const Range &r) const {
 	MidiNoteBuffer a = midi_events_to_notes(*this);
 	Array<MidiNote> b;
 	for (MidiNote *n: a)
@@ -251,13 +229,11 @@ Array<MidiNote> MidiEventBuffer::get_notes(const Range &r) const
 	return b;
 }
 
-int MidiEventBuffer::get_next_event(int pos) const
-{
+int MidiEventBuffer::get_next_event(int pos) const {
 	return 0;
 }
 
-Range MidiEventBuffer::range(int elongation) const
-{
+Range MidiEventBuffer::range(int elongation) const {
 	if (num == 0)
 		return Range::EMPTY;
 	int i0 = (*this)[0].pos;
@@ -265,16 +241,14 @@ Range MidiEventBuffer::range(int elongation) const
 	return Range(i0, i1 - i0 + elongation);
 }
 
-void MidiEventBuffer::sort()
-{
+void MidiEventBuffer::sort() {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
 			if ((*this)[i].pos > (*this)[j].pos)
 				swap(i, j);
 }
 
-void MidiEventBuffer::sanify(const Range &r)
-{
+void MidiEventBuffer::sanify(const Range &r) {
 	//int max_pos = 0;
 	Set<int> active;
 	Array<int> del_me;
@@ -282,21 +256,21 @@ void MidiEventBuffer::sanify(const Range &r)
 	sort();
 
 	// analyze
-	foreachi(MidiEvent &e, *this, i){
+	foreachi(MidiEvent &e, *this, i) {
 		int p = e.pitch;
 
 		// out of range
-		if (!r.is_inside(e.pos)){
+		if (!r.is_inside(e.pos)) {
 			del_me.add(i);
 			continue;
 		}
 
-		if (e.volume > 0){
+		if (e.volume > 0) {
 			active.add(p);
-		}else{
-			if (active.contains(p)){
+		} else {
+			if (active.contains(p)) {
 				active.erase(p);
-			}else{
+			} else {
 				// unnecessary stop -> delete
 				del_me.add(i);
 			}
@@ -316,79 +290,67 @@ void MidiEventBuffer::sanify(const Range &r)
 		add(MidiEvent(r.end(), p, 0));
 }
 
-void MidiEventBuffer::add_note(const Range &r, float pitch, float volume)
-{
+void MidiEventBuffer::add_note(const Range &r, float pitch, float volume) {
 	add(MidiEvent(r.start(), pitch, volume));
 	add(MidiEvent(r.end(), pitch, 0));
 }
 
-void MidiEventBuffer::add_metronome_click(int pos, int level, float volume)
-{
-	if (level == 0){
+void MidiEventBuffer::add_metronome_click(int pos, int level, float volume) {
+	if (level == 0) {
 		add(MidiEvent(pos, 81, volume));
 		add(MidiEvent(pos, 81, 0));
-	}else if (level == 1){
+	} else if (level == 1) {
 		add(MidiEvent(pos, 74, volume * 0.7f));
 		add(MidiEvent(pos, 74, 0));
-	}else{
+	} else {
 		add(MidiEvent(pos, 71, volume * 0.5f));
 		add(MidiEvent(pos, 71, 0));
 	}
 }
 
-void MidiEventBuffer::append(const MidiEventBuffer &data)
-{
+void MidiEventBuffer::append(const MidiEventBuffer &data) {
 	for (MidiEvent &e: data)
 		add(MidiEvent(e.pos + samples, e.pitch, e.volume));
 	samples += data.samples;
 }
 
-MidiNoteBuffer::MidiNoteBuffer()
-{
+MidiNoteBuffer::MidiNoteBuffer() {
 	samples = 0;
 }
 
-MidiNoteBuffer::MidiNoteBuffer(const MidiNoteBuffer &midi)
-{
+MidiNoteBuffer::MidiNoteBuffer(const MidiNoteBuffer &midi) {
 	*this = midi;
 }
 
-MidiNoteBuffer::~MidiNoteBuffer()
-{
+MidiNoteBuffer::~MidiNoteBuffer() {
 	deep_clear();
 }
 
-void MidiNoteBuffer::__init__()
-{
+void MidiNoteBuffer::__init__() {
 	new(this) MidiNoteBuffer;
 }
 
-void MidiNoteBuffer::__delete__()
-{
+void MidiNoteBuffer::__delete__() {
 	this->MidiNoteBuffer::~MidiNoteBuffer();
 }
 
-void MidiNoteBuffer::clear()
-{
+void MidiNoteBuffer::clear() {
 	Array<MidiNote*>::clear();
 	samples = 0;
 }
 
-void MidiNoteBuffer::deep_clear()
-{
+void MidiNoteBuffer::deep_clear() {
 	for (MidiNote *n: *this)
 		delete(n);
 	clear();
 }
 
-MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const
-{
+MidiEventBuffer MidiNoteBuffer::get_events(const Range &r) const {
 	MidiNoteBufferRef b = get_notes(r);
 	return midi_notes_to_events(b);
 }
 
-MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const
-{
+MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const {
 	MidiNoteBufferRef b;
 	for (MidiNote *n: *this)
 		if (r.overlaps(n->range))
@@ -396,8 +358,7 @@ MidiNoteBufferRef MidiNoteBuffer::get_notes(const Range &r) const
 	return b;
 }
 
-MidiNoteBufferRef MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const
-{
+MidiNoteBufferRef MidiNoteBuffer::get_notes_by_selection(const SongSelection &s) const {
 	MidiNoteBufferRef b;
 	for (MidiNote *n: *this)
 		if (s.has(n))
@@ -405,15 +366,13 @@ MidiNoteBufferRef MidiNoteBuffer::get_notes_by_selection(const SongSelection &s)
 	return b;
 }
 
-MidiNoteBuffer MidiNoteBuffer::duplicate() const
-{
+MidiNoteBuffer MidiNoteBuffer::duplicate() const {
 	MidiNoteBuffer b = *this;
 	return b;
 }
 
-void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset)
-{
-	for (MidiNote *n: midi){
+void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset) {
+	for (MidiNote *n: midi) {
 		MidiNote *nn = n->copy();
 		nn->range.offset += offset;
 		add(nn);
@@ -422,8 +381,7 @@ void MidiNoteBuffer::append(const MidiNoteBuffer &midi, int offset)
 	sort();
 }
 
-void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi)
-{
+void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi) {
 	deep_clear();
 
 	for (MidiNote *n: midi)
@@ -433,8 +391,7 @@ void MidiNoteBuffer::operator=(const MidiNoteBuffer &midi)
 }
 
 // deep copy!
-void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi)
-{
+void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi) {
 	deep_clear();
 
 	for (MidiNote *n: midi)
@@ -443,8 +400,7 @@ void MidiNoteBuffer::operator=(const MidiNoteBufferRef &midi)
 	samples = midi.samples;
 }
 
-Range MidiNoteBuffer::range(int elongation) const
-{
+Range MidiNoteBuffer::range(int elongation) const {
 	if (num == 0)
 		return Range::EMPTY;
 	int i0 = (*this)[0]->range.offset;
@@ -452,8 +408,7 @@ Range MidiNoteBuffer::range(int elongation) const
 	return RangeTo(i0, i1 + elongation);
 }
 
-void MidiNoteBuffer::sort()
-{
+void MidiNoteBuffer::sort() {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
 			if ((*this)[i]->range.offset > (*this)[j]->range.offset)
@@ -465,23 +420,20 @@ void MidiNoteBuffer::sanify(const Range &r)
 	sort();
 }
 
-MidiNoteBufferRef::MidiNoteBufferRef()
-{
+MidiNoteBufferRef::MidiNoteBufferRef() {
 }
 
-MidiNoteBufferRef::~MidiNoteBufferRef()
-{
+MidiNoteBufferRef::~MidiNoteBufferRef() {
 	clear();
 }
 
-MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
-{
+MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {
 	MidiEventBuffer r;
-	for (MidiNote *n: notes){
+	for (MidiNote *n: notes) {
 		Range rr = n->range;
 		if (n->is(NOTE_FLAG_STACCATO))
 			rr = Range(rr.offset, rr.length/2);
-		/*if (n->is(NOTE_FLAG_TRILL)){
+		/*if (n->is(NOTE_FLAG_TRILL)) {
 			int l = rr.length;
 			r.add(MidiEvent(n));
 			r.add(MidiEvent(rr.offset + l/4, n->pitch, 0));
@@ -489,7 +441,7 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
 			r.add(MidiEvent(rr.offset + l/2, n->pitch+1, 0));
 			r.add(MidiEvent(rr.offset + l/2, n->pitch, n->volume));
 			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
-		}else*/{
+		} else*/ {
 			r.add(MidiEvent(n));
 			r.add(MidiEvent(rr.end()-1, n->pitch, 0));
 		}
@@ -498,23 +450,22 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes)
 	return r;
 }
 
-MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events)
-{
+MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 	MidiNoteBuffer a;
 	MidiEventBuffer start_events;
-	for (MidiEvent &e: events){
-		if (e.volume > 0){
+	for (MidiEvent &e: events) {
+		if (e.volume > 0) {
 			bool exists = false;
 			for (MidiEvent &bb: start_events)
-				if ((int)bb.pitch == (int)e.pitch){
+				if ((int)bb.pitch == (int)e.pitch) {
 					exists = true;
 					break;
 				}
 			if (!exists)
 				start_events.add(e);
-		}else{
+		} else {
 			foreachi(MidiEvent &bb, start_events, i)
-				if ((int)bb.pitch == (int)e.pitch){
+				if ((int)bb.pitch == (int)e.pitch) {
 					MidiNote *n = new MidiNote(RangeTo(bb.pos, e.pos), bb.pitch, bb.volume);
 					n->flags = bb.flags;
 					n->stringno = bb.stringno;
@@ -530,8 +481,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events)
 }
 
 
-string chord_type_name(ChordType type)
-{
+string chord_type_name(ChordType type) {
 	if (type == ChordType::MINOR)
 		return _("Minor");
 	if (type == ChordType::MAJOR)
@@ -543,26 +493,25 @@ string chord_type_name(ChordType type)
 	return "???";
 }
 
-Array<int> chord_notes(ChordType type, int inversion, int pitch)
-{
+Array<int> chord_notes(ChordType type, int inversion, int pitch) {
 	Array<int> r;
 	r.add(pitch);
-	if (type == ChordType::MINOR){
+	if (type == ChordType::MINOR) {
 		r.add(pitch + 3);
 		r.add(pitch + 7);
-	}else if (type == ChordType::MAJOR){
+	} else if (type == ChordType::MAJOR) {
 		r.add(pitch + 4);
 		r.add(pitch + 7);
-	}else if (type == ChordType::DIMINISHED){
+	} else if (type == ChordType::DIMINISHED) {
 		r.add(pitch + 3);
 		r.add(pitch + 6);
-	}else if (type == ChordType::AUGMENTED){
+	} else if (type == ChordType::AUGMENTED) {
 		r.add(pitch + 4);
 		r.add(pitch + 8);
 	}
 	if (inversion == 2)
 		r.insert(r.pop() - 12, 0);
-	if (inversion == 1){
+	if (inversion == 1) {
 		r.insert(r.pop() - 12, 0);
 		r.insert(r.pop() - 12, 0);
 	}
@@ -570,15 +519,20 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch)
 }
 
 
-void MidiNoteBuffer::update_clef_pos(const Instrument &instrument, const Scale& scale) const
-{
+void MidiNoteBuffer::update_clef_pos(const Instrument &instrument, const Scale& scale) const {
 	const Clef& clef = instrument.get_clef();
 	for (MidiNote *n: *this)
 		n->update_clef_pos(clef, instrument, scale);
 }
 
-void MidiNoteBuffer::reset_clef() const
-{
+void MidiNoteBuffer::reset_clef() const {
 	for (MidiNote *n: *this)
 		n->reset_clef();
+}
+
+bool MidiNoteBuffer::has(MidiNote* n) const {
+	for (auto *nn: *this)
+		if (nn == n)
+			return true;
+	return false;
 }

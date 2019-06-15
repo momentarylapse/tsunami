@@ -22,7 +22,7 @@ class Clef;
 class Scale;
 class SongSelection;
 
-enum class MidiMode{
+enum class MidiMode {
 	LINEAR,
 	TAB,
 	CLASSICAL,
@@ -30,8 +30,7 @@ enum class MidiMode{
 };
 
 
-class MidiEventBuffer : public Array<MidiEvent>
-{
+class MidiEventBuffer : public Array<MidiEvent> {
 public:
 	MidiEventBuffer();
 	void _cdecl __init__();
@@ -52,8 +51,7 @@ public:
 	void append(const MidiEventBuffer &data);
 };
 
-class MidiNoteBuffer : public Array<MidiNote*>
-{
+class MidiNoteBuffer : public Array<MidiNote*> {
 public:
 	MidiNoteBuffer();
 	MidiNoteBuffer(const MidiNoteBuffer &midi);
@@ -79,10 +77,11 @@ public:
 
 	void update_clef_pos(const Instrument &instrument, const Scale &s) const;
 	void reset_clef() const;
+
+	bool has(MidiNote *n) const;
 };
 
-class MidiNoteBufferRef : public MidiNoteBuffer
-{
+class MidiNoteBufferRef : public MidiNoteBuffer {
 public:
 	MidiNoteBufferRef();
 	~MidiNoteBufferRef();
@@ -105,8 +104,7 @@ string pitch_name(int pitch);
 string drum_pitch_name(int pitch);
 
 
-enum DrumPitch
-{
+enum DrumPitch {
 	BASS_ACCOUSTIC = 35,
 	BASS = 36,
 	SIDE_STICK = 37,
@@ -136,8 +134,7 @@ enum DrumPitch
 	BONGO_LOW = 61,
 };
 
-enum class ChordType
-{
+enum class ChordType {
 	MINOR,
 	MAJOR,
 	DIMINISHED,
@@ -150,8 +147,7 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch);
 
 
 
-enum class NoteModifier
-{
+enum class NoteModifier {
 	NONE,
 	SHARP,
 	FLAT,

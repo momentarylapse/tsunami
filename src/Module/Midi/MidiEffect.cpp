@@ -15,13 +15,11 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Data/SongSelection.h"
 
-MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::AUDIO, "out")
-{
+MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::AUDIO, "out") {
 	fx = _fx;
 }
 
-int MidiEffect::Output::read_midi(MidiEventBuffer &buf)
-{
+int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
 	if (!fx->source)
 		return buf.samples;
 	return fx->source->read_midi(buf);
@@ -36,19 +34,16 @@ MidiEffect::MidiEffect() :
 	only_on_selection = false;
 }
 
-void MidiEffect::__init__()
-{
+void MidiEffect::__init__() {
 	new(this) MidiEffect;
 }
 
-void MidiEffect::__delete__()
-{
+void MidiEffect::__delete__() {
 	this->MidiEffect::~MidiEffect();
 }
 
 
-void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel)
-{
+void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel) {
 	MidiNoteBuffer midi = l->midi.get_notes_by_selection(sel);
 
 	l->song()->begin_action_group();
@@ -57,19 +52,21 @@ void MidiEffect::process_layer(TrackLayer *l, SongSelection &sel)
 		if (sel.has(l->midi[i]))
 			l->delete_midi_note(l->midi[i]);
 
+	auto ref = l->midi.get_notes(Range::ALL);
+
 	process(&midi);
 
 	l->insert_midi_data(0, midi);
 	l->song()->end_action_group();
 
 	// select new notes
-	for (auto *n: midi)
-		sel.set(n, true);
+	for (auto *n: l->midi)
+		if (!ref.has(n))
+			sel.set(n, true);
 }
 
 
-MidiEffect *CreateMidiEffect(Session *session, const string &name)
-{
+MidiEffect *CreateMidiEffect(Session *session, const string &name) {
 	return (MidiEffect*)ModuleFactory::create(session, ModuleType::MIDI_EFFECT, name);
 }
 

@@ -9,14 +9,13 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &instrument)
-{
+ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &instrument) {
 	track = t;
 	old_value = t->instrument;
 	new_value = instrument;
 
 	for (auto *l: track->layers)
-		for (auto *n: l->midi){
+		for (auto *n: l->midi) {
 			StringChange c;
 			c.note = n;
 			c.from = n->stringno;
@@ -27,8 +26,7 @@ ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &i
 
 }
 
-void* ActionTrackSetInstrument::execute(Data* d)
-{
+void* ActionTrackSetInstrument::execute(Data* d) {
 	track->instrument = new_value;
 	for (auto *l: track->layers)
 		l->midi.reset_clef();
@@ -41,8 +39,7 @@ void* ActionTrackSetInstrument::execute(Data* d)
 	return nullptr;
 }
 
-void ActionTrackSetInstrument::undo(Data* d)
-{
+void ActionTrackSetInstrument::undo(Data* d) {
 	track->instrument = old_value;
 	for (auto *l: track->layers)
 		l->midi.reset_clef();
@@ -53,19 +50,17 @@ void ActionTrackSetInstrument::undo(Data* d)
 	track->notify();
 }
 
-bool ActionTrackSetInstrument::mergable(Action* a)
-{
-	ActionTrackSetInstrument *aa = dynamic_cast<ActionTrackSetInstrument*>(a);
+bool ActionTrackSetInstrument::mergable(Action* a) {
+	auto *aa = dynamic_cast<ActionTrackSetInstrument*>(a);
 	if (!aa)
 		return false;
 	return (aa->track == track);
 }
 
-bool ActionTrackSetInstrument::absorb(ActionMergableBase* a)
-{
+bool ActionTrackSetInstrument::absorb(ActionMergableBase* a) {
 	if (!mergable(a))
 		return false;
-	ActionTrackSetInstrument* aa = dynamic_cast<ActionTrackSetInstrument*>(a);
+	auto* aa = dynamic_cast<ActionTrackSetInstrument*>(a);
 	new_value = aa->new_value;
 	string_change.append(aa->string_change);
 	return true;

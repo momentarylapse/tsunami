@@ -9,12 +9,15 @@
 #define SRC_VIEW_NODE_SCENEGRAPH_H_
 
 #include "ViewNode.h"
+#include "../HoverData.h"
 
 class AudioView;
+class MouseDelayPlanner;
+class MouseDelayAction;
 
 class SceneGraph : public ViewNode {
 public:
-	SceneGraph(AudioView *view);
+	SceneGraph(hui::Callback cb_set_current);//AudioView *view);
 
 	bool on_left_button_down() override;
 	bool on_left_button_up() override;
@@ -31,7 +34,20 @@ public:
 
 	string get_tip() override;
 
-	AudioView *view;
+	//AudioView *view;
+
+	HoverData hover;
+	HoverData cur_selection;
+	void set_current(const HoverData &h);
+	hui::Callback cb_set_current;
+
+	MouseDelayPlanner *mdp;
+	void mdp_prepare(MouseDelayAction *action);
+	void mdp_run(MouseDelayAction *action);
+	void mdp_prepare(hui::Callback update);
+
+	float mx, my;
+	void set_mouse();
 };
 
 #endif /* SRC_VIEW_NODE_SCENEGRAPH_H_ */

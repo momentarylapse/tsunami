@@ -14,9 +14,9 @@
 class Painter;
 class AudioView;
 
-class ScrollBar : public ViewNode {
+class ScrollBar : public ViewNodeRel {
 public:
-	ScrollBar(AudioView *view, ViewNode *parent);
+	ScrollBar(AudioView *view);
 	//ScrollBar(AudioView *view);
 	bool constrained = true;
 	float offset = 0;
@@ -38,7 +38,7 @@ public:
 
 class ScrollBarHorizontal : public ScrollBar {
 public:
-	ScrollBarHorizontal(AudioView *view, ViewNode *parent);
+	ScrollBarHorizontal(AudioView *view);
 };
 
 #endif /* SRC_VIEW_NODE_SCROLLBAR_H_ */

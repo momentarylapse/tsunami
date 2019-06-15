@@ -166,7 +166,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	mode_capture = new ViewModeCapture(this);
 	set_mode(mode_default);
 
-	scene_graph = new SceneGraph(this);
+	scene_graph = new SceneGraph([=]{ set_current(scene_graph->cur_selection); });
 	area = rect(0, 1024, 0, 768);
 	song_area = area;
 	enabled = true;
@@ -176,22 +176,28 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll_bar_h = new ScrollBar(this, scene_graph);//background);
+	scroll_bar_h = new ScrollBar(this);
 	scroll_bar_h->set_callback([=]{ thm.update_immediately(this, song, song_area); });
-	scroll_bar_w = new ScrollBarHorizontal(this, scene_graph);//background);
+	scroll_bar_w = new ScrollBarHorizontal(this);
 	scroll_bar_w->set_callback([=]{ cam.dirty_jump(song->range_with_time().start() + scroll_bar_w->offset); });
 	scroll_bar_w->constrained = false;
-	//background->children.add(background);
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
+	scene_graph->add_child(time_scale);
+	scene_graph->add_child(background);
+	scene_graph->add_child(cursor_start);
+	scene_graph->add_child(cursor_end);
+	scene_graph->add_child(selection_marker);
+	scene_graph->add_child(scroll_bar_h);
+	scene_graph->add_child(scroll_bar_w);
+	scene_graph->add_child(metronome_overlay_vlayer);
+
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(this);
 	midi_painter = new MidiPainter(this);
-
-	mdp = new MouseDelayPlanner(this);
 
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
@@ -275,8 +281,6 @@ AudioView::~AudioView() {
 
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
-
-	delete mdp;
 
 	delete scroll_bar_h;
 	delete scroll_bar_w;
@@ -503,26 +507,14 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	if (!mdp->update()) {
-		hover = scene_graph->get_hover_data(mx, my);
-		scene_graph->on_mouse_move();
-	}
+	scene_graph->on_mouse_move();
 
 	force_redraw();
 }
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	hover = scene_graph->get_hover_data(mx, my);
-
-	bool allow_handle = true;
-	if (hui::GetEvent()->just_focused)
-		allow_handle = scene_graph->allow_handle_click_when_gaining_focus();
-
-	if (allow_handle) {
-		set_current(hover);
-		scene_graph->on_left_button_down();
-	}
+	scene_graph->on_left_button_down();
 
 	force_redraw();
 	update_menu();
@@ -549,8 +541,6 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	mdp->finish();
-	hover = scene_graph->get_hover_data(mx, my);
 	scene_graph->on_left_button_up();
 
 	force_redraw();
@@ -570,8 +560,6 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	hover = scene_graph->get_hover_data(mx, my);
-	set_current(hover);
 	scene_graph->on_right_button_down();
 }
 
@@ -582,7 +570,7 @@ void AudioView::on_right_button_up() {
 void AudioView::on_mouse_leave() {
 	// TODO check if necessary
 	if (!hui::GetEvent()->lbut and !hui::GetEvent()->rbut) {
-		hover.clear();
+		hover().clear();
 		force_redraw();
 	}
 }
@@ -590,8 +578,6 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
-	hover = scene_graph->get_hover_data(mx, my);
-	set_current(hover);
 	scene_graph->on_left_double_click();
 	mode->on_left_double_click();
 	force_redraw();
@@ -608,7 +594,7 @@ void AudioView::on_command(const string & id) {
 void AudioView::on_key_down() {
 	int k = hui::GetEvent()->key_code;
 	if (k == hui::KEY_ESCAPE) {
-		mdp->cancel();
+		mdp()->cancel();
 	}
 	mode->on_key_down(k);
 }
@@ -809,6 +795,7 @@ void AudioView::update_tracks()
 		// new track
 		if (!found){
 			vtrack2[ti] = new AudioViewTrack(this, t);
+			background->add_child(vtrack2[ti]);
 		}
 	}
 
@@ -831,6 +818,7 @@ void AudioView::update_tracks()
 		// new layer
 		if (!found){
 			vlayer2[li] = new AudioViewLayer(this, l);
+			background->add_child(vlayer2[li]);
 			sel.add(l);
 		}
 
@@ -840,10 +828,10 @@ void AudioView::update_tracks()
 	// delete deleted
 	for (auto *v: vtrack)
 		if (v)
-			delete v;
+			background->delete_child(v);
 	for (auto *v: vlayer)
 		if (v)
-			delete v;
+			background->delete_child(v);
 	vtrack = vtrack2;
 	vlayer = vlayer2;
 	thm.dirty = true;
@@ -882,7 +870,7 @@ void AudioView::update_tracks()
 }
 
 void AudioView::rebuild_scene_graph() {
-	scene_graph->children.clear();
+	/*scene_graph->children.clear();
 	scene_graph->children.add(background);
 	scene_graph->children.add(scroll_bar_h);
 	scene_graph->children.add(scroll_bar_w);
@@ -896,7 +884,7 @@ void AudioView::rebuild_scene_graph() {
 	scene_graph->children.add(time_scale);
 	scene_graph->children.add(cursor_start);
 	scene_graph->children.add(cursor_end);
-	scene_graph->children.add(selection_marker);
+	scene_graph->children.add(selection_marker);*/
 }
 
 bool need_metro_overlay(Song *song, AudioView *view) {
@@ -923,14 +911,9 @@ bool AudioView::update_scene_graph() {
 	if (scroll_bar_w_needed)
 		song_area.y2 -= SCROLLBAR_WIDTH;
 	scroll_bar_h->hidden = !scroll_bar_h_needed;
-	scroll_bar_h->align.dy = song_area.y1;
-	scroll_bar_h->align.h = song_area.height();
-	//scroll->set_area(rect(area.x1, area.x1 + SCROLLBAR_WIDTH, song_area.y1, song_area.y2));
 	bool animating = thm.update(this, song, song_area);
 
 	scroll_bar_w->hidden = !scroll_bar_w_needed;
-	scroll_bar_w->align.dy = area.y2 - SCROLLBAR_WIDTH;
-	scroll_bar_w->align.w = area.width();
 	scroll_bar_w->update(cam.range().length, song->range_with_time().length);
 
 	for (auto *v: vlayer) {
@@ -1031,15 +1014,12 @@ void AudioView::draw_song(Painter *c) {
 	if (is_playback_active())
 		draw_time_line(c, playback_pos(), colors.preview_marker, false, true);
 
-	if (mdp->acting())
-		mdp->action->on_draw_post(c);
-
 	mode->draw_post(c);
 
 	// tool tip?
 	string tip;
-	if (hover.node)
-		tip = hover.node->get_tip();
+	if (hover().node)
+		tip = hover().node->get_tip();
 	if (tip.num > 0)
 		draw_cursor_hover(c, tip);
 
@@ -1352,9 +1332,9 @@ void AudioView::playback_click() {
 		return;
 
 	if (is_playback_active()) {
-		if (renderer->range().is_inside(hover.pos)) {
-			signal_chain->set_pos(hover.pos);
-			hover.type = HoverData::Type::PLAYBACK_CURSOR;
+		if (renderer->range().is_inside(hover().pos)) {
+			signal_chain->set_pos(hover().pos);
+			hover().type = HoverData::Type::PLAYBACK_CURSOR;
 			force_redraw();
 		} else {
 			stop();
@@ -1432,50 +1412,50 @@ void AudioView::select_under_cursor() {
 }
 
 bool AudioView::hover_any_object() {
-	if (hover.bar)
+	if (hover().bar)
 		return true;
-	if (hover.marker)
+	if (hover().marker)
 		return true;
-	if (hover.sample)
+	if (hover().sample)
 		return true;
-	if (hover.note)
+	if (hover().note)
 		return true;
 	return false;
 }
 
 bool AudioView::hover_selected_object() {
-	if (hover.bar)
-		return sel.has(hover.bar);
-	if (hover.marker)
-		return sel.has(hover.marker);
-	if (hover.sample)
-		return sel.has(hover.sample);
-	if (hover.note)
-		return sel.has(hover.note);
+	if (hover().bar)
+		return sel.has(hover().bar);
+	if (hover().marker)
+		return sel.has(hover().marker);
+	if (hover().sample)
+		return sel.has(hover().sample);
+	if (hover().note)
+		return sel.has(hover().note);
 	return false;
 }
 
 void AudioView::select_object() {
-	if (hover.bar) {
-		sel.add(hover.bar);
-	} else if (hover.marker) {
-		sel.add(hover.marker);
-	} else if (hover.sample) {
-		sel.add(hover.sample);
-	} else if (hover.note) {
-		sel.add(hover.note);
+	if (hover().bar) {
+		sel.add(hover().bar);
+	} else if (hover().marker) {
+		sel.add(hover().marker);
+	} else if (hover().sample) {
+		sel.add(hover().sample);
+	} else if (hover().note) {
+		sel.add(hover().note);
 	}
 }
 
 void AudioView::toggle_object() {
-	if (hover.bar) {
-		sel.toggle(hover.bar);
-	} else if (hover.marker) {
-		sel.toggle(hover.marker);
-	} else if (hover.sample) {
-		sel.toggle(hover.sample);
-	} else if (hover.note) {
-		sel.toggle(hover.note);
+	if (hover().bar) {
+		sel.toggle(hover().bar);
+	} else if (hover().marker) {
+		sel.toggle(hover().marker);
+	} else if (hover().sample) {
+		sel.toggle(hover().sample);
+	} else if (hover().note) {
+		sel.toggle(hover().note);
 	}
 }
 
@@ -1532,9 +1512,9 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 }
 
 void AudioView::prepare_menu(hui::Menu *menu) {
-	auto *vl = hover.vlayer;
-	auto *l = hover.layer();
-	auto *t = hover.track();
+	auto *vl = hover().vlayer;
+	auto *l = hover().layer();
+	auto *t = hover().track();
 	// midi mode
 	if (t) {
 		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
@@ -1569,26 +1549,26 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 
 void AudioView::open_popup(hui::Menu* menu) {
 	prepare_menu(menu);
-	hover_before_leave = hover;
+	hover_before_leave = hover();
 	menu->open_popup(win);
 }
 
+HoverData &AudioView::hover() {
+	return scene_graph->hover;
+}
+
+MouseDelayPlanner *AudioView::mdp() {
+	return scene_graph->mdp;
+}
+
 void AudioView::mdp_prepare(MouseDelayAction *a) {
-	mdp->prepare(a);
+	scene_graph->mdp_prepare(a);
 }
 
 void AudioView::mdp_run(MouseDelayAction *a) {
-	mdp->prepare(a);
-	mdp->start_acting();
+	scene_graph->mdp_run(a);
 }
 
-class MouseDelayActionWrapper : public MouseDelayAction {
-public:
-	hui::Callback callback;
-	MouseDelayActionWrapper(hui::Callback c) { callback = c; }
-	void on_update() override { callback(); }
-};
-
 void AudioView::mdp_prepare(hui::Callback update) {
-	mdp->prepare(new MouseDelayActionWrapper(update));
+	scene_graph->mdp_prepare(update);
 }

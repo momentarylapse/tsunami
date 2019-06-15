@@ -32,7 +32,7 @@ class LayerHeader;
 class ScrollBar;
 
 
-class AudioViewLayer : public ViewNode {
+class AudioViewLayer : public ViewNodeFree {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;

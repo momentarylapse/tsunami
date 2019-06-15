@@ -14,7 +14,7 @@ class AudioViewTrack;
 class AudioView;
 
 
-class TrackHeader : public ViewNode {
+class TrackHeader : public ViewNodeRel {
 public:
 	AudioView *view;
 	AudioViewTrack *vtrack;

@@ -17,7 +17,7 @@
 
 MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
-Background::Background(AudioView *_view) {
+Background::Background(AudioView *_view) : ViewNodeFree() {
 	view = _view;
 	z = -1;
 	area = rect(0, 2000, 0, 2000);
@@ -27,9 +27,9 @@ bool Background::on_left_button_down() {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
-		int pos = view->hover.pos_snap;
+		int pos = view->hover().pos_snap;
 		view->set_cursor_pos(pos);
-		view->hover.range = Range(pos, 0);
+		view->hover().range = Range(pos, 0);
 
 		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
 	}

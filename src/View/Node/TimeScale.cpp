@@ -17,15 +17,16 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 
 
-class PlaybackRange : public ViewNode {
+class PlaybackRange : public ViewNodeRel {
 public:
 	AudioView *view;
-	PlaybackRange(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+	PlaybackRange(TimeScale *time_scale) : ViewNodeRel(0, 0, 0, 0) {
 		view = time_scale->view;
-		align.fit_w = true;
+		align.horizontal = AlignData::Mode::FILL;
 	}
 	void update_area() override {
 		area = parent->area;
+		z = parent->z + 1;
 		view->cam.range2screen_clip(view->playback_wish_range, parent->area, area.x1, area.x2);
 		hidden = (view->playback_wish_range.length == 0);
 	}
@@ -55,10 +56,10 @@ public:
 	}
 };
 
-class PlaybackLockSymbol : public ViewNode {
+class PlaybackLockSymbol : public ViewNodeRel {
 public:
 	AudioView *view;
-	PlaybackLockSymbol(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+	PlaybackLockSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_area() override {
@@ -85,10 +86,10 @@ public:
 	}
 };
 
-class PlaybackLoopSymbol : public ViewNode {
+class PlaybackLoopSymbol : public ViewNodeRel {
 public:
 	AudioView *view;
-	PlaybackLoopSymbol(TimeScale *time_scale) : ViewNode(time_scale, 0, 0, 0, 0) {
+	PlaybackLoopSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
 	void update_area() override {
@@ -120,21 +121,17 @@ public:
 
 
 
-TimeScale::TimeScale(AudioView *_view) {
-	align.w = 100;
-	align.h = AudioView::TIME_SCALE_HEIGHT;
-	z = 20;
+TimeScale::TimeScale(AudioView *_view) : ViewNodeRel(0, 0, 100, AudioView::TIME_SCALE_HEIGHT) {
+	align.horizontal = AlignData::Mode::FILL;
+	align.dz = 20;
 	view = _view;
 
-	children.add(new PlaybackRange(this));
-	children.add(new PlaybackLockSymbol(this));
-	children.add(new PlaybackLoopSymbol(this));
+	add_child(new PlaybackRange(this));
+	add_child(new PlaybackLockSymbol(this));
+	add_child(new PlaybackLoopSymbol(this));
 }
 
 void TimeScale::draw(Painter* c) {
-	area = view->area;
-	area.y2 = align.h;
-
 	GridColors g;
 	g.bg = view->colors.background_track;
 	g.bg_sel = view->colors.background_track_selection;
@@ -158,9 +155,9 @@ bool TimeScale::on_left_button_down() {
 	if (view->is_playback_active()) {
 		view->playback_click();
 	} else {
-		int pos = view->hover.pos_snap;
+		int pos = view->hover().pos_snap;
 		view->set_cursor_pos(pos);
-		view->hover.range = Range(pos, 0);
+		view->hover().range = Range(pos, 0);
 		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME));
 	}
 	return true;

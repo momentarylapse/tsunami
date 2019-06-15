@@ -12,7 +12,7 @@
 
 class AudioView;
 
-class TimeScale : public ViewNode {
+class TimeScale : public ViewNodeRel {
 public:
 	TimeScale(AudioView *view);
 	void draw(Painter *p) override;

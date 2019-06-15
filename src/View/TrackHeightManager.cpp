@@ -106,8 +106,11 @@ bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 		t = 1;
 		animating = false;
 	}
-	for (auto *v: view->vlayer)
+	for (auto *v: view->vlayer) {
 		v->area = rect_inter(v->area_last, v->area_target, smooth_parametrization(t));
+		v->align.w = v->area.width();
+		v->align.h = v->area.height();
+	}
 
 	set_track_areas_from_layers(view);
 

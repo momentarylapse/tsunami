@@ -18,11 +18,11 @@
 
 
 
-class LayerHeaderButton : public ViewNode {
+class LayerHeaderButton : public ViewNodeRel {
 public:
 	AudioViewLayer *vlayer;
 	LayerHeader *header;
-	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : ViewNode(lh, dx, dy, 16, 16) {
+	LayerHeaderButton(LayerHeader *lh, float dx, float dy) : ViewNodeRel(dx, dy, 16, 16) {
 		vlayer = lh->vlayer;
 		header = lh;
 	}
@@ -33,7 +33,7 @@ public:
 	}
 	color get_color() {
 		auto *view = vlayer->view;
-		if (view_hover(view->hover))
+		if (is_cur_hover())
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
@@ -93,22 +93,22 @@ public:
 	}
 };
 
-LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNode(l, 0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNodeRel(0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
 	z = 10;
-	align.right = true;
+	align.horizontal = AlignData::Mode::RIGHT;
 	vlayer = l;
 	float x0 = 5;
 	float dx = 17;
-	children.add(new LayerButtonMute(this, x0, 22));
-	children.add(new LayerButtonSolo(this, x0+dx, 22));
-	children.add(new LayerButtonExplode(this, x0+dx*2, 22));
+	add_child(new LayerButtonMute(this, x0, 22));
+	add_child(new LayerButtonSolo(this, x0+dx, 22));
+	add_child(new LayerButtonExplode(this, x0+dx*2, 22));
 }
 
 void LayerHeader::draw(Painter *c) {
 
 	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
-	bool _hover = view_hover(view->hover);
+	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
 	bool playable = view->get_playable_layers().contains(layer);
 

@@ -10,9 +10,8 @@
 
 ViewMode::ViewMode(AudioView *_view) {
 	view = _view;
-	session = view->session;
 	cam = &view->cam;
-	hover = &view->hover;
+	session = view->session;
 	win = view->win;
 	song = view->song;
 	side_bar_console = -1;
@@ -20,6 +19,14 @@ ViewMode::ViewMode(AudioView *_view) {
 
 ViewMode::~ViewMode() {
 }
+
+HoverData &ViewMode::hover() {
+	return view->hover();
+}
+
+/*ViewPort &ViewMode::cam() {
+	return view->cam;
+}*/
 
 HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {
 	return HoverData();
@@ -29,9 +36,9 @@ SongSelection ViewMode::get_selection(const Range &r, SelectionMode mode) {
 	if (mode == SelectionMode::TIME)
 		return get_selection_for_range(r);
 	if (mode == SelectionMode::RECT)
-		return get_selection_for_rect(r, hover->y0, hover->y1);
+		return get_selection_for_rect(r, hover().y0, hover().y1);
 	if (mode == SelectionMode::TRACK_RECT)
-		return get_selection_for_track_rect(r, hover->y0, hover->y1);
+		return get_selection_for_track_rect(r, hover().y0, hover().y1);
 	return SongSelection();
 }
 

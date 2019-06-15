@@ -149,7 +149,7 @@ public:
 	static const int SCROLLBAR_WIDTH;
 	static const int SNAPPING_DIST;
 
-	HoverData hover;
+	HoverData &hover();
 	HoverData hover_before_leave;
 	SongSelection sel;
 	SongSelection sel_temp;
@@ -164,7 +164,7 @@ public:
 	bool hide_selection;
 
 
-	MouseDelayPlanner *mdp;
+	MouseDelayPlanner *mdp();
 	void mdp_prepare(MouseDelayAction *action);
 	void mdp_run(MouseDelayAction *action);
 	void mdp_prepare(hui::Callback update);

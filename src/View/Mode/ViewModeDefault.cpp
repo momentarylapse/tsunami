@@ -47,14 +47,14 @@ public:
 		mode = _mode;
 	}
 	void on_start() override {
-		view->hover.range.set_start(view->cur_selection.pos_snap);
-		view->hover.range.set_end(view->get_mouse_pos());
-		view->hover.y0 = view->mdp->y0;
-		view->hover.y1 = view->my;
+		view->hover().range.set_start(view->cur_selection.pos_snap);
+		view->hover().range.set_end(view->get_mouse_pos());
+		view->hover().y0 = view->mdp()->y0;
+		view->hover().y1 = view->my;
 		view->selection_mode = mode;
-		view->hover.type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
+		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
-		view->set_selection(view->mode->get_selection(view->hover.range, mode));
+		view->set_selection(view->mode->get_selection(view->hover().range, mode));
 	}
 	void on_update() override {
 		// cheap auto scrolling
@@ -63,12 +63,12 @@ public:
 		if (view->mx > view->area.width() - 50)
 			view->cam.move(10 / view->cam.scale);
 
-		view->hover.range.set_end(view->get_mouse_pos_snap());
-		view->hover.y1 = view->my;
+		view->hover().range.set_end(view->get_mouse_pos_snap());
+		view->hover().y1 = view->my;
 		if (view->select_xor)
-			view->set_selection(view->sel_temp or view->mode->get_selection(view->hover.range, mode));
+			view->set_selection(view->sel_temp or view->mode->get_selection(view->hover().range, mode));
 		else
-			view->set_selection(view->mode->get_selection(view->hover.range, mode));
+			view->set_selection(view->mode->get_selection(view->hover().range, mode));
 	}
 	void on_draw_post(Painter *c) override {
 		if (view->sel.range.length > 0){
@@ -99,8 +99,8 @@ public:
 		view = layer->view;
 		sel = s;
 //		view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES);
-		mouse_pos0 = view->hover.pos;
-		ref_pos = hover_reference_pos(view->hover);
+		mouse_pos0 = view->hover().pos;
+		ref_pos = hover_reference_pos(view->hover());
 	}
 	void on_start() override {
 		action = new ActionSongMoveSelection(view->song, sel);
@@ -188,12 +188,11 @@ void ViewModeDefault::start_selection_rect(SelectionMode mode) {
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
-	//view->set_cur_sample(nullptr);
-	view->set_current(view->hover);
+	view->set_current(view->hover());
 
 	if (view->sel.has(vlayer->layer)) {
 		// set cursor only when clicking on selected layers
-		view->set_cursor_pos(hover->pos_snap);
+		view->set_cursor_pos(hover().pos_snap);
 	}
 
 	view->exclusively_select_layer(vlayer);

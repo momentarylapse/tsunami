@@ -26,7 +26,7 @@
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
-AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode() { //_view->scene_graph, 0, 0, 0, 0) {
+AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNodeFree() {
 	view = _view;
 	track = _track;
 	solo = false;
@@ -34,7 +34,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNode() { /
 	imploded = false;
 
 	if (track) {
-		children.add(new TrackHeader(this));
+		add_child(new TrackHeader(this));
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_CHANGE);
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_ADD_EFFECT);
 		track->subscribe(this, [=]{ on_track_change(); }, track->MESSAGE_DELETE_EFFECT);

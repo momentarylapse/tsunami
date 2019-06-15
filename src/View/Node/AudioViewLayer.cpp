@@ -54,10 +54,9 @@ int hover_buffer(HoverData &hover) {
 class LayerScrollBar : public ScrollBar {
 public:
 	AudioViewLayer *vlayer;
-	LayerScrollBar(AudioViewLayer *l) : ScrollBar(l->view, l) {
+	LayerScrollBar(AudioViewLayer *l) : ScrollBar(l->view) {
 		vlayer = l;
-		align.right = true;
-		align.fit_h = true;
+		align.horizontal = AlignData::Mode::RIGHT;
 		hidden = true;
 	}
 	HoverData get_hover_data(float mx, float my) override {
@@ -68,12 +67,10 @@ public:
 };
 
 
-AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode()//_view->scene_graph, 0, 0, 0, 0)
-{
+AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeFree() {
 	view = _view;
 	layer = _layer;
 	solo = false;
-	z = 1;
 
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
@@ -88,9 +85,9 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNode(
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
 		update_midi_key_changes();
 		header = new LayerHeader(this);
-		children.add(header);
+		add_child(header);
 		scroll_bar = new LayerScrollBar(this);
-		children.add(scroll_bar);
+		add_child(scroll_bar);
 	}
 }
 
@@ -214,7 +211,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 	color col = view->colors.sample;
 	if (view->sel.has(s))
 		col = view->colors.sample_selected;
-	if (view->hover.sample == s)
+	if (view->hover().sample == s)
 		col = ColorInterpolate(col,  view->colors.hover, 0.2f);
 
 	draw_sample_frame(c, s, col, 0);
@@ -513,7 +510,7 @@ void AudioViewLayer::draw(Painter *c) {
 		draw_sample(c, s);
 
 	if (layer->is_main())
-		draw_markers(c, t->markers_sorted(), view->hover);
+		draw_markers(c, t->markers_sorted(), view->hover());
 
 	draw_fades(c);
 }
@@ -550,7 +547,7 @@ bool AudioViewLayer::on_left_button_down() {
 // TODO put somewhere more reasonable
 bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
 	if (view->mode == view->mode_midi)
-		if (view->hover.type == HoverData::Type::MIDI_PITCH)
+		if (view->hover().type == HoverData::Type::MIDI_PITCH)
 			if (view->mode_midi->creation_mode != ViewModeMidi::CreationMode::SELECT)
 				return true;
 	if (view->hover_any_object())
@@ -559,25 +556,27 @@ bool AudioViewLayer::allow_handle_click_when_gaining_focus() {
 }
 
 bool AudioViewLayer::on_left_double_click() {
-	int buffer_index = hover_buffer(view->hover);
+	auto &h = view->hover();
+	int buffer_index = hover_buffer(h);
 
-	if (view->hover.sample) {
-		view->sel = view->mode->get_selection_for_range(view->hover.sample->range());
+	if (h.sample) {
+		view->sel = view->mode->get_selection_for_range(h.sample->range());
 		view->update_selection();
-	} else if (view->hover.marker) {
-		view->sel = view->mode->get_selection_for_range(view->hover.marker->range);
+	} else if (h.marker) {
+		view->sel = view->mode->get_selection_for_range(h.marker->range);
 		view->update_selection();
 	} else if (buffer_index >= 0) {
 		view->sel = view->mode->get_selection_for_range(layer->buffers[buffer_index].range());
 		view->update_selection();
-	} else if (view->hover.bar) {
-		view->sel = view->mode->get_selection_for_range(view->hover.bar->range());
+	} else if (h.bar) {
+		view->sel = view->mode->get_selection_for_range(h.bar->range());
 		view->update_selection();
 	}
 	return true;
 }
 
 bool AudioViewLayer::on_right_button_down() {
+	auto &h = view->hover();
 	if (view->hover_any_object()) {
 		if (!view->hover_selected_object()) {
 			//select object exclusively
@@ -592,20 +591,20 @@ bool AudioViewLayer::on_right_button_down() {
 	} else { // void
 		if (!view->sel.has(layer))
 			view->exclusively_select_layer(this);
-		if (!view->sel.range.is_inside(view->hover.pos_snap))
-			view->set_cursor_pos(view->hover.pos_snap);
+		if (!view->sel.range.is_inside(h.pos_snap))
+			view->set_cursor_pos(h.pos_snap);
 		view->sel.clear_data();
 	}
 
-	if (view->hover.sample) {
+	if (h.sample) {
 		view->open_popup(view->menu_sample);
-	} else if (view->hover.bar) {
+	} else if (h.bar) {
 		view->open_popup(view->menu_bar);
-	} else if (view->hover.marker) {
+	} else if (h.marker) {
 		view->open_popup(view->menu_marker);
-	} else if (view->hover.type == HoverData::Type::BAR_GAP) {
+	} else if (h.type == HoverData::Type::BAR_GAP) {
 		view->open_popup(view->menu_bar_gap);
-	} else if (hover_buffer(view->hover) >= 0) {
+	} else if (hover_buffer(h) >= 0) {
 		view->open_popup(view->menu_buffer);
 	} else { // void
 		if (layer->is_main())
@@ -617,17 +616,18 @@ bool AudioViewLayer::on_right_button_down() {
 }
 
 string AudioViewLayer::get_tip() {
-	if (view->hover.sample)
-		return _("sample ") + view->hover.sample->origin->name;
-	if (view->hover.marker)
-		return  _("marker ") + view->hover.marker->nice_text();
-	if (view->hover.bar) {
-		if (view->hover.bar->is_pause())
-			return _("pause ") + view->song->get_time_str_long(view->hover.bar->length);
+	auto &h = view->hover();
+	if (h.sample)
+		return _("sample ") + h.sample->origin->name;
+	if (h.marker)
+		return  _("marker ") + h.marker->nice_text();
+	if (h.bar) {
+		if (h.bar->is_pause())
+			return _("pause ") + view->song->get_time_str_long(h.bar->length);
 		else
-			return _("bar ") + view->hover.bar->format_beats() + format(u8" \u2669=%.1f", view->hover.bar->bpm(view->song->sample_rate));
+			return _("bar ") + h.bar->format_beats() + format(u8" \u2669=%.1f", h.bar->bpm(view->song->sample_rate));
 	}
-	if (view->hover.type == HoverData::Type::BAR_GAP)
+	if (h.type == HoverData::Type::BAR_GAP)
 		return _("bar gap");
 	return "";
 }

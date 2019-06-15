@@ -13,15 +13,15 @@
 #include "../../Data/TrackLayer.h"
 
 
-Cursor::Cursor(AudioView *_view, bool end) {
+Cursor::Cursor(AudioView *_view, bool end) : ViewNodeFree() {
 	view = _view;
-	z = 50;
+	align.dz = 50;
 	is_end = end;
 	drag_range = Range::EMPTY;
 }
 
 void Cursor::draw(Painter* c) {
-	view->draw_time_line(c, pos(), view->colors.selection_boundary, view_hover(view->hover), false, true);
+	view->draw_time_line(c, pos(), view->colors.selection_boundary, is_cur_hover(), false, true);
 }
 
 int Cursor::pos() {
@@ -57,14 +57,16 @@ bool Cursor::on_left_button_down() {
 }
 
 
-SelectionMarker::SelectionMarker(AudioView *_view) {
+SelectionMarker::SelectionMarker(AudioView *_view) : ViewNodeFree() {
 	view = _view;
-	z = 49;
+	align.dz = 49;
 }
 
 void SelectionMarker::draw(Painter* p) {
 	float x1, x2;
 	view->cam.range2screen_clip(view->sel.range, view->song_area, x1, x2);
+
+	auto &hover = view->hover();
 
 	if (!view->hide_selection) {
 		if ((view->selection_mode == SelectionMode::TIME) or (view->selection_mode == SelectionMode::TRACK_RECT)) {
@@ -76,12 +78,12 @@ void SelectionMarker::draw(Painter* p) {
 					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
 		}else if (view->selection_mode == SelectionMode::RECT) {
 			float x1, x2;
-			view->cam.range2screen_clip(view->hover.range, view->clip, x1, x2);
+			view->cam.range2screen_clip(hover.range, view->clip, x1, x2);
 			p->set_color(view->colors.selection_internal);
 			p->set_fill(false);
-			p->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
+			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
 			p->set_fill(true);
-			p->draw_rect(rect(x1, x2, view->hover.y0, view->hover.y1));
+			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
 		}
 	}
 
@@ -99,8 +101,8 @@ void SelectionMarker::draw(Painter* p) {
 		}
 		p->set_line_width(1.0f);
 	}
-	if (view->hover.type == HoverData::Type::BAR_GAP) {
-		x2 = view->cam.sample2screen(view->song->bar_offset(view->hover.index));
+	if (hover.type == HoverData::Type::BAR_GAP) {
+		x2 = view->cam.sample2screen(view->song->bar_offset(hover.index));
 		p->set_color(view->colors.hover);
 		p->set_line_width(2.5f);
 		for (auto *t: view->vlayer)

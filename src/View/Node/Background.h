@@ -12,7 +12,7 @@
 
 class AudioView;
 
-class Background : public ViewNode {
+class Background : public ViewNodeFree {
 public:
 	Background(AudioView *view);
 

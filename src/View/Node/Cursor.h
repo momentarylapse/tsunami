@@ -13,7 +13,7 @@
 
 class AudioView;
 
-class Cursor : public ViewNode {
+class Cursor : public ViewNodeFree {
 public:
 	Cursor(AudioView *view, bool end);
 
@@ -30,7 +30,7 @@ public:
 	bool on_left_button_down() override;
 };
 
-class SelectionMarker : public ViewNode {
+class SelectionMarker : public ViewNodeFree {
 public:
 	SelectionMarker(AudioView *view);
 	bool hover(float mx, float my) override { return false; }

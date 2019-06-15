@@ -8,17 +8,16 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
-ScrollBar::ScrollBar(AudioView *_view, ViewNode *parent) : ViewNode(parent, 0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
-	//node_width = AudioView::SCROLLBAR_WIDTH;
-	//node_height = 100;
-	//node_align_right = true;
-	z += 10;
+ScrollBar::ScrollBar(AudioView *_view) : ViewNodeRel(0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
+	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::LEFT;
+	align.dz = 20;
 	view = _view;
 }
-ScrollBarHorizontal::ScrollBarHorizontal(AudioView *_view, ViewNode *parent) : ScrollBar(_view, parent) {
+ScrollBarHorizontal::ScrollBarHorizontal(AudioView *_view) : ScrollBar(_view) {
+	align.vertical = AlignData::Mode::BOTTOM;
+	align.horizontal = AlignData::Mode::FILL;
 	align.h = AudioView::SCROLLBAR_WIDTH;
-	align.w = 100;
-	//node_align_right = true;
 	horizontal = true;
 }
 
@@ -40,7 +39,7 @@ void ScrollBar::drag_update(float mx, float my) {
 void ScrollBar::draw(Painter *c) {
 	c->set_color(AudioView::colors.background);
 	c->draw_rect(area);
-	bool _hover = view_hover(view->hover);
+	bool _hover = is_cur_hover();
 	c->set_color(_hover ? AudioView::colors.text_soft1 : AudioView::colors.text_soft3);
 	float d = 5;
 	float f = page_size / content_size;

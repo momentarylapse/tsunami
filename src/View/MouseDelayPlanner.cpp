@@ -7,11 +7,11 @@
 
 #include "MouseDelayPlanner.h"
 #include "../lib/hui/hui.h"
-#include "AudioView.h"
+#include "Node/SceneGraph.h"
 #include <cmath>
 
-MouseDelayPlanner::MouseDelayPlanner(AudioView *_view) {
-	view = _view;
+MouseDelayPlanner::MouseDelayPlanner(SceneGraph *sg) {
+	scene_graph = sg;
 	min_move_to_start = hui::Config.get_int("View.MouseMinMoveToSelect", 5);
 	hui::Config.set_int("View.MouseMinMoveToSelect", min_move_to_start);
 }
@@ -20,16 +20,15 @@ void MouseDelayPlanner::prepare(MouseDelayAction *a) {
 	if (action)
 		cancel();
 	dist = 0;
-	pos0 = view->cam.screen2sample(view->mx);
-	x0 = view->mx;
-	y0 = view->my;
+	x0 = scene_graph->mx;
+	y0 = scene_graph->my;
 	action = a;
 }
 
 bool MouseDelayPlanner::update() {
 	if (acting()) {
 		action->on_update();
-		view->force_redraw();
+		//view->force_redraw();
 	} else if (has_focus()) {
 		auto e = hui::GetEvent();
 		dist += fabs(e->dx) + fabs(e->dy);
@@ -59,7 +58,7 @@ void MouseDelayPlanner::finish() {
 		delete action;
 		action = nullptr;
 		_started_acting = false;
-		view->force_redraw();
+		//view->force_redraw();
 	}
 	dist = -1;
 }
@@ -71,7 +70,7 @@ void MouseDelayPlanner::cancel() {
 		delete action;
 		action = nullptr;
 		_started_acting = false;
-		view->force_redraw();
+		//view->force_redraw();
 	}
 	dist = -1;
 }

@@ -274,7 +274,7 @@ public:
 		vlayer = l;
 		view = vlayer->view;
 		pitch = _pitch;
-		pos0 = vlayer->view->hover.pos;
+		pos0 = vlayer->view->hover().pos;
 	}
 	void on_start() override {
 		view->mode_midi->start_midi_preview(pitch, 1.0f);
@@ -317,8 +317,8 @@ public:
 		for (int p: pitch)
 			notes.add(new MidiNote(r and allowed, p, 1));
 		if (notes.num > 0){
-			notes[0]->clef_position = view->hover.clef_position;
-			notes[0]->modifier = view->hover.modifier;
+			notes[0]->clef_position = view->hover().clef_position;
+			notes[0]->modifier = view->hover().modifier;
 		}
 		return notes;
 	}
@@ -329,24 +329,24 @@ void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
 	auto mode = cur_vlayer()->midi_mode;
 
-	if (hover->type == HoverData::Type::CLEF_POSITION) {
+	if (hover().type == HoverData::Type::CLEF_POSITION) {
 		if (mode == MidiMode::TAB)
-			string_no = clampi(hover->clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
-	}else if (hover->type == HoverData::Type::MIDI_PITCH){
+			string_no = clampi(hover().clef_position, 0, view->cur_track()->instrument.string_pitch.num - 1);
+	}else if (hover().type == HoverData::Type::MIDI_PITCH){
 		if (mode == MidiMode::CLASSICAL)
-			octave = pitch_get_octave(hover->pitch);
+			octave = pitch_get_octave(hover().pitch);
 	}
 
 	if (creation_mode == CreationMode::SELECT ) {
-		view->set_cursor_pos(hover->pos_snap);
+		view->set_cursor_pos(hover().pos_snap);
 		select_in_edit_cursor();
 		start_selection_rect(SelectionMode::RECT);
 
 	} else {
 		if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
-			if (hover->type == HoverData::Type::MIDI_PITCH) {
+			if (hover().type == HoverData::Type::MIDI_PITCH) {
 
-				Array<int> pitch = get_creation_pitch(hover->pitch);
+				Array<int> pitch = get_creation_pitch(hover().pitch);
 				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch));
 			}
 		} else /* TAB */ {
@@ -765,8 +765,8 @@ void ViewModeMidi::draw_post(Painter *c) {
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 
 		// creation preview
-		if ((!hui::GetEvent()->lbut) and (hover->type == HoverData::Type::MIDI_PITCH)) {
-			auto notes = get_creation_notes(hover, hover->pos);
+		if ((!hui::GetEvent()->lbut) and (hover().type == HoverData::Type::MIDI_PITCH)) {
+			auto notes = get_creation_notes(&hover(), hover().pos);
 			mp->draw(c, notes);
 		}
 	}

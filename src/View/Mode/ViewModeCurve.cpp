@@ -31,11 +31,11 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 	if (!curve)
 		return;
 
-	if (hover->type == HoverData::Type::CURVE_POINT_NONE) {
+	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
 		int pos = view->get_mouse_pos();
 		float value = screen2value(view->my);
 		song->curve_add_point(curve, pos, value);
-	} else if (hover->type == HoverData::Type::CURVE_POINT) {
+	} else if (hover().type == HoverData::Type::CURVE_POINT) {
 		view->mdp_prepare([=] {
 			int pos = view->get_mouse_pos();
 			float value = screen2value(view->my);
@@ -73,9 +73,9 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 
 		// points
 		foreachi(auto &p, curve->points, i) {
-			if ((hover->type == HoverData::Type::CURVE_POINT) and (i == hover->index))
+			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index))
 				c->set_color(view->colors.selection_boundary_hover);
-			else if ((hover->type == HoverData::Type::CURVE_POINT) and (i == hover->index))
+			else if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index))
 				// TODO.... selected...
 				c->set_color(view->colors.selection_boundary);
 			else

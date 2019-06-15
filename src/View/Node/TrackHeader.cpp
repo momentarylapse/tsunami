@@ -22,12 +22,12 @@
 
 
 
-class TrackHeaderButton : public ViewNode {
+class TrackHeaderButton : public ViewNodeRel {
 public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
 	TrackHeader *header;
-	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNode(th, dx, dy, 16, 16) {
+	TrackHeaderButton(TrackHeader *th, float dx, float dy) : ViewNodeRel(dx, dy, 16, 16) {
 		vtrack = th->vtrack;
 		header = th;
 		view = th->view;
@@ -38,7 +38,7 @@ public:
 		return h;
 	}
 	color get_color() {
-		if (view_hover(view->hover))
+		if (is_cur_hover())
 			return view->colors.text;
 		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
 	}
@@ -108,20 +108,20 @@ public:
 	}
 };
 
-TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNode(t, 0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
-	z = 10;
+TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
+	align.dz = 10;
 	vtrack = t;
 	view = vtrack->view;
 	float x0 = 5;
 	float dx = 17;
-	children.add(new TrackButtonMute(this, x0, 22));
-	children.add(new TrackButtonSolo(this, x0+dx, 22));
-	children.add(new TrackButtonConfig(this, x0+dx*2, 22));
+	add_child(new TrackButtonMute(this, x0, 22));
+	add_child(new TrackButtonSolo(this, x0+dx, 22));
+	add_child(new TrackButtonConfig(this, x0+dx*2, 22));
 }
 
 void TrackHeader::draw(Painter *c) {
 	auto *track = vtrack->track;
-	bool _hover = view_hover(view->hover);
+	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_track(track);
 	bool playable = view->get_playable_tracks().contains(track);
 

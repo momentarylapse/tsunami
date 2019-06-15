@@ -17,7 +17,7 @@ class AudioViewLayer;
 class MidiKeyChange;
 
 
-class AudioViewTrack : public ViewNode {
+class AudioViewTrack : public ViewNodeFree {
 public:
 	AudioViewTrack(AudioView *view, Track *track);
 	~AudioViewTrack() override;

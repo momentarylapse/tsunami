@@ -1008,6 +1008,7 @@ void AudioView::draw_song(Painter *c) {
 
 	update_buffer_zoom();
 
+	scene_graph->update_geometry_recursive(area);
 	scene_graph->draw(c);
 
 	// playing/capturing position

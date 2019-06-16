@@ -24,9 +24,8 @@ public:
 		view = time_scale->view;
 		align.horizontal = AlignData::Mode::FILL;
 	}
-	void update_area() override {
-		area = parent->area;
-		z = parent->z + 1;
+	void update_geometry(const rect &target_area) override {
+		area = target_area;
 		view->cam.range2screen_clip(view->playback_wish_range, parent->area, area.x1, area.x2);
 		hidden = (view->playback_wish_range.length == 0);
 	}
@@ -62,7 +61,7 @@ public:
 	PlaybackLockSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
-	void update_area() override {
+	void update_geometry(const rect &target_area) override {
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
 		area = rect(x, x + 20, area.y1, area.y1 + AudioView::TIME_SCALE_HEIGHT);
 		hidden = !view->playback_range_locked;
@@ -92,7 +91,7 @@ public:
 	PlaybackLoopSymbol(TimeScale *time_scale) : ViewNodeRel(0, 0, 20, 20) {
 		view = time_scale->view;
 	}
-	void update_area() override {
+	void update_geometry(const rect &target_area) override {
 		float x = view->cam.sample2screen(view->get_playback_selection(false).end());
 		if (view->playback_range_locked)
 			x += 20;

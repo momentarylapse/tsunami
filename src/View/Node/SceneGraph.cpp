@@ -53,23 +53,19 @@ SceneGraph::SceneGraph(hui::Callback _cb_set_currtent) {
 
 bool SceneGraph::on_left_button_down() {
 	set_mouse();
-
-
 	hover = get_hover_data(mx, my);
 
-	bool allow_handle = true;
 	if (hui::GetEvent()->just_focused)
-		allow_handle = allow_handle_click_when_gaining_focus();
+		if (!allow_handle_click_when_gaining_focus())
+			return true;
 
-	if (allow_handle) {
-		set_current(hover);
+	set_current(hover);
 
-		auto nodes = collect_children_down(this);
-		for (auto *c: nodes)
-			if (c->hover(mx, my))
-				if (c->on_left_button_down())
-					return true;
-	}
+	auto nodes = collect_children_down(this);
+	for (auto *c: nodes)
+		if (c->hover(mx, my))
+			if (c->on_left_button_down())
+				return true;
 	return false;
 }
 
@@ -154,14 +150,7 @@ string SceneGraph::get_tip() {
 	return "";
 }
 
-void SceneGraph::update_area() {
-	auto nodes = collect_children(this, true);
-	for (auto *n: nodes)
-		n->update_area();
-}
-
 void SceneGraph::draw(Painter *p) {
-	update_area();
 
 	auto nodes = collect_children_up(this);
 	for (auto *n: nodes)

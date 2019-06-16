@@ -40,7 +40,8 @@ public:
 
 	virtual string get_tip();
 
-	virtual void update_area();
+	virtual void update_geometry(const rect &target_area);
+	virtual void update_geometry_recursive(const rect &target_area);
 
 	ViewNode *root();
 

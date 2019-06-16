@@ -80,31 +80,37 @@ string ViewNode::get_tip() {
 	return "";
 }
 
-void ViewNode::update_area() {
-	if (parent) {
-		z = parent->z + align.dz;
-		if (align.horizontal == AlignData::Mode::FILL) {
-			area.x1 = parent->area.x1;
-			area.x2 = parent->area.x2;
-		} else if (align.horizontal == AlignData::Mode::LEFT) {
-			area.x1 = parent->area.x1 + align.dx;
-			area.x2 = area.x1 + align.w;
-		} else if (align.horizontal == AlignData::Mode::RIGHT) {
-			area.x2 = parent->area.x2 + align.dx;
-			area.x1 = area.x2 - align.w;
-		}
-
-		if (align.vertical == AlignData::Mode::FILL) {
-			area.y1 = parent->area.y1;
-			area.y2 = parent->area.y2;
-		} else if (align.vertical == AlignData::Mode::TOP) {
-			area.y1 = parent->area.y1 + align.dy;
-			area.y2 = area.y1 + align.h;
-		} else if (align.vertical == AlignData::Mode::BOTTOM) {
-			area.y2 = parent->area.y2 + align.dy;
-			area.y1 = area.y2 - align.h;
-		}
+void ViewNode::update_geometry(const rect &target_area) {
+	if (align.horizontal == AlignData::Mode::FILL) {
+		area.x1 = target_area.x1;
+		area.x2 = target_area.x2;
+	} else if (align.horizontal == AlignData::Mode::LEFT) {
+		area.x1 = target_area.x1 + align.dx;
+		area.x2 = area.x1 + align.w;
+	} else if (align.horizontal == AlignData::Mode::RIGHT) {
+		area.x2 = target_area.x2 + align.dx;
+		area.x1 = area.x2 - align.w;
 	}
+
+	if (align.vertical == AlignData::Mode::FILL) {
+		area.y1 = target_area.y1;
+		area.y2 = target_area.y2;
+	} else if (align.vertical == AlignData::Mode::TOP) {
+		area.y1 = target_area.y1 + align.dy;
+		area.y2 = area.y1 + align.h;
+	} else if (align.vertical == AlignData::Mode::BOTTOM) {
+		area.y2 = target_area.y2 + align.dy;
+		area.y1 = area.y2 - align.h;
+	}
+}
+
+void ViewNode::update_geometry_recursive(const rect &target_area) {
+	update_geometry(target_area);
+	if (parent)
+		z = parent->z + align.dz;
+
+	for (auto *c: children)
+		c->update_geometry_recursive(area);
 }
 
 ViewNodeFree::ViewNodeFree() : ViewNode(0, 0) {

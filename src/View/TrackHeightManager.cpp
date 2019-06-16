@@ -129,7 +129,7 @@ void TrackHeightManager::update_immediately(AudioView *view, Song *a, const rect
 	set_track_areas_from_layers(view);
 }
 
-void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
+void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r)
 {
 	for (auto *l: v->vlayer){
 		l->height_min = v->mode->layer_min_height(l);

@@ -110,7 +110,8 @@ public:
 
 	struct{
 		bool antialiasing;
-		float dx_min;
+		float rhythm_zoom_min;
+		float notes_zoom_min;
 		float shadow_threshold;
 		float note_circle_threshold;
 		float tab_text_threshold;
@@ -134,7 +135,7 @@ public:
 	int screen_to_string(float y);
 
 	float pitch2y_classical(int pitch);
-	float pitch2y_linear(int pitch);
+	float pitch2y_linear(float pitch);
 	int y2pitch_classical(float y, NoteModifier modifier);
 	int y2pitch_linear(float y);
 	int y2clef_classical(float y, NoteModifier &mod);

@@ -104,7 +104,7 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiPainter::Midi
 	} else if (state & MidiPainter::STATE_REFERENCE) {
 		col = ColorInterpolate(col, colors.background_track, 0.65f);
 	}
-	col_shadow = ColorInterpolate(col, colors.background_track, 0.3f);
+	col_shadow = ColorInterpolate(col, colors.background_track, 0.5f);
 }
 
 
@@ -136,8 +136,8 @@ int MidiPainter::screen_to_string(float y) {
 	return (int)floor((string_y0 - y) / string_dy + 0.5f);
 }
 
-float MidiPainter::pitch2y_linear(int pitch) {
-	return area.y2 - area.height() * ((float)pitch - pitch_min) / (pitch_max - pitch_min);
+float MidiPainter::pitch2y_linear(float pitch) {
+	return area.y2 - area.height() * (pitch - (float)pitch_min) / (pitch_max - pitch_min);
 }
 
 float MidiPainter::pitch2y_classical(int pitch) {
@@ -435,9 +435,8 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 
 
 void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Range &range, std::function<float(MidiNote*)> y_func) {
-	if (cam->scale * song->sample_rate < quality.dx_min)
+	if (cam->scale < quality.rhythm_zoom_min)
 		return;
-
 
 	c->set_antialiasing(quality.antialiasing);
 
@@ -549,16 +548,14 @@ void MidiPainter::draw_complex_note(Painter *c, const MidiNote *n, MidiNoteState
 void MidiPainter::draw_note_linear(Painter *c, const MidiNote &n, MidiNoteState state) {
 	float x1, x2;
 	cam->range2screen(n.range, x1, x2);
-	float y1 = pitch2y_linear(n.pitch + 1);
-	float y2 = pitch2y_linear(n.pitch);
-
-	float y = (y1 + y2) / 2;
+	float y = pitch2y_linear(n.pitch);
 	n.y = y;
 
 	draw_complex_note(c, &n, state, x1, x2, y);
 }
 
 void MidiPainter::draw_linear(Painter *c, const MidiNoteBuffer &notes) {
+	draw_rhythm(c, notes, cur_range, [=](MidiNote *n){ return pitch2y_linear(n->pitch); });
 	//c->setLineWidth(3.0f);
 
 	// draw notes
@@ -798,8 +795,7 @@ void MidiPainter::draw(Painter *c, const MidiNoteBuffer &midi) {
 	midi.update_clef_pos(*instrument, midi_scale);
 	MidiNoteBufferRef notes = midi.get_notes(cur_range);
 
-	float w_1min = cam->dsample2screen(song->sample_rate * 60);
-	if ((notes.num > quality.note_count_threshold) or (w_1min < 1000/quality.factor)) {
+	if (cam->scale < quality.notes_zoom_min) {
 		draw_low_detail_dummy(c, midi);
 	} else {
 		_draw_notes(c, notes);
@@ -859,7 +855,8 @@ void MidiPainter::set_shift(int _shift) {
 
 void MidiPainter::set_quality(float q, bool antialiasing) {
 	quality.factor = q;
-	quality.dx_min = 20 / q;
+	quality.rhythm_zoom_min = 40 / q / song->sample_rate;
+	quality.notes_zoom_min = 20 / q / song->sample_rate;
 	quality.shadow_threshold = rr*1.5f / q;
 	quality.note_circle_threshold = 6 / q;
 	quality.tab_text_threshold = rr/4 / q;

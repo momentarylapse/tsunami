@@ -13,8 +13,7 @@ class Range;
 class rect;
 class Song;
 
-class ViewPort
-{
+class ViewPort {
 public:
 	ViewPort(AudioView *v);
 	ViewPort(rect &area);
@@ -23,7 +22,6 @@ public:
 	static const float BORDER_FACTOR_RIGHT;
 
 	AudioView *view;
-	rect &area;
 
 	double pos;
 	double pos_pre_animation;
@@ -47,6 +45,9 @@ public:
 	void move(float dpos);
 	void set_target(float pos, float nonlin);
 	void dirty_jump(float pos);
+
+	rect area();
+	rect *override_area;
 
 	void make_sample_visible(int sample, int samples_ahead);
 	rect nice_mapping_area();

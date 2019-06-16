@@ -45,6 +45,8 @@ Array<ViewNode*> collect_children_down(ViewNode *n) {
 
 
 SceneGraph::SceneGraph(hui::Callback _cb_set_currtent) {
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
 	mx = -1;
 	my = -1;
 	mdp = new MouseDelayPlanner(this);

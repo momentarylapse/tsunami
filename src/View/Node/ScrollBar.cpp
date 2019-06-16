@@ -80,3 +80,9 @@ bool ScrollBar::on_left_button_down() {
 	});
 	return true;
 }
+
+void ScrollBar::update_geometry(const rect& target_area) {
+	ViewNode::update_geometry(target_area);
+	if (auto_hide)
+		hidden = !(page_size < content_size);
+}

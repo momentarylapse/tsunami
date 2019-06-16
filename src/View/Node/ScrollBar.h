@@ -24,12 +24,15 @@ public:
 	float content_size = 0;
 	float mouse_offset = 0;
 	bool horizontal = false;
+	bool auto_hide = false;
 	void drag_update(float mx, float my);
 	void draw(Painter *c) override;
 	void set_area(const rect &r);
 	void update(float page, float content);
 
 	bool on_left_button_down() override;
+
+	void update_geometry(const rect &target_area) override;
 
 	AudioView *view;
 	std::function<void()> callback;

@@ -259,7 +259,7 @@ public:
 	bool editing_layer(AudioViewLayer *l);
 
 	rect area;
-	rect song_area;
+	rect song_area();
 	rect clip;
 	TrackHeightManager thm;
 	SceneGraph *scene_graph;
@@ -273,8 +273,8 @@ public:
 	ViewPort cam;
 	void cam_changed();
 
-	ScrollBar *scroll_bar_h;
-	ScrollBar *scroll_bar_w;
+	ScrollBar *scroll_bar_y;
+	ScrollBar *scroll_bar_time;
 	TimeScale *time_scale;
 	ViewNode *background;
 	Cursor *cursor_start, *cursor_end;

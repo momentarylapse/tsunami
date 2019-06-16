@@ -64,7 +64,7 @@ SelectionMarker::SelectionMarker(AudioView *_view) : ViewNodeFree() {
 
 void SelectionMarker::draw(Painter* p) {
 	float x1, x2;
-	view->cam.range2screen_clip(view->sel.range, view->song_area, x1, x2);
+	view->cam.range2screen_clip(view->sel.range, view->song_area(), x1, x2);
 
 	auto &hover = view->hover();
 

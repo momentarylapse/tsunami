@@ -146,11 +146,11 @@ void NodeHBox::update_geometry_recursive(const rect &target_area) {
 	}
 	float offset = 0;
 	for (auto *c: children) {
-		if (c->hidden)
-			continue;
 		float w = c->align.w;
 		if (c->align.horizontal == AlignData::Mode::FILL)
 			w = (w_avail - w_min) / n_expand;
+		if (c->hidden)
+			w = 0;
 		c->update_geometry_recursive(rect(area.x1 + offset, area.x1 + offset + w, area.y1, area.y2));
 		offset += w;
 	}
@@ -169,6 +169,8 @@ void NodeVBox::update_geometry_recursive(const rect &target_area) {
 	float h_min = 0;
 	int n_expand = 0;
 	for (auto *c: children) {
+		if (c->hidden)
+			continue;
 		if (c->align.vertical == AlignData::Mode::FILL)
 			n_expand ++;
 		else
@@ -179,6 +181,8 @@ void NodeVBox::update_geometry_recursive(const rect &target_area) {
 		float h = c->align.h;
 		if (c->align.vertical == AlignData::Mode::FILL)
 			h = (h_avail - h_min) / n_expand;
+		if (c->hidden)
+			h = 0;
 		c->update_geometry_recursive(rect(area.x1, area.x2, area.y1 + offset, area.y1 + offset + h));
 		offset += h;
 	}

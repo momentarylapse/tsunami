@@ -68,6 +68,7 @@ public:
 
 
 AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeFree() {
+	align.horizontal = AlignData::Mode::FILL;
 	view = _view;
 	layer = _layer;
 	solo = false;
@@ -530,7 +531,7 @@ GridColors AudioViewLayer::grid_colors() {
 bool AudioViewLayer::on_screen() {
 	if (hidden)
 		return false;
-	return (area.y1 < view->song_area.y2) and (area.y2 > view->song_area.y1);
+	return (area.y1 < view->song_area().y2) and (area.y2 > view->song_area().y1);
 }
 
 void AudioViewLayer::update_header() {

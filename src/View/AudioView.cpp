@@ -167,7 +167,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	scene_graph = new SceneGraph([=]{ set_current(scene_graph->cur_selection); });
 	area = rect(0, 1024, 0, 768);
-	song_area = area;
 	enabled = true;
 	time_scale = new TimeScale(this);
 
@@ -178,11 +177,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
 	selection_marker = new SelectionMarker(this);
-	scroll_bar_h = new ScrollBar(this);
-	scroll_bar_h->set_callback([=]{ thm.update_immediately(this, song, song_area); });
-	scroll_bar_w = new ScrollBarHorizontal(this);
-	scroll_bar_w->set_callback([=]{ cam.dirty_jump(song->range_with_time().start() + scroll_bar_w->offset); });
-	scroll_bar_w->constrained = false;
+	scroll_bar_y = new ScrollBar(this);
+	scroll_bar_y->auto_hide = true;
+	scroll_bar_y->set_callback([=]{ thm.update_immediately(this, song, song_area()); });
+	scroll_bar_time = new ScrollBarHorizontal(this);
+	scroll_bar_time->set_callback([=]{ cam.dirty_jump(song->range_with_time().start() + scroll_bar_time->offset); });
+	scroll_bar_time->constrained = false;
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
@@ -193,16 +193,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	vbox->add_child(time_scale);
 	vbox->add_child(hbox);
-	vbox->add_child(scroll_bar_w);
+	vbox->add_child(scroll_bar_time);
 
-	hbox->add_child(scroll_bar_h);
+	hbox->add_child(scroll_bar_y);
 	hbox->add_child(background);
 
 	scene_graph->add_child(cursor_start);
 	scene_graph->add_child(cursor_end);
 	scene_graph->add_child(selection_marker);
-	scene_graph->add_child(scroll_bar_h);
-	scene_graph->add_child(scroll_bar_w);
 	scene_graph->add_child(metronome_overlay_vlayer);
 
 	buffer_painter = new BufferPainter(this);
@@ -292,8 +290,8 @@ AudioView::~AudioView() {
 	signal_chain->unsubscribe(this);
 	song->unsubscribe(this);
 
-	delete scroll_bar_h;
-	delete scroll_bar_w;
+	delete scroll_bar_y;
+	delete scroll_bar_time;
 
 	delete buffer_painter;
 	delete grid_painter;
@@ -908,23 +906,12 @@ bool need_metro_overlay(Song *song, AudioView *view) {
 }
 
 bool AudioView::update_scene_graph() {
-	scene_graph->area = area;
 
-	//background->area = area;
-
-	song_area = area;
-	song_area.y1 += TIME_SCALE_HEIGHT;
-	bool scroll_bar_h_needed = scroll_bar_h->page_size < scroll_bar_h->content_size;
 	bool scroll_bar_w_needed = !cam.range().covers(song->range_with_time());
-	if (scroll_bar_h_needed)
-		song_area.x1 += SCROLLBAR_WIDTH;
-	if (scroll_bar_w_needed)
-		song_area.y2 -= SCROLLBAR_WIDTH;
-	scroll_bar_h->hidden = !scroll_bar_h_needed;
-	bool animating = thm.update(this, song, song_area);
+	bool animating = thm.update(this, song, song_area());
 
-	scroll_bar_w->hidden = !scroll_bar_w_needed;
-	scroll_bar_w->update(cam.range().length, song->range_with_time().length);
+	scroll_bar_time->hidden = !scroll_bar_w_needed;
+	scroll_bar_time->update(cam.range().length, song->range_with_time().length);
 
 	for (auto *v: vlayer) {
 		v->update_header();
@@ -933,9 +920,15 @@ bool AudioView::update_scene_graph() {
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {
 		metronome_overlay_vlayer->layer = song->time_track()->layers[0];
-		metronome_overlay_vlayer->area = rect(song_area.x1, song_area.x2, song_area.y1, song_area.y1 + this->TIME_SCALE_HEIGHT*2);
+		metronome_overlay_vlayer->area = rect(song_area().x1, song_area().x2, song_area().y1, song_area().y1 + this->TIME_SCALE_HEIGHT*2);
 	}
 	return animating;
+}
+
+rect AudioView::song_area() {
+	if (!background)
+		return rect::EMPTY;
+	return background->area;
 }
 
 
@@ -969,7 +962,7 @@ void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
-	draw_cursor_hover(c, msg, mx, my, song_area);
+	draw_cursor_hover(c, msg, mx, my, song_area());
 }
 
 void AudioView::draw_message(Painter *c, Message &m) {
@@ -987,7 +980,7 @@ void AudioView::draw_message(Painter *c, Message &m) {
 
 void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time, bool show_circle) {
 	float x = cam.sample2screen(pos);
-	if ((x >= song_area.x1) and (x <= song_area.x2)) {
+	if ((x >= song_area().x1) and (x <= song_area().x2)) {
 		color cc = col;
 		if (hover)
 			cc = colors.selection_boundary_hover;
@@ -995,7 +988,7 @@ void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover
 		c->set_line_width(2.0f);
 		c->draw_line(x, area.y1, x, area.y2);
 		if (show_time)
-			draw_boxed_str(c,  x, (song_area.y1 + song_area.y2) / 2, song->get_time_str_long(pos), cc, colors.background);
+			draw_boxed_str(c,  x, song_area().my(), song->get_time_str_long(pos), cc, colors.background);
 		c->set_line_width(1.0f);
 		if (show_circle)
 			c->draw_circle(x, area.y2, 8);
@@ -1036,7 +1029,7 @@ void AudioView::draw_song(Painter *c) {
 
 	tip = mode->get_tip();
 	if (tip.num > 0)
-		draw_boxed_str(c, song_area.mx(), area.y2 - 30, tip, colors.text_soft1, colors.background_track_selected, 0);
+		draw_boxed_str(c, song_area().mx(), area.y2 - 30, tip, colors.text_soft1, colors.background_track_selected, 0);
 
 
 	if (message.ttl > 0) {
@@ -1508,8 +1501,8 @@ HoverData AudioView::hover_time(float mx, float my) {
 
 void AudioView::cam_changed() {
 	notify(MESSAGE_VIEW_CHANGE);
-	scroll_bar_w->update(cam.range().length, song->range_with_time().length);
-	scroll_bar_w->offset = cam.pos - song->range_with_time().start();
+	scroll_bar_time->update(cam.range().length, song->range_with_time().length);
+	scroll_bar_time->offset = cam.pos - song->range_with_time().start();
 	force_redraw();
 }
 

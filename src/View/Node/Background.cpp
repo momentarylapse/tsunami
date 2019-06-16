@@ -41,7 +41,7 @@ bool Background::on_right_button_down() {
 	return true;
 }
 
-void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, AudioView *view) {
+void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2) {
 	float y = 0;
 	bool sel_any = false;
 	bool same_track = false;
@@ -60,13 +60,13 @@ void draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewLayer *l2, Au
 		c->set_line_dash({3,10}, 0);
 
 	c->set_color(AudioView::colors.grid);
-	c->draw_line(view->song_area.x1, y, view->song_area.x2, y);
+	c->draw_line(area.x1, y, area.x2, y);
 	c->set_line_dash({}, 0);
 
 }
 
 void Background::draw(Painter* c) {
-	int yy = view->song_area.y1;
+	int yy = area.y1;
 	if (view->vlayer.num > 0)
 		yy = view->vlayer.back()->area.y2;
 
@@ -76,9 +76,9 @@ void Background::draw(Painter* c) {
 			view->mode->draw_layer_background(c, l);
 
 	// free space below tracks
-	if (yy < view->song_area.y2) {
+	if (yy < area.y2) {
 		c->set_color(AudioView::colors.background);
-		rect rr = rect(view->song_area.x1, view->song_area.x2, yy, view->song_area.y2);
+		rect rr = rect(area.x1, area.x2, yy, area.y2);
 		GridColors g;
 		g.bg = g.bg_sel = view->colors.background;
 		g.fg = g.fg_sel = view->colors.grid;
@@ -93,10 +93,10 @@ void Background::draw(Painter* c) {
 	// lines between tracks
 	AudioViewLayer *prev = nullptr;
 	for (auto *l: view->vlayer) {
-		draw_layer_separator(c, prev, l, view);
+		draw_layer_separator(c, prev, l);
 		prev = l;
 	}
-	draw_layer_separator(c, prev, nullptr, view);
+	draw_layer_separator(c, prev, nullptr);
 }
 
 HoverData Background::get_hover_data(float mx, float my) {

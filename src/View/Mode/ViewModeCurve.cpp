@@ -90,8 +90,8 @@ void ViewModeCurve::draw_post(Painter* c) {
 	if (!t)
 		return;
 	c->set_color(color(0.1f, 1, 1, 1));
-	c->draw_rect(view->song_area.x1, t->area.y1-30, view->song_area.width(), 30);
-	c->draw_rect(view->song_area.x1, t->area.y2, view->song_area.width(), 30);
+	c->draw_rect(view->song_area().x1, t->area.y1-30, view->song_area().width(), 30);
+	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), 30);
 }
 
 HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {

@@ -8,9 +8,10 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
-ScrollBar::ScrollBar(AudioView *_view) : ViewNodeRel(0, 0, AudioView::SCROLLBAR_WIDTH, 100) {
+ScrollBar::ScrollBar(AudioView *_view) {
 	align.vertical = AlignData::Mode::FILL;
 	align.horizontal = AlignData::Mode::LEFT;
+	align.w = AudioView::SCROLLBAR_WIDTH;
 	align.dz = 20;
 	view = _view;
 }

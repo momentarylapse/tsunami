@@ -14,7 +14,7 @@
 class Painter;
 class AudioView;
 
-class ScrollBar : public ViewNodeRel {
+class ScrollBar : public ViewNode {
 public:
 	ScrollBar(AudioView *view);
 	//ScrollBar(AudioView *view);

@@ -115,7 +115,6 @@ void ___draw_str_with_shadow(Painter *c, float x, float y, const string &str, co
 
 
 
-
 AudioView::AudioView(Session *_session, const string &_id) :
 	cam(this)
 {
@@ -172,6 +171,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	enabled = true;
 	time_scale = new TimeScale(this);
 
+	auto *vbox = new NodeVBox();
+	auto *hbox = new NodeHBox();
+
 	background = new Background(this);
 	cursor_start = new Cursor(this, false);
 	cursor_end = new Cursor(this, true);
@@ -186,8 +188,16 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
 
-	scene_graph->add_child(time_scale);
-	scene_graph->add_child(background);
+
+	scene_graph->add_child(vbox);
+
+	vbox->add_child(time_scale);
+	vbox->add_child(hbox);
+	vbox->add_child(scroll_bar_w);
+
+	hbox->add_child(scroll_bar_h);
+	hbox->add_child(background);
+
 	scene_graph->add_child(cursor_start);
 	scene_graph->add_child(cursor_end);
 	scene_graph->add_child(selection_marker);
@@ -900,7 +910,7 @@ bool need_metro_overlay(Song *song, AudioView *view) {
 bool AudioView::update_scene_graph() {
 	scene_graph->area = area;
 
-	background->area = area;
+	//background->area = area;
 
 	song_area = area;
 	song_area.y1 += TIME_SCALE_HEIGHT;

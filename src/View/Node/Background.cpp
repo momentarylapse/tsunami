@@ -19,8 +19,8 @@ MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode);
 
 Background::Background(AudioView *_view) : ViewNodeFree() {
 	view = _view;
-	z = -1;
-	area = rect(0, 2000, 0, 2000);
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
 }
 
 bool Background::on_left_button_down() {

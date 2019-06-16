@@ -122,3 +122,65 @@ ViewNodeRel::ViewNodeRel(float dx, float dy, float w, float h) : ViewNode(w, h) 
 	align.vertical = AlignData::Mode::TOP;
 	align.dy = dy;
 }
+
+
+
+NodeHBox::NodeHBox() {
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
+}
+void NodeHBox::update_geometry_recursive(const rect &target_area) {
+	update_geometry(target_area);
+	if (parent)
+		z = parent->z + align.dz;
+	float w_avail = area.width();
+	float w_min = 0;
+	int n_expand = 0;
+	for (auto *c: children) {
+		if (c->hidden)
+			continue;
+		if (c->align.horizontal == AlignData::Mode::FILL)
+			n_expand ++;
+		else
+			w_min += c->align.w;
+	}
+	float offset = 0;
+	for (auto *c: children) {
+		if (c->hidden)
+			continue;
+		float w = c->align.w;
+		if (c->align.horizontal == AlignData::Mode::FILL)
+			w = (w_avail - w_min) / n_expand;
+		c->update_geometry_recursive(rect(area.x1 + offset, area.x1 + offset + w, area.y1, area.y2));
+		offset += w;
+	}
+}
+
+NodeVBox::NodeVBox() {
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
+}
+
+void NodeVBox::update_geometry_recursive(const rect &target_area) {
+	update_geometry(target_area);
+	if (parent)
+		z = parent->z + align.dz;
+	float h_avail = area.height();
+	float h_min = 0;
+	int n_expand = 0;
+	for (auto *c: children) {
+		if (c->align.vertical == AlignData::Mode::FILL)
+			n_expand ++;
+		else
+			h_min += c->align.h;
+	}
+	float offset = 0;
+	for (auto *c: children) {
+		float h = c->align.h;
+		if (c->align.vertical == AlignData::Mode::FILL)
+			h = (h_avail - h_min) / n_expand;
+		c->update_geometry_recursive(rect(area.x1, area.x2, area.y1 + offset, area.y1 + offset + h));
+		offset += h;
+	}
+}
+

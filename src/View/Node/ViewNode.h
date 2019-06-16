@@ -75,4 +75,17 @@ public:
 	ViewNodeRel(float dx, float dy, float w, float h);
 };
 
+
+class NodeHBox : public ViewNode {
+public:
+	NodeHBox();
+	void update_geometry_recursive(const rect &target_area) override;
+};
+
+class NodeVBox : public ViewNode {
+public:
+	NodeVBox();
+	void update_geometry_recursive(const rect &target_area) override;
+};
+
 #endif /* SRC_VIEW_NODE_VIEWNODE_H_ */

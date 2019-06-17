@@ -191,12 +191,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// table structure
 	set_size(width, height);
 	set_border_width(0);
-	add_grid("", 0, 0, "root_table");
-	set_target("root_table");
-	add_grid("", 0, 0, "main_table");
+	add_grid("", 0, 0, "root-grid");
+	set_target("root-grid");
+	add_grid("", 1, 0, "main-grid");
 
 	// main table
-	set_target("main_table");
+	set_target("main-grid");
 	add_drawing_area("!grabfocus", 0, 0, "area");
 
 	toolbar[0]->set_by_id("toolbar");
@@ -223,13 +223,13 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// side bar
 	side_bar = new SideBar(session);
-	embed(side_bar, "root_table", 1, 0);
+	embed(side_bar, "root-grid", 2, 0);
 
 	// bottom bar
 	bottom_bar = new BottomBar(session);
-	embed(bottom_bar, "main_table", 0, 1);
+	embed(bottom_bar, "main-grid", 0, 1);
 	mini_bar = new MiniBar(bottom_bar, session);
-	embed(mini_bar, "main_table", 0, 2);
+	embed(mini_bar, "main-grid", 0, 2);
 
 	view->subscribe(this, [=]{ on_update(); });
 	view->signal_chain->subscribe(this, [=]{ on_update(); });

@@ -11,11 +11,9 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Module/ConfigPanel.h"
 
-class PluginPanel : public hui::Panel
-{
+class PluginPanel : public hui::Panel {
 public:
-	PluginPanel(TsunamiPlugin *p, PluginConsole *_console)
-	{
+	PluginPanel(TsunamiPlugin *p, PluginConsole *_console) {
 		add_grid("!width=380,noexpandx", 0, 0, "grid");
 		set_target("grid");
 		add_grid("", 0, 0, "header-grid");
@@ -26,26 +24,57 @@ public:
 		add_button("", 1, 0, "big");
 		set_image("big", "hui:up");
 		set_tooltip("big", _("big!!!"));
-		add_label("!expandx,center,bold,big\\" + p->module_subtype, 2, 0, "label");
+		add_button("", 2, 0, "external");
+		set_image("external", "hui:zoom-out");
+		set_tooltip("external", _("external!!!"));
+		add_label("!expandx,center,bold,big\\" + p->module_subtype, 3, 0, "label");
 		plugin = p;
 		console = _console;
+		is_big;
 		config_panel = p->create_panel();
 		if (config_panel)
 			embed(config_panel, "grid", 0, 1);
 		hide_control("big", !config_panel);
 
 		event("close", [=]{ plugin->stop_request(); });
-		event("big", [=]{ on_big(); });
+		event("external", [=]{ start_external(); });
+		event("big", [=]{ if (is_big) stop_big(); else start_big(); });
 	}
 
-	~PluginPanel()
-	{
+	~PluginPanel() {
 		if (dlg)
 			delete dlg;
+		if (is_big)
+			console->set_big(nullptr);
 	}
 
-	void on_big()
-	{
+	void start_big() {
+		if (!config_panel or is_big)
+			return;
+		delete config_panel;
+		config_panel = nullptr;
+		console->set_big(this);
+		is_big = true;
+	}
+
+	void stop_big() {
+		if (!is_big)
+			return;
+		console->set_big(nullptr);
+		restart_normal();
+		is_big = false;
+	}
+
+	void restart_normal() {
+		if (config_panel)
+			return;
+		config_panel = plugin->create_panel();
+		if (config_panel)
+			embed(config_panel, "grid", 0, 1);
+		is_big = false;
+	}
+
+	void start_external() {
 		if (dlg or !config_panel)
 			return;
 		delete config_panel;
@@ -58,11 +87,12 @@ public:
 		dlg->embed(plugin->create_panel(), "root", 0, 0);
 		dlg->show();
 
-		dlg->event("hui:close", [=]{ hui::RunLater(0.001f, [=]{ close_dialog(); }); });
+		dlg->event("hui:close", [=]{ hui::RunLater(0.001f, [=]{ stop_external(); }); });
 	}
 
-	void close_dialog()
-	{
+	void stop_external() {
+		if (!dlg)
+			return;
 		delete dlg;
 		dlg = nullptr;
 		config_panel = plugin->create_panel();
@@ -70,11 +100,11 @@ public:
 			embed(config_panel, "grid", 0, 1);
 	}
 
+	bool is_big = false;
 	ConfigPanel *config_panel;
 	hui::Dialog *dlg = nullptr;
 	TsunamiPlugin *plugin;
 	PluginConsole *console;
-
 };
 
 PluginConsole::PluginConsole(Session *s) :
@@ -91,28 +121,28 @@ PluginConsole::PluginConsole(Session *s) :
 	add_grid("", 0, 0, "panel-grid");
 	next_x = 0;
 
+	big = nullptr;
+	big_panel = nullptr;
+
 	event("add", [=]{ on_add_button(); });
 
 	session->subscribe(this, [=]{ on_add_plugin(); }, session->MESSAGE_ADD_PLUGIN);
 	session->subscribe(this, [=]{ on_remove_plugin(); }, session->MESSAGE_REMOVE_PLUGIN);
 }
 
-PluginConsole::~PluginConsole()
-{
+PluginConsole::~PluginConsole() {
 	session->unsubscribe(this);
 	for (auto *p: panels)
 		delete p;
 }
 
-void PluginConsole::on_add_button()
-{
+void PluginConsole::on_add_button() {
 	string name = session->plugin_manager->choose_module(this, session, ModuleType::TSUNAMI_PLUGIN, "");
 	if (name != "")
 		session->execute_tsunami_plugin(name);
 }
 
-void PluginConsole::on_add_plugin()
-{
+void PluginConsole::on_add_plugin() {
 	auto *p = new PluginPanel(session->last_plugin, this);
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
@@ -120,14 +150,31 @@ void PluginConsole::on_add_plugin()
 	blink();
 }
 
-void PluginConsole::on_remove_plugin()
-{
+void PluginConsole::on_remove_plugin() {
 	foreachi (auto *p, panels, i)
-		if (p->plugin == session->last_plugin){
+		if (p->plugin == session->last_plugin) {
 			delete p;
 			panels.erase(i);
 			break;
 		}
 	hide_control("no-plugins-label", panels.num > 0);
+}
+
+void PluginConsole::set_big(PluginPanel *p) {
+	if (big)
+		big->restart_normal();
+	if (big_panel) {
+		delete big_panel;
+		big_panel = nullptr;
+		win->remove_control("plugin-grid");
+	}
+	big = p;
+	if (big) {
+		big_panel = big->plugin->create_panel();
+		win->set_target("root-grid");
+		//win->add_paned("!expandx", 0, 0, "plugin-grid");
+		win->add_grid("!expandx,width=500", 0, 0, "plugin-grid");
+		win->embed(big_panel, "plugin-grid", 0, 0);
+	}
 }
 

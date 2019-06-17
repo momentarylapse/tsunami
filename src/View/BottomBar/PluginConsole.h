@@ -11,9 +11,9 @@
 #include "BottomBar.h"
 
 class PluginPanel;
+class ConfigPanel;
 
-class PluginConsole: public BottomBar::Console
-{
+class PluginConsole: public BottomBar::Console {
 public:
 	PluginConsole(Session *session);
 	virtual ~PluginConsole();
@@ -25,8 +25,12 @@ public:
 
 	void load_data();
 
+	PluginPanel *big;
+	void set_big(PluginPanel *p);
+
 	Array<PluginPanel*> panels;
 	int next_x;
+	ConfigPanel *big_panel;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_PLUGINCONSOLE_H_ */

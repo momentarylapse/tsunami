@@ -32,15 +32,13 @@ const int AudioBuffer::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 const int MAX_CHANNELS = 2;
 
 
-AudioBuffer::AudioBuffer()
-{
+AudioBuffer::AudioBuffer() {
 	offset = 0;
 	length = 0;
 	channels = MAX_CHANNELS;
 }
 
-AudioBuffer::AudioBuffer(int _length, int _channels)
-{
+AudioBuffer::AudioBuffer(int _length, int _channels) {
 	offset = 0;
 	length = 0;
 	channels = _channels;
@@ -48,8 +46,7 @@ AudioBuffer::AudioBuffer(int _length, int _channels)
 }
 
 // copy constructor
-AudioBuffer::AudioBuffer(const AudioBuffer &b)
-{
+AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -58,8 +55,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b)
 }
 
 // move constructor
-AudioBuffer::AudioBuffer(AudioBuffer &&b)
-{
+AudioBuffer::AudioBuffer(AudioBuffer &&b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -67,18 +63,15 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b)
 		c[i] = std::move(b.c[i]);
 }
 
-void AudioBuffer::__init__()
-{
+void AudioBuffer::__init__() {
 	new(this) AudioBuffer;
 }
 
-void AudioBuffer::__delete__()
-{
+void AudioBuffer::__delete__() {
 	this->AudioBuffer::~AudioBuffer();
 }
 
-void AudioBuffer::operator=(const AudioBuffer &b)
-{
+void AudioBuffer::operator=(const AudioBuffer &b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -87,8 +80,7 @@ void AudioBuffer::operator=(const AudioBuffer &b)
 	peaks = b.peaks;
 }
 
-void AudioBuffer::operator=(AudioBuffer &&b)
-{
+void AudioBuffer::operator=(AudioBuffer &&b) {
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -97,36 +89,30 @@ void AudioBuffer::operator=(AudioBuffer &&b)
 	peaks = std::move(b.peaks);
 }
 
-AudioBuffer::~AudioBuffer()
-{
-}
+AudioBuffer::~AudioBuffer() {}
 
-void AudioBuffer::clear()
-{
+void AudioBuffer::clear() {
 	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].clear();
 	length = 0;
 	peaks.clear();
 }
 
-void AudioBuffer::set_zero()
-{
+void AudioBuffer::set_zero() {
 	for (int i=0; i<MAX_CHANNELS; i++)
 		memset(&c[i][0], 0, sizeof(float) * length);
 	peaks.clear();
 }
 
-void AudioBuffer::set_channels(int _channels)
-{
+void AudioBuffer::set_channels(int _channels) {
 	channels = _channels;
 	peaks.clear();
 }
 
-void AudioBuffer::_truncate_peaks(int _length)
-{
+void AudioBuffer::_truncate_peaks(int _length) {
 	int level4 = 0;
 	_length /= PEAK_FINEST_SIZE;
-	while(level4 < peaks.num){
+	while (level4 < peaks.num) {
 		for (int k=0; k<4; k++)
 			peaks[level4 + k].resize(_length);
 		level4 += 4;
@@ -135,8 +121,7 @@ void AudioBuffer::_truncate_peaks(int _length)
 
 }
 
-void AudioBuffer::resize(int _length)
-{
+void AudioBuffer::resize(int _length) {
 	if (is_ref())
 		make_own();
 
@@ -159,17 +144,15 @@ void fa_make_own(Array<float> &a)
 	memcpy(a.data, data, a.element_size * num);
 }
 
-void AudioBuffer::make_own()
-{
-	if (is_ref()){
+void AudioBuffer::make_own() {
+	if (is_ref()) {
 		//msg_write("bb::make_own!");
 		for (int i=0; i<MAX_CHANNELS; i++)
 			fa_make_own(c[i]);
 	}
 }
 
-void AudioBuffer::swap_ref(AudioBuffer &b)
-{
+void AudioBuffer::swap_ref(AudioBuffer &b) {
 	// buffer
 	for (int i=0; i<MAX_CHANNELS; i++)
 		c[i].exchange(b.c[i]);
@@ -193,24 +176,21 @@ void AudioBuffer::swap_ref(AudioBuffer &b)
 	b.channels = t;
 }
 
-void AudioBuffer::append(const AudioBuffer &b)
-{
+void AudioBuffer::append(const AudioBuffer &b) {
 	int num0 = length;
 	resize(length + b.length);
 	set(b, num0, 1.0f);
 }
 
-void float_array_swap_values(Array<float> &a, Array<float> &b)
-{
-	for (int i=0;i<a.num;i++){
+void float_array_swap_values(Array<float> &a, Array<float> &b) {
+	for (int i=0;i<a.num;i++) {
 		float t = a[i];
 		a[i] = b[i];
 		b[i] = t;
 	}
 }
 
-void AudioBuffer::swap_value(AudioBuffer &b)
-{
+void AudioBuffer::swap_value(AudioBuffer &b) {
 	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
 	for (int i=0; i<MAX_CHANNELS; i++)
@@ -221,36 +201,35 @@ void AudioBuffer::swap_value(AudioBuffer &b)
 
 // mixing a mono track will scale by (1,1) in the center
 // and by (0,sqrt(2)) on left/right (OVERDRIVE)!
-void AudioBuffer::mix_stereo(float volume, float panning)
-{
+void AudioBuffer::mix_stereo(float volume, float panning) {
 	if ((volume == 1.0f) and (panning == 0) and (channels == 2))
 		return;
 
 
 	float fl, fr;
-	if (channels == 2){
+	if (channels == 2) {
 		fl = volume;
 		fr = volume;
 		if (panning > 0)
 			fl *= (1 - panning);
 		else
 			fr *= (1 + panning);
-	}else{
+	} else {
 		fl = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
 		fr = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
 	}
 
 	// scale
-	if (channels == 2){
+	if (channels == 2) {
 		// stereo -> stereo
-		for (int i=0;i<length;i++){
+		for (int i=0;i<length;i++) {
 			c[0][i] *= fl;
 			c[1][i] *= fr;
 		}
-	}else{
+	} else {
 		set_channels(2);
 		// mono -> stereo
-		for (int i=0;i<length;i++){
+		for (int i=0;i<length;i++) {
 			float v = c[0][i];
 			c[0][i] *= fl;
 			c[1][i] = v * fr;
@@ -262,24 +241,21 @@ void AudioBuffer::mix_stereo(float volume, float panning)
 }
 
 
-void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume)
-{
-	/*if (source.channels > channels)
-		printf("AudioBuffer.add: channels\n");*/
+void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume) {
 
 	// relative to b
 	int i0 = max(0, -_offset);
 	int i1 = min(source.length, length - _offset);
 
 	// add buffers
-	if (volume == 1.0f){
-		for (int tc=0; tc<channels; tc++){
+	if (volume == 1.0f) {
+		for (int tc=0; tc<channels; tc++) {
 			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
 				c[tc][i + _offset] += source.c[sc][i];
 		}
-	}else{
-		for (int tc=0; tc<channels; tc++){
+	} else {
+		for (int tc=0; tc<channels; tc++) {
 			int sc = min(tc, source.channels-1);
 			for (int i=i0;i<i1;i++)
 				c[tc][i + _offset] += source.c[sc][i] * volume;
@@ -288,22 +264,20 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume)
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
-inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length)
-{
-	for (int tc=0; tc<target.channels; tc++){
+inline void _buf_copy_samples_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length) {
+	for (int tc=0; tc<target.channels; tc++) {
 		int sc = min(tc, source.channels-1);
 		memcpy(&target.c[tc][target_offset], &source.c[sc][source_offset], sizeof(float) * length);
 	}
 }
 
-inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length, float volume)
-{
-	for (int tc=0; tc<target.channels; tc++){
+inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, const AudioBuffer &source, int source_offset, int length, float volume) {
+	for (int tc=0; tc<target.channels; tc++) {
 		int sc = min(tc, source.channels-1);
 		float *pt = &target.c[tc][target_offset];
 		float *ps = &source.c[sc][source_offset];
 		float *ps_end = ps + length;
-		while(ps < ps_end){
+		while (ps < ps_end) {
 			*pt = *ps * volume;
 			ps ++;
 			pt ++;
@@ -312,8 +286,7 @@ inline void _buf_copy_samples_scale_(AudioBuffer &target, int target_offset, con
 }
 
 // this[offset:] = source[:length]
-void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume)
-{
+void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, float volume) {
 	/*if (source.channels > channels)
 		printf("AudioBuffer.set_x: channels >\n");*/
 
@@ -326,22 +299,20 @@ void AudioBuffer::set_x(const AudioBuffer &source, int _offset, int _length, flo
 		return;
 
 	// set buffers
-	if (volume == 1.0f){
+	if (volume == 1.0f) {
 		_buf_copy_samples_(*this, i0, source, i0 - _offset, i1 - i0);
-	}else{
+	} else {
 		_buf_copy_samples_scale_(*this, i0, source, i0 - _offset, i1 - i0, volume);
 	}
 	invalidate_peaks(Range(i0 + offset, i1 - i0));
 }
 
 // this[offset:] = source[:]
-void AudioBuffer::set(const AudioBuffer &source, int _offset, float volume)
-{
+void AudioBuffer::set(const AudioBuffer &source, int _offset, float volume) {
 	set_x(source, _offset, source.length, volume);
 }
 
-void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length)
-{
+void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length) {
 	clear();
 	length = _length;
 	offset = _offset + source.offset;
@@ -351,9 +322,8 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 }
 
 
-AudioBuffer AudioBuffer::ref(int start, int end)
-{
-	if (end == 0x81234567) // magical value (-_-)'
+AudioBuffer AudioBuffer::ref(int start, int end) {
+	if (end == (signed)0x81234567) // magical value (-_-)'
 		end = length;
 	AudioBuffer r;
 	if (start < 0)
@@ -366,103 +336,81 @@ AudioBuffer AudioBuffer::ref(int start, int end)
 	return r;
 }
 
-#if 0
-void AudioBuffer::set_16bit(const void *b, int offset, int length)
-{
-	// relative to b
-	int i0 = max(0, - offset);
-	int i1 = min(length, length - offset);
-	length = i1 - i0;
-	float *pr = &r[i0 + offset];
-	float *pl = &l[i0 + offset];
-	short *pb = &((short*)b)[i0 * 2];
-	for (int i=0;i<length;i++){
-		(*pr ++) = (float)(*pb ++) / 32768.0f;
-		(*pl ++) = (float)(*pb ++) / 32768.0f;
-	}
-}
-#endif
-
-inline int invert_16(int i)
-{
+inline int invert_16(int i) {
 	return ((i & 0xff) << 8) + ((i & 0xff00) >> 8);
 }
 
-inline int invert_24(int i)
-{
+inline int invert_24(int i) {
 	unsigned int ui = i;
 	unsigned int ext = (i < 0) ? 0xff000000 : 0;
 	ui = ((ui & 0xff) << 16) | (ui & 0xff00) | ((ui & 0xff0000) >> 16) | ext;
 	return (signed)ui;
 }
 
-inline int invert_32(int i)
-{
+inline int invert_32(int i) {
 	return ((i & 0xff) << 24) + ((i & 0xff00) << 8) + ((i & 0xff0000) >> 8) + ((i & 0xff000000) >> 24);
 }
 
-inline float import_24(int i)
-{
+inline float import_24(int i) {
 	if ((i & 0x00800000) != 0)
 		return (float)((i & 0x00ffffff) - 0x01000000) / 8388608.0f;
 	return (float)(i & 0x00ffffff) / 8388608.0f;
 }
 
-void AudioBuffer::import(void *data, int _channels, SampleFormat format, int samples)
-{
+void AudioBuffer::import(void *data, int _channels, SampleFormat format, int samples) {
 	char *cb = (char*)data;
 	short *sb = (short*)data;
 	int *ib = (int*)data;
 	float *fb = (float*)data;
 
-	for (int i=0;i<samples;i++){
-		if (_channels == 2){
-			if (format == SampleFormat::SAMPLE_FORMAT_8){
+	for (int i=0;i<samples;i++) {
+		if (_channels == 2) {
+			if (format == SampleFormat::SAMPLE_FORMAT_8) {
 				c[0][i] = (float)cb[i*2    ] / 128.0f;
 				if (channels > 1)
 					c[1][i] = (float)cb[i*2 + 1] / 128.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_16){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_16) {
 				c[0][i] = (float)sb[i*2    ] / 32768.0f;
 				if (channels > 1)
 					c[1][i] = (float)sb[i*2 + 1] / 32768.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN) {
 				c[0][i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
 				if (channels > 1)
 					c[1][i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_24){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
 				c[0][i] = import_24(*(int*)&cb[i*6    ]);
 				if (channels > 1)
 					c[1][i] = import_24(*(int*)&cb[i*6 + 3]);
-			}else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN) {
 				c[0][i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
 				if (channels > 1)
 					c[1][i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_32){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
 				c[0][i] = (float)ib[i*2  ] / 2147483648.0f;
 				if (channels > 1)
 					c[1][i] = (float)ib[i*2+1] / 2147483648.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
 				c[0][i] = fb[i*2];
 				if (channels > 1)
 					c[1][i] = fb[i*2+1];
-			}else
+			} else
 				throw string("BufferBox.import: unhandled format");
-		}else{
-			if (format == SampleFormat::SAMPLE_FORMAT_8){
+		} else {
+			if (format == SampleFormat::SAMPLE_FORMAT_8) {
 				c[0][i] = (float)cb[i] / 128.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_16){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_16) {
 				c[0][i] = (float)sb[i] / 32768.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_16_BIGENDIAN) {
 				c[0][i] = (float)invert_16(sb[i]) / 32768.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_24){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
 				c[0][i] = import_24(*(int*)&cb[i*3]);
-			}else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_24_BIGENDIAN) {
 				c[0][i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 8388608.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_32){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_32) {
 				c[0][i] = (float)ib[i] / 2147483648.0f;
-			}else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT){
+			} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
 				c[0][i] = fb[i];
-			}else
+			} else
 				throw string("BufferBox.import: unhandled format");
 			if (channels > 1)
 				c[1][i] = c[0][i];
@@ -479,14 +427,13 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 
 static bool wtb_overflow;
 
-inline int set_data(float value, float scale, int clamp, int warn_thresh)
-{
+inline int set_data(float value, float scale, int clamp, int warn_thresh) {
 	int value_int = (int)(value * scale);
-	if (value_int > clamp){
+	if (value_int > clamp) {
 		if (value_int > warn_thresh)
 			wtb_overflow = true;
 		value_int = clamp;
-	}else if (value_int < - clamp){
+	} else if (value_int < - clamp) {
 		if (value_int < -warn_thresh)
 			wtb_overflow = true;
 		return -clamp;
@@ -494,63 +441,58 @@ inline int set_data(float value, float scale, int clamp, int warn_thresh)
 	return value_int;
 }
 
-inline void set_data_16(short *data, float value)
-{
+inline void set_data_16(short *data, float value) {
 	*data = set_data(value, 32768.0f, VAL_MAX_16, VAL_ALERT_16);
 }
 
-inline void set_data_24(int *data, float value)
-{
+inline void set_data_24(int *data, float value) {
 	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
-bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool align32) const
-{
+bool AudioBuffer::_export(void *data, int _channels, SampleFormat format, bool align32) const {
 	wtb_overflow = false;
 	float*source[2];
 	for (int ci=0; ci<_channels; ci++)
 		source[ci] = &c[min(ci, channels-1)][0];
 
-	if (format == SampleFormat::SAMPLE_FORMAT_16){
+	if (format == SampleFormat::SAMPLE_FORMAT_16) {
 		short *sb = (short*)data;
 		int d = align32 ? 2 : 1;
-		for (int i=0;i<length;i++){
-			for (int ci=0; ci<_channels; ci++){
+		for (int i=0;i<length;i++) {
+			for (int ci=0; ci<_channels; ci++) {
 				set_data_16(sb, *(source[ci]++));
 				sb += d;
 			}
 		}
-	}else if (format == SampleFormat::SAMPLE_FORMAT_24){
+	} else if (format == SampleFormat::SAMPLE_FORMAT_24) {
 		char *sc = (char*)data;
 		int d = align32 ? 4 : 3;
-		for (int i=0;i<length;i++){
-			for (int ci=0; ci<_channels; ci++){
+		for (int i=0;i<length;i++) {
+			for (int ci=0; ci<_channels; ci++) {
 				set_data_24((int*)sc, *(source[ci]++));
 				sc += d;
 			}
 		}
-	}else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT){
+	} else if (format == SampleFormat::SAMPLE_FORMAT_32_FLOAT) {
 		float *fc = (float*)data;
-		for (int i=0;i<length;i++){
-			for (int ci=0; ci<_channels; ci++){
+		for (int i=0;i<length;i++) {
+			for (int ci=0; ci<_channels; ci++) {
 				*(fc ++) = *(source[ci]++);
 			}
 		}
-	}else{
+	} else {
 		throw Exception("invalid export format");
 	}
 
 	return !wtb_overflow;
 }
 
-bool AudioBuffer::exports(string &data, int _channels, SampleFormat format) const
-{
+bool AudioBuffer::exports(string &data, int _channels, SampleFormat format) const {
 	data.resize(length * _channels * (format_get_bits(format) / 8));
 	return _export(data.data, _channels, format, false);
 }
 
-inline float _clamp_(float f)
-{
+inline float _clamp_(float f) {
 	if (f < -0.999f)
 		return -0.999f;
 	if (f > 0.999f)
@@ -559,31 +501,30 @@ inline float _clamp_(float f)
 }
 
 // always outputting stereo... (for OutputStreams)
-void AudioBuffer::interleave(float *p, float volume) const
-{
+void AudioBuffer::interleave(float *p, float volume) const {
 	float *pl = &c[0][0];
 	float *pr = &c[1][0];
-	if (volume == 1.0f){
-		if (channels == 2){
-			for (int i=0; i<length; i++){
+	if (volume == 1.0f) {
+		if (channels == 2) {
+			for (int i=0; i<length; i++) {
 				*p ++ = _clamp_(*pl ++);
 				*p ++ = _clamp_(*pr ++);
 			}
-		}else{
-			for (int i=0; i<length; i++){
+		} else {
+			for (int i=0; i<length; i++) {
 				float ff = _clamp_(*pl ++);
 				*p ++ = ff;
 				*p ++ = ff;
 			}
 		}
-	}else{
-		if (channels == 2){
-			for (int i=0; i<length; i++){
+	} else {
+		if (channels == 2) {
+			for (int i=0; i<length; i++) {
 				*p ++ = _clamp_((*pl ++) * volume);
 				*p ++ = _clamp_((*pr ++) * volume);
 			}
-		}else{
-			for (int i=0; i<length; i++){
+		} else {
+			for (int i=0; i<length; i++) {
 				float ff = _clamp_((*pl ++) * volume);
 				*p ++ = ff;
 				*p ++ = ff;
@@ -592,27 +533,26 @@ void AudioBuffer::interleave(float *p, float volume) const
 	}
 }
 
-void AudioBuffer::deinterleave(float *p, int num_channels)
-{
+void AudioBuffer::deinterleave(float *p, int num_channels) {
 	float *pl = &c[0][0];
 	float *pr = &c[1][0];
-	if (num_channels == 1){
-		if (channels == 2){
-			for (int i=0; i<length; i++){
+	if (num_channels == 1) {
+		if (channels == 2) {
+			for (int i=0; i<length; i++) {
 				*pl ++ = *p;
 				*pr ++ = *p ++;
 			}
-		}else{
+		} else {
 			memcpy(pl, p, length * sizeof(float));
 		}
-	}else if (num_channels == 2){
-		if (channels == 2){
-			for (int i=0; i<length; i++){
+	} else if (num_channels == 2) {
+		if (channels == 2) {
+			for (int i=0; i<length; i++) {
 				*pl ++ = *p ++;
 				*pr ++ = *p ++;
 			}
-		}else{
-			for (int i=0; i<length; i++){
+		} else {
+			for (int i=0; i<length; i++) {
 				*pl ++ = *p ++;
 				p ++;
 			}
@@ -620,26 +560,22 @@ void AudioBuffer::deinterleave(float *p, int num_channels)
 	}
 }
 
-Range AudioBuffer::range() const
-{
+Range AudioBuffer::range() const {
 	return Range(offset, length);
 }
 
-Range AudioBuffer::range0() const
-{
+Range AudioBuffer::range0() const {
 	return Range(0, length);
 }
 
-unsigned char inline _shrink_mean(unsigned char a, unsigned char b)
-{
+unsigned char inline _shrink_mean(unsigned char a, unsigned char b) {
 	return (unsigned char)(sqrt(((float)a * (float)a + (float)b * (float)b) / 2));
 }
 
 static bool _shrink_table_created = false;
 static unsigned char _shrink_mean_table[256][256];
 
-static void update_shrink_table()
-{
+static void update_shrink_table() {
 	for (int a=0; a<256; a++)
 		for (int b=0; b<256; b++)
 			_shrink_mean_table[a][b] = _shrink_mean(a, b);
@@ -647,11 +583,12 @@ static void update_shrink_table()
 }
 
 #define shrink_max(a, b)	max((a), (b))
-unsigned char inline shrink_mean(unsigned char a, unsigned char b)
-{	return _shrink_mean_table[a][b];	}
 
-void AudioBuffer::invalidate_peaks(const Range &_range)
-{
+unsigned char inline shrink_mean(unsigned char a, unsigned char b) {
+	return _shrink_mean_table[a][b];
+}
+
+void AudioBuffer::invalidate_peaks(const Range &_range) {
 	Range r = range() and _range;
 
 	if (peaks.num < PEAK_MAGIC_LEVEL4)
@@ -664,8 +601,7 @@ void AudioBuffer::invalidate_peaks(const Range &_range)
 		peaks[PEAK_MAGIC_LEVEL4][i] = 255;
 }
 
-inline float fabsmax(float *p)
-{
+inline float fabsmax(float *p) {
 	float a = fabs(*p ++);
 	float b = fabs(*p ++);
 	float c = fabs(*p ++);
@@ -677,25 +613,23 @@ inline float fabsmax(float *p)
 	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
-void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid)
-{
+void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid) {
 	if (peaks.num < level4 + 4)
 		peaks.resize(level4 + 4);
-	if (peaks[level4].num < n){
+	if (peaks[level4].num < n) {
 		int n0 = peaks[level4].num;
-		for (int k=0; k<4; k++){
+		for (int k=0; k<4; k++) {
 			peaks[level4 + k].resize(n);
 			if (set_invalid)
 				memset(&peaks[level4 + k][n0], 255, (n - n0));
 		}
-	}/*else if (peaks[level4].num < n){
+	}/*else if (peaks[level4].num < n) {
 		for (int k=0; k<4; k++)
 			peaks[level4 + k].resize(n);
 	}*/
 }
 
-bool AudioBuffer::_peaks_chunk_needs_update(int index)
-{
+bool AudioBuffer::_peaks_chunk_needs_update(int index) {
 	if (peaks.num <= PEAK_MAGIC_LEVEL4)
 		return true;
 	if (index == peaks[PEAK_MAGIC_LEVEL4].num)
@@ -703,8 +637,7 @@ bool AudioBuffer::_peaks_chunk_needs_update(int index)
 	return (peaks[PEAK_MAGIC_LEVEL4][index] == 255);
 }
 
-void AudioBuffer::_update_peaks_chunk(int index)
-{
+void AudioBuffer::_update_peaks_chunk(int index) {
 	// first level
 	int i0 = index * (PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE);
 	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, length / PEAK_FINEST_SIZE);
@@ -714,7 +647,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 
 	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, peaks[0].num, index));
 
-	for (int j=0; j<channels; j++){
+	for (int j=0; j<channels; j++) {
 		for (int i=i0; i<i1; i++)
 			peaks[j][i] = (unsigned char)(fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
 	}
@@ -723,14 +656,14 @@ void AudioBuffer::_update_peaks_chunk(int index)
 
 	// medium levels
 	int level4 = 0;
-	while (n >= 2){
+	while (n >= 2) {
 		level4 += 4;
 		n = n / 2;
 		i0 = i0 / 2;
 		i1 = i0 + n;
 		_ensure_peak_size(level4, i1);
 
-		for (int i=i0; i<i1; i++){
+		for (int i=i0; i<i1; i++) {
 			peaks[level4    ][i] = shrink_max(peaks[level4 - 4][i * 2], peaks[level4 - 4][i * 2 + 1]);
 			peaks[level4 + 1][i] = shrink_max(peaks[level4 - 3][i * 2], peaks[level4 - 3][i * 2 + 1]);
 			peaks[level4 + 2][i] = shrink_mean(peaks[level4 - 2][i * 2], peaks[level4 - 2][i * 2 + 1]);
@@ -743,7 +676,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 		return;
 
 	// high levels
-	for (int k=0; k<32; k++){
+	for (int k=0; k<32; k++) {
 		if ((index & (1<<k)) == 0)
 			break;
 
@@ -762,8 +695,7 @@ void AudioBuffer::_update_peaks_chunk(int index)
 	}
 }
 
-int AudioBuffer::_update_peaks_prepare()
-{
+int AudioBuffer::_update_peaks_prepare() {
 	if (!_shrink_table_created)
 		update_shrink_table();
 

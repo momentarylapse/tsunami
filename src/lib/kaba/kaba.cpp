@@ -8,6 +8,7 @@
 \*----------------------------------------------------------------------------*/
 #include "../file/file.h"
 #include "kaba.h"
+#include <cassert>
 
 #include "../config.h"
 #ifdef _X_ALLOW_X_
@@ -153,7 +154,13 @@ const Class *GetDynamicType(const VirtualBase *p)
 	return nullptr;
 }
 
-Array<Script*> loading_script_stack;
+// wrapper preventing compiler complaints for Array<Script*>.pop()
+struct LoadingScript {
+	Script *s = nullptr;
+	LoadingScript() {}
+	LoadingScript(Script *_s) { s = _s; }
+};
+Array<LoadingScript> loading_script_stack;
 
 void Script::load(const string &_filename, bool _just_analyse)
 {
@@ -236,20 +243,23 @@ Script::Script()
 
 Script::~Script()
 {
+	int r = 0;
 	if (opcode){
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(opcode, 0, MEM_RELEASE);
 		#else
-			int r = munmap(opcode, MAX_OPCODE);
+			r = munmap(opcode, MAX_OPCODE);
 		#endif
 	}
 	if (memory){
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)
 			VirtualFree(memory, 0, MEM_RELEASE);
 		#else
-			int r = munmap(memory, memory_size);
+			r = munmap(memory, memory_size);
 		#endif
 	}
+	if (r != 0)
+		msg_error("munmap...");
 	//msg_write(string2("-----------            Memory:         %p",Memory));
 	delete(syntax);
 }

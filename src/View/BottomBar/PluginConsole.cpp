@@ -30,7 +30,6 @@ public:
 		add_label("!expandx,center,bold,big\\" + p->module_subtype, 3, 0, "label");
 		plugin = p;
 		console = _console;
-		is_big;
 		config_panel = p->create_panel();
 		if (config_panel)
 			embed(config_panel, "grid", 0, 1);

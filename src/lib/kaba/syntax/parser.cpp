@@ -236,7 +236,7 @@ Node *SyntaxTree::parse_operand_extension_array(Node *operand, Block *block)
 	if (!allowed)
 		do_error(format("type \"%s\" is neither an array nor a pointer to an array nor does it have a function __get__(%s)", operand->type->name.c_str(), index->type->name.c_str()));
 
-	Node *array;
+	Node *array = nullptr;
 
 	// pointer?
 	if (pparray){
@@ -617,8 +617,8 @@ Node *SyntaxTree::link_unary_operator(int po, Node *operand, Block *block)
 
 	// needs type casting?
 	if (!ok){
-		int pen2;
-		int c2, c2_best;
+		int pen2 = 0;
+		int c2 = -1, c2_best = -1;
 		int pen_min = 100;
 		for (auto *_op: operators)
 			if (po == _op->primitive_id)
@@ -877,8 +877,8 @@ Node *SyntaxTree::link_operator(int op_no, Node *param1, Node *param2)
 
 
 	// needs type casting?
-	int pen1, pen2;
-	int c1, c2, c1_best, c2_best;
+	int pen1 = 0, pen2 = 0;
+	int c1 = -1, c2 = -1, c1_best = -1, c2_best = -1;
 	int pen_min = 2000;
 	Operator *op_found = nullptr;
 	ClassFunction *op_cf_found = nullptr;

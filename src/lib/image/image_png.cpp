@@ -68,7 +68,7 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 void image_load_png(const string &filename, Image &image)
 {
 	char buf[8];
-	File *f;
+	File *f = nullptr;
 	try{
 	f = FileOpen(filename);
 
@@ -77,7 +77,7 @@ void image_load_png(const string &filename, Image &image)
 
 	string data;
 
-	int bytes_per_pixel;
+	int bytes_per_pixel = 1;
 
 	while (!f->eof()){
 		// read chunk
@@ -151,7 +151,8 @@ void image_load_png(const string &filename, Image &image)
 	}catch(FileError &e){
 	}catch(string &s){
 		msg_error("png: " + s);
-		FileClose(f);
+		if (f)
+			FileClose(f);
 	}
 }
 

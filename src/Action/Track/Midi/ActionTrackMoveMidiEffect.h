@@ -12,8 +12,7 @@
 class AudioEffect;
 class Track;
 
-class ActionTrackMoveMidiEffect: public Action
-{
+class ActionTrackMoveMidiEffect: public Action {
 public:
 	ActionTrackMoveMidiEffect(Track *track, int source, int target);
 

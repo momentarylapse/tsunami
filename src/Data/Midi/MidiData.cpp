@@ -495,25 +495,22 @@ string chord_type_name(ChordType type) {
 
 Array<int> chord_notes(ChordType type, int inversion, int pitch) {
 	Array<int> r;
-	r.add(pitch);
 	if (type == ChordType::MINOR) {
-		r.add(pitch + 3);
-		r.add(pitch + 7);
+		r = {pitch, pitch+3, pitch+7};
 	} else if (type == ChordType::MAJOR) {
-		r.add(pitch + 4);
-		r.add(pitch + 7);
+		r = {pitch, pitch+4, pitch+7};
 	} else if (type == ChordType::DIMINISHED) {
-		r.add(pitch + 3);
-		r.add(pitch + 6);
+		r = {pitch, pitch+3, pitch+6};
 	} else if (type == ChordType::AUGMENTED) {
-		r.add(pitch + 4);
-		r.add(pitch + 8);
+		r = {pitch, pitch+4, pitch+8};
+	} else {
+		return r;
 	}
-	if (inversion == 2)
-		r.insert(r.pop() - 12, 0);
-	if (inversion == 1) {
-		r.insert(r.pop() - 12, 0);
-		r.insert(r.pop() - 12, 0);
+
+	if (inversion == 2) {
+		r = {r[2]-12, r[0], r[1]};
+	} else if (inversion == 1) {
+		r = {r[1]-12, r[2]-12, r[0]};
 	}
 	return r;
 }

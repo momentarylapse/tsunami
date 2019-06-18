@@ -46,7 +46,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	AudioBuffer buf;
 	od->layer->get_buffers(buf, range);
 
-	Action *a;
+	Action *a = nullptr;
 	if (od->song->history_enabled())
 		a = new ActionTrackEditBuffer(od->layer, range);
 

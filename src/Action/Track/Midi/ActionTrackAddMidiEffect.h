@@ -5,15 +5,14 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKADDMIDIEFFECT_H_
-#define ACTIONTRACKADDMIDIEFFECT_H_
+#ifndef SRC_ACTION_TRACK_MIDI_ACTIONTRACKADDMIDIEFFECT_H_
+#define SRC_ACTION_TRACK_MIDI_ACTIONTRACKADDMIDIEFFECT_H_
 
 #include "../../Action.h"
 class Track;
 class MidiEffect;
 
-class ActionTrackAddMidiEffect: public Action
-{
+class ActionTrackAddMidiEffect: public Action {
 public:
 	ActionTrackAddMidiEffect(Track *t, MidiEffect *effect);
 	~ActionTrackAddMidiEffect();
@@ -26,4 +25,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKADDMIDIEFFECT_H_ */
+#endif /* SRC_ACTION_TRACK_MIDI_ACTIONTRACKADDMIDIEFFECT_H_ */

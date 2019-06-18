@@ -14,8 +14,7 @@ class Sample;
 class SampleRef;
 class TrackLayer;
 
-class ActionTrackAddSample: public Action
-{
+class ActionTrackAddSample: public Action {
 public:
 	ActionTrackAddSample(TrackLayer *l, int pos, Sample *sample);
 	~ActionTrackAddSample() override;

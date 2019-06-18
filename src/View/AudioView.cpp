@@ -478,7 +478,7 @@ void _update_find_min(int &new_pos, bool &found, float &dmin, int pos, int trial
 
 void AudioView::snap_to_grid(int &pos) {
 	bool found = false;
-	int new_pos;
+	int new_pos = pos;
 
 	if (selection_snap_mode == SelectionSnapMode::NONE) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST);

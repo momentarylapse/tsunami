@@ -10,9 +10,9 @@
 #include "../../../Data/TrackLayer.h"
 #include "../../../Data/SampleRef.h"
 #include "../../../Data/Sample.h"
+#include <cassert>
 
-ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample)
-{
+ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sample) {
 	layer = l;
 	pos = _pos;
 
@@ -29,9 +29,8 @@ ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, Sample *_sam
 	ref->owner = l->song();
 }
 
-ActionTrackAddSample::~ActionTrackAddSample()
-{
-	if (ref){
+ActionTrackAddSample::~ActionTrackAddSample() {
+	if (ref) {
 		sample->ref();
 		delete ref;
 	}
@@ -40,8 +39,8 @@ ActionTrackAddSample::~ActionTrackAddSample()
 	sample = nullptr;
 }
 
-void ActionTrackAddSample::undo(Data *d)
-{
+void ActionTrackAddSample::undo(Data *d) {
+	assert(layer->samples.num > 0);
 	ref = layer->samples.pop();
 	ref->notify(ref->MESSAGE_DELETE);
 
@@ -50,8 +49,7 @@ void ActionTrackAddSample::undo(Data *d)
 
 
 
-void *ActionTrackAddSample::execute(Data *d)
-{
+void *ActionTrackAddSample::execute(Data *d) {
 	sample->ref();
 
 	layer->samples.add(ref);

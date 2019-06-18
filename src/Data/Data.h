@@ -15,8 +15,7 @@ class ActionManager;
 class Action;
 class Session;
 
-class Data : public Observable<VirtualBase>
-{
+class Data : public Observable<VirtualBase> {
 public:
 	Data(Session *session);
 	virtual ~Data();

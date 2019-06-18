@@ -13,17 +13,14 @@
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
 
-ActionTrackDelete::ActionTrackDelete(Track *_track)
-{
+ActionTrackDelete::ActionTrackDelete(Track *_track) {
 	track = _track;
 }
 
-void ActionTrackDelete::build(Data *d)
-{
-	//Song *s = dynamic_cast<Song*>(d);
+void ActionTrackDelete::build(Data *d) {
 
 	// delete buffers
-	for (TrackLayer *l: track->layers){
+	for (auto *l: track->layers) {
 		for (int i=l->buffers.num-1; i>=0; i--)
 			add_sub_action(new ActionTrack__DeleteBuffer(l, i), d);
 

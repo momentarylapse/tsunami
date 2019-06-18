@@ -13,8 +13,7 @@
 class Track;
 class MidiNote;
 
-class ActionTrackSetInstrument: public ActionMergable<Instrument>
-{
+class ActionTrackSetInstrument: public ActionMergable<Instrument> {
 public:
 	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
 	virtual ~ActionTrackSetInstrument(){}
@@ -28,8 +27,7 @@ public:
 private:
 	Track *track;
 
-	struct StringChange
-	{
+	struct StringChange {
 		MidiNote* note;
 		int from, to;
 	};

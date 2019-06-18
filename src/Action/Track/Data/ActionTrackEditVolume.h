@@ -5,14 +5,13 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITVOLUME_H_
-#define ACTIONTRACKEDITVOLUME_H_
+#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_
+#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_
 
 #include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditVolume : public ActionMergable<float>
-{
+class ActionTrackEditVolume : public ActionMergable<float> {
 public:
 	ActionTrackEditVolume(Track *t, float volume);
 
@@ -25,4 +24,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKEDITVOLUME_H_ */
+#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITVOLUME_H_ */

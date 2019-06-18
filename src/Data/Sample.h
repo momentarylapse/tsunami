@@ -19,8 +19,7 @@ class SampleRef;
 class Tag;
 enum class SignalType;
 
-class Sample : public Observable<VirtualBase>
-{
+class Sample : public Observable<VirtualBase> {
 public:
 	Sample(SignalType type);
 	virtual ~Sample();

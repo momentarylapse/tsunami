@@ -5,14 +5,13 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITNAME_H_
-#define ACTIONTRACKEDITNAME_H_
+#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITNAME_H_
+#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITNAME_H_
 
 #include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditName: public ActionMergable<string>
-{
+class ActionTrackEditName: public ActionMergable<string> {
 public:
 	ActionTrackEditName(Track *t, const string &name);
 
@@ -25,4 +24,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKEDITNAME_H_ */
+#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITNAME_H_ */

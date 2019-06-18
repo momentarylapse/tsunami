@@ -26,8 +26,7 @@ enum class SignalType;
 
 
 
-class Track : public Observable<VirtualBase>
-{
+class Track : public Observable<VirtualBase> {
 public:
 	Track(SignalType type, Synthesizer *synth);
 	virtual ~Track();

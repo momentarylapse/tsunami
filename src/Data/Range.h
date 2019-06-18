@@ -12,8 +12,7 @@
 
 class string;
 
-class Range
-{
+class Range {
 public:
 	Range();
 	Range(int _offset, int _length);

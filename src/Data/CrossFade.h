@@ -10,8 +10,7 @@
 
 #include "Range.h"
 
-class CrossFade
-{
+class CrossFade {
 public:
 
 	int position;

@@ -11,20 +11,17 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 
-ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track)
-{
+ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(Track *_track) {
 	index = _track->get_index();
 	track = nullptr;
 }
 
-ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
-{
+ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty() {
 	if (track)
 		delete track;
 }
 
-void *ActionTrack__DeleteEmpty::execute(Data *d)
-{
+void *ActionTrack__DeleteEmpty::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < a->tracks.num);
 	Track *t = a->tracks[index];
@@ -55,8 +52,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 
 
 
-void ActionTrack__DeleteEmpty::undo(Data *d)
-{
+void ActionTrack__DeleteEmpty::undo(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);

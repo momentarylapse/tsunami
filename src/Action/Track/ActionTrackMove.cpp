@@ -8,14 +8,12 @@
 #include "ActionTrackMove.h"
 #include "../../Data/Song.h"
 
-ActionTrackMove::ActionTrackMove(Track *track, int _target)
-{
+ActionTrackMove::ActionTrackMove(Track *track, int _target) {
 	origin = get_track_index(track);
 	target = _target;
 }
 
-void *ActionTrackMove::execute(Data *d)
-{
+void *ActionTrackMove::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->tracks.move(origin, target);
@@ -24,8 +22,7 @@ void *ActionTrackMove::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTrackMove::undo(Data *d)
-{
+void ActionTrackMove::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->tracks.move(target, origin);

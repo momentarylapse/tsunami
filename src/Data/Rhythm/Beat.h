@@ -11,8 +11,7 @@
 #include "../Range.h"
 
 
-class Beat
-{
+class Beat {
 public:
 	Beat(){}
 	Beat(const Range &r, int beat, int level, int bar_index, int bar_no);

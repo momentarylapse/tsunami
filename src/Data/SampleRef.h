@@ -19,8 +19,7 @@ class AudioBuffer;
 class Range;
 enum class SignalType;
 
-class SampleRef : public Observable<VirtualBase>
-{
+class SampleRef : public Observable<VirtualBase> {
 public:
 	SampleRef(Sample *sample);
 	virtual ~SampleRef();

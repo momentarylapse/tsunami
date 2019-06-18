@@ -5,15 +5,14 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACK__DELETEEMPTY_H_
-#define ACTIONTRACK__DELETEEMPTY_H_
+#ifndef SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_
+#define SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_
 
 #include "../Action.h"
 
 class Track;
 
-class ActionTrack__DeleteEmpty: public Action
-{
+class ActionTrack__DeleteEmpty: public Action {
 public:
 	ActionTrack__DeleteEmpty(Track *track);
 	~ActionTrack__DeleteEmpty() override;
@@ -26,4 +25,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACK__DELETEEMPTY_H_ */
+#endif /* SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_ */

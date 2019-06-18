@@ -5,15 +5,14 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKADD_H_
-#define ACTIONTRACKADD_H_
+#ifndef SRC_ACTION_TRACK_ACTIONTRACKADD_H_
+#define SRC_ACTION_TRACK_ACTIONTRACKADD_H_
 
 #include "../Action.h"
 
 class Track;
 
-class ActionTrackAdd : public Action
-{
+class ActionTrackAdd : public Action {
 public:
 	ActionTrackAdd(Track *t, int index);
 	~ActionTrackAdd();
@@ -26,4 +25,4 @@ private:
 	int index;
 };
 
-#endif /* ACTIONTRACKADD_H_ */
+#endif /* SRC_ACTION_TRACK_ACTIONTRACKADD_H_ */

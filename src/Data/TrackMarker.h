@@ -14,8 +14,7 @@ class AudioEffect;
 class Scale;
 
 
-class TrackMarker
-{
+class TrackMarker {
 public:
 	Range range;
 	string text;

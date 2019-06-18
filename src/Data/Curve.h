@@ -14,25 +14,21 @@ class Song;
 class Track;
 class AudioEffect;
 class Module;
-namespace Kaba
-{
+namespace Kaba {
 	class Class;
 };
 
-class Curve : public Observable<VirtualBase>
-{
+class Curve : public Observable<VirtualBase> {
 public:
 	Curve();
 	virtual ~Curve();
 
-	enum
-	{
+	enum {
 		TYPE_LINEAR,
 		TYPE_LOG,
 	};
 
-	struct Target
-	{
+	struct Target {
 		float *p;
 		string temp_name;
 		string temp_name_nice;
@@ -56,8 +52,7 @@ public:
 
 	float min, max;
 
-	struct Point
-	{
+	struct Point {
 		int pos;
 		float value;
 	};

@@ -14,23 +14,22 @@
 
 
 // pos is precise... beat length not...
-Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
-{
+Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool include_sub_beats, int sub_beat_partition) {
 	Array<Beat> beats;
 
 	int pos_bar = 0;
 	int bar_index = 0;
 	int bar_no = 0;
 
-	for (Bar *b: *this){
-		if (!b->is_pause()){
+	for (Bar *b: *this) {
+		if (!b->is_pause()) {
 			auto _beats = b->get_beats(pos_bar, include_sub_beats, sub_beat_partition);
 			for (Beat &bb: _beats)
 				if (r.is_inside(bb.range.offset))
 					beats.add(bb);
 			pos_bar += b->length;
 			bar_no ++;
-		}else{
+		} else {
 			if (include_hidden)
 				beats.add(Beat(Range(pos_bar, b->length), 0, 0, bar_index, -1));
 			pos_bar += b->length;
@@ -42,8 +41,7 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 	return beats;
 }
 
-Array<Bar*> BarCollection::get_bars(const Range &r)
-{
+Array<Bar*> BarCollection::get_bars(const Range &r) {
 	Array<Bar*> bars;
 
 	int pos0 = 0;
@@ -64,8 +62,7 @@ Array<Bar*> BarCollection::get_bars(const Range &r)
 	return bars;
 }
 
-int BarCollection::get_next_beat(int pos)
-{
+int BarCollection::get_next_beat(int pos) {
 	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
@@ -73,11 +70,10 @@ int BarCollection::get_next_beat(int pos)
 	return 0;
 }
 
-int BarCollection::get_prev_beat(int pos)
-{
+int BarCollection::get_prev_beat(int pos) {
 	Array<Beat> beats = get_beats(Range::ALL, true, false);
 	int prev = 0;
-	for (Beat &b: beats){
+	for (Beat &b: beats) {
 		if (b.range.offset >= pos)
 			return prev;
 		prev = b.range.offset;
@@ -85,8 +81,7 @@ int BarCollection::get_prev_beat(int pos)
 	return 0;
 }
 
-int BarCollection::get_next_sub_beat(int pos, int sub_beat_partition)
-{
+int BarCollection::get_next_sub_beat(int pos, int sub_beat_partition) {
 	Array<Beat> beats = get_beats(Range::ALL, true, true, sub_beat_partition);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
@@ -94,11 +89,10 @@ int BarCollection::get_next_sub_beat(int pos, int sub_beat_partition)
 	return pos;
 }
 
-int BarCollection::get_prev_sub_beat(int pos, int sub_beat_partition)
-{
+int BarCollection::get_prev_sub_beat(int pos, int sub_beat_partition) {
 	Array<Beat> beats = get_beats(Range::ALL, true, true, sub_beat_partition);
 	int prev = pos;
-	for (Beat &b: beats){
+	for (Beat &b: beats) {
 		if (b.range.offset >= pos)
 			return prev;
 		prev = b.range.offset;
@@ -106,17 +100,16 @@ int BarCollection::get_prev_sub_beat(int pos, int sub_beat_partition)
 	return pos;
 }
 
-Range BarCollection::get_sub_beats(int pos, int sub_beat_partition, int num_sub_beats)
-{
+Range BarCollection::get_sub_beats(int pos, int sub_beat_partition, int num_sub_beats) {
 	int a = get_prev_sub_beat(pos+1, sub_beat_partition);
 	int b = get_next_sub_beat(pos-1, sub_beat_partition);
-	if (num_sub_beats > 0){
+	if (num_sub_beats > 0) {
 		// >>> forward
 		if (a == b) // on a sub beat
 			b = get_next_sub_beat(b, sub_beat_partition);
 		for (int i=1; i<num_sub_beats; i++)
 			b = get_next_sub_beat(b, sub_beat_partition);
-	}else{
+	} else {
 		// <<< backward
 		if (a == b) // on a sub beat
 			a = get_prev_sub_beat(a, sub_beat_partition);
@@ -132,16 +125,14 @@ Range BarCollection::get_sub_beats(int pos, int sub_beat_partition, int num_sub_
 
 
 
-Range BarCollection::expand(const Range &r, int beat_partition)
-{
+Range BarCollection::expand(const Range &r, int beat_partition) {
 	Range o = r;
 	o.set_start(get_prev_sub_beat(r.start(), beat_partition));
 	o.set_end(get_next_sub_beat(r.end(), beat_partition));
 	return r;
 }
 
-Range BarCollection::range()
-{
+Range BarCollection::range() {
 	int pos0 = 0;
 	for (Bar *b: *this)
 		pos0 += b->length;

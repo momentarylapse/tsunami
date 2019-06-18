@@ -5,14 +5,13 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITMUTED_H_
-#define ACTIONTRACKEDITMUTED_H_
+#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITMUTED_H_
+#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITMUTED_H_
 
 #include "../../Action.h"
 class Track;
 
-class ActionTrackEditMuted : public Action
-{
+class ActionTrackEditMuted : public Action {
 public:
 	ActionTrackEditMuted(Track *t, bool muted);
 
@@ -24,4 +23,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKEDITMUTED_H_ */
+#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITMUTED_H_ */

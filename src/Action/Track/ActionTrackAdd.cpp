@@ -11,20 +11,17 @@
 #include "../../Data/TrackLayer.h"
 #include <assert.h>
 
-ActionTrackAdd::ActionTrackAdd(Track *t, int _index)
-{
+ActionTrackAdd::ActionTrackAdd(Track *t, int _index) {
 	track = t;
 	index = _index;
 }
 
-ActionTrackAdd::~ActionTrackAdd()
-{
+ActionTrackAdd::~ActionTrackAdd() {
 	if (track)
 		delete track;
 }
 
-void ActionTrackAdd::undo(Data *d)
-{
+void ActionTrackAdd::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	track = s->tracks[index];
 	s->tracks.erase(index);
@@ -38,8 +35,7 @@ void ActionTrackAdd::undo(Data *d)
 
 
 
-void *ActionTrackAdd::execute(Data *d)
-{
+void *ActionTrackAdd::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	track->song = s;
 

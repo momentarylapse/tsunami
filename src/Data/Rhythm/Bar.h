@@ -17,8 +17,7 @@
 class BarCollection;
 class Beat;
 
-class BarPattern
-{
+class BarPattern {
 public:
 	BarPattern();
 	BarPattern(int length, int num_beats, int divisor);
@@ -37,14 +36,13 @@ public:
 	bool operator==(const BarPattern &o) const;
 	bool operator!=(const BarPattern &o) const;
 
-	enum Type{
+	enum Type {
 		BAR,
 		PAUSE
 	};
 };
 
-class Bar : public BarPattern
-{
+class Bar : public BarPattern {
 public:
 	Bar(){}
 	Bar(const BarPattern &b);
@@ -64,7 +62,7 @@ public:
 	Range range();
 
 	// when inserting new bars
-	enum EditMode{
+	enum EditMode {
 		IGNORE,
 		INSERT_SILENCE,
 		STRETCH,

@@ -18,6 +18,7 @@
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Data/ActionTrackSetInstrument.h"
+#include "../Action/Track/Data/ActionTrackSetTarget.h"
 #include "../Action/Track/Layer/ActionTrackLayerAdd.h"
 #include "../Action/Track/Layer/ActionTrackLayerDelete.h"
 #include "../Action/Track/Layer/ActionTrackLayerMerge.h"
@@ -53,17 +54,16 @@ const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 const string Track::MESSAGE_REPLACE_SYNTHESIZER = "ReplaceSynthesizer";
 
-Track::Track(SignalType _type, Synthesizer *_synth)
-{
+Track::Track(SignalType _type, Synthesizer *_synth) {
 	type = _type;
 	channels = 1;
-	if (type == SignalType::AUDIO_MONO){
+	if (type == SignalType::AUDIO_MONO) {
 		type = SignalType::AUDIO;
 		channels = 1;
-	}else if (type == SignalType::AUDIO_STEREO){
+	} else if (type == SignalType::AUDIO_STEREO) {
 		type = SignalType::AUDIO;
 		channels = 2;
-	}else if (type == SignalType::AUDIO){
+	} else if (type == SignalType::AUDIO) {
 		channels = 1;
 	}
 	muted = false;
@@ -81,8 +81,7 @@ Track::Track(SignalType _type, Synthesizer *_synth)
 }
 
 
-Track::~Track()
-{
+Track::~Track() {
 	notify(MESSAGE_DELETE);
 	for (TrackLayer *l: layers)
 		delete(l);
@@ -100,8 +99,7 @@ Track::~Track()
 		delete(synth);
 }
 
-Range Track::range() const
-{
+Range Track::range() const {
 	Range r = Range::EMPTY;
 
 	for (TrackLayer *l: layers)
@@ -113,8 +111,7 @@ Range Track::range() const
 	return r;
 }
 
-string Track::nice_name()
-{
+string Track::nice_name() {
 	if (name.num > 0)
 		return name;
 	if (type == SignalType::BEATS)
@@ -123,14 +120,12 @@ string Track::nice_name()
 	return format(_("Track %d"), n+1);
 }
 
-int Track::get_index()
-{
+int Track::get_index() {
 	//assert(song);
 	return song->tracks.find(this);
 }
 
-void Track::invalidate_all_peaks()
-{
+void Track::invalidate_all_peaks() {
 	for (TrackLayer *l: layers)
 		for (AudioBuffer &b: l->buffers)
 			b.peaks.clear();
@@ -138,8 +133,7 @@ void Track::invalidate_all_peaks()
 
 
 
-Array<TrackMarker*> Track::markers_sorted() const
-{
+Array<TrackMarker*> Track::markers_sorted() const {
 	Array<TrackMarker*> sorted = markers;
 	for (int i=0; i<sorted.num; i++)
 		for (int j=i+1; j<sorted.num; j++)
@@ -148,158 +142,130 @@ Array<TrackMarker*> Track::markers_sorted() const
 	return sorted;
 }
 
-bool Track::has_version_selection()
-{
+bool Track::has_version_selection() {
 	return fades.num > 0;
 }
 
-void Track::set_name(const string& name)
-{
+void Track::set_name(const string& name) {
 	song->execute(new ActionTrackEditName(this, name));
 }
 
-void Track::set_instrument(const Instrument& instrument)
-{
+void Track::set_instrument(const Instrument& instrument) {
 	song->execute(new ActionTrackSetInstrument(this, instrument));
 }
 
-void Track::set_muted(bool muted)
-{
+void Track::set_muted(bool muted) {
 	song->execute(new ActionTrackEditMuted(this, muted));
 }
 
-void Track::set_volume(float volume)
-{
+void Track::set_volume(float volume) {
 	song->execute(new ActionTrackEditVolume(this, volume));
 }
 
-void Track::set_panning(float panning)
-{
+void Track::set_panning(float panning) {
 	song->execute(new ActionTrackEditPanning(this, panning));
 }
 
-void Track::set_send_target(Track *t)
-{
-	send_target = t;
+void Track::set_send_target(Track *target) {
+	song->execute(new ActionTrackSetTarget(this, target));
 }
 
-void Track::move(int target)
-{
+void Track::move(int target) {
 	if (target != get_index())
 		song->execute(new ActionTrackMove(this, target));
 }
-void Track::set_channels(int _channels)
-{
+void Track::set_channels(int _channels) {
 	if (channels != _channels)
 		song->execute(new ActionTrackSetChannels(this, _channels));
 }
 
-void Track::add_effect(AudioEffect *effect)
-{
+void Track::add_effect(AudioEffect *effect) {
 	song->execute(new ActionTrackAddEffect(this, effect));
 }
 
 // execute after editing...
-void Track::edit_effect(AudioEffect *effect, const string &param_old)
-{
+void Track::edit_effect(AudioEffect *effect, const string &param_old) {
 	song->execute(new ActionTrackEditEffect(effect, param_old));
 }
 
-void Track::enable_effect(AudioEffect *effect, bool enabled)
-{
+void Track::enable_effect(AudioEffect *effect, bool enabled) {
 	if (effect->enabled != enabled)
 		song->execute(new ActionTrackToggleEffectEnabled(effect));
 }
 
-void Track::delete_effect(AudioEffect *effect)
-{
-	foreachi(AudioEffect *f, fx, index){
+void Track::delete_effect(AudioEffect *effect) {
+	foreachi(AudioEffect *f, fx, index) {
 		if (f == effect)
 			song->execute(new ActionTrackDeleteEffect(this, index));
 	}
 }
 
-void Track::move_effect(int source, int target)
-{
+void Track::move_effect(int source, int target) {
 	if (source != target)
 		song->execute(new ActionTrackMoveAudioEffect(this, source, target));
 }
 
-void Track::add_midi_effect(MidiEffect *effect)
-{
+void Track::add_midi_effect(MidiEffect *effect) {
 	song->execute(new ActionTrackAddMidiEffect(this, effect));
 }
 
 // execute after editing...
-void Track::edit_midi_effect(MidiEffect *effect, const string &param_old)
-{
+void Track::edit_midi_effect(MidiEffect *effect, const string &param_old) {
 	song->execute(new ActionTrackEditMidiEffect(effect, param_old));
 }
 
-void Track::enable_midi_effect(MidiEffect *effect, bool enabled)
-{
+void Track::enable_midi_effect(MidiEffect *effect, bool enabled) {
 	if (effect->enabled != enabled)
 		song->execute(new ActionTrackToggleMidiEffectEnabled(effect));
 }
 
-void Track::delete_midi_effect(MidiEffect *effect)
-{
+void Track::delete_midi_effect(MidiEffect *effect) {
 	foreachi(MidiEffect *f, midi_fx, index)
 		if (f == effect)
 			song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }
 
-void Track::move_midi_effect(int source, int target)
-{
+void Track::move_midi_effect(int source, int target) {
 	if (source != target)
 		song->execute(new ActionTrackMoveMidiEffect(this, source, target));
 }
 
-void Track::set_synthesizer(Synthesizer *_synth)
-{
+void Track::set_synthesizer(Synthesizer *_synth) {
 	song->execute(new ActionTrackSetSynthesizer(this, _synth));
 }
 
 // execute after editing...
-void Track::edit_synthesizer(const string &param_old)
-{
+void Track::edit_synthesizer(const string &param_old) {
 	song->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
-void Track::detune_synthesizer(int pitch, float dpitch, bool all_octaves)
-{
+void Track::detune_synthesizer(int pitch, float dpitch, bool all_octaves) {
 	song->execute(new ActionTrackDetuneSynthesizer(this, pitch, dpitch, all_octaves));
 }
 
-TrackMarker *Track::add_marker(const Range &range, const string &text)
-{
+TrackMarker *Track::add_marker(const Range &range, const string &text) {
 	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, range, text));
 }
 
-void Track::delete_marker(const TrackMarker *marker)
-{
+void Track::delete_marker(const TrackMarker *marker) {
 	foreachi(const TrackMarker *m, markers, index)
 		if (m == marker)
 			song->execute(new ActionTrackDeleteMarker(this, index));
 }
 
-void Track::edit_marker(const TrackMarker *marker, const Range &range, const string &text)
-{
+void Track::edit_marker(const TrackMarker *marker, const Range &range, const string &text) {
 	song->execute(new ActionTrackEditMarker(this, (TrackMarker*)marker, range, text));
 }
 
-TrackLayer *Track::add_layer()
-{
+TrackLayer *Track::add_layer() {
 	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, new TrackLayer(this)));
 }
 
-void Track::delete_layer(TrackLayer *layer)
-{
+void Track::delete_layer(TrackLayer *layer) {
 	song->execute(new ActionTrackLayerDelete(this, layer->version_number()));
 }
 
-void Track::merge_layers()
-{
+void Track::merge_layers() {
 	song->execute(new ActionTrackLayerMerge(this));
 }
 

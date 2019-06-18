@@ -24,8 +24,7 @@ enum class SignalType;
 
 
 
-class TrackLayer : public Observable<VirtualBase>
-{
+class TrackLayer : public Observable<VirtualBase> {
 public:
 	TrackLayer();
 	TrackLayer(Track *track);

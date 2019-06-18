@@ -5,14 +5,13 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKEDITPANNING_H_
-#define ACTIONTRACKEDITPANNING_H_
+#ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_
+#define SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_
 
 #include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditPanning : public ActionMergable<float>
-{
+class ActionTrackEditPanning : public ActionMergable<float> {
 public:
 	ActionTrackEditPanning(Track *t, float panning);
 
@@ -25,4 +24,4 @@ private:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKEDITPANNING_H_ */
+#endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKEDITPANNING_H_ */

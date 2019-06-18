@@ -17,8 +17,7 @@ float db2amplitude(float db);
 const int DEFAULT_SAMPLE_RATE = 44100;
 
 
-enum class SampleFormat
-{
+enum class SampleFormat {
 	SAMPLE_FORMAT_UNKNOWN,
 	SAMPLE_FORMAT_8,
 	SAMPLE_FORMAT_16,
@@ -37,8 +36,7 @@ int format_get_bits(SampleFormat);
 string format_name(SampleFormat format);
 
 
-enum class SignalType
-{
+enum class SignalType {
 	AUDIO,
 	BEATS,
 	MIDI,

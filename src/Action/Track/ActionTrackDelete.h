@@ -5,15 +5,14 @@
  *      Author: michi
  */
 
-#ifndef ACTIONTRACKDELETET_H_
-#define ACTIONTRACKDELETET_H_
+#ifndef SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_
+#define SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_
 
 #include "../ActionGroup.h"
 
 class Track;
 
-class ActionTrackDelete : public ActionGroup
-{
+class ActionTrackDelete : public ActionGroup {
 public:
 	ActionTrackDelete(Track *track);
 
@@ -22,4 +21,4 @@ public:
 	Track *track;
 };
 
-#endif /* ACTIONTRACKDELETET_H_ */
+#endif /* SRC_ACTION_TRACK_ACTIONTRACKDELETET_H_ */

@@ -12,8 +12,7 @@
 
 class Track;
 
-class ActionTrackMove: public Action
-{
+class ActionTrackMove: public Action {
 public:
 	ActionTrackMove(Track *track, int target);
 

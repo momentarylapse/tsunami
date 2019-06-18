@@ -8,14 +8,12 @@
 #include "ActionTrackEditMuted.h"
 #include "../../../Data/Track.h"
 
-ActionTrackEditMuted::ActionTrackEditMuted(Track *t, bool _muted)
-{
+ActionTrackEditMuted::ActionTrackEditMuted(Track *t, bool _muted) {
 	track = t;
 	muted = _muted;
 }
 
-void *ActionTrackEditMuted::execute(Data *d)
-{
+void *ActionTrackEditMuted::execute(Data *d) {
 	bool temp = muted;
 	muted = track->muted;
 	track->muted = temp;
@@ -24,7 +22,6 @@ void *ActionTrackEditMuted::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTrackEditMuted::undo(Data *d)
-{
+void ActionTrackEditMuted::undo(Data *d) {
 	execute(d);
 }

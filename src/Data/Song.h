@@ -29,20 +29,17 @@ class TrackMarker;
 enum class SampleFormat;
 enum class SignalType;
 
-class Tag
-{
+class Tag {
 public:
 	string key, value;
 	Tag(){}
-	Tag(const string &_key, const string &_value)
-	{
+	Tag(const string &_key, const string &_value) {
 		key = _key;
 		value = _value;
 	}
 };
 
-class Song : public Data
-{
+class Song : public Data {
 public:
 	Song(Session *session, int sample_rate);
 	virtual ~Song();
@@ -71,8 +68,7 @@ public:
 
 
 
-	class Exception
-	{
+	class Exception {
 	public:
 		Exception(const string &message);
 		string message;

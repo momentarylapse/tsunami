@@ -24,11 +24,10 @@ class FileChunkSynthesizerTuning;
 class Session;
 class Synthesizer;
 namespace Kaba{
-class Class;
+	class Class;
 }
 
-class PitchRenderer : public VirtualBase
-{
+class PitchRenderer : public VirtualBase {
 public:
 	PitchRenderer(Synthesizer *synth, int pitch);
 	virtual ~PitchRenderer(){}
@@ -46,8 +45,7 @@ public:
 	Synthesizer *synth;
 };
 
-class Synthesizer : public Module
-{
+class Synthesizer : public Module {
 	friend class PluginManager;
 	friend class DetuneSynthesizerDialog;
 	friend class ActionTrackDetuneSynthesizer;
@@ -83,8 +81,7 @@ public:
 
 	bool is_default();
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(Synthesizer *synth);
 		Synthesizer *synth;
@@ -110,8 +107,7 @@ protected:
 	void _handle_event(const MidiEvent &e);
 
 public:
-	struct Tuning
-	{
+	struct Tuning {
 		float freq[MAX_PITCH];
 		void set_default();
 		bool is_default();

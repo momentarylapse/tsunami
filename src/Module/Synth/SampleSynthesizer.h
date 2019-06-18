@@ -11,8 +11,7 @@
 #include "Synthesizer.h"
 #include "../../Data/Sample.h"
 
-class SampleSynthesizer : public Synthesizer
-{
+class SampleSynthesizer : public Synthesizer {
 public:
 	SampleSynthesizer();
 	virtual ~SampleSynthesizer();

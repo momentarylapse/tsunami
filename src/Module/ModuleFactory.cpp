@@ -131,7 +131,7 @@ Module* ModuleFactory::create(Session* session, ModuleType type, const string& s
 
 	// type specific initialization
 	if (m and type == ModuleType::SYNTHESIZER)
-		((Synthesizer*)m)->sample_rate = session->sample_rate();
+		((Synthesizer*)m)->set_sample_rate(session->sample_rate());
 
 	return m;
 }

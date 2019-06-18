@@ -12,17 +12,14 @@
 #include "../../lib/math/math.h"
 
 
-class DummyPitchRenderer : public PitchRenderer
-{
+class DummyPitchRenderer : public PitchRenderer {
 public:
-	DummyPitchRenderer(Synthesizer *synth, int pitch) : PitchRenderer(synth, pitch)
-	{
+	DummyPitchRenderer(Synthesizer *synth, int pitch) : PitchRenderer(synth, pitch) {
 		volume = 0;
 		phi = 0;
 		env = ((DummySynthesizer*)synth)->env[pitch];
 	}
-	bool _cdecl render(AudioBuffer &buf) override
-	{
+	bool _cdecl render(AudioBuffer &buf) override {
 		for (int i=0; i<buf.length; i++){
 			volume = env.get();
 
@@ -38,16 +35,13 @@ public:
 		}
 		return true;
 	}
-	void on_end() override
-	{
+	void on_end() override {
 		env.end();
 	}
-	void on_start(float volume) override
-	{
+	void on_start(float volume) override {
 		env.start(volume);
 	}
-	void on_config() override
-	{
+	void on_config() override {
 		env = ((DummySynthesizer*)synth)->env[pitch];
 	}
 	float volume;
@@ -56,34 +50,29 @@ public:
 };
 
 
-DummySynthesizer::DummySynthesizer()
-{
+DummySynthesizer::DummySynthesizer() {
 	module_subtype = "Dummy";
 	auto_generate_stereo = true;
 }
 
-void DummySynthesizer::__init__()
-{
+void DummySynthesizer::__init__() {
 	new(this) DummySynthesizer;
 }
 
-PitchRenderer *DummySynthesizer::create_pitch_renderer(int pitch)
-{
+PitchRenderer *DummySynthesizer::create_pitch_renderer(int pitch) {
 	return new DummyPitchRenderer(this, pitch);
 }
 
-void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack, float release)
-{
+void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack, float release) {
 	env[no].set(attack, release, 0.00001f, 0.05f, sample_rate);
 	env[no].set2(0, volume);
 	delta_phi[no] = freq * 2.0f * pi / sample_rate;
 }
 
 
-void DummySynthesizer::on_config()
-{
-	if (instrument.type == Instrument::Type::DRUMS){
-		for (int i=0; i<MAX_PITCH; i++){
+void DummySynthesizer::on_config() {
+	if (instrument.type == Instrument::Type::DRUMS) {
+		for (int i=0; i<MAX_PITCH; i++) {
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 			env[i].set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
 			env[i].set2(0, 0.45f);
@@ -127,8 +116,8 @@ void DummySynthesizer::on_config()
 		DrumPitch::VIBRASLASH = 58,
 		DrumPitch::BONGO_HI = 60,
 		DrumPitch::BONGO_LOW = 61,*/
-	}else{
-		for (int i=0; i<MAX_PITCH; i++){
+	} else {
+		for (int i=0; i<MAX_PITCH; i++) {
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 			env[i].set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
 			env[i].set2(0, 0.45f);

@@ -9,18 +9,15 @@
 #include "../../lib/file/file.h"
 #include "../../lib/math/math.h"
 
-EnvelopeADSR::EnvelopeADSR()
-{
+EnvelopeADSR::EnvelopeADSR() {
 	set(0, 0, 0, 0, 0);
 }
 
-void EnvelopeADSR::__init__()
-{
+void EnvelopeADSR::__init__() {
 	new(this) EnvelopeADSR();
 }
 
-void EnvelopeADSR::set(float t_attack, float t_decay, float _sustain, float t_release, int sample_rate)
-{
+void EnvelopeADSR::set(float t_attack, float t_decay, float _sustain, float t_release, int sample_rate) {
 	ttl_attack = t_attack * sample_rate;
 	ttl_decay = t_decay * sample_rate;
 	ttl_release = t_release * sample_rate;
@@ -31,15 +28,13 @@ void EnvelopeADSR::set(float t_attack, float t_decay, float _sustain, float t_re
 	//msg_write(format("%f  %d  %f  %d  %f  %d", initial, ttl_attack, peak, ttl_decay, sustain, ttl_release));
 }
 
-void EnvelopeADSR::set2(float _initial, float _peak)
-{
+void EnvelopeADSR::set2(float _initial, float _peak) {
 	initial = _initial;
 	peak = _peak;
 	//msg_write(format("%f  %d  %f  %d  %f  %d", initial, ttl_attack, peak, ttl_decay, sustain, ttl_release));
 }
 
-void EnvelopeADSR::reset()
-{
+void EnvelopeADSR::reset() {
 	mode = MODE_OFF;
 	value = 0;
 	just_killed = false;
@@ -66,43 +61,40 @@ void EnvelopeADSR::start(float volume)
 	start_attack();
 }
 
-void EnvelopeADSR::end()
-{
+void EnvelopeADSR::end() {
 	if (mode == MODE_ATTACK)
 		start_attack_zombie();
 	else
 		start_release();
 }
 
-float EnvelopeADSR::get()
-{
-	if (mode == MODE_ATTACK){
+float EnvelopeADSR::get() {
+	if (mode == MODE_ATTACK) {
 		value += step_attack;
 		ttl --;
 		if (ttl <= 0)
 			start_decay();
-	}else if (mode == MODE_ATTACK_ZOMBIE){
+	} else if (mode == MODE_ATTACK_ZOMBIE) {
 		value += step_attack;
 		ttl --;
 		if (ttl <= 0)
 			start_release();
-	}else if (mode == MODE_DECAY){
+	} else if (mode == MODE_DECAY) {
 		value += step_decay;
 		ttl --;
 		if (ttl <= 0)
 			start_sustain();
-	}else if (mode == MODE_RELEASE){
+	} else if (mode == MODE_RELEASE) {
 		value *= factor_release;
 		if (value <= 0.0001f)
 			kill();
-	}else{
+	} else {
 		just_killed = false;
 	}
 	return value;
 }
 
-void EnvelopeADSR::start_attack()
-{
+void EnvelopeADSR::start_attack() {
 	if (value < value_initial)
 		value = value_initial;
 
@@ -113,13 +105,11 @@ void EnvelopeADSR::start_attack()
 		start_decay();
 }
 
-void EnvelopeADSR::start_attack_zombie()
-{
+void EnvelopeADSR::start_attack_zombie() {
 	mode = MODE_ATTACK_ZOMBIE;
 }
 
-void EnvelopeADSR::start_decay()
-{
+void EnvelopeADSR::start_decay() {
 	value = value_peak;
 	mode = MODE_DECAY;
 	ttl = ttl_decay;
@@ -128,21 +118,18 @@ void EnvelopeADSR::start_decay()
 		start_sustain();
 }
 
-void EnvelopeADSR::start_sustain()
-{
+void EnvelopeADSR::start_sustain() {
 	value = value_sustain;
 	mode = MODE_SUSTAIN;
 }
 
-void EnvelopeADSR::start_release()
-{
+void EnvelopeADSR::start_release() {
 	//value = value_sustain;
 	mode = MODE_RELEASE;
 	ttl = ttl_release;
 }
 
-void EnvelopeADSR::kill()
-{
+void EnvelopeADSR::kill() {
 	value = 0;
 	mode = MODE_OFF;
 	just_killed = true;

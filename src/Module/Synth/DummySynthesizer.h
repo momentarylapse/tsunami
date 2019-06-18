@@ -12,8 +12,7 @@
 #include "EnvelopeADSR.h"
 
 
-class DummySynthesizer : public Synthesizer
-{
+class DummySynthesizer : public Synthesizer {
 public:
 	DummySynthesizer();
 	void __init__();

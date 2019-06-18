@@ -15,30 +15,25 @@
 #include "../../lib/math/math.h"
 #include "../Port/Port.h"
 
-PitchRenderer::PitchRenderer(Synthesizer *s, int p)
-{
+PitchRenderer::PitchRenderer(Synthesizer *s, int p) {
 	synth = s;
 	pitch = p;
 	delta_phi = synth->delta_phi[pitch];
 }
 
-void PitchRenderer::__init__(Synthesizer *s, int p)
-{
+void PitchRenderer::__init__(Synthesizer *s, int p) {
 	new(this) PitchRenderer(s, p);
 }
 
-void PitchRenderer::__delete__()
-{
+void PitchRenderer::__delete__() {
 	this->PitchRenderer::~PitchRenderer();
 }
 
-Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out")
-{
+Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out") {
 	synth = s;
 }
 
-int Synthesizer::Output::read_audio(AudioBuffer &buf)
-{
+int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	if (!synth->source)
 		return 0;
 //	printf("synth read %d\n", buf.length);
@@ -95,113 +90,98 @@ Synthesizer::Synthesizer() :
 	set_sample_rate(DEFAULT_SAMPLE_RATE);
 }
 
-void Synthesizer::__init__()
-{
+void Synthesizer::__init__() {
 	new(this) Synthesizer;
 }
 
-void Synthesizer::__delete__()
-{
+void Synthesizer::__delete__() {
 	this->Synthesizer::~Synthesizer();
 }
 
-void Synthesizer::Tuning::set_default()
-{
+void Synthesizer::Tuning::set_default() {
 	for (int p=0; p<MAX_PITCH; p++)
 		freq[p] = pitch_to_freq((float)p);
 }
 
-bool Synthesizer::Tuning::is_default()
-{
+bool Synthesizer::Tuning::is_default() {
 	for (int p=0; p<MAX_PITCH; p++)
 		if (fabs(freq[p] - pitch_to_freq((float)p)) > 0.01f)
 			return false;
 	return true;
 }
 
-void Synthesizer::set_sample_rate(int _sample_rate)
-{
-	//if (_sample_rate == sample_rate)
-	//	return;
+void Synthesizer::set_sample_rate(int _sample_rate) {
 	sample_rate = _sample_rate;
 
 	update_delta_phi();
 	on_config();
 }
 
-void Synthesizer::update_delta_phi()
-{
+void Synthesizer::update_delta_phi() {
 	for (int p=0; p<MAX_PITCH; p++)
 		delta_phi[p] = tuning.freq[p] * 2.0f * pi / sample_rate;
 }
 
-void Synthesizer::set_instrument(Instrument &i)
-{
+void Synthesizer::set_instrument(Instrument &i) {
 	instrument = i;
 	on_config();
 }
 
-bool Synthesizer::has_run_out_of_data()
-{
+bool Synthesizer::has_run_out_of_data() {
 	return (active_pitch.num == 0) and source_run_out;
 }
 
-PitchRenderer *Synthesizer::create_pitch_renderer(int pitch)
-{
+PitchRenderer *Synthesizer::create_pitch_renderer(int pitch) {
 	return nullptr;
 }
 
-PitchRenderer *Synthesizer::get_pitch_renderer(int pitch)
-{
+PitchRenderer *Synthesizer::get_pitch_renderer(int pitch) {
 	for (auto *p: pitch_renderer)
-		if (p->pitch == pitch){
+		if (p->pitch == pitch) {
 			return p;
 		}
 	auto *p = create_pitch_renderer(pitch);
-	if (p){
+	if (p) {
 		p->on_config();
 		pitch_renderer.add(p);
 	}
 	return p;
 }
 
-void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end)
-{
+void Synthesizer::_render_part(AudioBuffer &buf, int pitch, int offset, int end) {
 	if (offset == end)
 		return;
 
 	AudioBuffer part;
 	part.set_as_ref(buf, offset, end - offset);
-	PitchRenderer *pr = get_pitch_renderer(pitch);
+	auto *pr = get_pitch_renderer(pitch);
 	if (!pr)
 		return;
 	if (!pr->render(part))
 		active_pitch.erase(pitch);
 }
 
-void Synthesizer::_handle_event(const MidiEvent &e)
-{
-	PitchRenderer *pr = get_pitch_renderer((int)e.pitch);
+void Synthesizer::_handle_event(const MidiEvent &e) {
+	auto *pr = get_pitch_renderer((int)e.pitch);
 	if (!pr)
 		return;
-	if (e.volume > 0){
+	if (e.volume > 0) {
 		pr->on_start(e.volume);
-	}else{
+	} else {
 		pr->on_end();
 	}
 }
 
-void Synthesizer::render(AudioBuffer& buf)
-{
+void Synthesizer::render(AudioBuffer& buf) {
 	Set<int> pitch_involved = active_pitch;
 	for (MidiEvent &e: events)
 		pitch_involved.add((int)e.pitch);
 
-	for (int p: pitch_involved){
+	for (int p: pitch_involved) {
 		int offset = 0;
 
 		for (MidiEvent &e: events)
-			if (e.pitch == p){
+			if (e.pitch == p) {
 				// render before
 				if (active_pitch.contains(p))
 					_render_part(buf, p, offset, e.pos);
@@ -217,14 +197,12 @@ void Synthesizer::render(AudioBuffer& buf)
 	}
 }
 
-void Synthesizer::on_config()
-{
+void Synthesizer::on_config() {
 	for (auto *p: pitch_renderer)
 		p->on_config();
 }
 
-void Synthesizer::reset_default()
-{
+void Synthesizer::reset_default() {
 	for (auto *p: pitch_renderer)
 		delete p;
 	events.clear();
@@ -233,18 +211,15 @@ void Synthesizer::reset_default()
 	source_run_out = false;
 }
 
-void Synthesizer::reset_state()
-{
+void Synthesizer::reset_state() {
 	reset_default();
 }
 
-bool Synthesizer::is_default()
-{
+bool Synthesizer::is_default() {
 	return (module_subtype == "Dummy") and (tuning.is_default());
 }
 
-Synthesizer* CreateSynthesizer(Session *session, const string &name)
-{
+Synthesizer* CreateSynthesizer(Session *session, const string &name) {
 	return (Synthesizer*)ModuleFactory::create(session, ModuleType::SYNTHESIZER, name);
 }
 

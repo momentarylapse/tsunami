@@ -51,8 +51,7 @@ public:
 	void kill();
 
 
-	enum
-	{
+	enum {
 		MODE_OFF,
 		MODE_ATTACK,
 		MODE_ATTACK_ZOMBIE,

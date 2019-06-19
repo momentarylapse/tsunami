@@ -73,14 +73,17 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 
 		// points
 		foreachi(auto &p, curve->points, i) {
-			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index))
+			float r = 3;
+			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index)) {
 				c->set_color(view->colors.selection_boundary_hover);
-			else if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index))
+				r = 5;
+			} else if ((view->cur_selection.type == HoverData::Type::CURVE_POINT) and (i == view->cur_selection.index)) {
 				// TODO.... selected...
 				c->set_color(view->colors.selection_boundary);
-			else
+			} else {
 				c->set_color(view->colors.text);
-			c->draw_circle(cam->sample2screen(p.pos), value2screen(p.value), 3);
+			}
+			c->draw_circle(cam->sample2screen(p.pos), value2screen(p.value), r);
 		}
 	}
 }
@@ -89,9 +92,17 @@ void ViewModeCurve::draw_post(Painter* c) {
 	auto *t = cur_track();
 	if (!t)
 		return;
-	c->set_color(color(0.1f, 1, 1, 1));
-	c->draw_rect(view->song_area().x1, t->area.y1-30, view->song_area().width(), 30);
-	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), 30);
+	color col = view->colors.text;
+	col.a = 0.1f;
+	float d = 12;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, t->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), d);
+	d = 2;
+	col.a = 0.7f;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, t->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, t->area.y2, view->song_area().width(), d);
 }
 
 HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, float mx, float my) {

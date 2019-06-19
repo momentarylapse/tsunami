@@ -36,13 +36,14 @@ public:
 		Target(float *p);
 		Target(float *p, const string &name, const string &name_nice);
 		void from_string(const string &str, Song *a);
-		string str(Song *a);
-		string niceStr(Song *a);
+		string str(Song *s) const;
+		string nice_str(Song *s) const;
+		Track *track(Song *s) const;
 
-		static Array<Target> enumerate(Song *a);
-		static void enumerate_track(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
-		static void enumerate_module(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
-		static void enumerate_type(char *p, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static Array<Target> enumerate(Song *s);
+		static Array<Target> enumerate_track(Track *t, const string &prefix, const string &prefix_nice);
+		static Array<Target> enumerate_module(Module *c, const string &prefix, const string &prefix_nice);
+		static Array<Target> enumerate_type(char *p, const Kaba::Class *t, const string &prefix, const string &prefix_nice);
 	};
 
 	string name;
@@ -64,7 +65,7 @@ public:
 	void apply(int pos);
 	void unapply();
 
-	string get_targets(Song *a);
+	string get_targets(Song *s);
 };
 
 #endif /* SRC_DATA_CURVE_H_ */

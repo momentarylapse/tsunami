@@ -11,46 +11,41 @@
 #include "../Module/Module.h"
 #include "../Module/ModuleConfiguration.h"
 #include "../Module/Audio/AudioEffect.h"
+#include "../Module/Midi/MidiEffect.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../lib/kaba/kaba.h"
 
-Curve::Target::Target()
-{
+Curve::Target::Target() {
 	p = nullptr;
 }
 
-Curve::Target::Target(float *_p)
-{
+Curve::Target::Target(float *_p) {
 	p = _p;
 }
 
-Curve::Target::Target(float *_p, const string &name, const string &name_nice)
-{
+Curve::Target::Target(float *_p, const string &name, const string &name_nice) {
 	p = _p;
 	temp_name = name;
 	temp_name_nice = name_nice;
 }
 
-string Curve::Target::str(Song *a)
-{
-	Array<Target> list = enumerate(a);
+string Curve::Target::str(Song *s) const {
+	auto list = enumerate(s);
 	for (Target &t : list)
 		if (t.p == p)
 			return t.temp_name;
 	return "";
 }
 
-string Curve::Target::niceStr(Song *a)
-{
-	Array<Target> list = enumerate(a);
+string Curve::Target::nice_str(Song *s) const {
+	auto list = enumerate(s);
 	for (Target &t : list)
 		if (t.p == p)
 			return t.temp_name_nice;
 	return "";
 }
 
-void Curve::Target::from_string(const string &str, Song *s)
-{
+void Curve::Target::from_string(const string &str, Song *s) {
 	auto targets = enumerate(s);
 	p = nullptr;
 	for (auto t: targets)
@@ -60,68 +55,80 @@ void Curve::Target::from_string(const string &str, Song *s)
 		msg_error("can't find curve target " + str);
 }
 
-Array<Curve::Target> Curve::Target::enumerate(Song *s)
-{
+Track* Curve::Target::track(Song *s) const {
+	for (Track *track: s->tracks) {
+		auto list = enumerate_track(track, "", "");
+		for (Target &t : list)
+			if (t.p == p)
+				return track;
+	}
+	return nullptr;
+}
+
+Array<Curve::Target> Curve::Target::enumerate(Song *s) {
 	Array<Target> list;
 	foreachi(Track *t, s->tracks, i)
-		enumerate_track(t, list, format("t:%d", i), format("track[%d]", i));
+		list.append(enumerate_track(t, format("t:%d", i), format("track[%d]", i)));
 	return list;
 }
-void Curve::Target::enumerate_track(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
-{
+
+Array<Curve::Target> Curve::Target::enumerate_track(Track *t, const string &prefix, const string &prefix_nice) {
+	Array<Target> list;
 	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
 	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
-	foreachi(AudioEffect *fx, t->fx, i)
-		enumerate_module(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
-	enumerate_module(t->synth, list, prefix + ":s", prefix_nice + ".synth");
+	foreachi(auto *fx, t->fx, i)
+		list.append(enumerate_module(fx, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i)));
+	foreachi(auto *fx, t->midi_fx, i)
+		list.append(enumerate_module(fx, prefix + format(":mfx:%d", i), prefix_nice + format(".mfx[%d]", i)));
+	list.append(enumerate_module(t->synth, prefix + ":s", prefix_nice + ".synth"));
+	return list;
 }
-void Curve::Target::enumerate_module(Module *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
-{
-	ModuleConfiguration *pd = c->get_config();
+Array<Curve::Target> Curve::Target::enumerate_module(Module *c, const string &prefix, const string &prefix_nice) {
+	Array<Target> list;
+	auto *pd = c->get_config();
 	if (pd)
-		enumerate_type((char*)pd, pd->_class, list, prefix, prefix_nice);
+		list.append(enumerate_type((char*)pd, pd->_class, prefix, prefix_nice));
+	return list;
 }
 
-void Curve::Target::enumerate_type(char *pp, const Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
-{
-	if (t->name == "float"){
+Array<Curve::Target> Curve::Target::enumerate_type(char *pp, const Kaba::Class *t, const string &prefix, const string &prefix_nice) {
+	Array<Curve::Target> list;
+	if (t->name == "float") {
 		list.add(Target((float*)pp, prefix, prefix_nice));
-	}else if (t->is_array()){
-		for (int i=0; i<t->array_length; i++){
-			enumerate_type(pp + t->parent->size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+	} else if (t->is_array()) {
+		for (int i=0; i<t->array_length; i++) {
+			list.append(enumerate_type(pp + t->parent->size * i, t->parent, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
 		}
-	}else if (t->is_super_array()){
-		DynamicArray *da = (DynamicArray*)pp;
-		for (int i=0; i<da->num; i++){
-			enumerate_type(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+	} else if (t->is_super_array()) {
+		auto *da = (DynamicArray*)pp;
+		for (int i=0; i<da->num; i++) {
+			list.append(enumerate_type(pp + da->element_size * i, t->parent, prefix + format(":%d", i), prefix_nice + format("[%d]", i)));
 		}
-	}else{
+	} else {
 		for (auto &e : t->elements)
 			if (!e.hidden)
-				enumerate_type(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
+				list.append(enumerate_type(pp + e.offset, e.type, prefix + ":" + e.name, prefix_nice + "." + e.name));
 	}
+	return list;
 }
 
 
-Curve::Curve()
-{
+Curve::Curve() {
 	min = 0;
 	max = 1;
 	type = TYPE_LINEAR;
 }
 
-Curve::~Curve()
-{
+Curve::~Curve() {
 }
 
-float Curve::get(int pos)
-{
+float Curve::get(int pos) {
 	if (points.num == 0)
 		return min;
 	if (pos < points[0].pos)
 		return points[0].value;
 	for (int i=1; i<points.num; i++)
-		if (pos < points[i].pos){
+		if (pos < points[i].pos) {
 			float dv = points[i].value - points[i-1].value;
 			float dp = (float)(points[i].pos - points[i-1].pos);
 			return points[i-1].value + dv * (pos - points[i-1].pos) / dp;
@@ -131,29 +138,26 @@ float Curve::get(int pos)
 
 
 
-void Curve::apply(int pos)
-{
+void Curve::apply(int pos) {
 	temp_values.resize(targets.num);
-	for (int i=0; i<targets.num; i++){
+	for (int i=0; i<targets.num; i++) {
 		temp_values[i] = *targets[i].p;
 		*targets[i].p = get(pos);
 	}
 }
 
-void Curve::unapply()
-{
-	for (int i=0; i<targets.num; i++){
+void Curve::unapply() {
+	for (int i=0; i<targets.num; i++) {
 		*targets[i].p = temp_values[i];
 	}
 }
 
-string Curve::get_targets(Song *a)
-{
+string Curve::get_targets(Song *s) {
 	string tt;
-	foreachi(Target &t, targets, i){
+	foreachi(Target &t, targets, i) {
 		if (i > 0)
 			tt += ", ";
-		tt += t.niceStr(a);
+		tt += t.nice_str(s);
 	}
 	return tt;
 }

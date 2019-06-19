@@ -159,7 +159,7 @@ class CompressorPanel extends ConfigPanel
 	override void __init__(Module *_fx)
 		add_grid("", 0, 0, "table1")
 		set_target("table1")
-		add_drawing_area("!grabfocus,height=250\\", 0, 0, "drawing_area")
+		add_drawing_area("!grabfocus,height=200,expandy\\", 0, 0, "drawing_area")
 		add_grid("!noexpandy", 0, 1, "table2")
 		set_target("table2")
 		add_label("Attack", 0, 0, "")

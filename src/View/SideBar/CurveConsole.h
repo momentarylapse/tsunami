@@ -16,8 +16,7 @@ class AudioView;
 class Curve;
 class Session;
 
-class CurveConsole : public SideBarConsole
-{
+class CurveConsole : public SideBarConsole {
 public:
 	CurveConsole(Session *session);
 	virtual ~CurveConsole();
@@ -39,6 +38,7 @@ public:
 	void on_leave() override;
 
 	Curve* curve();
+	Array<Curve*> curves;
 
 	string id_list;
 };

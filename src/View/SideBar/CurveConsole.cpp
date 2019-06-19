@@ -10,22 +10,22 @@
 #include "../Mode/ViewModeCurve.h"
 #include "../Mode/ViewModeDefault.h"
 #include "../../Data/Song.h"
+#include "../../Data/Track.h"
 #include "../../Data/Curve.h"
 #include "../../Session.h"
 
-class CurveTargetDialog : public hui::Window
-{
+class CurveTargetDialog : public hui::Window {
 public:
-	CurveTargetDialog(hui::Panel *parent, Song *song, Array<Curve::Target> &t) :
+	CurveTargetDialog(hui::Panel *parent, Track *track, Array<Curve::Target> &t) :
 		hui::Window(("curve-target-dialog"), parent->win),
 		targets(t)
 	{
-		all_targets = Curve::Target::enumerate(song);
+		all_targets = Curve::Target::enumerate_track(track, "", "");
 
 		Array<int> sel;
 
-		foreachi(Curve::Target &t, all_targets, i){
-			add_string("list", t.niceStr(song));
+		foreachi(auto &t, all_targets, i) {
+			add_string("list", t.nice_str(track->song));
 
 			for (auto &tt : targets)
 				if (t.p == tt.p){
@@ -35,18 +35,17 @@ public:
 		}
 		set_selection("list", sel);
 
-		event("hui:close", std::bind(&CurveTargetDialog::destroy, this));
-		event("cancel", std::bind(&CurveTargetDialog::destroy, this));
-		event("ok", std::bind(&CurveTargetDialog::onOk, this));
-		event("list", std::bind(&CurveTargetDialog::onOk, this));
+		event("hui:close", [=]{ destroy(); });
+		event("cancel", [=]{ destroy(); });
+		event("ok", [=]{ on_ok(); });
+		event("list", [=]{ on_ok(); });
 	}
 
 	Array<Curve::Target> all_targets;
 	Array<Curve::Target> &targets;
 
-	void onOk()
-	{
-		Array<int> sel = get_selection("list");
+	void on_ok() {
+		auto sel = get_selection("list");
 		targets.clear();
 		for (int i: sel)
 			targets.add(all_targets[i]);
@@ -62,85 +61,85 @@ CurveConsole::CurveConsole(Session *session) :
 
 	id_list = "curves";
 
-	event("add", std::bind(&CurveConsole::on_add, this));
-	event("delete", std::bind(&CurveConsole::on_delete, this));
-	event("target", std::bind(&CurveConsole::on_target, this));
-	event_x(id_list, "hui:select", std::bind(&CurveConsole::on_list_select, this));
-	event_x(id_list, "hui:change", std::bind(&CurveConsole::on_list_edit, this));
-	event("edit_song", std::bind(&CurveConsole::on_edit_song, this));
-	event("edit_track", std::bind(&CurveConsole::on_edit_track, this));
-	event("edit_fx", std::bind(&CurveConsole::on_edit_fx, this));
+	event("add", [=]{ on_add(); });
+	event("delete", [=]{ on_delete(); });
+	event("target", [=]{ on_target(); });
+	event_x(id_list, "hui:select", [=]{ on_list_select(); });
+	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
+	event("edit_song", [=]{ on_edit_song(); });
+	event("edit_track", [=]{ on_edit_track(); });
+	event("edit_fx", [=]{ on_edit_fx(); });
 
-	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_NEW);
-	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_ADD_CURVE);
-	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_DELETE_CURVE);
-	song->subscribe(this, std::bind(&CurveConsole::on_update, this), song->MESSAGE_EDIT_CURVE);
-	view->subscribe(this, std::bind(&CurveConsole::on_view_change, this), view->MESSAGE_VIEW_CHANGE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ADD_CURVE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_DELETE_CURVE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_EDIT_CURVE);
+	view->subscribe(this, [=]{ on_view_change(); }, view->MESSAGE_VIEW_CHANGE);
+	view->subscribe(this, [=]{ view->mode_curve->set_curve(nullptr); update_list(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
-CurveConsole::~CurveConsole()
-{
+CurveConsole::~CurveConsole() {
 	song->unsubscribe(this);
 	view->unsubscribe(this);
 }
 
 
-void CurveConsole::on_view_change()
-{
+void CurveConsole::on_view_change() {
 	view->force_redraw();
 }
 
-void CurveConsole::on_update()
-{
+void CurveConsole::on_update() {
 	update_list();
 }
 
-void CurveConsole::on_enter()
-{
+void CurveConsole::on_enter() {
+	view->mode_curve->set_curve(nullptr);
+	update_list();
 }
 
-void CurveConsole::on_leave()
-{
+void CurveConsole::on_leave() {
+	view->mode_curve->set_curve(nullptr);
 }
 
-void CurveConsole::update_list()
-{
+void CurveConsole::update_list() {
 	reset(id_list);
-	foreachi(Curve *c, song->curves, i){
+	curves.clear();
+	for (auto *c: song->curves)
+		if (c->targets[0].track(song) == view->cur_track())
+			curves.add(c);
+
+	foreachi(Curve *c, curves, i) {
 		add_string(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->get_targets(song));
 		if (c == curve())
 			set_int(id_list, i);
 	}
 }
 
-void CurveConsole::on_add()
-{
+void CurveConsole::on_add() {
 	Array<Curve::Target> targets;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
+	auto *dlg = new CurveTargetDialog(this, view->cur_track(), targets);
 	dlg->run();
-	delete(dlg);
-	if (targets.num > 0){
+	delete dlg;
+	if (targets.num > 0) {
 		Curve *c = song->add_curve("new", targets);
 		view->mode_curve->set_curve(c);
-		update_list();
+		update_list(); // for selection update...
 	}
 }
 
-void CurveConsole::on_delete()
-{
+void CurveConsole::on_delete() {
 	int n = get_int(id_list);
-	if (n >= 0){
-		song->delete_curve(song->curves[n]);
+	if (n >= 0) {
+		song->delete_curve(curves[n]);
 		view->mode_curve->set_curve(nullptr);
 	}
 }
 
-void CurveConsole::on_target()
-{
+void CurveConsole::on_target() {
 	if (!curve())
 		return;
-	Array<Curve::Target> targets = curve()->targets;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, targets);
+	auto targets = curve()->targets;
+	auto *dlg = new CurveTargetDialog(this, view->cur_track(), targets);
 	dlg->run();
 	//if (dlg->id == "ok")
 		song->curve_set_targets(curve(), targets);
@@ -149,54 +148,48 @@ void CurveConsole::on_target()
 	update_list();
 }
 
-void CurveConsole::on_list_select()
-{
+void CurveConsole::on_list_select() {
 	view->mode_curve->set_curve(nullptr);
 	int n = get_int(id_list);
-	if (n >= 0){
-		view->mode_curve->set_curve(song->curves[n]);
-	}else{
+	if (n >= 0) {
+		view->mode_curve->set_curve(curves[n]);
+	} else {
 		view->mode_curve->set_curve(nullptr);
 	}
 	view->force_redraw();
 }
 
-void CurveConsole::on_list_edit()
-{
+void CurveConsole::on_list_edit() {
 	int n = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
-	if (n >= 0){
-		string name = song->curves[n]->name;
-		float min = song->curves[n]->min;
-		float max = song->curves[n]->max;
+	if (n >= 0) {
+		string name = curves[n]->name;
+		float min = curves[n]->min;
+		float max = curves[n]->max;
 		if (col == 0)
 			name = get_cell(id_list, n, col);
 		else if (col == 1)
 			min = get_cell(id_list, n, col)._float();
 		else if (col == 2)
 			max = get_cell(id_list, n, col)._float();
-		song->edit_curve(song->curves[n], name, min, max);
+		song->edit_curve(curves[n], name, min, max);
 	}
 	view->force_redraw();
 }
 
-void CurveConsole::on_edit_song()
-{
+void CurveConsole::on_edit_song() {
 	session->set_mode("default/song");
 }
 
-void CurveConsole::on_edit_track()
-{
+void CurveConsole::on_edit_track() {
 	session->set_mode("default/track");
 }
 
-void CurveConsole::on_edit_fx()
-{
+void CurveConsole::on_edit_fx() {
 	session->set_mode("default/fx");
 }
 
-Curve* CurveConsole::curve()
-{
+Curve* CurveConsole::curve() {
 	return view->mode_curve->curve;
 }
 

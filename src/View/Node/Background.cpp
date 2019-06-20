@@ -57,7 +57,7 @@ void Background::draw_layer_separator(Painter *c, AudioViewLayer *l1, AudioViewL
 		same_track = (l1->layer->track == l2->layer->track);
 	}
 	if (same_track)
-		c->set_line_dash({3,10}, 0);
+		c->set_line_dash({3.0f,10.0f}, 0);
 
 	c->set_color(AudioView::colors.grid);
 	c->draw_line(area.x1, y, area.x2, y);

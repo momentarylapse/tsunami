@@ -10397,7 +10397,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-238
+239
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10839,6 +10839,8 @@ not allowed to delete the main signal chain
 die Haupt-Signalkette darf nicht gelöscht werden
 not configurable
 nicht konfigurierbar
+note 
+Note 
 octave (↑,↓)    modifiers (#,3,0)    add note (A-G)
 Oktave (↑,↓)    Vorzeichen (#,3,0)    Note einfügen (A-G)
 open message.txt

@@ -62,6 +62,20 @@ SelectionMarker::SelectionMarker(AudioView *_view) : ViewNodeFree() {
 	align.dz = 49;
 }
 
+void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color &col) {
+
+	float x2 = view->cam.sample2screen(view->song->bar_offset(bar_gap));
+	p->set_color(col);
+	p->set_line_width(2.5f);
+	for (auto *t: view->vlayer)
+		if (t->layer->type == SignalType::BEATS) {
+			p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
+			p->draw_line(x2, t->area.y1, x2, t->area.y2);
+			p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
+	}
+	p->set_line_width(1.0f);
+}
+
 void SelectionMarker::draw(Painter* p) {
 	float x1, x2;
 	view->cam.range2screen_clip(view->sel.range, view->song_area(), x1, x2);
@@ -89,28 +103,8 @@ void SelectionMarker::draw(Painter* p) {
 
 
 	// bar gap selection
-	if (view->cur_selection.type == HoverData::Type::BAR_GAP){
-		x2 = view->cam.sample2screen(view->song->bar_offset(view->cur_selection.index));
-		p->set_color(view->colors.text_soft1);
-		p->set_line_width(2.5f);
-		for (auto *t: view->vlayer)
-			if (t->layer->type == SignalType::BEATS) {
-				p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				p->draw_line(x2, t->area.y1, x2, t->area.y2);
-				p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
-		}
-		p->set_line_width(1.0f);
-	}
-	if (hover.type == HoverData::Type::BAR_GAP) {
-		x2 = view->cam.sample2screen(view->song->bar_offset(hover.index));
-		p->set_color(view->colors.hover);
-		p->set_line_width(2.5f);
-		for (auto *t: view->vlayer)
-			if (t->layer->type == SignalType::BEATS) {
-				p->draw_line(x2 - 5, t->area.y1, x2 + 5, t->area.y1);
-				p->draw_line(x2, t->area.y1, x2, t->area.y2);
-				p->draw_line(x2 - 5, t->area.y2, x2 + 5, t->area.y2);
-		}
-		p->set_line_width(1.0f);
-	}
+	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
+		draw_bar_gap_selector(p, view->cur_selection.index, view->colors.text_soft1);
+	if (hover.type == HoverData::Type::BAR_GAP)
+		draw_bar_gap_selector(p, view->hover().index, view->colors.hover);
 }

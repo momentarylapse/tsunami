@@ -635,6 +635,8 @@ string AudioViewLayer::get_tip() {
 	}
 	if (h.type == HoverData::Type::BAR_GAP)
 		return _("bar gap");
+	if (h.note)
+		return _("note ") + pitch_name(h.note->pitch) + format(" %.0f%%", h.note->volume * 100);
 	return "";
 }
 
@@ -645,9 +647,7 @@ HoverData AudioViewLayer::get_hover_data(float mx, float my) {
 HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 	auto s = view->hover_time(mx, my);
 	s.vlayer = this;
-	foreachi(auto *l, view->vlayer, i)
-		if (this == l)
-			s.index = i;
+	s.node = this;
 	s.vtrack = view->get_track(layer->track);
 	s.type = HoverData::Type::LAYER;
 
@@ -659,7 +659,6 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)) {
 				s.marker = m;
 				s.type = HoverData::Type::MARKER;
-				s.index = i;
 				return s;
 			}
 		}

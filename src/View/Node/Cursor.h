@@ -12,6 +12,7 @@
 #include "../../Data/Range.h"
 
 class AudioView;
+class color;
 
 class Cursor : public ViewNodeFree {
 public:
@@ -37,6 +38,7 @@ public:
 
 	AudioView *view;
 	void draw(Painter *p) override;
+	void draw_bar_gap_selector(Painter* p, int bar_gap, const color &col);
 };
 
 #endif /* SRC_VIEW_NODE_CURSOR_H_ */

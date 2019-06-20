@@ -705,12 +705,10 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.modifier = combine_note_modifiers(modifier, cur_scale().get_modifier(upos));
 			s.pitch = uniclef_to_pitch(upos, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
-			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(auto *n, l->midi, i)
+			for (auto *n: l->midi)
 				if (hover_note_classical(*n, s, this)) {
 					s.note = n;
-					s.index = i;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
@@ -719,12 +717,10 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.clef_position = mp->screen_to_string(my);
 			s.modifier = modifier;
 			s.type = HoverData::Type::CLEF_POSITION;
-			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(auto *n, l->midi, i)
+			for (auto *n: l->midi)
 				if (hover_note_tab(*n, s, this)) {
 					s.note = n;
-					s.index = i;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
@@ -732,12 +728,10 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 			s.pitch = mp->y2pitch_linear(my);
 			s.clef_position = mp->y2clef_linear(my, s.modifier);
 			s.type = HoverData::Type::MIDI_PITCH;
-			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 
-			foreachi(auto *n, l->midi, i)
+			for (auto *n: l->midi)
 				if (hover_note_linear(*n, s, this)) {
 					s.note = n;
-					s.index = i;
 					s.type = HoverData::Type::MIDI_NOTE;
 					return s;
 				}
@@ -779,11 +773,11 @@ void ViewModeMidi::draw_post(Painter *c) {
 	} else if (mode == MidiMode::LINEAR) {
 		l->scroll_bar->hidden = false;
 		l->scroll_bar->offset = 127 - cur_vlayer()->edit_pitch_max;
-		l->scroll_bar->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
+		//l->scroll_bar->set_area(rect(l->area.x2 - view->SCROLLBAR_WIDTH, l->area.x2, l->area.y1, l->area.y2));
 	}
 
 
-
+	// layer border
 	c->set_color(view->colors.text_soft1);
 	c->set_fill(false);
 	if (mode == MidiMode::TAB) {
@@ -804,7 +798,21 @@ void ViewModeMidi::draw_post(Painter *c) {
 		int y2 = mp->pitch2y_linear(p1);
 		c->draw_rect(x1,  y1,  x2 - x1,  y2 - y1);
 	}
+
 	c->set_fill(true);
+
+
+	color col = view->colors.text;
+	col.a = 0.1f;
+	float d = 12;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
+	d = 2;
+	col.a = 0.7f;
+	c->set_color(col);
+	c->draw_rect(view->song_area().x1, l->area.y1-d, view->song_area().width(), d);
+	c->draw_rect(view->song_area().x1, l->area.y2, view->song_area().width(), d);
 }
 
 string ViewModeMidi::get_tip() {

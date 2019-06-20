@@ -2698,7 +2698,7 @@ track-routing-dialog/t-track
 Spur
 
 // Num Language Strings
-238
+239
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3176,3 +3176,5 @@ Clarinet
 Klarinette
 Harpsichord
 Cembalo
+note 
+Note 

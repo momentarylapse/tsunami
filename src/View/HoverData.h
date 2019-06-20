@@ -23,8 +23,7 @@ class Bar;
 class SongSelection;
 enum class NoteModifier;
 
-class HoverData
-{
+class HoverData {
 public:
 	ViewNode *node;
 	AudioViewLayer *vlayer;
@@ -69,7 +68,6 @@ public:
 
 	HoverData();
 	bool allow_auto_scroll() const;
-	bool is_in(Type type) const;
 	void clear();
 
 	SongSelection to_song_sel() const;

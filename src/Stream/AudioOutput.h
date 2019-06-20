@@ -31,8 +31,7 @@ typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 #endif
 
-class AudioOutput : public Module
-{
+class AudioOutput : public Module {
 public:
 	AudioOutput(Session *session);
 	virtual ~AudioOutput();
@@ -93,8 +92,7 @@ private:
 	DeviceManager *device_manager;
 
 
-	class Config : public ModuleConfiguration
-	{
+	class Config : public ModuleConfiguration {
 	public:
 		Device *device;
 		float volume;
@@ -104,7 +102,7 @@ private:
 
 	ModuleConfiguration* get_config() const override;
 
-	enum class State{
+	enum class State {
 		NO_DEVICE,
 		DEVICE_WITHOUT_DATA,
 		PAUSED,

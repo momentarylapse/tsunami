@@ -1,7 +1,6 @@
 namespace Kaba{
 
-enum ScriptFlag
-{
+enum ScriptFlag {
 	FLAG_NONE = 0,
 	FLAG_CALL_BY_VALUE = 1,
 	FLAG_SILENT = 2,
@@ -19,8 +18,12 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 int add_func(const string &name, const Class *return_type, void *func, ScriptFlag = FLAG_NONE);
 void func_set_inline(int index);
 void func_add_param(const string &name, const Class *type);
-void add_class(const Class *root_type);
+Class *add_class(const Class *root_type);
 void class_add_element(const string &name, const Class *type, int offset, ScriptFlag = FLAG_NONE);
+template<class T>
+void class_add_elementx(const string &name, const Class *type, T p) {
+	class_add_element(name, type, *(int*)(void*)&p);
+}
 void class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag = FLAG_NONE);
 void class_add_func_virtual(const string &name, const Class *return_type, void *func, ScriptFlag = FLAG_NONE);
 void class_link_vtable(void *p);

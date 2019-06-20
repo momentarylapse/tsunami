@@ -12,6 +12,7 @@
 #include "../Data/Audio/RingBuffer.h"
 #include "../Module/Port/Port.h"
 #include "../Module/Module.h"
+#include "../Module/ModuleConfiguration.h"
 
 class PluginManager;
 class DeviceManager;
@@ -30,8 +31,7 @@ typedef int PaError;
 #endif
 
 
-class AudioInput : public Module
-{
+class AudioInput : public Module {
 	friend class PluginManager;
 public:
 	AudioInput(Session *session);
@@ -66,8 +66,7 @@ public:
 
 	RingBuffer buffer;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioInput *s);
 		virtual ~Output(){}
@@ -86,7 +85,7 @@ private:
 
 	DeviceManager *dev_man;
 
-	enum class State{
+	enum class State {
 		NO_DEVICE,
 		CAPTURING,
 		PAUSED,
@@ -94,7 +93,15 @@ private:
 
 	int num_channels;
 
-	Device *device;
+
+	class Config : public ModuleConfiguration {
+	public:
+		Device *device;
+		void reset() override;
+		string auto_conf(const string &name) const override;
+	} config;
+
+	ModuleConfiguration* get_config() const override;
 
 #if HAS_LIB_PULSEAUDIO
 	pa_stream *pulse_stream;
@@ -105,8 +112,7 @@ private:
 
 	bool _pulse_test_error(const string &msg);
 
-	struct SyncData
-	{
+	struct SyncData {
 		int num_points;
 		long long int delay_sum;
 		int samples_in, offset_out;

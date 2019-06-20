@@ -296,9 +296,10 @@ void add_operator(int primitive_op, const Class *return_type, const Class *param
 //------------------------------------------------------------------------------------------------//
 
 
-void add_class(const Class *root_type)//, PreScript *ps = NULL)
+Class *add_class(const Class *root_type)//, PreScript *ps = NULL)
 {
 	cur_class = const_cast<Class*>(root_type);
+	return cur_class;
 }
 
 void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag)
@@ -307,6 +308,7 @@ void class_add_element(const string &name, const Class *type, int offset, Script
 	e.hidden = ((flag & FLAG_HIDDEN) > 0);
 	cur_class->elements.add(e);
 }
+
 void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable)
 {
 	cur_class->derive_from(parent, increase_size);

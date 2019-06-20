@@ -11,12 +11,13 @@
 #include "../Data/Midi/MidiData.h"
 #include "../Module/Port/Port.h"
 #include "../Module/Module.h"
+#include "../Module/ModuleConfiguration.h"
 
 class Device;
 class DeviceManager;
 class Session;
 
-namespace hui{
+namespace hui {
 	class Timer;
 }
 
@@ -24,8 +25,7 @@ namespace hui{
 struct _snd_seq_port_subscribe;
 #endif
 
-class MidiInput : public Module
-{
+class MidiInput : public Module {
 public:
 
 	MidiInput(Session *session);
@@ -34,7 +34,7 @@ public:
 	void _create_dev();
 	void _kill_dev();
 
-	enum class State{
+	enum class State {
 		NO_DEVICE,
 		CAPTURING,
 		PAUSED,
@@ -60,8 +60,7 @@ public:
 
 	MidiEventBuffer current_midi;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(MidiInput *input);
 
@@ -86,7 +85,17 @@ private:
 	int portid;
 
 	DeviceManager *device_manager;
-	Device *device;
+
+
+	class Config : public ModuleConfiguration {
+	public:
+		Device *device;
+		void reset() override;
+		string auto_conf(const string &name) const override;
+	} config;
+
+	ModuleConfiguration* get_config() const override;
+
 	int npfd;
 	struct pollfd *pfd;
 	hui::Timer *timer;

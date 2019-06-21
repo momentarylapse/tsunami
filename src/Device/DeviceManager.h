@@ -34,8 +34,7 @@ typedef int PaError;
 struct _snd_seq;
 #endif
 
-class DeviceManager : public Observable<VirtualBase>
-{
+class DeviceManager : public Observable<VirtualBase> {
 public:
 	friend class AudioOutput;
 	friend class AudioInput;
@@ -54,7 +53,7 @@ public:
 	void _init_audio_portaudio();
 	void _init_midi_alsa();
 
-	enum class ApiType{
+	enum class ApiType {
 		ALSA,
 		PULSE,
 		PORTAUDIO,
@@ -67,10 +66,6 @@ public:
 
 	float get_output_volume();
 	void set_output_volume(float volume);
-
-	void add_stream(Module *s);
-	void remove_stream(Module *s);
-	bool stream_exists(Module *s);
 
 	void remove_device(DeviceType type, int index);
 
@@ -103,8 +98,6 @@ public:
 #endif
 
 	float output_volume;
-
-	Array<Module*> streams;
 
 	void update_devices(bool serious);
 	void _update_devices_midi_alsa();

@@ -40,8 +40,6 @@ public:
 		PAUSED,
 	} state;
 
-	void init();
-
 	bool _cdecl start();
 	void _cdecl stop();
 
@@ -85,6 +83,8 @@ private:
 	int portid;
 
 	DeviceManager *device_manager;
+	Device *cur_device;
+	void update_device();
 
 
 	class Config : public ModuleConfiguration {
@@ -95,6 +95,7 @@ private:
 	} config;
 
 	ModuleConfiguration* get_config() const override;
+	void on_config() override;
 
 	int npfd;
 	struct pollfd *pfd;

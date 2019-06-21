@@ -172,7 +172,7 @@ int AudioInput::Output::read_audio(AudioBuffer &buf) {
 }
 
 void AudioInput::Config::reset() {
-	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
+	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 }
 
 string AudioInput::Config::auto_conf(const string &name) const {
@@ -182,9 +182,9 @@ string AudioInput::Config::auto_conf(const string &name) const {
 }
 
 AudioInput::AudioInput(Session *_session) :
-	Module(ModuleType::STREAM, "AudioInput"),
-	buffer(1048576) {
-	set_session_etc(_session, "AudioInput");
+		Module(ModuleType::STREAM, "AudioInput"),
+		buffer(1048576) {
+	session = _session;
 	_sample_rate = session->sample_rate();
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 0;
@@ -242,7 +242,6 @@ Device *AudioInput::get_device() {
 }
 
 void AudioInput::set_device(Device *device) {
-	msg_write("input set device");
 	config.device = device;
 	changed();
 }

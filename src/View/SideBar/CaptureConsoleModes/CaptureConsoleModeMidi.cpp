@@ -27,7 +27,6 @@
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {
-	chosen_device = nullptr;
 	input = nullptr;
 	target = nullptr;
 
@@ -41,8 +40,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
 	if ((n >= 0) and (n < sources.num)) {
-		chosen_device = sources[n];
-		input->set_device(chosen_device);
+		input->set_device(sources[n]);
 	}
 }
 
@@ -56,25 +54,13 @@ void CaptureConsoleModeMidi::set_target(const Track *t) {
 }
 
 void CaptureConsoleModeMidi::enter() {
-	chosen_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
-	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
 	cc->hide_control("single_grid", false);
 
 	chain = session->add_signal_chain_system("capture");
 
-	// add all
-	cc->reset("source");
-	for (Device *d: sources)
-		cc->set_string("source", d->get_name());
-
-	// select current
-	foreachi(Device *d, sources, i)
-		if (d == chosen_device)
-			cc->set_int("source", i);
-
 
 	input = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
-	input->set_device(chosen_device);
+	input->subscribe(this, [=]{ update_device_list(); });
 	auto *recorder = chain->add(ModuleType::PLUMBING, "MidiRecorder");
 	//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
 
@@ -96,6 +82,9 @@ void CaptureConsoleModeMidi::enter() {
 
 	cc->peak_meter->set_source(peak_meter);
 
+	update_device_list();
+	session->device_manager->subscribe(this, [=]{ update_device_list(); });
+
 	chain->start();
 	view->mode_capture->set_data({CaptureTrackData((Track*)target, recorder)});
 }
@@ -104,7 +93,22 @@ void CaptureConsoleModeMidi::allow_change_device(bool allow) {
 	cc->enable("source", allow);
 }
 
+void CaptureConsoleModeMidi::update_device_list() {
+	sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
+
+	// add all
+	cc->reset("source");
+	for (Device *d: sources)
+		cc->set_string("source", d->get_name());
+
+	// select current
+	foreachi(Device *d, sources, i)
+		if (d == input->get_device())
+			cc->set_int("source", i);
+}
+
 void CaptureConsoleModeMidi::leave() {
+	session->device_manager->unsubscribe(this);
 	cc->peak_meter->set_source(nullptr);
 	delete chain;
 	chain = nullptr;

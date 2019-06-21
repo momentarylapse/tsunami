@@ -49,10 +49,15 @@ ModulePanel::ModulePanel(Module *_m, std::function<void(bool)> _func_enable, std
 	old_param = module->config_to_string();
 	module->subscribe(this, [=]{ on_change(); }, module->MESSAGE_CHANGE);
 	module->subscribe(this, [=]{ on_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
+	module->subscribe(this, [=]{
+		module = nullptr;
+		delete p;
+	}, module->MESSAGE_DELETE);
 }
 
 ModulePanel::~ModulePanel() {
-	module->unsubscribe(this);
+	if (module)
+		module->unsubscribe(this);
 }
 
 void ModulePanel::on_load() {

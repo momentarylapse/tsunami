@@ -8,14 +8,15 @@
 #ifndef SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODE_H_
 #define SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODE_H_
 
+#include "../../../lib/base/base.h"
+
 class CaptureConsole;
 class Song;
 class AudioView;
 class Session;
 class SignalChain;
 
-class CaptureConsoleMode
-{
+class CaptureConsoleMode : public VirtualBase {
 public:
 	CaptureConsoleMode(CaptureConsole *cc);
 	virtual ~CaptureConsoleMode(){};

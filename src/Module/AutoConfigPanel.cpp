@@ -414,14 +414,12 @@ AutoConfigPanel::~AutoConfigPanel() {
 		delete a;
 }
 void AutoConfigPanel::on_change() {
-	msg_write("panel on config");
 	for (auto a: aa)
 		a->get_value();
 	changed();
 }
 
 void AutoConfigPanel::update() {
-	msg_write("panel update");
 	for (auto a: aa)
 		a->set_value();
 }

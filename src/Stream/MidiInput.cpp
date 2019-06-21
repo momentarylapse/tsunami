@@ -60,7 +60,7 @@ void MidiInput::Output::feed(const MidiEventBuffer &midi) {
 }
 
 void MidiInput::Config::reset() {
-	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
+	device = _module->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 }
 
 string MidiInput::Config::auto_conf(const string &name) const {
@@ -69,9 +69,8 @@ string MidiInput::Config::auto_conf(const string &name) const {
 	return "";
 }
 
-MidiInput::MidiInput(Session *_session) :
-	Module(ModuleType::STREAM, "MidiInput") {
-	set_session_etc(_session, "MidiInput");
+MidiInput::MidiInput(Session *_session) : Module(ModuleType::STREAM, "MidiInput") {
+	session = _session;
 	_sample_rate = session->sample_rate();
 	state = State::NO_DEVICE;
 
@@ -80,6 +79,7 @@ MidiInput::MidiInput(Session *_session) :
 #endif
 
 	device_manager = session->device_manager;
+	cur_device = nullptr;
 
 	out = new Output(this);
 	port_out.add(out);
@@ -94,8 +94,10 @@ MidiInput::MidiInput(Session *_session) :
 	config._class = _class;
 
 	timer = new hui::Timer;
-
-	init();
+	offset = 0;
+	pfd = nullptr;
+	npfd = 0;
+	portid = -1;
 }
 
 MidiInput::~MidiInput() {
@@ -103,10 +105,6 @@ MidiInput::~MidiInput() {
 	unconnect();
 	_kill_dev();
 	delete timer;
-}
-
-void MidiInput::init() {
-	set_device(device_manager->choose_device(DeviceType::MIDI_INPUT));
 }
 
 void MidiInput::_create_dev() {
@@ -149,14 +147,25 @@ bool MidiInput::unconnect() {
 }
 
 void MidiInput::set_device(Device *d) {
+	config.device = d;
+	changed();
+}
+
+Device *MidiInput::get_device() {
+	return cur_device;
+}
+
+void MidiInput::update_device() {
+
+	if (state != State::NO_DEVICE)
+		unconnect();
+
+	cur_device = config.device;
+
 	if (state == State::NO_DEVICE)
 		_create_dev();
 
-	unconnect();
-
-	config.device = d;
-
-	if ((d->client < 0) or (d->port < 0))
+	if ((cur_device->client < 0) or (cur_device->port < 0))
 		return;// true;
 
 #if HAS_LIB_ALSA
@@ -164,8 +173,8 @@ void MidiInput::set_device(Device *d) {
 		return;
 
 	snd_seq_addr_t sender, dest;
-	sender.client = d->client;
-	sender.port = d->port;
+	sender.client = cur_device->client;
+	sender.port = cur_device->port;
 	dest.client = snd_seq_client_id(device_manager->alsa_midi_handle);
 	dest.port = portid;
 
@@ -186,10 +195,6 @@ void MidiInput::set_device(Device *d) {
 		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
 	return r == 0;*/
 #endif
-}
-
-Device *MidiInput::get_device() {
-	return config.device;
 }
 
 void MidiInput::clear_input_queue() {
@@ -300,5 +305,10 @@ int MidiInput::command(ModuleCommand cmd, int param) {
 
 ModuleConfiguration *MidiInput::get_config() const {
 	return (ModuleConfiguration*)&config;
+}
+
+void MidiInput::on_config() {
+	if (config.device != cur_device)
+		update_device();
 }
 

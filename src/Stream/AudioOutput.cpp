@@ -180,7 +180,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	Module(ModuleType::STREAM, "AudioOutput"),
 	ring_buf(1048576) {
 	state = State::NO_DEVICE;
-	set_session_etc(_session, "AudioOutput");
+	session = _session;
 	source = nullptr;
 
 	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
@@ -212,15 +212,11 @@ AudioOutput::AudioOutput(Session *_session) :
 	played_end_of_stream = false;
 
 	buffer_is_cleared = true;
-
-	device_manager->add_stream(this);
 }
 
 AudioOutput::~AudioOutput() {
 	_pause();
 	_kill_dev();
-
-	device_manager->remove_stream(this);
 }
 
 void AudioOutput::__init__(Session *s) {

@@ -30,7 +30,6 @@
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
-	chosen_device = nullptr;
 	input = nullptr;
 	peak_meter = nullptr;
 	target = nullptr;
@@ -41,10 +40,8 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 
 void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
-	if ((n >= 0) and (n < sources.num)) {
-		chosen_device = sources[n];
-		input->set_device(chosen_device);
-	}
+	if ((n >= 0) and (n < sources.num))
+		input->set_device(sources[n]);
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
@@ -58,19 +55,7 @@ void CaptureConsoleModeAudio::set_target(Track *t) {
 }
 
 void CaptureConsoleModeAudio::enter() {
-	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
-	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	cc->hide_control("single_grid", false);
-
-	// add all
-	cc->reset("source");
-	for (Device *d: sources)
-		cc->set_string("source", d->get_name());
-
-	// select current
-	foreachi(Device *d, sources, i)
-		if (d == chosen_device)
-			cc->set_int("source", i);
 
 
 	for (Track *t: view->song->tracks)
@@ -81,7 +66,7 @@ void CaptureConsoleModeAudio::enter() {
 
 	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
 	input->set_chunk_size(4096);
-	input->set_device(chosen_device);
+	input->subscribe(this, [=]{ update_device_list(); });
 
 	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
@@ -98,10 +83,29 @@ void CaptureConsoleModeAudio::enter() {
 	chain->connect(backup, 0, recorder, 0);
 	chain->connect(recorder, 0, sucker, 0);
 
+
+	update_device_list();
+
 	cc->peak_meter->set_source(peak_meter);
 
 	chain->start(); // for preview
 	view->mode_capture->set_data({CaptureTrackData(target, recorder)});
+
+	session->device_manager->subscribe(this, [=]{ update_device_list(); });
+}
+
+void CaptureConsoleModeAudio::update_device_list() {
+	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
+
+	// add all
+	cc->reset("source");
+	for (Device *d: sources)
+		cc->set_string("source", d->get_name());
+
+	// select current
+	foreachi(Device *d, sources, i)
+		if (d == input->get_device())
+			cc->set_int("source", i);
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {
@@ -109,6 +113,7 @@ void CaptureConsoleModeAudio::allow_change_device(bool allow) {
 }
 
 void CaptureConsoleModeAudio::leave() {
+	session->device_manager->unsubscribe(this);
 	chain->stop();
 	cc->peak_meter->set_source(nullptr);
 	delete chain;

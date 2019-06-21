@@ -22,7 +22,6 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode
 	AudioInput *input;
 	PeakMeter *peak_meter;
 	Array<Device*> sources;
-	Device *chosen_device;
 	Track *target;
 
 public:
@@ -32,6 +31,8 @@ public:
 	void enter() override;
 	void leave() override;
 	void allow_change_device(bool allow) override;
+
+	void update_device_list();
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

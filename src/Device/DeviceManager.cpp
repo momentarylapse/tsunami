@@ -29,8 +29,7 @@ const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
 
-struct ApiDescription
-{
+struct ApiDescription {
 	string name;
 	DeviceManager::ApiType type;
 	int mode;
@@ -48,16 +47,15 @@ ApiDescription api_descriptions[] = {
 
 #if HAS_LIB_PULSEAUDIO
 
-void pulse_wait_op(Session *session, pa_operation *op)
-{
-	if (!op){
+void pulse_wait_op(Session *session, pa_operation *op) {
+	if (!op) {
 		session->e("pulse_wait_op:  op=nil");
 		return;
 	}
 	//printf("-w-");
 	int n = 0;
 	//msg_write("wait op " + p2s(op));
-	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING){
+	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING) {
 		//printf(".");
 		// PA_OPERATION_RUNNING
 		//pa_mainloop_iterate(m, 1, NULL);
@@ -68,7 +66,7 @@ void pulse_wait_op(Session *session, pa_operation *op)
 	}
 	auto status = pa_operation_get_state(op);
 	//printf("%d\n", status);
-	if (status != PA_OPERATION_DONE){
+	if (status != PA_OPERATION_DONE) {
 		if (status == PA_OPERATION_RUNNING)
 			session->e("pulse_wait_op() failed: still running");
 		else if (status == PA_OPERATION_CANCELLED)
@@ -81,22 +79,20 @@ void pulse_wait_op(Session *session, pa_operation *op)
 //	printf("-o-");
 }
 
-void pulse_ignore_op(Session *session, pa_operation *op)
-{
-	if (!op){
+void pulse_ignore_op(Session *session, pa_operation *op) {
+	if (!op) {
 		session->e("pulse_ignore_op:  op=nil");
 		return;
 	}
 	pa_operation_unref(op);
 }
 
-void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
-{
+void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
 	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
 
 	DeviceManager *out = (DeviceManager*)userdata;
 
-	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)){
+	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)) {
 		//printf("----change   %d\n", idx);
 
 		hui::RunLater(0.1f, [out]{ out->update_devices(true); });
@@ -104,11 +100,10 @@ void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, 
 }
 
 
-bool pulse_wait_context_ready(pa_context *c)
-{
+bool pulse_wait_context_ready(pa_context *c) {
 	//msg_write("wait stream ready");
 	int n = 0;
-	while (pa_context_get_state(c) != PA_CONTEXT_READY){
+	while (pa_context_get_state(c) != PA_CONTEXT_READY) {
 		//pa_mainloop_iterate(m, 1, NULL);
 		hui::Sleep(0.01f);
 		n ++;
@@ -122,8 +117,7 @@ bool pulse_wait_context_ready(pa_context *c)
 }
 
 
-void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
-{
+void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata) {
 	if (eol > 0 or !i or !userdata)
 		return;
 
@@ -137,8 +131,7 @@ void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, voi
 	dm->set_device_config(d);
 }
 
-void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
-{
+void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata) {
 	if (eol > 0 or !i or !userdata)
 		return;
 
@@ -155,8 +148,7 @@ void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol,
 #endif
 
 
-Array<Device*> str2devs(const string &s, DeviceType type)
-{
+Array<Device*> str2devs(const string &s, DeviceType type) {
 	Array<Device*> devices;
 	Array<string> a = s.explode("|");
 	for (string &b: a)
@@ -164,10 +156,9 @@ Array<Device*> str2devs(const string &s, DeviceType type)
 	return devices;
 }
 
-string devs2str(Array<Device*> devices)
-{
+string devs2str(Array<Device*> devices) {
 	string r;
-	foreachi(Device *d, devices, i){
+	foreachi(Device *d, devices, i) {
 		if (i > 0)
 			r += "|";
 		r += d->to_config();
@@ -176,8 +167,7 @@ string devs2str(Array<Device*> devices)
 }
 
 
-DeviceManager::DeviceManager()
-{
+DeviceManager::DeviceManager() {
 	initialized = false;
 
 	audio_api = ApiType::NONE;
@@ -200,8 +190,7 @@ DeviceManager::DeviceManager()
 	hui_rep_id = hui::RunRepeated(2.0f, [=]{ _update_devices_midi_alsa(); });
 }
 
-DeviceManager::~DeviceManager()
-{
+DeviceManager::~DeviceManager() {
 	hui::CancelRunner(hui_rep_id);
 
 	write_config();
@@ -217,8 +206,7 @@ DeviceManager::~DeviceManager()
 	delete dummy_device;
 }
 
-void DeviceManager::remove_device(DeviceType type, int index)
-{
+void DeviceManager::remove_device(DeviceType type, int index) {
 	Array<Device*> &devices = device_list(type);
 	if ((index < 0) or (index >= devices.num))
 		return;
@@ -233,8 +221,7 @@ void DeviceManager::remove_device(DeviceType type, int index)
 	notify(MESSAGE_REMOVE_DEVICE);
 }
 
-void DeviceManager::write_config()
-{
+void DeviceManager::write_config() {
 	string audio_api_name = api_descriptions[(int)audio_api].name;
 	string midi_api_name = api_descriptions[(int)midi_api].name;
 
@@ -247,12 +234,11 @@ void DeviceManager::write_config()
 
 
 // don't poll pulse too much... it will send notifications anyways
-void DeviceManager::update_devices(bool serious)
-{
-	if (audio_api == ApiType::PULSE){
+void DeviceManager::update_devices(bool serious) {
+	if (audio_api == ApiType::PULSE) {
 		if (serious)
 			_update_devices_audio_pulse();
-	}else if (audio_api == ApiType::PORTAUDIO){
+	}else if (audio_api == ApiType::PORTAUDIO) {
 		_update_devices_audio_portaudio();
 	}
 
@@ -264,8 +250,7 @@ void DeviceManager::update_devices(bool serious)
 }
 
 
-void DeviceManager::_update_devices_audio_pulse()
-{
+void DeviceManager::_update_devices_audio_pulse() {
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PULSEAUDIO
@@ -300,15 +285,14 @@ void DeviceManager::_update_devices_audio_pulse()
 }
 
 #if HAS_LIB_PORTAUDIO
-void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index)
-{
+void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	if (index < 0)
 		return;
 	const PaDeviceInfo* dev = Pa_GetDeviceInfo(index);
 	if (!dev)
 		return;
 	int channels = (type == DeviceType::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
-	if (channels > 0){
+	if (channels > 0) {
 		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
 		d->name = dev->name;
 		d->channels = min(channels, 2);
@@ -323,8 +307,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index)
 }
 #endif
 
-void DeviceManager::_update_devices_audio_portaudio()
-{
+void DeviceManager::_update_devices_audio_portaudio() {
 #if HAS_LIB_PORTAUDIO
 	for (Device *d: output_devices)
 		d->present = false;
@@ -335,21 +318,20 @@ void DeviceManager::_update_devices_audio_portaudio()
 	_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, Pa_GetDefaultInputDevice());
 
 	int count = Pa_GetDeviceCount();
-	for (int i=0; i<count; i++){
+	for (int i=0; i<count; i++) {
 		_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, i);
 		_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, i);
 	}
 #endif
 }
 
-void DeviceManager::_update_devices_midi_alsa()
-{
+void DeviceManager::_update_devices_midi_alsa() {
 #if HAS_LIB_ALSA
 
 	if (!alsa_midi_handle)
 		return;
 
-	for (Device *d: midi_input_devices){
+	for (Device *d: midi_input_devices) {
 		d->present_old = d->present;
 		d->present = false;
 	}
@@ -365,10 +347,10 @@ void DeviceManager::_update_devices_midi_alsa()
 	snd_seq_client_info_alloca(&cinfo);
 	snd_seq_port_info_alloca(&pinfo);
 	snd_seq_client_info_set_client(cinfo, -1);
-	while (snd_seq_query_next_client(alsa_midi_handle, cinfo) >= 0){
+	while (snd_seq_query_next_client(alsa_midi_handle, cinfo) >= 0) {
 		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
 		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(alsa_midi_handle, pinfo) >= 0){
+		while (snd_seq_query_next_port(alsa_midi_handle, pinfo) >= 0) {
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
 				continue;
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
@@ -392,10 +374,9 @@ void DeviceManager::_update_devices_midi_alsa()
 }
 
 
-static int select_api(const string &preferred_name, int mode)
-{
+static int select_api(const string &preferred_name, int mode) {
 	int best = -1;
-	for (int i=(int)DeviceManager::ApiType::NUM_APIS-1; i>=0; i--){
+	for (int i=(int)DeviceManager::ApiType::NUM_APIS-1; i>=0; i--) {
 		ApiDescription &a = api_descriptions[i];
 		if (!a.available or ((a.mode & mode) == 0))
 			continue;
@@ -406,8 +387,7 @@ static int select_api(const string &preferred_name, int mode)
 	return best;
 }
 
-void DeviceManager::init()
-{
+void DeviceManager::init() {
 	if (initialized)
 		return;
 
@@ -447,19 +427,18 @@ void DeviceManager::init()
 	initialized = true;
 }
 
-void DeviceManager::_init_audio_pulse()
-{
+void DeviceManager::_init_audio_pulse() {
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PULSEAUDIO
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
-	if (!m){
+	if (!m) {
 		session->e("pa_threaded_mainloop_new failed");
 		return;
 	}
 
 	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(m);
-	if (!m){
+	if (!m) {
 		session->e("pa_threaded_mainloop_get_api failed");
 		return;
 	}
@@ -476,7 +455,7 @@ void DeviceManager::_init_audio_pulse()
 	if (_pulse_test_error(session, "pa_threaded_mainloop_start"))
 		return;
 
-	if (!pulse_wait_context_ready(pulse_context)){
+	if (!pulse_wait_context_ready(pulse_context)) {
 		session->e("pulse audio context does not turn 'ready'");
 		return;
 	}
@@ -488,8 +467,7 @@ void DeviceManager::_init_audio_pulse()
 #endif
 }
 
-void DeviceManager::_init_audio_portaudio()
-{
+void DeviceManager::_init_audio_portaudio() {
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_PORTAUDIO
@@ -500,13 +478,12 @@ void DeviceManager::_init_audio_portaudio()
 #endif
 }
 
-void DeviceManager::_init_midi_alsa()
-{
+void DeviceManager::_init_midi_alsa() {
 	Session *session = Session::GLOBAL;
 
 #if HAS_LIB_ALSA
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
-	if (r < 0){
+	if (r < 0) {
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
 		return;
 	}
@@ -515,25 +492,20 @@ void DeviceManager::_init_midi_alsa()
 #endif
 }
 
-void DeviceManager::kill()
-{
+void DeviceManager::kill() {
 	if (!initialized)
 		return;
 
-	Array<Module*> to_del = streams;
-	for (Module *s: to_del)
-		delete s;
-
 	// audio
 #if HAS_LIB_PULSEAUDIO
-	if (audio_api == ApiType::PULSE and pulse_context){
+	if (audio_api == ApiType::PULSE and pulse_context) {
 		pa_context_disconnect(pulse_context);
 		_pulse_test_error(Session::GLOBAL, "pa_context_disconnect");
 	}
 #endif
 
 #if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO){
+	if (audio_api == ApiType::PORTAUDIO) {
 		PaError err = Pa_Terminate();
 		_portaudio_test_error(err, Session::GLOBAL, "Pa_Terminate");
 	}
@@ -549,39 +521,16 @@ void DeviceManager::kill()
 }
 
 
-float DeviceManager::get_output_volume()
-{
+float DeviceManager::get_output_volume() {
 	return output_volume;
 }
 
-void DeviceManager::set_output_volume(float _volume)
-{
+void DeviceManager::set_output_volume(float _volume) {
 	output_volume = _volume;
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::add_stream(Module *s)
-{
-	streams.add(s);
-}
-
-void DeviceManager::remove_stream(Module *s)
-{
-	for (int i=streams.num-1; i>=0; i--)
-		if (streams[i] == s)
-			streams.erase(i);
-}
-
-bool DeviceManager::stream_exists(Module *s)
-{
-	for (int i=streams.num-1; i>=0; i--)
-		if (streams[i] == s)
-			return true;
-	return false;
-}
-
-Device* DeviceManager::get_device(DeviceType type, const string &internal_name)
-{
+Device* DeviceManager::get_device(DeviceType type, const string &internal_name) {
 	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
@@ -589,8 +538,7 @@ Device* DeviceManager::get_device(DeviceType type, const string &internal_name)
 	return nullptr;
 }
 
-Device* DeviceManager::get_device_create(DeviceType type, const string &internal_name)
-{
+Device* DeviceManager::get_device_create(DeviceType type, const string &internal_name) {
 	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->internal_name == internal_name)
@@ -603,8 +551,7 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 	return d;
 }
 
-Array<Device*> &DeviceManager::device_list(DeviceType type)
-{
+Array<Device*> &DeviceManager::device_list(DeviceType type) {
 	if (type == DeviceType::AUDIO_OUTPUT)
 		return output_devices;
 	if (type == DeviceType::AUDIO_INPUT)
@@ -614,8 +561,7 @@ Array<Device*> &DeviceManager::device_list(DeviceType type)
 	return empty_device_list;
 }
 
-Array<Device*> DeviceManager::good_device_list(DeviceType type)
-{
+Array<Device*> DeviceManager::good_device_list(DeviceType type) {
 	Array<Device*> &all = device_list(type);
 	Array<Device*> list;
 	for (Device *d: all)
@@ -624,8 +570,7 @@ Array<Device*> DeviceManager::good_device_list(DeviceType type)
 	return list;
 }
 
-Device *DeviceManager::choose_device(DeviceType type)
-{
+Device *DeviceManager::choose_device(DeviceType type) {
 	Array<Device*> &devices = device_list(type);
 	for (Device *d: devices)
 		if (d->present and d->visible)
@@ -635,10 +580,9 @@ Device *DeviceManager::choose_device(DeviceType type)
 	return dummy_device;
 }
 
-void DeviceManager::set_device_config(Device *d)
-{
+void DeviceManager::set_device_config(Device *d) {
 	/*Device *dd = get_device(d.type, d.internal_name);
-	if (dd){
+	if (dd) {
 		dd->name = d.name;
 		dd->present = d.present;
 		dd->visible = d.visible;
@@ -646,18 +590,17 @@ void DeviceManager::set_device_config(Device *d)
 		dd->client = d.client;
 		dd->port = d.port;
 		dd->channels = d.channels;
-	}else{
+	} else {
 		getDeviceList(d.type).add(d);
 	}*/
 	write_config();
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::make_device_top_priority(Device *d)
-{
-	Array<Device*> &devices = device_list(d->type);
+void DeviceManager::make_device_top_priority(Device *d) {
+	auto &devices = device_list(d->type);
 	for (int i=0; i<devices.num; i++)
-		if (devices[i] == d){
+		if (devices[i] == d) {
 			devices.insert(d, 0);
 			devices.erase(i + 1);
 			break;
@@ -666,11 +609,10 @@ void DeviceManager::make_device_top_priority(Device *d)
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::move_device_priority(Device *d, int new_prio)
-{
-	Array<Device*> &devices = device_list(d->type);
+void DeviceManager::move_device_priority(Device *d, int new_prio) {
+	auto &devices = device_list(d->type);
 	for (int i=0; i<devices.num; i++)
-		if (devices[i] == d){
+		if (devices[i] == d) {
 			devices.move(i, new_prio);
 			break;
 		}
@@ -679,8 +621,7 @@ void DeviceManager::move_device_priority(Device *d, int new_prio)
 }
 
 #if HAS_LIB_PULSEAUDIO
-bool DeviceManager::_pulse_test_error(Session *session, const string &msg)
-{
+bool DeviceManager::_pulse_test_error(Session *session, const string &msg) {
 	int e = pa_context_errno(pulse_context);
 	if (e != 0)
 		session->e(msg + ": " + pa_strerror(e));
@@ -689,9 +630,8 @@ bool DeviceManager::_pulse_test_error(Session *session, const string &msg)
 #endif
 
 #if HAS_LIB_PORTAUDIO
-bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const string &msg)
-{
-	if (err != paNoError){
+bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const string &msg) {
+	if (err != paNoError) {
 		session->e(msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}

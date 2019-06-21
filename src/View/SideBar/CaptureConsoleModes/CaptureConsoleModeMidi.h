@@ -18,11 +18,9 @@ class Synthesizer;
 class AudioOutput;
 class PeakMeter;
 
-class CaptureConsoleModeMidi : public CaptureConsoleMode
-{
+class CaptureConsoleModeMidi : public CaptureConsoleMode {
 	MidiInput *input;
 	Array<Device*> sources;
-	Device *chosen_device;
 	const Track *target;
 	Synthesizer *preview_synth;
 	PeakMeter *peak_meter;
@@ -38,6 +36,8 @@ public:
 	void enter() override;
 	void leave() override;
 	void allow_change_device(bool allow) override;
+
+	void update_device_list();
 };
 
 

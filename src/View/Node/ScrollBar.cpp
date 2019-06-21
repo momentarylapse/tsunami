@@ -8,6 +8,8 @@
 #include "ScrollBar.h"
 #include "../AudioView.h"
 
+const float SCROLLBAR_MINIMUM_HANDLE_SIZE = 15.0f;
+
 ScrollBar::ScrollBar(AudioView *_view) {
 	align.vertical = AlignData::Mode::FILL;
 	align.horizontal = AlignData::Mode::LEFT;
@@ -48,12 +50,14 @@ void ScrollBar::draw(Painter *c) {
 		f = min(f, 1.0f);
 	if (horizontal) {
 		float w = area.width() - 2*d;
+		float ww = max(w * f, SCROLLBAR_MINIMUM_HANDLE_SIZE);
 		c->set_roundness(area.height()/2 - d);
-		c->draw_rect(area.x1 + d +  offset / content_size * w, area.y1 + d, w * f, area.height() - 2*d);
+		c->draw_rect(area.x1 + d +  offset / content_size * w, area.y1 + d, ww, area.height() - 2*d);
 	} else {
 		float h = area.height() - 2*d;
+		float hh = max(h * f, SCROLLBAR_MINIMUM_HANDLE_SIZE);
 		c->set_roundness(area.width()/2 - d);
-		c->draw_rect(area.x1 + d, area.y1 + d +  offset / content_size * h, area.width() - 2*d, h * f);
+		c->draw_rect(area.x1 + d, area.y1 + d +  offset / content_size * h, area.width() - 2*d, hh);
 	}
 	c->set_roundness(0);
 }
@@ -75,6 +79,13 @@ bool ScrollBar::on_left_button_down() {
 		mouse_offset = (view->mx - area.x1) * content_size / area.width() - offset;
 	else
 		mouse_offset = (view->my - area.y1) * content_size / area.height() - offset;
+
+	// outside?!?
+	if (mouse_offset < 0 or mouse_offset > page_size) {
+		mouse_offset = page_size / 2;
+		drag_update(view->mx, view->my);
+	}
+
 	view->mdp_prepare([=]{
 		drag_update(view->mx, view->my);
 	});

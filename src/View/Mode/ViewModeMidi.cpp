@@ -97,12 +97,6 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	rep_key = -1;
 	rep_key_num = 0;
 
-	/*scroll = new ScrollBar(view, [=] {
-		int _pitch_max = 127 - scroll->offset;
-		cur_vlayer()->set_edit_pitch_min_max(_pitch_max - EDIT_PITCH_SHOW_COUNT, _pitch_max);
-	});//view->scene_graph);
-	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);*/
-
 	preview = nullptr;
 	maximize_input_volume = true;
 

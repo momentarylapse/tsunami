@@ -28,6 +28,7 @@ public:
 	void on_view_vtrack_change();
 	void on_settings_change();
 	void update();
+	void update_input_device_list();
 
 	void on_beat_partition();
 	void on_note_length();

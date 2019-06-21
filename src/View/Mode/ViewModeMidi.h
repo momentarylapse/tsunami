@@ -97,7 +97,8 @@ public:
 	InputMode input_mode;
 
 	MidiPreview *preview;
-	Device *input_device;
+	Device *input_wanted_device;
+	Device *input_device();
 	bool input_wanted_active;
 	bool input_capture;
 

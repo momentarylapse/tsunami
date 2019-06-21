@@ -120,15 +120,8 @@ void MidiEditorConsole::update() {
 	check("input_active", view->mode_midi->is_input_active());
 	enable("input_capture", view->mode_midi->is_input_active());
 	check("input_capture", view->mode_midi->input_capture);
-	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
-	reset("input");
-	for (auto *d: input_sources)
-		set_string("input", d->get_name());
-
-	foreachi(auto *d, input_sources, i)
-		if (d == view->mode_midi->input_device)
-			set_int("input", i);
 	enable("input", view->mode_midi->is_input_active());
+	update_input_device_list();
 
 	if (view->mode_midi->maximize_input_volume)
 		check("input_volume:max", true);
@@ -138,11 +131,24 @@ void MidiEditorConsole::update() {
 	enable("input_volume:max", view->mode_midi->is_input_active());
 
 
+
 	if (layer->track->instrument.type == Instrument::Type::DRUMS) {
 		// select a nicer pitch range in linear mode for drums
 //		view->get_layer(layer->track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
 		// TODO
 	}
+}
+
+void MidiEditorConsole::update_input_device_list() {
+	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
+
+	reset("input");
+	for (auto *d: input_sources)
+		set_string("input", d->get_name());
+
+	foreachi(auto *d, input_sources, i)
+		if (d == view->mode_midi->input_device())
+			set_int("input", i);
 }
 
 void MidiEditorConsole::on_layer_delete() {
@@ -258,9 +264,11 @@ void MidiEditorConsole::clear() {
 }
 
 void MidiEditorConsole::on_enter() {
+	session->device_manager->subscribe(this, [=]{ update_input_device_list(); });
 }
 
 void MidiEditorConsole::on_leave() {
+	session->device_manager->unsubscribe(this);
 }
 
 void MidiEditorConsole::set_layer(TrackLayer *l) {

@@ -91,7 +91,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	input_wanted_active = false;
 	input_capture = true;
-	input_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+	input_wanted_device = session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 
 	rep_key_runner = -1;
 	rep_key = -1;
@@ -232,13 +232,20 @@ void ViewModeMidi::_stop_input() {
 }
 
 void ViewModeMidi::set_input_device(Device *d) {
-	input_device = d;
+	input_wanted_device = d;
 	preview->set_input_device(d);
+}
+
+Device *ViewModeMidi::input_device() {
+	if (preview)
+		if (preview->input)
+			return preview->input->get_device();
+	return input_wanted_device;
 }
 
 void ViewModeMidi::on_start() {
 	preview = new MidiPreview(view->session, (Synthesizer*)cur_vlayer()->layer->track->synth->copy());
-	preview->set_input_device(input_device);
+	preview->set_input_device(input_wanted_device);
 	if (input_wanted_active)
 		_start_input();
 	auto *sb = cur_vlayer()->scroll_bar;

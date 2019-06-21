@@ -104,7 +104,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	scroll->update(EDIT_PITCH_SHOW_COUNT, 128);*/
 
 	preview = nullptr;
-	maximize_input_volume = false;
+	maximize_input_volume = true;
 
 	mouse_pre_moving_pos = -1;
 

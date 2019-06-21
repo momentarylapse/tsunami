@@ -203,7 +203,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("PluginData", "auto_conf", Kaba::mf(&ModuleConfiguration::auto_conf), &plugin_data);
 
 
-	ConfigPanel config_panel;
+	ConfigPanel config_panel(nullptr);
 	Kaba::DeclareClassSize("ConfigPanel", sizeof(ConfigPanel));
 	Kaba::LinkExternal("ConfigPanel.__init__", Kaba::mf(&ConfigPanel::__init__));
 	Kaba::DeclareClassVirtualIndex("ConfigPanel", "__delete__", Kaba::mf(&ConfigPanel::__delete__), &config_panel);

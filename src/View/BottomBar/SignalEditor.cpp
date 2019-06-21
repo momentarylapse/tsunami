@@ -6,17 +6,18 @@
  */
 
 #include "SignalEditor.h"
+#include "../Helper/ModulePanel.h"
+#include "../AudioView.h"
 
 #include "../../Module/Port/Port.h"
-#include "../AudioView.h"
+#include "../../Module/Module.h"
+#include "../../Module/ConfigPanel.h"
+#include "../../Module/SignalChain.h"
 #include "../../Session.h"
 #include "../../Storage/Storage.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Module/Module.h"
-#include "../../Module/ConfigPanel.h"
 #include "../../lib/math/complex.h"
 #include "../../Data/base.h"
-#include "../../Module/SignalChain.h"
 #include "../../TsunamiWindow.h"
 #include "../../lib/math/interpolation.h"
 //template class Interpolator<complex>;
@@ -25,7 +26,6 @@
 
 const float MODULE_WIDTH = 160;
 const float MODULE_HEIGHT = 25;
-extern const int CONFIG_PANEL_WIDTH = 380;
 
 static rect module_rect(Module *m) {
 	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
@@ -480,10 +480,10 @@ SignalEditor::SignalEditor(Session *session) :
 	add_tab_control("!left\\aaa", 0, 0, "selector");
 	add_revealer("!slide=left", 1, 0, "revealer");
 	set_target("revealer");
-	add_grid(format("!width=%d,noexpandx", CONFIG_PANEL_WIDTH), 1, 0, config_grid_id);
+	add_grid("!noexpandx", 1, 0, config_grid_id);
 	set_target(config_grid_id);
-	add_label("!bold,center,big,expandx", 0, 0, "config-label");
-	add_label("!bold,center,expandx", 0, 1, "message");
+	//add_label("!bold,center,big,expandx", 0, 0, "config-label");
+	//add_label("!bold,center,expandx", 0, 1, "message");
 
 	menu_chain = hui::CreateResourceMenu("popup_signal_chain_menu");
 	menu_module = hui::CreateResourceMenu("popup_signal_module_menu");
@@ -548,22 +548,12 @@ void SignalEditor::show_config(Module *m) {
 	config_panel = nullptr;
 	config_module = m;
 	if (m) {
-		set_string("config-label", module_header(m));
-		config_panel = m->create_panel();
-		if (config_panel) {
-			config_panel->update();
-			embed(config_panel, config_grid_id, 0, 2);
-			config_panel->set_large(false);
-			//setOptions(config_grid_id, "width=330,noexpandx");
-			hide_control("message", true);
-		} else {
-			set_string("message", _("module not configurable"));
-			hide_control("message", false);
-		}
+		config_panel = new ModulePanel(config_module, [=](bool){}, [=]{}, [=](const string &){});
+		embed(config_panel, config_grid_id, 0, 0);
 	} else {
-		set_string("config-label", "");
+		/*set_string("config-label", "");
 		set_string("message", _("no module selected"));
-		hide_control("message", false);
+		hide_control("message", false);*/
 	}
 	reveal("revealer", m);
 }

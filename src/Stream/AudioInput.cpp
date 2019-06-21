@@ -212,10 +212,7 @@ AudioInput::AudioInput(Session *_session) :
 	config._class = _class;
 
 	playback_delay_const = 0;
-	if (config.device) {
-		playback_delay_const = config.device->latency;
-		num_channels = config.device->channels;
-	}
+	cur_device = nullptr;
 }
 
 AudioInput::~AudioInput() {
@@ -241,24 +238,35 @@ void AudioInput::set_chunk_size(int size) {
 }
 
 Device *AudioInput::get_device() {
-	return config.device;
+	return cur_device;
 }
 
-void AudioInput::set_device(Device *_device) {
+void AudioInput::set_device(Device *device) {
+	msg_write("input set device");
+	config.device = device;
+	changed();
+}
+
+void AudioInput::update_device() {
 	auto old_state = state;
 	if (state == State::CAPTURING)
 		_pause();
 	if (state == State::PAUSED)
 		_kill_dev();
 
-	config.device = _device;
-	playback_delay_const = config.device->latency;
+	cur_device = config.device;
+	playback_delay_const = cur_device->latency;
+	num_channels = config.device->channels;
 
 	if (old_state == State::CAPTURING)
 		start();
 
-
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
+}
+
+void AudioInput::on_config() {
+	if (cur_device != config.device)
+		update_device();
 }
 
 void AudioInput::_kill_dev() {
@@ -330,13 +338,13 @@ void AudioInput::_create_dev() {
 
 	session->debug("input", "create device");
 
-	num_channels = 2;
+	num_channels = min(cur_device->channels, 2);
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		pa_sample_spec ss;
 		ss.rate = _sample_rate;
-		ss.channels = 2;
+		ss.channels = num_channels;
 		ss.format = PA_SAMPLE_FLOAT32LE;
 		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
 		_pulse_test_error("pa_stream_new");
@@ -353,14 +361,13 @@ void AudioInput::_create_dev() {
 		attr_in.tlength = -1;
 		attr_in.prebuf = -1;
 		const char *dev = nullptr;
-		if (!config.device->is_default())
-			dev = config.device->internal_name.c_str();
+		if (!cur_device->is_default())
+			dev = cur_device->internal_name.c_str();
 		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 		_pulse_test_error("pa_stream_connect_record");
 
 		if (!pulse_wait_stream_ready(pulse_stream)) {
-
 			session->e("pulse_wait_stream_ready");
 			return;
 		}
@@ -371,19 +378,18 @@ void AudioInput::_create_dev() {
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 		session->i("open def stream");
 
-		if (config.device->is_default()) {
+		if (cur_device->is_default()) {
 			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 2, 0, paFloat32, _sample_rate, 256,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
 		} else {
 			PaStreamParameters params;
-			num_channels = min(config.device->channels, 2);
 			params.channelCount = num_channels;
 			params.sampleFormat = paFloat32;
-			params.device = config.device->index_in_lib;
+			params.device = cur_device->index_in_lib;
 			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, 256,
+			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, 0,
 					paNoFlag, &portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenStream");
 		}

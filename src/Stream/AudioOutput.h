@@ -101,6 +101,10 @@ private:
 	} config;
 
 	ModuleConfiguration* get_config() const override;
+	void on_config() override;
+
+	Device *cur_device;
+	void update_device();
 
 	enum class State {
 		NO_DEVICE,

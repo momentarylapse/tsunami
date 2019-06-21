@@ -724,7 +724,7 @@ image=hui:preferences,flat,menu=popup_fx_menu
 0
 Text
 name
-bold,center,expandx
+bold,center,big,expandx
 1
 0
 0
@@ -3469,7 +3469,7 @@ popup_fx_menu
 
 0
 0
-6
+7
 Item
 load_favorite
 image=hui:open
@@ -3494,16 +3494,22 @@ image=hui:zoom-in
 3
 0
 0
+Item
+show_external
+image=hui:zoom-in
+4
+0
+0
 Separator
 
 
-4
+5
 0
 0
 Item
 delete
 image=hui:delete
-5
+6
 0
 0
 // Resource
@@ -6189,7 +6195,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-502
+503
 // Text
 /bars-add
 Add bars...
@@ -7264,6 +7270,9 @@ Load parameters
 
 popup_fx_menu/save_favorite
 Save parameters
+
+popup_fx_menu/show_external
+Open dialog window
 
 popup_fx_menu/show_large
 Show large

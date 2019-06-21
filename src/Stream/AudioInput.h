@@ -102,6 +102,10 @@ private:
 	} config;
 
 	ModuleConfiguration* get_config() const override;
+	void on_config() override;
+
+	Device *cur_device;
+	void update_device();
 
 #if HAS_LIB_PULSEAUDIO
 	pa_stream *pulse_stream;

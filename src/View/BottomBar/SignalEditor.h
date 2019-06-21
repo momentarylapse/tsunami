@@ -14,14 +14,13 @@
 class Painter;
 class SignalChain;
 class Module;
-namespace hui{
+namespace hui {
 	class Menu;
 }
 class SignalEditorTab;
-class ConfigPanel;
+class ModulePanel;
 
-class SignalEditor: public BottomBar::Console
-{
+class SignalEditor: public BottomBar::Console {
 public:
 	SignalEditor(Session *session);
 	virtual ~SignalEditor();
@@ -39,7 +38,7 @@ public:
 	string grid_id;
 	string config_grid_id;
 	Module *config_module;
-	ConfigPanel *config_panel;
+	ModulePanel *config_panel;
 
 	void show_config(Module *m);
 

@@ -206,6 +206,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	portaudio_stream = nullptr;
 #endif
 	dev_sample_rate = -1;
+	cur_device = nullptr;
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
@@ -259,8 +260,8 @@ void AudioOutput::_create_dev() {
 		attr_out.prebuf = -1;
 
 		const char *dev = nullptr;
-		if (!config.device->is_default())
-			dev = config.device->internal_name.c_str();
+		if (!cur_device->is_default())
+			dev = cur_device->internal_name.c_str();
 		pa_stream_connect_playback(pulse_stream, dev, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
 		_pulse_test_error("pa_stream_connect_playback");
 
@@ -286,7 +287,7 @@ void AudioOutput::_create_dev() {
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 
 
-		if (config.device->is_default()) {
+		if (cur_device->is_default()) {
 			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, paFramesPerBufferUnspecified,//256,
 					&portaudio_stream_request_callback, this);
 			_portaudio_test_error(err, "Pa_OpenDefaultStream");
@@ -294,7 +295,7 @@ void AudioOutput::_create_dev() {
 			PaStreamParameters params;
 			params.channelCount = 2;
 			params.sampleFormat = paFloat32;
-			params.device = config.device->index_in_lib;
+			params.device = cur_device->index_in_lib;
 			params.hostApiSpecificStreamInfo = nullptr;
 			params.suggestedLatency = 0;
 			PaError err = Pa_OpenStream(&portaudio_stream, nullptr, &params, dev_sample_rate, paFramesPerBufferUnspecified,//256,
@@ -427,6 +428,8 @@ int AudioOutput::_read_stream(int buffer_size) {
 
 void AudioOutput::set_device(Device *d) {
 	config.device = d;
+	on_config();
+	notify(MESSAGE_CHANGE);
 }
 
 void AudioOutput::start() {
@@ -487,10 +490,31 @@ float AudioOutput::get_volume() {
 void AudioOutput::set_volume(float _volume) {
 	config.volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_CHANGE);
 }
 
 void AudioOutput::set_prebuffer_size(int size) {
 	prebuffer_size = size;
+}
+
+
+
+void AudioOutput::update_device() {
+	auto old_state = state;
+	if (state == State::PLAYING)
+		_pause();
+	if (state == State::PAUSED)
+		_kill_dev();
+
+	cur_device = config.device;
+
+	if (old_state == State::PLAYING)
+		start();
+}
+
+void AudioOutput::on_config() {
+	if (cur_device != config.device)
+		update_device();
 }
 
 #if HAS_LIB_PULSEAUDIO

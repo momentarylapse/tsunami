@@ -29,8 +29,7 @@
 
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
-	CaptureConsoleMode(_cc)
-{
+		CaptureConsoleMode(_cc) {
 	chosen_device = nullptr;
 	input = nullptr;
 	peak_meter = nullptr;
@@ -40,17 +39,15 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 	cc->event("source", [=]{ on_source(); });
 }
 
-void CaptureConsoleModeAudio::on_source()
-{
+void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
-	if ((n >= 0) and (n < sources.num)){
+	if ((n >= 0) and (n < sources.num)) {
 		chosen_device = sources[n];
 		input->set_device(chosen_device);
 	}
 }
 
-void CaptureConsoleModeAudio::set_target(Track *t)
-{
+void CaptureConsoleModeAudio::set_target(Track *t) {
 	target = t;
 
 	bool ok = (target->type == SignalType::AUDIO);
@@ -60,8 +57,7 @@ void CaptureConsoleModeAudio::set_target(Track *t)
 	cc->enable("start", ok);
 }
 
-void CaptureConsoleModeAudio::enter()
-{
+void CaptureConsoleModeAudio::enter() {
 	chosen_device = session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 	sources = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
 	cc->hide_control("single_grid", false);
@@ -108,13 +104,11 @@ void CaptureConsoleModeAudio::enter()
 	view->mode_capture->set_data({CaptureTrackData(target, recorder)});
 }
 
-void CaptureConsoleModeAudio::allow_change_device(bool allow)
-{
+void CaptureConsoleModeAudio::allow_change_device(bool allow) {
 	cc->enable("source", allow);
 }
 
-void CaptureConsoleModeAudio::leave()
-{
+void CaptureConsoleModeAudio::leave() {
 	chain->stop();
 	cc->peak_meter->set_source(nullptr);
 	delete chain;

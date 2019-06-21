@@ -5,25 +5,23 @@
  *      Author: michi
  */
 
-#ifndef SRC_PLUGINS_CONFIGPANEL_H_
-#define SRC_PLUGINS_CONFIGPANEL_H_
+#ifndef SRC_MODULE_CONFIGPANEL_H_
+#define SRC_MODULE_CONFIGPANEL_H_
 
 #include "../lib/hui/hui.h"
 
 class Module;
 
-class ConfigPanel : public hui::Panel
-{
+class ConfigPanel : public hui::Panel {
 public:
-	ConfigPanel();
 	ConfigPanel(Module *c);
 	~ConfigPanel() override;
 	void _cdecl __init__(Module *c);
 	void _cdecl __delete__() override;
 
 	void _cdecl changed();
-	virtual void _cdecl update(){}
-	virtual void _cdecl set_large(bool large){}
+	virtual void _cdecl update() {}
+	virtual void _cdecl set_large(bool large) {}
 
 	Module *c;
 };
@@ -31,4 +29,4 @@ public:
 
 bool configure_module(hui::Window *win, Module *m);
 
-#endif /* SRC_PLUGINS_CONFIGPANEL_H_ */
+#endif /* SRC_MODULE_CONFIGPANEL_H_ */

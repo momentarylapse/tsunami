@@ -7,6 +7,7 @@
 
 #include "MixingConsole.h"
 #include "../Helper/PeakMeterDisplay.h"
+#include "../Helper/ModulePanel.h"
 #include <math.h>
 
 #include "../../Data/base.h"
@@ -23,10 +24,6 @@
 #include "../../Stream/AudioOutput.h"
 #include "../AudioView.h"
 #include "../Node/AudioViewTrack.h"
-
-//string module_header(Module *m);
-
-extern const int CONFIG_PANEL_WIDTH;
 
 class TrackMixer: public hui::Panel {
 public:
@@ -249,99 +246,6 @@ public:
 
 
 
-class ModulePanel : public hui::Panel
-{
-public:
-	ModulePanel(Session *_session, MixingConsole *_console, Module *_m, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit) {
-		session = _session;
-		console = _console;
-		module = _m;
-
-		func_enable = _func_enable;
-		func_delete = _func_delete;
-		func_edit = _func_edit;
-
-		from_resource("fx_panel");
-
-		set_string("name", module->module_subtype);
-
-		p = module->create_panel();
-		if (p) {
-			embed(p, "content", 0, 0);
-			p->update();
-		} else {
-			set_target("content");
-			add_label(_("not configurable"), 0, 1, "");
-			hide_control("load_favorite", true);
-			hide_control("save_favorite", true);
-		}
-		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
-
-		event("enabled", [=]{ on_enabled(); });
-		event("delete", [=]{ on_delete(); });
-		event("load_favorite", [=]{ on_load(); });
-		event("save_favorite", [=]{ on_save(); });
-		event("show_large", [=]{ on_large(); });
-
-		check("enabled", module->enabled);
-
-		old_param = module->config_to_string();
-		module->subscribe(this, [=]{ on_fx_change(); }, module->MESSAGE_CHANGE);
-		module->subscribe(this, [=]{ on_fx_change_by_action(); }, module->MESSAGE_CHANGE_BY_ACTION);
-	}
-	virtual ~ModulePanel() {
-		module->unsubscribe(this);
-	}
-	void on_load() {
-		string name = session->plugin_manager->select_favorite_name(win, module, false);
-		if (name.num == 0)
-			return;
-		session->plugin_manager->apply_favorite(module, name);
-		func_edit(old_param);
-		old_param = module->config_to_string();
-	}
-	void on_save() {
-		string name = session->plugin_manager->select_favorite_name(win, module, true);
-		if (name.num == 0)
-			return;
-		session->plugin_manager->save_favorite(module, name);
-	}
-	void on_enabled() {
-		func_enable(is_checked(""));
-	}
-	void on_delete() {
-		hui::RunLater(0, func_delete);
-	}
-	void on_large() {
-		//console->set_exclusive(this);
-		p->set_large(true);
-
-	}
-	void on_fx_change() {
-		func_edit(old_param);
-		check("enabled", module->enabled);
-		if (p)
-			p->update();
-		old_param = module->config_to_string();
-
-	}
-	void on_fx_change_by_action() {
-		check("enabled", module->enabled);
-		if (p)
-			p->update();
-		old_param = module->config_to_string();
-	}
-	std::function<void(bool)> func_enable;
-	std::function<void(const string&)> func_edit;
-	std::function<void()> func_delete;
-	Session *session;
-	Module *module;
-	string old_param;
-	ConfigPanel *p;
-	MixingConsole *console;
-};
-
-
 
 MixingConsole::MixingConsole(Session *session) :
 	BottomBar::Console(_("Mixer"), session)
@@ -483,7 +387,7 @@ void MixingConsole::select_module(Module *m) {
 			for (auto *mm: mixer)
 				if (mm->track->fx.find(fx) >= 0)
 					track = mm->track;
-			config_panel = new ModulePanel(session, this, m,
+			config_panel = new ModulePanel(m,
 					[=](bool enabled){ track->enable_effect(fx, enabled); },
 					[=]{ track->delete_effect(fx); },
 					[=](const string &old_param){ track->edit_effect(fx, old_param); });
@@ -492,7 +396,7 @@ void MixingConsole::select_module(Module *m) {
 			for (auto *mm: mixer)
 				if (mm->track->midi_fx.find(fx) >= 0)
 					track = mm->track;
-			config_panel = new ModulePanel(session, this, m,
+			config_panel = new ModulePanel(m,
 					[=](bool enabled){ track->enable_midi_effect(fx, enabled); },
 					[=]{ track->delete_midi_effect(fx); },
 					[=](const string &old_param){ track->edit_midi_effect(fx, old_param); });

@@ -6,6 +6,8 @@
  */
 
 #include "SignalChain.h"
+
+#include "../Device/Stream/AudioOutput.h"
 #include "Module.h"
 #include "ModuleFactory.h"
 #include "Port/Port.h"
@@ -18,7 +20,6 @@
 #include "../lib/xfile/xml.h"
 #include "../lib/threads/Thread.h"
 #include "../lib/hui/hui.h"
-#include "../Stream/AudioOutput.h"
 #include "../Stuff/PerformanceMonitor.h"
 
 

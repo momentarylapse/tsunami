@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_STREAM_AUDIOINPUT_H_
-#define SRC_STREAM_AUDIOINPUT_H_
+#ifndef SRC_DEVICE_STREAM_AUDIOINPUT_H_
+#define SRC_DEVICE_STREAM_AUDIOINPUT_H_
 
-#include "../lib/base/base.h"
-#include "../Data/Audio/RingBuffer.h"
-#include "../Module/Port/Port.h"
-#include "../Module/Module.h"
-#include "../Module/ModuleConfiguration.h"
+#include "../../lib/base/base.h"
+#include "../../Data/Audio/RingBuffer.h"
+#include "../../Module/Port/Port.h"
+#include "../../Module/Module.h"
+#include "../../Module/ModuleConfiguration.h"
 
 class PluginManager;
 class DeviceManager;
@@ -146,4 +146,4 @@ public:
 
 };
 
-#endif /* SRC_STREAM_AUDIOINPUT_H_ */
+#endif /* SRC_DEVICE_STREAM_AUDIOINPUT_H_ */

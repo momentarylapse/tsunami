@@ -9,6 +9,7 @@
 #include "../../Tsunami.h"
 #include "../../Session.h"
 #include "../../Device/DeviceManager.h"
+#include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/MiniBar.h"
 #include "../Helper/CpuDisplay.h"
@@ -16,7 +17,6 @@
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
 #include "../../Module/SignalChain.h"
-#include "../../Stream/AudioOutput.h"
 
 struct ApiDescription {
 	string name;

@@ -7,13 +7,13 @@
 
 #include "MidiInput.h"
 
-#include "../Session.h"
-#include "../Module/Port/Port.h"
-#include "../Data/base.h"
-#include "../Device/Device.h"
-#include "../Device/DeviceManager.h"
-#include "../lib/kaba/lib/common.h"
-#include "../Plugins/PluginManager.h"
+#include "../../Session.h"
+#include "../../Module/Port/Port.h"
+#include "../../Data/base.h"
+#include "../Device.h"
+#include "../DeviceManager.h"
+#include "../../lib/kaba/lib/common.h"
+#include "../../Plugins/PluginManager.h"
 
 namespace Kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);

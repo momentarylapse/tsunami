@@ -10,8 +10,8 @@
 #include "../../Module/Synth/Synthesizer.h"
 #include "../../Module/Midi/MidiSource.h"
 #include "../../Module/SignalChain.h"
-#include "../../Stream/MidiInput.h"
 #include <mutex>
+#include "../../Device/Stream/MidiInput.h"
 
 
 class MidiPreviewSource : public MidiSource {

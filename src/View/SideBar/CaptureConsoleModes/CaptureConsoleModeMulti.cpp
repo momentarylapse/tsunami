@@ -22,8 +22,8 @@
 #include "../../../Module/SignalChain.h"
 #include "../../../Device/Device.h"
 #include "../../../Device/DeviceManager.h"
-#include "../../../Stream/AudioInput.h"
-#include "../../../Stream/MidiInput.h"
+#include "../../../Device/Stream/AudioInput.h"
+#include "../../../Device/Stream/MidiInput.h"
 
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)

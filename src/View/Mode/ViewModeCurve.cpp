@@ -11,9 +11,9 @@
 #include "../Node/AudioViewLayer.h"
 #include "../../Data/Curve.h"
 #include "../../Data/Song.h"
+#include "../../Device/Stream/AudioOutput.h"
 #include "../../TsunamiWindow.h"
 #include "../../Module/Audio/SongRenderer.h"
-#include "../../Stream/AudioOutput.h"
 #include "../SideBar/SideBar.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :

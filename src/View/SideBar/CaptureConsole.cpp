@@ -17,8 +17,9 @@
 #include "CaptureConsoleModes/CaptureConsoleModeMulti.h"
 
 #include "CaptureConsole.h"
+
+#include "../../Device/Stream/AudioOutput.h"
 #include "../../Session.h"
-#include "../../Stream/AudioOutput.h"
 
 
 

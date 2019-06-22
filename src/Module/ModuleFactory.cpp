@@ -6,6 +6,10 @@
  */
 
 #include "ModuleFactory.h"
+
+#include "../Device/Stream/AudioInput.h"
+#include "../Device/Stream/AudioOutput.h"
+#include "../Device/Stream/MidiInput.h"
 #include "Module.h"
 #include "Audio/SongRenderer.h"
 #include "Audio/AudioBackup.h"
@@ -28,9 +32,6 @@
 #include "../Plugins/Plugin.h"
 #include "../Plugins/PluginManager.h"
 #include "../Session.h"
-#include "../Stream/AudioInput.h"
-#include "../Stream/AudioOutput.h"
-#include "../Stream/MidiInput.h"
 
 
 Module* ModuleFactory::_create_special(Session* session, ModuleType type, const string& sub_type)

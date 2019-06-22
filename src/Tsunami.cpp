@@ -24,7 +24,7 @@
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
 #include "Device/DeviceManager.h"
-#include "Stream/AudioOutput.h"
+#include "Device/Stream/AudioOutput.h"
 #include "Test/TestRingBuffer.h"
 
 

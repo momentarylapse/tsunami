@@ -7,16 +7,16 @@
 
 #include "AudioInput.h"
 
-#include "../lib/hui/hui.h"
-#include "../Session.h"
-#include "../View/AudioView.h"
+#include "../../lib/hui/hui.h"
+#include "../../Session.h"
+#include "../../View/AudioView.h"
 
-#include "../Stuff/BackupManager.h"
-#include "../Data/base.h"
-#include "../Device/Device.h"
-#include "../Device/DeviceManager.h"
-#include "../lib/kaba/lib/common.h"
-#include "../Plugins/PluginManager.h"
+#include "../../Stuff/BackupManager.h"
+#include "../../Data/base.h"
+#include "../Device.h"
+#include "../DeviceManager.h"
+#include "../../lib/kaba/lib/common.h"
+#include "../../Plugins/PluginManager.h"
 
 namespace Kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);

@@ -21,8 +21,8 @@
 #include "../../../Session.h"
 #include "../../../Device/Device.h"
 #include "../../../Device/DeviceManager.h"
-#include "../../../Stream/AudioOutput.h"
-#include "../../../Stream/MidiInput.h"
+#include "../../../Device/Stream/AudioOutput.h"
+#include "../../../Device/Stream/MidiInput.h"
 
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)

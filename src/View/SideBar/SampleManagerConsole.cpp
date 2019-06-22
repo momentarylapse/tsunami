@@ -22,10 +22,10 @@
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
+#include "../../Device/Stream/AudioOutput.h"
 #include "../../Module/SignalChain.h"
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
-#include "../../Stream/AudioOutput.h"
 
 
 // TODO: use BufferPainter / MidiPainter

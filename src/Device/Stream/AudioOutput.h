@@ -5,15 +5,15 @@
  *      Author: michi
  */
 
-#ifndef SRC_STREAM_AUDIOOUTPUT_H_
-#define SRC_STREAM_AUDIOOUTPUT_H_
+#ifndef SRC_DEVICE_STREAM_AUDIOOUTPUT_H_
+#define SRC_DEVICE_STREAM_AUDIOOUTPUT_H_
 
 
 
-#include "../lib/base/base.h"
-#include "../Data/Audio/RingBuffer.h"
-#include "../Module/Module.h"
-#include "../Module/ModuleConfiguration.h"
+#include "../../lib/base/base.h"
+#include "../../Data/Audio/RingBuffer.h"
+#include "../../Module/Module.h"
+#include "../../Module/ModuleConfiguration.h"
 #include <atomic>
 
 class DeviceManager;
@@ -138,4 +138,4 @@ public:
 	int command(ModuleCommand cmd, int param) override;
 };
 
-#endif /* SRC_STREAM_AUDIOOUTPUT_H_ */
+#endif /* SRC_DEVICE_STREAM_AUDIOOUTPUT_H_ */

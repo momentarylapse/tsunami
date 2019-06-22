@@ -23,8 +23,8 @@
 #include "../../../Module/SignalChain.h"
 #include "../../../Device/Device.h"
 #include "../../../Device/DeviceManager.h"
-#include "../../../Stream/AudioInput.h"
-#include "../../../Stream/AudioOutput.h"
+#include "../../../Device/Stream/AudioInput.h"
+#include "../../../Device/Stream/AudioOutput.h"
 
 
 

@@ -19,8 +19,8 @@
 #include "../SideBar/SideBar.h"
 #include "../../Session.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
-#include "../../Stream/AudioInput.h"
-#include "../../Stream/MidiInput.h"
+#include "../../Device/Stream/AudioInput.h"
+#include "../../Device/Stream/MidiInput.h"
 
 CaptureTrackData::CaptureTrackData(){}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder)

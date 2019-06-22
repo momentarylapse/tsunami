@@ -21,7 +21,7 @@
 #include "../../Session.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Device/DeviceManager.h"
-#include "../../Stream/AudioOutput.h"
+#include "../../Device/Stream/AudioOutput.h"
 #include "../AudioView.h"
 #include "../Node/AudioViewTrack.h"
 

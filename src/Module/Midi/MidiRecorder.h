@@ -13,13 +13,11 @@
 #include "../Module.h"
 #include "../Port/Port.h"
 
-class MidiRecorder : public Module
-{
+class MidiRecorder : public Module {
 public:
 	MidiRecorder();
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(MidiRecorder *j);
 		int read_midi(MidiEventBuffer &buf) override;

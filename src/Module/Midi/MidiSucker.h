@@ -12,8 +12,7 @@
 
 class Port;
 
-class MidiSucker : public Module
-{
+class MidiSucker : public Module {
 public:
 	MidiSucker();
 

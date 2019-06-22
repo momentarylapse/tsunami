@@ -67,7 +67,6 @@ public:
 
 		MidiEventBuffer events;
 		MidiInput *input;
-		bool real_time_mode;
 	};
 	Output *out;
 
@@ -90,6 +89,7 @@ private:
 	class Config : public ModuleConfiguration {
 	public:
 		Device *device;
+		bool free_flow;
 		void reset() override;
 		string auto_conf(const string &name) const override;
 	} config;

@@ -11,14 +11,11 @@
 #include "../Port/Port.h"
 #include "../Module.h"
 
-class AudioBackup : public Module
-{
+class AudioBackup : public Module {
 public:
 	AudioBackup(Session *session);
-	~AudioBackup();
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioBackup *j);
 		int read_audio(AudioBuffer &buf) override;

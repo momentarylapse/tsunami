@@ -18,7 +18,7 @@ class MidiPreviewSource : public MidiSource {
 public:
 	MidiPreviewSource() {
 		module_subtype = "MidiPreviewSource";
-		mode = Mode::WAITING;
+		mode = Mode::END_OF_STREAM;
 		ttl = -1;
 		volume = 1.0f;
 		debug = false;

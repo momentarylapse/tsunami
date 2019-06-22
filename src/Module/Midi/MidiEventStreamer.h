@@ -12,8 +12,7 @@
 #include "../../Data/Midi/MidiData.h"
 
 
-class MidiEventStreamer : public MidiSource
-{
+class MidiEventStreamer : public MidiSource {
 public:
 	MidiEventStreamer(const MidiEventBuffer &midi);
 

@@ -29,7 +29,7 @@ MidiEffect::MidiEffect() :
 	Module(ModuleType::MIDI_EFFECT, "")
 {
 	port_out.add(new Output(this));
-	port_in.add(InPortDescription(SignalType::MIDI, &source, "in"));
+	port_in.add({SignalType::MIDI, &source, "in"});
 	source = nullptr;
 	only_on_selection = false;
 }

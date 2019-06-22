@@ -25,11 +25,10 @@ namespace Kaba {
 
 MidiInput::Output::Output(MidiInput *_input) : Port(SignalType::MIDI, "out") {
 	input = _input;
-	real_time_mode = true;
 }
 
 int MidiInput::Output::read_midi(MidiEventBuffer &midi) {
-	if (real_time_mode){
+	if (input->config.free_flow){
 		for (auto &e: events){
 			e.pos = 0;
 			midi.add(e);
@@ -60,6 +59,7 @@ void MidiInput::Output::feed(const MidiEventBuffer &midi) {
 }
 
 void MidiInput::Config::reset() {
+	free_flow = true;
 	device = _module->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 }
 
@@ -89,6 +89,7 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleType::STREAM, "MidiInput"
 	if (_class->elements.num == 0) {
 		Kaba::add_class(_class);
 		Kaba::class_add_elementx("device", device_pointer_class, &Config::device);
+		Kaba::class_add_elementx("free_flow", Kaba::TypeBool, &Config::free_flow);
 		_class->_vtable_location_target_ = Kaba::get_vtable(&config);
 	}
 	config._class = _class;

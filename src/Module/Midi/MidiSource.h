@@ -13,16 +13,14 @@
 
 class Song;
 
-class MidiSource : public Module
-{
+class MidiSource : public Module {
 public:
 	MidiSource();
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(MidiSource *s);
 		int read_midi(MidiEventBuffer &midi) override;

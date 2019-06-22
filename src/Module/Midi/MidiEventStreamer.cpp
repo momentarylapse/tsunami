@@ -10,15 +10,13 @@
 #include "../Beats/BeatSource.h"
 
 
-MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi)
-{
+MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi) {
 	midi = _midi;
 	offset = 0;
 	ignore_end = false;
 }
 
-int MidiEventStreamer::read(MidiEventBuffer& _midi)
-{
+int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 	int n = min(midi.samples - offset, _midi.samples);
 	if (ignore_end)
 		n = _midi.samples;
@@ -35,23 +33,19 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi)
 	return n;
 }
 
-void MidiEventStreamer::reset()
-{
+void MidiEventStreamer::reset() {
 	offset = 0;
 }
 
-void MidiEventStreamer::set_data(const MidiEventBuffer &_midi)
-{
+void MidiEventStreamer::set_data(const MidiEventBuffer &_midi) {
 	midi = _midi;
 }
 
-void MidiEventStreamer::set_pos(int pos)
-{
+void MidiEventStreamer::set_pos(int pos) {
 	offset = pos;
 }
 
-int MidiEventStreamer::get_pos()
-{
+int MidiEventStreamer::get_pos() {
 	return offset;
 }
 

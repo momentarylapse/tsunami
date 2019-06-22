@@ -10,24 +10,18 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../../Stuff/BackupManager.h"
 
-AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::PLUMBING, "AudioBackup")
-{
+AudioBackup::AudioBackup(Session *_session) : Module(ModuleType::PLUMBING, "AudioBackup") {
 	session = _session;
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
+	port_in.add({SignalType::AUDIO, &source, "in"});
 	source = nullptr;
 
 	backup_file = nullptr;
 	backup_mode = BACKUP_MODE_TEMP;
 }
 
-AudioBackup::~AudioBackup()
-{
-}
-
-int AudioBackup::Output::read_audio(AudioBuffer& buf)
-{
+int AudioBackup::Output::read_audio(AudioBuffer& buf) {
 	if (!backup->source)
 		return buf.length;
 
@@ -39,19 +33,16 @@ int AudioBackup::Output::read_audio(AudioBuffer& buf)
 	return r;
 }
 
-AudioBackup::Output::Output(AudioBackup *b) : Port(SignalType::AUDIO, "out")
-{
+AudioBackup::Output::Output(AudioBackup *b) : Port(SignalType::AUDIO, "out") {
 	backup = b;
 }
 
-void AudioBackup::set_backup_mode(int mode)
-{
+void AudioBackup::set_backup_mode(int mode) {
 	backup_mode = mode;
 }
 
-void AudioBackup::save_chunk(const AudioBuffer &buf)
-{
-	if (backup_file){
+void AudioBackup::save_chunk(const AudioBuffer &buf) {
+	if (backup_file) {
 		// write to file
 		string data;
 		buf.exports(data, 2, SampleFormat::SAMPLE_FORMAT_32_FLOAT);
@@ -59,17 +50,15 @@ void AudioBackup::save_chunk(const AudioBuffer &buf)
 	}
 }
 
-void AudioBackup::start()
-{
+void AudioBackup::start() {
 	if (backup_file)
 		stop();
 	if (backup_mode != BACKUP_MODE_NONE)
 		backup_file = BackupManager::create_file("raw", session);
 }
 
-void AudioBackup::stop()
-{
-	if (backup_file){
+void AudioBackup::stop() {
+	if (backup_file) {
 		BackupManager::done(backup_file);
 		backup_file = nullptr;
 		//if (backup_mode != BACKUP_MODE_KEEP)
@@ -77,12 +66,11 @@ void AudioBackup::stop()
 	}
 }
 
-int AudioBackup::command(ModuleCommand cmd, int param)
-{
-	if (cmd == ModuleCommand::START){
+int AudioBackup::command(ModuleCommand cmd, int param) {
+	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
-	}else if (cmd == ModuleCommand::STOP){
+	} else if (cmd == ModuleCommand::STOP) {
 		stop();
 		return 0;
 	}

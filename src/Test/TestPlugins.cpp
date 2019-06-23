@@ -25,6 +25,9 @@ TestPlugins::TestPlugins() : UnitTest("plugins") {
 
 Array<UnitTest::Test> TestPlugins::tests() {
 	Array<Test> list;
+	auto *pm = Session::GLOBAL->plugin_manager;
+	for (auto &pf: pm->plugin_files)
+		list.add(Test("compile:" + pf.filename, [pf]{ test_compile(pf.type, pf.filename); }));
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")
@@ -47,6 +50,14 @@ Array<UnitTest::Test> TestPlugins::tests() {
 
 	//list.add(Test("tsunami-plugins", TestPlugins::test_tsunami_plugin));
 	return list;
+}
+
+#include "../Plugins/Plugin.h"
+
+void TestPlugins::test_compile(ModuleType type, const string &filename) {
+	Plugin *p = Session::GLOBAL->plugin_manager->load_and_compile_plugin(type, filename);
+	if (!p->usable(Session::GLOBAL))
+		throw Failure(p->error_message);
 }
 
 void TestPlugins::test_audio_effect(const string &name) {

@@ -58,16 +58,18 @@ void add_esp_add(Asm::InstructionWithParamsList *list,int d)
 	}
 }
 
-void try_init_global_var(const Class *type, char* g_var)
-{
-	if (type->is_array()){
+void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
+	if (type->is_array()) {
 		for (int i=0;i<type->array_length;i++)
-			try_init_global_var(type->parent, g_var + i * type->parent->size);
+			try_init_global_var(type->parent, g_var + i * type->parent->size, ps);
 		return;
 	}
 	ClassFunction *cf = type->get_default_constructor();
-	if (!cf)
+	if (!cf) {
+		if (type->needs_constructor())
+			ps->do_error("global variable without default constructor...");
 		return;
+	}
 	typedef void init_func(void *);
 	//msg_write("global init: " + v.type->name);
 	init_func *ff = (init_func*)cf->func->address;
@@ -79,7 +81,7 @@ void init_all_global_objects(SyntaxTree *ps)
 {
 	for (Variable *v: ps->root_of_all_evil.var)
 		if (!v->is_extern)
-			try_init_global_var(v->type, (char*)v->memory);
+			try_init_global_var(v->type, (char*)v->memory, ps);
 }
 
 static int64 _opcode_rand_state_ = 10000;

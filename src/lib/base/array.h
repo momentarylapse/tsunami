@@ -141,6 +141,7 @@ public:
 			for (int i = 0; i < num; i++) {
 				new(&new_data[i]) T;
 				new_data[i] = ((T*)data)[i];
+				((T*)data)[i].~T();
 			}
 			if (allocated > 0)
 				free(data);

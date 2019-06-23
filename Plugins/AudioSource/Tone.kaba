@@ -34,6 +34,6 @@ class SineSource extends AudioSource
 		source = CreateMidiSource(session, "Tone")
 		synth = CreateSynthesizer(session, "")
 		synth.config_from_string("" + config.pitch + "," + config.volume)
-		synth.plug(0, source, 0)
+		synth.plug_in(0, source, 0)
 	override int read(AudioBuffer buf)
 		return synth.out.read_audio(buf)

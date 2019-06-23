@@ -770,8 +770,11 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, int modus)
 	if (modus == -1)
 		class_type = class_type->parent;
 	ClassFunction *f = class_type->get_default_constructor();
-	if (!f)
+	if (!f) {
+		if (class_type->needs_constructor())
+			do_error("missing default constructor for " + class_type->name);
 		return;
+	}
 
 	SerialNodeParam instance = param;
 	if (modus == -1){

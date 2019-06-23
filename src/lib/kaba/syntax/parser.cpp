@@ -1612,17 +1612,19 @@ Node *SyntaxTree::parse_block(Block *parent, Block *block)
 }
 
 // local (variable) definitions...
-void SyntaxTree::parse_local_definition(Block *block)
-{
+void SyntaxTree::parse_local_definition(Block *block) {
 	// type of variable
 	const Class *type = parse_type();
-	for (int l=0;!Exp.end_of_line();l++){
+	if (type->needs_constructor() and !type->get_default_constructor())
+		do_error(format("declaring a variable of type '%s' requires a constructor but no default constructor exists", type->name.c_str()));
+
+	for (int l=0;!Exp.end_of_line();l++) {
 		// name
 		block->add_var(Exp.cur, type);
 		Exp.next();
 
 		// assignment?
-		if (Exp.cur == "="){
+		if (Exp.cur == "=") {
 			Exp.rewind();
 			// parse assignment
 			block->add(parse_command(block));

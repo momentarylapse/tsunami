@@ -53,6 +53,7 @@ class MetronomePanel extends ConfigPanel
 	int sr_id
 	
 	void __init__(Session *session, Metronome *_metro)
+		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''")

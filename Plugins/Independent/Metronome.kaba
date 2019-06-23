@@ -40,9 +40,10 @@ class BlurredDot
 			p.draw_circle(pos.x, pos.y, r)
 
 class MetronomePanel extends ConfigPanel
+	override Metronome* c
 	BeatSource* source
 	SignalChain* chain
-	Metronome* metro
+	//Metronome* metro
 	float fraction_prev
 	
 	bool fullscreen
@@ -54,12 +55,13 @@ class MetronomePanel extends ConfigPanel
 	BlurredDot dot
 	
 	void __init__(Session* session, BeatSource* _source, SignalChain* _chain, Metronome* _metro)
+		super.__init__(_metro)
 		from_source("
 Grid ? '' vertical
 	DrawingArea area ''
 	Revealer config ''")
 
-		metro = _metro		
+		//metro = _metro		
 		source = _source
 		chain = _chain
 		fraction_prev = 0

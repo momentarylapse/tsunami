@@ -149,8 +149,8 @@ class Module
 	extern virtual int command(int cmd, int param)
 	extern virtual void set_pos(int pos)
 	extern virtual int get_pos()
-	//extern void plug(int in_port, Module* source, int out_port)
-	//extern void unplug(int in_port)
+	extern void plug_in(int in_port, Module* source, int out_port)
+	extern void unplug_in(int in_port)
 	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
 	extern Module* copy()
@@ -158,21 +158,21 @@ class Module
 class AudioEffect extends Module
 	Port *out
 	Port *source
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
 	extern virtual int read(AudioBuffer buf)
 
 class MidiEffect extends Module
 	Port *out
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(MidiNoteBuffer midi)
 
 class AudioVisualizer extends Module
 	Port *out
 	int chunk_size
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual void process(AudioBuffer buf)
 	extern void set_chunk_size(int chunk_size)
@@ -229,7 +229,7 @@ class Port
 	extern virtual int read_beats(Beat[] beats, int samples)
 
 class AudioSource extends Module
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
 	extern override int get_pos()
@@ -237,7 +237,7 @@ class AudioSource extends Module
 	Port *out
 
 class MidiSource extends Module
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	// crappy experimental note api:
@@ -275,7 +275,7 @@ class Synthesizer extends Module
 	bool auto_generate_stereo
 	MidiEventBuffer events
 	Port *out
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual void render(AudioBuffer buf)
 	extern override void on_config()
@@ -301,7 +301,7 @@ class EnvelopeADSR
 
 
 class BeatSource extends Module
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(Beat[] beats, int samples)
 	extern virtual int beats_per_bar()
@@ -591,7 +591,7 @@ class Slider
 	extern void set(float f)
 
 class TsunamiPlugin extends Module
-	extern override void __init__()
+	extern void __init__()
 	extern override void __delete__()
 	extern virtual void on_start()
 	extern virtual void on_stop()

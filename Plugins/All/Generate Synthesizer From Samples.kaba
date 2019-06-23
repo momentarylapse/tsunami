@@ -36,11 +36,11 @@ class XXX extends SongPlugin
 	void shift(Song* song, SampleSynthesizer* synth, int from, int to)
 		print("shift " + from + " -> " + to)
 		SampleRef* source = synth.config.samples[from]
-		Sample* t = song.add_sample("new", *source.buf)
+		Sample* t = song.add_sample("new", *source.origin.buf)
 		
 		PitchShift* ps = CreateAudioEffect(session, "Pitch Shift")
 		ps.config.pitch = pow(2, (to - from)/12.0)
-		ps.process(t.buf)
+		ps.process(*t.buf)
 		
 		synth.config.samples[to] = t.create_ref()
 		

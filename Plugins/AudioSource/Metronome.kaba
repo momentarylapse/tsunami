@@ -27,7 +27,7 @@ class Metronome extends AudioSource
 	void create_stuff()
 		synth = CreateSynthesizer(session, "")
 		source = CreateMidiSource(session, "Metronome")
-		synth.plug(0, source, 0)
+		synth.plug_in(0, source, 0)
 	
 	override void __delete__()
 		if source

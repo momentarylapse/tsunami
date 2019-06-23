@@ -508,14 +508,13 @@ Array<string> class_func_param_names(ClassFunction *cf)
 	return names;
 }
 
-void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t)
-{
+void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t) {
 	if (t->owner != this)
 		return;
 	if (t->is_pointer())
 		return;
 
-	if (t->is_super_array()){
+	if (t->is_super_array()) {
 		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
 		add_func_header(this, t, "clear", TypeVoid, {}, {});
@@ -523,40 +522,53 @@ void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t)
 		add_func_header(this, t, "add", TypeVoid, {t->parent}, {"x"});
 		add_func_header(this, t, "remove", TypeVoid, {TypeInt}, {"index"});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
-	}else if (t->is_array()){
+	} else if (t->is_array()) {
 		if (t->needs_constructor())
 			add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		if (t->needs_destructor())
 			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
-	}else if (t->is_dict()){
+	} else if (t->is_dict()) {
 		add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {});
 		add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {});
 		add_func_header(this, t, "clear", TypeVoid, {}, {});
 		add_func_header(this, t, "add", TypeVoid, {TypeString, t->parent}, {"key", "x"});
 		add_func_header(this, t, "__get__", t->parent, {TypeString}, {"key"});
 		add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"});
-	}else if (!t->is_simple_class()){//needs_init){
-		if (t->parent){
-			// only auto-implement matching constructors
-			for (auto *pcc: t->parent->get_constructors()){
-				auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc->func);
-				if (needs_new(c))
-					add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
+	} else if (!t->is_simple_class()) {
+		if (t->parent) {
+			bool has_own_constructors = false;
+			for (auto *cc: t->get_constructors())
+				if (!cc->needs_overriding)
+					has_own_constructors = true;
+
+			if (has_own_constructors) {
+				// don't inherit constructors!
+				for (int i=t->functions.num-1; i>=0; i--)
+					if (t->functions[i].name == IDENTIFIER_FUNC_INIT and t->functions[i].needs_overriding)
+						t->functions.erase(i);
+			} else {
+				// only auto-implement matching constructors
+				for (auto *pcc: t->parent->get_constructors()) {
+					auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc->func);
+					if (needs_new(c))
+						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
+				}
 			}
-		}else{
+		} else {
 			if (t->needs_constructor() and needs_new(t->get_default_constructor()))
-				add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
+				if (t->get_constructors().num == 0)
+					add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, {}, {}, t->get_default_constructor());
 		}
 		if (needs_new(t->get_destructor()))
 			add_func_header(this, t, IDENTIFIER_FUNC_DELETE, TypeVoid, {}, {}, t->get_destructor());
-		if (needs_new(t->get_assign())){
+		if (needs_new(t->get_assign())) {
 			//add_func_header(this, t, NAME_FUNC_ASSIGN, TypeVoid, t, "other");
 			// implement only if parent has also done so
-			if (t->parent){
+			if (t->parent) {
 				if (t->parent->get_assign())
 					add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
-			}else{
+			} else {
 				add_func_header(this, t, IDENTIFIER_FUNC_ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
 			}
 		}

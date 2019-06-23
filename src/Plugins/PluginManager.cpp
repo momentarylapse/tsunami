@@ -191,6 +191,8 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 	Kaba::LinkExternal("Module.copy", Kaba::mf(&Module::copy));
+	Kaba::LinkExternal("Module.plug_in", Kaba::mf(&Module::_plug_in));
+	Kaba::LinkExternal("Module.unplug_in", Kaba::mf(&Module::_unplug_in));
 
 
 	ModuleConfiguration plugin_data;

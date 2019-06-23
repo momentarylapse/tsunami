@@ -1,11 +1,11 @@
 use "../api.kaba"
 
 class MLPPanel extends ConfigPanel
-	MidiLivePlayback* mlp
+	override MidiLivePlayback* c
 	Session* session
 	ConfigPanel* synth_panel
 	void __init__(Session* _session, MidiLivePlayback* _mlp)
-		mlp = _mlp
+		super.__init__(_mlp)
 		session = _session
 		from_source("Grid grid ''
 	Button select-synth 'select synthesizer...' expandx image=hui:open")
@@ -17,11 +17,11 @@ class MLPPanel extends ConfigPanel
 	void on_select_synth()
 		if synth_panel
 			delete synth_panel
-		string name = ChooseModule(self, session, MODULE_SYNTHESIZER, mlp.synth.name)
-		mlp.set_synth(name)
+		string name = ChooseModule(self, session, MODULE_SYNTHESIZER, c.synth.name)
+		c.set_synth(name)
 		set_string("select-synth", name)
 		
-		synth_panel = mlp.synth.create_panel()
+		synth_panel = c.synth.create_panel()
 		if synth_panel
 			embed(synth_panel, "grid", 0, 1)
 			synth_panel.update()
@@ -43,7 +43,7 @@ class MidiLivePlayback extends TsunamiPlugin
 	void set_synth(string name)
 		chain.stop()
 		chain.reset_state()
-		chain.remove(synth)
+		chain.delete(synth)
 		
 		synth = chain.add(MODULE_SYNTHESIZER, name)
 		chain.connect(m_in, 0, synth, 0)

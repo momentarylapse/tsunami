@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "../asm/asm.h"
 #include "../../file/file.h"
+#include "../../hui/Application.h"
 #include <stdio.h>
 
 namespace Kaba{
@@ -1675,7 +1676,7 @@ void SyntaxTree::parse_import()
 		string base_name = name.substr(1, name.num - 2); // remove ""
 		string filename = script->filename.dirname() + base_name;
 		if (base_name.head(2) == "@/")
-			filename = "/usr/share/kaba/lib/" + base_name.substr(2, -1); // TODO...
+			filename = hui::Application::directory_static + "lib/" + base_name.substr(2, -1); // TODO...
 		filename = filename.no_recursion();
 
 

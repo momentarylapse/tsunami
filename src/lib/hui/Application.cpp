@@ -34,8 +34,7 @@ Array<string> Application::_args;
 
 
 
-Application::Application(const string &app_name, const string &def_lang, int flags)
-{
+Application::Application(const string &app_name, const string &def_lang, int flags) {
 	initial_working_directory = get_current_dir();
 	installed = false;
 
@@ -46,11 +45,17 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 		directory = initial_working_directory;
 		directory_static = directory + "static/";
-		if (_args.num > 0){
+		if (_args.num > 0) {
 			filename = _args[0].replace("\\", "/");
-
 			directory = filename.dirname();
-			if ((filename.head(5) == "/usr/") or (filename.find("/") < 0)){
+
+
+			if ((filename.head(11) == "/usr/local/") or (filename.find("/") < 0)) {
+				installed = true;
+				// installed version?
+				directory = format("%s/.%s/", getenv("HOME"), app_name.c_str());
+				directory_static = "/usr/local/share/" + app_name + "/";
+			} else if ((filename.head(5) == "/usr/") or (filename.find("/") < 0)) {
 				installed = true;
 				// installed version?
 				directory = format("%s/.%s/", getenv("HOME"), app_name.c_str());
@@ -71,7 +76,7 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 		directory_static = directory + "static\\";
 	#endif
 
-	if (!msg_inited){
+	if (!msg_inited) {
 		dir_create(directory);
 		msg_init(directory + "message.txt", !(flags & FLAG_SILENT));
 	}
@@ -111,6 +116,8 @@ Application::Application(const string &app_name, const string &def_lang, int fla
 
 	if (file_test_existence(directory_static + "icon.svg"))
 		set_property("logo", directory_static + "icon.svg");
+	else if (file_test_existence(directory_static + "icon.png"))
+		set_property("logo", directory_static + "icon.png");
 	else if (file_test_existence(directory_static + "icon.ico"))
 		set_property("logo", directory_static + "icon.ico");
 }

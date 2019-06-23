@@ -3,6 +3,7 @@ CPP = g++
 GLOBALFLAGS = -O2  -fno-omit-frame-pointer -g -std=c++14  -DHAS_LIB_GTK3=1 -DHAS_LIB_ZLIB=1 -DHAS_LIB_FFTW3=1 -DHAS_LIB_OGG=1 -DHAS_LIB_FLAC=1 -DHAS_LIB_ALSA=1 -DHAS_LIB_PULSEAUDIO=1 -DHAS_LIB_PORTAUDIO=1 -DHAS_LIB_UNWIND=1 -DHAS_LIB_DL=1
 CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
 CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lz -lfftw3f -logg -lvorbis -lvorbisfile -lvorbisenc -lFLAC -lasound -lpulse -lportaudio -lunwind -ldl $(GLOBALFLAGS)
+prefix = /usr/local
 
 OBJ = Action/Bar/Action__ScaleData.o \
  Action/Bar/Action__ShiftData.o \
@@ -1061,7 +1062,7 @@ lib/kaba/syntax/lexical.o : lib/kaba/syntax/lexical.cpp lib/base/base.h lib/base
 lib/kaba/syntax/Node.o : lib/kaba/syntax/Node.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
 	$(CPP) -c lib/kaba/syntax/Node.cpp -o $@ $(CXXFLAGS)
 
-lib/kaba/syntax/parser.o : lib/kaba/syntax/parser.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
+lib/kaba/syntax/parser.o : lib/kaba/syntax/parser.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/common.h lib/config.h
 	$(CPP) -c lib/kaba/syntax/parser.cpp -o $@ $(CXXFLAGS)
 
 lib/kaba/syntax/precompiler.o : lib/kaba/syntax/precompiler.cpp lib/kaba/kaba.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/kaba/asm/asm.h lib/kaba/lib/lib.h lib/kaba/syntax/SyntaxTree.h lib/kaba/syntax/lexical.h lib/kaba/syntax/Class.h lib/kaba/syntax/Constant.h lib/kaba/syntax/Function.h lib/kaba/syntax/Node.h lib/file/file.h lib/file/msg.h lib/file/file_op.h
@@ -1554,26 +1555,30 @@ TsunamiWindow.o : TsunamiWindow.cpp TsunamiWindow.h lib/hui/hui.h lib/hui/common
 	$(CPP) -c TsunamiWindow.cpp -o $@ $(CXXFLAGS)
 
 install :
-	mkdir -p /usr/share/tsunami
-	cp -f ../static/hui_resources.txt    /usr/share/tsunami
-	cp -f ../static/icon.*               /usr/share/tsunami
-	cp -f ../static/*.tga                /usr/share/tsunami
-	cp -f ../static/license.txt          /usr/share/tsunami
-	cp -f ../static/license_small.txt    /usr/share/tsunami
-	cp -f ../static/favorites_demo.txt   /usr/share/tsunami
-	mkdir -p /usr/share/tsunami/Plugins
-	cp -rf ../Plugins/                   /usr/share/tsunami/
-	cp -rf ../Lessons/                   /usr/share/tsunami/
-	cp -rf ../static/Midi\ Fonts/        /usr/share/tsunami/
-	cp -rf ../static/SignalChains        /usr/share/tsunami/
+	mkdir -p $(prefix)/share/tsunami
 	xdg-desktop-menu install ../static/michisoft-tsunami.desktop
 	xdg-mime install ../static/michisoft-nami.xml
-	xdg-icon-resource install --context mimetypes --size  32 ../static/Icons/32.png  application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size  48 ../static/Icons/48.png  application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size  64 ../static/Icons/64.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 32 ../static/Icons/32.png application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 48 ../static/Icons/48.png application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 64 ../static/Icons/64.png application-michisoft-nami --noupdate
 	xdg-icon-resource install --context mimetypes --size 128 ../static/Icons/128.png application-michisoft-nami
-	#xdg-icon-resource install --context mimetypes ../static/Icons/tsunami.svg application-michisoft-nami
-	cp $(BIN) /usr/bin
+	cp -rf '../static/Icons' $(prefix)/share/tsunami
+	cp -rf '../static/Midi Fonts' $(prefix)/share/tsunami
+	cp -rf '../static/SignalChains' $(prefix)/share/tsunami
+	cp -f '../static/favorites_demo.txt' $(prefix)/share/tsunami
+	cp -f '../static/hui_resources.txt' $(prefix)/share/tsunami
+	cp -f '../static/icon.svg' $(prefix)/share/tsunami
+	cp -f '../static/license.txt' $(prefix)/share/tsunami
+	cp -f '../static/license_small.txt' $(prefix)/share/tsunami
+	cp -f '../static/mute.tga' $(prefix)/share/tsunami
+	cp -f '../static/solo.tga' $(prefix)/share/tsunami
+	cp -f '../static/track-audio.tga' $(prefix)/share/tsunami
+	cp -f '../static/track-midi.tga' $(prefix)/share/tsunami
+	cp -f '../static/track-time.tga' $(prefix)/share/tsunami
+	cp -f '../static/volume.tga' $(prefix)/share/tsunami
+	cp -f '../static/x.tga' $(prefix)/share/tsunami
+	cp -rf '../Plugins' $(prefix)/share/tsunami
+	cp $(BIN) $(prefix)/bin
 
 clean :
 	rm -f $(BIN)

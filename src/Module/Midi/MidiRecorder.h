@@ -12,6 +12,7 @@
 #include "../../Data/Midi/MidiData.h"
 #include "../Module.h"
 #include "../Port/Port.h"
+#include <mutex>
 
 class MidiRecorder : public Module {
 public:
@@ -31,6 +32,7 @@ public:
 	Port *source;
 	MidiEventBuffer buffer;
 	bool accumulating;
+	std::mutex mtx_buf;
 };
 
 #endif /* SRC_MODULE_MIDI_MIDIRECORDER_H_ */

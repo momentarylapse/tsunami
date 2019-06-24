@@ -18,6 +18,7 @@ int MidiRecorder::Output::read_midi(MidiEventBuffer& buf) {
 	int r = rec->source->read_midi(buf);
 
 	if (rec->accumulating and (r > 0)) {
+		std::lock_guard<std::mutex> lock(rec->mtx_buf);
 		rec->buffer.append(buf);
 	}
 

@@ -12,14 +12,13 @@
 #include "../../Data/Audio/AudioBuffer.h"
 #include "../Module.h"
 #include "../Port/Port.h"
+#include <mutex>
 
-class AudioRecorder : public Module
-{
+class AudioRecorder : public Module {
 public:
 	AudioRecorder();
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioRecorder *j);
 		int read_audio(AudioBuffer &buf) override;
@@ -33,6 +32,7 @@ public:
 	Port *source;
 	AudioBuffer buf;
 	bool accumulating;
+	std::mutex mtx_buf;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIORECORDER_H_ */

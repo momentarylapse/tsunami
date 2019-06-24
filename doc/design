@@ -95,6 +95,21 @@ module commands
 
 * Observer messages from other threads must be forwarded via hui::RunLater()
 
+-- locking --
+
+* PeakThread locks Song (write,try)
+* MidiPreview locks self
+* ViewModeCapture.draw_post() locks Audio/MidiRecorder.buf
+* PerformanceMonitor locks self
+* FFT locks planner
+* SignalChain...send-to-modules locks self
+* SongRenderer locks Song (read)
+* Audio/MidiRecorder.suck() locks buf
+* hui::runner... locks self
+* Actions lock Song (write)
+* RingBuffer.clear() locks buf (....)
+
+
 -- safety --
 
 ???

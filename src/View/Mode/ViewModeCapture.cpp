@@ -22,15 +22,13 @@
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 
-CaptureTrackData::CaptureTrackData(){}
-CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder)
-{
+CaptureTrackData::CaptureTrackData() : CaptureTrackData(nullptr, nullptr) {}
+CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder) {
 	target = _target;
 	recorder = _recorder;
 }
 
-SignalType CaptureTrackData::type()
-{
+SignalType CaptureTrackData::type() {
 	return target->type;
 }
 
@@ -42,37 +40,37 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 	chain = nullptr;
 }
 
-ViewModeCapture::~ViewModeCapture()
-{
+ViewModeCapture::~ViewModeCapture() {
 	set_data({});
 }
 
-void ViewModeCapture::on_start()
-{
+void ViewModeCapture::on_start() {
 }
 
-void ViewModeCapture::on_end()
-{
+void ViewModeCapture::on_end() {
 }
 
-void ViewModeCapture::draw_post(Painter *c)
-{
+void ViewModeCapture::draw_post(Painter *c) {
 	// capturing preview
 	
 	if (!chain)
 		return;
 
 	int offset = view->get_playback_selection(true).offset;
-	for (auto &d: data){
+	for (auto &d: data) {
 		auto *l = view->get_layer(d.target->layers[0]);
-		if (d.type() == SignalType::AUDIO){
-			auto &buf = ((AudioRecorder*)d.recorder)->buf;
-			view->update_peaks_now(buf);
+		if (d.type() == SignalType::AUDIO) {
+			auto *rec = (AudioRecorder*)d.recorder;
+
 			view->buffer_painter->set_context(l->area);
 			view->buffer_painter->set_color(view->colors.capture_marker);
-			view->buffer_painter->draw_buffer(c, buf, offset);
-		}else if (d.type() == SignalType::MIDI){
+
+			std::lock_guard<std::mutex> lock(rec->mtx_buf);
+			view->update_peaks_now(rec->buf);
+			view->buffer_painter->draw_buffer(c, rec->buf, offset);
+		} else if (d.type() == SignalType::MIDI) {
 			auto *rec = (MidiRecorder*)d.recorder;
+			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			l->draw_midi(c, midi_events_to_notes(rec->buffer), true, offset);
 		}
 	}
@@ -81,30 +79,26 @@ void ViewModeCapture::draw_post(Painter *c)
 	view->draw_time_line(c, offset + l, view->colors.capture_marker, false, true);
 }
 
-Set<Track*> ViewModeCapture::prevent_playback()
-{
+Set<Track*> ViewModeCapture::prevent_playback() {
 	Set<Track*> prev;
 	for (auto &d: data)
 		prev.add(d.target);
 	return prev;
 }
 
-void ViewModeCapture::set_data(const Array<CaptureTrackData> &_data)
-{
+void ViewModeCapture::set_data(const Array<CaptureTrackData> &_data) {
 	data = _data;
 }
 
 
-bool layer_available(TrackLayer *l, const Range &r)
-{
+bool layer_available(TrackLayer *l, const Range &r) {
 	for (auto &b: l->buffers)
 		if (b.range().overlaps(r))
 			return false;
 	return true;
 }
 
-void ViewModeCapture::insert_midi(Track *target, const MidiEventBuffer &midi, int delay)
-{
+void ViewModeCapture::insert_midi(Track *target, const MidiEventBuffer &midi, int delay) {
 	int s_start = view->get_playback_selection(true).start();
 
 	int i0 = s_start + delay;
@@ -114,8 +108,7 @@ void ViewModeCapture::insert_midi(Track *target, const MidiEventBuffer &midi, in
 }
 
 
-void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int delay)
-{
+void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int delay) {
 	Song *song = target->song;
 
 	int s_start = view->get_playback_selection(true).start();
@@ -127,7 +120,7 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 
 	TrackLayer *layer = nullptr;
 	for (TrackLayer *l: target->layers)
-		if (layer_available(l, r)){
+		if (layer_available(l, r)) {
 			layer = l;
 			break;
 		}
@@ -146,14 +139,13 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 	song->end_action_group();
 }
 
-void ViewModeCapture::insert()
-{
+void ViewModeCapture::insert() {
 	song->begin_action_group();
-	for (auto &d: data){
-		if (d.type() == SignalType::AUDIO){
+	for (auto &d: data) {
+		if (d.type() == SignalType::AUDIO) {
 			auto *rec = (AudioRecorder*)d.recorder;
 			insert_audio(d.target, rec->buf, 0);
-		}else if (d.type() == SignalType::MIDI){
+		} else if (d.type() == SignalType::MIDI) {
 			auto *rec = (MidiRecorder*)d.recorder;
 			insert_midi(d.target, rec->buffer, 0);
 		}

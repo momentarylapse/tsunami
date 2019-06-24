@@ -143,11 +143,10 @@ int RunLater(float time, const Callback &c)
 		return 0;
 	#endif
 	#ifdef HUI_API_GTK
-		HuiGtkRunner *r;
+		HuiGtkRunner *r = new HuiGtkRunner(c, time);
 		{
 			std::lock_guard<std::mutex> lock(runner_mutex);
 			//msg_write("rl lock 0");
-			r = new HuiGtkRunner(c, time);
 			_hui_runners_.add(r);
 			_hui_runners_cleanup_();
 			//msg_write("rl lock z");
@@ -170,10 +169,9 @@ int RunRepeated(float time, const Callback &c)
 		return 0;
 	#endif
 	#ifdef HUI_API_GTK
-		HuiGtkRunner *r;
+		HuiGtkRunner *r = new HuiGtkRunner(c, time);
 		{
 			std::lock_guard<std::mutex> lock(runner_mutex);
-			r = new HuiGtkRunner(c, time);
 			//msg_write("rr lock a");
 			_hui_runners_.add(r);
 			_hui_runners_cleanup_();

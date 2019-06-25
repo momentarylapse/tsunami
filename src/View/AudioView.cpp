@@ -153,7 +153,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	selection_mode = SelectionMode::NONE;
 	selection_snap_mode = SelectionSnapMode::NONE;
 	hide_selection = false;
-	song->subscribe(this, [=]{ on_song_update(); });
 
 	// modes
 	mode = nullptr;
@@ -167,7 +166,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	scene_graph = new SceneGraph([=]{ set_current(scene_graph->cur_selection); });
 	area = rect(0, 1024, 0, 768);
-	enabled = true;
+	enabled = false;
 	time_scale = new TimeScale(this);
 
 	auto *vbox = new NodeVBox();
@@ -278,6 +277,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	menu_bar = hui::CreateResourceMenu("popup-menu-bar");
 	menu_bar_gap = hui::CreateResourceMenu("popup-menu-bar-gap");
 	menu_buffer = hui::CreateResourceMenu("popup-menu-buffer");
+
+	enable(true);
 
 	//ForceRedraw();
 	update_menu();
@@ -703,38 +704,35 @@ void AudioView::explode_track(Track *t) {
 	thm.dirty = true;
 }
 
-void AudioView::on_song_update()
-{
-	if (song->cur_message() == song->MESSAGE_NEW){
-		__set_cur_layer(nullptr);
-		update_tracks();
-		sel.range = Range(0, 0);
-		sel.clear();
-		for (Track *t: song->tracks)
-			for (TrackLayer *l: t->layers)
-				sel.add(l);
-		check_consistency();
-		optimize_view();
-	}else if (song->cur_message() == song->MESSAGE_FINISHED_LOADING){
-		for (auto *t: vtrack)
-			if (t->track->layers.num > 2)
-				implode_track(t->track);
-		optimize_view();
-		hui::RunLater(0.5f, [=]{ optimize_view(); });
-	}else{
-		if ((song->cur_message() == song->MESSAGE_ADD_TRACK) or (song->cur_message() == song->MESSAGE_DELETE_TRACK))
-			update_tracks();
-		if ((song->cur_message() == song->MESSAGE_ADD_LAYER) or (song->cur_message() == song->MESSAGE_DELETE_LAYER))
-			update_tracks();
-		if (song->cur_message() == song->MESSAGE_CHANGE_CHANNELS)
-			update_tracks();
-		force_redraw();
-		update_menu();
-	}
+void AudioView::on_song_new() {
+	__set_cur_layer(nullptr);
+	update_tracks();
+	sel.range = Range(0, 0);
+	sel.clear();
+	for (Track *t: song->tracks)
+		for (TrackLayer *l: t->layers)
+			sel.add(l);
+	check_consistency();
+	optimize_view();
+}
 
-	if (song->cur_message() == MESSAGE_CHANGE)
-		if (song->history_enabled())
-			update_peaks();
+void AudioView::on_song_finished_loading() {
+	for (auto *t: vtrack)
+		if (t->track->layers.num > 2)
+			implode_track(t->track);
+	optimize_view();
+	hui::RunLater(0.5f, [=]{ optimize_view(); });
+}
+
+void AudioView::on_song_tracks_change() {
+	update_tracks();
+	force_redraw();
+	update_menu();
+}
+
+void AudioView::on_song_change() {
+	if (song->history_enabled())
+		update_peaks();
 }
 
 void AudioView::on_stream_tick() {
@@ -1272,10 +1270,22 @@ void AudioView::__set_cur_sample(SampleRef *s) {
 
 // unused?!?
 void AudioView::enable(bool _enabled) {
-	if (enabled and !_enabled)
+	if (enabled and !_enabled) {
 		song->unsubscribe(this);
-	else if (!enabled and _enabled)
-		song->subscribe(this, [=]{ on_song_update(); });
+	} else if (!enabled and _enabled) {
+		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_TRACK);
+		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_TRACK);
+		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_ADD_LAYER);
+		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_DELETE_LAYER);
+		song->subscribe(this, [=]{ on_song_tracks_change(); }, song->MESSAGE_CHANGE_CHANNELS);
+		song->subscribe(this, [=]{ on_song_new(); }, song->MESSAGE_NEW);
+		song->subscribe(this, [=]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
+		song->subscribe(this, [=]{ on_song_change(); }, song->MESSAGE_CHANGE);
+		song->subscribe(this, [=]{
+			force_redraw();
+			update_menu();
+		}, song->MESSAGE_ANY);
+	}
 	enabled = _enabled;
 }
 

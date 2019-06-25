@@ -97,7 +97,10 @@ public:
 	void on_key_up();
 	void on_command(const string &id);
 
-	void on_song_update();
+	void on_song_change();
+	void on_song_new();
+	void on_song_finished_loading();
+	void on_song_tracks_change();
 	void on_stream_tick();
 	void on_stream_state_change();
 	void on_update();

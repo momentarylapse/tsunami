@@ -632,7 +632,7 @@ void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid) {
 bool AudioBuffer::_peaks_chunk_needs_update(int index) {
 	if (peaks.num <= PEAK_MAGIC_LEVEL4)
 		return true;
-	if (index == peaks[PEAK_MAGIC_LEVEL4].num)
+	if (index >= peaks[PEAK_MAGIC_LEVEL4].num)
 		return true;
 	return (peaks[PEAK_MAGIC_LEVEL4][index] == 255);
 }

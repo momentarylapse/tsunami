@@ -12,8 +12,7 @@
 #include "../Data/Data.h"
 #include <assert.h>
 
-ActionManager::ActionManager(Data *_data)
-{
+ActionManager::ActionManager(Data *_data) {
 	data = _data;
 	cur_group = nullptr;
 	lock_level = 0;
@@ -22,17 +21,15 @@ ActionManager::ActionManager(Data *_data)
 	reset();
 }
 
-ActionManager::~ActionManager()
-{
+ActionManager::~ActionManager() {
 	reset();
 	//delete(mutex);
-	delete(timer);
+	delete timer;
 }
 
-void ActionManager::reset()
-{
+void ActionManager::reset() {
 	for (Action *a: action)
-		delete(a);
+		delete a;
 	action.clear();
 	cur_pos = 0;
 	save_pos = 0;
@@ -40,22 +37,20 @@ void ActionManager::reset()
 	enabled = true;
 	cur_group_level = 0;
 	if (cur_group)
-		delete(cur_group);
+		delete cur_group;
 	cur_group = nullptr;
 	notify();
 }
 
 
-void ActionManager::truncate()
-{
+void ActionManager::truncate() {
 	// truncate future history
-	for (int i=cur_pos;i<action.num;i++)
-		delete(action[i]);
+	for (int i=cur_pos; i<action.num; i++)
+		delete action[i];
 	action.resize(cur_pos);
 }
 
-void ActionManager::add(Action *a)
-{
+void ActionManager::add(Action *a) {
 	truncate();
 
 	if (timer->get() < 2.0f)
@@ -67,13 +62,12 @@ void ActionManager::add(Action *a)
 	notify();
 }
 
-bool ActionManager::merge(Action *a)
-{
+bool ActionManager::merge(Action *a) {
 	if (action.num < 1)
 		return false;
 
-	ActionMergableBase *aa = dynamic_cast<ActionMergableBase*>(a);
-	ActionMergableBase *bb = dynamic_cast<ActionMergableBase*>(action.back());
+	auto *aa = dynamic_cast<ActionMergableBase*>(a);
+	auto *bb = dynamic_cast<ActionMergableBase*>(action.back());
 	if (!aa or !bb)
 		return false;
 
@@ -85,8 +79,7 @@ bool ActionManager::merge(Action *a)
 }
 
 
-void *ActionManager::execute(Action *a)
-{
+void *ActionManager::execute(Action *a) {
 	if (cur_group)
 		return cur_group->add_sub_action(a, data);
 
@@ -103,8 +96,7 @@ void *ActionManager::execute(Action *a)
 
 
 
-void ActionManager::undo()
-{
+void ActionManager::undo() {
 	if (!undoable())
 		return;
 
@@ -118,8 +110,7 @@ void ActionManager::undo()
 
 
 
-void ActionManager::redo()
-{
+void ActionManager::redo() {
 	if (!redoable())
 		return;
 
@@ -131,50 +122,42 @@ void ActionManager::redo()
 	notify();
 }
 
-bool ActionManager::undoable()
-{
+bool ActionManager::undoable() {
 	return enabled and (cur_pos > 0);
 }
 
 
 
-bool ActionManager::redoable()
-{
+bool ActionManager::redoable() {
 	return enabled and (cur_pos < action.num);
 }
 
 
 
-void ActionManager::mark_current_as_save()
-{
+void ActionManager::mark_current_as_save() {
 	save_pos = cur_pos;
 	notify();
 }
 
 
 
-bool ActionManager::is_save()
-{
+bool ActionManager::is_save() {
 	return (cur_pos == save_pos);
 }
 
-void ActionManager::enable(bool _enabled)
-{
+void ActionManager::enable(bool _enabled) {
 	enabled = _enabled;
 }
 
-bool ActionManager::is_enabled()
-{
+bool ActionManager::is_enabled() {
 	return enabled;
 }
 
-class DummyActionGroup : public ActionGroup
-{
-	virtual void build(Data *d){}
+class DummyActionGroup : public ActionGroup {
+	virtual void build(Data *d) {}
 };
 
-void ActionManager::group_begin()
-{
+void ActionManager::group_begin() {
 	if (!cur_group){
 		cur_group = new DummyActionGroup;
 		lock();
@@ -182,13 +165,12 @@ void ActionManager::group_begin()
 	cur_group_level ++;
 }
 
-void ActionManager::group_end()
-{
+void ActionManager::group_end() {
 	cur_group_level --;
 	assert(cur_group_level >= 0);
 
-	if (cur_group_level == 0){
-		ActionGroup *g = cur_group;
+	if (cur_group_level == 0) {
+		auto *g = cur_group;
 		cur_group = nullptr;
 		//execute(g);
 		add(g);
@@ -197,15 +179,13 @@ void ActionManager::group_end()
 	}
 }
 
-void ActionManager::lock()
-{
+void ActionManager::lock() {
 	if (lock_level == 0)
 		mtx.lock();
 	lock_level ++;
 }
 
-void ActionManager::unlock()
-{
+void ActionManager::unlock() {
 	lock_level --;
 	if (lock_level == 0)
 		mtx.unlock();

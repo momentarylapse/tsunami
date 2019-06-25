@@ -68,14 +68,10 @@ public:
 	void onSynthChange()
 	{
 		track->edit_synthesizer(old_param);
-		if (p)
-			p->update();
 		old_param = synth->config_to_string();
 	}
 	void onSynthChangeByAction()
 	{
-		if (p)
-			p->update();
 		old_param = synth->config_to_string();
 	}
 	Session *session;

@@ -20,8 +20,7 @@ public:
 	Array<AutoConfigData*> aa;
 	AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c);
 	~AutoConfigPanel();
-	void on_change();
-	virtual void _cdecl update();
+	void _cdecl update() override;
 };
 
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session);

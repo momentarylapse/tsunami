@@ -24,6 +24,7 @@ public:
 	virtual void _cdecl set_large(bool large) {}
 
 	Module *c;
+	bool ignore_change;
 };
 
 

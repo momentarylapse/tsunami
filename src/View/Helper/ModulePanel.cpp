@@ -93,16 +93,12 @@ void ModulePanel::on_large() {
 void ModulePanel::on_change() {
 	func_edit(old_param);
 	check("enabled", module->enabled);
-	if (p)
-		p->update();
 	old_param = module->config_to_string();
 
 }
 
 void ModulePanel::on_change_by_action() {
 	check("enabled", module->enabled);
-	if (p)
-		p->update();
 	old_param = module->config_to_string();
 }
 

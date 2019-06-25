@@ -12,9 +12,12 @@
 #include "../Session.h"
 
 ConfigPanel::ConfigPanel(Module *_c) {
+	ignore_change = false;
 	c = _c;
-	if (c)
-		c->subscribe(this, [=]{ update(); }, c->MESSAGE_CHANGE);
+	if (c) {
+		c->subscribe(this, [=]{ if (!ignore_change) update(); }, c->MESSAGE_CHANGE);
+		c->subscribe(this, [=]{ if (!ignore_change) update(); }, c->MESSAGE_CHANGE_BY_ACTION);
+	}
 }
 
 ConfigPanel::~ConfigPanel() {
@@ -32,7 +35,9 @@ void ConfigPanel::__delete__() {
 }
 
 void ConfigPanel::changed() {
+	ignore_change = true;
 	c->changed();
+	ignore_change = false;
 }
 
 

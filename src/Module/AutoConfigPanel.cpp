@@ -39,7 +39,7 @@ string to_camel_case(const string &s) {
 	return r;
 }
 
-class AutoConfigData {
+class AutoConfigData : public VirtualBase {
 public:
 	string name, label, unit;
 	AutoConfigData(const string &_name) {
@@ -53,8 +53,8 @@ public:
 	}
 	virtual void parse(const string &s) = 0;
 	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) = 0;
-	virtual void get_value() = 0;
-	virtual void set_value() = 0;
+	virtual void value_from_gui() = 0;
+	virtual void value_to_gui() = 0;
 };
 
 class AutoConfigDataFloat : public AutoConfigData {
@@ -95,10 +95,10 @@ public:
 		//p->addLabel(unit, 2, 0, "");
 		slider = new Slider(p, "slider-" + i2s(i), "spin-" + i2s(i), min, max, factor, callback, *value);
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		*value = slider->get();
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		slider->set(*value);
 	}
 };
@@ -120,10 +120,10 @@ public:
 		p->add_check_box("!width=150,expandx", 1, i, id);
 		p->event(id, callback);
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		*value = panel->is_checked(id);
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		panel->check(id, *value);
 	}
 };
@@ -156,10 +156,10 @@ public:
 		p->set_options(id, format("range=%d:%d", min, max));
 		p->event(id, callback);
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		*value = panel->get_int(id);
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		panel->set_int(id, *value);
 	}
 };
@@ -203,14 +203,14 @@ public:
 		p->event(id_freq, [=]{ on_freq(); });
 		p->event(id_mode, [=]{ on_mode(); });
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		bool m = panel->is_checked(id_mode);
 		if (m)
 			*value = freq_to_pitch(panel->get_float(id_freq));
 		else
 			*value = (float)panel->get_int(id);
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		panel->set_int(id, (int)*value);
 		panel->set_float(id_freq, pitch_to_freq(*value));
 	}
@@ -248,10 +248,10 @@ public:
 		p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
 		p->event(id, callback);
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		*value = panel->get_string(id);
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		panel->set_string(id, *value);
 	}
 };
@@ -273,7 +273,7 @@ public:
 		id = "sample-" + i2s(i);
 		panel = p;
 		p->add_button("!expandx", 1, i, id);
-		set_value();
+		value_to_gui();
 		p->event(id, [=]{ on_button(); });
 		callback = _callback;
 	}
@@ -288,13 +288,13 @@ public:
 			*value = nullptr;
 			if (s)
 				*value = s->create_ref();
-			set_value();
+			value_to_gui();
 			callback();
 		}
 	}
-	void get_value() override {
+	void value_from_gui() override {
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		if (*value)
 			panel->set_string(id, (*value)->origin->name);
 		else
@@ -340,13 +340,13 @@ public:
 		p->event(id, callback);
 		update_list();
 	}
-	void get_value() override {
+	void value_from_gui() override {
 		*value = session->device_manager->choose_device(type);
 		int n = panel->get_int(id);
 		if (n >= 0)
 			*value = list[n];
 	}
-	void set_value() override {
+	void value_to_gui() override {
 		panel->set_int(id, list.find(*value));
 	}
 };
@@ -405,7 +405,10 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 		set_target("grid");
 		add_label(a->label, 0, i, "");
 		add_label(a->unit, 2, i, "");
-		a->add_gui(this, i, [=]{ on_change(); });
+		a->add_gui(this, i, [a,this]{
+			a->value_from_gui();
+			changed();
+		});
 	}
 }
 
@@ -413,14 +416,9 @@ AutoConfigPanel::~AutoConfigPanel() {
 	for (auto a: aa)
 		delete a;
 }
-void AutoConfigPanel::on_change() {
-	for (auto a: aa)
-		a->get_value();
-	changed();
-}
 
 void AutoConfigPanel::update() {
 	for (auto a: aa)
-		a->set_value();
+		a->value_to_gui();
 }
 

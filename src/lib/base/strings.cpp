@@ -352,7 +352,7 @@ string string::extension() const
 static bool format_locale_set = false;
 
 // connecting strings
-string format(const string str,...)
+string format(const string &str,...)
 {
 	string tmp;
 	va_list args;

@@ -122,7 +122,7 @@ public:
 			resize(num - 1);
 		}
 	}
-	void _cdecl insert(const T item, int index)
+	void _cdecl insert(const T &item, int index)
 	{
 		resize(num + 1);
 		for (int i=num-1; i>index; i--)
@@ -191,7 +191,7 @@ public:
 				swap(i, i + 1);
 		}
 	}
-	int find(const T item) const
+	int find(const T &item) const
 	{
 		for (int i=0; i<num; i++)
 			if ((*this)[i] == item)

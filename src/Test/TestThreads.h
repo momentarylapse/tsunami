@@ -12,8 +12,7 @@
 
 #include "UnitTest.h"
 
-class TestThreads: public UnitTest
-{
+class TestThreads: public UnitTest {
 public:
 	TestThreads();
 

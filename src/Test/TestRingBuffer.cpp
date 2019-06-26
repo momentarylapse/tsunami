@@ -20,13 +20,13 @@ TestRingBuffer::TestRingBuffer() : UnitTest("ring-buffer")
 Array<UnitTest::Test> TestRingBuffer::tests()
 {
 	Array<Test> list;
-	list.add(Test("read-write", TestRingBuffer::test_read_write));
-	list.add(Test("read-write-wrap", TestRingBuffer::test_read_write_wrap));
-	list.add(Test("read-too-much", TestRingBuffer::test_read_too_much));
-	list.add(Test("write-too-much-middle", TestRingBuffer::test_write_too_much_middle));
-	list.add(Test("write-too-much-end", TestRingBuffer::test_write_too_much_end));
-	list.add(Test("read-write-ref", TestRingBuffer::test_read_write_ref));
-	list.add(Test("thread-safety", TestRingBuffer::test_thread_safety));
+	list.add({"read-write", TestRingBuffer::test_read_write});
+	list.add({"read-write-wrap", TestRingBuffer::test_read_write_wrap});
+	list.add({"read-too-much", TestRingBuffer::test_read_too_much});
+	list.add({"write-too-much-middle", TestRingBuffer::test_write_too_much_middle});
+	list.add({"write-too-much-end", TestRingBuffer::test_write_too_much_end});
+	list.add({"read-write-ref", TestRingBuffer::test_read_write_ref});
+	list.add({"thread-safety", TestRingBuffer::test_thread_safety});
 	return list;
 }
 

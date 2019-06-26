@@ -20,29 +20,25 @@
 
 const float sqrt2 = (float)sqrt(2.0);
 
-TestMixer::TestMixer() : UnitTest("mixer")
-{
-}
+TestMixer::TestMixer() : UnitTest("mixer") {}
 
 
-Array<UnitTest::Test> TestMixer::tests()
-{
+Array<UnitTest::Test> TestMixer::tests() {
 	Array<Test> list;
-	list.add(Test("mix-stereo-1track-simple", TestMixer::test_mix_stereo_1track_simple));
-	list.add(Test("mix-stereo-1track-volume", TestMixer::test_mix_stereo_1track_volume));
-	list.add(Test("mix-stereo-1track-balance-right", TestMixer::test_mix_stereo_1track_balance_right));
-	list.add(Test("mix-stereo-1track-balance-left", TestMixer::test_mix_stereo_1track_balance_left));
-	//list.add(Test("mix-stereo-2track-simple", TestMixer::test_mix_stereo_2track_simple));
-	list.add(Test("mix-mono-1track-simple", TestMixer::test_mix_mono_1track_simple));
-	list.add(Test("mix-mono-1track-panning-right", TestMixer::test_mix_mono_1track_panning_right));
-	list.add(Test("mix-mono-1track-panning-left", TestMixer::test_mix_mono_1track_panning_left));
+	list.add({"mix-stereo-1track-simple", TestMixer::test_mix_stereo_1track_simple});
+	list.add({"mix-stereo-1track-volume", TestMixer::test_mix_stereo_1track_volume});
+	list.add({"mix-stereo-1track-balance-right", TestMixer::test_mix_stereo_1track_balance_right});
+	list.add({"mix-stereo-1track-balance-left", TestMixer::test_mix_stereo_1track_balance_left});
+	//list.add({"mix-stereo-2track-simple", TestMixer::test_mix_stereo_2track_simple});
+	list.add({"mix-mono-1track-simple", TestMixer::test_mix_mono_1track_simple});
+	list.add({"mix-mono-1track-panning-right", TestMixer::test_mix_mono_1track_panning_right});
+	list.add({"mix-mono-1track-panning-left", TestMixer::test_mix_mono_1track_panning_left});
 	return list;
 }
 
-Song* make_example_song(int num_tracks, int channels)
-{
+Song* make_example_song(int num_tracks, int channels) {
 	Song *s = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
-	for (int ti=0; ti<num_tracks; ti++){
+	for (int ti=0; ti<num_tracks; ti++) {
 		Track *t1 = s->add_track((channels == 1) ? SignalType::AUDIO_MONO : SignalType::AUDIO_STEREO);
 		AudioBuffer buf;
 		t1->layers[0]->get_buffers(buf, Range(0, 4));
@@ -57,10 +53,9 @@ Song* make_example_song(int num_tracks, int channels)
 	return s;
 }
 
-void TestMixer::test_mix_stereo_1track_simple()
-{
+void TestMixer::test_mix_stereo_1track_simple() {
 	Song *s = make_example_song(1, 2);
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -70,12 +65,11 @@ void TestMixer::test_mix_stereo_1track_simple()
 	delete s;
 }
 
-void TestMixer::test_mix_stereo_1track_volume()
-{
+void TestMixer::test_mix_stereo_1track_volume() {
 	Song *s = make_example_song(1, 2);
 	s->tracks[0]->set_volume(0.5);
 
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -85,12 +79,11 @@ void TestMixer::test_mix_stereo_1track_volume()
 	delete s;
 }
 
-void TestMixer::test_mix_stereo_1track_balance_right()
-{
+void TestMixer::test_mix_stereo_1track_balance_right() {
 	Song *s = make_example_song(1, 2);
 	s->tracks[0]->set_panning(1.0f);
 
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -101,12 +94,11 @@ void TestMixer::test_mix_stereo_1track_balance_right()
 	delete s;
 }
 
-void TestMixer::test_mix_stereo_1track_balance_left()
-{
+void TestMixer::test_mix_stereo_1track_balance_left() {
 	Song *s = make_example_song(1, 2);
 	s->tracks[0]->set_panning(-1.0f);
 
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -117,10 +109,9 @@ void TestMixer::test_mix_stereo_1track_balance_left()
 	delete s;
 }
 
-void TestMixer::test_mix_stereo_2track_simple()
-{
+void TestMixer::test_mix_stereo_2track_simple() {
 	/*Song *s = make_stereo_song();
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -131,10 +122,9 @@ void TestMixer::test_mix_stereo_2track_simple()
 	delete s;*/
 }
 
-void TestMixer::test_mix_mono_1track_simple()
-{
+void TestMixer::test_mix_mono_1track_simple() {
 	Song *s = make_example_song(1, 1);
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -146,12 +136,11 @@ void TestMixer::test_mix_mono_1track_simple()
 	delete s;
 }
 
-void TestMixer::test_mix_mono_1track_panning_right()
-{
+void TestMixer::test_mix_mono_1track_panning_right() {
 	Song *s = make_example_song(1, 1);
 	s->tracks[0]->set_panning(1.0f);
 
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);
@@ -163,12 +152,11 @@ void TestMixer::test_mix_mono_1track_panning_right()
 	delete s;
 }
 
-void TestMixer::test_mix_mono_1track_panning_left()
-{
+void TestMixer::test_mix_mono_1track_panning_left() {
 	Song *s = make_example_song(1, 1);
 	s->tracks[0]->set_panning(-1.0f);
 
-	SongRenderer* sr = new SongRenderer(s);
+	auto* sr = new SongRenderer(s);
 	sr->prepare(Range(0,4), false);
 	AudioBuffer buf;
 	buf.resize(4);

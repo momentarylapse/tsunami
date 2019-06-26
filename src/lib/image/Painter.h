@@ -15,11 +15,10 @@ class color;
 class rect;
 class complex;
 
-class Painter
-{
+class Painter {
 public:
-	Painter(){}
-	virtual ~Painter(){}
+	Painter() {}
+	virtual ~Painter() {}
 
 	virtual void _cdecl set_color(const color &c) = 0;
 	virtual void _cdecl set_font(const string &font, float size, bool bold, bool italic) = 0;
@@ -41,8 +40,9 @@ public:
 	virtual float _cdecl get_str_width(const string &str) = 0;
 	virtual void _cdecl draw_image(float x, float y, const Image &image) = 0;
 	virtual void _cdecl draw_mask_image(float x, float y, const Image &image) = 0;
-	int width, height;
-	float font_size;
+	int width = 0;
+	int height = 0;
+	float font_size = 12;
 	virtual rect area() = 0;
 	virtual rect clip() = 0;
 };

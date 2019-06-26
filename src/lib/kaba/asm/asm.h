@@ -492,7 +492,7 @@ class Exception : public ::Exception
 {
 public:
 	Exception(const string &message, const string &expression, int line, int column);
-	virtual ~Exception();
+	~Exception() override;
 	void print() const;
 	int line, column;
 };

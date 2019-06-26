@@ -14,8 +14,7 @@
 
 enum class ModuleType;
 
-class TestPlugins : public UnitTest
-{
+class TestPlugins : public UnitTest {
 public:
 	TestPlugins();
 

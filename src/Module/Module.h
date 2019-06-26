@@ -68,7 +68,7 @@ public:
 	Module(ModuleType type, const string &sub_type);
 	virtual ~Module();
 	void _cdecl __init__(ModuleType type, const string &sub_type);
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	void set_session_etc(Session *session, const string &sub_type);
 

@@ -12,34 +12,15 @@
 #include "Toolbar.h"
 
 
-namespace hui
-{
+namespace hui {
 
 
 Array<Window*> _all_windows_;
 
 Window *CurWindow = nullptr;
 
-// recursively find a menu item and execute message_function
-/*bool TestMenuID(CHuiMenu *menu, const string &id, message_function *mf)
-{
-	if (!menu)
-		return false;
-	for (int i=0;i<menu->Item.num;i++){
-		if (menu->Item[i].ID==id){
-			mf(id);
-			return true;
-		}
-		if (menu->Item[i].SubMenu)
-			if (TestMenuID(menu->Item[i].SubMenu,id,mf))
-				return true;
-	}
-	return false;
-}*/
 
-
-void InputData::reset()
-{
+void InputData::reset() {
 	x = y = dx = dy = scroll_x = scroll_y = 0;
 	lb = mb = rb = false;
 	memset(key, 0, sizeof(key));
@@ -48,27 +29,23 @@ void InputData::reset()
 	just_focused = false;
 }
 
-Window::Window()
-{
+Window::Window() {
 	_init_("", 0, 0, nullptr, true, WIN_MODE_DUMMY);
 }
 
-Window::Window(const string &title, int width, int height)
-{
+Window::Window(const string &title, int width, int height) {
 	_init_(title, width, height, nullptr, true, 0);
 }
 
-void Window::__init_ext__(const string& title, int width, int height)
-{
+void Window::__init_ext__(const string& title, int width, int height) {
 	new(this) Window(title, width, height);
 }
 
 
 // resource constructor
-Window::Window(const string &id, Window *parent)
-{
+Window::Window(const string &id, Window *parent) {
 	Resource *res = GetResource(id);
-	if (!res){
+	if (!res) {
 		msg_error("Window: undefined resource id: " + id);
 		return;
 	}
@@ -77,17 +54,16 @@ Window::Window(const string &id, Window *parent)
 	set_from_resource(res);
 }
 
-void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
-{
+void Window::_init_generic_(Window *_root, bool _allow_root, int _mode) {
 	_MakeUsable_();
 	_all_windows_.add(this);
 
 	allowed = true;
 	allow_keys = true;
-	parent = _root;
+	parent_window = _root;
 	main_input_control = nullptr;
-	if (parent){
-		parent->allowed = _allow_root;
+	if (parent_window) {
+		parent_window->allowed = _allow_root;
 	}
 	menu = popup = nullptr;
 	statusbar_enabled = false;
@@ -100,8 +76,7 @@ void Window::_init_generic_(Window *_root, bool _allow_root, int _mode)
 	allow_input = false; // allow only if ->Show() was called
 }
 
-void Window::_clean_up_()
-{
+void Window::_clean_up_() {
 	for (int i=0; i<4; i++)
 		delete(toolbar[i]);
 
@@ -110,15 +85,14 @@ void Window::_clean_up_()
 	
 	// unregister window
 	for (int i=0;i<_all_windows_.num;i++)
-		if (_all_windows_[i] == this){
+		if (_all_windows_[i] == this) {
 			_all_windows_.erase(i);
 			break;
 		}
 }
 
 // default handler when trying to close the windows
-void Window::on_close_request()
-{
+void Window::on_close_request() {
 	destroy();
 	
 	// no message function (and last window): end program
@@ -129,16 +103,14 @@ void Window::on_close_request()
 
 
 // identify window (for automatic title assignment with language strings)
-void Window::set_id(const string &_id)
-{
+void Window::set_id(const string &_id) {
 	id = _id;
 	if (_using_language_ and (id.num > 0))
 		set_title(GetLanguage(id, id));
 }
 
 // align window relative to another window (like..."top right corner")
-void Window::set_position_special(Window *win,int mode)
-{
+void Window::set_position_special(Window *win,int mode) {
 	int pw, ph, cw, ch, px, py, cx, cy;
 	win->get_size(pw, ph);
 	win->get_position(px, py);
@@ -155,18 +127,15 @@ void Window::set_position_special(Window *win,int mode)
 	set_position(cx, cy);
 }
 
-Menu *Window::get_menu()
-{
+Menu *Window::get_menu() {
 	return menu;
 }
 
-Window *Window::get_parent()
-{
-	return parent;
+Window *Window::get_parent() {
+	return parent_window;
 }
 
-bool Window::get_key(int k)
-{
+bool Window::get_key(int k) {
 	if (k == KEY_CONTROL)
 		return (input.key[KEY_RCONTROL] or input.key[KEY_LCONTROL]);
 	else if (k == KEY_SHIFT)
@@ -175,29 +144,19 @@ bool Window::get_key(int k)
 		return input.key[k];
 }
 
-bool Window::get_mouse(int &x, int &y, int button)
-{
+bool Window::get_mouse(int &x, int &y, int button) {
 	x = (int)input.x;
 	y = (int)input.y;
-	if (button == 0){
+	if (button == 0) {
 		return input.lb;
-	}else if (button == 1){
+	} else if (button == 1) {
 		return input.mb;
-	}else{
+	} else {
 		return input.rb;
 	}
 }
 
 
-
-void FuncIgnore()
-{
-}
-
-void FuncClose()
-{
-	GetEvent()->win->destroy();
-}
 
 NixWindow::NixWindow(const string& title, int width, int height) :
 	Window(title, width, height)
@@ -205,25 +164,21 @@ NixWindow::NixWindow(const string& title, int width, int height) :
 	add_drawing_area("!opengl", 0, 0, "nix-area");
 }
 
-void NixWindow::__init_ext__(const string& title, int width, int height)
-{
+void NixWindow::__init_ext__(const string& title, int width, int height) {
 	new(this) NixWindow(title, width, height);
 }
 
-Dialog::Dialog(const string& title, int width, int height, Window* parent, bool allow_parent)
-{
+Dialog::Dialog(const string& title, int width, int height, Window* parent, bool allow_parent) {
 	_init_(title, width, height, parent, allow_parent, 0);
 }
 
-void Dialog::__init_ext__(const string& title, int width, int height, Window* parent, bool allow_parent)
-{
+void Dialog::__init_ext__(const string& title, int width, int height, Window* parent, bool allow_parent) {
 	new(this) Dialog(title, width, height, parent, allow_parent);
 }
 
 
 
-SourceWindow::SourceWindow(const string &buffer, Window *parent)
-{
+SourceWindow::SourceWindow(const string &buffer, Window *parent) {
 	_init_("", 300, 200, parent, buffer.find("allow-parent"), 0);
 	from_source(buffer);
 }

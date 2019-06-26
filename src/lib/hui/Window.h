@@ -16,8 +16,7 @@
 class rect;
 class Painter;
 
-namespace hui
-{
+namespace hui {
 
 class Menu;
 class Event;
@@ -27,8 +26,7 @@ class Toolbar;
 class ResourceNew;
 
 
-struct CompleteWindowMessage
-{
+struct CompleteWindowMessage {
 	#ifdef HUI_API_WIN
 		unsigned int msg,wparam,lparam;
 	#endif
@@ -36,8 +34,7 @@ struct CompleteWindowMessage
 
 
 // user input
-struct InputData
-{
+struct InputData {
 	// mouse
 	float x, y, dx, dy, scroll_x, scroll_y;	// position, change
 	bool inside, inside_smart;
@@ -61,8 +58,7 @@ class ControlRadioButton;
 class ControlGroup;
 class ControlExpander;
 
-class Window : public Panel
-{
+class Window : public Panel {
 	friend class Toolbar;
 	friend class Control;
 	friend class ControlTabControl;
@@ -79,7 +75,7 @@ public:
 	Window(const string &id, Window *parent);
 	void _cdecl __init_ext__(const string &title, int width, int height);
 	virtual ~Window();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	void _init_(const string &title, int width, int height, Window *parent, bool allow_parent, int mode);
 	void _init_generic_(Window *parent, bool allow_parent, int mode);
@@ -174,26 +170,23 @@ private:
 	GtkWidget *vbox, *hbox, *menubar, *statusbar, *infobar;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
-	int desired_width, desired_height;
 #endif
 	
 protected:
 	Menu *menu, *popup;
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
-	Window *parent;
+	Window *parent_window;
 };
 
 
-class NixWindow : public Window
-{
+class NixWindow : public Window {
 public:
 	NixWindow(const string &title, int width, int height);
 	void _cdecl __init_ext__(const string &title, int width, int height);
 };
 
-class Dialog : public Window
-{
+class Dialog : public Window {
 public:
 	Dialog(const string &title, int width, int height, Window *parent, bool allow_parent);
 	void _cdecl __init_ext__(const string &title, int width, int height, Window *parent, bool allow_parent);
@@ -202,22 +195,19 @@ public:
 extern Window *CurWindow;
 
 
-class SourceWindow : public Window
-{
+class SourceWindow : public Window {
 public:
 	SourceWindow(const string &source, Window *parent);
 	void _cdecl __init_ext__(const string &source, Window *parent);
 };
 
 
-void FuncIgnore();
-void FuncClose();
 
-enum{
+enum {
 	WIN_MODE_DUMMY = 16,
 };
 
-enum{
+enum {
 	HUI_LEFT = 1,
 	HUI_RIGHT = 2,
 	HUI_TOP = 4,
@@ -227,7 +217,7 @@ enum{
 
 
 // which one of the toolbars?
-enum{
+enum {
 	TOOLBAR_TOP,
 	TOOLBAR_BOTTOM,
 	TOOLBAR_LEFT,

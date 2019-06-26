@@ -25,7 +25,7 @@ public:
 	virtual ~SignalChain();
 
 	void _cdecl __init__(Session *session, const string &name);
-	void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	static const string MESSAGE_ADD_MODULE;
 	static const string MESSAGE_DELETE_MODULE;
@@ -87,8 +87,8 @@ public:
 	bool is_paused();
 	bool is_playback_active();
 
-	int get_pos();
-	void set_pos(int pos);
+	int get_pos() override;
+	void set_pos(int pos) override;
 
 
 	void set_buffer_size(int size);

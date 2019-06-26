@@ -10,8 +10,7 @@
 
 #include "UnitTest.h"
 
-class TestInterpolator : public UnitTest
-{
+class TestInterpolator : public UnitTest {
 public:
 	TestInterpolator();
 

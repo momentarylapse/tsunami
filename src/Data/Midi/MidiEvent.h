@@ -16,7 +16,7 @@ class MidiEvent
 public:
 	MidiEvent(){}
 	MidiEvent(int pos, float pitch, float volume);
-	MidiEvent(const MidiNote *n);
+	explicit MidiEvent(const MidiNote *n);
 	int pos;
 	float pitch;
 	float volume;

@@ -17,7 +17,7 @@ class Session;
 
 class Data : public Observable<VirtualBase> {
 public:
-	Data(Session *session);
+	explicit Data(Session *session);
 	virtual ~Data();
 
 	static const string MESSAGE_FINISHED_LOADING;

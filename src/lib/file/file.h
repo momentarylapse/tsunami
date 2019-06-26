@@ -42,8 +42,7 @@
 //--------------------------------------------------------------
 // time/date
 
-struct Date
-{
+struct Date {
 	int time;
 	int year, month, day, hour, minute, second, milli_second;
 	int day_of_week, day_of_year;
@@ -55,10 +54,9 @@ Date _cdecl get_current_date();
 
 
 
-class FileError : public Exception
-{
+class FileError : public Exception {
 public:
-	FileError(const string &msg):Exception(msg){}
+	explicit FileError(const string &msg):Exception(msg){}
 };
 
 
@@ -69,8 +67,7 @@ typedef bool t_file_try_again_func(const string &filename);
 
 extern t_file_try_again_func *FileTryAgainFunc;
 
-class File
-{
+class File {
 public:
 	File();
 	virtual ~File();

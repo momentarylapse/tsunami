@@ -12,13 +12,12 @@
 
 class Song;
 
-class Action__ShiftData: public Action
-{
+class Action__ShiftData: public Action {
 public:
 	Action__ShiftData(int offset, int shift, int mode);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 	void do_shift(Song *s, int delta);
 

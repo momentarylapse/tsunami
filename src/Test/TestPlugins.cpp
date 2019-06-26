@@ -17,6 +17,7 @@
 #include "../Module/SignalChain.h"
 #include "../Plugins/TsunamiPlugin.h"
 #include "../Plugins/PluginManager.h"
+#include "../Plugins/Plugin.h"
 #include "../Session.h"
 
 TestPlugins::TestPlugins() : UnitTest("plugins") {
@@ -27,32 +28,31 @@ Array<UnitTest::Test> TestPlugins::tests() {
 	Array<Test> list;
 	auto *pm = Session::GLOBAL->plugin_manager;
 	for (auto &pf: pm->plugin_files)
-		list.add(Test("compile:" + pf.filename, [pf]{ test_compile(pf.type, pf.filename); }));
+		list.add({"compile:" + pf.filename, [pf]{ test_compile(pf.type, pf.filename); }});
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_EFFECT);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")
-			list.add(Test("audio-effect:" + name, [name]{ test_audio_effect(name); }));
+			list.add({"audio-effect:" + name, [name]{ test_audio_effect(name); }});
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::AUDIO_SOURCE);
 	for (auto &name: names)
-		list.add(Test("audio-source:" + name, [name]{ test_audio_source(name); }));
+		list.add({"audio-source:" + name, [name]{ test_audio_source(name); }});
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_EFFECT);
 	for (auto &name: names)
-		list.add(Test("midi-effect:" + name, [name]{ test_midi_effect(name); }));
+		list.add({"midi-effect:" + name, [name]{ test_midi_effect(name); }});
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::MIDI_SOURCE);
 	for (auto &name: names)
-		list.add(Test("midi-source:" + name, [name]{ test_midi_source(name); }));
+		list.add({"midi-source:" + name, [name]{ test_midi_source(name); }});
 
 	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleType::SYNTHESIZER);
 	for (auto &name: names)
-		list.add(Test("synthesizer:" + name, [name]{ test_synthesizer(name); }));
+		list.add({"synthesizer:" + name, [name]{ test_synthesizer(name); }});
 
-	//list.add(Test("tsunami-plugins", TestPlugins::test_tsunami_plugin));
+	//list.add({"tsunami-plugins", TestPlugins::test_tsunami_plugin});
 	return list;
 }
 
-#include "../Plugins/Plugin.h"
 
 void TestPlugins::test_compile(ModuleType type, const string &filename) {
 	Plugin *p = Session::GLOBAL->plugin_manager->load_and_compile_plugin(type, filename);

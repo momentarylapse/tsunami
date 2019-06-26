@@ -14,21 +14,17 @@
 #include "../Session.h"
 #include <thread>
 
-TestMidiPreview::TestMidiPreview() : UnitTest("midi-preview")
-{
-}
+TestMidiPreview::TestMidiPreview() : UnitTest("midi-preview") {}
 
 
 
-Array<UnitTest::Test> TestMidiPreview::tests()
-{
+Array<UnitTest::Test> TestMidiPreview::tests() {
 	Array<Test> list;
-	list.add(Test("preview", TestMidiPreview::test_preview));
+	list.add({"preview", TestMidiPreview::test_preview});
 	return list;
 }
 
-void TestMidiPreview::test_preview()
-{
+void TestMidiPreview::test_preview() {
 	auto *synth = CreateSynthesizer(Session::GLOBAL, "");
 	auto *preview = new MidiPreview(Session::GLOBAL, synth);
 	msg_write("start");

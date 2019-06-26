@@ -40,7 +40,7 @@ public:
 	};
 
 	Instrument();
-	Instrument(Type type);
+	explicit Instrument(Type type);
 
 	Type type;
 	Array<int> string_pitch;

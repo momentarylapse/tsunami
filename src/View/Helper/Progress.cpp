@@ -17,7 +17,7 @@ Progress::Progress(const string &str, hui::Window *parent)
 	allow_next = 0;
 	if (parent){
 		dlg = hui::CreateResourceDialog("progress_dialog", parent);
-		dlg->event("hui:close", &hui::FuncIgnore);
+		dlg->event("hui:close", [=]{}); // ignore
 		set(str, 0);
 		dlg->show();
 	}

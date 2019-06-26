@@ -11,7 +11,7 @@
 
 #include "../lib/base/base.h"
 
-namespace Kaba{
+namespace Kaba {
 	class Script;
 	class Class;
 };
@@ -19,13 +19,12 @@ class Session;
 class Module;
 
 
-class ModuleConfiguration : public VirtualBase
-{
+class ModuleConfiguration : public VirtualBase {
 public:
 	ModuleConfiguration(){ _module = nullptr; _class = nullptr; }
 	virtual ~ModuleConfiguration(){}
 	void _cdecl __init__();
-	virtual void _cdecl __delete__();
+	void _cdecl __delete__() override;
 	virtual void _cdecl reset(){}
 	virtual string to_string() const;
 	virtual void from_string(const string &s, Session *session);

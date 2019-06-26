@@ -45,7 +45,7 @@ public:
 	virtual ~Song();
 
 	void _cdecl __init__(Session *session, int sample_rate);
-	void _cdecl __delete__();
+	void _cdecl __delete__() override;
 
 	Range _cdecl range();
 	Range _cdecl range_with_time();
@@ -70,7 +70,7 @@ public:
 
 	class Exception {
 	public:
-		Exception(const string &message);
+		explicit Exception(const string &message);
 		string message;
 	};
 
@@ -127,7 +127,6 @@ public:
 	Sample* _cdecl get_sample_by_uid(int uid);
 
 // data
-	string filename;
 	Array<Tag> tags;
 	int sample_rate;
 	SampleFormat default_format;

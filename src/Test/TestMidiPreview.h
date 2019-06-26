@@ -12,8 +12,7 @@
 
 #include "UnitTest.h"
 
-class TestMidiPreview: public UnitTest
-{
+class TestMidiPreview: public UnitTest {
 public:
 	TestMidiPreview();
 

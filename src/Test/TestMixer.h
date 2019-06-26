@@ -12,8 +12,7 @@
 
 #include "UnitTest.h"
 
-class TestMixer : public UnitTest
-{
+class TestMixer : public UnitTest {
 public:
 	TestMixer();
 

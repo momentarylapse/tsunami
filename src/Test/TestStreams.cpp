@@ -21,8 +21,8 @@ TestStreams::TestStreams() : UnitTest("streams") {
 
 Array<UnitTest::Test> TestStreams::tests() {
 	Array<Test> list;
-	list.add(Test("output", TestStreams::test_output_stream));
-	list.add(Test("input", TestStreams::test_input_stream));
+	list.add({"output", TestStreams::test_output_stream});
+	list.add({"input", TestStreams::test_input_stream});
 	return list;
 }
 

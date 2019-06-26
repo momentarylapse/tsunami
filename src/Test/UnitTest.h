@@ -15,28 +15,22 @@
 
 class AudioBuffer;
 
-class UnitTest
-{
+class UnitTest {
 public:
-	UnitTest(const string &name);
+	explicit UnitTest(const string &name);
 	virtual ~UnitTest();
 
 	string name;
 
-	struct TestProtocoll
-	{
+	struct TestProtocoll {
 		int num_tests_run = 0;
 		int num_failed = 0;
 	};
 
-	class Test
-	{
+	class Test {
 	public:
 		string name;
 		std::function<void()> f;
-		Test(){}
-		Test(const string &_name, std::function<void()> _f)
-		{ name = _name; f = _f; }
 	};
 	virtual Array<Test> tests() = 0;
 
@@ -46,10 +40,9 @@ public:
 
 	//void assert(bool )
 
-	class Failure : public Exception
-	{
+	class Failure : public Exception {
 	public:
-		Failure(const string &s) : Exception(s){}
+		Failure(const string &s) : Exception(s) {}
 	};
 	/*template<class T>
 	static void assert_equal(const T &a, const T&b, const string &text)

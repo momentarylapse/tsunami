@@ -12,8 +12,7 @@
 
 #include "UnitTest.h"
 
-class TestAudioBuffer : public UnitTest
-{
+class TestAudioBuffer : public UnitTest {
 public:
 	TestAudioBuffer();
 

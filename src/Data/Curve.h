@@ -33,7 +33,7 @@ public:
 		string temp_name;
 		string temp_name_nice;
 		Target();
-		Target(float *p);
+		explicit Target(float *p);
 		Target(float *p, const string &name, const string &name_nice);
 		void from_string(const string &str, Song *a);
 		string str(Song *s) const;

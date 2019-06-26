@@ -91,22 +91,22 @@ static void on_gtk_window_resize(GtkWidget *widget, gpointer user_data)
 
 // general window
 
-void Window::_init_(const string &title, int width, int height, Window *root, bool allow_root, int mode)
+void Window::_init_(const string &title, int width, int height, Window *parent, bool allow_parent, int mode)
 {
 	window = nullptr;
 	win = this;
 	if ((mode & WIN_MODE_DUMMY) > 0)
 		return;
 
-	_init_generic_(root, allow_root, mode);
+	_init_generic_(parent, allow_parent, mode);
 
 	// creation
 	if (parent){
 		//window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		//gtk_window_set_modal(GTK_WINDOW(window), !allow_root);
+		//gtk_window_set_modal(GTK_WINDOW(window), !allow_parent);
 		
 		window = gtk_dialog_new();
-		if (!allow_root)
+		if (!allow_parent)
 			gtk_window_set_modal(GTK_WINDOW(window), true);//false);
 		// TODO GTK3
 		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);

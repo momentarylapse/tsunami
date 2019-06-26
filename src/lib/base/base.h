@@ -15,16 +15,14 @@
 #endif
 
 template<class T>
-inline const T& max(const T &a, const T &b)
-{
+inline const T& max(const T &a, const T &b) {
 	if (a > b)
 		return a;
 	return b;
 }
 
 template<class T>
-inline const T& min(const T &a, const T &b)
-{
+inline const T& min(const T &a, const T &b) {
 	if (a > b)
 		return b;
 	return a;
@@ -33,8 +31,7 @@ inline const T& min(const T &a, const T &b)
 
 // base class for classes with virtual functions
 //  -> compatibility with kaba
-class VirtualBase
-{
+class VirtualBase {
 public:
 	virtual ~VirtualBase(){}
 	virtual void _cdecl __delete__(){}
@@ -58,11 +55,10 @@ public:
 
 
 // strings.cpp
-class Exception : public VirtualBase
-{
+class Exception : public VirtualBase {
 public:
 	Exception(){}
-	Exception(const string &msg){ text = msg; }
+	explicit Exception(const string &msg){ text = msg; }
 	virtual ~Exception(){}
 	virtual string message() const { return text; }
 	string text;

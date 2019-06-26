@@ -12,8 +12,7 @@
 
 class Data;
 
-class Action
-{
+class Action {
 public:
 	Action(){}
 	virtual ~Action(){}

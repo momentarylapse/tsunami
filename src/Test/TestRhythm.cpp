@@ -19,11 +19,11 @@ TestRhythm::TestRhythm() : UnitTest("rhythm")
 Array<UnitTest::Test> TestRhythm::tests()
 {
 	Array<Test> list;
-	list.add(Test("bar-simple-no-partition", TestRhythm::test_bar_simple_no_partition));
-	list.add(Test("bar-simple-partition-2", TestRhythm::test_bar_simple_partition_2));
-	list.add(Test("bar-complex-no-partition", TestRhythm::test_bar_complex_no_partition));
-	list.add(Test("bar-complex-partition-1", TestRhythm::test_bar_complex_partition_1));
-	list.add(Test("bar-complex-partition-2", TestRhythm::test_bar_complex_partition_2));
+	list.add({"bar-simple-no-partition", TestRhythm::test_bar_simple_no_partition});
+	list.add({"bar-simple-partition-2", TestRhythm::test_bar_simple_partition_2});
+	list.add({"bar-complex-no-partition", TestRhythm::test_bar_complex_no_partition});
+	list.add({"bar-complex-partition-1", TestRhythm::test_bar_complex_partition_1});
+	list.add({"bar-complex-partition-2", TestRhythm::test_bar_complex_partition_2});
 	return list;
 }
 

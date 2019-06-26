@@ -18,12 +18,11 @@ class MiniBar;
 class Session;
 class Tsunami;
 
-class TsunamiWindow : public hui::Window
-{
+class TsunamiWindow : public hui::Window {
 public:
 	TsunamiWindow(Session *session);
 	virtual ~TsunamiWindow();
-	virtual void on_destroy();
+	void on_destroy() override;
 
 	void on_help();
 	void on_about();

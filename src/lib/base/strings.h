@@ -9,8 +9,7 @@
 //--------------------------------------------------------------
 // cool string class
 
-class string : public Array<char>
-{
+class string : public Array<char> {
 	public:
 
 	// constructors
@@ -119,7 +118,7 @@ class string : public Array<char>
 // string operations
 
 
-string _cdecl format(const string s, ...);
+string _cdecl format(const string &s, ...);
 string _cdecl i2s(int i);
 string _cdecl i642s(long long i);
 string _cdecl i2s2(int i, int l);

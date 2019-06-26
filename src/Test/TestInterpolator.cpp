@@ -19,10 +19,10 @@ TestInterpolator::TestInterpolator() : UnitTest("interpolator")
 Array<UnitTest::Test> TestInterpolator::tests()
 {
 	Array<Test> list;
-	list.add(Test("linear-short", TestInterpolator::test_linear_short));
-	list.add(Test("linear", TestInterpolator::test_linear));
-	list.add(Test("cubic", TestInterpolator::test_cubic));
-	list.add(Test("fourier", TestInterpolator::test_fourier));
+	list.add({"linear-short", TestInterpolator::test_linear_short});
+	list.add({"linear", TestInterpolator::test_linear});
+	list.add({"cubic", TestInterpolator::test_cubic});
+	list.add({"fourier", TestInterpolator::test_fourier});
 	return list;
 }
 

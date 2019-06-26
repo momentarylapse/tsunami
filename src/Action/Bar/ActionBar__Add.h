@@ -12,13 +12,12 @@
 
 class Bar;
 
-class ActionBar__Add: public Action
-{
+class ActionBar__Add: public Action {
 public:
 	ActionBar__Add(int index, Bar *bar);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	int index;

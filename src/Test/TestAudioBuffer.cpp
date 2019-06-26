@@ -18,12 +18,12 @@ TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer")
 Array<UnitTest::Test> TestAudioBuffer::tests()
 {
 	Array<Test> list;
-	list.add(Test("resize", TestAudioBuffer::test_resize));
-	list.add(Test("append", TestAudioBuffer::test_append));
-	list.add(Test("set", TestAudioBuffer::test_set));
-	list.add(Test("scale", TestAudioBuffer::test_scale));
-	list.add(Test("ref", TestAudioBuffer::test_ref));
-	list.add(Test("ref-write", TestAudioBuffer::test_ref_write));
+	list.add({"resize", TestAudioBuffer::test_resize});
+	list.add({"append", TestAudioBuffer::test_append});
+	list.add({"set", TestAudioBuffer::test_set});
+	list.add({"scale", TestAudioBuffer::test_scale});
+	list.add({"ref", TestAudioBuffer::test_ref});
+	list.add({"ref-write", TestAudioBuffer::test_ref_write});
 	return list;
 }
 

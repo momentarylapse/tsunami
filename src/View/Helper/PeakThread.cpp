@@ -75,6 +75,7 @@ void PeakThread::update_song() {
 	for (Track *t: song->tracks)
 		update_track(t);
 	for (Sample *s: song->samples)
-		update_buffer(*s->buf);
+		if (s->buf)
+			update_buffer(*s->buf);
 }
 

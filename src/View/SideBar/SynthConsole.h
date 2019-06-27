@@ -11,12 +11,12 @@
 #include "SideBar.h"
 
 class Track;
+class ModulePanel;
 
-class SynthConsole : public SideBarConsole
-{
+class SynthConsole : public SideBarConsole {
 public:
 	SynthConsole(Session *session);
-	virtual ~SynthConsole();
+	~SynthConsole() override;
 
 	void clear();
 	void set_track(Track *t);
@@ -27,14 +27,13 @@ public:
 	void on_edit_song();
 	void on_edit_track();
 
-	void on_synth_delete();
 	void on_track_delete();
 	void on_track_change();
 	void on_view_cur_track_change();
 
 	string id_inner;
 
-	hui::Panel *panel;
+	ModulePanel *panel;
 
 	Track *track;
 };

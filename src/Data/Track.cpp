@@ -239,12 +239,14 @@ void Track::edit_synthesizer(const string &param_old) {
 	song->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
-void Track::detune_synthesizer(int pitch, float dpitch, bool all_octaves) {
-	song->execute(new ActionTrackDetuneSynthesizer(this, pitch, dpitch, all_octaves));
+void Track::detune_synthesizer(const float tuning[MAX_PITCH]) {
+	song->execute(new ActionTrackDetuneSynthesizer(this, tuning));
 }
 
 TrackMarker *Track::add_marker(const Range &range, const string &text) {
-	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, new TrackMarker({range, text})));
+	auto *m = new TrackMarker({range, text});
+	song->execute(new ActionTrackAddMarker(this, m));
+	return m;
 }
 
 void Track::delete_marker(const TrackMarker *marker) {
@@ -258,7 +260,9 @@ void Track::edit_marker(const TrackMarker *marker, const Range &range, const str
 }
 
 TrackLayer *Track::add_layer() {
-	return (TrackLayer*)song->execute(new ActionTrackLayerAdd(this, new TrackLayer(this)));
+	auto *layer = new TrackLayer(this);
+	song->execute(new ActionTrackLayerAdd(this, layer));
+	return layer;
 }
 
 void Track::delete_layer(TrackLayer *layer) {

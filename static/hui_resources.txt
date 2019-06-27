@@ -547,7 +547,7 @@ track_list
 // Resource
 Dialog
 detune_synthesizer_dialog
-width=400,height=400
+width=800,height=500
 0
 0
 1
@@ -7272,7 +7272,7 @@ popup_fx_menu/save_favorite
 Save parameters
 
 popup_fx_menu/show_external
-Open dialog window
+External window
 
 popup_fx_menu/show_large
 Show large
@@ -7712,7 +7712,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-897
+898
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -9378,6 +9378,9 @@ Parameter laden
 
 popup_fx_menu/save_favorite
 Parameter speichern
+
+popup_fx_menu/show_external
+Externes Fenster
 
 popup_fx_menu/show_large
 Groß...

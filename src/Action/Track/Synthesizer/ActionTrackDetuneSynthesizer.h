@@ -12,17 +12,16 @@
 #include "../../../Module/Synth/Synthesizer.h"
 class Track;
 
-class ActionTrackDetuneSynthesizer: public Action
-{
+class ActionTrackDetuneSynthesizer: public Action {
 public:
-	ActionTrackDetuneSynthesizer(Track *t, int pitch, float dpitch, bool all_octaves);
+	ActionTrackDetuneSynthesizer(Track *t, const float tuning[MAX_PITCH]);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
-	int track_no;
-	Synthesizer::Tuning tuning;
+	Track *track;
+	float tuning[MAX_PITCH];
 };
 
 #endif /* SRC_ACTION_TRACK_SYNTHESIZER_ACTIONTRACKDETUNESYNTHESIZER_H_ */

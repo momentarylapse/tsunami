@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-898
+899
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2696,6 +2696,9 @@ Ziel
 
 track-routing-dialog/t-track
 Spur
+
+popup_fx_menu/show_external
+Externes Fenster
 
 // Num Language Strings
 239

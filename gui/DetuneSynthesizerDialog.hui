@@ -1,4 +1,4 @@
-Dialog detune_synthesizer_dialog "Verstimmung" width=400 height=400
+Dialog detune_synthesizer_dialog "Verstimmung" width=800 height=500
 	Grid ? "" vertical
 		DrawingArea detune_area "" expandx expandy
 		Grid ? "" buttonbar

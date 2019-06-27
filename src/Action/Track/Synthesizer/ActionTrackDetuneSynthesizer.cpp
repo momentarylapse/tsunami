@@ -11,37 +11,21 @@
 #include "../../../Data/Track.h"
 #include "../../../Module/Synth/Synthesizer.h"
 
-ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, int pitch, float dpitch, bool all_octaves)
-{
-	track_no = t->get_index();
-	tuning = t->synth->tuning;
-
-	if (all_octaves){
-		for (int i=(pitch % 12); i<MAX_PITCH; i+=12)
-			tuning.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
-	}else
-		tuning.freq[pitch] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
+ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, const float _tuning[MAX_PITCH]) {
+	track = t;
+	memcpy(tuning, _tuning, sizeof(tuning));
 }
 
-void *ActionTrackDetuneSynthesizer::execute(Data *d)
-{
-	Song *a = dynamic_cast<Song*>(d);
+void *ActionTrackDetuneSynthesizer::execute(Data *d) {
+	for (int i=0; i<MAX_PITCH; i++)
+		std::swap(track->synth->tuning.freq[i], tuning[i]);
+	track->synth->update_delta_phi();
 
-	assert((track_no >= 0) and (track_no <= a->tracks.num));
+	track->synth->Observable::notify(track->synth->MESSAGE_CHANGE_BY_ACTION);
 
-	Track *t = a->tracks[track_no];
-
-	Synthesizer::Tuning temp = tuning;
-	tuning = t->synth->tuning;
-	t->synth->tuning = temp;
-	t->synth->update_delta_phi();
-
-	t->synth->Observable::notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
-
-	return t;
+	return nullptr;
 }
 
-void ActionTrackDetuneSynthesizer::undo(Data *d)
-{
+void ActionTrackDetuneSynthesizer::undo(Data *d) {
 	execute(d);
 }

@@ -15,7 +15,7 @@
 const int RELATIVE_NUM_PITCHES = 6;
 
 DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *v, hui::Window *parent) :
-	hui::Dialog("", 500, 550, parent, false)
+	hui::Dialog("", 800, 550, parent, false)
 {
 	from_resource("detune_synthesizer_dialog");
 
@@ -36,12 +36,7 @@ DetuneSynthesizerDialog::DetuneSynthesizerDialog(Synthesizer *s, Track *t, Audio
 	event("relative", [=]{ on_relative(); });
 }
 
-DetuneSynthesizerDialog::~DetuneSynthesizerDialog()
-{
-}
-
-void DetuneSynthesizerDialog::on_draw(Painter *p)
-{
+void DetuneSynthesizerDialog::on_draw(Painter *p) {
 	p->set_line_width(0.8f);
 	p->set_font_size(12);
 	float w = p->width;
@@ -52,8 +47,8 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 	p->set_color(view->colors.background);
 	p->draw_rect(0, 0, w, h);
 
-	if (hover >= 0){
-		if (is_checked("all_octaves")){
+	if (hover >= 0) {
+		if (is_checked("all_octaves")) {
 			color c = ColorInterpolate(view->colors.background, view->colors.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MAX_PITCH; i+=12)
@@ -66,17 +61,17 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 
 	// grid
 	p->set_color(view->colors.text_soft3);
-	for (int i=1; i<MAX_PITCH; i++){
+	for (int i=1; i<MAX_PITCH; i++) {
 		float x = pitch2x(i);
 		p->draw_line(x, 0, x, h);
 	}
-	if (mode_relative){
-		for (int i=-RELATIVE_NUM_PITCHES; i<=RELATIVE_NUM_PITCHES; i++){
+	if (mode_relative) {
+		for (int i=-RELATIVE_NUM_PITCHES; i<=RELATIVE_NUM_PITCHES; i++) {
 			float y = relpitch2y(i, 0);
 			p->draw_line(0, y, w, y);
 		}
-	}else{
-		for (int i=0; i<=MAX_PITCH; i++){
+	} else {
+		for (int i=0; i<=MAX_PITCH; i++) {
 			float y = pitch2y(i);
 			p->draw_line(0, y, w, y);
 		}
@@ -85,9 +80,9 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 
 	// reference
 	p->set_color(view->colors.preview_marker);
-	for (int i=0; i<MAX_PITCH; i++){
+	for (int i=0; i<MAX_PITCH; i++) {
 		float y = pitch2y(i);
-		if (mode_relative){
+		if (mode_relative) {
 			y = relpitch2y(i, i);
 		}
 		float x0 = pitch2x(i);
@@ -99,9 +94,9 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 	// current tuning
 	p->set_line_width(2.0f);
 	p->set_color(view->colors.capture_marker);
-	for (int i=0; i<MAX_PITCH; i++){
+	for (int i=0; i<MAX_PITCH; i++) {
 		float y = pitch2y(freq_to_pitch(synth->tuning.freq[i]));
-		if (mode_relative){
+		if (mode_relative) {
 			y = relpitch2y(freq_to_pitch(synth->tuning.freq[i]), i);
 		}
 		float x0 = pitch2x(i);
@@ -111,38 +106,54 @@ void DetuneSynthesizerDialog::on_draw(Painter *p)
 	p->set_line_width(1.0f);
 
 
-	if (hover >= 0){
+	if (hover >= 0) {
 		p->set_color(view->colors.text);
 		p->draw_str(20, 17, pitch_name(hover));
 		p->draw_str(70, 17, format("%+.2f semi tones", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}
 }
 
-float DetuneSynthesizerDialog::pitch2x(float p)
-{
+float DetuneSynthesizerDialog::pitch2x(float p) {
 	return width * p / MAX_PITCH;
 }
 
-float DetuneSynthesizerDialog::pitch2y(float p)
-{
-	return height - height * (p + 5) / (MAX_PITCH + 10);
+float DetuneSynthesizerDialog::pitch2y(float p) {
+	return height * (1 - (p + 5) / (MAX_PITCH + 10));
 }
 
-float DetuneSynthesizerDialog::relpitch2y(float p, float p0)
-{
-	return height/2 - height/RELATIVE_NUM_PITCHES/2 * (p - p0);
+float DetuneSynthesizerDialog::relpitch2y(float p, float p0) {
+	return height/2 * (1 - (p - p0)/RELATIVE_NUM_PITCHES);
 }
 
-void DetuneSynthesizerDialog::on_left_button_down()
-{
+float DetuneSynthesizerDialog::x2pitch(float x) {
+	return x / width * MAX_PITCH;
 }
 
-void DetuneSynthesizerDialog::on_left_button_up()
-{
+float DetuneSynthesizerDialog::y2pitch(float y) {
+	return (1 - y / height) * (MAX_PITCH + 10) - 5;
 }
 
-void DetuneSynthesizerDialog::on_mouse_move()
-{
+float DetuneSynthesizerDialog::y2relpitch(float y, float p0) {
+	return p0 + (1 - y*2/height) * RELATIVE_NUM_PITCHES;
+}
+
+void DetuneSynthesizerDialog::on_left_button_down() {
+	if (hover >= 0) {
+		auto tuning = track->synth->tuning;
+		if (mode_relative) {
+			tuning.freq[hover] = pitch_to_freq(y2relpitch(hui::GetEvent()->my, hover));
+		} else {
+			tuning.freq[hover] = pitch_to_freq(y2pitch(hui::GetEvent()->my));
+		}
+		track->detune_synthesizer(tuning.freq);
+		redraw("detune_area");
+	}
+}
+
+void DetuneSynthesizerDialog::on_left_button_up() {
+}
+
+void DetuneSynthesizerDialog::on_mouse_move() {
 	hover = -1;
 	auto e = hui::GetEvent();
 	if ((e->mx >= 0) and (e->mx < width))
@@ -151,24 +162,31 @@ void DetuneSynthesizerDialog::on_mouse_move()
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::on_mouse_wheel()
-{
-	if (hover >= 0){
+void DetuneSynthesizerDialog::on_mouse_wheel() {
+	if (hover >= 0) {
 		auto e = hui::GetEvent();
 		float speed = mode_relative ? 0.01f : 0.1f;
-		if (e->scroll_y != 0)
-			track->detune_synthesizer(hover, speed * e->scroll_y, is_checked("all_octaves"));
+		bool all_octaves = is_checked("all_octaves");
+		auto tuning = track->synth->tuning;
+		if (e->scroll_y != 0) {
+			float dpitch = speed * e->scroll_y;
+			if (all_octaves) {
+				for (int i=(hover % 12); i<MAX_PITCH; i+=12)
+					tuning.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
+			} else {
+				tuning.freq[hover] *= pitch_to_freq(dpitch) / pitch_to_freq(0);
+			}
+			track->detune_synthesizer(tuning.freq);
+		}
 		redraw("detune_area");
 	}
 }
 
-void DetuneSynthesizerDialog::on_relative()
-{
+void DetuneSynthesizerDialog::on_relative() {
 	mode_relative = is_checked("relative");
 	redraw("detune_area");
 }
 
-void DetuneSynthesizerDialog::on_close()
-{
+void DetuneSynthesizerDialog::on_close() {
 	destroy();
 }

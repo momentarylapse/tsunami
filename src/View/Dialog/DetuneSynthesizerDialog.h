@@ -14,11 +14,9 @@ class Synthesizer;
 class Track;
 class AudioView;
 
-class DetuneSynthesizerDialog : public hui::Dialog
-{
+class DetuneSynthesizerDialog : public hui::Dialog {
 public:
 	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, hui::Window *parent);
-	virtual ~DetuneSynthesizerDialog();
 
 	void _cdecl on_draw(Painter *p) override;
 	void _cdecl on_left_button_down() override;
@@ -33,6 +31,9 @@ public:
 	float pitch2x(float p);
 	float pitch2y(float p);
 	float relpitch2y(float p, float p0);
+	float x2pitch(float x);
+	float y2pitch(float y);
+	float y2relpitch(float y, float p0);
 
 	Synthesizer *synth;
 	Track *track;

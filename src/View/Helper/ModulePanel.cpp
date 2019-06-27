@@ -19,7 +19,7 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	session = module->session;
 
 	from_resource("fx_panel");
-	set_options("grid", format("width=%d", CONFIG_PANEL_WIDTH));
+	set_options("grid", format("width=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH));
 
 	set_string("name", module->module_subtype);
 
@@ -56,6 +56,10 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 ModulePanel::~ModulePanel() {
 	if (module)
 		module->unsubscribe(this);
+}
+
+void ModulePanel::set_width(int width) {
+	set_options("grid", format("width=%d", width));
 }
 
 void ModulePanel::set_func_enabled(std::function<void(bool)> _func_enable) {
@@ -112,8 +116,9 @@ void ModulePanel::on_large() {
 class ModuleExternalDialog : public hui::Dialog {
 public:
 	Module *module;
-	ModuleExternalDialog(ModulePanel *m, hui::Window *parent) : hui::Dialog("", CONFIG_PANEL_WIDTH, 200, parent, true) {
+	ModuleExternalDialog(ModulePanel *m, hui::Window *parent) : hui::Dialog(m->module->module_subtype, CONFIG_PANEL_WIDTH, 300, parent, true) {
 		module = m->module;
+		m->set_options("grid", "expandx");
 		add_grid("", 0, 0, "grid");
 		embed(m, "grid", 0, 0);
 		module->subscribe(this, [=]{

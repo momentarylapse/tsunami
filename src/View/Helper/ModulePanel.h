@@ -38,6 +38,8 @@ public:
 	void on_change();
 	void on_change_by_action();
 	
+	void set_width(int width);
+	
 	ModulePanel *copy();
 	
 	void set_func_enabled(std::function<void(bool)> func_enable);

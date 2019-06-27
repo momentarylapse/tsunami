@@ -9,8 +9,9 @@
 #include "../../Session.h"
 #include "../../Plugins/TsunamiPlugin.h"
 #include "../../Plugins/PluginManager.h"
-#include "../../Module/ConfigPanel.h"
+#include "../Helper/ModulePanel.h"
 
+#if 0
 class PluginPanel : public hui::Panel {
 public:
 	PluginPanel(TsunamiPlugin *p, PluginConsole *_console) {
@@ -106,6 +107,8 @@ public:
 	PluginConsole *console;
 };
 
+#endif
+
 PluginConsole::PluginConsole(Session *s) :
 	BottomBar::Console(_("Plugins"), s)
 {
@@ -119,9 +122,6 @@ PluginConsole::PluginConsole(Session *s) :
 	set_target("scroller");
 	add_grid("", 0, 0, "panel-grid");
 	next_x = 0;
-
-	big = nullptr;
-	big_panel = nullptr;
 
 	event("add", [=]{ on_add_button(); });
 
@@ -142,7 +142,9 @@ void PluginConsole::on_add_button() {
 }
 
 void PluginConsole::on_add_plugin() {
-	auto *p = new PluginPanel(session->last_plugin, this);
+	auto *plugin = session->last_plugin;
+	auto *p = new ModulePanel(plugin);
+	p->set_func_delete([=]{ plugin->stop_request(); });
 	embed(p, "panel-grid", next_x ++, 0);
 	panels.add(p);
 	hide_control("no-plugins-label", true);
@@ -151,7 +153,7 @@ void PluginConsole::on_add_plugin() {
 
 void PluginConsole::on_remove_plugin() {
 	foreachi (auto *p, panels, i)
-		if (p->plugin == session->last_plugin) {
+		if (p->module == session->last_plugin) {
 			delete p;
 			panels.erase(i);
 			break;
@@ -159,7 +161,7 @@ void PluginConsole::on_remove_plugin() {
 	hide_control("no-plugins-label", panels.num > 0);
 }
 
-void PluginConsole::set_big(PluginPanel *p) {
+/*void PluginConsole::set_big(PluginPanel *p) {
 	if (big)
 		big->restart_normal();
 	if (big_panel) {
@@ -175,5 +177,5 @@ void PluginConsole::set_big(PluginPanel *p) {
 		win->add_grid("!expandx,width=500", 0, 0, "plugin-grid");
 		win->embed(big_panel, "plugin-grid", 0, 0);
 	}
-}
+}*/
 

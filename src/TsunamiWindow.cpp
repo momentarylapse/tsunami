@@ -1070,9 +1070,12 @@ void TsunamiWindow::set_big_panel(ModulePanel* p) {
 	}
 	big_module_panel = p;
 	if (big_module_panel) {
+		int w, h;
+		get_size(w, h);
+		big_module_panel->set_width(w / 2);
 		set_target("root-grid");
 		//add_paned("!expandx", 0, 0, "plugin-grid");
-		add_grid("!expandx,width=500", 0, 0, "plugin-grid");
+		add_grid("", 0, 0, "plugin-grid");
 		embed(big_module_panel, "plugin-grid", 0, 0);
 	}
 }

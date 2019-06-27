@@ -31,7 +31,7 @@ void *ActionTrackAddMidiEffect::execute(Data *d) {
 void ActionTrackAddMidiEffect::undo(Data *d) {
 	assert(track->midi_fx.num > 0);
 	effect = track->midi_fx.pop();
-	effect->Observable::notify(effect->MESSAGE_DELETE);
+	effect->fake_death();
 	track->notify(track->MESSAGE_DELETE_MIDI_EFFECT);
 }
 

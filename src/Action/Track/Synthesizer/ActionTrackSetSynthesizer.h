@@ -13,8 +13,7 @@
 class Track;
 class Synthesizer;
 
-class ActionTrackSetSynthesizer : public Action
-{
+class ActionTrackSetSynthesizer : public Action {
 public:
 	ActionTrackSetSynthesizer(Track *t, Synthesizer *synth);
 	virtual ~ActionTrackSetSynthesizer();

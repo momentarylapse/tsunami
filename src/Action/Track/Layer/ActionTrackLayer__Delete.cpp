@@ -13,8 +13,7 @@
 #include "../../../Data/CrossFade.h"
 #include <assert.h>
 
-ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)
-{
+ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index) {
 	track = t;
 	index = _index;
 	layer = t->layers[index];
@@ -24,14 +23,12 @@ ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index)
 			fades_shifted.add(i);
 }
 
-ActionTrackLayer__Delete::~ActionTrackLayer__Delete()
-{
+ActionTrackLayer__Delete::~ActionTrackLayer__Delete() {
 	if (layer)
 		delete layer;
 }
 
-void* ActionTrackLayer__Delete::execute(Data* d)
-{
+void* ActionTrackLayer__Delete::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < track->layers.num);
@@ -41,7 +38,7 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 
 	layer = track->layers[index];
 	assert(layer->buffers.num == 0);
-	layer->notify(layer->MESSAGE_DELETE);
+	layer->fake_death();
 	track->layers.erase(index);
 
 	a->notify(a->MESSAGE_DELETE_LAYER);
@@ -49,8 +46,7 @@ void* ActionTrackLayer__Delete::execute(Data* d)
 	return nullptr;
 }
 
-void ActionTrackLayer__Delete::undo(Data* d)
-{
+void ActionTrackLayer__Delete::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	for (int i: fades_shifted)

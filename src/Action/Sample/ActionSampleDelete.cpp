@@ -11,19 +11,16 @@
 #include "../../Data/Song.h"
 #include "../../Data/Sample.h"
 
-ActionSampleDelete::ActionSampleDelete(Sample *s)
-{
+ActionSampleDelete::ActionSampleDelete(Sample *s) {
 	sample = s->_pointer_ref();
 	index = -1;
 }
 
-ActionSampleDelete::~ActionSampleDelete()
-{
+ActionSampleDelete::~ActionSampleDelete() {
 	sample->_pointer_unref();
 }
 
-void *ActionSampleDelete::execute(Data *d)
-{
+void *ActionSampleDelete::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(sample->ref_count == 0);
 	index = -1;
@@ -32,7 +29,7 @@ void *ActionSampleDelete::execute(Data *d)
 			index = i;
 	assert(index >= 0);
 
-	sample->notify(sample->MESSAGE_DELETE);
+	sample->fake_death();
 	a->samples.erase(index);
 	sample->unset_owner();
 
@@ -40,8 +37,7 @@ void *ActionSampleDelete::execute(Data *d)
 	return nullptr;
 }
 
-void ActionSampleDelete::undo(Data *d)
-{
+void ActionSampleDelete::undo(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	sample->set_owner(a);
 	a->samples.insert(sample, index);

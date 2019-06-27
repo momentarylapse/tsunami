@@ -7,7 +7,9 @@
 
 #include "ActionTrackPasteAsSample.h"
 
+#include "../../../Data/base.h"
 #include "../../../Data/Track.h"
+#include "../../../Data/Sample.h"
 #include "../../../Data/SampleRef.h"
 #include "../../Sample/ActionSampleAdd.h"
 #include "ActionTrackAddSample.h"
@@ -34,13 +36,20 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 
 void ActionTrackPasteAsSample::build(Data *d)
 {
-	if (buf){
-		sample = (Sample*)add_sub_action(new ActionSampleAdd("-paste-", *buf, auto_delete), d);
-		add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
-	}else if (midi){
-		sample = (Sample*)add_sub_action(new ActionSampleAdd("-paste-", *midi, auto_delete), d);
-		add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
+	if (buf) {
+		sample = new Sample(SignalType::AUDIO);
+		*sample->buf = *buf;
+		sample->buf->offset = 0;
+		sample->auto_delete = auto_delete;
+	} else {
+		sample = new Sample(SignalType::MIDI);
+		sample->midi = *midi;
+		sample->midi.sort();
+		sample->auto_delete = auto_delete;
 	}
+	sample->name = "-paste-";
+	add_sub_action(new ActionSampleAdd(sample), d);
+	add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
 }
 
 void *ActionTrackPasteAsSample::execute_return(Data *d)

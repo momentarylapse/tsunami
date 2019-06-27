@@ -12,8 +12,7 @@
 class Track;
 class AudioEffect;
 
-class ActionTrackAddEffect: public Action
-{
+class ActionTrackAddEffect: public Action {
 public:
 	ActionTrackAddEffect(Track *t, AudioEffect *effect);
 	~ActionTrackAddEffect();

@@ -31,6 +31,7 @@
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
+#include "View/Helper/ModulePanel.h"
 #include "View/AudioView.h"
 #include "View/Node/AudioViewTrack.h"
 #include "View/Node/AudioViewLayer.h"
@@ -72,6 +73,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	session->set_win(this);
 	song = session->song;
 	app = tsunami;
+	big_module_panel = nullptr;
 
 	int width = hui::Config.get_int("Window.Width", 800);
 	int height = hui::Config.get_int("Window.Height", 600);
@@ -1059,4 +1061,18 @@ void TsunamiWindow::on_edit_bars() {
 
 void TsunamiWindow::on_scale_bars() {
 	session->set_mode("scale-bars");
+}
+
+void TsunamiWindow::set_big_panel(ModulePanel* p) {
+	if (big_module_panel) {
+		delete big_module_panel;
+		remove_control("big-grid");
+	}
+	big_module_panel = p;
+	if (big_module_panel) {
+		set_target("root-grid");
+		//add_paned("!expandx", 0, 0, "plugin-grid");
+		add_grid("!expandx,width=500", 0, 0, "plugin-grid");
+		embed(big_module_panel, "plugin-grid", 0, 0);
+	}
 }

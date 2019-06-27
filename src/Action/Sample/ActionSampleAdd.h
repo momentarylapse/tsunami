@@ -14,11 +14,9 @@ class AudioBuffer;
 class MidiNoteBuffer;
 class Sample;
 
-class ActionSampleAdd : public Action
-{
+class ActionSampleAdd : public Action {
 public:
-	ActionSampleAdd(const string &name, const AudioBuffer &buf, bool auto_delete);
-	ActionSampleAdd(const string &name, const MidiNoteBuffer &midi, bool auto_delete);
+	ActionSampleAdd(Sample *s);
 	~ActionSampleAdd() override;
 
 	void *execute(Data *d) override;

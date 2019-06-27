@@ -13,8 +13,7 @@
 class Track;
 class TrackLayer;
 
-class ActionTrackLayer__Delete : public Action
-{
+class ActionTrackLayer__Delete : public Action {
 public:
 	ActionTrackLayer__Delete(Track *t, int index);
 	~ActionTrackLayer__Delete();

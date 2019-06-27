@@ -11,8 +11,7 @@
 #include "../../ActionMergable.h"
 class AudioEffect;
 
-class ActionTrackEditEffect: public ActionMergable<string>
-{
+class ActionTrackEditEffect: public ActionMergable<string> {
 public:
 	ActionTrackEditEffect(AudioEffect *fx, const string &old_params);
 

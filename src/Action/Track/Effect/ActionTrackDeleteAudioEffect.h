@@ -12,8 +12,7 @@
 class Track;
 class AudioEffect;
 
-class ActionTrackDeleteEffect: public Action
-{
+class ActionTrackDeleteEffect: public Action {
 public:
 	ActionTrackDeleteEffect(Track *t, int index);
 	~ActionTrackDeleteEffect();

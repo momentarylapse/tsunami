@@ -13,10 +13,10 @@ class Track;
 class TrackMarker;
 class Range;
 
-class ActionTrackAddMarker: public Action
-{
+class ActionTrackAddMarker: public Action {
 public:
-	ActionTrackAddMarker(Track *t, const Range &range, const string &text);
+	ActionTrackAddMarker(Track *t, TrackMarker *marker);
+	~ActionTrackAddMarker() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

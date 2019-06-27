@@ -17,6 +17,8 @@ class BottomBar;
 class MiniBar;
 class Session;
 class Tsunami;
+class Module;
+class ModulePanel;
 
 class TsunamiWindow : public hui::Window {
 public:
@@ -130,8 +132,6 @@ public:
 
 	AudioView *view;
 
-	Array<string> menu_layer_names;
-
 	Song *song;
 
 	Session *session;
@@ -139,6 +139,9 @@ public:
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
 	MiniBar *mini_bar;
+	
+	ModulePanel *big_module_panel;
+	void set_big_panel(ModulePanel *p);
 
 	bool auto_delete;
 

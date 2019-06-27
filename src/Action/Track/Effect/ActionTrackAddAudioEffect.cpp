@@ -10,20 +10,17 @@
 #include "../../../Data/Song.h"
 #include "../../../Module/Audio/AudioEffect.h"
 
-ActionTrackAddEffect::ActionTrackAddEffect(Track *t, AudioEffect *_effect)
-{
+ActionTrackAddEffect::ActionTrackAddEffect(Track *t, AudioEffect *_effect) {
 	track = t;
 	effect = _effect;
 }
 
-ActionTrackAddEffect::~ActionTrackAddEffect()
-{
+ActionTrackAddEffect::~ActionTrackAddEffect() {
 	if (effect)
 		delete effect;
 }
 
-void *ActionTrackAddEffect::execute(Data *d)
-{
+void *ActionTrackAddEffect::execute(Data *d) {
 	track->fx.add(effect);
 	track->notify(track->MESSAGE_ADD_EFFECT);
 	effect = nullptr;
@@ -31,10 +28,9 @@ void *ActionTrackAddEffect::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTrackAddEffect::undo(Data *d)
-{
+void ActionTrackAddEffect::undo(Data *d) {
 	effect = track->fx.back();
-	effect->Observable::notify(effect->MESSAGE_DELETE);
+	effect->fake_death();
 	track->fx.pop();
 	track->notify(track->MESSAGE_DELETE_EFFECT);
 }

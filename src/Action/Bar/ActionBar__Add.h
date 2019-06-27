@@ -15,6 +15,7 @@ class Bar;
 class ActionBar__Add: public Action {
 public:
 	ActionBar__Add(int index, Bar *bar);
+	~ActionBar__Add();
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

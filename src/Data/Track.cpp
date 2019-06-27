@@ -244,7 +244,7 @@ void Track::detune_synthesizer(int pitch, float dpitch, bool all_octaves) {
 }
 
 TrackMarker *Track::add_marker(const Range &range, const string &text) {
-	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, range, text));
+	return (TrackMarker*)song->execute(new ActionTrackAddMarker(this, new TrackMarker({range, text})));
 }
 
 void Track::delete_marker(const TrackMarker *marker) {

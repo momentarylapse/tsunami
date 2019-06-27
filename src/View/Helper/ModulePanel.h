@@ -17,15 +17,33 @@ class Session;
 
 class ModulePanel : public hui::Panel {
 public:
-	ModulePanel(Module *_m, std::function<void(bool)> _func_enable, std::function<void()> _func_delete, std::function<void(const string&)> _func_edit);
+	
+	enum Mode {
+		NONE = 0,
+		HEADER = 1,
+		FAVOURITES = 2,
+		ENABLE = 4,
+		DELETE = 8,
+		DEFAULT = HEADER | FAVOURITES | ENABLE
+	};
+	
+	ModulePanel(Module *m, Mode mode = Mode::DEFAULT);
 	virtual ~ModulePanel();
 	void on_load();
 	void on_save();
 	void on_enabled();
 	void on_delete();
 	void on_large();
+	void on_external();
 	void on_change();
 	void on_change_by_action();
+	
+	ModulePanel *copy();
+	
+	void set_func_enabled(std::function<void(bool)> func_enable);
+	void set_func_delete(std::function<void()> func_delete);
+	void set_func_edit(std::function<void(const string&)> func_edit);
+	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
 	std::function<void()> func_delete;

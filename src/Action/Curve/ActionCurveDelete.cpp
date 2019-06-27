@@ -9,23 +9,21 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveDelete::ActionCurveDelete(int _index)
-{
+ActionCurveDelete::ActionCurveDelete(int _index) {
 	curve = nullptr;
 	index = _index;
 }
 
-ActionCurveDelete::~ActionCurveDelete()
-{
+ActionCurveDelete::~ActionCurveDelete() {
 	if (curve)
 		delete curve;
 }
 
-void* ActionCurveDelete::execute(Data* d)
-{
+void* ActionCurveDelete::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	curve = a->curves[index];
+	curve->fake_death();
 	a->curves.erase(index);
 
 	a->notify(a->MESSAGE_DELETE_CURVE);
@@ -33,8 +31,7 @@ void* ActionCurveDelete::execute(Data* d)
 	return nullptr;
 }
 
-void ActionCurveDelete::undo(Data* d)
-{
+void ActionCurveDelete::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->curves.insert(curve, index);

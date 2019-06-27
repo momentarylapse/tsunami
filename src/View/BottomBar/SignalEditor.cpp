@@ -548,7 +548,13 @@ void SignalEditor::show_config(Module *m) {
 	config_panel = nullptr;
 	config_module = m;
 	if (m) {
-		config_panel = new ModulePanel(config_module, [=](bool){}, [=]{}, [=](const string &){});
+		config_panel = new ModulePanel(config_module);
+		config_panel->set_func_delete([=] {
+			for (auto *chain: session->all_signal_chains)
+				for (auto *_m: chain->modules)
+					if (m == _m)
+						chain->delete_module(m);
+		});
 		embed(config_panel, config_grid_id, 0, 0);
 	} else {
 		/*set_string("config-label", "");

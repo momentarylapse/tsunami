@@ -9,24 +9,27 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackMarker.h"
 
-ActionTrackAddMarker::ActionTrackAddMarker(Track *t, const Range &range, const string &text)
-{
+ActionTrackAddMarker::ActionTrackAddMarker(Track *t, TrackMarker *m) {
 	track = t;
-	marker = new TrackMarker;
-	marker->range = range;
-	marker->text = text;
+	marker = m;
 }
 
-void *ActionTrackAddMarker::execute(Data *d)
-{
+ActionTrackAddMarker::~ActionTrackAddMarker() {
+	if (marker)
+		delete marker;
+}
+
+void *ActionTrackAddMarker::execute(Data *d) {
 	track->markers.add(marker);
 	track->notify();
-	return marker;
+	auto *m = marker;
+	marker = nullptr;
+	return m;
 }
 
-void ActionTrackAddMarker::undo(Data *d)
-{
-	track->markers.pop();
+void ActionTrackAddMarker::undo(Data *d) {
+	marker = track->markers.pop();
+	//marker->fake_death();
 	track->notify();
 }
 

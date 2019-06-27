@@ -381,25 +381,24 @@ void MixingConsole::select_module(Module *m) {
 	Track *track = nullptr;
 
 	if (selected_module) {
+		config_panel = new ModulePanel(m);
 
 		if (m->module_type == ModuleType::AUDIO_EFFECT) {
 			AudioEffect *fx = (AudioEffect*)m;
 			for (auto *mm: mixer)
 				if (mm->track->fx.find(fx) >= 0)
 					track = mm->track;
-			config_panel = new ModulePanel(m,
-					[=](bool enabled){ track->enable_effect(fx, enabled); },
-					[=]{ track->delete_effect(fx); },
-					[=](const string &old_param){ track->edit_effect(fx, old_param); });
+			config_panel->set_func_enabled([=](bool enabled){ track->enable_effect(fx, enabled); });
+			config_panel->set_func_delete([=]{ track->delete_effect(fx); });
+			config_panel->set_func_edit([=](const string &old_param){ track->edit_effect(fx, old_param); });
 		} else { // MIDI_EFFECT
 			MidiEffect *fx = (MidiEffect*)m;
 			for (auto *mm: mixer)
 				if (mm->track->midi_fx.find(fx) >= 0)
 					track = mm->track;
-			config_panel = new ModulePanel(m,
-					[=](bool enabled){ track->enable_midi_effect(fx, enabled); },
-					[=]{ track->delete_midi_effect(fx); },
-					[=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
+			config_panel->set_func_enabled([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
+			config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
+			config_panel->set_func_edit([=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
 		}
 		embed(config_panel, config_grid_id, 0, 0);
 

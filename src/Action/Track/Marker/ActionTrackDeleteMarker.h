@@ -12,10 +12,10 @@
 class Track;
 class TrackMarker;
 
-class ActionTrackDeleteMarker: public Action
-{
+class ActionTrackDeleteMarker: public Action {
 public:
 	ActionTrackDeleteMarker(Track *t, int index);
+	~ActionTrackDeleteMarker() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

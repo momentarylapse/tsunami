@@ -17,6 +17,8 @@ namespace hui
 
 void *get_gtk_image(const string &image, bool large); // -> hui_menu_gtk.cpp
 
+Menu *_create_res_menu_(const string &ns, Resource *res); // -> Resource.cpp
+
 //void OnGtkMenuButtonPress(GtkWidget *widget, gpointer data)
 //{	reinterpret_cast<Control*>(data)->notify("hui:click");	}
 
@@ -55,13 +57,19 @@ void ControlMenuButton::set_image(const string& str)
 #endif
 }
 
-void ControlMenuButton::__set_option(const string &op, const string &value)
-{
-	if (op == "flat")
+void ControlMenuButton::__set_option(const string &op, const string &value) {
+	if (op == "flat") {
 		gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
-	else if (op == "menu"){
+	} else if (op == "menu") {
 		menu = CreateResourceMenu(value);
-		if (menu){
+		if (menu) {
+			menu->set_panel(panel);
+			gtk_menu_button_set_popup(GTK_MENU_BUTTON(widget), menu->widget);
+		}
+	} else if (op == "menusource") {
+		auto res = ParseResource(value);
+		menu = _create_res_menu_("source", &res);
+		if (menu) {
 			menu->set_panel(panel);
 			gtk_menu_button_set_popup(GTK_MENU_BUTTON(widget), menu->widget);
 		}

@@ -42,7 +42,7 @@ ActionTrackAddSample::~ActionTrackAddSample() {
 void ActionTrackAddSample::undo(Data *d) {
 	assert(layer->samples.num > 0);
 	ref = layer->samples.pop();
-	ref->notify(ref->MESSAGE_DELETE);
+	ref->fake_death();
 
 	sample->unref();
 }

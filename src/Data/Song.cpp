@@ -301,7 +301,12 @@ void Song::delete_track(Track *track) {
 }
 
 Sample *Song::add_sample(const string &name, AudioBuffer &buf) {
-	return (Sample*)execute(new ActionSampleAdd(name, buf, false));
+	auto *sample = new Sample(SignalType::AUDIO);
+	*sample->buf = buf;
+	sample->buf->offset = 0;
+	sample->auto_delete = false;
+	sample->name = name;
+	return (Sample*)execute(new ActionSampleAdd(sample));
 }
 
 void Song::delete_sample(Sample *s) {

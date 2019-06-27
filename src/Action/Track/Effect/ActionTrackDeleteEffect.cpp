@@ -11,27 +11,24 @@
 #include "../../../Data/Song.h"
 #include "../../../Module/Audio/AudioEffect.h"
 
-ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
-{
+ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index) {
 	track = t;
 	index = _index;
 	effect = nullptr;
 }
 
-ActionTrackDeleteEffect::~ActionTrackDeleteEffect()
-{
+ActionTrackDeleteEffect::~ActionTrackDeleteEffect() {
 	if (effect)
 		delete effect;
 }
 
-void *ActionTrackDeleteEffect::execute(Data *d)
-{
+void *ActionTrackDeleteEffect::execute(Data *d) {
 	assert(index >= 0);
 
 	assert(index < track->fx.num);
 
 	effect = track->fx[index];
-	effect->Observable::notify(effect->MESSAGE_DELETE);
+	effect->fake_death();
 	track->fx.erase(index);
 	track->notify(track->MESSAGE_DELETE_EFFECT);
 

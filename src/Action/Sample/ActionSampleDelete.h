@@ -12,11 +12,10 @@
 
 class Sample;
 
-class ActionSampleDelete : public Action
-{
+class ActionSampleDelete : public Action {
 public:
 	ActionSampleDelete(Sample *s);
-	virtual ~ActionSampleDelete();
+	~ActionSampleDelete() override;
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

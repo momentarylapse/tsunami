@@ -9,20 +9,17 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveAdd::ActionCurveAdd(Curve *_curve, int _index)
-{
+ActionCurveAdd::ActionCurveAdd(Curve *_curve, int _index) {
 	curve = _curve;
 	index = _index;
 }
 
-ActionCurveAdd::~ActionCurveAdd()
-{
+ActionCurveAdd::~ActionCurveAdd() {
 	if (curve)
 		delete curve;
 }
 
-void* ActionCurveAdd::execute(Data* d)
-{
+void* ActionCurveAdd::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->curves.insert(curve, index);
@@ -32,11 +29,11 @@ void* ActionCurveAdd::execute(Data* d)
 	return curve;
 }
 
-void ActionCurveAdd::undo(Data* d)
-{
+void ActionCurveAdd::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	curve = a->curves[index];
+	curve->fake_death();
 	a->curves.erase(index);
 
 	a->notify(a->MESSAGE_DELETE_CURVE);

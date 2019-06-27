@@ -104,6 +104,12 @@ ObservableData::~ObservableData() {
 	}
 }
 
+// in case an object is "out of service" but still needs to be kept in memory
+void ObservableData::fake_death() {
+	notify(Observable<VirtualBase>::MESSAGE_DELETE);
+	subscriptions.clear();
+}
+
 
 void ObservableData::subscribe(VirtualBase *_me, VirtualBase *observer, const ObservableData::Callback &callback, const ObservableData::CallbackP &callback_p, const string &message) {
 	subscriptions.add(ObservableData::Subscription(observer, &message, callback, callback_p));

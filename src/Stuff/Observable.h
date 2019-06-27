@@ -17,6 +17,8 @@ class ObservableData {
 public:
 	ObservableData();
 	~ObservableData();
+	
+	void fake_death();
 
 	void notify_begin();
 	void notify(const string &message);
@@ -87,6 +89,9 @@ public:
 	}
 	const string& cur_message() const {
 		return *observable_data.cur_message;
+	}
+	void fake_death() const {
+		observable_data.fake_death();
 	}
 private:
 

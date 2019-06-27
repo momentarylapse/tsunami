@@ -31,7 +31,7 @@ void* ActionTrackDeleteSample::execute(Data* d)
 	ref->origin->unref();
 	ref->owner = nullptr;
 
-	ref->notify(ref->MESSAGE_DELETE);
+	ref->fake_death();
 	layer->samples.erase(index);
 
 	return nullptr;

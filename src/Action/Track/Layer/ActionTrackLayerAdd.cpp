@@ -11,20 +11,17 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l)
-{
+ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, TrackLayer *l) {
 	track = t;
 	layer = l;
 }
 
-ActionTrackLayerAdd::~ActionTrackLayerAdd()
-{
+ActionTrackLayerAdd::~ActionTrackLayerAdd() {
 	if (layer)
 		delete layer;
 }
 
-void* ActionTrackLayerAdd::execute(Data* d)
-{
+void* ActionTrackLayerAdd::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.add(layer);
@@ -34,12 +31,11 @@ void* ActionTrackLayerAdd::execute(Data* d)
 	return track->layers.back();
 }
 
-void ActionTrackLayerAdd::undo(Data* d)
-{
+void ActionTrackLayerAdd::undo(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	layer = track->layers.back();
-	layer->notify(layer->MESSAGE_DELETE);
+	layer->fake_death();
 	track->layers.pop();
 
 	a->notify(a->MESSAGE_DELETE_LAYER);

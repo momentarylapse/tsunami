@@ -29,8 +29,8 @@ void ActionTrackAdd::undo(Data *d) {
 	// notify outer structures first!
 	s->notify(s->MESSAGE_DELETE_LAYER);
 	s->notify(s->MESSAGE_DELETE_TRACK);
-	track->layers[0]->notify(track->layers[0]->MESSAGE_DELETE);
-	track->notify(track->MESSAGE_DELETE);
+	track->layers[0]->fake_death();
+	track->fake_death();
 }
 
 

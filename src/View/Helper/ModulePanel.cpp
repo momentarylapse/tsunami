@@ -42,6 +42,7 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	event("show_large", [=]{ on_large(); });
 	event("show_external", [=]{ on_external(); });
 
+	hide_control("enabled", true);
 	check("enabled", module->enabled);
 
 	old_param = module->config_to_string();
@@ -64,6 +65,7 @@ void ModulePanel::set_width(int width) {
 
 void ModulePanel::set_func_enabled(std::function<void(bool)> _func_enable) {
 	func_enable = _func_enable;
+	hide_control("enabled", func_enable == nullptr);
 }
 
 void ModulePanel::set_func_delete(std::function<void()> _func_delete) {

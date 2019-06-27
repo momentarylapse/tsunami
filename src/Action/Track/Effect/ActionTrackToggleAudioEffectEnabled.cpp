@@ -7,22 +7,21 @@
 
 #include "ActionTrackToggleEffectEnabled.h"
 #include "../../../Module/Audio/AudioEffect.h"
+#include "../../../Data/Song.h"
 
-ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(AudioEffect *_fx)
-{
+ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(AudioEffect *_fx) {
 	fx = _fx;
 }
 
-void *ActionTrackToggleEffectEnabled::execute(Data *d)
-{
+void *ActionTrackToggleEffectEnabled::execute(Data *d) {
 	fx->enabled = !fx->enabled;
 	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
+	d->notify(Song::MESSAGE_ENABLE_FX);
 
 	return nullptr;
 }
 
-void ActionTrackToggleEffectEnabled::undo(Data *d)
-{
+void ActionTrackToggleEffectEnabled::undo(Data *d) {
 	execute(d);
 }
 

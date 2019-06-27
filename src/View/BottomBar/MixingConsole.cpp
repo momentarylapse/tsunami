@@ -72,11 +72,14 @@ public:
 
 		vtrack = t;
 		track = t->track;
+		auto *song = console->session->song;
+		song->subscribe(this, [=]{ update(); }, song->MESSAGE_ENABLE_FX);
 		vtrack->subscribe(this, [=]{ update(); }, vtrack->MESSAGE_CHANGE);
 		vtrack->subscribe(this, [=]{ on_vtrack_delete(); }, vtrack->MESSAGE_DELETE);
 		update();
 	}
 	~TrackMixer() {
+		console->session->song->unsubscribe(this);
 		clear_track();
 	}
 

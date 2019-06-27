@@ -11,8 +11,7 @@
 #include "../../Action.h"
 class AudioEffect;
 
-class ActionTrackToggleEffectEnabled: public Action
-{
+class ActionTrackToggleEffectEnabled: public Action {
 public:
 	ActionTrackToggleEffectEnabled(AudioEffect *fx);
 

@@ -3,6 +3,8 @@ use "../helper/tone.kaba"
 
 const int NUM_OSCILLATORS = 6
 
+const float OSCI_RADIUS = 15.0
+const float LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
 class OscillatorState
@@ -81,39 +83,22 @@ class FMPanel extends ConfigPanel
 		
 		from_source("
 Grid ? ''
-	DrawingArea area '' height=120 expandx noexpandy
+	DrawingArea area '' height=220 expandx noexpandy
 	---|
 	Grid ? ''
 		Label ? 'Freq Multiplier'
 		SpinButton factor '' range=0:32:0.001 expandx
 		---|
 		Label ? 'Amplitude'
-		SpinButton amplitude '' range=0:100:0.001
-		---|
-		Label ? 'Initial'
-		SpinButton initial '0' range=0:1:0.001
-		---|
-		Label ? 'Peak'
-		SpinButton peak '0' range=0:1:0.001
-		---|
-		Label ? 'Sustain'
-		SpinButton sustain '0' range=0:1:0.001
-		---|
-		Label ? 'Attack (ms)'
-		SpinButton attack '0' range=0:1000:0.1
-		---|
-		Label ? 'Decay (ms)'
-		SpinButton decay '0' range=0:1000:0.1
-		---|
-		Label ? 'Release (ms)'
-		SpinButton release '0' range=0:1000:0.1")
+		SpinButton amplitude '' range=0:100:0.001")
 		
 		event_x("area", "hui:draw", &on_draw)
 		event_x("area", "hui:left-button-down", &on_left_button_down)
+		event_x("area", "hui:left-button-up", &on_left_button_up)
 		event_x("area", "hui:right-button-down", &on_right_button_down)
-		let ids = ["factor", "amplitude", "initial", "peak", "sustain", "attack", "decay", "release", "type"]
-		for id in ids
-			event(id, &on_change)
+		event_x("area", "hui:mouse-move", &on_mouse_move)
+		event("factor", &on_spin_button)
+		event("amplitude", &on_spin_button)
 		chosen = 0
 		
 		menu_top = new Menu
@@ -154,11 +139,11 @@ Grid ? ''
 	complex _f_link(complex a, complex b)
 		float d = (b - a).abs()
 		complex dir = (b - a) * (1/d)
-		return dir * (d - 100) * 0.1 + complex(0, (b.y-a.y) * 0.05)
+		return dir * (d - LINK_LENGTH) * 0.1 + complex(0, (b.y-a.y) * 0.05)
 	complex _f_free(complex a, complex b)
 		float d = (b - a).abs()
 		complex dir = (b - a) * (1/d)
-		return dir * min(d - 50, 0) * 0.2
+		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.2
 	void iterate_osci_pos()
 		complex[NUM_OSCILLATORS] f
 		for o,i in fc.osc
@@ -182,7 +167,7 @@ Grid ? ''
 			return p_out
 		return p_osci[index]
 
-	void draw_type(Painter *p, complex z, int type, float dx, float amp)
+	void draw_type(Painter* p, complex z, int type, float dx, float amp)
 		dx /= pi
 		float v0 = 0
 		float t0 = -pi
@@ -200,24 +185,82 @@ Grid ? ''
 			t0 = t
 			v0 = v
 	
-	void draw_osci(Painter *p, int index)
+	void draw_osci(Painter* p, int index)
 		let z = osci_pos(index)
 		p.set_color(ColorInterpolate(colors.selection, colors.background, 0.7))
 		if index == chosen
 			p.set_color(colors.selection)
-		p.draw_circle(z.x, z.y, 18)
+		p.draw_circle(z.x, z.y, 15)
 	
 		let o = fc.osc[index]
 		p.set_color(colors.text)
-		draw_type(p, z, o._type, 12, 7)
+		draw_type(p, z, o._type, 9, 5.5)
 	
-	void draw_link(Painter *p, int a, int b)
+	void draw_link(Painter* p, int a, int b)
 		p.set_color(colors.text)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
-		p.draw_line(z1.x - 20, z1.y, z2.x + 20, z2.y)
+		p.draw_line(z1.x - 18, z1.y, z2.x + 18, z2.y)
+	
+	float t2x(float t)
+		return width*0.7 * sqrt(t)
+	float v2y(float v)
+		return height - 100*v
+	float x2t(float x)
+		return sqr(x / width / 0.7)
+	float y2v(float y)
+		return (height - y) / 100
+	void draw_curve_exp(Painter *p, float t0, float v0, float t1, float v1, color col)
+		float e = log(v1/v0)
+		complex[] cc
+		for a in 0:1.01:0.05
+			float t = t0+a*(t1-t0)
+			float v = v0 * exp(a * e)
+			cc.add(complex(t2x(t), v2y(v)))
+		let col2 = ColorInterpolate(col, colors.text_soft2, 0.8)
+		p.set_color(col2)
+		p.draw_lines(cc)
+		cc.add(complex(t2x(t1), v2y(0)))
+		cc.add(complex(t2x(t0), v2y(0)))
+		col2.a = 0.2
+		p.set_color(col2)
+		p.draw_polygon(cc)
+	
+	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
+		let col2 = ColorInterpolate(col, colors.text_soft2, 0.8)
+		if hover
+			col2 = ColorInterpolate(col, colors.text_soft2, 0.6)
+		p.set_color(col2)
+		p.set_line_width(3.0)
+		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
+		p.set_line_width(1)
+	
+	void draw_envelope(Painter* p, OscillatorConfig o)
+		float t0 = 0
+		float t1 = t0 + o.attack
+		float t2 = t1 + o.decay
+		float t3 = t2 + o.release
+		draw_curve_exp(p, t0, o.initial, t1, o.peak, Red)
+		draw_curve_exp(p, t1, o.peak, t2, o.sustain, White)
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Green)
 		
-	void on_draw(Painter *p)
+		int h = get_hover()
+		draw_grabber(p, t1, 0, t1, 1, Red, h == -10)
+		draw_grabber(p, t2, 0, t2, 1, White, h == -11)
+		draw_grabber(p, t3, 0, t3, 1, Green, h == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, White, h == -13)
+		p.set_color(colors.text_soft1)
+		p.set_font_size(9)
+		if h == -10
+			p.draw_str(width - 100, height - 20, "attack " + (o.attack * 1000).str2(1) + " ms")
+		else if h == -11
+			p.draw_str(width - 100, height - 20, "decay " + (o.decay * 1000).str2(0) + " ms")
+		else if h == -12
+			p.draw_str(width - 100, height - 20, "release " + (o.release * 1000).str2(0) + " ms")
+		else if h == -13
+			p.draw_str(width - 100, height - 20, "sustain " + (o.sustain * 100).str2(0) + " %")
+		
+	void on_draw(Painter* p)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)
@@ -234,22 +277,60 @@ Grid ? ''
 					draw_link(p, j, k)
 			if o.target_out
 				draw_link(p, j, -1)
+		
+		draw_envelope(p, fc.osc[chosen])
 	
-	int hover()
+	int get_hover()
 		let e = HuiGetEvent()
+		float mx = e.mouse_x
+		float my = e.mouse_y
 		for i in 0:NUM_OSCILLATORS
 			let z = osci_pos(i)
-			if abs(e.mouse_x - z.x) + abs(e.mouse_y - z.y) < 20
+			if abs(mx - z.x) + abs(my - z.y) < 20
 				return i
+		if my > v2y(1.1) and chosen >= 0
+			let o = &fc.osc[chosen]
+			if abs(mx - t2x(o.attack)) < 10
+				return -10
+			if abs(mx - t2x(o.attack + o.decay)) < 10
+				return -11
+			if abs(mx - t2x(o.attack + o.decay + o.release)) < 10
+				return -12
+			if mx > t2x(o.attack) and mx < t2x(o.attack + o.decay + o.release) and abs(my - v2y(o.sustain)) < 10
+				return -13
 		return -1
 	
+	int moving
 	void on_left_button_down()
-		int h = hover()
+		int h = get_hover()
+		moving = -1
 		if h >= 0
 			set_chosen(h)
+		else if h < -5
+			moving = h
+	void on_left_button_up()
+		moving = -1
+	void on_mouse_move()
+		let e = HuiGetEvent()
+		float mx = e.mouse_x
+		float my = e.mouse_y
+		if moving < -5 and chosen >= 0
+			let o = &fc.osc[chosen]
+			if moving == -10
+				o.attack = x2t(mx)
+			if moving == -11
+				o.decay = x2t(mx) - o.attack
+			if moving == -12
+				o.release = x2t(mx) - o.attack - o.decay
+			if moving == -13
+				o.sustain = y2v(my)
+			update()
+			changed()
+		redraw("area")
+				
 		
 	void on_right_button_down()
-		int h = hover()
+		int h = get_hover()
 		if h >= 0
 			set_chosen(h)
 			menu_osci.popup(self)
@@ -309,18 +390,12 @@ Grid ? ''
 		redraw("area")
 		changed()
 
-	void on_change()
+	void on_spin_button()
 		if chosen < 0
 			return
 		let o = &fc.osc[chosen]
 		o.factor = get_float("factor")
 		o.amplitude = get_float("amplitude")
-		o.initial = get_float("initial")
-		o.peak = get_float("peak")
-		o.sustain = get_float("sustain")
-		o.attack = get_float("attack") / 1000
-		o.decay = get_float("decay") / 1000
-		o.release = get_float("release") / 1000
 		changed()
 	
 	override void update()
@@ -328,12 +403,6 @@ Grid ? ''
 			let o = &fc.osc[chosen]
 			set_float("factor", o.factor)
 			set_float("amplitude", o.amplitude)
-			set_float("initial", o.initial)
-			set_float("peak", o.peak)
-			set_float("sustain", o.sustain)
-			set_float("attack", o.attack * 1000)
-			set_float("decay", o.decay * 1000)
-			set_float("release", o.release * 1000)
 		update_osci_pos()
 		redraw("area")
 

@@ -58,134 +58,284 @@ class FMConfig extends PluginData
 			o.reset()
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
-		/*osc[1].factor = 1.9881
-		osc[1].amplitude = 0.7
-		osc[2].factor = 3.9821 // 1.72
-		osc[2].amplitude = 0.3
-		osc[3].factor = 1.00621
-		osc[3].amplitude = 0.5
-		osc[4].factor = 1.9934
-		osc[4].amplitude = 0.7*/
-//		OscillatorLink l
-//		l.source = 0
-//		l.dest = -1
-//		link.add(l)
 		osc[0].target_out = true
-		/*l.source = 1
-		l.dest = 0
-		link.add(l)
-		l.source = 2
-		l.dest = 1
-		link.add(l)
-		l.source = 3
-		l.dest = -1
-		link.add(l)
-		l.source = 4
-		l.dest = 3
-		link.add(l)*/
-	override void __init__()
-		reset()
-	//void __assign__(FMConfig o)
+	void clear_links()
+		for o in osc
+			for t in o.target
+				t = false
+			o.target_out = false
 
 class FMPanel extends ConfigPanel
 	FMConfig *fc
 	int chosen
+	Menu* menu_top
+	Menu* menu_osci
+	
+	float width, height
+	complex[NUM_OSCILLATORS] p_osci
+	complex p_out
+	
 	override FMSynthesizer *c
 	override void __init__(Module *_s)
-		//super.__init__(_s)
 		fc = &c.config
-		add_grid("", 0, 0, "outer_table")
-		set_target("outer_table")
-		add_grid("", 0, 0, "main_table")
-		add_separator("!horizontal", 0, 1, "")
-		add_grid("", 0, 2, "osc_table")
-		set_target("main_table")
-		add_label("Frequency", 0, 0, "")
-		add_label("Amplitude", 1, 0, "")
-		for j in 0:NUM_OSCILLATORS
-			add_spin_button("!range=0:32:0.001\\0", 0, j + 1, "factor_" + j)
-			add_spin_button("!range=0:1:0.001\\0", 1, j + 1, "amplitude_" + j)
-			add_radio_button("", 2, j+1, "chosen:osc_" + j)
-			event("chosen:osc_" + j, &on_chosen)
-		set_target("osc_table")
-		add_label("Initial", 0, 1, "")
-		add_label("Peak", 0, 2, "")
-		add_label("Sustain", 0, 3, "")
-		add_label("Attack (ms)", 0, 4, "")
-		add_label("Decay (ms)", 0, 5, "")
-		add_label("Release (ms)", 0, 6, "")
-		add_spin_button("!range=0:1:0.001\\0", 1, 1, "initial")
-		add_spin_button("!range=0:1:0.001\\0", 1, 2, "peak")
-		add_spin_button("!range=0:1:0.001\\0", 1, 3, "sustain")
-		add_spin_button("!range=0:1000:0.1\\0", 1, 4, "attack")
-		add_spin_button("!range=0:1000:0.1\\0", 1, 5, "decay")
-		add_spin_button("!range=0:1000:0.1\\0", 1, 6, "release")
-		for j in 0:NUM_OSCILLATORS
-			add_check_box("" + j, 2, j+1, "link_" + j)
-		add_check_box("out", 2, NUM_OSCILLATORS + 1, "link_out")
-		add_combo_box("sine\\square\\saw", 3, 1, "type")
-		event("*", &on_change)
+		
+		from_source("
+Grid ? ''
+	DrawingArea area '' height=120 expandx noexpandy
+	---|
+	Grid ? ''
+		Label ? 'Freq Multiplier'
+		SpinButton factor '' range=0:32:0.001 expandx
+		---|
+		Label ? 'Amplitude'
+		SpinButton amplitude '' range=0:100:0.001
+		---|
+		Label ? 'Initial'
+		SpinButton initial '0' range=0:1:0.001
+		---|
+		Label ? 'Peak'
+		SpinButton peak '0' range=0:1:0.001
+		---|
+		Label ? 'Sustain'
+		SpinButton sustain '0' range=0:1:0.001
+		---|
+		Label ? 'Attack (ms)'
+		SpinButton attack '0' range=0:1000:0.1
+		---|
+		Label ? 'Decay (ms)'
+		SpinButton decay '0' range=0:1000:0.1
+		---|
+		Label ? 'Release (ms)'
+		SpinButton release '0' range=0:1000:0.1")
+		
+		event_x("area", "hui:draw", &on_draw)
+		event_x("area", "hui:left-button-down", &on_left_button_down)
+		event_x("area", "hui:right-button-down", &on_right_button_down)
+		let ids = ["factor", "amplitude", "initial", "peak", "sustain", "attack", "decay", "release", "type"]
+		for id in ids
+			event(id, &on_change)
 		chosen = 0
+		
+		menu_top = new Menu
+		menu_top.add("Topology", "label-top")
+		menu_top.enable("label-top", false)
+		menu_top.add("o-o", "top-0")
+		menu_top.add("o   o", "top-1")
+		menu_top.add("o-o-o", "top-2")
+		menu_top.add("o-(o   o)", "top-3")
+		menu_top.add("o-o   o", "top-4")
+		menu_top.add("o-o-o   o-o-o", "top-98")
+		menu_top.add("o-o-o   o-o   o", "top-99")
+		for i in 0:100
+			event("top-" + i, &on_topology)
+
+		menu_osci = new Menu
+		menu_osci.add("Oscillator", "label")
+		menu_osci.enable("label", false)
+		menu_osci.add("sine", "type-sine")
+		menu_osci.add("square", "type-square")
+		menu_osci.add("saw", "type-saw")
+		event("type-sine", &on_type_sine)
+		event("type-square", &on_type_square)
+		event("type-saw", &on_type_saw)
 	
-	void on_chosen()
-		chosen = HuiGetEvent().id.substr(11, -1).int()
+	void update_osci_pos()
+		// initial
+		p_out = complex(40, 50)
+		for p,i in p_osci
+			p = complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
+			bool has_links = fc.osc[i].target_out
+			for t in fc.osc[i].target
+				has_links = has_links or t
+			if !has_links
+				p += complex(1000,1000)
+		for i in 0:200
+			iterate_osci_pos()
+	complex _f_link(complex a, complex b)
+		float d = (b - a).abs()
+		complex dir = (b - a) * (1/d)
+		return dir * (d - 100) * 0.1 + complex(0, (b.y-a.y) * 0.05)
+	complex _f_free(complex a, complex b)
+		float d = (b - a).abs()
+		complex dir = (b - a) * (1/d)
+		return dir * min(d - 50, 0) * 0.2
+	void iterate_osci_pos()
+		complex[NUM_OSCILLATORS] f
+		for o,i in fc.osc
+			f[i] = complex(0,0)
+			for o2,j in fc.osc
+				if i == j
+					continue
+				if linked(i,j)
+					f[i] += _f_link(p_osci[i], p_osci[j])
+				else
+					f[i] += _f_free(p_osci[i], p_osci[j])
+			if o.target_out
+				f[i] += _f_link(p_osci[i], p_out)
+		for o,i in fc.osc
+			p_osci[i] += f[i]
+	bool linked(int i, int j)
+		return fc.osc[i].target[j] or fc.osc[j].target[i]
+	
+	complex osci_pos(int index)
+		if index < 0
+			return p_out
+		return p_osci[index]
+
+	void draw_type(Painter *p, complex z, int type, float dx, float amp)
+		dx /= pi
+		float v0 = 0
+		float t0 = -pi
+		for t in -pi:pi+0.1:0.1
+			float v = sin(t)
+			if type == TYPE_SQUARE
+				if v > 0
+					v = 1
+				else
+					v = -1
+			else if type == TYPE_SAW
+				v = -1 + 2*loop(t, 0, pi) / pi
+			if t > t0
+				p.draw_line(z.x + t0*dx, z.y - v0*amp, z.x + t*dx, z.y - v*amp)
+			t0 = t
+			v0 = v
+	
+	void draw_osci(Painter *p, int index)
+		let z = osci_pos(index)
+		p.set_color(ColorInterpolate(colors.selection, colors.background, 0.7))
+		if index == chosen
+			p.set_color(colors.selection)
+		p.draw_circle(z.x, z.y, 18)
+	
+		let o = fc.osc[index]
+		p.set_color(colors.text)
+		draw_type(p, z, o._type, 12, 7)
+	
+	void draw_link(Painter *p, int a, int b)
+		p.set_color(colors.text)
+		let z1 = osci_pos(a)
+		let z2 = osci_pos(b)
+		p.draw_line(z1.x - 20, z1.y, z2.x + 20, z2.y)
+		
+	void on_draw(Painter *p)
+		width = p.width
+		height = p.height
+		p.set_color(colors.background)
+		p.draw_rect(0, 0, width, height)
+		
+		p.set_color(colors.text)
+		p.draw_str(p_out.x-25, p_out.y-8, "out")
+		
+		for j in 0:NUM_OSCILLATORS
+			draw_osci(p, j)
+		for o,j in fc.osc
+			for k in 0:NUM_OSCILLATORS
+				if o.target[k]
+					draw_link(p, j, k)
+			if o.target_out
+				draw_link(p, j, -1)
+	
+	int hover()
+		let e = HuiGetEvent()
+		for i in 0:NUM_OSCILLATORS
+			let z = osci_pos(i)
+			if abs(e.mouse_x - z.x) + abs(e.mouse_y - z.y) < 20
+				return i
+		return -1
+	
+	void on_left_button_down()
+		int h = hover()
+		if h >= 0
+			set_chosen(h)
+		
+	void on_right_button_down()
+		int h = hover()
+		if h >= 0
+			set_chosen(h)
+			menu_osci.popup(self)
+		else
+			menu_top.popup(self)
+	
+	void set_chosen(int i)
+		chosen = i
+		redraw("area")
 		update()
 	
+	void on_topology()
+		int x = HuiGetEvent().id[4:].int()
+		fc.clear_links()
+		fc.osc[0].target_out = true
+		if x == 0
+			fc.osc[1].target[0] = true
+		else if x == 1
+			fc.osc[1].target_out = true
+		else if x == 2
+			fc.osc[1].target[0] = true
+			fc.osc[2].target[1] = true
+		else if x == 3
+			fc.osc[1].target[0] = true
+			fc.osc[2].target[0] = true
+		else if x == 4
+			fc.osc[1].target[0] = true
+			fc.osc[2].target_out = true
+		else if x == 98
+			fc.osc[1].target[0] = true
+			fc.osc[2].target[1] = true
+			fc.osc[3].target_out = true
+			fc.osc[4].target[3] = true
+			fc.osc[5].target[4] = true
+		else if x == 99
+			fc.osc[1].target[0] = true
+			fc.osc[2].target[1] = true
+			fc.osc[3].target_out = true
+			fc.osc[4].target[3] = true
+			fc.osc[5].target_out = true
+		update_osci_pos()
+		redraw("area")
+		changed()
+	
+	void on_type_sine()
+		fc.osc[chosen]._type = TYPE_SINE
+		redraw("area")
+		changed()
+	
+	void on_type_square()
+		fc.osc[chosen]._type = TYPE_SQUARE
+		redraw("area")
+		changed()
+		
+	void on_type_saw()
+		fc.osc[chosen]._type = TYPE_SAW
+		redraw("area")
+		changed()
+
 	void on_change()
-		if HuiGetEvent().id[:6] == "chosen"
+		if chosen < 0
 			return
-		for o,j in fc.osc
-			o.factor = get_float("factor_" + j)
-			o.amplitude = get_float("amplitude_" + j)
-			
-		OscillatorConfig *o = &fc.osc[chosen]
+		let o = &fc.osc[chosen]
+		o.factor = get_float("factor")
+		o.amplitude = get_float("amplitude")
 		o.initial = get_float("initial")
 		o.peak = get_float("peak")
 		o.sustain = get_float("sustain")
 		o.attack = get_float("attack") / 1000
 		o.decay = get_float("decay") / 1000
 		o.release = get_float("release") / 1000
-		o._type = get_int("type")
-		
-		/*for l,i in fc.link
-			if l.source == chosen
-				fc.link.remove(i)
-				i --*/
-		o.target_out = is_checked("link_out")
-		/*if isChecked("link_out")
-			OscillatorLink l
-			l.source = chosen
-			l.dest = -1
-			fc.link.add(l)*/
-		for j in 0:NUM_OSCILLATORS
-			o.target[j] = is_checked("link_" + j)
-			/*if isChecked("link_" + j)
-				l.dest = j
-				fc.link.add(l)*/
-		
 		changed()
 	
 	override void update()
-		for o,j in fc.osc
-			set_float("factor_" + j, o.factor)
-			set_float("amplitude_" + j, o.amplitude)
-		OscillatorConfig *o = &fc.osc[chosen]
-		set_float("initial", o.initial)
-		set_float("peak", o.peak)
-		set_float("sustain", o.sustain)
-		set_float("attack", o.attack * 1000)
-		set_float("decay", o.decay * 1000)
-		set_float("release", o.release * 1000)
-		set_int("type", o._type)
-		for j in 0:NUM_OSCILLATORS
-			check("link_" + j, o.target[j])
-		check("link_out", o.target_out)
-		/*for l in fc.link
-			if l.source == chosen
-				if l.dest == -1
-					check("link_out", true)
-				else
-					check("link_" + l.dest, true)*/
+		if chosen >= 0
+			let o = &fc.osc[chosen]
+			set_float("factor", o.factor)
+			set_float("amplitude", o.amplitude)
+			set_float("initial", o.initial)
+			set_float("peak", o.peak)
+			set_float("sustain", o.sustain)
+			set_float("attack", o.attack * 1000)
+			set_float("decay", o.decay * 1000)
+			set_float("release", o.release * 1000)
+		update_osci_pos()
+		redraw("area")
 
 
 

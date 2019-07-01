@@ -184,6 +184,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scroll_bar_time->constrained = false;
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
+	metronome_overlay_vlayer->align.dz = 20;
 	dummy_vtrack = new AudioViewTrack(this, nullptr);
 	dummy_vlayer = new AudioViewLayer(this, nullptr);
 

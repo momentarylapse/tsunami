@@ -970,11 +970,14 @@ void TsunamiWindow::on_render_export_selection() {
 	}
 }
 
+Song *copy_song_from_selection(Song *song, SongSelection &sel);
+
 void TsunamiWindow::on_export_selection() {
-	// TODO
 	if (session->storage->ask_save(this)) {
-		if (session->storage->render_export_selection(song, &view->sel, hui::Filename))
+		Song *s = copy_song_from_selection(song, view->sel);
+		if (session->storage->save(s, hui::Filename))
 			view->set_message(_("file exported"));
+		delete s;
 	}
 }
 

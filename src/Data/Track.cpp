@@ -76,8 +76,6 @@ Track::Track(SignalType _type, Synthesizer *_synth) {
 	muted = false;
 
 	synth = _synth;
-
-	layers.add(new TrackLayer(this));
 }
 
 

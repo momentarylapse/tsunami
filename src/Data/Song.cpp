@@ -10,8 +10,10 @@
 #include "Track.h"
 #include "TrackLayer.h"
 #include "Sample.h"
+#include "CrossFade.h"
 #include "SongSelection.h"
 #include "Curve.h"
+#include "TrackMarker.h"
 #include "Rhythm/Bar.h"
 #include "../Action/ActionManager.h"
 #include "../Action/Bar/ActionBarAdd.h"
@@ -40,6 +42,7 @@
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
 #include "../Module/Synth/DummySynthesizer.h"
 #include "../Module/Audio/AudioEffect.h"
+#include "../Module/Midi/MidiEffect.h"
 #include "../Stuff/Log.h"
 #include "../lib/threads/Mutex.h"
 #include <assert.h>
@@ -245,7 +248,9 @@ Track *Song::add_track(SignalType type, int index) {
 	}
 	if (index < 0)
 		index = tracks.num;
-	return (Track*)execute(new ActionTrackAdd(new Track(type, CreateSynthesizer(session, "")), index));
+	Track *t = new Track(type, CreateSynthesizer(session, ""));
+	t->layers.add(new TrackLayer(t));
+	return (Track*)execute(new ActionTrackAdd(t, index));
 }
 
 Track *Song::add_track_after(SignalType type, Track *ref) {
@@ -435,4 +440,61 @@ Array<TrackLayer*> Song::layers() const {
 		layers.append(t->layers);
 	return layers;
 
+}
+
+
+
+Song *copy_song_from_selection(Song *song, SongSelection &sel) {
+	Song *ss = new Song(song->session, song->sample_rate);
+	ss->tags = song->tags;
+	for (Bar *b: song->bars)
+		if (sel.range.covers(b->range())) {
+			int before = b->range().offset - sel.range.offset;
+			if (ss->bars.num == 0 and before > 0)
+				ss->bars.add(new Bar(before, 0, 0));
+			ss->bars.add(new Bar(*b));
+		}
+	for (Track *t: song->tracks) {
+		if (!sel.has(t))
+			continue;
+		Track *tt = new Track(t->type, (Synthesizer*)t->synth->copy());
+		ss->tracks.add(tt);
+		tt->name = t->name;
+		tt->volume = t->volume;
+		tt->panning = t->panning;
+		tt->muted = t->muted;
+		for (auto *f: t->fx)
+			tt->fx.add((AudioEffect*)f->copy());
+		for (auto *f: t->midi_fx)
+			tt->midi_fx.add((MidiEffect*)f->copy());
+		tt->synth = (Synthesizer*)t->synth->copy();
+		tt->instrument = t->instrument;
+		tt->channels = t->channels;
+		for (TrackLayer *l: t->layers) {
+			if (!sel.has(l))
+				continue;
+			auto *ll = new TrackLayer(tt);
+			tt->layers.add(ll);
+			for (auto *n: l->midi)
+				if (sel.has(n)) {
+					auto *nn = n->copy();
+					nn->range.offset -= sel.range.offset;
+					ll->midi.add(nn);
+				}
+			for (auto &b: l->buffers) {
+				if (b.range().overlaps(sel.range)) {
+					Range ri = b.range() and sel.range;
+					AudioBuffer bb;
+					l->read_buffers(bb, ri, true);
+					ll->buffers.add(bb);
+					ll->buffers.back().offset = ri.offset - sel.range.offset;
+				}
+			}
+		}
+		tt->fades = t->fades; // TODO...
+		for (auto *m: t->markers)
+			if (sel.has(m))
+				tt->markers.add(new TrackMarker({m->range - sel.range.offset, m->text}));
+	}
+	return ss;
 }

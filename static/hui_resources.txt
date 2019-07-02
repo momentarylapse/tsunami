@@ -1216,7 +1216,7 @@ image=hui:save-as
 0
 Item
 export_selection
-image=hui:save-as,disabled
+image=hui:save-as
 1
 0
 0

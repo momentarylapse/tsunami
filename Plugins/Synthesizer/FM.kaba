@@ -77,6 +77,12 @@ class FMPanel extends ConfigPanel
 	complex[NUM_OSCILLATORS] p_osci
 	complex p_out
 	
+	int moving, hover
+	
+	void add_top(string label, string id)
+		menu_top.add(label, "top-" + id)
+		event("top-" + id, &on_topology)
+	
 	override FMSynthesizer *c
 	override void __init__(Module *_s)
 		fc = &c.config
@@ -100,19 +106,23 @@ Grid ? ''
 		event("factor", &on_spin_button)
 		event("amplitude", &on_spin_button)
 		chosen = 0
+		hover = -1
 		
 		menu_top = new Menu
 		menu_top.add("Topology", "label-top")
 		menu_top.enable("label-top", false)
-		menu_top.add("o-o", "top-0")
-		menu_top.add("o   o", "top-1")
-		menu_top.add("o-o-o", "top-2")
-		menu_top.add("o-(o   o)", "top-3")
-		menu_top.add("o-o   o", "top-4")
-		menu_top.add("o-o-o   o-o-o", "top-98")
-		menu_top.add("o-o-o   o-o   o", "top-99")
-		for i in 0:100
-			event("top-" + i, &on_topology)
+		add_top("o", "x")
+		add_top("o-o", "x0")
+		add_top("o   o", "xx")
+		add_top("o-o-o", "x01")
+		add_top("o-(o   o)", "x00")
+		add_top("o-o   o", "x0x")
+		add_top("o-o   o-o", "x0x2")
+		add_top("o-o-o   o", "x01x")
+		add_top("o-(o   o)   o", "x00x")
+		add_top("o-o-o   o-o-o", "x01x34")
+		add_top("o-o-o   o-o   o", "x01x3x")
+		add_top("o-(o   o)   o-(o   o)", "x00x33")
 
 		menu_osci = new Menu
 		menu_osci.add("Oscillator", "label")
@@ -128,13 +138,13 @@ Grid ? ''
 		// initial
 		p_out = complex(40, 50)
 		for p,i in p_osci
-			p = complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
+			p = complex(100+15*i, i*20)//complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
 			bool has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
 				has_links = has_links or t
 			if !has_links
 				p += complex(1000,1000)
-		for i in 0:200
+		for i in 0:2000
 			iterate_osci_pos()
 	complex _f_link(complex a, complex b)
 		float d = (b - a).abs()
@@ -143,7 +153,7 @@ Grid ? ''
 	complex _f_free(complex a, complex b)
 		float d = (b - a).abs()
 		complex dir = (b - a) * (1/d)
-		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.2
+		return dir * min(d - OSCI_RADIUS*3.5, 0) * 0.3
 	void iterate_osci_pos()
 		complex[NUM_OSCILLATORS] f
 		for o,i in fc.osc
@@ -217,9 +227,11 @@ Grid ? ''
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
 			cc.add(complex(t2x(t), v2y(v)))
-		let col2 = ColorInterpolate(col, colors.text_soft2, 0.8)
+		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
+		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
+		p.set_line_dash([2.0,0.0])
 		cc.add(complex(t2x(t1), v2y(0)))
 		cc.add(complex(t2x(t0), v2y(0)))
 		col2.a = 0.2
@@ -227,11 +239,11 @@ Grid ? ''
 		p.draw_polygon(cc)
 	
 	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
-		let col2 = ColorInterpolate(col, colors.text_soft2, 0.8)
+		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
 		if hover
-			col2 = ColorInterpolate(col, colors.text_soft2, 0.6)
+			col2 = ColorInterpolate(col, colors.text, 0.5)
 		p.set_color(col2)
-		p.set_line_width(3.0)
+		p.set_line_width(2.0)
 		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
 		p.set_line_width(1)
 	
@@ -241,23 +253,23 @@ Grid ? ''
 		float t2 = t1 + o.decay
 		float t3 = t2 + o.release
 		draw_curve_exp(p, t0, o.initial, t1, o.peak, Red)
-		draw_curve_exp(p, t1, o.peak, t2, o.sustain, White)
+		draw_curve_exp(p, t1, o.peak, t2, o.sustain, Orange)
 		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Green)
 		
-		int h = get_hover()
-		draw_grabber(p, t1, 0, t1, 1, Red, h == -10)
-		draw_grabber(p, t2, 0, t2, 1, White, h == -11)
-		draw_grabber(p, t3, 0, t3, 1, Green, h == -12)
-		draw_grabber(p, t1, o.sustain, t3, o.sustain, White, h == -13)
+		
+		draw_grabber(p, t1, 0, t1, 1, Red, hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, Orange, hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, Green, hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, Yellow, hover == -13)
 		p.set_color(colors.text_soft1)
 		p.set_font_size(9)
-		if h == -10
+		if hover == -10
 			p.draw_str(width - 100, height - 20, "attack " + (o.attack * 1000).str2(1) + " ms")
-		else if h == -11
+		else if hover == -11
 			p.draw_str(width - 100, height - 20, "decay " + (o.decay * 1000).str2(0) + " ms")
-		else if h == -12
+		else if hover == -12
 			p.draw_str(width - 100, height - 20, "release " + (o.release * 1000).str2(0) + " ms")
-		else if h == -13
+		else if hover == -13
 			p.draw_str(width - 100, height - 20, "sustain " + (o.sustain * 100).str2(0) + " %")
 		
 	void on_draw(Painter* p)
@@ -300,14 +312,13 @@ Grid ? ''
 				return -13
 		return -1
 	
-	int moving
 	void on_left_button_down()
-		int h = get_hover()
+		hover = get_hover()
 		moving = -1
-		if h >= 0
-			set_chosen(h)
-		else if h < -5
-			moving = h
+		if hover >= 0
+			set_chosen(hover)
+		else if hover < -5
+			moving = hover
 	void on_left_button_up()
 		moving = -1
 	void on_mouse_move()
@@ -317,22 +328,24 @@ Grid ? ''
 		if moving < -5 and chosen >= 0
 			let o = &fc.osc[chosen]
 			if moving == -10
-				o.attack = x2t(mx)
+				o.attack = clamp(x2t(mx), 0.0002, 2)
 			if moving == -11
-				o.decay = x2t(mx) - o.attack
+				o.decay = clamp(x2t(mx) - o.attack, 0.001, 2)
 			if moving == -12
-				o.release = x2t(mx) - o.attack - o.decay
+				o.release = clamp(x2t(mx) - o.attack - o.decay, 0.001, 2)
 			if moving == -13
-				o.sustain = y2v(my)
+				o.sustain = clamp(y2v(my), 0.001, 1.0)
 			update()
 			changed()
+		else
+			hover = get_hover()
 		redraw("area")
 				
 		
 	void on_right_button_down()
-		int h = get_hover()
-		if h >= 0
-			set_chosen(h)
+		hover = get_hover()
+		if hover >= 0
+			set_chosen(hover)
 			menu_osci.popup(self)
 		else
 			menu_top.popup(self)
@@ -343,34 +356,14 @@ Grid ? ''
 		update()
 	
 	void on_topology()
-		int x = HuiGetEvent().id[4:].int()
+		let code = HuiGetEvent().id[4:]
 		fc.clear_links()
-		fc.osc[0].target_out = true
-		if x == 0
-			fc.osc[1].target[0] = true
-		else if x == 1
-			fc.osc[1].target_out = true
-		else if x == 2
-			fc.osc[1].target[0] = true
-			fc.osc[2].target[1] = true
-		else if x == 3
-			fc.osc[1].target[0] = true
-			fc.osc[2].target[0] = true
-		else if x == 4
-			fc.osc[1].target[0] = true
-			fc.osc[2].target_out = true
-		else if x == 98
-			fc.osc[1].target[0] = true
-			fc.osc[2].target[1] = true
-			fc.osc[3].target_out = true
-			fc.osc[4].target[3] = true
-			fc.osc[5].target[4] = true
-		else if x == 99
-			fc.osc[1].target[0] = true
-			fc.osc[2].target[1] = true
-			fc.osc[3].target_out = true
-			fc.osc[4].target[3] = true
-			fc.osc[5].target_out = true
+		for i in 0:len(code)
+			if code[i] == 'x'
+				fc.osc[i].target_out = true
+			else
+				int t = code[i:i+1].int()
+				fc.osc[i].target[t] = true
 		update_osci_pos()
 		redraw("area")
 		changed()

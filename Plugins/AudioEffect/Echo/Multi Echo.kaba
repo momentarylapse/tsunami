@@ -188,6 +188,7 @@ class MultiEchoGrid extends Grid
 	override void on_mouse_wheel()
 		if hover >= 0
 			config.refl[hover].feedback *= exp(HuiGetEvent().scroll_y * 0.02)
+			redraw()
 			cp.changed()
 
 class MultiEchoPanel extends ConfigPanel

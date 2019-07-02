@@ -1,0 +1,13 @@
+use "../../api.kaba"
+
+
+class SingleSamples extends AudioEffect
+	
+	override int read(AudioBuffer buf)
+		if !source
+			return -1
+		for i in 0:len(buf)
+			int r = source.read_audio(buf[i:i+1])
+			if r < 0
+				return r
+		return len(buf)

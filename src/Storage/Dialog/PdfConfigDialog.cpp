@@ -6,15 +6,16 @@
  */
 
 #include "PdfConfigDialog.h"
+#include "../StorageOperationData.h"
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 
-PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window *parent) :
+PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent) :
 	hui::Dialog("pdf export config", 200, 100, parent, false)
 {
-	data = _data;
-	song = _song;
+	od = _od;
+	song = od->song;
 	ok = false;
 
 	add_grid("", 0, 0, "root");
@@ -47,27 +48,23 @@ PdfConfigDialog::PdfConfigDialog(PdfConfigData *_data, Song *_song, hui::Window 
 	event("ok", [=]{ on_ok(); });
 }
 
-PdfConfigDialog::~PdfConfigDialog()
-{
-}
-
-void PdfConfigDialog::on_close()
-{
+void PdfConfigDialog::on_close() {
 	destroy();
 }
 
-void PdfConfigDialog::on_ok()
-{
+void PdfConfigDialog::on_ok() {
 	ok = true;
-	data->track_mode.resize(song->tracks.num);
 	foreachi(Track *t, song->tracks, i){
 		if (t->type != SignalType::MIDI)
 			continue;
-		bool classical = is_checked(format("classical-%d", i));
-		bool tab = is_checked(format("tab-%d", i));
-		data->track_mode[i] = (classical ? 1 : 0) + (tab ? 2 : 0);
+		Array<string> p;
+		if (is_checked(format("classical-%d", i)))
+			p.add("classical");
+		if (is_checked(format("tab-%d", i)))
+			p.add("tab");
+		od->parameters.set(format("track-%d", i), implode(p, ","));
 	}
-	data->horizontal_scale = get_float("scale") / 100;
+	od->parameters.set("horizontal-scale", f2s(get_float("scale") / 100, 3));
 
 	destroy();
 }

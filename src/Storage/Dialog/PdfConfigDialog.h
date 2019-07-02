@@ -11,22 +11,17 @@
 #include "../../lib/hui/hui.h"
 
 class Song;
-
-struct PdfConfigData {
-	float horizontal_scale;
-	Array<int> track_mode;
-};
+class StorageOperationData;
 
 class PdfConfigDialog : public hui::Dialog {
 public:
-	PdfConfigDialog(PdfConfigData *data, Song *song, hui::Window *parent);
-	virtual ~PdfConfigDialog();
+	PdfConfigDialog(StorageOperationData *od, hui::Window *parent);
 
 	void on_close();
 	void on_ok();
 
+	StorageOperationData *od;
 	Song *song;
-	PdfConfigData *data;
 	bool ok;
 };
 

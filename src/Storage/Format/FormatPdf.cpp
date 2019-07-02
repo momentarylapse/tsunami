@@ -32,12 +32,20 @@ static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
 Array<MidiKeyChange> get_key_changes(const Track *t);
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
-	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE)
-{
+	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE) {}
+
+
+bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
+	od->parameters.set("horizontal-scale", "1.0");
+	
+	auto *dlg = new PdfConfigDialog(od, od->win);
+	dlg->run();
+	bool ok = dlg->ok;
+	delete dlg;
+	return ok;
 }
 
-ColorScheme create_pdf_color_scheme()
-{
+ColorScheme create_pdf_color_scheme() {
 	ColorSchemeBasic bright;
 	bright.background = White;
 	bright.text = Black;//color(1, 0.3f, 0.3f, 0.1f);
@@ -48,15 +56,13 @@ ColorScheme create_pdf_color_scheme()
 	return bright.create(true);
 }
 
-FormatPdf::LineData::LineData(Track *t, float _y0, float _y1)
-{
+FormatPdf::LineData::LineData(Track *t, float _y0, float _y1) {
 	y0 = _y0;
 	y1 = _y1;
 	track = t;
 }
 
-int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
-{
+int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
 	int slack = song->sample_rate / 30;
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
@@ -73,7 +79,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 
 	// clef lines
 	p->set_color(colors->text_soft1);
-	for (int i=0; i<10; i+=2){
+	for (int i=0; i<10; i+=2) {
 		float y = mp->clef_pos_to_screen(i);
 		p->draw_line(x0, y, x0 + w, y);
 	}
@@ -86,8 +92,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	return y0 + 100;
 }
 
-int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale)
-{
+int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
 	float string_dy = 26;
 
 	int slack = song->sample_rate / 30;
@@ -107,7 +112,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 
 	// string lines
 	p->set_color(colors->text_soft1);
-	for (int i=0; i<t->instrument.string_pitch.num; i++){
+	for (int i=0; i<t->instrument.string_pitch.num; i++) {
 		float y = mp->string_to_screen(i);
 		p->draw_line(x0, y, x0 + w, y);
 	}
@@ -119,8 +124,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	return y0 + string_dy * n;
 }
 
-TrackMarker* get_bar_part(Song *s, int offset)
-{
+TrackMarker* get_bar_part(Song *s, int offset) {
 	auto *t = s->time_track();
 	if (!t)
 		return nullptr;
@@ -130,15 +134,14 @@ TrackMarker* get_bar_part(Song *s, int offset)
 	return nullptr;
 }
 
-void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r)
-{
+void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r) {
 	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
-	for (auto b: beats){
+	for (auto b: beats) {
 		float x = cam->sample2screen(b.range.offset);
-		if (b.level == 0){
+		if (b.level == 0) {
 			p->set_color(colors->text_soft1);
 			p->set_line_width(2);
-		}else{
+		} else {
 			p->set_color(colors->text_soft3);
 			p->set_line_width(1);
 		}
@@ -147,23 +150,22 @@ void FormatPdf::draw_beats(Painter *p, float x0, float w, float y, float h, cons
 	p->set_line_width(1);
 }
 
-void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r)
-{
+void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r) {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
 	for (auto b: bars){
 		float x = cam->sample2screen(b->offset);
 		double bpm = b->bpm(song->sample_rate);
 		string s;
-		if (b->beats != pdf_pattern){
+		if (b->beats != pdf_pattern) {
 			pdf_pattern = b->beats;
 			s += b->format_beats(false) + "   ";
 		}
-		if (fabs(bpm - pdf_bpm) > 0.2){
+		if (fabs(bpm - pdf_bpm) > 0.2) {
 			pdf_bpm = bpm;
 			s += format("%.0f bpm ", bpm);
 		}
 
-		if (s != ""){
+		if (s != "") {
 			p->set_color(colors->text_soft2);
 			//p->draw_line(x + 10, y - 65, x - 20, y + 5);
 			//p->draw_line(x + 10, y - 65, x + 20, y - 65);
@@ -176,7 +178,7 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 
 		// part?
 		auto *m = get_bar_part(song, b->offset);
-		if (m){
+		if (m) {
 			p->set_color(colors->text);
 			p->draw_line(x - 20, y - 65, x - 20, y - 35);
 			p->draw_line(x - 20, y - 65, x + 20, y - 65);
@@ -187,8 +189,7 @@ void FormatPdf::draw_bar_markers(Painter *p, float x0, float w, float y, float h
 	}
 }
 
-int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale, PdfConfigData *data)
-{
+int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
 	float track_space = 20;
 
 	cam->pos = r.offset;
@@ -196,7 +197,7 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 
 
 	auto bars = song->bars.get_bars(r + 1000);
-	if (bars.num > 0){
+	if (bars.num > 0) {
 		p->set_color(colors->text_soft1);
 		p->set_font_size(20);
 		p->draw_str(x0 + 5, y0 - 15, i2s(bars[0]->index_text + 1));
@@ -206,12 +207,13 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 
 	draw_bar_markers(p, x0, w, y0, 100, r);
 
-	foreachi (Track* t, song->tracks, ti){
+	foreachi (Track* t, song->tracks, ti) {
 		if (t->type != SignalType::MIDI)
 			continue;
 
-		bool allow_classical = (data->track_mode[ti] & 1);
-		bool allow_tab = (data->track_mode[ti] & 2) and (t->instrument.string_pitch.num > 0);
+		string ff = od->parameters[format("track-%d", ti)];
+		bool allow_classical = (ff.find("classical") >= 0);
+		bool allow_tab = (ff.find("tab") >= 0) and (t->instrument.string_pitch.num > 0);
 		if (!allow_classical and !allow_tab)
 			continue;
 
@@ -236,12 +238,11 @@ int FormatPdf::draw_line(Painter *p, float x0, float w, float y0, const Range &r
 	return y0;
 }
 
-int FormatPdf::good_samples(const Range &r0)
-{
+int FormatPdf::good_samples(const Range &r0) {
 	auto bars = song->bars.get_bars(Range(r0.offset, r0.length * 2));
 	int best_pos = -1;
 	float best_penalty = 100000;
-	for (auto b: bars){
+	for (auto b: bars) {
 		if (b->range().offset <= r0.offset)
 			continue;
 		// close to rough guess?
@@ -251,7 +252,7 @@ int FormatPdf::good_samples(const Range &r0)
 		if (get_bar_part(song, b->range().offset))
 			penalty -= song->sample_rate * 8;
 
-		if (penalty < best_penalty){
+		if (penalty < best_penalty) {
 			best_pos = b->range().offset;
 			best_penalty = penalty;
 		}
@@ -262,13 +263,9 @@ int FormatPdf::good_samples(const Range &r0)
 	return best_pos - r0.offset;
 }
 
-void FormatPdf::save_song(StorageOperationData* od)
-{
-	PdfConfigData data;
+void FormatPdf::save_song(StorageOperationData* _od) {
+	od = _od;
 	song = od->song;
-	auto *dlg = new PdfConfigDialog(&data, od->song, od->win);
-	dlg->run();
-	delete dlg;
 
 	float page_width = 1200;
 	float page_height = 2000;
@@ -290,7 +287,7 @@ void FormatPdf::save_song(StorageOperationData* od)
 	float x0 = border;
 	float w = page_width - 2*border;
 
-	float avg_scale = 130.0f / od->song->sample_rate * data.horizontal_scale;
+	float avg_scale = 130.0f / od->song->sample_rate * od->parameters["horizontal-scale"]._float();
 	float avg_samples_per_line = w / avg_scale;
 
 	int samples = od->song->range_with_time().end();
@@ -303,12 +300,12 @@ void FormatPdf::save_song(StorageOperationData* od)
 
 	auto p = parser->add_page(page_width, page_height);
 
-	if (first_page){
+	if (first_page) {
 		p->set_color(colors->text);
 		p->set_font("Times", 50, false, false);
 		//p->set_font("Helvetica", 50, false, false);
 		p->draw_str(200, 50, od->song->get_tag("title"));
-		if (od->song->get_tag("artist").num > 0){
+		if (od->song->get_tag("artist").num > 0) {
 			p->set_font("Courier", 15, false, false);
 			p->set_font_size(15);
 			p->set_color(colors->text_soft2);
@@ -321,19 +318,19 @@ void FormatPdf::save_song(StorageOperationData* od)
 	pdf_bpm = 0;
 
 	int offset = 0;
-	while (offset < samples){
+	while (offset < samples) {
 		int line_samples = good_samples(Range(offset, avg_samples_per_line));
 		float scale = w / line_samples;
 		Range r = Range(offset, line_samples);
 
 		float y_prev = y0;
-		y0 = draw_line(p, x0, w, y0, r, scale, &data) + line_space;
+		y0 = draw_line(p, x0, w, y0, r, scale) + line_space;
 
 		offset += line_samples;
 
 		// new page?
 		float dy = y0 - y_prev;
-		if (y0 + dy > page_height and offset < samples){
+		if (y0 + dy > page_height and offset < samples) {
 			delete p;
 			p = parser->add_page(page_width, page_height);
 			y0 = 100;

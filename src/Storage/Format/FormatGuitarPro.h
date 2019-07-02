@@ -13,27 +13,24 @@
 
 class Bar;
 
-class FormatGuitarPro: public Format
-{
+class FormatGuitarPro: public Format {
 public:
-	void load_track(StorageOperationData *od){}
-	void save_via_renderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od) override {}
+	void save_via_renderer(StorageOperationData *od) override {}
 
-	void load_song(StorageOperationData *od);
-	void save_song(StorageOperationData *od);
+	void load_song(StorageOperationData *od) override;
+	void save_song(StorageOperationData *od) override;
 
 	int version;
 
-	struct GpTrack
-	{
+	struct GpTrack {
 		Array<int> tuning;
 		int midi_instrument;
 		bool is_drum;
 		Track *t;
 	};
 	Array<GpTrack> tracks;
-	struct GpMeasure
-	{
+	struct GpMeasure {
 		int numerator, denominator;
 		string marker;
 		int length;
@@ -41,8 +38,7 @@ public:
 	Array<GpMeasure> measures;
 	int tempo;
 
-	struct GpChannel
-	{
+	struct GpChannel {
 		int instrument;
 		int volume;
 		int balance;
@@ -51,6 +47,7 @@ public:
 
 	File *f;
 	StorageOperationData *od;
+	Song *song;
 
 	void read_info();
 	void read_lyrics();
@@ -86,11 +83,10 @@ public:
 };
 
 
-class FormatDescriptorGuitarPro : public FormatDescriptor
-{
+class FormatDescriptorGuitarPro : public FormatDescriptor {
 public:
 	FormatDescriptorGuitarPro();
-	virtual Format *create(){ return new FormatGuitarPro; }
+	Format *create() override { return new FormatGuitarPro; }
 };
 
 #endif /* SRC_STORAGE_FORMATGUITARPRO_H_ */

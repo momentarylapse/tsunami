@@ -10,18 +10,17 @@
 
 #include "Format.h"
 
-class FormatRaw: public Format
-{
+class FormatRaw: public Format {
 public:
-	virtual void load_track(StorageOperationData *od);
-	virtual void save_via_renderer(StorageOperationData *od);
+	bool get_parameters(StorageOperationData *od, bool save) override;
+	void load_track(StorageOperationData *od) override;
+	void save_via_renderer(StorageOperationData *od) override;
 };
 
-class FormatDescriptorRaw : public FormatDescriptor
-{
+class FormatDescriptorRaw : public FormatDescriptor {
 public:
 	FormatDescriptorRaw();
-	virtual Format *create(){ return new FormatRaw; }
+	Format *create() override { return new FormatRaw; }
 };
 
 #endif /* FORMATRAW_H_ */

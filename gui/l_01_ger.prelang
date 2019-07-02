@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-899
+901
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2699,6 +2699,12 @@ Spur
 
 popup_fx_menu/show_external
 Externes Fenster
+
+raw_config_dialog/channels:mono
+Mono
+
+raw_config_dialog/channels:stereo
+Stereo
 
 // Num Language Strings
 239

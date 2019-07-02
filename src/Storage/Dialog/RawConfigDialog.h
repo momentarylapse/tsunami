@@ -8,27 +8,18 @@
 #ifndef SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
 #define SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
 
-#include "../../Data/Audio/AudioBuffer.h"
 #include "../../lib/hui/hui.h"
 
-struct RawConfigData
-{
-	SampleFormat format;
-	int channels;
-	int sample_rate;
-	int offset;
-};
+class StorageOperationData;
 
-class RawConfigDialog : public hui::Window
-{
+class RawConfigDialog : public hui::Window {
 public:
-	RawConfigDialog(RawConfigData *data, hui::Window *parent);
-	virtual ~RawConfigDialog();
+	RawConfigDialog(StorageOperationData *od, hui::Window *parent);
 
 	void on_close();
 	void on_ok();
 
-	RawConfigData *data;
+	StorageOperationData *od;
 	bool ok;
 };
 

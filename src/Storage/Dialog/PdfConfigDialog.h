@@ -12,14 +12,12 @@
 
 class Song;
 
-struct PdfConfigData
-{
+struct PdfConfigData {
 	float horizontal_scale;
 	Array<int> track_mode;
 };
 
-class PdfConfigDialog : public hui::Dialog
-{
+class PdfConfigDialog : public hui::Dialog {
 public:
 	PdfConfigDialog(PdfConfigData *data, Song *song, hui::Window *parent);
 	virtual ~PdfConfigDialog();

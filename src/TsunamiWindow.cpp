@@ -1066,10 +1066,10 @@ void TsunamiWindow::on_scale_bars() {
 void TsunamiWindow::set_big_panel(ModulePanel* p) {
 	if (big_module_panel) {
 		delete big_module_panel;
-		remove_control("big-grid");
 	}
 	big_module_panel = p;
 	if (big_module_panel) {
+		big_module_panel->set_func_close([=]{ remove_control("big-grid"); });
 		int w, h;
 		get_size(w, h);
 		big_module_panel->set_width(w / 2);

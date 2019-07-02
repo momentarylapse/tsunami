@@ -9,10 +9,11 @@
 #define SRC_STORAGE_STORAGEOPERATIONDATA_H_
 
 #include "../lib/base/base.h"
+#include "../lib/base/map.h"
 
 class Song;
 class Progress;
-namespace hui{
+namespace hui {
 	class Window;
 }
 class AudioBuffer;
@@ -26,10 +27,9 @@ class Storage;
 class Session;
 enum class SampleFormat;
 
-class StorageOperationData
-{
+class StorageOperationData {
 public:
-	StorageOperationData(Storage *storage, Format *format, Song *s, TrackLayer *l, const string &filename, const string &message, hui::Window *win);
+	StorageOperationData(Session *session, Format *format, const string &filename, const string &message);
 	virtual ~StorageOperationData();
 
 	void info(const string &message);
@@ -38,6 +38,8 @@ public:
 
 	void set(float t);
 	void set(const string &str, float t);
+	
+	void set_layer(TrackLayer *l);
 
 	int get_num_samples();
 
@@ -64,6 +66,8 @@ public:
 	Array<Tag> tags;
 	int num_samples;
 	int offset;
+	
+	Map<string, string> parameters;
 
 	bool only_load_metadata;
 };

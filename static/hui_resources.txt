@@ -4675,11 +4675,23 @@ t_channels
 0
 1
 0
-ComboBox
-channels
+Grid
+?
 
 1
 1
+2
+RadioButton
+channels:mono
+
+0
+0
+0
+RadioButton
+channels:stereo
+
+1
+0
 0
 Text
 t_samplerate
@@ -6195,7 +6207,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-503
+504
 // Text
 /bars-add
 Add bars...
@@ -7340,8 +7352,11 @@ in Arbeit
 progress_dialog/progress_dialog
 in Arbeit
 
-raw_config_dialog/channels
-Mono\\Stereo
+raw_config_dialog/channels:mono
+Mono
+
+raw_config_dialog/channels:stereo
+Stereo
 
 raw_config_dialog/raw_config_dialog
 Raw Datei
@@ -7712,7 +7727,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-898
+900
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -9915,6 +9930,12 @@ in Arbeit
 
 raw_config_dialog/channels
 Mono\\Stereo
+
+raw_config_dialog/channels:mono
+Mono
+
+raw_config_dialog/channels:stereo
+Stereo
 
 raw_config_dialog/raw_config_dialog
 Raw Datei

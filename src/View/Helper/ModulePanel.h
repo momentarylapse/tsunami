@@ -24,6 +24,7 @@ public:
 		FAVOURITES = 2,
 		ENABLE = 4,
 		DELETE = 8,
+		CLOSE = 16,
 		DEFAULT = HEADER | FAVOURITES | ENABLE
 	};
 	
@@ -42,13 +43,15 @@ public:
 	
 	ModulePanel *copy();
 	
-	void set_func_enabled(std::function<void(bool)> func_enable);
-	void set_func_delete(std::function<void()> func_delete);
+	void set_func_enable(std::function<void(bool)> func_enable);
 	void set_func_edit(std::function<void(const string&)> func_edit);
+	void set_func_delete(std::function<void()> func_delete);
+	void set_func_close(std::function<void()> func_close);
 	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
 	std::function<void()> func_delete;
+	std::function<void()> func_close;
 	Session *session;
 	Module *module;
 	string old_param;

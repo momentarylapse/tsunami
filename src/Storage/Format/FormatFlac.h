@@ -10,18 +10,16 @@
 
 #include "Format.h"
 
-class FormatFlac: public Format
-{
+class FormatFlac: public Format {
 public:
-	virtual void load_track(StorageOperationData *od);
-	virtual void save_via_renderer(StorageOperationData *od);
+	void load_track(StorageOperationData *od) override;
+	void save_via_renderer(StorageOperationData *od) override;
 };
 
-class FormatDescriptorFlac : public FormatDescriptor
-{
+class FormatDescriptorFlac : public FormatDescriptor {
 public:
 	FormatDescriptorFlac();
-	virtual Format *create(){ return new FormatFlac; }
+	Format *create() override { return new FormatFlac; }
 };
 
 #endif /* FORMATFLAC_H_ */

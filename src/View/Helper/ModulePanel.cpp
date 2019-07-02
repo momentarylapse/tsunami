@@ -57,13 +57,15 @@ ModulePanel::ModulePanel(Module *_m, Mode mode) {
 ModulePanel::~ModulePanel() {
 	if (module)
 		module->unsubscribe(this);
+	if (func_close)
+		func_close();
 }
 
 void ModulePanel::set_width(int width) {
 	set_options("grid", format("width=%d", width));
 }
 
-void ModulePanel::set_func_enabled(std::function<void(bool)> _func_enable) {
+void ModulePanel::set_func_enable(std::function<void(bool)> _func_enable) {
 	func_enable = _func_enable;
 	hide_control("enabled", func_enable == nullptr);
 }
@@ -74,6 +76,10 @@ void ModulePanel::set_func_delete(std::function<void()> _func_delete) {
 
 void ModulePanel::set_func_edit(std::function<void(const string&)> _func_edit) {
 	func_edit = _func_edit;
+}
+
+void ModulePanel::set_func_close(std::function<void()> _func_close) {
+	func_close = _func_close;
 }
 
 void ModulePanel::on_load() {
@@ -107,7 +113,8 @@ ModulePanel *ModulePanel::copy() {
 	auto *c = new ModulePanel(module);
 	c->set_func_delete(func_delete);
 	c->set_func_edit(func_edit);
-	c->set_func_enabled(func_enable);
+	c->set_func_enable(func_enable);
+	c->set_func_close(func_close);
 	return c;
 }
 

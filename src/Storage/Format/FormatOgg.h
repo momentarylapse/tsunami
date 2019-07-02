@@ -10,18 +10,16 @@
 
 #include "Format.h"
 
-class FormatOgg: public Format
-{
+class FormatOgg: public Format {
 public:
-	virtual void load_track(StorageOperationData *od);
-	virtual void save_via_renderer(StorageOperationData *od);
+	void load_track(StorageOperationData *od) override;
+	void save_via_renderer(StorageOperationData *od) override;
 };
 
-class FormatDescriptorOgg : public FormatDescriptor
-{
+class FormatDescriptorOgg : public FormatDescriptor {
 public:
 	FormatDescriptorOgg();
-	virtual Format *create(){ return new FormatOgg; }
+	Format *create() override { return new FormatOgg; }
 };
 
 #endif /* FORMATOGG_H_ */

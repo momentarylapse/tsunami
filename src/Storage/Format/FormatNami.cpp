@@ -1286,11 +1286,8 @@ StorageOperationData *cur_op(FileChunkBasic *c)
 }
 
 
-void FormatNami::save_song(StorageOperationData *_od)
+void FormatNami::save_song(StorageOperationData *od)
 {
-	od = _od;
-	song = od->song;
-
 	try{
 		ChunkedFileFormatNami n;
 		n.write_file(od);
@@ -1310,8 +1307,9 @@ void check_empty_subs(Song *a)
 			}*/
 }
 
-void FormatNami::make_consistent(Song *a)
+void FormatNami::make_consistent(StorageOperationData *od)
 {
+	Song *a = od->song;
 	for (auto *s : a->samples){
 		if (s->type == SignalType::MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
@@ -1351,10 +1349,8 @@ void FormatNami::make_consistent(Song *a)
 	}
 }
 
-void FormatNami::load_song(StorageOperationData *_od)
+void FormatNami::load_song(StorageOperationData *od)
 {
-	od = _od;
-
 	// TODO?
 	od->song->tags.clear();
 
@@ -1366,7 +1362,7 @@ void FormatNami::load_song(StorageOperationData *_od)
 	}
 
 	// some post processing
-	make_consistent(od->song);
+	make_consistent(od);
 
 	//od->song->updateSelection(Range(0, 0));
 }

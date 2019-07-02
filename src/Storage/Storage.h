@@ -24,8 +24,7 @@ class StorageOperationData;
 class Tag;
 class Session;
 
-class Storage
-{
+class Storage {
 public:
 	Storage(Session *session);
 	virtual ~Storage();

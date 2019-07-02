@@ -10,21 +10,19 @@
 
 #include "Format.h"
 
-class FormatMidi: public Format
-{
+class FormatMidi: public Format {
 public:
-	virtual void load_track(StorageOperationData *od){}
-	virtual void save_via_renderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od) override {}
+	void save_via_renderer(StorageOperationData *od) override {}
 
-	virtual void load_song(StorageOperationData *od);
-	virtual void save_song(StorageOperationData* od);
+	void load_song(StorageOperationData *od) override;
+	void save_song(StorageOperationData* od) override;
 };
 
-class FormatDescriptorMidi : public FormatDescriptor
-{
+class FormatDescriptorMidi : public FormatDescriptor {
 public:
 	FormatDescriptorMidi();
-	virtual Format *create(){ return new FormatMidi; }
+	Format *create() override { return new FormatMidi; }
 };
 
 #endif /* FORMATMIDI_H_ */

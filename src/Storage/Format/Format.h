@@ -20,8 +20,7 @@ enum class SampleFormat;
 const int CHUNK_SIZE = 1 << 18;
 const int CHUNK_SAMPLES = 1 << 16;
 
-class FormatDescriptor
-{
+class FormatDescriptor {
 public:
 	FormatDescriptor(const string &description, const string &extensions, int _flags);
 	virtual ~FormatDescriptor(){}
@@ -34,7 +33,7 @@ public:
 	string description;
 	int flags;
 
-	enum Flag{
+	enum Flag {
 		SINGLE_TRACK = 1<<0,
 		TAGS = 1<<1,
 		FX = 1<<2,
@@ -47,8 +46,7 @@ public:
 	};
 };
 
-class Format
-{
+class Format {
 public:
 	Format();
 	virtual ~Format(){}
@@ -60,10 +58,10 @@ public:
 
 	virtual void load_song(StorageOperationData *od);
 	virtual void save_song(StorageOperationData *od);
+	
+	virtual bool get_parameters(StorageOperationData *od, bool save) { return true; }
 
 	File *f;
-	Song *song;
-	StorageOperationData *od;
 };
 
 #endif /* FORMAT_H_ */

@@ -10,23 +10,21 @@
 
 #include "Format.h"
 
-class FormatNami : public Format
-{
+class FormatNami : public Format {
 public:
-	virtual void load_track(StorageOperationData *od){}
-	virtual void save_via_renderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od) override {}
+	void save_via_renderer(StorageOperationData *od) override {}
 
-	virtual void load_song(StorageOperationData *od);
-	virtual void save_song(StorageOperationData *od);
+	void load_song(StorageOperationData *od) override;
+	void save_song(StorageOperationData *od) override;
 
-	void make_consistent(Song *s);
+	void make_consistent(StorageOperationData *od);
 };
 
-class FormatDescriptorNami : public FormatDescriptor
-{
+class FormatDescriptorNami : public FormatDescriptor {
 public:
 	FormatDescriptorNami();
-	virtual Format *create(){ return new FormatNami; }
+	Format *create() override { return new FormatNami; }
 };
 
 #endif /* FORMATNAMI_H_ */

@@ -15,28 +15,25 @@
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Module/Audio/SongRenderer.h"
 
-FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags)
-{
+FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags) {
 	description = _description;
 	extensions = _extensions.explode(",");
 	flags = _flags;
 }
 
-bool FormatDescriptor::can_handle(const string & _extension)
-{
-	for (string &e : extensions)
+bool FormatDescriptor::can_handle(const string & _extension) {
+	for (string &e: extensions)
 		if (e == _extension)
 			return true;
 	return false;
 }
 
-bool FormatDescriptor::test_compatibility(Song *a)
-{
+bool FormatDescriptor::test_compatibility(Song *a) {
 	int num_subs = a->samples.num;
 	int num_fx = 0;
 	int num_audio = 0;
 	int num_midi = 0;
-	for (Track *t : a->tracks){
+	for (Track *t: a->tracks) {
 		num_fx += t->fx.num;
 		if (t->type == SignalType::AUDIO)
 			num_audio ++;
@@ -59,15 +56,11 @@ bool FormatDescriptor::test_compatibility(Song *a)
 	return true;
 }
 
-Format::Format()
-{
-	song = nullptr;
-	od = nullptr;
+Format::Format() {
 	f = nullptr;
 }
 
-void Format::import_data(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset)
-{
+void Format::import_data(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset) {
 	AudioBuffer buf;
 	layer->get_buffers(buf, Range(offset, samples));
 
@@ -77,16 +70,14 @@ void Format::import_data(TrackLayer *layer, void *data, int channels, SampleForm
 }
 
 
-void Format::load_song(StorageOperationData *od)
-{
+void Format::load_song(StorageOperationData *od) {
 	od->track = od->song->add_track(SignalType::AUDIO_STEREO, 0);
 	od->layer = od->track->layers[0];
 	od->allow_channels_change = true;
 	load_track(od);
 }
 
-bool is_simple_track(Song *s)
-{
+bool is_simple_track(Song *s) {
 	if (s->tracks.num > 1)
 		return false;
 	if (s->tracks[0]->type != SignalType::AUDIO)
@@ -98,11 +89,10 @@ bool is_simple_track(Song *s)
 	return true;
 }
 
-void Format::save_song(StorageOperationData* od)
-{
+void Format::save_song(StorageOperationData* od) {
 	SongRenderer renderer(od->song);
 
-	if (is_simple_track(od->song)){
+	if (is_simple_track(od->song)) {
 		od->channels_suggested = od->song->tracks[0]->channels;
 	}
 

@@ -75,8 +75,13 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
 	session->i(_("loading ") + filename);
 
 	Format *f = d->create();
-	auto od = StorageOperationData(this, f, song, nullptr, filename, _("loading ") + d->description, session->win);
+	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
+	od.song = song;
 	od.only_load_metadata = only_metadata;
+	if (!f->get_parameters(&od, true)) {
+		delete(f);
+		return false;
+	}
 
 	song->reset();
 	song->action_manager->enable(false);
@@ -96,7 +101,7 @@ bool Storage::load_ex(Song *song, const string &filename, bool only_metadata) {
 		t->notify();
 	song->notify(song->MESSAGE_FINISHED_LOADING);
 
-	delete(f);
+	delete f;
 	return true;
 }
 
@@ -113,18 +118,21 @@ bool Storage::load_track(TrackLayer *layer, const string &filename, int offset) 
 	session->i(_("loading track ") + filename);
 
 	Format *f = d->create();
-	Song *a = layer->track->song;
-	auto od = StorageOperationData(this, f, a, layer, filename, _("loading ") + d->description, session->win);
+	auto od = StorageOperationData(session, f, filename, _("loading ") + d->description);
+	od.set_layer(layer);
 	od.offset = offset;
-	od.layer = layer;
+	if (!f->get_parameters(&od, true)) {
+		delete f;
+		return false;
+	}
 
-	a->begin_action_group();
+	od.song->begin_action_group();
 
 	f->load_track(&od);
 
-	a->end_action_group();
+	od.song->end_action_group();
 
-	delete(f);
+	delete f;
 	return true;
 }
 
@@ -139,7 +147,7 @@ bool Storage::load_buffer(AudioBuffer *buf, const string &filename) {
 		buf->resize(l->buffers[0].length);
 		buf->set(l->buffers[0], 0, 1);
 	}
-	delete(aa);
+	delete aa;
 	return ok;
 }
 
@@ -156,7 +164,12 @@ bool Storage::save(Song *song, const string &filename) {
 		session->w(_("data loss when saving in this format!"));
 	Format *f = d->create();
 
-	auto od = StorageOperationData(this, f, song, nullptr, filename, _("saving ") + d->description, session->win);
+	auto od = StorageOperationData(session, f, filename, _("saving ") + d->description);
+	od.song = song;
+	if (!f->get_parameters(&od, true)) {
+		delete f;
+		return false;
+	}
 
 	song->filename = filename;
 
@@ -166,7 +179,7 @@ bool Storage::save(Song *song, const string &filename) {
 	if (session->win)
 		session->win->update_menu();
 
-	delete(f);
+	delete f;
 	return true;
 }
 
@@ -178,13 +191,16 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 	session->i(_("exporting ") + filename);
 
 	Format *f = d->create();
-	auto od = StorageOperationData(this, f, nullptr, nullptr, filename, _("exporting"), session->win);
-
+	auto od = StorageOperationData(session, f, filename, _("exporting"));
+	if (!f->get_parameters(&od, true)) {
+		delete f;
+		return false;
+	}
 	od.renderer = r;
 	od.tags = tags;
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
-	delete(f);
+	delete f;
 	return true;
 }
 
@@ -255,10 +271,9 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 		if (d->can_handle(ext)) {
 			if ((d->flags & flags) == flags) {
 				return d;
-			}else{
+			} else {
 				session->e(_("file format is incompatible for this action: ") + ext);
 				return nullptr;
-
 			}
 		}
 	}

@@ -10,18 +10,16 @@
 
 #include "Format.h"
 
-class FormatMp3: public Format
-{
+class FormatMp3: public Format {
 public:
-	void load_track(StorageOperationData *od);
-	void save_via_renderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od) override ;
+	void save_via_renderer(StorageOperationData *od) override {}
 };
 
-class FormatDescriptorMp3 : public FormatDescriptor
-{
+class FormatDescriptorMp3 : public FormatDescriptor {
 public:
 	FormatDescriptorMp3();
-	virtual Format *create(){ return new FormatMp3; }
+	Format *create() override { return new FormatMp3; }
 };
 
 #endif /* FORMATMP3_H_ */

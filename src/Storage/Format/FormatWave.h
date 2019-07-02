@@ -10,18 +10,16 @@
 
 #include "Format.h"
 
-class FormatWave: public Format
-{
+class FormatWave: public Format {
 public:
-	virtual void load_track(StorageOperationData *od);
-	virtual void save_via_renderer(StorageOperationData *od);
+	void load_track(StorageOperationData *od) override;
+	void save_via_renderer(StorageOperationData *od) override;
 };
 
-class FormatDescriptorWave : public FormatDescriptor
-{
+class FormatDescriptorWave : public FormatDescriptor {
 public:
 	FormatDescriptorWave();
-	virtual Format *create(){ return new FormatWave; }
+	Format *create() override { return new FormatWave; }
 };
 
 #endif /* FORMATWAVE_H_ */

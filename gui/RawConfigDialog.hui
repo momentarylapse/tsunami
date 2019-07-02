@@ -5,7 +5,9 @@ Dialog raw_config_dialog "Raw Datei" width=300 height=100
 			ComboBox format "" expandx
 			---|
 			Text t_channels "Channels"
-			ComboBox channels "Mono\\Stereo"
+			Grid ? ""
+				RadioButton channels:mono "Mono"
+				RadioButton channels:stereo "Stereo"
 			---|
 			Text t_samplerate "Samplerate"
 			SpinButton sample_rate "44100" range=1:

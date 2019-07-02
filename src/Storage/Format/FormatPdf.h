@@ -17,24 +17,24 @@ class Range;
 class PdfConfigData;
 class ColorScheme;
 
-class FormatPdf : public Format
-{
+class FormatPdf : public Format {
 public:
-	virtual void load_track(StorageOperationData *od){}
-	virtual void save_via_renderer(StorageOperationData *od){}
+	void load_track(StorageOperationData *od) override {}
+	void save_via_renderer(StorageOperationData *od) override {}
 
-	virtual void load_song(StorageOperationData *od){}
-	virtual void save_song(StorageOperationData* od);
+	void load_song(StorageOperationData *od) override {}
+	void save_song(StorageOperationData* od) override;
 
 	MidiPainter *mp;
 	ViewPort *cam;
 	ColorScheme *colors;
+	
+	Song *song;
 
 	double pdf_bpm;
 	Array<int> pdf_pattern;
 
-	struct LineData
-	{
+	struct LineData {
 		LineData(){}
 		LineData(Track *t, float y0, float y1);
 		float y0, y1;
@@ -51,11 +51,10 @@ public:
 	void draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r);
 };
 
-class FormatDescriptorPdf : public FormatDescriptor
-{
+class FormatDescriptorPdf : public FormatDescriptor {
 public:
 	FormatDescriptorPdf();
-	virtual Format *create(){ return new FormatPdf; }
+	Format *create() override { return new FormatPdf; }
 };
 
 #endif /* SRC_STORAGE_FORMAT_FORMATPDF_H_ */

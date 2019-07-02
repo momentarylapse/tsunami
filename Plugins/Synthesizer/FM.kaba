@@ -205,6 +205,10 @@ Grid ? ''
 		let o = fc.osc[index]
 		p.set_color(colors.text)
 		draw_type(p, z, o._type, 9, 5.5)
+		int f = o.factor + 0.5
+		p.set_font_size(7)
+		p.set_color(colors.text_soft1)
+		p.draw_str(z.x-4, z.y+8, "x" + f)
 	
 	void draw_link(Painter* p, int a, int b)
 		p.set_color(colors.text)
@@ -217,9 +221,9 @@ Grid ? ''
 	float v2y(float v)
 		return height - 100*v
 	float x2t(float x)
-		return sqr(x / width / 0.7)
+		return sqr(max(x,0) / width / 0.7)
 	float y2v(float y)
-		return (height - y) / 100
+		return max((height - y), 0) / 100
 	void draw_curve_exp(Painter *p, float t0, float v0, float t1, float v1, color col)
 		float e = log(v1/v0)
 		complex[] cc

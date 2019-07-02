@@ -31,7 +31,7 @@ class MultiEcho extends AudioEffect
 
 
 	void do_delay(float[] b, float[] d, ReflectorState rs, Reflector r)
-		int p = rs.offset % d.num
+		int p = rs.offset % len(d)
 		for bb in b
 	
 			// old value
@@ -39,19 +39,18 @@ class MultiEcho extends AudioEffect
 		
 			// add echo
 			bb = bb + d[p] * r.volume
-			//clampf(b[i], -1, 1)
 		
 			// add to echo
 			d[p] = b0 + d[p] * r.feedback
 		
 			p ++
-			if p >= d.num
+			if p >= len(d)
 				p = 0
 
 
 	override void process(AudioBuffer buf)
 
-		int n = config.refl.num
+		int n = len(config.refl)
 		refl.resize(n)
 		for r,i in refl
 			int delay_samples = session.sample_rate() * config.refl[i].delay
@@ -77,43 +76,58 @@ class MultiEchoGrid extends Grid
 	Config *config
 	ConfigPanel *cp
 	int hover, selected
+	Menu* menu_bg
+	Menu* menu_point
 	
 	
 	override void __init__()
 		hover = -1
 		selected = -1
+		
+		menu_bg = new Menu
+		menu_bg.add("add reflection", "reflection-add")
+		
+		menu_point = new Menu
+		menu_point.add("Reflection", "label")
+		menu_point.enable("label", false)
+		menu_point.add("delete", "reflection-delete")
+	void add_events()
+		cp.event_o("reflection-add", self, &on_add_reflection)
+		cp.event_o("reflection-delete", self, &on_delete_reflection)
 
 	void draw_hull_curve(Painter *c, Reflector r)
 		float v = r.volume
 		float t = r.delay
-		complex p0
-		c.set_line_width(3)
+		c.set_line_width(2)
 		float dt = 0.05
 		float dv = pow(r.feedback, dt/r.delay)
 		int n = min(100, x_axis.val_max/dt + 1)
+		complex[] cc
 		for i in 0:n
-			complex p = project2(complex(t, v))
+			cc.add(project2(complex(t, v)))
 			v *= dv
 			t += dt
-			if i > 0
-				c.set_color(color(sqrt(v), 1,0,0))
-				c.draw_line(p0.x, p0.y, p.x, p.y)
-			p0 = p
+		c.set_color(ColorInterpolate(Red, colors.text_soft2, 0.3))
+		c.set_line_dash([5.0, 2.0])
+		c.draw_lines(cc)
+		c.set_line_dash([5.0, 0.0])
 	
 	void draw_peaks(Painter *c, Reflector r)
 		float v = r.volume
 		float t = r.delay
 		int n = min(100, x_axis.val_max/r.delay)
-		c.set_line_width(1)
+		c.set_line_width(1.5)
 		for i in 0:n
 			complex p = project2(complex(t, v))
 			if i == 0
 				c.set_color(colors.text_soft1)
 			else
+				draw_point2(c, complex(t,v), false, false)
 				c.set_color(colors.text_soft2)
 			c.draw_line(p.x, c.height, p.x, p.y)
 			v *= r.feedback
 			t += r.delay
+		c.set_line_width(1)
 
 	override void on_draw(Painter *c)
 	
@@ -150,39 +164,51 @@ class MultiEchoGrid extends Grid
 	// [Delete] -> remove point
 	override void on_key_down()
 		if HuiGetEvent().key_code == KEY_DELETE
-			if selected >= 0
-				config.refl.remove(selected)
-				cp.changed()
-				selected = -1
-				redraw()
+			on_delete_reflection()
 
-	// right button down -> new point
+	void on_delete_reflection()
+		if selected >= 0
+			config.refl.remove(selected)
+			cp.changed()
+			selected = -1
+			hover = -1
+			redraw()
+
 	override void on_right_button_down()
+		hover = get_hover()
+		if hover >= 0
+			menu_point.popup(panel)
+		else
+			menu_bg.popup(panel)
+	
+	void on_add_reflection()
 		Reflector r
-		r.delay = get_mouse2().x
+		r.delay = max(get_mouse2().x, 0.001)
 		r.volume = get_mouse2().y
 		r.feedback = 0.5
 		config.refl.add(r)
 		cp.changed()
-		selected = config.refl.num - 1
+		selected = len(config.refl) - 1
 		redraw()
+
+	int get_hover()
+		for r,i in config.refl
+			complex z
+			z.x = r.delay
+			z.y = r.volume
+			complex p = project2(z)
+			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+				return i
+		return -1
 
 	override void on_mouse_move()
 		// move
 		if HuiGetEvent().button_l and (selected >= 0)
-			config.refl[selected].delay = max(get_mouse2().x, 0)
+			config.refl[selected].delay = max(get_mouse2().x, 0.001)
 			config.refl[selected].volume = max(get_mouse2().y, 0)
 			cp.changed()
 		else
-		// mouse over?
-			hover = -1
-			for r,i in config.refl
-				complex z
-				z.x = r.delay
-				z.y = r.volume
-				complex p = project2(z)
-				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
-					hover = i
+			hover = get_hover()
 		redraw()
 	
 	override void on_mouse_wheel()
@@ -204,17 +230,12 @@ Grid ? ''
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "s")
 		grid.y_axis.set(0, 1, false, "%")
+		grid.add_events()
 	
 		grid.redraw()
 	
 	override void update()
 		redraw("drawing")
-
-	override void set_large(bool large)
-		if large
-			set_options("drawing", "height=380")
-		else
-			set_options("drawing", "height=250")
 
 
 

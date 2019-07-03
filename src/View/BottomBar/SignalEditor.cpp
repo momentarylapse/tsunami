@@ -24,8 +24,8 @@
 
 
 
-const float MODULE_WIDTH = 160;
-const float MODULE_HEIGHT = 25;
+const float MODULE_WIDTH = 140;
+const float MODULE_HEIGHT = 23;
 
 static rect module_rect(Module *m) {
 	return rect(m->module_x, m->module_x + MODULE_WIDTH, m->module_y, m->module_y + MODULE_HEIGHT);
@@ -192,6 +192,17 @@ public:
 			return hover ? view->colors.blue_hover : view->colors.blue;
 		return hover ? view->colors.white_hover : view->colors.white;
 	}
+	
+	void draw_arrow(Painter *p, const complex &m, const complex &_d, float length) {
+		complex d = _d / _d.abs();
+		complex e = d * complex::I;
+		Array<complex> pp;
+		pp.add(m + d * length);
+		pp.add(m - d * length + e * length / 2);
+		pp.add(m - d * length * 0.8f);
+		pp.add(m - d * length - e * length / 2);
+		p->draw_polygon(pp);
+	}
 
 	void draw_cable(Painter *p, SignalChain::Cable &c) {
 		complex p0 = complex(module_port_out_x(c.source), module_port_out_y(c.source, c.source_port));
@@ -202,45 +213,48 @@ public:
 		inter.add2(p0, complex(length,0));
 		inter.add2(p1, complex(length,0));
 
-		p->set_color(signal_color(c.type));
+		color base_color = signal_color(c.type);
 
-		complex qq = complex::ZERO;
-		for (float t=0; t<1.0f; t+=0.025f) {
-			complex q = inter.get(t);
-			if (t > 0)
-				p->draw_line(qq.x, qq.y, q.x, q.y);
-			qq = q;
-		}
-		complex m = inter.get(0.5f);
-		complex d = inter.getTang(0.5);
-		d /= d.abs();
-		complex e = d * complex::I;
-		Array<complex> pp;
-		float arrow_length = min(length / 7, 18.0f);
-		pp.add(m + d * arrow_length);
-		pp.add(m - d * arrow_length + e * arrow_length / 2);
-		pp.add(m - d * arrow_length - e * arrow_length / 2);
-		p->draw_polygon(pp);
-		//p->dr
+		// curve
+		p->set_color(ColorInterpolate(base_color, view->colors.background, 0.5f));
+		p->set_line_dash({5, 2}, 0);
+		Array<complex> cc;
+		for (float t=0; t<=1.0f; t+=0.025f)
+			cc.add(inter.get(t));
+		p->draw_lines(cc);
+		p->set_line_dash({}, 0);
+		
+		p->set_color(base_color);
+		draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 	}
 
 	void draw_module(Painter *p, Module *m) {
-		p->set_color(view->colors.background_track_selected);
+		color bg = view->colors.blob_bg;
+		if (sel.type == sel.TYPE_MODULE and sel.module == m)
+			bg = view->colors.blob_bg_selected;
 		if (hover.type == Selection::TYPE_MODULE and hover.module == m)
-			p->set_color(ColorInterpolate(view->colors.background_track_selected, view->colors.hover, 0.25f));
+			bg = view->colors.hoverify(bg);
+		p->set_color(bg);
 		p->set_roundness(view->CORNER_RADIUS);
-		p->draw_rect(module_rect(m));
+		rect r = module_rect(m);
+		p->draw_rect(r);
 		p->set_roundness(0);
+		p->set_font_size(AudioView::FONT_SIZE * 1.2f);
 		if (sel.type == sel.TYPE_MODULE and sel.module == m) {
 			p->set_color(view->colors.text);
-			p->set_font("", 12, true, false);
+			p->set_font("", -1, true, false);
 		} else {
-			p->set_color(view->colors.text_soft1);
+			p->set_color(view->colors.text_soft2);
 		}
 		string type = module_header(m);
 		float ww = p->get_str_width(type);
-		p->draw_str(m->module_x + MODULE_WIDTH/2 - ww/2, m->module_y + 6, type);
-		p->set_font("", 12, false, false);
+		float wmax = r.width() - 12;
+		if (ww > wmax) {
+			p->set_font_size(p->font_size * wmax / ww);
+			ww = p->get_str_width(type);
+		}
+		p->draw_str(r.mx() - ww/2, r.my() - p->font_size/2, type);
+		p->set_font("", AudioView::FONT_SIZE, false, false);
 	}
 
 	void draw_ports(Painter *p, Module *m) {

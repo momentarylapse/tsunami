@@ -15,7 +15,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Data/SongSelection.h"
 
-MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::AUDIO, "out") {
+MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::MIDI, "out") {
 	fx = _fx;
 }
 

@@ -57,7 +57,7 @@ const float AudioView::CORNER_RADIUS = 8.0f;
 const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 120;
-const int AudioView::LAYER_HANDLE_WIDTH = 70;
+const int AudioView::LAYER_HANDLE_WIDTH = 60;
 const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
 const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
 const int AudioView::SCROLLBAR_WIDTH = 20;
@@ -230,6 +230,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_time_bg = ExpandImageMask(images.track_time, 1.5f);
 	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
 	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
+	images.track_group = LoadImage(tsunami->directory_static + "track-group.tga");
+	images.track_group_bg = ExpandImageMask(images.track_group, 1.5f);
 
 	peak_thread = nullptr;
 	draw_runner_id = -1;

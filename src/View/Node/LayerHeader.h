@@ -22,6 +22,10 @@ public:
 
 	HoverData get_hover_data(float mx, float my) override;
 
+	bool playable();
+	color color_bg();
+	color color_text();
+
 	bool on_left_button_down() override;
 	bool on_right_button_down() override;
 };

@@ -32,6 +32,7 @@ public:
 		return h;
 	}
 	color get_color() {
+		return header->color_text();
 		auto *view = vlayer->view;
 		if (is_cur_hover())
 			return view->colors.text;
@@ -104,31 +105,50 @@ LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNodeRel(0, 0, AudioView::LAYER
 	add_child(new LayerButtonExplode(this, x0+dx*2, 22));
 }
 
-void LayerHeader::draw(Painter *c) {
+color LayerHeader::color_bg() {
+	auto *layer = vlayer->layer;
+	auto *view = vlayer->view;
+	color col;
+	if (view->sel.has(layer))
+		col = view->colors.blob_bg_selected;
+	else
+		col = view->colors.blob_bg;
+	if (is_cur_hover())
+		col = view->colors.hoverify(col);
+	return col;
+}
 
+bool LayerHeader::playable() {
+	return vlayer->view->get_playable_layers().contains(vlayer->layer);
+}
+
+color LayerHeader::color_text() {
+	auto *layer = vlayer->layer;
+	auto *view = vlayer->view;
+	if (view->sel.has(layer)) {
+		if (playable())
+			return view->colors.text;
+		return view->colors.text_soft1;
+	} else {
+		return view->colors.text_soft2;
+	}
+}
+
+void LayerHeader::draw(Painter *c) {
 	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
-	bool playable = view->get_playable_layers().contains(layer);
 
-	color col = view->colors.background_track_selected;
-	if (view->sel.has(vlayer->layer))
-		col = ColorInterpolate(col, view->colors.selection, 0.2f);
-	if (_hover)
-		col = ColorInterpolate(col, view->colors.hover, 0.2f);
-	c->set_color(col);
+	c->set_color(color_bg());
 	float h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
 	c->set_roundness(view->CORNER_RADIUS);
 	c->draw_rect(area.x1,  area.y1,  area.width(), h);
 	c->set_roundness(0);
 
 	// track title
-	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable, false);
-	if (playable)
-		c->set_color(view->colors.text);
-	else
-		c->set_color(view->colors.text_soft2);
+	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable(), false);
+	c->set_color(color_text());
 	string title;
 	if (layer->track->has_version_selection()) {
 		if (layer->is_main())
@@ -140,11 +160,15 @@ void LayerHeader::draw(Painter *c) {
 	}
 	if (vlayer->solo)
 		title += " (solo)";
-	c->draw_str(area.x2 - view->LAYER_HANDLE_WIDTH + 23, area.y1 + 5, title);
+	c->draw_str(area.x1 + 5, area.y1 + 5, title);
+	if (!playable()) {
+		float ww = c->get_str_width(title);
+		c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);
+	}
 
 	c->set_font("", -1, false, false);
 
-	// icons
+/*	// icons
 	if (layer->type == SignalType::BEATS) {
 		c->set_color(view->colors.text);
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
@@ -154,7 +178,7 @@ void LayerHeader::draw(Painter *c) {
 	} else {
 		c->set_color(view->colors.text);
 		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
-	}
+	}*/
 
 
 

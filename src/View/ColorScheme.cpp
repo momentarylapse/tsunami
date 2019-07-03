@@ -8,8 +8,7 @@
 #include "ColorScheme.h"
 #include <math.h>
 
-color col_inter(const color a, const color &b, float t)
-{
+color col_inter(const color a, const color &b, float t) {
 	float e = 0.7f;
 	color c;
 	c.a = 1;//(1-t) * a.a + t * b.a;
@@ -20,33 +19,32 @@ color col_inter(const color a, const color &b, float t)
 }
 
 
-ColorScheme ColorSchemeBasic::create(bool active) const
-{
+ColorScheme ColorSchemeBasic::create(bool active) const {
 	ColorScheme c;
 	c.name = name;
 	c.background = background;
 
-	if (active){
+	if (active) {
 		c.text = text;
 		c.selection = selection;
 		c.hover = hover;
-	}else{
+	} else {
 		c.text = ColorInterpolate(text, background, 0.3f);
 		c.selection = ColorInterpolate(selection, background, pow(0.3f, gamma));
 		c.hover = ColorInterpolate(hover, background, 0.3f);
 	}
 
-	if (text.r > background.r){
+	if (text.r > background.r) {
 		c.high_contrast_a = White;
 		c.high_contrast_b = Black;
-	}else{
+	} else {
 		c.high_contrast_a = Black;
 		c.high_contrast_b = White;
 	}
 
 	//c.background_track_selected = ColorInterpolate(background, c.selection*1.5f, 0.17f);
 	//c.background_track = ColorInterpolate(c.background, c.background_track_selected, 0.5f);
-	c.background_track_selected = col_inter(background, c.selection*1.2f, 0.15f);
+	c.background_track_selected = col_inter(background, c.selection*1.2f, 0.10f);
 	c.background_track_selection = col_inter(background, c.selection*1.2f, 0.4f);
 	c.background_track = c.background;
 	c.selection_bars = c.selection;
@@ -68,6 +66,13 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	//c.grid = c.text_soft3;
 	c.sample = c.text_soft2;
 	c.sample_selected = c.selection;
+	
+	
+	c.blob_bg = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
+	c.blob_bg_selected = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.6f), c.background_track_selected, 0.3f);
+	color col_base_alt = ColorInterpolate(c.selection, Green, 0.8f);
+	c.blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
+	c.blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.6f), c.background_track_selected, 0.3f);
 
 	c.red = ColorInterpolate(Red, background, 0.3f);
 	c.green = ColorInterpolate(Green, background, 0.3f);
@@ -78,5 +83,9 @@ ColorScheme ColorSchemeBasic::create(bool active) const
 	c.blue_hover = ColorInterpolate(c.blue, hover, 0.3f);
 	c.white_hover = ColorInterpolate(c.white, hover, 0.3f);
 	return c;
+}
+
+color ColorScheme::hoverify(const color &c) const {
+	return ColorInterpolate(c, hover, 0.1f);
 }
 

@@ -13,8 +13,7 @@
 
 class ColorScheme;
 
-class ColorSchemeBasic
-{
+class ColorSchemeBasic {
 public:
 	color background;
 	color text;
@@ -26,8 +25,7 @@ public:
 	ColorScheme create(bool active) const;
 };
 
-class ColorScheme : public ColorSchemeBasic
-{
+class ColorScheme : public ColorSchemeBasic {
 public:
 	color background_track;
 	color background_track_selected;
@@ -48,6 +46,9 @@ public:
 	color sample;
 	color sample_selected;
 	color high_contrast_a, high_contrast_b;
+	
+	color blob_bg, blob_bg_selected;
+	color blob_bg_alt, blob_bg_alt_selected;
 
 	color red, blue, green, white;
 	color red_hover, blue_hover, green_hover, white_hover;
@@ -56,6 +57,8 @@ public:
 	color sample(bool selected, bool hover);
 	color buffer(bool selected, bool hover);
 	color layer_header(bool selected, bool hover);*/
+	
+	color hoverify(const color &c) const;
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

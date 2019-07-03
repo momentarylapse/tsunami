@@ -112,8 +112,6 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 		return;
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
-	//c->SetLineWidth(2.0f);
-	Array<float> dash = {5,4}, no_dash;
 
 
 	//color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
@@ -127,9 +125,12 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 
 		float dx_bar = cam->dsample2screen(b->range().length);
 		float dx_beat = dx_bar / b->beats.num;
-		float f1 = min(1.0f, dx_bar / 40.0f);
+		float f1 = dx_bar / 50.0f;
 		if ((b->index_text % 5) == 0)
-			f1 = 1;
+			f1 *= 5;
+		if ((b->index_text % 25) == 0)
+			f1 *= 5;
+		f1 = min(1.0f, f1);
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
 		if (f1 >= 0.1f) {
@@ -171,8 +172,10 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	auto bars = song->bars.get_bars(RangeTo(s0, s1));
 
 	c->set_font("", view->FONT_SIZE, true, false);
+	float change_block_until = -1;
 	for (Bar *b: bars) {
 		float xx = cam->sample2screen(b->range().offset);
+		float dx_bar = cam->dsample2screen(b->range().length);
 
 		color halo_col = color(0,0,0,0);
 		if (view->sel.has(b))
@@ -190,11 +193,12 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 		if (halo_col.a > 0) {
 			view->draw_boxed_str(c, xx + 4, area.y1+5, label, view->colors.text, halo_col);
 		} else {
-			float dx_bar = cam->dsample2screen(b->range().length);
-			float f1 = min(1.0f, dx_bar / 40.0f);
+			float f1 = min(1.0f, dx_bar / 60.0f);
 			if ((b->index_text % 5) == 0)
-				f1 = 1;
-			if (f1 > 0.9f or halo_col.a > 0) {
+				f1 *= 5;
+			if ((b->index_text % 25) == 0)
+				f1 *= 5;
+			if (f1 > 0.9f){
 				c->set_color(view->colors.text_soft1);
 				c->draw_str(xx + 4, area.y1+5, label);
 			}
@@ -215,9 +219,17 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			prev_bpm = bpm;
 		}
 		if (s.num > 0) {
-			c->set_font("", view->FONT_SIZE * 0.9f, false, false);
+			c->set_font("", view->FONT_SIZE * 0.8f, false, false);
 			c->set_color(view->colors.text_soft1);
-			c->draw_str(max(xx + 4, 20.0f), area.y2 - 16, s);
+			float xxx = max(xx + 4, 20.0f);
+			if (xxx > change_block_until) {
+				c->draw_str(xxx, area.y2 - 15, s);
+				change_block_until = xxx + c->get_str_width(s);
+			} else {
+				c->draw_str(change_block_until, area.y2 - 15, "...!");
+				change_block_until += c->get_str_width("...!");
+				
+			}
 			c->set_font("", view->FONT_SIZE, true, false);
 		}
 	}

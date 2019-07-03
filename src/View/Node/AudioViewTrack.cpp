@@ -141,10 +141,6 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 			draw_buffer_selection(c, b, view_pos_rel, view->colors.selection_boundary, view->sel.range);
 		}
 	}*/
-
-
-
-	view->draw_boxed_str(c, area.x2 - 200, area.y1 + 10, "imploded...", view->colors.text, view->colors.background_track_selection);
 }
 
 void AudioViewTrack::draw(Painter *c) {

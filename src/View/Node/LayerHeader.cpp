@@ -160,6 +160,8 @@ void LayerHeader::draw(Painter *c) {
 	}
 	if (vlayer->solo)
 		title += " (solo)";
+	if (vlayer->represents_imploded)
+		title = "imploded";
 	c->draw_str(area.x1 + 5, area.y1 + 5, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);

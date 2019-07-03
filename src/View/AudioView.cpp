@@ -721,7 +721,7 @@ void AudioView::on_song_new() {
 
 void AudioView::on_song_finished_loading() {
 	for (auto *t: vtrack)
-		if (t->track->layers.num > 2)
+		if (t->track->layers.num > 1)
 			implode_track(t->track);
 	optimize_view();
 	hui::RunLater(0.5f, [=]{ optimize_view(); });

@@ -36,7 +36,7 @@ class OscillatorConfig
 		reset()
 	void reset()
 		factor = 1
-		amplitude = 0
+		amplitude = 0.1
 		initial = 0.01
 		peak = 1
 		sustain = 0.6
@@ -136,7 +136,7 @@ Grid ? ''
 	
 	void update_osci_pos()
 		// initial
-		p_out = complex(40, 50)
+		p_out = complex(40, 60)
 		for p,i in p_osci
 			p = complex(100+15*i, i*20)//complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
 			bool has_links = fc.osc[i].target_out
@@ -197,21 +197,26 @@ Grid ? ''
 	
 	void draw_osci(Painter* p, int index)
 		let z = osci_pos(index)
-		p.set_color(ColorInterpolate(colors.selection, colors.background, 0.7))
+		let bg = colors.blob_bg
+		let col = colors.text_soft1
 		if index == chosen
-			p.set_color(colors.selection)
+			bg = colors.blob_bg_selected
+			col = colors.text
+		if index == hover
+			bg = colors.hoverify(bg)
+		p.set_color(bg)
 		p.draw_circle(z.x, z.y, 15)
 	
 		let o = fc.osc[index]
-		p.set_color(colors.text)
-		draw_type(p, z, o._type, 9, 5.5)
+		p.set_color(col)
+		draw_type(p, z - complex(0,2), o._type, 9, 5.5)
 		int f = o.factor + 0.5
 		p.set_font_size(7)
-		p.set_color(colors.text_soft1)
-		p.draw_str(z.x-4, z.y+8, "x" + f)
+		//p.set_color(colors.text_soft1)
+		p.draw_str(z.x-4, z.y+6, "x" + f)
 	
 	void draw_link(Painter* p, int a, int b)
-		p.set_color(colors.text)
+		p.set_color(colors.text_soft1)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
 		p.draw_line(z1.x - 18, z1.y, z2.x + 18, z2.y)
@@ -245,7 +250,7 @@ Grid ? ''
 	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
 		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
 		if hover
-			col2 = ColorInterpolate(col, colors.text, 0.5)
+			col2 = colors.hoverify(col2)
 		p.set_color(col2)
 		p.set_line_width(2.0)
 		p.draw_line(t2x(t0), v2y(v0), t2x(t1), v2y(v1))
@@ -282,8 +287,12 @@ Grid ? ''
 		p.set_color(colors.background)
 		p.draw_rect(0, 0, width, height)
 		
-		p.set_color(colors.text)
-		p.draw_str(p_out.x-25, p_out.y-8, "out")
+		p.set_roundness(5)
+		p.set_color(colors.blob_bg)
+		p.draw_rect(0, p_out.y-20, p_out.x+15, 40)
+		p.set_roundness(0)
+		p.set_color(colors.text_soft1)
+		p.draw_str(p_out.x-32, p_out.y-10, "out")
 		
 		for j in 0:NUM_OSCILLATORS
 			draw_osci(p, j)

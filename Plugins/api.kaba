@@ -483,6 +483,9 @@ class ColorScheme
 	color grid
 	color selection
 	color hover
+	color blob_bg
+	color blob_bg_selected
+	extern color hoverify(color c)
 
 class AudioView
 	SongSelection sel

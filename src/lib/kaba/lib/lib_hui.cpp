@@ -424,6 +424,8 @@ void SIAddPackageHui()
 			func_add_param("w", TypeFloat32);
 		class_add_func_virtual("set_line_dash", TypeVoid, mf(&hui::Painter::set_line_dash));
 			func_add_param("w", TypeFloatList);
+		class_add_func_virtual("set_roundness", TypeVoid, mf(&hui::Painter::set_roundness));
+			func_add_param("r", TypeFloat32);
 		class_add_func_virtual("set_antialiasing", TypeVoid, mf(&hui::Painter::set_antialiasing));
 			func_add_param("enabled", TypeBool);
 		class_add_func_virtual("set_font_size", TypeVoid, mf(&hui::Painter::set_font_size));

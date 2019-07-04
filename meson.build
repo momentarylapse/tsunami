@@ -488,6 +488,7 @@ install_data('static/license_small.txt', install_dir : join_paths(get_option('da
 install_data('static/mute.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/solo.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/track-audio.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
+install_data('static/track-group.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/track-midi.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/track-time.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/volume.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))

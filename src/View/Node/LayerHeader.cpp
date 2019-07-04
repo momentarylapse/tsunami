@@ -112,7 +112,7 @@ color LayerHeader::color_bg() {
 	if (view->sel.has(layer))
 		col = view->colors.blob_bg_selected;
 	else
-		col = view->colors.blob_bg;
+		col = view->colors.blob_bg_hidden;
 	if (is_cur_hover())
 		col = view->colors.hoverify(col);
 	return col;

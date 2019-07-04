@@ -52,7 +52,7 @@ public:
 		auto *track = vtrack->track;
 
 		c->set_color(get_color());
-		//c->drawStr(area.x1, area.y1-2, "\U0001f50a"); // U+1F50A "í¼íº¢
+		//c->drawStr(area.x1, area.y1-2, "\U0001f50a"); // U+1F50A "ï¿½ï¿½
 		c->draw_mask_image(area.x1, area.y1, *view->images.speaker);
 		if (track->muted)
 			c->draw_image(area.x1, area.y1, *view->images.x);
@@ -88,7 +88,7 @@ public:
 	TrackButtonConfig(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
-		c->draw_str(area.x1, area.y1, u8"\U0001f527"); // U+1F527 "í¼’í·¢
+		c->draw_str(area.x1, area.y1, u8"\U0001f527"); // U+1F527 "ï¿½ï¿½
 
 		/*c->setColor(col_but);
 		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))
@@ -127,12 +127,12 @@ color TrackHeader::color_bg() {
 		if (view->sel.has(track))
 			col = view->colors.blob_bg_alt_selected;
 		else
-			col = view->colors.blob_bg_alt;
+			col = view->colors.blob_bg_alt_hidden;
 	} else {
 		if (view->sel.has(track))
 			col = view->colors.blob_bg_selected;
 		else
-			col = view->colors.blob_bg;
+			col = view->colors.blob_bg_hidden;
 	}
 	if (is_cur_hover())
 		col = view->colors.hoverify(col);

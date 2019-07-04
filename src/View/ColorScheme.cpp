@@ -67,12 +67,14 @@ ColorScheme ColorSchemeBasic::create(bool active) const {
 	c.sample = c.text_soft2;
 	c.sample_selected = c.selection;
 	
-	
-	c.blob_bg = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
-	c.blob_bg_selected = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.6f), c.background_track_selected, 0.3f);
+
+	c.blob_bg_hidden = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
+	c.blob_bg = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.5f), c.background_track_selected, 0.6f);
+	c.blob_bg_selected = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.4f), c.background_track_selected, 0.3f);
 	color col_base_alt = ColorInterpolate(c.selection, Green, 0.8f);
-	c.blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
-	c.blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.6f), c.background_track_selected, 0.3f);
+	c.blob_bg_alt_hidden = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
+	c.blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.5f), c.background_track_selected, 0.6f);
+	c.blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.4f), c.background_track_selected, 0.3f);
 
 	c.red = ColorInterpolate(Red, background, 0.3f);
 	c.green = ColorInterpolate(Green, background, 0.3f);

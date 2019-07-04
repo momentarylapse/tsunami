@@ -288,7 +288,7 @@ Grid ? ''
 		p.draw_rect(0, 0, width, height)
 		
 		p.set_roundness(5)
-		p.set_color(colors.blob_bg)
+		p.set_color(colors.blob_bg_hidden)
 		p.draw_rect(0, p_out.y-20, p_out.x+15, 40)
 		p.set_roundness(0)
 		p.set_color(colors.text_soft1)

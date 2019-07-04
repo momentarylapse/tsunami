@@ -244,7 +244,7 @@ public:
 			p->set_color(view->colors.text);
 			p->set_font("", -1, true, false);
 		} else {
-			p->set_color(view->colors.text_soft2);
+			p->set_color(view->colors.text_soft1);
 		}
 		string type = module_header(m);
 		float ww = p->get_str_width(type);

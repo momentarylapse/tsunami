@@ -47,8 +47,9 @@ public:
 	color sample_selected;
 	color high_contrast_a, high_contrast_b;
 	
-	color blob_bg, blob_bg_selected;
-	color blob_bg_alt, blob_bg_alt_selected;
+
+	color blob_bg, blob_bg_hidden, blob_bg_selected;
+	color blob_bg_alt, blob_bg_alt_hidden, blob_bg_alt_selected;
 
 	color red, blue, green, white;
 	color red_hover, blue_hover, green_hover, white_hover;

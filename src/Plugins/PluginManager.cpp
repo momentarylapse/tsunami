@@ -606,6 +606,7 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("ColorScheme", "hover", _offsetof(ColorScheme, hover));
 	Kaba::DeclareClassOffset("ColorScheme", "blob_bg", _offsetof(ColorScheme, blob_bg));
 	Kaba::DeclareClassOffset("ColorScheme", "blob_bg_selected", _offsetof(ColorScheme, blob_bg_selected));
+	Kaba::DeclareClassOffset("ColorScheme", "blob_bg_hidden", _offsetof(ColorScheme, blob_bg_hidden));
 	Kaba::LinkExternal("ColorScheme.hoverify", (void*)&_hoverify_);
 
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));

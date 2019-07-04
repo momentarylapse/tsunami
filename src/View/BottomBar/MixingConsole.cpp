@@ -184,6 +184,12 @@ public:
 		float f = sqrt(console->view->renderer->get_peak(track));
 		p->draw_rect(0, h * (1 - f), w, h * f);
 	}
+	string nice_title() {
+		string s = track->nice_name();
+		if (s.num > 16)
+			return s.head(8) + ".." + s.tail(8);
+		return s;
+	}
 	void update() {
 		if (!vtrack)
 			return;
@@ -196,9 +202,9 @@ public:
 		bool is_playable = vtrack->view->get_playable_tracks().contains(track);
 		enable(id_name, is_playable);
 		if (is_playable)
-			set_string(id_name, track->nice_name());
+			set_string(id_name, nice_title());
 		else
-			set_string(id_name, "<s>" + track->nice_name() + "</s>");
+			set_string(id_name, "<s>" + nice_title() + "</s>");
 
 		// fx list
 		reset("fx");

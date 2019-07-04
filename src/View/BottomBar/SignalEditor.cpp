@@ -239,7 +239,7 @@ public:
 		rect r = module_rect(m);
 		p->draw_rect(r);
 		p->set_roundness(0);
-		p->set_font_size(AudioView::FONT_SIZE * 1.2f);
+		p->set_font_size(AudioView::FONT_SIZE);// * 1.2f);
 		if (sel.type == sel.TYPE_MODULE and sel.module == m) {
 			p->set_color(view->colors.text);
 			p->set_font("", -1, true, false);
@@ -247,13 +247,7 @@ public:
 			p->set_color(view->colors.text_soft1);
 		}
 		string type = module_header(m);
-		float ww = p->get_str_width(type);
-		float wmax = r.width() - 12;
-		if (ww > wmax) {
-			p->set_font_size(p->font_size * wmax / ww);
-			ww = p->get_str_width(type);
-		}
-		p->draw_str(r.mx() - ww/2, r.my() - p->font_size/2, type);
+		AudioView::draw_str_constrained(p, r.mx(), r.my() - p->font_size/2, r.width() - 12, type, 0);
 		p->set_font("", AudioView::FONT_SIZE, false, false);
 	}
 

@@ -952,6 +952,38 @@ void AudioView::draw_boxed_str(Painter *c, float x, float y, const string &str, 
 	c->draw_str(x + dx, y, str);
 }
 
+void AudioView::draw_framed_box(Painter *p, const rect &r, const color &bg, const color &frame, float frame_width) {
+	p->set_color(bg);
+	p->set_roundness(CORNER_RADIUS);
+	p->draw_rect(r);
+	
+	p->set_fill(false);
+	p->set_line_width(frame_width);
+	p->set_color(frame);
+	p->draw_rect(r);
+	p->set_line_width(1);
+	p->set_fill(true);
+	p->set_roundness(0);
+}
+
+float AudioView::draw_str_constrained(Painter *p, float x, float y, float w_max, const string &_str, int align) {
+	string str = _str;
+	float w = p->get_str_width(str);
+	//float fs0 = p->font_size;
+	if (w > w_max) {
+		for (int i=str.num/2; i>=1; i--) {
+			str = _str.head(i) + ".." + _str.tail(i);
+			w = p->get_str_width(str);
+			if (w < w_max)
+				break;
+		}
+	}
+	float dx = w/2 * (align-1);
+	p->draw_str(x + dx, y, str);
+	//p->set_font_size(fs0);
+	return w;
+}
+
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg, float mx, float my, const rect &area) {
 	c->set_font("", -1, true, false);

@@ -316,13 +316,15 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	w = max(w, x1 - x0);
 
 	color col = view->colors.text;
-	color col_bg = ColorInterpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.4f);
+	color col_bg = ColorInterpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.6f);
 	color col_frame = marker_color(marker);
 	if (sel) {
 		col = view->colors.text;
-		col_bg = view->colors.blob_bg_selected;
-		col_frame = ColorInterpolate(col_frame, view->colors.selection, 0.3f);
-		frame_height = 8;
+		//col_bg = view->colors.blob_bg_selected;//ColorInterpolate(col_bg, view->colors.selection, 0.6f);
+		//col_frame = view->colors.blob_bg_selected;//ColorInterpolate(col_frame, view->colors.selection, 0.6f);
+		col_bg = ColorInterpolate(col_bg, view->colors.blob_bg_selected, 0.8f);
+		col_frame = ColorInterpolate(col_frame, view->colors.blob_bg_selected, 0.8f);
+		//col_frame = view->colors.selection;
 	}
 	if (hover) {
 		col = view->colors.hoverify(col);
@@ -333,9 +335,9 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
 	if (marker->range.empty())
 		allow_label = (view->cam.dsample2screen(2000) > 1);
-	float dx = min((x1 - x0) * 0.2f, 40.0f);
+	float dx = max(0.0f, (x1-x0)/2-12);//0;//min((x1 - x0) * 0.2f, 40.0f);
 	if (allow_label) {
-		view->draw_boxed_str(c,  x0 + dx + view->CORNER_RADIUS, y0 + 8, text, col, col_bg);
+		view->draw_boxed_str(c,  x0 + dx + view->CORNER_RADIUS, y0 + frame_height, text, col, col_bg);
 	}
 
 

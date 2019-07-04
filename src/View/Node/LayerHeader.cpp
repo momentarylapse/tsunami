@@ -116,6 +116,19 @@ color LayerHeader::color_bg() {
 	return col;
 }
 
+color LayerHeader::color_frame() {
+	auto *layer = vlayer->layer;
+	auto *view = vlayer->view;
+	color col;
+	if (view->sel.has(layer))
+		col = view->colors.blob_bg_selected;
+	else
+		col = view->colors.blob_bg;
+	if (is_cur_hover())
+		col = view->colors.hoverify(col);
+	return col;
+}
+
 bool LayerHeader::playable() {
 	return vlayer->view->get_playable_layers().contains(vlayer->layer);
 }
@@ -132,63 +145,73 @@ color LayerHeader::color_text() {
 	}
 }
 
-void LayerHeader::draw(Painter *c) {
+void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	auto *view = vlayer->view;
 	auto *layer = vlayer->layer;
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_layer(vlayer);
 
-	c->set_color(color_bg());
-	float h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	c->set_roundness(view->CORNER_RADIUS);
-	c->draw_rect(area.x1,  area.y1,  area.width(), h);
-	c->set_roundness(0);
+	align.h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+	align.w = AudioView::LAYER_HANDLE_WIDTH;
+	if (vlayer->represents_imploded)
+		align.w = AudioView::LAYER_HANDLE_WIDTH * 1.6f;
+		
+		
+	for (auto *c: children)
+		c->hidden = !extended or vlayer->represents_imploded;
+	if (!vlayer->represents_imploded) {
+		children[1]->hidden |= (view->song->tracks.num == 1) or layer->track->has_version_selection();
+		//children[2]->hidden |= !layer->is_main();
+	}
+	
+	ViewNode::update_geometry_recursive(target_area);
+}
 
-	// track title
+void LayerHeader::draw(Painter *c) {
+	auto *view = vlayer->view;
+	auto *layer = vlayer->layer;
+	bool _hover = is_cur_hover();
+
+	float h = area.height();
+	c->set_antialiasing(true);
+	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
+	c->set_antialiasing(false);
+	
+	
 	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable(), false);
 	c->set_color(color_text());
-	string title;
-	if (layer->track->has_version_selection()) {
-		if (layer->is_main())
-			title = _("base");
-		else
-			title = "v" + i2s(layer->version_number() + 1);
+	
+	if (vlayer->represents_imploded) {
+		AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "imploded");
+		if (_hover)
+			c->draw_str(area.x1 + 25, area.y1 + 25,  u8"\u2b73   \u2b73   \u2b73");
 	} else {
-		title = "l" + i2s(layer->version_number() + 1);
-	}
-	if (vlayer->solo)
-		title += " (solo)";
-	if (vlayer->represents_imploded)
-		title = "imploded";
-	c->draw_str(area.x1 + 5, area.y1 + 5, title);
-	if (!playable()) {
-		float ww = c->get_str_width(title);
-		c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);
+
+		// track title
+		string title;
+		if (layer->track->has_version_selection()) {
+			if (layer->is_main())
+				title = _("base");
+			else
+				title = "v" + i2s(layer->version_number() + 1);
+		} else {
+			title = "l" + i2s(layer->version_number() + 1);
+		}
+		if (vlayer->solo)
+			title += " (solo)";
+		float ww = AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);
+		if (!playable())
+			c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);
 	}
 
 	c->set_font("", -1, false, false);
-
-/*	// icons
-	if (layer->type == SignalType::BEATS) {
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_time); // "⏱"
-	} else if (layer->type == SignalType::MIDI) {
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_midi); // "♫"
-	} else {
-		c->set_color(view->colors.text);
-		c->draw_mask_image(area.x2 - view->LAYER_HANDLE_WIDTH + 5, area.y1 + 5, *view->images.track_audio); // "∿"
-	}*/
-
-
-
-	for (auto *c: children)
-		c->hidden = !extended;
-	children[1]->hidden |= (view->song->tracks.num == 1) or layer->track->has_version_selection();
-	children[2]->hidden |= !layer->is_main();
 }
 
 bool LayerHeader::on_left_button_down() {
+	if (vlayer->represents_imploded) {
+		vlayer->view->explode_track(vlayer->layer->track);
+		return true;
+	}
 	auto *view = vlayer->view;
 	if (view->select_xor) {
 		view->toggle_select_layer_with_content_in_cursor(vlayer);

@@ -138,6 +138,25 @@ color TrackHeader::color_bg() {
 	return col;
 }
 
+color TrackHeader::color_frame() {
+	auto *track = vtrack->track;
+	color col;
+	if (track->type == SignalType::GROUP) {
+		if (view->sel.has(track))
+			col = view->colors.blob_bg_alt_selected;
+		else
+			col = view->colors.blob_bg_alt;
+	} else {
+		if (view->sel.has(track))
+			col = view->colors.blob_bg_selected;
+		else
+			col = view->colors.blob_bg;
+	}
+	if (is_cur_hover())
+		col = view->colors.hoverify(col);
+	return col;
+}
+
 bool TrackHeader::playable() {
 	auto *track = vtrack->track;
 	return view->get_playable_tracks().contains(track);
@@ -153,29 +172,38 @@ color TrackHeader::color_text() {
 	}
 }
 
-void TrackHeader::draw(Painter *c) {
+
+void TrackHeader::update_geometry_recursive(const rect &target_area) {
 	auto *track = vtrack->track;
 	bool _hover = is_cur_hover();
 	bool extended = _hover or view->editing_track(track);
 
-	c->set_color(color_bg());
-	float h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
-	//update_area();
-	c->set_roundness(view->CORNER_RADIUS);
-	c->draw_rect(rect(area.x1, area.x2, area.y1, area.y1 + h));
-	c->set_roundness(0);
+	align.h = extended ? view->TRACK_HANDLE_HEIGHT : view->TRACK_HANDLE_HEIGHT_SMALL;
+		
+	for (auto *c: children)
+		c->hidden = !extended;
+	children[1]->hidden |= (view->song->tracks.num == 1);
+	
+	ViewNode::update_geometry_recursive(target_area);
+}
+
+void TrackHeader::draw(Painter *c) {
+	auto *track = vtrack->track;
+	bool _hover = is_cur_hover();
+
+	c->set_antialiasing(true);
+	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
+	c->set_antialiasing(false);
 
 	// track title
 	c->set_font("", view->FONT_SIZE, view->sel.has(track) and playable(), false);
 	c->set_color(color_text());
 	string title = track->nice_name() + (vtrack->solo ? " (solo)" : "");
-	c->draw_str(area.x1 + 23, area.y1 + 5, title);
+	AudioView::draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);
 		c->draw_line(area.x1 + 23, area.y1+5+5, area.x1+23+ww, area.y1+5+5);
 	}
-	
-
 	c->set_font("", -1, false, false);
 
 	// icons
@@ -189,10 +217,6 @@ void TrackHeader::draw(Painter *c) {
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, *icon);
 //	if (track->muted and !extended)
 //		c->draw_image(area.x1 + 5, area.y1 + 5, *view->images.x);
-
-	for (auto *c: children)
-		c->hidden = !extended;
-	children[1]->hidden |= (view->song->tracks.num == 1);
 }
 
 class MouseDelayDndTrack : public MouseDelayAction {

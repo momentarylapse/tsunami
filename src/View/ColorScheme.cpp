@@ -88,6 +88,7 @@ ColorScheme ColorSchemeBasic::create(bool active) const {
 }
 
 color ColorScheme::hoverify(const color &c) const {
+	return col_inter(c, hover, 0.15f);
 	return ColorInterpolate(c, hover, 0.1f);
 }
 

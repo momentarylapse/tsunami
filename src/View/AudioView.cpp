@@ -1069,7 +1069,6 @@ void AudioView::on_draw(Painter *c) {
 
 	colors = basic_colors.create(true);
 
-
 	PerformanceMonitor::end_busy(perf_channel);
 }
 

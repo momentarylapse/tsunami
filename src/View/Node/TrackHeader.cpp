@@ -38,10 +38,9 @@ public:
 		return h;
 	}
 	color get_color() {
-		return header->color_text();
 		if (is_cur_hover())
-			return view->colors.text;
-		return ColorInterpolate(view->colors.text, view->colors.hover, 0.3f);
+			return view->colors.hoverify(header->color_text());
+		return header->color_text();
 	}
 };
 

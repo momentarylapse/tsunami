@@ -70,12 +70,6 @@ CurveConsole::CurveConsole(Session *session) :
 	event("edit_track", [=]{ on_edit_track(); });
 	event("edit_fx", [=]{ on_edit_fx(); });
 
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ADD_CURVE);
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_DELETE_CURVE);
-	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_EDIT_CURVE);
-	view->subscribe(this, [=]{ on_view_change(); }, view->MESSAGE_VIEW_CHANGE);
-	view->subscribe(this, [=]{ view->mode_curve->set_curve(nullptr); update_list(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
 CurveConsole::~CurveConsole() {
@@ -84,10 +78,6 @@ CurveConsole::~CurveConsole() {
 }
 
 
-void CurveConsole::on_view_change() {
-	view->force_redraw();
-}
-
 void CurveConsole::on_update() {
 	update_list();
 }
@@ -95,9 +85,16 @@ void CurveConsole::on_update() {
 void CurveConsole::on_enter() {
 	view->mode_curve->set_curve(nullptr);
 	update_list();
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_NEW);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_ADD_CURVE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_DELETE_CURVE);
+	song->subscribe(this, [=]{ on_update(); }, song->MESSAGE_EDIT_CURVE);
+	view->subscribe(this, [=]{ view->mode_curve->set_curve(nullptr); update_list(); }, view->MESSAGE_CUR_LAYER_CHANGE);
 }
 
 void CurveConsole::on_leave() {
+	song->unsubscribe(this);
+	view->unsubscribe(this);
 	view->mode_curve->set_curve(nullptr);
 }
 

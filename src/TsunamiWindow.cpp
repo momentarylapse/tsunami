@@ -233,7 +233,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	mini_bar = new MiniBar(bottom_bar, session);
 	embed(mini_bar, "main-grid", 0, 2);
 
-	view->subscribe(this, [=]{ on_update(); });
+	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_SETTINGS_CHANGE);
+	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_LAYER_CHANGE);
+	view->subscribe(this, [=]{ on_update(); }, view->MESSAGE_CUR_SAMPLE_CHANGE);
 	view->signal_chain->subscribe(this, [=]{ on_update(); });
 	song->action_manager->subscribe(this, [=]{ on_update(); });
 	app->clipboard->subscribe(this, [=]{ on_update(); });

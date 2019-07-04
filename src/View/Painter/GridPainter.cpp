@@ -113,10 +113,6 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 	int s0 = cam->screen2sample(area.x1 - 1);
 	int s1 = cam->screen2sample(area.x2);
 
-
-	//color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
-	//color c2 = colors.grid;
-
 	auto bars = song->bars.get_bars(RangeTo(s0, s1));
 	for (Bar *b: bars) {
 		if (b->is_pause())

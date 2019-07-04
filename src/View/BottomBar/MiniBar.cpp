@@ -15,8 +15,7 @@
 #include "../../Device/Stream/AudioOutput.h"
 #include "../Helper/PeakMeterDisplay.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
-{
+MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session) {
 	session = _session;
 	view = session->view;
 	dev_manager = session->device_manager;
@@ -39,11 +38,10 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, Session *_session)
 
 	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
 	dev_manager->subscribe(this, [=]{ on_volume_change(); });
-	view->subscribe(this, [=]{ on_view_settings_change(); });
+	view->subscribe(this, [=]{ on_view_settings_change(); }, view->MESSAGE_SETTINGS_CHANGE);
 }
 
-MiniBar::~MiniBar()
-{
+MiniBar::~MiniBar() {
 	view->unsubscribe(this);
 	dev_manager->unsubscribe(this);
 	bottom_bar->unsubscribe(this);
@@ -51,50 +49,42 @@ MiniBar::~MiniBar()
 	delete(cpu_display);
 }
 
-void MiniBar::on_show_bottom_bar()
-{
+void MiniBar::on_show_bottom_bar() {
 	bottom_bar->_show();
 	hide();
 }
 
-void MiniBar::on_volume()
-{
+void MiniBar::on_volume() {
 	dev_manager->set_output_volume(get_float(""));
 }
 
-void MiniBar::on_selection_snap_mode(SelectionSnapMode mode)
-{
+void MiniBar::on_selection_snap_mode(SelectionSnapMode mode) {
 	view->set_selection_snap_mode(mode);
 	check("select-snap-mode-free", mode == SelectionSnapMode::NONE);
 	check("select-snap-mode-bars", mode == SelectionSnapMode::BAR);
 	check("select-snap-mode-parts", mode == SelectionSnapMode::PART);
 }
 
-void MiniBar::on_show()
-{
+void MiniBar::on_show() {
 	peak_meter->enable(true);
 }
 
-void MiniBar::on_hide()
-{
+void MiniBar::on_hide() {
 	peak_meter->enable(false);
 }
 
-void MiniBar::on_bottom_bar_update()
-{
+void MiniBar::on_bottom_bar_update() {
 	if (bottom_bar->visible)
 		hide();
 	else
 		show();
 }
 
-void MiniBar::on_volume_change()
-{
+void MiniBar::on_volume_change() {
 	set_float("volume", dev_manager->get_output_volume());
 }
 
 
-void MiniBar::on_view_settings_change()
-{
+void MiniBar::on_view_settings_change() {
 	set_int("selection_snap_mode", (int)view->selection_snap_mode);
 }

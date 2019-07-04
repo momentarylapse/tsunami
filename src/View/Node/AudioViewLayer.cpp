@@ -215,7 +215,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 	if (view->sel.has(s))
 		col = view->colors.sample_selected;
 	if (view->hover().sample == s)
-		col = ColorInterpolate(col,  view->colors.hover, 0.2f);
+		col = view->colors.hoverify(col);
 
 	draw_sample_frame(c, s, col, 0);
 
@@ -311,31 +311,31 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	view->cam.range2screen(marker->range, x0, x1);
 	bool merged = (x1 - x0 < w_threshold);
 	float y0 = area.y1;
-	float y1 = y0 + 5;
+	float frame_height = 5;
 
 	w = max(w, x1 - x0);
 
 	color col = view->colors.text;
-	color col_bg = view->colors.background_track;
-	color col2 = marker_color(marker);
+	color col_bg = ColorInterpolate(view->colors.blob_bg_hidden, marker_color(marker), 0.4f);
+	color col_frame = marker_color(marker);
 	if (sel) {
-		col = view->colors.text;//view->colors.selection;
-		col_bg = view->colors.selection;//ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f);
-		col_bg.a = 0.5f;
-		col2 = ColorInterpolate(col2, view->colors.selection, 0.8f);
+		col = view->colors.text;
+		col_bg = view->colors.blob_bg_selected;
+		col_frame = ColorInterpolate(col_frame, view->colors.selection, 0.3f);
+		frame_height = 8;
 	}
 	if (hover) {
-		col = ColorInterpolate(col, view->colors.hover, 0.3f);
-		col2 = ColorInterpolate(col2, view->colors.hover, 0.3f);
-		col_bg = view->colors.hover;
-		col_bg.a = 0.5f;
+		col = view->colors.hoverify(col);
+		col_frame = view->colors.hoverify(col_frame);
+		col_bg = view->colors.hoverify(col_bg);
 	}
 
 	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
 	if (marker->range.empty())
 		allow_label = (view->cam.dsample2screen(2000) > 1);
-	if (allow_label){
-		view->draw_boxed_str(c,  x0 + view->CORNER_RADIUS, y0 + 10, text, col, col_bg);
+	float dx = min((x1 - x0) * 0.2f, 40.0f);
+	if (allow_label) {
+		view->draw_boxed_str(c,  x0 + dx + view->CORNER_RADIUS, y0 + 8, text, col, col_bg);
 	}
 
 
@@ -343,24 +343,24 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 
 	// left line
 	if (first) {
-		color cl = col2;
+		color cl = col_frame;
 		cl.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, true);
 		c->set_color(cl);
 		c->draw_line(x0, area.y1, x0, area.y2);
 	}
 	// right line
-	color cr = col2;
+	color cr = col_frame;
 	cr.a *= marker_alpha_factor(x1 - x0, gx1 - gx0, last);
 	c->set_color(cr);
 	c->draw_line(x1, area.y1, x1, area.y2);
 	c->set_line_width(1.0f);
 
 	// top
-	c->set_color(col2);
-	c->draw_rect(x0, y0, x1-x0, y1-y0);
+	c->set_color(col_frame);
+	c->draw_rect(x0, y0, x1-x0, frame_height);
 
-	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + 15));
-	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + view->CORNER_RADIUS, y0 + 10, text));
+	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + frame_height));
+	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + dx + view->CORNER_RADIUS, y0 + 8, text));
 
 	c->set_font("", view->FONT_SIZE, false, false);
 }

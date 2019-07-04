@@ -21,7 +21,6 @@ public:
 	CurveConsole(Session *session);
 	virtual ~CurveConsole();
 
-	void on_view_change();
 	void on_update();
 
 	void update_list();

@@ -51,10 +51,12 @@ public:
 		auto *track = vtrack->track;
 
 		c->set_color(get_color());
-		//c->drawStr(area.x1, area.y1-2, "\U0001f50a"); // U+1F50A "��
+		//c->drawStr(area.x1, area.y1-2, "\U0001f50a");
 		c->draw_mask_image(area.x1, area.y1, *view->images.speaker);
-		if (track->muted)
-			c->draw_image(area.x1, area.y1, *view->images.x);
+		if (track->muted) {
+			c->set_color(color(1, 0.7f, 0, 0));
+			c->draw_mask_image(area.x1, area.y1, *view->images.x);
+		}
 	}
 	bool on_left_button_down() override {
 		vtrack->set_muted(!vtrack->track->muted);
@@ -87,17 +89,8 @@ public:
 	TrackButtonConfig(TrackHeader *th, float dx, float dy) : TrackHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
 		c->set_color(get_color());
-		c->draw_str(area.x1, area.y1, u8"\U0001f527"); // U+1F527 "��
-
-		/*c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_FX))
-			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5 + 17*3, area.y1 + 22-2, "⚡"); // ...*/
-
-		/*c->setColor(col_but);
-		if ((view->hover.track == track) and (view->hover.type == Selection::Type::TRACK_BUTTON_CURVE))
-			c->setColor(col_but_hover);
-		c->drawStr(area.x1 + 5 + 17*4, area.y1 + 22-2, "☊"); // ... */
+		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
+		c->draw_mask_image(area.x1, area.y1, *view->images.config);
 	}
 	bool on_left_button_down() override {
 		view->session->set_mode("default/track");
@@ -215,8 +208,6 @@ void TrackHeader::draw(Painter *c) {
 	else if (track->type == SignalType::GROUP)
 		icon = view->images.track_group; // "G"
 	c->draw_mask_image(area.x1 + 5, area.y1 + 5, *icon);
-//	if (track->muted and !extended)
-//		c->draw_image(area.x1 + 5, area.y1 + 5, *view->images.x);
 }
 
 class MouseDelayDndTrack : public MouseDelayAction {

@@ -13,8 +13,11 @@
    height="32px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="volume.svg">
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   sodipodi:docname="volume.svg"
+   inkscape:export-filename="/home/michi/Projekte/Tsunami/static/volume.png"
+   inkscape:export-xdpi="36"
+   inkscape:export-ydpi="36">
   <defs
      id="defs2987">
     <inkscape:path-effect
@@ -38,14 +41,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.395604"
-     inkscape:cx="17.294897"
+     inkscape:cx="9.3692344"
      inkscape:cy="16"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1400"
-     inkscape:window-height="1028"
+     inkscape:window-width="2560"
+     inkscape:window-height="1387"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
@@ -57,7 +60,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -67,7 +70,7 @@
      inkscape:groupmode="layer">
     <path
        style="fill:#000000;fill-opacity:1;stroke:none"
-       d="m 1.0269873,12.755151 8.1265946,-3e-6 5.0902851,-4.1079483 -0.04465,14.8689883 -4.9563301,-4.152601 -8.30520078,3e-6 0.0893012,-6.608439"
+       d="m 1.0269873,12.755151 8.1265946,-3e-6 5.0902851,-4.1079483 -0.04465,14.8689883 -4.9563301,-4.152601 -8.30520078,3e-6 z"
        id="path2993"
        inkscape:path-effect="#path-effect2995"
        inkscape:original-d="m 1.0269873,12.755151 8.1265946,-3e-6 5.0902851,-4.1079483 -0.04465,14.8689883 -4.9563301,-4.152601 -8.30520078,3e-6 z"

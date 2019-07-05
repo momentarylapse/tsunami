@@ -68,16 +68,8 @@ bool has_track_name(Song *s, const string &name) {
 }
 
 void TrackRoutingDialog::on_add_group() {
-	string name = _("Master");
-	for (int i=2; i<100; i++) {
-		if (!has_track_name(song, name))
-			break;
-		name = format(_("Group %d"), i);
-	}
-
 	song->begin_action_group();
 	auto *t = song->add_track(SignalType::GROUP);
-	t->set_name(name);
 	song->end_action_group();
 	load();
 }

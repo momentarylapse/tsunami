@@ -13,11 +13,11 @@
    height="64px"
    id="svg3944"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
    sodipodi:docname="track-time.svg"
-   inkscape:export-filename="/home/michi/Projekte/Tsunami/Data/Icons/track-time.png"
-   inkscape:export-xdpi="16.875"
-   inkscape:export-ydpi="16.875">
+   inkscape:export-filename="/home/michi/Projekte/Tsunami/static/track-time.png"
+   inkscape:export-xdpi="18"
+   inkscape:export-ydpi="18">
   <defs
      id="defs3946" />
   <sodipodi:namedview
@@ -27,18 +27,23 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11"
-     inkscape:cx="33.773228"
-     inkscape:cy="32"
+     inkscape:zoom="15.556349"
+     inkscape:cx="9.7859146"
+     inkscape:cy="30.673964"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1600"
-     inkscape:window-height="845"
+     inkscape:window-width="2560"
+     inkscape:window-height="1387"
      inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     showguides="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid815" />
+  </sodipodi:namedview>
   <metadata
      id="metadata3949">
     <rdf:RDF>
@@ -47,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -56,26 +61,31 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       sodipodi:type="arc"
-       style="fill:none;stroke:#000000;stroke-width:5.57582795;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path3952"
-       sodipodi:cx="32.545456"
-       sodipodi:cy="32.727272"
-       sodipodi:rx="25.636364"
-       sodipodi:ry="24.90909"
-       d="m 58.18182,32.727272 a 25.636364,24.90909 0 1 1 -51.2727281,0 25.636364,24.90909 0 1 1 51.2727281,0 z"
-       transform="matrix(0.99882231,0,0,1.0316346,-0.09023627,-1.8534972)" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:6.0999999;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 32.181818,33.636363 0,-19.90909"
-       id="path4462"
+       style="fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 10,59 32,5 54,59"
+       id="path817"
        inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/home/michi/Projekte/Tsunami/static/path1141.png"
+       inkscape:export-xdpi="18"
+       inkscape:export-ydpi="18" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 32,45 60,20"
+       id="path819"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/michi/Projekte/Tsunami/static/path1141.png"
+       inkscape:export-xdpi="18"
+       inkscape:export-ydpi="18"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="M 32.545455,33.545455 43,27.454546"
-       id="path4464"
+       style="fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 55,20 4,5"
+       id="path1141"
        inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/michi/Projekte/Tsunami/static/path1141.png"
+       inkscape:export-xdpi="18"
+       inkscape:export-ydpi="18"
        sodipodi:nodetypes="cc" />
   </g>
 </svg>

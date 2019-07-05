@@ -218,20 +218,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
 
-	images.speaker = LoadImage(tsunami->directory_static + "volume.tga");
-	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
-	images.x = LoadImage(tsunami->directory_static + "x.tga");
-	images.x_bg = ExpandImageMask(images.x, 1.5f);
-	images.solo = LoadImage(tsunami->directory_static + "solo.tga");
-	images.solo_bg = ExpandImageMask(images.solo, 1.5f);
-	images.track_audio = LoadImage(tsunami->directory_static + "track-audio.tga");
-	images.track_audio_bg = ExpandImageMask(images.track_audio, 1.5f);
-	images.track_time = LoadImage(tsunami->directory_static + "track-time.tga");
-	images.track_time_bg = ExpandImageMask(images.track_time, 1.5f);
-	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.tga");
-	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
-	images.track_group = LoadImage(tsunami->directory_static + "track-group.tga");
-	images.track_group_bg = ExpandImageMask(images.track_group, 1.5f);
+	images.speaker = LoadImage(tsunami->directory_static + "volume.png");
+	images.solo = LoadImage(tsunami->directory_static + "solo.png");
+	images.config = LoadImage(tsunami->directory_static + "wrench.png");
+	images.x = LoadImage(tsunami->directory_static + "x.png");
+	images.track_audio = LoadImage(tsunami->directory_static + "track-audio.png");
+	images.track_time = LoadImage(tsunami->directory_static + "track-time.png");
+	images.track_midi = LoadImage(tsunami->directory_static + "track-midi.png");
+	images.track_group = LoadImage(tsunami->directory_static + "track-group.png");
 
 	peak_thread = nullptr;
 	draw_runner_id = -1;
@@ -316,17 +310,12 @@ AudioView::~AudioView() {
 	delete metronome_overlay_vlayer;
 
 	delete images.speaker;
-	delete images.speaker_bg;
 	delete images.x;
-	delete images.x_bg;
 	delete images.solo;
-	delete images.solo_bg;
+	delete images.config;
 	delete images.track_audio;
-	delete images.track_audio_bg;
 	delete images.track_midi;
-	delete images.track_midi_bg;
 	delete images.track_time;
-	delete images.track_time_bg;
 
 	delete signal_chain;
 

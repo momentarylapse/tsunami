@@ -13,8 +13,7 @@
 class AudioViewLayer;
 
 
-class LayerHeader : public ViewNodeRel
-{
+class LayerHeader : public ViewNodeRel {
 public:
 	AudioViewLayer *vlayer;
 	LayerHeader(AudioViewLayer *l);

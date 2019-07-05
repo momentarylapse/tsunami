@@ -109,13 +109,41 @@ Range Track::range() const {
 	return r;
 }
 
+int get_same_type_index(Track *t) {
+	if (!t->song)
+		return -1;
+	int n = 0;
+	foreachi(Track *tt, t->song->tracks, i)
+		if (tt->type == t->type) {
+			if (tt == t)
+				return n;
+			n ++;
+		}
+	return -1;
+}
+
+string track_base_name(SignalType type) {
+	if (type == SignalType::BEATS)
+		return _("Metronome");
+	if (type == SignalType::GROUP)
+		return _("Master");
+	if (type == SignalType::AUDIO)
+		return _("Audio");
+	if (type == SignalType::MIDI)
+		return _("Midi");
+	return _("Track");
+}
+
 string Track::nice_name() {
 	if (name.num > 0)
 		return name;
-	if (type == SignalType::BEATS)
-		return _("Metronome");
-	int n = get_track_index(this);
-	return format(_("Track %d"), n+1);
+	int n = get_same_type_index(this);
+	string base = track_base_name(type);
+	if ((n == 0) and ((type == SignalType::BEATS) or (type == SignalType::GROUP)))
+		return base;
+	return base + format(" %d", n+1);
+	//int n = get_track_index(this);
+	//return format(_("Track %d"), n+1);
 }
 
 int Track::get_index() {

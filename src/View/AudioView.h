@@ -319,10 +319,8 @@ public:
 	PeakThread *peak_thread;
 
 	struct ImageData {
-		Image *speaker, *x, *solo;
-		Image *speaker_bg, *x_bg, *solo_bg;
+		Image *speaker, *x, *solo, *config;
 		Image *track_audio, *track_time, *track_midi, *track_group;
-		Image *track_audio_bg, *track_time_bg, *track_midi_bg, *track_group_bg;
 	} images;
 
 	hui::Menu *menu_track;

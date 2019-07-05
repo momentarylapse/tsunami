@@ -446,6 +446,7 @@ sources = [
 	'src/View/Node/ScrollBar.cpp',
 	'src/View/Node/TimeScale.cpp',
 	'src/View/Node/TrackHeader.cpp',
+	'src/View/Node/ViewMarker.cpp',
 	'src/View/Node/ViewNode.cpp',
 	'src/View/Painter/BufferPainter.cpp',
 	'src/View/Painter/GridPainter.cpp',
@@ -477,7 +478,7 @@ sources = [
 
 executable('tsunami', sources, dependencies : deps, install : true)
 
-install_subdir('static/Icons', install_dir : join_paths(get_option('datadir'), 'tsunami'))
+install_subdir('static/icons', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_subdir('static/Midi Fonts', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_subdir('static/SignalChains', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/favorites_demo.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
@@ -485,13 +486,5 @@ install_data('static/hui_resources.txt', install_dir : join_paths(get_option('da
 install_data('static/icon.svg', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license_small.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/mute.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/solo.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/track-audio.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/track-group.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/track-midi.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/track-time.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/volume.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/x.tga', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_subdir('Plugins', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/michisoft-tsunami.desktop', install_dir : join_paths(get_option('datadir'), 'applications'))

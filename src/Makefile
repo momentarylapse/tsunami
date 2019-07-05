@@ -365,6 +365,7 @@ OBJ = Action/Bar/Action__ScaleData.o \
  View/Node/ScrollBar.o \
  View/Node/TimeScale.o \
  View/Node/TrackHeader.o \
+ View/Node/ViewMarker.o \
  View/Node/ViewNode.o \
  View/Painter/BufferPainter.o \
  View/Painter/GridPainter.o \
@@ -1476,6 +1477,9 @@ View/Node/TimeScale.o : View/Node/TimeScale.cpp View/Node/TimeScale.h View/Node/
 View/Node/TrackHeader.o : View/Node/TrackHeader.cpp View/Node/TrackHeader.h View/Node/ViewNode.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/math/math.h lib/image/color.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h View/Node/AudioViewTrack.h View/AudioView.h Data/SongSelection.h Data/Range.h Data/Midi/Scale.h View/TrackHeightManager.h View/ViewPort.h View/ColorScheme.h View/HoverData.h View/MouseDelayPlanner.h Data/base.h Data/Song.h Data/Data.h Data/Curve.h Data/Rhythm/BarCollection.h Data/Track.h Data/Midi/MidiData.h Data/Midi/MidiNote.h Data/Midi/MidiEvent.h Data/Midi/Instrument.h Data/TrackLayer.h Session.h
 	$(CPP) -c View/Node/TrackHeader.cpp -o $@ $(CXXFLAGS)
 
+View/Node/ViewMarker.o : View/Node/ViewMarker.cpp View/Node/ViewMarker.h View/Node/ViewNode.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/math/math.h lib/image/color.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h
+	$(CPP) -c View/Node/ViewMarker.cpp -o $@ $(CXXFLAGS)
+
 View/Node/ViewNode.o : View/Node/ViewNode.cpp View/Node/ViewNode.h lib/base/base.h lib/base/macros.h lib/base/array.h lib/base/strings.h lib/math/math.h lib/image/color.h lib/math/vector.h lib/math/matrix.h lib/math/matrix3.h lib/math/quaternion.h lib/math/plane.h lib/math/rect.h lib/math/complex.h lib/math/interpolation.h lib/math/random.h lib/math/ray.h Stuff/Observable.h lib/hui/hui.h lib/hui/common.h lib/config.h lib/file/file.h lib/file/msg.h lib/file/file_op.h lib/image/image.h lib/hui/Callback.h lib/hui/Application.h lib/base/map.h lib/base/set.h lib/hui/main.h lib/hui/Event.h lib/hui/Menu.h lib/hui/Panel.h lib/hui/Window.h lib/hui/common_dlg.h lib/hui/language.h lib/hui/Config.h lib/hui/Resource.h lib/hui/utility.h lib/hui/Painter.h lib/image/Painter.h lib/hui/Timer.h lib/hui/Toolbar.h lib/hui/error.h lib/hui/Clipboard.h View/Node/SceneGraph.h View/HoverData.h Data/Range.h
 	$(CPP) -c View/Node/ViewNode.cpp -o $@ $(CXXFLAGS)
 
@@ -1558,11 +1562,11 @@ install :
 	mkdir -p $(prefix)/share/tsunami
 	xdg-desktop-menu install ../static/michisoft-tsunami.desktop
 	xdg-mime install ../static/michisoft-nami.xml
-	xdg-icon-resource install --context mimetypes --size 32 ../static/Icons/32.png application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size 48 ../static/Icons/48.png application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size 64 ../static/Icons/64.png application-michisoft-nami --noupdate
-	xdg-icon-resource install --context mimetypes --size 128 ../static/Icons/128.png application-michisoft-nami
-	cp -rf '../static/Icons' $(prefix)/share/tsunami
+	xdg-icon-resource install --context mimetypes --size 32 ../static/icons/32.png application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 48 ../static/icons/48.png application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 64 ../static/icons/64.png application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size 128 ../static/icons/128.png application-michisoft-nami
+	cp -rf '../static/icons' $(prefix)/share/tsunami
 	cp -rf '../static/Midi Fonts' $(prefix)/share/tsunami
 	cp -rf '../static/SignalChains' $(prefix)/share/tsunami
 	cp -f '../static/favorites_demo.txt' $(prefix)/share/tsunami
@@ -1570,14 +1574,6 @@ install :
 	cp -f '../static/icon.svg' $(prefix)/share/tsunami
 	cp -f '../static/license.txt' $(prefix)/share/tsunami
 	cp -f '../static/license_small.txt' $(prefix)/share/tsunami
-	cp -f '../static/mute.tga' $(prefix)/share/tsunami
-	cp -f '../static/solo.tga' $(prefix)/share/tsunami
-	cp -f '../static/track-audio.tga' $(prefix)/share/tsunami
-	cp -f '../static/track-group.tga' $(prefix)/share/tsunami
-	cp -f '../static/track-midi.tga' $(prefix)/share/tsunami
-	cp -f '../static/track-time.tga' $(prefix)/share/tsunami
-	cp -f '../static/volume.tga' $(prefix)/share/tsunami
-	cp -f '../static/x.tga' $(prefix)/share/tsunami
 	cp -rf '../Plugins' $(prefix)/share/tsunami
 	cp $(BIN) $(prefix)/bin
 

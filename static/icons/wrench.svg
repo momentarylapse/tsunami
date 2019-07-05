@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933333"
+   version="1.1"
+   id="svg870"
+   sodipodi:docname="wrench.svg"
+   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   inkscape:export-filename="/home/michi/Projekte/Tsunami/static/wrench.png"
+   inkscape:export-xdpi="18"
+   inkscape:export-ydpi="18">
+  <defs
+     id="defs864" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.2"
+     inkscape:cx="15.140145"
+     inkscape:cy="24.269982"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer2"
+     showgrid="true"
+     units="px"
+     width="64px"
+     inkscape:snap-grids="false"
+     inkscape:snap-to-guides="false"
+     inkscape:snap-others="false"
+     inkscape:snap-nodes="false"
+     inkscape:snap-global="false"
+     inkscape:window-width="2560"
+     inkscape:window-height="1387"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1415" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata867">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2"
+     style="opacity:1">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.70128298;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 2.3717415,0.97800155 5.5901293,2.9503598 3.8619678,5.6459161 0.61853412,3.7831333 c 0,0 -0.2018197,1.8584145 1.11453888,2.7425174 1.3163587,0.8841028 3.9070676,0.038049 4.7783485,1.1373041 0.8712808,1.099255 3.0342836,4.0502802 3.6368825,4.8305472 0.602599,0.780267 0.115918,2.453285 1.260824,3.273891 1.144906,0.820606 3.155774,0.350641 3.155774,0.350641 l -2.44397,-1.719215 1.797704,-2.382706 2.399472,1.647431 c 0,0 -0.05635,-1.646763 -1.264813,-2.573458 C 13.844834,10.16339 11.980906,10.914485 11.444702,10.203526 10.908499,9.492566 8.0903487,5.6543394 7.4835599,4.8349389 6.876771,4.0155383 7.3680204,2.324535 6.2287977,1.328643 5.1113069,0.35174874 3.5359966,0.43468252 2.3717415,0.97800155 Z"
+       id="path1439"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccczzzzcccczzzsc" />
+  </g>
+</svg>

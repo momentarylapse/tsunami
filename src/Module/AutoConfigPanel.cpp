@@ -51,7 +51,7 @@ public:
 	bool name_match(const string &const_name) {
 		return (("AUTO_CONFIG_" + name).upper().replace("_", "") == const_name.upper().replace("_", ""));
 	}
-	virtual void parse(const string &s) = 0;
+	virtual void parse(const string &s) = 0; // before a gui exists!
 	virtual void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) = 0;
 	virtual void value_from_gui() = 0;
 	virtual void value_to_gui() = 0;
@@ -237,22 +237,44 @@ public:
 	string *value;
 	string id;
 	ConfigPanel *panel;
+	Array<string> choices;
 	AutoConfigDataString(const string &_name) : AutoConfigData(_name) {
 		value = nullptr;
 		panel = nullptr;
 	}
-	void parse(const string &s) override {}
+	void parse(const string &s) override {
+		if (s.find("|", 0) >= 0)
+			choices = s.explode("|");
+	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
-		id = "edit-" + i2s(i);
 		panel = p;
-		p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
+		id = "string-" + i2s(i);
+		if (choices.num > 0) {
+			p->add_combo_box("!expandx", 1, i, id);
+			for (string &c: choices)
+				p->add_string(id, c);
+		} else {
+			p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
+		}
 		p->event(id, callback);
 	}
 	void value_from_gui() override {
-		*value = panel->get_string(id);
+		if (choices.num > 0) {
+			int n = panel->get_int(id);
+			if (n >= 0)
+				*value = choices[n];
+		} else {
+			*value = panel->get_string(id);
+		}
 	}
 	void value_to_gui() override {
-		panel->set_string(id, *value);
+		if (choices.num > 0) {
+			foreachi (string &c, choices, i)
+				if (c == *value)
+					panel->set_int(id, i);
+		} else {
+			panel->set_string(id, *value);
+		}
 	}
 };
 
@@ -322,7 +344,6 @@ public:
 			type = DeviceType::AUDIO_INPUT;
 		if (s == "midi:input")
 			type = DeviceType::MIDI_INPUT;
-		update_list();
 	}
 	void update_list() {
 		list = session->device_manager->device_list(type);

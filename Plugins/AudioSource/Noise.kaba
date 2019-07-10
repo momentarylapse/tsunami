@@ -1,29 +1,25 @@
 use "../api.kaba"
 
 const string AUTO_CONFIG_VOLUME = "0:1:0.1:100:%"
-const string AUTO_CONFIG_TYPE = "0:1"
+const string AUTO_CONFIG_TYPE = "uniform|gauss"
 
-
-enum
-	TYPE_UNIFORM
-	TYPE_GAUSS
 
 class NoiseConfig extends PluginData
 	float volume
-	int type
+	string type
 	override void reset()
 		volume = 1
-		type = TYPE_UNIFORM
+		type = "uniform"
 
 class Noise extends AudioSource
 	NoiseConfig config
 	Random r
 	
 	void do(float[] buf)
-		if config.type == TYPE_UNIFORM
+		if config.type == "uniform"
 			for b in buf
 				b = r.uniform(-1,1) * config.volume
-		else if config.type == TYPE_GAUSS
+		else if config.type == "gauss"
 			for b in buf
 				b = r.normal(0, 0.2) * config.volume
 	

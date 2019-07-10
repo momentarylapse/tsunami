@@ -570,7 +570,6 @@ void TsunamiWindow::on_paste_time() {
 
 void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Window *win) {
 	auto *p = new Progress(_("applying effect"), win);
-	fx->sample_rate = l->song()->sample_rate;
 	fx->reset_state();
 
 	AudioBuffer buf;
@@ -591,93 +590,136 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	delete p;
 }
 
+void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::Window *win) {
+	auto *p = new Progress(_("applying source"), win);
+	fx->reset_state();
+	
+	AudioBuffer buf;
+	l->get_buffers(buf, r);
+	auto *a = new ActionTrackEditBuffer(l, r);
+	buf.set_zero();
+
+	int chunk_size = 2048;
+	int done = 0;
+	while (done < r.length) {
+		p->set((float) done / (float) r.length);
+
+		auto ref = buf.ref(done, min(done + chunk_size, r.length));
+		fx->read(ref);
+		done += chunk_size;
+	}
+
+	l->song()->execute(a);
+	delete p;
+}
+
 void TsunamiWindow::on_menu_execute_audio_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
+	int n_layers = 0;
 
 	auto *fx = CreateAudioEffect(session, name);
 
-	fx->reset_config();
-	if (configure_module(this, fx)) {
-		song->begin_action_group();
-		for (Track *t: song->tracks)
-			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-					fx_process_layer(l, view->sel.range, fx, this);
-				}
-		song->end_action_group();
+	if (!configure_module(this, fx)) {
+		delete fx;
+		return;
 	}
+	song->begin_action_group();
+	for (Track *t: song->tracks)
+		for (auto *l: t->layers)
+			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
+				fx_process_layer(l, view->sel.range, fx, this);
+				n_layers ++;
+			}
+	song->end_action_group();
 	delete fx;
+	
+	if (n_layers == 0)
+		session->e(_("no audio tracks selected"));
 }
 
 void TsunamiWindow::on_menu_execute_audio_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
+	int n_layers = 0;
 
 	auto *s = CreateAudioSource(session, name);
 
-	s->reset_config();
-	if (configure_module(this, s)) {
-		song->begin_action_group();
-		for (Track *t: song->tracks)
-			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-					s->reset_state();
-					AudioBuffer buf;
-					l->get_buffers(buf, view->sel.range);
-					auto *a = new ActionTrackEditBuffer(l, view->sel.range);
-					buf.set_zero();
-					s->read(buf);
-					song->execute(a);
-				}
-		song->end_action_group();
+	if (!configure_module(this, s)) {
+		delete s;
+		return;
 	}
+	song->begin_action_group();
+	for (Track *t: song->tracks)
+		for (auto *l: t->layers)
+			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
+				source_process_layer(l, view->sel.range, s, this);
+				n_layers ++;
+			}
+	song->end_action_group();
 	delete s;
+	
+	if (n_layers == 0)
+		session->e(_("no audio tracks selected"));
 }
 
 void TsunamiWindow::on_menu_execute_midi_effect() {
 	string name = hui::GetEvent()->id.explode("--")[1];
+	int n_layers = 0;
 
 	auto *fx = CreateMidiEffect(session, name);
 
-	fx->reset_config();
-	if (configure_module(this, fx)) {
-		song->action_manager->group_begin();
-		for (Track *t: song->tracks)
-			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-					fx->reset_state();
-					fx->process_layer(l, view->sel);
-				}
-		song->action_manager->group_end();
+	if (!configure_module(this, fx)) {
+		delete fx;
+		return;
 	}
+	
+	song->action_manager->group_begin();
+	for (Track *t: song->tracks)
+		for (auto *l: t->layers)
+			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+				fx->reset_state();
+				fx->process_layer(l, view->sel);
+				n_layers ++;
+			}
+	song->action_manager->group_end();
 	delete fx;
+	
+	if (n_layers == 0)
+		session->e(_("no midi tracks selected"));
 }
 
 void TsunamiWindow::on_menu_execute_midi_source() {
 	string name = hui::GetEvent()->id.explode("--")[1];
+	int n_layers = 0;
 
 	auto *s = CreateMidiSource(session, name);
 
-	s->reset_config();
-	if (configure_module(this, s)) {
-		song->begin_action_group();
-		for (Track *t: song->tracks)
-			for (auto *l: t->layers)
-				if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
-					s->reset_state();
-					MidiEventBuffer buf;
-					buf.samples = view->sel.range.length;
-					s->read(buf);
-					l->insert_midi_data(view->sel.range.offset, midi_events_to_notes(buf));
-				}
-		song->end_action_group();
+	if (!configure_module(this, s)) {
+		delete s;
+		return;
 	}
+	
+	song->begin_action_group();
+	for (Track *t: song->tracks)
+		for (auto *l: t->layers)
+			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
+				s->reset_state();
+				MidiEventBuffer buf;
+				buf.samples = view->sel.range.length;
+				s->read(buf);
+				l->insert_midi_data(view->sel.range.offset, midi_events_to_notes(buf));
+				n_layers ++;
+			}
+	song->end_action_group();
 	delete s;
+	
+	if (n_layers == 0)
+		session->e(_("no midi tracks selected"));
 }
 
 void TsunamiWindow::on_menu_execute_song_plugin() {
 	string name = hui::GetEvent()->id.explode("--")[1];
 
-	SongPlugin *p = CreateSongPlugin(session, name);
+	auto *p = CreateSongPlugin(session, name);
 
 	p->apply();
 	delete p;

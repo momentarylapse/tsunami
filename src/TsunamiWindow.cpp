@@ -582,7 +582,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	while (done < r.length) {
 		p->set((float) done / (float) r.length);
 
-		auto ref = buf.ref(done, done + chunk_size);
+		auto ref = buf.ref(done, min(done + chunk_size, r.length));
 		fx->process(ref);
 		done += chunk_size;
 	}
@@ -623,7 +623,10 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 					s->reset_state();
 					AudioBuffer buf;
 					l->get_buffers(buf, view->sel.range);
+					auto *a = new ActionTrackEditBuffer(l, view->sel.range);
+					buf.set_zero();
 					s->read(buf);
+					song->execute(a);
 				}
 		song->end_action_group();
 	}

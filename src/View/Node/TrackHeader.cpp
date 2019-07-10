@@ -156,13 +156,12 @@ bool TrackHeader::playable() {
 }
 
 color TrackHeader::color_text() {
-	if (view->sel.has(vtrack->track)) {
-		if (playable())
-			return view->colors.text;
+	if (playable())
+		return view->colors.text;
+	if (view->sel.has(vtrack->track))
 		return view->colors.text_soft1;
-	} else {
+	else
 		return view->colors.text_soft2;
-	}
 }
 
 
@@ -189,13 +188,15 @@ void TrackHeader::draw(Painter *c) {
 	c->set_antialiasing(false);
 
 	// track title
-	c->set_font("", view->FONT_SIZE, view->sel.has(track) and playable(), false);
+	c->set_font("", view->FONT_SIZE, playable(), false);
 	c->set_color(color_text());
 	string title = track->nice_name() + (vtrack->solo ? " (solo)" : "");
 	AudioView::draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);
+		c->set_line_width(1.7f);
 		c->draw_line(area.x1 + 23, area.y1+5+5, area.x1+23+ww, area.y1+5+5);
+		c->set_line_width(1);
 	}
 	c->set_font("", -1, false, false);
 

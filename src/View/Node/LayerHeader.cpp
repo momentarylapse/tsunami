@@ -136,9 +136,9 @@ bool LayerHeader::playable() {
 color LayerHeader::color_text() {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
+	if (playable())
+		return view->colors.text;
 	if (view->sel.has(layer)) {
-		if (playable())
-			return view->colors.text;
 		return view->colors.text_soft1;
 	} else {
 		return view->colors.text_soft2;
@@ -178,7 +178,7 @@ void LayerHeader::draw(Painter *c) {
 	c->set_antialiasing(false);
 	
 	
-	c->set_font("", view->FONT_SIZE, view->sel.has(layer) and playable(), false);
+	c->set_font("", view->FONT_SIZE, playable(), false);
 	c->set_color(color_text());
 	
 	if (vlayer->represents_imploded) {

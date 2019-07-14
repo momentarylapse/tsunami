@@ -24,7 +24,6 @@ MidiJoiner::Output::Output(MidiJoiner* j) : Port(SignalType::MIDI, "out") {
 
 // if A or B is end-of-stream... just ignore and suck the other!
 int MidiJoiner::Output::read_midi(MidiEventBuffer& buf) {
-	msg_write("join");
 	if (joiner->a and joiner->b) {
 		int ra = joiner->a->read_midi(buf);
 		if (ra == NOT_ENOUGH_DATA) {
@@ -35,7 +34,6 @@ int MidiJoiner::Output::read_midi(MidiEventBuffer& buf) {
 		MidiEventBuffer buf_b;
 		buf_b.samples = buf.samples;
 		int rb = joiner->b->read_midi(buf_b);
-		printf("join  %d   %d    ->  %d\n", ra, rb, max(ra, rb));
 		for (auto &n: buf_b)
 			buf.add(n);
 		return max(ra, rb);

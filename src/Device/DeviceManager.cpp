@@ -52,10 +52,7 @@ void pulse_wait_op(Session *session, pa_operation *op) {
 		session->e("pulse_wait_op:  op=nil");
 		return;
 	}
-	auto *m = session->device_manager->pulse_mainloop;
 	printf("-w-\n");
-	pa_threaded_mainloop_lock(m);
-	printf("-locked-\n");
 	int n = 0;
 	//msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING) {
@@ -66,7 +63,7 @@ void pulse_wait_op(Session *session, pa_operation *op) {
 		if (n > 300000)
 			break;
 		//hui::Sleep(0.010f);
-		pa_threaded_mainloop_wait(m);
+		pa_threaded_mainloop_wait(session->device_manager->pulse_mainloop);
 	}
 	auto status = pa_operation_get_state(op);
 	//printf("%d\n", status);
@@ -81,8 +78,6 @@ void pulse_wait_op(Session *session, pa_operation *op) {
 	pa_operation_unref(op);
 	//msg_write(" ok");
 	printf("-o-\n");
-	pa_threaded_mainloop_unlock(m);
-	printf("-unlocked-\n");
 }
 
 void pulse_ignore_op(Session *session, pa_operation *op) {
@@ -128,7 +123,7 @@ void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, voi
 	if (eol > 0 or !i or !userdata)
 		return;
 
-	printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
+	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	DeviceManager *dm = (DeviceManager*)userdata;
 	Device *d = dm->get_device_create(DeviceType::AUDIO_OUTPUT, i->name);
@@ -217,6 +212,26 @@ DeviceManager::~DeviceManager() {
 	delete dummy_device;
 }
 
+void DeviceManager::lock() {
+#if HAS_LIB_PULSEAUDIO
+	if (audio_api == ApiType::PULSE) {
+		printf("-lock...\n");
+		pa_threaded_mainloop_lock(pulse_mainloop);
+		printf("...ok-\n");
+	}
+#endif
+}
+
+void DeviceManager::unlock() {
+#if HAS_LIB_PULSEAUDIO
+	if (audio_api == ApiType::PULSE) {
+		printf("-unlock...\n");
+		pa_threaded_mainloop_unlock(pulse_mainloop);
+		printf("...ok-\n");
+	}
+#endif
+}
+
 void DeviceManager::remove_device(DeviceType type, int index) {
 	Array<Device*> &devices = device_list(type);
 	if ((index < 0) or (index >= devices.num))
@@ -276,6 +291,8 @@ void DeviceManager::_update_devices_audio_pulse() {
 	def->default_by_lib = true;
 	def->present = true;
 
+	lock();
+	
 	pa_operation *op = pa_context_get_sink_info_list(pulse_context, pulse_sink_info_callback, this);
 	if (!_pulse_test_error(session, "pa_context_get_sink_info_list"))
 		pulse_wait_op(session, op);
@@ -290,6 +307,7 @@ void DeviceManager::_update_devices_audio_pulse() {
 	if (!_pulse_test_error(session, "pa_context_get_source_info_list"))
 		pulse_wait_op(session, op);
 
+	unlock();
 
 #endif
 }
@@ -509,8 +527,11 @@ void DeviceManager::kill() {
 	// audio
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE and pulse_context) {
+		pa_threaded_mainloop_stop(pulse_mainloop);
 		pa_context_disconnect(pulse_context);
 		_pulse_test_error(session, "pa_context_disconnect");
+		pa_context_unref(pulse_context);
+		pa_threaded_mainloop_free(pulse_mainloop);
 	}
 #endif
 

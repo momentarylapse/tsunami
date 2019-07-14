@@ -37,12 +37,14 @@ extern void require_main_thread(const string &msg); // hui
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 //extern void pulse_ignore_op(Session*, pa_operation*);
 
-bool pulse_wait_stream_ready(pa_stream *s) {
+bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
 	msg_write("wait stream ready");
 	int n = 0;
 	while (pa_stream_get_state(s) != PA_STREAM_READY) {
+		printf(".\n");
 		//pa_mainloop_iterate(m, 1, NULL);
-		hui::Sleep(0.01f);
+		//hui::Sleep(0.01f);
+		pa_threaded_mainloop_wait(dm->pulse_mainloop);
 		n ++;
 		if (n >= 1000)
 			return false;
@@ -236,6 +238,7 @@ void AudioOutput::_create_dev() {
 		return;
 	session->debug("out", "create device");
 	dev_sample_rate = session->sample_rate();
+	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
@@ -244,9 +247,7 @@ void AudioOutput::_create_dev() {
 		ss.channels = 2;
 		ss.format = PA_SAMPLE_FLOAT32LE;
 		//ss.format = PA_SAMPLE_S16LE;
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pulse_stream = pa_stream_new(device_manager->pulse_context, "stream", &ss, nullptr);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_new");
 
 		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
@@ -265,20 +266,19 @@ void AudioOutput::_create_dev() {
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
 
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_stream_connect_playback(pulse_stream, dev, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_connect_playback");
 
 
-		if (!pulse_wait_stream_ready(pulse_stream)) {
+		if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
 			session->w("retry");
 
 			// retry with default device
 			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
 			_pulse_test_error("pa_stream_connect_playback");
 
-			if (!pulse_wait_stream_ready(pulse_stream)) {
+			if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
+				device_manager->unlock();
 				// still no luck... give up
 				session->e("pulse_wait_stream_ready");
 //				pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
@@ -286,7 +286,6 @@ void AudioOutput::_create_dev() {
 				return;
 			}
 		}
-//		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 	}
 #endif
 
@@ -311,6 +310,7 @@ void AudioOutput::_create_dev() {
 		}
 	}
 #endif
+	device_manager->unlock();
 	state = State::DEVICE_WITHOUT_DATA;
 }
 
@@ -318,16 +318,14 @@ void AudioOutput::_kill_dev() {
 	if (state != State::DEVICE_WITHOUT_DATA and state != State::PAUSED)
 		return;
 	session->debug("out", "kill device");
+	device_manager->lock();
+
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_stream_disconnect(pulse_stream);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_disconnect");
 
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_stream_unref(pulse_stream);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_unref");
 		pulse_stream = nullptr;
 	}
@@ -340,6 +338,8 @@ void AudioOutput::_kill_dev() {
 		portaudio_stream = nullptr;
 	}
 #endif
+
+	device_manager->unlock();
 	state = State::NO_DEVICE;
 }
 
@@ -355,15 +355,13 @@ void AudioOutput::_pause() {
 	if (state != State::PLAYING)
 		return;
 	session->debug("out", "pause");
+	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
-		//pulse_ignore_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -374,7 +372,7 @@ void AudioOutput::_pause() {
 	}
 #endif
 
-
+	device_manager->unlock();
 	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -386,15 +384,13 @@ void AudioOutput::_unpause() {
 
 	read_end_of_stream = false;
 	played_end_of_stream = false;
+	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
-		//pulse_ignore_op(session, op);
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -404,6 +400,7 @@ void AudioOutput::_unpause() {
 	}
 #endif
 
+	device_manager->unlock();
 	state = State::PLAYING;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -467,18 +464,17 @@ void AudioOutput::_fill_prebuffer() {
 
 	// we need some data in the buffer...
 	_read_stream(prebuffer_size);
+	
+	device_manager->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 		if (!pulse_stream)
 			return;
 
-		pa_threaded_mainloop_lock(device_manager->pulse_mainloop);
 		pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
-		pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 		_pulse_test_error("pa_stream_prebuf");
 		pulse_wait_op(session, op);
-		//pulse_ignore_op(session, op);
 
 		/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
 		_pulse_test_error("pa_stream_trigger");
@@ -495,6 +491,7 @@ void AudioOutput::_fill_prebuffer() {
 	}
 #endif
 
+	device_manager->unlock();
 	state = State::PAUSED;
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -575,6 +572,7 @@ void AudioOutput::reset_state() {
 		_pause();
 	require_main_thread("out.reset");
 	if (state == State::PAUSED) {
+		device_manager->lock();
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 			session->debug("out", "flush");
@@ -582,11 +580,11 @@ void AudioOutput::reset_state() {
 				pa_operation *op = pa_stream_flush(pulse_stream, nullptr, nullptr);
 				_pulse_test_error("pa_stream_flush");
 				pulse_wait_op(session, op);
-				//pulse_ignore_op(session, op);
 			}
 			session->debug("out", "/flush");
 		}
 #endif
+		device_manager->unlock();
 		state = State::DEVICE_WITHOUT_DATA;
 	}
 

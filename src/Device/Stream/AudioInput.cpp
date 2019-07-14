@@ -40,7 +40,7 @@ extern void require_main_thread(const string&);
 
 #if HAS_LIB_PULSEAUDIO
 extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
-extern bool pulse_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
+extern bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm); // -> OutputStream.cpp
 
 
 void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
@@ -276,15 +276,15 @@ void AudioInput::_kill_dev() {
 	if (state != State::PAUSED)
 		return;
 	session->debug("input", "kill device");
+	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 
-		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_stream_disconnect(pulse_stream);
-		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_disconnect");
 
+		// FIXME really necessary?!?!?!?
 		for (int i=0; i<1000; i++) {
 			if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED) {
 				break;
@@ -304,6 +304,8 @@ void AudioInput::_kill_dev() {
 		portaudio_stream = nullptr;
 	}
 #endif
+
+	dev_man->unlock();
 	state = State::NO_DEVICE;
 }
 
@@ -317,13 +319,12 @@ void AudioInput::_pause() {
 	if (state != State::CAPTURING)
 		return;
 	session->debug("input", "pause");
+	dev_man->lock();
 
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
-		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
@@ -336,8 +337,8 @@ void AudioInput::_pause() {
 	}
 #endif
 
+	dev_man->unlock();
 	state = State::PAUSED;
-	//buffer.clear();
 }
 
 void AudioInput::_create_dev() {
@@ -347,6 +348,7 @@ void AudioInput::_create_dev() {
 	session->debug("input", "create device");
 
 	num_channels = min(cur_device->channels, 2);
+	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
@@ -354,9 +356,7 @@ void AudioInput::_create_dev() {
 		ss.rate = _sample_rate;
 		ss.channels = num_channels;
 		ss.format = PA_SAMPLE_FLOAT32LE;
-		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
-		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_new");
 
 
@@ -373,13 +373,11 @@ void AudioInput::_create_dev() {
 		const char *dev = nullptr;
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
-		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
-		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 		_pulse_test_error("pa_stream_connect_record");
 
-		if (!pulse_wait_stream_ready(pulse_stream)) {
+		if (!pulse_wait_stream_ready(pulse_stream, dev_man)) {
 			session->e("pulse_wait_stream_ready");
 			return;
 		}
@@ -408,6 +406,7 @@ void AudioInput::_create_dev() {
 	}
 #endif
 
+	dev_man->unlock();
 	state = State::PAUSED;
 }
 
@@ -415,13 +414,12 @@ void AudioInput::_unpause() {
 	if (state != State::PAUSED)
 		return;
 	session->debug("input", "unpause");
+	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		if (pulse_stream) {
-			pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 			pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
-			pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 			_pulse_test_error("pa_stream_cork");
 			pulse_wait_op(session, op);
 		}
@@ -436,6 +434,7 @@ void AudioInput::_unpause() {
 	}
 #endif
 
+	dev_man->unlock();
 	state = State::CAPTURING;
 }
 

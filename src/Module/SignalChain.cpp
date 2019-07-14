@@ -435,6 +435,7 @@ bool SignalChain::is_playback_active() {
 // running in gui thread!
 void SignalChain::on_module_play_end_of_stream() {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
+	msg_write("   -auto-stop-");
 	stop_hard();
 }
 

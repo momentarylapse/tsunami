@@ -65,6 +65,9 @@ public:
 	};
 	ApiType audio_api;
 	ApiType midi_api;
+	
+	void lock();
+	void unlock();
 
 
 	float get_output_volume();

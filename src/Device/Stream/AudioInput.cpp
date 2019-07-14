@@ -74,8 +74,11 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 		input->_pulse_test_error("pa_stream_drop");
 	}
 	//msg_write(">");
+	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
 }
-void input_notify_callback(pa_stream *p, void *userdata) {
+
+void AudioInput::input_notify_callback(pa_stream *p, void *userdata) {
+	AudioInput *input = (AudioInput*)userdata;
 	printf("sstate... %p:  ", p);
 	int s = pa_stream_get_state(p);
 	if (s == PA_STREAM_UNCONNECTED)
@@ -85,6 +88,7 @@ void input_notify_callback(pa_stream *p, void *userdata) {
 	if (s == PA_STREAM_TERMINATED)
 		printf("terminated");
 	printf("\n");
+	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
 }
 
 
@@ -275,7 +279,10 @@ void AudioInput::_kill_dev() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
+
+		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_stream_disconnect(pulse_stream);
+		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_disconnect");
 
 		for (int i=0; i<1000; i++) {
@@ -314,7 +321,9 @@ void AudioInput::_pause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
+		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
+		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
@@ -345,12 +354,14 @@ void AudioInput::_create_dev() {
 		ss.rate = _sample_rate;
 		ss.channels = num_channels;
 		ss.format = PA_SAMPLE_FLOAT32LE;
+		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
+		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		_pulse_test_error("pa_stream_new");
 
 
 		pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
-		//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, NULL);
+		//pa_stream_set_state_callback(pulse_stream, &input_notify_callback, this);
 
 		pa_buffer_attr attr_in;
 	//	attr_in.fragsize = -1;
@@ -362,7 +373,9 @@ void AudioInput::_create_dev() {
 		const char *dev = nullptr;
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
+		pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+		pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 		_pulse_test_error("pa_stream_connect_record");
 
@@ -406,7 +419,9 @@ void AudioInput::_unpause() {
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		if (pulse_stream) {
+			pa_threaded_mainloop_lock(dev_man->pulse_mainloop);
 			pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
+			pa_threaded_mainloop_unlock(dev_man->pulse_mainloop);
 			_pulse_test_error("pa_stream_cork");
 			pulse_wait_op(session, op);
 		}

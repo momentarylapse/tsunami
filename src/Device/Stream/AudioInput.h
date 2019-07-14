@@ -81,7 +81,7 @@ public:
 
 	int _sample_rate;
 
-private:
+protected:
 
 	DeviceManager *dev_man;
 
@@ -131,6 +131,7 @@ private:
 
 #if HAS_LIB_PULSEAUDIO
 	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+	static void input_notify_callback(pa_stream *p, void *userdata);
 #endif
 #if HAS_LIB_PORTAUDIO
 	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,

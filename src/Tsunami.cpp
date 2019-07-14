@@ -83,8 +83,9 @@ bool Tsunami::on_startup(const Array<string> &_arg) {
 	Session::GLOBAL->i(AppName + " " + AppVersion + " \"" + AppNickname + "\"");
 	Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
-	device_manager = new DeviceManager;
+	device_manager = new DeviceManager(Session::GLOBAL);
 	Session::GLOBAL->device_manager = device_manager;
+	device_manager->init();
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;

@@ -23,6 +23,7 @@ class Session;
 
 #if HAS_LIB_PULSEAUDIO
 struct pa_context;
+struct pa_threaded_mainloop;
 #endif
 
 #if HAS_LIB_PORTAUDIO
@@ -43,8 +44,10 @@ public:
 	static const string MESSAGE_ADD_DEVICE;
 	static const string MESSAGE_REMOVE_DEVICE;
 
-	DeviceManager();
+	DeviceManager(Session *session);
 	virtual ~DeviceManager();
+
+	Session *session;
 
 	void init();
 	void kill();
@@ -87,6 +90,7 @@ public:
 
 #if HAS_LIB_PULSEAUDIO
 	pa_context *pulse_context;
+	pa_threaded_mainloop *pulse_mainloop;
 	bool _pulse_test_error(Session *session, const string &msg);
 #endif
 #if HAS_LIB_PORTAUDIO

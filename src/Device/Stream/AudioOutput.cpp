@@ -38,10 +38,10 @@ extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 //extern void pulse_ignore_op(Session*, pa_operation*);
 
 bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
-	msg_write("wait stream ready");
+	//msg_write("wait stream ready");
 	int n = 0;
 	while (pa_stream_get_state(s) != PA_STREAM_READY) {
-		printf(".\n");
+		//printf(".\n");
 		//pa_mainloop_iterate(m, 1, NULL);
 		//hui::Sleep(0.01f);
 		pa_threaded_mainloop_wait(dm->pulse_mainloop);
@@ -51,7 +51,7 @@ bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
 		if (pa_stream_get_state(s) == PA_STREAM_FAILED)
 			return false;
 	}
-	msg_write("ok");
+	//msg_write("ok");
 	return true;
 }
 
@@ -83,7 +83,7 @@ void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, voi
 
 void AudioOutput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
 	auto *stream = (AudioOutput*)userdata;
-	msg_write("--success");
+	//msg_write("--success");
 	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 }
 
@@ -112,8 +112,6 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 
 //	printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
 
-
-//	printf("  j\n");
 	for (int n=0; (n<2) and (done < (int)frames); n++) {
 		AudioBuffer b;
 		ring_buf.read_ref(b, frames - done);
@@ -126,7 +124,6 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 
 
 	if (available < frames_request) {
-//		printf("  x\n");
 		if (!read_end_of_stream and !buffer_is_cleared)
 			printf("< underflow  %d < %d\n", available, frames_request);
 		// output silence...
@@ -359,7 +356,7 @@ void AudioOutput::_pause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
+		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
@@ -388,7 +385,7 @@ void AudioOutput::_unpause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
+		pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
@@ -577,7 +574,7 @@ void AudioOutput::reset_state() {
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 			session->debug("out", "flush");
 			if (pulse_stream) {
-				pa_operation *op = pa_stream_flush(pulse_stream, nullptr, nullptr);
+				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
 				_pulse_test_error("pa_stream_flush");
 				pulse_wait_op(session, op);
 			}

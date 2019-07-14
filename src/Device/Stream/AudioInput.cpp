@@ -77,7 +77,13 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
 }
 
-void AudioInput::input_notify_callback(pa_stream *p, void *userdata) {
+void AudioInput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
+	auto *stream = (AudioInput*)userdata;
+	msg_write("--success");
+	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
+}
+
+void AudioInput::pulse_input_notify_callback(pa_stream *p, void *userdata) {
 	AudioInput *input = (AudioInput*)userdata;
 	printf("sstate... %p:  ", p);
 	int s = pa_stream_get_state(p);
@@ -324,7 +330,7 @@ void AudioInput::_pause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		pa_operation *op = pa_stream_cork(pulse_stream, true, nullptr, nullptr);
+		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
 		_pulse_test_error("pa_stream_cork");
 		pulse_wait_op(session, op);
 	}
@@ -419,7 +425,7 @@ void AudioInput::_unpause() {
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
 		if (pulse_stream) {
-			pa_operation *op = pa_stream_cork(pulse_stream, false, nullptr, nullptr);
+			pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 			_pulse_test_error("pa_stream_cork");
 			pulse_wait_op(session, op);
 		}

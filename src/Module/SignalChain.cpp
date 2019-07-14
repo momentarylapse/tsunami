@@ -323,8 +323,7 @@ void SignalChain::update_ports() {
 		port_out.add(p.module->port_out[p.port]);
 }
 
-void SignalChain::reset()
-{
+void SignalChain::reset() {
 	msg_write("aaaargh  reset");
 	for (int i=modules.num-1; i>=3; i--)
 		delete_module(modules[i]);
@@ -435,7 +434,7 @@ bool SignalChain::is_playback_active() {
 // running in gui thread!
 void SignalChain::on_module_play_end_of_stream() {
 	notify(MESSAGE_PLAY_END_OF_STREAM);
-	msg_write("   -auto-stop-");
+	//session->debug("auto stop");
 	stop_hard();
 }
 

@@ -48,16 +48,10 @@ ApiDescription api_descriptions[] = {
 #if HAS_LIB_PULSEAUDIO
 
 void pulse_wait_op(Session *session, pa_operation *op) {
-	if (!op) {
-		session->e("pulse_wait_op:  op=nil");
-		return;
-	}
-	printf("-w-\n");
+	//printf("-w-\n");
 	int n = 0;
-	//msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) == PA_OPERATION_RUNNING) {
-		printf(".");
-		// PA_OPERATION_RUNNING
+		//printf(".\n");
 		//pa_mainloop_iterate(m, 1, NULL);
 		n ++;
 		if (n > 300000)
@@ -76,8 +70,7 @@ void pulse_wait_op(Session *session, pa_operation *op) {
 			session->e("pulse_wait_op() failed: ???");
 	}
 	pa_operation_unref(op);
-	//msg_write(" ok");
-	printf("-o-\n");
+	//printf("-o-\n");
 }
 
 void pulse_ignore_op(Session *session, pa_operation *op) {
@@ -120,12 +113,14 @@ bool pulse_wait_context_ready(pa_context *c) {
 
 
 void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata) {
-	if (eol > 0 or !i or !userdata)
+	DeviceManager *dm = (DeviceManager*)userdata;
+	if (eol > 0 or !i or !userdata) {
+		pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
 		return;
+	}
 
 	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
-	DeviceManager *dm = (DeviceManager*)userdata;
 	Device *d = dm->get_device_create(DeviceType::AUDIO_OUTPUT, i->name);
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
@@ -135,12 +130,14 @@ void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, voi
 }
 
 void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata) {
-	if (eol > 0 or !i or !userdata)
+	DeviceManager *dm = (DeviceManager*)userdata;
+	if (eol > 0 or !i or !userdata) {
+		pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
 		return;
+	}
 
 	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
-	DeviceManager *dm = (DeviceManager*)userdata;
 	Device *d = dm->get_device_create(DeviceType::AUDIO_INPUT, i->name);
 	d->name = i->description;
 	d->channels = i->channel_map.channels;
@@ -215,9 +212,9 @@ DeviceManager::~DeviceManager() {
 void DeviceManager::lock() {
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE) {
-		printf("-lock...\n");
+		//printf("-lock...\n");
 		pa_threaded_mainloop_lock(pulse_mainloop);
-		printf("...ok-\n");
+		//printf("...ok-\n");
 	}
 #endif
 }
@@ -225,9 +222,9 @@ void DeviceManager::lock() {
 void DeviceManager::unlock() {
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE) {
-		printf("-unlock...\n");
+		//printf("-unlock...\n");
 		pa_threaded_mainloop_unlock(pulse_mainloop);
-		printf("...ok-\n");
+		//printf("...ok-\n");
 	}
 #endif
 }
@@ -489,11 +486,15 @@ void DeviceManager::_init_audio_pulse() {
 		session->e("pulse audio context does not turn 'ready'");
 		return;
 	}
+	
+	lock();
 
 	pa_context_set_subscribe_callback(pulse_context, &pulse_subscription_callback, this);
 	_pulse_test_error(session, "pa_context_set_subscribe_callback");
 	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), nullptr, this);
 	_pulse_test_error(session, "pa_context_subscribe");
+	
+	unlock();
 #endif
 }
 
@@ -527,11 +528,18 @@ void DeviceManager::kill() {
 	// audio
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE and pulse_context) {
+		
 		pa_threaded_mainloop_stop(pulse_mainloop);
+		_pulse_test_error(session, "pa_threaded_mainloop_stop");
+		
 		pa_context_disconnect(pulse_context);
 		_pulse_test_error(session, "pa_context_disconnect");
+		
 		pa_context_unref(pulse_context);
+		//_pulse_test_error(session, "pa_context_unref"); // would require a context...
+		
 		pa_threaded_mainloop_free(pulse_mainloop);
+		//_pulse_test_error(session, "pa_threaded_mainloop_free");
 	}
 #endif
 

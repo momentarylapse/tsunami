@@ -40,8 +40,7 @@ void EnvelopeADSR::reset() {
 	just_killed = false;
 }
 
-void EnvelopeADSR::start(float volume)
-{
+void EnvelopeADSR::start(float volume) {
 	value_initial = volume * initial;
 	value_peak = volume * peak;
 	value_sustain = volume * sustain;

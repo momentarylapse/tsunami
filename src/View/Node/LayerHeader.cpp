@@ -182,7 +182,7 @@ void LayerHeader::draw(Painter *c) {
 	c->set_color(color_text());
 	
 	if (vlayer->represents_imploded) {
-		AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "imploded");
+		AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, "explode");
 		if (_hover)
 			c->draw_str(area.x1 + 25, area.y1 + 25,  u8"\u2b73   \u2b73   \u2b73");
 	} else {

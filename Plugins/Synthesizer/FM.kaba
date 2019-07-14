@@ -7,17 +7,6 @@ const float OSCI_RADIUS = 15.0
 const float LINK_LENGTH = OSCI_RADIUS * 5.0
 
 
-class OscillatorState
-	float input, output
-	float volume
-	float phi
-	EnvelopeADSR env
-	void __init__()
-		volume = 0
-		input = 0
-		output = 0
-		phi = 0
-		env.reset()
 
 enum
 	TYPE_SINE
@@ -47,6 +36,13 @@ class OscillatorConfig
 		for t in target
 			t = false
 		target_out = false
+	bool active()
+		if target_out
+			return true
+		for t in target
+			if t
+				return true
+		return false
 
 class OscillatorLink
 	int source, dest
@@ -246,6 +242,20 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
+	void draw_curve_lin(Painter *p, float t0, float v0, float t1, float v1, color col)
+		complex[] cc
+		cc.add(complex(t2x(t0), v2y(v0)))
+		cc.add(complex(t2x(t1), v2y(v1)))
+		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
+		p.set_color(col2)
+		p.set_line_dash([5.0,2.0])
+		p.draw_lines(cc)
+		p.set_line_dash([2.0,0.0])
+		cc.add(complex(t2x(t1), v2y(0)))
+		cc.add(complex(t2x(t0), v2y(0)))
+		col2.a = 0.2
+		p.set_color(col2)
+		p.draw_polygon(cc)
 	
 	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
 		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
@@ -261,8 +271,8 @@ Grid ? ''
 		float t1 = t0 + o.attack
 		float t2 = t1 + o.decay
 		float t3 = t2 + o.release
-		draw_curve_exp(p, t0, o.initial, t1, o.peak, Red)
-		draw_curve_exp(p, t1, o.peak, t2, o.sustain, Orange)
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, Red)
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, Orange)
 		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Green)
 		
 		
@@ -413,10 +423,21 @@ Grid ? ''
 		redraw("area")
 
 
+class OscillatorState
+	float input, output
+	float volume
+	float phi
+	EnvelopeADSR env
+	OscillatorConfig conf
+	void __init__()
+		volume = 0
+		input = 0
+		output = 0
+		phi = 0
+		env.reset()
 
 class FMRenderer extends PitchRenderer
-	OscillatorState[NUM_OSCILLATORS] osc
-	OscillatorConfig[NUM_OSCILLATORS] conf
+	OscillatorState[] osc
 	int num_osc_active
 	override FMSynthesizer *synth
 	
@@ -427,50 +448,52 @@ class FMRenderer extends PitchRenderer
 	override void on_end()
 		for o,oi in osc
 			o.env.end()
+
 	override void on_start(float _volume)
-		num_osc_active = NUM_OSCILLATORS
-		for o,oi in osc
+		num_osc_active = len(osc)
+		for o in osc
 			// TODO: volume should only effect "output" oscs
-			o.env.start(_volume * conf[oi].amplitude)
+			o.env.start(_volume * o.conf.amplitude)
 
 	override void on_config()
-		for o,i in osc
-			conf[i] = synth.config.osc[i]
-			OscillatorConfig* c = &conf[i]
+		osc.clear()
+		for c in synth.config.osc
+			OscillatorState o
+			o.conf = c
 			o.env.set(c.attack, c.decay, c.sustain, c.release, synth.sample_rate)
 			o.env.set2(c.initial, c.peak)
+			if c.active()
+				osc.add(o)
 
 	override bool render(AudioBuffer buf)
 		for i in 0:len(buf)
 
-			for o,oi in osc
+			for o in osc
 				o.volume = o.env.get()
 				if o.env.just_killed
 					num_osc_active --
 					if num_osc_active == 0
 						return false
 					
-				OscillatorConfig *co = &conf[oi]
-				o.phi += delta_phi * (1 + o.input) * co.factor
-				if co._type == TYPE_SINE
+				o.phi += delta_phi * (1 + o.input) * o.conf.factor
+				if o.conf._type == TYPE_SINE
 					o.output = sin(o.phi) * o.volume
-				else if co._type == TYPE_SQUARE
+				else if o.conf._type == TYPE_SQUARE
 					if sin(o.phi) > 0
 						o.output = o.volume
 					else
 						o.output = -o.volume
-				else if co._type == TYPE_SAW
+				else if o.conf._type == TYPE_SAW
 					o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
 				o.input = 0
-				if o.phi > 8*pi
-					o.phi = loop(o.phi, 0, 8*pi)
+				if o.phi > 16*pi
+					o.phi = loop(o.phi, 0, 2*pi)
 			
 			// transport
-			for o,oi in osc
-				OscillatorConfig *co = &conf[oi]
-				if co.target_out
+			for o in osc
+				if o.conf.target_out
 					buf.l[i] += o.output
-				for t,j in co.target
+				for t,j in o.conf.target
 					if t
 						osc[j].input += o.output
 		buf.auto_generate_channels()

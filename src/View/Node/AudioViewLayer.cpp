@@ -335,9 +335,10 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	bool allow_label = ((!merged or first) and (gx1-gx0) > 40);
 	if (marker->range.empty())
 		allow_label = (view->cam.dsample2screen(2000) > 1);
-	float dx = max(0.0f, (x1-x0)/2-12);//0;//min((x1 - x0) * 0.2f, 40.0f);
+	float lw = c->get_str_width(text);
+	float dx = max(view->CORNER_RADIUS, (x1-x0)/2 - lw/2);
 	if (allow_label) {
-		view->draw_boxed_str(c,  x0 + dx + view->CORNER_RADIUS, y0 + frame_height, text, col, col_bg);
+		view->draw_boxed_str(c,  x0 + dx, y0 + frame_height, text, col, col_bg);
 	}
 
 
@@ -362,7 +363,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	c->draw_rect(x0, y0, x1-x0, frame_height);
 
 	marker_areas.set(marker, rect(x0, x0 + w, y0, y0 + frame_height));
-	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + dx + view->CORNER_RADIUS, y0 + 8, text));
+	marker_label_areas.set(marker, view->get_boxed_str_rect(c,  x0 + dx, y0 + 8, text));
 
 	c->set_font("", view->FONT_SIZE, false, false);
 }

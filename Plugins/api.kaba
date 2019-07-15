@@ -539,6 +539,7 @@ class Storage
 	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 
+// create via Session.add_signal_chain()
 class SignalChain extends Module
 	extern void __init__(Session* session, string name)
 	extern override void __delete__()
@@ -572,14 +573,13 @@ class Session
 	//PluginManager* plugin_manager
 	
 	extern Session* create_child()
+	extern SignalChain* add_signal_chain(string name)
 
 	// logging
 	extern void i(string msg)
 	extern void w(string msg)
 	extern void e(string msg)
-	
-	extern void play()
-	extern void stop()
+
 
 /*class PluginContext
 	Song *song

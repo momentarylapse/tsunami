@@ -7,7 +7,7 @@ class PitchFork extends TsunamiPlugin
 	Module* source
 	override void on_start()
 	
-		chain = new SignalChain(session, "pitch-fork")
+		chain = session.add_signal_chain("pitch-fork")
 		source = chain.add(MODULE_AUDIO_SOURCE, "Sine")
 		Module* out = chain.add(MODULE_STREAM, "AudioOutput")
 		chain.connect(source, 0, out, 0)

@@ -91,17 +91,6 @@ void GlobalSetTempBackupFilename(const string &filename)
 	//InputStreamAudio::setTempBackupFilename(filename);
 }
 
-void __play__(Session *s)
-{
-	s->win->on_play();
-	//s->signal_chain->start();
-}
-void __stop__(Session *s)
-{
-	s->win->on_stop();
-	//s->signal_chain->stop();
-}
-
 Module *_CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
 }
@@ -168,8 +157,7 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Session.i", Kaba::mf(&Session::i));
 	Kaba::LinkExternal("Session.w", Kaba::mf(&Session::w));
 	Kaba::LinkExternal("Session.e", Kaba::mf(&Session::e));
-	Kaba::LinkExternal("Session.play", (void*)&__play__);
-	Kaba::LinkExternal("Session.stop", (void*)&__stop__);
+	Kaba::LinkExternal("Session.add_signal_chain", Kaba::mf(&Session::add_signal_chain));
 	Kaba::LinkExternal("Session.create_child", Kaba::mf(&Session::create_child));
 
 

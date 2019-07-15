@@ -254,7 +254,7 @@ class Metronome extends TsunamiPlugin
 	BeatSource *source
 	
 	override void on_start()
-		chain = new SignalChain(session, "metronome")
+		chain = session.add_signal_chain("metronome")
 		source = chain._add(CreateBeatSource(session, "Metronome"))
 		
 		Module *beat_midifier = chain.add(MODULE_PLUMBING, "BeatMidifier")

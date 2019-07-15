@@ -11,6 +11,8 @@ const float UPDATE_DT = 1.0 / 50
 const float MAX_BACKGROUND_REDNESS = 0.7
 const int MOTION_BLUR_COUNT = 20
 
+// part uncertainty...
+const int DELTA = 400
 
 class BlurredDot
 	complex pos, pos0
@@ -191,15 +193,15 @@ Grid ? '' vertical
 			next_bar = song.bars[cur_bar_index + 1]
 		
 		int offset = cur_bar.offset
-		TrackMarker *cur_part = get_part(t, offset)
-		TrackMarker *next_part = get_part(t, offset + cur_bar.length + 10)
+		TrackMarker *cur_part = get_part(t, offset + DELTA)
+		TrackMarker *next_part = get_part(t, offset + cur_bar.length + DELTA)
 		p.set_color(colors.text_soft2)
 		float fs = h * 0.08
 		p.set_font_size(fs)
 		if cur_part
 			p.draw_str(10, 5, cur_part.text)
-			int first_bar = bar_index(song, cur_part.range.offset)
-			p.draw_str(w - 5 - fs*3, 5, (cur_bar.index - first_bar) + 1)
+			int first_bar = bar_index(song, cur_part.range.offset + DELTA)
+			p.draw_str(w - 5 - fs*3, 5, (cur_bar.index - first_bar) + 2)
 	
 		string change
 		if next_part and next_part != cur_part

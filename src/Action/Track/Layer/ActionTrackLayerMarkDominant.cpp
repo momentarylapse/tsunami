@@ -11,37 +11,65 @@
 #include "../../../Data/Track.h"
 #include "../../../Data/TrackLayer.h"
 
-ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(TrackLayer *_layer, const Range &_range)
-{
+
+const int SAMPLES = 2000; // for now, use default value
+
+ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(TrackLayer *_layer, const Range &_range, bool _exclusive) {
 	layer = _layer;
 	range = _range;
+	exclusive = _exclusive;
 }
 
-void ActionTrackLayerMarkDominant::build(Data *d)
-{
-	Track *track = layer->track;
-	int index = layer->version_number();
-
-	int index_before = 0;
-	int index_after = 0;
-
-	for (auto &f: track->fades){
-		if (f.position < range.start())
-			index_before = f.target;
-		if (f.position < range.end())
-			index_after = f.target;
-	}
-
-	// delete fades in range
-	foreachib (auto &f, track->fades, i){
+void ActionTrackLayerMarkDominant::del_fades_in_range(TrackLayer *l, const Range &r, Data *d) {
+	foreachib (auto &f, l->fades, i){
 		if (range.is_inside(f.position))
-			add_sub_action(new ActionTrackFadeDelete(track, i), d);
+			add_sub_action(new ActionTrackFadeDelete(l, i), d);
 	}
+}
 
-	// add new fades
-	int samples = 2000; // for now, use default value
-	if (index != index_before)
-		add_sub_action(new ActionTrackFadeAdd(track, range.start(), samples, index), d);
-	if (index != index_after)
-		add_sub_action(new ActionTrackFadeAdd(track, range.end(), samples, index_after), d);
+int ActionTrackLayerMarkDominant::first_fade_after(TrackLayer *l, int pos) {
+	foreachi(auto &f, l->fades, i)
+		if (f.position > pos)
+			return i;
+	return -1;
+}
+
+bool ActionTrackLayerMarkDominant::is_active_at(TrackLayer *l, int pos) {
+	int i0 = first_fade_after(l, pos);
+	if (i0 > 0)
+		return l->fades[i0 - 1].mode == CrossFade::INWARD;
+	return l->is_main();
+}
+
+void ActionTrackLayerMarkDominant::set_active(TrackLayer *l, const Range &r, Data *d) {
+	bool active_before = is_active_at(l, r.start());
+	bool active_after = is_active_at(l, r.end());
+	del_fades_in_range(l, r, d);
+	if (!active_before)
+		add_sub_action(new ActionTrackFadeAdd(l, range.start(), CrossFade::INWARD, SAMPLES), d);
+	if (!active_after)
+		add_sub_action(new ActionTrackFadeAdd(l, range.end(), CrossFade::OUTWARD, SAMPLES), d);
+}
+
+void ActionTrackLayerMarkDominant::set_inactive(TrackLayer *l, const Range &r, Data *d) {
+	bool active_before = is_active_at(l, r.start());
+	bool active_after = is_active_at(l, r.end());
+	del_fades_in_range(l, r, d);
+	if (active_before)
+		add_sub_action(new ActionTrackFadeAdd(l, range.start(), CrossFade::OUTWARD, SAMPLES), d);
+	if (active_after)
+		add_sub_action(new ActionTrackFadeAdd(l, range.end(), CrossFade::INWARD, SAMPLES), d);
+}
+
+void ActionTrackLayerMarkDominant::build(Data *d) {
+	if (exclusive) {
+		Track *track = layer->track;
+		for (TrackLayer *l: track->layers)
+			if (l == layer)
+				set_active(l, range, d);
+			else
+				set_inactive(l, range, d);
+	} else {
+		set_active(layer, range, d);
+	}
 }

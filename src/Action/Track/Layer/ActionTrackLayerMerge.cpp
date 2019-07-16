@@ -12,19 +12,16 @@
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "ActionTrackLayerDelete.h"
 #include "ActionTrackLayerAdd.h"
-#include "ActionTrackFadeDelete.h"
 
 #include "../../../Module/Audio/TrackRenderer.h"
 
 
-ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t)
-{
+ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t) {
 	track = t;
 }
 
 
-void ActionTrackLayerMerge::build(Data *d)
-{
+void ActionTrackLayerMerge::build(Data *d) {
 	TrackLayer *lnew = new TrackLayer(track);
 
 	Range r = track->range();
@@ -45,9 +42,6 @@ void ActionTrackLayerMerge::build(Data *d)
 
 	for (int i=track->layers.num-2; i>=0; i--)
 		add_sub_action(new ActionTrackLayerDelete(track, i), d);
-
-	for (int i=track->fades.num-1; i>=0; i--)
-		add_sub_action(new ActionTrackFadeDelete(track, i), d);
 
 	delete tr;
 

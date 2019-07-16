@@ -65,11 +65,6 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 				m->range.set_end(__shift_data_shift(r, new_length, m->range.end()));
 		}
 
-		// fades
-		for (CrossFade &f: t->fades)
-			if (f.position >= pos0)
-				f.position = __shift_data_shift(r, new_length, f.position);
-
 		// buffer
 		for (TrackLayer *l: t->layers){
 			for (AudioBuffer &b: l->buffers)
@@ -91,6 +86,11 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 			for (SampleRef *s: l->samples)
 				if (s->pos >= pos0)
 					s->pos = __shift_data_shift(r, new_length, s->pos);
+
+			// fades
+			for (CrossFade &f: l->fades)
+				if (f.position >= pos0)
+					f.position = __shift_data_shift(r, new_length, f.position);
 		}
 	}
 }

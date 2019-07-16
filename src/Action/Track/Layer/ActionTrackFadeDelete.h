@@ -11,17 +11,16 @@
 #include "../../Action.h"
 #include "../../../Data/CrossFade.h"
 
-class Track;
+class TrackLayer;
 
-class ActionTrackFadeDelete : public Action
-{
+class ActionTrackFadeDelete : public Action {
 public:
-	ActionTrackFadeDelete(Track *t, int index);
+	ActionTrackFadeDelete(TrackLayer *t, int index);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
-	Track *track;
+	TrackLayer *layer;
 	CrossFade fade;
 	int index;
 };

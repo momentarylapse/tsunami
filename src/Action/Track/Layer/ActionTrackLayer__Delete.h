@@ -24,7 +24,6 @@ private:
 	Track *track;
 	int index;
 	TrackLayer *layer;
-	Array<int> fades_shifted;
 };
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_ */

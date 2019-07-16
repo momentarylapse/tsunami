@@ -889,41 +889,58 @@ public:
 	}
 };
 
+class FileChunkFade: public FileChunk<TrackLayer,CrossFade> {
+public:
+	FileChunkFade() : FileChunk<TrackLayer,CrossFade>("fade"){}
+	void create() override {}
+	void read(File *f) override {
+		CrossFade ff;
+		ff.position = f->read_int();
+		ff.mode = (CrossFade::Mode)f->read_int();
+		ff.samples = f->read_int();
+		f->read_int();
+		f->read_int();
+		parent->fades.add(ff);
+	}
+	void write(File *f) override {
+		f->write_int(me->position);
+		f->write_int((int)me->mode);
+		f->write_int(me->samples);
+		f->write_int(0);
+		f->write_int(0);
+	}
+};
+
+
 class FileChunkTrackLayer : public FileChunk<Track,TrackLayer>
 {
 public:
 	int n;
-	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level")
-	{
+	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level") {
 		n = 0;
 		add_child(new FileChunkBufferBox);
 		add_child(new FileChunkSampleRef);
+		add_child(new FileChunkFade);
 	}
-	virtual void create()
-	{
-	}
-	virtual void read(File *f)
-	{
+	void create() override {}
+	void read(File *f) override {
 		n = f->read_int();
 		if (n > 0){
 			parent->layers.add(new TrackLayer(parent));
 		}
 		me = parent->layers.back();
 	}
-	virtual void write(File *f)
-	{
+	void write(File *f) override {
 		int n = 0;
 		foreachi(TrackLayer *l, parent->layers, i)
 			if (l == me)
 				n = i;
 		f->write_int(n);
 	}
-	virtual void write_subs()
-	{
+	void write_subs() override {
 		write_sub_array("bufbox", me->buffers);
 		write_sub_parray("samref", me->samples);
-		if (me->fades.num > 0)
-			this->error("fades...");
+		write_sub_array("fade", me->fades);
 	}
 };
 

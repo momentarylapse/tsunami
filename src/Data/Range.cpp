@@ -8,73 +8,63 @@
 #include "Range.h"
 #include "../lib/file/file.h"
 
-const Range Range::ALL = Range(-0x4000000, 0x8000000); // TODO
+const int Range::BEGIN = -1000000000; // just less than 0x4000.0000, so that also length < 0x8000.000 (staying positive)
+const int Range::END = 1000000000;
+const Range Range::ALL = RangeTo(BEGIN, END);
 const Range Range::EMPTY = Range(0, 0);
 
 
-Range RangeTo(int start, int end)
-{
+Range RangeTo(int start, int end) {
 	return Range(start, end - start);
 }
 
-Range::Range(const Range & r)
-{
+Range::Range(const Range & r) {
 	offset = r.offset;
 	length = r.length;
 }
 
-Range::Range()
-{
+Range::Range() {
 	offset = 0;
 	length = 0;
 }
 
-Range::Range(int _offset, int _length)
-{
+Range::Range(int _offset, int _length) {
 	offset = _offset;
 	length = _length;
 }
 
-void Range::clear()
-{
+void Range::clear() {
 	offset = 0;
 	length = 0;
 }
 
-string Range::str() const
-{
-	return format("(%d %d)", offset, length);
+string Range::str() const {
+	return format("(%d:%d)", start(), end());
 }
 
-void Range::move(int dpos)
-{
+void Range::move(int dpos) {
 	offset += dpos;
 }
 
-void Range::resize(int new_length)
-{
+void Range::resize(int new_length) {
 	length = new_length;
 }
 
-void Range::set_end(int end)
-{
+void Range::set_end(int end) {
 	length = end - offset;
 }
 
-void Range::set_start(int start)
-{
+void Range::set_start(int start) {
 	length = offset + length - start;
 	offset = start;
 }
 
-void Range::invert()
-{
+void Range::invert() {
 	offset += length;
 	length = - length;
 }
 
-Range Range::canonical() const
-{
+Range Range::canonical() const {
 	auto r = *this;
 	if (r.length < 0)
 		r.invert();
@@ -83,50 +73,41 @@ Range Range::canonical() const
 
 
 
-int Range::start() const
-{
+int Range::start() const {
 	return offset;
 }
 
-int Range::end() const
-{
+int Range::end() const {
 	return offset + length;
 }
 
-int Range::center() const
-{
+int Range::center() const {
 	return offset + length / 2;
 }
 
-bool Range::empty() const
-{
+bool Range::empty() const {
 	return length <= 0;
 }
 
 // do <this> and <r> have at least one sample of overlap?
-bool Range::overlaps(const Range &r) const
-{
+bool Range::overlaps(const Range &r) const {
 	return ((start() < r.end()) and (end() > r.start()));
 }
 
 // does <this> completely cover <r>?
-bool Range::covers(const Range &r) const
-{
+bool Range::covers(const Range &r) const {
 	return ((start() <= r.start()) and (end() >= r.end()));
 }
 
-bool Range::is_inside(int pos) const
-{
+bool Range::is_inside(int pos) const {
 	return ((pos >= start()) and (pos < end()));
 }
 
-bool Range::is_more_inside(int pos) const
-{
+bool Range::is_more_inside(int pos) const {
 	return ((pos > start()) and (pos < end() - 1));
 }
 
-Range Range::intersect(const Range &r) const
-{
+Range Range::intersect(const Range &r) const {
 	if (empty() or r.empty())
 		return EMPTY;
 	int i0 = max(start(), r.start());
@@ -134,8 +115,7 @@ Range Range::intersect(const Range &r) const
 	return Range(i0, i1 - i0);
 }
 
-Range Range::operator||(const Range &r) const
-{
+Range Range::operator||(const Range &r) const {
 	if (empty())
 		return r;
 	if (r.empty())
@@ -145,21 +125,24 @@ Range Range::operator||(const Range &r) const
 	return Range(i0, i1 - i0);
 }
 
-Range Range::operator&&(const Range &r) const
-{
+Range Range::operator&&(const Range &r) const {
 	return intersect(r);
 }
 
-Range Range::operator+ (int shift) const
-{
+Range Range::operator+ (int shift) const {
 	return Range(offset + shift, length);
 }
 
-Range Range::operator- (int shift) const
-{
+Range Range::operator- (int shift) const {
 	return Range(offset - shift, length);
 }
 
+bool Range::operator==(const Range &r) const {
+	return (offset == r.offset) and (length == r.length);
+}
 
+bool Range::operator!=(const Range &r) const {
+	return !(*this == r);
+}
 
 

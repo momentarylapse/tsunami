@@ -6,31 +6,25 @@
  */
 
 #include "ActionTrackFadeAdd.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 
-ActionTrackFadeAdd::ActionTrackFadeAdd(Track* t, int _position, int _samples, int _target)
-{
-	track = t;
-	fade.position = _position;
-	fade.samples = _samples;
-	fade.target = _target;
+ActionTrackFadeAdd::ActionTrackFadeAdd(TrackLayer* l, int position, CrossFade::Mode mode, int samples) {
+	layer = l;
+	fade = {position, mode, samples};
 	index = 0;
 }
 
-void* ActionTrackFadeAdd::execute(Data* d)
-{
-	for (int i=0; i<track->fades.num; i++)
-		if (track->fades[i].position < fade.position){
+void* ActionTrackFadeAdd::execute(Data* d) {
+	for (int i=0; i<layer->fades.num; i++)
+		if (layer->fades[i].position < fade.position){
 			index = i + 1;
 		}
-	track->fades.insert(fade, index);
+	layer->fades.insert(fade, index);
 
 	return nullptr;
 }
 
-void ActionTrackFadeAdd::undo(Data* d)
-{
-	track->fades.erase(index);
-
+void ActionTrackFadeAdd::undo(Data* d) {
+	layer->fades.erase(index);
 }

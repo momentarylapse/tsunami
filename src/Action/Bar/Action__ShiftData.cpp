@@ -54,10 +54,6 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 				m->range.length += delta;*/
 		}
 
-		for (CrossFade &f: t->fades)
-			if (f.position >= offset)
-				f.position += delta;
-
 
 		for (TrackLayer *l: t->layers){
 			// buffer
@@ -79,6 +75,10 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 			for (SampleRef *s: l->samples)
 				if (s->pos >= offset)
 					s->pos += delta;
+
+			for (CrossFade &f: l->fades)
+				if (f.position >= offset)
+					f.position += delta;
 		}
 	}
 }

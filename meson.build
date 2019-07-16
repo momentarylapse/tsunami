@@ -400,6 +400,7 @@ sources = [
 	'src/Test/TestRingBuffer.cpp',
 	'src/Test/TestStreams.cpp',
 	'src/Test/TestThreads.cpp',
+	'src/Test/TestTrackVersion.cpp',
 	'src/Test/UnitTest.cpp',
 	'src/View/BottomBar/BottomBar.cpp',
 	'src/View/BottomBar/DeviceConsole.cpp',

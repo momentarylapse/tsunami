@@ -14,6 +14,7 @@
 #include <functional>
 
 class AudioBuffer;
+class Range;
 
 class UnitTest {
 public:
@@ -57,6 +58,9 @@ public:
 	static void assert_equal(const Array<int> &a, const Array<int> &b);
 	static void assert_equal(const Array<float> &a, const Array<float> &b, float epsilon = 0.001f);
 	static void assert_equal(const AudioBuffer &a, const AudioBuffer &b, float epsilon = 0.001f);
+	static void assert_equal(const Range &a, const Range &b);
+	static void assert_equal(const Array<Range> &a, const Array<Range> &b);
+	static string ra2s(const Array<Range> &ra);
 
 	static Array<UnitTest*> all();
 	static void run_all(const string &filter);

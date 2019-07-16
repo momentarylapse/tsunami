@@ -1577,6 +1577,7 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	if (l) {
 		menu->enable("layer-merge", t->layers.num > 1);
 		menu->enable("layer-mark-dominant", t->layers.num > 1);// and sel.layers.num == 1);
+		menu->enable("layer-add-dominant", t->layers.num > 1);// and sel.layers.num == 1);
 		//menu->enable("layer-delete", !l->is_main());
 	}
 

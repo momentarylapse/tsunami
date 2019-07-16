@@ -12,8 +12,7 @@
 
 class Track;
 
-class ActionTrackLayerMerge : public ActionGroup
-{
+class ActionTrackLayerMerge : public ActionGroup {
 public:
 	ActionTrackLayerMerge(Track *t);
 

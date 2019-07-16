@@ -26,8 +26,7 @@
 
 
 
-bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
-{
+bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos) {
 	// intersected intervall (track-coordinates)
 	int i0 = max(s->pos, r.start());
 	int i1 = min(s->pos + s->buf().length, r.end());
@@ -42,21 +41,19 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 }
 
 
-int TrackRenderer::get_first_usable_layer()
-{
+int TrackRenderer::get_first_usable_layer() {
 	if (!song_renderer)
 		return 0;
-	foreachi(TrackLayer *l, track->layers, i){
+	foreachi(TrackLayer *l, track->layers, i) {
 		if (song_renderer->allowed_layers.contains(l))
 			return i;
 	}
 	return -1;
 }
 
-static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
-{
+static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf) {
 	// subs
-	for (SampleRef *s: l->samples){
+	for (SampleRef *s: l->samples) {
 		if (s->muted)
 			continue;
 
@@ -70,8 +67,7 @@ static void add_samples(TrackLayer *l, const Range &range_cur, AudioBuffer &buf)
 	}
 }
 
-void TrackRenderer::reset_state()
-{
+void TrackRenderer::reset_state() {
 	if (direct_mode)
 		fx = track->fx;
 	if (midi_streamer)
@@ -82,8 +78,7 @@ void TrackRenderer::reset_state()
 	synth->reset_state();
 }
 
-TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
-{
+TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	song_renderer = sr;
 	track = t;
 	offset = 0;
@@ -97,20 +92,20 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	synth->set_instrument(t->instrument);
 	midi_streamer = nullptr;
 
-	if (direct_mode){
+	if (direct_mode) {
 		fx = t->fx;
-	}else{
+	} else {
 		for (AudioEffect *f: t->fx)
 			fx.add((AudioEffect*)f->copy());
 	}
 
 	//midi.add(t, t->midi);
-	if (t->type == SignalType::MIDI){
+	if (t->type == SignalType::MIDI) {
 		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer(raw);
 		synth->_plug_in(0, midi_streamer, 0);
 		fill_midi_streamer();
-	}else if (t->type == SignalType::BEATS){
+	} else if (t->type == SignalType::BEATS) {
 
 		synth->_plug_in(0, sr->beat_midifier, 0);
 	}
@@ -121,27 +116,25 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr)
 	track->subscribe(this, [=]{ on_track_change_data(); }, track->MESSAGE_CHANGE);
 	track->subscribe(this, [=]{ track = nullptr; }, track->MESSAGE_DELETE);
 
-	/*for (TrackLayer *l: track->layers){
+	/*for (TrackLayer *l: track->layers) {
 		l->subscribe(this, [=]{ on_track_change_data(); }, l->MESSAGE_CHANGE);
 		l->subscribe(this, [=]{ on_track_delete_layer(); }, l->MESSAGE_DELETE);
 	}*/
 }
 
-TrackRenderer::~TrackRenderer()
-{
+TrackRenderer::~TrackRenderer() {
 	if (track)
 		track->unsubscribe(this);
 	if (midi_streamer)
 		delete midi_streamer;
-	if (!direct_mode){
+	if (!direct_mode) {
 		for (auto *f: fx)
 			delete f;
 		delete synth;
 	}
 }
 
-void TrackRenderer::fill_midi_streamer()
-{
+void TrackRenderer::fill_midi_streamer() {
 	if (!track)
 		return;
 	MidiNoteBuffer _midi = track->layers[0]->midi;
@@ -149,7 +142,7 @@ void TrackRenderer::fill_midi_streamer()
 		for (auto c: l->samples)
 			if (c->type() == SignalType::MIDI)
 			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
-	for (MidiEffect *fx: track->midi_fx){
+	for (MidiEffect *fx: track->midi_fx) {
 		fx->reset_state();
 		fx->process(&_midi);
 	}
@@ -160,22 +153,20 @@ void TrackRenderer::fill_midi_streamer()
 
 }
 
-void TrackRenderer::on_track_add_or_delete_fx()
-{
+void TrackRenderer::on_track_add_or_delete_fx() {
 	if (!track)
 		return;
-	if (direct_mode){
+	if (direct_mode) {
 		fx = track->fx;
 	}
 }
 
-void TrackRenderer::on_track_replace_synth()
-{
+void TrackRenderer::on_track_replace_synth() {
 	if (!track)
 		return;
-	if (direct_mode){
+	if (direct_mode) {
 		synth = track->synth;
-	}else{
+	} else {
 		delete synth;
 
 		synth = (Synthesizer*)track->synth->copy();
@@ -183,30 +174,26 @@ void TrackRenderer::on_track_replace_synth()
 		synth->set_instrument(track->instrument);
 	}
 
-	if (track->type == SignalType::MIDI){
+	if (track->type == SignalType::MIDI) {
 		synth->_plug_in(0, midi_streamer, 0);
-	}else if (track->type == SignalType::BEATS){
+	} else if (track->type == SignalType::BEATS) {
 		synth->_plug_in(0, song_renderer->beat_midifier, 0);
 	}
 }
 
-void TrackRenderer::on_track_change_data()
-{
-	if (midi_streamer){
+void TrackRenderer::on_track_change_data() {
+	if (midi_streamer) {
 		fill_midi_streamer();
 	}
 }
 
-void TrackRenderer::on_track_delete_layer()
-{
+void TrackRenderer::on_track_delete_layer() {
 }
 
-void TrackRenderer::on_track_add_layer()
-{
+void TrackRenderer::on_track_add_layer() {
 }
 
-void TrackRenderer::set_pos(int pos)
-{
+void TrackRenderer::set_pos(int pos) {
 	if (!track)
 		return;
 	offset = pos;
@@ -218,90 +205,92 @@ void TrackRenderer::set_pos(int pos)
 		song_renderer->bar_streamer->set_pos(pos);
 }
 
-static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur)
-{
+static void copy_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
 	Range r1 = r and cur;
-	AudioBuffer tbuf1;
-	tbuf1.set_as_ref(buf, r1.start() - cur.start(), r1.length);
-	l->read_buffers_fixed(tbuf1, r1);
+	AudioBuffer tbuf;
+	tbuf.set_as_ref(buf, r1.start() - cur.start(), r1.length);
+	l->read_buffers_fixed(tbuf, r1);
 }
 
-static void apply_fade(TrackLayer *l1, TrackLayer *l2, const Range &r, AudioBuffer &buf, const Range &cur)
-{
+static void add_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
 	Range r1 = r and cur;
-	AudioBuffer tbuf1;
-	tbuf1.set_as_ref(buf, r1.start() - cur.start(), r1.length);
-	l1->read_buffers_fixed(tbuf1, r1);
+	AudioBuffer tbuf;
+	tbuf.resize(r1.length);
+	l->read_buffers_fixed(tbuf, r1);
+	buf.add(tbuf, r1.start() - cur.start());
+}
 
-	AudioBuffer tbuf2;
-	tbuf2.resize(r1.length);
-	l2->read_buffers_fixed(tbuf2, r1);
+static void add_fade_out(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
+	Range r1 = r and cur;
+	AudioBuffer tbuf;
+	tbuf.resize(r1.length);
+	l->read_buffers_fixed(tbuf, r1);
 
 	// perform (linear) fade
-	for (int i=r1.start(); i<r1.end(); i++){
+	for (int i=r1.start(); i<r1.end(); i++) {
 		float a = (float)(r.end() - i) / (float)r.length;
 		for (int c=0; c<buf.channels; c++)
-			tbuf1.c[c][i - r1.start()] *= a;
+			tbuf.c[c][i - r1.start()] *= a;
 	}
-	for (int i=r1.start(); i<r1.end(); i++){
+	buf.add(tbuf, r1.start() - cur.start());
+}
+
+static void add_fade_in(TrackLayer *l, const Range &r, AudioBuffer &buf, const Range &cur) {
+	Range r1 = r and cur;
+	AudioBuffer tbuf;
+	tbuf.resize(r1.length);
+	l->read_buffers_fixed(tbuf, r1);
+
+	// perform (linear) fade
+	for (int i=r1.start(); i<r1.end(); i++) {
 		float a = (float)(i - r.start()) / (float)r.length;
 		for (int c=0; c<buf.channels; c++)
-			tbuf2.c[c][i - r1.start()] *= a;
+			tbuf.c[c][i - r1.start()] *= a;
 	}
-
-	tbuf1.add(tbuf2, 0);
+	buf.add(tbuf, r1.start() - cur.start());
 }
 
-void TrackRenderer::render_audio_versioned(AudioBuffer &buf)
-{
+void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 	Range cur = Range(offset, buf.length);
-
-	int index_before = 0;
-	Array<CrossFade*> fades;
-	foreachi(auto &f, track->fades, i){
-		Range r = f.range();
-		if (r.end() <= cur.start())
-			index_before = f.target;
-		if (r.overlaps(cur)){
-			fades.add(&f);
-		}
-	}
-	if (fades.num > 0){
+	
+	for (TrackLayer *l: track->layers) {
+		bool prev_active = l->is_main();
 		int prev_end = offset;
-		for (auto *ff: fades){
-			Range r = ff->range();
+		
+		for (auto &f: l->fades) {
+			Range r = f.range();
 
 			// before
-			copy_direct(track->layers[index_before], RangeTo(prev_end, r.start()), buf, cur);
+			if (prev_active and (prev_end < cur.end()))
+				add_direct(l, RangeTo(prev_end, r.start()), buf, cur);
 
-			apply_fade(track->layers[index_before], track->layers[ff->target], r, buf, cur);
-
-			index_before = ff->target;
-			prev_end = r.end();
+			// fade
+			if (r.overlaps(cur)) {
+				if (f.mode == f.INWARD)
+					add_fade_in(l, r, buf, cur);
+				else
+					add_fade_out(l, r, buf, cur);
+			}
+			
+			prev_active = (f.mode == f.INWARD);
+			prev_end = f.range().end();
 		}
-
+		
 		// after
-		auto *ff = fades.back();
-		copy_direct(track->layers[ff->target], RangeTo(prev_end, cur.end()), buf, cur);
-
-	}else{
-		// direct mode
-		track->layers[index_before]->read_buffers_fixed(buf, cur);
-		add_samples(track->layers[index_before], cur, buf);
+		if (prev_active and (prev_end < cur.end()))
+			add_direct(l, RangeTo(prev_end, cur.end()), buf, cur);
 	}
-
 }
 
-void TrackRenderer::render_audio_layered(AudioBuffer &buf)
-{
+void TrackRenderer::render_audio_layered(AudioBuffer &buf) {
 	Range cur = Range(offset, buf.length);
 
 	// any un-muted layer?
 	int i0 = get_first_usable_layer();
-	if (i0 < 0){
+	if (i0 < 0) {
 		// no -> return silence
 		buf.set_zero();
-	}else{
+	} else {
 
 		// first (un-muted) layer
 		track->layers[i0]->read_buffers_fixed(buf, cur);
@@ -310,7 +299,7 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf)
 
 		// other layers
 		AudioBuffer tbuf;
-		for (int i=i0+1;i<track->layers.num;i++){
+		for (int i=i0+1;i<track->layers.num;i++) {
 			if (song_renderer and !song_renderer->allowed_layers.contains(track->layers[i]))
 				continue;
 
@@ -326,32 +315,27 @@ void TrackRenderer::render_audio_layered(AudioBuffer &buf)
 	buf.channels = track->channels;
 }
 
-void TrackRenderer::render_audio(AudioBuffer &buf)
-{
-	if (track->has_version_selection()){
+void TrackRenderer::render_audio(AudioBuffer &buf) {
+	if (track->has_version_selection()) {
 		render_audio_versioned(buf);
-	}else{
+	} else {
 		render_audio_layered(buf);
 	}
 }
 
-void TrackRenderer::render_time(AudioBuffer &buf)
-{
+void TrackRenderer::render_time(AudioBuffer &buf) {
 	synth->out->read_audio(buf);
 }
 
-void TrackRenderer::render_midi(AudioBuffer &buf)
-{
+void TrackRenderer::render_midi(AudioBuffer &buf) {
 	synth->out->read_audio(buf);
 }
 
-void TrackRenderer::render_group(AudioBuffer &buf)
-{
+void TrackRenderer::render_group(AudioBuffer &buf) {
 	song_renderer->render_send_target(buf, track);
 }
 
-void TrackRenderer::render_no_fx(AudioBuffer &buf)
-{
+void TrackRenderer::render_no_fx(AudioBuffer &buf) {
 	if (!track)
 		return;
 	if (track->type == SignalType::AUDIO)
@@ -365,25 +349,22 @@ void TrackRenderer::render_no_fx(AudioBuffer &buf)
 	offset += buf.length;
 }
 
-void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list)
-{
+void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list) {
 	// apply fx
 	for (AudioEffect *f: fx_list)
-		if (f->enabled){
+		if (f->enabled) {
 			f->process(buf);
 		}
 }
 
-float get_max_volume(AudioBuffer &buf)
-{
+float get_max_volume(AudioBuffer &buf) {
 	float peak = 0;
 	for (int i=0; i<buf.length; i++)
 		peak = max(peak, fabs(buf.c[0][i]));
 	return peak;
 }
 
-void TrackRenderer::render(AudioBuffer &buf)
-{
+void TrackRenderer::render(AudioBuffer &buf) {
 	render_no_fx(buf);
 
 	auto _fx = fx;

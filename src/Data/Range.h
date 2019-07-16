@@ -20,6 +20,9 @@ public:
 
 	static const Range ALL;
 	static const Range EMPTY;
+	
+	static const int BEGIN;
+	static const int END;
 
 	string str() const;
 
@@ -49,6 +52,9 @@ public:
 	Range operator&&(const Range &r) const;
 	Range operator+ (int shift) const;
 	Range operator- (int shift) const;
+	
+	bool operator==(const Range &r) const;
+	bool operator!=(const Range &r) const;
 };
 
 Range RangeTo(int start, int end);

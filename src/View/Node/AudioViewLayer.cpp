@@ -139,11 +139,17 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 void AudioViewLayer::draw_track_buffers(Painter *c) {
 	view->buffer_painter->set_context(area);
 	if (is_playable() and layer->track->has_version_selection()) {
-		auto rr = layer->active_version_ranges();
+		auto active_ranges = layer->active_version_ranges();
+		auto inactive_ranges = layer->inactive_version_ranges();
 		for (auto &b: layer->buffers) {
-			foreachi(Range &r, rr, i) {
+			view->buffer_painter->set_color(view->colors.text);
+			for (Range &r: active_ranges) {
 				view->buffer_painter->set_clip(r);
-				view->buffer_painter->set_color((i % 2) ? view->colors.text_soft3 : view->colors.text);
+				view->buffer_painter->draw_buffer(c, b, b.offset);
+			}
+			view->buffer_painter->set_color(view->colors.text_soft3);
+			for (Range &r: inactive_ranges) {
+				view->buffer_painter->set_clip(r);
 				view->buffer_painter->draw_buffer(c, b, b.offset);
 			}
 		}
@@ -667,7 +673,7 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 		}
 
 		// bars
-		auto bars = view->song->bars.get_bars(Range(s.pos, 1000000));
+		auto bars = view->song->bars.get_bars(RangeTo(s.pos, Range::END));
 		for (auto *b: bars) {
 			float x = view->cam.sample2screen(b->range().offset);
 			// test for label area...

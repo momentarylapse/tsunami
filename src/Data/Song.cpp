@@ -490,8 +490,8 @@ Song *copy_song_from_selection(Song *song, SongSelection &sel) {
 					ll->buffers.back().offset = ri.offset - sel.range.offset;
 				}
 			}
+			ll->fades = l->fades; // TODO...
 		}
-		tt->fades = t->fades; // TODO...
 		for (auto *m: t->markers)
 			if (sel.has(m))
 				tt->markers.add(new TrackMarker({m->range - sel.range.offset, m->text}));

@@ -61,7 +61,7 @@ public:
 	Song *song() const;
 	SignalType type;
 	int channels;
-	bool is_main();
+	bool is_main() const;
 
 	Array<AudioBuffer> buffers;
 
@@ -74,6 +74,7 @@ public:
 	int version_number() const;
 
 	Array<Range> active_version_ranges() const;
+	Array<Range> inactive_version_ranges() const;
 };
 
 

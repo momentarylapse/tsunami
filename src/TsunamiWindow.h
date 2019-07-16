@@ -75,6 +75,7 @@ public:
 	void on_layer_make_track();
 	void on_layer_merge();
 	void on_layer_mark_selection_dominant();
+	void on_layer_add_selection_dominant();
 	void on_sample_manager();
 	void on_mixing_console();
 	void on_fx_console();

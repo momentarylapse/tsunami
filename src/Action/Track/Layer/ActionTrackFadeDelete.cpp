@@ -6,25 +6,21 @@
  */
 
 #include "ActionTrackFadeDelete.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 
 
-ActionTrackFadeDelete::ActionTrackFadeDelete(Track* t, int _index)
-{
-	track = t;
+ActionTrackFadeDelete::ActionTrackFadeDelete(TrackLayer* l, int _index) {
+	layer = l;
 	index = _index;
 }
 
-void* ActionTrackFadeDelete::execute(Data* d)
-{
-	fade = track->fades[index];
-	track->fades.erase(index);
+void* ActionTrackFadeDelete::execute(Data* d) {
+	fade = layer->fades[index];
+	layer->fades.erase(index);
 
 	return nullptr;
 }
 
-void ActionTrackFadeDelete::undo(Data* d)
-{
-	track->fades.insert(fade, index);
-
+void ActionTrackFadeDelete::undo(Data* d) {
+	layer->fades.insert(fade, index);
 }

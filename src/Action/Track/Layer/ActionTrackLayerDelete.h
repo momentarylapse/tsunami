@@ -12,8 +12,7 @@
 
 class Track;
 
-class ActionTrackLayerDelete : public ActionGroup
-{
+class ActionTrackLayerDelete : public ActionGroup {
 public:
 	ActionTrackLayerDelete(Track *t, int index);
 

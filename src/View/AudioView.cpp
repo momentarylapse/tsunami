@@ -1108,8 +1108,9 @@ void AudioView::optimize_view() {
 void AudioView::update_menu() {
 	MidiMode common_midi_mode = midi_view_mode;
 	for (auto *t: vtrack)
-		if ((t->track->type == SignalType::MIDI) and (t->midi_mode_wanted != midi_view_mode))
-			common_midi_mode = MidiMode::DONT_CARE;
+		if (t->track)
+			if ((t->track->type == SignalType::MIDI) and (t->midi_mode_wanted != midi_view_mode))
+				common_midi_mode = MidiMode::DONT_CARE;
 	// view
 	win->check("view-midi-linear", common_midi_mode == MidiMode::LINEAR);
 	win->check("view-midi-tab", common_midi_mode == MidiMode::TAB);

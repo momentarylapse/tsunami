@@ -30,9 +30,10 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNodeFree()
 	view = _view;
 	track = _track;
 	solo = false;
-	midi_mode_wanted = view->midi_view_mode;
-	if (midi_mode_wanted == MidiMode::DONT_CARE)
-		midi_mode_wanted = MidiMode::CLASSICAL;
+	midi_mode_wanted = MidiMode::CLASSICAL;
+	if (view)
+		if (view->midi_view_mode != MidiMode::DONT_CARE)
+			midi_mode_wanted = view->midi_view_mode;
 
 	imploded = false;
 
@@ -106,22 +107,16 @@ void AudioViewTrack::set_volume(float volume) {
 
 void AudioViewTrack::set_midi_mode(MidiMode mode) {
 	midi_mode_wanted = mode;
+	notify();
 	view->update_menu(); // FIXME
-	/*if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
-		midi_mode = MidiMode::TAB;*/
 	view->thm.dirty = true;
 	view->force_redraw();
 }
 
 MidiMode AudioViewTrack::midi_mode() {
-	//if (midi_mode_wanted != MidiMode::DONT_CARE)
-		return midi_mode_wanted;
-	/*if (view->midi_view_mode != MidiMode::DONT_CARE)
-		return view->midi_view_mode;*/
-	return MidiMode::CLASSICAL;
-	/*if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
-		midi_mode = MidiMode::TAB;*/
-	
+	if ((midi_mode_wanted == MidiMode::TAB) and (track->instrument.string_pitch.num > 0))
+		return MidiMode::TAB;
+	return midi_mode_wanted;
 }
 
 void AudioViewTrack::draw_imploded_data(Painter *c) {

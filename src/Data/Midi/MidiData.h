@@ -26,7 +26,8 @@ enum class MidiMode {
 	LINEAR,
 	TAB,
 	CLASSICAL,
-	DRUM
+	DRUM,
+	DONT_CARE
 };
 
 

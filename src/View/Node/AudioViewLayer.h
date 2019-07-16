@@ -30,6 +30,7 @@ enum class MidiMode;
 class MidiKeyChange;
 class LayerHeader;
 class ScrollBar;
+class AudioViewTrack;
 
 
 class AudioViewLayer : public ViewNodeFree {
@@ -74,12 +75,13 @@ public:
 
 	AudioView *view;
 	TrackLayer *layer;
+	Track *track();
+	AudioViewTrack *vtrack();
+	MidiMode midi_mode();
 	rect area_last, area_target;
 	int height_wish, height_min;
 	Map<const TrackMarker*, rect> marker_areas;
 	Map<const TrackMarker*, rect> marker_label_areas;
-	void set_midi_mode(MidiMode wanted);
-	MidiMode midi_mode;
 
 
 	static color marker_color(const TrackMarker *m);

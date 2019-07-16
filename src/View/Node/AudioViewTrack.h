@@ -15,6 +15,7 @@ class Painter;
 class AudioView;
 class AudioViewLayer;
 class MidiKeyChange;
+enum class MidiMode;
 
 
 class AudioViewTrack : public ViewNodeFree {
@@ -41,6 +42,9 @@ public:
 
 	bool is_playable();
 
+	void set_midi_mode(MidiMode mode);
+	MidiMode midi_mode_wanted;
+	MidiMode midi_mode();
 
 	bool imploded;
 };

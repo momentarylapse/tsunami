@@ -6,6 +6,7 @@
  */
 
 #include "AudioViewLayer.h"
+#include "AudioViewTrack.h"
 #include "LayerHeader.h"
 #include "ScrollBar.h"
 #include "../AudioView.h"
@@ -83,7 +84,6 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeF
 	represents_imploded = false;
 
 	if (layer){
-		set_midi_mode(view->midi_view_mode);
 		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
 		update_midi_key_changes();
@@ -106,6 +106,18 @@ void AudioViewLayer::on_track_change() {
 	//notify(MESSAGE_CHANGE);
 }
 
+Track *AudioViewLayer::track() {
+	return layer->track;
+}
+
+AudioViewTrack *AudioViewLayer::vtrack() {
+	return view->get_track(layer->track);
+}
+
+MidiMode AudioViewLayer::midi_mode() {
+	return vtrack()->midi_mode();
+}
+
 Array<MidiKeyChange> get_key_changes(const Track *t) {
 	Array<MidiKeyChange> key_changes;
 	for (auto *m: t->markers_sorted())
@@ -121,14 +133,6 @@ Array<MidiKeyChange> get_key_changes(const Track *t) {
 void AudioViewLayer::update_midi_key_changes() {
 	if (layer)
 		midi_key_changes = get_key_changes(layer->track);
-}
-
-void AudioViewLayer::set_midi_mode(MidiMode wanted) {
-	midi_mode = wanted;
-	if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
-		midi_mode = MidiMode::TAB;
-	view->thm.dirty = true;
-	view->force_redraw();
 }
 
 color AudioViewLayer::marker_color(const TrackMarker *m) {
@@ -215,7 +219,7 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 
 
 void AudioViewLayer::draw_midi(Painter *c, const MidiNoteBuffer &midi, bool as_reference, int shift) {
-	view->midi_painter->set_context(area, layer->track->instrument, is_playable(), midi_mode);
+	view->midi_painter->set_context(area, layer->track->instrument, is_playable(), midi_mode());
 	view->midi_painter->set_key_changes(midi_key_changes);
 	view->midi_painter->set_quality(view->high_details ? 1.0f : 0.4f, view->antialiasing);
 	view->midi_painter->set_shift(shift);
@@ -352,39 +356,6 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	c->set_font("", view->FONT_SIZE, false, false);
 }
 
-/*Range dominant_range(Track *t, int index) {
-	if (index == -1) {
-		return t->fades[0].range();
-	}
-	int start = t->fades[index].position;
-	if (index + 1 < t->fades.num)
-		return RangeTo(start, t->fades[index + 1].position + t->fades[index + 1].samples);
-	return Range(start, t->fades[index].samples);
-}
-
-void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i) {
-	Range r = dominant_range(l->layer->track, i);
-	color cs = color(0.2f, 0,0.7f,0);
-	float xx1, xx2;
-	view->cam.range2screen(r, xx1, xx2);
-	if (i == l->layer->track->fades.num - 1)
-		xx2 += 50;
-	if (i == -1)
-		xx1 -= 50;
-	float x1 = max(xx1, l->area.x1);
-	float x2 = min(xx2, l->area.x2);
-	c->set_color(cs);
-	c->draw_rect(x1, l->area.y1, x2-x1, l->area.height());
-	if (i == l->layer->track->fades.num - 1) {
-		cs.a *= 0.5f;
-		c->set_color(cs);
-		c->draw_rect(xx2, l->area.y1, 50, l->area.height());
-	} else if (i == -1) {
-		cs.a *= 0.5f;
-		c->set_color(cs);
-		c->draw_rect(xx1 - 50, l->area.y1, 50, l->area.height());
-	}
-}*/
 
 void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards, float flare_w) {
 	int N = 7;

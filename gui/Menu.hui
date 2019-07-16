@@ -57,18 +57,17 @@ Menu menu ""
 		Item /sample-insert "Insert statically" image=hui:add
 	Menu menu_view "View"
 		Menu menu_view_midi "Midi"
-			Item view_midi_default "Default" checkable
-			Item view_midi_tab "Tabulature" checkable
-			Item view_midi_score "Score" checkable
+			Item view-midi-linear "Linear" checkable
+			Item view-midi-tab "Tabulature" checkable
+			Item view-midi-classical "Classical" checkable
 		Item /show-mixing-console "Mixing" checkable
-		Item show_signal_chain "Signal chain" checkable
-		Item show_devices "Devices" checkable
-		Item show_fx_console "Effects"
+		Item show-signal-chain "Signal chain" checkable
+		Item show-devices "Devices" checkable
+		Item show-fx-console "Effects"
 		Separator
-		Item zoom_in "Zoon in" image=hui:zoom-in
-		Item zoom_out "Zoom out" image=hui:zoom-out
-		Item view_optimal "Optimal" image=hui:zoom-fit
-		Item view_samples "Samples" image=hui:zoom-one
+		Item zoom-in "Zoom in" image=hui:zoom-in
+		Item zoom-out "Zoom out" image=hui:zoom-out
+		Item view-optimal "Optimal" image=hui:zoom-fit
 	Menu menu_sound "Sound"
 		Item /play-toggle "Play" image=hui:media-play
 		Item /pause "Pause" image=hui:media-pause
@@ -95,6 +94,6 @@ Menu menu ""
 		Menu menu_plugins_other "Independent"
 	Menu menu_help "?"
 		Item help "Help" image=hui:help
-		Item show_log "Messages" image=hui:info
+		Item show-log "Messages" image=hui:info
 		Separator
 		Item about "About" image=hui:about

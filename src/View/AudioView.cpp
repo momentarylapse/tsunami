@@ -671,9 +671,9 @@ void AudioView::check_consistency()
 	}
 
 	// illegal midi mode?
-	for (auto *l: vlayer)
-		if ((l->midi_mode == MidiMode::TAB) and (l->layer->track->instrument.string_pitch.num == 0))
-			l->set_midi_mode(MidiMode::CLASSICAL);
+	for (auto *t: vtrack)
+		if ((t->midi_mode() == MidiMode::TAB) and (t->track->instrument.string_pitch.num == 0))
+			t->set_midi_mode(MidiMode::CLASSICAL);
 }
 
 void AudioView::implode_track(Track *t) {
@@ -1106,11 +1106,14 @@ void AudioView::optimize_view() {
 }
 
 void AudioView::update_menu() {
+	MidiMode common_midi_mode = midi_view_mode;
+	for (auto *t: vtrack)
+		if ((t->track->type == SignalType::MIDI) and (t->midi_mode_wanted != midi_view_mode))
+			common_midi_mode = MidiMode::DONT_CARE;
 	// view
-	win->check("view_midi_default", midi_view_mode == MidiMode::LINEAR);
-	win->check("view_midi_tab", midi_view_mode == MidiMode::TAB);
-	win->check("view_midi_score", midi_view_mode == MidiMode::CLASSICAL);
-	win->enable("view_samples", false);
+	win->check("view-midi-linear", common_midi_mode == MidiMode::LINEAR);
+	win->check("view-midi-tab", common_midi_mode == MidiMode::TAB);
+	win->check("view-midi-classical", common_midi_mode == MidiMode::CLASSICAL);
 }
 
 void AudioView::update_peaks() {
@@ -1137,8 +1140,8 @@ void AudioView::update_peaks() {
 void AudioView::set_midi_view_mode(MidiMode mode) {
 	midi_view_mode = mode;
 	hui::Config.set_int("View.MidiMode", (int)midi_view_mode);
-	for (auto *l: vlayer)
-		l->set_midi_mode(mode);
+	for (auto *t: vtrack)
+		t->set_midi_mode(mode);
 	//forceRedraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
 	update_menu();
@@ -1550,17 +1553,18 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 
 void AudioView::prepare_menu(hui::Menu *menu) {
 	auto *vl = hover().vlayer;
+	auto *vt = hover().vtrack;
 	auto *l = hover().layer();
 	auto *t = hover().track();
 	// midi mode
 	if (t) {
 		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
-		menu->enable("layer-midi-mode-tab", t->instrument.string_pitch.num > 0);
+		menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
 	}
-	if (vl) {
-		menu->check("layer-midi-mode-linear", vl->midi_mode == MidiMode::LINEAR);
-		menu->check("layer-midi-mode-classical", vl->midi_mode == MidiMode::CLASSICAL);
-		menu->check("layer-midi-mode-tab", vl->midi_mode == MidiMode::TAB);
+	if (vt) {
+		menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
+		menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
+		menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
 	}
 
 	if (t) {

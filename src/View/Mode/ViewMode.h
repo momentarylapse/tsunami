@@ -56,8 +56,6 @@ public:
 	virtual void draw_track_data(Painter *c, AudioViewTrack *t) {}
 	virtual void draw_post(Painter *c) {}
 
-	virtual MidiMode which_midi_mode(Track *t) = 0;
-
 	SongSelection get_selection(const Range &r, SelectionMode mode);
 	virtual SongSelection get_selection_for_range(const Range &r);
 	virtual SongSelection get_selection_for_rect(const Range &r, int y0, int y1);

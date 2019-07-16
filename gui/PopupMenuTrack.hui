@@ -5,6 +5,10 @@ Menu popup-menu-track ""
 	Menu /menu-convert "Convert"
 		Item /track-convert-mono "Mono"
 		Item /track-convert-stereo "Stereo"
+	Menu /menu-midi-mode "Midi mode"
+		Item /track-midi-mode-linear "Linear" checkable
+		Item /track-midi-mode-tab "Tabulature" checkable
+		Item /track-midi-mode-classical "Classical" checkable
 	Item /track-edit-fx "Edit effects"
 	Item /track-edit-midi "Edit midi"
 	Item /track-properties "Properties"
@@ -16,10 +20,6 @@ Menu popup-menu-track ""
 		Item /layer-mark-dominant "Mark selection as dominant"
 		Item /layer-add-dominant "Add selection to dominant"
 		Item /layer-merge "Merge..."
-		Menu /menu-midi-mode "Midi mode"
-			Item /layer-midi-mode-linear "Linear" checkable
-			Item /layer-midi-mode-tab "Tabulature" checkable
-			Item /layer-midi-mode-classical "Score" checkable
 	Menu /menu-song "File"
 		Menu /menu-track-new "Add new track"
 			Item /track-add-audio-mono "Audio (mono)" image=hui:add

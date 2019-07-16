@@ -30,6 +30,9 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) : ViewNodeFree()
 	view = _view;
 	track = _track;
 	solo = false;
+	midi_mode_wanted = view->midi_view_mode;
+	if (midi_mode_wanted == MidiMode::DONT_CARE)
+		midi_mode_wanted = MidiMode::CLASSICAL;
 
 	imploded = false;
 
@@ -100,6 +103,26 @@ void AudioViewTrack::set_volume(float volume) {
 	track->set_volume(volume);
 }
 
+
+void AudioViewTrack::set_midi_mode(MidiMode mode) {
+	midi_mode_wanted = mode;
+	view->update_menu(); // FIXME
+	/*if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
+		midi_mode = MidiMode::TAB;*/
+	view->thm.dirty = true;
+	view->force_redraw();
+}
+
+MidiMode AudioViewTrack::midi_mode() {
+	//if (midi_mode_wanted != MidiMode::DONT_CARE)
+		return midi_mode_wanted;
+	/*if (view->midi_view_mode != MidiMode::DONT_CARE)
+		return view->midi_view_mode;*/
+	return MidiMode::CLASSICAL;
+	/*if ((wanted == MidiMode::TAB) and (layer->track->instrument.string_pitch.num > 0))
+		midi_mode = MidiMode::TAB;*/
+	
+}
 
 void AudioViewTrack::draw_imploded_data(Painter *c) {
 	auto *l = view->get_layer(track->layers[0]);

@@ -1507,7 +1507,7 @@ menu_view
 
 5
 0
-10
+9
 Menu
 menu_view_midi
 
@@ -1515,19 +1515,19 @@ menu_view_midi
 0
 3
 Item
-view_midi_default
+view-midi-linear
 checkable
 0
 0
 0
 Item
-view_midi_tab
+view-midi-tab
 checkable
 1
 0
 0
 Item
-view_midi_score
+view-midi-classical
 checkable
 2
 0
@@ -1539,19 +1539,19 @@ checkable
 0
 0
 Item
-show_signal_chain
+show-signal-chain
 checkable
 2
 0
 0
 Item
-show_devices
+show-devices
 checkable
 3
 0
 0
 Item
-show_fx_console
+show-fx-console
 
 4
 0
@@ -1563,27 +1563,21 @@ Separator
 0
 0
 Item
-zoom_in
+zoom-in
 image=hui:zoom-in
 6
 0
 0
 Item
-zoom_out
+zoom-out
 image=hui:zoom-out
 7
 0
 0
 Item
-view_optimal
+view-optimal
 image=hui:zoom-fit
 8
-0
-0
-Item
-view_samples
-image=hui:zoom-one
-9
 0
 0
 Menu
@@ -1743,7 +1737,7 @@ image=hui:help
 0
 0
 Item
-show_log
+show-log
 image=hui:info
 1
 0
@@ -3312,7 +3306,7 @@ menu-version
 
 6
 0
-6
+5
 Item
 layer-delete
 
@@ -3344,35 +3338,11 @@ layer-merge
 0
 0
 Menu
-menu-midi-mode
-
-5
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-track
 
 7
 0
-5
+6
 Item
 track-delete
 
@@ -3397,22 +3367,46 @@ track-convert-stereo
 1
 0
 0
-Item
-track-edit-fx
+Menu
+menu-midi-mode
 
+2
+0
+3
+Item
+track-midi-mode-linear
+checkable
+0
+0
+0
+Item
+track-midi-mode-tab
+checkable
+1
+0
+0
+Item
+track-midi-mode-classical
+checkable
 2
 0
 0
 Item
-track-edit-midi
+track-edit-fx
 
 3
 0
 0
 Item
-track-properties
+track-edit-midi
 
 4
+0
+0
+Item
+track-properties
+
+5
 0
 0
 Menu
@@ -3586,19 +3580,19 @@ menu-midi-mode
 0
 3
 Item
-layer-midi-mode-linear
+track-midi-mode-linear
 checkable
 0
 0
 0
 Item
-layer-midi-mode-tab
+track-midi-mode-tab
 checkable
 1
 0
 0
 Item
-layer-midi-mode-classical
+track-midi-mode-classical
 checkable
 2
 0
@@ -3765,7 +3759,7 @@ menu-version
 
 6
 0
-6
+5
 Item
 layer-delete
 
@@ -3797,35 +3791,11 @@ layer-merge
 0
 0
 Menu
-menu-midi-mode
-
-5
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-track
 
 7
 0
-5
+6
 Item
 track-delete
 
@@ -3850,22 +3820,46 @@ track-convert-stereo
 1
 0
 0
-Item
-track-edit-fx
+Menu
+menu-midi-mode
 
+2
+0
+3
+Item
+track-midi-mode-linear
+checkable
+0
+0
+0
+Item
+track-midi-mode-tab
+checkable
+1
+0
+0
+Item
+track-midi-mode-classical
+checkable
 2
 0
 0
 Item
-track-edit-midi
+track-edit-fx
 
 3
 0
 0
 Item
-track-properties
+track-edit-midi
 
 4
+0
+0
+Item
+track-properties
+
+5
 0
 0
 Menu
@@ -4079,7 +4073,7 @@ menu-version
 
 7
 0
-6
+5
 Item
 layer-delete
 
@@ -4111,35 +4105,11 @@ layer-merge
 0
 0
 Menu
-menu-midi-mode
-
-5
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-track
 
 8
 0
-5
+6
 Item
 track-delete
 
@@ -4164,22 +4134,46 @@ track-convert-stereo
 1
 0
 0
-Item
-track-edit-fx
+Menu
+menu-midi-mode
 
+2
+0
+3
+Item
+track-midi-mode-linear
+checkable
+0
+0
+0
+Item
+track-midi-mode-tab
+checkable
+1
+0
+0
+Item
+track-midi-mode-classical
+checkable
 2
 0
 0
 Item
-track-edit-midi
+track-edit-fx
 
 3
 0
 0
 Item
-track-properties
+track-edit-midi
 
 4
+0
+0
+Item
+track-properties
+
+5
 0
 0
 Menu
@@ -4455,7 +4449,7 @@ popup-menu-track
 
 0
 0
-11
+12
 Item
 header
 disabled
@@ -4492,42 +4486,66 @@ track-convert-stereo
 1
 0
 0
-Item
-track-edit-fx
+Menu
+menu-midi-mode
 
 4
 0
+3
+Item
+track-midi-mode-linear
+checkable
+0
+0
 0
 Item
-track-edit-midi
+track-midi-mode-tab
+checkable
+1
+0
+0
+Item
+track-midi-mode-classical
+checkable
+2
+0
+0
+Item
+track-edit-fx
 
 5
 0
 0
 Item
-track-properties
+track-edit-midi
 
 6
+0
+0
+Item
+track-properties
+
+7
 0
 0
 Separator
 
 
-7
+8
 0
 0
 Item
 track-add-marker
 
-8
+9
 0
 0
 Menu
 menu-version
 
-9
+10
 0
-6
+5
 Item
 layer-delete
 
@@ -4559,33 +4577,9 @@ layer-merge
 0
 0
 Menu
-menu-midi-mode
-
-5
-0
-3
-Item
-layer-midi-mode-linear
-checkable
-0
-0
-0
-Item
-layer-midi-mode-tab
-checkable
-1
-0
-0
-Item
-layer-midi-mode-classical
-checkable
-2
-0
-0
-Menu
 menu-song
 
-10
+11
 0
 4
 Menu
@@ -6243,7 +6237,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-505
+504
 // Text
 /bars-add
 Add bars...
@@ -6325,15 +6319,6 @@ Mark selection as dominant
 
 /layer-merge
 Merge...
-
-/layer-midi-mode-classical
-Score
-
-/layer-midi-mode-linear
-Linear
-
-/layer-midi-mode-tab
-Tabulature
 
 /marker-delete
 Delete
@@ -6475,6 +6460,15 @@ Edit effects
 
 /track-edit-midi
 Edit midi
+
+/track-midi-mode-classical
+Classical
+
+/track-midi-mode-linear
+Linear
+
+/track-midi-mode-tab
+Tabulature
 
 /track-properties
 Properties
@@ -6884,16 +6878,16 @@ Expand selection
 menu/select_nothing
 Clear selection
 
-menu/show_devices
+menu/show-devices
 Devices
 
-menu/show_fx_console
+menu/show-fx-console
 Effects
 
-menu/show_log
+menu/show-log
 Messages
 
-menu/show_signal_chain
+menu/show-signal-chain
 Signal chain
 
 menu/track_import
@@ -6902,25 +6896,22 @@ Import from file...
 menu/track_render
 Render from selection
 
-menu/view_midi_default
-Default
+menu/view-midi-classical
+Classical
 
-menu/view_midi_score
-Score
+menu/view-midi-linear
+Linear
 
-menu/view_midi_tab
+menu/view-midi-tab
 Tabulature
 
-menu/view_optimal
+menu/view-optimal
 Optimal
 
-menu/view_samples
-Samples
+menu/zoom-in
+Zoom in
 
-menu/zoom_in
-Zoon in
-
-menu/zoom_out
+menu/zoom-out
 Zoom out
 
 menu_fake/play
@@ -7766,7 +7757,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-901
+914
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8037,6 +8028,15 @@ Effekte bearbeiten
 
 /track-edit-midi
 Midi bearbeiten
+
+/track-midi-mode-classical
+Klassisch
+
+/track-midi-mode-linear
+Linear
+
+/track-midi-mode-tab
+Tabulatur
 
 /track-properties
 Eigenschaften
@@ -8707,6 +8707,18 @@ Auswahl ausbreiten
 menu/select_nothing
 Nichts auswählen
 
+menu/show-devices
+Geräte
+
+menu/show-fx-console
+Effekte
+
+menu/show-log
+Nachrichten
+
+menu/show-signal-chain
+Signalkette
+
 menu/show_devices
 Geräte
 
@@ -8737,6 +8749,18 @@ Eigenschaften
 menu/track_render
 Aus Auswahl rendern
 
+menu/view-midi-classical
+Klassisch
+
+menu/view-midi-linear
+Linear
+
+menu/view-midi-tab
+Tabulatur
+
+menu/view-optimal
+Optimal
+
 menu/view_midi_default
 Standard
 
@@ -8766,6 +8790,12 @@ Sample-Ebene
 
 menu/view_stereo
 Stereo
+
+menu/zoom-in
+Vergrößern
+
+menu/zoom-out
+Verkleinern
 
 menu/zoom_in
 Vergrößern

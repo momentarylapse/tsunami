@@ -27,8 +27,6 @@ public:
 
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 
-	MidiMode which_midi_mode(Track *t) override;
-
 	SongSelection get_selection_for_range(const Range &r) override;
 	SongSelection get_selection_for_rect(const Range &r, int y0, int y1) override;
 	SongSelection get_selection_for_track_rect(const Range &r, int y0, int y1) override;

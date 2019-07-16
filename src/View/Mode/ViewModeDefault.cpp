@@ -301,7 +301,7 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 MidiPainter* midi_context(AudioViewLayer *l)
 {
 	auto *mp = l->view->midi_painter;
-	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode);
+	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode());
 	mp->set_key_changes(l->midi_key_changes);
 	mp->set_linear_range(l->edit_pitch_min, l->edit_pitch_max);
 	return mp;
@@ -403,14 +403,5 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 			_layers.add(vt->layer);
 	}
 	return SongSelection::from_range(song, r).filter(_layers);
-}
-
-MidiMode ViewModeDefault::which_midi_mode(Track *t)
-{
-	if (view->midi_view_mode == MidiMode::LINEAR)
-			return MidiMode::LINEAR;
-	if ((view->midi_view_mode == MidiMode::TAB) and (t->instrument.string_pitch.num > 0))
-		return MidiMode::TAB;
-	return MidiMode::CLASSICAL;
 }
 

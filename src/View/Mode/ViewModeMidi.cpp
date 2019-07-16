@@ -328,7 +328,7 @@ public:
 // note clicking already handled by ViewModeDefault!
 void ViewModeMidi::left_click_handle_void(AudioViewLayer *vlayer) {
 
-	auto mode = cur_vlayer()->midi_mode;
+	auto mode = cur_vlayer()->midi_mode();
 
 	if (hover().type == HoverData::Type::CLEF_POSITION) {
 		if (mode == MidiMode::TAB)
@@ -450,7 +450,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 
 void ViewModeMidi::on_key_down(int k) {
 	set_rep_key(k);
-	auto mode = cur_vlayer()->midi_mode;
+	auto mode = cur_vlayer()->midi_mode();
 	if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR)) {
 		if (input_mode == InputMode::DEFAULT) {
 			if (k == hui::KEY_0){
@@ -559,7 +559,7 @@ void ViewModeMidi::on_key_down(int k) {
 
 float ViewModeMidi::layer_min_height(AudioViewLayer *l) {
 	if (editing(l)) {
-		auto mode = l->midi_mode;
+		auto mode = l->midi_mode();
 		if (mode == MidiMode::LINEAR)
 			return 500;
 		else if (mode == MidiMode::CLASSICAL)
@@ -573,7 +573,7 @@ float ViewModeMidi::layer_min_height(AudioViewLayer *l) {
 
 float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l)) {
-		auto mode = l->midi_mode;
+		auto mode = l->midi_mode();
 		if (mode == MidiMode::LINEAR)
 			return 5000;
 		else if (mode == MidiMode::CLASSICAL)
@@ -653,7 +653,7 @@ void ViewModeMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 
 		if (l->layer->type == SignalType::MIDI) {
 			auto *mp = midi_context(l);
-			auto mode = l->midi_mode;
+			auto mode = l->midi_mode();
 			if (mode == MidiMode::LINEAR)
 				mp->draw_pitch_grid(c, l->layer->track->synth);
 
@@ -695,7 +695,7 @@ HoverData ViewModeMidi::get_hover_data(AudioViewLayer *vlayer, float mx, float m
 	auto *l = vlayer->layer;
 
 	// midi
-	auto mode = vlayer->midi_mode;
+	auto mode = vlayer->midi_mode();
 
 	auto *mp = midi_context(vlayer);
 
@@ -750,7 +750,7 @@ void ViewModeMidi::draw_post(Painter *c) {
 	auto *l = cur_vlayer();
 	if (!l)
 		return;
-	auto mode = l->midi_mode;
+	auto mode = l->midi_mode();
 	Range r = get_edit_range();
 	float x1, x2;
 	view->cam.range2screen(r, x1, x2);
@@ -824,7 +824,7 @@ string ViewModeMidi::get_tip() {
 	string message = _("cursor (←,→)    delete (⟵)    note length (L)    beat partition (P)");
 	if (!cur_vlayer())
 		return message;
-	auto mode = cur_vlayer()->midi_mode;
+	auto mode = cur_vlayer()->midi_mode();
 	if (mode == MidiMode::TAB)
 		message += "    " + _("string (↑,↓)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
@@ -866,7 +866,7 @@ Range ViewModeMidi::get_backwards_range() {
 SongSelection ViewModeMidi::get_select_in_edit_cursor() {
 	Range r = get_edit_range();
 	auto s = SongSelection::from_range(view->song, r).filter({view->cur_layer()}).filter(SongSelection::Mask::MIDI_NOTES);
-	auto mode = cur_vlayer()->midi_mode;
+	auto mode = cur_vlayer()->midi_mode();
 	auto notes = s.notes;
 	if (mode == MidiMode::TAB) {
 		for (auto *n: notes)

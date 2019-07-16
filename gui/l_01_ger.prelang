@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-902
+915
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2708,6 +2708,45 @@ Stereo
 
 /layer-add-dominant
 Auswahl auch aktivieren
+
+/track-midi-mode-classical
+Klassisch
+
+/track-midi-mode-linear
+Linear
+
+/track-midi-mode-tab
+Tabulatur
+
+menu/show-devices
+Geräte
+
+menu/show-fx-console
+Effekte
+
+menu/show-log
+Nachrichten
+
+menu/show-signal-chain
+Signalkette
+
+menu/view-midi-classical
+Klassisch
+
+menu/view-midi-linear
+Linear
+
+menu/view-midi-tab
+Tabulatur
+
+menu/view-optimal
+Optimal
+
+menu/zoom-out
+Verkleinern
+
+menu/zoom-in
+Vergrößern
 
 // Num Language Strings
 245

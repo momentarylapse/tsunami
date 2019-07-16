@@ -105,7 +105,7 @@ void MidiEditorConsole::update() {
 	check("modifier:flat", view->mode_midi->modifier == NoteModifier::FLAT);
 	check("modifier:natural", view->mode_midi->modifier == NoteModifier::NATURAL);
 
-	MidiMode mode = view->get_layer(layer)->midi_mode;
+	MidiMode mode = view->get_layer(layer)->midi_mode();
 
 	enable("modifier:none", mode == MidiMode::CLASSICAL);
 	enable("modifier:sharp", mode == MidiMode::CLASSICAL);

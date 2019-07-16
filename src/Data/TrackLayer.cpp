@@ -77,6 +77,27 @@ int TrackLayer::version_number() const
 			return i;
 	return 0;
 }
+// active | passive | active | ...
+Array<Range> TrackLayer::active_version_ranges() const {
+	Array<CrossFade> xfades;
+	xfades.add({-2000000000, CrossFade::INWARD, 0});
+	if (!is_main())
+		xfades.add({-2000000000, CrossFade::OUTWARD, 0});
+
+	for (auto &f: fades)
+		if (f.mode != fades.back().mode)
+			xfades.add(f);
+
+	if (!is_main())
+		xfades.add({-2000000000, CrossFade::INWARD, 0});
+	xfades.add({2000000000, CrossFade::OUTWARD, 0});
+
+	Array<Range> r;
+	for (int i=1; i<xfades.num; i+=2)
+		r.add(RangeTo(xfades[i-1].position, xfades[i].position));
+
+	return r;
+}
 
 
 void TrackLayer::read_buffers(AudioBuffer &buf, const Range &r, bool allow_ref)

@@ -169,7 +169,10 @@ Array<TrackMarker*> Track::markers_sorted() const {
 }
 
 bool Track::has_version_selection() {
-	return fades.num > 0;
+	for (auto *l: layers)
+		if (l->fades.num > 0)
+			return true;
+	return false;
 }
 
 void Track::set_name(const string& name) {

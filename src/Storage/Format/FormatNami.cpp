@@ -922,6 +922,8 @@ public:
 	{
 		write_sub_array("bufbox", me->buffers);
 		write_sub_parray("samref", me->samples);
+		if (me->fades.num > 0)
+			this->error("fades...");
 	}
 };
 
@@ -1084,22 +1086,22 @@ public:
 	}
 };
 
-class FileChunkFade: public FileChunk<Track,CrossFade>
+class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld>
 {
 public:
-	FileChunkFade() : FileChunk<Track,CrossFade>("fade"){}
+	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade"){}
 	virtual void create()
 	{
 	}
 	virtual void read(File *f)
 	{
-		CrossFade ff;
+		CrossFadeOld ff;
 		ff.position = f->read_int();
 		ff.target = f->read_int();
 		ff.samples = f->read_int();
 		f->read_int();
 		f->read_int();
-		parent->fades.add(ff);
+		parent->_fades_old.add(ff);
 	}
 	virtual void write(File *f)
 	{
@@ -1147,7 +1149,7 @@ public:
 		add_child(new FileChunkMarker);
 		add_child(new _FileChunkTrackSampleRef); // deprecated
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
-		add_child(new FileChunkFade);
+		add_child(new FileChunkFadeOld);
 	}
 	virtual void create()
 	{
@@ -1193,8 +1195,6 @@ public:
 				write_sub("synth", me->synth);
 		if (me->layers[0]->midi.num > 0)
 			write_sub("midi", &me->layers[0]->midi);
-		if (me->has_version_selection())
-			write_sub_array("fade", me->fades);
 	}
 };
 

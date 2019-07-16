@@ -20,6 +20,7 @@ class Song;
 class SampleRef;
 class Sample;
 class Track;
+class CrossFade;
 enum class SignalType;
 
 
@@ -54,6 +55,7 @@ public:
 	void _cdecl make_own_track();
 
 	void _cdecl mark_dominant(const Range &range);
+	void _cdecl mark_add_dominant(const Range &range);
 
 	Track *track;
 	Song *song() const;
@@ -67,7 +69,11 @@ public:
 
 	Array<SampleRef*> samples;
 
+	Array<CrossFade> fades;
+
 	int version_number() const;
+
+	Array<Range> active_version_ranges() const;
 };
 
 

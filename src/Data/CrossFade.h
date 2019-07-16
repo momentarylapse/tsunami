@@ -13,10 +13,22 @@
 class CrossFade {
 public:
 
+	enum Mode {
+		INWARD,
+		OUTWARD
+	};
+
+	int position;
+	Mode mode;
+	int samples;
+	Range range();
+};
+
+class CrossFadeOld {
+public:
 	int position;
 	int target;
 	int samples;
-	Range range();
 };
 
 #endif /* SRC_DATA_CROSSFADE_H_ */

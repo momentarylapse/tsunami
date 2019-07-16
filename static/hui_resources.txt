@@ -3312,7 +3312,7 @@ menu-version
 
 6
 0
-5
+6
 Item
 layer-delete
 
@@ -3332,15 +3332,21 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-add-dominant
 
 3
+0
+0
+Item
+layer-merge
+
+4
 0
 0
 Menu
 menu-midi-mode
 
-4
+5
 0
 3
 Item
@@ -3518,7 +3524,7 @@ popup-menu-layer
 
 0
 0
-11
+13
 Item
 header
 disabled
@@ -3538,33 +3544,45 @@ layer-delete
 0
 0
 Item
-layer-edit-midi
+layer-add
 
 3
 0
 0
 Item
-layer-make-track
+layer-edit-midi
 
 4
 0
 0
 Item
-layer-mark-dominant
+layer-make-track
 
 5
 0
 0
 Item
-layer-merge
+layer-mark-dominant
 
 6
+0
+0
+Item
+layer-add-dominant
+
+7
+0
+0
+Item
+layer-merge
+
+8
 0
 0
 Menu
 menu-midi-mode
 
-7
+9
 0
 3
 Item
@@ -3588,13 +3606,13 @@ checkable
 Separator
 
 
-8
+10
 0
 0
 Menu
 menu-track
 
-9
+11
 0
 5
 Item
@@ -3642,7 +3660,7 @@ track-properties
 Menu
 menu-song
 
-10
+12
 0
 4
 Menu
@@ -3747,7 +3765,7 @@ menu-version
 
 6
 0
-5
+6
 Item
 layer-delete
 
@@ -3767,15 +3785,21 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-add-dominant
 
 3
+0
+0
+Item
+layer-merge
+
+4
 0
 0
 Menu
 menu-midi-mode
 
-4
+5
 0
 3
 Item
@@ -4055,7 +4079,7 @@ menu-version
 
 7
 0
-5
+6
 Item
 layer-delete
 
@@ -4075,15 +4099,21 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-add-dominant
 
 3
+0
+0
+Item
+layer-merge
+
+4
 0
 0
 Menu
 menu-midi-mode
 
-4
+5
 0
 3
 Item
@@ -4497,7 +4527,7 @@ menu-version
 
 9
 0
-5
+6
 Item
 layer-delete
 
@@ -4517,15 +4547,21 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-add-dominant
 
 3
+0
+0
+Item
+layer-merge
+
+4
 0
 0
 Menu
 menu-midi-mode
 
-4
+5
 0
 3
 Item
@@ -6207,7 +6243,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-504
+505
 // Text
 /bars-add
 Add bars...
@@ -6271,6 +6307,9 @@ Exit
 
 /layer-add
 Add version
+
+/layer-add-dominant
+Add selection to dominant
 
 /layer-delete
 Delete
@@ -7727,7 +7766,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-900
+901
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7821,6 +7860,9 @@ Beenden
 
 /layer-add
 Neue Version
+
+/layer-add-dominant
+Auswahl auch aktivieren
 
 /layer-delete
 Löschen
@@ -10430,7 +10472,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-239
+245
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -10718,6 +10760,8 @@ There already is one rhythm track.
 Es existiert schon eine Rhythmus-Spur.
 There has to be at least one track.
 Es muss mindestens eine Spur existieren
+Track
+Spur
 Track %d
 Spur %d
 Track properties
@@ -10752,6 +10796,8 @@ all known files
 alles mögliche
 applying effect
 wende Effekt an
+applying source
+wende Quelle an
 audio library selected: 
 Audiobibliothek gewählt: 
 backup done: 
@@ -10860,6 +10906,12 @@ move selection to scale
 Selektierung ziehen zum Skalieren
 no alsa midi handler
 kein Alsa Midi Handler
+no audio tracks selected
+keine Audiospur ausgewählt
+no marker selected
+kein Marker ausgewählt
+no midi tracks selected
+keine Midispur ausgewählt
 no module selected
 kein Modul ausgewählt
 no plugins yet
@@ -10894,6 +10946,8 @@ sample
 sample 
 saving 
 speichere 
+source
+Quelle
 stop plugin
 Plugin stoppen
 string (↑,↓)    add note (0-9, A-F)

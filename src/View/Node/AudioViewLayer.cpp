@@ -135,34 +135,12 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 	return MidiPainter::pitch_color(m->text.hash() % MAX_PITCH);
 }
 
-// active | passive | active | ...
-Array<Range> version_ranges(TrackLayer *l) {
-	Array<Range> r;
-	if (!l->is_main())
-		r.add(Range::EMPTY);
-	int own_index = l->version_number();
-	CrossFade prev;
-	prev.position = -2000000000;
-	prev.samples = 0;
-	prev.target = 0;
-	for (auto &f: l->track->fades) {
-		if (f.target == own_index) {
-			r.add(RangeTo(prev.range().end(), f.range().start()));
-			prev = f;
-		} else if (prev.target == own_index) {
-			r.add(RangeTo(prev.range().start(), f.range().end()));
-			prev = f;
-		}
-	}
-	r.add(RangeTo(r.back().end(), 2000000000));
-	return r;
-}
 
 void AudioViewLayer::draw_track_buffers(Painter *c) {
 	view->buffer_painter->set_context(area);
 	if (is_playable() and layer->track->has_version_selection()) {
-		Array<Range> rr = version_ranges(layer);
-		for (AudioBuffer &b: layer->buffers) {
+		auto rr = layer->active_version_ranges();
+		for (auto &b: layer->buffers) {
 			foreachi(Range &r, rr, i) {
 				view->buffer_painter->set_clip(r);
 				view->buffer_painter->set_color((i % 2) ? view->colors.text_soft3 : view->colors.text);
@@ -171,7 +149,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 		}
 	} else {
 		view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
-		for (AudioBuffer &b: layer->buffers)
+		for (auto &b: layer->buffers)
 			view->buffer_painter->draw_buffer(c, b, b.offset);
 
 	}
@@ -368,7 +346,7 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	c->set_font("", view->FONT_SIZE, false, false);
 }
 
-Range dominant_range(Track *t, int index) {
+/*Range dominant_range(Track *t, int index) {
 	if (index == -1) {
 		return t->fades[0].range();
 	}
@@ -400,7 +378,7 @@ void draw_fade_bg(Painter *c, AudioViewLayer *l, AudioView *view, int i) {
 		c->set_color(cs);
 		c->draw_rect(xx1 - 50, l->area.y1, 50, l->area.height());
 	}
-}
+}*/
 
 void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards, float flare_w) {
 	int N = 7;
@@ -424,28 +402,20 @@ void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards
 }
 
 void AudioViewLayer::draw_fades(Painter *c) {
-	int index_before = 0;
-	int index_own = layer->version_number();
 
 	/*if (index_own == 0 and l->layer->track->has_version_selection()){
 		draw_fade_bg(c, l, view, -1);
 	}*/
 
 	c->set_line_width(2);
-	foreachi (auto &f, layer->track->fades, i) {
-		/*if (f.target == index_own){
-			draw_fade_bg(c, l, view, i);
-		}*/
-		if (f.target == index_own or index_before == index_own) {
-			float x1, x2;
-			view->cam.range2screen(f.range(), x1, x2);
-			c->set_color(color(1,0,0.7f,0));
-			c->draw_line(x1, area.y1, x1, area.y2);
-			c->draw_line(x2, area.y1, x2, area.y2);
+	for (auto &f: layer->fades) {
+		float x1, x2;
+		view->cam.range2screen(f.range(), x1, x2);
+		c->set_color(color(1,0,0.7f,0));
+		c->draw_line(x1, area.y1, x1, area.y2);
+		c->draw_line(x2, area.y1, x2, area.y2);
 
-			draw_flare(c, x1, x2, area.y1, area.y2, f.target == index_own, 20);
-		}
-		index_before = f.target;
+		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.INWARD, 20);
 	}
 	c->set_line_width(1);
 }

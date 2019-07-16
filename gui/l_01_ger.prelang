@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-901
+902
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2706,8 +2706,11 @@ Mono
 raw_config_dialog/channels:stereo
 Stereo
 
+/layer-add-dominant
+Auswahl auch aktivieren
+
 // Num Language Strings
-239
+245
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3187,3 +3190,15 @@ Harpsichord
 Cembalo
 note 
 Note 
+Track
+Spur
+source
+Quelle
+applying source
+wende Quelle an
+no audio tracks selected
+keine Audiospur ausgewählt
+no marker selected
+kein Marker ausgewählt
+no midi tracks selected
+keine Midispur ausgewählt

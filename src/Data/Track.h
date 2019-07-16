@@ -20,7 +20,7 @@ class Song;
 class TrackLayer;
 class Synthesizer;
 class AudioEffect;
-class CrossFade;
+class CrossFadeOld;
 class TrackMarker;
 enum class SignalType;
 
@@ -97,7 +97,7 @@ public:
 	Array<TrackMarker*> markers;
 	Array<TrackMarker*> markers_sorted() const;
 
-	Array<CrossFade> fades;
+	Array<CrossFadeOld> _fades_old;
 	bool has_version_selection();
 
 	Song *song;

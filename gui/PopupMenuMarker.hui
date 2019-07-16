@@ -9,6 +9,7 @@ Menu popup-menu-marker ""
 		Item /layer-delete "Delete"
 		Item /layer-add "Add version"
 		Item /layer-mark-dominant "Mark selection as dominant"
+		Item /layer-add-dominant "Add selection to dominant"
 		Item /layer-merge "Merge..."
 		Menu /menu-midi-mode "Midi mode"
 			Item /layer-midi-mode-linear "Linear" checkable

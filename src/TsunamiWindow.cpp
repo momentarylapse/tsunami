@@ -973,25 +973,31 @@ void TsunamiWindow::on_save() {
 	}
 }
 
+bool song_is_simple_audio(Song *s) {
+	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::AUDIO) and (s->tracks[0]->layers.num == 1));
+}
+
+bool song_is_simple_midi(Song *s) {
+	for (Track* t: s->tracks)
+		if ((t->type != SignalType::MIDI) and (t->type != SignalType::BEATS))
+			return false;
+	return true;
+}
+
 string _suggest_filename(Song *s, const string &dir) {
 	if (s->filename != "")
 		return s->filename.basename();
 	string base = get_current_date().format("%Y-%m-%d");
 
 	string ext = "nami";
-	if ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::AUDIO))
+	if (song_is_simple_audio(s))
 		ext = "ogg";
-	bool allow_midi = true;
-	for (Track* t: s->tracks)
-		if ((t->type != SignalType::MIDI) and (t->type != SignalType::BEATS))
-			allow_midi = false;
-	if (allow_midi)
+	else if (song_is_simple_midi(s))
 		ext = "midi";
 
 	for (int i=0; i<26; i++) {
 		string name = base + "a." + ext;
 		name[name.num - ext.num - 2] += i;
-		msg_write(dir + name);
 		if (!file_test_existence(dir + name))
 			return name;
 	}

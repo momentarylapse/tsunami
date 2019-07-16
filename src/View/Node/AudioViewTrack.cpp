@@ -107,25 +107,17 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 
 
 	if (track->has_version_selection()) {
-		Range r = Range(track->range().start(), 0);
-		int index = 0;
-		for (auto &f: track->fades) {
-			r = RangeTo(r.end(), f.position);
-			view->buffer_painter->set_clip(r);
+		for (auto *layer: track->layers) {
+			auto rr = layer->active_version_ranges();
 
-			for (AudioBuffer &b: track->layers[index]->buffers) {
-				view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
-				view->buffer_painter->draw_buffer(c, b, b.offset);
+			for (int i=0; i<rr.num; i+=2) {
+				view->buffer_painter->set_clip(rr[i]);
+
+				for (AudioBuffer &b: layer->buffers) {
+					view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
+					view->buffer_painter->draw_buffer(c, b, b.offset);
+				}
 			}
-
-			index = f.target;
-		}
-
-		r = RangeTo(r.end(), track->range().end());
-		view->buffer_painter->set_clip(r);
-		for (AudioBuffer &b: track->layers[index]->buffers) {
-			view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
-			view->buffer_painter->draw_buffer(c, b, b.offset);
 		}
 	} else {
 		view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);

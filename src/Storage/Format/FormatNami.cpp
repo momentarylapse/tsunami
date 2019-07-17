@@ -1364,6 +1364,18 @@ void FormatNami::make_consistent(StorageOperationData *od)
 			}
 		a->__fx.clear();
 	}
+
+	for (Track *t: a->tracks) {
+		if (t->_fades_old.num > 0) {
+			int previous = 0;
+			for (auto &f: t->_fades_old) {
+				t->layers[previous]->fades.add({f.position, CrossFade::OUTWARD, f.samples});
+				t->layers[f.target]->fades.add({f.position, CrossFade::INWARD, f.samples});
+				previous = f.target;
+			}
+
+		}
+	}
 }
 
 void FormatNami::load_song(StorageOperationData *od)

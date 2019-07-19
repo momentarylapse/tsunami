@@ -1,5 +1,6 @@
 // Image = hui:find
 // Title[Deutsch] = Supernova
+use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
 

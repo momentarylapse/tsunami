@@ -93,7 +93,7 @@ StackFrameInfo get_func_from_rip(void *rip)
 
 	// externally linked...
 	for (auto p: Packages){
-		func_from_rip_test_script(r, p.script, rip, true);
+		func_from_rip_test_script(r, p, rip, true);
 	}
 	return r;
 }
@@ -197,9 +197,9 @@ const Class* get_type(void *p)
 	if (!p)
 		return TypeUnknown;
 	void *vtable = *(void**)p;
-	Array<Script*> scripts = _public_scripts_;
+	auto scripts = _public_scripts_;
 	for (auto p: Packages)
-		scripts.add(p.script);
+		scripts.add(p);
 	for (Script* s: scripts)
 		for (auto *c: s->syntax->classes)
 			if (c->_vtable_location_compiler_)

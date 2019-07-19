@@ -355,9 +355,9 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 			AddFunctionCall(links[0]->as_func(), p_none, {param[0]}, p_none);
 			clear_nodes(links);
 			break;}
-		case STATEMENT_RAISE:
-			//AddFunctionCall();
-			break;
+		/*case STATEMENT_RAISE:
+			AddFunctionCall();
+			break;*/
 		case STATEMENT_TRY:{
 			int marker_finish = list->create_label("_TRY_AFTER_" + i2s(num_markers ++));
 			serialize_block(com->params[0]->as_block());

@@ -1,5 +1,6 @@
-use "../api.kaba"
-use "tone.kaba"
+use hui
+use "../api"
+use tone
 
 class Curve
 	color col, col_below

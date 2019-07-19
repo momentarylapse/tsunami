@@ -1,6 +1,6 @@
 // Image = hui:zoom-in
 // Title[Deutsch] = Hüllkurve
-
+use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
 

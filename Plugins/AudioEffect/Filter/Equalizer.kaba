@@ -1,6 +1,6 @@
 // Image = hui:properties
 // Title[Deutsch] = Equalizer
-
+use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
 use "../../helper/tone.kaba"

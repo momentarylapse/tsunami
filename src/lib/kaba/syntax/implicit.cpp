@@ -69,7 +69,7 @@ void SyntaxTree::AutoImplementConstructor(Function *f, const Class *t, bool allo
 			if (pc_same){
 				// first, try same signature
 				Node *n_init_parent = add_node_member_call(pc_same, cp_node(n_self));
-				for (int i=0;i<pc_same->param_types.num;i++)
+				for (int i=0; i<pc_same->func->num_params; i++)
 					n_init_parent->set_param(i, add_node_local_var(f->var[i]));
 				f->block->add(n_init_parent);
 			}else if (pc_def){
@@ -545,14 +545,14 @@ void SyntaxTree::AddMissingFunctionHeadersForClass(Class *t) {
 			if (has_own_constructors) {
 				// don't inherit constructors!
 				for (int i=t->functions.num-1; i>=0; i--)
-					if (t->functions[i].name == IDENTIFIER_FUNC_INIT and t->functions[i].needs_overriding)
+					if (t->functions[i].func->name == IDENTIFIER_FUNC_INIT and t->functions[i].needs_overriding)
 						t->functions.erase(i);
 			} else {
 				// only auto-implement matching constructors
 				for (auto *pcc: t->parent->get_constructors()) {
 					auto c = t->get_same_func(IDENTIFIER_FUNC_INIT, pcc->func);
 					if (needs_new(c))
-						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->param_types, class_func_param_names(pcc), c);
+						add_func_header(this, t, IDENTIFIER_FUNC_INIT, TypeVoid, pcc->func->literal_param_type, class_func_param_names(pcc), c);
 				}
 			}
 		} else {

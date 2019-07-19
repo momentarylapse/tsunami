@@ -312,20 +312,20 @@ void SIAddPackageHui()
 				func_add_param("id", TypeString);
 			class_add_func("event", TypeInt, mf(&hui::Panel::_kaba_event));
 				func_add_param("id", TypeString);
-				func_add_param("func", TypeFunctionP);
+				func_add_param("func", TypeFunctionCodeP);
 			class_add_func("event_o", TypeInt, mf(&hui::Panel::_kaba_event_o));
 				func_add_param("id", TypeString);
 				func_add_param("handler", TypePointer);
-				func_add_param("func", TypeFunctionP);
+				func_add_param("func", TypeFunctionCodeP);
 			class_add_func("event_x", TypeInt, mf(&hui::Panel::_kaba_event_x));
 				func_add_param("id", TypeString);
 				func_add_param("msg", TypeString);
-				func_add_param("func", TypeFunctionP);
+				func_add_param("func", TypeFunctionCodeP);
 			class_add_func("event_ox", TypeInt, mf(&hui::Panel::_kaba_event_ox));
 				func_add_param("id", TypeString);
 				func_add_param("msg", TypeString);
 				func_add_param("handler", TypePointer);
-				func_add_param("func", TypeFunctionP);
+				func_add_param("func", TypeFunctionCodeP);
 			class_add_func("remove_event_handler", TypeVoid, mf(&hui::Panel::remove_event_handler));
 				func_add_param("uid", TypeInt);
 			//class_add_func("beginDraw", TypeHuiPainterP, mf(&hui::HuiPanel::beginDraw));
@@ -501,15 +501,15 @@ void SIAddPackageHui()
 	
 	// user interface
 	add_func("HuiSetIdleFunction", TypeVoid, (void*)&HuiSetIdleFunctionKaba);
-		func_add_param("idle_func", TypeFunctionP);
+		func_add_param("idle_func", TypeFunctionCodeP);
 	add_func("HuiRunLater", TypeInt, (void*)&HuiRunLaterKaba);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypePointer);
-		func_add_param("f", TypeFunctionP);
+		func_add_param("f", TypeFunctionCodeP);
 	add_func("HuiRunRepeated", TypeInt, (void*)&HuiRunRepeatedKaba);
 		func_add_param("dt", TypeFloat32);
 		func_add_param("handler", TypePointer);
-		func_add_param("f", TypeFunctionP);
+		func_add_param("f", TypeFunctionCodeP);
 	add_func("HuiCancelRunner", TypeVoid, (void*)&hui::CancelRunner);
 		func_add_param("id", TypeInt);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode);
@@ -519,7 +519,7 @@ void SIAddPackageHui()
 		func_add_param("id", TypeString);
 		func_add_param("image", TypeString);
 		func_add_param("key_code", TypeInt);
-		func_add_param("func", TypeFunctionP);*/
+		func_add_param("func", TypeFunctionCodeP);*/
 	add_func("HuiGetEvent", TypeHuiEventP, (void*)&hui::GetEvent);
 	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
 	add_func("HuiEnd", TypeVoid, (void*)&hui::End);

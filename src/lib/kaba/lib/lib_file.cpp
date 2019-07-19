@@ -14,11 +14,6 @@ extern const Class *TypeIntPs;
 extern const Class *TypeFloatPs;
 extern const Class *TypeBoolPs;
 
-static Date *_date;
-#define	GetDADate(x)			int_p(&_date->x)-int_p(_date)
-static DirEntry *_dir_entry;
-#define	GetDADirEntry(x)			int_p(&_dir_entry->x)-int_p(_dir_entry)
-
 
 
 #pragma GCC push_options
@@ -180,7 +175,7 @@ void kaba_dir_delete(const string &f)
 
 void SIAddPackageFile()
 {
-	add_package("file", false);
+	add_package("file", true);
 
 	const Class *TypeFile = add_type("File", 0);
 	const Class *TypeFileP = add_type_p("File*", TypeFile);
@@ -193,121 +188,121 @@ void SIAddPackageFile()
 
 
 	add_class(TypeDate);
-		class_add_element("time", TypeInt, GetDADate(time));
-		class_add_element("year", TypeInt, GetDADate(year));
-		class_add_element("month", TypeInt, GetDADate(month));
-		class_add_element("day", TypeInt, GetDADate(day));
-		class_add_element("hour", TypeInt, GetDADate(hour));
-		class_add_element("minute", TypeInt, GetDADate(minute));
-		class_add_element("second", TypeInt, GetDADate(second));
-		class_add_element("milli_second", TypeInt, GetDADate(milli_second));
-		class_add_element("day_of_week", TypeInt, GetDADate(day_of_week));
-		class_add_element("day_of_year", TypeInt, GetDADate(day_of_year));
-		class_add_func("format", TypeString, mf(&Date::format));
+		class_add_elementx("time", TypeInt, &Date::time);
+		class_add_elementx("year", TypeInt, &Date::year);
+		class_add_elementx("month", TypeInt, &Date::month);
+		class_add_elementx("day", TypeInt, &Date::day);
+		class_add_elementx("hour", TypeInt, &Date::hour);
+		class_add_elementx("minute", TypeInt, &Date::minute);
+		class_add_elementx("second", TypeInt, &Date::second);
+		class_add_elementx("milli_second", TypeInt, &Date::milli_second);
+		class_add_elementx("day_of_week", TypeInt, &Date::day_of_week);
+		class_add_elementx("day_of_year", TypeInt, &Date::day_of_year);
+		class_add_funcx("format", TypeString, &Date::format);
 			func_add_param("f", TypeString);
-		class_add_func("str", TypeString, mf(&Date::str));
+		class_add_funcx("str", TypeString, &Date::str);
 	
 	add_class(TypeFile);
-		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, mf(&KabaFile::__delete__));
-		//class_add_func("getCDate", TypeDate, mf(&File::GetDateCreation));
-		class_add_func("get_date", TypeDate, mf(&File::GetDateModification));
-		//class_add_func("getADate", TypeDate, mf(&File::GetDateAccess));
-		class_add_func("get_size", TypeInt, mf(&File::get_size));
-		class_add_func("get_pos", TypeInt, mf(&File::get_pos));
-		class_add_func("set_pos", TypeVoid, mf(&File::set_pos), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFile::__delete__);
+		//class_add_funcx("getCDate", TypeDate, &File::GetDateCreation);
+		class_add_funcx("get_date", TypeDate, &File::GetDateModification);
+		//class_add_funcx("getADate", TypeDate, &File::GetDateAccess);
+		class_add_funcx("get_size", TypeInt, &File::get_size);
+		class_add_funcx("get_pos", TypeInt, &File::get_pos);
+		class_add_funcx("set_pos", TypeVoid, &File::set_pos, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("pos", TypeInt);
-		class_add_func("seek", TypeVoid, mf(&File::seek), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("seek", TypeVoid, &File::seek, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("delta", TypeInt);
-		class_add_func("read", TypeString, mf(&KabaFile::_read_buffer), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("read", TypeString, &KabaFile::_read_buffer, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("size", TypeInt);
-		class_add_func("write", TypeInt, mf(&KabaFile::_write_buffer), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("write", TypeInt, &KabaFile::_write_buffer, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
-		class_add_func("__lshift__", TypeVoid, mf(&KabaFile::_write_bool), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__lshift__", TypeVoid, &KabaFile::_write_bool, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("b", TypeBool);
-		class_add_func("__lshift__", TypeVoid, mf(&KabaFile::_write_int), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__lshift__", TypeVoid, &KabaFile::_write_int, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("i", TypeInt);
-		class_add_func("__lshift__", TypeVoid, mf(&KabaFile::_write_float), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__lshift__", TypeVoid, &KabaFile::_write_float, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("x", TypeFloat32);
-		class_add_func("__lshift__", TypeVoid, mf(&KabaFile::_write_vector), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__lshift__", TypeVoid, &KabaFile::_write_vector, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("v", TypeVector);
-		class_add_func("__lshift__", TypeVoid, mf(&KabaFile::_write_str), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__lshift__", TypeVoid, &KabaFile::_write_str, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
-		class_add_func("__rshift__", TypeVoid, mf(&KabaFile::_read_bool), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__rshift__", TypeVoid, &KabaFile::_read_bool, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("b", TypeBoolPs);
-		class_add_func("__rshift__", TypeVoid, mf(&KabaFile::_read_int), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__rshift__", TypeVoid, &KabaFile::_read_int, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("i", TypeIntPs);
-		class_add_func("__rshift__", TypeVoid, mf(&KabaFile::_read_float), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__rshift__", TypeVoid, &KabaFile::_read_float, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("x", TypeFloatPs);
-		class_add_func("__rshift__", TypeVoid, mf(&KabaFile::_read_vector), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__rshift__", TypeVoid, &KabaFile::_read_vector, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("v", TypeVector);
-		class_add_func("__rshift__", TypeVoid, mf(&KabaFile::_read_str), FLAG_RAISES_EXCEPTIONS);
+		class_add_funcx("__rshift__", TypeVoid, &KabaFile::_read_str, FLAG_RAISES_EXCEPTIONS);
 			func_add_param("s", TypeString);
-		class_add_func("eof", TypeBool, mf(&KabaFile::eof));
+		class_add_funcx("eof", TypeBool, &KabaFile::eof);
 
 	
 	add_class(TypeDirEntry);
-		class_add_element("name", TypeString, GetDADirEntry(name));
-		class_add_element("size", TypeInt, GetDADirEntry(size));
-		class_add_element("is_dir", TypeBool, GetDADirEntry(is_dir));
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&DirEntry::__init__));
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&DirEntry::__assign__));
+		class_add_elementx("name", TypeString, &DirEntry::name);
+		class_add_elementx("size", TypeInt, &DirEntry::size);
+		class_add_elementx("is_dir", TypeBool, &DirEntry::is_dir);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &DirEntry::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &DirEntry::__assign__);
 			func_add_param("other", TypeDirEntry);
-		class_add_func("str", TypeString, mf(&DirEntry::str));
+		class_add_funcx("str", TypeString, &DirEntry::str);
 	
 	add_class(TypeDirEntryList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&DirEntryList::__init__));
-		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&DirEntryList::__assign__));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &DirEntryList::__init__);
+		class_add_funcx(IDENTIFIER_FUNC_ASSIGN, TypeVoid, &DirEntryList::__assign__);
 			func_add_param("other", TypeDirEntryList);
-		class_add_func("str", TypeString, mf(&DirEntryList::str));
+		class_add_funcx("str", TypeString, &DirEntryList::str);
 
 	add_class(TypeFileError);
 		class_derive_from(TypeException, false, false);
 		class_set_vtable(KabaFileError);
 
 	// file access
-	add_func("FileOpen", TypeFileP, (void*)&kaba_file_open, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileOpen", TypeFileP, &kaba_file_open, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileOpenText", TypeFileP, (void*)&kaba_file_open_text, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileOpenText", TypeFileP, &kaba_file_open_text, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileCreate", TypeFileP, (void*)&kaba_file_create, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileCreate", TypeFileP, &kaba_file_create, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileCreateText", TypeFileP, (void*)&kaba_file_create_text, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileCreateText", TypeFileP, &kaba_file_create_text, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileRead", TypeString, (void*)&kaba_file_read, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileRead", TypeString, &kaba_file_read, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileReadText", TypeString, (void*)&kaba_file_read_text, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileReadText", TypeString, &kaba_file_read_text, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileWrite", TypeVoid, (void*)&kaba_file_write, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-		func_add_param("buffer", TypeString);
-	add_func("FileWriteText", TypeVoid, (void*)&kaba_file_write_text, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileWrite", TypeVoid, &kaba_file_write, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
 		func_add_param("buffer", TypeString);
-	add_func("FileExists", TypeBool, (void*)&file_test_existence);
+	add_funcx("FileWriteText", TypeVoid, &kaba_file_write_text, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("FileIsDirectory", TypeBool, (void*)&file_is_directory);
+		func_add_param("buffer", TypeString);
+	add_funcx("FileExists", TypeBool, &file_test_existence);
 		func_add_param("filename", TypeString);
-	add_func("FileHash", TypeString, (void*)&kaba_file_hash, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileIsDirectory", TypeBool, &file_is_directory);
+		func_add_param("filename", TypeString);
+	add_funcx("FileHash", TypeString, &kaba_file_hash, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
 		func_add_param("type", TypeString);
-	add_func("FileRename", TypeVoid, (void*)&kaba_file_rename, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileRename", TypeVoid, &kaba_file_rename, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("source", TypeString);
 		func_add_param("dest", TypeString);
-	add_func("FileCopy", TypeVoid, (void*)&kaba_file_copy, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileCopy", TypeVoid, &kaba_file_copy, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("source", TypeString);
 		func_add_param("dest", TypeString);
-	add_func("FileDelete", TypeVoid, (void*)&kaba_file_delete, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("FileDelete", TypeVoid, &kaba_file_delete, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("filename", TypeString);
-	add_func("DirSearch", TypeDirEntryList, (void*)&dir_search);
+	add_funcx("DirSearch", TypeDirEntryList, &dir_search);
 		func_add_param("dir", TypeString);
 		func_add_param("filter", TypeString);
 		func_add_param("show_dirs", TypeBool);
-	add_func("DirCreate", TypeVoid, (void*)&kaba_dir_create, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("DirCreate", TypeVoid, &kaba_dir_create, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("dir", TypeString);
-	add_func("DirDelete", TypeVoid, (void*)&kaba_dir_delete, FLAG_RAISES_EXCEPTIONS);
+	add_funcx("DirDelete", TypeVoid, &kaba_dir_delete, FLAG_RAISES_EXCEPTIONS);
 		func_add_param("dir", TypeString);
-	add_func("GetCurDir", TypeString, (void*)&get_current_dir);
-	add_func("GetCurDate", TypeDate, (void*)&get_current_date);
+	add_funcx("GetCurDir", TypeString, &get_current_dir);
+	add_funcx("GetCurDate", TypeDate, &get_current_date);
 }
 
 };

@@ -1,6 +1,6 @@
 // Image = hui:properties
 // Title[Deutsch] = Kompressor
-
+use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
 

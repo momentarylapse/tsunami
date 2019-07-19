@@ -379,7 +379,7 @@ void __rect_set(rect &r, float x1, float x2, float y1, float y2)
 
 void SIAddPackageMath()
 {
-	add_package("math", false);
+	add_package("math", true);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(float) * 2);

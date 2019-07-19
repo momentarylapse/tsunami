@@ -26,6 +26,8 @@ class SyntaxTree;
 class Class;
 class Value;
 class Function;
+class Variable;
+class Constant;
 
 
 void script_make_super_array(Class *t, SyntaxTree *ps = nullptr);
@@ -154,7 +156,7 @@ enum
 	STATEMENT_SIZEOF,
 	STATEMENT_TYPE,
 	STATEMENT_ASM,
-	STATEMENT_RAISE,
+	//STATEMENT_RAISE,
 	STATEMENT_TRY,
 	STATEMENT_EXCEPT,
 	STATEMENT_PASS,
@@ -447,14 +449,7 @@ int ProcessClassNumVirtuals(const string &class_name, int num_virtual);
 //--------------------------------------------------------------------------------------------------
 // packages
 
-class Package
-{
-public:
-	string name;
-	Script *script;
-	bool used_by_default;
-};
-extern Array<Package> Packages;
+extern Array<Script*> Packages;
 
 
 };

@@ -1,5 +1,6 @@
 // Image = hui:find
 // Title[Deutsch] = Tonerkennung
+use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
 use "../MidiSource/Click.kaba"

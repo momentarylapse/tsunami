@@ -89,6 +89,14 @@ public:
 
 	bool just_analyse, show_compiler_stats;
 	Function *cur_func;
+
+
+	// package
+	bool used_by_default;
+	Array<const Class*> classes();
+	Array<Variable*> variables();
+	Array<Constant*> constants();
+	Array<Function*> functions();
 };
 
 Script *Load(const string &filename, bool just_analyse = false);

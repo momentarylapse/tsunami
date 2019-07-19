@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.1.0";
+string Version = "0.17.2.1";
 
 //#define ScriptDebug
 
@@ -224,6 +224,7 @@ void Script::set_variable(const string &name, void *data)
 Script::Script()
 {
 	filename = "-empty script-";
+	used_by_default = false;
 
 	reference_counter = 0;
 
@@ -384,6 +385,22 @@ void Script::show_vars(bool include_consts)
 	/*if (include_consts)
 		foreachi(LocalVariable &c, pre_script->Constant, i)
 			print_var((void*)g_var[i], c.name, c.type);*/
+}
+
+Array<const Class*> Script::classes() {
+	return syntax->classes;
+}
+
+Array<Function*> Script::functions() {
+	return syntax->functions;
+}
+
+Array<Variable*> Script::variables() {
+	return syntax->root_of_all_evil.var;
+}
+
+Array<Constant*> Script::constants() {
+	return syntax->constants;
 }
 
 };

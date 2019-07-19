@@ -75,12 +75,16 @@ ColorScheme ColorSchemeBasic::create(bool active) const {
 	c.blob_bg_alt_hidden = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
 	c.blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.5f), c.background_track_selected, 0.6f);
 	c.blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.4f), c.background_track_selected, 0.3f);
+	
+	//c.selection_internal = c.blob_bg_selected;
+	//c.grid_selected = c.blob_bg_selected;
+	c.background_track_selection = c.blob_bg;
 
 	c.red = ColorInterpolate(Red, background, 0.3f);
 	c.green = ColorInterpolate(Green, background, 0.3f);
 	c.blue = ColorInterpolate(Blue, background, 0.3f);
 	c.white = ColorInterpolate(White, background, 0.3f);
-	c.red_hover = ColorInterpolate(c.red, hover, 0.3f);
+	c.red_hover = ColorInterpolate(c.red, hover, 0.3f); // DEPRECATED
 	c.green_hover = ColorInterpolate(c.green, hover, 0.3f);
 	c.blue_hover = ColorInterpolate(c.blue, hover, 0.3f);
 	c.white_hover = ColorInterpolate(c.white, hover, 0.3f);

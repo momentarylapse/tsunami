@@ -40,7 +40,7 @@ void amd64_image_get_pixel(color &r, Image &i, int x, int y)
 
 void SIAddPackageImage()
 {
-	add_package("image", false);
+	add_package("image", true);
 
 	TypeImage = add_type("Image", sizeof(Image));
 	const Class *TypeImageP = add_type_p("Image*", TypeImage);

@@ -183,14 +183,21 @@ public:
 	}
 
 
-	color signal_color(SignalType type, bool hover = false) {
+	color signal_color(SignalType type) {
 		if (type == SignalType::AUDIO)
-			return hover ? view->colors.red_hover : view->colors.red;
+			return view->colors.red;
 		if (type == SignalType::MIDI)
-			return hover ? view->colors.green_hover : view->colors.green;
+			return view->colors.green;
 		if (type == SignalType::BEATS)
-			return hover ? view->colors.blue_hover : view->colors.blue;
-		return hover ? view->colors.white_hover : view->colors.white;
+			return view->colors.blue;
+		return view->colors.white;
+	}
+
+	color signal_color(SignalType type, bool hover) {
+		color c = signal_color(type);
+		if (hover)
+			c = view->colors.hoverify(c);
+		return c;
 	}
 	
 	void draw_arrow(Painter *p, const complex &m, const complex &_d, float length) {

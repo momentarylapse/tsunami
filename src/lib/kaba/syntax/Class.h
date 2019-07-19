@@ -27,16 +27,13 @@ public:
 class ClassFunction
 {
 public:
-	string name;
-	Script *script;
 	Function *func;
 	// _func_(x)  ->  p.func(x)
-	Array<const Class*> param_types; // literal!
 	const Class *return_type; // literal!
 	int virtual_index;
 	bool needs_overriding;
 	ClassFunction();
-	ClassFunction(const string &name, const Class *return_type, Script *s, Function *f);
+	ClassFunction(const Class *return_type, Function *f);
 	string signature(bool include_class) const;
 };
 
@@ -114,8 +111,6 @@ extern const Class *TypeReg8; // dummy for compilation
 extern const Class *TypeVoid;
 extern const Class *TypePointer;
 extern const Class *TypeChunk;
-extern const Class *TypeFunction;
-extern const Class *TypeFunctionP;
 extern const Class *TypeBool;
 extern const Class *TypeInt;
 extern const Class *TypeInt64;
@@ -136,6 +131,10 @@ extern const Class *TypeExceptionP;
 
 extern const Class *TypeClass;
 extern const Class *TypeClassP;
+extern const Class *TypeFunction;
+extern const Class *TypeFunctionP;
+extern const Class *TypeFunctionCode;
+extern const Class *TypeFunctionCodeP;
 
 };
 

@@ -1,5 +1,6 @@
 // Image = hui:media-play
 // Title[Deutsch] = Metronom
+use hui
 use "../api.kaba"
 
 enum

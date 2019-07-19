@@ -565,6 +565,9 @@ void SIAddPackageX()
 		class_add_element("triangle_index",	TypeIntList,	GetDASubSkin(triangle_index));
 		class_add_element("skin_vertex",	TypeFloatList,	GetDASubSkin(skin_vertex));
 		class_add_element("normal",			TypeVectorList,	GetDASubSkin(normal));
+		
+	add_class(TypeSubSkinList);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<SubSkin>::__init__);
 
 	add_class(TypeMaterial);
 		class_add_element("textures",		TypeTexturePList,	GetDAMaterial(textures));
@@ -600,7 +603,7 @@ void SIAddPackageX()
 		class_add_element("cur_pos",		TypeVector,		GetDABone(cur_pos));
 
 	add_class(TypeBoneList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Array<Bone>::__init__)));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<Bone>::__init__);
 
 	add_class(TypeModel);
 		class_add_element("pos",			TypeVector,		GetDAModel(pos));
@@ -689,7 +692,7 @@ void SIAddPackageX()
 		class_set_vtable_x(Model);
 
 	add_class(TypeModelPList);
-		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, x_p(mf(&Array<Model*>::__init__)));
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<Model*>::__init__);
 
 	add_class(TypeTerrain);
 		class_add_element("pos",			TypeVector,		GetDATerrain(pos));
@@ -779,7 +782,7 @@ void SIAddPackageX()
 		class_add_func_virtual("on_remove_client",		TypeVoid,	x_p(mf(&Controller::on_remove_client)));
 		class_add_func("add_net_msg_handler",		TypeVoid,			x_p(mf(&Controller::add_net_msg_handler)));
 			func_add_param("name",		TypeString);
-			func_add_param("func",		TypeFunctionP);
+			func_add_param("func",		TypeFunctionCodeP);
 		class_add_func("start_net_msg",		TypeVoid,			x_p(mf(&Controller::start_net_msg)));
 			func_add_param("name",		TypeString);
 			func_add_param("target",		TypeInt);

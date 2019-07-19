@@ -387,14 +387,16 @@ void relink_calls(Script *s, Script *target, IncludeTranslationData &d)
 	//msg_write("relink ----" + s->filename + " : " + d.source->filename + " -> " + target->filename + "  ---------");
 	s->syntax->transform([&](Node *n){ return conv_relink_calls(n, s, target, d); });
 
+#if 0
 	// we might need some constructors later on...
 	for (const Class *t: s->syntax->classes)
 		for (ClassFunction &f: t->functions)
-			if (f.script == d.source){
+			if (f.func->owner == d.source->syntax){
 				if (f.script->filename.find(".kaba") < 0)
 					continue;
-				f.script = target;
+				f.script = target; ARGH
 			}
+#endif
 }
 
 IncludeTranslationData import_deep(SyntaxTree *dest, SyntaxTree *source)

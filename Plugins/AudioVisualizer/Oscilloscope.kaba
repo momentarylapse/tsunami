@@ -1,5 +1,6 @@
 // Image = hui:media-play
 // Title[Deutsch] = Oszilloskop
+use hui
 use "../api.kaba"
 
 const int NUM_SAMPLES = 2048

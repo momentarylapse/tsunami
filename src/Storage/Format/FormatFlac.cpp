@@ -14,6 +14,7 @@
 #include "../../Data/TrackLayer.h"
 #include "../../Data/Song.h"
 #include "../../Data/base.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #if HAS_LIB_FLAC
 #include <FLAC/all.h>
 
@@ -23,7 +24,6 @@ int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 SampleFormat flac_format;
 int flac_read_samples;
 
-#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 // -> FormatOgg.cpp
 string tag_from_vorbis(const string &key);
@@ -44,11 +44,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
 	AudioBuffer buf;
-	od->layer->get_buffers(buf, range);
-
-	Action *a = nullptr;
-	if (od->song->history_enabled())
-		a = new ActionTrackEditBuffer(od->layer, range);
+	auto *a = od->layer->edit_buffers(buf, range);
 
 	float scale = pow(2.0f, flac_bits-1);
 	for (int ci=0; ci<buf.channels; ci++){
@@ -57,8 +53,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 			buf.c[ci][i] = source[i] / scale;
 	}
 
-	if (od->song->history_enabled())
-		od->song->execute(a);
+	od->layer->edit_buffers_finish(a);
 
 	flac_read_samples += frame->header.blocksize;
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;

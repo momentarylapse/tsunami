@@ -14,6 +14,7 @@
 #include "../View/Helper/Slider.h"
 #include "../Data/base.h"
 #include "../Data/Song.h"
+#include "../Data/SongSelection.h"
 #include "../Data/Track.h"
 #include "../Data/TrackLayer.h"
 #include "../Data/TrackMarker.h"
@@ -450,6 +451,8 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassOffset("TrackLayer", "track", _offsetof(TrackLayer, track));
 	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::get_buffers));
 	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::read_buffers));
+	Kaba::LinkExternal("TrackLayer.edit_buffers", Kaba::mf(&TrackLayer::edit_buffers));
+	Kaba::LinkExternal("TrackLayer.edit_buffers_finish", Kaba::mf(&TrackLayer::edit_buffers_finish));
 	Kaba::LinkExternal("TrackLayer.insert_midi_data", Kaba::mf(&TrackLayer::insert_midi_data));
 	Kaba::LinkExternal("TrackLayer.add_midi_note", Kaba::mf(&TrackLayer::add_midi_note));
 	//Kaba::LinkExternal("TrackLayer.add_midi_notes", Kaba::mf(&TrackLayer::addMidiNotes));
@@ -601,6 +604,15 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Storage.save_via_renderer", Kaba::mf(&Storage::save_via_renderer));
 	Kaba::LinkExternal("Storage.load_buffer", Kaba::mf(&Storage::load_buffer));
 	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
+
+
+	Kaba::DeclareClassSize("SongSelection", sizeof(SongSelection));
+	Kaba::DeclareClassOffset("SongSelection", "range", _offsetof(SongSelection, range));
+	Kaba::LinkExternal("SongSelection.has_track", Kaba::mf((bool (SongSelection::*)(const Track*) const)&SongSelection::has));
+	Kaba::LinkExternal("SongSelection.has_layer", Kaba::mf((bool (SongSelection::*)(const TrackLayer*) const)&SongSelection::has));
+	Kaba::LinkExternal("SongSelection.has_marker", Kaba::mf((bool (SongSelection::*)(const TrackMarker*) const)&SongSelection::has));
+	Kaba::LinkExternal("SongSelection.has_note", Kaba::mf((bool (SongSelection::*)(const MidiNote*) const)&SongSelection::has));
+	Kaba::LinkExternal("SongSelection.has_bar", Kaba::mf((bool (SongSelection::*)(const Bar*) const)&SongSelection::has));
 
 
 	Slider slider;

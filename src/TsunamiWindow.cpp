@@ -391,11 +391,10 @@ void TsunamiWindow::on_track_render() {
 
 		AudioBuffer buf;
 		Range r = Range(offset, min(chunk_size, range.end() - offset));
-		t->layers[0]->get_buffers(buf, r);
+		auto *a = t->layers[0]->edit_buffers(buf, r);
 
-		auto *a = new ActionTrackEditBuffer(t->layers[0], r);
 		renderer.read(buf);
-		song->execute(a);
+		t->layers[0]->edit_buffers_finish(a);
 
 		offset += chunk_size;
 		if (p->is_cancelled())
@@ -574,8 +573,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	fx->reset_state();
 
 	AudioBuffer buf;
-	l->get_buffers(buf, r);
-	auto *a = new ActionTrackEditBuffer(l, r);
+	auto *a = l->edit_buffers(buf, r);
 
 	int chunk_size = 2048;
 	int done = 0;
@@ -587,7 +585,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 		done += chunk_size;
 	}
 
-	l->song()->execute(a);
+	l->edit_buffers_finish(a);
 	delete p;
 }
 
@@ -596,8 +594,7 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 	fx->reset_state();
 	
 	AudioBuffer buf;
-	l->get_buffers(buf, r);
-	auto *a = new ActionTrackEditBuffer(l, r);
+	auto *a = l->edit_buffers(buf, r);
 	buf.set_zero();
 
 	int chunk_size = 2048;
@@ -610,7 +607,7 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 		done += chunk_size;
 	}
 
-	l->song()->execute(a);
+	l->edit_buffers_finish(a);
 	delete p;
 }
 

@@ -8,7 +8,6 @@
 #include "Clipboard.h"
 #include "../View/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
-#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../Session.h"
 #include "../Data/base.h"
 #include "../Data/Song.h"
@@ -111,10 +110,9 @@ void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, AudioView *v
 	if (target->type == SignalType::AUDIO){
 		Range r = Range(view->sel.range.start(), source->buffers[0].length);
 		AudioBuffer buf;
-		target->get_buffers(buf, r);
-		Action *a = new ActionTrackEditBuffer(target, r);
+		auto *a = target->edit_buffers(buf, r);
 		buf.set(source->buffers[0], 0, 1.0f);
-		s->execute(a);
+		target->edit_buffers_finish(a);
 	}else if (target->type == SignalType::MIDI){
 		for (MidiNote *n: source->midi){
 			MidiNote *nn = n->copy();

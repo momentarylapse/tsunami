@@ -13,6 +13,7 @@
 #include "SampleRef.h"
 #include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../Action/Track/Layer/ActionTrackLayerMakeTrack.h"
 #include "../Action/Track/Layer/ActionTrackLayerMarkDominant.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
@@ -155,11 +156,16 @@ void TrackLayer::get_buffers(AudioBuffer &buf, const Range &r) {
 	read_buffers(buf, r, true);
 }
 
-// DEPRECATED
-AudioBuffer TrackLayer::_get_buffers(const Range &r) {
-	AudioBuffer b;
-	get_buffers(b, r);
-	return b;
+Action *TrackLayer::edit_buffers(AudioBuffer &buf, const Range &r) {
+	get_buffers(buf, r);
+	if (track->song->history_enabled())
+		return new ActionTrackEditBuffer(this, r);
+	return NULL;
+}
+
+void TrackLayer::edit_buffers_finish(Action *a) {
+	if (a)
+		track->song->execute(a);
 }
 
 SampleRef *TrackLayer::add_sample_ref(int pos, Sample* sample) {

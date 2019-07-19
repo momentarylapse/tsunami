@@ -18,7 +18,6 @@
 #include "../../Module/SignalChain.h"
 #include "../SideBar/SideBar.h"
 #include "../../Session.h"
-#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 
@@ -128,14 +127,13 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 		layer = target->add_layer();
 
 	AudioBuffer tbuf;
-	layer->get_buffers(tbuf, r);
-	auto *a = new ActionTrackEditBuffer(layer, r);
+	auto *a = layer->edit_buffers(tbuf, r);
 
 	/*if (hui::Config.getInt("Input.Mode", 0) == 1)
 		tbuf.add(buf, 0, 1.0f, 0);
 	else*/
 		tbuf.set(buf, 0, 1.0f);
-	song->execute(a);
+	layer->edit_buffers_finish(a);
 	song->end_action_group();
 }
 

@@ -11,8 +11,8 @@
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
 #include "../../Data/TrackLayer.h"
+#include "../../Data/Audio/AudioBuffer.h"
 #include "../../Action/ActionManager.h"
-#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../../Module/Audio/SongRenderer.h"
 
 FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags) {
@@ -62,11 +62,10 @@ Format::Format() {
 
 void Format::import_data(TrackLayer *layer, void *data, int channels, SampleFormat format, int samples, int offset) {
 	AudioBuffer buf;
-	layer->get_buffers(buf, Range(offset, samples));
+	auto *a = layer->edit_buffers(buf, Range(offset, samples));
 
-	Action *a = new ActionTrackEditBuffer(layer, Range(offset, samples));
 	buf.import(data, channels, format, samples);
-	layer->track->song->execute(a);
+	layer->edit_buffers_finish(a);
 }
 
 

@@ -1,0 +1,50 @@
+use hui
+use "../api.kaba"
+
+// t in [0,1]
+float step(float t)
+	return 1 - 1/(exp((t-0.5)*12) + 1)
+
+class ShowSpectrum extends SongPlugin
+	void soft_paste(AudioBuffer source, TrackLayer *dest, Range r)
+		int l = min(len(source), len(r))
+		AudioBuffer buf
+		let a = dest.edit_buffers(buf, Range(r.offset, l))
+		int ll = min(2000, l/4)
+		for i in 0:l
+			float x = 1
+			if i < ll
+				x = step(i2f(i) / ll)
+			if i > l - ll
+				x = step(i2f(l - i) / ll)
+			buf.l[i] = x * source.l[i] + (1-x) * buf.l[i]
+			buf.r[i] = x * source.r[i] + (1-x) * buf.r[i]
+		dest.edit_buffers_finish(a)
+	
+	bool check_clipboard()
+		if clipboard.temp.tracks.num == 0
+			return false
+		if clipboard.temp.tracks[0].type != TYPE_AUDIO
+			return false
+		return true
+		
+	
+	override void apply()
+		if !check_clipboard()
+			session.e("'Soft Paste': needs a single audio track in clipboard!")
+			return
+		if session.view.sel.range.length == 0
+			session.e("'Soft Paste': needs some selection!")
+			return
+
+		int n = 0
+		for t in song.tracks
+			if t.type == TYPE_AUDIO
+				for l in t.layers
+					if session.view.sel.has_layer(l)
+						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range)
+						n ++
+
+		if n == 0
+			session.e("'Soft Paste': no selected audio track")
+			return

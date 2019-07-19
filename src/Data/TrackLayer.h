@@ -21,6 +21,7 @@ class SampleRef;
 class Sample;
 class Track;
 class CrossFade;
+class Action;
 enum class SignalType;
 
 
@@ -37,8 +38,9 @@ public:
 	void _cdecl read_buffers_fixed(AudioBuffer &buf, const Range &r);
 
 	// actions
-	AudioBuffer _cdecl _get_buffers(const Range &r);
 	void _cdecl get_buffers(AudioBuffer &buf, const Range &r);
+	Action _cdecl *edit_buffers(AudioBuffer &buf, const Range &r);
+	void _cdecl edit_buffers_finish(Action *a);
 
 	void _cdecl insert_midi_data(int offset, const MidiNoteBuffer &midi);
 	void _cdecl add_midi_note(MidiNote *n);

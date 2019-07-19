@@ -25,7 +25,6 @@ namespace hui{
 namespace Kaba{
 	class Script;
 	class Class;
-	class Package;
 }
 
 class PluginManager
@@ -74,7 +73,7 @@ public:
 	FavoriteManager *favorites;
 
 
-	Kaba::Package package;
+	Kaba::Script *package;
 	Kaba::Class *get_class(const string &name);
 };
 

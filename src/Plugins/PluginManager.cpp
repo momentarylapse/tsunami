@@ -67,15 +67,14 @@ PluginManager::PluginManager()
 
 	find_plugins();
 
-	package.name = "-tsunami-internal-";
-	package.script = new Kaba::Script;
-	package.script->filename = package.name;
-	package.used_by_default = false;
+	package = new Kaba::Script;
+	package->filename = "-tsunami-internal-";
+	package->used_by_default = false;
 	Kaba::Packages.add(package);
-	Kaba::_public_scripts_.add(package.script);
+	Kaba::_public_scripts_.add(package);
 
-	auto *type_dev = package.script->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr);
-	package.script->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, type_dev);
+	auto *type_dev = package->syntax->make_class("Device", Kaba::Class::Type::OTHER, 0, 0, nullptr);
+	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, type_dev);
 }
 
 PluginManager::~PluginManager()
@@ -645,7 +644,7 @@ void PluginManager::link_app_script_data()
 
 Kaba::Class* PluginManager::get_class(const string &name)
 {
-	return (Kaba::Class*)package.script->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr);
+	return (Kaba::Class*)package->syntax->make_class(name, Kaba::Class::Type::OTHER, 0, 0, nullptr);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)

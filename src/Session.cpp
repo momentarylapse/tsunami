@@ -158,15 +158,14 @@ void Session::set_mode(const string &mode) {
 	} else if (mode == "default/mixing") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->set_mode(MixerMode::VOLUME);
 	} else if (mode == "default/fx") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->set_mode(MixerMode::EFFECTS);
+		win->bottom_bar->mixing_console->show_fx(view->cur_track());
 	} else if (mode == "default/midi-fx") {
 		view->set_mode(view->mode_default);
 		win->bottom_bar->open(BottomBar::MIXING_CONSOLE);
-		win->bottom_bar->mixing_console->set_mode(MixerMode::MIDI_EFFECTS);
+		win->bottom_bar->mixing_console->show_fx(view->cur_track());
 	} else if (mode == "default/synth"){
 		view->set_mode(view->mode_default);
 		win->side_bar->open(SideBar::SYNTH_CONSOLE);

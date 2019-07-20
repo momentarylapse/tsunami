@@ -9,8 +9,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-ActionCurveEdit::ActionCurveEdit(Curve *_curve, const string &_name, float _min, float _max, Array<Curve::Target> &_targets)
-{
+ActionCurveEdit::ActionCurveEdit(Curve *_curve, const string &_name, float _min, float _max, Array<Curve::Target> &_targets) {
 	curve = _curve;
 	name = _name;
 	min = _min;
@@ -18,12 +17,7 @@ ActionCurveEdit::ActionCurveEdit(Curve *_curve, const string &_name, float _min,
 	targets = _targets;
 }
 
-ActionCurveEdit::~ActionCurveEdit()
-{
-}
-
-void* ActionCurveEdit::execute(Data* d)
-{
+void* ActionCurveEdit::execute(Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	auto _name = name;
@@ -47,8 +41,7 @@ void* ActionCurveEdit::execute(Data* d)
 	return nullptr;
 }
 
-void ActionCurveEdit::undo(Data* d)
-{
+void ActionCurveEdit::undo(Data* d) {
 	execute(d);
 }
 

@@ -8,15 +8,20 @@ Dialog track-mixer2 ""
 					Slider volume "0" range=0:1:0.001 vertical width=80 expandy "tooltip=Volume in dB"
 					DrawingArea peaks "" width=5 noexpandx
 				Grid ? ""
+					Label ? "" width=5
 					ToggleButton mute "M" "tooltip=Mute" flat height=20 expandx padding=1
 					ToggleButton solo "S" "tooltip=Solo" flat height=20 expandx padding=1
-					ToggleButton show-fx "F" "tooltip=Effects" flat height=20 expandx padding=1
-			Revealer revealer-fx "" slide=left
-				TabControl tc "fx\\midi" width=140
-					Grid grid-fx "" expandy vertical
-						ListView fx "enabled\\name" format=Ct reorderable nobar expandy expandx
-						Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx
-					Grid grid-midi-fx "" expandy vertical
-						ListView midi-fx "enabled\\name" format=Ct reorderable nobar expandy expandx
-						Button add-midi-fx "" "tooltip=Add new midi effect" image=hui:add flat expandx
+					ToggleButton show-fx "fx" "tooltip=Effects" flat height=20 expandx padding=1
+					Label ? "" width=5
+			Revealer revealer-fx "" slide=right
+				Grid ? "" expandx
+					TabControl tc "fx\\midi" width=140
+						Grid grid-fx "" expandy vertical
+							ListView fx "enabled\\name" format=Ct reorderable nobar expandy expandx
+							Button add-fx "" "tooltip=Add new effect" image=hui:add flat expandx
+						Grid grid-midi-fx "" expandy vertical
+							ListView midi-fx "enabled\\name" format=Ct reorderable nobar expandy expandx
+							Button add-midi-fx "" "tooltip=Add new midi effect" image=hui:add flat expandx
+			Revealer config-revealer "" slide=right
+				Grid grid-config "" width=400
 

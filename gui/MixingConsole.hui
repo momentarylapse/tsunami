@@ -12,5 +12,3 @@ Dialog mixing-console "" width=300 height=200
 		Separator ? "" vertical
 		Scroller ? "" expandx scrolly=no
 			Grid inner-grid ""
-		Revealer config-revealer "" slide=right
-			Grid config-panel-grid "" width=300 noexpandx

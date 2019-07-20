@@ -23,27 +23,22 @@ class Session;
 class BottomBarConsole;
 class PluginConsole;
 
-class BottomBar : public Observable<hui::Panel>
-{
+class BottomBar : public Observable<hui::Panel> {
 public:
 	BottomBar(Session *session);
 	virtual ~BottomBar();
 
 
-	enum{
+	enum {
 		MIXING_CONSOLE,
 		SIGNAL_EDITOR,
 		DEVICE_CONSOLE,
 		PLUGIN_CONSOLE,
-		LOG_CONSOLE,
-
-		FAKE_FX_CONSOLE,
-		FAKE_MIDI_FX_CONSOLE
+		LOG_CONSOLE
 	};
 
 
-	class Console : public hui::Panel
-	{
+	class Console : public hui::Panel {
 	public:
 		Console(const string &_title, Session *_session);
 		string title;

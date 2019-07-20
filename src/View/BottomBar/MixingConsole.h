@@ -13,19 +13,11 @@
 
 
 
-enum class MixerMode
-{
-	VOLUME,
-	EFFECTS,
-	MIDI_EFFECTS
-};
 
 class PeakMeterDisplay;
 class DeviceManager;
 
 class TrackMixer;
-class Module;
-class ModulePanel;
 
 class MixingConsole: public BottomBar::Console
 {
@@ -53,13 +45,8 @@ public:
 	Array<TrackMixer*> mixer;
 
 	int peak_runner_id;
-
-	void set_mode(MixerMode mode);
-	MixerMode mode;
-
-	void select_module(Module *m);
-	Module *selected_module;
-	ModulePanel *config_panel;
+	
+	void show_fx(Track *t);
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

@@ -13,14 +13,12 @@
 
 class Curve;
 
-class ActionCurveEdit : public Action
-{
+class ActionCurveEdit : public Action {
 public:
 	ActionCurveEdit(Curve *curve, const string &name, float min, float max, Array<Curve::Target> &targets);
-	virtual ~ActionCurveEdit();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 private:
 	Curve *curve;
 	string name;

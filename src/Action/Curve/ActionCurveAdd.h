@@ -12,14 +12,13 @@
 
 class Curve;
 
-class ActionCurveAdd : public Action
-{
+class ActionCurveAdd : public Action {
 public:
 	ActionCurveAdd(Curve *curve, int index);
-	virtual ~ActionCurveAdd();
+	~ActionCurveAdd();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 private:
 	Curve *curve;
 	int index;

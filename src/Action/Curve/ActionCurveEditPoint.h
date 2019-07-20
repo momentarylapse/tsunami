@@ -13,15 +13,13 @@
 
 //class Curve;
 
-class ActionCurveEditPoint : public ActionMergable<Curve::Point>
-{
+class ActionCurveEditPoint : public ActionMergable<Curve::Point> {
 public:
 	ActionCurveEditPoint(Curve *curve, int index, int pos, float value);
-	virtual ~ActionCurveEditPoint();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
-	virtual bool mergable(Action *a);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
+	bool mergable(Action *a) override;
 private:
 	Curve *curve;
 	int index;

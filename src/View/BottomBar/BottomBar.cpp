@@ -15,8 +15,7 @@
 #include "MiniBar.h"
 #include "../../Session.h"
 
-BottomBar::BottomBar(Session *session)
-{
+BottomBar::BottomBar(Session *session) {
 	add_revealer("!slide=up", 0, 0, "revealer");
 	set_target("revealer");
 	add_grid("!noexpandy,height=330,expandx", 0, 0, "root_grid0");
@@ -58,54 +57,46 @@ BottomBar::BottomBar(Session *session)
 			open(c);
 }
 
-BottomBar::~BottomBar()
-{
+BottomBar::~BottomBar() {
 }
 
-void BottomBar::on_close()
-{
+void BottomBar::on_close() {
 	_hide();
 }
 
-void BottomBar::_show()
-{
+void BottomBar::_show() {
 	reveal("revealer", true);
 	visible = true;
 	notify();
 }
 
-void BottomBar::_hide()
-{
+void BottomBar::_hide() {
 	reveal("revealer", false);
 	visible = false;
 	notify();
 }
 
-void BottomBar::add_console(BottomBar::Console *c, const string &list_name)
-{
+void BottomBar::add_console(BottomBar::Console *c, const string &list_name) {
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
 	add_string("choose", list_name + c->title);
 	c->hide();
 }
 
-int BottomBar::index(BottomBar::Console *console)
-{
+int BottomBar::index(BottomBar::Console *console) {
 	foreachi (auto c, consoles, i)
 		if (console == c)
 			return i;
 	return -1;
 }
 
-void BottomBar::on_choose()
-{
+void BottomBar::on_choose() {
 	int n = get_int("");
 	if (n >= 0)
 		open(consoles[n]);
 }
 
-void BottomBar::choose(BottomBar::Console *console)
-{
+void BottomBar::choose(BottomBar::Console *console) {
 	if (active_console)
 		active_console->hide();
 
@@ -117,8 +108,7 @@ void BottomBar::choose(BottomBar::Console *console)
 	notify();
 }
 
-void BottomBar::open(BottomBar::Console *console)
-{
+void BottomBar::open(BottomBar::Console *console) {
 	choose(console);
 
 	if (!visible)
@@ -126,38 +116,24 @@ void BottomBar::open(BottomBar::Console *console)
 	notify();
 }
 
-void BottomBar::open(int console_index)
-{
-	if (console_index == FAKE_FX_CONSOLE){
-		open(mixing_console);
-		mixing_console->set_mode(MixerMode::EFFECTS);
-		return;
-	}
-	if (console_index == FAKE_MIDI_FX_CONSOLE){
-		open(mixing_console);
-		mixing_console->set_mode(MixerMode::MIDI_EFFECTS);
-		return;
-	}
+void BottomBar::open(int console_index) {
 	open(consoles[console_index]);
 }
 
-void BottomBar::toggle(int console_index)
-{
-	if (is_active(console_index)){
+void BottomBar::toggle(int console_index) {
+	if (is_active(console_index)) {
 		_hide();
-	}else{
+	} else {
 		open(console_index);
 	}
 }
 
-bool BottomBar::is_active(int console_index)
-{
+bool BottomBar::is_active(int console_index) {
 	return (active_console == consoles[console_index]) and visible;
 }
 
 
-BottomBar::Console::Console(const string &_title, Session *_session)
-{
+BottomBar::Console::Console(const string &_title, Session *_session) {
 	title = _title;
 	notify = false;
 	session = _session;
@@ -165,11 +141,10 @@ BottomBar::Console::Console(const string &_title, Session *_session)
 	view = session->view;
 }
 
-void BottomBar::Console::blink()
-{
-	if (bar()){
+void BottomBar::Console::blink() {
+	if (bar()) {
 		bar()->open(this);
-	}else{
+	} else {
 		notify = true;
 	}
 }

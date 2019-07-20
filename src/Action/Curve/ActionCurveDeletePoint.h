@@ -12,14 +12,12 @@
 
 class Curve;
 
-class ActionCurveDeletePoint : public Action
-{
+class ActionCurveDeletePoint : public Action {
 public:
 	ActionCurveDeletePoint(Curve *curve, int index);
-	virtual ~ActionCurveDeletePoint();
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 private:
 	Curve *curve;
 	int index;

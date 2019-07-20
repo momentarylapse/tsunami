@@ -37,6 +37,7 @@ public:
 		console = c;
 
 		reveal("revealer-fx", false);
+		reveal("config-revealer", false);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -67,7 +68,7 @@ public:
 		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
 		event("add-midi-fx", [=]{ on_add_midi_fx(); });
 		event_xp("peaks", "hui:draw", [=](Painter* p){ on_peak_draw(p); });
-		event("show-fx", [=]{ reveal("revealer-fx", is_checked("")); });
+		event("show-fx", [=]{ on_show_fx(is_checked("")); });
 
 		vtrack = t;
 		track = t->track;
@@ -78,6 +79,7 @@ public:
 		update();
 	}
 	~TrackMixer() {
+		select_module(nullptr);
 		console->session->song->unsubscribe(this);
 		clear_track();
 	}
@@ -118,20 +120,61 @@ public:
 	void on_vtrack_delete() {
 		clear_track();
 	}
-	void set_mode(MixerMode mode) {
-		//hide_control("grid-volume", mode != MixerMode::VOLUME);
-		//hide_control("grid-fx", mode != MixerMode::EFFECTS);
-		//hide_control("grid-midi-fx", mode != MixerMode::MIDI_EFFECTS);
-		//reveal("revealer-volume", mode == MixerMode::VOLUME);
-		//reveal("revealer-fx", mode == MixerMode::EFFECTS);
-		//reveal("revealer-midi-fx", mode == MixerMode::MIDI_EFFECTS);
+	void on_show_fx(bool show) {
+		if (show)
+			console->show_fx(track);
+		else
+			console->show_fx(nullptr);
 	}
+	void show_fx(bool show) {
+		reveal("revealer-fx", show);
+		check("show-fx", show);
+		select_module(nullptr);
+	}
+
+	Module *selected_module = nullptr;
+	ModulePanel *config_panel = nullptr;
+	void select_module(Module *m) {
+		if (selected_module)
+			selected_module->unsubscribe(this);
+
+		if (config_panel)
+			delete config_panel;
+		config_panel = nullptr;
+
+		selected_module = m;
+
+		string config_grid_id = "grid-config";
+
+		if (selected_module) {
+			config_panel = new ModulePanel(m);
+
+			if (m->module_type == ModuleType::AUDIO_EFFECT) {
+				AudioEffect *fx = (AudioEffect*)m;
+				config_panel->set_func_enable([=](bool enabled){ track->enable_effect(fx, enabled); });
+				config_panel->set_func_delete([=]{ track->delete_effect(fx); });
+				config_panel->set_func_edit([=](const string &old_param){ track->edit_effect(fx, old_param); });
+			} else { // MIDI_EFFECT
+				MidiEffect *fx = (MidiEffect*)m;
+				config_panel->set_func_enable([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
+				config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
+				config_panel->set_func_edit([=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
+			}
+			embed(config_panel, config_grid_id, 0, 0);
+
+			m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);
+		}
+
+		update_fx_list_selection();
+		reveal("config-revealer", m);
+	}
+
 	void on_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
-			console->select_module(track->fx[n]);
+			select_module(track->fx[n]);
 		else
-			console->select_module(nullptr);
+			select_module(nullptr);
 	}
 	void on_fx_edit() {
 		int n = hui::GetEvent()->row;
@@ -153,9 +196,9 @@ public:
 	void on_midi_fx_select() {
 		int n = get_int("");
 		if (n >= 0)
-			console->select_module(track->midi_fx[n]);
+			select_module(track->midi_fx[n]);
 		else
-			console->select_module(nullptr);
+			select_module(nullptr);
 	}
 	void on_midi_fx_edit() {
 		int n = hui::GetEvent()->row;
@@ -207,15 +250,19 @@ public:
 
 		// fx list
 		reset("fx");
-		for (auto *fx: vtrack->track->fx)
+		for (auto *fx: track->fx)
 			add_string("fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
-		set_int("fx", vtrack->track->fx.find((AudioEffect*)console->selected_module));
 
 		// midi fx list
 		reset("midi-fx");
-		for (auto *fx: vtrack->track->midi_fx)
+		for (auto *fx: track->midi_fx)
 			add_string("midi-fx", b2s(fx->enabled) + "\\" + fx->module_subtype);
-		set_int("midi-fx", vtrack->track->midi_fx.find((MidiEffect*)console->selected_module));
+		
+		update_fx_list_selection();
+	}
+	void update_fx_list_selection() {
+		set_int("fx", track->fx.find((AudioEffect*)selected_module));
+		set_int("midi-fx", track->midi_fx.find((MidiEffect*)selected_module));
 	}
 
 
@@ -264,24 +311,15 @@ MixingConsole::MixingConsole(Session *session) :
 	set_border_width(2);
 	from_resource("mixing-console");
 
-	config_panel = nullptr;
-	selected_module = nullptr;
-	select_module(nullptr);
-
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, PeakMeterDisplay::Mode::PEAKS);
 	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter, PeakMeterDisplay::Mode::SPECTRUM);
 	set_float("output-volume", device_manager->get_output_volume());
 
 	event("output-volume", [=]{ on_output_volume(); });
-	event("show-vol", [=]{ set_mode(MixerMode::VOLUME); });
-	event("show-fx", [=]{ set_mode(MixerMode::EFFECTS); });
-	event("show-midi-fx", [=]{ set_mode(MixerMode::MIDI_EFFECTS); });
 
 	view->subscribe(this, [=]{ on_tracks_change(); }, session->view->MESSAGE_VTRACK_CHANGE);
 	view->subscribe(this, [=]{ update_all(); }, session->view->MESSAGE_SOLO_CHANGE);
 	song->subscribe(this, [=]{ update_all(); }, song->MESSAGE_FINISHED_LOADING);
-
-	set_mode(MixerMode::VOLUME);
 
 	device_manager->subscribe(this, [=]{ on_update_device_manager(); });
 	load_data();
@@ -299,7 +337,6 @@ MixingConsole::~MixingConsole()
 	//song->unsubscribe(this);
 	view->unsubscribe(this);
 	device_manager->unsubscribe(this);
-	select_module(nullptr);
 	for (TrackMixer *m: mixer)
 		delete m;
 	delete peak_meter;
@@ -323,13 +360,9 @@ void MixingConsole::on_output_volume() {
 	device_manager->set_output_volume(get_float(""));
 }
 
-void MixingConsole::set_mode(MixerMode _mode) {
-	mode = _mode;
+void MixingConsole::show_fx(Track *t) {
 	for (auto *m: mixer)
-		m->set_mode(mode);
-	check("show-vol", mode == MixerMode::VOLUME);
-	check("show-fx", mode == MixerMode::EFFECTS);
-	check("show-midi-fx", mode == MixerMode::MIDI_EFFECTS);
+		m->show_fx(m->track == t);
 }
 
 void MixingConsole::load_data() {
@@ -359,7 +392,6 @@ void MixingConsole::load_data() {
 			mixer.add(m);
 			embed(m, id_inner, i*2, 0);
 			add_separator("!vertical", i*2 + 1, 0, "separator-" + i2s(i));
-			m->set_mode(mode);
 		}
 	}
 
@@ -372,56 +404,6 @@ void MixingConsole::on_update_device_manager() {
 
 void MixingConsole::on_tracks_change() {
 	load_data();
-}
-
-void MixingConsole::select_module(Module *m) {
-	if (selected_module)
-		selected_module->unsubscribe(this);
-
-	if (config_panel)
-		delete config_panel;
-	config_panel = nullptr;
-
-	selected_module = m;
-
-	string config_grid_id = "config-panel-grid";
-
-	Track *track = nullptr;
-
-	if (selected_module) {
-		config_panel = new ModulePanel(m);
-
-		if (m->module_type == ModuleType::AUDIO_EFFECT) {
-			AudioEffect *fx = (AudioEffect*)m;
-			for (auto *mm: mixer)
-				if (mm->track->fx.find(fx) >= 0)
-					track = mm->track;
-			config_panel->set_func_enable([=](bool enabled){ track->enable_effect(fx, enabled); });
-			config_panel->set_func_delete([=]{ track->delete_effect(fx); });
-			config_panel->set_func_edit([=](const string &old_param){ track->edit_effect(fx, old_param); });
-		} else { // MIDI_EFFECT
-			MidiEffect *fx = (MidiEffect*)m;
-			for (auto *mm: mixer)
-				if (mm->track->midi_fx.find(fx) >= 0)
-					track = mm->track;
-			config_panel->set_func_enable([=](bool enabled){ track->enable_midi_effect(fx, enabled); });
-			config_panel->set_func_delete([=]{ track->delete_midi_effect(fx); });
-			config_panel->set_func_edit([=](const string &old_param){ track->edit_midi_effect(fx, old_param); });
-		}
-		embed(config_panel, config_grid_id, 0, 0);
-
-		m->subscribe(this, [=]{ select_module(nullptr); }, m->MESSAGE_DELETE);
-	}
-
-	reveal("config-revealer", m);
-
-
-	// make sure only 1 item is selected in lists
-	for (auto *m: mixer)
-		if (m->track != track) {
-			m->set_int("fx", -1);
-			m->set_int("midi-fx", -1);
-		}
 }
 
 void MixingConsole::update_all() {

@@ -9,8 +9,7 @@
 #include "../../../Data/Song.h"
 #include "../../../Data/Track.h"
 
-ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t, float _volume)
-{
+ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t, float _volume) {
 	track_no = t->get_index();
 	new_value = _volume;
 	old_value = t->volume;
@@ -18,13 +17,12 @@ ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track 
 		old_volumes.add(tt->volume);
 }
 
-void *ActionSongChangeAllTrackVolumes::execute(Data *d)
-{
+void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	float factor = new_value / old_value;
 
-	foreachi(Track *tt, s->tracks, i){
+	foreachi(Track *tt, s->tracks, i) {
 		tt->volume = old_volumes[i] * factor;
 		tt->notify(tt->MESSAGE_CHANGE);
 	}
@@ -32,20 +30,20 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d)
 	return nullptr;
 }
 
-void ActionSongChangeAllTrackVolumes::undo(Data *d)
-{
+void ActionSongChangeAllTrackVolumes::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
-	foreachi(Track *tt, s->tracks, i){
+	foreachi(Track *tt, s->tracks, i) {
 		tt->volume = old_volumes[i];
 		tt->notify(tt->MESSAGE_CHANGE);
 	}
 }
 
 
-bool ActionSongChangeAllTrackVolumes::mergable(Action *a)
-{
+bool ActionSongChangeAllTrackVolumes::mergable(Action *a) {
 	auto *aa = dynamic_cast<ActionSongChangeAllTrackVolumes*>(a);
+	if (!aa)
+		return false;
 	if (aa->track_no != track_no)
 		return false;
 	return aa;

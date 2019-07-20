@@ -10,8 +10,7 @@
 
 #include "Action.h"
 
-class ActionMergableBase : public Action
-{
+class ActionMergableBase : public Action {
 public:
 
 	virtual bool mergable(Action *a) = 0;
@@ -19,15 +18,10 @@ public:
 };
 
 template<class T>
-class ActionMergable : public ActionMergableBase
-{
+class ActionMergable : public ActionMergableBase {
 public:
-	virtual ~ActionMergable(){}
 
-	virtual bool mergable(Action *a) = 0;
-
-	bool absorb(ActionMergableBase *a)
-	{
+	bool absorb(ActionMergableBase *a) override {
 		if (!mergable(a))
 			return false;
 		new_value = dynamic_cast<ActionMergable<T>*>(a)->new_value;

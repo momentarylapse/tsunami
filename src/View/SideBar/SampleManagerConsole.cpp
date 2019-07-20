@@ -296,7 +296,7 @@ void SampleManagerConsole::set_selection(const Array<Sample*> &samples)
 
 void SampleManagerConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void SampleManagerConsole::on_progress_cancel()

@@ -12,6 +12,7 @@
 #include "../../Data/Song.h"
 #include "../../Data/Sample.h"
 #include "../../Data/SampleRef.h"
+#include "../../Session.h"
 #include "../Helper/Slider.h"
 #include "SampleRefConsole.h"
 #include "SampleManagerConsole.h"
@@ -74,18 +75,18 @@ void SampleRefConsole::on_volume()
 
 void SampleRefConsole::on_edit_song()
 {
-	bar()->open(SideBar::SONG_CONSOLE);
+	session->set_mode("default/song");
 }
 
 void SampleRefConsole::on_edit_track()
 {
-	bar()->open(SideBar::TRACK_CONSOLE);
+	session->set_mode("default/track");
 }
 
 void SampleRefConsole::on_edit_sample()
 {
 	bar()->sample_manager->set_selection({sample->origin});
-	bar()->open(SideBar::SAMPLE_CONSOLE);
+	session->set_mode("default/samples");
 }
 
 void SampleRefConsole::load_data()

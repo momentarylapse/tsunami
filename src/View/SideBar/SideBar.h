@@ -24,27 +24,18 @@ class AudioView;
 class SideBarConsole;
 class Session;
 
-class SideBar : public Observable<hui::Panel>
-{
+class SideBar : public Observable<hui::Panel> {
 public:
 	SideBar(Session *session);
 	virtual ~SideBar();
 
-	static const int WIDTH_DEFAULT;
-	static const int WIDTH_LARGE;
-
 	void on_close();
-	void on_large();
 	void on_choose();
-
-	bool is_large;
-	void set_large(bool large);
 
 	void _show();
 	void _hide();
 
-	enum
-	{
+	enum {
 		SONG_CONSOLE,
 		SAMPLE_CONSOLE,
 		TRACK_CONSOLE,

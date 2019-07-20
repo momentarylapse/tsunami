@@ -132,7 +132,7 @@ void SongConsole::on_delete_tag()
 
 void SongConsole::on_edit_samples()
 {
-	bar()->open(SideBar::SAMPLE_CONSOLE);
+	session->set_mode("default/samples");
 }
 
 void SongConsole::on_update()

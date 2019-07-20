@@ -19,15 +19,13 @@
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/BottomBar.h"
 
-const int SideBar::WIDTH_DEFAULT = 380;
-const int SideBar::WIDTH_LARGE = 750;
+extern const int CONFIG_PANEL_WIDTH;
 
-SideBar::SideBar(Session *_session)
-{
+SideBar::SideBar(Session *_session) {
 	session = _session;
 	add_revealer("!slide=left", 0, 0, "revealer");
 	set_target("revealer");
-	add_grid("!noexpandx,width=380,expandy", 0, 0, "root_grid0");
+	add_grid(format("!noexpandx,width=%d,expandy", CONFIG_PANEL_WIDTH), 0, 0, "root_grid0");
 	set_target("root_grid0");
 	add_separator("!vertical,expandy", 0, 0, "");
 	add_grid("!expandx,expandy,margin-right=5,margin-bottom=5", 1, 0, "root_grid");
@@ -42,7 +40,6 @@ SideBar::SideBar(Session *_session)
 	set_image("large", "hui:up");
 	add_label("!big,bold,expandx,center\\...", 2, 0, "title");
 
-	is_large = false;
 	hide_control("large", true);
 
 	song_console = new SongConsole(session);
@@ -64,7 +61,6 @@ SideBar::SideBar(Session *_session)
 	add_console(capture_console);
 
 	event("close", [=]{ on_close(); });
-	event("large", [=]{ on_large(); });
 
 	reveal("revealer", false);
 	visible = false;
@@ -73,49 +69,22 @@ SideBar::SideBar(Session *_session)
 	subscribe(session->view, [=]{ session->view->on_update(); }); // EVIL HACK?!?
 }
 
-SideBar::~SideBar()
-{
+SideBar::~SideBar() {
 }
 
-void SideBar::add_console(SideBarConsole *c)
-{
+void SideBar::add_console(SideBarConsole *c) {
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
 	c->hide();
 }
 
-void SideBar::on_close()
-{
+void SideBar::on_close() {
 	if (allow_close())
 		session->set_mode("default");
 	//_hide();
 }
 
-void SideBar::on_large()
-{
-	set_large(!is_large);
-}
-
-void SideBar::set_large(bool large)
-{
-	if (large == is_large)
-		return;
-	is_large = large;
-	if (is_large){
-		set_options("root_grid0", format("width=%d", WIDTH_LARGE));
-		set_image("large", "hui:down");
-	}else{
-		set_options("root_grid0", format("width=%d", WIDTH_DEFAULT));
-		set_image("large", "hui:up");
-	}
-	hide_control("large", !is_large);
-	if (active_console >= 0)
-		consoles[active_console]->on_set_large(is_large);
-
-}
-
-void SideBar::_show()
-{
+void SideBar::_show() {
 	if ((!visible) and (active_console >= 0))
 		consoles[active_console]->on_enter();
 
@@ -125,8 +94,7 @@ void SideBar::_show()
 }
 
 // FIXME: this is the official closing function...
-void SideBar::_hide()
-{
+void SideBar::_hide() {
 	if ((visible) and (active_console >= 0))
 		consoles[active_console]->on_leave();
 
@@ -135,14 +103,12 @@ void SideBar::_hide()
 	notify();
 }
 
-void SideBar::choose(int console)
-{
-	if (active_console >= 0){
+void SideBar::choose(int console) {
+	if (active_console >= 0) {
 		if (visible)
 			consoles[active_console]->on_leave();
 		consoles[active_console]->hide();
 	}
-	set_large(false);
 
 	active_console = console;
 
@@ -154,8 +120,7 @@ void SideBar::choose(int console)
 	notify();
 }
 
-void SideBar::open(int console)
-{
+void SideBar::open(int console) {
 	choose(console);
 
 	if (!visible)
@@ -163,21 +128,18 @@ void SideBar::open(int console)
 	notify();
 }
 
-bool SideBar::is_active(int console)
-{
+bool SideBar::is_active(int console) {
 	return (active_console == console) and visible;
 }
 
-bool SideBar::allow_close()
-{
+bool SideBar::allow_close() {
 	if (!visible or active_console < 0)
 		return true;
 	return consoles[active_console]->allow_close();
 }
 
 
-SideBarConsole::SideBarConsole(const string &_title, Session *_session)
-{
+SideBarConsole::SideBarConsole(const string &_title, Session *_session) {
 	title = _title;
 	session = _session;
 	song = session->song;

@@ -36,9 +36,7 @@ public:
 		editing = false;
 		console = c;
 
-		reveal("revealer-volume", true);
-		hide_control("grid-fx", true);
-		hide_control("grid-midi-fx", true);
+		reveal("revealer-fx", false);
 
 		id_separator = "mixing-track-separator";
 		id_name = "name";
@@ -69,6 +67,7 @@ public:
 		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
 		event("add-midi-fx", [=]{ on_add_midi_fx(); });
 		event_xp("peaks", "hui:draw", [=](Painter* p){ on_peak_draw(p); });
+		event("show-fx", [=]{ reveal("revealer-fx", is_checked("")); });
 
 		vtrack = t;
 		track = t->track;
@@ -120,12 +119,12 @@ public:
 		clear_track();
 	}
 	void set_mode(MixerMode mode) {
-		hide_control("grid-volume", mode != MixerMode::VOLUME);
-		hide_control("grid-fx", mode != MixerMode::EFFECTS);
-		hide_control("grid-midi-fx", mode != MixerMode::MIDI_EFFECTS);
-		reveal("revealer-volume", mode == MixerMode::VOLUME);
-		reveal("revealer-fx", mode == MixerMode::EFFECTS);
-		reveal("revealer-midi-fx", mode == MixerMode::MIDI_EFFECTS);
+		//hide_control("grid-volume", mode != MixerMode::VOLUME);
+		//hide_control("grid-fx", mode != MixerMode::EFFECTS);
+		//hide_control("grid-midi-fx", mode != MixerMode::MIDI_EFFECTS);
+		//reveal("revealer-volume", mode == MixerMode::VOLUME);
+		//reveal("revealer-fx", mode == MixerMode::EFFECTS);
+		//reveal("revealer-midi-fx", mode == MixerMode::MIDI_EFFECTS);
 	}
 	void on_fx_select() {
 		int n = get_int("");
@@ -419,8 +418,10 @@ void MixingConsole::select_module(Module *m) {
 
 	// make sure only 1 item is selected in lists
 	for (auto *m: mixer)
-		if (m->track != track)
+		if (m->track != track) {
 			m->set_int("fx", -1);
+			m->set_int("midi-fx", -1);
+		}
 }
 
 void MixingConsole::update_all() {

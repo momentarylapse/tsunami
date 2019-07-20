@@ -116,6 +116,7 @@ public:
 			vtrack->unsubscribe(this);
 		vtrack = nullptr;
 		track = nullptr;
+		select_module(nullptr);
 	}
 	void on_vtrack_delete() {
 		clear_track();
@@ -261,8 +262,10 @@ public:
 		update_fx_list_selection();
 	}
 	void update_fx_list_selection() {
-		set_int("fx", track->fx.find((AudioEffect*)selected_module));
-		set_int("midi-fx", track->midi_fx.find((MidiEffect*)selected_module));
+		if (track) {
+			set_int("fx", track->fx.find((AudioEffect*)selected_module));
+			set_int("midi-fx", track->midi_fx.find((MidiEffect*)selected_module));
+		}
 	}
 
 

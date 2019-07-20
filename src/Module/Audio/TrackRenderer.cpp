@@ -217,6 +217,8 @@ static void add_direct(TrackLayer *l, const Range &r, AudioBuffer &buf, const Ra
 	AudioBuffer tbuf;
 	tbuf.resize(r1.length);
 	l->read_buffers_fixed(tbuf, r1);
+	add_samples(l, r1, tbuf);
+
 	buf.add(tbuf, r1.start() - cur.start());
 }
 
@@ -225,6 +227,7 @@ static void add_fade_out(TrackLayer *l, const Range &r, AudioBuffer &buf, const 
 	AudioBuffer tbuf;
 	tbuf.resize(r1.length);
 	l->read_buffers_fixed(tbuf, r1);
+	add_samples(l, r1, tbuf);
 
 	// perform (linear) fade
 	for (int i=r1.start(); i<r1.end(); i++) {
@@ -240,6 +243,7 @@ static void add_fade_in(TrackLayer *l, const Range &r, AudioBuffer &buf, const R
 	AudioBuffer tbuf;
 	tbuf.resize(r1.length);
 	l->read_buffers_fixed(tbuf, r1);
+	add_samples(l, r1, tbuf);
 
 	// perform (linear) fade
 	for (int i=r1.start(); i<r1.end(); i++) {

@@ -84,6 +84,7 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeF
 	represents_imploded = false;
 
 	if (layer){
+		layer->subscribe(this, [=]{ on_layer_change(); }, layer->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ on_track_change(); }, layer->track->MESSAGE_CHANGE);
 		layer->track->subscribe(this, [=]{ layer->track->unsubscribe(this); layer=nullptr; }, layer->track->MESSAGE_DELETE);
 		update_midi_key_changes();
@@ -97,6 +98,11 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeF
 AudioViewLayer::~AudioViewLayer() {
 	if (layer)
 		layer->track->unsubscribe(this);
+}
+
+void AudioViewLayer::on_layer_change() {
+	view->renderer->allow_layers(view->get_playable_layers());
+	notify();
 }
 
 void AudioViewLayer::on_track_change() {

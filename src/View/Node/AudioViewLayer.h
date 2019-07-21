@@ -48,6 +48,7 @@ public:
 	HoverData get_hover_data(float mx, float my) override;
 	HoverData get_hover_data_default(float mx, float my);
 
+	void on_layer_change();
 	void on_track_change();
 
 

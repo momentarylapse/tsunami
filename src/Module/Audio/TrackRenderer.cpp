@@ -258,6 +258,9 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 	Range cur = Range(offset, buf.length);
 	
 	for (TrackLayer *l: track->layers) {
+		if (song_renderer and !song_renderer->allowed_layers.contains(l))
+			continue;
+	
 		bool prev_active = true;
 		int prev_end = offset;
 		

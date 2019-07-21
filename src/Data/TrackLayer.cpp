@@ -223,6 +223,7 @@ void TrackLayer::set_muted(bool m) {
 	// todo
 	muted = m;
 	notify();
+	track->song->notify();
 }
 
 bool TrackLayer::is_main() const {

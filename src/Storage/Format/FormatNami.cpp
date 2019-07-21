@@ -1380,10 +1380,12 @@ void FormatNami::make_consistent(StorageOperationData *od)
 		for (auto *l: t->layers) {
 			if (l->fades.num > 0) {
 				if (l->fades[0].mode == CrossFade::INWARD) {
+					od->info("adding missing fade-in");
 					l->fades.insert({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples}, 0);
 					semi_old_version = true;
 				}
 				if (l->fades.back().mode == CrossFade::OUTWARD) {
+					od->info("adding missing fade-out");
 					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
 					semi_old_version = true;
 				}
@@ -1391,14 +1393,13 @@ void FormatNami::make_consistent(StorageOperationData *od)
 		}
 		if (semi_old_version)
 			for (auto *l: t->layers) {
-				if (l != t->layers[0]) {
-					// non-first layers without fades were disabled...
+				if (l != t->layers[0] and l->fades.num == 0) {
+					od->info("disabling non-first version without fades");
 					l->fades.add({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples});
 					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
 				}
 			}
-	}
-}
+	}}
 
 void FormatNami::load_song(StorageOperationData *od)
 {

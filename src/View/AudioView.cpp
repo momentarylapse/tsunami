@@ -684,6 +684,7 @@ void AudioView::implode_track(Track *t) {
 		}
 	get_track(t)->imploded = true;
 	thm.dirty = true;
+	force_redraw();
 }
 
 void AudioView::explode_track(Track *t) {
@@ -694,6 +695,7 @@ void AudioView::explode_track(Track *t) {
 		}
 	get_track(t)->imploded = false;
 	thm.dirty = true;
+	force_redraw();
 }
 
 void AudioView::on_song_new() {
@@ -1416,7 +1418,7 @@ Set<const TrackLayer*> AudioView::get_playable_layers() {
 			continue;
 		bool any_solo = has_any_solo_layer(t);
 		for (auto *l: vlayer)
-			if ((l->layer->track == t) and (l->solo or !any_solo))
+			if ((l->layer->track == t) and (l->solo or !any_solo) and !l->layer->muted)
 				layers.add(l->layer);
 	}
 	return layers;

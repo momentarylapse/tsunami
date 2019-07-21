@@ -35,6 +35,7 @@ TrackLayer::TrackLayer(Track *t) {
 	track = t;
 	type = t->type;
 	channels = t->channels;
+	muted = false;
 }
 
 TrackLayer::~TrackLayer() {
@@ -216,6 +217,12 @@ void TrackLayer::make_own_track() {
 
 void TrackLayer::version_activate(const Range &range, bool activate) {
 	track->song->execute(new ActionTrackLayerActivateVersion(this, range, activate));
+}
+
+void TrackLayer::set_muted(bool m) {
+	// todo
+	muted = m;
+	notify();
 }
 
 bool TrackLayer::is_main() const {

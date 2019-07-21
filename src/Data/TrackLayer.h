@@ -57,11 +57,13 @@ public:
 	void _cdecl make_own_track();
 
 	void _cdecl version_activate(const Range &range, bool activate);
+	void _cdecl set_muted(bool muted);
 
 	Track *track;
 	Song *song() const;
 	SignalType type;
 	int channels;
+	bool muted;
 	bool is_main() const;
 
 	Array<AudioBuffer> buffers;

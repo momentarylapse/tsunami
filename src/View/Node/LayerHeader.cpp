@@ -46,7 +46,7 @@ public:
 		c->draw_mask_image(area.x1, area.y1, *vlayer->view->images.speaker);
 	}
 	bool on_left_button_down() override {
-		//vlayer->set_mute
+		vlayer->layer->set_muted(!vlayer->layer->muted);
 		return true;
 	}
 	string get_tip() override {
@@ -163,7 +163,7 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	for (auto *c: children)
 		c->hidden = !extended or vlayer->represents_imploded;
 	if (!vlayer->represents_imploded) {
-		children[1]->hidden |= (view->song->tracks.num == 1);
+		//children[1]->hidden |= (layer->track->layers.num == 1);
 		//children[2]->hidden |= !layer->is_main();
 	}
 	

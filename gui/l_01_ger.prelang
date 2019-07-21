@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-925
+928
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2777,6 +2777,15 @@ audio\\midi
 
 /track-explode
 Ausklappen
+
+/layer-down
+Gehe runter
+
+/layer-up
+Gehe rauf
+
+/menu-view-track
+Spur
 
 // Num Language Strings
 245

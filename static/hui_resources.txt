@@ -1587,13 +1587,13 @@ menu-view-track
 0
 2
 Item
-current-layer-up
+layer-up
 
 0
 0
 0
 Item
-current-layer-down
+layer-down
 
 1
 0
@@ -6443,12 +6443,6 @@ Close
 /copy
 Copy
 
-/current-layer-down
-Go down
-
-/current-layer-up
-Go up
-
 /db
 dB
 
@@ -6485,6 +6479,9 @@ Add version
 /layer-delete
 Delete
 
+/layer-down
+Go down
+
 /layer-edit-midi
 Edit midi
 
@@ -6502,6 +6499,9 @@ Layer muted
 
 /layer-solo
 Layer solo
+
+/layer-up
+Go up
 
 /marker-delete
 Delete
@@ -7949,7 +7949,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-924
+927
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8056,6 +8056,9 @@ Auswahl auch aktivieren
 /layer-delete
 Löschen
 
+/layer-down
+Gehe runter
+
 /layer-edit-midi
 Midi bearbeiten
 
@@ -8085,6 +8088,9 @@ Version stumm
 
 /layer-solo
 Version solo
+
+/layer-up
+Gehe rauf
 
 /marker-delete
 Löschen
@@ -8118,6 +8124,9 @@ Neue Spur
 
 /menu-version
 Version
+
+/menu-view-track
+Spur
 
 /ms
 ms

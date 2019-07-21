@@ -69,8 +69,8 @@ Menu menu ""
 		Item zoom-out "Zoom out" image=hui:zoom-out
 		Item view-optimal "Optimal" image=hui:zoom-fit
 		Menu /menu-view-track "Track"
-			Item /current-layer-up "Go up"
-			Item /current-layer-down "Go down"
+			Item /layer-up "Go up"
+			Item /layer-down "Go down"
 	Menu menu_sound "Sound"
 		Item /play-toggle "Play" image=hui:media-play
 		Item /pause "Pause" image=hui:media-pause

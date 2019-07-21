@@ -276,31 +276,6 @@ void ViewModeDefault::on_key_down(int k) {
 			playback_seek_relative(view, -5);
 	}
 
-	/*if (k == hui::KEY_ALT + hui::KEY_M)
-		view->cur_track()->set_muted(!view->cur_track()->muted);
-	if (k == hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_M)
-		view->cur_layer()->set_muted(!view->cur_layer()->muted);
-	if (k == hui::KEY_ALT + hui::KEY_S)
-		view->cur_vtrack()->set_solo(!view->cur_vtrack()->solo);
-	if (k == hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_S)
-		view->cur_vlayer()->set_solo(!view->cur_vlayer()->solo);
-
-	if (k == hui::KEY_ALT + hui::KEY_X) {
-		if (view->cur_track()->layers.num > 0) {
-			if (view->cur_vtrack()->imploded)
-				view->explode_track(view->cur_track());
-			else
-				view->implode_track(view->cur_track());
-		}
-	}
-
-	if (view->mode == view->mode_default) {
-		if (k == hui::KEY_UP)
-			move_to_layer(view, -1);
-		if (k == hui::KEY_DOWN)
-			move_to_layer(view, 1);
-	}*/
-
 	view->update_menu();
 }
 

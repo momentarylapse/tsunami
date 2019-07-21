@@ -25,8 +25,7 @@ public:
 	Range range;
 	bool activate;
 
-	void del_fades_in_range(Data *d);
-	int first_fade_after(int pos);
+	void del_fades_in_range(const Range &r, Data *d);
 	bool is_active_at(int pos);
 };
 

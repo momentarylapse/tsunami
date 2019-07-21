@@ -21,37 +21,63 @@ ActionTrackLayerActivateVersion::ActionTrackLayerActivateVersion(TrackLayer *l, 
 	activate = _activate;
 }
 
-void ActionTrackLayerActivateVersion::del_fades_in_range(Data *d) {
-	foreachib (auto &f, layer->fades, i) {
-		if (range.is_inside(f.position))
+void ActionTrackLayerActivateVersion::del_fades_in_range(const Range &r, Data *d) {
+	foreachib (auto &f, layer->fades, i)
+		if (r.overlaps(f.range()))
 			add_sub_action(new ActionTrackFadeDelete(layer, i), d);
-	}
-}
-
-int ActionTrackLayerActivateVersion::first_fade_after(int pos) {
-	foreachi(auto &f, layer->fades, i)
-		if (f.position > pos)
-			return i;
-	return -1;
 }
 
 bool ActionTrackLayerActivateVersion::is_active_at(int pos) {
-	int i0 = first_fade_after(pos);
-	if (i0 > 0)
-		return layer->fades[i0 - 1].mode == CrossFade::INWARD;
-	return true;
+	bool active = true;
+	for (auto &f: layer->fades) {
+		if (f.range().is_inside(pos)) {
+			return true;
+		} else if (f.range().end() < pos) {
+			active = (f.mode == CrossFade::INWARD);
+		}
+	}
+	return active;
+}
+
+int r_dist(const Range &r, int pos) {
+	if (pos < r.start())
+		return r.start() - pos;
+	if (pos > r.end())
+		return pos - r.end();
+	return 0;
+}
+
+Range grow_reasonable(TrackLayer *l, const Range &r) {
+	Range rr = r;
+	bool dirty = true;
+	int dd = 1000;
+	while (dirty) {
+		dirty = false;
+		for (auto &f: l->fades) {
+			if (r_dist(f.range(), rr.start()) < dd) {
+				rr.set_start(f.range().start() - dd);
+				dirty = true;
+			}
+			if (r_dist(f.range(), rr.end()) < dd) {
+				rr.set_end(f.range().end() + dd);
+				dirty = true;
+			}
+		}
+	}
+	return rr;
 }
 
 
 void ActionTrackLayerActivateVersion::build(Data *d) {
-	bool active_before = is_active_at(range.start());
-	bool active_after = is_active_at(range.end());
-	del_fades_in_range(d);
+	Range rr = grow_reasonable(layer, range);
+	bool active_before = is_active_at(rr.start());
+	bool active_after = is_active_at(rr.end());
+	del_fades_in_range(rr, d);
 	if (activate) {
 		if (!active_before)
 			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::INWARD, SAMPLES), d);
 		if (!active_after)
-		add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::OUTWARD, SAMPLES), d);
+			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::OUTWARD, SAMPLES), d);
 	} else {
 		if (active_before)
 			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::OUTWARD, SAMPLES), d);

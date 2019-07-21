@@ -622,7 +622,6 @@ void move_to_layer(AudioView *view, int delta) {
 
 
 void AudioView::on_command(const string &id) {
-	msg_write("command " + id);
 	if (id == "track-muted")
 		cur_track()->set_muted(!cur_track()->muted);
 	if (id == "track-solo")

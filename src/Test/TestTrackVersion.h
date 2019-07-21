@@ -22,6 +22,7 @@ public:
 	static void test_inactive_version_ranges_base();
 	static void test_active_version_ranges_second();
 	static void test_inactive_version_ranges_second();
+	static void test_dominant();
 };
 
 #endif /* SRC_TEST_TESTTRACKVERSION_H_ */

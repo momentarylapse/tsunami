@@ -142,6 +142,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("layer-make-track", [=]{ on_layer_make_track(); });
 	event("layer-merge", [=]{ on_layer_merge(); });
 	event("layer-mark-dominant", [=]{ on_layer_mark_selection_dominant(); });
+	set_key_code("layer-mark-dominant", hui::KEY_ALT + hui::KEY_D);
 	event("layer-add-dominant", [=]{ on_layer_add_selection_dominant(); });
 	event("bars-add", [=]{ on_add_bars(); });
 	event("bars-add-pause", [=]{ on_add_pause(); });

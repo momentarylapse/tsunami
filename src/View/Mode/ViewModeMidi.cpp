@@ -429,7 +429,12 @@ void ViewModeMidi::set_rep_key(int k) {
 	rep_key = k;
 }
 
+int song_bar_divisor(Song *s, int pos);
+
 void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) {
+	int div = song_bar_divisor(m->view->song, m->view->sel.range.offset);
+	//l *= div;
+
 	if ((m->sub_beat_partition % p) == 0) {
 		m->set_note_length(m->sub_beat_partition / p * n);
 	} else {

@@ -641,10 +641,12 @@ void AudioView::on_command(const string &id) {
 		}
 	}
 
-	if (id == "layer-up")
-		move_to_layer(this, -1);
-	if (id == "layer-down")
-		move_to_layer(this, 1);
+	if (mode == mode_default) {
+		if (id == "layer-up")
+			move_to_layer(this, -1);
+		if (id == "layer-down")
+			move_to_layer(this, 1);
+	}
 }
 
 

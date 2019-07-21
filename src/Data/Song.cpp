@@ -231,11 +231,28 @@ string Song::get_time_str_long(int t) {
 	return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
 }
 
+
 int Song::bar_offset(int index) {
 	int pos = 0;
 	for (int i=0; i<min(index, bars.num); i++)
 		pos += bars[i]->length;
 	return pos;
+}
+
+Bar *song_bar_at(Song *s, int pos) {
+	for (Bar *b: s->bars)
+		if (b->range().is_inside(pos))
+			return b;
+	return nullptr;
+}
+
+int song_bar_divisor(Song *s, int pos) {
+	Bar *b = song_bar_at(s, pos);
+	if (!b)
+		return 1;
+	if (b->is_pause())
+		return 1;
+	return b->divisor;
 }
 
 

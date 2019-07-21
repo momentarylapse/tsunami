@@ -21,7 +21,21 @@ Cursor::Cursor(AudioView *_view, bool end) : ViewNodeFree() {
 }
 
 void Cursor::draw(Painter* c) {
-	view->draw_time_line(c, pos(), view->colors.selection_boundary, is_cur_hover(), false, true);
+	color col = ColorInterpolate(view->colors.selection_boundary, view->colors.background_track_selected, 0.2f);
+	if (!is_end) {
+		float x = view->cam.sample2screen(pos());
+		float r = 4;
+		c->set_line_width(4);
+		c->set_color(col);//view->colors.selection_boundary);
+		for (auto *v: view->vlayer)
+			if (view->sel.has(v->layer)) {
+				c->draw_line(x - r, v->area.y1, x + r, v->area.y1);
+				c->draw_line(x, v->area.y1, x, v->area.y2);
+				c->draw_line(x - r, v->area.y2, x + r, v->area.y2);
+			}
+		c->set_line_width(1);
+	}
+	view->draw_time_line(c, pos(), col, is_cur_hover(), false, true);
 }
 
 int Cursor::pos() {

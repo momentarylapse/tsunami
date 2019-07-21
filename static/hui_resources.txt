@@ -3276,7 +3276,7 @@ menu-version
 
 6
 0
-5
+4
 Item
 layer-delete
 
@@ -3296,15 +3296,9 @@ layer-mark-dominant
 0
 0
 Item
-layer-add-dominant
-
-3
-0
-0
-Item
 layer-merge
 
-4
+3
 0
 0
 Menu
@@ -3488,7 +3482,7 @@ popup-menu-layer
 
 0
 0
-13
+12
 Item
 header
 disabled
@@ -3532,21 +3526,15 @@ layer-mark-dominant
 0
 0
 Item
-layer-add-dominant
-
-7
-0
-0
-Item
 layer-merge
 
-8
+7
 0
 0
 Menu
 menu-midi-mode
 
-9
+8
 0
 3
 Item
@@ -3570,13 +3558,13 @@ checkable
 Separator
 
 
-10
+9
 0
 0
 Menu
 menu-track
 
-11
+10
 0
 5
 Item
@@ -3624,7 +3612,7 @@ track-properties
 Menu
 menu-song
 
-12
+11
 0
 4
 Menu
@@ -3729,7 +3717,7 @@ menu-version
 
 6
 0
-5
+4
 Item
 layer-delete
 
@@ -3749,15 +3737,9 @@ layer-mark-dominant
 0
 0
 Item
-layer-add-dominant
-
-3
-0
-0
-Item
 layer-merge
 
-4
+3
 0
 0
 Menu
@@ -4043,7 +4025,7 @@ menu-version
 
 7
 0
-5
+4
 Item
 layer-delete
 
@@ -4063,15 +4045,9 @@ layer-mark-dominant
 0
 0
 Item
-layer-add-dominant
-
-3
-0
-0
-Item
 layer-merge
 
-4
+3
 0
 0
 Menu
@@ -4515,7 +4491,7 @@ menu-version
 
 10
 0
-5
+4
 Item
 layer-delete
 
@@ -4535,15 +4511,9 @@ layer-mark-dominant
 0
 0
 Item
-layer-add-dominant
-
-3
-0
-0
-Item
 layer-merge
 
-4
+3
 0
 0
 Menu
@@ -6249,7 +6219,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-503
+502
 // Text
 /bars-add
 Add bars...
@@ -6313,9 +6283,6 @@ Exit
 
 /layer-add
 Add version
-
-/layer-add-dominant
-Add selection to dominant
 
 /layer-delete
 Delete

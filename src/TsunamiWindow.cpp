@@ -836,11 +836,12 @@ void TsunamiWindow::on_layer_merge() {
 }
 
 void TsunamiWindow::on_layer_mark_selection_dominant() {
-	view->cur_layer()->mark_dominant(view->sel.range);
+	view->cur_track()->mark_dominant(view->sel.layers, view->sel.range);
 }
 
 void TsunamiWindow::on_layer_add_selection_dominant() {
-	view->cur_layer()->mark_add_dominant(view->sel.range);
+	//...
+	//view->cur_layer()->mark_add_dominant(view->sel.range);
 }
 
 void TsunamiWindow::on_sample_from_selection() {

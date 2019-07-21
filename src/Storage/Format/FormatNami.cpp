@@ -1373,8 +1373,30 @@ void FormatNami::make_consistent(StorageOperationData *od)
 				t->layers[f.target]->fades.add({f.position, CrossFade::INWARD, f.samples});
 				previous = f.target;
 			}
-
 		}
+		if (!t->has_version_selection())
+			continue;
+		bool semi_old_version = false;
+		for (auto *l: t->layers) {
+			if (l->fades.num > 0) {
+				if (l->fades[0].mode == CrossFade::INWARD) {
+					l->fades.insert({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples}, 0);
+					semi_old_version = true;
+				}
+				if (l->fades.back().mode == CrossFade::OUTWARD) {
+					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
+					semi_old_version = true;
+				}
+			}
+		}
+		if (semi_old_version)
+			for (auto *l: t->layers) {
+				if (l != t->layers[0]) {
+					// non-first layers without fades were disabled...
+					l->fades.add({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples});
+					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
+				}
+			}
 	}
 }
 

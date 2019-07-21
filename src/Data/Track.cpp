@@ -23,6 +23,7 @@
 #include "../Action/Track/Layer/ActionTrackLayerDelete.h"
 #include "../Action/Track/Layer/ActionTrackLayerMerge.h"
 //#include "../Action/Track/Layer/ActionTrackLayerMove.h"
+#include "../Action/Track/Layer/ActionTrackLayerMarkDominant.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackEditMidiEffect.h"
@@ -300,6 +301,10 @@ void Track::delete_layer(TrackLayer *layer) {
 
 void Track::merge_layers() {
 	song->execute(new ActionTrackLayerMerge(this));
+}
+
+void Track::mark_dominant(const Array<const TrackLayer*> &layers, const Range &range) {
+	song->execute(new ActionTrackLayerMarkDominant(this, layers, range));
 }
 
 

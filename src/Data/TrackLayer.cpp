@@ -77,7 +77,7 @@ int TrackLayer::version_number() const {
 
 Array<Range> TrackLayer::active_version_ranges() const {
 	Array<Range> r;
-	bool active = is_main();
+	bool active = true;
 	int active_since = Range::BEGIN;
 	for (auto &f: fades) {
 		if (active and (f.mode == f.OUTWARD)) {
@@ -94,7 +94,7 @@ Array<Range> TrackLayer::active_version_ranges() const {
 
 Array<Range> TrackLayer::inactive_version_ranges() const {
 	Array<Range> r;
-	bool active = is_main();
+	bool active = true;
 	int active_since = Range::BEGIN;
 	for (auto &f: fades) {
 		if (active and (f.mode == f.OUTWARD)) {
@@ -214,12 +214,8 @@ void TrackLayer::make_own_track() {
 	track->song->execute(new ActionTrackLayerMakeTrack(this));
 }
 
-void TrackLayer::mark_dominant(const Range &range) {
-	track->song->execute(new ActionTrackLayerMarkDominant(this, range, true));
-}
-
-void TrackLayer::mark_add_dominant(const Range &range) {
-	track->song->execute(new ActionTrackLayerMarkDominant(this, range, false));
+void TrackLayer::version_activate(const Range &range, bool activate) {
+	track->song->execute(new ActionTrackLayerActivateVersion(this, range, activate));
 }
 
 bool TrackLayer::is_main() const {

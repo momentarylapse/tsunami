@@ -42,8 +42,11 @@ class LayerButtonMute: public LayerHeaderButton {
 public:
 	LayerButtonMute(LayerHeader *th, float dx, float dy) : LayerHeaderButton(th, dx, dy) {}
 	void draw(Painter *c) override {
+		c->set_color(get_color());
+		c->draw_mask_image(area.x1, area.y1, *vlayer->view->images.speaker);
 	}
 	bool on_left_button_down() override {
+		//vlayer->set_mute
 		return true;
 	}
 	string get_tip() override {
@@ -160,7 +163,7 @@ void LayerHeader::update_geometry_recursive(const rect &target_area) {
 	for (auto *c: children)
 		c->hidden = !extended or vlayer->represents_imploded;
 	if (!vlayer->represents_imploded) {
-		children[1]->hidden |= (view->song->tracks.num == 1) or layer->track->has_version_selection();
+		children[1]->hidden |= (view->song->tracks.num == 1);
 		//children[2]->hidden |= !layer->is_main();
 	}
 	
@@ -188,15 +191,7 @@ void LayerHeader::draw(Painter *c) {
 	} else {
 
 		// track title
-		string title;
-		if (layer->track->has_version_selection()) {
-			if (layer->is_main())
-				title = _("base");
-			else
-				title = "v" + i2s(layer->version_number() + 1);
-		} else {
-			title = "l" + i2s(layer->version_number() + 1);
-		}
+		string title = "v" + i2s(layer->version_number() + 1);
 		if (vlayer->solo)
 			title += " (solo)";
 		float ww = AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);

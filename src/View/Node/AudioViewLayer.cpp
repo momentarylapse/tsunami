@@ -361,12 +361,12 @@ void draw_flare(Painter *c, float x1, float x2, float y1, float y2, bool inwards
 	int N = 7;
 	float a1, a2;
 	if (inwards) {
-		a1 = 0.3f;
+		a1 = 0.6f;
 		a2 = 0.05f;
 		x2 += flare_w;
 	} else {
 		a1 = 0.05f;
-		a2 = 0.3f;
+		a2 = 0.6f;
 		x1 -= flare_w;
 	}
 	for (int j=0; j<N; j++) {
@@ -392,7 +392,7 @@ void AudioViewLayer::draw_fades(Painter *c) {
 		c->draw_line(x1, area.y1, x1, area.y2);
 		c->draw_line(x2, area.y1, x2, area.y2);
 
-		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.INWARD, 20);
+		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.INWARD, 50);
 	}
 	c->set_line_width(1);
 }

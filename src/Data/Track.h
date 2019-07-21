@@ -73,6 +73,7 @@ public:
 	TrackMarker* _cdecl add_marker(const Range &range, const string &text);
 	void _cdecl delete_marker(const TrackMarker *marker);
 	void _cdecl edit_marker(const TrackMarker *marker, const Range &range, const string &text);
+	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
 
 
 // data

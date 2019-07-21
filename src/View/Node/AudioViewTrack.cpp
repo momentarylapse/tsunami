@@ -125,22 +125,15 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 
 	view->buffer_painter->set_color(is_playable() ? view->colors.text : view->colors.text_soft3);
 
-	if (track->has_version_selection()) {
-		for (auto *layer: track->layers) {
-			auto rr = layer->active_version_ranges();
+	for (auto *layer: track->layers) {
+		auto rr = layer->active_version_ranges();
 
-			for (auto &r: rr) {
-				view->buffer_painter->set_clip(r);
+		for (auto &r: rr) {
+			view->buffer_painter->set_clip(r);
 
-				for (AudioBuffer &b: layer->buffers)
-					view->buffer_painter->draw_buffer(c, b, b.offset);
-			}
-		}
-	} else {
-		for (auto *layer: track->layers)
 			for (AudioBuffer &b: layer->buffers)
 				view->buffer_painter->draw_buffer(c, b, b.offset);
-
+		}
 	}
 
 	/*if (view->sel.has(layer)){

@@ -56,8 +56,7 @@ public:
 
 	void _cdecl make_own_track();
 
-	void _cdecl mark_dominant(const Range &range);
-	void _cdecl mark_add_dominant(const Range &range);
+	void _cdecl version_activate(const Range &range, bool activate);
 
 	Track *track;
 	Song *song() const;

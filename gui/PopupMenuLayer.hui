@@ -6,7 +6,6 @@ Menu popup-menu-layer ""
 	Item /layer-edit-midi "Edit midi"
 	Item /layer-make-track "Turn into track"
 	Item /layer-mark-dominant "Mark selection as dominant"
-	Item /layer-add-dominant "Add selection to dominant"
 	Item /layer-merge "Merge..."
 	Menu /menu-midi-mode "Midi mode"
 		Item /track-midi-mode-linear "Linear" checkable

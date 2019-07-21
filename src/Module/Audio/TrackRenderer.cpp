@@ -258,7 +258,7 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 	Range cur = Range(offset, buf.length);
 	
 	for (TrackLayer *l: track->layers) {
-		bool prev_active = l->is_main();
+		bool prev_active = true;
 		int prev_end = offset;
 		
 		for (auto &f: l->fades) {

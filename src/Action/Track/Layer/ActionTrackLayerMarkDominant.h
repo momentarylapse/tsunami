@@ -11,22 +11,35 @@
 #include "../../ActionGroup.h"
 #include "../../../Data/Range.h"
 
+class Track;
 class TrackLayer;
 class Range;
 
-class ActionTrackLayerMarkDominant : public ActionGroup {
+class ActionTrackLayerActivateVersion : public ActionGroup {
 public:
-	ActionTrackLayerMarkDominant(TrackLayer *layer, const Range &range, bool exclusive);
+	ActionTrackLayerActivateVersion(TrackLayer *layer, const Range &r, bool activate);
 
 	void build(Data *d) override;
 
 	TrackLayer *layer;
 	Range range;
-	bool exclusive;
-	
-	void del_fades_in_range(TrackLayer *l, const Range &r, Data *d);
-	int first_fade_after(TrackLayer *l, int pos);
-	bool is_active_at(TrackLayer *l, int pos);
+	bool activate;
+
+	void del_fades_in_range(Data *d);
+	int first_fade_after(int pos);
+	bool is_active_at(int pos);
+};
+
+class ActionTrackLayerMarkDominant : public ActionGroup {
+public:
+	ActionTrackLayerMarkDominant(Track *track, const Array<const TrackLayer*> &layers, const Range &range);
+
+	void build(Data *d) override;
+
+	Track *track;
+	Array<const TrackLayer*> layers;
+	Range range;
+
 	void set_active(TrackLayer *l, const Range &r, Data *d);
 	void set_inactive(TrackLayer *l, const Range &r, Data *d);
 };

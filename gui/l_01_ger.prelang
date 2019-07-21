@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-915
+925
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2747,6 +2747,36 @@ Verkleinern
 
 menu/zoom-in
 Vergrößern
+
+/current-layer-down
+Gehe runter
+
+/current-layer-up
+Gehe rauf
+
+/layer-muted
+Version stumm
+
+/layer-solo
+Version solo
+
+/menu-track-current
+Aktuell
+
+/track-muted
+Stumm
+
+/track-solo
+Solo
+
+track-mixer2/show-fx
+fx
+Effekte
+track-mixer2/tc
+audio\\midi
+
+/track-explode
+Ausklappen
 
 // Num Language Strings
 245

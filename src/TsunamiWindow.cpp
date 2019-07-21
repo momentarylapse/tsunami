@@ -126,6 +126,16 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-midi-mode-linear", [=]{ on_layer_midi_mode_linear(); });
 	event("track-midi-mode-tab", [=]{ on_layer_midi_mode_tab(); });
 	event("track-midi-mode-classical", [=]{ on_layer_midi_mode_classical(); });
+	
+	//event("track-muted", [=]{ view->cur_track()->set_muted(!view->cur_track()->muted); });
+	set_key_code("track-muted", hui::KEY_ALT + hui::KEY_M);
+	//event("track-solo", [=]{ view->cur_vtrack()->set_solo(!view->cur_vtrack()->solo); });
+	set_key_code("track-solo", hui::KEY_ALT + hui::KEY_S);
+	set_key_code("layer-muted", hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_M);
+	set_key_code("layer-solo", hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_S);
+	set_key_code("track-explode", hui::KEY_ALT + hui::KEY_X);
+	set_key_code("layer-up", hui::KEY_UP);
+	set_key_code("layer-down", hui::KEY_DOWN);
 
 	event("layer-add", [=]{ on_add_layer(); });
 	event("layer-delete", [=]{ on_delete_layer(); });
@@ -242,6 +252,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	app->clipboard->subscribe(this, [=]{ on_update(); });
 	bottom_bar->subscribe(this, [=]{ on_bottom_bar_update(); });
 	side_bar->subscribe(this, [=]{ on_side_bar_update(); });
+	
+	event("*", [=]{ view->on_command(hui::GetEvent()->id); });
 
 	// firt time start?
 	if (hui::Config.get_bool("FirstStart", true)) {

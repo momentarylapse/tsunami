@@ -7,6 +7,8 @@ Menu popup-menu-layer ""
 	Item /layer-make-track "Turn into track"
 	Item /layer-mark-dominant "Mark selection as dominant"
 	Item /layer-merge "Merge..."
+	Item /layer-muted "Mute" checkable
+	Item /layer-solo "Solo" checkable
 	Menu /menu-midi-mode "Midi mode"
 		Item /track-midi-mode-linear "Linear" checkable
 		Item /track-midi-mode-tab "Tabulature" checkable
@@ -19,6 +21,9 @@ Menu popup-menu-layer ""
 			Item /track-convert-stereo "Stereo"
 		Item /track-edit-fx "Edit effects"
 		Item /track-edit-midi "Edit midi"
+		Item /track-muted "Muted" checkable
+		Item /track-solo "Solo" checkable
+		Item /track-explode "Explode" checkable
 		Item /track-properties "Properties"
 	Menu /menu-song "File"
 		Menu /menu-track-new "Add new track"

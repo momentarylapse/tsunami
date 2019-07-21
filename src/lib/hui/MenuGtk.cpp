@@ -36,7 +36,7 @@ void try_add_accel(GtkWidget *item, const string &id, Panel *panel)
 	for (auto &c: panel->event_key_codes)
 		if ((id == c.id) and (c.key_code >= 0)){
 			int k = c.key_code;
-			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0);
+			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((k&KEY_ALT)>0) ? GDK_META_MASK : 0);
 			gtk_widget_add_accelerator(item, "activate", accel_group, HuiKeyID[k & 255], (GdkModifierType)mod, GTK_ACCEL_VISIBLE);
 		}
 }

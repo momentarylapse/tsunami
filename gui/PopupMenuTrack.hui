@@ -11,6 +11,9 @@ Menu popup-menu-track ""
 		Item /track-midi-mode-classical "Classical" checkable
 	Item /track-edit-fx "Edit effects"
 	Item /track-edit-midi "Edit midi"
+	Item /track-muted "Muted" checkable
+	Item /track-solo "Solo" checkable
+	Item /track-explode "Explode" checkable
 	Item /track-properties "Properties"
 	Separator
 	Item /track-add-marker "Add marker"
@@ -19,12 +22,15 @@ Menu popup-menu-track ""
 		Item /layer-add "Add version"
 		Item /layer-mark-dominant "Mark selection as dominant"
 		Item /layer-merge "Merge..."
+		Item /layer-muted "Layer muted" checkable
+		Item /layer-solo "Layer solo" checkable
 	Menu /menu-song "File"
 		Menu /menu-track-new "Add new track"
 			Item /track-add-audio-mono "Audio (mono)" image=hui:add
 			Item /track-add-audio-stereo "Audio (stereo)" image=hui:add
 			Item /track-add-midi "Midi" image=hui:add
 			Item /track-add-beats "Metronome" image=hui:add
+			Item /track-add-group "Group" image=hui:add
 		Item /song-edit-samples "Manage samples"
 		Item /show-mixing-console "Mixing"
 		Item /song-properties "Properties"

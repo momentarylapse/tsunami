@@ -1507,7 +1507,7 @@ menu_view
 
 5
 0
-9
+10
 Menu
 menu_view_midi
 
@@ -1578,6 +1578,24 @@ Item
 view-optimal
 image=hui:zoom-fit
 8
+0
+0
+Menu
+menu-view-track
+
+9
+0
+2
+Item
+current-layer-up
+
+0
+0
+0
+Item
+current-layer-down
+
+1
 0
 0
 Menu
@@ -3276,7 +3294,7 @@ menu-version
 
 6
 0
-4
+6
 Item
 layer-delete
 
@@ -3301,12 +3319,24 @@ layer-merge
 3
 0
 0
+Item
+layer-muted
+checkable
+4
+0
+0
+Item
+layer-solo
+checkable
+5
+0
+0
 Menu
 menu-track
 
 7
 0
-6
+9
 Item
 track-delete
 
@@ -3368,9 +3398,27 @@ track-edit-midi
 0
 0
 Item
+track-muted
+checkable
+5
+0
+0
+Item
+track-solo
+checkable
+6
+0
+0
+Item
+track-explode
+checkable
+7
+0
+0
+Item
 track-properties
 
-5
+8
 0
 0
 Menu
@@ -3384,7 +3432,7 @@ menu-track-new
 
 0
 0
-4
+5
 Item
 track-add-audio-mono
 image=hui:add
@@ -3407,6 +3455,12 @@ Item
 track-add-beats
 image=hui:add
 3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
 0
 0
 Item
@@ -3482,7 +3536,7 @@ popup-menu-layer
 
 0
 0
-12
+14
 Item
 header
 disabled
@@ -3531,10 +3585,22 @@ layer-merge
 7
 0
 0
+Item
+layer-muted
+checkable
+8
+0
+0
+Item
+layer-solo
+checkable
+9
+0
+0
 Menu
 menu-midi-mode
 
-8
+10
 0
 3
 Item
@@ -3558,15 +3624,15 @@ checkable
 Separator
 
 
-9
+11
 0
 0
 Menu
 menu-track
 
-10
+12
 0
-5
+8
 Item
 track-delete
 
@@ -3604,15 +3670,33 @@ track-edit-midi
 0
 0
 Item
+track-muted
+checkable
+4
+0
+0
+Item
+track-solo
+checkable
+5
+0
+0
+Item
+track-explode
+checkable
+6
+0
+0
+Item
 track-properties
 
-4
+7
 0
 0
 Menu
 menu-song
 
-11
+13
 0
 4
 Menu
@@ -3717,7 +3801,7 @@ menu-version
 
 6
 0
-4
+6
 Item
 layer-delete
 
@@ -3742,12 +3826,24 @@ layer-merge
 3
 0
 0
+Item
+layer-muted
+checkable
+4
+0
+0
+Item
+layer-solo
+checkable
+5
+0
+0
 Menu
 menu-track
 
 7
 0
-6
+9
 Item
 track-delete
 
@@ -3809,9 +3905,27 @@ track-edit-midi
 0
 0
 Item
+track-muted
+checkable
+5
+0
+0
+Item
+track-solo
+checkable
+6
+0
+0
+Item
+track-explode
+checkable
+7
+0
+0
+Item
 track-properties
 
-5
+8
 0
 0
 Menu
@@ -3825,7 +3939,7 @@ menu-track-new
 
 0
 0
-4
+5
 Item
 track-add-audio-mono
 image=hui:add
@@ -3848,6 +3962,12 @@ Item
 track-add-beats
 image=hui:add
 3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
 0
 0
 Item
@@ -4025,7 +4145,7 @@ menu-version
 
 7
 0
-4
+6
 Item
 layer-delete
 
@@ -4050,12 +4170,24 @@ layer-merge
 3
 0
 0
+Item
+layer-muted
+checkable
+4
+0
+0
+Item
+layer-solo
+checkable
+5
+0
+0
 Menu
 menu-track
 
 8
 0
-6
+9
 Item
 track-delete
 
@@ -4117,9 +4249,27 @@ track-edit-midi
 0
 0
 Item
+track-muted
+checkable
+5
+0
+0
+Item
+track-solo
+checkable
+6
+0
+0
+Item
+track-explode
+checkable
+7
+0
+0
+Item
 track-properties
 
-5
+8
 0
 0
 Menu
@@ -4133,7 +4283,7 @@ menu-track-new
 
 0
 0
-4
+5
 Item
 track-add-audio-mono
 image=hui:add
@@ -4156,6 +4306,12 @@ Item
 track-add-beats
 image=hui:add
 3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
 0
 0
 Item
@@ -4395,7 +4551,7 @@ popup-menu-track
 
 0
 0
-12
+15
 Item
 header
 disabled
@@ -4469,29 +4625,47 @@ track-edit-midi
 0
 0
 Item
+track-muted
+checkable
+7
+0
+0
+Item
+track-solo
+checkable
+8
+0
+0
+Item
+track-explode
+checkable
+9
+0
+0
+Item
 track-properties
 
-7
+10
 0
 0
 Separator
 
 
-8
+11
 0
 0
 Item
 track-add-marker
 
-9
+12
 0
 0
 Menu
 menu-version
 
-10
+13
 0
-4
+6
 Item
 layer-delete
 
@@ -4516,10 +4690,22 @@ layer-merge
 3
 0
 0
+Item
+layer-muted
+checkable
+4
+0
+0
+Item
+layer-solo
+checkable
+5
+0
+0
 Menu
 menu-song
 
-11
+14
 0
 4
 Menu
@@ -4527,7 +4713,7 @@ menu-track-new
 
 0
 0
-4
+5
 Item
 track-add-audio-mono
 image=hui:add
@@ -4550,6 +4736,12 @@ Item
 track-add-beats
 image=hui:add
 3
+0
+0
+Item
+track-add-group
+image=hui:add
+4
 0
 0
 Item
@@ -6219,7 +6411,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-502
+510
 // Text
 /bars-add
 Add bars...
@@ -6250,6 +6442,12 @@ Close
 
 /copy
 Copy
+
+/current-layer-down
+Go down
+
+/current-layer-up
+Go up
 
 /db
 dB
@@ -6299,6 +6497,12 @@ Mark selection as dominant
 /layer-merge
 Merge...
 
+/layer-muted
+Layer muted
+
+/layer-solo
+Layer solo
+
 /marker-delete
 Delete
 
@@ -6328,6 +6532,9 @@ Add new track
 
 /menu-version
 Version
+
+/menu-view-track
+Track
 
 /new
 New...
@@ -6440,6 +6647,9 @@ Edit effects
 /track-edit-midi
 Edit midi
 
+/track-explode
+Explode
+
 /track-midi-mode-classical
 Classical
 
@@ -6449,8 +6659,14 @@ Linear
 /track-midi-mode-tab
 Tabulature
 
+/track-muted
+Muted
+
 /track-properties
 Properties
+
+/track-solo
+Solo
 
 /undo
 Undo
@@ -7662,7 +7878,7 @@ track-mixer2/solo
 S
 Solo
 track-mixer2/tc
-fx\\midi
+audio\\midi
 
 track-mixer2/volume
 0
@@ -7733,7 +7949,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-914
+924
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -7782,6 +7998,12 @@ Schließen
 
 /copy
 Kopieren
+
+/current-layer-down
+Gehe runter
+
+/current-layer-up
+Gehe rauf
 
 /db
 dB
@@ -7858,6 +8080,12 @@ Linear
 /layer-midi-mode-tab
 Tabulatur
 
+/layer-muted
+Version stumm
+
+/layer-solo
+Version solo
+
 /marker-delete
 Löschen
 
@@ -7881,6 +8109,9 @@ Datei
 
 /menu-track
 Spur
+
+/menu-track-current
+Aktuell
 
 /menu-track-new
 Neue Spur
@@ -8005,6 +8236,9 @@ Effekte bearbeiten
 /track-edit-midi
 Midi bearbeiten
 
+/track-explode
+Ausklappen
+
 /track-midi-mode-classical
 Klassisch
 
@@ -8014,8 +8248,14 @@ Linear
 /track-midi-mode-tab
 Tabulatur
 
+/track-muted
+Stumm
+
 /track-properties
 Eigenschaften
+
+/track-solo
+Solo
 
 /undo
 Rückgängig
@@ -10381,11 +10621,17 @@ Stumm
 track-mixer2/panning
 ß
 Balance
+track-mixer2/show-fx
+fx
+Effekte
 track-mixer2/solo
 S
 Solo
 track-mixer2/tab
 a\\b
+
+track-mixer2/tc
+audio\\midi
 
 track-mixer2/volume
 0

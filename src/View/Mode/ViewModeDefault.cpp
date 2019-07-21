@@ -244,39 +244,6 @@ void playback_seek_relative(AudioView *view, float dt) {
 	view->signal_chain->set_pos(pos);
 }
 
-AudioViewLayer *next_layer(AudioView *view, AudioViewLayer *vlayer) {
-	bool found = false;
-	for (auto *l: view->vlayer) {
-		if (found and !l->hidden)
-			return l;
-		if (l == vlayer)
-			found = true;
-	}
-	return vlayer;
-}
-AudioViewLayer *prev_layer(AudioView *view, AudioViewLayer *vlayer) {
-	AudioViewLayer *prev = nullptr;
-	for (auto *l: view->vlayer) {
-		if (l == vlayer and prev)
-			return prev;
-		if (!l->hidden)
-			prev = l;
-	}
-	return vlayer;
-}
-
-void move_to_layer(AudioView *view, int delta) {
-	auto *vlayer = view->cur_vlayer();
-	if (delta > 0)
-		vlayer = next_layer(view, vlayer);
-	else
-		vlayer = prev_layer(view, vlayer);
-
-	view->set_current(vlayer->get_hover_data(0,0));
-	view->exclusively_select_layer(vlayer);
-	view->select_under_cursor();
-}
-
 void ViewModeDefault::on_key_down(int k) {
 
 // view
@@ -309,7 +276,7 @@ void ViewModeDefault::on_key_down(int k) {
 			playback_seek_relative(view, -5);
 	}
 
-	if (k == hui::KEY_ALT + hui::KEY_M)
+	/*if (k == hui::KEY_ALT + hui::KEY_M)
 		view->cur_track()->set_muted(!view->cur_track()->muted);
 	if (k == hui::KEY_ALT + hui::KEY_SHIFT + hui::KEY_M)
 		view->cur_layer()->set_muted(!view->cur_layer()->muted);
@@ -332,7 +299,7 @@ void ViewModeDefault::on_key_down(int k) {
 			move_to_layer(view, -1);
 		if (k == hui::KEY_DOWN)
 			move_to_layer(view, 1);
-	}
+	}*/
 
 	view->update_menu();
 }

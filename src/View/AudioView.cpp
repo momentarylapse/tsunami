@@ -586,8 +586,66 @@ void AudioView::on_left_double_click() {
 }
 
 
+AudioViewLayer *next_layer(AudioView *view, AudioViewLayer *vlayer) {
+	bool found = false;
+	for (auto *l: view->vlayer) {
+		if (found and !l->hidden)
+			return l;
+		if (l == vlayer)
+			found = true;
+	}
+	return vlayer;
+}
+AudioViewLayer *prev_layer(AudioView *view, AudioViewLayer *vlayer) {
+	AudioViewLayer *prev = nullptr;
+	for (auto *l: view->vlayer) {
+		if (l == vlayer and prev)
+			return prev;
+		if (!l->hidden)
+			prev = l;
+	}
+	return vlayer;
+}
 
-void AudioView::on_command(const string & id) {
+void move_to_layer(AudioView *view, int delta) {
+	auto *vlayer = view->cur_vlayer();
+	if (delta > 0)
+		vlayer = next_layer(view, vlayer);
+	else
+		vlayer = prev_layer(view, vlayer);
+
+	view->set_current(vlayer->get_hover_data(0,0));
+	view->exclusively_select_layer(vlayer);
+	view->select_under_cursor();
+}
+
+
+
+void AudioView::on_command(const string &id) {
+	msg_write("command " + id);
+	if (id == "track-muted")
+		cur_track()->set_muted(!cur_track()->muted);
+	if (id == "track-solo")
+		cur_vtrack()->set_solo(!cur_vtrack()->solo);
+	if (id == "layer-muted")
+		cur_layer()->set_muted(!cur_layer()->muted);
+	if (id == "layer-solo")
+		cur_vlayer()->set_solo(!cur_vlayer()->solo);
+
+	
+	if (id == "track-explode") {
+		if (cur_track()->layers.num > 0) {
+			if (cur_vtrack()->imploded)
+				explode_track(cur_track());
+			else
+				implode_track(cur_track());
+		}
+	}
+
+	if (id == "layer-up")
+		move_to_layer(this, -1);
+	if (id == "layer-down")
+		move_to_layer(this, 1);
 }
 
 
@@ -1568,6 +1626,20 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 		menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
 		menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
 		menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
+	}
+	
+	// mute/solo
+	if (t)
+		menu->check("track-muted", t->muted);
+	if (vt)
+		menu->check("track-solo", vt->solo);
+	if (l)
+		menu->check("layer-muted", l->muted);
+	if (vl)
+		menu->check("layer-solo", vl->solo);
+	if (vt and t) {
+		menu->check("track-explode", !vt->imploded);
+		menu->enable("track-explode", t->layers.num > 1);
 	}
 
 	if (t) {

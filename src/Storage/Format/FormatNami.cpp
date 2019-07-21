@@ -1395,8 +1395,8 @@ void FormatNami::make_consistent(StorageOperationData *od)
 			for (auto *l: t->layers) {
 				if (l != t->layers[0] and l->fades.num == 0) {
 					od->info("disabling non-first version without fades");
-					l->fades.add({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples});
-					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
+					l->fades.add({a->range().start(), CrossFade::OUTWARD, 2000});
+					l->fades.add({a->range().end(), CrossFade::INWARD, 2000});
 				}
 			}
 	}}

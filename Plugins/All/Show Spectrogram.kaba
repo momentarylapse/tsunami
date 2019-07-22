@@ -56,7 +56,7 @@ Grid ? ''
 		AudioView* view = plugin.session.view
 		
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(view.sel.range.offset / i2f(song.sample_rate), view.sel.range.end() / i2f(song.sample_rate), false, "s")
+		grid.x_axis.set(view.sel.range().offset / i2f(song.sample_rate), view.sel.range().end() / i2f(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	
@@ -82,7 +82,7 @@ class ShowSpectrogram extends SongPlugin
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)
-		renderer.render(session.view.sel.range, buf)
+		renderer.render(session.view.sel.range(), buf)
 		delete renderer
 	
 		complex[] f
@@ -133,7 +133,7 @@ class ShowSpectrogram extends SongPlugin
 
 	override void apply()
 	
-		if session.view.sel.range.length > 0
+		if session.view.sel.range().length > 0
 			show_spec(song)
 		else
 			session.e("'Show Spectrogram.kaba': Needs some selection!")

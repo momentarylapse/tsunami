@@ -206,7 +206,7 @@ bool Storage::save_via_renderer(Port *r, const string &filename, int num_samples
 
 bool Storage::render_export_selection(Song *song, SongSelection *sel, const string &filename) {
 	SongRenderer renderer(song);
-	renderer.prepare(sel->range, false);
+	renderer.prepare(sel->range(), false);
 	renderer.allow_tracks(sel->tracks());
 	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
 }

@@ -42,19 +42,21 @@ class MouseDelaySelect : public MouseDelayAction {
 public:
 	AudioView *view;
 	SelectionMode mode;
+	Range range;
+	int start_pos;
 	MouseDelaySelect(AudioView *v, SelectionMode _mode) {
 		view = v;
 		mode = _mode;
+		start_pos = view->get_mouse_pos_snap();
 	}
 	void on_start() override {
-		view->hover().range.set_start(view->cur_selection.pos_snap);
-		view->hover().range.set_end(view->get_mouse_pos());
+		range = RangeTo(view->get_mouse_pos_snap(), start_pos);
 		view->hover().y0 = view->mdp()->y0;
 		view->hover().y1 = view->my;
 		view->selection_mode = mode;
 		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
-		view->set_selection(view->mode->get_selection(view->hover().range, mode));
+		view->set_selection(view->mode->get_selection(range, mode));
 	}
 	void on_update() override {
 		// cheap auto scrolling
@@ -63,18 +65,19 @@ public:
 		if (view->mx > view->area.width() - 50)
 			view->cam.move(10 / view->cam.scale);
 
-		view->hover().range.set_end(view->get_mouse_pos_snap());
+		range.set_start(view->get_mouse_pos_snap());
 		view->hover().y1 = view->my;
 		if (view->select_xor)
-			view->set_selection(view->sel_temp or view->mode->get_selection(view->hover().range, mode));
+			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
 		else
-			view->set_selection(view->mode->get_selection(view->hover().range, mode));
+			view->set_selection(view->mode->get_selection(range, mode));
 	}
 	void on_draw_post(Painter *c) override {
-		if (view->sel.range.length > 0){
-			string s = view->song->get_time_str_long(view->sel.range.length);
-			if (view->sel.range.length < 1000)
-				s += format(_(" (%d samples)"), view->sel.range.length);
+		int l = view->cursor_range().length;
+		if (l > 0){
+			string s = view->song->get_time_str_long(l);
+			if (l < 1000)
+				s += format(_(" (%d samples)"), l);
 			if (view->sel.bars.num > 0)
 				s = format(_("%d bars"), view->sel.bars.num) + ", " + s;
 			view->draw_cursor_hover(c, s);
@@ -245,14 +248,9 @@ void playback_seek_relative(AudioView *view, float dt) {
 }
 
 void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
-	int pos;
-	if (forward) {
-		pos = m->suggest_move_cursor(view->sel.range.end(), true);
-		view->sel.range.set_end(pos);
-	} else {
-		pos = m->suggest_move_cursor(view->sel.range.end(), false);
-		view->sel.range.set_end(pos);
-	}
+	int pos = view->sel.range_raw.start();
+	pos = m->suggest_move_cursor(pos, forward);
+	view->sel.range_raw.set_start(pos);
 
 	view->select_under_cursor();
 	view->cam.make_sample_visible(pos, 0);
@@ -290,9 +288,9 @@ void ViewModeDefault::on_key_down(int k) {
 			playback_seek_relative(view, -5);
 	} else {
 		if (k == hui::KEY_RIGHT)
-			view->set_cursor_pos(suggest_move_cursor(view->sel.range.end(), true));
+			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().end(), true));
 		if (k == hui::KEY_LEFT)
-			view->set_cursor_pos(suggest_move_cursor(view->sel.range.offset, false));
+			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().offset, false));
 		if (k == hui::KEY_SHIFT + hui::KEY_RIGHT)
 			expand_sel_range(view, this, true);
 		if (k == hui::KEY_SHIFT + hui::KEY_LEFT)
@@ -324,31 +322,39 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 Bar *song_bar_at(Song *s, int pos);
 
 int ViewModeDefault::suggest_move_cursor(int pos, bool forward) {
-	int d = view->cam.dscreen2sample(100);
-	if (!forward)
-		d = -d;
+	int PIXELS = 100;
 
 	Bar *b = song_bar_at(view->song, pos);
 	if (!forward)
 		b = song_bar_at(view->song, pos - 1);
 	if (b) {
-		int pp = pos;
-		if (b->length < fabs(d * 0.5)) {
+		// 1 bar
+		if (view->cam.dsample2screen(b->length) < PIXELS * 1.2) {
 			if (forward)
-				pp = b->range().end();
+				return b->range().end();
 			else
-				pp = b->range().start();
-
-		} else {
-			if (forward)
-				pp = view->song->bars.get_next_beat(pos);
-			else
-				pp = view->song->bars.get_prev_beat(pos);
+				return b->range().start();
 		}
-		if (pp != pos)
+
+		// 1 beat
+		int pp = pos;
+		if (forward)
+			pp = view->song->bars.get_next_beat(pos);
+		else
+			pp = view->song->bars.get_prev_beat(pos);
+		if (view->cam.dsample2screen(fabs(pp - pos)) < PIXELS * 1.5)
 			return pp;
 	}
 
+	// N pixels
+	int d = view->cam.dscreen2sample(PIXELS);
+
+	// 1 sample
+	if (d < 10)
+		d = 1;
+
+	if (!forward)
+		d = -d;
 	return pos + d;
 }
 
@@ -400,9 +406,10 @@ SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
 	return SongSelection::from_range(song, r).filter(view->sel.layers);
 }
 
-SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1) {
+SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, int y1) {
 	SongSelection s;
-	s.range = r.canonical();
+	s.range_raw = _r;
+	Range r = _r.canonical();
 	if (y0 > y1) {
 		int t = y0;
 		y0 = y1;
@@ -416,7 +423,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 
 		// markers
 		for (TrackMarker *m: t->markers)
-			s.set(m, s.range.overlaps(m->range));
+			s.set(m, r.overlaps(m->range));
 	}
 
 	for (auto vl: view->vlayer) {
@@ -427,16 +434,16 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 
 		// subs
 		for (SampleRef *sr: l->samples)
-			s.set(sr, s.range.overlaps(sr->range()));
+			s.set(sr, r.overlaps(sr->range()));
 
 		// midi
 
 		auto *mp = midi_context(vl);
-		float r = mp->rr;
+		float d = mp->rr;
 		for (MidiNote *n: l->midi)
-			if ((n->y + r >= y0) and (n->y - r <= y1))
+			if ((n->y + d >= y0) and (n->y - d <= y1))
 				//s.set(n, s.range.is_inside(n->range.center()));
-				s.set(n, s.range.overlaps(n->range));
+				s.set(n, r.overlaps(n->range));
 	}
 	return s;
 }

@@ -95,7 +95,7 @@ class ShowSpectrum extends SongPlugin
 	
 		AudioBuffer buf
 		SongRenderer* renderer = new SongRenderer(song)
-		renderer.render(session.view.sel.range, buf)
+		renderer.render(session.view.sel.range(), buf)
 		delete renderer
 	
 		complex[] fr, fl
@@ -144,7 +144,7 @@ class ShowSpectrum extends SongPlugin
 		ffl.clear()
 
 	override void apply()
-		if session.view.sel.range.length > 0
+		if session.view.sel.range().length > 0
 			show_spec(song)
 		else
 			session.e("'Show Spectrum.kaba': Needs some selection!")

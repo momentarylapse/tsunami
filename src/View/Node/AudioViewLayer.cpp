@@ -173,7 +173,7 @@ void AudioViewLayer::draw_track_buffers(Painter *c) {
 	if (view->sel.has(layer)) {
 		// selection
 		view->buffer_painter->set_color(view->colors.selection_boundary);
-		view->buffer_painter->set_clip(view->sel.range);
+		view->buffer_painter->set_clip(view->cursor_range());
 		for (AudioBuffer &b: layer->buffers)
 			view->buffer_painter->draw_buffer_selection(c, b, b.offset);
 	}
@@ -553,7 +553,7 @@ bool AudioViewLayer::on_right_button_down() {
 	} else { // void
 		if (!view->sel.has(layer))
 			view->exclusively_select_layer(this);
-		if (!view->sel.range.is_inside(h.pos_snap))
+		if (!view->sel.range().is_inside(h.pos_snap))
 			view->set_cursor_pos(h.pos_snap);
 		view->sel.clear_data();
 	}

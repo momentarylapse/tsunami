@@ -85,6 +85,7 @@ int Range::center() const {
 	return offset + length / 2;
 }
 
+// FIXME   length == 0????
 bool Range::empty() const {
 	return length <= 0;
 }

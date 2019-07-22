@@ -33,7 +33,7 @@ class ShowSpectrum extends SongPlugin
 		if !check_clipboard()
 			session.e("'Soft Paste': needs a single audio track in clipboard!")
 			return
-		if session.view.sel.range.length == 0
+		if session.view.sel.range().length == 0
 			session.e("'Soft Paste': needs some selection!")
 			return
 
@@ -42,7 +42,7 @@ class ShowSpectrum extends SongPlugin
 			if t.type == TYPE_AUDIO
 				for l in t.layers
 					if session.view.sel.has_layer(l)
-						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range)
+						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
 						n ++
 
 		if n == 0

@@ -23,7 +23,7 @@ void ViewModeScaleBars::on_start() {
 
 void ViewModeScaleBars::draw_post(Painter *c) {
 	float x1, x2;
-	cam->range2screen_clip(view->sel.range, view->area, x1, x2);
+	cam->range2screen_clip(view->sel.range(), view->area, x1, x2);
 
 	c->set_color(color(0.1f, 1, 1, 1));
 	c->draw_rect(x1, view->area.y1, 30, view->area.height());
@@ -40,7 +40,7 @@ void ViewModeScaleBars::start_scaling(const Array<int> &sel) {
 	for (int i=sel[0]; i<=sel.back(); i++)
 		scaling_sel.add(i);
 	scaling_range_orig = RangeTo(song->bars[sel[0]]->range().start(), song->bars[sel.back()]->range().end());
-	view->sel.range = scaling_range_orig;
+	view->sel.range_raw = scaling_range_orig;
 	view->update_selection();
 }
 
@@ -62,7 +62,7 @@ void ViewModeScaleBars::on_key_down(int k) {
 }
 
 void ViewModeScaleBars::perform_scale() {
-	float factor = (float)view->sel.range.length / (float)scaling_range_orig.length;
+	float factor = (float)view->sel.range().length / (float)scaling_range_orig.length;
 
 	song->begin_action_group();
 	foreachb(int i, scaling_sel) {

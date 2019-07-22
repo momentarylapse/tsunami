@@ -28,12 +28,12 @@ GridPainter::GridPainter(AudioView *_view) {
 
 
 void GridPainter::draw_empty_background(Painter *c) {
-	if (view->sel.range.length > 0) {
+	if (view->cursor_range().length > 0) {
 		c->set_color(colors.bg);
 		c->draw_rect(area);
 
 		float x1, x2;
-		view->cam.range2screen_clip(view->sel.range, area, x1, x2);
+		view->cam.range2screen_clip(view->cursor_range(), area, x1, x2);
 		c->set_color(colors.bg_sel);
 		c->draw_rect(x1, area.y1, x2-x1, area.height());
 
@@ -67,7 +67,7 @@ void GridPainter::draw_time(Painter *c) {
 
 	for (int n=nx0; n<nx1; n++) {
 		double sample = n * dl;
-		if (view->sel.range.is_inside(sample))
+		if (view->cursor_range().is_inside(sample))
 			c->set_color(((n % 10) == 0) ? c2s : c1s);
 		else
 			c->set_color(((n % 10) == 0) ? c2 : c1);
@@ -130,7 +130,7 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
 		if (f1 >= 0.1f) {
-			if (view->sel.range.is_inside(b->range().offset))
+			if (view->cursor_range().is_inside(b->range().offset))
 				c->set_color(col_inter(colors.bg_sel, colors.fg_sel, f1));
 			else
 				c->set_color(col_inter(colors.bg, colors.fg, f1));
@@ -149,9 +149,9 @@ void GridPainter::draw_bars(Painter *c, int beat_partition) {
 					continue;
 				int x = cam->sample2screen(bb.range.offset);
 				if (bb.level > 1)
-					c->set_color(view->sel.range.is_inside(bb.range.offset) ? c2s : c2);
+					c->set_color(view->cursor_range().is_inside(bb.range.offset) ? c2s : c2);
 				else
-					c->set_color(view->sel.range.is_inside(bb.range.offset) ? c1s : c1);
+					c->set_color(view->cursor_range().is_inside(bb.range.offset) ? c1s : c1);
 				c->draw_line(x, area.y1, x, area.y2);
 			}
 		}

@@ -12,8 +12,7 @@
 class SongSelection;
 class TrackLayer;
 
-class ActionTrackSampleFromSelection : public ActionGroup
-{
+class ActionTrackSampleFromSelection : public ActionGroup {
 public:
 	ActionTrackSampleFromSelection(const SongSelection &sel, bool auto_delete);
 

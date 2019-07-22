@@ -432,7 +432,7 @@ void ViewModeMidi::set_rep_key(int k) {
 int song_bar_divisor(Song *s, int pos);
 
 void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) {
-	int div = song_bar_divisor(m->view->song, m->view->sel.range.offset);
+	int div = song_bar_divisor(m->view->song, m->view->cursor_pos());
 	//l *= div;
 
 	if ((m->sub_beat_partition % p) == 0) {
@@ -441,7 +441,7 @@ void set_note_lengthx(ViewModeMidi *m, int l, int p, int n, const string &text) 
 		m->set_note_length(l * n);
 		m->set_sub_beat_partition(p);
 	}
-	m->view->set_cursor_pos(m->view->sel.range.offset);
+	m->view->set_cursor_pos(m->view->cursor_pos());
 
 	string t;
 	if (n > 4) {
@@ -856,20 +856,20 @@ int ViewModeMidi::suggest_move_cursor(int pos, bool forward) {
 // seems fine
 Range ViewModeMidi::get_edit_range() {
 	// manual selection has priority
-	if (view->sel.range.length > 0)
-		return view->sel.range;
+	if (view->sel.range().length > 0)
+		return view->sel.range();
 
-	int pos = view->sel.range.end();
-	return RangeTo(view->sel.range.start(), suggest_move_cursor(pos, true));
+	int pos = view->cursor_pos();
+	return RangeTo(pos, suggest_move_cursor(pos, true));
 }
 
 
 Range ViewModeMidi::get_backwards_range() {
 	// manual selection has priority
-	if (view->sel.range.length > 0)
-		return view->sel.range;
+	if (view->sel.range().length > 0)
+		return view->sel.range();
 
-	int pos = view->sel.range.end();
+	int pos = view->cursor_pos();
 	return RangeTo(suggest_move_cursor(pos, false), pos);
 }
 

@@ -22,24 +22,22 @@ ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 	track = nullptr;
 }
 
-void ViewModeScaleMarker::on_start()
-{
+void ViewModeScaleMarker::on_start() {
 	scaling = false;
 	track = view->hover_before_leave.track();
 	marker = view->hover_before_leave.marker;
 
-	if (marker){
-		view->sel.range = marker->range;
+	if (marker) {
+		view->sel.range_raw = marker->range;
 		view->update_selection();
-	}else{
+	} else {
 		session->e(_("no marker selected"));
 	}
 }
 
-void ViewModeScaleMarker::draw_post(Painter *c)
-{
+void ViewModeScaleMarker::draw_post(Painter *c) {
 	float x1, x2;
-	cam->range2screen_clip(view->sel.range, view->area, x1, x2);
+	cam->range2screen_clip(view->sel.range(), view->area, x1, x2);
 
 	c->set_color(color(0.1f, 1, 1, 1));
 	c->draw_rect(x1, view->area.y1, 30, view->area.height());
@@ -50,36 +48,30 @@ string ViewModeScaleMarker::get_tip() {
 	return _("move selection handles to scale   cancel (Esc)   done (Return)");
 }
 
-void ViewModeScaleMarker::on_left_button_up()
-{
+void ViewModeScaleMarker::on_left_button_up() {
 	ViewModeDefault::on_left_button_up();
 
 	perform_scale();
 }
 
-void ViewModeScaleMarker::on_right_button_down()
-{
+void ViewModeScaleMarker::on_right_button_down() {
 	session->set_mode("default");
 }
 
-void ViewModeScaleMarker::on_mouse_move()
-{
+void ViewModeScaleMarker::on_mouse_move() {
 	ViewModeDefault::on_mouse_move();
 }
 
-void ViewModeScaleMarker::on_key_down(int k)
-{
+void ViewModeScaleMarker::on_key_down(int k) {
 	if (k == hui::KEY_ESCAPE)
 		session->set_mode("default");
 	if (k == hui::KEY_RETURN)
 		perform_scale();
 }
 
-void ViewModeScaleMarker::perform_scale()
-{
-	if (marker){
-		track->edit_marker(marker, view->sel.range, marker->text);
-	}
+void ViewModeScaleMarker::perform_scale() {
+	if (marker)
+		track->edit_marker(marker, view->sel.range(), marker->text);
 
 	session->set_mode("default");
 }

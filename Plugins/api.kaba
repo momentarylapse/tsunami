@@ -474,7 +474,8 @@ class Song
 	extern void end_action_group()
 
 class SongSelection
-	Range range
+	Range range_raw
+	extern Range range()
 	extern bool has_track(Track *t)
 	extern bool has_layer(TrackLayer *t)
 	extern bool has_marker(TrackMarker *m)

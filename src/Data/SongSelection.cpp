@@ -30,22 +30,24 @@ void SongSelection::clear_data() {
 	bars.clear();
 }
 
+Range SongSelection::range() const {
+	return range_raw.canonical();
+}
+
 SongSelection SongSelection::all(Song* s) {
 	return from_range(s, Range::ALL);
 }
 
 SongSelection SongSelection::from_range(Song *song, const Range &r) {
 	SongSelection s;
-	s.range = r;
-	if (s.range.length < 0)
-		s.range.invert();
+	s.range_raw = r;
 
 	s._update_bars(song);
 
 	for (Track *t: song->tracks) {
 
 		for (auto *m: t->markers)
-			s.set(m, s.range.overlaps(m->range));
+			s.set(m, s.range().overlaps(m->range));
 	}
 
 	for (Track *t: song->tracks) {
@@ -53,10 +55,10 @@ SongSelection SongSelection::from_range(Song *song, const Range &r) {
 			s.add(l);
 
 			for (auto *n: l->midi)
-				s.set(n, s.range.overlaps(n->range));
+				s.set(n, s.range().overlaps(n->range));
 
 			for (auto *sr: l->samples)
-				s.set(sr, s.range.overlaps(sr->range()));
+				s.set(sr, s.range().overlaps(sr->range()));
 		}
 	}
 
@@ -65,7 +67,7 @@ SongSelection SongSelection::from_range(Song *song, const Range &r) {
 
 SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) const {
 	SongSelection s;
-	s.range = range;
+	s.range_raw = range_raw;
 
 	for (auto *l: _layers) {
 		if (has(l))
@@ -109,14 +111,14 @@ void SongSelection::_update_bars(Song* s) {
 	bars.clear();
 
 
-	if (range.end() <= 0)
+	if (range().end() <= 0)
 		return;
 
 	int pos = 0;
 	foreachi(Bar *b, s->bars, i) {
 		Range r = Range(pos + 1, b->length - 2);
 		b->offset = pos;
-		if (r.overlaps(range))
+		if (r.overlaps(range()))
 			bars.add(b);
 		pos += b->length;
 	}
@@ -163,7 +165,7 @@ int SongSelection::num_samples() const {
 }
 
 bool SongSelection::is_empty() const {
-	if (!range.empty())
+	if (!range().empty())
 		return false;
 	return (samples.num == 0) and (markers.num == 0) and (notes.num == 0) and (bars.num == 0);
 }

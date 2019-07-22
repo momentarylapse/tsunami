@@ -13,8 +13,7 @@
 
 class SongSelection;
 
-class ActionSongDeleteSelection : public ActionGroup
-{
+class ActionSongDeleteSelection : public ActionGroup {
 public:
 	ActionSongDeleteSelection(const SongSelection &sel);
 

@@ -404,10 +404,10 @@ void AudioView::selection_update_pos(HoverData &s) {
 }
 
 void AudioView::update_selection() {
-	sel.range = sel.range.canonical();
+	//sel.range = sel.range.canonical();
 
 	if (!playback_range_locked) {
-		playback_wish_range = sel.range;
+		playback_wish_range = sel.range();
 	}
 
 
@@ -442,15 +442,15 @@ bool AudioView::mouse_over_time(int pos) {
 Range AudioView::get_playback_selection(bool for_recording) {
 	if (playback_wish_range.length > 0)
 		return playback_wish_range;
-	if (sel.range.empty()) {
+	if (sel.range().empty()) {
 		if (for_recording)
-			return Range(sel.range.start(), 0x70000000);
-		int num = song->range_with_time().end() - sel.range.start();
+			return Range(sel.range().start(), 0x70000000);
+		int num = song->range_with_time().end() - sel.range().start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
-		return Range(sel.range.start(), num);
+		return Range(sel.range().start(), num);
 	}
-	return sel.range;
+	return sel.range();
 }
 
 void AudioView::set_selection_snap_mode(SelectionSnapMode mode) {
@@ -764,7 +764,7 @@ void AudioView::explode_track(Track *t) {
 void AudioView::on_song_new() {
 	__set_cur_layer(nullptr);
 	update_tracks();
-	sel.range = Range(0, 0);
+	sel.range_raw = Range::EMPTY;
 	sel.clear();
 	for (Track *t: song->tracks)
 		for (TrackLayer *l: t->layers)
@@ -1242,7 +1242,7 @@ inline void test_range(const Range &r, Range &sel, bool &update) {
 }
 
 void AudioView::select_expand() {
-	Range r = sel.range;
+	Range r = sel.range();
 	bool update = true;
 	while (update) {
 		update = false;
@@ -1497,7 +1497,7 @@ void AudioView::set_message(const string& text, float size) {
 void AudioView::set_playback_range_locked(bool locked) {
 	playback_range_locked = locked;
 	if (!locked)
-		playback_wish_range = sel.range;
+		playback_wish_range = sel.range();
 	force_redraw();
 	//notify();
 }
@@ -1507,14 +1507,22 @@ void AudioView::set_playback_range_locked(bool locked) {
 
 
 void AudioView::set_cursor_pos(int pos) {
-	sel.range = Range(pos, 0);
+	sel.range_raw = Range(pos, 0);
 	select_under_cursor();
 	//update_selection();
 	cam.make_sample_visible(pos, 0);
 }
 
+int AudioView::cursor_pos() {
+	return sel.range_raw.offset;
+}
+
+Range AudioView::cursor_range() {
+	return sel.range();
+}
+
 void AudioView::select_under_cursor() {
-	set_selection(mode->get_selection_for_range(sel.range));
+	set_selection(mode->get_selection_for_range(sel.range_raw));
 }
 
 bool AudioView::hover_any_object() {
@@ -1613,7 +1621,7 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 	if (sel.has(l->layer))
 		sel = sel.minus(SongSelection::all(song).filter({l->layer}));
 	else
-		sel = sel || SongSelection::from_range(song, sel.range).filter({l->layer});
+		sel = sel || SongSelection::from_range(song, sel.range()).filter({l->layer});
 	//toggle_select_layer();
 }
 

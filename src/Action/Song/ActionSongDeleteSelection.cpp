@@ -21,10 +21,9 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(const SongSelection &_sel) 
 {
 }
 
-void ActionSongDeleteSelection::build(Data *d)
-{
+void ActionSongDeleteSelection::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
-	for (Track *t: s->tracks){
+	for (Track *t: s->tracks) {
 
 		// marker
 		for (int i=t->markers.num-1; i>=0; i--)
@@ -32,9 +31,9 @@ void ActionSongDeleteSelection::build(Data *d)
 				add_sub_action(new ActionTrackDeleteMarker(t, i), d);
 
 
-		for (TrackLayer *l: t->layers){
+		for (TrackLayer *l: t->layers) {
 			// buffer boxes
-			if (sel.has(l) and !sel.range.empty())
+			if (sel.has(l) and !sel.range().empty())
 				DeleteBuffersFromTrackLayer(s, t, l, sel);
 
 			// midi
@@ -50,29 +49,28 @@ void ActionSongDeleteSelection::build(Data *d)
 	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel)
-{
-	int i0 = sel.range.start();
-	int i1 = sel.range.end();
-	foreachib(AudioBuffer &b, l->buffers, n){
+void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel) {
+	int i0 = sel.range().start();
+	int i1 = sel.range().end();
+	foreachib(AudioBuffer &b, l->buffers, n) {
 		int bi0 = b.offset;
 		int bi1 = b.offset + b.length;
 
 
-		if (sel.range.covers(b.range())){
+		if (sel.range().covers(b.range())) {
 			// b completely inside?
 			add_sub_action(new ActionTrack__DeleteBuffer(l, n), a);
 
-		}else if (sel.range.is_inside(bi1-1)){
+		} else if (sel.range().is_inside(bi1-1)) {
 			// overlapping end of b?
 			add_sub_action(new ActionTrack__ShrinkBuffer(l, n, i0 - bi0), a);
 
-		}else if (sel.range.is_inside(bi0)){
+		} else if (sel.range().is_inside(bi0)) {
 			// overlapping beginning of b?
 			add_sub_action(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
 			add_sub_action(new ActionTrack__DeleteBuffer(l, n), a);
 
-		}else if (b.range().covers(sel.range)){
+		} else if (b.range().covers(sel.range())) {
 			// inside b?
 			add_sub_action(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
 			add_sub_action(new ActionTrack__SplitBuffer(l, n, i0 - bi0), a);

@@ -224,7 +224,7 @@ void SampleManagerConsole::on_insert()
 {
 	Array<Sample*> sel = get_selected();
 	for (Sample* s: sel)
-		view->cur_layer()->add_sample_ref(view->sel.range.start(), s);
+		view->cur_layer()->add_sample_ref(view->cursor_pos(), s);
 }
 
 void SampleManagerConsole::on_create_from_selection()

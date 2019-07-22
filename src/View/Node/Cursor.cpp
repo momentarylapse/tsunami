@@ -40,9 +40,9 @@ void Cursor::draw(Painter* c) {
 
 int Cursor::pos() {
 	if (is_end)
-		return view->sel.range.end();
+		return view->sel.range_raw.end();
 	else
-		return view->sel.range.start();
+		return view->sel.range_raw.start();
 }
 
 bool Cursor::hover(float mx, float my) {
@@ -57,13 +57,16 @@ string Cursor::get_tip() {
 }
 
 bool Cursor::on_left_button_down() {
-	drag_range = view->sel.range;
-	if (!is_end)
-		drag_range.invert();
+	drag_range = view->sel.range_raw;
+	/*if (!is_end)
+		drag_range.invert();*/
 
 	view->mdp_prepare([=]{
-		drag_range.set_end(view->get_mouse_pos_snap());
-		view->sel.range = drag_range;
+		if (is_end)
+			drag_range.set_end(view->get_mouse_pos_snap());
+		else
+			drag_range.set_start(view->get_mouse_pos_snap());
+		view->sel.range_raw = drag_range;
 		view->update_selection();
 		view->select_under_cursor();
 	});
@@ -92,7 +95,7 @@ void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color
 
 void SelectionMarker::draw(Painter* p) {
 	float x1, x2;
-	view->cam.range2screen_clip(view->sel.range, view->song_area(), x1, x2);
+	view->cam.range2screen_clip(view->cursor_range(), view->song_area(), x1, x2);
 
 	auto &hover = view->hover();
 

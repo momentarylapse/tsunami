@@ -351,7 +351,7 @@ void Song::delete_selection(const SongSelection &sel) {
 }
 
 void Song::create_samples_from_selection(const SongSelection &sel, bool auto_delete) {
-	if (!sel.range.empty())
+	if (!sel.range().empty())
 		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 
@@ -465,8 +465,8 @@ Song *copy_song_from_selection(Song *song, SongSelection &sel) {
 	Song *ss = new Song(song->session, song->sample_rate);
 	ss->tags = song->tags;
 	for (Bar *b: song->bars)
-		if (sel.range.covers(b->range())) {
-			int before = b->range().offset - sel.range.offset;
+		if (sel.range().covers(b->range())) {
+			int before = b->range().offset - sel.range().offset;
 			if (ss->bars.num == 0 and before > 0)
 				ss->bars.add(new Bar(before, 0, 0));
 			ss->bars.add(new Bar(*b));
@@ -495,23 +495,23 @@ Song *copy_song_from_selection(Song *song, SongSelection &sel) {
 			for (auto *n: l->midi)
 				if (sel.has(n)) {
 					auto *nn = n->copy();
-					nn->range.offset -= sel.range.offset;
+					nn->range.offset -= sel.range().offset;
 					ll->midi.add(nn);
 				}
 			for (auto &b: l->buffers) {
-				if (b.range().overlaps(sel.range)) {
-					Range ri = b.range() and sel.range;
+				if (b.range().overlaps(sel.range())) {
+					Range ri = b.range() and sel.range();
 					AudioBuffer bb;
 					l->read_buffers(bb, ri, true);
 					ll->buffers.add(bb);
-					ll->buffers.back().offset = ri.offset - sel.range.offset;
+					ll->buffers.back().offset = ri.offset - sel.range().offset;
 				}
 			}
 			ll->fades = l->fades; // TODO...
 		}
 		for (auto *m: t->markers)
 			if (sel.has(m))
-				tt->markers.add(new TrackMarker({m->range - sel.range.offset, m->text}));
+				tt->markers.add(new TrackMarker({m->range - sel.range().offset, m->text}));
 	}
 	return ss;
 }

@@ -339,6 +339,8 @@ public:
 
 
 	void set_cursor_pos(int pos);
+	int cursor_pos();
+	Range cursor_range();
 	void select_under_cursor();
 	bool hover_any_object();
 	bool hover_selected_object();

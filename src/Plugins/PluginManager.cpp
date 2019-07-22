@@ -607,7 +607,8 @@ void PluginManager::link_app_script_data()
 
 
 	Kaba::DeclareClassSize("SongSelection", sizeof(SongSelection));
-	Kaba::DeclareClassOffset("SongSelection", "range", _offsetof(SongSelection, range));
+	Kaba::DeclareClassOffset("SongSelection", "range_raw", _offsetof(SongSelection, range_raw));
+	Kaba::LinkExternal("SongSelection.range", Kaba::mf(&SongSelection::range));
 	Kaba::LinkExternal("SongSelection.has_track", Kaba::mf((bool (SongSelection::*)(const Track*) const)&SongSelection::has));
 	Kaba::LinkExternal("SongSelection.has_layer", Kaba::mf((bool (SongSelection::*)(const TrackLayer*) const)&SongSelection::has));
 	Kaba::LinkExternal("SongSelection.has_marker", Kaba::mf((bool (SongSelection::*)(const TrackMarker*) const)&SongSelection::has));

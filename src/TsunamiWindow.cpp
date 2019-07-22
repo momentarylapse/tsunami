@@ -381,7 +381,7 @@ void TsunamiWindow::on_add_midi_track() {
 }
 
 void TsunamiWindow::on_track_render() {
-	Range range = view->sel.range;
+	Range range = view->sel.range();
 	if (range.empty()) {
 		session->e(_("Selection range is empty"));
 		return;
@@ -441,7 +441,7 @@ void TsunamiWindow::on_track_edit_fx() {
 
 void TsunamiWindow::on_track_add_marker() {
 	if (view->cur_track()) {
-		Range range = view->sel.range;
+		Range range = view->sel.range();
 		if (!range.is_inside(view->hover_before_leave.pos))
 			range = Range(view->hover_before_leave.pos, 0);
 		auto *dlg = new MarkerDialog(this, view->cur_track(), range, "");
@@ -639,7 +639,7 @@ void TsunamiWindow::on_menu_execute_audio_effect() {
 	for (Track *t: song->tracks)
 		for (auto *l: t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				fx_process_layer(l, view->sel.range, fx, this);
+				fx_process_layer(l, view->sel.range(), fx, this);
 				n_layers ++;
 			}
 	song->end_action_group();
@@ -663,7 +663,7 @@ void TsunamiWindow::on_menu_execute_audio_source() {
 	for (Track *t: song->tracks)
 		for (auto *l: t->layers)
 			if (view->sel.has(l) and (t->type == SignalType::AUDIO)) {
-				source_process_layer(l, view->sel.range, s, this);
+				source_process_layer(l, view->sel.range(), s, this);
 				n_layers ++;
 			}
 	song->end_action_group();
@@ -716,9 +716,9 @@ void TsunamiWindow::on_menu_execute_midi_source() {
 			if (view->sel.has(l) and (t->type == SignalType::MIDI)) {
 				s->reset_state();
 				MidiEventBuffer buf;
-				buf.samples = view->sel.range.length;
+				buf.samples = view->sel.range().length;
 				s->read(buf);
-				l->insert_midi_data(view->sel.range.offset, midi_events_to_notes(buf));
+				l->insert_midi_data(view->sel.range().offset, midi_events_to_notes(buf));
 				n_layers ++;
 			}
 	song->end_action_group();
@@ -779,7 +779,7 @@ void TsunamiWindow::on_settings() {
 void TsunamiWindow::on_track_import() {
 	if (session->storage->ask_open_import(this)) {
 		Track *t = song->add_track(SignalType::AUDIO_STEREO);
-		session->storage->load_track(t->layers[0], hui::Filename, view->sel.range.start());
+		session->storage->load_track(t->layers[0], hui::Filename, view->cursor_pos());
 	}
 }
 
@@ -850,7 +850,7 @@ void TsunamiWindow::on_layer_merge() {
 }
 
 void TsunamiWindow::on_layer_mark_selection_dominant() {
-	view->cur_track()->mark_dominant(view->sel.layers, view->sel.range);
+	view->cur_track()->mark_dominant(view->sel.layers, view->sel.range());
 }
 
 void TsunamiWindow::on_layer_add_selection_dominant() {
@@ -909,12 +909,12 @@ void TsunamiWindow::update_menu() {
 	// file
 	//Enable("export_selection", true);
 	// bars
-	enable("delete_time", !view->sel.range.empty());
+	enable("delete_time", !view->sel.range().empty());
 	enable("bars-delete", view->sel.bars.num > 0);
 	enable("bars-edit", view->sel.bars.num > 0);
 	enable("bars-scale", view->sel.bars.num > 0);
 	// sample
-	enable("sample_from_selection", !view->sel.range.empty());
+	enable("sample_from_selection", !view->sel.range().empty());
 	enable("sample-insert", view->sel.num_samples() > 0);
 	enable("sample-delete", view->sel.num_samples() > 0);
 	enable("sample-properties", view->cur_sample());

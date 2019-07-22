@@ -40,7 +40,8 @@ public:
 	SongSelection filter(int mask) const;
 	SongSelection filter(const Array<const TrackLayer*> &layers) const;
 
-	Range range;
+	Range range_raw;
+	Range range() const;
 
 	Set<const TrackLayer*> layers;
 	Set<const SampleRef*> samples;

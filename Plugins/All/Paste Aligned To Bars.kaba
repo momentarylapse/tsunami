@@ -31,7 +31,7 @@ class XXX extends SongPlugin
 
 		song.begin_action_group()
 		for ls,i in source_layers
-			paste(session.view.sel.range.offset, ls, target_layers[i])
+			paste(session.view.sel.range().offset, ls, target_layers[i])
 		song.end_action_group()
 	
 	void paste(int offset, TrackLayer* source, TrackLayer* dest)

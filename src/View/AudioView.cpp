@@ -654,7 +654,11 @@ void AudioView::on_command(const string &id) {
 void AudioView::on_key_down() {
 	int k = hui::GetEvent()->key_code;
 	if (k == hui::KEY_ESCAPE) {
-		mdp()->cancel();
+		if (mdp()->acting()) {
+			mdp()->cancel();
+		} else {
+			session->set_mode("default");
+		}
 	}
 	mode->on_key_down(k);
 }

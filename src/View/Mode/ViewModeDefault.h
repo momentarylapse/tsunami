@@ -14,8 +14,7 @@ class SongSelection;
 class Range;
 class Track;
 
-class ViewModeDefault : public ViewMode
-{
+class ViewModeDefault : public ViewMode {
 public:
 	ViewModeDefault(AudioView *view);
 	virtual ~ViewModeDefault();
@@ -24,6 +23,7 @@ public:
 	void on_key_down(int k) override;
 	float layer_min_height(AudioViewLayer *l) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
+	int suggest_move_cursor(int pos, bool forward) override;
 
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 

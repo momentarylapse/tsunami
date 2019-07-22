@@ -31,7 +31,6 @@ class Session;
 class ViewMode : public Observable<VirtualBase> {
 public:
 	ViewMode(AudioView *view);
-	virtual ~ViewMode();
 
 	virtual void on_start() {}
 	virtual void on_end() {}
@@ -63,6 +62,8 @@ public:
 	virtual void start_selection() {}
 
 	virtual Set<Track*> prevent_playback(){ return {}; }
+
+	virtual int suggest_move_cursor(int pos, bool forward) = 0;
 
 	virtual void left_click_handle(AudioViewLayer *vlayer) {}
 	virtual void left_click_handle_object(AudioViewLayer *vlayer) {}

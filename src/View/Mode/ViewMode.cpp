@@ -17,9 +17,6 @@ ViewMode::ViewMode(AudioView *_view) {
 	side_bar_console = -1;
 }
 
-ViewMode::~ViewMode() {
-}
-
 HoverData &ViewMode::hover() {
 	return view->hover();
 }

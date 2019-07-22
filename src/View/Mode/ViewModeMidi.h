@@ -55,6 +55,7 @@ public:
 	void set_note_length(int length);
 
 	Array<int> get_creation_pitch(int base_pitch);
+	int suggest_move_cursor(int pos, bool forward) override;
 	Range get_edit_range();
 	Range get_backwards_range();
 	void start_midi_preview(const Array<int> &pitch, float ttl);

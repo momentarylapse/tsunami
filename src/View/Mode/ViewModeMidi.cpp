@@ -553,8 +553,8 @@ void ViewModeMidi::on_key_down(int k) {
 		set_input_mode(InputMode::NOTE_LENGTH);
 	if (k == hui::KEY_P)
 		set_input_mode(InputMode::BEAT_PARTITION);
-	if (k == hui::KEY_ESCAPE)
-		set_input_mode(InputMode::DEFAULT);
+//	if (k == hui::KEY_ESCAPE)
+//		set_input_mode(InputMode::DEFAULT);
 
 	//if (k == hui::KEY_ESCAPE)
 	//	session->set_mode("default");
@@ -838,19 +838,29 @@ string ViewModeMidi::get_tip() {
 	return message;
 }
 
+int ViewModeMidi::suggest_move_cursor(int pos, bool forward) {
+	if (forward) {
+		Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, note_length);
+		if (rr.length > 0)
+			return rr.end();
+	} else {
+		Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, -note_length);
+		if (rr.length > 0)
+			return rr.start();
+	}
+
+	// in case we ran out of bars
+	return pos + (forward ? 1 : -1) * note_length * session->sample_rate() / sub_beat_partition;
+}
+
 // seems fine
 Range ViewModeMidi::get_edit_range() {
 	// manual selection has priority
 	if (view->sel.range.length > 0)
 		return view->sel.range;
 
-	int pos = view->sel.range.offset;
-	Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, note_length);
-	if (rr.length > 0)
-		return rr;
-
-	// in case we ran out of bars
-	return RangeTo(pos, pos + note_length * session->sample_rate() / sub_beat_partition);
+	int pos = view->sel.range.end();
+	return RangeTo(view->sel.range.start(), suggest_move_cursor(pos, true));
 }
 
 
@@ -859,13 +869,8 @@ Range ViewModeMidi::get_backwards_range() {
 	if (view->sel.range.length > 0)
 		return view->sel.range;
 
-	int pos = view->sel.range.offset;
-	Range rr = song->bars.get_sub_beats(pos, sub_beat_partition, -note_length);
-	if (rr.length > 0)
-		return rr;
-
-		// in case we ran out of bars
-	return RangeTo(pos - note_length * session->sample_rate() / sub_beat_partition, pos);
+	int pos = view->sel.range.end();
+	return RangeTo(suggest_move_cursor(pos, false), pos);
 }
 
 SongSelection ViewModeMidi::get_select_in_edit_cursor() {

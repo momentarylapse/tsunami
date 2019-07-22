@@ -244,15 +244,29 @@ void playback_seek_relative(AudioView *view, float dt) {
 	view->signal_chain->set_pos(pos);
 }
 
+void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
+	int pos;
+	if (forward) {
+		pos = m->suggest_move_cursor(view->sel.range.end(), true);
+		view->sel.range.set_end(pos);
+	} else {
+		pos = m->suggest_move_cursor(view->sel.range.end(), false);
+		view->sel.range.set_end(pos);
+	}
+
+	view->select_under_cursor();
+	view->cam.make_sample_visible(pos, 0);
+}
+
 void ViewModeDefault::on_key_down(int k) {
 
 // view
 	// moving
 	float dt = 0.05f;
-	if (k == hui::KEY_RIGHT)
+/*	if (k == hui::KEY_RIGHT)
 		cam->move(view->ScrollSpeed * dt / cam->scale);
 	if (k == hui::KEY_LEFT)
-		cam->move(- view->ScrollSpeed * dt / cam->scale);
+		cam->move(- view->ScrollSpeed * dt / cam->scale);*/
 	if (k == hui::KEY_NEXT)
 		cam->move(view->ScrollSpeedFast * dt / cam->scale);
 	if (k == hui::KEY_PRIOR)
@@ -270,10 +284,19 @@ void ViewModeDefault::on_key_down(int k) {
 
 	// playback
 	if (view->is_playback_active()) {
-		if (k == hui::KEY_CONTROL + hui::KEY_RIGHT)
+		if (k == hui::KEY_RIGHT)
 			playback_seek_relative(view, 5);
-		if (k == hui::KEY_CONTROL + hui::KEY_LEFT)
+		if (k == hui::KEY_LEFT)
 			playback_seek_relative(view, -5);
+	} else {
+		if (k == hui::KEY_RIGHT)
+			view->set_cursor_pos(suggest_move_cursor(view->sel.range.end(), true));
+		if (k == hui::KEY_LEFT)
+			view->set_cursor_pos(suggest_move_cursor(view->sel.range.offset, false));
+		if (k == hui::KEY_SHIFT + hui::KEY_RIGHT)
+			expand_sel_range(view, this, true);
+		if (k == hui::KEY_SHIFT + hui::KEY_LEFT)
+			expand_sel_range(view, this, false);
 	}
 
 	view->update_menu();
@@ -298,8 +321,38 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 	return view->TIME_SCALE_HEIGHT * 2;
 }
 
-MidiPainter* midi_context(AudioViewLayer *l)
-{
+Bar *song_bar_at(Song *s, int pos);
+
+int ViewModeDefault::suggest_move_cursor(int pos, bool forward) {
+	int d = view->cam.dscreen2sample(100);
+	if (!forward)
+		d = -d;
+
+	Bar *b = song_bar_at(view->song, pos);
+	if (!forward)
+		b = song_bar_at(view->song, pos - 1);
+	if (b) {
+		int pp = pos;
+		if (b->length < fabs(d * 0.5)) {
+			if (forward)
+				pp = b->range().end();
+			else
+				pp = b->range().start();
+
+		} else {
+			if (forward)
+				pp = view->song->bars.get_next_beat(pos);
+			else
+				pp = view->song->bars.get_prev_beat(pos);
+		}
+		if (pp != pos)
+			return pp;
+	}
+
+	return pos + d;
+}
+
+MidiPainter* midi_context(AudioViewLayer *l) {
 	auto *mp = l->view->midi_painter;
 	mp->set_context(l->area, l->layer->track->instrument, l->is_playable(), l->midi_mode());
 	mp->set_key_changes(l->midi_key_changes);
@@ -307,14 +360,13 @@ MidiPainter* midi_context(AudioViewLayer *l)
 	return mp;
 }
 
-void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
-{
+void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	view->grid_painter->set_context(l->area, l->grid_colors());
 	view->grid_painter->draw_empty_background(c);
 	view->grid_painter->draw_whatever(c, 0);
 
 
-	if (l->layer->type == SignalType::MIDI){
+	if (l->layer->type == SignalType::MIDI) {
 		auto *mp = midi_context(l);
 		mp->draw_background(c);
 	}
@@ -324,10 +376,10 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l)
 	// parts
 	auto groups = group_markers(l->layer->song()->get_parts());
 	c->set_line_width(2.0f);
-	for (auto &g: groups){
+	for (auto &g: groups) {
 		float gx0, gx1;
 		view->cam.range2screen(RangeTo(g[0]->range.start(), g.back()->range.end()), gx0, gx1);
-		for (auto *m: g){
+		for (auto *m: g) {
 			color col = l->marker_color(m);
 			col.a = 0.75f;
 			float x0, x1;
@@ -348,17 +400,16 @@ SongSelection ViewModeDefault::get_selection_for_range(const Range &r) {
 	return SongSelection::from_range(song, r).filter(view->sel.layers);
 }
 
-SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1)
-{
+SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, int y1) {
 	SongSelection s;
 	s.range = r.canonical();
-	if (y0 > y1){
+	if (y0 > y1) {
 		int t = y0;
 		y0 = y1;
 		y1 = t;
 	}
 
-	for (auto vt: view->vtrack){
+	for (auto vt: view->vtrack) {
 		Track *t = vt->track;
 		if ((y1 < vt->area.y1) or (y0 > vt->area.y2))
 			continue;
@@ -368,7 +419,7 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 			s.set(m, s.range.overlaps(m->range));
 	}
 
-	for (auto vl: view->vlayer){
+	for (auto vl: view->vlayer) {
 		TrackLayer *l = vl->layer;
 		if ((y1 < vl->area.y1) or (y0 > vl->area.y2))
 			continue;
@@ -390,15 +441,14 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &r, int y0, in
 	return s;
 }
 
-SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int y0, int y1)
-{
-	if (y0 > y1){
+SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int y0, int y1) {
+	if (y0 > y1) {
 		int t = y0;
 		y0 = y1;
 		y1 = t;
 	}
 	Set<const TrackLayer*> _layers;
-	for (auto vt: view->vlayer){
+	for (auto vt: view->vlayer) {
 		if ((y1 >= vt->area.y1) and (y0 <= vt->area.y2))
 			_layers.add(vt->layer);
 	}

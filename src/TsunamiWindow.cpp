@@ -113,6 +113,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-add-midi", [=]{ on_add_midi_track(); });
 	event("track-delete", [=]{ on_delete_track(); });
 	event("track-edit-midi", [=]{ on_track_edit_midi(); });
+	set_key_code("track-edit-midi", hui::KEY_ALT + hui::KEY_E);
 	event("track-edit-fx", [=]{ on_track_edit_fx(); });
 	event("track-add-marker", [=]{ on_track_add_marker(); });
 	event("track-convert-mono", [=]{ on_track_convert_mono(); });

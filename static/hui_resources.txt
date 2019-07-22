@@ -4619,7 +4619,7 @@ track-edit-fx
 0
 0
 Item
-track-edit-midi
+layer-edit-midi
 
 6
 0

@@ -10,8 +10,7 @@
 
 #include "AudioSource.h"
 
-class BufferStreamer : public AudioSource
-{
+class BufferStreamer : public AudioSource {
 public:
 	BufferStreamer(AudioBuffer *buf);
 
@@ -20,8 +19,8 @@ public:
 
 	int read(AudioBuffer &buf) override;
 	void reset_state() override;
-	int get_pos() override { return offset; }
-	void set_pos(int pos) override { offset = pos; }
+	int get_pos() { return offset; }
+	void set_pos(int pos) { offset = pos; }
 
 	AudioBuffer *buf;
 	int offset;

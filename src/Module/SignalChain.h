@@ -87,9 +87,6 @@ public:
 	bool is_paused();
 	bool is_playback_active();
 
-	int get_pos() override;
-	void set_pos(int pos) override;
-
 
 	void set_buffer_size(int size);
 	static const int DEFAULT_BUFFER_SIZE;

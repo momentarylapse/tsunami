@@ -26,11 +26,16 @@ public:
 	}
 	void update_geometry(const rect &target_area) override {
 		area = target_area;
-		view->cam.range2screen_clip(view->playback_wish_range, parent->area, area.x1, area.x2);
-		hidden = (view->playback_wish_range.length == 0);
+		Range r = view->playback_wish_range;
+		if (view->is_playback_active())
+			r = view->renderer->range();
+		view->cam.range2screen_clip(r, parent->area, area.x1, area.x2);
+		hidden = (view->playback_wish_range.length == 0) and !view->is_playback_active();
 	}
 	void draw(Painter *p) override {
-		p->set_color(AudioView::colors.preview_marker);
+		p->set_color(AudioView::colors.blob_bg_selected);
+		if (view->is_playback_active())
+			p->set_color(AudioView::colors.preview_marker);
 		p->draw_rect(area.x1, area.y1, area.width(), 5);
 	}
 	string get_tip() override {
@@ -67,10 +72,10 @@ public:
 		hidden = !view->playback_range_locked;
 	}
 	void draw(Painter *p) override {
-		//p->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOCK) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		p->set_font_size(AudioView::FONT_SIZE * 0.7f);
-		p->draw_str(area.x1 + 8, area.y1 + 3, u8"🔒");
-		p->set_font_size(AudioView::FONT_SIZE);
+		p->set_color(view->colors.text);
+		if (this->is_cur_hover())
+			p->set_color(view->colors.hoverify(view->colors.text));
+		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\U0001f512");
 	}
 	string get_tip() override {
 		return _("locked");
@@ -99,10 +104,10 @@ public:
 		hidden = !view->playback_loop;
 	}
 	void draw(Painter *p) override {
-		//p->set_color((view->hover.type == Selection::Type::PLAYBACK_SYMBOL_LOOP) ? AudioView::colors.hover : AudioView::colors.preview_marker);
-		//p->set_font_size(FONT_SIZE * 0.7f);
-		p->draw_str(area.x1 + 8, area.y1 + 3, u8"⏎");
-		p->set_font_size(AudioView::FONT_SIZE);
+		p->set_color(view->colors.text);
+		if (this->is_cur_hover())
+			p->set_color(view->colors.hoverify(view->colors.text));
+		p->draw_str(area.x1 + 8, area.y1 + 3, u8"\u21bb");
 	}
 	string get_tip() override {
 		return _("looping");
@@ -141,12 +146,6 @@ void TimeScale::draw(Painter* c) {
 	gp->draw_empty_background(c);
 	gp->draw_time(c);
 
-	if (view->is_playback_active()){
-		c->set_color(AudioView::colors.preview_marker_internal);
-		float x0, x1;
-		view->cam.range2screen(view->renderer->range(), x0, x1);
-		c->draw_rect(x0, area.y1, x1 - x0, area.y1 + AudioView::TIME_SCALE_HEIGHT);
-	}
 	view->grid_painter->draw_time_numbers(c);
 }
 

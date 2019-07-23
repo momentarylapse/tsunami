@@ -438,25 +438,6 @@ void SignalChain::on_module_play_end_of_stream() {
 	stop_hard();
 }
 
-int SignalChain::get_pos() {
-	int delta = 0;
-	int pos = 0;
-	if (is_playback_active()) {
-		for (auto *m: modules)
-			if ((m->module_type == ModuleType::STREAM) and (m->module_subtype == "AudioOutput"))
-				delta = - ((AudioOutput*)m)->get_available();
-		for (auto *m: modules)
-			if (m->module_type == ModuleType::AUDIO_SOURCE)
-				pos = ((AudioSource*)m)->get_pos(); // + delta;
-	}
-	return pos + delta;
-}
-
-void SignalChain::set_pos(int pos) {
-	for (auto *m: modules)
-		m->set_pos(pos);
-}
-
 void SignalChain::set_buffer_size(int size) {
 	buffer_size = size;
 }

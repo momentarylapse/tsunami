@@ -244,7 +244,7 @@ void playback_seek_relative(AudioView *view, float dt) {
 	int pos = view->playback_pos();
 	pos += dt * view->song->sample_rate;
 	pos = max(pos, view->renderer->range().offset);
-	view->signal_chain->set_pos(pos);
+	view->set_playback_pos(pos);
 }
 
 void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {

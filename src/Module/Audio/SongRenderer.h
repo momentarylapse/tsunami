@@ -33,14 +33,14 @@ public:
 	void _cdecl __init__(Song *s);
 	void _cdecl __delete__() override;
 
-
 	// from Module
-	int get_pos() override;
-	void set_pos(int pos) override;
 	void reset_state() override ;
 
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
+	
+	int get_pos();
+	void set_pos(int pos);
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl prepare(const Range &range, bool alllow_loop);

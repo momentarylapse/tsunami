@@ -55,6 +55,10 @@ bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
 	return true;
 }
 
+int nnn = 0;
+int xxx_total_read = 0;
+int xxx_fake_read = 0;
+
 
 void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
 	//printf("output request %d\n", (int)nbytes);
@@ -96,6 +100,8 @@ void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) 
 
 #endif
 
+timeval xxx_prev_time;
+
 bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 	if (state != State::PLAYING) {
 		// output silence...
@@ -121,12 +127,35 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 		done += b.length;
 	}
 	done = frames;
+	
+	
+	
+	nnn ++;
+	if (nnn > 10) {
+		const pa_timing_info *ti = pa_stream_get_timing_info(pulse_stream);
+		if (ti and !ti->read_index_corrupt and !ti->write_index_corrupt and (pa_timeval_diff(&ti->timestamp, &xxx_prev_time) != 0)) {
+			//printf("%d\n", (int)pa_timeval_diff(&ti->timestamp, &xxx_prev_time) / 1000);
+		//	printf("%d   %d   %d   %d   %d\n", ti->write_index/8, ti->read_index/8, ti->since_underrun, (long)ti->transport_usec, (long)ti->sink_usec);
+			int bl = (ti->write_index - ti->read_index)/8;
+			//int lat = (double)bl / session->sample_rate() * 1000 + (ti->sink_usec - ti->transport_usec)/1000;
+			//printf("   %d ms\n", lat);
+			/* / (double)session->sample_rate() * 1000.0*/
+			double usec2samples = session->sample_rate() / 1000000.0;
+			latency = bl + (ti->sink_usec + ti->transport_usec) * usec2samples;
+			printf("%d   %.0f    %.0f\n", bl, ti->sink_usec*usec2samples, ti->transport_usec*usec2samples);
+			//printf("%d   %d\n", ti->write_index/8 - (xxx_total_read + xxx_fake_read), ti->read_index/8 - (xxx_total_read + xxx_fake_read));
+			nnn = 0;
+			xxx_prev_time = ti->timestamp;
+		}
+	}
 
+	xxx_total_read += done;
 
 	if (available < frames_request) {
 		if (!read_end_of_stream and !buffer_is_cleared)
 			printf("< underflow  %d < %d\n", available, frames_request);
 		// output silence...
+		xxx_fake_read += frames_request - done;
 		for (int i=done; i<frames_request; i++) {
 			*out ++ = 0;
 			*out ++ = 0;
@@ -215,6 +244,7 @@ AudioOutput::AudioOutput(Session *_session) :
 	played_end_of_stream = false;
 
 	buffer_is_cleared = true;
+	latency = 0;
 }
 
 AudioOutput::~AudioOutput() {
@@ -262,8 +292,9 @@ void AudioOutput::_create_dev() {
 		const char *dev = nullptr;
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
+		auto flags = (pa_stream_flags_t)(PA_STREAM_START_CORKED|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
 
-		pa_stream_connect_playback(pulse_stream, dev, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
+		pa_stream_connect_playback(pulse_stream, dev, &attr_out, flags, nullptr, nullptr);
 		_pulse_test_error("pa_stream_connect_playback");
 
 
@@ -271,7 +302,7 @@ void AudioOutput::_create_dev() {
 			session->w("retry");
 
 			// retry with default device
-			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, PA_STREAM_START_CORKED, nullptr, nullptr);
+			pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, flags, nullptr, nullptr);
 			_pulse_test_error("pa_stream_connect_playback");
 
 			if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
@@ -606,6 +637,7 @@ int AudioOutput::command(ModuleCommand cmd, int param) {
 	} else if (cmd == ModuleCommand::SUCK) {
 		if (ring_buf.available() >= prebuffer_size)
 			return 0;
+		//printf("suck %d    av %d\n", param, ring_buf.available());
 		return _read_stream(param);
 	}
 	return COMMAND_NOT_HANDLED;
@@ -613,6 +645,10 @@ int AudioOutput::command(ModuleCommand cmd, int param) {
 
 bool AudioOutput::is_playing() {
 	return (state == State::PLAYING) or (state == State::PAUSED);
+}
+
+int AudioOutput::get_latency() {
+	return latency;
 }
 
 ModuleConfiguration *AudioOutput::get_config() const

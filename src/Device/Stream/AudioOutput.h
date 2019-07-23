@@ -65,6 +65,8 @@ public:
 	void _cdecl set_volume(float volume);
 
 	void _cdecl set_prebuffer_size(int size);
+	
+	int get_latency();
 
 private:
 	int _read_stream(int buffer_size);
@@ -88,6 +90,7 @@ private:
 #endif
 
 	int dev_sample_rate;
+	int latency;
 
 	DeviceManager *device_manager;
 

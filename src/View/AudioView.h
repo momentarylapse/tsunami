@@ -244,6 +244,7 @@ public:
 	void playback_click();
 	bool is_paused();
 	int playback_pos();
+	void set_playback_pos(int pos);
 	Set<const Track*> get_playable_tracks();
 	bool has_any_solo_track();
 	Set<const TrackLayer*> get_playable_layers();

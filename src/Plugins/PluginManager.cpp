@@ -176,8 +176,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("Module.config_from_string", Kaba::mf(&Module::config_from_string));
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "get_pos", Kaba::mf(&Module::get_pos), &module);
-	Kaba::DeclareClassVirtualIndex("Module", "set_pos", Kaba::mf(&Module::set_pos), &module);
 	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 	Kaba::LinkExternal("Module.copy", Kaba::mf(&Module::copy));
@@ -209,8 +207,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("AudioSource.__init__", Kaba::mf(&AudioSource::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioSource", "__delete__", Kaba::mf(&AudioSource::__delete__), &asource);
 	Kaba::DeclareClassVirtualIndex("AudioSource", "read", Kaba::mf(&AudioSource::read), &asource);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "get_pos", Kaba::mf(&AudioSource::get_pos), &asource);
-	Kaba::DeclareClassVirtualIndex("AudioSource", "set_pos", Kaba::mf(&AudioSource::set_pos), &asource);
 
 	AudioEffect aeffect;
 	Kaba::DeclareClassSize("AudioEffect", sizeof(AudioEffect));
@@ -320,8 +316,6 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("MidiSource", "__delete__", Kaba::mf(&MidiSource::__delete__), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &msource);
 	Kaba::DeclareClassVirtualIndex("MidiSource", "reset", Kaba::mf(&MidiSource::reset), &msource);
-	Kaba::DeclareClassVirtualIndex("MidiSource", "get_pos", Kaba::mf(&MidiSource::get_pos), &msource);
-	Kaba::DeclareClassVirtualIndex("MidiSource", "set_pos", Kaba::mf(&MidiSource::set_pos), &msource);
 	Kaba::LinkExternal("MidiSource.note", Kaba::mf(&MidiSource::note));
 	Kaba::LinkExternal("MidiSource.skip", Kaba::mf(&MidiSource::skip));
 	Kaba::LinkExternal("MidiSource.note_x", Kaba::mf(&MidiSource::note_x));
@@ -432,8 +426,6 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("BeatSource", "__delete__", Kaba::mf(&BeatSource::__delete__), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "read", Kaba::mf(&BeatSource::read), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "reset", Kaba::mf(&BeatSource::reset), &bsource);
-	Kaba::DeclareClassVirtualIndex("BeatSource", "get_pos", Kaba::mf(&BeatSource::get_pos), &bsource);
-	Kaba::DeclareClassVirtualIndex("BeatSource", "set_pos", Kaba::mf(&BeatSource::set_pos), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "beats_per_bar", Kaba::mf(&BeatSource::beats_per_bar), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "cur_beat", Kaba::mf(&BeatSource::cur_beat), &bsource);
 	Kaba::DeclareClassVirtualIndex("BeatSource", "cur_bar", Kaba::mf(&BeatSource::cur_bar), &bsource);
@@ -519,10 +511,9 @@ void PluginManager::link_app_script_data()
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "__delete__", Kaba::mf(&SongRenderer::__delete__), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "read", Kaba::mf(&SongRenderer::read), &sr);
 	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset_state), &sr);
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
 	Kaba::LinkExternal("SongRenderer.range", Kaba::mf(&SongRenderer::range));
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "set_pos", Kaba::mf(&SongRenderer::set_pos), &sr);
-	Kaba::DeclareClassVirtualIndex("SongRenderer", "get_pos", Kaba::mf(&SongRenderer::get_pos), &sr);
+	Kaba::LinkExternal("SongRenderer.get_pos", Kaba::mf(&SongRenderer::get_pos));
+	Kaba::LinkExternal("SongRenderer.set_pos", Kaba::mf(&SongRenderer::set_pos));
 	Kaba::LinkExternal("SongRenderer.get_beat_source", Kaba::mf(&SongRenderer::get_beat_source));
 
 	{
@@ -572,8 +563,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("SignalChain.set_buffer_size", Kaba::mf(&SignalChain::set_buffer_size));
 	Kaba::LinkExternal("SignalChain.is_paused", Kaba::mf(&SignalChain::is_paused));
 	Kaba::LinkExternal("SignalChain.is_active", Kaba::mf(&SignalChain::is_playback_active));
-	Kaba::DeclareClassVirtualIndex("SignalChain", "set_pos", Kaba::mf(&SignalChain::set_pos), &chain);
-	Kaba::DeclareClassVirtualIndex("SignalChain", "get_pos", Kaba::mf(&SignalChain::get_pos), &chain);
 
 	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
 	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));

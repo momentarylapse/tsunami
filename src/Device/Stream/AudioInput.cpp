@@ -79,7 +79,7 @@ void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void
 
 void AudioInput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
 	auto *stream = (AudioInput*)userdata;
-	msg_write("--success");
+	//msg_write("--success");
 	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
 }
 
@@ -97,10 +97,6 @@ void AudioInput::pulse_input_notify_callback(pa_stream *p, void *userdata) {
 	pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
 }
 
-
-void input_success_callback(pa_stream *s, int success, void *userdata) {
-	msg_write("--success");
-}
 #endif
 
 

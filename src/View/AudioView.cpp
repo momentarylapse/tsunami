@@ -1430,7 +1430,13 @@ bool AudioView::is_paused() {
 }
 
 int AudioView::playback_pos() {
-	return signal_chain->get_pos();
+	return renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
+}
+
+void AudioView::set_playback_pos(int pos) {
+	if (mode == mode_capture)
+		return;
+	renderer->set_pos(pos);
 }
 
 void AudioView::playback_click() {
@@ -1439,7 +1445,7 @@ void AudioView::playback_click() {
 
 	if (is_playback_active()) {
 		if (renderer->range().is_inside(hover().pos)) {
-			signal_chain->set_pos(hover().pos);
+			set_playback_pos(hover().pos);
 			hover().type = HoverData::Type::PLAYBACK_CURSOR;
 			force_redraw();
 		} else {

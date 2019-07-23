@@ -150,8 +150,6 @@ class Module
 	extern string config_to_string()
 	extern void config_from_string(string s)
 	extern virtual int command(int cmd, int param)
-	extern virtual void set_pos(int pos)
-	extern virtual int get_pos()
 	extern void plug_in(int in_port, Module* source, int out_port)
 	extern void unplug_in(int in_port)
 	extern void subscribe(void* handler, func* f, string message)
@@ -235,8 +233,6 @@ class AudioSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(AudioBuffer buf)
-	extern override int get_pos()
-	extern override void set_pos(int pos)
 	Port *out
 
 class MidiSource extends Module
@@ -250,8 +246,6 @@ class MidiSource extends Module
 	extern void skip_x(int beats, int sub_beats, int beat_partition)
 	MidiEventBuffer* bh_midi
 	//extern void set_beat_source(BeatPort *source)
-	extern override int get_pos()
-	extern override void set_pos(int pos)
 
 class PitchDetector extends MidiSource
 	float frequency, volume
@@ -515,6 +509,8 @@ class SongRenderer extends AudioSource
 	extern override int read(AudioBuffer b)
 	//extern override void reset_state()
 	extern Range range()
+	extern int get_pos()
+	extern void set_pos(int pos)
 	extern BeatSource* get_beat_source()
 
 
@@ -565,8 +561,6 @@ class SignalChain extends Module
 	extern bool is_paused()
 	extern bool is_active()
 	extern void set_update_dt(float dt)
-	extern override int get_pos()
-	extern override void set_pos(int pos)
 	extern void set_buffer_size(int size)
 
 class Session

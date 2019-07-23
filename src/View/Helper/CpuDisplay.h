@@ -19,8 +19,7 @@ class PerformanceMonitor;
 class Session;
 class AudioView;
 
-class CpuDisplay : public VirtualBase
-{
+class CpuDisplay : public VirtualBase {
 public:
 	CpuDisplay(hui::Panel *panel, const string &id, Session *session);
 	virtual ~CpuDisplay();

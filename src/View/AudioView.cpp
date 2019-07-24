@@ -657,7 +657,8 @@ void AudioView::on_key_down() {
 		if (mdp()->acting()) {
 			mdp()->cancel();
 		} else {
-			session->set_mode("default");
+			if (win->side_bar->allow_close())
+				session->set_mode("default");
 		}
 	}
 	mode->on_key_down(k);
@@ -1399,6 +1400,7 @@ void AudioView::prepare_playback(const Range &range, bool allow_loop) {
 	renderer->prepare(range, allow_loop);
 	renderer->allow_tracks(get_playable_tracks());
 	renderer->allow_layers(get_playable_layers());
+	_playback_stream_offset = range.offset - output_stream->samples_played();
 
 	signal_chain->command(ModuleCommand::PREPARE_START, 0);
 }
@@ -1429,8 +1431,28 @@ bool AudioView::is_paused() {
 	return signal_chain->is_paused();
 }
 
+int ppnn = 0;
+
+int loop_in_range(int pos, const Range &r) {
+	return loopi(pos, r.start(), r.end());
+}
+
 int AudioView::playback_pos() {
-	return renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
+	int spos = output_stream->samples_played();
+	
+	// crappy syncing....
+	ppnn ++;
+	if (ppnn > 200) {
+		int xpos = renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
+		//msg_write("--- " + i2s((_playback_stream_offset - xpos + spos)));
+		_playback_stream_offset = xpos - spos;
+		ppnn = 0;
+	}
+	
+	int pos = spos + _playback_stream_offset;
+	if (playback_loop and renderer->allow_loop)
+		return loop_in_range(pos, renderer->range());
+	return pos;
 }
 
 void AudioView::set_playback_pos(int pos) {

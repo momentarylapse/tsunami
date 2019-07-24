@@ -375,7 +375,8 @@ void AudioInput::_create_dev() {
 		const char *dev = nullptr;
 		if (!cur_device->is_default())
 			dev = cur_device->internal_name.c_str();
-		pa_stream_connect_record(pulse_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+		auto flags = (pa_stream_flags_t)(PA_STREAM_ADJUST_LATENCY|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
+		pa_stream_connect_record(pulse_stream, dev, &attr_in, flags);
 		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 		_pulse_test_error("pa_stream_connect_record");
 
@@ -504,6 +505,20 @@ int AudioInput::command(ModuleCommand cmd, int param) {
 		return 0;
 	}
 	return COMMAND_NOT_HANDLED;
+}
+
+int64 AudioInput::samples_recorded() {
+	if (state == State::NO_DEVICE)
+		return 0;
+#if HAS_LIB_PULSEAUDIO
+	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
+		pa_usec_t t;
+		pa_stream_get_time(pulse_stream, &t);
+		double usec2samples = session->sample_rate() / 1000000.0;
+		return (double)t * usec2samples;
+	}
+#endif
+	return 0;
 }
 
 ModuleConfiguration *AudioInput::get_config() const {

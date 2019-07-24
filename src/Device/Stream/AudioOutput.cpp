@@ -57,7 +57,6 @@ bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
 
 int nnn = 0;
 int xxx_total_read = 0;
-int xxx_fake_read = 0;
 
 
 void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
@@ -130,6 +129,7 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 	
 	
 	
+	#if 0
 	nnn ++;
 	if (nnn > 10) {
 		const pa_timing_info *ti = pa_stream_get_timing_info(pulse_stream);
@@ -142,20 +142,20 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 			/* / (double)session->sample_rate() * 1000.0*/
 			double usec2samples = session->sample_rate() / 1000000.0;
 			latency = bl + (ti->sink_usec + ti->transport_usec) * usec2samples;
-			printf("%d   %.0f    %.0f\n", bl, ti->sink_usec*usec2samples, ti->transport_usec*usec2samples);
+//			printf("%d   %.0f    %.0f\n", bl, ti->sink_usec*usec2samples, ti->transport_usec*usec2samples);
 			//printf("%d   %d\n", ti->write_index/8 - (xxx_total_read + xxx_fake_read), ti->read_index/8 - (xxx_total_read + xxx_fake_read));
 			nnn = 0;
 			xxx_prev_time = ti->timestamp;
 		}
 	}
-
 	xxx_total_read += done;
+	#endif
 
 	if (available < frames_request) {
 		if (!read_end_of_stream and !buffer_is_cleared)
 			printf("< underflow  %d < %d\n", available, frames_request);
 		// output silence...
-		xxx_fake_read += frames_request - done;
+		fake_samples_played += frames_request - done;
 		for (int i=done; i<frames_request; i++) {
 			*out ++ = 0;
 			*out ++ = 0;
@@ -649,6 +649,20 @@ bool AudioOutput::is_playing() {
 
 int AudioOutput::get_latency() {
 	return latency;
+}
+
+int64 AudioOutput::samples_played() {
+	if (state == State::NO_DEVICE)
+		return 0;
+#if HAS_LIB_PULSEAUDIO
+	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
+		pa_usec_t t;
+		pa_stream_get_time(pulse_stream, &t);
+		double usec2samples = session->sample_rate() / 1000000.0;
+		return (double)t * usec2samples - fake_samples_played;
+	}
+#endif
+	return 0;
 }
 
 ModuleConfiguration *AudioOutput::get_config() const

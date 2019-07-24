@@ -21,17 +21,22 @@ class Track;
 class AudioBuffer;
 class MidiEventBuffer;
 
-struct CaptureTrackData
-{
+struct SyncPoint {
+	int64 pos_play, pos_record;
+};
+
+struct CaptureTrackData {
 	Track *target;
 	Module *recorder;
 	CaptureTrackData();
 	CaptureTrackData(Track *target, Module *recorder);
 	SignalType type();
+	
+	int64 samples_recorded_before_start = 0;
+	Array<SyncPoint> sync_points;
 };
 
-class ViewModeCapture : public ViewModeDefault
-{
+class ViewModeCapture : public ViewModeDefault {
 public:
 	ViewModeCapture(AudioView *view);
 	virtual ~ViewModeCapture();
@@ -50,6 +55,7 @@ public:
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;
+	int samples_played_before_capture;
 	
 	void insert();
 	void insert_midi(Track *target, const MidiEventBuffer &midi, int delay);

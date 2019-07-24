@@ -244,6 +244,7 @@ public:
 	void playback_click();
 	bool is_paused();
 	int playback_pos();
+	int64 _playback_stream_offset = 0;
 	void set_playback_pos(int pos);
 	Set<const Track*> get_playable_tracks();
 	bool has_any_solo_track();

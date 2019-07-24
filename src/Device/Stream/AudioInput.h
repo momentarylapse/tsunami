@@ -69,7 +69,6 @@ public:
 	class Output : public Port {
 	public:
 		Output(AudioInput *s);
-		virtual ~Output(){}
 		int read_audio(AudioBuffer &buf) override;
 
 		AudioInput *stream;
@@ -80,6 +79,8 @@ public:
 	int chunk_size;
 
 	int _sample_rate;
+	
+	int64 samples_recorded();
 
 protected:
 

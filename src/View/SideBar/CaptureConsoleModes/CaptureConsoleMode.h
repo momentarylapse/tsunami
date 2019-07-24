@@ -24,6 +24,9 @@ public:
 	virtual void leave() = 0;
 	
 	virtual void allow_change_device(bool allow) = 0;
+	
+	virtual void start_sync(){}
+	virtual void sync(){}
 
 	CaptureConsole *cc;
 	Session *session;

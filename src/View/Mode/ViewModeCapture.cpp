@@ -21,6 +21,9 @@
 #include "../../Device/Stream/AudioInput.h"
 #include "../../Device/Stream/MidiInput.h"
 
+
+#include "../../Device/Stream/AudioOutput.h"
+
 CaptureTrackData::CaptureTrackData() : CaptureTrackData(nullptr, nullptr) {}
 CaptureTrackData::CaptureTrackData(Track *_target, Module *_recorder) {
 	target = _target;
@@ -37,6 +40,7 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 {
 	side_bar_console = SideBar::CAPTURE_CONSOLE;
 	chain = nullptr;
+	samples_played_before_capture = 0;
 }
 
 ViewModeCapture::~ViewModeCapture() {

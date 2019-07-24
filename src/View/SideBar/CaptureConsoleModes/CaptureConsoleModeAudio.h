@@ -17,8 +17,8 @@ class Device;
 class Track;
 class SignalChain;
 
-class CaptureConsoleModeAudio : public CaptureConsoleMode
-{
+class CaptureConsoleModeAudio : public CaptureConsoleMode {
+public:
 	AudioInput *input;
 	PeakMeter *peak_meter;
 	Array<Device*> sources;
@@ -33,6 +33,9 @@ public:
 	void allow_change_device(bool allow) override;
 
 	void update_device_list();
+	
+	void start_sync() override;
+	void sync() override;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

@@ -1431,28 +1431,28 @@ bool AudioView::is_paused() {
 	return signal_chain->is_paused();
 }
 
-int ppnn = 0;
-
 int loop_in_range(int pos, const Range &r) {
 	return loopi(pos, r.start(), r.end());
 }
 
 int AudioView::playback_pos() {
-	int spos = output_stream->samples_played();
-	
 	// crappy syncing....
-	ppnn ++;
-	if (ppnn > 200) {
-		int xpos = renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
-		//msg_write("--- " + i2s((_playback_stream_offset - xpos + spos)));
-		_playback_stream_offset = xpos - spos;
-		ppnn = 0;
-	}
+	_playback_sync_counter ++;
+	if (_playback_sync_counter > 200)
+		_sync_playback_pos();
 	
-	int pos = spos + _playback_stream_offset;
+	int pos = output_stream->samples_played() + _playback_stream_offset;
 	if (playback_loop and renderer->allow_loop)
 		return loop_in_range(pos, renderer->range());
 	return pos;
+}
+
+// crappy syncing....
+void AudioView::_sync_playback_pos() {
+	int spos = output_stream->samples_played();
+	int xpos = renderer->get_pos() - output_stream->get_available() - output_stream->get_latency();
+	_playback_stream_offset = xpos - spos;
+	_playback_sync_counter = 0;
 }
 
 void AudioView::set_playback_pos(int pos) {

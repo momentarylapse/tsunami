@@ -31,8 +31,6 @@ namespace Kaba {
 #endif
 
 
-float AudioInput::playback_delay_const;
-
 
 static const int DEFAULT_CHUNK_SIZE = 512;
 
@@ -138,30 +136,6 @@ int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void 
 
 
 
-void AudioInput::SyncData::reset() {
-	num_points = 0;
-	delay_sum = 0;
-	samples_in = 0;
-	/*if (tsunami->output->IsPlaying())
-		offset_out = tsunami->output->GetRange().offset;*/ // TODO
-}
-
-void AudioInput::SyncData::add(int samples) {
-#if 0
-	if (tsunami->win->view->isPlaying()) {
-		samples_in += samples;
-		/*delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);*/ // TODO
-		num_points ++;
-	}
-#endif
-}
-
-int AudioInput::SyncData::get_delay() {
-	if (num_points > 0)
-		return (delay_sum / num_points);
-	return 0;
-}
-
 AudioInput::Output::Output(AudioInput *s) :
 	Port(SignalType::AUDIO, "out") {
 	stream = s;
@@ -217,7 +191,6 @@ AudioInput::AudioInput(Session *_session) :
 	}
 	config._class = _class;
 
-	playback_delay_const = 0;
 	cur_device = nullptr;
 }
 
@@ -260,7 +233,6 @@ void AudioInput::update_device() {
 		_kill_dev();
 
 	cur_device = config.device;
-	playback_delay_const = cur_device->latency;
 	num_channels = config.device->channels;
 
 	if (old_state == State::CAPTURING)
@@ -471,25 +443,9 @@ bool AudioInput::_portaudio_test_error(PaError err, const string &msg) {
 }
 #endif
 
-float AudioInput::get_playback_delay_const() {
-	return playback_delay_const;
-}
-
-void AudioInput::set_playback_delay_const(float f) {
-	playback_delay_const = f;
-	hui::Config.set_float("Input.PlaybackDelay", playback_delay_const);
-}
-
-void AudioInput::reset_sync() {
-	sync.reset();
-}
 
 bool AudioInput::is_capturing() {
 	return state == State::CAPTURING;
-}
-
-int AudioInput::get_delay() {
-	return sync.get_delay() - playback_delay_const * (float)_sample_rate / 1000.0f;
 }
 
 int AudioInput::command(ModuleCommand cmd, int param) {

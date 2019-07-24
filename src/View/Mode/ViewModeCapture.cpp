@@ -34,13 +34,21 @@ SignalType CaptureTrackData::type() {
 	return target->type;
 }
 
+int CaptureTrackData::get_sync_delay() {
+	if (sync_points.num == 0)
+		return 0;
+	int d = 0;
+	for (auto &p: sync_points)
+		d += (p.pos_play - samples_played_before_capture) - (p.pos_record - samples_skipped_start);
+	return d / sync_points.num;
+}
+
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
 	ViewModeDefault(view)
 {
 	side_bar_console = SideBar::CAPTURE_CONSOLE;
 	chain = nullptr;
-	samples_played_before_capture = 0;
 }
 
 ViewModeCapture::~ViewModeCapture() {
@@ -122,7 +130,7 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 	song->begin_action_group();
 
 	TrackLayer *layer = nullptr;
-	for (TrackLayer *l: target->layers)
+	for (auto *l: target->layers)
 		if (layer_available(l, r)) {
 			layer = l;
 			break;
@@ -144,12 +152,14 @@ void ViewModeCapture::insert_audio(Track *target, const AudioBuffer &buf, int de
 void ViewModeCapture::insert() {
 	song->begin_action_group();
 	for (auto &d: data) {
+		int delay = d.get_sync_delay();
+		session->debug("input", format("latency: %d samples", delay));
 		if (d.type() == SignalType::AUDIO) {
 			auto *rec = (AudioRecorder*)d.recorder;
-			insert_audio(d.target, rec->buf, 0);
+			insert_audio(d.target, rec->buf, delay);
 		} else if (d.type() == SignalType::MIDI) {
 			auto *rec = (MidiRecorder*)d.recorder;
-			insert_midi(d.target, rec->buffer, 0);
+			insert_midi(d.target, rec->buffer, delay);
 		}
 	}
 	song->end_action_group();

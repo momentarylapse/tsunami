@@ -44,7 +44,7 @@ string DeviceConsole::to_format(int i, const Device *d)
 	if (d->type == DeviceType::AUDIO_OUTPUT)
 		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
 	if (d->type == DeviceType::AUDIO_INPUT)
-		return format("%d\\%s\\%s\\%d\\%s\\%s\\%.1f", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false", d->latency);
+		return format("%d\\%s\\%s\\%d\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->channels, d->visible ? "true" : "false", d->present ? "true" : "false");
 	if (d->type == DeviceType::MIDI_INPUT)
 		return format("%d\\%s\\%s\\%s\\%s", i + 1, d->get_name().c_str(), d->internal_name.c_str(), d->visible ? "true" : "false", d->present ? "true" : "false");
 	return "";
@@ -137,11 +137,8 @@ void DeviceConsole::on_input_edit()
 	auto e = hui::GetEvent();
 	int index = e->row;
 	int col = e->column;
-	if (col == 4){
+	if (col == 4)
 		input_devices[index]->visible = get_cell("", index, col)._bool();
-	}else if (col == 6){
-		input_devices[index]->latency = get_cell("", index, col)._float();
-	}
 	device_manager->set_device_config(input_devices[index]);
 }
 

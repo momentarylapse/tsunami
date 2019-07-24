@@ -120,20 +120,28 @@ void CaptureConsoleModeAudio::leave() {
 	chain = nullptr;
 }
 
-void CaptureConsoleModeAudio::start_sync() {
-		for (auto &d: view->mode_capture->data) {
-			d.samples_recorded_before_start = input->samples_recorded();
-		}
+void CaptureConsoleModeAudio::start_sync_before() {
+	for (auto &d: view->mode_capture->data) {
+		d.samples_played_before_capture = view->output_stream->samples_played();
+	}
+}
+
+void CaptureConsoleModeAudio::start_sync_after() {
+	for (auto &d: view->mode_capture->data) {
+		d.samples_recorded_before_start = input->samples_recorded();
+		d.samples_skipped_start = ((AudioRecorder*)d.recorder)->samples_skipped;
+	}
 }
 
 void CaptureConsoleModeAudio::sync() {
-		for (auto &d: view->mode_capture->data) {
-			if (d.type() == SignalType::AUDIO) {
-				SyncPoint p;
-				p.pos_play = view->output_stream->samples_played();
-				p.pos_record = input->samples_recorded();
-				printf("%d  %d\n", p.pos_play, p.pos_record);
-				d.sync_points.add(p);
-			}
+	for (auto &d: view->mode_capture->data) {
+		if (d.type() == SignalType::AUDIO) {
+			SyncPoint p;
+			p.pos_play = view->output_stream->samples_played();
+			p.pos_record = input->samples_recorded();
+			printf("%lld  %lld    %lld  %lld\n", p.pos_play, p.pos_record, d.samples_played_before_capture, d.samples_skipped_start);
+			printf("   --->>   %lld\n", (p.pos_play - d.samples_played_before_capture) - (p.pos_record - d.samples_skipped_start));
+			d.sync_points.add(p);
 		}
+	}
 }

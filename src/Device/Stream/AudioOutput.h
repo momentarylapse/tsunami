@@ -65,9 +65,10 @@ public:
 	void _cdecl set_volume(float volume);
 
 	void _cdecl set_prebuffer_size(int size);
-	
-	int get_latency();
+
 	int64 samples_played();
+
+	int get_latency();
 
 private:
 	int _read_stream(int buffer_size);
@@ -91,7 +92,6 @@ private:
 #endif
 
 	int dev_sample_rate;
-	int latency;
 	int64 fake_samples_played = 0;
 
 	DeviceManager *device_manager;
@@ -117,6 +117,9 @@ private:
 		PAUSED,
 		PLAYING,
 	} state;
+
+	int latency;
+	timeval xxx_prev_time;
 
 
 	bool feed_stream_output(int frames, float *out);

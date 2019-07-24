@@ -614,7 +614,7 @@ format=ttttCc,reorderable
 0
 ListView
 input-list
-format=ttttCcT,reorderable
+format=ttttCc,reorderable
 1
 0
 0
@@ -6807,7 +6807,7 @@ device-manager/erase
 
 Remove from list
 device-manager/input-list
-#\\name\\internal name\\channels\\show\\present\\latency (ms)
+#\\name\\internal name\\channels\\show\\present
 
 device-manager/midi-input-list
 #\\name\\internal name\\show\\present

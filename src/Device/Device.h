@@ -10,15 +10,14 @@
 
 #include "../lib/base/base.h"
 
-enum class DeviceType{
+enum class DeviceType {
 	AUDIO_OUTPUT,
 	AUDIO_INPUT,
 	MIDI_OUTPUT,
 	MIDI_INPUT
 };
 
-class Device
-{
+class Device {
 public:
 
 	Device();
@@ -36,7 +35,6 @@ public:
 	int channels;
 	bool visible;
 	bool present;
-	float latency;
 	int client, port;
 	int index_in_lib;
 	bool default_by_lib;

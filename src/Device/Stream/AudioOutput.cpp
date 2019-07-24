@@ -99,7 +99,6 @@ void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) 
 
 #endif
 
-timeval xxx_prev_time;
 
 bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 	if (state != State::PLAYING) {
@@ -609,7 +608,6 @@ void AudioOutput::reset_state() {
 				_pulse_test_error("pa_stream_flush");
 				pulse_wait_op(session, op);
 			}
-			session->debug("out", "/flush");
 		}
 #endif
 		device_manager->unlock();

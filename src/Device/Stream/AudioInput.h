@@ -51,17 +51,10 @@ public:
 	bool _cdecl start();
 	void _cdecl stop();
 
-	int _cdecl get_delay();
-	void _cdecl reset_sync();
-
 
 	bool _cdecl is_capturing();
 
 	int _cdecl sample_rate(){ return _sample_rate; }
-
-	// delay/sync
-	static float get_playback_delay_const();
-	static void set_playback_delay_const(float f);
 
 
 	RingBuffer buffer;
@@ -116,19 +109,6 @@ protected:
 #endif
 
 	bool _pulse_test_error(const string &msg);
-
-	struct SyncData {
-		int num_points;
-		long long int delay_sum;
-		int samples_in, offset_out;
-
-		void reset();
-		void add(int samples);
-		int get_delay();
-	};
-	SyncData sync;
-
-	static float playback_delay_const;
 
 #if HAS_LIB_PULSEAUDIO
 	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);

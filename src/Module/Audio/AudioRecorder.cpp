@@ -16,9 +16,13 @@ int AudioRecorder::Output::read_audio(AudioBuffer& buf) {
 
 	int r = rec->source->read_audio(buf);
 
-	if (rec->accumulating and (r > 0)) {
-		std::lock_guard<std::mutex> lock(rec->mtx_buf);
-		rec->buf.append(buf.ref(0, r));
+	if (r > 0) {
+		if (rec->accumulating) {
+			std::lock_guard<std::mutex> lock(rec->mtx_buf);
+			rec->buf.append(buf.ref(0, r));
+		} else {
+			rec->samples_skipped += r;
+		}
 	}
 
 	return r;

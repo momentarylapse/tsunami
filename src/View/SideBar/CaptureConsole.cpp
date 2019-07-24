@@ -126,11 +126,11 @@ void CaptureConsole::on_start() {
 		view->prepare_playback(view->get_playback_selection(true), false);
 	}
 	
-	view->mode_capture->samples_played_before_capture = view->output_stream->samples_played();
+	mode->start_sync_before();
 	
 	view->signal_chain->start();
 	
-	mode->start_sync();
+	mode->start_sync_after();
 	chain->command(ModuleCommand::ACCUMULATION_START, 0);
 	mode->allow_change_device(false);
 	enable("start", false);

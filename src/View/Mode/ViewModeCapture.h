@@ -31,9 +31,13 @@ struct CaptureTrackData {
 	CaptureTrackData();
 	CaptureTrackData(Track *target, Module *recorder);
 	SignalType type();
-	
+
+	int64 samples_played_before_capture = 0;
 	int64 samples_recorded_before_start = 0;
+	int64 samples_skipped_start = 0;
 	Array<SyncPoint> sync_points;
+
+	int get_sync_delay();
 };
 
 class ViewModeCapture : public ViewModeDefault {
@@ -55,7 +59,6 @@ public:
 	Array<CaptureTrackData> data;
 	void set_data(const Array<CaptureTrackData> &data);
 	SignalChain *chain;
-	int samples_played_before_capture;
 	
 	void insert();
 	void insert_midi(Track *target, const MidiEventBuffer &midi, int delay);

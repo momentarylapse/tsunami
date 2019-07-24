@@ -33,6 +33,8 @@ public:
 	AudioBuffer buf;
 	bool accumulating;
 	std::mutex mtx_buf;
+
+	int64 samples_skipped = 0;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIORECORDER_H_ */

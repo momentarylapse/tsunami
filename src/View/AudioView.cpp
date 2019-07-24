@@ -123,7 +123,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	win = session->win;
 	song = session->song;
 
-	perf_channel = PerformanceMonitor::create_channel("view");
+	perf_channel = PerformanceMonitor::create_channel("view", this);
 
 	ColorSchemeBasic bright;
 	bright.background = White;

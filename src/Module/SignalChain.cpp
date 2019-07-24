@@ -75,7 +75,7 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 	if (ugly_hack_slow)
 		tick_dt *= 10;
 
-	perf_channel_suck = PerformanceMonitor::create_channel("suck");
+	perf_channel_suck = PerformanceMonitor::create_channel("suck", this);
 
 	sucking = false;
 	thread = nullptr;//new AudioSuckerThread(this);

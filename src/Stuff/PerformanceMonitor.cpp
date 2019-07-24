@@ -20,23 +20,23 @@ static std::mutex pm_mutex;
 static hui::Timer pm_timer;
 
 #if ALLOW_PERF_MON
-struct Channel
-{
+struct Channel {
 	bool used;
 
 	string name;
+	void *p;
+	
 	float t_busy, t_idle;
 	float t_last;
 	int counter;
 	int state;
-	void init(const string &_name)
-	{
+	void init(const string &_name, void *_p) {
 		used = true;
 		name = _name;
+		p = _p;
 		reset_state();
 	}
-	void reset_state()
-	{
+	void reset_state() {
 		t_busy = t_idle = 0;
 		t_last = 0;
 		state = -1;
@@ -48,8 +48,7 @@ static Array<Channel> channels;
 #endif
 
 // single instance!
-PerformanceMonitor::PerformanceMonitor()
-{
+PerformanceMonitor::PerformanceMonitor() {
 	pm_instance = this;
 #if ALLOW_PERF_MON
 	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&PerformanceMonitor::update, this));
@@ -58,24 +57,22 @@ PerformanceMonitor::PerformanceMonitor()
 #endif
 }
 
-PerformanceMonitor::~PerformanceMonitor()
-{
+PerformanceMonitor::~PerformanceMonitor() {
 #if ALLOW_PERF_MON
 	hui::CancelRunner(runner_id);
 #endif
 }
 
-int PerformanceMonitor::create_channel(const string &name)
-{
+int PerformanceMonitor::create_channel(const string &name, void *p) {
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	foreachi(Channel &c, channels, i)
-		if (!c.used){
-			c.init(name);
+		if (!c.used) {
+			c.init(name, p);
 			return i;
 		}
 	Channel c;
-	c.init(name);
+	c.init(name, p);
 	channels.add(c);
 	return channels.num - 1;
 #else
@@ -83,16 +80,14 @@ int PerformanceMonitor::create_channel(const string &name)
 #endif
 }
 
-void PerformanceMonitor::delete_channel(int channel)
-{
+void PerformanceMonitor::delete_channel(int channel) {
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	channels[channel].used = false;
 #endif
 }
 
-void PerformanceMonitor::start_busy(int channel)
-{
+void PerformanceMonitor::start_busy(int channel) {
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 
@@ -104,8 +99,7 @@ void PerformanceMonitor::start_busy(int channel)
 #endif
 }
 
-void PerformanceMonitor::end_busy(int channel)
-{
+void PerformanceMonitor::end_busy(int channel) {
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 
@@ -119,8 +113,7 @@ void PerformanceMonitor::end_busy(int channel)
 }
 
 // called in main thread
-void PerformanceMonitor::update()
-{
+void PerformanceMonitor::update() {
 #if ALLOW_PERF_MON
 	{
 	std::lock_guard<std::mutex> lock(pm_mutex);
@@ -129,9 +122,10 @@ void PerformanceMonitor::update()
 
 	pm_info.clear();
 	for (auto &c: channels)
-		if (c.used){
+		if (c.used) {
 			ChannelInfo i;
 			i.name = c.name;
+			i.p = c.p;
 			i.cpu = c.t_busy / dt;
 			i.avg = 0;
 			i.counter = c.counter;
@@ -147,8 +141,7 @@ void PerformanceMonitor::update()
 }
 
 // call from main thread!!!
-Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info()
-{
+Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info() {
 	//std::lock_guard<std::mutex> lock(pm_mutex);
 	return pm_info;
 }

@@ -67,12 +67,16 @@ void BottomBar::on_close() {
 void BottomBar::_show() {
 	reveal("revealer", true);
 	visible = true;
+	if (active_console)
+		active_console->on_show();
 	notify();
 }
 
 void BottomBar::_hide() {
 	reveal("revealer", false);
 	visible = false;
+	if (active_console)
+		active_console->on_hide();
 	notify();
 }
 

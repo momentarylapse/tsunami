@@ -11,14 +11,14 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
-class PerformanceMonitor : public Observable<VirtualBase>
-{
+class PerformanceMonitor : public Observable<VirtualBase> {
 public:
 	PerformanceMonitor();
 	virtual ~PerformanceMonitor();
 
-	struct ChannelInfo{
+	struct ChannelInfo {
 		string name;
+		void *p;
 		float cpu, avg;
 		int counter;
 	};
@@ -26,7 +26,7 @@ public:
 	int runner_id;
 	static Array<ChannelInfo> get_info();
 
-	static int create_channel(const string &name);
+	static int create_channel(const string &name, void *p);
 	static void delete_channel(int channel);
 	static void start_busy(int channel);
 	static void end_busy(int channel);

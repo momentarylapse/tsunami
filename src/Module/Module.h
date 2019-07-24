@@ -90,6 +90,8 @@ public:
 
 	bool enabled;
 	bool belongs_to_system;
+	
+	int perf_channel;
 
 
 

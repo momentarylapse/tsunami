@@ -65,10 +65,8 @@ void CaptureConsoleModeAudio::enter() {
 	chain = session->add_signal_chain_system("capture");
 
 	input = (AudioInput*)chain->add(ModuleType::STREAM, "AudioInput");
-	input->set_chunk_size(4096);
 	input->subscribe(this, [=]{ update_device_list(); });
 
-	//input->set_update_dt(0.03f); // FIXME: SignalChain ticks...
 	peak_meter = (PeakMeter*)chain->add(ModuleType::AUDIO_VISUALIZER, "PeakMeter");
 
 	auto *backup = (AudioBackup*)chain->add(ModuleType::PLUMBING, "AudioBackup");

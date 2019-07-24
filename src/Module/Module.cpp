@@ -17,7 +17,7 @@
 #include "../lib/kaba/syntax/Class.h"
 #include "../Plugins/PluginManager.h"
 #include "../Plugins/Plugin.h"
-#include "../View/AudioView.h"
+#include "../Stuff/PerformanceMonitor.h"
 
 const string Module::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Module::MESSAGE_STATE_CHANGE = "StateChange";
@@ -37,6 +37,7 @@ Module::Module(ModuleType type, const string &sub_type) {
 	allow_config_in_chain = false;
 	_class = nullptr;
 	belongs_to_system = false;
+	perf_channel = PerformanceMonitor::create_channel("module", this);
 }
 
 Module::~Module() {
@@ -49,6 +50,7 @@ Module::~Module() {
 
 	for (auto *p: port_out)
 		delete p;
+	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 

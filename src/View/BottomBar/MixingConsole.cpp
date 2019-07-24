@@ -317,6 +317,9 @@ MixingConsole::MixingConsole(Session *session) :
 	peak_meter = new PeakMeterDisplay(this, "output-peaks", view->peak_meter, PeakMeterDisplay::Mode::PEAKS);
 	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", view->peak_meter, PeakMeterDisplay::Mode::SPECTRUM);
 	set_float("output-volume", device_manager->get_output_volume());
+	
+	peak_meter->enable(false);
+	spectrum_meter->enable(false);
 
 	event("output-volume", [=]{ on_output_volume(); });
 
@@ -415,11 +418,13 @@ void MixingConsole::update_all() {
 }
 
 void MixingConsole::on_show() {
+	msg_write("on show");
 	peak_meter->enable(true);
 	spectrum_meter->enable(true);
 }
 
 void MixingConsole::on_hide() {
+	msg_write("on hide");
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
 }

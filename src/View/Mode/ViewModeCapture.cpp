@@ -122,7 +122,6 @@ void CaptureTrackData::sync(AudioOutput *out) {
 		SyncPoint p;
 		p.pos_play = out->samples_played();
 		p.pos_record = audio_input()->samples_recorded();
-		//printf("   --->>   %lld\n", (p.pos_play - samples_played_before_capture) - (p.pos_record - samples_skipped_start));
 		sync_points.add(p);
 	}
 }

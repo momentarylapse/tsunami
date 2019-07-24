@@ -37,11 +37,13 @@ public:
 
 	hui::Dialog *dlg;
 
-	enum{
+	enum {
 		TYPE_VIEW,
 		TYPE_PEAK,
 		TYPE_OUT,
 		TYPE_SUCK,
+		TYPE_FX,
+		TYPE_SYNTH,
 		NUM_TYPES
 	};
 

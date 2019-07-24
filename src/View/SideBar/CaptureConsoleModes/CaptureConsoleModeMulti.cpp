@@ -76,7 +76,7 @@ void CaptureConsoleModeMulti::enter() {
 			chain->connect(c.input_audio, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, recorder_audio, 0);
 			chain->connect(recorder_audio, 0, sucker, 0);
-			data.add({c.track, recorder_audio});
+			data.add({c.track, c.input_audio, recorder_audio});
 		} else if (t->type == SignalType::MIDI) {
 			c.input_midi = (MidiInput*)chain->add(ModuleType::STREAM, "MidiInput");
 			auto *recorder_midi = chain->add(ModuleType::PLUMBING, "MidiRecorder");
@@ -88,7 +88,7 @@ void CaptureConsoleModeMulti::enter() {
 			chain->connect(recorder_midi, 0, synth, 0);
 			chain->connect(synth, 0, c.peak_meter, 0);
 			chain->connect(c.peak_meter, 0, out, 0);
-			data.add({c.track, recorder_midi});
+			data.add({c.track, c.input_midi, recorder_midi});
 		}
 		cc->add_drawing_area("!height=30,noexpandy", 2, i*2+2, c.id_peaks);
 		c.peak_meter_display = new PeakMeterDisplay(cc, c.id_peaks, c.peak_meter);

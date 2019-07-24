@@ -14,6 +14,9 @@
 
 class AudioInput;
 class MidiInput;
+class AudioRecorder;
+class MidiRecorder;
+class AudioOutput;
 class Module;
 class SignalChain;
 enum class SignalType;
@@ -28,15 +31,27 @@ struct SyncPoint {
 struct CaptureTrackData {
 	Track *target;
 	Module *recorder;
+	Module *input;
 	CaptureTrackData();
-	CaptureTrackData(Track *target, Module *recorder);
+	CaptureTrackData(Track *target, Module *input, Module *recorder);
 	SignalType type();
+	AudioInput *audio_input();
+	MidiInput *midi_input();
+	AudioRecorder *audio_recorder();
+	MidiRecorder *midi_recorder();
 
 	int64 samples_played_before_capture = 0;
 	int64 samples_recorded_before_start = 0;
 	int64 samples_skipped_start = 0;
 	Array<SyncPoint> sync_points;
 
+	void insert(int pos);
+	void insert_audio(int pos, int delay);
+	void insert_midi(int pos, int delay);
+
+	void start_sync_before(AudioOutput *out);
+	void start_sync_after();
+	void sync(AudioOutput *out);
 	int get_sync_delay();
 };
 
@@ -61,8 +76,6 @@ public:
 	SignalChain *chain;
 	
 	void insert();
-	void insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
-	void insert_audio(Track *target, const AudioBuffer &buf, int delay);
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

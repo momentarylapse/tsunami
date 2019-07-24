@@ -86,7 +86,7 @@ void CaptureConsoleModeMidi::enter() {
 	session->device_manager->subscribe(this, [=]{ update_device_list(); });
 
 	chain->start();
-	view->mode_capture->set_data({CaptureTrackData((Track*)target, recorder)});
+	view->mode_capture->set_data({{(Track*)target, input, recorder}});
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {

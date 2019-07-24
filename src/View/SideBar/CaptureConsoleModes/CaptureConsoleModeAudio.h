@@ -33,10 +33,6 @@ public:
 	void allow_change_device(bool allow) override;
 
 	void update_device_list();
-
-	void start_sync_before() override;
-	void start_sync_after() override;
-	void sync() override;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

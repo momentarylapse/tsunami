@@ -114,6 +114,13 @@ void CaptureTrackData::start_sync_after() {
 	if (type() == SignalType::AUDIO) {
 		samples_recorded_before_start = audio_input()->samples_recorded();
 		samples_skipped_start = audio_recorder()->samples_skipped;
+		printf("pre: play %d   skipped.. %d\n", samples_played_before_capture, samples_skipped_start);
+	}
+}
+
+void CaptureTrackData::end_sync() {
+	if (type() == SignalType::AUDIO) {
+		//audio_recorder()->samples_skipped += audio_recorder()->buf.length;
 	}
 }
 

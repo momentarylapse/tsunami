@@ -17,30 +17,25 @@ BeatSource::BeatSource() :
 	port_out.add(out);
 }
 
-void BeatSource::__init__()
-{
+void BeatSource::__init__() {
 	new(this) BeatSource;
 }
 
-void BeatSource::__delete__()
-{
+void BeatSource::__delete__() {
 	this->BeatSource::~BeatSource();
 }
 
-BeatSource::Output::Output(BeatSource* s) : Port(SignalType::BEATS, "out")
-{
+BeatSource::Output::Output(BeatSource* s) : Port(SignalType::BEATS, "out") {
 	source = s;
 }
 
-int BeatSource::Output::read_beats(Array<Beat> &beats, int samples)
-{
+int BeatSource::Output::read_beats(Array<Beat> &beats, int samples) {
 	return source->read(beats, samples);
 }
 
 
 
-BeatSource *CreateBeatSource(Session *session, const string &name)
-{
+BeatSource *CreateBeatSource(Session *session, const string &name) {
 	return (BeatSource*)ModuleFactory::create(session, ModuleType::BEAT_SOURCE, name);
 }
 

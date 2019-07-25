@@ -27,6 +27,7 @@ public:
 
 	void start_sync_before();
 	void start_sync_after();
+	void end_sync();
 	void sync();
 
 	CaptureConsole *cc;

@@ -12,8 +12,7 @@
 #include "../../Data/Rhythm/Beat.h"
 #include "../../Data/base.h"
 
-BeatMidifier::BeatMidifier()
-{
+BeatMidifier::BeatMidifier() {
 	module_type = ModuleType::PLUMBING;
 	module_subtype = "BeatMidifier";
 	beat_source = nullptr;
@@ -22,8 +21,7 @@ BeatMidifier::BeatMidifier()
 	volume = 1.0f;
 }
 
-int BeatMidifier::read(MidiEventBuffer &midi)
-{
+int BeatMidifier::read(MidiEventBuffer &midi) {
 	if (!beat_source)
 		return midi.samples;
 

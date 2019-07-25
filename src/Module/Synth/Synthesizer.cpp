@@ -10,7 +10,6 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Audio/AudioBuffer.h"
-#include "../../Stuff/PerformanceMonitor.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
 #include "../../lib/math/math.h"
@@ -61,7 +60,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	}
 
 //	printf("...%d  %d  ok\n", n, buf.length);
-	PerformanceMonitor::start_busy(synth->perf_channel);
+	synth->perf_start();
 	buf.set_zero();
 	synth->render(buf);
 
@@ -70,7 +69,7 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 
 	synth->events.clear();
 
-	PerformanceMonitor::end_busy(synth->perf_channel);
+	synth->perf_end();
 	return buf.length;
 }
 

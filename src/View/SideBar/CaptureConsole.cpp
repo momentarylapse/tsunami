@@ -124,6 +124,8 @@ void CaptureConsole::on_start() {
 	if (state == State::PAUSED) {
 	} else {
 		view->prepare_playback(view->get_playback_selection(true), false);
+		chain->stop_hard();
+		chain->start();
 	}
 	
 	mode->start_sync_before();
@@ -143,6 +145,7 @@ void CaptureConsole::on_start() {
 void CaptureConsole::on_dump() {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
+	mode->end_sync();
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	mode->allow_change_device(true);
 	enable("start", true);

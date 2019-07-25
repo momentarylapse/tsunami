@@ -74,7 +74,7 @@ void SongRenderer::render_send_target(AudioBuffer &buf, Track* target) {
 	} else {
 
 		// first (un-muted) track
-		tracks[i0]->render(buf);
+		tracks[i0]->read(buf);
 
 		// other tracks
 		for (int i=i0+1;i<tracks.num;i++){
@@ -87,7 +87,7 @@ void SongRenderer::render_send_target(AudioBuffer &buf, Track* target) {
 				continue;
 			AudioBuffer tbuf;
 			tbuf.resize(buf.length);
-			tracks[i]->render(tbuf);
+			tracks[i]->read(tbuf);
 			buf.add(tbuf, 0, 1);
 		}
 
@@ -224,8 +224,10 @@ void SongRenderer::reset_state() {
 
 void SongRenderer::build_data() {
 	bar_streamer = new BarStreamer(song->bars);
+	bar_streamer->perf_set_parent(this);
 	beat_midifier = new BeatMidifier;
 	beat_midifier->_plug_in(0, bar_streamer, 0);
+	beat_midifier->perf_set_parent(this);
 
 	for (Track *t: song->tracks)
 		tracks.add(new TrackRenderer(t, this));

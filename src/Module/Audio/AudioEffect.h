@@ -20,12 +20,11 @@ class AudioBuffer;
 class Session;
 
 namespace Script{
-class Script;
-class Type;
+	class Script;
+	class Type;
 };
 
-class AudioEffect : public Module
-{
+class AudioEffect : public Module {
 public:
 	AudioEffect();
 
@@ -34,8 +33,7 @@ public:
 
 	int sample_rate;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioEffect *fx);
 		int read_audio(AudioBuffer &buf) override;

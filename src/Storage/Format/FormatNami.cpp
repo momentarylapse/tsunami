@@ -134,13 +134,11 @@ public:
 	}
 };
 
-class FileChunkEffect : public FileChunk<Track,AudioEffect>
-{
+class FileChunkEffect : public FileChunk<Track,AudioEffect> {
 public:
 	FileChunkEffect() : FileChunk<Track,AudioEffect>("effect"){}
 	virtual void create(){}
-	virtual void read(File *f)
-	{
+	virtual void read(File *f) {
 		me = CreateAudioEffect(cur_op(this)->session, f->read_str());
 		f->read_bool();
 		f->read_int();
@@ -150,10 +148,9 @@ public:
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
-		parent->fx.add(me);
+		parent->add_effect(me);
 	}
-	virtual void write(File *f)
-	{
+	virtual void write(File *f) {
 		f->write_str(me->module_subtype);
 		f->write_bool(false);
 		f->write_int(0);

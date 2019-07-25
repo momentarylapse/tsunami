@@ -8,7 +8,7 @@
 #ifndef SRC_MODULE_AUDIO_TRACKRENDERER_H_
 #define SRC_MODULE_AUDIO_TRACKRENDERER_H_
 
-#include "../../lib/base/base.h"
+#include "AudioSource.h"
 
 class Track;
 class AudioEffect;
@@ -17,8 +17,7 @@ class MidiEventStreamer;
 class SongRenderer;
 class AudioBuffer;
 
-class TrackRenderer : public VirtualBase
-{
+class TrackRenderer : public AudioSource {
 	friend SongRenderer;
 public:
 	TrackRenderer(Track *t, SongRenderer *sr);
@@ -43,7 +42,7 @@ public:
 	void render_midi(AudioBuffer &buf);
 	void render_group(AudioBuffer &buf);
 	void render_no_fx(AudioBuffer &buf);
-	void render(AudioBuffer &buf);
+	int read(AudioBuffer &buf) override;
 
 	void fill_midi_streamer();
 	int get_first_usable_layer();

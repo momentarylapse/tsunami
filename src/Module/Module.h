@@ -92,6 +92,9 @@ public:
 	bool belongs_to_system;
 	
 	int perf_channel;
+	void perf_start();
+	void perf_end();
+	void perf_set_parent(Module *m);
 
 
 

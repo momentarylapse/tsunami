@@ -13,16 +13,14 @@
 
 class DummyBeatSource;
 
-class BeatSource : public Module
-{
+class BeatSource : public Module {
 public:
 	BeatSource();
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(BeatSource *s);
 		int read_beats(Array<Beat> &beats, int samples) override;
@@ -42,8 +40,7 @@ public:
 	virtual float _cdecl beat_fraction(){ return 0; }
 };
 
-class DummyBeatSource : public BeatSource
-{
+class DummyBeatSource : public BeatSource {
 public:
 	int _cdecl read(Array<Beat> &beats, int samples) override { return samples; }
 };

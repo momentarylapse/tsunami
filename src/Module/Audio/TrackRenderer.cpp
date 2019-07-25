@@ -79,6 +79,7 @@ void TrackRenderer::reset_state() {
 }
 
 TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
+	module_subtype = "TrackRenderer";
 	song_renderer = sr;
 	track = t;
 	offset = 0;
@@ -103,12 +104,20 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	if (t->type == SignalType::MIDI) {
 		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer(raw);
+		midi_streamer->perf_set_parent(this);
 		synth->_plug_in(0, midi_streamer, 0);
 		fill_midi_streamer();
 	} else if (t->type == SignalType::BEATS) {
 
 		synth->_plug_in(0, sr->beat_midifier, 0);
 	}
+	
+	perf_set_parent(song_renderer);
+	synth->perf_set_parent(this);
+	
+	for (auto *f: fx)
+		f->perf_set_parent(this);
+		
 
 	track->subscribe(this, [=]{ on_track_replace_synth(); }, track->MESSAGE_REPLACE_SYNTHESIZER);
 	track->subscribe(this, [=]{ on_track_add_or_delete_fx(); }, track->MESSAGE_ADD_EFFECT);
@@ -123,6 +132,7 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 }
 
 TrackRenderer::~TrackRenderer() {
+	synth->perf_set_parent(nullptr);
 	if (track)
 		track->unsubscribe(this);
 	if (midi_streamer)
@@ -159,11 +169,14 @@ void TrackRenderer::on_track_add_or_delete_fx() {
 	if (direct_mode) {
 		fx = track->fx;
 	}
+	for (auto *f: fx)
+		f->perf_set_parent(this);
 }
 
 void TrackRenderer::on_track_replace_synth() {
 	if (!track)
 		return;
+	synth->perf_set_parent(nullptr);
 	if (direct_mode) {
 		synth = track->synth;
 	} else {
@@ -179,6 +192,7 @@ void TrackRenderer::on_track_replace_synth() {
 	} else if (track->type == SignalType::BEATS) {
 		synth->_plug_in(0, song_renderer->beat_midifier, 0);
 	}
+	synth->perf_set_parent(this);
 }
 
 void TrackRenderer::on_track_change_data() {
@@ -360,7 +374,9 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list) {
 	// apply fx
 	for (AudioEffect *f: fx_list)
 		if (f->enabled) {
+			f->perf_start();
 			f->process(buf);
+			f->perf_end();
 		}
 }
 
@@ -371,7 +387,8 @@ float get_max_volume(AudioBuffer &buf) {
 	return peak;
 }
 
-void TrackRenderer::render(AudioBuffer &buf) {
+int TrackRenderer::read(AudioBuffer &buf) {
+	perf_start();
 	render_no_fx(buf);
 
 	auto _fx = fx;
@@ -383,4 +400,6 @@ void TrackRenderer::render(AudioBuffer &buf) {
 	buf.mix_stereo(track->volume, track->panning);
 
 	peak = max(peak, get_max_volume(buf));
+	perf_end();
+	return buf.length;
 }

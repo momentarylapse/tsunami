@@ -173,6 +173,8 @@ string Module::type_to_name(ModuleType type) {
 		return "Stream";
 	if (type == ModuleType::PLUMBING)
 		return "Plumbing";
+	if (type == ModuleType::SIGNAL_CHAIN)
+		return "SignalChain";
 	if (type == ModuleType::TSUNAMI_PLUGIN)
 		return "TsunamiPlugin";
 	return "???";
@@ -200,6 +202,8 @@ ModuleType Module::type_from_name(const string &str) {
 		return ModuleType::PITCH_DETECTOR;
 	if (str == "AudioVisualizer")
 		return ModuleType::AUDIO_VISUALIZER;
+	if (str == "SignalChain")
+		return ModuleType::SIGNAL_CHAIN;
 	return (ModuleType)-1;
 }
 
@@ -215,5 +219,21 @@ void Module::_plug_in(int in_port, Module *source, int source_port) {
 void Module::_unplug_in(int in_port) {
 	auto tp = port_in[in_port];
 	*tp.port = nullptr;
+}
+
+void Module::perf_start() {
+	PerformanceMonitor::start_busy(perf_channel);
+}
+
+void Module::perf_end() {
+	PerformanceMonitor::end_busy(perf_channel);
+}
+
+// only for PerformanceMonitor
+void Module::perf_set_parent(Module *m) {
+	if (m)
+		PerformanceMonitor::set_parent(perf_channel, m->perf_channel);
+	else
+		PerformanceMonitor::set_parent(perf_channel, -1);
 }
 

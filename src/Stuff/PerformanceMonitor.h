@@ -18,6 +18,7 @@ struct PerfChannelStat {
 };
 
 struct PerfChannelInfo {
+	int id, parent;
 	string name;
 	void *p;
 	Array<PerfChannelStat> stats;
@@ -33,6 +34,7 @@ public:
 	static Array<PerfChannelInfo> get_info();
 
 	static int create_channel(const string &name, void *p);
+	static void set_parent(int channel, int parent);
 	static void delete_channel(int channel);
 	static void start_busy(int channel);
 	static void end_busy(int channel);

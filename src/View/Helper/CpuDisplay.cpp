@@ -67,17 +67,9 @@ void CpuDisplay::on_draw(Painter* p) {
 
 	p->set_color(view->colors.background);
 	p->draw_rect(2, 2, w-4, h-4);
-	p->set_line_width(large ? 1.5f : 1.0f);
+	p->set_line_width(large ? 2.0f : 1.0f);
 
-	if (large) {
-		p->set_font_size(10);
-		p->set_color(view->colors.text_soft1);
-		p->draw_str(68, 10, "cpu");
-		p->draw_str(118, 10, "avg");
-		p->draw_str(173, 10, "freq");
-	}
-
-	int t = 0;
+	// graphs
 	for (auto &c: channels) {
 		p->set_color(type_color(c.name));
 		for (int j=1; j<c.stats.num; j++) {
@@ -88,25 +80,57 @@ void CpuDisplay::on_draw(Painter* p) {
 			if (x1 >= 2)
 				p->draw_line(x0, y0, x1, y1);
 		}
-		if (c.stats.num > 0) {
-			color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
-			p->set_color(col);
-			if (c.stats.back().counter == 0)
-				p->set_color(ColorInterpolate(col, view->colors.background, 0.7f));
-			if (large) {
+	}
+	
+	
+	if (large) {
+		p->set_font_size(10);
+		p->set_color(view->colors.text_soft1);
+		p->draw_str(150, 10, "cpu");
+		p->draw_str(210, 10, "avg");
+		p->draw_str(270, 10, "freq");
+		
+		int t = 0;
+		Array<int> indent;
+		for (auto &c: channels) {
+			if (c.stats.num > 0) {
+				color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
+				p->set_color(col);
+				if (c.stats.back().counter == 0)
+					p->set_color(ColorInterpolate(col, view->colors.background, 0.7f));
+				int dx = 0;
+				if (c.parent >= 0) {
+					for (int i=0; i<channels.num; i++)
+						if (channels[i].id == c.parent)
+							if (i < indent.num) {
+								dx = indent[i] + 12;
+							}
+				}
 				string name = channel_title(c);
 				p->set_font_size(10);
-				p->draw_str(20, 30  + t * 20, name);
-				p->draw_str(120, 30  + t * 20, format("%.0f%%", c.stats.back().cpu * 100));
-				p->draw_str(170, 30  + t * 20, format("%.2fms", c.stats.back().avg * 1000));
-				p->draw_str(240, 30  + t * 20, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
-
+				p->draw_str(20 + dx, 30  + t * 20, name);
+				p->draw_str(160, 30  + t * 20, format("%.1f%%", c.stats.back().cpu * 100));
+				p->draw_str(210, 30  + t * 20, format("%.2fms", c.stats.back().avg * 1000));
+				p->draw_str(280, 30  + t * 20, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
+				indent.add(dx);
 			} else {
-				p->set_font_size(7);
+				indent.add(0);
+			}
+			t ++;
+		}
+	} else {
+	
+		p->set_font_size(7);
+	
+		int t = 0;
+		for (auto &c: channels) {
+			if (c.stats.num > 0) {
+				color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
+				p->set_color(col);
 				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
+				t ++;
 			}
 		}
-		t ++;
 	}
 }
 
@@ -129,10 +153,7 @@ void CpuDisplay::on_dialog_close() {
 	dlg->hide();
 }
 
-void CpuDisplay::update() {
-	channels = perf_mon->get_info();
-
-	// sort
+void ch_sort(Array<PerfChannelInfo> &channels) {
 	for (int i=0; i<channels.num; i++)
 		for (int j=i+1; j<channels.num; j++) {
 			if (channels[i].name.compare(channels[j].name) < 0) {
@@ -141,6 +162,29 @@ void CpuDisplay::update() {
 				channels.swap(i, j);
 			}
 		}
+}
+
+Array<PerfChannelInfo> ch_children(const Array<PerfChannelInfo> &channels, int parent) {
+	Array<PerfChannelInfo> r;
+	for (auto &c: channels)
+		if (c.parent == parent)
+			r.add(c);
+	ch_sort(r);
+	return r;
+}
+
+Array<PerfChannelInfo> ch_tree_sort(const Array<PerfChannelInfo> &ch) {
+	auto r = ch_children(ch, -1);
+	for (int i=0; i<r.num; i++) {
+		auto x = ch_children(ch, r[i].id);
+		foreachi (auto &c, x, j)
+			r.insert(c, i+j+1);
+	}
+	return r;
+}
+
+void CpuDisplay::update() {
+	channels = ch_tree_sort(perf_mon->get_info());
 
 	panel->redraw(id);
 	if (dlg)

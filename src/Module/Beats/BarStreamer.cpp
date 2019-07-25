@@ -11,16 +11,19 @@
 #include "../../Data/Rhythm/Bar.h"
 
 BarStreamer::BarStreamer(BarCollection &_bars) {
+	module_subtype = "BarStreamer";
 	bars = _bars;
 	offset = 0;
 }
 
 int BarStreamer::read(Array<Beat> &beats, int samples) {
+	perf_start();
 	beats = bars.get_beats(Range(offset, samples), false, false);
 	for (Beat &b: beats)
 		if (b.range.offset >= offset)
 			b.range.offset -= offset;
 	offset += samples;
+	perf_end();
 	return samples;
 }
 

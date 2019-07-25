@@ -7,11 +7,19 @@
 
 #include "PerformanceMonitor.h"
 #include "../lib/hui/hui.h"
+#include "../Module/Module.h"
 #include <mutex>
 
 #define ALLOW_PERF_MON	1
 
 static const float UPDATE_DT = 2.0f;
+
+void require_main_thread(const string &);
+
+// on a slow computer, a group of
+//   start_busy()
+//   end_busy()
+// added ~35ns of overhead
 
 
 static PerformanceMonitor *pm_instance;
@@ -25,6 +33,8 @@ struct Channel {
 
 	string name;
 	void *p;
+	int parent;
+	int id;
 	
 	float t_busy, t_idle;
 	float t_last;
@@ -34,10 +44,12 @@ struct Channel {
 
 	Array<PerfChannelStat> history;
 
-	void init(const string &_name, void *_p) {
+	void init(const string &_name, void *_p, int _id) {
 		used = true;
 		name = _name;
 		p = _p;
+		id = _id;
+		parent = -1;
 		history.clear();
 		reset_state();
 	}
@@ -56,7 +68,7 @@ static Array<Channel> channels;
 PerformanceMonitor::PerformanceMonitor() {
 	pm_instance = this;
 #if ALLOW_PERF_MON
-	runner_id = hui::RunRepeated(UPDATE_DT, std::bind(&PerformanceMonitor::update, this));
+	runner_id = hui::RunRepeated(UPDATE_DT, [=]{ update(); });
 #else
 	runner_id = -1;
 #endif
@@ -73,15 +85,22 @@ int PerformanceMonitor::create_channel(const string &name, void *p) {
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	foreachi(Channel &c, channels, i)
 		if (!c.used) {
-			c.init(name, p);
+			c.init(name, p, i);
 			return i;
 		}
 	Channel c;
-	c.init(name, p);
+	c.init(name, p, channels.num);
 	channels.add(c);
 	return channels.num - 1;
 #else
 	return -1;
+#endif
+}
+
+void PerformanceMonitor::set_parent(int channel, int parent) {
+#if ALLOW_PERF_MON
+	std::lock_guard<std::mutex> lock(pm_mutex);
+	channels[channel].parent = parent;
 #endif
 }
 
@@ -141,6 +160,8 @@ void PerformanceMonitor::update() {
 			PerfChannelInfo i;
 			i.name = c.name;
 			i.p = c.p;
+			i.id = c.id;
+			i.parent = c.parent;
 			i.stats = c.history;
 			pm_info.add(i);
 			c.reset_state();
@@ -151,8 +172,9 @@ void PerformanceMonitor::update() {
 #endif
 }
 
-// call from main thread!!!
 Array<PerfChannelInfo> PerformanceMonitor::get_info() {
+	require_main_thread("PerfMon.info");
+	
 	//std::lock_guard<std::mutex> lock(pm_mutex);
 	return pm_info;
 }

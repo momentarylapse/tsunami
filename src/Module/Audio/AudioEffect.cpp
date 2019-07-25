@@ -13,7 +13,6 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/TrackLayer.h"
-#include "../../Stuff/PerformanceMonitor.h"
 
 
 AudioEffect::Output::Output(AudioEffect *_fx) : Port(SignalType::AUDIO, "out") {
@@ -30,7 +29,7 @@ AudioEffect::AudioEffect() :
 	source = nullptr;
 	out = new Output(this);
 	port_out.add(out);
-	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
+	port_in.add({SignalType::AUDIO, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
@@ -47,10 +46,11 @@ int AudioEffect::read(AudioBuffer &buf) {
 		return buf.length;
 	sample_rate = session->sample_rate();
 	int samples = source->read_audio(buf);
-	PerformanceMonitor::start_busy(perf_channel);
+	
+	perf_start();
 	if (samples > 0)
 		process(buf);
-	PerformanceMonitor::end_busy(perf_channel);
+	perf_end();
 	return samples;
 }
 

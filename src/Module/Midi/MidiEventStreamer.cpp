@@ -11,6 +11,7 @@
 
 
 MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi) {
+	module_subtype = "MidiEventStreamer";
 	midi = _midi;
 	offset = 0;
 	ignore_end = false;

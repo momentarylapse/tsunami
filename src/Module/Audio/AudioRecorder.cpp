@@ -45,6 +45,10 @@ void AudioRecorder::_accumulate(bool enable) {
 	accumulating = enable;
 }
 
+void AudioRecorder::reset_state() {
+	samples_skipped = 0;
+}
+
 int AudioRecorder::command(ModuleCommand cmd, int param) {
 	if (cmd == ModuleCommand::ACCUMULATION_START) {
 		_accumulate(true);
@@ -53,6 +57,7 @@ int AudioRecorder::command(ModuleCommand cmd, int param) {
 		_accumulate(false);
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
+		samples_skipped += buf.length;
 		buf.clear();
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {

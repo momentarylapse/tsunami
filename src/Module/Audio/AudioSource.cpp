@@ -8,7 +8,6 @@
 #include "AudioSource.h"
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
-#include "../../Stuff/PerformanceMonitor.h"
 
 
 AudioSource::AudioSource() :
@@ -31,9 +30,9 @@ AudioSource::Output::Output(AudioSource *s) : Port(SignalType::AUDIO, "out") {
 }
 
 int AudioSource::Output::read_audio(AudioBuffer& buf) {
-	PerformanceMonitor::start_busy(source->perf_channel);
+	source->perf_start();
 	int r = source->read(buf);
-	PerformanceMonitor::end_busy(source->perf_channel);
+	source->perf_end();
 	return r;
 }
 

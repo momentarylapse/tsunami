@@ -51,6 +51,7 @@ struct CaptureTrackData {
 
 	void start_sync_before(AudioOutput *out);
 	void start_sync_after();
+	void end_sync();
 	void sync(AudioOutput *out);
 	int get_sync_delay();
 };

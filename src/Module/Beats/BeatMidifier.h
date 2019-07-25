@@ -12,8 +12,7 @@
 
 class Port;
 
-class BeatMidifier : public MidiSource
-{
+class BeatMidifier : public MidiSource {
 public:
 	BeatMidifier();
 	int read(MidiEventBuffer &midi) override;

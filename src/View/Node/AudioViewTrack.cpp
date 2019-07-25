@@ -56,6 +56,8 @@ AudioViewTrack::~AudioViewTrack() {
 }
 
 void AudioViewTrack::on_track_change() {
+	view->renderer->allow_tracks(view->get_playable_tracks());
+	view->renderer->allow_layers(view->get_playable_layers());
 	notify(MESSAGE_CHANGE);
 }
 
@@ -80,11 +82,9 @@ bool AudioView::editing_track(Track *t) {
 
 void AudioViewTrack::set_muted(bool muted) {
 	track->set_muted(muted);
-	view->renderer->allow_tracks(view->get_playable_tracks());
-	view->renderer->allow_layers(view->get_playable_layers());
-	view->force_redraw();
+	/*view->force_redraw();
 	notify();
-	view->notify(view->MESSAGE_SOLO_CHANGE);
+	view->notify(view->MESSAGE_SOLO_CHANGE);*/
 }
 
 void AudioViewTrack::set_solo(bool _solo) {

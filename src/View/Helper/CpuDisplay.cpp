@@ -9,6 +9,7 @@
 #include "../../Stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
+#include "../../Module/Module.h"
 #include "../AudioView.h"
 
 static const float UPDATE_DT = 2.0f;
@@ -36,28 +37,27 @@ CpuDisplay::~CpuDisplay() {
 		delete dlg;
 }
 
-color type_color(int t) {
-	if (t == CpuDisplay::TYPE_VIEW)
+color type_color(const string &t) {
+	if (t == "view")
 		return color(1, 0.1f, 0.9f, 0.2f);
-	if (t == CpuDisplay::TYPE_PEAK)
+	if (t == "peak")
 		return color(1, 0.1f, 0.9f, 0.9f);
-	if (t == CpuDisplay::TYPE_OUT)
+	if (t == "module")
 		return color(1, 0.2f, 0.2f, 0.9f);
-	if (t == CpuDisplay::TYPE_SUCK)
+	if (t == "suck")
 		return color(1, 0.9f, 0.1f, 0.1f);
-	return Black;
+	return AudioView::colors.text_soft1;
 }
 
-string type_name(int t) {
-	if (t == CpuDisplay::TYPE_VIEW)
-		return "view";
-	if (t == CpuDisplay::TYPE_PEAK)
-		return "peak";
-	if (t == CpuDisplay::TYPE_OUT)
-		return "out";
-	if (t == CpuDisplay::TYPE_SUCK)
-		return "suck";
-	return "?";
+string channel_title(PerfChannelInfo &c) {
+	if (c.name != "module")
+		return c.name;
+
+	auto *m = (Module*)c.p;
+	if (m->module_subtype != "")
+		return m->module_subtype;
+
+	return m->type_to_name(m->module_type);
 }
 
 void CpuDisplay::on_draw(Painter* p) {
@@ -77,30 +77,36 @@ void CpuDisplay::on_draw(Painter* p) {
 		p->draw_str(173, 10, "freq");
 	}
 
-	for (int t=0; t<NUM_TYPES; t++) {
-		p->set_color(type_color(t));
-		for (int j=1; j<cpu[t].num; j++) {
-			float x0 = w - 2 - (cpu[t].num - (j-1)) * 2;
-			float x1 = w - 2 - (cpu[t].num -  j   ) * 2;
-			float y0 = 2 + (h - 4) * (1 - cpu[t][j-1]);
-			float y1 = 2 + (h - 4) * (1 - cpu[t][j]);
+	int t = 0;
+	for (auto &c: channels) {
+		p->set_color(type_color(c.name));
+		for (int j=1; j<c.stats.num; j++) {
+			float x0 = w - 2 - (c.stats.num - (j-1)) * 2;
+			float x1 = w - 2 - (c.stats.num -  j   ) * 2;
+			float y0 = 2 + (h - 4) * (1 - c.stats[j-1].cpu);
+			float y1 = 2 + (h - 4) * (1 - c.stats[j].cpu);
 			if (x1 >= 2)
 				p->draw_line(x0, y0, x1, y1);
 		}
-		if (cpu[t].num > 0) {
-			p->set_color(ColorInterpolate(type_color(t), view->colors.text, 0.5f));
+		if (c.stats.num > 0) {
+			color col = ColorInterpolate(type_color(c.name), view->colors.text, 0.5f);
+			p->set_color(col);
+			if (c.stats.back().counter == 0)
+				p->set_color(ColorInterpolate(col, view->colors.background, 0.7f));
 			if (large) {
+				string name = channel_title(c);
 				p->set_font_size(10);
-				p->draw_str(20, 30  + t * 20, type_name(t));
-				p->draw_str(68, 30  + t * 20, format("%.0f%%", cpu[t].back() * 100));
-				p->draw_str(118, 30  + t * 20, format("%.2fms", avg[t].back() * 1000));
-				p->draw_str(173, 30  + t * 20, format("%.1f", (float)count[t].back() / UPDATE_DT));
+				p->draw_str(20, 30  + t * 20, name);
+				p->draw_str(120, 30  + t * 20, format("%.0f%%", c.stats.back().cpu * 100));
+				p->draw_str(170, 30  + t * 20, format("%.2fms", c.stats.back().avg * 1000));
+				p->draw_str(240, 30  + t * 20, format("%.1f", (float)c.stats.back().counter / UPDATE_DT));
 
 			} else {
 				p->set_font_size(7);
-				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", cpu[t].back() * 100));
+				p->draw_str(20 + (t/2) * 30, h / 2-14 + (t%2)*12, format("%.0f%%", c.stats.back().cpu * 100));
 			}
 		}
+		t ++;
 	}
 }
 
@@ -108,7 +114,7 @@ void CpuDisplay::on_left_button_down() {
 	if (dlg) {
 		dlg->show();
 	} else {
-		dlg = new hui::Dialog("cpu", 250, 180, panel->win, true);
+		dlg = new hui::Dialog("cpu", 380, 260, panel->win, true);
 		dlg->set_border_width(0);
 		dlg->add_drawing_area("", 0, 0, "area");
 		dlg->event_xp("area", "hui:draw", [=](Painter *p){ on_draw(p); });
@@ -124,27 +130,17 @@ void CpuDisplay::on_dialog_close() {
 }
 
 void CpuDisplay::update() {
-	float c[NUM_TYPES], a[NUM_TYPES];
-	int cc[NUM_TYPES];
-	for (int t=0; t<NUM_TYPES; t++) {
-		c[t] = a[t] = 0;
-		cc[t] = 0;
-	}
+	channels = perf_mon->get_info();
 
-	auto infos = perf_mon->get_info();
-	for (auto &i: infos)
-		for (int t=0; t<NUM_TYPES; t++)
-			if (i.name == type_name(t)) {
-				c[t] += i.cpu;
-				a[t] += i.avg;
-				cc[t] += i.counter;
+	// sort
+	for (int i=0; i<channels.num; i++)
+		for (int j=i+1; j<channels.num; j++) {
+			if (channels[i].name.compare(channels[j].name) < 0) {
+				channels.swap(i, j);
+			} else if ((channels[i].name.compare(channels[j].name) == 0) and (channels[i].stats.back().cpu < channels[j].stats.back().cpu)) {
+				channels.swap(i, j);
 			}
-
-	for (int t=0; t<NUM_TYPES; t++) {
-		cpu[t].add(c[t]);
-		avg[t].add(a[t]);
-		count[t].add(cc[t]);
-	}
+		}
 
 	panel->redraw(id);
 	if (dlg)

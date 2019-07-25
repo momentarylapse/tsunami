@@ -68,7 +68,7 @@ void BottomBar::_show() {
 	reveal("revealer", true);
 	visible = true;
 	if (active_console)
-		active_console->on_show();
+		active_console->show();
 	notify();
 }
 
@@ -76,7 +76,7 @@ void BottomBar::_hide() {
 	reveal("revealer", false);
 	visible = false;
 	if (active_console)
-		active_console->on_hide();
+		active_console->hide();
 	notify();
 }
 
@@ -106,7 +106,8 @@ void BottomBar::choose(BottomBar::Console *console) {
 
 	active_console = console;
 
-	active_console->show();
+	if (visible)
+		active_console->show();
 	set_int("choose", index(active_console));
 
 	notify();

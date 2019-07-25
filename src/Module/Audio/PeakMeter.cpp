@@ -74,12 +74,10 @@ inline float PeakMeter::i_to_freq(int i) {
 
 void PeakMeter::request_spectrum() {
 	spectrum_requests ++;
-	printf("req ...%d\n", spectrum_requests);
 }
 
 void PeakMeter::unrequest_spectrum() {
 	spectrum_requests --;
-	printf("unreq ...%d\n", spectrum_requests);
 }
 
 void PeakMeter::find_spectrum(AudioBuffer &buf) {

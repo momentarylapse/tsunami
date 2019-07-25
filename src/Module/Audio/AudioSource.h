@@ -13,16 +13,14 @@
 
 class BeatSource;
 
-class AudioSource : public Module
-{
+class AudioSource : public Module {
 public:
 	AudioSource();
 
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port
-	{
+	class Output : public Port {
 	public:
 		Output(AudioSource *s);
 		int read_audio(AudioBuffer &buf) override;

@@ -11,20 +11,26 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
+
+struct PerfChannelStat {
+	float cpu, avg;
+	int counter;
+};
+
+struct PerfChannelInfo {
+	string name;
+	void *p;
+	Array<PerfChannelStat> stats;
+};
+
 class PerformanceMonitor : public Observable<VirtualBase> {
 public:
 	PerformanceMonitor();
 	virtual ~PerformanceMonitor();
 
-	struct ChannelInfo {
-		string name;
-		void *p;
-		float cpu, avg;
-		int counter;
-	};
 	void update();
 	int runner_id;
-	static Array<ChannelInfo> get_info();
+	static Array<PerfChannelInfo> get_info();
 
 	static int create_channel(const string &name, void *p);
 	static void delete_channel(int channel);

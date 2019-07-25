@@ -1459,6 +1459,7 @@ void AudioView::set_playback_pos(int pos) {
 	if (mode == mode_capture)
 		return;
 	renderer->set_pos(pos);
+	_playback_stream_offset = pos - output_stream->samples_played();
 }
 
 void AudioView::playback_click() {

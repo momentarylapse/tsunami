@@ -15,7 +15,7 @@ static const float UPDATE_DT = 2.0f;
 
 
 static PerformanceMonitor *pm_instance;
-static Array<PerformanceMonitor::ChannelInfo> pm_info;
+static Array<PerfChannelInfo> pm_info;
 static std::mutex pm_mutex;
 static hui::Timer pm_timer;
 
@@ -30,10 +30,15 @@ struct Channel {
 	float t_last;
 	int counter;
 	int state;
+
+
+	Array<PerfChannelStat> history;
+
 	void init(const string &_name, void *_p) {
 		used = true;
 		name = _name;
 		p = _p;
+		history.clear();
 		reset_state();
 	}
 	void reset_state() {
@@ -84,6 +89,7 @@ void PerformanceMonitor::delete_channel(int channel) {
 #if ALLOW_PERF_MON
 	std::lock_guard<std::mutex> lock(pm_mutex);
 	channels[channel].used = false;
+	channels[channel].history.clear();
 #endif
 }
 
@@ -123,14 +129,19 @@ void PerformanceMonitor::update() {
 	pm_info.clear();
 	for (auto &c: channels)
 		if (c.used) {
-			ChannelInfo i;
+
+			PerfChannelStat s;
+			s.cpu = c.t_busy / dt;
+			s.avg = 0;
+			s.counter = c.counter;
+			if (c.counter > 0)
+				s.avg = c.t_busy / c.counter;
+			c.history.add(s);
+
+			PerfChannelInfo i;
 			i.name = c.name;
 			i.p = c.p;
-			i.cpu = c.t_busy / dt;
-			i.avg = 0;
-			i.counter = c.counter;
-			if (c.counter > 0)
-				i.avg = c.t_busy / c.counter;
+			i.stats = c.history;
 			pm_info.add(i);
 			c.reset_state();
 		}
@@ -141,7 +152,7 @@ void PerformanceMonitor::update() {
 }
 
 // call from main thread!!!
-Array<PerformanceMonitor::ChannelInfo> PerformanceMonitor::get_info() {
+Array<PerfChannelInfo> PerformanceMonitor::get_info() {
 	//std::lock_guard<std::mutex> lock(pm_mutex);
 	return pm_info;
 }

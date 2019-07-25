@@ -8,6 +8,7 @@
 #include "AudioSource.h"
 #include "../ModuleFactory.h"
 #include "../../Data/base.h"
+#include "../../Stuff/PerformanceMonitor.h"
 
 
 AudioSource::AudioSource() :
@@ -17,27 +18,25 @@ AudioSource::AudioSource() :
 	port_out.add(out);
 }
 
-void AudioSource::__init__()
-{
+void AudioSource::__init__() {
 	new(this) AudioSource;
 }
 
-void AudioSource::__delete__()
-{
+void AudioSource::__delete__() {
 	this->AudioSource::~AudioSource();
 }
 
-AudioSource::Output::Output(AudioSource *s) : Port(SignalType::AUDIO, "out")
-{
+AudioSource::Output::Output(AudioSource *s) : Port(SignalType::AUDIO, "out") {
 	source = s;
 }
 
-int AudioSource::Output::read_audio(AudioBuffer& buf)
-{
-	return source->read(buf);
+int AudioSource::Output::read_audio(AudioBuffer& buf) {
+	PerformanceMonitor::start_busy(source->perf_channel);
+	int r = source->read(buf);
+	PerformanceMonitor::end_busy(source->perf_channel);
+	return r;
 }
 
-AudioSource *CreateAudioSource(Session *session, const string &name)
-{
+AudioSource *CreateAudioSource(Session *session, const string &name) {
 	return (AudioSource*)ModuleFactory::create(session, ModuleType::AUDIO_SOURCE, name);
 }

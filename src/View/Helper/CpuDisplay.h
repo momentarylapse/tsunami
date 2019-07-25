@@ -18,6 +18,7 @@ class Painter;
 class PerformanceMonitor;
 class Session;
 class AudioView;
+class PerfChannelInfo;
 
 class CpuDisplay : public VirtualBase {
 public:
@@ -37,19 +38,8 @@ public:
 
 	hui::Dialog *dlg;
 
-	enum {
-		TYPE_VIEW,
-		TYPE_PEAK,
-		TYPE_OUT,
-		TYPE_SUCK,
-		TYPE_FX,
-		TYPE_SYNTH,
-		NUM_TYPES
-	};
 
-	Array<float> cpu[NUM_TYPES];
-	Array<float> avg[NUM_TYPES];
-	Array<int> count[NUM_TYPES];
+	Array<PerfChannelInfo> channels;
 };
 
 #endif /* SRC_VIEW_HELPER_CPUDISPLAY_H_ */

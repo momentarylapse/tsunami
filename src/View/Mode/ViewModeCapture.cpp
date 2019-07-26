@@ -139,7 +139,10 @@ int CaptureTrackData::get_sync_delay() {
 	int d = 0;
 	for (auto &p: sync_points)
 		d += (p.pos_play - samples_played_before_capture) - (p.pos_record - samples_skipped_start);
-	return d / sync_points.num;
+	d /= sync_points.num;
+	if (fabs(d) > 50000)
+		return 0;
+	return d;
 }
 
 

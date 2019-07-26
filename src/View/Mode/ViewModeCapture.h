@@ -26,6 +26,8 @@ class MidiEventBuffer;
 
 struct SyncPoint {
 	int64 pos_play, pos_record;
+	int64 samples_skipped_start;
+	int delay(int64 samples_played_before_capture);
 };
 
 struct CaptureTrackData {
@@ -41,8 +43,6 @@ struct CaptureTrackData {
 	MidiRecorder *midi_recorder();
 
 	int64 samples_played_before_capture = 0;
-	int64 samples_recorded_before_start = 0;
-	int64 samples_skipped_start = 0;
 	Array<SyncPoint> sync_points;
 
 	void insert(int pos);
@@ -50,8 +50,6 @@ struct CaptureTrackData {
 	void insert_midi(int pos, int delay);
 
 	void start_sync_before(AudioOutput *out);
-	void start_sync_after();
-	void end_sync();
 	void sync(AudioOutput *out);
 	int get_sync_delay();
 };

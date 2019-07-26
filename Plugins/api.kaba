@@ -312,6 +312,10 @@ class BeatMidifier extends MidiSource
 	extern override int read(MidiEventBuffer midi)
 	float volume
 
+class AudioRecorder extends Module
+	int samples_skipped
+	AudioBuffer buffer
+
 class TrackRenderBuffer
 	int dummy
 
@@ -496,8 +500,7 @@ class AudioView
 	SongSelection sel
 	SongRenderer* renderer
 	SignalChain* signal_chain
-	OutputStream* output_stream
-	//InputStreamAny* input
+	AudioOutput* output_stream
 	extern void subscribe(void* handler, func* f, string message)
 	extern void unsubscribe(void* handler)
 
@@ -514,21 +517,21 @@ class SongRenderer extends AudioSource
 	extern BeatSource* get_beat_source()
 
 
-class OutputStream extends Module
+class AudioOutput extends Module
 	extern void __init__(Session *session)
 	extern override void __delete__()
 	extern void stop()
 	extern void start()
 	extern bool is_playing()
-	//extern void setSource(AudioSource *r)
 	extern float get_volume()
 	extern void set_volume(float volume)
+	extern int samples_played()
 
 class _MidiPort
 	int client, port
 	string client_name, port_name
 
-class InputStreamAudio extends Module
+class AudioInput extends Module
 	RingBuffer current_buffer
 	AudioBuffer buffer
 	extern void __init__(Session* session)
@@ -537,6 +540,7 @@ class InputStreamAudio extends Module
 	extern void stop()
 	extern bool is_capturing()
 	extern int sample_rate()
+	extern int samples_recorded()
 
 class Storage
 	extern bool load(Song *s, string filename)
@@ -631,7 +635,6 @@ class Clipboard
 
 //extern PluginContext plugin_context
 extern ColorScheme colors
-//extern InputStreamAudio* view_input
 
 extern Clipboard* clipboard
 

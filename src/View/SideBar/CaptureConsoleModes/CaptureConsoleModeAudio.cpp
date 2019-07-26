@@ -26,6 +26,8 @@
 #include "../../../Device/Stream/AudioInput.h"
 #include "../../../Device/Stream/AudioOutput.h"
 
+#include "../../../Module/Audio/SongRenderer.h"
+
 
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :

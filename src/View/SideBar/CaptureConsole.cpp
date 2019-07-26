@@ -124,15 +124,11 @@ void CaptureConsole::on_start() {
 	if (state == State::PAUSED) {
 	} else {
 		view->prepare_playback(view->get_playback_selection(true), false);
-		chain->stop_hard();
-		chain->start();
 	}
 	
 	mode->start_sync_before();
 	
 	view->signal_chain->start();
-	
-	mode->start_sync_after();
 	chain->command(ModuleCommand::ACCUMULATION_START, 0);
 	mode->allow_change_device(false);
 	enable("start", false);
@@ -145,7 +141,6 @@ void CaptureConsole::on_start() {
 void CaptureConsole::on_dump() {
 	view->stop();
 	chain->command(ModuleCommand::ACCUMULATION_STOP, 0);
-	mode->end_sync();
 	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
 	mode->allow_change_device(true);
 	enable("start", true);
@@ -206,15 +201,13 @@ void CaptureConsole::on_output_end_of_stream() {
 	state = State::PAUSED;
 }
 
-int nnxx = 0;
-
 void CaptureConsole::on_putput_tick() {
 	update_time();
 	
-	nnxx ++;
-	if (nnxx > 20) {
+	n_sync ++;
+	if (n_sync > 20) {
 		mode->sync();
-		nnxx = 0;
+		n_sync = 0;
 	}
 }
 

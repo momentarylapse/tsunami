@@ -34,6 +34,7 @@
 #include "../Module/Audio/SongRenderer.h"
 #include "../Module/Audio/AudioVisualizer.h"
 #include "../Module/Audio/PitchDetector.h"
+#include "../Module/Audio/AudioRecorder.h"
 #include "../Module/Midi/MidiSource.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Module/Beats/BeatSource.h"
@@ -62,8 +63,7 @@ namespace Kaba{
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
-PluginManager::PluginManager()
-{
+PluginManager::PluginManager() {
 	favorites = new FavoriteManager;
 
 	find_plugins();
@@ -78,18 +78,11 @@ PluginManager::PluginManager()
 	package->syntax->make_class("Device*", Kaba::Class::Type::POINTER, sizeof(void*), 0, type_dev);
 }
 
-PluginManager::~PluginManager()
-{
+PluginManager::~PluginManager() {
 	delete(favorites);
 	Kaba::End();
 }
 
-
-
-void GlobalSetTempBackupFilename(const string &filename)
-{
-	//InputStreamAudio::setTempBackupFilename(filename);
-}
 
 Module *_CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
@@ -99,8 +92,7 @@ void _hoverify_(color &ret, ColorScheme *cs, const color &c){
 	ret = cs->hoverify(c);
 }
 
-void PluginManager::link_app_script_data()
-{
+void PluginManager::link_app_script_data() {
 	Kaba::config.directory = "";
 
 	// api definition
@@ -121,7 +113,6 @@ void PluginManager::link_app_script_data()
 	Kaba::LinkExternal("CreateMidiSource", (void*)&CreateMidiSource);
 	Kaba::LinkExternal("CreateBeatSource", (void*)&CreateBeatSource);
 	Kaba::LinkExternal("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
-	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 	Kaba::LinkExternal("ChooseModule", (void*)&choose_module);
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
@@ -518,33 +509,37 @@ void PluginManager::link_app_script_data()
 
 	{
 	AudioInput input(Session::GLOBAL);
-	Kaba::DeclareClassSize("InputStreamAudio", sizeof(AudioInput));
-	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(AudioInput, buffer));
-	Kaba::DeclareClassOffset("InputStreamAudio", "out", _offsetof(AudioInput, out));
-//	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
-	Kaba::LinkExternal("InputStreamAudio.__init__", Kaba::mf(&AudioInput::__init__));
-	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "__delete__", Kaba::mf(&AudioInput::__delete__), &input);
-	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&AudioInput::start));
-	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&AudioInput::stop));
-	Kaba::LinkExternal("InputStreamAudio.is_capturing", Kaba::mf(&AudioInput::is_capturing));
-	Kaba::LinkExternal("InputStreamAudio.sample_rate", Kaba::mf(&AudioInput::sample_rate));
-	//Kaba::LinkExternal("InputStreamAudio.set_backup_mode", Kaba::mf(&InputStreamAudio::set_backup_mode));
+	Kaba::DeclareClassSize("AudioInput", sizeof(AudioInput));
+	Kaba::DeclareClassOffset("AudioInput", "current_buffer", _offsetof(AudioInput, buffer));
+	Kaba::DeclareClassOffset("AudioInput", "out", _offsetof(AudioInput, out));
+	Kaba::LinkExternal("AudioInput.__init__", Kaba::mf(&AudioInput::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioInput", "__delete__", Kaba::mf(&AudioInput::__delete__), &input);
+	Kaba::LinkExternal("AudioInput.start", Kaba::mf(&AudioInput::start));
+	Kaba::LinkExternal("AudioInput.stop",	 Kaba::mf(&AudioInput::stop));
+	Kaba::LinkExternal("AudioInput.is_capturing", Kaba::mf(&AudioInput::is_capturing));
+	Kaba::LinkExternal("AudioInput.sample_rate", Kaba::mf(&AudioInput::sample_rate));
+	Kaba::LinkExternal("AudioInput.samples_recorded", Kaba::mf(&AudioInput::samples_recorded));
+	//Kaba::LinkExternal("AudioInput.set_backup_mode", Kaba::mf(&AudioInput::set_backup_mode));
 	}
 
 	{
 	AudioOutput stream(Session::GLOBAL);
-	Kaba::DeclareClassSize("OutputStream", sizeof(AudioOutput));
-	Kaba::LinkExternal("OutputStream.__init__", Kaba::mf(&AudioOutput::__init__));
-	Kaba::DeclareClassVirtualIndex("OutputStream", "__delete__", Kaba::mf(&AudioOutput::__delete__), &stream);
-	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
-	Kaba::LinkExternal("OutputStream.start", Kaba::mf(&AudioOutput::start));
-	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&AudioOutput::stop));
-	Kaba::LinkExternal("OutputStream.is_playing", Kaba::mf(&AudioOutput::is_playing));
-	//Kaba::LinkExternal("OutputStream.sample_rate", Kaba::mf(&OutputStream::sample_rate));
-	Kaba::LinkExternal("OutputStream.get_volume", Kaba::mf(&AudioOutput::get_volume));
-	Kaba::LinkExternal("OutputStream.set_volume", Kaba::mf(&AudioOutput::set_volume));
-	Kaba::DeclareClassVirtualIndex("OutputStream", "reset_state", Kaba::mf(&AudioOutput::reset_state), &stream);
+	Kaba::DeclareClassSize("AudioOutput", sizeof(AudioOutput));
+	Kaba::LinkExternal("AudioOutput.__init__", Kaba::mf(&AudioOutput::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioOutput", "__delete__", Kaba::mf(&AudioOutput::__delete__), &stream);
+	//Kaba::LinkExternal("AudioOutput.setSource", Kaba::mf(&AudioStream::setSource));
+	Kaba::LinkExternal("AudioOutput.start", Kaba::mf(&AudioOutput::start));
+	Kaba::LinkExternal("AudioOutput.stop", Kaba::mf(&AudioOutput::stop));
+	Kaba::LinkExternal("AudioOutput.is_playing", Kaba::mf(&AudioOutput::is_playing));
+	//Kaba::LinkExternal("AudioOutput.sample_rate", Kaba::mf(&OutputStream::sample_rate));
+	Kaba::LinkExternal("AudioOutput.get_volume", Kaba::mf(&AudioOutput::get_volume));
+	Kaba::LinkExternal("AudioOutput.set_volume", Kaba::mf(&AudioOutput::set_volume));
+	Kaba::LinkExternal("AudioOutput.samples_played", Kaba::mf(&AudioOutput::samples_played));
+	Kaba::DeclareClassVirtualIndex("AudioOutput", "reset_state", Kaba::mf(&AudioOutput::reset_state), &stream);
 	}
+	
+	Kaba::DeclareClassOffset("AudioRecorder", "samples_skipped", _offsetof(AudioRecorder, samples_skipped));
+	Kaba::DeclareClassOffset("AudioRecorder", "buffer", _offsetof(AudioRecorder, buf));
 
 	SignalChain chain(Session::GLOBAL, "");
 	Kaba::DeclareClassSize("SignalChain", sizeof(SignalChain));

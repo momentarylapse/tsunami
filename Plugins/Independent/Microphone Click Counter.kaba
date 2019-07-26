@@ -64,8 +64,8 @@ class ClickCounterDialog extends ConfigPanel
 
 class MicrophoneClickCounter extends TsunamiPlugin
 
-	InputStreamAudio *input
-	OutputStream *stream
+	AudioInput *input
+	AudioOutput *stream
 	Synthesizer *synth
 	ClickSource *source
 

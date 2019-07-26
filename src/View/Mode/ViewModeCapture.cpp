@@ -107,21 +107,8 @@ void CaptureTrackData::insert(int pos) {
 }
 
 void CaptureTrackData::start_sync_before(AudioOutput *out) {
+	sync_points.clear();
 	samples_played_before_capture = out->samples_played();
-}
-
-void CaptureTrackData::start_sync_after() {
-	if (type() == SignalType::AUDIO) {
-		samples_recorded_before_start = audio_input()->samples_recorded();
-		samples_skipped_start = audio_recorder()->samples_skipped;
-		printf("pre: play %d   skipped.. %d\n", samples_played_before_capture, samples_skipped_start);
-	}
-}
-
-void CaptureTrackData::end_sync() {
-	if (type() == SignalType::AUDIO) {
-		//audio_recorder()->samples_skipped += audio_recorder()->buf.length;
-	}
 }
 
 void CaptureTrackData::sync(AudioOutput *out) {
@@ -129,8 +116,13 @@ void CaptureTrackData::sync(AudioOutput *out) {
 		SyncPoint p;
 		p.pos_play = out->samples_played();
 		p.pos_record = audio_input()->samples_recorded();
+		p.samples_skipped_start = audio_recorder()->samples_skipped;
 		sync_points.add(p);
 	}
+}
+
+int SyncPoint::delay(int64 samples_played_before_capture) {
+	return (pos_play - samples_played_before_capture) - (pos_record - samples_skipped_start);
 }
 
 int CaptureTrackData::get_sync_delay() {
@@ -138,10 +130,10 @@ int CaptureTrackData::get_sync_delay() {
 		return 0;
 	int d = 0;
 	for (auto &p: sync_points)
-		d += (p.pos_play - samples_played_before_capture) - (p.pos_record - samples_skipped_start);
+		d += p.delay(samples_played_before_capture);
 	d /= sync_points.num;
-	if (fabs(d) > 50000)
-		return 0;
+	/*if (fabs(d) > 50000)
+		return 0;*/
 	return d;
 }
 

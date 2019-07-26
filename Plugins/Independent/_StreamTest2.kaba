@@ -1,0 +1,42 @@
+use "../api.kaba"
+use hui
+
+class _StreamTest extends TsunamiPlugin
+	SignalChain* chain
+	AudioInput* input
+	AudioRecorder* recorder
+	int runner
+	int nn
+	bool acc
+	override void on_start()
+	
+		chain = session.add_signal_chain("test")
+		input = chain.add(MODULE_STREAM, "AudioInput")
+		recorder = chain.add(MODULE_PLUMBING, "AudioRecorder")
+		Module* sucker = chain.add(MODULE_PLUMBING, "AudioSucker")
+		chain.connect(input, 0, recorder, 0)
+		chain.connect(recorder, 0, sucker, 0)
+		
+		nn = 0
+		acc = false
+		runner = HuiRunRepeated(0.1, self, &on_tick)
+		
+		chain.start()
+
+	override void on_stop()
+		HuiCancelRunner(runner)
+		delete chain
+	
+	void on_tick()
+		print("" + input.samples_recorded() + "\t" + recorder.samples_skipped)
+		nn ++
+		if nn > 100
+			acc = !acc
+			if acc
+				print("-------start")
+				chain.command(COMMAND_ACCUMULATION_START, 0)
+			else
+				print("-------stop")
+				chain.command(COMMAND_ACCUMULATION_STOP, 0)
+				chain.command(COMMAND_ACCUMULATION_CLEAR, 0)
+			nn = 0

@@ -1,0 +1,9 @@
+use "../api.kaba"
+
+class SilenceSource extends AudioSource
+	int offset
+	override void reset_state()
+		offset = 0
+	override int read(AudioBuffer buf)
+		offset += len(buf)
+		return len(buf)

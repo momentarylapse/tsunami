@@ -1,0 +1,26 @@
+use "../api.kaba"
+use "../AudioSource/Silence.kaba"
+use hui
+
+class _StreamTest extends TsunamiPlugin
+	SignalChain* chain
+	SilenceSource* source
+	AudioOutput* out
+	int runner
+	override void on_start()
+	
+		chain = session.add_signal_chain("test")
+		source = chain.add(MODULE_AUDIO_SOURCE, "Silence")
+		out = chain.add(MODULE_STREAM, "AudioOutput")
+		chain.connect(source, 0, out, 0)
+		
+		runner = HuiRunRepeated(0.1, self, &on_tick)
+		
+		chain.start()
+
+	override void on_stop()
+		HuiCancelRunner(runner)
+		delete chain
+	
+	void on_tick()
+		print("" + out.samples_played() + "\t" + source.offset)

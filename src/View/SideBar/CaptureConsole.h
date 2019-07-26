@@ -21,12 +21,10 @@ class AudioSucker;
 class SignalChain;
 class MidiEventBuffer;
 
-class CaptureConsole : public SideBarConsole
-{
+class CaptureConsole : public SideBarConsole {
 public:
 	CaptureConsole(Session *session);
 	virtual ~CaptureConsole();
-
 
 
 	void on_enter() override;
@@ -48,7 +46,7 @@ public:
 
 	bool has_data();
 
-	enum class State{
+	enum class State {
 		EMPTY,
 		CAPTURING,
 		PAUSED
@@ -61,6 +59,7 @@ public:
 	CaptureConsoleMode *mode_midi;
 	CaptureConsoleMode *mode_multi;
 	SignalChain *chain;
+	int n_sync = 0;
 
 
 	bool insert_audio(Track *target, AudioBuffer &buf, int delay);

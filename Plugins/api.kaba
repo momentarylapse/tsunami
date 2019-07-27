@@ -12,14 +12,6 @@
 use hui
 use kaba
 
-//#define NUM_PEAK_LEVELS		24
-
-//#define val_min			-32766
-//#define val_max			32766
-
-
-//#define NUM_CAPTURE_SAMPLES		8192
-
 const int NUM_PEAK_LEVELS = 24
 
 const int DEFAULT_SAMPLE_RATE = 44100
@@ -84,11 +76,6 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	extern void add_metronome_click(int pos, int level, float volume)
-	string str()
-		string s
-		for e in *self
-			s += e.str()
-		return "[" + s + "]"
 
 class MidiNoteBuffer extends MidiNote*[]
 	int samples
@@ -348,10 +335,6 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
-enum
-	TRACK_TYPE_AUDIO
-	TRACK_TYPE_TIME
-	TRACK_TYPE_MIDI
 
 class TrackLayer
 	int type
@@ -394,9 +377,9 @@ enum
 	TYPE_AUDIO
 	TYPE_TIME
 	TYPE_MIDI
-	AUDIO_MONO
-	AUDIO_STEREO
-	GROUP
+	TYPE_AUDIO_MONO
+	TYPE_AUDIO_STEREO
+	TYPE_GROUP
 
 class Track
 	int type
@@ -446,7 +429,6 @@ class Song
 
 	float volume
 	
-	AudioEffect[] fx
 	Track*[] tracks
 	Sample*[] samples
 	
@@ -526,10 +508,6 @@ class AudioOutput extends Module
 	extern float get_volume()
 	extern void set_volume(float volume)
 	extern int samples_played()
-
-class _MidiPort
-	int client, port
-	string client_name, port_name
 
 class AudioInput extends Module
 	RingBuffer current_buffer

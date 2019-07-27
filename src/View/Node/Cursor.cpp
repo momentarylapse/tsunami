@@ -98,6 +98,7 @@ void SelectionMarker::draw(Painter* p) {
 	view->cam.range2screen_clip(view->cursor_range(), view->song_area(), x1, x2);
 
 	auto &hover = view->hover();
+	auto &sel = view->sel;
 
 	if (!view->hide_selection) {
 		if ((view->selection_mode == SelectionMode::TIME) or (view->selection_mode == SelectionMode::TRACK_RECT)) {
@@ -109,7 +110,7 @@ void SelectionMarker::draw(Painter* p) {
 					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
 		}else if (view->selection_mode == SelectionMode::RECT) {
 			float x1, x2;
-			view->cam.range2screen_clip(hover.range, view->clip, x1, x2);
+			view->cam.range2screen_clip(sel.range(), view->clip, x1, x2);
 			p->set_color(view->colors.selection_internal);
 			p->set_fill(false);
 			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));

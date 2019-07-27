@@ -589,6 +589,8 @@ void MidiPainter::draw_clef_tab(Painter *c) {
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
+	c->set_line_width(area.height() / 150);
+	c->set_antialiasing(true);
 
 	// clef lines
 	float h = string_dy * instrument->string_pitch.num;
@@ -596,6 +598,8 @@ void MidiPainter::draw_clef_tab(Painter *c) {
 		float y = string_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
+	c->set_line_width(1);
+	c->set_antialiasing(false);
 
 
 	if (is_playable)
@@ -692,12 +696,16 @@ void MidiPainter::draw_clef_classical(Painter *c) {
 		c->set_color(colors.text_soft1);
 	else
 		c->set_color(colors.text_soft3);
+	c->set_line_width(area.height() / 150);
+	c->set_antialiasing(true);
 
 	for (int i=0; i<10; i+=2) {
 		float y = clef_pos_to_screen(i);
 		c->draw_line(area.x1, y, area.x2, y);
 	}
-
+	c->set_line_width(1);
+	c->set_antialiasing(false);
+	
 	if (is_playable)
 		c->set_color(colors.text);
 	else

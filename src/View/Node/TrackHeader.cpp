@@ -102,7 +102,7 @@ public:
 };
 
 TrackHeader::TrackHeader(AudioViewTrack *t) : ViewNodeRel(0, 0, AudioView::TRACK_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
-	align.dz = 10;
+	align.dz = 70;
 	vtrack = t;
 	view = vtrack->view;
 	float x0 = 5;

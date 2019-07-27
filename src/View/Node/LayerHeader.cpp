@@ -96,7 +96,7 @@ public:
 };
 
 LayerHeader::LayerHeader(AudioViewLayer *l) : ViewNodeRel(0, 0, AudioView::LAYER_HANDLE_WIDTH, AudioView::TRACK_HANDLE_HEIGHT) {
-	z = 10;
+	z = 70;
 	align.horizontal = AlignData::Mode::RIGHT;
 	vlayer = l;
 	float x0 = 5;

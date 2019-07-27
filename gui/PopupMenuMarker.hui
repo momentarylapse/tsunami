@@ -9,6 +9,7 @@ Menu popup-menu-marker ""
 		Item /layer-delete "Delete"
 		Item /layer-add "Add version"
 		Item /layer-mark-dominant "Mark selection as dominant"
+		Item /layer-make-track "Turn into track"
 		Item /layer-merge "Merge..."
 		Item /layer-muted "Layer muted" checkable
 		Item /layer-solo "Layer solo" checkable

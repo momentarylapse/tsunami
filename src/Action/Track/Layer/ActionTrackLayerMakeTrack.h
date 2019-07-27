@@ -12,8 +12,7 @@
 
 class TrackLayer;
 
-class ActionTrackLayerMakeTrack : public ActionGroup
-{
+class ActionTrackLayerMakeTrack : public ActionGroup {
 public:
 	ActionTrackLayerMakeTrack(TrackLayer *layer);
 

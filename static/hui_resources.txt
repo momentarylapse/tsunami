@@ -3294,7 +3294,7 @@ menu-version
 
 6
 0
-6
+7
 Item
 layer-delete
 
@@ -3314,21 +3314,27 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-make-track
 
 3
 0
 0
 Item
+layer-merge
+
+4
+0
+0
+Item
 layer-muted
 checkable
-4
+5
 0
 0
 Item
 layer-solo
 checkable
-5
+6
 0
 0
 Menu
@@ -3568,13 +3574,13 @@ layer-edit-midi
 0
 0
 Item
-layer-make-track
+layer-mark-dominant
 
 5
 0
 0
 Item
-layer-mark-dominant
+layer-make-track
 
 6
 0
@@ -3801,7 +3807,7 @@ menu-version
 
 6
 0
-6
+7
 Item
 layer-delete
 
@@ -3821,21 +3827,27 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-make-track
 
 3
 0
 0
 Item
+layer-merge
+
+4
+0
+0
+Item
 layer-muted
 checkable
-4
+5
 0
 0
 Item
 layer-solo
 checkable
-5
+6
 0
 0
 Menu
@@ -4145,7 +4157,7 @@ menu-version
 
 7
 0
-6
+7
 Item
 layer-delete
 
@@ -4165,21 +4177,27 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-make-track
 
 3
 0
 0
 Item
+layer-merge
+
+4
+0
+0
+Item
 layer-muted
 checkable
-4
+5
 0
 0
 Item
 layer-solo
 checkable
-5
+6
 0
 0
 Menu
@@ -4665,7 +4683,7 @@ menu-version
 
 13
 0
-6
+7
 Item
 layer-delete
 
@@ -4685,21 +4703,27 @@ layer-mark-dominant
 0
 0
 Item
-layer-merge
+layer-make-track
 
 3
 0
 0
 Item
+layer-merge
+
+4
+0
+0
+Item
 layer-muted
 checkable
-4
+5
 0
 0
 Item
 layer-solo
 checkable
-5
+6
 0
 0
 Menu

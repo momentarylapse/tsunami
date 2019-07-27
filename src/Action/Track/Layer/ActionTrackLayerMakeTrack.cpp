@@ -15,36 +15,30 @@
 #include "../../../Module/Synth/Synthesizer.h"
 #include <utility>
 
-class ActionLayerMoveData : public Action
-{
+class ActionLayerMoveData : public Action {
 public:
-	ActionLayerMoveData(TrackLayer *_origin, TrackLayer *_dest)
-	{
+	ActionLayerMoveData(TrackLayer *_origin, TrackLayer *_dest) {
 		origin = _origin;
 		dest = _dest;
 	}
-	void *execute(Data *d) override
-	{
+	void *execute(Data *d) override {
 		origin->buffers.exchange(dest->buffers);
 		origin->midi.exchange(dest->midi);
 		origin->samples.exchange(dest->samples);
 		std::swap(origin, dest);
 		return nullptr;
 	}
-	void undo(Data *d) override
-	{
+	void undo(Data *d) override {
 		execute(d);
 	}
 	TrackLayer *origin, *dest;
 };
 
-int get_layer_index(TrackLayer *layer)
-{
+int get_layer_index(TrackLayer *layer) {
 	return layer->track->layers.find(layer);
 }
 
-SignalType effective_type(Track *t)
-{
+SignalType effective_type(Track *t) {
 	if (t->type == SignalType::AUDIO and t->channels == 1)
 		return SignalType::AUDIO_MONO;
 	if (t->type == SignalType::AUDIO and t->channels == 2)
@@ -52,15 +46,14 @@ SignalType effective_type(Track *t)
 	return t->type;
 }
 
-ActionTrackLayerMakeTrack::ActionTrackLayerMakeTrack(TrackLayer *_layer)
-{
+ActionTrackLayerMakeTrack::ActionTrackLayerMakeTrack(TrackLayer *_layer) {
 	layer = _layer;
 }
 
-void ActionTrackLayerMakeTrack::build(Data *d)
-{
+void ActionTrackLayerMakeTrack::build(Data *d) {
 	Track *orig = layer->track;
 	Track *t = new Track(effective_type(layer->track), (Synthesizer*)orig->synth->copy());
+	t->layers.add(new TrackLayer(t));
 	t->instrument = orig->instrument;
 	t->volume = orig->volume;
 	t->panning = orig->panning;

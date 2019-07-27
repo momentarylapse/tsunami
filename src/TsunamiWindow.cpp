@@ -842,7 +842,10 @@ void TsunamiWindow::on_delete_layer() {
 }
 
 void TsunamiWindow::on_layer_make_track() {
-	view->cur_layer()->make_own_track();
+	if (view->cur_track()->layers.num > 1)
+		view->cur_layer()->make_own_track();
+	else
+		session->e(_("this is already the only version of the track"));
 }
 
 void TsunamiWindow::on_layer_merge() {

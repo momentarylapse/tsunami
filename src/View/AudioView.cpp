@@ -622,10 +622,23 @@ void move_to_layer(AudioView *view, int delta) {
 
 
 void AudioView::on_command(const string &id) {
-	if (id == "track-muted")
-		cur_track()->set_muted(!cur_track()->muted);
-	if (id == "track-solo")
-		cur_vtrack()->set_solo(!cur_vtrack()->solo);
+	if (id == "track-muted") {
+		bool muted = cur_track()->muted;
+		song->begin_action_group();
+		for (auto *t: song->tracks)
+			if (sel.has(t))
+				t->set_muted(!muted);
+		song->end_action_group();
+	}
+	if (id == "track-solo") {
+		if (cur_vtrack()->solo) {
+			for (auto *vt: vtrack)
+				vt->set_solo(false);
+		} else {
+			for (auto *vt: vtrack)
+				vt->set_solo(sel.has(vt->track));
+		}
+	}
 	if (id == "layer-muted")
 		cur_layer()->set_muted(!cur_layer()->muted);
 	if (id == "layer-solo")

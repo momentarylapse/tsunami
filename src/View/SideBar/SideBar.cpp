@@ -10,6 +10,7 @@
 #include "CurveConsole.h"
 #include "SynthConsole.h"
 #include "../AudioView.h"
+#include "AudioEditorConsole.h"
 #include "MidiEditorConsole.h"
 #include "SampleManagerConsole.h"
 #include "SampleRefConsole.h"
@@ -45,6 +46,7 @@ SideBar::SideBar(Session *_session) {
 	song_console = new SongConsole(session);
 	sample_manager = new SampleManagerConsole(session);
 	track_console = new TrackConsole(session);
+	audio_editor_console = new AudioEditorConsole(session);
 	midi_editor_console = new MidiEditorConsole(session);
 	curve_console = new CurveConsole(session);
 	synth_console = new SynthConsole(session);
@@ -54,6 +56,7 @@ SideBar::SideBar(Session *_session) {
 	add_console(song_console);
 	add_console(sample_manager);
 	add_console(track_console);
+	add_console(audio_editor_console);
 	add_console(midi_editor_console);
 	add_console(curve_console);
 	add_console(synth_console);

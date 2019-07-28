@@ -18,6 +18,7 @@
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeCapture.h"
 #include "View/Mode/ViewModeCurve.h"
+#include "View/Mode/ViewModeEditAudio.h"
 #include "View/Mode/ViewModeMidi.h"
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Mode/ViewModeScaleMarker.h"
@@ -134,6 +135,9 @@ void Session::set_mode(const string &mode) {
 	} else if (mode == "capture") {
 		view->set_mode(view->mode_capture);
 		win->side_bar->open(SideBar::CAPTURE_CONSOLE);
+	} else if (mode == "audio") {
+		view->set_mode(view->mode_edit_audio);
+		win->side_bar->open(SideBar::AUDIO_EDITOR_CONSOLE);
 	} else if (mode == "midi") {
 		view->set_mode(view->mode_midi);
 		win->side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);

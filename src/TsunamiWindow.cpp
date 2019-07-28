@@ -120,6 +120,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-convert-stereo", [=]{ on_track_convert_stereo(); });
 	event("buffer-delete", [=]{ on_buffer_delete(); });
 	event("buffer-make-movable", [=]{ on_buffer_make_movable(); });
+	event("buffer-edit", [=]{ session->set_mode("audio"); });
 
 	event("edit-track-groups", [=]{ auto *dlg = new TrackRoutingDialog(this, song); dlg->run(); delete dlg; });
 	set_key_code("edit-track-groups", hui::KEY_G + hui::KEY_CONTROL);

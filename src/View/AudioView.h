@@ -38,6 +38,7 @@ class AudioViewLayer;
 class PeakThread;
 class ViewMode;
 class ViewModeDefault;
+class ViewModeEditAudio;
 class ViewModeMidi;
 class ViewModeScaleBars;
 class ViewModeCurve;
@@ -219,6 +220,7 @@ public:
 	ViewMode *mode;
 	void set_mode(ViewMode *m);
 	ViewModeDefault *mode_default;
+	ViewModeEditAudio *mode_edit_audio;
 	ViewModeMidi *mode_midi;
 	ViewModeScaleBars *mode_scale_bars;
 	ViewModeCurve *mode_curve;

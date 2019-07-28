@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-57
+58
 // Resource
 Menu
 menu_fake
@@ -17,6 +17,85 @@ play
 Item
 stop
 
+1
+0
+0
+// Resource
+Dialog
+audio-editor
+width=300,height=516
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+4
+Grid
+grid-no
+
+0
+0
+1
+Text
+t-no-audio
+expandx,center,italic
+0
+0
+0
+Grid
+grid-yes
+vertical
+1
+0
+1
+Group
+me_group_creation
+
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+1
+TabControl
+edit-mode
+left
+0
+0
+0
+Text
+?
+expandy
+2
+0
+0
+Group
+group-edit
+
+3
+0
+1
+Grid
+?
+
+0
+0
+2
+Button
+edit_song
+link
+0
+0
+0
+Button
+edit_track
+link
 1
 0
 0
@@ -3252,7 +3331,7 @@ popup-menu-buffer
 
 0
 0
-9
+10
 Item
 header
 disabled
@@ -3272,27 +3351,33 @@ buffer-make-movable
 0
 0
 Item
-buffer-delete
+buffer-edit
 
 3
+0
+0
+Item
+buffer-delete
+
+4
 0
 0
 Separator
 
 
-4
+5
 0
 0
 Item
 track-add-marker
 
-5
+6
 0
 0
 Menu
 menu-version
 
-6
+7
 0
 7
 Item
@@ -3340,7 +3425,7 @@ checkable
 Menu
 menu-track
 
-7
+8
 0
 9
 Item
@@ -3430,7 +3515,7 @@ track-properties
 Menu
 menu-song
 
-8
+9
 0
 4
 Menu
@@ -6435,7 +6520,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-510
+516
 // Text
 /bars-add
 Add bars...
@@ -6454,6 +6539,9 @@ Scale
 scale selected bars (by moving the selection on the left)
 /buffer-delete
 Delete
+
+/buffer-edit
+Edit
 
 /buffer-make-movable
 Make movable
@@ -6694,6 +6782,21 @@ Solo
 
 /undo
 Undo
+
+audio-editor/audio-editor
+Audio
+
+audio-editor/edit-mode
+Select\\Smoothen\\Clone
+
+audio-editor/group-edit
+Edit
+
+audio-editor/me_group_creation
+Creation
+
+audio-editor/t-no-audio
+No audio track selected
 
 bar_add_dialog/bad_t_beats
 Beats

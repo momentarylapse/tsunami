@@ -15,6 +15,7 @@
 #include "Node/Cursor.h"
 #include "Node/Background.h"
 #include "Mode/ViewModeDefault.h"
+#include "Mode/ViewModeEditAudio.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
@@ -157,6 +158,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	// modes
 	mode = nullptr;
 	mode_default = new ViewModeDefault(this);
+	mode_edit_audio = new ViewModeEditAudio(this);
 	mode_midi = new ViewModeMidi(this);
 	mode_scale_bars = new ViewModeScaleBars(this);
 	mode_scale_marker = new ViewModeScaleMarker(this);
@@ -298,6 +300,7 @@ AudioView::~AudioView() {
 	delete mode_curve;
 	delete mode_scale_bars;
 	delete mode_scale_marker;
+	delete mode_edit_audio;
 	delete mode_midi;
 	delete mode_capture;
 	delete mode_default;

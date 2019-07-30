@@ -57,14 +57,6 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 	int pos0 = r.offset;
 	for (Track *t: s->tracks){
 
-		// marker
-		for (TrackMarker *m: t->markers){
-			if (m->range.start() >= pos0)
-				m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
-			if (m->range.end() >= pos0)
-				m->range.set_end(__shift_data_shift(r, new_length, m->range.end()));
-		}
-
 		// buffer
 		for (TrackLayer *l: t->layers){
 			for (AudioBuffer &b: l->buffers)
@@ -80,6 +72,14 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 				// note end
 				if (n->range.end() >= pos0)
 					n->range.set_end(__shift_data_shift(r, new_length, n->range.end()));
+			}
+
+			// marker
+			for (TrackMarker *m: l->markers){
+				if (m->range.start() >= pos0)
+					m->range.set_start(__shift_data_shift(r, new_length, m->range.start()));
+				if (m->range.end() >= pos0)
+					m->range.set_end(__shift_data_shift(r, new_length, m->range.end()));
 			}
 
 			// samples

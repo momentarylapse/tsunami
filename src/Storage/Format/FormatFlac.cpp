@@ -132,7 +132,7 @@ void FormatFlac::load_track(StorageOperationData *od)
 		if (od->only_load_metadata){
 			if (!FLAC__stream_decoder_process_until_end_of_metadata(decoder))
 				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
-			t->add_marker(Range(0, flac_samples), "dummy");
+			od->layer->add_marker(Range(0, flac_samples), "dummy");
 		}else{
 			if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
 				throw Exception(string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);

@@ -7,7 +7,6 @@
 
 #include "Track.h"
 #include "TrackLayer.h"
-#include "TrackMarker.h"
 #include "CrossFade.h"
 #include "base.h"
 #include "Song.h"
@@ -38,9 +37,6 @@
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Action/Track/Effect/ActionTrackMoveAudioEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
-#include "../Action/Track/Marker/ActionTrackAddMarker.h"
-#include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
-#include "../Action/Track/Marker/ActionTrackEditMarker.h"
 #include "../Module/Synth/Synthesizer.h"
 #include "../Module/Audio/AudioEffect.h"
 #include "../Plugins/PluginManager.h"
@@ -104,9 +100,6 @@ Range Track::range() const {
 	for (TrackLayer *l: layers)
 		r = r or l->range(synth->keep_notes);
 
-	for (TrackMarker *m: markers)
-		r = r or m->range;
-
 	return r;
 }
 
@@ -159,15 +152,6 @@ void Track::invalidate_all_peaks() {
 }
 
 
-
-Array<TrackMarker*> Track::markers_sorted() const {
-	Array<TrackMarker*> sorted = markers;
-	for (int i=0; i<sorted.num; i++)
-		for (int j=i+1; j<sorted.num; j++)
-			if (sorted[i]->range.offset > sorted[j]->range.offset)
-				sorted.swap(i, j);
-	return sorted;
-}
 
 bool Track::has_version_selection() {
 	for (auto *l: layers)
@@ -271,22 +255,6 @@ void Track::edit_synthesizer(const string &param_old) {
 
 void Track::detune_synthesizer(const float tuning[MAX_PITCH]) {
 	song->execute(new ActionTrackDetuneSynthesizer(this, tuning));
-}
-
-TrackMarker *Track::add_marker(const Range &range, const string &text) {
-	auto *m = new TrackMarker({range, text});
-	song->execute(new ActionTrackAddMarker(this, m));
-	return m;
-}
-
-void Track::delete_marker(const TrackMarker *marker) {
-	foreachi(const TrackMarker *m, markers, index)
-		if (m == marker)
-			song->execute(new ActionTrackDeleteMarker(this, index));
-}
-
-void Track::edit_marker(const TrackMarker *marker, const Range &range, const string &text) {
-	song->execute(new ActionTrackEditMarker(this, (TrackMarker*)marker, range, text));
 }
 
 TrackLayer *Track::add_layer() {

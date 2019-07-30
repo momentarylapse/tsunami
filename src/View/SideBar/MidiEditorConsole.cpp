@@ -366,7 +366,7 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_add_key_change() {
-	auto *dlg = new MarkerDialog(win, layer->track, Range(view->cursor_pos(), 0), "::key=c-major::");
+	auto *dlg = new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::");
 	dlg->run();
 	delete dlg;
 }

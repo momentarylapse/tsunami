@@ -11,19 +11,18 @@
 #include "../../Action.h"
 #include "../../../Data/Range.h"
 
-class Track;
+class TrackLayer;
 class TrackMarker;
 
-class ActionTrackEditMarker: public Action
-{
+class ActionTrackEditMarker: public Action {
 public:
-	ActionTrackEditMarker(const Track *t, TrackMarker *m, const Range &range, const string &text);
+	ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m, const Range &range, const string &text);
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;
 
 private:
-	const Track *track;
+	const TrackLayer *layer;
 	TrackMarker *marker;
 	Range range;
 	string text;

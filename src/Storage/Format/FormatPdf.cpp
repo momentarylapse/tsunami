@@ -29,7 +29,7 @@
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
 static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
 
-Array<MidiKeyChange> get_key_changes(const Track *t);
+Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
 	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE) {}
@@ -67,7 +67,7 @@ int FormatPdf::draw_track_classical(Painter *p, float x0, float w, float y0, con
 	Range r_inside = Range(r.offset + slack, r.length - slack * 2);
 
 	mp->set_context(rect(x0, x0+w, y0-50, y0+180), t->instrument, true, MidiMode::CLASSICAL);
-	mp->set_key_changes(get_key_changes(t));
+	mp->set_key_changes(get_key_changes(t->layers[0]));
 	mp->set_quality(2, true);
 
 	float ya = mp->clef_pos_to_screen(8);
@@ -101,7 +101,7 @@ int FormatPdf::draw_track_tab(Painter *p, float x0, float w, float y0, const Ran
 	int n = t->instrument.string_pitch.num;
 
 	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
-	mp->set_key_changes(get_key_changes(t));
+	mp->set_key_changes(get_key_changes(t->layers[0]));
 	mp->set_quality(2, true);
 
 	float sy0 = mp->string_to_screen(n - 1) - string_dy/2;
@@ -128,7 +128,7 @@ TrackMarker* get_bar_part(Song *s, int offset) {
 	auto *t = s->time_track();
 	if (!t)
 		return nullptr;
-	for (TrackMarker *m: t->markers)
+	for (TrackMarker *m: t->layers[0]->markers)
 		if (abs(m->range.offset - offset) < 1000)
 			return m;
 	return nullptr;

@@ -6,20 +6,18 @@
  */
 
 #include "ActionTrackEditMarker.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/TrackMarker.h"
 #include <assert.h>
 
-ActionTrackEditMarker::ActionTrackEditMarker(const Track *t, TrackMarker *m, const Range &_range, const string &_text)
-{
-	track = t;
+ActionTrackEditMarker::ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m, const Range &_range, const string &_text) {
+	layer = l;
 	marker = m;
 	range = _range;
 	text = _text;
 }
 
-void *ActionTrackEditMarker::execute(Data *d)
-{
+void *ActionTrackEditMarker::execute(Data *d) {
 	string temp = text;
 	text = marker->text;
 	marker->text = temp;
@@ -28,12 +26,11 @@ void *ActionTrackEditMarker::execute(Data *d)
 	range = marker->range;
 	marker->range = r;
 
-	track->notify();
+	layer->notify();
 	return nullptr;
 }
 
-void ActionTrackEditMarker::undo(Data *d)
-{
+void ActionTrackEditMarker::undo(Data *d) {
 	execute(d);
 }
 

@@ -431,6 +431,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::DeclareClassOffset("TrackLayer", "buffers", _offsetof(TrackLayer, buffers));
 	Kaba::DeclareClassOffset("TrackLayer", "midi", _offsetof(TrackLayer, midi));
 	Kaba::DeclareClassOffset("TrackLayer", "samples", _offsetof(TrackLayer, samples));
+	Kaba::DeclareClassOffset("TrackLayer", "markers", _offsetof(TrackLayer, markers));
 	Kaba::DeclareClassOffset("TrackLayer", "track", _offsetof(TrackLayer, track));
 	Kaba::LinkExternal("TrackLayer.get_buffers", Kaba::mf(&TrackLayer::get_buffers));
 	Kaba::LinkExternal("TrackLayer.read_buffers", Kaba::mf(&TrackLayer::read_buffers));
@@ -443,6 +444,9 @@ void PluginManager::link_app_script_data() {
 	Kaba::LinkExternal("TrackLayer.add_sample_ref", Kaba::mf(&TrackLayer::add_sample_ref));
 	Kaba::LinkExternal("TrackLayer.delete_sample_ref", Kaba::mf(&TrackLayer::delete_sample_ref));
 	Kaba::LinkExternal("TrackLayer.edit_sample_ref", Kaba::mf(&TrackLayer::edit_sample_ref));
+	Kaba::LinkExternal("TrackLayer.add_marker", Kaba::mf(&TrackLayer::add_marker));
+	Kaba::LinkExternal("TrackLayer.delete_marker", Kaba::mf(&TrackLayer::delete_marker));
+	Kaba::LinkExternal("TrackLayer.edit_marker", Kaba::mf(&TrackLayer::edit_marker));
 
 	Kaba::DeclareClassSize("Track", sizeof(Track));
 	Kaba::DeclareClassOffset("Track", "type", _offsetof(Track, type));
@@ -453,7 +457,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
 	Kaba::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
 	Kaba::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
-	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
 	Kaba::LinkExternal("Track.nice_name", Kaba::mf(&Track::nice_name));
 	Kaba::LinkExternal("Track.set_name", Kaba::mf(&Track::set_name));
@@ -465,9 +468,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::LinkExternal("Track.edit_effect", Kaba::mf(&Track::edit_effect));
 	Kaba::LinkExternal("Track.enable_effect", Kaba::mf(&Track::enable_effect));
 	Kaba::LinkExternal("Track.set_synthesizer", Kaba::mf(&Track::set_synthesizer));
-	Kaba::LinkExternal("Track.add_marker", Kaba::mf(&Track::add_marker));
-	Kaba::LinkExternal("Track.delete_marker", Kaba::mf(&Track::delete_marker));
-	Kaba::LinkExternal("Track.edit_marker", Kaba::mf(&Track::edit_marker));
 
 	Song af(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 	Kaba::DeclareClassSize("Song", sizeof(Song));

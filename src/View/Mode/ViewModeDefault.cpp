@@ -416,25 +416,20 @@ SongSelection ViewModeDefault::get_selection_for_rect(const Range &_r, int y0, i
 		y1 = t;
 	}
 
-	for (auto vt: view->vtrack) {
-		Track *t = vt->track;
-		if ((y1 < vt->area.y1) or (y0 > vt->area.y2))
-			continue;
-
-		// markers
-		for (TrackMarker *m: t->markers)
-			s.set(m, r.overlaps(m->range));
-	}
-
 	for (auto vl: view->vlayer) {
 		TrackLayer *l = vl->layer;
 		if ((y1 < vl->area.y1) or (y0 > vl->area.y2))
 			continue;
 		s.add(l);
 
-		// subs
+		// samples
 		for (SampleRef *sr: l->samples)
 			s.set(sr, r.overlaps(sr->range()));
+			
+
+		// markers
+		for (TrackMarker *m: l->markers)
+			s.set(m, r.overlaps(m->range));
 
 		// midi
 

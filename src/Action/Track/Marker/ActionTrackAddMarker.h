@@ -9,13 +9,14 @@
 #define SRC_ACTION_TRACK_MARKER_ACTIONTRACKADDMARKER_H_
 
 #include "../../Action.h"
-class Track;
+
+class TrackLayer;
 class TrackMarker;
 class Range;
 
 class ActionTrackAddMarker: public Action {
 public:
-	ActionTrackAddMarker(Track *t, TrackMarker *marker);
+	ActionTrackAddMarker(TrackLayer *l, TrackMarker *marker);
 	~ActionTrackAddMarker() override;
 
 	void *execute(Data *d) override;
@@ -23,7 +24,7 @@ public:
 
 private:
 	TrackMarker *marker;
-	Track *track;
+	TrackLayer *layer;
 };
 
 #endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKADDMARKER_H_ */

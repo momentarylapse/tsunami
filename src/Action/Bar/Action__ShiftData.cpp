@@ -45,16 +45,6 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 {
 	for (Track *t: s->tracks){
 
-
-		// marker
-		for (TrackMarker *m: t->markers){
-			if (m->range.offset >= offset)
-				m->range.offset += delta;
-			/*else if (m->range.end() >= offset)
-				m->range.length += delta;*/
-		}
-
-
 		for (TrackLayer *l: t->layers){
 			// buffer
 			for (AudioBuffer &b : l->buffers)
@@ -69,6 +59,14 @@ void Action__ShiftData::do_shift(Song *s, int delta)
 					printf("end... %p %d\n", n, n->range.end());
 					n->range.length += delta;
 				}*/
+			}
+
+			// marker
+			for (TrackMarker *m: l->markers){
+				if (m->range.offset >= offset)
+					m->range.offset += delta;
+				/*else if (m->range.end() >= offset)
+					m->range.length += delta;*/
 			}
 
 			// samples

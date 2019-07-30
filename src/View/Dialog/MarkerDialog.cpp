@@ -6,24 +6,23 @@
  */
 
 #include "MarkerDialog.h"
-#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/TrackMarker.h"
 #include "../../Data/Midi/Scale.h"
 
-string encode_key(const Scale &key)
-{
+string encode_key(const Scale &key) {
 	return "::key=" + key.encode() + "::";
 }
 
-MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, const string &_text, const TrackMarker *_marker):
+MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const Range &_range, const string &_text, const TrackMarker *_marker):
 	hui::Window("marker_dialog", _parent)
 {
-	track = _t;
+	layer = _l;
 	range = _range;
 	text = _text;
 	marker = _marker; // might be nil
 	mode = Mode::TEXT;
-	if (marker_is_key(text)){
+	if (marker_is_key(text)) {
 		mode = Mode::KEY;
 	}
 
@@ -46,38 +45,31 @@ MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range,
 	event("ok", [=]{ on_ok(); });
 }
 
-MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const Range &_range, const string &_text):
-	MarkerDialog(_parent, _t, _range, _text, nullptr){}
+MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const Range &_range, const string &_text):
+	MarkerDialog(_parent, _l, _range, _text, nullptr) {}
 
-MarkerDialog::MarkerDialog(hui::Window* _parent, Track* _t, const TrackMarker *_marker):
-	MarkerDialog(_parent, _t, _marker->range, _marker->text, _marker){}
+MarkerDialog::MarkerDialog(hui::Window* _parent, TrackLayer* _l, const TrackMarker *_marker):
+	MarkerDialog(_parent, _l, _marker->range, _marker->text, _marker) {}
 
-MarkerDialog::~MarkerDialog()
-{
-}
-
-void MarkerDialog::on_edit()
-{
+void MarkerDialog::on_edit() {
 	enable("ok", get_string("text").num > 0);
 }
 
-void MarkerDialog::on_ok()
-{
+void MarkerDialog::on_ok() {
 	string text = get_string("text");
-	if (mode == Mode::KEY){
+	if (mode == Mode::KEY) {
 		Scale key = Scale((Scale::Type)get_int("key_type"), 11 - get_int("key_root"));
 		text = encode_key(key);
 	}
 
-	if (marker){
-		track->edit_marker(marker, marker->range, text);
-	}else{
-		track->add_marker(range, text);
+	if (marker) {
+		layer->edit_marker(marker, marker->range, text);
+	} else {
+		layer->add_marker(range, text);
 	}
 	destroy();
 }
 
-void MarkerDialog::on_close()
-{
+void MarkerDialog::on_close() {
 	destroy();
 }

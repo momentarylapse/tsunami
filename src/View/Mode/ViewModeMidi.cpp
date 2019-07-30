@@ -363,11 +363,11 @@ void ViewModeMidi::edit_add_pause() {
 	select_in_edit_cursor();
 }
 
-Array<MidiKeyChange> get_key_changes(const Track *t);
+Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
 
 Scale ViewModeMidi::cur_scale() {
 	Scale scale = Scale::C_MAJOR;
-	for (auto &kc: get_key_changes(view->cur_track()))
+	for (auto &kc: get_key_changes(view->cur_layer()))
 		if (kc.pos < get_edit_range().offset)
 			scale = kc.key;
 	return scale;
@@ -537,13 +537,13 @@ void ViewModeMidi::on_key_down(int k) {
 
 	if (k == hui::KEY_Q)
 		// quarter
-		set_note_lengthx(this, 1, 1, rep_key_num, "ð…Ÿ  ");
+		set_note_lengthx(this, 1, 1, rep_key_num, "í³•í¿  ");
 	if (k == hui::KEY_W)
 		// 8th
-		set_note_lengthx(this, 1, 2, rep_key_num, "ð…   ");
+		set_note_lengthx(this, 1, 2, rep_key_num, "í³–í°  ");
 	if (k == hui::KEY_S)
 		// 16th
-		set_note_lengthx(this, 1, 4, rep_key_num, "ð…¡  ");
+		set_note_lengthx(this, 1, 4, rep_key_num, "í³–í±  ");
 
 	if (k == hui::KEY_T)
 		set_note_lengthx(this, 1, 3, rep_key_num, "â…“");
@@ -834,7 +834,7 @@ string ViewModeMidi::get_tip() {
 		message += "    " + _("string (â†‘,â†“)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
 		message += "    " + _("octave (â†‘,â†“)    modifiers (#,3,0)    add note (A-G)");
-	message += "    " + _("ð…Ÿ  ,ð…   ,ð…¡  ,ð…  â‚ƒ    (Q,W,S,T)");
+	message += "    " + _("í³•í¿  ,í³–í°  ,í³–í±  ,í³–í° â‚ƒ    (Q,W,S,T)");
 	return message;
 }
 

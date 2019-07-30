@@ -133,6 +133,10 @@ void AudioViewTrack::draw_imploded_data(Painter *c) {
 
 			for (AudioBuffer &b: layer->buffers)
 				view->buffer_painter->draw_buffer(c, b, b.offset);
+				
+			/*for (auto *m: layer->markers)
+				if (m->range.overlaps(r))
+					...argh*/
 		}
 	}
 

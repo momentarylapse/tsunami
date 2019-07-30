@@ -25,12 +25,6 @@ void ActionSongDeleteSelection::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	for (Track *t: s->tracks) {
 
-		// marker
-		for (int i=t->markers.num-1; i>=0; i--)
-			if (sel.has(t->markers[i]))
-				add_sub_action(new ActionTrackDeleteMarker(t, i), d);
-
-
 		for (TrackLayer *l: t->layers) {
 			// buffer boxes
 			if (sel.has(l) and !sel.range().empty())
@@ -40,6 +34,11 @@ void ActionSongDeleteSelection::build(Data *d) {
 			for (int i=l->midi.num-1; i>=0; i--)
 				if (sel.has(l->midi[i]))
 					add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);
+
+			// marker
+			for (int i=l->markers.num-1; i>=0; i--)
+				if (sel.has(l->markers[i]))
+					add_sub_action(new ActionTrackDeleteMarker(l, i), d);
 
 			// samples
 			for (int i=l->samples.num-1; i>=0; i--)

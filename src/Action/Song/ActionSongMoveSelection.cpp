@@ -19,14 +19,6 @@ ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &s
 	for (Track *t: a->tracks){
 		if (sel.has(t))
 			tracks.add(t);
-		for (TrackMarker *m: t->markers)
-			if (sel.has(m)){
-				MarkerSaveData d;
-				d.track = t;
-				d.marker = m;
-				d.pos_old = m->range.offset;
-				markers.add(d);
-			}
 
 		for (TrackLayer *l: t->layers){
 			for (MidiNote *n: l->midi)
@@ -35,6 +27,14 @@ ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &s
 					d.note = n;
 					d.pos_old = n->range.offset;
 					notes.add(d);
+				}
+			for (TrackMarker *m: l->markers)
+				if (sel.has(m)){
+					MarkerSaveData d;
+					d.track = t;
+					d.marker = m;
+					d.pos_old = m->range.offset;
+					markers.add(d);
 				}
 			for (SampleRef *s: l->samples)
 				if (sel.has(s)){

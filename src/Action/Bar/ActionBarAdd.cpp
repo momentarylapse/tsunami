@@ -21,24 +21,21 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode)
-{
+ActionBarAdd::ActionBarAdd(int _index, const BarPattern &_bar, int _mode) {
 	index = _index;
 	bar = new Bar(_bar);
 	mode = _mode;
 }
 
-ActionBarAdd::~ActionBarAdd()
-{
+ActionBarAdd::~ActionBarAdd() {
 	delete bar;
 }
 
-void ActionBarAdd::build(Data *d)
-{
+void ActionBarAdd::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	add_sub_action(new ActionBar__Add(index, bar), d);
 
-	if (mode != Bar::EditMode::IGNORE){
+	if (mode != Bar::EditMode::IGNORE) {
 		int pos0 = s->bar_offset(index);
 
 		for (Track *t: s->tracks)
@@ -52,18 +49,19 @@ void ActionBarAdd::build(Data *d)
 		Range r = Range(pos0, bar->length);
 
 		for (Track *t: s->tracks){
-			foreachi (TrackMarker *m, t->markers, i){
-				if (m->range.is_inside(pos0)){
-					// stretch
-					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, m->range.length + r.length), m->text), d);
+			for (TrackLayer *l: t->layers) {
+				foreachi (TrackMarker *m, l->markers, i) {
+					if (m->range.is_inside(pos0)) {
+						// stretch
+						add_sub_action(new ActionTrackEditMarker(l, m, Range(m->range.offset, m->range.length + r.length), m->text), d);
+					}
 				}
-			}
 
-			for (TrackLayer *l: t->layers)
-			foreachi (MidiNote *m, l->midi, i){
-				if (m->range.is_inside(pos0)){
-					// stretch
-					add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume, m->stringno, m->flags), d);
+				foreachi (MidiNote *m, l->midi, i) {
+					if (m->range.is_inside(pos0)) {
+						// stretch
+						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length + r.length), m->pitch, m->volume, m->stringno, m->flags), d);
+					}
 				}
 			}
 		}

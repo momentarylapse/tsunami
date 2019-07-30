@@ -9,12 +9,12 @@
 #define SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_
 
 #include "../../Action.h"
-class Track;
+class TrackLayer;
 class TrackMarker;
 
 class ActionTrackDeleteMarker: public Action {
 public:
-	ActionTrackDeleteMarker(Track *t, int index);
+	ActionTrackDeleteMarker(TrackLayer *l, int index);
 	~ActionTrackDeleteMarker() override;
 
 	void *execute(Data *d) override;
@@ -23,7 +23,7 @@ public:
 private:
 	int index;
 	TrackMarker *marker;
-	Track *track;
+	TrackLayer *layer;
 };
 
 #endif /* SRC_ACTION_TRACK_MARKER_ACTIONTRACKDELETEMARKER_H_ */

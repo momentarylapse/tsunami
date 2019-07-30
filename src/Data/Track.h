@@ -70,9 +70,6 @@ public:
 	void _cdecl set_synthesizer(Synthesizer *synth);
 	void _cdecl edit_synthesizer(const string &param_old);
 	void _cdecl detune_synthesizer(const float tuning[MAX_PITCH]);
-	TrackMarker* _cdecl add_marker(const Range &range, const string &text);
-	void _cdecl delete_marker(const TrackMarker *marker);
-	void _cdecl edit_marker(const TrackMarker *marker, const Range &range, const string &text);
 	void _cdecl mark_dominant(const Array<const TrackLayer*> &layers, const Range &range);
 
 
@@ -95,8 +92,7 @@ public:
 
 	Synthesizer *synth;
 
-	Array<TrackMarker*> markers;
-	Array<TrackMarker*> markers_sorted() const;
+	Array<TrackMarker*> _markers_old;
 
 	Array<CrossFadeOld> _fades_old;
 	bool has_version_selection();

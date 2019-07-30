@@ -24,56 +24,56 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Delete.h"
 
-ActionBarDelete::ActionBarDelete(int _index, bool _affect_data)
-{
+ActionBarDelete::ActionBarDelete(int _index, bool _affect_data) {
 	index = _index;
 	affect_data = _affect_data;
 }
 
-void ActionBarDelete::build(Data *d)
-{
+void ActionBarDelete::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < s->bars.num);
 
 	Range r = Range(s->bar_offset(index), s->bars[index]->length);
 	add_sub_action(new ActionBar__Delete(index), d);
 
-	if (affect_data){
+	if (affect_data) {
 		SongSelection sel = SongSelection::from_range(s, r).filter(SongSelection::Mask::SAMPLES);
 
-		for (Track *t: s->tracks){
-			foreachib (TrackMarker *m, t->markers, i){
-				if (r.covers(m->range)){
-					// cover
-					add_sub_action(new ActionTrackDeleteMarker(t, i), d);
-				}else if (r.is_inside(m->range.start())){
-					// cover start
-					add_sub_action(new ActionTrackEditMarker(t, m, Range(r.offset, m->range.end() - r.end()), m->text), d);
-				}else if (r.is_inside(m->range.end())){
-					// cover end
-					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
-				}else if (m->range.covers(r)){
-					// cut out part
-					add_sub_action(new ActionTrackEditMarker(t, m, Range(m->range.offset, m->range.length - r.length), m->text), d);
+		for (Track *t: s->tracks) {
+			
+			for (TrackLayer *l: t->layers) {
+				foreachib (TrackMarker *m, l->markers, i) {
+					if (r.covers(m->range)) {
+						// cover
+						add_sub_action(new ActionTrackDeleteMarker(l, i), d);
+					} else if (r.is_inside(m->range.start())) {
+						// cover start
+						add_sub_action(new ActionTrackEditMarker(l, m, Range(r.offset, m->range.end() - r.end()), m->text), d);
+					} else if (r.is_inside(m->range.end())) {
+						// cover end
+						add_sub_action(new ActionTrackEditMarker(l, m, Range(m->range.offset, r.offset - m->range.offset), m->text), d);
+					} else if (m->range.covers(r)) {
+						// cut out part
+						add_sub_action(new ActionTrackEditMarker(l, m, Range(m->range.offset, m->range.length - r.length), m->text), d);
+					}
 				}
-			}
 
-			for (TrackLayer *l: t->layers)
-				foreachib (MidiNote *m, l->midi, i){
-					if (r.covers(m->range)){
+				foreachib (MidiNote *m, l->midi, i) {
+					if (r.covers(m->range)) {
 						// cover
 						add_sub_action(new ActionTrackDeleteMidiNote(l, i), d);
-					}else if (r.is_inside(m->range.start())){
+					} else if (r.is_inside(m->range.start())) {
 						// cover start
 						add_sub_action(new ActionTrackEditMidiNote(m, Range(r.offset, m->range.end() - r.end()), m->pitch, m->volume, m->stringno, m->flags), d);
-					}else if (r.is_inside(m->range.end())){
+					} else if (r.is_inside(m->range.end())) {
 						// cover end
 						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, r.offset - m->range.offset), m->pitch, m->volume, m->stringno, m->flags), d);
-					}else if (m->range.covers(r)){
+					} else if (m->range.covers(r)) {
 						// cut out part
 						add_sub_action(new ActionTrackEditMidiNote(m, Range(m->range.offset, m->range.length - r.length), m->pitch, m->volume, m->stringno, m->flags), d);
 					}
 				}
+			}
 		}
 
 		add_sub_action(new ActionSongDeleteSelection(sel), d);

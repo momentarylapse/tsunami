@@ -15,6 +15,7 @@
 #include "../../Data/base.h"
 #include "../../Data/Song.h"
 #include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Audio/AudioBuffer.h"
 
 #if HAS_LIB_OGG
@@ -238,7 +239,7 @@ void FormatOgg::load_track(StorageOperationData *od)
 	int samples = (int)ov_pcm_total(&vf, -1);
 	if (od->only_load_metadata){
 		ov_clear(&vf);
-		t->add_marker(Range(0, samples), "dummy");
+		od->layer->add_marker(Range(0, samples), "dummy");
 		return;
 	}
 

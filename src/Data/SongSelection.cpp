@@ -45,17 +45,14 @@ SongSelection SongSelection::from_range(Song *song, const Range &r) {
 	s._update_bars(song);
 
 	for (Track *t: song->tracks) {
-
-		for (auto *m: t->markers)
-			s.set(m, s.range().overlaps(m->range));
-	}
-
-	for (Track *t: song->tracks) {
 		for (auto *l: t->layers) {
 			s.add(l);
 
 			for (auto *n: l->midi)
 				s.set(n, s.range().overlaps(n->range));
+				
+			for (auto *m: l->markers)
+				s.set(m, s.range().overlaps(m->range));
 
 			for (auto *sr: l->samples)
 				s.set(sr, s.range().overlaps(sr->range()));
@@ -73,7 +70,7 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 		if (has(l))
 			s.add(l);
 
-		for (auto m: l->track->markers)
+		for (auto m: l->markers)
 			if (has(m))
 				s.add(m);
 

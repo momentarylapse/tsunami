@@ -6,12 +6,12 @@
  */
 
 #include "ActionTrackDeleteMarker.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/TrackMarker.h"
 #include <assert.h>
 
-ActionTrackDeleteMarker::ActionTrackDeleteMarker(Track *t, int _index) {
-	track = t;
+ActionTrackDeleteMarker::ActionTrackDeleteMarker(TrackLayer *l, int _index) {
+	layer = l;
 	index = _index;
 	marker = nullptr;
 }
@@ -23,20 +23,20 @@ ActionTrackDeleteMarker::~ActionTrackDeleteMarker() {
 
 void *ActionTrackDeleteMarker::execute(Data *d) {
 	assert(index >= 0);
-	assert(index < track->markers.num);
+	assert(index < layer->markers.num);
 
-	marker = track->markers[index];
+	marker = layer->markers[index];
 	//marker->fake_death();
-	track->markers.erase(index);
+	layer->markers.erase(index);
 	marker = nullptr;
 
-	track->notify();
+	layer->notify();
 	return nullptr;
 }
 
 void ActionTrackDeleteMarker::undo(Data *d) {
-	track->markers.insert(marker, index);
-	track->notify();
+	layer->markers.insert(marker, index);
+	layer->notify();
 	marker = nullptr;
 }
 

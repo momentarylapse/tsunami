@@ -124,9 +124,9 @@ MidiMode AudioViewLayer::midi_mode() {
 	return vtrack()->midi_mode();
 }
 
-Array<MidiKeyChange> get_key_changes(const Track *t) {
+Array<MidiKeyChange> get_key_changes(const TrackLayer *l) {
 	Array<MidiKeyChange> key_changes;
-	for (auto *m: t->markers_sorted())
+	for (auto *m: l->markers_sorted())
 		if (marker_is_key(m->text)) {
 			MidiKeyChange c;
 			c.pos = m->range.offset;
@@ -138,7 +138,7 @@ Array<MidiKeyChange> get_key_changes(const Track *t) {
 
 void AudioViewLayer::update_midi_key_changes() {
 	if (layer)
-		midi_key_changes = get_key_changes(layer->track);
+		midi_key_changes = get_key_changes(layer);
 }
 
 color AudioViewLayer::marker_color(const TrackMarker *m) {
@@ -468,8 +468,7 @@ void AudioViewLayer::draw(Painter *c) {
 	for (auto *s: layer->samples)
 		draw_sample(c, s);
 
-	if (layer->is_main())
-		draw_markers(c, t->markers_sorted(), view->hover());
+	draw_markers(c, layer->markers_sorted(), view->hover());
 
 	draw_fades(c);
 }
@@ -608,16 +607,14 @@ HoverData AudioViewLayer::get_hover_data_default(float mx, float my) {
 	s.type = HoverData::Type::LAYER;
 
 	// markers
-	if (layer->is_main()) {
-		for (int i=0; i<min(layer->track->markers.num, marker_areas.num); i++) {
-			auto *m = layer->track->markers[i];
-			if (marker_areas.contains(m) and marker_label_areas.contains(m))
+	for (int i=0; i<min(layer->markers.num, marker_areas.num); i++) {
+		auto *m = layer->markers[i];
+		if (marker_areas.contains(m) and marker_label_areas.contains(m))
 			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)) {
 				s.marker = m;
 				s.type = HoverData::Type::MARKER;
 				return s;
 			}
-		}
 	}
 
 	// TODO: prefer selected samples

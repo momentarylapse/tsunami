@@ -12,16 +12,14 @@
 #include "../../lib/hui/hui.h"
 #include "../../Data/Range.h"
 
-class Track;
+class TrackLayer;
 class TrackMarker;
 
-class MarkerDialog: public hui::Window
-{
+class MarkerDialog: public hui::Window {
 public:
-	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, const string &text, const TrackMarker *marker);
-	MarkerDialog(hui::Window *_parent, Track *t, const Range &range, const string &text);
-	MarkerDialog(hui::Window *_parent, Track *t, const TrackMarker *marker);
-	virtual ~MarkerDialog();
+	MarkerDialog(hui::Window *_parent, TrackLayer *t, const Range &range, const string &text, const TrackMarker *marker);
+	MarkerDialog(hui::Window *_parent, TrackLayer *t, const Range &range, const string &text);
+	MarkerDialog(hui::Window *_parent, TrackLayer *t, const TrackMarker *marker);
 
 	void on_edit();
 	void on_ok();
@@ -32,7 +30,7 @@ public:
 		KEY
 	} mode;
 
-	Track *track;
+	TrackLayer *layer;
 	Range range;
 	string text;
 	const TrackMarker *marker;

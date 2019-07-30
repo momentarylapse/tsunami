@@ -441,7 +441,7 @@ Array<TrackMarker*> Song::get_parts() {
 	Track *t = time_track();
 	if (!t)
 		return {};
-	return t->markers_sorted();
+	return t->layers[0]->markers_sorted();
 }
 
 string Song::get_tag(const string &key) {
@@ -507,11 +507,11 @@ Song *copy_song_from_selection(Song *song, SongSelection &sel) {
 					ll->buffers.back().offset = ri.offset - sel.range().offset;
 				}
 			}
+			for (auto *m: l->markers)
+				if (sel.has(m))
+					ll->markers.add(new TrackMarker({m->range - sel.range().offset, m->text}));
 			ll->fades = l->fades; // TODO...
 		}
-		for (auto *m: t->markers)
-			if (sel.has(m))
-				tt->markers.add(new TrackMarker({m->range - sel.range().offset, m->text}));
 	}
 	return ss;
 }

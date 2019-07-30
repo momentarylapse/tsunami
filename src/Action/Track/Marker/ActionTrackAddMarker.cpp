@@ -6,11 +6,11 @@
  */
 
 #include "ActionTrackAddMarker.h"
-#include "../../../Data/Track.h"
+#include "../../../Data/TrackLayer.h"
 #include "../../../Data/TrackMarker.h"
 
-ActionTrackAddMarker::ActionTrackAddMarker(Track *t, TrackMarker *m) {
-	track = t;
+ActionTrackAddMarker::ActionTrackAddMarker(TrackLayer *l, TrackMarker *m) {
+	layer = l;
 	marker = m;
 }
 
@@ -20,16 +20,16 @@ ActionTrackAddMarker::~ActionTrackAddMarker() {
 }
 
 void *ActionTrackAddMarker::execute(Data *d) {
-	track->markers.add(marker);
-	track->notify();
+	layer->markers.add(marker);
+	layer->notify();
 	auto *m = marker;
 	marker = nullptr;
 	return m;
 }
 
 void ActionTrackAddMarker::undo(Data *d) {
-	marker = track->markers.pop();
+	marker = layer->markers.pop();
 	//marker->fake_death();
-	track->notify();
+	layer->notify();
 }
 

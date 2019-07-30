@@ -909,8 +909,30 @@ public:
 };
 
 
-class FileChunkTrackLayer : public FileChunk<Track,TrackLayer>
-{
+class FileChunkMarker : public FileChunk<TrackLayer,TrackMarker> {
+public:
+	FileChunkMarker() : FileChunk<TrackLayer,TrackMarker>("marker"){}
+	virtual void create() {
+		me = new TrackMarker();
+		parent->markers.add(me);
+	}
+	virtual void read(File *f) {
+		me->range.offset = f->read_int();
+		me->range.length = f->read_int();
+		me->text = f->read_str();
+		int nfx = f->read_int();
+		int version = f->read_int();
+	}
+	virtual void write(File *f) {
+		f->write_int(me->range.offset);
+		f->write_int(me->range.length);
+		f->write_str(me->text);
+		f->write_int(0);//me->fx.num);
+		f->write_int(1);
+	}
+};
+
+class FileChunkTrackLayer : public FileChunk<Track,TrackLayer> {
 public:
 	int n;
 	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level") {
@@ -918,6 +940,7 @@ public:
 		add_child(new FileChunkBufferBox);
 		add_child(new FileChunkSampleRef);
 		add_child(new FileChunkFade);
+		add_child(new FileChunkMarker);
 	}
 	void create() override {}
 	void read(File *f) override {
@@ -937,6 +960,7 @@ public:
 	void write_subs() override {
 		write_sub_array("bufbox", me->buffers);
 		write_sub_parray("samref", me->samples);
+		write_sub_parray("marker", me->markers);
 		write_sub_array("fade", me->fades);
 	}
 };
@@ -1071,14 +1095,14 @@ public:
 	}
 };*/
 
-class FileChunkMarker : public FileChunk<Track,TrackMarker>
+class FileChunkMarkerOld : public FileChunk<Track,TrackMarker>
 {
 public:
-	FileChunkMarker() : FileChunk<Track,TrackMarker>("marker"){}
+	FileChunkMarkerOld() : FileChunk<Track,TrackMarker>("marker"){}
 	virtual void create()
 	{
 		me = new TrackMarker();
-		parent->markers.add(me);
+		parent->_markers_old.add(me);
 	}
 	virtual void read(File *f)
 	{
@@ -1149,28 +1173,24 @@ public:
 	}
 };
 
-class FileChunkTrack : public FileChunk<Song,Track>
-{
+class FileChunkTrack : public FileChunk<Song,Track> {
 public:
-	FileChunkTrack() : FileChunk<Song,Track>("track")
-	{
+	FileChunkTrack() : FileChunk<Song,Track>("track") {
 		add_child(new FileChunkTuning);
 		add_child(new FileChunkTrackLayer);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
 		//add_child(new FileChunkTrackBar);
-		add_child(new FileChunkMarker);
+		add_child(new FileChunkMarkerOld);
 		add_child(new _FileChunkTrackSampleRef); // deprecated
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 		add_child(new FileChunkFadeOld);
 	}
-	virtual void create()
-	{
+	virtual void create() {
 		//me = parent->addTrack(SignalType::AUDIO);
 	}
-	virtual void read(File *f)
-	{
+	virtual void read(File *f) {
 		string name = f->read_str();
 		float volume = f->read_float();
 		float muted = f->read_bool();
@@ -1185,8 +1205,7 @@ public:
 
 		notify();
 	}
-	virtual void write(File *f)
-	{
+	virtual void write(File *f) {
 		f->write_str(me->name);
 		f->write_float(me->volume);
 		f->write_bool(me->muted);
@@ -1197,13 +1216,11 @@ public:
 
 		notify();
 	}
-	virtual void write_subs()
-	{
+	virtual void write_subs() {
 		if (!me->instrument.has_default_tuning())
 			write_sub("tuning", &me->instrument);
 		write_sub_parray("level", me->layers);
 		write_sub_parray("effect", me->fx);
-		write_sub_parray("marker", me->markers);
 		if ((me->type == SignalType::BEATS) or (me->type == SignalType::MIDI))
 			if (!me->synth->is_default())
 				write_sub("synth", me->synth);
@@ -1363,6 +1380,8 @@ void FormatNami::make_consistent(StorageOperationData *od)
 	}
 
 	for (Track *t: a->tracks) {
+		t->layers[0]->markers.append(t->_markers_old);
+		
 		if (t->_fades_old.num > 0) {
 			int previous = 0;
 			for (auto &f: t->_fades_old) {

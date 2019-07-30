@@ -9,7 +9,7 @@
 #include "../AudioView.h"
 #include "../../Session.h"
 #include "../../Data/TrackMarker.h"
-#include "../../Data/Track.h"
+#include "../../Data/TrackLayer.h"
 #include "../../Data/Range.h"
 
 
@@ -19,12 +19,12 @@ ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 
 	scaling = false;
 	marker = nullptr;
-	track = nullptr;
+	layer = nullptr;
 }
 
 void ViewModeScaleMarker::on_start() {
 	scaling = false;
-	track = view->hover_before_leave.track();
+	layer = view->hover_before_leave.layer();
 	marker = view->hover_before_leave.marker;
 
 	if (marker) {
@@ -71,7 +71,7 @@ void ViewModeScaleMarker::on_key_down(int k) {
 
 void ViewModeScaleMarker::perform_scale() {
 	if (marker)
-		track->edit_marker(marker, view->sel.range(), marker->text);
+		layer->edit_marker(marker, view->sel.range(), marker->text);
 
 	session->set_mode("default");
 }

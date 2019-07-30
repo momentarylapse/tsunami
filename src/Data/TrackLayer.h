@@ -21,6 +21,7 @@ class SampleRef;
 class Sample;
 class Track;
 class CrossFade;
+class TrackMarker;
 class Action;
 enum class SignalType;
 
@@ -53,6 +54,10 @@ public:
 	SampleRef *_cdecl add_sample_ref(int pos, Sample* sample);
 	void _cdecl delete_sample_ref(SampleRef *ref);
 	void _cdecl edit_sample_ref(SampleRef *ref, float volume, bool mute);
+	
+	TrackMarker* _cdecl add_marker(const Range &range, const string &text);
+	void _cdecl delete_marker(const TrackMarker *marker);
+	void _cdecl edit_marker(const TrackMarker *marker, const Range &range, const string &text);
 
 	void _cdecl make_own_track();
 
@@ -71,6 +76,9 @@ public:
 	MidiNoteBuffer midi;
 
 	Array<SampleRef*> samples;
+	
+	Array<TrackMarker*> markers;
+	Array<TrackMarker*> markers_sorted() const;
 
 	Array<CrossFade> fades;
 

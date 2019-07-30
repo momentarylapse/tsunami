@@ -14,10 +14,9 @@
 #include "../../lib/base/base.h"
 
 class TrackMarker;
-class Track;
+class TrackLayer;
 
-class ViewModeScaleMarker : public ViewModeDefault
-{
+class ViewModeScaleMarker : public ViewModeDefault {
 public:
 	ViewModeScaleMarker(AudioView *view);
 
@@ -34,7 +33,7 @@ public:
 	void perform_scale();
 
 	bool scaling;
-	Track *track;
+	TrackLayer *layer;
 	TrackMarker *marker;
 };
 

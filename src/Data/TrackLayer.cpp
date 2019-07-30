@@ -11,6 +11,7 @@
 #include "Song.h"
 #include "CrossFade.h"
 #include "SampleRef.h"
+#include "TrackMarker.h"
 #include "Audio/AudioBuffer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
@@ -23,6 +24,9 @@
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackEditMidiNote.h"
+#include "../Action/Track/Marker/ActionTrackAddMarker.h"
+#include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
+#include "../Action/Track/Marker/ActionTrackEditMarker.h"
 //#include "../Plugins/PluginManager.h"
 //#include "../Tsunami.h"
 #include "../lib/hui/hui.h"
@@ -54,6 +58,9 @@ Range TrackLayer::range(int keep_notes) const {
 
 	if ((type == SignalType::MIDI) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
+
+	for (TrackMarker *m: markers)
+		r = r or m->range;
 
 	for (SampleRef *s: samples)
 		r = r or s->range();
@@ -108,6 +115,15 @@ Array<Range> TrackLayer::inactive_version_ranges() const {
 	if (!active)
 		r.add(RangeTo(active_since, Range::END));
 	return r;
+}
+
+Array<TrackMarker*> TrackLayer::markers_sorted() const {
+	auto sorted = markers;
+	for (int i=0; i<sorted.num; i++)
+		for (int j=i+1; j<sorted.num; j++)
+			if (sorted[i]->range.offset > sorted[j]->range.offset)
+				sorted.swap(i, j);
+	return sorted;
 }
 
 
@@ -209,6 +225,22 @@ void TrackLayer::delete_midi_note(const MidiNote *note) {
 	foreachi(MidiNote *n, midi, index)
 		if (n == note)
 			track->song->execute(new ActionTrackDeleteMidiNote(this, index));
+}
+
+TrackMarker *TrackLayer::add_marker(const Range &range, const string &text) {
+	auto *m = new TrackMarker({range, text});
+	track->song->execute(new ActionTrackAddMarker(this, m));
+	return m;
+}
+
+void TrackLayer::delete_marker(const TrackMarker *marker) {
+	foreachi(const TrackMarker *m, markers, index)
+		if (m == marker)
+			track->song->execute(new ActionTrackDeleteMarker(this, index));
+}
+
+void TrackLayer::edit_marker(const TrackMarker *marker, const Range &range, const string &text) {
+	track->song->execute(new ActionTrackEditMarker(this, (TrackMarker*)marker, range, text));
 }
 
 void TrackLayer::make_own_track() {

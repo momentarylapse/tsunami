@@ -33,11 +33,11 @@ int[] find_clicks(float[] b)
 	print(clicks)
 	return clicks
 
-void unclick(float[] b, Track *t, int offset)
+void unclick(float[] b, TrackLayer *l, int offset)
 	int[] clicks = find_clicks(b)
 	for i in 0:clicks.num:2
-		t.add_marker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click")
-		//t.addMarker(clicks[i+1] + offset, "]")
+		l.add_marker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click")
+		//l.addMarker(clicks[i+1] + offset, "]")
 
 class FindClicks extends SongPlugin
 
@@ -45,5 +45,5 @@ class FindClicks extends SongPlugin
 		for t in song.tracks
 			for l in t.layers
 				for b in l.buffers
-					unclick(b.r, t, b.offset)
-					unclick(b.l, t, b.offset)
+					unclick(b.r, l, b.offset)
+					unclick(b.l, l, b.offset)

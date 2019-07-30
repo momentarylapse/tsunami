@@ -261,7 +261,7 @@ int bar_index(Song* song, int offset)
 
 
 TrackMarker* get_part(Track* t, int offset)
-	for m in t.markers
+	for m in t.layers[0].markers
 		if m.range.inside(offset)
 			return m
 	return nil

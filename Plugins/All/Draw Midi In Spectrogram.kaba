@@ -117,7 +117,7 @@ Grid ? ''
 		dmis = plugin
 		song = plugin.session.song
 		for t in song.tracks
-			if t.type == TRACK_TYPE_MIDI
+			if t.type == TYPE_MIDI
 				tracks.add(t)
 				set_string("target", t.nice_name())
 		set_int("target", 0)

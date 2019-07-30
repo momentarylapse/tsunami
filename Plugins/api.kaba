@@ -342,6 +342,7 @@ class TrackLayer
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
 	SampleRef*[] samples
+	TrackMarker*[] markers
 	
 	extern void get_buffers(AudioBuffer buf, Range r)
 	extern void read_buffers(AudioBuffer buf, Range r, bool allow_ref)
@@ -354,6 +355,9 @@ class TrackLayer
 	extern SampleRef* add_sample_ref(int pos, Sample* sample)
 	extern void delete_sample_ref(SampleRef *ref)
 	extern void edit_sample_ref(SampleRef *ref, float volume, bool mute)
+	extern TrackMarker* add_marker(Range range, string text)
+	extern void delete_marker(TrackMarker *marker)
+	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
 class Sample // TODO
 	string name
@@ -393,8 +397,6 @@ class Track
 	MidiEffect*[] midi_fx
 	
 	Synthesizer *synth
-	
-	TrackMarker*[] markers
 
 	// editing
 	Song *song
@@ -412,9 +414,6 @@ class Track
 	extern void edit_effect(int index, string param_old)
 	extern void enable_effect(int index, bool enabled)
 	extern void set_synthesizer(Synthesizer *synth)
-	extern TrackMarker* add_marker(Range range, string text)
-	extern void delete_marker(TrackMarker *marker)
-	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
 class Tag
 	string key, value

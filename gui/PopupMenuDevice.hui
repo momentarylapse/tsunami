@@ -1,0 +1,5 @@
+Menu popup-menu-device ""
+	Item header "Device" disabled
+	Separator
+	Item /device-delete "Delete"
+	Item /device-hide "Hide" checkable

@@ -133,29 +133,48 @@ void OnGtkListActivate(GtkWidget *widget, void* a, void* b, gpointer data)
 void OnGtkListSelect(GtkTreeSelection *selection, gpointer data)
 {	reinterpret_cast<Control*>(data)->notify("hui:select", false);	}
 
+gboolean OnGtkListButton(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+	if (event->button != 3) // right
+		return false;
+	if (event->type != GDK_BUTTON_PRESS)
+		return false;
+	auto *c = reinterpret_cast<Control*>(user_data);
+	if (event->window != gtk_tree_view_get_bin_window(GTK_TREE_VIEW(c->widget)))
+		return false;
+	c->panel->win->input.column = -1;
+	GtkTreePath *path = nullptr;
+	int cell_x = 0, cell_y = 0;
+	if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(c->widget), event->x, event->y, &path, nullptr, &cell_x, &cell_y)) {
+		gint *indices = gtk_tree_path_get_indices(path);
+		c->panel->win->input.column = indices[0];
+		gtk_tree_path_free(path);
+	}
 
-void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data)
-{
-	ControlListView *lv = reinterpret_cast<ControlListView*>(user_data);
+	c->notify("hui:right-button-down", false);
+	return false;
+}
+
+
+void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data) {
+	auto *lv = reinterpret_cast<ControlListView*>(user_data);
 	if (!lv->allow_change_messages)
 		return;
 
 	//msg_write("row del");
 	gint *indices = gtk_tree_path_get_indices(path);
 
-	if (indices[0] >= lv->row_target){
+	if (indices[0] >= lv->row_target) {
 		lv->panel->win->input.row = indices[0] - 1;
 		lv->panel->win->input.row_target = lv->row_target;
-	}else{
+	} else {
 		lv->panel->win->input.row = indices[0];
 		lv->panel->win->input.row_target = lv->row_target - 1;
 	}
 	lv->notify("hui:move", false);
 }
 
-void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
-{
-	ControlListView *lv = reinterpret_cast<ControlListView*>(user_data);
+void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data) {
+	auto *lv = reinterpret_cast<ControlListView*>(user_data);
 	if (!lv->allow_change_messages)
 		return;
 	//msg_write("row insert");
@@ -180,6 +199,8 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	GtkWidget *view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	g_object_unref(G_OBJECT(store));
 	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(&OnGtkListActivate), this);
+	g_signal_connect(G_OBJECT(view), "button-press-event", G_CALLBACK(&OnGtkListButton), this);
+	gtk_widget_add_events(view, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&OnGtkListSelect), this);

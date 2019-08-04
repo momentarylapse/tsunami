@@ -20,6 +20,8 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 	SampleFormat::SAMPLE_FORMAT_32_FLOAT
 };
 
+static hui::Menu *menu_tag = nullptr;
+
 SongConsole::SongConsole(Session *session) :
 	SideBarConsole(_("File properties"), session)
 {
@@ -40,13 +42,18 @@ SongConsole::SongConsole(Session *session) :
 
 	load_data();
 
+	if (!menu_tag)
+		menu_tag = hui::CreateResourceMenu("popup-menu-tag");
+
 	event("samplerate", [=]{ on_samplerate(); });
 	event("format", [=]{ on_format(); });
 	event("compress", [=]{ on_compression(); });
 	event_x("tags", "hui:select", [=]{ on_tags_select(); });
 	event_x("tags", "hui:change", [=]{ on_tags_edit(); });
+	event_x("tags", "hui:right-button-down", [=]{ if (hui::GetEvent()->column >= 0) menu_tag->open_popup(this); });
 	event("add_tag", [=]{ on_add_tag(); });
 	event("delete_tag", [=]{ on_delete_tag(); });
+	event("tag-delete", [=]{ on_delete_tag(); });
 
 	event("edit_samples", [=]{ on_edit_samples(); });
 

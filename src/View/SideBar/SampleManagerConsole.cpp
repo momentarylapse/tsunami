@@ -28,6 +28,8 @@
 #include "../../Module/Audio/SongRenderer.h"
 
 
+static hui::Menu *menu_sample = nullptr;
+
 // TODO: use BufferPainter / MidiPainter
 void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 	int w = im.width;
@@ -74,7 +76,7 @@ public:
 		manager = _manager;
 		s = _s;
 		icon = render_sample(s, view);
-		s->subscribe(this, std::bind(&SampleManagerItem::on_update, this));
+		s->subscribe(this, [=]{ on_update(); });
 	}
 	virtual ~SampleManagerItem() {
 		zombify();
@@ -111,18 +113,27 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 {
 	from_resource("sample_manager_dialog");
 
-	event("import_from_file", std::bind(&SampleManagerConsole::on_import, this));
-	event("export_sample", std::bind(&SampleManagerConsole::on_export, this));
-	event("preview_sample", std::bind(&SampleManagerConsole::on_preview, this));
-	event("paste_sample", std::bind(&SampleManagerConsole::on_insert, this));
-	event("create_from_selection", std::bind(&SampleManagerConsole::on_create_from_selection, this));
-	event("delete_sample", std::bind(&SampleManagerConsole::on_delete, this));
-	event("scale_sample", std::bind(&SampleManagerConsole::on_scale, this));
-	event_x("sample_list", "hui:change", std::bind(&SampleManagerConsole::on_list_edit, this));
-	event_x("sample_list", "hui:select", std::bind(&SampleManagerConsole::on_list_select, this));
-	event("sample_list", std::bind(&SampleManagerConsole::on_preview, this));
+	if (!menu_sample)
+		menu_sample = hui::CreateResourceMenu("popup-menu-sample-manager");
 
-	event("edit_song", std::bind(&SampleManagerConsole::on_edit_song, this));
+	event("import_from_file", [=]{ on_import(); });
+	event("export_sample", [=]{ on_export(); });
+	event("preview_sample", [=]{ on_preview(); });
+	event("paste_sample", [=]{ on_insert(); });
+	event("create_from_selection", [=]{ on_create_from_selection(); });
+	event("delete_sample", [=]{ on_delete(); });
+	event("sample-delete", [=]{ on_delete(); });
+	event("scale_sample", [=]{ on_scale(); });
+	event("sample-scale", [=]{ on_scale(); });
+	event("sample-export", [=]{ on_export(); });
+	event("sample-preview", [=]{ on_preview(); });
+	event("sample-paste", [=]{ on_insert(); });
+	event_x("sample_list", "hui:change", [=]{ on_list_edit(); });
+	event_x("sample_list", "hui:select", [=]{ on_list_select(); });
+	event_x("sample_list", "hui:right-button-down", [=]{ if (hui::GetEvent()->column >= 0) menu_sample->open_popup(this); });
+	event("sample_list", [=]{ on_preview(); });
+
+	event("edit_song", [=]{ on_edit_song(); });
 
 	preview_chain = nullptr;
 	preview_renderer = nullptr;
@@ -133,9 +144,9 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 
 	update_list();
 
-	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_ADD_SAMPLE);
-	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_DELETE_SAMPLE);
-	song->subscribe(this, std::bind(&SampleManagerConsole::on_song_update, this), song->MESSAGE_NEW);
+	song->subscribe(this, [=]{ on_song_update(); }, song->MESSAGE_ADD_SAMPLE);
+	song->subscribe(this, [=]{ on_song_update(); }, song->MESSAGE_DELETE_SAMPLE);
+	song->subscribe(this, [=]{ on_song_update(); }, song->MESSAGE_NEW);
 }
 
 SampleManagerConsole::~SampleManagerConsole() {

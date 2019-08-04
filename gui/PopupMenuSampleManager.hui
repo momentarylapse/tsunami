@@ -1,0 +1,7 @@
+Menu popup-menu-sample-manager ""
+	Item header "Sample" disabled
+	Separator
+	Item /sample-preview "Preview"
+	Item /sample-export "Export..."
+	Item /sample-scale "Scale..."
+	Item /sample-delete "Delete"

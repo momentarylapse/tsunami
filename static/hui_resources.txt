@@ -1,6 +1,6 @@
 t7
 // Number Of Resources
-58
+62
 // Resource
 Menu
 menu_fake
@@ -3574,6 +3574,37 @@ song-properties
 0
 // Resource
 Menu
+popup-menu-device
+
+0
+0
+4
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+device-delete
+
+2
+0
+0
+Item
+device-hide
+checkable
+3
+0
+0
+// Resource
+Menu
 popup_fx_menu
 
 0
@@ -3619,6 +3650,31 @@ Item
 delete
 image=hui:delete
 6
+0
+0
+// Resource
+Menu
+popup-menu-fx-list
+
+0
+0
+3
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+fx-delete
+
+2
 0
 0
 // Resource
@@ -4437,6 +4493,49 @@ song-properties
 0
 // Resource
 Menu
+popup-menu-sample-manager
+
+0
+0
+6
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+sample-preview
+
+2
+0
+0
+Item
+sample-export
+
+3
+0
+0
+Item
+sample-scale
+
+4
+0
+0
+Item
+sample-delete
+
+5
+0
+0
+// Resource
+Menu
 popup_signal_chain_menu
 
 0
@@ -4646,6 +4745,31 @@ Item
 song-properties
 
 5
+0
+0
+// Resource
+Menu
+popup-menu-tag
+
+0
+0
+3
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+tag-delete
+
+2
 0
 0
 // Resource
@@ -6520,7 +6644,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-516
+527
 // Text
 /bars-add
 Add bars...
@@ -6561,6 +6685,12 @@ dB
 /delete
 Delete
 
+/device-delete
+Delete
+
+/device-hide
+Hide
+
 /edit_curves
 Curves
 
@@ -6584,6 +6714,9 @@ Track
 
 /exit
 Exit
+
+/fx-delete
+Delete
 
 /layer-add
 Add version
@@ -6699,11 +6832,20 @@ s
 /sample-delete
 Delete
 
+/sample-export
+Export...
+
 /sample-insert
 Insert statically
 
+/sample-preview
+Preview
+
 /sample-properties
 Properties
+
+/sample-scale
+Scale...
 
 /save
 Save
@@ -6725,6 +6867,9 @@ Properties
 
 /stop
 Stop
+
+/tag-delete
+Delete
 
 /track-add-audio-mono
 Audio (mono)
@@ -7485,6 +7630,12 @@ Bar
 popup-menu-buffer/header
 Audio buffer
 
+popup-menu-device/header
+Device
+
+popup-menu-fx-list/header
+Effect
+
 popup-menu-layer/header
 Version
 
@@ -7494,11 +7645,17 @@ Marker
 popup-menu-playback-range/header
 Playback range
 
+popup-menu-sample-manager/header
+Sample
+
 popup-menu-sample/header
 Sample
 
 popup-menu-song/header
 File
+
+popup-menu-tag/header
+Tag
 
 popup-menu-track/header
 Track

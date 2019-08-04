@@ -1,0 +1,4 @@
+Menu popup-menu-fx-list ""
+	Item header "Effect" disabled
+	Separator
+	Item /fx-delete "Delete"

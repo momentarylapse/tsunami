@@ -31,8 +31,8 @@ public:
 
 	void clear();
 	void append_track(TrackLayer *l, AudioView *view, int offset);
-	void paste_track(TrackLayer *source, TrackLayer *target, AudioView *view);
-	void paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, AudioView *view);
+	void paste_track(TrackLayer *source, TrackLayer *target, int offset);
+	void paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, int offset);
 	bool has_data();
 	bool can_copy(AudioView *view);
 

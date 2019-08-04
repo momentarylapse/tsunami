@@ -97,11 +97,9 @@ void Clipboard::copy(AudioView *view) {
 	notify();
 }
 
-void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, AudioView *view) {
-	Song *s = target->track->song;
-
+void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, int offset) {
 	if (target->type == SignalType::AUDIO) {
-		Range r = Range(view->cursor_pos(), source->buffers[0].length);
+		Range r = Range(offset, source->buffers[0].length);
 		AudioBuffer buf;
 		auto *a = target->edit_buffers(buf, r);
 		buf.set(source->buffers[0], 0, 1.0f);
@@ -109,26 +107,26 @@ void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, AudioView *v
 	} else if (target->type == SignalType::MIDI) {
 		for (MidiNote *n: source->midi) {
 			MidiNote *nn = n->copy();
-			nn->range.offset += view->cursor_pos();
+			nn->range.offset += offset;
 			target->add_midi_note(nn);
 		}
 	}
 }
 
-void Clipboard::paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, AudioView *view) {
+void Clipboard::paste_track_as_samples(TrackLayer *source, int source_index, TrackLayer *target, int offset) {
 	Song *s = target->track->song;
 	//Track *source = temp->tracks[source_index];
 
 	Sample* ref = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref) {
-		target->add_sample_ref(view->cursor_pos(), ref);
+		target->add_sample_ref(offset, ref);
 	} else {
 		if (target->type == SignalType::AUDIO) {
 			MidiNoteBuffer midi;
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->cursor_pos(), source->buffers[0], true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, offset, source->buffers[0], true));
 			ref_uid[source_index] = sample->uid;
 		} else if (target->type == SignalType::MIDI) {
-			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->cursor_pos(), source->midi, true));
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, offset, source->midi, true));
 			ref_uid[source_index] = sample->uid;
 		}
 	}
@@ -177,8 +175,9 @@ void Clipboard::paste(AudioView *view) {
 
 	s->begin_action_group();
 
+	int offset = view->sel.range().start();
 	foreachi(auto *ls, source_list, i)
-		paste_track(ls, target_list[i], view);
+		paste_track(ls, target_list[i], offset);
 
 	s->end_action_group();
 }
@@ -195,8 +194,9 @@ void Clipboard::paste_as_samples(AudioView *view) {
 
 	s->begin_action_group();
 
+	int offset = view->sel.range().start();
 	foreachi(auto *ls, source_list, i)
-		paste_track_as_samples(ls, i, target_list[i], view);
+		paste_track_as_samples(ls, i, target_list[i], offset);
 
 	s->end_action_group();
 }

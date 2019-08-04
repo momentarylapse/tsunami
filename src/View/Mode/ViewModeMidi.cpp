@@ -537,13 +537,13 @@ void ViewModeMidi::on_key_down(int k) {
 
 	if (k == hui::KEY_Q)
 		// quarter
-		set_note_lengthx(this, 1, 1, rep_key_num, "í³•í¿  ");
+		set_note_lengthx(this, 1, 1, rep_key_num, u8"\U0001d15f  ");
 	if (k == hui::KEY_W)
 		// 8th
-		set_note_lengthx(this, 1, 2, rep_key_num, "í³–í°  ");
+		set_note_lengthx(this, 1, 2, rep_key_num, u8"\U0001d160  ");
 	if (k == hui::KEY_S)
 		// 16th
-		set_note_lengthx(this, 1, 4, rep_key_num, "í³–í±  ");
+		set_note_lengthx(this, 1, 4, rep_key_num, u8"\U0001d161  ");
 
 	if (k == hui::KEY_T)
 		set_note_lengthx(this, 1, 3, rep_key_num, "â…“");
@@ -834,7 +834,7 @@ string ViewModeMidi::get_tip() {
 		message += "    " + _("string (â†‘,â†“)    add note (0-9, A-F)");
 	else if ((mode == MidiMode::CLASSICAL) or (mode == MidiMode::LINEAR))
 		message += "    " + _("octave (â†‘,â†“)    modifiers (#,3,0)    add note (A-G)");
-	message += "    " + _("í³•í¿  ,í³–í°  ,í³–í±  ,í³–í° â‚ƒ    (Q,W,S,T)");
+	message += u8"    \U0001d15f  ,\U0001d160  ,\U0001d161  ,\U0001d160/â‚ƒ    (Q,W,S,T)";
 	return message;
 }
 

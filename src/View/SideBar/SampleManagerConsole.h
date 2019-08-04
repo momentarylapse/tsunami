@@ -14,6 +14,7 @@ class Song;
 class Sample;
 class AudioOutput;
 class BufferStreamer;
+class MidiEventStreamer;
 class SampleManagerItem;
 class Progress;
 class Session;
@@ -56,10 +57,13 @@ public:
 
 	void set_selection(const Array<Sample*> &samples);
 
-	SignalChain *preview_chain;
-	AudioOutput *preview_stream;
-	BufferStreamer *preview_renderer;
-	Sample *preview_sample;
+	struct Preview {
+		SignalChain *chain = nullptr;
+		AudioOutput *stream = nullptr;
+		BufferStreamer *renderer = nullptr;
+		MidiEventStreamer *midi_streamer = nullptr;
+		Sample *sample = nullptr;
+	} preview;
 
 	Progress *progress;
 	

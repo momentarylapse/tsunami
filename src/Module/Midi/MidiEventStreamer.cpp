@@ -21,10 +21,9 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 	int n = min(midi.samples - offset, _midi.samples);
 	if (ignore_end)
 		n = _midi.samples;
-	if (n <= 0)
+	if ((n <= 0) and !ignore_end)
 		return Port::END_OF_STREAM;
-	if ((n < _midi.samples) and !ignore_end)
-		return Port::NOT_ENOUGH_DATA;
+
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
 	for (MidiEvent &e : midi)

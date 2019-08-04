@@ -26,6 +26,7 @@
 #include "../../Module/SignalChain.h"
 #include "../../Module/Audio/BufferStreamer.h"
 #include "../../Module/Audio/SongRenderer.h"
+#include "../../Module/Midi/MidiEventStreamer.h"
 
 
 // TODO: use BufferPainter / MidiPainter
@@ -131,11 +132,6 @@ SampleManagerConsole::SampleManagerConsole(Session *session) :
 	event("sample-list", [=]{ on_preview(); });
 
 	event("edit_song", [=]{ on_edit_song(); });
-
-	preview_chain = nullptr;
-	preview_renderer = nullptr;
-	preview_stream = nullptr;
-	preview_sample = nullptr;
 
 	progress = nullptr;
 
@@ -313,32 +309,45 @@ void SampleManagerConsole::on_song_update() {
 }
 
 void SampleManagerConsole::on_preview_tick() {
-	int pos = preview_renderer->get_pos();
-	Range r = preview_sample->range();
+	int pos = 0;
+	if (preview.sample->type == SignalType::AUDIO) {
+		pos = preview.renderer->get_pos();
+	} else {
+		pos = preview.midi_streamer->get_pos();
+	}
+	Range r = preview.sample->range();
 	progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 }
 
 void SampleManagerConsole::on_preview_stream_end() {
-	end_preview();
+	hui::RunLater(0.1f, [=]{ end_preview(); });
 }
 
 void SampleManagerConsole::on_preview() {
 	if (progress)
 		end_preview();
 	int sel = get_int(id_list);
-	preview_sample = items[sel]->s;
-	preview_chain = new SignalChain(session, "sample-preview");
-	preview_renderer = new BufferStreamer(preview_sample->buf);
-	preview_stream = new AudioOutput(session);
-	preview_chain->_add(preview_renderer);
-	preview_chain->_add(preview_stream);
-	preview_chain->connect(preview_renderer, 0, preview_stream, 0);
+	preview.sample = items[sel]->s;
+	preview.chain = session->add_signal_chain_system("sample-preview");
+	if (preview.sample->type == SignalType::AUDIO) {
+		preview.renderer = new BufferStreamer(preview.sample->buf);
+		preview.chain->_add(preview.renderer);
+		preview.stream = (AudioOutput*)preview.chain->add(ModuleType::STREAM, "AudioOutput");
+		preview.chain->connect(preview.renderer, 0, preview.stream, 0);
+	} else { // MIDI
+		preview.midi_streamer = new MidiEventStreamer(midi_notes_to_events(preview.sample->midi));
+		preview.chain->_add(preview.midi_streamer);
+		auto *synth = preview.chain->add(ModuleType::SYNTHESIZER, "");
+		preview.stream = (AudioOutput*)preview.chain->add(ModuleType::STREAM, "AudioOutput");
+		preview.chain->connect(preview.midi_streamer, 0, synth, 0);
+		preview.chain->connect(synth, 0, preview.stream, 0);
+	}
 
 	progress = new ProgressCancelable(_("Preview"), win);
 	progress->subscribe(this, [=]{ on_progress_cancel(); });
-	preview_chain->subscribe(this, [=]{ on_preview_tick(); });
-	preview_chain->subscribe(this, [=]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
-	preview_chain->start();
+	preview.chain->subscribe(this, [=]{ on_preview_tick(); });
+	preview.chain->subscribe(this, [=]{ on_preview_stream_end(); }, Module::MESSAGE_PLAY_END_OF_STREAM);
+	preview.chain->start();
 }
 
 void SampleManagerConsole::end_preview() {
@@ -347,11 +356,11 @@ void SampleManagerConsole::end_preview() {
 		delete progress;
 		progress = nullptr;
 	}
-	preview_chain->unsubscribe(this);
-	preview_stream->unsubscribe(this);
-	preview_chain->stop();
-	delete preview_chain;
-	preview_sample = nullptr;
+	preview.chain->unsubscribe(this);
+	preview.stream->unsubscribe(this);
+	preview.chain->stop();
+	delete preview.chain;
+	preview.sample = nullptr;
 }
 
 

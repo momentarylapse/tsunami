@@ -1,4 +1,8 @@
 Menu popup-menu-fx-list ""
 	Item header "Effect" disabled
 	Separator
-	Item /fx-delete "Delete"
+	Item fx-enabled "Enabled" checkable
+	Item fx-delete "Delete"
+	Separator
+	Item fx-add "Add..."
+	Item fx-copy-from-track "Copy from track..."

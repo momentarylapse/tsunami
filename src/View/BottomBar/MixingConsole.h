@@ -19,8 +19,7 @@ class DeviceManager;
 
 class TrackMixer;
 
-class MixingConsole: public BottomBar::Console
-{
+class MixingConsole: public BottomBar::Console {
 public:
 	MixingConsole(Session *session);
 	virtual ~MixingConsole();
@@ -45,6 +44,8 @@ public:
 	Array<TrackMixer*> mixer;
 
 	int peak_runner_id;
+	
+	hui::Menu *menu_fx;
 	
 	void show_fx(Track *t);
 };

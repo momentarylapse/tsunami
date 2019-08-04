@@ -25,6 +25,25 @@
 #include "../AudioView.h"
 #include "../Node/AudioViewTrack.h"
 
+class TrackSelectionDialog : public hui::Dialog {
+public:
+	Song *song;
+	Track *selected = nullptr;
+	TrackSelectionDialog(hui::Window *parent, Song *_song) : hui::Dialog(_("Track Selector"), 300, 500, parent, false) {
+		add_list_view("!nobar\\tracks", 0, 0, "tracks");
+		song = _song;
+		for (Track *t: song->tracks)
+			add_string("tracks", t->nice_name());
+		event("tracks", [=]{ on_select(); });
+	}
+	void on_select() {
+		int n = get_int("");
+		if (n >= 0)
+			selected = song->tracks[n];
+		destroy();
+	}
+};
+
 class TrackMixer: public hui::Panel {
 public:
 	TrackMixer(AudioViewTrack *t, MixingConsole *c) {
@@ -62,7 +81,12 @@ public:
 		event_x("fx", "hui:select", [=]{ on_fx_select(); });
 		event_x("fx", "hui:change", [=]{ on_fx_edit(); });
 		event_x("fx", "hui:move", [=]{ on_fx_move(); });
+		event_x("fx", "hui:right-button-down", [=]{ on_fx_right_click(); });
 		event("add-fx", [=]{ on_add_fx(); });
+		event("fx-add", [=]{ on_add_fx(); });
+		event("fx-delete", [=]{ on_fx_delete(); });
+		event("fx-enabled", [=]{ on_fx_enabled(); });
+		event("fx-copy-from-track", [=]{ on_fx_copy_from_track(); });
 		event_x("midi-fx", "hui:select", [=]{ on_midi_fx_select(); });
 		event_x("midi-fx", "hui:change", [=]{ on_midi_fx_edit(); });
 		event_x("midi-fx", "hui:move", [=]{ on_midi_fx_move(); });
@@ -186,6 +210,37 @@ public:
 		int s = hui::GetEvent()->row;
 		int t = hui::GetEvent()->row_target;
 		track->move_effect(s, t);
+	}
+	void on_fx_right_click() {
+		int n = hui::GetEvent()->column;
+		console->menu_fx->enable("fx-delete", n >= 0);
+		console->menu_fx->enable("fx-enabled", n >= 0);
+		if (n >= 0)
+			console->menu_fx->check("fx-enabled", track->fx[n]->enabled);
+		console->menu_fx->open_popup(this);
+	}
+	void on_fx_delete() {
+		int n = get_int("fx");
+		if (n >= 0)
+			track->delete_effect(track->fx[n]);
+	}
+	void on_fx_enabled() {
+		int n = get_int("fx");
+		if (n >= 0)
+			track->enable_effect(track->fx[n], !track->fx[n]->enabled);
+	}
+	void on_fx_copy_from_track() {
+		auto *dlg = new TrackSelectionDialog(win, track->song);
+		dlg->run();
+		if (dlg->selected and dlg->selected != track) {
+			track->song->begin_action_group();
+			foreachb (auto *fx, track->fx)
+				track->delete_effect(fx);
+			for (auto *fx: dlg->selected->fx)
+				track->add_effect((AudioEffect*)fx->copy());
+			track->song->end_action_group();
+		}
+		delete dlg;
 	}
 	void on_add_fx() {
 		string name = console->session->plugin_manager->choose_module(win, console->session, ModuleType::AUDIO_EFFECT);
@@ -320,6 +375,8 @@ MixingConsole::MixingConsole(Session *session) :
 	
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
+	
+	menu_fx = hui::CreateResourceMenu("popup-menu-fx-list");
 
 	event("output-volume", [=]{ on_output_volume(); });
 
@@ -335,8 +392,7 @@ MixingConsole::MixingConsole(Session *session) :
 	view->signal_chain->subscribe(this, [=]{ on_chain_state_change(); }, SignalChain::MESSAGE_STATE_CHANGE);
 }
 
-MixingConsole::~MixingConsole()
-{
+MixingConsole::~MixingConsole() {
 	view->signal_chain->unsubscribe(this);
 	if (peak_runner_id >= 0)
 		hui::CancelRunner(peak_runner_id);
@@ -347,6 +403,7 @@ MixingConsole::~MixingConsole()
 		delete m;
 	delete peak_meter;
 	delete spectrum_meter;
+	delete menu_fx;
 }
 
 void MixingConsole::on_chain_state_change() {

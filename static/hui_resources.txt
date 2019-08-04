@@ -3658,7 +3658,7 @@ popup-menu-fx-list
 
 0
 0
-3
+7
 Item
 header
 disabled
@@ -3672,9 +3672,33 @@ Separator
 0
 0
 Item
+fx-enabled
+checkable
+2
+0
+0
+Item
 fx-delete
 
-2
+3
+0
+0
+Separator
+
+
+4
+0
+0
+Item
+fx-add
+
+5
+0
+0
+Item
+fx-copy-from-track
+
+6
 0
 0
 // Resource
@@ -6680,7 +6704,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-536
+539
 // Text
 /bars-add
 Add bars...
@@ -6750,9 +6774,6 @@ Track
 
 /exit
 Exit
-
-/fx-delete
-Delete
 
 /layer-add
 Add version
@@ -7656,6 +7677,18 @@ Audio buffer
 
 popup-menu-device/header
 Device
+
+popup-menu-fx-list/fx-add
+Add...
+
+popup-menu-fx-list/fx-copy-from-track
+Copy from track...
+
+popup-menu-fx-list/fx-delete
+Delete
+
+popup-menu-fx-list/fx-enabled
+Enabled
 
 popup-menu-fx-list/header
 Effect

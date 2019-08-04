@@ -15,19 +15,16 @@
 #include "../../../Data/Sample.h"
 #include "../../../Data/SampleRef.h"
 #include "../Midi/ActionTrackAddMidiNote.h"
-#include "../../Sample/ActionSampleDelete.h"
 
-ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index)
-{
+ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
 }
 
-void ActionTrackInsertSample::build(Data *d)
-{
+void ActionTrackInsertSample::build(Data *d) {
 	SampleRef *ref = layer->samples[index];
-	Sample *sample = ref->origin;
-	if (layer->type == SignalType::AUDIO){
+
+	if (layer->type == SignalType::AUDIO) {
 
 		// get target buffer
 		Range r = ref->range();
@@ -39,9 +36,9 @@ void ActionTrackInsertSample::build(Data *d)
 		auto *action = new ActionTrackEditBuffer(layer, r);
 		buf.set(ref->buf(), 0, ref->volume);
 		add_sub_action(action, d);
-	}else if (layer->type == SignalType::MIDI){
+	}else if (layer->type == SignalType::MIDI) {
 		auto midi = ref->midi();
-		for (MidiNote *n : midi){
+		for (MidiNote *n : midi) {
 			MidiNote *nn = n->copy();
 			nn->range.offset += ref->pos;
 			add_sub_action(new ActionTrackAddMidiNote(layer, nn), d);
@@ -50,8 +47,5 @@ void ActionTrackInsertSample::build(Data *d)
 
 	// delete sub
 	add_sub_action(new ActionTrackDeleteSample(ref), d);
-
-	if (sample->auto_delete and (sample->ref_count == 0))
-		add_sub_action(new ActionSampleDelete(sample), d);
 }
 

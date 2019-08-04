@@ -11,8 +11,7 @@
 #include "../../ActionGroup.h"
 class TrackLayer;
 
-class ActionTrackInsertSample : public ActionGroup
-{
+class ActionTrackInsertSample : public ActionGroup {
 public:
 	ActionTrackInsertSample(TrackLayer *layer, int index);
 

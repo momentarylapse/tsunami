@@ -8,22 +8,16 @@
 #ifndef ACTIONTRACKDELETESAMPLE_H_
 #define ACTIONTRACKDELETESAMPLE_H_
 
-#include "../../Action.h"
+#include "../../ActionGroup.h"
 class SampleRef;
-class TrackLayer;
 
-class ActionTrackDeleteSample : public Action
-{
+class ActionTrackDeleteSample : public ActionGroup {
 public:
 	ActionTrackDeleteSample(SampleRef *ref);
-	~ActionTrackDeleteSample() override;
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void build(Data *d) override;
 
 private:
-	TrackLayer *layer;
-	int index;
 	SampleRef *ref;
 };
 

@@ -1,7 +1,12 @@
 Menu popup-menu-sample-manager ""
 	Item header "Sample" disabled
 	Separator
-	Item /sample-preview "Preview"
-	Item /sample-export "Export..."
-	Item /sample-scale "Scale..."
-	Item /sample-delete "Delete"
+	Item sample-preview "Preview"
+	Item sample-export "Export..."
+	Item sample-paste "Paste at cursor"
+	Item sample-scale "Scale..."
+	Item sample-auto-delete "Auto delete when unused" checkable
+	Item sample-delete "Delete"
+	Menu menu-new "New"
+		Item import-from-file "Import from file"
+		Item create-from-selection "Create from selection"

@@ -4497,7 +4497,7 @@ popup-menu-sample-manager
 
 0
 0
-6
+9
 Item
 header
 disabled
@@ -4523,15 +4523,45 @@ sample-export
 0
 0
 Item
-sample-scale
+sample-paste
 
 4
 0
 0
 Item
-sample-delete
+sample-scale
 
 5
+0
+0
+Item
+sample-auto-delete
+checkable
+6
+0
+0
+Item
+sample-delete
+
+7
+0
+0
+Menu
+menu-new
+
+8
+0
+2
+Item
+import-from-file
+
+0
+0
+0
+Item
+create-from-selection
+
+1
 0
 0
 // Resource
@@ -4753,7 +4783,7 @@ popup-menu-tag
 
 0
 0
-3
+4
 Item
 header
 disabled
@@ -4770,6 +4800,12 @@ Item
 tag-delete
 
 2
+0
+0
+Item
+tag-add
+
+3
 0
 0
 // Resource
@@ -5259,7 +5295,7 @@ image=hui:ok
 0
 // Resource
 Dialog
-sample_manager_dialog
+sample-manager-dialog
 width=400,height=400,allow-parent
 0
 0
@@ -5271,8 +5307,8 @@ vertical
 0
 3
 ListView
-sample_list
-format=iTttC,select-multi
+sample-list
+format=itTt,select-multi
 0
 0
 0
@@ -5283,49 +5319,49 @@ Grid
 0
 7
 Button
-import_from_file
+import-from-file
 flat,image=hui:open,padding=1
 0
 0
 0
 Button
-export_sample
+sample-export
 flat,image=hui:save,padding=1
 1
 0
 0
 Button
-delete_sample
+sample-delete
 flat,image=hui:delete,padding=1
 2
 0
 0
 Button
-preview_sample
+sample-preview
 flat,image=hui:media-play,padding=1
 3
 0
 0
 Button
-paste_sample
+sample-paste
 flat,image=hui:paste,padding=1
 4
 0
 0
 Button
-create_from_selection
+create-from-selection
 flat,image=hui:copy,padding=1
 5
 0
 0
 Button
-scale_sample
+sample-scale
 flat,image=hui:zoom-in,padding=1
 6
 0
 0
 Group
-smd_group_edit
+group-edit
 
 2
 0
@@ -5936,13 +5972,13 @@ Grid
 1
 2
 Button
-add_tag
+tag-add
 flat,image=hui:add
 0
 0
 0
 Button
-delete_tag
+tag-delete
 flat,image=hui:delete
 1
 0
@@ -6644,7 +6680,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-527
+536
 // Text
 /bars-add
 Add bars...
@@ -6832,20 +6868,11 @@ s
 /sample-delete
 Delete
 
-/sample-export
-Export...
-
 /sample-insert
 Insert statically
 
-/sample-preview
-Preview
-
 /sample-properties
 Properties
-
-/sample-scale
-Scale...
 
 /save
 Save
@@ -6867,9 +6894,6 @@ Properties
 
 /stop
 Stop
-
-/tag-delete
-Delete
 
 /track-add-audio-mono
 Audio (mono)
@@ -7645,8 +7669,35 @@ Marker
 popup-menu-playback-range/header
 Playback range
 
+popup-menu-sample-manager/create-from-selection
+Create from selection
+
 popup-menu-sample-manager/header
 Sample
+
+popup-menu-sample-manager/import-from-file
+Import from file
+
+popup-menu-sample-manager/menu-new
+New
+
+popup-menu-sample-manager/sample-auto-delete
+Auto delete when unused
+
+popup-menu-sample-manager/sample-delete
+Delete
+
+popup-menu-sample-manager/sample-export
+Export...
+
+popup-menu-sample-manager/sample-paste
+Paste at cursor
+
+popup-menu-sample-manager/sample-preview
+Preview
+
+popup-menu-sample-manager/sample-scale
+Scale...
 
 popup-menu-sample/header
 Sample
@@ -7656,6 +7707,12 @@ File
 
 popup-menu-tag/header
 Tag
+
+popup-menu-tag/tag-add
+Add
+
+popup-menu-tag/tag-delete
+Delete
 
 popup-menu-track/header
 Track
@@ -7900,36 +7957,36 @@ Aufnahme
 record_dialog/time
 0:00
 
-sample_manager_dialog/create_from_selection
+sample-manager-dialog/create-from-selection
 
 create from selection
-sample_manager_dialog/delete_sample
-
-delete
-sample_manager_dialog/export_sample
-
-export to file
-sample_manager_dialog/import_from_file
-
-import from file
-sample_manager_dialog/paste_sample
-
-paste at the cursor into the current track
-sample_manager_dialog/preview_sample
-
-preview
-sample_manager_dialog/sample_list
-Preview\\Duration\\Name\\Usage\\Temporary
-
-sample_manager_dialog/sample_manager_dialog
-Sample Manager
-
-sample_manager_dialog/scale_sample
-
-scale/resize
-sample_manager_dialog/smd_group_edit
+sample-manager-dialog/group-edit
 Edit
 
+sample-manager-dialog/import-from-file
+
+import from file
+sample-manager-dialog/sample-delete
+
+delete
+sample-manager-dialog/sample-export
+
+export to file
+sample-manager-dialog/sample-list
+Preview\\Duration\\Name\\Usage
+
+sample-manager-dialog/sample-manager-dialog
+Sample Manager
+
+sample-manager-dialog/sample-paste
+
+paste at the cursor into the current track
+sample-manager-dialog/sample-preview
+
+preview
+sample-manager-dialog/sample-scale
+
+scale/resize
 sample_ref_dialog/edit_sample
 Sample
 
@@ -8107,6 +8164,12 @@ when saving
 song_dialog/song_dialog
 Sound-Datei
 
+song_dialog/tag-add
+Add
+
+song_dialog/tag-delete
+Delete
+
 song_dialog/tags
 Tag\\Value
 Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
@@ -8233,7 +8296,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-927
+948
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8271,6 +8334,9 @@ Bpm
 /buffer-delete
 Löschen
 
+/buffer-edit
+Bearbeiten
+
 /buffer-make-movable
 Beweglich machen
 
@@ -8297,6 +8363,12 @@ Löschen
 
 /delete-track
 Löschen
+
+/device-delete
+Löschen
+
+/device-hide
+Verstecken
 
 /edit_bars
 Takte
@@ -8330,6 +8402,9 @@ Spur
 
 /exit
 Beenden
+
+/fx-delete
+Löschen
 
 /layer-add
 Neue Version
@@ -8552,6 +8627,18 @@ Solo
 
 /undo
 Rückgängig
+
+audio-editor/audio-editor
+Audio
+
+audio-editor/edit-mode
+Auswahl\\Glätten\\Clonen
+
+audio-editor/group-edit
+Bearbeiten
+
+audio-editor/t-no-audio
+Keine Audio-Spur ausgewählt
 
 bar_add_dialog/bad_t_beats
 Schläge
@@ -9645,6 +9732,12 @@ Takt
 popup-menu-buffer/header
 Audiopuffer
 
+popup-menu-device/header
+Gerät
+
+popup-menu-fx-list/header
+Effekt
+
 popup-menu-layer/header
 Version
 
@@ -9654,11 +9747,44 @@ Markierung
 popup-menu-playback-range/header
 Abspielbereich
 
+popup-menu-sample-manager/create-from-selection
+Aus Auswahl erzeugen
+
+popup-menu-sample-manager/header
+Sample
+
+popup-menu-sample-manager/import-from-file
+Aus Datei importieren
+
+popup-menu-sample-manager/menu-new
+Neu
+
+popup-menu-sample-manager/sample-auto-delete
+Automatisch löschen
+
+popup-menu-sample-manager/sample-delete
+Löschen
+
+popup-menu-sample-manager/sample-export
+Exportieren...
+
+popup-menu-sample-manager/sample-preview
+Abspielen
+
+popup-menu-sample-manager/sample-scale
+Skalieren...
+
 popup-menu-sample/header
 Sample
 
 popup-menu-song/header
 Datei
+
+popup-menu-tag/header
+Tag
+
+popup-menu-tag/tag-delete
+Löschen
 
 popup-menu-track/header
 Spur
@@ -10623,36 +10749,36 @@ Ziel
 record_midi_dialog/record_midi_dialog
 Midi Aufnahme
 
-sample_manager_dialog/create_from_selection
+sample-manager-dialog/create-from-selection
 
 aus Auswahl erzeugen
-sample_manager_dialog/delete_sample
-
-löschen
-sample_manager_dialog/export_sample
-
-in Datei exportieren
-sample_manager_dialog/import_from_file
-
-aus Datei importieren
-sample_manager_dialog/paste_sample
-
-am Cursor der aktuellen Spur einfügen
-sample_manager_dialog/preview_sample
-
-Vorschau
-sample_manager_dialog/sample_list
-Vorschau\\Dauer\\Name\\Benutzung\\Temporär
-
-sample_manager_dialog/sample_manager_dialog
-Sample Manager
-
-sample_manager_dialog/scale_sample
-
-skalieren/Größe ändern
-sample_manager_dialog/smd_group_edit
+sample-manager-dialog/group-edit
 Bearbeiten
 
+sample-manager-dialog/import-from-file
+
+aus Datei importieren
+sample-manager-dialog/sample-delete
+
+löschen
+sample-manager-dialog/sample-export
+
+in Datei exportieren
+sample-manager-dialog/sample-list
+Vorschau\\Dauer\\Name\\Benutzung
+
+sample-manager-dialog/sample-manager-dialog
+Sample Manager
+
+sample-manager-dialog/sample-paste
+
+am Cursor der aktuellen Spur einfügen
+sample-manager-dialog/sample-preview
+
+Vorschau
+sample-manager-dialog/sample-scale
+
+skalieren/Größe ändern
 sample_ref_dialog/edit_sample
 Sample
 

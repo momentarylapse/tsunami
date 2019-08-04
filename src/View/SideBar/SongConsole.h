@@ -11,8 +11,7 @@
 #include "SideBar.h"
 class Song;
 
-class SongConsole: public SideBarConsole
-{
+class SongConsole: public SideBarConsole {
 public:
 	SongConsole(Session *session);
 	virtual ~SongConsole();
@@ -26,12 +25,15 @@ public:
 	void on_track_list();
 	void on_tags_select();
 	void on_tags_edit();
+	void on_tags_right_click();
 	void on_add_tag();
 	void on_delete_tag();
 
 	void on_edit_samples();
 
 	void on_update();
+	
+	hui::Menu *menu_tags;
 };
 
 #endif /* SONGCONSOLE_H_ */

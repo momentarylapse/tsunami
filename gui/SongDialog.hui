@@ -18,8 +18,8 @@ Dialog song_dialog "Sound-Datei" width=430 height=375
 				ListView tags "Tag\\Value" format=TT "tooltip=Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
 				---|
 				Grid ? ""
-					Button add_tag "" flat image=hui:add
-					Button delete_tag "" flat image=hui:delete
+					Button tag-add "Add" flat image=hui:add
+					Button tag-delete "Delete" flat image=hui:delete
 		Group ad_t_edit "Edit"
 			Grid ? ""
 				Button /edit_samples "Samples" link

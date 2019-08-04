@@ -1,4 +1,5 @@
 Menu popup-menu-tag ""
 	Item header "Tag" disabled
 	Separator
-	Item /tag-delete "Delete"
+	Item tag-delete "Delete"
+	Item tag-add "Add"

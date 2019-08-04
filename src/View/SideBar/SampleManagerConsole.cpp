@@ -28,8 +28,6 @@
 #include "../../Module/Audio/SongRenderer.h"
 
 
-static hui::Menu *menu_sample = nullptr;
-
 // TODO: use BufferPainter / MidiPainter
 void render_bufbox(Image &im, AudioBuffer &b, AudioView *view) {
 	int w = im.width;
@@ -88,7 +86,7 @@ public:
 		} else {
 			int n = manager->get_index(s);
 			if (n >= 0)
-				manager->change_string("sample_list", n, str());
+				manager->change_string(manager->id_list, n, str());
 		}
 	}
 
@@ -101,7 +99,10 @@ public:
 	}
 
 	string str() {
-		return icon + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + s->name + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		string e;
+		if (s->auto_delete)
+			e = " *";
+		return icon + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + s->name + e + "\\" + format(_("%d times"), s->ref_count);
 	}
 	string icon;
 	Sample *s;
@@ -111,27 +112,23 @@ public:
 SampleManagerConsole::SampleManagerConsole(Session *session) :
 	SideBarConsole(_("Samples"), session)
 {
-	from_resource("sample_manager_dialog");
+	from_resource("sample-manager-dialog");
 
-	if (!menu_sample)
-		menu_sample = hui::CreateResourceMenu("popup-menu-sample-manager");
+	menu_samples = hui::CreateResourceMenu("popup-menu-sample-manager");
 
-	event("import_from_file", [=]{ on_import(); });
-	event("export_sample", [=]{ on_export(); });
-	event("preview_sample", [=]{ on_preview(); });
-	event("paste_sample", [=]{ on_insert(); });
-	event("create_from_selection", [=]{ on_create_from_selection(); });
-	event("delete_sample", [=]{ on_delete(); });
+	id_list = "sample-list";
+	event("import-from-file", [=]{ on_import(); });
+	event("create-from-selection", [=]{ on_create_from_selection(); });
 	event("sample-delete", [=]{ on_delete(); });
-	event("scale_sample", [=]{ on_scale(); });
 	event("sample-scale", [=]{ on_scale(); });
+	event("sample-auto-delete", [=]{ on_auto_delete(); });
 	event("sample-export", [=]{ on_export(); });
 	event("sample-preview", [=]{ on_preview(); });
 	event("sample-paste", [=]{ on_insert(); });
-	event_x("sample_list", "hui:change", [=]{ on_list_edit(); });
-	event_x("sample_list", "hui:select", [=]{ on_list_select(); });
-	event_x("sample_list", "hui:right-button-down", [=]{ if (hui::GetEvent()->column >= 0) menu_sample->open_popup(this); });
-	event("sample_list", [=]{ on_preview(); });
+	event_x(id_list, "hui:change", [=]{ on_list_edit(); });
+	event_x(id_list, "hui:select", [=]{ on_list_select(); });
+	event_x(id_list, "hui:right-button-down", [=]{ on_list_right_click(); });
+	event("sample-list", [=]{ on_preview(); });
 
 	event("edit_song", [=]{ on_edit_song(); });
 
@@ -176,20 +173,41 @@ void SampleManagerConsole::update_list() {
 void SampleManagerConsole::on_list_select() {
 	auto sel = get_selected();
 
-	enable("export_sample", sel.num == 1);
-	enable("preview_sample", sel.num == 1);
-	enable("delete_sample", sel.num > 0);
-	enable("paste_sample", sel.num == 1);
-	enable("scale_sample", sel.num == 1);
+	enable("sample-export", sel.num == 1);
+	enable("sample-preview", sel.num == 1);
+	enable("sample-delete", sel.num > 0);
+	enable("sample-paste", sel.num == 1);
+	enable("sample-scale", sel.num == 1);
 }
 
 void SampleManagerConsole::on_list_edit() {
 	int sel = hui::GetEvent()->row;
 	int col = hui::GetEvent()->column;
-	if (col == 1)
-		song->edit_sample_name(items[sel]->s, get_cell("sample_list", sel, 1));
-	else if (col == 4)
-		items[sel]->s->auto_delete = get_cell("sample_list", sel, 4)._bool();
+	if (col == 2)
+		song->edit_sample_name(items[sel]->s, get_cell(id_list, sel, col));
+	//else if (col == 4)
+	//	items[sel]->s->auto_delete = get_cell(id_list, sel, col)._bool();
+}
+
+void SampleManagerConsole::on_list_right_click() {
+	int n = hui::GetEvent()->column;
+	menu_samples->enable("sample-preview", n >= 0);
+	menu_samples->enable("sample-export", n >= 0);
+	menu_samples->enable("sample-paste", n >= 0);
+	menu_samples->enable("sample-scale", n >= 0);
+	menu_samples->enable("sample-delete", n >= 0);
+	menu_samples->enable("sample-auto-delete", n >= 0);
+	if (n >= 0)
+		menu_samples->check("sample-auto-delete", items[n]->s->auto_delete);
+	menu_samples->open_popup(this);
+}
+
+void SampleManagerConsole::on_auto_delete() {
+	auto sel = get_selected();
+	for (auto *s: sel) {
+		s->auto_delete = !s->auto_delete;
+		s->notify();
+	}
 }
 
 void SampleManagerConsole::on_import() {
@@ -234,16 +252,16 @@ void SampleManagerConsole::on_delete() {
 	song->action_manager->group_end();
 
 	// hui bug
-	set_int("sample_list", -1);
+	set_int(id_list, -1);
 }
 
 
 void SampleManagerConsole::on_scale() {
-	Array<Sample*> sel = get_selected();
+	auto sel = get_selected();
 	for (Sample* s: sel) {
 		if (s->type != SignalType::AUDIO)
 			continue;
-		SampleScaleDialog *dlg = new SampleScaleDialog(parent->win, s);
+		auto *dlg = new SampleScaleDialog(parent->win, s);
 		dlg->run();
 		delete(dlg);
 	}
@@ -251,14 +269,14 @@ void SampleManagerConsole::on_scale() {
 
 void SampleManagerConsole::add(SampleManagerItem *item) {
 	items.add(item);
-	add_string("sample_list", item->str());
+	add_string("sample-list", item->str());
 }
 
 void SampleManagerConsole::remove(SampleManagerItem *item) {
 	foreachi(auto *si, items, i)
 		if (si == item) {
 			items.erase(i);
-			remove_string("sample_list", i);
+			remove_string(id_list, i);
 
 			// don't delete now... we're still in notify()?
 			item->zombify();
@@ -267,7 +285,7 @@ void SampleManagerConsole::remove(SampleManagerItem *item) {
 }
 
 Array<Sample*> SampleManagerConsole::get_selected() {
-	auto indices = get_selection("sample_list");
+	auto indices = get_selection(id_list);
 	Array<Sample*> sel;
 	for (int i: indices)
 		sel.add(items[i]->s);
@@ -278,7 +296,7 @@ void SampleManagerConsole::set_selection(const Array<Sample*> &samples) {
 	Array<int> indices;
 	for (Sample *s: samples)
 		indices.add(get_index(s));
-	hui::Panel::set_selection("sample_list", indices);
+	hui::Panel::set_selection(id_list, indices);
 }
 
 void SampleManagerConsole::on_edit_song() {
@@ -307,7 +325,7 @@ void SampleManagerConsole::on_preview_stream_end() {
 void SampleManagerConsole::on_preview() {
 	if (progress)
 		end_preview();
-	int sel = get_int("sample_list");
+	int sel = get_int(id_list);
 	preview_sample = items[sel]->s;
 	preview_chain = new SignalChain(session, "sample-preview");
 	preview_renderer = new BufferStreamer(preview_sample->buf);

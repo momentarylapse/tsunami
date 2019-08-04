@@ -19,8 +19,7 @@ class Progress;
 class Session;
 class SignalChain;
 
-class SampleManagerConsole : public SideBarConsole
-{
+class SampleManagerConsole : public SideBarConsole {
 public:
 	SampleManagerConsole(Session *session);
 	virtual ~SampleManagerConsole();
@@ -29,11 +28,13 @@ public:
 
 	void on_list_select();
 	void on_list_edit();
+	void on_list_right_click();
 	void on_import();
 	void on_export();
 	void on_preview();
 	void on_insert();
 	void on_create_from_selection();
+	void on_auto_delete();
 	void on_delete();
 	void on_scale();
 
@@ -61,6 +62,9 @@ public:
 	Sample *preview_sample;
 
 	Progress *progress;
+	
+	string id_list;
+	hui::Menu *menu_samples;
 
 	static Sample *_cdecl select(Session *session, hui::Panel *parent, Sample *old);
 };

@@ -1,14 +1,14 @@
-Dialog sample_manager_dialog "Sample Manager" width=400 height=400 allow-parent
+Dialog sample-manager-dialog "Sample Manager" width=400 height=400 allow-parent
 	Grid ? "" vertical
-		ListView sample_list "Preview\\Duration\\Name\\Usage\\Temporary" format=iTttC select-multi
+		ListView sample-list "Preview\\Duration\\Name\\Usage" format=itTt select-multi
 		Grid ? ""
-			Button import_from_file "" flat image=hui:open "tooltip=import from file" padding=1
-			Button export_sample "" flat image=hui:save "tooltip=export to file" padding=1
-			Button delete_sample "" flat image=hui:delete "tooltip=delete" padding=1
-			Button preview_sample "" flat image=hui:media-play "tooltip=preview" padding=1
-			Button paste_sample "" flat image=hui:paste "tooltip=paste at the cursor into the current track" padding=1
-			Button create_from_selection "" flat image=hui:copy "tooltip=create from selection" padding=1
-			Button scale_sample "" flat image=hui:zoom-in "tooltip=scale/resize" padding=1
-		Group smd_group_edit "Edit"
+			Button import-from-file "" flat image=hui:open "tooltip=import from file" padding=1
+			Button sample-export "" flat image=hui:save "tooltip=export to file" padding=1
+			Button sample-delete "" flat image=hui:delete "tooltip=delete" padding=1
+			Button sample-preview "" flat image=hui:media-play "tooltip=preview" padding=1
+			Button sample-paste "" flat image=hui:paste "tooltip=paste at the cursor into the current track" padding=1
+			Button create-from-selection "" flat image=hui:copy "tooltip=create from selection" padding=1
+			Button sample-scale "" flat image=hui:zoom-in "tooltip=scale/resize" padding=1
+		Group group-edit "Edit"
 			Grid ? ""
 				Button /edit_song "File" link

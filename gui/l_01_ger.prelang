@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-928
+949
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -945,34 +945,34 @@ Ziel
 record_midi_dialog/record_midi_dialog
 Midi Aufnahme
 
-sample_manager_dialog/create_from_selection
+sample-manager-dialog/create-from-selection
 
 aus Auswahl erzeugen
-sample_manager_dialog/delete_sample
+sample-manager-dialog/sample-delete
 
 löschen
-sample_manager_dialog/export_sample
+sample-manager-dialog/sample-export
 
 in Datei exportieren
-sample_manager_dialog/import_from_file
+sample-manager-dialog/import-from-file
 
 aus Datei importieren
-sample_manager_dialog/paste_sample
+sample-manager-dialog/sample-paste
 
 am Cursor der aktuellen Spur einfügen
-sample_manager_dialog/preview_sample
+sample-manager-dialog/sample-preview
 
 Vorschau
-sample_manager_dialog/sample_list
-Vorschau\\Dauer\\Name\\Benutzung\\Temporär
+sample-manager-dialog/sample-list
+Vorschau\\Dauer\\Name\\Benutzung
 
-sample_manager_dialog/sample_manager_dialog
+sample-manager-dialog/sample-manager-dialog
 Sample Manager
 
-sample_manager_dialog/scale_sample
+sample-manager-dialog/sample-scale
 
 skalieren/Größe ändern
-sample_manager_dialog/smd_group_edit
+sample-manager-dialog/group-edit
 Bearbeiten
 
 sample_ref_dialog/edit_sample
@@ -2786,6 +2786,69 @@ Gehe rauf
 
 /menu-view-track
 Spur
+
+/buffer-edit
+Bearbeiten
+
+/device-delete
+Löschen
+
+/device-hide
+Verstecken
+
+/fx-delete
+Löschen
+
+audio-editor/audio-editor
+Audio
+
+audio-editor/edit-mode
+Auswahl\\Glätten\\Clonen
+
+audio-editor/group-edit
+Bearbeiten
+
+audio-editor/t-no-audio
+Keine Audio-Spur ausgewählt
+
+popup-menu-device/header
+Gerät
+
+popup-menu-fx-list/header
+Effekt
+
+popup-menu-sample-manager/create-from-selection
+Aus Auswahl erzeugen
+
+popup-menu-sample-manager/header
+Sample
+
+popup-menu-sample-manager/import-from-file
+Aus Datei importieren
+
+popup-menu-sample-manager/menu-new
+Neu
+
+popup-menu-sample-manager/sample-auto-delete
+Automatisch löschen
+
+popup-menu-sample-manager/sample-delete
+Löschen
+
+popup-menu-sample-manager/sample-export
+Exportieren...
+
+popup-menu-sample-manager/sample-preview
+Abspielen
+
+popup-menu-sample-manager/sample-scale
+Skalieren...
+
+popup-menu-tag/header
+Tag
+
+popup-menu-tag/tag-delete
+Löschen
 
 // Num Language Strings
 245

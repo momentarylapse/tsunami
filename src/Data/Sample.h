@@ -22,6 +22,8 @@ enum class SignalType;
 class Sample : public Observable<VirtualBase> {
 public:
 	Sample(SignalType type);
+	Sample(const string &name, const AudioBuffer &buf);
+	Sample(const string &name, const MidiNoteBuffer &buf);
 	virtual ~Sample();
 
 	static const string MESSAGE_CHANGE_BY_ACTION;

@@ -26,6 +26,7 @@ class SongSelection;
 class AudioBuffer;
 class BarPattern;
 class TrackMarker;
+class MidiNoteBuffer;
 enum class SampleFormat;
 enum class SignalType;
 
@@ -103,7 +104,9 @@ public:
 	Track *_cdecl add_track(SignalType type, int index = -1);
 	Track *_cdecl add_track_after(SignalType type, Track *insert_after = nullptr);
 	void _cdecl delete_track(Track *track);
-	Sample *_cdecl add_sample(const string &name, AudioBuffer &buf);
+	Sample *_cdecl create_sample_audio(const string &name, const AudioBuffer &buf);
+	Sample *_cdecl create_sample_midi(const string &name, const MidiNoteBuffer &midi);
+	void _cdecl add_sample(Sample *s);
 	void _cdecl delete_sample(Sample *s);
 	void _cdecl edit_sample_name(Sample *s, const string &name);
 	void _cdecl sample_replace_buffer(Sample *s, AudioBuffer *buf);

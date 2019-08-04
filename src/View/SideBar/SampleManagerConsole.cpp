@@ -210,7 +210,7 @@ void SampleManagerConsole::on_import() {
 	if (session->storage->ask_open_import(win)) {
 		AudioBuffer buf;
 		session->storage->load_buffer(&buf, hui::Filename);
-		song->add_sample(hui::Filename.basename(), buf);
+		song->create_sample_audio(hui::Filename.basename(), buf);
 		//setInt("sample_list", items.num - 1);
 		on_list_select();
 	}
@@ -236,7 +236,19 @@ void SampleManagerConsole::on_insert() {
 }
 
 void SampleManagerConsole::on_create_from_selection() {
-	song->create_samples_from_selection(view->sel, false);
+	if (view->sel.range().length == 0)
+		return;
+	for (auto *l: song->layers())
+		if (view->sel.has(l)) {
+			if (l->type == SignalType::AUDIO) {
+				AudioBuffer buf;
+				buf.resize(view->sel.range().length);
+				l->read_buffers_fixed(buf, view->sel.range());
+				song->create_sample_audio("-new-", buf);
+			} else if (l->type == SignalType::MIDI) {
+				song->create_sample_midi("-new-", l->midi.get_notes(view->sel.range()));
+			}
+		}
 }
 
 void SampleManagerConsole::on_delete() {
@@ -432,7 +444,7 @@ public:
 		if (session->storage->ask_open_import(win)) {
 			AudioBuffer buf;
 			session->storage->load_buffer(&buf, hui::Filename);
-			song->add_sample(hui::Filename.basename(), buf);
+			song->create_sample_audio(hui::Filename.basename(), buf);
 			fill_list();
 		}
 

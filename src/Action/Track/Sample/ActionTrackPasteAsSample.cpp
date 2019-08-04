@@ -37,17 +37,11 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 void ActionTrackPasteAsSample::build(Data *d)
 {
 	if (buf) {
-		sample = new Sample(SignalType::AUDIO);
-		*sample->buf = *buf;
-		sample->buf->offset = 0;
-		sample->auto_delete = auto_delete;
+		sample = new Sample("-paste-", *buf);
 	} else {
-		sample = new Sample(SignalType::MIDI);
-		sample->midi = *midi;
-		sample->midi.sort();
-		sample->auto_delete = auto_delete;
+		sample = new Sample("-paste-", *midi);
 	}
-	sample->name = "-paste-";
+	sample->auto_delete = auto_delete;
 	add_sub_action(new ActionSampleAdd(sample), d);
 	add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
 }

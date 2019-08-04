@@ -323,13 +323,20 @@ void Song::delete_track(Track *track) {
 	execute(new ActionTrackDelete(track));
 }
 
-Sample *Song::add_sample(const string &name, AudioBuffer &buf) {
-	auto *sample = new Sample(SignalType::AUDIO);
-	*sample->buf = buf;
-	sample->buf->offset = 0;
-	sample->auto_delete = false;
-	sample->name = name;
-	return (Sample*)execute(new ActionSampleAdd(sample));
+Sample *Song::create_sample_audio(const string &name, const AudioBuffer &buf) {
+	auto *sample = new Sample(name, buf);
+	add_sample(sample);
+	return sample;
+}
+
+Sample *Song::create_sample_midi(const string &name, const MidiNoteBuffer &buf) {
+	auto *sample = new Sample(name, buf);
+	add_sample(sample);
+	return sample;
+}
+
+void Song::add_sample(Sample *sample) {
+	execute(new ActionSampleAdd(sample));
 }
 
 void Song::delete_sample(Sample *s) {

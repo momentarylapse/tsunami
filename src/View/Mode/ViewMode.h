@@ -44,7 +44,7 @@ public:
 	virtual void on_mouse_wheel() {}
 	virtual void on_key_down(int k) {}
 	virtual void on_key_up(int k) {}
-	virtual float layer_min_height(AudioViewLayer *l) = 0;
+	virtual void on_command(const string &id) {}
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change() {}
 

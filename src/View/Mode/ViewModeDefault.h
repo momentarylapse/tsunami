@@ -21,7 +21,7 @@ public:
 
 	void on_mouse_wheel() override;
 	void on_key_down(int k) override;
-	float layer_min_height(AudioViewLayer *l) override;
+	void on_command(const string &id) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
 	int suggest_move_cursor(int pos, bool forward) override;
 

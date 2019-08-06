@@ -202,7 +202,21 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("view-midi-classical", [=]{ on_view_midi_score(); });
 	event("view-optimal", [=]{ on_view_optimal(); });
 	event("zoom-in", [=]{ on_zoom_in(); });
+	set_key_code("zoom-in", hui::KEY_ADD);
 	event("zoom-out", [=]{ on_zoom_out(); });
+	set_key_code("zoom-out", hui::KEY_SUBTRACT);
+
+	set_key_code("vertical-zoom-in", hui::KEY_ADD + hui::KEY_SHIFT);
+	set_key_code("vertical-zoom-out", hui::KEY_SUBTRACT + hui::KEY_SHIFT);
+
+	set_key_code("cam-move-right", hui::KEY_NEXT);
+	set_key_code("cam-move-left", hui::KEY_PRIOR);
+	set_key_code("cursor-jump-start", hui::KEY_HOME);
+	set_key_code("cursor-jump-end", hui::KEY_END);
+	set_key_code("cursor-move-left", hui::KEY_LEFT);
+	set_key_code("cursor-move-right", hui::KEY_RIGHT);
+	set_key_code("cursor-expand-left", hui::KEY_LEFT + hui::KEY_SHIFT);
+	set_key_code("cursor-expand-right", hui::KEY_RIGHT + hui::KEY_SHIFT);
 
 	// table structure
 	set_size(width, height);

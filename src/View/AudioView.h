@@ -73,8 +73,7 @@ enum class SelectionMode {
 	FAKE,
 };
 
-class AudioView : public Observable<VirtualBase>
-{
+class AudioView : public Observable<VirtualBase> {
 public:
 	AudioView(Session *session, const string &id);
 	virtual ~AudioView();

@@ -65,12 +65,21 @@ Menu menu ""
 		Item show-devices "Devices" checkable
 		Item show-fx-console "Effects"
 		Separator
-		Item zoom-in "Zoom in" image=hui:zoom-in
-		Item zoom-out "Zoom out" image=hui:zoom-out
-		Item view-optimal "Optimal" image=hui:zoom-fit
-		Menu /menu-view-track "Track"
-			Item /layer-up "Go up"
-			Item /layer-down "Go down"
+		Menu /menu-view-zoom "Zoom"
+			Item vertical-zoom-in "Zoom in vertical"
+			Item vertical-zoom-out "Zoom out vertical"
+			Item vertical-zoom-default "Reset vertical zoom"
+			Separator
+			Item zoom-in "Zoom in" image=hui:zoom-in
+			Item zoom-out "Zoom out" image=hui:zoom-out
+			Item view-optimal "Optimal" image=hui:zoom-fit
+		Menu /menu-view-cursor "Cursor"
+			Item /layer-up "Go up one track"
+			Item /layer-down "Go down one track"
+			Item /cursor-move-left "Step left"
+			Item /cursor-move-right "Step right"
+			Item /cursor-jump-start "Jump to start"
+			Item /cursor-jump-end "Jump to end"
 	Menu menu_sound "Sound"
 		Item /play-toggle "Play" image=hui:media-play
 		Item /pause "Pause" image=hui:media-pause

@@ -21,17 +21,11 @@ ViewPort::ViewPort(AudioView *v) {
 	pos_pre_animation = 0;
 	animation_time = -1;
 	animation_non_linearity = 0;
+	scale_y = 1.0f;
 }
 
-ViewPort::ViewPort(rect &_area) {
+ViewPort::ViewPort(rect &_area) : ViewPort(nullptr) {
 	override_area = &_area;
-	view = nullptr;
-	scale = 1.0f;
-	pos = 0;
-	pos_target = 0;
-	pos_pre_animation = 0;
-	animation_time = -1;
-	animation_non_linearity = 0;
 }
 
 

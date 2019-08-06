@@ -210,14 +210,12 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	midi_painter = new MidiPainter(this);
 
 	preview_sleep_time = hui::Config.get_int("PreviewSleepTime", 10);
-	ScrollSpeed = 600;//hui::Config.getInt("View.ScrollSpeed", 600);
-	ScrollSpeedFast = 6000;//hui::Config.getInt("View.ScrollSpeedFast", 6000);
+	ScrollSpeed = 20;
+	ScrollSpeedFast = 200;
 	ZoomSpeed = hui::Config.get_float("View.ZoomSpeed", 0.1f);
 	set_mouse_wheel_speed(hui::Config.get_float("View.MouseWheelSpeed", 1.0f));
 	set_antialiasing(hui::Config.get_bool("View.Antialiasing", true));
 	set_high_details(hui::Config.get_bool("View.HighDetails", true));
-	hui::Config.set_int("View.ScrollSpeed", ScrollSpeed);
-	hui::Config.set_int("View.ScrollSpeedFast", ScrollSpeedFast);
 	hui::Config.set_float("View.ZoomSpeed", ZoomSpeed);
 
 	images.speaker = LoadImage(tsunami->directory_static + "icons/volume.png");
@@ -623,6 +621,13 @@ void move_to_layer(AudioView *view, int delta) {
 }
 
 
+void zoom_y(AudioView *view, float zoom) {
+	view->cam.scale_y = clampf(zoom, 0.7f, 2.0f);
+	view->thm.dirty = true;
+	view->set_message(format(_("vertical zoom %.0f%%"), view->cam.scale_y * 100.0f));
+	view->force_redraw();
+}
+
 
 void AudioView::on_command(const string &id) {
 	if (id == "track-muted") {
@@ -663,6 +668,32 @@ void AudioView::on_command(const string &id) {
 		if (id == "layer-down")
 			move_to_layer(this, 1);
 	}
+
+	float dt = 0.05f;
+	if (id == "cam-move-right")
+		cam.move(ScrollSpeedFast * dt / cam.scale);
+	if (id == "cam-move-left")
+		cam.move(- ScrollSpeedFast * dt / cam.scale);
+	if (id == "cursor-jump-start")
+		set_cursor_pos(song->range_with_time().start());
+	if (id == "cursor-jump-end")
+		set_cursor_pos(song->range_with_time().end());
+
+	// zoom
+	if (id == "zoom-in")
+		cam.zoom(exp(  ZoomSpeed), mx);
+	if (id == "zoom-out")
+		cam.zoom(exp(- ZoomSpeed), mx);
+
+	// vertical zoom
+	if (id == "vertical-zoom-in")
+		zoom_y(this, cam.scale_y * 1.2f);
+	if (id == "vertical-zoom-out")
+		zoom_y(this, cam.scale_y / 1.2f);
+	if (id == "vertical-zoom-default")
+		zoom_y(this, 1.0f);
+
+	mode->on_command(id);
 }
 
 

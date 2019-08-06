@@ -500,18 +500,6 @@ void ViewModeMidi::on_key_down(int k) {
 			jump_string(-1);
 	}
 	
-	
-	// cursor
-	if (k == hui::KEY_LEFT) {
-		Range r = get_backwards_range();
-		view->set_cursor_pos(r.offset);
-		select_in_edit_cursor();
-		return;
-	}
-	if (k == hui::KEY_RIGHT) {
-		edit_add_pause();
-		return;
-	}
 
 	// remove
 	if (k == hui::KEY_BACKSPACE)
@@ -562,18 +550,21 @@ void ViewModeMidi::on_key_down(int k) {
 	ViewModeDefault::on_key_down(k);
 }
 
-float ViewModeMidi::layer_min_height(AudioViewLayer *l) {
-	if (editing(l)) {
-		auto mode = l->midi_mode();
-		if (mode == MidiMode::LINEAR)
-			return 500;
-		else if (mode == MidiMode::CLASSICAL)
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
-		else // TAB
-			return view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+void ViewModeMidi::on_command(const string &id) {
+
+	// cursor
+	if (id == "cursor-move-left") {
+		Range r = get_backwards_range();
+		view->set_cursor_pos(r.offset);
+		select_in_edit_cursor();
+		return;
+	}
+	if (id == "cursor-move-right") {
+		edit_add_pause();
+		return;
 	}
 
-	return ViewModeDefault::layer_min_height(l);
+	ViewModeDefault::on_command(id);
 }
 
 float ViewModeMidi::layer_suggested_height(AudioViewLayer *l) {

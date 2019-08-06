@@ -10,6 +10,7 @@
 #include "../Node/AudioViewTrack.h"
 #include "../Node/AudioViewLayer.h"
 #include "../Node/SceneGraph.h"
+#include "../Node/ScrollBar.h"
 #include "../MouseDelayPlanner.h"
 #include "../../TsunamiWindow.h"
 #include "../../Session.h"
@@ -226,18 +227,28 @@ void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
 	view->toggle_object();
 }
 
+void scroll_y(AudioView *view, float dy) {
+	view->scroll_bar_y->set_offset(view->scroll_bar_y->offset + dy);
+	//if (view->scroll_bar_y->drag_update())
+	view->force_redraw();
+}
 
 
 void ViewModeDefault::on_mouse_wheel() {
 	auto e = hui::GetEvent();
 	if (fabs(e->scroll_y) > 0.1f) {
-		if (win->get_key(hui::KEY_CONTROL))
+		if (win->get_key(hui::KEY_CONTROL)) {
 			cam->zoom(exp(e->scroll_y * view->mouse_wheel_speed * view->ZoomSpeed * 0.3f), view->mx);
-		else
-			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
+		} else if (win->get_key(hui::KEY_SHIFT)) {
+			cam->move(e->scroll_y * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed);
+		} else {
+			scroll_y(view, e->scroll_y * view->mouse_wheel_speed * view->ScrollSpeed);
+		}
 	}
+
+	// horizontal scroll
 	if (fabs(e->scroll_x) > 0.1f)
-		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed * 0.03f);
+		cam->move(e->scroll_x * view->mouse_wheel_speed / cam->scale * view->ScrollSpeed);
 }
 
 void playback_seek_relative(AudioView *view, float dt) {
@@ -257,53 +268,26 @@ void expand_sel_range(AudioView *view, ViewModeDefault *m, bool forward) {
 }
 
 void ViewModeDefault::on_key_down(int k) {
+}
 
-// view
-	// moving
-	float dt = 0.05f;
-/*	if (k == hui::KEY_RIGHT)
-		cam->move(view->ScrollSpeed * dt / cam->scale);
-	if (k == hui::KEY_LEFT)
-		cam->move(- view->ScrollSpeed * dt / cam->scale);*/
-	if (k == hui::KEY_NEXT)
-		cam->move(view->ScrollSpeedFast * dt / cam->scale);
-	if (k == hui::KEY_PRIOR)
-		cam->move(- view->ScrollSpeedFast * dt / cam->scale);
-	if (k == hui::KEY_HOME)
-		view->set_cursor_pos(view->song->range_with_time().start());
-	if (k == hui::KEY_END)
-		view->set_cursor_pos(view->song->range_with_time().end());
-
-	// zoom
-	if (k == hui::KEY_ADD)
-		cam->zoom(exp(  view->ZoomSpeed), view->mx);
-	if (k == hui::KEY_SUBTRACT)
-		cam->zoom(exp(- view->ZoomSpeed), view->mx);
+void ViewModeDefault::on_command(const string &id) {
 
 	// playback
 	if (view->is_playback_active()) {
-		if (k == hui::KEY_RIGHT)
+		if (id == "cursor-move-right")
 			playback_seek_relative(view, 5);
-		if (k == hui::KEY_LEFT)
+		if (id == "cursor-move-left")
 			playback_seek_relative(view, -5);
 	} else {
-		if (k == hui::KEY_RIGHT)
+		if (id == "cursor-move-right")
 			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().end(), true));
-		if (k == hui::KEY_LEFT)
+		if (id == "cursor-move-left")
 			view->set_cursor_pos(suggest_move_cursor(view->cursor_range().offset, false));
-		if (k == hui::KEY_SHIFT + hui::KEY_RIGHT)
+		if (id == "cursor-expand-right")
 			expand_sel_range(view, this, true);
-		if (k == hui::KEY_SHIFT + hui::KEY_LEFT)
+		if (id == "cursor-expand-left")
 			expand_sel_range(view, this, false);
 	}
-
-	view->update_menu();
-}
-
-float ViewModeDefault::layer_min_height(AudioViewLayer *l) {
-	if (l->layer->type == SignalType::MIDI)
-		return view->TIME_SCALE_HEIGHT * 3;
-	return view->TIME_SCALE_HEIGHT * 2;
 }
 
 float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {

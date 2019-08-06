@@ -36,7 +36,7 @@ public:
 	void on_end() override;
 
 	void on_key_down(int k) override;
-	float layer_min_height(AudioViewLayer *l) override;
+	void on_command(const string &id) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
 	void on_cur_layer_change() override;
 

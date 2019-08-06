@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-949
+963
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -2850,8 +2850,50 @@ Tag
 popup-menu-tag/tag-delete
 Löschen
 
+/cursor-jump-end
+Ans Ende springen
+
+/cursor-jump-start
+Zum Anfang springen
+
+/cursor-move-left
+Schritt links
+
+/cursor-move-right
+Schritt rechts
+
+/menu-view-cursor
+Cursor
+
+/menu-view-zoom
+Zoom
+
+popup-menu-fx-list/fx-add
+Hinzufügen...
+
+popup-menu-fx-list/fx-copy-from-track
+Aus Spur kopieren...
+
+popup-menu-fx-list/fx-delete
+Löschen
+
+popup-menu-fx-list/fx-enabled
+Aktiv
+
+popup-menu-sample-manager/sample-paste
+Am Cursor einfügen
+
+popup-menu-tag/tag-add
+Hinzufügen
+
+song_dialog/tag-add
+Hinzufügen
+
+song_dialog/tag-delete
+Löschen
+
 // Num Language Strings
-245
+246
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -3343,3 +3385,5 @@ no marker selected
 kein Marker ausgewählt
 no midi tracks selected
 keine Midispur ausgewählt
+vertical zoom %.0f%%
+vertikaler Zoom %.0f%%

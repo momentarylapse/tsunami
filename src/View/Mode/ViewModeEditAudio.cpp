@@ -52,16 +52,13 @@ void ViewModeEditAudio::on_key_down(int k) {
 		edit_radius = max(edit_radius / 1.1f, 5.0f);
 	view->force_redraw();
 }
-float ViewModeEditAudio::layer_min_height(AudioViewLayer *l) {
-	if (editing(l))
-		return 200;
-	return ViewModeDefault::layer_min_height(l);
-}
+
 float ViewModeEditAudio::layer_suggested_height(AudioViewLayer *l) {
 	if (editing(l))
 		return 200;
 	return ViewModeDefault::layer_suggested_height(l);
 }
+
 void ViewModeEditAudio::on_cur_layer_change() {
 }
 

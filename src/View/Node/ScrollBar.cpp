@@ -30,9 +30,13 @@ void ScrollBar::set_callback(std::function<void()> cb) {
 
 void ScrollBar::drag_update(float mx, float my) {
 	if (horizontal)
-		offset = (mx - area.x1) * content_size / area.width() - mouse_offset;
+		set_offset((mx - area.x1) * content_size / area.width() - mouse_offset);
 	else
-		offset = (my - area.y1) * content_size / area.height() - mouse_offset;
+		set_offset((my - area.y1) * content_size / area.height() - mouse_offset);
+}
+
+void ScrollBar::set_offset(float _offset) {
+	offset = _offset;
 	if (constrained)
 		offset = max(min(offset, content_size - page_size), 0.0f);
 	if (callback)

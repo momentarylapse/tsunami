@@ -1586,7 +1586,7 @@ menu_view
 
 5
 0
-10
+8
 Menu
 menu_view_midi
 
@@ -1641,30 +1641,60 @@ Separator
 5
 0
 0
+Menu
+menu-view-zoom
+
+6
+0
+7
+Item
+vertical-zoom-in
+
+0
+0
+0
+Item
+vertical-zoom-out
+
+1
+0
+0
+Item
+vertical-zoom-default
+
+2
+0
+0
+Separator
+
+
+3
+0
+0
 Item
 zoom-in
 image=hui:zoom-in
-6
+4
 0
 0
 Item
 zoom-out
 image=hui:zoom-out
-7
+5
 0
 0
 Item
 view-optimal
 image=hui:zoom-fit
-8
+6
 0
 0
 Menu
-menu-view-track
+menu-view-cursor
 
-9
+7
 0
-2
+6
 Item
 layer-up
 
@@ -1675,6 +1705,30 @@ Item
 layer-down
 
 1
+0
+0
+Item
+cursor-move-left
+
+2
+0
+0
+Item
+cursor-move-right
+
+3
+0
+0
+Item
+cursor-jump-start
+
+4
+0
+0
+Item
+cursor-jump-end
+
+5
 0
 0
 Menu
@@ -6704,7 +6758,7 @@ image=hui:ok
 // Language
 English
 // Number Of IDs
-539
+547
 // Text
 /bars-add
 Add bars...
@@ -6738,6 +6792,18 @@ Close
 
 /copy
 Copy
+
+/cursor-jump-end
+Jump to end
+
+/cursor-jump-start
+Jump to start
+
+/cursor-move-left
+Step left
+
+/cursor-move-right
+Step right
 
 /db
 dB
@@ -6782,7 +6848,7 @@ Add version
 Delete
 
 /layer-down
-Go down
+Go down one track
 
 /layer-edit-midi
 Edit midi
@@ -6803,7 +6869,7 @@ Layer muted
 Layer solo
 
 /layer-up
-Go up
+Go up one track
 
 /marker-delete
 Delete
@@ -6835,8 +6901,11 @@ Add new track
 /menu-version
 Version
 
-/menu-view-track
-Track
+/menu-view-cursor
+Cursor
+
+/menu-view-zoom
+Zoom
 
 /new
 New...
@@ -7407,6 +7476,15 @@ Import from file...
 
 menu/track_render
 Render from selection
+
+menu/vertical-zoom-default
+Reset vertical zoom
+
+menu/vertical-zoom-in
+Zoom in vertical
+
+menu/vertical-zoom-out
+Zoom out vertical
 
 menu/view-midi-classical
 Classical
@@ -8329,7 +8407,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-948
+962
 // Text
 /add-track-audio-mono
 Audio (mono)
@@ -8387,6 +8465,18 @@ Gehe runter
 
 /current-layer-up
 Gehe rauf
+
+/cursor-jump-end
+Ans Ende springen
+
+/cursor-jump-start
+Zum Anfang springen
+
+/cursor-move-left
+Schritt links
+
+/cursor-move-right
+Schritt rechts
 
 /db
 dB
@@ -8517,8 +8607,14 @@ Neue Spur
 /menu-version
 Version
 
+/menu-view-cursor
+Cursor
+
 /menu-view-track
 Spur
+
+/menu-view-zoom
+Zoom
 
 /ms
 ms
@@ -9768,6 +9864,18 @@ Audiopuffer
 popup-menu-device/header
 Gerät
 
+popup-menu-fx-list/fx-add
+Hinzufügen...
+
+popup-menu-fx-list/fx-copy-from-track
+Aus Spur kopieren...
+
+popup-menu-fx-list/fx-delete
+Löschen
+
+popup-menu-fx-list/fx-enabled
+Aktiv
+
 popup-menu-fx-list/header
 Effekt
 
@@ -9801,6 +9909,9 @@ Löschen
 popup-menu-sample-manager/sample-export
 Exportieren...
 
+popup-menu-sample-manager/sample-paste
+Am Cursor einfügen
+
 popup-menu-sample-manager/sample-preview
 Abspielen
 
@@ -9815,6 +9926,9 @@ Datei
 
 popup-menu-tag/header
 Tag
+
+popup-menu-tag/tag-add
+Hinzufügen
 
 popup-menu-tag/tag-delete
 Löschen
@@ -11025,6 +11139,12 @@ beim Speichern
 song_dialog/song_dialog
 Sound-Datei
 
+song_dialog/tag-add
+Hinzufügen
+
+song_dialog/tag-delete
+Löschen
+
 song_dialog/tags
 Tag\\Wert
 Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
@@ -11176,7 +11296,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-245
+246
 // Text
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -11666,5 +11786,7 @@ unknown file extension:
 unbekannte Dateiendung: 
 unknown synthesizer: 
 unbekannter Synthesizer: 
+vertical zoom %.0f%%
+vertikaler Zoom %.0f%%
 𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)
 𝅘𝅥  ,𝅘𝅥𝅮  ,𝅘𝅥𝅯  ,𝅘𝅥𝅮 ₃    (Q,W,S,T)

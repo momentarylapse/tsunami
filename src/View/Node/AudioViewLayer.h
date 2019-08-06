@@ -80,7 +80,7 @@ public:
 	AudioViewTrack *vtrack();
 	MidiMode midi_mode();
 	rect area_last, area_target;
-	int height_wish, height_min;
+	int height;
 	Map<const TrackMarker*, rect> marker_areas;
 	Map<const TrackMarker*, rect> marker_label_areas;
 

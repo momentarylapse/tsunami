@@ -79,7 +79,7 @@ AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : ViewNodeF
 	edit_pitch_min = 55;
 	edit_pitch_max = edit_pitch_min + PITCH_SHOW_COUNT;
 
-	height_min = height_wish = 0;
+	height = 0;
 
 	represents_imploded = false;
 

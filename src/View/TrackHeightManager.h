@@ -15,8 +15,7 @@ class Song;
 class AudioView;
 class Track;
 
-class TrackHeightManager
-{
+class TrackHeightManager {
 public:
 	TrackHeightManager();
 

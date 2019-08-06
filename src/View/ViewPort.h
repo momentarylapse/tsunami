@@ -31,6 +31,8 @@ public:
 	double scale;
 	Range range();
 
+	float scale_y;
+
 	void update(float dt);
 	bool needs_update();
 

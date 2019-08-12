@@ -92,10 +92,9 @@ static string ascii2utf8(const string &s)
 	return r;
 }
 
-void FormatMidi::load_song(StorageOperationData *od)
-{
+void FormatMidi::load_song(StorageOperationData *od) {
 	File *f = nullptr;
-	try{
+	try {
 		f = FileOpen(od->filename);
 
 		string hn = read_chunk_name(f);
@@ -116,9 +115,9 @@ void FormatMidi::load_song(StorageOperationData *od)
 
 		int ticks_per_beat = 4;
 
-		if ((time_division & 0x8000) > 0){
+		if ((time_division & 0x8000) > 0) {
 
-		}else{
+		} else {
 			ticks_per_beat = time_division;
 		}
 
@@ -131,7 +130,7 @@ void FormatMidi::load_song(StorageOperationData *od)
 
 		od->song->add_track(SignalType::BEATS);
 
-		for (int i=0; i<num_tracks; i++){
+		for (int i=0; i<num_tracks; i++) {
 			string tn = read_chunk_name(f);
 			int tsize = read_int(f);
 			int pos0 = f->get_pos();
@@ -144,36 +143,37 @@ void FormatMidi::load_song(StorageOperationData *od)
 			int last_status = 0;
 
 			int moffset = 0;
-			while(f->get_pos() < pos0 + tsize){
+			while (f->get_pos() < pos0 + tsize) {
 				int v = read_var(f);
 				moffset += v;
 				int length = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
-				BarPattern b = BarPattern(length, numerator, 1);
-//				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
-				int offset = 0;
-				throw "ahhhhhhhhhhh";
-				while (offset > last_bar){
+				int offset = (double)moffset * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+//				int offset = 0;
+				//throw Exception("ahhhhhhhhhhh");
+				while (offset > last_bar) {
+					int bar_length = (double)numerator * (double)mpqn / 1000000.0 * (double)od->song->sample_rate;
+					auto b = BarPattern(bar_length, numerator, max(denominator / 4, 1));
 					od->song->add_bar(-1, b, false);
 					last_bar = od->song->bars.range().end();
 				}
 				int c0 = f->read_byte();
-				if ((c0 & 128) == 0){ // "running status"
+				if ((c0 & 128) == 0) { // "running status"
 					c0 = last_status;
 					f->seek(-1);
 				}
 				//msg_write(format("  %d %p", v, c0));
 				last_status = c0;
-				if (c0 == 0xff){
+				if (c0 == 0xff) {
 					int type = f->read_byte();
 					//msg_write("meta " + i2s(type));
 					int l = read_var(f);
-					if (type == 81){
+					if (type == 81) {
 						int a0 = f->read_byte();
 						int a1 = f->read_byte();
 						int a2 = f->read_byte();
 						mpqn = (a0 << 16) + (a1 << 8) + a2;
 						//msg_write(format("%.1f bpm", 60000000.0f / (float)mpqn));
-					}else if (type == 88){
+					} else if (type == 88) {
 						int a0 = f->read_byte();
 						int a1 = f->read_byte();
 						int a2 = f->read_byte();
@@ -181,57 +181,58 @@ void FormatMidi::load_song(StorageOperationData *od)
 						numerator = a0;
 						denominator = 1<<a1;
 						//msg_write(format("time %d %d %d %d", a0, 1<<a1, a2, a3));
-					}else{
+					} else {
 						string t;
 						t.resize(l);
 						f->read_buffer(t.data, l);
 						if (type == 3)
 							track_name = ascii2utf8(t);
 					}
-				}else if ((c0 & 0xf0) == 0xf0){
+				} else if ((c0 & 0xf0) == 0xf0) {
 					//msg_write("sys ev");
 					int l = read_var(f);
 					f->seek(l);
-				}else{
+				} else {
 					int type = ((c0 >> 4) & 15);
 					int channel = (c0 & 15);
 					//msg_write(format("ev %d  %d", type, channel));
-					if (type == 9){ // on
+					if (type == 9) { // on
 						int c1 = f->read_byte() & 127;
 						int c2 = f->read_byte() & 127;
 						if (!events.contains(channel))
 							events.set(channel, {});
 						events[channel].add(MidiEvent(offset, c1, (float)c2 / 127.0f));
 						//msg_write(format("on %d  %d   %d %d", offset, c1, type, channel));
-					}else if (type == 8){ // off
+					} else if (type == 8) { // off
 						int c1 = f->read_byte() & 127;
 						int c2 = f->read_byte() & 127;
 						if (!events.contains(channel))
 							events.set(channel, {});
 						events[channel].add(MidiEvent(offset, c1, 0));
-					}else if (type == 10){ // note after touch
+					} else if (type == 10) { // note after touch
 						f->read_byte();
 						f->read_byte();
-					}else if (type == 11){ // controller
+					} else if (type == 11) { // controller
 						f->read_byte();
 						f->read_byte();
-					}else if (type == 12){ // program change
+					} else if (type == 12) { // program change
 						f->read_byte();
-					}else if (type == 13){ // channel after touch
+					} else if (type == 13) { // channel after touch
 						f->read_byte();
-					}else if (type == 14){ // pitch bend
+					} else if (type == 14) { // pitch bend
 						f->read_byte();
 						f->read_byte();
-					}else
+					} else {
 						od->warn("unhandled midi event " + i2s(type));
+					}
 				}
 			}
 
 			f->set_pos(pos0 + tsize);
 
-			if ((events.num > 0) or (i > 0)){
+			if ((events.num > 0) or (i > 0)) {
 				Array<int> keys = events.keys();
-				for (int k : keys){
+				for (int k : keys) {
 					Track *t = od->song->add_track(SignalType::MIDI);
 					t->layers[0]->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;
@@ -240,7 +241,7 @@ void FormatMidi::load_song(StorageOperationData *od)
 		}
 
 		FileClose(f);
-	}catch(Exception &e){
+	} catch(Exception &e) {
 		if (f)
 			FileClose(f);
 		od->error(e.message());
@@ -330,11 +331,11 @@ void FormatMidi::save_song(StorageOperationData* od)
 			f->set_pos(pos);
 		}
 		FileClose(f);
-	} catch (const string& s) {
+	} catch(Exception &e) {
 		if (f)
 			FileClose(f);
 
-		od->error(s);
+		od->error(e.message());
 	}
 
 

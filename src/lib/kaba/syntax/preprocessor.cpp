@@ -143,7 +143,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 					*c = *c->param[0];
 				}
 			}
-		}else*/ if (o->f->address){
+		}else*/ if (o->f->address_preprocess){
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
@@ -155,7 +155,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 				else if (c->params[i]->kind != KIND_CONSTANT)
 					all_const = false;
 			if (all_const){
-				op_func *f = (op_func*)o->f->address;
+				op_func *f = (op_func*)o->f->address_preprocess;
 				if (is_address){
 					// pre process address
 					/*void *d1 = (void*)&c->Param[0]->LinkNr;
@@ -188,7 +188,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 			return c;
 		if (f->return_type->get_default_constructor()) // TODO
 			return c;
-		void *ff = (void*)c->as_func_p();
+		void *ff = f->address_preprocess;
 		if (!ff)
 			return c;
 		bool all_const = true;

@@ -57,6 +57,7 @@ public:
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();
 	void link_functions();
+	void link_virtual_functions_into_vtable(const Class *c);
 
 	// error messages
 	void do_error(const string &msg, int override_line = -1);

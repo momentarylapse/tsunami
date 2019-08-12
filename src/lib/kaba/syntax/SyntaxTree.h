@@ -76,17 +76,17 @@ public:
 	// syntax parsing
 	void parse();
 	void parse_top_level();
-	void parse_all_class_names();
+	void parse_all_class_names(Class *ns, int indent0);
 	void parse_all_function_bodies();
 	void parse_import();
-	void parse_enum();
-	void parse_class();
+	void parse_enum(Class *_namespace);
+	void parse_class(Class *_namespace);
 	Function *parse_function_header(const Class *class_type, bool as_extern);
 	void SkipParsingFunctionBody();
 	void parse_function_body(Function *f);
-	void parse_class_function_header(Class *t, bool as_extern, bool as_virtual, bool override);
+	void parse_class_function_header(Class *t, bool as_extern, bool as_static, bool as_virtual, bool override);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
-	const Class *parse_type();
+	const Class *parse_type(const Class *ns);
 	void ParseVariableDef(bool single, Block *block);
 	void parse_global_const(const string &name, const Class *type);
 	int which_primitive_operator(const string &name);
@@ -111,28 +111,33 @@ public:
 	// syntax analysis
 	const Class *get_constant_type(const string &str);
 	void get_constant_value(const string &str, Value &value);
-	const Class *find_type_by_name(const string &name);
+	const Class *find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion);
 	const Class *AddClass(const Class *type);
-	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *sub);
+	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *sub, Class *ns);
 	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *sub);
 	const Class *make_class_super_array(const Class *element_type);
 	const Class *make_class_array(const Class *element_type, int num_elements);
 	const Class *make_class_dict(const Class *element_type);
 	const Class *make_class_func(Function *f);
-	Array<Node*> get_existence(const string &name, Block *block);
-	Array<Node*> get_existence_shared(const string &name);
+	Array<Node*> get_existence(const string &name, Block *block, const Class *ns, bool prefer_class);
+	Array<Node*> get_existence_global(const string &name, const Class *ns, bool prefer_class);
 	void link_most_important_operator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);
 	Node *link_operator(int op_no, Node *param1, Node *param2);
 	Node *parse_operand_extension(Array<Node*> operands, Block *block);
-	Array<Node*> parse_operand_extension_element(Node *operand, Block *block);
+	Array<Node*> parse_operand_extension_element(Node *operand);
 	Node *parse_operand_extension_array(Node *operand, Block *block);
-	Node *parse_operand_extension_call(Array<Node*> operands, Block *block);
-	Node *parse_command(Block *block);
+	Node *parse_operand_extension_call(Array<Node*> operands, Block *block, bool check = true);
+	Array<Node*> make_class_node_callable(const Class *t, Block *block);
+	void make_func_node_callable(Node *l, bool check);
+	const Class *parse_type_extension_array(const Class *c);
+	const Class *parse_type_extension_dict(const Class *c);
+	const Class *parse_type_extension_pointer(const Class *c);
+	Node *parse_command(Block *block, Node *first_operand = nullptr);
 	Node *parse_single_func_param(Block *block);
 	void parse_complete_command(Block *block);
-	void parse_local_definition(Block *block);
+	void parse_local_definition(Block *block, const Class *type);
 	Node *parse_block(Block *parent, Block *block = nullptr);
-	Node *parse_operand(Block *block);
+	Node *parse_operand(Block *block, bool prefer_class = false);
 	Node *link_unary_operator(int op_no, Node *operand, Block *block);
 	Node *parse_primitive_operator(Block *block);
 	Array<Node*> parse_call_parameters(Block *block);
@@ -172,7 +177,7 @@ public:
 	static Node* transform_node(Node *n, std::function<Node*(Node*)> F);
 
 	// data creation
-	Constant *add_constant(const Class *type);
+	Constant *add_constant(const Class *type, Class *_namespace = nullptr);
 	Function *add_function(const string &name, const Class *type);
 
 	// nodes
@@ -209,16 +214,16 @@ public:
 	bool flag_immortal;
 	bool flag_string_const_as_cstring;
 
-	Array<const Class*> classes;
+	Class *base_class;
+	//Array<const Class*> classes;
 	Array<Script*> includes;
 	Array<Define> defines;
 	Asm::MetaInfo *asm_meta_info;
 	Array<AsmBlock> asm_blocks;
-	Array<Constant*> constants;
 	Array<Operator*> operators;
 	Array<Function*> functions;
 
-	Function root_of_all_evil;
+	Function *root_of_all_evil;
 
 	Script *script;
 	Function *cur_func;

@@ -17,8 +17,7 @@ class Block;
 class SyntaxTree;
 
 
-class Variable
-{
+class Variable {
 public:
 	Variable(const string &name, const Class *type);
 	~Variable();
@@ -33,13 +32,12 @@ public:
 };
 
 // user defined functions
-class Function
-{
+class Function {
 public:
 	SyntaxTree *owner;
 
 	string name;
-	string long_name; // "Class.Function"
+	string long_name() const; // "Class.Function"
 	// parameters (linked to intern variables)
 	int num_params;
 	// block of code
@@ -51,7 +49,7 @@ public:
 	const Class *return_type;
 	const Class *literal_return_type;
 	bool is_extern, auto_declared;
-	bool is_pure;
+	bool is_pure, is_static;
 	bool throws_exceptions; // for external
 	int inline_no;
 	int num_slightly_hidden_vars;
@@ -60,8 +58,9 @@ public:
 	int _logical_line_no;
 	int _exp_no;
 	void *address;
+	void *address_preprocess;
 	int _label;
-	Function(const string &name, const Class *return_type, SyntaxTree *owner);
+	Function(const string &name, const Class *return_type, const Class *name_space);
 	~Function();
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();

@@ -222,7 +222,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 			}else{
 				stack_param.add(p);
 			}
-		}else if (p->type == TypeFloat32){
+		}else if ((p->type == TypeFloat32) or (p->type == TypeFloat64)){
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
 			}else{
@@ -235,7 +235,12 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	// xmm0-7
 	foreachib(Variable *p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
-		add_cmd(Asm::INST_MOVSS, param_local(p->type, p->_offset), param_preg(p->type, reg));
+		if (p->type == TypeFloat64)
+			add_cmd(Asm::INST_MOVSD, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+		else
+			add_cmd(Asm::INST_MOVSS, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+
+
 	}
 
 	// rdi, rsi,rdx, rcx, r8, r9

@@ -192,6 +192,19 @@ void relink_return(void *rip, void *rbp, void *rsp)
 	exit(0);
 }
 
+const Class* _get_type(void *p, void *vtable, const Class *ns) {
+	for (auto *c: ns->classes) {
+		if (c->_vtable_location_compiler_)
+			if ((c->_vtable_location_target_ == vtable) or (c->_vtable_location_external_ == vtable))
+				return c;
+		auto *r = _get_type(p, vtable, c);
+		if (r)
+			return r;
+
+	}
+	return nullptr;
+}
+
 const Class* get_type(void *p)
 {
 	if (!p)
@@ -200,11 +213,11 @@ const Class* get_type(void *p)
 	auto scripts = _public_scripts_;
 	for (auto p: Packages)
 		scripts.add(p);
-	for (Script* s: scripts)
-		for (auto *c: s->syntax->classes)
-			if (c->_vtable_location_compiler_)
-				if ((c->_vtable_location_target_ == vtable) or (c->_vtable_location_external_ == vtable))
-					return c;
+	for (Script* s: scripts) {
+		auto *r = _get_type(p, vtable, s->syntax->base_class);
+		if (r)
+			return r;
+	}
 	return TypeUnknown;
 }
 
@@ -233,7 +246,7 @@ Array<StackFrameInfo> get_stack_trace(void **rbp)
 			r.rbp = rbp;
 			trace.add(r);
 			if (_verbose_exception_)
-				msg_write(">>  " + r.s->filename + " : " + r.f->long_name + format("()  +%d", r.offset));
+				msg_write(">>  " + r.s->filename + " : " + r.f->long_name() + format("()  +%d", r.offset));
 
 		}else{
 			//if (_verbose_exception_)
@@ -282,7 +295,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 	for (auto r: trace){
 
 		if (_verbose_exception_)
-			msg_write(">>  " + r.s->filename + " : " + r.f->long_name + format("()  +%d", r.offset));
+			msg_write(">>  " + r.s->filename + " : " + r.f->long_name() + format("()  +%d", r.offset));
 		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
 
 		for (Block *b: ebd.needs_killing){
@@ -327,7 +340,7 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception)
 	else
 		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
 	for (auto r: trace)
-		msg_write(">>  " + r.s->filename + " : " + r.f->long_name + format("()  + 0x%x", r.offset));
+		msg_write(">>  " + r.s->filename + " : " + r.f->long_name() + format("()  + 0x%x", r.offset));
 #endif
 	exit(1);
 }

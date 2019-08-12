@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.2.2";
+string LibVersion = "0.17.3.1";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -187,12 +187,17 @@ void add_package(const string &name, bool used_by_default)
 	cur_package = s;
 }
 
+void __add_class__(Class *t) {
+	cur_package->syntax->base_class->classes.add(t);
+	t->name_space = cur_package->syntax->base_class;
+}
+
 const Class *add_type(const string &name, int size, ScriptFlag flag)
 {
 	Class *t = new Class(name, size, cur_package->syntax);
 	if ((flag & FLAG_CALL_BY_VALUE) > 0)
 		t->force_call_by_value = true;
-	cur_package->syntax->classes.add(t);
+	__add_class__(t);
 	return t;
 }
 const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag)
@@ -202,7 +207,7 @@ const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag fl
 	if ((flag & FLAG_SILENT) > 0)
 		t->type = Class::Type::POINTER_SILENT;
 	t->parent = sub_type;
-	cur_package->syntax->classes.add(t);
+	__add_class__(t);
 	return t;
 }
 const Class *add_type_a(const string &name, const Class *sub_type, int array_length)
@@ -219,7 +224,7 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 		t->type = Class::Type::ARRAY;
 		t->array_length = array_length;
 	}
-	cur_package->syntax->classes.add(t);
+	__add_class__(t);
 	return t;
 }
 
@@ -228,7 +233,7 @@ const Class *add_type_d(const string &name, const Class *sub_type)
 	Class *t = new Class(name, config.super_array_size, cur_package->syntax, sub_type);
 	t->type = Class::Type::DICT;
 	script_make_dict(t);
-	cur_package->syntax->classes.add(t);
+	__add_class__(t);
 	return t;
 }
 
@@ -342,12 +347,11 @@ ClassFunction *_class_add_func(const Class *ccc, const ClassFunction &f, ScriptF
 	return &c->functions.back();
 }
 
-void _class_add_func_virtual(const string &tname, const string &name, const Class *return_type, int index, ScriptFlag flag)
+void _class_add_func_virtual(const string &name, const Class *return_type, int index, ScriptFlag flag)
 {
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
 	add_func(name, return_type, nullptr, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
-	cur_func->long_name = tname + "." + name + "[virtual]";
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(return_type, cur_func), flag);
 	cur_class_func->virtual_index = index;
@@ -359,14 +363,7 @@ void _class_add_func_virtual(const string &tname, const string &name, const Clas
 
 void class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag)
 {
-	string tname = cur_class->name;
-	if (tname[0] == '-'){
-		for (const Class *t: cur_package->syntax->classes)
-			if (t->is_pointer() and (t->parent == cur_class))
-				tname = t->name;
-	}
 	add_func(name, return_type, func, ScriptFlag(flag | FLAG_CLASS));
-	cur_func->long_name = tname + "." + name;
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(return_type, cur_func), flag);
 }
@@ -420,12 +417,12 @@ void class_add_func_virtual(const string &name, const Class *return_type, void *
 {
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
-		for (auto *t: cur_package->syntax->classes)
+		for (auto *t: cur_package->syntax->base_class->classes)
 			if ((t->is_pointer()) and (t->parent == cur_class))
 				tname = t->name;
 	}
 	int index = get_virtual_index(func, tname, name);
-	_class_add_func_virtual(tname, name, return_type, index, flag);
+	_class_add_func_virtual(name, return_type, index, flag);
 }
 
 void class_link_vtable(void *p)
@@ -440,7 +437,7 @@ void class_link_vtable(void *p)
 
 void add_const(const string &name, const Class *type, void *value)
 {
-	Constant *c = new Constant(type, cur_package->syntax);
+	Constant *c = cur_package->syntax->add_constant(type);
 	c->name = name;
 	c->address = c->p();
 
@@ -449,7 +446,6 @@ void add_const(const string &name, const Class *type, void *value)
 		*(void**)c->p() = value;
 	else
 		memcpy(c->p(), value, type->size);
-	cur_package->syntax->constants.add(c);
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -459,7 +455,7 @@ void add_const(const string &name, const Class *type, void *value)
 
 void add_ext_var(const string &name, const Class *type, void *var)
 {
-	auto *v = cur_package->syntax->root_of_all_evil.block->add_var(name, type);
+	auto *v = cur_package->syntax->root_of_all_evil->block->add_var(name, type);
 	if (config.allow_std_lib)
 		v->memory = var;
 };
@@ -602,12 +598,13 @@ string _cdecl kaba_shell_execute(const string &cmd)
 
 Array<Statement> Statements;
 
-int add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag)
-{
-	Function *f = new Function(name, return_type, cur_package->syntax);
+int add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
+	Function *f = new Function(name, return_type, cur_package->syntax->base_class);
 	f->is_pure = ((flag & FLAG_PURE) > 0);
 	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
+	f->is_static = ((flag & FLAG_CLASS) == 0);
 	cur_package->syntax->functions.add(f);
+	f->address_preprocess = func;
 	if (config.allow_std_lib)
 		f->address = func;
 	cur_func = f;
@@ -615,8 +612,7 @@ int add_func(const string &name, const Class *return_type, void *func, ScriptFla
 	return cur_package->syntax->functions.num - 1;
 }
 
-int add_statement(const string &name, int index, int num_params = 0)
-{
+int add_statement(const string &name, int index, int num_params = 0) {
 	Statement s;
 	s.name = name;
 	s.num_params = num_params;
@@ -909,7 +905,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	c.penalty = penalty;
 	c.f = nullptr;
 	for (auto *f: cur_package->syntax->functions)
-		if (f->long_name == cmd){
+		if (f->long_name() == cmd){
 			c.f = f;
 			break;
 		}
@@ -1095,7 +1091,7 @@ void SIAddPackageBase()
 		func_add_param("f", TypeFloat32);
 	add_funcx("f642f", TypeFloat32, &_Float642Float, FLAG_PURE);
 		func_set_inline(INLINE_FLOAT64_TO_FLOAT);
-		func_add_param("f", TypeFloat32);
+		func_add_param("f", TypeFloat64);
 	add_funcx("i2i64", TypeInt64, &_Int2Int64, FLAG_PURE);
 		func_set_inline(INLINE_INT_TO_INT64);
 		func_add_param("i", TypeInt);
@@ -1298,14 +1294,18 @@ void SIAddPackageKaba()
 		class_add_elementx("name", TypeString, &Class::name);
 		class_add_elementx("size", TypeInt, &Class::size);
 		class_add_elementx("parent", TypeClassP, &Class::parent);
+		class_add_elementx("namespace", TypeClassP, &Class::name_space);
 		class_add_elementx("elements", TypeClassElementList, &Class::elements);
 		class_add_elementx("functions", TypeClassFunctionList, &Class::functions);
+		class_add_elementx("classes", TypeClassPList, &Class::classes);
+		class_add_elementx("constants", TypeConstantPList, &Class::constants);
 		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);
 			func_add_param("c", TypeClassP);
+		class_add_funcx("long_name", TypeString, &Class::long_name);
 
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
-		class_add_elementx("long_name", TypeString, &Function::long_name);
+		class_add_funcx("long_name", TypeString, &Function::long_name);
 		class_add_elementx("class", TypeClassP, &Function::_class);
 		class_add_elementx("num_params", TypeInt, &Function::num_params);
 		class_add_elementx("var", TypeVariablePList, &Function::var);
@@ -1763,18 +1763,17 @@ void LinkExternal(const string &name, void *pointer)
 	l.name = name;
 	l.pointer = pointer;
 	ExternalLinks.add(l);
-	if (name.head(5) == "lib__"){
-		Array<string> names = name.explode(":");
-		string sname = names[0].substr(5, -1).replace("@list", "[]").replace("@@", ".");
-		for (auto *p: Packages)
-			foreachi(Function *f, p->syntax->functions, i)
-				if (f->name == sname){
-					if (names.num > 0)
-						if (f->num_params != names[1]._int())
-							continue;
-					f->address = pointer;
-				}
-	}
+
+	Array<string> names = name.explode(":");
+	string sname = names[0].replace("@list", "[]").replace("@@", ".");
+	for (auto *p: Packages)
+		foreachi(Function *f, p->syntax->functions, i)
+			if (f->long_name() == sname){
+				if (names.num > 0)
+					if (f->num_params != names[1]._int())
+						continue;
+				f->address = pointer;
+			}
 }
 
 void *GetExternalLink(const string &name)
@@ -1861,7 +1860,7 @@ bool CompilerConfiguration::allow_output_func(const Function *f)
 		return true;
 	Array<string> filters = verbose_func_filter.explode(",");
 	for (auto &fil: filters)
-		if (f->long_name.match(fil))
+		if (f->long_name().match(fil))
 			return true;
 	return false;
 }

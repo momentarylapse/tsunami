@@ -82,14 +82,14 @@ bool _type_match(const Class *given, bool same_chunk, const Class *wanted)
 	return type_match(given, wanted);
 }
 
-Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent)
-{
+Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_parent) {
 	name = _name;
 	owner = _owner;
 	size = _size;
 	type = Type::OTHER;
 	array_length = 0;
 	parent = _parent;
+	name_space = nullptr;
 	force_call_by_value = false;
 	fully_parsed = true;
 	_vtable_location_target_ = nullptr;
@@ -97,8 +97,18 @@ Class::Class(const string &_name, int _size, SyntaxTree *_owner, const Class *_p
 	_vtable_location_external_ = nullptr;
 };
 
-Class::~Class()
-{
+Class::~Class() {
+	for (auto *c: constants)
+		delete c;
+	for (auto *c: classes)
+		delete c;
+}
+
+string Class::long_name() const {
+	if (name_space)
+		if (name_space != name_space->owner->base_class)
+			return name_space->long_name() + "." + name;
+	return name;
 }
 
 bool Class::is_array() const
@@ -184,7 +194,7 @@ bool Class::needs_constructor() const
 	if (is_super_array() or is_dict())
 		return true;
 	if (is_array())
-		return parent->get_default_constructor();
+		return parent->needs_constructor();
 	if (vtable.num > 0)
 		return true;
 	if (parent)
@@ -396,21 +406,18 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 }
 
 
-const Class *Class::get_pointer() const
-{
+const Class *Class::get_pointer() const {
 	return owner->make_class(name + "*", Class::Type::POINTER, config.pointer_size, 0, this);
 }
 
-const Class *Class::get_root() const
-{
+const Class *Class::get_root() const {
 	const Class *r = this;
 	while (r->parent)
 		r = r->parent;
 	return r;
 }
 
-void class_func_out(Class *c, ClassFunction *f)
-{
+void class_func_out(Class *c, ClassFunction *f) {
 	msg_write(f->signature(true));
 }
 
@@ -494,6 +501,8 @@ string Class::var2str(const void *p) const
 		return i2s(*(int*)p);
 	}else if (this == TypeFloat32){
 		return f2s(*(float*)p, 3);
+	}else if (this == TypeFloat64){
+		return f2s((float)*(double*)p, 3);
 	}else if (this == TypeBool){
 		return b2s(*(bool*)p);
 	}else if (this == TypeClass){
@@ -521,6 +530,8 @@ string Class::var2str(const void *p) const
 	}else if (elements.num > 0){
 		string s;
 		for (auto &e: elements){
+			if (e.hidden)
+				continue;
 			if (s.num > 0)
 				s += ", ";
 			s += e.type->var2str(((char*)p) + e.offset);

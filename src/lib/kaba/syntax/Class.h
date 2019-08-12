@@ -9,6 +9,8 @@ class Script;
 class SyntaxTree;
 class Class;
 class Function;
+class Constant;
+class Variable;
 
 
 class ClassElement
@@ -46,6 +48,7 @@ public:
 	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr);
 	~Class();
 	string name;
+	string long_name() const;
 	long long size; // complete size of type
 	int array_length;
 
@@ -67,7 +70,12 @@ public:
 	bool fully_parsed;
 	Array<ClassElement> elements;
 	Array<ClassFunction> functions;
+	Array<Function*> static_functions;
+	Array<Variable*> static_variables;
+	Array<Constant*> constants;
+	Array<const Class*> classes;
 	const Class *parent;
+	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...
 	Array<void*> vtable;
 	void *_vtable_location_compiler_; // may point to const/opcode

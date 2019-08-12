@@ -13,8 +13,7 @@ namespace Kaba{
 
 extern bool next_extern;
 
-string kind2str(int kind)
-{
+string kind2str(int kind) {
 	if (kind == KIND_VAR_LOCAL)
 		return "local";
 	if (kind == KIND_VAR_GLOBAL)
@@ -93,17 +92,16 @@ string kind2str(int kind)
 }
 
 
-string Node::sig() const
-{
+string Node::sig() const {
 	string t = type->name + " ";
 	if (kind == KIND_VAR_LOCAL)
 		return t + as_local()->name;
 	if (kind == KIND_VAR_GLOBAL)
 		return t + as_global()->name;
 	if (kind == KIND_FUNCTION_POINTER)
-		return t + as_func()->long_name;
+		return t + as_func()->long_name();
 	if (kind == KIND_FUNCTION_NAME)
-		return t + as_func()->long_name;
+		return t + as_func()->long_name();
 	if (kind == KIND_CONSTANT)
 		return t + as_const()->str();
 	if (kind == KIND_FUNCTION_CALL)
@@ -149,14 +147,12 @@ string Node::sig() const
 	return t + i2s(link_no);
 }
 
-string Node::str() const
-{
+string Node::str() const {
 	return "<" + kind2str(kind) + ">  " + sig();
 }
 
 
-void Node::show() const
-{
+void Node::show() const {
 	string orig;
 	msg_write(str() + orig);
 	msg_right();
@@ -185,30 +181,24 @@ Block::Block(Function *f, Block *_parent) :
 	_label_start = _label_end = -1;
 }
 
-Block::~Block()
-{
+Block::~Block() {
 }
 
 
-inline void set_command(Node *&a, Node *b)
-{
+inline void set_command(Node *&a, Node *b) {
 	a = b;
 }
 
-void Block::add(Node *c)
-{
-	if (c){
+void Block::add(Node *c) {
+	if (c)
 		params.add(c);
-	}
 }
 
-void Block::set(int index, Node *c)
-{
+void Block::set(int index, Node *c) {
 	params[index] = c;
 }
 
-Variable *Block::add_var(const string &name, const Class *type)
-{
+Variable *Block::add_var(const string &name, const Class *type) {
 	if (get_var(name))
 		function->owner->do_error(format("variable '%s' already declared in this context", name.c_str()));
 	Variable *v = new Variable(name, type);
@@ -218,8 +208,7 @@ Variable *Block::add_var(const string &name, const Class *type)
 	return v;
 }
 
-Variable *Block::get_var(const string &name)
-{
+Variable *Block::get_var(const string &name) {
 	for (auto *v: vars)
 		if (v->name == name)
 			return v;
@@ -228,17 +217,26 @@ Variable *Block::get_var(const string &name)
 	return nullptr;
 }
 
+const Class *Block::name_space() const {
+	if (function->_class)
+		return function->_class;
+	return function->owner->base_class;
+}
 
-Node::Node(int _kind, int64 _link_no, const Class *_type)
-{
+
+Node::Node(int _kind, int64 _link_no, const Class *_type) {
 	type = _type;
 	kind = _kind;
 	link_no = _link_no;
 	instance = nullptr;
 }
 
-Node::~Node()
-{
+Node::Node(const Class *c) : Node(KIND_CLASS, (int_p)c, TypeClass) {}
+Node::Node(const Block *b) : Node(KIND_BLOCK, (int_p)b, TypeVoid) {}
+Node::Node(const Function *f) : Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunction) {}
+Node::Node(const Constant *c) : Node(KIND_CONSTANT, (int_p)c, c->type) {}
+
+Node::~Node() {
 	if (instance)
 		delete instance;
 	for (auto &p: params)
@@ -246,78 +244,63 @@ Node::~Node()
 			delete p;
 }
 
-Block *Node::as_block() const
-{
+Block *Node::as_block() const {
 	return (Block*)this;
 }
 
-Function *Node::as_func() const
-{
+Function *Node::as_func() const {
 	return (Function*)link_no;
 }
 
-const Class *Node::as_class() const
-{
+const Class *Node::as_class() const {
 	return (const Class*)link_no;
 }
 
-Constant *Node::as_const() const
-{
+Constant *Node::as_const() const {
 	return (Constant*)link_no;
 }
 
-Operator *Node::as_op() const
-{
+Operator *Node::as_op() const {
 	return (Operator*)link_no;
 }
-void *Node::as_func_p() const
-{
+void *Node::as_func_p() const {
 	return as_func()->address;
 }
 
 // will be the address at runtime...(not the current location...)
-void *Node::as_const_p() const
-{
+void *Node::as_const_p() const {
 	return as_const()->address;
 }
 
-void *Node::as_global_p() const
-{
+void *Node::as_global_p() const {
 	return as_global()->memory;
 }
 
-Variable *Node::as_global() const
-{
+Variable *Node::as_global() const {
 	return (Variable*)link_no;
 }
 
-Variable *Node::as_local() const
-{
+Variable *Node::as_local() const {
 	return (Variable*)link_no;
 }
 
-Statement *Node::as_statement() const
-{
+Statement *Node::as_statement() const {
 	return &Statements[link_no];
 }
 
-PrimitiveOperator *Node::as_prim_op() const
-{
+PrimitiveOperator *Node::as_prim_op() const {
 	return &PrimitiveOperators[link_no];
 }
 
-void Node::set_instance(Node *p)
-{
+void Node::set_instance(Node *p) {
 	set_command(instance, p);
 }
 
-void Node::set_num_params(int n)
-{
+void Node::set_num_params(int n) {
 	params.resize(n);
 }
 
-void Node::set_param(int index, Node *p)
-{
+void Node::set_param(int index, Node *p) {
 	/*if ((index < 0) or (index >= params.num)){
 		show();
 		throw Exception(format("internal: Node.set_param...  %d %d", index, params.num), "", 0);

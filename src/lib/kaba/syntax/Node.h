@@ -87,6 +87,10 @@ public:
 	// return value
 	const Class *type;
 	Node(int kind, int64 link_no, const Class *type);
+	Node(const Class *c);
+	Node(const Block *b);
+	Node(const Function *f);
+	Node(const Constant *c);
 	virtual ~Node();
 	Block *as_block() const;
 	Function *as_func() const;
@@ -128,6 +132,8 @@ public:
 	int level;
 	void add(Node *c);
 	void set(int index, Node *c);
+	
+	const Class *name_space() const;
 
 	Variable *get_var(const string &name);
 	Variable *add_var(const string &name, const Class *type);

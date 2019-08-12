@@ -382,7 +382,7 @@ void SIAddPackageHui()
 		class_add_func_virtual("on_mouse_wheel", TypeVoid, mf(&hui::Window::on_mouse_wheel));
 		class_add_func_virtual("on_left_button_down", TypeVoid, mf(&hui::Window::on_left_button_down));
 		class_add_func_virtual("on_middle_button_down", TypeVoid, mf(&hui::Window::on_middle_button_down));
-		class_add_func_virtual("on_right_button_ own", TypeVoid, mf(&hui::Window::on_right_button_down));
+		class_add_func_virtual("on_right_button_down", TypeVoid, mf(&hui::Window::on_right_button_down));
 		class_add_func_virtual("on_left_button_up", TypeVoid, mf(&hui::Window::on_left_button_up));
 		class_add_func_virtual("on_middle_button_up", TypeVoid, mf(&hui::Window::on_middle_button_up));
 		class_add_func_virtual("on_right_button_up", TypeVoid, mf(&hui::Window::on_right_button_up));
@@ -522,8 +522,8 @@ void SIAddPackageHui()
 		func_add_param("func", TypeFunctionCodeP);*/
 	add_func("HuiGetEvent", TypeHuiEventP, (void*)&hui::GetEvent);
 	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
-	add_func("HuiEnd", TypeVoid, (void*)&hui::End);
-	add_func("HuiDoSingleMainLoop", TypeVoid, (void*)&hui::doSingleMainLoop);*/
+	add_func("HuiEnd", TypeVoid, (void*)&hui::End);*/
+	add_func("HuiDoSingleMainLoop", TypeVoid, (void*)&hui::Application::do_single_main_loop);
 	add_func("HuiSleep", TypeVoid, (void*)&hui::Sleep);
 		func_add_param("duration", TypeFloat32);
 	add_func("HuiFileDialogOpen", TypeBool, (void*)&hui::FileDialogOpen);

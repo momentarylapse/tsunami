@@ -357,6 +357,8 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_MINSD,  "minsd",  64+3, 64+1},
 	{INST_MAXSS,  "maxss",  64+3, 64+1},
 	{INST_MAXSD,  "maxsd",  64+3, 64+1},
+	{INST_CVTSS2SD,  "cvtss2sd",  64+3, 64+1},
+	{INST_CVTSD2SS,  "cvtsd2ss",  64+3, 64+1},
 	{INST_CVTTSS2SI, "cvttss2si", 64+3, 64+1},
 	{INST_CVTTSD2SI, "cvttsd2si", 64+3, 64+1},
 	{INST_CVTSI2SS,  "cvtsi2ss",  64+3, 64+1},
@@ -651,6 +653,8 @@ int InstructionWithParamsList::_find_label(const string &name)
 	return -1;
 
 }
+
+// really declare an existing one now
 void InstructionWithParamsList::insert_label(int index)
 {
 	if (index < 0)
@@ -671,16 +675,16 @@ int64 InstructionWithParamsList::_label_value(int index)
 
 }
 
+// declare
 int InstructionWithParamsList::add_label(const string &name)
 {
 	so("add_label: " + name);
 	// label already in use? (used before declared)
 	int l = _find_label(name);
-	if (l >= 0){
-		insert_label(l);
-		return l;
-	}
-	return create_label(name);
+	if (l < 0)
+		l = create_label(name);
+	insert_label(l);
+	return l;
 }
 
 // good
@@ -1867,6 +1871,8 @@ void InitX86()
 	add_inst(INST_MINSD,  0x5d0ff2, 3, -1, Xx, XMq);
 	add_inst(INST_MAXSS,  0x5f0ff3, 3, -1, Xx, XMd);
 	add_inst(INST_MAXSD,  0x5f0ff2, 3, -1, Xx, XMq);
+	add_inst(INST_CVTSS2SD, 0x5a0ff3, 3, -1, Xx, XMd);
+	add_inst(INST_CVTSD2SS, 0x5a0ff2, 3, -1, Xx, XMq);
 	add_inst(INST_CVTTSS2SI, 0x2c0ff3, 3, -1, Rd, XMd);
 	add_inst(INST_CVTTSD2SI, 0x2c0ff2, 3, -1, Rq, XMd);
 	add_inst(INST_CVTSI2SS,  0x2a0ff3, 3, -1, Xx, Ed);

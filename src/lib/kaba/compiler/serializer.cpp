@@ -256,7 +256,7 @@ string guess_constant(int64 c, Serializer *ser)
 	for (auto *s: ser->syntax_tree->includes)
 		for (auto *f: s->syntax->functions)
 			if (c == (int_p)f->address)
-				return "FUNC:" + f->long_name;
+				return "FUNC:" + f->long_name();
 
 	return "C:"+p2s((void*)c);
 }
@@ -479,7 +479,7 @@ void Serializer::move_param(SerialNodeParam &p, int from, int to)
 			}
 		if (!found){
 			msg_error(format("move_param: no RegChannel...  reg_root=%d  from=%d", r, from));
-			msg_write(script->filename + " : " + cur_func->long_name);
+			msg_write(script->filename + " : " + cur_func->long_name());
 		}
 	}
 }
@@ -630,7 +630,7 @@ bool node_is_assign_mem(Node *n)
 	/*if (n->kind == KIND_FUNCTION_CALL){
 		msg_error("test 2");
 		msg_write(n->as_func()->name);
-		msg_write(n->as_func()->long_name);
+		msg_write(n->as_func()->long_name());
 		return n->as_func()->name == "__assign__";
 	}*/
 	return false;
@@ -2077,7 +2077,7 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list)
 void Script::assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list)
 {
 	if (config.verbose and config.allow_output(cur_func, "asm"))
-		msg_write("serializing " + f->long_name + " -------------------");
+		msg_write("serializing " + f->long_name() + " -------------------");
 	f->show("asm");
 
 	cur_func = f;
@@ -2099,17 +2099,17 @@ void Script::assemble_function(int index, Function *f, Asm::InstructionWithParam
 
 void Script::compile_functions(char *oc, int &ocs)
 {
-	Asm::InstructionWithParamsList *list = new Asm::InstructionWithParamsList(0);
+	auto *list = new Asm::InstructionWithParamsList(0);
 
 	// link external functions
 	int func_no = 0;
 	for (Function *f: syntax->functions)
 		if (f->is_extern){
-			f->address = GetExternalLink(f->long_name + ":" + i2s(f->num_params));
+			f->address = GetExternalLink(f->long_name() + ":" + i2s(f->num_params));
 			if (!f->address)
-				f->address = GetExternalLink(f->long_name);
+				f->address = GetExternalLink(f->long_name());
 			if (!f->address)
-				do_error_link("external function " + f->long_name + " not linkable");
+				do_error_link("external function " + f->long_name() + " not linkable");
 		}else{
 			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
 		}

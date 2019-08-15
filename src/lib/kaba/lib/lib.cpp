@@ -1306,6 +1306,7 @@ void SIAddPackageKaba() {
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
 		class_add_funcx("long_name", TypeString, &Function::long_name);
+		class_add_funcx("signature", TypeString, &Function::signature);
 		class_add_elementx("namespace", TypeClassP, &Function::name_space);
 		class_add_elementx("num_params", TypeInt, &Function::num_params);
 		class_add_elementx("var", TypeVariablePList, &Function::var);
@@ -1313,6 +1314,8 @@ void SIAddPackageKaba() {
 		class_add_elementx("return_type", TypeClassP, &Function::literal_return_type);
 		class_add_elementx("is_static", TypeBool, &Function::is_static);
 		class_add_elementx("is_pure", TypeBool, &Function::is_pure);
+		class_add_elementx("is_extern", TypeBool, &Function::is_extern);
+		class_add_elementx("needs_overriding", TypeBool, &Function::needs_overriding);
 		class_add_elementx("virtual_index", TypeInt, &Function::virtual_index);
 		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
 		class_add_elementx("code", TypeFunctionCodeP, &Function::address);

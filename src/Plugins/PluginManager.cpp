@@ -88,9 +88,6 @@ Module *_CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
 }
 
-void _hoverify_(color &ret, ColorScheme *cs, const color &c){
-	ret = cs->hoverify(c);
-}
 
 void PluginManager::link_app_script_data() {
 	Kaba::config.directory = "";
@@ -581,7 +578,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::DeclareClassOffset("ColorScheme", "blob_bg", _offsetof(ColorScheme, blob_bg));
 	Kaba::DeclareClassOffset("ColorScheme", "blob_bg_selected", _offsetof(ColorScheme, blob_bg_selected));
 	Kaba::DeclareClassOffset("ColorScheme", "blob_bg_hidden", _offsetof(ColorScheme, blob_bg_hidden));
-	Kaba::LinkExternal("ColorScheme.hoverify", (void*)&_hoverify_);
+	Kaba::LinkExternal("ColorScheme.hoverify", Kaba::mf(&ColorScheme::hoverify));
 
 	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
 	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));

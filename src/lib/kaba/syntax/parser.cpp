@@ -311,13 +311,12 @@ Array<Node*> SyntaxTree::make_class_node_callable(const Class *t, Block *block) 
 	}
 	
 	// constructor
-	auto *vv = block->add_var(block->function->create_slightly_hidden_name(), t);
-	vv->dont_add_constructor = true;
-	Node *dummy = add_node_local_var(vv);
+	//auto *vv = block->add_var(block->function->create_slightly_hidden_name(), t);
+	//vv->explicitly_constructed = true;
+	//Node *dummy = add_node_local_var(vv);
 	Array<Node*> links;
 	for (auto *cf: t->get_constructors()) {
-		Node *n = add_node_member_call(cf, ref_node(dummy));
-		//links.add(exlink_make_func_class(this, block->function, *cf));
+		Node *n = add_node_member_call(cf, nullptr /*ref_node(dummy)*/); // temp var added later...
 		n->kind = KIND_CONSTRUCTOR_AS_FUNCTION;
 		n->type = t;
 		links.add(n);

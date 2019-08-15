@@ -77,7 +77,7 @@ void SyntaxTree::auto_implement_constructor(Function *f, const Class *t, bool al
 				// then, try default constructor
 				f->block->add(add_node_member_call(pc_def, cp_node(n_self)));
 			} else if (t->parent->needs_constructor()) {
-				do_error_implicit(f, "can't find a constructor in the parent class with matching signature or a default constructor");
+				do_error_implicit(f, "parent class does not have a default constructor or one with matching signature. Use super.__init__(...)");
 			}
 		}
 

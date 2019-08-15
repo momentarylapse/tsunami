@@ -247,7 +247,9 @@ void SyntaxTree::do_error(const string &str, int override_exp_no, int override_l
 }
 
 void SyntaxTree::do_error_implicit(Function *f, const string &str) {
-	do_error("[auto generating " + f->signature() + "] : " + str, f->name_space->_exp_no, f->name_space->_logical_line_no);
+	int line = max(f->_logical_line_no, f->name_space->_logical_line_no);
+	int ex = max(f->_exp_no, f->name_space->_exp_no);
+	do_error("[auto generating " + f->signature() + "] : " + str, ex, line);
 }
 
 void SyntaxTree::create_asm_meta_info() {
@@ -816,16 +818,24 @@ Node *conv_constr_func(SyntaxTree *ps, Node *n) {
 			msg_error("constr func....");
 			n->show();
 		}
+		auto *f = ps->cur_func;
+		
+		// temp var
+		auto *vv = f->block->add_var(f->create_slightly_hidden_name(), n->type);
+		vv->explicitly_constructed = true;
+		Node *dummy = ps->add_node_local_var(vv);
+		
 		auto *ib = ps->cp_node(n);
 		ib->kind = KIND_FUNCTION_CALL;
 		ib->type = TypeVoid;
+		ib->set_instance(ps->ref_node(dummy));
 		if (config.verbose)
 			ib->show();
 
 		_transform_insert_before_.add(ib);
 
 		// n->instance should be a reference to local... FIXME
-		return ps->cp_node(n->instance->params[0]);
+		return ps->cp_node(dummy);//n->instance->params[0]);
 	}
 	return n;
 }

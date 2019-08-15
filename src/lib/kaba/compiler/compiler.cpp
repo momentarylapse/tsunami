@@ -536,10 +536,10 @@ void Script::compile()
 
 	parse_magic_linker_string(syntax);
 
-	syntax->map_local_variables_to_stack();
-
 	syntax->break_down_complicated_commands();
 
+	syntax->map_local_variables_to_stack();
+	
 	syntax->simplify_ref_deref();
 	syntax->simplify_shift_deref();
 

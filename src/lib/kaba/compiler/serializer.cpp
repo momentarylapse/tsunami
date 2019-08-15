@@ -806,7 +806,7 @@ void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref
 void Serializer::FillInConstructorsBlock(Block *b)
 {
 	for (auto *v: b->vars){
-		if (!v->dont_add_constructor){
+		if (!v->explicitly_constructed){
 			SerialNodeParam param = param_local(v->type, v->_offset);
 			add_cmd_constructor(param, (v->name == IDENTIFIER_RETURN_VAR) ? -1 : KIND_VAR_LOCAL);
 		}

@@ -2083,7 +2083,9 @@ void SyntaxTree::parse_variable_def(bool single, Block *block) {
 		if (next_const) {
 			parse_global_const(name, type);
 		} else {
-			base_class->static_variables.add(new Variable(name, type));
+			auto *v = new Variable(name, type);
+			v->is_extern = next_extern;
+			base_class->static_variables.add(v);
 		}
 
 		if ((Exp.cur != ",") and (!Exp.end_of_line()))

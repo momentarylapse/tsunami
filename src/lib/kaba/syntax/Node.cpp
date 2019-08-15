@@ -11,8 +11,6 @@
 
 namespace Kaba{
 
-extern bool next_extern;
-
 string kind2str(int kind) {
 	if (kind == KIND_VAR_LOCAL)
 		return "local";
@@ -204,7 +202,6 @@ Variable *Block::add_var(const string &name, const Class *type) {
 	if (get_var(name))
 		function->owner->do_error(format("variable '%s' already declared in this context", name.c_str()));
 	Variable *v = new Variable(name, type);
-	v->is_extern = next_extern;
 	function->var.add(v);
 	vars.add(v);
 	return v;

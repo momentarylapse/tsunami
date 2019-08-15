@@ -115,7 +115,6 @@ void PluginManager::link_app_script_data() {
 	Kaba::LinkExternal("draw_boxed_str", (void*)&AudioView::draw_boxed_str);
 	Kaba::LinkExternal("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 
-
 	Kaba::DeclareClassSize("Clipboard", sizeof(Clipboard));
 	Kaba::DeclareClassOffset("Clipboard", "temp", _offsetof(Clipboard, temp));
 	Kaba::LinkExternal("Clipboard.has_data", Kaba::mf(&Clipboard::has_data));

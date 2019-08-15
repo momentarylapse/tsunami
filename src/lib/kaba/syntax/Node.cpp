@@ -105,13 +105,15 @@ string Node::sig() const {
 	if (kind == KIND_CONSTANT)
 		return t + as_const()->str();
 	if (kind == KIND_FUNCTION_CALL)
-		return as_func()->signature(true);
+		return as_func()->signature();
 	if (kind == KIND_POINTER_CALL)
 		return "";
 	if (kind == KIND_INLINE_CALL)
-		return as_func()->signature(true);
+		return as_func()->signature();
 	if (kind == KIND_VIRTUAL_CALL)
 		return t + i2s(link_no);//s->Functions[nr]->name;
+	if (kind == KIND_CONSTRUCTOR_AS_FUNCTION)
+		return as_func()->signature();
 	if (kind == KIND_STATEMENT)
 		return t + as_statement()->name;
 	if (kind == KIND_OPERATOR)
@@ -218,9 +220,7 @@ Variable *Block::get_var(const string &name) {
 }
 
 const Class *Block::name_space() const {
-	if (function->_class)
-		return function->_class;
-	return function->owner->base_class;
+	return function->name_space;
 }
 
 

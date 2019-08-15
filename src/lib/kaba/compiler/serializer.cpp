@@ -515,10 +515,10 @@ void Serializer::AddFunctionCall(Function *f, const SerialNodeParam &instance, c
 	add_function_call(f, instance, params, ret);
 }
 
-void Serializer::AddClassFunctionCall(ClassFunction *cf, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
+void Serializer::AddClassFunctionCall(Function *cf, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	if (cf->virtual_index < 0){
-		AddFunctionCall(cf->func, instance, params, ret);
+		AddFunctionCall(cf, instance, params, ret);
 		return;
 	}
 	call_used = true;
@@ -715,12 +715,12 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index)
 	}else if (com->kind == KIND_STATEMENT){
 		SerializeStatement(com, params, ret, block, index);
 	}else if (com->kind == KIND_ARRAY_BUILDER){
-		ClassFunction *cf = com->type->get_func("add", TypeVoid, {com->type->parent});
+		Function *cf = com->type->get_func("add", TypeVoid, {com->type->parent});
 		if (!cf)
 			do_error(format("[..]: can not find %s.add(%s) function???", com->type->name.c_str(), com->type->parent->name.c_str()));
 		instance = AddReference(ret, com->type->get_pointer());
 		for (int i=0; i<com->params.num; i++){
-			AddFunctionCall(cf->func, instance, {params[i]}, p_none);
+			AddFunctionCall(cf, instance, {params[i]}, p_none);
 		}
 	}else if (com->kind == KIND_BLOCK){
 		serialize_block(com->as_block());
@@ -769,7 +769,7 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, int modus)
 	const Class *class_type = param.type;
 	if (modus == -1)
 		class_type = class_type->parent;
-	ClassFunction *f = class_type->get_default_constructor();
+	Function *f = class_type->get_default_constructor();
 	if (!f) {
 		if (class_type->needs_constructor())
 			do_error("missing default constructor for " + class_type->name);
@@ -790,13 +790,13 @@ void Serializer::add_cmd_destructor(const SerialNodeParam &param, bool needs_ref
 	Array<SerialNodeParam> params;
 
 	if (needs_ref){
-		ClassFunction *f = param.type->get_destructor();
+		Function *f = param.type->get_destructor();
 		if (!f)
 			return;
 		SerialNodeParam inst = AddReference(param);
 		AddClassFunctionCall(f, inst, params, p_none);
 	}else{
-		ClassFunction *f = param.type->parent->get_destructor();
+		Function *f = param.type->parent->get_destructor();
 		if (!f)
 			return;
 		AddClassFunctionCall(f, param, params, p_none);
@@ -1710,7 +1710,7 @@ void Serializer::resolve_deref_reg_shift()
 
 void Serializer::serialize_function(Function *f)
 {
-	syntax_tree->CreateAsmMetaInfo();
+	syntax_tree->create_asm_meta_info();
 	syntax_tree->asm_meta_info->line_offset = 0;
 	Asm::CurrentMetaInfo = syntax_tree->asm_meta_info;
 

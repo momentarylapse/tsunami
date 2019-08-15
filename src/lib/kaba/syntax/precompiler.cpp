@@ -17,7 +17,7 @@ void SetImmortal(SyntaxTree *ps)
 }
 
 // import data from an included script file
-void SyntaxTree::AddIncludeData(Script *s)
+void SyntaxTree::add_include_data(Script *s)
 {
 	for (Script *i: includes)
 		if (i == s)
@@ -75,7 +75,7 @@ string MacroName[NumMacroNames] =
 	"#immortal",
 };
 
-void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
+void SyntaxTree::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
 {
 	string filename;
 	Define d;
@@ -135,7 +135,7 @@ void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool j
 }
 
 // ... maybe some time later
-void SyntaxTree::PreCompiler(bool just_analyse)
+void SyntaxTree::pre_compiler(bool just_analyse)
 {
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
@@ -143,7 +143,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 	for (int i=0;i<Exp.line.num-1;i++){
 		Exp.set(0, i);
 		if (Exp.cur[0] == '#'){
-			HandleMacro(i, NumIfDefs, IfDefed, just_analyse);
+			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
 		}else if (Exp.line[i].exp[0].name == IDENTIFIER_USE){
 			parse_import();
 			Exp.line.erase(i);

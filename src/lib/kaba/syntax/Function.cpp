@@ -32,11 +32,11 @@ Variable::~Variable() {
 Function::Function(const string &_name, const Class *_return_type, const Class *_name_space) {
 	owner = _name_space->owner;
 	name = _name;
-	block = nullptr;
+	block = new Block(this, nullptr);
 	num_params = 0;
 	return_type = _return_type;
 	literal_return_type = _return_type;
-	_class = _name_space;
+	name_space = _name_space;
 	is_extern = false;
 	is_static = true;
 	auto_declared = false;
@@ -46,10 +46,12 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	_logical_line_no = -1;
 	_exp_no = -1;
 	inline_no = -1;
+	virtual_index = -1;
 	throws_exceptions = false;
 	num_slightly_hidden_vars = 0;
 	address = address_preprocess = nullptr;
 	_label = -1;
+	needs_overriding = false;
 }
 
 #include "../../base/set.h"
@@ -75,11 +77,11 @@ Function::~Function() {
 		delete v;
 }
 
+string namespacify(const string &name, const Class *name_space);
+
 string Function::long_name() const {
-	if (_class)
-		if (_class->name_space)
-			return _class->long_name() + "." + name;
-	return name;
+	string p = (needs_overriding ? " [NEEDS OVERRIDE]" : "");
+	return namespacify(name, name_space) + p;
 }
 
 void Function::show(const string &stage) const {
@@ -97,12 +99,9 @@ Variable *Function::__get_var(const string &name) const {
 	return block->get_var(name);
 }
 
-string Function::signature(bool include_class) const {
+string Function::signature() const {
 	string r = literal_return_type->long_name() + " ";
-	if (include_class)
-		r += long_name() + "(";
-	else
-		r += name + "(";
+	r += long_name() + "(";
 	for (int i=0; i<num_params; i++) {
 		if (i > 0)
 			r += ", ";
@@ -137,6 +136,43 @@ Array<Block*> Function::all_blocks() {
 	if (block)
 		blocks_add_recursive(blocks, block);
 	return blocks;
+}
+
+
+void Function::update_parameters_after_parsing() {
+	// save "original" param types (Var[].Type gets altered for call by reference)
+	for (int i=literal_param_type.num;i<num_params;i++)
+		literal_param_type.add(var[i]->type);
+	// but only, if not existing yet...
+
+	// return by memory
+	if (return_type->uses_return_by_memory())
+		block->add_var(IDENTIFIER_RETURN_VAR, return_type->get_pointer());
+
+	// class function
+	if (!is_static) {
+		if (!__get_var(IDENTIFIER_SELF))
+			block->add_var(IDENTIFIER_SELF, name_space->get_pointer());
+	}
+}
+
+
+Function *Function::create_dummy_clone(const Class *_name_space) const {
+	Function *f = new Function(name, return_type, _name_space);
+	f->needs_overriding = true;
+
+	f->num_params = num_params;
+	f->literal_param_type = literal_param_type;
+	for (int i=0; i<num_params; i++)
+		f->block->add_var(var[i]->name, var[i]->type);
+
+	f->is_static = is_static;
+	f->virtual_index = virtual_index;
+
+	f->update_parameters_after_parsing();
+	if (config.verbose)
+		msg_write("DUMMY CLONE   " + f->signature());
+	return f;
 }
 
 

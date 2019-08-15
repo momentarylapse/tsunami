@@ -16,7 +16,7 @@ bool next_static = false;
 bool next_const = false;
 
 
-static Node* _transform_insert_before_ = nullptr;
+static Array<Node*> _transform_insert_before_;
 
 Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var);
 
@@ -105,37 +105,30 @@ Node *SyntaxTree::add_node_statement(int index)
 }
 
 // virtual call, if func is virtual
-Node *SyntaxTree::add_node_member_call(ClassFunction *f, Node *inst, bool force_non_virtual)
-{
+Node *SyntaxTree::add_node_member_call(Function *f, Node *inst, bool force_non_virtual) {
 	Node *c;
-	if ((f->virtual_index >= 0) and (!force_non_virtual)){
-		c = new Node(KIND_VIRTUAL_CALL, f->virtual_index, f->return_type);
-	}else{
-		c = add_node_call(f->func);
-
-		// some classes share a function (for example @DynamicArray.__subarray__)
-		c->type = f->return_type;
+	if ((f->virtual_index >= 0) and (!force_non_virtual)) {
+		c = new Node(KIND_VIRTUAL_CALL, f->virtual_index, f->literal_return_type);
+	} else {
+		c = add_node_call(f);
 	}
 	c->set_instance(inst);
-	c->set_num_params(f->func->num_params);
+	c->set_num_params(f->num_params);
 	return c;
 }
 
-Node *SyntaxTree::add_node_call(Function *f)
-{
+Node *SyntaxTree::add_node_call(Function *f) {
 	Node *c = new Node(KIND_FUNCTION_CALL, (int_p)f, f->return_type);
 	c->set_num_params(f->num_params);
 	return c;
 }
 
-Node *SyntaxTree::add_node_func_name(Function *f)
-{
+Node *SyntaxTree::add_node_func_name(Function *f) {
 	return new Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunctionCode);
 }
 
 
-Node *SyntaxTree::add_node_operator(Node *p1, Node *p2, Operator *op)
-{
+Node *SyntaxTree::add_node_operator(Node *p1, Node *p2, Operator *op) {
 	Node *cmd = new Node(KIND_OPERATOR, (int_p)op, op->return_type);
 	bool unitary = ((op->param_type_1 == TypeVoid) or (op->param_type_2 == TypeVoid));
 	cmd->set_num_params( unitary ? 1 : 2); // unary / binary
@@ -181,7 +174,6 @@ SyntaxTree::SyntaxTree(Script *_script)
 {
 	base_class = new Class("-base-", 0, this);
 	root_of_all_evil = new Function("RootOfAllEvil", TypeVoid, base_class);
-	root_of_all_evil->block = new Block(root_of_all_evil, nullptr);
 
 	flag_string_const_as_cstring = false;
 	flag_immortal = false;
@@ -195,7 +187,7 @@ SyntaxTree::SyntaxTree(Script *_script)
 	// "include" default stuff
 	for (Script *p: Packages)
 		if (p->used_by_default)
-			AddIncludeData(p);
+			add_include_data(p);
 }
 
 
@@ -203,33 +195,32 @@ void SyntaxTree::parse_buffer(const string &buffer, bool just_analyse)
 {
 	Exp.Analyse(this, buffer + string("\0", 1)); // compatibility... expected by lexical
 	
-	PreCompiler(just_analyse);
+	pre_compiler(just_analyse);
 
 	parse();
 
 	Exp.clear();
 
 	if (config.verbose)
-		Show("par:a");
+		show("par:a");
 
-	ConvertCallByReference();
+	convert_call_by_reference();
 
 	/*if (FlagShow)
 		Show();*/
 
-	SimplifyShiftDeref();
-	SimplifyRefDeref();
+	simplify_shift_deref();
+	simplify_ref_deref();
 	
-	PreProcessor();
+	pre_processor();
 
 	if (config.verbose)
-		Show("par:b");
+		show("par:b");
 }
 
 
 // override_line is logical! not physical
-void SyntaxTree::do_error(const string &str, int override_exp_no, int override_line)
-{
+void SyntaxTree::do_error(const string &str, int override_exp_no, int override_line) {
 	// what data do we have?
 	int logical_line = Exp.get_line_no();
 	int exp_no = Exp.cur_exp;
@@ -238,7 +229,7 @@ void SyntaxTree::do_error(const string &str, int override_exp_no, int override_l
 	string expr;
 
 	// override?
-	if (override_line >= 0){
+	if (override_line >= 0) {
 		logical_line = override_line;
 		exp_no = 0;
 	}
@@ -246,7 +237,7 @@ void SyntaxTree::do_error(const string &str, int override_exp_no, int override_l
 		exp_no = override_exp_no;
 
 	// logical -> physical
-	if ((logical_line >= 0) and (logical_line < Exp.line.num)){
+	if ((logical_line >= 0) and (logical_line < Exp.line.num)) {
 		physical_line = Exp.line[logical_line].physical_line;
 		pos = Exp.line[logical_line].exp[exp_no].pos;
 		expr = Exp.line[logical_line].exp[exp_no].name;
@@ -255,65 +246,63 @@ void SyntaxTree::do_error(const string &str, int override_exp_no, int override_l
 	throw Exception(str, expr, physical_line, pos, script);
 }
 
-void SyntaxTree::CreateAsmMetaInfo()
-{
+void SyntaxTree::do_error_implicit(Function *f, const string &str) {
+	do_error("[auto generating " + f->signature() + "] : " + str, f->name_space->_exp_no, f->name_space->_logical_line_no);
+}
+
+void SyntaxTree::create_asm_meta_info() {
 	asm_meta_info->global_var.clear();
-	for (int i=0;i<root_of_all_evil->var.num;i++){
-		Asm::GlobalVar v;
-		v.name = root_of_all_evil->var[i]->name;
-		v.size = root_of_all_evil->var[i]->type->size;
-		v.pos = root_of_all_evil->var[i]->memory;
-		asm_meta_info->global_var.add(v);
+	for (auto *v: base_class->static_variables){
+		Asm::GlobalVar vv;
+		vv.name = v->name;
+		vv.size = v->type->size;
+		vv.pos = v->memory;
+		asm_meta_info->global_var.add(vv);
 	}
 }
 
 
 
-Constant *SyntaxTree::add_constant(const Class *type, Class *_namespace)
-{
+Constant *SyntaxTree::add_constant(const Class *type, Class *name_space) {
+	if (!name_space)
+		name_space = base_class;
 	auto *c = new Constant(type, this);
-	if (_namespace)
-		_namespace->constants.add(c);
-	else
-		base_class->constants.add(c);
+	name_space->constants.add(c);
 	return c;
 }
 
 
 
-Function *SyntaxTree::add_function(const string &name, const Class *type)
-{
-	Function *f = new Function(name, type, base_class);
+Function *SyntaxTree::add_function(const string &name, const Class *return_type, const Class *name_space, bool is_static) {
+	if (!name_space)
+		name_space = base_class;
+	Function *f = new Function(name, return_type, name_space);
+	f->is_static = is_static;
 	functions.add(f);
-	f->block = new Block(f, nullptr);
 	return f;
 }
 
 
 
-Node *SyntaxTree::add_node_const(Constant *c)
-{
+Node *SyntaxTree::add_node_const(Constant *c) {
 	return new Node(KIND_CONSTANT, (int_p)c, c->type);
 }
 
-int SyntaxTree::which_primitive_operator(const string &name)
-{
+int SyntaxTree::which_primitive_operator(const string &name) {
 	for (int i=0;i<NUM_PRIMITIVE_OPERATORS;i++)
 		if (name == PrimitiveOperators[i].name)
 			return i;
 	return -1;
 }
 
-const Class *SyntaxTree::which_owned_class(const string &name)
-{
+const Class *SyntaxTree::which_owned_class(const string &name) {
 	for (auto *c: base_class->classes)
 		if (name == c->name)
 			return c;
 	return nullptr;
 }
 
-int SyntaxTree::which_statement(const string &name)
-{
+int SyntaxTree::which_statement(const string &name) {
 	for (int i=0;i<Statements.num;i++)
 		if (name == Statements[i].name)
 			return i;
@@ -336,15 +325,8 @@ Node *exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 	return link;
 }
 
-Node *exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
-{
-	Node *link = new Node(KIND_FUNCTION_NAME, (int_p)cf.func, TypeFunctionCode);
-	/*if (cf.virtual_index >= 0){
-		link = new Node(KIND_VIRTUAL_CALL, cf.virtual_index, cf.script, cf.return_type);
-	}else{
-		link = new Node(KIND_FUNCTION_CALL, (int_p)cf.func, cf.script, cf.return_type);
-	}*/
-	//link->set_num_params(cf.param_types.num);
+Node *exlink_make_class_func(SyntaxTree *ps, Function *f, Function *cf) {
+	Node *link = new Node(KIND_FUNCTION_NAME, (int_p)cf, TypeFunctionCode);
 	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF));
 	link->set_instance(self);
 	return link;
@@ -355,7 +337,7 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 
 	if (!prefer_class) {
 		// global variables (=local variables in "RootOfAllEvil")
-		for (Variable *v: root_of_all_evil->var)
+		for (Variable *v: base_class->static_variables)
 			if (v->name == name)
 				return {new Node(KIND_VAR_GLOBAL, (int_p)v, v->type)};
 		// TODO.... namespace...
@@ -372,7 +354,7 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 					return {new Node(c)};
 
 			// then the (real) functions
-			for (Function *f: functions)
+			for (Function *f: ns->static_functions)
 				if (f->name == name and f->is_static)
 					links.add(new Node(KIND_FUNCTION_NAME, (int_p)f, TypeFunctionCode));
 			if (links.num > 0 and !prefer_class)
@@ -403,15 +385,15 @@ Node* block_get_existence(SyntaxTree *tree, const string &name, Block *block) {
 	if (v)
 		return exlink_make_var_local(tree, v->type, v);
 	if (!f->is_static){
-		if ((name == IDENTIFIER_SUPER) and (f->_class->parent))
-			return exlink_make_var_local(tree, f->_class->parent->get_pointer(), f->__get_var(IDENTIFIER_SELF));
+		if ((name == IDENTIFIER_SUPER) and (f->name_space->parent))
+			return exlink_make_var_local(tree, f->name_space->parent->get_pointer(), f->__get_var(IDENTIFIER_SELF));
 		// class elements (within a class function)
-		for (auto &e: f->_class->elements)
+		for (auto &e: f->name_space->elements)
 			if (e.name == name)
 				return exlink_make_var_element(tree, f, e);
-		for (auto &cf: f->_class->functions)
-			if (cf.func->name == name)
-				return exlink_make_func_class(tree, f, cf);
+		for (auto *cf: f->name_space->member_functions)
+			if (cf->name == name)
+				return exlink_make_class_func(tree, f, cf);
 	}
 	return nullptr;
 }
@@ -480,6 +462,8 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 
 	Class *t = new Class(name, size, this, sub);
 	t->type = type;
+	t->_logical_line_no = Exp.get_line_no();
+	t->_exp_no = Exp.cur_exp;
 	
 	// link namespace
 	ns->classes.add(t);
@@ -491,11 +475,11 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 		if (sub->needs_constructor() and !sub->get_default_constructor())
 			do_error(format("can not create a dynamic array from type %s, missing default constructor", sub->name.c_str()));
 		t->parent = sub;
-		AddMissingFunctionHeadersForClass(t);
+		add_missing_function_headers_for_class(t);
 	} else if (t->is_array()) {
 		if (sub->needs_constructor() and !sub->get_default_constructor())
 			do_error(format("can not create an array from type %s, missing default constructor", sub->name.c_str()));
-		AddMissingFunctionHeadersForClass(t);
+		add_missing_function_headers_for_class(t);
 	}
 	return t;
 }
@@ -525,10 +509,9 @@ const Class *SyntaxTree::make_class_dict(const Class *element_type) {
 	return make_class(name, Class::Type::DICT, config.super_array_size, 0, element_type);
 }
 
-Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var)
-{
+Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var) {
 	// convert
-	if ((c->kind == KIND_VAR_LOCAL) and (c->as_local() == var)){
+	if ((c->kind == KIND_VAR_LOCAL) and (c->as_local() == var)) {
 		c->type = c->type->get_pointer();
 		return ps->deref_node(c);
 	}
@@ -536,13 +519,12 @@ Node *conv_cbr(SyntaxTree *ps, Node *c, Variable *var)
 }
 
 #if 0
-void conv_return(SyntaxTree *ps, nodes *c)
-{
+void conv_return(SyntaxTree *ps, nodes *c) {
 	// recursion...
 	for (int i=0;i<c->num_params;i++)
 		conv_return(ps, c->params[i]);
 	
-	if ((c->kind == KIND_STATEMENT) and (c->link_no == COMMAND_RETURN)){
+	if ((c->kind == KIND_STATEMENT) and (c->link_no == COMMAND_RETURN)) {
 		msg_write("conv ret");
 		ref_command_old(ps, c);
 	}
@@ -550,26 +532,25 @@ void conv_return(SyntaxTree *ps, nodes *c)
 #endif
 
 
-Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
-{
+Node *conv_calls(SyntaxTree *ps, Node *c, int tt) {
 	if ((c->kind == KIND_STATEMENT) and (c->link_no == STATEMENT_RETURN))
-		if (c->params.num > 0){
-			if ((c->params[0]->type->is_array()) /*or (c->Param[j]->Type->IsSuperArray)*/){
+		if (c->params.num > 0) {
+			if ((c->params[0]->type->is_array()) /*or (c->Param[j]->Type->IsSuperArray)*/) {
 				c->set_param(0, ps->ref_node(c->params[0]));
 			}
 			return c;
 		}
 
-	if ((c->kind == KIND_FUNCTION_CALL) or (c->kind == KIND_VIRTUAL_CALL) or (c->kind == KIND_ARRAY_BUILDER) or (c->kind == KIND_CONSTRUCTOR_AS_FUNCTION)){
+	if ((c->kind == KIND_FUNCTION_CALL) or (c->kind == KIND_VIRTUAL_CALL) or (c->kind == KIND_ARRAY_BUILDER) or (c->kind == KIND_CONSTRUCTOR_AS_FUNCTION)) {
 
 		// parameters: array/class as reference
 		for (int j=0;j<c->params.num;j++)
-			if (c->params[j]->type->uses_call_by_reference()){
+			if (c->params[j]->type->uses_call_by_reference()) {
 				c->set_param(j, ps->ref_node(c->params[j]));
 			}
 
 		// return: array reference (-> dereference)
-		if ((c->type->is_array()) /*or (c->Type->IsSuperArray)*/){
+		if ((c->type->is_array()) /*or (c->Type->IsSuperArray)*/) {
 			c->type = c->type->get_pointer();
 			return ps->deref_node(c);
 			//deref_command_old(this, c);
@@ -577,10 +558,10 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 	}
 
 	// special string / list operators
-	if (c->kind == KIND_OPERATOR){
+	if (c->kind == KIND_OPERATOR) {
 		// parameters: super array as reference
 		for (int j=0;j<c->params.num;j++)
-			if ((c->params[j]->type->is_array()) or (c->params[j]->type->is_super_array())){
+			if ((c->params[j]->type->is_array()) or (c->params[j]->type->is_super_array())) {
 				c->set_param(j, ps->ref_node(c->params[j]));
 			}
   	}
@@ -589,10 +570,9 @@ Node *conv_calls(SyntaxTree *ps, Node *c, int tt)
 
 
 // remove &*x
-Node *easyfy_ref_deref(SyntaxTree *ps, Node *c, int l)
-{
-	if (c->kind == KIND_REFERENCE){
-		if (c->params[0]->kind == KIND_DEREFERENCE){
+Node *easyfy_ref_deref(SyntaxTree *ps, Node *c, int l) {
+	if (c->kind == KIND_REFERENCE) {
+		if (c->params[0]->kind == KIND_DEREFERENCE) {
 			// remove 2 knots...
 			return c->params[0]->params[0];
 		}
@@ -601,10 +581,9 @@ Node *easyfy_ref_deref(SyntaxTree *ps, Node *c, int l)
 }
 
 // remove (*x)[] and (*x).y
-Node *easyfy_shift_deref(SyntaxTree *ps, Node *c, int l)
-{
-	if ((c->kind == KIND_ADDRESS_SHIFT) or (c->kind == KIND_ARRAY)){
-		if (c->params[0]->kind == KIND_DEREFERENCE){
+Node *easyfy_shift_deref(SyntaxTree *ps, Node *c, int l) {
+	if ((c->kind == KIND_ADDRESS_SHIFT) or (c->kind == KIND_ARRAY)) {
+		if (c->params[0]->kind == KIND_DEREFERENCE) {
 			// unify 2 knots (remove 1)
 			Node *t = c->params[0]->params[0];
 			c->kind = (c->kind == KIND_ADDRESS_SHIFT) ? KIND_DEREF_ADDRESS_SHIFT : KIND_POINTER_AS_ARRAY;
@@ -617,8 +596,7 @@ Node *easyfy_shift_deref(SyntaxTree *ps, Node *c, int l)
 }
 
 
-Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f)
-{
+Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f) {
 	ps->script->cur_func = f;
 
 	if ((n->kind != KIND_STATEMENT) or (n->link_no != STATEMENT_RETURN))
@@ -627,7 +605,7 @@ Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f)
 	// convert into   *-return- = param
 	Node *p_ret = nullptr;
 	for (Variable *v: f->var)
-		if (v->name == IDENTIFIER_RETURN_VAR){
+		if (v->name == IDENTIFIER_RETURN_VAR) {
 			p_ret = ps->add_node_local_var(v);
 		}
 	if (!p_ret)
@@ -636,7 +614,7 @@ Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f)
 	Node *cmd_assign = ps->link_operator(OPERATOR_ASSIGN, ret, n->params[0]);
 	if (!cmd_assign)
 		ps->do_error("no = operator for return from function found: " + f->long_name());
-	_transform_insert_before_ = cmd_assign;
+	_transform_insert_before_.add(cmd_assign);
 
 	n->set_num_params(0);
 	return n;
@@ -646,16 +624,15 @@ Node *convert_return_by_memory(SyntaxTree *ps, Node *n, Function *f)
 // convert "source code"...
 //    call by ref params:  array, super array, class
 //    return by ref:       array
-void SyntaxTree::ConvertCallByReference()
-{
+void SyntaxTree::convert_call_by_reference() {
 	if (config.verbose)
 		msg_write("ConvertCallByReference");
 	// convert functions
-	for (Function *f: functions){
+	for (Function *f: functions) {
 		
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
-			if (f->var[j]->type->uses_call_by_reference()){
+			if (f->var[j]->type->uses_call_by_reference()) {
 				f->var[j]->type = f->var[j]->type->get_pointer();
 
 				// internal usage...
@@ -664,7 +641,7 @@ void SyntaxTree::ConvertCallByReference()
 
 		// return: array as reference
 #if 0
-		if ((func->return_type->is_array) /*or (f->Type->IsSuperArray)*/){
+		if ((func->return_type->is_array) /*or (f->Type->IsSuperArray)*/) {
 			func->return_type = GetPointerType(func->return_type);
 			/*for (int k=0;k<f->Block->Command.num;k++)
 				conv_return(this, f->Block->Command[k]);*/
@@ -684,28 +661,24 @@ void SyntaxTree::ConvertCallByReference()
 }
 
 
-void SyntaxTree::SimplifyRefDeref()
-{
+void SyntaxTree::simplify_ref_deref() {
 	// remove &*
 	transform([&](Node *n){ return easyfy_ref_deref(this, n, 0); });
 }
 
-void SyntaxTree::SimplifyShiftDeref()
-{
+void SyntaxTree::simplify_shift_deref() {
 	// remove &*
 	transform([&](Node *n){ return easyfy_shift_deref(this, n, 0); });
 }
 
-int __get_pointer_add_int()
-{
+int __get_pointer_add_int() {
 	if (config.abi == Asm::INSTRUCTION_SET_AMD64)
 		return INLINE_INT64_ADD_INT;
 	return INLINE_INT_ADD;
 }
 
-Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
-{
-	if (c->kind == KIND_ARRAY){
+Node *SyntaxTree::break_down_complicated_command(Node *c) {
+	if (c->kind == KIND_ARRAY) {
 
 		auto *el_type = c->type;
 
@@ -730,7 +703,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
-	}else if (c->kind == KIND_POINTER_AS_ARRAY){
+	} else if (c->kind == KIND_POINTER_AS_ARRAY) {
 
 		auto *el_type = c->type;
 
@@ -754,7 +727,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
-	}else if (c->kind == KIND_ADDRESS_SHIFT){
+	} else if (c->kind == KIND_ADDRESS_SHIFT) {
 
 		auto *el_type = c->type;
 
@@ -774,7 +747,7 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
-	}else if (c->kind == KIND_DEREF_ADDRESS_SHIFT){
+	} else if (c->kind == KIND_DEREF_ADDRESS_SHIFT) {
 
 		auto *el_type = c->type;
 
@@ -797,11 +770,10 @@ Node *SyntaxTree::BreakDownComplicatedCommand(Node *c)
 	return c;
 }
 
-Node* SyntaxTree::transform_node(Node *n, std::function<Node*(Node*)> F)
-{
-	if (n->kind == KIND_BLOCK){
+Node* SyntaxTree::transform_node(Node *n, std::function<Node*(Node*)> F) {
+	if (n->kind == KIND_BLOCK) {
 		transform_block(n->as_block(), F);
-	}else{
+	} else {
 		for (int i=0; i<n->params.num; i++)
 			n->set_param(i, transform_node(n->params[i], F));
 
@@ -814,43 +786,43 @@ Node* SyntaxTree::transform_node(Node *n, std::function<Node*(Node*)> F)
 }
 
 
-void SyntaxTree::transform_block(Block *block, std::function<Node*(Node*)> F)
-{
+void SyntaxTree::transform_block(Block *block, std::function<Node*(Node*)> F) {
 	//foreachi (Node *n, block->nodes, i){
-	for (int i=0; i<block->params.num; i++){
+	for (int i=0; i<block->params.num; i++) {
 		block->params[i] = transform_node(block->params[i], F);
-		if (_transform_insert_before_){
-			if (config.verbose)
-				msg_error("INSERT BEFORE...");
-			block->params.insert(_transform_insert_before_, i);
-			_transform_insert_before_ = nullptr;
-			i ++;
+		if (_transform_insert_before_.num > 0) {
+			for (auto *ib: _transform_insert_before_) {
+				if (config.verbose)
+					msg_error("INSERT BEFORE...");
+				block->params.insert(ib, i);
+				i ++;
+			}
+			_transform_insert_before_.clear();
 		}
 	}
 }
 
 // split arrays and address shifts into simpler commands...
-void SyntaxTree::transform(std::function<Node*(Node*)> F)
-{
-	_transform_insert_before_ = nullptr;
-	for (Function *f: functions){
+void SyntaxTree::transform(std::function<Node*(Node*)> F) {
+	for (Function *f: functions) {
 		cur_func = f;
 		transform_block(f->block, F);
 	}
 }
 
-Node *conv_constr_func(SyntaxTree *ps, Node *n)
-{
-	if (n->kind == KIND_CONSTRUCTOR_AS_FUNCTION){
-		if (config.verbose){
+Node *conv_constr_func(SyntaxTree *ps, Node *n) {
+	if (n->kind == KIND_CONSTRUCTOR_AS_FUNCTION) {
+		if (config.verbose) {
 			msg_error("constr func....");
 			n->show();
 		}
-		_transform_insert_before_ = ps->cp_node(n);
-		_transform_insert_before_->kind = KIND_FUNCTION_CALL;
-		_transform_insert_before_->type = TypeVoid;
+		auto *ib = ps->cp_node(n);
+		ib->kind = KIND_FUNCTION_CALL;
+		ib->type = TypeVoid;
 		if (config.verbose)
-			_transform_insert_before_->show();
+			ib->show();
+
+		_transform_insert_before_.add(ib);
 
 		// n->instance should be a reference to local... FIXME
 		return ps->cp_node(n->instance->params[0]);
@@ -859,27 +831,25 @@ Node *conv_constr_func(SyntaxTree *ps, Node *n)
 }
 
 // split arrays and address shifts into simpler commands...
-void SyntaxTree::BreakDownComplicatedCommands()
-{
-	if (config.verbose){
-		Show("break:a");
+void SyntaxTree::break_down_complicated_commands() {
+	if (config.verbose) {
+		show("break:a");
 		msg_write("BreakDownComplicatedCommands");
 	}
-	transform([&](Node* n){ return BreakDownComplicatedCommand(n); });
+	transform([&](Node* n){ return break_down_complicated_command(n); });
 	transform([&](Node* n){ return conv_constr_func(this, n); });
 	if (config.verbose)
-		Show("break:b");
+		show("break:b");
 }
 
-Node* conv_func_inline(SyntaxTree *ps, Node *n)
-{
-	if (n->kind == KIND_FUNCTION_CALL){
-		if (n->as_func()->inline_no >= 0){
+Node* conv_func_inline(SyntaxTree *ps, Node *n) {
+	if (n->kind == KIND_FUNCTION_CALL) {
+		if (n->as_func()->inline_no >= 0) {
 			n->kind = KIND_INLINE_CALL;
 			return n;
 		}
 	}
-	if (n->kind == KIND_OPERATOR){
+	if (n->kind == KIND_OPERATOR) {
 		Operator *op = n->as_op();
 		n->kind = KIND_INLINE_CALL; // FIXME
 		n->link_no = (int_p)op->f;
@@ -888,51 +858,47 @@ Node* conv_func_inline(SyntaxTree *ps, Node *n)
 	return n;
 }
 
-void SyntaxTree::MakeFunctionsInline()
-{
+void SyntaxTree::make_functions_inline() {
 	transform([&](Node* n){ return conv_func_inline(this, n); });
 	if (config.verbose)
-		Show("break:c");
+		show("break:c");
 }
 
 
 
-void MapLVSX86Return(Function *f)
-{
-	if (f->return_type->uses_return_by_memory()){
+void MapLVSX86Return(Function *f) {
+	if (f->return_type->uses_return_by_memory()) {
 		foreachi(Variable *v, f->var, i)
-			if (v->name == IDENTIFIER_RETURN_VAR){
+			if (v->name == IDENTIFIER_RETURN_VAR) {
 				v->_offset = f->_param_size;
 				f->_param_size += 4;
 			}
 	}
 }
 
-void MapLVSX86Self(Function *f)
-{
-	if (f->_class){
+void MapLVSX86Self(Function *f) {
+	if (!f->is_static){
 		foreachi(Variable *v, f->var, i)
-			if (v->name == IDENTIFIER_SELF){
+			if (v->name == IDENTIFIER_SELF) {
 				v->_offset = f->_param_size;
 				f->_param_size += 4;
 			}
 	}
 }
 
-void SyntaxTree::MapLocalVariablesToStack()
-{
-	for (Function *f: functions){
+void SyntaxTree::map_local_variables_to_stack() {
+	for (Function *f: functions) {
 		f->_param_size = 2 * config.pointer_size; // space for return value and eBP
-		if (config.instruction_set == Asm::INSTRUCTION_SET_X86){
+		if (config.instruction_set == Asm::INSTRUCTION_SET_X86) {
 			f->_var_size = 0;
 
-			if (config.abi == ABI_WINDOWS_32){
+			if (config.abi == ABI_WINDOWS_32) {
 				// map "self" to the VERY first parameter
 				MapLVSX86Self(f);
 
 				// map "-return-" to the first parameter
 				MapLVSX86Return(f);
-			}else{
+			} else {
 				// map "-return-" to the VERY first parameter
 				MapLVSX86Return(f);
 
@@ -940,34 +906,34 @@ void SyntaxTree::MapLocalVariablesToStack()
 				MapLVSX86Self(f);
 			}
 
-			foreachi(Variable *v, f->var, i){
-				if ((f->_class) and (v->name == IDENTIFIER_SELF))
+			foreachi(Variable *v, f->var, i) {
+				if (!f->is_static and (v->name == IDENTIFIER_SELF))
 					continue;
 				if (v->name == IDENTIFIER_RETURN_VAR)
 					continue;
 				int s = mem_align(v->type->size, 4);
-				if (i < f->num_params){
+				if (i < f->num_params) {
 					// parameters
 					v->_offset = f->_param_size;
 					f->_param_size += s;
-				}else{
+				} else {
 					// "real" local variables
 					v->_offset = - f->_var_size - s;
 					f->_var_size += s;
 				}				
 			}
-		}else if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
+		} else if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64) {
 			f->_var_size = 0;
 			
-			foreachi(Variable *v, f->var, i){
+			foreachi(Variable *v, f->var, i) {
 				long long s = mem_align(v->type->size, 4);
 				v->_offset = - f->_var_size - s;
 				f->_var_size += s;
 			}
-		}else if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
+		} else if (config.instruction_set == Asm::INSTRUCTION_SET_ARM) {
 			f->_var_size = 0;
 
-			foreachi(Variable *v, f->var, i){
+			foreachi(Variable *v, f->var, i) {
 				int s = mem_align(v->type->size, 4);
 				v->_offset = f->_var_size + s;
 				f->_var_size += s;
@@ -978,8 +944,7 @@ void SyntaxTree::MapLocalVariablesToStack()
 
 
 // no included scripts may be deleted before us!!!
-SyntaxTree::~SyntaxTree()
-{
+SyntaxTree::~SyntaxTree() {
 	// delete all types created by this script
 	/*for (auto *t: classes)
 		if (t->owner == this)
@@ -987,15 +952,11 @@ SyntaxTree::~SyntaxTree()
 	if (asm_meta_info)
 		delete asm_meta_info;
 
-	for (auto *f: functions)
-		delete f;
-
 	delete root_of_all_evil;
 	delete base_class;
 }
 
-void SyntaxTree::Show(const string &stage)
-{
+void SyntaxTree::show(const string &stage) {
 	if (!config.allow_output_stage(stage))
 		return;
 	msg_write("--------- Syntax of " + script->filename + "  " + stage + " ---------");

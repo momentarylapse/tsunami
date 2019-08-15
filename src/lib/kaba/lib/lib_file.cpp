@@ -40,10 +40,13 @@ public:
 	}
 };
 
-class KabaFileError : public KabaException
-{
-public: KabaFileError() : KabaException(){}
-public: KabaFileError(const string &t) : KabaException(t){}
+class KabaFileError : public KabaException {
+public:
+	KabaFileError() : KabaException(){}
+	KabaFileError(const string &t) : KabaException(t){}
+	void __init__(const string &t) {
+		new(this) KabaFileError(t);
+	}
 };
 
 class KabaFile : public File
@@ -175,10 +178,11 @@ void kaba_dir_delete(const string &f)
 
 void SIAddPackageFile()
 {
-	add_package("file", true);
+	add_package("file", false);
 
 	const Class *TypeFile = add_type("File", 0);
 	const Class *TypeFileP = add_type_p("File*", TypeFile);
+	const Class *TypeFilesystem = add_type("Filesystem", 0);
 	const Class *TypeDate = add_type("Date", sizeof(Date));
 	const Class *TypeDirEntry = add_type("DirEntry", sizeof(DirEntry));
 	const Class *TypeDirEntryList = add_type_a("DirEntry[]", TypeDirEntry, -1);
@@ -201,6 +205,7 @@ void SIAddPackageFile()
 		class_add_funcx("format", TypeString, &Date::format);
 			func_add_param("f", TypeString);
 		class_add_funcx("str", TypeString, &Date::str);
+		class_add_funcx("now", TypeDate, &get_current_date, FLAG_STATIC);
 	
 	add_class(TypeFile);
 		class_add_funcx(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFile::__delete__);
@@ -257,52 +262,54 @@ void SIAddPackageFile()
 
 	add_class(TypeFileError);
 		class_derive_from(TypeException, false, false);
+		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &KabaFileError::__init__, FLAG_OVERRIDE);
+		class_add_func_virtualx(IDENTIFIER_FUNC_DELETE, TypeVoid, &KabaFileError::__delete__, FLAG_OVERRIDE);
 		class_set_vtable(KabaFileError);
 
 	// file access
-	add_funcx("FileOpen", TypeFileP, &kaba_file_open, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileOpenText", TypeFileP, &kaba_file_open_text, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileCreate", TypeFileP, &kaba_file_create, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileCreateText", TypeFileP, &kaba_file_create_text, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileRead", TypeString, &kaba_file_read, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileReadText", TypeString, &kaba_file_read_text, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("FileWrite", TypeVoid, &kaba_file_write, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-		func_add_param("buffer", TypeString);
-	add_funcx("FileWriteText", TypeVoid, &kaba_file_write_text, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-		func_add_param("buffer", TypeString);
-	add_funcx("FileExists", TypeBool, &file_test_existence);
-		func_add_param("filename", TypeString);
-	add_funcx("FileIsDirectory", TypeBool, &file_is_directory);
-		func_add_param("filename", TypeString);
-	add_funcx("FileHash", TypeString, &kaba_file_hash, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-		func_add_param("type", TypeString);
-	add_funcx("FileRename", TypeVoid, &kaba_file_rename, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("source", TypeString);
-		func_add_param("dest", TypeString);
-	add_funcx("FileCopy", TypeVoid, &kaba_file_copy, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("source", TypeString);
-		func_add_param("dest", TypeString);
-	add_funcx("FileDelete", TypeVoid, &kaba_file_delete, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("filename", TypeString);
-	add_funcx("DirSearch", TypeDirEntryList, &dir_search);
-		func_add_param("dir", TypeString);
-		func_add_param("filter", TypeString);
-		func_add_param("show_dirs", TypeBool);
-	add_funcx("DirCreate", TypeVoid, &kaba_dir_create, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("dir", TypeString);
-	add_funcx("DirDelete", TypeVoid, &kaba_dir_delete, FLAG_RAISES_EXCEPTIONS);
-		func_add_param("dir", TypeString);
-	add_funcx("GetCurDir", TypeString, &get_current_dir);
-	add_funcx("GetCurDate", TypeDate, &get_current_date);
+	add_class(TypeFilesystem);
+		class_add_funcx("open", TypeFileP, &kaba_file_open, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("open_text", TypeFileP, &kaba_file_open_text, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("create", TypeFileP, &kaba_file_create, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("create_text", TypeFileP, &kaba_file_create_text, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("read", TypeString, &kaba_file_read, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("read_text", TypeString, &kaba_file_read_text, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("write", TypeVoid, &kaba_file_write, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+			func_add_param("buffer", TypeString);
+		class_add_funcx("write_text", TypeVoid, &kaba_file_write_text, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+			func_add_param("buffer", TypeString);
+		class_add_funcx("exists", TypeBool, &file_test_existence, FLAG_STATIC);
+			func_add_param("filename", TypeString);
+		class_add_funcx("is_directory", TypeBool, &file_is_directory, FLAG_STATIC);
+			func_add_param("filename", TypeString);
+		class_add_funcx("hash", TypeString, &kaba_file_hash, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+			func_add_param("type", TypeString);
+		class_add_funcx("rename", TypeVoid, &kaba_file_rename, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("source", TypeString);
+			func_add_param("dest", TypeString);
+		class_add_funcx("copy", TypeVoid, &kaba_file_copy, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("source", TypeString);
+			func_add_param("dest", TypeString);
+		class_add_funcx("delete", TypeVoid, &kaba_file_delete, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+		class_add_funcx("search", TypeDirEntryList, &dir_search, FLAG_STATIC);
+			func_add_param("dir", TypeString);
+			func_add_param("filter", TypeString);
+			func_add_param("show_dirs", TypeBool);
+		class_add_funcx("create_directory", TypeVoid, &kaba_dir_create, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("dir", TypeString);
+		class_add_funcx("delete_directory", TypeVoid, &kaba_dir_delete, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("dir", TypeString);
+		class_add_funcx("current_directory", TypeString, &get_current_dir, FLAG_STATIC);
 }
 
 };

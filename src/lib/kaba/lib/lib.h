@@ -82,8 +82,7 @@ extern const string IDENTIFIER_ASM;
 
 //--------------------------------------------------------------------------------------------------
 // operators
-enum
-{
+enum {
 	OPERATOR_ASSIGN,        //  =
 	OPERATOR_ADD,           //  +
 	OPERATOR_SUBTRACT,      //  -
@@ -114,8 +113,7 @@ enum
 	NUM_PRIMITIVE_OPERATORS
 };
 
-class PrimitiveOperator
-{
+class PrimitiveOperator {
 public:
 	string name;
 	int id;
@@ -132,8 +130,7 @@ extern PrimitiveOperator PrimitiveOperators[];
 //--------------------------------------------------------------------------------------------------
 // commands
 
-class Statement
-{
+class Statement {
 public:
 	string name;
 	int num_params;
@@ -142,8 +139,7 @@ extern Array<Statement> Statements;
 
 
 // statements
-enum
-{
+enum {
 	STATEMENT_RETURN,
 	STATEMENT_IF,
 	STATEMENT_IF_ELSE,
@@ -169,8 +165,7 @@ enum
 
 
 // inline commands
-enum
-{
+enum {
 	INLINE_FLOAT_TO_INT,
 	INLINE_FLOAT_TO_FLOAT64,
 	INLINE_FLOAT64_TO_FLOAT,
@@ -337,8 +332,7 @@ enum
 // type casting
 
 typedef void t_cast_func(Value&, Value&);
-class TypeCast
-{
+class TypeCast {
 public:
 	int penalty;
 	const Class *source, *dest;
@@ -350,8 +344,7 @@ extern Array<TypeCast> TypeCasts;
 
 typedef void t_func();
 
-enum
-{
+enum {
 	ABI_GNU_32,
 	ABI_GNU_64,
 	ABI_WINDOWS_32,
@@ -360,8 +353,7 @@ enum
 	ABI_GNU_ARM_64,
 };
 
-class CompilerConfiguration
-{
+class CompilerConfiguration {
 public:
 	int instruction_set;
 	int abi;
@@ -404,15 +396,14 @@ extern CompilerConfiguration config;
 
 
 template<typename T>
-void* mf(T tmf)
-{
-	union{
+void* mf(T tmf) {
+	union {
 		T f;
-		struct{
+		struct {
 			int_p a;
 			int_p b;
 		};
-	}pp;
+	} pp;
 	pp.a = 0;
 	pp.b = 0;
 	pp.f = tmf;
@@ -430,8 +421,7 @@ void End();
 void ResetExternalData();
 void LinkExternal(const string &name, void *pointer);
 template<typename T>
-void LinkExternalClassFunc(const string &name, T pointer)
-{
+void LinkExternalClassFunc(const string &name, T pointer) {
 	LinkExternal(name, mf(pointer));
 }
 void DeclareClassSize(const string &class_name, int offset);
@@ -439,7 +429,7 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance);
 
 void *GetExternalLink(const string &name);
-int ProcessClassOffset(const string &class_name, const string &element, int offset);
+int process_class_offset(const string &class_name, const string &element, int offset);
 int ProcessClassSize(const string &class_name, int size);
 int ProcessClassNumVirtuals(const string &class_name, int num_virtual);
 

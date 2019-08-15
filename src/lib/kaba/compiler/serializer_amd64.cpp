@@ -107,25 +107,39 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 	return push_size;
 }
 
-void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
-{
+void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	const Class *type = ret.get_type_save();
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->uses_return_by_memory())){
-		if (type == TypeFloat32)
-			add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
-		else if (type == TypeFloat64)
-			add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
-		else if (type->size == 1){
+	if ((type != TypeVoid) and (!type->uses_return_by_memory())) {
+		if (type->_amd64_allow_pass_in_xmm) {
+			if (type == TypeFloat32) {
+				add_cmd(Asm::INST_MOVSS, ret, p_xmm0);
+			} else if (type == TypeFloat64) {
+				add_cmd(Asm::INST_MOVSD, ret, p_xmm0);
+			} else if (type->size == 8) { // float[2]
+				add_cmd(Asm::INST_MOVLPS, ret, p_xmm0);
+			} else if (type->size == 12) { // float[3]
+				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
+				add_cmd(Asm::INST_MOVSS, param_shift(ret, 8, TypeFloat32), p_xmm1);
+			} else if (type->size == 16) { // float[4]
+				// hmm, weird
+				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
+				//add_cmd(Asm::INST_MOVHPS, param_shift(ret, 8, TypeReg64), p_xmm0);
+				add_cmd(Asm::INST_MOVLPS, param_shift(ret, 8, TypeReg64), p_xmm1);
+				//add_cmd(Asm::INST_MOVUPS, ret, p_xmm0);
+			} else {
+				do_error("xmm return ..." + type->long_name());
+			}
+		} else if (type->size == 1) {
 			int r = add_virtual_reg(Asm::REG_AL);
 			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
 			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
-		}else if (type->size == 4){
+		} else if (type->size == 4) {
 			int r = add_virtual_reg(Asm::REG_EAX);
 			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
 			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
-		}else{
+		} else {
 			int r = add_virtual_reg(Asm::REG_RAX);
 			add_cmd(Asm::INST_MOV, ret, param_vreg(type, r));
 			set_virtual_reg(r, cmd.num - 2, cmd.num - 1);
@@ -133,34 +147,37 @@ void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, con
 	}
 }
 
-bool dist_fits_32bit(void *a, void *b)
-{
+bool dist_fits_32bit(void *a, void *b) {
 	int_p d = (int_p)a - (int_p)b;
 	if (d < 0)
 		d = -d;
 	return (d < 0x70000000);
 }
 
-void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
-{
+void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	int push_size = fc_begin(instance, params, ret);
 
-	if (f->address){
-		if (dist_fits_32bit(f->address, script->opcode)){
+	if (f->address) {
+		if (dist_fits_32bit(f->address, script->opcode)) {
 			// 32bit call distance
 			add_cmd(Asm::INST_CALL, param_imm(TypeReg32, (int_p)f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
-		}else{
+		} else {
 			// 64bit call distance
 			add_cmd(Asm::INST_MOV, p_rax, param_imm(TypeReg64, (int_p)f->address));
 			add_cmd(Asm::INST_CALL, p_rax);
 		}
-	}else if (f->_label >= 0){
-		// 64bit call distance
-		add_cmd(Asm::INST_MOV, p_rax, param_marker(TypePointer, f->_label));
-		add_cmd(Asm::INST_CALL, p_rax);
-	}else{
-		do_error_link("could not link function " + f->signature(true));
+	} else if (f->_label >= 0) {
+		if (f->owner == syntax_tree) {
+			// 32bit call distance
+			add_cmd(Asm::INST_CALL, param_marker(TypeInt, f->_label));
+		} else {
+			// 64bit call distance
+			add_cmd(Asm::INST_MOV, p_rax, param_marker(TypePointer, f->_label));
+			add_cmd(Asm::INST_CALL, p_rax);
+		}
+	} else {
+		do_error_link("could not link function " + f->signature());
 	}
 
 	fc_end(push_size, instance, params, ret);
@@ -201,7 +218,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 				break;
 			}
 	}
-	if (f->_class){
+	if (!f->is_static){
 		for (Variable *v: f->var)
 			if (v->name == IDENTIFIER_SELF){
 				param.add(v);

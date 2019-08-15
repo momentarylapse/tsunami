@@ -1,3 +1,4 @@
+use file
 use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
@@ -34,7 +35,7 @@ class FontList
 
 	//string[] find_drumsets()
 	void update()
-		DirEntry[] list = DirSearch(AppDirectoryStatic + "Midi Fonts", "*.nami", false)
+		let list = Filesystem.search(AppDirectoryStatic + "Midi Fonts", "*.nami", false)
 		for e in list
 			string name = e.name.substr(0, -6)
 			if find(name) >= 0

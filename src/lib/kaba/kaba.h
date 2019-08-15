@@ -98,6 +98,7 @@ public:
 	Array<Variable*> variables();
 	Array<Constant*> constants();
 	Array<Function*> functions();
+	const Class* base_class();
 };
 
 Script *Load(const string &filename, bool just_analyse = false);

@@ -1,6 +1,7 @@
 // Image = hui:find
 // Title[Deutsch] = Midi in Spektrum malen
 use hui
+use image
 use "../api.kaba"
 use "../helper/grid.kaba"
 use "../helper/tone.kaba"
@@ -124,6 +125,7 @@ Grid ? ''
 	
 		event("close", &on_close)
 		event("export", &on_export)
+	override void __delete__()
 
 	void on_close()
 		destroy()

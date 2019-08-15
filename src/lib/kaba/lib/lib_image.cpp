@@ -40,7 +40,7 @@ void amd64_image_get_pixel(color &r, Image &i, int x, int y)
 
 void SIAddPackageImage()
 {
-	add_package("image", true);
+	add_package("image", false);
 
 	TypeImage = add_type("Image", sizeof(Image));
 	const Class *TypeImageP = add_type_p("Image*", TypeImage);
@@ -81,7 +81,7 @@ void SIAddPackageImage()
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, image_p(mf(&Image::__assign__)));
 			func_add_param("other", TypeImage);
 
-	add_func("LoadImage", TypeImageP, image_p(&LoadImage));
+	add_func("LoadImage", TypeImageP, image_p(&LoadImage), FLAG_STATIC);
 		func_add_param("filename", TypeString);
 }
 

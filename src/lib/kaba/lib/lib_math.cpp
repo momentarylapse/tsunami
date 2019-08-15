@@ -280,92 +280,22 @@ string _cdecl ffff2s(quaternion &x){	return x.str();	}
 
 
 
-string CastVector2StringP(string &s)
-{
+string CastVector2StringP(string &s) {
 	return ((vector*)s.data)->str();
 }
-string CastFFFF2StringP(string &s)
-{
+string CastFFFF2StringP(string &s) {
 	return ((quaternion*)s.data)->str();
 }
-string CastComplex2StringP(string &s)
-{
+string CastComplex2StringP(string &s) {
 	return ((complex*)s.data)->str();
 }
 
-// amd64 complex return wrappers
-void amd64_comlist_sum(complex &r, ComplexList &l)
-{	r = l.sum();	}
-void amd64_com_bar(complex &r, complex &c)
-{	r = c.bar();	}
-
-// amd64 vector return wrappers
-void amd64_vec_dir2ang(vector &r, vector &v)
-{	r = v.dir2ang();	}
-void amd64_vec_dir2ang2(vector &r, vector &v, vector &u)
-{	r = v.dir2ang2(u);	}
-void amd64_vec_ang2dir(vector &r, vector &v)
-{	r = v.ang2dir();	}
-void amd64_vec_rotate(vector &r, vector &v, vector &a)
-{	r = v.rotate(a);	}
-void amd64_mat_transform(vector &r, matrix &m, vector &v)
-{	r = v.transform(m);	}
-void amd64_mat_transform_normal(vector &r, matrix &m, vector &v)
-{	r = v.transform_normal(m);	}
-void amd64_mat_untransform(vector &r, matrix &m, vector &v)
-{	r = v.untransform(m);	}
-void amd64_mat_project(vector &r, matrix &m, vector &v)
-{	r = m.project(v);	}
-void amd64_mat_unproject(vector &r, matrix &m, vector &v)
-{	r = m.unproject(v);	}
-void amd64_vec_ortho(vector &r, vector &v)
-{	r = v.ortho();	}
-void amd64_quat_get_angles(vector &r, quaternion &q)
-{	r = q.get_angles();	}
-void amd64_vec_inter_get(vector &r, Interpolator<vector> &inter, float t)
-{	r = inter.get(t);	}
-void amd64_vec_inter_get_tang(vector &r, Interpolator<vector> &inter, float t)
-{	r = inter.getTang(t);	}
-void amd64_mat_vec_mul(vector &r, matrix &m, vector &v)
-{	r = m * v;	}
-void amd64_mat3_vec_mul(vector &r, matrix3 &m, vector &v)
-{	r = m * v;	}
-void amd64_vec_ang_add(vector &r, vector &a, vector &b)
-{	r = VecAngAdd(a, b);	}
-void amd64_vec_ang_interpolate(vector &r, vector &a, vector &b, float t)
-{	r = VecAngInterpolate(a, b, t);	}
-void amd64_vec_cross_product(vector &r, vector &a, vector &b)
-{	r = VecCrossProduct(a, b);	}
-
-void amd64_vec_rand_dir(vector &v, Random &r)
-{	v = r.dir();	}
-void amd64_vec_rand_in_ball(vector &v, Random &r, float rad)
-{	v = r.in_ball(rad);	}
-
-
-// amd64 quaternion return wrappers
-void amd64_quat_mul(quaternion &r, quaternion &a, quaternion&b)
-{	r = a * b;	}
-void amd64_quat_vec_mul(vector &r, quaternion &a, vector &b)
-{	r = a * b;	}
-void amd64_quat_bar(quaternion &r, quaternion &a)
-{	r = a.bar();	}
-
-// amd64 color return wrappers
-void amd64_col_hsb(color &r, float a, float h, float s, float b)
-{	r = SetColorHSB(a, h, s, b);	}
-void amd64_col_interpolate(color &r, color &a, color &b, float t)
-{	r = ColorInterpolate(a, b, t);	}
-void amd64_col_add(color &r, color &a, color &b)
-{	r = a + b;	}
-void amd64_col_sub(color &r, color &a, color &b)
-{	r = a - b;	}
-void amd64_col_mul_c(color &r, color &a, color &b)
-{	r = a * b;	}
-void amd64_col_mul_f(color &r, color &a, float b)
-{	r = a * b;	}
-
-#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
+vector _quat_vec_mul(quaternion &a, vector &b)
+{	return a * b;	}
+color _col_mul_c(color &a, color &b)
+{	return a * b;	}
+color _col_mul_f(color &a, float b)
+{	return a * b;	}
 
 
 void __complex_set(complex &r, float x, float y)
@@ -377,8 +307,7 @@ void __vector_set(vector &r, float x, float y, float z)
 void __rect_set(rect &r, float x1, float x2, float y1, float y2)
 {	r = rect(x1, x2, y1, y2);	}
 
-void SIAddPackageMath()
-{
+void SIAddPackageMath() {
 	add_package("math", true);
 
 	// types
@@ -405,6 +334,18 @@ void SIAddPackageMath()
 	const Class *TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
 	const Class *TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vector>));
 	const Class *TypeRandom = add_type("Random", sizeof(Random));
+	
+	// dirty hack :P
+	if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64) {
+		((Class*)TypeFloat32)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeFloat64)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeComplex)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeQuaternion)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeVector)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeColor)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypePlane)->_amd64_allow_pass_in_xmm = true;
+		((Class*)TypeRect)->_amd64_allow_pass_in_xmm = true;
+	}
 	
 	
 	add_class(TypeIntList);
@@ -465,7 +406,7 @@ void SIAddPackageMath()
 
 	add_class(TypeComplexList);
 		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&ComplexList::__init__));
-		class_add_func("sum", TypeComplex, amd64_wrap(mf(&ComplexList::sum), &amd64_comlist_sum), FLAG_PURE);
+		class_add_func("sum", TypeComplex, mf(&ComplexList::sum), FLAG_PURE);
 		class_add_func("sum2", TypeFloat32, mf(&ComplexList::sum2), FLAG_PURE);
 		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd));
 			func_add_param("other", TypeComplexList);
@@ -505,49 +446,87 @@ void SIAddPackageMath()
 
 	
 	add_class(TypeComplex);
-		class_add_element("x", TypeFloat32, 0);
-		class_add_element("y", TypeFloat32, 4);
+		class_add_elementx("x", TypeFloat32, &complex::x);
+		class_add_elementx("y", TypeFloat32, &complex::y);
 		class_add_func("abs", TypeFloat32, mf(&complex::abs), FLAG_PURE);
-		class_add_func("absSqr", TypeFloat32, mf(&complex::abs_sqr), FLAG_PURE);
-		class_add_func("bar", TypeComplex, 		amd64_wrap(mf(&complex::bar), &amd64_com_bar), FLAG_PURE);
+		class_add_func("abs_sqr", TypeFloat32, mf(&complex::abs_sqr), FLAG_PURE);
+		class_add_func("bar", TypeComplex, 		mf(&complex::bar), FLAG_PURE);
 		class_add_func("str", TypeString, mf(&complex::str), FLAG_PURE);
+		class_add_const("I", TypeComplex, &complex::I);
+		class_add_func("create", TypeComplex, (void*)__complex_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_set_inline(INLINE_COMPLEX_SET);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)__complex_set);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
 	
 	add_class(TypeVector);
-		class_add_element("x", TypeFloat32, 0);
-		class_add_element("y", TypeFloat32, 4);
-		class_add_element("z", TypeFloat32, 8);
+		class_add_elementx("x", TypeFloat32, &vector::x);
+		class_add_elementx("y", TypeFloat32, &vector::y);
+		class_add_elementx("z", TypeFloat32, &vector::z);
 		class_add_element("e", TypeFloatArray3, 0, FLAG_HIDDEN);
 		class_add_func("length", TypeFloat32, type_p(mf(&vector::length)), FLAG_PURE);
 		class_add_func("length_sqr", TypeFloat32, type_p(mf(&vector::length_sqr)), FLAG_PURE);
 		class_add_func("length_fuzzy", TypeFloat32, type_p(mf(&vector::length_fuzzy)), FLAG_PURE);
-		class_add_func("normalize", TypeVoid, type_p(mf(&vector::normalize)));
-		class_add_func("dir2ang", TypeVector, amd64_wrap(mf(&vector::dir2ang), &amd64_vec_dir2ang), FLAG_PURE);
-		class_add_func("dir2ang2", TypeVector, amd64_wrap(mf(&vector::dir2ang2), &amd64_vec_dir2ang2), FLAG_PURE);
+		class_add_func("normalized", TypeVector, mf(&vector::normalized), FLAG_PURE);
+		class_add_func("dir2ang", TypeVector, mf(&vector::dir2ang), FLAG_PURE);
+		class_add_func("dir2ang2", TypeVector, mf(&vector::dir2ang2), FLAG_PURE);
 			func_add_param("up", TypeVector);
-		class_add_func("ang2dir", TypeVector, amd64_wrap(mf(&vector::ang2dir), &amd64_vec_ang2dir), FLAG_PURE);
-		class_add_func("rotate", TypeVector, amd64_wrap(mf(&vector::rotate), &amd64_vec_rotate), FLAG_PURE);
+		class_add_func("ang2dir", TypeVector, mf(&vector::ang2dir), FLAG_PURE);
+		class_add_func("rotate", TypeVector, mf(&vector::rotate), FLAG_PURE);
 			func_add_param("ang", TypeVector);
-//		class_add_func("__div__", TypeVector, amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform), FLAG_PURE);
+//		class_add_func("__div__", TypeVector, mf(&vector::untransform), FLAG_PURE);
 //			func_add_param("m", TypeMatrix);
-		class_add_func("ortho", TypeVector, amd64_wrap(mf(&vector::ortho), &amd64_vec_ortho), FLAG_PURE);
+		class_add_func("ortho", TypeVector, mf(&vector::ortho), FLAG_PURE);
 		class_add_func("str", TypeString, mf(&vector::str), FLAG_PURE);
+		class_add_func("dot", TypeFloat32, (void*)&vector::dot, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("v1", TypeVector);
+			func_add_param("v2", TypeVector);
+		class_add_funcx("cross", TypeVector, &vector::cross, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("v1", TypeVector);
+			func_add_param("v2", TypeVector);
+		class_add_func("create", TypeVector, (void*)&__vector_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_set_inline(INLINE_VECTOR_SET);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
+			func_add_param("z", TypeFloat32);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)&__vector_set);
+			func_add_param("x", TypeFloat32);
+			func_add_param("y", TypeFloat32);
+			func_add_param("z", TypeFloat32);
 	
 	add_class(TypeQuaternion);
-		class_add_element("x", TypeFloat32, 0);
-		class_add_element("y", TypeFloat32, 4);
-		class_add_element("z", TypeFloat32, 8);
-		class_add_element("w", TypeFloat32, 12);
-		class_add_func("__mul__", TypeQuaternion, amd64_wrap(mf(&quaternion::mul), &amd64_quat_mul), FLAG_PURE);
+		class_add_elementx("x", TypeFloat32, &quaternion::x);
+		class_add_elementx("y", TypeFloat32, &quaternion::y);
+		class_add_elementx("z", TypeFloat32, &quaternion::z);
+		class_add_elementx("w", TypeFloat32, &quaternion::w);
+		class_add_func("__mul__", TypeQuaternion, mf(&quaternion::mul), FLAG_PURE);
 			func_add_param("other", TypeQuaternion);
-		class_add_func("__mul__", TypeVector, (void*)&amd64_quat_vec_mul, FLAG_PURE);
+		class_add_func("__mul__", TypeVector, (void*)&_quat_vec_mul, FLAG_PURE);
 			func_add_param("other", TypeVector);
 		class_add_func("__imul__", TypeVoid, mf(&quaternion::imul));
 			func_add_param("other", TypeQuaternion);
-		class_add_func("invert", TypeVoid, mf(&quaternion::invert));
-		class_add_func("bar", TypeQuaternion, amd64_wrap(mf(&quaternion::bar), &amd64_quat_bar), FLAG_PURE);
+		class_add_func("bar", TypeQuaternion, mf(&quaternion::bar), FLAG_PURE);
 		class_add_func("normalize", TypeVoid, mf(&quaternion::normalize));
-		class_add_func("angles", TypeVector, amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles), FLAG_PURE);
+		class_add_func("angles", TypeVector, mf(&quaternion::get_angles), FLAG_PURE);
 		class_add_func("str", TypeString, mf(&quaternion::str), FLAG_PURE);
+		class_add_func("rotation_v", TypeQuaternion, (void*)&quaternion::rotation_v, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeVector);
+		class_add_func("rotation_a", TypeQuaternion, (void*)&quaternion::rotation_a, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("axis", TypeVector);
+			func_add_param("angle", TypeFloat32);
+		class_add_func("rotation_m", TypeQuaternion, (void*)&quaternion::rotation_m, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("m_in", TypeMatrix);
+		class_add_func("interpolate", TypeQuaternion, (void*)(quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("q_0", TypeQuaternion);
+			func_add_param("q_1", TypeQuaternion);
+			func_add_param("t", TypeFloat32);
+		class_add_func("drag", TypeQuaternion, (void*)&quaternion::drag, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("up", TypeVector);
+			func_add_param("dang", TypeVector);
+			func_add_param("reset_z", TypeBool);
+		class_add_const("ID", TypeQuaternion, (void*)&quaternion::ID);
 	
 	add_class(TypeRect);
 		class_add_element("x1", TypeFloat32, 0);
@@ -561,6 +540,18 @@ void SIAddPackageMath()
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 		class_add_func("str", TypeString, mf(&rect::str), FLAG_PURE);
+		class_add_const("ID", TypeRect, (void*)&rect::ID);
+		class_add_func("create", TypeRect, (void*)__rect_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_set_inline(INLINE_RECT_SET);
+			func_add_param("x1", TypeFloat32);
+			func_add_param("x2", TypeFloat32);
+			func_add_param("y1", TypeFloat32);
+			func_add_param("y2", TypeFloat32);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)__rect_set);
+			func_add_param("x1", TypeFloat32);
+			func_add_param("x2", TypeFloat32);
+			func_add_param("y1", TypeFloat32);
+			func_add_param("y2", TypeFloat32);
 	
 	add_class(TypeColor);
 		class_add_element("a", TypeFloat32, 12);
@@ -568,18 +559,38 @@ void SIAddPackageMath()
 		class_add_element("g", TypeFloat32, 4);
 		class_add_element("b", TypeFloat32, 8);
 		class_add_func("str", TypeString, mf(&color::str), FLAG_PURE);
-		class_add_func("__add__", TypeColor, amd64_wrap(mf(&color::operator+), &amd64_col_add), FLAG_PURE);
+		class_add_func("__add__", TypeColor, mf(&color::operator+), FLAG_PURE);
 			func_add_param("o", TypeColor);
 		class_add_func("__adds__", TypeVoid, mf(&color::operator+=));
 			func_add_param("o", TypeColor);
-		class_add_func("__sub__", TypeColor, amd64_wrap(mf(&color::operator-), &amd64_col_sub), FLAG_PURE);
+		class_add_func("__sub__", TypeColor, mf(&color::operator-), FLAG_PURE);
 			func_add_param("o", TypeColor);
 		class_add_func("__subs__", TypeVoid, mf(&color::operator-=));
 			func_add_param("o", TypeColor);
-		class_add_func("__mul__", TypeColor, (void*)&amd64_col_mul_f, FLAG_PURE);
+		class_add_func("__mul__", TypeColor, (void*)&_col_mul_f, FLAG_PURE);
 			func_add_param("f", TypeFloat32);
-		class_add_func("__mul__", TypeColor, (void*)&amd64_col_mul_c, FLAG_PURE);
+		class_add_func("__mul__", TypeColor, (void*)&_col_mul_c, FLAG_PURE);
 			func_add_param("c", TypeColor);
+		class_add_funcx("hsb", TypeColor, &SetColorHSB, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("a", TypeFloat32);
+			func_add_param("h", TypeFloat32);
+			func_add_param("s", TypeFloat32);
+			func_add_param("b", TypeFloat32);
+		class_add_funcx("interpolate", TypeColor, &ColorInterpolate, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("c1", TypeColor);
+			func_add_param("c2", TypeColor);
+			func_add_param("t", TypeFloat32);
+		class_add_func("create", TypeColor, (void*)&__color_set, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_set_inline(INLINE_COLOR_SET);
+			func_add_param("a", TypeFloat32);
+			func_add_param("r", TypeFloat32);
+			func_add_param("g", TypeFloat32);
+			func_add_param("b", TypeFloat32);
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, (void*)&__color_set);
+			func_add_param("a", TypeFloat32);
+			func_add_param("r", TypeFloat32);
+			func_add_param("g", TypeFloat32);
+			func_add_param("b", TypeFloat32);
 	
 	add_class(TypePlane);
 		class_add_element("a", TypeFloat32, 0);
@@ -595,6 +606,15 @@ void SIAddPackageMath()
 		class_add_func("distance", TypeFloat32, mf(&plane::distance), FLAG_PURE);
 			func_add_param("p", TypeVector);
 		class_add_func("str", TypeString, mf(&plane::str), FLAG_PURE);
+		class_add_func("transform", TypePlane, mf(&plane::transform), FLAG_PURE);
+			func_add_param("m", TypeMatrix);
+		class_add_func("from_points", TypePlane, (void*)&plane::from_points, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("a", TypeVector);
+			func_add_param("b", TypeVector);
+			func_add_param("c", TypeVector);
+		class_add_func("from_point_normal", TypePlane, (void*)&plane::from_point_normal, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("p", TypeVector);
+			func_add_param("n", TypeVector);
 	
 	add_class(TypeMatrix);
 		class_add_element("_00", TypeFloat32, 0);
@@ -619,17 +639,44 @@ void SIAddPackageMath()
 			func_add_param("other", TypeMatrix);
 		class_add_func("__mul__", TypeMatrix, mf(&matrix::mul), FLAG_PURE);
 			func_add_param("other", TypeMatrix);
-		class_add_func("__mul__", TypeVector, amd64_wrap(mf(&matrix::mul_v), &amd64_mat_vec_mul), FLAG_PURE);
+		class_add_func("__mul__", TypeVector, mf(&matrix::mul_v), FLAG_PURE);
 			func_add_param("other", TypeVector);
 		class_add_func("str", TypeString, mf(&matrix::str), FLAG_PURE);
-		class_add_func("transform", TypeVector, /*amd64_wrap(mf(&m::transform),*/ (void*)&amd64_mat_transform/*)*/, FLAG_PURE);
+		class_add_func("transform", TypeVector, mf(&matrix::transform), FLAG_PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("transform_normal", TypeVector, /*amd64_wrap(mf(&vector::transform_normal),*/ (void*)&amd64_mat_transform_normal/*)*/, FLAG_PURE);
+		class_add_func("transform_normal", TypeVector, mf(&matrix::transform_normal), FLAG_PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("untransform", TypeVector, /*amd64_wrap(mf(&vector::untransform),*/ (void*)&amd64_mat_untransform/*)*/, FLAG_PURE);
+		class_add_func("untransform", TypeVector, mf(&matrix::untransform), FLAG_PURE);
 			func_add_param("v", TypeVector);
-		class_add_func("project", TypeVector, amd64_wrap(mf(&matrix::project), &amd64_mat_project), FLAG_PURE);
+		class_add_func("project", TypeVector, mf(&matrix::project), FLAG_PURE);
 			func_add_param("v", TypeVector);
+		class_add_func("unproject", TypeVector, mf(&matrix::unproject), FLAG_PURE);
+			func_add_param("v", TypeVector);
+		class_add_func("inverse", TypeMatrix, mf(&matrix::inverse), FLAG_PURE);
+		class_add_func("translation", TypeMatrix, (void*)&matrix::translation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("trans", TypeVector);
+		class_add_func("rotation", TypeMatrix, (void*)&matrix::rotation, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeVector);
+		class_add_func("rotation_x", TypeMatrix, (void*)&matrix::rotation_x, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeFloat32);
+		class_add_func("rotation_y", TypeMatrix, (void*)&matrix::rotation_y, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeFloat32);
+		class_add_func("rotation_z", TypeMatrix, (void*)&matrix::rotation_z, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeFloat32);
+		class_add_func("rotation_q", TypeMatrix, (void*)&matrix::rotation_q, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeQuaternion);
+		class_add_func("rotation_view", TypeMatrix, (void*)&matrix::rotation_view, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("ang", TypeVector);
+		class_add_func("scale", TypeMatrix, (void*)&matrix::scale, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("s_x", TypeFloat32);
+			func_add_param("s_y", TypeFloat32);
+			func_add_param("s_z", TypeFloat32);
+		class_add_func("perspective", TypeMatrix, (void*)&matrix::perspective, ScriptFlag(FLAG_PURE | FLAG_STATIC));
+			func_add_param("fovy", TypeFloat32);
+			func_add_param("aspect", TypeFloat32);
+			func_add_param("z_near", TypeFloat32);
+			func_add_param("z_far", TypeFloat32);
+		class_add_const("ID", TypeMatrix, (void*)&matrix::ID);
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11", TypeFloat32, 0);
@@ -645,9 +692,11 @@ void SIAddPackageMath()
 		class_add_element("_e", TypeFloatArray9, 0, FLAG_HIDDEN);
 		class_add_func("__mul__", TypeMatrix3, mf(&matrix3::mul), FLAG_PURE);
 			func_add_param("other", TypeMatrix3);
-		class_add_func("__mul__", TypeVector, amd64_wrap(mf(&matrix3::mul_v), &amd64_mat3_vec_mul), FLAG_PURE);
+		class_add_func("__mul__", TypeVector, mf(&matrix3::mul_v), FLAG_PURE);
 			func_add_param("other", TypeVector);
 		class_add_func("str", TypeString, mf(&matrix3::str), FLAG_PURE);
+		class_add_func("inverse", TypeMatrix3, mf(&matrix3::inverse), FLAG_PURE);
+		class_add_const("m3_id", TypeMatrix3, (void*)&matrix3::ID);
 	
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);
@@ -766,21 +815,10 @@ void SIAddPackageMath()
 		class_add_func("normal", TypeFloat32, mf(&Random::normal));
 			func_add_param("mean", TypeFloat32);
 			func_add_param("stddev", TypeFloat32);
-		class_add_func("inBall", TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));
+		class_add_func("inBall", TypeVector, mf(&Random::in_ball));
 			func_add_param("r", TypeFloat32);
-		class_add_func("dir", TypeVector, amd64_wrap(mf(&Random::dir), &amd64_vec_rand_dir));
+		class_add_func("dir", TypeVector, mf(&Random::dir));
 	
-	add_func("complex", TypeComplex, (void*)__complex_set, FLAG_PURE);
-		func_set_inline(INLINE_COMPLEX_SET);
-		func_add_param("x", TypeFloat32);
-		func_add_param("y", TypeFloat32);
-	add_func("rect", TypeRect, (void*)__rect_set, FLAG_PURE);
-		func_set_inline(INLINE_RECT_SET);
-		func_add_param("x1", TypeFloat32);
-		func_add_param("x2", TypeFloat32);
-		func_add_param("y1", TypeFloat32);
-		func_add_param("y2", TypeFloat32);
-
 	
 	add_class(TypeFloatInterpolator);
 		class_add_element("type", TypeInt, 0);
@@ -806,9 +844,9 @@ void SIAddPackageMath()
 		class_add_func("normalize", TypeVoid, mf(&Interpolator<float>::normalize));
 		class_add_func("get", TypeFloat32, mf(&Interpolator<float>::get));
 			func_add_param("t", TypeFloat32);
-		class_add_func("getTang", TypeFloat32, mf(&Interpolator<float>::getTang));
+		class_add_func("get_tang", TypeFloat32, mf(&Interpolator<float>::getTang));
 			func_add_param("t", TypeFloat32);
-		class_add_func("getList", TypeFloatList, mf(&Interpolator<float>::getList));
+		class_add_func("get_list", TypeFloatList, mf(&Interpolator<float>::getList));
 			func_add_param("t", TypeFloatList);
 
 	
@@ -834,201 +872,110 @@ void SIAddPackageMath()
 			func_add_param("p", TypeVector);
 			func_add_param("v", TypeVector);
 		class_add_func("normalize", TypeVoid, mf(&Interpolator<vector>::normalize));
-		class_add_func("get", TypeVector, amd64_wrap(mf(&Interpolator<vector>::get), &amd64_vec_inter_get));
+		class_add_func("get", TypeVector, mf(&Interpolator<vector>::get));
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeVector, amd64_wrap(mf(&Interpolator<vector>::getTang), &amd64_vec_inter_get_tang));
+		class_add_func("get_tang", TypeVector, mf(&Interpolator<vector>::getTang));
 			func_add_param("t", TypeFloat32);
 		class_add_func("get_list", TypeVectorList, mf(&Interpolator<vector>::getList));
 			func_add_param("t", TypeFloatList);
 
 	// mathematical
-	add_func("sin", TypeFloat32, (void*)&sinf, FLAG_PURE);
+	add_func("sin", TypeFloat32, (void*)&sinf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("cos", TypeFloat32, (void*)&cosf, FLAG_PURE);
+	add_func("cos", TypeFloat32, (void*)&cosf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("tan", TypeFloat32, (void*)&tanf, FLAG_PURE);
+	add_func("tan", TypeFloat32, (void*)&tanf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("asin", TypeFloat32, (void*)&asinf, FLAG_PURE);
+	add_func("asin", TypeFloat32, (void*)&asinf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("acos", TypeFloat32, (void*)&acosf, FLAG_PURE);
+	add_func("acos", TypeFloat32, (void*)&acosf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("atan", TypeFloat32, (void*)&atanf, FLAG_PURE);
+	add_func("atan", TypeFloat32, (void*)&atanf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("atan2", TypeFloat32, (void*)&atan2f, FLAG_PURE);
+	add_func("atan2", TypeFloat32, (void*)&atan2f, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
 		func_add_param("y", TypeFloat32);
-	add_func("sqrt", TypeFloat32, (void*)&sqrtf, FLAG_PURE);
+	add_func("sqrt", TypeFloat32, (void*)&sqrtf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, (void*)&f_sqr, FLAG_PURE);
+	add_func("sqr", TypeFloat32, (void*)&f_sqr, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("exp", TypeFloat32, (void*)&expf, FLAG_PURE);
+	add_func("exp", TypeFloat32, (void*)&expf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("log", TypeFloat32, (void*)&logf, FLAG_PURE);
+	add_func("log", TypeFloat32, (void*)&logf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
-	add_func("pow", TypeFloat32, (void*)&powf, FLAG_PURE);
+	add_func("pow", TypeFloat32, (void*)&powf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
-	add_func("clamp", TypeFloat32, (void*)&clampf, FLAG_PURE);
+	add_func("clamp", TypeFloat32, (void*)&clampf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("loop", TypeFloat32, (void*)&loopf, FLAG_PURE);
+	add_func("loop", TypeFloat32, (void*)&loopf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("abs", TypeFloat32, (void*)&fabsf, FLAG_PURE);
+	add_func("abs", TypeFloat32, (void*)&fabsf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, (void*)&minf, FLAG_PURE);
+	add_func("min", TypeFloat32, (void*)&minf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, (void*)&maxf, FLAG_PURE);
+	add_func("max", TypeFloat32, (void*)&maxf, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
 	// int
-	add_func("clampi", TypeInt, (void*)&clampi, FLAG_PURE);
+	add_func("clampi", TypeInt, (void*)&clampi, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
-	add_func("loopi", TypeInt, (void*)&loopi, FLAG_PURE);
+	add_func("loopi", TypeInt, (void*)&loopi, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("i", TypeInt);
 		func_add_param("min", TypeInt);
 		func_add_param("max", TypeInt);
 	// lists
-	add_func("range", TypeIntList, (void*)&int_range, FLAG_PURE);
+	add_func("range", TypeIntList, (void*)&int_range, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("start", TypeInt);
 		func_add_param("end", TypeInt);
-	add_func("rangef", TypeFloatList, (void*)&float_range, FLAG_PURE);
+	add_func("rangef", TypeFloatList, (void*)&float_range, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("start", TypeFloat32);
 		func_add_param("end", TypeFloat32);
 		func_add_param("step", TypeFloat32);
 	// vectors
-	add_func("vector", TypeVector, (void*)&__vector_set, FLAG_PURE);
-		func_set_inline(INLINE_VECTOR_SET);
-		func_add_param("x", TypeFloat32);
-		func_add_param("y", TypeFloat32);
-		func_add_param("z", TypeFloat32);
-	add_func("VecAngAdd", TypeVector, amd64_wrap(&VecAngAdd, &amd64_vec_ang_add), FLAG_PURE);
+	add_func("VecAngAdd", TypeVector, mf(&VecAngAdd), ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("ang1", TypeVector);
 		func_add_param("ang2", TypeVector);
-	add_func("VecAngInterpolate", TypeVector, amd64_wrap(&VecAngInterpolate, &amd64_vec_ang_interpolate), FLAG_PURE);
+	add_func("VecAngInterpolate", TypeVector, mf(&VecAngInterpolate), ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("ang1", TypeVector);
 		func_add_param("ang2", TypeVector);
 		func_add_param("t", TypeFloat32);
-	add_func("VecDotProduct", TypeFloat32, (void*)&VecDotProduct, FLAG_PURE);
-		func_add_param("v1", TypeVector);
-		func_add_param("v2", TypeVector);
-	add_func("VecCrossProduct", TypeVector, amd64_wrap(&VecCrossProduct, &amd64_vec_cross_product), FLAG_PURE);
-		func_add_param("v1", TypeVector);
-		func_add_param("v2", TypeVector);
-	// matrices
-	add_func("MatrixTranslation", TypeMatrix, (void*)&MatrixTranslation, FLAG_PURE);
-		func_add_param("trans", TypeVector);
-	add_func("MatrixRotation", TypeMatrix, (void*)&MatrixRotation, FLAG_PURE);
-		func_add_param("ang", TypeVector);
-	add_func("MatrixRotationX", TypeMatrix, (void*)&MatrixRotationX, FLAG_PURE);
-		func_add_param("ang", TypeFloat32);
-	add_func("MatrixRotationY", TypeMatrix, (void*)&MatrixRotationY, FLAG_PURE);
-		func_add_param("ang", TypeFloat32);
-	add_func("MatrixRotationZ", TypeMatrix, (void*)&MatrixRotationZ, FLAG_PURE);
-		func_add_param("ang", TypeFloat32);
-	add_func("MatrixRotationQ", TypeMatrix, (void*)&MatrixRotationQ, FLAG_PURE);
-		func_add_param("ang", TypeQuaternion);
-	add_func("MatrixRotationView", TypeMatrix, (void*)&MatrixRotationView, FLAG_PURE);
-		func_add_param("ang", TypeVector);
-	add_func("MatrixScale", TypeMatrix, (void*)&MatrixScale, FLAG_PURE);
-		func_add_param("s_x", TypeFloat32);
-		func_add_param("s_y", TypeFloat32);
-		func_add_param("s_z", TypeFloat32);
-	add_func("MatrixPerspective", TypeMatrix, (void*)&MatrixPerspective, FLAG_PURE);
-		func_add_param("fovy", TypeFloat32);
-		func_add_param("aspect", TypeFloat32);
-		func_add_param("z_near", TypeFloat32);
-		func_add_param("z_far", TypeFloat32);
-	add_func("MatrixMultiply", TypeMatrix, (void*)&MatrixMultiply, FLAG_PURE);
-		func_add_param("m2", TypeMatrix);
-		func_add_param("m1", TypeMatrix);
-	add_func("MatrixInverse", TypeMatrix, (void*)&MatrixInverse, FLAG_PURE);
-		func_add_param("m_in", TypeMatrix);
-	add_func("Matrix3Inverse", TypeMatrix3, (void*)&Matrix3Inverse, FLAG_PURE);
-		func_add_param("m_in", TypeMatrix3);
-	// quaternions
-	add_func("QuaternionRotationV", TypeQuaternion, (void*)&QuaternionRotationV, FLAG_PURE);
-		func_add_param("ang", TypeVector);
-	add_func("QuaternionRotationA", TypeQuaternion, (void*)&QuaternionRotationA, FLAG_PURE);
-		func_add_param("axis", TypeVector);
-		func_add_param("angle", TypeFloat32);
-	add_func("QuaternionRotationM", TypeQuaternion, (void*)&QuaternionRotationM, FLAG_PURE);
-		func_add_param("m_in", TypeMatrix);
-	add_func("QuaternionInterpolate", TypeQuaternion, (void*)(void(*)(quaternion&, const quaternion&, const quaternion&, float))&QuaternionInterpolate, FLAG_PURE);
-		func_add_param("q_0", TypeQuaternion);
-		func_add_param("q_1", TypeQuaternion);
-		func_add_param("t", TypeFloat32);
-	add_func("QuaternionDrag", TypeQuaternion, (void*)&QuaternionDrag, FLAG_PURE);
-		func_add_param("up", TypeVector);
-		func_add_param("dang", TypeVector);
-		func_add_param("reset_z", TypeBool);
-	// plane
-	add_func("PlaneFromPoints", TypePlane, (void*)&PlaneFromPoints, FLAG_PURE);
-		func_add_param("a", TypeVector);
-		func_add_param("b", TypeVector);
-		func_add_param("c", TypeVector);
-	add_func("PlaneFromPointNormal", TypePlane, (void*)&PlaneFromPointNormal, FLAG_PURE);
-		func_add_param("p", TypeVector);
-		func_add_param("n", TypeVector);
-	add_func("PlaneTransform", TypePlane, (void*)&PlaneTransform, FLAG_PURE);
-		func_add_param("m", TypeMatrix);
-		func_add_param("pl_in", TypePlane);
 	// other types
-	add_func("GetBaryCentric", TypeVoid, (void*)&GetBaryCentric, FLAG_PURE);
+	add_func("GetBaryCentric", TypeVoid, (void*)&GetBaryCentric, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("p", TypeVector);
 		func_add_param("a", TypeVector);
 		func_add_param("b", TypeVector);
 		func_add_param("c", TypeVector);
 		func_add_param("f", TypeFloatPs);
 		func_add_param("g", TypeFloatPs);
-	add_func("color", TypeColor, (void*)&__color_set, FLAG_PURE);
-		func_set_inline(INLINE_COLOR_SET);
-		func_add_param("a", TypeFloat32);
-		func_add_param("r", TypeFloat32);
-		func_add_param("g", TypeFloat32);
-		func_add_param("b", TypeFloat32);
-	add_func("ColorSetHSB", TypeColor, amd64_wrap(&SetColorHSB, &amd64_col_hsb), FLAG_PURE);
-		func_add_param("a", TypeFloat32);
-		func_add_param("h", TypeFloat32);
-		func_add_param("s", TypeFloat32);
-		func_add_param("b", TypeFloat32);
-	add_func("ColorInterpolate", TypeColor, amd64_wrap(&ColorInterpolate, &amd64_col_interpolate), FLAG_PURE);
-		func_add_param("c1", TypeColor);
-		func_add_param("c2", TypeColor);
-		func_add_param("t", TypeFloat32);
-	add_func("CryptoCreateKeys", TypeVoid, algebra_p(&CryptoCreateKeys));
+	add_func("CryptoCreateKeys", TypeVoid, algebra_p(&CryptoCreateKeys), FLAG_STATIC);
 		func_add_param("c1", TypeCrypto);
 		func_add_param("c2", TypeCrypto);
 		func_add_param("type", TypeString);
 		func_add_param("bits", TypeInt);
 	// random numbers
-	add_func("randi", TypeInt, (void*)&randi);
+	add_func("randi", TypeInt, (void*)&randi, FLAG_STATIC);
 		func_add_param("max", TypeInt);
-	add_func("rand", TypeFloat32, (void*)&randf);
+	add_func("rand", TypeFloat32, (void*)&randf, FLAG_STATIC);
 		func_add_param("max", TypeFloat32);
-	add_func("rand_seed", TypeVoid, (void*)&srand);
+	add_func("rand_seed", TypeVoid, (void*)&srand, FLAG_STATIC);
 		func_add_param("seed", TypeInt);
 
 	
 	// float
 	add_const("pi",  TypeFloat32, *(void**)&pi);
-	// complex
-	add_const("c_i", TypeComplex, (void**)&complex::I);
 	// vector
 	add_const("v_0", TypeVector, (void*)&vector::ZERO);
 	add_const("e_x", TypeVector, (void*)&vector::EX);
 	add_const("e_y", TypeVector, (void*)&vector::EY);
 	add_const("e_z", TypeVector, (void*)&vector::EZ);
-	// matrix
-	add_const("m_id", TypeMatrix, (void*)&matrix::ID);
-	add_const("m3_id", TypeMatrix3, (void*)&matrix3::ID);
-	// quaternion
-	add_const("q_id", TypeQuaternion, (void*)&quaternion::ID);
 	// color
 	add_const("White",  TypeColor, (void*)&White);
 	add_const("Black",  TypeColor, (void*)&Black);
@@ -1038,23 +985,21 @@ void SIAddPackageMath()
 	add_const("Blue",   TypeColor, (void*)&Blue);
 	add_const("Yellow", TypeColor, (void*)&Yellow);
 	add_const("Orange", TypeColor, (void*)&Orange);
-	// rect
-	add_const("r_id", TypeRect, (void*)&rect::ID);
 
 
 
 	// internal type casts
-	add_func("-v2s-", TypeString, (void*)&fff2s, FLAG_PURE);
+	add_func("-v2s-", TypeString, (void*)&fff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("v", TypeVector);
-	add_func("-complex2s-", TypeString, (void*)&ff2s, FLAG_PURE);
+	add_func("-complex2s-", TypeString, (void*)&ff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("z", TypeComplex);
-	add_func("-quaternion2s-", TypeString, (void*)&ffff2s, FLAG_PURE);
+	add_func("-quaternion2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("q", TypeQuaternion);
-	add_func("-plane2s-", TypeString, (void*)&ffff2s, FLAG_PURE);
+	add_func("-plane2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("p", TypePlane);
-	add_func("-color2s-", TypeString, (void*)&ffff2s, FLAG_PURE);
+	add_func("-color2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("c", TypeColor);
-	add_func("-rect2s-", TypeString, (void*)&ffff2s, FLAG_PURE);
+	add_func("-rect2s-", TypeString, (void*)&ffff2s, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_add_param("r", TypeRect);
 	add_type_cast(50, TypeVector, TypeString, "-v2s-", (void*)&CastVector2StringP);
 	add_type_cast(50, TypeComplex, TypeString, "-complex2s-", (void*)&CastComplex2StringP);

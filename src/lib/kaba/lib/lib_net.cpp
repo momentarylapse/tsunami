@@ -94,14 +94,14 @@ void SIAddPackageNet()
 		class_add_func("__lshift__", TypeVoid, net_p(mf((void(Socket::*)(const vector &))&Socket::operator<<)));
 			func_add_param("v", TypeVector);
 
-	add_func("SocketListen", TypeSocketP, net_p(&NetListen));
-		func_add_param("port", TypeInt);
-		func_add_param("block", TypeBool);
-	add_func("SocketConnect", TypeSocketP, net_p(&NetConnect));
-		func_add_param("addr", TypeString);
-		func_add_param("port", TypeInt);
-	add_func("CreateUDP", TypeSocketP, net_p(&NetCreateUDP));
-		func_add_param("port", TypeInt);
+		class_add_func("listen", TypeSocketP, net_p(&NetListen), FLAG_STATIC);
+			func_add_param("port", TypeInt);
+			func_add_param("block", TypeBool);
+		class_add_func("connect", TypeSocketP, net_p(&NetConnect), FLAG_STATIC);
+			func_add_param("addr", TypeString);
+			func_add_param("port", TypeInt);
+		class_add_func("create_udp", TypeSocketP, net_p(&NetCreateUDP), FLAG_STATIC);
+			func_add_param("port", TypeInt);
 }
 
 };

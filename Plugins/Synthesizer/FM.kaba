@@ -233,7 +233,7 @@ Grid ? ''
 			float t = t0+a*(t1-t0)
 			float v = v0 * exp(a * e)
 			cc.add(complex(t2x(t), v2y(v)))
-		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -247,7 +247,7 @@ Grid ? ''
 		complex[] cc
 		cc.add(complex(t2x(t0), v2y(v0)))
 		cc.add(complex(t2x(t1), v2y(v1)))
-		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -259,7 +259,7 @@ Grid ? ''
 		p.draw_polygon(cc)
 	
 	void draw_grabber(Painter *p, float t0, float v0, float t1, float v1, color col, bool hover)
-		let col2 = ColorInterpolate(col, colors.text_soft2, 0.3)
+		let col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		if hover
 			col2 = colors.hoverify(col2)
 		p.set_color(col2)

@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.2.12";
+string Version = "0.17.4.0";
 
 //#define ScriptDebug
 
@@ -212,7 +212,7 @@ void Script::do_error_link(const string &str)
 void Script::set_variable(const string &name, void *data)
 {
 	//msg_write(name);
-	for (auto *v: syntax->root_of_all_evil->var)
+	for (auto *v: syntax->base_class->static_variables)
 		if (v->name == name){
 			memcpy(v->memory, data, v->type->size);
 			return;
@@ -291,7 +291,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 // analyse syntax
 
 	// create a main() function
-	Function *func = ps->add_function("--command-func--", TypeVoid);
+	Function *func = ps->add_function("--command-func--", TypeVoid, ps->base_class, true);
 	func->_var_size = 0; // set to -1...
 
 	// parse
@@ -299,7 +299,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	ps->parse_complete_command(func->block);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
 
-	ps->ConvertCallByReference();
+	ps->convert_call_by_reference();
 
 // compile
 	s->compile();
@@ -352,9 +352,9 @@ void *Script::match_class_function(const string &_class, bool allow_derived, con
 
 	// match
 	for (Function *f: syntax->functions){
-		if (!f->_class)
+		if (!f->name_space)
 			continue;
-		if (!f->_class->is_derived_from(root_type))
+		if (!f->name_space->is_derived_from(root_type))
 			continue;
 		if ((f->name == name) and (f->literal_return_type->name == return_type) and (param_types.num == f->num_params)){
 
@@ -382,7 +382,7 @@ void print_var(void *p, const string &name, const Class *t)
 
 void Script::show_vars(bool include_consts)
 {
-	for (auto *v: syntax->root_of_all_evil->var)
+	for (auto *v: syntax->base_class->static_variables)
 		print_var(v->memory, v->name, v->type);
 	/*if (include_consts)
 		foreachi(LocalVariable &c, pre_script->Constant, i)
@@ -398,11 +398,15 @@ Array<Function*> Script::functions() {
 }
 
 Array<Variable*> Script::variables() {
-	return syntax->root_of_all_evil->var;
+	return syntax->base_class->static_variables;
 }
 
 Array<Constant*> Script::constants() {
 	return syntax->base_class->constants;
+}
+
+const Class *Script::base_class() {
+	return syntax->base_class;
 }
 
 };

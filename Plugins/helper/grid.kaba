@@ -211,7 +211,7 @@ class GridData
 	
 	void draw_axis_y(Painter *c, GridPartition part)
 		for t in part.tick
-			c.set_color(ColorInterpolate(col_bg, col_grid, t.weight))
+			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
 			if yy < y_axis.rect.y1 or yy > y_axis.rect.y2
 				continue
@@ -223,7 +223,7 @@ class GridData
 	
 	void draw_axis_x(Painter *c, GridPartition part)
 		for t in part.tick
-			c.set_color(ColorInterpolate(col_bg, col_grid, t.weight))
+			c.set_color(color.interpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
 			if xx < x_axis.rect.x1 or xx > x_axis.rect.x2
 				continue
@@ -271,7 +271,7 @@ class GridData
 		float[] tt, yy
 		complex[] pp
 		tt = rangef(0, 1, 0.003)
-		yy = fi.getList(tt)
+		yy = fi.get_list(tt)
 		for t,i in tt
 			complex zz = project2(complex(x_axis.rel2val(t), yy[i]))
 			pp.add(zz)
@@ -324,9 +324,9 @@ class GridData
 	
 	color point_color(bool selected, bool hover)
 		if hover
-			return ColorInterpolate(col_hover, col_line, 0.0)
+			return color.interpolate(col_hover, col_line, 0.0)
 		if selected
-			return ColorInterpolate(col_sel, col_line, 0.5)//color(1, 0.7, 0, 0)
+			return color.interpolate(col_sel, col_line, 0.5)//color(1, 0.7, 0, 0)
 		return col_line
 	
 	void draw_point_xy(Painter *c, float x, float y, bool selected, bool hover)

@@ -131,7 +131,7 @@ void PreProcessFunction(SyntaxTree *ps, Node *c)
 #endif
 
 
-Node *SyntaxTree::PreProcessNode(Node *c)
+Node *SyntaxTree::pre_process_node(Node *c)
 {
 	if (c->kind == KIND_OPERATOR){
 		Operator *o = c->as_op();
@@ -279,7 +279,7 @@ Node *SyntaxTree::PreProcessNode(Node *c)
 
 
 // may not use AddConstant()!!!
-Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
+Node *SyntaxTree::pre_process_node_addresses(Node *c)
 {
 	if (c->kind == KIND_OPERATOR){
 		Operator *o = c->as_op();
@@ -334,15 +334,15 @@ Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 	return c;
 }
 
-void SyntaxTree::PreProcessor()
+void SyntaxTree::pre_processor()
 {
-	transform([&](Node *n){ return PreProcessNode(n); });
+	transform([&](Node *n){ return pre_process_node(n); });
 	//Show();
 }
 
-void SyntaxTree::PreProcessorAddresses()
+void SyntaxTree::pre_processor_addresses()
 {
-	transform([&](Node *n){ return PreProcessNodeAddresses(n); });
+	transform([&](Node *n){ return pre_process_node_addresses(n); });
 	//Show();
 }
 

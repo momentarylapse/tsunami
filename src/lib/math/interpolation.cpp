@@ -230,12 +230,10 @@ template<class T>
 T _inter_angular_lerp_(const typename Interpolator<T>::Part &p, float t);
 
 template<>
-inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t)
-{
-	quaternion q0, q1, q;
-	QuaternionRotationV(q0, p.pos0);
-	QuaternionRotationV(q1, p.pos1);
-	QuaternionInterpolate(q, q0, q1, t);
+inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t) {
+	auto q0 = quaternion::rotation_v(p.pos0);
+	auto q1 = quaternion::rotation_v(p.pos1);
+	auto q = quaternion::interpolate(q0, q1, t);
 	return q.get_angles();
 }
 template<>

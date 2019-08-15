@@ -94,7 +94,7 @@ void SerializerX86::add_function_call(Function *f, const SerialNodeParam &instan
 	}else if (f->_label >= 0){
 		add_cmd(Asm::INST_CALL, param_marker(TypePointer, f->_label));
 	}else{
-		do_error_link("could not link function " + f->signature(true));
+		do_error_link("could not link function " + f->signature());
 	}
 
 	fc_end(push_size, ret);
@@ -265,7 +265,30 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 		case STATEMENT_RETURN:
 			if (com->params.num > 0){
 				param[0] = SerializeParameter(com->params[0], block, index); // operand
-				if (cur_func->return_type->uses_return_by_memory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
+					
+				if (cur_func->return_type->_amd64_allow_pass_in_xmm) {
+					//SerialNodeParam t = add_temp(cur_func->return_type);
+					auto t = param[0];
+					FillInDestructorsBlock(block, true);
+					// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
+					//		add_cmd(Asm::INST_FLD, t); 
+					if (cur_func->return_type == TypeFloat32){
+						add_cmd(Asm::INST_MOVSS, p_xmm0, t);
+					}else if (cur_func->return_type == TypeFloat64){
+						add_cmd(Asm::INST_MOVSD, p_xmm0, t);
+					}else if (cur_func->return_type->size == 8){ // float[2]
+						add_cmd(Asm::INST_MOVLPS, p_xmm0, t);
+					}else if (cur_func->return_type->size == 12){ // float[3]
+						add_cmd(Asm::INST_MOVLPS, p_xmm0, param_shift(t, 0, TypeReg64));
+						add_cmd(Asm::INST_MOVSS, p_xmm1, param_shift(t, 8, TypeFloat32));
+					}else if (cur_func->return_type->size == 16){ // float[4]
+						add_cmd(Asm::INST_MOVLPS, p_xmm0, param_shift(t, 0, TypeReg64));
+						add_cmd(Asm::INST_MOVLPS, p_xmm1, param_shift(t, 8, TypeReg64));
+					} else {
+						do_error("...ret xmm " + cur_func->return_type->long_name());
+					}
+					AddFunctionOutro(cur_func);
+				} else if (cur_func->return_type->uses_return_by_memory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
 					FillInDestructorsBlock(block, true);
 					// internally handled...
 #if 0
@@ -303,14 +326,8 @@ void SerializerX86::SerializeStatement(Node *com, const Array<SerialNodeParam> &
 					SerialNodeParam t = add_temp(cur_func->return_type);
 					add_cmd(Asm::INST_MOV, t, param[0]);
 					FillInDestructorsBlock(block, true);
-					if (cur_func->return_type == TypeFloat32){
-						if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os))
-							add_cmd(Asm::INST_MOVSS, p_xmm0, t);
-						else
-							add_cmd(Asm::INST_FLD, t);
-					}else if (cur_func->return_type == TypeFloat64){
-						add_cmd(Asm::INST_MOVSD, p_xmm0, t);
-					}else if (cur_func->return_type->size == 1){
+					
+					if (cur_func->return_type->size == 1){
 						int v = add_virtual_reg(Asm::REG_AL);
 						add_cmd(Asm::INST_MOV, param_vreg(cur_func->return_type, v), t);
 					}else if (cur_func->return_type->size == 8){

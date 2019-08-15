@@ -10,40 +10,35 @@ const vector vector::EX = vector(1, 0, 0);
 const vector vector::EY = vector(0, 1, 0);
 const vector vector::EZ = vector(0, 0, 1);
 
-vector::vector(float x, float y, float z)
-{
+vector::vector(float x, float y, float z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
 // assignment operators
-vector& vector::operator += (const vector& v)
-{
+vector& vector::operator += (const vector& v) {
 	x += v.x;
 	y += v.y;
 	z += v.z;
 	return *this;
 }
 
-vector& vector::operator -= (const vector& v)
-{
+vector& vector::operator -= (const vector& v) {
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
 	return *this;
 }
 
-vector& vector::operator *= (float f)
-{
+vector& vector::operator *= (float f) {
 	x *= f;
 	y *= f;
 	z *= f;
 	return *this;
 }
 
-vector& vector::operator /= (float f)
-{
+vector& vector::operator /= (float f) {
 	x /= f;
 	y /= f;
 	z /= f;
@@ -51,67 +46,55 @@ vector& vector::operator /= (float f)
 }
 
 // unitary operator(s)
-vector vector::operator - () const
-{
+vector vector::operator - () const {
 	return vector(-x, -y, -z);
 }
 
 // binary operators
-vector vector::operator + (const vector &v) const
-{
+vector vector::operator + (const vector &v) const {
 	return vector(x+v.x ,y+v.y, z+v.z);
 }
 
-vector vector::operator - (const vector &v) const
-{
+vector vector::operator - (const vector &v) const {
 	return vector(x-v.x, y-v.y, z-v.z);
 }
 
-vector vector::operator * (float f) const
-{
+vector vector::operator * (float f) const {
 	return vector(x*f, y*f, z*f);
 }
 
-vector vector::operator / (float f) const
-{
+vector vector::operator / (float f) const {
 	return vector(x/f, y/f, z/f);
 }
 
-bool vector::operator == (const vector &v) const
-{
-	return ((x==v.x) && (y==v.y) && (z==v.z));
+bool vector::operator == (const vector &v) const {
+	return ((x==v.x) and (y==v.y) and (z==v.z));
 }
 
-bool vector::operator != (const vector &v) const
-{
-	return !((x==v.x) && (y==v.y) && (z==v.z));
+bool vector::operator != (const vector &v) const {
+	return !((x==v.x) and (y==v.y) and (z==v.z));
 }
 
-float vector::operator * (const vector &v) const
-{
+float vector::operator * (const vector &v) const {
 	return x*v.x + y*v.y + z*v.z;
 }
 
-vector vector::operator ^ (const vector &v) const
-{
+vector vector::operator ^ (const vector &v) const {
 	return vector( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x );
 }
 
-string vector::str() const
-{
+string vector::str() const {
 	return format("(%f, %f, %f)", x, y, z);
 }
 
 // real length of the vector
-float vector::length() const
-{
+float vector::length() const {
 	return sqrtf( x*x + y*y + z*z );
 }
 
 // gibt die laengste Seite zurueck (="unendlich-Norm")
 // (immer <= <echte Laenge>)
-float vector::length_fuzzy() const
-{
+float vector::length_fuzzy() const {
 	float l=fabs(x);
 	float a=fabs(y);
 	if (a>l)
@@ -122,14 +105,12 @@ float vector::length_fuzzy() const
 	return l;
 }
 
-float vector::length_sqr() const
-{
+float vector::length_sqr() const {
 	return x*x + y*y + z*z;
 }
 
 // v in cube(a,b) ?
-bool vector::between(const vector &a, const vector &b) const
-{
+bool vector::between(const vector &a, const vector &b) const {
 	/*if ((x>a.x)&&(x>b.x))	return false;
 	if ((x<a.x)&&(x<b.x))	return false;
 	if ((y>a.y)&&(y>b.y))	return false;
@@ -137,7 +118,7 @@ bool vector::between(const vector &a, const vector &b) const
 	if ((z>a.z)&&(z>b.z))	return false;
 	if ((z<a.z)&&(z<b.z))	return false;
 	return true;*/
-	float f = VecDotProduct(*this - a, b - a);
+	float f = dot(*this - a, b - a);
 	if (f < 0)
 		return false;
 	f /= (b - a).length_sqr();
@@ -146,8 +127,7 @@ bool vector::between(const vector &a, const vector &b) const
 
 // v = a + f*( b - a )
 //   get f
-float vector::factor_between(const vector &a, const vector &b) const
-{
+float vector::factor_between(const vector &a, const vector &b) const {
 	if (a.x!=b.x)
 		return ((x-a.x)/(b.x-a.x));
 	else if (a.y!=b.y)
@@ -157,21 +137,19 @@ float vector::factor_between(const vector &a, const vector &b) const
 	return 0;
 }
 
-// a im Wuerfel mit Radius=d um b ?
-bool vector::bounding_cube(const vector &a, float r) const
-{
-	if ((a.x-x>r)||(a.x-x<-r))
+// a in cube with radius=d around b ?
+bool vector::bounding_cube(const vector &a, float r) const {
+	if ((a.x-x>r) or (a.x-x<-r))
 		return false;
-	if ((a.y-y>r)||(a.y-y<-r))
+	if ((a.y-y>r) or (a.y-y<-r))
 		return false;
-	if ((a.z-z>r)||(a.z-z<-r))
+	if ((a.z-z>r) or (a.z-z<-r))
 		return false;
 	return true;
 }
 
-// auf die Laenge 1 bringen
-void vector::normalize()
-{
+// scale to length 1
+void vector::normalize() {
 	float l = length();
 	if (l > 0)
 		*this /= l;
@@ -179,17 +157,23 @@ void vector::normalize()
 		*this = vector::EZ;
 }
 
+// scale to length 1
+vector vector::normalized() const {
+	float l = length();
+	if (l == 0)
+		return vector::EZ;
+	return *this / l;
+}
+
 // cos( Winkel zwischen Vektoren) * Laenge1 * Laenge2
-float VecDotProduct(const vector &v1, const vector &v2)
-{
-	return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;
+float vector::dot(const vector &v1, const vector &v2) {
+	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 
 // Richtung: zu beiden orthogonal!!
 // Laenge: sin( Winkel zwischen Vektoren) * Laenge1 * Laenge2
 // (0,0,0) bei: ( v1 parallel v2 )
-vector VecCrossProduct(const vector &v1,const vector &v2)
-{
+vector vector::cross(const vector &v1,const vector &v2) {
 	vector v;
     v.x = v1.y * v2.z - v1.z * v2.y;
     v.y = v1.z * v2.x - v1.x * v2.z;
@@ -200,32 +184,26 @@ vector VecCrossProduct(const vector &v1,const vector &v2)
 
 // Koordinaten-Transformation
 // matrix * vector(x,y,z,1)
-vector vector::transform(const matrix &m) const
-{
+vector vector::transform(const matrix &m) const {
 	return m * *this;
 }
 
 // Transformation eines Normalenvektors
 // matrix * vector(x,y,z,0)
-vector vector::transform_normal(const matrix &m) const
-{
+vector vector::transform_normal(const matrix &m) const {
 	vector vo;
 	vo.x= x*m._00 + y*m._01 + z*m._02;
 	vo.y= x*m._10 + y*m._11 + z*m._12;
 	vo.z= x*m._20 + y*m._21 + z*m._22;
 	return vo;
 }
-vector vector::untransform(const matrix &m) const
-{
-	matrix i;
-	MatrixInverse(i, m);
-	return i * *this;
+vector vector::untransform(const matrix &m) const {
+	return m.inverse() * *this;
 }
 
 // Transformation eines Richtungsvektors
 // matrix * vector(x,y,z,0)
-vector vector::transform3(const matrix3 &m) const
-{
+vector vector::transform3(const matrix3 &m) const {
 	vector vo;
 	vo.x= x*m._00 + y*m._01 + z*m._02;
 	vo.y= x*m._10 + y*m._11 + z*m._12;
@@ -235,16 +213,14 @@ vector vector::transform3(const matrix3 &m) const
 
 // vector(0,0,1) wird um ang rotiert
 // ZXY, da nur im Spiel-Koordinaten-System
-vector vector::ang2dir() const
-{
+vector vector::ang2dir() const {
 	return vector(		sin(y)*cos(x),
 					-	sin(x),
 						cos(y)*cos(x));
 }
 
 // um welche Winkel wurde vector(0,0,1) rotiert?
-vector vector::dir2ang() const
-{
+vector vector::dir2ang() const {
 	return vector(	-	atan2(y,sqrt(x*x+z*z)),
 						atan2(x,z),
 						0); // too few information to get z!
@@ -252,9 +228,8 @@ vector vector::dir2ang() const
 
 // um welche Winkel wurde vector(0,0,1) rotiert?
 //    
-vector vector::dir2ang2(const vector &up) const
-{
-	vector right=VecCrossProduct(up,*this);
+vector vector::dir2ang2(const vector &up) const {
+	vector right = cross(up,*this);
 	return vector(	-	atan2(y,sqrt(x*x+z*z)),
 						atan2(x,z),
 						atan2(right.y,up.y)); // atan2( < up, (0,1,0) >, < right, (0,1,0) > )    where: right = up x dir
@@ -272,41 +247,34 @@ vector vector::dir2ang2(const vector &up) const
 }
 
 // adds two angles (juxtaposition of rotations)
-vector VecAngAdd(const vector &ang1,const vector &ang2)
-{
-	quaternion q,q1,q2;
-	QuaternionRotationV(q1,ang1);
-	QuaternionRotationV(q2,ang2);
-	q = q2 * q1;
+vector VecAngAdd(const vector &ang1,const vector &ang2) {
+	auto q1 = quaternion::rotation_v(ang1);
+	auto q2 = quaternion::rotation_v(ang2);
+	auto q = q2 * q1;
 	return q.get_angles();
 }
 
-vector VecAngInterpolate(const vector &ang1,const vector &ang2,float t)
-{
-	quaternion q1,q2,r;
-	QuaternionRotationV(q1,ang1);
-	QuaternionRotationV(q2,ang2);
-	QuaternionInterpolate(r,q1,q2,t);
+vector VecAngInterpolate(const vector &ang1,const vector &ang2,float t) {
+	auto q1 = quaternion::rotation_v(ang1);
+	auto q2 = quaternion::rotation_v(ang2);
+	auto r = quaternion::interpolate(q1,q2,t);
 	return r.get_angles();
 }
 
 // rotate a vector by an angle
-vector vector::rotate(const vector &ang) const
-{
+vector vector::rotate(const vector &ang) const {
 	// slow...indirect
-	matrix m;
-	MatrixRotation(m, ang);
+	matrix m = matrix::rotation(ang);
 	return transform(m);
 }
 
 // which one is the largest coordinate of this vector
-int vector::important_plane() const
-{
+int vector::important_plane() const {
 	vector w;
 	w.x=fabs(x);
 	w.y=fabs(y);
 	w.z=fabs(z);
-	if ((w.x<=w.y)&&(w.x<=w.z))
+	if ((w.x<=w.y) and (w.x<=w.z))
 		return 1;	// Y-Z-Ebene
 	if (w.y<=w.z)
 		return 2;	// X-Z-Ebene
@@ -314,8 +282,7 @@ int vector::important_plane() const
 }
 
 // finds an orthogonal vector to v
-vector vector::ortho() const
-{
+vector vector::ortho() const {
 	int p = important_plane();
 	if (p == 3)
 		return vector(y, - x, 0);
@@ -325,44 +292,37 @@ vector vector::ortho() const
 }
 
 // kuerzeste Entfernung von p zur Geraden(l1,l2)
-float VecLineDistance(const vector &p,const vector &l1,const vector &l2)
-{
-	return (float)sqrt( (p-l1).length_sqr() - sqr(VecDotProduct(l2-l1,p-l1))/(l2-l1).length_sqr() );
+float VecLineDistance(const vector &p,const vector &l1,const vector &l2) {
+	return (float)sqrt( (p-l1).length_sqr() - sqr(vector::dot(l2-l1,p-l1))/(l2-l1).length_sqr() );
 }
 
 // Punkt der Geraden(l1,l2), der p am naechsten ist
-vector VecLineNearestPoint(const vector &p,const vector &l1,const vector &l2)
-{
+vector VecLineNearestPoint(const vector &p,const vector &l1,const vector &l2) {
 	vector n = l2-l1, np;
 	n.normalize();
-	plane pl;
-	PlaneFromPointNormal(pl, p, n);
+	plane pl = plane::from_point_normal(p, n);
 	pl.intersect_line(l1, l2, np);
 	return np;
 }
 
-void vector::_min(const vector &test_partner)
-{
+void vector::_min(const vector &test_partner) {
 	if (test_partner.x<x)	x=test_partner.x;
 	if (test_partner.y<y)	y=test_partner.y;
 	if (test_partner.z<z)	z=test_partner.z;
 }
 
-void vector::_max(const vector &test_partner)
-{
+void vector::_max(const vector &test_partner) {
 	if (test_partner.x>x)	x=test_partner.x;
 	if (test_partner.y>y)	y=test_partner.y;
 	if (test_partner.z>z)	z=test_partner.z;
 }
 
 
-float _vec_length_(const vector &v)
-{
+float _vec_length_(const vector &v) {
 	return sqrt(v*v);
 }
 
-float _vec_length_fuzzy_(const vector &v)
-{
+float _vec_length_fuzzy_(const vector &v) {
 	float x = fabs(v.x);
 	float y = fabs(v.y);
 	float z = fabs(v.z);
@@ -370,19 +330,16 @@ float _vec_length_fuzzy_(const vector &v)
 	return (xy > z) ? xy : z;
 }
 
-void _vec_normalize_(vector &v)
-{
+void _vec_normalize_(vector &v) {
 	float inv_norm = 1.0f / sqrt(v*v);
 	v *= inv_norm;
 }
 
-bool _vec_between_(const vector &v,const vector &a,const vector &b)
-{
+bool _vec_between_(const vector &v,const vector &a,const vector &b) {
 	float ff = _vec_factor_between_(v, a, b);
 	return (ff >= 0) and (ff <= 1);
 }
 
-float _vec_factor_between_(const vector &v,const vector &a,const vector &b)
-{
+float _vec_factor_between_(const vector &v,const vector &a,const vector &b) {
 	return ((v-a)*(b-a)) / ((b-a)*(b-a));
 }

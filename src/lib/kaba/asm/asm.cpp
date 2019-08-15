@@ -342,6 +342,8 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_MOVSD,  "movsd",  64+3, 64+1},
 	{INST_MOVUPS, "movups", 64+3, 64+1},
 	{INST_MOVAPS, "movaps", 64+3, 64+1},
+	{INST_MOVLPS, "movlps", 64+3, 64+1},
+	{INST_MOVHPS, "movhps", 64+3, 64+1},
 	{INST_ADDSS,  "addss",  64+3, 64+1},
 	{INST_ADDSD,  "addsd",  64+3, 64+1},
 	{INST_ADDPS,  "addps",  64+3, 64+1},
@@ -1856,6 +1858,10 @@ void InitX86()
 	add_inst(INST_MOVUPS, 0x110f,   2, -1, XMdq, Xx);
 	add_inst(INST_MOVAPS, 0x280f,   2, -1, Xx, XMdq);
 	add_inst(INST_MOVAPS, 0x290f,   2, -1, XMdq, Xx);
+	add_inst(INST_MOVLPS, 0x120f,   2, -1, Xx, XMq);
+	add_inst(INST_MOVLPS, 0x130f,   2, -1, XMq, Xx);
+	add_inst(INST_MOVHPS, 0x160f,   2, -1, Xx, XMq);
+	add_inst(INST_MOVHPS, 0x170f,   2, -1, XMq, Xx);
 	add_inst(INST_ADDSS,  0x580ff3, 3, -1, Xx, XMd);
 	add_inst(INST_ADDSD,  0x580ff2, 3, -1, Xx, XMq);
 	add_inst(INST_ADDPS,  0x580f,   2, -1, Xx, XMdq);

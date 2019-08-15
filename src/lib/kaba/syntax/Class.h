@@ -13,8 +13,7 @@ class Constant;
 class Variable;
 
 
-class ClassElement
-{
+class ClassElement {
 public:
 	string name;
 	const Class *type;
@@ -25,24 +24,9 @@ public:
 	string signature(bool include_class) const;
 };
 
-// TODO: use Function instead!
-class ClassFunction
-{
-public:
-	Function *func;
-	// _func_(x)  ->  p.func(x)
-	const Class *return_type; // literal!
-	int virtual_index;
-	bool needs_overriding;
-	ClassFunction();
-	ClassFunction(const Class *return_type, Function *f);
-	string signature(bool include_class) const;
-};
-
 typedef void *VirtualTable;
 
-class Class
-{
+class Class {
 public:
 	//Class();
 	Class(const string &name, int size, SyntaxTree *owner, const Class *parent = nullptr);
@@ -52,7 +36,7 @@ public:
 	long long size; // complete size of type
 	int array_length;
 
-	enum class Type{
+	enum class Type {
 		OTHER,
 		ARRAY,
 		SUPER_ARRAY,
@@ -69,7 +53,7 @@ public:
 	bool is_pointer_silent() const;
 	bool fully_parsed;
 	Array<ClassElement> elements;
-	Array<ClassFunction> functions;
+	Array<Function*> member_functions;
 	Array<Function*> static_functions;
 	Array<Variable*> static_variables;
 	Array<Constant*> constants;
@@ -77,6 +61,9 @@ public:
 	const Class *parent;
 	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...
+	int _logical_line_no;
+	int _exp_no;
+	bool _amd64_allow_pass_in_xmm;
 	Array<void*> vtable;
 	void *_vtable_location_compiler_; // may point to const/opcode
 	void *_vtable_location_target_; // (opcode offset adjusted)
@@ -93,18 +80,18 @@ public:
 	bool needs_destructor() const;
 	bool is_derived_from(const Class *root) const;
 	bool is_derived_from_s(const string &root) const;
-	bool derive_from(const Class *root, bool increase_size);
+	void derive_from(const Class *root, bool increase_size);
 	const Class *get_pointer() const;
 	const Class *get_root() const;
 	void add_function(SyntaxTree *s, Function *f, bool as_virtual = false, bool override = false);
-	ClassFunction *get_func(const string &name, const Class *return_type, const Array<const Class*> &params) const;
-	ClassFunction *get_same_func(const string &name, Function *f) const;
-	ClassFunction *get_default_constructor() const;
-	Array<ClassFunction*> get_constructors() const;
-	ClassFunction *get_destructor() const;
-	ClassFunction *get_assign() const;
-	ClassFunction *get_virtual_function(int virtual_index) const;
-	ClassFunction *get_get(const Class *index) const;
+	Function *get_func(const string &name, const Class *return_type, const Array<const Class*> &params) const;
+	Function *get_same_func(const string &name, Function *f) const;
+	Function *get_default_constructor() const;
+	Array<Function*> get_constructors() const;
+	Function *get_destructor() const;
+	Function *get_assign() const;
+	Function *get_virtual_function(int virtual_index) const;
+	Function *get_get(const Class *index) const;
 	void link_virtual_table();
 	void link_external_virtual_table(void *p);
 	void *create_instance() const;

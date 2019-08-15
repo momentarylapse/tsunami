@@ -128,14 +128,14 @@ Grid ? '' vertical
 		// background
 		color bg = colors.background
 		if allow_blink_background
-			bg = ColorInterpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+			bg = color.interpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
 		p.draw_rect(0, 0, w, h)
 		
 		if mode == MODE_CIRCLE
 			// circle
 			p.set_line_width(r*0.05)
-			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.5))
+			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
 			p.set_fill(false)
 			p.draw_circle(x0, y0, r)
 		
@@ -179,7 +179,7 @@ Grid ? '' vertical
 			paused = chain.is_paused()
 		if paused
 			p.set_font_size(fs)
-			p.set_color(ColorInterpolate(colors.grid, colors.background, 0.2))
+			p.set_color(color.interpolate(colors.grid, colors.background, 0.2))
 			p.draw_str(x0-fs*0.4, y0-fs/2, "⏸")
 		else
 			if cur_beat == 0

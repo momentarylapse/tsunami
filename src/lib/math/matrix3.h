@@ -4,11 +4,10 @@
 
 class vector;
 
-class matrix3
-{
+class matrix3 {
 public:
-	union{
-		struct{
+	union {
+		struct {
 			// the squared form of this block is "transposed"!
 			float _00,_10,_20;
 			float _01,_11,_21;
@@ -43,14 +42,14 @@ public:
 
 
 	static const matrix3 ID;
+	
+	
+	matrix3 _cdecl inverse() const;
+	matrix3 _cdecl transpose() const;
+	static matrix3 _cdecl rotation(const vector &ang);
+	static matrix3 _cdecl rotation_q(const quaternion &q);
 };
 
-// matrix3s
-void _cdecl Matrix3Identity(matrix3 &m);
-void _cdecl Matrix3Inverse(matrix3 &mo, const matrix3 &mi);
-void _cdecl Matrix3Transpose(matrix3 &mo, const matrix3 &mi);
-void _cdecl Matrix3Rotation(matrix3 &m, const vector &ang);
-void _cdecl Matrix3RotationQ(matrix3 &m, const quaternion &q);
 
 
 

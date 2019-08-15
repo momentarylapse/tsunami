@@ -931,45 +931,45 @@ void SIAddPackageX()
 		class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, x_p(mf(&HostDataList::__assign__)));
 			func_add_param("other", TypeHostDataList);
 
-	add_func("LoadFont",			TypeFontP,	x_p(&__LoadFont));
+	add_func("LoadFont",			TypeFontP,	x_p(&__LoadFont), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
-	add_func("LoadModel",												TypeModelP,	x_p(&__LoadModel));
+	add_func("LoadModel",												TypeModelP,	x_p(&__LoadModel), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
-/*	add_func("GetModelOID",												TypeInt,	x_p(&MetaGetModelOID));
+/*	add_func("GetModelOID",												TypeInt,	x_p(&MetaGetModelOID), FLAG_STATIC);
 		func_add_param("filename",		TypeString);*/
 	
 	// engine
 	// game
-	add_func("ExitProgram",									TypeVoid,	x_p(ExitProgram));
-	add_func("ScreenShot",									TypeVoid,	x_p(ScreenShot));
-	add_func("FindHosts",									TypeHostDataList,	x_p(FindHosts));
-	add_func("LoadWorld",									TypeVoid,	x_p(LoadWorldSoon));
+	add_func("ExitProgram",									TypeVoid,	x_p(ExitProgram), FLAG_STATIC);
+	add_func("ScreenShot",									TypeVoid,	x_p(ScreenShot), FLAG_STATIC);
+	add_func("FindHosts",									TypeHostDataList,	x_p(FindHosts), FLAG_STATIC);
+	add_func("LoadWorld",									TypeVoid,	x_p(LoadWorldSoon), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
-	add_func("LoadGameFromHost",					TypeVoid,	x_p(LoadGameFromHostSoon));
+	add_func("LoadGameFromHost",					TypeVoid,	x_p(LoadGameFromHostSoon), FLAG_STATIC);
 		func_add_param("host",		TypeHostData);
-	add_func("SaveGameState",							TypeVoid,	x_p(SaveGameState));
+	add_func("SaveGameState",							TypeVoid,	x_p(SaveGameState), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
-	add_func("LoadGameState",							TypeVoid,	x_p(LoadGameStateSoon));
+	add_func("LoadGameState",							TypeVoid,	x_p(LoadGameStateSoon), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
-	add_func("GetObjectByName",							TypeModelP,	x_p(&GetObjectByName));
+	add_func("GetObjectByName",							TypeModelP,	x_p(&GetObjectByName), FLAG_STATIC);
 		func_add_param("name",		TypeString);
-	add_func("FindObjects",								TypeInt,	x_p(&GodFindObjects));
+	add_func("FindObjects",								TypeInt,	x_p(&GodFindObjects), FLAG_STATIC);
 		func_add_param("pos",		TypeVector);
 		func_add_param("radius",	TypeFloat32);
 		func_add_param("mode",		TypeInt);
 		func_add_param("o",			TypeModelPListPs);
-	add_func("NextObject",									TypeBool,	x_p(&NextObject));
+	add_func("NextObject",									TypeBool,	x_p(&NextObject), FLAG_STATIC);
 		func_add_param("o",		TypeModelPPs);
-	add_func("CreateObject",							TypeModelP,	x_p(&__CreateObject));
+	add_func("CreateObject",							TypeModelP,	x_p(&__CreateObject), FLAG_STATIC);
 		func_add_param("filename",		TypeString);
 		func_add_param("pos",		TypeVector);
-	add_func("SplashScreen",					TypeVoid,	x_p(DrawSplashScreen));
+	add_func("SplashScreen",					TypeVoid,	x_p(DrawSplashScreen), FLAG_STATIC);
 		func_add_param("status",		TypeString);
 		func_add_param("progress",		TypeFloat32);
-	add_func("RenderScene",									TypeVoid, 	nullptr);
-	add_func("GetG",											TypeVector,	amd64_wrap(&GetG, &amd64_getg));
+	add_func("RenderScene",									TypeVoid, 	nullptr, FLAG_STATIC);
+	add_func("GetG",											TypeVector,	amd64_wrap(&GetG, &amd64_getg), FLAG_STATIC);
 		func_add_param("pos",		TypeVector);
-	add_func("Trace",											TypeBool,	x_p(&GodTrace));
+	add_func("Trace",											TypeBool,	x_p(&GodTrace), FLAG_STATIC);
 		func_add_param("p1",		TypeVector);
 		func_add_param("p2",		TypeVector);
 		func_add_param("d",			TypeTraceData);
@@ -978,21 +978,21 @@ void SIAddPackageX()
 	
 
 		// user input
-	add_func("UpdateInput",			TypeVoid,	x_p(&update_input));
-	add_func("GetKey",								TypeBool,	x_p(&get_key));
+	add_func("UpdateInput",			TypeVoid,	x_p(&update_input), FLAG_STATIC);
+	add_func("GetKey",								TypeBool,	x_p(&get_key), FLAG_STATIC);
 		func_add_param("id",		TypeInt);
-	add_func("GetKeyDown",								TypeBool,	x_p(&get_key_down));
+	add_func("GetKeyDown",								TypeBool,	x_p(&get_key_down), FLAG_STATIC);
 		func_add_param("id",		TypeInt);
-	add_func("GetKeyDownRep",							TypeInt,	x_p(&get_key_down_rep));
-	add_func("GetKeyUp",								TypeBool,	x_p(&get_key_up));
+	add_func("GetKeyDownRep",							TypeInt,	x_p(&get_key_down_rep), FLAG_STATIC);
+	add_func("GetKeyUp",								TypeBool,	x_p(&get_key_up), FLAG_STATIC);
 		func_add_param("id",		TypeInt);
-	add_func("GetKeyChar",							TypeString,	x_p(&get_key_char));
+	add_func("GetKeyChar",							TypeString,	x_p(&get_key_char), FLAG_STATIC);
 		func_add_param("id",		TypeInt);
-	add_func("GetButton",										TypeBool,	x_p(&get_button));
+	add_func("GetButton",										TypeBool,	x_p(&get_button), FLAG_STATIC);
 		func_add_param("button",	TypeInt);
-	add_func("GetButtonDown",										TypeBool,	x_p(&get_button_down));
+	add_func("GetButtonDown",										TypeBool,	x_p(&get_button_down), FLAG_STATIC);
 		func_add_param("button",	TypeInt);
-	add_func("GetButtonUp",										TypeBool,	x_p(&get_button_up));
+	add_func("GetButtonUp",										TypeBool,	x_p(&get_button_up), FLAG_STATIC);
 		func_add_param("button",	TypeInt);
 
 	// game variables

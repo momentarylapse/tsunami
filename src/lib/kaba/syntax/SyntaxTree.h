@@ -66,9 +66,10 @@ public:
 	~SyntaxTree();
 
 	void parse_buffer(const string &buffer, bool just_analyse);
-	void AddIncludeData(Script *s);
+	void add_include_data(Script *s);
 
 	void do_error(const string &msg, int override_exp_no = -1, int override_line = -1);
+	void do_error_implicit(Function *f, const string &msg);
 	void expect_no_new_line();
 	void expect_new_line();
 	void expect_indent();
@@ -77,42 +78,41 @@ public:
 	void parse();
 	void parse_top_level();
 	void parse_all_class_names(Class *ns, int indent0);
-	void parse_all_function_bodies();
+	void parse_all_function_bodies(const Class *name_space);
 	void parse_import();
 	void parse_enum(Class *_namespace);
 	void parse_class(Class *_namespace);
-	Function *parse_function_header(const Class *class_type, bool as_extern);
-	void SkipParsingFunctionBody();
+	Function *parse_function_header(Class *name_space, bool as_extern, bool as_static, bool as_virtual, bool override);
+	void skip_parsing_function_body();
 	void parse_function_body(Function *f);
-	void parse_class_function_header(Class *t, bool as_extern, bool as_static, bool as_virtual, bool override);
-	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
+	bool parse_function_command(Function *f, ExpressionBuffer::Line *this_line);
 	const Class *parse_type(const Class *ns);
-	void ParseVariableDef(bool single, Block *block);
+	void parse_variable_def(bool single, Block *block);
 	void parse_global_const(const string &name, const Class *type);
 	int which_primitive_operator(const string &name);
 	int which_statement(const string &name);
 	const Class *which_owned_class(const string &name);
 
 	// pre compiler
-	void PreCompiler(bool just_analyse);
-	void HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
-	void AutoImplementAddVirtualTable(Node *self, Function *f, const Class *t);
-	void AutoImplementAddChildConstructors(Node *self, Function *f, const Class *t);
-	void AutoImplementConstructor(Function *f, const Class *t, bool allow_parent_constructor);
-	void AutoImplementDestructor(Function *f, const Class *t);
-	void AutoImplementAssign(Function *f, const Class *t);
-	void AutoImplementArrayClear(Function *f, const Class *t);
-	void AutoImplementArrayResize(Function *f, const Class *t);
-	void AutoImplementArrayAdd(Function *f, const Class *t);
-	void AutoImplementArrayRemove(Function *f, const Class *t);
-	void AutoImplementFunctions(const Class *t);
-	void AddMissingFunctionHeadersForClass(Class *t);
+	void pre_compiler(bool just_analyse);
+	void handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
+	void auto_implement_add_virtual_table(Node *self, Function *f, const Class *t);
+	void auto_implement_add_child_constructors(Node *self, Function *f, const Class *t);
+	void auto_implement_constructor(Function *f, const Class *t, bool allow_parent_constructor);
+	void auto_implement_destructor(Function *f, const Class *t);
+	void auto_implement_assign(Function *f, const Class *t);
+	void auto_implement_array_clear(Function *f, const Class *t);
+	void auto_implement_array_resize(Function *f, const Class *t);
+	void auto_implement_array_add(Function *f, const Class *t);
+	void auto_implement_array_remove(Function *f, const Class *t);
+	void auto_implement_functions(const Class *t);
+	void add_missing_function_headers_for_class(Class *t);
 
 	// syntax analysis
 	const Class *get_constant_type(const string &str);
 	void get_constant_value(const string &str, Value &value);
 	const Class *find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion);
-	const Class *AddClass(const Class *type);
+	const Class *add_class(const Class *type);
 	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *sub, Class *ns);
 	const Class *make_class(const string &name, Class::Type type, int size, int array_size, const Class *sub);
 	const Class *make_class_super_array(const Class *element_type);
@@ -163,26 +163,26 @@ public:
 	Node *parse_statement_len(Block *block);
 	Node *parse_statement_let(Block *block);
 
-	void CreateAsmMetaInfo();
+	void create_asm_meta_info();
 
 	// neccessary conversions
-	void ConvertCallByReference();
-	void BreakDownComplicatedCommands();
-	Node *BreakDownComplicatedCommand(Node *c);
-	void MakeFunctionsInline();
-	void MapLocalVariablesToStack();
+	void convert_call_by_reference();
+	void break_down_complicated_commands();
+	Node *break_down_complicated_command(Node *c);
+	void make_functions_inline();
+	void map_local_variables_to_stack();
 
 	void transform(std::function<Node*(Node*)> F);
 	static void transform_block(Block *block, std::function<Node*(Node*)> F);
 	static Node* transform_node(Node *n, std::function<Node*(Node*)> F);
 
 	// data creation
-	Constant *add_constant(const Class *type, Class *_namespace = nullptr);
-	Function *add_function(const string &name, const Class *type);
+	Constant *add_constant(const Class *type, Class *name_space = nullptr);
+	Function *add_function(const string &name, const Class *type, const Class *name_space, bool is_static);
 
 	// nodes
 	Node *add_node_statement(int index);
-	Node *add_node_member_call(ClassFunction *f, Node *inst, bool force_non_virtual = false);
+	Node *add_node_member_call(Function *f, Node *inst, bool force_non_virtual = false);
 	Node *add_node_func_name(Function *f);
 	Node *add_node_call(Function *f);
 	Node *add_node_const(Constant *c);
@@ -197,14 +197,14 @@ public:
 	Node *shift_node(Node *sub, bool deref, int shift, const Class *type);
 
 	// pre processor
-	Node *PreProcessNode(Node *c);
-	void PreProcessor();
-	Node *PreProcessNodeAddresses(Node *c);
-	void PreProcessorAddresses();
-	void SimplifyRefDeref();
-	void SimplifyShiftDeref();
+	Node *pre_process_node(Node *c);
+	void pre_processor();
+	Node *pre_process_node_addresses(Node *c);
+	void pre_processor_addresses();
+	void simplify_ref_deref();
+	void simplify_shift_deref();
 
-	void Show(const string &stage);
+	void show(const string &stage);
 
 // data
 

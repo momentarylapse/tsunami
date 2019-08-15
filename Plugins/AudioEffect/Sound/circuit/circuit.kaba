@@ -1,3 +1,4 @@
+use file
 use "linalg.kaba"
 
 
@@ -314,7 +315,7 @@ class Circuit
 			res.phi.add(phi)
 	
 	void save(string filename)
-		File* f = FileCreateText(filename)
+		File* f = Filesystem.create_text(filename)
 		for n in nodes
 			f << "Node"
 			f << n.pos.x

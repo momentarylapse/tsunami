@@ -37,6 +37,7 @@ public:
 	float _cdecl length_sqr() const;
 	float _cdecl length_fuzzy() const;
 	void _cdecl normalize();
+	vector _cdecl normalized() const;
 	vector _cdecl ang2dir() const;
 	vector _cdecl dir2ang() const;
 	vector _cdecl dir2ang2(const vector &up) const;
@@ -54,10 +55,11 @@ public:
 	bool _cdecl bounding_cube(const vector &a, float r) const;
 
 	static const vector ZERO, EX, EY, EZ;
+	
+	static float _cdecl dot(const vector &v1, const vector &v2);
+	static vector _cdecl cross(const vector &v1, const vector &v2);
 };
 // vectors
-float _cdecl VecDotProduct(const vector &v1, const vector &v2);
-vector _cdecl VecCrossProduct(const vector &v1, const vector &v2);
 vector _cdecl VecAngAdd(const vector &ang1, const vector &ang2);
 vector _cdecl VecAngInterpolate(const vector &ang1, const vector &ang2, float t);
 float _cdecl VecLineDistance(const vector &p, const vector &l1, const vector &l2);

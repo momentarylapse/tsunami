@@ -39,6 +39,9 @@ void SIAddPackageThread()
 		class_add_func("is_done", TypeBool, thread_p(mf(&Thread::is_done)));
 		class_add_func("kill", TypeVoid, thread_p(mf(&Thread::kill)));
 		class_add_func("join", TypeVoid, thread_p(mf(&Thread::join)));
+		class_add_func("get_num_cores", TypeInt, thread_p(&Thread::get_num_cores), FLAG_STATIC);
+		class_add_func("exit", TypeVoid, thread_p(&Thread::exit), FLAG_STATIC);
+		class_add_func("self", TypeThreadP,thread_p(&Thread::get_self), FLAG_STATIC);
 #ifdef _X_USE_THREADS_
 		class_set_vtable(Thread);
 #endif
@@ -64,10 +67,6 @@ void SIAddPackageThread()
 #ifdef _X_USE_THREADS_
 		class_set_vtable(ThreadedWork);
 #endif
-
-	add_func("ThreadGetNumCores", TypeInt, thread_p(&Thread::get_num_cores));
-	add_func("ThreadExit", TypeVoid, thread_p(&Thread::exit));
-	add_func("ThreadSelf", TypeThreadP,thread_p(&Thread::get_self));
 }
 
 };

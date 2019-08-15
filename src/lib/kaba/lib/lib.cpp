@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.3.1";
+string LibVersion = "0.17.4.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -77,23 +77,20 @@ const string IDENTIFIER_ASM = "asm";
 
 CompilerConfiguration config;
 
-struct ExternalLinkData
-{
+struct ExternalLinkData {
 	string name;
 	void *pointer;
 };
 Array<ExternalLinkData> ExternalLinks;
 
-struct ClassOffsetData
-{
+struct ClassOffsetData {
 	string class_name, element;
 	int offset;
 	bool is_virtual;
 };
 Array<ClassOffsetData> ClassOffsets;
 
-struct ClassSizeData
-{
+struct ClassSizeData {
 	string class_name;
 	int size;
 };
@@ -175,7 +172,6 @@ Script *cur_package = nullptr;
 
 static Function *cur_func = nullptr;
 static Class *cur_class;
-static ClassFunction *cur_class_func = nullptr;
 
 
 void add_package(const string &name, bool used_by_default)
@@ -192,16 +188,15 @@ void __add_class__(Class *t) {
 	t->name_space = cur_package->syntax->base_class;
 }
 
-const Class *add_type(const string &name, int size, ScriptFlag flag)
-{
+const Class *add_type(const string &name, int size, ScriptFlag flag) {
 	Class *t = new Class(name, size, cur_package->syntax);
 	if ((flag & FLAG_CALL_BY_VALUE) > 0)
 		t->force_call_by_value = true;
 	__add_class__(t);
 	return t;
 }
-const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag)
-{
+
+const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag flag) {
 	Class *t = new Class(name, config.pointer_size, cur_package->syntax);
 	t->type = Class::Type::POINTER;
 	if ((flag & FLAG_SILENT) > 0)
@@ -210,15 +205,14 @@ const Class *add_type_p(const string &name, const Class *sub_type, ScriptFlag fl
 	__add_class__(t);
 	return t;
 }
-const Class *add_type_a(const string &name, const Class *sub_type, int array_length)
-{
+const Class *add_type_a(const string &name, const Class *sub_type, int array_length) {
 	Class *t = new Class(name, 0, cur_package->syntax, sub_type);
-	if (array_length < 0){
+	if (array_length < 0) {
 		// super array
 		t->size = config.super_array_size;
 		t->type = Class::Type::SUPER_ARRAY;
 		script_make_super_array(t);
-	}else{
+	} else {
 		// standard array
 		t->size = sub_type->size * array_length;
 		t->type = Class::Type::ARRAY;
@@ -228,8 +222,7 @@ const Class *add_type_a(const string &name, const Class *sub_type, int array_len
 	return t;
 }
 
-const Class *add_type_d(const string &name, const Class *sub_type)
-{
+const Class *add_type_d(const string &name, const Class *sub_type) {
 	Class *t = new Class(name, config.super_array_size, cur_package->syntax, sub_type);
 	t->type = Class::Type::DICT;
 	script_make_dict(t);
@@ -243,7 +236,7 @@ const Class *add_type_d(const string &name, const Class *sub_type)
 
 //   without type information ("primitive")
 
-PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
+PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS] = {
 	{"=",  OPERATOR_ASSIGN,        true,  1, IDENTIFIER_FUNC_ASSIGN},
 	{"+",  OPERATOR_ADD,           false, 11, "__add__"},
 	{"-",  OPERATOR_SUBTRACT,      false, 11, "__sub__"},
@@ -277,19 +270,17 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 
 //   with type information
 
-void add_operator(int primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, int inline_index, void *func = nullptr)
-{
+void add_operator(int primitive_op, const Class *return_type, const Class *param_type1, const Class *param_type2, int inline_index, void *func = nullptr) {
 	Operator *o = new Operator;
+	o->owner = cur_package->syntax;
 	o->primitive_id = primitive_op;
 	o->return_type = return_type;
 	o->param_type_1 = param_type1;
 	o->param_type_2 = param_type2;
-	add_func(PrimitiveOperators[primitive_op].function_name, return_type, func);
+	o->f = add_func(PrimitiveOperators[primitive_op].function_name, return_type, func);
 	func_set_inline(inline_index);
 	func_add_param("a", param_type1);
 	func_add_param("b", param_type2);
-	o->f = cur_func;
-	o->owner = cur_package->syntax;
 	cur_package->syntax->operators.add(o);
 }
 
@@ -299,21 +290,18 @@ void add_operator(int primitive_op, const Class *return_type, const Class *param
 //------------------------------------------------------------------------------------------------//
 
 
-Class *add_class(const Class *root_type)//, PreScript *ps = NULL)
-{
+Class *add_class(const Class *root_type) {
 	cur_class = const_cast<Class*>(root_type);
 	return cur_class;
 }
 
-void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag)
-{
+void class_add_element(const string &name, const Class *type, int offset, ScriptFlag flag) {
 	auto e = ClassElement(name, type, offset);
 	e.hidden = ((flag & FLAG_HIDDEN) > 0);
 	cur_class->elements.add(e);
 }
 
-void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable)
-{
+void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable) {
 	cur_class->derive_from(parent, increase_size);
 	if (copy_vtable)
 		cur_class->vtable = parent->vtable;
@@ -321,56 +309,53 @@ void class_derive_from(const Class *parent, bool increase_size, bool copy_vtable
 
 int _class_override_num_params = -1;
 
-ClassFunction *_class_add_func(const Class *ccc, const ClassFunction &f, ScriptFlag flag)
-{
+void _class_add_member_func(const Class *ccc, Function *f, ScriptFlag flag) {
 	Class *c = const_cast<Class*>(ccc);
-	if ((flag & FLAG_OVERRIDE) > 0){
-		foreachi(ClassFunction &ff, c->functions, i)
-			if (ff.func->name == f.func->name){
-				if (_class_override_num_params < 0 or _class_override_num_params == ff.func->num_params){
-					ff = f;
-					return &ff;
+	if ((flag & FLAG_OVERRIDE) > 0) {
+		foreachi(Function *ff, c->member_functions, i)
+			if (ff->name == f->name) {
+				if (_class_override_num_params < 0 or _class_override_num_params == ff->num_params) {
+					//msg_write("OVERRIDE");
+					c->member_functions[i] = f;
+					return;
 				}
 			}
-		msg_error("could not override " + c->name + "." + f.func->name);
-	}else{
+		msg_error("could not override " + c->name + "." + f->name);
+	} else {
 		// name alone is not enough for matching...
 		/*foreachi(ClassFunction &ff, c->functions, i)
-			if (ff.name == f.name){
-				if (_class_override_num_params < 0 or _class_override_num_params == ff.param_types.num){
+			if (ff.name == f.name) {
+				if (_class_override_num_params < 0 or _class_override_num_params == ff.param_types.num) {
 					msg_error("missing override " + c->name + "." + f.name);
 					break;
 				}
 			}*/
+		c->member_functions.add(f);
 	}
-	c->functions.add(f);
-	return &c->functions.back();
 }
 
-void _class_add_func_virtual(const string &name, const Class *return_type, int index, ScriptFlag flag)
-{
-	//msg_write("virtual: " + tname + "." + name);
-	//msg_write(index);
-	add_func(name, return_type, nullptr, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
-	cur_func->_class = cur_class;
-	cur_class_func = _class_add_func(cur_class, ClassFunction(return_type, cur_func), flag);
-	cur_class_func->virtual_index = index;
-	if (index >= cur_class->vtable.num)
-		cur_class->vtable.resize(index + 1);
-	cur_class->_vtable_location_compiler_ = cur_class->vtable.data;
-	cur_class->_vtable_location_target_ = cur_class->vtable.data;
+
+Function* class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
+	Function *f = new Function(name, return_type, cur_class);
+	f->is_pure = ((flag & FLAG_PURE) > 0);
+	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
+	f->is_static = ((flag & FLAG_STATIC) > 0);
+	cur_package->syntax->functions.add(f);
+	f->address_preprocess = func;
+	if (config.allow_std_lib)
+		f->address = func;
+	cur_func = f;
+
+
+	if (f->is_static)
+		cur_class->static_functions.add(f);
+	else
+		_class_add_member_func(cur_class, f, flag);
+	return f;
 }
 
-void class_add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag)
-{
-	add_func(name, return_type, func, ScriptFlag(flag | FLAG_CLASS));
-	cur_func->_class = cur_class;
-	cur_class_func = _class_add_func(cur_class, ClassFunction(return_type, cur_func), flag);
-}
-
-int get_virtual_index(void *func, const string &tname, const string &name)
-{
-	if (config.abi == ABI_WINDOWS_32){
+int get_virtual_index(void *func, const string &tname, const string &name) {
+	if (config.abi == ABI_WINDOWS_32) {
 		if (!func)
 			return 0;
 		unsigned char *pp = (unsigned char*)func;
@@ -380,7 +365,7 @@ int get_virtual_index(void *func, const string &tname, const string &name)
 				// 8b.44.24.**    8b.00     ff.60.10
 				// virtual function
 				return (int)pp[8] / 4;
-			}else if (pp[0] == 0xe9){
+			} else if (pp[0] == 0xe9) {
 				// jmp
 				//msg_write(Asm::Disassemble(func, 16));
 				pp = &pp[5] + *(int*)&pp[1];
@@ -389,44 +374,47 @@ int get_virtual_index(void *func, const string &tname, const string &name)
 					// 8b.44.24.**    8b.00     ff.60.10
 					// virtual function
 					return (int)pp[8] / 4;
-				}else
+				} else {
 					throw(1);
-			}else
+				}
+			} else {
 				throw(1);
-		}catch (...){
+			}
+		} catch (...) {
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 			msg_write(string((char*)pp, 4).hex());
 			msg_write(Asm::Disassemble(func, 16));
 		}
-	}else{
+	} else {
 
 		int_p p = (int_p)func;
-		if ((p & 1) > 0){
+		if ((p & 1) > 0) {
 			// virtual function
 			return p / sizeof(void*);
-		}else if (!func){
+		} else if (!func) {
 			return 0;
-		}else{
+		} else {
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		}
 	}
 	return -1;
 }
 
-void class_add_func_virtual(const string &name, const Class *return_type, void *func, ScriptFlag flag)
-{
+Function* class_add_func_virtual(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
 	string tname = cur_class->name;
-	if (tname[0] == '-'){
-		for (auto *t: cur_package->syntax->base_class->classes)
-			if ((t->is_pointer()) and (t->parent == cur_class))
-				tname = t->name;
-	}
 	int index = get_virtual_index(func, tname, name);
-	_class_add_func_virtual(name, return_type, index, flag);
+	//msg_write("virtual: " + tname + "." + name);
+		//msg_write(index);
+	Function *f = class_add_func(name, return_type, func, flag);
+	cur_func->virtual_index = index;
+	if (index >= cur_class->vtable.num)
+		cur_class->vtable.resize(index + 1);
+	cur_class->_vtable_location_compiler_ = cur_class->vtable.data;
+	cur_class->_vtable_location_target_ = cur_class->vtable.data;
+	return f;
 }
 
-void class_link_vtable(void *p)
-{
+void class_link_vtable(void *p) {
 	cur_class->link_external_virtual_table(p);
 }
 
@@ -435,17 +423,21 @@ void class_link_vtable(void *p)
 //                                           constants                                            //
 //------------------------------------------------------------------------------------------------//
 
-void add_const(const string &name, const Class *type, void *value)
-{
-	Constant *c = cur_package->syntax->add_constant(type);
+void class_add_const(const string &name, const Class *type, const void *value) {
+	Constant *c = cur_package->syntax->add_constant(type, cur_class);
 	c->name = name;
 	c->address = c->p();
 
 	// config.PointerSize might be smaller than needed for the following assignment
 	if ((type == TypeInt) or (type == TypeFloat32) or (type == TypeChar)  or (type == TypeBool) or (type->is_pointer()))
-		*(void**)c->p() = value;
+		*(const void**)c->p() = value;
 	else
 		memcpy(c->p(), value, type->size);
+}
+
+void add_const(const string &name, const Class *type, const void *value) {
+	cur_class = cur_package->syntax->base_class;
+	class_add_const(name, type, value);
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -453,9 +445,9 @@ void add_const(const string &name, const Class *type, void *value)
 //------------------------------------------------------------------------------------------------//
 
 
-void add_ext_var(const string &name, const Class *type, void *var)
-{
-	auto *v = cur_package->syntax->root_of_all_evil->block->add_var(name, type);
+void add_ext_var(const string &name, const Class *type, void *var) {
+	auto *v = new Variable(name, type);
+	cur_package->syntax->base_class->static_variables.add(v);
 	if (config.allow_std_lib)
 		v->memory = var;
 };
@@ -564,6 +556,8 @@ void _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
 			_ultra_sort_p<int>(array, offset);
 		else if (ell->type == TypeFloat)
 			_ultra_sort_p<float>(array, offset);
+		else if (ell->type == TypeBool)
+			_ultra_sort_p<bool>(array, offset);
 		else
 			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
 	}else{
@@ -573,6 +567,8 @@ void _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
 			_ultra_sort<int>(array, offset);
 		else if (ell->type == TypeFloat)
 			_ultra_sort<float>(array, offset);
+		else if (ell->type == TypeBool)
+			_ultra_sort<bool>(array, offset);
 		else
 			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
 	}
@@ -598,18 +594,9 @@ string _cdecl kaba_shell_execute(const string &cmd)
 
 Array<Statement> Statements;
 
-int add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
-	Function *f = new Function(name, return_type, cur_package->syntax->base_class);
-	f->is_pure = ((flag & FLAG_PURE) > 0);
-	f->throws_exceptions = ((flag & FLAG_RAISES_EXCEPTIONS) > 0);
-	f->is_static = ((flag & FLAG_CLASS) == 0);
-	cur_package->syntax->functions.add(f);
-	f->address_preprocess = func;
-	if (config.allow_std_lib)
-		f->address = func;
-	cur_func = f;
-	cur_class_func = nullptr;
-	return cur_package->syntax->functions.num - 1;
+Function *add_func(const string &name, const Class *return_type, void *func, ScriptFlag flag) {
+	add_class(cur_package->base_class());
+	return class_add_func(name, return_type, func, flag);
 }
 
 int add_statement(const string &name, int index, int num_params = 0) {
@@ -645,7 +632,8 @@ void script_make_super_array(Class *t, SyntaxTree *ps)
 	t->parent = parent;
 	add_class(t);
 
-	ClassFunction *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
+	Function *sub = t->get_func(IDENTIFIER_FUNC_SUBARRAY, TypeDynamicArray, {nullptr,nullptr});
+	sub->literal_return_type = t;
 	sub->return_type = t;
 
 	// FIXME  wrong for complicated classes
@@ -904,7 +892,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 	TypeCast c;
 	c.penalty = penalty;
 	c.f = nullptr;
-	for (auto *f: cur_package->syntax->functions)
+	for (auto *f: cur_package->syntax->base_class->static_functions)
 		if (f->long_name() == cmd){
 			c.f = f;
 			break;
@@ -977,8 +965,7 @@ public:
 	string _cdecl str(){	string r;	r.add(c);	return r;	}
 };
 
-class PointerClass
-{
+class PointerClass {
 	void *p;
 public:
 	string _cdecl str(){	return p2s(p);	}
@@ -986,15 +973,13 @@ public:
 
 
 
-int xop_int_add(int a, int b)
-{
+int xop_int_add(int a, int b) {
 	return a + b;
 }
 
 
 
-void SIAddPackageBase()
-{
+void SIAddPackageBase() {
 	add_package("base", true);
 
 	// internal
@@ -1080,31 +1065,31 @@ void SIAddPackageBase()
 
 
 	//	add_func_special("f2i", TypeInt, (void*)&_Float2Int);
-	add_funcx("f2i", TypeInt, &_Float2Int, FLAG_PURE);
+	add_funcx("f2i", TypeInt, &_Float2Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_FLOAT_TO_INT);    // sometimes causes floating point exceptions...
 		func_add_param("f", TypeFloat32);
-	add_funcx("i2f", TypeFloat32, &_Int2Float, FLAG_PURE);
+	add_funcx("i2f", TypeFloat32, &_Int2Float, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_INT_TO_FLOAT);
 		func_add_param("i", TypeInt);
-	add_funcx("f2f64", TypeFloat64, &_Float2Float64, FLAG_PURE);
+	add_funcx("f2f64", TypeFloat64, &_Float2Float64, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_FLOAT_TO_FLOAT64);
 		func_add_param("f", TypeFloat32);
-	add_funcx("f642f", TypeFloat32, &_Float642Float, FLAG_PURE);
+	add_funcx("f642f", TypeFloat32, &_Float642Float, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_FLOAT64_TO_FLOAT);
 		func_add_param("f", TypeFloat64);
-	add_funcx("i2i64", TypeInt64, &_Int2Int64, FLAG_PURE);
+	add_funcx("i2i64", TypeInt64, &_Int2Int64, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_INT_TO_INT64);
 		func_add_param("i", TypeInt);
-	add_funcx("i642i", TypeInt, &_Int642Int, FLAG_PURE);
+	add_funcx("i642i", TypeInt, &_Int642Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_INT64_TO_INT);
 		func_add_param("i", TypeInt64);
-	add_funcx("i2c", TypeChar, &_Int2Char, FLAG_PURE);
+	add_funcx("i2c", TypeChar, &_Int2Char, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_INT_TO_CHAR);
 		func_add_param("i", TypeInt);
-	add_funcx("c2i", TypeInt, &_Char2Int, FLAG_PURE);
+	add_funcx("c2i", TypeInt, &_Char2Int, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_CHAR_TO_INT);
 		func_add_param("c", TypeChar);
-	add_funcx("p2b", TypeBool, &_Pointer2Bool, FLAG_PURE);
+	add_funcx("p2b", TypeBool, &_Pointer2Bool, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_POINTER_TO_BOOL);
 		func_add_param("p", TypePointer);
 
@@ -1225,7 +1210,7 @@ void SIAddPackageBase()
 	add_const("true",  TypeBool, (void*)true);
 
 
-	add_funcx("int_add", TypeInt, &xop_int_add, FLAG_PURE);
+	add_funcx("int_add", TypeInt, &xop_int_add, ScriptFlag(FLAG_PURE | FLAG_STATIC));
 		func_set_inline(INLINE_INT_ADD);
 		func_add_param("a", TypeInt);
 		func_add_param("b", TypeInt);
@@ -1238,14 +1223,34 @@ void SIAddPackageBase()
 		class_add_element("text", TypeString, config.pointer_size);
 		class_set_vtable(KabaException);
 
-	add_funcx(IDENTIFIER_RAISE, TypeVoid, &kaba_raise_exception, FLAG_RAISES_EXCEPTIONS);
+	add_funcx(IDENTIFIER_RAISE, TypeVoid, &kaba_raise_exception, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("e", TypeExceptionP);
 }
 
 
 
-void SIAddPackageKaba()
-{
+#pragma GCC push_options
+#pragma GCC optimize("no-omit-frame-pointer")
+#pragma GCC optimize("no-inline")
+#pragma GCC optimize("0")
+
+Script *__load_script__(const string &filename, bool just_analyse) {
+	KABA_EXCEPTION_WRAPPER( return Load(filename, just_analyse); );
+	return nullptr;
+}
+
+Script *__create_from_source__(const string &source, bool just_analyse) {
+	KABA_EXCEPTION_WRAPPER( return CreateForSource(source, just_analyse); );
+	return nullptr;
+}
+
+void __execute_single_command__(const string &cmd) {
+	KABA_EXCEPTION_WRAPPER( ExecuteSingleScriptCommand(cmd); );
+}
+
+#pragma GCC pop_options
+
+void SIAddPackageKaba() {
 	add_package("kaba", false);
 
 
@@ -1262,15 +1267,13 @@ void SIAddPackageKaba()
 	auto *TypeStatementList = add_type_a("Statement[]", TypeStatement, -1);
 		
 
-	auto *TypePackage = add_type  ("Package", sizeof(Script));
-	auto *TypePackageP = add_type_p("Package*", TypePackage);
-	auto *TypePackagePList = add_type_a("Package*[]", TypePackageP, -1);
+	auto *TypeScript = add_type  ("Script", sizeof(Script));
+	auto *TypeScriptP = add_type_p("Script*", TypeScript);
+	auto *TypeScriptPList = add_type_a("Script*[]", TypeScriptP, -1);
 
 	
 	auto *TypeClassElement = add_type("ClassElement", sizeof(ClassElement));
 	auto *TypeClassElementList = add_type_a("ClassElement[]", TypeClassElement, -1);
-	auto *TypeClassFunction = add_type("ClassFunction", sizeof(ClassFunction));
-	auto *TypeClassFunctionList = add_type_a("ClassFunction[]", TypeClassFunction, -1);
 	auto *TypeVariable = add_type("Variable", sizeof(Variable));
 	auto *TypeVariableP = add_type_p("Variable*", TypeVariable);
 	auto *TypeVariablePList = add_type_a("Variable*[]", TypeVariableP, -1);
@@ -1284,10 +1287,6 @@ void SIAddPackageKaba()
 		class_add_elementx("type", TypeClassP, &ClassElement::type);
 		class_add_elementx("hidden", TypeBool, &ClassElement::hidden);
 		class_add_elementx("offset", TypeInt, &ClassElement::offset);
-	
-	add_class(TypeClassFunction);
-		class_add_elementx("func", TypeFunctionP, &ClassFunction::func);
-		class_add_elementx("virtual_index", TypeInt, &ClassFunction::virtual_index);
 
 
 	add_class(TypeClass);
@@ -1296,7 +1295,8 @@ void SIAddPackageKaba()
 		class_add_elementx("parent", TypeClassP, &Class::parent);
 		class_add_elementx("namespace", TypeClassP, &Class::name_space);
 		class_add_elementx("elements", TypeClassElementList, &Class::elements);
-		class_add_elementx("functions", TypeClassFunctionList, &Class::functions);
+		class_add_elementx("functions", TypeFunctionPList, &Class::member_functions);
+		class_add_elementx("static_functions", TypeFunctionPList, &Class::static_functions);
 		class_add_elementx("classes", TypeClassPList, &Class::classes);
 		class_add_elementx("constants", TypeConstantPList, &Class::constants);
 		class_add_funcx("is_derived_from", TypeBool, &Class::is_derived_from);
@@ -1306,11 +1306,15 @@ void SIAddPackageKaba()
 	add_class(TypeFunction);
 		class_add_elementx("name", TypeString, &Function::name);
 		class_add_funcx("long_name", TypeString, &Function::long_name);
-		class_add_elementx("class", TypeClassP, &Function::_class);
+		class_add_elementx("namespace", TypeClassP, &Function::name_space);
 		class_add_elementx("num_params", TypeInt, &Function::num_params);
 		class_add_elementx("var", TypeVariablePList, &Function::var);
 		class_add_elementx("param_type", TypeClassPList, &Function::literal_param_type);
 		class_add_elementx("return_type", TypeClassP, &Function::literal_return_type);
+		class_add_elementx("is_static", TypeBool, &Function::is_static);
+		class_add_elementx("is_pure", TypeBool, &Function::is_pure);
+		class_add_elementx("virtual_index", TypeInt, &Function::virtual_index);
+		class_add_elementx("inline_index", TypeInt, &Function::inline_no);
 		class_add_elementx("code", TypeFunctionCodeP, &Function::address);
 
 
@@ -1322,13 +1326,24 @@ void SIAddPackageKaba()
 		class_add_elementx("name", TypeString, &Constant::name);
 		class_add_elementx("type", TypeClassP, &Constant::type);
 
-	add_class(TypePackage);
+	add_class(TypeScript);
 		class_add_elementx("name", TypeString, &Script::filename);
 		class_add_elementx("used_by_default", TypeBool, &Script::used_by_default);
 		class_add_funcx("classes", TypeClassPList, &Script::classes);
 		class_add_funcx("functions", TypeFunctionPList, &Script::functions);
 		class_add_funcx("variables", TypeVariablePList, &Script::variables);
 		class_add_funcx("constants", TypeConstantPList, &Script::constants);
+		class_add_funcx("base_class", TypeClassP, &Script::base_class);
+		class_add_funcx("load", TypeScriptP, &__load_script__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("filename", TypeString);
+			func_add_param("just_analize", TypeBool);
+		class_add_funcx("create", TypeScriptP, &__create_from_source__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("source", TypeString);
+			func_add_param("just_analize", TypeBool);
+		class_add_funcx("delete", TypeVoid, &Remove, FLAG_STATIC);
+			func_add_param("script", TypeScriptP);
+		class_add_funcx("execute_single_command", TypeVoid, &__execute_single_command__, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+			func_add_param("cmd", TypeString);
 	
 	add_class(TypeStatement);
 		class_add_elementx("name", TypeString, &Statement::name);
@@ -1336,31 +1351,18 @@ void SIAddPackageKaba()
 		
 	add_class(TypeClassElementList);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassElement>::__init__);
-	add_class(TypeClassFunctionList);
-		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<ClassFunction>::__init__);
 	add_class(TypeStatementList);
 		class_add_funcx(IDENTIFIER_FUNC_INIT, TypeVoid, &Array<Statement>::__init__);
 
-	add_funcx("load_script", TypePackageP, &Load);
-		func_add_param("filename", TypeString);
-		func_add_param("just_analize", TypeBool);
-	add_funcx("create_script", TypePackageP, &CreateForSource);
-		func_add_param("source", TypeString);
-		func_add_param("just_analize", TypeBool);
-	add_funcx("delete_script", TypeVoid, &Remove);
-		func_add_param("script", TypePackageP);
-	add_funcx("execute_single_command", TypeVoid, &ExecuteSingleScriptCommand);
-		func_add_param("cmd", TypeString);
-	add_funcx("get_dynamic_type", TypeClassP, &GetDynamicType);
+	add_funcx("get_dynamic_type", TypeClassP, &GetDynamicType, FLAG_STATIC);
 		func_add_param("p", TypePointer);
 
-	add_ext_var("packages", TypePackagePList, (void*)&Packages);
+	add_ext_var("packages", TypeScriptPList, (void*)&Packages);
 	add_ext_var("statements", TypeStatementList, (void*)&Statements);
 }
 
 
-void SIAddBasicCommands()
-{
+void SIAddBasicCommands() {
 	// statements
 	add_statement(IDENTIFIER_RETURN, STATEMENT_RETURN); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_IF, STATEMENT_IF, 2);
@@ -1440,9 +1442,7 @@ void op_complex_mul(Value &r, Value &a, Value &b)
 void op_complex_div(Value &r, Value &a, Value &b)
 {	r.as_complex() = a.as_complex() / b.as_complex(); }
 
-void SIAddOperators()
-{
-	// same order as in .h file...
+void SIAddOperators() {
 	add_operator(OPERATOR_ASSIGN, TypeVoid, TypePointer, TypePointer, INLINE_POINTER_ASSIGN);
 	add_operator(OPERATOR_EQUAL, 	TypeBool, TypePointer, TypePointer, INLINE_POINTER_EQUAL);
 	add_operator(OPERATOR_NOTEQUAL, TypeBool, TypePointer, TypePointer, INLINE_POINTER_NOT_EQUAL);
@@ -1578,56 +1578,55 @@ void SIAddOperators()
 	add_operator(OPERATOR_SUBTRACT, TypeVector, TypeVoid, TypeVector, INLINE_VECTOR_NEGATE);
 }
 
-void SIAddCommands()
-{
+void SIAddCommands() {
 	// type casting
-	add_func("@s2i", TypeInt, (void*)&s2i);
+	add_func("@s2i", TypeInt, (void*)&s2i, FLAG_STATIC);
 		func_add_param("s", TypeString);
-	add_func("@s2f", TypeFloat32, (void*)&s2f);
+	add_func("@s2f", TypeFloat32, (void*)&s2f, FLAG_STATIC);
 		func_add_param("s", TypeString);
-	add_func("@i2s", TypeString, (void*)&i2s);
+	add_func("@i2s", TypeString, (void*)&i2s, FLAG_STATIC);
 		func_add_param("i", TypeInt);
-	add_func("@i642s", TypeString, (void*)&i642s);
+	add_func("@i642s", TypeString, (void*)&i642s, FLAG_STATIC);
 		func_add_param("i", TypeInt64);
-	add_func("@f2s", TypeString, (void*)&f2s);
+	add_func("@f2s", TypeString, (void*)&f2s, FLAG_STATIC);
 		func_add_param("f", TypeFloat32);
 		func_add_param("decimals", TypeInt);
-	add_func("@f2sf", TypeString, (void*)&f2sf);
+	add_func("@f2sf", TypeString, (void*)&f2sf, FLAG_STATIC);
 		func_add_param("f", TypeFloat32);
-	add_func("@f642sf", TypeString, (void*)&f642sf);
+	add_func("@f642sf", TypeString, (void*)&f642sf, FLAG_STATIC);
 		func_add_param("f", TypeFloat64);
-	add_func("@b2s", TypeString, (void*)&b2s);
+	add_func("@b2s", TypeString, (void*)&b2s, FLAG_STATIC);
 		func_add_param("b", TypeBool);
-	add_func("p2s", TypeString, (void*)&p2s);
+	add_func("p2s", TypeString, (void*)&p2s, FLAG_STATIC);
 		func_add_param("p", TypePointer);
-	add_func("@ia2s", TypeString, (void*)&ia2s);
+	add_func("@ia2s", TypeString, (void*)&ia2s, FLAG_STATIC);
 		func_add_param("a", TypeIntList);
-	add_func("@fa2s", TypeString, (void*)&fa2s); // TODO...
+	add_func("@fa2s", TypeString, (void*)&fa2s, FLAG_STATIC); // TODO...
 		func_add_param("a", TypeFloatList);
-	add_func("@ba2s", TypeString, (void*)&ba2s);
+	add_func("@ba2s", TypeString, (void*)&ba2s, FLAG_STATIC);
 		func_add_param("a", TypeBoolList);
-	add_func("@sa2s", TypeString, (void*)&sa2s);
+	add_func("@sa2s", TypeString, (void*)&sa2s, FLAG_STATIC);
 		func_add_param("a", TypeStringList);
 	// debug output
-	/*add_func("cprint", TypeVoid, (void*)&_cstringout);
+	/*add_func("cprint", TypeVoid, (void*)&_cstringout, FLAG_STATIC);
 		func_add_param("str", TypeCString);*/
-	add_func("print", TypeVoid, (void*)&_print);
+	add_func("print", TypeVoid, (void*)&_print, FLAG_STATIC);
 		func_add_param("str", TypeString);
 	// memory
-	add_func("@malloc", TypePointer, (void*)&malloc);
+	add_func("@malloc", TypePointer, (void*)&malloc, FLAG_STATIC);
 		func_add_param("size", TypeInt);
-	add_func("@free", TypeVoid, (void*)&free);
+	add_func("@free", TypeVoid, (void*)&free, FLAG_STATIC);
 		func_add_param("p", TypePointer);
 	// system
-	add_func("shell_execute", TypeString, (void*)&kaba_shell_execute, FLAG_RAISES_EXCEPTIONS);
+	add_func("shell_execute", TypeString, (void*)&kaba_shell_execute, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("cmd", TypeString);
 
 
-	add_func("sort_list", TypeVoid, (void*)&ultra_sort, FLAG_RAISES_EXCEPTIONS);
+	add_func("sort_list", TypeVoid, (void*)&ultra_sort, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("list", TypePointer);
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
-	add_func("-var2str-", TypeString, (void*)var2str, FLAG_RAISES_EXCEPTIONS);
+	add_func("-var2str-", TypeString, (void*)var2str, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
 
@@ -1740,13 +1739,19 @@ void Init(int instruction_set, int abi, bool allow_std_lib)
 
 
 	// consistency checks
+#ifndef NDEBUG
 	for (auto *p: Packages)
 		for (auto *c: p->classes()) {
 			if (c->is_super_array()) {
 				if (!c->get_default_constructor() or !c->get_assign() or !c->get_destructor())
 					msg_error("SUPER ARRAY INCONSISTENT: " + c->name);
 			}
+			// x package failing
+			/*for (auto *f: c->member_functions)
+				if (f->needs_overriding and (f->name != IDENTIFIER_FUNC_SUBARRAY))
+					msg_error(f->signature());*/
 		}
+#endif
 }
 
 void ResetExternalLinkData()
@@ -1819,7 +1824,7 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 	LinkExternal(class_name + "." + func, v[d.offset]);
 }
 
-int ProcessClassOffset(const string &class_name, const string &element, int offset)
+int process_class_offset(const string &class_name, const string &element, int offset)
 {
 	for (ClassOffsetData &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.element == element))

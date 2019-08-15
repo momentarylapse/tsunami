@@ -1,6 +1,7 @@
 // Image = hui:find
 // Title[Deutsch] = Spektrum zeigen
 use hui
+use image
 use "../api.kaba"
 use "../helper/grid.kaba"
 

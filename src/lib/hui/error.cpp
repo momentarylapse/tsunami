@@ -121,7 +121,7 @@ public:
 		event("send_report", std::bind(&ErrorDialog::onSendBugReport, this));
 	#else
 		enable("send_report", false);
-		setTooltip("send_report", _("Program was compiled without network support..."));
+		set_tooltip("send_report", _("Program was compiled without network support..."));
 	#endif
 		for (int i=1023;i>=0;i--){
 			string temp = msg_get_str(i);

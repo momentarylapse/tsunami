@@ -205,28 +205,28 @@ void Script::update_constant_locations() {
 	_update_const_locations(syntax->base_class);
 }
 
-void Script::map_global_variables_to_memory()
-{
-	// global variables -> into Memory
-	int override_offset = 0;
-	for (Variable *v: syntax->base_class->static_variables){
-		if (v->is_extern){
+void Script::_map_global_variables_to_memory(char *mem, int &offset, char *address, const Class *name_space) {
+	for (Variable *v: name_space->static_variables) {
+		if (v->is_extern) {
 			v->memory = GetExternalLink(v->name);
 			if (!v->memory)
 				do_error_link("external variable " + v->name + " was not linked");
-		}else{
+		} else {
 			int size_aligned = mem_align(v->type->size, 4);
-			if (config.override_variables_offset){
-				v->memory = (char*)(int_p)(config.variables_offset + override_offset);
-				override_offset += size_aligned;
-			}else{
-				v->memory = &memory[memory_size];
-				memory_size += size_aligned;
-				//v->memory_owner = true;
-			}
+			v->memory = &address[offset];
+			offset += size_aligned;
 			//memset(v->memory, 0, v->type->size); // reset all global variables to 0
 		}
 	}
+}
+
+void Script::map_global_variables_to_memory() {
+	// global variables -> into Memory
+	int override_offset = 0;
+	if (config.override_variables_offset)
+		_map_global_variables_to_memory(memory, override_offset, (char*)config.variables_offset, syntax->base_class);
+	else
+		_map_global_variables_to_memory(memory, memory_size, memory, syntax->base_class);
 }
 
 void Script::align_opcode() {
@@ -259,13 +259,13 @@ Node *check_const_used(Node *n, Script *me) {
 	return n;
 }
 
-void remap_virtual_tables(Script *s, char *mem, int &offset, const Class *ct)
+void remap_virtual_tables(Script *s, char *mem, int &offset, char *address, const Class *ct)
 {
 	// vtables -> no data yet...
 	if (ct->vtable.num > 0){
 		Class *t = const_cast<Class*>(ct);
 		t->_vtable_location_compiler_ = &mem[offset];
-		t->_vtable_location_target_ = &mem[offset];//(void*)(s->syntax->asm_meta_info->code_origin + opcode_size);
+		t->_vtable_location_target_ = &address[offset];
 		offset += config.pointer_size * t->vtable.num;
 		for (Constant *c: s->syntax->base_class->constants)
 			if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data)){
@@ -274,19 +274,17 @@ void remap_virtual_tables(Script *s, char *mem, int &offset, const Class *ct)
 	}
 
 	for (auto *c: ct->classes)
-		remap_virtual_tables(s, mem, offset, c);
+		remap_virtual_tables(s, mem, offset, address, c);
 }
 
 
-void _map_constants_to_memory(char *mem, int &offset, const Class *ns) {
-	//update_constant_locations();
-	//return;
+void _map_constants_to_memory(char *mem, int &offset, char *address, const Class *ns) {
 
 	// also allow named constants... might be imported by other scripts!
 	for (Constant *c: ns->constants)
-		if (c->used or c->name[0] != '-'){
-//			c->address = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
-			c->address = &mem[offset];
+		if (c->used or ((c->name[0] != '-') and !config.compile_os)){
+			c->address = (void*)(address + offset);//ns->owner->asm_meta_info->code_origin + offset);
+		//	c->address = &mem[offset];
 			c->map_into(&mem[offset], (char*)c->address);
 			offset += mem_align(c->mapping_size(), 4);
 		}
@@ -305,15 +303,12 @@ void _map_constants_to_memory(char *mem, int &offset, const Class *ns) {
 		}*/
 
 	for (auto *c: ns->classes)
-		_map_constants_to_memory(mem, offset, c);
+		_map_constants_to_memory(mem, offset, address, c);
 }
 
-void Script::map_constants_to_memory(char *mem, int &offset)
-{
-	//update_constant_locations();
-	//return;
+void Script::map_constants_to_memory(char *mem, int &offset, char *address) {
 
-	remap_virtual_tables(this, mem, offset, syntax->base_class);
+	remap_virtual_tables(this, mem, offset, address, syntax->base_class);
 
 
 	syntax->transform([&](Node* n){ return check_const_used(n, this); });
@@ -334,14 +329,13 @@ void Script::map_constants_to_memory(char *mem, int &offset)
 	opcode_size = size0;*/
 
 
-	_map_constants_to_memory(mem, offset, syntax->base_class);
+	_map_constants_to_memory(mem, offset, address, syntax->base_class);
 
 	//msg_write(format("    compressed:  %d  ->  %d", uncompressed, opcode_size - size0));
 }
 
-void Script::map_constants_to_opcode()
-{
-	map_constants_to_memory(opcode, opcode_size);
+void Script::map_constants_to_opcode() {
+	map_constants_to_memory(opcode, opcode_size, (char*)(long)syntax->asm_meta_info->code_origin);
 	align_opcode();
 }
 
@@ -378,17 +372,8 @@ bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, ch
 	return false;
 }
 
-struct IncludeTranslationData
-{
-	int const_off;
-	int func_off;
-	int var_off;
-	Script *source;
-};
 
-
-void import_deep(SyntaxTree *dest, SyntaxTree *source)
-{
+void import_deep(SyntaxTree *dest, SyntaxTree *source) {
 	dest->base_class->constants.append(source->base_class->constants);
 	source->base_class->constants.clear();
 
@@ -404,14 +389,13 @@ void import_deep(SyntaxTree *dest, SyntaxTree *source)
 	source->base_class->classes.clear();
 
 	//int asm_off = a->AsmBlocks.num;
-	for (AsmBlock &ab: source->asm_blocks){
+	for (AsmBlock &ab: source->asm_blocks) {
 		dest->asm_blocks.add(ab);
 	}
 }
 
-void find_all_includes_rec(Script *s, Set<Script*> &includes)
-{
-	for (Script *i: s->syntax->includes){
+void find_all_includes_rec(Script *s, Set<Script*> &includes) {
+	for (Script *i: s->syntax->includes) {
 		//if (i->filename.find(".kaba") < 0)
 		//	continue;
 		includes.add(i);
@@ -420,8 +404,7 @@ void find_all_includes_rec(Script *s, Set<Script*> &includes)
 }
 
 // only for "os"
-void import_includes(Script *s)
-{
+void import_includes(Script *s) {
 	Set<Script*> includes;
 	find_all_includes_rec(s, includes);
 
@@ -429,13 +412,12 @@ void import_includes(Script *s)
 		import_deep(s->syntax, i->syntax);
 }
 
-void Script::link_functions()
-{
-	for (Asm::WantedLabel &l: functions_to_link){
+void Script::link_functions() {
+	for (Asm::WantedLabel &l: functions_to_link) {
 		string name = l.name.substr(10, -1);
 		bool found = false;
 		for (Function *f: syntax->functions)
-			if (f->name == name){
+			if (f->name == name) {
 				*(int*)&opcode[l.pos] = (int_p)f->address - (syntax->asm_meta_info->code_origin + l.pos + 4);
 				found = true;
 				break;
@@ -443,7 +425,7 @@ void Script::link_functions()
 		if (!found)
 			do_error_link("could not link function: " + name);
 	}
-	for (int n: function_vars_to_link){
+	for (int n: function_vars_to_link) {
 		int64 p = (n + 0xefef0000);
 		int64 q = (int_p)syntax->functions[n]->address;
 		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
@@ -552,7 +534,7 @@ void Script::compile()
 	allocate_memory();
 	map_global_variables_to_memory();
 	if (!config.compile_os)
-		map_constants_to_memory(memory, memory_size);
+		map_constants_to_memory(memory, memory_size, memory);
 
 	allocate_opcode();
 

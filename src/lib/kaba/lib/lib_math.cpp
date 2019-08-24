@@ -336,7 +336,7 @@ void SIAddPackageMath() {
 	const Class *TypeRandom = add_type("Random", sizeof(Random));
 	
 	// dirty hack :P
-	if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64) {
+	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
 		((Class*)TypeFloat32)->_amd64_allow_pass_in_xmm = true;
 		((Class*)TypeFloat64)->_amd64_allow_pass_in_xmm = true;
 		((Class*)TypeComplex)->_amd64_allow_pass_in_xmm = true;

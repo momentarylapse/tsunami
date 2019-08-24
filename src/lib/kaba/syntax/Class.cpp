@@ -321,7 +321,7 @@ void Class::link_virtual_table() {
 	// link virtual functions into vtable
 	for (Function *cf: member_functions) {
 		if (cf->virtual_index >= 0) {
-			//msg_write(i2s(cf.virtual_index) + ": " + cf.GetFunc()->name);
+			//msg_write(i2s(cf->virtual_index) + ": " + cf->signature());
 			if (cf->virtual_index >= vtable.num)
 				owner->do_error("LinkVirtualTable");
 				//vtable.resize(cf.virtual_index + 1);

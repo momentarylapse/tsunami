@@ -18,6 +18,7 @@ namespace Kaba{
 	typedef int Socket;
 	typedef int NetAddress;
 	#define net_p(p)		NULL
+	#define GetDAAddress(x)			0
 #endif
 #ifdef _X_ALLOW_X_
 	#define x_p(p)		(void*)p

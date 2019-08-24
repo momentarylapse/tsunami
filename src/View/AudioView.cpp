@@ -622,7 +622,7 @@ void move_to_layer(AudioView *view, int delta) {
 
 
 void zoom_y(AudioView *view, float zoom) {
-	view->cam.scale_y = clampf(zoom, 0.7f, 2.0f);
+	view->cam.scale_y = clampf(zoom, 0.5f, 2.0f);
 	view->thm.dirty = true;
 	view->set_message(format(_("vertical zoom %.0f%%"), view->cam.scale_y * 100.0f));
 	view->force_redraw();

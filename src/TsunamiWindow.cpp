@@ -141,6 +141,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	event("layer-add", [=]{ on_add_layer(); });
 	event("layer-delete", [=]{ on_delete_layer(); });
+	set_key_code("layer-delete", hui::KEY_CONTROL + hui::KEY_DELETE);
 	event("layer-make-track", [=]{ on_layer_make_track(); });
 	event("layer-merge", [=]{ on_layer_merge(); });
 	event("layer-mark-dominant", [=]{ on_layer_mark_selection_dominant(); });

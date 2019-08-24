@@ -974,6 +974,7 @@ void AudioView::update_tracks()
 	}
 
 	rebuild_scene_graph();
+	hover().node = nullptr;
 
 	// TODO: detect order change
 	check_consistency();

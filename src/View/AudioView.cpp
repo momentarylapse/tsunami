@@ -1657,6 +1657,14 @@ bool AudioView::exclusively_select_layer(AudioViewLayer *l) {
 	return had_sel;
 }
 
+bool AudioView::exclusively_select_track(AudioViewTrack *t) {
+	bool had_sel = sel.has(t->track);
+	sel.layers.clear();
+	for (auto *l: t->track->layers)
+		sel.add(l);
+	return had_sel;
+}
+
 void AudioView::toggle_select_layer(AudioViewLayer *l) {
 	sel.toggle(l->layer);
 }
@@ -1699,6 +1707,18 @@ void AudioView::toggle_select_layer_with_content_in_cursor(AudioViewLayer *l) {
 		sel = sel.minus(SongSelection::all(song).filter({l->layer}));
 	else
 		sel = sel || SongSelection::from_range(song, sel.range()).filter({l->layer});
+	//toggle_select_layer();
+}
+
+// hmmm, should we also unselect contents of this layer that is not in the cursor range?!?!?
+void AudioView::toggle_select_track_with_content_in_cursor(AudioViewTrack *t) {
+	if (sel.has(t->track)) {
+		for (auto *l: t->track->layers)
+			sel = sel.minus(SongSelection::all(song).filter({l}));
+	} else {
+		for (auto *l: t->track->layers)
+			sel = sel || SongSelection::from_range(song, sel.range()).filter({l});
+	}
 	//toggle_select_layer();
 }
 

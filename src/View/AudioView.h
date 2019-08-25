@@ -353,8 +353,10 @@ public:
 	void toggle_object();
 	void exclusively_select_object();
 	bool exclusively_select_layer(AudioViewLayer *l);
+	bool exclusively_select_track(AudioViewTrack *t);
 	void toggle_select_layer(AudioViewLayer *l);
 	void toggle_select_layer_with_content_in_cursor(AudioViewLayer *l);
+	void toggle_select_track_with_content_in_cursor(AudioViewTrack *t);
 };
 
 #endif /* AUDIOVIEW_H_ */

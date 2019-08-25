@@ -181,7 +181,6 @@ void TrackHeader::update_geometry_recursive(const rect &target_area) {
 
 void TrackHeader::draw(Painter *c) {
 	auto *track = vtrack->track;
-	bool _hover = is_cur_hover();
 
 	c->set_antialiasing(true);
 	AudioView::draw_framed_box(c, area, color_bg(), color_frame(), 1.5f);
@@ -257,14 +256,13 @@ public:
 };
 
 bool TrackHeader::on_left_button_down() {
-	auto *l = vtrack->first_layer();
 	if (view->select_xor) {
-		view->toggle_select_layer_with_content_in_cursor(l);
+		view->toggle_select_track_with_content_in_cursor(vtrack);
 	} else {
 		if (view->sel.has(vtrack->track)) {
 			view->set_selection(view->sel.restrict_to_track(vtrack->track));
 		} else {
-			view->exclusively_select_layer(l);
+			view->exclusively_select_track(vtrack);
 			view->select_under_cursor();
 		}
 	}

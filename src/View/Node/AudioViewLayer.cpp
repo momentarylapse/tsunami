@@ -568,7 +568,7 @@ bool AudioViewLayer::on_right_button_down() {
 	} else if (hover_buffer(h) >= 0) {
 		view->open_popup(view->menu_buffer);
 	} else { // void
-		if (layer->is_main())
+		if (track()->layers.num == 1)
 			view->open_popup(view->menu_track);
 		else
 			view->open_popup(view->menu_layer);

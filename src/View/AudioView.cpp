@@ -628,39 +628,93 @@ void zoom_y(AudioView *view, float zoom) {
 	view->force_redraw();
 }
 
+void toggle_track_mute(AudioView *v) {
+	bool muted = v->cur_track()->muted;
+	v->song->begin_action_group();
+	for (auto *t: v->song->tracks)
+		if (v->sel.has(t))
+			t->set_muted(!muted);
+	v->song->end_action_group();
+}
+
+void toggle_track_solo(AudioView *v) {
+	if (v->cur_vtrack()->solo) {
+		for (auto *vt: v->vtrack)
+			vt->set_solo(false);
+	} else {
+		for (auto *vt: v->vtrack)
+			vt->set_solo(v->sel.has(vt->track));
+	}
+}
+
+void toggle_layer_mute(AudioView *v) {
+	/*msg_write("mm");
+	bool any_muted = false;
+	for (auto *l: v->vlayer)
+		if (v->sel.has(l->layer) and l->layer->muted)
+			any_muted = true;
+	msg_write(any_muted);
+	v->song->begin_action_group();
+	for (auto *l: v->vlayer)
+		if (v->sel.has(l->layer)){
+			msg_write("sm");
+			l->layer->set_muted(!any_muted);
+		}
+
+	msg_write("--");
+	v->song->end_action_group();
+
+	msg_write("/mm");*/
+	v->cur_layer()->set_muted(!v->cur_layer()->muted);
+}
+
+void toggle_layer_solo(AudioView *v) {
+	bool any_solo = false;
+	for (auto *l: v->vlayer)
+		if (v->sel.has(l->layer) and l->solo)
+			any_solo = true;
+	for (auto *t: v->vtrack)
+		if (v->sel.has(t->track)){
+			if (any_solo) {
+				for (auto *l: v->vlayer)
+					if (l->track() == t->track)
+						l->set_solo(false);
+			} else {
+				for (auto *l: v->vlayer)
+					if (l->track() == t->track)
+						l->set_solo(v->sel.has(l->layer));
+			}
+		}
+}
+
+void toggle_track_exploded(AudioView *v) {
+	bool any_imploded = false;
+	for (auto *t: v->vtrack)
+		if (v->sel.has(t->track) and t->imploded and t->track->layers.num > 0)
+			any_imploded = true;
+
+	for (auto *t: v->vtrack)
+		if (v->sel.has(t->track) and t->track->layers.num > 0) {
+			if (any_imploded)
+				v->explode_track(t->track);
+			else
+				v->implode_track(t->track);
+		}
+}
 
 void AudioView::on_command(const string &id) {
-	if (id == "track-muted") {
-		bool muted = cur_track()->muted;
-		song->begin_action_group();
-		for (auto *t: song->tracks)
-			if (sel.has(t))
-				t->set_muted(!muted);
-		song->end_action_group();
-	}
-	if (id == "track-solo") {
-		if (cur_vtrack()->solo) {
-			for (auto *vt: vtrack)
-				vt->set_solo(false);
-		} else {
-			for (auto *vt: vtrack)
-				vt->set_solo(sel.has(vt->track));
-		}
-	}
+	if (id == "track-muted")
+		toggle_track_mute(this);
+	if (id == "track-solo")
+		toggle_track_solo(this);
 	if (id == "layer-muted")
-		cur_layer()->set_muted(!cur_layer()->muted);
+		toggle_layer_mute(this);
 	if (id == "layer-solo")
-		cur_vlayer()->set_solo(!cur_vlayer()->solo);
+		toggle_layer_solo(this);
 
 	
-	if (id == "track-explode") {
-		if (cur_track()->layers.num > 0) {
-			if (cur_vtrack()->imploded)
-				explode_track(cur_track());
-			else
-				implode_track(cur_track());
-		}
-	}
+	if (id == "track-explode")
+		toggle_track_exploded(this);
 
 	if (mode == mode_default) {
 		if (id == "layer-up")

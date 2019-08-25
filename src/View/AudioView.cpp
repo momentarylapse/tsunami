@@ -629,11 +629,15 @@ void zoom_y(AudioView *view, float zoom) {
 }
 
 void toggle_track_mute(AudioView *v) {
-	bool muted = v->cur_track()->muted;
+	bool any_unmuted = false;
+	for (auto *t: v->song->tracks)
+		if (v->sel.has(t) and !t->muted)
+			any_unmuted = true;
+
 	v->song->begin_action_group();
 	for (auto *t: v->song->tracks)
 		if (v->sel.has(t))
-			t->set_muted(!muted);
+			t->set_muted(any_unmuted);
 	v->song->end_action_group();
 }
 
@@ -648,24 +652,16 @@ void toggle_track_solo(AudioView *v) {
 }
 
 void toggle_layer_mute(AudioView *v) {
-	/*msg_write("mm");
-	bool any_muted = false;
+	bool any_unmuted = false;
 	for (auto *l: v->vlayer)
-		if (v->sel.has(l->layer) and l->layer->muted)
-			any_muted = true;
-	msg_write(any_muted);
+		if (v->sel.has(l->layer) and !l->layer->muted)
+			any_unmuted = true;
+
 	v->song->begin_action_group();
 	for (auto *l: v->vlayer)
-		if (v->sel.has(l->layer)){
-			msg_write("sm");
-			l->layer->set_muted(!any_muted);
-		}
-
-	msg_write("--");
+		if (v->sel.has(l->layer))
+			l->layer->set_muted(any_unmuted);
 	v->song->end_action_group();
-
-	msg_write("/mm");*/
-	v->cur_layer()->set_muted(!v->cur_layer()->muted);
 }
 
 void toggle_layer_solo(AudioView *v) {
@@ -876,9 +872,11 @@ void AudioView::on_song_new() {
 }
 
 void AudioView::on_song_finished_loading() {
-	for (auto *t: vtrack)
-		if (t->track->layers.num > 1)
-			implode_track(t->track);
+	if ((vlayer.num >= 12) and (vtrack.num >= 2)) {
+		for (auto *t: vtrack)
+			if (t->track->layers.num > 1)
+				implode_track(t->track);
+	}
 	optimize_view();
 	hui::RunLater(0.5f, [=]{ optimize_view(); });
 }
@@ -891,7 +889,7 @@ void AudioView::on_song_tracks_change() {
 
 void AudioView::on_song_change() {
 	if (song->history_enabled())
-		update_peaks();
+		hui::RunLater(0.01f, [=]{ update_peaks(); });
 }
 
 void AudioView::on_stream_tick() {
@@ -1296,14 +1294,6 @@ void AudioView::update_peaks() {
 
 	peak_thread = new PeakThread(this);
 	peak_thread->run();
-
-	/*for (int i=0; i<5; i++){
-		if (peak_thread->is_done()){
-			forceRedraw();
-			break;
-		}else
-			hui::Sleep(0.001f);
-	}*/
 }
 
 void AudioView::set_midi_view_mode(MidiMode mode) {

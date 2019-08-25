@@ -284,6 +284,8 @@ public:
 	}
 	string nice_title() {
 		string s = track->nice_name();
+		if (vtrack->solo)
+			s = u8"\u00bb " + s + u8" \u00ab";
 		if (s.num > 16)
 			return s.head(8) + ".." + s.tail(8);
 		return s;

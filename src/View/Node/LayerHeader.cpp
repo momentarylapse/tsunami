@@ -193,7 +193,7 @@ void LayerHeader::draw(Painter *c) {
 		// track title
 		string title = "v" + i2s(layer->version_number() + 1);
 		if (vlayer->solo)
-			title += " (solo)";
+			title = u8"\u00bb " + title + u8" \u00ab";
 		float ww = AudioView::draw_str_constrained(c, area.x1 + 5, area.y1 + 5, area.width() - 10, title);
 		if (!playable())
 			c->draw_line(area.x1 + 5, area.y1+5+5, area.x1+5+ww, area.y1+5+5);

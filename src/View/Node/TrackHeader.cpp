@@ -189,7 +189,9 @@ void TrackHeader::draw(Painter *c) {
 	// track title
 	c->set_font("", view->FONT_SIZE, playable(), false);
 	c->set_color(color_text());
-	string title = track->nice_name() + (vtrack->solo ? " (solo)" : "");
+	string title = track->nice_name();
+	if (vtrack->solo)
+		title = u8"\u00bb " + title + u8" \u00ab";
 	AudioView::draw_str_constrained(c, area.x1 + 23, area.y1 + 5, area.width() - 25, title);
 	if (!playable()) {
 		float ww = c->get_str_width(title);

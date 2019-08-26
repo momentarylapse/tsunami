@@ -63,7 +63,7 @@ const int AudioView::TRACK_HANDLE_HEIGHT = AudioView::TIME_SCALE_HEIGHT * 2;
 const int AudioView::TRACK_HANDLE_HEIGHT_SMALL = AudioView::TIME_SCALE_HEIGHT;
 const int AudioView::SCROLLBAR_WIDTH = 20;
 const int AudioView::SNAPPING_DIST = 8;
-ColorSchemeBasic AudioView::basic_colors;
+ColorScheme AudioView::basic_colors;
 ColorScheme AudioView::colors;
 
 
@@ -126,23 +126,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	perf_channel = PerformanceMonitor::create_channel("view", this);
 
-	ColorSchemeBasic bright;
-	bright.background = White;
-	bright.text = color(1, 0.3f, 0.3f, 0.3f);
-	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
-	bright.hover = White;
-	bright.gamma = 1.0f;
-	bright.name = "bright";
-	basic_schemes.add(bright);
-
-	ColorSchemeBasic dark;
-	dark.background = color(1, 0.15f, 0.15f, 0.15f);
-	dark.text = color(1, 0.95f, 0.95f, 0.95f);
-	dark.selection = color(1, 0.3f, 0.3f, 0.9f);
-	dark.hover = White;
-	dark.gamma = 0.3f;
-	dark.name = "dark";
-	basic_schemes.add(dark);
+	color_schemes.add(ColorSchemeBright());
+	color_schemes.add(ColorSchemeDark());
 
 	set_color_scheme(hui::Config.get_str("View.ColorScheme", "bright"));
 
@@ -346,12 +331,12 @@ void AudioView::set_mouse_wheel_speed(float speed) {
 
 void AudioView::set_color_scheme(const string &name) {
 	hui::Config.set_str("View.ColorScheme", name);
-	basic_colors = basic_schemes[0];
-	for (auto &b: basic_schemes)
+	basic_colors = color_schemes[0];
+	for (auto &b: color_schemes)
 		if (b.name == name)
 			basic_colors = b;
 
-	colors = basic_colors.create(true);
+	colors = basic_colors;
 	force_redraw();
 }
 
@@ -1241,7 +1226,9 @@ int frame = 0;
 void AudioView::on_draw(Painter *c) {
 	PerformanceMonitor::start_busy(perf_channel);
 
-	colors = basic_colors.create(win->is_active(id));
+	colors = basic_colors;
+	if (!win->is_active(id))
+		colors = basic_colors.disabled();
 
 	area = c->area();
 	clip = c->clip();
@@ -1254,7 +1241,7 @@ void AudioView::on_draw(Painter *c) {
 
 	//c->draw_str(100, 100, i2s(frame++));
 
-	colors = basic_colors.create(true);
+	colors = basic_colors;
 
 	PerformanceMonitor::end_busy(perf_channel);
 }

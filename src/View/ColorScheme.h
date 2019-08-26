@@ -11,10 +11,13 @@
 #include "../lib/base/base.h"
 #include "../lib/image/color.h"
 
-class ColorScheme;
-
-class ColorSchemeBasic {
+class ColorScheme {
 public:
+
+	void auto_generate();
+	ColorScheme disabled() const;
+
+	// basic
 	color background;
 	color text;
 	color selection;
@@ -22,11 +25,6 @@ public:
 	float gamma;
 	string name;
 
-	ColorScheme create(bool active) const;
-};
-
-class ColorScheme : public ColorSchemeBasic {
-public:
 	color background_track;
 	color background_track_selected;
 	color background_track_selection;
@@ -52,7 +50,6 @@ public:
 	color blob_bg_alt, blob_bg_alt_hidden, blob_bg_alt_selected;
 
 	color red, blue, green, white;
-	color red_hover, blue_hover, green_hover, white_hover;
 
 	/*color layer(bool selected, bool hover);
 	color sample(bool selected, bool hover);
@@ -60,6 +57,16 @@ public:
 	color layer_header(bool selected, bool hover);*/
 	
 	color hoverify(const color &c) const;
+};
+
+class ColorSchemeBright : public ColorScheme {
+public:
+	ColorSchemeBright();
+};
+
+class ColorSchemeDark : public ColorScheme {
+public:
+	ColorSchemeDark();
 };
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

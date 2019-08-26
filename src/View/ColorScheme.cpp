@@ -18,77 +18,67 @@ color col_inter(const color a, const color &b, float t) {
 	return c;
 }
 
+ColorScheme ColorScheme::disabled() const {
+	ColorScheme c = *this;
+	c.text = ColorInterpolate(text, background, 0.3f);
+	c.selection = ColorInterpolate(selection, background, pow(0.3f, gamma));
+	c.hover = ColorInterpolate(hover, background, 0.3f);
+	c.auto_generate();
+	return c;
+}
 
-ColorScheme ColorSchemeBasic::create(bool active) const {
-	ColorScheme c;
-	c.name = name;
-	c.background = background;
-
-	if (active) {
-		c.text = text;
-		c.selection = selection;
-		c.hover = hover;
-	} else {
-		c.text = ColorInterpolate(text, background, 0.3f);
-		c.selection = ColorInterpolate(selection, background, pow(0.3f, gamma));
-		c.hover = ColorInterpolate(hover, background, 0.3f);
-	}
+void ColorScheme::auto_generate() {
 
 	if (text.r > background.r) {
-		c.high_contrast_a = White;
-		c.high_contrast_b = Black;
+		high_contrast_a = White;
+		high_contrast_b = Black;
 	} else {
-		c.high_contrast_a = Black;
-		c.high_contrast_b = White;
+		high_contrast_a = Black;
+		high_contrast_b = White;
 	}
 
-	//c.background_track_selected = ColorInterpolate(background, c.selection*1.5f, 0.17f);
-	//c.background_track = ColorInterpolate(c.background, c.background_track_selected, 0.5f);
-	c.background_track_selected = col_inter(background, c.selection*1.2f, 0.10f);
-	c.background_track_selection = col_inter(background, c.selection*1.2f, 0.4f);
-	c.background_track = c.background;
-	c.selection_bars = c.selection;
-	c.selection_bars.a = pow(0.13f, gamma);
-	c.selection_bars_hover = ColorInterpolate(c.selection_bars, hover, 0.5f);
-	c.selection_internal = c.selection;
-	c.selection_internal.a = pow(0.1f, gamma);
-	c.selection_boundary = c.selection;
-	c.selection_boundary_hover = ColorInterpolate(c.selection, c.hover, 0.6f);
-	c.preview_marker = color(1, 0, 0.7f, 0);
-	c.preview_marker_internal = color(0.25f, 0, 0.7f, 0);
-	c.capture_marker = color(1, 0.7f, 0, 0);
-	c.text_soft1 = col_inter(background, c.text, 0.72f);
-	c.text_soft3 = col_inter(background, col_inter(c.text, c.selection, 0.3f), 0.3f);
-	c.text_soft2 = col_inter(c.text_soft3, c.text_soft1, 0.4f);
-	c.grid = col_inter(background, col_inter(c.text, c.selection, 0.4f), 0.35f);
-	c.grid_selected = col_inter(c.grid, c.selection, 0.4f);
+	//background_track_selected = ColorInterpolate(background, selection*1.5f, 0.17f);
+	//background_track = ColorInterpolate(background, background_track_selected, 0.5f);
+	background_track_selected = col_inter(background, selection*1.2f, 0.10f);
+	background_track_selection = col_inter(background, selection*1.2f, 0.4f);
+	background_track = background;
+	selection_bars = selection;
+	selection_bars.a = pow(0.13f, gamma);
+	selection_bars_hover = ColorInterpolate(selection_bars, hover, 0.5f);
+	selection_internal = selection;
+	selection_internal.a = pow(0.1f, gamma);
+	selection_boundary = selection;
+	selection_boundary_hover = ColorInterpolate(selection, hover, 0.6f);
+	preview_marker = color(1, 0, 0.7f, 0);
+	preview_marker_internal = color(0.25f, 0, 0.7f, 0);
+	capture_marker = color(1, 0.7f, 0, 0);
+	text_soft1 = col_inter(background, text, 0.78f);
+	text_soft3 = col_inter(background, col_inter(text, selection, 0.2f), 0.5f);
+	text_soft2 = col_inter(text_soft3, text_soft1, 0.4f);
+	grid = col_inter(background, col_inter(text, selection, 0.4f), 0.35f);
+	grid_selected = col_inter(grid, selection, 0.4f);
 
-	//c.grid = c.text_soft3;
-	c.sample = c.text_soft2;
-	c.sample_selected = c.selection;
+	//grid = text_soft3;
+	sample = text_soft2;
+	sample_selected = selection;
 	
 
-	c.blob_bg_hidden = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
-	c.blob_bg = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.5f), c.background_track_selected, 0.6f);
-	c.blob_bg_selected = ColorInterpolate(ColorInterpolate(c.selection, c.text_soft2, 0.4f), c.background_track_selected, 0.3f);
-	color col_base_alt = ColorInterpolate(c.selection, Green, 0.8f);
-	c.blob_bg_alt_hidden = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft3, 0.6f), c.background_track_selected, 0.8f);
-	c.blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.5f), c.background_track_selected, 0.6f);
-	c.blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, c.text_soft2, 0.4f), c.background_track_selected, 0.3f);
+	blob_bg_hidden = ColorInterpolate(ColorInterpolate(selection, text_soft3, 0.6f), background_track_selected, 0.8f);
+	blob_bg = ColorInterpolate(ColorInterpolate(selection, text_soft2, 0.5f), background_track_selected, 0.6f);
+	blob_bg_selected = ColorInterpolate(ColorInterpolate(selection, text_soft2, 0.4f), background_track_selected, 0.3f);
+	color col_base_alt = ColorInterpolate(selection, Green, 0.8f);
+	blob_bg_alt_hidden = ColorInterpolate(ColorInterpolate(col_base_alt, text_soft3, 0.6f), background_track_selected, 0.8f);
+	blob_bg_alt = ColorInterpolate(ColorInterpolate(col_base_alt, text_soft2, 0.5f), background_track_selected, 0.6f);
+	blob_bg_alt_selected = ColorInterpolate(ColorInterpolate(col_base_alt, text_soft2, 0.4f), background_track_selected, 0.3f);
 	
-	//c.selection_internal = c.blob_bg_selected;
-	//c.grid_selected = c.blob_bg_selected;
-	c.background_track_selection = c.blob_bg;
+	//selection_internal = blob_bg_selected;
+	//grid_selected = blob_bg_selected;
+	background_track_selection = blob_bg;
 
-	c.red = ColorInterpolate(Red, background, 0.3f);
-	c.green = ColorInterpolate(Green, background, 0.3f);
-	c.blue = ColorInterpolate(Blue, background, 0.3f);
-	c.white = ColorInterpolate(White, background, 0.3f);
-	c.red_hover = ColorInterpolate(c.red, hover, 0.3f); // DEPRECATED
-	c.green_hover = ColorInterpolate(c.green, hover, 0.3f);
-	c.blue_hover = ColorInterpolate(c.blue, hover, 0.3f);
-	c.white_hover = ColorInterpolate(c.white, hover, 0.3f);
-	return c;
+	red = color(1, 0.8f, 0, 0);
+	green = color(1, 0, 0.7f, 0);
+	blue = color(1, 0.1f, 0.1f, 1);
+	white = White;
 }
 
 color ColorScheme::hoverify(const color &c) const {
@@ -96,3 +86,22 @@ color ColorScheme::hoverify(const color &c) const {
 	return ColorInterpolate(c, hover, 0.1f);
 }
 
+ColorSchemeBright::ColorSchemeBright() {
+	background = White;
+	text = color(1, 0.3f, 0.3f, 0.3f);
+	selection = color(1, 0.2f, 0.2f, 0.7f);
+	hover = White;
+	gamma = 1.0f;
+	name = "bright";
+	auto_generate();
+}
+
+ColorSchemeDark::ColorSchemeDark() {
+	background = color(1, 0.15f, 0.15f, 0.15f);
+	text = color(1, 0.95f, 0.95f, 0.95f);
+	selection = color(1, 0.3f, 0.3f, 0.9f);
+	hover = White;
+	gamma = 0.3f;
+	name = "dark";
+	auto_generate();
+}

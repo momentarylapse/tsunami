@@ -136,8 +136,8 @@ public:
 
 	string id;
 
-	Array<ColorSchemeBasic> basic_schemes;
-	static ColorSchemeBasic basic_colors;
+	Array<ColorScheme> color_schemes;
+	static ColorScheme basic_colors;
 	static ColorScheme colors;
 	void set_color_scheme(const string &name);
 

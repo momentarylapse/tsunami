@@ -183,7 +183,7 @@ public:
 	}
 
 
-	color signal_color(SignalType type) {
+	color signal_color_base(SignalType type) {
 		if (type == SignalType::AUDIO)
 			return view->colors.red;
 		if (type == SignalType::MIDI)
@@ -194,7 +194,9 @@ public:
 	}
 
 	color signal_color(SignalType type, bool hover) {
-		color c = signal_color(type);
+		color c = signal_color_base(type);
+		c = ColorInterpolate(c, view->colors.text, 0.2f);
+		//c = ColorInterpolate(c, view->colors.background, 0.2f);
 		if (hover)
 			c = view->colors.hoverify(c);
 		return c;
@@ -220,18 +222,22 @@ public:
 		inter.add2(p0, complex(length,0));
 		inter.add2(p1, complex(length,0));
 
-		color base_color = signal_color(c.type);
+		color base_color = signal_color(c.type, false);
 
 		// curve
-		p->set_color(ColorInterpolate(base_color, view->colors.background, 0.5f));
+		p->set_color(base_color);
+		//p->set_color(ColorInterpolate(base_color, view->colors.background, 0.1f));
+		p->set_line_width(2.0f);
 		p->set_line_dash({5, 2}, 0);
 		Array<complex> cc;
 		for (float t=0; t<=1.0f; t+=0.025f)
 			cc.add(inter.get(t));
 		p->draw_lines(cc);
 		p->set_line_dash({}, 0);
-		
-		p->set_color(base_color);
+		p->set_line_width(1);
+
+		p->set_color(ColorInterpolate(base_color, view->colors.text, 0.1f));
+		//p->set_color(base_color);
 		draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 	}
 
@@ -295,7 +301,7 @@ public:
 		}
 
 		if (sel.type == sel.TYPE_PORT_IN or sel.type == sel.TYPE_PORT_OUT) {
-			p->set_color(White);
+			p->set_color(view->colors.text);
 			if (hover.target_module) {
 				p->set_line_width(5);
 				Module *t = hover.target_module;

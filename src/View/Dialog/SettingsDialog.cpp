@@ -75,7 +75,7 @@ void SettingsDialog::load_data() {
 	}
 
 	// color scheme
-	foreachi(auto &b, view->basic_schemes, i) {
+	foreachi(auto &b, view->color_schemes, i) {
 		add_string("color_scheme", b.name);
 		if (b.name == view->colors.name)
 			set_int("color_scheme", i);
@@ -131,8 +131,8 @@ void SettingsDialog::on_language() {
 
 void SettingsDialog::on_color_scheme() {
 	int i = get_int("");
-	if ((i >= 0) and (i < view->basic_schemes.num))
-		view->set_color_scheme(view->basic_schemes[i].name);
+	if ((i >= 0) and (i < view->color_schemes.num))
+		view->set_color_scheme(view->color_schemes[i].name);
 }
 
 void SettingsDialog::on_ogg_bitrate() {

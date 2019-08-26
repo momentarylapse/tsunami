@@ -94,7 +94,7 @@ void GridPainter::draw_time_numbers(Painter *c) {
 	int nx0 = ceil(cam->screen2sample(area.x1) / dl);
 	int nx1 = ceil(cam->screen2sample(area.x2) / dl);
 
-	c->set_color(view->colors.grid);
+	c->set_color(view->colors.text_soft3);//grid);
 	for (int n=nx0; n<nx1; n++) {
 		if ((cam->sample2screen(dl) - cam->sample2screen(0)) > 25) {
 			if (n % 5 == 0)
@@ -169,6 +169,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 
 	c->set_font("", view->FONT_SIZE, true, false);
 	float change_block_until = -1;
+	bool block_reported = false;
 	for (Bar *b: bars) {
 		float xx = cam->sample2screen(b->range().offset);
 		float dx_bar = cam->dsample2screen(b->range().length);
@@ -221,9 +222,11 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			if (xxx > change_block_until) {
 				c->draw_str(xxx, area.y2 - 15, s);
 				change_block_until = xxx + c->get_str_width(s);
-			} else {
+				block_reported = false;
+			} else if (!block_reported) {
 				c->draw_str(change_block_until, area.y2 - 15, "...!");
 				change_block_until += c->get_str_width("...!");
+				block_reported = true;
 				
 			}
 			c->set_font("", view->FONT_SIZE, true, false);

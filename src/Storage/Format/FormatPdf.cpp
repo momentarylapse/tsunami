@@ -46,14 +46,15 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 }
 
 ColorScheme create_pdf_color_scheme() {
-	ColorSchemeBasic bright;
+	ColorScheme bright;
 	bright.background = White;
 	bright.text = Black;//color(1, 0.3f, 0.3f, 0.1f);
 	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
 	bright.hover = White;
 	bright.gamma = 1.0f;
 	bright.name = "pdf";
-	return bright.create(true);
+	bright.auto_generate();
+	return bright;
 }
 
 FormatPdf::LineData::LineData(Track *t, float _y0, float _y1) {

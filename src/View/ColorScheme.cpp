@@ -52,7 +52,7 @@ void ColorScheme::auto_generate() {
 	preview_marker = color(1, 0, 0.7f, 0);
 	preview_marker_internal = color(0.25f, 0, 0.7f, 0);
 	capture_marker = color(1, 0.7f, 0, 0);
-	text_soft1 = col_inter(background, text, 0.78f);
+	text_soft1 = col_inter(background, text, 0.82f);
 	text_soft3 = col_inter(background, col_inter(text, selection, 0.2f), 0.5f);
 	text_soft2 = col_inter(text_soft3, text_soft1, 0.4f);
 	grid = col_inter(background, col_inter(text, selection, 0.4f), 0.35f);

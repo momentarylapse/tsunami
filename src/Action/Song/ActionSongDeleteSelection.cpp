@@ -74,7 +74,6 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, T
 			add_sub_action(new ActionTrack__SplitBuffer(l, n, i1 - bi0), a);
 			add_sub_action(new ActionTrack__SplitBuffer(l, n, i0 - bi0), a);
 			add_sub_action(new ActionTrack__DeleteBuffer(l, n + 1), a);
-
 		}
 		_foreach_it_.update();
 	}

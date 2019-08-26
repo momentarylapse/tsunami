@@ -10,8 +10,7 @@
 #include "../../../Data/TrackLayer.h"
 #include "../../../Data/Audio/AudioBuffer.h"
 
-ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset)
-{
+ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset) {
 	layer = l;
 	index = _index;
 	offset = _offset;
@@ -19,8 +18,7 @@ ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(TrackLayer *l, int _index, in
 
 
 
-void ActionTrack__SplitBuffer::undo(Data *d)
-{
+void ActionTrack__SplitBuffer::undo(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	AudioBuffer &b2 = layer->buffers[index + 1];
 
@@ -34,12 +32,9 @@ void ActionTrack__SplitBuffer::undo(Data *d)
 
 
 
-void *ActionTrack__SplitBuffer::execute(Data *d)
-{
-	//msg_write(format("cut %d   at %d", index, offset));
-
+void *ActionTrack__SplitBuffer::execute(Data *d) {
 	assert(offset > 0);
-	assert(offset < (layer->buffers[index].length - 1));
+	assert(offset < layer->buffers[index].length);
 
 	// create new
 	AudioBuffer dummy(0, layer->channels);

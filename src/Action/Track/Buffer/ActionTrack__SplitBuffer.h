@@ -12,8 +12,7 @@
 
 class TrackLayer;
 
-class ActionTrack__SplitBuffer : public Action
-{
+class ActionTrack__SplitBuffer : public Action {
 public:
 	ActionTrack__SplitBuffer(TrackLayer *l, int _index, int _offset);
 

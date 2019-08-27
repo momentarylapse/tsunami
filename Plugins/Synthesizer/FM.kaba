@@ -86,7 +86,7 @@ class FMPanel extends ConfigPanel
 		
 		from_source("
 Grid ? ''
-	DrawingArea area '' height=220 expandx noexpandy
+	DrawingArea area '' expandx expandy
 	---|
 	Grid ? ''
 		Label ? 'Freq Multiplier'

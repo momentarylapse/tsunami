@@ -10,7 +10,7 @@ class OscilloscopePanel extends ConfigPanel
 	
 	override void __init__(Module *_osci)
 		from_source("
-DrawingArea area '' height=300")
+DrawingArea area '' height=200 expandy")
 		
 		c.panel = self
 	

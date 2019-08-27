@@ -13,13 +13,14 @@
 #include "../../TsunamiWindow.h"
 
 extern const int CONFIG_PANEL_WIDTH = 400;
+extern const int CONFIG_PANEL_HEIGHT = 300;
 
 ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	module = _m;
 	session = module->session;
 
 	from_resource("fx_panel");
-	set_options("grid", format("width=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH));
+	set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_HEIGHT));
 
 	set_string("name", module->module_subtype);
 

@@ -93,7 +93,7 @@ class BiquadPanel extends ConfigPanel
 		super.__init__(_biquad)
 		from_source("
 Grid ? '' vertical
-	DrawingArea drawing '' grabfocus height=250
+	DrawingArea drawing '' grabfocus expandy
 	Grid ? ''
 		Label ? 'a'
 		.

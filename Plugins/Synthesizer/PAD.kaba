@@ -162,7 +162,7 @@ Grid ? ''
 		Text ? 'detune'
 		SpinButton detune '0' range=-10:10:0.01
 	---|
-	DrawingArea drawing '' grabfocus height=300 noexpandy")
+	DrawingArea drawing '' grabfocus expandy")
 		event("bw", &on_change)
 		event("bwscale", &on_change)
 		event("detune", &on_change)

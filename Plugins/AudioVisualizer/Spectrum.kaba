@@ -69,7 +69,7 @@ class SpectrumPanel extends ConfigPanel
 	
 	override void __init__(Module *_sp)
 		from_source("
-DrawingArea area '' height=200")
+DrawingArea area '' height=200 expandy")
 		
 		c.panels.add(self)
 		

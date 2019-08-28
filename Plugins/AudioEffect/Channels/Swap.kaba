@@ -1,5 +1,5 @@
-// Image = hui:back
-// Title[Deutsch] = Kanäle L <- R
+# Image = hui:back
+# Title[Deutsch] = Kanäle L <- R
 use "../../api.kaba"
 
 class Swap extends AudioEffect

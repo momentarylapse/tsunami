@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Equalizer
+# Image = hui:properties
+# Title[Deutsch] = Equalizer
 use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
@@ -33,9 +33,9 @@ class Peak
 		r.x = pitch_to_freq(pitch)
 		r.y = gain + g0
 		return r
-	//float q()
-		// ~ (f1 - f0) / f0 = f1/f0 - 1
-	//	return pow(2, width/12) - 1
+	#float q()
+		# ~ (f1 - f0) / f0 = f1/f0 - 1
+	#	return pow(2, width/12) - 1
 	
 	void create_filter(Filter f, float sample_rate)
 		float freq = pitch_to_freq(pitch)
@@ -51,13 +51,13 @@ class EqCurve extends Curve
 		peaks = c.peaks
 		sample_rate = _sample_rate
 	override float get(float freq)
-		/*float pitch = freq_to_pitch(f)*/
+		#float pitch = freq_to_pitch(f)
 		float r = gain
 		for p in peaks
 			if p.enabled
 				Filter f
 				p.create_filter(f, sample_rate)
-				r += f.l.f.gain(freq)//p.dgain(pitch)
+				r += f.l.f.gain(freq)#p.dgain(pitch)
 		return r
 
 
@@ -77,7 +77,7 @@ class Equalizer extends AudioEffect
 
 	Config config
 
-	Filter[] filter // state
+	Filter[] filter # state
 	
 	override void __init__()
 		grid = nil
@@ -93,14 +93,14 @@ class Equalizer extends AudioEffect
 			f.reset()
 
 	override void process(AudioBuffer buf)
-		// global gain
+		# global gain
 		buf.scale(db_to_factor(config.gain))
 		
-		// eq
+		# eq
 		for f in filter
 			f.apply(buf)
 		
-		// visualization
+		# visualization
 		if grid
 			grid.set_buffer(buf)
 
@@ -140,12 +140,12 @@ class EqualizerGrid extends Grid
 	override void on_draw(Painter *p)
 		draw_curve_c(p, spectrum, false)
 	
-		// curve + area below
+		# curve + area below
 		EqCurve curve
 		curve.set(*c, sample_rate)
 		draw_curve_c(p, curve, true)
 		
-		// gain base-line
+		# gain base-line
 		float y = y_axis.project(c.gain)
 		p.set_line_width(2)
 		p.set_color(colors.text_soft2)
@@ -153,7 +153,7 @@ class EqualizerGrid extends Grid
 		p.draw_line(0,y, p.width,y)
 		p.set_line_dash([8.0,0.0])
 	
-		// points
+		# points
 		for pk,i in c.peaks
 			complex pp = project2(pk.z(c.gain))
 			
@@ -181,7 +181,7 @@ class EqualizerGrid extends Grid
 			p.draw_str(mx - 20, y_axis.project(c.gain) - 20, "Gain " + c.gain.str2(1) + " dB")
 			
 
-	// left button down -> select
+	# left button down -> select
 	override void on_left_button_down()
 		selected = hover
 		redraw()
@@ -198,7 +198,7 @@ class EqualizerGrid extends Grid
 	
 	vector right_click_mouse_pos
 
-	// right button down -> new point
+	# right button down -> new point
 	override void on_right_button_down()
 		right_click_mouse_pos = get_mouse3(0)
 		if menu
@@ -221,7 +221,7 @@ class EqualizerGrid extends Grid
 			menu.add("add High Shelf", "add-high-shelf")
 		menu.popup(panel)
 	
-	// hui events
+	# hui events
 	void on_add_peak()
 		string id = HuiGetEvent().id
 		int t = FILTER_PEAK
@@ -254,7 +254,7 @@ class EqualizerGrid extends Grid
 			redraw()
 
 	override void on_mouse_move()
-		// move
+		# move
 		if HuiGetEvent().button_l
 			if selected >= 0
 				c.peaks[selected].pitch = freq_to_pitch(get_mouse2().x)
@@ -264,7 +264,7 @@ class EqualizerGrid extends Grid
 				c.gain = get_mouse2().y
 				cp.changed()
 		else
-		// mouse over?
+		# mouse over?
 			hover = -1
 			if abs(my - y_axis.project(c.gain)) < 10
 				hover = HOVER_GAIN
@@ -273,7 +273,7 @@ class EqualizerGrid extends Grid
 					hover = i
 		redraw()
 
-	// [Delete] -> remove point
+	# [Delete] -> remove point
 	override void on_key_down()
 		if HuiGetEvent().key_code == KEY_DELETE
 			on_peak_delete()

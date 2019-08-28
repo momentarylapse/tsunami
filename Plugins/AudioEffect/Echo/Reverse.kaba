@@ -1,5 +1,5 @@
-// Image = hui:back
-// Title[Deutsch] = Rückwärts
+# Image = hui:back
+# Title[Deutsch] = Rückwärts
 use "../../api.kaba"
 
 class Reverse extends AudioEffect

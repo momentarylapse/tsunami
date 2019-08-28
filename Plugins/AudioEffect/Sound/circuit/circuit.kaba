@@ -132,7 +132,7 @@ class Diode extends Edge
 		u_high = 1
 		g_high = (I_sch(u_high+0.01) - I_sch(u_high)) / 0.01
 		g_low = (I_sch(u_low+0.1) - I_sch(u_low)) / 0.1
-		//0.000001
+		#0.000001
 		i_high = I_sch(u_high) - u_high*g_high
 		i_low = I_sch(u_low) - u_low*g_low
 	float I_sch(float u)
@@ -154,12 +154,12 @@ class Diode extends Edge
 			return i_high
 		if U < u_low
 			return i_low
-		//print("Ioff=" + (I_id(U) - g(dt) * U))
+		#print("Ioff=" + (I_id(U) - g(dt) * U))
 		return (I_id(U) - g(dt) * U)
 	override void update(Node[] nodes, float dt)
 		U = nodes[b].phi - nodes[a].phi
 		I = I_id(U)
-		//print("=> I=" + I + "   U=" + U)
+		#print("=> I=" + I + "   U=" + U)
 	override string tell()
 		return "D U=" + U + " I=" + I
 
@@ -250,33 +250,33 @@ class Circuit
 		int n = nodes.num-1
 		Matrix G
 		create_G(G, dt)
-		//print("G")
-		//print(G)
+		#print("G")
+		#print(G)
 		
 		
 		float[] I
 		create_I(I, I_in, dt)
-		//print("I " + I)
+		#print("I " + I)
 	
-		// U = R * I
-		// I = G * U
+		# U = R * I
+		# I = G * U
 		float[] u = G.solve(I)
-		//print("u " + u)
+		#print("u " + u)
 		
-		// update potentials
+		# update potentials
 		for i in 0:n
 			nodes[i+1].phi = u[i]
-		// update edges
+		# update edges
 		for e in edges
 			e.update(nodes, dt)
 	
 	void time_step(float I_in, float dt)
 		
-		//print("-----")
+		#print("-----")
 		for i in 0:15
 			optimizer_step(I_in, dt)
 		
-		// update edges
+		# update edges
 		for e in edges
 			e.iterate(dt)
 	
@@ -284,13 +284,13 @@ class Circuit
 		float Uin = nodes[1].phi
 		float Uout = nodes[out].phi
 		float factor = Uout / Uin
-		//print(factor)
+		#print(factor)
 		return factor
 	
 	void simulate(float t_max, float dt, float amp, float omega, int type, SimResult res)
 		for t in 0:t_max:dt
 		
-			// input
+			# input
 			float input = amp
 			if type == 1
 				input = amp * sin(t * omega)
@@ -303,7 +303,7 @@ class Circuit
 			
 			time_step(input, dt)
 			
-			// result
+			# result
 			float[] I, U, phi
 			for e in edges
 				I.add(e.I)
@@ -328,9 +328,9 @@ class Circuit
 
 void _main()
 	Circuit c
-	//c.nodes.add(Node(complex(0,0)))
-	//c.edges.add(new Diode([0, 2]))
-	//c.edges.add(new Resistor([2,1], 1))
+	#c.nodes.add(Node(complex(0,0)))
+	#c.edges.add(new Diode([0, 2]))
+	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
 	SimResult res
 	c.simulate(1, 1, 0.1, 1, 0, res)
@@ -339,7 +339,7 @@ void __main()
 	Diode* d = new Diode([0,0])
 	return
 	for f in 0.5:1.5:0.01
-	//	print(f)
+	#	print(f)
 		d.U = f
 		print(d.I_id(f))
 	

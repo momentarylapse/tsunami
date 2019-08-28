@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Kompressor
+# Image = hui:properties
+# Title[Deutsch] = Kompressor
 use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
@@ -23,8 +23,8 @@ class CompressorConfig extends PluginData
 		curve.add(complex(0, 0))
 		attack = 0.01
 		release = 0.1
-		//MouseOver = -1
-		//Selected = -1
+		#MouseOver = -1
+		#Selected = -1
 
 
 class Compressor extends AudioEffect
@@ -48,23 +48,23 @@ class Compressor extends AudioEffect
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:b.num
 		
-			// in level (filtered)
+			# in level (filtered)
 			squares[i%squares.num] = b[i]*b[i]
 			float rms = sqrt(squares.sum() / squares.num * 2)
-			if config.attack < 0.00005 // = 0
+			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
 			float in_level = MIN_DB
 			if rms > bmin
 				in_level = log(rms) / log(10) * 20
 		
-			// out level
+			# out level
 			float out_level = in_level
 			for j in 1:config.curve.num
 				if (in_level >= config.curve[j - 1].x) and (in_level <= config.curve[j].x)
 					out_level = config.curve[j - 1].y + (config.curve[j].y - config.curve[j - 1].y) * (in_level - config.curve[j - 1].x) / (config.curve[j].x - config.curve[j - 1].x)
 					break
 			
-			// slow gain changes
+			# slow gain changes
 			float cur_gain = out_level - in_level
 			if cur_gain > *gain
 				if config.release < 0.00005
@@ -77,7 +77,7 @@ class Compressor extends AudioEffect
 				else
 					*gain -= dgain_attack
 			
-			// apply gain
+			# apply gain
 			b[i] *= pow(10, *gain / 20)
 
 	override ConfigPanel *create_panel()
@@ -100,17 +100,17 @@ class CompressorGrid extends Grid
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
-		// curve
+		# curve
 		draw_curve(p, fi, true)
 		for i in 1:config.curve.num
 			draw_point2(p, config.curve[i], i == selected, i == hover)
 
-	// left button down -> select
+	# left button down -> select
 	override void on_left_button_down()
 		selected = hover
 		redraw()
 
-	// right button down -> new point
+	# right button down -> new point
 	override void on_right_button_down()
 		complex m = get_mouse2()
 		for i in 1:config.curve.num
@@ -124,7 +124,7 @@ class CompressorGrid extends Grid
 				break
 
 	override void on_mouse_move()
-		// move
+		# move
 		if HuiGetEvent().button_l and (selected > 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = config.curve[selected - 1].x
@@ -136,7 +136,7 @@ class CompressorGrid extends Grid
 				config.curve[selected].x = 0
 			cp.changed()
 		else
-		// mouse over?
+		# mouse over?
 			hover = -1
 			for i in 1:config.curve.num
 				if mouse_over_point2(config.curve[i])
@@ -146,7 +146,7 @@ class CompressorGrid extends Grid
 	override void on_key_down()
 		int k = HuiGetEvent().key
 
-		// [Delete] -> remove point
+		# [Delete] -> remove point
 		if (k == KEY_DELETE) and (selected > 0) and (selected < config.curve.num - 1)
 			config.curve.remove(selected)
 			cp.changed()

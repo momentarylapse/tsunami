@@ -1,4 +1,4 @@
-// Title[Deutsch] = Tremolo
+# Title[Deutsch] = Tremolo
 
 use "../../api.kaba"
 
@@ -25,7 +25,7 @@ class Tremolo extends AudioEffect
 		for bb,i in b
 			float f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5
 	
-			// old value
+			# old value
 			bb *= f
 	
 	override void process(AudioBuffer buf)

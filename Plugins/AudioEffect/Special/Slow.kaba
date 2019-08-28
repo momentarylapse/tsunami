@@ -9,10 +9,10 @@ class Config extends PluginData
 
 class Slow extends AudioEffect
 	Config config
-	//RingBuffer *rb
+	#RingBuffer *rb
 	
-	//override void __init__()
-		//rb = new RingBuffer(1<<20)
+	#override void __init__()
+		#rb = new RingBuffer(1<<20)
 	
 	override int read(AudioBuffer buf)
 		int n_out = len(buf)

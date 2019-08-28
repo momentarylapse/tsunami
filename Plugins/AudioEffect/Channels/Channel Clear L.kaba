@@ -1,5 +1,5 @@
-// Image = hui:clear
-// Title[Deutsch] = Kanal Löschen L
+# Image = hui:clear
+# Title[Deutsch] = Kanal Löschen L
 use "../../api.kaba"
 
 class ClearL extends AudioEffect

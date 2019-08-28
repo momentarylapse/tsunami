@@ -1,5 +1,5 @@
-// Image = hui:media-play
-// Title[Deutsch] = Song Metronom
+# Image = hui:media-play
+# Title[Deutsch] = Song Metronom
 use hui
 use "../api.kaba"
 
@@ -12,7 +12,7 @@ const float UPDATE_DT = 1.0 / 50
 const float MAX_BACKGROUND_REDNESS = 0.7
 const int MOTION_BLUR_COUNT = 20
 
-// part uncertainty...
+# part uncertainty...
 const int DELTA = 400
 
 class BlurredDot
@@ -86,7 +86,7 @@ Grid ? '' vertical
 		event("mode-circle", &on_mode_circle)
 		event("mode-bounce", &on_mode_bounce)
 		event("mode-bounce-walk", &on_mode_bounce_walk)
-		//event("fullscreen", &on_fullscreen)
+		#event("fullscreen", &on_fullscreen)
 		
 		sr_id = HuiRunRepeated(UPDATE_DT, self, &on_update)
 	
@@ -118,7 +118,7 @@ Grid ? '' vertical
 			closeness = 1 - beat_fraction*2
 		float bar_fraction = (cur_beat + beat_fraction) / num_beats
 		
-		// background
+		# background
 		color bg = colors.background
 		if allow_blink_background
 			bg = color.interpolate(Red, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
@@ -126,18 +126,18 @@ Grid ? '' vertical
 		p.draw_rect(0, 0, w, h)
 		
 		if mode == MODE_CIRCLE
-			// circle
+			# circle
 			p.set_line_width(r*0.05)
 			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
 			p.set_fill(false)
 			p.draw_circle(x0, y0, r)
 		
-			// top point
+			# top point
 			p.set_fill(true)
 			p.set_color(colors.text_soft3)
 			p.draw_circle(x0, y0 - r, r*0.07)
 		
-			// moving point
+			# moving point
 			float t = beat_fraction - 0.5
 			float phi = 2 *pi * (2*t*t*t + t/2)
 			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
@@ -163,7 +163,7 @@ Grid ? '' vertical
 				dot.move(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
 			dot.draw(p, colors.text, r*0.1)
 		
-		// beat number
+		# beat number
 		float fs = r * 0.5
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
@@ -247,10 +247,10 @@ Grid ? '' vertical
 		mode = MODE_BOUNCE_WALK
 		HuiConfig.set_int("Plugins/Metronome/Mode", mode)
 	
-	/*void on_fullscreen()
-		fullscreen = !fullscreen
-		set_fullscreen(fullscreen)
-		//show_control()*/
+	#void on_fullscreen()
+#		fullscreen = !fullscreen
+#		set_fullscreen(fullscreen)
+#		#show_control()
 
 
 int bar_index(Song* song, int offset)

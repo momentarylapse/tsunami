@@ -1,5 +1,5 @@
-// Image = hui:clear
-// Title[Deutsch] = Klicks Entfernen
+# Image = hui:clear
+# Title[Deutsch] = Klicks Entfernen
 use "../api.kaba"
 
 const int MAX_CLICK_SAMPLES = 128
@@ -37,7 +37,7 @@ void unclick(float[] b, TrackLayer *l, int offset)
 	int[] clicks = find_clicks(b)
 	for i in 0:clicks.num:2
 		l.add_marker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click")
-		//l.addMarker(clicks[i+1] + offset, "]")
+		#l.addMarker(clicks[i+1] + offset, "]")
 
 class FindClicks extends SongPlugin
 

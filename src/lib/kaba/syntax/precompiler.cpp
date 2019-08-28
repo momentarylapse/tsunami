@@ -177,14 +177,14 @@ void SyntaxTree::pre_compiler(bool just_analyse)
 			while(!Exp.end_of_line()){
 				if (Exp.cur == "-"){
 					string last = Exp.get_name(Exp.cur_exp - 1);
-					if ((last == "(") ||
-						(last == ",") ||
-						(last == ":") ||
-						(last == "[") ||
-						(last == "=") ||
-						(last == "<") ||
+					if ((last == "(") or
+						(last == ",") or
+						(last == ":") or
+						(last == "[") or
+						(last == "=") or
+						(last == "<") or
 						(last == ">")){
-						if (isNumber(last[0])){
+						if (is_number(last[0])){
 							string name = "-" + Exp.get_name(Exp.cur_exp + 1);
 							int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 							Exp.remove(Exp.cur_exp);

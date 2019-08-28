@@ -24,7 +24,7 @@
 
 namespace Kaba{
 
-string Version = "0.17.4.1";
+string Version = "0.17.5.0";
 
 //#define ScriptDebug
 
@@ -281,7 +281,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	try{
 
 // find expressions
-	ps->Exp.Analyse(ps, cmd + string("\0", 1));
+	ps->Exp.analyse(ps, cmd + string("\0", 1));
 	if (ps->Exp.line[0].exp.num < 1){
 		//clear_exp_buffer(&ps->Exp);
 		delete(s);

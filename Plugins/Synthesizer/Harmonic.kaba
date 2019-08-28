@@ -23,7 +23,7 @@ class HarmonicGrid extends Grid
 
 	override void on_draw(Painter *c)
 	
-		// points
+		# points
 		for i,n in hc.intensity
 			complex z0 = complex(n+1, 0)
 			complex z1 = complex(n+1, i)
@@ -31,18 +31,18 @@ class HarmonicGrid extends Grid
 			draw_line2(c, z0, z1, n == Selected, n == Hover)
 			draw_point2(c, z1, n == Selected, n == Hover)
 			
-	// left button down -> select
+	# left button down -> select
 	override void on_left_button_down()
 		Selected = Hover
 		redraw()
 
 	override void on_mouse_move()
-		// move
+		# move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			hc.intensity[Selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
-		// hover?
+		# hover?
 			Hover = -1
 			for i,n in hc.intensity
 				complex p = project2(complex(n+1, i))

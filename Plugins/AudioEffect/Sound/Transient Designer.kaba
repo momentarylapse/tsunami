@@ -26,7 +26,7 @@ class TransientDesigner extends AudioEffect
 		env_att.session = session
 		env_att.config_from_string("0.02, 0, 0.0001")
 		env_sus.session = session
-		env_sus.config_from_string("0.2, 0, 0.00000002") // ~100ms release
+		env_sus.config_from_string("0.2, 0, 0.00000002") # ~100ms release
 	
 	override void reset_state()
 		env_fast.reset_state()
@@ -36,22 +36,22 @@ class TransientDesigner extends AudioEffect
 	void do(float[] buf, int c, float[] h_fast, float[] h_att, float[] h_sus)
 		
 		for i in 0:len(buf)
-			// gain?
+			# gain?
 			float gain = 0
 			float hf = h_fast[i]
 			float ha = h_att[i]
 			float hs = h_sus[i]
 			if hf > ha
-				// attack
+				# attack
 				gain += config.attack * (hf - ha)
 			if hf < hs
-				// sustain
+				# sustain
 				gain += config.sustain * (hs - hf)
 			
-			// apply gain and mix
+			# apply gain and mix
 			buf[i] = (config.mix * gain + 1) * buf[i]
-			//buf[i] = gain*2
-			//buf[i] = hs
+			#buf[i] = gain*2
+			#buf[i] = hs
 			
 	override void process(AudioBuffer buf)
 		buf_fast = buf

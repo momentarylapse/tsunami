@@ -1,5 +1,5 @@
-// Image = hui:forward
-// Title[Deutsch] = Kanäle L -> R
+# Image = hui:forward
+# Title[Deutsch] = Kanäle L -> R
 use "../../api.kaba"
 
 class LToR extends AudioEffect

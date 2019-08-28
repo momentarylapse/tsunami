@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-// pitch is in MIDI notation (69 = A4 = 440Hz)
+# pitch is in MIDI notation (69 = A4 = 440Hz)
 
 float pitch_to_freq(float pitch)
 	return 440 * pow(2, (pitch - 69.0) / 12.0)
@@ -8,8 +8,8 @@ float pitch_to_freq(float pitch)
 float freq_to_pitch(float freq)
 	return log(freq / 440.0) / log(2) * 12.0 + 69.0
 
-// "scientific" notation
-//   naive MIDI octave is off by 1
+# "scientific" notation
+#   naive MIDI octave is off by 1
 int pitch_get_octave(int pitch)
 	return (pitch / 12) - 1
 
@@ -94,41 +94,41 @@ Chord[]  ParseChords(string str)
 		chords.add(c)
 	return chords
 
-/*void AddSimpleTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
-	float f_w = 1.0 / sample_rate * f * 2.0 * pi
-	int i0 = max(pos0, 0)
-	int i1 = min(pos1, buf.num)
-	for int i, i0, i1
-		float tt = (i - pos0) * f_w
-		float d = sin(tt) * vol
-		if i < pos0 + 1000
-			d *= (i - pos0) * 0.001
-		if i > pos1 - 1000
-			d *= (pos1 - i) * 0.001
-		buf.r[i] += d
-		buf.l[i] += d
+#void AddSimpleTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
+#	float f_w = 1.0 / sample_rate * f * 2.0 * pi
+#	int i0 = max(pos0, 0)
+#	int i1 = min(pos1, buf.num)
+#	for int i, i0, i1
+#		float tt = (i - pos0) * f_w
+#		float d = sin(tt) * vol
+#		if i < pos0 + 1000
+#			d *= (i - pos0) * 0.001
+#		if i > pos1 - 1000
+#			d *= (pos1 - i) * 0.001
+#		buf.r[i] += d
+#		buf.l[i] += d
+#
+#void AddRichTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
+#	AddSimpleTone(sample_rate, buf, pos0, pos1, f,     vol * 0.6)
+#	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 2, vol * 0.5)
+#	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 4, vol * 0.3)
+#	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 8, vol * 0.1)
 
-void AddRichTone(float sample_rate, AudioBuffer buf, int pos0, int pos1, float f, float vol)
-	AddSimpleTone(sample_rate, buf, pos0, pos1, f,     vol * 0.6)
-	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 2, vol * 0.5)
-	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 4, vol * 0.3)
-	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 8, vol * 0.1)*/
+#class RichSynthesizer : DummySynthesizer
+#	virtual void AddToneFreq(AudioBuffer buf, Range r, float freq, float volume)
 
-/*class RichSynthesizer : DummySynthesizer
-	virtual void AddToneFreq(AudioBuffer buf, Range r, float freq, float volume)*/
-
-/*void AddChord(Synthesizer s, Range r, Chord c, float volume)
-	
-	float[] pitch
-	pitch.add(c.base_tone)
-	if c.type == ChordMinor
-		pitch.add(c.base_tone + 3)
-	else
-		pitch.add(c.base_tone + 4)
-	pitch.add(c.base_tone + 7)
-	pitch.add(c.base_tone + 12)
-	
-	MidiEventBuffer midi
-	for p in pitch
-		midi.addNote(MidiNote(r, p, volume))
-	s.feed(midi)*/
+#void AddChord(Synthesizer s, Range r, Chord c, float volume)
+#	
+#	float[] pitch
+#	pitch.add(c.base_tone)
+#	if c.type == ChordMinor
+#		pitch.add(c.base_tone + 3)
+#	else
+#		pitch.add(c.base_tone + 4)
+#	pitch.add(c.base_tone + 7)
+#	pitch.add(c.base_tone + 12)
+#	
+#	MidiEventBuffer midi
+#	for p in pitch
+#		midi.addNote(MidiNote(r, p, volume))
+#	s.feed(midi)

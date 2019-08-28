@@ -28,7 +28,7 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.4.0";
+string LibVersion = "0.17.5.0";
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";

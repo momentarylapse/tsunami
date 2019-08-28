@@ -1,5 +1,5 @@
-// Image = hui:copy
-// Title[Deutsch] = Echo
+# Image = hui:copy
+# Title[Deutsch] = Echo
 
 use "../../api.kaba"
 
@@ -29,14 +29,14 @@ class Echo extends AudioEffect
 		int p = offset % d.num
 		for bb in b
 	
-			// old value
+			# old value
 			float b0 = bb
 		
-			// add echo
+			# add echo
 			bb = bb + d[p] * config.volume
-			//clampf(b[i], -1, 1)
+			#clampf(b[i], -1, 1)
 		
-			// add to echo
+			# add to echo
 			d[p] = b0 + d[p] * config.feedback
 		
 			p ++

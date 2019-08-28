@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Equalizer 15
+# Image = hui:properties
+# Title[Deutsch] = Equalizer 15
 use hui
 use "../../api.kaba"
 
@@ -37,12 +37,12 @@ class Equalizer15 extends AudioEffect
 		int _STACK_ALIGNMENT_
 		float sample_rate = session.sample_rate()
 	
-		// transform
+		# transform
 		int len2 = b.num / 2 + 1
 		f.resize(len2)
 		fft_r2c(b, f)
 
-		// equalize
+		# equalize
 		float w = i2f(b.num) / sample_rate
 		for i in 0:NUM_BANDS
 			int j0 = clamp(FreqMin[i] * w, 0, len2)
@@ -51,7 +51,7 @@ class Equalizer15 extends AudioEffect
 			for j in j0:j1
 				f[j] = f[j] * ff
 		
-		// transform back
+		# transform back
 		fft_c2r_inv(f, b)
 
 	override void process(AudioBuffer buf)
@@ -71,7 +71,7 @@ class Equalizer15Panel extends ConfigPanel
 		set_target("grid")
 		for i in 0:NUM_BANDS
 			add_slider("!expandy,vertical,height=200", i, 0, "slider_" + i)
-			//add_string("slider_" + i, "0.5:0")
+			#add_string("slider_" + i, "0.5:0")
 		add_label("20", 0, 1, "")
 		add_label("54", 2, 1, "")
 		add_label("140", 4, 1, "")

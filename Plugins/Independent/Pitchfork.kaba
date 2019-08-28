@@ -1,5 +1,5 @@
-// Image = hui:media-play
-// Title[Deutsch] = Stimmgabel
+# Image = hui:media-play
+# Title[Deutsch] = Stimmgabel
 use "../api.kaba"
 
 class PitchFork extends TsunamiPlugin

@@ -1,5 +1,5 @@
-// Image = hui:zoom-in
-// Title[Deutsch] = Lautstärke
+# Image = hui:zoom-in
+# Title[Deutsch] = Lautstärke
 
 use "../../api.kaba"
 

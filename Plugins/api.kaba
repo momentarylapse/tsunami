@@ -1,13 +1,13 @@
-/*--------------------------------------------------------------------*\
-|                                                                      |
-| header for Tsunami plugin api                                        |
-|                                                                      |
-|    (c) by MichiSoft TM 2010                                          |
-|                                                                      |
-| Don't even think of changing anything within this file!              |
-|    (unless you dare dying a cruel death)                             |
-|                                                                      |
-\*--------------------------------------------------------------------*/
+#--------------------------------------------------------------------*\
+#|                                                                      |
+#| header for Tsunami plugin api                                        |
+#|                                                                      |
+#|    (c) by MichiSoft TM 2010                                          |
+#|                                                                      |
+#| Don't even think of changing anything within this file!              |
+#|    (unless you dare dying a cruel death)                             |
+#|                                                                      |
+#\*--------------------------------------------------------------------
 
 use hui
 use kaba
@@ -179,7 +179,7 @@ class AudioBuffer
 	extern void resize(int length)
 	extern void set(AudioBuffer b, int offset, float volume)
 	extern void add(AudioBuffer b, int offset, float volume)
-	//extern void mix_stereo(float volume, float panning)
+	#extern void mix_stereo(float volume, float panning)
 	extern void set_as_ref(AudioBuffer source, int offset, int length)
 	extern AudioBuffer __subarray__(int start, int end)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
@@ -203,13 +203,13 @@ class RingBuffer
 	extern void peek_ref(AudioBuffer b, int size)
 	extern void write_ref(AudioBuffer b, int size)
 	extern void write_ref_done(AudioBuffer b)
-	//extern void move_read_pos(int delta)
-	//extern void move_write_pos(int delta)
+	#extern void move_read_pos(int delta)
+	#extern void move_write_pos(int delta)
 	extern void clear()
 	void __assign__(RingBuffer o)
 
 
-// general "interface"
+# general "interface"
 class Port
 	extern void __init__()
 	extern virtual void __delete__()
@@ -227,13 +227,13 @@ class MidiSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
-	// crappy experimental note api:
+	# crappy experimental note api:
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
 	extern void skip_x(int beats, int sub_beats, int beat_partition)
 	MidiEventBuffer* bh_midi
-	//extern void set_beat_source(BeatPort *source)
+	#extern void set_beat_source(BeatPort *source)
 
 class PitchDetector extends MidiSource
 	float frequency, volume
@@ -242,8 +242,8 @@ class PitchDetector extends MidiSource
 class PitchRenderer
 	extern void __init__(Synthesizer *synth, int pitch)
 	extern virtual void __delete__()
-	extern virtual bool render(AudioBuffer buf) // return: keep alive
-	//extern virtual void on_event(MidiEvent e)
+	extern virtual bool render(AudioBuffer buf) # return: keep alive
+	#extern virtual void on_event(MidiEvent e)
 	extern virtual void on_start(float volume)
 	extern virtual void on_end()
 	extern virtual void on_config()
@@ -270,12 +270,12 @@ class Synthesizer extends Module
 
 class DummySynthesizer extends Synthesizer
 	extern override void __init__()
-	//extern overwrite void __delete__()
+	#extern overwrite void __delete__()
 	extern override void render(AudioBuffer buf)
 	extern override PitchRenderer *create_pitch_renderer(int pitch)
 
 class EnvelopeADSR
-	//extern void __init__()
+	#extern void __init__()
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
 	extern void set2(float initial, float peak)
 	extern void reset()
@@ -296,7 +296,7 @@ class BeatSource extends Module
 
 class BeatMidifier extends MidiSource
 	extern override void __init__()
-	//extern override void __delete__()
+	#extern override void __delete__()
 	extern override int read(MidiEventBuffer midi)
 	float volume
 
@@ -352,7 +352,7 @@ class TrackLayer
 	extern void edit_buffers_finish(void *a)
 	extern void insert_midi_data(int offset, MidiNoteBuffer midi)
 	extern void add_midi_note(MidiNote *n)
-	//extern void add_midi_notes(MidiNoteBuffer midi)
+	#extern void add_midi_notes(MidiNoteBuffer midi)
 	extern void delete_midi_note(MidiNote *n)
 	extern SampleRef* add_sample_ref(int pos, Sample* sample)
 	extern void delete_sample_ref(SampleRef *ref)
@@ -361,7 +361,7 @@ class TrackLayer
 	extern void delete_marker(TrackMarker *marker)
 	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
-class Sample // TODO
+class Sample # TODO
 	string name
 	int type
 	AudioBuffer* buf
@@ -373,7 +373,7 @@ class Sample // TODO
 	extern string get_value(string key)
 	extern void set_value(string key, string value)
 
-class SampleRef // TODO
+class SampleRef # TODO
 	Sample* origin
 	extern void __init__(Sample* sam)
 	extern virtual void __delete__()
@@ -400,12 +400,12 @@ class Track
 	
 	Synthesizer *synth
 
-	// editing
+	# editing
 	Song *song
 	
 	extern string nice_name()
 
-	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
+	#TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
 	extern void set_name(string name)
 	extern void set_muted(bool muted)
@@ -447,7 +447,7 @@ class Song
 	extern void delete_track(int index)
 	extern void add_bar(int index, float bpm, int beats, bool affect_midi)
 	extern void add_pause(int index, float time, bool affect_midi)
-	//extern void edit_bar(int index, BarPattern p, bool affect_midi)
+	#extern void edit_bar(int index, BarPattern p, bool affect_midi)
 	extern void delete_bar(int index, bool affect_midi)
 	extern Sample* add_sample(string name, AudioBuffer buf)
 	extern void delete_sample(Sample* sample)
@@ -494,7 +494,7 @@ class SongRenderer extends AudioSource
 	extern void render(Range r, AudioBuffer buf)
 	extern void prepare(Range r, bool allow_loop)
 	extern override int read(AudioBuffer b)
-	//extern override void reset_state()
+	#extern override void reset_state()
 	extern Range range()
 	extern int get_pos()
 	extern void set_pos(int pos)
@@ -529,7 +529,7 @@ class Storage
 	extern bool load_buffer(AudioBuffer buf, string filename)
 	string current_directory
 
-// create via Session.add_signal_chain()
+# create via Session.add_signal_chain()
 class SignalChain extends Module
 	extern void __init__(Session* session, string name)
 	extern override void __delete__()
@@ -549,7 +549,7 @@ class SignalChain extends Module
 
 class Session
 	int id
-	//TsunamiWindow* win
+	#TsunamiWindow* win
 	Window* win
 	Song* song
 	AudioView* view
@@ -557,24 +557,24 @@ class Session
 	
 	extern int sample_rate()
 	
-	//DeviceManager* device_manager
-	//PluginManager* plugin_manager
+	#DeviceManager* device_manager
+	#PluginManager* plugin_manager
 	
 	extern Session* create_child()
 	extern SignalChain* add_signal_chain(string name)
 
-	// logging
+	# logging
 	extern void i(string msg)
 	extern void w(string msg)
 	extern void e(string msg)
 
 
-/*class PluginContext
-	Song *song
-	Track *track
-	int track_no
-	int layer
-	Range range*/
+#class PluginContext
+#	Song *song
+#	Track *track
+#	int track_no
+#	int layer
+#	Range range
 
 class Slider
 	extern void __init__(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
@@ -597,10 +597,10 @@ class SongPlugin
 	Session* session
 	Song* song
 
-/*class Progress
-	extern void __init__(string title, Window *parent)
-	virtual extern void __delete__()
-	extern void set(string msg, float progress)*/
+#class Progress
+#	extern void __init__(string title, Window *parent)
+#	virtual extern void __delete__()
+#	extern void set(string msg, float progress)
 class ProgressX
 	extern void __init__(string title, Window *parent)
 	extern virtual void __delete__()
@@ -613,7 +613,7 @@ class Clipboard
 	extern bool has_data()
 	extern bool prepare_layer_map(AudioView *view, TrackLayer*[] sources, TrackLayer*[] targets)
 
-//extern PluginContext plugin_context
+#extern PluginContext plugin_context
 extern ColorScheme colors
 
 extern Clipboard* clipboard
@@ -635,7 +635,7 @@ extern MidiEffect* CreateMidiEffect(Session* session, string name)
 extern BeatMidifier* CreateBeatMidifier(Session* session)
 extern BeatSource* CreateBeatSource(Session* session, string name)
 extern Sample* SelectSample(Session* session, Panel* panel, Sample* old)
-//extern void SetTempBackupFilename(string filename)
+#extern void SetTempBackupFilename(string filename)
 
 extern string ChooseModule(Panel* parent, Session* session, int type, string old_name)
 

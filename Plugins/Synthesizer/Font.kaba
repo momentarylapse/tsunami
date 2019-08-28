@@ -33,7 +33,7 @@ class FontList
 			list.add(s.name)
 		return list
 
-	//string[] find_drumsets()
+	#string[] find_drumsets()
 	void update()
 		let list = Filesystem.search(AppDirectoryStatic + "Midi Fonts", "*.nami", false)
 		for e in list
@@ -75,7 +75,7 @@ class FontSynthesizer extends Synthesizer
 		s = nil
 	override void on_config()
 		if s
-			//delete s
+			#delete s
 			s = nil
 
 		a = font_list.get(session, config.name)
@@ -102,7 +102,7 @@ class FontPanel extends ConfigPanel
 	FontConfig *sc
 	override FontSynthesizer *c
 	override void __init__(Module *_s)
-		//super.__init__(_s)
+		#super.__init__(_s)
 		sc = &c.config
 		add_grid("", 0, 0, "grid")
 		set_target("grid")

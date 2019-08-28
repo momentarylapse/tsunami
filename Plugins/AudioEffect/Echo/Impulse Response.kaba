@@ -6,20 +6,20 @@ void fold(float[] x, float[] h, complex[] HH, float[] result)
 	int N = x.num
 	int K = h.num
 	
-	// fft of input
+	# fft of input
 	float[] xx = x
 	xx.resize(N + K)
 	complex[] XX
 	fft_r2c(xx, XX)
 	
-	// fft of kernel
+	# fft of kernel
 	if HH.num != (N+K)/2+1
-		//print("recalc HH")
+		#print("recalc HH")
 		float[] hh = h
 		hh.resize(N + K)
 		fft_r2c(hh, HH)
 	
-	// convolution
+	# convolution
 	XX *= HH
 	result.resize(N + K)
 	fft_c2r_inv(XX, result)
@@ -65,7 +65,7 @@ class Folding extends AudioEffect
 		if !config.sample
 			return
 		
-		// apply
+		# apply
 		do(buf.l, overlapl)
 		if buf.channels > 1
 			do(buf.r, overlapr)
@@ -87,9 +87,9 @@ class Folding extends AudioEffect
 			overlap.resize(N)
 		
 		buf = ttt[:N]
-		buf += overlap // [:N]
+		buf += overlap # [:N]
 		
-		// overlap = overlap[:-N]
+		# overlap = overlap[:-N]
 		for i in N:len(overlap)
 			overlap[i-N] = overlap[i]
 		overlap.resize(len(overlap) - N)

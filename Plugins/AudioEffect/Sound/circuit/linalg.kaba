@@ -6,8 +6,8 @@ class Matrix
 		n = 0
 		m = 0
 	void __init__(float[][] el)
-		n = len(el) // rows
-		m = len(el[0]) // columns
+		n = len(el) # rows
+		m = len(el[0]) # columns
 		e.resize(n*m)
 		for i in 0:n
 			for j in 0:m
@@ -31,7 +31,7 @@ class Matrix
 			float f = get(i,i)
 			if f == 0
 				f = 0.0000001
-			//print f
+			#print f
 			for j in i:m
 				e[i * m + j] /= f
 			b[i] /= f
@@ -57,7 +57,7 @@ class Matrix
 				s += mm.get(i, j) * x[j]
 			float f = mm.get(i, i)
 			if abs(f) > 0.00001
-				x[i] = (bb[i] - s) // / f
+				x[i] = (bb[i] - s) # / f
 			else
 				x[i] = 0
 			i --
@@ -65,7 +65,7 @@ class Matrix
 
 
 
-// ok
+# ok
 void _test_solve()
 	Matrix mm = Matrix([[2.,1.],[-1.,2.]])
 	print(mm)

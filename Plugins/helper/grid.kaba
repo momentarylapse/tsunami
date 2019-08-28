@@ -255,7 +255,7 @@ class GridData
 		y_axis.size = -h
 		y_axis.rect = rect(_x0, x, _y0, y+h)
 		
-		// background
+		# background
 		if allow_bg
 			c.set_color(col_bg)
 			c.draw_rect(x, y, w, h)
@@ -289,7 +289,7 @@ class GridData
 		float[] tt, yy
 		complex[] pp
 		tt = rangef(0, 1, 0.003)
-		//yy = curve.get_list(tt)
+		#yy = curve.get_list(tt)
 		for t,i in tt
 			float x = x_axis.rel2val(t)
 			float y = curve.get(x)
@@ -326,7 +326,7 @@ class GridData
 		if hover
 			return color.interpolate(col_hover, col_line, 0.0)
 		if selected
-			return color.interpolate(col_sel, col_line, 0.5)//color(1, 0.7, 0, 0)
+			return color.interpolate(col_sel, col_line, 0.5)#color(1, 0.7, 0, 0)
 		return col_line
 	
 	void draw_point_xy(Painter *c, float x, float y, bool selected, bool hover)
@@ -436,7 +436,7 @@ class Grid extends GridData
 	void on_mouse_move_all()
 		mx = HuiGetEvent().mouse_x
 		my = HuiGetEvent().mouse_y
-		//if plot_rect.inside(mx, my)
+		#if plot_rect.inside(mx, my)
 		on_mouse_move()
 	
 	void on_mouse_wheel_all()

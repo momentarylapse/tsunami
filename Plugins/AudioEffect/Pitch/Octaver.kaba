@@ -1,5 +1,5 @@
-// Image = hui:bottom
-// Title[Deutsch] = Oktavieren
+# Image = hui:bottom
+# Title[Deutsch] = Oktavieren
 use "../../api.kaba"
 
 const string AUTO_CONFIG_LEVEL = "0:1:0.1:100:%"

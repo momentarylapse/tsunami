@@ -1,4 +1,4 @@
-// Image = hui:cut
+# Image = hui:cut
 use file
 use hui
 use "../api.kaba"
@@ -9,7 +9,7 @@ class Part
 
 string sanitize(string s)
 	string t = s.replace("/", " - ")
-	//t = t.replace("", " - ")
+	#t = t.replace("", " - ")
 	return t
 
 class CueSplitter extends TsunamiPlugin
@@ -29,7 +29,7 @@ class CueSplitter extends TsunamiPlugin
 			while true
 				string s
 				f >> s
-				//print(s)
+				#print(s)
 				
 				if s.head(6) == "FILE \""
 					fn = s.substr(6, s.num - 12)

@@ -8,18 +8,16 @@ class SyntaxTree;
 
 // character buffer and expressions (syntax analysis)
 
-struct ExpressionBuffer
-{
+class ExpressionBuffer {
+public:
 	ExpressionBuffer();
 
-	struct Expression
-	{
+	struct Expression {
 		string name;
 		int pos;
 	};
 
-	struct Line
-	{
+	struct Line {
 		int physical_line, length, indent;
 		Array<Expression> exp;
 	};
@@ -28,7 +26,6 @@ struct ExpressionBuffer
 	Line temp_line;
 	Line *cur_line;
 	int cur_exp;
-	int comment_level;
 	string dummy;
 	string &cur;
 	SyntaxTree *syntax;
@@ -57,29 +54,26 @@ struct ExpressionBuffer
 
 	void show();
 
-	void Analyse(SyntaxTree *ps, const string &source);
-	bool AnalyseExpression(const char *source, int &pos, ExpressionBuffer::Line *l, int &line_no);
-	bool AnalyseLine(const char *source, ExpressionBuffer::Line *l, int &line_no);
-	void AnalyseLogicalLine(const char *source, ExpressionBuffer::Line *l, int &line_no);
-	void DoAsmBlock(const char *source, int &pos, int &line_no);
-	bool DoMultiLineComment(const char *source, int &pos);
+	void analyse(SyntaxTree *ps, const string &source);
+	bool analyse_expression(const char *source, int &pos, ExpressionBuffer::Line *l, int &line_no);
+	bool analyse_line(const char *source, ExpressionBuffer::Line *l, int &line_no);
+	void analyse_logical_line(const char *source, ExpressionBuffer::Line *l, int &line_no);
+	void do_asm_block(const char *source, int &pos, int &line_no);
 };
 
 
-inline bool isNumber(char c)
-{
-	if ((c>=48) and (c<=57))
+inline bool is_number(char c) {
+	if ((c >= 48) and (c <= 57))
 		return true;
 	return false;
 }
 
-inline bool isLetter(char c)
-{
-	if ((c>='a') and (c<='z'))
+inline bool is_letter(char c) {
+	if ((c >= 'a') and (c <= 'z'))
 		return true;
-	if ((c>='A') and (c<='Z'))
+	if ((c >= 'A') and (c <= 'Z'))
 		return true;
-	if ((c=='_'))
+	if ((c == '_'))
 		return true;
 	// Umlaute
 #ifdef OS_WINDOWS
@@ -93,15 +87,13 @@ inline bool isLetter(char c)
 	return false;
 }
 
-inline bool isSpacing(char c)
-{
-	if ((c==' ') or (c=='\t') or (c=='\n'))
+inline bool is_spacing(char c) {
+	if ((c == ' ') or (c == '\t') or (c == '\n'))
 		return true;
 	return false;
 }
 
-inline bool isSign(char c)
-{
+inline bool is_sign(char c) {
 	if ((c=='.') or (c==':') or (c==',') or (c==';') or (c=='+') or (c=='-') or (c=='*') or (c=='%') or (c=='/') or (c=='=') or (c=='<') or (c=='>') or (c=='\''))
 		return true;
 	if ((c=='(') or (c==')') or (c=='{') or (c=='}') or (c=='&') or (c=='|') or (c=='!') or (c=='[') or (c==']') or (c=='\"') or (c=='\\') or (c=='#') or (c=='?') or (c=='$'))

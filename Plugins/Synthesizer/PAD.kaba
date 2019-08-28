@@ -115,28 +115,28 @@ class PADGrid extends Grid
 	override void on_draw(Painter *c)
 		pc.A.resize(8)
 	
-		// curve + area below
+		# curve + area below
 		complex[] curve
 		for a,i in pc.A
 			pc.fill_curve(curve, i)
 			draw_curve_b(c, curve, false, Red)
 	
-		// points
+		# points
 		for a,i in pc.A
 			draw_point2(c, complex(i+1, a), i == selected, i == hover)
 			
-	// left button down -> select
+	# left button down -> select
 	override void on_left_button_down()
 		selected = hover
 		redraw()
 
 	override void on_mouse_move()
-		// move
+		# move
 		if HuiGetEvent().button_l and (selected >= 0)
 			pc.A[selected] = clamp(get_mouse2().y, 0, 1)
 			p.changed()
 		else
-		// hover?
+		# hover?
 			hover = -1
 			for a,i in pc.A
 				complex p = project2(complex(i+1, a))

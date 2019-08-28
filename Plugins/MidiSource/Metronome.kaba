@@ -7,10 +7,10 @@ const string AUTO_CONFIG_SUB_BEATS = "1:20"
 
 class Config extends PluginData
 	
-	// sound
+	# sound
 	float volume
 	
-	// rhythm
+	# rhythm
 	float bpm
 	int beats
 	int sub_beats
@@ -26,13 +26,13 @@ class MetronomeSource extends MidiSource
 	
 	bool pause
 	
-	// state/output
+	# state/output
 	int cur_beat
 	int cur_sub_beat
 
 	int offset_sub_beat
 	float fraction_beat
-	//float fraction_sub_beat
+	#float fraction_sub_beat
 	int samples_beat
 	int samples_sub_beat
 	
@@ -42,7 +42,7 @@ class MetronomeSource extends MidiSource
 		cur_beat = 0
 		cur_sub_beat = -1
 		fraction_beat = 0
-//		fraction_sub_beat = 0
+#		fraction_sub_beat = 0
 
 		pause = false
 		
@@ -52,7 +52,7 @@ class MetronomeSource extends MidiSource
 		if pause
 			return midi.samples
 	
-		// render clicks
+		# render clicks
 		while offset_sub_beat < midi.samples
 			cur_sub_beat ++
 			if cur_sub_beat >= config.sub_beats
@@ -61,7 +61,7 @@ class MetronomeSource extends MidiSource
 			if cur_beat >= config.beats
 				cur_beat = 0
 			
-			// render
+			# render
 			if cur_sub_beat == 0
 				if cur_beat == 0
 					midi.add_metronome_click(offset_sub_beat, 0, config.volume)
@@ -97,7 +97,7 @@ class MetronomeSource extends MidiSource
 		samples_beat = dt_b * sample_rate
 		samples_sub_beat = dt_s * sample_rate
 		
-		//if cur_beat >
+		#if cur_beat >
 		
 		cur_sub_beat = config.sub_beats * fraction_beat
 		offset_sub_beat = (1 + cur_sub_beat - fraction_beat * config.sub_beats) * samples_sub_beat

@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Verzerrer
+# Image = hui:properties
+# Title[Deutsch] = Verzerrer
 use "../../api.kaba"
 
 const string AUTO_CONFIG_GAIN = "0:1:0.1:100:%"

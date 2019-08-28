@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Pitch Shift
+# Image = hui:properties
+# Title[Deutsch] = Pitch Shift
 
 use "../../api.kaba"
 
@@ -28,7 +28,7 @@ class PitchShift extends AudioEffect
 			int ii_s = f2i(i_s)
 			float di_s = i_s - i2f(ii_s)
 			if i < ll and ii_s < ll
-				buf2[i] = f*(buf1[ii_s])// * (1 - di_s) + buf[ii_s + 1] * di_s)
+				buf2[i] = f*(buf1[ii_s])# * (1 - di_s) + buf[ii_s + 1] * di_s)
 			else
 				buf2[i] = complex(0, 0)
 		fft_c2r_inv(buf2, b)

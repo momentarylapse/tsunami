@@ -1,5 +1,5 @@
-// Image = hui:zoom-in
-// Title[Deutsch] = Hüllkurve
+# Image = hui:zoom-in
+# Title[Deutsch] = Hüllkurve
 use hui
 use "../../api.kaba"
 use "../../helper/grid.kaba"
@@ -23,8 +23,8 @@ class Config extends PluginData
 		curve.clear()
 		curve.add(complex(0, 0))
 		curve.add(complex(1, 0))
-		//MouseOver = -1
-		//Selected = -1
+		#MouseOver = -1
+		#Selected = -1
 
 
 class HullCurve extends AudioEffect
@@ -36,7 +36,7 @@ class HullCurve extends AudioEffect
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
-		// hull curve
+		# hull curve
 		for i in 1:b.num
 			float param = i2f(i) / b.num
 			float db = fi.get(param)
@@ -57,21 +57,21 @@ class HullGrid extends Grid
 
 	override void on_draw(Painter *c)
 	
-		// curve + area below
+		# curve + area below
 		FloatInterpolator fi
 		config.fill_inter(fi)
 		draw_curve(c, fi, true)
 	
-		// points
+		# points
 		for i in 0:config.curve.num
 			draw_point2(c, config.curve[i], i == selected, i == hover)
 
-	// left button down -> select
+	# left button down -> select
 	override void on_left_button_down()
 		selected = hover
 		redraw()
 
-	// [Delete] -> remove point
+	# [Delete] -> remove point
 	override void on_key_down()
 		if HuiGetEvent().key_code == KEY_DELETE
 			if selected > 0 and selected < config.curve.num-1
@@ -80,7 +80,7 @@ class HullGrid extends Grid
 				selected = -1
 				redraw()
 
-	// right button down -> new point
+	# right button down -> new point
 	override void on_right_button_down()
 		for i in 1:config.curve.num
 			complex q = project2(config.curve[i - 1])
@@ -94,7 +94,7 @@ class HullGrid extends Grid
 				break
 
 	override void on_mouse_move()
-		// move
+		# move
 		if HuiGetEvent().button_l and (selected >= 0)
 			config.curve[selected] = get_mouse2()
 			float xmin = 0
@@ -111,7 +111,7 @@ class HullGrid extends Grid
 				config.curve[selected].x = 0
 			cp.changed()
 		else
-		// mouse over?
+		# mouse over?
 			hover = -1
 			for c,i in config.curve
 				complex p = project2(c)
@@ -130,7 +130,7 @@ Grid ? '' vertical
 		ComboBox type 'linear\\log'
 		CheckBox preview 'show buffer'")
 	
-		//EventMX("drawing", "hui:draw", self, &OnDraw)
+		#EventMX("drawing", "hui:draw", self, &OnDraw)
 	
 		grid.config = &c.config
 		grid.cp = self

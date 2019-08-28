@@ -1,12 +1,12 @@
-// Image = hui:back
-// Title[Deutsch] = Monofizieren
+# Image = hui:back
+# Title[Deutsch] = Monofizieren
 use "../../api.kaba"
 
 const string AUTO_CONFIG_PANNING = "-1:1:1:100:%"
 const string AUTO_CONFIG_DISTANCE = "-2:2:0.1:100:cm"
 const string AUTO_CONFIG_INVERT = ""
 
-const float SPEED_OF_SOUND = 320.0 // m/s
+const float SPEED_OF_SOUND = 320.0 # m/s
 
 class Config extends PluginData
 	float panning
@@ -14,7 +14,7 @@ class Config extends PluginData
 	float distance
 	
 	override void reset()
-		panning = 0 // INVERTED.... for historic reasons...
+		panning = 0 # INVERTED.... for historic reasons...
 		distance = 0
 		invert = false
 	
@@ -45,7 +45,7 @@ class Monofier extends AudioEffect
 				buf.l[i] = x
 				buf.r[i] = x
 		else if config.distance > 0
-			// delay right channel
+			# delay right channel
 			for i in 0:len(buf)
 				float x = sl * buf.l[i] + sr * temp[offset]
 				temp[offset] = buf.r[i]
@@ -55,7 +55,7 @@ class Monofier extends AudioEffect
 				buf.l[i] = x
 				buf.r[i] = x
 		else if config.distance < 0
-			// delay left channel
+			# delay left channel
 			for i in 0:len(buf)
 				float x = sl * temp[offset] + sr * buf.r[i]
 				temp[offset] = buf.l[i]

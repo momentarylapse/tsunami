@@ -1,10 +1,10 @@
-// Image = hui:find
-// Title[Deutsch] = Supernova
+# Image = hui:find
+# Title[Deutsch] = Supernova
 use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
 
-//const int freq = 44100
+#const int freq = 44100
 const int f_min = 50
 const int f_max = 5000
 
@@ -53,8 +53,8 @@ string get_note(float f)
 	int rel = f2i(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
 	return rel_pitch_name(rel)
-	//loopf(fl, 0, 1)
-	//note = i2s(n)
+	#loopf(fl, 0, 1)
+	#note = i2s(n)
 
 class SuperNovaWindow extends Window
 	int hover
@@ -203,15 +203,15 @@ void UpdateInput()
 	
 	if available > BUFFER_SIZE
 		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
-		Offset += available - BUFFER_SIZE//input.cur_buf.num
+		Offset += available - BUFFER_SIZE#input.cur_buf.num
 	
 	int num = clampi(available, 0, BUFFER_SIZE)
 	input.current_buffer.peekRef(buf, num)
 	
-	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
-	for int i, 0, buf_size
-		float tt = i * w_f
-		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+	#float w_f = 1.0 / freq * 440.0 * 2.0 * pi
+#	for int i, 0, buf_size
+#		float tt = i * w_f
+#		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
 	float[] temp = buf.r + buf.l
 	
@@ -224,11 +224,11 @@ void UpdateInput()
 		float f = get_freq(i)
 		if f > f_min and f < f_max
 			float amp = (b.x*b.x + b.y*b.y) / f
-			//floatout f
-			/*if (amp > max * 2.5) or (amp > max and f < fmax2)
-				max = amp
-				fmax = f
-				fmax2 = f * 1.5*/
+			#floatout f
+			#if (amp > max * 2.5) or (amp > max and f < fmax2)
+#				max = amp
+#				fmax = f
+#				fmax2 = f * 1.5
 			if (amp > max)
 				max = amp
 				fmax = f
@@ -243,7 +243,7 @@ void UpdateInput()
 		LoudEnough = true
 		Frequency = fmax
 		p.note = f2i(freq_to_pitch(Frequency) + 0.5)
-		//Frequency = fmax
+		#Frequency = fmax
 		Error = error
 	
 		MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
@@ -324,7 +324,7 @@ void main()
 	win = new SuperNovaWindow
 		
 	StringPitch[0] = 40
-	StringPitch[1] = 45 // A = 110
+	StringPitch[1] = 45 # A = 110
 	StringPitch[2] = 50
 	StringPitch[3] = 55
 	StringPitch[4] = 59

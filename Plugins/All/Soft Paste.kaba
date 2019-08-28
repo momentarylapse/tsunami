@@ -1,7 +1,7 @@
 use hui
 use "../api.kaba"
 
-// t in [0,1]
+# t in [0,1]
 float step(float t)
 	return 1 - 1/(exp((t-0.5)*12) + 1)
 

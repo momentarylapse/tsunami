@@ -1,5 +1,5 @@
-// Image = hui:zoom-out
-// Title[Deutsch] = Ausblenden
+# Image = hui:zoom-out
+# Title[Deutsch] = Ausblenden
 
 use "../../api.kaba"
 

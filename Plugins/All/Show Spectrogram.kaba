@@ -1,16 +1,16 @@
-// Image = hui:find
-// Title[Deutsch] = Spektrum zeigen
+# Image = hui:find
+# Title[Deutsch] = Spektrum zeigen
 use hui
 use image
 use "../api.kaba"
 use "../helper/grid.kaba"
 
-//#show
-//#disasm
+##show
+##disasm
 
-const int N = 4096*2 // fft size
-const int NT = 512 // time bins
-const int NF = 512*2 // freq bins
+const int N = 4096*2 # fft size
+const int NT = 512 # time bins
+const int NF = 512*2 # freq bins
 const float MIN_FREQ = 60.0
 const float MAX_FREQ = 3000.0
 const float MIN_VOL = 0.0 - 60.0
@@ -39,9 +39,9 @@ class SpecGrid extends Grid
 				im.set_pixel(x, y, im0.get_pixel(x * xa + xb, y * ya + yb))
 		c.draw_image(r.x1, r.y1, im)
 	
-		/*Image *im = im0.scale(r.width(), r.height())
-		c.DrawImage(r.x1, r.y1, *im)
-		delete(im)*/
+		#Image *im = im0.scale(r.width(), r.height())
+#		c.DrawImage(r.x1, r.y1, *im)
+#		delete(im)
 
 class SpectrumDialog extends Dialog
 	SpecGrid grid
@@ -59,7 +59,7 @@ Grid ? ''
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range().offset / i2f(song.sample_rate), view.sel.range().end() / i2f(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
-		//grid.allow_bg = false
+		#grid.allow_bg = false
 	
 		event("close", &on_close)
 
@@ -95,7 +95,7 @@ class ShowSpectrogram extends SongPlugin
 		float log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
 		for t in 0:NT
-			// time slice
+			# time slice
 			int offset = (buf.length - N) * t / NT
 		
 			for j in 0:N
@@ -103,7 +103,7 @@ class ShowSpectrogram extends SongPlugin
 			fft_r2c(sub, f)
 			float ww = i2f(N) / song.sample_rate
 			for i in 0:NF
-				// frequency slice
+				# frequency slice
 				float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
 				float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
 				int j0 = fmin * ww
@@ -111,7 +111,7 @@ class ShowSpectrogram extends SongPlugin
 				j0 = clamp(j0, 0, f.num)
 				j1 = clamp(j1, 0, f.num)
 				
-				// find maximum amplitude in that frequency interval
+				# find maximum amplitude in that frequency interval
 				float bmaxr = 0
 				for j in j0:j1
 					float amp = f[j].x * f[j].x + f[j].y * f[j].y

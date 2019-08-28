@@ -6,7 +6,7 @@ const string AUTO_CONFIG_SUB_BEATS = "1:20"
 
 class Config extends PluginData
 	
-	// rhythm
+	# rhythm
 	float bpm
 	int beats
 	int sub_beats
@@ -19,7 +19,7 @@ class Config extends PluginData
 class MetronomeSource extends BeatSource
 	Config config
 	
-	// state/output
+	# state/output
 	int next_beat
 	int next_sub_beat
 
@@ -40,10 +40,10 @@ class MetronomeSource extends BeatSource
 		
 	override int read(Beat[] beats, int samples)
 	
-		// render clicks
+		# render clicks
 		while offset_sub_beat < samples
 			
-			// render
+			# render
 			int level = 2
 			if next_sub_beat == 0
 				if next_beat == 0
@@ -99,7 +99,7 @@ class MetronomeSource extends BeatSource
 		samples_beat = dt_b * sample_rate
 		samples_sub_beat = dt_s * sample_rate
 		
-		//if cur_beat >
+		#if cur_beat >
 		
 		int _cur_sub_beat = config.sub_beats * fraction_beat
 		next_sub_beat = _cur_sub_beat + 1

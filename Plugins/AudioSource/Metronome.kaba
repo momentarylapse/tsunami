@@ -1,5 +1,5 @@
-// Image = hui:add
-// Title[Deutsch] = Metronom
+# Image = hui:add
+# Title[Deutsch] = Metronom
 
 use "../api.kaba"
 use "../MidiSource/Metronome.kaba"
@@ -38,8 +38,8 @@ class Metronome extends AudioSource
 		return synth.out.read_audio(buf)
 		
 	override ConfigPanel *create_panel()
-		//return source.create_panel()
-		// how to deal with configuration/string exports...
+		#return source.create_panel()
+		# how to deal with configuration/string exports...
 		
 		return new MetronomePanel(self)
 	
@@ -81,7 +81,7 @@ class MetronomePanel extends ConfigPanel
 		set_float("beats_per_minute", c.config.beats_per_minute)
 		set_int("beats_per_measure", c.config.beats_per_measure)
 		set_float("volume", c.config.volume * 100)
-		//SliderSet(self, "volume", c.config.volume)
+		#SliderSet(self, "volume", c.config.volume)
 
 	void on_bpm()
 		c.config.beats_per_minute = get_float("")
@@ -93,6 +93,6 @@ class MetronomePanel extends ConfigPanel
 
 	void on_volume()
 		c.config.volume = get_float("") / 100
-		//m.config.volume = SliderGet(self, "volume")
+		#m.config.volume = SliderGet(self, "volume")
 		changed()
 

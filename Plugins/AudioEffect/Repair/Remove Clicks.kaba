@@ -1,5 +1,5 @@
-// Image = hui:clear
-// Title[Deutsch] = Klicks Entfernen
+# Image = hui:clear
+# Title[Deutsch] = Klicks Entfernen
 use "../../api.kaba"
 
 const int MAX_CLICK_SAMPLES = 128

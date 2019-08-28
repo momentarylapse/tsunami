@@ -1,5 +1,5 @@
-// Image = hui:copy
-// Title[Deutsch] = Flanger
+# Image = hui:copy
+# Title[Deutsch] = Flanger
 
 use "../../api.kaba"
 
@@ -39,17 +39,17 @@ class Flanger extends AudioEffect
 	
 		for bb,i in b
 	
-			// old value
+			# old value
 			temp[p] = bb
 		
-			// shift
+			# shift
 			float dt = f_a - cos((i + offset) * f_c) * f_b
 			int dp = dt * sample_rate
 			int p2 = p - dp
 			if p2 < 0
 				p2 += temp.num
 		
-			// add echo
+			# add echo
 			bb += temp[p2]
 		
 			p ++

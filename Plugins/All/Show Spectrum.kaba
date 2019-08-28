@@ -1,5 +1,5 @@
-// Image = hui:find
-// Title[Deutsch] = Spektrum zeigen
+# Image = hui:find
+# Title[Deutsch] = Spektrum zeigen
 use hui
 use "../api.kaba"
 use "../helper/grid.kaba"
@@ -16,12 +16,12 @@ enum
 	TYPE_LINEAR
 	TYPE_LOG
 
-//float[] x, yr, yl
+#float[] x, yr, yl
 float[] ffr, ffl
 
-//GridData grid
+#GridData grid
 
-//int w, h
+#int w, h
 
 float todb(float v)
 	return log(v) / log(10) * 10
@@ -42,7 +42,7 @@ class SpecGrid extends Grid
 			if type == TYPE_LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
-			else //if type == TypeLogarithm
+			else #if type == TypeLogarithm
 				float vol_max = todb(peak_max)
 				float vol_min = vol_max - 60
 				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
@@ -51,7 +51,7 @@ class SpecGrid extends Grid
 		type = t
 		if type == TYPE_LINEAR
 			y_axis.set(0, peak_max, false, "")
-		else //if type == TypeLogarithm
+		else #if type == TypeLogarithm
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
@@ -103,9 +103,9 @@ class ShowSpectrum extends SongPlugin
 		int len2 = buf.r.num / 2 + 1
 		fr.resize(len2)
 		fl.resize(len2)
-		//ff.clear()
-		//fft_r2c(buf.r, fr)
-		//fft_r2c(buf.l, fl)
+		#ff.clear()
+		#fft_r2c(buf.r, fr)
+		#fft_r2c(buf.l, fl)
 		buf.get_spectrum(fr, fl, 4096)
 	
 		float ww = i2f(buf.r.num) / song.sample_rate

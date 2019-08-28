@@ -1,5 +1,5 @@
-// Image = hui:find
-// Title[Deutsch] = Tonerkennung
+# Image = hui:find
+# Title[Deutsch] = Tonerkennung
 use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
@@ -19,8 +19,8 @@ class PitchRecognitionPanel extends ConfigPanel
 		int rel = f2i(pitch + 0.5) % 12
 		note_error = loop(pitch, -0.5, 0.5)
 		return rel_pitch_name(rel)
-		//loopf(fl, 0, 1)
-		//note = i2s(n)
+		#loopf(fl, 0, 1)
+		#note = i2s(n)
 
 	void draw_volume(Painter *p)
 		p.set_color(color(1, 0.8, 0.8, 0.8))

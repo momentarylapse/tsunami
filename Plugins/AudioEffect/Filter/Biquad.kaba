@@ -32,7 +32,7 @@ class Config extends PluginData
 		f.l.f.b[0] = b0
 		f.l.f.b[1] = b1
 		f.l.f.b[2] = b2
-		//f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
+		#f.create(FILTER_ALL_PASS, a1, a2, 0, sample_rate)
 
 class Biquad extends AudioEffect
 
@@ -40,7 +40,7 @@ class Biquad extends AudioEffect
 
 	Config config
 
-	Filter filter // state
+	Filter filter # state
 	
 	override void __init__()
 		grid = nil
@@ -71,12 +71,12 @@ class BiquadGrid extends Grid
 	override void on_draw(Painter *p)
 		draw_curve_c(p, spectrum, false)
 	
-		// curve + area below
+		# curve + area below
 		FilterGainCurve gain
 		c.create_filter(gain.f, sample_rate)
 		draw_curve_c(p, gain, true)
 	
-		// curve + area below
+		# curve + area below
 		FilterPhaseShiftCurve phase
 		c.create_filter(phase.f, sample_rate)
 		draw_curve_c(p, phase, false)

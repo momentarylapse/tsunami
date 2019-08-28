@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Kompressor
+# Image = hui:properties
+# Title[Deutsch] = Kompressor
 
 use "../../api.kaba"
 
@@ -50,16 +50,16 @@ class Compressor extends AudioEffect
 		float bmin = pow(10, MIN_DB/20)
 		for i in 0:b.num
 		
-			// in level (filtered)
+			# in level (filtered)
 			squares[i%squares.num] = b[i]*b[i]
 			float rms = sqrt(squares.sum() / squares.num * 2)
-			if config.attack < 0.00005 // = 0
+			if config.attack < 0.00005 # = 0
 				rms = abs(b[i])
 			float in_level = MIN_DB
 			if rms > bmin
 				in_level = log(rms) / log(10) * 20
 		
-			// out level
+			# out level
 			float out_level = in_level
 			if config.upward
 				if in_level > config.threshold
@@ -70,7 +70,7 @@ class Compressor extends AudioEffect
 				if in_level > config.threshold
 					out_level = config.threshold + (in_level - config.threshold) / config.ratio
 			
-			// slow gain changes
+			# slow gain changes
 			float cur_gain = out_level - in_level
 			if cur_gain > *gain
 				if config.release < 0.00005
@@ -83,7 +83,7 @@ class Compressor extends AudioEffect
 				else
 					*gain -= dgain_attack
 			
-			// apply gain
+			# apply gain
 			b[i] *= pow(10, *gain / 20)
 
 	override void process(AudioBuffer buf)

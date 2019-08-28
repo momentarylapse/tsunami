@@ -1,5 +1,5 @@
-// Image = hui:clear
-// Title[Deutsch] = Kanal Löschen R
+# Image = hui:clear
+# Title[Deutsch] = Kanal Löschen R
 use "../../api.kaba"
 
 

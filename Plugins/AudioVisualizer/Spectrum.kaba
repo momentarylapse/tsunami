@@ -1,5 +1,5 @@
-// Image = hui:media-play
-// Title[Deutsch] = Oszilloskop
+# Image = hui:media-play
+# Title[Deutsch] = Oszilloskop
 use hui
 use "../api.kaba"
 use "../helper/grid.kaba"
@@ -31,7 +31,7 @@ class SpecGrid extends Grid
 		ffr = _ffr
 		
 		create_lines()
-		//print(str(pr))
+		#print(str(pr))
 		
 
 	void create_lines()
@@ -44,17 +44,17 @@ class SpecGrid extends Grid
 			if type == TYPE_LINEAR
 				pr[i].y = ffr[i]
 				pl[i].y = ffl[i]
-			else //if type == TypeLogarithm
-				//float db_max = todb(peak_max)
-				//float db_min = db_max - 80
-				pr[i].y = todb(ffr[i])//clamp(todb(ffr[i]), db_min, db_max)
-				pl[i].y = todb(ffl[i])//clamp(todb(ffl[i]), db_min, db_max)
+			else #if type == TypeLogarithm
+				#float db_max = todb(peak_max)
+				#float db_min = db_max - 80
+				pr[i].y = todb(ffr[i])#clamp(todb(ffr[i]), db_min, db_max)
+				pl[i].y = todb(ffl[i])#clamp(todb(ffl[i]), db_min, db_max)
 	void set_type(int t)
 		type = t
 		if type == TYPE_LINEAR
 			y_axis.set(0, 1, false, "")
-		else //if type == TypeLogarithm
-			float db_max = 0//todb(peak_max)
+		else #if type == TypeLogarithm
+			float db_max = 0#todb(peak_max)
 			float db_min = db_max - 80
 			y_axis.set(db_min, db_max, false, "db")
 		create_lines()

@@ -3,7 +3,7 @@ use "../api.kaba"
 class SongSpectrum extends TsunamiPlugin
 	Module* spec
 	override void on_start()
-		// very crappy topology :P
+		# very crappy topology :P
 		let chain = session.view.signal_chain
 		spec = chain.add(MODULE_AUDIO_VISUALIZER, "Spectrum")
 		chain.connect(session.view.renderer, 0, spec, 0)

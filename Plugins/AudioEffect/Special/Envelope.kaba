@@ -29,11 +29,11 @@ class Envelope extends AudioEffect
 			float x = abs(buf[i])
 			
 			if x > v
-				// go up
+				# go up
 				v += (x - v) * config.a
 				dv = 0
 			else
-				// go down
+				# go down
 				dv -= config.c
 				v += (x - v) * config.b + dv
 

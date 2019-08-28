@@ -6,21 +6,21 @@ class ZeroRenderer extends PitchRenderer
 	float volume
 	bool fade_out
 	
-	// gets called when creating the renderer
+	# gets called when creating the renderer
 	override void __init__(Synthesizer *s, int pitch)
-		// dark magic...gave up
+		# dark magic...gave up
 		super.__init__(s, pitch)
 		phase = 0
 		volume = 0
 		fade_out = false
 	
-	// use += ... otherwise would overwrite previous notes...!!!!
+	# use += ... otherwise would overwrite previous notes...!!!!
 	override bool render(AudioBuffer buf)
-		//print(buf.length)
+		#print(buf.length)
 		
-//		float freq = pitch_to_freq(pitch)
-//		float dt = 1.0 / synth.sample_rate
-//		...delta_phi = freq * dt * 2 * pi
+#		float freq = pitch_to_freq(pitch)
+#		float dt = 1.0 / synth.sample_rate
+#		...delta_phi = freq * dt * 2 * pi
 		
 		if fade_out
 			for i in 0:len(buf)
@@ -34,7 +34,7 @@ class ZeroRenderer extends PitchRenderer
 	
 		buf.auto_generate_channels()
 				
-		// keep alive?
+		# keep alive?
 		return volume > 0.001
 		
 	override void on_start(float _volume)
@@ -47,6 +47,6 @@ class ZeroRenderer extends PitchRenderer
 
 class Zero extends Synthesizer
 
-	// messy :P
+	# messy :P
 	override PitchRenderer* create_pitch_renderer(int pitch)
 		return new ZeroRenderer(self, pitch)

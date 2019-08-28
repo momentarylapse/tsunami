@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Band Pass Filter
+# Image = hui:properties
+# Title[Deutsch] = Band Pass Filter
 use "../../api.kaba"
 
 const string AUTO_CONFIG_FREQUENCY = "0:5000:0.1:1:Hz"
@@ -21,8 +21,8 @@ class LowPassFilter extends AudioEffect
 		used[1] = false
 
 
-	// y[i] := α * (y[i-1] + x[i] - x[i-1])
-	// z[i] := α * x[i] + (1-α) * z[i-1]
+	# y[i] := α * (y[i-1] + x[i] - x[i-1])
+	# z[i] := α * x[i] + (1-α) * z[i-1]
 	
 	void do(float[] buf, int c)
 		float RC = 1 / (2 * pi * config.frequency)
@@ -34,16 +34,16 @@ class LowPassFilter extends AudioEffect
 			float t = buf[0]
 			buf[0] = bb * (buf[0] + _out[c] - _in[c])
 			prev_in = t
-			//buf.r[0] = aa * buf.r[0] + bb * state.out_r
+			#buf.r[0] = aa * buf.r[0] + bb * state.out_r
 		
-		// y[i] := b * (y[i-1] + x[i] - x[i-1])
-		// z[i] := α * y[i] + b * z[i-1]
+		# y[i] := b * (y[i-1] + x[i] - x[i-1])
+		# z[i] := α * y[i] + b * z[i-1]
 	
 		for i in 1:buf.num
 			float t = buf[i]
 			buf[i] = bb * (buf[i] + buf[i-1] - prev_in)
 			prev_in = t
-			//buf[i] = aa * buf[i] + bb * buf[i-1]
+			#buf[i] = aa * buf[i] + bb * buf[i-1]
 		
 		used[c] = true
 		_in[c] = prev_in

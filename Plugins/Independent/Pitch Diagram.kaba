@@ -1,5 +1,5 @@
-// Image = hui:find
-// Title[Deutsch] = Tonerkennung
+# Image = hui:find
+# Title[Deutsch] = Tonerkennung
 use hui
 use "../api.kaba"
 use "../helper/tone.kaba"
@@ -30,8 +30,8 @@ string get_note(float f)
 	int rel = f2i(pitch + 0.5) % 12
 	error = loop(pitch, -0.5, 0.5)
 	return rel_pitch_name(rel)
-	//loopf(fl, 0, 1)
-	//note = i2s(n)
+	#loopf(fl, 0, 1)
+	#note = i2s(n)
 
 void DrawVolume(Painter *c)
 	c.set_color(color(1, 0.8, 0.8, 0.8))
@@ -72,23 +72,23 @@ void OnClose()
 	win = nil
 
 void UpdateInput()
-	int[1] stack_corrector // needed for stack alignment (T_T)
+	int[1] stack_corrector # needed for stack alignment (T_T)
 	
 	int num = clampi(input.cur_buf.num, 0, buf_size)
 	buf.resize(buf_size)
 	
-	// alten Pufferinhalt verschieben
+	# alten Pufferinhalt verschieben
 	for i in 0:(buf_size - num)
 		buf[i] = buf[i + num]
 	
-	// neuen Inhalt anfügen
+	# neuen Inhalt anfügen
 	for i in 0:num
 		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
 	
-	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
-	for int i, 0, buf_size
-		float tt = i * w_f
-		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+	#float w_f = 1.0 / freq * 440.0 * 2.0 * pi
+#	for int i, 0, buf_size
+#		float tt = i * w_f
+#		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
 	complex[] bufc
 	bufc.resize(buf.num / 2 + 1)
@@ -99,11 +99,11 @@ void UpdateInput()
 		float f = get_freq(i)
 		if f > f_min and f < f_max
 			float amp = (b.x*b.x + b.y*b.y) / f
-			//floatout f
-			/*if (amp > max * 2.5) or (amp > max and f < fmax2)
-				max = amp
-				fmax = f
-				fmax2 = f * 1.5*/
+			#floatout f
+			#if (amp > max * 2.5) or (amp > max and f < fmax2)
+#				max = amp
+#				fmax = f
+#				fmax2 = f * 1.5
 			if (amp > max)
 				max = amp
 				fmax = f
@@ -114,7 +114,7 @@ void UpdateInput()
 		LoudEnough = true
 		Frequency = fmax
 		played.add(f2i(freq_to_pitch(Frequency) + 0.5))
-		//Frequency = fmax
+		#Frequency = fmax
 		Error = error
 	else
 		LoudEnough = false

@@ -1,5 +1,5 @@
-// Image = hui:properties
-// Title[Deutsch] = Schaltkreis
+# Image = hui:properties
+# Title[Deutsch] = Schaltkreis
 use "../../api.kaba"
 use "circuit/circuit.kaba"
 
@@ -7,8 +7,8 @@ class Config extends PluginData
 	complex[] nodes
 	
 
-/*class State : PluginData
-	overwrite void reset()*/
+#class State : PluginData
+#	overwrite void reset()
 
 class CircuitEffect extends AudioEffect
 	Config config

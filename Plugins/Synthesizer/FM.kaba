@@ -50,9 +50,9 @@ class OscillatorLink
 
 class FMConfig extends PluginData
 	OscillatorConfig[NUM_OSCILLATORS] osc
-	//OscillatorLink[] link
+	#OscillatorLink[] link
 	override void reset()
-		//link.clear()
+		#link.clear()
 		for o in osc
 			o.reset()
 		osc[0].factor = 1
@@ -132,10 +132,10 @@ Grid ? ''
 		event("type-saw", &on_type_saw)
 	
 	void update_osci_pos()
-		// initial
+		# initial
 		p_out = complex(40, 60)
 		for p,i in p_osci
-			p = complex(100+15*i, i*20)//complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
+			p = complex(100+15*i, i*20)#complex((i % 3) * 100 + 100, i * 20 + 10 + pow((i%3),2)*3)
 			bool has_links = fc.osc[i].target_out
 			for t in fc.osc[i].target
 				has_links = has_links or t
@@ -209,7 +209,7 @@ Grid ? ''
 		draw_type(p, z - complex(0,2), o._type, 9, 5.5)
 		int f = o.factor + 0.5
 		p.set_font_size(7)
-		//p.set_color(colors.text_soft1)
+		#p.set_color(colors.text_soft1)
 		p.draw_str(z.x-4, z.y+6, "x" + f)
 	
 	void draw_link(Painter* p, int a, int b)
@@ -443,7 +443,7 @@ class FMRenderer extends PitchRenderer
 	override FMSynthesizer *synth
 	
 	override void __init__(Synthesizer *s, int _pitch)
-		//super.__init__(s, _pitch)
+		#super.__init__(s, _pitch)
 		num_osc_active = 0
 
 	override void on_end()
@@ -453,7 +453,7 @@ class FMRenderer extends PitchRenderer
 	override void on_start(float _volume)
 		num_osc_active = len(osc)
 		for o in osc
-			// TODO: volume should only effect "output" oscs
+			# TODO: volume should only effect "output" oscs
 			o.env.start(_volume * o.conf.amplitude)
 
 	override void on_config()
@@ -490,7 +490,7 @@ class FMRenderer extends PitchRenderer
 				if o.phi > 16*pi
 					o.phi = loop(o.phi, 0, 2*pi)
 			
-			// transport
+			# transport
 			for o in osc
 				if o.conf.target_out
 					buf.l[i] += o.output

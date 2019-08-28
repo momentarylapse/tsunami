@@ -30,7 +30,6 @@ Variable::~Variable() {
 
 
 Function::Function(const string &_name, const Class *_return_type, const Class *_name_space) {
-	owner = _name_space->owner;
 	name = _name;
 	block = new Block(this, nullptr);
 	num_params = 0;
@@ -75,6 +74,10 @@ Function::~Function() {
 		delete block;
 	for (Variable* v: var)
 		delete v;
+}
+
+SyntaxTree *Function::owner() const {
+	return name_space->owner;
 }
 
 string namespacify(const string &name, const Class *name_space);

@@ -13,14 +13,14 @@
 #include "../../TsunamiWindow.h"
 
 extern const int CONFIG_PANEL_WIDTH = 400;
-extern const int CONFIG_PANEL_HEIGHT = 300;
+extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 
 ModulePanel::ModulePanel(Module *_m, Mode mode) {
 	module = _m;
 	session = module->session;
 
 	from_resource("fx_panel");
-	set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_HEIGHT));
+	set_options("grid", format("width=%d,height=%d,expandy,noexpandx", CONFIG_PANEL_WIDTH, CONFIG_PANEL_MIN_HEIGHT));
 
 	set_string("name", module->module_subtype);
 
@@ -79,6 +79,10 @@ void ModulePanel::set_func_edit(std::function<void(const string&)> _func_edit) {
 	func_edit = _func_edit;
 }
 
+void ModulePanel::set_func_replace(std::function<void(const Module*)> _func_replace) {
+	func_replace = _func_replace;
+}
+
 void ModulePanel::set_func_close(std::function<void()> _func_close) {
 	func_close = _func_close;
 }
@@ -114,6 +118,7 @@ ModulePanel *ModulePanel::copy() {
 	auto *c = new ModulePanel(module);
 	c->set_func_delete(func_delete);
 	c->set_func_edit(func_edit);
+	c->set_func_replace(func_replace);
 	c->set_func_enable(func_enable);
 	c->set_func_close(func_close);
 	return c;

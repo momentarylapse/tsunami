@@ -168,7 +168,7 @@ void SerializerAMD64::add_function_call(Function *f, const SerialNodeParam &inst
 			add_cmd(Asm::INST_CALL, p_rax);
 		}
 	} else if (f->_label >= 0) {
-		if (f->owner == syntax_tree) {
+		if (f->owner() == syntax_tree) {
 			// 32bit call distance
 			add_cmd(Asm::INST_CALL, param_marker(TypeInt, f->_label));
 		} else {

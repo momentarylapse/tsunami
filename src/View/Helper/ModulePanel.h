@@ -9,13 +9,14 @@
 #define SRC_VIEW_HELPER_MODULEPANEL_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../Stuff/Observable.h"
 
 class Module;
 class ConfigPanel;
 class Session;
 
 
-class ModulePanel : public hui::Panel {
+class ModulePanel : public Observable<hui::Panel> {
 public:
 	
 	enum Mode {
@@ -45,11 +46,13 @@ public:
 	
 	void set_func_enable(std::function<void(bool)> func_enable);
 	void set_func_edit(std::function<void(const string&)> func_edit);
+	void set_func_replace(std::function<void(const Module*)> func_replace);
 	void set_func_delete(std::function<void()> func_delete);
 	void set_func_close(std::function<void()> func_close);
 	
 	std::function<void(bool)> func_enable;
 	std::function<void(const string&)> func_edit;
+	std::function<void(const Module*)> func_replace;
 	std::function<void()> func_delete;
 	std::function<void()> func_close;
 	Session *session;

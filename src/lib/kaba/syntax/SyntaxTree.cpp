@@ -473,7 +473,7 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 	
 	t->array_length = max(array_size, 0);
 	if (t->is_super_array() or t->is_dict()) {
-		t->derive_from(TypeDynamicArray, false);
+		t->derive_from(TypeDynamicArray, false); // we already set its size!
 		if (sub->needs_constructor() and !sub->get_default_constructor())
 			do_error(format("can not create a dynamic array from type %s, missing default constructor", sub->name.c_str()));
 		t->parent = sub;
@@ -955,10 +955,8 @@ void SyntaxTree::map_local_variables_to_stack() {
 
 // no included scripts may be deleted before us!!!
 SyntaxTree::~SyntaxTree() {
-	// delete all types created by this script
-	/*for (auto *t: classes)
-		if (t->owner == this)
-			delete(t);*/
+	// delete all classes, functions etc created by this script
+	
 	if (asm_meta_info)
 		delete asm_meta_info;
 

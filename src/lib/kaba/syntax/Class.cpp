@@ -77,10 +77,10 @@ Class::~Class() {
 	for (auto *v: static_variables)
 		delete v;
 	for (auto *f: member_functions)
-		if (f->owner == owner)
+		if (f->name_space == this)
 			delete f;
 	for (auto *f: static_functions)
-		if (f->owner == owner)
+		if (f->name_space == this)
 			delete f;
 	for (auto *c: classes)
 		if (c->owner == owner)

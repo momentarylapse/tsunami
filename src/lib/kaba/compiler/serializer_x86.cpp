@@ -118,14 +118,6 @@ void SerializerX86::add_pointer_call(const SerialNodeParam &pointer, const Array
 	do_error("pointer call");
 }
 
-int func_index(Function *f)
-{
-	foreachi(Function *ff, f->owner->functions, i)
-		if (ff == f)
-			return i;
-	return -1;
-}
-
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
 SerialNodeParam SerializerX86::SerializeParameter(Node *link, Block *block, int index)

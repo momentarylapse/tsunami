@@ -118,7 +118,7 @@ void SerializerARM::add_function_call(Function *f, const SerialNodeParam &instan
 {
 	int push_size = fc_begin(instance, params, ret);
 
-	if ((f->owner->script == this->script) and (!f->is_extern)){
+	if ((f->owner() == syntax_tree) and (!f->is_extern)){
 		add_cmd(Asm::INST_CALL, param_marker(TypePointer, f->_label));
 	}else{
 		if (!f->address)
@@ -409,6 +409,11 @@ bool const_is_arm_representable(int value)
 	return false;
 }
 
+int func_index(Function *f) {
+	f->owner()->do_error("ARM func_index...");
+	return -1;
+}
+
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
 SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int index)
@@ -423,7 +428,7 @@ SerialNodeParam SerializerARM::SerializeParameter(Node *link, Block *block, int 
 		p.p = (int_p)link->as_func_p();
 		p.kind = KIND_MEMORY;
 		if (!p.p){
-			if (link->as_func()->owner == syntax_tree){
+			if (link->as_func()->owner() == syntax_tree){
 				int index = func_index(link->as_func());
 				p.p = index + 0xefef0000;
 				script->function_vars_to_link.add(index);

@@ -287,9 +287,9 @@ void SyntaxTree::make_func_node_callable(Node *l, bool check) {
 	l->set_num_params(f->num_params);
 	if (check) {
 		if (f->is_static and l->instance)
-			f->owner->do_error("calling static function with object???");
+			f->owner()->do_error("calling static function with object???");
 		if (!f->is_static and !l->instance)
-			f->owner->do_error("calling member function without object: " + f->long_name());
+			f->owner()->do_error("calling member function without object: " + f->long_name());
 	}
 
 	// virtual?

@@ -34,8 +34,8 @@ public:
 // user defined functions
 class Function {
 public:
-	SyntaxTree *owner;
-
+	SyntaxTree *owner() const;
+	
 	string name;
 	string long_name() const; // "Class.Function"
 	// parameters (linked to intern variables)

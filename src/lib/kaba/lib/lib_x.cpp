@@ -245,20 +245,6 @@ extern const Class *TypeShaderP;
 #endif
 
 
-#ifdef _X_ALLOW_X_
-void amd64_model_get_vertex(vector &r, Model *m, int a, int b)
-{	r = m->GetVertex(a, b);	}
-void amd64_camera_project(vector &r, Camera *c, vector &v)
-{	r = c->project(v);	}
-void amd64_camera_unproject(vector &r, Camera *c, vector &v)
-{	r = c->unproject(v);	}
-void amd64_getg(vector &r, vector &v)
-{	r = GetG(v);	}
-#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
-#else
-#define amd64_wrap(a, b)	nullptr
-#endif
-
 
 void SIAddPackageX()
 {
@@ -655,7 +641,7 @@ void SIAddPackageX()
 	add_func("Draw",						TypeVoid,		x_p(mf(&Model::Draw)));
 		func_add_param("skin",				TypeInt);
 		func_add_param("fx",				TypeBool);*/
-		class_add_func("get_vertex",		TypeVector,		amd64_wrap(mf(&Model::GetVertex), &amd64_model_get_vertex));
+		class_add_func("get_vertex",		TypeVector,		x_p(mf(&Model::GetVertex)));
 			func_add_param("index",			TypeInt);
 			func_add_param("skin",			TypeInt);
 		class_add_func("reset_animation",		TypeVoid,		x_p(mf(&Model::ResetAnimation)));
@@ -744,9 +730,9 @@ void SIAddPackageX()
 		class_add_func("stop",		TypeVoid,	x_p(mf(&Camera::stop_script)));
 		class_add_func_virtual("on_iterate",		TypeVoid,	x_p(mf(&Camera::on_iterate)));
 			func_add_param("dt", TypeFloat32);
-		class_add_func("project",		TypeVector,	amd64_wrap(mf(&Camera::project), &amd64_camera_project));
+		class_add_func("project",		TypeVector,	x_p(mf(&Camera::project)));
 			func_add_param("v",			TypeVector);
-		class_add_func("unproject",		TypeVector,	amd64_wrap(mf(&Camera::unproject), &amd64_camera_unproject));
+		class_add_func("unproject",		TypeVector,	x_p(mf(&Camera::unproject)));
 			func_add_param("v",			TypeVector);
 		class_set_vtable_x(Camera);
 
@@ -967,7 +953,7 @@ void SIAddPackageX()
 		func_add_param("status",		TypeString);
 		func_add_param("progress",		TypeFloat32);
 	add_func("RenderScene",									TypeVoid, 	nullptr, FLAG_STATIC);
-	add_func("GetG",											TypeVector,	amd64_wrap(&GetG, &amd64_getg), FLAG_STATIC);
+	add_func("GetG",											TypeVector,	x_p(&GetG), FLAG_STATIC);
 		func_add_param("pos",		TypeVector);
 	add_func("Trace",											TypeBool,	x_p(&GodTrace), FLAG_STATIC);
 		func_add_param("p1",		TypeVector);

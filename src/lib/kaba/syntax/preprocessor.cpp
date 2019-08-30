@@ -8,38 +8,70 @@ typedef void op_func(Value &r, Value &a, Value &b);
 
 //static Function *cur_func;
 
-bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> param)
-{
-	if (f->num_params == 0){
-		if (f->return_type == TypeInt){
-			*(int*)ret = ((int(*)())ff)();
+template<class R>
+void call0(void *ff, void *ret, const Array<void*> &param) {
+	*(R*)ret = ((R(*)())ff)();
+}
+template<class R, class A>
+void call1(void *ff, void *ret, const Array<void*> &param) {
+	*(R*)ret = ((R(*)(A))ff)(*(A*)param[0]);
+}
+template<class R, class A, class B>
+void call2(void *ff, void *ret, const Array<void*> &param) {
+	*(R*)ret = ((R(*)(A, B))ff)(*(A*)param[0], *(B*)param[1]);
+}
+template<class R, class A, class B, class C>
+void call3(void *ff, void *ret, const Array<void*> &param) {
+	*(R*)ret = ((R(*)(A, B, C))ff)(*(A*)param[0], *(B*)param[1], *(C*)param[2]);
+}
+template<class R, class A, class B, class C, class D>
+void call4(void *ff, void *ret, const Array<void*> &param) {
+	*(R*)ret = ((R(*)(A, B, C, D))ff)(*(A*)param[0], *(B*)param[1], *(C*)param[2], *(D*)param[3]);
+}
+
+bool call_function(Function *f, void *ff, void *ret, void *__inst, const Array<void*> &param) {
+	if (f->num_params == 0) {
+		if (f->return_type == TypeInt) {
+			call0<int>(ff, ret, param);
 			return true;
-		}else if (f->return_type == TypeFloat32){
-			*(float*)ret = ((float(*)())ff)();
+		} else if (f->return_type == TypeFloat32) {
+			call0<float>(ff, ret, param);
 			return true;
-		}else if (f->return_type->uses_return_by_memory()){
+		} else if (f->return_type->uses_return_by_memory()) {
+			//call1<void,void*>(ff, ret, param);
 			((void(*)(void*))ff)(ret);
 			return true;
 		}
-	}else if (f->num_params == 1){
-		if (f->return_type == TypeInt){
-			if (f->literal_param_type[0] == TypeInt){
-				*(int*)ret = ((int(*)(int))ff)(*(int*)param[0]);
+	}else if (f->num_params == 1) {
+		if (f->return_type == TypeInt) {
+			if (f->literal_param_type[0] == TypeInt) {
+				call1<int,int>(ff, ret, param);
+				return true;
+			} else if (f->literal_param_type[0] == TypeFloat32) {
+				call1<int,float>(ff, ret, param);
 				return true;
 			}
-		}else if (f->return_type == TypeFloat32){
-			if (f->literal_param_type[0] == TypeFloat32){
-				*(float*)ret = ((float(*)(float))ff)(*(float*)param[0]);
+		} else if (f->return_type == TypeBool) {
+			if (f->literal_param_type[0] == TypeInt) {
+				call1<bool,int>(ff, ret, param);
+				return true;
+			} else if (f->literal_param_type[0] == TypeFloat32) {
+				call1<bool,float>(ff, ret, param);
 				return true;
 			}
-		}else if (f->return_type->uses_return_by_memory()){
-			if (f->literal_param_type[0] == TypeInt){
+		} else if (f->return_type == TypeFloat32) {
+			if (f->literal_param_type[0] == TypeFloat32) {
+				call1<float,float>(ff, ret, param);
+				return true;
+			}
+		} else if (f->return_type->uses_return_by_memory()) {
+			if (f->literal_param_type[0] == TypeInt) {
 				((void(*)(void*, int))ff)(ret, *(int*)param[0]);
 				return true;
-			}else if (f->literal_param_type[0] == TypeFloat32){
+			} else if (f->literal_param_type[0] == TypeFloat32) {
 				((void(*)(void*, float))ff)(ret, *(float*)param[0]);
 				return true;
-			}else if (f->literal_param_type[0]->uses_call_by_reference()){
+			} else if (f->literal_param_type[0]->uses_call_by_reference()) {
 				((void(*)(void*, void*))ff)(ret, param[0]);
 				return true;
 			}
@@ -47,12 +79,12 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 	}else if (f->num_params == 2){
 		if (f->return_type == TypeInt){
 			if ((f->literal_param_type[0] == TypeInt) and(f->literal_param_type[1] == TypeInt)){
-				*(int*)ret = ((int(*)(int, int))ff)(*(int*)param[0], *(int*)param[1]);
+				call2<int,int,int>(ff, ret, param);
 				return true;
 			}
 		}else if (f->return_type == TypeFloat32){
 			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32)){
-				*(float*)ret = ((float(*)(float, float))ff)(*(float*)param[0], *(float*)param[1]);
+				call2<float,float,float>(ff, ret, param);
 				return true;
 			}
 		}else if (f->return_type->uses_return_by_memory()){

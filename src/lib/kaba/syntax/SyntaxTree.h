@@ -12,7 +12,7 @@
 
 class complex;
 
-namespace Asm{
+namespace Asm {
 	struct MetaInfo;
 };
 
@@ -27,18 +27,15 @@ class Node;
 class Constant;
 class Block;
 
-#define MAX_STRING_CONST_LENGTH	2048
 
 // macros
-struct Define
-{
+struct Define {
 	string source;
 	Array<string> dest;
 };
 
 
-class Operator
-{
+class Operator {
 public:
 	int primitive_id;
 	const Class *return_type, *param_type_1, *param_type_2;
@@ -50,8 +47,7 @@ public:
 };
 
 
-struct AsmBlock
-{
+struct AsmBlock {
 	string block;
 	int line;
 };
@@ -59,8 +55,7 @@ struct AsmBlock
 
 
 // data structures (uncompiled)
-class SyntaxTree
-{
+class SyntaxTree {
 public:
 	SyntaxTree(Script *_script);
 	~SyntaxTree();
@@ -162,6 +157,10 @@ public:
 	Node *parse_statement_str(Block *block);
 	Node *parse_statement_len(Block *block);
 	Node *parse_statement_let(Block *block);
+	Node *parse_statement_map(Block *block);
+	Node *parse_statement_lambda(Block *block);
+	Node *parse_statement_sorted(Block *block);
+	Node *parse_statement_filter(Block *block);
 
 	void create_asm_meta_info();
 

@@ -797,6 +797,8 @@ Node *SyntaxTree::parse_operand(Block *block, bool prefer_class)
 		}
 
 	}
+	if (Exp.end_of_line())
+		return operands[0];
 
 	// resolve arrays, structures, calls...
 	return parse_operand_extension(operands, block);
@@ -1561,13 +1563,12 @@ Node *SyntaxTree::parse_statement_type(Block *block)
 	return c;
 }
 
-Node *SyntaxTree::parse_statement_len(Block *block)
-{
+Node *SyntaxTree::parse_statement_len(Block *block) {
 	Exp.next(); // len
 	Node *sub = parse_single_func_param(block);
 
 	// array?
-	if (sub->type->is_array()){
+	if (sub->type->is_array()) {
 		auto *c = add_constant(TypeInt);
 		c->as_int() = sub->type->array_length;
 		return add_node_const(c);
@@ -1575,7 +1576,7 @@ Node *SyntaxTree::parse_statement_len(Block *block)
 
 	// element "int num/length"?
 	for (auto &e: sub->type->elements)
-		if (e.type == TypeInt and (e.name == "length" or e.name == "num")){
+		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
 			return shift_node(sub, false, e.offset, e.type);
 		}
 
@@ -1584,16 +1585,15 @@ Node *SyntaxTree::parse_statement_len(Block *block)
 	return nullptr;
 }
 
-Node *SyntaxTree::parse_statement_str(Block *block)
-{
+Node *SyntaxTree::parse_statement_str(Block *block) {
 	Exp.next(); // str
 	Node *sub = parse_single_func_param(block);
 
 	// direct/type cast?
 	int ie = Exp.cur_exp;
-	try{
+	try {
 		return check_param_link(sub, TypeString, "", 0);
-	}catch(...){
+	} catch(...) {
 	}
 	Exp.set(ie);
 
@@ -1611,8 +1611,7 @@ Node *SyntaxTree::parse_statement_str(Block *block)
 }
 
 // local (variable) definitions...
-Node *SyntaxTree::parse_statement_let(Block *block)
-{
+Node *SyntaxTree::parse_statement_let(Block *block) {
 	Exp.next(); // "let"
 	string name = Exp.cur;
 	Exp.next();
@@ -1624,7 +1623,147 @@ Node *SyntaxTree::parse_statement_let(Block *block)
 	auto* rhs = parse_command(block);
 	auto *var = block->add_var(name, rhs->type);
 	int op_no = which_primitive_operator("=");
-	return link_operator(op_no, add_node_local_var(var), rhs);
+	auto cmd = link_operator(op_no, add_node_local_var(var), rhs);
+	if (!cmd)
+		do_error("let: no assignment operator for type " + rhs->type->long_name());
+	return cmd;
+}
+
+Node *SyntaxTree::parse_statement_map(Block *block) {
+	Exp.next(); // "map"
+	string name = Exp.cur;
+
+	auto params = parse_call_parameters(block);
+	if (params.num != 2)
+		do_error("map() expects 2 parameters");
+	if (params[0]->kind != KIND_FUNCTION_NAME)
+		do_error("map(): first parameter must be a function name");
+	if (!params[1]->type->is_super_array())
+		do_error("map(): second parameter must be a list[]");
+
+	if (params[0]->as_func()->num_params != 1)
+		do_error("map(): function must have exactly one parameter");
+	if (params[0]->as_func()->literal_param_type[0] != params[1]->type->parent)
+		do_error("map(): function parameter does not match list type");
+
+	auto links = get_existence("-map-", nullptr, nullptr, false);
+	Function *f = links[0]->as_func();
+
+	auto *c = add_constant(TypeFunctionP);
+	c->as_int64() = (int64)params[0]->as_func();
+
+	Node *cmd = add_node_call(f);
+	cmd->set_param(0, add_node_const(c));
+	cmd->set_param(1, params[1]);
+	cmd->type = make_class_super_array(params[0]->as_func()->literal_return_type);
+	return cmd;
+}
+
+Node *SyntaxTree::parse_statement_lambda(Block *block) {
+	Exp.next(); // "lambda"
+	auto *prev_func = cur_func;
+
+	Function *f = add_function("-lambda-", TypeUnknown, base_class, true);
+	f->_logical_line_no = Exp.get_line_no();
+	f->_exp_no = Exp.cur_exp;
+
+	cur_func = f;
+	next_extern = false;
+
+	Exp.next(); // '('
+
+	// parameter list
+	if (Exp.cur != ")")
+		for (int k=0;;k++) {
+			// like variable definitions
+
+			// type of parameter variable
+			const Class *param_type = parse_type(base_class); // force
+			f->block->add_var(Exp.cur, param_type);
+			f->literal_param_type.add(param_type);
+			Exp.next();
+			f->num_params ++;
+
+			if (Exp.cur == ")")
+				break;
+
+			if (Exp.cur != ",")
+				do_error("\",\" or \")\" expected after parameter");
+			Exp.next(); // ','
+		}
+	Exp.next(); // ')'
+
+	cur_func = prev_func;
+
+	auto *cmd = parse_command(f->block);
+	f->return_type = cmd->type;
+	f->literal_return_type = cmd->type;
+
+	f->update_parameters_after_parsing();
+
+	auto *ret = add_node_statement(STATEMENT_RETURN);
+	ret->set_num_params(1);
+	ret->params[0] = cmd;
+	f->block->add(ret);
+
+	base_class->add_function(this, f, false, false);
+
+	return add_node_func_name(f);
+}
+
+Node *SyntaxTree::parse_statement_sorted(Block *block) {
+	Exp.next(); // "sorted"
+	string name = Exp.cur;
+
+	auto params = parse_call_parameters(block);
+	if (params.num != 2)
+		do_error("sorted() expects 2 parameters");
+	if (!params[0]->type->is_super_array())
+		do_error("sorted(): first parameter must be a list[]");
+	if (params[1]->type != TypeString)
+		do_error("sorted(): second parameter must be a string");
+
+	auto links = get_existence("-sorted-", nullptr, nullptr, false);
+	Function *f = links[0]->as_func();
+
+	Node *cmd = add_node_call(f);
+	cmd->set_param(0, params[0]);
+	cmd->set_param(1, ref_node(new Node(KIND_CLASS, (int_p)params[0]->type, TypeClass)));
+	cmd->set_param(2, params[1]);
+	cmd->type = params[0]->type;
+	return cmd;
+}
+
+Node *SyntaxTree::parse_statement_filter(Block *block) {
+	Exp.next(); // "filter"
+	string name = Exp.cur;
+
+	auto params = parse_call_parameters(block);
+	if (params.num != 2)
+		do_error("filter() expects 2 parameters");
+	if (params[0]->kind != KIND_FUNCTION_NAME)
+		do_error("filter(): first parameter must be a function name");
+	if (!params[1]->type->is_super_array())
+		do_error("filter(): second parameter must be a list[]");
+
+	if (params[0]->as_func()->num_params != 1)
+		do_error("filter(): function must have exactly one parameter");
+	if (params[0]->as_func()->literal_param_type[0] != params[1]->type->parent)
+		do_error("filter(): function parameter does not match list type");
+	if (params[0]->as_func()->literal_return_type != TypeBool)
+		do_error("filter(): function must return bool");
+
+	auto links = get_existence("-filter-", nullptr, nullptr, false);
+	Function *f = links[0]->as_func();
+
+	auto *c = add_constant(TypeFunctionP);
+	c->as_int64() = (int64)params[0]->as_func();
+
+	Node *cmd = add_node_call(f);
+	cmd->set_param(0, add_node_const(c));
+	cmd->set_param(1, params[1]);
+	cmd->type = params[1]->type;
+	return cmd;
 }
 
 Node *SyntaxTree::parse_statement(Block *block)
@@ -1668,6 +1807,14 @@ Node *SyntaxTree::parse_statement(Block *block)
 		return parse_statement_len(block);
 	}else if (Exp.cur == IDENTIFIER_LET){
 		return parse_statement_let(block);
+	}else if (Exp.cur == IDENTIFIER_MAP){
+		return parse_statement_map(block);
+	}else if (Exp.cur == IDENTIFIER_LAMBDA){
+		return parse_statement_lambda(block);
+	}else if (Exp.cur == IDENTIFIER_SORTED){
+		return parse_statement_sorted(block);
+	}else if (Exp.cur == IDENTIFIER_FILTER){
+		return parse_statement_filter(block);
 	}
 	return nullptr;
 }

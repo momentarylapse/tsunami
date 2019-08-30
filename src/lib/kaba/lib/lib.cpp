@@ -28,7 +28,10 @@
 
 namespace Kaba{
 
-string LibVersion = "0.17.5.0";
+string LibVersion = "0.17.6.2";
+
+
+bool call_function(Function *f, void *ff, void *ret, void *inst, const Array<void*> &param);
 
 const string IDENTIFIER_CLASS = "class";
 const string IDENTIFIER_FUNC_INIT = "__init__";
@@ -74,6 +77,10 @@ const string IDENTIFIER_XOR = "xor";
 const string IDENTIFIER_NOT = "not";
 const string IDENTIFIER_IS = "is";
 const string IDENTIFIER_ASM = "asm";
+const string IDENTIFIER_MAP = "map";
+const string IDENTIFIER_LAMBDA = "lambda";
+const string IDENTIFIER_SORTED = "sorted";
+const string IDENTIFIER_FILTER = "filter";
 
 CompilerConfiguration config;
 
@@ -526,7 +533,28 @@ void _ultra_sort_p(DynamicArray &array, int offset_by)
 	}
 }
 
-void _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
+void ultra_clone(DynamicArray &r, const DynamicArray &a, const Class *type) {
+	r.init(a.element_size);
+	r.simple_resize(a.num);
+
+	// simple?
+	if (!type->needs_constructor()) { // pointer, int etc
+		memcpy(r.data, a.data, a.element_size * a.num);
+	} else {/*if (type == TypeString)
+
+		for (int i=0; i<a.num; i++) {
+			void *pa = (char*)r.data + i * a.element_size;
+			void *pr = (char*)r.data + i * a.element_size;
+			if (type == TypeString) {
+				((string*)pr)->__init__();
+				*((string*)pr) = *((string*)pa);
+			}
+		}*/
+		kaba_raise_exception(new KabaException("can't clone array of " + type->long_name()));
+	}
+}
+
+DynamicArray _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
 {
 	if (!type->is_super_array())
 		kaba_raise_exception(new KabaException("type '" + type->name + "' is not an array"));
@@ -534,49 +562,116 @@ void _cdecl ultra_sort(DynamicArray &array, const Class *type, const string &by)
 	if (array.element_size != el->size)
 		kaba_raise_exception(new KabaException("element type size mismatch..."));
 
+	DynamicArray rr;
+	ultra_clone(rr, array, el);
+
 	const Class *rel = el;
 
 	if (el->is_pointer()){
 		rel = el->parent;
 	}
 
-	ClassElement *ell = nullptr;
-	for (auto &e: rel->elements)
-		if (e.name == by)
-			ell = &e;
-	if (!ell)
-		kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
-	int offset = ell->offset;
+	int offset = -1;
+	const Class *by_type = nullptr;
+	if (by == "") {
+		offset = 0;
+		by_type = rel;
+	} else {
+		for (auto &e: rel->elements)
+			if (e.name == by) {
+				by_type = e.type;
+				offset = e.offset;
+			}
+		if (!by_type)
+			kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));
+	}
 
 
 	if (el->is_pointer()){
-		if (ell->type == TypeString)
-			_ultra_sort_p<string>(array, offset);
-		else if (ell->type == TypeInt)
-			_ultra_sort_p<int>(array, offset);
-		else if (ell->type == TypeFloat)
-			_ultra_sort_p<float>(array, offset);
-		else if (ell->type == TypeBool)
-			_ultra_sort_p<bool>(array, offset);
+		if (by_type == TypeString)
+			_ultra_sort_p<string>(rr, offset);
+		else if (by_type == TypeInt)
+			_ultra_sort_p<int>(rr, offset);
+		else if (by_type == TypeFloat)
+			_ultra_sort_p<float>(rr, offset);
+		else if (by_type == TypeBool)
+			_ultra_sort_p<bool>(rr, offset);
 		else
-			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
+			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
 	}else{
-		if (ell->type == TypeString)
-			_ultra_sort<string>(array, offset);
-		else if (ell->type == TypeInt)
-			_ultra_sort<int>(array, offset);
-		else if (ell->type == TypeFloat)
-			_ultra_sort<float>(array, offset);
-		else if (ell->type == TypeBool)
-			_ultra_sort<bool>(array, offset);
+		if (by_type == TypeString)
+			_ultra_sort<string>(rr, offset);
+		else if (by_type == TypeInt)
+			_ultra_sort<int>(rr, offset);
+		else if (by_type == TypeFloat)
+			_ultra_sort<float>(rr, offset);
+		else if (by_type == TypeBool)
+			_ultra_sort<bool>(rr, offset);
 		else
-			kaba_raise_exception(new KabaException("can't sort by '" + ell->name + " " + by + "'"));
+			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
 	}
+	return rr;
 }
 
-string _cdecl var2str(const void *var, const Class *type)
-{
+void kaba_array_add(DynamicArray &array, void *p, const Class *el) {
+	if ((el == TypeInt) or (el == TypeFloat32))
+		array.append_4_single(*(int*)p);
+	else if (el == TypeBool)
+		array.append_1_single(*(char*)p);
+	else if (el == TypeString)
+		((Array<string>*)&array)->add(*(string*)p);
+	else
+		kaba_raise_exception(new KabaException("can not add to array of type " + el->long_name() + " yet"));
+}
+
+DynamicArray _cdecl ultra_filter(Function *f, DynamicArray &array) {
+	const Class *el = f->literal_param_type[0];
+	if (array.element_size != el->size)
+		kaba_raise_exception(new KabaException("element type size mismatch..."));
+	//Function *f_init = el->get_default_constructor();
+	//Function *f_ass = el->get_assign();
+
+	DynamicArray rr;
+	rr.init(array.element_size);
+
+	for (int i=0; i<array.num; i++) {
+		bool filter_pass = false;
+		void *pa = (char*)array.data + i * array.element_size;
+		bool ok = call_function(f, f->address, &filter_pass, nullptr, {pa});
+		if (!ok)
+			kaba_raise_exception(new KabaException("can not call filter function " + f->signature()));
+		if (filter_pass)
+			kaba_array_add(rr, pa, el);
+	}
+	return rr;
+}
+
+string _cdecl var2str(const void *var, const Class *type) {
 	return type->var2str(var);
+}
+
+DynamicArray kaba_map(Function *func, DynamicArray *a) {
+	DynamicArray r;
+	auto *ti = func->literal_param_type[0];
+	auto *to = func->literal_return_type;
+	r.init(to->size);
+	if (to->needs_constructor()) {
+		if (to == TypeString) {
+			((string*)&r)->resize(a->num);
+		} else  {
+			kaba_raise_exception(new KabaException("map(): output type not allowed: " + to->long_name()));
+		}
+	} else {
+		r.simple_resize(a->num);
+	}
+	for (int i=0; i<a->num; i++) {
+		void *po = (char*)r.data + to->size * i;
+		void *pi = (char*)a->data + ti->size * i;
+		bool ok = call_function(func, func->address, po, nullptr, {pi});
+		if (!ok)
+			kaba_raise_exception(new KabaException("map(): failed to dynamically call " + func->signature()));
+	}
+	return r;
 }
 
 string _cdecl kaba_shell_execute(const string &cmd)
@@ -1386,6 +1481,10 @@ void SIAddBasicCommands() {
 	add_statement(IDENTIFIER_TRY, STATEMENT_TRY); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_EXCEPT, STATEMENT_EXCEPT); // return: ParamType will be defined by the parser!
 	add_statement(IDENTIFIER_PASS, STATEMENT_PASS);
+	add_statement(IDENTIFIER_MAP, STATEMENT_MAP);
+	add_statement(IDENTIFIER_LAMBDA, STATEMENT_LAMBDA);
+	add_statement(IDENTIFIER_SORTED, STATEMENT_SORTED);
+	add_statement(IDENTIFIER_FILTER, STATEMENT_FILTER);
 }
 
 
@@ -1625,13 +1724,19 @@ void SIAddCommands() {
 		func_add_param("cmd", TypeString);
 
 
-	add_func("sort_list", TypeVoid, (void*)&ultra_sort, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+	add_func("-sorted-", TypeDynamicArray, (void*)&ultra_sort, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("list", TypePointer);
 		func_add_param("class", TypeClassP);
 		func_add_param("by", TypeString);
+	add_func("-filter-", TypeDynamicArray, (void*)&ultra_filter, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		func_add_param("func", TypeFunctionP);
+		func_add_param("list", TypePointer);
 	add_func("-var2str-", TypeString, (void*)var2str, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
 		func_add_param("var", TypePointer);
 		func_add_param("class", TypeClassP);
+	add_func("-map-", TypeDynamicArray, (void*)kaba_map, ScriptFlag(FLAG_RAISES_EXCEPTIONS | FLAG_STATIC));
+		func_add_param("func", TypeFunctionP);
+		func_add_param("array", TypePointer);
 
 
 // add_func("ExecuteScript", TypeVoid);

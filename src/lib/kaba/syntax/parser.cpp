@@ -709,6 +709,12 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 	Node *n_for = parse_for_header(block);
 
 	Node *n_exp = parse_command(block);
+	
+	Node *n_cmp = nullptr;
+	if (Exp.cur == IDENTIFIER_IF) {
+		Exp.next(); // if
+		n_cmp = parse_command(block);
+	}
 
 
 	if (Exp.cur != "]")
@@ -718,16 +724,31 @@ Node *SyntaxTree::parse_set_builder(Block *block) {
 
 	const Class *el_type = n_exp->type;
 	const Class *type = make_class_super_array(el_type);
+	auto *var = block->add_var("set-builder", type);
+	
+	// array.add(exp)
 	auto *f_add = type->get_func("add", TypeVoid, {el_type});
 	if (!f_add)
 		do_error("...add() ???");
-
-	auto *var = block->add_var("set-builder", type);
 	auto *n_add = add_node_member_call(f_add, ref_node(add_node_local_var(var)));
 	n_add->set_param(0, n_exp);
 
-	Block *b = new Block(block->function, block);
-	b->add(n_add);
+	Block *b;
+	if (n_cmp) {
+		Block *b_if = new Block(block->function, block);
+		Block *b_add = new Block(block->function, b_if);
+		b_add->add(n_add);
+	
+		Node *n_if = add_node_statement(StatementID::IF);
+		n_if->set_param(0, n_cmp);
+		n_if->set_param(1, b_add);
+	
+		b_if->add(n_if);
+		b = b_if;
+	} else {
+		b = new Block(block->function, block);
+		b->add(n_add);
+	}
 
 	n_for->set_param(n_for->params.num - 1, b);
 

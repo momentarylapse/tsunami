@@ -123,8 +123,8 @@ Grid ? ''
 				set_string("target", t.nice_name())
 		set_int("target", 0)
 	
-		event("close", &on_close)
-		event("export", &on_export)
+		event("close", on_close)
+		event("export", on_export)
 	override void __delete__()
 
 	void on_close()

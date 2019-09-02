@@ -61,7 +61,7 @@ Grid ? ''
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		#grid.allow_bg = false
 	
-		event("close", &on_close)
+		event("close", on_close)
 
 	void on_close()
 		destroy()

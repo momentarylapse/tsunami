@@ -232,9 +232,8 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type) {
 	instance = nullptr;
 }
 
-Node::Node(const Class *c) : Node(NodeKind::CLASS, (int_p)c, TypeClass) {}
+Node::Node(const Class *c) : Node(NodeKind::CLASS, (int_p)c, TypeClassP) {}
 Node::Node(const Block *b) : Node(NodeKind::BLOCK, (int_p)b, TypeVoid) {}
-Node::Node(const Function *f) : Node(NodeKind::FUNCTION_NAME, (int_p)f, TypeFunction) {}
 Node::Node(const Constant *c) : Node(NodeKind::CONSTANT, (int_p)c, c->type) {}
 
 Node::~Node() {

@@ -88,6 +88,15 @@ Module *_CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
 }
 
+template<class T>
+class ObservableKabaWrapper : public T {
+public:
+	void _cdecl subscribe_kaba(hui::EventHandler *handler, Kaba::Function *f, const string &message) {
+		auto *ff = (hui::kaba_member_callback*)f->address;
+		T::subscribe(handler, [=] { ff(handler); }, message);
+	}
+};
+
 
 void PluginManager::link_app_script_data() {
 	Kaba::config.directory = "";
@@ -163,7 +172,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::LinkExternal("Module.config_from_string", Kaba::mf(&Module::config_from_string));
 	Kaba::DeclareClassVirtualIndex("Module", "on_config", Kaba::mf(&Module::on_config), &module);
 	Kaba::DeclareClassVirtualIndex("Module", "command", Kaba::mf(&Module::command), &module);
-	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&Module::subscribe_kaba));
+	Kaba::LinkExternal("Module.subscribe", Kaba::mf(&ObservableKabaWrapper<Module>::subscribe_kaba));
 	Kaba::LinkExternal("Module.unsubscribe", Kaba::mf(&Module::unsubscribe));
 	Kaba::LinkExternal("Module.copy", Kaba::mf(&Module::copy));
 	Kaba::LinkExternal("Module.plug_in", Kaba::mf(&Module::_plug_in));
@@ -560,7 +569,7 @@ void PluginManager::link_app_script_data() {
 	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
 	Kaba::DeclareClassOffset("AudioView", "signal_chain", _offsetof(AudioView, signal_chain));
 	Kaba::DeclareClassOffset("AudioView", "output_stream", _offsetof(AudioView, output_stream));
-	Kaba::LinkExternal("AudioView.subscribe", Kaba::mf(&AudioView::subscribe_kaba));
+	Kaba::LinkExternal("AudioView.subscribe", Kaba::mf(&ObservableKabaWrapper<AudioView>::subscribe_kaba));
 	Kaba::LinkExternal("AudioView.unsubscribe", Kaba::mf(&AudioView::unsubscribe));
 
 	Kaba::DeclareClassSize("ColorScheme", sizeof(ColorScheme));

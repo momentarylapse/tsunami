@@ -108,7 +108,7 @@ class FontPanel extends ConfigPanel
 		set_target("grid")
 		add_label("Set", 0 ,0, "")
 		add_combo_box("!expandx", 1, 0, "sets")
-		event("sets", &on_select)
+		event("sets", on_select)
 
 	override void update()
 		reset("sets")

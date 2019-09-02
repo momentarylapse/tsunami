@@ -52,7 +52,7 @@ class SamplePanel extends ConfigPanel
 	override void __init__(Module *_s)
 		sc = &c.config
 		add_list_view("!width=300\\Note\\Sample", 0, 0, "list")
-		event("list", &on_select)
+		event("list", on_select)
 
 	override void update()
 		reset("list")

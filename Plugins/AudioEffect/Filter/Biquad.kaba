@@ -122,7 +122,7 @@ Grid ? '' vertical
 		
 		let ids = ["a1", "a2", "b0", "b1", "b2"]
 		for id in ids
-			event(id, &on_change)
+			event(id, on_change)
 	
 	override void __delete__()
 		c.grid = nil

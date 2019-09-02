@@ -78,17 +78,17 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
 		popup_menu.add_sub_menu("Animation", "sub-menu-mode", sub_mode)
 	
-		event_x("area", "hui:draw", &on_draw)
-		event_x("area", "hui:right-button-down", &on_area_right_button_down)
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:right-button-down", on_area_right_button_down)
 		
-		event("blink-background", &on_blink_background)
-		event("blink-number", &on_blink_number)
-		event("mode-circle", &on_mode_circle)
-		event("mode-bounce", &on_mode_bounce)
-		event("mode-bounce-walk", &on_mode_bounce_walk)
-		#event("fullscreen", &on_fullscreen)
+		event("blink-background", on_blink_background)
+		event("blink-number", on_blink_number)
+		event("mode-circle", on_mode_circle)
+		event("mode-bounce", on_mode_bounce)
+		event("mode-bounce-walk", on_mode_bounce_walk)
+		#event("fullscreen", on_fullscreen)
 		
-		sr_id = HuiRunRepeated(UPDATE_DT, self, &on_update)
+		sr_id = HuiRunRepeated(UPDATE_DT, self, on_update)
 	
 	override void __delete__()
 		HuiCancelRunner(sr_id)

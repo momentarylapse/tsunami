@@ -459,14 +459,14 @@ class Grid extends GridData
 		data_init()
 		panel = _panel
 		id = _id
-		panel.event_ox(id, "hui:draw", self, &on_draw_all)
-		panel.event_ox(id, "hui:left-button-down", self, &on_left_button_down_all)
-		panel.event_ox(id, "hui:left-button-up", self, &on_left_button_up_all)
-		panel.event_ox(id, "hui:right-button-down", self, &on_right_button_down_all)
-		panel.event_ox(id, "hui:right-button-up", self, &on_right_button_up_all)
-		panel.event_ox(id, "hui:mouse-move", self, &on_mouse_move_all)
-		panel.event_ox(id, "hui:mouse-wheel", self, &on_mouse_wheel_all)
-		panel.event_ox(id, "hui:key-down", self, &on_key_down_all)
+		panel.event_ox(id, "hui:draw", self, on_draw_all)
+		panel.event_ox(id, "hui:left-button-down", self, on_left_button_down_all)
+		panel.event_ox(id, "hui:left-button-up", self, on_left_button_up_all)
+		panel.event_ox(id, "hui:right-button-down", self, on_right_button_down_all)
+		panel.event_ox(id, "hui:right-button-up", self, on_right_button_up_all)
+		panel.event_ox(id, "hui:mouse-move", self, on_mouse_move_all)
+		panel.event_ox(id, "hui:mouse-wheel", self, on_mouse_wheel_all)
+		panel.event_ox(id, "hui:key-down", self, on_key_down_all)
 	
 	virtual void on_draw(Painter *c)
 	virtual void on_left_button_down()

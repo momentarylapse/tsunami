@@ -6,6 +6,7 @@
  */
 
 #include "Slider.h"
+#include "../../lib/kaba/kaba.h"
 
 Slider::Slider()
 {
@@ -36,7 +37,7 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 
 
 
-Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui::kaba_member_callback *_func, float _value)
+Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value)
 {
 	panel = _panel;
 	id_slider = _id_slider;
@@ -44,7 +45,8 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = std::bind(_func, panel);
+	auto *ff = (hui::kaba_member_callback*)_func->address;
+	func = [=]{ ff(panel); };
 
 	event_handler_id[0] = panel->event(id_slider, [=]{ on_slide(); });
 	event_handler_id[1] = panel->event(id_edit, [=]{ on_edit(); });
@@ -61,7 +63,7 @@ Slider::~Slider()
 	}
 }
 
-void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui::kaba_member_callback *_func, float _value)
+void Slider::__init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, Kaba::Function *_func, float _value)
 {
 	new(this) Slider(_panel, _id_slider, _id_edit, _v_min, _v_max, _factor, _func, _value);
 }

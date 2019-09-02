@@ -76,9 +76,9 @@ Grid ? ''
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-		event("type", &on_type)
-		event("hui:close", &on_close)
-		event("close", &on_close)
+		event("type", on_type)
+		event("hui:close", on_close)
+		event("close", on_close)
 	
 		set_int("type", TYPE_LOG)
 

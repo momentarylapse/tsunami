@@ -53,13 +53,15 @@ Node *SyntaxTree::ref_node(Node *sub, const Class *override_type) {
 	const Class *t = override_type ? override_type : sub->type->get_pointer();
 
 	if (sub->kind == NodeKind::CLASS) {
+		msg_error("ref class...");
 		// Class pointer
-		auto *c = add_constant(TypeClassP, base_class);
-		c->as_int64() = (int64)(int_p)sub->as_class();
-		return add_node_const(c);
+//		auto *c = add_constant(TypeClassP, base_class);
+//		c->as_int64() = (int64)(int_p)sub->as_class();
+//		return add_node_const(c);
 	} else if (sub->kind == NodeKind::FUNCTION_NAME) {
+		msg_error("ref func...");
 		// can't be const because the function might not be compiled yet!
-		return new Node(NodeKind::FUNCTION_POINTER, sub->link_no, make_class_func(sub->as_func()));
+//		return new Node(NodeKind::FUNCTION_POINTER, sub->link_no, make_class_func(sub->as_func()));
 		// could also happen later via transform()
 	}
 
@@ -118,7 +120,11 @@ Node *SyntaxTree::add_node_call(Function *f) {
 }
 
 Node *SyntaxTree::add_node_func_name(Function *f) {
-	return new Node(NodeKind::FUNCTION_NAME, (int_p)f, TypeFunctionCode);
+	return new Node(NodeKind::FUNCTION_NAME, (int_p)f, TypeFunctionP);
+}
+
+Node *SyntaxTree::add_node_class(const Class *c) {
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassP);
 }
 
 
@@ -340,7 +346,7 @@ Node *exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e) {
 }
 
 Node *exlink_make_class_func(SyntaxTree *ps, Function *f, Function *cf) {
-	Node *link = new Node(NodeKind::FUNCTION_NAME, (int_p)cf, TypeFunctionCode);
+	Node *link = new Node(NodeKind::FUNCTION_NAME, (int_p)cf, TypeFunctionP);
 	Node *self = ps->add_node_local_var(f->__get_var(IDENTIFIER_SELF));
 	link->set_instance(self);
 	return link;
@@ -370,7 +376,7 @@ Array<Node*> SyntaxTree::get_existence_global(const string &name, const Class *n
 			// then the (real) functions
 			for (Function *f: ns->static_functions)
 				if (f->name == name and f->is_static)
-					links.add(new Node(NodeKind::FUNCTION_NAME, (int_p)f, TypeFunctionCode));
+					links.add(add_node_func_name(f));
 			if (links.num > 0 and !prefer_class)
 				return links;
 		}
@@ -776,6 +782,10 @@ Node *SyntaxTree::break_down_complicated_command(Node *c) {
 		c_address->type = el_type->get_pointer();//TypePointer;
 		// * address
 		return deref_node(c_address);
+	} else if (c->kind == NodeKind::FUNCTION_NAME) {
+		return add_node_const(add_constant_pointer(TypeFunctionP, c->as_func()));
+	} else if (c->kind == NodeKind::CLASS) {
+		return add_node_const(add_constant_pointer(TypeClassP, c->as_class()));
 	} else if (c->kind == NodeKind::ARRAY_BUILDER_FOR) {
 
 		_transform_insert_before_.add(c->params[0]);

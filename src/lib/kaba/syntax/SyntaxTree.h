@@ -192,6 +192,7 @@ public:
 	Node *add_node_statement(StatementID id);
 	Node *add_node_member_call(Function *f, Node *inst, bool force_non_virtual = false);
 	Node *add_node_func_name(Function *f);
+	Node *add_node_class(const Class *c);
 	Node *add_node_call(Function *f);
 	Node *add_node_const(Constant *c);
 	Node *add_node_operator(Node *p1, Node *p2, Operator *op);

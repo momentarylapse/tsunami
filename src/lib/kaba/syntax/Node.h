@@ -90,7 +90,6 @@ public:
 	Node(NodeKind kind, int64 link_no, const Class *type);
 	Node(const Class *c);
 	Node(const Block *b);
-	Node(const Function *f);
 	Node(const Constant *c);
 	virtual ~Node();
 	Block *as_block() const;

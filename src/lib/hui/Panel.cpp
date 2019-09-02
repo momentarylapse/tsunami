@@ -15,8 +15,7 @@ namespace hui
 // for unique window identifiers
 static int current_uid = 0;
 
-Panel::Panel()
-{
+Panel::Panel() {
 	win = nullptr;
 	parent = nullptr;
 	border_width = 5;
@@ -31,47 +30,41 @@ Panel::Panel()
 	set_target("");
 }
 
-Panel::~Panel()
-{
+Panel::~Panel() {
 	_ClearPanel_();
 }
 
-void Panel::__init__()
-{
+void Panel::__init__() {
 	new(this) Panel;
 }
 
-void Panel::__delete__()
-{
+void Panel::__delete__() {
 	this->Panel::~Panel();
 }
 
-void DBDEL(const string &type, const string &id, void *p)
-{
+void DBDEL(const string &type, const string &id, void *p) {
 	//msg_write("<del " + type + " " + id + " " + p2s(p) + ">");
 	//msg_right();
 }
 
-void DBDEL_DONE()
-{
+void DBDEL_DONE() {
 	//msg_left();
 	//msg_write("</>");
 }
 
 // might be executed repeatedly
-void Panel::_ClearPanel_()
-{
+void Panel::_ClearPanel_() {
 	DBDEL("panel", id, this);
 	event_listeners.clear();
-	if (parent){
+	if (parent) {
 		// disconnect
 		for (int i=0; i<parent->children.num; i++)
-			if (parent->children[i] == this){
+			if (parent->children[i] == this) {
 				parent->children.erase(i);
 			}
 		parent = nullptr;
 	}
-	while (children.num > 0){
+	while (children.num > 0) {
 		Panel *p = children.pop();
 		delete(p);
 	}
@@ -85,87 +78,52 @@ void Panel::_ClearPanel_()
 	DBDEL_DONE();
 }
 
-void Panel::set_border_width(int width)
-{
+void Panel::set_border_width(int width) {
 	border_width = width;
 }
 
-void Panel::set_decimals(int decimals)
-{
+void Panel::set_decimals(int decimals) {
 	num_float_decimals = decimals;
 }
 
-string Panel::_get_cur_id_()
-{
+string Panel::_get_cur_id_() {
 	return cur_id;
 }
 
-void Panel::_set_cur_id_(const string &id)
-{
+void Panel::_set_cur_id_(const string &id) {
 	if (win)
 		win->cur_id = id;
 	cur_id = id;
 }
 
-int Panel::event(const string &id, const Callback &function)
-{
+int Panel::event(const string &id, const Callback &function) {
 	return event_x(id, ":def:", function);
 }
 
-int Panel::event_x(const string &id, const string &msg, const Callback &function)
-{
+int Panel::event_x(const string &id, const string &msg, const Callback &function) {
 	int uid = current_event_listener_uid ++;
 	event_listeners.add(EventListener(uid, id, msg, function));
 	return uid;
 }
 
 // hopefully deprecated soon?
-int Panel::event_xp(const string &id, const string &msg, const CallbackP &function)
-{
+int Panel::event_xp(const string &id, const string &msg, const CallbackP &function) {
 	int uid = current_event_listener_uid ++;
 	event_listeners.add(EventListener(uid, id, msg, -1, function));
 	return uid;
 }
 
-void Panel::remove_event_handler(int event_handler_id)
-{
+void Panel::remove_event_handler(int event_handler_id) {
 	for (int i=event_listeners.num-1; i>=0; i--)
 		if (event_listeners[i].uid == event_handler_id)
 			event_listeners.erase(i);
 }
 
-void Panel::set_key_code(const string &id, int key_code, const string &image)
-{
+void Panel::set_key_code(const string &id, int key_code, const string &image) {
 	event_key_codes.add(EventKeyCode(id, "", key_code));
 }
 
-int Panel::_kaba_event(const string &id, kaba_member_callback *function)
-{
-	return event(id, std::bind(function, this));
-}
-
-int Panel::_kaba_event_o(const string &id, EventHandler* handler, kaba_member_callback *function)
-{
-	return event(id, std::bind(function, handler));
-}
-
-int Panel::_kaba_event_x(const string &id, const string &msg, kaba_member_callback *function)
-{
-	return _kaba_event_ox(id, msg, this, function);
-}
-
-int Panel::_kaba_event_ox(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function)
-{
-	if (msg == "hui:draw"){
-		kaba_member_callback_p *f = (kaba_member_callback_p*)function;
-		return event_xp(id, msg, std::bind(f, handler, std::placeholders::_1));
-	}else{
-		return event_x(id, msg, std::bind(function, handler));
-	}
-}
-
-bool Panel::_send_event_(Event *e, bool force_if_not_allowed)
-{
+bool Panel::_send_event_(Event *e, bool force_if_not_allowed) {
 	if (!win)
 		return false;
 	if (!win->allow_input and !force_if_not_allowed)
@@ -197,20 +155,20 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed)
 
 	bool sent = false;
 
-	for (auto &ee: event_listeners){
+	for (auto &ee: event_listeners) {
 		if (!e->match(ee.id, ee.message))
 			continue;
 
 		// send the event
 
-		if (e->message == "hui:draw"){
-			if (ee.function_p){
+		if (e->message == "hui:draw") {
+			if (ee.function_p) {
 				Painter p(this, e->id);
 				ee.function_p(&p);
 				sent = true;
 			}
-		}else{
-			if (ee.function){
+		} else {
+			if (ee.function) {
 				ee.function();
 				sent = true;
 			}
@@ -230,13 +188,11 @@ bool Panel::_send_event_(Event *e, bool force_if_not_allowed)
 	return sent;
 }
 
-int Panel::_get_unique_id_()
-{
+int Panel::_get_unique_id_() {
 	return unique_id;
 }
 
-void Panel::show()
-{
+void Panel::show() {
 	if (this == win)
 		win->show();
 	else if (root_control)
@@ -244,8 +200,7 @@ void Panel::show()
 	on_show();
 }
 
-void Panel::hide()
-{
+void Panel::hide() {
 	if (this == win)
 		win->hide();
 	else if (root_control)
@@ -257,8 +212,7 @@ void Panel::hide()
 // easy window creation functions
 
 
-void Panel::add_control(const string &type, const string &title, int x, int y, const string &id)
-{
+void Panel::add_control(const string &type, const string &title, int x, int y, const string &id) {
 	//printf("HuiPanelAddControl %s  %s  %d  %d  %s\n", type.c_str(), title.c_str(), x, y, id.c_str());
 	if (type == "Button")
 		add_button(title, x, y, id);
@@ -318,8 +272,7 @@ void Panel::add_control(const string &type, const string &title, int x, int y, c
 		msg_error("unknown hui control: " + type);
 }
 
-void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_id)
-{
+void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_id) {
 	//msg_write(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 	set_target(parent_id);
 	add_control(cmd.type, GetLanguageR(ns, cmd),
@@ -345,15 +298,13 @@ void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_i
 		_add_control(ns, c, cmd.id);
 }
 
-void Panel::from_resource(const string &id)
-{
+void Panel::from_resource(const string &id) {
 	Resource *res = GetResource(id);
 	if (res)
 		set_from_resource(res);
 }
 
-void Panel::set_from_resource(Resource *res)
-{
+void Panel::set_from_resource(Resource *res) {
 	if (!res)
 		return;
 
@@ -361,7 +312,7 @@ void Panel::set_from_resource(Resource *res)
 	bool panel_is_window = win and !parent;
 
 	// directly change window?
-	if (panel_is_window and res_is_window){
+	if (panel_is_window and res_is_window) {
 		// title
 		win->set_title(GetLanguage(id, res->id));
 
@@ -388,28 +339,25 @@ void Panel::set_from_resource(Resource *res)
 
 
 	// controls
-	if (res_is_window){
+	if (res_is_window) {
 		for (Resource &cmd: res->children)
 			_add_control(id, cmd, "");
-	}else{
+	} else {
 		embed_resource(*res, "", 0, 0);
 	}
 }
 
-void Panel::from_source(const string &buffer)
-{
+void Panel::from_source(const string &buffer) {
 	Resource res = ParseResource(buffer);
 	set_from_resource(&res);
 }
 
 
-void Panel::embed_resource(Resource &c, const string &parent_id, int x, int y)
-{
+void Panel::embed_resource(Resource &c, const string &parent_id, int x, int y) {
 	_embed_resource(c.id, c, parent_id, x, y);
 }
 
-void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_id, int x, int y)
-{
+void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_id, int x, int y) {
 	//_addControl(main_id, c, parent_id);
 
 	set_target(parent_id);
@@ -432,17 +380,15 @@ void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_
 		_embed_resource(ns, child, c.id, child.x, child.y);
 }
 
-void Panel::embed_source(const string &buffer, const string &parent_id, int x, int y)
-{
+void Panel::embed_source(const string &buffer, const string &parent_id, int x, int y) {
 	Resource res = ParseResource(buffer);
 	embed_resource(res, parent_id, x, y);
 }
 
-void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
-{
+void Panel::embed(Panel *panel, const string &parent_id, int x, int y) {
 	if (!panel)
 		return;
-	if (!panel->root_control){
+	if (!panel->root_control) {
 		msg_error("trying to embed an empty panel");
 		return;
 	}
@@ -459,8 +405,7 @@ void Panel::embed(Panel *panel, const string &parent_id, int x, int y)
 	panel->root_control->panel = orig;//panel;
 }
 
-void Panel::set_win(Window *_win)
-{
+void Panel::set_win(Window *_win) {
 	win = _win;
 	for (Panel *p: children)
 		p->set_win(win);
@@ -472,13 +417,11 @@ void Panel::set_win(Window *_win)
 
 
 // used for automatic type casting...
-bool panel_equal(Panel *a, Panel *b)
-{
+bool panel_equal(Panel *a, Panel *b) {
 	return a == b;
 }
 
-void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
-{
+void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f) {
 	string id = _id;
 	if (id == "")
 		id = cur_id;
@@ -486,7 +429,7 @@ void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
 		root_control->apply_foreach(id, f);
 
 	// FIXME: might be a derived class by kaba....
-	if (panel_equal(win, this)){
+	if (panel_equal(win, this)) {
 		if (win->get_menu())
 			win->get_menu()->apply_foreach(id, f);
 		/*if (win->popup)
@@ -499,93 +442,80 @@ void Panel::apply_foreach(const string &_id, std::function<void(Control*)> f)
 
 // replace all the text
 //    for all
-void Panel::set_string(const string &_id, const string &str)
-{
+void Panel::set_string(const string &_id, const string &str) {
 	if (win and (id == _id))
 		win->set_title(str);
-	apply_foreach(_id, [=](Control *c){ c->set_string(str); });
+	apply_foreach(_id, [=](Control *c) { c->set_string(str); });
 }
 
 // replace all the text with a numerical value (int)
 //    for all
 // select an item
 //    for ComboBox, TabControl, ListView?
-void Panel::set_int(const string &_id, int n)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_int(n); });
+void Panel::set_int(const string &_id, int n) {
+	apply_foreach(_id, [=](Control *c) { c->set_int(n); });
 }
 
 // replace all the text with a float
 //    for all
-void Panel::set_float(const string &_id, float f)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_float(f); });
+void Panel::set_float(const string &_id, float f) {
+	apply_foreach(_id, [=](Control *c) { c->set_float(f); });
 }
 
-void Panel::set_image(const string &_id, const string &image)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_image(image); });
+void Panel::set_image(const string &_id, const string &image) {
+	apply_foreach(_id, [=](Control *c) { c->set_image(image); });
 }
 
-void Panel::set_tooltip(const string &_id, const string &tip)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_tooltip(tip); });
+void Panel::set_tooltip(const string &_id, const string &tip) {
+	apply_foreach(_id, [=](Control *c) { c->set_tooltip(tip); });
 }
 
 
 // add a single line/string
 //    for ComboBox, ListView, ListViewTree, ListViewIcons
-void Panel::add_string(const string &_id, const string &str)
-{
-	apply_foreach(_id, [=](Control *c){ c->add_string(str); });
+void Panel::add_string(const string &_id, const string &str) {
+	apply_foreach(_id, [=](Control *c) { c->add_string(str); });
 }
 
 // add a single line as a child in the tree of a ListViewTree
 //    for ListViewTree
-void Panel::add_child_string(const string &_id, int parent_row, const string &str)
-{
-	apply_foreach(_id, [=](Control *c){ c->add_child_string(parent_row, str); });
+void Panel::add_child_string(const string &_id, int parent_row, const string &str) {
+	apply_foreach(_id, [=](Control *c) { c->add_child_string(parent_row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
-void Panel::change_string(const string &_id, int row, const string &str)
-{
-	apply_foreach(_id, [=](Control *c){ c->change_string(row, str); });
+void Panel::change_string(const string &_id, int row, const string &str) {
+	apply_foreach(_id, [=](Control *c) { c->change_string(row, str); });
 }
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
-void Panel::remove_string(const string &_id, int row)
-{
-	apply_foreach(_id, [=](Control *c){ c->remove_string(row); });
+void Panel::remove_string(const string &_id, int row) {
+	apply_foreach(_id, [=](Control *c) { c->remove_string(row); });
 }
 
 // listview / treeview
-string Panel::get_cell(const string &_id, int row, int column)
-{
+string Panel::get_cell(const string &_id, int row, int column) {
 	string r = "";
-	apply_foreach(_id, [&](Control *c){ r = c->get_cell(row, column); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_cell(row, column); });
 	return r;
 }
 
 // listview / treeview
-void Panel::set_cell(const string &_id, int row, int column, const string &str)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_cell(row, column, str); });
+void Panel::set_cell(const string &_id, int row, int column, const string &str) {
+	apply_foreach(_id, [=](Control *c) { c->set_cell(row, column, str); });
 }
 
-void Panel::set_color(const string &_id, const color &col)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_color(col); });
+void Panel::set_color(const string &_id, const color &col) {
+	apply_foreach(_id, [=](Control *c) { c->set_color(col); });
 }
 
 // retrieve the text
 //    for edit
-string Panel::get_string(const string &_id)
-{
+string Panel::get_string(const string &_id) {
 	string r = "";
-	apply_foreach(_id, [&](Control *c){ r = c->get_string(); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_string(); });
 	return r;
 }
 
@@ -593,125 +523,108 @@ string Panel::get_string(const string &_id)
 //    for edit
 // which item/line is selected?
 //    for ComboBox, TabControl, ListView
-int Panel::get_int(const string &_id)
-{
+int Panel::get_int(const string &_id) {
 	int r = 0;
-	apply_foreach(_id, [&](Control *c){ r = c->get_int(); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_int(); });
 	return r;
 }
 
 // retrieve the text as a numerical value (float)
 //    for edit
-float Panel::get_float(const string &_id)
-{
+float Panel::get_float(const string &_id) {
 	float r = 0;
-	apply_foreach(_id, [&](Control *c){ r = c->get_float(); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_float(); });
 	return r;
 }
 
-color Panel::get_color(const string &_id)
-{
+color Panel::get_color(const string &_id) {
 	color r = Black;
-	apply_foreach(_id, [&](Control *c){ r = c->get_color(); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_color(); });
 	return r;
 }
 
 // switch control to usable/unusable
 //    for all
-void Panel::enable(const string &_id,bool enabled)
-{
-	apply_foreach(_id, [=](Control *c){ c->enable(enabled); });
+void Panel::enable(const string &_id,bool enabled) {
+	apply_foreach(_id, [=](Control *c) { c->enable(enabled); });
 }
 
 // show/hide control
 //    for all
-void Panel::hide_control(const string &_id,bool hide)
-{
-	apply_foreach(_id, [=](Control *c){ c->hide(hide); });
+void Panel::hide_control(const string &_id,bool hide) {
+	apply_foreach(_id, [=](Control *c) { c->hide(hide); });
 }
 
 // mark as "checked"
 //    for CheckBox, ToolBarItemCheckable
-void Panel::check(const string &_id,bool checked)
-{
-	apply_foreach(_id, [=](Control *c){ c->check(checked); });
+void Panel::check(const string &_id,bool checked) {
+	apply_foreach(_id, [=](Control *c) { c->check(checked); });
 }
 
 // is marked as "checked"?
 //    for CheckBox
-bool Panel::is_checked(const string &_id)
-{
+bool Panel::is_checked(const string &_id) {
 	bool r = false;
-	apply_foreach(_id, [&](Control *c){ r = c->is_checked(); });
+	apply_foreach(_id, [&](Control *c) { r = c->is_checked(); });
 	return r;
 }
 
 // which lines are selected?
 //    for ListView
-Array<int> Panel::get_selection(const string &_id)
-{
+Array<int> Panel::get_selection(const string &_id) {
 	Array<int> r;
-	apply_foreach(_id, [&](Control *c){ r = c->get_selection(); });
+	apply_foreach(_id, [&](Control *c) { r = c->get_selection(); });
 	return r;
 }
 
-void Panel::set_selection(const string &_id, const Array<int> &sel)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_selection(sel); });
+void Panel::set_selection(const string &_id, const Array<int> &sel) {
+	apply_foreach(_id, [=](Control *c) { c->set_selection(sel); });
 }
 
 // delete all the content
 //    for ComboBox, ListView
-void Panel::reset(const string &_id)
-{
-	apply_foreach(_id, [=](Control *c){ c->reset(); });
+void Panel::reset(const string &_id) {
+	apply_foreach(_id, [=](Control *c) { c->reset(); });
 }
 
 // expand a single row
 //    for TreeView
-void Panel::expand(const string &_id, int row, bool expand)
-{
-	apply_foreach(_id, [=](Control *c){ c->expand(row, expand); });
+void Panel::expand(const string &_id, int row, bool expand) {
+	apply_foreach(_id, [=](Control *c) { c->expand(row, expand); });
 }
 
 // expand all rows
 //    for TreeView
-void Panel::expand_all(const string &_id, bool expand)
-{
-	apply_foreach(_id, [=](Control *c){ c->expand_all(expand); });
+void Panel::expand_all(const string &_id, bool expand) {
+	apply_foreach(_id, [=](Control *c) { c->expand_all(expand); });
 }
 
 // is column in tree expanded?
 //    for TreeView
-bool Panel::is_expanded(const string &_id, int row)
-{
+bool Panel::is_expanded(const string &_id, int row) {
 	bool r = false;
-//	apply_foreach(_id, [&](Control *c){ r = c->isExpanded(); });
+//	apply_foreach(_id, [&](Control *c) { r = c->isExpanded(); });
 	return r;
 }
 
 //    for Revealer
-void Panel::reveal(const string &_id, bool reveal)
-{
-	apply_foreach(_id, [=](Control *c){ c->reveal(reveal); });
+void Panel::reveal(const string &_id, bool reveal) {
+	apply_foreach(_id, [=](Control *c) { c->reveal(reveal); });
 }
 
 //    for Revealer
-bool Panel::is_revealed(const string &_id)
-{
+bool Panel::is_revealed(const string &_id) {
 	bool r = false;
-	apply_foreach(_id, [&](Control *c){ r = c->is_revealed(); });
+	apply_foreach(_id, [&](Control *c) { r = c->is_revealed(); });
 	return r;
 }
 
-void Panel::delete_control(const string &_id)
-{
-	apply_foreach(_id, [=](Control *c){ delete c; });
+void Panel::delete_control(const string &_id) {
+	apply_foreach(_id, [=](Control *c) { delete c; });
 }
 
-void Panel::set_options(const string &_id, const string &options)
-{
-	apply_foreach(_id, [=](Control *c){ c->set_options(options); });
+void Panel::set_options(const string &_id, const string &options) {
+	apply_foreach(_id, [=](Control *c) { c->set_options(options); });
 }
 
 };

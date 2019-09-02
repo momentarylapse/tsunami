@@ -172,8 +172,8 @@ class CompressorPanel extends ConfigPanel
 		grid.config = &c.config
 		grid.cp = self
 		
-		event("attack", &on_edit)
-		event("release", &on_edit)
+		event("attack", on_edit)
+		event("release", on_edit)
 	
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_DB, 0, false, "dB")

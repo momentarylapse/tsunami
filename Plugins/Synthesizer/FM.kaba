@@ -78,7 +78,7 @@ class FMPanel extends ConfigPanel
 	
 	void add_top(string label, string id)
 		menu_top.add(label, "top-" + id)
-		event("top-" + id, &on_topology)
+		event("top-" + id, on_topology)
 	
 	override FMSynthesizer *c
 	override void __init__(Module *_s)
@@ -95,13 +95,13 @@ Grid ? ''
 		Label ? 'Amplitude'
 		SpinButton amplitude '' range=0:100:0.001")
 		
-		event_x("area", "hui:draw", &on_draw)
-		event_x("area", "hui:left-button-down", &on_left_button_down)
-		event_x("area", "hui:left-button-up", &on_left_button_up)
-		event_x("area", "hui:right-button-down", &on_right_button_down)
-		event_x("area", "hui:mouse-move", &on_mouse_move)
-		event("factor", &on_spin_button)
-		event("amplitude", &on_spin_button)
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", on_left_button_down)
+		event_x("area", "hui:left-button-up", on_left_button_up)
+		event_x("area", "hui:right-button-down", on_right_button_down)
+		event_x("area", "hui:mouse-move", on_mouse_move)
+		event("factor", on_spin_button)
+		event("amplitude", on_spin_button)
 		chosen = 0
 		hover = -1
 		
@@ -127,9 +127,9 @@ Grid ? ''
 		menu_osci.add("sine", "type-sine")
 		menu_osci.add("square", "type-square")
 		menu_osci.add("saw", "type-saw")
-		event("type-sine", &on_type_sine)
-		event("type-square", &on_type_square)
-		event("type-saw", &on_type_saw)
+		event("type-sine", on_type_sine)
+		event("type-square", on_type_square)
+		event("type-saw", on_type_saw)
 	
 	void update_osci_pos()
 		# initial

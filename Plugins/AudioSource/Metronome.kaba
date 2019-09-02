@@ -71,9 +71,9 @@ class MetronomePanel extends ConfigPanel
 		add_spin_button("!range=0:100:0.1\\", 1, 2, "volume")
 		add_label("%", 2, 2, "")
 	
-		event("beats_per_minute", &on_bpm)
-		event("beats_per_measure", &on_beats)
-		event("volume", &on_volume)
+		event("beats_per_minute", on_bpm)
+		event("beats_per_measure", on_beats)
+		event("volume", on_volume)
 	
 		update()
 

@@ -81,7 +81,7 @@ class Equalizer15Panel extends ConfigPanel
 		add_label("7k5", 12, 1, "")
 		add_label("20k", 14, 1, "")
 	
-		event("*", &on_event)
+		event("*", on_event)
 	
 		update()
 

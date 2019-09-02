@@ -26,8 +26,7 @@ class EventKeyCode;
 class Control;
 class ControlRadioButton;
 
-class Panel : public EventHandler
-{
+class Panel : public EventHandler {
 	friend class Control;
 	friend class ControlRadioButton;
 	friend class Menu;
@@ -59,12 +58,6 @@ public:
 	void _cdecl remove_event_handler(int event_handler_id);
 	void _cdecl set_key_code(const string &id, int key_code, const string &image = "");
 	bool _send_event_(Event *e, bool force_if_not_allowed = false);
-
-	// kaba wrappers
-	int _cdecl _kaba_event(const string &id, kaba_member_callback *function);
-	int _cdecl _kaba_event_o(const string &id, EventHandler* handler, kaba_member_callback *function);
-	int _cdecl _kaba_event_x(const string &id, const string &msg, kaba_member_callback *function);
-	int _cdecl _kaba_event_ox(const string &id, const string &msg, EventHandler* handler, kaba_member_callback *function);
 
 	// creating controls
 

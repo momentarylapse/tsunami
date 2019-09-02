@@ -9,7 +9,7 @@ class MLPPanel extends ConfigPanel
 		session = _session
 		from_source("Grid grid ''
 	Button select-synth 'select synthesizer...' expandx image=hui:open")
-		event("select-synth", &on_select_synth)
+		event("select-synth", on_select_synth)
 		
 		synth_panel = nil
 		

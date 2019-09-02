@@ -161,7 +161,7 @@ Array<Node*> SyntaxTree::parse_operand_extension_element(Node *operand) {
 	for (auto *c: type->classes)
 		if (Exp.cur == c->name) {
 			Exp.next();
-			return {new Node(NodeKind::CLASS, (int_p)c, TypeClass)};
+			return {new Node(NodeKind::CLASS, (int_p)c, TypeClassP)};
 		}
 
 
@@ -1692,7 +1692,7 @@ Node *SyntaxTree::parse_statement_sorted(Block *block) {
 
 	Node *cmd = add_node_call(f);
 	cmd->set_param(0, params[0]);
-	cmd->set_param(1, ref_node(new Node(NodeKind::CLASS, (int_p)params[0]->type, TypeClass)));
+	cmd->set_param(1, add_node_class(params[0]->type));
 	cmd->set_param(2, params[1]);
 	cmd->type = params[0]->type;
 	return cmd;
@@ -1725,7 +1725,7 @@ Node *SyntaxTree::parse_statement_filter(Block *block) {
 	Node *cmd = add_node_call(f);
 	cmd->set_param(0, add_node_const(c));
 	cmd->set_param(1, params[1]);
-	cmd->set_param(2, ref_node(new Node(NodeKind::CLASS, (int_p)params[1]->type, TypeClass)));
+	cmd->set_param(2, add_node_class(params[1]->type));
 	cmd->type = params[1]->type;
 	return cmd;
 }

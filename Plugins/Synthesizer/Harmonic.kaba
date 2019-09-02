@@ -64,7 +64,7 @@ class HarmonicPanel extends ConfigPanel
 		add_label("Release", 0, 0, "")
 		add_spin_button("!range=0:500:0.1\\0", 1, 0, "release")
 		add_label("ms", 2, 0, "")
-		event("release", &on_change)
+		event("release", on_change)
 		hc = &c.config
 		
 		grid.hc = hc

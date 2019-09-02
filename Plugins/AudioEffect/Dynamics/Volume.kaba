@@ -49,9 +49,9 @@ class VolumePanel extends ConfigPanel
 		add_spin_button("\\0\\1000\\0.1", 1, 0, "volume")
 		add_label("%", 2, 0, "")
 		
-		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.volume)
+		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, on_volume, c.config.volume)
 	
-		event("max", &onMax)
+		event("max", on_max)
 	
 	override void __delete__()
 		delete(slider)
@@ -62,13 +62,13 @@ class VolumePanel extends ConfigPanel
 		enable("volume", !c.config.maximize)
 		enable("volume_slider", !c.config.maximize)
 
-	void onMax()
+	void on_max()
 		c.config.maximize = is_checked("max")
 		enable("volume", !c.config.maximize)
 		enable("volume_slider", !c.config.maximize)
 		changed()
 
-	void onVolume()
+	void on_volume()
 		c.config.volume = slider.get()
 		changed()
 

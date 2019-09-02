@@ -14,7 +14,7 @@ DrawingArea area '' height=200 expandy")
 		
 		c.panel = self
 	
-		event_x("area", "hui:draw", &on_draw)
+		event_x("area", "hui:draw", on_draw)
 	
 	override void __delete__()
 		c.panel = nil

@@ -1365,8 +1365,8 @@ void SIAddPackageKaba() {
 	TypeFunction		= add_type  ("Function", sizeof(Function));
 	TypeFunctionP		= add_type_p("Function*", TypeFunction);
 	auto *TypeFunctionPList = add_type_a("Function*[]", TypeFunctionP, -1);
-	TypeFunctionCode	= add_type  ("func", 32); // whatever
-	TypeFunctionCodeP	= add_type_p("func*", TypeFunctionCode);
+	TypeFunctionCode	= add_type  ("code", 32); // whatever
+	TypeFunctionCodeP	= add_type_p("code*", TypeFunctionCode);
 	auto *TypeStatement = add_type  ("Statement", sizeof(Statement));
 	auto *TypeStatementP= add_type_p("Statement*", TypeStatement);
 	auto *TypeStatementPList = add_type_a("Statement*[]", TypeStatementP, -1);
